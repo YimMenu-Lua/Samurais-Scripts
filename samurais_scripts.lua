@@ -2983,14 +2983,19 @@ local function displayHijackAnims()
 end
 
 world_tab:add_imgui(function()
-  pedGrabber, pgUsed = ImGui.Checkbox(translateLabel("pedGrabber"), pedGrabber, true)
-  UI.helpMarker(false, translateLabel("pedGrabber_tt"))
-  if pgUsed then
-    UI.widgetSound("Nav2")
-  end
-
-  if pedGrabber and pgUsed then
-    vehicleGrabber = false
+  if ped_grabbed or vehicle_grabbed then
+    ImGui.BeginDisabled()
+    pedGrabber, pgUsed = ImGui.Checkbox(translateLabel("pedGrabber"), pedGrabber, true)
+    ImGui.EndDisabled()
+  else
+    pedGrabber, pgUsed = ImGui.Checkbox(translateLabel("pedGrabber"), pedGrabber, true)
+    UI.helpMarker(false, translateLabel("pedGrabber_tt"))
+    if pgUsed then
+      UI.widgetSound("Nav2")
+      if pedGrabber then
+        vehicleGrabber = false
+      end
+    end
   end
 
   if pedGrabber then
@@ -3003,13 +3008,19 @@ world_tab:add_imgui(function()
     end
   end
 
-  vehicleGrabber, vgUsed = ImGui.Checkbox("Vehicle Grabber", vehicleGrabber, true)
-  UI.helpMarker(false, "Same as 'Ped Grabber' but with vehicles.")
-  if vgUsed then
-    UI.widgetSound("Nav2")
-  end
-  if vehicleGrabber and vgUsed then
-    pedGrabber = false
+  if ped_grabbed or vehicle_grabbed then
+    ImGui.BeginDisabled()
+    vehicleGrabber, vgUsed = ImGui.Checkbox("Vehicle Grabber", vehicleGrabber, true)
+    ImGui.EndDisabled()
+  else
+    vehicleGrabber, vgUsed = ImGui.Checkbox("Vehicle Grabber", vehicleGrabber, true)
+    UI.helpMarker(false, "Same as 'Ped Grabber' but with vehicles.")
+    if vgUsed then
+      UI.widgetSound("Nav2")
+      if vehicleGrabber then
+        pedGrabber = false
+      end
+    end
   end
 
   if vehicleGrabber then
