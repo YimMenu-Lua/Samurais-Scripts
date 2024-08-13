@@ -4387,6 +4387,7 @@ local lang_T       = {
   -- { name = 'Chinese (Simplified)',  iso = 'zh-CH' },
   -- { name = 'Español',               iso = 'es-ES' },
   { name = 'Português (Brasil)',    iso = 'pt-BR' },
+  { name = 'Русский (Russian)',    iso = 'ru-RU' },
 }
 
 function displayLangs()
