@@ -3150,7 +3150,7 @@ casino_pacino:add_imgui(function()
           end)
         end
       elseif casino_heist_gunman == 2 then --Gustavo Fring
-        ImGui.SameLine()
+        ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
         local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons, { "Rifle Loadout", "Shotgun Loadout" }, 2)
         if weapons_clicked then
           script.run_in_fiber(function()
@@ -3158,7 +3158,7 @@ casino_pacino:add_imgui(function()
           end)
         end
       elseif casino_heist_gunman == 3 then --Charlie Reed
-        ImGui.SameLine()
+        ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
         local charlie_gun_list = { {'##1", "##2'}, { "SMG Loadout", "Shotgun Loadout" }, { "Machine Pistol Loadout", "Shotgun Loadout" }, { "SMG Loadout", "Shotgun Loadout" } }
         local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons, charlie_gun_list[casino_heist_approach+1], 2)
         if weapons_clicked then
@@ -3167,7 +3167,7 @@ casino_pacino:add_imgui(function()
           end)
         end
       elseif casino_heist_gunman == 4 then --Chester McCoy
-        ImGui.SameLine()
+        ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
         local chester_gun_list = { {'##1", "##2'}, { "MK II Shotgun Loadout", "MK II Rifle Loadout" }, { "MK II SMG Loadout", "MK II Rifle Loadout" }, { "MK II Shotgun Loadout", "MK II Rifle Loadout" } }
         local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons, chester_gun_list[casino_heist_approach+1], 2)
         if weapons_clicked then
@@ -3176,7 +3176,7 @@ casino_pacino:add_imgui(function()
           end)
         end
       elseif casino_heist_gunman == 5 then --Laddie Paddie Sadie Enweird
-        ImGui.SameLine()
+        ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
         local laddie_paddie_gun_list = { {'##1", "##2'}, { "Combat PDW Loadout", "Rifle Loadout" }, { "Shotgun Loadout", "Rifle Loadout" }, { "Shotgun Loadout", "Combat MG Loadout" } }
         local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons, laddie_paddie_gun_list[casino_heist_approach+1], 2)
         if weapons_clicked then
