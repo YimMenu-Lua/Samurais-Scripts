@@ -1447,6 +1447,7 @@ Labels = {
         {iso = "fr-FR", text = "Jeux De Casino"},
         {iso = "it-IT", text = "Giochi Di Casinò"},
         {iso = "pt-BR", text = "Jogos De Cassino"},
+        {iso = "ru-RU", text = "Игры Казино"},
     },
 
     ["bypassCasinoCooldownCB"] = {
@@ -1455,6 +1456,7 @@ Labels = {
         {iso = "fr-FR", text = "Désactiver Le Temps De Recharge"},
         {iso = "it-IT", text = "Disattivare Il Tempo Di Ricarica"},
         {iso = "pt-BR", text = "Desabilitar O Tempo De Recarga"},
+        {iso = "ru-RU", text = "Обход кулдауна Казино"},
     },
 
     ["casinoCDwarn"] = {
@@ -1463,6 +1465,7 @@ Labels = {
         {iso = "fr-FR", text = "ATTENTION!\10\10Si vous gagnez trop et trop vite, vous risquez d'être banni. Activez cette option à vos risques et périls."},
         {iso = "it-IT", text = "ATTENZIONE!\10\10Vincere troppo e troppo in fretta potrebbe farvi bannare. Quindi attivatevi a vostro rischio e pericolo."},
         {iso = "pt-BR", text = "ATENÇÃO!\10\10Ganhar muito rapidamente pode fazer com que você seja banido. Ative isso por sua própria conta e risco."},
+        {iso = "ru-RU", text = "ВНИМАНИЕ!\10\10Обильные и частые выигрыши могут привести к бану. Включайте на свой страх и риск."},
     },
 
     ["casinoCDstatus"] = {
@@ -1471,6 +1474,7 @@ Labels = {
         {iso = "fr-FR", text = "Statut Du Temps De Recharge Du Casino:"},
         {iso = "it-IT", text = "Stato Di Tempo Di Ricarica Del Casinò:"},
         {iso = "pt-BR", text = "Status De Resfriamento Do Cassino:"},
+        {iso = "ru-RU", text = "Статус кулдауна Казино:"},
     },
 
     ["forcePokerCardsCB"] = {
@@ -1479,6 +1483,7 @@ Labels = {
         {iso = "fr-FR", text = "Forcer Tous Les Joueurs à Obtenir Une Quinte Royale"},
         {iso = "it-IT", text = "Forzare Tutte Le Mani Dei Giocatori Alla Scala Reale"},
         {iso = "pt-BR", text = "Forçar Todas As Mãos Dos Jogadores A Um Royal Flush"},
+        {iso = "ru-RU", text = "Принудительно собрать Флеш Рояль для всех игроков"},
     },
 
     ["setDealersCardsCB"] = {
@@ -1487,6 +1492,7 @@ Labels = {
         {iso = "fr-FR", text = "Forcer La Main Du Croupier à Un 'Bad Beat'"},
         {iso = "it-IT", text = "Forzare La Mano Del Mazziere A 'Bad Beat'"},
         {iso = "pt-BR", text = "Forçar A Mão Do Crupiê A Uma 'Bad Beat'"},
+        {iso = "ru-RU", text = "Принудить дилера к «Бэд-Биту»"},
     },
 
     ["faceDownCard"] = {
@@ -1495,6 +1501,7 @@ Labels = {
         {iso = "fr-FR", text = "Carte cachée du croupier : "},
         {iso = "it-IT", text = "Carta scoperta del mazziere: "},
         {iso = "pt-BR", text = "Carta virada para baixo do crupiê: "},
+        {iso = "ru-RU", text = "Скрытые карты дилера: "},
     },
 
     ["dealerBustBtn"] = {
@@ -1503,6 +1510,7 @@ Labels = {
         {iso = "fr-FR", text = "Forcer La Main Du Croupier A Echouer"},
         {iso = "it-IT", text = "Forzare La Mano Del Mazziere A Fallire"},
         {iso = "pt-BR", text = "Forçar A Mão Do Crupiê A Falhar"},
+        {iso = "ru-RU", text = "Принудить дилера к перебору"},
     },
 
     ["forceRouletteCB"] = {
@@ -1511,14 +1519,16 @@ Labels = {
         {iso = "fr-FR", text = "Forcer La Balle à Atterrir Sur Rouge 18"},
         {iso = "it-IT", text = "Forzare La Palla Ad Atterrare Sul Rosso 18"},
         {iso = "pt-BR", text = "Forçar A Bola A Aterrissar No Vermelho 18"},
+        {iso = "ru-RU", text = "Принудить шар выпасть на 18 Красный"},
     },
 
     ["rigSlotsCB"] = {
         {iso = "en-US", text = "Rig Slot Machines"},
         {iso = "de-DE", text = "Spielautomaten Manipulieren"},
         {iso = "fr-FR", text = "Truquer Les Machines A Sous"},
-        {iso = "it-IT", text = "Fingere Le Slot Machine"}, -- Huh? We're fingering the slot machines? Someone help with these translations PLEASE 😭
+        {iso = "it-IT", text = "Truccare Macchina da gioco"},
         {iso = "pt-BR", text = "Falsificação Máquinas Caça-Níquei"},
+        {iso = "ru-RU", text = "Подтасовать Слоты"},
     },
 
     ["autoplaySlotsCB"] = {
@@ -1527,6 +1537,7 @@ Labels = {
         {iso = "fr-FR", text = "Autoplay"},
         {iso = "it-IT", text = "Autoplay"},
         {iso = "pt-BR", text = "Autoplay"},
+        {iso = "ru-RU", text = "Авто-Игра"},
     },
 
     ["autoplayCapCB"] = {
@@ -1535,6 +1546,7 @@ Labels = {
         {iso = "fr-FR", text = "Max Jetons"},
         {iso = "it-IT", text = "Massimo Di Gettoni"},
         {iso = "pt-BR", text = "Fichas Máximas"},
+        {iso = "ru-RU", text = "Лимит Авто-Игры"},
     },
 
     ["podiumVeh_Btn"] = {
@@ -1543,6 +1555,7 @@ Labels = {
         {iso = "fr-FR", text = "Donner Le Véhicule Du Podium"},
         {iso = "it-IT", text = "Dare Il Veicolo Del Podio"},
         {iso = "pt-BR", text = "Oferecer Veículo Pódio"},
+        {iso = "ru-RU", text = "Выдать подиумное авто"},
     },
 
     ["mysteryPrize_Btn"] = {
@@ -1551,6 +1564,7 @@ Labels = {
         {iso = "fr-FR", text = "Donner Un Cadeau Mystère"},
         {iso = "it-IT", text = "Dare Un Premio Misterioso"},
         {iso = "pt-BR", text = "Dê Um Prêmio Misterioso"},
+        {iso = "ru-RU", text = "Выдать таинственный приз"},
     },
 
     ["50k_Btn"] = {
@@ -1559,6 +1573,7 @@ Labels = {
         {iso = "fr-FR", text = "Donner $50,000"},
         {iso = "it-IT", text = "Dare $50,000"},
         {iso = "pt-BR", text = "Dar $50,000"},
+        {iso = "ru-RU", text = "Выдать $50,000"},
     },
 
     ["25k_Btn"] = {
@@ -1567,6 +1582,7 @@ Labels = {
         {iso = "fr-FR", text = "Donner 25000 Jetons"},
         {iso = "it-IT", text = "Donare 25000 Gettoni"},
         {iso = "pt-BR", text = "Dê 25000 Fichas"},
+        {iso = "ru-RU", text = "Выдать 25000 фишек"},
     },
 
     ["15k_Btn"] = {
@@ -1575,6 +1591,7 @@ Labels = {
         {iso = "fr-FR", text = "Donner 15000 RP"},
         {iso = "it-IT", text = "Donare 15000 RP"},
         {iso = "pt-BR", text = "Dê 15000 RP"},
+        {iso = "ru-RU", text = "Выдать 15000 RP"},
     },
 
     ["%_Btn"] = {
@@ -1583,6 +1600,7 @@ Labels = {
         {iso = "fr-FR", text = "Donner Une Remise"},
         {iso = "it-IT", text = "Dare Uno Sconto"},
         {iso = "pt-BR", text = "Dar Desconto"},
+        {iso = "ru-RU", text = "Дать скидку"},
     },
 
     ["clothing_Btn"] = {
@@ -1591,6 +1609,7 @@ Labels = {
         {iso = "fr-FR", text = "Donner Des Vêtements"},
         {iso = "it-IT", text = "Dare Abbigliamento"},
         {iso = "pt-BR", text = "Dar Roupa"},
+        {iso = "ru-RU", text = "Выдать одежду"},
     },
 
     ["approach"] = {
@@ -1599,6 +1618,7 @@ Labels = {
         {iso = "fr-FR", text = "Approche"},
         {iso = "it-IT", text = "Approccio"},
         {iso = "pt-BR", text = "Abordagem"},
+        {iso = "ru-RU", text = "Подход"},
     },
 
     ["target"] = {
@@ -1607,6 +1627,7 @@ Labels = {
         {iso = "fr-FR", text = "Cible"},
         {iso = "it-IT", text = "Obiettivo"},
         {iso = "pt-BR", text = "Objetivo"},
+        {iso = "ru-RU", text = "Цель"},
     },
 
     ["last_approach"] = {
@@ -1615,6 +1636,7 @@ Labels = {
         {iso = "fr-FR", text = "Dernière Approche"},
         {iso = "it-IT", text = "Ultimo Approccio"},
         {iso = "pt-BR", text = "Última Abordagem"},
+        {iso = "ru-RU", text = "Последний подход"},
     },
 
     ["hard_approach"] = {
@@ -1623,6 +1645,7 @@ Labels = {
         {iso = "fr-FR", text = "Approche Dure"},
         {iso = "it-IT", text = "Approccio Duro"},
         {iso = "pt-BR", text = "Abordagem Difícil"},
+        {iso = "ru-RU", text = "Сложный подход"},
     },
 
     ["gunman"] = {
@@ -1631,6 +1654,7 @@ Labels = {
         {iso = "fr-FR", text = "Tireur"},
         {iso = "it-IT", text = "Pistolero"},
         {iso = "pt-BR", text = "Pistoleiro"},
+        {iso = "ru-RU", text = "Стрелок"},
     },
 
     ["driver"] = {
@@ -1639,6 +1663,7 @@ Labels = {
         {iso = "fr-FR", text = "Conducteur"},
         {iso = "it-IT", text = "Autista"},
         {iso = "pt-BR", text = "Condutor"},
+        {iso = "ru-RU", text = "Водитель"},
     },
 
     ["hacker"] = {
@@ -1647,6 +1672,7 @@ Labels = {
         {iso = "fr-FR", text = "Hacker"},
         {iso = "it-IT", text = "Hacker"},
         {iso = "pt-BR", text = "Hacker"},
+        {iso = "ru-RU", text = "Хакер"},
     },
 
     ["unmarked_weapons"] = {
@@ -1655,6 +1681,7 @@ Labels = {
         {iso = "fr-FR", text = "Armes Banalisées"},
         {iso = "it-IT", text = "Armi Non Marcate"},
         {iso = "pt-BR", text = "Armas Não Marcadas"},
+        {iso = "ru-RU", text = "Немаркированное Оружие"},
     },
 
     ["getaways"] = {
@@ -1663,6 +1690,7 @@ Labels = {
         {iso = "fr-FR", text = "Véhicules De Fuite"},
         {iso = "it-IT", text = "Veicoli Da Fuga"},
         {iso = "pt-BR", text = "Veículos De Fuga"},
+        {iso = "ru-RU", text = "Авто для побега"},
     },
 
     ["masks"] = {
@@ -1671,6 +1699,7 @@ Labels = {
         {iso = "fr-FR", text = "Masques"},
         {iso = "it-IT", text = "Maschere"},
         {iso = "pt-BR", text = "Máscaras"},
+        {iso = "ru-RU", text = "Маски"},
     },
 
     ["autograb"] = {
@@ -1679,6 +1708,7 @@ Labels = {
         {iso = "fr-FR", text = "Récupérer Automatiquement L'argent / L'or / Les diamants"},
         {iso = "it-IT", text = "Afferrare automaticamente Contanti / Oro / Diamanti"},
         {iso = "pt-BR", text = "Captura Automática De Dinheiro / Ouro / Diamantes"},
+        {iso = "ru-RU", text = "Автоматически подбирать деньги/золото/алмазы"},
     },
 
     ["Unlock All Heist Options"] = {
@@ -1687,6 +1717,7 @@ Labels = {
         {iso = "fr-FR", text = "Déverrouiller Toutes Les Options Du Braquage"},
         {iso = "it-IT", text = "Sbloccare Tutte Le Opzioni Di Rapina"},
         {iso = "pt-BR", text = "Desbloqueie Todas As Opções De Roubo"},
+        {iso = "ru-RU", text = "Разблокировать все варианты ограблений"},
     },
 
     ["%0_ai_cuts_Btn"] = {
@@ -1695,6 +1726,7 @@ Labels = {
         {iso = "fr-FR", text = "Fixer Les Pourcentages D'équipe IA à %0"},
         {iso = "it-IT", text = "Imposta Le Percentuali Della Squadra AI A %0"},
         {iso = "pt-BR", text = "Definir As Porcentagens Da Equipe IA Como %0"},
+        {iso = "ru-RU", text = "Установить долю 0% для ИИ команды"},
     },
 
     ["%100_p_cuts_Btn"] = {
@@ -1703,6 +1735,7 @@ Labels = {
         {iso = "fr-FR", text = "Fixer Tous Les Pourcentages à %100"},
         {iso = "it-IT", text = "Imposta Tuute Le Percentuali A %100"},
         {iso = "pt-BR", text = "Definir Todas Porcentagens Como %100"},
+        {iso = "ru-RU", text = "Установить всю долю в 100%"},
     },
 }
 
