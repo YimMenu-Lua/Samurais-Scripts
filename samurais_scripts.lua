@@ -178,6 +178,7 @@ stop_searching      = false
 hijack_started      = false
 sound_btn_off       = false
 is_drifting         = false
+start_rgb_loop      = false
 flag                = 0
 grp_anim_index      = 0
 attached_ped        = 0
@@ -1860,14 +1861,20 @@ vehicle_tab:add_imgui(function()
     if rgbToggled then
       UI.widgetSound("Nav2")
       lua_cfg.save("rgbLights", rgbLights)
-      script.run_in_fiber(function()
-        if not VEHICLE.IS_TOGGLE_MOD_ON(current_vehicle, 22) then
-          has_xenon = false
-        else
-          has_xenon    = true
-          defaultXenon = VEHICLE.GET_VEHICLE_XENON_LIGHT_COLOR_INDEX(current_vehicle)
-        end
-      end)
+      if rgbLights then
+        script.run_in_fiber(function(rgbhl)
+          if not VEHICLE.IS_TOGGLE_MOD_ON(current_vehicle, 22) then
+            has_xenon = false
+          else
+            has_xenon    = true
+            defaultXenon = VEHICLE.GET_VEHICLE_XENON_LIGHT_COLOR_INDEX(current_vehicle)
+          end
+          rgbhl:sleep(200)
+          start_rgb_loop = true
+        end)
+      else
+        start_rgb_loop = false
+      end
     end
 
     ImGui.SameLine(); ImGui.Dummy(62, 1); ImGui.SameLine(); flappyDoors, flappyDoorsUsed = ImGui.Checkbox("Flappy Doors",
@@ -2517,7 +2524,7 @@ vehicle_creator:add_imgui(function()
             ENTITY.SET_ENTITY_AS_MISSION_ENTITY(selectedVeh, true, true)
             del:sleep(200)
             VEHICLE.DELETE_VEHICLE(selectedVeh)
-            vehicle_creation = {}
+            -- vehicle_creation = {}
             creation_name = ""
             attached_vehicle = 0
             if spawned_veh_index ~= 0 then
@@ -2555,7 +2562,7 @@ vehicle_creator:add_imgui(function()
               attached_vehicles.color_2.r, attached_vehicles.color_2.g, attached_vehicles.color_2.b = VEHICLE.GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(selectedVeh, attached_vehicles.color_2.r, attached_vehicles.color_2.g, attached_vehicles.color_2.b)
               appendVehicleMods(selectedVeh, attached_vehicles.mods)
               table.insert(veh_attachments, attached_vehicles)
-              attached_vehicles = {}
+              attached_vehicles = {entity = 0, hash = 0, mods = {}, color_1 = {r = 0, g = 0, b = 0}, color_2 = {r = 0, g = 0, b = 0}, tint = 0, posx = 0.0, posy = 0.0, posz = 0.0, rotx = 0.0, roty = 0.0, rotz = 0.0}
             else
               UI.widgetSound("Error")
               gui.show_error("Samurais Scripts", translateLabel("vc_alrattached_err"))
@@ -2716,7 +2723,7 @@ vehicle_creator:add_imgui(function()
           2, true, 1)
       end
       ImGui.Spacing()
-      if ImGui.Button(translateLabel("saveBtn") .. "##vehcreator1") then
+      if ImGui.Button("   " .. translateLabel("saveBtn") .. "   ##vehcreator1") then
         UI.widgetSound("Select2")
         ImGui.OpenPopup("Save Merged Vehicles")
       end
@@ -2776,16 +2783,16 @@ vehicle_creator:add_imgui(function()
         UI.widgetSound("Select")
         spawnPersistVeh(persist_info.main_veh, persist_info.mods, persist_info.color_1, persist_info.color_2, persist_info.tint, persist_info.attachments)
       end
-      ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine()
+      ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
       if UI.coloredButton(translateLabel("vc_delete_persist"), "#E40000", "#FF3F3F", "#FF8080", 0.87) then
         UI.widgetSound("Focus_In")
         ImGui.OpenPopup("Remove Persistent")
       end
       ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
-      ImGui.SetNextWindowSizeConstraints(200, 200, 400, 400)
+      ImGui.SetNextWindowSizeConstraints(200, 100, 400, 400)
       ImGui.SetNextWindowBgAlpha(0.7)
       if ImGui.BeginPopupModal("Remove Persistent", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-        UI.coloredText(translateLabel("confirm_txt") .. "##vehcreator", "yellow", 0.91, 35)
+        UI.coloredText(translateLabel("confirm_txt"), "yellow", 0.91, 35)
         ImGui.Dummy(1, 20)
         if ImGui.Button("   " .. translateLabel("yes") .. "   ##vehcreator") then
           for key, value in ipairs(saved_vehicles) do
@@ -4710,7 +4717,7 @@ end
 local function var_reset()
   resetOnSave()
   isCrouched = false; is_handsUp = false; anim_music = false; is_playing_radio = false; npc_blips = {}; spawned_npcs = {}; plyrProps = {}; npcProps = {}; selfPTFX = {}; npcPTFX = {}; curr_playing_anim = {}; is_playing_anim = false; is_playing_scenario = false; tab1Sound = true; tab2Sound = true; tab3Sound = true; actions_switch = 0; actions_search =
-  ""; currentMvmt = ""; currentStrf = ""; currentWmvmt = ""; aimBool = false; HashGrabber = false; drew_laser = false; Entity = 0; laserPtfx_T = {}; sound_btn_off = false; tire_smoke = false; purge_started = false; nos_started = false; twostep_started = false; open_sounds_window = false; started_lct = false; launch_active = false; started_popSound = false; started_popSound2 = false; timerA = 0; timerB = 0; lastVeh = 0; defaultXenon = 0; vehSound_index = 0; smokePtfx_t = {}; nosptfx_t = {}; purgePtfx_t = {}; lctPtfx_t = {}; popSounds_t = {}; popsPtfx_t = {}; attached_vehicle = 0; tow_xAxis = 0.0; tow_yAxis = 0.0; tow_zAxis = 0.0; pedGrabber = false; ped_grabbed = false;; vehicleGrabber = false; vehicle_grabbed = false; carpool = false; show_npc_veh_ctrls = false; stop_searching = false; hijack_started = false; grp_anim_index = 0; attached_ped = 0; grabbed_veh = 0; thisVeh = 0; pedthrowF = 10; propName =
+  ""; currentMvmt = ""; currentStrf = ""; currentWmvmt = ""; aimBool = false; HashGrabber = false; drew_laser = false; Entity = 0; laserPtfx_T = {}; sound_btn_off = false; tire_smoke = false; purge_started = false; nos_started = false; twostep_started = false; open_sounds_window = false; started_lct = false; launch_active = false; started_popSound = false; started_popSound2 = false; timerA = 0; timerB = 0; lastVeh = 0; defaultXenon = 0; start_rgb_loop = false; vehSound_index = 0; smokePtfx_t = {}; nosptfx_t = {}; purgePtfx_t = {}; lctPtfx_t = {}; popSounds_t = {}; popsPtfx_t = {}; attached_vehicle = 0; tow_xAxis = 0.0; tow_yAxis = 0.0; tow_zAxis = 0.0; pedGrabber = false; ped_grabbed = false;; vehicleGrabber = false; vehicle_grabbed = false; carpool = false; show_npc_veh_ctrls = false; stop_searching = false; hijack_started = false; grp_anim_index = 0; attached_ped = 0; grabbed_veh = 0; thisVeh = 0; pedthrowF = 10; propName =
   ""; invalidType = ""; preview = false; is_drifting = false; previewLoop = false; activeX = false; activeY = false; activeZ = false; rotX = false; rotY = false; rotZ = false; attached = false; attachToSelf = false; attachToVeh = false; previewStarted = false; isChanged = false; prop = 0; propHash = 0; os_switch = 0; prop_index = 0; objects_index = 0; spawned_index = 0; selectedObject = 0; selected_bone = 0; previewEntity = 0; currentObjectPreview = 0; attached_index = 0; zOffset = 0; spawned_props = {}; spawnedNames = {}; filteredSpawnNames = {}; selfAttachments = {}; selfAttachNames = {}; vehAttachments = {}; vehAttachNames = {}; filteredVehAttachNames = {}; filteredAttachNames = {}; missiledefense = false;
 end
 
@@ -4797,7 +4804,7 @@ script.register_looped("GameInput", function()
       end
     end
     if keepWheelsTurned then
-      if Game.Self.isDriving() and not is_typing and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
+      if Game.Self.isDriving() and not is_typing and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) and (is_car or is_quad) then
         if PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
           PAD.DISABLE_CONTROL_ACTION(0, 75, true)
         end
@@ -5580,7 +5587,7 @@ script.register_looped("TDFT", function(script)
         end
       end
     end
-    if Game.Self.isDriving() and keepWheelsTurned and not holdF then
+    if Game.Self.isDriving() and (is_car or is_quad) and keepWheelsTurned and not holdF then
       if PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) and (PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35)) then
         VEHICLE.SET_VEHICLE_ENGINE_ON(current_vehicle, false, true, false)
         TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 16)
@@ -5590,9 +5597,10 @@ script.register_looped("TDFT", function(script)
       if PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) then
         timerB = timerB + 1
         if timerB >= 15 then
-          if keepWheelsTurned and PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
+          if keepWheelsTurned and (PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35)) and (is_car or is_quad) then
             VEHICLE.SET_VEHICLE_ENGINE_ON(current_vehicle, false, true, false)
             TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 16)
+            timerB = 0
           else
             PED.SET_PED_CONFIG_FLAG(self.get_ped(), 241, false)
             TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 0)
@@ -5602,8 +5610,9 @@ script.register_looped("TDFT", function(script)
       end
       if timerB >= 1 and timerB <= 10 then
         if PAD.IS_DISABLED_CONTROL_RELEASED(0, 75) then
-          if keepWheelsTurned and PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
+          if keepWheelsTurned and (PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35)) and (is_car or is_quad) then
             TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 16)
+            timerB = 0
           else
             PED.SET_PED_CONFIG_FLAG(self.get_ped(), 241, true)
             TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 0)
@@ -6303,9 +6312,9 @@ script.register_looped("Purge", function(nosprg)
 end)
 
 script.register_looped("rgbLights", function(rgb)
-  if rgbLights then
+  if start_rgb_loop then
     for i = 0, 14 do
-      if rgbLights and not VEHICLE.GET_BOTH_VEHICLE_HEADLIGHTS_DAMAGED(current_vehicle) then
+      if start_rgb_loop and not VEHICLE.GET_BOTH_VEHICLE_HEADLIGHTS_DAMAGED(current_vehicle) then
         if not has_xenon then
           VEHICLE.TOGGLE_VEHICLE_MOD(current_vehicle, 22, true)
         end
