@@ -3140,20 +3140,8 @@ casino_pacino:add_imgui(function()
           stats.set_int("MPX_H3OPT_CREWWEAP", new_gunman)
         end)
       end
-      local new_driver, driver_clicked = ImGui.Combo(translateLabel("driver"), casino_heist_driver, { "Unselected", "Karim Deniz", "Taliana Martinez", "Eddie Toh", "Zach Nelson", "Chester McCoy" }, 6)
-      if driver_clicked then
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3OPT_CREWDRIVER", new_driver)
-        end)
-      end
-      local new_hacker, hacker_clicked = ImGui.Combo(translateLabel("hacker"), casino_heist_hacker, { "Unselected", "Rickie Lukens", "Christian Feltz", "Yohan Blair", "Avi Schwartzman", "Page Harris" }, 6)
-      if hacker_clicked then
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3OPT_CREWHACKER", new_hacker)
-        end)
-      end
-
       if casino_heist_gunman == 1 then --Karl Abolaji
+        ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
         local karl_gun_list = { {'##1", "##2'}, { "Micro SMG Loadout", "Machine Pistol Loadout" }, { "Micro SMG Loadout", "Shotgun Loadout" }, { "Shotgun Loadout", "Revolver Loadout" } }
         local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons, karl_gun_list[casino_heist_approach+1], 2)
         if weapons_clicked then
@@ -3161,16 +3149,16 @@ casino_pacino:add_imgui(function()
             stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
           end)
         end
-        ImGui.SameLine()
       elseif casino_heist_gunman == 2 then --Gustavo Fring
+        ImGui.SameLine()
         local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons, { "Rifle Loadout", "Shotgun Loadout" }, 2)
         if weapons_clicked then
           script.run_in_fiber(function()
             stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
           end)
         end
-        ImGui.SameLine()
       elseif casino_heist_gunman == 3 then --Charlie Reed
+        ImGui.SameLine()
         local charlie_gun_list = { {'##1", "##2'}, { "SMG Loadout", "Shotgun Loadout" }, { "Machine Pistol Loadout", "Shotgun Loadout" }, { "SMG Loadout", "Shotgun Loadout" } }
         local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons, charlie_gun_list[casino_heist_approach+1], 2)
         if weapons_clicked then
@@ -3178,8 +3166,8 @@ casino_pacino:add_imgui(function()
             stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
           end)
         end
-        ImGui.SameLine()
       elseif casino_heist_gunman == 4 then --Chester McCoy
+        ImGui.SameLine()
         local chester_gun_list = { {'##1", "##2'}, { "MK II Shotgun Loadout", "MK II Rifle Loadout" }, { "MK II SMG Loadout", "MK II Rifle Loadout" }, { "MK II Shotgun Loadout", "MK II Rifle Loadout" } }
         local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons, chester_gun_list[casino_heist_approach+1], 2)
         if weapons_clicked then
@@ -3187,8 +3175,8 @@ casino_pacino:add_imgui(function()
             stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
           end)
         end
-        ImGui.SameLine()
       elseif casino_heist_gunman == 5 then --Laddie Paddie Sadie Enweird
+        ImGui.SameLine()
         local laddie_paddie_gun_list = { {'##1", "##2'}, { "Combat PDW Loadout", "Rifle Loadout" }, { "Shotgun Loadout", "Rifle Loadout" }, { "Shotgun Loadout", "Combat MG Loadout" } }
         local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons, laddie_paddie_gun_list[casino_heist_approach+1], 2)
         if weapons_clicked then
@@ -3196,10 +3184,17 @@ casino_pacino:add_imgui(function()
             stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
           end)
         end
-        ImGui.SameLine()
+      end
+
+      local new_driver, driver_clicked = ImGui.Combo(translateLabel("driver"), casino_heist_driver, { "Unselected", "Karim Deniz", "Taliana Martinez", "Eddie Toh", "Zach Nelson", "Chester McCoy" }, 6)
+      if driver_clicked then
+        script.run_in_fiber(function()
+          stats.set_int("MPX_H3OPT_CREWDRIVER", new_driver)
+        end)
       end
 
       if casino_heist_driver == 1 then --Karim Deniz
+        ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
         local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars, { "Issi Classic", "Asbo", "Kanjo", "Sentinel Classic" }, 4)
         if car_clicked then
           script.run_in_fiber(function()
@@ -3207,6 +3202,7 @@ casino_pacino:add_imgui(function()
           end)
         end
       elseif casino_heist_driver == 2 then --Taliana Martinez
+        ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
         local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars, { "Retinue MK II", "Drift Yosemite", "Sugoi", "Jugular" }, 4)
         if car_clicked then
           script.run_in_fiber(function()
@@ -3214,6 +3210,7 @@ casino_pacino:add_imgui(function()
           end)
         end
       elseif casino_heist_driver == 3 then --Eddie Toh
+        ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
         local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars, { "Sultan Classic", "Guantlet Classic", "Ellie", "Komoda" }, 4)
         if car_clicked then
           script.run_in_fiber(function()
@@ -3221,6 +3218,7 @@ casino_pacino:add_imgui(function()
           end)
         end
       elseif casino_heist_driver == 4 then --Zach Nelson
+        ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
         local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars, { "Manchez", "Stryder", "Defiler", "Lectro" }, 4)
         if car_clicked then
           script.run_in_fiber(function()
@@ -3228,12 +3226,20 @@ casino_pacino:add_imgui(function()
           end)
         end
       elseif casino_heist_driver == 5 then --Chester McCoy
+        ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
         local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars, { "Zhaba", "Vagrant", "Outlaw", "Everon" }, 4)
         if car_clicked then
           script.run_in_fiber(function()
             stats.set_int("MPX_H3OPT_VEHS", new_car)
           end)
         end
+      end
+
+      local new_hacker, hacker_clicked = ImGui.Combo(translateLabel("hacker"), casino_heist_hacker, { "Unselected", "Rickie Lukens", "Christian Feltz", "Yohan Blair", "Avi Schwartzman", "Page Harris" }, 6)
+      if hacker_clicked then
+        script.run_in_fiber(function()
+          stats.set_int("MPX_H3OPT_CREWHACKER", new_hacker)
+        end)
       end
 
       local new_masks, masks_clicked = ImGui.Combo(translateLabel("masks"), casino_heist_masks, { "Unselected", "Geometric Set", "Hunter Set", "Oni Half Mask Set", "Emoji Set", "Ornate Skull Set", "Lucky Fruit Set", "Gurilla Set", "Clown Set", "Animal Set", "Riot Set", "Oni Set", "Hockey Set" }, 13)
