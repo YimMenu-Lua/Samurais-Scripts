@@ -1265,7 +1265,7 @@ Labels = {
     },
 
     ["Movement Options:"] = {
-        {iso = "en-US", text = "Detaches all props."},
+        {iso = "en-US", text = "Movement Options."},
         {iso = "de-DE", text = "Bewegungsoptionen:"},
         {iso = "fr-FR", text = "Options De Mouvement :"},
         {iso = "it-IT", text = "Opzioni Di Movimento:"},
@@ -1439,6 +1439,270 @@ Labels = {
         {iso = "fr-FR", text = "Transforme tous les conducteurs proches de vous en maniaques suicidaires."},
         {iso = "it-IT", text = "Trasforma tutti gli automobilisti vicini in maniaci suicidi."},
         {iso = "pt-BR", text = "Transforma todos os motoristas próximos a você em maníacos suicidas."},
+    },
+
+    ["Gambling"] = {
+        {iso = "en-US", text = "Casino Games"},
+        {iso = "de-DE", text = "Casino Spiele"},
+        {iso = "fr-FR", text = "Jeux De Casino"},
+        {iso = "it-IT", text = "Giochi Di Casinò"},
+        {iso = "pt-BR", text = "Jogos De Cassino"},
+    },
+
+    ["bypassCasinoCooldownCB"] = {
+        {iso = "en-US", text = "Bypass Casino Cooldown"},
+        {iso = "de-DE", text = "Casino Abkühlung umgehen"},
+        {iso = "fr-FR", text = "Désactiver Le Temps De Recharge"},
+        {iso = "it-IT", text = "Disattivare Il Tempo Di Ricarica"},
+        {iso = "pt-BR", text = "Desabilitar O Tempo De Recarga"},
+    },
+
+    ["casinoCDwarn"] = {
+        {iso = "en-US", text = "WARINIG!\10\10Winning too much too quickly might get you banned. Enable this at your own risk."},
+        {iso = "de-DE", text = "ACHTUNG\10\10Wenn Sie zu schnell zu viel gewinnen, können Sie gesperrt werden. Aktivieren Sie dies auf eigenes Risiko."},
+        {iso = "fr-FR", text = "ATTENTION!\10\10Si vous gagnez trop et trop vite, vous risquez d'être banni. Activez cette option à vos risques et périls."},
+        {iso = "it-IT", text = "ATTENZIONE!\10\10Vincere troppo e troppo in fretta potrebbe farvi bannare. Quindi attivatevi a vostro rischio e pericolo."},
+        {iso = "pt-BR", text = "ATENÇÃO!\10\10Ganhar muito rapidamente pode fazer com que você seja banido. Ative isso por sua própria conta e risco."},
+    },
+
+    ["casinoCDstatus"] = {
+        {iso = "en-US", text = "Casino Cooldown Status:"},
+        {iso = "de-DE", text = "Casino-Abklingzeit-Status:"},
+        {iso = "fr-FR", text = "Statut Du Temps De Recharge Du Casino:"},
+        {iso = "it-IT", text = "Stato Di Tempo Di Ricarica Del Casinò:"},
+        {iso = "pt-BR", text = "Status De Resfriamento Do Cassino:"},
+    },
+
+    ["forcePokerCardsCB"] = {
+        {iso = "en-US", text = "Force all Players Hands to Royal Flush"},
+        {iso = "de-DE", text = "Erzwinge Einen Royal Flush Für Alle Spieler"},
+        {iso = "fr-FR", text = "Forcer Tous Les Joueurs à Obtenir Une Quinte Royale"},
+        {iso = "it-IT", text = "Forzare Tutte Le Mani Dei Giocatori Alla Scala Reale"},
+        {iso = "pt-BR", text = "Forçar Todas As Mãos Dos Jogadores A Um Royal Flush"},
+    },
+
+    ["setDealersCardsCB"] = {
+        {iso = "en-US", text = "Force Dealer's Hand to 'Bad Beat'"},
+        {iso = "de-DE", text = "Die Hand Des Gebers Zu Einem 'Bad Beat' Zwingen"},
+        {iso = "fr-FR", text = "Forcer La Main Du Croupier à Un 'Bad Beat'"},
+        {iso = "it-IT", text = "Forzare La Mano Del Mazziere A 'Bad Beat'"},
+        {iso = "pt-BR", text = "Forçar A Mão Do Crupiê A Uma 'Bad Beat'"},
+    },
+
+    ["faceDownCard"] = {
+        {iso = "en-US", text = "Dealer's face down card: "},
+        {iso = "de-DE", text = "Verdeckte Karte des Gebers: "},
+        {iso = "fr-FR", text = "Carte cachée du croupier : "},
+        {iso = "it-IT", text = "Carta scoperta del mazziere: "},
+        {iso = "pt-BR", text = "Carta virada para baixo do crupiê: "},
+    },
+
+    ["dealerBustBtn"] = {
+        {iso = "en-US", text = "Set Dealer's Hand To Bust"},
+        {iso = "de-DE", text = "Geberhand auf Bust setzen"},
+        {iso = "fr-FR", text = "Forcer La Main Du Croupier A Echouer"},
+        {iso = "it-IT", text = "Forzare La Mano Del Mazziere A Fallire"},
+        {iso = "pt-BR", text = "Forçar A Mão Do Crupiê A Falhar"},
+    },
+
+    ["forceRouletteCB"] = {
+        {iso = "en-US", text = "Force The Ball To Land On Red 18"},
+        {iso = "de-DE", text = "Den Ball Auf Die Rote 18 Zwingen"},
+        {iso = "fr-FR", text = "Forcer La Balle à Atterrir Sur Rouge 18"},
+        {iso = "it-IT", text = "Forzare La Palla Ad Atterrare Sul Rosso 18"},
+        {iso = "pt-BR", text = "Forçar A Bola A Aterrissar No Vermelho 18"},
+    },
+
+    ["rigSlotsCB"] = {
+        {iso = "en-US", text = "Rig Slot Machines"},
+        {iso = "de-DE", text = "Spielautomaten Manipulieren"},
+        {iso = "fr-FR", text = "Truquer Les Machines A Sous"},
+        {iso = "it-IT", text = "Fingere Le Slot Machine"}, -- Huh? We're fingering the slot machines? Someone help with these translations PLEASE 😭
+        {iso = "pt-BR", text = "Falsificação Máquinas Caça-Níquei"},
+    },
+
+    ["autoplaySlotsCB"] = {
+        {iso = "en-US", text = "Autoplay"},
+        {iso = "de-DE", text = "Autoplay"},
+        {iso = "fr-FR", text = "Autoplay"},
+        {iso = "it-IT", text = "Autoplay"},
+        {iso = "pt-BR", text = "Autoplay"},
+    },
+
+    ["autoplayCapCB"] = {
+        {iso = "en-US", text = "Max Chips"},
+        {iso = "de-DE", text = "Max Chips"},
+        {iso = "fr-FR", text = "Max Jetons"},
+        {iso = "it-IT", text = "Massimo Di Gettoni"},
+        {iso = "pt-BR", text = "Fichas Máximas"},
+    },
+
+    ["podiumVeh_Btn"] = {
+        {iso = "en-US", text = "Give Podium Vehicle"},
+        {iso = "de-DE", text = "Podium Fahrzeug Geben"},
+        {iso = "fr-FR", text = "Donner Le Véhicule Du Podium"},
+        {iso = "it-IT", text = "Dare Il Veicolo Del Podio"},
+        {iso = "pt-BR", text = "Oferecer Veículo Pódio"},
+    },
+
+    ["mysteryPrize_Btn"] = {
+        {iso = "en-US", text = "Give Mystery Prize"},
+        {iso = "de-DE", text = "Mystery-Preis Geben"},
+        {iso = "fr-FR", text = "Donner Un Cadeau Mystère"},
+        {iso = "it-IT", text = "Dare Un Premio Misterioso"},
+        {iso = "pt-BR", text = "Dê Um Prêmio Misterioso"},
+    },
+
+    ["50k_Btn"] = {
+        {iso = "en-US", text = "Give $50,000"},
+        {iso = "de-DE", text = "Gib $50,000"},
+        {iso = "fr-FR", text = "Donner $50,000"},
+        {iso = "it-IT", text = "Dare $50,000"},
+        {iso = "pt-BR", text = "Dar $50,000"},
+    },
+
+    ["25k_Btn"] = {
+        {iso = "en-US", text = "Give 25000 Chips"},
+        {iso = "de-DE", text = "Gib 25000 Toekn"},
+        {iso = "fr-FR", text = "Donner 25000 Jetons"},
+        {iso = "it-IT", text = "Donare 25000 Gettoni"},
+        {iso = "pt-BR", text = "Dê 25000 Fichas"},
+    },
+
+    ["15k_Btn"] = {
+        {iso = "en-US", text = "Give 15000 RP"},
+        {iso = "de-DE", text = "Gib 15000 RP"},
+        {iso = "fr-FR", text = "Donner 15000 RP"},
+        {iso = "it-IT", text = "Donare 15000 RP"},
+        {iso = "pt-BR", text = "Dê 15000 RP"},
+    },
+
+    ["%_Btn"] = {
+        {iso = "en-US", text = "Give Discount"},
+        {iso = "de-DE", text = "Gib Rabatt"},
+        {iso = "fr-FR", text = "Donner Une Remise"},
+        {iso = "it-IT", text = "Dare Uno Sconto"},
+        {iso = "pt-BR", text = "Dar Desconto"},
+    },
+
+    ["clothing_Btn"] = {
+        {iso = "en-US", text = "Give Clothing"},
+        {iso = "de-DE", text = "Kleidung Geben"},
+        {iso = "fr-FR", text = "Donner Des Vêtements"},
+        {iso = "it-IT", text = "Dare Abbigliamento"},
+        {iso = "pt-BR", text = "Dar Roupa"},
+    },
+
+    ["approach"] = {
+        {iso = "en-US", text = "Approach"},
+        {iso = "de-DE", text = "Näherung"},
+        {iso = "fr-FR", text = "Approche"},
+        {iso = "it-IT", text = "Approccio"},
+        {iso = "pt-BR", text = "Abordagem"},
+    },
+
+    ["target"] = {
+        {iso = "en-US", text = "Target"},
+        {iso = "de-DE", text = "Ziel"},
+        {iso = "fr-FR", text = "Cible"},
+        {iso = "it-IT", text = "Obiettivo"},
+        {iso = "pt-BR", text = "Objetivo"},
+    },
+
+    ["last_approach"] = {
+        {iso = "en-US", text = "Last Approach"},
+        {iso = "de-DE", text = "Letzte Annäherung"},
+        {iso = "fr-FR", text = "Dernière Approche"},
+        {iso = "it-IT", text = "Ultimo Approccio"},
+        {iso = "pt-BR", text = "Última Abordagem"},
+    },
+
+    ["hard_approach"] = {
+        {iso = "en-US", text = "Hard Approach"},
+        {iso = "de-DE", text = "Harte Annäherung"},
+        {iso = "fr-FR", text = "Approche Dure"},
+        {iso = "it-IT", text = "Approccio Duro"},
+        {iso = "pt-BR", text = "Abordagem Difícil"},
+    },
+
+    ["gunman"] = {
+        {iso = "en-US", text = "Gunman"},
+        {iso = "de-DE", text = "Schütze"},
+        {iso = "fr-FR", text = "Tireur"},
+        {iso = "it-IT", text = "Pistolero"},
+        {iso = "pt-BR", text = "Pistoleiro"},
+    },
+
+    ["driver"] = {
+        {iso = "en-US", text = "Driver"},
+        {iso = "de-DE", text = "Treiber"},
+        {iso = "fr-FR", text = "Conducteur"},
+        {iso = "it-IT", text = "Autista"},
+        {iso = "pt-BR", text = "Condutor"},
+    },
+
+    ["hacker"] = {
+        {iso = "en-US", text = "Hacker"}, -- technically we don't need to translate this but I'm keeping it in case
+        {iso = "de-DE", text = "Hacker"}, -- someone contributes Chinese, Russian or Japanese translations
+        {iso = "fr-FR", text = "Hacker"},
+        {iso = "it-IT", text = "Hacker"},
+        {iso = "pt-BR", text = "Hacker"},
+    },
+
+    ["unmarked_weapons"] = {
+        {iso = "en-US", text = "Unmarked Weapons"},
+        {iso = "de-DE", text = "Unmarkierte Waffen"},
+        {iso = "fr-FR", text = "Armes Banalisées"},
+        {iso = "it-IT", text = "Armi Non Marcate"},
+        {iso = "pt-BR", text = "Armas Não Marcadas"},
+    },
+
+    ["getaways"] = {
+        {iso = "en-US", text = "Getaway Vehicles"},
+        {iso = "de-DE", text = "Fluchtfahrzeuge"},
+        {iso = "fr-FR", text = "Véhicules De Fuite"},
+        {iso = "it-IT", text = "Veicoli Da Fuga"},
+        {iso = "pt-BR", text = "Veículos De Fuga"},
+    },
+
+    ["masks"] = {
+        {iso = "en-US", text = "Masks"},
+        {iso = "de-DE", text = "Masken"},
+        {iso = "fr-FR", text = "Masques"},
+        {iso = "it-IT", text = "Maschere"},
+        {iso = "pt-BR", text = "Máscaras"},
+    },
+
+    ["autograb"] = {
+        {iso = "en-US", text = "Auto Grab Cash/Gold/Diamonds"},
+        {iso = "de-DE", text = "Autogreifbar Bargeld/Gold/Diamanten"},
+        {iso = "fr-FR", text = "Récupérer Automatiquement L'argent / L'or / Les diamants"},
+        {iso = "it-IT", text = "Afferrare automaticamente Contanti / Oro / Diamanti"},
+        {iso = "pt-BR", text = "Captura Automática De Dinheiro / Ouro / Diamantes"},
+    },
+
+    ["Unlock All Heist Options"] = {
+        {iso = "en-US", text = "Unlock All Heist Options"},
+        {iso = "de-DE", text = "Alle Rauboptionen Freischalten"},
+        {iso = "fr-FR", text = "Déverrouiller Toutes Les Options Du Braquage"},
+        {iso = "it-IT", text = "Sbloccare Tutte Le Opzioni Di Rapina"},
+        {iso = "pt-BR", text = "Desbloqueie Todas As Opções De Roubo"},
+    },
+
+    ["%0_ai_cuts_Btn"] = {
+        {iso = "en-US", text = "Set AI Crew Cuts to %0"},
+        {iso = "de-DE", text = "Die Prozentsätze der IA-Teams Auf %0 Setzen"},
+        {iso = "fr-FR", text = "Fixer Les Pourcentages D'équipe IA à %0"},
+        {iso = "it-IT", text = "Imposta Le Percentuali Della Squadra AI A %0"},
+        {iso = "pt-BR", text = "Definir As Porcentagens Da Equipe IA Como %0"},
+    },
+
+    ["%100_p_cuts_Btn"] = {
+        {iso = "en-US", text = "Set All Cuts to 100%"},
+        {iso = "de-DE", text = "Alle Prozentsätze Auf %100 Setzen"},
+        {iso = "fr-FR", text = "Fixer Tous Les Pourcentages à %100"},
+        {iso = "it-IT", text = "Imposta Tuute Le Percentuali A %100"},
+        {iso = "pt-BR", text = "Definir Todas Porcentagens Como %100"},
     },
 }
 
