@@ -70,8 +70,12 @@
   - Spawn and merge two or more vehicles into one then save it as a custom vehicle. Wanna create a widebody Futo? A Sentinel XS with 2 BMXs on the roof? A drivable skyscraper made out of tanks? Feel free.
 
 
-## Players
-- For now this only displays information about players (money, health, coordinates, vehicle...). I don't know what I'm going to do here since Vehicle Gifting was patched and I don't like nor write toxic features and money drops so unless I can figure out something that can be used to help other players, this will be removed.
+## Online
+- **Casino Pacino**
+  - An implementation of gir489's [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) with translation support and a slightly altered UI.
+
+- **Players:**
+  - For now this only displays information about players (money, health, coordinates, vehicle...). I don't know what I'm going to do here since Vehicle Gifting was patched and I don't like nor write toxic features and money drops so unless I can figure out something that can be used to help other players, this will be removed.
 
 ## World
 - **Main World Tab:**
