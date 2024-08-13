@@ -7,7 +7,7 @@ require('data/objects')
 require('data/actions')
 require('data/refs')
 
-SCRIPT_VERSION  = '1.1'   -- 1.1
+SCRIPT_VERSION  = '1.1.1'   -- v1.1.1
 TARGET_BUILD    = '3274'  -- Only YimResupplier needs a version check.
 TARGET_VERSION  = '1.69'
 CURRENT_BUILD   = Game.GetBuildNumber()
@@ -61,9 +61,11 @@ default_config   = {
   launchCtrl              = false,
   popsNbangs              = false,
   limitVehOptions         = false,
+  missiledefense          = false,
   louderPops              = false,
   autobrklight            = false,
   holdF                   = false,
+  keepWheelsTurned        = false,
   noJacking               = false,
   useGameLang             = false,
   bypass_casino_bans      = false,
@@ -129,9 +131,11 @@ launchCtrl          = lua_cfg.read("launchCtrl")
 popsNbangs          = lua_cfg.read("popsNbangs")
 louderPops          = lua_cfg.read("louderPops")
 limitVehOptions     = lua_cfg.read("limitVehOptions")
+missiledefense      = lua_cfg.read("missiledefense")
 autobrklight        = lua_cfg.read("autobrklight")
 rgbLights           = lua_cfg.read("rgbLights")
 holdF               = lua_cfg.read("holdF")
+keepWheelsTurned    = lua_cfg.read("keepWheelsTurned")
 noJacking           = lua_cfg.read("noJacking")
 insta180            = lua_cfg.read("insta180")
 tab1Sound           = true
@@ -174,7 +178,6 @@ stop_searching      = false
 hijack_started      = false
 sound_btn_off       = false
 is_drifting         = false
-missiledefense      = false
 flag                = 0
 grp_anim_index      = 0
 attached_ped        = 0
@@ -1709,16 +1712,19 @@ vehicle_tab:add_imgui(function()
       lua_cfg.save("limitVehOptions", limitVehOptions)
     end
 
-    ImGui.SameLine(); ImGui.Dummy(7, 1); ImGui.SameLine(); missiledefense, mdefUsed = ImGui.Checkbox("Missile Defense", missiledefense, true)
-    UI.toolTip(false,
-    "Inrercepts any missiles near your vehicle including those fired by you.\10As a security measure, this option will not be saved for the next script load.\10\10NOTE: If you fire any missiles from or near your vehicle, the defense will render them inert.")
-    if missiledefense and mdefUsed then
+    ImGui.SameLine(); ImGui.Dummy(7, 1); ImGui.SameLine();
+    missiledefense, mdefUsed = ImGui.Checkbox("Missile Defense", missiledefense, true)
+    UI.toolTip(false, translateLabel("missile_def_tt"))
+    if mdefUsed then
       UI.widgetSound("Radar")
-      gui.show_success("Samurais Scripts", "Missile defense activated! Please note that firing any missiles from or near your vehicle will render them inert.")
+      lua_cfg.save("missiledefense", missiledefense)
+      if missiledefense then
+        gui.show_success("Samurais Scripts", translateLabel("missile_def_on_notif"))
+      end
     end
     if not missiledefense and mdefUsed then
       UI.widgetSound("Delete")
-      gui.show_message("Samurais Scripts", "Missile defense deactivated.")
+      gui.show_message("Samurais Scripts", translateLabel("missile_def_off_notif"))
     end
 
     launchCtrl, lctrlUsed = ImGui.Checkbox("Launch Control", launchCtrl, true)
@@ -1828,7 +1834,14 @@ vehicle_tab:add_imgui(function()
       lua_cfg.save("holdF", holdF)
     end
 
-    ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); noJacking, noJackingUsed = ImGui.Checkbox(
+    ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); keepWheelsTurned, kwtrnd = ImGui.Checkbox("Keep Wheels Turned", keepWheelsTurned, true)
+    UI.toolTip(false, translateLabel("wheelsturned_tt"))
+    if kwtrnd then
+      UI.widgetSound("Nav2")
+      lua_cfg.save("keepWheelsTurned", keepWheelsTurned)
+    end
+
+    noJacking, noJackingUsed = ImGui.Checkbox(
       "Can't Touch This!", noJacking, true)
     UI.toolTip(false, translateLabel("canttouchthis_tt"))
     if noJackingUsed then
@@ -1836,19 +1849,12 @@ vehicle_tab:add_imgui(function()
       lua_cfg.save("noJacking", noJacking)
     end
 
-    insta180, insta180Used = ImGui.Checkbox("Instant 180°", insta180, true)
+    ImGui.SameLine(); ImGui.Dummy(15, 1); ImGui.SameLine(); insta180, insta180Used = ImGui.Checkbox("Instant 180°", insta180, true)
     if insta180Used then
       UI.widgetSound("Nav2")
       lua_cfg.save("insta180", insta180)
     end
     UI.toolTip(false, translateLabel("insta180_tt"))
-
-    ImGui.SameLine(); ImGui.Dummy(54, 1); ImGui.SameLine(); flappyDoors, flappyDoorsUsed = ImGui.Checkbox("Flappy Doors",
-      flappyDoors, true)
-    if flappyDoorsUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("flappyDoors", flappyDoors)
-    end
 
     rgbLights, rgbToggled = ImGui.Checkbox(translateLabel("rgbLights"), rgbLights, true)
     if rgbToggled then
@@ -1863,8 +1869,15 @@ vehicle_tab:add_imgui(function()
         end
       end)
     end
+
+    ImGui.SameLine(); ImGui.Dummy(62, 1); ImGui.SameLine(); flappyDoors, flappyDoorsUsed = ImGui.Checkbox("Flappy Doors",
+      flappyDoors, true)
+    if flappyDoorsUsed then
+      UI.widgetSound("Nav2")
+      lua_cfg.save("flappyDoors", flappyDoors)
+    end
+
     if rgbLights then
-      ImGui.SameLine();
       ImGui.PushItemWidth(120)
       lightSpeed, lightSpeedUsed = ImGui.SliderInt(translateLabel("rgbSlider"), lightSpeed, 1, 3)
       ImGui.PopItemWidth()
@@ -1873,7 +1886,8 @@ vehicle_tab:add_imgui(function()
         lua_cfg.save("lightSpeed", lightSpeed)
       end
     end
-    ImGui.Spacing()
+
+    ImGui.Spacing();
     if ImGui.Button(translateLabel("engineSoundBtn")) then
       if is_car or is_bike or is_quad then
         open_sounds_window = true
@@ -2390,26 +2404,26 @@ end
 
 vehicle_creator:add_imgui(function()
   ImGui.Dummy(1, 10)
-  persist_switch, pswChanged = ImGui.RadioButton("Create", persist_switch, 0)
-  UI.helpMarker(false, "Start by spawning a vehicle. The first one you spawn will always be the main vehicle that others will be attached to.\10Once you spawn more than one vehicle, other UI widgets will appear allowing you to manage all your spawned vehicles:\10 - Delete\10 - Attach\10 - Adjust attach position\10 - Save")
+  persist_switch, pswChanged = ImGui.RadioButton(translateLabel("Create"), persist_switch, 0)
+  UI.helpMarker(false, translateLabel("vcreator_tt"))
   if pswChanged then
     UI.widgetSound("Nav")
   end
   if saved_vehicles[1] ~= nil then
-    ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); persist_switch, pswChanged = ImGui.RadioButton("Spawn Persistent", persist_switch, 1)
+    ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); persist_switch, pswChanged = ImGui.RadioButton(translateLabel("vc_saved_vehs"), persist_switch, 1)
     if pswChanged then
       UI.widgetSound("Nav")
     end
   else
     ImGui.BeginDisabled()
-    ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); persist_switch, pswChanged = ImGui.RadioButton("Spawn Persistent", persist_switch, 1)
+    ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); persist_switch, pswChanged = ImGui.RadioButton(translateLabel("vc_saved_vehs"), persist_switch, 1)
     ImGui.EndDisabled()
-    UI.toolTip(false, "You do not have any saved vehicles. This option will be unlocked after you create and save a vehicle.")
+    UI.toolTip(false, translateLabel("vc_saved_vehs_tt"))
   end
   if persist_switch == 0 then
     ImGui.Spacing()
     ImGui.PushItemWidth(350)
-    vCreator_searchQ, used = ImGui.InputTextWithHint("##searchVehicles", "Search", vCreator_searchQ, 32)
+    vCreator_searchQ, used = ImGui.InputTextWithHint("##searchVehicles", translateLabel("search_hint"), vCreator_searchQ, 32)
     ImGui.PopItemWidth()
     if ImGui.IsItemActive() then
       is_typing = true
@@ -2425,7 +2439,7 @@ vehicle_creator:add_imgui(function()
       vehicleName = vehicles.get_vehicle_display_name(joaat(filtered_vehicles[vehicle_index + 1]))
     end
     ImGui.Dummy(1, 10)
-    if ImGui.Button("    Spawn   ") then
+    if ImGui.Button("   " .. translateLabel("Spawn") .. "   ##vehcreator") then
       UI.widgetSound("Select")
       script.run_in_fiber(function()
         local plyrCoords   = self.get_pos()
@@ -2455,16 +2469,16 @@ vehicle_creator:add_imgui(function()
     end
     if saved_vehicles[1] == nil then
       ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
-      if ImGui.Button("Generate A Widebody Civic") then
+      if ImGui.Button(translateLabel("widebodycivic_Btn")) then
         createWideBodyCivic()
         spawnPersistVeh(saved_vehicles[1].main_veh, saved_vehicles[1].mods, saved_vehicles[1].color_1, saved_vehicles[1].color_2, saved_vehicles[1].tint, saved_vehicles[1].attachments)
       end
-      UI.toolTip(false, "Generates, spawns and saves a widebody Honda Civic (Sugoi) as a simple example of what the vehicle creator can do.")
+      UI.toolTip(false, translateLabel("widebodycivic_tt"))
     end
     if main_vehicle ~= 0 then
       ImGui.Dummy(1, 10);
-      ImGui.BulletText("Main Vehicle: " .. main_vehicle_name); ImGui.Spacing()
-      if ImGui.Button("   Delete   ##mainVeh") then
+      ImGui.BulletText(translateLabel("vc_main_veh") .. main_vehicle_name); ImGui.Spacing()
+      if ImGui.Button("   " .. translateLabel("generic_delete") .. "   ##mainVeh") then
         UI.widgetSound("Delete")
         script.run_in_fiber(function(delmv)
           if entities.take_control_of(main_vehicle, 300) then
@@ -2490,13 +2504,13 @@ vehicle_creator:add_imgui(function()
       end
     end
     if spawned_vehicles[1] ~= nil then
-      ImGui.Spacing(); ImGui.Text("Spawned Vehicles")
+      ImGui.Spacing(); ImGui.Text(translateLabel("vc_spawned_vehs"))
       ImGui.PushItemWidth(230)
       spawned_veh_index, _ = ImGui.Combo("##Spawned Vehicles", spawned_veh_index, filteredVehNames, #spawned_vehicles)
       ImGui.PopItemWidth()
       selectedVeh = spawned_vehicles[spawned_veh_index + 1]
       ImGui.SameLine()
-      if ImGui.Button("   Delete   ##spawnedVeh") then
+      if ImGui.Button("   " .. translateLabel("generic_delete") .. "   ##spawnedVeh") then
         UI.widgetSound("Delete")
         script.run_in_fiber(function(del)
           if entities.take_control_of(selectedVeh, 300) then
@@ -2513,11 +2527,11 @@ vehicle_creator:add_imgui(function()
               attachment_index = 0
             end
           else
-            gui.show_error("Vehicle Creator", "Failed to delete the vehicle! ")
+            gui.show_error("Samurais Scripts", translateLabel("generic_veh_delete_fail"))
           end
         end)
       end
-      if ImGui.Button("Attach To " .. main_vehicle_name) then
+      if ImGui.Button(translateLabel("vc_attach_btn") .. main_vehicle_name) then
         if selectedVeh ~= main_vehicle then
           script.run_in_fiber(function()
             if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedVeh, main_vehicle) then
@@ -2544,12 +2558,12 @@ vehicle_creator:add_imgui(function()
               attached_vehicles = {}
             else
               UI.widgetSound("Error")
-              gui.show_error("Vehicle Creator", "This vehicle is already attached.")
+              gui.show_error("Samurais Scripts", translateLabel("vc_alrattached_err"))
             end
           end)
         else
           UI.widgetSound("Error")
-          gui.show_error("Vehicle Creator", "You cannot attach a vehicle to itself.")
+          gui.show_error("Samurais Scripts", translateLabel("vc_selfattach_err"))
         end
       end
     end
@@ -2558,7 +2572,7 @@ vehicle_creator:add_imgui(function()
       showAttachedVehicles()
       ImGui.PopItemWidth()
       selected_attchmnt = veh_attachments[attachment_index + 1]
-      ImGui.Text("Multiplier:")
+      ImGui.Text(translateLabel("generic_multiplier_label"))
       ImGui.PushItemWidth(271)
       veh_axisMult, _ = ImGui.InputInt("##AttachMultiplier", veh_axisMult, 1, 2, 0)
       ImGui.PopItemWidth()
@@ -2702,21 +2716,21 @@ vehicle_creator:add_imgui(function()
           2, true, 1)
       end
       ImGui.Spacing()
-      if ImGui.Button(" Save ") then
+      if ImGui.Button(translateLabel("saveBtn") .. "##vehcreator1") then
         UI.widgetSound("Select2")
         ImGui.OpenPopup("Save Merged Vehicles")
       end
       ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
       ImGui.SetNextWindowBgAlpha(0.81)
       if ImGui.BeginPopupModal("Save Merged Vehicles", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-        creation_name, _ = ImGui.InputTextWithHint("##save_merge", "Choose a name", creation_name, 64)
+        creation_name, _ = ImGui.InputTextWithHint("##save_merge", translateLabel("vc_choose_name_hint"), creation_name, 128)
         if ImGui.IsItemActive() then
           is_typing = true
         else
           is_typing = false
         end
         ImGui.Spacing()
-        if ImGui.Button(" Save ##2") then
+        if ImGui.Button(translateLabel("saveBtn") .. "##vehcreator2") then
           script.run_in_fiber(function()
             if creation_name ~= "" then
               UI.widgetSound("Select")
@@ -2733,17 +2747,17 @@ vehicle_creator:add_imgui(function()
               for _, veh in ipairs(spawned_vehicles) do
                 ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(veh)
               end
-              gui.show_success("Vehicle Creator", "Your vehicle has been saved.")
+              gui.show_success("Samurais Scripts", translateLabel("vc_saved_msg"))
               resetOnSave()
               ImGui.CloseCurrentPopup()
             else
               UI.widgetSound("Error")
-              gui.show_warning("Vehicle Creator", "Please choose a name for your vehicle!")
+              gui.show_warning("Samurais Scripts", translateLabel("vc_save_err"))
             end
           end)
         end
         ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
-        if ImGui.Button("Cancel") then
+        if ImGui.Button(translateLabel("generic_cancel_btn") .. "##vehcreator") then
           UI.widgetSound("Cancel")
           creation_name = ""
           ImGui.CloseCurrentPopup()
@@ -2758,21 +2772,22 @@ vehicle_creator:add_imgui(function()
       ImGui.PopItemWidth()
       persist_info = filteredCreations[persist_index + 1]
       ImGui.Spacing()
-      if ImGui.Button("  Spawn  ##persist") then
+      if ImGui.Button(translateLabel("vc_spawn_persist") .. "##vehcreator") then
         UI.widgetSound("Select")
         spawnPersistVeh(persist_info.main_veh, persist_info.mods, persist_info.color_1, persist_info.color_2, persist_info.tint, persist_info.attachments)
       end
       ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine()
-      if UI.coloredButton("Remove From The List", "#E40000", "#FF3F3F", "#FF8080", 0.87) then
+      if UI.coloredButton(translateLabel("vc_delete_persist"), "#E40000", "#FF3F3F", "#FF8080", 0.87) then
         UI.widgetSound("Focus_In")
         ImGui.OpenPopup("Remove Persistent")
       end
       ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
+      ImGui.SetNextWindowSizeConstraints(200, 200, 400, 400)
       ImGui.SetNextWindowBgAlpha(0.7)
       if ImGui.BeginPopupModal("Remove Persistent", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-        UI.coloredText("Are you sure?\10This will permanently remove your saved vehicle.", "yellow", 0.91, 35)
+        UI.coloredText(translateLabel("confirm_txt") .. "##vehcreator", "yellow", 0.91, 35)
         ImGui.Dummy(1, 20)
-        if ImGui.Button("  Yes  ##delPerst") then
+        if ImGui.Button("   " .. translateLabel("yes") .. "   ##vehcreator") then
           for key, value in ipairs(saved_vehicles) do
             if persist_info == value then
               table.remove(saved_vehicles, key)
@@ -2784,10 +2799,10 @@ vehicle_creator:add_imgui(function()
           end
           UI.widgetSound("Select")
           ImGui.CloseCurrentPopup()
-          gui.show_success("Samurais Scripts", "You saved vehicle has been deleted.")
+          gui.show_success("Samurais Scripts", translateLabel("vc_delete_msg"))
         end
         ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
-        if ImGui.Button("  Cancel  ") then
+        if ImGui.Button("   " .. translateLabel("no") .. "   ##vehcreator") then
           UI.widgetSound("Cancel")
           ImGui.CloseCurrentPopup()
         end
@@ -2802,8 +2817,8 @@ end)
     *online*
 ]]
 online_tab = Samurais_scripts:add_tab("Online")
--- Players
 
+-- Casino
 casino_pacino = online_tab:add_tab("Casino Pacino") --IT'S NOT AL ANYMORE! IT'S DUNK!
 blackjack_cards                       = 116
 blackjack_decks                       = 846
@@ -3279,6 +3294,7 @@ casino_pacino:add_imgui(function()
   end
 end)
 
+-- Players
 players_tab = online_tab:add_tab(translateLabel("playersTab"))
 playerIndex           = 0
 local selectedPlayer  = 0
@@ -3359,6 +3375,9 @@ end)
     *world*
 ]]
 world_tab = Samurais_scripts:add_tab(translateLabel("worldTab"))
+
+local default_wanted_lvl = 5
+
 local function playHandsUp()
   script.run_in_fiber(function()
     if Game.requestAnimDict("mp_missheist_countrybank@lift_hands") then
@@ -4387,7 +4406,7 @@ local lang_T       = {
   -- { name = 'Chinese (Simplified)',  iso = 'zh-CH' },
   -- { name = 'Español',               iso = 'es-ES' },
   { name = 'Português (Brasil)',    iso = 'pt-BR' },
-  { name = 'Русский (Russian)',    iso = 'ru-RU' },
+  { name = 'Русский (Russian)',     iso = 'ru-RU' },
 }
 
 function displayLangs()
@@ -4506,9 +4525,11 @@ settings_tab:add_imgui(function()
       launchCtrl              = false
       popsNbangs              = false
       limitVehOptions         = false
+      missiledefense          = false
       louderPops              = false
       autobrklight            = false
       holdF                   = false
+      keepWheelsTurned        = false
       noJacking               = false
       useGameLang             = false
       disableProps            = false
@@ -4697,7 +4718,7 @@ end
 
 
 --[[
-    looped scripts
+    Threads
 ]]
 
 script.register_looped("basic ass loading text", function(balt)
@@ -4775,6 +4796,13 @@ script.register_looped("GameInput", function()
         timerB = 0
       end
     end
+    if keepWheelsTurned then
+      if Game.Self.isDriving() and not is_typing and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
+        if PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
+          PAD.DISABLE_CONTROL_ACTION(0, 75, true)
+        end
+      end
+    end
   end
 
   if (pedGrabber or vehicleGrabber) and Game.Self.isOnFoot() and not WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
@@ -4837,8 +4865,8 @@ end)
 -- end)
 script.register_looped("self features", function(script)
   -- Crouch instead of sneak
-  if Game.Self.isOnFoot() and not Game.Self.isInWater() then
-    if replaceSneakAnim and not ped_grabbed and not is_playing_anim and not is_playing_scenario and not is_typing and not PED.IS_PED_RAGDOLL(self.get_ped()) then
+  if Game.Self.isOnFoot() and not Game.Self.isInWater() and not Game.Self.is_ragdoll() and not gui.is_open() then
+    if replaceSneakAnim and not ped_grabbed and not is_playing_anim and not is_playing_scenario and not is_typing then
       if not isCrouched and PAD.IS_DISABLED_CONTROL_PRESSED(0, 36) then
         script:sleep(200)
         if is_handsUp then
@@ -4865,25 +4893,27 @@ script.register_looped("self features", function(script)
   end
 
   -- Replace 'Point At' Action
-  if Game.Self.isOnFoot() or is_car then
-    if replacePointAct and not ped_grabbed and not is_playing_anim and not is_playing_scenario and not is_typing then
-      if not is_handsUp and PAD.IS_DISABLED_CONTROL_PRESSED(0, 29) then
-        script:sleep(200)
-        if isCrouched then
-          isCrouched = false
-          PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
+  if not gui.is_open() then
+    if Game.Self.isOnFoot() or is_car then
+      if replacePointAct and not ped_grabbed and not is_playing_anim and not is_playing_scenario and not is_typing then
+        if not is_handsUp and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29) then
+          script:sleep(200)
+          if isCrouched then
+            isCrouched = false
+            PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
+          end
+          playHandsUp()
+          is_handsUp = true
         end
-        playHandsUp()
-        is_handsUp = true
       end
     end
-  end
 
-  if is_handsUp and PAD.IS_DISABLED_CONTROL_PRESSED(0, 29) then
-    script:sleep(200)
-    TASK.CLEAR_PED_TASKS(self.get_ped())
-    script:sleep(500)
-    is_handsUp = false
+    if is_handsUp and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29) then
+      script:sleep(200)
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      script:sleep(500)
+      is_handsUp = false
+    end
   end
   if is_handsUp then
     if WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
@@ -5248,7 +5278,7 @@ end)
 
 -- Animation Shotrcut
 script.register_looped("anim shortcut", function(animsc)
-  if shortcut_anim.anim ~= nil then
+  if shortcut_anim.anim ~= nil and not gui.is_open() and not ped_grabbed and not vehicle_grabbed then
     if PAD.IS_CONTROL_JUST_PRESSED(0, shortcut_anim.btn) and not is_typing then
       is_shortcut_anim = true
       info = shortcut_anim
@@ -5550,20 +5580,35 @@ script.register_looped("TDFT", function(script)
         end
       end
     end
-    if holdF then
+    if Game.Self.isDriving() and keepWheelsTurned and not holdF then
+      if PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) and (PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35)) then
+        VEHICLE.SET_VEHICLE_ENGINE_ON(current_vehicle, false, true, false)
+        TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 16)
+      end
+    end
+    if Game.Self.isDriving() and holdF then
       if PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) then
         timerB = timerB + 1
         if timerB >= 15 then
-          PED.SET_PED_CONFIG_FLAG(self.get_ped(), 241, false)
-          TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 0)
-          timerB = 0
+          if keepWheelsTurned and PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
+            VEHICLE.SET_VEHICLE_ENGINE_ON(current_vehicle, false, true, false)
+            TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 16)
+          else
+            PED.SET_PED_CONFIG_FLAG(self.get_ped(), 241, false)
+            TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 0)
+            timerB = 0
+          end
         end
       end
       if timerB >= 1 and timerB <= 10 then
         if PAD.IS_DISABLED_CONTROL_RELEASED(0, 75) then
-          PED.SET_PED_CONFIG_FLAG(self.get_ped(), 241, true)
-          TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 0)
-          timerB = 0
+          if keepWheelsTurned and PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
+            TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 16)
+          else
+            PED.SET_PED_CONFIG_FLAG(self.get_ped(), 241, true)
+            TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 0)
+            timerB = 0
+          end
         end
       end
     else
@@ -5586,7 +5631,7 @@ end)
 
 script.register_looped("tire smoke", function(smkptfx)
   if driftMode or DriftTires then
-    if DriftSmoke and Game.Self.isDriving() then
+    if DriftSmoke and Game.Self.isDriving() and is_drifting then
       if is_car and PAD.IS_CONTROL_PRESSED(0, tdBtn) and PAD.IS_CONTROL_PRESSED(0, 71) and VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(current_vehicle) > 0 and ENTITY.GET_ENTITY_SPEED(current_vehicle) > 6 then
         local dict = "scr_ba_bb"
         local wheels = { "wheel_lr", "wheel_rr" }

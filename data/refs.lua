@@ -336,6 +336,5 @@ pe_config_flags_T = {
     {id = 229, bool = true},
     {id = 286, bool = true},
     {id = 294, bool = true},
-    {id = 314, bool = true},
     {id = 435, bool = true},
 }

@@ -377,6 +377,30 @@ Labels = {
         {iso = "pt-BR", text = "Limitar algumas opções apenas a veículos de desempenho. Por exemplo, com essa opção ativada, os veículos lentos e irrelevantes não terão 'Launch Control' nem um 'Pops & Bangs'."},
     },
 
+    ["missile_def_tt"] = {
+        {iso = "en-US", text = "Inrercepts any missiles near your vehicle including those fired by you.\10\10NOTE: If you fire any missiles from or near your vehicle, the defense will render them inert."},
+        {iso = "de-DE", text = "Fängt alle Raketen in der Nähe Ihres Fahrzeugs ab, einschließlich der von Ihnen abgefeuerten.\10\10HINWEIS: Wenn Sie von Ihrem Fahrzeug aus oder in dessen Nähe Raketen abfeuern, werden diese durch die Verteidigung unschädlich gemacht."},
+        {iso = "fr-FR", text = "Intercepte tous les missiles à proximité de votre véhicule, y compris ceux que vous avez tirés.\10\10REMARQUE : Si vous tirez des missiles depuis ou à proximité de votre véhicule, la défense les rendra inertes."},
+        {iso = "it-IT", text = "Intercetta tutti i missili vicini al veicolo, compresi quelli lanciati dall'utente.\10\10NOTA: Se si lanciano missili dal veicolo o nelle sue vicinanze, la difesa li renderà inerti."},
+        {iso = "pt-BR", text = "Intercepta todos os mísseis próximos ao seu veículo, inclusive os disparados por você.\10\10NOTA: Se você disparar algum míssil do seu veículo ou próximo a ele, a defesa o tornará inerte."},
+    },
+
+    ["missile_def_on_notif"] = {
+        {iso = "en-US", text = "Missile defense activated! Please note that firing any missiles from or near your vehicle will render them inert."},
+        {iso = "de-DE", text = "Raketenabwehr aktiviert! Bitte beachten Sie, dass das Abfeuern von Raketen aus oder in der Nähe Ihres Fahrzeugs diese unbrauchbar macht."},
+        {iso = "fr-FR", text = "Défense antimissile activée ! Veuillez noter que le fait de tirer des missiles à partir ou à proximité de votre véhicule les rendra inertes."},
+        {iso = "it-IT", text = "Difesa missilistica attivata! Si noti che il lancio di missili da o vicino al veicolo li renderà inerti."},
+        {iso = "pt-BR", text = "Defesa antimísseis ativada! Observe que disparar qualquer míssil do seu veículo ou próximo a ele o deixará inerte."},
+    },
+
+    ["missile_def_off_notif"] = {
+        {iso = "en-US", text = "Missile defense deactivated."},
+        {iso = "de-DE", text = "Die Raketenabwehr wurde deaktiviert."},
+        {iso = "fr-FR", text = "Défense antimissile désactivée."},
+        {iso = "it-IT", text = "Difesa missilistica disattivata."},
+        {iso = "pt-BR", text = "Defesa antimísseis desativada."},
+    },
+
     ["lct_tt"] = {
         {iso = "en-US", text = "When your vehicle is completely stopped, press and hold [Accelerate] + [Brake] for 3 seconds then let go of the brakes."},
         {iso = "de-DE", text = "Halte die Tasten [Beschleunigen] + [Bremsen] drei Sekunden lang gedrückt und lasse dann die Bremse los. Funktioniert nur wenn das Fahrzeug still steht."},
@@ -455,6 +479,15 @@ Labels = {
         {iso = "it-IT", text = "Ripristina l'uscita dal veicolo di GTA IV: tieni premuto [F] per spegnere il motore prima di uscire dal veicolo o premi normalmente per uscire e tenerlo in funzione."},
         {iso = "pt-BR", text = "Traz de volta a saída do veículo do GTA IV: segure [F] para desligar o motor antes de sair do veículo ou pressione normalmente para sair e mantê-lo funcionando."},
     },
+
+    ["wheelsturned_tt"] = {
+        {iso = "en-US", text = "Keeps your wheels turned when you exit your vehicle while holding [A] or [D]."},
+        {iso = "de-DE", text = "Hält die Räder beim Verlassen des Fahrzeugs gedreht, während Sie [A] oder [D]."},
+        {iso = "fr-FR", text = "Les roues restent tournées lorsque vous sortez du véhicule en maintenant la touche [A] ou [D]."},
+        {iso = "it-IT", text = "Mantiene le ruote girate quando si esce dal veicolo tenendo premuto [A] o [D]."},
+        {iso = "pt-BR", text = "Mantém as rodas girando quando você sai do veículo enquanto segura [A] ou [D]."},
+    },
+
 
     ["canttouchthis_tt"] = {
         {iso = "en-US", text = "Prevent NPCs and players from carjacking you."},
@@ -1441,6 +1474,158 @@ Labels = {
         {iso = "pt-BR", text = "Transforma todos os motoristas próximos a você em maníacos suicidas."},
     },
 
+    ["Create"] = {
+        {iso = "en-US", text = "Create"},
+        {iso = "de-DE", text = "Erstellen"},
+        {iso = "fr-FR", text = "Créer"},
+        {iso = "it-IT", text = "Creare"},
+        {iso = "pt-BR", text = "Criar"},
+    },
+
+    ["vcreator_tt"] = {
+        {iso = "en-US", text = "Start by spawning a vehicle. The first one you spawn will always be the main vehicle that others will be attached to.\10Once you spawn more than one vehicle, other UI widgets will appear allowing you to manage all your spawned vehicles:\10 - Delete\10 - Attach\10 - Adjust attach position\10 - Save"},
+        {iso = "de-DE", text = "Beginnen Sie damit, ein Fahrzeug zu spawnen. Das erste, das Sie spawnen, wird immer das Hauptfahrzeug sein, an das die anderen angehängt werden.\10Wenn Sie mehr als ein Fahrzeug spawnen, erscheinen andere UI-Widgets, mit denen Sie alle Ihre gespawnten Fahrzeuge verwalten können:\10 - Löschen\10 - Anhängen\10 - Anhängeposition anpassen\10 - Speichern"},
+        {iso = "fr-FR", text = "Commencez par créer un véhicule. Le premier que vous créez sera toujours le véhicule principal auquel les autres seront attachés.\10Lorsque vous créez plus d'un véhicule, d'autres widgets d'interface utilisateur apparaîtront pour vous permettre de gérer tous les véhicules créés:\10- Supprimer\10- Attacher\10- Ajuster la position de l'attache\10- Sauvegarder"},
+        {iso = "it-IT", text = "Iniziare con la creazione di un veicolo. Il primo che viene generato sarà sempre il veicolo principale a cui verranno agganciati gli altri.\10Quando si genera più di un veicolo, appariranno altri widget dell'interfaccia utente che permetteranno di gestire tutti i veicoli generati:\10 - Elimina\10 - Attacca\10 - Regola la posizione di attacco\10 - Salva"},
+        {iso = "pt-BR", text = "Comece gerando um veículo. O primeiro que você gerar será sempre o veículo principal ao qual os outros serão anexados.\10Quando você gerar mais de um veículo, outros widgets da interface do usuário aparecerão, permitindo que você gerencie todos os veículos gerados:\10 - Excluir\10 - Anexar\10 - Ajustar a posição de anexação\10 - Salvar"},
+    },
+
+    ["vc_saved_vehs"] = {
+        {iso = "en-US", text = "Saved Vehicles"},
+        {iso = "de-DE", text = "Gespeicherte Fahrzeuge"},
+        {iso = "fr-FR", text = "Véhicules Sauvegardés"},
+        {iso = "it-IT", text = "Veicoli Salvati"},
+        {iso = "pt-BR", text = "Veículos Salvos"},
+    },
+
+    ["vc_saved_vehs_tt"] = {
+        {iso = "en-US", text = "You do not have any saved vehicles. This option will be unlocked after you create and save a vehicle."},
+        {iso = "de-DE", text = "Sie haben noch keine Fahrzeuge gespeichert. Diese Option wird freigeschaltet, nachdem Sie ein Fahrzeug erstellt und gespeichert haben."},
+        {iso = "fr-FR", text = "Vous n'avez pas de véhicules sauvegardés. Cette option sera débloquée après la création et la sauvegarde d'un véhicule."},
+        {iso = "it-IT", text = "Non ci sono veicoli salvati. Questa opzione verrà sbloccata dopo aver creato e salvato un veicolo."},
+        {iso = "pt-BR", text = "Você não tem nenhum veículo salvo. Essa opção será desbloqueada depois que você criar e salvar um veículo."},
+    },
+
+    ["widebodycivic_Btn"] = {
+        {iso = "en-US", text = "Generate A 'Widebody Civic'"},
+        {iso = "de-DE", text = "Einen 'Widebody Civic' Generieren"},
+        {iso = "fr-FR", text = "Générer Une 'Widebody Civic'"},
+        {iso = "it-IT", text = "Generare Una 'Widebody Civic'"},
+        {iso = "pt-BR", text = "Gerar Um 'Widebody Civic'"},
+    },
+
+    ["widebodycivic_tt"] = {
+        {iso = "en-US", text = "Generates, spawns and saves a widebody Honda Civic (Sugoi) as a simple example of what the vehicle creator can do."},
+        {iso = "de-DE", text = "Generiert, erstellt und speichert einen Honda Civic (Sugoi) als einfaches Beispiel dafür, was der Fahrzeugentwickler tun kann."},
+        {iso = "fr-FR", text = "Génère, crée et enregistre une Honda Civic (Sugoi) à carrosserie large comme exemple simple de ce que le créateur de véhicule peut faire."},
+        {iso = "it-IT", text = "Genera, créa e salva una Honda Civic (Sugoi) corpo largo come semplice esempio di ciò che il creatore di veicoli può fare."},
+        {iso = "pt-BR", text = "Gera, cria e salva um Honda Civic (Sugoi) de corpo largo como um exemplo simples do que o criador de veículos pode fazer."},
+    },
+
+    ["vc_main_veh"] = {
+        {iso = "en-US", text = "Main Vehicle: "},
+        {iso = "de-DE", text = "Hauptfahrzeug: "},
+        {iso = "fr-FR", text = "Véhicule Principal: "},
+        {iso = "it-IT", text = "Veicolo Principale: "},
+        {iso = "pt-BR", text = "Veículo Principal: "},
+    },
+
+    ["vc_spawned_vehs"] = {
+        {iso = "en-US", text = "Spawned Vehicles:"},
+        {iso = "de-DE", text = "Gespawnte Fahrzeuge:"},
+        {iso = "fr-FR", text = "Véhicules Générés :"},
+        {iso = "it-IT", text = "Veicoli Generati:"},
+        {iso = "pt-BR", text = "Veículos Gerados:"},
+    },
+
+    ["vc_attach_btn"] = {
+        {iso = "en-US", text = "Attach To "},
+        {iso = "de-DE", text = "Anhängen An "},
+        {iso = "fr-FR", text = "Attacher À "},
+        {iso = "it-IT", text = "Allegare A "},
+        {iso = "pt-BR", text = "Anexar A "},
+    },
+
+    ["generic_veh_delete_fail"] = {
+        {iso = "en-US", text = "Failed to delete the vehicle!"},
+        {iso = "de-DE", text = "Löschen des Fahrzeugs fehlgeschlagen!"},
+        {iso = "fr-FR", text = "Échec de la suppression du véhicule !"},
+        {iso = "it-IT", text = "Impossibile cancellare il veicolo!"},
+        {iso = "pt-BR", text = "Falha ao excluir o veículo!"},
+    },
+
+    ["vc_alrattached_err"] = {
+        {iso = "en-US", text = "This vehicle is already attached."},
+        {iso = "de-DE", text = "Dieses Fahrzeug ist bereits angeschlossen."},
+        {iso = "fr-FR", text = "Ce véhicule est déjà attaché."},
+        {iso = "it-IT", text = "Questo veicolo è già collegato."},
+        {iso = "pt-BR", text = "Esse veículo já está acoplado."},
+    },
+
+    ["vc_selfattach_err"] = {
+        {iso = "en-US", text = "You cannot attach a vehicle to itself!"},
+        {iso = "de-DE", text = "Sie können ein Fahrzeug nicht an sich selbst befestigen!"},
+        {iso = "fr-FR", text = "Il n'est pas possible d'attacher un véhicule à lui-même !"},
+        {iso = "it-IT", text = "Non si può attaccare un veicolo a se stesso!"},
+        {iso = "pt-BR", text = "Não é possível acoplar um veículo a si mesmo!"},
+    },
+
+    ["generic_multiplier_label"] = {
+        {iso = "en-US", text = "Multiplier:"},
+        {iso = "de-DE", text = "Multiplikator:"},
+        {iso = "fr-FR", text = "Multiplicateur :"},
+        {iso = "it-IT", text = "Moltiplicatore:"},
+        {iso = "pt-BR", text = "Multiplicador:"},
+    },
+
+    ["vc_choose_name_hint"] = {
+        {iso = "en-US", text = "Choose a name"},
+        {iso = "de-DE", text = "Wählen Sie einen Namen"},
+        {iso = "fr-FR", text = "Choisissez un nom"},
+        {iso = "it-IT", text = "Scegliete un nome"},
+        {iso = "pt-BR", text = "Escolha um nome"},
+    },
+
+    ["vc_saved_msg"] = {
+        {iso = "en-US", text = "Your vehicle has been saved."},
+        {iso = "de-DE", text = "Ihr Fahrzeug wurde gespeichert."},
+        {iso = "fr-FR", text = "Votre véhicule a été sauvegardé."},
+        {iso = "it-IT", text = "Il vostro veicolo è stato salvato."},
+        {iso = "pt-BR", text = "Seu veículo foi salvo."},
+    },
+
+    ["vc_save_err"] = {
+        {iso = "en-US", text = "Please choose a name for your vehicle!"},
+        {iso = "de-DE", text = "Bitte wählen Sie einen Namen für Ihr Fahrzeug!"},
+        {iso = "fr-FR", text = "Veuillez choisir un nom pour votre véhicule !"},
+        {iso = "it-IT", text = "Scegliete un nome per il vostro veicolo!"},
+        {iso = "pt-BR", text = "Escolha um nome para seu veículo!"},
+    },
+
+    ["vc_spawn_persist"] = {
+        {iso = "en-US", text = "Spawn Persistent"},
+        {iso = "de-DE", text = "Dauerhaftes Laichen"},
+        {iso = "fr-FR", text = "Spawn Persistant"},
+        {iso = "it-IT", text = "Spawn Persistente"},
+        {iso = "pt-BR", text = "Geração Persistente"},
+    },
+
+    ["vc_delete_persist"] = {
+        {iso = "en-US", text = "Remove From The List"},
+        {iso = "de-DE", text = "Aus Der Liste Entfernen"},
+        {iso = "fr-FR", text = "Retirer De La Liste"},
+        {iso = "it-IT", text = "Rimuovere Dall'elenco"},
+        {iso = "pt-BR", text = "Remover Da Lista"},
+    },
+
+    ["vc_delete_msg"] = {
+        {iso = "en-US", text = "Your saved vehicle has been deleted."},
+        {iso = "de-DE", text = "Ihr gespeichertes Fahrzeug wurde gelöscht."},
+        {iso = "fr-FR", text = "Votre véhicule enregistré a été supprimé."},
+        {iso = "it-IT", text = "Il veicolo salvato è stato cancellato."},
+        {iso = "pt-BR", text = "Seu veículo salvo foi excluído."},
+    },
+
     ["Gambling"] = {
         {iso = "en-US", text = "Casino Games"},
         {iso = "de-DE", text = "Casino Spiele"},
@@ -1526,7 +1711,7 @@ Labels = {
         {iso = "en-US", text = "Rig Slot Machines"},
         {iso = "de-DE", text = "Spielautomaten Manipulieren"},
         {iso = "fr-FR", text = "Truquer Les Machines A Sous"},
-        {iso = "it-IT", text = "Truccare Macchina da gioco"},
+        {iso = "it-IT", text = "Truccare Macchina Da Gioco"},
         {iso = "pt-BR", text = "Falsificação Máquinas Caça-Níquei"},
         {iso = "ru-RU", text = "Подтасовать Слоты"},
     },
@@ -1762,8 +1947,8 @@ function translateLabel(g)
         end
         if retStr == nil or retStr == "" then
             if logMsg then
-                gui.show_warning("Samurai's Scripts", "Unsupported language or missing label detected! Defaulting to English.")
-                log.warning("Unsupported language or missing label detected! Defaulting to English.")
+                gui.show_warning("Samurai's Scripts", "Unsupported language or missing label(s) detected! Defaulting to English.")
+                log.warning("Unsupported language or missing label(s) detected! Defaulting to English.")
             end
             retStr = Labels[g][1].text
             logMsg = false

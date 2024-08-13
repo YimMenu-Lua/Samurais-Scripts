@@ -32,7 +32,7 @@ lua_Fn = {
   ---Inserts a string into another string at the given position. (index starts from 0).
   --[[ -- Example:
 
-      str_insert("Hello", 5, " World")
+      lua_Fn.str_insert("Hello", 5, " World")
         -> "Hello World"
   ]]
   ---@param str string
@@ -63,7 +63,7 @@ lua_Fn = {
   --- Rounds a float to x number of decimals.
   --[[ -- Example:
 
-      round(420.69458797, 2)
+      lua_Fn.round(420.69458797, 2)
         -> 420.69
   ]]
   ---@param n number
@@ -75,7 +75,7 @@ lua_Fn = {
     ---Returns a string containing the input value separated by the thousands.
   --[[ -- Example:
 
-      formatMoney(42069)
+      lua_Fn.separateInt(42069)
         -> "42,069"
   ]]
   ---@param value number | string
@@ -86,7 +86,7 @@ lua_Fn = {
   ---Returns a string containing the input value separated by the thousands and prefixed by a dollar sign.
   --[[ -- Example:
 
-      formatMoney(42069)
+      lua_Fn.formatMoney(42069)
         -> "$42,069"
   ]]
   ---@param value number | string
@@ -108,11 +108,11 @@ lua_Fn = {
 
   - Example:
 
-        red, green, blue = hexToRGB("#E0D0B6")
+        red, green, blue = lua_Fn.hexToRGB("#E0D0B6")
           -> 224, 208, 182
   - Another example:
 
-        r, g, b = hexToRGB("0B4")
+        r, g, b = lua_Fn.hexToRGB("0B4")
           -> 0, 187, 68
   ]]
   ---@param hex string
@@ -135,7 +135,7 @@ lua_Fn = {
       
   - Example:
 
-        hexToString("63756e74")
+        lua_Fn.hexToString("63756E74")
           -> "cunt"
   ]]
   ---@param hex string
@@ -181,9 +181,9 @@ lua_Fn = {
     return count
   end,
 
-  ---Converts 0 and 1 values to bools.
+  ---Converts 0 and 1 values to Lua booleans. Useful when working with memory.
   ---@param value integer
-  get_bool = function(value)
+  lua_bool = function(value)
     if type(value) == "number" then
       if value == 0 then
         return false
@@ -195,6 +195,39 @@ lua_Fn = {
     else
       return error("Incorrect value", 2)
     end
+  end,
+
+  ---Iterates over bits.
+  ---@param n integer
+  get_bit = function(n)
+    return 2 ^ (n - 1)
+  end,
+
+  --[[ Checks if `n` has `x` bit.
+      
+  - Example:
+
+        if lua_Fn.has_bit(n, x) then 
+          --do something
+        end
+  ]]
+  ---@param x integer
+  ---@param n integer
+  has_bit = function(n, x)
+    nn = lua_Fn.get_bit(n)
+    return x % (nn + nn) >= nn
+  end,
+
+  ---Sets `p` bit in `x`
+  ---@param n integer
+  ---@param x integer
+  set_bit = function(n, x)
+    return lua_Fn.hasbit(x, n) and x or x + n
+  end,
+
+  ---Sets `p` bit from `x`
+  clear_bit = function(x, n)
+    return lua_Fn.hasbit(x, n) and x - n or x
   end,
 
   ---Lua version of Bob Jenskins' "Jenkins One At A Time" hash function (https://en.wikipedia.org/wiki/Jenkins_hash_function).
