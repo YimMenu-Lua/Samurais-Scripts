@@ -1093,7 +1093,7 @@ Game = {
           retVal = ""
         end
       elseif vehicle > 65535 then
-        if STEAMING.IS_THIS_MODEL_A_VEHICLE(vehicle) then
+        if STREAMING.IS_THIS_MODEL_A_VEHICLE(vehicle) then
           retVal = vehicles.get_vehicle_display_name(vehicle)
         else
           retVal = ""
@@ -1118,7 +1118,7 @@ Game = {
           retVal = ""
         end
       elseif vehicle > 65535 then
-        if STEAMING.IS_THIS_MODEL_A_VEHICLE(vehicle) then
+        if STREAMING.IS_THIS_MODEL_A_VEHICLE(vehicle) then
           local mfr = VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(vehicle)
           retVal = (mfr:lower():gsub("^%l", string.upper))
         else
