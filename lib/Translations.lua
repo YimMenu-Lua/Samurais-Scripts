@@ -345,6 +345,14 @@ Labels = {
         {iso = "pt-BR", text = "Isso equipará seu carro com pneus de drift sempre que você pressionar [Left Shift]. Seus pneus serão zerados quando você soltar o botão."},
     },
 
+    ["driftToruqe_tt"] = {
+        {iso = "en-US", text = "Increases you vehicle's toruqe when drifting. Works for both 'Drift Mode' and 'Drift Tires'."},
+        {iso = "de-DE", text = "Erhöht das Drehmoment des Fahrzeugs beim Driften.Funktioniert sowohl für 'Drift Mode' und 'Drift Tires'."},
+        {iso = "fr-FR", text = "Augmente le couple du véhicule lorque vous driftez. Fonctionne à la fois pour 'Drift Mode' et 'Drift Tires'."},
+        {iso = "it-IT", text = "Aumenta la coppia del veicolo durante le derapate. Funziona sia per 'Drift Mode' che per 'Drift Tires'."},
+        {iso = "pt-BR", text = "Aumenta o torque de seu veículo ao fazer drifting. Funciona para ambos 'Drift Mode' e 'Drift Tires'."},
+    },
+
     ["DriftSmoke_tt"] = {
         {iso = "en-US", text = "Creates a smoke effect when drifting. You can change the smoke color but it's not related to the games tire smoke color."},
         {iso = "de-DE", text = "Erzeugt einen Raucheffekt beim Driften. Sie können die Rauchfarbe ändern, aber es ist nicht auf die Spiele Reifen Rauch Farbe bezogen."},

@@ -197,7 +197,6 @@ lua_Fn = {
     end
   end,
 
-  ---Iterates over bits.
   ---@param n integer
   get_bit = function(n)
     return 2 ^ (n - 1)
@@ -222,12 +221,12 @@ lua_Fn = {
   ---@param n integer
   ---@param x integer
   set_bit = function(n, x)
-    return lua_Fn.hasbit(x, n) and x or x + n
+    return lua_Fn.has_bit(x, n) and x or x + n
   end,
 
   ---Sets `p` bit from `x`
   clear_bit = function(x, n)
-    return lua_Fn.hasbit(x, n) and x - n or x
+    return lua_Fn.has_bit(x, n) and x - n or x
   end,
 
   ---Lua version of Bob Jenskins' "Jenkins One At A Time" hash function (https://en.wikipedia.org/wiki/Jenkins_hash_function).
@@ -1081,27 +1080,50 @@ Game = {
 
   Vehicle = {
 
-    -- Returns the name of the vehicle localPlayer is sitting in.
-    name = function()
+    ---Returns the name of the specified vehicle.
+    ---You can specify either an entity number or a vehicle hash.
+    ---@param vehicle number
+    name = function(vehicle)
       ---@type string
       local retVal
-      if not Game.Self.isOnFoot() then
-        retVal = vehicles.get_vehicle_display_name(Game.getEntityModel(self.get_veh()))
+      if vehicle <= 65535 then
+        if ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+          retVal = vehicles.get_vehicle_display_name(Game.getEntityModel(vehicle))
+        else
+          retVal = ""
+        end
+      elseif vehicle > 65535 then
+        if STEAMING.IS_THIS_MODEL_A_VEHICLE(vehicle) then
+          retVal = vehicles.get_vehicle_display_name(vehicle)
+        else
+          retVal = ""
+        end
       else
         retVal = ""
       end
       return retVal
     end,
 
-    -- Returns the manufacturer name of the vehicle localPlayer is sitting in.
-    manufacturer = function()
+    ---Returns the manufacturer's name of the specified vehicle.
+    ---You can specify either an entity number or a vehicle hash.
+    ---@param vehicle number
+    manufacturer = function(vehicle)
       ---@type string
       local retVal
-      if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
-        local mfr = VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(Game.getEntityModel(self.get_veh()))
-        retVal = (mfr:lower():gsub("^%l", string.upper))
-      else
-        retVal = ""
+      if vehicle <= 65535 then
+        if ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+          local mfr = VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(Game.getEntityModel(vehicle))
+          retVal = (mfr:lower():gsub("^%l", string.upper))
+        else
+          retVal = ""
+        end
+      elseif vehicle > 65535 then
+        if STEAMING.IS_THIS_MODEL_A_VEHICLE(vehicle) then
+          local mfr = VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(vehicle)
+          retVal = (mfr:lower():gsub("^%l", string.upper))
+        else
+          retVal = ""
+        end
       end
       return retVal
     end,

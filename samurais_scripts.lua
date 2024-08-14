@@ -7,7 +7,7 @@ require('data/objects')
 require('data/actions')
 require('data/refs')
 
-SCRIPT_VERSION  = '1.1.1'   -- v1.1.1
+SCRIPT_VERSION  = '1.1.2'   -- v1.1.2
 TARGET_BUILD    = '3274'  -- Only YimResupplier needs a version check.
 TARGET_VERSION  = '1.69'
 CURRENT_BUILD   = Game.GetBuildNumber()
@@ -78,6 +78,7 @@ default_config   = {
   heist_cart_autograb     = false,
   nosPower                = 10,
   lightSpeed              = 1,
+  DriftPowerIncrease      = 1,
   laser_switch            = 0,
   lang_idx                = 0,
   DriftIntensity          = 0,
@@ -117,6 +118,7 @@ laser_switch        = lua_cfg.read("laser_switch")
 laser_choice        = lua_cfg.read("laser_choice")
 driftMode           = lua_cfg.read("driftMode")
 DriftIntensity      = lua_cfg.read("DriftIntensity")
+DriftPowerIncrease  = lua_cfg.read("DriftPowerIncrease")
 DriftTires          = lua_cfg.read("DriftTires")
 DriftSmoke          = lua_cfg.read("DriftSmoke")
 driftMinigame       = lua_cfg.read("driftMinigame")
@@ -208,6 +210,7 @@ drift_extra_pts     = 0
 straight_counter    = 0
 drift_time          = 0
 drift_multiplier    = 1
+quote_alpha         = 1
 pedthrowF           = 10
 tdBtn               = 21
 stop_anim           = 47
@@ -222,6 +225,7 @@ currentStrf         = ""
 currentWmvmt        = ""
 search_term         = ""
 smokeHex            = ""
+random_quote        = ""
 selected_sound      = {}
 selected_radio      = {}
 smokePtfx_t         = {}
@@ -392,6 +396,7 @@ function checkDriftCollision()
     text = "Hit and run"
     crashed = false
   elseif entity_type == "Vehicle" then
+    text = "Samir, you're breaking the car!"
     crashed = true
   elseif entity_type == "Object" then
     -- ENTITY.GET_ENTITY_MODEL(entity) ~= 3300474446 and ENTITY.GET_ENTITY_MODEL(entity) ~= 3231494328 and ENTITY.GET_ENTITY_MODEL(entity) ~= 3008087081 and ENTITY.GET_ENTITY_MODEL(entity) ~= 874602658
@@ -399,9 +404,11 @@ function checkDriftCollision()
       text = "Wrecking ball"
       crashed = false
     else
+      text = "Samir, you're breaking the car!"
       crashed = true
     end
   elseif entity_type == "None" or entity_type == "Invalid" then
+    text = "Samir, you're breaking the car!"
     crashed = true
   end
   return crashed, text
@@ -423,6 +430,15 @@ function bankDriftPoints_SP(points)
   end)
 end
 
+Samurais_scripts:add_imgui(function()
+  ImGui.Dummy(1, 10); ImGui.SeparatorText("About")
+  UI.wrappedText("A collection of scripts aimed towards adding some roleplaying and fun elements to the game.", 25)
+  ImGui.Dummy(1, 10)
+  ImGui.BulletText("Script Version:   v" .. SCRIPT_VERSION)
+  ImGui.BulletText("Game Version:   b" .. TARGET_BUILD .. "   Online " .. TARGET_VERSION)
+  ImGui.Dummy(1, 10); ImGui.SeparatorText("Quote Of The Day"); ImGui.Spacing()
+  UI.coloredText(random_quote, 'white', quote_alpha, 24)
+end)
 
 --[[
     *self*
@@ -1605,14 +1621,15 @@ local function onVehEnter()
 end
 
 vehicle_tab:add_imgui(function()
-  local manufacturer  = Game.Vehicle.manufacturer()
-  local vehicle_name  = Game.Vehicle.name()
-  local full_veh_name = manufacturer .. " " .. vehicle_name
-  local vehicle_class = Game.Vehicle.class(current_vehicle)
   if PED.IS_PED_IN_ANY_VEHICLE(self.get_ped(), true) then
+    local manufacturer  = Game.Vehicle.manufacturer(self.get_veh())
+    local vehicle_name  = Game.Vehicle.name(self.get_veh())
+    local full_veh_name = manufacturer .. " " .. vehicle_name
+    local vehicle_class = Game.Vehicle.class(self.get_veh())
     if validModel then
       ImGui.Text(full_veh_name .. "   (" .. vehicle_class .. ")")
       ImGui.Spacing()
+      ImGui.SeparatorText("Drift Mode")
       driftMode, driftModeUsed = ImGui.Checkbox(translateLabel("driftModeCB"), driftMode, true)
       UI.helpMarker(false, translateLabel("driftMode_tt"))
       if driftModeUsed then
@@ -1623,7 +1640,6 @@ vehicle_tab:add_imgui(function()
       if driftMode then
         DriftTires = false
         ImGui.SameLine()
-        -- ImGui.Text(translateLabel("driftSlider"))
         ImGui.PushItemWidth(160)
         DriftIntensity, DriftIntensityUsed = ImGui.SliderInt("##Intensity", DriftIntensity, 0, 3)
         ImGui.PopItemWidth()
@@ -1633,6 +1649,7 @@ vehicle_tab:add_imgui(function()
           lua_cfg.save("DriftIntensity", DriftIntensity)
         end
       end
+
       DriftTires, DriftTiresUsed = ImGui.Checkbox(translateLabel("driftTiresCB"), DriftTires, true)
       UI.helpMarker(false, translateLabel("driftTires_tt"))
       if DriftTires then
@@ -1643,19 +1660,31 @@ vehicle_tab:add_imgui(function()
         lua_cfg.save("DriftTires", DriftTires)
         lua_cfg.save("driftMode", false)
       end
+
       if driftMode or DriftTires then
+        ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+        ImGui.PushItemWidth(160)
+        DriftPowerIncrease, dpiUsed = ImGui.SliderInt("Torque", DriftPowerIncrease, 10, 100); ImGui.PopItemWidth()
+        UI.toolTip(false, translateLabel("driftToruqe_tt"))
+        if dpiUsed then
+          UI.widgetSound("Nav2")
+          lua_cfg.save("DriftPowerIncrease", DriftPowerIncrease)
+        end
+
         DriftSmoke, dsmkUsed = ImGui.Checkbox("Drift Smoke", DriftSmoke, true)
         UI.toolTip(false, translateLabel("DriftSmoke_tt"))
         if dsmkUsed then
           UI.widgetSound("Nav2")
           lua_cfg.save("DriftSmoke", DriftSmoke)
         end
+
         ImGui.SameLine(); ImGui.Dummy(70, 1); ImGui.SameLine(); driftMinigame, drmgUsed = ImGui.Checkbox("Drift Minigame", driftMinigame, true)
         UI.toolTip(false, "[WIP] Accumulate points for drifting around without crashing. Your points are automatically transformed into cash once you stop drifting and don't crash for 3 seconds.\n\nNOTE: The cashout feature is for Signle Player only.")
         if drmgUsed then
           UI.widgetSound("Nav2")
           lua_cfg.save("driftMinigame", driftMinigame)
         end
+
         if DriftSmoke then
           ImGui.Spacing(); ImGui.Text(translateLabel("driftSmokeCol"))
           if not customSmokeCol then
@@ -1705,8 +1734,8 @@ vehicle_tab:add_imgui(function()
       UI.wrappedText(translateLabel("driftInvalidVehTxt"), 15)
     end
 
-    ImGui.Separator(); ImGui.Spacing(); limitVehOptions, lvoUsed = ImGui.Checkbox(translateLabel("lvoCB"),
-      limitVehOptions, true)
+    ImGui.Spacing(); ImGui.Spacing(); ImGui.SeparatorText("Fun Features"); ImGui.Spacing();
+    limitVehOptions, lvoUsed = ImGui.Checkbox(translateLabel("lvoCB"), limitVehOptions, true)
     UI.toolTip(false, translateLabel("lvo_tt"))
     if lvoUsed then
       UI.widgetSound("Nav2")
@@ -4566,6 +4595,7 @@ settings_tab:add_imgui(function()
       lang_idx                = 0
       autoplay_chips_cap      = 0
       lightSpeed              = 1
+      DriftPowerIncrease      = 1
       nosPower                = 10
       laser_choice            = "proj_laser_enemy"
       LANG                    = "en-US"
@@ -4720,12 +4750,12 @@ local function SS_handle_events()
   end
 end
 
-local function var_reset()
-  resetOnSave()
-  isCrouched = false; is_handsUp = false; anim_music = false; is_playing_radio = false; npc_blips = {}; spawned_npcs = {}; plyrProps = {}; npcProps = {}; selfPTFX = {}; npcPTFX = {}; curr_playing_anim = {}; is_playing_anim = false; is_playing_scenario = false; tab1Sound = true; tab2Sound = true; tab3Sound = true; actions_switch = 0; actions_search =
-  ""; currentMvmt = ""; currentStrf = ""; currentWmvmt = ""; aimBool = false; HashGrabber = false; drew_laser = false; Entity = 0; laserPtfx_T = {}; sound_btn_off = false; tire_smoke = false; purge_started = false; nos_started = false; twostep_started = false; open_sounds_window = false; started_lct = false; launch_active = false; started_popSound = false; started_popSound2 = false; timerA = 0; timerB = 0; lastVeh = 0; defaultXenon = 0; start_rgb_loop = false; vehSound_index = 0; smokePtfx_t = {}; nosptfx_t = {}; purgePtfx_t = {}; lctPtfx_t = {}; popSounds_t = {}; popsPtfx_t = {}; attached_vehicle = 0; tow_xAxis = 0.0; tow_yAxis = 0.0; tow_zAxis = 0.0; pedGrabber = false; ped_grabbed = false;; vehicleGrabber = false; vehicle_grabbed = false; carpool = false; show_npc_veh_ctrls = false; stop_searching = false; hijack_started = false; grp_anim_index = 0; attached_ped = 0; grabbed_veh = 0; thisVeh = 0; pedthrowF = 10; propName =
-  ""; invalidType = ""; preview = false; is_drifting = false; previewLoop = false; activeX = false; activeY = false; activeZ = false; rotX = false; rotY = false; rotZ = false; attached = false; attachToSelf = false; attachToVeh = false; previewStarted = false; isChanged = false; prop = 0; propHash = 0; os_switch = 0; prop_index = 0; objects_index = 0; spawned_index = 0; selectedObject = 0; selected_bone = 0; previewEntity = 0; currentObjectPreview = 0; attached_index = 0; zOffset = 0; spawned_props = {}; spawnedNames = {}; filteredSpawnNames = {}; selfAttachments = {}; selfAttachNames = {}; vehAttachments = {}; vehAttachNames = {}; filteredVehAttachNames = {}; filteredAttachNames = {}; missiledefense = false;
-end
+-- local function var_reset()
+--   resetOnSave()
+--   isCrouched = false; is_handsUp = false; anim_music = false; is_playing_radio = false; npc_blips = {}; spawned_npcs = {}; plyrProps = {}; npcProps = {}; selfPTFX = {}; npcPTFX = {}; curr_playing_anim = {}; is_playing_anim = false; is_playing_scenario = false; tab1Sound = true; tab2Sound = true; tab3Sound = true; actions_switch = 0; actions_search =
+--   ""; currentMvmt = ""; currentStrf = ""; currentWmvmt = ""; aimBool = false; HashGrabber = false; drew_laser = false; Entity = 0; laserPtfx_T = {}; sound_btn_off = false; tire_smoke = false; purge_started = false; nos_started = false; twostep_started = false; open_sounds_window = false; started_lct = false; launch_active = false; started_popSound = false; started_popSound2 = false; timerA = 0; timerB = 0; lastVeh = 0; defaultXenon = 0; start_rgb_loop = false; vehSound_index = 0; smokePtfx_t = {}; nosptfx_t = {}; purgePtfx_t = {}; lctPtfx_t = {}; popSounds_t = {}; popsPtfx_t = {}; attached_vehicle = 0; tow_xAxis = 0.0; tow_yAxis = 0.0; tow_zAxis = 0.0; pedGrabber = false; ped_grabbed = false;; vehicleGrabber = false; vehicle_grabbed = false; carpool = false; show_npc_veh_ctrls = false; stop_searching = false; hijack_started = false; grp_anim_index = 0; attached_ped = 0; grabbed_veh = 0; thisVeh = 0; pedthrowF = 10; propName =
+--   ""; invalidType = ""; preview = false; is_drifting = false; previewLoop = false; activeX = false; activeY = false; activeZ = false; rotX = false; rotY = false; rotZ = false; attached = false; attachToSelf = false; attachToVeh = false; previewStarted = false; isChanged = false; prop = 0; propHash = 0; os_switch = 0; prop_index = 0; objects_index = 0; spawned_index = 0; selectedObject = 0; selected_bone = 0; previewEntity = 0; currentObjectPreview = 0; attached_index = 0; zOffset = 0; spawned_props = {}; spawnedNames = {}; filteredSpawnNames = {}; selfAttachments = {}; selfAttachNames = {}; vehAttachments = {}; vehAttachNames = {}; filteredVehAttachNames = {}; filteredAttachNames = {}; missiledefense = false;
+-- end
 
 
 
@@ -4754,6 +4784,30 @@ script.register_looped("basic ass loading text", function(balt)
     loading_label = "    "
     balt:sleep(80)
     return
+  end
+end)
+
+script.register_looped("Quote Of The Day", function(qotd)
+  qotd:yield()
+  if gui.is_open() and Samurais_scripts:is_selected()  then
+    random_quote = random_quotes_T[math.random(1, #random_quotes_T)]
+    qotd:sleep(15000)
+  end
+end)
+script.register_looped("QBE", function(qbe)
+  qbe:yield()
+  if gui.is_open() and Samurais_scripts:is_selected() and random_quote ~= "" then
+    if quote_alpha > 0.1 then
+      while quote_alpha > 0.1 do
+        quote_alpha = quote_alpha - 0.05
+        qbe:sleep(100)
+      end
+    else
+      while quote_alpha < 1.0 do
+        quote_alpha = quote_alpha + 0.05
+        qbe:sleep(100)
+      end
+    end
   end
 end)
 
@@ -5533,7 +5587,7 @@ script.register_looped("TDFT", function(script)
       if not VEHICLE.GET_DRIFT_TYRES_SET(current_vehicle) then
         VEHICLE.SET_DRIFT_TYRES(current_vehicle, true)
       end
-      VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 100.0)
+      VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, DriftPowerIncrease)
     else
       VEHICLE.SET_DRIFT_TYRES(current_vehicle, false)
       VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 1.0)
@@ -5542,7 +5596,7 @@ script.register_looped("TDFT", function(script)
     if validModel and driftMode and PAD.IS_CONTROL_PRESSED(0, tdBtn) and not DriftTires then
       VEHICLE.SET_VEHICLE_REDUCE_GRIP(current_vehicle, true)
       VEHICLE.SET_VEHICLE_REDUCE_GRIP_LEVEL(current_vehicle, DriftIntensity)
-      VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 100.0)
+      VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, DriftPowerIncrease)
     else
       VEHICLE.SET_VEHICLE_REDUCE_GRIP(current_vehicle, false)
       VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 1.0)
@@ -6165,12 +6219,12 @@ script.register_looped("extra points checker", function(epc)
       if not ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) then
         local vehicle_height = ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(current_vehicle)
         if vehicle_height > 0.8 and not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle) then
-          if vehicle_height >= 1.1 and vehicle_height <= 5 and not lua_Fn.str_contains(drift_extra_text, "Big Air!") and drift_streak_text ~= 'Streak Lost!' then
+          if vehicle_height >= 1.1 and vehicle_height <= 5 and not lua_Fn.str_contains(drift_extra_text, "Big Air!") then
             drift_extra_pts  = drift_extra_pts + 1
             drift_points     = drift_points + drift_extra_pts
             drift_extra_text = "Air  +" .. drift_extra_pts .. " pts"
             epc:sleep(100)
-          elseif vehicle_height > 5 and drift_streak_text ~= 'Streak Lost!' then
+          elseif vehicle_height > 5 then
             drift_extra_pts  = drift_extra_pts + 5
             drift_points     = drift_points + drift_extra_pts
             drift_extra_text = "Big Air!  +" .. drift_extra_pts .. " pts"
@@ -6180,19 +6234,21 @@ script.register_looped("extra points checker", function(epc)
           if drift_extra_pts > 0 then
             epc:sleep(2000)
             drift_extra_pts = 0
+            drift_extra_text = ""
           end
         end
       else
         local bool, txt = checkDriftCollision()
-        if not bool and drift_streak_text ~= 'Streak Lost!' then
+        if not bool and drift_streak_text ~= "" then
           drift_extra_pts  = drift_extra_pts + 1
           drift_points     = drift_points + drift_extra_pts
           drift_extra_text = txt .. "  +" .. drift_extra_pts .. " pts"
         else
-          if drift_extra_pts > 0 then
-            drift_extra_pts = 0
+          drift_extra_text = txt
+          epc:sleep(3000)
+          if drift_extra_pts > 0 or drift_extra_text ~= "" then
+            drift_extra_pts  = 0
             drift_extra_text = ""
-            epc:sleep(2000)
           end
         end
       end
@@ -6232,7 +6288,7 @@ end)
 script.register_looped("drift points", function()
   if Game.Self.isDriving() and is_car and is_drifting then
     showDriftCounter(drift_streak_text .. "\n+" .. lua_Fn.separateInt(drift_points) .. " pts")
-    if drift_extra_pts > 0 then
+    if drift_extra_pts > 0 or drift_extra_text ~= "" then
       showDriftExtra(drift_extra_text)
     end
   end
@@ -6242,7 +6298,8 @@ end)
 script.register_looped("missile defense", function(md)
   if missiledefense and current_vehicle ~= 0 then
     local missile
-    local vehPos = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
+    local vehPos  = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
+    local selfPos = self.get_pos()
     for _, p in pairs(projectile_types_T) do
       if MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 500, vehPos.y + 500, vehPos.z + 100, vehPos.x - 500, vehPos.y - 500, vehPos.z - 100, p, false) then
         missile = p
@@ -6251,7 +6308,7 @@ script.register_looped("missile defense", function(md)
     end
     if missile ~= 0 then
       if MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 20, vehPos.y + 20, vehPos.z + 100, vehPos.x - 20, vehPos.y - 20, vehPos.z - 100, missile, false) then
-        if not MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 10, vehPos.y + 10, vehPos.z + 50, vehPos.x - 10, vehPos.y - 10, vehPos.z - 50, missile, false) then
+        if not MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 10, vehPos.y + 10, vehPos.z + 50, vehPos.x - 10, vehPos.y - 10, vehPos.z - 50, missile, false) and not MISC.IS_PROJECTILE_TYPE_IN_AREA(selfPos.x + 10, selfPos.y + 10, selfPos.z + 50, selfPos.x - 10, selfPos.y - 10, selfPos.z - 50, missile, false) then
           log.info('Detected projectile within our defense area! Proceeding to destroy it.')
           WEAPON.REMOVE_ALL_PROJECTILES_OF_TYPE(missile, true)
           if Game.requestNamedPtfxAsset("scr_sm_counter") then

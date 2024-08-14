@@ -338,3 +338,26 @@ pe_config_flags_T = {
     {id = 294, bool = true},
     {id = 435, bool = true},
 }
+
+random_quotes_T = {
+    "FACT: AWD drifting isn't drifting.",
+    "People who put M badges on a non-M BMW should go to prison.",
+    "Speed has never killed anyone. Suddenly becoming stationary, that's what gets you.",
+    "Fun Fact: lonelybud is is not really lonely. He has four wives.",
+    "Being a lorry driver is hard: change gear change gear change gear change gear, check your mirrors, murder a prostitute, change gear change gear, murder... That's a lot of effort in a day.",
+    "Jaguar is pronounced just the way it's spelled.",
+    "Some say, the person who wrote this script has a full size tattoo of his face... on his face.",
+    "Fun Fact: Harmless is not really harmless. He's a Kung-Fu master.",
+    "The drift feature in this script is an ingenious solution to a problem that should never have existed.",
+    "A car guy's diet: Gasoline and burnt rubber.",
+    "Fun Fact: Yimura is the cousin of LMFAO, an infamous chinese hacker.",
+    "There is never enough horsepower, just not enough traction.",
+    "The best way to make a small fortune racing is to start with a large fortune and work your way down.",
+    "Fun Fact: DeadlineEm has an issue with deadlines. He never meets them.",
+    "You can sleep in your car, but you can't race your house.",
+    "It don't matter if you win by an inch or a mile. Winning's winning.",
+    "Fun Fact: gir489returns will hurt your feelings.",
+    "There's no 'wax on wax off' with drifting. You learn by doing it. The first drifters invented drifting out in the touge by feeling it. So feel it.",
+    "Dude, I almost had you!\10\10    ¤ RIP, Paul Walker ¤",
+    "Fun Fact: USBMenus has a tattoo of a USB stick on his forehead. He really loves USBs.",
+}
