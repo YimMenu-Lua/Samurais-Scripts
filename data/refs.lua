@@ -342,7 +342,7 @@ pe_config_flags_T = {
 random_quotes_T = {
     "FACT: AWD drifting isn't drifting.",
     "People who put M badges on a non-M BMW should go to prison.",
-    "Fun Fact: tupy-ya is actually a KGB spy.",
+    "Fun Fact: tupoy-ya is actually a KGB spy.",
     "Speed has never killed anyone. Suddenly becoming stationary, that's what gets you.",
     "Fun Fact: lonelybud is not really lonely. He has four wives.",
     "Being a lorry driver is hard: change gear change gear change gear change gear, check your mirrors, murder a prostitute, change gear change gear, murder... That's a lot of effort in a day.",
@@ -365,5 +365,7 @@ random_quotes_T = {
     "Why did the car go to therapy? Because it had too many breakdowns! Haha... I uh.. I think I need therapy.",
     "Fun Fact: The inventor of the Pringles can is now buried in one.",
     "Life is too short to drive boring cars.",
-    "A dream without ambition is like a car without gas... You're not going anywhere."
+    "A dream without ambition is like a car without gas... You're not going anywhere.",
+    "Ok I understand that at some point in time someone saw a bug on a bed and just thought I'm gonna name them bed bugs yeah that makes sense so who the fuck named them cockroaches?",
+    "What's the difference between your job and your wife? Your job still sucks after 5 years.",
 }

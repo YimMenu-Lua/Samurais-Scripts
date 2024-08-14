@@ -1081,23 +1081,12 @@ Game = {
   Vehicle = {
 
     ---Returns the name of the specified vehicle.
-    ---You can specify either an entity number or a vehicle hash.
     ---@param vehicle number
     name = function(vehicle)
       ---@type string
       local retVal
-      if vehicle <= 65535 then
-        if ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
-          retVal = vehicles.get_vehicle_display_name(Game.getEntityModel(vehicle))
-        else
-          retVal = ""
-        end
-      elseif vehicle > 65535 then
-        if STREAMING.IS_THIS_MODEL_A_VEHICLE(vehicle) then
-          retVal = vehicles.get_vehicle_display_name(vehicle)
-        else
-          retVal = ""
-        end
+      if ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+        retVal = vehicles.get_vehicle_display_name(Game.getEntityModel(vehicle))
       else
         retVal = ""
       end
@@ -1105,25 +1094,15 @@ Game = {
     end,
 
     ---Returns the manufacturer's name of the specified vehicle.
-    ---You can specify either an entity number or a vehicle hash.
     ---@param vehicle number
     manufacturer = function(vehicle)
       ---@type string
       local retVal
-      if vehicle <= 65535 then
-        if ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
-          local mfr = VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(Game.getEntityModel(vehicle))
-          retVal = (mfr:lower():gsub("^%l", string.upper))
-        else
-          retVal = ""
-        end
-      elseif vehicle > 65535 then
-        if STREAMING.IS_THIS_MODEL_A_VEHICLE(vehicle) then
-          local mfr = VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(vehicle)
-          retVal = (mfr:lower():gsub("^%l", string.upper))
-        else
-          retVal = ""
-        end
+      if ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+        local mfr = VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(Game.getEntityModel(vehicle))
+        retVal = (mfr:lower():gsub("^%l", string.upper))
+      else
+        retVal = ""
       end
       return retVal
     end,
