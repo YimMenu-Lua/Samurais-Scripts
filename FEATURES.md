@@ -100,6 +100,15 @@
    
   - **Public Enemy N°1:**
     - When enabled, all nearby NPCs will attack you *(except cops)*.
+  
+  - **Less Air Turbulence:**
+    - Decreases air turbulence when flying planes and helicopters.
+  
+  - **Higher Plane Speeds:**
+     - Increases the speed limit on planes. Just enable the option and the rest will take care of itself.
+      > **NOTE:** This option will not do anything until you're flying high enough, with your landing gear fully retracted, and at a speed higher than 260km/h.
+      
+      > **NOTE:** This option will allow your planes (mainly jets) to gain significant speed but no more than 500km/h. Anything over that will prevent textures from loading and end up crashing your game (you can still go over 500km/h when nose-diving).
       
 - **Improved [Object Spawner](https://github.com/xesdoog/object-spawner):**
   - Fixed a few bugs in the main script and added the ability to attach objects to your vehicle.
