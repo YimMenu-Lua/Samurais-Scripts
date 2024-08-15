@@ -7,7 +7,7 @@ require('data/objects')
 require('data/actions')
 require('data/refs')
 
-SCRIPT_VERSION  = '1.1.2'   -- v1.1.2
+SCRIPT_VERSION  = '1.1.3'   -- v1.1.3
 TARGET_BUILD    = '3274'  -- Only YimResupplier needs a version check.
 TARGET_VERSION  = '1.69'
 CURRENT_BUILD   = Game.GetBuildNumber()
@@ -76,6 +76,8 @@ default_config   = {
   autoplay_slots          = false,
   autoplay_cap            = false,
   heist_cart_autograb     = false,
+  no_turbulence           = false,
+  real_plane_speed        = false,
   nosPower                = 10,
   lightSpeed              = 1,
   DriftPowerIncrease      = 1,
@@ -140,6 +142,8 @@ holdF               = lua_cfg.read("holdF")
 keepWheelsTurned    = lua_cfg.read("keepWheelsTurned")
 noJacking           = lua_cfg.read("noJacking")
 insta180            = lua_cfg.read("insta180")
+no_turbulence       = lua_cfg.read("no_turbulence")
+real_plane_speed    = lua_cfg.read("real_plane_speed")
 tab1Sound           = true
 tab2Sound           = true
 tab3Sound           = true
@@ -431,12 +435,35 @@ function bankDriftPoints_SP(points)
 end
 
 Samurais_scripts:add_imgui(function()
+  local YY, MM, DD, H, M, S = CLOCK.GET_LOCAL_TIME(YY, MM, DD, H, M, S)
+  if MM < 10 then
+    MM = 0 .. MM
+  end
+  if DD < 10 then
+    DD = 0 .. DD
+  end
+  if H < 10 then
+    H = 0 .. H
+  end
+  if M < 10 then
+    M = 0 .. M
+  end
+  if S < 10 then
+    S = 0 .. S
+  end
+  local date_str = DD .. "-" .. months_T[tonumber(MM)] .. "-" .. YY
+  local time_str = H .. ":" .. M .. ":" .. S
+  local combined_str = "\10" .. "        " .. time_str .. "\10    " .. date_str .. "    " .. "\10\10"
+  ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
+  ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
+  UI.coloredButton(combined_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
+  ImGui.PopStyleVar()
   ImGui.Dummy(1, 10); ImGui.SeparatorText("About")
   UI.wrappedText("A collection of scripts aimed towards adding some roleplaying and fun elements to the game.", 25)
   ImGui.Dummy(1, 10)
   ImGui.BulletText("Script Version:   v" .. SCRIPT_VERSION)
   ImGui.BulletText("Game Version:   b" .. TARGET_BUILD .. "   Online " .. TARGET_VERSION)
-  ImGui.Dummy(1, 10); ImGui.SeparatorText("Quote Of The Day"); ImGui.Spacing()
+  ImGui.Dummy(1, 20); ImGui.SeparatorText("Quote Of The Day"); ImGui.Spacing()
   UI.coloredText(random_quote, 'white', quote_alpha, 24)
 end)
 
@@ -979,6 +1006,7 @@ Actions:add_imgui(function()
           if ImGui.Button(translateLabel("generic_cancel_btn") .. "##shotcut") then
             UI.widgetSound("Cancel")
             btn, btn_name = nil, nil
+            start_loading_anim = false
             ImGui.CloseCurrentPopup()
           end
           ImGui.End()
@@ -1626,10 +1654,10 @@ vehicle_tab:add_imgui(function()
     local vehicle_name  = Game.Vehicle.name(self.get_veh())
     local full_veh_name = manufacturer .. " " .. vehicle_name
     local vehicle_class = Game.Vehicle.class(self.get_veh())
+    ImGui.Spacing()
+    ImGui.SeparatorText("Drift Mode")
     if validModel then
       ImGui.Text(full_veh_name .. "   (" .. vehicle_class .. ")")
-      ImGui.Spacing()
-      ImGui.SeparatorText("Drift Mode")
       driftMode, driftModeUsed = ImGui.Checkbox(translateLabel("driftModeCB"), driftMode, true)
       UI.helpMarker(false, translateLabel("driftMode_tt"))
       if driftModeUsed then
@@ -1696,7 +1724,13 @@ vehicle_tab:add_imgui(function()
               driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = r, g, b
             end
           else
-            smokeHex, smokeHexEntered = ImGui.InputTextWithHint("##customHex", "HEX", smokeHex, 8, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.CharsNoBlank); ImGui.SameLine()
+            local hex_len
+            if smokeHex:find("^#") then
+              hex_len = 8
+            else
+              hex_len = 7
+            end
+            smokeHex, smokeHexEntered = ImGui.InputTextWithHint("##customHex", "HEX", smokeHex, hex_len, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.CharsNoBlank); ImGui.SameLine()
             if ImGui.IsItemActive() then
               is_typing = true
             else
@@ -1711,7 +1745,7 @@ vehicle_tab:add_imgui(function()
                 if smokeHex:len() > 1 then
                   if smokeHex:len() ~= 4 and smokeHex:len() ~= 7 then
                     UI.widgetSound("Error")
-                    gui.show_warning("Samurais Scripts", "'" .. smokeHex .. "' is not a valid HEX color code.\10Please enter either a short or a long HEX string.")
+                    gui.show_warning("Samurais Scripts", "'" .. smokeHex .. "' is not a valid HEX color code. Please enter either a short or a long HEX string.")
                   else
                     UI.widgetSound("Select")
                     gui.show_success("Samurais Scripts", "Drift smoke color changed")
@@ -3727,6 +3761,30 @@ world_tab:add_imgui(function()
       end
     end
     UI.helpMarker(false, "Everyone is out to get you")
+
+    no_turbulence, noturbUsed = ImGui.Checkbox("Less Air Turbulence", no_turbulence, true)
+    UI.helpMarker(false, "Radically decreases air turbulence when flying helicopters and planes.")
+    if noturbUsed then
+      UI.widgetSound("Nav2")
+      lua_cfg.save("no_turbulence", no_turbulence)
+      if no_turbulence then
+        script.run_in_fiber(function()
+          MISC.SET_WIND_SPEED(0.0)
+        end)
+      else
+        script.run_in_fiber(function()
+          MISC.SET_WIND_SPEED(-1)
+        end)
+      end
+    end
+
+    real_plane_speed, rpsUsed = ImGui.Checkbox("Higher Plane Speeds", real_plane_speed, true)
+    UI.helpMarker(false,
+    "Increases the speed limit on planes.\10\10  ¤ Note 1: You must be flying at a reasonable altitude to gain speed, otherwise the game will force you to fly slowly if you're too low.\10\10  ¤ Note 2: Even with this option, we're still capping the speed at approximately 500km/h because anything over that will prevent textures from loading and eventually break your game, which is the reason why R* limited plane speeds in the first place.")
+    if rpsUsed then
+      UI.widgetSound("Nav2")
+      lua_cfg.save("real_plane_speed", real_plane_speed)
+    end
 end)
 
 object_spawner = world_tab:add_tab("Object Spawner")
@@ -4590,6 +4648,8 @@ settings_tab:add_imgui(function()
       autoplay_slots          = false
       autoplay_cap            = false
       heist_cart_autograb     = false
+      no_turbulence           = false
+      real_plane_speed        = false
       laser_switch            = 0
       DriftIntensity          = 0
       lang_idx                = 0
@@ -4761,7 +4821,7 @@ end
 
 
 --[[
-    Threads
+    *Threads*
 ]]
 
 script.register_looped("basic ass loading text", function(balt)
@@ -5575,7 +5635,10 @@ script.register_looped("TDFT", function(script)
     lastVeh, _, current_vehicle, _ = onVehEnter()
     is_car                         = VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(current_vehicle))
     is_quad                        = VEHICLE.IS_THIS_MODEL_A_QUADBIKE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
-    is_bike                        = (VEHICLE.IS_THIS_MODEL_A_BIKE(ENTITY.GET_ENTITY_MODEL(current_vehicle)) and VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 13 and ENTITY.GET_ENTITY_MODEL(current_vehicle) ~= 0x7B54A9D3)
+    is_plane                       = VEHICLE.IS_THIS_MODEL_A_PLANE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
+    is_heli                        = VEHICLE.IS_THIS_MODEL_A_HELI(ENTITY.GET_ENTITY_MODEL(current_vehicle))
+    is_bike                        = (VEHICLE.IS_THIS_MODEL_A_BIKE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
+    and VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 13 and ENTITY.GET_ENTITY_MODEL(current_vehicle) ~= 0x7B54A9D3)
     is_boat                        = VEHICLE.IS_THIS_MODEL_A_BOAT(ENTITY.GET_ENTITY_MODEL(current_vehicle)) or
         VEHICLE.IS_THIS_MODEL_A_JETSKI(ENTITY.GET_ENTITY_MODEL(current_vehicle))
     if is_car or is_quad then
@@ -6459,6 +6522,46 @@ script.register_looped("no jacking", function(ctt)
     end
   end
   ctt:yield()
+end)
+
+-- Planes & Helis
+script.register_looped("disable turbulence", function(noturb)
+  noturb:yield()
+  if no_turbulence then
+    if Game.Self.isDriving() and (is_plane or is_heli) then
+      if Game.Self.get_elevation() > 7 then
+        if is_heli then
+          VEHICLE.SET_HELI_TURBULENCE_SCALAR(current_vehicle, 0.0)
+        elseif is_plane then
+          VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(current_vehicle, 0.0)
+        end
+      end
+    end
+  end
+end)
+script.register_looped("Real Jet Speed", function(rjspd)
+  rjspd:yield()
+  if real_plane_speed then
+    if Game.Self.isDriving() and is_plane then
+      local jet_increase
+      local current_speed = ENTITY.GET_ENTITY_SPEED(current_vehicle)
+      local jet_rotation  = ENTITY.GET_ENTITY_ROTATION(current_vehicle, 2)
+      if jet_rotation.x >= 30 then
+        jet_increase = 0.4
+      elseif jet_rotation.x >= 60 then
+        jet_increase = 0.8
+      else
+        jet_increase  = 0.21
+      end
+      -- wait for the plane to go over the low altitude speed limit then start increasing its top speed and don't go over 500km/h 
+      -- (500km/h is fast and safe. Higher speeds break the game)
+      if current_speed >= 73 and current_speed < 140 then
+        if PAD.IS_CONTROL_PRESSED(0, 87) and VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) == 4 then
+          VEHICLE.SET_VEHICLE_FORWARD_SPEED(current_vehicle, (current_speed + jet_increase))
+        end
+      end
+    end
+  end
 end)
 
 script.register_looped("flatbed script", function(script)

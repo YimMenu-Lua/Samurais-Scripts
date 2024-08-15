@@ -409,9 +409,6 @@ UI = {
     if alpha > 1 then
       alpha = 1
     end
-    if alpha < 0.1 then
-      alpha = 0.1
-    end
     ImGui.PushStyleColor(ImGuiCol.Text, r, g, b, alpha)
     ImGui.PushTextWrapPos(ImGui.GetFontSize() * wrap_size)
     ImGui.TextWrapped(text)
@@ -452,9 +449,6 @@ UI = {
     end
     if alpha > 1 then
       alpha = 1
-    end
-    if alpha < 0.1 then
-      alpha = 0.1
     end
     ImGui.PushStyleColor(ImGuiCol.Button, r, g, b, alpha)
     ImGui.PushStyleColor(ImGuiCol.ButtonHovered, hoverR, hoverG, hoverB, alpha)
