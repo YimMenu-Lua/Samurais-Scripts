@@ -63,6 +63,13 @@
   - **Fake Siren:**
     - Equip any land vehicle with a siren *(except of course, vehicles that already have one)*.
 
+  - **Unlimited Flares:**
+     - This option doesn't just give you unlimited flare counter-measures, instead it equips any plane or helicopter you fly with unlimited flares. Just use the same counter-measure button (E on keyboard) to fire flares. And yes, they do work as counter-measures same as the ones in weaponized planes, there's just a 3 second delay between each use to prevent unexpected issues.
+    
+  - **Higher Plane Speeds:**
+     - Increases the speed limit on planes. Just enable the option and the rest will take care of itself.
+      > **NOTE:** This option will not do anything until you're flying high enough, with your landing gear fully retracted, and at a speed higher than 260km/h.
+
 - **An implementation of [Flatbed Script](https://github.com/xesdoog/Flatbed-Script):**
   - Short explanation: You can tow anything with a flatbed truck. If the vehicle you're towing is occupied, you'll still tow it and kidnap whoever is sitting in it. Note that kidnapping players could sometimes log errors and cause issues. Also you can't tow players who have protections.
  
@@ -100,13 +107,6 @@
    
   - **Public Enemy N°1:**
     - When enabled, all nearby NPCs will attack you *(except cops)*.
-  
-  - **Less Air Turbulence:**
-    - Decreases air turbulence when flying planes and helicopters.
-  
-  - **Higher Plane Speeds:**
-     - Increases the speed limit on planes. Just enable the option and the rest will take care of itself.
-      > **NOTE:** This option will not do anything until you're flying high enough, with your landing gear fully retracted, and at a speed higher than 260km/h.
       
       > **NOTE:** This option will allow your planes (mainly jets) to gain significant speed but no more than 500km/h. Anything over that will prevent textures from loading and end up crashing your game (you can still go over 500km/h when nose-diving).
       
