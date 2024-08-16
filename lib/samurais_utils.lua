@@ -775,6 +775,15 @@ Game = {
     return STREAMING.HAS_ANIM_DICT_LOADED(dict)
   end,
 
+  ---@param weapon integer
+  requestWeaponAsset = function(weapon)
+    while not WEAPON.HAS_WEAPON_ASSET_LOADED(weapon) do
+      WEAPON.REQUEST_WEAPON_ASSET(weapon, 31, 0)
+      coroutine.yield()
+    end
+    return WEAPON.HAS_WEAPON_ASSET_LOADED(weapon)
+  end,
+
   ---@param entity integer
   ---@param isAlive boolean
   getCoords = function(entity, isAlive)

@@ -1539,11 +1539,11 @@ Labels = {
     },
 
     ["vc_spawned_vehs"] = {
-        {iso = "en-US", text = "Spawned Vehicles:"},
-        {iso = "de-DE", text = "Gespawnte Fahrzeuge:"},
-        {iso = "fr-FR", text = "Véhicules Générés :"},
-        {iso = "it-IT", text = "Veicoli Generati:"},
-        {iso = "pt-BR", text = "Veículos Gerados:"},
+        {iso = "en-US", text = "Secondary Vehicles:"},
+        {iso = "de-DE", text = "Sekundäre Fahrzeuge:"},
+        {iso = "fr-FR", text = "Véhicules Secondaires :"},
+        {iso = "it-IT", text = "Veicoli Secondari:"},
+        {iso = "pt-BR", text = "Veículos Secundários:"},
     },
 
     ["vc_attach_btn"] = {
@@ -1592,6 +1592,14 @@ Labels = {
         {iso = "fr-FR", text = "Choisissez un nom"},
         {iso = "it-IT", text = "Scegliete un nome"},
         {iso = "pt-BR", text = "Escolha um nome"},
+    },
+
+    ["vc_same_name_err"] = {
+        {iso = "en-US", text = "You already have a vehicle with the same name!"},
+        {iso = "de-DE", text = "Sie haben bereits ein Fahrzeug mit demselben Namen!"},
+        {iso = "fr-FR", text = "Vous avez déjà un véhicule portant le même nom !"},
+        {iso = "it-IT", text = "Avete già un veicolo con lo stesso nome!"},
+        {iso = "pt-BR", text = "Você já tem um veículo com o mesmo nome!"},
     },
 
     ["vc_saved_msg"] = {
@@ -1929,6 +1937,15 @@ Labels = {
         {iso = "it-IT", text = "Imposta Tuute Le Percentuali A %100"},
         {iso = "pt-BR", text = "Definir Todas Porcentagens Como %100"},
         {iso = "ru-RU", text = "Установить всю долю в 100%"},
+    },
+
+    ["Unavailable in Single Player"] = {
+        {iso = "en-US", text = "Unavailable in Single Player."},
+        {iso = "de-DE", text = "Im Einzelspieler nicht verfügbar."},
+        {iso = "fr-FR", text = "Indisponible en mode solo."},
+        {iso = "it-IT", text = "Non disponibile in giocatore singolo."},
+        {iso = "pt-BR", text = "Indisponível em um único jogador."},
+        {iso = "ru-RU", text = "Недоступно в одиночной игре."},
     },
 }
 

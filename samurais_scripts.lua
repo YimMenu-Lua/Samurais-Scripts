@@ -7,7 +7,7 @@ require('data/objects')
 require('data/actions')
 require('data/refs')
 
-SCRIPT_VERSION  = '1.1.3'   -- v1.1.3
+SCRIPT_VERSION  = '1.1.4'   -- v1.1.4
 TARGET_BUILD    = '3274'  -- Only YimResupplier needs a version check.
 TARGET_VERSION  = '1.69'
 CURRENT_BUILD   = Game.GetBuildNumber()
@@ -15,9 +15,9 @@ CURRENT_VERSION = Game.GetOnlineVersion()
 
 
 Samurais_scripts = gui.add_tab("Samurai's Scripts")
-local loading_label = ""
-local start_loading_anim = false
-default_config   = {
+local loading_label       = ""
+local start_loading_anim  = false
+default_config            = {
   shortcut_anim           = {},
   saved_vehicles          = {},
   Regen                   = false,
@@ -76,7 +76,7 @@ default_config   = {
   autoplay_slots          = false,
   autoplay_cap            = false,
   heist_cart_autograb     = false,
-  no_turbulence           = false,
+  flares_forall           = false,
   real_plane_speed        = false,
   nosPower                = 10,
   lightSpeed              = 1,
@@ -142,7 +142,7 @@ holdF               = lua_cfg.read("holdF")
 keepWheelsTurned    = lua_cfg.read("keepWheelsTurned")
 noJacking           = lua_cfg.read("noJacking")
 insta180            = lua_cfg.read("insta180")
-no_turbulence       = lua_cfg.read("no_turbulence")
+flares_forall       = lua_cfg.read("flares_forall")
 real_plane_speed    = lua_cfg.read("real_plane_speed")
 tab1Sound           = true
 tab2Sound           = true
@@ -152,7 +152,7 @@ is_shortcut_anim    = false
 anim_music          = false
 is_playing_scenario = false
 is_playing_radio    = false
-aimBool             = false
+-- aimBool             = false
 HashGrabber         = false
 drew_laser          = false
 isCrouched          = false
@@ -1021,7 +1021,7 @@ Actions:add_imgui(function()
         UI.toolTip(false, translateLabel("removeShortcut_tt"))
       end
     end
-    ImGui.Separator(); ImGui.Spacing(); ImGui.Text(translateLabel("Movement Options:")); ImGui.Spacing()
+    ImGui.Spacing(); ImGui.SeparatorText(translateLabel("Movement Options:")); ImGui.Spacing()
     local isChanged = false
     actions_switch, isChanged = ImGui.RadioButton("Normal", actions_switch, 0)
     if isChanged then
@@ -1064,8 +1064,7 @@ Actions:add_imgui(function()
       setballistic()
       UI.widgetSound("Nav")
     end
-    ImGui.Separator()
-    ImGui.Text(translateLabel("Play Animations On NPCs:"))
+    ImGui.Spacing(); ImGui.SeparatorText(translateLabel("Play Animations On NPCs:"))
     ImGui.PushItemWidth(220)
     displayNpcs()
     ImGui.PopItemWidth()
@@ -1270,8 +1269,7 @@ Actions:add_imgui(function()
       end
     end
     UI.toolTip(false, translateLabel("stopScenarios_tt"))
-    ImGui.Separator()
-    ImGui.Text(translateLabel("Play Scenarios On NPCs:"))
+    ImGui.Spacing(); ImGui.SeparatorText(translateLabel("Play Scenarios On NPCs:"))
     ImGui.PushItemWidth(220)
     displayNpcs()
     ImGui.PopItemWidth()
@@ -1513,7 +1511,7 @@ function displayRadioStations()
 end
 
 sound_player:add_imgui(function()
- ImGui.Spacing(); ImGui.Text("- Human Sounds -"); ImGui.Spacing()
+ ImGui.Spacing(); ImGui.SeparatorText("Human Sounds"); ImGui.Spacing()
   ImGui.Dummy(20, 1); ImGui.SameLine(); sound_switch, isChanged = ImGui.RadioButton(translateLabel("malesounds"), sound_switch, 0); ImGui.SameLine()
   if isChanged then
     UI.widgetSound("Nav")
@@ -1554,8 +1552,8 @@ sound_player:add_imgui(function()
     end
   end
 
-  ImGui.Dummy(1, 10); ImGui.Text("- Radio Stations -")
-  UI.helpMarker(false, translateLabel("radioStations_tt"))
+  ImGui.Dummy(1, 10); ImGui.SeparatorText("Radio Stations")
+  UI.toolTip(false, translateLabel("radioStations_tt"))
   ImGui.Spacing()
   ImGui.PushItemWidth(280)
   displayRadioStations()
@@ -1646,6 +1644,22 @@ local function onVehEnter()
     resetLastVehState()
   end
   return lastVeh, lastVehPtr, current_vehicle, currentVehPtr
+end
+
+function shoot_flares(sex)
+  if Game.requestWeaponAsset(0x47757124) then
+    for _, bone in pairs(plane_bones_T) do
+      local bone_idx  = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(self.get_veh(), bone)
+      local jet_fwd_X = ENTITY.GET_ENTITY_FORWARD_X(self.get_veh())
+      local jet_fwd_Y = ENTITY.GET_ENTITY_FORWARD_Y(self.get_veh())
+      if bone_idx ~= -1 then
+        local bone_pos = ENTITY.GET_ENTITY_BONE_POSTION(self.get_veh(), bone_idx)
+        MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS((bone_pos.x + (jet_fwd_X * 1.3)), (bone_pos.y + jet_fwd_Y * 1.3) , bone_pos.z,
+        (bone_pos.x - (jet_fwd_X * 1.3)), (bone_pos.y - jet_fwd_Y * 1.3), bone_pos.z - 0.06, 1, false, 0x47757124, self.get_ped(), true, false, 1.0)
+        sex:sleep(250)
+      end
+    end
+  end
 end
 
 vehicle_tab:add_imgui(function()
@@ -1919,6 +1933,28 @@ vehicle_tab:add_imgui(function()
       lua_cfg.save("insta180", insta180)
     end
     UI.toolTip(false, translateLabel("insta180_tt"))
+
+    if Game.isOnline() then
+      flares_forall, flaresUsed = ImGui.Checkbox("Unlimited Flares", flares_forall, true)
+      UI.toolTip(false, "Equip all planes with unlimited flares.\10\10 ¤ NOTE: There is a 3 second delay between each use of these flares.")
+      if flaresUsed then
+        UI.widgetSound("Nav2")
+        lua_cfg.save("flares_forall", flares_forall)
+      end
+    else
+      ImGui.BeginDisabled()
+      flares_forall, flaresUsed = ImGui.Checkbox("Unlimited Flares", flares_forall, true)
+      ImGui.EndDisabled()
+      UI.toolTip(true, translateLabel("Unavailable in Single Player"), '#FF3333', 1)
+    end
+
+    ImGui.SameLine(); ImGui.Dummy(22, 1); ImGui.SameLine(); real_plane_speed, rpsUsed = ImGui.Checkbox("Higher Plane Speeds", real_plane_speed, true)
+    UI.toolTip(false,
+    "Increases the speed limit on planes.\10\10  ¤ Note 1: You must be flying at a reasonable altitude to gain speed, otherwise the game will force you to fly slowly if you're too low.\10\10  ¤ Note 2: Even with this option, we're still capping the speed at approximately 500km/h because anything over that will prevent textures from loading and eventually break your game, which is the reason why R* limited plane speeds in the first place.")
+    if rpsUsed then
+      UI.widgetSound("Nav2")
+      lua_cfg.save("real_plane_speed", real_plane_speed)
+    end
 
     rgbLights, rgbToggled = ImGui.Checkbox(translateLabel("rgbLights"), rgbLights, true)
     if rgbToggled then
@@ -2383,7 +2419,7 @@ local function setVehicleMods(v, t)
   script.run_in_fiber(function()
     VEHICLE.SET_VEHICLE_MOD_KIT(v, 0)
     for slot, mod in pairs(t) do
-      VEHICLE.SET_VEHICLE_MOD(v, (slot - 1), mod)
+      VEHICLE.SET_VEHICLE_MOD(v, (slot - 1), mod, true)
     end
   end)
 end
@@ -2508,7 +2544,6 @@ vehicle_creator:add_imgui(function()
       vehicleHash = joaat(filtered_vehicles[vehicle_index + 1])
       vehicleName = vehicles.get_vehicle_display_name(joaat(filtered_vehicles[vehicle_index + 1]))
     end
-    ImGui.Dummy(1, 10)
     if ImGui.Button("   " .. translateLabel("Spawn") .. "   ##vehcreator") then
       UI.widgetSound("Select")
       script.run_in_fiber(function()
@@ -2517,7 +2552,7 @@ vehicle_creator:add_imgui(function()
         local plyrForwardY = Game.getForwardY(self.get_ped())
         if Game.requestModel(vehicleHash) then
           spawned_vehicle = VEHICLE.CREATE_VEHICLE(vehicleHash, plyrCoords.x + (plyrForwardX * 5),
-            plyrCoords.y + (plyrForwardY * 5), plyrCoords.z, (ENTITY.GET_ENTITY_HEADING(self.get_ped()) - 90), true, false, false)
+            plyrCoords.y + (plyrForwardY * 5), plyrCoords.z, (ENTITY.GET_ENTITY_HEADING(self.get_ped()) + 90), true, false, false)
           VEHICLE.SET_VEHICLE_IS_STOLEN(spawned_vehicle, false)
           DECORATOR.DECOR_SET_INT(spawned_vehicle, "MPBitset", 0)
           if main_vehicle == 0 then
@@ -2540,15 +2575,16 @@ vehicle_creator:add_imgui(function()
     if saved_vehicles[1] == nil then
       ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
       if ImGui.Button(translateLabel("widebodycivic_Btn")) then
+        UI.widgetSound("Select")
         createWideBodyCivic()
         spawnPersistVeh(saved_vehicles[1].main_veh, saved_vehicles[1].mods, saved_vehicles[1].color_1, saved_vehicles[1].color_2, saved_vehicles[1].tint, saved_vehicles[1].attachments)
       end
       UI.toolTip(false, translateLabel("widebodycivic_tt"))
     end
     if main_vehicle ~= 0 then
-      ImGui.Dummy(1, 10);
-      ImGui.BulletText(translateLabel("vc_main_veh") .. main_vehicle_name); ImGui.Spacing()
-      if ImGui.Button("   " .. translateLabel("generic_delete") .. "   ##mainVeh") then
+      ImGui.Separator()
+      UI.coloredText(translateLabel("vc_main_veh"), 'green', 0.9, 20); ImGui.SameLine(); ImGui.Text(main_vehicle_name); ImGui.SameLine()
+      if ImGui.Button(" " .. translateLabel("generic_delete") .. " ##mainVeh") then
         UI.widgetSound("Delete")
         script.run_in_fiber(function(delmv)
           if entities.take_control_of(main_vehicle, 300) then
@@ -2574,7 +2610,7 @@ vehicle_creator:add_imgui(function()
       end
     end
     if spawned_vehicles[1] ~= nil then
-      ImGui.Spacing(); ImGui.Text(translateLabel("vc_spawned_vehs"))
+      ImGui.SeparatorText(translateLabel("vc_spawned_vehs"))
       ImGui.PushItemWidth(230)
       spawned_veh_index, _ = ImGui.Combo("##Spawned Vehicles", spawned_veh_index, filteredVehNames, #spawned_vehicles)
       ImGui.PopItemWidth()
@@ -2638,6 +2674,7 @@ vehicle_creator:add_imgui(function()
       end
     end
     if veh_attachments[1] ~= nil then
+      ImGui.Spacing(); ImGui.SeparatorText("Attached Vehicles")
       ImGui.PushItemWidth(230)
       showAttachedVehicles()
       ImGui.PopItemWidth()
@@ -2800,31 +2837,49 @@ vehicle_creator:add_imgui(function()
           is_typing = false
         end
         ImGui.Spacing()
-        if ImGui.Button(translateLabel("saveBtn") .. "##vehcreator2") then
-          script.run_in_fiber(function()
-            if creation_name ~= "" then
-              UI.widgetSound("Select")
-              vehicle_creation.name         = creation_name
-              vehicle_creation.main_veh     = ENTITY.GET_ENTITY_MODEL(main_vehicle)
-              vehicle_creation.attachments  = veh_attachments
-              vehicle_creation.tint         = VEHICLE.GET_VEHICLE_WINDOW_TINT(main_vehicle)
-              vehicle_creation.color_1.r, vehicle_creation.color_1.g, vehicle_creation.color_1.b = VEHICLE.GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(main_vehicle, vehicle_creation.color_1.r, vehicle_creation.color_1.g, vehicle_creation.color_1.b)
-              vehicle_creation.color_2.r, vehicle_creation.color_2.g, vehicle_creation.color_2.b = VEHICLE.GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(main_vehicle, vehicle_creation.color_2.r, vehicle_creation.color_2.g, vehicle_creation.color_2.b)
-              appendVehicleMods(main_vehicle, vehicle_creation.mods)
-              table.insert(saved_vehicles, vehicle_creation)
-              lua_cfg.save("saved_vehicles", saved_vehicles)
-              ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(main_vehicle)
-              for _, veh in ipairs(spawned_vehicles) do
-                ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(veh)
+        if not start_loading_anim then
+          if ImGui.Button(translateLabel("saveBtn") .. "##vehcreator2") then
+            script.run_in_fiber(function(save)
+              if creation_name ~= "" then
+                if saved_vehicles[1] ~= nil then
+                  for _, v in pairs(saved_vehicles) do
+                    if creation_name == v.name then
+                      UI.widgetSound("Error")
+                      gui.show_error("Samurai's Scripts", translateLabel("vc_same_name_err"))
+                      return
+                    end
+                  end
+                end
+                UI.widgetSound("Select")
+                vehicle_creation.name         = creation_name
+                vehicle_creation.main_veh     = ENTITY.GET_ENTITY_MODEL(main_vehicle)
+                vehicle_creation.attachments  = veh_attachments
+                vehicle_creation.tint         = VEHICLE.GET_VEHICLE_WINDOW_TINT(main_vehicle)
+                vehicle_creation.color_1.r, vehicle_creation.color_1.g, vehicle_creation.color_1.b = VEHICLE.GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(main_vehicle, vehicle_creation.color_1.r, vehicle_creation.color_1.g, vehicle_creation.color_1.b)
+                vehicle_creation.color_2.r, vehicle_creation.color_2.g, vehicle_creation.color_2.b = VEHICLE.GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(main_vehicle, vehicle_creation.color_2.r, vehicle_creation.color_2.g, vehicle_creation.color_2.b)
+                appendVehicleMods(main_vehicle, vehicle_creation.mods)
+                start_loading_anim = true
+                save:sleep(500)
+                table.insert(saved_vehicles, vehicle_creation)
+                lua_cfg.save("saved_vehicles", saved_vehicles)
+                ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(main_vehicle)
+                for _, veh in ipairs(spawned_vehicles) do
+                  ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(veh)
+                end
+                gui.show_success("Samurais Scripts", translateLabel("vc_saved_msg"))
+                resetOnSave()
+                start_loading_anim = false
+                ImGui.CloseCurrentPopup()
+              else
+                UI.widgetSound("Error")
+                gui.show_warning("Samurais Scripts", translateLabel("vc_save_err"))
               end
-              gui.show_success("Samurais Scripts", translateLabel("vc_saved_msg"))
-              resetOnSave()
-              ImGui.CloseCurrentPopup()
-            else
-              UI.widgetSound("Error")
-              gui.show_warning("Samurais Scripts", translateLabel("vc_save_err"))
-            end
-          end)
+            end)
+          end
+        else
+          ImGui.BeginDisabled()
+          ImGui.Button("  " .. loading_label .. "  ")
+          ImGui.EndDisabled()
         end
         ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
         if ImGui.Button(translateLabel("generic_cancel_btn") .. "##vehcreator") then
@@ -3366,7 +3421,7 @@ casino_pacino:add_imgui(function()
       ImGui.EndTabItem()
     end
   else
-    ImGui.Dummy(1, 5); ImGui.Text("Unavailable in Single Player.")
+    ImGui.Dummy(1, 5); ImGui.Text(translateLabel("Unavailable in Single Player"))
   end
 end)
 
@@ -3442,7 +3497,7 @@ players_tab:add_imgui(function()
       ImGui.Text("Player left the session.")
     end
   else
-    ImGui.Text("You are currently in Single Player.")
+    ImGui.Dummy(1, 5); ImGui.Text(translateLabel("Unavailable in Single Player"))
   end
 end)
 
@@ -3534,16 +3589,23 @@ local function attachVeh(veh)
         end
         if veh_class == "Commercial" or veh_class == "Industrial" or veh_class == "Utility" then
           if VEHICLE.IS_BIG_VEHICLE(veh) then
-            attach_X = 2.1
+            attach_X  = 2.1
+            attach_RY = 0.0
           else
-            attach_X = 1.9
+            attach_X  = 1.9
+            attach_RY = 0.0
           end
         elseif veh_class == "Cycles" or veh_class == "Motorcycles" then
-          attach_X = 0.4
+          attach_X  = 0.4
+          attach_RY = 0.0
+        elseif veh_class == "Planes" or veh_class == "Helicopters" then
+          attach_X  = 1.45
+          attach_RY = 90
         else
-          attach_X = 1.17
+          attach_X  = 1.17
+          attach_RY = 0.0
         end
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(veh, self.get_ped(), myBone, attach_X, 0.0, 0.0, 0.0, 0.0, -16.0, false, true,
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(veh, self.get_ped(), myBone, attach_X, 0.0, 0.0, 0.0, attach_RY, -16.0, false, true,
           false, true, 1, true, 1)
         vehicle_grabbed = true
         grabbed_veh     = veh
@@ -3664,127 +3726,103 @@ world_tab:add_imgui(function()
     end
   end
 
-   animateNPCs, used = ImGui.Checkbox("Animate Nearby NPCs", animateNPCs, true)
-    if used then
-      UI.widgetSound("Nav")
-    end
-    UI.helpMarker(false, "Make all nearby NPCs do one of the actions listed down below. This has no relation to the animations list and only works with NPCs that are on foot.")
-    if animateNPCs then
-      ImGui.PushItemWidth(220)
-      displayHijackAnims()
-      ImGui.PopItemWidth()
-      local hijackData = hijackOptions[grp_anim_index + 1]
-      ImGui.SameLine()
-      if not hijack_started then
-        if ImGui.Button("  Start  ##hjStart") then
-          UI.widgetSound("Select")
-          script.run_in_fiber(function(hjk)
-            local gta_peds = entities.get_all_peds_as_handles()
-            while not STREAMING.HAS_ANIM_DICT_LOADED(hijackData.dict) do
-              STREAMING.REQUEST_ANIM_DICT(hijackData.dict)
-              coroutine.yield()
-            end
-            for _, npc in pairs(gta_peds) do
-              if not PED.IS_PED_A_PLAYER(npc) and not PED.IS_PED_IN_ANY_VEHICLE(npc, true) then
-                TASK.CLEAR_PED_TASKS_IMMEDIATELY(npc)
-                TASK.CLEAR_PED_SECONDARY_TASK(npc)
-                hjk:sleep(50)
-                TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(npc, true)
-                PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(npc, true)
-                TASK.TASK_PLAY_ANIM(npc, hijackData.dict, hijackData.anim, 4.0, -4.0, -1, 1, 1.0, false, false, false)
-                hijack_started = true
-              end
-            end
-          end)
-        end
-      else
-        if ImGui.Button("  Stop  ##hjStop") then
-          UI.widgetSound("Cancel")
-          script.run_in_fiber(function()
-            local gta_peds = entities.get_all_peds_as_handles()
-            for _, npc in ipairs(gta_peds) do
-              if not PED.IS_PED_A_PLAYER(npc) then
-                TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(npc, false)
-                PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(npc, false)
-                TASK.CLEAR_PED_TASKS(npc)
-                hijack_started = false
-              end
-            end
-          end)
-        end
-      end
-    end
-
-    kamikazeDrivers, kdUsed = ImGui.Checkbox("Kamikaze Drivers", kamikazeDrivers, true)
-    if kdUsed then
-      UI.widgetSound("Nav2")
-      if kamikazeDrivers then
-        publicEnemy = false
-      end
-    end
-    UI.helpMarker(false, translateLabel("kamikazeDrivers_tt"))
-
-    publicEnemy, peUsed = ImGui.Checkbox("Public Enemy N°1", publicEnemy, true)
-    if peUsed then
-      UI.widgetSound("Nav2")
-      if publicEnemy then
-        kamikazeDrivers = false
-        runaway         = false
-        script.run_in_fiber(function()
-          default_wanted_lvl = PLAYER.GET_MAX_WANTED_LEVEL()
-        end)
-      else
-        script.run_in_fiber(function()
-          local myGroup = PED.GET_PED_GROUP_INDEX(self.get_ped())
-          if default_wanted_lvl ~= nil then
-            PLAYER.SET_MAX_WANTED_LEVEL(default_wanted_lvl)
-            PLAYER.SET_POLICE_IGNORE_PLAYER(self.get_id(), false)
+  animateNPCs, used = ImGui.Checkbox("Animate Nearby NPCs", animateNPCs, true)
+  if used then
+    UI.widgetSound("Nav")
+  end
+  UI.helpMarker(false, "Make all nearby NPCs do one of the actions listed down below. This has no relation to the animations list and only works with NPCs that are on foot.")
+  if animateNPCs then
+    ImGui.PushItemWidth(220)
+    displayHijackAnims()
+    ImGui.PopItemWidth()
+    local hijackData = hijackOptions[grp_anim_index + 1]
+    ImGui.SameLine()
+    if not hijack_started then
+      if ImGui.Button("  Start  ##hjStart") then
+        UI.widgetSound("Select")
+        script.run_in_fiber(function(hjk)
+          local gta_peds = entities.get_all_peds_as_handles()
+          while not STREAMING.HAS_ANIM_DICT_LOADED(hijackData.dict) do
+            STREAMING.REQUEST_ANIM_DICT(hijackData.dict)
+            coroutine.yield()
           end
-          for _, ped in ipairs(entities.get_all_peds_as_handles()) do
-            if not PED.IS_PED_A_PLAYER(ped) and not PED.IS_PED_GROUP_MEMBER(ped, myGroup) then
-              if PED.IS_PED_IN_COMBAT(ped, self.get_ped()) then
-                for _, attr in ipairs(pe_combat_attributes_T) do
-                  PED.SET_PED_COMBAT_ATTRIBUTES(ped, attr.id, (not attr.bool))
-                end
-                for _, cflg in ipairs(pe_config_flags_T) do
-                  if PED.GET_PED_CONFIG_FLAG(ped, cflg.id, cflg.bool) then
-                    PED.SET_PED_CONFIG_FLAG(ped, cflg.id, (not cflg.bool))
-                  end
-                end
-                TASK.CLEAR_PED_TASKS_IMMEDIATELY(ped)
-                TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, false)
-                PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, false)
-              end
+          for _, npc in pairs(gta_peds) do
+            if not PED.IS_PED_A_PLAYER(npc) and not PED.IS_PED_IN_ANY_VEHICLE(npc, true) then
+              TASK.CLEAR_PED_TASKS_IMMEDIATELY(npc)
+              TASK.CLEAR_PED_SECONDARY_TASK(npc)
+              hjk:sleep(50)
+              TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(npc, true)
+              PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(npc, true)
+              TASK.TASK_PLAY_ANIM(npc, hijackData.dict, hijackData.anim, 4.0, -4.0, -1, 1, 1.0, false, false, false)
+              hijack_started = true
+            end
+          end
+        end)
+      end
+    else
+      if ImGui.Button("  Stop  ##hjStop") then
+        UI.widgetSound("Cancel")
+        script.run_in_fiber(function()
+          local gta_peds = entities.get_all_peds_as_handles()
+          for _, npc in ipairs(gta_peds) do
+            if not PED.IS_PED_A_PLAYER(npc) then
+              TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(npc, false)
+              PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(npc, false)
+              TASK.CLEAR_PED_TASKS(npc)
+              hijack_started = false
             end
           end
         end)
       end
     end
-    UI.helpMarker(false, "Everyone is out to get you")
+  end
 
-    no_turbulence, noturbUsed = ImGui.Checkbox("Less Air Turbulence", no_turbulence, true)
-    UI.helpMarker(false, "Radically decreases air turbulence when flying helicopters and planes.")
-    if noturbUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("no_turbulence", no_turbulence)
-      if no_turbulence then
-        script.run_in_fiber(function()
-          MISC.SET_WIND_SPEED(0.0)
-        end)
-      else
-        script.run_in_fiber(function()
-          MISC.SET_WIND_SPEED(-1)
-        end)
-      end
+  kamikazeDrivers, kdUsed = ImGui.Checkbox("Kamikaze Drivers", kamikazeDrivers, true)
+  if kdUsed then
+    UI.widgetSound("Nav2")
+    if kamikazeDrivers then
+      publicEnemy = false
     end
+  end
+  UI.helpMarker(false, translateLabel("kamikazeDrivers_tt"))
 
-    real_plane_speed, rpsUsed = ImGui.Checkbox("Higher Plane Speeds", real_plane_speed, true)
-    UI.helpMarker(false,
-    "Increases the speed limit on planes.\10\10  ¤ Note 1: You must be flying at a reasonable altitude to gain speed, otherwise the game will force you to fly slowly if you're too low.\10\10  ¤ Note 2: Even with this option, we're still capping the speed at approximately 500km/h because anything over that will prevent textures from loading and eventually break your game, which is the reason why R* limited plane speeds in the first place.")
-    if rpsUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("real_plane_speed", real_plane_speed)
+  publicEnemy, peUsed = ImGui.Checkbox("Public Enemy N°1", publicEnemy, true)
+  UI.helpMarker(false, "Everyone is out to get you")
+  if peUsed then
+    UI.widgetSound("Nav2")
+    if publicEnemy then
+      kamikazeDrivers = false
+      runaway         = false
+      script.run_in_fiber(function()
+        default_wanted_lvl = PLAYER.GET_MAX_WANTED_LEVEL()
+      end)
+    else
+      script.run_in_fiber(function()
+        local myGroup = PED.GET_PED_GROUP_INDEX(self.get_ped())
+        if default_wanted_lvl ~= nil then
+          PLAYER.SET_MAX_WANTED_LEVEL(default_wanted_lvl)
+          PLAYER.SET_POLICE_IGNORE_PLAYER(self.get_id(), false)
+        end
+        for _, ped in ipairs(entities.get_all_peds_as_handles()) do
+          if not PED.IS_PED_A_PLAYER(ped) and not PED.IS_PED_GROUP_MEMBER(ped, myGroup) then
+            if PED.IS_PED_IN_COMBAT(ped, self.get_ped()) then
+              for _, attr in ipairs(pe_combat_attributes_T) do
+                PED.SET_PED_COMBAT_ATTRIBUTES(ped, attr.id, (not attr.bool))
+              end
+              for _, cflg in ipairs(pe_config_flags_T) do
+                if PED.GET_PED_CONFIG_FLAG(ped, cflg.id, cflg.bool) then
+                  PED.SET_PED_CONFIG_FLAG(ped, cflg.id, (not cflg.bool))
+                end
+              end
+              TASK.CLEAR_PED_TASKS_IMMEDIATELY(ped)
+              TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, false)
+              PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, false)
+            end
+          end
+        end
+      end)
     end
+  end
 end)
 
 object_spawner = world_tab:add_tab("Object Spawner")
@@ -4648,7 +4686,7 @@ settings_tab:add_imgui(function()
       autoplay_slots          = false
       autoplay_cap            = false
       heist_cart_autograb     = false
-      no_turbulence           = false
+      flares_forall           = false
       real_plane_speed        = false
       laser_switch            = 0
       DriftIntensity          = 0
@@ -6370,20 +6408,28 @@ script.register_looped("missile defense", function(md)
       end
     end
     if missile ~= 0 then
+      -- if MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 100, vehPos.y + 100, vehPos.z + 100, vehPos.x - 100, vehPos.y - 100, vehPos.z - 100, missile, false) then
+      --   if Game.Self.isDriving() and (is_plane or is_heli) then
+      --     shoot_flares(md)
+      --   end
+      -- end
+      -- ^ auto-counters missiles with flares but it's too easy
       if MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 20, vehPos.y + 20, vehPos.z + 100, vehPos.x - 20, vehPos.y - 20, vehPos.z - 100, missile, false) then
         if not MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 10, vehPos.y + 10, vehPos.z + 50, vehPos.x - 10, vehPos.y - 10, vehPos.z - 50, missile, false) and not MISC.IS_PROJECTILE_TYPE_IN_AREA(selfPos.x + 10, selfPos.y + 10, selfPos.z + 50, selfPos.x - 10, selfPos.y - 10, selfPos.z - 50, missile, false) then
           log.info('Detected projectile within our defense area! Proceeding to destroy it.')
           WEAPON.REMOVE_ALL_PROJECTILES_OF_TYPE(missile, true)
           if Game.requestNamedPtfxAsset("scr_sm_counter") then
             GRAPHICS.USE_PARTICLE_FX_ASSET("scr_sm_counter")
-            GRAPHICS.START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD("scr_sm_counter_chaff", vehPos.x, vehPos.y, (vehPos.z + 2.5), 0.0, 0.0, 0.0, 5.0, false, false, false, false)
+            GRAPHICS.START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD("scr_sm_counter_chaff", vehPos.x, vehPos.y, (vehPos.z + 2.5),
+            0.0, 0.0, 0.0, 5.0, false, false, false, false)
           end
         else
           log.warning('Found a projectile very close to our vehicle! Proceeding to remove it.')
           WEAPON.REMOVE_ALL_PROJECTILES_OF_TYPE(missile, false)
           if Game.requestNamedPtfxAsset("scr_sm_counter") then
             GRAPHICS.USE_PARTICLE_FX_ASSET("scr_sm_counter")
-            GRAPHICS.START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD("scr_sm_counter_chaff", vehPos.x, vehPos.y, (vehPos.z + 2.5), 0.0, 0.0, 0.0, 5.0, false, false, false, false)
+            GRAPHICS.START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD("scr_sm_counter_chaff", vehPos.x, vehPos.y, (vehPos.z + 2.5),
+            0.0, 0.0, 0.0, 5.0, false, false, false, false)
           end
         end
       end
@@ -6525,16 +6571,13 @@ script.register_looped("no jacking", function(ctt)
 end)
 
 -- Planes & Helis
-script.register_looped("disable turbulence", function(noturb)
-  noturb:yield()
-  if no_turbulence then
+script.register_looped("Unlimited Flares", function(flrs)
+  flrs:yield()
+  if flares_forall then
     if Game.Self.isDriving() and (is_plane or is_heli) then
-      if Game.Self.get_elevation() > 7 then
-        if is_heli then
-          VEHICLE.SET_HELI_TURBULENCE_SCALAR(current_vehicle, 0.0)
-        elseif is_plane then
-          VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(current_vehicle, 0.0)
-        end
+      if PAD.IS_CONTROL_PRESSED(0, 356) and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
+        shoot_flares(flrs)
+        flrs:sleep(3000)
       end
     end
   end
@@ -6712,7 +6755,7 @@ end)
 -- World
 script.register_looped("Ped Grabber", function(pg)
   if pedGrabber and not vehicleGrabber then
-    if Game.Self.isOnFoot() then
+    if Game.Self.isOnFoot() and not gui.is_open() and not WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
       local nearestPed = Game.getClosestPed(self.get_ped(), 10)
       local myGroup    = PED.GET_PED_GROUP_INDEX(self.get_ped())
       if not ped_grabbed and nearestPed ~= 0 then
@@ -6771,7 +6814,7 @@ end)
 
 script.register_looped("Vehicle Grabber", function(vg)
   if vehicleGrabber and not pedGrabber then
-    if Game.Self.isOnFoot() then
+    if Game.Self.isOnFoot() and not gui.is_open() and not WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
       local nearestVeh = Game.getClosestVehicle(self.get_ped(), 10)
       if not vehicle_grabbed and nearestVeh ~= 0 then
         if PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257) then
