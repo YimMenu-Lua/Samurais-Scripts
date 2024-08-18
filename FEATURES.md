@@ -34,7 +34,7 @@
 - **Info Gun:**
   - A debug option that will be removed in the future. Simply aim your gun at a game entity and press [Left Mouse Button] to log information about it to the console.
 - **Trigger Bot:**
-  - ~A barebones and janky triggerbot. *Kinda works?* Only on foot though. Will probably be removed once YimMenu's triggerbot gets fixed.~ [gir489returns](https://github.com/gir489returns) also fixed YimMenu's triggerbot. There's no need for this feature anymore.
+  - ~A barebones and janky triggerbot. *Kinda works?* Only on foot though.
 - **Autokill Enemies:**
   - Automatically kills nearby enemies. I've put a delay to prevent kill spamming because I don't want enemies to die the moment they spawn. Feedback on this would be appreciated *(keep the delay or spam kill?)*.
 - **Enemies Flee:**
@@ -48,6 +48,7 @@
     - Increased torque while drifting so that you could pick up speed faster while drifting and hold bigger angles.
   - **Drift Smoke:**
     - Your tires will now produce a lot more smoke when drifting. The smoke will appear when you're drifting at a speed higher than *approx: 15mph // 20km/h*. You can change the smoke color either from a drop down list of pre-defined colors or inputting your own [HEX](https://www.color-hex.com/) color. Note that the drift smoke color has no relation to your actual tire smoke color but I can change that if desired, it's just one line of code.
+  - Enabling **Pops & Bangs** and **Louder Pops** makes nearby NPCs react to your exhaust pops. Some will flee, some will insult you, some will be utterly confused, others will take a picture of your car.
   - **Drift Minigame:**
     - When this option is enabled, drifting your car gives you points which when banked, 10% of them are converted into cash (currently the cashout feature is for Single Player only). You also get bonus points for destroying objects (fences, road signs, road cones, etc...), hitting pedestrians, and jumping in the air. *(PS: if you don't land on all four wheels after a jump, you will lose your points. I will probably rewrite this to make you lose your multiplier instead but as of now, jumping is risky)*.
       
@@ -59,19 +60,21 @@
   - **Instant 180°:**
     - Press **[Mouse Scroll Down]** or **[Numpad -]** to instantly turn your car 180 degrees. Note that if your car is stopped or moving but you were not holding **[W]** / accelerating when you pressed the Instant 180° button, your car will simply face the opposite direction but if you press it while holding the accelerator then the option will give you back your speed in the opposite direction.
   - **Flappy Doors:**
-    - Just opens and closes your doors in succession. It's all about the rhythm the doors opening and closing produce.
+    - Just opens and closes your doors in succession. It's all about the rhythm the doors opening and closing produce. I find it funny, I don't know, I might be retarded 🤷‍♂️
   - **Fake Siren:**
     - Equip any land vehicle with a siren *(except of course, vehicles that already have one)*.
 
-  - **Unlimited Flares:**
-     - This option doesn't just give you unlimited flare counter-measures, instead it equips any plane or helicopter you fly with unlimited flares. Just use the same counter-measure button (E on keyboard) to fire flares. And yes, they do work as counter-measures same as the ones in weaponized planes, there's just a 3 second delay between each use to prevent unexpected issues.
+  - **Flares For All:**
+     - This option equips any plane or helicopter you fly with unlimited flares. Just use the same counter-measure button you use on your weaponized planes *(default: [E] on keyboard)* to fire flares. And yes, they do work as counter-measures same as the ones in weaponized planes, there's just a 3 second delay between each use to prevent unexpected issues.
     
   - **Higher Plane Speeds:**
-     - Increases the speed limit on planes. Just enable the option and the rest will take care of itself.
-      > **NOTE:** This option will not do anything until you're flying high enough, with your landing gear fully retracted, and at a speed higher than 260km/h.
+     - Increases the speed limit on planes to 555km/h. Just enable the option and the rest will take care of itself.
+      > **NOTE:** This option will not do anything unless you're flying high enough, with your landing gear fully retracted, and at a speed of at least 260km/h. If for some reason you want to fly a Cropduster at 555km/h, fly high enough then nose-dive to hit 260km/h.
+      
+      > **NOTE 2:** The reason the speed is still capped at 555km/h is because anything over that will prevent textures from loading and end up crashing your game (you can still go over the limit when nose-diving).
 
 - **An implementation of [Flatbed Script](https://github.com/xesdoog/Flatbed-Script):**
-  - Short explanation: You can tow anything with a flatbed truck. If the vehicle you're towing is occupied, you'll still tow it and kidnap whoever is sitting in it. Note that kidnapping players could sometimes log errors and cause issues. Also you can't tow players who have protections.
+  - Short explanation: You can tow anything with a flatbed truck. If the vehicle you're towing is occupied, you'll still tow it and kidnap whoever is sitting in it. Note that kidnapping players could sometimes log errors and cause issues *(may even crash your game)*. Also you can't tow players who have protections.
  
 - **Vehicle Creator:**
   - Spawn and merge two or more vehicles into one then save it as a custom vehicle. Wanna create a widebody Futo? A Sentinel XS with 2 BMXs on the roof? A drivable skyscraper made out of tanks? Feel free.
@@ -107,8 +110,6 @@
    
   - **Public Enemy N°1:**
     - When enabled, all nearby NPCs will attack you *(except cops)*.
-      
-      > **NOTE:** This option will allow your planes (mainly jets) to gain significant speed but no more than 500km/h. Anything over that will prevent textures from loading and end up crashing your game (you can still go over 500km/h when nose-diving).
       
 - **Improved [Object Spawner](https://github.com/xesdoog/object-spawner):**
   - Fixed a few bugs in the main script and added the ability to attach objects to your vehicle.
