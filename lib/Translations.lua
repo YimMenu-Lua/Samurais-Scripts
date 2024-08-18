@@ -413,6 +413,15 @@ Labels = {
         {iso = "ru-RU", text = "Создает эффект дыма при дрифте. Вы можете изменить цвет дыма, но он не связан c цветом дыма шин в игре."},
     },
 
+    ["DriftGame_tt"] = {
+        {iso = "en-US", text = "[WIP] Accumulate points for drifting around without crashing. Your points are automatically transformed into cash once you stop drifting and don't crash for 3 seconds.\n\nNOTE: The cashout feature is for Signle Player only."},
+        {iso = "de-DE", text = "[WIP] Sammle Punkte für das Driften, ohne zu crashen. Deine Punkte werden automatisch in Geld umgewandelt, sobald du aufhörst zu driften und 3 Sekunden lang keinen Unfall baust.\n\nHinweis: Die Auszahlungsfunktion ist nur für Signle Player."},
+        {iso = "fr-FR", text = "[WIP] Accumulez des points en dérivant sans vous écraser. Vos points sont automatiquement transformés en argent dès que vous arrêtez de dériver et que vous ne vous écrasez pas pendant 3 secondes. REMARQUE : la fonction d'encaissement est réservée au joueur Signle."},
+        {iso = "it-IT", text = "[WIP] Accumula punti per andare alla deriva senza schiantarsi. I punti si trasformano automaticamente in denaro quando si smette di derapare e non ci si schianta per 3 secondi.NOTA: la funzione di incasso è riservata al giocatore Signle."},
+        {iso = "pt-BR", text = "[WIP] Acumule pontos por andar à deriva sem bater. Seus pontos são automaticamente transformados em dinheiro quando você para de derrapar e não bate por 3 segundos.\n\nNOTA: O recurso de saque é apenas para o Signle Player."},
+        {iso = "ru-RU", text = "[WIP] Накапливайте очки за дрифт без аварий. Очки автоматически превращаются в деньги, как только вы прекращаете дрифтовать и не разбиваетесь в течение 3 секунд.\n\nПРИМЕЧАНИЕ: Функция обналичивания денег предназначена только для Signle Player."},
+    },
+
     ["driftInvalidVehTxt"] = {
         {iso = "en-US", text = "You can only drift cars, trucks and quad bikes."},
         {iso = "de-DE", text = "Das Driften funktioniert nur mit Autos, LKWs und Quads."},
@@ -580,6 +589,33 @@ Labels = {
         {iso = "it-IT", text = "Premere [NUMPAD-] o [Mouse Scroll Down] per ruotare istantaneamente l'auto di 180 gradi."},
         {iso = "pt-BR", text = "Pressione [NUMPAD-] ou [Mouse Scroll Down] para girar instantaneamente o carro em 180 graus."},
         {iso = "ru-RU", text = "Нажмите [NUMPAD-] или [Прокрутка мыши вниз], чтобы мгновенно развернуть автомобиль на 180 градусов."},
+    },
+
+    ["flaresforall_tt"] = {
+        {iso = "en-US", text = "Equip all planes with unlimited flares.\10\10 ¤ NOTE: There is a 3 second delay between each use of these flares. The button is the same counter-measure button, default: [E]."},
+        {iso = "de-DE", text = "Rüsten Sie alle Flugzeuge mit unbegrenzten Leuchtraketen aus.\10\10 ¤ HINWEIS: Es gibt eine 3-Sekunden-Verzögerung zwischen jedem Einsatz dieser Leuchtraketen. Die Taste ist die gleiche Taste für Gegenmaßnahmen, Standard: [E]."},
+        {iso = "fr-FR", text = "Équiper tous les avions avec un nombre illimité de fusées éclairantes.\10\10 ¤ NOTE : Il y a un délai de 3 secondes entre chaque utilisation de ces fusées. Le bouton est le même que celui des contre-mesures, par défaut : [E]."},
+        {iso = "it-IT", text = "Equipaggia tutti gli aerei con razzi illimitati.\10\10 ¤ NOTA: c'è un ritardo di 3 secondi tra l'uso di questi razzi. Il pulsante è lo stesso pulsante di contromisura, predefinito: [E]."},
+        {iso = "pt-BR", text = "Equipe todos os aviões com sinalizadores ilimitados.\10\10 ¤ OBSERVAÇÃO: há um atraso de 3 segundos entre cada uso desses sinalizadores. O botão é o mesmo botão de contramedida, padrão: [E]."},
+        {iso = "ru-RU", text = "Оснастите все самолеты неограниченным количеством сигнальных ракет.\10\10 ¤ ПРИМЕЧАНИЕ: Между каждым использованием этих сигнальных ракет есть 3-секундная задержка. Кнопка - та же кнопка противодействия, по умолчанию: [E]."},
+    },
+
+    ["planeSpeed_tt"] = {
+        {iso = "en-US", text = "Increases the speed limit on planes.\10\10  ¤ Note 1: You must be flying at a reasonable altitude to gain speed, otherwise the game will force you to fly slowly if you're too low.\10\10  ¤ Note 2: Even with this option, we're still capping the speed at approximately 555km/h because anything over that will prevent textures from loading and eventually break your game, which is the reason why R* limited plane speeds in the first place."},
+        {iso = "de-DE", text = "Erhöht die Geschwindigkeitsbegrenzung für Flugzeuge.\10\10 ¤ Hinweis 1: Ihr müsst in einer angemessenen Höhe fliegen, um Geschwindigkeit zu erreichen, sonst zwingt euch das Spiel, langsam zu fliegen, wenn ihr zu niedrig seid.\10\10 ¤ Hinweis 2: Auch mit dieser Option begrenzen wir die Geschwindigkeit auf etwa 555 km/h, weil alles, was darüber hinausgeht, das Laden von Texturen verhindert und schließlich euer Spiel kaputt macht, was der Grund dafür ist, dass R* die Geschwindigkeit von Flugzeugen überhaupt begrenzt hat."},
+        {iso = "fr-FR", text = "Augmente la vitesse limite des avions.\10\10- Note 1 : Vous devez voler à une altitude raisonnable pour gagner de la vitesse, sinon le jeu vous forcera à voler lentement si vous êtes trop bas.\10\10- Note 2 : Même avec cette option, nous limitons toujours la vitesse à environ 555km/h parce que tout ce qui dépasse cette vitesse empêchera le chargement des textures et finira par casser votre jeu, ce qui est la raison pour laquelle R* a limité la vitesse des avions en premier lieu."},
+        {iso = "it-IT", text = "Aumenta il limite di velocità degli aerei.\10\10 ¤ Nota 1: per guadagnare velocità è necessario volare a un'altitudine ragionevole, altrimenti il gioco vi costringerà a volare lentamente se siete troppo bassi.\10\10 ¤ Nota 2: anche con questa opzione, limitiamo la velocità a circa 555 km/h, perché qualsiasi velocità superiore impedisce il caricamento delle texture e finisce per rompere il gioco, che è il motivo per cui R* ha limitato la velocità degli aerei in primo luogo."},
+        {iso = "pt-BR", text = "Aumenta o limite de velocidade dos aviões.\10\10 ¤ Nota 1: Você deve estar voando a uma altitude razoável para ganhar velocidade, caso contrário, o jogo o forçará a voar lentamente se estiver muito baixo.\10\10 ¤ Nota 2: Mesmo com essa opção, ainda estamos limitando a velocidade a aproximadamente 555 km/h, pois qualquer coisa acima disso impedirá que as texturas sejam carregadas e acabará quebrando o jogo, razão pela qual o R* limitou a velocidade dos aviões em primeiro lugar."},
+        {iso = "ru-RU", text = "Увеличивает предельную скорость на самолетах.\10\10 ¤ Примечание 1: Вы должны лететь на разумной высоте, чтобы набрать скорость, иначе игра заставит вас лететь медленно, если вы слишком низко.\10\10 ¤ Примечание 2: Даже с этой опцией, мы все еще ограничиваем скорость примерно 555 км/ч, потому что все, что больше, будет препятствовать загрузке текстур и в конечном итоге сломает вашу игру, что является причиной, по которой R* ограничила скорость самолетов в первую очередь."},
+    },
+
+    ["strongWindows_tt"] = {
+        {iso = "en-US", text = "Prevents your vehicle's windows from breaking."},
+        {iso = "de-DE", text = "Verhindert, dass die Scheiben Ihres Fahrzeugs zerbrechen."},
+        {iso = "fr-FR", text = "Empêche les vitres de votre véhicule de se briser."},
+        {iso = "it-IT", text = "Impedisce la rottura dei vetri del veicolo."},
+        {iso = "pt-BR", text = "Evita a quebra dos vidros do veículo."},
+        {iso = "ru-RU", text = "Предотвращает разбивание стекол автомобиля."},
     },
 
     ["rgbLights"] = {
@@ -787,6 +823,87 @@ Labels = {
         {iso = "it-IT", text = "Prossima Sede"},
         {iso = "pt-BR", text = "Próxima Sede"},
         {iso = "ru-RU", text = "Следующее место"},
+    },
+
+    ["animateNPCsCB"] = {
+        {iso = "en-US", text = "Animate Nearby NPCs"},
+        {iso = "de-DE", text = "NPCs in der Nähe animieren"},
+        {iso = "fr-FR", text = "Animer Les PNJ À Proximité"},
+        {iso = "it-IT", text = "Animare Gli PNG Vicini"},
+        {iso = "pt-BR", text = "Animar NPCs Próximos"},
+        {iso = "ru-RU", text = "Анимируйте ближайших NPC"},
+    },
+
+    ["animateNPCs_tt"] = {
+        {iso = "en-US", text = "Make all nearby NPCs do one of the actions listed down below. This has no relation to the animations list and only works with NPCs that are on foot."},
+        {iso = "de-DE", text = "Bringt alle NPCs in der Nähe dazu, eine der unten aufgeführten Aktionen auszuführen. Dies hat nichts mit der Animationsliste zu tun und funktioniert nur mit NPCs, die zu Fuß unterwegs sind."},
+        {iso = "fr-FR", text = "Faites faire à tous les PNJ proches l'une des actions listées ci-dessous. Cette action n'a aucun rapport avec la liste des animations et ne fonctionne qu'avec les PNJ qui sont à pied."},
+        {iso = "it-IT", text = "Fa compiere a tutti i PNG vicini una delle azioni elencate di seguito. Questo non ha alcuna relazione con l'elenco delle animazioni e funziona solo con i PNG che sono a piedi."},
+        {iso = "pt-BR", text = "Faça com que todos os PNJs próximos realizem uma das ações listadas abaixo. Isso não tem relação com a lista de animações e só funciona com NPCs que estão a pé."},
+        {iso = "ru-RU", text = "Заставьте всех ближайших NPC выполнить одно из действий, перечисленных ниже. Это не имеет отношения к списку анимаций и работает только с пешими NPC."},
+    },
+
+    ["kamikazeCB"] = {
+        {iso = "en-US", text = "Kamikaze Drivers"},
+        {iso = "de-DE", text = "Kamikaze-Treiber"},
+        {iso = "fr-FR", text = "Conducteurs Kamikazes"},
+        {iso = "it-IT", text = "Piloti Kamikaze"},
+        {iso = "pt-BR", text = "Motoristas Kamikaze"},
+        {iso = "ru-RU", text = "Водители-камикадзе"},
+    },
+
+    ["publicEnemyCB"] = {
+        {iso = "en-US", text = "Public Enemy N°1"},
+        {iso = "de-DE", text = "Staatsfeind Nr. 1"},
+        {iso = "fr-FR", text = "Ennemi Public N°1"},
+        {iso = "it-IT", text = "Nemico Pubblico N°1"},
+        {iso = "pt-BR", text = "Inimigo Público N° 1"},
+        {iso = "ru-RU", text = "Общественный враг N°1"},
+    },
+
+    ["publicEnemy_tt"] = {
+        {iso = "en-US", text = "Everyone is out to get you. All nearby NPCs will attack you."},
+        {iso = "de-DE", text = "Jeder hat es auf dich abgesehen. Alle NPCs in der Nähe werden dich angreifen."},
+        {iso = "fr-FR", text = "Tout le monde veut votre peau. Tous les PNJ à proximité vous attaqueront."},
+        {iso = "it-IT", text = "Tutti vogliono prendervi. Tutti i PNG nelle vicinanze vi attaccheranno."},
+        {iso = "pt-BR", text = "Todos querem pegar você. Todos os NPCs próximos atacarão você."},
+        {iso = "ru-RU", text = "Все хотят добраться до вас. Все ближайшие NPC будут нападать на вас."},
+    },
+
+    ["extendWorldCB"] = {
+        {iso = "en-US", text = "Extend World Limits"},
+        {iso = "de-DE", text = "Weltweite Grenzen Ausdehnen"},
+        {iso = "fr-FR", text = "Prolonger Les Limites Du Monde"},
+        {iso = "it-IT", text = "Estendere I Limiti Del Mondo"},
+        {iso = "pt-BR", text = "Ampliar Os Limites Do Mundo"},
+        {iso = "ru-RU", text = "Расширить мировые пределы"},
+    },
+
+    ["extendWorld_tt"] = {
+        {iso = "en-US", text = "Travel farther across the ocean without dying.\10\10This does not remove the sky box."},
+        {iso = "de-DE", text = "Reise weiter über den Ozean, ohne zu sterben.\10\10Die Himmelsbox wird dadurch nicht entfernt."},
+        {iso = "fr-FR", text = "Voyagez plus loin à travers l'océan sans mourir.\10\10Ceci ne supprime pas la boîte du ciel."},
+        {iso = "it-IT", text = "Viaggia più lontano attraverso l'oceano senza morire.\10\10Questo non rimuove la casella del cielo."},
+        {iso = "pt-BR", text = "Viaje mais longe no oceano sem morrer.\10\10Isso não remove a caixa do céu."},
+        {iso = "ru-RU", text = "Путешествуйте дальше через океан, не умирая.\10\10Это не убирает небесную коробку."},
+    },
+
+    ["smoothwatersCB"] = {
+        {iso = "en-US", text = "Smooth Waters"},
+        {iso = "de-DE", text = "Glatte Gewässer"},
+        {iso = "fr-FR", text = "Eaux Calmes"},
+        {iso = "it-IT", text = "Acque Calme"},
+        {iso = "pt-BR", text = "Águas Calmas"},
+        {iso = "ru-RU", text = "Гладкие воды"},
+    },
+
+    ["smoothwaters_tt"] = {
+        {iso = "en-US", text = "Disables ocean waves. Especially useful when playing those awful boat sell missions -_-\10\10Although this is only local, but just to be safe this option will not be saved. You will have to manually enable it whenever you want to use it."},
+        {iso = "de-DE", text = "Deaktiviert Meereswellen. Besonders nützlich, wenn man diese schrecklichen Bootsverkaufsmissionen spielt -_-\10\10Dies ist zwar nur lokal, aber um sicher zu gehen, wird diese Option nicht gespeichert. Ihr müsst sie manuell aktivieren, wenn ihr sie benutzen wollt."},
+        {iso = "fr-FR", text = "Désactive les vagues de l'océan. Particulièrement utile lorsque vous jouez ces horribles missions de vente en bateaux -_-\10\10Bien que ce ne soit que local, mais juste pour être sûr, cette option ne sera pas sauvegardée. Vous devrez l'activer manuellement chaque fois que vous voudrez l'utiliser."},
+        {iso = "it-IT", text = "Disattiva le onde oceaniche. Particolarmente utile quando si giocano quelle terribili missioni di vendita di barche -_-\10\10Anche se si tratta solo di un'opzione locale, per sicurezza questa opzione non verrà salvata. Dovrete attivarla manualmente ogni volta che vorrete utilizzarla."},
+        {iso = "pt-BR", text = "Desativa as ondas do mar. Especialmente útil ao jogar aquelas terríveis missões de venda de barcos -_-\10\10Embora isso seja apenas local, mas por segurança, essa opção não será salva. Você terá de ativá-la manualmente sempre que quiser usá-la."},
+        {iso = "ru-RU", text = "Отключает океанские волны. Особенно полезно, когда играешь в эти ужасные миссии по продаже лодок -_-\10\10Хотя это только локально, но на всякий случай эта опция не будет сохранена. Вам придется вручную включать ее всякий раз, когда вы захотите ее использовать."},
     },
 
     ["settingsTab"] = {

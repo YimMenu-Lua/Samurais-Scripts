@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.1.5' -- v1.1.5
+SCRIPT_VERSION = '1.1.6' -- v1.1.6
 TARGET_BUILD   = '3274'  -- Only YimResupplier needs a version check.
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -79,10 +79,13 @@ default_config           = {
   autoplay_cap            = false,
   heist_cart_autograb     = false,
   flares_forall           = false,
+  unbreakableWindows      = false,
   real_plane_speed        = false,
+  extend_world            = false,
   nosPower                = 10,
   lightSpeed              = 1,
   DriftPowerIncrease      = 1,
+  driftPB                 = 0,
   laser_switch            = 0,
   lang_idx                = 0,
   DriftIntensity          = 0,
@@ -126,6 +129,7 @@ DriftPowerIncrease       = lua_cfg.read("DriftPowerIncrease")
 DriftTires               = lua_cfg.read("DriftTires")
 DriftSmoke               = lua_cfg.read("DriftSmoke")
 driftMinigame            = lua_cfg.read("driftMinigame")
+driftPB                  = lua_cfg.read("driftPB")
 speedBoost               = lua_cfg.read("speedBoost")
 nosvfx                   = lua_cfg.read("nosvfx")
 hornLight                = lua_cfg.read("hornLight")
@@ -146,6 +150,8 @@ noJacking                = lua_cfg.read("noJacking")
 insta180                 = lua_cfg.read("insta180")
 flares_forall            = lua_cfg.read("flares_forall")
 real_plane_speed         = lua_cfg.read("real_plane_speed")
+unbreakableWindows       = lua_cfg.read("unbreakableWindows")
+extend_world             = lua_cfg.read("extend_world")
 tab1Sound                = true
 tab2Sound                = true
 tab3Sound                = true
@@ -187,7 +193,12 @@ hijack_started           = false
 sound_btn_off            = false
 is_drifting              = false
 start_rgb_loop           = false
+ubwindowsToggled         = false
 default_pops_disabled    = false
+world_extended           = false
+autopilot_waypoint       = false
+autopilot_objective      = false
+autopilot_random         = false
 flag                     = 0
 grp_anim_index           = 0
 attached_ped             = 0
@@ -347,13 +358,13 @@ function dummyCop()
       if ENTITY.DOES_ENTITY_EXIST(dummyCopCar) then
         entities.take_control_of(dummyCopCar, 300)
         local boneidx1 = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(dummyCopCar, veh_bone1)
-        local boneidx2 = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(self.get_veh(), veh_bone2)
+        local boneidx2 = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, veh_bone2)
         VEHICLE.SET_VEHICLE_LIGHTS(dummyCopCar, 1)
-        ENTITY.SET_ENTITY_HEADING(dummyCopCar, ENTITY.GET_ENTITY_HEADING(self.get_veh()))
+        ENTITY.SET_ENTITY_HEADING(dummyCopCar, ENTITY.GET_ENTITY_HEADING(current_vehicle))
         if attach_mode == 1 then
-          ENTITY.ATTACH_ENTITY_BONE_TO_ENTITY_BONE(dummyCopCar, self.get_veh(), boneidx1, boneidx2, false, true)
+          ENTITY.ATTACH_ENTITY_BONE_TO_ENTITY_BONE(dummyCopCar, current_vehicle, boneidx1, boneidx2, false, true)
         else
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(dummyCopCar, self.get_veh(), boneidx2, 0.46, 0.4, -0.9, 0.0, 0.0, 0.0, false,
+          ENTITY.ATTACH_ENTITY_TO_ENTITY(dummyCopCar, current_vehicle, boneidx2, 0.46, 0.4, -0.9, 0.0, 0.0, 0.0, false,
             true,
             false, true, 1, true, 1)
         end
@@ -361,10 +372,10 @@ function dummyCop()
         VEHICLE.SET_VEHICLE_SIREN(dummyCopCar, true)
         VEHICLE.SET_VEHICLE_HAS_MUTED_SIRENS(dummyCopCar, false)
         AUDIO.TRIGGER_SIREN_AUDIO(dummyCopCar)
-        VEHICLE.SET_VEHICLE_ACT_AS_IF_HAS_SIREN_ON(self.get_veh(), true)
-        VEHICLE.SET_VEHICLE_CAUSES_SWERVING(self.get_veh(), true)
-        VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(self.get_veh(), 0, true)
-        VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(self.get_veh(), 1, true)
+        VEHICLE.SET_VEHICLE_ACT_AS_IF_HAS_SIREN_ON(current_vehicle, true)
+        VEHICLE.SET_VEHICLE_CAUSES_SWERVING(current_vehicle, true)
+        VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 0, true)
+        VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 1, true)
       end
     end
   end)
@@ -1488,9 +1499,14 @@ weapon_tab:add_imgui(function()
   end
   if laserSight then
     ImGui.Text(translateLabel("laserChoice_txt"))
-    ImGui.SameLine(); laser_switch, lsrswUsed = ImGui.RadioButton("Red", laser_switch, 0)
-    ImGui.SameLine(); laser_switch, lsrswUsed = ImGui.RadioButton("Green", laser_switch, 1)
+    ImGui.SameLine(); laser_switch, lsrswUsed   = ImGui.RadioButton("Red", laser_switch, 0)
+    ImGui.SameLine(); laser_switch, lsrswUsed_2 = ImGui.RadioButton("Green", laser_switch, 1)
     if lsrswUsed then
+      UI.widgetSound("Nav")
+      lua_cfg.save("laser_switch", laser_switch)
+      lua_cfg.save("laser_choice", laser_choice)
+    end
+    if lsrswUsed_2 then
       UI.widgetSound("Nav")
       lua_cfg.save("laser_switch", laser_switch)
       lua_cfg.save("laser_choice", laser_choice)
@@ -1687,15 +1703,487 @@ function shoot_flares(script)
 end
 
 vehicle_tab:add_imgui(function()
-  if PED.IS_PED_IN_ANY_VEHICLE(self.get_ped(), true) then
-    local manufacturer  = Game.Vehicle.manufacturer(self.get_veh())
-    local vehicle_name  = Game.Vehicle.name(self.get_veh())
-    local full_veh_name = manufacturer .. " " .. vehicle_name
-    local vehicle_class = Game.Vehicle.class(self.get_veh())
+  local manufacturer  = Game.Vehicle.manufacturer(current_vehicle)
+  local vehicle_name  = Game.Vehicle.name(current_vehicle)
+  local full_veh_name = manufacturer .. " " .. vehicle_name
+  local vehicle_class = Game.Vehicle.class(current_vehicle)
+  ImGui.SeparatorText(full_veh_name .. "   (" .. vehicle_class .. ")")
+  ImGui.Spacing(); limitVehOptions, lvoUsed = ImGui.Checkbox(translateLabel("lvoCB"), limitVehOptions, true)
+  UI.toolTip(false, translateLabel("lvo_tt"))
+  if lvoUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("limitVehOptions", limitVehOptions)
+  end
+
+  ImGui.SameLine(); ImGui.Dummy(7, 1); ImGui.SameLine();
+  missiledefense, mdefUsed = ImGui.Checkbox("Missile Defense", missiledefense, true)
+  UI.toolTip(false, translateLabel("missile_def_tt"))
+  if mdefUsed then
+    UI.widgetSound("Radar")
+    lua_cfg.save("missiledefense", missiledefense)
+    if missiledefense then
+      gui.show_success("Samurais Scripts", translateLabel("missile_def_on_notif"))
+    end
+  end
+  if not missiledefense and mdefUsed then
+    UI.widgetSound("Delete")
+    gui.show_message("Samurais Scripts", translateLabel("missile_def_off_notif"))
+  end
+
+  launchCtrl, lctrlUsed = ImGui.Checkbox("Launch Control", launchCtrl, true)
+  UI.toolTip(false, translateLabel("lct_tt"))
+  if lctrlUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("launchCtrl", launchCtrl)
+  end
+
+  ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine(); speedBoost, spdbstUsed = ImGui.Checkbox("NOS", speedBoost,
+    true)
+  UI.toolTip(false, translateLabel("speedBoost_tt"))
+  if spdbstUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("speedBoost", speedBoost)
+  end
+  if speedBoost then
+    ImGui.SameLine(); nosvfx, nosvfxUsed = ImGui.Checkbox("VFX", nosvfx, true)
+    UI.toolTip(false, translateLabel("vfx_tt"))
+    if nosvfxUsed then
+      UI.widgetSound("Nav2")
+      lua_cfg.save("nosvfx", nosvfx)
+    end
+    ImGui.Dummy(192, 1); ImGui.SameLine()
+    if ImGui.SmallButton("  NOS Power  ") then
+      ImGui.OpenPopup("Nos Power")
+    end
+    ImGui.SetNextWindowPos(780, 400, ImGuiCond.Appearing)
+    ImGui.SetNextWindowBgAlpha(0.9)
+    if ImGui.BeginPopupModal("Nos Power", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
+      ImGui.Text("NOS Power")
+      nosPower, nspwrUsed = ImGui.SliderInt("##nospower", nosPower, 10, 100, "%d",
+        ImGuiSliderFlags.NoInput | ImGuiSliderFlags.AlwaysClamp | ImGuiSliderFlags.Logarithmic)
+      if nspwrUsed then
+        UI.widgetSound("Nav")
+      end
+      ImGui.Spacing(); if ImGui.Button(" Save ") then
+        UI.widgetSound("Select2")
+        lua_cfg.save("nosPower", nosPower)
+        ImGui.CloseCurrentPopup()
+      end
+      ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); if ImGui.Button(" Cancel ") then
+        UI.widgetSound("Cancel")
+        ImGui.CloseCurrentPopup()
+      end
+      ImGui.End()
+    end
+  end
+
+  loud_radio, loudRadioUsed = ImGui.Checkbox("Big Subwoofer", loud_radio, true)
+  UI.toolTip(false, translateLabel("loudradio_tt"))
+  if loudRadioUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("loud_radio", loud_radio)
+  end
+  if loud_radio then
+    script.run_in_fiber(function()
+      AUDIO.SET_VEHICLE_RADIO_LOUD(current_vehicle, true)
+    end)
+  else
+    script.run_in_fiber(function()
+      AUDIO.SET_VEHICLE_RADIO_LOUD(current_vehicle, false)
+    end)
+  end
+
+  ImGui.SameLine(); ImGui.Dummy(32, 1); ImGui.SameLine(); nosPurge, nosPurgeUsed = ImGui.Checkbox("NOS Purge", nosPurge,
+    true)
+  UI.toolTip(false, translateLabel("purge_tt"))
+  if nosPurgeUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("nosPurge", nosPurge)
+  end
+
+  popsNbangs, pnbUsed = ImGui.Checkbox("Pops & Bangs", popsNbangs, true)
+  UI.toolTip(false, translateLabel("pnb_tt"))
+  if pnbUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("popsNbangs", popsNbangs)
+  end
+  if popsNbangs then
+    ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine(); louderPops, louderPopsUsed = ImGui.Checkbox("Louder Pops",
+      louderPops, true)
+    UI.toolTip(false, translateLabel("louderpnb_tt"))
+    if louderPopsUsed then
+      UI.widgetSound("Nav2")
+      lua_cfg.save("louderPops", louderPops)
+    end
+  end
+
+  hornLight, hornLightUsed = ImGui.Checkbox("High Beams on Horn", hornLight, true)
+  UI.toolTip(false, translateLabel("highbeams_tt"))
+  if hornLightUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("hornLight", hornLight)
+  end
+
+  ImGui.SameLine(); autobrklight, autobrkUsed = ImGui.Checkbox("Auto Brake Lights", autobrklight, true)
+  UI.toolTip(false, translateLabel("brakeLight_tt"))
+  if autobrkUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("autobrklight", autobrklight)
+  end
+
+  holdF, holdFused = ImGui.Checkbox("Keep Engine On", holdF, true)
+  UI.toolTip(false, translateLabel("engineOn_tt"))
+  if holdFused then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("holdF", holdF)
+  end
+
+  ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); keepWheelsTurned, kwtrnd = ImGui.Checkbox(
+  "Keep Wheels Turned", keepWheelsTurned, true)
+  UI.toolTip(false, translateLabel("wheelsturned_tt"))
+  if kwtrnd then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("keepWheelsTurned", keepWheelsTurned)
+  end
+
+  noJacking, noJackingUsed = ImGui.Checkbox(
+    "Can't Touch This!", noJacking, true)
+  UI.toolTip(false, translateLabel("canttouchthis_tt"))
+  if noJackingUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("noJacking", noJacking)
+  end
+
+  ImGui.SameLine(); ImGui.Dummy(15, 1); ImGui.SameLine(); insta180, insta180Used = ImGui.Checkbox("Instant 180°",
+    insta180, true)
+  if insta180Used then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("insta180", insta180)
+  end
+  UI.toolTip(false, translateLabel("insta180_tt"))
+
+  if Game.isOnline() then
+    flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall, true)
+    UI.toolTip(false, translateLabel("flaresforall_tt"))
+    if flaresUsed then
+      UI.widgetSound("Nav2")
+      lua_cfg.save("flares_forall", flares_forall)
+    end
+  else
+    ImGui.BeginDisabled()
+    flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall, true)
+    ImGui.EndDisabled()
+    UI.toolTip(true, translateLabel("Unavailable in Single Player"), '#FF3333', 1)
+  end
+
+  ImGui.SameLine(); ImGui.Dummy(46, 1); ImGui.SameLine(); real_plane_speed, rpsUsed = ImGui.Checkbox(
+  "Higher Plane Speeds", real_plane_speed, true)
+  UI.toolTip(false, translateLabel("planeSpeed_tt"))
+  if rpsUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("real_plane_speed", real_plane_speed)
+  end
+
+  unbreakableWindows, ubwUsed = ImGui.Checkbox("Strong Windows", unbreakableWindows, true)
+  UI.toolTip(false, translateLabel("strongWindows_tt"))
+  if ubwUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("unbreakableWindows", unbreakableWindows)
+    if not unbreakableWindows and ubwindowsToggled then
+      VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS(current_vehicle, false)
+      ubwindowsToggled = false
+    end
+  end
+
+  ImGui.SameLine(); ImGui.Dummy(18, 1); ImGui.SameLine(); flappyDoors, flappyDoorsUsed = ImGui.Checkbox("Flappy Doors",
+    flappyDoors, true)
+  if flappyDoorsUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("flappyDoors", flappyDoors)
+  end
+
+  ImGui.Dummy(1, 5); rgbLights, rgbToggled = ImGui.Checkbox(translateLabel("rgbLights"), rgbLights, true)
+  if rgbToggled then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("rgbLights", rgbLights)
+    if rgbLights then
+      script.run_in_fiber(function(rgbhl)
+        if not VEHICLE.IS_TOGGLE_MOD_ON(current_vehicle, 22) then
+          has_xenon = false
+        else
+          has_xenon    = true
+          defaultXenon = VEHICLE.GET_VEHICLE_XENON_LIGHT_COLOR_INDEX(current_vehicle)
+        end
+        rgbhl:sleep(200)
+        start_rgb_loop = true
+      end)
+    else
+      start_rgb_loop = false
+    end
+  end
+  if rgbLights then
+    ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
+    ImGui.PushItemWidth(150)
+    lightSpeed, lightSpeedUsed = ImGui.SliderInt(translateLabel("rgbSlider"), lightSpeed, 1, 3)
+    ImGui.PopItemWidth()
+    if lightSpeedUsed then
+      UI.widgetSound("Nav")
+      lua_cfg.save("lightSpeed", lightSpeed)
+    end
+  end
+
+  ImGui.Spacing(); ImGui.SeparatorText("Auto-Pilot")
+  if current_vehicle ~= nil and current_vehicle ~= 0 then
+    local bool = is_plane or is_heli
+    ImGui.BeginDisabled(not bool)
+    if ImGui.Button(" Fly To Waypoint ") then
+      script.run_in_fiber(function()
+        local wp = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_WAYPOINT_BLIP_ENUM_ID())
+        if HUD.DOES_BLIP_EXIST(wp) then
+          UI.widgetSound("Select")
+          local waypoint_coords = HUD.GET_BLIP_COORDS(wp)
+          if autopilot_objective or autopilot_random then
+            TASK.CLEAR_PED_TASKS(self.get_ped())
+            TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+          end
+          autopilot_waypoint  = true
+          autopilot_objective = false
+          autopilot_random    = false
+          if is_plane then
+            if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
+              if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
+                VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+              end
+            end
+            TASK.TASK_PLANE_MISSION(
+              self.get_ped(), current_vehicle, 0, 0, waypoint_coords.x, waypoint_coords.y, waypoint_coords.z + 600,
+            4, 100.0, 0, 90, 0, 0, 200
+          )
+          elseif is_heli then
+            TASK.TASK_HELI_MISSION(
+              self.get_ped(), current_vehicle, 0, 0, waypoint_coords.x, waypoint_coords.y, waypoint_coords.z,
+            4, 50.0, 4.0, -1, -1, 100, 100.0, 0
+          )
+          end
+          gui.show_success("Samurai's Scripts", "Flying towards your waypoint")
+        else
+          UI.widgetSound("Error")
+          gui.show_warning("Samurai's Scripts", "Please set a waypoint on the map first!")
+        end
+      end)
+    end
+    ImGui.SameLine()
+    if ImGui.Button(" Fly To Objective ") then
+      local objective_coords
+      for _, id in pairs(objectives_T) do
+        local blip = HUD.GET_CLOSEST_BLIP_INFO_ID(id)
+        if HUD.DOES_BLIP_EXIST(blip) then
+          objective_coords = HUD.GET_BLIP_COORDS(blip)
+          break
+        end
+      end
+      if objective_coords ~= nil then
+        UI.widgetSound("Select")
+        if autopilot_waypoint or autopilot_random then
+          TASK.CLEAR_PED_TASKS(self.get_ped())
+          TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+        end
+        autopilot_waypoint  = false
+        autopilot_objective = true
+        autopilot_random    = false
+        if is_plane then
+          if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
+            if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
+              VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+            end
+          end
+          TASK.TASK_PLANE_MISSION(
+            self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z + 600,
+          4, 100.0, 0, 90, 0, 0, 200
+        )
+        elseif is_heli then
+          TASK.TASK_HELI_MISSION(
+            self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z,
+          4, 50.0, 4.0, -1, -1, 100, 100.0, 0
+        )
+        end
+        gui.show_success("Samurai's Scripts", "Flying towards objective")
+      else
+        UI.widgetSound("Error")
+        gui.show_warning("Samurai's Scripts", "No objective found!")
+      end
+    end
+    ImGui.SameLine()
+    if ImGui.Button(" Random ") then
+      script.run_in_fiber(function()
+        if autopilot_waypoint or autopilot_objective then
+          TASK.CLEAR_PED_TASKS(self.get_ped())
+          TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+        end
+        autopilot_waypoint  = false
+        autopilot_objective = false
+        autopilot_random    = true
+        if is_plane then
+          if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
+            if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
+              VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+            end
+          end
+          TASK.TASK_PLANE_MISSION(
+            self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000), math.random(400, 900),
+          4, 100.0, 0, 90, 0, 0, 200
+        )
+        elseif is_heli then
+          TASK.TASK_HELI_MISSION(
+            self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000), math.random(10, 300),
+          4, 50.0, 4.0, -1, -1, 100, 100.0, 0
+        )
+        end
+        gui.show_success("Samurai's Scripts", "Flying towards some random coordinates")
+      end)
+    end
+    if autopilot_waypoint or autopilot_objective or autopilot_random then
+      ImGui.Dummy(160, 1); ImGui.SameLine()
+      if ImGui.Button("Stop", 60, 40) then
+        script.run_in_fiber(function()
+          TASK.CLEAR_PED_TASKS(self.get_ped())
+          TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+          autopilot_waypoint  = false
+          autopilot_objective = false
+          autopilot_random    = false
+        end)
+      end
+    end
+    ImGui.EndDisabled()
+    if not bool then
+      UI.coloredText("You must be flying a plane or a helicopter to use these features.", 'yellow', 0.87, 20)
+    end
+  end
+  ImGui.Dummy(1, 5); ImGui.SeparatorText("MISC")
+  if ImGui.Button(" " .. translateLabel("engineSoundBtn") .. " ") then
+    if is_car or is_bike or is_quad then
+      UI.widgetSound("Select")
+      open_sounds_window = true
+    else
+      open_sounds_window = false
+      UI.widgetSound("Error")
+      gui.show_error("Samurais Scripts", translateLabel("engineSoundErr"))
+    end
+  end
+  if open_sounds_window then
+    ImGui.SetNextWindowPos(740, 300, ImGuiCond.Appearing)
+    ImGui.SetNextWindowSizeConstraints(100, 100, 600, 800)
+    ImGui.Begin("Vehicle Sounds",
+      ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse)
+    if ImGui.Button(translateLabel("closeBtn")) then
+      UI.widgetSound("Cancel")
+      open_sounds_window = false
+    end
+    ImGui.Spacing(); ImGui.Spacing()
+    ImGui.PushItemWidth(250)
+    search_term, used = ImGui.InputTextWithHint("", translateLabel("searchVeh_hint"), search_term, 32)
+    if ImGui.IsItemActive() then
+      is_typing = true
+    else
+      is_typing = false
+    end
+    ImGui.PushItemWidth(270)
+    displayVehNames()
+    ImGui.PopItemWidth()
+    local selected_name = filteredNames[vehSound_index + 1]
     ImGui.Spacing()
-    ImGui.SeparatorText("Drift Mode")
+    if ImGui.Button(translateLabel("Use This Sound")) then
+      UI.widgetSound("Select")
+      script.run_in_fiber(function()
+        AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(current_vehicle, selected_name)
+      end)
+    end
+    ImGui.SameLine()
+    if ImGui.Button(translateLabel("Restore Default")) then
+      UI.widgetSound("Delete")
+      script.run_in_fiber(function()
+        AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(current_vehicle,
+          vehicles.get_vehicle_display_name(ENTITY.GET_ENTITY_MODEL(current_vehicle)))
+      end)
+    end
+    ImGui.End()
+  end
+
+  ImGui.SameLine()
+  if dummyCopCar == 0 then
+    if VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 18 then
+      if ImGui.Button(" Equip Fake Siren ") then
+        if is_car or is_bike and not PED.IS_PED_IN_FLYING_VEHICLE(self.get_ped()) then
+          UI.widgetSound("Select")
+          dummyCop()
+        else
+          UI.widgetSound("Error")
+          gui.show_error("Samurais Scripts", "This feature is only available for cars and bikes.")
+        end
+      end
+      if not Game.isOnline() then
+        UI.toolTip(false, "The siren audio only works Online.")
+      end
+    else
+      ImGui.BeginDisabled()
+      ImGui.Button("Equip Fake Siren")
+      ImGui.EndDisabled()
+      UI.toolTip(false, "Your vehicle has a real siren. You don't need a fake one.")
+    end
+  else
+    if ImGui.Button("Remove Fake Siren") then
+      UI.widgetSound("Cancel")
+      script.run_in_fiber(function(deletecop)
+        VEHICLE.SET_VEHICLE_ACT_AS_IF_HAS_SIREN_ON(current_vehicle, false)
+        VEHICLE.SET_VEHICLE_CAUSES_SWERVING(current_vehicle, false)
+        VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 0, false)
+        VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 1, false)
+        if ENTITY.DOES_ENTITY_EXIST(dummyCopCar) then
+          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(dummyCopCar)
+          deletecop:sleep(200)
+          ENTITY.DELETE_ENTITY(dummyCopCar)
+        end
+        dummyCopCar = 0
+      end)
+    end
+  end
+
+  local engineHealth = VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle)
+  if engineHealth <= 300 then
+    engineDestroyed = true
+  else
+    engineDestroyed = false
+  end
+  if engineDestroyed then
+    engineButton_label = translateLabel("Fix Engine")
+    engine_hp          = 1000
+    button_color_1     = "#008000"
+    button_color_2     = "#005A00"
+    button_color_3     = "#BFFFBF"
+  else
+    engineButton_label = translateLabel("Destroy Engine")
+    engine_hp          = -4000
+    button_color_1     = "#FF0000"
+    button_color_2     = "#B30000"
+    button_color_3     = "#FF8080"
+  end
+  if UI.coloredButton(engineButton_label, button_color_1, button_color_2, button_color_3, 1) then
+    script.run_in_fiber(function()
+      VEHICLE.SET_VEHICLE_ENGINE_HEALTH(current_vehicle, engine_hp)
+    end)
+  end
+end)
+
+drift_mode_tab = vehicle_tab:add_tab("Drift Mode")
+drift_mode_tab:add_imgui(function()
+  if Game.Self.isDriving() then
+    local manufacturer  = Game.Vehicle.manufacturer(current_vehicle)
+    local vehicle_name  = Game.Vehicle.name(current_vehicle)
+    local full_veh_name = manufacturer .. " " .. vehicle_name
+    local vehicle_class = Game.Vehicle.class(current_vehicle)
+    ImGui.Spacing()
     if validModel then
-      ImGui.Text(full_veh_name .. "   (" .. vehicle_class .. ")")
+      ImGui.SeparatorText(full_veh_name .. "   (" .. vehicle_class .. ")")
       driftMode, driftModeUsed = ImGui.Checkbox(translateLabel("driftModeCB"), driftMode, true)
       UI.helpMarker(false, translateLabel("driftMode_tt"))
       if driftModeUsed then
@@ -1737,22 +2225,12 @@ vehicle_tab:add_imgui(function()
           lua_cfg.save("DriftPowerIncrease", DriftPowerIncrease)
         end
 
-        DriftSmoke, dsmkUsed = ImGui.Checkbox("Drift Smoke", DriftSmoke, true)
+        ImGui.Spacing(); DriftSmoke, dsmkUsed = ImGui.Checkbox("Drift Smoke", DriftSmoke, true)
         UI.toolTip(false, translateLabel("DriftSmoke_tt"))
         if dsmkUsed then
           UI.widgetSound("Nav2")
           lua_cfg.save("DriftSmoke", DriftSmoke)
         end
-
-        ImGui.SameLine(); ImGui.Dummy(70, 1); ImGui.SameLine(); driftMinigame, drmgUsed = ImGui.Checkbox(
-        "Drift Minigame", driftMinigame, true)
-        UI.toolTip(false,
-          "[WIP] Accumulate points for drifting around without crashing. Your points are automatically transformed into cash once you stop drifting and don't crash for 3 seconds.\n\nNOTE: The cashout feature is for Signle Player only.")
-        if drmgUsed then
-          UI.widgetSound("Nav2")
-          lua_cfg.save("driftMinigame", driftMinigame)
-        end
-
         if DriftSmoke then
           ImGui.Spacing(); ImGui.Text(translateLabel("driftSmokeCol"))
           if not customSmokeCol then
@@ -1807,328 +2285,21 @@ vehicle_tab:add_imgui(function()
             UI.widgetSound("Nav2")
           end
         end
+
+        ImGui.Dummy(1, 10); ImGui.SeparatorText("[Experimental]")
+        ImGui.Spacing(); driftMinigame, drmgUsed = ImGui.Checkbox("Drift Minigame", driftMinigame, true)
+        UI.toolTip(false, translateLabel("DriftGame_tt"))
+        if drmgUsed then
+          UI.widgetSound("Nav2")
+          lua_cfg.save("driftMinigame", driftMinigame)
+        end
+        if driftMinigame then
+          ImGui.Dummy(1, 10)
+          UI.coloredText("Your Highest Score: ", 'yellow', 0.92, 20); ImGui.SameLine(); ImGui.Text(lua_Fn.separateInt(driftPB) .. " Points")
+        end
       end
     else
       UI.wrappedText(translateLabel("driftInvalidVehTxt"), 15)
-    end
-
-    ImGui.Spacing(); ImGui.Spacing(); ImGui.SeparatorText("Fun Features"); ImGui.Spacing();
-    limitVehOptions, lvoUsed = ImGui.Checkbox(translateLabel("lvoCB"), limitVehOptions, true)
-    UI.toolTip(false, translateLabel("lvo_tt"))
-    if lvoUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("limitVehOptions", limitVehOptions)
-    end
-
-    ImGui.SameLine(); ImGui.Dummy(7, 1); ImGui.SameLine();
-    missiledefense, mdefUsed = ImGui.Checkbox("Missile Defense", missiledefense, true)
-    UI.toolTip(false, translateLabel("missile_def_tt"))
-    if mdefUsed then
-      UI.widgetSound("Radar")
-      lua_cfg.save("missiledefense", missiledefense)
-      if missiledefense then
-        gui.show_success("Samurais Scripts", translateLabel("missile_def_on_notif"))
-      end
-    end
-    if not missiledefense and mdefUsed then
-      UI.widgetSound("Delete")
-      gui.show_message("Samurais Scripts", translateLabel("missile_def_off_notif"))
-    end
-
-    launchCtrl, lctrlUsed = ImGui.Checkbox("Launch Control", launchCtrl, true)
-    UI.toolTip(false, translateLabel("lct_tt"))
-    if lctrlUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("launchCtrl", launchCtrl)
-    end
-
-    ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine(); speedBoost, spdbstUsed = ImGui.Checkbox("NOS", speedBoost,
-      true)
-    UI.toolTip(false, translateLabel("speedBoost_tt"))
-    if spdbstUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("speedBoost", speedBoost)
-    end
-    if speedBoost then
-      ImGui.SameLine(); nosvfx, nosvfxUsed = ImGui.Checkbox("VFX", nosvfx, true)
-      UI.toolTip(false, translateLabel("vfx_tt"))
-      if nosvfxUsed then
-        UI.widgetSound("Nav2")
-        lua_cfg.save("nosvfx", nosvfx)
-      end
-      ImGui.Dummy(192, 1); ImGui.SameLine()
-      if ImGui.SmallButton("  NOS Power  ") then
-        ImGui.OpenPopup("Nos Power")
-      end
-      ImGui.SetNextWindowPos(780, 400, ImGuiCond.Appearing)
-      ImGui.SetNextWindowBgAlpha(0.9)
-      if ImGui.BeginPopupModal("Nos Power", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-        ImGui.Text("NOS Power")
-        nosPower, nspwrUsed = ImGui.SliderInt("##nospower", nosPower, 10, 100, "%d",
-          ImGuiSliderFlags.NoInput | ImGuiSliderFlags.AlwaysClamp | ImGuiSliderFlags.Logarithmic)
-        if nspwrUsed then
-          UI.widgetSound("Nav")
-        end
-        ImGui.Spacing(); if ImGui.Button(" Save ") then
-          UI.widgetSound("Select2")
-          lua_cfg.save("nosPower", nosPower)
-          ImGui.CloseCurrentPopup()
-        end
-        ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); if ImGui.Button(" Cancel ") then
-          UI.widgetSound("Cancel")
-          ImGui.CloseCurrentPopup()
-        end
-        ImGui.End()
-      end
-    end
-
-    loud_radio, loudRadioUsed = ImGui.Checkbox("Big Subwoofer", loud_radio, true)
-    UI.toolTip(false, translateLabel("loudradio_tt"))
-    if loudRadioUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("loud_radio", loud_radio)
-    end
-    if loud_radio then
-      script.run_in_fiber(function()
-        AUDIO.SET_VEHICLE_RADIO_LOUD(current_vehicle, true)
-      end)
-    else
-      script.run_in_fiber(function()
-        AUDIO.SET_VEHICLE_RADIO_LOUD(current_vehicle, false)
-      end)
-    end
-
-    ImGui.SameLine(); ImGui.Dummy(32, 1); ImGui.SameLine(); nosPurge, nosPurgeUsed = ImGui.Checkbox("NOS Purge", nosPurge,
-      true)
-    UI.toolTip(false, translateLabel("purge_tt"))
-    if nosPurgeUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("nosPurge", nosPurge)
-    end
-
-    popsNbangs, pnbUsed = ImGui.Checkbox("Pops & Bangs", popsNbangs, true)
-    UI.toolTip(false, translateLabel("pnb_tt"))
-    if pnbUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("popsNbangs", popsNbangs)
-    end
-    if popsNbangs then
-      ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine(); louderPops, louderPopsUsed = ImGui.Checkbox("Louder Pops",
-        louderPops, true)
-      UI.toolTip(false, translateLabel("louderpnb_tt"))
-      if louderPopsUsed then
-        UI.widgetSound("Nav2")
-        lua_cfg.save("louderPops", louderPops)
-      end
-    end
-
-    hornLight, hornLightUsed = ImGui.Checkbox("High Beams on Horn", hornLight, true)
-    UI.toolTip(false, translateLabel("highbeams_tt"))
-    if hornLightUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("hornLight", hornLight)
-    end
-
-    ImGui.SameLine(); autobrklight, autobrkUsed = ImGui.Checkbox("Auto Brake Lights", autobrklight, true)
-    UI.toolTip(false, translateLabel("brakeLight_tt"))
-    if autobrkUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("autobrklight", autobrklight)
-    end
-
-    holdF, holdFused = ImGui.Checkbox("Keep Engine On", holdF, true)
-    UI.toolTip(false, translateLabel("engineOn_tt"))
-    if holdFused then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("holdF", holdF)
-    end
-
-    ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); keepWheelsTurned, kwtrnd = ImGui.Checkbox(
-    "Keep Wheels Turned", keepWheelsTurned, true)
-    UI.toolTip(false, translateLabel("wheelsturned_tt"))
-    if kwtrnd then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("keepWheelsTurned", keepWheelsTurned)
-    end
-
-    noJacking, noJackingUsed = ImGui.Checkbox(
-      "Can't Touch This!", noJacking, true)
-    UI.toolTip(false, translateLabel("canttouchthis_tt"))
-    if noJackingUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("noJacking", noJacking)
-    end
-
-    ImGui.SameLine(); ImGui.Dummy(15, 1); ImGui.SameLine(); insta180, insta180Used = ImGui.Checkbox("Instant 180°",
-      insta180, true)
-    if insta180Used then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("insta180", insta180)
-    end
-    UI.toolTip(false, translateLabel("insta180_tt"))
-
-    if Game.isOnline() then
-      flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall, true)
-      UI.toolTip(false,
-        "Equip all planes with unlimited flares.\10\10 ¤ NOTE: There is a 3 second delay between each use of these flares. The button is the same counter-measure button, default: [E].")
-      if flaresUsed then
-        UI.widgetSound("Nav2")
-        lua_cfg.save("flares_forall", flares_forall)
-      end
-    else
-      ImGui.BeginDisabled()
-      flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall, true)
-      ImGui.EndDisabled()
-      UI.toolTip(true, translateLabel("Unavailable in Single Player"), '#FF3333', 1)
-    end
-
-    ImGui.SameLine(); ImGui.Dummy(46, 1); ImGui.SameLine(); real_plane_speed, rpsUsed = ImGui.Checkbox(
-    "Higher Plane Speeds", real_plane_speed, true)
-    UI.toolTip(false,
-      "Increases the speed limit on planes.\10\10  ¤ Note 1: You must be flying at a reasonable altitude to gain speed, otherwise the game will force you to fly slowly if you're too low.\10\10  ¤ Note 2: Even with this option, we're still capping the speed at approximately 500km/h because anything over that will prevent textures from loading and eventually break your game, which is the reason why R* limited plane speeds in the first place.")
-    if rpsUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("real_plane_speed", real_plane_speed)
-    end
-
-    rgbLights, rgbToggled = ImGui.Checkbox(translateLabel("rgbLights"), rgbLights, true)
-    if rgbToggled then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("rgbLights", rgbLights)
-      if rgbLights then
-        script.run_in_fiber(function(rgbhl)
-          if not VEHICLE.IS_TOGGLE_MOD_ON(current_vehicle, 22) then
-            has_xenon = false
-          else
-            has_xenon    = true
-            defaultXenon = VEHICLE.GET_VEHICLE_XENON_LIGHT_COLOR_INDEX(current_vehicle)
-          end
-          rgbhl:sleep(200)
-          start_rgb_loop = true
-        end)
-      else
-        start_rgb_loop = false
-      end
-    end
-
-    ImGui.SameLine(); ImGui.Dummy(62, 1); ImGui.SameLine(); flappyDoors, flappyDoorsUsed = ImGui.Checkbox("Flappy Doors",
-      flappyDoors, true)
-    if flappyDoorsUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("flappyDoors", flappyDoors)
-    end
-
-    if rgbLights then
-      ImGui.PushItemWidth(120)
-      lightSpeed, lightSpeedUsed = ImGui.SliderInt(translateLabel("rgbSlider"), lightSpeed, 1, 3)
-      ImGui.PopItemWidth()
-      if lightSpeedUsed then
-        UI.widgetSound("Nav")
-        lua_cfg.save("lightSpeed", lightSpeed)
-      end
-    end
-
-    ImGui.Spacing();
-    if ImGui.Button(translateLabel("engineSoundBtn")) then
-      if is_car or is_bike or is_quad then
-        open_sounds_window = true
-      else
-        open_sounds_window = false
-        gui.show_error("Samurais Scripts", translateLabel("engineSoundErr"))
-      end
-    end
-    if open_sounds_window then
-      ImGui.SetNextWindowPos(740, 300, ImGuiCond.Appearing)
-      ImGui.SetNextWindowSizeConstraints(100, 100, 600, 800)
-      ImGui.Begin("Vehicle Sounds",
-        ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse)
-      if ImGui.Button(translateLabel("closeBtn")) then
-        open_sounds_window = false
-      end
-      ImGui.Spacing(); ImGui.Spacing()
-      ImGui.PushItemWidth(250)
-      search_term, used = ImGui.InputTextWithHint("", translateLabel("searchVeh_hint"), search_term, 32)
-      if ImGui.IsItemActive() then
-        is_typing = true
-      else
-        is_typing = false
-      end
-      ImGui.PushItemWidth(270)
-      displayVehNames()
-      ImGui.PopItemWidth()
-      local selected_name = filteredNames[vehSound_index + 1]
-      ImGui.Spacing()
-      if ImGui.Button(translateLabel("Use This Sound")) then
-        script.run_in_fiber(function()
-          AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(current_vehicle, selected_name)
-        end)
-      end
-      ImGui.SameLine()
-      if ImGui.Button(translateLabel("Restore Default")) then
-        script.run_in_fiber(function()
-          AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(current_vehicle,
-            vehicles.get_vehicle_display_name(ENTITY.GET_ENTITY_MODEL(current_vehicle)))
-        end)
-      end
-      ImGui.End()
-    end
-
-    ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
-    local engineHealth = VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle)
-    if engineHealth <= 300 then
-      engineDestroyed = true
-    else
-      engineDestroyed = false
-    end
-    if engineDestroyed then
-      engineButton_label = translateLabel("Fix Engine")
-      engine_hp          = 1000
-    else
-      engineButton_label = translateLabel("Destroy Engine")
-      engine_hp          = -4000
-    end
-    if ImGui.Button(engineButton_label) then
-      script.run_in_fiber(function()
-        VEHICLE.SET_VEHICLE_ENGINE_HEALTH(current_vehicle, engine_hp)
-      end)
-    end
-
-    if dummyCopCar == 0 then
-      if VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 18 then
-        if ImGui.Button("Equip Fake Siren") then
-          if is_car or is_bike and not PED.IS_PED_IN_FLYING_VEHICLE(self.get_ped()) then
-            UI.widgetSound("Select")
-            dummyCop()
-          else
-            UI.widgetSound("Error")
-            gui.show_error("Samurais Scripts", "This feature is only available for cars and bikes.")
-          end
-        end
-        if not Game.isOnline() then
-          UI.toolTip(false, "The siren audio only works Online.")
-        end
-      else
-        ImGui.BeginDisabled()
-        ImGui.Button("Equip Fake Siren")
-        ImGui.EndDisabled()
-        UI.toolTip(false, "Your vehicle has a real siren. You don't need a fake one.")
-      end
-    else
-      if ImGui.Button("Remove Fake Siren") then
-        UI.widgetSound("Cancel")
-        script.run_in_fiber(function(deletecop)
-          VEHICLE.SET_VEHICLE_ACT_AS_IF_HAS_SIREN_ON(self.get_veh(), false)
-          VEHICLE.SET_VEHICLE_CAUSES_SWERVING(self.get_veh(), false)
-          VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(self.get_veh(), 0, false)
-          VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(self.get_veh(), 1, false)
-          if ENTITY.DOES_ENTITY_EXIST(dummyCopCar) then
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(dummyCopCar)
-            deletecop:sleep(200)
-            ENTITY.DELETE_ENTITY(dummyCopCar)
-          end
-          dummyCopCar = 0
-        end)
-      end
     end
   else
     ImGui.Text(translateLabel("getinveh"))
@@ -3852,12 +4023,11 @@ world_tab:add_imgui(function()
     end
   end
 
-  animateNPCs, used = ImGui.Checkbox("Animate Nearby NPCs", animateNPCs, true)
+  animateNPCs, used = ImGui.Checkbox(translateLabel("animateNPCsCB"), animateNPCs, true)
   if used then
     UI.widgetSound("Nav")
   end
-  UI.helpMarker(false,
-    "Make all nearby NPCs do one of the actions listed down below. This has no relation to the animations list and only works with NPCs that are on foot.")
+  UI.helpMarker(false, translateLabel("animateNPCs_tt"))
   if animateNPCs then
     ImGui.PushItemWidth(220)
     displayHijackAnims()
@@ -3865,7 +4035,7 @@ world_tab:add_imgui(function()
     local hijackData = hijackOptions[grp_anim_index + 1]
     ImGui.SameLine()
     if not hijack_started then
-      if ImGui.Button("  Start  ##hjStart") then
+      if ImGui.Button(translateLabel("  " .. "generic_play_btn")"  ##hjStart") then
         UI.widgetSound("Select")
         script.run_in_fiber(function(hjk)
           local gta_peds = entities.get_all_peds_as_handles()
@@ -3887,7 +4057,7 @@ world_tab:add_imgui(function()
         end)
       end
     else
-      if ImGui.Button("  Stop  ##hjStop") then
+      if ImGui.Button("  " .. translateLabel("generic_stop_btn") .. "  ##hjStop") then
         UI.widgetSound("Cancel")
         script.run_in_fiber(function()
           local gta_peds = entities.get_all_peds_as_handles()
@@ -3904,17 +4074,17 @@ world_tab:add_imgui(function()
     end
   end
 
-  kamikazeDrivers, kdUsed = ImGui.Checkbox("Kamikaze Drivers", kamikazeDrivers, true)
+  kamikazeDrivers, kdUsed = ImGui.Checkbox(translateLabel("kamikazeCB"), kamikazeDrivers, true)
+  UI.helpMarker(false, translateLabel("kamikazeDrivers_tt"))
   if kdUsed then
     UI.widgetSound("Nav2")
     if kamikazeDrivers then
       publicEnemy = false
     end
   end
-  UI.helpMarker(false, translateLabel("kamikazeDrivers_tt"))
 
-  publicEnemy, peUsed = ImGui.Checkbox("Public Enemy N°1", publicEnemy, true)
-  UI.helpMarker(false, "Everyone is out to get you")
+  publicEnemy, peUsed = ImGui.Checkbox(translateLabel("publicEnemyCB"), publicEnemy, true)
+  UI.helpMarker(false, translateLabel("publicEnemy_tt"))
   if peUsed then
     UI.widgetSound("Nav2")
     if publicEnemy then
@@ -3948,6 +4118,30 @@ world_tab:add_imgui(function()
           end
         end
       end)
+    end
+  end
+
+  extend_world, ewbUsed = ImGui.Checkbox(translateLabel("extendWorldCB"), extend_world, true)
+  UI.helpMarker(false, translateLabel("extendWorld_tt"))
+  if ewbUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("extend_world", extend_world)
+    if not extend_world then
+      script.run_in_fiber(function()
+        Game.World.extendBounds(false)
+        world_extended = false
+      end)
+    end
+  end
+
+  disable_waves, dowUsed = ImGui.Checkbox(translateLabel("smoothwatersCB"), disable_waves, true)
+  UI.helpMarker(false, translateLabel("smoothwaters_tt"))
+  if dowUsed then
+    UI.widgetSound("Nav2")
+    if disable_waves then
+      Game.World.disableOceanWaves(true)
+    else
+      Game.World.disableOceanWaves(false)
     end
   end
 end)
@@ -4750,6 +4944,8 @@ settings_tab:add_imgui(function()
       heist_cart_autograb     = false
       flares_forall           = false
       real_plane_speed        = false
+      extend_world            = false
+      unbreakableWindows      = false
       laser_switch            = 0
       DriftIntensity          = 0
       lang_idx                = 0
@@ -4908,6 +5104,20 @@ local function SS_handle_events()
 
   if isCrouched then
     PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
+  end
+
+  if disable_waves then
+    Game.World.disableOceanWaves(false)
+  end
+
+  if autopilot_waypoint or autopilot_objective or autopilot_random then
+    if Game.Self.isDriving() then
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+      autopilot_waypoint  = false
+      autopilot_objective = false
+      autopilot_random    = false
+    end
   end
 end
 
@@ -6361,6 +6571,9 @@ script.register_looped("drift counter", function(dcounter)
                       bankDriftPoints_SP(lua_Fn.round((drift_points / 10), 0))
                     end
                   end
+                  if drift_points > driftPB then
+                    lua_cfg.save("driftPB", drift_points)
+                  end
                   dcounter:sleep(3000)
                   drift_points     = 0
                   drift_extra_pts  = 0
@@ -6389,6 +6602,9 @@ script.register_looped("drift counter", function(dcounter)
                 if drift_points > 100 then
                   bankDriftPoints_SP(lua_Fn.round((drift_points / 10), 0))
                 end
+              end
+              if drift_points > driftPB then
+                lua_cfg.save("driftPB", drift_points)
               end
               dcounter:sleep(3000)
               drift_points     = 0
@@ -6724,6 +6940,36 @@ script.register_looped("Real Jet Speed", function(rjspd)
     end
   end
 end)
+script.register_looped("UBWIN", function()
+  if unbreakableWindows and current_vehicle ~= nil and current_vehicle ~= 0 then
+    if not ubwindowsToggled then
+      VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS(current_vehicle, true)
+      ubwindowsToggled = true
+    end
+  end
+end)
+script.register_looped("Auto-Pilot Keyboard Interrupt", function(apki)
+  if autopilot_waypoint or autopilot_objective or autopilot_random then
+    if Game.Self.isDriving() then
+      for _, ctrl in pairs(flight_controls_T) do
+        if PAD.IS_CONTROL_PRESSED(0, ctrl) then
+          TASK.CLEAR_PED_TASKS(self.get_ped())
+          TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+          gui.show_message("Samurai's Scripts", "Autopilot interrupted! Giving back control to the player.")
+          autopilot_waypoint  = false
+          autopilot_objective = false
+          autopilot_random    = false
+          break
+        end
+      end
+    else
+      autopilot_waypoint  = false
+      autopilot_objective = false
+      autopilot_random    = false
+    end
+  end
+  apki:yield()
+end)
 
 script.register_looped("flatbed script", function(script)
   local vehicleHandles  = entities.get_all_vehicles_as_handles()
@@ -7024,6 +7270,14 @@ script.register_looped("Carpool", function(cp)
     end
   end
   cp:yield()
+end)
+script.register_looped("World Bounds", function()
+  if extend_world then
+    if not world_extended then
+      Game.World.extendBounds(true)
+      world_extended = true
+    end
+  end
 end)
 
 -- object spawner

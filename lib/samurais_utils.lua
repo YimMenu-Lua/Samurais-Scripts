@@ -1154,6 +1154,28 @@ Game = {
       return VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(self.get_veh())
     end,
   },
+
+  World = {
+
+    ---@param bool boolean
+    extendBounds = function(bool)
+      if bool then
+        PLAYER.EXTEND_WORLD_BOUNDARY_FOR_PLAYER(-42069420.0, -42069420.0, -42069420.0)
+        PLAYER.EXTEND_WORLD_BOUNDARY_FOR_PLAYER(42069420.0, 42069420.0, 42069420.0)
+      else
+        PLAYER.RESET_WORLD_BOUNDARY_FOR_PLAYER()
+      end
+    end,
+
+    ---@param bool boolean
+    disableOceanWaves = function(bool)
+      if bool then
+        MISC.WATER_OVERRIDE_SET_STRENGTH(1.0)
+      else
+        MISC.WATER_OVERRIDE_SET_STRENGTH(-1)
+      end
+    end,
+  },
 }
 
 
