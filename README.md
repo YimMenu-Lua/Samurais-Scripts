@@ -43,7 +43,6 @@ A base for a Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu
 - [x] Improve and merge [Object Spawner](https://github.com/xesdoog/object-spawner). ✔️ Done.
 - [ ] Improve and merge [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier). *Probably*
 - [ ] Add new features. ⚙️ In-progress...
-- [x] Keep it unique and don't turn it into another copypasta. 🤌 **FUGGEDABOUTIT**
 
 ## Credits
 
