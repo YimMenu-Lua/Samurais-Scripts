@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest a new idea
+title: "[Request]: "
+labels: request
+body:
+- type: textarea
+  attributes:
+    label: Problem
+    description: "Is your feature request related to a problem? Please describe."
+    placeholder: "A clear description of what the problem is."
+  validations:
+    required: false
+
+- type: textarea
+  attributes:
+    label: Solution
+    description: "Describe the solution or feature you're requesting"
+    placeholder: "A clear description of your request."
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Additional context
+    description: |
+      (Optional) Add any other context about the request/improvement here.
+      
+      Tip: You can attach images or videos by clicking this area to highlight it then dragging your files in.
+  validations:
+    required: false

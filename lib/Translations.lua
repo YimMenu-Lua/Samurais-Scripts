@@ -6,7 +6,9 @@ Labels = {
         {iso = "de-DE", text = "Selbst "},
         {iso = "fr-FR", text = "Soi "},
         {iso = "it-IT", text = "L'io "},
+        -- {iso = "es-ES", text = "Propio "},
         {iso = "pt-BR", text = "Autônomo "},
+        {iso = "ru-RU", text = "себя "},
     },
 
     ["Auto-Heal"] = {
@@ -14,7 +16,9 @@ Labels = {
         {iso = "de-DE", text = "Auto-Heilung"},
         {iso = "fr-FR", text = "Auto-Guérison"},
         {iso = "it-IT", text = "Auto-Guarigione"},
+        -- {iso = "es-ES", text = "Curación Automática"},
         {iso = "pt-BR", text = "Auto-Cura"},
+        {iso = "ru-RU", text = "автоисцеление"},
     },
 
     ["autoheal_tooltip"] = {
@@ -22,31 +26,37 @@ Labels = {
         {iso = "de-DE", text = "Füllt die Gesundheit und Rüstung automatisch wieder auf."},
         {iso = "fr-FR", text = "Rechargez automatiquement votre santé et votre armure."},
         {iso = "it-IT", text = "Ricarica automaticamente la tua salute e la tua armatura."},
+        -- {iso = "es-ES", text = "Recarga automáticamente tu salud y armadura."},
         {iso = "pt-BR", text = "Recarregue automaticamente sua saúde e armadura."},
+        {iso = "ru-RU", text = "Автоматическое пополнение здоровья и брони."},
     },
 
-    ["objectiveTP"] = {
-        {iso = "en-US", text = "Teleport To Objective."},
-        {iso = "de-DE", text = "Zum (Missions-)Ziel teleportieren."},
-        {iso = "fr-FR", text = "Téléportation Vers L'objectif."},
-        {iso = "it-IT", text = "Teletrasporto All'obiettivo."},
-        {iso = "pt-BR", text = "Teleportar para o objetivo."},
-    },
+    -- ["objectiveTP"] = {
+    --     {iso = "en-US", text = "Teleport To Objective."},
+    --     {iso = "de-DE", text = "Zum (Missions-)Ziel teleportieren."},
+    --     {iso = "fr-FR", text = "Téléportation Vers L'objectif."},
+    --     {iso = "it-IT", text = "Teletrasporto All'obiettivo."},
+    --     {iso = "pt-BR", text = "Teleportar para o objetivo."},
+    --     {iso = "pt-BR", text = "Телепорт к цели"},
+    -- },
 
-    ["objectiveTP_tooltip"] = {
-        {iso = "en-US", text = "While this option is enabled, press [F10] to teleport to mission objectives."},
-        {iso = "de-DE", text = "Wenn aktiviert, [F10] drücken um sich zum aktuellen Missionsziel zu teleportieren."},
-        {iso = "fr-FR", text = "Lorsque cette option est activée, appuyez sur [F10] pour téléporter vers les objectifs de la mission."},
-        {iso = "it-IT", text = "Mentre questa opzione è abilitata, premi [F10] per teletrasportarti agli obiettivi della missione."},
-        {iso = "pt-BR", text = "Enquanto essa opção estiver ativada, pressione [F10] para se teletransportar para os objetivos da missão."},
-    },
+    -- ["objectiveTP_tooltip"] = {
+    --     {iso = "en-US", text = "While this option is enabled, press [F10] to teleport to mission objectives."},
+    --     {iso = "de-DE", text = "Wenn aktiviert, [F10] drücken um sich zum aktuellen Missionsziel zu teleportieren."},
+    --     {iso = "fr-FR", text = "Lorsque cette option est activée, appuyez sur [F10] pour téléporter vers les objectifs de la mission."},
+    --     {iso = "it-IT", text = "Mentre questa opzione è abilitata, premi [F10] per teletrasportarti agli obiettivi della missione."},
+    --     {iso = "pt-BR", text = "Enquanto essa opção estiver ativada, pressione [F10] para se teletransportar para os objetivos da missão."},
+    --     {iso = "ru-RU", text = "Пока эта опция включена, нажмите [F10], чтобы телепортироваться к целям миссии."},
+    -- },
 
     ["CrouchCB"] = {
         {iso = "en-US", text = "Crouch Instead of Sneak"},
         {iso = "de-DE", text = "Ducken statt Schleichen"},
         {iso = "fr-FR", text = "Accroupir"},
         {iso = "it-IT", text = "Accovacciarsi"},
+        -- {iso = "es-ES", text = "Agacharse"},
         {iso = "pt-BR", text = "Agachamento"},
+        {iso = "ru-RU", text = "Приседать вместо красться"},
     },
 
     ["Crouch_tooltip"] = {
@@ -54,23 +64,29 @@ Labels = {
         {iso = "de-DE", text = "Ersetzt die Schleichanimation (L-STRG)."},
         {iso = "fr-FR", text = "Remplacez l'animation de furtivité (CTRL Gauche) par l'accroupissement."},
         {iso = "it-IT", text = "Sostituisci l'animazione furtiva (CTRL sinistro) con quella accovacciata."},
+        -- {iso = "es-ES", text = "Sustituye la animación de sigilo del modo sigilo (CTRL izquierda) por agacharse."},
         {iso = "pt-BR", text = "Substituir a animação de esgueirar-se do modo furtivo (CTRL Esquerda) por agachar-se."},
+        {iso = "ru-RU", text = "Замените анимацию подкрадывания в режиме стелс (левый CTRL) на приседание."},
     },
 
     ["rpaCB"] = {
         {iso = "en-US", text = "Replace 'Point' Action"},
-        {iso = "de-DE", text = ""}, -- ???
+        {iso = "de-DE", text = "Ersetze 'Punkt' Aktion"},
         {iso = "fr-FR", text = "Remplacer L'action de 'Pointer'"},
-        {iso = "it-IT", text = ""}, -- ???
-        {iso = "pt-BR", text = ""}, -- ???
+        {iso = "it-IT", text = "Sostituire L'azione 'Punto'."},
+        -- {iso = "es-ES", text = "Sustituir 'Punto' Acción"},
+        {iso = "pt-BR", text = "Substituir a Ação 'Ponto'"},
+        {iso = "ru-RU", text = "Заменить действие 'Point'"},
     },
 
     ["rpa_tooltip"] = {
         {iso = "en-US", text = "Replace the 'Point' action when pressing [B] with 'Hands Up' animation."},
-        {iso = "de-DE", text = ""}, -- ???
+        {iso = "de-DE", text = "Ersetzen Die Aktion von 'Zeigen'."},
         {iso = "fr-FR", text = "Remplacer l'action 'Pointer' lorsque l'on appuie sur [B] par l'animation 'Mains En L'air'."},
-        {iso = "it-IT", text = ""}, -- ???
-        {iso = "pt-BR", text = ""}, -- ???
+        {iso = "it-IT", text = "Sostituire l'azione 'Punto'"},
+        -- {iso = "es-ES", text = "Sustituir la acción 'Apuntar' al pulsar [B] por la animación 'Manos Arriba'."},
+        {iso = "pt-BR", text = "Substituir a ação 'Ponto'"},
+        {iso = "ru-RU", text = "Замените действие 'Point'"},
     },
 
     ["PhoneAnimCB"] = {
@@ -78,7 +94,9 @@ Labels = {
         {iso = "de-DE", text = "Aktiviere Handy-animationen"},
         {iso = "fr-FR", text = "Activer Les Animations Du Téléphone"},
         {iso = "it-IT", text = "Abilita Animazioni Telefono"},
+        -- {iso = "es-ES", text = "Activar Animaciones Del Teléfono"},
         {iso = "pt-BR", text = "Ativar Animações Do Telefone"},
+        {iso = "ru-RU", text = "Включите анимацию телефона"},
     },
 
     ["PhoneAnim_tooltip"] = {
@@ -86,7 +104,9 @@ Labels = {
         {iso = "de-DE", text = "Aktiviert die Handy-animationen aus dem Einzelspielermodus für GTA Online."},
         {iso = "fr-FR", text = "Restaure les animations téléphoniques désactivées du mode solo."},
         {iso = "it-IT", text = "Ripristina le animazioni del telefono disabilitate nella modalità giocatore singolo."},
+        -- {iso = "es-ES", text = "Restaura las animaciones de teléfono desactivadas en el modo de un jugador."},
         {iso = "pt-BR", text = "Restaura as animações telefônicas desativadas do modo Single Player."},
+        {iso = "ru-RU", text = "Восстановление отключенных анимаций телефона в одиночной игре."},
     },
 
     ["SprintInsideCB"] = {
@@ -95,6 +115,7 @@ Labels = {
         {iso = "fr-FR", text = "Courir Dans Les Intérieurs"},
         {iso = "it-IT", text = "Correre Al Chiuso"},
         {iso = "pt-BR", text = "Correndo Em Interiores"},
+        {iso = "ru-RU", text = "Интерьеры c внутренней отделкой"},
     },
 
     ["SprintInside_tooltip"] = {
@@ -103,6 +124,7 @@ Labels = {
         {iso = "fr-FR", text = "Permet de sprinter à pleine vitesse dans des intérieurs qui ne le permettent pas comme le Casino. Certains intérieurs vous obligeront tout de même à courir lentement."},
         {iso = "it-IT", text = "Ti consente di correre a tutta velocità all'interno di interni che non lo consentono, come il Casinò. Alcuni interni ti costringeranno comunque a correre lentamente."},
         {iso = "pt-BR", text = "Permite que você corra a toda velocidade em interiores que não permitem isso, como o Cassino. Alguns interiores ainda o forçarão a correr lentamente."},
+        {iso = "ru-RU", text = "Позволяет бегать на полной скорости в интерьерах, которые этого не позволяют, например в казино. Некоторые интерьеры все равно заставят вас бежать медленно.."},
     },
 
     ["LockpickCB"] = {
@@ -111,6 +133,7 @@ Labels = {
         {iso = "fr-FR", text = "Utiliser L'animation De Crochetage"},
         {iso = "it-IT", text = "Usa L'animazione Del Gancio"},
         {iso = "pt-BR", text = "Usar Animação De Arrombamento"},
+        {iso = "ru-RU", text = "Используйте анимацию Lockpick"},
     },
 
     ["Lockpick_tooltip"] = {
@@ -119,6 +142,7 @@ Labels = {
         {iso = "fr-FR", text = "Lors du vol de véhicules, votre personnage utilisera l'animation de crochetage au lieu de casser la vitre."},
         {iso = "it-IT", text = "Quando rubi veicoli, il tuo personaggio userà l'animazione del grimaldello invece di rompere il finestrino."},
         {iso = "pt-BR", text = "Ao roubar veículos, seu personagem usará a animação de lockpick em vez de quebrar a janela."},
+        {iso = "ru-RU", text = "При краже автомобилей ваш персонаж будет использовать анимацию взлома замка вместо того, чтобы разбивать окно."},
     },
 
     ["ActionModeCB"] = {
@@ -127,6 +151,7 @@ Labels = {
         {iso = "fr-FR", text = "Désactiver Le Mode D'action"},
         {iso = "it-IT", text = "Disabilita La Modalità Azione"},
         {iso = "pt-BR", text = "Desativar O Modo De Ação"},
+        {iso = "ru-RU", text = "Отключить режим действий"},
     },
 
     ["ActionMode_tooltip"] = {
@@ -135,6 +160,7 @@ Labels = {
         {iso = "fr-FR", text = "Désactive le style de mouvement forcé que le joueur utilise après avoir tiré avec une arme."},
         {iso = "it-IT", text = "Disattiva lo stile di movimento forzato che il giocatore usa dopo aver sparato con un'arma."},
         {iso = "pt-BR", text = "Desativa o estilo de movimento forçado que o jogador usa depois de disparar uma arma."},
+        {iso = "ru-RU", text = "Отключает принудительный стиль передвижения игрока после стрельбы из оружия."},
     },
 
     ["soundplayer"] = {
@@ -143,6 +169,7 @@ Labels = {
         {iso = "fr-FR", text = "Joueur De Son"},
         {iso = "it-IT", text = "Lettore Suonare"},
         {iso = "pt-BR", text = "Reprodutor De Som"},
+        {iso = "ru-RU", text = "Звуковой проигрыватель"},
     },
 
     ["malesounds"] = {
@@ -151,6 +178,7 @@ Labels = {
         {iso = "fr-FR", text = "Masculin"},
         {iso = "it-IT", text = "Uomo"},
         {iso = "pt-BR", text = "Masculino"},
+        {iso = "ru-RU", text = "Мужчина"},
     },
 
     ["femalesounds"] = {
@@ -159,6 +187,7 @@ Labels = {
         {iso = "fr-FR", text = "Feminin"},
         {iso = "it-IT", text = "Femminile"},
         {iso = "pt-BR", text = "Feminino"},
+        {iso = "ru-RU", text = "Женщина"},
     },
 
     ["generic_play_btn"] = {
@@ -167,6 +196,7 @@ Labels = {
         {iso = "fr-FR", text = " Jouer "},
         {iso = "it-IT", text = " Giocare "},
         {iso = "pt-BR", text = " Jogar "},
+        {iso = "ru-RU", text = " Играть "},
     },
 
     ["generic_stop_btn"] = {
@@ -175,6 +205,7 @@ Labels = {
         {iso = "fr-FR", text = " Arrêter "},
         {iso = "it-IT", text = " Fermarsi "},
         {iso = "pt-BR", text = " Parar "},
+        {iso = "ru-RU", text = " Стоп "},
     },
 
     ["weaponTab"] = {
@@ -183,6 +214,7 @@ Labels = {
         {iso = "fr-FR", text = "Arme "},
         {iso = "it-IT", text = "Arma "},
         {iso = "pt-BR", text = "Arma "},
+        {iso = "ru-RU", text = "Оружие "},
     },
 
     ["hashgrabberCB"] = {
@@ -191,6 +223,7 @@ Labels = {
         {iso = "fr-FR", text = "Arme D'infos"},
         {iso = "it-IT", text = "Arma Di Informazioni"},
         {iso = "pt-BR", text = "Arma De Informação"},
+        {iso = "ru-RU", text = "Инфо-пушка"},
     },
 
     ["hashgrabber_tt"] = {
@@ -199,6 +232,7 @@ Labels = {
         {iso = "fr-FR", text = "Ceci est principalement destiné aux développeurs. Visez une entité du jeu avec votre arme et appuyez sur [TIRER] pour obtenir des informations à son sujet."},
         {iso = "it-IT", text = "Questo è principalmente per gli sviluppatori. Punta la tua pistola a un'entità di gioco e premi [FUOCO] per ottenere informazioni su di essa."},
         {iso = "pt-BR", text = "Isso é principalmente para os desenvolvedores. Aponte sua arma para uma entidade do jogo e pressione [FIRE] para obter informações sobre ela."},
+        {iso = "ru-RU", text = "Это в основном для разработчиков. Направьте оружие на игровой объект и нажмите [FIRE], чтобы получить информацию о нем."},
     },
 
     ["triggerbotCB"] = {
@@ -207,6 +241,7 @@ Labels = {
         {iso = "fr-FR", text = "Bot De Déclencheur"},
         {iso = "it-IT", text = "Bot Di Grilletto"},
         {iso = "pt-BR", text = "Bot De Gatilho"},
+        {iso = "ru-RU", text = "Триггерный бот"},
     },
 
     ["triggerbot_tt"] = {
@@ -231,6 +266,7 @@ Labels = {
         {iso = "fr-FR", text = "Auto-tuer Les Ennemis"},
         {iso = "it-IT", text = "Uccidi Automaticamente i Nemici"},
         {iso = "pt-BR", text = "Matar Inimigos Automaticamente"},
+        {iso = "ru-RU", text = "Автоматическое убийство врагов"},
     },
 
     ["autokill_tt"] = {
@@ -239,6 +275,7 @@ Labels = {
         {iso = "fr-FR", text = "Tuez automatiquement tous les ennemis à proximité."},
         {iso = "it-IT", text = "Uccidi automaticamente tutti i nemici nelle tue vicinanze."},
         {iso = "pt-BR", text = "Mate automaticamente todos os inimigos que estiverem próximos a você."},
+        {iso = "ru-RU", text = "Автоматически убивайте всех врагов в непосредственной близости от вас."},
     },
 
     ["runawayCB"] = {
@@ -247,6 +284,7 @@ Labels = {
         {iso = "fr-FR", text = "Ennemis S'enfuient"},
         {iso = "it-IT", text = "I Nemici Fuggono"},
         {iso = "pt-BR", text = "Inimigos Fogem"},
+        {iso = "ru-RU", text = "Враги бегут"},
     },
 
     ["runaway_tt"] = {
@@ -255,6 +293,7 @@ Labels = {
         {iso = "fr-FR", text = "Les ennemis proches vous fuiront."},
         {iso = "it-IT", text = "I nemici vicini fuggiranno da voi."},
         {iso = "pt-BR", text = "Os inimigos próximos fugirão de você."},
+        {iso = "ru-RU", text = "Ближайшие враги будут убегать от вас."},
     },
 
     ["laserSightCB"] = {
@@ -263,6 +302,7 @@ Labels = {
         {iso = "fr-FR", text = "Viseur Laser"},
         {iso = "it-IT", text = "Mirino Laser"},
         {iso = "pt-BR", text = "Visor Laser"},
+        {iso = "ru-RU", text = "Лазерный прицел"},
     },
 
     ["laserSight_tt"] = {
@@ -271,6 +311,7 @@ Labels = {
         {iso = "fr-FR", text = "Activez une visée laser sur vos armes."},
         {iso = "it-IT", text = "Attivare un mirino laser sulle armi."},
         {iso = "pt-BR", text = "Habilite uma mira a laser em suas armas."},
+        {iso = "ru-RU", text = "Создайте лазерный прицел для вашего оружия."},
     },
 
     ["laserChoice_txt"] = {
@@ -279,6 +320,7 @@ Labels = {
         {iso = "fr-FR", text = "Couleur Du Laser: "},
         {iso = "it-IT", text = "Colore Laser: "},
         {iso = "pt-BR", text = "Cor Do Laser: "},
+        {iso = "ru-RU", text = "Лазерный цвет: "},
     },
 
     ["vehicleTab"] = {
@@ -287,6 +329,7 @@ Labels = {
         {iso = "fr-FR", text = "Véhicule "},
         {iso = "it-IT", text = "Veicolo "},
         {iso = "pt-BR", text = "Veículo "},
+        {iso = "ru-RU", text = "Автомобиль "},
     },
 
     ["driftModeCB"] = {
@@ -295,6 +338,7 @@ Labels = {
         {iso = "fr-FR", text = "Activer Le Mode Drift"},
         {iso = "it-IT", text = "Attiva La Modalità Drift"},
         {iso = "pt-BR", text = "Ativar O Modo Drift"},
+        {iso = "ru-RU", text = "Активировать режим дрифта"},
     },
 
     ["driftMode_tt"] = {
@@ -303,6 +347,7 @@ Labels = {
         {iso = "fr-FR", text = "Cela fera perdre l'adhérence à votre voiture. Maintenez la touche [Maj Gauche] pour drifter."},
         {iso = "it-IT", text = "Questo farà perdere aderenza alla tua auto. Tieni premuto [Maiusc sinistro] per andare alla deriva."},
         {iso = "pt-BR", text = "Isso fará com que seu carro perca a aderência. Mantenha pressionada a tecla [Shift esquerdo] para fazer drift."},
+        {iso = "ru-RU", text = "Это приведет к потере сцепления c дорогой. Удерживайте [левый Shift], чтобы дрифтовать."},
     },
 
     ["driftSlider"] = {
@@ -311,6 +356,7 @@ Labels = {
         {iso = "fr-FR", text = "Intensité"},
         {iso = "it-IT", text = "Intensità"},
         {iso = "pt-BR", text = "Intensidade"},
+        {iso = "ru-RU", text = "Интенсивность"},
     },
 
     ["driftSmokeCol"] = {
@@ -319,6 +365,7 @@ Labels = {
         {iso = "fr-FR", text = "Couleur Fumée"},
         {iso = "it-IT", text = "Colore Fumo"},
         {iso = "pt-BR", text = "Cor De Fumaça"},
+        {iso = "ru-RU", text = "Цвет дрейфующего дыма"},
     },
 
     ["driftSlider_tt"] = {
@@ -327,6 +374,7 @@ Labels = {
         {iso = "fr-FR", text = "0 : Pas d'adhérence (très rigide).\n1 : Équilibré (recommandé).\n2 : Dérive faible.\n3 : Dérive la plus faible."},
         {iso = "it-IT", text = "0: Nessuna presa (molto rigido).\n1: Bilanciato (consigliato).\n2: Drift debole.\n3: Drift debolissimo."},
         {iso = "pt-BR", text = "0: Sem aderência (muito rígido).\n1: Equilibrado (recomendado).\n2: Drift fraco.\n3: Drift mais fraco."},
+        {iso = "ru-RU", text = "0: Нет сцепления (очень жесткое).\n1: Сбалансированное (рекомендуется).\n2: Слабый дрифт.\n3: Самый слабый дрифт."},
     },
 
     ["driftTiresCB"] = {
@@ -335,6 +383,7 @@ Labels = {
         {iso = "fr-FR", text = "Équiper Les Pneus De Drift"},
         {iso = "it-IT", text = "Equipaggiare Pneumatici Da Drift"},
         {iso = "pt-BR", text = "Equipar Pneus De Drift"},
+        {iso = "ru-RU", text = "Оборудовать шины для дрифта"},
     },
 
     ["driftTires_tt"] = {
@@ -343,6 +392,7 @@ Labels = {
         {iso = "fr-FR", text = "Cela équipera votre voiture de pneus de drift lorsque vous appuierez sur [MAJ Droite]. Vos pneus seront réinitialisés lorsque vous relâcherez le bouton."},
         {iso = "it-IT", text = "Questo equipaggerà l'auto con pneumatici da drift quando si preme [Left Shift]. I pneumatici verranno ripristinati quando si rilascia il pulsante."},
         {iso = "pt-BR", text = "Isso equipará seu carro com pneus de drift sempre que você pressionar [Left Shift]. Seus pneus serão zerados quando você soltar o botão."},
+        {iso = "ru-RU", text = "Это позволит оснастить автомобиль дрифтовыми шинами при каждом нажатии кнопки [Left Shift]. Шины будут сброшены, когда вы отпустите кнопку."},
     },
 
     ["driftToruqe_tt"] = {
@@ -351,6 +401,7 @@ Labels = {
         {iso = "fr-FR", text = "Augmente le couple du véhicule lorque vous driftez. Fonctionne à la fois pour 'Drift Mode' et 'Drift Tires'."},
         {iso = "it-IT", text = "Aumenta la coppia del veicolo durante le derapate. Funziona sia per 'Drift Mode' che per 'Drift Tires'."},
         {iso = "pt-BR", text = "Aumenta o torque de seu veículo ao fazer drifting. Funciona para ambos 'Drift Mode' e 'Drift Tires'."},
+        {iso = "ru-RU", text = "Увеличивает крутящий момент автомобиля во время дрифта. Работает как в режиме 'Дрифт', так и в режиме 'Дрифт-шины'."},
     },
 
     ["DriftSmoke_tt"] = {
@@ -359,6 +410,7 @@ Labels = {
         {iso = "fr-FR", text = "Crée un effet de fumée lorsque vous drifter. Vous pouvez changer la couleur de la fumée, mais elle n'est pas liée à la couleur de la fumée du pneu du jeu."},
         {iso = "it-IT", text = "Crea un effetto fumo durante la derapata. È possibile modificare il colore del fumo, ma non è correlato al colore del fumo delle gomme del gioco."},
         {iso = "pt-BR", text = "Cria um efeito de fumaça durante a deriva. É possível alterar a cor da fumaça, mas ela não está relacionada à cor da fumaça do pneu do jogo."},
+        {iso = "ru-RU", text = "Создает эффект дыма при дрифте. Вы можете изменить цвет дыма, но он не связан c цветом дыма шин в игре."},
     },
 
     ["driftInvalidVehTxt"] = {
@@ -367,6 +419,7 @@ Labels = {
         {iso = "fr-FR", text = "Vous ne pouvez faire du drift que sur des voitures, des camions et des quads."},
         {iso = "it-IT", text = "Si possono fare drifting solo con auto, camion e quad."},
         {iso = "pt-BR", text = "Você só pode fazer drift de carros, caminhões e quadriciclos."},
+        {iso = "ru-RU", text = "Дрифтовать можно только на легковых автомобилях, грузовиках и квадроциклах."},
     },
 
     ["lvoCB"] = {
@@ -375,6 +428,7 @@ Labels = {
         {iso = "fr-FR", text = "Sports/Super Uniquement"},
         {iso = "it-IT", text = "Solo Sports/Super"},
         {iso = "pt-BR", text = "Somente Sports/Super"},
+        {iso = "ru-RU", text = "Только спорт/супер"},
     },
 
     ["lvo_tt"] = {
@@ -383,6 +437,7 @@ Labels = {
         {iso = "fr-FR", text = "Limitez certaines options aux véhicules performants uniquement. Par exemple, si cette option est activée, les véhicules lents et non pertinents n'auront pas de Launch Control ou de Pops & Bangs."},
         {iso = "it-IT", text = "Limita alcune opzioni solo ai veicoli ad alte prestazioni. Ad esempio, con questa opzione abilitata, i veicoli lenti e irrilevanti non avranno Launch Control o un Pops & Bangs."},
         {iso = "pt-BR", text = "Limitar algumas opções apenas a veículos de desempenho. Por exemplo, com essa opção ativada, os veículos lentos e irrelevantes não terão 'Launch Control' nem um 'Pops & Bangs'."},
+        {iso = "ru-RU", text = "Ограничение некоторых опций только для мощных автомобилей. Например, при включении этой опции медленные и неактуальные автомобили не будут иметь возможности управления запуском или настройки треска."},
     },
 
     ["missile_def_tt"] = {
@@ -391,6 +446,7 @@ Labels = {
         {iso = "fr-FR", text = "Intercepte tous les missiles à proximité de votre véhicule, y compris ceux que vous avez tirés.\10\10REMARQUE : Si vous tirez des missiles depuis ou à proximité de votre véhicule, la défense les rendra inertes."},
         {iso = "it-IT", text = "Intercetta tutti i missili vicini al veicolo, compresi quelli lanciati dall'utente.\10\10NOTA: Se si lanciano missili dal veicolo o nelle sue vicinanze, la difesa li renderà inerti."},
         {iso = "pt-BR", text = "Intercepta todos os mísseis próximos ao seu veículo, inclusive os disparados por você.\10\10NOTA: Se você disparar algum míssil do seu veículo ou próximo a ele, a defesa o tornará inerte."},
+        {iso = "ru-RU", text = "Перехватывает любые ракеты, находящиеся рядом с машиной, в том числе и выпущенные вами.\10\10Примечание: Если вы выпустите ракеты из машины или рядом с ней, защита сделает их инертными."},
     },
 
     ["missile_def_on_notif"] = {
@@ -399,6 +455,7 @@ Labels = {
         {iso = "fr-FR", text = "Défense antimissile activée ! Veuillez noter que le fait de tirer des missiles à partir ou à proximité de votre véhicule les rendra inertes."},
         {iso = "it-IT", text = "Difesa missilistica attivata! Si noti che il lancio di missili da o vicino al veicolo li renderà inerti."},
         {iso = "pt-BR", text = "Defesa antimísseis ativada! Observe que disparar qualquer míssil do seu veículo ou próximo a ele o deixará inerte."},
+        {iso = "ru-RU", text = "Противоракетная оборона активирована! Обратите внимание, что если выпустить ракеты из машины или рядом c ней, они станут неактивными."},
     },
 
     ["missile_def_off_notif"] = {
@@ -407,6 +464,7 @@ Labels = {
         {iso = "fr-FR", text = "Défense antimissile désactivée."},
         {iso = "it-IT", text = "Difesa missilistica disattivata."},
         {iso = "pt-BR", text = "Defesa antimísseis desativada."},
+        {iso = "ru-RU", text = "Противоракетная оборона деактивирована."},
     },
 
     ["lct_tt"] = {
@@ -415,6 +473,7 @@ Labels = {
         {iso = "fr-FR", text = "Lorsque votre véhicule est complètement arrêté, maintenez enfoncés [Accélérer] + [Frein] pendant 3 secondes puis relâchez les freins."},
         {iso = "it-IT", text = "Quando il veicolo è completamente fermo, tieni premuti [Accelerazione] + [Freno] per 3 secondi, quindi rilascia i freni."},
         {iso = "pt-BR", text = "Quando o veículo estiver completamente parado, pressione e mantenha pressionado [Acelerar] + [Freio] por 3 segundos e, em seguida, solte os freios."},
+        {iso = "ru-RU", text = "Когда автомобиль полностью остановится, нажмите и удерживайте [Accelerate] + [Brake] в течение 3 секунд, затем отпустите тормоза."},
     },
 
     ["speedBoost_tt"] = {
@@ -423,6 +482,7 @@ Labels = {
         {iso = "fr-FR", text = "Un boost de vitesse qui simule le protoxyde d'azote. Vous donne plus de puissance et augmente votre vitesse de pointe lorsque vous appuyez sur [Maj Gauche]."},
         {iso = "it-IT", text = "Un aumento di velocità che simula il nitro. Ti dà più potenza e aumenta la tua velocità massima quando premi [Maiusc Sinistro]."},
         {iso = "pt-BR", text = "Um aumento de velocidade que simula o nitrogênio. Dá a você mais potência e aumenta a velocidade máxima ao pressionar [Shift esquerdo]."},
+        {iso = "ru-RU", text = "Прибавка к скорости, имитирующая закись азота. Дает вам больше мощности и увеличивает максимальную скорость при нажатии [Left Shift]."},
     },
 
     ["vfx_tt"] = {
@@ -431,6 +491,7 @@ Labels = {
         {iso = "fr-FR", text = "Active un effet visuel sur votre écran lorsque vous utilisez NOS."},
         {iso = "it-IT", text = "Attiva un effetto visivo sullo schermo quando si utilizza NOS."},
         {iso = "pt-BR", text = "Ativa um efeito visual na tela ao usar o NOS."},
+        {iso = "ru-RU", text = "Активирует визуальный эффект на экране при использовании NOS."},
     },
 
     ["loudradio_tt"] = {
@@ -439,6 +500,7 @@ Labels = {
         {iso = "fr-FR", text = "Augmente le volume de la radio de votre véhicule depuis l'extérieur. Pour constater la différence, activez cette option puis placez-vous à proximité de votre voiture pendant que le moteur tourne et que la radio est allumée."},
         {iso = "it-IT", text = "Rende più forte il suono della radio del tuo veicolo dall'esterno. Per notare la differenza, attiva questa opzione, quindi stai vicino alla tua auto mentre il motore è in funzione e la radio è accesa."},
         {iso = "pt-BR", text = "Faz com que o rádio do seu veículo soe mais alto do lado de fora. Para notar a diferença, ative essa opção e fique perto do carro enquanto o motor estiver funcionando e o rádio estiver ligado."},
+        {iso = "ru-RU", text = "Заставляет радио вашего автомобиля звучать громче со стороны. Чтобы заметить разницу, активируйте эту опцию и встаньте рядом с автомобилем при работающем двигателе и включенном радио."},
     },
 
     ["purge_tt"] = {
@@ -447,6 +509,7 @@ Labels = {
         {iso = "fr-FR", text = "Appuyez sur [X] sur le clavier ou [A] sur le contrôleur pour purger votre NOS à la Fast & Furious."},
         {iso = "it-IT", text = "Premi [X] sulla tastiera o [A] sul controller per purgare il tuo NOS alla stile Fast & Furious."},
         {iso = "pt-BR", text = "Pressione [X] no teclado ou [A] no controle para limpar seu NOS no estilo Fast & Furious."},
+        {iso = "ru-RU", text = "Нажмите [X] на клавиатуре или [A] на контроллере, чтобы очистить NOS в стиле Fast & Furious."},
     },
 
     ["pnb_tt"] = {
@@ -454,7 +517,7 @@ Labels = {
         {iso = "de-DE", text = "Aktiviert Abgasstöße. [Beschleunigen]-Taste bei hoher Motordrehzahl loslassen."},
         {iso = "fr-FR", text = "Active les rafales d'échappement lorsque vous relâchez la touche [Accélérer] à partir d'un régime moteur élevé."},
         {iso = "it-IT", text = "Attiva le raffiche di scarico quando si rilascia il pulsante [Accelerazione] da un regime elevato."},
-        {iso = "pt-BR", text = "Ativa as rajadas de escapamento quando você solta o botão [Acelerar] em uma velocidade alta do motor."},
+        {iso = "ru-RU", text = "Включает хлопки выхлопных газов, когда вы отпускаете кнопку [Accelerate] с высоких оборотов."},
     },
 
     ["louderpnb_tt"] = {
@@ -463,6 +526,7 @@ Labels = {
         {iso = "fr-FR", text = "Rend le son de 'Pops & Bangs' extrêmement fort."},
         {iso = "it-IT", text = "Rende il suono di 'Pops & Bangs' estremamente forte."},
         {iso = "pt-BR", text = "Faz com que seus 'Pops & Bangs' soem extremamente altos."},
+        {iso = "ru-RU", text = "Заставляет ваши 'Pops & Bangs' звучать очень громко."},
     },
 
     ["highbeams_tt"] = {
@@ -470,6 +534,7 @@ Labels = {
         {iso = "de-DE", text = "Schalte das Fernlicht beim Hupen ein."},
         {iso = "fr-FR", text = "Allumez vos feux de route lorsque vous klaxonnez."},
         {iso = "pt-BR", text = "Ligue o farol alto ao buzinar."},
+        {iso = "ru-RU", text = "Мигайте дальним светом, когда сигналите."},
     },
 
     ["brakeLight_tt"] = {
@@ -478,6 +543,7 @@ Labels = {
         {iso = "fr-FR", text = "Allume automatiquement les feux stop lorsque votre voiture est à l'arrêt."},
         {iso = "it-IT", text = "Accende automaticamente le luci dei freni quando l'auto è ferma."},
         {iso = "pt-BR", text = "Acende automaticamente as luzes de freio quando o carro está parado."},
+        {iso = "ru-RU", text = "Автоматически включает стоп-сигналы при остановке автомобиля."},
     },
 
     ["engineOn_tt"] = {
@@ -486,6 +552,7 @@ Labels = {
         {iso = "fr-FR", text = "Ramène la sortie du véhicule de GTA IV : maintenez la touche [F] pour éteindre le moteur avant de sortir du véhicule ou appuyez normalement pour sortir et le laisser en marche."},
         {iso = "it-IT", text = "Ripristina l'uscita dal veicolo di GTA IV: tieni premuto [F] per spegnere il motore prima di uscire dal veicolo o premi normalmente per uscire e tenerlo in funzione."},
         {iso = "pt-BR", text = "Traz de volta a saída do veículo do GTA IV: segure [F] para desligar o motor antes de sair do veículo ou pressione normalmente para sair e mantê-lo funcionando."},
+        {iso = "ru-RU", text = "Верните в GTA IV функцию выезда из автомобиля: удерживайте [F], чтобы выключить двигатель перед выходом из автомобиля, или нажмите обычную кнопку, чтобы выйти из автомобиля, но при этом он должен работать."},
     },
 
     ["wheelsturned_tt"] = {
@@ -493,7 +560,7 @@ Labels = {
         {iso = "de-DE", text = "Hält die Räder beim Verlassen des Fahrzeugs gedreht, während Sie [A] oder [D]."},
         {iso = "fr-FR", text = "Les roues restent tournées lorsque vous sortez du véhicule en maintenant la touche [A] ou [D]."},
         {iso = "it-IT", text = "Mantiene le ruote girate quando si esce dal veicolo tenendo premuto [A] o [D]."},
-        {iso = "pt-BR", text = "Mantém as rodas girando quando você sai do veículo enquanto segura [A] ou [D]."},
+        {iso = "ru-RU", text = "Удерживает колеса повернутыми, когда вы выходите из автомобиля, удерживая [A] или [D]."},
     },
 
 
@@ -503,6 +570,7 @@ Labels = {
         {iso = "fr-FR", text = "Empêche les PNJ et les joueurs de vous faire sortir de votre voiture."},
         {iso = "it-IT", text = "Impedisce a PNG e giocatori di farvi scendere dall'auto."},
         {iso = "pt-BR", text = "Impede que NPCs e jogadores tirem você do carro."},
+        {iso = "ru-RU", text = "Запретите NPC и игрокам угонять ваши машины."},
     },
 
     ["insta180_tt"] = {
@@ -511,6 +579,7 @@ Labels = {
         {iso = "fr-FR", text = "Appuyez sur [NUMPAD-] ou [Mouse Scroll Down] pour faire pivoter instantanément votre voiture de 180 degrés."},
         {iso = "it-IT", text = "Premere [NUMPAD-] o [Mouse Scroll Down] per ruotare istantaneamente l'auto di 180 gradi."},
         {iso = "pt-BR", text = "Pressione [NUMPAD-] ou [Mouse Scroll Down] para girar instantaneamente o carro em 180 graus."},
+        {iso = "ru-RU", text = "Нажмите [NUMPAD-] или [Прокрутка мыши вниз], чтобы мгновенно развернуть автомобиль на 180 градусов."},
     },
 
     ["rgbLights"] = {
@@ -519,6 +588,7 @@ Labels = {
         {iso = "fr-FR", text = "Lumières RVB"},
         {iso = "it-IT", text = "Luci RVB"},
         {iso = "pt-BR", text = "Luzes RGB"},
+        {iso = "ru-RU", text = "RGB-светильники"},
     },
 
     ["rgbSlider"] = {
@@ -527,6 +597,7 @@ Labels = {
         {iso = "fr-FR", text = "Vitesse RVB"},
         {iso = "it-IT", text = "Velocità RVB"},
         {iso = "pt-BR", text = "Velocidade RGB"},
+        {iso = "ru-RU", text = "Скорость RGB"},
     },
 
     ["engineSoundBtn"] = {
@@ -535,6 +606,7 @@ Labels = {
         {iso = "fr-FR", text = "Changer Le Son Du Moteur"},
         {iso = "it-IT", text = "Cambia Il Suono Del Motore"},
         {iso = "pt-BR", text = "Alterar O Som Do Motor"},
+        {iso = "ru-RU", text = "Изменение звука двигателя"},
     },
 
     ["engineSoundErr"] = {
@@ -543,6 +615,7 @@ Labels = {
         {iso = "fr-FR", text = "Cette option ne fonctionne que sur les véhicules routiers."},
         {iso = "it-IT", text = "Questa opzione funziona solo sui veicoli stradali."},
         {iso = "pt-BR", text = "Essa opção só funciona em veículos rodoviários."},
+        {iso = "ru-RU", text = "Эта опция работает только на дорожных транспортных средствах."},
     },
 
     ["closeBtn"] = {
@@ -551,6 +624,7 @@ Labels = {
         {iso = "fr-FR", text = " Fermer "},
         {iso = "it-IT", text = " Chiudere "},
         {iso = "pt-BR", text = " Próximo "},
+        {iso = "ru-RU", text = " Закрыть "},
     },
 
     ["openBtn"] = {
@@ -559,6 +633,7 @@ Labels = {
         {iso = "fr-FR", text = " Ouvrir "},
         {iso = "it-IT", text = " Aprire "},
         {iso = "pt-BR", text = " Aberto "},
+        {iso = "ru-RU", text = " Открыть "},
     },
 
     ["searchVeh_hint"] = {
@@ -567,6 +642,7 @@ Labels = {
         {iso = "fr-FR", text = "Rechercher les noms de véhicules"},
         {iso = "it-IT", text = "Cerca nomi veicoli"},
         {iso = "pt-BR", text = "Pesquisar Nomes De Veículos"},
+        {iso = "ru-RU", text = "Поиск названий автомобилей"},
     },
 
     ["Use This Sound"] = {
@@ -575,6 +651,7 @@ Labels = {
         {iso = "fr-FR", text = "Utilisez Ce Son"},
         {iso = "it-IT", text = "Usa Questo Suono"},
         {iso = "pt-BR", text = "Use Este Som"},
+        {iso = "ru-RU", text = "Используйте этот звук"},
     },
 
     ["Restore Default"] = {
@@ -583,6 +660,7 @@ Labels = {
         {iso = "fr-FR", text = "Restaurer"},
         {iso = "it-IT", text = "Ristabilire"},
         {iso = "pt-BR", text = "Restaurador"},
+        {iso = "ru-RU", text = "Восстановить"},
     },
 
     ["Fix Engine"] = {
@@ -591,6 +669,7 @@ Labels = {
         {iso = "fr-FR", text = "Réparer Le Moteur"},
         {iso = "it-IT", text = "Riparare Il Motore"},
         {iso = "pt-BR", text = "Reparo Do Motor"},
+        {iso = "ru-RU", text = "Починить двигатель"},
     },
 
     ["Destroy Engine"] = {
@@ -599,6 +678,7 @@ Labels = {
         {iso = "fr-FR", text = "Détruire Le Moteur"},
         {iso = "it-IT", text = "Distruggi Il Motore"},
         {iso = "pt-BR", text = "Destruir O Motor"},
+        {iso = "ru-RU", text = "Уничтожить двигатель"},
     },
 
     ["getinveh"] = {
@@ -607,6 +687,7 @@ Labels = {
         {iso = "fr-FR", text = "Veuillez montez dans un véhicule SVP !"},
         {iso = "it-IT", text = "Per favore, salite su un veicolo!"},
         {iso = "pt-BR", text = "Por favor, entre em um veículo!"},
+        {iso = "ru-RU", text = "Пожалуйста, садитесь в машину!"},
     },
 
     ["playersTab"] = {
@@ -615,15 +696,17 @@ Labels = {
         {iso = "fr-FR", text = "Joueurs "},
         {iso = "it-IT", text = "Giocatori "},
         {iso = "pt-BR", text = "Jogadores "},
+        {iso = "ru-RU", text = "Игроки "},
     },
 
-    ["temporarily disabled"] = {
-        {iso = "en-US", text = "Temporarily Disabled"},
-        {iso = "de-DE", text = "Zeitweise deaktiviert"},
-        {iso = "fr-FR", text = "Temporairement Désactivé"},
-        {iso = "it-IT", text = "Temporaneamente Disabilitato"},
-        {iso = "pt-BR", text = "Temporariamente Desativado"},
-    },
+    -- ["temporarily disabled"] = {
+    --     {iso = "en-US", text = "Temporarily Disabled"},
+    --     {iso = "de-DE", text = "Zeitweise deaktiviert"},
+    --     {iso = "fr-FR", text = "Temporairement Désactivé"},
+    --     {iso = "it-IT", text = "Temporaneamente Disabilitato"},
+    --     {iso = "pt-BR", text = "Temporariamente Desativado"},
+    --     {iso = "ru-RU", text = "Временно отключен"},
+    -- },
 
     ["worldTab"] = {
         {iso = "en-US", text = "World "},
@@ -631,6 +714,7 @@ Labels = {
         {iso = "fr-FR", text = "Monde "},
         {iso = "it-IT", text = "Mondo "},
         {iso = "pt-BR", text = "Mundo "},
+        {iso = "ru-RU", text = "Мир "},
     },
 
     ["failedToCtrlNPC"] = {
@@ -639,6 +723,7 @@ Labels = {
         {iso = "fr-FR", text = "Échec de la prise de contrôle du PNJ !"},
         {iso = "it-IT", text = "Impossibile prendere il controllo del PNG!"},
         {iso = "pt-BR", text = "Falha ao assumir o controle do NPC!"},
+        {iso = "ru-RU", text = "Не удалось взять под контроль NPC!"},
     },
 
     ["pedGrabber"] = {
@@ -647,6 +732,7 @@ Labels = {
         {iso = "fr-FR", text = "NPC Grabber"},
         {iso = "it-IT", text = "NPC Grabber"},
         {iso = "pt-BR", text = "NPC Grabber"},
+        {iso = "ru-RU", text = "NPC-захватчик"},
     },
 
     ["pedGrabber_tt"] = {
@@ -655,6 +741,7 @@ Labels = {
         {iso = "fr-FR", text = "Placez-vous près d'un PNJ à pied et appuyez sur [FEU] pour l'attraper. Une fois qu'ils sont saisis, maintenez [AIM] puis appuyez à nouveau sur [FEU] pour les lancer."},
         {iso = "it-IT", text = "Avvicinatevi a un PNG a piedi e premete [FUOCO] per afferrarlo. Una volta afferrato, tenete premuto [MIRARE] e premete di nuovo [FUOCO] per lanciarlo."},
         {iso = "pt-BR", text = "Aproxime-se de um NPC que esteja a pé e pressione [FIRE] para agarrá-lo. Depois que ele for agarrado, segure [AIM] e pressione [FIRE] novamente para arremessá-lo."},
+        {iso = "ru-RU", text = "Встаньте рядом с пешим NPC и нажмите [FIRE], чтобы схватить его. Когда они будут схвачены, удерживайте [AIM], а затем снова нажмите [FIRE], чтобы бросить их."},
     },
 
     ["Throw Force"] = {
@@ -663,6 +750,7 @@ Labels = {
         {iso = "fr-FR", text = "Force De Lancement :"},
         {iso = "it-IT", text = "Forza Di Lancio:"},
         {iso = "pt-BR", text = "Força De Lançamento:"},
+        {iso = "ru-RU", text = "Сила броска:"},
     },
 
     ["carpool"] = {
@@ -671,6 +759,7 @@ Labels = {
         {iso = "fr-FR", text = "Chevaucher Avec Les NPCs"},
         {iso = "it-IT", text = "Cavalcare Con I NPCs"},
         {iso = "pt-BR", text = "Passeio Com NPCs"},
+        {iso = "ru-BR", text = "Поездка с NPC"},
     },
 
     ["carpool_tt"] = {
@@ -679,6 +768,7 @@ Labels = {
         {iso = "fr-FR", text = "Permet de monter dans les véhicules des NPC en tant que passager."},
         {iso = "it-IT", text = "Permette di salire sui veicoli degli NPC come passeggero."},
         {iso = "pt-BR", text = "Permite que você entre em veículos de NPCs como passageiro."},
+        {iso = "ru-RU", text = "Позволяет садиться в транспортные средства NPC в качестве пассажира."},
     },
 
     ["prevSeat"] = {
@@ -687,6 +777,7 @@ Labels = {
         {iso = "fr-FR", text = "Siège Précédent"},
         {iso = "it-IT", text = "Sede Precedente"},
         {iso = "pt-BR", text = "Sede Anterior"},
+        {iso = "ru-RU", text = "Предыдущее место"},
     },
 
     ["nextSeat"] = {
@@ -695,6 +786,7 @@ Labels = {
         {iso = "fr-FR", text = "Siège Suivant"},
         {iso = "it-IT", text = "Prossima Sede"},
         {iso = "pt-BR", text = "Próxima Sede"},
+        {iso = "ru-RU", text = "Следующее место"},
     },
 
     ["settingsTab"] = {
@@ -703,6 +795,7 @@ Labels = {
         {iso = "fr-FR", text = "Paramètres "},
         {iso = "it-IT", text = "Impostazioni "},
         {iso = "pt-BR", text = "Configurações "},
+        {iso = "ru-RU", text = "Настройки "},
     },
 
     ["Disable Tooltips"] = {
@@ -711,6 +804,7 @@ Labels = {
         {iso = "fr-FR", text = "Désactiver Les Infobulles"},
         {iso = "it-IT", text = "Disattivare I Suggerimenti"},
         {iso = "pt-BR", text = "Desativar Dicas De Ferramentas"},
+        {iso = "ru-RU", text = "Отключить подсказки"},
     },
 
     ["DisableSound"] = {
@@ -719,6 +813,7 @@ Labels = {
         {iso = "fr-FR", text = "Désactiver Le Son De l'IU"},
         {iso = "it-IT", text = "Disattivare Il Suono Dell'IU"},
         {iso = "pt-BR", text = "Desativar O Som Da IU"},
+        {iso = "ru-RU", text = "Отключить звук графического интерфейса"},
     },
 
     ["DisableSound_tt"] = {
@@ -727,6 +822,7 @@ Labels = {
         {iso = "fr-FR", text = "Désactiver le retour sonore des widgets de l'interface utilisateur."},
         {iso = "it-IT", text = "Disabilita il feedback sonoro dai widget dell'interfaccia utente."},
         {iso = "pt-BR", text = "Desative o feedback sonoro dos widgets da interface do usuário."},
+        {iso = "ru-RU", text = "Отключите звуковую обратную связь с виджетами графического интерфейса."},
     },
 
     ["langTitle"] = {
@@ -735,6 +831,7 @@ Labels = {
         {iso = "fr-FR", text = "Langue: "},
         {iso = "it-IT", text = "Lingua: "},
         {iso = "pt-BR", text = "Idioma: "},
+        {iso = "ru-RU", text = "Язык: "},
     },
 
     ["gameLangCB"] = {
@@ -743,6 +840,7 @@ Labels = {
         {iso = "fr-FR", text = "Utiliser Le Langage Du Jeu"},
         {iso = "it-IT", text = "Utilizzare Il Linguaggio Del Gioco"},
         {iso = "pt-BR", text = "Use A Linguagem Do Jogo"},
+        {iso = "ru-RU", text = "Используйте игровой язык"},
     },
 
     ["gameLang_tt"] = {
@@ -751,6 +849,7 @@ Labels = {
         {iso = "fr-FR", text = "Pour choisir une autre langue, désactivez cette option."},
         {iso = "it-IT", text = "Per scegliere una lingua diversa, disattivare questa opzione."},
         {iso = "pt-BR", text = "Para escolher um idioma diferente, desative essa opção."},
+        {iso = "ru-RU", text = "Чтобы выбрать другой язык, отключите эту опцию."},
     },
 
     ["customLangTxt"] = {
@@ -759,6 +858,7 @@ Labels = {
         {iso = "fr-FR", text = "Personnalisé"},
         {iso = "it-IT", text = "Personalizzato"},
         {iso = "pt-BR", text = "Personalizado"},
+        {iso = "ru-RU", text = "Пользовательское"},
     },
 
     ["saveBtn"] = {
@@ -767,6 +867,7 @@ Labels = {
         {iso = "fr-FR", text = " Enregistrer "},
         {iso = "it-IT", text = " Risparmiare "},
         {iso = "pt-BR", text = " Salvar "},
+        {iso = "ru-RU", text = " Сохранить "},
     },
 
     ["lang_success_msg"] = {
@@ -775,6 +876,7 @@ Labels = {
         {iso = "fr-FR", text = "Les paramètres linguistiques ont été enregistrés. Veuillez recharger le script pour appliquer les changements."},
         {iso = "it-IT", text = "Impostazioni della lingua salvate. Ricaricare lo script per applicare le modifiche."},
         {iso = "pt-BR", text = "Configurações de idioma salvas. Recarregue o script para aplicar as alterações."},
+        {iso = "ru-RU", text = "Языковые настройки сохранены. Пожалуйста, перезагрузите скрипт, чтобы применить изменения."},
     },
 
     ["reset_settings_Btn"] = {
@@ -783,6 +885,7 @@ Labels = {
         {iso = "fr-FR", text = "Réinitialiser Tout"},
         {iso = "it-IT", text = "Resettare Tutto"},
         {iso = "pt-BR", text = "Restaurar Configurações"},
+        {iso = "ru-RU", text = "Сброс настроек"},
     },
 
     ["confirm_txt"] = {
@@ -791,6 +894,7 @@ Labels = {
         {iso = "fr-FR", text = "Êtes-vous sûr?"},
         {iso = "it-IT", text = "Sei sicuro?"},
         {iso = "pt-BR", text = "Tem certeza?"},
+        {iso = "ru-RU", text = "Вы уверены?"},
     },
 
     ["yes"] = {
@@ -799,6 +903,7 @@ Labels = {
         {iso = "fr-FR", text = "Oui"},
         {iso = "it-IT", text = "Si"},
         {iso = "pt-BR", text = "Sim"},
+        {iso = "ru-RU", text = "Да"},
     },
 
     ["no"] = {
@@ -807,6 +912,7 @@ Labels = {
         {iso = "fr-FR", text = "Non"},
         {iso = "it-IT", text = "No"},
         {iso = "pt-BR", text = "Não"},
+        {iso = "ru-RU", text = "Нет"},
     },
 
     ["getinsidefltbd"] = {
@@ -815,14 +921,16 @@ Labels = {
         {iso = "fr-FR", text = "Veuillez monter dans un camion à plate-forme.\10Vous pouvez utiliser le bouton ci-dessous pour en faire naître un."},
         {iso = "it-IT", text = "Entrare in un camion con pianale.\10Potete usare il pulsante qui sotto per generarne uno."},
         {iso = "pt-BR", text = "Entre em um caminhão-plataforma.\10Você pode usar o botão abaixo para gerar um."},
+        {iso = "ru-RU", text = "Пожалуйста, сядьте в грузовик.\10Вы можете использовать кнопку ниже, чтобы разродиться."},
     },
 
     ["spawnfltbd"] = {
         {iso = "en-US", text = "Spawn Flatbed"},
-        {iso = "de-DE", text = "Spawn Flatbed"},
-        {iso = "fr-FR", text = "Spawn Flatbed"},
-        {iso = "it-IT", text = "Spawn Flatbed"},
-        {iso = "pt-BR", text = "Spawn Flatbed"},
+        {iso = "de-DE", text = "Laichen Pritschenwagen"},
+        {iso = "fr-FR", text = "Générer Un Camion À Plate-forme"},
+        {iso = "it-IT", text = "Generare Un Camion Con Pianale"},
+        {iso = "pt-BR", text = "Gerar Caminhão-plataforma"},
+        {iso = "ru-RU", text = "Спаун-плоскодонка"},
     },
 
     ["fltbd_nonearbyvehTxt"] = {
@@ -831,6 +939,7 @@ Labels = {
         {iso = "fr-FR", text = "Aucun véhicule à proximité n'a été trouvé !"},
         {iso = "it-IT", text = "Nessun veicolo nelle vicinanze!"},
         {iso = "pt-BR", text = "Não foram encontrados veículos próximos!"},
+        {iso = "ru-RU", text = "Близлежащих автомобилей не найдено!"},
     },
 
     ["fltbd_nootherfltbdTxt"] = {
@@ -839,6 +948,7 @@ Labels = {
         {iso = "fr-FR", text = "Vous ne pouvez pas remorquer un autre camion à plate-forme."},
         {iso = "it-IT", text = "Non è possibile trainare un altro camion con pianale."},
         {iso = "pt-BR", text = "Não é possível rebocar outro caminhão-plataforma."},
+        {iso = "ru-RU", text = "Вы не можете буксировать другой бортовой грузовик."},
     },
 
     ["fltbd_carsOnlyTxt"] = {
@@ -847,6 +957,7 @@ Labels = {
         {iso = "fr-FR", text = "Vous ne pouvez remorquer que des voitures, des camions et des motos."},
         {iso = "it-IT", text = "È possibile trainare solo auto, camion e moto."},
         {iso = "pt-BR", text = "Só é possível rebocar carros, caminhões e motocicletas."},
+        {iso = "ru-RU", text = "Вы можете буксировать только легковые, грузовые автомобили и велосипеды."},
     },
 
     ["fltbd_closest_veh"] = {
@@ -855,6 +966,7 @@ Labels = {
         {iso = "fr-FR", text = "Véhicule le plus proche : "},
         {iso = "it-IT", text = "Il veicolo più vicino: "},
         {iso = "pt-BR", text = "Veículo mais próximo: "},
+        {iso = "ru-RU", text = "Ближайший автомобиль: "},
     },
 
     ["fltbd_towingTxt"] = {
@@ -863,6 +975,7 @@ Labels = {
         {iso = "fr-FR", text = "Véhicule remorqué : "},
         {iso = "it-IT", text = "Veicolo rimorchiato: "},
         {iso = "pt-BR", text = "Veículo rebocado: "},
+        {iso = "ru-RU", text = "Буксируемый автомобиль: "},
     },
 
     ["Show Towing Position"] = {
@@ -871,6 +984,7 @@ Labels = {
         {iso = "fr-FR", text = "Afficher La Position De Remorquage"},
         {iso = "it-IT", text = "Mostra Posizione Di Traino"},
         {iso = "pt-BR", text = "Mostrar Posição De Reboque"},
+        {iso = "ru-RU", text = "Показать положение буксировки"},
     },
 
     ["towpos_tt"] = {
@@ -879,6 +993,7 @@ Labels = {
         {iso = "fr-FR", text = "Marque la position à laquelle le script détecte les véhicules proches."},
         {iso = "it-IT", text = "Contrassegna la posizione in cui lo script rileva i veicoli vicini."},
         {iso = "pt-BR", text = "Marca a posição em que o script detecta veículos próximos."},
+        {iso = "ru-RU", text = "Отмечает позицию, в которой скрипт обнаруживает близлежащие автомобили."},
     },
 
     ["Tow Everything"] = {
@@ -887,6 +1002,7 @@ Labels = {
         {iso = "fr-FR", text = "Remorquer Tout"},
         {iso = "it-IT", text = "Rimorchiare Tutto"},
         {iso = "pt-BR", text = "Rebocar Tudo"},
+        {iso = "ru-RU", text = "Буксировка всего"},
     },
 
     ["TowEverything_tt"] = {
@@ -895,6 +1011,7 @@ Labels = {
         {iso = "fr-FR", text = "Par défaut, le script est limité aux voitures, camions et motos. Cette option ignore cette limite."},
         {iso = "it-IT", text = "Per impostazione predefinita, lo script è limitato alle sole auto, camion e moto. Questa opzione ignora tale limite."},
         {iso = "pt-BR", text = "Por padrão, o script é limitado apenas a carros, caminhões e motocicletas. Essa opção ignora esse limite."},
+        {iso = "ru-RU", text = "By default, the script is limited to cars, trucks and bikes only. This option ignores that limit."},
     },
 
     ["towBtn"] = {
@@ -903,6 +1020,7 @@ Labels = {
         {iso = "fr-FR", text = "Remorquer"},
         {iso = "it-IT", text = " Traino  "},
         {iso = "pt-BR", text = " Reboque "},
+        {iso = "ru-RU", text = " Буксировка "},
     },
 
     ["detachBtn"] = {
@@ -911,6 +1029,7 @@ Labels = {
         {iso = "fr-FR", text = " Détacher "},
         {iso = "it-IT", text = " Staccare "},
         {iso = "pt-BR", text = " Desanexar "},
+        {iso = "ru-RU", text = " Отсоедините "},
     },
 
     ["failed_veh_ctrl"] = {
@@ -919,6 +1038,7 @@ Labels = {
         {iso = "fr-FR", text = "Impossible de prendre le contrôle du véhicule ! Le propriétaire a-t-il des protections ?"},
         {iso = "it-IT", text = "Impossibile prendere il controllo del veicolo! Il proprietario ha delle protezioni?"},
         {iso = "pt-BR", text = "Incapaz de assumir o controle do veículo! O proprietário tem proteções?"},
+        {iso = "ru-RU", text = "Невозможно получить контроль над автомобилем! Есть ли у владельца средства защиты?"},
     },
 
     ["Adjust Vehicle Position"] = {
@@ -927,6 +1047,7 @@ Labels = {
         {iso = "fr-FR", text = "Ajuster La Position Du Véhicule"},
         {iso = "it-IT", text = "Regolare La Posizione Del Veicolo"},
         {iso = "pt-BR", text = "Ajuste Da Posição Do Veículo"},
+        {iso = "ru-RU", text = "Отрегулируйте положение автомобиля"},
     },
 
     ["AdjustPosition_tt"] = {
@@ -935,6 +1056,7 @@ Labels = {
         {iso = "fr-FR", text = "Pour que les flèches aient un sens, déplacez la caméra du jeu vers la droite. (Regarder à droite)"},
         {iso = "it-IT", text = "Affinché le frecce abbiano senso, spostare la telecamera di gioco verso destra. (Guarda a destra)"},
         {iso = "pt-BR", text = "Para que as setas façam sentido, mova a câmera do jogo para a direita. (Olhe para a direita)"},
+        {iso = "ru-RU", text = "Чтобы стрелки приобрели смысл, переместите игровую камеру вправо. (Посмотрите направо)"},
     },
 
     ["Exit your current vehicle first."] = {
@@ -943,6 +1065,7 @@ Labels = {
         {iso = "fr-FR", text = "Sortez d'abord de votre véhicule actuel."},
         {iso = "it-IT", text = "Uscire prima dal veicolo attuale."},
         {iso = "pt-BR", text = "Saia primeiro de seu veículo atual."},
+        {iso = "ru-RU", text = "Сначала выйдите из своего автомобиля."},
     },
 
     ["noSpawnInside"] = {
@@ -951,6 +1074,7 @@ Labels = {
         {iso = "fr-FR", text = "Il n'est pas possible de crééer un camion lorsque vous êtes à l'intérieur."},
         {iso = "it-IT", text = "Non è possibile spawnare un autocarro con pianale all'interno degli interni."},
         {iso = "pt-BR", text = "Não é possível desovar um caminhão-plataforma dentro de interiores."},
+        {iso = "ru-RU", text = "Вы не можете размножать бортовые грузовики внутри интерьеров."},
     },
 
     ["Total Players:"] = {
@@ -959,6 +1083,7 @@ Labels = {
         {iso = "fr-FR", text = "Nombre De Joueurs :"},
         {iso = "it-IT", text = "Totale Giocatori:"},
         {iso = "pt-BR", text = "Total De Jogadores:"},
+        {iso = "ru-RU", text = "Всего игроков:"},
     },
 
     ["editMode"] = {
@@ -967,6 +1092,7 @@ Labels = {
         {iso = "fr-FR", text = "Mode Édition"},
         {iso = "it-IT", text = "Modo Modifica"},
         {iso = "pt-BR", text = "Modo Editar"},
+        {iso = "ru-RU", text = "Режим правки"},
     },
 
     ["editMode_tt"] = {
@@ -975,6 +1101,7 @@ Labels = {
         {iso = "fr-FR", text = "Repositionnez l'objet après l'avoir créé."},
         {iso = "it-IT", text = "Riposiziona l'oggetto dopo averlo generato."},
         {iso = "pt-BR", text = "Reposicione o objeto depois de gerá-lo."},
+        {iso = "ru-RU", text = "Переставьте реквизит после его появления."},
     },
 
     ["search_hint"] = {
@@ -983,6 +1110,7 @@ Labels = {
         {iso = "fr-FR", text = "Rechercher"},
         {iso = "it-IT", text = "Ricerca"},
         {iso = "pt-BR", text = "Buscar"},
+        {iso = "ru-RU", text = "Поиск"},
     },
 
     ["R*_blacklist"] = {
@@ -991,6 +1119,7 @@ Labels = {
         {iso = "fr-FR", text = "bloqué par Rockstar et n'apparaîtra pas."},
         {iso = "it-IT", text = "bloccato da Rockstar e non apparirà."},
         {iso = "pt-BR", text = "bloqueado pela Rockstar e não aparecerá."},
+        {iso = "ru-RU", text = "занесен в черный список Rockstar и не будет появляться."},
     },
 
     ["crash_object"] = {
@@ -999,6 +1128,7 @@ Labels = {
         {iso = "fr-FR", text = "peut faire planter votre jeu. Soyez prudent !"},
         {iso = "it-IT", text = "potrebbe bloccare il gioco. Procedete con cautela!"},
         {iso = "pt-BR", text = "pode travar o jogo. Prossiga com cuidado!"},
+        {iso = "ru-RU", text = "может привести к краху вашей игры. Будьте осторожны!"},
     },
 
     ["Custom Objects"] = {
@@ -1007,6 +1137,7 @@ Labels = {
         {iso = "fr-FR", text = "Objets Personnalisés"},
         {iso = "it-IT", text = "Oggetti Personalizzati"},
         {iso = "pt-BR", text = "Objetos Personalizados"},
+        {iso = "ru-RU", text = "Пользовательские объекты"},
     },
 
     ["All Objects"] = {
@@ -1015,6 +1146,7 @@ Labels = {
         {iso = "fr-FR", text = "Tous Les Objets"},
         {iso = "it-IT", text = "Tutti Gli Oggetti"},
         {iso = "pt-BR", text = "Todos Os Objectos"},
+        {iso = "ru-RU", text = "Все объекты"},
     },
 
     ["Preview"] = {
@@ -1023,6 +1155,7 @@ Labels = {
         {iso = "fr-FR", text = "Aperçu"},
         {iso = "it-IT", text = "Anteprima"},
         {iso = "pt-BR", text = "Previsão"},
+        {iso = "ru-RU", text = "Предпросмотр"},
     },
 
     ["Move_FB"] = {
@@ -1031,6 +1164,7 @@ Labels = {
         {iso = "fr-FR", text = "Avant/Arrière"},
         {iso = "it-IT", text = "Avanti/Indietro:"},
         {iso = "pt-BR", text = "Frente/Trás:"},
+        {iso = "ru-RU", text = "вперед/назад:"},
     },
 
     ["Move_UD"] = {
@@ -1039,6 +1173,7 @@ Labels = {
         {iso = "fr-FR", text = "Haut/Bas"},
         {iso = "it-IT", text = "Muoversi Su/Giù"},
         {iso = "pt-BR", text = "Cima/Baixo"},
+        {iso = "ru-RU", text = "вверх/вниз:"},
     },
 
     ["Spawn For a Player"] = {
@@ -1047,6 +1182,7 @@ Labels = {
         {iso = "fr-FR", text = "Créer Pour Un Joueur"},
         {iso = "it-IT", text = "Spawn Per Un Giocatore"},
         {iso = "pt-BR", text = "Spawn Para Um Jogador"},
+        {iso = "ru-RU", text = "Спаун для игрока"},
     },
 
     ["Spawn"] = {
@@ -1055,6 +1191,7 @@ Labels = {
         {iso = "fr-FR", text = "Créer"},
         {iso = "it-IT", text = "Creare"},
         {iso = "pt-BR", text = "Criar"},
+        {iso = "ru-RU", text = "Спаун"},
     },
 
     ["invalid_obj"] = {
@@ -1063,6 +1200,7 @@ Labels = {
         {iso = "fr-FR", text = "Cet objet "},
         {iso = "it-IT", text = "Questo oggetto "},
         {iso = "pt-BR", text = "Esse objeto "},
+        {iso = "ru-RU", text = "Этот объект "},
     },
 
     ["spawned_objects"] = {
@@ -1071,6 +1209,7 @@ Labels = {
         {iso = "fr-FR", text = "Objets Créés :"},
         {iso = "it-IT", text = "Oggetti Creati:"},
         {iso = "pt-BR", text = "Objetos Criados:"},
+        {iso = "ru-RU", text = "Порожденные объекты:"},
     },
 
     ["generic_delete"] = {
@@ -1079,6 +1218,7 @@ Labels = {
         {iso = "fr-FR", text = "Supprimer"},
         {iso = "it-IT", text = "Cancellare"},
         {iso = "pt-BR", text = "Apagar"},
+        {iso = "ru-RU", text = "Удалить"},
     },
 
     ["Attach To Self"] = {
@@ -1087,6 +1227,7 @@ Labels = {
         {iso = "fr-FR", text = "Attacher à Vous"},
         {iso = "it-IT", text = "Attaccato A Voi"},
         {iso = "pt-BR", text = "Ligado A Você"},
+        {iso = "ru-RU", text = "Прикрепление к себе"},
     },
 
     ["Attach To Vehicle"] = {
@@ -1095,6 +1236,7 @@ Labels = {
         {iso = "fr-FR", text = "Attacher Au Véhicule"},
         {iso = "it-IT", text = "Fissare Al Veicolo"},
         {iso = "pt-BR", text = "Fixação No Veículo"},
+        {iso = "ru-RU", text = "Прикрепить к автомобилю"},
     },
 
     ["attached_objects"] = {
@@ -1103,6 +1245,7 @@ Labels = {
         {iso = "fr-FR", text = "Objets Attachés :"},
         {iso = "it-IT", text = "Oggetti Allegati:"},
         {iso = "pt-BR", text = "Objetos Anexados:"},
+        {iso = "ru-RU", text = "Прикрепленные объекты:"},
     },
 
     ["attachBtn"] = {
@@ -1111,6 +1254,7 @@ Labels = {
         {iso = "fr-FR", text = "Attacher"},
         {iso = "it-IT", text = "Allegare"},
         {iso = "pt-BR", text = "Anexar"},
+        {iso = "ru-RU", text = "Прикрепить"},
     },
 
     ["xyz_multiplier"] = {
@@ -1119,6 +1263,7 @@ Labels = {
         {iso = "fr-FR", text = "Multiplier les valeurs X, Y et Z :"},
         {iso = "it-IT", text = "Moltiplicare i valori X, Y e Z:"},
         {iso = "pt-BR", text = "Multiplicar os valores de X, Y e Z:"},
+        {iso = "ru-RU", text = "Перемножьте значения X, Y и Z:"},
     },
 
     ["Move Object:"] = {
@@ -1127,6 +1272,7 @@ Labels = {
         {iso = "fr-FR", text = "Déplacer L'objet :"},
         {iso = "it-IT", text = "Spostare L'oggetto:"},
         {iso = "pt-BR", text = "Mover Objeto:"},
+        {iso = "ru-RU", text = "Переместить объект:"},
     },
 
     ["Rotate Object:"] = {
@@ -1135,6 +1281,7 @@ Labels = {
         {iso = "fr-FR", text = "Pivoter L'objet :"},
         {iso = "it-IT", text = "Ruotare L'oggetto:"},
         {iso = "pt-BR", text = "Rotacionar O Objeto:"},
+        {iso = "ru-RU", text = "Повернуть объект:"},
     },
 
     ["generic_reset"] = {
@@ -1143,6 +1290,7 @@ Labels = {
         {iso = "fr-FR", text = "Reinitialiser"},
         {iso = "it-IT", text = "Reset"},
         {iso = "pt-BR", text = "Reinicialização"},
+        {iso = "ru-RU", text = "Сброс"},
     },
 
     ["resetSlider_tt"] = {
@@ -1151,6 +1299,7 @@ Labels = {
         {iso = "fr-FR", text = "Remettre les curseurs à zéro et la position de l'objet par défaut."},
         {iso = "it-IT", text = "Azzera i cursori e riporta la posizione dell'oggetto ai valori predefiniti."},
         {iso = "pt-BR", text = "Redefina os controles deslizantes para zero e a posição do objeto para o padrão."},
+        {iso = "ru-RU", text = "Сбросьте ползунки на ноль, а положение пропеллера - на значение по умолчанию."},
     },
 
     ["hex_tt"] = {
@@ -1159,6 +1308,7 @@ Labels = {
         {iso = "fr-FR", text = "Saisissez votre propre couleur hexadecimale puis appuyez sur [Entrée] pour l'appliquer. Exemple : \"#FF0000\""},
         {iso = "it-IT", text = "Immettere il colore esadecimale personalizzato quindi premere [ENTER] per applicare. Esempio: \"#FF0000\""},
         {iso = "pt-BR", text = "Insira sua própria cor hexadecimal personalizada e pressione [ENTER] para aplicar. Exemplo: \"#FF0000\""},
+        {iso = "ru-RU", text = "Введите свой собственный цвет Hex и нажмите [ENTER], чтобы применить его. Пример: \"#FF0000\""},
     },
 
     ["animations"] = {
@@ -1167,6 +1317,7 @@ Labels = {
         {iso = "fr-FR", text = "Animations"},
         {iso = "it-IT", text = "Animazioni"},
         {iso = "pt-BR", text = "Animações"},
+        {iso = "ru-RU", text = "Анимация"},
     },
 
     ["scenarios"] = {
@@ -1175,6 +1326,7 @@ Labels = {
         {iso = "fr-FR", text = "Scénarios"},
         {iso = "it-IT", text = "Scenari"},
         {iso = "pt-BR", text = "Cenários"},
+        {iso = "ru-RU", text = "Сценарии"},
     },
 
     ["flags_tt"] = {
@@ -1183,6 +1335,7 @@ Labels = {
         {iso = "fr-FR", text = "Permet de personnaliser la façon dont l'animation est jouée.\10Exemple : si une animation est réglée pour tourner en boucle mais que vous souhaitez qu'elle se fige, activez cette option puis choisissez les paramètres souhaités."},
         {iso = "it-IT", text = "Permette di personalizzare il modo in cui l'animazione viene riprodotta.\10Esempio: se un'animazione è impostata su loop ma si desidera che si blocchi, attivare questa opzione e scegliere le impostazioni desiderate."},
         {iso = "pt-BR", text = "Permite que você personalize a forma como a animação é reproduzida.\10Exemplo: se uma animação estiver definida para loop, mas você quiser que ela congele, ative essa opção e escolha as configurações desejadas."},
+        {iso = "ru-RU", text = "Позволяет настроить воспроизведение анимации.\10Например: если анимация зациклена, но вы хотите, чтобы она замерла, активируйте этот параметр и выберите нужные настройки."},
     },
 
     ["DisableProps_tt"] = {
@@ -1191,6 +1344,7 @@ Labels = {
         {iso = "fr-FR", text = "Permet de choisir si les animations doivent être jouées avec des accessoires ou non. Cochez ou décochez cette case avant de jouer l'animation."},
         {iso = "it-IT", text = "Scegliere se riprodurre o meno le animazioni con gli oggetti di scena. Selezionare o deselezionare questa opzione prima di riprodurre l'animazione."},
         {iso = "pt-BR", text = "Escolha se deseja reproduzir animações com adereços ou não. Marque ou desmarque essa opção antes de reproduzir a animação."},
+        {iso = "ru-RU", text = "Выберите, воспроизводить ли анимацию с реквизитом или нет. Установите или снимите этот флажок перед воспроизведением анимации."},
     },
 
     ["Allow Control"] = {
@@ -1199,6 +1353,7 @@ Labels = {
         {iso = "fr-FR", text = "Autoriser Le Contrôle"},
         {iso = "it-IT", text = "Consentire Il Controllo"},
         {iso = "pt-BR", text = "Permitir Controle"},
+        {iso = "ru-RU", text = "Разрешить контроль"},
     },
 
     ["AllowControl_tt"] = {
@@ -1207,6 +1362,7 @@ Labels = {
         {iso = "fr-FR", text = "Vous permet de garder le contrôle de votre personnage et/ou de votre véhicule. S'il est associé à « Upper Body Only », vous pouvez jouer des animations et marcher/courir/conduire."},
         {iso = "it-IT", text = "Consente di mantenere il controllo del personaggio e/o del veicolo. Se abbinato a “Solo corpo superiore”, è possibile riprodurre animazioni e camminare/correre/guidare."},
         {iso = "pt-BR", text = "Permite que você mantenha o controle do personagem e/ou do veículo. Se for combinado com “Upper Body Only”, você poderá reproduzir animações e andar/correr/dirigir."},
+        {iso = "ru-RU", text = "Позволяет сохранять контроль над персонажем и/или транспортным средством. В паре с «Только верхняя часть тела» вы можете воспроизводить анимации и ходить/бегать/ездить."},
     },
 
     ["looped_tt"] = {
@@ -1215,6 +1371,7 @@ Labels = {
         {iso = "fr-FR", text = "Joue l'animation indéfiniment jusqu'à ce que vous l'arrêtiez manuellement."},
         {iso = "it-IT", text = "Riproduce l'animazione per sempre finché non la si interrompe manualmente."},
         {iso = "pt-BR", text = "Reproduz a animação para sempre até que você a interrompa manualmente."},
+        {iso = "ru-RU", text = "Воспроизводит анимацию до тех пор, пока вы не остановите ее вручную."},
     },
 
     ["Upper Body Only"] = {
@@ -1223,6 +1380,7 @@ Labels = {
         {iso = "fr-FR", text = "Corps Supérieur Uniquement"},
         {iso = "it-IT", text = "Solo Corpo Superiore"},
         {iso = "pt-BR", text = "Somente Parte Superior Do Corpo"},
+        {iso = "ru-RU", text = "Только верхняя часть тела"},
     },
 
     ["UpperBodyOnly_tt"] = {
@@ -1231,6 +1389,7 @@ Labels = {
         {iso = "fr-FR", text = "Joue uniquement l'animation sur le haut du corps de votre personnage (à partir de la taille)."},
         {iso = "it-IT", text = "Riproduce l'animazione solo sulla parte superiore del corpo del personaggio (dalla vita in su)."},
         {iso = "pt-BR", text = "Reproduz a animação somente na parte superior do corpo do personagem (da cintura para cima)."},
+        {iso = "ru-RU", text = "Воспроизводит анимацию только верхней части тела персонажа (от пояса вверх)."},
     },
 
     ["Freeze"] = {
@@ -1239,6 +1398,7 @@ Labels = {
         {iso = "fr-FR", text = "Geler"},
         {iso = "it-IT", text = "Congelare"},
         {iso = "pt-BR", text = "Congelar"},
+        {iso = "ru-RU", text = "Заморозьте"},
     },
 
     ["Freeze_tt"] = {
@@ -1247,6 +1407,7 @@ Labels = {
         {iso = "fr-FR", text = "Arrête l'animation à la toute dernière image. Utile pour les animations 'ragdoll', de sommeil ou de mort."},
         {iso = "it-IT", text = "Congela l'animazione all'ultimo fotogramma. Utile per le animazioni ragdoll/sleeping/dead."},
         {iso = "pt-BR", text = "Congela a animação no último quadro. Útil para animações de bonecas de pano, dormindo ou mortas."},
+        {iso = "ru-RU", text = "Замораживает анимацию на самом последнем кадре. Полезно для анимаций ragdoll/спящих/мертвых."},
     },
 
     ["You can not play animations while grabbing an NPC."] = {
@@ -1255,6 +1416,7 @@ Labels = {
         {iso = "fr-FR", text = "Vous ne pouvez pas jouer des animations lorsque vous saisissez un NPC."},
         {iso = "it-IT", text = "Non è possibile riprodurre animazioni mentre si afferra un NPC."},
         {iso = "pt-BR", text = "Você não pode reproduzir animações enquanto estiver agarrando um NPC."},
+        {iso = "ru-RU", text = "Вы не можете воспроизводить анимацию при захвате NPC."},
     },
 
     ["You can not play scenarios while grabbing an NPC."] = {
@@ -1263,6 +1425,7 @@ Labels = {
         {iso = "fr-FR", text = "Vous ne pouvez pas jouer des scénarios lorsque vous saisissez un NPC."},
         {iso = "it-IT", text = "Non è possibile riprodurre scenari mentre si afferra un NPC."},
         {iso = "pt-BR", text = "Você não pode reproduzir senários enquanto estiver agarrando um NPC."},
+        {iso = "ru-RU", text = "Вы не можете воспроизводить анимацию при захвате NPC."},
     },
 
     ["stopAnims_tt"] = {
@@ -1271,6 +1434,7 @@ Labels = {
         {iso = "fr-FR", text = "ASTUCE : Vous pouvez également arrêter les Animations en appuyant sur [G] sur le clavier ou sur [DPAD LEFT] sur le contrôleur."},
         {iso = "it-IT", text = "SUGGERIMENTO: è possibile interrompere le Animazioni anche premendo [G] sulla tastiera o [DPAD LEFT] sul controller."},
         {iso = "pt-BR", text = "DICA: Você também pode interromper as Animações pressionando [G] no teclado ou [DPAD LEFT] no controle."},
+        {iso = "ru-RU", text = "СОВЕТ: Вы также можете остановить анимацию, нажав [G] на клавиатуре или [DPAD LEFT] на контроллере."},
     },
 
     ["stopScenarios_tt"] = {
@@ -1279,6 +1443,7 @@ Labels = {
         {iso = "fr-FR", text = "ASTUCE : Vous pouvez également arrêter les Scénarios en appuyant sur [G] sur le clavier ou sur [DPAD LEFT] sur le contrôleur."},
         {iso = "it-IT", text = "SUGGERIMENTO: è possibile interrompere le Scenari anche premendo [G] sulla tastiera o [DPAD LEFT] sul controller."},
         {iso = "pt-BR", text = "DICA: Você também pode interromper as Cenários pressionando [G] no teclado ou [DPAD LEFT] no controle."},
+        {iso = "ru-RU", text = "СОВЕТ: Вы также можете остановить Сценарии, нажав [G] на клавиатуре или [DPAD LEFT] на контроллере."},
     },
 
     ["scenarios_spinner"] = {
@@ -1287,6 +1452,7 @@ Labels = {
         {iso = "fr-FR", text = "Arrêt du scénario..."},
         {iso = "it-IT", text = "Fermate lo scenario..."},
         {iso = "pt-BR", text = "Cenário de parada..."},
+        {iso = "ru-RU", text = "Сценарий остановки..."},
     },
 
     ["Remove Attachments"] = {
@@ -1295,6 +1461,7 @@ Labels = {
         {iso = "fr-FR", text = "Déposer Les Objets"},
         {iso = "it-IT", text = "Oggetti A Caduta"},
         {iso = "pt-BR", text = "Soltar Objetos"},
+        {iso = "ru-RU", text = "Реквизит для падения"},
     },
 
     ["RemoveAttachments_tt"] = {
@@ -1303,14 +1470,16 @@ Labels = {
         {iso = "fr-FR", text = "Fait tomber ce qui est attaché à vous et arrête l'animation.\10Ce bouton peut éventuellement supprimer les objets attachés à vous par d'autres scripts ou par d'autres joueurs."},
         {iso = "it-IT", text = "Fa cadere tutto ciò che è attaccato a voi e interrompe l'animazione.\10Questo pulsante può eliminare gli oggetti attaccati all'utente da altri script o da altri giocatori."},
         {iso = "pt-BR", text = "Solta o que estiver preso a você e interrompe a animação.\10Esse botão pode excluir objetos presos a você por outros scripts ou por outros jogadores."},
+        {iso = "ru-RU", text = "Сбрасывает все, что к вам прикреплено, и останавливает анимацию.\10Эта кнопка может удалить прикрепления из других скриптов или объекты, прикрепленные к вам другими игроками."},
     },
 
     ["Movement Options:"] = {
-        {iso = "en-US", text = "Movement Options."},
+        {iso = "en-US", text = "Movement Options:"},
         {iso = "de-DE", text = "Bewegungsoptionen:"},
         {iso = "fr-FR", text = "Options De Mouvement :"},
         {iso = "it-IT", text = "Opzioni Di Movimento:"},
         {iso = "pt-BR", text = "Opções De Movimento:"},
+        {iso = "ru-RU", text = "Варианты передвижения."},
     },
 
     ["Play Animations On NPCs:"] = {
@@ -1319,6 +1488,7 @@ Labels = {
         {iso = "fr-FR", text = "Jouer des animations sur les PNJ :"},
         {iso = "it-IT", text = "Riprodurre animazioni sui PNG:"},
         {iso = "pt-BR", text = "Reproduzir animações em NPCs:"},
+        {iso = "ru-RU", text = "Воспроизведение анимации у NPC:"},
     },
 
     ["Play Scenarios On NPCs:"] = {
@@ -1327,6 +1497,7 @@ Labels = {
         {iso = "fr-FR", text = "Jouer des scénarios sur les PNJ :"},
         {iso = "it-IT", text = "Riprodurre scenari sui PNG:"},
         {iso = "pt-BR", text = "Reproduzir cenários em NPCs:"},
+        {iso = "ru-RU", text = "Воспроизведение анимации у NPC:"},
     },
 
 
@@ -1336,6 +1507,7 @@ Labels = {
         {iso = "fr-FR", text = "Faire naître des PNJ en mode Dieu."},
         {iso = "it-IT", text = "Generare PNG in modalità Dio."},
         {iso = "pt-BR", text = "Gera NPCs no Modo Deus."},
+        {iso = "ru-RU", text = "Порождение NPC в режиме бога."},
     },
 
     ["animKeys_tt"] = {
@@ -1344,6 +1516,7 @@ Labels = {
         {iso = "fr-FR", text = "Utilisez des touches de raccourci expérimentales pour jouer les animations. Ces touches de raccourci peuvent interférer avec le gameplay, c'est pourquoi il existe une option pour les désactiver.\10-[PAGE UP] : Fait défiler la liste vers le haut.\10-[PAGE DOWN] : Défilement vers le bas de la liste.\10-[DEL] : Lecture.\10-[G] : Stop."},
         {iso = "it-IT", text = "Utilizzare i tasti di scelta rapida sperimentali per riprodurre le animazioni. Questi tasti di scelta rapida possono interferire con il gioco, per cui è disponibile un'opzione per disabilitarli.\1010Impostazione attuale:\10-[PAGINA SU]: Scorre l'elenco verso l'alto.\10-[PAGINA GIÙ]: Scorre l'elenco verso il basso.\10-[DEL]: Riproduzione.\10-[G]: Stop."},
         {iso = "pt-BR", text = "Use teclas de atalho experimentais para reproduzir animações. Essas teclas de atalho podem interferir na jogabilidade, por isso há uma opção para desativá-las.\10\10Configuração atual:\10-[PAGE UP]: Rolar a lista para cima.\10-[PAGE DOWN]: Rolar a lista para baixo.\10-[DEL]: Reproduzir.\10-[G]: Parar."},
+        {iso = "ru-RU", text = "Используйте экспериментальные горячие клавиши для воспроизведения анимации. Эти горячие клавиши могут мешать игровому процессу, поэтому есть возможность их отключения.\10\10Текущая настройка:\10-[PAGE UP]: Прокрутить список вверх.\10-[PAGE DOWN]: Прокрутить список вниз.\10-[DEL]: Воспроизвести.\10-[G]: Стоп."},
     },
 
     ["clumsy_tt"] = {
@@ -1352,6 +1525,7 @@ Labels = {
         {iso = "fr-FR", text = "Vous fait trébucher et tomber lorsque vous entrez en collision avec n'importe quel objet.\10(Ne fonctionne pas avec 'Ragdoll On Demand')"},
         {iso = "it-IT", text = "Ti fa inciampare e cadere quando ti scontri con qualsiasi oggetto.\10(Non funziona con 'Ragdoll On Demand')"},
         {iso = "pt-BR", text = "Faz com que você tropece e caia ao colidir com qualquer objeto.\10(Não funciona com 'Ragdoll On Demand')"},
+        {iso = "ru-RU", text = "Заставляет вас спотыкаться и падать при столкновении с любым объектом.\10(Не работает с 'Ragdoll On Demand')"},
     },
 
     ["rod_tt"] = {
@@ -1360,6 +1534,7 @@ Labels = {
         {iso = "fr-FR", text = "Appuyez sur [X] sur le clavier ou sur [LT] sur la manette pour ragdoller instantanément. Plus vous maintenez le bouton enfoncé, plus vous restez au sol.\10(Ne fonctionne pas avec 'Clumsy')"},
         {iso = "it-IT", text = "Premi [X] sulla tastiera o [LT] sul controller per fare immediatamente Ragdoll. Più a lungo tieni premuto il pulsante, più a lungo rimani a terra.\10(Non funziona con 'Maldestro')"},
         {iso = "pt-BR", text = "Pressione [X] no teclado ou [LT] no controle para fazer Ragdoll instantaneamente. Quanto mais tempo você segurar o botão, mais tempo ficará no chão.\10(Não funciona com 'Clumsy')"},
+        {iso = "ru-RU", text = "Нажмите [X] на клавиатуре или [LT] на контроллере, чтобы мгновенно превратиться в Ragdoll. Чем дольше вы держите кнопку, тем дольше вы остаетесь на земле.\10 (Не работает с «Неуклюжим»)"},
     },
 
     ["radioStations_tt"] = {
@@ -1368,6 +1543,7 @@ Labels = {
         {iso = "fr-FR", text = "Ce n'est pas la même chose que la « Radio Mobile ». Tout le monde près de vous peut entendre la musique, à condition que vous ne soyez pas à la traîne et qu'il n'y ait pas de problèmes de synchronisation radio causés par le jeu ou le menu."},
         {iso = "it-IT", text = "Non è la stessa cosa della 'Radio Mobile'. Tutti coloro che si trovano nelle vicinanze possono sentire la musica, a patto che non ci sia un rallentamento e che non ci siano problemi di sincronizzazione della radio causati dal gioco o dal menu."},
         {iso = "pt-BR", text = "Isso não é o mesmo que 'Rádio Móvel'. Todos que estiverem perto de você poderão ouvir a música, desde que você não esteja com atraso e que não haja problemas de sincronização de rádio causados pelo jogo ou pelo menu."},
+        {iso = "ru-RU", text = "Это не то же самое, что «Мобильное радио». Все, кто находится рядом с вами, слышат музыку, при условии, что вы не лагаете и нет проблем с синхронизацией радио, вызванных игрой или меню."},
     },
 
     ["reserved_button"] = {
@@ -1376,6 +1552,7 @@ Labels = {
         {iso = "fr-FR", text = "Le bouton que vous avez choisi est réservé ! Veuillez en choisir un autre."},
         {iso = "it-IT", text = "Il pulsante scelto è riservato! Si prega di sceglierne uno diverso."},
         {iso = "pt-BR", text = "O botão que você escolheu está reservado! Por favor, escolha um botão diferente."},
+        {iso = "ru-RU", text = "Выбранная вами кнопка зарезервирована! Пожалуйста, выберите другую."},
     },
 
     ["animShortcut_btn"] = {
@@ -1384,6 +1561,7 @@ Labels = {
         {iso = "fr-FR", text = "Créer Un Raccourci"},
         {iso = "it-IT", text = "Creare Una Scorciatoia"},
         {iso = "pt-BR", text = "Criar Atalho"},
+        {iso = "ru-RU", text = "Создать ярлык"},
     },
 
     ["animShortcut_tt"] = {
@@ -1392,6 +1570,7 @@ Labels = {
         {iso = "fr-FR", text = "Associer un bouton qui jouera l'animation sélectionnée à tout moment."},
         {iso = "it-IT", text = "Associa un pulsante che riproduce l'animazione selezionata in qualsiasi momento."},
         {iso = "pt-BR", text = "Associe um botão que reproduzirá a animação selecionada a qualquer momento."},
+        {iso = "ru-RU", text = "Создайте кнопку, которая будет воспроизводить выбранную анимацию в любое время."},
     },
 
     ["removeShortcut_btn"] = {
@@ -1400,6 +1579,7 @@ Labels = {
         {iso = "fr-FR", text = "Supprimer Le Raccourci"},
         {iso = "it-IT", text = "Rimuovere La Scorciatoia"},
         {iso = "pt-BR", text = "Remover Atalho"},
+        {iso = "ru-RU", text = "Удалить ярлык"},
     },
 
     ["removeShortcut_btn2"] = {
@@ -1408,6 +1588,7 @@ Labels = {
         {iso = "fr-FR", text = "Supprimer Le Raccourci D'animation"},
         {iso = "it-IT", text = "Rimuovere La Scorciatoia Per L'animazione"},
         {iso = "pt-BR", text = "Remover Atalho De Animação"},
+        {iso = "ru-RU", text = "Удалить ярлык анимации"},
     },
 
     ["removeShortcut_tt"] = {
@@ -1416,6 +1597,7 @@ Labels = {
         {iso = "fr-FR", text = "Réinitialiser le bouton de raccourci associé à cette animation."},
         {iso = "it-IT", text = "Ripristina il pulsante di scelta rapida associato a questa animazione."},
         {iso = "pt-BR", text = "Redefinir o botão de atalho associado a essa animação."},
+        {iso = "ru-RU", text = "Сбросьте кнопку быстрого доступа, связанную с этой анимацией."},
     },
 
     ["no_shortcut_tt"] = {
@@ -1424,6 +1606,7 @@ Labels = {
         {iso = "fr-FR", text = "Il n'y a pas de bouton associé à une animation."},
         {iso = "it-IT", text = "Non esiste un pulsante associato a un'animazione."},
         {iso = "pt-BR", text = "Não há nenhum botão associado a uma animação."},
+        {iso = "ru-RU", text = "С анимацией не ассоциируется ни одна кнопка."},
     },
 
     ["input_waiting"] = {
@@ -1432,6 +1615,7 @@ Labels = {
         {iso = "fr-FR", text = "Appuyez sur une touche"},
         {iso = "it-IT", text = "Premere un tasto qualsiasi "},
         {iso = "pt-BR", text = "Pressione qualquer tecla "},
+        {iso = "ru-RU", text = "Нажмите любую клавишу "},
     },
 
     ["generic_confirm_btn"] = {
@@ -1440,6 +1624,7 @@ Labels = {
         {iso = "fr-FR", text = "Confirmer"},
         {iso = "it-IT", text = "Confermare"},
         {iso = "pt-BR", text = "Confirmar"},
+        {iso = "ru-RU", text = "Подтвердите"},
     },
 
     ["generic_clear_btn"] = {
@@ -1448,6 +1633,7 @@ Labels = {
         {iso = "fr-FR", text = "Effacer"},
         {iso = "it-IT", text = "Eliminare"},
         {iso = "pt-BR", text = "Excluir"},
+        {iso = "ru-RU", text = "Очистить"},
     },
 
     ["generic_cancel_btn"] = {
@@ -1456,6 +1642,7 @@ Labels = {
         {iso = "fr-FR", text = "Annuler"},
         {iso = "it-IT", text = "Annullare"},
         {iso = "pt-BR", text = "Cancelar"},
+        {iso = "ru-RU", text = "Отмена"},
     },
 
     ["shortcut_success_1/2"] = {
@@ -1464,6 +1651,7 @@ Labels = {
         {iso = "fr-FR", text = "Le raccourci a bien été enregistré. Vous pouvez désormais utiliser "},
         {iso = "it-IT", text = "Il collegamento è stato salvato. Ora è possibile utilizzare "},
         {iso = "pt-BR", text = "O atalho foi salvo. Agora você pode usar o "},
+        {iso = "ru-RU", text = "Анимационный ярлык успешно сохранен. Теперь вы можете нажать "},
     },
 
     ["shortcut_success_2/2"] = {
@@ -1472,6 +1660,7 @@ Labels = {
         {iso = "fr-FR", text = " pour jouer cette animation à tout moment."},
         {iso = "it-IT", text = " per riprodurre questa animazione in qualsiasi momento."},
         {iso = "pt-BR", text = " para reproduzir essa animação a qualquer momento."},
+        {iso = "ru-RU", text = " чтобы воспроизвести эту анимацию в любое время."},
     },
 
     ["kamikazeDrivers_tt"] = {
@@ -1480,6 +1669,7 @@ Labels = {
         {iso = "fr-FR", text = "Transforme tous les conducteurs proches de vous en maniaques suicidaires."},
         {iso = "it-IT", text = "Trasforma tutti gli automobilisti vicini in maniaci suicidi."},
         {iso = "pt-BR", text = "Transforma todos os motoristas próximos a você em maníacos suicidas."},
+        {iso = "ru-RU", text = "Превращает всех водителей рядом с вами в маньяков-самоубийц."},
     },
 
     ["Create"] = {
@@ -1488,6 +1678,7 @@ Labels = {
         {iso = "fr-FR", text = "Créer"},
         {iso = "it-IT", text = "Creare"},
         {iso = "pt-BR", text = "Criar"},
+        {iso = "ru-RU", text = "Создать"},
     },
 
     ["vcreator_tt"] = {
@@ -1496,6 +1687,7 @@ Labels = {
         {iso = "fr-FR", text = "Commencez par créer un véhicule. Le premier que vous créez sera toujours le véhicule principal auquel les autres seront attachés.\10Lorsque vous créez plus d'un véhicule, d'autres widgets d'interface utilisateur apparaîtront pour vous permettre de gérer tous les véhicules créés:\10- Supprimer\10- Attacher\10- Ajuster la position de l'attache\10- Sauvegarder"},
         {iso = "it-IT", text = "Iniziare con la creazione di un veicolo. Il primo che viene generato sarà sempre il veicolo principale a cui verranno agganciati gli altri.\10Quando si genera più di un veicolo, appariranno altri widget dell'interfaccia utente che permetteranno di gestire tutti i veicoli generati:\10 - Elimina\10 - Attacca\10 - Regola la posizione di attacco\10 - Salva"},
         {iso = "pt-BR", text = "Comece gerando um veículo. O primeiro que você gerar será sempre o veículo principal ao qual os outros serão anexados.\10Quando você gerar mais de um veículo, outros widgets da interface do usuário aparecerão, permitindo que você gerencie todos os veículos gerados:\10 - Excluir\10 - Anexar\10 - Ajustar a posição de anexação\10 - Salvar"},
+        {iso = "ru-RU", text = "Начните с порождения транспортного средства. Первая машина всегда будет основной, к которой будут прикрепляться остальные.\10Когда вы породите более одной машины, появятся другие виджеты пользовательского интерфейса, позволяющие управлять всеми порожденными машинами:\10 - Удалить\10 - Прикрепить\10 - Отрегулировать положение прикрепления\10 - Сохранить"},
     },
 
     ["vc_saved_vehs"] = {
@@ -1504,6 +1696,7 @@ Labels = {
         {iso = "fr-FR", text = "Véhicules Sauvegardés"},
         {iso = "it-IT", text = "Veicoli Salvati"},
         {iso = "pt-BR", text = "Veículos Salvos"},
+        {iso = "ru-RU", text = "Сохраненные транспортные средства"},
     },
 
     ["vc_saved_vehs_tt"] = {
@@ -1512,6 +1705,7 @@ Labels = {
         {iso = "fr-FR", text = "Vous n'avez pas de véhicules sauvegardés. Cette option sera débloquée après la création et la sauvegarde d'un véhicule."},
         {iso = "it-IT", text = "Non ci sono veicoli salvati. Questa opzione verrà sbloccata dopo aver creato e salvato un veicolo."},
         {iso = "pt-BR", text = "Você não tem nenhum veículo salvo. Essa opção será desbloqueada depois que você criar e salvar um veículo."},
+        {iso = "ru-RU", text = "У вас нет ни одного сохраненного автомобиля. Эта опция будет открыта после того, как вы создадите и сохраните автомобиль."},
     },
 
     ["widebodycivic_Btn"] = {
@@ -1520,6 +1714,7 @@ Labels = {
         {iso = "fr-FR", text = "Générer Une 'Widebody Civic'"},
         {iso = "it-IT", text = "Generare Una 'Widebody Civic'"},
         {iso = "pt-BR", text = "Gerar Um 'Widebody Civic'"},
+        {iso = "ru-RU", text = "Создайте «Широкоплечий Civic"},
     },
 
     ["widebodycivic_tt"] = {
@@ -1528,6 +1723,7 @@ Labels = {
         {iso = "fr-FR", text = "Génère, crée et enregistre une Honda Civic (Sugoi) à carrosserie large comme exemple simple de ce que le créateur de véhicule peut faire."},
         {iso = "it-IT", text = "Genera, créa e salva una Honda Civic (Sugoi) corpo largo come semplice esempio di ciò che il creatore di veicoli può fare."},
         {iso = "pt-BR", text = "Gera, cria e salva um Honda Civic (Sugoi) de corpo largo como um exemplo simples do que o criador de veículos pode fazer."},
+        {iso = "ru-RU", text = "Создает, порождает и сохраняет широкофюзеляжный Honda Civic (Sugoi) в качестве простого примера того, на что способен создатель автомобиля."},
     },
 
     ["vc_main_veh"] = {
@@ -1536,6 +1732,7 @@ Labels = {
         {iso = "fr-FR", text = "Véhicule Principal: "},
         {iso = "it-IT", text = "Veicolo Principale: "},
         {iso = "pt-BR", text = "Veículo Principal: "},
+        {iso = "ru-RU", text = "Основной автомобиль: "},
     },
 
     ["vc_spawned_vehs"] = {
@@ -1544,6 +1741,7 @@ Labels = {
         {iso = "fr-FR", text = "Véhicules Secondaires :"},
         {iso = "it-IT", text = "Veicoli Secondari:"},
         {iso = "pt-BR", text = "Veículos Secundários:"},
+        {iso = "ru-RU", text = "Вторичные транспортные средства:"},
     },
 
     ["vc_attach_btn"] = {
@@ -1552,6 +1750,7 @@ Labels = {
         {iso = "fr-FR", text = "Attacher À "},
         {iso = "it-IT", text = "Allegare A "},
         {iso = "pt-BR", text = "Anexar A "},
+        {iso = "ru-RU", text = "Прикрепить к "},
     },
 
     ["generic_veh_delete_fail"] = {
@@ -1560,6 +1759,7 @@ Labels = {
         {iso = "fr-FR", text = "Échec de la suppression du véhicule !"},
         {iso = "it-IT", text = "Impossibile cancellare il veicolo!"},
         {iso = "pt-BR", text = "Falha ao excluir o veículo!"},
+        {iso = "ru-RU", text = "Не удалось удалить автомобиль!"},
     },
 
     ["vc_alrattached_err"] = {
@@ -1568,6 +1768,7 @@ Labels = {
         {iso = "fr-FR", text = "Ce véhicule est déjà attaché."},
         {iso = "it-IT", text = "Questo veicolo è già collegato."},
         {iso = "pt-BR", text = "Esse veículo já está acoplado."},
+        {iso = "ru-RU", text = "Этот автомобиль уже прикреплен."},
     },
 
     ["vc_selfattach_err"] = {
@@ -1576,6 +1777,7 @@ Labels = {
         {iso = "fr-FR", text = "Il n'est pas possible d'attacher un véhicule à lui-même !"},
         {iso = "it-IT", text = "Non si può attaccare un veicolo a se stesso!"},
         {iso = "pt-BR", text = "Não é possível acoplar um veículo a si mesmo!"},
+        {iso = "ru-RU", text = "Вы не можете прикрепить транспортное средство к себе!"},
     },
 
     ["generic_multiplier_label"] = {
@@ -1584,6 +1786,7 @@ Labels = {
         {iso = "fr-FR", text = "Multiplicateur :"},
         {iso = "it-IT", text = "Moltiplicatore:"},
         {iso = "pt-BR", text = "Multiplicador:"},
+        {iso = "ru-RU", text = "Множитель:"},
     },
 
     ["vc_choose_name_hint"] = {
@@ -1592,6 +1795,7 @@ Labels = {
         {iso = "fr-FR", text = "Choisissez un nom"},
         {iso = "it-IT", text = "Scegliete un nome"},
         {iso = "pt-BR", text = "Escolha um nome"},
+        {iso = "ru-RU", text = "Выберите имя"},
     },
 
     ["vc_same_name_err"] = {
@@ -1600,6 +1804,7 @@ Labels = {
         {iso = "fr-FR", text = "Vous avez déjà un véhicule portant le même nom !"},
         {iso = "it-IT", text = "Avete già un veicolo con lo stesso nome!"},
         {iso = "pt-BR", text = "Você já tem um veículo com o mesmo nome!"},
+        {iso = "ru-RU", text = "У вас уже есть автомобиль с таким же названием!"},
     },
 
     ["vc_saved_msg"] = {
@@ -1608,6 +1813,7 @@ Labels = {
         {iso = "fr-FR", text = "Votre véhicule a été sauvegardé."},
         {iso = "it-IT", text = "Il vostro veicolo è stato salvato."},
         {iso = "pt-BR", text = "Seu veículo foi salvo."},
+        {iso = "ru-RU", text = "Ваш автомобиль был сохранен."},
     },
 
     ["vc_save_err"] = {
@@ -1616,6 +1822,7 @@ Labels = {
         {iso = "fr-FR", text = "Veuillez choisir un nom pour votre véhicule !"},
         {iso = "it-IT", text = "Scegliete un nome per il vostro veicolo!"},
         {iso = "pt-BR", text = "Escolha um nome para seu veículo!"},
+        {iso = "ru-RU", text = "Пожалуйста, выберите имя для вашего автомобиля!"},
     },
 
     ["vc_spawn_persist"] = {
@@ -1624,6 +1831,7 @@ Labels = {
         {iso = "fr-FR", text = "Spawn Persistant"},
         {iso = "it-IT", text = "Spawn Persistente"},
         {iso = "pt-BR", text = "Geração Persistente"},
+        {iso = "ru-RU", text = "Спаун стойкий"},
     },
 
     ["vc_delete_persist"] = {
@@ -1632,6 +1840,7 @@ Labels = {
         {iso = "fr-FR", text = "Retirer De La Liste"},
         {iso = "it-IT", text = "Rimuovere Dall'elenco"},
         {iso = "pt-BR", text = "Remover Da Lista"},
+        {iso = "ru-RU", text = "Удалить из списка"},
     },
 
     ["vc_delete_msg"] = {
@@ -1640,6 +1849,7 @@ Labels = {
         {iso = "fr-FR", text = "Votre véhicule enregistré a été supprimé."},
         {iso = "it-IT", text = "Il veicolo salvato è stato cancellato."},
         {iso = "pt-BR", text = "Seu veículo salvo foi excluído."},
+        {iso = "ru-RU", text = "Ваш сохраненный автомобиль был удален."},
     },
 
     ["Gambling"] = {
@@ -1868,8 +2078,8 @@ Labels = {
     },
 
     ["hacker"] = {
-        {iso = "en-US", text = "Hacker"}, -- technically we don't need to translate this but I'm keeping it in case
-        {iso = "de-DE", text = "Hacker"}, -- someone contributes Chinese, Russian or Japanese translations
+        {iso = "en-US", text = "Hacker"},
+        {iso = "de-DE", text = "Hacker"},
         {iso = "fr-FR", text = "Hacker"},
         {iso = "it-IT", text = "Hacker"},
         {iso = "pt-BR", text = "Hacker"},
@@ -1979,7 +2189,7 @@ function translateLabel(g)
             logMsg = false
         end
     else
-        retStr = tostring(g) .. " [LABEL NOT FOUND!]"
+        retStr = tostring(g) .. " [MISSING LABEL!]"
     end
     return retStr
 end

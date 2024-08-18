@@ -1,0 +1,54 @@
+name: Issue Report
+description: Create an issue report to help improve the script
+title: "[Issue]: "
+labels: issue
+body:
+- type: textarea
+  attributes:
+    label: Describe the issue
+    description: A clear description of what the problem is.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Steps To Reproduce
+    description: Steps to reproduce the behavior.
+    placeholder: |
+      1. Go to '...'
+      2. Click on '...'
+      3. Scroll down to '...'
+      4. See error
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Log
+    description: |
+      The log can be found under %AppData%\YimMenu\cout.log
+
+      Tip: To easily upload your log file you can rename cout.log to cout.txt or zip it then drag and drop it here. Alternatively you can just open it and copy/paste its contents.
+    value: |
+      <!-- Place your logs here -->
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Screenshot / Video
+    description: |
+      If you think the issue can be better explained with a screenshot or a video then consider adding it here.
+
+      Tip: You can attach images/videos by clicking this area to highlight it then dragging files in.
+    value: |
+      <!-- drag and drop your image or video here -->
+  validations:
+    required: false
+
+- type: textarea
+  attributes:
+    label: Additional context
+    description: Add any other context about the issue here.
+  validations:
+    required: false
