@@ -803,7 +803,9 @@ Actions:add_imgui(function()
     ImGui.PushItemWidth(345)
     displayFilteredAnims()
     ImGui.PopItemWidth()
-    info = filteredAnims[anim_index + 1]
+    if filteredAnims ~= nil then
+      info = filteredAnims[anim_index + 1]
+    end
     ImGui.Separator(); manualFlags, used = ImGui.Checkbox("Edit Flags", manualFlags, true)
     if used then
       lua_cfg.save("manualFlags", manualFlags)
@@ -4066,7 +4068,7 @@ world_tab:add_imgui(function()
     local hijackData = hijackOptions[grp_anim_index + 1]
     ImGui.SameLine()
     if not hijack_started then
-      if ImGui.Button(translateLabel("  " .. "generic_play_btn") "  ##hjStart") then
+      if ImGui.Button("  " .. translateLabel("generic_play_btn") .. "  ##hjStart") then
         UI.widgetSound("Select")
         script.run_in_fiber(function(hjk)
           local gta_peds = entities.get_all_peds_as_handles()
