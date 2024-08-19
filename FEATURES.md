@@ -20,7 +20,7 @@
     - Makes you stumble and fall when you collide with objects and sidewalks.
   - **Ragdoll On Demand:**
     - Gives you the ability to make your character fall whenever you want by pressing [X] on keyboard. Note that this feature can knock you off bikes whenever you press the button *(kinda funny)*.
-  -**Ragdoll Sound:**
+  - **Ragdoll Sound:**
     - Online Only: Plays a hurt/panicked ped sound when the player ragdolls.
 
 - **Actions:**
