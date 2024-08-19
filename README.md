@@ -42,6 +42,9 @@
 - [ ] Improve and merge [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier). *Probably*
 - [ ] Add new features. ⚙️ In-progress...
 
+## Known Issues:
+- Object Spawner: When saving a new creation, you'll have to reload the script to see the correct new addition, otherwise it will have a different name and you will not be able to sawn it.
+
 ## Credits
 
 | Awesome Person                                    | Contribution                                                  |
