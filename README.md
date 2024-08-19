@@ -1,8 +1,6 @@
 # Samurais-Scripts
-A base for a Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and centered around roleplaying and having fun in a game full of ad bots and toxic cheaters.
-
-> [!NOTE]
-> This is still a work in progress.
+### A base for a Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and centered around roleplaying and having fun in a game full of ad bots and toxic cheaters.
+###  
 
 ## Contributing To Translations
 #### Editing a pre-existing language:
