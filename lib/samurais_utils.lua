@@ -578,13 +578,174 @@ UI = {
 ----------------------------------------------- Script Specific -------------------------------------------------
 
 -- As in Samurai's Scripts, not Schutzstaffel 🙄
-SS = {}
+SS = {
+
+  ---Resets changes done by the script.
+  handle_events = function()
+    if attached_ped ~= nil and attached_ped ~= 0 then
+      ENTITY.DETACH_ENTITY(attached_ped, true, true)
+      ENTITY.FREEZE_ENTITY_POSITION(attached_ped, false)
+      TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
+      PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
+      TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+    end
+
+    if grabbed_veh ~= nil and grabbed_veh ~= 0 then
+      ENTITY.DETACH_ENTITY(grabbed_veh, true, true)
+      TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+    end
+
+    if attached_vehicle ~= nil and attached_vehicle ~= 0 then
+      local modelHash         = ENTITY.GET_ENTITY_MODEL(attached_vehicle)
+      local attachedVehicle   = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(PED.GET_VEHICLE_PED_IS_USING(self.get_ped()),
+        modelHash)
+      local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(attached_vehicle, false)
+      local playerForwardX    = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
+      local playerForwardY    = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+      controlled              = entities.take_control_of(attachedVehicle, 300)
+      if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) then
+        if controlled then
+          ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
+          ENTITY.SET_ENTITY_COORDS(attachedVehicle, attachedVehcoords.x - (playerForwardX * 10),
+            attachedVehcoords.y - (playerForwardY * 10), playerPosition.z, false, false, false, false)
+          VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(attached_vehicle, 5.0)
+          attached_vehicle = 0
+        end
+      end
+    end
+
+    if spawned_props[1] ~= nil then
+      for _, p in ipairs(spawned_props) do
+        if ENTITY.DOES_ENTITY_EXIST(p) then
+          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p)
+          ENTITY.DELETE_ENTITY(p)
+        end
+      end
+    end
+
+    if selfAttachments[1] ~= nil then
+      for _, v in ipairs(selfAttachments) do
+        ENTITY.DETACH_ENTITY(v, true, true)
+      end
+    end
+
+    if vehAttachments[1] ~= nil then
+      for _, v in ipairs(vehAttachments) do
+        ENTITY.DETACH_ENTITY(v, true, true)
+      end
+    end
+
+    if currentMvmt ~= "" then
+      PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0.0)
+    end
+
+    if currentWmvmt ~= "" then
+      PED.RESET_PED_WEAPON_MOVEMENT_CLIPSET(self.get_ped())
+    end
+
+    if currentStrf ~= "" then
+      PED.RESET_PED_STRAFE_CLIPSET(self.get_ped())
+    end
+
+    if clumsy then
+      PED.SET_PED_RAGDOLL_ON_COLLISION(self.get_ped(), false)
+    end
+    WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(self.get_ped(), 3839837909)
+
+    if is_playing_anim then
+      if anim_music then
+        if ENTITY.DOES_ENTITY_EXIST(pBus) then
+          ENTITY.DELETE_ENTITY(pBus)
+        end
+        if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
+          ENTITY.DELETE_ENTITY(dummyDriver)
+        end
+      end
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      if selfPTFX[1] ~= nil then
+        for _, v in ipairs(selfPTFX) do
+          GRAPHICS.STOP_PARTICLE_FX_LOOPED(v)
+        end
+      end
+      local current_coords = self.get_pos()
+      if PED.IS_PED_IN_ANY_VEHICLE(self.get_ped(), false) then
+        local veh    = PED.GET_VEHICLE_PED_IS_USING(self.get_ped())
+        local mySeat = Game.getPedVehicleSeat(self.get_ped())
+        PED.SET_PED_INTO_VEHICLE(self.get_ped(), veh, mySeat)
+      else
+        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(self.get_ped(), current_coords.x, current_coords.y, current_coords.z, true,
+          false, false)
+      end
+      if plyrProps[1] ~= nil then
+        for _, v in ipairs(plyrProps) do
+          if ENTITY.DOES_ENTITY_EXIST(v) then
+            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v)
+            ENTITY.DELETE_ENTITY(v)
+          end
+        end
+      end
+    end
+
+    if spawned_npcs[1] ~= nil then
+      for _, v in ipairs(spawned_npcs) do
+        if ENTITY.DOES_ENTITY_EXIST(v) then
+          ENTITY.DELETE_ENTITY(v)
+        end
+      end
+    end
+
+    if is_playing_scenario then
+      TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+      if ENTITY.DOES_ENTITY_EXIST(bbq) then
+        ENTITY.DELETE_ENTITY(bbq)
+      end
+    end
+
+    if is_playing_radio then
+      if ENTITY.DOES_ENTITY_EXIST(pBus) then
+        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(pBus)
+        ENTITY.DELETE_ENTITY(pBus)
+      end
+      if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
+        ENTITY.DELETE_ENTITY(dummyDriver)
+      end
+    end
+
+    if is_handsUp then
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+    end
+
+    if isCrouched then
+      PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
+    end
+
+    if disable_waves then
+      Game.World.disableOceanWaves(false)
+    end
+
+    if autopilot_waypoint or autopilot_objective or autopilot_random then
+      if Game.Self.isDriving() then
+        TASK.CLEAR_PED_TASKS(self.get_ped())
+        TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+        autopilot_waypoint  = false
+        autopilot_objective = false
+        autopilot_random    = false
+      end
+    end
+  end,
+}
 
 
 ----------------------------------------------- GTA Funcs -------------------------------------------------------
 Game = {
 
-  -- Returns GTA V's current build number.
+  --[[
+  
+   Returns GTA V's current build number.
+
+   **Credits:** [sch-lda](https://github.com/sch-lda)
+
+  ]]
   ---@return string
   GetBuildNumber = function()
     local game_build = memory.scan_pattern("8B C3 33 D2 C6 44 24 20"):add(0x24):rip()

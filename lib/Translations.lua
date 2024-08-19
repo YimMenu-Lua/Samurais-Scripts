@@ -925,7 +925,7 @@ Labels = {
     },
 
     ["DisableSound"] = {
-        {iso = "en-US", text = "Disable UI Sound"},
+        {iso = "en-US", text = "Disable UI Sounds"},
         {iso = "de-DE", text = "UI-Ton Deaktivieren"},
         {iso = "fr-FR", text = "Désactiver Le Son De l'IU"},
         {iso = "it-IT", text = "Disattivare Il Suono Dell'IU"},
@@ -940,6 +940,24 @@ Labels = {
         {iso = "it-IT", text = "Disabilita il feedback sonoro dai widget dell'interfaccia utente."},
         {iso = "pt-BR", text = "Desative o feedback sonoro dos widgets da interface do usuário."},
         {iso = "ru-RU", text = "Отключите звуковую обратную связь с виджетами графического интерфейса."},
+    },
+
+    ["flightMusicCB"] = {
+        {iso = "en-US", text = "Disable Flight Music"},
+        {iso = "de-DE", text = "Flugmusik deaktivieren"},
+        {iso = "fr-FR", text = "Désactiver La Musique De Vol"},
+        {iso = "it-IT", text = "Disattivare La Musica Di Volo"},
+        {iso = "pt-BR", text = "Desativar Música De Voo"},
+        {iso = "ru-RU", text = "Отключить музыку полета"},
+    },
+
+    ["flightMusic_tt"] = {
+        {iso = "en-US", text = "Désactive la musique d'ambiance qui est automatiquement diffusée lorsque vous pilotez un avion."},
+        {iso = "de-DE", text = "Deaktiviert die Hintergrundmusik, die automatisch abgespielt wird, wenn Sie ein Flugzeug fliegen."},
+        {iso = "fr-FR", text = "Désactive la musique d'ambiance qui est automatiquement diffusée lorsque vous pilotez un avion."},
+        {iso = "it-IT", text = "Disattiva la musica ambientale che viene riprodotta automaticamente quando si vola su un aereo."},
+        {iso = "pt-BR", text = "Desativa a música ambiente que é reproduzida automaticamente quando você está pilotando uma aeronave."},
+        {iso = "ru-RU", text = "Отключает окружающую музыку, которая автоматически воспроизводится во время полета на самолете."},
     },
 
     ["langTitle"] = {

@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.1.6' -- v1.1.6
+SCRIPT_VERSION = '1.1.7' -- v1.1.7
 TARGET_BUILD   = '3274'  -- Only YimResupplier needs a version check.
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -22,6 +22,7 @@ local start_loading_anim = false
 default_config           = {
   shortcut_anim           = {},
   saved_vehicles          = {},
+  persist_attachments     = {},
   Regen                   = false,
   -- objectiveTP             = false,
   disableTooltips         = false,
@@ -31,6 +32,7 @@ default_config           = {
   lockpick                = false,
   rod                     = false,
   clumsy                  = false,
+  ragdoll_sound           = false,
   manualFlags             = false,
   controllable            = false,
   looped                  = false,
@@ -82,6 +84,7 @@ default_config           = {
   unbreakableWindows      = false,
   real_plane_speed        = false,
   extend_world            = false,
+  disableFlightMusic      = false,
   nosPower                = 10,
   lightSpeed              = 1,
   DriftPowerIncrease      = 1,
@@ -107,6 +110,7 @@ replacePointAct          = lua_cfg.read("replacePointAct")
 disableActionMode        = lua_cfg.read("disableActionMode")
 rod                      = lua_cfg.read("rod")
 clumsy                   = lua_cfg.read("clumsy")
+ragdoll_sound            = lua_cfg.read("ragdoll_sound")
 manualFlags              = lua_cfg.read("manualFlags")
 controllable             = lua_cfg.read("controllable")
 looped                   = lua_cfg.read("looped")
@@ -152,6 +156,7 @@ flares_forall            = lua_cfg.read("flares_forall")
 real_plane_speed         = lua_cfg.read("real_plane_speed")
 unbreakableWindows       = lua_cfg.read("unbreakableWindows")
 extend_world             = lua_cfg.read("extend_world")
+disableFlightMusic       = lua_cfg.read("disableFlightMusic")
 tab1Sound                = true
 tab2Sound                = true
 tab3Sound                = true
@@ -199,6 +204,7 @@ world_extended           = false
 autopilot_waypoint       = false
 autopilot_objective      = false
 autopilot_random         = false
+flight_music_off         = false
 flag                     = 0
 grp_anim_index           = 0
 attached_ped             = 0
@@ -583,6 +589,15 @@ self_tab:add_imgui(function()
           "This option will not work if you're blocking ragdoll. Please make sure 'No Ragdoll' option is disabled in YimMennu.")
       end
     end)
+  end
+
+  if rod or clumsy then
+    ragdoll_sound, rgdlsnd = ImGui.Checkbox("Ragdoll Sound", ragdoll_sound, true)
+    UI.helpMarker(false, "Your online character will make a hurt/scared sound when ragdolling.")
+    if rgdlsnd then
+      UI.widgetSound("Nav2")
+      lua_cfg.save("ragdoll_sound", ragdoll_sound)
+    end
   end
 end)
 
@@ -986,7 +1001,7 @@ Actions:add_imgui(function()
             end)
           end
           UI.coloredText("Selected Animation:  ", "green", 0.9, 20); ImGui.SameLine(); ImGui.Text("« " ..
-          chosen_anim.name .. " »")
+            chosen_anim.name .. " »")
           ImGui.Dummy(1, 10)
           if btn_name == nil then
             start_loading_anim = true
@@ -1499,7 +1514,7 @@ weapon_tab:add_imgui(function()
   end
   if laserSight then
     ImGui.Text(translateLabel("laserChoice_txt"))
-    ImGui.SameLine(); laser_switch, lsrswUsed   = ImGui.RadioButton("Red", laser_switch, 0)
+    ImGui.SameLine(); laser_switch, lsrswUsed = ImGui.RadioButton("Red", laser_switch, 0)
     ImGui.SameLine(); laser_switch, lsrswUsed_2 = ImGui.RadioButton("Green", laser_switch, 1)
     if lsrswUsed then
       UI.widgetSound("Nav")
@@ -1703,11 +1718,15 @@ function shoot_flares(script)
 end
 
 vehicle_tab:add_imgui(function()
-  local manufacturer  = Game.Vehicle.manufacturer(current_vehicle)
-  local vehicle_name  = Game.Vehicle.name(current_vehicle)
-  local full_veh_name = manufacturer .. " " .. vehicle_name
-  local vehicle_class = Game.Vehicle.class(current_vehicle)
-  ImGui.SeparatorText(full_veh_name .. "   (" .. vehicle_class .. ")")
+  if current_vehicle ~= nil and current_vehicle ~= 0 then
+    local manufacturer  = Game.Vehicle.manufacturer(current_vehicle)
+    local vehicle_name  = Game.Vehicle.name(current_vehicle)
+    local full_veh_name = manufacturer .. " " .. vehicle_name
+    local vehicle_class = Game.Vehicle.class(current_vehicle)
+    ImGui.SeparatorText(full_veh_name .. "   (" .. vehicle_class .. ")")
+  else
+    ImGui.SeparatorText("Footsies")
+  end
   ImGui.Spacing(); limitVehOptions, lvoUsed = ImGui.Checkbox(translateLabel("lvoCB"), limitVehOptions, true)
   UI.toolTip(false, translateLabel("lvo_tt"))
   if lvoUsed then
@@ -1839,7 +1858,7 @@ vehicle_tab:add_imgui(function()
   end
 
   ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); keepWheelsTurned, kwtrnd = ImGui.Checkbox(
-  "Keep Wheels Turned", keepWheelsTurned, true)
+    "Keep Wheels Turned", keepWheelsTurned, true)
   UI.toolTip(false, translateLabel("wheelsturned_tt"))
   if kwtrnd then
     UI.widgetSound("Nav2")
@@ -1877,7 +1896,7 @@ vehicle_tab:add_imgui(function()
   end
 
   ImGui.SameLine(); ImGui.Dummy(46, 1); ImGui.SameLine(); real_plane_speed, rpsUsed = ImGui.Checkbox(
-  "Higher Plane Speeds", real_plane_speed, true)
+    "Higher Plane Speeds", real_plane_speed, true)
   UI.toolTip(false, translateLabel("planeSpeed_tt"))
   if rpsUsed then
     UI.widgetSound("Nav2")
@@ -1937,10 +1956,10 @@ vehicle_tab:add_imgui(function()
     local bool = is_plane or is_heli
     ImGui.BeginDisabled(not bool)
     if ImGui.Button(" Fly To Waypoint ") then
+      UI.widgetSound("Select")
       script.run_in_fiber(function()
         local wp = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_WAYPOINT_BLIP_ENUM_ID())
         if HUD.DOES_BLIP_EXIST(wp) then
-          UI.widgetSound("Select")
           local waypoint_coords = HUD.GET_BLIP_COORDS(wp)
           if autopilot_objective or autopilot_random then
             TASK.CLEAR_PED_TASKS(self.get_ped())
@@ -1957,64 +1976,65 @@ vehicle_tab:add_imgui(function()
             end
             TASK.TASK_PLANE_MISSION(
               self.get_ped(), current_vehicle, 0, 0, waypoint_coords.x, waypoint_coords.y, waypoint_coords.z + 600,
-            4, 100.0, 0, 90, 0, 0, 200
-          )
+              4, 100.0, 0, 90, 0, 0, 200
+            )
           elseif is_heli then
             TASK.TASK_HELI_MISSION(
               self.get_ped(), current_vehicle, 0, 0, waypoint_coords.x, waypoint_coords.y, waypoint_coords.z,
-            4, 50.0, 4.0, -1, -1, 100, 100.0, 0
-          )
+              4, 50.0, 4.0, -1, -1, 100, 100.0, 0
+            )
           end
           gui.show_success("Samurai's Scripts", "Flying towards your waypoint")
         else
-          UI.widgetSound("Error")
           gui.show_warning("Samurai's Scripts", "Please set a waypoint on the map first!")
         end
       end)
     end
     ImGui.SameLine()
     if ImGui.Button(" Fly To Objective ") then
-      local objective_coords
-      for _, id in pairs(objectives_T) do
-        local blip = HUD.GET_CLOSEST_BLIP_INFO_ID(id)
-        if HUD.DOES_BLIP_EXIST(blip) then
-          objective_coords = HUD.GET_BLIP_COORDS(blip)
-          break
-        end
-      end
-      if objective_coords ~= nil then
-        UI.widgetSound("Select")
-        if autopilot_waypoint or autopilot_random then
-          TASK.CLEAR_PED_TASKS(self.get_ped())
-          TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
-        end
-        autopilot_waypoint  = false
-        autopilot_objective = true
-        autopilot_random    = false
-        if is_plane then
-          if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
-            if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
-              VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
-            end
+      UI.widgetSound("Select")
+      script.run_in_fiber(function()
+        local objective_coords
+        for _, id in pairs(objectives_T) do
+          local blip = HUD.GET_CLOSEST_BLIP_INFO_ID(id)
+          if HUD.DOES_BLIP_EXIST(blip) then
+            objective_coords = HUD.GET_BLIP_COORDS(blip)
+            break
           end
-          TASK.TASK_PLANE_MISSION(
-            self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z + 600,
-          4, 100.0, 0, 90, 0, 0, 200
-        )
-        elseif is_heli then
-          TASK.TASK_HELI_MISSION(
-            self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z,
-          4, 50.0, 4.0, -1, -1, 100, 100.0, 0
-        )
         end
-        gui.show_success("Samurai's Scripts", "Flying towards objective")
-      else
-        UI.widgetSound("Error")
-        gui.show_warning("Samurai's Scripts", "No objective found!")
-      end
+        if objective_coords ~= nil then
+          if autopilot_waypoint or autopilot_random then
+            TASK.CLEAR_PED_TASKS(self.get_ped())
+            TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+          end
+          autopilot_waypoint  = false
+          autopilot_objective = true
+          autopilot_random    = false
+          if is_plane then
+            if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
+              if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
+                VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+              end
+            end
+            TASK.TASK_PLANE_MISSION(
+              self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z + 600,
+              4, 100.0, 0, 90, 0, 0, 200
+            )
+          elseif is_heli then
+            TASK.TASK_HELI_MISSION(
+              self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z,
+              4, 50.0, 4.0, -1, -1, 100, 100.0, 0
+            )
+          end
+          gui.show_success("Samurai's Scripts", "Flying towards objective")
+        else
+          gui.show_warning("Samurai's Scripts", "No objective found!")
+        end
+      end)
     end
     ImGui.SameLine()
     if ImGui.Button(" Random ") then
+      UI.widgetSound("Select")
       script.run_in_fiber(function()
         if autopilot_waypoint or autopilot_objective then
           TASK.CLEAR_PED_TASKS(self.get_ped())
@@ -2030,21 +2050,24 @@ vehicle_tab:add_imgui(function()
             end
           end
           TASK.TASK_PLANE_MISSION(
-            self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000), math.random(400, 900),
-          4, 100.0, 0, 90, 0, 0, 200
-        )
+            self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000),
+            math.random(400, 900),
+            4, 100.0, 0, 90, 0, 0, 200
+          )
         elseif is_heli then
           TASK.TASK_HELI_MISSION(
-            self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000), math.random(10, 300),
-          4, 50.0, 4.0, -1, -1, 100, 100.0, 0
-        )
+            self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000),
+            math.random(10, 300),
+            4, 50.0, 4.0, -1, -1, 100, 100.0, 0
+          )
         end
         gui.show_success("Samurai's Scripts", "Flying towards some random coordinates")
       end)
     end
     if autopilot_waypoint or autopilot_objective or autopilot_random then
       ImGui.Dummy(160, 1); ImGui.SameLine()
-      if ImGui.Button("Stop", 60, 40) then
+      if ImGui.Button("Stop", 60, 35) then
+        UI.widgetSound("Cancel")
         script.run_in_fiber(function()
           TASK.CLEAR_PED_TASKS(self.get_ped())
           TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
@@ -2056,10 +2079,13 @@ vehicle_tab:add_imgui(function()
     end
     ImGui.EndDisabled()
     if not bool then
-      UI.coloredText("You must be flying a plane or a helicopter to use these features.", 'yellow', 0.87, 20)
+      UI.coloredText("You must be flying a plane or a helicopter to use this feature.", 'yellow', 0.87, 20)
     end
+  else
+    UI.coloredText("You must be flying a plane or a helicopter to use this feature.", 'yellow', 0.87, 20)
   end
   ImGui.Dummy(1, 5); ImGui.SeparatorText("MISC")
+  ImGui.BeginDisabled(current_vehicle == 0)
   if ImGui.Button(" " .. translateLabel("engineSoundBtn") .. " ") then
     if is_car or is_bike or is_quad then
       UI.widgetSound("Select")
@@ -2139,7 +2165,7 @@ vehicle_tab:add_imgui(function()
         VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 0, false)
         VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 1, false)
         if ENTITY.DOES_ENTITY_EXIST(dummyCopCar) then
-          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(dummyCopCar)
+          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(dummyCopCar, true, true)
           deletecop:sleep(200)
           ENTITY.DELETE_ENTITY(dummyCopCar)
         end
@@ -2172,6 +2198,7 @@ vehicle_tab:add_imgui(function()
       VEHICLE.SET_VEHICLE_ENGINE_HEALTH(current_vehicle, engine_hp)
     end)
   end
+  ImGui.EndDisabled()
 end)
 
 drift_mode_tab = vehicle_tab:add_tab("Drift Mode")
@@ -2295,7 +2322,8 @@ drift_mode_tab:add_imgui(function()
         end
         if driftMinigame then
           ImGui.Dummy(1, 10)
-          UI.coloredText("Your Highest Score: ", 'yellow', 0.92, 20); ImGui.SameLine(); ImGui.Text(lua_Fn.separateInt(driftPB) .. " Points")
+          UI.coloredText("Your Highest Score: ", 'yellow', 0.92, 20); ImGui.SameLine(); ImGui.Text(lua_Fn.separateInt(
+            driftPB) .. " Points")
         end
       end
     else
@@ -2563,12 +2591,6 @@ attached_vehicles = { entity = 0, hash = 0, mods = {}, color_1 = { r = 0, g = 0,
 vehicle_creation  = { name = "", main_veh = 0, mods = {}, color_1 = { r = 0, g = 0, b = 0 }, color_2 = { r = 0, g = 0, b = 0 }, tint = 0, attachments = {} }
 saved_vehicles    = lua_cfg.read("saved_vehicles")
 
-script.register_looped("disableInput", function()
-  if is_typing then
-    PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
-  end
-end)
-
 local function updateFilteredVehicles()
   filtered_vehicles = {}
   for _, veh in ipairs(gta_vehicles_T) do
@@ -2744,14 +2766,14 @@ vehicle_creator:add_imgui(function()
   end
   if saved_vehicles[1] ~= nil then
     ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); persist_switch, pswChanged = ImGui.RadioButton(
-    translateLabel("vc_saved_vehs"), persist_switch, 1)
+      translateLabel("vc_saved_vehs"), persist_switch, 1)
     if pswChanged then
       UI.widgetSound("Nav")
     end
   else
     ImGui.BeginDisabled()
     ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); persist_switch, pswChanged = ImGui.RadioButton(
-    translateLabel("vc_saved_vehs"), persist_switch, 1)
+      translateLabel("vc_saved_vehs"), persist_switch, 1)
     ImGui.EndDisabled()
     UI.toolTip(false, translateLabel("vc_saved_vehs_tt"))
   end
@@ -2882,9 +2904,9 @@ vehicle_creator:add_imgui(function()
                 2, true, 1)
               attached_vehicles.entity                                                              = selectedVeh
               attached_vehicles.hash                                                                = ENTITY
-              .GET_ENTITY_MODEL(selectedVeh)
+                  .GET_ENTITY_MODEL(selectedVeh)
               attached_vehicles.name                                                                = vehicles
-              .get_vehicle_display_name(ENTITY.GET_ENTITY_MODEL(selectedVeh))
+                  .get_vehicle_display_name(ENTITY.GET_ENTITY_MODEL(selectedVeh))
               attached_vehicles.posx                                                                = veh_attach_X
               attached_vehicles.posy                                                                = veh_attach_Y
               attached_vehicles.posz                                                                = veh_attach_Z
@@ -2892,13 +2914,15 @@ vehicle_creator:add_imgui(function()
               attached_vehicles.roty                                                                = veh_attach_RY
               attached_vehicles.rotz                                                                = veh_attach_RZ
               attached_vehicles.tint                                                                = VEHICLE
-              .GET_VEHICLE_WINDOW_TINT(selectedVeh)
+                  .GET_VEHICLE_WINDOW_TINT(selectedVeh)
               attached_vehicles.color_1.r, attached_vehicles.color_1.g, attached_vehicles.color_1.b = VEHICLE
-              .GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(selectedVeh, attached_vehicles.color_1.r, attached_vehicles.color_1.g,
-                attached_vehicles.color_1.b)
+                  .GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(selectedVeh, attached_vehicles.color_1.r,
+                    attached_vehicles.color_1.g,
+                    attached_vehicles.color_1.b)
               attached_vehicles.color_2.r, attached_vehicles.color_2.g, attached_vehicles.color_2.b = VEHICLE
-              .GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(selectedVeh, attached_vehicles.color_2.r, attached_vehicles.color_2.g,
-                attached_vehicles.color_2.b)
+                  .GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(selectedVeh, attached_vehicles.color_2.r,
+                    attached_vehicles.color_2.g,
+                    attached_vehicles.color_2.b)
               appendVehicleMods(selectedVeh, attached_vehicles.mods)
               table.insert(veh_attachments, attached_vehicles)
               attached_vehicles = { entity = 0, hash = 0, mods = {}, color_1 = { r = 0, g = 0, b = 0 }, color_2 = { r = 0, g = 0, b = 0 }, tint = 0, posx = 0.0, posy = 0.0, posz = 0.0, rotx = 0.0, roty = 0.0, rotz = 0.0 }
@@ -3119,16 +3143,18 @@ vehicle_creator:add_imgui(function()
                 UI.widgetSound("Select")
                 vehicle_creation.name                                                              = creation_name
                 vehicle_creation.main_veh                                                          = ENTITY
-                .GET_ENTITY_MODEL(main_vehicle)
+                    .GET_ENTITY_MODEL(main_vehicle)
                 vehicle_creation.attachments                                                       = veh_attachments
                 vehicle_creation.tint                                                              = VEHICLE
-                .GET_VEHICLE_WINDOW_TINT(main_vehicle)
+                    .GET_VEHICLE_WINDOW_TINT(main_vehicle)
                 vehicle_creation.color_1.r, vehicle_creation.color_1.g, vehicle_creation.color_1.b = VEHICLE
-                .GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(main_vehicle, vehicle_creation.color_1.r, vehicle_creation.color_1.g,
-                  vehicle_creation.color_1.b)
+                    .GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(main_vehicle, vehicle_creation.color_1.r,
+                      vehicle_creation.color_1.g,
+                      vehicle_creation.color_1.b)
                 vehicle_creation.color_2.r, vehicle_creation.color_2.g, vehicle_creation.color_2.b = VEHICLE
-                .GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(main_vehicle, vehicle_creation.color_2.r, vehicle_creation.color_2
-                .g, vehicle_creation.color_2.b)
+                    .GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(main_vehicle, vehicle_creation.color_2.r,
+                      vehicle_creation.color_2
+                      .g, vehicle_creation.color_2.b)
                 appendVehicleMods(main_vehicle, vehicle_creation.mods)
                 start_loading_anim = true
                 save:sleep(500)
@@ -3320,401 +3346,406 @@ end
 
 casino_pacino:add_imgui(function()
   if Game.isOnline() then
-    ImGui.BeginTabBar("Dunk Pacino")
-    if ImGui.BeginTabItem(translateLabel("Gambling")) then
-      bypass_casino_bans, bcbUsed = ImGui.Checkbox(translateLabel("bypassCasinoCooldownCB"), bypass_casino_bans, true)
-      if bcbUsed then
-        UI.widgetSound("Nav2")
-        lua_cfg.save("bypass_casino_bans", bypass_casino_bans)
-      end
-      if not bypass_casino_bans then
-        UI.toolTip(true, translateLabel("casinoCDwarn"), "#FFCC00", 1)
-      end
-
-      ImGui.Spacing(); ImGui.Text(translateLabel("casinoCDstatus")); ImGui.SameLine()
-      ImGui.BulletText(casino_cooldown_update_str)
-
-      ImGui.Spacing(); ImGui.SeparatorText("Poker")
-      force_poker_cards, fpcUsed = ImGui.Checkbox(translateLabel("forcePokerCardsCB"), force_poker_cards, true)
-      if fpcUsed then
-        UI.widgetSound("Nav2")
-        lua_cfg.save("force_poker_cards", force_poker_cards)
-      end
-
-      set_dealers_poker_cards, sdpcUsed = ImGui.Checkbox(translateLabel("setDealersCardsCB"), set_dealers_poker_cards,
-        true)
-      if sdpcUsed then
-        UI.widgetSound("Nav2")
-        lua_cfg.save("set_dealers_poker_cards", set_dealers_poker_cards)
-      end
-
-      ImGui.Spacing(); ImGui.SeparatorText("Blackjack")
-      ImGui.Spacing(); ImGui.BulletText(translateLabel("faceDownCard")); ImGui.SameLine(); ImGui.Text(dealers_card_str); ImGui
-          .Spacing()
-      if ImGui.Button(translateLabel("dealerBustBtn")) then
-        UI.widgetSound("Select")
-        script.run_in_fiber(function(script)
-          local player_id = PLAYER.PLAYER_ID()
-          while NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", -1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 0, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 2, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 3, 0) ~= player_id do
-            network.force_script_host("blackjack")
-            gui.show_message("CasinoPacino", "Taking control of the blackjack script.") --If you see this spammed, someone is fighting you for control.
-            script:yield()
-          end
-          local blackjack_table = locals.get_int("blackjack",
-            blackjack_table_players + 1 + (player_id * blackjack_table_players_size) + 4)                                                   --The Player's current table he is sitting at.
-          if blackjack_table ~= -1 then
-            locals.set_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1, 11)
-            locals.set_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 2, 12)
-            locals.set_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 3, 13)
-            locals.set_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 12, 3)
-          end
-        end)
-      end
-
-      ImGui.Spacing(); ImGui.SeparatorText("Roulette")
-      force_roulette_wheel, frwUsed = ImGui.Checkbox(translateLabel("forceRouletteCB"), force_roulette_wheel, true)
-      if frwUsed then
-        UI.widgetSound("Nav2")
-        lua_cfg.save("force_roulette_wheel", force_roulette_wheel)
-      end
-
-      ImGui.Spacing(); ImGui.SeparatorText("Slot Machines")
-      rig_slot_machine, rsmUsed = ImGui.Checkbox(translateLabel("rigSlotsCB"), rig_slot_machine, true)
-      if rsmUsed then
-        UI.widgetSound("Nav2")
-        lua_cfg.save("rig_slot_machine", rig_slot_machine)
-      end
-
-      autoplay_slots, apsUsed = ImGui.Checkbox(translateLabel("autoplaySlotsCB"), autoplay_slots, true); ImGui.SameLine()
-      if apsUsed then
-        UI.widgetSound("Nav2")
-        lua_cfg.save("autoplay_slots", autoplay_slots)
-      end
-      if autoplay_slots then
-        autoplay_cap, apcapUsed = ImGui.Checkbox(translateLabel("autoplayCapCB"), autoplay_cap, true); ImGui.SameLine()
-        if apcapUsed then
+    if CURRENT_BUILD == TARGET_BUILD then
+      ImGui.BeginTabBar("Dunk Pacino")
+      if ImGui.BeginTabItem(translateLabel("Gambling")) then
+        bypass_casino_bans, bcbUsed = ImGui.Checkbox(translateLabel("bypassCasinoCooldownCB"), bypass_casino_bans, true)
+        if bcbUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("autoplay_cap", autoplay_cap)
+          lua_cfg.save("bypass_casino_bans", bypass_casino_bans)
         end
-        if autoplay_cap then
-          ImGui.PushItemWidth(200)
-          autoplay_chips_cap, chipsCapUsed = ImGui.InputInt("##chips_cap", autoplay_chips_cap, 1000, 100000,
-            ImGuiInputTextFlags.CharsDecimal)
-          ImGui.PopItemWidth()
-          if chipsCapUsed then
+        if not bypass_casino_bans then
+          UI.toolTip(true, translateLabel("casinoCDwarn"), "#FFCC00", 1)
+        end
+
+        ImGui.Spacing(); ImGui.Text(translateLabel("casinoCDstatus")); ImGui.SameLine()
+        ImGui.BulletText(casino_cooldown_update_str)
+
+        ImGui.Spacing(); ImGui.SeparatorText("Poker")
+        force_poker_cards, fpcUsed = ImGui.Checkbox(translateLabel("forcePokerCardsCB"), force_poker_cards, true)
+        if fpcUsed then
+          UI.widgetSound("Nav2")
+          lua_cfg.save("force_poker_cards", force_poker_cards)
+        end
+
+        set_dealers_poker_cards, sdpcUsed = ImGui.Checkbox(translateLabel("setDealersCardsCB"), set_dealers_poker_cards,
+          true)
+        if sdpcUsed then
+          UI.widgetSound("Nav2")
+          lua_cfg.save("set_dealers_poker_cards", set_dealers_poker_cards)
+        end
+
+        ImGui.Spacing(); ImGui.SeparatorText("Blackjack")
+        ImGui.Spacing(); ImGui.BulletText(translateLabel("faceDownCard")); ImGui.SameLine(); ImGui.Text(dealers_card_str); ImGui
+            .Spacing()
+        if ImGui.Button(translateLabel("dealerBustBtn")) then
+          UI.widgetSound("Select")
+          script.run_in_fiber(function(script)
+            local player_id = PLAYER.PLAYER_ID()
+            while NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", -1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 0, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 2, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 3, 0) ~= player_id do
+              network.force_script_host("blackjack")
+              gui.show_message("CasinoPacino", "Taking control of the blackjack script.") --If you see this spammed, someone is fighting you for control.
+              script:yield()
+            end
+            local blackjack_table = locals.get_int("blackjack",
+              blackjack_table_players + 1 + (player_id * blackjack_table_players_size) + 4) --The Player's current table he is sitting at.
+            if blackjack_table ~= -1 then
+              locals.set_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1, 11)
+              locals.set_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 2, 12)
+              locals.set_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 3, 13)
+              locals.set_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 12, 3)
+            end
+          end)
+        end
+
+        ImGui.Spacing(); ImGui.SeparatorText("Roulette")
+        force_roulette_wheel, frwUsed = ImGui.Checkbox(translateLabel("forceRouletteCB"), force_roulette_wheel, true)
+        if frwUsed then
+          UI.widgetSound("Nav2")
+          lua_cfg.save("force_roulette_wheel", force_roulette_wheel)
+        end
+
+        ImGui.Spacing(); ImGui.SeparatorText("Slot Machines")
+        rig_slot_machine, rsmUsed = ImGui.Checkbox(translateLabel("rigSlotsCB"), rig_slot_machine, true)
+        if rsmUsed then
+          UI.widgetSound("Nav2")
+          lua_cfg.save("rig_slot_machine", rig_slot_machine)
+        end
+
+        autoplay_slots, apsUsed = ImGui.Checkbox(translateLabel("autoplaySlotsCB"), autoplay_slots, true); ImGui
+            .SameLine()
+        if apsUsed then
+          UI.widgetSound("Nav2")
+          lua_cfg.save("autoplay_slots", autoplay_slots)
+        end
+        if autoplay_slots then
+          autoplay_cap, apcapUsed = ImGui.Checkbox(translateLabel("autoplayCapCB"), autoplay_cap, true); ImGui.SameLine()
+          if apcapUsed then
             UI.widgetSound("Nav2")
-            lua_cfg.save("autoplay_chips_cap", autoplay_chips_cap)
+            lua_cfg.save("autoplay_cap", autoplay_cap)
+          end
+          if autoplay_cap then
+            ImGui.PushItemWidth(200)
+            autoplay_chips_cap, chipsCapUsed = ImGui.InputInt("##chips_cap", autoplay_chips_cap, 1000, 100000,
+              ImGuiInputTextFlags.CharsDecimal)
+            ImGui.PopItemWidth()
+            if chipsCapUsed then
+              UI.widgetSound("Nav2")
+              lua_cfg.save("autoplay_chips_cap", autoplay_chips_cap)
+            end
           end
         end
-      end
 
-      ImGui.Spacing(); ImGui.SeparatorText("Lucky Wheel")
-      if ImGui.Button(translateLabel("podiumVeh_Btn")) then
-        script.run_in_fiber(function()
-          if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
-            UI.widgetSound("Select")
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 18)
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
-          else
-            UI.widgetSound("Error")
+        ImGui.Spacing(); ImGui.SeparatorText("Lucky Wheel")
+        if ImGui.Button(translateLabel("podiumVeh_Btn")) then
+          script.run_in_fiber(function()
+            if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
+              UI.widgetSound("Select")
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 18)
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
+            else
+              UI.widgetSound("Error")
+            end
+          end)
+        end
+        ImGui.SameLine()
+        if ImGui.Button(translateLabel("mysteryPrize_Btn")) then
+          script.run_in_fiber(function()
+            if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
+              UI.widgetSound("Select")
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 11)
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
+            else
+              UI.widgetSound("Error")
+            end
+          end)
+        end
+
+        ImGui.SameLine()
+        if ImGui.Button(translateLabel("50k_Btn")) then
+          script.run_in_fiber(function()
+            if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
+              UI.widgetSound("Select")
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 19)
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
+            else
+              UI.widgetSound("Error")
+            end
+          end)
+        end
+
+        if ImGui.Button(translateLabel("25k_Btn")) then
+          script.run_in_fiber(function()
+            if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
+              UI.widgetSound("Select")
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 15)
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
+            else
+              UI.widgetSound("Error")
+            end
+          end)
+        end
+
+        ImGui.SameLine(); ImGui.Dummy(6, 1); ImGui.SameLine()
+        if ImGui.Button(translateLabel("15k_Btn")) then
+          script.run_in_fiber(function()
+            if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
+              UI.widgetSound("Select")
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 17)
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
+            else
+              UI.widgetSound("Error")
+            end
+          end)
+        end
+
+        ImGui.SameLine(); ImGui.Dummy(21, 1); ImGui.SameLine()
+        if ImGui.Button(translateLabel("%_Btn")) then
+          script.run_in_fiber(function()
+            if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
+              UI.widgetSound("Select")
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 4)
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
+            else
+              UI.widgetSound("Error")
+            end
+          end)
+        end
+
+        if ImGui.Button(translateLabel("clothing_Btn")) then
+          script.run_in_fiber(function()
+            if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
+              UI.widgetSound("Select")
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 8)
+              locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
+            else
+              UI.widgetSound("Error")
+            end
+          end)
+        end
+        ImGui.EndTabItem()
+      end
+      if ImGui.BeginTabItem("Casino Heist") then
+        ImGui.PushItemWidth(165)
+        new_approach, approach_clicked = ImGui.Combo(translateLabel("approach"), casino_heist_approach,
+          { "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" }, 4) --You gotta sneak the word in there, like you're sneaking in food to a movie theater. Tuck it in your jacket for later, then when they least suspect it, deploy the word.
+        if approach_clicked then
+          script.run_in_fiber(function()
+            stats.set_int("MPX_H3OPT_APPROACH", new_approach)
+          end)
+        end
+        ImGui.SameLine(); ImGui.Dummy(24, 0); ImGui.SameLine()
+        local new_target, target_clicked = ImGui.Combo(translateLabel("target"), casino_heist_target,
+          { "Money", "Gold", "Art", "Diamonds" }, 4)
+        if target_clicked then
+          script.run_in_fiber(function()
+            stats.set_int("MPX_H3OPT_TARGET", new_target)
+          end)
+        end
+        local new_last_approach, last_approach_clicked = ImGui.Combo(translateLabel("last_approach"),
+          casino_heist_last_approach, { "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" }, 4)
+        if last_approach_clicked then
+          script.run_in_fiber(function()
+            stats.set_int("MPX_H3_LAST_APPROACH", new_last_approach)
+          end)
+        end
+        ImGui.SameLine()
+        local new_hard_approach, hard_approach_clicked = ImGui.Combo(translateLabel("hard_approach"), casino_heist_hard,
+          { "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" }, 4)
+        if hard_approach_clicked then
+          script.run_in_fiber(function()
+            stats.set_int("MPX_H3_HARD_APPROACH", new_hard_approach)
+          end)
+        end
+        ImGui.PopItemWidth()
+
+        ImGui.Spacing()
+        ImGui.PushItemWidth(165)
+        local new_gunman, gunman_clicked = ImGui.Combo(translateLabel("gunman"), casino_heist_gunman,
+          { "Unselected", "Karl Abolaji", "Gustavo Mota", "Charlie Reed", "Chester McCoy", "Patrick McReary" }, 6)
+        if gunman_clicked then
+          script.run_in_fiber(function()
+            stats.set_int("MPX_H3OPT_CREWWEAP", new_gunman)
+          end)
+        end
+        if casino_heist_gunman == 1 then --Karl Abolaji
+          ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
+          local karl_gun_list = { { '##1", "##2' }, { "Micro SMG Loadout", "Machine Pistol Loadout" }, { "Micro SMG Loadout", "Shotgun Loadout" }, { "Shotgun Loadout", "Revolver Loadout" } }
+          local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons,
+            karl_gun_list[casino_heist_approach + 1], 2)
+          if weapons_clicked then
+            script.run_in_fiber(function()
+              stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
+            end)
           end
-        end)
-      end
-      ImGui.SameLine()
-      if ImGui.Button(translateLabel("mysteryPrize_Btn")) then
-        script.run_in_fiber(function()
-          if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
-            UI.widgetSound("Select")
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 11)
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
-          else
-            UI.widgetSound("Error")
+        elseif casino_heist_gunman == 2 then --Gustavo Fring
+          ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
+          local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons,
+            { "Rifle Loadout", "Shotgun Loadout" }, 2)
+          if weapons_clicked then
+            script.run_in_fiber(function()
+              stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
+            end)
           end
-        end)
-      end
-
-      ImGui.SameLine()
-      if ImGui.Button(translateLabel("50k_Btn")) then
-        script.run_in_fiber(function()
-          if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
-            UI.widgetSound("Select")
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 19)
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
-          else
-            UI.widgetSound("Error")
+        elseif casino_heist_gunman == 3 then --Charlie Reed
+          ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
+          local charlie_gun_list = { { '##1", "##2' }, { "SMG Loadout", "Shotgun Loadout" }, { "Machine Pistol Loadout", "Shotgun Loadout" }, { "SMG Loadout", "Shotgun Loadout" } }
+          local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons,
+            charlie_gun_list[casino_heist_approach + 1], 2)
+          if weapons_clicked then
+            script.run_in_fiber(function()
+              stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
+            end)
           end
-        end)
-      end
-
-      if ImGui.Button(translateLabel("25k_Btn")) then
-        script.run_in_fiber(function()
-          if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
-            UI.widgetSound("Select")
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 15)
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
-          else
-            UI.widgetSound("Error")
+        elseif casino_heist_gunman == 4 then --Chester McCoy
+          ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
+          local chester_gun_list = { { '##1", "##2' }, { "MK II Shotgun Loadout", "MK II Rifle Loadout" }, { "MK II SMG Loadout", "MK II Rifle Loadout" }, { "MK II Shotgun Loadout", "MK II Rifle Loadout" } }
+          local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons,
+            chester_gun_list[casino_heist_approach + 1], 2)
+          if weapons_clicked then
+            script.run_in_fiber(function()
+              stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
+            end)
           end
-        end)
-      end
-
-      ImGui.SameLine(); ImGui.Dummy(6, 1); ImGui.SameLine()
-      if ImGui.Button(translateLabel("15k_Btn")) then
-        script.run_in_fiber(function()
-          if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
-            UI.widgetSound("Select")
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 17)
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
-          else
-            UI.widgetSound("Error")
+        elseif casino_heist_gunman == 5 then --Laddie Paddie Sadie Enweird
+          ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
+          local laddie_paddie_gun_list = { { '##1", "##2' }, { "Combat PDW Loadout", "Rifle Loadout" }, { "Shotgun Loadout", "Rifle Loadout" }, { "Shotgun Loadout", "Combat MG Loadout" } }
+          local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons,
+            laddie_paddie_gun_list[casino_heist_approach + 1], 2)
+          if weapons_clicked then
+            script.run_in_fiber(function()
+              stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
+            end)
           end
-        end)
-      end
+        end
 
-      ImGui.SameLine(); ImGui.Dummy(21, 1); ImGui.SameLine()
-      if ImGui.Button(translateLabel("%_Btn")) then
-        script.run_in_fiber(function()
-          if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
-            UI.widgetSound("Select")
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 4)
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
-          else
-            UI.widgetSound("Error")
+        local new_driver, driver_clicked = ImGui.Combo(translateLabel("driver"), casino_heist_driver,
+          { "Unselected", "Karim Deniz", "Taliana Martinez", "Eddie Toh", "Zach Nelson", "Chester McCoy" }, 6)
+        if driver_clicked then
+          script.run_in_fiber(function()
+            stats.set_int("MPX_H3OPT_CREWDRIVER", new_driver)
+          end)
+        end
+
+        if casino_heist_driver == 1 then --Karim Deniz
+          ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
+          local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars,
+            { "Issi Classic", "Asbo", "Kanjo", "Sentinel Classic" }, 4)
+          if car_clicked then
+            script.run_in_fiber(function()
+              stats.set_int("MPX_H3OPT_VEHS", new_car)
+            end)
           end
-        end)
-      end
-
-      if ImGui.Button(translateLabel("clothing_Btn")) then
-        script.run_in_fiber(function()
-          if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
-            UI.widgetSound("Select")
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 8)
-            locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
-          else
-            UI.widgetSound("Error")
+        elseif casino_heist_driver == 2 then --Taliana Martinez
+          ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
+          local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars,
+            { "Retinue MK II", "Drift Yosemite", "Sugoi", "Jugular" }, 4)
+          if car_clicked then
+            script.run_in_fiber(function()
+              stats.set_int("MPX_H3OPT_VEHS", new_car)
+            end)
           end
-        end)
-      end
-      ImGui.EndTabItem()
-    end
-    if ImGui.BeginTabItem("Casino Heist") then
-      ImGui.PushItemWidth(165)
-      new_approach, approach_clicked = ImGui.Combo(translateLabel("approach"), casino_heist_approach,
-        { "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" }, 4)                                                                                               --You gotta sneak the word in there, like you're sneaking in food to a movie theater. Tuck it in your jacket for later, then when they least suspect it, deploy the word.
-      if approach_clicked then
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3OPT_APPROACH", new_approach)
-        end)
-      end
-      ImGui.SameLine(); ImGui.Dummy(24, 0); ImGui.SameLine()
-      local new_target, target_clicked = ImGui.Combo(translateLabel("target"), casino_heist_target,
-        { "Money", "Gold", "Art", "Diamonds" }, 4)
-      if target_clicked then
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3OPT_TARGET", new_target)
-        end)
-      end
-      local new_last_approach, last_approach_clicked = ImGui.Combo(translateLabel("last_approach"),
-        casino_heist_last_approach, { "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" }, 4)
-      if last_approach_clicked then
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3_LAST_APPROACH", new_last_approach)
-        end)
-      end
-      ImGui.SameLine()
-      local new_hard_approach, hard_approach_clicked = ImGui.Combo(translateLabel("hard_approach"), casino_heist_hard,
-        { "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" }, 4)
-      if hard_approach_clicked then
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3_HARD_APPROACH", new_hard_approach)
-        end)
-      end
-      ImGui.PopItemWidth()
+        elseif casino_heist_driver == 3 then --Eddie Toh
+          ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
+          local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars,
+            { "Sultan Classic", "Guantlet Classic", "Ellie", "Komoda" }, 4)
+          if car_clicked then
+            script.run_in_fiber(function()
+              stats.set_int("MPX_H3OPT_VEHS", new_car)
+            end)
+          end
+        elseif casino_heist_driver == 4 then --Zach Nelson
+          ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
+          local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars,
+            { "Manchez", "Stryder", "Defiler", "Lectro" }, 4)
+          if car_clicked then
+            script.run_in_fiber(function()
+              stats.set_int("MPX_H3OPT_VEHS", new_car)
+            end)
+          end
+        elseif casino_heist_driver == 5 then --Chester McCoy
+          ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
+          local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars,
+            { "Zhaba", "Vagrant", "Outlaw", "Everon" }, 4)
+          if car_clicked then
+            script.run_in_fiber(function()
+              stats.set_int("MPX_H3OPT_VEHS", new_car)
+            end)
+          end
+        end
 
-      ImGui.Spacing()
-      ImGui.PushItemWidth(165)
-      local new_gunman, gunman_clicked = ImGui.Combo(translateLabel("gunman"), casino_heist_gunman,
-        { "Unselected", "Karl Abolaji", "Gustavo Mota", "Charlie Reed", "Chester McCoy", "Patrick McReary" }, 6)
-      if gunman_clicked then
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3OPT_CREWWEAP", new_gunman)
-        end)
-      end
-      if casino_heist_gunman == 1 then --Karl Abolaji
-        ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
-        local karl_gun_list = { { '##1", "##2' }, { "Micro SMG Loadout", "Machine Pistol Loadout" }, { "Micro SMG Loadout", "Shotgun Loadout" }, { "Shotgun Loadout", "Revolver Loadout" } }
-        local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons,
-          karl_gun_list[casino_heist_approach + 1], 2)
-        if weapons_clicked then
+        local new_hacker, hacker_clicked = ImGui.Combo(translateLabel("hacker"), casino_heist_hacker,
+          { "Unselected", "Rickie Lukens", "Christian Feltz", "Yohan Blair", "Avi Schwartzman", "Page Harris" }, 6)
+        if hacker_clicked then
           script.run_in_fiber(function()
-            stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
+            stats.set_int("MPX_H3OPT_CREWHACKER", new_hacker)
           end)
         end
-      elseif casino_heist_gunman == 2 then --Gustavo Fring
-        ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
-        local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons,
-          { "Rifle Loadout", "Shotgun Loadout" }, 2)
-        if weapons_clicked then
-          script.run_in_fiber(function()
-            stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
-          end)
-        end
-      elseif casino_heist_gunman == 3 then --Charlie Reed
-        ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
-        local charlie_gun_list = { { '##1", "##2' }, { "SMG Loadout", "Shotgun Loadout" }, { "Machine Pistol Loadout", "Shotgun Loadout" }, { "SMG Loadout", "Shotgun Loadout" } }
-        local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons,
-          charlie_gun_list[casino_heist_approach + 1], 2)
-        if weapons_clicked then
-          script.run_in_fiber(function()
-            stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
-          end)
-        end
-      elseif casino_heist_gunman == 4 then --Chester McCoy
-        ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
-        local chester_gun_list = { { '##1", "##2' }, { "MK II Shotgun Loadout", "MK II Rifle Loadout" }, { "MK II SMG Loadout", "MK II Rifle Loadout" }, { "MK II Shotgun Loadout", "MK II Rifle Loadout" } }
-        local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons,
-          chester_gun_list[casino_heist_approach + 1], 2)
-        if weapons_clicked then
-          script.run_in_fiber(function()
-            stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
-          end)
-        end
-      elseif casino_heist_gunman == 5 then --Laddie Paddie Sadie Enweird
-        ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
-        local laddie_paddie_gun_list = { { '##1", "##2' }, { "Combat PDW Loadout", "Rifle Loadout" }, { "Shotgun Loadout", "Rifle Loadout" }, { "Shotgun Loadout", "Combat MG Loadout" } }
-        local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("unmarked_weapons"), casino_heist_weapons,
-          laddie_paddie_gun_list[casino_heist_approach + 1], 2)
-        if weapons_clicked then
-          script.run_in_fiber(function()
-            stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
-          end)
-        end
-      end
 
-      local new_driver, driver_clicked = ImGui.Combo(translateLabel("driver"), casino_heist_driver,
-        { "Unselected", "Karim Deniz", "Taliana Martinez", "Eddie Toh", "Zach Nelson", "Chester McCoy" }, 6)
-      if driver_clicked then
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3OPT_CREWDRIVER", new_driver)
-        end)
-      end
-
-      if casino_heist_driver == 1 then --Karim Deniz
-        ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
-        local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars,
-          { "Issi Classic", "Asbo", "Kanjo", "Sentinel Classic" }, 4)
-        if car_clicked then
+        local new_masks, masks_clicked = ImGui.Combo(translateLabel("masks"), casino_heist_masks,
+          { "Unselected", "Geometric Set", "Hunter Set", "Oni Half Mask Set", "Emoji Set", "Ornate Skull Set",
+            "Lucky Fruit Set", "Gurilla Set", "Clown Set", "Animal Set", "Riot Set", "Oni Set", "Hockey Set" }, 13)
+        if masks_clicked then
           script.run_in_fiber(function()
-            stats.set_int("MPX_H3OPT_VEHS", new_car)
+            stats.set_int("MPX_H3OPT_MASKS", new_masks)
           end)
         end
-      elseif casino_heist_driver == 2 then --Taliana Martinez
-        ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
-        local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars,
-          { "Retinue MK II", "Drift Yosemite", "Sugoi", "Jugular" }, 4)
-        if car_clicked then
+
+        heist_cart_autograb, hcagUsed = ImGui.Checkbox(translateLabel("autograb"), heist_cart_autograb, true)
+        if hcagUsed then
+          UI.widgetSound("Nav2")
+          lua_cgf.save("heist_cart_autograb", heist_cart_autograb)
+        end
+
+        if ImGui.Button(translateLabel("Unlock All Heist Options")) then
+          UI.widgetSound("Select")
           script.run_in_fiber(function()
-            stats.set_int("MPX_H3OPT_VEHS", new_car)
+            stats.set_int("MPX_H3OPT_ACCESSPOINTS", -1)
+            stats.set_int("MPX_H3OPT_POI", -1)
+            stats.set_int("MPX_H3OPT_BITSET0", -1)
+            stats.set_int("MPX_H3OPT_BITSET1", -1)
+            stats.set_int("MPX_H3OPT_BODYARMORLVL", 3)
+            stats.set_int("MPX_H3OPT_DISRUPTSHIP", 3)
+            stats.set_int("MPX_H3OPT_KEYLEVELS", 2)
+            stats.set_int("MPX_H3_COMPLETEDPOSIX", 0)
+            stats.set_int("MPX_CAS_HEIST_FLOW", -1)
+            stats.set_int("MPPLY_H3_COOLDOWN", 0)
+            stats.set_packed_stat_bool(26969, true) --Unlock High Roller
           end)
         end
-      elseif casino_heist_driver == 3 then --Eddie Toh
-        ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
-        local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars,
-          { "Sultan Classic", "Guantlet Classic", "Ellie", "Komoda" }, 4)
-        if car_clicked then
-          script.run_in_fiber(function()
-            stats.set_int("MPX_H3OPT_VEHS", new_car)
-          end)
+
+        if ImGui.Button(translateLabel("%0_ai_cuts_Btn")) then
+          UI.widgetSound("Select")
+          tunables.set_int("CH_LESTER_CUT", 0)
+          tunables.set_int("HEIST3_PREPBOARD_GUNMEN_KARL_CUT", 0)
+          tunables.set_int("HEIST3_PREPBOARD_GUNMEN_GUSTAVO_CUT", 0)
+          tunables.set_int("HEIST3_PREPBOARD_GUNMEN_CHARLIE_CUT", 0)
+          tunables.set_int("HEIST3_PREPBOARD_GUNMEN_CHESTER_CUT", 0)
+          tunables.set_int("HEIST3_PREPBOARD_GUNMEN_PATRICK_CUT", 0)
+          tunables.set_int("HEIST3_DRIVERS_KARIM_CUT", 0)
+          tunables.set_int("HEIST3_DRIVERS_TALIANA_CUT", 0)
+          tunables.set_int("HEIST3_DRIVERS_EDDIE_CUT", 0)
+          tunables.set_int("HEIST3_DRIVERS_ZACH_CUT", 0)
+          tunables.set_int("HEIST3_DRIVERS_CHESTER_CUT", 0)
+          tunables.set_int("HEIST3_HACKERS_CHRISTIAN_CUT", 0)
+          tunables.set_int("HEIST3_HACKERS_YOHAN_CUT", 0)
+          tunables.set_int("HEIST3_HACKERS_AVI_CUT", 0)
+          tunables.set_int("HEIST3_HACKERS_RICKIE_CUT", 0)
+          tunables.set_int("HEIST3_HACKERS_PAIGE_CUT", 0)
+          tunables.set_int("HEIST3_FINALE_CLEAN_VEHICLE", 0)
+          tunables.set_int("HEIST3_FINALE_DECOY_GUNMAN", 0)
         end
-      elseif casino_heist_driver == 4 then --Zach Nelson
-        ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
-        local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars,
-          { "Manchez", "Stryder", "Defiler", "Lectro" }, 4)
-        if car_clicked then
-          script.run_in_fiber(function()
-            stats.set_int("MPX_H3OPT_VEHS", new_car)
-          end)
+
+        if ImGui.Button(translateLabel("%100_p_cuts_Btn")) then
+          UI.widgetSound("Select")
+          for i = 1, 4, 1 do
+            globals.set_int(gb_casino_heist_planning + gb_casino_heist_planning_cut_offset + i, 100)
+          end
         end
-      elseif casino_heist_driver == 5 then --Chester McCoy
-        ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
-        local new_car, car_clicked = ImGui.Combo(translateLabel("getaways"), casino_heist_cars,
-          { "Zhaba", "Vagrant", "Outlaw", "Everon" }, 4)
-        if car_clicked then
-          script.run_in_fiber(function()
-            stats.set_int("MPX_H3OPT_VEHS", new_car)
-          end)
-        end
+        ImGui.EndTabItem()
       end
-
-      local new_hacker, hacker_clicked = ImGui.Combo(translateLabel("hacker"), casino_heist_hacker,
-        { "Unselected", "Rickie Lukens", "Christian Feltz", "Yohan Blair", "Avi Schwartzman", "Page Harris" }, 6)
-      if hacker_clicked then
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3OPT_CREWHACKER", new_hacker)
-        end)
-      end
-
-      local new_masks, masks_clicked = ImGui.Combo(translateLabel("masks"), casino_heist_masks,
-        { "Unselected", "Geometric Set", "Hunter Set", "Oni Half Mask Set", "Emoji Set", "Ornate Skull Set",
-          "Lucky Fruit Set", "Gurilla Set", "Clown Set", "Animal Set", "Riot Set", "Oni Set", "Hockey Set" }, 13)
-      if masks_clicked then
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3OPT_MASKS", new_masks)
-        end)
-      end
-
-      heist_cart_autograb, hcagUsed = ImGui.Checkbox(translateLabel("autograb"), heist_cart_autograb, true)
-      if hcagUsed then
-        UI.widgetSound("Nav2")
-        lua_cgf.save("heist_cart_autograb", heist_cart_autograb)
-      end
-
-      if ImGui.Button(translateLabel("Unlock All Heist Options")) then
-        UI.widgetSound("Select")
-        script.run_in_fiber(function()
-          stats.set_int("MPX_H3OPT_ACCESSPOINTS", -1)
-          stats.set_int("MPX_H3OPT_POI", -1)
-          stats.set_int("MPX_H3OPT_BITSET0", -1)
-          stats.set_int("MPX_H3OPT_BITSET1", -1)
-          stats.set_int("MPX_H3OPT_BODYARMORLVL", 3)
-          stats.set_int("MPX_H3OPT_DISRUPTSHIP", 3)
-          stats.set_int("MPX_H3OPT_KEYLEVELS", 2)
-          stats.set_int("MPX_H3_COMPLETEDPOSIX", 0)
-          stats.set_int("MPX_CAS_HEIST_FLOW", -1)
-          stats.set_int("MPPLY_H3_COOLDOWN", 0)
-          stats.set_packed_stat_bool(26969, true) --Unlock High Roller
-        end)
-      end
-
-      if ImGui.Button(translateLabel("%0_ai_cuts_Btn")) then
-        UI.widgetSound("Select")
-        tunables.set_int("CH_LESTER_CUT", 0)
-        tunables.set_int("HEIST3_PREPBOARD_GUNMEN_KARL_CUT", 0)
-        tunables.set_int("HEIST3_PREPBOARD_GUNMEN_GUSTAVO_CUT", 0)
-        tunables.set_int("HEIST3_PREPBOARD_GUNMEN_CHARLIE_CUT", 0)
-        tunables.set_int("HEIST3_PREPBOARD_GUNMEN_CHESTER_CUT", 0)
-        tunables.set_int("HEIST3_PREPBOARD_GUNMEN_PATRICK_CUT", 0)
-        tunables.set_int("HEIST3_DRIVERS_KARIM_CUT", 0)
-        tunables.set_int("HEIST3_DRIVERS_TALIANA_CUT", 0)
-        tunables.set_int("HEIST3_DRIVERS_EDDIE_CUT", 0)
-        tunables.set_int("HEIST3_DRIVERS_ZACH_CUT", 0)
-        tunables.set_int("HEIST3_DRIVERS_CHESTER_CUT", 0)
-        tunables.set_int("HEIST3_HACKERS_CHRISTIAN_CUT", 0)
-        tunables.set_int("HEIST3_HACKERS_YOHAN_CUT", 0)
-        tunables.set_int("HEIST3_HACKERS_AVI_CUT", 0)
-        tunables.set_int("HEIST3_HACKERS_RICKIE_CUT", 0)
-        tunables.set_int("HEIST3_HACKERS_PAIGE_CUT", 0)
-        tunables.set_int("HEIST3_FINALE_CLEAN_VEHICLE", 0)
-        tunables.set_int("HEIST3_FINALE_DECOY_GUNMAN", 0)
-      end
-
-      if ImGui.Button(translateLabel("%100_p_cuts_Btn")) then
-        UI.widgetSound("Select")
-        for i = 1, 4, 1 do
-          globals.set_int(gb_casino_heist_planning + gb_casino_heist_planning_cut_offset + i, 100)
-        end
-      end
-      ImGui.EndTabItem()
+    else
+      ImGui.Dummy(1, 5); ImGui.Text("Outdated.")
     end
   else
     ImGui.Dummy(1, 5); ImGui.Text(translateLabel("Unavailable in Single Player"))
@@ -4035,7 +4066,7 @@ world_tab:add_imgui(function()
     local hijackData = hijackOptions[grp_anim_index + 1]
     ImGui.SameLine()
     if not hijack_started then
-      if ImGui.Button(translateLabel("  " .. "generic_play_btn")"  ##hjStart") then
+      if ImGui.Button(translateLabel("  " .. "generic_play_btn") "  ##hjStart") then
         UI.widgetSound("Select")
         script.run_in_fiber(function(hjk)
           local gta_peds = entities.get_all_peds_as_handles()
@@ -4146,70 +4177,67 @@ world_tab:add_imgui(function()
   end
 end)
 
-object_spawner               = world_tab:add_tab("Object Spawner")
-local coords                 = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
-local heading                = ENTITY.GET_ENTITY_HEADING(self.get_ped())
-local forwardX               = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-local forwardY               = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
-local objects_search         = ""
-local propName               = ""
-local invalidType            = ""
-local edit_mode              = false
-local activeX                = false
-local activeY                = false
-local activeZ                = false
-local rotX                   = false
-local rotY                   = false
-local rotZ                   = false
-local attached               = false
-local attachToSelf           = false
-local attachToVeh            = false
-local previewStarted         = false
-local isChanged              = false
-local showInvalidObjText     = false
-local blacklisted_obj        = false
-local prop                   = 0
-local propHash               = 0
-local os_switch              = 0
-local prop_index             = 0
-local objects_index          = 0
-local spawned_index          = 0
-local selectedObject         = 0
-local axisMult               = 1
-local selected_bone          = 0
-local previewEntity          = 0
-local currentObjectPreview   = 0
-local attached_index         = 0
-local zOffset                = 0
-local spawned_props          = {}
-local spawnedNames           = {}
-local filteredSpawnNames     = {}
-local selfAttachments        = {}
-local selfAttachNames        = {}
-local vehAttachments         = {}
-local vehAttachNames         = {}
-local filteredVehAttachNames = {}
-local filteredAttachNames    = {}
-local spawnDistance          = { x = 0, y = 0, z = 0 }
-local spawnRot               = { x = 0, y = 0, z = 0 }
-local attachPos              = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
+object_spawner         = world_tab:add_tab("Object Spawner")
+local coords           = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
+local heading          = ENTITY.GET_ENTITY_HEADING(self.get_ped())
+local forwardX         = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
+local forwardY         = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+objects_search         = ""
+propName               = ""
+invalidType            = ""
+saved_props_name       = ""
+edit_mode              = false
+activeX                = false
+activeY                = false
+activeZ                = false
+rotX                   = false
+rotY                   = false
+rotZ                   = false
+attached               = false
+attachToSelf           = false
+attachToVeh            = false
+previewStarted         = false
+isChanged              = false
+showInvalidObjText     = false
+blacklisted_obj        = false
+spawned_persist_props  = false
+prop                   = 0
+propHash               = 0
+os_switch              = 0
+prop_index             = 0
+objects_index          = 0
+spawned_index          = 0
+selectedObject         = 0
+axisMult               = 1
+selected_bone          = 0
+previewEntity          = 0
+currentObjectPreview   = 0
+attached_index         = 0
+zOffset                = 0
+persist_prop_index     = 0
+spawned_props          = {}
+spawnedNames           = {}
+filteredSpawnNames     = {}
+selfAttachNames        = {}
+vehAttachments         = {}
+vehAttachNames         = {}
+filteredVehAttachNames = {}
+filteredAttachNames    = {}
+persist_prop_names     = {}
+spawned_persist_T      = {}
+attached_props         = {}
+spawnDistance          = { x = 0, y = 0, z = 0 }
+spawnRot               = { x = 0, y = 0, z = 0 }
+attachPos              = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
+prop_creation          = { name = "", props = {} }
+selfAttachments        = { entity = 0, hash = 0, bone = 0, posx = 0.0, posy = 0.0, posz = 0.0, rotx = 0.0, roty = 0.0, rotz = 0.0 }
+persist_attachments    = lua_cfg.read("persist_attachments")
 
 local function resetSliders()
   spawnDistance = { x = 0, y = 0, z = 0 }
   spawnRot      = { x = 0, y = 0, z = 0 }
   attachPos     = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
 end
-
-object_spawner:add_imgui(function()
-  ImGui.PushItemWidth(280)
-  objects_search, used = ImGui.InputTextWithHint("##searchObjects", translateLabel("search_hint"), objects_search, 32)
-  ImGui.PopItemWidth()
-  if ImGui.IsItemActive() then
-    is_typing = true
-  else
-    is_typing = false
-  end
-end)
 
 local function updateFilteredProps()
   filteredProps = {}
@@ -4321,115 +4349,128 @@ local function stopPreview()
   previewEntity       = 0
 end
 
+local function filterPersistProps()
+  filteredPersistProps = {}
+  if persist_attachments[1] ~= nil then
+    for _, t in ipairs(persist_attachments) do
+      table.insert(filteredPersistProps, t)
+    end
+  end
+end
+
+local function showPersistProps()
+  filterPersistProps()
+  for _, p in ipairs(filteredPersistProps) do
+    table.insert(persist_prop_names, p.name)
+  end
+  persist_prop_index, _ = ImGui.ListBox("##persist_props", persist_prop_index, persist_prop_names, #filteredPersistProps)
+end
+
 object_spawner:add_imgui(function()
-  os_switch, os_switchUsed = ImGui.RadioButton(translateLabel("Custom Objects"), os_switch, 0)
-  if os_switchUsed then
-    UI.widgetSound("Nav")
-  end
-  ImGui.SameLine(); os_switch, os_switchUsed = ImGui.RadioButton(translateLabel("All Objects"), os_switch, 1)
-  if os_switchUsed then
-    UI.widgetSound("Nav")
-  end
-  if os_switch == 0 then
-    ImGui.PushItemWidth(300)
-    displayFilteredProps()
+  ImGui.BeginTabBar("Object Spawner")
+  if ImGui.BeginTabItem("Spawn & Create") then
+    ImGui.Spacing(); os_switch, os_switchUsed = ImGui.RadioButton(translateLabel("Custom Objects"), os_switch, 0)
+    if os_switchUsed then
+      UI.widgetSound("Nav")
+    end
+    ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); os_switch, os_switchUsed = ImGui.RadioButton(
+      translateLabel("All Objects"), os_switch, 1)
+    ImGui.PushItemWidth(360)
+    objects_search, used = ImGui.InputTextWithHint("##searchObjects", translateLabel("search_hint"), objects_search, 32)
+    if ImGui.IsItemActive() then
+      is_typing = true
+    else
+      is_typing = false
+    end
+    if os_switchUsed then
+      UI.widgetSound("Nav")
+    end
+    if os_switch == 0 then
+      displayFilteredProps()
+      ImGui.PopItemWidth()
+    else
+      getAllObjects()
+    end
     ImGui.PopItemWidth()
-  else
-    ImGui.PushItemWidth(300)
-    getAllObjects()
-    ImGui.PopItemWidth()
-  end
-  ImGui.Spacing()
-  if blacklisted_obj then
-    ImGui.BeginDisabled()
+    ImGui.Spacing()
+    ImGui.BeginDisabled(blacklisted_obj)
     preview, _ = ImGui.Checkbox(translateLabel("Preview"), preview, true)
     ImGui.EndDisabled()
-  else
-    preview, previewUsed = ImGui.Checkbox(translateLabel("Preview"), preview, true)
     if previewUsed then
       UI.widgetSound("Nav2")
     end
-  end
-  if preview then
-    spawnCoords            = ENTITY.GET_ENTITY_COORDS(previewEntity, false)
-    previewLoop            = true
-    currentObjectPreview   = propHash
-    local previewObjectPos = ENTITY.GET_ENTITY_COORDS(previewEntity, false)
-    ImGui.Text(translateLabel("Move_FB")); ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine(); ImGui.Text(
-    translateLabel("Move_UD"))
-    ImGui.Dummy(10, 1); ImGui.SameLine()
-    ImGui.ArrowButton("##f2", 2)
-    if ImGui.IsItemActive() then
-      forwardX = forwardX * 0.1
-      forwardY = forwardY * 0.1
-      ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x + forwardX, previewObjectPos.y + forwardY,
-        previewObjectPos.z)
-    end
-    ImGui.SameLine()
-    ImGui.ArrowButton("##f3", 3)
-    if ImGui.IsItemActive() then
-      forwardX = forwardX * 0.1
-      forwardY = forwardY * 0.1
-      ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x - forwardX, previewObjectPos.y - forwardY,
-        previewObjectPos.z)
-    end
-    ImGui.SameLine()
-    ImGui.Dummy(60, 1); ImGui.SameLine()
-    ImGui.ArrowButton("##z2", 2)
-    if ImGui.IsItemActive() then
-      zOffset = zOffset + 0.01
-      ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z + 0.01)
-    end
-    ImGui.SameLine()
-    ImGui.ArrowButton("##z3", 3)
-    if ImGui.IsItemActive() then
-      zOffset = zOffset - 0.01
-      ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z - 0.01)
-    end
-  else
-    previewStarted = false
-    previewLoop    = false
-    zOffset        = 0.0
-    forwardX       = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-    forwardY       = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
-  end
-  if NETWORK.NETWORK_IS_SESSION_ACTIVE() then
-    if not preview then
+    if preview then
+      spawnCoords            = ENTITY.GET_ENTITY_COORDS(previewEntity, false)
+      previewLoop            = true
+      currentObjectPreview   = propHash
+      local previewObjectPos = ENTITY.GET_ENTITY_COORDS(previewEntity, false)
+      ImGui.Text(translateLabel("Move_FB")); ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine(); ImGui.Text(
+        translateLabel("Move_UD"))
+      ImGui.Dummy(10, 1); ImGui.SameLine()
+      ImGui.ArrowButton("##f2", 2)
+      if ImGui.IsItemActive() then
+        forwardX = forwardX * 0.1
+        forwardY = forwardY * 0.1
+        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x + forwardX, previewObjectPos.y + forwardY,
+          previewObjectPos.z)
+      end
       ImGui.SameLine()
-    end
-    if blacklisted_obj then
-      ImGui.BeginDisabled()
-      spawnForPlayer, _ = ImGui.Checkbox(translateLabel("Spawn For a Player"), spawnForPlayer, true)
-      ImGui.EndDisabled()
+      ImGui.ArrowButton("##f3", 3)
+      if ImGui.IsItemActive() then
+        forwardX = forwardX * 0.1
+        forwardY = forwardY * 0.1
+        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x - forwardX, previewObjectPos.y - forwardY,
+          previewObjectPos.z)
+      end
+      ImGui.SameLine()
+      ImGui.Dummy(60, 1); ImGui.SameLine()
+      ImGui.ArrowButton("##z2", 2)
+      if ImGui.IsItemActive() then
+        zOffset = zOffset + 0.01
+        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z + 0.01)
+      end
+      ImGui.SameLine()
+      ImGui.ArrowButton("##z3", 3)
+      if ImGui.IsItemActive() then
+        zOffset = zOffset - 0.01
+        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z - 0.01)
+      end
     else
-      spawnForPlayer, spawnForPlayerUsed = ImGui.Checkbox(translateLabel("Spawn For a Player"), spawnForPlayer, true)
+      previewStarted = false
+      previewLoop    = false
+      zOffset        = 0.0
+      forwardX       = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
+      forwardY       = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+    end
+    if NETWORK.NETWORK_IS_SESSION_ACTIVE() then
+      if not preview then
+        ImGui.SameLine()
+      end
+      ImGui.BeginDisabled(blacklisted_obj)
+      spawnForPlayer, _ = ImGui.Checkbox(translateLabel("Spawn For a Player"), spawnForPlayer, true)
       if spawnForPlayerUsed then
         UI.widgetSound("Nav2")
       end
+      ImGui.EndDisabled()
     end
-  end
-  if spawnForPlayer then
-    ImGui.PushItemWidth(200)
-    Game.displayPlayerList()
-    ImGui.PopItemWidth()
-    selectedPlayer = filteredPlayers[playerIndex + 1]
-    coords         = ENTITY.GET_ENTITY_COORDS(selectedPlayer, false)
-    heading        = ENTITY.GET_ENTITY_HEADING(selectedPlayer)
-    forwardX       = ENTITY.GET_ENTITY_FORWARD_X(selectedPlayer)
-    forwardY       = ENTITY.GET_ENTITY_FORWARD_Y(selectedPlayer)
-    ImGui.SameLine()
-  else
-    coords   = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
-    heading  = ENTITY.GET_ENTITY_HEADING(self.get_ped())
-    forwardX = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-    forwardY = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
-  end
-  if blacklisted_obj then
-    ImGui.BeginDisabled()
-    ImGui.Button("   " .. translateLabel("Spawn") .. "  ")
-    ImGui.EndDisabled()
-  else
-    if ImGui.Button("   " .. translateLabel("Spawn") .. "  ") then
+    if spawnForPlayer then
+      ImGui.PushItemWidth(200)
+      Game.displayPlayerList()
+      ImGui.PopItemWidth()
+      selectedPlayer = filteredPlayers[playerIndex + 1]
+      coords         = ENTITY.GET_ENTITY_COORDS(selectedPlayer, false)
+      heading        = ENTITY.GET_ENTITY_HEADING(selectedPlayer)
+      forwardX       = ENTITY.GET_ENTITY_FORWARD_X(selectedPlayer)
+      forwardY       = ENTITY.GET_ENTITY_FORWARD_Y(selectedPlayer)
+      ImGui.SameLine()
+    else
+      coords   = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
+      heading  = ENTITY.GET_ENTITY_HEADING(self.get_ped())
+      forwardX = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
+      forwardY = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+    end
+    ImGui.SameLine(); ImGui.BeginDisabled(blacklisted_obj)
+    if ImGui.Button(translateLabel("Spawn") .. "##obj") then
       UI.widgetSound("Select")
       script.run_in_fiber(function()
         while not STREAMING.HAS_MODEL_LOADED(propHash) do
@@ -4457,329 +4498,528 @@ object_spawner:add_imgui(function()
         end
       end)
     end
-  end
-  if showInvalidObjText then
-    UI.coloredText(translateLabel("invalid_obj") .. invalidType, "#EED202", 1, 15)
-  end
-  if spawned_props[1] ~= nil then
-    ImGui.Text(translateLabel("spawned_objects"))
-    ImGui.PushItemWidth(230)
-    spawned_index, used = ImGui.Combo("##Spawned Objects", spawned_index, filteredSpawnNames, #spawned_props)
-    ImGui.PopItemWidth()
-    selectedObject = spawned_props[spawned_index + 1]
-    ImGui.SameLine()
-    if ImGui.Button(translateLabel("generic_delete") .. "##objects") then
-      UI.widgetSound("Delete")
-      script.run_in_fiber(function(script)
-        if ENTITY.DOES_ENTITY_EXIST(selectedObject) then
-          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(selectedObject)
-          script:sleep(100)
-          ENTITY.DELETE_ENTITY(selectedObject)
-          table.remove(spawnedNames, spawned_index + 1)
-          table.remove(filteredSpawnNames, spawned_index + 1)
-          table.remove(spawned_props, spawned_index + 1)
-          spawned_index = 0
-          if spawned_index > 1 then
-            spawned_index = spawned_index - 1
-          end
-          if selfAttachments[1] ~= nil or vehAttachments[1] ~= nil then
-            attachPos      = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
-            attached       = false
-            attachedToSelf = false
-            attachedToVeh  = false
-          end
-        end
-      end)
+    ImGui.EndDisabled()
+    if showInvalidObjText then
+      UI.coloredText(translateLabel("invalid_obj") .. invalidType, "#EED202", 1, 15)
     end
-    ImGui.Separator()
-    attachToSelf, attachToSelfUsed = ImGui.Checkbox(translateLabel("Attach To Self"), attachToSelf, true)
-    if attachToSelfUsed then
-      UI.widgetSound("Nav2")
-    end
-    if current_vehicle ~= nil and current_vehicle ~= 0 then
-      ImGui.SameLine(); attachToVeh, attachToVehUsed = ImGui.Checkbox(translateLabel("Attach To Vehicle"), attachToVeh,
-        true)
-      if attachToVehUsed then
-        attachToSelf = false
+    if spawned_props[1] ~= nil then
+      ImGui.Text(translateLabel("spawned_objects"))
+      ImGui.PushItemWidth(230)
+      spawned_index, used = ImGui.Combo("##Spawned Objects", spawned_index, filteredSpawnNames, #spawned_props)
+      ImGui.PopItemWidth()
+      selectedObject = spawned_props[spawned_index + 1]
+      ImGui.SameLine()
+      if ImGui.Button(translateLabel("generic_delete") .. "##objects") then
+        UI.widgetSound("Delete")
+        script.run_in_fiber(function(script)
+          if ENTITY.DOES_ENTITY_EXIST(selectedObject) then
+            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(selectedObject, true, true)
+            script:sleep(100)
+            ENTITY.DELETE_ENTITY(selectedObject)
+            table.remove(spawnedNames, spawned_index + 1)
+            table.remove(filteredSpawnNames, spawned_index + 1)
+            table.remove(spawned_props, spawned_index + 1)
+            spawned_index = 0
+            if spawned_index > 1 then
+              spawned_index = spawned_index - 1
+            end
+            if selfAttachments[1] ~= nil or vehAttachments[1] ~= nil then
+              attachPos      = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
+              attached       = false
+              attachedToSelf = false
+              attachedToVeh  = false
+            end
+          end
+        end)
+      end
+      ImGui.Separator()
+      attachToSelf, attachToSelfUsed = ImGui.Checkbox(translateLabel("Attach To Self"), attachToSelf, true)
+      if attachToSelfUsed then
         UI.widgetSound("Nav2")
       end
-    else
-      ImGui.BeginDisabled()
-      ImGui.SameLine(); attachToVeh, _ = ImGui.Checkbox(translateLabel("Attach To Vehicle"), attachToVeh, true)
-      ImGui.EndDisabled()
-      UI.toolTip(false, translateLabel("getinveh"))
-    end
-    if attachToSelf then
-      attachToVeh = false
-      displaySelfBones()
-      boneData = filteredSelfBones[selected_bone + 1]
-      ImGui.SameLine()
-      if ImGui.Button(" " .. translateLabel("attachBtn") .. " " .. "##self") then
-        UI.widgetSound("Select2")
-        script.run_in_fiber(function()
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, self.get_ped(),
-            PED.GET_PED_BONE_INDEX(self.get_ped(), boneData.ID), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false, false,
-            2, true, 1)
-          attached = true
-          attachedObject = selectedObject
-          attachedObjectName = propName
-          if selfAttachments[1] ~= nil then
-            for _, v in ipairs(selfAttachments) do
-              if attachedObject ~= v then
-                table.insert(selfAttachments, attachedObject)
-                table.insert(selfAttachNames, attachedObjectName)
-              end
-            end
-          else
-            table.insert(selfAttachments, attachedObject)
-            table.insert(selfAttachNames, attachedObjectName)
-          end
-          local attach_dupes = lua_Fn.getTableDupes(selfAttachNames, propName)
-          if attach_dupes > 1 then
-            attach_name = attachedObjectName .. " #" .. tostring(attach_dupes)
-            table.insert(filteredAttachNames, attach_name)
-          else
-            table.insert(filteredAttachNames, propName)
-          end
-        end)
-      end
-      if selfAttachments[1] ~= nil then
-        ImGui.Text(translateLabel("attached_objects"))
-        ImGui.PushItemWidth(230)
-        attached_index, used = ImGui.Combo("##Attached Objects", attached_index, filteredAttachNames, #selfAttachments)
-        ImGui.PopItemWidth()
-        selectedAttachment = selfAttachments[attached_index + 1]
-        ImGui.SameLine()
-        if ImGui.Button(translateLabel("detachBtn") .. "##self") then
-          UI.widgetSound("Cancel")
-          script.run_in_fiber(function()
-            ENTITY.DETACH_ENTITY(selectedAttachment, true, true)
-            attachPos = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
-          end)
+      if current_vehicle ~= nil and current_vehicle ~= 0 then
+        ImGui.SameLine(); attachToVeh, attachToVehUsed = ImGui.Checkbox(translateLabel("Attach To Vehicle"), attachToVeh,
+          true)
+        if attachToVehUsed then
+          attachToSelf = false
+          UI.widgetSound("Nav2")
         end
-      end
-    end
-    if attachToVeh then
-      attachToSelf = false
-      displayVehBones()
-      boneData = filteredVehBones[selected_bone + 1]
-      ImGui.SameLine()
-      if ImGui.Button(" " .. translateLabel("attachBtn") .. " " .. "##veh") then
-        UI.widgetSound("Select2")
-        script.run_in_fiber(function()
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, current_vehicle,
-            ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false,
-            false,
-            false,
-            2, true, 1)
-          attached = true
-          attachedObject = selectedObject
-          attachedObjectName = propName
-          if vehAttachments[1] ~= nil then
-            for _, v in ipairs(vehAttachments) do
-              if attachedObject ~= v then
-                table.insert(vehAttachments, attachedObject)
-                table.insert(vehAttachNames, attachedObjectName)
-              end
-            end
-          else
-            table.insert(vehAttachments, attachedObject)
-            table.insert(vehAttachNames, attachedObjectName)
-          end
-          local attach_dupes = lua_Fn.getTableDupes(vehAttachNames, propName)
-          if attach_dupes > 1 then
-            attach_name = attachedObjectName .. " #" .. tostring(attach_dupes)
-            table.insert(filteredVehAttachNames, attach_name)
-          else
-            table.insert(filteredVehAttachNames, propName)
-          end
-        end)
-      end
-      if vehAttachments[1] ~= nil then
-        ImGui.Text(translateLabel("attached_objects"))
-        ImGui.PushItemWidth(230)
-        attached_index, used = ImGui.Combo("##vehAttachedObjects", attached_index, filteredVehAttachNames,
-          #vehAttachments)
-        ImGui.PopItemWidth()
-        selectedAttachment = vehAttachments[attached_index + 1]
-        ImGui.SameLine()
-        if ImGui.Button(translateLabel("detachBtn") .. "##veh") then
-          UI.widgetSound("Cancel")
-          script.run_in_fiber(function()
-            ENTITY.DETACH_ENTITY(selectedAttachment, true, true)
-            attachPos = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
-          end)
-        end
-      end
-    end
-    ImGui.Separator()
-    edit_mode, edit_modeUsed = ImGui.Checkbox(translateLabel("editMode"), edit_mode, true)
-    if edit_modeUsed then
-      UI.widgetSound("Nav2")
-    end
-    UI.helpMarker(false, translateLabel("editMode_tt"))
-    if edit_mode and not attached then
-      ImGui.Text(translateLabel("xyz_multiplier"))
-      ImGui.PushItemWidth(280)
-      axisMult, _ = ImGui.InputInt("##multiplier", axisMult, 1, 2, 0)
-      ImGui.Text(translateLabel("Move Object:"))
-      ImGui.Text("                        X Axis :")
-      spawnDistance.x, _ = ImGui.SliderFloat(" ", spawnDistance.x, -0.1 * axisMult, 0.1 * axisMult)
-      activeX = ImGui.IsItemActive()
-      ImGui.Separator()
-      ImGui.Text("                        Y Axis :")
-      spawnDistance.y, _ = ImGui.SliderFloat("  ", spawnDistance.y, -0.1 * axisMult, 0.1 * axisMult)
-      activeY = ImGui.IsItemActive()
-      ImGui.Separator()
-      ImGui.Text("                        Z Axis :")
-      spawnDistance.z, _ = ImGui.SliderFloat("   ", spawnDistance.z, -0.05 * axisMult, 0.05 * axisMult)
-      activeZ = ImGui.IsItemActive()
-      ImGui.Separator(); ImGui.Text(translateLabel("Rotate Object:"))
-      ImGui.Text("                        X Axis :")
-      spawnRot.x, _ = ImGui.SliderFloat("##xRot", spawnRot.x, -0.1 * axisMult, 0.1 * axisMult)
-      rotX = ImGui.IsItemActive()
-      ImGui.Separator()
-      ImGui.Text("                        Y Axis :")
-      spawnRot.y, _ = ImGui.SliderFloat("##yRot", spawnRot.y, -0.1 * axisMult, 0.1 * axisMult)
-      rotY = ImGui.IsItemActive()
-      ImGui.Separator()
-      ImGui.Text("                        Z Axis :")
-      spawnRot.z, _ = ImGui.SliderFloat("##zRot", spawnRot.z, -0.5 * axisMult, 0.5 * axisMult)
-      rotZ = ImGui.IsItemActive()
-      ImGui.PopItemWidth()
-    else
-      if edit_mode and selfAttachments[1] ~= nil or edit_mode and vehAttachments[1] ~= nil then
-        ImGui.Text(translateLabel("Move Object:") .. "##attached"); ImGui.Separator(); ImGui.Spacing()
-        if attachToSelf then
-          target     = self.get_ped()
-          attachBone = PED.GET_PED_BONE_INDEX(self.get_ped(), boneData.ID)
-        elseif attachToVeh then
-          target     = current_vehicle
-          attachBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData)
-        end
-        ImGui.Text(translateLabel("xyz_multiplier"))
-        ImGui.PushItemWidth(271)
-        axisMult, _ = ImGui.InputInt("##AttachMultiplier", axisMult, 1, 2, 0)
-        ImGui.PopItemWidth()
-        ImGui.Spacing()
-        ImGui.Text("X Axis :"); ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); ImGui.Text("Y Axis :"); ImGui
-            .SameLine()
-        ImGui.Dummy(25, 1); ImGui.SameLine(); ImGui.Text("Z Axis :")
-        ImGui.ArrowButton("##Xleft", 0)
-        if ImGui.IsItemActive() then
-          attachPos.x = attachPos.x + 0.001 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.SameLine()
-        ImGui.ArrowButton("##XRight", 1)
-        if ImGui.IsItemActive() then
-          attachPos.x = attachPos.x - 0.001 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.SameLine()
-        ImGui.Dummy(5, 1); ImGui.SameLine()
-        ImGui.ArrowButton("##Yleft", 0)
-        if ImGui.IsItemActive() then
-          attachPos.y = attachPos.y + 0.001 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.SameLine()
-        ImGui.ArrowButton("##YRight", 1)
-        if ImGui.IsItemActive() then
-          attachPos.y = attachPos.y - 0.001 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.SameLine()
-        ImGui.Dummy(5, 1); ImGui.SameLine()
-        ImGui.ArrowButton("##zUp", 2)
-        if ImGui.IsItemActive() then
-          attachPos.z = attachPos.z + 0.001 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.SameLine()
-        ImGui.ArrowButton("##zDown", 3)
-        if ImGui.IsItemActive() then
-          attachPos.z = attachPos.z - 0.001 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.Text("X Rotation :"); ImGui.SameLine(); ImGui.Text("Y Rotation :"); ImGui.SameLine(); ImGui.Text(
-          "Z Rotation :")
-        ImGui.ArrowButton("##rotXleft", 0)
-        if ImGui.IsItemActive() then
-          attachPos.rotX = attachPos.rotX + 1 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.SameLine()
-        ImGui.ArrowButton("##rotXright", 1)
-        if ImGui.IsItemActive() then
-          attachPos.rotX = attachPos.rotX - 1 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.SameLine()
-        ImGui.Dummy(5, 1); ImGui.SameLine()
-        ImGui.ArrowButton("##rotYleft", 0)
-        if ImGui.IsItemActive() then
-          attachPos.rotY = attachPos.rotY + 1 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.SameLine()
-        ImGui.ArrowButton("##rotYright", 1)
-        if ImGui.IsItemActive() then
-          attachPos.rotY = attachPos.rotY - 1 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.SameLine()
-        ImGui.Dummy(5, 1); ImGui.SameLine()
-        ImGui.ArrowButton("##rotZup", 2)
-        if ImGui.IsItemActive() then
-          attachPos.rotZ = attachPos.rotZ + 1 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-        ImGui.SameLine()
-        ImGui.ArrowButton("##rotZdown", 3)
-        if ImGui.IsItemActive() then
-          attachPos.rotZ = attachPos.rotZ - 1 * axisMult
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, attachPos.x,
-            attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2, true,
-            1)
-        end
-      end
-    end
-    if ImGui.Button("   " .. translateLabel("generic_reset") .. "   ") then
-      UI.widgetSound("Select")
-      resetSliders()
-      if attached then
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, target, attachBone, 0.0, 0.0, 0.0,
-          0.0, 0.0, 0.0, false, false, false, false, 2, true, 1)
       else
-        ENTITY.SET_ENTITY_COORDS(selectedObject, coords.x + (forwardX * 3), coords.y + (forwardY * 3), coords.z)
-        ENTITY.SET_ENTITY_HEADING(selectedObject, heading)
-        OBJECT.PLACE_OBJECT_ON_GROUND_OR_OBJECT_PROPERLY(selectedObject)
+        ImGui.BeginDisabled()
+        ImGui.SameLine(); attachToVeh, _ = ImGui.Checkbox(translateLabel("Attach To Vehicle"), attachToVeh, true)
+        ImGui.EndDisabled()
+        UI.toolTip(false, translateLabel("getinveh"))
+      end
+      if attachToSelf then
+        attachToVeh = false
+        ImGui.PushItemWidth(230)
+        displaySelfBones()
+        ImGui.PopItemWidth()
+        boneData = filteredSelfBones[selected_bone + 1]
+        ImGui.SameLine()
+        if ImGui.Button(" " .. translateLabel("attachBtn") .. " " .. "##self") then
+          UI.widgetSound("Select2")
+          script.run_in_fiber(function(sa)
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, self.get_ped(),
+              PED.GET_PED_BONE_INDEX(self.get_ped(), boneData.ID), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false,
+              false,
+              2, true, 1)
+            attached = true
+            attachedObject = selectedObject
+            attachedObjectName = propName
+            if selfAttachments[1] ~= nil then
+              for _, v in ipairs(selfAttachments) do
+                if attachedObject ~= v.entity then
+                  selfAttachments.entity = attachedObject
+                  selfAttachments.hash   = Game.getEntityModel(attachedObject)
+                  selfAttachments.bone   = boneData.ID
+                  selfAttachments.posx   = attachPos.x
+                  selfAttachments.posy   = attachPos.y
+                  selfAttachments.posz   = attachPos.z
+                  selfAttachments.rotx   = attachPos.rotX
+                  selfAttachments.roty   = attachPos.rotY
+                  selfAttachments.rotz   = attachPos.rotZ
+                  table.insert(attached_props, selfAttachments)
+                  table.insert(selfAttachNames, attachedObjectName)
+                end
+              end
+            else
+              selfAttachments.entity = attachedObject
+              selfAttachments.hash   = Game.getEntityModel(attachedObject)
+              selfAttachments.bone   = boneData.ID
+              selfAttachments.posx   = attachPos.x
+              selfAttachments.posy   = attachPos.y
+              selfAttachments.posz   = attachPos.z
+              selfAttachments.rotx   = attachPos.rotX
+              selfAttachments.roty   = attachPos.rotY
+              selfAttachments.rotz   = attachPos.rotZ
+              table.insert(attached_props, selfAttachments)
+              table.insert(selfAttachNames, attachedObjectName)
+            end
+            local attach_dupes = lua_Fn.getTableDupes(selfAttachNames, propName)
+            if attach_dupes > 1 then
+              attach_name = attachedObjectName .. " #" .. tostring(attach_dupes)
+              table.insert(filteredAttachNames, attach_name)
+            else
+              table.insert(filteredAttachNames, propName)
+            end
+            selfAttachments = {}
+            attachedToSelf  = true
+          end)
+        end
+        if attached_props[1] ~= nil then
+          ImGui.Text(translateLabel("attached_objects"))
+          ImGui.PushItemWidth(230)
+          attached_index, used = ImGui.Combo("##Attached Objects", attached_index, filteredAttachNames, #attached_props)
+          ImGui.PopItemWidth()
+          selectedAttachment = attached_props[attached_index + 1]
+          ImGui.SameLine()
+          if ImGui.Button(translateLabel("detachBtn") .. "##self") then
+            UI.widgetSound("Cancel")
+            script.run_in_fiber(function()
+              ENTITY.DETACH_ENTITY(selectedAttachment.entity, true, true)
+              attachPos = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
+              for k, v in ipairs(attached_props) do
+                if selectedAttachment.entity == v.entity then
+                  table.remove(attached_props, k)
+                end
+              end
+            end)
+          end
+        end
+      end
+      if attachToVeh then
+        attachToSelf = false
+        ImGui.PushItemWidth(230)
+        displayVehBones()
+        ImGui.PopItemWidth()
+        boneData = filteredVehBones[selected_bone + 1]
+        ImGui.SameLine()
+        if ImGui.Button(" " .. translateLabel("attachBtn") .. " " .. "##veh") then
+          UI.widgetSound("Select2")
+          script.run_in_fiber(function()
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, current_vehicle,
+              ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false,
+              false,
+              false,
+              2, true, 1)
+            attached = true
+            attachedObject = selectedObject
+            attachedObjectName = propName
+            if vehAttachments[1] ~= nil then
+              for _, v in ipairs(vehAttachments) do
+                if attachedObject ~= v then
+                  table.insert(vehAttachments, attachedObject)
+                  table.insert(vehAttachNames, attachedObjectName)
+                end
+              end
+            else
+              table.insert(vehAttachments, attachedObject)
+              table.insert(vehAttachNames, attachedObjectName)
+            end
+            local attach_dupes = lua_Fn.getTableDupes(vehAttachNames, propName)
+            if attach_dupes > 1 then
+              attach_name = attachedObjectName .. " #" .. tostring(attach_dupes)
+              table.insert(filteredVehAttachNames, attach_name)
+            else
+              table.insert(filteredVehAttachNames, propName)
+            end
+          end)
+        end
+        if vehAttachments[1] ~= nil then
+          ImGui.Text(translateLabel("attached_objects"))
+          ImGui.PushItemWidth(230)
+          attached_index, used = ImGui.Combo("##vehAttachedObjects", attached_index, filteredVehAttachNames,
+            #vehAttachments)
+          ImGui.PopItemWidth()
+          selectedAttachment = vehAttachments[attached_index + 1]
+          ImGui.SameLine()
+          if ImGui.Button(translateLabel("detachBtn") .. "##veh") then
+            UI.widgetSound("Cancel")
+            script.run_in_fiber(function()
+              ENTITY.DETACH_ENTITY(selectedAttachment, true, true)
+              attachPos = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
+            end)
+          end
+        end
+      end
+      edit_mode, edit_modeUsed = ImGui.Checkbox(translateLabel("editMode"), edit_mode, true)
+      if edit_modeUsed then
+        UI.widgetSound("Nav2")
+      end
+      UI.helpMarker(false, translateLabel("editMode_tt"))
+      ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+      if ImGui.Button("   " .. translateLabel("generic_reset") .. "   ") then
+        UI.widgetSound("Select")
+        resetSliders()
+        if attached then
+          ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, false, false, false, false, 2, true, 1)
+        else
+          ENTITY.SET_ENTITY_COORDS(selectedObject, coords.x + (forwardX * 3), coords.y + (forwardY * 3), coords.z)
+          ENTITY.SET_ENTITY_HEADING(selectedObject, heading)
+          OBJECT.PLACE_OBJECT_ON_GROUND_OR_OBJECT_PROPERLY(selectedObject)
+        end
+      end
+      UI.helpMarker(false, translateLabel("resetSlider_tt"))
+      if edit_mode and not attached then
+        ImGui.Text(translateLabel("xyz_multiplier"))
+        ImGui.PushItemWidth(280)
+        axisMult, _ = ImGui.InputInt("##multiplier", axisMult, 1, 2, 0)
+        ImGui.Text("                        X Axis :")
+        spawnDistance.x, _ = ImGui.SliderFloat(" ", spawnDistance.x, -0.1 * axisMult, 0.1 * axisMult)
+        activeX = ImGui.IsItemActive()
+        ImGui.Separator()
+        ImGui.Text("                        Y Axis :")
+        spawnDistance.y, _ = ImGui.SliderFloat("  ", spawnDistance.y, -0.1 * axisMult, 0.1 * axisMult)
+        activeY = ImGui.IsItemActive()
+        ImGui.Separator()
+        ImGui.Text("                        Z Axis :")
+        spawnDistance.z, _ = ImGui.SliderFloat("   ", spawnDistance.z, -0.05 * axisMult, 0.05 * axisMult)
+        activeZ = ImGui.IsItemActive()
+        ImGui.Separator(); ImGui.Text(translateLabel("Rotate Object:"))
+        ImGui.Text("                        X Axis :")
+        spawnRot.x, _ = ImGui.SliderFloat("##xRot", spawnRot.x, -0.1 * axisMult, 0.1 * axisMult)
+        rotX = ImGui.IsItemActive()
+        ImGui.Separator()
+        ImGui.Text("                        Y Axis :")
+        spawnRot.y, _ = ImGui.SliderFloat("##yRot", spawnRot.y, -0.1 * axisMult, 0.1 * axisMult)
+        rotY = ImGui.IsItemActive()
+        ImGui.Separator()
+        ImGui.Text("                        Z Axis :")
+        spawnRot.z, _ = ImGui.SliderFloat("##zRot", spawnRot.z, -0.5 * axisMult, 0.5 * axisMult)
+        rotZ = ImGui.IsItemActive()
+        ImGui.PopItemWidth()
+      else
+        if edit_mode and attached_props[1] ~= nil or edit_mode and vehAttachments[1] ~= nil then
+          if attachToSelf then
+            target       = self.get_ped()
+            attachBone   = PED.GET_PED_BONE_INDEX(self.get_ped(), selectedAttachment.bone)
+            selected_att = selectedAttachment.entity
+          elseif attachToVeh then
+            target       = current_vehicle
+            attachBone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData)
+            selected_att = selectedAttachment
+          end
+          ImGui.Text(translateLabel("xyz_multiplier"))
+          ImGui.PushItemWidth(271)
+          axisMult, _ = ImGui.InputInt("##AttachMultiplier", axisMult, 1, 2, 0)
+          ImGui.PopItemWidth()
+          ImGui.Spacing()
+          ImGui.Text("X Axis :"); ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); ImGui.Text("Y Axis :"); ImGui
+              .SameLine()
+          ImGui.Dummy(25, 1); ImGui.SameLine(); ImGui.Text("Z Axis :")
+          ImGui.ArrowButton("##Xleft", 0)
+          if ImGui.IsItemActive() then
+            attachPos.x = attachPos.x + 0.001 * axisMult
+            if attachedToSelf then
+              selectedAttachment.posx = attachPos.x
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.SameLine()
+          ImGui.ArrowButton("##XRight", 1)
+          if ImGui.IsItemActive() then
+            attachPos.x = attachPos.x - 0.001 * axisMult
+            if attachedToSelf then
+              selectedAttachment.posx = attachPos.x
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.SameLine()
+          ImGui.Dummy(5, 1); ImGui.SameLine()
+          ImGui.ArrowButton("##Yleft", 0)
+          if ImGui.IsItemActive() then
+            attachPos.y = attachPos.y + 0.001 * axisMult
+            if attachedToSelf then
+              selectedAttachment.posy = attachPos.y
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.SameLine()
+          ImGui.ArrowButton("##YRight", 1)
+          if ImGui.IsItemActive() then
+            attachPos.y = attachPos.y - 0.001 * axisMult
+            if attachedToSelf then
+              selectedAttachment.posy = attachPos.y
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.SameLine()
+          ImGui.Dummy(5, 1); ImGui.SameLine()
+          ImGui.ArrowButton("##zUp", 2)
+          if ImGui.IsItemActive() then
+            attachPos.z = attachPos.z + 0.001 * axisMult
+            if attachedToSelf then
+              selectedAttachment.posz = attachPos.yz
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.SameLine()
+          ImGui.ArrowButton("##zDown", 3)
+          if ImGui.IsItemActive() then
+            attachPos.z = attachPos.z - 0.001 * axisMult
+            if attachedToSelf then
+              selectedAttachment.posz = attachPos.z
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.Text("X Rotation :"); ImGui.SameLine(); ImGui.Text("Y Rotation :"); ImGui.SameLine(); ImGui.Text(
+            "Z Rotation :")
+          ImGui.ArrowButton("##rotXleft", 0)
+          if ImGui.IsItemActive() then
+            attachPos.rotX = attachPos.rotX + 1 * axisMult
+            if attachedToSelf then
+              selectedAttachment.rotx = attachPos.rotX
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.SameLine()
+          ImGui.ArrowButton("##rotXright", 1)
+          if ImGui.IsItemActive() then
+            attachPos.rotX = attachPos.rotX - 1 * axisMult
+            if attachedToSelf then
+              selectedAttachment.rotx = attachPos.rotX
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.SameLine()
+          ImGui.Dummy(5, 1); ImGui.SameLine()
+          ImGui.ArrowButton("##rotYleft", 0)
+          if ImGui.IsItemActive() then
+            attachPos.rotY = attachPos.rotY + 1 * axisMult
+            if attachedToSelf then
+              selectedAttachment.roty = attachPos.rotY
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.SameLine()
+          ImGui.ArrowButton("##rotYright", 1)
+          if ImGui.IsItemActive() then
+            attachPos.rotY = attachPos.rotY - 1 * axisMult
+            if attachedToSelf then
+              selectedAttachment.roty = attachPos.rotY
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.SameLine()
+          ImGui.Dummy(5, 1); ImGui.SameLine()
+          ImGui.ArrowButton("##rotZup", 2)
+          if ImGui.IsItemActive() then
+            attachPos.rotZ = attachPos.rotZ + 1 * axisMult
+            if attachedToSelf then
+              selectedAttachment.rotz = attachPos.rotZ
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+          ImGui.SameLine()
+          ImGui.ArrowButton("##rotZdown", 3)
+          if ImGui.IsItemActive() then
+            attachPos.rotZ = attachPos.rotZ - 1 * axisMult
+            if attachedToSelf then
+              selectedAttachment.rotz = attachPos.rotZ
+            end
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
+              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
+              true,
+              1)
+          end
+        end
+      end
+      ImGui.Dummy(1, 5)
+      if attachedToSelf and attached_props[1] ~= nil then
+        if ImGui.Button("  " .. translateLabel("saveBtn") .. "  ##obj") then
+          UI.widgetSound("Select")
+          ImGui.OpenPopup("persist props")
+        end
+        ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
+        ImGui.SetNextWindowBgAlpha(0.8)
+        if ImGui.BeginPopupModal("persist props", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
+          ImGui.Dummy(1, 5); ImGui.Text("Give your creation a name and save it."); ImGui.Dummy(1, 5)
+          saved_props_name, _ = ImGui.InputTextWithHint("##persistpropname", "Name", saved_props_name, 64)
+          if ImGui.IsItemActive() then
+            is_typing = true
+          else
+            is_typing = false
+          end
+          ImGui.Dummy(1, 5)
+          if ImGui.Button(translateLabel("saveBtn") .. "##obj2") then
+            if saved_props_name ~= "" then
+              UI.widgetSound("Select")
+              prop_creation.name  = saved_props_name
+              prop_creation.props = attached_props
+              table.insert(persist_attachments, prop_creation)
+              lua_cfg.save("persist_attachments", persist_attachments)
+              prop_creation = { name = "", props = {} }
+            else
+              UI.widgetSound("Error")
+              gui.show_error("Samurai's Scripts", "Please enter a name")
+            end
+            saved_props_name = ""
+            ImGui.CloseCurrentPopup()
+          end
+          ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
+          if ImGui.Button(translateLabel("generic_cancel_btn")) then
+            UI.widgetSound("Cancel")
+            saved_props_name = ""
+            ImGui.CloseCurrentPopup()
+          end
+          ImGui.EndPopup()
+        end
       end
     end
-    UI.helpMarker(false, translateLabel("resetSlider_tt"))
+    ImGui.EndTabItem()
+  end
+  if ImGui.BeginTabItem("Saved Props") then
+    if persist_attachments[1] ~= nil then
+      ImGui.PushItemWidth(360)
+      showPersistProps()
+      ImGui.PopItemWidth()
+      local persist_prop_info = filteredPersistProps[persist_prop_index + 1]
+      ImGui.Dummy(1, 5)
+      if ImGui.Button(translateLabel("Spawn")) then
+        if not spawned_persist_props then
+          UI.widgetSound("Select")
+          script.run_in_fiber(function(pers)
+            for _, p in pairs(persist_prop_info.props) do
+              if Game.requestModel(p.hash) then
+                local persist_prop = OBJECT.CREATE_OBJECT(p.hash, 0.0, 0.0, 0.0, true, true, false)
+                pers:sleep(200)
+                if ENTITY.DOES_ENTITY_EXIST(persist_prop) then
+                  table.insert(spawned_persist_T, persist_prop)
+                  ENTITY.ATTACH_ENTITY_TO_ENTITY(persist_prop, self.get_ped(),
+                    PED.GET_PED_BONE_INDEX(self.get_ped(), p.bone), p.posx, p.posy, p.posz, p.rotx, p.roty, p.rotz,
+                    false, false, false, false, 2, true, 1)
+                end
+              end
+            end
+          end)
+        else
+          UI.widgetSound("Error")
+          gui.show_error("Samurai's Scripts", "Delete the currently spawned props first.")
+        end
+      end
+      if spawned_persist_T[1] ~= nil then
+        ImGui.SameLine()
+        if ImGui.Button(translateLabel("generic_delete") .. "##persist_props") then
+          UI.widgetSound("Delete")
+          script.run_in_fiber(function(del)
+            for _, p in ipairs(spawned_persist_T) do
+              if ENTITY.DOES_ENTITY_EXIST(p) then
+                ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p, true, true)
+                del:sleep(100)
+                ENTITY.DELETE_ENTITY(p)
+              end
+            end
+          end)
+        end
+      end
+      ImGui.SameLine()
+      if UI.coloredButton(translateLabel("vc_delete_persist") .. "##props", "#E40000", "#FF3F3F", "#FF8080", 0.87) then
+        UI.widgetSound("Focus_In")
+        ImGui.OpenPopup("Remove Persistent Props")
+      end
+      ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
+      ImGui.SetNextWindowSizeConstraints(200, 100, 400, 400)
+      ImGui.SetNextWindowBgAlpha(0.7)
+      if ImGui.BeginPopupModal("Remove Persistent Props", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
+        UI.coloredText(translateLabel("confirm_txt"), "yellow", 0.91, 35)
+        ImGui.Dummy(1, 20)
+        if ImGui.Button("   " .. translateLabel("yes") .. "   ##selfprops") then
+          for key, value in ipairs(persist_attachments) do
+            if persist_prop_info == value then
+              table.remove(persist_attachments, key)
+              lua_cfg.save("persist_attachments", persist_attachments)
+            end
+          end
+          UI.widgetSound("Select")
+          ImGui.CloseCurrentPopup()
+        end
+        ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
+        if ImGui.Button("   " .. translateLabel("no") .. "   ##selfprops") then
+          UI.widgetSound("Cancel")
+          ImGui.CloseCurrentPopup()
+        end
+        ImGui.End()
+      end
+    else
+      ImGui.Dummy(1, 10); UI.wrappedText(
+        "Attach some objects to yourself then save them to be able to spawn them from this tab.", 20)
+    end
+    ImGui.EndTabItem()
   end
 end)
 --[[
@@ -4792,15 +5032,15 @@ disableUiSounds    = lua_cfg.read("disableUiSounds")
 useGameLang        = lua_cfg.read("useGameLang")
 local selected_lang
 local lang_T       = {
-  { name = 'English',               iso = 'en-US' },
-  { name = 'Français',              iso = 'fr-FR' },
-  { name = 'Deütsch',               iso = 'de-DE' },
-  { name = 'Italiano',              iso = 'it-IT' },
+  { name = 'English', iso = 'en-US' },
+  { name = 'Français', iso = 'fr-FR' },
+  { name = 'Deütsch', iso = 'de-DE' },
+  { name = 'Italiano', iso = 'it-IT' },
   -- { name = 'Chinese (Traditional)', iso = 'zh-TW' },
   -- { name = 'Chinese (Simplified)',  iso = 'zh-CH' },
   -- { name = 'Español',               iso = 'es-ES' },
-  { name = 'Português (Brasil)',    iso = 'pt-BR' },
-  { name = 'Русский (Russian)',     iso = 'ru-RU' },
+  { name = 'Português (Brasil)', iso = 'pt-BR' },
+  { name = 'Русский (Russian)', iso = 'ru-RU' },
 }
 
 function displayLangs()
@@ -4823,6 +5063,19 @@ settings_tab:add_imgui(function()
   if duisndUsed then
     lua_cfg.save("disableUiSounds", disableUiSounds)
     UI.widgetSound("Nav2")
+  end
+
+  disableFlightMusic, dpmUsed = ImGui.Checkbox(translateLabel("flightMusicCB"), disableFlightMusic, true)
+  UI.toolTip(false, translateLabel("flightMusic_tt"))
+  if dpmUsed then
+    lua_cfg.save("disableFlightMusic", disableFlightMusic)
+    UI.widgetSound("Nav2")
+    if not disableFlightMusic then
+      script.run_in_fiber(function()
+        AUDIO.SET_AUDIO_FLAG("DisableFlightMusic", false)
+        flight_music_off = false
+      end)
+    end
   end
 
   if shortcut_anim.anim ~= nil then
@@ -4879,7 +5132,7 @@ settings_tab:add_imgui(function()
     ImGui.OpenPopup("Confirm")
   end
   ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
-  ImGui.SetNextWindowBgAlpha(0.6)
+  ImGui.SetNextWindowBgAlpha(0.8)
   if ImGui.BeginPopupModal("Confirm", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
     UI.coloredText(translateLabel("confirm_txt"), "yellow", 1, 20)
     if ImGui.Button("  " .. translateLabel("yes") .. "  ") then
@@ -4898,6 +5151,7 @@ settings_tab:add_imgui(function()
       disableActionMode       = false
       rod                     = false
       clumsy                  = false
+      ragdoll_sound           = false
       Triggerbot              = false
       aimEnemy                = false
       autoKill                = false
@@ -4946,6 +5200,7 @@ settings_tab:add_imgui(function()
       real_plane_speed        = false
       extend_world            = false
       unbreakableWindows      = false
+      disableFlightMusic      = false
       laser_switch            = 0
       DriftIntensity          = 0
       lang_idx                = 0
@@ -4966,160 +5221,6 @@ settings_tab:add_imgui(function()
     ImGui.EndPopup()
   end
 end)
-
-
-local function SS_handle_events()
-  if attached_ped ~= nil and attached_ped ~= 0 then
-    ENTITY.DETACH_ENTITY(attached_ped, true, true)
-    ENTITY.FREEZE_ENTITY_POSITION(attached_ped, false)
-    TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
-    PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
-    TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
-  end
-
-  if grabbed_veh ~= nil and grabbed_veh ~= 0 then
-    ENTITY.DETACH_ENTITY(grabbed_veh, true, true)
-    TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
-  end
-
-  if attached_vehicle ~= nil and attached_vehicle ~= 0 then
-    local modelHash         = ENTITY.GET_ENTITY_MODEL(attached_vehicle)
-    local attachedVehicle   = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(PED.GET_VEHICLE_PED_IS_USING(self.get_ped()),
-      modelHash)
-    local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(attached_vehicle, false)
-    local playerForwardX    = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-    local playerForwardY    = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
-    controlled              = entities.take_control_of(attachedVehicle, 300)
-    if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) then
-      if controlled then
-        ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
-        ENTITY.SET_ENTITY_COORDS(attachedVehicle, attachedVehcoords.x - (playerForwardX * 10),
-          attachedVehcoords.y - (playerForwardY * 10), playerPosition.z, false, false, false, false)
-        VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(attached_vehicle, 5.0)
-        attached_vehicle = 0
-      end
-    end
-  end
-
-  if spawned_props[1] ~= nil then
-    for _, p in ipairs(spawned_props) do
-      if ENTITY.DOES_ENTITY_EXIST(p) then
-        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p)
-        ENTITY.DELETE_ENTITY(p)
-      end
-    end
-  end
-
-  if selfAttachments[1] ~= nil then
-    for _, v in ipairs(selfAttachments) do
-      ENTITY.DETACH_ENTITY(v, true, true)
-    end
-  end
-
-  if vehAttachments[1] ~= nil then
-    for _, v in ipairs(vehAttachments) do
-      ENTITY.DETACH_ENTITY(v, true, true)
-    end
-  end
-
-  if currentMvmt ~= "" then
-    PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0.0)
-  end
-
-  if currentWmvmt ~= "" then
-    PED.RESET_PED_WEAPON_MOVEMENT_CLIPSET(self.get_ped())
-  end
-
-  if currentStrf ~= "" then
-    PED.RESET_PED_STRAFE_CLIPSET(self.get_ped())
-  end
-
-  if clumsy then
-    PED.SET_PED_RAGDOLL_ON_COLLISION(self.get_ped(), false)
-  end
-  WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(self.get_ped(), 3839837909)
-
-  if is_playing_anim then
-    if anim_music then
-      if ENTITY.DOES_ENTITY_EXIST(pBus) then
-        ENTITY.DELETE_ENTITY(pBus)
-      end
-      if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
-        ENTITY.DELETE_ENTITY(dummyDriver)
-      end
-    end
-    TASK.CLEAR_PED_TASKS(self.get_ped())
-    if selfPTFX[1] ~= nil then
-      for _, v in ipairs(selfPTFX) do
-        GRAPHICS.STOP_PARTICLE_FX_LOOPED(v)
-      end
-    end
-    local current_coords = self.get_pos()
-    if PED.IS_PED_IN_ANY_VEHICLE(self.get_ped(), false) then
-      local veh    = PED.GET_VEHICLE_PED_IS_USING(self.get_ped())
-      local mySeat = Game.getPedVehicleSeat(self.get_ped())
-      PED.SET_PED_INTO_VEHICLE(self.get_ped(), veh, mySeat)
-    else
-      ENTITY.SET_ENTITY_COORDS_NO_OFFSET(self.get_ped(), current_coords.x, current_coords.y, current_coords.z, true,
-        false, false)
-    end
-    if plyrProps[1] ~= nil then
-      for _, v in ipairs(plyrProps) do
-        if ENTITY.DOES_ENTITY_EXIST(v) then
-          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v)
-          ENTITY.DELETE_ENTITY(v)
-        end
-      end
-    end
-  end
-
-  if spawned_npcs[1] ~= nil then
-    for _, v in ipairs(spawned_npcs) do
-      if ENTITY.DOES_ENTITY_EXIST(v) then
-        ENTITY.DELETE_ENTITY(v)
-      end
-    end
-  end
-
-  if is_playing_scenario then
-    TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
-    if ENTITY.DOES_ENTITY_EXIST(bbq) then
-      ENTITY.DELETE_ENTITY(bbq)
-    end
-  end
-
-  if is_playing_radio then
-    if ENTITY.DOES_ENTITY_EXIST(pBus) then
-      ENTITY.SET_ENTITY_AS_MISSION_ENTITY(pBus)
-      ENTITY.DELETE_ENTITY(pBus)
-    end
-    if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
-      ENTITY.DELETE_ENTITY(dummyDriver)
-    end
-  end
-
-  if is_handsUp then
-    TASK.CLEAR_PED_TASKS(self.get_ped())
-  end
-
-  if isCrouched then
-    PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
-  end
-
-  if disable_waves then
-    Game.World.disableOceanWaves(false)
-  end
-
-  if autopilot_waypoint or autopilot_objective or autopilot_random then
-    if Game.Self.isDriving() then
-      TASK.CLEAR_PED_TASKS(self.get_ped())
-      TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
-      autopilot_waypoint  = false
-      autopilot_objective = false
-      autopilot_random    = false
-    end
-  end
-end
 
 -- local function var_reset()
 --   resetOnSave()
@@ -5471,8 +5572,9 @@ script.register_looped("Ragdoll Loop", function(rgdl)
       end
     end
   end
-  if PED.IS_PED_RAGDOLL(self.get_ped()) then
-    if NETWORK.NETWORK_IS_SESSION_ACTIVE() then
+  if ragdoll_sound then
+    if PED.IS_PED_RAGDOLL(self.get_ped()) and Game.isOnline() then
+      local soundName
       if PED.IS_PED_MALE(self.get_ped()) then
         soundName = "WAVELOAD_PAIN_MALE"
       else
@@ -5781,8 +5883,12 @@ script.register_looped("anim shortcut", function(animsc)
         playSelected(self.get_ped(), shortcut_anim.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, myboneIndex,
           mycoords, myheading,
           myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX)
-        curr_playing_anim = { curr_dict = shortcut_anim.dict, curr_anim = shortcut_anim.anim, curr_flag = shortcut_anim
-        .flag }
+        curr_playing_anim = {
+          curr_dict = shortcut_anim.dict,
+          curr_anim = shortcut_anim.anim,
+          curr_flag = shortcut_anim
+              .flag
+        }
         if lua_Fn.str_contains(shortcut_anim.name, "DJ") then
           if not is_playing_radio then
             play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
@@ -5831,7 +5937,7 @@ script.register_looped("HashGrabber", function(hg)
       local hash = Game.getEntityModel(ent)
       local type = Game.getEntityTypeString(ent)
       log.debug("\n----- Info Gun -----" ..
-      "\n¤ Handle: " .. tostring(ent) .. "\n¤ Hash:   " .. tostring(hash) .. "\n¤ Type:   " .. tostring(type))
+        "\n¤ Handle: " .. tostring(ent) .. "\n¤ Hash:   " .. tostring(hash) .. "\n¤ Type:   " .. tostring(type))
     end
   end
   hg:yield()
@@ -6103,6 +6209,11 @@ script.register_looped("TDFT", function(script)
     end
     if started_popSound2 then
       started_popSound2 = false
+    end
+    if current_vehicle ~= 0 then
+      if not ENTITY.DOES_ENTITY_EXIST(current_vehicle) then
+        current_vehicle = 0
+      end
     end
   end
 end)
@@ -6438,10 +6549,10 @@ script.register_looped("pops&bangs", function(pnb)
         end
         AUDIO.ENABLE_VEHICLE_EXHAUST_POPS(current_vehicle, false)
         default_pops_disabled = true
-        local counter  = 0
-        local asset    = "core"
-        local currRPM  = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
-        local currGear = VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(current_vehicle)
+        local counter         = 0
+        local asset           = "core"
+        local currRPM         = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
+        local currGear        = VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(current_vehicle)
         if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) then
           rpmThreshold = 0.45
         else
@@ -6573,6 +6684,7 @@ script.register_looped("drift counter", function(dcounter)
                   end
                   if drift_points > driftPB then
                     lua_cfg.save("driftPB", drift_points)
+                    driftPB = lua_cfg.read("driftPB")
                   end
                   dcounter:sleep(3000)
                   drift_points     = 0
@@ -6605,6 +6717,7 @@ script.register_looped("drift counter", function(dcounter)
               end
               if drift_points > driftPB then
                 lua_cfg.save("driftPB", drift_points)
+                driftPB = lua_cfg.read("driftPB")
               end
               dcounter:sleep(3000)
               drift_points     = 0
@@ -7371,10 +7484,17 @@ script.register_looped("edit mode", function()
       end
     end
   end
-  if selfAttachments[1] ~= nil then
-    for index, entity in ipairs(selfAttachments) do
-      if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(entity, self.get_ped()) then
-        table.remove(selfAttachments, index)
+  if attached_props[1] ~= nil then
+    for i, v in ipairs(attached_props) do
+      if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(v.entity, self.get_ped()) then
+        table.remove(attached_props, i)
+      end
+    end
+  end
+  if spawned_persist_T[1] ~= nil then
+    for k, v in ipairs(spawned_persist_T) do
+      if not ENTITY.DOES_ENTITY_EXIST(v) then
+        table.remove(spawned_persist_T, k)
       end
     end
   end
@@ -7454,8 +7574,8 @@ script.register_looped("Casino Pacino Thread", function(pacino)
           pacino:sleep(500)
         end
         local players_current_table = locals.get_int("three_card_poker",
-          three_card_poker_table + 1 + (player_id * three_card_poker_table_size) + 2)                                                                --The Player's current table he is sitting at.
-        if (players_current_table ~= -1) then                                                                                                        -- If the player is sitting at a poker table
+          three_card_poker_table + 1 + (player_id * three_card_poker_table_size) + 2) --The Player's current table he is sitting at.
+        if (players_current_table ~= -1) then                                         -- If the player is sitting at a poker table
           local player_0_card_1 = locals.get_int("three_card_poker",
             (three_card_poker_cards) + (three_card_poker_current_deck) +
             (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (1) + (0 * 3))
@@ -7488,9 +7608,9 @@ script.register_looped("Casino Pacino Thread", function(pacino)
     if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("blackjack")) ~= 0 then
       local dealers_card = 0
       local blackjack_table = locals.get_int("blackjack",
-        blackjack_table_players + 1 + (PLAYER.PLAYER_ID() * blackjack_table_players_size) + 4)                                                   --The Player's current table he is sitting at.
+        blackjack_table_players + 1 + (PLAYER.PLAYER_ID() * blackjack_table_players_size) + 4)                             --The Player's current table he is sitting at.
       if blackjack_table ~= -1 then
-        dealers_card     = locals.get_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1)                       --Dealer's facedown card.
+        dealers_card     = locals.get_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1) --Dealer's facedown card.
         dealers_card_str = get_cardname_from_index(dealers_card)
       else
         dealers_card_str = "Not sitting at a Blackjack table."
@@ -7584,7 +7704,7 @@ script.register_looped("Casino Pacino Thread", function(pacino)
       casino_heist_masks         = stats.get_int("MPX_H3OPT_MASKS")
       local cooldown_time        = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_LOSS_COOLDOWN")
       local time_delta           = os.time() -
-      stats.get_int("MPPLY_CASINO_CHIPS_WONTIM")                                          --"I've won the jackpot, and it doesn't make me feel bad." ~Casino Pacino (He only cares about winners)
+          stats.get_int("MPPLY_CASINO_CHIPS_WONTIM") --"I've won the jackpot, and it doesn't make me feel bad." ~Casino Pacino (He only cares about winners)
       local minutes_left         = (cooldown_time - time_delta) / 60
       local chipswon_gd          = stats.get_int("MPPLY_CASINO_CHIPS_WON_GD")
       local max_chip_wins        = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_DAILY")
@@ -7628,15 +7748,23 @@ script.register_looped("Online Player Info", function()
     end
   end
 end)
+script.register_looped("Flight Music", function(fm)
+  if disableFlightMusic then
+    if not flight_music_off then
+      AUDIO.SET_AUDIO_FLAG("DisableFlightMusic", true)
+      flight_music_off = true
+    end
+  end
+end)
 
 
 --[[
    *event handlers*
 ]]
 event.register_handler(menu_event.MenuUnloaded, function()
-  SS_handle_events()
+  SS.handle_events()
 end)
 
 event.register_handler(menu_event.ScriptsReloaded, function()
-  SS_handle_events()
+  SS.handle_events()
 end)
