@@ -20,6 +20,8 @@
     - Makes you stumble and fall when you collide with objects and sidewalks.
   - **Ragdoll On Demand:**
     - Gives you the ability to make your character fall whenever you want by pressing [X] on keyboard. Note that this feature can knock you off bikes whenever you press the button *(kinda funny)*.
+  -**Ragdoll Sound:**
+    - Online Only: Plays a hurt/panicked ped sound when the player ragdolls.
 
 - **Actions:**
   - **An improved version of [YimActions](https://github.com/xesdoog/YimActions) with the side features moved into the main Self tab. The improvements include:**
@@ -122,6 +124,7 @@
       
 - **Improved [Object Spawner](https://github.com/xesdoog/object-spawner):**
   - Fixed a few bugs in the main script and added the ability to attach objects to your vehicle.
+  - Added an option to save self attachments. This gives you the ability to create outfits for yourself made out of objects then spawn them at any time in the future.
 
 ## Settings
-- Here you can enable/disable tooltips, enable/disable sound feedback from UI interactions, delete the custom animation hotkey, change the script's language, and reset all saved options.
+- Here you can enable/disable tooltips, enable/disable sound feedback from UI interactions, enable/disable ambient flight music, delete the custom animation hotkey, change the script's language, and reset all saved options (except created vehicles and outfits).
