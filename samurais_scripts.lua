@@ -4223,7 +4223,6 @@ vehAttachments         = {}
 vehAttachNames         = {}
 filteredVehAttachNames = {}
 filteredAttachNames    = {}
-persist_prop_names     = {}
 spawned_persist_T      = {}
 attached_props         = {}
 spawnDistance          = { x = 0, y = 0, z = 0 }
@@ -4360,6 +4359,7 @@ end
 
 local function showPersistProps()
   filterPersistProps()
+  persist_prop_names = {}
   for _, p in ipairs(filteredPersistProps) do
     table.insert(persist_prop_names, p.name)
   end
@@ -4917,18 +4917,33 @@ object_spawner:add_imgui(function()
           end
           ImGui.Dummy(1, 5)
           if ImGui.Button(translateLabel("saveBtn") .. "##obj2") then
+            local timer = 0
             if saved_props_name ~= "" then
+              if persist_attachments[1] ~= nil then
+                for _, v in pairs(persist_attachments) do
+                  if saved_props_name == v.name then
+                    UI.widgetSound("Error")
+                    gui.show_error("Samurai's Scripts", "You already have an outfit with the same name.")
+                    return
+                  end
+                end
+              end
               UI.widgetSound("Select")
               prop_creation.name  = saved_props_name
               prop_creation.props = attached_props
               table.insert(persist_attachments, prop_creation)
               lua_cfg.save("persist_attachments", persist_attachments)
-              prop_creation = { name = "", props = {} }
+              repeat
+                timer = timer + 1
+              until timer >= 50
+              prop_creation      = { name = "", props = {} }
+              persist_prop_index = 0
+              saved_props_name   = ""
+              persist_attachments = lua_cfg.read("persist_attachments")
             else
               UI.widgetSound("Error")
               gui.show_error("Samurai's Scripts", "Please enter a name")
             end
-            saved_props_name = ""
             ImGui.CloseCurrentPopup()
           end
           ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
@@ -4951,10 +4966,10 @@ object_spawner:add_imgui(function()
       local persist_prop_info = filteredPersistProps[persist_prop_index + 1]
       ImGui.Dummy(1, 5)
       if ImGui.Button(translateLabel("Spawn")) then
-        if not spawned_persist_props then
+        if spawned_persist_T[1] == nil then
           UI.widgetSound("Select")
           script.run_in_fiber(function(pers)
-            for _, p in pairs(persist_prop_info.props) do
+            for _, p in ipairs(persist_prop_info.props) do
               if Game.requestModel(p.hash) then
                 local persist_prop = OBJECT.CREATE_OBJECT(p.hash, 0.0, 0.0, 0.0, true, true, false)
                 pers:sleep(200)

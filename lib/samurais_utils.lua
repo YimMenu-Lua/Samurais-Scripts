@@ -732,6 +732,15 @@ SS = {
         autopilot_random    = false
       end
     end
+
+    if spawned_persist_T[1] ~= nil then
+      for _, p in ipairs(spawned_persist_T) do
+        if ENTITY.DOES_ENTITY_EXIST(p) then
+          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p, true, true)
+          ENTITY.DELETE_ENTITY(p)
+        end
+      end
+    end
   end,
 }
 
