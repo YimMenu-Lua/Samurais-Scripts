@@ -1,11 +1,11 @@
 name: Issue Report
-description: Create an issue report to help improve the script
-title: "[Issue]: "
-labels: issue
+description: Create a bug report to help improve the script
+title: "[BUG]: "
+labels: bug
 body:
 - type: textarea
   attributes:
-    label: Describe the issue
+    label: Describe The Bug
     description: A clear description of what the problem is.
   validations:
     required: true
