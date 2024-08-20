@@ -1,12 +1,12 @@
 name: Feature request
 description: Suggest a new idea
-title: "[Request]: "
+title: "[REQUEST]: "
 labels: request
 body:
 - type: textarea
   attributes:
     label: Problem
-    description: "Is your feature request related to a problem? Please describe."
+    description: "Is your feature request related to a problem? Please describe"
     placeholder: "A clear description of what the problem is."
   validations:
     required: false
