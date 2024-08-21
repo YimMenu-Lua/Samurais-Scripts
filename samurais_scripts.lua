@@ -462,25 +462,7 @@ function bankDriftPoints_SP(points)
 end
 
 Samurais_scripts:add_imgui(function()
-  local YY, MM, DD, H, M, S = CLOCK.GET_LOCAL_TIME(YY, MM, DD, H, M, S)
-  if MM < 10 then
-    MM = 0 .. MM
-  end
-  if DD < 10 then
-    DD = 0 .. DD
-  end
-  if H < 10 then
-    H = 0 .. H
-  end
-  if M < 10 then
-    M = 0 .. M
-  end
-  if S < 10 then
-    S = 0 .. S
-  end
-  local date_str = DD .. "-" .. months_T[tonumber(MM)] .. "-" .. YY
-  local time_str = H .. ":" .. M .. ":" .. S
-  local combined_str = "\10" .. "        " .. time_str .. "\10    " .. date_str .. "    " .. "\10\10"
+  local combined_str = os.date("\10    %x\10    %H:%M:%S    \10\10")
   ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
   ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
   UI.coloredButton(combined_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
@@ -497,7 +479,7 @@ end)
 --[[
     *self*
 ]]
-self_tab = Samurais_scripts:add_tab(translateLabel("Self"))
+self_tab = Samurais_scripts:add_tab("Not Self")
 self_tab:add_imgui(function()
   Regen, RegenUsed = ImGui.Checkbox(translateLabel("Auto-Heal"), Regen, true)
   UI.helpMarker(false, translateLabel("autoheal_tooltip"))
@@ -1461,6 +1443,7 @@ Actions:add_imgui(function()
     end
     ImGui.EndTabItem()
   end
+  ImGui.EndTabBar()
 end)
 
 
@@ -5038,6 +5021,7 @@ object_spawner:add_imgui(function()
     end
     ImGui.EndTabItem()
   end
+  ImGui.EndTabBar()
 end)
 --[[
     *settings*
