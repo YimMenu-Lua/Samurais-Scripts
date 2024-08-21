@@ -462,10 +462,10 @@ function bankDriftPoints_SP(points)
 end
 
 Samurais_scripts:add_imgui(function()
-  local combined_str = os.date("\10    %x\10    %H:%M:%S    \10\10")
+  local date_str = os.date("\10    %x\10    %H:%M:%S    \10\10")
   ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
   ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
-  UI.coloredButton(combined_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
+  UI.coloredButton(date_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
   ImGui.PopStyleVar()
   ImGui.Dummy(1, 10); ImGui.SeparatorText("About")
   UI.wrappedText("A collection of scripts aimed towards adding some roleplaying and fun elements to the game.", 25)
@@ -479,7 +479,7 @@ end)
 --[[
     *self*
 ]]
-self_tab = Samurais_scripts:add_tab("Not Self")
+self_tab = Samurais_scripts:add_tab(translateLabel("Self"))
 self_tab:add_imgui(function()
   Regen, RegenUsed = ImGui.Checkbox(translateLabel("Auto-Heal"), Regen, true)
   UI.helpMarker(false, translateLabel("autoheal_tooltip"))
