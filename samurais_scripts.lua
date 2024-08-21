@@ -462,28 +462,10 @@ function bankDriftPoints_SP(points)
 end
 
 Samurais_scripts:add_imgui(function()
-  local YY, MM, DD, H, M, S = CLOCK.GET_LOCAL_TIME(YY, MM, DD, H, M, S)
-  if MM < 10 then
-    MM = 0 .. MM
-  end
-  if DD < 10 then
-    DD = 0 .. DD
-  end
-  if H < 10 then
-    H = 0 .. H
-  end
-  if M < 10 then
-    M = 0 .. M
-  end
-  if S < 10 then
-    S = 0 .. S
-  end
-  local date_str = DD .. "-" .. months_T[tonumber(MM)] .. "-" .. YY
-  local time_str = H .. ":" .. M .. ":" .. S
-  local combined_str = "\10" .. "        " .. time_str .. "\10    " .. date_str .. "    " .. "\10\10"
+  local date_str = os.date("\10%d-%b-%Y\10    %H:%M:%S    \10\10")
   ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
   ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
-  UI.coloredButton(combined_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
+  UI.coloredButton(date_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
   ImGui.PopStyleVar()
   ImGui.Dummy(1, 10); ImGui.SeparatorText("About")
   UI.wrappedText("A collection of scripts aimed towards adding some roleplaying and fun elements to the game.", 25)
@@ -1461,6 +1443,7 @@ Actions:add_imgui(function()
     end
     ImGui.EndTabItem()
   end
+  ImGui.EndTabBar()
 end)
 
 
@@ -5038,6 +5021,7 @@ object_spawner:add_imgui(function()
     end
     ImGui.EndTabItem()
   end
+  ImGui.EndTabBar()
 end)
 --[[
     *settings*
