@@ -462,7 +462,7 @@ function bankDriftPoints_SP(points)
 end
 
 Samurais_scripts:add_imgui(function()
-  local date_str = os.date("\10    %x\10    %H:%M:%S    \10\10")
+  local date_str = os.date("\10%d-%b-%Y\10    %H:%M:%S    \10\10")
   ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
   ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
   UI.coloredButton(date_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
