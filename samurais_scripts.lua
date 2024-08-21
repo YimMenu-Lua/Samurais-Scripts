@@ -467,7 +467,7 @@ Samurais_scripts:add_imgui(function()
   local date_str = os.date("\10    %d-%b-%Y    \10       %H:%M:%S\10\10")
   ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
   ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
-  UI.coloredButton(date_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
+  UI.coloredButton(tostring(date_str), '#A67C00', '#A67C00', '#A67C00', 0.15)
   ImGui.PopStyleVar()
   ImGui.Dummy(1, 10); ImGui.SeparatorText("About")
   UI.wrappedText("A collection of scripts aimed towards adding some roleplaying and fun elements to the game.", 25)
