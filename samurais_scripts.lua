@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.1.7' -- v1.1.7
+SCRIPT_VERSION = '1.1.8' -- v1.1.8
 TARGET_BUILD   = '3274'  -- Only YimResupplier needs a version check.
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -16,10 +16,10 @@ CURRENT_BUILD   = Game.GetBuildNumber()
 CURRENT_VERSION = Game.GetOnlineVersion()
 
 
-Samurais_scripts         = gui.add_tab("Samurai's Scripts")
-local loading_label      = ""
-local start_loading_anim = false
-default_config           = {
+Samurais_scripts          = gui.add_tab("Samurai's Scripts")
+local loading_label       = ""
+local start_loading_anim  = false
+default_config            = {
   shortcut_anim           = {},
   saved_vehicles          = {},
   persist_attachments     = {},
@@ -85,6 +85,7 @@ default_config           = {
   real_plane_speed        = false,
   extend_world            = false,
   disableFlightMusic      = false,
+  disable_quotes          = false,
   nosPower                = 10,
   lightSpeed              = 1,
   DriftPowerIncrease      = 1,
@@ -157,6 +158,7 @@ real_plane_speed         = lua_cfg.read("real_plane_speed")
 unbreakableWindows       = lua_cfg.read("unbreakableWindows")
 extend_world             = lua_cfg.read("extend_world")
 disableFlightMusic       = lua_cfg.read("disableFlightMusic")
+disable_quotes           = lua_cfg.read("disable_quotes")
 tab1Sound                = true
 tab2Sound                = true
 tab3Sound                = true
@@ -462,7 +464,7 @@ function bankDriftPoints_SP(points)
 end
 
 Samurais_scripts:add_imgui(function()
-  local date_str = os.date("\10%d-%b-%Y\10    %H:%M:%S    \10\10")
+  local date_str = os.date("\10    %d-%b-%Y    \10       %H:%M:%S\10\10")
   ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
   ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
   UI.coloredButton(date_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
@@ -472,8 +474,10 @@ Samurais_scripts:add_imgui(function()
   ImGui.Dummy(1, 10)
   ImGui.BulletText("Script Version:   v" .. SCRIPT_VERSION)
   ImGui.BulletText("Game Version:   b" .. TARGET_BUILD .. "   Online " .. TARGET_VERSION)
-  ImGui.Dummy(1, 20); ImGui.SeparatorText("Quote Of The Day"); ImGui.Spacing()
-  UI.coloredText(random_quote, 'white', quote_alpha, 24)
+  if not disable_quotes then
+    ImGui.Dummy(1, 20); ImGui.SeparatorText("Quote Of The Day"); ImGui.Spacing()
+    UI.coloredText(random_quote, 'white', quote_alpha, 24)
+  end
 end)
 
 --[[
@@ -5079,6 +5083,14 @@ settings_tab:add_imgui(function()
     end
   end
 
+  disable_quotes, dqUsed = ImGui.Checkbox(translateLabel("dailyQuotesCB"), disable_quotes, true)
+  UI.toolTip(false, translateLabel("dailyQuotes_tt"))
+  if dqUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("disable_quotes", disable_quotes)
+  end
+
+  ImGui.Spacing()
   if shortcut_anim.anim ~= nil then
     if ImGui.Button(translateLabel("removeShortcut_btn2")) then
       UI.widgetSound("Delete")
@@ -5202,6 +5214,7 @@ settings_tab:add_imgui(function()
       extend_world            = false
       unbreakableWindows      = false
       disableFlightMusic      = false
+      disable_quotes          = false
       laser_switch            = 0
       DriftIntensity          = 0
       lang_idx                = 0
@@ -5262,23 +5275,27 @@ end)
 
 script.register_looped("Quote Of The Day", function(qotd)
   qotd:yield()
-  if gui.is_open() and Samurais_scripts:is_selected() then
-    random_quote = random_quotes_T[math.random(1, #random_quotes_T)]
-    qotd:sleep(15000)
+  if not disable_quotes then
+    if gui.is_open() and Samurais_scripts:is_selected() then
+      random_quote = random_quotes_T[math.random(1, #random_quotes_T)]
+      qotd:sleep(15000)
+    end
   end
 end)
 script.register_looped("QBE", function(qbe)
   qbe:yield()
-  if gui.is_open() and Samurais_scripts:is_selected() and random_quote ~= "" then
-    if quote_alpha > 0.1 then
-      while quote_alpha > 0.1 do
-        quote_alpha = quote_alpha - 0.05
-        qbe:sleep(100)
-      end
-    else
-      while quote_alpha < 1.0 do
-        quote_alpha = quote_alpha + 0.05
-        qbe:sleep(100)
+  if not disable_quotes then
+    if gui.is_open() and Samurais_scripts:is_selected() and random_quote ~= "" then
+      if quote_alpha > 0.1 then
+        while quote_alpha > 0.1 do
+          quote_alpha = quote_alpha - 0.05
+          qbe:sleep(100)
+        end
+      else
+        while quote_alpha < 1.0 do
+          quote_alpha = quote_alpha + 0.05
+          qbe:sleep(100)
+        end
       end
     end
   end

@@ -952,7 +952,7 @@ Labels = {
     },
 
     ["flightMusic_tt"] = {
-        {iso = "en-US", text = "Désactive la musique d'ambiance qui est automatiquement diffusée lorsque vous pilotez un avion."},
+        {iso = "en-US", text = "Disables the ambient music that automatically plays when you're flying an aircraft."},
         {iso = "de-DE", text = "Deaktiviert die Hintergrundmusik, die automatisch abgespielt wird, wenn Sie ein Flugzeug fliegen."},
         {iso = "fr-FR", text = "Désactive la musique d'ambiance qui est automatiquement diffusée lorsque vous pilotez un avion."},
         {iso = "it-IT", text = "Disattiva la musica ambientale che viene riprodotta automaticamente quando si vola su un aereo."},
@@ -2291,6 +2291,24 @@ Labels = {
         {iso = "it-IT", text = "Non disponibile in giocatore singolo."},
         {iso = "pt-BR", text = "Indisponível em um único jogador."},
         {iso = "ru-RU", text = "Недоступно в одиночной игре."},
+    },
+
+    ["dailyQuotesCB"] = {
+        {iso = "en-US", text = "Disable Daily Quotes"},
+        {iso = "de-DE", text = "Tägliche Zitate deaktivieren"},
+        {iso = "fr-FR", text = "Désactiver les citations quotidiennes"},
+        {iso = "it-IT", text = "Disattivare le citazioni quotidiane"},
+        {iso = "pt-BR", text = "Desativar citações diárias"},
+        {iso = "ru-RU", text = "Отключить ежедневные котировки"},
+    },
+
+    ["dailyQuotes_tt"] = {
+        {iso = "en-US", text = "Disable the 'Quote Of The Day' element in the script's welcome window."},
+        {iso = "de-DE", text = "Deaktiviert das Element 'Quote Of The Day' im Begrüßungsfenster des Skripts."},
+        {iso = "fr-FR", text = "Désactive l'élément 'Quote Of The Day' dans la fenêtre d'accueil du script."},
+        {iso = "it-IT", text = "Disattiva l'elemento 'Quote Of The Day' nella finestra di benvenuto dello script."},
+        {iso = "pt-BR", text = "Desativa o elemento 'Quote Of The Day' na janela de boas-vindas do script."},
+        {iso = "ru-RU", text = "Отключает элемент 'Quote Of The Day' в окне приветствия скрипта."},
     },
 }
 

@@ -224,7 +224,7 @@ lua_Fn = {
     return lua_Fn.has_bit(x, n) and x or x + n
   end,
 
-  ---Sets `p` bit from `x`
+  ---Clears `p` bit from `x`
   clear_bit = function(x, n)
     return lua_Fn.has_bit(x, n) and x - n or x
   end,
