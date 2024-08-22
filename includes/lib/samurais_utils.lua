@@ -744,6 +744,9 @@ SS = {
   end,
 }
 
+local gvov = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
+local game_build_offset = gvov:add(0x24):rip()
+local online_version_offset = game_build_offset:add(0x20)
 
 ----------------------------------------------- GTA Funcs -------------------------------------------------------
 Game = {
@@ -757,14 +760,13 @@ Game = {
   ]]
   ---@return string
   GetBuildNumber = function()
-    local game_build = memory.scan_pattern("8B C3 33 D2 C6 44 24 20"):add(0x24):rip()
-    return game_build:get_string()
+    return game_build_offset:get_string()
   end,
 
   -- Returns GTA Online's current version.
   ---@return string
   GetOnlineVersion = function()
-    return NETWORK.GET_ONLINE_VERSION()
+    return online_version_offset:get_string()
   end,
 
   GetLang = function()

@@ -4167,10 +4167,10 @@ world_tab:add_imgui(function()
 end)
 
 object_spawner         = world_tab:add_tab("Object Spawner")
-local coords           = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
-local heading          = ENTITY.GET_ENTITY_HEADING(self.get_ped())
-local forwardX         = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-local forwardY         = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+local coords           = self.get_pos()
+local heading          = 0.0
+local forwardX         = 0.0
+local forwardY         = 0.0
 objects_search         = ""
 propName               = ""
 invalidType            = ""
