@@ -3733,6 +3733,7 @@ casino_pacino:add_imgui(function()
         end
         ImGui.EndTabItem()
       end
+      ImGui.EndTabBar()
     else
       ImGui.Dummy(1, 5); ImGui.Text("Outdated.")
     end
