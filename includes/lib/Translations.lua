@@ -2310,6 +2310,24 @@ Labels = {
         {iso = "pt-BR", text = "Desativa o elemento 'Quote Of The Day' na janela de boas-vindas do script."},
         {iso = "ru-RU", text = "Отключает элемент 'Quote Of The Day' в окне приветствия скрипта."},
     },
+
+    ["missileLogsCB"] = {
+        {iso = "en-US", text = "Disable 'Missile Defense' Logs"},
+        {iso = "de-DE", text = "Deaktivieren der 'Missile Defense' Konsolenprotokolle"},
+        {iso = "fr-FR", text = "Désactiver Les Journaux de 'Missile Defense'"},
+        {iso = "it-IT", text = "Disattivare i Log 'Missile Defense'"},
+        {iso = "pt-BR", text = "Desativar os registros 'Missile Defense'"},
+        {iso = "ru-RU", text = "Отключите логи 'Missile Defense'"},
+    },
+
+    ["missileLogs_tt"] = {
+        {iso = "en-US", text = "Disables the console logs from the 'Missile Defense' feature."},
+        {iso = "de-DE", text = "Deaktiviert die Konsolenprotokolle der Option 'Missile Defense'"},
+        {iso = "fr-FR", text = "Désactive les journaux de console de l'option 'Missile Defense'"},
+        {iso = "it-IT", text = "Disattiva i log della console dall'opzione 'Missile Defense'"},
+        {iso = "pt-BR", text = "Desativa os logs do console da opção 'Missile Defense'"},
+        {iso = "ru-RU", text = "тключает консольные журналы из опции 'Missile Defense'"},
+    },
 }
 
 

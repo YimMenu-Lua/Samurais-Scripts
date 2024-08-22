@@ -745,7 +745,7 @@ SS = {
 }
 
 local gvov = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
-local game_build_offset = gvov:add(0x24):rip()
+local game_build_offset     = gvov:add(0x24):rip()
 local online_version_offset = game_build_offset:add(0x20)
 
 ----------------------------------------------- GTA Funcs -------------------------------------------------------
@@ -755,7 +755,7 @@ Game = {
   
    Returns GTA V's current build number.
 
-   **Credits:** [sch-lda](https://github.com/sch-lda)
+   **Credits:** [tupoy-ya](https://github.com/tupoy-ya)
 
   ]]
   ---@return string
@@ -763,7 +763,13 @@ Game = {
     return game_build_offset:get_string()
   end,
 
-  -- Returns GTA Online's current version.
+  --[[
+  
+   Returns GTA V's current online version.
+
+   **Credits:** [tupoy-ya](https://github.com/tupoy-ya)
+
+  ]]
   ---@return string
   GetOnlineVersion = function()
     return online_version_offset:get_string()
@@ -801,11 +807,7 @@ Game = {
   end,
 
   isOnline = function()
-    if NETWORK.NETWORK_IS_GAME_IN_PROGRESS() and NETWORK.NETWORK_IS_SESSION_ACTIVE() then
-      return true
-    else
-      return false
-    end
+    return network.is_session_started()
   end,
 
   updatePlayerList = function()
