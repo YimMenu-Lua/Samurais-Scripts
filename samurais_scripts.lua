@@ -71,6 +71,7 @@ default_config            = {
   holdF                   = false,
   keepWheelsTurned        = false,
   noJacking               = false,
+  towEverything           = false,
   useGameLang             = false,
   bypass_casino_bans      = false,
   force_poker_cards       = false,
@@ -157,6 +158,7 @@ insta180                 = lua_cfg.read("insta180")
 flares_forall            = lua_cfg.read("flares_forall")
 real_plane_speed         = lua_cfg.read("real_plane_speed")
 unbreakableWindows       = lua_cfg.read("unbreakableWindows")
+towEverything            = lua_cfg.read("towEverything")
 extend_world             = lua_cfg.read("extend_world")
 disableFlightMusic       = lua_cfg.read("disableFlightMusic")
 disable_quotes           = lua_cfg.read("disable_quotes")
@@ -1948,7 +1950,7 @@ vehicle_tab:add_imgui(function()
     ImGui.BeginDisabled(not aircraft_check)
     if ImGui.Button(" Fly To Waypoint ") then
       UI.widgetSound("Select")
-      script.run_in_fiber(function()
+      script.run_in_fiber(function(ap)
         local wp = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_WAYPOINT_BLIP_ENUM_ID())
         if HUD.DOES_BLIP_EXIST(wp) then
           local waypoint_coords = HUD.GET_BLIP_COORDS(wp)
@@ -1959,23 +1961,30 @@ vehicle_tab:add_imgui(function()
           autopilot_waypoint  = true
           autopilot_objective = false
           autopilot_random    = false
+          gui.show_success("Samurai's Scripts", "Flying towards your waypoint")
           if is_plane then
-            if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
-              if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
-                VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
-              end
-            end
             TASK.TASK_PLANE_MISSION(
               self.get_ped(), current_vehicle, 0, 0, waypoint_coords.x, waypoint_coords.y, waypoint_coords.z + 600,
-              4, 100.0, 0, 90, 0, 0, 200
+              4, 100.0, 0, 90, 0, 0, true
             )
+            if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
+              if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
+                if Game.Self.get_elevation() >= 15 then
+                  VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+                else
+                  repeat
+                    ap:sleep(10)
+                  until Game.Self.get_elevation() >= 15
+                  VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+                end
+              end
+            end
           elseif is_heli then
             TASK.TASK_HELI_MISSION(
               self.get_ped(), current_vehicle, 0, 0, waypoint_coords.x, waypoint_coords.y, waypoint_coords.z,
               4, 50.0, 4.0, -1, -1, 100, 100.0, 0
             )
           end
-          gui.show_success("Samurai's Scripts", "Flying towards your waypoint")
         else
           gui.show_warning("Samurai's Scripts", "Please set a waypoint on the map first!")
         end
@@ -1984,7 +1993,7 @@ vehicle_tab:add_imgui(function()
     ImGui.SameLine()
     if ImGui.Button(" Fly To Objective ") then
       UI.widgetSound("Select")
-      script.run_in_fiber(function()
+      script.run_in_fiber(function(ap)
         local objective_coords
         for _, id in pairs(objectives_T) do
           local blip = HUD.GET_CLOSEST_BLIP_INFO_ID(id)
@@ -2001,23 +2010,30 @@ vehicle_tab:add_imgui(function()
           autopilot_waypoint  = false
           autopilot_objective = true
           autopilot_random    = false
+          gui.show_success("Samurai's Scripts", "Flying towards objective")
           if is_plane then
-            if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
-              if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
-                VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
-              end
-            end
             TASK.TASK_PLANE_MISSION(
               self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z + 600,
-              4, 100.0, 0, 90, 0, 0, 200
+              4, 100.0, 0, 90, 0, 0, true
             )
+            if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
+              if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
+                if Game.Self.get_elevation() >= 15 then
+                  VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+                else
+                  repeat
+                    ap:sleep(10)
+                  until Game.Self.get_elevation() >= 15
+                  VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+                end
+              end
+            end
           elseif is_heli then
             TASK.TASK_HELI_MISSION(
               self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z,
               4, 50.0, 4.0, -1, -1, 100, 100.0, 0
             )
           end
-          gui.show_success("Samurai's Scripts", "Flying towards objective")
         else
           gui.show_warning("Samurai's Scripts", "No objective found!")
         end
@@ -2026,7 +2042,7 @@ vehicle_tab:add_imgui(function()
     ImGui.SameLine()
     if ImGui.Button(" Random ") then
       UI.widgetSound("Select")
-      script.run_in_fiber(function()
+      script.run_in_fiber(function(ap)
         if autopilot_waypoint or autopilot_objective then
           TASK.CLEAR_PED_TASKS(self.get_ped())
           TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
@@ -2034,17 +2050,24 @@ vehicle_tab:add_imgui(function()
         autopilot_waypoint  = false
         autopilot_objective = false
         autopilot_random    = true
+        gui.show_success("Samurai's Scripts", "Flying towards some random coordinates")
         if is_plane then
-          if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
-            if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
-              VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
-            end
-          end
           TASK.TASK_PLANE_MISSION(
             self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000),
-            math.random(400, 900),
-            4, 100.0, 0, 90, 0, 0, 200
+            math.random(400, 900), 4, 100.0, 0, 90, 0, 0, true
           )
+          if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
+            if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
+              if Game.Self.get_elevation() >= 15 then
+                VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+              else
+                repeat
+                  ap:sleep(10)
+                until Game.Self.get_elevation() >= 15
+                VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+              end
+            end
+          end
         elseif is_heli then
           TASK.TASK_HELI_MISSION(
             self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000),
@@ -2052,7 +2075,6 @@ vehicle_tab:add_imgui(function()
             4, 50.0, 4.0, -1, -1, 100, 100.0, 0
           )
         end
-        gui.show_success("Samurai's Scripts", "Flying towards some random coordinates")
       end)
     end
     if autopilot_waypoint or autopilot_objective or autopilot_random then
@@ -2332,16 +2354,18 @@ tow_yAxis     = 0.0
 tow_zAxis     = 0.0
 modelOverride = false
 flatbed:add_imgui(function()
-  local vehicleHandles = entities.get_all_vehicles_as_handles()
-  local flatbedModel   = 1353720154
-  local vehicle_model  = Game.getEntityModel(current_vehicle)
-  local playerPosition = self.get_pos()
-  local playerForwardX = Game.getForwardX(self.get_ped())
-  local playerForwardY = Game.getForwardY(self.get_ped())
+  local window_size_x, window_size_y = ImGui.GetWindowSize()
+  local vehicleHandles  = entities.get_all_vehicles_as_handles()
+  local flatbedModel    = 1353720154
+  local vehicle_model   = Game.getEntityModel(current_vehicle)
+  local playerPosition  = self.get_pos()
+  local flatbedPosition = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
+  local flatbedForwardX = Game.getForwardX(current_vehicle)
+  local flatbedForwardY = Game.getForwardY(current_vehicle)
   for _, veh in ipairs(vehicleHandles) do
     script.run_in_fiber(function(detector)
-      local detectPos = vec3:new(playerPosition.x - (playerForwardX * 10), playerPosition.y - (playerForwardY * 10),
-        playerPosition.z)
+      local detectPos = vec3:new(flatbedPosition.x - (flatbedForwardX * 10), flatbedPosition.y - (flatbedForwardY * 10),
+      flatbedPosition.z)
       local vehPos    = ENTITY.GET_ENTITY_COORDS(veh, false)
       local vDist     = SYSTEM.VDIST(detectPos.x, detectPos.y, detectPos.z, vehPos.x, vehPos.y, vehPos.z)
       if vDist <= 5 then
@@ -2388,8 +2412,11 @@ flatbed:add_imgui(function()
     towable = true
   end
   if is_in_flatbed then
-    ImGui.Text(displayText)
+    ImGui.Dummy(1, 10); ImGui.SeparatorText(displayText)
+    ImGui.Dummy(1, 10);
+    ImGui.BeginDisabled(not Game.Self.isDriving() or towed_vehicle ~= 0)
     towPos, towPosUsed = ImGui.Checkbox(translateLabel("Show Towing Position"), towPos, true)
+    ImGui.EndDisabled()
     UI.helpMarker(false, translateLabel("towpos_tt"))
     if towPosUsed then
       UI.widgetSound("Nav2")
@@ -2399,6 +2426,7 @@ flatbed:add_imgui(function()
     UI.helpMarker(false, translateLabel("TowEverything_tt"))
     if towEverythingUsed then
       UI.widgetSound("Nav2")
+      lua_cfg.save("towEverything", towEverything)
     end
     if towEverything then
       modelOverride = true
@@ -2406,15 +2434,15 @@ flatbed:add_imgui(function()
       modelOverride = false
     end
 
+    ImGui.Dummy(1, 10); ImGui.Dummy((window_size_x // 2) - 65, 1); ImGui.SameLine()
     if towed_vehicle == 0 then
-      if ImGui.Button(translateLabel("towBtn")) then
+      if ImGui.Button(translateLabel("towBtn"), 80, 40) then
         UI.widgetSound("Select")
         if towable and closestVehicle ~= nil and closestVehicleModel ~= flatbedModel then
           script.run_in_fiber(function()
-            controlled = entities.take_control_of(closestVehicle, 300)
-            if controlled then
+            if entities.take_control_of(closestVehicle, 300) then
               flatbedHeading = ENTITY.GET_ENTITY_HEADING(current_vehicle)
-              flatbedBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, "chassis_dummy")
+              flatbedBone    = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, "chassis_dummy")
               vehBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(closestVehicle, "chassis_dummy")
               local vehicleClass = VEHICLE.GET_VEHICLE_CLASS(closestVehicle)
               if vehicleClass == 1 then
@@ -2458,35 +2486,27 @@ flatbed:add_imgui(function()
         end
       end
     else
-      if ImGui.Button(translateLabel("detachBtn")) then
+      if ImGui.Button(translateLabel("detachBtn"), 80, 40) then
         UI.widgetSound("Select2")
         script.run_in_fiber(function()
           local modelHash = ENTITY.GET_ENTITY_MODEL(towed_vehicle)
-          local attachedVehicle = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(
-            PED.GET_VEHICLE_PED_IS_USING(self.get_ped()), modelHash)
+          local attachedVehicle = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(current_vehicle, modelHash)
           local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(towed_vehicle, false)
           controlled = entities.take_control_of(attachedVehicle, 300)
           if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) then
             if controlled then
-              ENTITY.DETACH_ENTITY(attachedVehicle)
-              ENTITY.SET_ENTITY_COORDS(attachedVehicle, attachedVehcoords.x - (playerForwardX * 10),
-                attachedVehcoords.y - (playerForwardY * 10), playerPosition.z, false, false, false, false)
+              ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
+              ENTITY.SET_ENTITY_COORDS(attachedVehicle, attachedVehcoords.x - (flatbedForwardX * 10),
+                attachedVehcoords.y - (flatbedForwardY * 10), flatbedPosition.z, false, false, false, false)
               VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(towed_vehicle, 5.0)
               towed_vehicle = 0
             end
           end
         end)
       end
-      ImGui.Spacing(); ImGui.Text(translateLabel("Adjust Vehicle Position"))
-      if ImGui.IsItemHovered() then
-        ImGui.BeginTooltip()
-        ImGui.PushTextWrapPos(ImGui.GetFontSize() * 20)
-        ImGui.TextWrapped(translateLabel("AdjustPosition_tt"))
-        ImGui.PopTextWrapPos()
-        ImGui.EndTooltip()
-      end
-      ImGui.Separator(); ImGui.Spacing()
-      ImGui.Dummy(100, 1); ImGui.SameLine()
+      ImGui.Dummy(1, 5); ImGui.SeparatorText(translateLabel("Adjust Vehicle Position"))
+      UI.toolTip(false, translateLabel("AdjustPosition_tt"))
+      ImGui.Spacing(); ImGui.Dummy((window_size_x // 2) - 40, 1); ImGui.SameLine()
       ImGui.ArrowButton("##Up", 2)
       if ImGui.IsItemActive() then
         tow_zAxis = tow_zAxis + 0.01
@@ -2494,7 +2514,7 @@ flatbed:add_imgui(function()
           0.0, 0.0, 0.0,
           true, true, false, false, 1, true, 1)
       end
-      ImGui.Dummy(60, 1); ImGui.SameLine()
+      ImGui.Dummy((window_size_x // 2) - 80, 1); ImGui.SameLine()
       ImGui.ArrowButton("##Left", 0)
       if ImGui.IsItemActive() then
         tow_yAxis = tow_yAxis + 0.01
@@ -2510,7 +2530,7 @@ flatbed:add_imgui(function()
           0.0, 0.0, 0.0,
           true, true, false, false, 1, true, 1)
       end
-      ImGui.Dummy(100, 1); ImGui.SameLine()
+      ImGui.Dummy((window_size_x // 2) - 40, 1); ImGui.SameLine()
       ImGui.ArrowButton("##Down", 3)
       if ImGui.IsItemActive() then
         tow_zAxis = tow_zAxis - 0.01
@@ -2659,10 +2679,8 @@ local function spawnPersistVeh(main, mods, col_1, col_2, tint, attachments)
     local forwardX = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
     local forwardY = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
     local heading  = ENTITY.GET_ENTITY_HEADING(self.get_ped())
-    Pos.x          = Pos.x + (forwardX * 7)
-    Pos.y          = Pos.y + (forwardY * 7)
     if Game.requestModel(main) then
-      spawned_persist = VEHICLE.CREATE_VEHICLE(main, Pos.x, Pos.y, Pos.z, heading, true, false, false)
+      spawned_persist = VEHICLE.CREATE_VEHICLE(main, Pos.x + (forwardX * 7), Pos.y + (forwardY * 7), Pos.z, heading, true, false, false)
       VEHICLE.SET_VEHICLE_IS_STOLEN(spawned_persist, false)
       DECORATOR.DECOR_SET_INT(spawned_persist, "MPBitset", 0)
       VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(spawned_persist, col_1.r, col_1.g, col_1.b)
@@ -2672,7 +2690,7 @@ local function spawnPersistVeh(main, mods, col_1, col_2, tint, attachments)
     end
     for _, att in ipairs(attachments) do
       if Game.requestModel(att.hash) then
-        local attach = VEHICLE.CREATE_VEHICLE(att.hash, Pos.x, Pos.y, Pos.z, heading, true, false, false)
+        local attach = VEHICLE.CREATE_VEHICLE(att.hash, Pos.x + (forwardX * 7), Pos.y + (forwardY * 7), Pos.z, heading, true, false, false)
         VEHICLE.SET_VEHICLE_IS_STOLEN(attach, false)
         DECORATOR.DECOR_SET_INT(attach, "MPBitset", 0)
         VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(attach, att.color_1.r, att.color_1.g, att.color_1.b)
@@ -2936,7 +2954,7 @@ vehicle_creator:add_imgui(function()
       selected_attchmnt = veh_attachments[attachment_index + 1]
       ImGui.Text(translateLabel("generic_multiplier_label"))
       ImGui.PushItemWidth(271)
-      veh_axisMult, _ = ImGui.InputInt("##AttachMultiplier", veh_axisMult, 1, 2, 0)
+      veh_axisMult, _ = ImGui.InputInt("##AttachMultiplier", veh_axisMult, 1, 2)
       ImGui.PopItemWidth()
       ImGui.Spacing()
       ImGui.Text("X Axis :"); ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); ImGui.Text("Y Axis :"); ImGui
@@ -3268,6 +3286,16 @@ casino_heist_hacker                   = 0
 casino_heist_weapons                  = 0
 casino_heist_cars                     = 0
 casino_heist_masks                    = 0
+new_approach                          = 0
+new_target                            = 0
+new_last_approach                     = 0
+new_hard_approach                     = 0
+new_gunman                            = 0
+new_weapons                           = 0
+new_driver                            = 0
+new_car                               = 0
+new_hacker                            = 0
+new_masks                             = 0
 casino_cooldown_update_str            = ""
 dealers_card_str                      = ""
 heist_cart_autograb                   = lua_cfg.read("heist_cart_autograb")
@@ -4404,7 +4432,7 @@ object_spawner:add_imgui(function()
         forwardX = forwardX * 0.1
         forwardY = forwardY * 0.1
         ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x + forwardX, previewObjectPos.y + forwardY,
-          previewObjectPos.z)
+          previewObjectPos.z, false, false, false, false)
       end
       ImGui.SameLine()
       ImGui.ArrowButton("##f3", 3)
@@ -4412,20 +4440,20 @@ object_spawner:add_imgui(function()
         forwardX = forwardX * 0.1
         forwardY = forwardY * 0.1
         ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x - forwardX, previewObjectPos.y - forwardY,
-          previewObjectPos.z)
+          previewObjectPos.z, false, false, false, false)
       end
       ImGui.SameLine()
       ImGui.Dummy(60, 1); ImGui.SameLine()
       ImGui.ArrowButton("##z2", 2)
       if ImGui.IsItemActive() then
         zOffset = zOffset + 0.01
-        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z + 0.01)
+        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z + 0.01, false, false, false, false)
       end
       ImGui.SameLine()
       ImGui.ArrowButton("##z3", 3)
       if ImGui.IsItemActive() then
         zOffset = zOffset - 0.01
-        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z - 0.01)
+        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z - 0.01, false, false, false, false)
       end
     else
       previewStarted = false
@@ -4690,7 +4718,7 @@ object_spawner:add_imgui(function()
           ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, false, false, false, false, 2, true, 1)
         else
-          ENTITY.SET_ENTITY_COORDS(selectedObject, coords.x + (forwardX * 3), coords.y + (forwardY * 3), coords.z)
+          ENTITY.SET_ENTITY_COORDS(selectedObject, coords.x + (forwardX * 3), coords.y + (forwardY * 3), coords.z, false, false, false, false)
           ENTITY.SET_ENTITY_HEADING(selectedObject, heading)
           OBJECT.PLACE_OBJECT_ON_GROUND_OR_OBJECT_PROPERLY(selectedObject)
         end
@@ -4699,7 +4727,7 @@ object_spawner:add_imgui(function()
       if edit_mode and not attached then
         ImGui.Text(translateLabel("xyz_multiplier"))
         ImGui.PushItemWidth(280)
-        axisMult, _ = ImGui.InputInt("##multiplier", axisMult, 1, 2, 0)
+        axisMult, _ = ImGui.InputInt("##multiplier", axisMult, 1, 2)
         ImGui.Text("                        X Axis :")
         spawnDistance.x, _ = ImGui.SliderFloat(" ", spawnDistance.x, -0.1 * axisMult, 0.1 * axisMult)
         activeX = ImGui.IsItemActive()
@@ -4737,7 +4765,7 @@ object_spawner:add_imgui(function()
           end
           ImGui.Text(translateLabel("xyz_multiplier"))
           ImGui.PushItemWidth(271)
-          axisMult, _ = ImGui.InputInt("##AttachMultiplier", axisMult, 1, 2, 0)
+          axisMult, _ = ImGui.InputInt("##AttachMultiplier", axisMult, 1, 2)
           ImGui.PopItemWidth()
           ImGui.Spacing()
           ImGui.Text("X Axis :"); ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); ImGui.Text("Y Axis :"); ImGui
@@ -4938,7 +4966,7 @@ object_spawner:add_imgui(function()
                 script.run_in_fiber(function()
                   for _, p in ipairs(spawned_props) do
                     if ENTITY.DOES_ENTITY_EXIST(p) then
-                      ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p)
+                      ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p, true, true)
                       ENTITY.DELETE_ENTITY(p)
                     end
                   end
@@ -5208,6 +5236,7 @@ settings_tab:add_imgui(function()
       autobrklight            = false
       holdF                   = false
       keepWheelsTurned        = false
+      towEverything           = false
       noJacking               = false
       useGameLang             = false
       disableProps            = false
@@ -5327,7 +5356,7 @@ script.register_looped("GameInput", function()
     PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
   end
 
-  if PAD.IS_USING_KEYBOARD_AND_MOUSE() then
+  if PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
     stopButton = "[G]"
   else
     stopButton = "[DPAD LEFT]"
@@ -5335,21 +5364,21 @@ script.register_looped("GameInput", function()
 
   if shortcut_anim.btn ~= nil then
     if gui.is_open() then
-      PAD.DISABLE_CONTROL_ACTION(0, shortcut_anim.btn)
+      PAD.DISABLE_CONTROL_ACTION(0, shortcut_anim.btn, true)
     end
   end
 
   if HashGrabber and WEAPON.IS_PED_ARMED(self.get_ped(), 4) then
-    PAD.DISABLE_CONTROL_ACTION(0, 24, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 257, 1)
+    PAD.DISABLE_CONTROL_ACTION(0, 24, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 257, true)
   end
 
   if replaceSneakAnim and Game.Self.isOnFoot() then
-    PAD.DISABLE_CONTROL_ACTION(0, 36, 1)
+    PAD.DISABLE_CONTROL_ACTION(0, 36, true)
   end
 
   if replacePointAct or is_playing_anim or is_playing_scenario or ped_grabbed then
-    PAD.DISABLE_CONTROL_ACTION(0, 29, 1)
+    PAD.DISABLE_CONTROL_ACTION(0, 29, true)
   end
 
   if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
@@ -5383,20 +5412,20 @@ script.register_looped("GameInput", function()
   end
 
   if (pedGrabber or vehicleGrabber) and Game.Self.isOnFoot() and not WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
-    PAD.DISABLE_CONTROL_ACTION(0, 24, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 25, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 50, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 68, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 91, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 257, 1)
+    PAD.DISABLE_CONTROL_ACTION(0, 24, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 25, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 50, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 68, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 91, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 257, true)
   end
   if ped_grabbed or vehicle_grabbed then
-    PAD.DISABLE_CONTROL_ACTION(0, 24, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 25, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 50, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 68, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 91, 1)
-    PAD.DISABLE_CONTROL_ACTION(0, 257, 1)
+    PAD.DISABLE_CONTROL_ACTION(0, 24, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 25, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 50, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 68, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 91, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 257, true)
   end
 end)
 
@@ -5408,7 +5437,7 @@ script.register_looped("auto-heal", function(ah)
     local myHp   = Game.Self.health()
     local myArmr = Game.Self.armour()
     if myHp < maxHp and myHp > 0 then
-      if PED.IS_PED_IN_COVER(self.get_ped()) then
+      if PED.IS_PED_IN_COVER(self.get_ped(), false) then
         ENTITY.SET_ENTITY_HEALTH(self.get_ped(), myHp + 10, 0, 0)
       else
         ENTITY.SET_ENTITY_HEALTH(self.get_ped(), myHp + 1, 0, 0)
@@ -5515,18 +5544,18 @@ script.register_looped("self features", function(script)
 
   -- Online Phone Animations
   if NETWORK.NETWORK_IS_SESSION_ACTIVE() then
-    if phoneAnim and not ENTITY.IS_ENTITY_DEAD(self.get_ped()) then
+    if phoneAnim and not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) then
       if not is_playing_anim and not is_playing_scenario and not ped_grabbed and not is_handsUp and PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0 then
-        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 242, 1) then
+        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 242, true) then
           PED.SET_PED_CONFIG_FLAG(self.get_ped(), 242, false)
         end
-        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 243, 1) then
+        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 243, true) then
           PED.SET_PED_CONFIG_FLAG(self.get_ped(), 243, false)
         end
-        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 244, 1) then
+        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 244, true) then
           PED.SET_PED_CONFIG_FLAG(self.get_ped(), 244, false)
         end
-        if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 243, 1) and AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() then
+        if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 243, true) and AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() then
           if not STREAMING.HAS_ANIM_DICT_LOADED("anim@scripted@freemode@ig19_mobile_phone@male@") then
             STREAMING.REQUEST_ANIM_DICT("anim@scripted@freemode@ig19_mobile_phone@male@")
             return
@@ -5550,7 +5579,7 @@ script.register_looped("self features", function(script)
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 244, true)
     end
   else
-    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 242, 1) and PED.GET_PED_CONFIG_FLAG(self.get_ped(), 243, 1) and PED.GET_PED_CONFIG_FLAG(self.get_ped(), 244, 1) then
+    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 242, true) and PED.GET_PED_CONFIG_FLAG(self.get_ped(), 243, true) and PED.GET_PED_CONFIG_FLAG(self.get_ped(), 244, true) then
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 242, false)
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 243, false)
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 244, false)
@@ -5559,22 +5588,22 @@ script.register_looped("self features", function(script)
 
   -- Sprint Inside
   if sprintInside then
-    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 427, 1) == false then
+    if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 427, true) then
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 427, true)
     end
   else
-    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 427, 1) then
+    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 427, true) then
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 427, false)
     end
   end
 
   -- Lockpick animation
   if lockPick then
-    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 426, 1) == false then
+    if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 426, true) then
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 426, true)
     end
   else
-    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 426, 1) then
+    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 426, true) then
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 426, false)
     end
   end
@@ -5596,7 +5625,7 @@ script.register_looped("Ragdoll Loop", function(rgdl)
   elseif rod then
     if PED.CAN_PED_RAGDOLL(self.get_ped()) then
       if PAD.IS_CONTROL_PRESSED(0, 252) and Game.getEntityModel(self.get_veh()) ~= 884483972 and Game.getEntityModel(self.get_veh()) ~= 2069146067 then
-        PED.SET_PED_TO_RAGDOLL(self.get_ped(), 1500, 0, 0, false)
+        PED.SET_PED_TO_RAGDOLL(self.get_ped(), 1500, 0, 0, false, false , false)
         if isCrouched then
           isCrouched = false
         end
@@ -5623,7 +5652,7 @@ script.register_looped("Ragdoll Loop", function(rgdl)
       rgdl:sleep(500)
       local myPos = ENTITY.GET_ENTITY_COORDS(self.get_ped(), true)
       AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE("SCREAM_PANIC_SHORT", soundName, myPos.x, myPos.y, myPos.z,
-        "SPEECH_PARAMS_FORCE_SHOUTED", 0)
+        "SPEECH_PARAMS_FORCE_SHOUTED")
       repeat
         rgdl:sleep(100)
       until
@@ -5639,7 +5668,7 @@ script.register_looped("Anim Sound Effects", function(animSfx)
       if info.sfx ~= nil then
         local soundCoords = self.get_pos()
         AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(info.sfx, info.sfxName, soundCoords.x, soundCoords.y,
-          soundCoords.z, info.sfxFlg, 0)
+          soundCoords.z, info.sfxFlg)
         animSfx:sleep(10000)
       end
     end
@@ -5648,7 +5677,7 @@ script.register_looped("Anim Sound Effects", function(animSfx)
     if shortcut_anim.sfx ~= nil then
       local soundCoords = self.get_pos()
       AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(info.sfx, info.sfxName, soundCoords.x, soundCoords.y, soundCoords.z,
-        info.sfxFlg, 0)
+        info.sfxFlg)
       animSfx:sleep(10000)
     end
   end
@@ -5780,13 +5809,13 @@ script.register_looped("animation hotkey", function(script)
           if PED.IS_PED_IN_ANY_VEHICLE(v, false) then
             PED.SET_PED_INTO_VEHICLE(v, veh, npcSeat)
           else
-            local current_NPCcoords = ENTITY.GET_ENTITY_COORDS(v)
+            local current_NPCcoords = ENTITY.GET_ENTITY_COORDS(v, true)
             ENTITY.SET_ENTITY_COORDS_NO_OFFSET(v, current_NPCcoords.x, current_NPCcoords.y, current_NPCcoords.z, true,
               false, false)
           end
         end
       else
-        local current_coords = ENTITY.GET_ENTITY_COORDS(self.get_ped())
+        local current_coords = ENTITY.GET_ENTITY_COORDS(self.get_ped(), true)
         ENTITY.SET_ENTITY_COORDS_NO_OFFSET(self.get_ped(), current_coords.x, current_coords.y, current_coords.z, true,
           false, false)
       end
@@ -5829,7 +5858,7 @@ script.register_looped("animation hotkey", function(script)
             local myforwardX   = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
             local myforwardY   = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
             local myboneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
-            local mybonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID)
+            local mybonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
             if manualFlags then
               setmanualflag()
             else
@@ -5901,7 +5930,7 @@ script.register_looped("anim shortcut", function(animsc)
       local myforwardX   = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
       local myforwardY   = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
       local myboneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
-      local mybonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID)
+      local mybonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
       if is_playing_anim or is_playing_scenario then
         cleanup()
         if ENTITY.DOES_ENTITY_EXIST(bbq) then
@@ -5954,7 +5983,7 @@ script.register_looped("action mode", function(amode)
   if disableActionMode then
     if PED.IS_PED_USING_ACTION_MODE(self.get_ped()) then
       PLAYER.SET_DISABLE_AMBIENT_MELEE_MOVE(self.get_id(), true)
-      PED.SET_PED_USING_ACTION_MODE(self.get_ped(), false, -1, 0)
+      PED.SET_PED_USING_ACTION_MODE(self.get_ped(), false, -1, "DEFAULT_ACTION")
     else
       amode:sleep(500)
     end
@@ -5965,7 +5994,7 @@ script.register_looped("npc stuff", function(npcStuff)
   if spawned_npcs[1] ~= nil then
     for k, v in ipairs(spawned_npcs) do
       if ENTITY.DOES_ENTITY_EXIST(v) then
-        if ENTITY.IS_ENTITY_DEAD(v) then
+        if ENTITY.IS_ENTITY_DEAD(v, false) then
           PED.REMOVE_PED_FROM_GROUP(v)
           npcStuff:sleep(3000)
           PED.DELETE_PED(v)
@@ -5997,10 +6026,10 @@ script.register_looped("TriggerBot", function(trgrbot)
       aimBool, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER.PLAYER_ID(), Entity)
       if aimBool then
         if ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
-          local bonePos = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Entity, "head"))
+          local bonePos = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(Entity, ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Entity, "head"))
           weapon = Game.Self.weapon()
           if WEAPON.IS_PED_WEAPON_READY_TO_SHOOT(self.get_ped()) and Game.Self.isOnFoot() and not PED.IS_PED_RELOADING(self.get_ped()) then
-            if not ENTITY.IS_ENTITY_DEAD(Entity) then
+            if not ENTITY.IS_ENTITY_DEAD(Entity, false) then
               if PAD.IS_CONTROL_PRESSED(0, 21) then
                 if aimEnemy then
                   if PED.IS_PED_IN_COMBAT(Entity, self.get_ped()) then
@@ -6033,10 +6062,10 @@ script.register_looped("auto-kill-enemies", function(ak)
       for _, p in pairs(gta_peds) do
         if PED.IS_PED_HUMAN(p) and PED.IS_PED_IN_COMBAT(p, self.get_ped()) and not PED.IS_PED_A_PLAYER(p) then
           if PED.CAN_PED_IN_COMBAT_SEE_TARGET(p, self.get_ped()) then
-            PED.APPLY_DAMAGE_TO_PED(p, 100000, 1, 0); PED.EXPLODE_PED_HEAD(p, 0x7FD62962)
+            PED.APPLY_DAMAGE_TO_PED(p, 100000, true, 0, 0x7FD62962); PED.EXPLODE_PED_HEAD(p, 0x7FD62962)
           else
             ak:sleep(969) -- prevent kill spamming. It's fine, I just don't like it.
-            PED.APPLY_DAMAGE_TO_PED(p, 100000, 1, 0); PED.EXPLODE_PED_HEAD(p, 0x7FD62962)
+            PED.APPLY_DAMAGE_TO_PED(p, 100000, true, 0, 0x7FD62962); PED.EXPLODE_PED_HEAD(p, 0x7FD62962)
           end
           ak:yield()
         end
@@ -6079,8 +6108,8 @@ end)
 script.register_looped("laser_render", function(lsr)
   if laserSight and WEAPON.IS_PED_ARMED(self.get_ped(), 4) and Game.Self.isOnFoot() then
     local wpn_hash = WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped())
-    local wpn_idx  = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped())
-    local hr, _, _ = NETWORK.NETWORK_GET_GLOBAL_MULTIPLAYER_CLOCK()
+    local wpn_idx  = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
+    local h, m, s = NETWORK.NETWORK_GET_GLOBAL_MULTIPLAYER_CLOCK(h, m, s)
     local laser_a  = 1.0
     local wpn_bone = 0
     if wpn_hash ~= 0x34A67B97 and wpn_hash ~= 0xBA536372 and wpn_hash ~= 0x184140A1 and wpn_hash ~= 0x060EC506 then
@@ -6092,8 +6121,8 @@ script.register_looped("laser_render", function(lsr)
         end
       end
     end
-    if hr ~= nil then
-      if hr > 6 and hr < 20 then
+    if h ~= nil then
+      if h > 6 and h < 20 then
         laser_a = 0.5
       else
         laser_a = 0.2
@@ -6106,7 +6135,7 @@ script.register_looped("laser_render", function(lsr)
         lsr:sleep(300)
         GRAPHICS.USE_PARTICLE_FX_ASSET('core')
         laserPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(laser_choice, wpn_idx,
-          1.0, 0.0, -0.01, 0.0, 0.0, 90.0, wpn_bone, 0.20, false, false, false, 0, 0, 0)
+          1.0, 0.0, -0.01, 0.0, 0.0, 90.0, wpn_bone, 0.20, false, false, false, 0, 0, 0, laser_a)
         GRAPHICS.SET_PARTICLE_FX_LOOPED_ALPHA(laserPtfx, laser_a)
         table.insert(laserPtfx_T, laserPtfx)
         drew_laser = true
@@ -6117,8 +6146,8 @@ script.register_looped("laser_render", function(lsr)
         until PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) == false
         for _, laser in ipairs(laserPtfx_T) do
           if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(laser) then
-            GRAPHICS.STOP_PARTICLE_FX_LOOPED(laser)
-            GRAPHICS.REMOVE_PARTICLE_FX(laser)
+            GRAPHICS.STOP_PARTICLE_FX_LOOPED(laser, false)
+            GRAPHICS.REMOVE_PARTICLE_FX(laser, false)
           end
           drew_laser = false
         end
@@ -6176,13 +6205,8 @@ script.register_looped("TDFT", function(script)
           if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
             if PAD.IS_DISABLED_CONTROL_PRESSED(0, tdBtn) and PAD.IS_CONTROL_PRESSED(0, 71) then
               if VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) < 300 then
-                failSound = AUDIO.PLAY_SOUND_FROM_ENTITY(-1, "Engine_fail", current_vehicle,
+                AUDIO.PLAY_SOUND_FROM_ENTITY(-1, "Engine_fail", current_vehicle,
                   "DLC_PILOT_ENGINE_FAILURE_SOUNDS", true, 0)
-                repeat
-                  script:sleep(50)
-                until
-                  AUDIO.HAS_SOUND_FINISHED(failSound) and PAD.IS_CONTROL_PRESSED(0, tdBtn) == false and PAD.IS_CONTROL_PRESSED(0, 71) == false
-                AUDIO.STOP_SOUND(failSound)
               end
             end
           end
@@ -6243,7 +6267,7 @@ script.register_looped("TDFT", function(script)
         end
       end
     else
-      if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 241, 1) then
+      if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 241, true) then
         PED.SET_PED_CONFIG_FLAG(self.get_ped(), 241, false)
       end
     end
@@ -6278,10 +6302,10 @@ script.register_looped("tire smoke", function(smkptfx)
               GRAPHICS.USE_PARTICLE_FX_ASSET(dict)
               smokePtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("scr_ba_bb_plane_smoke_trail",
                 current_vehicle,
-                -0.4, 0.0, 0.0, 0.0, 0.0, 0.0, r_wheels, 0.3, false, false, false, 0, 0, 0)
-              GRAPHICS.SET_PARTICLE_FX_LOOPED_COLOUR(smokePtfx, driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, 0)
+                -0.4, 0.0, 0.0, 0.0, 0.0, 0.0, r_wheels, 0.3, false, false, false, 0, 0, 0, 255)
+              GRAPHICS.SET_PARTICLE_FX_LOOPED_COLOUR(smokePtfx, driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, false)
               table.insert(smokePtfx_t, smokePtfx)
-              GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke)
+              GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke, false)
               tire_smoke = true
             end
             if tire_smoke then
@@ -6291,8 +6315,8 @@ script.register_looped("tire smoke", function(smkptfx)
                 PAD.IS_CONTROL_RELEASED(0, tdBtn) or PAD.IS_CONTROL_RELEASED(0, 71)
               for _, smoke in ipairs(smokePtfx_t) do
                 if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(smoke) then
-                  GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke)
-                  GRAPHICS.REMOVE_PARTICLE_FX(smoke)
+                  GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke, false)
+                  GRAPHICS.REMOVE_PARTICLE_FX(smoke, false)
                 end
               end
               tire_smoke = false
@@ -6365,7 +6389,7 @@ end)
 script.register_looped("MISC Vehicle Options", function(mvo)
   if Game.Self.isDriving() then
     if autobrklight then
-      if VEHICLE.IS_VEHICLE_DRIVEABLE(current_vehicle) and VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
+      if VEHICLE.IS_VEHICLE_DRIVEABLE(current_vehicle, false) and VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
         VEHICLE.SET_VEHICLE_BRAKE_LIGHTS(current_vehicle, true)
       end
     end
@@ -6436,7 +6460,7 @@ script.register_looped("NOS ptfx", function(spbptfx)
             if retBool then
               GRAPHICS.USE_PARTICLE_FX_ASSET(effect)
               nosPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_nitrous", current_vehicle, 0.0,
-                0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 1.0, false, false, false, 0, 0, 0)
+                0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 1.0, false, false, false, 0, 0, 0, 255)
               table.insert(nosptfx_t, nosPtfx)
               if nosvfx then
                 GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrous", 0, false)
@@ -6460,8 +6484,8 @@ script.register_looped("NOS ptfx", function(spbptfx)
             end
             for _, nos in ipairs(nosptfx_t) do
               if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(nos) then
-                GRAPHICS.STOP_PARTICLE_FX_LOOPED(nos)
-                GRAPHICS.REMOVE_PARTICLE_FX(nos)
+                GRAPHICS.STOP_PARTICLE_FX_LOOPED(nos, false)
+                GRAPHICS.REMOVE_PARTICLE_FX(nos, false)
                 nos_started = false
               end
             end
@@ -6500,7 +6524,7 @@ script.register_looped("2-step", function(twostep)
             if retBool then
               GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
               lctPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_backfire", current_vehicle, 0.0,
-                0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 0.69420, false, false, false, 0, 0, 0)
+                0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 0.69420, false, false, false, 0, 0, 0, 255)
               table.insert(lctPtfx_t, lctPtfx)
               twostep_started = true
             end
@@ -6511,8 +6535,8 @@ script.register_looped("2-step", function(twostep)
             until PAD.IS_CONTROL_RELEASED(0, 72) or launch_active == false
             for _, bfire in ipairs(lctPtfx_t) do
               if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(bfire) then
-                GRAPHICS.STOP_PARTICLE_FX_LOOPED(bfire)
-                GRAPHICS.REMOVE_PARTICLE_FX(bfire)
+                GRAPHICS.STOP_PARTICLE_FX_LOOPED(bfire, false)
+                GRAPHICS.REMOVE_PARTICLE_FX(bfire, false)
               end
             end
             twostep_started = false
@@ -6635,8 +6659,8 @@ script.register_looped("pops&bangs", function(pnb)
               if currRPM < 1.0 and currRPM > 0.55 then
                 GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
                 popsPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_backfire", current_vehicle,
-                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, flame_size, false, false, false, 0, 0, 0)
-                GRAPHICS.STOP_PARTICLE_FX_LOOPED(popsPtfx)
+                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, flame_size, false, false, false, 0, 0, 0, 255)
+                GRAPHICS.STOP_PARTICLE_FX_LOOPED(popsPtfx, false)
                 table.insert(popsPtfx_t, popsPtfx)
                 started_popSound2 = true
               end
@@ -6648,8 +6672,8 @@ script.register_looped("pops&bangs", function(pnb)
           if PAD.IS_CONTROL_PRESSED(0, 71) or currRPM < rpmThreshold then
             for _, bfire in ipairs(popsPtfx_t) do
               if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(bfire) then
-                GRAPHICS.STOP_PARTICLE_FX_LOOPED(bfire)
-                GRAPHICS.REMOVE_PARTICLE_FX(bfire)
+                GRAPHICS.STOP_PARTICLE_FX_LOOPED(bfire, false)
+                GRAPHICS.REMOVE_PARTICLE_FX(bfire, false)
               end
             end
             for _, s in ipairs(popSounds_t) do
@@ -6969,7 +6993,7 @@ script.register_looped("Purge", function(nosprg)
           end
           GRAPHICS.USE_PARTICLE_FX_ASSET(dict)
           purgePtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("weap_extinguisher", current_vehicle,
-            purge_posX, -0.33, 0.2, 0.0, -17.5, purge_rotZ, purge_exit, 0.4, false, false, false, 0, 0, 0)
+            purge_posX, -0.33, 0.2, 0.0, -17.5, purge_rotZ, purge_exit, 0.4, false, false, false, 0, 0, 0, 255)
           table.insert(purgePtfx_t, purgePtfx)
           purge_started = true
         end
@@ -6980,8 +7004,8 @@ script.register_looped("Purge", function(nosprg)
             PAD.IS_DISABLED_CONTROL_RELEASED(0, 73)
           for _, purge in ipairs(purgePtfx_t) do
             if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(purge) then
-              GRAPHICS.STOP_PARTICLE_FX_LOOPED(purge)
-              GRAPHICS.REMOVE_PARTICLE_FX(purge)
+              GRAPHICS.STOP_PARTICLE_FX_LOOPED(purge, false)
+              GRAPHICS.REMOVE_PARTICLE_FX(purge, false)
               purge_started = false
             end
           end
@@ -7059,20 +7083,20 @@ end)
 
 script.register_looped("no jacking", function(ctt)
   if noJacking then
-    if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 398, 1) then
+    if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 398, true) then
       PED.SET_PED_CAN_BE_DRAGGED_OUT(self.get_ped(), false)
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 398, true)
     end
-    if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 177, 1) then
+    if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 177, true) then
       PED.SET_PED_CAN_BE_DRAGGED_OUT(self.get_ped(), false)
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 177, true)
     end
   else
-    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 398, 1) then
+    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 398, true) then
       PED.SET_PED_CAN_BE_DRAGGED_OUT(self.get_ped(), true)
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 398, false)
     end
-    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 177, 1) then
+    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 177, true) then
       PED.SET_PED_CAN_BE_DRAGGED_OUT(self.get_ped(), true)
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), 177, false)
     end
@@ -7249,9 +7273,9 @@ script.register_looped("flatbed script", function(script)
         controlled              = entities.take_control_of(attachedVehicle, 350)
         if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) then
           if controlled then
-            ENTITY.DETACH_ENTITY(attachedVehicle)
+            ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
             ENTITY.SET_ENTITY_COORDS(attachedVehicle, attachedVehcoords.x - (playerForwardX * 10),
-              attachedVehcoords.y - (playerForwardY * 10), playerPosition.z, 0, 0, 0, 0)
+              attachedVehcoords.y - (playerForwardY * 10), playerPosition.z, false, false, false, false)
             VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(towed_vehicle, 5.0)
             towed_vehicle = 0
           end
@@ -7316,7 +7340,7 @@ script.register_looped("Ped Grabber", function(pg)
         end
       end
       if ped_grabbed and attached_ped ~= 0 then
-        PED.FORCE_PED_MOTION_STATE(attached_ped, 0x0EC17E58, 0, 0, 0)
+        PED.FORCE_PED_MOTION_STATE(attached_ped, 0x0EC17E58, false, 0, false)
         if not ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), "mp_missheist_countrybank@lift_hands", "lift_hands_in_air_outro", 3) then
           playHandsUp()
         end
@@ -7340,7 +7364,7 @@ script.register_looped("Ped Grabber", function(pg)
             ENTITY.DETACH_ENTITY(attached_ped, true, true)
             TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
             PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
-            PED.SET_PED_TO_RAGDOLL(attached_ped, 1500, 0, 0, false)
+            PED.SET_PED_TO_RAGDOLL(attached_ped, 1500, 0, 0, false, false, false)
             ENTITY.SET_ENTITY_VELOCITY(attached_ped, (pedthrowF * myFwdX), (pedthrowF * myFwdY), 0)
             TASK.CLEAR_PED_TASKS(self.get_ped())
             PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), true)
@@ -7470,14 +7494,15 @@ script.register_looped("Preview", function(preview)
       ENTITY.DELETE_ENTITY(previewEntity)
       previewStarted = false
     end
-    if not ENTITY.IS_ENTITY_DEAD(self.get_ped()) then
+    if not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) then
       while not STREAMING.HAS_MODEL_LOADED(propHash) do
         STREAMING.REQUEST_MODEL(propHash)
         coroutine.yield()
       end
       if not previewStarted then
-        previewEntity = OBJECT.CREATE_OBJECT(propHash, coords.x + forwardX * 5, coords.y + forwardY * 5, coords.z,
-          currentHeading, false, false, false)
+        previewEntity = OBJECT.CREATE_OBJECT(
+          propHash, coords.x + forwardX * 5, coords.y + forwardY * 5, coords.z, false, false, false
+        )
         ENTITY.SET_ENTITY_ALPHA(previewEntity, 200.0, false)
         ENTITY.SET_ENTITY_COLLISION(previewEntity, false, false)
         ENTITY.SET_ENTITY_CAN_BE_DAMAGED(previewEntity, false)
@@ -7519,16 +7544,16 @@ end)
 script.register_looped("edit mode", function()
   if spawned_props[1] ~= nil then
     if edit_mode and selfAttachments[1] == nil and vehAttachments[1] == nil then
-      local current_coords   = ENTITY.GET_ENTITY_COORDS(selectedObject)
+      local current_coords   = ENTITY.GET_ENTITY_COORDS(selectedObject, true)
       local current_rotation = ENTITY.GET_ENTITY_ROTATION(selectedObject, 2)
       if activeX then
-        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x + spawnDistance.x, current_coords.y, current_coords.z)
+        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x + spawnDistance.x, current_coords.y, current_coords.z, false, false, false, false)
       end
       if activeY then
-        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x, current_coords.y + spawnDistance.y, current_coords.z)
+        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x, current_coords.y + spawnDistance.y, current_coords.z, false, false, false, false)
       end
       if activeZ then
-        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x, current_coords.y, current_coords.z + spawnDistance.z)
+        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x, current_coords.y, current_coords.z + spawnDistance.z, false, false, false, false)
       end
       if rotX then
         ENTITY.SET_ENTITY_ROTATION(selectedObject, current_rotation.x + spawnRot.x, current_rotation.y,
@@ -7592,7 +7617,7 @@ script.register_looped("KamikazeDrivers", function(rd)
               TASK.TASK_VEHICLE_TEMP_ACTION(ped, ped_veh, 23, 1000)
             end
             if ENTITY.GET_ENTITY_SPEED(ped_veh) > 1.8 and ENTITY.GET_ENTITY_SPEED(ped_veh) < 70 then
-              if VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(ped_veh) and not ENTITY.IS_ENTITY_DEAD(ped) then
+              if VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(ped_veh) and not ENTITY.IS_ENTITY_DEAD(ped, false) then
                 VEHICLE.SET_VEHICLE_BRAKE(ped_veh, false)
                 VEHICLE.SET_VEHICLE_FORWARD_SPEED(ped_veh, (ENTITY.GET_ENTITY_SPEED(ped_veh) + 0.7))
               end
