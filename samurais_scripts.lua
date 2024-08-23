@@ -291,15 +291,15 @@ function play_music(musicSwitch, station)
         pBus = VEHICLE.CREATE_VEHICLE(pbus_model, myPos.x, myPos.y, (myPos.z - 10), 0, true, false, false)
         ENTITY.SET_ENTITY_ALPHA(pBus, 0.0, false)
         ENTITY.FREEZE_ENTITY_POSITION(pBus, true)
-        ENTITY.SET_ENTITY_COLLISION(pBus, false, 0)
+        ENTITY.SET_ENTITY_COLLISION(pBus, false, false)
         ENTITY.SET_ENTITY_INVINCIBLE(pBus, true)
-        VEHICLE.SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(pBus, false, 0)
+        VEHICLE.SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(pBus, false, false)
       end
       mp:sleep(500)
       if ENTITY.DOES_ENTITY_EXIST(pBus) then
         entities.take_control_of(pBus, 300)
         if Game.requestModel(dummy_model) then
-          dummyDriver = PED.CREATE_PED("PED_TYPE_CIVMALE", dummy_model, myPos.x, myPos.y, (myPos.z + 40), 0, true, false)
+          dummyDriver = PED.CREATE_PED(4, dummy_model, myPos.x, myPos.y, (myPos.z + 40), 0, true, false)
           if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
             entities.take_control_of(dummyDriver, 300)
             ENTITY.SET_ENTITY_ALPHA(dummyDriver, 0.0, false)
@@ -351,7 +351,7 @@ function dummyCop()
     if current_vehicle ~= nil and current_vehicle ~= 0 then
       local polhash, veh_bone1, veh_bone2, attach_mode
       if is_car then
-        if VEHICLE.DOES_VEHICLE_HAVE_ROOF(current_vehicle) and not VEHICLE.IS_VEHICLE_A_CONVERTIBLE(current_vehicle) then
+        if VEHICLE.DOES_VEHICLE_HAVE_ROOF(current_vehicle) and not VEHICLE.IS_VEHICLE_A_CONVERTIBLE(current_vehicle, false) then
           polhash, veh_bone1, veh_bone2, attach_mode = 0xD1E0B7D7, "interiorlight", "interiorlight", 1
         else
           polhash, veh_bone1, veh_bone2, attach_mode = 0xD1E0B7D7, "interiorlight", "dashglow", 2
@@ -363,8 +363,8 @@ function dummyCop()
       end
       if Game.requestModel(polhash) then
         dummyCopCar = VEHICLE.CREATE_VEHICLE(polhash, 0.0, 0.0, 0.0, 0, true, false, false)
-        ENTITY.SET_ENTITY_COLLISION(dummyCopCar, false, 0)
-        VEHICLE.SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(dummyCopCar, false, 0)
+        ENTITY.SET_ENTITY_COLLISION(dummyCopCar, false, false)
+        VEHICLE.SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(dummyCopCar, false, false)
         VEHICLE.SET_VEHICLE_UNDRIVEABLE(dummyCopCar, true)
         ENTITY.SET_ENTITY_ALPHA(dummyCopCar, 49.0, false)
         ENTITY.SET_ENTITY_INVINCIBLE(dummyCopCar, true)
@@ -463,7 +463,7 @@ function bankDriftPoints_SP(points)
       if ENTITY.GET_ENTITY_MODEL(self.get_ped()) == v.hash then
         stats.set_int("SP" .. tostring(v.int) .. "_TOTAL_CASH",
           stats.get_int("SP" .. tostring(v.int) .. "_TOTAL_CASH") + points)
-        AUDIO.PLAY_SOUND_FRONTEND(-1, "LOCAL_PLYR_CASH_COUNTER_INCREASE", "DLC_HEISTS_GENERAL_FRONTEND_SOUNDS")
+        AUDIO.PLAY_SOUND_FRONTEND(-1, "LOCAL_PLYR_CASH_COUNTER_INCREASE", "DLC_HEISTS_GENERAL_FRONTEND_SOUNDS", true)
       end
     end
   end)
@@ -847,7 +847,7 @@ Actions:add_imgui(function()
         local forwardX   = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
         local forwardY   = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
         local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
-        local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID)
+        local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
         if manualFlags then
           setmanualflag()
         else
@@ -952,7 +952,7 @@ Actions:add_imgui(function()
           ENTITY.FREEZE_ENTITY_POSITION(attached_ped, false)
           TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
           PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
-          PED.SET_PED_TO_RAGDOLL(attached_ped, 1500, 0, 0, false)
+          PED.SET_PED_TO_RAGDOLL(attached_ped, 1500, 0, 0, false, false, false)
           TASK.CLEAR_PED_TASKS(self.get_ped())
           PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), true)
         end
@@ -1200,7 +1200,7 @@ Actions:add_imgui(function()
             local npcForwardX    = ENTITY.GET_ENTITY_FORWARD_X(v)
             local npcForwardY    = ENTITY.GET_ENTITY_FORWARD_Y(v)
             local npcBoneIndex   = PED.GET_PED_BONE_INDEX(v, info.boneID)
-            local npcBboneCoords = PED.GET_PED_BONE_COORDS(v, info.boneID)
+            local npcBboneCoords = PED.GET_PED_BONE_COORDS(v, info.boneID, 0.0, 0.0, 0.0)
             if manualFlags then
               setmanualflag()
             else
@@ -1588,7 +1588,7 @@ sound_player:add_imgui(function()
       script.run_in_fiber(function(playsnd)
         local myCoords = Game.getCoords(self.get_ped(), true)
         AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(selected_sound.soundName, selected_sound.soundRef, myCoords.x,
-          myCoords.y, myCoords.z, "SPEECH_PARAMS_FORCE", 0)
+          myCoords.y, myCoords.z, "SPEECH_PARAMS_FORCE")
         sound_btn_off = true
         start_loading_anim = true
         playsnd:sleep(5000)
