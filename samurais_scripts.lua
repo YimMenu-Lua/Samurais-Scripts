@@ -315,7 +315,9 @@ function play_music(musicSwitch, station)
             AUDIO.SET_VEHICLE_RADIO_LOUD(pBus, true)
             VEHICLE.SET_VEHICLE_LIGHTS(pBus, 1)
             mp:sleep(500)
-            AUDIO.SET_VEH_RADIO_STATION(pBus, station)
+            if station ~= nil then
+              AUDIO.SET_VEH_RADIO_STATION(pBus, station)
+            end
             mp:sleep(500)
             ENTITY.ATTACH_ENTITY_TO_ENTITY(pBus, self.get_ped(), bone_idx, -4.0, -1.3, -1.0, 0.0, 90.0, -90.0, false,
               true,
@@ -491,42 +493,42 @@ end)
 ]]
 self_tab = Samurais_scripts:add_tab(translateLabel("Self"))
 self_tab:add_imgui(function()
-  Regen, RegenUsed = ImGui.Checkbox(translateLabel("Auto-Heal"), Regen, true)
+  Regen, RegenUsed = ImGui.Checkbox(translateLabel("Auto-Heal"), Regen)
   UI.helpMarker(false, translateLabel("autoheal_tooltip"))
   if RegenUsed then
     lua_cfg.save("Regen", Regen)
     UI.widgetSound("Nav2")
   end
 
-  -- objectiveTP, objectiveTPUsed = ImGui.Checkbox(translateLabel("objectiveTP"), objectiveTP, true)
+  -- objectiveTP, objectiveTPUsed = ImGui.Checkbox(translateLabel("objectiveTP"), objectiveTP)
   -- UI.helpMarker(false, translateLabel("objectiveTP_tooltip"))
   -- if objectiveTPUsed then
   --   lua_cfg.save("objectiveTP", objectiveTP)
   --   UI.widgetSound("Nav2")
   -- end
 
-  replaceSneakAnim, rsanimUsed = ImGui.Checkbox(translateLabel("CrouchCB"), replaceSneakAnim, true)
+  replaceSneakAnim, rsanimUsed = ImGui.Checkbox(translateLabel("CrouchCB"), replaceSneakAnim)
   UI.helpMarker(false, translateLabel("Crouch_tooltip"))
   if rsanimUsed then
     lua_cfg.save("replaceSneakAnim", replaceSneakAnim)
     UI.widgetSound("Nav2")
   end
 
-  replacePointAct, rpaUsed = ImGui.Checkbox(translateLabel("rpaCB"), replacePointAct, true)
+  replacePointAct, rpaUsed = ImGui.Checkbox(translateLabel("rpaCB"), replacePointAct)
   UI.helpMarker(false, translateLabel("rpa_tooltip"))
   if rpaUsed then
     lua_cfg.save("replacePointAct", replacePointAct)
     UI.widgetSound("Nav2")
   end
 
-  phoneAnim, phoneAnimUsed = ImGui.Checkbox(translateLabel("PhoneAnimCB"), phoneAnim, true)
+  phoneAnim, phoneAnimUsed = ImGui.Checkbox(translateLabel("PhoneAnimCB"), phoneAnim)
   UI.helpMarker(false, translateLabel("PhoneAnim_tooltip"))
   if phoneAnimUsed then
     lua_cfg.save("phoneAnim", phoneAnim)
     UI.widgetSound("Nav2")
   end
 
-  sprintInside, sprintInsideUsed = ImGui.Checkbox(translateLabel("SprintInsideCB"), sprintInside, true)
+  sprintInside, sprintInsideUsed = ImGui.Checkbox(translateLabel("SprintInsideCB"), sprintInside)
   UI.helpMarker(false,
     translateLabel("SprintInside_tooltip"))
   if sprintInsideUsed then
@@ -534,7 +536,7 @@ self_tab:add_imgui(function()
     UI.widgetSound("Nav2")
   end
 
-  lockPick, lockPickUsed = ImGui.Checkbox(translateLabel("LockpickCB"), lockPick, true)
+  lockPick, lockPickUsed = ImGui.Checkbox(translateLabel("LockpickCB"), lockPick)
   UI.helpMarker(false,
     translateLabel("Lockpick_tooltip"))
   if lockPickUsed then
@@ -542,14 +544,14 @@ self_tab:add_imgui(function()
     UI.widgetSound("Nav2")
   end
 
-  disableActionMode, actionModeUsed = ImGui.Checkbox(translateLabel("ActionModeCB"), disableActionMode, true)
+  disableActionMode, actionModeUsed = ImGui.Checkbox(translateLabel("ActionModeCB"), disableActionMode)
   UI.helpMarker(false, translateLabel("ActionMode_tooltip"))
   if actionModeUsed then
     lua_cfg.save("disableActionMode", disableActionMode)
     UI.widgetSound("Nav2")
   end
 
-  clumsy, clumsyUsed = ImGui.Checkbox("Clumsy", clumsy, true)
+  clumsy, clumsyUsed = ImGui.Checkbox("Clumsy", clumsy)
   UI.helpMarker(false, translateLabel("clumsy_tt"))
   if clumsyUsed then
     rod = false
@@ -566,7 +568,7 @@ self_tab:add_imgui(function()
     end)
   end
 
-  rod, rodUsed = ImGui.Checkbox("Ragdoll On Demand", rod, true)
+  rod, rodUsed = ImGui.Checkbox("Ragdoll On Demand", rod)
   UI.helpMarker(false, translateLabel("rod_tt"))
   if rodUsed then
     clumsy = false
@@ -584,7 +586,7 @@ self_tab:add_imgui(function()
   end
 
   if rod or clumsy then
-    ragdoll_sound, rgdlsnd = ImGui.Checkbox("Ragdoll Sound", ragdoll_sound, true)
+    ragdoll_sound, rgdlsnd = ImGui.Checkbox("Ragdoll Sound", ragdoll_sound)
     UI.helpMarker(false, "Your online character will make a hurt/scared sound when ragdolling.")
     if rgdlsnd then
       UI.widgetSound("Nav2")
@@ -798,13 +800,13 @@ Actions:add_imgui(function()
     if filteredAnims ~= nil then
       info = filteredAnims[anim_index + 1]
     end
-    ImGui.Separator(); manualFlags, used = ImGui.Checkbox("Edit Flags", manualFlags, true)
+    ImGui.Separator(); manualFlags, used = ImGui.Checkbox("Edit Flags", manualFlags)
     if used then
       lua_cfg.save("manualFlags", manualFlags)
       UI.widgetSound("Nav2")
     end
     UI.helpMarker(false, translateLabel("flags_tt"))
-    ImGui.SameLine(); disableProps, used = ImGui.Checkbox("Disable Props", disableProps, true)
+    ImGui.SameLine(); disableProps, used = ImGui.Checkbox("Disable Props", disableProps)
     if used then
       lua_cfg.save("disableProps", disableProps)
       UI.widgetSound("Nav2")
@@ -812,27 +814,27 @@ Actions:add_imgui(function()
     UI.helpMarker(false, translateLabel("DisableProps_tt"))
     if manualFlags then
       ImGui.Separator()
-      controllable, used = ImGui.Checkbox(translateLabel("Allow Control"), controllable, true)
+      controllable, used = ImGui.Checkbox(translateLabel("Allow Control"), controllable)
       if used then
         lua_cfg.save("controllable", controllable)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, translateLabel("AllowControl_tt"))
       ImGui.SameLine(); ImGui.Dummy(27, 1); ImGui.SameLine()
-      looped, used = ImGui.Checkbox("Loop", looped, true)
+      looped, used = ImGui.Checkbox("Loop", looped)
       if used then
         lua_cfg.save("looped", looped)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, translateLabel("looped_tt"))
-      upperbody, used = ImGui.Checkbox(translateLabel("Upper Body Only"), upperbody, true)
+      upperbody, used = ImGui.Checkbox(translateLabel("Upper Body Only"), upperbody)
       if used then
         lua_cfg.save("upperbody", upperbody)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, translateLabel("UpperBodyOnly_tt"))
       ImGui.SameLine(); ImGui.Dummy(1, 1); ImGui.SameLine()
-      freeze, used = ImGui.Checkbox(translateLabel("Freeze"), freeze, true)
+      freeze, used = ImGui.Checkbox(translateLabel("Freeze"), freeze)
       if used then
         lua_cfg.save("freeze", freeze)
         UI.widgetSound("Nav2")
@@ -1108,7 +1110,7 @@ Actions:add_imgui(function()
       UI.widgetSound("Nav2")
     end
     ImGui.SameLine()
-    npc_godMode, used = ImGui.Checkbox("Invincible", npc_godMode, true)
+    npc_godMode, used = ImGui.Checkbox("Invincible", npc_godMode)
     if used then
       lua_cfg.save("npc_godMode", npc_godMode)
       UI.widgetSound("Nav")
@@ -1230,7 +1232,7 @@ Actions:add_imgui(function()
         end)
       end
     end
-    usePlayKey, upkUsed = ImGui.Checkbox("Enable Animation Hotkeys", usePlayKey, true)
+    usePlayKey, upkUsed = ImGui.Checkbox("Enable Animation Hotkeys", usePlayKey)
     UI.toolTip(false, translateLabel("animKeys_tt"))
     if upkUsed then
       lua_cfg.save("usePlayKey", usePlayKey)
@@ -1312,7 +1314,7 @@ Actions:add_imgui(function()
     displayNpcs()
     ImGui.PopItemWidth()
     ImGui.SameLine()
-    npc_godMode, used = ImGui.Checkbox("Invincible", npc_godMode, true)
+    npc_godMode, used = ImGui.Checkbox("Invincible", npc_godMode)
     UI.toolTip(false, translateLabel("Spawn NPCs in God Mode."))
     local npcData = filteredNpcs[npc_index + 1]
     if ImGui.Button(translateLabel("Spawn") .. "##scenario_npc") then
@@ -1462,18 +1464,18 @@ end)
 ]]
 weapon_tab = Samurais_scripts:add_tab(translateLabel("weaponTab"))
 weapon_tab:add_imgui(function()
-  HashGrabber, HgUsed = ImGui.Checkbox(translateLabel("hashgrabberCB"), HashGrabber, true)
+  HashGrabber, HgUsed = ImGui.Checkbox(translateLabel("hashgrabberCB"), HashGrabber)
   UI.helpMarker(false,
     translateLabel("hashgrabber_tt"))
   if HgUsed then
     UI.widgetSound("Nav2")
   end
 
-  Triggerbot, TbUsed = ImGui.Checkbox(translateLabel("triggerbotCB"), Triggerbot, true)
+  Triggerbot, TbUsed = ImGui.Checkbox(translateLabel("triggerbotCB"), Triggerbot)
   UI.helpMarker(false,
     translateLabel("triggerbot_tt"))
   if Triggerbot then
-    ImGui.SameLine(); aimEnemy, aimEnemyUsed = ImGui.Checkbox(translateLabel("enemyonlyCB"), aimEnemy, true)
+    ImGui.SameLine(); aimEnemy, aimEnemyUsed = ImGui.Checkbox(translateLabel("enemyonlyCB"), aimEnemy)
     if aimEnemyUsed then
       lua_cfg.save("aimEnemy", aimEnemy)
       UI.widgetSound("Nav2")
@@ -1484,14 +1486,14 @@ weapon_tab:add_imgui(function()
     UI.widgetSound("Nav2")
   end
 
-  autoKill, autoKillUsed = ImGui.Checkbox(translateLabel("autokillCB"), autoKill, true)
+  autoKill, autoKillUsed = ImGui.Checkbox(translateLabel("autokillCB"), autoKill)
   UI.helpMarker(false, translateLabel("autokill_tt"))
   if autoKillUsed then
     lua_cfg.save("autoKill", autoKill)
     UI.widgetSound("Nav2")
   end
 
-  runaway, runawayUsed = ImGui.Checkbox(translateLabel("runawayCB"), runaway, true)
+  runaway, runawayUsed = ImGui.Checkbox(translateLabel("runawayCB"), runaway)
   UI.helpMarker(false, translateLabel("runaway_tt"))
   if runawayUsed then
     lua_cfg.save("runaway", runaway)
@@ -1501,7 +1503,7 @@ weapon_tab:add_imgui(function()
     end
   end
 
-  laserSight, laserSightUSed = ImGui.Checkbox(translateLabel("laserSightCB"), laserSight, true)
+  laserSight, laserSightUSed = ImGui.Checkbox(translateLabel("laserSightCB"), laserSight)
   UI.helpMarker(false, translateLabel("laserSight_tt"))
   if laserSightUSed then
     lua_cfg.save("laserSight", laserSight)
@@ -1723,7 +1725,7 @@ vehicle_tab:add_imgui(function()
   else
     ImGui.SeparatorText("Footsies")
   end
-  ImGui.Spacing(); limitVehOptions, lvoUsed = ImGui.Checkbox(translateLabel("lvoCB"), limitVehOptions, true)
+  ImGui.Spacing(); limitVehOptions, lvoUsed = ImGui.Checkbox(translateLabel("lvoCB"), limitVehOptions)
   UI.toolTip(false, translateLabel("lvo_tt"))
   if lvoUsed then
     UI.widgetSound("Nav2")
@@ -1731,7 +1733,7 @@ vehicle_tab:add_imgui(function()
   end
 
   ImGui.SameLine(); ImGui.Dummy(7, 1); ImGui.SameLine();
-  missiledefense, mdefUsed = ImGui.Checkbox("Missile Defense", missiledefense, true)
+  missiledefense, mdefUsed = ImGui.Checkbox("Missile Defense", missiledefense)
   UI.toolTip(false, translateLabel("missile_def_tt"))
   if mdefUsed then
     UI.widgetSound("Radar")
@@ -1745,22 +1747,21 @@ vehicle_tab:add_imgui(function()
     gui.show_message("Samurais Scripts", translateLabel("missile_def_off_notif"))
   end
 
-  launchCtrl, lctrlUsed = ImGui.Checkbox("Launch Control", launchCtrl, true)
+  launchCtrl, lctrlUsed = ImGui.Checkbox("Launch Control", launchCtrl)
   UI.toolTip(false, translateLabel("lct_tt"))
   if lctrlUsed then
     UI.widgetSound("Nav2")
     lua_cfg.save("launchCtrl", launchCtrl)
   end
 
-  ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine(); speedBoost, spdbstUsed = ImGui.Checkbox("NOS", speedBoost,
-    true)
+  ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine(); speedBoost, spdbstUsed = ImGui.Checkbox("NOS", speedBoost)
   UI.toolTip(false, translateLabel("speedBoost_tt"))
   if spdbstUsed then
     UI.widgetSound("Nav2")
     lua_cfg.save("speedBoost", speedBoost)
   end
   if speedBoost then
-    ImGui.SameLine(); nosvfx, nosvfxUsed = ImGui.Checkbox("VFX", nosvfx, true)
+    ImGui.SameLine(); nosvfx, nosvfxUsed = ImGui.Checkbox("VFX", nosvfx)
     UI.toolTip(false, translateLabel("vfx_tt"))
     if nosvfxUsed then
       UI.widgetSound("Nav2")
@@ -1792,7 +1793,7 @@ vehicle_tab:add_imgui(function()
     end
   end
 
-  loud_radio, loudRadioUsed = ImGui.Checkbox("Big Subwoofer", loud_radio, true)
+  loud_radio, loudRadioUsed = ImGui.Checkbox("Big Subwoofer", loud_radio)
   UI.toolTip(false, translateLabel("loudradio_tt"))
   if loudRadioUsed then
     UI.widgetSound("Nav2")
@@ -1805,15 +1806,14 @@ vehicle_tab:add_imgui(function()
     end
   end
 
-  ImGui.SameLine(); ImGui.Dummy(32, 1); ImGui.SameLine(); nosPurge, nosPurgeUsed = ImGui.Checkbox("NOS Purge", nosPurge,
-    true)
+  ImGui.SameLine(); ImGui.Dummy(32, 1); ImGui.SameLine(); nosPurge, nosPurgeUsed = ImGui.Checkbox("NOS Purge", nosPurge)
   UI.toolTip(false, translateLabel("purge_tt"))
   if nosPurgeUsed then
     UI.widgetSound("Nav2")
     lua_cfg.save("nosPurge", nosPurge)
   end
 
-  popsNbangs, pnbUsed = ImGui.Checkbox("Pops & Bangs", popsNbangs, true)
+  popsNbangs, pnbUsed = ImGui.Checkbox("Pops & Bangs", popsNbangs)
   UI.toolTip(false, translateLabel("pnb_tt"))
   if pnbUsed then
     UI.widgetSound("Nav2")
@@ -1821,7 +1821,7 @@ vehicle_tab:add_imgui(function()
   end
   if popsNbangs then
     ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine(); louderPops, louderPopsUsed = ImGui.Checkbox("Louder Pops",
-      louderPops, true)
+      louderPops)
     UI.toolTip(false, translateLabel("louderpnb_tt"))
     if louderPopsUsed then
       UI.widgetSound("Nav2")
@@ -1829,21 +1829,21 @@ vehicle_tab:add_imgui(function()
     end
   end
 
-  hornLight, hornLightUsed = ImGui.Checkbox("High Beams on Horn", hornLight, true)
+  hornLight, hornLightUsed = ImGui.Checkbox("High Beams on Horn", hornLight)
   UI.toolTip(false, translateLabel("highbeams_tt"))
   if hornLightUsed then
     UI.widgetSound("Nav2")
     lua_cfg.save("hornLight", hornLight)
   end
 
-  ImGui.SameLine(); autobrklight, autobrkUsed = ImGui.Checkbox("Auto Brake Lights", autobrklight, true)
+  ImGui.SameLine(); autobrklight, autobrkUsed = ImGui.Checkbox("Auto Brake Lights", autobrklight)
   UI.toolTip(false, translateLabel("brakeLight_tt"))
   if autobrkUsed then
     UI.widgetSound("Nav2")
     lua_cfg.save("autobrklight", autobrklight)
   end
 
-  holdF, holdFused = ImGui.Checkbox("Keep Engine On", holdF, true)
+  holdF, holdFused = ImGui.Checkbox("Keep Engine On", holdF)
   UI.toolTip(false, translateLabel("engineOn_tt"))
   if holdFused then
     UI.widgetSound("Nav2")
@@ -1851,7 +1851,7 @@ vehicle_tab:add_imgui(function()
   end
 
   ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); keepWheelsTurned, kwtrnd = ImGui.Checkbox(
-    "Keep Wheels Turned", keepWheelsTurned, true)
+    "Keep Wheels Turned", keepWheelsTurned)
   UI.toolTip(false, translateLabel("wheelsturned_tt"))
   if kwtrnd then
     UI.widgetSound("Nav2")
@@ -1859,7 +1859,7 @@ vehicle_tab:add_imgui(function()
   end
 
   noJacking, noJackingUsed = ImGui.Checkbox(
-    "Can't Touch This!", noJacking, true)
+    "Can't Touch This!", noJacking)
   UI.toolTip(false, translateLabel("canttouchthis_tt"))
   if noJackingUsed then
     UI.widgetSound("Nav2")
@@ -1867,7 +1867,7 @@ vehicle_tab:add_imgui(function()
   end
 
   ImGui.SameLine(); ImGui.Dummy(15, 1); ImGui.SameLine(); insta180, insta180Used = ImGui.Checkbox("Instant 180°",
-    insta180, true)
+    insta180)
   if insta180Used then
     UI.widgetSound("Nav2")
     lua_cfg.save("insta180", insta180)
@@ -1875,7 +1875,7 @@ vehicle_tab:add_imgui(function()
   UI.toolTip(false, translateLabel("insta180_tt"))
 
   if Game.isOnline() then
-    flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall, true)
+    flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall)
     UI.toolTip(false, translateLabel("flaresforall_tt"))
     if flaresUsed then
       UI.widgetSound("Nav2")
@@ -1883,20 +1883,20 @@ vehicle_tab:add_imgui(function()
     end
   else
     ImGui.BeginDisabled()
-    flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall, true)
+    flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall)
     ImGui.EndDisabled()
     UI.toolTip(true, translateLabel("Unavailable in Single Player"), '#FF3333', 1)
   end
 
   ImGui.SameLine(); ImGui.Dummy(46, 1); ImGui.SameLine(); real_plane_speed, rpsUsed = ImGui.Checkbox(
-    "Higher Plane Speeds", real_plane_speed, true)
+    "Higher Plane Speeds", real_plane_speed)
   UI.toolTip(false, translateLabel("planeSpeed_tt"))
   if rpsUsed then
     UI.widgetSound("Nav2")
     lua_cfg.save("real_plane_speed", real_plane_speed)
   end
 
-  unbreakableWindows, ubwUsed = ImGui.Checkbox("Strong Windows", unbreakableWindows, true)
+  unbreakableWindows, ubwUsed = ImGui.Checkbox("Strong Windows", unbreakableWindows)
   UI.toolTip(false, translateLabel("strongWindows_tt"))
   if ubwUsed then
     UI.widgetSound("Nav2")
@@ -1908,13 +1908,13 @@ vehicle_tab:add_imgui(function()
   end
 
   ImGui.SameLine(); ImGui.Dummy(18, 1); ImGui.SameLine(); flappyDoors, flappyDoorsUsed = ImGui.Checkbox("Flappy Doors",
-    flappyDoors, true)
+    flappyDoors)
   if flappyDoorsUsed then
     UI.widgetSound("Nav2")
     lua_cfg.save("flappyDoors", flappyDoors)
   end
 
-  ImGui.Dummy(1, 5); rgbLights, rgbToggled = ImGui.Checkbox(translateLabel("rgbLights"), rgbLights, true)
+  ImGui.Dummy(1, 5); rgbLights, rgbToggled = ImGui.Checkbox(translateLabel("rgbLights"), rgbLights)
   if rgbToggled then
     UI.widgetSound("Nav2")
     lua_cfg.save("rgbLights", rgbLights)
@@ -2224,7 +2224,7 @@ drift_mode_tab:add_imgui(function()
     ImGui.Spacing()
     if validModel then
       ImGui.SeparatorText(full_veh_name .. "   (" .. vehicle_class .. ")")
-      driftMode, driftModeUsed = ImGui.Checkbox(translateLabel("driftModeCB"), driftMode, true)
+      driftMode, driftModeUsed = ImGui.Checkbox(translateLabel("driftModeCB"), driftMode)
       UI.helpMarker(false, translateLabel("driftMode_tt"))
       if driftModeUsed then
         UI.widgetSound("Nav2")
@@ -2244,7 +2244,7 @@ drift_mode_tab:add_imgui(function()
         end
       end
 
-      DriftTires, DriftTiresUsed = ImGui.Checkbox(translateLabel("driftTiresCB"), DriftTires, true)
+      DriftTires, DriftTiresUsed = ImGui.Checkbox(translateLabel("driftTiresCB"), DriftTires)
       UI.helpMarker(false, translateLabel("driftTires_tt"))
       if DriftTires then
         driftMode = false
@@ -2265,7 +2265,7 @@ drift_mode_tab:add_imgui(function()
           lua_cfg.save("DriftPowerIncrease", DriftPowerIncrease)
         end
 
-        ImGui.Spacing(); DriftSmoke, dsmkUsed = ImGui.Checkbox("Drift Smoke", DriftSmoke, true)
+        ImGui.Spacing(); DriftSmoke, dsmkUsed = ImGui.Checkbox("Drift Smoke", DriftSmoke)
         UI.toolTip(false, translateLabel("DriftSmoke_tt"))
         if dsmkUsed then
           UI.widgetSound("Nav2")
@@ -2320,14 +2320,14 @@ drift_mode_tab:add_imgui(function()
               end
             end
           end
-          customSmokeCol, cscUsed = ImGui.Checkbox(translateLabel("customLangTxt"), customSmokeCol, true)
+          customSmokeCol, cscUsed = ImGui.Checkbox(translateLabel("customLangTxt"), customSmokeCol)
           if cscUsed then
             UI.widgetSound("Nav2")
           end
         end
 
         ImGui.Dummy(1, 10); ImGui.SeparatorText("[Experimental]")
-        ImGui.Spacing(); driftMinigame, drmgUsed = ImGui.Checkbox("Drift Minigame", driftMinigame, true)
+        ImGui.Spacing(); driftMinigame, drmgUsed = ImGui.Checkbox("Drift Minigame", driftMinigame)
         UI.toolTip(false, translateLabel("DriftGame_tt"))
         if drmgUsed then
           UI.widgetSound("Nav2")
@@ -2415,14 +2415,14 @@ flatbed:add_imgui(function()
     ImGui.Dummy(1, 10); ImGui.SeparatorText(displayText)
     ImGui.Dummy(1, 10);
     ImGui.BeginDisabled(not Game.Self.isDriving() or towed_vehicle ~= 0)
-    towPos, towPosUsed = ImGui.Checkbox(translateLabel("Show Towing Position"), towPos, true)
+    towPos, towPosUsed = ImGui.Checkbox(translateLabel("Show Towing Position"), towPos)
     ImGui.EndDisabled()
     UI.helpMarker(false, translateLabel("towpos_tt"))
     if towPosUsed then
       UI.widgetSound("Nav2")
     end
 
-    towEverything, towEverythingUsed = ImGui.Checkbox(translateLabel("Tow Everything"), towEverything, true)
+    towEverything, towEverythingUsed = ImGui.Checkbox(translateLabel("Tow Everything"), towEverything)
     UI.helpMarker(false, translateLabel("TowEverything_tt"))
     if towEverythingUsed then
       UI.widgetSound("Nav2")
@@ -3368,7 +3368,7 @@ casino_pacino:add_imgui(function()
     if CURRENT_BUILD == TARGET_BUILD then
       ImGui.BeginTabBar("Dunk Pacino")
       if ImGui.BeginTabItem(translateLabel("Gambling")) then
-        bypass_casino_bans, bcbUsed = ImGui.Checkbox(translateLabel("bypassCasinoCooldownCB"), bypass_casino_bans, true)
+        bypass_casino_bans, bcbUsed = ImGui.Checkbox(translateLabel("bypassCasinoCooldownCB"), bypass_casino_bans)
         if bcbUsed then
           UI.widgetSound("Nav2")
           lua_cfg.save("bypass_casino_bans", bypass_casino_bans)
@@ -3381,14 +3381,13 @@ casino_pacino:add_imgui(function()
         ImGui.BulletText(casino_cooldown_update_str)
 
         ImGui.Spacing(); ImGui.SeparatorText("Poker")
-        force_poker_cards, fpcUsed = ImGui.Checkbox(translateLabel("forcePokerCardsCB"), force_poker_cards, true)
+        force_poker_cards, fpcUsed = ImGui.Checkbox(translateLabel("forcePokerCardsCB"), force_poker_cards)
         if fpcUsed then
           UI.widgetSound("Nav2")
           lua_cfg.save("force_poker_cards", force_poker_cards)
         end
 
-        set_dealers_poker_cards, sdpcUsed = ImGui.Checkbox(translateLabel("setDealersCardsCB"), set_dealers_poker_cards,
-          true)
+        set_dealers_poker_cards, sdpcUsed = ImGui.Checkbox(translateLabel("setDealersCardsCB"), set_dealers_poker_cards)
         if sdpcUsed then
           UI.widgetSound("Nav2")
           lua_cfg.save("set_dealers_poker_cards", set_dealers_poker_cards)
@@ -3418,27 +3417,27 @@ casino_pacino:add_imgui(function()
         end
 
         ImGui.Spacing(); ImGui.SeparatorText("Roulette")
-        force_roulette_wheel, frwUsed = ImGui.Checkbox(translateLabel("forceRouletteCB"), force_roulette_wheel, true)
+        force_roulette_wheel, frwUsed = ImGui.Checkbox(translateLabel("forceRouletteCB"), force_roulette_wheel)
         if frwUsed then
           UI.widgetSound("Nav2")
           lua_cfg.save("force_roulette_wheel", force_roulette_wheel)
         end
 
         ImGui.Spacing(); ImGui.SeparatorText("Slot Machines")
-        rig_slot_machine, rsmUsed = ImGui.Checkbox(translateLabel("rigSlotsCB"), rig_slot_machine, true)
+        rig_slot_machine, rsmUsed = ImGui.Checkbox(translateLabel("rigSlotsCB"), rig_slot_machine)
         if rsmUsed then
           UI.widgetSound("Nav2")
           lua_cfg.save("rig_slot_machine", rig_slot_machine)
         end
 
-        autoplay_slots, apsUsed = ImGui.Checkbox(translateLabel("autoplaySlotsCB"), autoplay_slots, true); ImGui
+        autoplay_slots, apsUsed = ImGui.Checkbox(translateLabel("autoplaySlotsCB"), autoplay_slots); ImGui
             .SameLine()
         if apsUsed then
           UI.widgetSound("Nav2")
           lua_cfg.save("autoplay_slots", autoplay_slots)
         end
         if autoplay_slots then
-          autoplay_cap, apcapUsed = ImGui.Checkbox(translateLabel("autoplayCapCB"), autoplay_cap, true); ImGui.SameLine()
+          autoplay_cap, apcapUsed = ImGui.Checkbox(translateLabel("autoplayCapCB"), autoplay_cap); ImGui.SameLine()
           if apcapUsed then
             UI.widgetSound("Nav2")
             lua_cfg.save("autoplay_cap", autoplay_cap)
@@ -3710,7 +3709,7 @@ casino_pacino:add_imgui(function()
           end)
         end
 
-        heist_cart_autograb, hcagUsed = ImGui.Checkbox(translateLabel("autograb"), heist_cart_autograb, true)
+        heist_cart_autograb, hcagUsed = ImGui.Checkbox(translateLabel("autograb"), heist_cart_autograb)
         if hcagUsed then
           UI.widgetSound("Nav2")
           lua_cgf.save("heist_cart_autograb", heist_cart_autograb)
@@ -3976,10 +3975,10 @@ end
 world_tab:add_imgui(function()
   if ped_grabbed or vehicle_grabbed then
     ImGui.BeginDisabled()
-    pedGrabber, pgUsed = ImGui.Checkbox(translateLabel("pedGrabber"), pedGrabber, true)
+    pedGrabber, pgUsed = ImGui.Checkbox(translateLabel("pedGrabber"), pedGrabber)
     ImGui.EndDisabled()
   else
-    pedGrabber, pgUsed = ImGui.Checkbox(translateLabel("pedGrabber"), pedGrabber, true)
+    pedGrabber, pgUsed = ImGui.Checkbox(translateLabel("pedGrabber"), pedGrabber)
     UI.helpMarker(false, translateLabel("pedGrabber_tt"))
     if pgUsed then
       UI.widgetSound("Nav2")
@@ -4001,10 +4000,10 @@ world_tab:add_imgui(function()
 
   if ped_grabbed or vehicle_grabbed then
     ImGui.BeginDisabled()
-    vehicleGrabber, vgUsed = ImGui.Checkbox("Vehicle Grabber", vehicleGrabber, true)
+    vehicleGrabber, vgUsed = ImGui.Checkbox("Vehicle Grabber", vehicleGrabber)
     ImGui.EndDisabled()
   else
-    vehicleGrabber, vgUsed = ImGui.Checkbox("Vehicle Grabber", vehicleGrabber, true)
+    vehicleGrabber, vgUsed = ImGui.Checkbox("Vehicle Grabber", vehicleGrabber)
     UI.helpMarker(false, "Same as 'Ped Grabber' but with vehicles.")
     if vgUsed then
       UI.widgetSound("Nav2")
@@ -4024,7 +4023,7 @@ world_tab:add_imgui(function()
     end
   end
 
-  carpool, carpoolUsed = ImGui.Checkbox(translateLabel("carpool"), carpool, true)
+  carpool, carpoolUsed = ImGui.Checkbox(translateLabel("carpool"), carpool)
   UI.helpMarker(false, translateLabel("carpool_tt"))
   if carpoolUsed then
     UI.widgetSound("Nav2")
@@ -4074,7 +4073,7 @@ world_tab:add_imgui(function()
     end
   end
 
-  animateNPCs, used = ImGui.Checkbox(translateLabel("animateNPCsCB"), animateNPCs, true)
+  animateNPCs, used = ImGui.Checkbox(translateLabel("animateNPCsCB"), animateNPCs)
   if used then
     UI.widgetSound("Nav")
   end
@@ -4125,7 +4124,7 @@ world_tab:add_imgui(function()
     end
   end
 
-  kamikazeDrivers, kdUsed = ImGui.Checkbox(translateLabel("kamikazeCB"), kamikazeDrivers, true)
+  kamikazeDrivers, kdUsed = ImGui.Checkbox(translateLabel("kamikazeCB"), kamikazeDrivers)
   UI.helpMarker(false, translateLabel("kamikazeDrivers_tt"))
   if kdUsed then
     UI.widgetSound("Nav2")
@@ -4134,7 +4133,7 @@ world_tab:add_imgui(function()
     end
   end
 
-  publicEnemy, peUsed = ImGui.Checkbox(translateLabel("publicEnemyCB"), publicEnemy, true)
+  publicEnemy, peUsed = ImGui.Checkbox(translateLabel("publicEnemyCB"), publicEnemy)
   UI.helpMarker(false, translateLabel("publicEnemy_tt"))
   if peUsed then
     UI.widgetSound("Nav2")
@@ -4172,7 +4171,7 @@ world_tab:add_imgui(function()
     end
   end
 
-  extend_world, ewbUsed = ImGui.Checkbox(translateLabel("extendWorldCB"), extend_world, true)
+  extend_world, ewbUsed = ImGui.Checkbox(translateLabel("extendWorldCB"), extend_world)
   UI.helpMarker(false, translateLabel("extendWorld_tt"))
   if ewbUsed then
     UI.widgetSound("Nav2")
@@ -4185,7 +4184,7 @@ world_tab:add_imgui(function()
     end
   end
 
-  disable_waves, dowUsed = ImGui.Checkbox(translateLabel("smoothwatersCB"), disable_waves, true)
+  disable_waves, dowUsed = ImGui.Checkbox(translateLabel("smoothwatersCB"), disable_waves)
   UI.helpMarker(false, translateLabel("smoothwaters_tt"))
   if dowUsed then
     UI.widgetSound("Nav2")
@@ -4414,7 +4413,7 @@ object_spawner:add_imgui(function()
     ImGui.PopItemWidth()
     ImGui.Spacing()
     ImGui.BeginDisabled(blacklisted_obj)
-    preview, _ = ImGui.Checkbox(translateLabel("Preview"), preview, true)
+    preview, _ = ImGui.Checkbox(translateLabel("Preview"), preview)
     ImGui.EndDisabled()
     if previewUsed then
       UI.widgetSound("Nav2")
@@ -4467,7 +4466,7 @@ object_spawner:add_imgui(function()
         ImGui.SameLine()
       end
       ImGui.BeginDisabled(blacklisted_obj)
-      spawnForPlayer, _ = ImGui.Checkbox(translateLabel("Spawn For a Player"), spawnForPlayer, true)
+      spawnForPlayer, _ = ImGui.Checkbox(translateLabel("Spawn For a Player"), spawnForPlayer)
       if spawnForPlayerUsed then
         UI.widgetSound("Nav2")
       end
@@ -4550,20 +4549,19 @@ object_spawner:add_imgui(function()
         end)
       end
       ImGui.Separator()
-      attachToSelf, attachToSelfUsed = ImGui.Checkbox(translateLabel("Attach To Self"), attachToSelf, true)
+      attachToSelf, attachToSelfUsed = ImGui.Checkbox(translateLabel("Attach To Self"), attachToSelf)
       if attachToSelfUsed then
         UI.widgetSound("Nav2")
       end
       if current_vehicle ~= nil and current_vehicle ~= 0 then
-        ImGui.SameLine(); attachToVeh, attachToVehUsed = ImGui.Checkbox(translateLabel("Attach To Vehicle"), attachToVeh,
-          true)
+        ImGui.SameLine(); attachToVeh, attachToVehUsed = ImGui.Checkbox(translateLabel("Attach To Vehicle"), attachToVeh)
         if attachToVehUsed then
           attachToSelf = false
           UI.widgetSound("Nav2")
         end
       else
         ImGui.BeginDisabled()
-        ImGui.SameLine(); attachToVeh, _ = ImGui.Checkbox(translateLabel("Attach To Vehicle"), attachToVeh, true)
+        ImGui.SameLine(); attachToVeh, _ = ImGui.Checkbox(translateLabel("Attach To Vehicle"), attachToVeh)
         ImGui.EndDisabled()
         UI.toolTip(false, translateLabel("getinveh"))
       end
@@ -4705,7 +4703,7 @@ object_spawner:add_imgui(function()
           end
         end
       end
-      edit_mode, edit_modeUsed = ImGui.Checkbox(translateLabel("editMode"), edit_mode, true)
+      edit_mode, edit_modeUsed = ImGui.Checkbox(translateLabel("editMode"), edit_mode)
       if edit_modeUsed then
         UI.widgetSound("Nav2")
       end
@@ -5095,20 +5093,20 @@ function displayLangs()
 end
 
 settings_tab:add_imgui(function()
-  disableTooltips, dtUsed = ImGui.Checkbox(translateLabel("Disable Tooltips"), disableTooltips, true)
+  disableTooltips, dtUsed = ImGui.Checkbox(translateLabel("Disable Tooltips"), disableTooltips)
   if dtUsed then
     lua_cfg.save("disableTooltips", disableTooltips)
     UI.widgetSound("Nav2")
   end
 
-  disableUiSounds, duisndUsed = ImGui.Checkbox(translateLabel("DisableSound"), disableUiSounds, true)
+  disableUiSounds, duisndUsed = ImGui.Checkbox(translateLabel("DisableSound"), disableUiSounds)
   UI.toolTip(false, translateLabel("DisableSound_tt"))
   if duisndUsed then
     lua_cfg.save("disableUiSounds", disableUiSounds)
     UI.widgetSound("Nav2")
   end
 
-  disableFlightMusic, dpmUsed = ImGui.Checkbox(translateLabel("flightMusicCB"), disableFlightMusic, true)
+  disableFlightMusic, dpmUsed = ImGui.Checkbox(translateLabel("flightMusicCB"), disableFlightMusic)
   UI.toolTip(false, translateLabel("flightMusic_tt"))
   if dpmUsed then
     lua_cfg.save("disableFlightMusic", disableFlightMusic)
@@ -5121,14 +5119,14 @@ settings_tab:add_imgui(function()
     end
   end
 
-  disable_quotes, dqUsed = ImGui.Checkbox(translateLabel("dailyQuotesCB"), disable_quotes, true)
+  disable_quotes, dqUsed = ImGui.Checkbox(translateLabel("dailyQuotesCB"), disable_quotes)
   UI.toolTip(false, translateLabel("dailyQuotes_tt"))
   if dqUsed then
     UI.widgetSound("Nav2")
     lua_cfg.save("disable_quotes", disable_quotes)
   end
 
-  disable_mdef_logs, dmlUsed = ImGui.Checkbox(translateLabel("missileLogsCB"), disable_mdef_logs, true)
+  disable_mdef_logs, dmlUsed = ImGui.Checkbox(translateLabel("missileLogsCB"), disable_mdef_logs)
   UI.toolTip(false, translateLabel("missileLogs_tt"))
   if dmlUsed then
     UI.widgetSound("Nav2")
@@ -5151,7 +5149,7 @@ settings_tab:add_imgui(function()
   end
 
   ImGui.Dummy(1, 10); ImGui.Text(translateLabel("langTitle") .. " " .. current_lang)
-  useGameLang, uglUsed = ImGui.Checkbox(translateLabel("gameLangCB"), useGameLang, true)
+  useGameLang, uglUsed = ImGui.Checkbox(translateLabel("gameLangCB"), useGameLang)
   if useGameLang then
     UI.toolTip(false, translateLabel("gameLang_tt"))
   end

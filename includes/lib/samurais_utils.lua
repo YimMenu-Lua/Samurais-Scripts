@@ -328,7 +328,7 @@ UI = {
         btn, kbm, gpad  = v.ctrl, v.kbm, v.gpad
       end
     end
-    if PAD.IS_USING_KEYBOARD_AND_MOUSE() then
+    if PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
       return btn, kbm
     else
       return btn, gpad
@@ -617,7 +617,7 @@ SS = {
     if spawned_props[1] ~= nil then
       for _, p in ipairs(spawned_props) do
         if ENTITY.DOES_ENTITY_EXIST(p) then
-          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p)
+          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p, false, false)
           ENTITY.DELETE_ENTITY(p)
         end
       end
@@ -664,7 +664,7 @@ SS = {
       TASK.CLEAR_PED_TASKS(self.get_ped())
       if selfPTFX[1] ~= nil then
         for _, v in ipairs(selfPTFX) do
-          GRAPHICS.STOP_PARTICLE_FX_LOOPED(v)
+          GRAPHICS.STOP_PARTICLE_FX_LOOPED(v, false)
         end
       end
       local current_coords = self.get_pos()
@@ -679,7 +679,7 @@ SS = {
       if plyrProps[1] ~= nil then
         for _, v in ipairs(plyrProps) do
           if ENTITY.DOES_ENTITY_EXIST(v) then
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v)
+            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v, false, false)
             ENTITY.DELETE_ENTITY(v)
           end
         end
@@ -703,7 +703,7 @@ SS = {
 
     if is_playing_radio then
       if ENTITY.DOES_ENTITY_EXIST(pBus) then
-        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(pBus)
+        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(pBus, false, false)
         ENTITY.DELETE_ENTITY(pBus)
       end
       if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
@@ -993,7 +993,7 @@ Game = {
   ---@param ped integer
   ---@param boneID integer
   getPedBoneCoords = function(ped, boneID)
-    return PED.GET_PED_BONE_COORDS(ped, boneID)
+    return PED.GET_PED_BONE_COORDS(ped, boneID, 0, 0, 0)
   end,
 
   ---@param entity integer
@@ -1113,7 +1113,7 @@ Game = {
         local distCalc     = SYSTEM.VDIST2(thisPos.x, thisPos.y, thisPos.z, randomPedPos.x, randomPedPos.y,
           randomPedPos.z)
         if distCalc <= range then
-          if not ENTITY.IS_ENTITY_DEAD(ped) then
+          if not ENTITY.IS_ENTITY_DEAD(ped, false) then
             closestPed = ped
           end
         end
@@ -1140,7 +1140,7 @@ Game = {
       return self.get_id()
     end,
 
-    ---@return userdata
+    ---@return vec3
     get_coords = function()
       return self.get_pos()
     end,
@@ -1175,7 +1175,7 @@ Game = {
 
     -- Checks if localPlayer is alive.
     isAlive = function()
-      if ENTITY.IS_ENTITY_DEAD(self.get_ped()) then
+      if ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) then
         return false
       else
         return true
@@ -1229,7 +1229,7 @@ Game = {
     ---@return number
     weapon = function()
       local weaponHash
-      check, weapon = WEAPON.GET_CURRENT_PED_WEAPON(self.get_ped(), weapon, 0)
+      check, weapon = WEAPON.GET_CURRENT_PED_WEAPON(self.get_ped(), weapon, false)
       if check then
         weaponHash = weapon
       end
@@ -1249,7 +1249,7 @@ Game = {
           if not Game.Self.isOnFoot() then
             TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
           end
-          ENTITY.SET_ENTITY_COORDS(self.get_ped(), coords.x, coords.y, coords.z, false, false, true)
+          ENTITY.SET_ENTITY_COORDS(self.get_ped(), coords.x, coords.y, coords.z, false, false, true, false)
         end
       end)
     end,
