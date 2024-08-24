@@ -2377,7 +2377,10 @@ flatbed:add_imgui(function()
       end
     end)
   end
-  local closestVehicleModel = Game.getEntityModel(closestVehicle)
+  local closestVehicleModel = 0
+  if closestVehicle ~= nil then
+    closestVehicleModel = Game.getEntityModel(closestVehicle)
+  end
   local iscar               = VEHICLE.IS_THIS_MODEL_A_CAR(closestVehicleModel)
   local isbike              = VEHICLE.IS_THIS_MODEL_A_BIKE(closestVehicleModel)
   local closestVehicleName  = vehicles.get_vehicle_display_name(closestVehicleModel)
@@ -2492,7 +2495,7 @@ flatbed:add_imgui(function()
           local modelHash = ENTITY.GET_ENTITY_MODEL(towed_vehicle)
           local attachedVehicle = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(current_vehicle, modelHash)
           local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(towed_vehicle, false)
-          controlled = entities.take_control_of(attachedVehicle, 300)
+          local controlled = entities.take_control_of(attachedVehicle, 300)
           if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) then
             if controlled then
               ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
@@ -7189,7 +7192,10 @@ script.register_looped("flatbed script", function(script)
       closestVehicle = veh
     end
   end
-  local closestVehicleModel = ENTITY.GET_ENTITY_MODEL(closestVehicle)
+  local closestVehicleModel = 0
+  if closestVehicle ~= nil then
+    closestVehicleModel = Game.getEntityModel(closestVehicle)
+  end
   local iscar               = VEHICLE.IS_THIS_MODEL_A_CAR(closestVehicleModel)
   local isbike              = VEHICLE.IS_THIS_MODEL_A_BIKE(closestVehicleModel)
   local towable             = false
@@ -7218,8 +7224,11 @@ script.register_looped("flatbed script", function(script)
   if is_in_flatbed and towed_vehicle == 0 then
     if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 73) and towable and closestVehicleModel ~= flatbedModel then
       script:sleep(200)
-      controlled = entities.take_control_of(closestVehicle, 350)
-      if controlled then
+      local controlled = false
+      if closestVehicle ~= nil then
+        entities.take_control_of(closestVehicle, 350)
+      end
+      if controlled and closestVehicle ~= nil then
         local vehicleClass = VEHICLE.GET_VEHICLE_CLASS(closestVehicle)
         if vehicleClass == 1 then
           tow_zAxis = 0.9
@@ -7268,7 +7277,7 @@ script.register_looped("flatbed script", function(script)
         local modelHash         = ENTITY.GET_ENTITY_MODEL(v)
         local attachedVehicle   = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(current_vehicle, modelHash)
         local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(towed_vehicle, false)
-        controlled              = entities.take_control_of(attachedVehicle, 350)
+        local controlled              = entities.take_control_of(attachedVehicle, 350)
         if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) then
           if controlled then
             ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
