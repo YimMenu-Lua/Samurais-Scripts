@@ -15,7 +15,6 @@ require('data/refs')
 CURRENT_BUILD   = Game.GetBuildNumber()
 CURRENT_VERSION = Game.GetOnlineVersion()
 
-
 Samurais_scripts          = gui.add_tab("Samurai's Scripts")
 local loading_label       = ""
 local start_loading_anim  = false
@@ -88,6 +87,7 @@ default_config            = {
   disableFlightMusic      = false,
   disable_quotes          = false,
   disable_mdef_logs       = false,
+  replace_pool_q          = false,
   nosPower                = 10,
   lightSpeed              = 1,
   DriftPowerIncrease      = 1,
@@ -163,6 +163,7 @@ extend_world             = lua_cfg.read("extend_world")
 disableFlightMusic       = lua_cfg.read("disableFlightMusic")
 disable_quotes           = lua_cfg.read("disable_quotes")
 disable_mdef_logs        = lua_cfg.read("disable_mdef_logs")
+replace_pool_q           = lua_cfg.read("replace_pool_q")
 current_vehicle          = self.get_veh()
 last_vehicle             = self.get_veh()
 tab1Sound                = true
@@ -214,6 +215,7 @@ autopilot_objective      = false
 autopilot_random         = false
 flight_music_off         = false
 loud_radio_enabled       = false
+q_replaced               = false
 flag                     = 0
 grp_anim_index           = 0
 attached_ped             = 0
@@ -242,6 +244,7 @@ drift_extra_pts          = 0
 straight_counter         = 0
 drift_time               = 0
 loud_pops_event          = 0
+katana                   = 0
 drift_multiplier         = 1
 quote_alpha              = 1
 pedthrowF                = 10
@@ -1501,6 +1504,13 @@ weapon_tab:add_imgui(function()
     if runaway then
       publicEnemy = false
     end
+  end
+
+  replace_pool_q, rpqUsed = ImGui.Checkbox(translateLabel("katanaCB"), replace_pool_q)
+  UI.helpMarker(false, translateLabel("katana_tt"))
+  if rpqUsed then
+    lua_cfg.save("replace_pool_q", replace_pool_q)
+    UI.widgetSound("Nav2")
   end
 
   laserSight, laserSightUSed = ImGui.Checkbox(translateLabel("laserSightCB"), laserSight)
@@ -5263,6 +5273,7 @@ settings_tab:add_imgui(function()
       disableFlightMusic      = false
       disable_quotes          = false
       disable_mdef_logs       = false
+      replace_pool_q          = false
       laser_switch            = 0
       DriftIntensity          = 0
       lang_idx                = 0
@@ -6020,7 +6031,7 @@ script.register_looped("HashGrabber", function(hg)
   hg:yield()
 end)
 
--- Triggerbot loop
+-- weapon stuff
 script.register_looped("TriggerBot", function(trgrbot)
   if Triggerbot then
     if PLAYER.IS_PLAYER_FREE_AIMING(PLAYER.PLAYER_ID()) then
@@ -6054,7 +6065,6 @@ script.register_looped("TriggerBot", function(trgrbot)
   end
   trgrbot:yield()
 end)
-
 script.register_looped("auto-kill-enemies", function(ak)
   if autoKill then
     local myCoords = self.get_pos()
@@ -6105,6 +6115,32 @@ script.register_looped("enemies-flee", function(ef)
     end
   end
   ef:yield()
+end)
+script.register_looped("Katana", function(rpq)
+  rpq:yield()
+  if replace_pool_q then
+    if WEAPON.IS_PED_ARMED(self.get_ped(), 1) and WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped()) == 0x94117305 then
+      local pool_q   = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
+      local q_coords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(pool_q, 0.0, 0.0, 0.0)
+      if not ENTITY.DOES_ENTITY_EXIST(katana) then
+        if Game.requestModel(0xE2BA016F) then
+          katana = OBJECT.CREATE_OBJECT(0xE2BA016F, q_coords.x, q_coords.y, q_coords.z + 50, true, false, true)
+          if ENTITY.DOES_ENTITY_EXIST(katana) then
+            ENTITY.SET_ENTITY_ALPHA(pool_q, 0, false)
+            rpq:sleep(300)
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, false, false, false, false, 2, true, 0)
+            ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(katana)
+            q_replaced = true
+          end
+        end
+      end
+    else
+      if q_replaced then
+        q_replaced = false
+        katana     = 0
+      end
+    end
+  end
 end)
 script.register_looped("laser_render", function(lsr)
   if laserSight and WEAPON.IS_PED_ARMED(self.get_ped(), 4) and Game.Self.isOnFoot() then
