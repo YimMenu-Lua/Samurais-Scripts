@@ -7226,7 +7226,7 @@ script.register_looped("flatbed script", function(script)
       script:sleep(200)
       local controlled = false
       if closestVehicle ~= nil then
-        entities.take_control_of(closestVehicle, 350)
+        controlled = entities.take_control_of(closestVehicle, 350)
       end
       if controlled and closestVehicle ~= nil then
         local vehicleClass = VEHICLE.GET_VEHICLE_CLASS(closestVehicle)
