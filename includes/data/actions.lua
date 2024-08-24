@@ -387,7 +387,7 @@ function entToNet(netID)
     end
     if NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) then
       NETWORK.SET_NETWORK_ID_CAN_MIGRATE(netID, true)
-      NETWORK.SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(netID)
+      NETWORK.SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(netID, false)
       NETWORK.SET_NETWORK_ID_VISIBLE_IN_CUTSCENE(netID, false, true)
     end
   end)
@@ -402,7 +402,7 @@ function cleanup()
           PED.DELETE_PED(v)
         end
         if ENTITY.DOES_ENTITY_EXIST(v) then
-          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v)
+          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v, false, false)
           script:sleep(100)
           ENTITY.DELETE_ENTITY(v)
         end
@@ -410,7 +410,7 @@ function cleanup()
     end
     if selfPTFX[1] ~= nil then
       for _, v in ipairs(selfPTFX) do
-        GRAPHICS.STOP_PARTICLE_FX_LOOPED(v)
+        GRAPHICS.STOP_PARTICLE_FX_LOOPED(v, false)
       end
     end
   end)
@@ -428,7 +428,7 @@ function cleanupNPC()
           PED.DELETE_PED(v)
         end
         if ENTITY.DOES_ENTITY_EXIST(v) then
-          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v)
+          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v, false, false)
           script:sleep(100)
           ENTITY.DELETE_ENTITY(v)
         end
@@ -439,7 +439,7 @@ function cleanupNPC()
     end
     if npcPTFX[1] ~= nil then
       for _, v in ipairs(npcPTFX) do
-        GRAPHICS.STOP_PARTICLE_FX_LOOPED(v)
+        GRAPHICS.STOP_PARTICLE_FX_LOOPED(v, false)
       end
     end
   end)
@@ -540,7 +540,7 @@ function playSelected(target, Flag, prop1, prop2, loopedFX, propPed, targetBone,
         prop1 = OBJECT.CREATE_OBJECT(info.prop1, 0.0, 0.0, 0.0, true, true, false)
         table.insert(propTable, prop1)
         ENTITY.SET_ENTITY_COORDS(prop1, targetBoneCoords.x + info.posx, targetBoneCoords.y + info.posy,
-          targetBoneCoords.z + info.posz)
+          targetBoneCoords.z + info.posz, false, false, false, false)
         type4:sleep(20)
         OBJECT.PLACE_OBJECT_ON_GROUND_PROPERLY(prop1)
         ENTITY.SET_ENTITY_COLLISION(prop1, info.propColl, info.propColl)
