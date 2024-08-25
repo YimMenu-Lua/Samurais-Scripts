@@ -979,12 +979,21 @@ Labels = {
     },
 
     ["langTitle"] = {
-        {iso = "en-US", text = "Language: "},
-        {iso = "de-DE", text = "Sprache: "},
-        {iso = "fr-FR", text = "Langue: "},
-        {iso = "it-IT", text = "Lingua: "},
-        {iso = "pt-BR", text = "Idioma: "},
-        {iso = "ru-RU", text = "Язык: "},
+        {iso = "en-US", text = "Language Settings"},
+        {iso = "de-DE", text = "Spracheinstellungen"},
+        {iso = "fr-FR", text = "Paramètres De Langue"},
+        {iso = "it-IT", text = "Impostazioni Di Lingua"},
+        {iso = "pt-BR", text = "Configurações De Idioma"},
+        {iso = "ru-RU", text = "Настройки языка"},
+    },
+
+    ["currentLang_txt"] = {
+        {iso = "en-US", text = "Current Language: "},
+        {iso = "de-DE", text = "Aktuelle Sprache: "},
+        {iso = "fr-FR", text = "Langue Actuelle : "},
+        {iso = "it-IT", text = "Lingua Attuale: "},
+        {iso = "pt-BR", text = "Idioma Atual: "},
+        {iso = "ru-RU", text = "Текущий язык: "},
     },
 
     ["gameLangCB"] = {

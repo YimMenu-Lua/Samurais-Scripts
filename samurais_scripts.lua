@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.1.9' -- v1.1.9
+SCRIPT_VERSION = '1.2.1' -- v1.2.1
 TARGET_BUILD   = '3274'  -- Only YimResupplier needs a version check.
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -55,6 +55,8 @@ default_config            = {
   driftMinigame           = false,
   speedBoost              = false,
   nosvfx                  = false,
+  nosAudio                = false,
+  nosFlames               = false,
   hornLight               = false,
   nosPurge                = false,
   insta180                = false,
@@ -88,6 +90,7 @@ default_config            = {
   disable_quotes          = false,
   disable_mdef_logs       = false,
   replace_pool_q          = false,
+  nosBtn                  = 21,
   nosPower                = 10,
   lightSpeed              = 1,
   DriftPowerIncrease      = 1,
@@ -142,6 +145,9 @@ nosvfx                   = lua_cfg.read("nosvfx")
 hornLight                = lua_cfg.read("hornLight")
 nosPurge                 = lua_cfg.read("nosPurge")
 nosPower                 = lua_cfg.read("nosPower")
+nosAudio                 = lua_cfg.read("nosAudio")
+nosBtn                   = lua_cfg.read("nosBtn")
+nosFlames                = lua_cfg.read("nosFlames")
 lightSpeed               = lua_cfg.read("lightSpeed")
 loud_radio               = lua_cfg.read("loud_radio")
 launchCtrl               = lua_cfg.read("launchCtrl")
@@ -1771,31 +1777,56 @@ vehicle_tab:add_imgui(function()
     lua_cfg.save("speedBoost", speedBoost)
   end
   if speedBoost then
-    ImGui.SameLine(); nosvfx, nosvfxUsed = ImGui.Checkbox("VFX", nosvfx)
-    UI.toolTip(false, translateLabel("vfx_tt"))
-    if nosvfxUsed then
-      UI.widgetSound("Nav2")
-      lua_cfg.save("nosvfx", nosvfx)
-    end
-    ImGui.Dummy(192, 1); ImGui.SameLine()
-    if ImGui.SmallButton("  NOS Power  ") then
-      ImGui.OpenPopup("Nos Power")
+    ImGui.SameLine()
+    if ImGui.Button("NOS Settings") then
+      ImGui.OpenPopup("Nos Settings")
     end
     ImGui.SetNextWindowPos(780, 400, ImGuiCond.Appearing)
     ImGui.SetNextWindowBgAlpha(0.9)
-    if ImGui.BeginPopupModal("Nos Power", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-      ImGui.Text("NOS Power")
+    ImGui.SetNextWindowSize(450, 260)
+    if ImGui.BeginPopupModal("Nos Settings", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
+      ImGui.Spacing(); ImGui.Text("NOS Settings"); ImGui.SameLine(); ImGui.Dummy(256, 1); ImGui.SameLine()
+      ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
+      if ImGui.Button("  X  ##nos_settings") then
+        UI.widgetSound("Cancel")
+        ImGui.CloseCurrentPopup()
+      end
+      ImGui.PopStyleVar(); ImGui.Separator(); ImGui.Dummy(1, 10)
+      nosAudio, nosaudioUsed = ImGui.Checkbox("NOS Sound", nosAudio)
+      UI.toolTip(false, translateLabel("nos_sound_tt"))
+      if nosaudioUsed then
+        UI.widgetSound("Nav2")
+        lua_cfg.save("nosAudio", nosAudio)
+      end
+
+      ImGui.SameLine(); nosFlames, nosflamesUsed = ImGui.Checkbox("NOS Flames", nosFlames)
+      UI.toolTip(false, translateLabel("flames_tt"))
+      if nosflamesUsed then
+        UI.widgetSound("Nav2")
+        lua_cfg.save("nosFlames", nosFlames)
+      end
+
+      ImGui.SameLine(); nosvfx, nosvfxUsed = ImGui.Checkbox("Screen Effect", nosvfx)
+      UI.toolTip(false, translateLabel("vfx_tt"))
+      if nosvfxUsed then
+        UI.widgetSound("Nav2")
+        lua_cfg.save("nosvfx", nosvfx)
+      end
+
+      ImGui.Dummy(1, 15); ImGui.Text(" Power:  "); ImGui.SameLine()
       nosPower, nspwrUsed = ImGui.SliderInt("##nospower", nosPower, 10, 100, "%d",
         ImGuiSliderFlags.NoInput | ImGuiSliderFlags.AlwaysClamp | ImGuiSliderFlags.Logarithmic)
       if nspwrUsed then
         UI.widgetSound("Nav")
       end
-      ImGui.Spacing(); if ImGui.Button(" Save ") then
+      ImGui.Dummy(1, 20)
+      if ImGui.Button("  " .. translateLabel("saveBtn") .. "  ##nos_settings") then
         UI.widgetSound("Select2")
         lua_cfg.save("nosPower", nosPower)
         ImGui.CloseCurrentPopup()
       end
-      ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); if ImGui.Button(" Cancel ") then
+      ImGui.SameLine(); ImGui.Dummy(30, 1); ImGui.SameLine()
+      if ImGui.Button("  " .. translateLabel("generic_cancel_btn") .. "  ##nos_settings") then
         UI.widgetSound("Cancel")
         ImGui.CloseCurrentPopup()
       end
@@ -5160,19 +5191,23 @@ settings_tab:add_imgui(function()
     ImGui.EndDisabled()
     UI.toolTip(false, translateLabel("no_shortcut_tt"))
   end
+  ImGui.BeginDisabled()
+  ImGui.Button("Hotkeys")
+  ImGui.EndDisabled()
+  UI.toolTip(false, "[ ! ] Not sure if this will ever become a proper option.\10\10If you're a YimMenu dev, please consider adding a binding for ImGui::IsKeyPressed() because GTA's controls are so annoying to work with. Thanks <3")
 
-  ImGui.Dummy(1, 10); ImGui.Text(translateLabel("langTitle") .. " " .. current_lang)
-  useGameLang, uglUsed = ImGui.Checkbox(translateLabel("gameLangCB"), useGameLang)
+  ImGui.Dummy(1, 10); ImGui.SeparatorText(translateLabel("langTitle"))
+  ImGui.Spacing(); ImGui.BulletText(translateLabel("currentLang_txt") .. " " .. current_lang)
+  ImGui.Spacing(); useGameLang, uglUsed = ImGui.Checkbox(translateLabel("gameLangCB"), useGameLang)
   if useGameLang then
     UI.toolTip(false, translateLabel("gameLang_tt"))
-  end
-  if useGameLang then
     LANG, current_lang = Game.GetLang()
   end
   if uglUsed then
     UI.widgetSound("Nav2")
     gui.show_success("Samurai's Scripts", translateLabel("lang_success_msg"))
     lua_cfg.save("useGameLang", useGameLang)
+    lua_cfg.save("current_lang", current_lang)
     lua_cfg.save("LANG", LANG)
     lua_cfg.save("lang_idx", 0)
   end
@@ -5233,6 +5268,8 @@ settings_tab:add_imgui(function()
       driftMinigame           = false
       speedBoost              = false
       nosvfx                  = false
+      nosAudio                = false
+      nosFlames               = false
       hornLight               = false
       nosPurge                = false
       insta180                = false
@@ -5281,6 +5318,7 @@ settings_tab:add_imgui(function()
       lightSpeed              = 1
       DriftPowerIncrease      = 1
       nosPower                = 10
+      nosBtn                  = 21
       laser_choice            = "proj_laser_enemy"
       LANG                    = "en-US"
       current_lang            = "English"
@@ -6122,16 +6160,23 @@ script.register_looped("Katana", function(rpq)
     if WEAPON.IS_PED_ARMED(self.get_ped(), 1) and WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped()) == 0x94117305 then
       local pool_q   = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
       local q_coords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(pool_q, 0.0, 0.0, 0.0)
-      if not ENTITY.DOES_ENTITY_EXIST(katana) then
-        if Game.requestModel(0xE2BA016F) then
-          katana = OBJECT.CREATE_OBJECT(0xE2BA016F, q_coords.x, q_coords.y, q_coords.z + 50, true, false, true)
-          if ENTITY.DOES_ENTITY_EXIST(katana) then
-            ENTITY.SET_ENTITY_ALPHA(pool_q, 0, false)
-            rpq:sleep(300)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, false, false, false, false, 2, true, 0)
-            ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(katana)
-            q_replaced = true
+      if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(pool_q, self.get_ped()) then
+        if not ENTITY.DOES_ENTITY_EXIST(katana) then
+          if Game.requestModel(0xE2BA016F) then
+            katana = OBJECT.CREATE_OBJECT(0xE2BA016F, q_coords.x, q_coords.y, q_coords.z + 50, true, false, true)
+            if ENTITY.DOES_ENTITY_EXIST(katana) then
+              ENTITY.SET_ENTITY_ALPHA(pool_q, 0, false)
+              rpq:sleep(300)
+              ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, false, false, false, false, 2, true, 0)
+              ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(katana)
+              q_replaced = true
+            end
           end
+        end
+      else
+        if q_replaced then
+          q_replaced = false
+          katana     = 0
         end
       end
     else
@@ -6232,15 +6277,20 @@ script.register_looped("TDFT", function(script)
     if speedBoost then
       if validModel or is_boat or is_bike then
         if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
-          if PAD.IS_DISABLED_CONTROL_PRESSED(0, tdBtn) and PAD.IS_CONTROL_PRESSED(0, 71) then
+          if PAD.IS_DISABLED_CONTROL_PRESSED(0, nosBtn) and PAD.IS_CONTROL_PRESSED(0, 71) then
             VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, (nosPower) / 5)
             VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, nosPower)
-            AUDIO.SET_VEHICLE_BOOST_ACTIVE(current_vehicle, true)
+            if nosAudio then
+              AUDIO.SET_VEHICLE_BOOST_ACTIVE(current_vehicle, true)
+            end
+            if nosvfx then
+              GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrous", 0, false)
+            end
             using_nos = true
           end
         else
           if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
-            if PAD.IS_DISABLED_CONTROL_PRESSED(0, tdBtn) and PAD.IS_CONTROL_PRESSED(0, 71) then
+            if PAD.IS_DISABLED_CONTROL_PRESSED(0, nosBtn) and PAD.IS_CONTROL_PRESSED(0, 71) then
               if VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) < 300 then
                 AUDIO.PLAY_SOUND_FROM_ENTITY(-1, "Engine_fail", current_vehicle,
                   "DLC_PILOT_ENGINE_FAILURE_SOUNDS", true, 0)
@@ -6249,10 +6299,19 @@ script.register_looped("TDFT", function(script)
           end
         end
       end
-      if using_nos and PAD.IS_DISABLED_CONTROL_RELEASED(0, tdBtn) then
+      if using_nos and PAD.IS_DISABLED_CONTROL_RELEASED(0, nosBtn) then
         VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 1.0)
         VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, -1)
         AUDIO.SET_VEHICLE_BOOST_ACTIVE(current_vehicle, false)
+        if nosvfx then
+          GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrousOut", 0, false)
+        end
+        if GRAPHICS.ANIMPOSTFX_IS_RUNNING("DragRaceNitrous") then
+          GRAPHICS.ANIMPOSTFX_STOP("DragRaceNitrous")
+        end
+        if GRAPHICS.ANIMPOSTFX_IS_RUNNING("DragRaceNitrousOut") then
+          GRAPHICS.ANIMPOSTFX_STOP("DragRaceNitrousOut")
+        end
         using_nos = false
       end
     end
@@ -6325,7 +6384,6 @@ script.register_looped("TDFT", function(script)
     end
   end
 end)
-
 script.register_looped("tire smoke", function(smkptfx)
   if driftMode or DriftTires then
     if DriftSmoke and Game.Self.isDriving() and is_drifting then
@@ -6364,7 +6422,6 @@ script.register_looped("tire smoke", function(smkptfx)
     end
   end
 end)
-
 script.register_looped("LCTRL", function(lct)
   if launchCtrl and Game.Self.isDriving() then
     if limitVehOptions then
@@ -6422,7 +6479,6 @@ script.register_looped("LCTRL", function(lct)
   end
   lct:yield()
 end)
-
 script.register_looped("MISC Vehicle Options", function(mvo)
   if Game.Self.isDriving() then
     if autobrklight then
@@ -6461,6 +6517,7 @@ script.register_looped("MISC Vehicle Options", function(mvo)
       end
     end
   end
+
   if loud_radio then
     if current_vehicle ~= nil and current_vehicle ~= 0 then
       if not loud_radio_enabled then
@@ -6474,56 +6531,46 @@ script.register_looped("MISC Vehicle Options", function(mvo)
     end
   end
 end)
-
 script.register_looped("NOS ptfx", function(spbptfx)
-  if speedBoost and Game.Self.isDriving() then
-    if validModel or is_boat or is_bike then
-      if PAD.IS_DISABLED_CONTROL_PRESSED(0, tdBtn) and PAD.IS_CONTROL_PRESSED(0, 71) then
-        if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
-          local effect  = "veh_xs_vehicle_mods"
-          local counter = 0
-          while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(effect) do
-            STREAMING.REQUEST_NAMED_PTFX_ASSET(effect)
-            spbptfx:yield()
-            if counter > 100 then
-              return
-            else
-              counter = counter + 1
-            end
-          end
-          local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
-          for i = 0, exhaustCount do
-            local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
-            if retBool then
-              GRAPHICS.USE_PARTICLE_FX_ASSET(effect)
-              nosPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_nitrous", current_vehicle, 0.0,
-                0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 1.0, false, false, false, 0, 0, 0, 255)
-              table.insert(nosptfx_t, nosPtfx)
-              if nosvfx then
-                GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrous", 0, false)
+  spbptfx:yield()
+  if nosFlames then
+    if speedBoost and Game.Self.isDriving() then
+      if validModel or is_boat or is_bike then
+        if PAD.IS_DISABLED_CONTROL_PRESSED(0, nosBtn) and PAD.IS_CONTROL_PRESSED(0, 71) then
+          if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
+            local effect  = "veh_xs_vehicle_mods"
+            local counter = 0
+            while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(effect) do
+              STREAMING.REQUEST_NAMED_PTFX_ASSET(effect)
+              spbptfx:yield()
+              if counter > 100 then
+                return
+              else
+                counter = counter + 1
               end
-              nos_started = true
             end
-          end
-          if nos_started then
-            repeat
-              spbptfx:sleep(50)
-            until
-              PAD.IS_DISABLED_CONTROL_RELEASED(0, tdBtn) or PAD.IS_CONTROL_RELEASED(0, 71)
-            if nosvfx then
-              GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrousOut", 0, false)
+            local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
+            for i = 0, exhaustCount do
+              local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
+              if retBool then
+                GRAPHICS.USE_PARTICLE_FX_ASSET(effect)
+                nosPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_nitrous", current_vehicle, 0.0,
+                  0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 1.0, false, false, false, 0, 0, 0, 255)
+                table.insert(nosptfx_t, nosPtfx)
+                nos_started = true
+              end
             end
-            if GRAPHICS.ANIMPOSTFX_IS_RUNNING("DragRaceNitrous") then
-              GRAPHICS.ANIMPOSTFX_STOP("DragRaceNitrous")
-            end
-            if GRAPHICS.ANIMPOSTFX_IS_RUNNING("DragRaceNitrousOut") then
-              GRAPHICS.ANIMPOSTFX_STOP("DragRaceNitrousOut")
-            end
-            for _, nos in ipairs(nosptfx_t) do
-              if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(nos) then
-                GRAPHICS.STOP_PARTICLE_FX_LOOPED(nos, false)
-                GRAPHICS.REMOVE_PARTICLE_FX(nos, false)
-                nos_started = false
+            if nos_started then
+              repeat
+                spbptfx:sleep(50)
+              until
+                PAD.IS_DISABLED_CONTROL_RELEASED(0, nosBtn) or PAD.IS_CONTROL_RELEASED(0, 71)
+              for _, nos in ipairs(nosptfx_t) do
+                if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(nos) then
+                  GRAPHICS.STOP_PARTICLE_FX_LOOPED(nos, false)
+                  GRAPHICS.REMOVE_PARTICLE_FX(nos, false)
+                  nos_started = false
+                end
               end
             end
           end
@@ -6532,7 +6579,6 @@ script.register_looped("NOS ptfx", function(spbptfx)
     end
   end
 end)
-
 script.register_looped("2-step", function(twostep)
   if launchCtrl and Game.Self.isDriving() then
     if limitVehOptions then
@@ -6583,7 +6629,6 @@ script.register_looped("2-step", function(twostep)
     end
   end
 end)
-
 script.register_looped("LCTRL SFX", function(tstp)
   if Game.Self.isDriving() then
     if limitVehOptions then
@@ -6592,7 +6637,6 @@ script.register_looped("LCTRL SFX", function(tstp)
         return
       end
     end
-
     if launchCtrl then
       if lctPtfx_t[1] ~= nil then
         local popSound
@@ -6618,7 +6662,6 @@ script.register_looped("LCTRL SFX", function(tstp)
         end
       end
     end
-
     if popsNbangs then
       if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) then
         rpmThreshold = 0.45
@@ -6656,7 +6699,6 @@ script.register_looped("LCTRL SFX", function(tstp)
     tstp:yield()
   end
 end)
-
 script.register_looped("pops&bangs", function(pnb)
   if Game.Self.isDriving() and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
     if is_car or is_bike or is_quad then
@@ -6742,7 +6784,6 @@ script.register_looped("PBSE", function(pnbse)
     end
   end
 end)
-
 -- drift minigame (WIP)
 script.register_looped("straight line counter", function()
   if driftMode or DriftTires and is_car then
@@ -6959,7 +7000,6 @@ script.register_looped("drift points", function()
     end
   end
 end)
-
 -- Missile defense
 script.register_looped("missile defense", function(md)
   if missiledefense and current_vehicle ~= 0 then
@@ -6973,12 +7013,15 @@ script.register_looped("missile defense", function(md)
       end
     end
     if missile ~= nil and missile ~= 0 then
-      -- if MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 100, vehPos.y + 100, vehPos.z + 100, vehPos.x - 100, vehPos.y - 100, vehPos.z - 100, missile, false) then
-      --   if Game.Self.isDriving() and (is_plane or is_heli) then
-      --     shoot_flares(md)
-      --   end
-      -- end
-      -- ^ auto-counters missiles with flares but it's too easy
+    --[[
+      if MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 100, vehPos.y + 100, vehPos.z + 100, vehPos.x - 100, vehPos.y - 100, vehPos.z - 100, missile, false) then
+        if Game.Self.isDriving() and (is_plane or is_heli) then
+          shoot_flares(md)
+        end
+      end
+      ^ auto-counters missiles with flares but it's too easy in dogfights and also I couldn't find
+      a way to determine if a missile was coming towards us or if it was fired by us... I'm such a noob!
+    ]]
       if MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 20, vehPos.y + 20, vehPos.z + 100, vehPos.x - 20, vehPos.y - 20, vehPos.z - 100, missile, false) then
         if not MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 10, vehPos.y + 10, vehPos.z + 50, vehPos.x - 10, vehPos.y - 10, vehPos.z - 50, missile, false) and not MISC.IS_PROJECTILE_TYPE_IN_AREA(selfPos.x + 10, selfPos.y + 10, selfPos.z + 50, selfPos.x - 10, selfPos.y - 10, selfPos.z - 50, missile, false) then
           if not disable_mdef_logs then
@@ -7008,7 +7051,6 @@ script.register_looped("missile defense", function(md)
     md:yield()
   end
 end)
-
 script.register_looped("Purge", function(nosprg)
   if Game.Self.isDriving() then
     if nosPurge and validModel or nosPurge and is_bike then
@@ -7053,7 +7095,6 @@ script.register_looped("Purge", function(nosprg)
     nosprg:yield()
   end
 end)
-
 script.register_looped("rgbLights", function(rgb)
   if start_rgb_loop then
     for i = 0, 14 do
@@ -7117,7 +7158,6 @@ script.register_looped("rgbLights", function(rgb)
     rgb:yield()
   end
 end)
-
 script.register_looped("no jacking", function(ctt)
   if noJacking then
     if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 398, true) then
