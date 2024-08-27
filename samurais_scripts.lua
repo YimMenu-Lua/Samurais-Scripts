@@ -241,9 +241,9 @@ kers_boost_enabled       = false
 offroader_enabled        = false
 rally_tires_enabled      = false
 easy_wheelie_enabled     = false
-rw_steering_enabled      = false
-aw_steering_enabled      = false
-hb_steering_enabled      = false
+-- rw_steering_enabled      = false
+-- aw_steering_enabled      = false
+-- hb_steering_enabled      = false
 world_extended           = false
 autopilot_waypoint       = false
 autopilot_objective      = false
@@ -1749,6 +1749,12 @@ local function resetLastVehState(s)
   loud_radio_enabled = false
   if default_handling_flags ~= nil then
     SS.resetHandlingFlags(last_vehicle, default_handling_flags)
+    engine_brake_disabled  = false
+    traction_ctrl_disabled = false
+    kers_boost_enabled     = false
+    offroader_enabled      = false
+    rally_tires_enabled    = false
+    easy_wheelie_enabled   = false
   end
   s:sleep(200)
   last_vehicle = current_vehicle
@@ -7559,7 +7565,7 @@ script.register_looped("Handling Editor", function(he)
       end
     end
 
-    if kersBoost then
+    if kersBoost and not is_plane and not is_heli then
       if not kers_boost_enabled and not VEHICLE.GET_VEHICLE_HAS_KERS(current_vehicle) then
         SS.setHandlingFlag(current_vehicle, HF._HAS_KERS, true)
         VEHICLE.SET_VEHICLE_KERS_ALLOWED(current_vehicle, true)
