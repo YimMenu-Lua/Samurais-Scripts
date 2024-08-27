@@ -197,9 +197,9 @@ lua_Fn = {
     end
   end,
 
-  ---@param n integer
+  ---@param n number
   get_bit = function(n)
-    return 2 ^ (n - 1)
+    return (2 ^ (n - 1)) * 2
   end,
 
   --[[ Checks if `n` has `x` bit.
@@ -210,23 +210,22 @@ lua_Fn = {
           --do something
         end
   ]]
-  ---@param x integer
-  ---@param n integer
+  ---@param x number
+  ---@param n number
   has_bit = function(n, x)
-    nn = lua_Fn.get_bit(n)
-    return x % (nn + nn) >= nn
+    return x % (n + n) >= n
   end,
 
-  ---Sets `p` bit in `x`
-  ---@param n integer
-  ---@param x integer
+  ---Sets `n` bit in `x`
+  ---@param n number
+  ---@param x number
   set_bit = function(n, x)
-    return lua_Fn.has_bit(x, n) and x or x + n
+    return lua_Fn.has_bit(n, x) and x or x + n
   end,
 
-  ---Clears `p` bit from `x`
-  clear_bit = function(x, n)
-    return lua_Fn.has_bit(x, n) and x - n or x
+  ---Clears `n` bit from `x`
+  clear_bit = function(n, x)
+    return lua_Fn.has_bit(n, x) and x - n or x
   end,
 
   ---Lua version of Bob Jenskins' "Jenkins One At A Time" hash function (https://en.wikipedia.org/wiki/Jenkins_hash_function).
@@ -237,14 +236,14 @@ lua_Fn = {
     for i = 1, #key do
       hash = hash + string.byte(key, i)
       hash = hash + (hash << 10)
-      hash = hash & 0xffffffff
+      hash = hash & 0xFFFFFFFF
       hash = hash ~ (hash >> 6)
     end
     hash = hash + (hash << 3)
-    hash = hash & 0xffffffff
+    hash = hash & 0xFFFFFFFF
     hash = hash ~ (hash >> 11)
     hash = hash + (hash << 15)
-    hash = hash & 0xffffffff
+    hash = hash & 0xFFFFFFFF
     return hash
   end
 }
@@ -740,6 +739,78 @@ SS = {
           ENTITY.DELETE_ENTITY(p)
         end
       end
+    end
+
+    if is_sitting or ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), "timetable@ron@ig_3_couch", "base", 3) then
+      TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+    end
+
+    if default_handling_flags ~= nil then
+      local vehPtr           = memory.handle_to_ptr(current_vehicle)
+      local CHandlingData    = vehPtr:add(0x0960):deref()
+      local m_handling_flags = CHandlingData:add(0x0128)
+      m_handling_flags:set_dword(default_handling_flags)
+    end
+  end,
+
+  -- Checks if localPlayer is standing near a public seat and returns its position and rotation vectors.
+  isNearPublicSeat = function()
+    local retBool
+    ---@type vec3
+    local seatPos
+    ---@type vec3
+    local seatRot
+    local myCoords = self.get_pos()
+    for _, seat in ipairs(world_seats_T) do
+      local distCalc = SYSTEM.VDIST2(myCoords.x, myCoords.y, myCoords.z, seat.pos.x, seat.pos.y, seat.pos.z)
+      if distCalc <= 1.8 then
+        seatPos = {x = seat.pos.x, y = seat.pos.y, z = seat.pos.z}
+        seatRot = {x = seat.rot.x, y = seat.rot.y, z = seat.rot.z}
+        retBool = true
+        break
+      else
+        retBool = false
+        seatPos = {x = 0.0, y = 0.0, z = 0.0}
+        seatRot = {x = 0.0, y = 0.0, z = 0.0}
+      end
+    end
+    return retBool, seatPos, seatRot
+  end,
+
+  ---@param vehicle integer
+  ---@param flag integer
+  ---@param switch boolean
+  setHandlingFlag = function(vehicle, flag, switch)
+    local vehPtr           = memory.handle_to_ptr(vehicle)
+    local CHandlingData    = vehPtr:add(0x0960):deref()
+    local m_handling_flags = CHandlingData:add(0x0128)
+    local handling_flags   = m_handling_flags:get_dword()
+    local new_flag
+    if switch == true then
+      default_handling_flags = handling_flags
+      if handling_flags == 0 then
+        new_flag = flag
+      else
+        new_flag = lua_Fn.set_bit(flag, handling_flags)
+      end
+    else
+      if handling_flags == flag then
+        new_flag = 0
+      else
+        new_flag = lua_Fn.clear_bit(flag, handling_flags)
+      end
+    end
+    m_handling_flags:set_dword(new_flag)
+  end,
+
+  ---@param vehicle integer
+  ---@param default integer
+  resetHandlingFlags = function(vehicle, default)
+    if default ~= nil then
+      local vehPtr           = memory.handle_to_ptr(vehicle)
+      local CHandlingData    = vehPtr:add(0x0960):deref()
+      local m_handling_flags = CHandlingData:add(0x0128)
+      m_handling_flags:set_dword(default)
     end
   end,
 }

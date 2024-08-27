@@ -1,29 +1,41 @@
 ## Self
 - **Main Self Features:**
+  
   - **Auto-Heal:**
     - Constantly fills your health and armour whenever they fall below the maximum.
+  
   - **Teleport To Objective:**
     - This was only added because the option in YimMenu was kind of broken. [gir489returns](https://github.com/gir489returns) fixed it so this one will be removed.
+  
   - **Crouch Instead Of Sneak:**
     - Replaces the default sneaking stance (Left control) with crouching.
+
   - **Replace 'Point At' Action:**
     - Replaces the *Point At* action in Online (B) with *Hands Up*.
+
   - **Enable Phone Animations:**
     - Allows your online character to physically interact with their mobile phone.
+
   - **Sprint Inside Interiors:**
     - Allows your character to sprint at full speed inside a few interiors that normally don't allow it. Some other interiors like the bunker will still force you to run slowly.
+
   - **Use Lockpick Animation:**
     - When stealing cars, your character will pick the door lock instead of smashing the window. Note that this won't work on some missions and also if you approach the vehicle while running, your character will still break the window.
+
   - **Disable Action Mode:**
     - Keeps your character in their normal stance after firing a weapon instead of going into that janky movement stance R* calls *Action Mode*. So now for example after killing everyone in the Stash House, you can calmly walk to the safe instead of slamming into walls and being all over the place.
+
   - **Clumsy:**
     - Makes you stumble and fall when you collide with objects and sidewalks.
+
   - **Ragdoll On Demand:**
     - Gives you the ability to make your character fall whenever you want by pressing [X] on keyboard. Note that this feature can knock you off bikes whenever you press the button *(kinda funny)*.
+
   - **Ragdoll Sound:**
     - Online Only: Plays a hurt/panicked ped sound when the player ragdolls.
 
 - **Actions:**
+
   - **An improved version of [YimActions](https://github.com/xesdoog/YimActions) with the side features moved into the main Self tab. The improvements include:**
     - The ability to set a custom shortcut key for a specific animation so that you could play it any time you want. I have mine set as **[L]** to play a hitch-hike animation.
     - Some animations produce sound (Sleeping, Crying, DJ *(plays loud music)*, some uh.. uhm, NSFW animations also play sounds).
@@ -33,26 +45,36 @@
   - Plays either human speeches or loud radio music that players nearby can hear (assuming you're not lagging and there are no sync issues).
 
 ## Weapon
+
 - **Info Gun:**
   - A debug option that will be removed in the future. Simply aim your gun at a game entity and press [Left Mouse Button] to log information about it to the console.
+
 - **Trigger Bot:**
   - A barebones and janky triggerbot. *Kinda works?* Only on foot though.
+
 - **Autokill Enemies:**
   - Automatically kills nearby enemies. I've put a delay to prevent kill spamming because I don't want enemies to die the moment they spawn. Feedback on this would be appreciated *(keep the delay or spam kill?)*.
+
 - **Enemies Flee:**
   - All enemies nearby will drop their weapons and run away from you. Note that during some missions, enemies will be confused and sometimes stand still and scream in horror because the game is forcing them to attack and this script is forcing them to flee.
+
 - **Katana:**
   - Replace the *Pool Cue* weapon with a Japanese katana. If you don't own a pool cue, you can either buy one from Ammu-Nation or use YimMenu to equip a tempoary one. Once you have one equipped in your hands, it will be automatically replaced with a Katana.
+
 - **Laser Sight:**
   - Renders a laser sight on your weapons when you're aiming them. The laser doesn't look perfect and doesn't travel far either. You can choose between red and green lasers.
 
 ## Vehicle:
+
 - **All features from [TokyoDrift](https://github.com/YimMenu-Lua/TokyoDrift) with a few improvements and additions:**
+
   - **Better Drift Mode / Drift Tires:**
     - Increased torque while drifting so that you could pick up speed faster and hold bigger angles. You can choose how much toruqe you want to gain.
+
   - **Drift Smoke:**
     - Your tires will now produce a lot more smoke when drifting. The smoke will appear when you're drifting at a speed higher than *approx: 15mph // 20km/h*. You can change the smoke color either from a drop down list of pre-defined colors or by inputting your own [HEX](https://www.color-hex.com/) color. Note that the drift smoke color has no relation to your actual tire smoke color but I can change that if desired, it's just one line of code.
   - Enabling **Pops & Bangs** and **Louder Pops** makes nearby NPCs react to your exhaust pops. Some will flee, some will insult you, some will be utterly confused, others will take a picture of your car.
+
   - **Drift Minigame:**
     - When this option is enabled, drifting your car gives you points which when banked, 10% of them are converted into cash (currently the cashout feature is for Single Player only). You also get bonus points for destroying objects (fences, road signs, road cones, etc...), hitting pedestrians, and jumping in the air. *(PS: if you don't land on all four wheels after a jump, you will lose your points. I will probably rewrite this to make you lose your multiplier instead but as of now, jumping is risky)*.
     - Your highest score will be saved and displayed in the UI.
@@ -64,12 +86,16 @@
       
   - **Instant 180°:**
     - Press **[Mouse Scroll Down]** or **[Numpad -]** to instantly turn your car 180 degrees. Note that if your car is stopped or moving but you were not holding **[W]** / accelerating when you pressed the Instant 180° button, your car will simply face the opposite direction but if you press it while holding the accelerator then the option will give you back your speed in the opposite direction.
+
   - **Flappy Doors:**
-    - Just opens and closes your doors in succession. It's all about the rhythm the doors opening and closing produce. I find it funny, I don't know, I might be retarded 🤷‍♂️
+    - Just opens and closes your doors in succession.
+  
   - **Strong Windows:**
     - Prevents your vehicle's windows from breaking.
+
   - **Flares For All:**
      - This option equips any plane or helicopter you fly with unlimited flares. Just use the same counter-measure button you use on your weaponized planes *(default: [E] on keyboard)* to fire flares. And yes, they do work as counter-measures same as the ones in weaponized planes, there's just a 3 second delay between each use to prevent unexpected issues.
+
   - **Higher Plane Speeds:**
      - Increases the speed limit on planes to 555km/h. Just enable the option and the rest will take care of itself.
       > **NOTE:** This option will not do anything unless you're flying high enough, with your landing gear fully retracted, and at a speed of at least 260km/h. If for some reason you want to fly a Cropduster at 555km/h, fly high enough then nose-dive to hit 260km/h.
@@ -83,12 +109,16 @@
 
 - **An implementation of [Flatbed Script](https://github.com/xesdoog/Flatbed-Script):**
   - Short explanation: You can tow anything with a flatbed truck. If the vehicle you're towing is occupied, you'll still tow it and kidnap whoever is sitting in it. Note that kidnapping players could sometimes log errors and cause issues *(may even crash your game)*. Also you can't tow players who have protections.
+
+- **Handling Editor:**
+  - A tab with a few options that change your vehicle's handling behavior like for example disabling the engine brake (I hate it with a passion 😡) and allowing motorcycles to drift. This has been a thorn in my side for longer than I would like to admit. Thanks to [tupoy-ya](https://github.com/tupoy-ya) for helping me finally figure it out.
  
 - **Vehicle Creator:**
   - Spawn and merge two or more vehicles into one then save it as a custom vehicle. Wanna create a widebody Futo? A Sentinel XS with 2 BMXs on the roof? A drivable skyscraper made out of tanks? Feel free.
 
 
 ## Online
+
 - **Casino Pacino**
   - An implementation of gir489's [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) with translation support and a slightly altered UI.
 
@@ -97,6 +127,7 @@
 
 ## World
 - **Main World Tab:**
+
   - **Ped Grabber:** 
     - Get close to an NPC then press **[LEFT MOUSE BUTTON]** to grab them. Once grabbed, press and hold **[RIGHT MOUSE BUTTON]** then press **[LEFT MOUSE BUTTON]** to throw them. You can change the throwing force using a slider in the UI.
       > NOTE 1: You have to be unarmed to be able to grab an NPC.
@@ -110,6 +141,7 @@
       
   - **Ride With NPCs:**
     - When enabled, you will not be able to jack NPC vehicles but instead when you press **[F]** you will get in as a passenger and the driver NPC will be cool with it. *The passengers will be confused and frightened though...*
+
   - **Animate Nearby NPCs:**
     - Activate the option then choose an action from the drop down list and press **Play** to make all nearby NPCs do that action.
 
@@ -121,8 +153,13 @@
 
   - **Extend World Limits:**
     - Allows you to travel farther into the ocean without you dying or your vehicle getting destroyed. Useful if you want to have dogfights in the middle of nowhere. Please note that this does not remove the sky box, you'll still be limited as to how high you can fly.
+
   - **Smooth Waters:**
-     - Gets rid of ocean waves and makes sailing boats or riding jetskis feel like skiing. Especially useful when playing those awful boat sell missions.
+    - Gets rid of ocean waves and makes sailing boats or riding jetskis feel like skiing. Especially useful when playing those awful boat sell missions.
+
+  - **Public Seating:**
+    - Allows you to sit down on public seats and benches. Approach a bench in the game's world *(there are a bunch of them in Vespucci Beach)*, face it and when prompted, press [E] to sit down. You can sit up by pressing [E] again or [B] if you have the **Hands Up** feature from the **Self** tab enabled.
+      > NOTE: This feature is not polished. For now you will have to face the bench/seat to end up sitting on it correctly, otherwise if you face the opposite direction from it and try to sit down, you will be placed in an awkward position.
       
 - **Improved [Object Spawner](https://github.com/xesdoog/object-spawner):**
   - Fixed a few bugs in the main script and added the ability to attach objects to your vehicle.
