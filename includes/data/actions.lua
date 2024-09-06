@@ -1,4 +1,4 @@
----@diagnostic disable: undefined-global, lowercase-global
+---@diagnostic disable
 
 animlist =  {
     { dict = "rcmpaparazzo_2",                                              anim = "shag_loop_a",                        name = "NSFW: Hit It From The Back 01",         flag = 47, type = 7, boneID = 0, pedType = "PED_TYPE_PROSTITUTE", pedHash = 1846523796, posx = 0.0,  posy = 0.2, posz = 0.0,  rotx  = 40.0, roty = 0.0, rotz = 0.0,   dict2 = "rcmpaparazzo_2",       anim2 = "shag_loop_poppy", sfx = "SEX_GENERIC_FEM", sfxName = "S_F_Y_HOOKER_03_BLACK_FULL_01", sfxFlg = "SPEECH_PARAMS_FORCE"},

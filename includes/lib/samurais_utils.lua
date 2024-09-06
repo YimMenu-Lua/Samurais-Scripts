@@ -48,6 +48,7 @@ lua_Fn = {
   ---@param new string
   str_replace = function(str, old, new)
     local search_index = 1
+    local result
     while true do
       local start_index, end_index = str:find(old, search_index, true)
       if not start_index then
@@ -60,16 +61,16 @@ lua_Fn = {
     return result
   end,
 
-  --- Rounds a float to x number of decimals.
+  --- Rounds n float to x number of decimals.
   --[[ -- Example:
 
       lua_Fn.round(420.69458797, 2)
         -> 420.69
   ]]
   ---@param n number
-  ---@param points integer
-  round = function(n, points)
-    return tonumber(string.format("%." .. (points or 0) .. "f", n))
+  ---@param x integer
+  round = function(n, x)
+    return tonumber(string.format("%." .. (x or 0) .. "f", n))
   end,
 
     ---Returns a string containing the input value separated by the thousands.
@@ -150,8 +151,8 @@ lua_Fn = {
   ---@param str string
   ---@return string
   stringToHex = function(str)
-    return (str:gsub(".", function(char) 
-      return string.format("%02x", char:byte()) 
+    return (str:gsub(".", function(char)
+      return string.format("%02x", char:byte())
     end))
   end,
 
@@ -380,7 +381,7 @@ UI = {
     return r, g, b, errorMsg
   end,
 
-  ---Creates a text wrapped around the provided size. (You can use coloredText() and set the color to white but this is simpler.)
+  ---Creates a text wrapped around the provided size. (We can use coloredText() and set the color to white but this is simpler.)
   ---@param text string
   ---@param wrap_size integer
   wrappedText = function(text, wrap_size)
@@ -579,7 +580,7 @@ UI = {
 -- As in Samurai's Scripts, not Schutzstaffel 🙄
 SS = {
 
-  ---Resets changes done by the script.
+  ---Reverts changes done by the script.
   handle_events = function()
     if attached_ped ~= nil and attached_ped ~= 0 then
       ENTITY.DETACH_ENTITY(attached_ped, true, true)
@@ -644,10 +645,6 @@ SS = {
 
     if currentStrf ~= "" then
       PED.RESET_PED_STRAFE_CLIPSET(self.get_ped())
-    end
-
-    if clumsy then
-      PED.SET_PED_RAGDOLL_ON_COLLISION(self.get_ped(), false)
     end
     WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(self.get_ped(), 3839837909)
 
@@ -745,7 +742,7 @@ SS = {
       TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
     end
 
-    if default_handling_flags ~= nil then
+    if default_handling_flags ~= nil and ENTITY.DOES_ENTITY_EXIST(current_vehicle) then
       local vehPtr           = memory.handle_to_ptr(current_vehicle)
       local CHandlingData    = vehPtr:add(0x0960):deref()
       local m_handling_flags = CHandlingData:add(0x0128)
@@ -755,6 +752,7 @@ SS = {
 
   -- Checks if localPlayer is standing near a public seat and returns its position and rotation vectors.
   isNearPublicSeat = function()
+    ---@type boolean
     local retBool
     ---@type vec3
     local seatPos
@@ -813,11 +811,84 @@ SS = {
       m_handling_flags:set_dword(default)
     end
   end,
+
+  get_ceo_global_offset = function(crates)
+    local offset
+    if crates ~= nil then
+      if crates == 1 then
+        offset = 15732
+      end
+      if crates == 2 then
+        offset = 15733
+      end
+      if crates == 3 then
+        offset = 15734
+      end
+      if crates == 4 or crates == 5 then
+        offset = 15735
+      end
+      if crates == 6 or crates == 7 then
+        offset = 15736
+      end
+      if crates == 8 or crates == 9 then
+        offset = 15737
+      end
+      if crates >= 10 and crates <= 14 then
+        offset = 15738
+      end
+      if crates >= 15 and crates <= 19 then
+        offset = 15739
+      end
+      if crates >= 20 and crates <= 24 then
+        offset = 15740
+      end
+      if crates >= 25 and crates <= 29 then
+        offset = 15741
+      end
+      if crates >= 30 and crates <= 34 then
+        offset = 15742
+      end
+      if crates >= 35 and crates <= 39 then
+        offset = 15743
+      end
+      if crates >= 40 and crates <= 44 then
+        offset = 15744
+      end
+      if crates >= 45 and crates <= 49 then
+        offset = 15745
+      end
+      if crates >= 50 and crates <= 59 then
+        offset = 15746
+      end
+      if crates >= 60 and crates <= 69 then
+        offset = 15747
+      end
+      if crates >= 70 and crates <= 79 then
+        offset = 15748
+      end
+      if crates >= 80 and crates <= 89 then
+        offset = 15749
+      end
+      if crates >= 90 and crates <= 99 then
+        offset = 15750
+      end
+      if crates >= 100 and crates <= 110 then
+        offset = 15751
+      end
+      if crates == 111 then
+        offset = 15752
+      end
+    else
+      offset = 0
+    end
+    return offset
+  end,
 }
 
 local gvov = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
 local game_build_offset     = gvov:add(0x24):rip()
 local online_version_offset = game_build_offset:add(0x20)
+MPx = "MP" .. stats.get_character_index()
 
 ----------------------------------------------- GTA Funcs -------------------------------------------------------
 Game = {
@@ -848,31 +919,31 @@ Game = {
 
   GetLang = function()
     local language_codes_T = {
-        { name = "English",             id = 0,  iso = "en-US" },
-        { name = "French",              id = 1,  iso = "fr-FR" },
-        { name = "German",              id = 2,  iso = "de-DE" },
-        { name = "Italian",             id = 3,  iso = "it-IT" },
-        { name = "Spanish, Spain",      id = 4,  iso = "es-ES" },
-        { name = "Portugese",           id = 5,  iso = "pt-BR" },
-        { name = "Polish",              id = 6,  iso = "pl-PL" },
-        { name = "Russian",             id = 7,  iso = "ru-RU" },
-        { name = "Korean",              id = 8,  iso = "ko-KR" },
-        { name = "Chinese Traditional", id = 9,  iso = "zh-TW" },
-        { name = "Japanese",            id = 10, iso = "ja-JP" },
-        { name = "Spanish, Mexico",     id = 11, iso = "es-MX" },
-        { name = "Chinese Simplified",  id = 12, iso = "zh-CN" },
+      { name = "English",             id = 0,  iso = "en-US" },
+      { name = "French",              id = 1,  iso = "fr-FR" },
+      { name = "German",              id = 2,  iso = "de-DE" },
+      { name = "Italian",             id = 3,  iso = "it-IT" },
+      { name = "Spanish, Spain",      id = 4,  iso = "es-ES" },
+      { name = "Portugese",           id = 5,  iso = "pt-BR" },
+      { name = "Polish",              id = 6,  iso = "pl-PL" },
+      { name = "Russian",             id = 7,  iso = "ru-RU" },
+      { name = "Korean",              id = 8,  iso = "ko-KR" },
+      { name = "Chinese Traditional", id = 9,  iso = "zh-TW" },
+      { name = "Japanese",            id = 10, iso = "ja-JP" },
+      { name = "Spanish, Mexico",     id = 11, iso = "es-MX" },
+      { name = "Chinese Simplified",  id = 12, iso = "zh-CN" },
     }
     local lang_iso, lang_name
     local lang = LOCALIZATION.GET_CURRENT_LANGUAGE()
     for _, l in ipairs(language_codes_T) do
-        if lang == l.id then
-            lang_iso  = l.iso
-            lang_name = l.name
-            break
-        else
-            lang_iso  = "en-US"
-            lang_name = "English"
-        end
+      if lang == l.id then
+          lang_iso  = l.iso
+          lang_name = l.name
+          break
+      else
+          lang_iso  = "en-US"
+          lang_name = "English"
+      end
     end
     return lang_iso, lang_name
   end,
@@ -1297,7 +1368,7 @@ Game = {
     end,
 
     -- Returns the hash of localPlayer's selected weapon.
-    ---@return number
+    ---@return integer
     weapon = function()
       local weaponHash
       check, weapon = WEAPON.GET_CURRENT_PED_WEAPON(self.get_ped(), weapon, false)
@@ -1309,7 +1380,7 @@ Game = {
 
     -- Teleports localPlayer to the provided coordinates.
     ---@param keepVehicle boolean
-    ---@param coords vector3
+    ---@param coords vec3
     teleport = function(keepVehicle, coords)
       script.run_in_fiber(function(selftp)
         STREAMING.REQUEST_COLLISION_AT_COORD(coords.x, coords.y, coords.z)
@@ -1807,13 +1878,21 @@ lua_cfg = {
   end,
 
   checkAndCreateConfig = function(default_config)
-    local config = lua_cfg.readFromFile()
-    if config == nil then
-      log.warning("Config file not found! Creating a default config profile...")
+    local exists = io.exists("samurais_scripts.json")
+    local config
+    if not exists then
+      log.warning("Config file not found, creating a default config")
+      gui.show_warning("Harmless's Scripts", "Config file not found, creating a default config")
       if not lua_cfg.writeToFile(default_config) then
         return false
       end
       config = default_config
+    else
+      config = lua_cfg.readFromFile()
+      if config == nil then
+        log.error("Failed to read config file")
+        return false
+      end
     end
 
     for key, defaultValue in pairs(default_config) do

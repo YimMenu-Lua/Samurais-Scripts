@@ -1,4 +1,4 @@
----@diagnostic disable: undefined-global, lowercase-global
+---@diagnostic disable
 custom_props = {
     { hash = 1524959858,	name = "Microphone"},
     { hash = 2473946431,	name = "TV Camera"},

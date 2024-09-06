@@ -119,6 +119,9 @@
 
 ## Online
 
+- **Business Manager**
+  - An improved version of [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier)
+
 - **Casino Pacino**
   - An implementation of gir489's [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) with translation support and a slightly altered UI.
 

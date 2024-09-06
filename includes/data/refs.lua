@@ -1,4 +1,4 @@
----@diagnostic disable: undefined-global, lowercase-global
+---@diagnostic disable
 
 gta_vehicles_T         = {
   "adder", "airbus", "airtug", "akula", "akuma", "aleutian", "alkonost", "alpha", "alphaz1",
@@ -566,7 +566,7 @@ flight_controls_T      = {
   112,
 }
 
----CVehicle::m_handling_data
+--`CVehicle::m_handling_data`
 HF                     = {
   _SMOOTHED_COMPRESSION     = 1,
   _REDUCED_MOD_MASS         = 2,
@@ -584,6 +584,80 @@ HF                     = {
   _HEAVYARMOUR              = 67108864,
   _ARMOURED                 = 134217728,
   _LOW_SPEED_WHEELIES       = 1073741824,
+}
+
+Global_1663174 = {
+  f_0 = {
+    f_1 = 1663174 + 0 + 1
+  },
+  f_1 = {
+    f_1 = 1663174 + 1 + 1
+  },
+  f_2 = {
+    f_1 = 1663174 + 2 + 1
+  },
+  f_3 = {
+    f_1 = 1663174 + 3 + 1
+  },
+  f_4 = {
+    f_1 = 1663174 + 4 + 1
+  },
+  f_5 = {
+    f_1 = 1663174 + 5 + 1
+  },
+  f_6 = {
+    f_1 = 1663174 + 6 + 1
+  },
+}
+
+Global_262145 = {
+  f_4413  = 262145 + 4413,  -- Snow Weather
+  f_15397 = 262145 + 15397, -- Hangar CD_1 *(600000ms)*
+  f_15499 = 262145 + 15499, -- CEO Buy CD *(300000ms)*
+  f_15500 = 262145 + 15500, -- CEO Sell CD *(1800000ms)*
+  f_15501 = 262145 + 15501, -- CEO Buy Failure CD *(off)*
+  f_15502 = 262145 + 15502, -- CEO Sell Failure CD *(off)*
+  f_17290 = 262145 + 17290, -- Weed Production Time *(360000ms)*
+  f_17291 = 262145 + 17291, -- Meth Production Time *(180000ms)*
+  f_17292 = 262145 + 17292, -- Coke Production Time *(3000000ms)*
+  f_17293 = 262145 + 17293, -- Fake Documents Production Time *(300000ms)*
+  f_17294 = 262145 + 17294, -- Fake Cash Production Time *(720000ms)*
+  f_17319 = 262145 + 17319, -- Fake Documents Unit Value
+  f_17320 = 262145 + 17320, -- Cash Factory Unit Value
+  f_17321 = 262145 + 17321, -- Cocaine Unit Value
+  f_17322 = 262145 + 17322, -- Meth Unit Value
+  f_17323 = 262145 + 17323, -- Weed Unit Value
+  f_17324 = 262145 + 17324, -- Acid Unit Value
+  f_17325 = 262145 + 17325, -- Fake Documents Equipment Upgrade Boost Amount
+  f_17326 = 262145 + 17326, -- Cash Factory Equipment Upgrade Boost Amount
+  f_17327 = 262145 + 17327, -- Cocaine Equipment Upgrade Boost Amount
+  f_17328 = 262145 + 17328, -- Meth Equipment Upgrade Boost Amount
+  f_17329 = 262145 + 17329, -- Weed Equipment Upgrade Boost Amount
+  f_17330 = 262145 + 17330, -- Acid Lab Upgrade Boost Amount
+  f_17331 = 262145 + 17331, -- Fake Documents Staff Upgrade Boost Amount
+  f_17332 = 262145 + 17332, -- Cash Factory Staff Upgrade Boost Amount
+  f_17333 = 262145 + 17333, -- Cocaine Staff Upgrade Boost Amount
+  f_17334 = 262145 + 17334, -- Meth Staff Upgrade Boost Amount
+  f_17335 = 262145 + 17335, -- Weed Staff Upgrade Boost Amount
+  f_18571 = 262145 + 18571, -- MC Work CD *(180000ms)*
+  f_19077 = 262145 + 19077, -- I/E Vehicle Source CD *(180000ms)*
+  f_19153 = 262145 + 19153, -- I/E Vehicle Sell CD *(180000ms)*
+  f_19432 = 262145 + 19432, -- I/E Vehicle Sell CD_1 *(1200000ms)*
+  f_19433 = 262145 + 19433, -- I/E Vehicle Sell CD_2 *(1680000ms)*
+  f_19434 = 262145 + 19434, -- I/E Vehicle Sell CD_3 *(2340000ms)*
+  f_19435 = 262145 + 19435, -- I/E Vehicle Sell CD_4 *(2880000ms)*
+  f_21254 = 262145 + 21254, -- Bunker Crate Value
+  f_21255 = 262145 + 21255, -- Bunker Equipment Upgrade Boost Amount
+  f_21256 = 262145 + 21256, -- Bunker Staff Upgrade Boost Amount
+  f_22433 = 262145 + 22433, -- Hangar Steal CD_1 *(120000ms)*
+  f_22434 = 262145 + 22434, -- Hangar Steal CD_2 *(180000ms)*
+  f_22435 = 262145 + 22435, -- Hangar Steal CD_3 *(240000ms)*
+  f_24026 = 262145 + 24026, -- Nightclub Management CD *(300000ms)*
+  f_31038 = 262145 + 31038, -- Security Missions CD *(600000ms)*
+  f_31882 = 262145 + 31882, -- NC VIP Mission Spawn Chance% *(50)*
+  f_32158 = 262145 + 32158, -- Halloween Weather
+
+  -- f_31118 = 262145 + 31118, -- Payphone Hits CD *(600000ms)*
 }
 
 world_seats_T          = {
