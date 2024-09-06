@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.2.3' -- v1.2.3
+SCRIPT_VERSION = '1.2.4' -- v1.2.4
 TARGET_BUILD   = '3274'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -52,6 +52,7 @@ default_config            = {
   driftMode               = false,
   DriftTires              = false,
   DriftSmoke              = false,
+  BurnoutSmoke            = false,
   driftMinigame           = false,
   speedBoost              = false,
   nosvfx                  = false,
@@ -177,6 +178,7 @@ DriftIntensity           = lua_cfg.read("DriftIntensity")
 DriftPowerIncrease       = lua_cfg.read("DriftPowerIncrease")
 DriftTires               = lua_cfg.read("DriftTires")
 DriftSmoke               = lua_cfg.read("DriftSmoke")
+BurnoutSmoke             = lua_cfg.read("BurnoutSmoke")
 driftMinigame            = lua_cfg.read("driftMinigame")
 driftPB                  = lua_cfg.read("driftPB")
 speedBoost               = lua_cfg.read("speedBoost")
@@ -2438,61 +2440,82 @@ drift_mode_tab:add_imgui(function()
           UI.widgetSound("Nav2")
           lua_cfg.save("DriftSmoke", DriftSmoke)
         end
-        if DriftSmoke then
-          ImGui.Spacing(); ImGui.Text(translateLabel("driftSmokeCol"))
-          if not customSmokeCol then
-            driftSmokeIndex, dsiUsed = ImGui.Combo("##tireSmoke", driftSmokeIndex, driftSmokeColors, #driftSmokeColors); ImGui
-                .SameLine()
-            if dsiUsed then
-              selected_smoke_col = driftSmokeColors[driftSmokeIndex + 1]
-              local r, g, b = UI.getColor(string.lower(selected_smoke_col))
-              r, g, b = lua_Fn.round((r * 255), 2), lua_Fn.round((g * 255), 2), lua_Fn.round((b * 255), 2)
-              driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = r, g, b
-            end
-          else
-            local hex_len
-            if smokeHex:find("^#") then
-              hex_len = 8
-            else
-              hex_len = 7
-            end
-            smokeHex, smokeHexEntered = ImGui.InputTextWithHint("##customHex", "HEX", smokeHex, hex_len,
-              ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.CharsNoBlank); ImGui.SameLine()
-            if ImGui.IsItemActive() then
-              is_typing = true
-            else
-              is_typing = false
-            end
-            UI.toolTip(false, translateLabel("hex_tt"))
-            if smokeHexEntered then
-              if smokeHex ~= nil then
-                if not smokeHex:find("^#") then
-                  smokeHex = "#" .. smokeHex
-                end
-                if smokeHex:len() > 1 then
-                  if smokeHex:len() ~= 4 and smokeHex:len() ~= 7 then
-                    UI.widgetSound("Error")
-                    gui.show_warning("Samurais Scripts",
-                      "'" ..
-                      smokeHex .. "' is not a valid HEX color code. Please enter either a short or a long HEX string.")
-                  else
-                    UI.widgetSound("Select")
-                    gui.show_success("Samurais Scripts", "Drift smoke color changed")
-                  end
-                else
-                  UI.widgetSound("Error")
-                  gui.show_warning("Samurais Scripts", "Please enter a valid HEX color code.")
-                end
-                driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = lua_Fn.hexToRGB(smokeHex)
+      end
+
+      BurnoutSmoke, bsmkUsed = ImGui.Checkbox("Burnout Smoke", BurnoutSmoke)
+      -- UI.toolTip(false, translateLabel("BurnoutSmoke_tt"))
+      if bsmkUsed then
+        UI.widgetSound("Nav2")
+        lua_cfg.save("BurnoutSmoke", BurnoutSmoke)
+      end
+      if DriftSmoke or BurnoutSmoke then
+        ImGui.Spacing(); ImGui.Text(translateLabel("driftSmokeCol"))
+        if not customSmokeCol then
+          driftSmokeIndex, dsiUsed = ImGui.Combo("##tireSmoke", driftSmokeIndex, driftSmokeColors, #driftSmokeColors)
+          ImGui.SameLine()
+          if dsiUsed then
+            selected_smoke_col = driftSmokeColors[driftSmokeIndex + 1]
+            local r, g, b = UI.getColor(string.lower(selected_smoke_col))
+            r, g, b = lua_Fn.round((r * 255), 2), lua_Fn.round((g * 255), 2), lua_Fn.round((b * 255), 2)
+            driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = r, g, b
+            script.run_in_fiber(function()
+              if not VEHICLE.IS_TOGGLE_MOD_ON(current_vehicle, 20) then
+                VEHICLE.TOGGLE_VEHICLE_MOD(current_vehicle, 20, true)
               end
-            end
+              VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, r, g, b)
+            end)
           end
-          customSmokeCol, cscUsed = ImGui.Checkbox(translateLabel("customLangTxt"), customSmokeCol)
-          if cscUsed then
-            UI.widgetSound("Nav2")
+        else
+          local hex_len
+          if smokeHex:find("^#") then
+            hex_len = 8
+          else
+            hex_len = 7
+          end
+          smokeHex, smokeHexEntered = ImGui.InputTextWithHint("##customHex", "HEX", smokeHex, hex_len,
+            ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.CharsNoBlank); ImGui.SameLine()
+          if ImGui.IsItemActive() then
+            is_typing = true
+          else
+            is_typing = false
+          end
+          UI.toolTip(false, translateLabel("hex_tt"))
+          if smokeHexEntered then
+            if smokeHex ~= nil then
+              if not smokeHex:find("^#") then
+                smokeHex = "#" .. smokeHex
+              end
+              if smokeHex:len() > 1 then
+                if smokeHex:len() ~= 4 and smokeHex:len() ~= 7 then
+                  UI.widgetSound("Error")
+                  gui.show_warning("Samurais Scripts",
+                    "'" ..
+                    smokeHex .. "' is not a valid HEX color code. Please enter either a short or a long HEX string.")
+                else
+                  UI.widgetSound("Select")
+                  gui.show_success("Samurais Scripts", "Drift smoke color changed")
+                end
+              else
+                UI.widgetSound("Error")
+                gui.show_warning("Samurais Scripts", "Please enter a valid HEX color code.")
+              end
+              driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = lua_Fn.hexToRGB(smokeHex)
+              script.run_in_fiber(function()
+                if not VEHICLE.IS_TOGGLE_MOD_ON(current_vehicle, 20) then
+                  VEHICLE.TOGGLE_VEHICLE_MOD(current_vehicle, 20, true)
+                end
+                VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, r, g, b)
+              end)
+            end
           end
         end
+        customSmokeCol, cscUsed = ImGui.Checkbox(translateLabel("customLangTxt"), customSmokeCol)
+        if cscUsed then
+          UI.widgetSound("Nav2")
+        end
+      end
 
+      if driftMode or DriftTires then
         ImGui.Dummy(1, 10); ImGui.SeparatorText("[Experimental]")
         ImGui.Spacing(); driftMinigame, drmgUsed = ImGui.Checkbox("Drift Minigame", driftMinigame)
         UI.toolTip(false, translateLabel("DriftGame_tt"))
@@ -7735,42 +7758,71 @@ script.register_looped("TDFT", function(script)
     end
   end
 end)
-script.register_looped("tire smoke", function(smkptfx)
-  if driftMode or DriftTires then
-    if DriftSmoke and Game.Self.isDriving() then
-      local vehSpeedVec = ENTITY.GET_ENTITY_SPEED_VECTOR(current_vehicle, true)
-      if vehSpeedVec.x ~= 0 and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle) then
-        if vehSpeedVec.x > 6 or vehSpeedVec.x < -6 then
+script.register_looped("TSPTFX", function(dsptfx)
+  if Game.Self.isDriving() then
+    local dict = "scr_ba_bb"
+    local wheels = { "wheel_lr", "wheel_rr" }
+    if not VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) then
+      if DriftSmoke and (driftMode or DriftTires) then
+        local vehSpeedVec = ENTITY.GET_ENTITY_SPEED_VECTOR(current_vehicle, true)
+        if (vehSpeedVec.x > 6 or vehSpeedVec.x < -6) and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle) then
           if is_car and PAD.IS_CONTROL_PRESSED(0, tdBtn) and PAD.IS_CONTROL_PRESSED(0, 71) and VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(current_vehicle) > 0 and ENTITY.GET_ENTITY_SPEED(current_vehicle) > 6 then
-            local dict = "scr_ba_bb"
-            local wheels = { "wheel_lr", "wheel_rr" }
-            if VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle) and not VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) then
-              if Game.requestNamedPtfxAsset(dict) then
-                for _, boneName in ipairs(wheels) do
-                  local r_wheels = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneName)
-                  GRAPHICS.USE_PARTICLE_FX_ASSET(dict)
-                  smokePtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("scr_ba_bb_plane_smoke_trail",
-                    current_vehicle,
-                    -0.4, 0.0, 0.0, 0.0, 0.0, 0.0, r_wheels, 0.3, false, false, false, 0, 0, 0, 255)
-                  GRAPHICS.SET_PARTICLE_FX_LOOPED_COLOUR(smokePtfx, driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, false)
-                  table.insert(smokePtfx_t, smokePtfx)
-                  GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke, false)
-                  tire_smoke = true
-                end
-                if tire_smoke then
-                  repeat
-                    smkptfx:sleep(50)
-                  until
-                    PAD.IS_CONTROL_RELEASED(0, tdBtn) or PAD.IS_CONTROL_RELEASED(0, 71)
-                  for _, smoke in ipairs(smokePtfx_t) do
-                    if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(smoke) then
-                      GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke, false)
-                      GRAPHICS.REMOVE_PARTICLE_FX(smoke, false)
-                    end
+            if Game.requestNamedPtfxAsset(dict) then
+              for _, boneName in ipairs(wheels) do
+                local r_wheels = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneName)
+                GRAPHICS.USE_PARTICLE_FX_ASSET(dict)
+                smokePtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("scr_ba_bb_plane_smoke_trail",
+                  current_vehicle,
+                  -0.4, 0.0, 0.0, 0.0, 0.0, 0.0, r_wheels, 0.3, false, false, false, 0, 0, 0, 255)
+                GRAPHICS.SET_PARTICLE_FX_LOOPED_COLOUR(smokePtfx, driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, false)
+                table.insert(smokePtfx_t, smokePtfx)
+                GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke, false)
+                tire_smoke = true
+              end
+              if tire_smoke then
+                repeat
+                  dsptfx:sleep(50)
+                until
+                  PAD.IS_CONTROL_RELEASED(0, tdBtn) or PAD.IS_CONTROL_RELEASED(0, 71)
+                for _, smoke in ipairs(smokePtfx_t) do
+                  if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(smoke) then
+                    GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke, false)
+                    GRAPHICS.REMOVE_PARTICLE_FX(smoke, false)
                   end
-                  tire_smoke = false
+                end
+                tire_smoke = false
+              end
+            end
+          end
+        end
+      end
+    else
+      if BurnoutSmoke and not launchCtrl then
+        if VEHICLE.IS_VEHICLE_IN_BURNOUT(current_vehicle) then
+          if Game.requestNamedPtfxAsset(dict) then
+            for _, boneName in ipairs(wheels) do
+              local r_wheels = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneName)
+              GRAPHICS.USE_PARTICLE_FX_ASSET(dict)
+              smokePtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("scr_ba_bb_plane_smoke_trail",
+                current_vehicle,
+                -0.4, 0.0, 0.0, 0.0, 0.0, 90.0, r_wheels, 0.2, false, false, false, 0, 0, 0, 255)
+              GRAPHICS.SET_PARTICLE_FX_LOOPED_COLOUR(smokePtfx, driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, false)
+              table.insert(smokePtfx_t, smokePtfx)
+              GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke, false)
+              tire_smoke = true
+            end
+            if tire_smoke then
+              repeat
+                dsptfx:sleep(50)
+              until
+                VEHICLE.IS_VEHICLE_IN_BURNOUT(current_vehicle) == false
+              for _, smoke in ipairs(smokePtfx_t) do
+                if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(smoke) then
+                  GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke, false)
+                  GRAPHICS.REMOVE_PARTICLE_FX(smoke, false)
                 end
               end
+              tire_smoke = false
             end
           end
         end

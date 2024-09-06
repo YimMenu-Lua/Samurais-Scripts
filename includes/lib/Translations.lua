@@ -378,7 +378,7 @@ Labels = {
     },
 
     ["driftSmokeCol"] = {
-        {iso = "en-US", text = "Drift Smoke Color"},
+        {iso = "en-US", text = "Tire Smoke Color"},
         {iso = "de-DE", text = "Rauchfarbe"},
         {iso = "fr-FR", text = "Couleur Fumée"},
         {iso = "it-IT", text = "Colore Fumo"},
@@ -423,12 +423,12 @@ Labels = {
     },
 
     ["DriftSmoke_tt"] = {
-        {iso = "en-US", text = "Creates a smoke effect when drifting. You can change the smoke color but it's not related to the games tire smoke color."},
-        {iso = "de-DE", text = "Erzeugt einen Raucheffekt beim Driften. Sie können die Rauchfarbe ändern, aber es ist nicht auf die Spiele Reifen Rauch Farbe bezogen."},
-        {iso = "fr-FR", text = "Crée un effet de fumée lorsque vous drifter. Vous pouvez changer la couleur de la fumée, mais elle n'est pas liée à la couleur de la fumée du pneu du jeu."},
-        {iso = "it-IT", text = "Crea un effetto fumo durante la derapata. È possibile modificare il colore del fumo, ma non è correlato al colore del fumo delle gomme del gioco."},
-        {iso = "pt-BR", text = "Cria um efeito de fumaça durante a deriva. É possível alterar a cor da fumaça, mas ela não está relacionada à cor da fumaça do pneu do jogo."},
-        {iso = "ru-RU", text = "Создает эффект дыма при дрифте. Вы можете изменить цвет дыма, но он не связан c цветом дыма шин в игре."},
+        {iso = "en-US", text = "Creates a smoke effect when drifting."},
+        {iso = "de-DE", text = "Erzeugt einen Raucheffekt beim Driften."},
+        {iso = "fr-FR", text = "Crée un effet de fumée lorsque vous drifter."},
+        {iso = "it-IT", text = "Crea un effetto fumo durante la derapata."},
+        {iso = "pt-BR", text = "Cria um efeito de fumaça durante a deriva."},
+        {iso = "ru-RU", text = "Создает эффект дыма при дрифте."},
     },
 
     ["DriftGame_tt"] = {
