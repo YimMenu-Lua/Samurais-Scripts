@@ -1882,7 +1882,7 @@ lua_cfg = {
     local config
     if not exists then
       log.warning("Config file not found, creating a default config")
-      gui.show_warning("Harmless's Scripts", "Config file not found, creating a default config")
+      gui.show_warning("Samurai's Scripts", "Config file not found, creating a default config")
       if not lua_cfg.writeToFile(default_config) then
         return false
       end
