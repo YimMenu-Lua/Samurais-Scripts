@@ -12,13 +12,13 @@ require('data/objects')
 require('data/actions')
 require('data/refs')
 
-CURRENT_BUILD   = Game.GetBuildNumber()
-CURRENT_VERSION = Game.GetOnlineVersion()
+CURRENT_BUILD            = Game.GetBuildNumber()
+CURRENT_VERSION          = Game.GetOnlineVersion()
 
-Samurais_scripts          = gui.add_tab("Samurai's Scripts")
-local loading_label       = ""
-local start_loading_anim  = false
-default_config            = {
+Samurais_scripts         = gui.add_tab("Samurai's Scripts")
+local loading_label      = ""
+local start_loading_anim = false
+default_config           = {
   shortcut_anim           = {},
   saved_vehicles          = {},
   persist_attachments     = {},
@@ -376,7 +376,7 @@ npcPTFX                  = {}
 curr_playing_anim        = {}
 laserPtfx_T              = {}
 chosen_anim              = {}
-default_handling_flags    = unk
+default_handling_flags   = unk
 
 
 ---@param musicSwitch string
@@ -981,10 +981,11 @@ Actions:add_imgui(function()
             forwardX,
             forwardY, bonecoords, "self", plyrProps, selfPTFX)
           is_playing_anim = true
-        end) 
+        end)
       else
         UI.widgetSound("Error")
-        gui.show_error("Samurais Scripts", translateLabel("You can not play animations while grabbing an NPC or a vehicle."))
+        gui.show_error("Samurais Scripts",
+          translateLabel("You can not play animations while grabbing an NPC or a vehicle."))
       end
     end
     ImGui.SameLine()
@@ -1308,7 +1309,7 @@ Actions:add_imgui(function()
     if ImGui.Button(translateLabel("generic_play_btn") .. "##npc_anim") then
       if spawned_npcs[1] ~= nil then
         UI.widgetSound("Select")
-        script.run_in_fiber(function ()
+        script.run_in_fiber(function()
           for _, v in ipairs(spawned_npcs) do
             if ENTITY.DOES_ENTITY_EXIST(v) then
               local npcCoords      = ENTITY.GET_ENTITY_COORDS(v, false)
@@ -1408,7 +1409,8 @@ Actions:add_imgui(function()
           end
         end)
       else
-        gui.show_error("Samurais Scripts", translateLabel("You can not play scenarios while grabbing an NPC or a vehicle."))
+        gui.show_error("Samurais Scripts",
+          translateLabel("You can not play scenarios while grabbing an NPC or a vehicle."))
       end
     end
     ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine()
@@ -1827,7 +1829,7 @@ local function resetLastVehState(s)
     offroader_enabled      = false
     rally_tires_enabled    = false
     easy_wheelie_enabled   = false
-    last_vehicle = current_vehicle
+    last_vehicle           = current_vehicle
   end
 end
 
@@ -2545,17 +2547,17 @@ tow_zAxis     = 0.0
 modelOverride = false
 flatbed:add_imgui(function()
   local window_size_x, window_size_y = ImGui.GetWindowSize()
-  local vehicleHandles  = entities.get_all_vehicles_as_handles()
-  local flatbedModel    = 1353720154
-  local vehicle_model   = Game.getEntityModel(current_vehicle)
-  local playerPosition  = self.get_pos()
-  local flatbedPosition = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
-  local flatbedForwardX = Game.getForwardX(current_vehicle)
-  local flatbedForwardY = Game.getForwardY(current_vehicle)
+  local vehicleHandles               = entities.get_all_vehicles_as_handles()
+  local flatbedModel                 = 1353720154
+  local vehicle_model                = Game.getEntityModel(current_vehicle)
+  local playerPosition               = self.get_pos()
+  local flatbedPosition              = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
+  local flatbedForwardX              = Game.getForwardX(current_vehicle)
+  local flatbedForwardY              = Game.getForwardY(current_vehicle)
   for _, veh in ipairs(vehicleHandles) do
     script.run_in_fiber(function(detector)
       local detectPos = vec3:new(flatbedPosition.x - (flatbedForwardX * 10), flatbedPosition.y - (flatbedForwardY * 10),
-      flatbedPosition.z)
+        flatbedPosition.z)
       local vehPos    = ENTITY.GET_ENTITY_COORDS(veh, false)
       local vDist     = SYSTEM.VDIST(detectPos.x, detectPos.y, detectPos.z, vehPos.x, vehPos.y, vehPos.z)
       if vDist <= 5 then
@@ -2571,9 +2573,9 @@ flatbed:add_imgui(function()
   if closestVehicle ~= nil then
     closestVehicleModel = Game.getEntityModel(closestVehicle)
   end
-  local iscar               = VEHICLE.IS_THIS_MODEL_A_CAR(closestVehicleModel)
-  local isbike              = VEHICLE.IS_THIS_MODEL_A_BIKE(closestVehicleModel)
-  local closestVehicleName  = vehicles.get_vehicle_display_name(closestVehicleModel)
+  local iscar              = VEHICLE.IS_THIS_MODEL_A_CAR(closestVehicleModel)
+  local isbike             = VEHICLE.IS_THIS_MODEL_A_BIKE(closestVehicleModel)
+  local closestVehicleName = vehicles.get_vehicle_display_name(closestVehicleModel)
   if vehicle_model == flatbedModel then
     is_in_flatbed = true
   else
@@ -2634,9 +2636,9 @@ flatbed:add_imgui(function()
         if towable and closestVehicle ~= nil and closestVehicleModel ~= flatbedModel then
           script.run_in_fiber(function()
             if entities.take_control_of(closestVehicle, 300) then
-              flatbedHeading = ENTITY.GET_ENTITY_HEADING(current_vehicle)
-              flatbedBone    = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, "chassis_dummy")
-              vehBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(closestVehicle, "chassis_dummy")
+              flatbedHeading     = ENTITY.GET_ENTITY_HEADING(current_vehicle)
+              flatbedBone        = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, "chassis_dummy")
+              vehBone            = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(closestVehicle, "chassis_dummy")
               local vehicleClass = VEHICLE.GET_VEHICLE_CLASS(closestVehicle)
               if vehicleClass == 1 then
                 tow_zAxis = 0.9
@@ -2772,7 +2774,7 @@ handling_tab:add_imgui(function()
     lua_cfg.save("noEngineBraking", noEngineBraking)
   end
 
-  -- ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine(); 
+  -- ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine();
   kersBoost, kbUsed = ImGui.Checkbox("KERS Boost", kersBoost)
   UI.toolTip(false, "Equips your vehicle with KERS boost, similar to Open Wheel vehicles. Press [E] to use.")
   if kbUsed then
@@ -2796,7 +2798,8 @@ handling_tab:add_imgui(function()
   end
 
   noTractionCtrl, notcUsed = ImGui.Checkbox("Force No Traction Control", noTractionCtrl)
-  UI.toolTip(false, "Forcibly disables your vehicle's traction control. This is mainly useful for morotrcycles because with this enabled, bikes will be able to drift :D")
+  UI.toolTip(false,
+    "Forcibly disables your vehicle's traction control. This is mainly useful for morotrcycles because with this enabled, bikes will be able to drift :D")
   if notcUsed then
     UI.widgetSound("Nav2")
     lua_cfg.save("noTractionCtrl", noTractionCtrl)
@@ -2947,7 +2950,8 @@ local function spawnPersistVeh(main, mods, col_1, col_2, tint, attachments)
     local forwardY = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
     local heading  = ENTITY.GET_ENTITY_HEADING(self.get_ped())
     if Game.requestModel(main) then
-      spawned_persist = VEHICLE.CREATE_VEHICLE(main, Pos.x + (forwardX * 7), Pos.y + (forwardY * 7), Pos.z, heading, true, false, false)
+      spawned_persist = VEHICLE.CREATE_VEHICLE(main, Pos.x + (forwardX * 7), Pos.y + (forwardY * 7), Pos.z, heading, true,
+        false, false)
       VEHICLE.SET_VEHICLE_IS_STOLEN(spawned_persist, false)
       DECORATOR.DECOR_SET_INT(spawned_persist, "MPBitset", 0)
       VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(spawned_persist, col_1.r, col_1.g, col_1.b)
@@ -2957,7 +2961,8 @@ local function spawnPersistVeh(main, mods, col_1, col_2, tint, attachments)
     end
     for _, att in ipairs(attachments) do
       if Game.requestModel(att.hash) then
-        local attach = VEHICLE.CREATE_VEHICLE(att.hash, Pos.x + (forwardX * 7), Pos.y + (forwardY * 7), Pos.z, heading, true, false, false)
+        local attach = VEHICLE.CREATE_VEHICLE(att.hash, Pos.x + (forwardX * 7), Pos.y + (forwardY * 7), Pos.z, heading,
+          true, false, false)
         VEHICLE.SET_VEHICLE_IS_STOLEN(attach, false)
         DECORATOR.DECOR_SET_INT(attach, "MPBitset", 0)
         VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(attach, att.color_1.r, att.color_1.g, att.color_1.b)
@@ -3519,61 +3524,61 @@ end)
 online_tab = Samurais_scripts:add_tab("Online")
 
 business_tab = online_tab:add_tab("Business Manager")
-local yrv2_color = {0, 255, 255, 1}
+local wh1_loop       = false
+local wh2_loop       = false
+local wh3_loop       = false
+local wh4_loop       = false
+local wh5_loop       = false
+local hangarLoop     = false
+local hangarTotal    = 0
+local fcashTotal     = 0
+local cokeTotal      = 0
+local methTotal      = 0
+local weedTotal      = 0
+local fdTotal        = 0
+local bunkerTotal    = 0
+local acidTotal      = 0
+local wh1Supplies    = 0
+local wh2Supplies    = 0
+local wh3Supplies    = 0
+local wh4Supplies    = 0
+local wh5Supplies    = 0
+local hangarSupplies = 0
+local wh1Value       = 0
+local wh2Value       = 0
+local wh3Value       = 0
+local wh4Value       = 0
+local wh5Value       = 0
+local ceo_moola      = 0
+local yrv2_color     = { 0, 255, 255, 1 }
 business_tab:add_imgui(function()
-  local window_width = ImGui.GetWindowWidth()
-  ImGui.Spacing(); ImGui.Dummy((window_width / 2) - 110, 1); ImGui.SameLine(); UI.coloredText("- YimResupplier V2 -", yrv2_color, 1, 60)
-end)
-if Game.isOnline() then
-  local hangarOwned    = stats.get_int(MPx.."_PROP_HANGAR") ~= 0
-  local fCashOwned     = stats.get_int(MPx.."_PROP_FAC_SLOT0") ~= 0
-  local cokeOwned      = stats.get_int(MPx.."_PROP_FAC_SLOT1") ~= 0
-  local methOwned      = stats.get_int(MPx.."_PROP_FAC_SLOT2") ~= 0
-  local weedOwned      = stats.get_int(MPx.."_PROP_FAC_SLOT3") ~= 0
-  local fdOwned        = stats.get_int(MPx.."_PROP_FAC_SLOT4") ~= 0
-  local bunkerOwned    = stats.get_int(MPx.."_PROP_FAC_SLOT5") ~= 0
-  local acidOwned      = stats.get_int(MPx.."_PROP_FAC_SLOT6") ~= 0
-  local wh1_loop       = false
-  local wh2_loop       = false
-  local wh3_loop       = false
-  local wh4_loop       = false
-  local wh5_loop       = false
-  local hangarLoop     = false
-  local hangarTotal    = 0
-  local fcashTotal     = 0
-  local cokeTotal      = 0
-  local methTotal      = 0
-  local weedTotal      = 0
-  local fdTotal        = 0
-  local bunkerTotal    = 0
-  local acidTotal      = 0
-  local wh1Supplies    = 0
-  local wh2Supplies    = 0
-  local wh3Supplies    = 0
-  local wh4Supplies    = 0
-  local wh5Supplies    = 0
-  local hangarSupplies = 0
-  local wh1Value       = 0
-  local wh2Value       = 0
-  local wh3Value       = 0
-  local wh4Value       = 0
-  local wh5Value       = 0
-  local ceo_moola      = 0
-  local mc_moola       = 0
-  business_tab:add_imgui(function()
+  local window_width   = ImGui.GetWindowWidth()
+  ImGui.Spacing(); ImGui.Dummy((window_width / 2) - 110, 1); ImGui.SameLine(); UI.coloredText("- YimResupplier V2 -",
+    yrv2_color, 1, 60)
+  if Game.isOnline() then
+    local hangarOwned = stats.get_int(MPx .. "_PROP_HANGAR") ~= 0
+    local fCashOwned  = stats.get_int(MPx .. "_PROP_FAC_SLOT0") ~= 0
+    local cokeOwned   = stats.get_int(MPx .. "_PROP_FAC_SLOT1") ~= 0
+    local methOwned   = stats.get_int(MPx .. "_PROP_FAC_SLOT2") ~= 0
+    local weedOwned   = stats.get_int(MPx .. "_PROP_FAC_SLOT3") ~= 0
+    local fdOwned     = stats.get_int(MPx .. "_PROP_FAC_SLOT4") ~= 0
+    local bunkerOwned = stats.get_int(MPx .. "_PROP_FAC_SLOT5") ~= 0
+    local acidOwned   = stats.get_int(MPx .. "_PROP_FAC_SLOT6") ~= 0
     if CURRENT_BUILD == TARGET_BUILD then
       ImGui.Spacing(); ImGui.BeginTabBar("CEO Warehouses", ImGuiTabBarFlags.None)
-      if ImGui.BeginTabItem("CEO Warehouses") then
-        ImGui.Spacing(); ImGui.Text("Select the warehouses you own:"); ImGui.Spacing()
+      if ImGui.BeginTabItem(translateLabel("ceo_whouses_title")) then
+        ImGui.Spacing(); ImGui.Text(translateLabel("ceo_whouses_txt")); ImGui.Spacing()
 
-        whouse_1_owned, wh1Used = ImGui.Checkbox("1", whouse_1_owned); ImGui.SameLine(); ImGui.Dummy(80, 1); ImGui.SameLine()
+        whouse_1_owned, wh1Used = ImGui.Checkbox("1", whouse_1_owned); ImGui.SameLine(); ImGui.Dummy(80, 1); ImGui
+            .SameLine()
         if wh1Used then
           UI.widgetSound("Nav2")
           lua_cfg.save("whouse_1_owned", whouse_1_owned)
         end
 
         ImGui.BeginDisabled(not whouse_1_owned)
-        whouse_2_owned, wh2Used = ImGui.Checkbox("2", whouse_2_owned); ImGui.SameLine(); ImGui.Dummy(80, 1); ImGui.SameLine()
+        whouse_2_owned, wh2Used = ImGui.Checkbox("2", whouse_2_owned); ImGui.SameLine(); ImGui.Dummy(80, 1); ImGui
+            .SameLine()
         if wh2Used then
           UI.widgetSound("Nav2")
           lua_cfg.save("whouse_2_owned", whouse_2_owned)
@@ -3581,7 +3586,8 @@ if Game.isOnline() then
         ImGui.EndDisabled()
 
         ImGui.BeginDisabled(not whouse_2_owned)
-        whouse_3_owned, wh3Used = ImGui.Checkbox("3", whouse_3_owned); ImGui.SameLine(); ImGui.Dummy(80, 1); ImGui.SameLine()
+        whouse_3_owned, wh3Used = ImGui.Checkbox("3", whouse_3_owned); ImGui.SameLine(); ImGui.Dummy(80, 1); ImGui
+            .SameLine()
         if wh3Used then
           UI.widgetSound("Nav2")
           lua_cfg.save("whouse_3_owned", whouse_3_owned)
@@ -3589,7 +3595,8 @@ if Game.isOnline() then
         ImGui.EndDisabled()
 
         ImGui.BeginDisabled(not whouse_3_owned)
-        whouse_4_owned, wh4Used = ImGui.Checkbox("4", whouse_4_owned); ImGui.SameLine(); ImGui.Dummy(80, 1); ImGui.SameLine()
+        whouse_4_owned, wh4Used = ImGui.Checkbox("4", whouse_4_owned); ImGui.SameLine(); ImGui.Dummy(80, 1); ImGui
+            .SameLine()
         if wh4Used then
           UI.widgetSound("Nav2")
           lua_cfg.save("whouse_4_owned", whouse_4_owned)
@@ -3606,16 +3613,21 @@ if Game.isOnline() then
 
         if whouse_1_owned then
           wh1Supplies = stats.get_int(MPx .. "_CONTOTALFORWHOUSE0")
-          wh1Value    = (globals.get_int(262145 + (SS.get_ceo_global_offset(wh1Supplies))))
+          if wh1Supplies ~= nil and wh1Supplies > 0 then
+            wh1Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh1Supplies)))
+          else
+            wh1Value = 0
+          end
           wh1Total    = wh1Value * wh1Supplies
           ceo_moola   = wh1Total
-          ImGui.SeparatorText("Warehouse 1")
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar((wh1Supplies/111), 240, 30)
+          ImGui.SeparatorText(translateLabel("Warehouse") .. " 1")
+          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+          (wh1Supplies / 111), 240, 30)
           if wh1Supplies < 111 then
             ImGui.SameLine()
             ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            if ImGui.Button("Source Random Crate(s)##wh1") then
-              stats.set_bool_masked(MPx.."_FIXERPSTAT_BOOL1", true, 12)
+            if ImGui.Button(translateLabel("random_crates") .. "##wh1") then
+              stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
             end
             ImGui.EndDisabled()
             ImGui.BeginDisabled(wh2_loop or wh3_loop or wh4_loop or wh5_loop)
@@ -3630,7 +3642,7 @@ if Game.isOnline() then
             if wh1_loop then
               script.run_in_fiber(function(wh1l)
                 repeat
-                  stats.set_bool_masked(MPx.."_FIXERPSTAT_BOOL1", true, 12)
+                  stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
                   wh1l:sleep(800)
                 until
                   wh1Supplies == 111 or wh1_loop == false
@@ -3641,24 +3653,30 @@ if Game.isOnline() then
               wh1_loop = false
             end
           end
-          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine(); 
-          ImGui.ProgressBar((wh1Supplies/111), 240, 30, tostring(wh1Supplies).." Crates ("..tostring(math.floor((wh1Supplies / 111) * 100)).."%)")
+          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
+          ImGui.ProgressBar((wh1Supplies / 111), 240, 30,
+            tostring(wh1Supplies) .. " Crates (" .. tostring(math.floor((wh1Supplies / 111) * 100)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh1Total))
         else
           whouse_2_owned, whouse_3_owned, whouse_4_owned, whouse_5_owned = false, false, false, false
         end
         if whouse_2_owned then
           wh2Supplies = stats.get_int(MPx .. "_CONTOTALFORWHOUSE1")
-          wh2Value    = (globals.get_int(262145 + (SS.get_ceo_global_offset(wh2Supplies))))
+          if wh2Supplies ~= nil and wh2Supplies > 0 then
+            wh2Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh2Supplies)))
+          else
+            wh2Value = 0
+          end
           wh2Total    = wh2Value * wh2Supplies
           ceo_moola   = wh1Total + wh2Total
-          ImGui.SeparatorText("Warehouse 2")
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar((wh2Supplies/111), 240, 30)
+          ImGui.SeparatorText(translateLabel("Warehouse") .. " 2")
+          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+          (wh2Supplies / 111), 240, 30)
           if wh2Supplies < 111 then
             ImGui.SameLine()
             ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            if ImGui.Button("Source Random Crate(s)##wh2") then
-              stats.set_bool_masked(MPx.."_FIXERPSTAT_BOOL1", true, 13)
+            if ImGui.Button(translateLabel("random_crates") .. "##wh2") then
+              stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
             end
             ImGui.EndDisabled()
             ImGui.BeginDisabled(wh1_loop or wh3_loop or wh4_loop or wh5_loop)
@@ -3673,7 +3691,7 @@ if Game.isOnline() then
             if wh2_loop then
               script.run_in_fiber(function(wh2l)
                 repeat
-                  stats.set_bool_masked(MPx.."_FIXERPSTAT_BOOL1", true, 13)
+                  stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
                   wh2l:sleep(800)
                 until
                   wh2Supplies == 111 or wh2_loop == false
@@ -3684,24 +3702,30 @@ if Game.isOnline() then
               wh2_loop = false
             end
           end
-          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine(); 
-          ImGui.ProgressBar((wh2Supplies/111), 240, 30, tostring(wh2Supplies).." Crates ("..tostring(math.floor((wh2Supplies / 111) * 100)).."%)")
+          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
+          ImGui.ProgressBar((wh2Supplies / 111), 240, 30,
+            tostring(wh2Supplies) .. " Crates (" .. tostring(math.floor((wh2Supplies / 111) * 100)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh2Total))
         else
           whouse_3_owned, whouse_4_owned, whouse_5_owned = false, false, false
         end
         if whouse_3_owned then
           wh3Supplies = stats.get_int(MPx .. "_CONTOTALFORWHOUSE2")
-          wh3Value    = (globals.get_int(262145 + (SS.get_ceo_global_offset(wh3Supplies))))
+          if wh3Supplies ~= nil and wh3Supplies > 0 then
+            wh3Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh3Supplies)))
+          else
+            wh3Value = 0
+          end
           wh3Total    = wh3Value * wh3Supplies
           ceo_moola   = wh1Total + wh2Total + wh3Total
-          ImGui.SeparatorText("Warehouse 3")
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar((wh3Supplies/111), 240, 30)
+          ImGui.SeparatorText(translateLabel("Warehouse") .. " 3")
+          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+          (wh3Supplies / 111), 240, 30)
           if wh3Supplies < 111 then
             ImGui.SameLine()
             ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            if ImGui.Button("Source Random Crate(s)##wh3") then
-              stats.set_bool_masked(MPx.."_FIXERPSTAT_BOOL1", true, 14)
+            if ImGui.Button(translateLabel("random_crates") .. "##wh3") then
+              stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
             end
             ImGui.EndDisabled()
             ImGui.BeginDisabled(wh1_loop or wh2_loop or wh4_loop or wh5_loop)
@@ -3716,7 +3740,7 @@ if Game.isOnline() then
             if wh3_loop then
               script.run_in_fiber(function(wh3l)
                 repeat
-                  stats.set_bool_masked(MPx.."_FIXERPSTAT_BOOL1", true, 14)
+                  stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
                   wh3l:sleep(800)
                 until
                   wh3Supplies == 111 or wh3_loop == false
@@ -3727,24 +3751,30 @@ if Game.isOnline() then
               wh3_loop = false
             end
           end
-          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine(); 
-          ImGui.ProgressBar((wh3Supplies/111), 240, 30, tostring(wh3Supplies).." Crates ("..tostring(math.floor((wh3Supplies / 111) * 100)).."%)")
+          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
+          ImGui.ProgressBar((wh3Supplies / 111), 240, 30,
+            tostring(wh3Supplies) .. " Crates (" .. tostring(math.floor((wh3Supplies / 111) * 100)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh3Total))
         else
           whouse_4_owned, whouse_5_owned = false, false
         end
         if whouse_4_owned then
           wh4Supplies = stats.get_int(MPx .. "_CONTOTALFORWHOUSE3")
-          wh4Value    = (globals.get_int(262145 + (SS.get_ceo_global_offset(wh4Supplies))))
+          if wh4Supplies ~= nil and wh4Supplies > 0 then
+            wh4Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh4Supplies)))
+          else
+            wh4Value = 0
+          end
           wh4Total    = wh4Value * wh4Supplies
           ceo_moola   = wh1Total + wh2Total + wh3Total + wh4Total
-          ImGui.SeparatorText("Warehouse 4")
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar((wh4Supplies/111), 240, 30)
+          ImGui.SeparatorText(translateLabel("Warehouse") .. " 4")
+          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+          (wh4Supplies / 111), 240, 30)
           if wh4Supplies < 111 then
             ImGui.SameLine()
             ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            if ImGui.Button("Source Random Crate(s)##wh4") then
-              stats.set_bool_masked(MPx.."_FIXERPSTAT_BOOL1", true, 15)
+            if ImGui.Button(translateLabel("random_crates") .. "##wh4") then
+              stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
             end
             ImGui.EndDisabled()
             ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh5_loop)
@@ -3759,7 +3789,7 @@ if Game.isOnline() then
             if wh4_loop then
               script.run_in_fiber(function(wh4l)
                 repeat
-                  stats.set_bool_masked(MPx.."_FIXERPSTAT_BOOL1", true, 15)
+                  stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
                   wh4l:sleep(800)
                 until
                   wh4Supplies == 111 or wh4_loop == false
@@ -3770,24 +3800,30 @@ if Game.isOnline() then
               wh4_loop = false
             end
           end
-          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine(); 
-          ImGui.ProgressBar((wh4Supplies/111), 240, 30, tostring(wh4Supplies).." Crates ("..tostring(math.floor((wh4Supplies / 111) * 100)).."%)")
+          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
+          ImGui.ProgressBar((wh4Supplies / 111), 240, 30,
+            tostring(wh4Supplies) .. " Crates (" .. tostring(math.floor((wh4Supplies / 111) * 100)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh4Total))
         else
           whouse_5_owned = false
         end
         if whouse_5_owned then
           wh5Supplies = stats.get_int(MPx .. "_CONTOTALFORWHOUSE4")
-          wh5Value    = (globals.get_int(262145 + (SS.get_ceo_global_offset(wh5Supplies))))
+          if wh5Supplies ~= nil and wh5Supplies > 0 then
+            wh5Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh5Supplies)))
+          else
+            wh5Value = 0
+          end
           wh5Total    = wh5Value * wh5Supplies
           ceo_moola   = wh1Total + wh2Total + wh3Total + wh4Total + wh5Total
-          ImGui.SeparatorText("Warehouse 5")
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar((wh5Supplies/111), 240, 30)
+          ImGui.SeparatorText(translateLabel("Warehouse") .. " 5")
+          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+          (wh5Supplies / 111), 240, 30)
           if wh5Supplies < 111 then
             ImGui.SameLine()
             ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            if ImGui.Button("Source Random Crate(s)##wh5") then
-              stats.set_bool_masked(MPx.."_FIXERPSTAT_BOOL1", true, 16)
+            if ImGui.Button(translateLabel("random_crates") .. "##wh5") then
+              stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
             end
             ImGui.EndDisabled()
             ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop)
@@ -3802,7 +3838,7 @@ if Game.isOnline() then
             if wh5_loop then
               script.run_in_fiber(function(wh5l)
                 repeat
-                  stats.set_bool_masked(MPx.."_FIXERPSTAT_BOOL1", true, 16)
+                  stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
                   wh5l:sleep(800)
                 until
                   wh5Supplies == 111 or wh5_loop == false
@@ -3813,34 +3849,39 @@ if Game.isOnline() then
               wh5_loop = false
             end
           end
-          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine(); 
-          ImGui.ProgressBar((wh5Supplies/111), 240, 30, tostring(wh5Supplies).." Crates ("..tostring(math.floor((wh5Supplies / 111) * 100)).."%)")
+          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
+          ImGui.ProgressBar((wh5Supplies / 111), 240, 30,
+            tostring(wh5Supplies) .. " Crates (" .. tostring(math.floor((wh5Supplies / 111) * 100)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh5Total))
         end
         ImGui.Separator(); ImGui.Spacing(); ImGui.Text("Total Value: " .. lua_Fn.formatMoney(ceo_moola))
         ImGui.EndTabItem()
       end
 
-      if ImGui.BeginTabItem("Hangar") then
+      if ImGui.BeginTabItem(translateLabel("hangar_title")) then
         ImGui.Dummy(1, 5)
         if hangarOwned then
           hangarSupplies = stats.get_int(MPx .. "_HANGAR_CONTRABAND_TOTAL")
           hangarTotal    = hangarSupplies * 30000
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar((hangarSupplies / 50), 240, 30)
+          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+          (hangarSupplies / 50), 240, 30)
           if hangarSupplies < 50 then
             ImGui.SameLine()
             ImGui.BeginDisabled(hangarLoop)
-            if ImGui.Button("Source Random Crate(s)##hangar") then
+            if ImGui.Button(translateLabel("random_crates") .. "##hangar") then
               script.run_in_fiber(function()
-                stats.set_bool_masked(MPx.."_DLC22022PSTAT_BOOL3", true, 9)
+                stats.set_bool_masked(MPx .. "_DLC22022PSTAT_BOOL3", true, 9)
               end)
             end
             ImGui.EndDisabled()
             ImGui.SameLine(); hangarLoop, hlUsed = ImGui.Checkbox("Auto##hangar", hangarLoop)
+            if hlUsed then
+              UI.widgetSound("Nav2")
+            end
             if hangarLoop then
               script.run_in_fiber(function(hl)
                 repeat
-                  stats.set_bool_masked(MPx.."_DLC22022PSTAT_BOOL3", true, 9)
+                  stats.set_bool_masked(MPx .. "_DLC22022PSTAT_BOOL3", true, 9)
                   hl:sleep(969) -- delay to prevent transaction error or infinite 'transaction pending'
                 until
                   hangarSupplies == 50 or hangarLoop == false
@@ -3852,10 +3893,11 @@ if Game.isOnline() then
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((hangarSupplies / 50), 240, 30, tostring(hangarSupplies).." Crates ("..tostring(math.floor(hangarSupplies / 0.5)).."%)")
+          ImGui.ProgressBar((hangarSupplies / 50), 240, 30,
+            tostring(hangarSupplies) .. " Crates (" .. tostring(math.floor(hangarSupplies / 0.5)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(hangarTotal))
           if Game.Self.isOutside() then
-            ImGui.Spacing(); ImGui.SeparatorText("Quick Teleport")
+            ImGui.Spacing(); ImGui.SeparatorText(translateLabel("quick_tp"))
             if ImGui.Button("Teleport To Hangar") then
               UI.widgetSound("Select")
               script.run_in_fiber(function()
@@ -3867,7 +3909,7 @@ if Game.isOnline() then
                 end
               end)
             end
-            UI.helpMarker(true, "[ ! ] WARNING\10\10This works for solo players. It may teleport you to another player's hangar instead of yours if you are in a public session.", "#FFA134", 1)
+            UI.helpMarker(true, translateLabel("tp_warn"), "#FFA134", 1)
           end
         else
           ImGui.Text("You don't own a hangar.")
@@ -3894,15 +3936,16 @@ if Game.isOnline() then
             bunkerOffset1 = 0
           end
           if bunkerUpdgrade2 then
-            bunkerOffset2  = globals.get_int(Global_262145.f_21255)
+            bunkerOffset2 = globals.get_int(Global_262145.f_21255)
           else
             bunkerOffset2 = 0
           end
           local bunkerSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY5")
-          local bunkerStock    = stats.get_int(MPx.."_PRODTOTALFORFACTORY5")
+          local bunkerStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY5")
           bunkerTotal          = ((globals.get_int(Global_262145.f_21254) + bunkerOffset1 + bunkerOffset2) * bunkerStock)
           ImGui.Spacing()
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar((bunkerSupplies / 100), 240, 30)
+          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+          (bunkerSupplies / 100), 240, 30)
           if bunkerSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##Bunker") then
@@ -3910,9 +3953,11 @@ if Game.isOnline() then
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((bunkerStock / 100), 240, 30, tostring(bunkerStock).." Crates ("..tostring(bunkerStock).."%)")
+          ImGui.ProgressBar((bunkerStock / 100), 240, 30, tostring(bunkerStock) ..
+          " Crates (" .. tostring(bunkerStock) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
-          ImGui.Text("¤ Blaine County:  " .. lua_Fn.formatMoney(bunkerTotal).."\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(bunkerTotal * 1.5)))
+          ImGui.Text("¤ Blaine County:  " ..
+          lua_Fn.formatMoney(bunkerTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(bunkerTotal * 1.5)))
           if Game.Self.isOutside() then
             ImGui.Spacing(); ImGui.SeparatorText("Quick Teleport")
             if ImGui.Button("Teleport To Bunker") then
@@ -3926,7 +3971,7 @@ if Game.isOnline() then
                 end
               end)
             end
-            UI.helpMarker(true, "[ ! ] WARNING\10\10This works for solo players. It may teleport you to another player's bunker instead of yours if you are in a public session.", "#FFA134", 1)
+            UI.helpMarker(true, translateLabel("tp_warn"), "#FFA134", 1)
           end
         else
           ImGui.Text("You don't own a bunker.")
@@ -3954,7 +3999,7 @@ if Game.isOnline() then
             cashOffset1 = 0
           end
           if cashUpdgrade2 then
-            cashOffset2  = globals.get_int(Global_262145.f_17332)
+            cashOffset2 = globals.get_int(Global_262145.f_17332)
           else
             cashOffset2 = 0
           end
@@ -3970,9 +4015,11 @@ if Game.isOnline() then
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((fcashStock / 40), 240, 30, tostring(fcashStock) .. " Boxes (" .. tostring(math.floor(fcashStock * 2.5)) .. "%)")
+          ImGui.ProgressBar((fcashStock / 40), 240, 30,
+            tostring(fcashStock) .. " Boxes (" .. tostring(math.floor(fcashStock * 2.5)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
-          ImGui.Text("¤ Blaine County:  " .. lua_Fn.formatMoney(fcashTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(fcashTotal * 1.5)))
+          ImGui.Text("¤ Blaine County:  " ..
+          lua_Fn.formatMoney(fcashTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(fcashTotal * 1.5)))
         else
           ImGui.Text("You don't own a Fake Cash business.")
         end
@@ -3995,7 +4042,7 @@ if Game.isOnline() then
             cokeOffset1 = 0
           end
           if cokeUpdgrade2 then
-            cokeOffset2  = globals.get_int(Global_262145.f_17333)
+            cokeOffset2 = globals.get_int(Global_262145.f_17333)
           else
             cokeOffset2 = 0
           end
@@ -4011,9 +4058,11 @@ if Game.isOnline() then
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((cokeStock / 10), 240, 30, tostring(cokeStock) .. " Kilos (" .. tostring(cokeStock * 10) .. "%)")
+          ImGui.ProgressBar((cokeStock / 10), 240, 30,
+            tostring(cokeStock) .. " Kilos (" .. tostring(cokeStock * 10) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
-          ImGui.Text("¤ Blaine County:  " .. lua_Fn.formatMoney(cokeTotal).."\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(cokeTotal * 1.5)))
+          ImGui.Text("¤ Blaine County:  " ..
+          lua_Fn.formatMoney(cokeTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(cokeTotal * 1.5)))
         else
           ImGui.Text("You don't own a Cocaine business.")
         end
@@ -4036,7 +4085,7 @@ if Game.isOnline() then
             methOffset1 = 0
           end
           if methUpdgrade2 then
-            methOffset2  = globals.get_int(Global_262145.f_17334)
+            methOffset2 = globals.get_int(Global_262145.f_17334)
           else
             methOffset2 = 0
           end
@@ -4052,9 +4101,11 @@ if Game.isOnline() then
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((methStock / 20), 240, 30, tostring(methStock) .. " Pounds (" .. tostring(methStock * 5) .. "%)")
+          ImGui.ProgressBar((methStock / 20), 240, 30,
+            tostring(methStock) .. " Pounds (" .. tostring(methStock * 5) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
-          ImGui.Text("¤ Blaine County:  " .. lua_Fn.formatMoney(methTotal).."\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(methTotal * 1.5)))
+          ImGui.Text("¤ Blaine County:  " ..
+          lua_Fn.formatMoney(methTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(methTotal * 1.5)))
         else
           ImGui.Text("You don't own a Meth business.")
         end
@@ -4077,7 +4128,7 @@ if Game.isOnline() then
             weedOffset1 = 0
           end
           if weedUpdgrade2 then
-            weedOffset2  = globals.get_int(Global_262145.f_17335)
+            weedOffset2 = globals.get_int(Global_262145.f_17335)
           else
             weedOffset2 = 0
           end
@@ -4093,9 +4144,11 @@ if Game.isOnline() then
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((weedStock / 80), 240, 30, tostring(weedStock) .. " Pounds (" .. tostring(math.floor(weedStock / 8 * 10)) .. "%)")
+          ImGui.ProgressBar((weedStock / 80), 240, 30,
+            tostring(weedStock) .. " Pounds (" .. tostring(math.floor(weedStock / 8 * 10)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
-          ImGui.Text("¤ Blaine County:  " .. lua_Fn.formatMoney(weedTotal).."\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(weedTotal * 1.5)))
+          ImGui.Text("¤ Blaine County:  " ..
+          lua_Fn.formatMoney(weedTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(weedTotal * 1.5)))
         else
           ImGui.Text("You don't own a Weed business.")
         end
@@ -4134,9 +4187,11 @@ if Game.isOnline() then
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((fdStock / 60), 240, 30, tostring(fdStock) .. " Boxes (" .. tostring(math.floor(fdStock / 6 * 10)) .. "%)")
+          ImGui.ProgressBar((fdStock / 60), 240, 30,
+            tostring(fdStock) .. " Boxes (" .. tostring(math.floor(fdStock / 6 * 10)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
-          ImGui.Text("¤ Blaine County:  " .. lua_Fn.formatMoney(fdTotal).."\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(fdTotal * 1.5)))
+          ImGui.Text("¤ Blaine County:  " ..
+          lua_Fn.formatMoney(fdTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(fdTotal * 1.5)))
         else
           ImGui.Text("You don't own a Document Forgery office.")
         end
@@ -4165,13 +4220,15 @@ if Game.isOnline() then
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((acidStock / 100), 240, 30, tostring(acidStock) .. " Sheets (" .. tostring(math.floor(acidStock / 16 * 10)) .. "%)")
+          ImGui.ProgressBar((acidStock / 100), 240, 30,
+            tostring(acidStock) .. " Sheets (" .. tostring(math.floor(acidStock / 16 * 10)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(acidTotal))
         else
           ImGui.Text("You don't own a Document Forgery office.")
         end
 
-        ImGui.Separator(); ImGui.Spacing(); ImGui.Text("Total MC Business Value: " .. lua_Fn.formatMoney(fcashTotal + cokeTotal + methTotal + weedTotal + fdTotal + acidTotal))
+        ImGui.Separator(); ImGui.Spacing(); ImGui.Text("Total MC Business Value: " ..
+        lua_Fn.formatMoney(fcashTotal + cokeTotal + methTotal + weedTotal + fdTotal + acidTotal))
 
         ------------------------MC Quick TP------------------------------
         if Game.Self.isOutside() then
@@ -4189,11 +4246,7 @@ if Game.isOnline() then
             end)
           end
           ImGui.EndDisabled()
-          UI.helpMarker(
-            true,
-            "[ ! ] WARNING\10\10This works for solo players. It may teleport you to another player's cash factory instead of yours if you are in a public session.",
-            "#FFA134", 1
-          )
+          UI.helpMarker(true, translateLabel("tp_warn"), "#FFA134", 1)
           ImGui.SameLine()
           ImGui.BeginDisabled(not cokeOwned)
           if ImGui.Button("To Cocaine Lockup") then
@@ -4208,11 +4261,7 @@ if Game.isOnline() then
             end)
           end
           ImGui.EndDisabled()
-          UI.helpMarker(
-            true,
-            "[ ! ] WARNING\10\10This works for solo players. It may teleport you to another player's cocaine lockup instead of yours if you are in a public session.",
-            "#FFA134", 1
-          )
+          UI.helpMarker(true, translateLabel("tp_warn"), "#FFA134", 1)
           ImGui.SameLine()
           ImGui.BeginDisabled(not methOwned)
           if ImGui.Button("To Meth Lab") then
@@ -4227,11 +4276,7 @@ if Game.isOnline() then
             end)
           end
           ImGui.EndDisabled()
-          UI.helpMarker(
-            true,
-            "[ ! ] WARNING\10\10This works for solo players. It may teleport you to another player's meth lab instead of yours if you are in a public session.",
-            "#FFA134", 1
-          )
+          UI.helpMarker(true, translateLabel("tp_warn"), "#FFA134", 1)
           ImGui.BeginDisabled(not weedOwned)
           if ImGui.Button("To Weed Lockup") then
             UI.widgetSound("Select")
@@ -4245,11 +4290,7 @@ if Game.isOnline() then
             end)
           end
           ImGui.EndDisabled()
-          UI.helpMarker(
-            true,
-            "[ ! ] WARNING\10\10This works for solo players. It may teleport you to another player's weed growhouse instead of yours if you are in a public session.",
-            "#FFA134", 1
-          )
+          UI.helpMarker(true, translateLabel("tp_warn"), "#FFA134", 1)
           ImGui.SameLine()
           ImGui.BeginDisabled(not fdOwned)
           if ImGui.Button("To Document Forgery") then
@@ -4264,11 +4305,7 @@ if Game.isOnline() then
             end)
           end
           ImGui.EndDisabled()
-          UI.helpMarker(
-            true,
-            "[ ! ] WARNING\10\10This works for solo players. It may teleport you to another player's document forgery office instead of yours if you are in a public session.",
-            "#FFA134", 1
-          )
+          UI.helpMarker(true, translateLabel("tp_warn"), "#FFA134", 1)
           ImGui.SameLine()
           ImGui.BeginDisabled(not acidOwned)
           if ImGui.Button("To Acid Lab") then
@@ -4283,11 +4320,7 @@ if Game.isOnline() then
             end)
           end
           ImGui.EndDisabled()
-          UI.helpMarker(
-            true,
-            "[ ! ] WARNING\10\10This works for solo players. It may teleport you to another player's document forgery office instead of yours if you are in a public session.",
-            "#FFA134", 1
-          )
+          UI.helpMarker(true, translateLabel("tp_warn"), "#FFA134", 1)
         end
         ImGui.EndTabItem()
       end
@@ -4296,16 +4329,16 @@ if Game.isOnline() then
 
         if stats.get_int(MPx .. "_PROP_NIGHTCLUB") ~= 0 then
           ImGui.Spacing(); ImGui.SeparatorText("Nightclub")
-          local currentNcPop    = stats.get_int(MPx.."_CLUB_POPULARITY")
+          local currentNcPop    = stats.get_int(MPx .. "_CLUB_POPULARITY")
           local popDiff         = 1000 - currentNcPop
-          local currNcSafeMoney = stats.get_int(MPx.."_CLUB_SAFE_CASH_VALUE")
+          local currNcSafeMoney = stats.get_int(MPx .. "_CLUB_SAFE_CASH_VALUE")
           ImGui.BulletText("Popularity: "); ImGui.SameLine(); ImGui.Dummy(18, 1); ImGui.SameLine();
           ImGui.ProgressBar(currentNcPop / 1000, 240, 30, tostring(currentNcPop))
           if currentNcPop < 1000 then
             ImGui.SameLine()
             if ImGui.Button("Max Popularity") then
               UI.widgetSound("Select")
-              stats.set_int(MPx.."_CLUB_POPULARITY", currentNcPop + popDiff)
+              stats.set_int(MPx .. "_CLUB_POPULARITY", currentNcPop + popDiff)
               gui.show_success("Samurai's Scripts", "Nightclub popularity increased.")
             end
           end
@@ -4314,6 +4347,7 @@ if Game.isOnline() then
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##nc") then
+              UI.widgetSound("Select")
               script.run_in_fiber(function()
                 local ncBlip = HUD.GET_FIRST_BLIP_INFO_ID(614)
                 local ncLoc
@@ -4327,13 +4361,16 @@ if Game.isOnline() then
         end
 
         if stats.get_int(MPx .. "_PROP_ARCADE") ~= 0 then
-          ImGui.Spacing() ImGui.SeparatorText("Arcade")
-          local currArSafeMoney = stats.get_int(MPx.."_ARCADE_SAFE_CASH_VALUE")
-          ImGui.BulletText("Safe: ")ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
+          ImGui.Spacing()
+          ImGui.SeparatorText("Arcade")
+          local currArSafeMoney = stats.get_int(MPx .. "_ARCADE_SAFE_CASH_VALUE")
+          ImGui.BulletText("Safe: ")
+          ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
           ImGui.ProgressBar(currArSafeMoney / 100000, 240, 30, lua_Fn.formatMoney(currArSafeMoney))
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##arcade") then
+              UI.widgetSound("Select")
               script.run_in_fiber(function()
                 local arBlip = HUD.GET_FIRST_BLIP_INFO_ID(740)
                 local arLoc
@@ -4348,12 +4385,13 @@ if Game.isOnline() then
 
         if stats.get_int(MPx .. "_PROP_SECURITY_OFFICE") ~= 0 then
           ImGui.Spacing(); ImGui.SeparatorText("Agency")
-          local currAgSafeMoney = stats.get_int(MPx.."_FIXER_SAFE_CASH_VALUE")
+          local currAgSafeMoney = stats.get_int(MPx .. "_FIXER_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
           ImGui.ProgressBar(currAgSafeMoney / 250000, 240, 30, lua_Fn.formatMoney(currAgSafeMoney))
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##agnc") then
+              UI.widgetSound("Select")
               script.run_in_fiber(function()
                 local agncBlip = HUD.GET_FIRST_BLIP_INFO_ID(826)
                 local agncLoc
@@ -4368,12 +4406,13 @@ if Game.isOnline() then
 
         if stats.get_int(MPx .. "_PROP_CLUBHOUSE") ~= 0 then
           ImGui.Spacing(); ImGui.SeparatorText("MC Clubhouse")
-          local currClubHouseBarProfit = stats.get_int(MPx.."_BIKER_BAR_RESUPPLY_CASH")
+          local currClubHouseBarProfit = stats.get_int(MPx .. "_BIKER_BAR_RESUPPLY_CASH")
           ImGui.BulletText("Bar Earnings:"); ImGui.SameLine(); ImGui.Dummy(2, 1); ImGui.SameLine();
           ImGui.ProgressBar(currClubHouseBarProfit / 100000, 240, 30, lua_Fn.formatMoney(currClubHouseBarProfit))
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##mc") then
+              UI.widgetSound("Select")
               script.run_in_fiber(function()
                 local mcBlip = HUD.GET_FIRST_BLIP_INFO_ID(492)
                 local mcLoc
@@ -4386,7 +4425,7 @@ if Game.isOnline() then
           end
         end
 
-        if stats.get_int(MPx.."_PROP_BAIL_OFFICE") ~= 0 then
+        if stats.get_int(MPx .. "_PROP_BAIL_OFFICE") ~= 0 then
           ImGui.Spacing(); ImGui.SeparatorText("Bail Office")
           local currBailSafe = stats.get_int(MPx .. "_BAIL_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe:"); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
@@ -4394,6 +4433,7 @@ if Game.isOnline() then
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##bail") then
+              UI.widgetSound("Select")
               script.run_in_fiber(function()
                 local bailBlip = HUD.GET_FIRST_BLIP_INFO_ID(893)
                 local bailLoc
@@ -4409,12 +4449,13 @@ if Game.isOnline() then
 
         if stats.get_int(MPx .. "_SALVAGE_YARD_OWNED") ~= 0 then
           ImGui.Spacing(); ImGui.SeparatorText("Salvage Yard")
-          local currSalvSafe = stats.get_int(MPx.."_SALVAGE_SAFE_CASH_VALUE")
+          local currSalvSafe = stats.get_int(MPx .. "_SALVAGE_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
           ImGui.ProgressBar(currSalvSafe / 250000, 240, 30, lua_Fn.formatMoney(currSalvSafe))
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##salvage") then
+              UI.widgetSound("Select")
               script.run_in_fiber(function()
                 local slvgBlip = HUD.GET_FIRST_BLIP_INFO_ID(867)
                 local slvgLoc
@@ -4427,7 +4468,7 @@ if Game.isOnline() then
           end
         end
         if Game.Self.isOutside() then
-          ImGui.Dummy(1, 10); UI.coloredText("[ ! ] WARNING\10Teleport buttons might be broken in public sessions.", "#FFA134", 1, 40)
+          ImGui.Dummy(1, 10); UI.coloredText(translateLabel("tp_warn_2"), "#FFA134", 1, 40)
         end
         ImGui.EndTabItem()
       end
@@ -4455,7 +4496,8 @@ if Game.isOnline() then
 
         ImGui.SameLine()
         nc_vip_mission_chance, nvipmcUsed = ImGui.Checkbox("Always Troublemaker", nc_vip_mission_chance)
-        UI.helpMarker(false, "Always spawns the troublemaker nightclub missions and disables the knocked out VIP missions.")
+        UI.helpMarker(false,
+          "Always spawns the troublemaker nightclub missions and disables the knocked out VIP missions.")
         if nvipmcUsed then
           UI.widgetSound("Nav2")
           lua_cfg.save("nc_vip_mission_chance", nc_vip_mission_chance)
@@ -4512,15 +4554,15 @@ if Game.isOnline() then
             ie_vehicle_sell_cd    = false
             ceo_crate_buy_cd      = false
             ceo_crate_sell_cd     = false
-            lua_cfg.save("mc_work_cd",            mc_work_cd)
-            lua_cfg.save("hangar_cd",             hangar_cd)
-            lua_cfg.save("nc_management_cd",      nc_management_cd)
+            lua_cfg.save("mc_work_cd", mc_work_cd)
+            lua_cfg.save("hangar_cd", hangar_cd)
+            lua_cfg.save("nc_management_cd", nc_management_cd)
             lua_cfg.save("nc_vip_mission_chance", nc_vip_mission_chance)
-            lua_cfg.save("security_missions_cd",  security_missions_cd)
-            lua_cfg.save("ie_vehicle_steal_cd",   ie_vehicle_steal_cd)
-            lua_cfg.save("ie_vehicle_sell_cd",    ie_vehicle_sell_cd)
-            lua_cfg.save("ceo_crate_buy_cd",      ceo_crate_buy_cd)
-            lua_cfg.save("ceo_crate_sell_cd",     ceo_crate_sell_cd)
+            lua_cfg.save("security_missions_cd", security_missions_cd)
+            lua_cfg.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
+            lua_cfg.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
+            lua_cfg.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
+            lua_cfg.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
           end
         else
           if ImGui.Button("Check All", 120, 40) then
@@ -4534,16 +4576,61 @@ if Game.isOnline() then
             ie_vehicle_sell_cd    = true
             ceo_crate_buy_cd      = true
             ceo_crate_sell_cd     = true
-            lua_cfg.save("mc_work_cd",            mc_work_cd)
-            lua_cfg.save("hangar_cd",             hangar_cd)
-            lua_cfg.save("nc_management_cd",      nc_management_cd)
+            lua_cfg.save("mc_work_cd", mc_work_cd)
+            lua_cfg.save("hangar_cd", hangar_cd)
+            lua_cfg.save("nc_management_cd", nc_management_cd)
             lua_cfg.save("nc_vip_mission_chance", nc_vip_mission_chance)
-            lua_cfg.save("security_missions_cd",  security_missions_cd)
-            lua_cfg.save("ie_vehicle_steal_cd",   ie_vehicle_steal_cd)
-            lua_cfg.save("ie_vehicle_sell_cd",    ie_vehicle_sell_cd)
-            lua_cfg.save("ceo_crate_buy_cd",      ceo_crate_buy_cd)
-            lua_cfg.save("ceo_crate_sell_cd",     ceo_crate_sell_cd)
+            lua_cfg.save("security_missions_cd", security_missions_cd)
+            lua_cfg.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
+            lua_cfg.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
+            lua_cfg.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
+            lua_cfg.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
           end
+        end
+        ImGui.Spacing(); ImGui.SeparatorText("Sell Missions")
+        ImGui.Spacing(); UI.wrappedText("These options will not be saved. Each button disables the most tedious sell missions for that business.", 32)
+        ImGui.Spacing(); UI.coloredText("[ ! ] NOTE: If you plan on selling more than once for the same business (example: MC businesses or more than one CEO warehouse), please switch sessions after finishing the first sale to reset the missions, otherwise a sesond sell mission may fail to start.", 'yellow', 0.69, 32)
+
+        if ImGui.Button("Easy Biker Sell Missions") then
+          UI.widgetSound("Select")
+          for _, index in pairs(mc_sell_mission_types_T) do
+            if globals.get_int(index) == 0 then
+              globals.set_int(index, 1)
+            end
+          end
+          gui.show_success("Samurai's Scripts", "Successfully disabled the most annoying missions.")
+        end
+
+        ImGui.SameLine(); ImGui.Dummy(41, 1); ImGui.SameLine()
+        if ImGui.Button("Easy CEO Sell Missions") then
+          UI.widgetSound("Select")
+          for _, index in pairs(ceo_sell_mission_types_T) do
+            if globals.get_int(index) == 0 then
+              globals.set_int(index, 1)
+            end
+          end
+          gui.show_success("Samurai's Scripts", "Successfully disabled the most annoying missions.")
+        end
+
+        if ImGui.Button("Easy Nightclub Sell Missions") then
+          UI.widgetSound("Select")
+          for _, index in pairs(nc_sell_mission_types_T) do
+            if globals.get_int(index) > 0.0 then
+              globals.set_int(index, 0.0)
+            end
+          end
+          gui.show_success("Samurai's Scripts", "Successfully disabled the most annoying missions.")
+        end
+
+        ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+        if ImGui.Button("Easy Hangar Sell Missions") then
+          UI.widgetSound("Select")
+          for _, index in pairs(hg_sell_mission_types_T) do
+            if globals.get_int(index) > 0.0 then
+              globals.set_int(index, 0.0)
+            end
+          end
+          gui.show_success("Samurai's Scripts", "Successfully disabled the most annoying missions.")
         end
         ImGui.EndTabItem()
       end
@@ -4559,12 +4646,10 @@ if Game.isOnline() then
     else
       ImGui.Dummy(1, 5); ImGui.SameLine(); ImGui.Text("Outdated.")
     end
-  end)
-else
-  business_tab:add_imgui(function()
+  else
     ImGui.Dummy(1, 5); ImGui.Text(translateLabel("Unavailable in Single Player"))
-  end)
-end
+  end
+end)
 
 -- Casino
 casino_pacino                         = online_tab:add_tab("Casino Pacino") --IT'S NOT AL ANYMORE! IT'S DUNK!
@@ -5767,13 +5852,15 @@ object_spawner:add_imgui(function()
       ImGui.ArrowButton("##z2", 2)
       if ImGui.IsItemActive() then
         zOffset = zOffset + 0.01
-        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z + 0.01, false, false, false, false)
+        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z + 0.01, false,
+          false, false, false)
       end
       ImGui.SameLine()
       ImGui.ArrowButton("##z3", 3)
       if ImGui.IsItemActive() then
         zOffset = zOffset - 0.01
-        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z - 0.01, false, false, false, false)
+        ENTITY.SET_ENTITY_COORDS(previewEntity, previewObjectPos.x, previewObjectPos.y, previewObjectPos.z - 0.01, false,
+          false, false, false)
       end
     else
       previewStarted = false
@@ -5901,7 +5988,7 @@ object_spawner:add_imgui(function()
                 PED.GET_PED_BONE_INDEX(self.get_ped(), boneData.ID), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false,
                 false,
                 2, true, 1)
-              attached = true
+              attached           = true
               attachedObject     = selectedObject
               attachedObjectName = propName
               if selfAttachments[1] ~= nil then
@@ -6037,7 +6124,8 @@ object_spawner:add_imgui(function()
           ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, false, false, false, false, 2, true, 1)
         else
-          ENTITY.SET_ENTITY_COORDS(selectedObject, coords.x + (forwardX * 3), coords.y + (forwardY * 3), coords.z, false, false, false, false)
+          ENTITY.SET_ENTITY_COORDS(selectedObject, coords.x + (forwardX * 3), coords.y + (forwardY * 3), coords.z, false,
+            false, false, false)
           ENTITY.SET_ENTITY_HEADING(selectedObject, heading)
           OBJECT.PLACE_OBJECT_ON_GROUND_OR_OBJECT_PROPERLY(selectedObject)
         end
@@ -6277,9 +6365,9 @@ object_spawner:add_imgui(function()
               repeat
                 timer = timer + 1
               until timer >= 50
-              prop_creation      = { name = "", props = {} }
-              persist_prop_index = 0
-              saved_props_name   = ""
+              prop_creation       = { name = "", props = {} }
+              persist_prop_index  = 0
+              saved_props_name    = ""
               persist_attachments = lua_cfg.read("persist_attachments")
               if spawned_props[1] ~= nil then
                 script.run_in_fiber(function()
@@ -6395,13 +6483,13 @@ disableUiSounds    = lua_cfg.read("disableUiSounds")
 useGameLang        = lua_cfg.read("useGameLang")
 local selected_lang
 local lang_T       = {
-  { name = 'English',            iso = 'en-US' },
-  { name = 'Français',           iso = 'fr-FR' },
-  { name = 'Deütsch',            iso = 'de-DE' },
+  { name = 'English', iso = 'en-US' },
+  { name = 'Français', iso = 'fr-FR' },
+  { name = 'Deütsch', iso = 'de-DE' },
   -- { name = 'Español',            iso = 'es-ES' },
-  { name = 'Italiano',           iso = 'it-IT' },
+  { name = 'Italiano', iso = 'it-IT' },
   { name = 'Português (Brasil)', iso = 'pt-BR' },
-  { name = 'Русский (Russian)',  iso = 'ru-RU' },
+  { name = 'Русский (Russian)', iso = 'ru-RU' },
   -- { name = 'Chinese (Traditional)', iso = 'zh-TW' },
   -- { name = 'Chinese (Simplified)',  iso = 'zh-CH' },
 }
@@ -6472,7 +6560,8 @@ settings_tab:add_imgui(function()
   ImGui.BeginDisabled()
   ImGui.Button("Hotkeys")
   ImGui.EndDisabled()
-  UI.toolTip(false, "[ ! ] Not sure if this will ever become a proper option.\10\10If you're a YimMenu dev, please consider adding a binding for ImGui::IsKeyPressed() because GTA's controls are so annoying to work with. Thanks <3")
+  UI.toolTip(false,
+    "[ ! ] Not sure if this will ever become a proper option.\10\10If you're a YimMenu dev, please consider adding a binding for ImGui::IsKeyPressed() because GTA's controls are so annoying to work with. Thanks <3")
 
   ImGui.Dummy(1, 10); ImGui.SeparatorText(translateLabel("langTitle"))
   ImGui.Spacing(); ImGui.BulletText(translateLabel("currentLang_txt") .. " " .. current_lang)
@@ -6691,29 +6780,29 @@ end)
 script.register_looped("shitty rgb text", function(rgbtxt)
   if gui.is_open() and business_tab:is_selected() then
     rgbtxt:sleep(200)
-    yrv2_color = {0, 255, 255, 1}
+    yrv2_color = { 0, 255, 255, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {0, 127, 255, 1}
+    yrv2_color = { 0, 127, 255, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {0, 0, 255, 1}
+    yrv2_color = { 0, 0, 255, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {127, 0, 255, 1}
+    yrv2_color = { 127, 0, 255, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {255, 0, 255, 1}
+    yrv2_color = { 255, 0, 255, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {255, 0, 127, 1}
+    yrv2_color = { 255, 0, 127, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {255, 0, 0, 1}
+    yrv2_color = { 255, 0, 0, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {255, 127, 0, 1}
+    yrv2_color = { 255, 127, 0, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {255, 255, 0, 1}
+    yrv2_color = { 255, 255, 0, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {127, 255, 0, 1}
+    yrv2_color = { 127, 255, 0, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {0, 255, 0, 1}
+    yrv2_color = { 0, 255, 0, 1 }
     rgbtxt:sleep(200)
-    yrv2_color = {0, 255, 127, 1}
+    yrv2_color = { 0, 255, 127, 1 }
   end
 end)
 script.register_looped("Quote Of The Day", function(qotd)
@@ -6771,7 +6860,7 @@ script.register_looped("GameInput", function()
     PAD.DISABLE_CONTROL_ACTION(0, 36, true)
   end
 
-  if replacePointAct or is_playing_anim or is_playing_scenario or ped_grabbed  or vehicle_grabbed then
+  if replacePointAct or is_playing_anim or is_playing_scenario or ped_grabbed or vehicle_grabbed then
     PAD.DISABLE_CONTROL_ACTION(0, 29, true)
   end
 
@@ -7024,7 +7113,7 @@ script.register_looped("Ragdoll Loop", function(rgdl)
   elseif rod then
     if PED.CAN_PED_RAGDOLL(self.get_ped()) then
       if PAD.IS_CONTROL_PRESSED(0, 252) and Game.getEntityModel(self.get_veh()) ~= 884483972 and Game.getEntityModel(self.get_veh()) ~= 2069146067 then
-        PED.SET_PED_TO_RAGDOLL(self.get_ped(), 1500, 0, 0, false, false , false)
+        PED.SET_PED_TO_RAGDOLL(self.get_ped(), 1500, 0, 0, false, false, false)
         if isCrouched then
           isCrouched = false
         end
@@ -7379,7 +7468,7 @@ script.register_looped("anim shortcut", function(animsc)
           end
         end
         animsc:sleep(200)
-        is_playing_anim  = true
+        is_playing_anim = true
       end
     end
   end
@@ -7436,7 +7525,8 @@ script.register_looped("TriggerBot", function(trgrbot)
       aimBool, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER.PLAYER_ID(), Entity)
       if aimBool then
         if ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
-          local bonePos = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(Entity, ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Entity, "head"))
+          local bonePos = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(Entity,
+            ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Entity, "head"))
           weapon = Game.Self.weapon()
           if WEAPON.IS_PED_WEAPON_READY_TO_SHOOT(self.get_ped()) and Game.Self.isOnFoot() and not PED.IS_PED_RELOADING(self.get_ped()) then
             if not ENTITY.IS_ENTITY_DEAD(Entity, false) then
@@ -7467,21 +7557,30 @@ script.register_looped("auto-kill-enemies", function(ak)
   if autoKill then
     local myCoords = self.get_pos()
     local gta_peds = entities.get_all_peds_as_handles()
-    if (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET_WITHIN_RADIUS(self.get_ped(), myCoords.x, myCoords.y, myCoords.z, 100)) > 0 then
+    if (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET_WITHIN_RADIUS(self.get_ped(), myCoords.x, myCoords.y, myCoords.z, 500)) > 0 then
+      ak:sleep(10)
       for _, p in pairs(gta_peds) do
         if PED.IS_PED_HUMAN(p) and PED.IS_PED_IN_COMBAT(p, self.get_ped()) and not PED.IS_PED_A_PLAYER(p) then
-          if PED.CAN_PED_IN_COMBAT_SEE_TARGET(p, self.get_ped()) then
-            PED.APPLY_DAMAGE_TO_PED(p, 100000, true, 0, 0x7FD62962); PED.EXPLODE_PED_HEAD(p, 0x7FD62962)
+          if PED.IS_PED_IN_ANY_VEHICLE(p, false) then
+            local enemy_vehicle        = PED.GET_VEHICLE_PED_IS_IN(p, false)
+            local enemy_vehicle_coords = ENTITY.GET_ENTITY_COORDS(enemy_vehicle, true)
+            local dist                 = SYSTEM.VDIST(enemy_vehicle_coords.x, enemy_vehicle_coords.y, enemy_vehicle_coords.z, myCoords.x, myCoords.y, myCoords.z)
+            if dist >= 20 then
+              VEHICLE.SET_VEHICLE_ENGINE_HEALTH(enemy_vehicle, -4000)
+              if VEHICLE.IS_THIS_MODEL_A_BIKE(ENTITY.GET_ENTITY_MODEL(enemy_vehicle)) or VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(enemy_vehicle)) then
+                for i = 0, 7 do
+                  VEHICLE.SET_VEHICLE_TYRE_BURST(enemy_vehicle, i, false, 1000.0)
+                end
+              end
+              -- NETWORK.NETWORK_EXPLODE_VEHICLE(enemy_vehicle, true, false, 0)
+            end
           else
-            ak:sleep(969) -- prevent kill spamming. It's fine, I just don't like it.
-            PED.APPLY_DAMAGE_TO_PED(p, 100000, true, 0, 0x7FD62962); PED.EXPLODE_PED_HEAD(p, 0x7FD62962)
+            PED.APPLY_DAMAGE_TO_PED(p, 100000, true, 0, 0x7FD62962)
           end
-          ak:yield()
         end
       end
     end
   end
-  ak:yield()
 end)
 script.register_looped("enemies-flee", function(ef)
   if runaway then
@@ -7527,7 +7626,8 @@ script.register_looped("Katana", function(rpq)
             if ENTITY.DOES_ENTITY_EXIST(katana) then
               ENTITY.SET_ENTITY_ALPHA(pool_q, 0, false)
               rpq:sleep(300)
-              ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, false, false, false, false, 2, true, 0)
+              ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, false, false, false, false,
+                2, true, 0)
               ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(katana)
               q_replaced = true
             end
@@ -7551,7 +7651,7 @@ script.register_looped("laser_render", function(lsr)
   if laserSight and WEAPON.IS_PED_ARMED(self.get_ped(), 4) and Game.Self.isOnFoot() then
     local wpn_hash = WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped())
     local wpn_idx  = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
-    local h, m, s = NETWORK.NETWORK_GET_GLOBAL_MULTIPLAYER_CLOCK(h, m, s)
+    local h, m, s  = NETWORK.NETWORK_GET_GLOBAL_MULTIPLAYER_CLOCK(h, m, s)
     local laser_a  = 1.0
     local wpn_bone = 0
     if wpn_hash ~= 0x34A67B97 and wpn_hash ~= 0xBA536372 and wpn_hash ~= 0x184140A1 and wpn_hash ~= 0x060EC506 then
@@ -7609,8 +7709,8 @@ script.register_looped("TDFT", function(script)
     is_heli         = VEHICLE.IS_THIS_MODEL_A_HELI(ENTITY.GET_ENTITY_MODEL(current_vehicle))
     is_bike         = (VEHICLE.IS_THIS_MODEL_A_BIKE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
       and VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 13 and ENTITY.GET_ENTITY_MODEL(current_vehicle) ~= 0x7B54A9D3)
-    is_boat            = (VEHICLE.IS_THIS_MODEL_A_BOAT(ENTITY.GET_ENTITY_MODEL(current_vehicle)) or
-        VEHICLE.IS_THIS_MODEL_A_JETSKI(ENTITY.GET_ENTITY_MODEL(current_vehicle)))
+    is_boat         = (VEHICLE.IS_THIS_MODEL_A_BOAT(ENTITY.GET_ENTITY_MODEL(current_vehicle)) or
+      VEHICLE.IS_THIS_MODEL_A_JETSKI(ENTITY.GET_ENTITY_MODEL(current_vehicle)))
     if is_car or is_quad or is_bike then
       validModel = true
     else
@@ -8425,7 +8525,7 @@ script.register_looped("missile defense", function(md)
       end
     end
     if missile ~= nil and missile ~= 0 then
-    --[[
+      --[[
       if MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 100, vehPos.y + 100, vehPos.z + 100, vehPos.x - 100, vehPos.y - 100, vehPos.z - 100, missile, false) then
         if Game.Self.isDriving() and (is_plane or is_heli) then
           shoot_flares(md)
@@ -8683,9 +8783,9 @@ script.register_looped("flatbed script", function(script)
   if closestVehicle ~= nil then
     closestVehicleModel = Game.getEntityModel(closestVehicle)
   end
-  local iscar               = VEHICLE.IS_THIS_MODEL_A_CAR(closestVehicleModel)
-  local isbike              = VEHICLE.IS_THIS_MODEL_A_BIKE(closestVehicleModel)
-  local towable             = false
+  local iscar   = VEHICLE.IS_THIS_MODEL_A_CAR(closestVehicleModel)
+  local isbike  = VEHICLE.IS_THIS_MODEL_A_BIKE(closestVehicleModel)
+  local towable = false
   if modelOverride then
     towable = true
   else
@@ -8764,7 +8864,7 @@ script.register_looped("flatbed script", function(script)
         local modelHash         = ENTITY.GET_ENTITY_MODEL(v)
         local attachedVehicle   = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(current_vehicle, modelHash)
         local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(towed_vehicle, false)
-        local controlled              = entities.take_control_of(attachedVehicle, 350)
+        local controlled        = entities.take_control_of(attachedVehicle, 350)
         if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) then
           if controlled then
             ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
@@ -9204,13 +9304,16 @@ script.register_looped("edit mode", function()
       local current_coords   = ENTITY.GET_ENTITY_COORDS(selectedObject, true)
       local current_rotation = ENTITY.GET_ENTITY_ROTATION(selectedObject, 2)
       if activeX then
-        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x + spawnDistance.x, current_coords.y, current_coords.z, false, false, false, false)
+        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x + spawnDistance.x, current_coords.y, current_coords.z,
+          false, false, false, false)
       end
       if activeY then
-        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x, current_coords.y + spawnDistance.y, current_coords.z, false, false, false, false)
+        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x, current_coords.y + spawnDistance.y, current_coords.z,
+          false, false, false, false)
       end
       if activeZ then
-        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x, current_coords.y, current_coords.z + spawnDistance.z, false, false, false, false)
+        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x, current_coords.y, current_coords.z + spawnDistance.z,
+          false, false, false, false)
       end
       if rotX then
         ENTITY.SET_ENTITY_ROTATION(selectedObject, current_rotation.x + spawnRot.x, current_rotation.y,

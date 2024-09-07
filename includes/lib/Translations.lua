@@ -2014,6 +2014,78 @@ Labels = {
         {iso = "ru-RU", text = "Ваш сохраненный автомобиль был удален."},
     },
 
+    ["ceo_whouses_title"] = {
+        {iso = "en-US", text = "CEO Warehouses"},
+        {iso = "de-DE", text = "CEO-Lagerhäuser"},
+        {iso = "fr-FR", text = "Entrepôts du PDG"},
+        {iso = "it-IT", text = "Magazzini CEO"},
+        {iso = "pt-BR", text = "Armazéns de CEOs"},
+        {iso = "ru-RU", text = "Генеральный директор Склады"},
+    },
+
+    ["ceo_whouses_txt"] = {
+        {iso = "en-US", text = "Select the warehouses you own:"},
+        {iso = "de-DE", text = "Wählen Sie die Lagerhäuser aus, die Sie besitzen:"},
+        {iso = "fr-FR", text = "Sélectionnez les entrepôts que vous possédez :"},
+        {iso = "it-IT", text = "Selezionare i magazzini di proprietà:"},
+        {iso = "pt-BR", text = "Selecione os armazéns que você possui:"},
+        {iso = "ru-RU", text = "Выберите склады, которыми вы владеете:"},
+    },
+
+    ["Warehouse"] = {
+        {iso = "en-US", text = "Warehouse"},
+        {iso = "de-DE", text = "Lagerhaus"},
+        {iso = "fr-FR", text = "Entrepôt"},
+        {iso = "it-IT", text = "Magazzino"},
+        {iso = "pt-BR", text = "Armazém"},
+        {iso = "ru-RU", text = "Склад"},
+    },
+
+    ["random_crates"] = {
+        {iso = "en-US", text = "Source Random Crate(s)"},
+        {iso = "de-DE", text = "Zufällige Kiste(n) holen"},
+        {iso = "fr-FR", text = "Obtenir Caisse(s) Aléatoire(s)"},
+        {iso = "it-IT", text = "Ottenere Casse Casuali"},
+        {iso = "pt-BR", text = "Obter Caixa(s) Aleatória(s)"},
+        {iso = "ru-RU", text = "Получить случайный ящик(и)"},
+    },
+
+    ["quick_tp"] = {
+        {iso = "en-US", text = "Quick Teleport"},
+        {iso = "de-DE", text = "Schnelles Teleportieren"},
+        {iso = "fr-FR", text = "Téléportation Rapide"},
+        {iso = "it-IT", text = "Teletrasporto Rapido"},
+        {iso = "pt-BR", text = "Teletransporte Rápido"},
+        {iso = "ru-RU", text = "Быстрый телепорт"},
+    },
+
+    ["hangar_title"] = {
+        {iso = "en-US", text = "Hangar"},
+        {iso = "de-DE", text = "Hangar"},
+        {iso = "fr-FR", text = "Hangar"},
+        {iso = "it-IT", text = "Capannone"},
+        {iso = "pt-BR", text = "Galpão"},
+        {iso = "ru-RU", text = "ангар"},
+    },
+
+    ["tp_warn"] = {
+        {iso = "en-US", text = "[ ! ] WARNING\10\10This works for solo players. It may teleport you to a different location if you are in a public session."},
+        {iso = "de-DE", text = "[ ! ] WARNUNG\10\10Dies funktioniert für Einzelspieler. Es kann Sie an einen anderen Ort teleportieren, wenn Sie sich in einer öffentlichen Sitzung befinden."},
+        {iso = "fr-FR", text = "[ ! ] ATTENTION\10\10Cela fonctionne pour les joueurs solitaires. Il se peut que vous soyez téléporté à un autre endroit si vous participez à une session publique."},
+        {iso = "it-IT", text = "[ ! ] AVVISO\10\10Funziona per i giocatori solitari. Potrebbe teletrasportarvi in una posizione diversa se siete in una sessione pubblica."},
+        {iso = "pt-BR", text = "[ ! ] AVISO\10\10Isso funciona para jogadores individuais. Ele pode teletransportá-lo para um local diferente se você estiver em uma sessão pública."},
+        {iso = "ru-RU", text = "[ ! ] ПРЕДУПРЕЖДЕНИЕ\10\10Это работает для одиночных игроков. Он может телепортировать вас в другое место, если вы находитесь в публичной сессии."},
+    },
+
+    ["tp_warn_2"] = {
+        {iso = "en-US", text = "[ ! ] WARNING\10\10Teleport buttons might be broken in public sessions."},
+        {iso = "de-DE", text = "[ ! ] WARNUNG\10\10Teleport-Schaltflächen können in öffentlichen Sitzungen defekt sein."},
+        {iso = "fr-FR", text = "[ ! ] ATTENTION\10\10Les boutons de téléportation risquent de ne plus fonctionner lors des sessions publiques."},
+        {iso = "it-IT", text = "[ ! ] AVVISO\10\10I pulsanti per il teletrasporto potrebbero essere interrotti nelle sessioni pubbliche."},
+        {iso = "pt-BR", text = "[ ! ] AVISO\10\10Os botões de teletransporte podem estar quebrados em sessões públicas."},
+        {iso = "ru-RU", text = "[ ! ] ПРЕДУПРЕЖДЕНИЕ\10\10Кнопки телепортации могут быть сломаны в публичных сессиях."},
+    },
+
     ["Gambling"] = {
         {iso = "en-US", text = "Casino Games"},
         {iso = "de-DE", text = "Casino Spiele"},
