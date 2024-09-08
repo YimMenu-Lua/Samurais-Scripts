@@ -697,7 +697,7 @@ self_tab:add_imgui(function()
 end)
 
 
-Actions = self_tab:add_tab("Actions")
+Actions = self_tab:add_tab("Actions ")
 
 local function updatefilteredAnims()
   filteredAnims = {}
@@ -3521,9 +3521,9 @@ end)
 --[[
     *online*
 ]]
-online_tab = Samurais_scripts:add_tab("Online")
+online_tab = Samurais_scripts:add_tab("Online ")
 
-business_tab = online_tab:add_tab("Business Manager")
+business_tab = online_tab:add_tab("Business Manager (YRV2)")
 local wh1_loop       = false
 local wh2_loop       = false
 local wh3_loop       = false
@@ -4652,7 +4652,7 @@ business_tab:add_imgui(function()
 end)
 
 -- Casino
-casino_pacino                         = online_tab:add_tab("Casino Pacino") --IT'S NOT AL ANYMORE! IT'S DUNK!
+casino_pacino                         = online_tab:add_tab("Casino Pacino ") --IT'S NOT AL ANYMORE! IT'S DUNK!
 blackjack_cards                       = 116
 blackjack_decks                       = 846
 blackjack_table_players               = 1776
@@ -7616,7 +7616,7 @@ end)
 script.register_looped("Katana", function(rpq)
   rpq:yield()
   if replace_pool_q then
-    if WEAPON.IS_PED_ARMED(self.get_ped(), 1) and WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped()) == 0x94117305 then
+    if WEAPON.IS_PED_ARMED(self.get_ped(), 1) and WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped()) == 0xDD5DF8D9 then
       local pool_q   = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
       local q_coords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(pool_q, 0.0, 0.0, 0.0)
       if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(pool_q, self.get_ped()) then
@@ -7626,7 +7626,7 @@ script.register_looped("Katana", function(rpq)
             if ENTITY.DOES_ENTITY_EXIST(katana) then
               ENTITY.SET_ENTITY_ALPHA(pool_q, 0, false)
               rpq:sleep(300)
-              ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, false, false, false, false,
+              ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.025, 0.0, 0.0, 0.0, false, false, false, false,
                 2, true, 0)
               ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(katana)
               q_replaced = true

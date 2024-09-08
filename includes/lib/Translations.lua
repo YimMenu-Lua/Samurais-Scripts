@@ -306,12 +306,12 @@ Labels = {
     },
 
     ["katana_tt"] = {
-        {iso = "en-US", text = "Terrorize the streets of Los Santos like a true Samurai by replacing the 'Pool Cue' weapon with a Japanese Katana.\10\10If you don't own a pool cue, you can either buy one from Ammu-Nation or use YimMenu to equip a temporary one."},
-        {iso = "de-DE", text = "Terrorisiere die Straßen von Los Santos wie ein echter Samurai, indem du die 'Billardqueue'-Waffe durch ein japanisches Katana ersetzst.\10\10Wenn du keinen Billardqueue besitzt, kannst du entweder einen von Ammu-Nation kaufen oder YimMenu benutzen, um einen temporären Queue zu besorgen."},
-        {iso = "fr-FR", text = "Terrorisez les rues de Los Santos comme un vrai Samouraï en remplaçant l'arme 'Queue De Billard' par un Katana japonais.\10\10Si vous ne possédez pas de queue de billard, vous pouvez en acheter une auprès d'Ammu-Nation ou utiliser YimMenu pour en équiper une provisoire."},
-        {iso = "it-IT", text = "Terrorizza le strade di Los Santos come un vero Samurai sostituendo l'arma 'Stecca Da Biliardo' con una Katana giapponese.\10\10Se non si possiede una stecca da biliardo, è possibile acquistarne una da Ammu-Nation o utilizzare YimMenu per equipaggiarne una temporanea."},
-        {iso = "pt-BR", text = "Aterrorize as ruas de Los Santos como um verdadeiro samurai, substituindo a arma 'Taco De Bilhar' por uma Katana japonesa.\10\10Se você não tiver um taco de bilhar, poderá comprar um na Ammu-Nation ou usar o YimMenu para equipar um taco temporário."},
-        {iso = "ru-RU", text = "Наводите ужас на улицы Лос-Сантоса как настоящий самурай, заменив оружие 'бильярдный кий' на японскую катану.\10\10Если у вас нет бильярдного кия, вы можете купить его у Ammu-Nation или использовать YimMenu для создания временного кия."},
+        {iso = "en-US", text = "Terrorize the streets of Los Santos like a true Samurai by replacing the 'Machete' weapon with a Japanese Katana.\10\10If you don't own a Machete, you can either buy one from Ammu-Nation or use YimMenu to equip a temporary one."},
+        {iso = "de-DE", text = "Terrorisiere die Straßen von Los Santos wie ein echter Samurai, indem du die 'Machete'-Waffe durch ein japanisches Katana ersetzst.\10\10Wenn du keinen Machete besitzt, kannst du entweder einen von Ammu-Nation kaufen oder YimMenu benutzen, um einen temporären Queue zu besorgen."},
+        {iso = "fr-FR", text = "Terrorisez les rues de Los Santos comme un vrai Samouraï en remplaçant l'arme 'Machete' par un Katana japonais.\10\10Si vous ne possédez pas de Machete, vous pouvez en acheter une auprès d'Ammu-Nation ou utiliser YimMenu pour en équiper une provisoire."},
+        {iso = "it-IT", text = "Terrorizza le strade di Los Santos come un vero Samurai sostituendo l'arma 'Machete' con una Katana giapponese.\10\10Se non si possiede una Machete, è possibile acquistarne una da Ammu-Nation o utilizzare YimMenu per equipaggiarne una temporanea."},
+        {iso = "pt-BR", text = "Aterrorize as ruas de Los Santos como um verdadeiro samurai, substituindo a arma 'Machete' por uma Katana japonesa.\10\10Se você não tiver um Machete, poderá comprar um na Ammu-Nation ou usar o YimMenu para equipar um taco temporário."},
+        {iso = "ru-RU", text = "Наводите ужас на улицы Лос-Сантоса как настоящий самурай, заменив оружие 'мачете' на японскую катану.\10\10Если у вас нет мачете, вы можете купить его у Ammu-Nation или использовать YimMenu для создания временного кия."},
     },
 
     ["laserSightCB"] = {

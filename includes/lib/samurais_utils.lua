@@ -812,6 +812,19 @@ SS = {
     end
   end,
 
+  ---@param dword integer
+  setWeaponEffectGroup = function(dword)
+    local pedPtr            = memory.handle_to_ptr(self.get_ped())
+    local CPedWeaponManager = pedPtr:add(0x10B8):deref()
+    local CWeaponInfo       = CPedWeaponManager:add(0x0020):deref()
+    local sWeaponFx         = CWeaponInfo:add(0x0170)
+    local eEffectGroup      = sWeaponFx:add(0x00) -- int32_t
+    -- local m_time_between_shots      = CWeaponInfo:add(0x013C)
+    -- local m_time_left_between_shots = CWeaponInfo:add(0x0140)
+    -- local CWeaponFiringPatternInfo  = CWeaponInfo:add(0x0920)
+    eEffectGroup:set_dword(dword)
+  end,
+
   get_ceo_global_offset = function(crates)
     local offset
     if crates ~= nil then
