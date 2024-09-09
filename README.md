@@ -6,7 +6,27 @@
 
 - Full list of features is documented [here](FEATURES.md).
 
-  
+## Setup
+
+1. Download the latest zip archive from the [releases section](https://github.com/YimMenu-Lua/Samurais-Scripts/releases).
+2. Extract the archive to YimMenu's `scripts` folder:
+   
+       %AppData%\YimMenu\scripts
+
+The folder structure should look like this
+```bash
+├── scripts
+│   └── Samurais Scripts
+|       ├── includes
+|       |   ├── data
+|       |   |   ├── actions.lua
+|       |   |   ├── objects.lua
+|       |   |   └── refs.lua
+|       |   └── lib
+|       |       ├── Translations.lua
+|       |       └── samurais_utils.lua
+│       └── samurais_scripts.lua
+```
 
 ## TODO:
 
