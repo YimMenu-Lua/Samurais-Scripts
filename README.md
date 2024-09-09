@@ -5,6 +5,10 @@
 ## Features
 
 - Full list of features is documented [here](FEATURES.md).
+  
+
+ 
+
 
 ## Setup
 
@@ -27,6 +31,7 @@ The folder structure should look like this
 |       |       └── samurais_utils.lua
 │       └── samurais_scripts.lua
 ```
+  
 
 ## TODO:
 
