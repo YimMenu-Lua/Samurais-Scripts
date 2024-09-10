@@ -97,10 +97,13 @@
      - This option equips any plane or helicopter you fly with unlimited flares. Just use the same counter-measure button you use on your weaponized planes *(default: [E] on keyboard)* to fire flares. And yes, they do work as counter-measures same as the ones in weaponized planes, there's just a 3 second delay between each use to prevent unexpected issues.
 
   - **Higher Plane Speeds:**
-     - Increases the speed limit on planes to 555km/h. Just enable the option and the rest will take care of itself.
+    - Increases the speed limit on planes to 555km/h. Just enable the option and the rest will take care of itself.
       > **NOTE:** This option will not do anything unless you're flying high enough, with your landing gear fully retracted, and at a speed of at least 260km/h. If for some reason you want to fly a Cropduster at 555km/h, fly high enough then nose-dive to hit 260km/h.
       
       > **NOTE 2:** The reason the speed is still capped at 555km/h is because anything over that will prevent textures from loading and end up crashing your game (you can still go over the limit when nose-diving).
+  
+  - **Vehicle Mines:**
+    - Equip any land vehicle with mines. Enable the option then press the button to choose the type of mine you want *(Spike, Slick, Kinetic, EMP, Explosive)* Once everything is set, while driving a vehicle press the **Push To Talk** button *(default [N])* to deploy mines.
 
   - **Auto-Pilot:**
     - While flying a plane or a helicopter, open the UI and choose one of the auto-pilot options: Fly To Waypoint, Fly To Objective or Fly to random coordinates.

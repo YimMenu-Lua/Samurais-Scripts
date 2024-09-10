@@ -812,6 +812,7 @@ SS = {
     end
   end,
 
+  --[[unused
   ---@param dword integer
   setWeaponEffectGroup = function(dword)
     local pedPtr            = memory.handle_to_ptr(self.get_ped())
@@ -824,6 +825,7 @@ SS = {
     -- local CWeaponFiringPatternInfo  = CWeaponInfo:add(0x0920)
     eEffectGroup:set_dword(dword)
   end,
+  ]]
 
   get_ceo_global_offset = function(crates)
     local offset

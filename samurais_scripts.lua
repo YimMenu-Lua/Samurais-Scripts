@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.2.5' -- v1.2.5
+SCRIPT_VERSION = '1.2.6' -- v1.2.6
 TARGET_BUILD   = '3274'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -22,6 +22,12 @@ default_config           = {
   shortcut_anim           = {},
   saved_vehicles          = {},
   persist_attachments     = {},
+  vmine_type              = {spikes = false, slick = false, explosive = false, emp = false, kinetic = false},
+  whouse_1_size           = {small = false, medium = false, large = false},
+  whouse_2_size           = {small = false, medium = false, large = false},
+  whouse_3_size           = {small = false, medium = false, large = false},
+  whouse_4_size           = {small = false, medium = false, large = false},
+  whouse_5_size           = {small = false, medium = false, large = false},
   Regen                   = false,
   -- objectiveTP             = false,
   disableTooltips         = false,
@@ -73,6 +79,7 @@ default_config           = {
   holdF                   = false,
   keepWheelsTurned        = false,
   noJacking               = false,
+  veh_mines               = false,
   towEverything           = false,
   noEngineBraking         = false,
   kersBoost               = false,
@@ -205,6 +212,8 @@ insta180                 = lua_cfg.read("insta180")
 flares_forall            = lua_cfg.read("flares_forall")
 real_plane_speed         = lua_cfg.read("real_plane_speed")
 unbreakableWindows       = lua_cfg.read("unbreakableWindows")
+veh_mines                = lua_cfg.read("veh_mines")
+vmine_type               = lua_cfg.read("vmine_type")
 towEverything            = lua_cfg.read("towEverything")
 noEngineBraking          = lua_cfg.read("noEngineBraking")
 kersBoost                = lua_cfg.read("kersBoost")
@@ -250,6 +259,11 @@ whouse_2_owned           = lua_cfg.read("whouse_2_owned")
 whouse_3_owned           = lua_cfg.read("whouse_3_owned")
 whouse_4_owned           = lua_cfg.read("whouse_4_owned")
 whouse_5_owned           = lua_cfg.read("whouse_5_owned")
+whouse_1_size            = lua_cfg.read("whouse_1_size")
+whouse_2_size            = lua_cfg.read("whouse_2_size")
+whouse_3_size            = lua_cfg.read("whouse_3_size")
+whouse_4_size            = lua_cfg.read("whouse_4_size")
+whouse_5_size            = lua_cfg.read("whouse_5_size")
 current_vehicle          = self.get_veh()
 last_vehicle             = self.get_veh()
 tab1Sound                = true
@@ -1882,15 +1896,14 @@ vehicle_tab:add_imgui(function()
   missiledefense, mdefUsed = ImGui.Checkbox("Missile Defense", missiledefense)
   UI.toolTip(false, translateLabel("missile_def_tt"))
   if mdefUsed then
-    UI.widgetSound("Radar")
     lua_cfg.save("missiledefense", missiledefense)
     if missiledefense then
+      UI.widgetSound("Radar")
       gui.show_success("Samurais Scripts", translateLabel("missile_def_on_notif"))
+    else
+      UI.widgetSound("Delete")
+      gui.show_message("Samurais Scripts", translateLabel("missile_def_off_notif"))
     end
-  end
-  if not missiledefense and mdefUsed then
-    UI.widgetSound("Delete")
-    gui.show_message("Samurais Scripts", translateLabel("missile_def_off_notif"))
   end
 
   launchCtrl, lctrlUsed = ImGui.Checkbox("Launch Control", launchCtrl)
@@ -2083,6 +2096,91 @@ vehicle_tab:add_imgui(function()
   if flappyDoorsUsed then
     UI.widgetSound("Nav2")
     lua_cfg.save("flappyDoors", flappyDoors)
+  end
+
+  veh_mines, vmnsUsed = ImGui.Checkbox("Vehicle Mines", veh_mines)
+  if vmnsUsed then
+    UI.widgetSound("Nav2")
+    lua_cfg.save("veh_mines", veh_mines)
+  end
+  UI.toolTip(false, "Equip any land vehicle with mines. Choose the type of mine you want then press [N] to use it.")
+  if veh_mines then
+    ImGui.SameLine(); ImGui.Dummy(35, 1); ImGui.SameLine();
+    if ImGui.Button("Select Mine Type") then
+      UI.widgetSound("Select")
+      ImGui.OpenPopup("Mine Types")
+    end
+    ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
+    ImGui.SetNextWindowBgAlpha(0.81)
+    if ImGui.BeginPopupModal("Mine Types", true, ImGuiWindowFlags.AlwaysAutoResize) then
+      ImGui.Dummy(1, 5); ImGui.Text("Choose which type of mine to equip:"); ImGui.Dummy(1, 5)
+      vmine_type.spikes, spikeUsed = ImGui.Checkbox("Spike", vmine_type.spikes)
+      if spikeUsed then
+        UI.widgetSound("Nav2")
+        vmine_type.slick     = false
+        vmine_type.explosive = false
+        vmine_type.emp       = false
+        vmine_type.kinetic   = false
+        lua_cfg.save("vmine_type", vmine_type)
+      end
+
+      ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+      vmine_type.slick, slickUsed = ImGui.Checkbox("Slick", vmine_type.slick)
+      if slickUsed then
+        UI.widgetSound("Nav2")
+        vmine_type.spikes    = false
+        vmine_type.explosive = false
+        vmine_type.emp       = false
+        vmine_type.kinetic   = false
+        lua_cfg.save("vmine_type", vmine_type)
+      end
+
+      ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+      vmine_type.explosive, expUsed = ImGui.Checkbox("Explosive", vmine_type.explosive)
+      if expUsed then
+        UI.widgetSound("Nav2")
+        vmine_type.spikes  = false
+        vmine_type.slick   = false
+        vmine_type.emp     = false
+        vmine_type.kinetic = false
+        lua_cfg.save("vmine_type", vmine_type)
+      end
+
+      ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+      vmine_type.emp, empUsed = ImGui.Checkbox("EMP", vmine_type.emp)
+      if empUsed then
+        UI.widgetSound("Nav2")
+        vmine_type.spikes    = false
+        vmine_type.slick     = false
+        vmine_type.explosive = false
+        vmine_type.kinetic   = false
+        lua_cfg.save("vmine_type", vmine_type)
+      end
+
+      ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+      vmine_type.kinetic, kntcUsed = ImGui.Checkbox("Kinetic", vmine_type.kinetic)
+      if kntcUsed then
+        UI.widgetSound("Nav2")
+        vmine_type.spikes    = false
+        vmine_type.slick     = false
+        vmine_type.explosive = false
+        vmine_type.emp       = false
+        lua_cfg.save("vmine_type", vmine_type)
+      end
+
+      ImGui.Dummy(1, 5)
+      if missiledefense and (vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic) then
+        UI.coloredText("[ ! ] NOTE: You have 'Missile Defense' activated which will automatically destroy / remove these mines. If you still want to use them, please disable 'Missile Defense'.", "yellow", 0.69, 30)
+      end
+      ImGui.Dummy(1, 5)
+      if vmine_type.spikes or vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic then
+        if ImGui.Button("Confirm") then
+          lua_cfg.save("vmine_type", vmine_type)
+          ImGui.CloseCurrentPopup()
+        end
+      end
+      ImGui.End()
+    end
   end
 
   ImGui.Dummy(1, 5); rgbLights, rgbToggled = ImGui.Checkbox(translateLabel("rgbLights"), rgbLights)
@@ -3621,42 +3719,74 @@ business_tab:add_imgui(function()
           wh1Total    = wh1Value * wh1Supplies
           ceo_moola   = wh1Total
           ImGui.SeparatorText(translateLabel("Warehouse") .. " 1")
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-          (wh1Supplies / 111), 240, 30)
-          if wh1Supplies < 111 then
-            ImGui.SameLine()
-            ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            if ImGui.Button(translateLabel("random_crates") .. "##wh1") then
-              stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
-            end
-            ImGui.EndDisabled()
-            ImGui.BeginDisabled(wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            ImGui.SameLine(); wh1_loop, wh1lUsed = ImGui.Checkbox("Auto##wh1", wh1_loop)
-            ImGui.EndDisabled()
-            if wh1lUsed then
-              UI.widgetSound("Nav2")
+          whouse_1_size.small, wh1sUsed = ImGui.Checkbox("Small", whouse_1_size.small); ImGui.SameLine()
+          if wh1sUsed then
+            UI.widgetSound("Nav2")
+            whouse_1_size.medium = false
+            whouse_1_size.large  = false
+            lua_cfg.save("whouse_1_size", whouse_1_size)
+          end
+          whouse_1_size.medium, wh1mUsed = ImGui.Checkbox("Medium", whouse_1_size.medium); ImGui.SameLine()
+          if wh1mUsed then
+            UI.widgetSound("Nav2")
+            whouse_1_size.small = false
+            whouse_1_size.large = false
+            lua_cfg.save("whouse_1_size", whouse_1_size)
+          end
+          whouse_1_size.large, wh1lUsed = ImGui.Checkbox("Large", whouse_1_size.large)
+          if wh1lUsed then
+            UI.widgetSound("Nav2")
+            whouse_1_size.small = false
+            whouse_1_size.medium = false
+            lua_cfg.save("whouse_1_size", whouse_1_size)
+          end
+          if whouse_1_size.small then
+            whouse1_max = 16
+          elseif whouse_1_size.medium then
+            whouse1_max = 42
+          elseif whouse_1_size.large then
+            whouse1_max = 111
+          end
+          if whouse_1_size.small or whouse_1_size.medium or whouse_1_size.large then
+            ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+            (wh1Supplies / whouse1_max), 240, 30)
+            if wh1Supplies < whouse1_max then
+              ImGui.SameLine()
+              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
+              if ImGui.Button(translateLabel("random_crates") .. "##wh1") then
+                stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
+              end
+              ImGui.EndDisabled()
+              ImGui.BeginDisabled(wh2_loop or wh3_loop or wh4_loop or wh5_loop)
+              ImGui.SameLine(); wh1_loop, wh1lUsed = ImGui.Checkbox("Auto##wh1", wh1_loop)
+              ImGui.EndDisabled()
+              if wh1lUsed then
+                UI.widgetSound("Nav2")
+                if wh1_loop then
+                  wh2_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
+                end
+              end
               if wh1_loop then
-                wh2_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
+                script.run_in_fiber(function(wh1l)
+                  repeat
+                    stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
+                    wh1l:sleep(800)
+                  until
+                    wh1Supplies == whouse1_max or wh1_loop == false
+                end)
+              end
+            else
+              if wh1_loop then
+                wh1_loop = false
               end
             end
-            if wh1_loop then
-              script.run_in_fiber(function(wh1l)
-                repeat
-                  stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
-                  wh1l:sleep(800)
-                until
-                  wh1Supplies == 111 or wh1_loop == false
-              end)
-            end
+            ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
+            ImGui.ProgressBar((wh1Supplies / whouse1_max), 240, 30,
+              tostring(wh1Supplies) .. " Crates (" .. tostring(math.floor((wh1Supplies / whouse1_max) * 100)) .. "%)")
+            ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh1Total))
           else
-            if wh1_loop then
-              wh1_loop = false
-            end
+            ImGui.Text("Please select your warehouse size.")
           end
-          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((wh1Supplies / 111), 240, 30,
-            tostring(wh1Supplies) .. " Crates (" .. tostring(math.floor((wh1Supplies / 111) * 100)) .. "%)")
-          ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh1Total))
         else
           whouse_2_owned, whouse_3_owned, whouse_4_owned, whouse_5_owned = false, false, false, false
         end
@@ -3670,42 +3800,74 @@ business_tab:add_imgui(function()
           wh2Total    = wh2Value * wh2Supplies
           ceo_moola   = wh1Total + wh2Total
           ImGui.SeparatorText(translateLabel("Warehouse") .. " 2")
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-          (wh2Supplies / 111), 240, 30)
-          if wh2Supplies < 111 then
-            ImGui.SameLine()
-            ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            if ImGui.Button(translateLabel("random_crates") .. "##wh2") then
-              stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
-            end
-            ImGui.EndDisabled()
-            ImGui.BeginDisabled(wh1_loop or wh3_loop or wh4_loop or wh5_loop)
-            ImGui.SameLine(); wh2_loop, wh2lUsed = ImGui.Checkbox("Auto##wh2", wh2_loop)
-            ImGui.EndDisabled()
-            if wh2lUsed then
-              UI.widgetSound("Nav2")
+          whouse_2_size.small, wh2sUsed = ImGui.Checkbox("Small##wh2", whouse_2_size.small); ImGui.SameLine()
+          if wh2sUsed then
+            UI.widgetSound("Nav2")
+            whouse_2_size.medium = false
+            whouse_2_size.large  = false
+            lua_cfg.save("whouse_2_size", whouse_2_size)
+          end
+          whouse_2_size.medium, wh2mUsed = ImGui.Checkbox("Medium##wh2", whouse_2_size.medium); ImGui.SameLine()
+          if wh2mUsed then
+            UI.widgetSound("Nav2")
+            whouse_2_size.small = false
+            whouse_2_size.large = false
+            lua_cfg.save("whouse_2_size", whouse_2_size)
+          end
+          whouse_2_size.large, wh2lUsed = ImGui.Checkbox("Large##wh2", whouse_2_size.large)
+          if wh2lUsed then
+            UI.widgetSound("Nav2")
+            whouse_2_size.small = false
+            whouse_2_size.medium = false
+            lua_cfg.save("whouse_2_size", whouse_2_size)
+          end
+          if whouse_2_size.small then
+            whouse2_max = 16
+          elseif whouse_2_size.medium then
+            whouse2_max = 42
+          elseif whouse_2_size.large then
+            whouse2_max = 111
+          end
+          if whouse_2_size.small or whouse_2_size.medium or whouse_2_size.large then
+            ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+            (wh2Supplies / whouse2_max), 240, 30)
+            if wh2Supplies < whouse2_max then
+              ImGui.SameLine()
+              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
+              if ImGui.Button(translateLabel("random_crates") .. "##wh2") then
+                stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
+              end
+              ImGui.EndDisabled()
+              ImGui.BeginDisabled(wh1_loop or wh3_loop or wh4_loop or wh5_loop)
+              ImGui.SameLine(); wh2_loop, wh2lUsed = ImGui.Checkbox("Auto##wh2", wh2_loop)
+              ImGui.EndDisabled()
+              if wh2lUsed then
+                UI.widgetSound("Nav2")
+                if wh2_loop then
+                  wh1_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
+                end
+              end
               if wh2_loop then
-                wh1_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
+                script.run_in_fiber(function(wh2l)
+                  repeat
+                    stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
+                    wh2l:sleep(800)
+                  until
+                    wh2Supplies == whouse2_max or wh2_loop == false
+                end)
+              end
+            else
+              if wh2_loop then
+                wh2_loop = false
               end
             end
-            if wh2_loop then
-              script.run_in_fiber(function(wh2l)
-                repeat
-                  stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
-                  wh2l:sleep(800)
-                until
-                  wh2Supplies == 111 or wh2_loop == false
-              end)
-            end
+            ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
+            ImGui.ProgressBar((wh2Supplies / whouse2_max), 240, 30,
+              tostring(wh2Supplies) .. " Crates (" .. tostring(math.floor((wh2Supplies / whouse2_max) * 100)) .. "%)")
+            ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh2Total))
           else
-            if wh2_loop then
-              wh2_loop = false
-            end
+            ImGui.Text("Please select your warehouse size.")
           end
-          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((wh2Supplies / 111), 240, 30,
-            tostring(wh2Supplies) .. " Crates (" .. tostring(math.floor((wh2Supplies / 111) * 100)) .. "%)")
-          ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh2Total))
         else
           whouse_3_owned, whouse_4_owned, whouse_5_owned = false, false, false
         end
@@ -3719,42 +3881,74 @@ business_tab:add_imgui(function()
           wh3Total    = wh3Value * wh3Supplies
           ceo_moola   = wh1Total + wh2Total + wh3Total
           ImGui.SeparatorText(translateLabel("Warehouse") .. " 3")
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-          (wh3Supplies / 111), 240, 30)
-          if wh3Supplies < 111 then
-            ImGui.SameLine()
-            ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            if ImGui.Button(translateLabel("random_crates") .. "##wh3") then
-              stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
-            end
-            ImGui.EndDisabled()
-            ImGui.BeginDisabled(wh1_loop or wh2_loop or wh4_loop or wh5_loop)
-            ImGui.SameLine(); wh3_loop, wh3lUsed = ImGui.Checkbox("Auto##wh3", wh3_loop)
-            ImGui.EndDisabled()
-            if wh3lUsed then
-              UI.widgetSound("Nav2")
+          whouse_3_size.small, wh3sUsed = ImGui.Checkbox("Small##wh3", whouse_3_size.small); ImGui.SameLine()
+          if wh3sUsed then
+            UI.widgetSound("Nav2")
+            whouse_3_size.medium = false
+            whouse_3_size.large  = false
+            lua_cfg.save("whouse_3_size", whouse_3_size)
+          end
+          whouse_3_size.medium, wh3mUsed = ImGui.Checkbox("Medium##wh3", whouse_3_size.medium); ImGui.SameLine()
+          if wh3mUsed then
+            UI.widgetSound("Nav2")
+            whouse_3_size.small = false
+            whouse_3_size.large = false
+            lua_cfg.save("whouse_3_size", whouse_3_size)
+          end
+          whouse_3_size.large, wh3lUsed = ImGui.Checkbox("Large##wh3", whouse_3_size.large)
+          if wh3lUsed then
+            UI.widgetSound("Nav2")
+            whouse_3_size.small  = false
+            whouse_3_size.medium = false
+            lua_cfg.save("whouse_3_size", whouse_3_size)
+          end
+          if whouse_3_size.small then
+            whouse3_max = 16
+          elseif whouse_3_size.medium then
+            whouse3_max = 42
+          elseif whouse_3_size.large then
+            whouse3_max = 111
+          end
+          if whouse_3_size.small or whouse_3_size.medium or whouse_3_size.large then
+            ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+            (wh3Supplies / whouse3_max), 240, 30)
+            if wh3Supplies < whouse3_max then
+              ImGui.SameLine()
+              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
+              if ImGui.Button(translateLabel("random_crates") .. "##wh3") then
+                stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
+              end
+              ImGui.EndDisabled()
+              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh4_loop or wh5_loop)
+              ImGui.SameLine(); wh3_loop, wh3lUsed = ImGui.Checkbox("Auto##wh3", wh3_loop)
+              ImGui.EndDisabled()
+              if wh3lUsed then
+                UI.widgetSound("Nav2")
+                if wh3_loop then
+                  wh1_loop, wh2_loop, wh4_loop, wh5_loop = false, false, false, false
+                end
+              end
               if wh3_loop then
-                wh1_loop, wh2_loop, wh4_loop, wh5_loop = false, false, false, false
+                script.run_in_fiber(function(wh3l)
+                  repeat
+                    stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
+                    wh3l:sleep(800)
+                  until
+                    wh3Supplies == whouse3_max or wh3_loop == false
+                end)
+              end
+            else
+              if wh3_loop then
+                wh3_loop = false
               end
             end
-            if wh3_loop then
-              script.run_in_fiber(function(wh3l)
-                repeat
-                  stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
-                  wh3l:sleep(800)
-                until
-                  wh3Supplies == 111 or wh3_loop == false
-              end)
-            end
+            ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
+            ImGui.ProgressBar((wh3Supplies / whouse3_max), 240, 30,
+              tostring(wh3Supplies) .. " Crates (" .. tostring(math.floor((wh3Supplies / whouse3_max) * 100)) .. "%)")
+            ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh3Total))
           else
-            if wh3_loop then
-              wh3_loop = false
-            end
+            ImGui.Text("Please select your warehouse size.")
           end
-          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((wh3Supplies / 111), 240, 30,
-            tostring(wh3Supplies) .. " Crates (" .. tostring(math.floor((wh3Supplies / 111) * 100)) .. "%)")
-          ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh3Total))
         else
           whouse_4_owned, whouse_5_owned = false, false
         end
@@ -3768,42 +3962,74 @@ business_tab:add_imgui(function()
           wh4Total    = wh4Value * wh4Supplies
           ceo_moola   = wh1Total + wh2Total + wh3Total + wh4Total
           ImGui.SeparatorText(translateLabel("Warehouse") .. " 4")
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-          (wh4Supplies / 111), 240, 30)
-          if wh4Supplies < 111 then
-            ImGui.SameLine()
-            ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            if ImGui.Button(translateLabel("random_crates") .. "##wh4") then
-              stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
-            end
-            ImGui.EndDisabled()
-            ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh5_loop)
-            ImGui.SameLine(); wh4_loop, wh4lUsed = ImGui.Checkbox("Auto##wh4", wh4_loop)
-            ImGui.EndDisabled()
-            if wh4lUsed then
-              UI.widgetSound("Nav2")
+          whouse_4_size.small, wh4sUsed = ImGui.Checkbox("Small##wh4", whouse_4_size.small); ImGui.SameLine()
+          if wh4sUsed then
+            UI.widgetSound("Nav2")
+            whouse_4_size.medium = false
+            whouse_4_size.large  = false
+            lua_cfg.save("whouse_4_size", whouse_4_size)
+          end
+          whouse_4_size.medium, wh4mUsed = ImGui.Checkbox("Medium##wh4", whouse_4_size.medium); ImGui.SameLine()
+          if wh4mUsed then
+            UI.widgetSound("Nav2")
+            whouse_4_size.small = false
+            whouse_4_size.large = false
+            lua_cfg.save("whouse_4_size", whouse_4_size)
+          end
+          whouse_4_size.large, wh4lUsed = ImGui.Checkbox("Large##wh4", whouse_4_size.large)
+          if wh4lUsed then
+            UI.widgetSound("Nav2")
+            whouse_4_size.small  = false
+            whouse_4_size.medium = false
+            lua_cfg.save("whouse_4_size", whouse_4_size)
+          end
+          if whouse_4_size.small then
+            whouse4_max = 16
+          elseif whouse_4_size.medium then
+            whouse4_max = 42
+          elseif whouse_4_size.large then
+            whouse4_max = 111
+          end
+          if whouse_4_size.small or whouse_4_size.medium or whouse_4_size.large then
+            ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+            (wh4Supplies / whouse4_max), 240, 30)
+            if wh4Supplies < whouse4_max then
+              ImGui.SameLine()
+              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
+              if ImGui.Button(translateLabel("random_crates") .. "##wh4") then
+                stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
+              end
+              ImGui.EndDisabled()
+              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh5_loop)
+              ImGui.SameLine(); wh4_loop, wh4lUsed = ImGui.Checkbox("Auto##wh4", wh4_loop)
+              ImGui.EndDisabled()
+              if wh4lUsed then
+                UI.widgetSound("Nav2")
+                if wh4_loop then
+                  wh1_loop, wh2_loop, wh3_loop, wh5_loop = false, false, false, false
+                end
+              end
               if wh4_loop then
-                wh1_loop, wh2_loop, wh3_loop, wh5_loop = false, false, false, false
+                script.run_in_fiber(function(wh4l)
+                  repeat
+                    stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
+                    wh4l:sleep(800)
+                  until
+                    wh4Supplies == whouse4_max or wh4_loop == false
+                end)
+              end
+            else
+              if wh4_loop then
+                wh4_loop = false
               end
             end
-            if wh4_loop then
-              script.run_in_fiber(function(wh4l)
-                repeat
-                  stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
-                  wh4l:sleep(800)
-                until
-                  wh4Supplies == 111 or wh4_loop == false
-              end)
-            end
+            ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
+            ImGui.ProgressBar((wh4Supplies / whouse4_max), 240, 30,
+              tostring(wh4Supplies) .. " Crates (" .. tostring(math.floor((wh4Supplies / whouse4_max) * 100)) .. "%)")
+            ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh4Total))
           else
-            if wh4_loop then
-              wh4_loop = false
-            end
+            ImGui.Text("Please select your warehouse size.")
           end
-          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((wh4Supplies / 111), 240, 30,
-            tostring(wh4Supplies) .. " Crates (" .. tostring(math.floor((wh4Supplies / 111) * 100)) .. "%)")
-          ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh4Total))
         else
           whouse_5_owned = false
         end
@@ -3817,42 +4043,74 @@ business_tab:add_imgui(function()
           wh5Total    = wh5Value * wh5Supplies
           ceo_moola   = wh1Total + wh2Total + wh3Total + wh4Total + wh5Total
           ImGui.SeparatorText(translateLabel("Warehouse") .. " 5")
-          ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-          (wh5Supplies / 111), 240, 30)
-          if wh5Supplies < 111 then
-            ImGui.SameLine()
-            ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-            if ImGui.Button(translateLabel("random_crates") .. "##wh5") then
-              stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
-            end
-            ImGui.EndDisabled()
-            ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop)
-            ImGui.SameLine(); wh5_loop, wh5lUsed = ImGui.Checkbox("Auto##wh5", wh5_loop)
-            ImGui.EndDisabled()
-            if wh5lUsed then
-              UI.widgetSound("Nav2")
+          whouse_5_size.small, wh5sUsed = ImGui.Checkbox("Small##wh5", whouse_5_size.small); ImGui.SameLine()
+          if wh5sUsed then
+            UI.widgetSound("Nav2")
+            whouse_5_size.medium = false
+            whouse_5_size.large  = false
+            lua_cfg.save("whouse_5_size", whouse_5_size)
+          end
+          whouse_5_size.medium, wh5mUsed = ImGui.Checkbox("Medium##wh5", whouse_5_size.medium); ImGui.SameLine()
+          if wh5mUsed then
+            UI.widgetSound("Nav2")
+            whouse_5_size.small = false
+            whouse_5_size.large = false
+            lua_cfg.save("whouse_5_size", whouse_5_size)
+          end
+          whouse_5_size.large, wh5lUsed = ImGui.Checkbox("Large##wh5", whouse_5_size.large)
+          if wh5lUsed then
+            UI.widgetSound("Nav2")
+            whouse_5_size.small  = false
+            whouse_5_size.medium = false
+            lua_cfg.save("whouse_5_size", whouse_5_size)
+          end
+          if whouse_5_size.small then
+            whouse5_max = 16
+          elseif whouse_5_size.medium then
+            whouse5_max = 42
+          elseif whouse_5_size.large then
+            whouse5_max = 111
+          end
+          if whouse_5_size.small or whouse_5_size.medium or whouse_5_size.large then
+            ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
+            (wh5Supplies / whouse5_max), 240, 30)
+            if wh5Supplies < whouse5_max then
+              ImGui.SameLine()
+              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
+              if ImGui.Button(translateLabel("random_crates") .. "##wh5") then
+                stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
+              end
+              ImGui.EndDisabled()
+              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop)
+              ImGui.SameLine(); wh5_loop, wh5lUsed = ImGui.Checkbox("Auto##wh5", wh5_loop)
+              ImGui.EndDisabled()
+              if wh5lUsed then
+                UI.widgetSound("Nav2")
+                if wh5_loop then
+                  wh1_loop, wh2_loop, wh3_loop, wh4_loop = false, false, false, false
+                end
+              end
               if wh5_loop then
-                wh1_loop, wh2_loop, wh3_loop, wh4_loop = false, false, false, false
+                script.run_in_fiber(function(wh5l)
+                  repeat
+                    stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
+                    wh5l:sleep(800)
+                  until
+                    wh5Supplies == whouse5_max or wh5_loop == false
+                end)
+              end
+            else
+              if wh5_loop then
+                wh5_loop = false
               end
             end
-            if wh5_loop then
-              script.run_in_fiber(function(wh5l)
-                repeat
-                  stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
-                  wh5l:sleep(800)
-                until
-                  wh5Supplies == 111 or wh5_loop == false
-              end)
-            end
+            ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
+            ImGui.ProgressBar((wh5Supplies / whouse5_max), 240, 30,
+              tostring(wh5Supplies) .. " Crates (" .. tostring(math.floor((wh5Supplies / whouse5_max) * 100)) .. "%)")
+            ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh5Total))
           else
-            if wh5_loop then
-              wh5_loop = false
-            end
+            ImGui.Text("Please select your warehouse size.")
           end
-          ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((wh5Supplies / 111), 240, 30,
-            tostring(wh5Supplies) .. " Crates (" .. tostring(math.floor((wh5Supplies / 111) * 100)) .. "%)")
-          ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh5Total))
         end
         ImGui.Separator(); ImGui.Spacing(); ImGui.Text("Total Value: " .. lua_Fn.formatMoney(ceo_moola))
         ImGui.EndTabItem()
@@ -6608,8 +6866,13 @@ settings_tab:add_imgui(function()
     UI.coloredText(translateLabel("confirm_txt"), "yellow", 1, 20)
     if ImGui.Button("  " .. translateLabel("yes") .. "  ") then
       UI.widgetSound("Select2")
-      lua_cfg.reset(default_config)
       shortcut_anim           = {}
+      vmine_type              = {spikes = false, slick = false, explosive = false, emp = false, kinetic = false}
+      whouse_1_size           = {small = false, medium = false, large = false}
+      whouse_2_size           = {small = false, medium = false, large = false}
+      whouse_3_size           = {small = false, medium = false, large = false}
+      whouse_4_size           = {small = false, medium = false, large = false}
+      whouse_5_size           = {small = false, medium = false, large = false}
       Regen                   = false
       -- objectiveTP             = false
       disableTooltips         = false
@@ -6717,6 +6980,7 @@ settings_tab:add_imgui(function()
       whouse_3_owned          = false
       whouse_4_owned          = false
       whouse_5_owned          = false
+      veh_mines               = false
       laser_switch            = 0
       DriftIntensity          = 0
       lang_idx                = 0
@@ -6728,6 +6992,7 @@ settings_tab:add_imgui(function()
       laser_choice            = "proj_laser_enemy"
       LANG                    = "en-US"
       current_lang            = "English"
+      lua_cfg.reset(default_config)
       ImGui.CloseCurrentPopup()
     end
     ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
@@ -7572,6 +7837,7 @@ script.register_looped("auto-kill-enemies", function(ak)
                   VEHICLE.SET_VEHICLE_TYRE_BURST(enemy_vehicle, i, false, 1000.0)
                 end
               end
+              PED.APPLY_DAMAGE_TO_PED(p, 100000, true, 0, 0x7FD62962)
               -- NETWORK.NETWORK_EXPLODE_VEHICLE(enemy_vehicle, true, false, 0)
             end
           else
@@ -7625,7 +7891,7 @@ script.register_looped("Katana", function(rpq)
             katana = OBJECT.CREATE_OBJECT(0xE2BA016F, q_coords.x, q_coords.y, q_coords.z + 50, true, false, true)
             if ENTITY.DOES_ENTITY_EXIST(katana) then
               ENTITY.SET_ENTITY_ALPHA(pool_q, 0, false)
-              rpq:sleep(300)
+              rpq:sleep(100)
               ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.025, 0.0, 0.0, 0.0, false, false, false, false,
                 2, true, 0)
               ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(katana)
@@ -8293,6 +8559,47 @@ script.register_looped("PBSE", function(pnbse)
         pnbse:sleep(10)
       until started_popSound2 == false
       EVENT.REMOVE_SHOCKING_EVENT(loud_pops_event)
+    end
+  end
+end)
+-- vehicle mines
+script.register_looped("VEHMNS", function(vmns)
+  if Game.Self.isDriving() then
+    if veh_mines and current_vehicle ~= 0 and (is_car or is_bike or is_quad) then
+      local bone_n
+      local mine_hash
+      if is_car then
+        bone_n = "neon_b"
+      elseif is_bike or is_quad then
+        bone_n = "chassis_dummy"
+      end
+      if vmine_type.spikes then
+        mine_hash = -647126932
+      elseif vmine_type.slick then
+        mine_hash = 1459276487
+      elseif vmine_type.explosive then
+        mine_hash = 1508567460
+      elseif vmine_type.emp then
+        mine_hash = 1776356704
+      elseif vmine_type.kinetic then
+        mine_hash = 1007245390
+      else
+        mine_hash = -647126932 -- default to spikes if nothing else was selected.
+      end
+      local bone_idx = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(self.get_veh(), bone_n)
+      if PAD.IS_CONTROL_JUST_PRESSED(0, 249) then
+        if Game.requestWeaponAsset(mine_hash) then
+          if bone_idx ~= -1 then
+            local bone_pos = ENTITY.GET_ENTITY_BONE_POSTION(self.get_veh(), bone_idx)
+            local check, ground_z = MISC.GET_GROUND_Z_FOR_3D_COORD(bone_pos.x, bone_pos.y, bone_pos.z, ground_z, false, false)
+            MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(bone_pos.x, bone_pos.y, bone_pos.z,
+              bone_pos.x, bone_pos.y, ground_z,
+              0.0, false, mine_hash, self.get_ped(), true, false, 0.01
+            )
+          end
+        end
+        vmns:sleep(969)
+      end
     end
   end
 end)
