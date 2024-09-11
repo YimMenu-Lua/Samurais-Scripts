@@ -1,33 +1,49 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.2.6' -- v1.2.6
+SCRIPT_VERSION = '1.2.7' -- v1.2.7
 TARGET_BUILD   = '3274'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
 
 
 require('lib/samurais_utils')
-require('lib/Translations')
-require('data/objects')
-require('data/actions')
-require('data/refs')
 
-CURRENT_BUILD            = Game.GetBuildNumber()
-CURRENT_VERSION          = Game.GetOnlineVersion()
+CURRENT_BUILD          = Game.GetBuildNumber()
+CURRENT_VERSION        = Game.GetOnlineVersion()
 
-Samurais_scripts         = gui.add_tab("Samurai's Scripts")
-local loading_label      = ""
-local start_loading_anim = false
-default_config           = {
+Samurais_scripts       = gui.add_tab("Samurai's Scripts")
+loading_label          = ""
+start_loading_anim     = false
+default_config         = {
   shortcut_anim           = {},
   saved_vehicles          = {},
   persist_attachments     = {},
-  vmine_type              = {spikes = false, slick = false, explosive = false, emp = false, kinetic = false},
-  whouse_1_size           = {small = false, medium = false, large = false},
-  whouse_2_size           = {small = false, medium = false, large = false},
-  whouse_3_size           = {small = false, medium = false, large = false},
-  whouse_4_size           = {small = false, medium = false, large = false},
-  whouse_5_size           = {small = false, medium = false, large = false},
+  vmine_type              = { spikes = false, slick = false, explosive = false, emp = false, kinetic = false },
+  whouse_1_size           = { small = false, medium = false, large = false },
+  whouse_2_size           = { small = false, medium = false, large = false },
+  whouse_3_size           = { small = false, medium = false, large = false },
+  whouse_4_size           = { small = false, medium = false, large = false },
+  whouse_5_size           = { small = false, medium = false, large = false },
+  keybinds                = {
+    tdBtn         = { code = 0x10, name = "[Shift]" },
+    nosBtn        = { code = 0x10, name = "[Shift]" },
+    stop_anim     = { code = 0x47, name = "[G]" },
+    play_anim     = { code = 0x2E, name = "[DEL]" },
+    previous_anim = { code = 0x21, name = "[PAGE UP]" },
+    next_anim     = { code = 0x22, name = "[PAGE DOWN]" },
+    flatbedBtn    = { code = 0x58, name = "[X]" },
+    purgeBtn      = { code = 0x58, name = "[X]" },
+    autokill      = { code = 0x76, name = "[F7]" },
+    enemiesFlee   = { code = 0x77, name = "[F8]" },
+    vehicle_mine  = { code = 0x4E, name = "[N]" },
+  },
+  gpad_keybinds           = {
+    tdBtn        = { code = 0, name = "[Unbound]" },
+    nosBtn       = { code = 0, name = "[Unbound]" },
+    flatbedBtn   = { code = 0, name = "[Unbound]" },
+    purgeBtn     = { code = 0, name = "[Unbound]" },
+    vehicle_mine = { code = 0, name = "[Unbound]" },
+  },
   Regen                   = false,
   -- objectiveTP             = false,
   disableTooltips         = false,
@@ -151,246 +167,261 @@ default_config           = {
   current_lang            = 'English',
 }
 
-LANG                     = lua_cfg.read("LANG")
-current_lang             = lua_cfg.read("current_lang")
-Regen                    = lua_cfg.read("Regen")
+LANG                   = lua_cfg.read("LANG")
+current_lang           = lua_cfg.read("current_lang")
+keybinds               = lua_cfg.read("keybinds")
+gpad_keybinds          = lua_cfg.read("gpad_keybinds")
+Regen                  = lua_cfg.read("Regen")
 -- objectiveTP              = lua_cfg.read("objectiveTP")
-phoneAnim                = lua_cfg.read("phoneAnim")
-sprintInside             = lua_cfg.read("sprintInside")
-lockPick                 = lua_cfg.read("lockPick")
-replaceSneakAnim         = lua_cfg.read("replaceSneakAnim")
-replacePointAct          = lua_cfg.read("replacePointAct")
-disableActionMode        = lua_cfg.read("disableActionMode")
-rod                      = lua_cfg.read("rod")
-clumsy                   = lua_cfg.read("clumsy")
-ragdoll_sound            = lua_cfg.read("ragdoll_sound")
-manualFlags              = lua_cfg.read("manualFlags")
-controllable             = lua_cfg.read("controllable")
-looped                   = lua_cfg.read("looped")
-upperbody                = lua_cfg.read("upperbody")
-freeze                   = lua_cfg.read("freeze")
-disableProps             = lua_cfg.read("disableProps")
-npc_godMode              = lua_cfg.read("npc_godMode")
-usePlayKey               = lua_cfg.read("usePlayKey")
-shortcut_anim            = lua_cfg.read("shortcut_anim")
-Triggerbot               = lua_cfg.read("Triggerbot")
-aimEnemy                 = lua_cfg.read("aimEnemy")
-autoKill                 = lua_cfg.read("autoKill")
-runaway                  = lua_cfg.read("runaway")
-laserSight               = lua_cfg.read("laserSight")
-laser_switch             = lua_cfg.read("laser_switch")
-laser_choice             = lua_cfg.read("laser_choice")
-driftMode                = lua_cfg.read("driftMode")
-DriftIntensity           = lua_cfg.read("DriftIntensity")
-DriftPowerIncrease       = lua_cfg.read("DriftPowerIncrease")
-DriftTires               = lua_cfg.read("DriftTires")
-DriftSmoke               = lua_cfg.read("DriftSmoke")
-BurnoutSmoke             = lua_cfg.read("BurnoutSmoke")
-driftMinigame            = lua_cfg.read("driftMinigame")
-driftPB                  = lua_cfg.read("driftPB")
-speedBoost               = lua_cfg.read("speedBoost")
-nosvfx                   = lua_cfg.read("nosvfx")
-hornLight                = lua_cfg.read("hornLight")
-nosPurge                 = lua_cfg.read("nosPurge")
-nosPower                 = lua_cfg.read("nosPower")
-nosAudio                 = lua_cfg.read("nosAudio")
-nosBtn                   = lua_cfg.read("nosBtn")
-nosFlames                = lua_cfg.read("nosFlames")
-lightSpeed               = lua_cfg.read("lightSpeed")
-loud_radio               = lua_cfg.read("loud_radio")
-launchCtrl               = lua_cfg.read("launchCtrl")
-popsNbangs               = lua_cfg.read("popsNbangs")
-louderPops               = lua_cfg.read("louderPops")
-limitVehOptions          = lua_cfg.read("limitVehOptions")
-missiledefense           = lua_cfg.read("missiledefense")
-autobrklight             = lua_cfg.read("autobrklight")
-rgbLights                = lua_cfg.read("rgbLights")
-holdF                    = lua_cfg.read("holdF")
-keepWheelsTurned         = lua_cfg.read("keepWheelsTurned")
-noJacking                = lua_cfg.read("noJacking")
-insta180                 = lua_cfg.read("insta180")
-flares_forall            = lua_cfg.read("flares_forall")
-real_plane_speed         = lua_cfg.read("real_plane_speed")
-unbreakableWindows       = lua_cfg.read("unbreakableWindows")
-veh_mines                = lua_cfg.read("veh_mines")
-vmine_type               = lua_cfg.read("vmine_type")
-towEverything            = lua_cfg.read("towEverything")
-noEngineBraking          = lua_cfg.read("noEngineBraking")
-kersBoost                = lua_cfg.read("kersBoost")
-offroaderx2              = lua_cfg.read("offroaderx2")
-rallyTires               = lua_cfg.read("rallyTires")
-noTractionCtrl           = lua_cfg.read("noTractionCtrl")
-easyWheelie              = lua_cfg.read("easyWheelie")
-rwSteering               = lua_cfg.read("rwSteering")
-awSteering               = lua_cfg.read("awSteering")
-handbrakeSteering        = lua_cfg.read("handbrakeSteering")
-extend_world             = lua_cfg.read("extend_world")
-disableFlightMusic       = lua_cfg.read("disableFlightMusic")
-disable_quotes           = lua_cfg.read("disable_quotes")
-disable_mdef_logs        = lua_cfg.read("disable_mdef_logs")
-replace_pool_q           = lua_cfg.read("replace_pool_q")
-public_seats             = lua_cfg.read("public_seats")
-mc_work_cd               = lua_cfg.read("mc_work_cd")
-hangar_cd                = lua_cfg.read("hangar_cd")
-nc_management_cd         = lua_cfg.read("nc_management_cd")
-nc_vip_mission_chance    = lua_cfg.read("nc_vip_mission_chance")
-security_missions_cd     = lua_cfg.read("security_missions_cd")
-ie_vehicle_steal_cd      = lua_cfg.read("ie_vehicle_steal_cd")
-ie_vehicle_sell_cd       = lua_cfg.read("ie_vehicle_sell_cd")
-ceo_crate_buy_cd         = lua_cfg.read("ceo_crate_buy_cd")
-ceo_crate_sell_cd        = lua_cfg.read("ceo_crate_sell_cd")
-ceo_crate_buy_f_cd       = lua_cfg.read("ceo_crate_buy_f_cd")
-ceo_crate_sell_f_cd      = lua_cfg.read("ceo_crate_sell_f_cd")
-cashUpdgrade1            = lua_cfg.read("cashUpdgrade1")
-cashUpdgrade2            = lua_cfg.read("cashUpdgrade2")
-cokeUpdgrade1            = lua_cfg.read("cokeUpdgrade1")
-cokeUpdgrade2            = lua_cfg.read("cokeUpdgrade2")
-methUpdgrade1            = lua_cfg.read("methUpdgrade1")
-methUpdgrade2            = lua_cfg.read("methUpdgrade2")
-weedUpdgrade1            = lua_cfg.read("weedUpdgrade1")
-weedUpdgrade2            = lua_cfg.read("weedUpdgrade2")
-fdUpdgrade1              = lua_cfg.read("fdUpdgrade1")
-fdUpdgrade2              = lua_cfg.read("fdUpdgrade2")
-bunkerUpdgrade1          = lua_cfg.read("bunkerUpdgrade1")
-bunkerUpdgrade2          = lua_cfg.read("bunkerUpdgrade2")
-acidUpdgrade             = lua_cfg.read("acidUpdgrade")
-whouse_1_owned           = lua_cfg.read("whouse_1_owned")
-whouse_2_owned           = lua_cfg.read("whouse_2_owned")
-whouse_3_owned           = lua_cfg.read("whouse_3_owned")
-whouse_4_owned           = lua_cfg.read("whouse_4_owned")
-whouse_5_owned           = lua_cfg.read("whouse_5_owned")
-whouse_1_size            = lua_cfg.read("whouse_1_size")
-whouse_2_size            = lua_cfg.read("whouse_2_size")
-whouse_3_size            = lua_cfg.read("whouse_3_size")
-whouse_4_size            = lua_cfg.read("whouse_4_size")
-whouse_5_size            = lua_cfg.read("whouse_5_size")
-current_vehicle          = self.get_veh()
-last_vehicle             = self.get_veh()
-tab1Sound                = true
-tab2Sound                = true
-tab3Sound                = true
-is_playing_anim          = false
-is_shortcut_anim         = false
-anim_music               = false
-is_playing_scenario      = false
-is_playing_radio         = false
-aimBool                  = false
-HashGrabber              = false
-drew_laser               = false
-isCrouched               = false
-is_handsUp               = false
-is_car                   = false
-is_quad                  = false
-is_boat                  = false
-is_bike                  = false
-validModel               = false
-has_xenon                = false
-tire_smoke               = false
-drift_started            = false
-purge_started            = false
-nos_started              = false
-twostep_started          = false
-is_typing                = false
-open_sounds_window       = false
-started_lct              = false
-launch_active            = false
-started_popSound         = false
-started_popSound2        = false
-customSmokeCol           = false
-pedGrabber               = false
-ped_grabbed              = false
-vehicleGrabber           = false
-vehicle_grabbed          = false
-carpool                  = false
-show_npc_veh_ctrls       = false
-stop_searching           = false
-hijack_started           = false
-sound_btn_off            = false
-is_drifting              = false
-start_rgb_loop           = false
-ubwindowsToggled         = false
-default_pops_disabled    = false
-engine_brake_disabled    = false
-traction_ctrl_disabled   = false
-kers_boost_enabled       = false
-offroader_enabled        = false
-rally_tires_enabled      = false
-easy_wheelie_enabled     = false
+phoneAnim              = lua_cfg.read("phoneAnim")
+sprintInside           = lua_cfg.read("sprintInside")
+lockPick               = lua_cfg.read("lockPick")
+replaceSneakAnim       = lua_cfg.read("replaceSneakAnim")
+replacePointAct        = lua_cfg.read("replacePointAct")
+disableActionMode      = lua_cfg.read("disableActionMode")
+rod                    = lua_cfg.read("rod")
+clumsy                 = lua_cfg.read("clumsy")
+ragdoll_sound          = lua_cfg.read("ragdoll_sound")
+manualFlags            = lua_cfg.read("manualFlags")
+controllable           = lua_cfg.read("controllable")
+looped                 = lua_cfg.read("looped")
+upperbody              = lua_cfg.read("upperbody")
+freeze                 = lua_cfg.read("freeze")
+disableProps           = lua_cfg.read("disableProps")
+npc_godMode            = lua_cfg.read("npc_godMode")
+usePlayKey             = lua_cfg.read("usePlayKey")
+shortcut_anim          = lua_cfg.read("shortcut_anim")
+Triggerbot             = lua_cfg.read("Triggerbot")
+aimEnemy               = lua_cfg.read("aimEnemy")
+autoKill               = lua_cfg.read("autoKill")
+runaway                = lua_cfg.read("runaway")
+laserSight             = lua_cfg.read("laserSight")
+laser_switch           = lua_cfg.read("laser_switch")
+laser_choice           = lua_cfg.read("laser_choice")
+driftMode              = lua_cfg.read("driftMode")
+DriftIntensity         = lua_cfg.read("DriftIntensity")
+DriftPowerIncrease     = lua_cfg.read("DriftPowerIncrease")
+DriftTires             = lua_cfg.read("DriftTires")
+DriftSmoke             = lua_cfg.read("DriftSmoke")
+BurnoutSmoke           = lua_cfg.read("BurnoutSmoke")
+driftMinigame          = lua_cfg.read("driftMinigame")
+driftPB                = lua_cfg.read("driftPB")
+speedBoost             = lua_cfg.read("speedBoost")
+nosvfx                 = lua_cfg.read("nosvfx")
+hornLight              = lua_cfg.read("hornLight")
+nosPurge               = lua_cfg.read("nosPurge")
+nosPower               = lua_cfg.read("nosPower")
+nosAudio               = lua_cfg.read("nosAudio")
+nosBtn                 = lua_cfg.read("nosBtn")
+nosFlames              = lua_cfg.read("nosFlames")
+lightSpeed             = lua_cfg.read("lightSpeed")
+loud_radio             = lua_cfg.read("loud_radio")
+launchCtrl             = lua_cfg.read("launchCtrl")
+popsNbangs             = lua_cfg.read("popsNbangs")
+louderPops             = lua_cfg.read("louderPops")
+limitVehOptions        = lua_cfg.read("limitVehOptions")
+missiledefense         = lua_cfg.read("missiledefense")
+autobrklight           = lua_cfg.read("autobrklight")
+rgbLights              = lua_cfg.read("rgbLights")
+holdF                  = lua_cfg.read("holdF")
+keepWheelsTurned       = lua_cfg.read("keepWheelsTurned")
+noJacking              = lua_cfg.read("noJacking")
+insta180               = lua_cfg.read("insta180")
+flares_forall          = lua_cfg.read("flares_forall")
+real_plane_speed       = lua_cfg.read("real_plane_speed")
+unbreakableWindows     = lua_cfg.read("unbreakableWindows")
+veh_mines              = lua_cfg.read("veh_mines")
+vmine_type             = lua_cfg.read("vmine_type")
+towEverything          = lua_cfg.read("towEverything")
+noEngineBraking        = lua_cfg.read("noEngineBraking")
+kersBoost              = lua_cfg.read("kersBoost")
+offroaderx2            = lua_cfg.read("offroaderx2")
+rallyTires             = lua_cfg.read("rallyTires")
+noTractionCtrl         = lua_cfg.read("noTractionCtrl")
+easyWheelie            = lua_cfg.read("easyWheelie")
+rwSteering             = lua_cfg.read("rwSteering")
+awSteering             = lua_cfg.read("awSteering")
+handbrakeSteering      = lua_cfg.read("handbrakeSteering")
+extend_world           = lua_cfg.read("extend_world")
+disableFlightMusic     = lua_cfg.read("disableFlightMusic")
+disable_quotes         = lua_cfg.read("disable_quotes")
+disable_mdef_logs      = lua_cfg.read("disable_mdef_logs")
+replace_pool_q         = lua_cfg.read("replace_pool_q")
+public_seats           = lua_cfg.read("public_seats")
+mc_work_cd             = lua_cfg.read("mc_work_cd")
+hangar_cd              = lua_cfg.read("hangar_cd")
+nc_management_cd       = lua_cfg.read("nc_management_cd")
+nc_vip_mission_chance  = lua_cfg.read("nc_vip_mission_chance")
+security_missions_cd   = lua_cfg.read("security_missions_cd")
+ie_vehicle_steal_cd    = lua_cfg.read("ie_vehicle_steal_cd")
+ie_vehicle_sell_cd     = lua_cfg.read("ie_vehicle_sell_cd")
+ceo_crate_buy_cd       = lua_cfg.read("ceo_crate_buy_cd")
+ceo_crate_sell_cd      = lua_cfg.read("ceo_crate_sell_cd")
+ceo_crate_buy_f_cd     = lua_cfg.read("ceo_crate_buy_f_cd")
+ceo_crate_sell_f_cd    = lua_cfg.read("ceo_crate_sell_f_cd")
+cashUpdgrade1          = lua_cfg.read("cashUpdgrade1")
+cashUpdgrade2          = lua_cfg.read("cashUpdgrade2")
+cokeUpdgrade1          = lua_cfg.read("cokeUpdgrade1")
+cokeUpdgrade2          = lua_cfg.read("cokeUpdgrade2")
+methUpdgrade1          = lua_cfg.read("methUpdgrade1")
+methUpdgrade2          = lua_cfg.read("methUpdgrade2")
+weedUpdgrade1          = lua_cfg.read("weedUpdgrade1")
+weedUpdgrade2          = lua_cfg.read("weedUpdgrade2")
+fdUpdgrade1            = lua_cfg.read("fdUpdgrade1")
+fdUpdgrade2            = lua_cfg.read("fdUpdgrade2")
+bunkerUpdgrade1        = lua_cfg.read("bunkerUpdgrade1")
+bunkerUpdgrade2        = lua_cfg.read("bunkerUpdgrade2")
+acidUpdgrade           = lua_cfg.read("acidUpdgrade")
+whouse_1_owned         = lua_cfg.read("whouse_1_owned")
+whouse_2_owned         = lua_cfg.read("whouse_2_owned")
+whouse_3_owned         = lua_cfg.read("whouse_3_owned")
+whouse_4_owned         = lua_cfg.read("whouse_4_owned")
+whouse_5_owned         = lua_cfg.read("whouse_5_owned")
+whouse_1_size          = lua_cfg.read("whouse_1_size")
+whouse_2_size          = lua_cfg.read("whouse_2_size")
+whouse_3_size          = lua_cfg.read("whouse_3_size")
+whouse_4_size          = lua_cfg.read("whouse_4_size")
+whouse_5_size          = lua_cfg.read("whouse_5_size")
+current_vehicle        = self.get_veh()
+last_vehicle           = self.get_veh()
+tab1Sound              = true
+tab2Sound              = true
+tab3Sound              = true
+is_playing_anim        = false
+is_shortcut_anim       = false
+anim_music             = false
+is_playing_scenario    = false
+is_playing_radio       = false
+aimBool                = false
+HashGrabber            = false
+drew_laser             = false
+isCrouched             = false
+is_handsUp             = false
+is_car                 = false
+is_quad                = false
+is_boat                = false
+is_bike                = false
+validModel             = false
+has_xenon              = false
+tire_smoke             = false
+drift_started          = false
+purge_started          = false
+nos_started            = false
+twostep_started        = false
+is_typing              = false
+is_setting_hotkeys     = false
+open_sounds_window     = false
+started_lct            = false
+launch_active          = false
+started_popSound       = false
+started_popSound2      = false
+customSmokeCol         = false
+pedGrabber             = false
+ped_grabbed            = false
+vehicleGrabber         = false
+vehicle_grabbed        = false
+carpool                = false
+show_npc_veh_ctrls     = false
+stop_searching         = false
+hijack_started         = false
+sound_btn_off          = false
+is_drifting            = false
+start_rgb_loop         = false
+ubwindowsToggled       = false
+default_pops_disabled  = false
+engine_brake_disabled  = false
+traction_ctrl_disabled = false
+kers_boost_enabled     = false
+offroader_enabled      = false
+rally_tires_enabled    = false
+easy_wheelie_enabled   = false
 -- rw_steering_enabled      = false
 -- aw_steering_enabled      = false
 -- hb_steering_enabled      = false
-world_extended           = false
-autopilot_waypoint       = false
-autopilot_objective      = false
-autopilot_random         = false
-flight_music_off         = false
-loud_radio_enabled       = false
-q_replaced               = false
-is_sitting               = false
-flag                     = 0
-grp_anim_index           = 0
-attached_ped             = 0
-grabbed_veh              = 0
-thisVeh                  = 0
-anim_index               = 0
-scenario_index           = 0
-npc_index                = 0
-actions_switch           = 0
-Entity                   = 0
-timerA                   = 0
-timerB                   = 0
-defaultXenon             = 0
-vehSound_index           = 0
-driftSmokeIndex          = 0
-selected_smoke_col       = 0
-pBus                     = 0
-dummyDriver              = 0
-dummyCopCar              = 0
-sound_index1             = 0
-sound_index2             = 0
-sound_switch             = 0
-radio_index              = 0
-drift_points             = 0
-drift_extra_pts          = 0
-straight_counter         = 0
-drift_time               = 0
-loud_pops_event          = 0
-katana                   = 0
-drift_multiplier         = 1
-quote_alpha              = 1
-pedthrowF                = 10
-tdBtn                    = 21
-stop_anim                = 47
-play_anim                = 256
-previous_anim            = 316
-next_anim                = 317
-drift_streak_text        = ""
-drift_extra_text         = ""
-actions_search           = ""
-currentMvmt              = ""
-currentStrf              = ""
-currentWmvmt             = ""
-search_term              = ""
-smokeHex                 = ""
-random_quote             = ""
-selected_sound           = {}
-selected_radio           = {}
-smokePtfx_t              = {}
-nosptfx_t                = {}
-purgePtfx_t              = {}
-lctPtfx_t                = {}
-popSounds_t              = {}
-popsPtfx_t               = {}
-npc_blips                = {}
-spawned_npcs             = {}
-plyrProps                = {}
-npcProps                 = {}
-selfPTFX                 = {}
-npcPTFX                  = {}
-curr_playing_anim        = {}
-laserPtfx_T              = {}
-chosen_anim              = {}
-default_handling_flags   = unk
+world_extended         = false
+autopilot_waypoint     = false
+autopilot_objective    = false
+autopilot_random       = false
+flight_music_off       = false
+loud_radio_enabled     = false
+q_replaced             = false
+is_sitting             = false
+SS_debug               = false
+debug_count            = 0
+flag                   = 0
+grp_anim_index         = 0
+attached_ped           = 0
+grabbed_veh            = 0
+thisVeh                = 0
+anim_index             = 0
+scenario_index         = 0
+npc_index              = 0
+actions_switch         = 0
+Entity                 = 0
+timerA                 = 0
+timerB                 = 0
+defaultXenon           = 0
+vehSound_index         = 0
+driftSmokeIndex        = 0
+selected_smoke_col     = 0
+pBus                   = 0
+dummyDriver            = 0
+dummyCopCar            = 0
+sound_index1           = 0
+sound_index2           = 0
+sound_switch           = 0
+radio_index            = 0
+drift_points           = 0
+drift_extra_pts        = 0
+straight_counter       = 0
+drift_time             = 0
+loud_pops_event        = 0
+katana                 = 0
+drift_multiplier       = 1
+quote_alpha            = 1
+pedthrowF              = 10
+drift_streak_text      = ""
+drift_extra_text       = ""
+actions_search         = ""
+currentMvmt            = ""
+currentStrf            = ""
+currentWmvmt           = ""
+search_term            = ""
+smokeHex               = ""
+random_quote           = ""
+selected_sound         = {}
+selected_radio         = {}
+smokePtfx_t            = {}
+nosptfx_t              = {}
+purgePtfx_t            = {}
+lctPtfx_t              = {}
+popSounds_t            = {}
+popsPtfx_t             = {}
+npc_blips              = {}
+spawned_npcs           = {}
+plyrProps              = {}
+npcProps               = {}
+selfPTFX               = {}
+npcPTFX                = {}
+curr_playing_anim      = {}
+laserPtfx_T            = {}
+chosen_anim            = {}
+default_handling_flags = unk
+DRIFT_BUTTON           = keybinds.tdBtn.name
+STOP_ANIM_BUTTON       = keybinds.stop_anim.name
+PLAY_ANIM_BUTTON       = keybinds.play_anim.name
+PREVIOUS_ANIM_BUTTON   = keybinds.previous_anim.name
+NEXT_ANIM_BUTTON       = keybinds.next_anim.name
+FLATBED_BUTTON         = keybinds.flatbedBtn.name
+PURGE_BUTTON           = keybinds.purgeBtn.name
+AUTOKILL_BUTTON        = keybinds.autokill.name
+ENEMIES_FLEE_BUTTON    = keybinds.enemiesFlee.name
+VEHICLE_MINE_BUTTON    = keybinds.vehicle_mine.name
+
+require('lib/Translations')
+require('data/objects')
+require('data/actions')
+require('data/refs')
 
 
 ---@param musicSwitch string
@@ -587,11 +618,30 @@ function bankDriftPoints_SP(points)
 end
 
 Samurais_scripts:add_imgui(function()
-  local date_str = os.date("\10    %d-%b-%Y    \10       %H:%M:%S\10\10")
+  local date_str = os.date("\10    %d-%b-%Y    \10         %H:%M\10\10")
   ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
   ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
   UI.coloredButton(tostring(date_str), '#A67C00', '#A67C00', '#A67C00', 0.15)
   ImGui.PopStyleVar()
+  if UI.isItemClicked('lmb') then
+    debug_count = debug_count + 1
+    if debug_count > 7 then
+      debug_count = 0
+    end
+  end
+  if debug_count == 7 then
+    if not SS_debug then
+      UI.widgetSound("Nav")
+      log.debug("Debug mode activated.")
+    end
+    SS_debug = true
+  else
+    if SS_debug then
+      UI.widgetSound("Cancel")
+      log.debug("Debug mode deactivated.")
+    end
+    SS_debug = false
+  end
   ImGui.Dummy(1, 10); ImGui.SeparatorText("About")
   UI.wrappedText("A collection of scripts aimed towards adding some roleplaying and fun elements to the game.", 25)
   ImGui.Dummy(1, 10)
@@ -1106,7 +1156,8 @@ Actions:add_imgui(function()
     if info ~= nil then
       if shortcut_anim.name ~= info.name then
         if ImGui.Button(translateLabel("animShortcut_btn")) then
-          chosen_anim = info
+          chosen_anim        = info
+          is_setting_hotkeys = true
           UI.widgetSound("Select2")
           ImGui.OpenPopup("Set Shortcut")
         end
@@ -1114,22 +1165,13 @@ Actions:add_imgui(function()
         ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
         ImGui.SetNextWindowBgAlpha(0.9)
         if ImGui.BeginPopupModal("Set Shortcut", true, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-          if btn_name == nil then
-            script.run_in_fiber(function()
-              for i = 1, 360 do
-                if PAD.IS_CONTROL_JUST_PRESSED(0, i) then
-                  btn, btn_name = UI.getKeyPressed()
-                  break
-                end
-              end
-            end)
-          end
           UI.coloredText("Selected Animation:  ", "green", 0.9, 20); ImGui.SameLine(); ImGui.Text("« " ..
             chosen_anim.name .. " »")
           ImGui.Dummy(1, 10)
           if btn_name == nil then
             start_loading_anim = true
             UI.coloredText(translateLabel("input_waiting") .. loading_label, "#FFFFFF", 0.75, 20)
+            is_pressed, btn, btn_name = SS.isAnyKeyPressed()
           else
             start_loading_anim = false
             for _, key in pairs(reserved_keys_T) do
@@ -1165,14 +1207,17 @@ Actions:add_imgui(function()
               lua_cfg.save("shortcut_anim", shortcut_anim)
               gui.show_success("Samurais Scripts",
                 translateLabel("shortcut_success_1/2") .. btn_name .. translateLabel("shortcut_success_2/2"))
+              btn, btn_name      = nil, nil
+              is_setting_hotkeys = false
               ImGui.CloseCurrentPopup()
             end
             ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
           end
           if ImGui.Button(translateLabel("generic_cancel_btn") .. "##shotcut") then
             UI.widgetSound("Cancel")
-            btn, btn_name = nil, nil
+            btn, btn_name      = nil, nil
             start_loading_anim = false
+            is_setting_hotkeys = false
             ImGui.CloseCurrentPopup()
           end
           ImGui.End()
@@ -1182,7 +1227,7 @@ Actions:add_imgui(function()
           UI.widgetSound("Delete")
           shortcut_anim = {}
           lua_cfg.save("shortcut_anim", {})
-          gui.show_success("Samurais Scripts", "Animation shortcut has been reset. Please reload the script!")
+          gui.show_success("Samurais Scripts", "Animation shortcut has been reset.")
         end
         UI.toolTip(false, translateLabel("removeShortcut_tt"))
       end
@@ -2103,17 +2148,17 @@ vehicle_tab:add_imgui(function()
     UI.widgetSound("Nav2")
     lua_cfg.save("veh_mines", veh_mines)
   end
-  UI.toolTip(false, "Equip any land vehicle with mines. Choose the type of mine you want then press [N] to use it.")
+  UI.toolTip(false, translateLabel("veh_mines_tt"))
   if veh_mines then
     ImGui.SameLine(); ImGui.Dummy(35, 1); ImGui.SameLine();
-    if ImGui.Button("Select Mine Type") then
+    if ImGui.Button(translateLabel("mine_type_btn")) then
       UI.widgetSound("Select")
       ImGui.OpenPopup("Mine Types")
     end
     ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
     ImGui.SetNextWindowBgAlpha(0.81)
     if ImGui.BeginPopupModal("Mine Types", true, ImGuiWindowFlags.AlwaysAutoResize) then
-      ImGui.Dummy(1, 5); ImGui.Text("Choose which type of mine to equip:"); ImGui.Dummy(1, 5)
+      ImGui.Dummy(1, 5); ImGui.Text(translateLabel("mine_type_txt")); ImGui.Dummy(1, 5)
       vmine_type.spikes, spikeUsed = ImGui.Checkbox("Spike", vmine_type.spikes)
       if spikeUsed then
         UI.widgetSound("Nav2")
@@ -2170,7 +2215,9 @@ vehicle_tab:add_imgui(function()
 
       ImGui.Dummy(1, 5)
       if missiledefense and (vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic) then
-        UI.coloredText("[ ! ] NOTE: You have 'Missile Defense' activated which will automatically destroy / remove these mines. If you still want to use them, please disable 'Missile Defense'.", "yellow", 0.69, 30)
+        UI.coloredText(
+        "[ ! ] NOTE: You have 'Missile Defense' activated which will automatically destroy / remove these mines. If you still want to use them, please disable 'Missile Defense'.",
+          "yellow", 0.69, 30)
       end
       ImGui.Dummy(1, 5)
       if vmine_type.spikes or vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic then
@@ -2939,7 +2986,6 @@ handling_tab:add_imgui(function()
 end)
 
 vehicle_creator   = vehicle_tab:add_tab("Vehicle Creator")
-is_typing         = false
 vCreator_searchQ  = ""
 vehicleName       = ""
 creation_name     = ""
@@ -2970,26 +3016,38 @@ attached_vehicles = { entity = 0, hash = 0, mods = {}, color_1 = { r = 0, g = 0,
 vehicle_creation  = { name = "", main_veh = 0, mods = {}, color_1 = { r = 0, g = 0, b = 0 }, color_2 = { r = 0, g = 0, b = 0 }, tint = 0, attachments = {} }
 saved_vehicles    = lua_cfg.read("saved_vehicles")
 
-local function updateFilteredVehicles()
-  filtered_vehicles = {}
+local function listVehicles()
+  vehicle_list   = {}
+  local this_veh = {}
   for _, veh in ipairs(gta_vehicles_T) do
-    if string.find(string.lower(veh), string.lower(vCreator_searchQ)) then
+    local vehicle_hash = joaat(veh)
+    local displayName  = vehicles.get_vehicle_display_name(veh)
+    this_veh           = { hash = vehicle_hash, name = displayName }
+    table.insert(vehicle_list, this_veh)
+  end
+end
+local function updatefilteredVehicles()
+  listVehicles()
+  filtered_vehicles = {}
+  for _, veh in ipairs(vehicle_list) do
+    if string.find(string.lower(veh.name), string.lower(vCreator_searchQ)) then
       table.insert(filtered_vehicles, veh)
     end
   end
+  table.sort(filtered_vehicles, function(a, b)
+    return a.name < b.name
+  end)
 end
 
 local function displayFilteredList()
-  updateFilteredVehicles()
-  local vehicle_names = {}
-  if filtered_vehicles[1] ~= nil then
-    for _, veh in ipairs(filtered_vehicles) do
-      local displayName = vehicles.get_vehicle_display_name(joaat(veh))
-      if string.find(string.lower(veh), "drift") then
-        displayName = displayName .. "  (Drift)"
-      end
-      table.insert(vehicle_names, displayName)
+  updatefilteredVehicles()
+  vehicle_names = {}
+  for _, veh in ipairs(filtered_vehicles) do
+    local displayName = veh.name
+    if string.find(string.lower(displayName), "drift") then
+      displayName = displayName .. "  (Drift)"
     end
+    table.insert(vehicle_names, displayName)
   end
   vehicle_index, _ = ImGui.ListBox("##vehList", vehicle_index, vehicle_names, #filtered_vehicles)
 end
@@ -3172,8 +3230,8 @@ vehicle_creator:add_imgui(function()
     ImGui.PopItemWidth()
     ImGui.Separator()
     if filtered_vehicles[1] ~= nil then
-      vehicleHash = joaat(filtered_vehicles[vehicle_index + 1])
-      vehicleName = vehicles.get_vehicle_display_name(joaat(filtered_vehicles[vehicle_index + 1]))
+      vehicleHash = filtered_vehicles[vehicle_index + 1].hash
+      vehicleName = filtered_vehicles[vehicle_index + 1].name
     end
     if ImGui.Button("   " .. translateLabel("Spawn") .. "   ##vehcreator") then
       UI.widgetSound("Select")
@@ -3619,9 +3677,9 @@ end)
 --[[
     *online*
 ]]
-online_tab = Samurais_scripts:add_tab("Online ")
+online_tab           = Samurais_scripts:add_tab("Online ")
 
-business_tab = online_tab:add_tab("Business Manager (YRV2)")
+business_tab         = online_tab:add_tab("Business Manager (YRV2)")
 local wh1_loop       = false
 local wh2_loop       = false
 local wh3_loop       = false
@@ -3650,7 +3708,7 @@ local wh5Value       = 0
 local ceo_moola      = 0
 local yrv2_color     = { 0, 255, 255, 1 }
 business_tab:add_imgui(function()
-  local window_width   = ImGui.GetWindowWidth()
+  local window_width = ImGui.GetWindowWidth()
   ImGui.Spacing(); ImGui.Dummy((window_width / 2) - 110, 1); ImGui.SameLine(); UI.coloredText("- YimResupplier V2 -",
     yrv2_color, 1, 60)
   if Game.isOnline() then
@@ -3716,8 +3774,8 @@ business_tab:add_imgui(function()
           else
             wh1Value = 0
           end
-          wh1Total    = wh1Value * wh1Supplies
-          ceo_moola   = wh1Total
+          wh1Total  = wh1Value * wh1Supplies
+          ceo_moola = wh1Total
           ImGui.SeparatorText(translateLabel("Warehouse") .. " 1")
           whouse_1_size.small, wh1sUsed = ImGui.Checkbox("Small", whouse_1_size.small); ImGui.SameLine()
           if wh1sUsed then
@@ -3749,7 +3807,7 @@ business_tab:add_imgui(function()
           end
           if whouse_1_size.small or whouse_1_size.medium or whouse_1_size.large then
             ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-            (wh1Supplies / whouse1_max), 240, 30)
+              (wh1Supplies / whouse1_max), 240, 30)
             if wh1Supplies < whouse1_max then
               ImGui.SameLine()
               ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
@@ -3797,8 +3855,8 @@ business_tab:add_imgui(function()
           else
             wh2Value = 0
           end
-          wh2Total    = wh2Value * wh2Supplies
-          ceo_moola   = wh1Total + wh2Total
+          wh2Total  = wh2Value * wh2Supplies
+          ceo_moola = wh1Total + wh2Total
           ImGui.SeparatorText(translateLabel("Warehouse") .. " 2")
           whouse_2_size.small, wh2sUsed = ImGui.Checkbox("Small##wh2", whouse_2_size.small); ImGui.SameLine()
           if wh2sUsed then
@@ -3830,7 +3888,7 @@ business_tab:add_imgui(function()
           end
           if whouse_2_size.small or whouse_2_size.medium or whouse_2_size.large then
             ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-            (wh2Supplies / whouse2_max), 240, 30)
+              (wh2Supplies / whouse2_max), 240, 30)
             if wh2Supplies < whouse2_max then
               ImGui.SameLine()
               ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
@@ -3878,8 +3936,8 @@ business_tab:add_imgui(function()
           else
             wh3Value = 0
           end
-          wh3Total    = wh3Value * wh3Supplies
-          ceo_moola   = wh1Total + wh2Total + wh3Total
+          wh3Total  = wh3Value * wh3Supplies
+          ceo_moola = wh1Total + wh2Total + wh3Total
           ImGui.SeparatorText(translateLabel("Warehouse") .. " 3")
           whouse_3_size.small, wh3sUsed = ImGui.Checkbox("Small##wh3", whouse_3_size.small); ImGui.SameLine()
           if wh3sUsed then
@@ -3911,7 +3969,7 @@ business_tab:add_imgui(function()
           end
           if whouse_3_size.small or whouse_3_size.medium or whouse_3_size.large then
             ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-            (wh3Supplies / whouse3_max), 240, 30)
+              (wh3Supplies / whouse3_max), 240, 30)
             if wh3Supplies < whouse3_max then
               ImGui.SameLine()
               ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
@@ -3959,8 +4017,8 @@ business_tab:add_imgui(function()
           else
             wh4Value = 0
           end
-          wh4Total    = wh4Value * wh4Supplies
-          ceo_moola   = wh1Total + wh2Total + wh3Total + wh4Total
+          wh4Total  = wh4Value * wh4Supplies
+          ceo_moola = wh1Total + wh2Total + wh3Total + wh4Total
           ImGui.SeparatorText(translateLabel("Warehouse") .. " 4")
           whouse_4_size.small, wh4sUsed = ImGui.Checkbox("Small##wh4", whouse_4_size.small); ImGui.SameLine()
           if wh4sUsed then
@@ -3992,7 +4050,7 @@ business_tab:add_imgui(function()
           end
           if whouse_4_size.small or whouse_4_size.medium or whouse_4_size.large then
             ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-            (wh4Supplies / whouse4_max), 240, 30)
+              (wh4Supplies / whouse4_max), 240, 30)
             if wh4Supplies < whouse4_max then
               ImGui.SameLine()
               ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
@@ -4040,8 +4098,8 @@ business_tab:add_imgui(function()
           else
             wh5Value = 0
           end
-          wh5Total    = wh5Value * wh5Supplies
-          ceo_moola   = wh1Total + wh2Total + wh3Total + wh4Total + wh5Total
+          wh5Total  = wh5Value * wh5Supplies
+          ceo_moola = wh1Total + wh2Total + wh3Total + wh4Total + wh5Total
           ImGui.SeparatorText(translateLabel("Warehouse") .. " 5")
           whouse_5_size.small, wh5sUsed = ImGui.Checkbox("Small##wh5", whouse_5_size.small); ImGui.SameLine()
           if wh5sUsed then
@@ -4073,7 +4131,7 @@ business_tab:add_imgui(function()
           end
           if whouse_5_size.small or whouse_5_size.medium or whouse_5_size.large then
             ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-            (wh5Supplies / whouse5_max), 240, 30)
+              (wh5Supplies / whouse5_max), 240, 30)
             if wh5Supplies < whouse5_max then
               ImGui.SameLine()
               ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
@@ -4122,7 +4180,7 @@ business_tab:add_imgui(function()
           hangarSupplies = stats.get_int(MPx .. "_HANGAR_CONTRABAND_TOTAL")
           hangarTotal    = hangarSupplies * 30000
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-          (hangarSupplies / 50), 240, 30)
+            (hangarSupplies / 50), 240, 30)
           if hangarSupplies < 50 then
             ImGui.SameLine()
             ImGui.BeginDisabled(hangarLoop)
@@ -4203,7 +4261,7 @@ business_tab:add_imgui(function()
           bunkerTotal          = ((globals.get_int(Global_262145.f_21254) + bunkerOffset1 + bunkerOffset2) * bunkerStock)
           ImGui.Spacing()
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-          (bunkerSupplies / 100), 240, 30)
+            (bunkerSupplies / 100), 240, 30)
           if bunkerSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##Bunker") then
@@ -4212,10 +4270,11 @@ business_tab:add_imgui(function()
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
           ImGui.ProgressBar((bunkerStock / 100), 240, 30, tostring(bunkerStock) ..
-          " Crates (" .. tostring(bunkerStock) .. "%)")
+            " Crates (" .. tostring(bunkerStock) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-          lua_Fn.formatMoney(bunkerTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(bunkerTotal * 1.5)))
+            lua_Fn.formatMoney(bunkerTotal) ..
+            "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(bunkerTotal * 1.5)))
           if Game.Self.isOutside() then
             ImGui.Spacing(); ImGui.SeparatorText("Quick Teleport")
             if ImGui.Button("Teleport To Bunker") then
@@ -4277,7 +4336,7 @@ business_tab:add_imgui(function()
             tostring(fcashStock) .. " Boxes (" .. tostring(math.floor(fcashStock * 2.5)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-          lua_Fn.formatMoney(fcashTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(fcashTotal * 1.5)))
+            lua_Fn.formatMoney(fcashTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(fcashTotal * 1.5)))
         else
           ImGui.Text("You don't own a Fake Cash business.")
         end
@@ -4320,7 +4379,7 @@ business_tab:add_imgui(function()
             tostring(cokeStock) .. " Kilos (" .. tostring(cokeStock * 10) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-          lua_Fn.formatMoney(cokeTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(cokeTotal * 1.5)))
+            lua_Fn.formatMoney(cokeTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(cokeTotal * 1.5)))
         else
           ImGui.Text("You don't own a Cocaine business.")
         end
@@ -4363,7 +4422,7 @@ business_tab:add_imgui(function()
             tostring(methStock) .. " Pounds (" .. tostring(methStock * 5) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-          lua_Fn.formatMoney(methTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(methTotal * 1.5)))
+            lua_Fn.formatMoney(methTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(methTotal * 1.5)))
         else
           ImGui.Text("You don't own a Meth business.")
         end
@@ -4406,7 +4465,7 @@ business_tab:add_imgui(function()
             tostring(weedStock) .. " Pounds (" .. tostring(math.floor(weedStock / 8 * 10)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-          lua_Fn.formatMoney(weedTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(weedTotal * 1.5)))
+            lua_Fn.formatMoney(weedTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(weedTotal * 1.5)))
         else
           ImGui.Text("You don't own a Weed business.")
         end
@@ -4449,7 +4508,7 @@ business_tab:add_imgui(function()
             tostring(fdStock) .. " Boxes (" .. tostring(math.floor(fdStock / 6 * 10)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-          lua_Fn.formatMoney(fdTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(fdTotal * 1.5)))
+            lua_Fn.formatMoney(fdTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(fdTotal * 1.5)))
         else
           ImGui.Text("You don't own a Document Forgery office.")
         end
@@ -4478,7 +4537,7 @@ business_tab:add_imgui(function()
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-          ImGui.ProgressBar((acidStock / 100), 240, 30,
+          ImGui.ProgressBar((acidStock / 160), 240, 30,
             tostring(acidStock) .. " Sheets (" .. tostring(math.floor(acidStock / 16 * 10)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(acidTotal))
         else
@@ -4486,7 +4545,7 @@ business_tab:add_imgui(function()
         end
 
         ImGui.Separator(); ImGui.Spacing(); ImGui.Text("Total MC Business Value: " ..
-        lua_Fn.formatMoney(fcashTotal + cokeTotal + methTotal + weedTotal + fdTotal + acidTotal))
+          lua_Fn.formatMoney(fcashTotal + cokeTotal + methTotal + weedTotal + fdTotal + acidTotal))
 
         ------------------------MC Quick TP------------------------------
         if Game.Self.isOutside() then
@@ -4719,7 +4778,7 @@ business_tab:add_imgui(function()
                 local slvgLoc
                 if HUD.DOES_BLIP_EXIST(slvgBlip) then
                   slvgLoc = HUD.GET_BLIP_COORDS(slvgBlip)
-                  selfTP(false, true, slvgLoc, 180)
+                  Game.Self.teleport(false, slvgLoc)
                 end
               end)
             end
@@ -4846,8 +4905,11 @@ business_tab:add_imgui(function()
           end
         end
         ImGui.Spacing(); ImGui.SeparatorText("Sell Missions")
-        ImGui.Spacing(); UI.wrappedText("These options will not be saved. Each button disables the most tedious sell missions for that business.", 32)
-        ImGui.Spacing(); UI.coloredText("[ ! ] NOTE: If you plan on selling more than once for the same business (example: MC businesses or more than one CEO warehouse), please switch sessions after finishing the first sale to reset the missions, otherwise a sesond sell mission may fail to start.", 'yellow', 0.69, 32)
+        ImGui.Spacing(); UI.wrappedText(
+        "These options will not be saved. Each button disables the most tedious sell missions for that business.", 32)
+        ImGui.Spacing(); UI.coloredText(
+        "[ ! ] NOTE: If you plan on selling more than once for the same business (example: MC businesses or more than one CEO warehouse), please switch sessions after finishing the first sale to reset the missions, otherwise a sesond sell mission may fail to start.",
+          'yellow', 0.69, 32)
 
         if ImGui.Button("Easy Biker Sell Missions") then
           UI.widgetSound("Select")
@@ -6815,11 +6877,6 @@ settings_tab:add_imgui(function()
     ImGui.EndDisabled()
     UI.toolTip(false, translateLabel("no_shortcut_tt"))
   end
-  ImGui.BeginDisabled()
-  ImGui.Button("Hotkeys")
-  ImGui.EndDisabled()
-  UI.toolTip(false,
-    "[ ! ] Not sure if this will ever become a proper option.\10\10If you're a YimMenu dev, please consider adding a binding for ImGui::IsKeyPressed() because GTA's controls are so annoying to work with. Thanks <3")
 
   ImGui.Dummy(1, 10); ImGui.SeparatorText(translateLabel("langTitle"))
   ImGui.Spacing(); ImGui.BulletText(translateLabel("currentLang_txt") .. " " .. current_lang)
@@ -6867,12 +6924,32 @@ settings_tab:add_imgui(function()
     if ImGui.Button("  " .. translateLabel("yes") .. "  ") then
       UI.widgetSound("Select2")
       shortcut_anim           = {}
-      vmine_type              = {spikes = false, slick = false, explosive = false, emp = false, kinetic = false}
-      whouse_1_size           = {small = false, medium = false, large = false}
-      whouse_2_size           = {small = false, medium = false, large = false}
-      whouse_3_size           = {small = false, medium = false, large = false}
-      whouse_4_size           = {small = false, medium = false, large = false}
-      whouse_5_size           = {small = false, medium = false, large = false}
+      vmine_type              = { spikes = false, slick = false, explosive = false, emp = false, kinetic = false }
+      whouse_1_size           = { small = false, medium = false, large = false }
+      whouse_2_size           = { small = false, medium = false, large = false }
+      whouse_3_size           = { small = false, medium = false, large = false }
+      whouse_4_size           = { small = false, medium = false, large = false }
+      whouse_5_size           = { small = false, medium = false, large = false }
+      keybinds                = {
+        tdBtn         = { code = 0x10, name = "[Shift]" },
+        nosBtn        = { code = 0x10, name = "[Shift]" },
+        stop_anim     = { code = 0x47, name = "[G]" },
+        play_anim     = { code = 0x2E, name = "[DEL]" },
+        previous_anim = { code = 0x21, name = "[PAGE UP]" },
+        next_anim     = { code = 0x22, name = "[PAGE DOWN]" },
+        flatbedBtn    = { code = 0x58, name = "[X]" },
+        purgeBtn      = { code = 0x58, name = "[X]" },
+        autokill      = { code = 0x76, name = "[F7]" },
+        enemiesFlee   = { code = 0x77, name = "[F8]" },
+        vehicle_mine  = { code = 0x4E, name = "[N]" },
+      }
+      gpad_keybinds           = {
+        tdBtn        = { code = 0, name = "[Unbound]" },
+        nosBtn       = { code = 0, name = "[Unbound]" },
+        flatbedBtn   = { code = 0, name = "[Unbound]" },
+        purgeBtn     = { code = 0, name = "[Unbound]" },
+        vehicle_mine = { code = 0, name = "[Unbound]" },
+      }
       Regen                   = false
       -- objectiveTP             = false
       disableTooltips         = false
@@ -7004,6 +7081,52 @@ settings_tab:add_imgui(function()
   end
 end)
 
+hotkeys_tab = settings_tab:add_tab("Hotkeys ")
+hotkeys_tab:add_imgui(function()
+  ImGui.BeginTabBar("Keyboard Hotkeys")
+  if ImGui.BeginTabItem("Keyboard") then
+    ImGui.Dummy(1, 5)
+
+    SS.openHotkeyWindow("Drift Button               ", keybinds.tdBtn)
+
+    SS.openHotkeyWindow("NOS Button               ", keybinds.nosBtn)
+
+    SS.openHotkeyWindow("Stop Anim Button      ", keybinds.stop_anim)
+
+    SS.openHotkeyWindow("Play Anim Button      ", keybinds.play_anim)
+
+    SS.openHotkeyWindow("Previous Anim Button", keybinds.previous_anim)
+
+    SS.openHotkeyWindow("Next Anim Button      ", keybinds.next_anim)
+
+    SS.openHotkeyWindow("Flatbed Button          ", keybinds.flatbedBtn)
+
+    SS.openHotkeyWindow("Purge Button            ", keybinds.purgeBtn)
+
+    SS.openHotkeyWindow("Toggle Auto-kill        ", keybinds.autokill)
+
+    SS.openHotkeyWindow("Toggle Enemies Flee", keybinds.enemiesFlee)
+
+    SS.openHotkeyWindow("Vehicle Mine Button ", keybinds.vehicle_mine)
+    ImGui.EndTabItem()
+  end
+  if ImGui.BeginTabItem("Controller") then
+    ImGui.Dummy(1, 5)
+
+    SS.gpadHotkeyWindow("Drift Button               ", gpad_keybinds.tdBtn)
+
+    SS.gpadHotkeyWindow("NOS Button               ", gpad_keybinds.nosBtn)
+
+    SS.gpadHotkeyWindow("Flatbed Button          ", gpad_keybinds.flatbedBtn)
+
+    SS.gpadHotkeyWindow("Purge Button            ", gpad_keybinds.purgeBtn)
+
+    SS.gpadHotkeyWindow("Vehicle Mine Button ", gpad_keybinds.vehicle_mine)
+    ImGui.EndTabItem()
+  end
+  ImGui.EndTabBar()
+end)
+
 --[[
 -- local function var_reset()
 --   resetOnSave()
@@ -7100,20 +7223,8 @@ end)
 
 -- Game Input
 script.register_looped("GameInput", function()
-  if is_typing then
+  if is_typing or is_setting_hotkeys then
     PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
-  end
-
-  if PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
-    stopButton = "[G]"
-  else
-    stopButton = "[DPAD LEFT]"
-  end
-
-  if shortcut_anim.btn ~= nil then
-    if gui.is_open() then
-      PAD.DISABLE_CONTROL_ACTION(0, shortcut_anim.btn, true)
-    end
   end
 
   if HashGrabber and WEAPON.IS_PED_ARMED(self.get_ped(), 4) then
@@ -7129,29 +7240,55 @@ script.register_looped("GameInput", function()
     PAD.DISABLE_CONTROL_ACTION(0, 29, true)
   end
 
-  if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
-    if validModel then
-      if nosPurge or is_in_flatbed then
-        PAD.DISABLE_CONTROL_ACTION(0, 73, true)
-      end
+  if PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
+    pressing_drift_button = SS.isKeyPressed(keybinds.tdBtn.code)
+    pressing_nos_button   = SS.isKeyPressed(keybinds.nosBtn.code)
+    pressing_purge_button = SS.isKeyPressed(keybinds.purgeBtn.code)
+    pressing_fltbd_button = SS.isKeyJustPressed(keybinds.flatbedBtn.code)
+    pressing_vmine_button = SS.isKeyJustPressed(keybinds.vehicle_mine.code)
+  else
+    pressing_drift_button = gpad_keybinds.tdBtn.code ~= 0 and PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.tdBtn.code)
+    pressing_nos_button   = gpad_keybinds.nosBtn.code ~= 0 and PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.nosBtn.code)
+    pressing_purge_button = gpad_keybinds.purgeBtn.code ~= 0 and
+    (PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.purgeBtn.code) or PAD.IS_DISABLED_CONTROL_PRESSED(0, gpad_keybinds.purgeBtn.code))
+    pressing_fltbd_button = gpad_keybinds.flatbedBtn.code ~= 0 and
+    (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.flatbedBtn.code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.flatbedBtn.code))
+    pressing_vmine_button = gpad_keybinds.vehicle_mine.code ~= 0 and
+    (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.vehicle_mine.code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.vehicle_mine.code))
+  end
+
+  if is_in_flatbed then
+    if keybinds.flatbedBtn.code == 0x58 or gpad_keybinds.flatbedBtn.code == 73 then
+      PAD.DISABLE_CONTROL_ACTION(0, 73, true)
     end
-    if speedBoost and PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, tdBtn) then
-      if validModel or is_boat or is_bike then
-        -- prevent face planting when using NOS mid-air
-        PAD.DISABLE_CONTROL_ACTION(0, 60, true)
-        PAD.DISABLE_CONTROL_ACTION(0, 61, true)
-        PAD.DISABLE_CONTROL_ACTION(0, 62, true)
+  end
+
+  if nosPurge and Game.Self.isDriving() then
+    if validModel and keybinds.purgeBtn.code == 0x58 or gpad_keybinds.purgeBtn.code == 73 then
+      PAD.DISABLE_CONTROL_ACTION(0, 73, true)
+    end
+  end
+
+  if Game.Self.isDriving() then
+    if speedBoost and (keybinds.nosBtn.code == 0x10 or gpad_keybinds.nosBtn.code == 21) then
+      if PAD.IS_CONTROL_PRESSED(0, 71) and pressing_nos_button then
+        if validModel or is_boat or is_bike then
+          -- prevent face planting when using NOS mid-air
+          PAD.DISABLE_CONTROL_ACTION(0, 60, true)
+          PAD.DISABLE_CONTROL_ACTION(0, 61, true)
+          PAD.DISABLE_CONTROL_ACTION(0, 62, true)
+        end
       end
     end
     if holdF then
-      if Game.Self.isDriving() and not is_typing and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
+      if not is_typing and not is_setting_hotkeys and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
         PAD.DISABLE_CONTROL_ACTION(0, 75, true)
       else
         timerB = 0
       end
     end
     if keepWheelsTurned then
-      if Game.Self.isDriving() and not is_typing and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) and (is_car or is_quad) then
+      if not is_typing and not is_setting_hotkeys and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) and (is_car or is_quad) then
         if PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
           PAD.DISABLE_CONTROL_ACTION(0, 75, true)
         end
@@ -7223,7 +7360,7 @@ end)
 script.register_looped("self features", function(script)
   -- Crouch instead of sneak
   if Game.Self.isOnFoot() and not Game.Self.isInWater() and not Game.Self.is_ragdoll() and not gui.is_open() then
-    if replaceSneakAnim and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario and not is_typing and not is_sitting then
+    if replaceSneakAnim and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario and not is_typing and not is_sitting and not is_setting_hotkeys then
       if not isCrouched and PAD.IS_DISABLED_CONTROL_PRESSED(0, 36) then
         script:sleep(200)
         if is_handsUp then
@@ -7252,7 +7389,7 @@ script.register_looped("self features", function(script)
   -- Replace 'Point At' Action
   if not gui.is_open() then
     if Game.Self.isOnFoot() or is_car then
-      if replacePointAct and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario and not is_typing then
+      if replacePointAct and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario and not is_typing and not is_setting_hotkeys then
         if not is_handsUp and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29) then
           script:sleep(200)
           if isCrouched then
@@ -7546,7 +7683,7 @@ end)
 script.register_looped("animation hotkey", function(script)
   script:yield()
   if is_playing_anim then
-    if PAD.IS_CONTROL_PRESSED(0, 47) then
+    if SS.isKeyJustPressed(keybinds.stop_anim.code) then
       cleanup()
       if anim_music then
         play_music("stop")
@@ -7580,7 +7717,7 @@ script.register_looped("animation hotkey", function(script)
     if filteredAnims == nil then
       updatefilteredAnims()
     end
-    if PAD.IS_CONTROL_PRESSED(0, 317) then
+    if SS.isKeyJustPressed(keybinds.next_anim.code) then
       anim_index = anim_index + 1
       info = filteredAnims[anim_index + 1]
       if info == nil then
@@ -7591,18 +7728,17 @@ script.register_looped("animation hotkey", function(script)
       if info ~= nil then
         gui.show_message("Current Animation:", info.name)
       end
-      script:sleep(200)                                           -- average iki is about what, 250ms? this should be enough.
-    elseif PAD.IS_CONTROL_PRESSED(0, 316) and anim_index > 0 then -- prevent going to index 0 which breaks the script.
+    elseif SS.isKeyJustPressed(keybinds.previous_anim.code) and anim_index > 0 then -- prevent going to index 0 which breaks the script.
       anim_index = anim_index - 1
       info = filteredAnims[anim_index + 1]
       gui.show_message("Current Animation:", info.name)
       script:sleep(200)
-    elseif PAD.IS_CONTROL_PRESSED(0, 316) and anim_index == 0 then
+    elseif SS.isKeyJustPressed(keybinds.previous_anim.code) and anim_index == 0 then
       info = filteredAnims[anim_index + 1]
       gui.show_warning("Current Animation:", info.name .. "\n\nYou have reached the top of the list.")
       script:sleep(400)
     end
-    if PAD.IS_CONTROL_PRESSED(0, 256) then
+    if SS.isKeyJustPressed(keybinds.play_anim.code) then
       if not ped_grabbed and not vehicle_grabbed then
         if not is_playing_anim then
           if info ~= nil then
@@ -7641,7 +7777,7 @@ script.register_looped("animation hotkey", function(script)
         else
           PAD.SET_CONTROL_SHAKE(0, 500, 250)
           gui.show_warning("Samurais Scripts",
-            "Press " .. stopButton .. " to stop the current animation before playing the next one.")
+            "Press " .. STOP_ANIM_BUTTON .. " to stop the current animation before playing the next one.")
           script:sleep(800)
         end
       else
@@ -7678,12 +7814,25 @@ script.register_looped("animation hotkey", function(script)
       end
     end
   end
+
+  if is_playing_scenario then
+    if SS.isKeyJustPressed(keybinds.stop_anim.code) then
+      Game.busySpinnerOn(translateLabel("scenarios_spinner"), 3)
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      is_playing_scenario = false
+      script:sleep(1000)
+      Game.busySpinnerOff()
+      if ENTITY.DOES_ENTITY_EXIST(bbq) then
+        ENTITY.DELETE_ENTITY(bbq)
+      end
+    end
+  end
 end)
 
 -- Animation Shotrcut
 script.register_looped("anim shortcut", function(animsc)
   if shortcut_anim.anim ~= nil and not gui.is_open() and not ped_grabbed and not vehicle_grabbed then
-    if PAD.IS_CONTROL_JUST_PRESSED(0, shortcut_anim.btn) and not is_typing and not is_playing_anim then
+    if SS.isKeyJustPressed(shortcut_anim.btn) and not is_typing and not is_setting_hotkeys and not is_playing_anim and not gui.is_open() then
       is_shortcut_anim   = true
       info               = shortcut_anim
       local mycoords     = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
@@ -7732,12 +7881,14 @@ script.register_looped("anim shortcut", function(animsc)
             anim_music = true
           end
         end
-        animsc:sleep(200)
-        is_playing_anim = true
+        animsc:sleep(100)
+        is_playing_anim  = true
+        is_shortcut_anim = true
       end
     end
   end
-  if is_shortcut_anim and PAD.IS_CONTROL_JUST_PRESSED(0, shortcut_anim.btn) then
+  if is_shortcut_anim and SS.isKeyJustPressed(shortcut_anim.btn) then
+    animsc:sleep(100)
     cleanup()
     is_playing_anim  = false
     is_shortcut_anim = false
@@ -7829,7 +7980,8 @@ script.register_looped("auto-kill-enemies", function(ak)
           if PED.IS_PED_IN_ANY_VEHICLE(p, false) then
             local enemy_vehicle        = PED.GET_VEHICLE_PED_IS_IN(p, false)
             local enemy_vehicle_coords = ENTITY.GET_ENTITY_COORDS(enemy_vehicle, true)
-            local dist                 = SYSTEM.VDIST(enemy_vehicle_coords.x, enemy_vehicle_coords.y, enemy_vehicle_coords.z, myCoords.x, myCoords.y, myCoords.z)
+            local dist                 = SYSTEM.VDIST(enemy_vehicle_coords.x, enemy_vehicle_coords.y,
+              enemy_vehicle_coords.z, myCoords.x, myCoords.y, myCoords.z)
             if dist >= 20 then
               VEHICLE.SET_VEHICLE_ENGINE_HEALTH(enemy_vehicle, -4000)
               if VEHICLE.IS_THIS_MODEL_A_BIKE(ENTITY.GET_ENTITY_MODEL(enemy_vehicle)) or VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(enemy_vehicle)) then
@@ -7892,7 +8044,8 @@ script.register_looped("Katana", function(rpq)
             if ENTITY.DOES_ENTITY_EXIST(katana) then
               ENTITY.SET_ENTITY_ALPHA(pool_q, 0, false)
               rpq:sleep(100)
-              ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.025, 0.0, 0.0, 0.0, false, false, false, false,
+              ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.025, 0.0, 0.0, 0.0, false, false, false,
+                false,
                 2, true, 0)
               ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(katana)
               q_replaced = true
@@ -7983,7 +8136,7 @@ script.register_looped("TDFT", function(script)
       validModel = false
     end
     if validModel and DriftTires then
-      if PAD.IS_CONTROL_PRESSED(0, tdBtn) then
+      if pressing_drift_button then
         if not drift_started then
           VEHICLE.SET_DRIFT_TYRES(current_vehicle, true)
           drift_started = true
@@ -7999,7 +8152,7 @@ script.register_looped("TDFT", function(script)
     end
     script:yield()
     if validModel and driftMode and not DriftTires then
-      if PAD.IS_CONTROL_PRESSED(0, tdBtn) then
+      if pressing_drift_button then
         if not drift_started then
           VEHICLE.SET_VEHICLE_REDUCE_GRIP(current_vehicle, true)
           VEHICLE.SET_VEHICLE_REDUCE_GRIP_LEVEL(current_vehicle, DriftIntensity)
@@ -8017,7 +8170,7 @@ script.register_looped("TDFT", function(script)
     if speedBoost then
       if validModel or is_boat then
         if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
-          if PAD.IS_DISABLED_CONTROL_PRESSED(0, nosBtn) and PAD.IS_CONTROL_PRESSED(0, 71) then
+          if pressing_nos_button and PAD.IS_CONTROL_PRESSED(0, 71) then
             VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, (nosPower) / 5)
             VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, nosPower)
             if nosAudio then
@@ -8030,7 +8183,7 @@ script.register_looped("TDFT", function(script)
           end
         else
           if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
-            if PAD.IS_DISABLED_CONTROL_PRESSED(0, nosBtn) and PAD.IS_CONTROL_PRESSED(0, 71) then
+            if pressing_nos_button and PAD.IS_CONTROL_PRESSED(0, 71) then
               if VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) < 300 then
                 AUDIO.PLAY_SOUND_FROM_ENTITY(-1, "Engine_fail", current_vehicle,
                   "DLC_PILOT_ENGINE_FAILURE_SOUNDS", true, 0)
@@ -8039,7 +8192,7 @@ script.register_looped("TDFT", function(script)
           end
         end
       end
-      if using_nos and PAD.IS_DISABLED_CONTROL_RELEASED(0, nosBtn) then
+      if using_nos and not pressing_nos_button then
         VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 1.0)
         VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, -1)
         AUDIO.SET_VEHICLE_BOOST_ACTIVE(current_vehicle, false)
@@ -8124,7 +8277,7 @@ script.register_looped("TDFT", function(script)
     end
   end
 end)
-script.register_looped("TSPTFX", function(dsptfx)
+script.register_looped("DSPTFX", function(dsptfx)
   if Game.Self.isDriving() then
     local dict = "scr_ba_bb"
     local wheels = { "wheel_lr", "wheel_rr" }
@@ -8132,7 +8285,7 @@ script.register_looped("TSPTFX", function(dsptfx)
       if DriftSmoke and (driftMode or DriftTires) then
         local vehSpeedVec = ENTITY.GET_ENTITY_SPEED_VECTOR(current_vehicle, true)
         if (vehSpeedVec.x > 6 or vehSpeedVec.x < -6) and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle) then
-          if is_car and PAD.IS_CONTROL_PRESSED(0, tdBtn) and PAD.IS_CONTROL_PRESSED(0, 71) and VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(current_vehicle) > 0 and ENTITY.GET_ENTITY_SPEED(current_vehicle) > 6 then
+          if is_car and pressing_drift_button and PAD.IS_CONTROL_PRESSED(0, 71) and VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(current_vehicle) > 0 and ENTITY.GET_ENTITY_SPEED(current_vehicle) > 6 then
             if Game.requestNamedPtfxAsset(dict) then
               for _, boneName in ipairs(wheels) do
                 local r_wheels = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneName)
@@ -8149,7 +8302,7 @@ script.register_looped("TSPTFX", function(dsptfx)
                 repeat
                   dsptfx:sleep(50)
                 until
-                  PAD.IS_CONTROL_RELEASED(0, tdBtn) or PAD.IS_CONTROL_RELEASED(0, 71)
+                  not pressing_drift_button or PAD.IS_CONTROL_RELEASED(0, 71)
                 for _, smoke in ipairs(smokePtfx_t) do
                   if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(smoke) then
                     GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke, false)
@@ -8212,7 +8365,7 @@ script.register_looped("LCTRL", function(lct)
     end
     if validModel or is_bike or is_quad then
       if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) and VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) > 300 then
-        if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not PAD.IS_CONTROL_PRESSED(0, tdBtn) then
+        if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
           started_lct = true
           ENTITY.FREEZE_ENTITY_POSITION(current_vehicle, true)
           timerA = timerA + 1
@@ -8310,7 +8463,7 @@ script.register_looped("NOS ptfx", function(spbptfx)
   if nosFlames then
     if speedBoost and Game.Self.isDriving() then
       if validModel or is_boat or is_bike then
-        if PAD.IS_DISABLED_CONTROL_PRESSED(0, nosBtn) and PAD.IS_CONTROL_PRESSED(0, 71) then
+        if pressing_nos_button and PAD.IS_CONTROL_PRESSED(0, 71) then
           if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
             local effect  = "veh_xs_vehicle_mods"
             local counter = 0
@@ -8338,7 +8491,7 @@ script.register_looped("NOS ptfx", function(spbptfx)
               repeat
                 spbptfx:sleep(50)
               until
-                PAD.IS_DISABLED_CONTROL_RELEASED(0, nosBtn) or PAD.IS_CONTROL_RELEASED(0, 71)
+                not pressing_nos_button or PAD.IS_CONTROL_RELEASED(0, 71)
               for _, nos in ipairs(nosptfx_t) do
                 if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(nos) then
                   GRAPHICS.STOP_PARTICLE_FX_LOOPED(nos, false)
@@ -8363,7 +8516,7 @@ script.register_looped("2-step", function(twostep)
     end
     if validModel or is_bike or is_quad then
       if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) and VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) >= 300 then
-        if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not PAD.IS_CONTROL_PRESSED(0, tdBtn) then
+        if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
           local asset   = "core"
           local counter = 0
           while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(asset) do
@@ -8414,7 +8567,7 @@ script.register_looped("LCTRL SFX", function(tstp)
     if launchCtrl then
       if lctPtfx_t[1] ~= nil then
         local popSound
-        if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not PAD.IS_CONTROL_PRESSED(0, tdBtn) then
+        if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
           for _, p in ipairs(lctPtfx_t) do
             if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(p) then
               local randStime = math.random(60, 120)
@@ -8566,13 +8719,8 @@ end)
 script.register_looped("VEHMNS", function(vmns)
   if Game.Self.isDriving() then
     if veh_mines and current_vehicle ~= 0 and (is_car or is_bike or is_quad) then
-      local bone_n
+      local bone_n = "chassis_dummy"
       local mine_hash
-      if is_car then
-        bone_n = "neon_b"
-      elseif is_bike or is_quad then
-        bone_n = "chassis_dummy"
-      end
       if vmine_type.spikes then
         mine_hash = -647126932
       elseif vmine_type.slick then
@@ -8587,13 +8735,20 @@ script.register_looped("VEHMNS", function(vmns)
         mine_hash = -647126932 -- default to spikes if nothing else was selected.
       end
       local bone_idx = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(self.get_veh(), bone_n)
-      if PAD.IS_CONTROL_JUST_PRESSED(0, 249) then
+      if pressing_vmine_button then
         if Game.requestWeaponAsset(mine_hash) then
           if bone_idx ~= -1 then
-            local bone_pos = ENTITY.GET_ENTITY_BONE_POSTION(self.get_veh(), bone_idx)
-            local check, ground_z = MISC.GET_GROUND_Z_FOR_3D_COORD(bone_pos.x, bone_pos.y, bone_pos.z, ground_z, false, false)
-            MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(bone_pos.x, bone_pos.y, bone_pos.z,
-              bone_pos.x, bone_pos.y, ground_z,
+            local bone_pos    = ENTITY.GET_ENTITY_BONE_POSTION(self.get_veh(), bone_idx)
+            local veh_pos     = ENTITY.GET_ENTITY_COORDS(self.get_veh(), true)
+            local veh_fwd     = ENTITY.GET_ENTITY_FORWARD_VECTOR(self.get_veh())
+            local vmin, vmax  = MISC.GET_MODEL_DIMENSIONS(ENTITY.GET_ENTITY_MODEL(self.get_veh()), vmin, vmax)
+            local veh_len     = vmax.y - vmin.y
+            local _, ground_z = MISC.GET_GROUND_Z_FOR_3D_COORD(veh_pos.x, veh_pos.y, veh_pos.z, ground_z, false, false)
+            local x_offset    = veh_fwd.x * (veh_len / 1.6)
+            local y_offset    = veh_fwd.y * (veh_len / 1.6)
+            MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
+              bone_pos.x - x_offset, bone_pos.y - y_offset, bone_pos.z,
+              bone_pos.x - x_offset, bone_pos.y - y_offset, ground_z,
               0.0, false, mine_hash, self.get_ped(), true, false, 0.01
             )
           end
@@ -8873,7 +9028,7 @@ end)
 script.register_looped("Purge", function(nosprg)
   if Game.Self.isDriving() then
     if nosPurge and validModel or nosPurge and is_bike then
-      if PAD.IS_DISABLED_CONTROL_PRESSED(0, 73) and not is_in_flatbed then
+      if pressing_purge_button and not is_in_flatbed then
         local dict       = "core"
         local purgeBones = { "suspension_lf", "suspension_rf" }
         if not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(dict) then
@@ -8899,7 +9054,7 @@ script.register_looped("Purge", function(nosprg)
           repeat
             nosprg:sleep(50)
           until
-            PAD.IS_DISABLED_CONTROL_RELEASED(0, 73)
+            not pressing_purge_button
           for _, purge in ipairs(purgePtfx_t) do
             if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(purge) then
               GRAPHICS.STOP_PARTICLE_FX_LOOPED(purge, false)
@@ -9116,7 +9271,7 @@ script.register_looped("flatbed script", function(script)
     is_in_flatbed = false
   end
   if is_in_flatbed and towed_vehicle == 0 then
-    if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 73) and towable and closestVehicleModel ~= flatbedModel then
+    if pressing_fltbd_button and towable and closestVehicleModel ~= flatbedModel then
       script:sleep(200)
       local controlled = false
       if closestVehicle ~= nil then
@@ -9156,16 +9311,16 @@ script.register_looped("flatbed script", function(script)
         gui.show_error("Samurais Scripts", translateLabel("failed_veh_ctrl"))
       end
     end
-    if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 73) and closestVehicle ~= nil and not towable then
+    if pressing_fltbd_button and closestVehicle ~= nil and not towable then
       gui.show_message("Samurais Scripts", translateLabel("fltbd_carsOnlyTxt"))
       script:sleep(400)
     end
-    if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 73) and closestVehicleModel == flatbedModel then
+    if pressing_fltbd_button and closestVehicleModel == flatbedModel then
       script:sleep(400)
       gui.show_message("Samurais Scripts", translateLabel("fltbd_nootherfltbdTxt"))
     end
   elseif is_in_flatbed and towed_vehicle ~= 0 then
-    if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 73) then
+    if pressing_fltbd_button then
       script:sleep(200)
       for _, v in ipairs(vehicleHandles) do
         local modelHash         = ENTITY.GET_ENTITY_MODEL(v)
@@ -10002,6 +10157,44 @@ script.register_looped("Flight Music", function()
   end
 end)
 
+---Remote Options
+script.register_looped("REOPT", function(ro)
+  if SS.isKeyJustPressed(keybinds.autokill.code) then
+    if autoKill then
+      autoKill = false
+      gui.show_message("Samurai's Scripts", "Auto-Kill Enemies disabled.")
+      ro:sleep(100)
+    else
+      autoKill = true
+      gui.show_success("Samurai's Scripts", "Auto-Kill Enemies enabled.")
+      ro:sleep(100)
+    end
+    lua_cfg.save("autoKill", autoKill)
+  end
+  if SS.isKeyJustPressed(keybinds.enemiesFlee.code) then
+    if runaway then
+      runaway = false
+      gui.show_message("Samurai's Scripts", "Enemies Flee disabled.")
+      ro:sleep(100)
+    else
+      runaway = true
+      gui.show_success("Samurai's Scripts", "Enemies Flee enabled.")
+      ro:sleep(100)
+    end
+    lua_cfg.save("runaway", runaway)
+  end
+end)
+
+---IsKeyJustPressed
+script.register_looped("IKJP", function(ikjp)
+  for _, k in ipairs(VK_T) do
+    if k.just_pressed then
+      ikjp:sleep(0.2)
+      k.just_pressed = false
+    end
+  end
+end)
+
 
 --[[
    *event handlers*
@@ -10012,4 +10205,30 @@ end)
 
 event.register_handler(menu_event.ScriptsReloaded, function()
   SS.handle_events()
+end)
+
+event.register_handler(menu_event.Wndproc, function(hwnd, msg, wParam, lParam)
+  if msg == WM._KEYDOWN or msg == WM._SYSKEYDOWN or msg == WM._XBUTTONDOWN then
+    for _, key in ipairs(VK_T) do
+      if wParam == key.code then
+        key.pressed      = true
+        key.just_pressed = true
+        if SS_debug then
+          log.debug(
+            "\10--- Pressed Key ---" .. "\10 ¤ Name:       " .. key.name .. "\10 ¤ Keycode:    " ..
+            lua_Fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit 24 Set: " .. tostring((lParam & (0x1 << 24)) > 0)
+            .. "\10 ¤ SYSKEY:     " .. tostring(msg == WM._SYSKEYDOWN)
+          )
+        end
+      end
+    end
+  elseif msg == WM._KEYUP or msg == WM._SYSKEYUP or msg == WM._XBUTTONUP then
+    for _, key in ipairs(VK_T) do
+      if wParam == key.code then
+        key.pressed      = false
+        key.just_pressed = false
+        break
+      end
+    end
+  end
 end)

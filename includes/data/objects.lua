@@ -21,7 +21,7 @@ custom_props = {
     { hash = 3640564381,	name = "Snacks Vending Machine"},
     { hash = 690372739,		name = "Coffee Vending Machine"},
     { hash = 4111834409,	name = "Start/Finish Gate (Racing)"},
-    { hash = 2544207977,	name = "Inflate Arch (Racing)"},
+    { hash = 2544207977,	name = "Inflatable Arch (Racing)"},
     { hash = 2156563864,	name = "Race Start/Finish Platform"},
     { hash = 3554707317,	name = "Race Start Line 01"},
     { hash = 2156563864,	name = "Race Start Line 02"},

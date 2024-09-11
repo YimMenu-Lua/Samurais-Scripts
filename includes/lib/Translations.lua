@@ -504,12 +504,12 @@ Labels = {
     },
 
     ["speedBoost_tt"] = {
-        {iso = "en-US", text = "A speed boost that simulates nitrous. Gives you more power and increases your top speed when pressing [Left Shift]."},
-        {iso = "de-DE", text = "Ein Geschwindigkeitsschub, der Lachgas simuliert. Dafür [Linke Umschalttaste] drücken, um mehr Leistung eine höhere Höchstgeschwindigkeit zu erhalten."},
-        {iso = "fr-FR", text = "Un boost de vitesse qui simule le protoxyde d'azote. Vous donne plus de puissance et augmente votre vitesse de pointe lorsque vous appuyez sur [Maj Gauche]."},
-        {iso = "it-IT", text = "Un aumento di velocità che simula il nitro. Ti dà più potenza e aumenta la tua velocità massima quando premi [Maiusc Sinistro]."},
-        {iso = "pt-BR", text = "Um aumento de velocidade que simula o nitrogênio. Dá a você mais potência e aumenta a velocidade máxima ao pressionar [Shift esquerdo]."},
-        {iso = "ru-RU", text = "Прибавка к скорости, имитирующая закись азота. Дает вам больше мощности и увеличивает максимальную скорость при нажатии [Left Shift]."},
+        {iso = "en-US", text = "A speed boost that simulates nitrous. Gives you more power and increases your top speed when pressing " .. DRIFT_BUTTON .. "."},
+        {iso = "de-DE", text = "Ein Geschwindigkeitsschub, der Lachgas simuliert. Dafür " .. DRIFT_BUTTON .. " drücken, um mehr Leistung eine höhere Höchstgeschwindigkeit zu erhalten."},
+        {iso = "fr-FR", text = "Un boost de vitesse qui simule le protoxyde d'azote. Vous donne plus de puissance et augmente votre vitesse de pointe lorsque vous appuyez sur " .. DRIFT_BUTTON .. "."},
+        {iso = "it-IT", text = "Un aumento di velocità che simula il nitro. Ti dà più potenza e aumenta la tua velocità massima quando premi " .. DRIFT_BUTTON .. "."},
+        {iso = "pt-BR", text = "Um aumento de velocidade que simula o nitrogênio. Dá a você mais potência e aumenta a velocidade máxima ao pressionar " .. DRIFT_BUTTON .. "."},
+        {iso = "ru-RU", text = "Прибавка к скорости, имитирующая закись азота. Дает вам больше мощности и увеличивает максимальную скорость при нажатии " .. DRIFT_BUTTON .. "."},
     },
 
     ["vfx_tt"] = {
@@ -634,6 +634,33 @@ Labels = {
         {iso = "it-IT", text = "Impedisce la rottura dei vetri del veicolo."},
         {iso = "pt-BR", text = "Evita a quebra dos vidros do veículo."},
         {iso = "ru-RU", text = "Предотвращает разбивание стекол автомобиля."},
+    },
+
+    ["veh_mines_tt"] = {
+        {iso = "en-US", text = "Equip any land vehicle with mines. Choose the type of mine you want then press " .. VEHICLE_MINE_BUTTON .. " to use it."},
+        {iso = "de-DE", text = "Rüsten Sie jedes Landfahrzeug mit Minen aus. Wählen Sie den gewünschten Minentyp und drücken Sie dann " .. VEHICLE_MINE_BUTTON .. ", um ihn zu verwenden."},
+        {iso = "fr-FR", text = "Équipez n'importe quel véhicule terrestre de mines. Choisissez le type de mine que vous souhaitez puis appuyez sur " .. VEHICLE_MINE_BUTTON .. " pour l'utiliser."},
+        {iso = "it-IT", text = "Equipaggia qualsiasi veicolo terrestre con mine. Scegli il tipo di mina che desideri, quindi premi " .. VEHICLE_MINE_BUTTON .. " per usarla."},
+        {iso = "pt-BR", text = "Equipe qualquer veículo terrestre com minas. Escolha o tipo de mina que você quer e então pressione " .. VEHICLE_MINE_BUTTON .. " para usá-la."},
+        {iso = "ru-RU", text = "Оснастите любое наземное транспортное средство минами. Выберите нужный тип мины, затем нажмите " .. VEHICLE_MINE_BUTTON .. ", чтобы использовать ее."},
+    },
+
+    ["mine_type_btn"] = {
+        {iso = "en-US", text = "Mine Type"},
+        {iso = "de-DE", text = "Minentyp"},
+        {iso = "fr-FR", text = "Type De Mine"},
+        {iso = "it-IT", text = "Tipo Di Miniera"},
+        {iso = "pt-BR", text = "Tipo De Mina"},
+        {iso = "ru-RU", text = "Тип шахты"},
+    },
+
+    ["mine_type_txt"] = {
+        {iso = "en-US", text = "Choose which type of mine to equip:"},
+        {iso = "de-DE", text = "Wählen Sie aus, welchen Minentyp Sie ausrüsten möchten:"},
+        {iso = "fr-FR", text = "Choisissez le type de mine à équiper :"},
+        {iso = "it-IT", text = "Scegli che tipo di mina equipaggiare:"},
+        {iso = "pt-BR", text = "Escolha qual tipo de mina equipar:"},
+        {iso = "ru-RU", text = "Выберите, какой тип мины установить:"},
     },
 
     ["rgbLights"] = {
@@ -1591,21 +1618,21 @@ Labels = {
     },
 
     ["stopAnims_tt"] = {
-        {iso = "en-US", text = "TIP: You can also stop Animations by pressing [G] on keyboard or [DPAD LEFT] on controller."},
-        {iso = "de-DE", text = "TIPP: Sie können Animationen auch anhalten, indem Sie [G] auf der Tastatur oder [DPAD LEFT] auf dem Controller drücken."},
-        {iso = "fr-FR", text = "ASTUCE : Vous pouvez également arrêter les Animations en appuyant sur [G] sur le clavier ou sur [DPAD LEFT] sur le contrôleur."},
-        {iso = "it-IT", text = "SUGGERIMENTO: è possibile interrompere le Animazioni anche premendo [G] sulla tastiera o [DPAD LEFT] sul controller."},
-        {iso = "pt-BR", text = "DICA: Você também pode interromper as Animações pressionando [G] no teclado ou [DPAD LEFT] no controle."},
-        {iso = "ru-RU", text = "СОВЕТ: Вы также можете остановить анимацию, нажав [G] на клавиатуре или [DPAD LEFT] на контроллере."},
+        {iso = "en-US", text = "TIP: You can also stop Animations by pressing " .. STOP_ANIM_BUTTON .. " on keyboard."},
+        {iso = "de-DE", text = "TIPP: Sie können Animationen auch anhalten, indem Sie " .. STOP_ANIM_BUTTON .. " auf der Tastatur."},
+        {iso = "fr-FR", text = "ASTUCE : Vous pouvez également arrêter les Animations en appuyant sur " .. STOP_ANIM_BUTTON .. " sur le clavier."},
+        {iso = "it-IT", text = "SUGGERIMENTO: è possibile interrompere le Animazioni anche premendo " .. STOP_ANIM_BUTTON .. " sulla tastiera."},
+        {iso = "pt-BR", text = "DICA: Você também pode interromper as Animações pressionando " .. STOP_ANIM_BUTTON .. " no teclado."},
+        {iso = "ru-RU", text = "СОВЕТ: Вы также можете остановить анимацию, нажав " .. STOP_ANIM_BUTTON .. " на клавиатуре."},
     },
 
     ["stopScenarios_tt"] = {
-        {iso = "en-US", text = "TIP: You can also stop Scenarios by pressing [G] on keyboard or [DPAD LEFT] on controller."},
-        {iso = "de-DE", text = "TIPP: Sie können Szenarien auch anhalten, indem Sie [G] auf der Tastatur oder [DPAD LEFT] auf dem Controller drücken."},
-        {iso = "fr-FR", text = "ASTUCE : Vous pouvez également arrêter les Scénarios en appuyant sur [G] sur le clavier ou sur [DPAD LEFT] sur le contrôleur."},
-        {iso = "it-IT", text = "SUGGERIMENTO: è possibile interrompere le Scenari anche premendo [G] sulla tastiera o [DPAD LEFT] sul controller."},
-        {iso = "pt-BR", text = "DICA: Você também pode interromper as Cenários pressionando [G] no teclado ou [DPAD LEFT] no controle."},
-        {iso = "ru-RU", text = "СОВЕТ: Вы также можете остановить Сценарии, нажав [G] на клавиатуре или [DPAD LEFT] на контроллере."},
+        {iso = "en-US", text = "TIP: You can also stop Scenarios by pressing " .. STOP_ANIM_BUTTON .. " on keyboard."},
+        {iso = "de-DE", text = "TIPP: Sie können Szenarien auch anhalten, indem Sie " .. STOP_ANIM_BUTTON .. " auf der Tastatur."},
+        {iso = "fr-FR", text = "ASTUCE : Vous pouvez également arrêter les Scénarios en appuyant sur " .. STOP_ANIM_BUTTON .. " sur le clavier."},
+        {iso = "it-IT", text = "SUGGERIMENTO: è possibile interrompere le Scenari anche premendo " .. STOP_ANIM_BUTTON .. " sulla tastiera."},
+        {iso = "pt-BR", text = "DICA: Você também pode interromper as Cenários pressionando " .. STOP_ANIM_BUTTON .. " no teclado."},
+        {iso = "ru-RU", text = "СОВЕТ: Вы также можете остановить Сценарии, нажав " .. STOP_ANIM_BUTTON .. " на клавиатуре."},
     },
 
     ["scenarios_spinner"] = {
@@ -1673,12 +1700,12 @@ Labels = {
     },
 
     ["animKeys_tt"] = {
-        {iso = "en-US", text = "Use experimental hotkeys to play animations. These hotkeys may interfere with gameplay, hence why there is an option to disable them.\10\10Current Setup:\10-[PAGE UP]: Scroll up the list.\10-[PAGE DOWN]: Scroll down the list.\10-[DEL]: Play.\10-[G]: Stop."},
-        {iso = "de-DE", text = "Verwenden Sie experimentelle Hotkeys, um Animationen abzuspielen. Diese Hotkeys können das Spielgeschehen stören, weshalb es eine Option gibt, um sie zu deaktivieren.\10\10Aktuelles Setup:\10-[PAGE UP]: In der Liste nach oben blättern.\10-[PAGE DOWN]: In der Liste nach unten blättern.\10-[ENTF]: Wiedergabe.\10-[G]: Stopp."},
-        {iso = "fr-FR", text = "Utilisez des touches de raccourci expérimentales pour jouer les animations. Ces touches de raccourci peuvent interférer avec le gameplay, c'est pourquoi il existe une option pour les désactiver.\10-[PAGE UP] : Fait défiler la liste vers le haut.\10-[PAGE DOWN] : Défilement vers le bas de la liste.\10-[DEL] : Lecture.\10-[G] : Stop."},
-        {iso = "it-IT", text = "Utilizzare i tasti di scelta rapida sperimentali per riprodurre le animazioni. Questi tasti di scelta rapida possono interferire con il gioco, per cui è disponibile un'opzione per disabilitarli.\1010Impostazione attuale:\10-[PAGINA SU]: Scorre l'elenco verso l'alto.\10-[PAGINA GIÙ]: Scorre l'elenco verso il basso.\10-[DEL]: Riproduzione.\10-[G]: Stop."},
-        {iso = "pt-BR", text = "Use teclas de atalho experimentais para reproduzir animações. Essas teclas de atalho podem interferir na jogabilidade, por isso há uma opção para desativá-las.\10\10Configuração atual:\10-[PAGE UP]: Rolar a lista para cima.\10-[PAGE DOWN]: Rolar a lista para baixo.\10-[DEL]: Reproduzir.\10-[G]: Parar."},
-        {iso = "ru-RU", text = "Используйте экспериментальные горячие клавиши для воспроизведения анимации. Эти горячие клавиши могут мешать игровому процессу, поэтому есть возможность их отключения.\10\10Текущая настройка:\10-[PAGE UP]: Прокрутить список вверх.\10-[PAGE DOWN]: Прокрутить список вниз.\10-[DEL]: Воспроизвести.\10-[G]: Стоп."},
+        {iso = "en-US", text = "Use experimental hotkeys to play animations. These hotkeys may interfere with gameplay, hence why there is an option to disable them.\10\10Current Setup:\10-" .. PREVIOUS_ANIM_BUTTON .. ": Scroll up the list.\10-" .. NEXT_ANIM_BUTTON .. ": Scroll down the list.\10-" .. PLAY_ANIM_BUTTON .. ": Play.\10-".. STOP_ANIM_BUTTON .. ": Stop."},
+        {iso = "de-DE", text = "Verwenden Sie experimentelle Hotkeys, um Animationen abzuspielen. Diese Hotkeys können das Spielgeschehen stören, weshalb es eine Option gibt, um sie zu deaktivieren.\10\10Aktuelles Setup:\10-" .. PREVIOUS_ANIM_BUTTON .. ": In der Liste nach oben blättern.\10-" .. NEXT_ANIM_BUTTON .. ": In der Liste nach unten blättern.\10-" .. PLAY_ANIM_BUTTON .. ": Wiedergabe.\10-".. STOP_ANIM_BUTTON .. ": Stopp."},
+        {iso = "fr-FR", text = "Utilisez des touches de raccourci expérimentales pour jouer les animations. Ces touches de raccourci peuvent interférer avec le gameplay, c'est pourquoi il existe une option pour les désactiver.\10-" .. PREVIOUS_ANIM_BUTTON .. ": Fait défiler la liste vers le haut.\10-" .. NEXT_ANIM_BUTTON .. " : Défilement vers le bas de la liste.\10-" .. PLAY_ANIM_BUTTON .. " : Lecture.\10-".. STOP_ANIM_BUTTON .. " : Stop."},
+        {iso = "it-IT", text = "Utilizzare i tasti di scelta rapida sperimentali per riprodurre le animazioni. Questi tasti di scelta rapida possono interferire con il gioco, per cui è disponibile un'opzione per disabilitarli.\10\10Impostazione attuale:\10-" .. PREVIOUS_ANIM_BUTTON .. ": Scorre l'elenco verso l'alto.\10-" .. NEXT_ANIM_BUTTON .. ": Scorre l'elenco verso il basso.\10-" .. PLAY_ANIM_BUTTON .. ": Riproduzione.\10-".. STOP_ANIM_BUTTON .. ": Stop."},
+        {iso = "pt-BR", text = "Use teclas de atalho experimentais para reproduzir animações. Essas teclas de atalho podem interferir na jogabilidade, por isso há uma opção para desativá-las.\10\10Configuração atual:\10-" .. PREVIOUS_ANIM_BUTTON .. ": Rolar a lista para cima.\10-" .. NEXT_ANIM_BUTTON .. ": Rolar a lista para baixo.\10-" .. PLAY_ANIM_BUTTON .. ": Reproduzir.\10-".. STOP_ANIM_BUTTON .. ": Parar."},
+        {iso = "ru-RU", text = "Используйте экспериментальные горячие клавиши для воспроизведения анимации. Эти горячие клавиши могут мешать игровому процессу, поэтому есть возможность их отключения.\10\10Текущая настройка:\10-" .. PREVIOUS_ANIM_BUTTON .. ": Прокрутить список вверх.\10-" .. NEXT_ANIM_BUTTON .. ": Прокрутить список вниз.\10-" .. PLAY_ANIM_BUTTON .. ": Воспроизвести.\10-".. STOP_ANIM_BUTTON .. ": Стоп."},
     },
 
     ["clumsy_tt"] = {

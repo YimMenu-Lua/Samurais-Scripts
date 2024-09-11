@@ -156,6 +156,18 @@ lua_Fn = {
     end))
   end,
 
+  ---@param n integer
+  ---@param base integer
+  decimalToHex = function(n, base)
+    local hex_rep, str, i, d = "0123456789ABCDEF", "", 0, 0
+    while n > 0 do
+      i = i + 1
+      n, d = math.floor(n / base), (n % base) + 1
+      str = string.sub(hex_rep , d, d) .. str
+    end
+    return '0x' .. str
+  end,
+
   ---Iterates over a table and returns the value from each key.
   ---@param table table
   iter = function(table)
@@ -200,7 +212,7 @@ lua_Fn = {
 
   ---@param n number
   get_bit = function(n)
-    return (2 ^ (n - 1)) * 2
+    return 2 ^ (n - 1)
   end,
 
   --[[ Checks if `n` has `x` bit.
@@ -252,86 +264,86 @@ lua_Fn = {
 -------------------------------------------------- ImGui Stuff ---------------------------------------------------------------
 UI = {
   getKeyPressed = function()
-    local btn, kbm, gpad
+    local btn, gpad
     local controls_T = {
-      { ctrl = 7,   kbm = "[L]",                          gpad = "[R3]" },
-      { ctrl = 10,  kbm = "[PAGE UP]",                    gpad = "[LT]" },
-      { ctrl = 11,  kbm = "[PAGE DOWN]",                  gpad = "[RT]" },
-      { ctrl = 14,  kbm = "[SCROLL WHEEL DOWN]",          gpad = "[DPAD RIGHT]" },
-      { ctrl = 15,  kbm = "[SCROLLWHEEL UP]",             gpad = "[DPAD LEFT]" },
-      { ctrl = 19,  kbm = "[LEFT ALT]",                   gpad = "[DPAD DOWN]" },
-      { ctrl = 20,  kbm = "[Z]",                          gpad = "[DPAD DOWN]" },
-      { ctrl = 21,  kbm = "[LEFT SHIFT]",                 gpad = "[A]" },
-      { ctrl = 22,  kbm = "[SPACEBAR]",                   gpad = "[X]" },
-      { ctrl = 23,  kbm = "[F]",                          gpad = "[Y]" },
-      { ctrl = 27,  kbm = "[ARROW UP / MID MOUSE DOWN]",  gpad = "[DPAD UP]" },
-      { ctrl = 29,  kbm = "[B]",                          gpad = "[R3]" },
-      { ctrl = 30,  kbm = "[D]",                          gpad = "[LEFT STICK]" },
-      { ctrl = 34,  kbm = "[A]",                          gpad = "[LEFT STICK]" },
-      { ctrl = 36,  kbm = "[LEFT CTRL]",                  gpad = "[L3]" },
-      { ctrl = 37,  kbm = "[TAB]",                        gpad = "[LB]" },
-      { ctrl = 38,  kbm = "[E]",                          gpad = "[LB]" },
-      { ctrl = 42,  kbm = "[ ] ]",                        gpad = "[DPAD UP]" },
-      { ctrl = 43,  kbm = "[ [ ]",                        gpad = "[DPAD DOWN]" },
-      { ctrl = 44,  kbm = "[Q]",                          gpad = "[RB]" },
-      { ctrl = 45,  kbm = "[R]",                          gpad = "[B]" },
-      { ctrl = 46,  kbm = "[E]",                          gpad = "[DPAD RIGHT]" },
-      { ctrl = 47,  kbm = "[G]",                          gpad = "[DPAD LEFT]" },
-      { ctrl = 56,  kbm = "[F9]",                         gpad = "[Y]" },
-      { ctrl = 57,  kbm = "[F10]",                        gpad = "[B]" },
-      { ctrl = 70,  kbm = "[RIGHT CTRL]",                 gpad = "[A]" },
-      { ctrl = 71,  kbm = "[W]",                          gpad = "[RT]" },
-      { ctrl = 72,  kbm = "[S]",                          gpad = "[LT]" },
-      { ctrl = 73,  kbm = "[X]",                          gpad = "[A]" },
-      { ctrl = 74,  kbm = "[H]",                          gpad = "[DPAD RIGHT]" },
-      { ctrl = 75,  kbm = "[F]",                          gpad = "[Y]" },
-      { ctrl = 76,  kbm = "[SPACE]",                      gpad = "[RB]" },
-      { ctrl = 79,  kbm = "[C]",                          gpad = "[R3]" },
-      { ctrl = 81,  kbm = "[ . ]",                        gpad = "(NONE)" },
-      { ctrl = 82,  kbm = "[ , ]",                        gpad = "(NONE)" },
-      { ctrl = 83,  kbm = "[ = ]",                        gpad = "(NONE)" },
-      { ctrl = 84,  kbm = "[ - ]",                        gpad = "(NONE)" },
-      { ctrl = 84,  kbm = "[Q]",                          gpad = "[DPAD LEFT]" },
-      { ctrl = 96,  kbm = "[NUMPAD+ / SCROLLWHEEL UP]",   gpad = "(NONE)" },
-      { ctrl = 97,  kbm = "[NUMPAD- / SCROLLWHEEL DOWN]", gpad = "(NONE)" },
-      { ctrl = 124, kbm = "[NUMPAD 4]",                   gpad = "[LEFT STICK]" },
-      { ctrl = 125, kbm = "[NUMPAD 6]",                   gpad = "[LEFT STICK]" },
-      { ctrl = 112, kbm = "[NUMPAD 5]",                   gpad = "[LEFT STICK]" },
-      { ctrl = 127, kbm = "[NUMPAD 8]",                   gpad = "[LEFT STICK]" },
-      { ctrl = 117, kbm = "[NUMPAD 7]",                   gpad = "[LB]" },
-      { ctrl = 118, kbm = "[NUMPAD 9]",                   gpad = "[RB]" },
-      { ctrl = 167, kbm = "[F6]",                         gpad = "(NONE)" },
-      { ctrl = 168, kbm = "[F7]",                         gpad = "(NONE)" },
-      { ctrl = 169, kbm = "[F8]",                         gpad = "(NONE)" },
-      { ctrl = 170, kbm = "[F3]",                         gpad = "[B]" },
-      { ctrl = 172, kbm = "[ARROW UP]",                   gpad = "[DPAD UP]" },
-      { ctrl = 173, kbm = "[ARROW DOWN]",                 gpad = "[DPAD DOWN]" },
-      { ctrl = 174, kbm = "[ARROW LEFT]",                 gpad = "[DPAD LEFT]" },
-      { ctrl = 175, kbm = "[ARROW RIGHT]",                gpad = "[DPAD RIGHT]" },
-      { ctrl = 178, kbm = "[DELETE]",                     gpad = "[Y]" },
-      { ctrl = 194, kbm = "[BACKSPACE]",                  gpad = "[B]" },
-      { ctrl = 243, kbm = "[ ~ ]",                        gpad = "(NONE)" },
-      { ctrl = 244, kbm = "[M]",                          gpad = "[BACK]" },
-      { ctrl = 249, kbm = "[N]",                          gpad = "(NONE)" },
-      { ctrl = 288, kbm = "[F1]",                         gpad = "[A]" },
-      { ctrl = 289, kbm = "[F2]",                         gpad = "[X]" },
-      { ctrl = 303, kbm = "[U]",                          gpad = "[DPAD UP]" },
-      { ctrl = 307, kbm = "[ARROW RIGHT]",                gpad = "[DPAD RIGHT]" },
-      { ctrl = 308, kbm = "[ARROW LEFT]",                 gpad = "[DPAD LEFT]" },
-      { ctrl = 311, kbm = "[K]",                          gpad = "[DPAD DOWN]" },
-      { ctrl = 318, kbm = "[F5]",                         gpad = "[START]" },
-      { ctrl = 322, kbm = "[ESC]",                        gpad = "(NONE)" },
-      { ctrl = 344, kbm = "[F11]",                        gpad = "[DPAD RIGHT]" },
+      { ctrl = 7,   gpad = "[R3]" },
+      { ctrl = 10,  gpad = "[LT]" },
+      { ctrl = 11,  gpad = "[RT]" },
+      { ctrl = 14,  gpad = "[DPAD RIGHT]" },
+      { ctrl = 15,  gpad = "[DPAD LEFT]" },
+      { ctrl = 19,  gpad = "[DPAD DOWN]" },
+      { ctrl = 20,  gpad = "[DPAD DOWN]" },
+      { ctrl = 21,  gpad = "[A]" },
+      { ctrl = 22,  gpad = "[X]" },
+      { ctrl = 23,  gpad = "[Y]" },
+      { ctrl = 27,  gpad = "[DPAD UP]" },
+      { ctrl = 29,  gpad = "[R3]" },
+      { ctrl = 30,  gpad = "[LEFT STICK]" },
+      { ctrl = 34,  gpad = "[LEFT STICK]" },
+      { ctrl = 36,  gpad = "[L3]" },
+      { ctrl = 37,  gpad = "[LB]" },
+      { ctrl = 38,  gpad = "[LB]" },
+      { ctrl = 42,  gpad = "[DPAD UP]" },
+      { ctrl = 43,  gpad = "[DPAD DOWN]" },
+      { ctrl = 44,  gpad = "[RB]" },
+      { ctrl = 45,  gpad = "[B]" },
+      { ctrl = 46,  gpad = "[DPAD RIGHT]" },
+      { ctrl = 47,  gpad = "[DPAD LEFT]" },
+      { ctrl = 56,  gpad = "[Y]" },
+      { ctrl = 57,  gpad = "[B]" },
+      { ctrl = 70,  gpad = "[A]" },
+      { ctrl = 71,  gpad = "[RT]" },
+      { ctrl = 72,  gpad = "[LT]" },
+      { ctrl = 73,  gpad = "[A]" },
+      { ctrl = 74,  gpad = "[DPAD RIGHT]" },
+      { ctrl = 75,  gpad = "[Y]" },
+      { ctrl = 76,  gpad = "[RB]" },
+      { ctrl = 79,  gpad = "[R3]" },
+      { ctrl = 81,  gpad = "(NONE)" },
+      { ctrl = 82,  gpad = "(NONE)" },
+      { ctrl = 83,  gpad = "(NONE)" },
+      { ctrl = 84,  gpad = "(NONE)" },
+      { ctrl = 84,  gpad = "[DPAD LEFT]" },
+      { ctrl = 96,  gpad = "(NONE)" },
+      { ctrl = 97,  gpad = "(NONE)" },
+      { ctrl = 124, gpad = "[LEFT STICK]" },
+      { ctrl = 125, gpad = "[LEFT STICK]" },
+      { ctrl = 112, gpad = "[LEFT STICK]" },
+      { ctrl = 127, gpad = "[LEFT STICK]" },
+      { ctrl = 117, gpad = "[LB]" },
+      { ctrl = 118, gpad = "[RB]" },
+      { ctrl = 167, gpad = "(NONE)" },
+      { ctrl = 168, gpad = "(NONE)" },
+      { ctrl = 169, gpad = "(NONE)" },
+      { ctrl = 170, gpad = "[B]" },
+      { ctrl = 172, gpad = "[DPAD UP]" },
+      { ctrl = 173, gpad = "[DPAD DOWN]" },
+      { ctrl = 174, gpad = "[DPAD LEFT]" },
+      { ctrl = 175, gpad = "[DPAD RIGHT]" },
+      { ctrl = 178, gpad = "[Y]" },
+      { ctrl = 194, gpad = "[B]" },
+      { ctrl = 243, gpad = "(NONE)" },
+      { ctrl = 244, gpad = "[BACK]" },
+      { ctrl = 249, gpad = "(NONE)" },
+      { ctrl = 288, gpad = "[A]" },
+      { ctrl = 289, gpad = "[X]" },
+      { ctrl = 303, gpad = "[DPAD UP]" },
+      { ctrl = 307, gpad = "[DPAD RIGHT]" },
+      { ctrl = 308, gpad = "[DPAD LEFT]" },
+      { ctrl = 311, gpad = "[DPAD DOWN]" },
+      { ctrl = 318, gpad = "[START]" },
+      { ctrl = 322, gpad = "(NONE)" },
+      { ctrl = 344, gpad = "[DPAD RIGHT]" },
     }
     for _, v in ipairs(controls_T) do
       if PAD.IS_CONTROL_JUST_PRESSED(0, v.ctrl) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, v.ctrl) then
-        btn, kbm, gpad  = v.ctrl, v.kbm, v.gpad
+        btn, gpad  = v.ctrl, v.gpad
       end
     end
-    if PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
-      return btn, kbm
-    else
+    if not PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
       return btn, gpad
+    else
+      return nil, nil
     end
   end,
 
@@ -579,6 +591,193 @@ UI = {
 
 -- As in Samurai's Scripts, not Schutzstaffel 🙄
 SS = {
+
+  isAnyKeyPressed = function()
+    ---@type boolean
+    local check
+    ---@type integer
+    local key_code
+    ---@type string
+    local key_name
+    for _, k in ipairs(VK_T) do
+      if k.just_pressed then
+        check    = true
+        key_code = k.code
+        key_name = k.name
+        break
+      end
+    end
+    return check, key_code, key_name
+  end,
+
+  ---@param key integer
+  isKeyPressed = function(key)
+    for _, k in ipairs(VK_T) do
+      if key == k.code then
+        if k.pressed then
+          return true
+        else
+          return false
+        end
+      end
+    end
+  end,
+
+  ---@param key integer
+  isKeyJustPressed = function(key)
+    for _, k in ipairs(VK_T) do
+      if key == k.code then
+        return k.just_pressed
+      end
+    end
+  end,
+
+  set_hotkey = function(keybind)
+    ImGui.Dummy(1, 10)
+    if key_name == nil then
+      start_loading_anim = true
+      UI.coloredText(translateLabel("input_waiting") .. loading_label, "#FFFFFF", 0.75, 20)
+      key_pressed, key_code, key_name = SS.isAnyKeyPressed()
+    else
+      start_loading_anim = false
+      for _, key in pairs(reserved_keys_T) do
+        if key_code == key then
+          _reserved = true
+          break
+        else
+          _reserved = false
+        end
+      end
+      if not _reserved then
+          ImGui.Text("New Key: "); ImGui.SameLine(); ImGui.Text(key_name)
+      else
+          UI.coloredText(translateLabel("reserved_button"), "red", 0.86, 20)
+      end
+      ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
+      if UI.coloredButton(" " .. translateLabel("generic_clear_btn") .. " ##Shortcut", "#FFDB58", "#FFFAA0", "#FFFFF0", 0.7) then
+        UI.widgetSound("Cancel")
+        key_code, key_name = nil, nil
+      end
+    end
+    ImGui.Dummy(1, 10)
+    if not _reserved and key_code ~= nil then
+      if ImGui.Button(translateLabel("generic_confirm_btn") .. "##keybinds") then
+        UI.widgetSound("Select")
+        keybind.code, keybind.name = key_code, key_name
+        lua_cfg.save("keybinds", keybinds)
+        key_code, key_name = nil, nil
+        is_setting_hotkeys = false
+        ImGui.CloseCurrentPopup()
+      end
+      ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
+    end
+    if ImGui.Button(translateLabel("generic_cancel_btn") .. "##shotcut") then
+      UI.widgetSound("Cancel")
+      key_code, key_name = nil, nil
+      start_loading_anim = false
+      is_setting_hotkeys = false
+      ImGui.CloseCurrentPopup()
+    end
+  end,
+
+  openHotkeyWindow = function(window_name, keybind)
+    ImGui.PushItemWidth(120)
+    ImGui.BulletText(window_name) ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+    keybind.name, _ = ImGui.InputText("##" .. window_name, keybind.name, 32, ImGuiInputTextFlags.ReadOnly)
+    ImGui.PopItemWidth()
+    if UI.isItemClicked('lmb') then
+      UI.widgetSound("Select2")
+      ImGui.OpenPopup(window_name)
+      is_setting_hotkeys = true
+    end
+    ImGui.SameLine(); ImGui.BeginDisabled(keybind.code == 0x0)
+    if ImGui.Button("Remove##" .. window_name) then
+      UI.widgetSound("Delete")
+      keybind.code, keybind.name = 0x0, "[Unbound]"
+    end
+    ImGui.EndDisabled()
+    ImGui.SetNextWindowPos(780, 400, ImGuiCond.Appearing)
+    ImGui.SetNextWindowSizeConstraints(240, 60, 600, 400)
+    ImGui.SetNextWindowBgAlpha(0.8)
+    if ImGui.BeginPopupModal(window_name, true, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar) then
+      is_setting_hotkeys = true
+      SS.set_hotkey(keybind)
+      ImGui.End()
+    end
+  end,
+
+  set_gpad_hotkey = function(keybind)
+    ImGui.Dummy(1, 10)
+    if gpad_keyName == nil then
+      start_loading_anim = true
+      UI.coloredText(translateLabel("input_waiting") .. loading_label, "#FFFFFF", 0.75, 20)
+      gpad_keyCode, gpad_keyName = UI.getKeyPressed()
+    else
+      start_loading_anim = false
+      for _, key in pairs(reserved_keys_T) do
+        if gpad_keyCode == key then
+          _reserved = true
+          break
+        else
+          _reserved = false
+        end
+      end
+      if not _reserved then
+          ImGui.Text("New Key: "); ImGui.SameLine(); ImGui.Text(gpad_keyName)
+      else
+          UI.coloredText(translateLabel("reserved_button"), "red", 0.86, 20)
+      end
+      ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
+      if UI.coloredButton(" " .. translateLabel("generic_clear_btn") .. " ##Shortcut", "#FFDB58", "#FFFAA0", "#FFFFF0", 0.7) then
+        UI.widgetSound("Cancel")
+        gpad_keyCode, gpad_keyName = nil, nil
+      end
+    end
+    ImGui.Dummy(1, 10)
+    if not _reserved and gpad_keyCode ~= nil then
+      if ImGui.Button(translateLabel("generic_confirm_btn") .. "##keybinds") then
+        UI.widgetSound("Select")
+        keybind.code, keybind.name = gpad_keyCode, gpad_keyName
+        lua_cfg.save("gpad_keybinds", gpad_keybinds)
+        gpad_keyCode, gpad_keyName = nil, nil
+        is_setting_hotkeys = false
+        ImGui.CloseCurrentPopup()
+      end
+      ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
+    end
+    if ImGui.Button(translateLabel("generic_cancel_btn") .. "##shotcut") then
+      UI.widgetSound("Cancel")
+      gpad_keyCode, gpad_keyName = nil, nil
+      start_loading_anim = false
+      is_setting_hotkeys = false
+      ImGui.CloseCurrentPopup()
+    end
+  end,
+
+  gpadHotkeyWindow = function(window_name, keybind)
+    ImGui.PushItemWidth(120)
+    ImGui.BulletText(window_name) ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+    keybind.name, _ = ImGui.InputText("##" .. window_name, keybind.name, 32, ImGuiInputTextFlags.ReadOnly)
+    ImGui.PopItemWidth()
+    if UI.isItemClicked('lmb') then
+      UI.widgetSound("Select2")
+      ImGui.OpenPopup(window_name)
+      is_setting_hotkeys = true
+    end
+    ImGui.SameLine(); ImGui.BeginDisabled(keybind.code == 0)
+    if ImGui.Button("Remove##" .. window_name) then
+      UI.widgetSound("Delete")
+      keybind.code, keybind.name = 0, "[Unbound]"
+    end
+    ImGui.EndDisabled()
+    ImGui.SetNextWindowPos(780, 400, ImGuiCond.Appearing)
+    ImGui.SetNextWindowSizeConstraints(240, 60, 600, 400)
+    ImGui.SetNextWindowBgAlpha(0.8)
+    if ImGui.BeginPopupModal(window_name, true, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar) then
+      SS.set_gpad_hotkey(keybind)
+      ImGui.End()
+    end
+  end,
 
   ---Reverts changes done by the script.
   handle_events = function()
