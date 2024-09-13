@@ -936,8 +936,8 @@ VK_T = {
   { code = 0xFA,    name = "[Play]",                 pressed = false, just_pressed = false },
   { code = 0xFB,    name = "[Zoom]",                 pressed = false, just_pressed = false },
   { code = 0xFE,    name = "[Clear]",                pressed = false, just_pressed = false },
-  { code = 0x20040, name = "[MOUSE 4]",              pressed = false, just_pressed = false },
-  { code = 0x10020, name = "[MOUSE 5]",              pressed = false, just_pressed = false },
+  { code = 0x10020, name = "[MOUSE 4]",              pressed = false, just_pressed = false },
+  { code = 0x20040, name = "[MOUSE 5]",              pressed = false, just_pressed = false },
 }
 
 world_seats_T          = {

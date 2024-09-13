@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.2.7' -- v1.2.7
+SCRIPT_VERSION = '1.2.8' -- v1.2.8
 TARGET_BUILD   = '3274'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -8,8 +8,10 @@ log.info("version " .. SCRIPT_VERSION)
 
 require('lib/samurais_utils')
 
-CURRENT_BUILD          = Game.GetBuildNumber()
-CURRENT_VERSION        = Game.GetOnlineVersion()
+
+CURRENT_BUILD   = Game.GetBuildNumber()
+CURRENT_VERSION = Game.GetOnlineVersion()
+
 
 Samurais_scripts       = gui.add_tab("Samurai's Scripts")
 loading_label          = ""
@@ -25,6 +27,7 @@ default_config         = {
   whouse_4_size           = { small = false, medium = false, large = false },
   whouse_5_size           = { small = false, medium = false, large = false },
   keybinds                = {
+    rodBtn        = { code = 0x58, name = "[X]" },
     tdBtn         = { code = 0x10, name = "[Shift]" },
     nosBtn        = { code = 0x10, name = "[Shift]" },
     stop_anim     = { code = 0x47, name = "[G]" },
@@ -36,13 +39,16 @@ default_config         = {
     autokill      = { code = 0x76, name = "[F7]" },
     enemiesFlee   = { code = 0x77, name = "[F8]" },
     vehicle_mine  = { code = 0x4E, name = "[N]" },
+    triggerbotBtn = { code = 0x10, name = "[Shift]" },
   },
   gpad_keybinds           = {
-    tdBtn        = { code = 0, name = "[Unbound]" },
-    nosBtn       = { code = 0, name = "[Unbound]" },
-    flatbedBtn   = { code = 0, name = "[Unbound]" },
-    purgeBtn     = { code = 0, name = "[Unbound]" },
-    vehicle_mine = { code = 0, name = "[Unbound]" },
+    rodBtn        = { code = 0, name = "[Unbound]" },
+    tdBtn         = { code = 0, name = "[Unbound]" },
+    nosBtn        = { code = 0, name = "[Unbound]" },
+    flatbedBtn    = { code = 0, name = "[Unbound]" },
+    purgeBtn      = { code = 0, name = "[Unbound]" },
+    vehicle_mine  = { code = 0, name = "[Unbound]" },
+    triggerbotBtn = { code = 0, name = "[Unbound]" },
   },
   Regen                   = false,
   -- objectiveTP             = false,
@@ -162,6 +168,7 @@ default_config         = {
   lang_idx                = 0,
   DriftIntensity          = 0,
   autoplay_chips_cap      = 0,
+  supply_autofill_delay   = 500,
   laser_choice            = "proj_laser_enemy",
   LANG                    = 'en-US',
   current_lang            = 'English',
@@ -282,6 +289,7 @@ whouse_2_size          = lua_cfg.read("whouse_2_size")
 whouse_3_size          = lua_cfg.read("whouse_3_size")
 whouse_4_size          = lua_cfg.read("whouse_4_size")
 whouse_5_size          = lua_cfg.read("whouse_5_size")
+supply_autofill_delay  = lua_cfg.read("supply_autofill_delay")
 current_vehicle        = self.get_veh()
 last_vehicle           = self.get_veh()
 tab1Sound              = true
@@ -407,16 +415,28 @@ curr_playing_anim      = {}
 laserPtfx_T            = {}
 chosen_anim            = {}
 default_handling_flags = unk
+
+
+SS.check_kb_keybinds()
+SS.check_gpad_keybinds()
+
+
 DRIFT_BUTTON           = keybinds.tdBtn.name
 STOP_ANIM_BUTTON       = keybinds.stop_anim.name
 PLAY_ANIM_BUTTON       = keybinds.play_anim.name
 PREVIOUS_ANIM_BUTTON   = keybinds.previous_anim.name
 NEXT_ANIM_BUTTON       = keybinds.next_anim.name
 FLATBED_BUTTON         = keybinds.flatbedBtn.name
-PURGE_BUTTON           = keybinds.purgeBtn.name
 AUTOKILL_BUTTON        = keybinds.autokill.name
 ENEMIES_FLEE_BUTTON    = keybinds.enemiesFlee.name
 VEHICLE_MINE_BUTTON    = keybinds.vehicle_mine.name
+KBM_ROD_BUTTON         = keybinds.rodBtn.name
+KBM_PURGE_BUTTON       = keybinds.purgeBtn.name
+KBM_TRIGGERBOT_BUTTON  = keybinds.triggerbotBtn.name
+GPAD_ROD_BUTTON        = gpad_keybinds.rodBtn.name
+GPAD_PURGE_BUTTON      = gpad_keybinds.purgeBtn.name
+GPAD_TRIGGERBOT_BUTTON = gpad_keybinds.triggerbotBtn.name
+
 
 require('lib/Translations')
 require('data/objects')
@@ -1967,6 +1987,7 @@ vehicle_tab:add_imgui(function()
   if speedBoost then
     ImGui.SameLine()
     if ImGui.Button("NOS Settings") then
+      UI.widgetSound("Select")
       ImGui.OpenPopup("Nos Settings")
     end
     ImGui.SetNextWindowPos(780, 400, ImGuiCond.Appearing)
@@ -2009,7 +2030,7 @@ vehicle_tab:add_imgui(function()
       end
       ImGui.Dummy(1, 20)
       if ImGui.Button("  " .. translateLabel("saveBtn") .. "  ##nos_settings") then
-        UI.widgetSound("Select2")
+        UI.widgetSound("Select")
         lua_cfg.save("nosPower", nosPower)
         ImGui.CloseCurrentPopup()
       end
@@ -2216,12 +2237,13 @@ vehicle_tab:add_imgui(function()
       ImGui.Dummy(1, 5)
       if missiledefense and (vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic) then
         UI.coloredText(
-        "[ ! ] NOTE: You have 'Missile Defense' activated which will automatically destroy / remove these mines. If you still want to use them, please disable 'Missile Defense'.",
+          "[ ! ] NOTE: You have 'Missile Defense' activated which will automatically destroy / remove these mines. If you still want to use them, please disable 'Missile Defense'.",
           "yellow", 0.69, 30)
       end
       ImGui.Dummy(1, 5)
       if vmine_type.spikes or vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic then
         if ImGui.Button("Confirm") then
+          UI.widgetSound("Select")
           lua_cfg.save("vmine_type", vmine_type)
           ImGui.CloseCurrentPopup()
         end
@@ -3815,23 +3837,21 @@ business_tab:add_imgui(function()
                 stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
               end
               ImGui.EndDisabled()
-              ImGui.BeginDisabled(wh2_loop or wh3_loop or wh4_loop or wh5_loop)
+              -- ImGui.BeginDisabled(wh2_loop or wh3_loop or wh4_loop or wh5_loop)
               ImGui.SameLine(); wh1_loop, wh1lUsed = ImGui.Checkbox("Auto##wh1", wh1_loop)
-              ImGui.EndDisabled()
+              -- ImGui.EndDisabled()
               if wh1lUsed then
                 UI.widgetSound("Nav2")
                 if wh1_loop then
-                  wh2_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
+                  -- wh2_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
+                  script.run_in_fiber(function(wh1l)
+                    repeat
+                      stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
+                      wh1l:sleep(supply_autofill_delay)
+                    until
+                      wh1Supplies == whouse1_max or wh1_loop == false
+                  end)
                 end
-              end
-              if wh1_loop then
-                script.run_in_fiber(function(wh1l)
-                  repeat
-                    stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
-                    wh1l:sleep(800)
-                  until
-                    wh1Supplies == whouse1_max or wh1_loop == false
-                end)
               end
             else
               if wh1_loop then
@@ -3896,23 +3916,21 @@ business_tab:add_imgui(function()
                 stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
               end
               ImGui.EndDisabled()
-              ImGui.BeginDisabled(wh1_loop or wh3_loop or wh4_loop or wh5_loop)
+              -- ImGui.BeginDisabled(wh1_loop or wh3_loop or wh4_loop or wh5_loop)
               ImGui.SameLine(); wh2_loop, wh2lUsed = ImGui.Checkbox("Auto##wh2", wh2_loop)
-              ImGui.EndDisabled()
+              -- ImGui.EndDisabled()
               if wh2lUsed then
                 UI.widgetSound("Nav2")
                 if wh2_loop then
-                  wh1_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
+                  -- wh1_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
+                  script.run_in_fiber(function(wh2l)
+                    repeat
+                      stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
+                      wh2l:sleep(supply_autofill_delay)
+                    until
+                      wh2Supplies == whouse2_max or wh2_loop == false
+                  end)
                 end
-              end
-              if wh2_loop then
-                script.run_in_fiber(function(wh2l)
-                  repeat
-                    stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
-                    wh2l:sleep(800)
-                  until
-                    wh2Supplies == whouse2_max or wh2_loop == false
-                end)
               end
             else
               if wh2_loop then
@@ -3977,23 +3995,21 @@ business_tab:add_imgui(function()
                 stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
               end
               ImGui.EndDisabled()
-              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh4_loop or wh5_loop)
+              -- ImGui.BeginDisabled(wh1_loop or wh2_loop or wh4_loop or wh5_loop)
               ImGui.SameLine(); wh3_loop, wh3lUsed = ImGui.Checkbox("Auto##wh3", wh3_loop)
-              ImGui.EndDisabled()
+              -- ImGui.EndDisabled()
               if wh3lUsed then
                 UI.widgetSound("Nav2")
                 if wh3_loop then
-                  wh1_loop, wh2_loop, wh4_loop, wh5_loop = false, false, false, false
+                  -- wh1_loop, wh2_loop, wh4_loop, wh5_loop = false, false, false, false
+                  script.run_in_fiber(function(wh3l)
+                    repeat
+                      stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
+                      wh3l:sleep(supply_autofill_delay)
+                    until
+                      wh3Supplies == whouse3_max or wh3_loop == false
+                  end)
                 end
-              end
-              if wh3_loop then
-                script.run_in_fiber(function(wh3l)
-                  repeat
-                    stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
-                    wh3l:sleep(800)
-                  until
-                    wh3Supplies == whouse3_max or wh3_loop == false
-                end)
               end
             else
               if wh3_loop then
@@ -4058,23 +4074,21 @@ business_tab:add_imgui(function()
                 stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
               end
               ImGui.EndDisabled()
-              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh5_loop)
+              -- ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh5_loop)
               ImGui.SameLine(); wh4_loop, wh4lUsed = ImGui.Checkbox("Auto##wh4", wh4_loop)
-              ImGui.EndDisabled()
+              -- ImGui.EndDisabled()
               if wh4lUsed then
                 UI.widgetSound("Nav2")
                 if wh4_loop then
-                  wh1_loop, wh2_loop, wh3_loop, wh5_loop = false, false, false, false
+                  -- wh1_loop, wh2_loop, wh3_loop, wh5_loop = false, false, false, false
+                  script.run_in_fiber(function(wh4l)
+                    repeat
+                      stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
+                      wh4l:sleep(supply_autofill_delay)
+                    until
+                      wh4Supplies == whouse4_max or wh4_loop == false
+                  end)
                 end
-              end
-              if wh4_loop then
-                script.run_in_fiber(function(wh4l)
-                  repeat
-                    stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
-                    wh4l:sleep(800)
-                  until
-                    wh4Supplies == whouse4_max or wh4_loop == false
-                end)
               end
             else
               if wh4_loop then
@@ -4139,23 +4153,21 @@ business_tab:add_imgui(function()
                 stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
               end
               ImGui.EndDisabled()
-              ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop)
+              -- ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop)
               ImGui.SameLine(); wh5_loop, wh5lUsed = ImGui.Checkbox("Auto##wh5", wh5_loop)
-              ImGui.EndDisabled()
+              -- ImGui.EndDisabled()
               if wh5lUsed then
                 UI.widgetSound("Nav2")
                 if wh5_loop then
-                  wh1_loop, wh2_loop, wh3_loop, wh4_loop = false, false, false, false
+                  -- wh1_loop, wh2_loop, wh3_loop, wh4_loop = false, false, false, false
+                  script.run_in_fiber(function(wh5l)
+                    repeat
+                      stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
+                      wh5l:sleep(supply_autofill_delay)
+                    until
+                      wh5Supplies == whouse5_max or wh5_loop == false
+                  end)
                 end
-              end
-              if wh5_loop then
-                script.run_in_fiber(function(wh5l)
-                  repeat
-                    stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
-                    wh5l:sleep(800)
-                  until
-                    wh5Supplies == whouse5_max or wh5_loop == false
-                end)
               end
             else
               if wh5_loop then
@@ -4193,15 +4205,15 @@ business_tab:add_imgui(function()
             ImGui.SameLine(); hangarLoop, hlUsed = ImGui.Checkbox("Auto##hangar", hangarLoop)
             if hlUsed then
               UI.widgetSound("Nav2")
-            end
-            if hangarLoop then
-              script.run_in_fiber(function(hl)
-                repeat
-                  stats.set_bool_masked(MPx .. "_DLC22022PSTAT_BOOL3", true, 9)
-                  hl:sleep(969) -- delay to prevent transaction error or infinite 'transaction pending'
-                until
-                  hangarSupplies == 50 or hangarLoop == false
-              end)
+              if hangarLoop then
+                script.run_in_fiber(function(hgl)
+                  repeat
+                    stats.set_bool_masked(MPx .. "_DLC22022PSTAT_BOOL3", true, 9)
+                    hgl:sleep(supply_autofill_delay)
+                  until
+                    hangarSupplies == 50 or hangarLoop == false
+                end)
+              end
             end
           else
             if hangarLoop then
@@ -4906,9 +4918,9 @@ business_tab:add_imgui(function()
         end
         ImGui.Spacing(); ImGui.SeparatorText("Sell Missions")
         ImGui.Spacing(); UI.wrappedText(
-        "These options will not be saved. Each button disables the most tedious sell missions for that business.", 32)
+          "These options will not be saved. Each button disables the most tedious sell missions for that business.", 32)
         ImGui.Spacing(); UI.coloredText(
-        "[ ! ] NOTE: If you plan on selling more than once for the same business (example: MC businesses or more than one CEO warehouse), please switch sessions after finishing the first sale to reset the missions, otherwise a sesond sell mission may fail to start.",
+          "[ ! ] NOTE: If you plan on selling more than once for the same business (example: MC businesses or more than one CEO warehouse), please switch sessions after finishing the first sale to reset the missions, otherwise a sesond sell mission may fail to start.",
           'yellow', 0.69, 32)
 
         if ImGui.Button("Easy Biker Sell Missions") then
@@ -6878,6 +6890,20 @@ settings_tab:add_imgui(function()
     UI.toolTip(false, translateLabel("no_shortcut_tt"))
   end
 
+  ImGui.Spacing(); ImGui.Text("Supplies Autofill Delay:")
+  ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop or hangarLoop)
+  ImGui.PushItemWidth(200)
+  supply_autofill_delay, safdUsed = ImGui.SliderInt("##autofillDelay", supply_autofill_delay, 500, 60000)
+  ImGui.PopItemWidth()
+  ImGui.EndDisabled()
+  UI.toolTip(false, translateLabel("autofillDelay_tt"))
+  ImGui.SameLine(); ImGui.Text(tostring(lua_Fn.round((supply_autofill_delay / 1000), 1)) .. "s")
+  if safdUsed then
+    UI.widgetSound("Nav")
+    lua_cfg.save("supply_autofill_delay", supply_autofill_delay)
+    supply_autofill_delay = lua_cfg.read("supply_autofill_delay")
+  end
+
   ImGui.Dummy(1, 10); ImGui.SeparatorText(translateLabel("langTitle"))
   ImGui.Spacing(); ImGui.BulletText(translateLabel("currentLang_txt") .. " " .. current_lang)
   ImGui.Spacing(); useGameLang, uglUsed = ImGui.Checkbox(translateLabel("gameLangCB"), useGameLang)
@@ -6923,153 +6949,7 @@ settings_tab:add_imgui(function()
     UI.coloredText(translateLabel("confirm_txt"), "yellow", 1, 20)
     if ImGui.Button("  " .. translateLabel("yes") .. "  ") then
       UI.widgetSound("Select2")
-      shortcut_anim           = {}
-      vmine_type              = { spikes = false, slick = false, explosive = false, emp = false, kinetic = false }
-      whouse_1_size           = { small = false, medium = false, large = false }
-      whouse_2_size           = { small = false, medium = false, large = false }
-      whouse_3_size           = { small = false, medium = false, large = false }
-      whouse_4_size           = { small = false, medium = false, large = false }
-      whouse_5_size           = { small = false, medium = false, large = false }
-      keybinds                = {
-        tdBtn         = { code = 0x10, name = "[Shift]" },
-        nosBtn        = { code = 0x10, name = "[Shift]" },
-        stop_anim     = { code = 0x47, name = "[G]" },
-        play_anim     = { code = 0x2E, name = "[DEL]" },
-        previous_anim = { code = 0x21, name = "[PAGE UP]" },
-        next_anim     = { code = 0x22, name = "[PAGE DOWN]" },
-        flatbedBtn    = { code = 0x58, name = "[X]" },
-        purgeBtn      = { code = 0x58, name = "[X]" },
-        autokill      = { code = 0x76, name = "[F7]" },
-        enemiesFlee   = { code = 0x77, name = "[F8]" },
-        vehicle_mine  = { code = 0x4E, name = "[N]" },
-      }
-      gpad_keybinds           = {
-        tdBtn        = { code = 0, name = "[Unbound]" },
-        nosBtn       = { code = 0, name = "[Unbound]" },
-        flatbedBtn   = { code = 0, name = "[Unbound]" },
-        purgeBtn     = { code = 0, name = "[Unbound]" },
-        vehicle_mine = { code = 0, name = "[Unbound]" },
-      }
-      Regen                   = false
-      -- objectiveTP             = false
-      disableTooltips         = false
-      phoneAnim               = false
-      sprintInside            = false
-      lockpick                = false
-      replaceSneakAnim        = false
-      replacePointAct         = false
-      disableSound            = false
-      disableActionMode       = false
-      rod                     = false
-      clumsy                  = false
-      ragdoll_sound           = false
-      Triggerbot              = false
-      aimEnemy                = false
-      autoKill                = false
-      runaway                 = false
-      laserSight              = false
-      disableUiSounds         = false
-      driftMode               = false
-      DriftTires              = false
-      DriftSmoke              = false
-      driftMinigame           = false
-      speedBoost              = false
-      nosvfx                  = false
-      nosAudio                = false
-      nosFlames               = false
-      hornLight               = false
-      nosPurge                = false
-      insta180                = false
-      flappyDoors             = false
-      rgbLights               = false
-      loud_radio              = false
-      launchCtrl              = false
-      popsNbangs              = false
-      limitVehOptions         = false
-      missiledefense          = false
-      louderPops              = false
-      autobrklight            = false
-      holdF                   = false
-      keepWheelsTurned        = false
-      towEverything           = false
-      noJacking               = false
-      noEngineBraking         = false
-      kersBoost               = false
-      offroaderx2             = false
-      rallyTires              = false
-      noTractionCtrl          = false
-      easyWheelie             = false
-      rwSteering              = false
-      awSteering              = false
-      handbrakeSteering       = false
-      useGameLang             = false
-      disableProps            = false
-      manualFlags             = false
-      controllable            = false
-      looped                  = false
-      upperbody               = false
-      freeze                  = false
-      usePlayKey              = false
-      npc_godMode             = false
-      bypass_casino_bans      = false
-      force_poker_cards       = false
-      set_dealers_poker_cards = false
-      force_roulette_wheel    = false
-      rig_slot_machine        = false
-      autoplay_slots          = false
-      autoplay_cap            = false
-      heist_cart_autograb     = false
-      flares_forall           = false
-      real_plane_speed        = false
-      extend_world            = false
-      unbreakableWindows      = false
-      disableFlightMusic      = false
-      disable_quotes          = false
-      disable_mdef_logs       = false
-      replace_pool_q          = false
-      public_seats            = false
-      mc_work_cd              = false
-      hangar_cd               = false
-      nc_management_cd        = false
-      nc_vip_mission_chance   = false
-      security_missions_cd    = false
-      ie_vehicle_steal_cd     = false
-      ie_vehicle_sell_cd      = false
-      ceo_crate_buy_cd        = false
-      ceo_crate_sell_cd       = false
-      ceo_crate_buy_f_cd      = false
-      ceo_crate_sell_f_cd     = false
-      cashUpdgrade1           = false
-      cashUpdgrade2           = false
-      cokeUpdgrade1           = false
-      cokeUpdgrade2           = false
-      methUpdgrade1           = false
-      methUpdgrade2           = false
-      weedUpdgrade1           = false
-      weedUpdgrade2           = false
-      fdUpdgrade1             = false
-      fdUpdgrade2             = false
-      bunkerUpdgrade1         = false
-      bunkerUpdgrade2         = false
-      acidUpdgrade            = false
-      whouse_1_owned          = false
-      whouse_2_owned          = false
-      whouse_3_owned          = false
-      whouse_4_owned          = false
-      whouse_5_owned          = false
-      veh_mines               = false
-      laser_switch            = 0
-      DriftIntensity          = 0
-      lang_idx                = 0
-      autoplay_chips_cap      = 0
-      lightSpeed              = 1
-      DriftPowerIncrease      = 1
-      nosPower                = 10
-      nosBtn                  = 21
-      laser_choice            = "proj_laser_enemy"
-      LANG                    = "en-US"
-      current_lang            = "English"
-      lua_cfg.reset(default_config)
+      SS.reset_settings()
       ImGui.CloseCurrentPopup()
     end
     ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
@@ -7087,31 +6967,39 @@ hotkeys_tab:add_imgui(function()
   if ImGui.BeginTabItem("Keyboard") then
     ImGui.Dummy(1, 5)
 
-    SS.openHotkeyWindow("Drift Button               ", keybinds.tdBtn)
+    SS.openHotkeyWindow("Ragdoll On Demand   ", keybinds.rodBtn)
 
-    SS.openHotkeyWindow("NOS Button               ", keybinds.nosBtn)
+    SS.openHotkeyWindow("Drift Button                ", keybinds.tdBtn)
 
-    SS.openHotkeyWindow("Stop Anim Button      ", keybinds.stop_anim)
+    SS.openHotkeyWindow("NOS Button                ", keybinds.nosBtn)
 
-    SS.openHotkeyWindow("Play Anim Button      ", keybinds.play_anim)
+    SS.openHotkeyWindow("Stop Anim Button       ", keybinds.stop_anim)
+
+    SS.openHotkeyWindow("Play Anim Button       ", keybinds.play_anim)
 
     SS.openHotkeyWindow("Previous Anim Button", keybinds.previous_anim)
 
     SS.openHotkeyWindow("Next Anim Button      ", keybinds.next_anim)
 
-    SS.openHotkeyWindow("Flatbed Button          ", keybinds.flatbedBtn)
+    SS.openHotkeyWindow("Triggerbot Button      ", keybinds.triggerbotBtn)
 
-    SS.openHotkeyWindow("Purge Button            ", keybinds.purgeBtn)
+    SS.openHotkeyWindow("Flatbed Button           ", keybinds.flatbedBtn)
 
-    SS.openHotkeyWindow("Toggle Auto-kill        ", keybinds.autokill)
+    SS.openHotkeyWindow("Purge Button             ", keybinds.purgeBtn)
 
-    SS.openHotkeyWindow("Toggle Enemies Flee", keybinds.enemiesFlee)
+    SS.openHotkeyWindow("Toggle Auto-Kill         ", keybinds.autokill)
 
-    SS.openHotkeyWindow("Vehicle Mine Button ", keybinds.vehicle_mine)
+    SS.openHotkeyWindow("Toggle Enemies Flee ", keybinds.enemiesFlee)
+
+    SS.openHotkeyWindow("Vehicle Mine Button  ", keybinds.vehicle_mine)
     ImGui.EndTabItem()
   end
   if ImGui.BeginTabItem("Controller") then
     ImGui.Dummy(1, 5)
+
+    SS.gpadHotkeyWindow("Ragdoll On Demand  ", gpad_keybinds.rodBtn)
+
+    SS.gpadHotkeyWindow("Triggerbot Button      ", gpad_keybinds.triggerbotBtn)
 
     SS.gpadHotkeyWindow("Drift Button               ", gpad_keybinds.tdBtn)
 
@@ -7250,11 +7138,11 @@ script.register_looped("GameInput", function()
     pressing_drift_button = gpad_keybinds.tdBtn.code ~= 0 and PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.tdBtn.code)
     pressing_nos_button   = gpad_keybinds.nosBtn.code ~= 0 and PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.nosBtn.code)
     pressing_purge_button = gpad_keybinds.purgeBtn.code ~= 0 and
-    (PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.purgeBtn.code) or PAD.IS_DISABLED_CONTROL_PRESSED(0, gpad_keybinds.purgeBtn.code))
+        (PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.purgeBtn.code) or PAD.IS_DISABLED_CONTROL_PRESSED(0, gpad_keybinds.purgeBtn.code))
     pressing_fltbd_button = gpad_keybinds.flatbedBtn.code ~= 0 and
-    (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.flatbedBtn.code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.flatbedBtn.code))
+        (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.flatbedBtn.code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.flatbedBtn.code))
     pressing_vmine_button = gpad_keybinds.vehicle_mine.code ~= 0 and
-    (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.vehicle_mine.code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.vehicle_mine.code))
+        (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.vehicle_mine.code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.vehicle_mine.code))
   end
 
   if is_in_flatbed then
@@ -10213,21 +10101,38 @@ event.register_handler(menu_event.Wndproc, function(hwnd, msg, wParam, lParam)
       if wParam == key.code then
         key.pressed      = true
         key.just_pressed = true
-        if SS_debug then
-          log.debug(
-            "\10--- Pressed Key ---" .. "\10 ¤ Name:       " .. key.name .. "\10 ¤ Keycode:    " ..
-            lua_Fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit 24 Set: " .. tostring((lParam & (0x1 << 24)) > 0)
-            .. "\10 ¤ SYSKEY:     " .. tostring(msg == WM._SYSKEYDOWN)
-          )
+        SS.debug(
+          "\10--- Pressed Key ---" .. "\10 ¤ Name:       " .. key.name .. "\10 ¤ Keycode:    " ..
+          lua_Fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit 24 Set: " .. tostring((lParam & (0x1 << 24)) > 0)
+          .. "\10 ¤ SYSKEY:     " .. tostring(msg == WM._SYSKEYDOWN)
+        )
+        break
+      end
+    end
+  elseif msg == WM._KEYUP or msg == WM._SYSKEYUP then
+    for _, key in ipairs(VK_T) do
+      if wParam == key.code then
+        if key.pressed then
+          key.pressed      = false
+          key.just_pressed = false
+          break
         end
       end
     end
-  elseif msg == WM._KEYUP or msg == WM._SYSKEYUP or msg == WM._XBUTTONUP then
+  elseif msg == WM._XBUTTONUP then
     for _, key in ipairs(VK_T) do
-      if wParam == key.code then
-        key.pressed      = false
-        key.just_pressed = false
-        break
+      if key.code == 0x10020 then
+        if key.pressed then
+          key.pressed      = false
+          key.just_pressed = false
+          break
+        end
+      elseif key.code == 0x20040 then
+        if key.pressed then
+          key.pressed      = false
+          key.just_pressed = false
+          break
+        end
       end
     end
   end

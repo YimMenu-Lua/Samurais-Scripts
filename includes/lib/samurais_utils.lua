@@ -73,7 +73,7 @@ lua_Fn = {
     return tonumber(string.format("%." .. (x or 0) .. "f", n))
   end,
 
-    ---Returns a string containing the input value separated by the thousands.
+  ---Returns a string containing the input value separated by the thousands.
   --[[ -- Example:
 
       lua_Fn.separateInt(42069)
@@ -133,7 +133,7 @@ lua_Fn = {
   --[[ Decodes hex to string.
 
   HEX must be provided in a string format.
-      
+
   - Example:
 
         lua_Fn.hexToString("63756E74")
@@ -163,7 +163,7 @@ lua_Fn = {
     while n > 0 do
       i = i + 1
       n, d = math.floor(n / base), (n % base) + 1
-      str = string.sub(hex_rep , d, d) .. str
+      str = string.sub(hex_rep, d, d) .. str
     end
     return '0x' .. str
   end,
@@ -179,6 +179,17 @@ lua_Fn = {
         return table[i]
       end
     end
+  end,
+
+  ---Returns the number of values in a table.
+  ---@param table table
+  ---@return number
+  getTableLength = function(table)
+    local count = 0
+    for _ in pairs(table) do
+      count = count + 1
+    end
+    return count
   end,
 
   ---Returns the number of duplicate values in a table.
@@ -216,10 +227,10 @@ lua_Fn = {
   end,
 
   --[[ Checks if `n` has `x` bit.
-      
+
   - Example:
 
-        if lua_Fn.has_bit(n, x) then 
+        if lua_Fn.has_bit(n, x) then
           --do something
         end
   ]]
@@ -337,7 +348,7 @@ UI = {
     }
     for _, v in ipairs(controls_T) do
       if PAD.IS_CONTROL_JUST_PRESSED(0, v.ctrl) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, v.ctrl) then
-        btn, gpad  = v.ctrl, v.gpad
+        btn, gpad = v.ctrl, v.gpad
       end
     end
     if not PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
@@ -354,7 +365,7 @@ UI = {
     if type(col) == "string" then
       if col:find("^#") then
         r, g, b = lua_Fn.hexToRGB(col)
-        r, g , b = lua_Fn.round((r / 255), 1), lua_Fn.round((g / 255), 1), lua_Fn.round((b / 255), 1)
+        r, g, b = lua_Fn.round((r / 255), 1), lua_Fn.round((g / 255), 1), lua_Fn.round((b / 255), 1)
       elseif col == "black" then
         r, g, b = 0, 0, 0
       elseif col == "white" then
@@ -590,7 +601,14 @@ UI = {
 ----------------------------------------------- Script Specific -------------------------------------------------
 
 -- As in Samurai's Scripts, not Schutzstaffel 🙄
-SS = {
+SS                          = {
+
+  ---@param data string
+  debug = function(data)
+    if SS_debug then
+      log.debug(data)
+    end
+  end,
 
   isAnyKeyPressed = function()
     ---@type boolean
@@ -649,9 +667,9 @@ SS = {
         end
       end
       if not _reserved then
-          ImGui.Text("New Key: "); ImGui.SameLine(); ImGui.Text(key_name)
+        ImGui.Text("New Key: "); ImGui.SameLine(); ImGui.Text(key_name)
       else
-          UI.coloredText(translateLabel("reserved_button"), "red", 0.86, 20)
+        UI.coloredText(translateLabel("reserved_button"), "red", 0.86, 20)
       end
       ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
       if UI.coloredButton(" " .. translateLabel("generic_clear_btn") .. " ##Shortcut", "#FFDB58", "#FFFAA0", "#FFFFF0", 0.7) then
@@ -682,7 +700,8 @@ SS = {
 
   openHotkeyWindow = function(window_name, keybind)
     ImGui.PushItemWidth(120)
-    ImGui.BulletText(window_name) ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+    ImGui.BulletText(window_name)
+    ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
     keybind.name, _ = ImGui.InputText("##" .. window_name, keybind.name, 32, ImGuiInputTextFlags.ReadOnly)
     ImGui.PopItemWidth()
     if UI.isItemClicked('lmb') then
@@ -723,9 +742,9 @@ SS = {
         end
       end
       if not _reserved then
-          ImGui.Text("New Key: "); ImGui.SameLine(); ImGui.Text(gpad_keyName)
+        ImGui.Text("New Key: "); ImGui.SameLine(); ImGui.Text(gpad_keyName)
       else
-          UI.coloredText(translateLabel("reserved_button"), "red", 0.86, 20)
+        UI.coloredText(translateLabel("reserved_button"), "red", 0.86, 20)
       end
       ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
       if UI.coloredButton(" " .. translateLabel("generic_clear_btn") .. " ##Shortcut", "#FFDB58", "#FFFAA0", "#FFFFF0", 0.7) then
@@ -756,7 +775,8 @@ SS = {
 
   gpadHotkeyWindow = function(window_name, keybind)
     ImGui.PushItemWidth(120)
-    ImGui.BulletText(window_name) ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+    ImGui.BulletText(window_name)
+    ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
     keybind.name, _ = ImGui.InputText("##" .. window_name, keybind.name, 32, ImGuiInputTextFlags.ReadOnly)
     ImGui.PopItemWidth()
     if UI.isItemClicked('lmb') then
@@ -779,6 +799,66 @@ SS = {
     end
   end,
 
+  ---Seamlessly add/remove keyboard keybinds on script update without requiring a config reset.
+  check_kb_keybinds = function()
+    local kb_keybinds_list = default_config.keybinds
+    local t_len            = lua_Fn.getTableLength
+    if t_len(keybinds) == t_len(kb_keybinds_list) then
+      SS.debug('No new keyboard keybinds.')
+      return false -- early exit
+    elseif t_len(keybinds) > t_len(kb_keybinds_list) then
+      for k, _ in pairs(keybinds) do
+        local kk = kb_keybinds_list[k]
+        if kk == nil then -- removed keybind
+          SS.debug('Removed keyboard keybind: ' .. tostring(keybinds[k]))
+          keybinds[k] = nil
+          lua_cfg.save("keybinds", keybinds)  -- save
+          keybinds = lua_cfg.read("keybinds") -- refresh
+        end
+      end
+    else
+      for k, _ in pairs(kb_keybinds_list) do
+        local kk = keybinds[k]
+        if kk == nil then -- new keybind
+          SS.debug('Added keyboard keybind: ' .. tostring(k))
+          keybinds[k] = kb_keybinds_list[k]
+          lua_cfg.save("keybinds", keybinds)  -- save
+          keybinds = lua_cfg.read("keybinds") -- refresh
+        end
+      end
+    end
+  end,
+
+  ---Seamlessly add/remove controller keybinds on script update without requiring a config reset.
+  check_gpad_keybinds = function()
+    local gpad_keybinds_list = default_config.gpad_keybinds
+    local t_len              = lua_Fn.getTableLength
+    if t_len(gpad_keybinds) == t_len(gpad_keybinds_list) then
+      SS.debug('No new gamepad keybinds.')
+      return false -- early exit
+    elseif t_len(gpad_keybinds) > t_len(gpad_keybinds_list) then
+      for k, _ in pairs(gpad_keybinds) do
+        local kk = gpad_keybinds_list[k]
+        if kk == nil then -- removed keybind
+          SS.debug('Removed gamepad keybind: ' .. tostring(gpad_keybinds[k]))
+          gpad_keybinds[k] = nil
+          lua_cfg.save("gpad_keybinds", gpad_keybinds)  -- save
+          gpad_keybinds = lua_cfg.read("gpad_keybinds") -- refresh
+        end
+      end
+    else
+      for k, _ in pairs(gpad_keybinds_list) do
+        local kk = gpad_keybinds[k]
+        if kk == nil then -- new keybind
+          SS.debug('Added gamepad keybind: ' .. tostring(k))
+          gpad_keybinds[k] = gpad_keybinds_list[k]
+          lua_cfg.save("gpad_keybinds", gpad_keybinds)  -- save
+          gpad_keybinds = lua_cfg.read("gpad_keybinds") -- refresh
+        end
+      end
+    end
+  end,
+
   ---Reverts changes done by the script.
   handle_events = function()
     if attached_ped ~= nil and attached_ped ~= 0 then
@@ -796,7 +876,8 @@ SS = {
 
     if attached_vehicle ~= nil and attached_vehicle ~= 0 then
       local modelHash         = ENTITY.GET_ENTITY_MODEL(attached_vehicle)
-      local attachedVehicle   = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(PED.GET_VEHICLE_PED_IS_USING(self.get_ped()),
+      local attachedVehicle   = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(
+        PED.GET_VEHICLE_PED_IS_USING(self.get_ped()),
         modelHash)
       local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(attached_vehicle, false)
       local playerForwardX    = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
@@ -961,14 +1042,14 @@ SS = {
     for _, seat in ipairs(world_seats_T) do
       local distCalc = SYSTEM.VDIST2(myCoords.x, myCoords.y, myCoords.z, seat.pos.x, seat.pos.y, seat.pos.z)
       if distCalc <= 1.8 then
-        seatPos = {x = seat.pos.x, y = seat.pos.y, z = seat.pos.z}
-        seatRot = {x = seat.rot.x, y = seat.rot.y, z = seat.rot.z}
+        seatPos = { x = seat.pos.x, y = seat.pos.y, z = seat.pos.z }
+        seatRot = { x = seat.rot.x, y = seat.rot.y, z = seat.rot.z }
         retBool = true
         break
       else
         retBool = false
-        seatPos = {x = 0.0, y = 0.0, z = 0.0}
-        seatRot = {x = 0.0, y = 0.0, z = 0.0}
+        seatPos = { x = 0.0, y = 0.0, z = 0.0 }
+        seatRot = { x = 0.0, y = 0.0, z = 0.0 }
       end
     end
     return retBool, seatPos, seatRot
@@ -1097,18 +1178,174 @@ SS = {
     end
     return offset
   end,
+
+  ---Reset saved config without affecting custom outfits and custom vahicles.
+  reset_settings = function()
+    shortcut_anim = {}; lua_cfg.save("shortcut_anim", shortcut_anim)
+    vmine_type = { spikes = false, slick = false, explosive = false, emp = false, kinetic = false }; lua_cfg.save(
+    "vmine_type", vmine_type)
+    whouse_1_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_1_size", whouse_1_size)
+    whouse_2_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_2_size", whouse_2_size)
+    whouse_3_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_3_size", whouse_3_size)
+    whouse_4_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_4_size", whouse_4_size)
+    whouse_5_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_5_size", whouse_5_size)
+    keybinds = {
+      rodBtn        = { code = 0x58, name = "[X]" },
+      tdBtn         = { code = 0x10, name = "[Shift]" },
+      nosBtn        = { code = 0x10, name = "[Shift]" },
+      stop_anim     = { code = 0x47, name = "[G]" },
+      play_anim     = { code = 0x2E, name = "[DEL]" },
+      previous_anim = { code = 0x21, name = "[PAGE UP]" },
+      next_anim     = { code = 0x22, name = "[PAGE DOWN]" },
+      flatbedBtn    = { code = 0x58, name = "[X]" },
+      purgeBtn      = { code = 0x58, name = "[X]" },
+      autokill      = { code = 0x76, name = "[F7]" },
+      enemiesFlee   = { code = 0x77, name = "[F8]" },
+      vehicle_mine  = { code = 0x4E, name = "[N]" },
+      triggerbotBtn = { code = 0x10, name = "[Shift]" }
+    }; lua_cfg.save("keybinds", keybinds)
+    gpad_keybinds = {
+      rodBtn        = { code = 0, name = "[Unbound]" },
+      tdBtn         = { code = 0, name = "[Unbound]" },
+      nosBtn        = { code = 0, name = "[Unbound]" },
+      flatbedBtn    = { code = 0, name = "[Unbound]" },
+      purgeBtn      = { code = 0, name = "[Unbound]" },
+      vehicle_mine  = { code = 0, name = "[Unbound]" },
+      triggerbotBtn = { code = 0, name = "[Unbound]" },
+    }; lua_cfg.save("gpad_keybinds", gpad_keybinds)
+    Regen = false; lua_cfg.save("Regen", Regen)
+    -- objectiveTP             = false
+    disableTooltips = false; lua_cfg.save("disableTooltips", disableTooltips)
+    phoneAnim = false; lua_cfg.save("phoneAnim", phoneAnim)
+    sprintInside = false; lua_cfg.save("sprintInside", sprintInside)
+    lockpick = false; lua_cfg.save("lockpick", lockpick)
+    replaceSneakAnim = false; lua_cfg.save("replaceSneakAnim", replaceSneakAnim)
+    replacePointAct = false; lua_cfg.save("replacePointAct", replacePointAct)
+    disableSound = false; lua_cfg.save("disableSound", disableSound)
+    disableActionMode = false; lua_cfg.save("disableActionMode", disableActionMode)
+    rod = false; lua_cfg.save("rod", rod)
+    clumsy = false; lua_cfg.save("clumsy", clumsy)
+    ragdoll_sound = false; lua_cfg.save("ragdoll_sound", ragdoll_sound)
+    Triggerbot = false; lua_cfg.save("Triggerbot", Triggerbot)
+    aimEnemy = false; lua_cfg.save("aimEnemy", aimEnemy)
+    autoKill = false; lua_cfg.save("autoKill", autoKill)
+    runaway = false; lua_cfg.save("runaway", runaway)
+    laserSight = false; lua_cfg.save("laserSight", laserSight)
+    disableUiSounds = false; lua_cfg.save("disableUiSounds", disableUiSounds)
+    driftMode = false; lua_cfg.save("driftMode", driftMode)
+    DriftTires = false; lua_cfg.save("DriftTires", DriftTires)
+    DriftSmoke = false; lua_cfg.save("DriftSmoke", DriftSmoke)
+    driftMinigame = false; lua_cfg.save("driftMinigame", driftMinigame)
+    speedBoost = false; lua_cfg.save("speedBoost", speedBoost)
+    nosvfx = false; lua_cfg.save("nosvfx", nosvfx)
+    nosAudio = false; lua_cfg.save("nosAudio", nosAudio)
+    nosFlames = false; lua_cfg.save("nosFlames", nosFlames)
+    hornLight = false; lua_cfg.save("hornLight", hornLight)
+    nosPurge = false; lua_cfg.save("nosPurge", nosPurge)
+    insta180 = false; lua_cfg.save("insta180", insta180)
+    flappyDoors = false; lua_cfg.save("flappyDoors", flappyDoors)
+    rgbLights = false; lua_cfg.save("rgbLights", rgbLights)
+    loud_radio = false; lua_cfg.save("loud_radio", loud_radio)
+    launchCtrl = false; lua_cfg.save("launchCtrl", launchCtrl)
+    popsNbangs = false; lua_cfg.save("popsNbangs", popsNbangs)
+    limitVehOptions = false; lua_cfg.save("limitVehOptions", limitVehOptions)
+    missiledefense = false; lua_cfg.save("missiledefense", missiledefense)
+    louderPops = false; lua_cfg.save("louderPops", louderPops)
+    autobrklight = false; lua_cfg.save("autobrklight", autobrklight)
+    holdF = false; lua_cfg.save("holdF", holdF)
+    keepWheelsTurned = false; lua_cfg.save("keepWheelsTurned", keepWheelsTurned)
+    towEverything = false; lua_cfg.save("towEverything", towEverything)
+    noJacking = false; lua_cfg.save("noJacking", noJacking)
+    noEngineBraking = false; lua_cfg.save("noEngineBraking", noEngineBraking)
+    kersBoost = false; lua_cfg.save("kersBoost", kersBoost)
+    offroaderx2 = false; lua_cfg.save("offroaderx2", offroaderx2)
+    rallyTires = false; lua_cfg.save("rallyTires", rallyTires)
+    noTractionCtrl = false; lua_cfg.save("noTractionCtrl", noTractionCtrl)
+    easyWheelie = false; lua_cfg.save("easyWheelie", easyWheelie)
+    rwSteering = false; lua_cfg.save("rwSteering", rwSteering)
+    awSteering = false; lua_cfg.save("awSteering", awSteering)
+    handbrakeSteering = false; lua_cfg.save("handbrakeSteering", handbrakeSteering)
+    useGameLang = false; lua_cfg.save("useGameLang", useGameLang)
+    disableProps = false; lua_cfg.save("disableProps", disableProps)
+    manualFlags = false; lua_cfg.save("manualFlags", manualFlags)
+    controllable = false; lua_cfg.save("controllable", controllable)
+    looped = false; lua_cfg.save("looped", looped)
+    upperbody = false; lua_cfg.save("upperbody", upperbody)
+    freeze = false; lua_cfg.save("freeze", freeze)
+    usePlayKey = false; lua_cfg.save("usePlayKey", usePlayKey)
+    npc_godMode = false; lua_cfg.save("npc_godMode", npc_godMode)
+    bypass_casino_bans = false; lua_cfg.save("bypass_casino_bans", bypass_casino_bans)
+    force_poker_cards = false; lua_cfg.save("force_poker_cards", force_poker_cards)
+    set_dealers_poker_cards = false; lua_cfg.save("set_dealers_poker_cards", set_dealers_poker_cards)
+    force_roulette_wheel = false; lua_cfg.save("force_roulette_wheel", force_roulette_wheel)
+    rig_slot_machine = false; lua_cfg.save("rig_slot_machine", rig_slot_machine)
+    autoplay_slots = false; lua_cfg.save("autoplay_slots", autoplay_slots)
+    autoplay_cap = false; lua_cfg.save("autoplay_cap", autoplay_cap)
+    heist_cart_autograb = false; lua_cfg.save("heist_cart_autograb", heist_cart_autograb)
+    flares_forall = false; lua_cfg.save("flares_forall", flares_forall)
+    real_plane_speed = false; lua_cfg.save("real_plane_speed", real_plane_speed)
+    extend_world = false; lua_cfg.save("extend_world", extend_world)
+    unbreakableWindows = false; lua_cfg.save("unbreakableWindows", unbreakableWindows)
+    disableFlightMusic = false; lua_cfg.save("disableFlightMusic", disableFlightMusic)
+    disable_quotes = false; lua_cfg.save("disable_quotes", disable_quotes)
+    disable_mdef_logs = false; lua_cfg.save("disable_mdef_logs", disable_mdef_logs)
+    replace_pool_q = false; lua_cfg.save("replace_pool_q", replace_pool_q)
+    public_seats = false; lua_cfg.save("public_seats", public_seats)
+    mc_work_cd = false; lua_cfg.save("mc_work_cd", mc_work_cd)
+    hangar_cd = false; lua_cfg.save("hangar_cd", hangar_cd)
+    nc_management_cd = false; lua_cfg.save("nc_management_cd", nc_management_cd)
+    nc_vip_mission_chance = false; lua_cfg.save("nc_vip_mission_chance", nc_vip_mission_chance)
+    security_missions_cd = false; lua_cfg.save("security_missions_cd", security_missions_cd)
+    ie_vehicle_steal_cd = false; lua_cfg.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
+    ie_vehicle_sell_cd = false; lua_cfg.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
+    ceo_crate_buy_cd = false; lua_cfg.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
+    ceo_crate_sell_cd = false; lua_cfg.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
+    ceo_crate_buy_f_cd = false; lua_cfg.save("ceo_crate_buy_f_cd", ceo_crate_buy_f_cd)
+    ceo_crate_sell_f_cd = false; lua_cfg.save("ceo_crate_sell_f_cd", ceo_crate_sell_f_cd)
+    cashUpdgrade1 = false; lua_cfg.save("cashUpdgrade1", cashUpdgrade1)
+    cashUpdgrade2 = false; lua_cfg.save("cashUpdgrade2", cashUpdgrade2)
+    cokeUpdgrade1 = false; lua_cfg.save("cokeUpdgrade1", cokeUpdgrade1)
+    cokeUpdgrade2 = false; lua_cfg.save("cokeUpdgrade2", cokeUpdgrade2)
+    methUpdgrade1 = false; lua_cfg.save("methUpdgrade1", methUpdgrade1)
+    methUpdgrade2 = false; lua_cfg.save("methUpdgrade2", methUpdgrade2)
+    weedUpdgrade1 = false; lua_cfg.save("weedUpdgrade1", weedUpdgrade1)
+    weedUpdgrade2 = false; lua_cfg.save("weedUpdgrade2", weedUpdgrade2)
+    fdUpdgrade1 = false; lua_cfg.save("fdUpdgrade1", fdUpdgrade1)
+    fdUpdgrade2 = false; lua_cfg.save("fdUpdgrade2", fdUpdgrade2)
+    bunkerUpdgrade1 = false; lua_cfg.save("bunkerUpdgrade1", bunkerUpdgrade1)
+    bunkerUpdgrade2 = false; lua_cfg.save("bunkerUpdgrade2", bunkerUpdgrade2)
+    acidUpdgrade = false; lua_cfg.save("acidUpdgrade", acidUpdgrade)
+    whouse_1_owned = false; lua_cfg.save("whouse_1_owned", whouse_1_owned)
+    whouse_2_owned = false; lua_cfg.save("whouse_2_owned", whouse_2_owned)
+    whouse_3_owned = false; lua_cfg.save("whouse_3_owned", whouse_3_owned)
+    whouse_4_owned = false; lua_cfg.save("whouse_4_owned", whouse_4_owned)
+    whouse_5_owned = false; lua_cfg.save("whouse_5_owned", whouse_5_owned)
+    veh_mines = false; lua_cfg.save("veh_mines", veh_mines)
+    laser_switch = 0; lua_cfg.save("laser_switch", laser_switch)
+    DriftIntensity = 0; lua_cfg.save("DriftIntensity", DriftIntensity)
+    lang_idx = 0; lua_cfg.save("lang_idx", lang_idx)
+    autoplay_chips_cap = 0; lua_cfg.save("autoplay_chips_cap", autoplay_chips_cap)
+    lightSpeed = 1; lua_cfg.save("lightSpeed", lightSpeed)
+    DriftPowerIncrease = 1; lua_cfg.save("DriftPowerIncrease", DriftPowerIncrease)
+    nosPower = 10; lua_cfg.save("nosPower", nosPower)
+    nosBtn = 21; lua_cfg.save("nosBtn", nosBtn)
+    supply_autofill_delay = 500; lua_cfg.save("supply_autofill_delay", supply_autofill_delay)
+    laser_choice = "proj_laser_enemy"; lua_cfg.save("laser_choice", laser_choice)
+    LANG = "en-US"; lua_cfg.save("LANG", LANG)
+    current_lang = "English"; lua_cfg.save("current_lang", current_lang)
+  end,
 }
 
-local gvov = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
+local gvov                  = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
 local game_build_offset     = gvov:add(0x24):rip()
 local online_version_offset = game_build_offset:add(0x20)
-MPx = "MP" .. stats.get_character_index()
+MPx                         = "MP" .. stats.get_character_index()
 
 ----------------------------------------------- GTA Funcs -------------------------------------------------------
-Game = {
+Game                        = {
 
   --[[
-  
+
    Returns GTA V's current build number.
 
    **Credits:** [tupoy-ya](https://github.com/tupoy-ya)
@@ -1120,7 +1357,7 @@ Game = {
   end,
 
   --[[
-  
+
    Returns GTA V's current online version.
 
    **Credits:** [tupoy-ya](https://github.com/tupoy-ya)
@@ -1151,12 +1388,12 @@ Game = {
     local lang = LOCALIZATION.GET_CURRENT_LANGUAGE()
     for _, l in ipairs(language_codes_T) do
       if lang == l.id then
-          lang_iso  = l.iso
-          lang_name = l.name
-          break
+        lang_iso  = l.iso
+        lang_name = l.name
+        break
       else
-          lang_iso  = "en-US"
-          lang_name = "English"
+        lang_iso  = "en-US"
+        lang_name = "English"
       end
     end
     return lang_iso, lang_name
@@ -2095,8 +2332,7 @@ lua_cfg = {
     local exists = io.exists("samurais_scripts.json")
     local config
     if not exists then
-      log.warning("Config file not found, creating a default config")
-      gui.show_warning("Samurai's Scripts", "Config file not found, creating a default config")
+      log.info("Config file not found, creating a default config")
       if not lua_cfg.writeToFile(default_config) then
         return false
       end
