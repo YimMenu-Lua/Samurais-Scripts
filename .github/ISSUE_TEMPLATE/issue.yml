@@ -24,7 +24,7 @@ body:
 
 - type: textarea
   attributes:
-    label: Log
+    label: YimMenu Log
     description: |
       The log can be found under %AppData%\YimMenu\cout.log
 
@@ -52,3 +52,19 @@ body:
     description: Add any other context about the issue here.
   validations:
     required: false
+
+- type: checkboxes
+  attributes:
+    label: YimMenu Build
+    description: Were you using the latest version of YimMenu?
+    options:
+      - label: I've confirmed that this issue exists on the latest version of YimMenu.
+        required: true
+
+- type: checkboxes
+  attributes:
+    label: Script Version
+    description: Were you using the latest version of Samurai's Scripts?
+    options:
+      - label: I've confirmed that this issue exists on the latest version of Samurai's Scripts.
+        required: true
