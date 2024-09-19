@@ -40,6 +40,10 @@
     - The ability to set a custom shortcut key for a specific animation so that you could play it any time you want. I have mine set as **[L]** to play a hitch-hike animation.
     - Some animations produce sound (Sleeping, Crying, DJ *(plays loud music)*, some uh.. uhm, NSFW animations also play sounds).
     - An option to browse and play animations using hotkeys. This option may interfere with gameplay so you can enable/disable it any time you want.
+    - New **Favorites** tab:
+      - Save animations and scenarios to favorites then play them from this tab (they will persist even if you reset your config from the **Settings** tab).
+    - New **Recently Played** tab:
+      - A new tab that shows recently played animations and scenarios and allows you to play/stop them from there.
 
 - **Sound Player:**
   - Plays either human speeches or loud radio music that players nearby can hear (assuming you're not lagging and there are no sync issues).
@@ -75,6 +79,9 @@
     - Your tires will now produce a lot more smoke when drifting. The smoke will appear when you're drifting at a speed higher than *approx: 15mph // 20km/h*. You can change the smoke color either from a drop down list of pre-defined colors or by inputting your own [HEX](https://www.color-hex.com/) color. Note that the drift smoke color has no relation to your actual tire smoke color but I can change that if desired, it's just one line of code.
   - Enabling **Pops & Bangs** and **Louder Pops** makes nearby NPCs react to your exhaust pops. Some will flee, some will insult you, some will be utterly confused, others will take a picture of your car.
 
+  - **Burnout Smoke:**
+    - Same as **Drift Smoke** but for burnouts.
+
   - **Drift Minigame:**
     - When this option is enabled, drifting your car gives you points which when banked, 10% of them are converted into cash (currently the cashout feature is for Single Player only). You also get bonus points for destroying objects (fences, road signs, road cones, etc...), hitting pedestrians, and jumping in the air. *(PS: if you don't land on all four wheels after a jump, you will lose your points. I will probably rewrite this to make you lose your multiplier instead but as of now, jumping is risky)*.
     - Your highest score will be saved and displayed in the UI.
@@ -108,7 +115,9 @@
   - **Auto-Pilot:**
     - While flying a plane or a helicopter, open the UI and choose one of the auto-pilot options: Fly To Waypoint, Fly To Objective or Fly to random coordinates.
   - **Fake Siren:**
-    - Equip any land vehicle with a siren *(except of course, vehicles that already have one)*.
+    - Equip any land vehicle with a siren *(except of course, vehicles that already have one)*. **NOTE:** If you use this in Online, your vehicle will appear glitched to other players.
+  - **Ejecto Seato Cuz!**
+    - Press this button to eject all peds from your vehicle. Currently, this does not work on other players.
 
 - **An implementation of [Flatbed Script](https://github.com/xesdoog/Flatbed-Script):**
   - Short explanation: You can tow anything with a flatbed truck. If the vehicle you're towing is occupied, you'll still tow it and kidnap whoever is sitting in it. Note that kidnapping players could sometimes log errors and cause issues *(may even crash your game)*. Also you can't tow players who have protections.
@@ -123,7 +132,7 @@
 ## Online
 
 - **Business Manager**
-  - An improved version of [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier)
+  - An improved version of [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier) with a few more options and a redesigned UI.
 
 - **Casino Pacino**
   - An implementation of gir489's [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) with translation support and a slightly altered UI.
@@ -165,7 +174,7 @@
 
   - **Public Seating:**
     - Allows you to sit down on public seats and benches. Approach a bench in the game's world *(there are a bunch of them in Vespucci Beach)*, face it and when prompted, press [E] to sit down. You can sit up by pressing [E] again or [B] if you have the **Hands Up** feature from the **Self** tab enabled.
-      > NOTE: This feature is not polished. For now you will have to face the bench/seat to end up sitting on it correctly, otherwise if you face the opposite direction from it and try to sit down, you will be placed in an awkward position.
+      > NOTE: This feature is not polished. For now you will have to face the bench/seat to end up sitting on it correctly, otherwise if you face the opposite direction from it and try to sit down, you will be placed in an awkward position. This is probably gonna get removed. I hate it.
       
 - **Improved [Object Spawner](https://github.com/xesdoog/object-spawner):**
   - Fixed a few bugs in the main script and added the ability to attach objects to your vehicle.
@@ -173,3 +182,6 @@
 
 ## Settings
 - Here you can enable/disable tooltips, enable/disable sound feedback from UI interactions, enable/disable ambient flight music, delete the custom animation hotkey, change the script's language, and reset all saved options (except created vehicles and outfits).
+
+## Hotkeys
+- Here you can set keyboard and controller hotkeys for a few options.
