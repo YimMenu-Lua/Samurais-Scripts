@@ -207,6 +207,60 @@ Labels = {
         { iso = "pt-BR", text = " Parar " },
         { iso = "ru-RU", text = " Стоп " },
     },
+    
+    ["add_to_favs"] = {
+        { iso = "en-US", text = "Add To Favorites" },
+        { iso = "de-DE", text = "Zu Favoriten hinzufügen" },
+        { iso = "fr-FR", text = "Ajouter Aux Favoris" },
+        { iso = "it-IT", text = "Aggiungi Ai Preferiti" },
+        { iso = "pt-BR", text = "Adicionar Aos Favoritos" },
+        { iso = "ru-RU", text = "Добавить в избранное" },
+    },
+        
+    ["remove_from_favs"] = {
+        { iso = "en-US", text = "Remove From Favorites" },
+        { iso = "de-DE", text = "Aus Favoriten Entfernen" },
+        { iso = "fr-FR", text = "Supprimer Des Favoris" },
+        { iso = "it-IT", text = "Rimuovi Dai Preferiti" },
+        { iso = "pt-BR", text = "Remover Dos Favoritos" },
+        { iso = "ru-RU", text = "Удалить из избранного" },
+    },
+
+    ["favs_tab"] = {
+        { iso = "en-US", text = "Favorites" },
+        { iso = "de-DE", text = "Favoriten" },
+        { iso = "fr-FR", text = "Favoris" },
+        { iso = "it-IT", text = "Preferiti" },
+        { iso = "pt-BR", text = "Favoritos" },
+        { iso = "ru-RU", text = "Избранное" },
+    },
+        
+    ["favs_nil_txt"] = {
+        { iso = "en-US", text = "Nothing to show at the moment.\10\10Add some animations or scenarios to favorites to save them here." },
+        { iso = "de-DE", text = "Im Moment gibt es nichts zu zeigen.\10\10Fügen Sie einige Animationen oder Szenarien zu den Favoriten hinzu, um sie hier zu speichern." },
+        { iso = "fr-FR", text = "Rien à montrer pour l'instant.\10\10Ajouter des animations ou des scénarios aux favoris pour les sauvegarder ici." },
+        { iso = "it-IT", text = "Non c'è nulla da mostrare al momento.\10}Aggiungi alcune animazioni o scenari ai preferiti per salvarli qui." },
+        { iso = "pt-BR", text = "Nada para mostrar no momento.\10\10Adicione algumas animações ou cenários aos favoritos para salvá-los aqui." },
+        { iso = "ru-RU", text = "На данный момент показывать нечего.\10\10Добавьте несколько анимаций или сценариев в избранное, чтобы сохранить их здесь." },
+    },
+    
+    ["recents_tab"] = {
+        { iso = "en-US", text = "Recently Played" },
+        { iso = "de-DE", text = "Kürzlich gespielt" },
+        { iso = "fr-FR", text = "Récemment Joué" },
+        { iso = "it-IT", text = "Giocato Recentemente" },
+        { iso = "pt-BR", text = "Jogado Recentemente" },
+        { iso = "ru-RU", text = "Недавно сыграно" },
+    },
+    
+    ["recents_nil_txt"] = {
+        { iso = "en-US", text = "Nothing to show at the moment.\10\10Play some animations or scenarios to find them here afterwards." },
+        { iso = "de-DE", text = "Im Moment gibt es nichts zu zeigen.\10\10Spielen Sie einige Animationen oder Szenarien, um sie anschließend hier zu finden." },
+        { iso = "fr-FR", text = "Rien à montrer pour le moment.\10\10Jouez quelques animations ou scénarios pour les retrouver ici par la suite." },
+        { iso = "it-IT", text = "Nulla da mostrare al momento.\10\10Gioca ad alcune animazioni o scenari per trovarli qui in seguito." },
+        { iso = "pt-BR", text = "Nada para mostrar no momento.\10\10Jogue algumas animações ou cenários para encontrá-los aqui depois." },
+        { iso = "ru-RU", text = "На данный момент показать нечего.\10\10Поиграйте в анимации или сценарии, чтобы потом найти их здесь." },
+    },
 
     ["weaponTab"] = {
         { iso = "en-US", text = "Weapon " },
@@ -683,6 +737,15 @@ Labels = {
         { iso = "ru-RU", text = "Скорость RGB" },
     },
 
+    ["autopilot_err_txt"] = {
+        { iso = "en-US", text = "You must be flying a plane or a helicopter to use this feature." },
+        { iso = "de-DE", text = "Sie müssen ein Flugzeug oder einen Hubschrauber fliegen, um diese Funktion nutzen zu können." },
+        { iso = "fr-FR", text = "Vous devez être en train de commander un avion ou un hélicoptère pour utiliser cette fonction." },
+        { iso = "it-IT", text = "Per utilizzare questa funzione è necessario pilotare un aereo o un elicottero." },
+        { iso = "pt-BR", text = "Você deve estar pilotando um avião ou um helicóptero para usar esse recurso." },
+        { iso = "ru-RU", text = "Чтобы воспользоваться этой функцией, вы должны управлять самолетом или вертолетом." },
+    },
+
     ["engineSoundBtn"] = {
         { iso = "en-US", text = "Change Engine Sound" },
         { iso = "de-DE", text = "Motorsound ändern" },
@@ -762,6 +825,15 @@ Labels = {
         { iso = "it-IT", text = "Distruggi Il Motore" },
         { iso = "pt-BR", text = "Destruir O Motor" },
         { iso = "ru-RU", text = "Уничтожить двигатель" },
+    },
+
+    ["ejecto_seato_tt"] = {
+        { iso = "en-US", text = "Ejects all passengers from your vehicle. Currently doesn't work against other players." },
+        { iso = "de-DE", text = "Schmeißt alle Passagiere aus Ihrem Fahrzeug. Funktioniert derzeit nicht gegen andere Spieler." },
+        { iso = "fr-FR", text = "Éjecte tous les passagers de votre véhicule. Ne fonctionne pas pour l'instant contre d'autres joueurs." },
+        { iso = "it-IT", text = "Espelle tutti i passeggeri dal veicolo. Attualmente non funziona contro altri giocatori." },
+        { iso = "pt-BR", text = "Ejeta todos os passageiros de seu veículo. Atualmente não funciona contra outros jogadores." },
+        { iso = "ru-RU", text = "Выбрасывает всех пассажиров из вашего автомобиля. В настоящее время не работает против других игроков." },
     },
 
     ["getinveh"] = {
@@ -1756,7 +1828,7 @@ Labels = {
     },
 
     ["animShortcut_tt"] = {
-        { iso = "en-US", text = "Associate a button that will play the selected animation at any time." },
+        { iso = "en-US", text = "Keyboard & Mouse Only: Associate a button that will play the selected animation at any time." },
         { iso = "de-DE", text = "Weisen Sie eine Schaltfläche zu, mit der die ausgewählte Animation jederzeit abgespielt werden kann." },
         { iso = "fr-FR", text = "Associer un bouton qui jouera l'animation sélectionnée à tout moment." },
         { iso = "it-IT", text = "Associa un pulsante che riproduce l'animazione selezionata in qualsiasi momento." },

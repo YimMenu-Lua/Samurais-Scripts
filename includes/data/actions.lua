@@ -312,52 +312,85 @@ ped_scenarios = {
   { scenario = "WORLD_HUMAN_YOGA",                       name = "Workout: Yoga" },
 }
 
+PED_TYPE   = {
+  _PLAYER_0              = 0,
+  _PLAYER_1              = 1,
+  _NETWORK_PLAYER        = 2,
+  _PLAYER_2              = 3,
+  _CIVMALE               = 4,
+  _CIVFEMALE             = 5,
+  _COP                   = 6,
+  _GANG_ALBANIAN         = 7,
+  _GANG_BIKER_1          = 8,
+  _GANG_BIKER_2          = 9,
+  _GANG_ITALIAN          = 10,
+  _GANG_RUSSIAN          = 11,
+  _GANG_RUSSIAN_2        = 12,
+  _GANG_IRISH            = 13,
+  _GANG_JAMAICAN         = 14,
+  _GANG_AFRICAN_AMERICAN = 15,
+  _GANG_KOREAN           = 16,
+  _GANG_CHINESE_JAPANESE = 17,
+  _GANG_PUERTO_RICAN     = 18,
+  _DEALER                = 19,
+  _MEDIC                 = 20,
+  _FIREMAN               = 21,
+  _CRIMINAL              = 22,
+  _BUM                   = 23,
+  _PROSTITUTE            = 24,
+  _SPECIAL               = 25,
+  _MISSION               = 26,
+  _SWAT                  = 27,
+  _ANIMAL                = 28,
+  _ARMY                  = 29,
+}
+
 npcList = {
-  { group = "PED_TYPE_PROSTITUTE", hash = 0x6E0FB794, name = "Hooker" },
-  { group = "PED_TYPE_PROSTITUTE", hash = 0x52580019, name = "Hooker 02" },
-  { group = "PED_TYPE_CIVFEMALE",  hash = 0x780C01BD, name = "VU Bartender" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x5442C66B, name = "Cult Fat Man" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x55446010, name = "Cult Old Man" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0xCF0C7037, name = "DRE" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x69287899, name = "Vincent" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x65B93076, name = "Lamar" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0xCE2CB751, name = "JEEBUS" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0xA17EC96C, name = "Yusuf Amir" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x8CE6A476, name = "Yeti" },
-  { group = "PED_TYPE_CIVFEMALE",  hash = 0xB5CF80E4, name = "Cult Fat Woman" },
-  { group = "PED_TYPE_CIVFEMALE",  hash = 0x3BD99114, name = "Muscle Woman" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0xDA116E7E, name = "Muscle Man" },
-  { group = "PED_TYPE_CIVFEMALE",  hash = 0x51D861F2, name = "Luchadora" },
-  { group = "PED_TYPE_ANIMAL",     hash = 0xCE5FF074, name = "Boar" },
-  { group = "PED_TYPE_ANIMAL",     hash = 0x4E8F95A2, name = "Husky" },
-  { group = "PED_TYPE_ANIMAL",     hash = 0x14EC17EA, name = "Chop" },
-  { group = "PED_TYPE_ANIMAL",     hash = 0x7E0C64AA, name = "Monkey" },
-  { group = "PED_TYPE_ANIMAL",     hash = 0xC2D06F53, name = "Monkey 02" },
-  { group = "PED_TYPE_ANIMAL",     hash = 0xB11BAB56, name = "Pig" },
-  { group = "PED_TYPE_ANIMAL",     hash = 0xFCFA9E1E, name = "Cow" },
-  { group = "PED_TYPE_ANIMAL",     hash = 0xC3B52966, name = "Rat" },
-  { group = "PED_TYPE_ARMY",       hash = 0xB3F3EE34, name = "Mercenary 01" },
-  { group = "PED_TYPE_ARMY",       hash = 0x5076A73B, name = "Mercenary 02" },
-  { group = "PED_TYPE_ARMY",       hash = 0x613E626C, name = "Mercenary 03" },
-  { group = "PED_TYPE_COP",        hash = 0x15F8700D, name = "Police (female)" },
-  { group = "PED_TYPE_COP",        hash = 0x5E3DA4A4, name = "Police (male)" },
-  { group = "PED_TYPE_COP",        hash = 0x8D8F1B10, name = "Police (SWAT)" },
-  { group = "PED_TYPE_CIVFEMALE",  hash = 0x7671A8F6, name = "Imani" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x4DA6E849, name = "Lester" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x9B810FA2, name = "Trevor" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0xD7114C9,  name = "Michael" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x9B22DBAF, name = "Franklin" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x842DC2D6, name = "Jimmy" },
-  { group = "PED_TYPE_CIVFEMALE",  hash = 0x6D1E15F7, name = "Amanda" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0xEC9E8F1C, name = "Hao" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x7461A0B0, name = "Devin Weston" },
-  { group = "PED_TYPE_CIVFEMALE",  hash = 0xDE352A35, name = "Tracy" },
-  { group = "PED_TYPE_CIVFEMALE",  hash = 0x2D145A18, name = "Agatha Baker" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x86BDFE26, name = "Solomun Richards" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x9B557274, name = "Personal Bodyguard" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x850446EC, name = "Lazlow" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0xE80E9160, name = "Brucie Kibbutz" },
-  { group = "PED_TYPE_CIVMALE",    hash = 0x64611296, name = "Alien" },
+  { group = PED_TYPE._PROSTITUTE, hash = 0x6E0FB794, name = "Hooker" },
+  { group = PED_TYPE._PROSTITUTE, hash = 0x52580019, name = "Hooker 02" },
+  { group = PED_TYPE._CIVFEMALE,  hash = 0x780C01BD, name = "VU Bartender" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x5442C66B, name = "Cult Fat Man" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x55446010, name = "Cult Old Man" },
+  { group = PED_TYPE._CIVMALE,    hash = 0xCF0C7037, name = "DRE" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x69287899, name = "Vincent" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x65B93076, name = "Lamar" },
+  { group = PED_TYPE._CIVMALE,    hash = 0xCE2CB751, name = "JEEBUS" },
+  { group = PED_TYPE._CIVMALE,    hash = 0xA17EC96C, name = "Yusuf Amir" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x8CE6A476, name = "Yeti" },
+  { group = PED_TYPE._CIVFEMALE,  hash = 0xB5CF80E4, name = "Cult Fat Woman" },
+  { group = PED_TYPE._CIVFEMALE,  hash = 0x3BD99114, name = "Muscle Woman" },
+  { group = PED_TYPE._CIVMALE,    hash = 0xDA116E7E, name = "Muscle Man" },
+  { group = PED_TYPE._CIVFEMALE,  hash = 0x51D861F2, name = "Luchadora" },
+  { group = PED_TYPE._ANIMAL,     hash = 0xCE5FF074, name = "Boar" },
+  { group = PED_TYPE._ANIMAL,     hash = 0x4E8F95A2, name = "Husky" },
+  { group = PED_TYPE._ANIMAL,     hash = 0x14EC17EA, name = "Chop" },
+  { group = PED_TYPE._ANIMAL,     hash = 0x7E0C64AA, name = "Monkey" },
+  { group = PED_TYPE._ANIMAL,     hash = 0xC2D06F53, name = "Monkey 02" },
+  { group = PED_TYPE._ANIMAL,     hash = 0xB11BAB56, name = "Pig" },
+  { group = PED_TYPE._ANIMAL,     hash = 0xFCFA9E1E, name = "Cow" },
+  { group = PED_TYPE._ANIMAL,     hash = 0xC3B52966, name = "Rat" },
+  { group = PED_TYPE._ARMY,       hash = 0xB3F3EE34, name = "Mercenary 01" },
+  { group = PED_TYPE._ARMY,       hash = 0x5076A73B, name = "Mercenary 02" },
+  { group = PED_TYPE._ARMY,       hash = 0x613E626C, name = "Mercenary 03" },
+  { group = PED_TYPE._COP,        hash = 0x15F8700D, name = "Police (female)" },
+  { group = PED_TYPE._COP,        hash = 0x5E3DA4A4, name = "Police (male)" },
+  { group = PED_TYPE._COP,        hash = 0x8D8F1B10, name = "Police (SWAT)" },
+  { group = PED_TYPE._CIVFEMALE,  hash = 0x7671A8F6, name = "Imani" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x4DA6E849, name = "Lester" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x9B810FA2, name = "Trevor" },
+  { group = PED_TYPE._CIVMALE,    hash = 0xD7114C9,  name = "Michael" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x9B22DBAF, name = "Franklin" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x842DC2D6, name = "Jimmy" },
+  { group = PED_TYPE._CIVFEMALE,  hash = 0x6D1E15F7, name = "Amanda" },
+  { group = PED_TYPE._CIVMALE,    hash = 0xEC9E8F1C, name = "Hao" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x7461A0B0, name = "Devin Weston" },
+  { group = PED_TYPE._CIVFEMALE,  hash = 0xDE352A35, name = "Tracy" },
+  { group = PED_TYPE._CIVFEMALE,  hash = 0x2D145A18, name = "Agatha Baker" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x86BDFE26, name = "Solomun Richards" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x9B557274, name = "Personal Bodyguard" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x850446EC, name = "Lazlow" },
+  { group = PED_TYPE._CIVMALE,    hash = 0xE80E9160, name = "Brucie Kibbutz" },
+  { group = PED_TYPE._CIVMALE,    hash = 0x64611296, name = "Alien" },
 }
 
 function RequestControl(entity, netID, ticks)
@@ -445,10 +478,20 @@ function cleanupNPC()
   end)
 end
 
-function playSelected(target, Flag, prop1, prop2, loopedFX, propPed, targetBone, targetCoords, targetHeading,
+function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBone, targetCoords, targetHeading,
                       targetForwardX,
                       targetForwardY, targetBoneCoords, ent, propTable, ptfxTable)
-  if info.type == 1 then
+  if target == self.get_ped() then
+    if is_sitting or is_handsUp then
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      is_sitting = false
+      is_handsUp = false
+    end
+    if isCrouched then
+      PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
+    end
+  end
+  if Info.type == 1 then
     if ent == "self" then
       cleanup()
     elseif ent == "npc" then
@@ -456,50 +499,50 @@ function playSelected(target, Flag, prop1, prop2, loopedFX, propPed, targetBone,
     end
     script.run_in_fiber(function()
       if not disableProps then
-        while not STREAMING.HAS_MODEL_LOADED(info.prop1) do
-          STREAMING.REQUEST_MODEL(info.prop1)
+        while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
+          STREAMING.REQUEST_MODEL(Info.prop1)
           coroutine.yield()
         end
-        prop1 = OBJECT.CREATE_OBJECT(info.prop1, 0.0, 0.0, 0.0, true, true, true)
+        prop1 = OBJECT.CREATE_OBJECT(Info.prop1, 0.0, 0.0, 0.0, true, true, true)
         table.insert(propTable, prop1)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(prop1, target, targetBone, info.posx, info.posy, info.posz, info.rotx, info.roty,
-          info.rotz, false, false, false, false, 2, true, 1)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(prop1, target, targetBone, Info.posx, Info.posy, Info.posz, Info.rotx, Info.roty,
+        Info.rotz, false, false, false, false, 2, true, 1)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(prop1)
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(info.dict)
+      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
+        STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, info.dict, info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
-  elseif info.type == 2 then
+  elseif Info.type == 2 then
     if ent == "self" then
       cleanup()
     elseif ent == "npc" then
       cleanupNPC()
     end
     script.run_in_fiber(function(type2)
-      while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(info.ptfxdict) do
-        STREAMING.REQUEST_NAMED_PTFX_ASSET(info.ptfxdict)
+      while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(Info.ptfxdict) do
+        STREAMING.REQUEST_NAMED_PTFX_ASSET(Info.ptfxdict)
         coroutine.yield()
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(info.dict)
+      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
+        STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, info.dict, info.anim, 4.0, -4.0, -1, Flag, 0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
-      type2:sleep(info.ptfxdelay)
-      GRAPHICS.USE_PARTICLE_FX_ASSET(info.ptfxdict)
-      loopedFX = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(info.ptfxname, target, info.ptfxOffx,
-        info.ptfxOffy, info.ptfxOffz, info.ptfxrotx, info.ptfxroty, info.ptfxrotz, targetBone, info.ptfxscale, false,
+      type2:sleep(Info.ptfxdelay)
+      GRAPHICS.USE_PARTICLE_FX_ASSET(Info.ptfxdict)
+      loopedFX = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(Info.ptfxname, target, Info.ptfxOffx,
+        Info.ptfxOffy, Info.ptfxOffz, Info.ptfxrotx, Info.ptfxroty, Info.ptfxrotz, targetBone, Info.ptfxscale, false,
         false, false, 0, 0, 0, 0)
       table.insert(ptfxTable, loopedFX)
     end)
-  elseif info.type == 3 then
+  elseif Info.type == 3 then
     if ent == "self" then
       cleanup()
     elseif ent == "npc" then
@@ -507,26 +550,26 @@ function playSelected(target, Flag, prop1, prop2, loopedFX, propPed, targetBone,
     end
     script.run_in_fiber(function()
       if not disableProps then
-        while not STREAMING.HAS_MODEL_LOADED(info.prop1) do
-          STREAMING.REQUEST_MODEL(info.prop1)
+        while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
+          STREAMING.REQUEST_MODEL(Info.prop1)
           coroutine.yield()
         end
-        prop1 = OBJECT.CREATE_OBJECT(info.prop1, targetCoords.x + targetForwardX / 1.7,
+        prop1 = OBJECT.CREATE_OBJECT(Info.prop1, targetCoords.x + targetForwardX / 1.7,
           targetCoords.y + targetForwardY / 1.7, targetCoords.z, true, true, false)
         table.insert(propTable, prop1)
-        ENTITY.SET_ENTITY_HEADING(prop1, targetHeading + info.rotz)
+        ENTITY.SET_ENTITY_HEADING(prop1, targetHeading + Info.rotz)
         OBJECT.PLACE_OBJECT_ON_GROUND_PROPERLY(prop1)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(prop1)
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(info.dict)
+      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
+        STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, info.dict, info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
-  elseif info.type == 4 then
+  elseif Info.type == 4 then
     if ent == "self" then
       cleanup()
     elseif ent == "npc" then
@@ -534,64 +577,64 @@ function playSelected(target, Flag, prop1, prop2, loopedFX, propPed, targetBone,
     end
     script.run_in_fiber(function(type4)
       if not disableProps then
-        while not STREAMING.HAS_MODEL_LOADED(info.prop1) do
-          STREAMING.REQUEST_MODEL(info.prop1)
+        while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
+          STREAMING.REQUEST_MODEL(Info.prop1)
           coroutine.yield()
         end
-        prop1 = OBJECT.CREATE_OBJECT(info.prop1, 0.0, 0.0, 0.0, true, true, false)
+        prop1 = OBJECT.CREATE_OBJECT(Info.prop1, 0.0, 0.0, 0.0, true, true, false)
         table.insert(propTable, prop1)
-        ENTITY.SET_ENTITY_COORDS(prop1, targetBoneCoords.x + info.posx, targetBoneCoords.y + info.posy,
-          targetBoneCoords.z + info.posz, false, false, false, false)
+        ENTITY.SET_ENTITY_COORDS(prop1, targetBoneCoords.x + Info.posx, targetBoneCoords.y + Info.posy,
+          targetBoneCoords.z + Info.posz, false, false, false, false)
         type4:sleep(20)
         OBJECT.PLACE_OBJECT_ON_GROUND_PROPERLY(prop1)
-        ENTITY.SET_ENTITY_COLLISION(prop1, info.propColl, info.propColl)
+        ENTITY.SET_ENTITY_COLLISION(prop1, Info.propColl, Info.propColl)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(prop1)
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(info.dict)
+      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
+        STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, info.dict, info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
-  elseif info.type == 5 then
+  elseif Info.type == 5 then
     if ent == "self" then
       cleanup()
     elseif ent == "npc" then
       cleanupNPC()
     end
     script.run_in_fiber(function(type5)
-      while not STREAMING.HAS_ANIM_DICT_LOADED(info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(info.dict)
+      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
+        STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, info.dict, info.anim, 4.0, -4.0, -1, Flag, 0.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 0.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       if not disableProps then
-        while not STREAMING.HAS_MODEL_LOADED(info.prop1) do
-          STREAMING.REQUEST_MODEL(info.prop1)
+        while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
+          STREAMING.REQUEST_MODEL(Info.prop1)
           coroutine.yield()
         end
-        prop1 = OBJECT.CREATE_OBJECT(info.prop1, 0.0, 0.0, 0.0, true, true, false)
+        prop1 = OBJECT.CREATE_OBJECT(Info.prop1, 0.0, 0.0, 0.0, true, true, false)
         table.insert(propTable, prop1)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(prop1, target, targetBone, info.posx, info.posy, info.posz, info.rotx, info.roty,
-          info.rotz, false, false, false, false, 2, true, 1)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(prop1, target, targetBone, Info.posx, Info.posy, Info.posz, Info.rotx, Info.roty,
+          Info.rotz, false, false, false, false, 2, true, 1)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(prop1)
         type5:sleep(50)
-        while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(info.ptfxdict) do
-          STREAMING.REQUEST_NAMED_PTFX_ASSET(info.ptfxdict)
+        while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(Info.ptfxdict) do
+          STREAMING.REQUEST_NAMED_PTFX_ASSET(Info.ptfxdict)
           coroutine.yield()
         end
-        type5:sleep(info.ptfxdelay)
-        GRAPHICS.USE_PARTICLE_FX_ASSET(info.ptfxdict)
-        loopedFX = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY(info.ptfxname, prop1, info.ptfxOffx,
-          info.ptfxOffy, info.ptfxOffz, info.ptfxrotx, info.ptfxroty, info.ptfxrotz, info.ptfxscale, false, false, false,
+        type5:sleep(Info.ptfxdelay)
+        GRAPHICS.USE_PARTICLE_FX_ASSET(Info.ptfxdict)
+        loopedFX = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY(Info.ptfxname, prop1, Info.ptfxOffx,
+          Info.ptfxOffy, Info.ptfxOffz, Info.ptfxrotx, Info.ptfxroty, Info.ptfxrotz, Info.ptfxscale, false, false, false,
           0, 0, 0, 0)
       end
       is_playing_anim = true
     end)
-  elseif info.type == 6 then
+  elseif Info.type == 6 then
     if ent == "self" then
       cleanup()
     elseif ent == "npc" then
@@ -599,33 +642,33 @@ function playSelected(target, Flag, prop1, prop2, loopedFX, propPed, targetBone,
     end
     script.run_in_fiber(function()
       if not disableProps then
-        while not STREAMING.HAS_MODEL_LOADED(info.prop1) do
-          STREAMING.REQUEST_MODEL(info.prop1)
+        while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
+          STREAMING.REQUEST_MODEL(Info.prop1)
           coroutine.yield()
         end
-        prop1 = OBJECT.CREATE_OBJECT(info.prop1, 0.0, 0.0, 0.0, true, true, false)
+        prop1 = OBJECT.CREATE_OBJECT(Info.prop1, 0.0, 0.0, 0.0, true, true, false)
         table.insert(propTable, prop1)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(prop1, target, targetBone, info.posx, info.posy, info.posz, info.rotx, info.roty,
-          info.rotz, false, false, false, false, 2, true, 1)
-        while not STREAMING.HAS_MODEL_LOADED(info.prop2) do
-          STREAMING.REQUEST_MODEL(info.prop2)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(prop1, target, targetBone, Info.posx, Info.posy, Info.posz, Info.rotx, Info.roty,
+          Info.rotz, false, false, false, false, 2, true, 1)
+        while not STREAMING.HAS_MODEL_LOADED(Info.prop2) do
+          STREAMING.REQUEST_MODEL(Info.prop2)
           coroutine.yield()
         end
-        prop2 = OBJECT.CREATE_OBJECT(info.prop2, 0.0, 0.0, 0.0, true, true, false)
+        prop2 = OBJECT.CREATE_OBJECT(Info.prop2, 0.0, 0.0, 0.0, true, true, false)
         table.insert(propTable, prop2)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(prop2, target, PED.GET_PED_BONE_INDEX(target, info.bone2), info.posx2, info.posy2,
-          info.posz2, info.rotx2, info.roty2, info.rotz2, false, false, false, false, 2, true, 1)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(prop2, target, PED.GET_PED_BONE_INDEX(target, Info.bone2), Info.posx2, Info.posy2,
+          Info.posz2, Info.rotx2, Info.roty2, Info.rotz2, false, false, false, false, 2, true, 1)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(prop2)
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(info.dict)
+      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
+        STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, info.dict, info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
-  elseif info.type == 7 then
+  elseif Info.type == 7 then
     if ent == "self" then
       cleanup()
     elseif ent == "npc" then
@@ -633,32 +676,31 @@ function playSelected(target, Flag, prop1, prop2, loopedFX, propPed, targetBone,
     end
     script.run_in_fiber(function()
       if not disableProps then
-        while not STREAMING.HAS_MODEL_LOADED(info.pedHash) do
-          STREAMING.REQUEST_MODEL(info.pedHash)
+        while not STREAMING.HAS_MODEL_LOADED(Info.pedHash) do
+          STREAMING.REQUEST_MODEL(Info.pedHash)
           coroutine.yield()
         end
-        propPed = PED.CREATE_PED(info.pedType, info.pedHash, 0.0, 0.0, 0.0, 0.0, true, false)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(propPed, target, targetBone, info.posx, info.posy, info.posz, info.rotx, info
-          .roty, info.rotz, false, true, false, true, 1, true, 1)
+        propPed = PED.CREATE_PED(Info.pedType, Info.pedHash, 0.0, 0.0, 0.0, 0.0, true, false)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(propPed, target, targetBone, Info.posx, Info.posy, Info.posz, Info.rotx, Info.roty, Info.rotz, false, true, false, true, 1, true, 1)
         ENTITY.SET_ENTITY_INVINCIBLE(propPed, true)
         table.insert(propTable, propPed)
         npcNetID = NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(propPed)
         RequestControl(propPed, npcNetID, 250)
         entToNet(npcNetID)
-        while not STREAMING.HAS_ANIM_DICT_LOADED(info.dict2) do
-          STREAMING.REQUEST_ANIM_DICT(info.dict2)
+        while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict2) do
+          STREAMING.REQUEST_ANIM_DICT(Info.dict2)
           coroutine.yield()
         end
-        TASK.TASK_PLAY_ANIM(propPed, info.dict2, info.anim2, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+        TASK.TASK_PLAY_ANIM(propPed, Info.dict2, Info.anim2, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
         PED.SET_PED_CONFIG_FLAG(propPed, 179, true)
         PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(propPed, true)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(propPed)
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(info.dict)
+      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
+        STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, info.dict, info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
@@ -669,13 +711,71 @@ function playSelected(target, Flag, prop1, prop2, loopedFX, propPed, targetBone,
       cleanupNPC()
     end
     script.run_in_fiber(function()
-      while not STREAMING.HAS_ANIM_DICT_LOADED(info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(info.dict)
+      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
+        STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, info.dict, info.anim, 4.0, -4.0, -1, Flag, 0.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 0.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
+  end
+end
+
+---@param ref table
+---@param target integer
+function playScenario(ref, target)
+  script.run_in_fiber(function()
+    local coords   = ENTITY.GET_ENTITY_COORDS(target, false)
+    local heading  = ENTITY.GET_ENTITY_HEADING(target)
+    local forwardX = ENTITY.GET_ENTITY_FORWARD_X(target)
+    local forwardY = ENTITY.GET_ENTITY_FORWARD_Y(target)
+    if target == self.get_ped() then
+      if is_sitting or is_handsUp then
+        TASK.CLEAR_PED_TASKS(self.get_ped())
+        is_sitting = false
+        is_handsUp = false
+      end
+      if isCrouched then
+        PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
+      end
+    end
+    if ref.name == "Cook On BBQ" then
+      while not STREAMING.HAS_MODEL_LOADED(286252949) do
+        STREAMING.REQUEST_MODEL(286252949)
+        coroutine.yield()
+      end
+      bbq = OBJECT.CREATE_OBJECT(286252949, coords.x + (forwardX), coords.y + (forwardY), coords.z, true, true,
+        false)
+      ENTITY.SET_ENTITY_HEADING(bbq, heading)
+      OBJECT.PLACE_OBJECT_ON_GROUND_PROPERLY(bbq)
+      TASK.CLEAR_PED_TASKS_IMMEDIATELY(target)
+      TASK.TASK_START_SCENARIO_IN_PLACE(target, ref.scenario, -1, true)
+      is_playing_scenario = true
+    else
+      TASK.CLEAR_PED_TASKS_IMMEDIATELY(target)
+      TASK.TASK_START_SCENARIO_IN_PLACE(target, ref.scenario, -1, true)
+      is_playing_scenario = true
+      if ENTITY.DOES_ENTITY_EXIST(bbq) then
+        ENTITY.DELETE_ENTITY(bbq)
+      end
+    end
+  end)
+end
+
+---@param t table
+function addActionToRecents(action)
+  if recently_played_a[1] ~= nil then
+    for _, v in ipairs(recently_played_a) do
+      if action.name == v.name then
+        recent_exists = true
+        break
+      else
+        recent_exists = false
+      end
+    end
+  end
+  if not recent_exists then
+    table.insert(recently_played_a, action)
   end
 end

@@ -182,27 +182,30 @@ vehBones               = { "chassis", "chassis_lowlod", "chassis_dummy", "seat_d
   "chassis_Control",
 }
 
-driftSmoke_T           = {
-  r = 255,
-  g = 255,
-  b = 255,
+reserved_keys_T        = {
+  kb   = {
+    0x01,
+    0x07,
+    0x0A,
+    0x0B,
+    0x1B,
+    0x24,
+    0x2C,
+    0x2D,
+    0x46,
+    0x5B,
+    0x5C,
+    0x5E,
+  },
+  gpad = {
+    23,
+    24,
+    25,
+    71,
+    75,
+  }
 }
 
-reserved_keys_T        = {
-  0x01,
-  0x01,
-  0x07,
-  0x0A,
-  0x0B,
-  0x1B,
-  0x24,
-  0x2C,
-  0x2D,
-  0x46,
-  0x5B,
-  0x5C,
-  0x5E,
-}
 
 weapbones_T            = {
   "WAPLasr",

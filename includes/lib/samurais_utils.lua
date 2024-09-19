@@ -658,7 +658,7 @@ SS                          = {
       key_pressed, key_code, key_name = SS.isAnyKeyPressed()
     else
       start_loading_anim = false
-      for _, key in pairs(reserved_keys_T) do
+      for _, key in pairs(reserved_keys_T.kb) do
         if key_code == key then
           _reserved = true
           break
@@ -733,7 +733,7 @@ SS                          = {
       gpad_keyCode, gpad_keyName = UI.getKeyPressed()
     else
       start_loading_anim = false
-      for _, key in pairs(reserved_keys_T) do
+      for _, key in pairs(reserved_keys_T.gpad) do
         if gpad_keyCode == key then
           _reserved = true
           break
@@ -1092,7 +1092,6 @@ SS                          = {
     end
   end,
 
-  --[[unused
   ---@param dword integer
   setWeaponEffectGroup = function(dword)
     local pedPtr            = memory.handle_to_ptr(self.get_ped())
@@ -1100,12 +1099,8 @@ SS                          = {
     local CWeaponInfo       = CPedWeaponManager:add(0x0020):deref()
     local sWeaponFx         = CWeaponInfo:add(0x0170)
     local eEffectGroup      = sWeaponFx:add(0x00) -- int32_t
-    -- local m_time_between_shots      = CWeaponInfo:add(0x013C)
-    -- local m_time_left_between_shots = CWeaponInfo:add(0x0140)
-    -- local CWeaponFiringPatternInfo  = CWeaponInfo:add(0x0920)
     eEffectGroup:set_dword(dword)
   end,
-  ]]
 
   get_ceo_global_offset = function(crates)
     local offset
@@ -1183,7 +1178,7 @@ SS                          = {
   reset_settings = function()
     shortcut_anim = {}; lua_cfg.save("shortcut_anim", shortcut_anim)
     vmine_type = { spikes = false, slick = false, explosive = false, emp = false, kinetic = false }; lua_cfg.save(
-    "vmine_type", vmine_type)
+      "vmine_type", vmine_type)
     whouse_1_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_1_size", whouse_1_size)
     whouse_2_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_2_size", whouse_2_size)
     whouse_3_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_3_size", whouse_3_size)
@@ -1915,9 +1910,27 @@ Game                        = {
       return retVal
     end,
 
+    ---Returns a table containing all occupants of a vehicle.
+    ---@param vehicle integer
+    getOccupants = function(vehicle)
+      if ENTITY.DOES_ENTITY_EXIST(vehicle) and ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+        local passengers    = {}
+        local maxPassengers = VEHICLE.GET_VEHICLE_MODEL_NUMBER_OF_SEATS(ENTITY.GET_ENTITY_MODEL(vehicle))
+        for i = -1, maxPassengers do
+          if not VEHICLE.IS_VEHICLE_SEAT_FREE(vehicle, i, true) then
+            local ped = VEHICLE.GET_PED_IN_VEHICLE_SEAT(vehicle, i, false)
+            if ped ~= 0 then
+              table.insert(passengers, ped)
+            end
+          end
+        end
+        return passengers
+      end
+    end,
+
     -- Returns whether a vehicle has weapons or not.
     ---@return boolean
-    weaponized = function()
+    isWeaponized = function()
       return VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(self.get_veh())
     end,
   },
