@@ -1135,11 +1135,11 @@ SS                          = {
       { str = "Invalid",       int = -1 },
       { str = "Playing",       int = 0 },
       { str = "Died",          int = 1 },
-      { str = "Arrested",      int = 3 },
-      { str = "FailedMission", int = 4 },
-      { str = "LeftGame",      int = 5 },
-      { str = "Respawn",       int = 6 },
-      { str = "InMPCutscene",  int = 7 },
+      { str = "Arrested",      int = 2 },
+      { str = "FailedMission", int = 3 },
+      { str = "LeftGame",      int = 4 },
+      { str = "Respawn",       int = 5 },
+      { str = "InMPCutscene",  int = 6 },
     }
     local ped_info_T          = {}
     local pedPtr              = memory.handle_to_ptr(ped)
