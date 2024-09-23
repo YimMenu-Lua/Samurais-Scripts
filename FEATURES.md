@@ -173,8 +173,7 @@
     - Gets rid of ocean waves and makes sailing boats or riding jetskis feel like skiing. Especially useful when playing those awful boat sell missions.
 
   - **Public Seating:**
-    - Allows you to sit down on public seats and benches. Approach a bench in the game's world *(there are a bunch of them in Vespucci Beach)*, face it and when prompted, press [E] to sit down. You can sit up by pressing [E] again or [B] if you have the **Hands Up** feature from the **Self** tab enabled.
-      > NOTE: This feature is not polished. For now you will have to face the bench/seat to end up sitting on it correctly, otherwise if you face the opposite direction from it and try to sit down, you will be placed in an awkward position. This is probably gonna get removed. I hate it.
+    - Allows you to sit down on public seats, chairs and benches. While free roaming in the game's outside world, approach a seat *(there are a bunch of them in Vespucci Beach)*, then when prompted press **[E]** to sit down. You can sit up by pressing **[E]** again, aiming a weapon or pressing **[B]** if you have the **Hands Up** feature from the **Self** tab enabled.
       
 - **Improved [Object Spawner](https://github.com/xesdoog/object-spawner):**
   - Fixed a few bugs in the main script and added the ability to attach objects to your vehicle.
