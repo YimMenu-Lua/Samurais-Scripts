@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-doc-name, undefined-field
 ---@alias RAGE_Entity
----| 'Entity' # A game entity (object, ped, vehicle...) represented by a an integer.
+---| integer # A game entity (object, ped, vehicle...) represented by a an integer.
 
 
 
@@ -168,41 +168,73 @@ lua_Fn = {
     return '0x' .. str
   end,
 
-  ---Iterates over a table and returns the value from each key.
-  ---@param table table
-  iter = function(table)
-    local i = 0
-    local n = #table
-    return function()
-      i = i + 1
-      if i <= n then
-        return table[i]
+  ---Returns key, value pairs of a table.
+  ---@param t table
+  ---@param indent? integer
+  ---@return string
+  listIter = function(t, indent)
+    if not indent then
+      indent = 0
+    end
+    local ret_str = string.rep(" ", indent) .. "{\r\n"
+    indent = indent + 2
+    for k, v in pairs(t) do
+      ret_str = ret_str .. string.rep(" ", indent)
+      if type(k) == "number" then
+        ret_str = ret_str .. "[" .. k .. "] = "
+      elseif type(k) == "string" then
+        ret_str = ret_str .. k .. " = "
+      end
+      if type(v) == "number" then
+        ret_str = ret_str .. v .. ",\r\n"
+      elseif type(v) == "string" then
+        ret_str = ret_str .. "\"" .. v .. "\",\r\n"
+      elseif type(v) == "table" then
+        ret_str = ret_str .. lua_Fn.listIter(v, indent + 2) .. ",\r\n"
+      else
+        ret_str = ret_str .. "\"" .. tostring(v) .. "\",\r\n"
       end
     end
+    ret_str = ret_str .. string.rep(" ", indent - 2) .. "}"
+    return ret_str
   end,
 
   ---Returns the number of values in a table.
-  ---@param table table
+  ---@param t table
   ---@return number
-  getTableLength = function(table)
+  getTableLength = function(t)
     local count = 0
-    for _ in pairs(table) do
+    for _ in pairs(t) do
       count = count + 1
     end
     return count
   end,
 
-  ---Returns the number of duplicate values in a table.
-  ---@param table table
-  ---@param value string | number | integer | table | userdata | lightuserdata | function | thread
-  getTableDupes = function(table, value)
+  ---Returns the number of duplicate items in a table.
+  ---@param t table
+  ---@param value string | number | integer | table
+  getTableDupes = function(t, value)
     local count = 0
-    for _, v in pairs(table) do
+    for _, v in ipairs(t) do
       if value == v then
         count = count + 1
       end
     end
     return count
+  end,
+
+  ---Removes duplicate items from a table and returns a new one with the results.
+  ---@param t table
+  removeTableDupes = function(t)
+    local exists_T = {}
+    local result_T = {}
+    for _, v in ipairs(t) do
+      if not exists_T[v] then
+        result_T[#result_T + 1] = v
+        exists_T[v] = true
+      end
+    end
+    return result_T
   end,
 
   ---Converts 0 and 1 values to Lua booleans. Useful when working with memory.
@@ -1032,27 +1064,22 @@ SS                          = {
 
   -- Checks if localPlayer is standing near a public seat and returns its position and rotation vectors.
   isNearPublicSeat = function()
-    ---@type boolean
-    local retBool
-    ---@type vec3
-    local seatPos
-    ---@type vec3
-    local seatRot
-    local myCoords = self.get_pos()
+    local retBool, prop, seatPos, x_offset, myCoords = false, 0, vec3:new(0.0, 0.0, 0.0), 0.0, self.get_pos()
     for _, seat in ipairs(world_seats_T) do
-      local distCalc = SYSTEM.VDIST2(myCoords.x, myCoords.y, myCoords.z, seat.pos.x, seat.pos.y, seat.pos.z)
-      if distCalc <= 1.8 then
-        seatPos = { x = seat.pos.x, y = seat.pos.y, z = seat.pos.z }
-        seatRot = { x = seat.rot.x, y = seat.rot.y, z = seat.rot.z }
-        retBool = true
-        break
-      else
-        retBool = false
-        seatPos = { x = 0.0, y = 0.0, z = 0.0 }
-        seatRot = { x = 0.0, y = 0.0, z = 0.0 }
+      prop = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(myCoords.x, myCoords.y, myCoords.z, 1.5, joaat(seat), false, false, false)
+      if ENTITY.DOES_ENTITY_EXIST(prop) then
+        seatPos = Game.getCoords(prop, false)
+        local distCalc = SYSTEM.VDIST2(myCoords.x, myCoords.y, myCoords.z, seatPos.x, seatPos.y, seatPos.z)
+        if distCalc <= 1.8 then
+          retBool = true
+          if string.find(string.lower(seat), "bench") then
+            x_offset = -0.5
+          end
+          break
+        end
       end
     end
-    return retBool, seatPos, seatRot
+    return retBool, prop, x_offset
   end,
 
   ---@param vehicle integer
@@ -1100,6 +1127,35 @@ SS                          = {
     local sWeaponFx         = CWeaponInfo:add(0x0170)
     local eEffectGroup      = sWeaponFx:add(0x00) -- int32_t
     eEffectGroup:set_dword(dword)
+  end,
+
+  ---@param ped integer
+  getPlayerInfo = function(ped)
+    local enumGameState       = {
+      { str = "Invalid",       int = -1 },
+      { str = "Playing",       int = 0 },
+      { str = "Died",          int = 1 },
+      { str = "Arrested",      int = 3 },
+      { str = "FailedMission", int = 4 },
+      { str = "LeftGame",      int = 5 },
+      { str = "Respawn",       int = 6 },
+      { str = "InMPCutscene",  int = 7 },
+    }
+    local ped_info_T          = {}
+    local pedPtr              = memory.handle_to_ptr(ped)
+    local CPlayerInfo         = pedPtr:add(0x10A8):deref()
+    ped_info_T.swim_speed_ptr = CPlayerInfo:add(0x01C8)
+    ped_info_T.run_speed_ptr  = CPlayerInfo:add(0x0D50)
+    ped_info_T.velocity_ptr   = CPlayerInfo:add(0x0300)
+    ped_info_T.getGameState   = function()
+      local m_game_state = CPlayerInfo:add(0x0230):get_dword()
+      for _, v in ipairs(enumGameState) do
+        if m_game_state == v.int then
+          return v.str
+        end
+      end
+    end
+    return ped_info_T
   end,
 
   get_ceo_global_offset = function(crates)
@@ -1401,11 +1457,14 @@ Game                        = {
   updatePlayerList = function()
     filteredPlayers = {}
     local players = entities.get_all_peds_as_handles()
+    ---@param p  integer
+    local function is_in_session(p)
+      return SS.getPlayerInfo(p).getGameState() ~= "Invalid"
+          and SS.getPlayerInfo(p).getGameState() ~= "LeftGame"
+    end
     for _, ped in ipairs(players) do
-      if PED.IS_PED_A_PLAYER(ped) then
-        if NETWORK.NETWORK_IS_PLAYER_ACTIVE(NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(ped)) then
-          table.insert(filteredPlayers, ped)
-        end
+      if PED.IS_PED_A_PLAYER(ped) and is_in_session(ped) then
+        table.insert(filteredPlayers, ped)
       end
     end
   end,
@@ -1415,10 +1474,11 @@ Game                        = {
     Game.updatePlayerList()
     local playerNames = {}
     for _, player in ipairs(filteredPlayers) do
-      local playerName  = PLAYER.GET_PLAYER_NAME(NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(player))
+      local playerIdx   = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(player)
+      local playerName  = PLAYER.GET_PLAYER_NAME(playerIdx)
       local playerHost  = NETWORK.NETWORK_GET_HOST_PLAYER_INDEX()
       local friendCount = NETWORK.NETWORK_GET_FRIEND_COUNT()
-      if NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(player) == PLAYER.PLAYER_ID() then
+      if playerIdx == self.get_id() then
         playerName = playerName .. "  [You]"
       end
       if friendCount > 0 then
@@ -1428,7 +1488,7 @@ Game                        = {
           end
         end
       end
-      if playerHost == NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(player) then
+      if playerHost == playerIdx then
         playerName = playerName .. "  [Host]"
       end
       table.insert(playerNames, playerName)
@@ -1718,21 +1778,6 @@ Game                        = {
 
   Self = {
 
-    ---@return integer
-    get_ped = function()
-      return self.get_ped()
-    end,
-
-    ---@return integer
-    get_id = function()
-      return self.get_id()
-    end,
-
-    ---@return vec3
-    get_coords = function()
-      return self.get_pos()
-    end,
-
     ---@return number
     get_elevation = function()
       return ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(self.get_ped())
@@ -1840,6 +1885,44 @@ Game                        = {
           ENTITY.SET_ENTITY_COORDS(self.get_ped(), coords.x, coords.y, coords.z, false, false, true, false)
         end
       end)
+    end,
+
+    ---Enables or disables physical phone intercations in GTA Online
+    ---@param toggle boolean
+    PhoneAnims = function(toggle)
+      for i = 242, 244 do
+        PED.SET_PED_CONFIG_FLAG(self.get_ped(), i, not toggle)
+      end
+    end,
+
+    ---Enables phone gestures in GTA Online.
+    ---@param s script_util
+    PlayPhoneGestures = function(s)
+      local is_phone_in_hand   = SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat(
+      "CELLPHONE_FLASHHAND")) > 0
+      local is_browsing_email  = SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("APPMPEMAIL")) > 0
+      local call_anim_dict     = "anim@scripted@freemode@ig19_mobile_phone@male@"
+      local call_anim          = "base"
+      local call_anim_boneMask = "BONEMASK_HEAD_NECK_AND_R_ARM"
+      if AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() then
+        if Game.requestAnimDict(call_anim_dict) then
+          TASK.TASK_PLAY_PHONE_GESTURE_ANIMATION(self.get_ped(), call_anim_dict, call_anim,
+            call_anim_boneMask, 0.25, 0.25, true, false)
+          repeat
+            s:sleep(10)
+          until
+            AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() == false
+          TASK.TASK_STOP_PHONE_GESTURE_ANIMATION(self.get_ped(), 0.25)
+        end
+      end
+      if is_phone_in_hand then
+        MOBILE.CELL_HORIZONTAL_MODE_TOGGLE(is_browsing_email)
+        for _, v in ipairs(cell_inputs_T) do
+          if PAD.IS_CONTROL_JUST_PRESSED(0, v.control) then
+            MOBILE.CELL_SET_INPUT(v.input)
+          end
+        end
+      end
     end,
   },
 
@@ -1954,6 +2037,31 @@ Game                        = {
       else
         MISC.WATER_OVERRIDE_SET_STRENGTH(-1)
       end
+    end,
+
+    ---Shows a green chevron down element on top of an entity in the game world.
+    ---@param entity RAGE_Entity
+    markSelectedEntity = function(entity)
+      script.run_in_fiber(function()
+        if not ENTITY.IS_ENTITY_ATTACHED(entity) then
+          local entity_hash  = ENTITY.GET_ENTITY_MODEL(entity)
+          local entity_pos   = ENTITY.GET_ENTITY_COORDS(entity, false)
+          local min, max     = vec3:new(0.0, 0.0, 0.0), vec3:new(0.0, 0.0, 0.0)
+          if STREAMING.IS_MODEL_VALID(entity_hash) then
+            min, max = MISC.GET_MODEL_DIMENSIONS(entity_hash, min, max)
+          end
+          local entityHeight = max.z - min.z
+          GRAPHICS.DRAW_MARKER(2, entity_pos.x, entity_pos.y, entity_pos.z + (entityHeight + 0.4),
+          --[[
+           Using 0 for both textureDict and textureName works when drawing a chevron down but 
+           it causes an exception [ACESS_VIOLATION] (only once).
+           Using const char* for both params when using type 2 (chevron) crashes my game.
+           **Reference for textures: https://github.com/esc0rtd3w/illicit-sprx/blob/master/main/illicit/textures.h
+          ]]
+          ---@diagnostic disable-next-line: param-type-mismatch
+            0, 0, 0, 0, 180, 0, 0.3, 0.3, 0.3, 0, 255, 0, 100, true, true, 1, false, 0, 0, false)
+        end
+      end)
     end,
   },
 }

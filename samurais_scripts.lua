@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.2.9' -- v1.2.9
+SCRIPT_VERSION = '1.3.0' -- v1.3.0
 TARGET_BUILD   = '3323'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -319,7 +319,7 @@ HashGrabber            = false
 drew_laser             = false
 isCrouched             = false
 is_handsUp             = false
-PV_spawned             = false
+phoneAnimsEnabled      = false
 is_car                 = false
 is_quad                = false
 is_boat                = false
@@ -415,6 +415,7 @@ currentWmvmt           = ""
 search_term            = ""
 smokeHex               = ""
 random_quote           = ""
+filteredPlayers        = {}
 recently_played_a      = {}
 selected_sound         = {}
 selected_radio         = {}
@@ -1575,7 +1576,7 @@ Actions:add_imgui(function()
       end
     end
     if not fav_exists then
-    if ImGui.Button(translateLabel("add_to_favs") .. "##scenarios") then
+      if ImGui.Button(translateLabel("add_to_favs") .. "##scenarios") then
         UI.widgetSound("Select")
         table.insert(favorite_actions, data)
         lua_cfg.save("favorite_actions", favorite_actions)
@@ -1736,8 +1737,9 @@ Actions:add_imgui(function()
               anim_music = false
             end
           end
-          playAnim(selected_favorite, self.get_ped(), selected_favorite.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, boneIndex, coords, heading,
-          forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX)
+          playAnim(selected_favorite, self.get_ped(), selected_favorite.flag, selfprop1, selfprop2, selfloopedFX,
+            selfSexPed, boneIndex, coords, heading,
+            forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX)
           curr_playing_anim = {
             curr_dict = selected_favorite.dict,
             curr_anim = selected_favorite.anim,
@@ -1816,8 +1818,9 @@ Actions:add_imgui(function()
               anim_music = false
             end
           end
-          playAnim(selected_recent, self.get_ped(), selected_recent.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, boneIndex, coords, heading,
-          forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX)
+          playAnim(selected_recent, self.get_ped(), selected_recent.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
+            boneIndex, coords, heading,
+            forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX)
           is_recent_anim = true
         elseif selected_recent.scenario ~= nil then -- scenario type
           playScenario(selected_recent, self.get_ped())
@@ -2090,7 +2093,8 @@ local function resetLastVehState(s)
       VEHICLE.TOGGLE_VEHICLE_MOD(current_vehicle, 20, false)
     end
     if default_tire_smoke.r ~= driftSmoke_T.r or default_tire_smoke.g ~= driftSmoke_T.g or default_tire_smoke.b ~= driftSmoke_T.b then
-      VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, default_tire_smoke.r, default_tire_smoke.g, default_tire_smoke.b)
+      VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, default_tire_smoke.r, default_tire_smoke.g,
+        default_tire_smoke.b)
     end
     if default_handling_flags ~= nil then
       SS.resetHandlingFlags(last_vehicle, default_handling_flags)
@@ -2709,10 +2713,10 @@ vehicle_tab:add_imgui(function()
             TASK.TASK_LEAVE_VEHICLE(ped, current_vehicle, 4160)
           else
             local player_index = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(ped)
-            command.call("vehkick", {player_index})
+            command.call("vehkick", { player_index })
             ejecto:sleep(1000)
             if PED.IS_PED_SITTING_IN_VEHICLE(ped, current_vehicle) then -- player wasn't ejected. Try something else maybe?
-            --[[
+              --[[
               does jack shit. -_-
               if entities.take_control_of(current_vehicle, 250) then
                 VEHICLE.SET_VEHICLE_CAN_EJECT_PASSENGERS_IF_LOCKED(current_vehicle, true)
@@ -2781,15 +2785,17 @@ vehicle_tab:add_imgui(function()
       if ENTITY.DOES_ENTITY_EXIST(current_vehicle) and ENTITY.IS_ENTITY_A_VEHICLE(current_vehicle) then
         local veh_coords  = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
         local self_coords = self.get_pos()
-        local distance    = MISC.GET_DISTANCE_BETWEEN_COORDS(veh_coords.x, veh_coords.y, veh_coords.z, self_coords.x, self_coords.y, self_coords.z, false)
+        local distance    = MISC.GET_DISTANCE_BETWEEN_COORDS(veh_coords.x, veh_coords.y, veh_coords.z, self_coords.x,
+          self_coords.y, self_coords.z, false)
         if distance <= 15 then
           gui.show_warning("Samurai's Scripts", "Your last vehicle is already too close")
         else
           local self_fwd   = ENTITY.GET_ENTITY_FORWARD_VECTOR(self.get_ped())
           local vmin, vmax = MISC.GET_MODEL_DIMENSIONS(ENTITY.GET_ENTITY_MODEL(current_vehicle), vmin, vmax)
           local veh_length = vmax.y - vmin.y
-          local tp_offset  = { x = self_fwd.x * veh_length, y = self_fwd.y * veh_length}
-          ENTITY.SET_ENTITY_COORDS(current_vehicle, self_coords.x + tp_offset.x, self_coords.y + tp_offset.y, self_coords.z, false, false, false, true)
+          local tp_offset  = { x = self_fwd.x * veh_length, y = self_fwd.y * veh_length }
+          ENTITY.SET_ENTITY_COORDS(current_vehicle, self_coords.x + tp_offset.x, self_coords.y + tp_offset.y,
+            self_coords.z, false, false, false, true)
         end
       else
         gui.show_error("Samurai's Scripts", "Your last vehicle no longer exists in the game world.")
@@ -2822,15 +2828,17 @@ vehicle_tab:add_imgui(function()
           if INTERIOR.GET_INTERIOR_FROM_ENTITY(globals.get_int(1572056)) == 0 then
             local veh_coords  = ENTITY.GET_ENTITY_COORDS(globals.get_int(1572056), true)
             local self_coords = self.get_pos()
-            local distance    = MISC.GET_DISTANCE_BETWEEN_COORDS(veh_coords.x, veh_coords.y, veh_coords.z, self_coords.x, self_coords.y, self_coords.z, false)
+            local distance    = MISC.GET_DISTANCE_BETWEEN_COORDS(veh_coords.x, veh_coords.y, veh_coords.z, self_coords.x,
+              self_coords.y, self_coords.z, false)
             if distance <= 15 then
               gui.show_warning("Samurai's Scripts", "Your personal vehicle is already too close")
             else
               local self_fwd   = ENTITY.GET_ENTITY_FORWARD_VECTOR(self.get_ped())
               local vmin, vmax = MISC.GET_MODEL_DIMENSIONS(ENTITY.GET_ENTITY_MODEL(globals.get_int(1572056)), vmin, vmax)
               local veh_length = vmax.y - vmin.y
-              local tp_offset  = { x = self_fwd.x * veh_length, y = self_fwd.y * veh_length}
-              ENTITY.SET_ENTITY_COORDS(globals.get_int(1572056), self_coords.x + tp_offset.x, self_coords.y + tp_offset.y, self_coords.z, false, false, false, true)
+              local tp_offset  = { x = self_fwd.x * veh_length, y = self_fwd.y * veh_length }
+              ENTITY.SET_ENTITY_COORDS(globals.get_int(1572056), self_coords.x + tp_offset.x, self_coords.y + tp_offset
+                .y, self_coords.z, false, false, false, true)
             end
           else
             gui.show_error("Samurai's Scripts", "Your personal vehicle is not outside.")
@@ -2945,7 +2953,8 @@ drift_mode_tab:add_imgui(function()
                 VEHICLE.TOGGLE_VEHICLE_MOD(current_vehicle, 20, false)
               end
               if default_tire_smoke.r ~= driftSmoke_T.r or default_tire_smoke.g ~= driftSmoke_T.g or default_tire_smoke.b ~= driftSmoke_T.b then
-                VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, default_tire_smoke.r, default_tire_smoke.g, default_tire_smoke.b)
+                VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, default_tire_smoke.r, default_tire_smoke.g,
+                  default_tire_smoke.b)
               end
             end)
           end
@@ -2964,13 +2973,15 @@ drift_mode_tab:add_imgui(function()
             end
             if default_tire_smoke.r ~= driftSmoke_T.r or default_tire_smoke.g ~= driftSmoke_T.g or default_tire_smoke.b ~= driftSmoke_T.b then
               log.info('true')
-              VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, default_tire_smoke.r, default_tire_smoke.g, default_tire_smoke.b)
+              VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, default_tire_smoke.r, default_tire_smoke.g,
+                default_tire_smoke.b)
             end
           end)
         end
       end
       if DriftSmoke or BurnoutSmoke then
-        ImGui.Spacing(); UI.coloredText(translateLabel("driftSmokeCol"), {driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b}, 1, 35)
+        ImGui.Spacing(); UI.coloredText(translateLabel("driftSmokeCol"), { driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T
+            .b }, 1, 35)
         if not customSmokeCol then
           driftSmokeIndex, dsiUsed = ImGui.Combo("##tireSmoke", driftSmokeIndex, driftSmokeColors, #driftSmokeColors)
           ImGui.SameLine()
@@ -2988,7 +2999,7 @@ drift_mode_tab:add_imgui(function()
               end
               if has_custom_tires and not tire_smoke_col_checked then
                 default_tire_smoke.r, default_tire_smoke.g, default_tire_smoke.b = VEHICLE.GET_VEHICLE_TYRE_SMOKE_COLOR(
-                current_vehicle, default_tire_smoke.r, default_tire_smoke.g, default_tire_smoke.b)
+                  current_vehicle, default_tire_smoke.r, default_tire_smoke.g, default_tire_smoke.b)
                 tire_smoke_col_checked = true
               end
             end)
@@ -3017,7 +3028,9 @@ drift_mode_tab:add_imgui(function()
               if smokeHex:len() > 1 then
                 if smokeHex:len() ~= 4 and smokeHex:len() ~= 7 then
                   UI.widgetSound("Error")
-                  gui.show_warning("Samurais Scripts", string.format("' %s ' is not a valid HEX color code. Please enter either a short or a long HEX string.", smokeHex))
+                  gui.show_warning("Samurais Scripts",
+                    string.format(
+                      "' %s ' is not a valid HEX color code. Please enter either a short or a long HEX string.", smokeHex))
                 else
                   UI.widgetSound("Select")
                   driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = lua_Fn.hexToRGB(smokeHex)
@@ -3028,8 +3041,9 @@ drift_mode_tab:add_imgui(function()
                       custom_tires_checked = true
                     end
                     if has_custom_tires and not tire_smoke_col_checked then
-                      default_tire_smoke.r, default_tire_smoke.g, default_tire_smoke.b = VEHICLE.GET_VEHICLE_TYRE_SMOKE_COLOR(
-                      current_vehicle, default_tire_smoke.r, default_tire_smoke.g, default_tire_smoke.b)
+                      default_tire_smoke.r, default_tire_smoke.g, default_tire_smoke.b = VEHICLE
+                          .GET_VEHICLE_TYRE_SMOKE_COLOR(
+                            current_vehicle, default_tire_smoke.r, default_tire_smoke.g, default_tire_smoke.b)
                       tire_smoke_col_checked = true
                     end
                   end)
@@ -6306,65 +6320,60 @@ world_tab:add_imgui(function()
   end
 end)
 
-object_spawner         = world_tab:add_tab("Object Spawner")
-local coords           = self.get_pos()
-local heading          = 0.0
-local forwardX         = 0.0
-local forwardY         = 0.0
-objects_search         = ""
-propName               = ""
-invalidType            = ""
-saved_props_name       = ""
-edit_mode              = false
-activeX                = false
-activeY                = false
-activeZ                = false
-rotX                   = false
-rotY                   = false
-rotZ                   = false
-attached               = false
-attachToSelf           = false
-attachToVeh            = false
-previewStarted         = false
-isChanged              = false
-showInvalidObjText     = false
-blacklisted_obj        = false
-spawned_persist_props  = false
-prop                   = 0
-propHash               = 0
-os_switch              = 0
-prop_index             = 0
-objects_index          = 0
-spawned_index          = 0
-selectedObject         = 0
-axisMult               = 1
-selected_bone          = 0
-previewEntity          = 0
-currentObjectPreview   = 0
-attached_index         = 0
-zOffset                = 0
-persist_prop_index     = 0
-spawned_props          = {}
-spawnedNames           = {}
-filteredSpawnNames     = {}
-selfAttachNames        = {}
-vehAttachments         = {}
-vehAttachNames         = {}
-filteredVehAttachNames = {}
-filteredAttachNames    = {}
-spawned_persist_T      = {}
-attached_props         = {}
-spawnDistance          = { x = 0, y = 0, z = 0 }
-spawnRot               = { x = 0, y = 0, z = 0 }
-attachPos              = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
-prop_creation          = { name = "", props = {} }
-selfAttachments        = { entity = 0, hash = 0, bone = 0, posx = 0.0, posy = 0.0, posz = 0.0, rotx = 0.0, roty = 0.0, rotz = 0.0 }
-persist_attachments    = lua_cfg.read("persist_attachments")
+object_spawner        = world_tab:add_tab("Object Spawner")
+local coords          = self.get_pos()
+local heading         = 0.0
+local forwardX        = 0.0
+local forwardY        = 0.0
+objects_search        = ""
+propName              = ""
+invalidType           = ""
+saved_props_name      = ""
+edit_mode             = false
+activeX               = false
+activeY               = false
+activeZ               = false
+rotX                  = false
+rotY                  = false
+rotZ                  = false
+attached              = false
+attachToSelf          = false
+attachToVeh           = false
+previewStarted        = false
+isChanged             = false
+showInvalidObjText    = false
+blacklisted_obj       = false
+spawned_persist_props = false
+prop                  = 0
+propHash              = 0
+os_switch             = 0
+prop_index            = 0
+objects_index         = 0
+spawned_index         = 0
+selectedObject        = 0
+axisMult              = 1
+selected_bone         = 0
+previewEntity         = 0
+currentObjectPreview  = 0
+attached_index        = 0
+vattached_index       = 0
+zOffset               = 0
+persist_prop_index    = 0
+spawned_props         = {}
+vehAttachments        = {}
+vehicle_attachments   = {}
+spawned_persist_T     = {}
+attached_props        = {}
+selfAttachNames       = {}
+spawnDistance         = { x = 0, y = 0, z = 0 }
+spawnRot              = { x = 0, y = 0, z = 0 }
+prop_creation         = { name = "", props = {} }
+selfAttachments       = { entity = 0, hash = 0, bone = 0, posx = 0.0, posy = 0.0, posz = 0.0, rotx = 0.0, roty = 0.0, rotz = 0.0 }
+persist_attachments   = lua_cfg.read("persist_attachments")
 
 local function resetSliders()
   spawnDistance = { x = 0, y = 0, z = 0 }
   spawnRot      = { x = 0, y = 0, z = 0 }
-  attachPos     = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
 end
 
 local function updateFilteredProps()
@@ -6477,6 +6486,36 @@ local function stopPreview()
   previewEntity       = 0
 end
 
+local function displaySpawnedObjects()
+  spawnedNames = {}
+  if spawned_props[1] ~= nil then
+    for _, v in ipairs(spawned_props) do
+      table.insert(spawnedNames, v.name)
+    end
+  end
+  spawned_index, spiUsed = ImGui.Combo("##spawnedProps", spawned_index, spawnedNames, #spawned_props)
+end
+
+local function displayAttachedObjects()
+  selfAttachNames = {}
+  if attached_props[1] ~= nil then
+    for _, v in ipairs(attached_props) do
+      table.insert(selfAttachNames, v.name)
+    end
+  end
+  attached_index, used = ImGui.Combo("##Attached Objects", attached_index, selfAttachNames, #attached_props)
+end
+
+local function displayVehAttachments()
+  vehAttachNames = {}
+  if vehicle_attachments[1] ~= nil then
+    for _, v in ipairs(vehicle_attachments) do
+      table.insert(vehAttachNames, v.name)
+    end
+  end
+  vattached_index, used = ImGui.Combo("##vehAttachedObjects", vattached_index, vehAttachNames, #vehicle_attachments)
+end
+
 local function filterPersistProps()
   filteredPersistProps = {}
   if persist_attachments[1] ~= nil then
@@ -6585,7 +6624,7 @@ object_spawner:add_imgui(function()
       ImGui.EndDisabled()
     end
     if spawnForPlayer then
-      ImGui.PushItemWidth(200)
+      ImGui.PushItemWidth(270)
       Game.displayPlayerList()
       ImGui.PopItemWidth()
       selectedPlayer = filteredPlayers[playerIndex + 1]
@@ -6617,15 +6656,11 @@ object_spawner:add_imgui(function()
         if ENTITY.DOES_ENTITY_EXIST(spawnedObject) then
           ENTITY.SET_ENTITY_HEADING(spawnedObject, heading)
           OBJECT.PLACE_OBJECT_ON_GROUND_PROPERLY(spawnedObject)
-          table.insert(spawned_props, spawnedObject)
-          table.insert(spawnedNames, propName)
-          local dupes = lua_Fn.getTableDupes(spawnedNames, propName)
-          if dupes > 1 then
-            newPropName = propName .. " #" .. tostring(dupes)
-            table.insert(filteredSpawnNames, newPropName)
-          else
-            table.insert(filteredSpawnNames, propName)
-          end
+          local thisProp  = {}
+          thisProp.name   = propName
+          thisProp.hash   = propHash
+          thisProp.entity = spawnedObject
+          table.insert(spawned_props, thisProp)
         end
       end)
     end
@@ -6635,27 +6670,24 @@ object_spawner:add_imgui(function()
     end
     if spawned_props[1] ~= nil then
       ImGui.Text(translateLabel("spawned_objects"))
-      ImGui.PushItemWidth(230)
-      spawned_index, used = ImGui.Combo("##Spawned Objects", spawned_index, filteredSpawnNames, #spawned_props)
+      ImGui.PushItemWidth(270)
+      displaySpawnedObjects()
       ImGui.PopItemWidth()
       selectedObject = spawned_props[spawned_index + 1]
+      if #spawned_props > 1 then
+        Game.World.markSelectedEntity(selectedObject.entity)
+      end
       ImGui.SameLine()
       if ImGui.Button(translateLabel("generic_delete") .. "##objects") then
         UI.widgetSound("Delete")
         script.run_in_fiber(function(script)
-          if ENTITY.DOES_ENTITY_EXIST(selectedObject) then
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(selectedObject, true, true)
+          if ENTITY.DOES_ENTITY_EXIST(selectedObject.entity) then
+            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(selectedObject.entity, true, true)
             script:sleep(100)
-            ENTITY.DELETE_ENTITY(selectedObject)
-            table.remove(spawnedNames, spawned_index + 1)
-            table.remove(filteredSpawnNames, spawned_index + 1)
-            table.remove(spawned_props, spawned_index + 1)
+            ENTITY.DELETE_ENTITY(selectedObject.entity)
             spawned_index = 0
             if spawned_index > 1 then
               spawned_index = spawned_index - 1
-            end
-            if selfAttachments[1] == nil or vehAttachments[1] == nil then
-              attachPos = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
             end
           end
         end)
@@ -6686,52 +6718,43 @@ object_spawner:add_imgui(function()
         ImGui.SameLine()
         if ImGui.Button(" " .. translateLabel("attachBtn") .. " " .. "##self") then
           script.run_in_fiber(function()
-            if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject, self.get_ped()) then
+            if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, self.get_ped()) then
               UI.widgetSound("Select2")
-              ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, self.get_ped(),
+              ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject.entity, self.get_ped(),
                 PED.GET_PED_BONE_INDEX(self.get_ped(), boneData.ID), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false,
                 false,
                 2, true, 1)
-              attached           = true
-              attachedObject     = selectedObject
-              attachedObjectName = propName
+              attached = true
               if selfAttachments[1] ~= nil then
                 for _, v in ipairs(selfAttachments) do
-                  if attachedObject ~= v.entity then
-                    selfAttachments.entity = attachedObject
-                    selfAttachments.hash   = Game.getEntityModel(attachedObject)
+                  if selectedObject.entity ~= v.entity then
+                    selfAttachments.entity = selectedObject.entity
+                    selfAttachments.hash   = Game.getEntityModel(selectedObject.entity)
+                    selfAttachments.name   = selectedObject.name
                     selfAttachments.bone   = boneData.ID
-                    selfAttachments.posx   = attachPos.x
-                    selfAttachments.posy   = attachPos.y
-                    selfAttachments.posz   = attachPos.z
-                    selfAttachments.rotx   = attachPos.rotX
-                    selfAttachments.roty   = attachPos.rotY
-                    selfAttachments.rotz   = attachPos.rotZ
-                    table.insert(attached_props, selfAttachments)
-                    table.insert(selfAttachNames, attachedObjectName)
+                    selfAttachments.posx   = 0.0
+                    selfAttachments.posy   = 0.0
+                    selfAttachments.posz   = 0.0
+                    selfAttachments.rotx   = 0.0
+                    selfAttachments.roty   = 0.0
+                    selfAttachments.rotz   = 0.0
                   end
                 end
               else
-                selfAttachments.entity = attachedObject
-                selfAttachments.hash   = Game.getEntityModel(attachedObject)
+                selfAttachments.entity = selectedObject.entity
+                selfAttachments.hash   = Game.getEntityModel(selectedObject.entity)
+                selfAttachments.name   = selectedObject.name
                 selfAttachments.bone   = boneData.ID
-                selfAttachments.posx   = attachPos.x
-                selfAttachments.posy   = attachPos.y
-                selfAttachments.posz   = attachPos.z
-                selfAttachments.rotx   = attachPos.rotX
-                selfAttachments.roty   = attachPos.rotY
-                selfAttachments.rotz   = attachPos.rotZ
-                table.insert(attached_props, selfAttachments)
-                table.insert(selfAttachNames, attachedObjectName)
+                selfAttachments.posx   = 0.0
+                selfAttachments.posy   = 0.0
+                selfAttachments.posz   = 0.0
+                selfAttachments.rotx   = 0.0
+                selfAttachments.roty   = 0.0
+                selfAttachments.rotz   = 0.0
               end
-              local attach_dupes = lua_Fn.getTableDupes(selfAttachNames, propName)
-              if attach_dupes > 1 then
-                attach_name = attachedObjectName .. " #" .. tostring(attach_dupes)
-                table.insert(filteredAttachNames, attach_name)
-              else
-                table.insert(filteredAttachNames, propName)
-              end
+              table.insert(attached_props, selfAttachments)
               selfAttachments = {}
+              attached        = true
               attachedToSelf  = true
             else
               UI.widgetSound("Error")
@@ -6742,7 +6765,7 @@ object_spawner:add_imgui(function()
         if attached_props[1] ~= nil then
           ImGui.Text(translateLabel("attached_objects"))
           ImGui.PushItemWidth(230)
-          attached_index, used = ImGui.Combo("##Attached Objects", attached_index, filteredAttachNames, #attached_props)
+          displayAttachedObjects()
           ImGui.PopItemWidth()
           selectedAttachment = attached_props[attached_index + 1]
           ImGui.SameLine()
@@ -6750,7 +6773,6 @@ object_spawner:add_imgui(function()
             UI.widgetSound("Cancel")
             script.run_in_fiber(function()
               ENTITY.DETACH_ENTITY(selectedAttachment.entity, true, true)
-              attachPos = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
               for k, v in ipairs(attached_props) do
                 if selectedAttachment.entity == v.entity then
                   table.remove(attached_props, k)
@@ -6770,47 +6792,62 @@ object_spawner:add_imgui(function()
         if ImGui.Button(" " .. translateLabel("attachBtn") .. " " .. "##veh") then
           UI.widgetSound("Select2")
           script.run_in_fiber(function()
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject, current_vehicle,
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject.entity, current_vehicle,
               ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false,
               false,
               false,
               2, true, 1)
-            attached = true
+            attached       = ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, self.get_veh())
             attachedObject = selectedObject
-            attachedObjectName = propName
             if vehAttachments[1] ~= nil then
               for _, v in ipairs(vehAttachments) do
-                if attachedObject ~= v then
-                  table.insert(vehAttachments, attachedObject)
-                  table.insert(vehAttachNames, attachedObjectName)
+                if selectedObject.entity ~= v.entity then
+                  vehAttachments.entity = selectedObject.entity
+                  vehAttachments.hash   = Game.getEntityModel(selectedObject.entity)
+                  vehAttachments.name   = selectedObject.name
+                  vehAttachments.bone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData)
+                  vehAttachments.posx   = 0.0
+                  vehAttachments.posy   = 0.0
+                  vehAttachments.posz   = 0.0
+                  vehAttachments.rotx   = 0.0
+                  vehAttachments.roty   = 0.0
+                  vehAttachments.rotz   = 0.0
                 end
               end
             else
-              table.insert(vehAttachments, attachedObject)
-              table.insert(vehAttachNames, attachedObjectName)
+              vehAttachments.entity = selectedObject.entity
+              vehAttachments.hash   = Game.getEntityModel(selectedObject.entity)
+              vehAttachments.name   = selectedObject.name
+              vehAttachments.bone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData)
+              vehAttachments.posx   = 0.0
+              vehAttachments.posy   = 0.0
+              vehAttachments.posz   = 0.0
+              vehAttachments.rotx   = 0.0
+              vehAttachments.roty   = 0.0
+              vehAttachments.rotz   = 0.0
             end
-            local attach_dupes = lua_Fn.getTableDupes(vehAttachNames, propName)
-            if attach_dupes > 1 then
-              attach_name = attachedObjectName .. " #" .. tostring(attach_dupes)
-              table.insert(filteredVehAttachNames, attach_name)
-            else
-              table.insert(filteredVehAttachNames, propName)
-            end
+            table.insert(vehicle_attachments, vehAttachments)
+            vehAttachments = {}
+            attached       = true
+            attachedToSelf = true
           end)
         end
-        if vehAttachments[1] ~= nil then
+        if vehicle_attachments[1] ~= nil then
           ImGui.Text(translateLabel("attached_objects"))
           ImGui.PushItemWidth(230)
-          attached_index, used = ImGui.Combo("##vehAttachedObjects", attached_index, filteredVehAttachNames,
-            #vehAttachments)
+          displayVehAttachments()
           ImGui.PopItemWidth()
-          selectedAttachment = vehAttachments[attached_index + 1]
+          selectedAttachment = vehicle_attachments[attached_index + 1]
           ImGui.SameLine()
           if ImGui.Button(translateLabel("detachBtn") .. "##veh") then
             UI.widgetSound("Cancel")
             script.run_in_fiber(function()
-              ENTITY.DETACH_ENTITY(selectedAttachment, true, true)
-              attachPos = { x = 0.0, y = 0.0, z = 0.0, rotX = 0.0, rotY = 0.0, rotZ = 0.0 }
+              ENTITY.DETACH_ENTITY(selectedAttachment.entity, true, true)
+              for k, v in ipairs(vehicle_attachments) do
+                if selectedAttachment.entity == v.entity then
+                  table.remove(vehicle_attachments, k)
+                end
+              end
             end)
           end
         end
@@ -6823,19 +6860,25 @@ object_spawner:add_imgui(function()
       ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
       if ImGui.Button("   " .. translateLabel("generic_reset") .. "   ") then
         UI.widgetSound("Select")
-        resetSliders()
-        if attached then
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, false, false, false, false, 2, true, 1)
-        else
-          ENTITY.SET_ENTITY_COORDS(selectedObject, coords.x + (forwardX * 3), coords.y + (forwardY * 3), coords.z, false,
-            false, false, false)
-          ENTITY.SET_ENTITY_HEADING(selectedObject, heading)
-          OBJECT.PLACE_OBJECT_ON_GROUND_OR_OBJECT_PROPERLY(selectedObject)
-        end
+        script.run_in_fiber(function()
+          if ENTITY.IS_ENTITY_ATTACHED(selected_att) then
+            selectedAttachment.posx, selectedAttachment.posy, selectedAttachment.posz,
+            selectedAttachment.rotx, selectedAttachment.roty, selectedAttachment.rotz = 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, 0.0, 0.0, 0.0,
+              0.0, 0.0, 0.0, false, false, false, false, 2, true, 1)
+          else
+            resetSliders()
+            ENTITY.SET_ENTITY_COORDS(selectedObject.entity, coords.x + (forwardX * 3), coords.y + (forwardY * 3),
+              coords.z, false,
+              false, false, false)
+            ENTITY.SET_ENTITY_HEADING(selectedObject.entity, heading)
+            OBJECT.PLACE_OBJECT_ON_GROUND_OR_OBJECT_PROPERLY(selectedObject.entity)
+          end
+        end)
       end
       UI.helpMarker(false, translateLabel("resetSlider_tt"))
-      if edit_mode and not attached then
+      if edit_mode and not ENTITY.IS_ENTITY_ATTACHED(selectedObject.entity) then
         ImGui.Text(translateLabel("xyz_multiplier"))
         ImGui.PushItemWidth(280)
         axisMult, _ = ImGui.InputInt("##multiplier", axisMult, 1, 2)
@@ -6864,15 +6907,15 @@ object_spawner:add_imgui(function()
         rotZ = ImGui.IsItemActive()
         ImGui.PopItemWidth()
       else
-        if edit_mode and attached_props[1] ~= nil or edit_mode and vehAttachments[1] ~= nil then
-          if attachToSelf then
+        if edit_mode and attached_props[1] ~= nil or edit_mode and vehicle_attachments[1] ~= nil then
+          if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, self.get_ped()) then
             target       = self.get_ped()
             attachBone   = PED.GET_PED_BONE_INDEX(self.get_ped(), selectedAttachment.bone)
             selected_att = selectedAttachment.entity
-          elseif attachToVeh then
+          elseif ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, self.get_veh()) then
             target       = current_vehicle
             attachBone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData)
-            selected_att = selectedAttachment
+            selected_att = selectedAttachment.entity
           end
           ImGui.Text(translateLabel("xyz_multiplier"))
           ImGui.PushItemWidth(271)
@@ -6884,151 +6927,127 @@ object_spawner:add_imgui(function()
           ImGui.Dummy(25, 1); ImGui.SameLine(); ImGui.Text("Z Axis :")
           ImGui.ArrowButton("##Xleft", 0)
           if ImGui.IsItemActive() then
-            attachPos.x = attachPos.x + 0.001 * axisMult
-            if attachedToSelf then
-              selectedAttachment.posx = attachPos.x
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.posx = selectedAttachment.posx + 0.001 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.SameLine()
           ImGui.ArrowButton("##XRight", 1)
           if ImGui.IsItemActive() then
-            attachPos.x = attachPos.x - 0.001 * axisMult
-            if attachedToSelf then
-              selectedAttachment.posx = attachPos.x
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.posx = selectedAttachment.posx - 0.001 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.SameLine()
           ImGui.Dummy(5, 1); ImGui.SameLine()
           ImGui.ArrowButton("##Yleft", 0)
           if ImGui.IsItemActive() then
-            attachPos.y = attachPos.y + 0.001 * axisMult
-            if attachedToSelf then
-              selectedAttachment.posy = attachPos.y
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.posy = selectedAttachment.posy + 0.001 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.SameLine()
           ImGui.ArrowButton("##YRight", 1)
           if ImGui.IsItemActive() then
-            attachPos.y = attachPos.y - 0.001 * axisMult
-            if attachedToSelf then
-              selectedAttachment.posy = attachPos.y
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.posy = selectedAttachment.posy - 0.001 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.SameLine()
           ImGui.Dummy(5, 1); ImGui.SameLine()
           ImGui.ArrowButton("##zUp", 2)
           if ImGui.IsItemActive() then
-            attachPos.z = attachPos.z + 0.001 * axisMult
-            if attachedToSelf then
-              selectedAttachment.posz = attachPos.yz
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.posz = selectedAttachment.posz + 0.001 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.SameLine()
           ImGui.ArrowButton("##zDown", 3)
           if ImGui.IsItemActive() then
-            attachPos.z = attachPos.z - 0.001 * axisMult
-            if attachedToSelf then
-              selectedAttachment.posz = attachPos.z
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.posz = selectedAttachment.posz - 0.001 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.Text("X Rotation :"); ImGui.SameLine(); ImGui.Text("Y Rotation :"); ImGui.SameLine(); ImGui.Text(
             "Z Rotation :")
           ImGui.ArrowButton("##rotXleft", 0)
           if ImGui.IsItemActive() then
-            attachPos.rotX = attachPos.rotX + 1 * axisMult
-            if attachedToSelf then
-              selectedAttachment.rotx = attachPos.rotX
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.rotx = selectedAttachment.rotx + 0.5 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.SameLine()
           ImGui.ArrowButton("##rotXright", 1)
           if ImGui.IsItemActive() then
-            attachPos.rotX = attachPos.rotX - 1 * axisMult
-            if attachedToSelf then
-              selectedAttachment.rotx = attachPos.rotX
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.rotx = selectedAttachment.rotx - 0.5 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.SameLine()
           ImGui.Dummy(5, 1); ImGui.SameLine()
           ImGui.ArrowButton("##rotYleft", 0)
           if ImGui.IsItemActive() then
-            attachPos.rotY = attachPos.rotY + 1 * axisMult
-            if attachedToSelf then
-              selectedAttachment.roty = attachPos.rotY
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.roty = selectedAttachment.roty + 0.5 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.SameLine()
           ImGui.ArrowButton("##rotYright", 1)
           if ImGui.IsItemActive() then
-            attachPos.rotY = attachPos.rotY - 1 * axisMult
-            if attachedToSelf then
-              selectedAttachment.roty = attachPos.rotY
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.roty = selectedAttachment.roty - 0.5 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.SameLine()
           ImGui.Dummy(5, 1); ImGui.SameLine()
           ImGui.ArrowButton("##rotZup", 2)
           if ImGui.IsItemActive() then
-            attachPos.rotZ = attachPos.rotZ + 1 * axisMult
-            if attachedToSelf then
-              selectedAttachment.rotz = attachPos.rotZ
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.rotz = selectedAttachment.rotz + 0.5 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
           ImGui.SameLine()
           ImGui.ArrowButton("##rotZdown", 3)
           if ImGui.IsItemActive() then
-            attachPos.rotZ = attachPos.rotZ - 1 * axisMult
-            if attachedToSelf then
-              selectedAttachment.rotz = attachPos.rotZ
-            end
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, attachPos.x,
-              attachPos.y, attachPos.z, attachPos.rotX, attachPos.rotY, attachPos.rotZ, false, false, false, false, 2,
-              true,
-              1)
+            selectedAttachment.rotz = selectedAttachment.rotz - 0.5 * axisMult
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              selected_att, target, attachBone, selectedAttachment.posx,
+              selectedAttachment.posy, selectedAttachment.posz, selectedAttachment.rotx,
+              selectedAttachment.roty, selectedAttachment.rotz, false, false, false, false, 2, true, 1
+            )
           end
         end
       end
@@ -7066,6 +7085,7 @@ object_spawner:add_imgui(function()
               prop_creation.props = attached_props
               table.insert(persist_attachments, prop_creation)
               lua_cfg.save("persist_attachments", persist_attachments)
+              gui.show_success("Samurai's Scripts", string.format("Your [ %s ] has been saved", saved_props_name))
               repeat
                 timer = timer + 1
               until timer >= 50
@@ -7076,9 +7096,9 @@ object_spawner:add_imgui(function()
               if spawned_props[1] ~= nil then
                 script.run_in_fiber(function()
                   for _, p in ipairs(spawned_props) do
-                    if ENTITY.DOES_ENTITY_EXIST(p) then
-                      ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p, true, true)
-                      ENTITY.DELETE_ENTITY(p)
+                    if ENTITY.DOES_ENTITY_EXIST(p.entity) then
+                      ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p.entity, true, true)
+                      ENTITY.DELETE_ENTITY(p.entity)
                     end
                   end
                 end)
@@ -7693,46 +7713,27 @@ script.register_looped("self features", function(script)
   end
 
   -- Online Phone Animations
-  if NETWORK.NETWORK_IS_SESSION_ACTIVE() then
-    if phoneAnim and not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) then
-      if not is_playing_anim and not is_playing_scenario and not ped_grabbed and not vehicle_grabbed and not is_handsUp and not is_sitting and PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0 then
-        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 242, true) then
-          PED.SET_PED_CONFIG_FLAG(self.get_ped(), 242, false)
+  if Game.isOnline() then
+    if phoneAnim then
+      if not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) and not is_playing_anim and not is_playing_scenario and not ped_grabbed and not vehicle_grabbed and not is_handsUp and not is_sitting and PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0 then
+        if not phoneAnimsEnabled then
+          Game.Self.PhoneAnims(true)
+          phoneAnimsEnabled = true
         end
-        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 243, true) then
-          PED.SET_PED_CONFIG_FLAG(self.get_ped(), 243, false)
-        end
-        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 244, true) then
-          PED.SET_PED_CONFIG_FLAG(self.get_ped(), 244, false)
-        end
-        if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 243, true) and AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() then
-          if not STREAMING.HAS_ANIM_DICT_LOADED("anim@scripted@freemode@ig19_mobile_phone@male@") then
-            STREAMING.REQUEST_ANIM_DICT("anim@scripted@freemode@ig19_mobile_phone@male@")
-            return
-          end
-          TASK.TASK_PLAY_PHONE_GESTURE_ANIMATION(self.get_ped(), "anim@scripted@freemode@ig19_mobile_phone@male@", "base",
-            "BONEMASK_HEAD_NECK_AND_R_ARM", 0.25, 0.25, true, false)
-          repeat
-            script:sleep(10)
-          until
-            AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() == false
-          TASK.TASK_STOP_PHONE_GESTURE_ANIMATION(self.get_ped(), 0.25)
+        if phoneAnimsEnabled then
+          Game.Self.PlayPhoneGestures(script)
         end
       else
-        PED.SET_PED_CONFIG_FLAG(self.get_ped(), 242, true)
-        PED.SET_PED_CONFIG_FLAG(self.get_ped(), 243, true)
-        PED.SET_PED_CONFIG_FLAG(self.get_ped(), 244, true)
+        if phoneAnimsEnabled then
+          Game.Self.PhoneAnims(false)
+          phoneAnimsEnabled = false
+        end
       end
     else
-      PED.SET_PED_CONFIG_FLAG(self.get_ped(), 242, true)
-      PED.SET_PED_CONFIG_FLAG(self.get_ped(), 243, true)
-      PED.SET_PED_CONFIG_FLAG(self.get_ped(), 244, true)
-    end
-  else
-    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 242, true) and PED.GET_PED_CONFIG_FLAG(self.get_ped(), 243, true) and PED.GET_PED_CONFIG_FLAG(self.get_ped(), 244, true) then
-      PED.SET_PED_CONFIG_FLAG(self.get_ped(), 242, false)
-      PED.SET_PED_CONFIG_FLAG(self.get_ped(), 243, false)
-      PED.SET_PED_CONFIG_FLAG(self.get_ped(), 244, false)
+      if phoneAnimsEnabled then
+        Game.Self.PhoneAnims(false)
+        phoneAnimsEnabled = false
+      end
     end
   end
 
@@ -8135,7 +8136,8 @@ script.register_looped("anim shortcut", function(animsc)
         animsc:sleep(100)
       end
       if Game.requestAnimDict(shortcut_anim.dict) then
-        playAnim(shortcut_anim, self.get_ped(), shortcut_anim.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, myboneIndex,
+        playAnim(shortcut_anim, self.get_ped(), shortcut_anim.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
+          myboneIndex,
           mycoords, myheading,
           myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX)
         curr_playing_anim = {
@@ -8397,14 +8399,14 @@ end)
 script.register_looped("TDFT", function(script)
   script:yield()
   if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
-    current_vehicle  = onVehEnter(script)
-    is_car           = VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(current_vehicle))
-    is_quad          = VEHICLE.IS_THIS_MODEL_A_QUADBIKE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
-    is_plane         = VEHICLE.IS_THIS_MODEL_A_PLANE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
-    is_heli          = VEHICLE.IS_THIS_MODEL_A_HELI(ENTITY.GET_ENTITY_MODEL(current_vehicle))
-    is_bike          = (VEHICLE.IS_THIS_MODEL_A_BIKE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
+    current_vehicle = onVehEnter(script)
+    is_car          = VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(current_vehicle))
+    is_quad         = VEHICLE.IS_THIS_MODEL_A_QUADBIKE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
+    is_plane        = VEHICLE.IS_THIS_MODEL_A_PLANE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
+    is_heli         = VEHICLE.IS_THIS_MODEL_A_HELI(ENTITY.GET_ENTITY_MODEL(current_vehicle))
+    is_bike         = (VEHICLE.IS_THIS_MODEL_A_BIKE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
       and VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 13 and ENTITY.GET_ENTITY_MODEL(current_vehicle) ~= 0x7B54A9D3)
-    is_boat          = (VEHICLE.IS_THIS_MODEL_A_BOAT(ENTITY.GET_ENTITY_MODEL(current_vehicle)) or
+    is_boat         = (VEHICLE.IS_THIS_MODEL_A_BOAT(ENTITY.GET_ENTITY_MODEL(current_vehicle)) or
       VEHICLE.IS_THIS_MODEL_A_JETSKI(ENTITY.GET_ENTITY_MODEL(current_vehicle)))
     if is_car or is_quad or is_bike then
       validModel = true
@@ -9936,20 +9938,21 @@ script.register_looped("World Bounds", function()
   end
 end)
 script.register_looped("Public Seats", function(pseats)
-  pseats:yield()
-  if public_seats and Game.Self.isOnFoot() and PED.IS_PED_STOPPED(self.get_ped()) and not is_sitting and not is_crouched and not is_handsUp and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario then
-    local near_seat, seatPos, seatRot = SS.isNearPublicSeat()
-    local fwdVec = Game.getForwardVec(self.get_ped())
-    if near_seat and not PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) and not is_playing_anim and not is_playing_scenario and not ped_grabbed and not vehicle_grabbed and not is_handsUp and not isCrouched then
+  if public_seats and Game.Self.isOutside() and Game.Self.isOnFoot() and not NETWORK.NETWORK_IS_ACTIVITY_SESSION() and not Game.Self.isMoving() and not is_sitting and not is_crouched and not is_handsUp and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario then
+    local near_seat, seat, x_offset = SS.isNearPublicSeat()
+    if near_seat and Game.Self.isAlive() and not PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) and not is_playing_anim and not is_playing_scenario and not ped_grabbed and not vehicle_grabbed and not is_handsUp and not isCrouched then
       HUD.BEGIN_TEXT_COMMAND_DISPLAY_HELP("STRING")
       HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME("Press ~INPUT_PICKUP~ to sit down")
       HUD.END_TEXT_COMMAND_DISPLAY_HELP(0, false, true, -1)
       if PAD.IS_CONTROL_PRESSED(0, 38) then
         if Game.requestAnimDict("timetable@ron@ig_3_couch") then
-          TASK.TASK_PLAY_ANIM_ADVANCED(
-            self.get_ped(), "timetable@ron@ig_3_couch", "base", seatPos.x, seatPos.y, seatPos.z,
-            seatRot.x + (fwdVec.x / 0.6), seatRot.y + (fwdVec.y / 0.6), seatRot.z - 180, 1.69, 4.0, -1, 33, 0, 2, 0
-          )
+          TASK.TASK_TURN_PED_TO_FACE_ENTITY(self.get_ped(), prop, 100)
+          pseats:sleep(150)
+          TASK.TASK_PLAY_ANIM(self.get_ped(), "timetable@ron@ig_3_couch", "base", 1.69, 4.0, -1, 33, 1.0, false, false,
+            false)
+          local bone_index = PED.GET_PED_BONE_INDEX(self.get_ped(), 0)
+          ENTITY.ATTACH_ENTITY_TO_ENTITY(self.get_ped(), seat, bone_index, x_offset, -0.6, 1.0, 0.0, 0.0, 180.0, false,
+            false, false, false, 20, true, 1)
           pseats:sleep(1000)
           is_sitting = true
         end
@@ -9960,14 +9963,22 @@ script.register_looped("Public Seats", function(pseats)
   end
   if is_sitting then
     if PED.IS_PED_IN_MELEE_COMBAT(self.get_ped()) then
+      ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
       TASK.CLEAR_PED_TASKS(self.get_ped())
       is_sitting = false
     end
     if PED.IS_PED_RAGDOLL(self.get_ped()) then
+      ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
       TASK.CLEAR_PED_TASKS(self.get_ped())
       is_sitting = false
     end
     if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
+      ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      is_sitting = false
+    end
+    if not Game.Self.isAlive() then
+      ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
       TASK.CLEAR_PED_TASKS(self.get_ped())
       is_sitting = false
     end
@@ -9978,6 +9989,7 @@ script.register_looped("Public Seats", function(pseats)
       HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME("Press ~INPUT_PICKUP~ to get up")
       HUD.END_TEXT_COMMAND_DISPLAY_HELP(0, false, true, -1)
       if PAD.IS_CONTROL_PRESSED(0, 38) then
+        ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
         TASK.STOP_ANIM_TASK(self.get_ped(), "timetable@ron@ig_3_couch", "base", -2.69)
         pseats:sleep(1000)
         is_sitting = false
@@ -10046,36 +10058,39 @@ script.register_looped("Preview", function(preview)
 end)
 script.register_looped("edit mode", function()
   if spawned_props[1] ~= nil then
-    if edit_mode and selfAttachments[1] == nil and vehAttachments[1] == nil then
-      local current_coords   = ENTITY.GET_ENTITY_COORDS(selectedObject, true)
-      local current_rotation = ENTITY.GET_ENTITY_ROTATION(selectedObject, 2)
+    if edit_mode and not ENTITY.IS_ENTITY_ATTACHED(selectedObject.entity) then
+      local current_coords   = ENTITY.GET_ENTITY_COORDS(selectedObject.entity, true)
+      local current_rotation = ENTITY.GET_ENTITY_ROTATION(selectedObject.entity, 2)
       if activeX then
-        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x + spawnDistance.x, current_coords.y, current_coords.z,
+        ENTITY.SET_ENTITY_COORDS(selectedObject.entity, current_coords.x + spawnDistance.x, current_coords.y,
+          current_coords.z,
           false, false, false, false)
       end
       if activeY then
-        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x, current_coords.y + spawnDistance.y, current_coords.z,
+        ENTITY.SET_ENTITY_COORDS(selectedObject.entity, current_coords.x, current_coords.y + spawnDistance.y,
+          current_coords.z,
           false, false, false, false)
       end
       if activeZ then
-        ENTITY.SET_ENTITY_COORDS(selectedObject, current_coords.x, current_coords.y, current_coords.z + spawnDistance.z,
+        ENTITY.SET_ENTITY_COORDS(selectedObject.entity, current_coords.x, current_coords.y,
+          current_coords.z + spawnDistance.z,
           false, false, false, false)
       end
       if rotX then
-        ENTITY.SET_ENTITY_ROTATION(selectedObject, current_rotation.x + spawnRot.x, current_rotation.y,
+        ENTITY.SET_ENTITY_ROTATION(selectedObject.entity, current_rotation.x + spawnRot.x, current_rotation.y,
           current_rotation.z, 2, true)
       end
       if rotY then
-        ENTITY.SET_ENTITY_ROTATION(selectedObject, current_rotation.x, current_rotation.y + spawnRot.y,
+        ENTITY.SET_ENTITY_ROTATION(selectedObject.entity, current_rotation.x, current_rotation.y + spawnRot.y,
           current_rotation.z, 2, true)
       end
       if rotZ then
-        ENTITY.SET_ENTITY_ROTATION(selectedObject, current_rotation.x, current_rotation.y,
+        ENTITY.SET_ENTITY_ROTATION(selectedObject.entity, current_rotation.x, current_rotation.y,
           current_rotation.z + spawnRot.z, 2, true)
       end
     end
     for k, v in ipairs(spawned_props) do
-      if not ENTITY.DOES_ENTITY_EXIST(v) then
+      if not ENTITY.DOES_ENTITY_EXIST(v.entity) then
         table.remove(spawned_props, k)
       end
     end
@@ -10084,6 +10099,13 @@ script.register_looped("edit mode", function()
     for i, v in ipairs(attached_props) do
       if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(v.entity, self.get_ped()) then
         table.remove(attached_props, i)
+      end
+    end
+  end
+  if vehicle_attachments[1] ~= nil then
+    for i, v in ipairs(vehicle_attachments) do
+      if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(v.entity, self.get_veh()) then
+        table.remove(vehicle_attachments, i)
       end
     end
   end
