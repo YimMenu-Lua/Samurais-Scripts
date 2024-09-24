@@ -13,8 +13,10 @@ animlist = {
 
   { dict = "missheistdockssetup1clipboard@base",                          anim = "base",                               name = "MISC: Clipboard",                       flag = 49, prop1 = 2896824542,               boneID = 60309,                         posx = 0.011,                    posy = 0.007,         posz = -0.02,   rotx = 96.2,          roty = 0.0,            rotz = 0.0,      prop2 = 463086472,              bone2 = 58867,                           posx2 = 0.05,                   posy2 = -0.01,             posz2 = -0.01,                  rotx2 = 0.0,                               roty2 = 0.0,                   rotz2 = 0.0,     type = 6 },
 
-  { dict = "amb@world_human_drinking@beer@male@idle_a",                   anim = "idle_a",                             name = "MISC: Drink Beer",                      flag = 49, prop1 = 2010247122,               boneID = 28422,                         posx = 0.0,                      posy = 0.0,           posz = 0.0,     rotx = 0.0,           roty = 0.0,            rotz = 0.0,      ptfxOffx = 0.0,                 ptfxOffy = 0.0,                          ptfxOffz = 0.0,                 ptfxrotx = 0.0,            ptfxroty = 0.0,                 ptfxrotz = 0.0,                            type = 1,                      propColl = true, prop2 = 0 },
-  { dict = "amb@world_human_drinking@coffee@male@idle_a",                 anim = "idle_c",                             name = "MISC: Drink Coffee",                    flag = 49, prop1 = 4161278897,               boneID = 64096,                         posx = 0.01,                     posy = 0.055,         posz = -0.005,  rotx = -15.0,         roty = 5.0,            rotz = -87.0,    ptfxOffx = 0.0,                 ptfxOffy = 0.0,                          ptfxOffz = 0.0,                 ptfxrotx = 0.0,            ptfxroty = 0.0,                 ptfxrotz = 0.0,                            type = 1,                      propColl = true, prop2 = 0 },
+  { dict = "amb@world_human_drinking@beer@male@idle_a",                   anim = "idle_a",                             name = "MISC: Drink Beer 01",                   flag = 49, prop1 = 2010247122,               boneID = 28422,                         posx = 0.0,                      posy = 0.0,           posz = 0.0,     rotx = 0.0,           roty = 0.0,            rotz = 0.0,      ptfxOffx = 0.0,                 ptfxOffy = 0.0,                          ptfxOffz = 0.0,                 ptfxrotx = 0.0,            ptfxroty = 0.0,                 ptfxrotz = 0.0,                            type = 1,                      propColl = true, prop2 = 0 },
+  { dict = "amb@world_human_drinking@beer@female@idle_a",                 anim = "idle_b",                             name = "MISC: Drink Beer 02",                   flag = 49, prop1 = 2010247122,               boneID = 28422,                         posx = -0.02,                    posy = 0.0,           posz = 0.0,     rotx = 10.0,          roty = 10.0,           rotz = 0.0,      ptfxOffx = 0.0,                 ptfxOffy = 0.0,                          ptfxOffz = 0.0,                 ptfxrotx = 0.0,            ptfxroty = 0.0,                 ptfxrotz = 0.0,                            type = 1,                      propColl = true, prop2 = 0 },
+  { dict = "amb@world_human_drinking@coffee@male@idle_a",                 anim = "idle_c",                             name = "MISC: Drink Coffee 01",                 flag = 49, prop1 = 4161278897,               boneID = 64096,                         posx = 0.01,                     posy = 0.055,         posz = -0.005,  rotx = -15.0,         roty = 5.0,            rotz = -87.0,    ptfxOffx = 0.0,                 ptfxOffy = 0.0,                          ptfxOffz = 0.0,                 ptfxrotx = 0.0,            ptfxroty = 0.0,                 ptfxrotz = 0.0,                            type = 1,                      propColl = true, prop2 = 0 },
+  { dict = "amb@world_human_drinking@coffee@female@idle_a",               anim = "idle_b",                             name = "MISC: Drink Coffee 02",                 flag = 49, prop1 = 4161278897,               boneID = 64096,                         posx = 0.015,                    posy = 0.066,         posz = -0.011,  rotx = -15.0,         roty = 5.0,            rotz = -120.0,   ptfxOffx = 0.0,                 ptfxOffy = 0.0,                          ptfxOffz = 0.0,                 ptfxrotx = 0.0,            ptfxroty = 0.0,                 ptfxrotz = 0.0,                            type = 1,                      propColl = true, prop2 = 0 },
   { dict = "amb@code_human_wander_eating_donut@male@base",                anim = "static",                             name = "MISC: Eat Donut",                       flag = 49, prop1 = 3992024553,               boneID = 64096,                         posx = 0.06,                     posy = 0.05,          posz = 0.02,    rotx = -90.0,         roty = 180.0,          rotz = 0.0,      ptfxOffx = 0.0,                 ptfxOffy = 0.0,                          ptfxOffz = 0.0,                 ptfxrotx = 0.0,            ptfxroty = 0.0,                 ptfxrotz = 0.0,                            type = 1,                      propColl = true, prop2 = 0 },
   { dict = "amb@world_human_seat_wall_eating@male@both_hands@idle_a",     anim = "idle_c",                             name = "MISC: Eat Taco",                        flag = 49, prop1 = 1655278098,               boneID = 64096,                         posx = 0.1,                      posy = 0.05,          posz = 0.01,    rotx = -25.0,         roty = 0.0,            rotz = 290.0,    ptfxOffx = 0.0,                 ptfxOffy = 0.0,                          ptfxOffz = 0.0,                 ptfxrotx = 0.0,            ptfxroty = 0.0,                 ptfxrotz = 0.0,                            type = 1,                      propColl = true, prop2 = 0 },
   { dict = "amb@world_human_musician@guitar@male@idle_a",                 anim = "idle_b",                             name = "Activity: Guitar (acoustic)",           flag = 33, prop1 = 3586178055,               boneID = 24818,                         posx = -0.06,                    posy = 0.29,          posz = 0.18,    rotx = 10.0,          roty = 348.0,          rotz = 161.0,    ptfxOffx = 0.0,                 ptfxOffy = 0.0,                          ptfxOffz = 0.0,                 ptfxrotx = 0.0,            ptfxroty = 0.0,                 ptfxrotz = 0.0,                            type = 1,                      propColl = true, prop2 = 0 },
@@ -66,7 +68,8 @@ animlist = {
   { dict = "amb@code_human_police_investigate@idle_a",                    anim = "idle_a",                             name = "Action: Crime Scene Investigator",      flag = 1,  tprop1 = 3026386862,              boneID = 0,                             posx = 0.0,                      posy = 0.0,           posz = 0.0,     rotx = 0.0,           roty = 0.0,            rotz = 20.0,     type = 3 },
   { dict = "amb@world_human_clipboard@male@base",                         anim = "base",                               name = "NSFW: Porn Magazine 01",                flag = 49, prop1 = 2727617608,               boneID = 60309,                         posx = 0.08,                     posy = -0.049,        posz = -0.05,   rotx = 87.93,         roty = -0.4292,        rotz = -14.3925, type = 1 },
   { dict = "amb@world_human_clipboard@male@base",                         anim = "base",                               name = "NSFW: Porn Magazine 02",                flag = 49, prop1 = 3306343310,               boneID = 60309,                         posx = 0.12,                     posy = -0.049,        posz = -0.05,   rotx = 87.93,         roty = -0.4292,        rotz = -14.3925, type = 1 },
-  { dict = "amb@incar@male@patrol@torch@idle_a",                          anim = "idle_a",                             name = "Car: Police Torch (in-car)",            flag = 33, prop1 = 211760048,                boneID = 28422,                         posx = 0.0,                      posy = -0.009,        posz = -0.01,   rotx = 0.0,           roty = 0.0,            rotz = 90.0,     type = 1 },
+  { dict = "amb@incar@male@patrol@torch@idle_a",                          anim = "idle_a",                             name = "Car: Police Torch Right (in-car)",      flag = 33, prop1 = 211760048,                boneID = 28422,                         posx = 0.0,                      posy = -0.009,        posz = -0.01,   rotx = 0.0,           roty = 0.0,            rotz = 90.0,     type = 1 },
+  { dict = "amb@incar@male@patrol@torch@idle_b",                          anim = "idle_d",                             name = "Car: Police Torch Left (in-car)",       flag = 33, prop1 = 211760048,                boneID = 28422,                         posx = 0.0,                      posy = -0.009,        posz = -0.01,   rotx = 0.0,           roty = 0.0,            rotz = 90.0,     type = 1 },
   { dict = "amb@world_human_sunbathe@male@back@base",                     anim = "base",                               name = "MISC: Sunbathe",                        flag = 33, prop1 = 1280564504,               boneID = 0,                             posx = 0.0,                      posy = 0.0,           posz = 0.0,     rotx = 0.0,           roty = 0.0,            rotz = 0.0,      type = 4,                       propColl = true },
   { dict = "timetable@tracy@sleep@",                                      anim = "idle_b",                             name = "MISC: Sleep",                           flag = 33, prop1 = 3314781611,               boneID = 0,                             posx = 0.0,                      posy = 0.0,           posz = 0.0,     rotx = 0.0,           roty = 0.0,            rotz = 0.0,      type = 4,                       propColl = true,                         sfx = "SNORING",                sfxName = "TREVOR_NORMAL", sfxFlg = "SPEECH_PARAMS_FORCE" },
   { dict = "anim@amb@nightclub@lazlow@hi_dancefloor@",                    anim = "crowddance_hi_11_raiseup_laz",       name = "Activity: Dance 01",                    flag = 33, prop1 = 3324004640,               boneID = 64096,                         posx = 0.02481,                  posy = 0.05,          posz = 0.0,     rotx = 0.0,           roty = 0.0,            rotz = 0.0,      type = 1,                       propColl = true },
@@ -145,6 +148,11 @@ animlist = {
   { dict = "melee@unarmed@streamed_variations",                           anim = "plyr_takedown_front_headbutt",       name = "Action: Headbutt",                      flag = 0 },
   { dict = "rcmextreme2",                                                 anim = "loop_punching",                      name = "Activity: Boxing 01",                   flag = 48 },
   { dict = "anim@mp_player_intuppershadow_boxing",                        anim = "idle_a",                             name = "Activity: Boxing 02",                   flag = 49 },
+  { dict = "timetable@reunited@ig_2",                                     anim = "jimmy_getknocked",                   name = "Activity: Jumping Jacks 01",            flag = 33 },
+  { dict = "timetable@tracy@ig_5@base",                                   anim = "base",                               name = "Activity: Jumping Jacks 02",            flag = 33 },
+  { dict = "timetable@tracy@ig_5@idle_a",                                 anim = "idle_c",                             name = "Activity: Jumping Jacks 03",            flag = 33 },
+  { dict = "timetable@tracy@ig_5@idle_b",                                 anim = "idle_e",                             name = "Activity: Jumping Jacks 04",            flag = 33 },
+  { dict = "timetable@tracy@ig_5@idle_b",                                 anim = "idle_d",                             name = "Activity: Jumping Jacks 05",            flag = 33 },
   { dict = "random@drunk_driver_1",                                       anim = "drunk_fall_over",                    name = "Movement: Ragdoll (drunk)",             flag = 34 },
   { dict = "move_fall",                                                   anim = "land_fall",                          name = "Movement: Ragdoll",                     flag = 34 },
   { dict = "missfinale_c2ig_11",                                          anim = "pushcar_offcliff_f",                 name = "Action: Push",                          flag = 50 },
@@ -210,6 +218,7 @@ animlist = {
   { dict = "amb@world_human_bum_standing@depressed@idle_a",               anim = "idle_a",                             name = "Action: Depressed",                     flag = 33 },
   { dict = "amb@world_human_stand_fire@male@idle_a",                      anim = "idle_a",                             name = "Action: Stand Around Camp Fire",        flag = 33 },
   { dict = "move_fall",                                                   anim = "land_roll",                          name = "Movement: Front Roll",                  flag = 32 },
+  { dict = "anim@arena@celeb@flat@solo@no_props@",                        anim = "flip_a_player_a",                    name = "Movement: Backflip",                    flag = 33  , blendin = 2.69,                  blendout = 2.69,                        atime = 2000, autoOff = true},
 }
 
 hijackOptions = {
@@ -300,7 +309,6 @@ ped_scenarios = {
   { scenario = "WORLD_HUMAN_TOURIST_MOBILE",             name = "Take Photo" },
   { scenario = "PROP_HUMAN_ATM",                         name = "Use ATM" },
   { scenario = "WORLD_HUMAN_VALET",                      name = "Valet" },
-  { scenario = "WORLD_VEHICLE_BROKEN_DOWN",              name = "Vehicle Broken (must be in a vehicle)" },
   { scenario = "PROP_HUMAN_SEAT_BUS_STOP_WAIT",          name = "Wait At Bus Stop" },
   { scenario = "PROP_HUMAN_SEAT_STRIP_WATCH",            name = "Watch Stripper" },
   { scenario = "WORLD_HUMAN_WINDOW_SHOP_BROWSE",         name = "Window Shop" },
@@ -393,94 +401,95 @@ npcList = {
   { group = PED_TYPE._CIVMALE,    hash = 0x64611296, name = "Alien" },
 }
 
-function RequestControl(entity, netID, ticks)
-  local tick = 0
-  ticks = ticks or 50
-  script.run_in_fiber(function()
-    NETWORK.SET_NETWORK_ID_CAN_MIGRATE(netID, true)
-    while not NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity) and tick < ticks do
-      NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
-      tick = tick + 1
+---@param s script_util
+function cleanup(s)
+  TASK.CLEAR_PED_TASKS(self.get_ped())
+  if plyrProps[1] ~= nil then
+    for _, v in ipairs(plyrProps) do
+      if ENTITY.DOES_ENTITY_EXIST(v) then
+        PED.DELETE_PED(v)
+      end
+      if ENTITY.DOES_ENTITY_EXIST(v) then
+        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v, false, false)
+        s:sleep(100)
+        ENTITY.DELETE_ENTITY(v)
+      end
     end
-    return NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity), tick
-  end)
+  end
+  if selfPTFX[1] ~= nil then
+    for _, v in ipairs(selfPTFX) do
+      GRAPHICS.STOP_PARTICLE_FX_LOOPED(v, false)
+    end
+  end
+  if ENTITY.DOES_ENTITY_EXIST(bbq) then
+    ENTITY.DELETE_ENTITY(bbq)
+  end
+  if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
+    local mySeat = Game.getPedVehicleSeat(self.get_ped())
+    PED.SET_PED_INTO_VEHICLE(self.get_ped(), self.get_veh(), mySeat)
+  else
+    local current_coords = self.get_pos()
+    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(self.get_ped(), current_coords.x, current_coords.y, current_coords.z, true,
+      false, false)
+  end
 end
 
-function entToNet(netID)
-  script.run_in_fiber(function()
-    local retry = 0
-    while not NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) do
-      NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
-      coroutine.yield()
-      if retry > 150 then
-        return
-      else
-        retry = retry + 1
+---@param s script_util
+function cleanupNPC(s)
+  for _, v in ipairs(spawned_npcs) do
+    TASK.CLEAR_PED_TASKS(v)
+    PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(v, true)
+    if PED.IS_PED_IN_ANY_VEHICLE(v, false) then
+      local veh     = PED.GET_VEHICLE_PED_IS_IN(v, false)
+      local npcSeat = Game.getPedVehicleSeat(v)
+      PED.SET_PED_INTO_VEHICLE(v, veh, npcSeat)
+    end
+  end
+  if npcProps[1] ~= nil then
+    for _, v in ipairs(npcProps) do
+      if ENTITY.DOES_ENTITY_EXIST(v) then
+        PED.DELETE_PED(v)
+      end
+      if ENTITY.DOES_ENTITY_EXIST(v) then
+        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v, false, false)
+        s:sleep(100)
+        ENTITY.DELETE_ENTITY(v)
       end
     end
-    if NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) then
-      NETWORK.SET_NETWORK_ID_CAN_MIGRATE(netID, true)
-      NETWORK.SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(netID, false)
-      NETWORK.SET_NETWORK_ID_VISIBLE_IN_CUTSCENE(netID, false, true)
+  end
+  if ENTITY.DOES_ENTITY_EXIST(npcSexPed) then
+    PED.DELETE_PED(npcSexPed)
+  end
+  if npcPTFX[1] ~= nil then
+    for _, v in ipairs(npcPTFX) do
+      GRAPHICS.STOP_PARTICLE_FX_LOOPED(v, false)
     end
-  end)
+  end
+  if ENTITY.DOES_ENTITY_EXIST(bbq) then
+    ENTITY.DELETE_ENTITY(bbq)
+  end
 end
 
-function cleanup()
-  script.run_in_fiber(function(script)
-    TASK.CLEAR_PED_TASKS(self.get_ped())
-    if plyrProps[1] ~= nil then
-      for _, v in ipairs(plyrProps) do
-        if ENTITY.DOES_ENTITY_EXIST(v) then
-          PED.DELETE_PED(v)
-        end
-        if ENTITY.DOES_ENTITY_EXIST(v) then
-          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v, false, false)
-          script:sleep(100)
-          ENTITY.DELETE_ENTITY(v)
-        end
-      end
-    end
-    if selfPTFX[1] ~= nil then
-      for _, v in ipairs(selfPTFX) do
-        GRAPHICS.STOP_PARTICLE_FX_LOOPED(v, false)
-      end
-    end
-  end)
-end
-
-function cleanupNPC()
-  script.run_in_fiber(function(script)
-    for _, v in ipairs(spawned_npcs) do
-      TASK.CLEAR_PED_TASKS(v)
-      PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(v, true)
-    end
-    if npcProps[1] ~= nil then
-      for _, v in ipairs(npcProps) do
-        if ENTITY.DOES_ENTITY_EXIST(v) then
-          PED.DELETE_PED(v)
-        end
-        if ENTITY.DOES_ENTITY_EXIST(v) then
-          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v, false, false)
-          script:sleep(100)
-          ENTITY.DELETE_ENTITY(v)
-        end
-      end
-    end
-    if ENTITY.DOES_ENTITY_EXIST(npcSexPed) then
-      PED.DELETE_PED(npcSexPed)
-    end
-    if npcPTFX[1] ~= nil then
-      for _, v in ipairs(npcPTFX) do
-        GRAPHICS.STOP_PARTICLE_FX_LOOPED(v, false)
-      end
-    end
-  end)
-end
-
+---@param Info table
+---@param target integer
+---@param Flag integer
+---@param prop1 integer
+---@param prop2 integer
+---@param loopedFX integer
+---@param propPed integer
+---@param targetBone integer
+---@param targetCoords vec3
+---@param targetHeading integer
+---@param targetForwardX integer
+---@param targetForwardY integer
+---@param targetBoneCoords vec3
+---@param ent string
+---@param propTable table
+---@param ptfxTable table
+---@param s script_util
 function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBone, targetCoords, targetHeading,
-                      targetForwardX,
-                      targetForwardY, targetBoneCoords, ent, propTable, ptfxTable)
+  targetForwardX, targetForwardY, targetBoneCoords, ent, propTable, ptfxTable, s)
+  local blendInSpeed, blendOutSpeed, duration = 4.0, -4.0, -1
   if target == self.get_ped() then
     if is_sitting or is_handsUp then
       TASK.CLEAR_PED_TASKS(self.get_ped())
@@ -491,11 +500,20 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
       PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
     end
   end
+  if Info.blendin ~= nil then
+    blendInSpeed = Info.blendin
+  end
+  if Info.blendout ~= nil then
+    blendOutSpeed = Info.blendout
+  end
+  if Info.atime ~= nil then
+    duration = Info.atime
+  end
   if Info.type == 1 then
     if ent == "self" then
-      cleanup()
+      cleanup(s)
     elseif ent == "npc" then
-      cleanupNPC()
+      cleanupNPC(s)
     end
     script.run_in_fiber(function()
       if not disableProps then
@@ -513,15 +531,15 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
   elseif Info.type == 2 then
     if ent == "self" then
-      cleanup()
+      cleanup(s)
     elseif ent == "npc" then
-      cleanupNPC()
+      cleanupNPC(s)
     end
     script.run_in_fiber(function(type2)
       while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(Info.ptfxdict) do
@@ -532,7 +550,7 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
       type2:sleep(Info.ptfxdelay)
@@ -544,9 +562,9 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
     end)
   elseif Info.type == 3 then
     if ent == "self" then
-      cleanup()
+      cleanup(s)
     elseif ent == "npc" then
-      cleanupNPC()
+      cleanupNPC(s)
     end
     script.run_in_fiber(function()
       if not disableProps then
@@ -565,15 +583,15 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
   elseif Info.type == 4 then
     if ent == "self" then
-      cleanup()
+      cleanup(s)
     elseif ent == "npc" then
-      cleanupNPC()
+      cleanupNPC(s)
     end
     script.run_in_fiber(function(type4)
       if not disableProps then
@@ -594,22 +612,22 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
   elseif Info.type == 5 then
     if ent == "self" then
-      cleanup()
+      cleanup(s)
     elseif ent == "npc" then
-      cleanupNPC()
+      cleanupNPC(s)
     end
     script.run_in_fiber(function(type5)
       while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
         STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 0.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 0.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       if not disableProps then
         while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
@@ -636,9 +654,9 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
     end)
   elseif Info.type == 6 then
     if ent == "self" then
-      cleanup()
+      cleanup(s)
     elseif ent == "npc" then
-      cleanupNPC()
+      cleanupNPC(s)
     end
     script.run_in_fiber(function()
       if not disableProps then
@@ -664,15 +682,15 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
   elseif Info.type == 7 then
     if ent == "self" then
-      cleanup()
+      cleanup(s)
     elseif ent == "npc" then
-      cleanupNPC()
+      cleanupNPC(s)
     end
     script.run_in_fiber(function()
       if not disableProps then
@@ -685,13 +703,12 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         ENTITY.SET_ENTITY_INVINCIBLE(propPed, true)
         table.insert(propTable, propPed)
         npcNetID = NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(propPed)
-        RequestControl(propPed, npcNetID, 250)
-        entToNet(npcNetID)
+        entities.take_control_of(propPed, 250)
         while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict2) do
           STREAMING.REQUEST_ANIM_DICT(Info.dict2)
           coroutine.yield()
         end
-        TASK.TASK_PLAY_ANIM(propPed, Info.dict2, Info.anim2, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+        TASK.TASK_PLAY_ANIM(propPed, Info.dict2, Info.anim2, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
         PED.SET_PED_CONFIG_FLAG(propPed, 179, true)
         PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(propPed, true)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(propPed)
@@ -700,22 +717,22 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 1.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
   else
     if ent == "self" then
-      cleanup()
+      cleanup(s)
     elseif ent == "npc" then
-      cleanupNPC()
+      cleanupNPC(s)
     end
     script.run_in_fiber(function()
       while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
         STREAMING.REQUEST_ANIM_DICT(Info.dict)
         coroutine.yield()
       end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, 4.0, -4.0, -1, Flag, 0.0, false, false, false)
+      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 0.0, false, false, false)
       PED.SET_PED_CONFIG_FLAG(target, 179, true)
       is_playing_anim = true
     end)
@@ -725,12 +742,16 @@ end
 ---@param ref table
 ---@param target integer
 function playScenario(ref, target)
-  script.run_in_fiber(function()
+  script.run_in_fiber(function(script)
     local coords   = ENTITY.GET_ENTITY_COORDS(target, false)
     local heading  = ENTITY.GET_ENTITY_HEADING(target)
     local forwardX = ENTITY.GET_ENTITY_FORWARD_X(target)
     local forwardY = ENTITY.GET_ENTITY_FORWARD_Y(target)
     if target == self.get_ped() then
+      if is_playing_anim then
+        cleanup(script)
+        is_playing_anim = false
+      end
       if is_sitting or is_handsUp then
         TASK.CLEAR_PED_TASKS(self.get_ped())
         is_sitting = false
@@ -761,6 +782,23 @@ function playScenario(ref, target)
       end
     end
   end)
+end
+
+---@param ped integer
+---@param s script_util
+function stopScenario(ped, s)
+  if PED.IS_PED_USING_ANY_SCENARIO(ped) then
+    Game.busySpinnerOn(translateLabel("scenarios_spinner"), 3)
+    TASK.CLEAR_PED_TASKS(ped)
+    if ENTITY.DOES_ENTITY_EXIST(bbq) then
+      ENTITY.DELETE_ENTITY(bbq)
+    end
+    repeat
+      s:sleep(10)
+    until not PED.IS_PED_USING_ANY_SCENARIO(ped)
+    Game.busySpinnerOff()
+    is_playing_scenario = false
+  end
 end
 
 ---@param t table

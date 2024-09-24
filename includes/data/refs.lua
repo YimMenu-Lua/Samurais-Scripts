@@ -1059,3 +1059,15 @@ world_seats_T            = {
   "h4_int_04_chair_chesterfield_01a",
   "h4_int_04_desk_chair"
 }
+
+trash_bins_T = {
+  "m23_2_prop_m32_dumpster_01a",
+  "prop_cs_dumpster_01a",
+  "prop_dumpster_01a",
+  "prop_dumpster_02a",
+  "prop_dumpster_02b",
+  "prop_dumpster_3a",
+  "prop_dumpster_4a",
+  "prop_dumpster_4b",
+  "p_dumpster_t",
+}

@@ -163,6 +163,24 @@ Labels = {
         { iso = "ru-RU", text = "Отключает принудительный стиль передвижения игрока после стрельбы из оружия." },
     },
 
+    ["ragdoll_sound_tt"] = {
+        { iso = "en-US", text = "Your online character will make a hurt/scared sound when ragdolling." },
+        { iso = "de-DE", text = "Ihr Online-Charakter gibt beim Fallen ein verletztes/ängstliches Geräusch von sich." },
+        { iso = "fr-FR", text = "Votre personnage en ligne émettra un son de douleur/peur en tombant." },
+        { iso = "it-IT", text = "Il tuo personaggio online emetterà un suono di dolore/spaventamento quando cadrà." },
+        { iso = "pt-BR", text = "Seu personagem online fará um som de dor/medo ao cair." },
+        { iso = "ru-RU", text = "Ваш онлайн-персонаж издаст звук боли/испуга при падении." },
+    },
+
+    ["hide&seek_tt"] = {
+        { iso = "en-US", text = "Allows you to hide inside the trunk of any vehicle (if the vehicle actually has a trunk of course), hide inside dumpsters, or when wanted by the cops, you can press [ENTER] when your vehicle is stopped to hide inside your car.\10\10¤ NOTE: All hiding options prevent the cops from seeing you but you can't use them if the cops are looking at you." },
+        { iso = "de-DE", text = "Ermöglicht Ihnen, sich im Kofferraum eines Fahrzeugs zu verstecken (sofern das Fahrzeug überhaupt einen Kofferraum hat), sich in Müllcontainern zu verstecken oder sich, wenn Sie von der Polizei gesucht werden, durch Drücken der [EINGABE]-Taste in Ihrem Auto zu verstecken, wenn Ihr Fahrzeug angehalten wird.\10\10¤ HINWEIS: Alle Versteckmöglichkeiten verhindern, dass die Polizei Sie sieht, aber Sie können sie nicht verwenden, wenn die Polizei Sie beobachtet." },
+        { iso = "fr-FR", text = "Vous permet de vous cacher dans le coffre de n'importe quel véhicule (si le véhicule a réellement un coffre bien sûr), de vous cacher dans des bennes à ordures, ou lorsque vous êtes recherché par la police, vous pouvez appuyer sur [ENTRÉE] lorsque votre véhicule est arrêté pour vous cacher à l'intérieur de votre voiture.\10\10¤ REMARQUE : toutes ces options empêchent les flics de vous voir, mais vous ne pouvez pas les utiliser si les flics vous regardent." },
+        { iso = "it-IT", text = "Ti consente di nasconderti nel bagagliaio di qualsiasi veicolo (se il veicolo ne ha effettivamente uno, ovviamente), di nasconderti nei cassonetti o, quando la polizia ti cerca, puoi premere [INVIO] quando il tuo veicolo è fermo per nasconderti all'interno della tua auto.\10\10¤ NOTA: tutte le opzioni per nasconderti impediscono alla polizia di vederti, ma non puoi usarle se la polizia ti sta guardando." },
+        { iso = "pt-BR", text = "Permite que você se esconda dentro do porta-malas de qualquer veículo (se o veículo realmente tiver um porta-malas, é claro), se esconda dentro de caçambas ou, quando procurado pela polícia, você pode pressionar [ENTER] quando seu veículo estiver parado para se esconder dentro do carro.\10\10¤ NOTA: Todas as opções de esconderijo impedem que os policiais vejam você, mas você não pode usá-las se os policiais estiverem olhando para você." },
+        { iso = "ru-RU", text = "Позволяет вам прятаться в багажнике любого транспортного средства (конечно, если у транспортного средства действительно есть багажник), прятаться в мусорных контейнерах или, когда вас разыскивает полиция, вы можете нажать [ENTER], когда ваше транспортное средство остановлено, чтобы спрятаться внутри.\10\10¤ ПРИМЕЧАНИЕ: Все варианты укрытия не позволяют полицейским видеть вас, но вы не можете их использовать, если полицейские смотрят на вас." },
+    },
+
     ["soundplayer"] = {
         { iso = "en-US", text = "Sound Player" },
         { iso = "de-DE", text = "Sound Player" },

@@ -599,7 +599,7 @@ UI = {
 
   **Sound strings:**
 
-  "Select" | "Select2" | "Cancel" | "Error" | "Nav" | "Nav2" | "Pickup" | "Radar" | "Delete" | "W_Pickup" | "Focus_In" | "Focus_Out"
+  "Select" | "Select2" | "Cancel" | "Error" | "Nav" | "Nav2" | "Pickup" | "Radar" | "Delete" | "W_Pickup" | "Fail" | "Focus_In" | "Focus_Out"
   ]]
   widgetSound = function(sound)
     if not disableUiSounds then
@@ -608,6 +608,7 @@ UI = {
         { name = "Select",    sound = "SELECT",              soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET" },
         { name = "Pickup",    sound = "PICK_UP",             soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET" },
         { name = "W_Pickup",  sound = "PICK_UP_WEAPON",      soundRef = "HUD_FRONTEND_CUSTOM_SOUNDSET" },
+        { name = "Fail",      sound = "CLICK_FAIL",          soundRef = "WEB_NAVIGATION_SOUNDS_PHONE" },
         { name = "Delete",    sound = "DELETE",              soundRef = "HUD_DEATHMATCH_SOUNDSET" },
         { name = "Cancel",    sound = "CANCEL",              soundRef = "HUD_FREEMODE_SOUNDSET" },
         { name = "Error",     sound = "ERROR",               soundRef = "HUD_FREEMODE_SOUNDSET" },
@@ -899,11 +900,13 @@ SS                          = {
       TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
       PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
       TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+      attached_ped = 0; ped_grabbed = false
     end
 
     if grabbed_veh ~= nil and grabbed_veh ~= 0 then
       ENTITY.DETACH_ENTITY(grabbed_veh, true, true)
       TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+      grabbed_veh = 0; vehicle_grabbed = false
     end
 
     if attached_vehicle ~= nil and attached_vehicle ~= 0 then
@@ -921,9 +924,9 @@ SS                          = {
           ENTITY.SET_ENTITY_COORDS(attachedVehicle, attachedVehcoords.x - (playerForwardX * 10),
             attachedVehcoords.y - (playerForwardY * 10), playerPosition.z, false, false, false, false)
           VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(attached_vehicle, 5.0)
-          attached_vehicle = 0
         end
       end
+      attached_vehicle = 0
     end
 
     if spawned_props[1] ~= nil then
@@ -933,30 +936,36 @@ SS                          = {
           ENTITY.DELETE_ENTITY(p)
         end
       end
+      spawned_props = {}
     end
 
     if selfAttachments[1] ~= nil then
       for _, v in ipairs(selfAttachments) do
         ENTITY.DETACH_ENTITY(v, true, true)
       end
+      selfAttachments = {}
     end
 
     if vehAttachments[1] ~= nil then
       for _, v in ipairs(vehAttachments) do
         ENTITY.DETACH_ENTITY(v, true, true)
       end
+      vehAttachments = {}
     end
 
     if currentMvmt ~= "" then
       PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0.0)
+      currentMvmt = ""
     end
 
     if currentWmvmt ~= "" then
       PED.RESET_PED_WEAPON_MOVEMENT_CLIPSET(self.get_ped())
+      currentWmvmt = ""
     end
 
     if currentStrf ~= "" then
       PED.RESET_PED_STRAFE_CLIPSET(self.get_ped())
+      currentStrf = ""
     end
     WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(self.get_ped(), 3839837909)
 
@@ -992,6 +1001,7 @@ SS                          = {
           end
         end
       end
+      is_playing_anim = false
     end
 
     if spawned_npcs[1] ~= nil then
@@ -1000,6 +1010,7 @@ SS                          = {
           ENTITY.DELETE_ENTITY(v)
         end
       end
+      spawned_npcs = {}
     end
 
     if is_playing_scenario then
@@ -1007,6 +1018,7 @@ SS                          = {
       if ENTITY.DOES_ENTITY_EXIST(bbq) then
         ENTITY.DELETE_ENTITY(bbq)
       end
+      is_playing_scenario = false
     end
 
     if is_playing_radio then
@@ -1017,27 +1029,29 @@ SS                          = {
       if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
         ENTITY.DELETE_ENTITY(dummyDriver)
       end
+      is_playing_radio = false
     end
 
     if is_handsUp then
       TASK.CLEAR_PED_TASKS(self.get_ped())
+      is_handsUp = false
     end
 
     if isCrouched then
       PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
+      isCrouched = false
     end
 
     if disable_waves then
       Game.World.disableOceanWaves(false)
+      disable_waves = false
     end
 
     if autopilot_waypoint or autopilot_objective or autopilot_random then
       if Game.Self.isDriving() then
         TASK.CLEAR_PED_TASKS(self.get_ped())
         TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
-        autopilot_waypoint  = false
-        autopilot_objective = false
-        autopilot_random    = false
+        autopilot_waypoint, autopilot_objective, autopilot_random = false, false, false
       end
     end
 
@@ -1048,10 +1062,13 @@ SS                          = {
           ENTITY.DELETE_ENTITY(p)
         end
       end
+      spawned_persist_T = {}
     end
 
     if is_sitting or ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), "timetable@ron@ig_3_couch", "base", 3) then
+      ENTITY.DETACH_ENTITY(self.get_ped(), true, true)
       TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+      is_sitting = false
     end
 
     if default_handling_flags ~= nil and ENTITY.DOES_ENTITY_EXIST(current_vehicle) then
@@ -1059,7 +1076,20 @@ SS                          = {
       local CHandlingData    = vehPtr:add(0x0960):deref()
       local m_handling_flags = CHandlingData:add(0x0128)
       m_handling_flags:set_dword(default_handling_flags)
+      default_handling_flags = unk
+      engine_brake_disabled, kers_boost_enabled, offroader_enabled,
+      rally_tires_enabled, traction_ctrl_disabled, easy_wheelie_enabled = false, false, false, false, false, false
     end
+
+    if is_hiding then
+      if hiding_in_boot or hiding_in_dumpster then
+        ENTITY.DETACH_ENTITY(self.get_ped(), false, false)
+        hiding_in_boot, hiding_in_dumpster = false, false
+      end
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      is_hiding = false
+    end
+    TASK.CLEAR_PED_TASKS(self.get_ped())
   end,
 
   -- Checks if localPlayer is standing near a public seat and returns its position and rotation vectors.
@@ -1070,7 +1100,7 @@ SS                          = {
       if ENTITY.DOES_ENTITY_EXIST(prop) then
         seatPos = Game.getCoords(prop, false)
         local distCalc = SYSTEM.VDIST2(myCoords.x, myCoords.y, myCoords.z, seatPos.x, seatPos.y, seatPos.z)
-        if distCalc <= 1.8 then
+        if distCalc <= 2 then
           retBool = true
           if string.find(string.lower(seat), "bench") then
             x_offset = -0.5
@@ -1080,6 +1110,46 @@ SS                          = {
       end
     end
     return retBool, prop, x_offset
+  end,
+
+  isNearTrashBin = function()
+    local retBool, bin, binPos, myCoords = false, 0, vec3:new(0.0, 0.0, 0.0), self.get_pos()
+    for _, trash in ipairs(trash_bins_T) do
+      bin = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(myCoords.x, myCoords.y, myCoords.z, 1.5, joaat(trash), false, false, false)
+      if ENTITY.DOES_ENTITY_EXIST(bin) then
+        binPos = Game.getCoords(bin, false)
+        local distCalc = SYSTEM.VDIST2(myCoords.x, myCoords.y, myCoords.z, binPos.x, binPos.y, binPos.z)
+        if distCalc <= 3.3 then
+          retBool = true
+          break
+        end
+      end
+    end
+    return retBool, bin
+  end,
+
+  isNearCarTrunk = function()
+    local retBool, veh, myCoords = false, Game.getClosestVehicle(self.get_ped(), 10), self.get_pos()
+    if veh ~= 0 and veh ~= nil then
+      if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(veh)) then
+        local vehClass = Game.Vehicle.class(veh)
+        local bootBoneName
+        if vehClass == "Vans" then
+          bootBoneName = "door_pside_r"
+        else
+          bootBoneName = "boot"
+        end
+        local bootBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, bootBoneName)
+        if bootBone ~= -1 then
+          local bonePos  = ENTITY.GET_ENTITY_BONE_POSTION(veh, bootBone)
+          local distCalc = SYSTEM.VDIST2(bonePos.x, bonePos.y, bonePos.z, myCoords.x, myCoords.y, myCoords.z)
+          if distCalc <= 3.69420 then
+            retBool = true
+          end
+        end
+      end
+    end
+    return retBool, veh
   end,
 
   ---@param vehicle integer
@@ -1253,7 +1323,8 @@ SS                          = {
       autokill      = { code = 0x76, name = "[F7]" },
       enemiesFlee   = { code = 0x77, name = "[F8]" },
       vehicle_mine  = { code = 0x4E, name = "[N]" },
-      triggerbotBtn = { code = 0x10, name = "[Shift]" }
+      triggerbotBtn = { code = 0x10, name = "[Shift]" },
+      panik         = { code = 0x8,  name = "[BACKSPACE]" },
     }; lua_cfg.save("keybinds", keybinds)
     gpad_keybinds = {
       rodBtn        = { code = 0, name = "[Unbound]" },
@@ -1266,124 +1337,125 @@ SS                          = {
     }; lua_cfg.save("gpad_keybinds", gpad_keybinds)
     Regen = false; lua_cfg.save("Regen", Regen)
     -- objectiveTP             = false
-    disableTooltips = false; lua_cfg.save("disableTooltips", disableTooltips)
-    phoneAnim = false; lua_cfg.save("phoneAnim", phoneAnim)
-    sprintInside = false; lua_cfg.save("sprintInside", sprintInside)
-    lockpick = false; lua_cfg.save("lockpick", lockpick)
-    replaceSneakAnim = false; lua_cfg.save("replaceSneakAnim", replaceSneakAnim)
-    replacePointAct = false; lua_cfg.save("replacePointAct", replacePointAct)
-    disableSound = false; lua_cfg.save("disableSound", disableSound)
-    disableActionMode = false; lua_cfg.save("disableActionMode", disableActionMode)
-    rod = false; lua_cfg.save("rod", rod)
-    clumsy = false; lua_cfg.save("clumsy", clumsy)
-    ragdoll_sound = false; lua_cfg.save("ragdoll_sound", ragdoll_sound)
-    Triggerbot = false; lua_cfg.save("Triggerbot", Triggerbot)
-    aimEnemy = false; lua_cfg.save("aimEnemy", aimEnemy)
-    autoKill = false; lua_cfg.save("autoKill", autoKill)
-    runaway = false; lua_cfg.save("runaway", runaway)
-    laserSight = false; lua_cfg.save("laserSight", laserSight)
-    disableUiSounds = false; lua_cfg.save("disableUiSounds", disableUiSounds)
-    driftMode = false; lua_cfg.save("driftMode", driftMode)
-    DriftTires = false; lua_cfg.save("DriftTires", DriftTires)
-    DriftSmoke = false; lua_cfg.save("DriftSmoke", DriftSmoke)
-    driftMinigame = false; lua_cfg.save("driftMinigame", driftMinigame)
-    speedBoost = false; lua_cfg.save("speedBoost", speedBoost)
-    nosvfx = false; lua_cfg.save("nosvfx", nosvfx)
-    nosAudio = false; lua_cfg.save("nosAudio", nosAudio)
-    nosFlames = false; lua_cfg.save("nosFlames", nosFlames)
-    hornLight = false; lua_cfg.save("hornLight", hornLight)
-    nosPurge = false; lua_cfg.save("nosPurge", nosPurge)
-    insta180 = false; lua_cfg.save("insta180", insta180)
-    flappyDoors = false; lua_cfg.save("flappyDoors", flappyDoors)
-    rgbLights = false; lua_cfg.save("rgbLights", rgbLights)
-    loud_radio = false; lua_cfg.save("loud_radio", loud_radio)
-    launchCtrl = false; lua_cfg.save("launchCtrl", launchCtrl)
-    popsNbangs = false; lua_cfg.save("popsNbangs", popsNbangs)
-    limitVehOptions = false; lua_cfg.save("limitVehOptions", limitVehOptions)
-    missiledefense = false; lua_cfg.save("missiledefense", missiledefense)
-    louderPops = false; lua_cfg.save("louderPops", louderPops)
-    autobrklight = false; lua_cfg.save("autobrklight", autobrklight)
-    holdF = false; lua_cfg.save("holdF", holdF)
-    keepWheelsTurned = false; lua_cfg.save("keepWheelsTurned", keepWheelsTurned)
-    towEverything = false; lua_cfg.save("towEverything", towEverything)
-    noJacking = false; lua_cfg.save("noJacking", noJacking)
-    noEngineBraking = false; lua_cfg.save("noEngineBraking", noEngineBraking)
-    kersBoost = false; lua_cfg.save("kersBoost", kersBoost)
-    offroaderx2 = false; lua_cfg.save("offroaderx2", offroaderx2)
-    rallyTires = false; lua_cfg.save("rallyTires", rallyTires)
-    noTractionCtrl = false; lua_cfg.save("noTractionCtrl", noTractionCtrl)
-    easyWheelie = false; lua_cfg.save("easyWheelie", easyWheelie)
-    rwSteering = false; lua_cfg.save("rwSteering", rwSteering)
-    awSteering = false; lua_cfg.save("awSteering", awSteering)
-    handbrakeSteering = false; lua_cfg.save("handbrakeSteering", handbrakeSteering)
-    useGameLang = false; lua_cfg.save("useGameLang", useGameLang)
-    disableProps = false; lua_cfg.save("disableProps", disableProps)
-    manualFlags = false; lua_cfg.save("manualFlags", manualFlags)
-    controllable = false; lua_cfg.save("controllable", controllable)
-    looped = false; lua_cfg.save("looped", looped)
-    upperbody = false; lua_cfg.save("upperbody", upperbody)
-    freeze = false; lua_cfg.save("freeze", freeze)
-    usePlayKey = false; lua_cfg.save("usePlayKey", usePlayKey)
-    npc_godMode = false; lua_cfg.save("npc_godMode", npc_godMode)
-    bypass_casino_bans = false; lua_cfg.save("bypass_casino_bans", bypass_casino_bans)
-    force_poker_cards = false; lua_cfg.save("force_poker_cards", force_poker_cards)
+    disableTooltips         = false; lua_cfg.save("disableTooltips", disableTooltips)
+    phoneAnim               = false; lua_cfg.save("phoneAnim", phoneAnim)
+    sprintInside            = false; lua_cfg.save("sprintInside", sprintInside)
+    lockpick                = false; lua_cfg.save("lockpick", lockpick)
+    replaceSneakAnim        = false; lua_cfg.save("replaceSneakAnim", replaceSneakAnim)
+    replacePointAct         = false; lua_cfg.save("replacePointAct", replacePointAct)
+    disableSound            = false; lua_cfg.save("disableSound", disableSound)
+    disableActionMode       = false; lua_cfg.save("disableActionMode", disableActionMode)
+    hideFromCops            = false; lua_cfg.save("hideFromCops", hideFromCops)
+    rod                     = false; lua_cfg.save("rod", rod)
+    clumsy                  = false; lua_cfg.save("clumsy", clumsy)
+    ragdoll_sound           = false; lua_cfg.save("ragdoll_sound", ragdoll_sound)
+    Triggerbot              = false; lua_cfg.save("Triggerbot", Triggerbot)
+    aimEnemy                = false; lua_cfg.save("aimEnemy", aimEnemy)
+    autoKill                = false; lua_cfg.save("autoKill", autoKill)
+    runaway                 = false; lua_cfg.save("runaway", runaway)
+    laserSight              = false; lua_cfg.save("laserSight", laserSight)
+    disableUiSounds         = false; lua_cfg.save("disableUiSounds", disableUiSounds)
+    driftMode               = false; lua_cfg.save("driftMode", driftMode)
+    DriftTires              = false; lua_cfg.save("DriftTires", DriftTires)
+    DriftSmoke              = false; lua_cfg.save("DriftSmoke", DriftSmoke)
+    driftMinigame           = false; lua_cfg.save("driftMinigame", driftMinigame)
+    speedBoost              = false; lua_cfg.save("speedBoost", speedBoost)
+    nosvfx                  = false; lua_cfg.save("nosvfx", nosvfx)
+    nosAudio                = false; lua_cfg.save("nosAudio", nosAudio)
+    nosFlames               = false; lua_cfg.save("nosFlames", nosFlames)
+    hornLight               = false; lua_cfg.save("hornLight", hornLight)
+    nosPurge                = false; lua_cfg.save("nosPurge", nosPurge)
+    insta180                = false; lua_cfg.save("insta180", insta180)
+    flappyDoors             = false; lua_cfg.save("flappyDoors", flappyDoors)
+    rgbLights               = false; lua_cfg.save("rgbLights", rgbLights)
+    loud_radio              = false; lua_cfg.save("loud_radio", loud_radio)
+    launchCtrl              = false; lua_cfg.save("launchCtrl", launchCtrl)
+    popsNbangs              = false; lua_cfg.save("popsNbangs", popsNbangs)
+    limitVehOptions         = false; lua_cfg.save("limitVehOptions", limitVehOptions)
+    missiledefense          = false; lua_cfg.save("missiledefense", missiledefense)
+    louderPops              = false; lua_cfg.save("louderPops", louderPops)
+    autobrklight            = false; lua_cfg.save("autobrklight", autobrklight)
+    holdF                   = false; lua_cfg.save("holdF", holdF)
+    keepWheelsTurned        = false; lua_cfg.save("keepWheelsTurned", keepWheelsTurned)
+    towEverything           = false; lua_cfg.save("towEverything", towEverything)
+    noJacking               = false; lua_cfg.save("noJacking", noJacking)
+    noEngineBraking         = false; lua_cfg.save("noEngineBraking", noEngineBraking)
+    kersBoost               = false; lua_cfg.save("kersBoost", kersBoost)
+    offroaderx2             = false; lua_cfg.save("offroaderx2", offroaderx2)
+    rallyTires              = false; lua_cfg.save("rallyTires", rallyTires)
+    noTractionCtrl          = false; lua_cfg.save("noTractionCtrl", noTractionCtrl)
+    easyWheelie             = false; lua_cfg.save("easyWheelie", easyWheelie)
+    rwSteering              = false; lua_cfg.save("rwSteering", rwSteering)
+    awSteering              = false; lua_cfg.save("awSteering", awSteering)
+    handbrakeSteering       = false; lua_cfg.save("handbrakeSteering", handbrakeSteering)
+    useGameLang             = false; lua_cfg.save("useGameLang", useGameLang)
+    disableProps            = false; lua_cfg.save("disableProps", disableProps)
+    manualFlags             = false; lua_cfg.save("manualFlags", manualFlags)
+    controllable            = false; lua_cfg.save("controllable", controllable)
+    looped                  = false; lua_cfg.save("looped", looped)
+    upperbody               = false; lua_cfg.save("upperbody", upperbody)
+    freeze                  = false; lua_cfg.save("freeze", freeze)
+    usePlayKey              = false; lua_cfg.save("usePlayKey", usePlayKey)
+    npc_godMode             = false; lua_cfg.save("npc_godMode", npc_godMode)
+    bypass_casino_bans      = false; lua_cfg.save("bypass_casino_bans", bypass_casino_bans)
+    force_poker_cards       = false; lua_cfg.save("force_poker_cards", force_poker_cards)
     set_dealers_poker_cards = false; lua_cfg.save("set_dealers_poker_cards", set_dealers_poker_cards)
-    force_roulette_wheel = false; lua_cfg.save("force_roulette_wheel", force_roulette_wheel)
-    rig_slot_machine = false; lua_cfg.save("rig_slot_machine", rig_slot_machine)
-    autoplay_slots = false; lua_cfg.save("autoplay_slots", autoplay_slots)
-    autoplay_cap = false; lua_cfg.save("autoplay_cap", autoplay_cap)
-    heist_cart_autograb = false; lua_cfg.save("heist_cart_autograb", heist_cart_autograb)
-    flares_forall = false; lua_cfg.save("flares_forall", flares_forall)
-    real_plane_speed = false; lua_cfg.save("real_plane_speed", real_plane_speed)
-    extend_world = false; lua_cfg.save("extend_world", extend_world)
-    unbreakableWindows = false; lua_cfg.save("unbreakableWindows", unbreakableWindows)
-    disableFlightMusic = false; lua_cfg.save("disableFlightMusic", disableFlightMusic)
-    disable_quotes = false; lua_cfg.save("disable_quotes", disable_quotes)
-    disable_mdef_logs = false; lua_cfg.save("disable_mdef_logs", disable_mdef_logs)
-    replace_pool_q = false; lua_cfg.save("replace_pool_q", replace_pool_q)
-    public_seats = false; lua_cfg.save("public_seats", public_seats)
-    mc_work_cd = false; lua_cfg.save("mc_work_cd", mc_work_cd)
-    hangar_cd = false; lua_cfg.save("hangar_cd", hangar_cd)
-    nc_management_cd = false; lua_cfg.save("nc_management_cd", nc_management_cd)
-    nc_vip_mission_chance = false; lua_cfg.save("nc_vip_mission_chance", nc_vip_mission_chance)
-    security_missions_cd = false; lua_cfg.save("security_missions_cd", security_missions_cd)
-    ie_vehicle_steal_cd = false; lua_cfg.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
-    ie_vehicle_sell_cd = false; lua_cfg.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
-    ceo_crate_buy_cd = false; lua_cfg.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
-    ceo_crate_sell_cd = false; lua_cfg.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
-    ceo_crate_buy_f_cd = false; lua_cfg.save("ceo_crate_buy_f_cd", ceo_crate_buy_f_cd)
-    ceo_crate_sell_f_cd = false; lua_cfg.save("ceo_crate_sell_f_cd", ceo_crate_sell_f_cd)
-    cashUpdgrade1 = false; lua_cfg.save("cashUpdgrade1", cashUpdgrade1)
-    cashUpdgrade2 = false; lua_cfg.save("cashUpdgrade2", cashUpdgrade2)
-    cokeUpdgrade1 = false; lua_cfg.save("cokeUpdgrade1", cokeUpdgrade1)
-    cokeUpdgrade2 = false; lua_cfg.save("cokeUpdgrade2", cokeUpdgrade2)
-    methUpdgrade1 = false; lua_cfg.save("methUpdgrade1", methUpdgrade1)
-    methUpdgrade2 = false; lua_cfg.save("methUpdgrade2", methUpdgrade2)
-    weedUpdgrade1 = false; lua_cfg.save("weedUpdgrade1", weedUpdgrade1)
-    weedUpdgrade2 = false; lua_cfg.save("weedUpdgrade2", weedUpdgrade2)
-    fdUpdgrade1 = false; lua_cfg.save("fdUpdgrade1", fdUpdgrade1)
-    fdUpdgrade2 = false; lua_cfg.save("fdUpdgrade2", fdUpdgrade2)
-    bunkerUpdgrade1 = false; lua_cfg.save("bunkerUpdgrade1", bunkerUpdgrade1)
-    bunkerUpdgrade2 = false; lua_cfg.save("bunkerUpdgrade2", bunkerUpdgrade2)
-    acidUpdgrade = false; lua_cfg.save("acidUpdgrade", acidUpdgrade)
-    whouse_1_owned = false; lua_cfg.save("whouse_1_owned", whouse_1_owned)
-    whouse_2_owned = false; lua_cfg.save("whouse_2_owned", whouse_2_owned)
-    whouse_3_owned = false; lua_cfg.save("whouse_3_owned", whouse_3_owned)
-    whouse_4_owned = false; lua_cfg.save("whouse_4_owned", whouse_4_owned)
-    whouse_5_owned = false; lua_cfg.save("whouse_5_owned", whouse_5_owned)
-    veh_mines = false; lua_cfg.save("veh_mines", veh_mines)
-    laser_switch = 0; lua_cfg.save("laser_switch", laser_switch)
-    DriftIntensity = 0; lua_cfg.save("DriftIntensity", DriftIntensity)
-    lang_idx = 0; lua_cfg.save("lang_idx", lang_idx)
-    autoplay_chips_cap = 0; lua_cfg.save("autoplay_chips_cap", autoplay_chips_cap)
-    lightSpeed = 1; lua_cfg.save("lightSpeed", lightSpeed)
-    DriftPowerIncrease = 1; lua_cfg.save("DriftPowerIncrease", DriftPowerIncrease)
-    nosPower = 10; lua_cfg.save("nosPower", nosPower)
-    nosBtn = 21; lua_cfg.save("nosBtn", nosBtn)
-    supply_autofill_delay = 500; lua_cfg.save("supply_autofill_delay", supply_autofill_delay)
-    laser_choice = "proj_laser_enemy"; lua_cfg.save("laser_choice", laser_choice)
-    LANG = "en-US"; lua_cfg.save("LANG", LANG)
-    current_lang = "English"; lua_cfg.save("current_lang", current_lang)
+    force_roulette_wheel    = false; lua_cfg.save("force_roulette_wheel", force_roulette_wheel)
+    rig_slot_machine        = false; lua_cfg.save("rig_slot_machine", rig_slot_machine)
+    autoplay_slots          = false; lua_cfg.save("autoplay_slots", autoplay_slots)
+    autoplay_cap            = false; lua_cfg.save("autoplay_cap", autoplay_cap)
+    heist_cart_autograb     = false; lua_cfg.save("heist_cart_autograb", heist_cart_autograb)
+    flares_forall           = false; lua_cfg.save("flares_forall", flares_forall)
+    real_plane_speed        = false; lua_cfg.save("real_plane_speed", real_plane_speed)
+    extend_world            = false; lua_cfg.save("extend_world", extend_world)
+    unbreakableWindows      = false; lua_cfg.save("unbreakableWindows", unbreakableWindows)
+    disableFlightMusic      = false; lua_cfg.save("disableFlightMusic", disableFlightMusic)
+    disable_quotes          = false; lua_cfg.save("disable_quotes", disable_quotes)
+    disable_mdef_logs       = false; lua_cfg.save("disable_mdef_logs", disable_mdef_logs)
+    replace_pool_q          = false; lua_cfg.save("replace_pool_q", replace_pool_q)
+    public_seats            = false; lua_cfg.save("public_seats", public_seats)
+    mc_work_cd              = false; lua_cfg.save("mc_work_cd", mc_work_cd)
+    hangar_cd               = false; lua_cfg.save("hangar_cd", hangar_cd)
+    nc_management_cd        = false; lua_cfg.save("nc_management_cd", nc_management_cd)
+    nc_vip_mission_chance   = false; lua_cfg.save("nc_vip_mission_chance", nc_vip_mission_chance)
+    security_missions_cd    = false; lua_cfg.save("security_missions_cd", security_missions_cd)
+    ie_vehicle_steal_cd     = false; lua_cfg.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
+    ie_vehicle_sell_cd      = false; lua_cfg.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
+    ceo_crate_buy_cd        = false; lua_cfg.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
+    ceo_crate_sell_cd       = false; lua_cfg.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
+    ceo_crate_buy_f_cd      = false; lua_cfg.save("ceo_crate_buy_f_cd", ceo_crate_buy_f_cd)
+    ceo_crate_sell_f_cd     = false; lua_cfg.save("ceo_crate_sell_f_cd", ceo_crate_sell_f_cd)
+    cashUpdgrade1           = false; lua_cfg.save("cashUpdgrade1", cashUpdgrade1)
+    cashUpdgrade2           = false; lua_cfg.save("cashUpdgrade2", cashUpdgrade2)
+    cokeUpdgrade1           = false; lua_cfg.save("cokeUpdgrade1", cokeUpdgrade1)
+    cokeUpdgrade2           = false; lua_cfg.save("cokeUpdgrade2", cokeUpdgrade2)
+    methUpdgrade1           = false; lua_cfg.save("methUpdgrade1", methUpdgrade1)
+    methUpdgrade2           = false; lua_cfg.save("methUpdgrade2", methUpdgrade2)
+    weedUpdgrade1           = false; lua_cfg.save("weedUpdgrade1", weedUpdgrade1)
+    weedUpdgrade2           = false; lua_cfg.save("weedUpdgrade2", weedUpdgrade2)
+    fdUpdgrade1             = false; lua_cfg.save("fdUpdgrade1", fdUpdgrade1)
+    fdUpdgrade2             = false; lua_cfg.save("fdUpdgrade2", fdUpdgrade2)
+    bunkerUpdgrade1         = false; lua_cfg.save("bunkerUpdgrade1", bunkerUpdgrade1)
+    bunkerUpdgrade2         = false; lua_cfg.save("bunkerUpdgrade2", bunkerUpdgrade2)
+    acidUpdgrade            = false; lua_cfg.save("acidUpdgrade", acidUpdgrade)
+    whouse_1_owned          = false; lua_cfg.save("whouse_1_owned", whouse_1_owned)
+    whouse_2_owned          = false; lua_cfg.save("whouse_2_owned", whouse_2_owned)
+    whouse_3_owned          = false; lua_cfg.save("whouse_3_owned", whouse_3_owned)
+    whouse_4_owned          = false; lua_cfg.save("whouse_4_owned", whouse_4_owned)
+    whouse_5_owned          = false; lua_cfg.save("whouse_5_owned", whouse_5_owned)
+    veh_mines               = false; lua_cfg.save("veh_mines", veh_mines)
+    laser_switch            = 0; lua_cfg.save("laser_switch", laser_switch)
+    DriftIntensity          = 0; lua_cfg.save("DriftIntensity", DriftIntensity)
+    lang_idx                = 0; lua_cfg.save("lang_idx", lang_idx)
+    autoplay_chips_cap      = 0; lua_cfg.save("autoplay_chips_cap", autoplay_chips_cap)
+    lightSpeed              = 1; lua_cfg.save("lightSpeed", lightSpeed)
+    DriftPowerIncrease      = 1; lua_cfg.save("DriftPowerIncrease", DriftPowerIncrease)
+    nosPower                = 10; lua_cfg.save("nosPower", nosPower)
+    nosBtn                  = 21; lua_cfg.save("nosBtn", nosBtn)
+    supply_autofill_delay   = 500; lua_cfg.save("supply_autofill_delay", supply_autofill_delay)
+    laser_choice            = "proj_laser_enemy"; lua_cfg.save("laser_choice", laser_choice)
+    LANG                    = "en-US"; lua_cfg.save("LANG", LANG)
+    current_lang            = "English"; lua_cfg.save("current_lang", current_lang)
   end,
 }
 
@@ -1537,6 +1609,13 @@ Game                        = {
     return HUD.BUSYSPINNER_OFF()
   end,
 
+  ---@param text string
+  showButtonPrompt = function(text)
+    HUD.BEGIN_TEXT_COMMAND_DISPLAY_HELP("STRING")
+    HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text)
+    HUD.END_TEXT_COMMAND_DISPLAY_HELP(0, false, true, -1)
+  end,
+
   ---@param entity integer
   createBlip = function(entity)
     return HUD.ADD_BLIP_FOR_ENTITY(entity)
@@ -1571,6 +1650,19 @@ Game                        = {
       end
     end
     return STREAMING.HAS_MODEL_LOADED(model)
+  end,
+
+  ---@param model integer
+  ---@param s script_util
+  getModelDimensions = function(model, s)
+    local vmin, vmax = vec3:new(0.0, 0.0, 0.0), vec3:new(0.0, 0.0, 0.0)
+    if STREAMING.IS_MODEL_VALID(model) then
+      if Game.requestModel(model) then
+        vmin, vmax = MISC.GET_MODEL_DIMENSIONS(model, vmin, vmax)
+        STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(model)
+      end
+    end
+    return vmin, vmax
   end,
 
   ---@param dict string
@@ -2042,14 +2134,11 @@ Game                        = {
     ---Shows a green chevron down element on top of an entity in the game world.
     ---@param entity RAGE_Entity
     markSelectedEntity = function(entity)
-      script.run_in_fiber(function()
+      script.run_in_fiber(function(mse)
         if not ENTITY.IS_ENTITY_ATTACHED(entity) then
           local entity_hash  = ENTITY.GET_ENTITY_MODEL(entity)
           local entity_pos   = ENTITY.GET_ENTITY_COORDS(entity, false)
-          local min, max     = vec3:new(0.0, 0.0, 0.0), vec3:new(0.0, 0.0, 0.0)
-          if STREAMING.IS_MODEL_VALID(entity_hash) then
-            min, max = MISC.GET_MODEL_DIMENSIONS(entity_hash, min, max)
-          end
+          local min, max     = Game.getModelDimensions(entity_hash, mse)
           local entityHeight = max.z - min.z
           GRAPHICS.DRAW_MARKER(2, entity_pos.x, entity_pos.y, entity_pos.z + (entityHeight + 0.4),
           --[[
