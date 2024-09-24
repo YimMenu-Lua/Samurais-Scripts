@@ -33,6 +33,12 @@
 
   - **Ragdoll Sound:**
     - Online Only: Plays a hurt/panicked ped sound when the player ragdolls.
+   
+  - **Hide & Seek:**
+    - When the option is enabled, you have 3 choices:
+      1. Hide inside any vehicle's trunk (assuming the vehicle actually has a trunk). Approach the vehicle's trunk then when prompted, press **[E]** to hide inside.
+      2. Hide inside dumpsters: Approach any dumpster then when prompted, press **[E]** to hide inside.
+      3. **Only when you have a wanted level** -> Hide in you car: When you're wanted and not actively being seen by the cops, stop your vehicle completely then when prompted, press **[ENTER]** to hide inside your car.
 
 - **Actions:**
 
