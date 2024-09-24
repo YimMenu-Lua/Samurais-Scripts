@@ -1068,7 +1068,10 @@ SS                          = {
     if is_sitting or ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), "timetable@ron@ig_3_couch", "base", 3) then
       ENTITY.DETACH_ENTITY(self.get_ped(), true, true)
       TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
-      is_sitting = false
+      if ENTITY.DOES_ENTITY_EXIST(thisSeat) then
+        ENTITY.FREEZE_ENTITY_POSITION(thisSeat, false)
+      end
+      is_sitting, thisSeat = false, 0
     end
 
     if default_handling_flags ~= nil and ENTITY.DOES_ENTITY_EXIST(current_vehicle) then

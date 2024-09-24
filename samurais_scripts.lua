@@ -410,6 +410,7 @@ loud_pops_event        = 0
 katana                 = 0
 boot_vehicle           = 0
 thisDumpster           = 0
+thisSeat               = 0
 drift_multiplier       = 1
 quote_alpha            = 1
 pedthrowF              = 10
@@ -1113,7 +1114,7 @@ Actions:add_imgui(function()
       UI.helpMarker(false, translateLabel("Freeze_tt"))
     end
     if ImGui.Button(translateLabel("generic_play_btn") .. "##anim") then
-      if not ped_grabbed and not vehicle_grabbed then
+      if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
         UI.widgetSound("Select")
         script.run_in_fiber(function(pa)
           local coords     = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
@@ -1146,8 +1147,7 @@ Actions:add_imgui(function()
         end)
       else
         UI.widgetSound("Error")
-        gui.show_error("Samurais Scripts",
-          translateLabel("You can not play animations while grabbing an NPC or a vehicle."))
+        gui.show_error("Samurais Scripts", "You can not play animations while grabbing an NPC, grabbing a vehicle, sitting or hiding.")
       end
     end
     ImGui.SameLine()
@@ -1542,23 +1542,22 @@ Actions:add_imgui(function()
     end
     ImGui.Separator()
     if ImGui.Button(translateLabel("generic_play_btn") .. "##scenarios") then
-      if not ped_grabbed and not vehicle_grabbed then
-        UI.widgetSound("Select")
-        script.run_in_fiber(function(psc)
-          if Game.Self.isOnFoot() then
-            if is_playing_anim then
-              cleanup(psc)
+      if not ped_grabbed and not vehicle_grabbed and not is_hiding then
+          UI.widgetSound("Select")
+          script.run_in_fiber(function(psc)
+            if Game.Self.isOnFoot() then
+              if is_playing_anim then
+                cleanup(psc)
+              end
+              playScenario(data, self.get_ped())
+              addActionToRecents(data)
+              is_playing_scenario = true
+            else
+              gui.show_error("Samurai's Scripts", "You can not play scenarios in vehicles.")
             end
-            playScenario(data, self.get_ped())
-            addActionToRecents(data)
-            is_playing_scenario = true
-          else
-            gui.show_error("Samurai's Scripts", "You can not play scenarios in vehicles.")
-          end
-        end)
+          end)
       else
-        gui.show_error("Samurais Scripts",
-          translateLabel("You can not play scenarios while grabbing an NPC or a vehicle."))
+        gui.show_error("Samurais Scripts", "You can not play scenarios while grabbing an NPC, grabbing a vehicle or hiding.")
       end
     end
     ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine()
@@ -1733,37 +1732,42 @@ Actions:add_imgui(function()
       local selected_favorite = filteredFavs[fav_actions_index + 1]
       ImGui.Spacing()
       if ImGui.Button(translateLabel("generic_play_btn") .. "##favs") then
-        UI.widgetSound("Select")
-        if selected_favorite.dict ~= nil then -- animation type
-          script.run_in_fier(function(pf)
-            local coords     = self.get_pos()
-            local heading    = Game.getHeading(self.get_ped())
-            local forwardX   = Game.getForwardX(self.get_ped())
-            local forwardY   = Game.getForwardY(self.get_ped())
-            local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_favorite.boneID)
-            local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_favorite.boneID, 0.0, 0.0, 0.0)
-            if lua_Fn.str_contains(selected_favorite.name, "DJ") then
-              if not is_playing_radio and not anim_music then
-                play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-                anim_music = true
+        if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
+          UI.widgetSound("Select")
+          if selected_favorite.dict ~= nil then -- animation type
+            script.run_in_fier(function(pf)
+              local coords     = self.get_pos()
+              local heading    = Game.getHeading(self.get_ped())
+              local forwardX   = Game.getForwardX(self.get_ped())
+              local forwardY   = Game.getForwardY(self.get_ped())
+              local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_favorite.boneID)
+              local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_favorite.boneID, 0.0, 0.0, 0.0)
+              if lua_Fn.str_contains(selected_favorite.name, "DJ") then
+                if not is_playing_radio and not anim_music then
+                  play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
+                  anim_music = true
+                end
+              else
+                if anim_music then
+                  play_music("stop")
+                  anim_music = false
+                end
               end
-            else
-              if anim_music then
-                play_music("stop")
-                anim_music = false
-              end
-            end
-            playAnim(selected_favorite, self.get_ped(), selected_favorite.flag, selfprop1, selfprop2, selfloopedFX,
-              selfSexPed, boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pf
-            )
-            curr_playing_anim = selected_favorite
-            is_playing_anim   = true
-          end)
-        elseif selected_favorite.scenario ~= nil then -- scenario type
-          playScenario(selected_favorite, self.get_ped())
-          is_playing_scenario = true
+              playAnim(selected_favorite, self.get_ped(), selected_favorite.flag, selfprop1, selfprop2, selfloopedFX,
+                selfSexPed, boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pf
+              )
+              curr_playing_anim = selected_favorite
+              is_playing_anim   = true
+            end)
+          elseif selected_favorite.scenario ~= nil then -- scenario type
+            playScenario(selected_favorite, self.get_ped())
+            is_playing_scenario = true
+          end
+          addActionToRecents(selected_favorite)
+        else
+          UI.widgetSound("Error")
+          gui.show_error("Samurais Scripts", "You can not play animations while grabbing an NPC, grabbing a vehicle, sitting or hiding.")
         end
-        addActionToRecents(selected_favorite)
       end
       ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine()
       if ImGui.Button(translateLabel("generic_stop_btn") .. "##favs") then
@@ -1805,35 +1809,40 @@ Actions:add_imgui(function()
       ImGui.PopItemWidth()
       local selected_recent = filteredRecents[recents_index + 1]
       if ImGui.Button(translateLabel("generic_play_btn") .. "##recents") then
-        UI.widgetSound("Select")
-        if selected_recent.dict ~= nil then -- animation type
-          script.run_in_fiber(function(pr)
-            local coords     = self.get_pos()
-            local heading    = Game.getHeading(self.get_ped())
-            local forwardX   = Game.getForwardX(self.get_ped())
-            local forwardY   = Game.getForwardY(self.get_ped())
-            local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_recent.boneID)
-            local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_recent.boneID, 0.0, 0.0, 0.0)
-            if lua_Fn.str_contains(selected_recent.name, "DJ") then
-              if not is_playing_radio and not anim_music then
-                play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-                anim_music = true
+        if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
+          UI.widgetSound("Select")
+          if selected_recent.dict ~= nil then -- animation type
+            script.run_in_fiber(function(pr)
+              local coords     = self.get_pos()
+              local heading    = Game.getHeading(self.get_ped())
+              local forwardX   = Game.getForwardX(self.get_ped())
+              local forwardY   = Game.getForwardY(self.get_ped())
+              local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_recent.boneID)
+              local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_recent.boneID, 0.0, 0.0, 0.0)
+              if lua_Fn.str_contains(selected_recent.name, "DJ") then
+                if not is_playing_radio and not anim_music then
+                  play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
+                  anim_music = true
+                end
+              else
+                if anim_music then
+                  play_music("stop")
+                  anim_music = false
+                end
               end
-            else
-              if anim_music then
-                play_music("stop")
-                anim_music = false
-              end
-            end
-            playAnim(selected_recent, self.get_ped(), selected_recent.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
-              boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pr
-            )
-            curr_playing_anim = selected_recent
-            is_playing_anim   = true
-          end)
-        elseif selected_recent.scenario ~= nil then -- scenario type
-          playScenario(selected_recent, self.get_ped())
-          is_playing_scenario = true
+              playAnim(selected_recent, self.get_ped(), selected_recent.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
+                boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pr
+              )
+              curr_playing_anim = selected_recent
+              is_playing_anim   = true
+            end)
+          elseif selected_recent.scenario ~= nil then -- scenario type
+            playScenario(selected_recent, self.get_ped())
+            is_playing_scenario = true
+          end
+        else
+          UI.widgetSound("Error")
+          gui.show_error("Samurais Scripts", "You can not play animations while grabbing an NPC, grabbing a vehicle, sitting or hiding.")
         end
       end
       ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine()
@@ -8177,7 +8186,7 @@ script.register_looped("animation hotkey", function(script)
       script:sleep(400)
     end
     if SS.isKeyJustPressed(keybinds.play_anim.code) then
-      if not ped_grabbed and not vehicle_grabbed and not is_hiding then
+      if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
         if not is_playing_anim then
           if info ~= nil then
             local mycoords     = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
@@ -8190,14 +8199,6 @@ script.register_looped("animation hotkey", function(script)
               setmanualflag()
             else
               flag = info.flag
-            end
-            if is_sitting or is_handsUp then
-              TASK.CLEAR_PED_TASKS(self.get_ped())
-              is_sitting, is_handsUp = false, false
-            end
-            if isCrouched then
-              PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
-              isCrouched = false
             end
             playAnim(info, self.get_ped(), flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, myboneIndex, mycoords,
               myheading, myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX, script
@@ -8220,7 +8221,7 @@ script.register_looped("animation hotkey", function(script)
         end
       else
         gui.show_error("Samurais Scripts",
-          "You can not play animations while grabbing an NPC.")
+          "You can not play animations while grabbing an NPC, grabbing a vehicle or hiding.")
         script:sleep(800)
       end
     end
@@ -8271,53 +8272,42 @@ end)
 script.register_looped("anim shortcut", function(animsc)
   if shortcut_anim.anim ~= nil and not gui.is_open() and not ped_grabbed and not vehicle_grabbed and not is_hiding then
     if SS.isKeyJustPressed(shortcut_anim.btn) and not is_typing and not is_setting_hotkeys and not is_playing_anim and not is_playing_scenario then
-      is_shortcut_anim   = true
-      info               = shortcut_anim
-      local mycoords     = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
-      local myheading    = ENTITY.GET_ENTITY_HEADING(self.get_ped())
-      local myforwardX   = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-      local myforwardY   = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
-      local myboneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
-      local mybonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
-      if is_playing_anim or is_playing_scenario then
-        cleanup(animsc)
-        if ENTITY.DOES_ENTITY_EXIST(bbq) then
-          ENTITY.DELETE_ENTITY(bbq)
-        end
-        is_playing_anim     = false
-        is_playing_scenario = false
-        animsc:sleep(500)
-      end
-      if is_handsUp then
-        TASK.CLEAR_PED_TASKS(self.get_ped())
-        is_handsUp = false
-        animsc:sleep(100)
-      end
-      if is_sitting then
-        TASK.CLEAR_PED_TASKS(self.get_ped())
-        is_sitting = false
-        animsc:sleep(100)
-      end
-      if isCrouched then
-        PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
-        isCrouched = false
-        animsc:sleep(100)
-      end
-      if Game.requestAnimDict(shortcut_anim.dict) then
-        playAnim(shortcut_anim, self.get_ped(), shortcut_anim.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
-          myboneIndex, mycoords, myheading, myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX, animsc
-        )
-        curr_playing_anim = shortcut_anim
-        if lua_Fn.str_contains(shortcut_anim.name, "DJ") then
-          if not is_playing_radio then
-            play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-            anim_music = true
+      if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
+        is_shortcut_anim   = true
+        info               = shortcut_anim
+        local mycoords     = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
+        local myheading    = ENTITY.GET_ENTITY_HEADING(self.get_ped())
+        local myforwardX   = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
+        local myforwardY   = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+        local myboneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
+        local mybonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
+        if is_playing_anim or is_playing_scenario then
+          cleanup(animsc)
+          if ENTITY.DOES_ENTITY_EXIST(bbq) then
+            ENTITY.DELETE_ENTITY(bbq)
           end
+          is_playing_anim     = false
+          is_playing_scenario = false
+          animsc:sleep(500)
         end
-        animsc:sleep(100)
-        curr_playing_anim = shortcut_anim
-        is_playing_anim  = true
-        is_shortcut_anim = true
+        if Game.requestAnimDict(shortcut_anim.dict) then
+          playAnim(shortcut_anim, self.get_ped(), shortcut_anim.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
+            myboneIndex, mycoords, myheading, myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX, animsc
+          )
+          curr_playing_anim = shortcut_anim
+          if lua_Fn.str_contains(shortcut_anim.name, "DJ") then
+            if not is_playing_radio then
+              play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
+              anim_music = true
+            end
+          end
+          animsc:sleep(100)
+          curr_playing_anim = shortcut_anim
+          is_playing_anim  = true
+          is_shortcut_anim = true
+        end
+      else
+        gui.show_error("Samurai's Scripts", "You can not play animations while grabbing an NPC, grabbing a vehicle, sitting or hiding.")
       end
     end
   end
@@ -10114,15 +10104,18 @@ script.register_looped("Public Seats", function(pseats)
       Game.showButtonPrompt("Press ~INPUT_PICKUP~ to sit down")
       if PAD.IS_CONTROL_PRESSED(0, 38) then
         if Game.requestAnimDict("timetable@ron@ig_3_couch") then
-          TASK.TASK_TURN_PED_TO_FACE_ENTITY(self.get_ped(), prop, 100)
-          pseats:sleep(150)
-          TASK.TASK_PLAY_ANIM(self.get_ped(), "timetable@ron@ig_3_couch", "base", 1.69, 4.0, -1, 33, 1.0, false, false,
-            false)
-          local bone_index = PED.GET_PED_BONE_INDEX(self.get_ped(), 0)
-          ENTITY.ATTACH_ENTITY_TO_ENTITY(self.get_ped(), seat, bone_index, x_offset, -0.6, 1.0, 0.0, 0.0, 180.0, false,
-            false, false, false, 20, true, 1)
-          pseats:sleep(1000)
-          is_sitting = true
+          if ENTITY.DOES_ENTITY_EXIST(seat) then
+            ENTITY.FREEZE_ENTITY_POSITION(seat, true)
+            TASK.TASK_TURN_PED_TO_FACE_ENTITY(self.get_ped(), seat, 100)
+            pseats:sleep(150)
+            TASK.TASK_PLAY_ANIM(self.get_ped(), "timetable@ron@ig_3_couch", "base", 1.69, 4.0, -1, 33, 1.0, false, false,
+              false)
+            local bone_index = PED.GET_PED_BONE_INDEX(self.get_ped(), 0)
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(self.get_ped(), seat, bone_index, x_offset, -0.6, 1.0, 0.0, 0.0, 180.0, false,
+              false, false, false, 20, true, 1)
+            pseats:sleep(1000)
+            is_sitting, thisSeat = true, seat
+          end
         end
       end
     else
@@ -10157,8 +10150,11 @@ script.register_looped("Public Seats", function(pseats)
       if PAD.IS_CONTROL_PRESSED(0, 38) then
         ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
         TASK.STOP_ANIM_TASK(self.get_ped(), "timetable@ron@ig_3_couch", "base", -2.69)
+        if ENTITY.DOES_ENTITY_EXIST(thisSeat) then
+          ENTITY.FREEZE_ENTITY_POSITION(thisSeat, false)
+        end
         pseats:sleep(1000)
-        is_sitting = false
+        is_sitting, thisSeat = false, 0
       end
     end
   end

@@ -491,13 +491,13 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
   targetForwardX, targetForwardY, targetBoneCoords, ent, propTable, ptfxTable, s)
   local blendInSpeed, blendOutSpeed, duration = 4.0, -4.0, -1
   if target == self.get_ped() then
-    if is_sitting or is_handsUp then
+    if is_handsUp then
       TASK.CLEAR_PED_TASKS(self.get_ped())
-      is_sitting = false
       is_handsUp = false
     end
     if isCrouched then
       PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
+      isCrouched = false
     end
   end
   if Info.blendin ~= nil then
