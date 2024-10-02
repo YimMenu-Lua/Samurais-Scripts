@@ -1,14 +1,20 @@
 # Samurais-Scripts
 #### A Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and [Tupoye-Menu](https://github.com/TupoyeMenu/TupoyeMenu), centered around roleplaying and having fun in a game full of ad bots and toxic cheaters.
-  
+
+####    
+
+> [!NOTE]
+> **Discontinued** due to a series of unfortunate events including what happened to our beloved YimMenu as well as some shitty life circumstances. I will not update this small project anymore but pull requests are still welcome.
+> 
+> If you want to borrow code, feel free to do so. The only requirement is that you mention the author.
+
+####    
 
 ## Features
 
-- Full list of features is documented [here](FEATURES.md).
-  
+- Full list of features is documented [here](FEATURES.md).  
 
- 
-
+####    
 
 ## Setup
 
@@ -31,7 +37,8 @@ The folder structure should look like this
 |       |       └── samurais_utils.lua
 │       └── samurais_scripts.lua
 ```
-  
+
+####    
 
 ## TODO:
 
@@ -40,7 +47,7 @@ The folder structure should look like this
 - [x] Improve and merge [Object Spawner](https://github.com/xesdoog/object-spawner). ✔️ Done.
 - [x] Improve and merge [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier). ✔️ Done.
 
-  
+####    
 
 ## Credits
 
