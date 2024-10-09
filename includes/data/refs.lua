@@ -301,6 +301,8 @@ driftSmokeColors         = {
 }
 
 objectives_T             = {
+  1,
+  9,
   143,
   144,
   145,
@@ -353,6 +355,7 @@ handguns_T               = {
 }
 
 cell_inputs_T            = {
+  { control = 172, input = 1 },
   { control = 173, input = 2 },
   { control = 174, input = 3 },
   { control = 175, input = 4 },
@@ -1070,4 +1073,34 @@ trash_bins_T = {
   "prop_dumpster_4a",
   "prop_dumpster_4b",
   "p_dumpster_t",
+}
+
+app_script_names_T = {
+  "appArcadeBusiness",
+  "appArcadeBusinessHub",
+  "appAvengerOperations",
+  "appBikerBusiness",
+  "appBunkerBusiness",
+  "appBusinessHub",
+  "appFixerSecurity",
+  "appHackerTruck",
+  "appHackerTruck",
+  "appInternet",
+  "appSmuggler",
+}
+
+modshop_script_names = {
+  "arena_carmod",
+  "armory_aircraft_carmod",
+  "base_carmod",
+  "business_hub_carmod",
+  "car_meet_carmod",
+  "carmod_shop",
+  "fixer_hq_carmod",
+  "hacker_truck_carmod",
+  "hangar_carmod",
+  "juggalo_hideout_carmod",
+  "personal_carmod_shop",
+  "tuner_property_carmod",
+  -- "vinewood_premium_garage_carmod",
 }

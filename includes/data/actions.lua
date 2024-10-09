@@ -752,9 +752,19 @@ function playScenario(ref, target)
         cleanup(script)
         is_playing_anim = false
       end
-      if is_sitting or is_handsUp then
+      if is_sitting then
         TASK.CLEAR_PED_TASKS(self.get_ped())
+        if ENTITY.DOES_ENTITY_EXIST(thisSeat) then
+          ENTITY.FREEZE_ENTITY_POSITION(thisSeat, false)
+          if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(self.get_ped(), thisSeat) then
+            ENTITY.DETACH_ENTITY(self.get_ped(), true, true)
+          end
+          thisSeat = 0
+        end
         is_sitting = false
+      end
+      if is_handsUp then
+        TASK.CLEAR_PED_TASKS(self.get_ped())
         is_handsUp = false
       end
       if isCrouched then
@@ -802,10 +812,12 @@ function stopScenario(ped, s)
 end
 
 ---@param t table
-function addActionToRecents(action)
+function addActionToRecents(t)
+  ---@type boolean
+  local recent_exists
   if recently_played_a[1] ~= nil then
     for _, v in ipairs(recently_played_a) do
-      if action.name == v.name then
+      if t.name == v.name then
         recent_exists = true
         break
       else
@@ -814,6 +826,6 @@ function addActionToRecents(action)
     end
   end
   if not recent_exists then
-    table.insert(recently_played_a, action)
+    table.insert(recently_played_a, t)
   end
 end

@@ -599,7 +599,11 @@ UI = {
 
   **Sound strings:**
 
-  "Select" | "Select2" | "Cancel" | "Error" | "Nav" | "Nav2" | "Pickup" | "Radar" | "Delete" | "W_Pickup" | "Fail" | "Focus_In" | "Focus_Out"
+  "Select" | "Select2"  | "Cancel"   | "Error"  | "Nav" |
+
+  "Nav2"   | "Pickup"   | "Radar"    | "Delete" | "W_Pickup" |
+
+  "Fail"   | "Focus_In" | "Focus_Out" | "Notif"
   ]]
   widgetSound = function(sound)
     if not disableUiSounds then
@@ -609,6 +613,7 @@ UI = {
         { name = "Pickup",    sound = "PICK_UP",             soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET" },
         { name = "W_Pickup",  sound = "PICK_UP_WEAPON",      soundRef = "HUD_FRONTEND_CUSTOM_SOUNDSET" },
         { name = "Fail",      sound = "CLICK_FAIL",          soundRef = "WEB_NAVIGATION_SOUNDS_PHONE" },
+        { name = "Notif",     sound = "LOSE_1ST",            soundRef = "GTAO_FM_EVENTS_SOUNDSET" },
         { name = "Delete",    sound = "DELETE",              soundRef = "HUD_DEATHMATCH_SOUNDSET" },
         { name = "Cancel",    sound = "CANCEL",              soundRef = "HUD_FREEMODE_SOUNDSET" },
         { name = "Error",     sound = "ERROR",               soundRef = "HUD_FREEMODE_SOUNDSET" },
@@ -621,7 +626,7 @@ UI = {
       script.run_in_fiber(function()
         for _, snd in ipairs(sounds_T) do
           if sound == snd.name then
-            AUDIO.PLAY_SOUND_FRONTEND(-1, snd.sound, snd.soundRef, true)
+            AUDIO.PLAY_SOUND_FRONTEND(-1, snd.sound, snd.soundRef, false)
             break
           end
         end
@@ -930,27 +935,27 @@ SS                          = {
     end
 
     if spawned_props[1] ~= nil then
-      for _, p in ipairs(spawned_props) do
-        if ENTITY.DOES_ENTITY_EXIST(p) then
-          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p, false, false)
-          ENTITY.DELETE_ENTITY(p)
+      for i, v in ipairs(spawned_props) do
+        if ENTITY.DOES_ENTITY_EXIST(v.entity) then
+          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v.entity, false, false)
+          ENTITY.DELETE_ENTITY(v.entity)
+          table.remove(spawned_props, i)
         end
       end
-      spawned_props = {}
     end
 
     if selfAttachments[1] ~= nil then
-      for _, v in ipairs(selfAttachments) do
-        ENTITY.DETACH_ENTITY(v, true, true)
+      for i, v in ipairs(selfAttachments) do
+        ENTITY.DETACH_ENTITY(v.entity, true, true)
+        table.remove(selfAttachments, i)
       end
-      selfAttachments = {}
     end
 
     if vehAttachments[1] ~= nil then
-      for _, v in ipairs(vehAttachments) do
-        ENTITY.DETACH_ENTITY(v, true, true)
+      for i, v in ipairs(vehAttachments) do
+        ENTITY.DETACH_ENTITY(v.entity, true, true)
+        table.remove(vehAttachments, i)
       end
-      vehAttachments = {}
     end
 
     if currentMvmt ~= "" then
@@ -1005,12 +1010,12 @@ SS                          = {
     end
 
     if spawned_npcs[1] ~= nil then
-      for _, v in ipairs(spawned_npcs) do
+      for i, v in ipairs(spawned_npcs) do
         if ENTITY.DOES_ENTITY_EXIST(v) then
           ENTITY.DELETE_ENTITY(v)
+          table.remove(spawned_npcs, i)
         end
       end
-      spawned_npcs = {}
     end
 
     if is_playing_scenario then
@@ -1056,17 +1061,17 @@ SS                          = {
     end
 
     if spawned_persist_T[1] ~= nil then
-      for _, p in ipairs(spawned_persist_T) do
-        if ENTITY.DOES_ENTITY_EXIST(p) then
-          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(p, true, true)
-          ENTITY.DELETE_ENTITY(p)
+      for i, v in ipairs(spawned_persist_T) do
+        if ENTITY.DOES_ENTITY_EXIST(v) then
+          ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v, true, true)
+          ENTITY.DELETE_ENTITY(v)
+          table.remove(spawned_persist_T, i)
         end
       end
-      spawned_persist_T = {}
     end
 
     if is_sitting or ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), "timetable@ron@ig_3_couch", "base", 3) then
-      ENTITY.DETACH_ENTITY(self.get_ped(), true, true)
+      ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
       TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
       if ENTITY.DOES_ENTITY_EXIST(thisSeat) then
         ENTITY.FREEZE_ENTITY_POSITION(thisSeat, false)
@@ -1097,7 +1102,7 @@ SS                          = {
 
   -- Checks if localPlayer is standing near a public seat and returns its position and rotation vectors.
   isNearPublicSeat = function()
-    local retBool, prop, seatPos, x_offset, myCoords = false, 0, vec3:new(0.0, 0.0, 0.0), 0.0, self.get_pos()
+    local retBool, prop, seatPos, x_offset, z_offset, myCoords = false, 0, vec3:new(0.0, 0.0, 0.0), 0.0, 1.0, self.get_pos()
     for _, seat in ipairs(world_seats_T) do
       prop = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(myCoords.x, myCoords.y, myCoords.z, 1.5, joaat(seat), false, false, false)
       if ENTITY.DOES_ENTITY_EXIST(prop) then
@@ -1108,11 +1113,17 @@ SS                          = {
           if string.find(string.lower(seat), "bench") then
             x_offset = -0.5
           end
+          if seat == "prop_hobo_seat_01" then
+            z_offset = 0.8
+          end
+          if string.find(string.lower(seat), "skid_chair") then
+            z_offset = 0.6
+          end
           break
         end
       end
     end
-    return retBool, prop, x_offset
+    return retBool, prop, x_offset, z_offset
   end,
 
   isNearTrashBin = function()
@@ -1144,9 +1155,9 @@ SS                          = {
         end
         local bootBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, bootBoneName)
         if bootBone ~= -1 then
-          local bonePos  = ENTITY.GET_ENTITY_BONE_POSTION(veh, bootBone)
+          local bonePos  = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, bootBone)
           local distCalc = SYSTEM.VDIST2(bonePos.x, bonePos.y, bonePos.z, myCoords.x, myCoords.y, myCoords.z)
-          if distCalc <= 3.69420 then
+          if distCalc <= 3.0 then
             retBool = true
           end
         end
@@ -1325,9 +1336,10 @@ SS                          = {
       purgeBtn      = { code = 0x58, name = "[X]" },
       autokill      = { code = 0x76, name = "[F7]" },
       enemiesFlee   = { code = 0x77, name = "[F8]" },
+      missl_def     = { code = 0x0,  name = "[Unbound]"},
       vehicle_mine  = { code = 0x4E, name = "[N]" },
       triggerbotBtn = { code = 0x10, name = "[Shift]" },
-      panik         = { code = 0x8,  name = "[BACKSPACE]" },
+      panik         = { code = 0x7B, name = "[F12]" },
     }; lua_cfg.save("keybinds", keybinds)
     gpad_keybinds = {
       rodBtn        = { code = 0, name = "[Unbound]" },
@@ -1662,6 +1674,7 @@ Game                        = {
     if STREAMING.IS_MODEL_VALID(model) then
       if Game.requestModel(model) then
         vmin, vmax = MISC.GET_MODEL_DIMENSIONS(model, vmin, vmax)
+        s:sleep(100)
         STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(model)
       end
     end
@@ -1871,6 +1884,24 @@ Game                        = {
     return memory.handle_to_ptr(gameEntity)
   end,
 
+  -- Temporary workaround to fix auto-pilot's "fly to objective" option.
+  findObjectiveBlip = function()
+    for _, v in ipairs(objectives_T) do
+      local blip = HUD.GET_FIRST_BLIP_INFO_ID(v)
+      if HUD.DOES_BLIP_EXIST(blip) then
+        return true, HUD.GET_BLIP_INFO_ID_COORD(blip)
+      else
+        local stdBlip    = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_STANDARD_BLIP_ENUM_ID())
+        local blipCoords = HUD.GET_BLIP_INFO_ID_COORD(stdBlip)
+        if blipCoords ~= vec3:new(0.0, 0.0, 0.0) then
+          return true, blipCoords
+        else
+          return false, nil
+        end
+      end
+    end
+  end,
+
   Self = {
 
     ---@return number
@@ -1986,23 +2017,30 @@ Game                        = {
     ---@param toggle boolean
     PhoneAnims = function(toggle)
       for i = 242, 244 do
-        PED.SET_PED_CONFIG_FLAG(self.get_ped(), i, not toggle)
+        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), i, toggle) then
+          PED.SET_PED_CONFIG_FLAG(self.get_ped(), i, not toggle)
+        end
       end
     end,
 
     ---Enables phone gestures in GTA Online.
     ---@param s script_util
     PlayPhoneGestures = function(s)
-      local is_phone_in_hand   = SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat(
-      "CELLPHONE_FLASHHAND")) > 0
-      local is_browsing_email  = SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("APPMPEMAIL")) > 0
+      local is_phone_in_hand   = SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(
+        joaat("CELLPHONE_FLASHHAND")
+      ) > 0
+      local is_browsing_email  = SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(
+        joaat("APPMPEMAIL")
+      ) > 0
       local call_anim_dict     = "anim@scripted@freemode@ig19_mobile_phone@male@"
       local call_anim          = "base"
       local call_anim_boneMask = "BONEMASK_HEAD_NECK_AND_R_ARM"
       if AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() then
         if Game.requestAnimDict(call_anim_dict) then
-          TASK.TASK_PLAY_PHONE_GESTURE_ANIMATION(self.get_ped(), call_anim_dict, call_anim,
-            call_anim_boneMask, 0.25, 0.25, true, false)
+          TASK.TASK_PLAY_PHONE_GESTURE_ANIMATION(
+            self.get_ped(), call_anim_dict, call_anim,
+            call_anim_boneMask, 0.25, 0.25, true, false
+          )
           repeat
             s:sleep(10)
           until
@@ -2018,6 +2056,26 @@ Game                        = {
           end
         end
       end
+    end,
+
+    -- Returns whether the player is currently using any mobile or computer app.
+    isBrowsingApps = function()
+      for _, v in ipairs(app_script_names_T) do
+        if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat(v)) > 0 then
+          return true
+        end
+      end
+      return false
+    end,
+
+    -- Returns whether the player is currently modifying their vehicle in a modshop.
+    isInCarModShop = function()
+      for _, v in ipairs(modshop_script_names) do
+        if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat(v)) > 0 then
+          return true
+        end
+      end
+      return false
     end,
   },
 

@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.3.1' -- v1.3.1
-TARGET_BUILD   = '3323'
+SCRIPT_VERSION = '1.3.2' -- v1.3.2
+TARGET_BUILD   = '3337'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
 
@@ -44,9 +44,10 @@ default_config         = {
     purgeBtn      = { code = 0x58, name = "[X]" },
     autokill      = { code = 0x76, name = "[F7]" },
     enemiesFlee   = { code = 0x77, name = "[F8]" },
+    missl_def     = { code = 0x0,  name = "[Unbound]"},
     vehicle_mine  = { code = 0x4E, name = "[N]" },
     triggerbotBtn = { code = 0x10, name = "[Shift]" },
-    panik         = { code = 0x8,  name = "[BACKSPACE]" },
+    panik         = { code = 0x7B, name = "[F12]" },
   },
   gpad_keybinds           = {
     rodBtn        = { code = 0, name = "[Unbound]" },
@@ -672,6 +673,18 @@ function bankDriftPoints_SP(points)
   end)
 end
 
+function standUp()
+  if is_sitting then
+    ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
+    TASK.CLEAR_PED_TASKS(self.get_ped())
+    if ENTITY.DOES_ENTITY_EXIST(thisSeat) then
+      ENTITY.FREEZE_ENTITY_POSITION(thisSeat, false)
+      thisSeat = 0
+    end
+    is_sitting = false
+  end
+end
+
 Samurais_scripts:add_imgui(function()
   local date_str = os.date("\10    %d-%b-%Y    \10         %H:%M\10\10")
   ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
@@ -1115,6 +1128,11 @@ Actions:add_imgui(function()
     end
     if ImGui.Button(translateLabel("generic_play_btn") .. "##anim") then
       if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
+        if lua_Fn.str_contains(string.lower(info.name), "in-car") and Game.Self.isOnFoot() then
+          UI.widgetSound("Error")
+          gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
+          goto pass
+        end
         UI.widgetSound("Select")
         script.run_in_fiber(function(pa)
           local coords     = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
@@ -1140,7 +1158,8 @@ Actions:add_imgui(function()
               anim_music = false
             end
           end
-          playAnim(info, self.get_ped(), flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, boneIndex, coords, heading,
+          playAnim(
+            info, self.get_ped(), flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, boneIndex, coords, heading,
             forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pa)
           is_playing_anim = true
           addActionToRecents(info)
@@ -1149,6 +1168,7 @@ Actions:add_imgui(function()
         UI.widgetSound("Error")
         gui.show_error("Samurais Scripts", "You can not play animations while grabbing an NPC, grabbing a vehicle, sitting or hiding.")
       end
+      ::pass::
     end
     ImGui.SameLine()
     if ImGui.Button(translateLabel("generic_stop_btn") .. "##anim") then
@@ -1485,6 +1505,11 @@ Actions:add_imgui(function()
     ImGui.SameLine()
     if ImGui.Button(translateLabel("generic_play_btn") .. "##npc_anim") then
       if spawned_npcs[1] ~= nil then
+        if lua_Fn.str_contains(string.lower(info.name), "in-car") and Game.Self.isOnFoot() then
+          UI.widgetSound("Error")
+          gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
+          goto pass
+        end
         UI.widgetSound("Select")
         script.run_in_fiber(function(npca)
           for _, v in ipairs(spawned_npcs) do
@@ -1500,7 +1525,8 @@ Actions:add_imgui(function()
               else
                 flag = info.flag
               end
-              playAnim(info, v, flag, npcprop1, npcprop2, npcloopedFX, npcSexPed, npcBoneIndex, npcCoords, npcHeading,
+              playAnim(
+                info, v, flag, npcprop1, npcprop2, npcloopedFX, npcSexPed, npcBoneIndex, npcCoords, npcHeading,
                 npcForwardX, npcForwardY, npcBboneCoords, "cunt", npcProps, npcPTFX, npca
               )
             end
@@ -1510,6 +1536,7 @@ Actions:add_imgui(function()
         UI.widgetSound("Error")
         gui.show_error("Samurais Scripts", "Spawn an NPC first!")
       end
+      ::pass::
     end
     ImGui.SameLine()
     if ImGui.Button(translateLabel("generic_stop_btn") .. "##npc_anim") then
@@ -1733,33 +1760,40 @@ Actions:add_imgui(function()
       ImGui.Spacing()
       if ImGui.Button(translateLabel("generic_play_btn") .. "##favs") then
         if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
-          UI.widgetSound("Select")
           if selected_favorite.dict ~= nil then -- animation type
-            script.run_in_fier(function(pf)
-              local coords     = self.get_pos()
-              local heading    = Game.getHeading(self.get_ped())
-              local forwardX   = Game.getForwardX(self.get_ped())
-              local forwardY   = Game.getForwardY(self.get_ped())
-              local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_favorite.boneID)
-              local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_favorite.boneID, 0.0, 0.0, 0.0)
-              if lua_Fn.str_contains(selected_favorite.name, "DJ") then
-                if not is_playing_radio and not anim_music then
-                  play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-                  anim_music = true
+            if lua_Fn.str_contains(string.lower(selected_favorite.name), "in-car") and Game.Self.isOnFoot() then
+              UI.widgetSound("Error")
+              gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
+            else
+              UI.widgetSound("Select")
+              script.run_in_fier(function(pf)
+                local coords     = self.get_pos()
+                local heading    = Game.getHeading(self.get_ped())
+                local forwardX   = Game.getForwardX(self.get_ped())
+                local forwardY   = Game.getForwardY(self.get_ped())
+                local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_favorite.boneID)
+                local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_favorite.boneID, 0.0, 0.0, 0.0)
+                if lua_Fn.str_contains(selected_favorite.name, "DJ") then
+                  if not is_playing_radio and not anim_music then
+                    play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
+                    anim_music = true
+                  end
+                else
+                  if anim_music then
+                    play_music("stop")
+                    anim_music = false
+                  end
                 end
-              else
-                if anim_music then
-                  play_music("stop")
-                  anim_music = false
-                end
-              end
-              playAnim(selected_favorite, self.get_ped(), selected_favorite.flag, selfprop1, selfprop2, selfloopedFX,
-                selfSexPed, boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pf
-              )
-              curr_playing_anim = selected_favorite
-              is_playing_anim   = true
-            end)
+                playAnim(
+                  selected_favorite, self.get_ped(), selected_favorite.flag, selfprop1, selfprop2, selfloopedFX,
+                  selfSexPed, boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pf
+                )
+                curr_playing_anim = selected_favorite
+                is_playing_anim   = true
+              end)
+            end
           elseif selected_favorite.scenario ~= nil then -- scenario type
+          UI.widgetSound("Select")
             playScenario(selected_favorite, self.get_ped())
             is_playing_scenario = true
           end
@@ -1810,33 +1844,40 @@ Actions:add_imgui(function()
       local selected_recent = filteredRecents[recents_index + 1]
       if ImGui.Button(translateLabel("generic_play_btn") .. "##recents") then
         if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
-          UI.widgetSound("Select")
           if selected_recent.dict ~= nil then -- animation type
-            script.run_in_fiber(function(pr)
-              local coords     = self.get_pos()
-              local heading    = Game.getHeading(self.get_ped())
-              local forwardX   = Game.getForwardX(self.get_ped())
-              local forwardY   = Game.getForwardY(self.get_ped())
-              local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_recent.boneID)
-              local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_recent.boneID, 0.0, 0.0, 0.0)
-              if lua_Fn.str_contains(selected_recent.name, "DJ") then
-                if not is_playing_radio and not anim_music then
-                  play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-                  anim_music = true
+            if lua_Fn.str_contains(string.lower(selected_recent.name), "in-car") and Game.Self.isOnFoot() then
+              UI.widgetSound("Error")
+              gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
+            else
+              UI.widgetSound("Select")
+              script.run_in_fiber(function(pr)
+                local coords     = self.get_pos()
+                local heading    = Game.getHeading(self.get_ped())
+                local forwardX   = Game.getForwardX(self.get_ped())
+                local forwardY   = Game.getForwardY(self.get_ped())
+                local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_recent.boneID)
+                local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_recent.boneID, 0.0, 0.0, 0.0)
+                if lua_Fn.str_contains(selected_recent.name, "DJ") then
+                  if not is_playing_radio and not anim_music then
+                    play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
+                    anim_music = true
+                  end
+                else
+                  if anim_music then
+                    play_music("stop")
+                    anim_music = false
+                  end
                 end
-              else
-                if anim_music then
-                  play_music("stop")
-                  anim_music = false
-                end
-              end
-              playAnim(selected_recent, self.get_ped(), selected_recent.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
-                boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pr
-              )
-              curr_playing_anim = selected_recent
-              is_playing_anim   = true
-            end)
+                playAnim(
+                  selected_recent, self.get_ped(), selected_recent.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
+                  boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pr
+                )
+                curr_playing_anim = selected_recent
+                is_playing_anim   = true
+              end)
+            end
           elseif selected_recent.scenario ~= nil then -- scenario type
+            UI.widgetSound("Select")
             playScenario(selected_recent, self.get_ped())
             is_playing_scenario = true
           end
@@ -2551,15 +2592,8 @@ vehicle_tab:add_imgui(function()
     if ImGui.Button(" Fly To Objective ") then
       UI.widgetSound("Select")
       script.run_in_fiber(function(ap)
-        local objective_coords
-        for _, id in ipairs(objectives_T) do
-          local blip = HUD.GET_CLOSEST_BLIP_INFO_ID(id)
-          if HUD.DOES_BLIP_EXIST(blip) then
-            objective_coords = HUD.GET_BLIP_COORDS(blip)
-            break
-          end
-        end
-        if objective_coords ~= nil then
+        local objective_found, objective_coords = Game.findObjectiveBlip()
+        if objective_found and objective_coords ~= nil then
           if autopilot_waypoint or autopilot_random then
             TASK.CLEAR_PED_TASKS(self.get_ped())
             TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
@@ -4777,15 +4811,15 @@ business_tab:add_imgui(function()
           else
             cokeOffset2 = 0
           end
-          local cokeSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY1")
-          local cokeStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY1")
+          local cokeSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY4")
+          local cokeStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY4")
           cokeTotal          = ((globals.get_int(Global_262145.f_17321) + cokeOffset1 + cokeOffset2) * cokeStock)
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine();
           ImGui.ProgressBar((cokeSupplies / 100), 240, 30)
           if cokeSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##blow") then
-              globals.set_int(Global_1663174.f_1.f_1, 1)
+              globals.set_int(Global_1663174.f_4.f_1, 1)
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4906,15 +4940,15 @@ business_tab:add_imgui(function()
           else
             fdOffset2 = 0
           end
-          local fdSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY4")
-          local fdStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY4")
+          local fdSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY1")
+          local fdStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY1")
           fdTotal          = ((globals.get_int(Global_262145.f_17319) + fdOffset1 + fdOffset2) * fdStock)
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine();
           ImGui.ProgressBar((fdSupplies / 100), 240, 30)
           if fdSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##fd") then
-              globals.set_int(Global_1663174.f_4.f_1, 1)
+              globals.set_int(Global_1663174.f_1.f_1, 1)
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -5323,7 +5357,7 @@ business_tab:add_imgui(function()
           "These options will not be saved. Each button disables the most tedious sell missions for that business.", 32)
         ImGui.Spacing(); UI.coloredText(
           "[ ! ] NOTE: If you plan on selling more than once for the same business (example: MC businesses or more than one CEO warehouse), please switch sessions after finishing the first sale to reset the missions, otherwise a sesond sell mission may fail to start.",
-          'yellow', 0.69, 32)
+          'yellow', 0.69, 30)
 
         if ImGui.Button("Easy Biker Sell Missions") then
           UI.widgetSound("Select")
@@ -5368,15 +5402,6 @@ business_tab:add_imgui(function()
         end
         ImGui.EndTabItem()
       end
-      if ImGui.BeginTabItem(" ? ") then
-        ImGui.Dummy(1, 10); ImGui.SeparatorText("About")
-        ImGui.Spacing(); UI.wrappedText(
-          "This script was developed to be as non-conspicuous as possible. Sure, using any form of cheating already carries a ban risk but there is a difference between simply filling your supplies ONLY when they are below max, and giving you a shit ton of money for just standing there like a bot or allowing you to sell a product for an unreasonable amount of money that is easily detectable.\10\10Therefore, this section will never have any money loops, instant sales or anything of the sort. This is meant for solo grinders: fill your supplies then go do some awesome drifts, street races, dogfights or whatever is your favorite GTAO thing to do while you wait for your stocks to fill up and once they do, sell them by actually playing the missions. You can teleport to finish sell missions quicker but make sure you're in a locked solo session before doing so.",
-          30
-        )
-        ImGui.EndTabItem()
-      end
-      ImGui.EndTabBar()
     else
       ImGui.Dummy(1, 5); ImGui.SameLine(); ImGui.Text("Outdated.")
     end
@@ -7369,33 +7394,35 @@ hotkeys_tab:add_imgui(function()
   if ImGui.BeginTabItem("Keyboard") then
     ImGui.Dummy(1, 5)
 
-    SS.openHotkeyWindow("Ragdoll On Demand   ", keybinds.rodBtn)
+    SS.openHotkeyWindow("Ragdoll On Demand       ", keybinds.rodBtn)
 
-    SS.openHotkeyWindow("Drift Button                ", keybinds.tdBtn)
+    SS.openHotkeyWindow("Drift Button                    ", keybinds.tdBtn)
 
-    SS.openHotkeyWindow("NOS Button                ", keybinds.nosBtn)
+    SS.openHotkeyWindow("NOS Button                    ", keybinds.nosBtn)
 
-    SS.openHotkeyWindow("Stop Anim Button       ", keybinds.stop_anim)
+    SS.openHotkeyWindow("Stop Anim Button          ", keybinds.stop_anim)
 
-    SS.openHotkeyWindow("Play Anim Button       ", keybinds.play_anim)
+    SS.openHotkeyWindow("Play Anim Button          ", keybinds.play_anim)
 
-    SS.openHotkeyWindow("Previous Anim Button", keybinds.previous_anim)
+    SS.openHotkeyWindow("Previous Anim Button   ", keybinds.previous_anim)
 
-    SS.openHotkeyWindow("Next Anim Button      ", keybinds.next_anim)
+    SS.openHotkeyWindow("Next Anim Button          ", keybinds.next_anim)
 
-    SS.openHotkeyWindow("Triggerbot Button      ", keybinds.triggerbotBtn)
+    SS.openHotkeyWindow("Triggerbot Button          ", keybinds.triggerbotBtn)
 
-    SS.openHotkeyWindow("Flatbed Button           ", keybinds.flatbedBtn)
+    SS.openHotkeyWindow("Flatbed Button              ", keybinds.flatbedBtn)
 
-    SS.openHotkeyWindow("Purge Button             ", keybinds.purgeBtn)
+    SS.openHotkeyWindow("Purge Button                ", keybinds.purgeBtn)
 
-    SS.openHotkeyWindow("Toggle Auto-Kill         ", keybinds.autokill)
+    SS.openHotkeyWindow("Toggle Auto-Kill            ", keybinds.autokill)
 
-    SS.openHotkeyWindow("Toggle Enemies Flee ", keybinds.enemiesFlee)
+    SS.openHotkeyWindow("Toggle Enemies Flee    ", keybinds.enemiesFlee)
 
-    SS.openHotkeyWindow("Vehicle Mine Button  ", keybinds.vehicle_mine)
+    SS.openHotkeyWindow("Toggle Missile Defense", keybinds.missl_def)
 
-    SS.openHotkeyWindow("PANIK!! Button          ", keybinds.panik)
+    SS.openHotkeyWindow("Vehicle Mine Button     ", keybinds.vehicle_mine)
+
+    SS.openHotkeyWindow("PANIK!! Button             ", keybinds.panik)
     ImGui.EndTabItem()
   end
   if ImGui.BeginTabItem("Controller") then
@@ -7487,15 +7514,22 @@ script.register_looped("Quote Of The Day", function(qotd)
   qotd:yield()
   if not disable_quotes then
     if gui.is_open() and Samurais_scripts:is_selected() then
-      random_quote = random_quotes_T[math.random(1, #random_quotes_T)]
-      qotd:sleep(15000)
+      quote_changed = false
+      random_quote  = random_quotes_T[math.random(1, #random_quotes_T)]
+      qotd:sleep(8000)
+      quote_changed = true
+      qotd:sleep(2000)
+    else
+      random_quote  = ""
+      quote_changed = false
+      quote_alpha   = 1.0
     end
   end
 end)
 script.register_looped("QBE", function(qbe)
   qbe:yield()
   if not disable_quotes then
-    if gui.is_open() and Samurais_scripts:is_selected() and random_quote ~= "" then
+    if gui.is_open() and Samurais_scripts:is_selected() and random_quote ~= "" and quote_changed then
       if quote_alpha > 0.1 then
         while quote_alpha > 0.1 do
           quote_alpha = quote_alpha - 0.05
@@ -7576,14 +7610,16 @@ script.register_looped("GameInput", function()
       end
     end
     if holdF then
-      if not is_typing and not is_setting_hotkeys and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) and not ducking_in_car then
+      if not is_typing and not is_setting_hotkeys and (is_car or is_quad) and not ducking_in_car
+        and not Game.Self.isInCarModShop() and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
         PAD.DISABLE_CONTROL_ACTION(0, 75, true)
       else
         timerB = 0
       end
     end
     if keepWheelsTurned then
-      if not is_typing and not is_setting_hotkeys and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) and (is_car or is_quad) and not ducking_in_car then
+      if not is_typing and not is_setting_hotkeys and (is_car or is_quad) and not ducking_in_car
+        and not Game.Self.isInCarModShop() and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
         if PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
           PAD.DISABLE_CONTROL_ACTION(0, 75, true)
         end
@@ -7657,7 +7693,8 @@ script.register_looped("self features", function(script)
   if Game.Self.isOnFoot() and not Game.Self.isInWater() and not Game.Self.is_ragdoll() and not gui.is_open() then
     if replaceSneakAnim and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario
       and not is_typing and not is_sitting and not is_setting_hotkeys and not is_hiding then
-      if not isCrouched and PAD.IS_DISABLED_CONTROL_PRESSED(0, 36)  and not HUD.IS_MP_TEXT_CHAT_TYPING() then
+      if not isCrouched and PAD.IS_DISABLED_CONTROL_PRESSED(0, 36)
+        and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Game.Self.isBrowsingApps() then
         script:sleep(200)
         if is_handsUp then
           is_handsUp = false
@@ -7674,7 +7711,8 @@ script.register_looped("self features", function(script)
         isCrouched = true
       end
     end
-    if isCrouched and PAD.IS_DISABLED_CONTROL_PRESSED(0, 36) and not HUD.IS_MP_TEXT_CHAT_TYPING() then
+    if isCrouched and PAD.IS_DISABLED_CONTROL_PRESSED(0, 36)
+      and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Game.Self.isBrowsingApps() then
       script:sleep(200)
       PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0.3)
       script:sleep(500)
@@ -7686,16 +7724,16 @@ script.register_looped("self features", function(script)
   if not gui.is_open() and not HUD.IS_MP_TEXT_CHAT_TYPING() then
     if Game.Self.isOnFoot() or is_car then
       if replacePointAct and not ped_grabbed and not vehicle_grabbed and not is_playing_anim
-      and not is_playing_scenario and not is_typing and not is_setting_hotkeys and not is_hiding then
-        if not is_handsUp and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29) and not HUD.IS_MP_TEXT_CHAT_TYPING() then
+        and not is_playing_scenario and not is_typing and not is_setting_hotkeys and not is_hiding then
+        if not is_handsUp and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29)
+          and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Game.Self.isBrowsingApps() then
           script:sleep(200)
           if isCrouched then
             isCrouched = false
             PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
           end
           if is_sitting then
-            TASK.CLEAR_PED_TASKS(self.get_ped())
-            is_sitting = false
+            standUp()
           end
           playHandsUp()
           is_handsUp = true
@@ -7703,7 +7741,8 @@ script.register_looped("self features", function(script)
       end
     end
 
-    if is_handsUp and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29) and not HUD.IS_MP_TEXT_CHAT_TYPING() then
+    if is_handsUp and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29)
+      and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Game.Self.isBrowsingApps() then
       script:sleep(200)
       TASK.CLEAR_PED_TASKS(self.get_ped())
       script:sleep(500)
@@ -7730,21 +7769,20 @@ script.register_looped("self features", function(script)
   end
 
   -- Online Phone Animations
-  if Game.isOnline() then
-    if phoneAnim then
+  if phoneAnim then
+    if Game.isOnline() then
       if not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) and not is_playing_anim and not is_playing_scenario
-      and not ped_grabbed and not vehicle_grabbed and not is_handsUp and not is_sitting
-      and not is_hiding and PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0 then
-        if not phoneAnimsEnabled then
-          Game.Self.PhoneAnims(true)
-          phoneAnimsEnabled = true
-        end
+        and not ped_grabbed and not vehicle_grabbed and not is_handsUp and not is_sitting
+        and not is_hiding and PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0 then
+        Game.Self.PhoneAnims(true)
+        phoneAnimsEnabled = true
         if phoneAnimsEnabled then
           Game.Self.PlayPhoneGestures(script)
         end
       else
         if phoneAnimsEnabled then
           Game.Self.PhoneAnims(false)
+          script:sleep(200)
           phoneAnimsEnabled = false
         end
       end
@@ -7753,6 +7791,11 @@ script.register_looped("self features", function(script)
         Game.Self.PhoneAnims(false)
         phoneAnimsEnabled = false
       end
+    end
+  else
+    if phoneAnimsEnabled then
+      Game.Self.PhoneAnims(false)
+      phoneAnimsEnabled = false
     end
   end
 
@@ -7843,9 +7886,10 @@ script.register_looped("Anim S/VFX", function(animSfx)
       if ENTITY.DOES_ENTITY_EXIST(torch) then
         local torchPos = ENTITY.GET_ENTITY_COORDS(torch, false)
         local torchFwd = Game.getForwardVec(torch)
-        GRAPHICS.DRAW_SPOT_LIGHT(torchPos.x, torchPos.y, torchPos.z - 0.2,
+        GRAPHICS.DRAW_SPOT_LIGHT(
+          torchPos.x, torchPos.y, torchPos.z - 0.2,
           (torchFwd.x * -1), (torchFwd.y * -1), torchFwd.z, 226, 130, 78,
-          10.0, 40.0, 1.0, 20.0, 0.0
+          100.0, 40.0, 1.0, 10.0, 0.0
         )
       end
     end
@@ -8005,7 +8049,7 @@ script.register_looped("Hide From Cops", function(hfc)
         VEHICLE.SET_VEHICLE_DOOR_OPEN(boot_vehicle, bootDoorID, false, false)
         hfc:sleep(500)
         TASK.CLEAR_PED_TASKS(self.get_ped())
-        ENTITY.DETACH_ENTITY(self.get_ped(), true, true)
+        ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
         ENTITY.SET_ENTITY_COORDS(self.get_ped(), my_pos.x - (veh_fwd.x * 1.3),
         my_pos.y - (veh_fwd.y * 1.3), ground_z, false, false, false, false)
         ENTITY.SET_ENTITY_HEADING(self.get_ped(), (ENTITY.GET_ENTITY_HEADING(self.get_ped()) - 180))
@@ -8089,7 +8133,9 @@ end)
 script.register_looped("MISC Anim Stuff", function(miscanim)
   miscanim:yield()
   if is_playing_anim or is_shortcut_anim then
-    PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), false)
+    if not curr_playing_anim.autoOff then
+      PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), false)
+    end
     if WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
       WEAPON.SET_CURRENT_PED_WEAPON(self.get_ped(), 0xA2719263, false)
     end
@@ -8145,84 +8191,97 @@ end)
 ]]
 
 script.register_looped("animation hotkey", function(script)
-  script:yield()
-  if is_playing_anim then
-    if SS.isKeyJustPressed(keybinds.stop_anim.code) then
-      cleanup(script)
-      is_playing_anim  = false
-      is_shortcut_anim = false
-      if anim_music then
-        play_music("stop")
-        anim_music = false
-      end
-      if spawned_npcs[1] ~= nil then
-        cleanupNPC(script)
+  if not HUD.IS_PAUSE_MENU_ACTIVE() and not HUD.IS_MP_TEXT_CHAT_TYPING() then
+    if is_playing_anim then
+      if SS.isKeyJustPressed(keybinds.stop_anim.code) and not Game.Self.isBrowsingApps() then
+        UI.widgetSound("Cancel")
+        cleanup(script)
+        is_playing_anim  = false
+        is_shortcut_anim = false
+        if anim_music then
+          play_music("stop")
+          anim_music = false
+        end
+        if spawned_npcs[1] ~= nil then
+          cleanupNPC(script)
+        end
       end
     end
-  end
-  if usePlayKey then
-    if filteredAnims == nil then
-      updatefilteredAnims()
-    end
-    if SS.isKeyJustPressed(keybinds.next_anim.code) then
-      anim_index = anim_index + 1
-      info = filteredAnims[anim_index + 1]
-      if info == nil then
-        anim_index = 0
+    if usePlayKey then
+      if filteredAnims == nil then
+        updatefilteredAnims()
+      end
+      if SS.isKeyJustPressed(keybinds.next_anim.code) and not Game.Self.isBrowsingApps() then
+        UI.widgetSound("Nav")
+        if anim_index < #filteredAnims - 1 then
+          anim_index = anim_index + 1
+        else
+          anim_index = 0
+        end
         info = filteredAnims[anim_index + 1]
         gui.show_message("Current Animation:", info.name)
+        script:sleep(200)
       end
-      if info ~= nil then
+      if SS.isKeyJustPressed(keybinds.previous_anim.code) and not Game.Self.isBrowsingApps() then
+        UI.widgetSound("Nav")
+        if anim_index <= 0 then
+          anim_index = #filteredAnims - 1
+        else
+          anim_index = anim_index - 1
+        end
+        info = filteredAnims[anim_index + 1]
         gui.show_message("Current Animation:", info.name)
+        script:sleep(200)
       end
-    elseif SS.isKeyJustPressed(keybinds.previous_anim.code) and anim_index > 0 then -- prevent going to index 0 which breaks the script.
-      anim_index = anim_index - 1
-      info = filteredAnims[anim_index + 1]
-      gui.show_message("Current Animation:", info.name)
-      script:sleep(200)
-    elseif SS.isKeyJustPressed(keybinds.previous_anim.code) and anim_index == 0 then
-      info = filteredAnims[anim_index + 1]
-      gui.show_warning("Current Animation:", info.name .. "\10\10You have reached the top of the list.")
-      script:sleep(400)
-    end
-    if SS.isKeyJustPressed(keybinds.play_anim.code) then
-      if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
-        if not is_playing_anim then
-          if info ~= nil then
-            local mycoords     = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
-            local myheading    = ENTITY.GET_ENTITY_HEADING(self.get_ped())
-            local myforwardX   = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-            local myforwardY   = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
-            local myboneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
-            local mybonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
-            if manualFlags then
-              setmanualflag()
-            else
-              flag = info.flag
-            end
-            playAnim(info, self.get_ped(), flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, myboneIndex, mycoords,
-              myheading, myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX, script
-            )
-            curr_playing_anim = info
-            is_playing_anim   = true
-            if lua_Fn.str_contains(curr_playing_anim.name, "DJ") then
-              if not is_playing_radio then
-                play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-                anim_music = true
+      if SS.isKeyJustPressed(keybinds.play_anim.code) and not Game.Self.isBrowsingApps() then
+        if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
+          if not is_playing_anim then
+            if info ~= nil then
+              if lua_Fn.str_contains(string.lower(info.name), "in-car") and Game.Self.isOnFoot() then
+                UI.widgetSound("Error")
+                gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
+              else
+                UI.widgetSound("Select")
+                local mycoords     = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
+                local myheading    = ENTITY.GET_ENTITY_HEADING(self.get_ped())
+                local myforwardX   = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
+                local myforwardY   = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+                local myboneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
+                local mybonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
+                if manualFlags then
+                  setmanualflag()
+                else
+                  flag = info.flag
+                end
+                playAnim(info, self.get_ped(), flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, myboneIndex, mycoords,
+                  myheading, myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX, script
+                )
+                curr_playing_anim = info
+                is_playing_anim   = true
+                if lua_Fn.str_contains(curr_playing_anim.name, "DJ") then
+                  if not is_playing_radio then
+                    play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
+                    anim_music = true
+                  end
+                end
               end
+              script:sleep(200)
             end
-            script:sleep(200)
+          else
+            UI.widgetSound("Error")
+            if not PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
+              PAD.SET_CONTROL_SHAKE(0, 500, 250)
+            end
+            gui.show_warning("Samurais Scripts",
+              "Press " .. STOP_ANIM_BUTTON .. " to stop the current animation before playing the next one.")
+            script:sleep(800)
           end
         else
-          PAD.SET_CONTROL_SHAKE(0, 500, 250)
-          gui.show_warning("Samurais Scripts",
-            "Press " .. STOP_ANIM_BUTTON .. " to stop the current animation before playing the next one.")
+          UI.widgetSound("Error")
+          gui.show_error("Samurais Scripts",
+            "You can not play animations while grabbing an NPC, grabbing a vehicle or hiding.")
           script:sleep(800)
         end
-      else
-        gui.show_error("Samurais Scripts",
-          "You can not play animations while grabbing an NPC, grabbing a vehicle or hiding.")
-        script:sleep(800)
       end
     end
   end
@@ -8256,6 +8315,7 @@ script.register_looped("animation hotkey", function(script)
 
   if is_playing_scenario then
     if SS.isKeyJustPressed(keybinds.stop_anim.code) then
+      UI.widgetSound("Cancel")
       Game.busySpinnerOn(translateLabel("scenarios_spinner"), 3)
       TASK.CLEAR_PED_TASKS(self.get_ped())
       is_playing_scenario = false
@@ -9942,7 +10002,7 @@ script.register_looped("Ped Grabber", function(pg)
       local myGroup    = PED.GET_PED_GROUP_INDEX(self.get_ped())
       if not ped_grabbed and nearestPed ~= 0 then
         if PED.IS_PED_ON_FOOT(nearestPed) and not PED.IS_PED_A_PLAYER(nearestPed) and not PED.IS_PED_GROUP_MEMBER(nearestPed, myGroup) then
-          if PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257) then
+          if (PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257)) and not Game.Self.isBrowsingApps() then
             ped_grabbed, attached_ped = attachPed(nearestPed)
             pg:sleep(200)
             if attached_ped ~= 0 then
@@ -9995,11 +10055,12 @@ script.register_looped("Ped Grabber", function(pg)
 end)
 script.register_looped("Vehicle Grabber", function(vg)
   if vehicleGrabber and not pedGrabber and not HUD.IS_MP_TEXT_CHAT_TYPING() and not is_playing_anim
-  and not is_playing_scenario and not isCrouched and not is_handsUp and not is_hiding then
+    and not is_playing_scenario and not isCrouched and not is_handsUp and not is_hiding then
     if Game.Self.isOnFoot() and not gui.is_open() and not WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
       local nearestVeh = Game.getClosestVehicle(self.get_ped(), 10)
       if not vehicle_grabbed and nearestVeh ~= 0 then
-        if PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257) then
+        if (PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257))
+          and not Game.Self.isBrowsingApps() then
           vehicle_grabbed, grabbed_veh = attachVeh(nearestVeh)
           vg:sleep(200)
           if grabbed_veh ~= 0 then
@@ -10097,7 +10158,7 @@ script.register_looped("World Bounds", function()
 end)
 script.register_looped("Public Seats", function(pseats)
   if public_seats and Game.Self.isOutside() and Game.Self.isOnFoot() and not NETWORK.NETWORK_IS_ACTIVITY_SESSION() and not is_sitting then
-    local near_seat, seat, x_offset = SS.isNearPublicSeat()
+    local near_seat, seat, x_offset, z_offset = SS.isNearPublicSeat()
     if near_seat and Game.Self.isAlive() and not PLAYER.IS_PLAYER_FREE_AIMING(self.get_id())
     and not is_playing_anim and not is_playing_scenario and not ped_grabbed and not vehicle_grabbed
     and not is_handsUp and not isCrouched and not ped_grabbed and not vehicle_grabbed and not is_hiding then
@@ -10111,7 +10172,7 @@ script.register_looped("Public Seats", function(pseats)
             TASK.TASK_PLAY_ANIM(self.get_ped(), "timetable@ron@ig_3_couch", "base", 1.69, 4.0, -1, 33, 1.0, false, false,
               false)
             local bone_index = PED.GET_PED_BONE_INDEX(self.get_ped(), 0)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(self.get_ped(), seat, bone_index, x_offset, -0.6, 1.0, 0.0, 0.0, 180.0, false,
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(self.get_ped(), seat, bone_index, x_offset, -0.6, z_offset, 0.0, 0.0, 180.0, false,
               false, false, false, 20, true, 1)
             pseats:sleep(1000)
             is_sitting, thisSeat = true, seat
@@ -10124,26 +10185,32 @@ script.register_looped("Public Seats", function(pseats)
   end
   if is_sitting then
     if PED.IS_PED_IN_MELEE_COMBAT(self.get_ped()) then
-      ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
-      TASK.CLEAR_PED_TASKS(self.get_ped())
-      is_sitting = false
+      standUp()
     end
     if PED.IS_PED_RAGDOLL(self.get_ped()) then
-      ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
-      TASK.CLEAR_PED_TASKS(self.get_ped())
-      is_sitting = false
+      standUp()
     end
     if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
-      ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
-      TASK.CLEAR_PED_TASKS(self.get_ped())
-      is_sitting = false
+      standUp()
     end
     if not Game.Self.isAlive() then
-      ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
-      TASK.CLEAR_PED_TASKS(self.get_ped())
+      if ENTITY.DOES_ENTITY_EXIST(thisSeat) then
+        ENTITY.FREEZE_ENTITY_POSITION(thisSeat, false)
+        if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(self.get_ped(), thisSeat) then
+          ENTITY.DETACH_ENTITY(self.get_ped(), true, true)
+        end
+        thisSeat = 0
+      end
       is_sitting = false
     end
     if not ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), "timetable@ron@ig_3_couch", "base", 3) then
+      if ENTITY.DOES_ENTITY_EXIST(thisSeat) then
+        ENTITY.FREEZE_ENTITY_POSITION(thisSeat, false)
+        if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(self.get_ped(), thisSeat) then
+          ENTITY.DETACH_ENTITY(self.get_ped(), true, true)
+        end
+        thisSeat = 0
+      end
       is_sitting = false
     else
       Game.showButtonPrompt("Press ~INPUT_PICKUP~ to get up")
@@ -10629,10 +10696,12 @@ script.register_looped("REOPT", function(ro)
   if SS.isKeyJustPressed(keybinds.autokill.code) then
     if autoKill then
       autoKill = false
+      UI.widgetSound("Cancel")
       gui.show_message("Samurai's Scripts", "Auto-Kill Enemies disabled.")
       ro:sleep(100)
     else
       autoKill = true
+      UI.widgetSound("Notif")
       gui.show_success("Samurai's Scripts", "Auto-Kill Enemies enabled.")
       ro:sleep(100)
     end
@@ -10641,14 +10710,30 @@ script.register_looped("REOPT", function(ro)
   if SS.isKeyJustPressed(keybinds.enemiesFlee.code) then
     if runaway then
       runaway = false
+      UI.widgetSound("Cancel")
       gui.show_message("Samurai's Scripts", "Enemies Flee disabled.")
       ro:sleep(100)
     else
       runaway = true
+      UI.widgetSound("Notif")
       gui.show_success("Samurai's Scripts", "Enemies Flee enabled.")
       ro:sleep(100)
     end
     lua_cfg.save("runaway", runaway)
+  end
+  if SS.isKeyJustPressed(keybinds.missl_def.code) then
+    if missiledefense then
+      missiledefense = false
+      UI.widgetSound("Cancel")
+      gui.show_message("Samurai's Scripts", "Missile Defense disabled.")
+      ro:sleep(100)
+    else
+      missiledefense = true
+      UI.widgetSound("Notif")
+      gui.show_success("Samurai's Scripts", "Missile Defense enabled.")
+      ro:sleep(100)
+    end
+    lua_cfg.save("missiledefense", missiledefense)
   end
 end)
 
@@ -10658,7 +10743,10 @@ script.register_looped("PANIK", function(panik)
   and not is_typing and not is_setting_hotkeys and not gui.is_open() and not script.is_active("CELLPHONE_FLASHHAND") then
     panik:sleep(200)
     SS.handle_events()
-    UI.widgetSound("Fail")
+    AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(
+      "ELECTROCUTION", "MISTERK", self.get_pos().x,
+      self.get_pos().y, self.get_pos().z, "SPEECH_PARAMS_FORCE"
+    )
     gui.show_message("PANIK!", "(Ó _ Ò )!!")
   end
 end)
@@ -10694,7 +10782,7 @@ event.register_handler(menu_event.Wndproc, function(hwnd, msg, wParam, lParam)
         if key.just_pressed then
           SS.debug(
             "\10--- Pressed Key ---" .. "\10 ¤ Name:       " .. key.name .. "\10 ¤ Keycode:    " ..
-            lua_Fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit 24 Set: " .. tostring((lParam & (0x1 << 24)) > 0)
+            lua_Fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit 24 Set: " .. tostring((lParam & (0x1 << 24)) ~= 0)
             .. "\10 ¤ SYSKEY:     " .. tostring(msg == WM._SYSKEYDOWN)
           )
         end
