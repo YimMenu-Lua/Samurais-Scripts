@@ -125,6 +125,11 @@
   - **Ejecto Seato Cuz!**
     - Press this button to eject all peds from your vehicle. Currently, this does not work on other players.
 
+- **Custom Paint Jobs:**
+  - Apply a custom paint job to your vehicle from a list of real-life OEM and custom colors.
+    
+    > **NOTE:** To save the custom paint job on your personal vehicle, you have to drive into a modshop and buy something.
+
 - **An implementation of [Flatbed Script](https://github.com/xesdoog/Flatbed-Script):**
   - Short explanation: You can tow anything with a flatbed truck. If the vehicle you're towing is occupied, you'll still tow it and kidnap whoever is sitting in it. Note that kidnapping players could sometimes log errors and cause issues *(may even crash your game)*. Also you can't tow players who have protections.
 
