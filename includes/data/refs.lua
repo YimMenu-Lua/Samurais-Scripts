@@ -1158,7 +1158,6 @@ custom_paints_T = {
   {name = "Maxi Pad Blue",                             color = "#36589A", pearl = 112, matte = false},
   {name = "Bikini Pearl Blue",                         color = "#002533", pearl = 68,  matte = false}, -- surf blue pearl
   {name = "Lavender Blue",                             color = "#485D78", pearl = 67,  matte = false},
-  {name = "Bikini Pearl Blue",                         color = "#002533", pearl = 67,  matte = false},
   {name = "Crayon",                                    color = "#9693A1", pearl = 10,  matte = false}, -- cast iron silver pearl
   {name = "Light Orange",                              color = "#C45C33", pearl = 0,   matte = false},
   {name = "Seawash",                                   color = "#455C56", pearl = 0,   matte = false},
@@ -1193,7 +1192,7 @@ custom_paints_T = {
   {name = "Oak Green (Porsche)",                       color = "#0F1916", pearl = 52,  matte = false}, -- olive green pearl
   {name = "Caribbean Blue",                            color = "#1f375b", pearl = 87,  matte = false}, -- light blue pearl
   {name = "Hyazinth Red",                              color = "#580101", pearl = 0,   matte = false},
-  {name = "Vouge Silver",                              color = "#646E7A", pearl = 4,   matte = false},
+  {name = "Vogue Silver",                              color = "#646E7A", pearl = 4,   matte = false},
   {name = "Laranja Bittersweet",                       color = "#AC2612", pearl = 0,   matte = false},
   {name = "Faggio (Alfa Romeo)",                       color = "#15060A", pearl = 0,   matte = false},
   {name = "Vintage Dodge Cream",                       color = "#A19072", pearl = 0,   matte = false},
@@ -1239,7 +1238,7 @@ custom_paints_T = {
   {name = "Ipanema Brown (Audi)",                      color = "#452505", pearl = 36,  matte = false}, -- sunrise orange pearl
   {name = "Shadow Grey",                               color = "#181E27", pearl = 7,   matte = false},
   {name = "Ferrari Rosso 70 Anni",                     color = "#60020C", pearl = 29,  matte = false},
-  {name = "Lamnorghini Verde Faunus",                  color = "#78AA14", pearl = 4,   matte = false},
+  {name = "Lamborghini Verde Faunus",                  color = "#78AA14", pearl = 4,   matte = false},
   {name = "Giallo Medio",                              color = "#43494f", pearl = 5,   matte = false},
   {name = "Silver Sand",                               color = "#7C766D", pearl = 0,   matte = false},
   {name = "Dark Highland Green",                       color = "#0A1013", pearl = 54,  matte = false},

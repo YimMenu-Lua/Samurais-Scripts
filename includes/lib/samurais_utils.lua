@@ -1230,17 +1230,17 @@ SS                          = {
     local CPlayerInfo         = pedPtr:add(0x10A8):deref()
     local m_ped_type          = pedPtr:add(0x1098) -- uint32_t
     local m_ped_task_flag     = pedPtr:add(0x144B) -- uint8_t
-    local m_steatbelt         = pedPtr:add(0x143C):get_word() -- uint8_t
+    local m_seatbelt         = pedPtr:add(0x143C):get_word() -- uint8_t
     ped_info_T.ped_type       = m_ped_type:get_dword()
     ped_info_T.task_flag      = m_ped_task_flag:get_word()
     ped_info_T.swim_speed_ptr = CPlayerInfo:add(0x01C8)
     ped_info_T.run_speed_ptr  = CPlayerInfo:add(0x0D50)
     ped_info_T.velocity_ptr   = CPlayerInfo:add(0x0300)
-    ped_info_T.canPedRagoll   = function()
+    ped_info_T.canPedRagdoll   = function()
       return (ped_info_T.ped_type & 0x20) > 0
     end;
     ped_info_T.hasSeatbelt    = function()
-      return (m_steatbelt & 0x3) > 0
+      return (m_seatbelt & 0x3) > 0
     end;
     ped_info_T.getGameState   = function()
       local m_game_state = CPlayerInfo:add(0x0230):get_dword()
