@@ -1228,9 +1228,20 @@ SS                          = {
     local ped_info_T          = {}
     local pedPtr              = memory.handle_to_ptr(ped)
     local CPlayerInfo         = pedPtr:add(0x10A8):deref()
+    local m_ped_type          = pedPtr:add(0x1098) -- uint32_t
+    local m_ped_task_flag     = pedPtr:add(0x144B) -- uint8_t
+    local m_steatbelt         = pedPtr:add(0x143C):get_word() -- uint8_t
+    ped_info_T.ped_type       = m_ped_type:get_dword()
+    ped_info_T.task_flag      = m_ped_task_flag:get_word()
     ped_info_T.swim_speed_ptr = CPlayerInfo:add(0x01C8)
     ped_info_T.run_speed_ptr  = CPlayerInfo:add(0x0D50)
     ped_info_T.velocity_ptr   = CPlayerInfo:add(0x0300)
+    ped_info_T.canPedRagoll   = function()
+      return (ped_info_T.ped_type & 0x20) > 0
+    end;
+    ped_info_T.hasSeatbelt    = function()
+      return (m_steatbelt & 0x3) > 0
+    end;
     ped_info_T.getGameState   = function()
       local m_game_state = CPlayerInfo:add(0x0230):get_dword()
       for _, v in ipairs(enumGameState) do
@@ -2168,6 +2179,23 @@ Game                        = {
     ---@return boolean
     isWeaponized = function()
       return VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(self.get_veh())
+    end,
+
+    -- Applies a custom paint job to the vehicle
+    setCustomPaint = function(vehicle, color, pearl, matte_flag)
+      local paintType = 1
+      if ENTITY.DOES_ENTITY_EXIST(vehicle) then
+        if matte_flag then
+          paintType = 3
+        end
+        local r, g, b = lua_Fn.hexToRGB(color)
+        VEHICLE.SET_VEHICLE_MOD_KIT(vehicle, 0)
+        VEHICLE.SET_VEHICLE_MOD_COLOR_1(vehicle, paintType, 0, pearl)
+        VEHICLE.SET_VEHICLE_MOD_COLOR_2(vehicle, paintType, 0)
+        VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, r, g, b)
+        VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, r, g, b)
+        VEHICLE.SET_VEHICLE_EXTRA_COLOURS(vehicle, pearl, 0)
+      end
     end,
   },
 

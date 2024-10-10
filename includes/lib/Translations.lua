@@ -2555,6 +2555,42 @@ Labels = {
         { iso = "pt-BR", text = "Um atraso global para todas as opções de preenchimento automático no Business Manager. O atraso é em milissegundos." },
         { iso = "ru-RU", text = "Глобальная задержка для всех вариантов автозаполнения в Business Manager. Задержка в миллисекундах." },
     },
+
+    ["remove_matte_CB"] = {
+        { iso = "en-US", text = "Remove Matte Finish" },
+        { iso = "de-DE", text = "Mattes Finish entfernen" },
+        { iso = "fr-FR", text = "Supprimer la finition mate" },
+        { iso = "it-IT", text = "Rimuovi finitura opaca" },
+        { iso = "pt-BR", text = "Remover acabamento fosco" },
+        { iso = "ru-RU", text = "Удалить матовую отделку" },
+    },
+
+    ["apply_matte_CB"] = {
+        { iso = "en-US", text = "Apply Matte Finish" },
+        { iso = "de-DE", text = "Mattes Finish auftragen" },
+        { iso = "fr-FR", text = "Appliquer la finition mate" },
+        { iso = "it-IT", text = "Applicare la finitura opaca" },
+        { iso = "pt-BR", text = "Aplicar acabamento fosco" },
+        { iso = "ru-RU", text = "Нанесите матовое покрытие" },
+    },
+
+    ["apply_matte_tt"] = {
+        { iso = "en-US", text = "Applies/removes a matte finish to/from the selected paint job." },
+        { iso = "de-DE", text = "Fügt dem ausgewählten Lack eine matte Oberfläche hinzu bzw. entfernt sie." },
+        { iso = "fr-FR", text = "Applique/supprime une finition mate sur/de la peinture sélectionnée." },
+        { iso = "it-IT", text = "Applica/rimuove una finitura opaca alla/dalla verniciatura selezionata." },
+        { iso = "pt-BR", text = "Aplica/remove um acabamento fosco na/da pintura selecionada." },
+        { iso = "ru-RU", text = "Наносит/удаляет матовое покрытие на выбранную покраску." },
+    },
+
+    ["save_paint_tt"] = {
+        { iso = "en-US", text = "To save this color on a personal vehicle, go to a modshop and buy something like window tint or plate style or anything." },
+        { iso = "de-DE", text = "Um diese Farbe bei einem Privatfahrzeug zu speichern, gehen Sie zu LSC und kaufen Sie etwas wie eine Fenstertönung oder eine Kennzeichenart oder so etwas." },
+        { iso = "fr-FR", text = "Pour conserver cette couleur sur un véhicule personnel, rendez-vous chez LSC et achetez quelque chose comme une teinte de vitre ou un style de plaque d'immatriculation ou autre." },
+        { iso = "it-IT", text = "Per conservare questo colore su un veicolo personale, recatevi da LSC e acquistate qualcosa come una pellicola per i finestrini, una targhetta o qualsiasi altra cosa." },
+        { iso = "pt-BR", text = "Para salvar essa cor em um veículo pessoal, vá até a LSC e compre algo como película para janelas, estilo de placa ou qualquer coisa." },
+        { iso = "ru-RU", text = "Чтобы сохранить этот цвет на личном автомобиле, зайдите в LSC и купите что-нибудь вроде тонировки для окон или наклейки на номерные знаки или что-нибудь еще." },
+    },
 }
 
 

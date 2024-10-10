@@ -1104,3 +1104,150 @@ modshop_script_names = {
   "tuner_property_carmod",
   -- "vinewood_premium_garage_carmod",
 }
+
+custom_paints_T = {
+  {name = "AMG Matte Gray",                            color = "#171717", pearl = 7,   matte = true},  -- shadow silver pearl
+  {name = "AMG Matte Light Gray",                      color = "#2B2B2B", pearl = 8,   matte = true},  -- stone silver pearl
+  {name = "AMG GTR Green Hell Magno",                  color = "#00661F", pearl = 5,   matte = true},  -- bluish silver pearl
+  {name = "AMG GTR Yosemite Blue Magno",               color = "#142942", pearl = 63,  matte = true},  -- saxon blue pearl
+  {name = "BMW Portimao Blue",                         color = "#000738", pearl = 64,  matte = false}, -- blue pearl
+  {name = "Pure Black",                                color = "#000000", pearl = 0,   matte = false}, -- black pearl
+  {name = "TOP SECRET Japan",                          color = "#5A4B3C", pearl = 107, matte = false}, -- cream get the money
+  {name = "TOP SECRET Japan Alt Gold (GTR R32 650R)",  color = "#524A26", pearl = 90,  matte = false}, -- bronze pearl
+  {name = "TOP SECRET Japan Bright Gold (Supra MKIV)", color = "#724C25", pearl = 97,  matte = false}, -- saddle Brown pearl
+  {name = "TOP SECRET Japan Light Gold",               color = "#524A26", pearl = 90,  matte = false},
+  {name = "Vantablack",                                color = "#000100", pearl = 0,   matte = false},
+  {name = "Pure White",                                color = "#FFFFFF", pearl = 112, matte = false}, -- frost white pearl
+  {name = "Off-White",                                 color = "#999999", pearl = 0,   matte = false},
+  {name = "HERMES White",                              color = "#BAB6A0", pearl = 0,   matte = false},
+  {name = "Straw Beige",                               color = "#615F55", pearl = 0,   matte = false},
+  {name = "Honey Beige",                               color = "#8C7C68", pearl = 0,   matte = false},
+  {name = "Saw Dust Beige",                            color = "#FFA057", pearl = 107, matte = false},
+  {name = "Lamborghini Tenzo Milenio Gray",            color = "#1B1D26", pearl = 8,   matte = false},
+  {name = "Purple Gray",                               color = "#121015", pearl = 8,   matte = false},
+  {name = "BMW Austin Yellow I",                       color = "#745613", pearl = 105, matte = false}, -- sandy brown pearl
+  {name = "BMW Austin Yellow II",                      color = "#584E1D", pearl = 91,  matte = false}, -- dew yellow pearl
+  {name = "BMW Sao Paulo Yellow",                      color = "#D0D53D", pearl = 91,  matte = false},
+  {name = "Better Race Yellow",                        color = "#FFD700", pearl = 0,   matte = false},
+  {name = "Bay Leaf Green",                            color = "#7BA790", pearl = 0,   matte = false},
+  {name = "British Racing Green",                      color = "#000F0E", pearl = 50,  matte = false}, -- racing green pearl
+  {name = "Lamborghini Verde Gea Lucido",              color = "#353517", pearl = 97,  matte = false},
+  {name = "Spring Leaves (Initial-D Iketanis S13)",    color = "#57876B", pearl = 4,   matte = false}, -- silver pearl
+  {name = "Trippy Green",                              color = "#00FF7F", pearl = 92,  matte = false}, -- lime green pearl
+  {name = "Pfister Green",                             color = "#54AB3C", pearl = 90,  matte = false},
+  {name = "Verde Francesca Green",                     color = "#315447", pearl = 9,   matte = false}, -- midnight silver pearl
+  {name = "Verde Francesca Green (Ferrari)",           color = "#23403F", pearl = 3,   matte = false}, -- dark steel pearl
+  {name = "Willow Green",                              color = "#607E65", pearl = 0,   matte = false},
+  {name = "Chameleon",                                 color = "#0D020D", pearl = 54,  matte = false}, -- gasoline green pearl
+  {name = "Cyan",                                      color = "#00FFFF", pearl = 73,  matte = false}, -- ultra blue pearl
+  {name = "Bugatti Crème de Menthe",                   color = "#547270", pearl = 112, matte = false},
+  {name = "Bugatti Champagne",                         color = "#4E443C", pearl = 107, matte = false},
+  {name = "Bugatti Exposed Blue Carbon",               color = "#030811", pearl = 0,   matte = false},
+  {name = "Bugatti Exposed Red Carbon",                color = "#250D12", pearl = 34,  matte = false}, -- cabernet red pearl
+  {name = "Bugatti Ladybug",                           color = "#35000C", pearl = 29,  matte = false}, -- formula red pearl
+  {name = "Bugatti Petrol Blue",                       color = "#203E5D", pearl = 6,   matte = false}, -- rolled steel pearl
+  {name = "Bugatti Quartz",                            color = "#909EC0", pearl = 67,  matte = false}, -- diamond blue pearl
+  {name = "Bugatti Steel Blue",                        color = "#101527", pearl = 5,   matte = false}, -- bluish silver pearl
+  {name = "French Racing Blue",                        color = "#003792", pearl = 11,  matte = false}, -- anthracite black pearl
+  {name = "Police Blue",                               color = "#2A77A1", pearl = 0,   matte = false},
+  {name = "Bright Blue",                               color = "#223BA1", pearl = 0,   matte = false},
+  {name = "Deep Sea Blue",                             color = "#0A1E3E", pearl = 64,  matte = false},
+  {name = "Brighter Midnight Blue",                    color = "#000128", pearl = 0,   matte = false},
+  {name = "Beautiful Blue",                            color = "#214FC6", pearl = 73,  matte = false},
+  {name = "Aqua Pearl Blue",                           color = "#05C1FF", pearl = 64,  matte = false},
+  {name = "Maxi Pad Blue",                             color = "#36589A", pearl = 112, matte = false},
+  {name = "Bikini Pearl Blue",                         color = "#002533", pearl = 68,  matte = false}, -- surf blue pearl
+  {name = "Lavender Blue",                             color = "#485D78", pearl = 67,  matte = false},
+  {name = "Bikini Pearl Blue",                         color = "#002533", pearl = 67,  matte = false},
+  {name = "Crayon",                                    color = "#9693A1", pearl = 10,  matte = false}, -- cast iron silver pearl
+  {name = "Light Orange",                              color = "#C45C33", pearl = 0,   matte = false},
+  {name = "Seawash",                                   color = "#455C56", pearl = 0,   matte = false},
+  {name = "Hot Pink",                                  color = "#FF05BE", pearl = 0,   matte = false},
+  {name = "Cassis Pink",                               color = "#31222A", pearl = 136, matte = false}, -- salmon pink pearl
+  {name = "Kisama Pink",                               color = "#990F36", pearl = 0,   matte = false},
+  {name = "Viola Beast Pink",                          color = "#2E000B", pearl = 137, matte = false}, -- pfister pink pearl
+  {name = "Bright Wine Red",                           color = "#280000", pearl = 27,  matte = false}, -- red pearl
+  {name = "Coca Cola Red",                             color = "#A5121C", pearl = 0,   matte = false},
+  {name = "Chromeo Red",                               color = "#350000", pearl = 35,  matte = false}, -- candy red pearl
+  {name = "Rosso Siviglia",                            color = "#57000C", pearl = 27,  matte = false},
+  {name = "Rosso Corsa",                               color = "#D40000", pearl = 28,  matte = false}, -- torino red pearl
+  {name = "Millenium Jade",                            color = "#3B3F31", pearl = 102, matte = false}, -- woodbench brown pearl
+  {name = "Copper Gold",                               color = "#5A4441", pearl = 136, matte = false},
+  {name = "Gold Taipei",                               color = "#7D4946", pearl = 99,  matte = false}, -- straw beige pearl
+  {name = "Olympic Gold",                              color = "#706546", pearl = 104, matte = false}, -- sienna brown pearl
+  {name = "Sandy Gold",                                color = "#504942", pearl = 105, matte = false},
+  {name = "Mulberry",                                  color = "#240719", pearl = 137, matte = false},
+  {name = "Onyx",                                      color = "#353839", pearl = 103, matte = false}, -- beachwood brown pearl
+  {name = "Amethyst",                                  color = "#27253C", pearl = 65,  matte = false}, -- mariner blue pearl
+  {name = "Koeniggsegg AAden Purple",                  color = "#0C080C", pearl = 96,  matte = false}, -- chocolate brown pearl
+  {name = "Koeniggsegg Zjin Purple",                   color = "#120119", pearl = 145, matte = false}, -- schafter purple pearl
+  {name = "Viola Ophelia Purple",                      color = "#1A000F", pearl = 7,   matte = false},
+  {name = "Nismo Gray",                                color = "#191919", pearl = 4,   matte = false},
+  {name = "Pagani Brown",                              color = "#201913", pearl = 94,  matte = false}, -- feltzer brown pearl
+  {name = "Tootsie Roll Brown",                        color = "#1A1110", pearl = 1,   matte = false}, -- graphite pearl
+  {name = "McLaren Sage Green",                        color = "#1A1F15", pearl = 99,  matte = false},
+  {name = "McLaren K-Purple",                          color = "#13062C", pearl = 63,  matte = false}, -- saxon blue pearl
+  {name = "Pascha Red (Porsche)",                      color = "#1A0102", pearl = 0,   matte = false},
+  {name = "Silver Tempest (Bentley)",                  color = "#191C1E", pearl = 7,   matte = false},
+  {name = "Raven Black",                               color = "#0C0C0C", pearl = 0,   matte = false},
+  {name = "Oak Green (Porsche)",                       color = "#0F1916", pearl = 52,  matte = false}, -- olive green pearl
+  {name = "Caribbean Blue",                            color = "#1f375b", pearl = 87,  matte = false}, -- light blue pearl
+  {name = "Hyazinth Red",                              color = "#580101", pearl = 0,   matte = false},
+  {name = "Vouge Silver",                              color = "#646E7A", pearl = 4,   matte = false},
+  {name = "Laranja Bittersweet",                       color = "#AC2612", pearl = 0,   matte = false},
+  {name = "Faggio (Alfa Romeo)",                       color = "#15060A", pearl = 0,   matte = false},
+  {name = "Vintage Dodge Cream",                       color = "#A19072", pearl = 0,   matte = false},
+  {name = "BMW Baby Blue",                             color = "#3961B2", pearl = 3,   matte = false},
+  {name = "BMW Atlantis Blue I",                       color = "#002845", pearl = 54,  matte = false},
+  {name = "BMW Atlantis Blue II",                      color = "#02334E", pearl = 54,  matte = false},
+  {name = "BMW Alpina Purple",                         color = "#0E0A19", pearl = 72,  matte = false}, -- spinnaker purple pearl
+  {name = "BMW Brilliant Red",                         color = "#BB000A", pearl = 9,   matte = false},
+  {name = "BMW Fire Orange (M3 E92)",                  color = "#8A2B03", pearl = 1,   matte = false},
+  {name = "BMW Fire Red",                              color = "#A70A00", pearl = 0,   matte = false},
+  {name = "BMW Hockenheim Silver",                     color = "#7885A2", pearl = 7,   matte = false},
+  {name = "BMW Messing",                               color = "#1F2018", pearl = 97,  matte = false},
+  {name = "BMW Java Green I",                          color = "#16591A", pearl = 103, matte = false},
+  {name = "BMW Java Green II",                         color = "#1A5525", pearl = 94,  matte = true},
+  {name = "BMW Phoenix Yellow",                        color = "#7C6D0C", pearl = 93,  matte = false}, -- champagne pearl
+  {name = "Long Beach Blue",                           color = "#012349", pearl = 54,  matte = false},
+  {name = "Marina Blue",                               color = "#051151", pearl = 64,  matte = false},
+  {name = "Purple Silk",                               color = "#1F0F25", pearl = 145, matte = false},
+  {name = "Ferrari Alluminio Opaco",                   color = "#6A7679", pearl = 0,   matte = true},
+  {name = "Ferrari Avorio",                            color = "#989180", pearl = 0,   matte = false},
+  {name = "Argento Nurburgring",                       color = "#4D576A", pearl = 4,   matte = false},
+  {name = "Azzurro California I",                      color = "#274059", pearl = 87,  matte = false},
+  {name = "Azzurro California II",                     color = "#36506B", pearl = 69,  matte = false}, -- nautical blue pearl
+  {name = "Azzurro Dino",                              color = "#082BA2", pearl = 64,  matte = false},
+  {name = "Azzurro Monaco",                            color = "#0F1433", pearl = 62,  matte = false}, -- dark blue pearl
+  {name = "Azzurro Vela",                              color = "#000D32", pearl = 87,  matte = false},
+  {name = "BP Green",                                  color = "#013527", pearl = 0,   matte = false},
+  {name = "Bianco Avus I",                             color = "#ACB0B2", pearl = 0,   matte = false},
+  {name = "Bianco Avus II",                            color = "#DFF5FF", pearl = 112, matte = false},
+  {name = "Bianco Fuji",                               color = "#B8BABB", pearl = 0,   matte = false},
+  {name = "Bianco Italia I",                           color = "#C3BCB9", pearl = 11,  matte = false},
+  {name = "Bianco Italia II",                          color = "#ABAEB0", pearl = 0,   matte = false},
+  {name = "Abu Dhabi Blue",                            color = "#0B1B27", pearl = 63,  matte = false},
+  {name = "Blu Corsa",                                 color = "#132BB1", pearl = 73,  matte = false},
+  {name = "Portofino Blue",                            color = "#000711", pearl = 64,  matte = false},
+  {name = "Vegas Yellow",                              color = "#916E1D", pearl = 11,  matte = false},
+  {name = "Honey Gold",                                color = "#6B4821", pearl = 0,   matte = false},
+  {name = "Montana Green",                             color = "#6B4821", pearl = 69,  matte = false},
+  {name = "Pagani LH Purple",                          color = "#6B4821", pearl = 52,  matte = false},
+  {name = "Jade Green (Porsche)",                      color = "#1B504C", pearl = 0,   matte = false},
+  {name = "Imperial Maroon",                           color = "#4F0F13", pearl = 0,   matte = false},
+  {name = "Mexico Blue (Porsche)",                     color = "#003eb3", pearl = 0,   matte = false},
+  {name = "Ipanema Brown (Audi)",                      color = "#452505", pearl = 36,  matte = false}, -- sunrise orange pearl
+  {name = "Shadow Grey",                               color = "#181E27", pearl = 7,   matte = false},
+  {name = "Ferrari Rosso 70 Anni",                     color = "#60020C", pearl = 29,  matte = false},
+  {name = "Lamnorghini Verde Faunus",                  color = "#78AA14", pearl = 4,   matte = false},
+  {name = "Giallo Medio",                              color = "#43494f", pearl = 5,   matte = false},
+  {name = "Silver Sand",                               color = "#7C766D", pearl = 0,   matte = false},
+  {name = "Dark Highland Green",                       color = "#0A1013", pearl = 54,  matte = false},
+  {name = "Cascade Green '60",                         color = "#415349", pearl = 6,   matte = false},
+  {name = "Magma Orange",                              color = "#F12702", pearl = 0,   matte = false},
+  {name = "Grabber Blue",                              color = "#033663", pearl = 0,   matte = false},
+  {name = "Verde Pampa",                               color = "#64642A", pearl = 0,   matte = false},
+  {name = "Midori Green",                              color = "#23907D", pearl = 5,   matte = false},
+  {name = "Ascot Fawn",                                color = "#7A736E", pearl = 0,   matte = false},
+  {name = "McLaren Tarocco Orange",                    color = "#F13C08", pearl = 37,  matte = false},
+}

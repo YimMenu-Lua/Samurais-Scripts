@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.3.2' -- v1.3.2
+SCRIPT_VERSION = '1.3.3'
 TARGET_BUILD   = '3337'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -378,6 +378,7 @@ ducking_in_car         = false
 hiding_in_boot         = false
 hiding_in_dumpster     = false
 SS_debug               = false
+matte_overwrite        = false
 debug_counter          = 0
 flag                   = 0
 grp_anim_index         = 0
@@ -412,6 +413,7 @@ katana                 = 0
 boot_vehicle           = 0
 thisDumpster           = 0
 thisSeat               = 0
+custom_paint_index     = 0
 drift_multiplier       = 1
 quote_alpha            = 1
 pedthrowF              = 10
@@ -424,6 +426,7 @@ currentWmvmt           = ""
 search_term            = ""
 smokeHex               = ""
 random_quote           = ""
+custom_paints_sq       = ""
 filteredPlayers        = {}
 recently_played_a      = {}
 selected_sound         = {}
@@ -448,7 +451,7 @@ default_tire_smoke     = {
   g = 255,
   b = 255,
 }
-default_handling_flags = unk
+default_handling_flags = nil
 
 
 SS.check_kb_keybinds()
@@ -2938,6 +2941,72 @@ vehicle_tab:add_imgui(function()
       end)
     end
     ImGui.End()
+  end
+end)
+
+custom_paints_tab = vehicle_tab:add_tab("Custom Paint Jobs")
+local function sortCustomPaints()
+  filteredPaints = {}
+  for _, v in ipairs(custom_paints_T) do
+    if string.find(string.lower(v.name), custom_paints_sq) then
+      table.insert(filteredPaints, v)
+    end
+  end
+  table.sort(filteredPaints, function(a, b)
+    return a.name < b.name
+  end)
+end
+local function displayCustomPaints()
+  sortCustomPaints()
+  local customPaintNames = {}
+  for _, v in ipairs(filteredPaints) do
+    table.insert(customPaintNames, v.name)
+  end
+  custom_paint_index, isChanged = ImGui.ListBox("##customPaintsList", custom_paint_index, customPaintNames, #filteredPaints)
+end
+custom_paints_tab:add_imgui(function()
+  if Game.Self.isOnFoot() then
+    ImGui.Dummy(1, 5);ImGui.Text(translateLabel("getinveh"))
+  else
+    ImGui.PushItemWidth(420)
+    custom_paints_sq, cpsqUsed = ImGui.InputTextWithHint("##custompaintssq", "Search", custom_paints_sq, 64)
+    if ImGui.IsItemActive() then
+      is_typing = true
+    else
+      is_typing = false
+    end
+    displayCustomPaints()
+    ImGui.PopItemWidth()
+    local selected_paint = filteredPaints[custom_paint_index + 1]
+    local matte_flag, overwrite_text = false, ""
+    if selected_paint ~= nil then
+      if matte_overwrite then
+        matte_flag = not selected_paint.matte
+      else
+        matte_flag = selected_paint.matte
+      end
+      if selected_paint.matte then
+        overwrite_text = translateLabel("remove_matte_CB")
+      else
+        overwrite_text = translateLabel("apply_matte_CB")
+      end
+    end
+    ImGui.Spacing()
+    ImGui.BeginDisabled(selected_paint == nil)
+    matte_overwrite, movwUsed = ImGui.Checkbox(overwrite_text, matte_overwrite)
+    UI.toolTip(false, translateLabel("apply_matte_tt"))
+    if movwUsed then
+      UI.widgetSound("Nav2")
+    end
+    ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
+    if ImGui.Button(translateLabel("generic_confirm_btn"), 80, 40) then
+      UI.widgetSound("Select")
+      Game.Vehicle.setCustomPaint(current_vehicle, selected_paint.color, selected_paint.pearl, matte_flag) -- no I don't.
+    end
+    if selected_paint ~= nil then
+      UI.toolTip(false, translateLabel("save_paint_tt"))
+    end
+    ImGui.EndDisabled()
   end
 end)
 
