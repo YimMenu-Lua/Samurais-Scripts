@@ -2556,6 +2556,14 @@ Labels = {
         { iso = "ru-RU", text = "Глобальная задержка для всех вариантов автозаполнения в Business Manager. Задержка в миллисекундах." },
     },
 
+    ["sort_by_color_txt"] = {
+        { iso = "en-US", text = "Sort By Color" },
+        { iso = "de-DE", text = "Nach Farbe sortieren" },
+        { iso = "fr-FR", text = "Trier Par Couleur" },
+        { iso = "it-IT", text = "Ordina Per Colore" },
+        { iso = "pt-BR", text = "Ordenar Por Cor" },
+        { iso = "ru-RU", text = "Сортировать по цвету" },
+    },
     ["remove_matte_CB"] = {
         { iso = "en-US", text = "Remove Matte Finish" },
         { iso = "de-DE", text = "Mattes Finish entfernen" },

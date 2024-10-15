@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.3.3'
+SCRIPT_VERSION = '1.3.4'
 TARGET_BUILD   = '3337'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -378,7 +378,7 @@ ducking_in_car         = false
 hiding_in_boot         = false
 hiding_in_dumpster     = false
 SS_debug               = false
-matte_overwrite        = false
+mf_overwrite        = false
 debug_counter          = 0
 flag                   = 0
 grp_anim_index         = 0
@@ -414,6 +414,7 @@ boot_vehicle           = 0
 thisDumpster           = 0
 thisSeat               = 0
 custom_paint_index     = 0
+sortby_idx             = 0
 drift_multiplier       = 1
 quote_alpha            = 1
 pedthrowF              = 10
@@ -2143,7 +2144,7 @@ local function displayVehNames()
 end
 
 local function resetLastVehState(s)
-  if ENTITY.DOES_ENTITY_EXIST(las_vehicle) then
+  if last_vehicle > 0 and ENTITY.DOES_ENTITY_EXIST(last_vehicle) then
     AUDIO.SET_VEHICLE_RADIO_LOUD(last_vehicle, false)
     if not has_custom_tires then
       VEHICLE.TOGGLE_VEHICLE_MOD(current_vehicle, 20, false)
@@ -2945,11 +2946,35 @@ vehicle_tab:add_imgui(function()
 end)
 
 custom_paints_tab = vehicle_tab:add_tab("Custom Paint Jobs")
+local sortByColors = {
+  "All",
+  "Beige",
+  "Black",
+  "Blue",
+  "Brown",
+  "Gold",
+  "Green",
+  "Grey",
+  "Orange",
+  "Pink",
+  "Purple",
+  "Red",
+  "White",
+  "Yellow",
+}
 local function sortCustomPaints()
   filteredPaints = {}
   for _, v in ipairs(custom_paints_T) do
-    if string.find(string.lower(v.name), custom_paints_sq) then
-      table.insert(filteredPaints, v)
+    if sortby_idx == 0 then
+      if string.find(string.lower(v.name), string.lower(custom_paints_sq)) then
+        table.insert(filteredPaints, v)
+      end
+    else
+      if string.find(string.lower(v.name), string.lower(sortByColors[sortby_idx + 1])) then
+        if string.find(string.lower(v.name), string.lower(custom_paints_sq)) then
+          table.insert(filteredPaints, v)
+        end
+      end
     end
   end
   table.sort(filteredPaints, function(a, b)
@@ -2968,6 +2993,15 @@ custom_paints_tab:add_imgui(function()
   if Game.Self.isOnFoot() then
     ImGui.Dummy(1, 5);ImGui.Text(translateLabel("getinveh"))
   else
+    ImGui.BulletText(translateLabel("sort_by_color_txt")); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+    ImGui.PushItemWidth(180)
+    sortby_idx, sortbyUsed = ImGui.Combo("##sortpaintjobs", sortby_idx, sortByColors, #sortByColors)
+    ImGui.PopItemWidth(); ImGui.SameLine()
+    if filteredPaints ~= nil then
+      ImGui.Text("[ " .. tostring(#filteredPaints) .. " ]")
+    else
+      ImGui.Text("[ 0 ]")
+    end
     ImGui.PushItemWidth(420)
     custom_paints_sq, cpsqUsed = ImGui.InputTextWithHint("##custompaintssq", "Search", custom_paints_sq, 64)
     if ImGui.IsItemActive() then
@@ -2978,14 +3012,14 @@ custom_paints_tab:add_imgui(function()
     displayCustomPaints()
     ImGui.PopItemWidth()
     local selected_paint = filteredPaints[custom_paint_index + 1]
-    local matte_flag, overwrite_text = false, ""
+    local mf, overwrite_text = false, ""
     if selected_paint ~= nil then
-      if matte_overwrite then
-        matte_flag = not selected_paint.matte
+      if mf_overwrite then
+        mf = not selected_paint.m
       else
-        matte_flag = selected_paint.matte
+        mf = selected_paint.m
       end
-      if selected_paint.matte then
+      if selected_paint.m then
         overwrite_text = translateLabel("remove_matte_CB")
       else
         overwrite_text = translateLabel("apply_matte_CB")
@@ -2993,20 +3027,20 @@ custom_paints_tab:add_imgui(function()
     end
     ImGui.Spacing()
     ImGui.BeginDisabled(selected_paint == nil)
-    matte_overwrite, movwUsed = ImGui.Checkbox(overwrite_text, matte_overwrite)
+    mf_overwrite, movwUsed = ImGui.Checkbox(overwrite_text, mf_overwrite)
     UI.toolTip(false, translateLabel("apply_matte_tt"))
     if movwUsed then
       UI.widgetSound("Nav2")
     end
     ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
-    if ImGui.Button(translateLabel("generic_confirm_btn"), 80, 40) then
+    if ImGui.Button(translateLabel("generic_confirm_btn"), 80, 40) and selected_paint ~= nil then -- fine, sumneko! I submit to your needs.
       UI.widgetSound("Select")
-      Game.Vehicle.setCustomPaint(current_vehicle, selected_paint.color, selected_paint.pearl, matte_flag) -- no I don't.
+      Game.Vehicle.setCustomPaint(current_vehicle, selected_paint.hex, selected_paint.p, mf)
     end
+    ImGui.EndDisabled()
     if selected_paint ~= nil then
       UI.toolTip(false, translateLabel("save_paint_tt"))
     end
-    ImGui.EndDisabled()
   end
 end)
 
@@ -7515,15 +7549,6 @@ hotkeys_tab:add_imgui(function()
   ImGui.EndTabBar()
 end)
 
---[[
--- local function var_reset()
---   resetOnSave()
---   isCrouched = false; is_handsUp = false; anim_music = false; is_playing_radio = false; npc_blips = {}; spawned_npcs = {}; plyrProps = {}; npcProps = {}; selfPTFX = {}; npcPTFX = {}; curr_playing_anim = {}; is_playing_anim = false; is_playing_scenario = false; tab1Sound = true; tab2Sound = true; tab3Sound = true; actions_switch = 0; actions_search =
---   ""; currentMvmt = ""; currentStrf = ""; currentWmvmt = ""; aimBool = false; HashGrabber = false; drew_laser = false; Entity = 0; laserPtfx_T = {}; sound_btn_off = false; tire_smoke = false; purge_started = false; nos_started = false; twostep_started = false; open_sounds_window = false; started_lct = false; launch_active = false; started_popSound = false; started_popSound2 = false; timerA = 0; timerB = 0; defaultXenon = 0; start_rgb_loop = false; vehSound_index = 0; smokePtfx_t = {}; nosptfx_t = {}; purgePtfx_t = {}; lctPtfx_t = {}; popSounds_t = {}; popsPtfx_t = {}; attached_vehicle = 0; tow_xAxis = 0.0; tow_yAxis = 0.0; tow_zAxis = 0.0; pedGrabber = false; ped_grabbed = false;; vehicleGrabber = false; vehicle_grabbed = false; carpool = false; show_npc_veh_ctrls = false; stop_searching = false; hijack_started = false; grp_anim_index = 0; attached_ped = 0; grabbed_veh = 0; thisVeh = 0; pedthrowF = 10; propName =
---   ""; invalidType = ""; preview = false; is_drifting = false; previewLoop = false; activeX = false; activeY = false; activeZ = false; rotX = false; rotY = false; rotZ = false; attached = false; attachToSelf = false; attachToVeh = false; previewStarted = false; isChanged = false; prop = 0; propHash = 0; os_switch = 0; prop_index = 0; objects_index = 0; spawned_index = 0; selectedObject = 0; selected_bone = 0; previewEntity = 0; currentObjectPreview = 0; attached_index = 0; zOffset = 0; spawned_props = {}; spawnedNames = {}; filteredSpawnNames = {}; selfAttachments = {}; selfAttachNames = {}; vehAttachments = {}; vehAttachNames = {}; filteredVehAttachNames = {}; filteredAttachNames = {}; missiledefense = false;
--- end
-]]
-
 
 --[[
     *Threads*
@@ -7759,11 +7784,8 @@ end)
 ]]
 script.register_looped("self features", function(script)
   -- Crouch instead of sneak
-  if Game.Self.isOnFoot() and not Game.Self.isInWater() and not Game.Self.is_ragdoll() and not gui.is_open() then
-    if replaceSneakAnim and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario
-      and not is_typing and not is_sitting and not is_setting_hotkeys and not is_hiding then
-      if not isCrouched and PAD.IS_DISABLED_CONTROL_PRESSED(0, 36)
-        and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Game.Self.isBrowsingApps() then
+    if replaceSneakAnim then
+      if PAD.IS_DISABLED_CONTROL_PRESSED(0, 36) and SS.canCrouch() then
         script:sleep(200)
         if is_handsUp then
           is_handsUp = false
@@ -7787,35 +7809,27 @@ script.register_looped("self features", function(script)
       script:sleep(500)
       isCrouched = false
     end
-  end
 
   -- Replace 'Point At' Action
-  if not gui.is_open() and not HUD.IS_MP_TEXT_CHAT_TYPING() then
-    if Game.Self.isOnFoot() or is_car then
-      if replacePointAct and not ped_grabbed and not vehicle_grabbed and not is_playing_anim
-        and not is_playing_scenario and not is_typing and not is_setting_hotkeys and not is_hiding then
-        if not is_handsUp and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29)
-          and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Game.Self.isBrowsingApps() then
-          script:sleep(200)
-          if isCrouched then
-            isCrouched = false
-            PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
-          end
-          if is_sitting then
-            standUp()
-          end
-          playHandsUp()
-          is_handsUp = true
+  if replacePointAct then
+    if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29) and SS.canUseHandsUp() then
+      if not is_handsUp then
+        script:sleep(200)
+        if isCrouched then
+          isCrouched = false
+          PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
         end
+        if is_sitting then
+          standUp()
+        end
+        playHandsUp()
+        is_handsUp = true
+      else
+        script:sleep(200)
+        TASK.CLEAR_PED_TASKS(self.get_ped())
+        script:sleep(500)
+        is_handsUp = false
       end
-    end
-
-    if is_handsUp and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29)
-      and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Game.Self.isBrowsingApps() then
-      script:sleep(200)
-      TASK.CLEAR_PED_TASKS(self.get_ped())
-      script:sleep(500)
-      is_handsUp = false
     end
   end
   if is_handsUp then
@@ -7839,27 +7853,10 @@ script.register_looped("self features", function(script)
 
   -- Online Phone Animations
   if phoneAnim then
-    if Game.isOnline() then
-      if not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) and not is_playing_anim and not is_playing_scenario
-        and not ped_grabbed and not vehicle_grabbed and not is_handsUp and not is_sitting
-        and not is_hiding and PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0 then
-        Game.Self.PhoneAnims(true)
-        phoneAnimsEnabled = true
-        if phoneAnimsEnabled then
-          Game.Self.PlayPhoneGestures(script)
-        end
-      else
-        if phoneAnimsEnabled then
-          Game.Self.PhoneAnims(false)
-          script:sleep(200)
-          phoneAnimsEnabled = false
-        end
-      end
-    else
-      if phoneAnimsEnabled then
-        Game.Self.PhoneAnims(false)
-        phoneAnimsEnabled = false
-      end
+    if Game.isOnline() and SS.canUsePhoneAnims() then
+      Game.Self.PhoneAnims(true)
+      Game.Self.PlayPhoneGestures(script)
+      phoneAnimsEnabled = true
     end
   else
     if phoneAnimsEnabled then
@@ -8200,7 +8197,6 @@ script.register_looped("anim_interrupt_event", function(aiev)
   end
 end)
 script.register_looped("MISC Anim Stuff", function(miscanim)
-  miscanim:yield()
   if is_playing_anim or is_shortcut_anim then
     if not curr_playing_anim.autoOff then
       PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), false)
@@ -8226,38 +8222,14 @@ script.register_looped("MISC Anim Stuff", function(miscanim)
       miscanim:sleep(10)
     until is_playing_anim == false or is_shortcut_anim == false
     PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), true)
+    if lua_Fn.str_contains(string.lower(curr_playing_anim.name), "in-car") then
+      if PAD.IS_CONTROL_PRESSED(0, 75) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) or Game.Self.isOnFoot() then
+        cleanup(miscanim)
+        is_playing_anim = false
+      end
+    end
   end
 end)
-
---[[
-script.register_looped("on_game_mode_switch", function(ogms) -- <- it was behaving nice by resetting variables on session or game mode switches
-  if Game.isOnline() then                                      --  then it started causing problems.
-    if NETWORK.NETWORK_IS_IN_SESSION() then
-      repeat
-        ogms:sleep(1000)
-      until not NETWORK.NETWORK_IS_IN_SESSION()
-      if is_playing_anim or is_playing_scenario or ped_grabbed then
-        TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
-      end
-      if is_playing_radio or anim_music then
-        play_music("stop")
-      end
-      var_reset()
-    end
-  else
-    repeat
-      ogms:sleep(1000)
-    until NETWORK.NETWORK_IS_SESSION_STARTED()
-    if is_playing_anim or is_playing_scenario or ped_grabbed then
-      TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
-    end
-    if is_playing_radio or anim_music then
-      play_music("stop")
-    end
-    var_reset()
-  end
-end)
-]]
 
 script.register_looped("animation hotkey", function(script)
   if not HUD.IS_PAUSE_MENU_ACTIVE() and not HUD.IS_MP_TEXT_CHAT_TYPING() then
@@ -9989,18 +9961,21 @@ script.register_looped("Handling Editor", function(he)
         end
       end
 
-      if easyWheelie then
-        if not easy_wheelie_enabled then
-          SS.setHandlingFlag(current_vehicle, HF._LOW_SPEED_WHEELIES, true)
-          easy_wheelie_enabled = true
-        end
-      else
-        if easy_wheelie_enabled then
-          SS.setHandlingFlag(current_vehicle, HF._LOW_SPEED_WHEELIES, false)
-          easy_wheelie_enabled = false
+      if is_bike or is_quad then
+        if easyWheelie then
+          if not easy_wheelie_enabled then
+            SS.setHandlingFlag(current_vehicle, HF._LOW_SPEED_WHEELIES, true)
+            easy_wheelie_enabled = true
+          end
+        else
+          if easy_wheelie_enabled then
+            SS.setHandlingFlag(current_vehicle, HF._LOW_SPEED_WHEELIES, false)
+            easy_wheelie_enabled = false
+          end
         end
       end
 
+      -- the ones below do work but the steering is not rendered.
       -- if rwSteering then
       --   if not rw_steering_enabled then
       --     SS.setHandlingFlag(current_vehicle, HF._STEER_REARWHEELS, true)

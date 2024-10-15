@@ -8,6 +8,13 @@
 -------------------------------------------------- Lua Funcs -----------------------------------------------------------------
 lua_Fn = {
 
+  ---@param cond boolean
+  ---@param ifTrue any
+  ---@param ifFalse any
+  condReturn = function(cond, ifTrue, ifFalse)
+    return cond and ifTrue or ifFalse
+  end,
+
   ---Checks whether a string starts with the provided prefix and returns true or false.
   ---@param str string
   ---@param prefix string
@@ -223,18 +230,47 @@ lua_Fn = {
     return count
   end,
 
-  ---Removes duplicate items from a table and returns a new one with the results.
+  -- Removes duplicate items from a table and returns a new one with the results.
+  --
+  -- If `is_dev` is set to `true`, it adds a table with duplicate items to the return as well.
+  --
+  -- If you use the dev flag then you will need to specify which table you want to use (clean items or duplicates)
+  --
+  --[[
+    **Example:**
+
+    case1:
+
+      local clean_items = lua_Fn.removeTableDupes(yourTable, false) -- when set to false it only returns a table with clean items (no duplicates)
+      log.info(tostring(lua_Fn.listIter(clean_items, 0)))
+
+    case2:
+
+      local results = lua_Fn.removeTableDupes(yourTable, true) -- when set to true it returns a table containing both clean items and duplicates.
+      local clean_items = results.clean_T
+      local duplicate_items = results.dupes_T
+      log.info("\10Clean Items:\10" .. tostring(lua_Fn.listIter(clean_items, 0)))
+      log.info("\10Duplicate Items:\10" .. tostring(lua_Fn.listIter(duplicate_items, 0)))
+  ]]
   ---@param t table
-  removeTableDupes = function(t)
-    local exists_T = {}
-    local result_T = {}
+  ---@param is_dev boolean
+  removeTableDupes = function(t, is_dev)
+    local exists_T, clean_T, dupes_T, result_T = {}, {}, {}, {}
     for _, v in ipairs(t) do
       if not exists_T[v] then
-        result_T[#result_T + 1] = v
+        clean_T[#clean_T + 1] = v
         exists_T[v] = true
+      else
+        if is_dev then
+          dupes_T[#dupes_T + 1] = v
+        end
       end
     end
-    return result_T
+    if is_dev then
+      result_T.clean_T = clean_T
+      result_T.dupes_T = dupes_T
+    end
+    return lua_Fn.condReturn(is_dev, result_T, clean_T)
   end,
 
   ---Converts 0 and 1 values to Lua booleans. Useful when working with memory.
@@ -306,89 +342,6 @@ lua_Fn = {
 
 -------------------------------------------------- ImGui Stuff ---------------------------------------------------------------
 UI = {
-  getKeyPressed = function()
-    local btn, gpad
-    local controls_T = {
-      { ctrl = 7,   gpad = "[R3]" },
-      { ctrl = 10,  gpad = "[LT]" },
-      { ctrl = 11,  gpad = "[RT]" },
-      { ctrl = 14,  gpad = "[DPAD RIGHT]" },
-      { ctrl = 15,  gpad = "[DPAD LEFT]" },
-      { ctrl = 19,  gpad = "[DPAD DOWN]" },
-      { ctrl = 20,  gpad = "[DPAD DOWN]" },
-      { ctrl = 21,  gpad = "[A]" },
-      { ctrl = 22,  gpad = "[X]" },
-      { ctrl = 23,  gpad = "[Y]" },
-      { ctrl = 27,  gpad = "[DPAD UP]" },
-      { ctrl = 29,  gpad = "[R3]" },
-      { ctrl = 30,  gpad = "[LEFT STICK]" },
-      { ctrl = 34,  gpad = "[LEFT STICK]" },
-      { ctrl = 36,  gpad = "[L3]" },
-      { ctrl = 37,  gpad = "[LB]" },
-      { ctrl = 38,  gpad = "[LB]" },
-      { ctrl = 42,  gpad = "[DPAD UP]" },
-      { ctrl = 43,  gpad = "[DPAD DOWN]" },
-      { ctrl = 44,  gpad = "[RB]" },
-      { ctrl = 45,  gpad = "[B]" },
-      { ctrl = 46,  gpad = "[DPAD RIGHT]" },
-      { ctrl = 47,  gpad = "[DPAD LEFT]" },
-      { ctrl = 56,  gpad = "[Y]" },
-      { ctrl = 57,  gpad = "[B]" },
-      { ctrl = 70,  gpad = "[A]" },
-      { ctrl = 71,  gpad = "[RT]" },
-      { ctrl = 72,  gpad = "[LT]" },
-      { ctrl = 73,  gpad = "[A]" },
-      { ctrl = 74,  gpad = "[DPAD RIGHT]" },
-      { ctrl = 75,  gpad = "[Y]" },
-      { ctrl = 76,  gpad = "[RB]" },
-      { ctrl = 79,  gpad = "[R3]" },
-      { ctrl = 81,  gpad = "(NONE)" },
-      { ctrl = 82,  gpad = "(NONE)" },
-      { ctrl = 83,  gpad = "(NONE)" },
-      { ctrl = 84,  gpad = "(NONE)" },
-      { ctrl = 84,  gpad = "[DPAD LEFT]" },
-      { ctrl = 96,  gpad = "(NONE)" },
-      { ctrl = 97,  gpad = "(NONE)" },
-      { ctrl = 124, gpad = "[LEFT STICK]" },
-      { ctrl = 125, gpad = "[LEFT STICK]" },
-      { ctrl = 112, gpad = "[LEFT STICK]" },
-      { ctrl = 127, gpad = "[LEFT STICK]" },
-      { ctrl = 117, gpad = "[LB]" },
-      { ctrl = 118, gpad = "[RB]" },
-      { ctrl = 167, gpad = "(NONE)" },
-      { ctrl = 168, gpad = "(NONE)" },
-      { ctrl = 169, gpad = "(NONE)" },
-      { ctrl = 170, gpad = "[B]" },
-      { ctrl = 172, gpad = "[DPAD UP]" },
-      { ctrl = 173, gpad = "[DPAD DOWN]" },
-      { ctrl = 174, gpad = "[DPAD LEFT]" },
-      { ctrl = 175, gpad = "[DPAD RIGHT]" },
-      { ctrl = 178, gpad = "[Y]" },
-      { ctrl = 194, gpad = "[B]" },
-      { ctrl = 243, gpad = "(NONE)" },
-      { ctrl = 244, gpad = "[BACK]" },
-      { ctrl = 249, gpad = "(NONE)" },
-      { ctrl = 288, gpad = "[A]" },
-      { ctrl = 289, gpad = "[X]" },
-      { ctrl = 303, gpad = "[DPAD UP]" },
-      { ctrl = 307, gpad = "[DPAD RIGHT]" },
-      { ctrl = 308, gpad = "[DPAD LEFT]" },
-      { ctrl = 311, gpad = "[DPAD DOWN]" },
-      { ctrl = 318, gpad = "[START]" },
-      { ctrl = 322, gpad = "(NONE)" },
-      { ctrl = 344, gpad = "[DPAD RIGHT]" },
-    }
-    for _, v in ipairs(controls_T) do
-      if PAD.IS_CONTROL_JUST_PRESSED(0, v.ctrl) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, v.ctrl) then
-        btn, gpad = v.ctrl, v.gpad
-      end
-    end
-    if not PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
-      return btn, gpad
-    else
-      return nil, nil
-    end
-  end,
 
   ---@param col string | table
   getColor = function(col)
@@ -768,7 +721,7 @@ SS                          = {
     if gpad_keyName == nil then
       start_loading_anim = true
       UI.coloredText(translateLabel("input_waiting") .. loading_label, "#FFFFFF", 0.75, 20)
-      gpad_keyCode, gpad_keyName = UI.getKeyPressed()
+      gpad_keyCode, gpad_keyName = Game.getKeyPressed()
     else
       start_loading_anim = false
       for _, key in pairs(reserved_keys_T.gpad) do
@@ -895,6 +848,25 @@ SS                          = {
         end
       end
     end
+  end,
+
+  canUsePhoneAnims = function ()
+    return not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) and not is_playing_anim and not is_playing_scenario
+    and not ped_grabbed and not vehicle_grabbed and not is_handsUp and not is_sitting
+    and not is_hiding and PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0
+  end,
+
+  canCrouch = function ()
+    return Game.Self.isOnFoot() and not Game.Self.isInWater() and not Game.Self.is_ragdoll()
+    and not gui.is_open() and not ped_grabbed and not vehicle_grabbed and not is_playing_anim
+    and not is_playing_scenario and not is_typing and not is_sitting and not is_setting_hotkeys
+    and not is_hiding and not isCrouched and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Game.Self.isBrowsingApps()
+  end,
+
+  canUseHandsUp = function()
+    return (Game.Self.isOnFoot() or is_car) and not gui.is_open() and not HUD.IS_MP_TEXT_CHAT_TYPING()
+    and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario
+    and not is_typing and not is_setting_hotkeys and not is_hiding and not Game.Self.isBrowsingApps()
   end,
 
   ---Reverts changes done by the script.
@@ -1230,13 +1202,13 @@ SS                          = {
     local CPlayerInfo         = pedPtr:add(0x10A8):deref()
     local m_ped_type          = pedPtr:add(0x1098) -- uint32_t
     local m_ped_task_flag     = pedPtr:add(0x144B) -- uint8_t
-    local m_seatbelt         = pedPtr:add(0x143C):get_word() -- uint8_t
+    local m_seatbelt          = pedPtr:add(0x143C):get_word() -- uint8_t
     ped_info_T.ped_type       = m_ped_type:get_dword()
     ped_info_T.task_flag      = m_ped_task_flag:get_word()
     ped_info_T.swim_speed_ptr = CPlayerInfo:add(0x01C8)
     ped_info_T.run_speed_ptr  = CPlayerInfo:add(0x0D50)
     ped_info_T.velocity_ptr   = CPlayerInfo:add(0x0300)
-    ped_info_T.canPedRagdoll   = function()
+    ped_info_T.canPedRagdoll  = function()
       return (ped_info_T.ped_type & 0x20) > 0
     end;
     ped_info_T.hasSeatbelt    = function()
@@ -1546,6 +1518,90 @@ Game                        = {
       end
     end
     return lang_iso, lang_name
+  end,
+
+  getKeyPressed = function()
+    local btn, gpad
+    local controls_T = {
+      { ctrl = 7,   gpad = "[R3]" },
+      { ctrl = 10,  gpad = "[LT]" },
+      { ctrl = 11,  gpad = "[RT]" },
+      { ctrl = 14,  gpad = "[DPAD RIGHT]" },
+      { ctrl = 15,  gpad = "[DPAD LEFT]" },
+      { ctrl = 19,  gpad = "[DPAD DOWN]" },
+      { ctrl = 20,  gpad = "[DPAD DOWN]" },
+      { ctrl = 21,  gpad = "[A]" },
+      { ctrl = 22,  gpad = "[X]" },
+      { ctrl = 23,  gpad = "[Y]" },
+      { ctrl = 27,  gpad = "[DPAD UP]" },
+      { ctrl = 29,  gpad = "[R3]" },
+      { ctrl = 30,  gpad = "[LEFT STICK]" },
+      { ctrl = 34,  gpad = "[LEFT STICK]" },
+      { ctrl = 36,  gpad = "[L3]" },
+      { ctrl = 37,  gpad = "[LB]" },
+      { ctrl = 38,  gpad = "[LB]" },
+      { ctrl = 42,  gpad = "[DPAD UP]" },
+      { ctrl = 43,  gpad = "[DPAD DOWN]" },
+      { ctrl = 44,  gpad = "[RB]" },
+      { ctrl = 45,  gpad = "[B]" },
+      { ctrl = 46,  gpad = "[DPAD RIGHT]" },
+      { ctrl = 47,  gpad = "[DPAD LEFT]" },
+      { ctrl = 56,  gpad = "[Y]" },
+      { ctrl = 57,  gpad = "[B]" },
+      { ctrl = 70,  gpad = "[A]" },
+      { ctrl = 71,  gpad = "[RT]" },
+      { ctrl = 72,  gpad = "[LT]" },
+      { ctrl = 73,  gpad = "[A]" },
+      { ctrl = 74,  gpad = "[DPAD RIGHT]" },
+      { ctrl = 75,  gpad = "[Y]" },
+      { ctrl = 76,  gpad = "[RB]" },
+      { ctrl = 79,  gpad = "[R3]" },
+      { ctrl = 81,  gpad = "(NONE)" },
+      { ctrl = 82,  gpad = "(NONE)" },
+      { ctrl = 83,  gpad = "(NONE)" },
+      { ctrl = 84,  gpad = "(NONE)" },
+      { ctrl = 84,  gpad = "[DPAD LEFT]" },
+      { ctrl = 96,  gpad = "(NONE)" },
+      { ctrl = 97,  gpad = "(NONE)" },
+      { ctrl = 124, gpad = "[LEFT STICK]" },
+      { ctrl = 125, gpad = "[LEFT STICK]" },
+      { ctrl = 112, gpad = "[LEFT STICK]" },
+      { ctrl = 127, gpad = "[LEFT STICK]" },
+      { ctrl = 117, gpad = "[LB]" },
+      { ctrl = 118, gpad = "[RB]" },
+      { ctrl = 167, gpad = "(NONE)" },
+      { ctrl = 168, gpad = "(NONE)" },
+      { ctrl = 169, gpad = "(NONE)" },
+      { ctrl = 170, gpad = "[B]" },
+      { ctrl = 172, gpad = "[DPAD UP]" },
+      { ctrl = 173, gpad = "[DPAD DOWN]" },
+      { ctrl = 174, gpad = "[DPAD LEFT]" },
+      { ctrl = 175, gpad = "[DPAD RIGHT]" },
+      { ctrl = 178, gpad = "[Y]" },
+      { ctrl = 194, gpad = "[B]" },
+      { ctrl = 243, gpad = "(NONE)" },
+      { ctrl = 244, gpad = "[BACK]" },
+      { ctrl = 249, gpad = "(NONE)" },
+      { ctrl = 288, gpad = "[A]" },
+      { ctrl = 289, gpad = "[X]" },
+      { ctrl = 303, gpad = "[DPAD UP]" },
+      { ctrl = 307, gpad = "[DPAD RIGHT]" },
+      { ctrl = 308, gpad = "[DPAD LEFT]" },
+      { ctrl = 311, gpad = "[DPAD DOWN]" },
+      { ctrl = 318, gpad = "[START]" },
+      { ctrl = 322, gpad = "(NONE)" },
+      { ctrl = 344, gpad = "[DPAD RIGHT]" },
+    }
+    for _, v in ipairs(controls_T) do
+      if PAD.IS_CONTROL_JUST_PRESSED(0, v.ctrl) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, v.ctrl) then
+        btn, gpad = v.ctrl, v.gpad
+      end
+    end
+    if not PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
+      return btn, gpad
+    else
+      return nil, nil
+    end
   end,
 
   isOnline = function()
@@ -2028,7 +2084,7 @@ Game                        = {
     ---@param toggle boolean
     PhoneAnims = function(toggle)
       for i = 242, 244 do
-        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), i, toggle) then
+        if PED.GET_PED_CONFIG_FLAG(self.get_ped(), i, true) == toggle then
           PED.SET_PED_CONFIG_FLAG(self.get_ped(), i, not toggle)
         end
       end
@@ -2182,19 +2238,23 @@ Game                        = {
     end,
 
     -- Applies a custom paint job to the vehicle
-    setCustomPaint = function(vehicle, color, pearl, matte_flag)
-      local paintType = 1
-      if ENTITY.DOES_ENTITY_EXIST(vehicle) then
-        if matte_flag then
-          paintType = 3
+    ---@param veh integer
+    ---@param hex string
+    ---@param p integer
+    ---@param m boolean
+    setCustomPaint = function(veh, hex, p, m)
+      local pt = 1
+      if ENTITY.DOES_ENTITY_EXIST(veh) then
+        if m then
+          pt = 3
         end
-        local r, g, b = lua_Fn.hexToRGB(color)
-        VEHICLE.SET_VEHICLE_MOD_KIT(vehicle, 0)
-        VEHICLE.SET_VEHICLE_MOD_COLOR_1(vehicle, paintType, 0, pearl)
-        VEHICLE.SET_VEHICLE_MOD_COLOR_2(vehicle, paintType, 0)
-        VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, r, g, b)
-        VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, r, g, b)
-        VEHICLE.SET_VEHICLE_EXTRA_COLOURS(vehicle, pearl, 0)
+        local r, g, b = lua_Fn.hexToRGB(hex)
+        VEHICLE.SET_VEHICLE_MOD_KIT(veh, 0)
+        VEHICLE.SET_VEHICLE_MOD_COLOR_1(veh, pt, 0, p)
+        VEHICLE.SET_VEHICLE_MOD_COLOR_2(veh, pt, 0)
+        VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(veh, r, g, b)
+        VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(veh, r, g, b)
+        VEHICLE.SET_VEHICLE_EXTRA_COLOURS(veh, p, 0)
       end
     end,
   },
