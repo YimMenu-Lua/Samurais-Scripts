@@ -1,12 +1,22 @@
-# Samurais-Scripts
+<h1 align="center">
+   Samurai's-Scripts
+</h1>
+
 #### A Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and [Tupoye-Menu](https://github.com/TupoyeMenu/TupoyeMenu), centered around roleplaying and having fun in a game full of ad bots and toxic cheaters.
 
 ####    
 
+[![sv](https://img.shields.io/badge/Script%20Version-v1.3.4-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)    
+[![gv](https://img.shields.io/badge/Game%20Version-Online%201.69%20|%20Build%203337-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)    
+[![bm](https://img.shields.io/badge/Business%20Manager-Outdated-red)](https://github.com/YimMenu-Lua/Samurais-Scripts/)    
+[![cp](https://img.shields.io/badge/Casino%20Pacino-Outdated-red)](https://github.com/YimMenu-Lua/Samurais-Scripts/)    
+[![etc](https://img.shields.io/badge/All%20Other%20Features-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/)
+####    
+
 > [!NOTE]
-> **Discontinued** due to a series of unfortunate events including what happened to our beloved YimMenu as well as some shitty life circumstances. I will not update this small project anymore but pull requests are still welcome.
+> **Discontinued** due to a series of unfortunate events including what happened to our beloved YimMenu as well as some shitty life circumstances.
 > 
-> If you want to borrow code, feel free to do so. The only requirement is that you mention the author.
+> Updates will no longer be as frequent as before but pull requests are still welcome.
 
 ####    
 
