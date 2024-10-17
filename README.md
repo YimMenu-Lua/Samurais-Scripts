@@ -6,11 +6,11 @@
 
 ####    
 
-[![sv](https://img.shields.io/badge/Script%20Version-v1.3.4-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)    
-[![gv](https://img.shields.io/badge/Game%20Version-Online%201.69%20|%20Build%203337-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)    
-[![bm](https://img.shields.io/badge/Business%20Manager-Outdated-red)](https://github.com/YimMenu-Lua/Samurais-Scripts/)    
-[![cp](https://img.shields.io/badge/Casino%20Pacino-Outdated-red)](https://github.com/YimMenu-Lua/Samurais-Scripts/)    
-[![etc](https://img.shields.io/badge/All%20Other%20Features-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/)
+[![sv](https://img.shields.io/badge/Script%20Version-v1.3.4-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
+[![gv](https://img.shields.io/badge/Game%20Version-Online%201.69%20|%20Build%203337-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
+[![bm](https://img.shields.io/badge/Business%20Manager-Outdated-red)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)
+[![cp](https://img.shields.io/badge/Casino%20Pacino-Outdated-red)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)
+[![etc](https://img.shields.io/badge/All%20Other%20Features-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)
 ####    
 
 > [!NOTE]
