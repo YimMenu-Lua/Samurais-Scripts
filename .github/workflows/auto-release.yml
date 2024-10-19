@@ -1,0 +1,57 @@
+name: Create Archive
+on: 
+  push:
+    branches:
+      - 'debug'
+    paths:
+      - '**.lua'
+    tags:
+      - '*'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Archive Release
+      uses: thedoctor0/zip-release@0.7.6
+      with:
+        type: 'zip'
+        filename: "Samurais_Scripts.zip"
+        exclusions: '*.git* /*.json/ *.md'
+    
+    - name: Increment Tag
+      id: increment_tag
+      uses: actions/github-script@v7
+      with:
+        script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            // Get the latest tag
+            const tags = await github.rest.repos.listTags({
+                owner: owner,
+                repo: repo,
+            });
+            let newVersion;
+            let oldTag;
+            if (tags.data.length === 0) {
+                // No tags found, start with a default version
+                console.log('No existing tags found. Starting with version v1.0.0');
+                newVersion = 'v1.0.0';
+            } else {
+                // Extract the latest tag name
+                const latestTag = tags.data[0].name;
+                const versionParts = latestTag.substring(1).split('.').map(Number);
+                versionParts[2] += 1; // Increment the patch version
+                newVersion = `v${versionParts.join('.')}`;
+                oldTag = latestTag;
+            }
+            core.setOutput("new_version", newVersion); 
+            core.setOutput("old_tag", oldTag);
+
+    - name: Upload Release
+      uses: ncipollo/release-action@v1.14.0
+      with:
+        artifacts: "Samurais_Scripts.zip"
+        bodyFile: "CHANGELOG.md"

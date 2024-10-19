@@ -378,7 +378,7 @@ ducking_in_car         = false
 hiding_in_boot         = false
 hiding_in_dumpster     = false
 SS_debug               = false
-mf_overwrite        = false
+mf_overwrite           = false
 debug_counter          = 0
 flag                   = 0
 grp_anim_index         = 0
@@ -7992,7 +7992,7 @@ script.register_looped("Hide From Cops", function(hfc)
         if nearBoot and not is_playing_anim and not is_playing_scenario and not ped_grabbed and not vehicle_grabbed then
           Game.showButtonPrompt("Press ~INPUT_PICKUP~ to hide in the trunk.")
           if PAD.IS_CONTROL_JUST_PRESSED(0, 38) then
-            local z_offset = 0.7
+            local z_offset = 0.93
             if is_handsUp then
               TASK.CLEAR_PED_TASKS(self.get_ped())
               is_handsUp = false
@@ -8058,7 +8058,10 @@ script.register_looped("Hide From Cops", function(hfc)
                 if Game.requestAnimDict("anim@amb@inspect@crouch@male_a@base") then
                   TASK.TASK_PLAY_ANIM(self.get_ped(), "anim@amb@inspect@crouch@male_a@base", "base", 4.0, -4.0, -1, 1, 1.0, false, false, false)
                 end
+                hfc:sleep(200)
                 CAM.DO_SCREEN_FADE_IN(500)
+                hfc:sleep(200)
+                AUDIO.PLAY_SOUND_FRONTEND(-1, "TRASH_BAG_LAND", "DLC_HEIST_SERIES_A_SOUNDS", true)
                 hfc:sleep(1000)
                 is_hiding, hiding_in_dumpster, thisDumpster = true, true, bin
               end
@@ -8138,6 +8141,9 @@ script.register_looped("Hide From Cops", function(hfc)
         ENTITY.SET_ENTITY_COORDS(self.get_ped(), my_pos.x + (my_fwd.x * 1.3),
         my_pos.y + (my_fwd.y * 1.3), ground_z, false, false, false, false)
         CAM.DO_SCREEN_FADE_IN(500)
+        if Game.requestAnimDict("move_m@_idles@shake_off") then
+          TASK.TASK_PLAY_ANIM(self.get_ped(), "move_m@_idles@shake_off", "shakeoff_1", 4.0, -4.0, 3000, 48, 0.0, false, false, false)
+        end
         hfc:sleep(1000)
         is_hiding, hiding_in_dumpster = false, false
       end
