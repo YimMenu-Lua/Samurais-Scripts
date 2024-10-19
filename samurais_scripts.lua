@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.3.4'
+SCRIPT_VERSION = '1.3.5'
 TARGET_BUILD   = '3337'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)

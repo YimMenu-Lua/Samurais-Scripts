@@ -1,0 +1,72 @@
+name: Zip Release
+on: 
+  push:
+    branches:
+      - main
+    paths:
+      - '**.lua'
+    tags:
+      - '*'
+
+jobs:
+  Main:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Increment Tag
+      id: increment_tag
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const owner = context.repo.owner;
+          const repo  = context.repo.repo;
+          const tags  = await github.rest.repos.listTags(
+            {
+              owner: owner,
+              repo: repo,
+            }
+          );
+
+          let new_tag;
+          let old_tag;
+
+          if (tags.data.length === 0) {
+            console.log('No existing tags found. Starting with version 1.0.0');
+            new_tag = 'v1.0.0';
+          }
+          else {
+            const latest_tag = tags.data[0].name;
+            const tag_part   = latest_tag.substring(1).split('.').map(Number);
+            if (tag_part[1] === 9 && tag_part[2] === 9) {
+              tag_part[0] += 1;
+              tag_part[1] = 0;
+              tag_part[2] = 0;
+            } 
+            else if (tag_part[2] === 9) {
+              tag_part[1] += 1;
+              tag_part[2] = 0;
+            }
+            else {
+              tag_part[2] += 1;
+            }
+
+            new_tag = `v${tag_part.join('.')}`;
+            old_tag = latest_tag;
+          }
+          core.setOutput("version_number", new_tag);
+          core.setOutput("old_tag", old_tag);
+
+    - uses: actions/checkout@master
+    - name: Create Archive
+      uses: thedoctor0/zip-release@0.7.6
+      with:
+        type: 'zip'
+        filename: "Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip"
+        exclusions: /.git* *.json *.md .editorconfig
+
+    - name: Upload Release
+      uses: ncipollo/release-action@v1.14.0
+      with:
+        artifacts: "Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip"
+        bodyFile: ./CHANGELOG.md
+        name: Samurai's Scripts ${{steps.increment_tag.outputs.version_number}}
+        tag: ${{steps.increment_tag.outputs.version_number}}
