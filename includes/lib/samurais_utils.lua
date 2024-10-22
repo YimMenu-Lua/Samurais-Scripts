@@ -137,6 +137,13 @@ lua_Fn = {
     return r, g, b
   end,
 
+  ---@param r number
+  ---@param g number
+  ---@param b number
+  RGBtoHex = function(r, g, b)
+    return string.format("#%02X%02X%02X", r, g, b)
+  end,
+
   --[[ Decodes hex to string.
 
   HEX must be provided in a string format.
@@ -291,33 +298,25 @@ lua_Fn = {
 
   ---@param n number
   get_bit = function(n)
-    return 2 ^ (n - 1)
+    return 2 ^ n - 1
   end,
 
-  --[[ Checks if `n` has `x` bit.
-
-  - Example:
-
-        if lua_Fn.has_bit(n, x) then
-          --do something
-        end
-  ]]
-  ---@param x number
   ---@param n number
+  ---@param x number
   has_bit = function(n, x)
-    return x % (n + n) >= n
+    return n & x > 0
   end,
 
-  ---Sets `n` bit in `x`
   ---@param n number
   ---@param x number
   set_bit = function(n, x)
-    return lua_Fn.has_bit(n, x) and x or x + n
+    return lua_Fn.has_bit(n, x) and n or n + x
   end,
 
-  ---Clears `n` bit from `x`
+  ---@param n number
+  ---@param x number
   clear_bit = function(n, x)
-    return lua_Fn.has_bit(n, x) and x - n or x
+    return lua_Fn.has_bit(n, x) and n - x or n
   end,
 
   ---Lua version of Bob Jenskins' "Jenkins One At A Time" hash function (https://en.wikipedia.org/wiki/Jenkins_hash_function).
@@ -1051,15 +1050,8 @@ SS                          = {
       is_sitting, thisSeat = false, 0
     end
 
-    if default_handling_flags ~= nil and ENTITY.DOES_ENTITY_EXIST(current_vehicle) then
-      local vehPtr           = memory.handle_to_ptr(current_vehicle)
-      local CHandlingData    = vehPtr:add(0x0960):deref()
-      local m_handling_flags = CHandlingData:add(0x0128)
-      m_handling_flags:set_dword(default_handling_flags)
-      default_handling_flags = unk
-      engine_brake_disabled, kers_boost_enabled, offroader_enabled,
-      rally_tires_enabled, traction_ctrl_disabled, easy_wheelie_enabled = false, false, false, false, false, false
-    end
+    engine_brake_disabled, kers_boost_enabled, offroader_enabled,
+    rally_tires_enabled, traction_ctrl_disabled, easy_wheelie_enabled = false, false, false, false, false, false
 
     if is_hiding then
       if hiding_in_boot or hiding_in_dumpster then
@@ -1082,7 +1074,7 @@ SS                          = {
         local distCalc = SYSTEM.VDIST2(myCoords.x, myCoords.y, myCoords.z, seatPos.x, seatPos.y, seatPos.z)
         if distCalc <= 2 then
           retBool = true
-          if string.find(string.lower(seat), "bench") then
+          if string.find(string.lower(seat), "bench") and seat ~= "prop_bench_07" then
             x_offset = -0.5
           end
           if seat == "prop_hobo_seat_01" then
@@ -1139,27 +1131,34 @@ SS                          = {
   end,
 
   ---@param vehicle integer
-  ---@param flag integer
-  ---@param switch boolean
-  setHandlingFlag = function(vehicle, flag, switch)
+  getHandlingFlagsPtr = function(vehicle)
     local vehPtr           = memory.handle_to_ptr(vehicle)
     local CHandlingData    = vehPtr:add(0x0960):deref()
     local m_handling_flags = CHandlingData:add(0x0128)
+    return m_handling_flags
+  end,
+
+  getHandlingFlagState = function(vehicle, flag)
+    if vehicle ~= nil and vehicle > 0 then
+      local m_handling_flags = SS.getHandlingFlagsPtr(vehicle)
+      local handling_flags   = m_handling_flags:get_dword()
+      return lua_Fn.has_bit(handling_flags, flag)
+    else
+      return false
+    end
+  end,
+
+  ---@param vehicle integer
+  ---@param flag integer
+  ---@param switch boolean
+  setHandlingFlag = function(vehicle, flag, switch)
+    local m_handling_flags = SS.getHandlingFlagsPtr(vehicle)
     local handling_flags   = m_handling_flags:get_dword()
     local new_flag
-    if switch == true then
-      default_handling_flags = handling_flags
-      if handling_flags == 0 then
-        new_flag = flag
-      else
-        new_flag = lua_Fn.set_bit(flag, handling_flags)
-      end
+    if switch then
+      new_flag = lua_Fn.set_bit(handling_flags, flag)
     else
-      if handling_flags == flag then
-        new_flag = 0
-      else
-        new_flag = lua_Fn.clear_bit(flag, handling_flags)
-      end
+      new_flag = lua_Fn.clear_bit(handling_flags, flag)
     end
     m_handling_flags:set_dword(new_flag)
   end,
@@ -1168,9 +1167,7 @@ SS                          = {
   ---@param default integer
   resetHandlingFlags = function(vehicle, default)
     if default ~= nil then
-      local vehPtr           = memory.handle_to_ptr(vehicle)
-      local CHandlingData    = vehPtr:add(0x0960):deref()
-      local m_handling_flags = CHandlingData:add(0x0128)
+      local m_handling_flags = SS.getHandlingFlagsPtr(vehicle)
       m_handling_flags:set_dword(default)
     end
   end,
@@ -2135,12 +2132,10 @@ Game                        = {
       return false
     end,
 
-    -- Returns whether the player is currently modifying their vehicle in a modshop.
+    -- Returns whether the player is currently modifying their vehicle in a modshop. <- Also returns true when just near a mod shop and not actually inside (tested with LS Customs).
     isInCarModShop = function()
       for _, v in ipairs(modshop_script_names) do
-        if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat(v)) > 0 then
-          return true
-        end
+        return script.is_active(v)
       end
       return false
     end,
@@ -2177,8 +2172,6 @@ Game                        = {
 
     -- Returns the class of the specified vehicle.
     class = function(vehicle)
-      ---@type string
-      local retVal
       local class_T = {
         { class = 0,  name = "Compacts" },
         { class = 1,  name = "Sedans" },
@@ -2202,15 +2195,15 @@ Game                        = {
         { class = 19, name = "Military" },
         { class = 20, name = "Commercial" },
         { class = 21, name = "Trains" },
+        { class = 22, name = "Open Wheel" },
       }
 
       for _, v in ipairs(class_T) do
         if VEHICLE.GET_VEHICLE_CLASS(vehicle) == v.class then
-          retVal = v.name
-          break
+          return v.name
         end
       end
-      return retVal
+      return "Unknown" -- in case R* adds a new class.
     end,
 
     ---Returns a table containing all occupants of a vehicle.
@@ -2242,7 +2235,9 @@ Game                        = {
     ---@param hex string
     ---@param p integer
     ---@param m boolean
-    setCustomPaint = function(veh, hex, p, m)
+    ---@param is_primary boolean
+    ---@param is_secondary boolean
+    setCustomPaint = function(veh, hex, p, m, is_primary, is_secondary)
       local pt = 1
       if ENTITY.DOES_ENTITY_EXIST(veh) then
         if m then
@@ -2250,11 +2245,15 @@ Game                        = {
         end
         local r, g, b = lua_Fn.hexToRGB(hex)
         VEHICLE.SET_VEHICLE_MOD_KIT(veh, 0)
-        VEHICLE.SET_VEHICLE_MOD_COLOR_1(veh, pt, 0, p)
-        VEHICLE.SET_VEHICLE_MOD_COLOR_2(veh, pt, 0)
-        VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(veh, r, g, b)
-        VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(veh, r, g, b)
-        VEHICLE.SET_VEHICLE_EXTRA_COLOURS(veh, p, 0)
+        if is_primary then
+          VEHICLE.SET_VEHICLE_MOD_COLOR_1(veh, pt, 0, p)
+          VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(veh, r, g, b)
+          VEHICLE.SET_VEHICLE_EXTRA_COLOURS(veh, p, 0)
+        end
+        if is_secondary then
+          VEHICLE.SET_VEHICLE_MOD_COLOR_2(veh, pt, 0)
+          VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(veh, r, g, b)
+        end
       end
     end,
   },

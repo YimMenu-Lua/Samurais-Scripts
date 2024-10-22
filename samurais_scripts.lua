@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.3.5'
-TARGET_BUILD   = '3337'
+SCRIPT_VERSION = '1.3.6'
+TARGET_BUILD   = '3351'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
 
@@ -379,6 +379,8 @@ hiding_in_boot         = false
 hiding_in_dumpster     = false
 SS_debug               = false
 mf_overwrite           = false
+is_primary             = false
+is_secondary           = false
 debug_counter          = 0
 flag                   = 0
 grp_anim_index         = 0
@@ -452,7 +454,6 @@ default_tire_smoke     = {
   g = 255,
   b = 255,
 }
-default_handling_flags = nil
 
 
 SS.check_kb_keybinds()
@@ -2153,15 +2154,6 @@ local function resetLastVehState(s)
       VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, default_tire_smoke.r, default_tire_smoke.g,
         default_tire_smoke.b)
     end
-    if default_handling_flags ~= nil then
-      SS.resetHandlingFlags(last_vehicle, default_handling_flags)
-      engine_brake_disabled  = false
-      traction_ctrl_disabled = false
-      kers_boost_enabled     = false
-      offroader_enabled      = false
-      rally_tires_enabled    = false
-      easy_wheelie_enabled   = false
-    end
     s:sleep(200)
     last_vehicle = current_vehicle
   else
@@ -2178,7 +2170,7 @@ end
 
 local function onVehEnter(s)
   current_vehicle = self.get_veh()
-  if Game.Self.isDriving() and current_vehicle ~= last_vehicle then
+  if Game.Self.isDriving() and current_vehicle > 0 and current_vehicle ~= last_vehicle then
     resetLastVehState(s)
   end
   return current_vehicle
@@ -2990,7 +2982,7 @@ local function displayCustomPaints()
   custom_paint_index, isChanged = ImGui.ListBox("##customPaintsList", custom_paint_index, customPaintNames, #filteredPaints)
 end
 custom_paints_tab:add_imgui(function()
-  if Game.Self.isOnFoot() then
+  if current_vehicle == 0 then
     ImGui.Dummy(1, 5);ImGui.Text(translateLabel("getinveh"))
   else
     ImGui.BulletText(translateLabel("sort_by_color_txt")); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
@@ -3012,30 +3004,28 @@ custom_paints_tab:add_imgui(function()
     displayCustomPaints()
     ImGui.PopItemWidth()
     local selected_paint = filteredPaints[custom_paint_index + 1]
-    local mf, overwrite_text = false, ""
-    if selected_paint ~= nil then
-      if mf_overwrite then
-        mf = not selected_paint.m
-      else
-        mf = selected_paint.m
-      end
-      if selected_paint.m then
-        overwrite_text = translateLabel("remove_matte_CB")
-      else
-        overwrite_text = translateLabel("apply_matte_CB")
-      end
-    end
     ImGui.Spacing()
     ImGui.BeginDisabled(selected_paint == nil)
-    mf_overwrite, movwUsed = ImGui.Checkbox(overwrite_text, mf_overwrite)
+    mf_overwrite, movwUsed = ImGui.Checkbox("Matte Finish", selected_paint.m)
     UI.toolTip(false, translateLabel("apply_matte_tt"))
     if movwUsed then
       UI.widgetSound("Nav2")
+      selected_paint.m = not selected_paint.m
     end
-    ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
+    ImGui.Separator()
+    is_primary, isPused   = ImGui.Checkbox("Primary", is_primary); ImGui.SameLine()
+    is_secondary, isSused = ImGui.Checkbox("Secondary", is_secondary)
+    if isPused or isSused then
+      UI.widgetSound("Nav2")
+    end
     if ImGui.Button(translateLabel("generic_confirm_btn"), 80, 40) and selected_paint ~= nil then -- fine, sumneko! I submit to your needs.
-      UI.widgetSound("Select")
-      Game.Vehicle.setCustomPaint(current_vehicle, selected_paint.hex, selected_paint.p, mf)
+      if not is_primary and not is_secondary then
+        UI.widgetSound("Error")
+        gui.show_error("Samurai's Scripts", "Please select primary or secondary or both.")
+      else
+        UI.widgetSound("Select")
+        Game.Vehicle.setCustomPaint(current_vehicle, selected_paint.hex, selected_paint.p, selected_paint.m, is_primary, is_secondary)
+      end
     end
     ImGui.EndDisabled()
     if selected_paint ~= nil then
@@ -7705,7 +7695,7 @@ script.register_looped("GameInput", function()
     end
     if holdF then
       if not is_typing and not is_setting_hotkeys and (is_car or is_quad) and not ducking_in_car
-        and not Game.Self.isInCarModShop() and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
+        and Game.Self.isOutside() and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
         PAD.DISABLE_CONTROL_ACTION(0, 75, true)
       else
         timerB = 0
@@ -7713,7 +7703,7 @@ script.register_looped("GameInput", function()
     end
     if keepWheelsTurned then
       if not is_typing and not is_setting_hotkeys and (is_car or is_quad) and not ducking_in_car
-        and not Game.Self.isInCarModShop() and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
+        and Game.Self.isOutside() and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
         if PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
           PAD.DISABLE_CONTROL_ACTION(0, 75, true)
         end
@@ -9902,7 +9892,6 @@ script.register_looped("TowPos Marker", function()
   end
 end)
 script.register_looped("Handling Editor", function(he)
-  he:yield()
   if Game.Self.isOutside() then
     if Game.Self.isDriving() and current_vehicle == last_vehicle and not is_plane and not is_heli then
       if noEngineBraking then
@@ -10474,7 +10463,7 @@ script.register_looped("Casino Pacino Thread", function(pacino)
       if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("three_card_poker")) ~= 0 then
         while NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", -1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 0, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 2, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 3, 0) ~= player_id do
           network.force_script_host("three_card_poker")
-          gui.show_message("CasinoPacino", "Taking control of the three_card_poker script.") --If you see this spammed, someone if fighting you for control.
+          gui.show_message("Samuai's Scripts", translateLabel("tcc_ctrl_txt")) --If you see this spammed, someone if fighting you for control.
           pacino:sleep(500)
         end
         local players_current_table = locals.get_int("three_card_poker",
@@ -10517,10 +10506,10 @@ script.register_looped("Casino Pacino Thread", function(pacino)
         dealers_card     = locals.get_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1) --Dealer's facedown card.
         dealers_card_str = get_cardname_from_index(dealers_card)
       else
-        dealers_card_str = "Not sitting at a Blackjack table."
+        dealers_card_str = translateLabel("not_playing_bj_txt")
       end
     else
-      dealers_card_str = "Not in Casino."
+      dealers_card_str = translateLabel("not_in_casino_txt")
     end
 
     if force_roulette_wheel then
@@ -10528,7 +10517,7 @@ script.register_looped("Casino Pacino Thread", function(pacino)
       if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casinoroulette")) ~= 0 then
         while NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", -1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 0, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 2, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 3, 0) ~= player_id do
           network.force_script_host("casinoroulette")
-          gui.show_message("CasinoPacino", "Taking control of the casinoroulette script.") --If you see this spammed, someone if fighting you for control.
+          gui.show_message("Samurai's Scripts", translateLabel("roulette_ctrl_txt")) --If you see this spammed, someone if fighting you for control.
           script:sleep(500)
         end
         for tabler_iter = 0, 6, 1 do
@@ -10632,8 +10621,9 @@ script.register_looped("OPI", function()
     targetPlayerPed   = selectedPlayer
     targetPlayerIndex = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(targetPlayerPed)
     player_name       = PLAYER.GET_PLAYER_NAME(targetPlayerIndex)
-    if NETWORK.NETWORK_IS_PLAYER_ACTIVE(targetPlayerIndex) then
-      player_active = true
+    local gameState   = SS.getPlayerInfo(targetPlayerPed).getGameState()
+    player_active     = gameState ~= "Invalid" and gameState ~= "LeftGame"
+    if player_active then
       playerWallet  = Game.getPlayerWallet(targetPlayerIndex)
       playerBank    = Game.getPlayerBank(targetPlayerIndex)
       playerCoords  = Game.getCoords(targetPlayerPed, false)
@@ -10647,8 +10637,6 @@ script.register_looped("OPI", function()
       else
         player_in_veh = false
       end
-    else
-      player_active = false
     end
   end
 end)

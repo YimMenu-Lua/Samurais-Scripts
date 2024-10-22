@@ -2286,6 +2286,42 @@ Labels = {
         { iso = "ru-RU", text = "Принудить шар выпасть на 18 Красный" },
     },
 
+    ["not_playing_bj_txt"] = {
+        { iso = "en-US", text = "Not sitting at a Blackjack table." },
+        { iso = "de-DE", text = "Nicht an einem Blackjack-Tisch sitzt." },
+        { iso = "fr-FR", text = "N'est pas assis à une table de Blackjack." },
+        { iso = "it-IT", text = "Non è seduto al tavolo del Blackjack." },
+        { iso = "pt-BR", text = "Não está sentado em uma mesa de Blackjack." },
+        { iso = "ru-RU", text = "не сидит за столом для игры в блэкджек." },
+    },
+
+    ["not_in_casino_txt"] = {
+        { iso = "en-US", text = "Not inside the Casino" },
+        { iso = "de-DE", text = "Ist nicht im Casino." },
+        { iso = "fr-FR", text = "N'est pas à l'intérieur du casino." },
+        { iso = "it-IT", text = "Non è all'interno del Casinò." },
+        { iso = "pt-BR", text = "Não está dentro do cassino." },
+        { iso = "ru-RU", text = "не находится внутри казино." },
+    },
+
+    ["roulette_ctrl_txt"] = {
+        { iso = "en-US", text = "Taking control of the 'Casino Roulette' script..." },
+        { iso = "de-DE", text = "Übernahme der Kontrolle über das Skript „Casino Roulette“..." },
+        { iso = "fr-FR", text = "Prise de contrôle du script « Casino Roulette »..." },
+        { iso = "it-IT", text = "Prendendo il controllo del script “Casino Roulette”...”." },
+        { iso = "pt-BR", text = "Assumir o controle do script “Casino Roulette”..." },
+        { iso = "ru-RU", text = "Взяв под контроль сценарий «Казино Рулетка»..." },
+    },
+
+    ["tcc_ctrl_txt"] = {
+        { iso = "en-US", text = "Taking control of the 'Three Card Poker' script..." },
+        { iso = "de-DE", text = "Übernahme der Kontrolle über das Skript „Three Card Poker“..." },
+        { iso = "fr-FR", text = "Prise de contrôle du script « Three Card Poker »..." },
+        { iso = "it-IT", text = "Prendendo il controllo del script “Three Card Poker”...”." },
+        { iso = "pt-BR", text = "Assumir o controle do script “Three Card Poker”..." },
+        { iso = "ru-RU", text = "Взяв под контроль сценарий «Трехкарточный покер»..." },
+    },
+
     ["rigSlotsCB"] = {
         { iso = "en-US", text = "Rig Slot Machines" },
         { iso = "de-DE", text = "Spielautomaten Manipulieren" },
