@@ -1439,6 +1439,7 @@ SS                          = {
     whouse_4_owned          = false; lua_cfg.save("whouse_4_owned", whouse_4_owned)
     whouse_5_owned          = false; lua_cfg.save("whouse_5_owned", whouse_5_owned)
     veh_mines               = false; lua_cfg.save("veh_mines", veh_mines)
+    SS_debug                = false; lua_cfg.save("SS_debug", SS_debug)
     laser_switch            = 0; lua_cfg.save("laser_switch", laser_switch)
     DriftIntensity          = 0; lua_cfg.save("DriftIntensity", DriftIntensity)
     lang_idx                = 0; lua_cfg.save("lang_idx", lang_idx)
@@ -1451,6 +1452,7 @@ SS                          = {
     laser_choice            = "proj_laser_enemy"; lua_cfg.save("laser_choice", laser_choice)
     LANG                    = "en-US"; lua_cfg.save("LANG", LANG)
     current_lang            = "English"; lua_cfg.save("current_lang", current_lang)
+    initStrings()
   end,
 }
 
