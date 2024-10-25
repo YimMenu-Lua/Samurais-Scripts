@@ -17,7 +17,7 @@
 
 3. Open a PR.
 
-## Adding a new language
+### Adding a new language
 
 1. Follow the same structure by adding a new table under each field containing your language's iso code and the translated text. So let's suppose you want to add Portuguese support:
 
