@@ -1456,3 +1456,16 @@ custom_paints_T          = {
   { name = "Mako Blue",                                hex = "#517E91", p = 4,   m = false, manufacturer = "Aston Martin",      shade = "Blue" },
   { name = "Hyper Red",                                hex = "#3C0612", p = 30,  m = false, manufacturer = "Aston Martin",      shade = "Red" },
 }
+
+translations_button_map = {
+  {name = "driftMode_tt",      kbm = DRIFT_BUTTON},
+  {name = "driftTires_tt",     kbm = DRIFT_BUTTON},
+  {name = "speedBoost_tt",     kbm = NOS_BUTTON},
+  {name = "speedBoost_tt",     kbm = NOS_BUTTON},
+  {name = "veh_mines_tt",      kbm = VEHICLE_MINE_BUTTON},
+  {name = "stopAnims_tt",      kbm = STOP_ANIM_BUTTON},
+  {name = "stopScenarios_tt",  kbm = STOP_ANIM_BUTTON},
+  {name = "purge_tt",          kbm = KBM_PURGE_BUTTON,      gpad = GPAD_PURGE_BUTTON},
+  {name = "rod_tt",            kbm = KBM_ROD_BUTTON,        gpad = GPAD_ROD_BUTTON},
+  {name = "triggerbot_tt",     kbm = KBM_TRIGGERBOT_BUTTON, gpad = GPAD_TRIGGERBOT_BUTTON},
+}

@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.3.7'
+SCRIPT_VERSION = '1.3.8'
 TARGET_BUILD   = '3351'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -464,10 +464,8 @@ SS.check_gpad_keybinds()
 
 
 DRIFT_BUTTON           = keybinds.tdBtn.name
+NOS_BUTTON             = keybinds.nosBtn.name
 STOP_ANIM_BUTTON       = keybinds.stop_anim.name
-PLAY_ANIM_BUTTON       = keybinds.play_anim.name
-PREVIOUS_ANIM_BUTTON   = keybinds.previous_anim.name
-NEXT_ANIM_BUTTON       = keybinds.next_anim.name
 FLATBED_BUTTON         = keybinds.flatbedBtn.name
 AUTOKILL_BUTTON        = keybinds.autokill.name
 ENEMIES_FLEE_BUTTON    = keybinds.enemiesFlee.name
@@ -2144,8 +2142,9 @@ local function displayVehNames()
   vehSound_index, used = ImGui.ListBox("##Vehicle Names", vehSound_index, vehNames, #filteredNames)
 end
 
-local function resetLastVehState(s)
-  if last_vehicle > 0 and ENTITY.DOES_ENTITY_EXIST(last_vehicle) then
+local function resetLastVehState()
+  if last_vehicle > 0 and ENTITY.DOES_ENTITY_EXIST(last_vehicle)
+    and ENTITY.IS_ENTITY_A_VEHICLE(last_vehicle) then
     AUDIO.SET_VEHICLE_RADIO_LOUD(last_vehicle, false)
     if not has_custom_tires then
       VEHICLE.TOGGLE_VEHICLE_MOD(current_vehicle, 20, false)
@@ -2159,9 +2158,10 @@ local function resetLastVehState(s)
   last_vehicle       = current_vehicle
 end
 
-local function onVehEnter(s)
+local function onVehEnter()
   current_vehicle = self.get_veh()
-  if Game.Self.isDriving() and is_car or is_bike or is_quad then
+  if Game.Self.isDriving() and (is_car or is_bike or is_quad)
+    and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
     engine_brake_disabled  = SS.getHandlingFlagState(current_vehicle, HF._FREEWHEEL_NO_GAS)
     traction_ctrl_disabled = SS.getHandlingFlagState(current_vehicle, HF._FORCE_NO_TC_OR_SC)
     kers_boost_enabled     = SS.getHandlingFlagState(current_vehicle, HF._HAS_KERS)
@@ -2170,7 +2170,7 @@ local function onVehEnter(s)
     easy_wheelie_enabled   = SS.getHandlingFlagState(current_vehicle, HF._LOW_SPEED_WHEELIES)
   end
   if Game.Self.isDriving() and current_vehicle ~= last_vehicle then
-    resetLastVehState(s)
+    resetLastVehState()
   end
   return current_vehicle
 end
@@ -7407,15 +7407,17 @@ disableUiSounds    = lua_cfg.read("disableUiSounds")
 useGameLang        = lua_cfg.read("useGameLang")
 local selected_lang
 local lang_T       = {
-  { name = 'English', iso = 'en-US' },
-  { name = 'Français', iso = 'fr-FR' },
-  { name = 'Deütsch', iso = 'de-DE' },
-  -- { name = 'Español',            iso = 'es-ES' },
-  { name = 'Italiano', iso = 'it-IT' },
-  { name = 'Português (Brasil)', iso = 'pt-BR' },
-  { name = 'Русский (Russian)', iso = 'ru-RU' },
-  -- { name = 'Chinese (Traditional)', iso = 'zh-TW' },
-  -- { name = 'Chinese (Simplified)',  iso = 'zh-CH' },
+  { name = 'English',               iso = 'en-US' },
+  { name = 'Français',              iso = 'fr-FR' },
+  { name = 'Deütsch',               iso = 'de-DE' },
+  { name = 'Español',               iso = 'es-ES' },
+  { name = 'Italiano',              iso = 'it-IT' },
+  { name = 'Português (Brasil)',    iso = 'pt-BR' },
+  { name = 'Русский (Russian)',     iso = 'ru-RU' },
+  { name = 'Chinese (Traditional)', iso = 'zh-TW' },
+  { name = 'Chinese (Simplified)',  iso = 'zh-CN' },
+  { name = 'Japanese',              iso = 'ja-JP' },
+  { name = 'Polish',                iso = 'pl-PL' },
 }
 
 function displayLangs()
@@ -7518,7 +7520,7 @@ settings_tab:add_imgui(function()
 
   if not useGameLang then
     ImGui.Text(GENERIC_CUSTOM_LABEL_)
-    ImGui.PushItemWidth(180)
+    ImGui.PushItemWidth(260)
     displayLangs()
     ImGui.PopItemWidth()
     selected_lang = lang_T[lang_idx + 1]
@@ -8725,7 +8727,7 @@ end)
 script.register_looped("TDFT", function(script)
   script:yield()
   if PED.IS_PED_IN_ANY_VEHICLE(self.get_ped(), false) then
-    current_vehicle = onVehEnter(script)
+    current_vehicle = onVehEnter()
     is_car          = VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(current_vehicle))
     is_quad         = VEHICLE.IS_THIS_MODEL_A_QUADBIKE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
     is_plane        = VEHICLE.IS_THIS_MODEL_A_PLANE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
@@ -9970,7 +9972,8 @@ end)
 script.register_looped("HFE", function(hfe)
   if Game.Self.isOutside() then
     if Game.Self.isDriving() and current_vehicle == last_vehicle
-      and not is_plane and not is_heli and not is_boat then
+      and not is_plane and not is_heli and not is_boat
+      and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
       if noEngineBraking then
         if not engine_brake_disabled then
           SS.setHandlingFlag(current_vehicle, HF._FREEWHEEL_NO_GAS, true)

@@ -61,7 +61,7 @@ jobs:
       with:
         type: 'zip'
         filename: "Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip"
-        exclusions: /.git* *.json *.md .editorconfig
+        exclusions: /.git* *.json *.md .editorconfig .py
 
     - name: Upload Release
       uses: ncipollo/release-action@v1.14.0

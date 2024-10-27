@@ -1,20 +1,12 @@
-### v1.3.7 Changelog
+### v1.3.8 Changelog
 
 **Translations:**
 
-- Initialize all strings once instead of calling `tanslateLabel()` inside the GUI loop.
-
-**Custom Paint Jobs:**
-
-- Improved the "Sort By Color" option.
-- Added "Sort By Manufacturer" option.
-- Added more custom paint jobs.
-
-**Handling Flags:**
-
-- Further improvements.
-- Only auto-enable saved handling flags in the background and let the user manually disable them to avoid mistakenly disabling flags for vehicles that already have them by default.
-
-**General:**
-
-- Avoid using string concatenation inside loops.
+- **DEVS ONLY:** Added a Python script that automatically adds new translations in bulk. Either manually install the requirements using pip or uncomment the first 10 lines. Once all requirements are met, run the script and enter your desired language code. The script will translate all text then update the Lua translations file.
+- Added 5 new languages:
+  - Chinese (traditional)
+  - Chinese (Simplified)
+  - Japanese
+  - Polish
+  - Spanish
+- Fixed some broken translations.
