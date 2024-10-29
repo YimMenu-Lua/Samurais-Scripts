@@ -4835,8 +4835,10 @@ business_tab:add_imgui(function()
                   repeat
                     stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
                     hgl:sleep(supply_autofill_delay)
-                  until
-                    hangarSupplies == 50 or hangarLoop == false
+                  until hangarSupplies == 50 or hangarLoop == false
+                  if hangarLoop then
+                    hangarLoop = false
+                  end
                 end)
               end
             end
@@ -5708,7 +5710,7 @@ local function get_cardname_from_index(card_index)
     cardSuit = "Spades"
   end
 
-  return sring.format("%s of %s", cardName, cardSuit)
+  return string.format("%s of %s", cardName, cardSuit)
 end
 
 casino_pacino:add_imgui(function()

@@ -71,10 +71,9 @@ def main_loop():
                         add_translation(Labels, key, iso, target_lang)
                         bar()
                 print(f'All strings translated to {get_lang_name(iso)}')
-                with open(lua_file, "w+", closefd = True):
-                    luadata.write(lua_file, Labels, encoding = "utf-8", indent = "\t", prefix = "Labels = ")
-                    print("\n")
-                    print(f"Added {get_n_strings(Labels, iso)} translated strings to {lua_file}")
+                luadata.write(lua_file, Labels, encoding = "utf-8", indent = "\t", prefix = "Labels = ")
+                print("\n")
+                print(f"Added {get_n_strings(Labels, iso)} translated strings to {lua_file}")
             except Exception as exc:
                 print("\n")
                 print(f'An error occured!\nTraceback: {exc}')
