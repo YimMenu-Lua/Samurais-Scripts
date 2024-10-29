@@ -830,47 +830,47 @@ Labels = {
 	["hide&seek_tt"] = {
 		{
 			iso = "en-US",
-			text = "Allows you to hide inside the trunk of any vehicle (if the vehicle actually has a trunk of course), hide inside dumpsters, or when wanted by the cops, you can press [ENTER] when your vehicle is stopped to hide inside your car.\\10\\10¤ NOTE: All hiding options prevent the cops from seeing you but you can't use them if the cops are looking at you.",
+			text = "Allows you to hide inside the trunk of any vehicle (if the vehicle actually has a trunk of course), hide inside dumpsters, or when wanted by the cops, you can press [ENTER] when your vehicle is stopped to hide inside your car.\10\10¤ NOTE: All hiding options prevent the cops from seeing you but you can't use them if the cops are looking at you.",
 		},
 		{
 			iso = "de-DE",
-			text = "Ermöglicht Ihnen, sich im Kofferraum eines Fahrzeugs zu verstecken (sofern das Fahrzeug überhaupt einen Kofferraum hat), sich in Müllcontainern zu verstecken oder sich, wenn Sie von der Polizei gesucht werden, durch Drücken der [EINGABE]-Taste in Ihrem Auto zu verstecken, wenn Ihr Fahrzeug angehalten wird.\\10\\10¤ HINWEIS: Alle Versteckmöglichkeiten verhindern, dass die Polizei Sie sieht, aber Sie können sie nicht verwenden, wenn die Polizei Sie beobachtet.",
+			text = "Ermöglicht Ihnen, sich im Kofferraum eines Fahrzeugs zu verstecken (sofern das Fahrzeug überhaupt einen Kofferraum hat), sich in Müllcontainern zu verstecken oder sich, wenn Sie von der Polizei gesucht werden, durch Drücken der [EINGABE]-Taste in Ihrem Auto zu verstecken, wenn Ihr Fahrzeug angehalten wird.\10\10¤ HINWEIS: Alle Versteckmöglichkeiten verhindern, dass die Polizei Sie sieht, aber Sie können sie nicht verwenden, wenn die Polizei Sie beobachtet.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Vous permet de vous cacher dans le coffre de n'importe quel véhicule (si le véhicule a réellement un coffre bien sûr), de vous cacher dans des bennes à ordures, ou lorsque vous êtes recherché par la police, vous pouvez appuyer sur [ENTRÉE] lorsque votre véhicule est arrêté pour vous cacher à l'intérieur de votre voiture.\\10\\10¤ REMARQUE : toutes ces options empêchent les flics de vous voir, mais vous ne pouvez pas les utiliser si les flics vous regardent.",
+			text = "Vous permet de vous cacher dans le coffre de n'importe quel véhicule (si le véhicule a réellement un coffre bien sûr), de vous cacher dans des bennes à ordures, ou lorsque vous êtes recherché par la police, vous pouvez appuyer sur [ENTRÉE] lorsque votre véhicule est arrêté pour vous cacher à l'intérieur de votre voiture.\10\10¤ REMARQUE : toutes ces options empêchent les flics de vous voir, mais vous ne pouvez pas les utiliser si les flics vous regardent.",
 		},
 		{
 			iso = "it-IT",
-			text = "Ti consente di nasconderti nel bagagliaio di qualsiasi veicolo (se il veicolo ne ha effettivamente uno, ovviamente), di nasconderti nei cassonetti o, quando la polizia ti cerca, puoi premere [INVIO] quando il tuo veicolo è fermo per nasconderti all'interno della tua auto.\\10\\10¤ NOTA: tutte le opzioni per nasconderti impediscono alla polizia di vederti, ma non puoi usarle se la polizia ti sta guardando.",
+			text = "Ti consente di nasconderti nel bagagliaio di qualsiasi veicolo (se il veicolo ne ha effettivamente uno, ovviamente), di nasconderti nei cassonetti o, quando la polizia ti cerca, puoi premere [INVIO] quando il tuo veicolo è fermo per nasconderti all'interno della tua auto.\10\10¤ NOTA: tutte le opzioni per nasconderti impediscono alla polizia di vederti, ma non puoi usarle se la polizia ti sta guardando.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Permite que você se esconda dentro do porta-malas de qualquer veículo (se o veículo realmente tiver um porta-malas, é claro), se esconda dentro de caçambas ou, quando procurado pela polícia, você pode pressionar [ENTER] quando seu veículo estiver parado para se esconder dentro do carro.\\10\\10¤ NOTA: Todas as opções de esconderijo impedem que os policiais vejam você, mas você não pode usá-las se os policiais estiverem olhando para você.",
+			text = "Permite que você se esconda dentro do porta-malas de qualquer veículo (se o veículo realmente tiver um porta-malas, é claro), se esconda dentro de caçambas ou, quando procurado pela polícia, você pode pressionar [ENTER] quando seu veículo estiver parado para se esconder dentro do carro.\10\10¤ NOTA: Todas as opções de esconderijo impedem que os policiais vejam você, mas você não pode usá-las se os policiais estiverem olhando para você.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Позволяет вам прятаться в багажнике любого транспортного средства (конечно, если у транспортного средства действительно есть багажник), прятаться в мусорных контейнерах или, когда вас разыскивает полиция, вы можете нажать [ENTER], когда ваше транспортное средство остановлено, чтобы спрятаться внутри.\\10\\10¤ ПРИМЕЧАНИЕ: Все варианты укрытия не позволяют полицейским видеть вас, но вы не можете их использовать, если полицейские смотрят на вас.",
+			text = "Позволяет вам прятаться в багажнике любого транспортного средства (конечно, если у транспортного средства действительно есть багажник), прятаться в мусорных контейнерах или, когда вас разыскивает полиция, вы можете нажать [ENTER], когда ваше транспортное средство остановлено, чтобы спрятаться внутри.\10\10¤ ПРИМЕЧАНИЕ: Все варианты укрытия не позволяют полицейским видеть вас, но вы не можете их использовать, если полицейские смотрят на вас.",
 		},
 		{
 			iso = "es-ES",
-			text = "Te permite esconderte dentro del maletero de cualquier vehículo (si el vehículo tiene maletero, por supuesto), esconderte dentro de contenedores de basura o, cuando te busque la policía, puedes presionar [ENTER] cuando tu vehículo esté detenido para esconderte dentro de tu coche.\\10\\10¤ NOTA: Todas las opciones de ocultación evitan que la policía te vea, pero no puedes usarlas si la policía te está mirando.",
+			text = "Te permite esconderte dentro del maletero de cualquier vehículo (si el vehículo tiene maletero, por supuesto), esconderte dentro de contenedores de basura o, cuando te busque la policía, puedes presionar [ENTER] cuando tu vehículo esté detenido para esconderte dentro de tu coche.\10\10¤ NOTA: Todas las opciones de ocultación evitan que la policía te vea, pero no puedes usarlas si la policía te está mirando.",
 		},
 		{
 			iso = "zh-CN",
-			text = "允许您隐藏在任何车辆的后备箱内（当然，如果车辆确实有后备箱的话），隐藏在垃圾箱内，或者当警察通缉时，您可以在车辆停下时按 [ENTER] 隐藏在车内。\\10\\10¤ 注意：所有隐藏选项都可以防止警察看到您，但如果警察正在看着您，您就无法使用它们。",
+			text = "允许您隐藏在任何车辆的后备箱内（当然，如果车辆确实有后备箱的话），隐藏在垃圾箱内，或者当警察通缉时，您可以在车辆停下时按 [ENTER] 隐藏在车内。\10\10¤ 注意：所有隐藏选项都可以防止警察看到您，但如果警察正在看着您，您就无法使用它们。",
 		},
 		{
 			iso = "zh-TW",
-			text = "允許您隱藏在任何車輛的後備箱內（當然，如果車輛確實有後備箱）、隱藏在垃圾箱內，或者當警察通緝時，您可以在車輛停下來時按 [ENTER] 隱藏在車內。 10\\10¤ 注意：所有隱藏選項都會阻止警察看到您，但如果警察正在看著您，您就無法使用它們。",
+			text = "允許您隱藏在任何車輛的後備箱內（當然，如果車輛確實有後備箱）、隱藏在垃圾箱內，或者當警察通緝時，您可以在車輛停下來時按 [ENTER] 隱藏在車內。 10\10¤ 注意：所有隱藏選項都會阻止警察看到您，但如果警察正在看著您，您就無法使用它們。",
 		},
 		{
 			iso = "ja-JP",
-			text = "あらゆる車両のトランクの中に隠れることができます (もちろん、車両にトランクが実際にある場合)。また、ゴミ箱の中に隠れたり、警察に指名手配されたときに車両が停止しているときに [ENTER] を押して車の中に隠れたりすることもできます。\\10\\10¤ 注: すべての隠れオプションは、警察に見られないようにしますが、警察に見られている場合は使用できません。",
+			text = "あらゆる車両のトランクの中に隠れることができます (もちろん、車両にトランクが実際にある場合)。また、ゴミ箱の中に隠れたり、警察に指名手配されたときに車両が停止しているときに [ENTER] を押して車の中に隠れたりすることもできます。\10\10¤ 注: すべての隠れオプションは、警察に見られないようにしますが、警察に見られている場合は使用できません。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Umożliwia ci ukrycie się w bagażniku dowolnego pojazdu (oczywiście, jeśli pojazd go posiada), ukrycie się w śmietniku lub, gdy policja cię szuka, możesz nacisnąć [ENTER], gdy twój pojazd stoi, aby schować się w środku samochodu.\\10\\10¤ UWAGA: Wszystkie opcje ukrywania się uniemożliwiają policji zobaczenie cię, ale nie możesz z nich skorzystać, jeśli policja na ciebie patrzy.",
+			text = "Umożliwia ci ukrycie się w bagażniku dowolnego pojazdu (oczywiście, jeśli pojazd go posiada), ukrycie się w śmietniku lub, gdy policja cię szuka, możesz nacisnąć [ENTER], gdy twój pojazd stoi, aby schować się w środku samochodu.\10\10¤ UWAGA: Wszystkie opcje ukrywania się uniemożliwiają policji zobaczenie cię, ale nie możesz z nich skorzystać, jeśli policja na ciebie patrzy.",
 		},
 	},
 	soundplayer = {
@@ -1244,35 +1244,35 @@ Labels = {
 	favs_nil_txt = {
 		{
 			iso = "en-US",
-			text = "Nothing to show at the moment.\\10\\10Add some animations or scenarios to favorites to save them here.",
+			text = "Nothing to show at the moment.\10\10Add some animations or scenarios to favorites to save them here.",
 		},
 		{
 			iso = "de-DE",
-			text = "Im Moment gibt es nichts zu zeigen.\\10\\10Fügen Sie einige Animationen oder Szenarien zu den Favoriten hinzu, um sie hier zu speichern.",
+			text = "Im Moment gibt es nichts zu zeigen.\10\10Fügen Sie einige Animationen oder Szenarien zu den Favoriten hinzu, um sie hier zu speichern.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Rien à montrer pour l'instant.\\10\\10Ajouter des animations ou des scénarios aux favoris pour les sauvegarder ici.",
+			text = "Rien à montrer pour l'instant.\10\10Ajouter des animations ou des scénarios aux favoris pour les sauvegarder ici.",
 		},
 		{
 			iso = "it-IT",
-			text = "Non c'è nulla da mostrare al momento.\\10}Aggiungi alcune animazioni o scenari ai preferiti per salvarli qui.",
+			text = "Non c'è nulla da mostrare al momento.\10}Aggiungi alcune animazioni o scenari ai preferiti per salvarli qui.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Nada para mostrar no momento.\\10\\10Adicione algumas animações ou cenários aos favoritos para salvá-los aqui.",
+			text = "Nada para mostrar no momento.\10\10Adicione algumas animações ou cenários aos favoritos para salvá-los aqui.",
 		},
 		{
 			iso = "ru-RU",
-			text = "На данный момент показывать нечего.\\10\\10Добавьте несколько анимаций или сценариев в избранное, чтобы сохранить их здесь.",
+			text = "На данный момент показывать нечего.\10\10Добавьте несколько анимаций или сценариев в избранное, чтобы сохранить их здесь.",
 		},
 		{
 			iso = "es-ES",
-			text = "No hay nada que mostrar en este momento.\\10\\10Agrega algunas animaciones o escenarios a favoritos para guardarlos aquí.",
+			text = "No hay nada que mostrar en este momento.\10\10Agrega algunas animaciones o escenarios a favoritos para guardarlos aquí.",
 		},
 		{
 			iso = "zh-CN",
-			text = "目前还没有任何内容可显示。\\10\\10将一些动画或场景添加到收藏夹以在此处保存。",
+			text = "目前还没有任何内容可显示。\10\10将一些动画或场景添加到收藏夹以在此处保存。",
 		},
 		{
 			iso = "zh-TW",
@@ -1280,11 +1280,11 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "現時点では表示するものはありません。\\10\\10アニメーションやシナリオをお気に入りに追加して、ここに保存します。",
+			text = "現時点では表示するものはありません。\10\10アニメーションやシナリオをお気に入りに追加して、ここに保存します。",
 		},
 		{
 			iso = "pl-PL",
-			text = "W tej chwili nie ma nic do pokazania.\\10\\10Dodaj animacje lub scenariusze do ulubionych, aby je tutaj zapisać.",
+			text = "W tej chwili nie ma nic do pokazania.\10\10Dodaj animacje lub scenariusze do ulubionych, aby je tutaj zapisać.",
 		},
 	},
 	recents_tab = {
@@ -1336,35 +1336,35 @@ Labels = {
 	recents_nil_txt = {
 		{
 			iso = "en-US",
-			text = "Nothing to show at the moment.\\10\\10Play some animations or scenarios to find them here afterwards.",
+			text = "Nothing to show at the moment.\10\10Play some animations or scenarios to find them here afterwards.",
 		},
 		{
 			iso = "de-DE",
-			text = "Im Moment gibt es nichts zu zeigen.\\10\\10Spielen Sie einige Animationen oder Szenarien, um sie anschließend hier zu finden.",
+			text = "Im Moment gibt es nichts zu zeigen.\10\10Spielen Sie einige Animationen oder Szenarien, um sie anschließend hier zu finden.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Rien à montrer pour le moment.\\10\\10Jouez quelques animations ou scénarios pour les retrouver ici par la suite.",
+			text = "Rien à montrer pour le moment.\10\10Jouez quelques animations ou scénarios pour les retrouver ici par la suite.",
 		},
 		{
 			iso = "it-IT",
-			text = "Nulla da mostrare al momento.\\10\\10Gioca ad alcune animazioni o scenari per trovarli qui in seguito.",
+			text = "Nulla da mostrare al momento.\10\10Gioca ad alcune animazioni o scenari per trovarli qui in seguito.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Nada para mostrar no momento.\\10\\10Jogue algumas animações ou cenários para encontrá-los aqui depois.",
+			text = "Nada para mostrar no momento.\10\10Jogue algumas animações ou cenários para encontrá-los aqui depois.",
 		},
 		{
 			iso = "ru-RU",
-			text = "На данный момент показать нечего.\\10\\10Поиграйте в анимации или сценарии, чтобы потом найти их здесь.",
+			text = "На данный момент показать нечего.\10\10Поиграйте в анимации или сценарии, чтобы потом найти их здесь.",
 		},
 		{
 			iso = "es-ES",
-			text = "No hay nada que mostrar por el momento.\\10\\10Reproduce algunas animaciones o escenarios para encontrarlos aquí después.",
+			text = "No hay nada que mostrar por el momento.\10\10Reproduce algunas animaciones o escenarios para encontrarlos aquí después.",
 		},
 		{
 			iso = "zh-CN",
-			text = "目前还没有任何内容可显示。\\10\\10播放一些动画或场景，然后在这里找到它们。",
+			text = "目前还没有任何内容可显示。\10\10播放一些动画或场景，然后在这里找到它们。",
 		},
 		{
 			iso = "zh-TW",
@@ -1372,11 +1372,11 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "現時点では表示するものはありません。\\10\\10いくつかのアニメーションまたはシナリオを再生して、後でここで見つけてください。",
+			text = "現時点では表示するものはありません。\10\10いくつかのアニメーションまたはシナリオを再生して、後でここで見つけてください。",
 		},
 		{
 			iso = "pl-PL",
-			text = "W tej chwili nie ma nic do pokazania.\\10\\10Odtwórz animacje lub scenariusze, aby później je tutaj znaleźć.",
+			text = "W tej chwili nie ma nic do pokazania.\10\10Odtwórz animacje lub scenariusze, aby później je tutaj znaleźć.",
 		},
 	},
 	weaponTab = {
@@ -1566,35 +1566,35 @@ Labels = {
 	triggerbot_tt = {
 		{
 			iso = "en-US",
-			text = "A barebones triggerbot that uses game natives. No hackery involved.\\10\\10Press ___ on keyboard or --- on controller while aiming at a ped to automatically shoot them in the head. Only works on foot.",
+			text = "A barebones triggerbot that uses game natives. No hackery involved.\10\10Press ___ on keyboard or --- on controller while aiming at a ped to automatically shoot them in the head. Only works on foot.",
 		},
 		{
 			iso = "de-DE",
-			text = "Ein Triggerbot, der 'native Elemente' (RAGE natives) des Spiels verwendet. Keine Hacks involviert.\\10\\10Drücke die ___ auf der Tastatur oder  --- auf dem Controller, während des Zielen auf einen NPC, um diesen automatisch in den Kopf zu schießen. Funktioniert nur zu Fuß.",
+			text = "Ein Triggerbot, der 'native Elemente' (RAGE natives) des Spiels verwendet. Keine Hacks involviert.\10\10Drücke die ___ auf der Tastatur oder  --- auf dem Controller, während des Zielen auf einen NPC, um diesen automatisch in den Kopf zu schießen. Funktioniert nur zu Fuß.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Un triggerbot minimaliste qui utilise les natifs du jeu (RAGE natives). Aucun piratage n'est impliqué.\\10\\10Appuyez sur ___ sur le clavier ou --- sur le contrôleur tout en visant un piéton pour lui tirer automatiquement une balle dans la tête. Ne fonctionne qu'à pied.",
+			text = "Un triggerbot minimaliste qui utilise les natifs du jeu (RAGE natives). Aucun piratage n'est impliqué.\10\10Appuyez sur ___ sur le clavier ou --- sur le contrôleur tout en visant un piéton pour lui tirer automatiquement une balle dans la tête. Ne fonctionne qu'à pied.",
 		},
 		{
 			iso = "it-IT",
-			text = "Un triggerbot essenziale che usa i nativi del gioco. Nessun hackeraggio coinvolto.\\10\\10Premi ___ sulla tastiera o --- sul controller mentre miri a un pedone per sparargli automaticamente alla testa. Funziona solo a piedi.",
+			text = "Un triggerbot essenziale che usa i nativi del gioco. Nessun hackeraggio coinvolto.\10\10Premi ___ sulla tastiera o --- sul controller mentre miri a un pedone per sparargli automaticamente alla testa. Funziona solo a piedi.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Um triggerbot simples que usa nativos do jogo. Não há hackers envolvidos.\\10\\10Pressione ___ no teclado ou --- no controle ao mirar em um pedestre para atirar automaticamente na cabeça dele. Só funciona a pé.",
+			text = "Um triggerbot simples que usa nativos do jogo. Não há hackers envolvidos.\10\10Pressione ___ no teclado ou --- no controle ao mirar em um pedestre para atirar automaticamente na cabeça dele. Só funciona a pé.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Базовый триггербот, использующий нативные игровые возможности. Никакого хакерства.\\10\\10Нажмите ___ на клавиатуре или --- на контроллере, нацелившись на пешехода, чтобы автоматически выстрелить ему в голову. Работает только на ногах.",
+			text = "Базовый триггербот, использующий нативные игровые возможности. Никакого хакерства.\10\10Нажмите ___ на клавиатуре или --- на контроллере, нацелившись на пешехода, чтобы автоматически выстрелить ему в голову. Работает только на ногах.",
 		},
 		{
 			iso = "es-ES",
-			text = "Un bot de disparo básico que utiliza elementos nativos del juego. No requiere ningún tipo de piratería.\\10\\10Presiona ___ en el teclado o --- en el control mientras apuntas a un peatón para dispararle automáticamente en la cabeza. Solo funciona a pie.",
+			text = "Un bot de disparo básico que utiliza elementos nativos del juego. No requiere ningún tipo de piratería.\10\10Presiona ___ en el teclado o --- en el control mientras apuntas a un peatón para dispararle automáticamente en la cabeza. Solo funciona a pie.",
 		},
 		{
 			iso = "zh-CN",
-			text = "一款使用游戏原生代码的简易触发机器人。无需黑客技术。\\10\\10 瞄准行人时按下键盘上的 ___ 或控制器上的 --- 即可自动射击行人的头部。仅适用于步行。",
+			text = "一款使用游戏原生代码的简易触发机器人。无需黑客技术。\10\10 瞄准行人时按下键盘上的 ___ 或控制器上的 --- 即可自动射击行人的头部。仅适用于步行。",
 		},
 		{
 			iso = "zh-TW",
@@ -1602,11 +1602,11 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "ゲームネイティブを使用する必要最低限​​のトリガーボット。ハッキングは一切使用していません。\\10\\10歩行者を狙っているときにキーボードの ___ またはコントローラーの --- を押すと、歩行者の頭を自動的に撃ちます。徒歩でのみ機能します。",
+			text = "ゲームネイティブを使用する必要最低限​​のトリガーボット。ハッキングは一切使用していません。\10\10歩行者を狙っているときにキーボードの ___ またはコントローラーの --- を押すと、歩行者の頭を自動的に撃ちます。徒歩でのみ機能します。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Prosty triggerbot, który używa natywnych elementów gry. Bez żadnych sztuczek.\\10\\10Naciśnij ___ na klawiaturze lub --- na kontrolerze, celując w pieszego, aby automatycznie strzelić mu w głowę. Działa tylko pieszo.",
+			text = "Prosty triggerbot, który używa natywnych elementów gry. Bez żadnych sztuczek.\10\10Naciśnij ___ na klawiaturze lub --- na kontrolerze, celując w pieszego, aby automatycznie strzelić mu w głowę. Działa tylko pieszo.",
 		},
 	},
 	enemyonlyCB = {
@@ -1888,47 +1888,47 @@ Labels = {
 	katana_tt = {
 		{
 			iso = "en-US",
-			text = "Terrorize the streets of Los Santos like a true Samurai by replacing the 'Machete' weapon with a Japanese Katana.\\10\\10If you don't own a Machete, you can either buy one from Ammu-Nation or use YimMenu to equip a temporary one.",
+			text = "Terrorize the streets of Los Santos like a true Samurai by replacing the 'Machete' weapon with a Japanese Katana.\10\10If you don't own a Machete, you can either buy one from Ammu-Nation or use YimMenu to equip a temporary one.",
 		},
 		{
 			iso = "de-DE",
-			text = "Terrorisiere die Straßen von Los Santos wie ein echter Samurai, indem du die 'Machete'-Waffe durch ein japanisches Katana ersetzst.\\10\\10Wenn du keinen Machete besitzt, kannst du entweder einen von Ammu-Nation kaufen oder YimMenu benutzen, um einen temporären Queue zu besorgen.",
+			text = "Terrorisiere die Straßen von Los Santos wie ein echter Samurai, indem du die 'Machete'-Waffe durch ein japanisches Katana ersetzst.\10\10Wenn du keinen Machete besitzt, kannst du entweder einen von Ammu-Nation kaufen oder YimMenu benutzen, um einen temporären Queue zu besorgen.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Terrorisez les rues de Los Santos comme un vrai Samouraï en remplaçant l'arme 'Machete' par un Katana japonais.\\10\\10Si vous ne possédez pas de Machete, vous pouvez en acheter une auprès d'Ammu-Nation ou utiliser YimMenu pour en équiper une provisoire.",
+			text = "Terrorisez les rues de Los Santos comme un vrai Samouraï en remplaçant l'arme 'Machete' par un Katana japonais.\10\10Si vous ne possédez pas de Machete, vous pouvez en acheter une auprès d'Ammu-Nation ou utiliser YimMenu pour en équiper une provisoire.",
 		},
 		{
 			iso = "it-IT",
-			text = "Terrorizza le strade di Los Santos come un vero Samurai sostituendo l'arma 'Machete' con una Katana giapponese.\\10\\10Se non si possiede una Machete, è possibile acquistarne una da Ammu-Nation o utilizzare YimMenu per equipaggiarne una temporanea.",
+			text = "Terrorizza le strade di Los Santos come un vero Samurai sostituendo l'arma 'Machete' con una Katana giapponese.\10\10Se non si possiede una Machete, è possibile acquistarne una da Ammu-Nation o utilizzare YimMenu per equipaggiarne una temporanea.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Aterrorize as ruas de Los Santos como um verdadeiro samurai, substituindo a arma 'Machete' por uma Katana japonesa.\\10\\10Se você não tiver um Machete, poderá comprar um na Ammu-Nation ou usar o YimMenu para equipar um taco temporário.",
+			text = "Aterrorize as ruas de Los Santos como um verdadeiro samurai, substituindo a arma 'Machete' por uma Katana japonesa.\10\10Se você não tiver um Machete, poderá comprar um na Ammu-Nation ou usar o YimMenu para equipar um taco temporário.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Наводите ужас на улицы Лос-Сантоса как настоящий самурай, заменив оружие 'мачете' на японскую катану.\\10\\10Если у вас нет мачете, вы можете купить его у Ammu-Nation или использовать YimMenu для создания временного кия.",
+			text = "Наводите ужас на улицы Лос-Сантоса как настоящий самурай, заменив оружие 'мачете' на японскую катану.\10\10Если у вас нет мачете, вы можете купить его у Ammu-Nation или использовать YimMenu для создания временного кия.",
 		},
 		{
 			iso = "es-ES",
-			text = "Aterroriza las calles de Los Santos como un verdadero samurái reemplazando el arma 'Machete' con una Katana japonesa.\\10\\10Si no tienes un Machete, puedes comprar uno en Ammu-Nation o usar YimMenu para equipar uno temporal.",
+			text = "Aterroriza las calles de Los Santos como un verdadero samurái reemplazando el arma 'Machete' con una Katana japonesa.\10\10Si no tienes un Machete, puedes comprar uno en Ammu-Nation o usar YimMenu para equipar uno temporal.",
 		},
 		{
 			iso = "zh-CN",
-			text = "用日本武士刀代替“砍刀”武器，像真正的武士一样恐吓洛圣都的街道。\\10\\10如果您没有砍刀，您可以从 Ammu-Nation 购买一把，也可以使用 YimMenu 装备一把临时的。",
+			text = "用日本武士刀代替“砍刀”武器，像真正的武士一样恐吓洛圣都的街道。\10\10如果您没有砍刀，您可以从 Ammu-Nation 购买一把，也可以使用 YimMenu 装备一把临时的。",
 		},
 		{
 			iso = "zh-TW",
-			text = "用日本武士刀替換「彎刀」武器，像真正的武士一樣恐嚇洛桑托斯的街道。 \\10\\10如果你沒有彎刀，你可以從 Ammu-Nation 購買一把，也可以使用 YimMenu 裝備臨時武器一。",
+			text = "用日本武士刀替換「彎刀」武器，像真正的武士一樣恐嚇洛桑托斯的街道。 \10\10如果你沒有彎刀，你可以從 Ammu-Nation 購買一把，也可以使用 YimMenu 裝備臨時武器一。",
 		},
 		{
 			iso = "ja-JP",
-			text = "「マチェーテ」武器を日本刀に置き換えて、真のサムライのようにロスサントスの街を恐怖に陥れましょう。\\10\\10マチェーテを持っていない場合は、Ammu-Nation から購入するか、YimMenu を使用して一時的に装備することができます。",
+			text = "「マチェーテ」武器を日本刀に置き換えて、真のサムライのようにロスサントスの街を恐怖に陥れましょう。\10\10マチェーテを持っていない場合は、Ammu-Nation から購入するか、YimMenu を使用して一時的に装備することができます。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Siej terror na ulicach Los Santos jak prawdziwy samuraj, zastępując broń „maczetę” japońską kataną.\\10\\10Jeśli nie posiadasz maczety, możesz kupić ją w Ammu-Nation lub skorzystać z YimMenu, aby wyposażyć się w tymczasową broń.",
+			text = "Siej terror na ulicach Los Santos jak prawdziwy samuraj, zastępując broń „maczetę” japońską kataną.\10\10Jeśli nie posiadasz maczety, możesz kupić ją w Ammu-Nation lub skorzystać z YimMenu, aby wyposażyć się w tymczasową broń.",
 		},
 	},
 	laserSightCB = {
@@ -2716,53 +2716,53 @@ Labels = {
 	missile_def_tt = {
 		{
 			iso = "en-US",
-			text = "Inrercepts any missiles near your vehicle including those fired by you.\\10\\10NOTE: If you fire any missiles from or near your vehicle, the defense will render them inert.",
+			text = "Inrercepts any missiles near your vehicle including those fired by you.\10\10NOTE: If you fire any missiles from or near your vehicle, the defence will render them inert.",
 		},
 		{
 			iso = "de-DE",
-			text = "Fängt alle Raketen in der Nähe Ihres Fahrzeugs ab, einschließlich der von Ihnen abgefeuerten.\\10\\10HINWEIS: Wenn Sie von Ihrem Fahrzeug aus oder in dessen Nähe Raketen abfeuern, werden diese durch die Verteidigung unschädlich gemacht.",
+			text = "Fängt alle Raketen in der Nähe Ihres Fahrzeugs ab, einschließlich der von Ihnen abgefeuerten.\10\10HINWEIS: Wenn Sie von Ihrem Fahrzeug aus oder in dessen Nähe Raketen abfeuern, werden diese durch die Verteidigung unschädlich gemacht.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Intercepte tous les missiles à proximité de votre véhicule, y compris ceux que vous avez tirés.\\10\\10REMARQUE : Si vous tirez des missiles depuis ou à proximité de votre véhicule, la défense les rendra inertes.",
+			text = "Intercepte tous les missiles à proximité de votre véhicule, y compris ceux que vous avez tirés.\10\10REMARQUE : Si vous tirez des missiles depuis ou à proximité de votre véhicule, la défense les rendra inertes.",
 		},
 		{
 			iso = "it-IT",
-			text = "Intercetta tutti i missili vicini al veicolo, compresi quelli lanciati dall'utente.\\10\\10NOTA: Se si lanciano missili dal veicolo o nelle sue vicinanze, la difesa li renderà inerti.",
+			text = "Intercetta tutti i missili vicini al veicolo, compresi quelli lanciati dall'utente.\10\10NOTA: Se si lanciano missili dal veicolo o nelle sue vicinanze, la difesa li renderà inerti.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Intercepta todos os mísseis próximos ao seu veículo, inclusive os disparados por você.\\10\\10NOTA: Se você disparar algum míssil do seu veículo ou próximo a ele, a defesa o tornará inerte.",
+			text = "Intercepta todos os mísseis próximos ao seu veículo, inclusive os disparados por você.\10\10NOTA: Se você disparar algum míssil do seu veículo ou próximo a ele, a defesa o tornará inerte.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Перехватывает любые ракеты, находящиеся рядом с машиной, в том числе и выпущенные вами.\\10\\10Примечание: Если вы выпустите ракеты из машины или рядом с ней, защита сделает их инертными.",
+			text = "Перехватывает любые ракеты, находящиеся рядом с машиной, в том числе и выпущенные вами.\10\10Примечание: Если вы выпустите ракеты из машины или рядом с ней, защита сделает их инертными.",
 		},
 		{
 			iso = "es-ES",
-			text = "Intercepta cualquier misil cerca de tu vehículo, incluidos aquellos disparados por ti.\\10\\10NOTA: Si disparas cualquier misil desde o cerca de tu vehículo, la defensa los dejará inertes.",
+			text = "Intercepta cualquier misil cerca de tu vehículo, incluidos aquellos disparados por ti.\10\10NOTA: Si disparas cualquier misil desde o cerca de tu vehículo, la defensa los dejará inertes.",
 		},
 		{
 			iso = "zh-CN",
-			text = "拦截您车辆附近的任何导弹，包括您发射的导弹。\\10\\10注意：如果您从车辆或车辆附近发射任何导弹，防御系统将使它们失效。",
+			text = "拦截您车辆附近的任何导弹，包括您发射的导弹。\10\10注意：如果您从车辆或车辆附近发射任何导弹，防御系统将使它们失效。",
 		},
 		{
 			iso = "zh-TW",
-			text = "攔截你的車輛附近的任何飛彈，包括你發射的飛彈。 \\10\\10注意：如果你從你的車輛或靠近你的車輛發射任何飛彈，防禦將使它們失效。",
+			text = "攔截你的車輛附近的任何飛彈，包括你發射的飛彈。 \10\10注意：如果你從你的車輛或靠近你的車輛發射任何飛彈，防禦將使它們失效。",
 		},
 		{
 			iso = "ja-JP",
-			text = "あなた自身が発射したミサイルも含め、あなたの車両の近くにあるミサイルをすべて迎撃します。\\10\\10注: 車両からまたは車両の近くでミサイルを発射した場合、防御によりミサイルは不活性化されます。",
+			text = "あなた自身が発射したミサイルも含め、あなたの車両の近くにあるミサイルをすべて迎撃します。\10\10注: 車両からまたは車両の近くでミサイルを発射した場合、防御によりミサイルは不活性化されます。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Wykrywa wszelkie pociski w pobliżu Twojego pojazdu, w tym te wystrzelone przez Ciebie.\\10\\10UWAGA: Jeśli wystrzelisz pociski ze swojego pojazdu lub w jego pobliżu, obrona unieruchomi je.",
+			text = "Wykrywa wszelkie pociski w pobliżu Twojego pojazdu, w tym te wystrzelone przez Ciebie.\10\10UWAGA: Jeśli wystrzelisz pociski ze swojego pojazdu lub w jego pobliżu, obrona unieruchomi je.",
 		},
 	},
 	missile_def_on_notif = {
 		{
 			iso = "en-US",
-			text = "Missile defense activated! Please note that firing any missiles from or near your vehicle will render them inert.",
+			text = "Missile defence activated! Please note that firing any missiles from or near your vehicle will render them inert.",
 		},
 		{
 			iso = "de-DE",
@@ -2808,7 +2808,7 @@ Labels = {
 	missile_def_off_notif = {
 		{
 			iso = "en-US",
-			text = "Missile defense deactivated.",
+			text = "Missile defence deactivated.",
 		},
 		{
 			iso = "de-DE",
@@ -3447,35 +3447,35 @@ Labels = {
 	flaresforall_tt = {
 		{
 			iso = "en-US",
-			text = "Equip all planes with unlimited flares.\\10\\10 ¤ NOTE: There is a 3 second delay between each use of these flares. The button is the same counter-measure button, default: [E].",
+			text = "Equip all planes with unlimited flares.\10\10 ¤ NOTE: There is a 3 second delay between each use of these flares. The button is the same counter-measure button, default: [E].",
 		},
 		{
 			iso = "de-DE",
-			text = "Rüsten Sie alle Flugzeuge mit unbegrenzten Leuchtraketen aus.\\10\\10 ¤ HINWEIS: Es gibt eine 3-Sekunden-Verzögerung zwischen jedem Einsatz dieser Leuchtraketen. Die Taste ist die gleiche Taste für Gegenmaßnahmen, Standard: [E].",
+			text = "Rüsten Sie alle Flugzeuge mit unbegrenzten Leuchtraketen aus.\10\10 ¤ HINWEIS: Es gibt eine 3-Sekunden-Verzögerung zwischen jedem Einsatz dieser Leuchtraketen. Die Taste ist die gleiche Taste für Gegenmaßnahmen, Standard: [E].",
 		},
 		{
 			iso = "fr-FR",
-			text = "Équiper tous les avions avec un nombre illimité de fusées éclairantes.\\10\\10 ¤ NOTE : Il y a un délai de 3 secondes entre chaque utilisation de ces fusées. Le bouton est le même que celui des contre-mesures, par défaut : [E].",
+			text = "Équiper tous les avions avec un nombre illimité de fusées éclairantes.\10\10 ¤ NOTE : Il y a un délai de 3 secondes entre chaque utilisation de ces fusées. Le bouton est le même que celui des contre-mesures, par défaut : [E].",
 		},
 		{
 			iso = "it-IT",
-			text = "Equipaggia tutti gli aerei con razzi illimitati.\\10\\10 ¤ NOTA: c'è un ritardo di 3 secondi tra l'uso di questi razzi. Il pulsante è lo stesso pulsante di contromisura, predefinito: [E].",
+			text = "Equipaggia tutti gli aerei con razzi illimitati.\10\10 ¤ NOTA: c'è un ritardo di 3 secondi tra l'uso di questi razzi. Il pulsante è lo stesso pulsante di contromisura, predefinito: [E].",
 		},
 		{
 			iso = "pt-BR",
-			text = "Equipe todos os aviões com sinalizadores ilimitados.\\10\\10 ¤ OBSERVAÇÃO: há um atraso de 3 segundos entre cada uso desses sinalizadores. O botão é o mesmo botão de contramedida, padrão: [E].",
+			text = "Equipe todos os aviões com sinalizadores ilimitados.\10\10 ¤ OBSERVAÇÃO: há um atraso de 3 segundos entre cada uso desses sinalizadores. O botão é o mesmo botão de contramedida, padrão: [E].",
 		},
 		{
 			iso = "ru-RU",
-			text = "Оснастите все самолеты неограниченным количеством сигнальных ракет.\\10\\10 ¤ ПРИМЕЧАНИЕ: Между каждым использованием этих сигнальных ракет есть 3-секундная задержка. Кнопка - та же кнопка противодействия, по умолчанию: [E].",
+			text = "Оснастите все самолеты неограниченным количеством сигнальных ракет.\10\10 ¤ ПРИМЕЧАНИЕ: Между каждым использованием этих сигнальных ракет есть 3-секундная задержка. Кнопка - та же кнопка противодействия, по умолчанию: [E].",
 		},
 		{
 			iso = "es-ES",
-			text = "Equipa todos los aviones con bengalas ilimitadas.\\10\\10 ¤ NOTA: Hay un retraso de 3 segundos entre cada uso de estas bengalas. El botón es el mismo botón de contramedida, predeterminado: [E].",
+			text = "Equipa todos los aviones con bengalas ilimitadas.\10\10 ¤ NOTA: Hay un retraso de 3 segundos entre cada uso de estas bengalas. El botón es el mismo botón de contramedida, predeterminado: [E].",
 		},
 		{
 			iso = "zh-CN",
-			text = "为所有飞机配备无限数量的照明弹。\\10\\10 ¤ 注意：每次使用这些照明弹之间有 3 秒的延迟。按钮与反制措施按钮相同，默认：[E]。",
+			text = "为所有飞机配备无限数量的照明弹。\10\10 ¤ 注意：每次使用这些照明弹之间有 3 秒的延迟。按钮与反制措施按钮相同，默认：[E]。",
 		},
 		{
 			iso = "zh-TW",
@@ -3483,45 +3483,45 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "すべての飛行機に無制限のフレアを装備します。\\10\\10 ¤ 注意: これらのフレアの使用には 3 秒の遅延があります。ボタンは対抗手段ボタンと同じです。デフォルト: [E]。",
+			text = "すべての飛行機に無制限のフレアを装備します。\10\10 ¤ 注意: これらのフレアの使用には 3 秒の遅延があります。ボタンは対抗手段ボタンと同じです。デフォルト: [E]。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Wyposaż wszystkie samoloty w nieograniczoną liczbę flar.\\10\\10 ¤ UWAGA: Między każdym użyciem flar występuje 3-sekundowe opóźnienie. Przycisk jest tym samym przyciskiem przeciwdziałania, domyślnie: [E].",
+			text = "Wyposaż wszystkie samoloty w nieograniczoną liczbę flar.\10\10 ¤ UWAGA: Między każdym użyciem flar występuje 3-sekundowe opóźnienie. Przycisk jest tym samym przyciskiem przeciwdziałania, domyślnie: [E].",
 		},
 	},
 	planeSpeed_tt = {
 		{
 			iso = "en-US",
-			text = "Increases the speed limit on planes.\\10\\10  ¤ Note 1: You must be flying at a reasonable altitude to gain speed, otherwise the game will force you to fly slowly if you're too low.\\10\\10  ¤ Note 2: Even with this option, we're still capping the speed at approximately 555km/h because anything over that will prevent textures from loading and eventually break your game, which is the reason why R* limited plane speeds in the first place.",
+			text = "Increases the speed limit on planes.\10\10  ¤ Note 1: You must be flying at a reasonable altitude to gain speed, otherwise the game will force you to fly slowly if you're too low.\10\10  ¤ Note 2: Even with this option, we're still capping the speed at approximately 555km/h because anything over that will prevent textures from loading and eventually break your game, which is the reason why R* limited plane speeds in the first place.",
 		},
 		{
 			iso = "de-DE",
-			text = "Erhöht die Geschwindigkeitsbegrenzung für Flugzeuge.\\10\\10 ¤ Hinweis 1: Ihr müsst in einer angemessenen Höhe fliegen, um Geschwindigkeit zu erreichen, sonst zwingt euch das Spiel, langsam zu fliegen, wenn ihr zu niedrig seid.\\10\\10 ¤ Hinweis 2: Auch mit dieser Option begrenzen wir die Geschwindigkeit auf etwa 555 km/h, weil alles, was darüber hinausgeht, das Laden von Texturen verhindert und schließlich euer Spiel kaputt macht, was der Grund dafür ist, dass R* die Geschwindigkeit von Flugzeugen überhaupt begrenzt hat.",
+			text = "Erhöht die Geschwindigkeitsbegrenzung für Flugzeuge.\10\10 ¤ Hinweis 1: Ihr müsst in einer angemessenen Höhe fliegen, um Geschwindigkeit zu erreichen, sonst zwingt euch das Spiel, langsam zu fliegen, wenn ihr zu niedrig seid.\10\10 ¤ Hinweis 2: Auch mit dieser Option begrenzen wir die Geschwindigkeit auf etwa 555 km/h, weil alles, was darüber hinausgeht, das Laden von Texturen verhindert und schließlich euer Spiel kaputt macht, was der Grund dafür ist, dass R* die Geschwindigkeit von Flugzeugen überhaupt begrenzt hat.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Augmente la vitesse limite des avions.\\10\\10- Note 1 : Vous devez voler à une altitude raisonnable pour gagner de la vitesse, sinon le jeu vous forcera à voler lentement si vous êtes trop bas.\\10\\10- Note 2 : Même avec cette option, nous limitons toujours la vitesse à environ 555km/h parce que tout ce qui dépasse cette vitesse empêchera le chargement des textures et finira par casser votre jeu, ce qui est la raison pour laquelle R* a limité la vitesse des avions en premier lieu.",
+			text = "Augmente la vitesse limite des avions.\10\10- Note 1 : Vous devez voler à une altitude raisonnable pour gagner de la vitesse, sinon le jeu vous forcera à voler lentement si vous êtes trop bas.\10\10- Note 2 : Même avec cette option, nous limitons toujours la vitesse à environ 555km/h parce que tout ce qui dépasse cette vitesse empêchera le chargement des textures et finira par casser votre jeu, ce qui est la raison pour laquelle R* a limité la vitesse des avions en premier lieu.",
 		},
 		{
 			iso = "it-IT",
-			text = "Aumenta il limite di velocità degli aerei.\\10\\10 ¤ Nota 1: per guadagnare velocità è necessario volare a un'altitudine ragionevole, altrimenti il gioco vi costringerà a volare lentamente se siete troppo bassi.\\10\\10 ¤ Nota 2: anche con questa opzione, limitiamo la velocità a circa 555 km/h, perché qualsiasi velocità superiore impedisce il caricamento delle texture e finisce per rompere il gioco, che è il motivo per cui R* ha limitato la velocità degli aerei in primo luogo.",
+			text = "Aumenta il limite di velocità degli aerei.\10\10 ¤ Nota 1: per guadagnare velocità è necessario volare a un'altitudine ragionevole, altrimenti il gioco vi costringerà a volare lentamente se siete troppo bassi.\10\10 ¤ Nota 2: anche con questa opzione, limitiamo la velocità a circa 555 km/h, perché qualsiasi velocità superiore impedisce il caricamento delle texture e finisce per rompere il gioco, che è il motivo per cui R* ha limitato la velocità degli aerei in primo luogo.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Aumenta o limite de velocidade dos aviões.\\10\\10 ¤ Nota 1: Você deve estar voando a uma altitude razoável para ganhar velocidade, caso contrário, o jogo o forçará a voar lentamente se estiver muito baixo.\\10\\10 ¤ Nota 2: Mesmo com essa opção, ainda estamos limitando a velocidade a aproximadamente 555 km/h, pois qualquer coisa acima disso impedirá que as texturas sejam carregadas e acabará quebrando o jogo, razão pela qual o R* limitou a velocidade dos aviões em primeiro lugar.",
+			text = "Aumenta o limite de velocidade dos aviões.\10\10 ¤ Nota 1: Você deve estar voando a uma altitude razoável para ganhar velocidade, caso contrário, o jogo o forçará a voar lentamente se estiver muito baixo.\10\10 ¤ Nota 2: Mesmo com essa opção, ainda estamos limitando a velocidade a aproximadamente 555 km/h, pois qualquer coisa acima disso impedirá que as texturas sejam carregadas e acabará quebrando o jogo, razão pela qual o R* limitou a velocidade dos aviões em primeiro lugar.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Увеличивает предельную скорость на самолетах.\\10\\10 ¤ Примечание 1: Вы должны лететь на разумной высоте, чтобы набрать скорость, иначе игра заставит вас лететь медленно, если вы слишком низко.\\10\\10 ¤ Примечание 2: Даже с этой опцией, мы все еще ограничиваем скорость примерно 555 км/ч, потому что все, что больше, будет препятствовать загрузке текстур и в конечном итоге сломает вашу игру, что является причиной, по которой R* ограничила скорость самолетов в первую очередь.",
+			text = "Увеличивает предельную скорость на самолетах.\10\10 ¤ Примечание 1: Вы должны лететь на разумной высоте, чтобы набрать скорость, иначе игра заставит вас лететь медленно, если вы слишком низко.\10\10 ¤ Примечание 2: Даже с этой опцией, мы все еще ограничиваем скорость примерно 555 км/ч, потому что все, что больше, будет препятствовать загрузке текстур и в конечном итоге сломает вашу игру, что является причиной, по которой R* ограничила скорость самолетов в первую очередь.",
 		},
 		{
 			iso = "es-ES",
-			text = "Aumenta el límite de velocidad de los aviones.\\10\\10 ¤ Nota 1: Debes volar a una altitud razonable para ganar velocidad, de lo contrario, el juego te obligará a volar lentamente si estás demasiado bajo.\\10\\10 ¤ Nota 2: Incluso con esta opción, seguimos limitando la velocidad a aproximadamente 555 km/h porque cualquier valor por encima de eso evitará que se carguen las texturas y, eventualmente, romperá el juego, que es la razón por la que R* limitó las velocidades de los aviones en primer lugar.",
+			text = "Aumenta el límite de velocidad de los aviones.\10\10 ¤ Nota 1: Debes volar a una altitud razonable para ganar velocidad, de lo contrario, el juego te obligará a volar lentamente si estás demasiado bajo.\10\10 ¤ Nota 2: Incluso con esta opción, seguimos limitando la velocidad a aproximadamente 555 km/h porque cualquier valor por encima de eso evitará que se carguen las texturas y, eventualmente, romperá el juego, que es la razón por la que R* limitó las velocidades de los aviones en primer lugar.",
 		},
 		{
 			iso = "zh-CN",
-			text = "提高飞机的速度限制。\\10\\10 ¤ 注1：您必须在合理的高度飞行才能获得速度，否则如果飞行高度太低，游戏会强迫您缓慢飞行。\\10\\10 ¤ 注2：即使使用此选项，我们仍然将速度限制在约 555 公里/小时，因为超过此速度会导致纹理无法加载并最终导致游戏中断，这也是 R* 首先限制飞机速度的原因。",
+			text = "提高飞机的速度限制。\10\10 ¤ 注1：您必须在合理的高度飞行才能获得速度，否则如果飞行高度太低，游戏会强迫您缓慢飞行。\10\10 ¤ 注2：即使使用此选项，我们仍然将速度限制在约 555 公里/小时，因为超过此速度会导致纹理无法加载并最终导致游戏中断，这也是 R* 首先限制飞机速度的原因。",
 		},
 		{
 			iso = "zh-TW",
@@ -3529,11 +3529,11 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "飛行機の速度制限を上げます。\\10\\10 ¤ 注 1: 速度を上げるには、適切な高度で飛行する必要があります。そうでない場合、高度が低すぎるとゲームによって低速飛行が強制されます。\\10\\10 ¤ 注 2: このオプションを使用しても、速度は約 555 km/h に制限されます。これを超えるとテクスチャが読み込まれなくなり、最終的にゲームが壊れるためです。これが、R* が飛行機の速度を制限した理由です。",
+			text = "飛行機の速度制限を上げます。\10\10 ¤ 注 1: 速度を上げるには、適切な高度で飛行する必要があります。そうでない場合、高度が低すぎるとゲームによって低速飛行が強制されます。\10\10 ¤ 注 2: このオプションを使用しても、速度は約 555 km/h に制限されます。これを超えるとテクスチャが読み込まれなくなり、最終的にゲームが壊れるためです。これが、R* が飛行機の速度を制限した理由です。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Zwiększa limit prędkości samolotów.\\10\\10 ¤ Uwaga 1: Aby nabrać prędkości, musisz lecieć na rozsądnej wysokości, w przeciwnym razie gra zmusi cię do powolnego lotu, jeżeli będziesz leciał zbyt nisko.\\10\\10 ¤ Uwaga 2: Nawet przy tej opcji nadal ograniczamy prędkość do około 555 km/h, ponieważ wszelkie wartości powyżej tej wartości uniemożliwią wczytywanie tekstur i ostatecznie spowodują uszkodzenie gry, co jest powodem, dla którego R* w pierwszej kolejności ogranicza prędkość samolotów.",
+			text = "Zwiększa limit prędkości samolotów.\10\10 ¤ Uwaga 1: Aby nabrać prędkości, musisz lecieć na rozsądnej wysokości, w przeciwnym razie gra zmusi cię do powolnego lotu, jeżeli będziesz leciał zbyt nisko.\10\10 ¤ Uwaga 2: Nawet przy tej opcji nadal ograniczamy prędkość do około 555 km/h, ponieważ wszelkie wartości powyżej tej wartości uniemożliwią wczytywanie tekstur i ostatecznie spowodują uszkodzenie gry, co jest powodem, dla którego R* w pierwszej kolejności ogranicza prędkość samolotów.",
 		},
 	},
 	strongWindows_tt = {
@@ -5103,35 +5103,35 @@ Labels = {
 	extendWorld_tt = {
 		{
 			iso = "en-US",
-			text = "Travel farther across the ocean without dying.\\10\\10This does not remove the sky box.",
+			text = "Travel farther across the ocean without dying.\10\10This does not remove the sky box.",
 		},
 		{
 			iso = "de-DE",
-			text = "Reise weiter über den Ozean, ohne zu sterben.\\10\\10Die Himmelsbox wird dadurch nicht entfernt.",
+			text = "Reise weiter über den Ozean, ohne zu sterben.\10\10Die Himmelsbox wird dadurch nicht entfernt.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Voyagez plus loin à travers l'océan sans mourir.\\10\\10Ceci ne supprime pas la boîte du ciel.",
+			text = "Voyagez plus loin à travers l'océan sans mourir.\10\10Ceci ne supprime pas la boîte du ciel.",
 		},
 		{
 			iso = "it-IT",
-			text = "Viaggia più lontano attraverso l'oceano senza morire.\\10\\10Questo non rimuove la casella del cielo.",
+			text = "Viaggia più lontano attraverso l'oceano senza morire.\10\10Questo non rimuove la casella del cielo.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Viaje mais longe no oceano sem morrer.\\10\\10Isso não remove a caixa do céu.",
+			text = "Viaje mais longe no oceano sem morrer.\10\10Isso não remove a caixa do céu.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Путешествуйте дальше через океан, не умирая.\\10\\10Это не убирает небесную коробку.",
+			text = "Путешествуйте дальше через океан, не умирая.\10\10Это не убирает небесную коробку.",
 		},
 		{
 			iso = "es-ES",
-			text = "Viaja más lejos a través del océano sin morir.\\10\\10Esto no elimina la caja del cielo.",
+			text = "Viaja más lejos a través del océano sin morir.\10\10Esto no elimina la caja del cielo.",
 		},
 		{
 			iso = "zh-CN",
-			text = "跨越更远的海洋而不会死亡。\\10\\10这不会移除天空盒。",
+			text = "跨越更远的海洋而不会死亡。\10\10这不会移除天空盒。",
 		},
 		{
 			iso = "zh-TW",
@@ -5139,11 +5139,11 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "死なずに海を越えてさらに遠くまで旅しましょう。\\10\\10これによってスカイボックスは削除されません。",
+			text = "死なずに海を越えてさらに遠くまで旅しましょう。\10\10これによってスカイボックスは削除されません。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Podróżuj dalej przez ocean, nie ginąc.\\10\\10To nie usuwa Sky Boxa.",
+			text = "Podróżuj dalej przez ocean, nie ginąc.\10\10To nie usuwa Sky Boxa.",
 		},
 	},
 	smoothwatersCB = {
@@ -5195,47 +5195,47 @@ Labels = {
 	smoothwaters_tt = {
 		{
 			iso = "en-US",
-			text = "Disables ocean waves. Especially useful when playing those awful boat sell missions -_-\\10\\10Although this is only local, but just to be safe this option will not be saved. You will have to manually enable it whenever you want to use it.",
+			text = "Disables ocean waves. Especially useful when playing those awful boat sell missions -_-\10\10Although this is only local, but just to be safe this option will not be saved. You will have to manually enable it whenever you want to use it.",
 		},
 		{
 			iso = "de-DE",
-			text = "Deaktiviert Meereswellen. Besonders nützlich, wenn man diese schrecklichen Bootsverkaufsmissionen spielt -_-\\10\\10Dies ist zwar nur lokal, aber um sicher zu gehen, wird diese Option nicht gespeichert. Ihr müsst sie manuell aktivieren, wenn ihr sie benutzen wollt.",
+			text = "Deaktiviert Meereswellen. Besonders nützlich, wenn man diese schrecklichen Bootsverkaufsmissionen spielt -_-\10\10Dies ist zwar nur lokal, aber um sicher zu gehen, wird diese Option nicht gespeichert. Ihr müsst sie manuell aktivieren, wenn ihr sie benutzen wollt.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Désactive les vagues de l'océan. Particulièrement utile lorsque vous jouez ces horribles missions de vente en bateaux -_-\\10\\10Bien que ce ne soit que local, mais juste pour être sûr, cette option ne sera pas sauvegardée. Vous devrez l'activer manuellement chaque fois que vous voudrez l'utiliser.",
+			text = "Désactive les vagues de l'océan. Particulièrement utile lorsque vous jouez ces horribles missions de vente en bateaux -_-\10\10Bien que ce ne soit que local, mais juste pour être sûr, cette option ne sera pas sauvegardée. Vous devrez l'activer manuellement chaque fois que vous voudrez l'utiliser.",
 		},
 		{
 			iso = "it-IT",
-			text = "Disattiva le onde oceaniche. Particolarmente utile quando si giocano quelle terribili missioni di vendita di barche -_-\\10\\10Anche se si tratta solo di un'opzione locale, per sicurezza questa opzione non verrà salvata. Dovrete attivarla manualmente ogni volta che vorrete utilizzarla.",
+			text = "Disattiva le onde oceaniche. Particolarmente utile quando si giocano quelle terribili missioni di vendita di barche -_-\10\10Anche se si tratta solo di un'opzione locale, per sicurezza questa opzione non verrà salvata. Dovrete attivarla manualmente ogni volta che vorrete utilizzarla.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Desativa as ondas do mar. Especialmente útil ao jogar aquelas terríveis missões de venda de barcos -_-\\10\\10Embora isso seja apenas local, mas por segurança, essa opção não será salva. Você terá de ativá-la manualmente sempre que quiser usá-la.",
+			text = "Desativa as ondas do mar. Especialmente útil ao jogar aquelas terríveis missões de venda de barcos -_-\10\10Embora isso seja apenas local, mas por segurança, essa opção não será salva. Você terá de ativá-la manualmente sempre que quiser usá-la.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Отключает океанские волны. Особенно полезно, когда играешь в эти ужасные миссии по продаже лодок -_-\\10\\10Хотя это только локально, но на всякий случай эта опция не будет сохранена. Вам придется вручную включать ее всякий раз, когда вы захотите ее использовать.",
+			text = "Отключает океанские волны. Особенно полезно, когда играешь в эти ужасные миссии по продаже лодок -_-\10\10Хотя это только локально, но на всякий случай эта опция не будет сохранена. Вам придется вручную включать ее всякий раз, когда вы захотите ее использовать.",
 		},
 		{
 			iso = "es-ES",
-			text = "Desactiva las olas del océano. Especialmente útil al jugar esas horribles misiones de venta de barcos -_-\\10\\10Aunque esto es solo local, por si acaso, esta opción no se guardará. Tendrás que habilitarla manualmente cada vez que quieras usarla.",
+			text = "Desactiva las olas del océano. Especialmente útil al jugar esas horribles misiones de venta de barcos -_-\10\10Aunque esto es solo local, por si acaso, esta opción no se guardará. Tendrás que habilitarla manualmente cada vez que quieras usarla.",
 		},
 		{
 			iso = "zh-CN",
-			text = "禁用海浪。在玩那些可怕的船只出售任务时特别有用 -_-\\10\\10虽然这只是本地的，但为了安全起见，此选项不会被保存。每当您想使用它时，您都必须手动启用它。",
+			text = "禁用海浪。在玩那些可怕的船只出售任务时特别有用 -_-\10\10虽然这只是本地的，但为了安全起见，此选项不会被保存。每当您想使用它时，您都必须手动启用它。",
 		},
 		{
 			iso = "zh-TW",
-			text = "禁用海浪。在玩那些糟糕的賣船任務時特別有用 -_-\\10\\10雖然這只是本地的，但為了安全起見，這個選項不會被保存。每當您想使用它時，您都必須手動啟用它。",
+			text = "禁用海浪。在玩那些糟糕的賣船任務時特別有用 -_-\10\10雖然這只是本地的，但為了安全起見，這個選項不會被保存。每當您想使用它時，您都必須手動啟用它。",
 		},
 		{
 			iso = "ja-JP",
-			text = "海の波を無効にします。特に、ひどいボート販売ミッションをプレイするときに便利です -_-\\10\\10これはローカルのみですが、安全のためにこのオプションは保存されません。使用するたびに手動で有効にする必要があります。",
+			text = "海の波を無効にします。特に、ひどいボート販売ミッションをプレイするときに便利です -_-\10\10これはローカルのみですが、安全のためにこのオプションは保存されません。使用するたびに手動で有効にする必要があります。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Wyłącza fale oceaniczne. Szczególnie przydatne podczas grania w te okropne misje sprzedaży łodzi -_-\\10\\10Chociaż jest to tylko lokalne, ale dla bezpieczeństwa ta opcja nie zostanie zapisana. Będziesz musiał ręcznie włączyć ją, kiedy tylko będziesz chciał jej użyć.",
+			text = "Wyłącza fale oceaniczne. Szczególnie przydatne podczas grania w te okropne misje sprzedaży łodzi -_-\10\10Chociaż jest to tylko lokalne, ale dla bezpieczeństwa ta opcja nie zostanie zapisana. Będziesz musiał ręcznie włączyć ją, kiedy tylko będziesz chciał jej użyć.",
 		},
 	},
 	settingsTab = {
@@ -6023,35 +6023,35 @@ Labels = {
 	getinsidefltbd = {
 		{
 			iso = "en-US",
-			text = "Please get inside a flatbed truck.\\10You can use the button below to spawn one",
+			text = "Please get inside a flatbed truck.\10You can use the button below to spawn one",
 		},
 		{
 			iso = "de-DE",
-			text = "Bitte steigen Sie in einen Pritschenwagen.\\10Sie können die Schaltfläche unten verwenden, um einen zu erzeugen",
+			text = "Bitte steigen Sie in einen Pritschenwagen.\10Sie können die Schaltfläche unten verwenden, um einen zu erzeugen",
 		},
 		{
 			iso = "fr-FR",
-			text = "Veuillez monter dans un camion à plate-forme.\\10Vous pouvez utiliser le bouton ci-dessous pour en faire naître un.",
+			text = "Veuillez monter dans un camion à plate-forme.\10Vous pouvez utiliser le bouton ci-dessous pour en faire naître un.",
 		},
 		{
 			iso = "it-IT",
-			text = "Entrare in un camion con pianale.\\10Potete usare il pulsante qui sotto per generarne uno.",
+			text = "Entrare in un camion con pianale.\10Potete usare il pulsante qui sotto per generarne uno.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Entre em um caminhão-plataforma.\\10Você pode usar o botão abaixo para gerar um.",
+			text = "Entre em um caminhão-plataforma.\10Você pode usar o botão abaixo para gerar um.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Пожалуйста, сядьте в грузовик.\\10Вы можете использовать кнопку ниже, чтобы разродиться.",
+			text = "Пожалуйста, сядьте в грузовик.\10Вы можете использовать кнопку ниже, чтобы разродиться.",
 		},
 		{
 			iso = "es-ES",
-			text = "Por favor, entra en un camión de plataforma.\\10Puedes usar el botón de abajo para generar uno.",
+			text = "Por favor, entra en un camión de plataforma.\10Puedes usar el botón de abajo para generar uno.",
 		},
 		{
 			iso = "zh-CN",
-			text = "请进入平板卡车。\\10您可以使用下面的按钮来生成一个",
+			text = "请进入平板卡车。\10您可以使用下面的按钮来生成一个",
 		},
 		{
 			iso = "zh-TW",
@@ -6059,11 +6059,11 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "フラットベッドトラックに乗ってください。\\10下のボタンを使ってトラックを1台スポーンできます",
+			text = "フラットベッドトラックに乗ってください。\10下のボタンを使ってトラックを1台スポーンできます",
 		},
 		{
 			iso = "pl-PL",
-			text = "Proszę wsiąść do ciężarówki z platformą.\\10Możesz użyć poniższego przycisku, aby ją wygenerować",
+			text = "Proszę wsiąść do ciężarówki z platformą.\10Możesz użyć poniższego przycisku, aby ją wygenerować",
 		},
 	},
 	spawnfltbd = {
@@ -8139,35 +8139,35 @@ Labels = {
 	flags_tt = {
 		{
 			iso = "en-US",
-			text = "Allows you to customize how the animation plays.\\10Example: if an animation is set to loop but you want it to freeze, activate this then choose your desired settings.",
+			text = "Allows you to customize how the animation plays.\10Example: if an animation is set to loop but you want it to freeze, activate this then choose your desired settings.",
 		},
 		{
 			iso = "de-DE",
-			text = "Ermöglicht es Ihnen, die Art und Weise, wie die Animation abgespielt wird, anzupassen.\\10Beispiel: Wenn eine Animation als Schleife eingestellt ist, Sie sie aber einfrieren möchten, aktivieren Sie dies und wählen Sie dann die gewünschten Einstellungen.",
+			text = "Ermöglicht es Ihnen, die Art und Weise, wie die Animation abgespielt wird, anzupassen.\10Beispiel: Wenn eine Animation als Schleife eingestellt ist, Sie sie aber einfrieren möchten, aktivieren Sie dies und wählen Sie dann die gewünschten Einstellungen.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Permet de personnaliser la façon dont l'animation est jouée.\\10Exemple : si une animation est réglée pour tourner en boucle mais que vous souhaitez qu'elle se fige, activez cette option puis choisissez les paramètres souhaités.",
+			text = "Permet de personnaliser la façon dont l'animation est jouée.\10Exemple : si une animation est réglée pour tourner en boucle mais que vous souhaitez qu'elle se fige, activez cette option puis choisissez les paramètres souhaités.",
 		},
 		{
 			iso = "it-IT",
-			text = "Permette di personalizzare il modo in cui l'animazione viene riprodotta.\\10Esempio: se un'animazione è impostata su loop ma si desidera che si blocchi, attivare questa opzione e scegliere le impostazioni desiderate.",
+			text = "Permette di personalizzare il modo in cui l'animazione viene riprodotta.\10Esempio: se un'animazione è impostata su loop ma si desidera che si blocchi, attivare questa opzione e scegliere le impostazioni desiderate.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Permite que você personalize a forma como a animação é reproduzida.\\10Exemplo: se uma animação estiver definida para loop, mas você quiser que ela congele, ative essa opção e escolha as configurações desejadas.",
+			text = "Permite que você personalize a forma como a animação é reproduzida.\10Exemplo: se uma animação estiver definida para loop, mas você quiser que ela congele, ative essa opção e escolha as configurações desejadas.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Позволяет настроить воспроизведение анимации.\\10Например: если анимация зациклена, но вы хотите, чтобы она замерла, активируйте этот параметр и выберите нужные настройки.",
+			text = "Позволяет настроить воспроизведение анимации.\10Например: если анимация зациклена, но вы хотите, чтобы она замерла, активируйте этот параметр и выберите нужные настройки.",
 		},
 		{
 			iso = "es-ES",
-			text = "Le permite personalizar cómo se reproduce la animación.\\10Ejemplo: si una animación está configurada para repetirse pero desea que se congele, active esta opción y luego elija la configuración deseada.",
+			text = "Le permite personalizar cómo se reproduce la animación.\10Ejemplo: si una animación está configurada para repetirse pero desea que se congele, active esta opción y luego elija la configuración deseada.",
 		},
 		{
 			iso = "zh-CN",
-			text = "允许您自定义动画的播放方式。\\10示例：如果动画设置为循环播放但您希望它冻结，请激活此功能然后选择所需的设置。",
+			text = "允许您自定义动画的播放方式。\10示例：如果动画设置为循环播放但您希望它冻结，请激活此功能然后选择所需的设置。",
 		},
 		{
 			iso = "zh-TW",
@@ -8175,11 +8175,11 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "アニメーションの再生方法をカスタマイズできます。\\10例: アニメーションがループするように設定されているが、それをフリーズさせたい場合は、これを有効にして、希望の設定を選択します。",
+			text = "アニメーションの再生方法をカスタマイズできます。\10例: アニメーションがループするように設定されているが、それをフリーズさせたい場合は、これを有効にして、希望の設定を選択します。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Umożliwia dostosowanie sposobu odtwarzania animacji.\\10Przykład: jeśli animacja jest ustawiona na pętlę, ale chcesz, aby się zamroziła, aktywuj tę opcję, a następnie wybierz żądane ustawienia.",
+			text = "Umożliwia dostosowanie sposobu odtwarzania animacji.\10Przykład: jeśli animacja jest ustawiona na pętlę, ale chcesz, aby się zamroziła, aktywuj tę opcję, a następnie wybierz żądane ustawienia.",
 		},
 	},
 	DisableProps_tt = {
@@ -8829,47 +8829,47 @@ Labels = {
 	RemoveAttachments_tt = {
 		{
 			iso = "en-US",
-			text = "Drops whatever is attached to you and stops the animation.\\10This button could possibly remove attachments from other scripts or objects attached to you by other players.",
+			text = "Drops whatever is attached to you and stops the animation.\10This button could possibly remove attachments from other scripts or objects attached to you by other players.",
 		},
 		{
 			iso = "de-DE",
-			text = "Lässt alles fallen, was an dir befestigt ist, und stoppt die Animation.\\10Diese Schaltfläche kann eventuell Objekte entfernen, die von anderen Skripten oder anderen Spielern an Sie gebunden wurden.",
+			text = "Lässt alles fallen, was an dir befestigt ist, und stoppt die Animation.\10Diese Schaltfläche kann eventuell Objekte entfernen, die von anderen Skripten oder anderen Spielern an Sie gebunden wurden.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Fait tomber ce qui est attaché à vous et arrête l'animation.\\10Ce bouton peut éventuellement supprimer les objets attachés à vous par d'autres scripts ou par d'autres joueurs.",
+			text = "Fait tomber ce qui est attaché à vous et arrête l'animation.\10Ce bouton peut éventuellement supprimer les objets attachés à vous par d'autres scripts ou par d'autres joueurs.",
 		},
 		{
 			iso = "it-IT",
-			text = "Fa cadere tutto ciò che è attaccato a voi e interrompe l'animazione.\\10Questo pulsante può eliminare gli oggetti attaccati all'utente da altri script o da altri giocatori.",
+			text = "Fa cadere tutto ciò che è attaccato a voi e interrompe l'animazione.\10Questo pulsante può eliminare gli oggetti attaccati all'utente da altri script o da altri giocatori.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Solta o que estiver preso a você e interrompe a animação.\\10Esse botão pode excluir objetos presos a você por outros scripts ou por outros jogadores.",
+			text = "Solta o que estiver preso a você e interrompe a animação.\10Esse botão pode excluir objetos presos a você por outros scripts ou por outros jogadores.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Сбрасывает все, что к вам прикреплено, и останавливает анимацию.\\10Эта кнопка может удалить прикрепления из других скриптов или объекты, прикрепленные к вам другими игроками.",
+			text = "Сбрасывает все, что к вам прикреплено, и останавливает анимацию.\10Эта кнопка может удалить прикрепления из других скриптов или объекты, прикрепленные к вам другими игроками.",
 		},
 		{
 			iso = "es-ES",
-			text = "Elimina todo lo que esté adjunto a ti y detiene la animación.\\10Este botón podría eliminar archivos adjuntos de otros scripts u objetos adjuntos a ti por otros jugadores.",
+			text = "Elimina todo lo que esté adjunto a ti y detiene la animación.\10Este botón podría eliminar archivos adjuntos de otros scripts u objetos adjuntos a ti por otros jugadores.",
 		},
 		{
 			iso = "zh-CN",
-			text = "放下附着在您身上的任何东西并停止动画。\\10此按钮可能会删除其他脚本的附件或其他玩家附着在您身上的对象。",
+			text = "放下附着在您身上的任何东西并停止动画。\10此按钮可能会删除其他脚本的附件或其他玩家附着在您身上的对象。",
 		},
 		{
 			iso = "zh-TW",
-			text = "刪除附加到您身上的任何內容並停止動畫。 \\10此按鈕可能會刪除其他腳本中的附件或其他玩家附加到您身上的物件。",
+			text = "刪除附加到您身上的任何內容並停止動畫。 \10此按鈕可能會刪除其他腳本中的附件或其他玩家附加到您身上的物件。",
 		},
 		{
 			iso = "ja-JP",
-			text = "自分に添付されているものをすべて削除し、アニメーションを停止します。\\10このボタンは、他のスクリプトからの添付物や、他のプレイヤーによって自分に添付されたオブジェクトを削除する可能性があります。",
+			text = "自分に添付されているものをすべて削除し、アニメーションを停止します。\10このボタンは、他のスクリプトからの添付物や、他のプレイヤーによって自分に添付されたオブジェクトを削除する可能性があります。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Usuwa wszystko, co jest do Ciebie dołączone i zatrzymuje animację.\\10Ten przycisk może usuwać załączniki z innych skryptów lub obiekty dołączone do Ciebie przez innych graczy.",
+			text = "Usuwa wszystko, co jest do Ciebie dołączone i zatrzymuje animację.\10Ten przycisk może usuwać załączniki z innych skryptów lub obiekty dołączone do Ciebie przez innych graczy.",
 		},
 	},
 	["Movement Options:"] = {
@@ -9105,35 +9105,35 @@ Labels = {
 	clumsy_tt = {
 		{
 			iso = "en-US",
-			text = "Makes You trip and fall when you collide with any object.\\10(Doesn't work with 'Ragdoll On Demand')",
+			text = "Makes You trip and fall when you collide with any object.\10(Doesn't work with 'Ragdoll On Demand')",
 		},
 		{
 			iso = "de-DE",
-			text = "Lässt dich stolpern und fallen, wenn du mit irgendeinem Objekt zusammenstößt.\\10(Funktioniert nicht mit 'Ragdoll On Demand')",
+			text = "Lässt dich stolpern und fallen, wenn du mit irgendeinem Objekt zusammenstößt.\10(Funktioniert nicht mit 'Ragdoll On Demand')",
 		},
 		{
 			iso = "fr-FR",
-			text = "Vous fait trébucher et tomber lorsque vous entrez en collision avec n'importe quel objet.\\10(Ne fonctionne pas avec 'Ragdoll On Demand')",
+			text = "Vous fait trébucher et tomber lorsque vous entrez en collision avec n'importe quel objet.\10(Ne fonctionne pas avec 'Ragdoll On Demand')",
 		},
 		{
 			iso = "it-IT",
-			text = "Ti fa inciampare e cadere quando ti scontri con qualsiasi oggetto.\\10(Non funziona con 'Ragdoll On Demand')",
+			text = "Ti fa inciampare e cadere quando ti scontri con qualsiasi oggetto.\10(Non funziona con 'Ragdoll On Demand')",
 		},
 		{
 			iso = "pt-BR",
-			text = "Faz com que você tropece e caia ao colidir com qualquer objeto.\\10(Não funciona com 'Ragdoll On Demand')",
+			text = "Faz com que você tropece e caia ao colidir com qualquer objeto.\10(Não funciona com 'Ragdoll On Demand')",
 		},
 		{
 			iso = "ru-RU",
-			text = "Заставляет вас спотыкаться и падать при столкновении с любым объектом.\\10(Не работает с 'Ragdoll On Demand')",
+			text = "Заставляет вас спотыкаться и падать при столкновении с любым объектом.\10(Не работает с 'Ragdoll On Demand')",
 		},
 		{
 			iso = "es-ES",
-			text = "Te hace tropezar y caer cuando chocas con cualquier objeto.\\10(No funciona con 'Ragdoll On Demand')",
+			text = "Te hace tropezar y caer cuando chocas con cualquier objeto.\10(No funciona con 'Ragdoll On Demand')",
 		},
 		{
 			iso = "zh-CN",
-			text = "与任何物体相撞时都会让你绊倒。\\10（不适用于‘Ragdoll On Demand’）",
+			text = "与任何物体相撞时都会让你绊倒。\10（不适用于‘Ragdoll On Demand’）",
 		},
 		{
 			iso = "zh-TW",
@@ -9141,45 +9141,45 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "何かの物体に衝突すると、つまずいて転倒します。\\10(「Ragdoll On Demand」では機能しません)",
+			text = "何かの物体に衝突すると、つまずいて転倒します。\10(「Ragdoll On Demand」では機能しません)",
 		},
 		{
 			iso = "pl-PL",
-			text = "Sprawia, że ​​potykasz się i upadasz, gdy zderzysz się z jakimś przedmiotem.\\10(Nie działa z „Ragdoll On Demand”)",
+			text = "Sprawia, że ​​potykasz się i upadasz, gdy zderzysz się z jakimś przedmiotem.\10(Nie działa z „Ragdoll On Demand”)",
 		},
 	},
 	rod_tt = {
 		{
 			iso = "en-US",
-			text = "Press ___ On Keyboard or --- On Controller To Instantly Ragdoll. The Longer You Hold The Button, The Longer You Stay On The Ground.\\10(Doesn't work with 'Clumsy')",
+			text = "Press ___ On Keyboard or --- On Controller To Instantly Ragdoll. The Longer You Hold The Button, The Longer You Stay On The Ground.\10(Doesn't work with 'Clumsy')",
 		},
 		{
 			iso = "de-DE",
-			text = "Drücken Sie ___ auf der Tastatur oder --- auf dem Controller, um sofort Ragdoll zu spielen. Je länger du die Taste gedrückt hältst, desto länger bleibst du auf dem Boden.\\10(Funktioniert nicht mit 'Clumsy')",
+			text = "Drücken Sie ___ auf der Tastatur oder --- auf dem Controller, um sofort Ragdoll zu spielen. Je länger du die Taste gedrückt hältst, desto länger bleibst du auf dem Boden.\10(Funktioniert nicht mit 'Clumsy')",
 		},
 		{
 			iso = "fr-FR",
-			text = "Appuyez sur ___ sur le clavier ou sur --- sur la manette pour ragdoller instantanément. Plus vous maintenez le bouton enfoncé, plus vous restez au sol.\\10(Ne fonctionne pas avec 'Clumsy')",
+			text = "Appuyez sur ___ sur le clavier ou sur --- sur la manette pour ragdoller instantanément. Plus vous maintenez le bouton enfoncé, plus vous restez au sol.\10(Ne fonctionne pas avec 'Clumsy')",
 		},
 		{
 			iso = "it-IT",
-			text = "Premi ___ sulla tastiera o --- sul controller per fare immediatamente Ragdoll. Più a lungo tieni premuto il pulsante, più a lungo rimani a terra.\\10(Non funziona con 'Maldestro')",
+			text = "Premi ___ sulla tastiera o --- sul controller per fare immediatamente Ragdoll. Più a lungo tieni premuto il pulsante, più a lungo rimani a terra.\10(Non funziona con 'Maldestro')",
 		},
 		{
 			iso = "pt-BR",
-			text = "Pressione ___ no teclado ou --- no controle para fazer Ragdoll instantaneamente. Quanto mais tempo você segurar o botão, mais tempo ficará no chão.\\10(Não funciona com 'Clumsy')",
+			text = "Pressione ___ no teclado ou --- no controle para fazer Ragdoll instantaneamente. Quanto mais tempo você segurar o botão, mais tempo ficará no chão.\10(Não funciona com 'Clumsy')",
 		},
 		{
 			iso = "ru-RU",
-			text = "Нажмите ___ на клавиатуре или --- на контроллере, чтобы мгновенно превратиться в Ragdoll. Чем дольше вы держите кнопку, тем дольше вы остаетесь на земле.\\10 (Не работает с «Неуклюжим»)",
+			text = "Нажмите ___ на клавиатуре или --- на контроллере, чтобы мгновенно превратиться в Ragdoll. Чем дольше вы держите кнопку, тем дольше вы остаетесь на земле.\10 (Не работает с «Неуклюжим»)",
 		},
 		{
 			iso = "es-ES",
-			text = "Presiona ___ en el teclado o --- en el control para convertirte en un muñeco de trapo al instante. Cuanto más mantengas presionado el botón, más tiempo permanecerás en el suelo.\\10(No funciona con 'Clumsy')",
+			text = "Presiona ___ en el teclado o --- en el control para convertirte en un muñeco de trapo al instante. Cuanto más mantengas presionado el botón, más tiempo permanecerás en el suelo.\10(No funciona con 'Clumsy')",
 		},
 		{
 			iso = "zh-CN",
-			text = "按键盘上的 ___ 或控制器上的 --- 即可立即进行布娃娃动作。按住按钮的时间越长，您在地面上停留的时间就越长。\\10（不适用于“笨拙”）",
+			text = "按键盘上的 ___ 或控制器上的 --- 即可立即进行布娃娃动作。按住按钮的时间越长，您在地面上停留的时间就越长。\10（不适用于“笨拙”）",
 		},
 		{
 			iso = "zh-TW",
@@ -9187,11 +9187,11 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "キーボードの ___ またはコントローラーの --- を押すと、即座にラグドールになります。ボタンを長く押し続けるほど、地面に長く留まります。\\10(「Clumsy」では機能しません)",
+			text = "キーボードの ___ またはコントローラーの --- を押すと、即座にラグドールになります。ボタンを長く押し続けるほど、地面に長く留まります。\10(「Clumsy」では機能しません)",
 		},
 		{
 			iso = "pl-PL",
-			text = "Naciśnij ___ na klawiaturze lub --- na kontrolerze, aby natychmiast wykonać Ragdoll. Im dłużej przytrzymasz przycisk, tym dłużej pozostaniesz na ziemi.\\10(Nie działa z 'Clumsy')",
+			text = "Naciśnij ___ na klawiaturze lub --- na kontrolerze, aby natychmiast wykonać Ragdoll. Im dłużej przytrzymasz przycisk, tym dłużej pozostaniesz na ziemi.\10(Nie działa z 'Clumsy')",
 		},
 	},
 	radioStations_tt = {
@@ -9933,47 +9933,47 @@ Labels = {
 	vcreator_tt = {
 		{
 			iso = "en-US",
-			text = "Start by spawning a vehicle. The first one you spawn will always be the main vehicle that others will be attached to.\\10Once you spawn more than one vehicle, other UI widgets will appear allowing you to manage all your spawned vehicles:\\10 - Delete\\10 - Attach\\10 - Adjust attach position\\10 - Save",
+			text = "Start by spawning a vehicle. The first one you spawn will always be the main vehicle that others will be attached to.\10Once you spawn more than one vehicle, other UI widgets will appear allowing you to manage all your spawned vehicles:\10 - Delete\10 - Attach\10 - Adjust attach position\10 - Save",
 		},
 		{
 			iso = "de-DE",
-			text = "Beginnen Sie damit, ein Fahrzeug zu spawnen. Das erste, das Sie spawnen, wird immer das Hauptfahrzeug sein, an das die anderen angehängt werden.\\10Wenn Sie mehr als ein Fahrzeug spawnen, erscheinen andere UI-Widgets, mit denen Sie alle Ihre gespawnten Fahrzeuge verwalten können:\\10 - Löschen\\10 - Anhängen\\10 - Anhängeposition anpassen\\10 - Speichern",
+			text = "Beginnen Sie damit, ein Fahrzeug zu spawnen. Das erste, das Sie spawnen, wird immer das Hauptfahrzeug sein, an das die anderen angehängt werden.\10Wenn Sie mehr als ein Fahrzeug spawnen, erscheinen andere UI-Widgets, mit denen Sie alle Ihre gespawnten Fahrzeuge verwalten können:\10 - Löschen\10 - Anhängen\10 - Anhängeposition anpassen\10 - Speichern",
 		},
 		{
 			iso = "fr-FR",
-			text = "Commencez par créer un véhicule. Le premier que vous créez sera toujours le véhicule principal auquel les autres seront attachés.\\10Lorsque vous créez plus d'un véhicule, d'autres widgets d'interface utilisateur apparaîtront pour vous permettre de gérer tous les véhicules créés:\\10- Supprimer\\10- Attacher\\10- Ajuster la position de l'attache\\10- Sauvegarder",
+			text = "Commencez par créer un véhicule. Le premier que vous créez sera toujours le véhicule principal auquel les autres seront attachés.\10Lorsque vous créez plus d'un véhicule, d'autres widgets d'interface utilisateur apparaîtront pour vous permettre de gérer tous les véhicules créés:\10- Supprimer\10- Attacher\10- Ajuster la position de l'attache\10- Sauvegarder",
 		},
 		{
 			iso = "it-IT",
-			text = "Iniziare con la creazione di un veicolo. Il primo che viene generato sarà sempre il veicolo principale a cui verranno agganciati gli altri.\\10Quando si genera più di un veicolo, appariranno altri widget dell'interfaccia utente che permetteranno di gestire tutti i veicoli generati:\\10 - Elimina\\10 - Attacca\\10 - Regola la posizione di attacco\\10 - Salva",
+			text = "Iniziare con la creazione di un veicolo. Il primo che viene generato sarà sempre il veicolo principale a cui verranno agganciati gli altri.\10Quando si genera più di un veicolo, appariranno altri widget dell'interfaccia utente che permetteranno di gestire tutti i veicoli generati:\10 - Elimina\10 - Attacca\10 - Regola la posizione di attacco\10 - Salva",
 		},
 		{
 			iso = "pt-BR",
-			text = "Comece gerando um veículo. O primeiro que você gerar será sempre o veículo principal ao qual os outros serão anexados.\\10Quando você gerar mais de um veículo, outros widgets da interface do usuário aparecerão, permitindo que você gerencie todos os veículos gerados:\\10 - Excluir\\10 - Anexar\\10 - Ajustar a posição de anexação\\10 - Salvar",
+			text = "Comece gerando um veículo. O primeiro que você gerar será sempre o veículo principal ao qual os outros serão anexados.\10Quando você gerar mais de um veículo, outros widgets da interface do usuário aparecerão, permitindo que você gerencie todos os veículos gerados:\10 - Excluir\10 - Anexar\10 - Ajustar a posição de anexação\10 - Salvar",
 		},
 		{
 			iso = "ru-RU",
-			text = "Начните с порождения транспортного средства. Первая машина всегда будет основной, к которой будут прикрепляться остальные.\\10Когда вы породите более одной машины, появятся другие виджеты пользовательского интерфейса, позволяющие управлять всеми порожденными машинами:\\10 - Удалить\\10 - Прикрепить\\10 - Отрегулировать положение прикрепления\\10 - Сохранить",
+			text = "Начните с порождения транспортного средства. Первая машина всегда будет основной, к которой будут прикрепляться остальные.\10Когда вы породите более одной машины, появятся другие виджеты пользовательского интерфейса, позволяющие управлять всеми порожденными машинами:\10 - Удалить\10 - Прикрепить\10 - Отрегулировать положение прикрепления\10 - Сохранить",
 		},
 		{
 			iso = "es-ES",
-			text = "Comienza generando un vehículo. El primero que generes siempre será el vehículo principal al que se unirán los demás.\\10Una vez que generes más de un vehículo, aparecerán otros widgets de la interfaz de usuario que te permitirán administrar todos los vehículos generados:\\10 - Eliminar\\10 - Adjuntar\\10 - Ajustar la posición de unión\\10 - Guardar",
+			text = "Comienza generando un vehículo. El primero que generes siempre será el vehículo principal al que se unirán los demás.\10Una vez que generes más de un vehículo, aparecerán otros widgets de la interfaz de usuario que te permitirán administrar todos los vehículos generados:\10 - Eliminar\10 - Adjuntar\10 - Ajustar la posición de unión\10 - Guardar",
 		},
 		{
 			iso = "zh-CN",
-			text = "首先生成一辆车。您生成的第一辆车将始终是其他车辆将附着的主车辆。\\10一旦您生成多辆车辆，将出现其他 UI 小部件，允许您管理所有生成的车辆：\\10 - 删除\\10 - 附着\\10 - 调整附着位置\\10 - 保存",
+			text = "首先生成一辆车。您生成的第一辆车将始终是其他车辆将附着的主车辆。\10一旦您生成多辆车辆，将出现其他 UI 小部件，允许您管理所有生成的车辆：\10 - 删除\10 - 附着\10 - 调整附着位置\10 - 保存",
 		},
 		{
 			iso = "zh-TW",
-			text = "首先生成車輛。您產生的第一個車輛將始終是其他車輛將附加到的主要車輛。 10 - 附加\\ 10 - 調整附加位置\\10 - 儲存",
+			text = "首先生成車輛。您產生的第一個車輛將始終是其他車輛將附加到的主要車輛。 10 - 附加\\ 10 - 調整附加位置\10 - 儲存",
 		},
 		{
 			iso = "ja-JP",
-			text = "まず車両をスポーンします。最初にスポーンした車両が常にメイン車両となり、他の車両がそれに取り付けられます。\\10 複数の車両をスポーンすると、他の UI ウィジェットが表示され、スポーンしたすべての車両を管理できるようになります:\\10 - 削除\\10 - 取り付け\\10 - 取り付け位置の調整\\10 - 保存",
+			text = "まず車両をスポーンします。最初にスポーンした車両が常にメイン車両となり、他の車両がそれに取り付けられます。\10 複数の車両をスポーンすると、他の UI ウィジェットが表示され、スポーンしたすべての車両を管理できるようになります:\10 - 削除\10 - 取り付け\10 - 取り付け位置の調整\10 - 保存",
 		},
 		{
 			iso = "pl-PL",
-			text = "Zacznij od stworzenia pojazdu. Pierwszy, który stworzysz, zawsze będzie głównym pojazdem, do którego będą dołączane inne pojazdy.\\10Gdy stworzysz więcej niż jeden pojazd, pojawią się inne widżety interfejsu użytkownika, które pozwolą Ci zarządzać wszystkimi stworzonymi pojazdami:\\10 - Usuń\\10 - Dołącz\\10 - Dostosuj pozycję dołączania\\10 - Zapisz",
+			text = "Zacznij od stworzenia pojazdu. Pierwszy, który stworzysz, zawsze będzie głównym pojazdem, do którego będą dołączane inne pojazdy.\10Gdy stworzysz więcej niż jeden pojazd, pojawią się inne widżety interfejsu użytkownika, które pozwolą Ci zarządzać wszystkimi stworzonymi pojazdami:\10 - Usuń\10 - Dołącz\10 - Dostosuj pozycję dołączania\10 - Zapisz",
 		},
 	},
 	vc_saved_vehs = {
@@ -11083,93 +11083,93 @@ Labels = {
 	tp_warn = {
 		{
 			iso = "en-US",
-			text = "[ ! ] WARNING\\10\\10This works for solo players. It may teleport you to a different location if you are in a public session.",
+			text = "[ ! ] WARNING\10\10This works for solo players. It may teleport you to a different location if you are in a public session.",
 		},
 		{
 			iso = "de-DE",
-			text = "[ ! ] WARNUNG\\10\\10Dies funktioniert für Einzelspieler. Es kann Sie an einen anderen Ort teleportieren, wenn Sie sich in einer öffentlichen Sitzung befinden.",
+			text = "[ ! ] WARNUNG\10\10Dies funktioniert für Einzelspieler. Es kann Sie an einen anderen Ort teleportieren, wenn Sie sich in einer öffentlichen Sitzung befinden.",
 		},
 		{
 			iso = "fr-FR",
-			text = "[ ! ] ATTENTION\\10\\10Cela fonctionne pour les joueurs solitaires. Il se peut que vous soyez téléporté à un autre endroit si vous participez à une session publique.",
+			text = "[ ! ] ATTENTION\10\10Cela fonctionne pour les joueurs solitaires. Il se peut que vous soyez téléporté à un autre endroit si vous participez à une session publique.",
 		},
 		{
 			iso = "it-IT",
-			text = "[ ! ] AVVISO\\10\\10Funziona per i giocatori solitari. Potrebbe teletrasportarvi in una posizione diversa se siete in una sessione pubblica.",
+			text = "[ ! ] AVVISO\10\10Funziona per i giocatori solitari. Potrebbe teletrasportarvi in una posizione diversa se siete in una sessione pubblica.",
 		},
 		{
 			iso = "pt-BR",
-			text = "[ ! ] AVISO\\10\\10Isso funciona para jogadores individuais. Ele pode teletransportá-lo para um local diferente se você estiver em uma sessão pública.",
+			text = "[ ! ] AVISO\10\10Isso funciona para jogadores individuais. Ele pode teletransportá-lo para um local diferente se você estiver em uma sessão pública.",
 		},
 		{
 			iso = "ru-RU",
-			text = "[ ! ] ПРЕДУПРЕЖДЕНИЕ\\10\\10Это работает для одиночных игроков. Он может телепортировать вас в другое место, если вы находитесь в публичной сессии.",
+			text = "[ ! ] ПРЕДУПРЕЖДЕНИЕ\10\10Это работает для одиночных игроков. Он может телепортировать вас в другое место, если вы находитесь в публичной сессии.",
 		},
 		{
 			iso = "es-ES",
-			text = "[ ! ] ADVERTENCIA\\10\\10Esto funciona para jugadores individuales. Puede teletransportarte a una ubicación diferente si estás en una sesión pública.",
+			text = "[ ! ] ADVERTENCIA\10\10Esto funciona para jugadores individuales. Puede teletransportarte a una ubicación diferente si estás en una sesión pública.",
 		},
 		{
 			iso = "zh-CN",
-			text = "[ ! ] 警告\\10\\10这适用于单人玩家。如果您处于公开会话中，它可能会将您传送到其他位置。",
+			text = "[ ! ] 警告\10\10这适用于单人玩家。如果您处于公开会话中，它可能会将您传送到其他位置。",
 		},
 		{
 			iso = "zh-TW",
-			text = "[！ ] 警告\\10\\10這適用於單人玩家。如果您在公共會話中，它可能會將您傳送到不同的位置。",
+			text = "[！ ] 警告\10\10這適用於單人玩家。如果您在公共會話中，它可能會將您傳送到不同的位置。",
 		},
 		{
 			iso = "ja-JP",
-			text = "[ ! ] 警告\\10\\10これはソロ プレイヤーに有効です。パブリック セッションの場合は、別の場所にテレポートする可能性があります。",
+			text = "[ ! ] 警告\10\10これはソロ プレイヤーに有効です。パブリック セッションの場合は、別の場所にテレポートする可能性があります。",
 		},
 		{
 			iso = "pl-PL",
-			text = "[ ! ] WARNING\\10\\10Działa to na graczy solo. Może cię teleportować do innej lokalizacji, jeśli jesteś w sesji publicznej.",
+			text = "[ ! ] WARNING\10\10Działa to na graczy solo. Może cię teleportować do innej lokalizacji, jeśli jesteś w sesji publicznej.",
 		},
 	},
 	tp_warn_2 = {
 		{
 			iso = "en-US",
-			text = "[ ! ] WARNING\\10\\10Teleport buttons might be broken in public sessions.",
+			text = "[ ! ] WARNING\10\10Teleport buttons might be broken in public sessions.",
 		},
 		{
 			iso = "de-DE",
-			text = "[ ! ] WARNUNG\\10\\10Teleport-Schaltflächen können in öffentlichen Sitzungen defekt sein.",
+			text = "[ ! ] WARNUNG\10\10Teleport-Schaltflächen können in öffentlichen Sitzungen defekt sein.",
 		},
 		{
 			iso = "fr-FR",
-			text = "[ ! ] ATTENTION\\10\\10Les boutons de téléportation risquent de ne plus fonctionner lors des sessions publiques.",
+			text = "[ ! ] ATTENTION\10\10Les boutons de téléportation risquent de ne plus fonctionner lors des sessions publiques.",
 		},
 		{
 			iso = "it-IT",
-			text = "[ ! ] AVVISO\\10\\10I pulsanti per il teletrasporto potrebbero essere interrotti nelle sessioni pubbliche.",
+			text = "[ ! ] AVVISO\10\10I pulsanti per il teletrasporto potrebbero essere interrotti nelle sessioni pubbliche.",
 		},
 		{
 			iso = "pt-BR",
-			text = "[ ! ] AVISO\\10\\10Os botões de teletransporte podem estar quebrados em sessões públicas.",
+			text = "[ ! ] AVISO\10\10Os botões de teletransporte podem estar quebrados em sessões públicas.",
 		},
 		{
 			iso = "ru-RU",
-			text = "[ ! ] ПРЕДУПРЕЖДЕНИЕ\\10\\10Кнопки телепортации могут быть сломаны в публичных сессиях.",
+			text = "[ ! ] ПРЕДУПРЕЖДЕНИЕ\10\10Кнопки телепортации могут быть сломаны в публичных сессиях.",
 		},
 		{
 			iso = "es-ES",
-			text = "[ ! ] ADVERTENCIA\\10\\10Los botones de teletransporte podrían no funcionar en sesiones públicas.",
+			text = "[ ! ] ADVERTENCIA\10\10Los botones de teletransporte podrían no funcionar en sesiones públicas.",
 		},
 		{
 			iso = "zh-CN",
-			text = "[ ！] 警告\\10\\10传送按钮在公共会话中可能会损坏。",
+			text = "[ ！] 警告\10\10传送按钮在公共会话中可能会损坏。",
 		},
 		{
 			iso = "zh-TW",
-			text = "[！ ] 警告\\10\\10傳送按鈕在公共會話中可能會損壞。",
+			text = "[！ ] 警告\10\10傳送按鈕在公共會話中可能會損壞。",
 		},
 		{
 			iso = "ja-JP",
-			text = "[ ! ] 警告\\10\\10パブリック セッションではテレポート ボタンが壊れる可能性があります。",
+			text = "[ ! ] 警告\10\10パブリック セッションではテレポート ボタンが壊れる可能性があります。",
 		},
 		{
 			iso = "pl-PL",
-			text = "[ ! ] OSTRZEŻENIE\\10\\10Przyciski teleportacji mogą być uszkodzone w sesjach publicznych.",
+			text = "[ ! ] OSTRZEŻENIE\10\10Przyciski teleportacji mogą być uszkodzone w sesjach publicznych.",
 		},
 	},
 	Gambling = {
@@ -11267,47 +11267,47 @@ Labels = {
 	casinoCDwarn = {
 		{
 			iso = "en-US",
-			text = "WARINIG!\\10\\10Winning too much too quickly might get you banned. Enable this at your own risk.",
+			text = "WARINIG!\10\10Winning too much too quickly might get you banned. Enable this at your own risk.",
 		},
 		{
 			iso = "de-DE",
-			text = "ACHTUNG\\10\\10Wenn Sie zu schnell zu viel gewinnen, können Sie gesperrt werden. Aktivieren Sie dies auf eigenes Risiko.",
+			text = "ACHTUNG\10\10Wenn Sie zu schnell zu viel gewinnen, können Sie gesperrt werden. Aktivieren Sie dies auf eigenes Risiko.",
 		},
 		{
 			iso = "fr-FR",
-			text = "ATTENTION!\\10\\10Si vous gagnez trop et trop vite, vous risquez d'être banni. Activez cette option à vos risques et périls.",
+			text = "ATTENTION!\10\10Si vous gagnez trop et trop vite, vous risquez d'être banni. Activez cette option à vos risques et périls.",
 		},
 		{
 			iso = "it-IT",
-			text = "ATTENZIONE!\\10\\10Vincere troppo e troppo in fretta potrebbe farvi bannare. Quindi attivatevi a vostro rischio e pericolo.",
+			text = "ATTENZIONE!\10\10Vincere troppo e troppo in fretta potrebbe farvi bannare. Quindi attivatevi a vostro rischio e pericolo.",
 		},
 		{
 			iso = "pt-BR",
-			text = "ATENÇÃO!\\10\\10Ganhar muito rapidamente pode fazer com que você seja banido. Ative isso por sua própria conta e risco.",
+			text = "ATENÇÃO!\10\10Ganhar muito rapidamente pode fazer com que você seja banido. Ative isso por sua própria conta e risco.",
 		},
 		{
 			iso = "ru-RU",
-			text = "ВНИМАНИЕ!\\10\\10Обильные и частые выигрыши могут привести к бану. Включайте на свой страх и риск.",
+			text = "ВНИМАНИЕ!\10\10Обильные и частые выигрыши могут привести к бану. Включайте на свой страх и риск.",
 		},
 		{
 			iso = "es-ES",
-			text = "¡ATENCIÓN!\\10\\10Si ganas demasiado y demasiado rápido, podrías ser baneado. Activa esta opción bajo tu propio riesgo.",
+			text = "¡ATENCIÓN!\10\10Si ganas demasiado y demasiado rápido, podrías ser baneado. Activa esta opción bajo tu propio riesgo.",
 		},
 		{
 			iso = "zh-CN",
-			text = "警告！\\10\\10获胜次数过多或过快可能会导致您被禁赛。启用此功能风险自负。",
+			text = "警告！\10\10获胜次数过多或过快可能会导致您被禁赛。启用此功能风险自负。",
 		},
 		{
 			iso = "zh-TW",
-			text = "警告！ \\10\\10贏得太多太快可能會讓你被禁止。啟用此功能需要您自擔風險。",
+			text = "警告！ \10\10贏得太多太快可能會讓你被禁止。啟用此功能需要您自擔風險。",
 		},
 		{
 			iso = "ja-JP",
-			text = "警告!\\10\\10あまりにも早く勝ちすぎると、禁止される可能性があります。自己責任でこれを有効にしてください。",
+			text = "警告!\10\10あまりにも早く勝ちすぎると、禁止される可能性があります。自己責任でこれを有効にしてください。",
 		},
 		{
 			iso = "pl-PL",
-			text = "UWAGA!\\10\\10Zbyt szybkie wygranie może skutkować banem. Włącz to na własne ryzyko.",
+			text = "UWAGA!\10\10Zbyt szybkie wygranie może skutkować banem. Włącz to na własne ryzyko.",
 		},
 	},
 	casinoCDstatus = {
@@ -13015,7 +13015,7 @@ Labels = {
 	missileLogsCB = {
 		{
 			iso = "en-US",
-			text = "Disable 'Missile Defense' Logs",
+			text = "Disable 'Missile Defence' Logs",
 		},
 		{
 			iso = "de-DE",
@@ -13061,7 +13061,7 @@ Labels = {
 	missileLogs_tt = {
 		{
 			iso = "en-US",
-			text = "Disables the console logs from the 'Missile Defense' feature.",
+			text = "Disables the console logs from the 'Missile Defence' feature.",
 		},
 		{
 			iso = "de-DE",

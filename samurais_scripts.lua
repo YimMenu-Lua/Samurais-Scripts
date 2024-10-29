@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.3.8'
+SCRIPT_VERSION = '1.3.9'
 TARGET_BUILD   = '3351'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -894,9 +894,9 @@ local function displayRecentlyPlayed()
   for _, v in ipairs(filteredRecents) do
     local recentName = v.name
     if v.dict ~= nil then
-      recentName = "[Animation]  " .. recentName
+      recentName = string.format("[Animation]  %s", recentName)
     elseif v.scenario ~= nil then
-      recentName = "[Scenario]    " .. recentName
+      recentName = string.format("[Scenario]    %s", recentName)
     end
     table.insert(recentNames, recentName)
   end
@@ -918,9 +918,9 @@ local function displayFavoriteActions()
   for _, v in ipairs(filteredFavs) do
     local favName = v.name
     if v.dict ~= nil then
-      favName = "[Animation]  " .. favName
+      favName = string.format("[Animation]  %s", favName)
     elseif v.scenario ~= nil then
-      favName = "[Scenario]    " .. favName
+      favName = string.format("[Scenario]    %s", favName)
     end
     table.insert(favNames, favName)
   end
@@ -1282,7 +1282,7 @@ Actions:add_imgui(function()
           ImGui.Dummy(1, 10)
           if btn_name == nil then
             start_loading_anim = true
-            UI.coloredText(INPUT_WAIT_TXT_ .. loading_label, "#FFFFFF", 0.75, 20)
+            UI.coloredText(string.format("%s %s", INPUT_WAIT_TXT_, loading_label), "#FFFFFF", 0.75, 20)
             is_pressed, btn, btn_name = SS.isAnyKeyPressed()
           else
             start_loading_anim = false
@@ -1317,8 +1317,7 @@ Actions:add_imgui(function()
               shortcut_anim     = chosen_anim
               shortcut_anim.btn = btn
               lua_cfg.save("shortcut_anim", shortcut_anim)
-              gui.show_success("Samurais Scripts",
-              HOTKEY_SUCCESS1_ .. btn_name .. HOTKEY_SUCCESS2_)
+              gui.show_success("Samurais Scripts", string.format("%s %s %s", HOTKEY_SUCCESS1_, btn_name, HOTKEY_SUCCESS2_))
               btn, btn_name      = nil, nil
               is_setting_hotkeys = false
               ImGui.CloseCurrentPopup()
@@ -1646,7 +1645,7 @@ Actions:add_imgui(function()
     npc_godMode, used = ImGui.Checkbox("Invincible", npc_godMode)
     UI.toolTip(false, NPC_GODMODE_DESC_)
     local npcData = filteredNpcs[npc_index + 1]
-    if ImGui.Button(GENERIC_SPAWN_BTN_ .. "##scenario_npc") then
+    if ImGui.Button(string.format("%s##scenario_npc", GENERIC_SPAWN_BTN_)) then
       UI.widgetSound("Select")
       script.run_in_fiber(function()
         local pedCoords = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
@@ -1710,7 +1709,7 @@ Actions:add_imgui(function()
       end)
     end
     ImGui.SameLine()
-    if ImGui.Button(GENERIC_DELETE_BTN_ .. "##scenarios") then
+    if ImGui.Button(string.format("%s##scenarios", GENERIC_DELETE_BTN_)) then
       UI.widgetSound("Delete")
       script.run_in_fiber(function()
         for k, v in ipairs(spawned_npcs) do
@@ -1723,7 +1722,7 @@ Actions:add_imgui(function()
       end)
     end
     ImGui.SameLine()
-    if ImGui.Button(GENERIC_PLAY_BTN_ .. "##npc_scenarios") then
+    if ImGui.Button(string.format("%s##npc_scenarios", GENERIC_PLAY_BTN_)) then
       if spawned_npcs[1] ~= nil then
         UI.widgetSound("Select")
         script.run_in_fiber(function(npcsc)
@@ -1745,7 +1744,7 @@ Actions:add_imgui(function()
       end
     end
     ImGui.SameLine()
-    if ImGui.Button(GENERIC_STOP_BTN_ .. "##npc_scenarios") then
+    if ImGui.Button(string.format("%s##npc_scenarios", GENERIC_STOP_BTN_)) then
       if is_playing_scenario then
         UI.widgetSound("Cancel")
         script.run_in_fiber(function(stp)
@@ -1765,7 +1764,7 @@ Actions:add_imgui(function()
       ImGui.PopItemWidth()
       local selected_favorite = filteredFavs[fav_actions_index + 1]
       ImGui.Spacing()
-      if ImGui.Button(GENERIC_PLAY_BTN_ .. "##favs") then
+      if ImGui.Button(string.format("%s##favs", GENERIC_PLAY_BTN_)) then
         if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
           if selected_favorite.dict ~= nil then -- animation type
             if lua_Fn.str_contains(string.lower(selected_favorite.name), "in-car") and Game.Self.isOnFoot() then
@@ -1773,7 +1772,7 @@ Actions:add_imgui(function()
               gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
             else
               UI.widgetSound("Select")
-              script.run_in_fier(function(pf)
+              script.run_in_fiber(function(pf)
                 local coords     = self.get_pos()
                 local heading    = Game.getHeading(self.get_ped())
                 local forwardX   = Game.getForwardX(self.get_ped())
@@ -1811,7 +1810,7 @@ Actions:add_imgui(function()
         end
       end
       ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine()
-      if ImGui.Button(GENERIC_STOP_BTN_ .. "##favs") then
+      if ImGui.Button(string.format("%s##favs", GENERIC_STOP_BTN_)) then
         UI.widgetSound("Cancel")
         script.run_in_fiber(function(fav)
           if is_playing_anim then
@@ -1828,7 +1827,7 @@ Actions:add_imgui(function()
         end)
       end
       ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine()
-      if UI.coloredButton(REMOVE_FROM_FAVS_ .. "##favorites", "#FF0000", "#B30000", "#FF8080", 1) then
+      if UI.coloredButton(string.format("%s##favs", REMOVE_FROM_FAVS_), "#FF0000", "#B30000", "#FF8080", 1) then
         UI.widgetSound("Delete")
         for k, v in ipairs(favorite_actions) do
           if v == selected_favorite then
@@ -1849,7 +1848,7 @@ Actions:add_imgui(function()
       displayRecentlyPlayed()
       ImGui.PopItemWidth()
       local selected_recent = filteredRecents[recents_index + 1]
-      if ImGui.Button(GENERIC_PLAY_BTN_ .. "##recents") then
+      if ImGui.Button(string.format("%s##recents", GENERIC_PLAY_BTN_)) then
         if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
           if selected_recent.dict ~= nil then -- animation type
             if lua_Fn.str_contains(string.lower(selected_recent.name), "in-car") and Game.Self.isOnFoot() then
@@ -1894,7 +1893,7 @@ Actions:add_imgui(function()
         end
       end
       ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine()
-      if ImGui.Button(GENERIC_STOP_BTN_ .. "##recents") then
+      if ImGui.Button(string.format("%s##recents", GENERIC_STOP_BTN_)) then
         UI.widgetSound("Cancel")
         script.run_in_fiber(function(recent)
           if is_playing_anim then
@@ -2046,7 +2045,7 @@ sound_player:add_imgui(function()
   ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
   if sound_btn_off then
     ImGui.BeginDisabled()
-    ImGui.Button(" " .. loading_label .. " ", 60, 30)
+    ImGui.Button(string.format(" %s ", loading_label), 60, 30)
     ImGui.EndDisabled()
   else
     if ImGui.Button(string.format("%s##sounds", GENERIC_PLAY_BTN_)) then
@@ -2104,7 +2103,7 @@ sound_player:add_imgui(function()
   else
     ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
     ImGui.BeginDisabled()
-    ImGui.Button(" " .. loading_label .. " ", 60, 30)
+    ImGui.Button(string.format(" %s ", loading_label), 60, 30)
     ImGui.EndDisabled()
   end
 end)
@@ -2135,7 +2134,7 @@ local function displayVehNames()
   for _, veh in ipairs(filteredNames) do
     local vehName = vehicles.get_vehicle_display_name(joaat(veh))
     if string.find(string.lower(veh), "drift") then
-      vehName = vehName .. "(Drift)"
+      vehName = string.format("%s  (Drift)", vehName)
     end
     table.insert(vehNames, vehName)
   end
@@ -2199,9 +2198,9 @@ vehicle_tab:add_imgui(function()
   if current_vehicle ~= nil and current_vehicle ~= 0 then
     local manufacturer  = Game.Vehicle.manufacturer(current_vehicle)
     local vehicle_name  = Game.Vehicle.name(current_vehicle)
-    local full_veh_name = manufacturer .. " " .. vehicle_name
+    local full_veh_name = string.format("%s %s", manufacturer, vehicle_name)
     local vehicle_class = Game.Vehicle.class(current_vehicle)
-    ImGui.SeparatorText(full_veh_name .. "   (" .. vehicle_class .. ")")
+    ImGui.SeparatorText(string.format("%s  (%s)", full_veh_name, vehicle_class))
   else
     ImGui.SeparatorText("On Foot")
   end
@@ -2213,7 +2212,7 @@ vehicle_tab:add_imgui(function()
   end
 
   ImGui.SameLine(); ImGui.Dummy(7, 1); ImGui.SameLine();
-  missiledefense, mdefUsed = ImGui.Checkbox("Missile Defense", missiledefense)
+  missiledefense, mdefUsed = ImGui.Checkbox("Missile Defence", missiledefense)
   UI.toolTip(false, MISSILE_DEF_DESC_)
   if mdefUsed then
     lua_cfg.save("missiledefense", missiledefense)
@@ -2282,13 +2281,13 @@ vehicle_tab:add_imgui(function()
         UI.widgetSound("Nav")
       end
       ImGui.Dummy(1, 20)
-      if ImGui.Button("  " .. GENERIC_SAVE_BTN_ .. "  ##nos_settings") then
+      if ImGui.Button(string.format(" %s ##nos_settings", GENERIC_SAVE_BTN_)) then
         UI.widgetSound("Select")
         lua_cfg.save("nosPower", nosPower)
         ImGui.CloseCurrentPopup()
       end
       ImGui.SameLine(); ImGui.Dummy(30, 1); ImGui.SameLine()
-      if ImGui.Button("  " .. GENERIC_CANCEL_BTN_ .. "  ##nos_settings") then
+      if ImGui.Button(string.format(" %s ##nos_settings", GENERIC_CANCEL_BTN_)) then
         UI.widgetSound("Cancel")
         ImGui.CloseCurrentPopup()
       end
@@ -2490,7 +2489,7 @@ vehicle_tab:add_imgui(function()
       ImGui.Dummy(1, 5)
       if missiledefense and (vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic) then
         UI.coloredText(
-          "[ ! ] NOTE: You have 'Missile Defense' activated which will automatically destroy / remove these mines. If you still want to use them, please disable 'Missile Defense'.",
+          "[ ! ] NOTE: You have 'Missile Defence' activated which will automatically destroy / remove these mines. If you still want to use them, please disable 'Missile Defence'.",
           "yellow", 0.69, 30)
       end
       ImGui.Dummy(1, 5)
@@ -3021,7 +3020,7 @@ local function displayCustomPaints()
 end
 local function showPaintsCount()
   if filteredPaints ~= nil then
-    ImGui.Text("[ " .. tostring(#filteredPaints) .. " ]")
+    ImGui.Text(string.format("[ %d ]", #filteredPaints))
   else
     ImGui.Text("[ 0 ]")
   end
@@ -3102,11 +3101,11 @@ drift_mode_tab:add_imgui(function()
   if Game.Self.isDriving() then
     local manufacturer  = Game.Vehicle.manufacturer(current_vehicle)
     local vehicle_name  = Game.Vehicle.name(current_vehicle)
-    local full_veh_name = manufacturer .. " " .. vehicle_name
+    local full_veh_name = string.format("%s %s", manufacturer, vehicle_name)
     local vehicle_class = Game.Vehicle.class(current_vehicle)
     ImGui.Spacing()
     if validModel then
-      ImGui.SeparatorText(full_veh_name .. "   (" .. vehicle_class .. ")")
+      ImGui.SeparatorText(string.format("%s  (%s)", full_veh_name, vehicle_class))
       driftMode, driftModeUsed = ImGui.Checkbox(DRIFT_MODE_CB_, driftMode)
       UI.helpMarker(false, DRIFT_MODE_DESC_)
       if driftModeUsed then
@@ -3285,8 +3284,8 @@ drift_mode_tab:add_imgui(function()
         end
         if driftMinigame then
           ImGui.Dummy(1, 10)
-          UI.coloredText("Your Highest Score: ", 'yellow', 0.92, 20); ImGui.SameLine(); ImGui.Text(lua_Fn.separateInt(
-            driftPB) .. " Points")
+          UI.coloredText("Your Highest Score: ", 'yellow', 0.92, 20); ImGui.SameLine()
+          ImGui.Text(string.format("%s Points", lua_Fn.separateInt(driftPB)))
         end
       end
     else
@@ -3693,7 +3692,7 @@ local function displayFilteredList()
   for _, veh in ipairs(filtered_vehicles) do
     local displayName = veh.name
     if string.find(string.lower(displayName), "drift") then
-      displayName = displayName .. "  (Drift)"
+      displayName = string.format("%s  (Drift)", displayName)
     end
     table.insert(vehicle_names, displayName)
   end
@@ -3881,7 +3880,7 @@ vehicle_creator:add_imgui(function()
       vehicleHash = filtered_vehicles[vehicle_index + 1].hash
       vehicleName = filtered_vehicles[vehicle_index + 1].name
     end
-    if ImGui.Button("   " .. GENERIC_SPAWN_BTN_ .. "   ##vehcreator") then
+    if ImGui.Button(string.format("   %s   ##vehcreator", GENERIC_SPAWN_BTN_)) then
       UI.widgetSound("Select")
       script.run_in_fiber(function()
         local plyrCoords   = self.get_pos()
@@ -3901,7 +3900,7 @@ vehicle_creator:add_imgui(function()
             table.insert(spawned_vehNames, vehicleName)
             local dupes = lua_Fn.getTableDupes(spawned_vehNames, vehicleName)
             if dupes > 1 then
-              newVehName = vehicleName .. " #" .. tostring(dupes)
+              newVehName = string.format("%s #%d", vehicleName, dupes)
               table.insert(filteredVehNames, newVehName)
             else
               table.insert(filteredVehNames, vehicleName)
@@ -3924,7 +3923,7 @@ vehicle_creator:add_imgui(function()
       ImGui.Separator()
       UI.coloredText(VC_MAIN_VEH_TXT_, 'green', 0.9, 20); ImGui.SameLine(); ImGui.Text(main_vehicle_name); ImGui
           .SameLine()
-      if ImGui.Button(" " .. GENERIC_DELETE_BTN_ .. " ##mainVeh") then
+      if ImGui.Button(string.format(" %s ##mainVeh", GENERIC_DELETE_BTN_)) then
         UI.widgetSound("Delete")
         script.run_in_fiber(function(delmv)
           if entities.take_control_of(main_vehicle, 300) then
@@ -3956,7 +3955,7 @@ vehicle_creator:add_imgui(function()
       ImGui.PopItemWidth()
       selectedVeh = spawned_vehicles[spawned_veh_index + 1]
       ImGui.SameLine()
-      if ImGui.Button("   " .. GENERIC_DELETE_BTN_ .. "   ##spawnedVeh") then
+      if ImGui.Button(string.format("   %s   ##spawnedVeh", GENERIC_DELETE_BTN_)) then
         UI.widgetSound("Delete")
         script.run_in_fiber(function(del)
           if entities.take_control_of(selectedVeh, 300) then
@@ -3977,7 +3976,7 @@ vehicle_creator:add_imgui(function()
           end
         end)
       end
-      if ImGui.Button(VC_ATTACH_BTN_ .. main_vehicle_name) then
+      if ImGui.Button(string.format("%s%s", VC_ATTACH_BTN_, main_vehicle_name)) then
         if selectedVeh ~= main_vehicle then
           script.run_in_fiber(function()
             if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedVeh, main_vehicle) then
@@ -4197,7 +4196,7 @@ vehicle_creator:add_imgui(function()
           2, true, 1)
       end
       ImGui.Spacing()
-      if ImGui.Button("   " .. GENERIC_SAVE_BTN_ .. "   ##vehcreator1") then
+      if ImGui.Button(strinf.format("   %s   ##vehcreator1", GENERIC_SAVE_BTN_)) then
         UI.widgetSound("Select2")
         ImGui.OpenPopup("Save Merged Vehicles")
       end
@@ -4213,7 +4212,7 @@ vehicle_creator:add_imgui(function()
         end
         ImGui.Spacing()
         if not start_loading_anim then
-          if ImGui.Button(GENERIC_SAVE_BTN_ .. "##vehcreator2") then
+          if ImGui.Button(string.format("%s##vehcreator2", GENERIC_SAVE_BTN_)) then
             script.run_in_fiber(function(save)
               if creation_name ~= "" then
                 if saved_vehicles[1] ~= nil then
@@ -4261,11 +4260,11 @@ vehicle_creator:add_imgui(function()
           end
         else
           ImGui.BeginDisabled()
-          ImGui.Button("  " .. loading_label .. "  ")
+          ImGui.Button(string.format("  %s  ", loading_label))
           ImGui.EndDisabled()
         end
         ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
-        if ImGui.Button(GENERIC_CANCEL_BTN_ .. "##vehcreator") then
+        if ImGui.Button(string.format("%s##vehcreator", GENERIC_CANCEL_BTN_)) then
           UI.widgetSound("Cancel")
           creation_name = ""
           ImGui.CloseCurrentPopup()
@@ -4296,7 +4295,7 @@ vehicle_creator:add_imgui(function()
       if ImGui.BeginPopupModal("Remove Persistent", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
         UI.coloredText(CONFIRM_PROMPT_, "yellow", 0.91, 35)
         ImGui.Dummy(1, 20)
-        if ImGui.Button("   " .. GENERIC_YES_ .. "   ##vehcreator") then
+        if ImGui.Button(string.format("   %s   ##vehcreator", GENERIC_YES_)) then
           for key, value in ipairs(saved_vehicles) do
             if persist_info == value then
               table.remove(saved_vehicles, key)
@@ -4311,7 +4310,7 @@ vehicle_creator:add_imgui(function()
           gui.show_success("Samurais Scripts", VC_DELETE_NOTIF_)
         end
         ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
-        if ImGui.Button("   " .. GENERIC_NO_ .. "   ##vehcreator") then
+        if ImGui.Button(string.format("   %s   ##vehcreator", GENERIC_NO_)) then
           UI.widgetSound("Cancel")
           ImGui.CloseCurrentPopup()
         end
@@ -4360,14 +4359,14 @@ business_tab:add_imgui(function()
   ImGui.Spacing(); ImGui.Dummy((window_width / 2) - 110, 1); ImGui.SameLine(); UI.coloredText("- YimResupplier V2 -",
     yrv2_color, 1, 60)
   if Game.isOnline() then
-    local hangarOwned = stats.get_int(MPx .. "_PROP_HANGAR") ~= 0
-    local fCashOwned  = stats.get_int(MPx .. "_PROP_FAC_SLOT0") ~= 0
-    local cokeOwned   = stats.get_int(MPx .. "_PROP_FAC_SLOT1") ~= 0
-    local methOwned   = stats.get_int(MPx .. "_PROP_FAC_SLOT2") ~= 0
-    local weedOwned   = stats.get_int(MPx .. "_PROP_FAC_SLOT3") ~= 0
-    local fdOwned     = stats.get_int(MPx .. "_PROP_FAC_SLOT4") ~= 0
-    local bunkerOwned = stats.get_int(MPx .. "_PROP_FAC_SLOT5") ~= 0
-    local acidOwned   = stats.get_int(MPx .. "_PROP_FAC_SLOT6") ~= 0
+    local hangarOwned = stats.get_int("MPX_PROP_HANGAR") ~= 0
+    local fCashOwned  = stats.get_int("MPX_PROP_FAC_SLOT0") ~= 0
+    local cokeOwned   = stats.get_int("MPX_PROP_FAC_SLOT1") ~= 0
+    local methOwned   = stats.get_int("MPX_PROP_FAC_SLOT2") ~= 0
+    local weedOwned   = stats.get_int("MPX_PROP_FAC_SLOT3") ~= 0
+    local fdOwned     = stats.get_int("MPX_PROP_FAC_SLOT4") ~= 0
+    local bunkerOwned = stats.get_int("MPX_PROP_FAC_SLOT5") ~= 0
+    local acidOwned   = stats.get_int("MPX_PROP_FAC_SLOT6") ~= 0
     if CURRENT_BUILD == TARGET_BUILD then
       ImGui.Spacing(); ImGui.BeginTabBar("CEO Warehouses", ImGuiTabBarFlags.None)
       if ImGui.BeginTabItem(CEO_WHOUSES_TXT_) then
@@ -4416,7 +4415,7 @@ business_tab:add_imgui(function()
         ImGui.EndDisabled()
 
         if whouse_1_owned then
-          wh1Supplies = stats.get_int(MPx .. "_CONTOTALFORWHOUSE0")
+          wh1Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE0")
           if wh1Supplies ~= nil and wh1Supplies > 0 then
             wh1Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh1Supplies)))
           else
@@ -4459,8 +4458,8 @@ business_tab:add_imgui(function()
             if wh1Supplies < whouse1_max then
               ImGui.SameLine()
               ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-              if ImGui.Button(CEO_RANDOM_CRATES_ .. "##wh1") then
-                stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
+              if ImGui.Button(string.format("%s##wh1", CEO_RANDOM_CRATES_)) then
+                stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
               end
               ImGui.EndDisabled()
               -- ImGui.BeginDisabled(wh2_loop or wh3_loop or wh4_loop or wh5_loop)
@@ -4472,7 +4471,7 @@ business_tab:add_imgui(function()
                   -- wh2_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
                   script.run_in_fiber(function(wh1l)
                     repeat
-                      stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 12)
+                      stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
                       wh1l:sleep(supply_autofill_delay)
                     until
                       wh1Supplies == whouse1_max or wh1_loop == false
@@ -4495,7 +4494,7 @@ business_tab:add_imgui(function()
           whouse_2_owned, whouse_3_owned, whouse_4_owned, whouse_5_owned = false, false, false, false
         end
         if whouse_2_owned then
-          wh2Supplies = stats.get_int(MPx .. "_CONTOTALFORWHOUSE1")
+          wh2Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE1")
           if wh2Supplies ~= nil and wh2Supplies > 0 then
             wh2Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh2Supplies)))
           else
@@ -4538,8 +4537,8 @@ business_tab:add_imgui(function()
             if wh2Supplies < whouse2_max then
               ImGui.SameLine()
               ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-              if ImGui.Button(CEO_RANDOM_CRATES_ .. "##wh2") then
-                stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
+              if ImGui.Button(string.format("%s##wh2", CEO_RANDOM_CRATES_)) then
+                stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
               end
               ImGui.EndDisabled()
               -- ImGui.BeginDisabled(wh1_loop or wh3_loop or wh4_loop or wh5_loop)
@@ -4551,7 +4550,7 @@ business_tab:add_imgui(function()
                   -- wh1_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
                   script.run_in_fiber(function(wh2l)
                     repeat
-                      stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 13)
+                      stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
                       wh2l:sleep(supply_autofill_delay)
                     until
                       wh2Supplies == whouse2_max or wh2_loop == false
@@ -4574,7 +4573,7 @@ business_tab:add_imgui(function()
           whouse_3_owned, whouse_4_owned, whouse_5_owned = false, false, false
         end
         if whouse_3_owned then
-          wh3Supplies = stats.get_int(MPx .. "_CONTOTALFORWHOUSE2")
+          wh3Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE2")
           if wh3Supplies ~= nil and wh3Supplies > 0 then
             wh3Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh3Supplies)))
           else
@@ -4617,8 +4616,8 @@ business_tab:add_imgui(function()
             if wh3Supplies < whouse3_max then
               ImGui.SameLine()
               ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-              if ImGui.Button(CEO_RANDOM_CRATES_ .. "##wh3") then
-                stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
+              if ImGui.Button(string.format("%s##wh3", CEO_RANDOM_CRATES_)) then
+                stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
               end
               ImGui.EndDisabled()
               -- ImGui.BeginDisabled(wh1_loop or wh2_loop or wh4_loop or wh5_loop)
@@ -4630,7 +4629,7 @@ business_tab:add_imgui(function()
                   -- wh1_loop, wh2_loop, wh4_loop, wh5_loop = false, false, false, false
                   script.run_in_fiber(function(wh3l)
                     repeat
-                      stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 14)
+                      stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
                       wh3l:sleep(supply_autofill_delay)
                     until
                       wh3Supplies == whouse3_max or wh3_loop == false
@@ -4653,7 +4652,7 @@ business_tab:add_imgui(function()
           whouse_4_owned, whouse_5_owned = false, false
         end
         if whouse_4_owned then
-          wh4Supplies = stats.get_int(MPx .. "_CONTOTALFORWHOUSE3")
+          wh4Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE3")
           if wh4Supplies ~= nil and wh4Supplies > 0 then
             wh4Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh4Supplies)))
           else
@@ -4696,8 +4695,8 @@ business_tab:add_imgui(function()
             if wh4Supplies < whouse4_max then
               ImGui.SameLine()
               ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-              if ImGui.Button(CEO_RANDOM_CRATES_ .. "##wh4") then
-                stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
+              if ImGui.Button(string.format("%s##wh4", CEO_RANDOM_CRATES_)) then
+                stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
               end
               ImGui.EndDisabled()
               -- ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh5_loop)
@@ -4709,7 +4708,7 @@ business_tab:add_imgui(function()
                   -- wh1_loop, wh2_loop, wh3_loop, wh5_loop = false, false, false, false
                   script.run_in_fiber(function(wh4l)
                     repeat
-                      stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 15)
+                      stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
                       wh4l:sleep(supply_autofill_delay)
                     until
                       wh4Supplies == whouse4_max or wh4_loop == false
@@ -4732,7 +4731,7 @@ business_tab:add_imgui(function()
           whouse_5_owned = false
         end
         if whouse_5_owned then
-          wh5Supplies = stats.get_int(MPx .. "_CONTOTALFORWHOUSE4")
+          wh5Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE4")
           if wh5Supplies ~= nil and wh5Supplies > 0 then
             wh5Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh5Supplies)))
           else
@@ -4775,8 +4774,8 @@ business_tab:add_imgui(function()
             if wh5Supplies < whouse5_max then
               ImGui.SameLine()
               ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
-              if ImGui.Button(CEO_RANDOM_CRATES_ .. "##wh5") then
-                stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
+              if ImGui.Button(string.format("%s##wh5", CEO_RANDOM_CRATES_)) then
+                stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
               end
               ImGui.EndDisabled()
               -- ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop)
@@ -4788,7 +4787,7 @@ business_tab:add_imgui(function()
                   -- wh1_loop, wh2_loop, wh3_loop, wh4_loop = false, false, false, false
                   script.run_in_fiber(function(wh5l)
                     repeat
-                      stats.set_bool_masked(MPx .. "_FIXERPSTAT_BOOL1", true, 16)
+                      stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
                       wh5l:sleep(supply_autofill_delay)
                     until
                       wh5Supplies == whouse5_max or wh5_loop == false
@@ -4815,16 +4814,16 @@ business_tab:add_imgui(function()
       if ImGui.BeginTabItem(HANGAR_TXT_) then
         ImGui.Dummy(1, 5)
         if hangarOwned then
-          hangarSupplies = stats.get_int(MPx .. "_HANGAR_CONTRABAND_TOTAL")
+          hangarSupplies = stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
           hangarTotal    = hangarSupplies * 30000
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
             (hangarSupplies / 50), 240, 30)
           if hangarSupplies < 50 then
             ImGui.SameLine()
             ImGui.BeginDisabled(hangarLoop)
-            if ImGui.Button(CEO_RANDOM_CRATES_ .. "##hangar") then
+            if ImGui.Button(string.format("%s##hangar", CEO_RANDOM_CRATES_)) then
               script.run_in_fiber(function()
-                stats.set_bool_masked(MPx .. "_DLC22022PSTAT_BOOL3", true, 9)
+                stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
               end)
             end
             ImGui.EndDisabled()
@@ -4834,7 +4833,7 @@ business_tab:add_imgui(function()
               if hangarLoop then
                 script.run_in_fiber(function(hgl)
                   repeat
-                    stats.set_bool_masked(MPx .. "_DLC22022PSTAT_BOOL3", true, 9)
+                    stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
                     hgl:sleep(supply_autofill_delay)
                   until
                     hangarSupplies == 50 or hangarLoop == false
@@ -4894,8 +4893,8 @@ business_tab:add_imgui(function()
           else
             bunkerOffset2 = 0
           end
-          local bunkerSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY5")
-          local bunkerStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY5")
+          local bunkerSupplies = stats.get_int("MPX_MATTOTALFORFACTORY5")
+          local bunkerStock    = stats.get_int("MPX_PRODTOTALFORFACTORY5")
           bunkerTotal          = ((globals.get_int(Global_262145.f_21254) + bunkerOffset1 + bunkerOffset2) * bunkerStock)
           ImGui.Spacing()
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
@@ -4958,8 +4957,8 @@ business_tab:add_imgui(function()
           else
             cashOffset2 = 0
           end
-          local cashSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY0")
-          local fcashStock   = stats.get_int(MPx .. "_PRODTOTALFORFACTORY0")
+          local cashSupplies = stats.get_int("MPX_MATTOTALFORFACTORY0")
+          local fcashStock   = stats.get_int("MPX_PRODTOTALFORFACTORY0")
           fcashTotal         = ((globals.get_int(Global_262145.f_17320) + cashOffset1 + cashOffset2) * fcashStock)
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine();
           ImGui.ProgressBar((cashSupplies / 100), 240, 30)
@@ -5001,8 +5000,8 @@ business_tab:add_imgui(function()
           else
             cokeOffset2 = 0
           end
-          local cokeSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY4")
-          local cokeStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY4")
+          local cokeSupplies = stats.get_int("MPX_MATTOTALFORFACTORY4")
+          local cokeStock    = stats.get_int("MPX_PRODTOTALFORFACTORY4")
           cokeTotal          = ((globals.get_int(Global_262145.f_17321) + cokeOffset1 + cokeOffset2) * cokeStock)
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine();
           ImGui.ProgressBar((cokeSupplies / 100), 240, 30)
@@ -5044,8 +5043,8 @@ business_tab:add_imgui(function()
           else
             methOffset2 = 0
           end
-          local methSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY2")
-          local methStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY2")
+          local methSupplies = stats.get_int("MPX_MATTOTALFORFACTORY2")
+          local methStock    = stats.get_int("MPX_PRODTOTALFORFACTORY2")
           methTotal          = ((globals.get_int(Global_262145.f_17322) + methOffset1 + methOffset2) * methStock)
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine();
           ImGui.ProgressBar((methSupplies / 100), 240, 30)
@@ -5087,8 +5086,8 @@ business_tab:add_imgui(function()
           else
             weedOffset2 = 0
           end
-          local weedSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY3")
-          local weedStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY3")
+          local weedSupplies = stats.get_int("MPX_MATTOTALFORFACTORY3")
+          local weedStock    = stats.get_int("MPX_PRODTOTALFORFACTORY3")
           weedTotal          = ((globals.get_int(Global_262145.f_17323) + weedOffset1 + weedOffset2) * weedStock)
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine();
           ImGui.ProgressBar((weedSupplies / 100), 240, 30)
@@ -5130,8 +5129,8 @@ business_tab:add_imgui(function()
           else
             fdOffset2 = 0
           end
-          local fdSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY1")
-          local fdStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY1")
+          local fdSupplies = stats.get_int("MPX_MATTOTALFORFACTORY1")
+          local fdStock    = stats.get_int("MPX_PRODTOTALFORFACTORY1")
           fdTotal          = ((globals.get_int(Global_262145.f_17319) + fdOffset1 + fdOffset2) * fdStock)
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine();
           ImGui.ProgressBar((fdSupplies / 100), 240, 30)
@@ -5163,8 +5162,8 @@ business_tab:add_imgui(function()
           else
             acidOffset = 0
           end
-          local acidSupplies = stats.get_int(MPx .. "_MATTOTALFORFACTORY6")
-          local acidStock    = stats.get_int(MPx .. "_PRODTOTALFORFACTORY6")
+          local acidSupplies = stats.get_int("MPX_MATTOTALFORFACTORY6")
+          local acidStock    = stats.get_int("MPX_PRODTOTALFORFACTORY6")
           acidTotal          = ((globals.get_int(Global_262145.f_17324) + acidOffset) * acidStock)
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine();
           ImGui.ProgressBar((acidSupplies / 100), 240, 30)
@@ -5282,18 +5281,18 @@ business_tab:add_imgui(function()
       if ImGui.BeginTabItem("Safes") then
         ImGui.Dummy(1, 10)
 
-        if stats.get_int(MPx .. "_PROP_NIGHTCLUB") ~= 0 then
+        if stats.get_int("MPX_PROP_NIGHTCLUB") ~= 0 then
           ImGui.Spacing(); ImGui.SeparatorText("Nightclub")
-          local currentNcPop    = stats.get_int(MPx .. "_CLUB_POPULARITY")
+          local currentNcPop    = stats.get_int("MPX_CLUB_POPULARITY")
           local popDiff         = 1000 - currentNcPop
-          local currNcSafeMoney = stats.get_int(MPx .. "_CLUB_SAFE_CASH_VALUE")
+          local currNcSafeMoney = stats.get_int("MPX_CLUB_SAFE_CASH_VALUE")
           ImGui.BulletText("Popularity: "); ImGui.SameLine(); ImGui.Dummy(18, 1); ImGui.SameLine();
           ImGui.ProgressBar(currentNcPop / 1000, 240, 30, tostring(currentNcPop))
           if currentNcPop < 1000 then
             ImGui.SameLine()
             if ImGui.Button("Max Popularity") then
               UI.widgetSound("Select")
-              stats.set_int(MPx .. "_CLUB_POPULARITY", currentNcPop + popDiff)
+              stats.set_int("MPX_CLUB_POPULARITY", currentNcPop + popDiff)
               gui.show_success("Samurai's Scripts", "Nightclub popularity increased.")
             end
           end
@@ -5315,10 +5314,10 @@ business_tab:add_imgui(function()
           end
         end
 
-        if stats.get_int(MPx .. "_PROP_ARCADE") ~= 0 then
+        if stats.get_int("MPX_PROP_ARCADE") ~= 0 then
           ImGui.Spacing()
           ImGui.SeparatorText("Arcade")
-          local currArSafeMoney = stats.get_int(MPx .. "_ARCADE_SAFE_CASH_VALUE")
+          local currArSafeMoney = stats.get_int("MPX_ARCADE_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe: ")
           ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
           ImGui.ProgressBar(currArSafeMoney / 100000, 240, 30, lua_Fn.formatMoney(currArSafeMoney))
@@ -5338,9 +5337,9 @@ business_tab:add_imgui(function()
           end
         end
 
-        if stats.get_int(MPx .. "_PROP_SECURITY_OFFICE") ~= 0 then
+        if stats.get_int("MPX_PROP_SECURITY_OFFICE") ~= 0 then
           ImGui.Spacing(); ImGui.SeparatorText("Agency")
-          local currAgSafeMoney = stats.get_int(MPx .. "_FIXER_SAFE_CASH_VALUE")
+          local currAgSafeMoney = stats.get_int("MPX_FIXER_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
           ImGui.ProgressBar(currAgSafeMoney / 250000, 240, 30, lua_Fn.formatMoney(currAgSafeMoney))
           if Game.Self.isOutside() then
@@ -5359,9 +5358,9 @@ business_tab:add_imgui(function()
           end
         end
 
-        if stats.get_int(MPx .. "_PROP_CLUBHOUSE") ~= 0 then
+        if stats.get_int("MPX_PROP_CLUBHOUSE") ~= 0 then
           ImGui.Spacing(); ImGui.SeparatorText("MC Clubhouse")
-          local currClubHouseBarProfit = stats.get_int(MPx .. "_BIKER_BAR_RESUPPLY_CASH")
+          local currClubHouseBarProfit = stats.get_int("MPX_BIKER_BAR_RESUPPLY_CASH")
           ImGui.BulletText("Bar Earnings:"); ImGui.SameLine(); ImGui.Dummy(2, 1); ImGui.SameLine();
           ImGui.ProgressBar(currClubHouseBarProfit / 100000, 240, 30, lua_Fn.formatMoney(currClubHouseBarProfit))
           if Game.Self.isOutside() then
@@ -5380,9 +5379,9 @@ business_tab:add_imgui(function()
           end
         end
 
-        if stats.get_int(MPx .. "_PROP_BAIL_OFFICE") ~= 0 then
+        if stats.get_int("MPX_PROP_BAIL_OFFICE") ~= 0 then
           ImGui.Spacing(); ImGui.SeparatorText("Bail Office")
-          local currBailSafe = stats.get_int(MPx .. "_BAIL_SAFE_CASH_VALUE")
+          local currBailSafe = stats.get_int("MPX_BAIL_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe:"); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
           ImGui.ProgressBar(currBailSafe / 100000, 240, 30, lua_Fn.formatMoney(currBailSafe))
           if Game.Self.isOutside() then
@@ -5402,9 +5401,9 @@ business_tab:add_imgui(function()
           end
         end
 
-        if stats.get_int(MPx .. "_SALVAGE_YARD_OWNED") ~= 0 then
+        if stats.get_int("MPX_SALVAGE_YARD_OWNED") ~= 0 then
           ImGui.Spacing(); ImGui.SeparatorText("Salvage Yard")
-          local currSalvSafe = stats.get_int(MPx .. "_SALVAGE_SAFE_CASH_VALUE")
+          local currSalvSafe = stats.get_int("MPX_SALVAGE_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
           ImGui.ProgressBar(currSalvSafe / 250000, 240, 30, lua_Fn.formatMoney(currSalvSafe))
           if Game.Self.isOutside() then
@@ -5709,7 +5708,7 @@ local function get_cardname_from_index(card_index)
     cardSuit = "Spades"
   end
 
-  return cardName .. " of " .. cardSuit
+  return sring.format("%s of %s", cardName, cardSuit)
 end
 
 casino_pacino:add_imgui(function()
@@ -6147,32 +6146,32 @@ players_tab:add_imgui(function()
     ImGui.Spacing()
     if player_active then
       ImGui.Spacing()
-      ImGui.Text("Cash:" .. "      " .. playerWallet)
+      ImGui.Text(string.format("Cash:         %s", playerWallet))
       ImGui.Spacing()
-      ImGui.Text("Bank:" .. "      " .. playerBank)
+      ImGui.Text(string.format("Bank:         %s", playerBank))
       ImGui.Spacing()
-      ImGui.Text("Coords:" .. "      " .. tostring(playerCoords))
-      if ImGui.IsItemHovered() and ImGui.IsItemClicked(0) then
+      ImGui.Text(string.format("Coords:      [X: %.3f] [Y: %.3f] [Z: %.3f]", playerCoords.x, playerCoords.y, playerCoords.z))
+      if UI.isItemClicked('lmb') or UI.isItemClicked('rmb') then
         log.debug(player_name .. "'s coords: " .. tostring(playerCoords))
         gui.show_message("Samurai's Scripts", player_name .. "'s coordinates logged to console.")
       end
       ImGui.Spacing()
-      ImGui.Text("Heading:" .. "     " .. tostring(playerHeading))
+      ImGui.Text(string.format("Heading:     %d", playerHeading))
       if ImGui.IsItemHovered() and ImGui.IsItemClicked(0) then
         log.debug(player_name .. "'s heading: " .. tostring(playerHeading))
         gui.show_message("Samurai's Scripts", player_name .. "'s heading logged to console.")
       end
       ImGui.Spacing()
-      ImGui.Text("Health:" .. "        " .. tostring(playerHealth))
+      ImGui.Text(string.format("Health:        %d", playerHealth))
       if playerArmour ~= nil then
         ImGui.Spacing()
-        ImGui.Text("Armour:" .. "      " .. tostring(playerArmour))
+        ImGui.Text(string.format("Armour:      %d", playerArmour))
       end
       ImGui.Spacing()
-      ImGui.Text("God Mode:" .. "  " .. tostring(godmode))
+      ImGui.Text(string.format("God Mode:  %s", godmode))
       if player_in_veh then
         ImGui.Spacing()
-        ImGui.Text("Vehicle:" .. "  " .. tostring(vehicles.get_vehicle_display_name(ENTITY.GET_ENTITY_MODEL(playerVeh))))
+        ImGui.Text(string.format("Vehicle:  %s", playerVehName))
         if SS_debug then
           if ImGui.Button("Delete Vehicle") then
             script.run_in_fiber(function(del)
@@ -6404,7 +6403,7 @@ world_tab:add_imgui(function()
     local hijackData = hijackOptions[grp_anim_index + 1]
     ImGui.SameLine()
     if not hijack_started then
-      if ImGui.Button("  " .. GENERIC_PLAY_BTN_ .. "  ##hjStart") then
+      if ImGui.Button(string.format("  %s  ##hjStart", GENERIC_PLAY_BTN_)) then
         UI.widgetSound("Select")
         script.run_in_fiber(function(hjk)
           local gta_peds = entities.get_all_peds_as_handles()
@@ -6426,7 +6425,7 @@ world_tab:add_imgui(function()
         end)
       end
     else
-      if ImGui.Button("  " .. GENERIC_STOP_BTN_ .. "  ##hjStop") then
+      if ImGui.Button(string.format("  %s  ##hjStop", GENERIC_STOP_BTN_)) then
         UI.widgetSound("Cancel")
         script.run_in_fiber(function()
           local gta_peds = entities.get_all_peds_as_handles()
@@ -6840,7 +6839,7 @@ object_spawner:add_imgui(function()
       forwardY = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
     end
     ImGui.SameLine(); ImGui.BeginDisabled(blacklisted_obj)
-    if ImGui.Button(GENERIC_SPAWN_BTN_ .. "##obj") then
+    if ImGui.Button(string.format("%s##obj", GENERIC_SPAWN_BTN_)) then
       UI.widgetSound("Select")
       script.run_in_fiber(function()
         while not STREAMING.HAS_MODEL_LOADED(propHash) do
@@ -6878,7 +6877,7 @@ object_spawner:add_imgui(function()
         Game.World.markSelectedEntity(selectedObject.entity)
       end
       ImGui.SameLine()
-      if ImGui.Button(GENERIC_DELETE_BTN_ .. "##objects") then
+      if ImGui.Button(string.format(" %s ##obj", GENERIC_DELETE_BTN_)) then
         UI.widgetSound("Delete")
         script.run_in_fiber(function(script)
           if ENTITY.DOES_ENTITY_EXIST(selectedObject.entity) then
@@ -6916,7 +6915,7 @@ object_spawner:add_imgui(function()
         ImGui.PopItemWidth()
         boneData = filteredSelfBones[selected_bone + 1]
         ImGui.SameLine()
-        if ImGui.Button(" " .. GENERIC_ATTACH_BTN_ .. " " .. "##self") then
+        if ImGui.Button(string.format(" %s ##self", GENERIC_ATTACH_BTN_)) then
           script.run_in_fiber(function()
             if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, self.get_ped()) then
               UI.widgetSound("Select2")
@@ -6969,7 +6968,7 @@ object_spawner:add_imgui(function()
           ImGui.PopItemWidth()
           selectedAttachment = attached_props[attached_index + 1]
           ImGui.SameLine()
-          if ImGui.Button(GENERIC_DETACH_BTN_ .. "##self") then
+          if ImGui.Button(string.format("%s##self", GENERIC_DETACH_BTN_)) then
             UI.widgetSound("Cancel")
             script.run_in_fiber(function()
               ENTITY.DETACH_ENTITY(selectedAttachment.entity, true, true)
@@ -6989,7 +6988,7 @@ object_spawner:add_imgui(function()
         ImGui.PopItemWidth()
         boneData = filteredVehBones[selected_bone + 1]
         ImGui.SameLine()
-        if ImGui.Button(" " .. GENERIC_ATTACH_BTN_ .. " " .. "##veh") then
+        if ImGui.Button(string.format(" %s ##veh"), GENERIC_ATTACH_BTN_) then
           UI.widgetSound("Select2")
           script.run_in_fiber(function()
             ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject.entity, current_vehicle,
@@ -7039,7 +7038,7 @@ object_spawner:add_imgui(function()
           ImGui.PopItemWidth()
           selectedAttachment = vehicle_attachments[attached_index + 1]
           ImGui.SameLine()
-          if ImGui.Button(GENERIC_DETACH_BTN_ .. "##veh") then
+          if ImGui.Button(string.format("%s##veh", GENERIC_DETACH_BTN_)) then
             UI.widgetSound("Cancel")
             script.run_in_fiber(function()
               ENTITY.DETACH_ENTITY(selectedAttachment.entity, true, true)
@@ -7058,7 +7057,7 @@ object_spawner:add_imgui(function()
       end
       UI.helpMarker(false, EDIT_MODE_DESC_)
       ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
-      if ImGui.Button("   " .. GENERIC_RESET_BTN_ .. "   ") then
+      if ImGui.Button(string.format("   %s   "), GENERIC_RESET_BTN_) then
         UI.widgetSound("Select")
         script.run_in_fiber(function()
           if ENTITY.IS_ENTITY_ATTACHED(selected_att) then
@@ -7253,7 +7252,7 @@ object_spawner:add_imgui(function()
       end
       ImGui.Dummy(1, 5)
       if attachedToSelf and attached_props[1] ~= nil then
-        if ImGui.Button("  " .. GENERIC_SAVE_BTN_ .. "  ##obj") then
+        if ImGui.Button(string.format("  %s  ##obj"), GENERIC_SAVE_BTN_) then
           UI.widgetSound("Select")
           ImGui.OpenPopup("persist props")
         end
@@ -7268,7 +7267,7 @@ object_spawner:add_imgui(function()
             is_typing = false
           end
           ImGui.Dummy(1, 5)
-          if ImGui.Button(GENERIC_SAVE_BTN_ .. "##obj2") then
+          if ImGui.Button(string.format("  %s  ##obj2", GENERIC_SAVE_BTN_)) then
             local timer = 0
             if saved_props_name ~= "" then
               if persist_attachments[1] ~= nil then
@@ -7347,7 +7346,7 @@ object_spawner:add_imgui(function()
           end)
         end
       else
-        if ImGui.Button(GENERIC_DELETE_BTN_ .. "##persist_props", 80, 32) then
+        if ImGui.Button(string.format("%s##persist_props", GENERIC_DELETE_BTN_), 80, 32) then
           UI.widgetSound("Delete")
           script.run_in_fiber(function(del)
             for _, p in ipairs(spawned_persist_T) do
@@ -7371,7 +7370,7 @@ object_spawner:add_imgui(function()
       if ImGui.BeginPopupModal("Remove Persistent Props", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
         UI.coloredText(CONFIRM_PROMPT_, "yellow", 0.91, 35)
         ImGui.Dummy(1, 20)
-        if ImGui.Button("   " .. GENERIC_YES_ .. "   ##selfprops") then
+        if ImGui.Button(string.format("   %s   ##selfprops", GENERIC_YES_)) then
           for key, value in ipairs(persist_attachments) do
             if persist_prop_info == value then
               table.remove(persist_attachments, key)
@@ -7382,7 +7381,7 @@ object_spawner:add_imgui(function()
           ImGui.CloseCurrentPopup()
         end
         ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
-        if ImGui.Button("   " .. GENERIC_NO_ .. "   ##selfprops") then
+        if ImGui.Button(string.format("   %s   ##selfprops", GENERIC_NO_)) then
           UI.widgetSound("Cancel")
           ImGui.CloseCurrentPopup()
         end
@@ -7494,7 +7493,7 @@ settings_tab:add_imgui(function()
   ImGui.PopItemWidth()
   ImGui.EndDisabled()
   UI.toolTip(false, AUTOFILL_TIMEDELAY_DESC_)
-  ImGui.SameLine(); ImGui.Text(tostring(lua_Fn.round((supply_autofill_delay / 1000), 1)) .. "s")
+  ImGui.SameLine(); ImGui.Text(string.format("%.1f s", (supply_autofill_delay / 1000)))
   if safdUsed then
     UI.widgetSound("Nav")
     lua_cfg.save("supply_autofill_delay", supply_autofill_delay)
@@ -7589,7 +7588,7 @@ hotkeys_tab:add_imgui(function()
 
     SS.openHotkeyWindow("Toggle Enemies Flee    ", keybinds.enemiesFlee)
 
-    SS.openHotkeyWindow("Toggle Missile Defense", keybinds.missl_def)
+    SS.openHotkeyWindow("Toggle Missile Defence", keybinds.missl_def)
 
     SS.openHotkeyWindow("Vehicle Mine Button     ", keybinds.vehicle_mine)
 
@@ -8033,9 +8032,11 @@ script.register_looped("Hide From Cops", function(hfc)
   if hideFromCops then
     local isWanted    = PLAYER.GET_PLAYER_WANTED_LEVEL(self.get_id()) > 0
     local was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(self.get_id())
+    local condition   = Game.Self.isDriving() and VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) or true
     if not is_hiding then
-      if Game.Self.isDriving() and is_car and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) and not PAD.IS_CONTROL_PRESSED(0, 71)
-        and not PAD.IS_CONTROL_PRESSED(0, 72) and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self.get_veh()) and isWanted and not was_spotted then
+      if current_vehicle ~= 0 and is_car and condition and not PAD.IS_CONTROL_PRESSED(0, 71)
+        and not PAD.IS_CONTROL_PRESSED(0, 72) and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle)
+        and isWanted and not was_spotted then
         Game.showButtonPrompt("Press ~INPUT_FRONTEND_ACCEPT~ to hide inside your car.")
         if PAD.IS_CONTROL_JUST_PRESSED(0, 201) and not HUD.IS_MP_TEXT_CHAT_TYPING() then
           if is_handsUp then
@@ -8043,9 +8044,11 @@ script.register_looped("Hide From Cops", function(hfc)
             is_handsUp = false
           end
           if Game.requestAnimDict("missmic3leadinout_mcs1") then
-            VEHICLE.SET_VEHICLE_IS_WANTED(self.get_veh(), false)
-            VEHICLE.SET_VEHICLE_ENGINE_ON(self.get_veh(), false, false, true)
+            VEHICLE.SET_VEHICLE_IS_WANTED(current_vehicle, false)
             TASK.TASK_PLAY_ANIM(self.get_ped(), "missmic3leadinout_mcs1", "cockpit_pilot", 6.0, 3.0, -1, 18, 1.0, false, false, false)
+            if Game.Self.isDriving() then
+              VEHICLE.SET_VEHICLE_ENGINE_ON(self.get_veh(), false, false, true)
+            end
             is_hiding, ducking_in_car = true, true
             hfc:sleep(1000)
           end
@@ -8171,8 +8174,10 @@ script.register_looped("Hide From Cops", function(hfc)
       Game.showButtonPrompt("Press ~INPUT_FRONTEND_ACCEPT~ or ~INPUT_VEH_ACCELERATE~ or ~INPUT_VEH_BRAKE~ to stop hiding.")
       if PAD.IS_CONTROL_JUST_PRESSED(0, 201) or PAD.IS_CONTROL_PRESSED(0, 71)
         or PAD.IS_CONTROL_PRESSED(0, 72) and not HUD.IS_MP_TEXT_CHAT_TYPING() then
-        VEHICLE.SET_VEHICLE_ENGINE_ON(self.get_veh(), true, false, false)
         TASK.CLEAR_PED_TASKS(self.get_ped())
+        if Game.Self.isDriving() then
+          VEHICLE.SET_VEHICLE_ENGINE_ON(self.get_veh(), true, false, false)
+        end
         is_hiding, ducking_in_car = false, false
         hfc:sleep(1000)
       end
@@ -9592,8 +9597,8 @@ script.register_looped("drift points", function()
     end
   end
 end)
--- Missile defense
-script.register_looped("missile defense", function(md)
+-- Missile defence
+script.register_looped("MDEF", function(md)
   if missiledefense and current_vehicle ~= 0 then
     local missile
     local vehPos  = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
@@ -9616,7 +9621,7 @@ script.register_looped("missile defense", function(md)
       if MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 20, vehPos.y + 20, vehPos.z + 100, vehPos.x - 20, vehPos.y - 20, vehPos.z - 100, missile, false) then
         if not MISC.IS_PROJECTILE_TYPE_IN_AREA(vehPos.x + 10, vehPos.y + 10, vehPos.z + 50, vehPos.x - 10, vehPos.y - 10, vehPos.z - 50, missile, false) and not MISC.IS_PROJECTILE_TYPE_IN_AREA(selfPos.x + 10, selfPos.y + 10, selfPos.z + 50, selfPos.x - 10, selfPos.y - 10, selfPos.z - 50, missile, false) then
           if not disable_mdef_logs then
-            log.info('Detected projectile within our defense area! Proceeding to destroy it.')
+            log.info('Detected projectile within our defence area! Proceeding to destroy it.')
           end
           WEAPON.REMOVE_ALL_PROJECTILES_OF_TYPE(missile, true)
           if Game.requestNamedPtfxAsset("scr_sm_counter") then
@@ -10194,44 +10199,44 @@ script.register_looped("Vehicle Grabber", function(vg)
 end)
 script.register_looped("Carpool", function(cp)
   if carpool then
-    if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
-      stop_searching = true
-    else
-      stop_searching = false
-    end
+    stop_searching = PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) and true or false
     if not stop_searching then
       nearestVeh = Game.getClosestVehicle(self.get_ped(), 10)
     end
     local trying_to_enter = PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(self.get_ped())
-    if trying_to_enter ~= 0 and trying_to_enter == nearestVeh then
-      driverPed = VEHICLE.GET_PED_IN_VEHICLE_SEAT(trying_to_enter, -1, true)
-      if driverPed ~= nil and driverPed ~= self.get_ped() and not PED.IS_PED_A_PLAYER(driverPed) then
-        thisVeh = trying_to_enter
-        PED.SET_PED_CONFIG_FLAG(driverPed, 251, true)
-        PED.SET_PED_CONFIG_FLAG(driverPed, 255, true)
-        PED.SET_PED_CONFIG_FLAG(driverPed, 398, true)
-        PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(driverPed, true)
+    if trying_to_enter ~= 0 and trying_to_enter == nearestVeh and VEHICLE.ARE_ANY_VEHICLE_SEATS_FREE(trying_to_enter) then
+      local Occupants = Game.Vehicle.getOccupants(trying_to_enter)
+      for _, occupant in ipairs(Occupants) do
+        if occupant ~= nil and ENTITY.IS_ENTITY_A_PED(occupant) and not PED.IS_PED_A_PLAYER(occupant) then
+          thisVeh = trying_to_enter
+          PED.SET_PED_CONFIG_FLAG(occupant, 251, true)
+          PED.SET_PED_CONFIG_FLAG(occupant, 255, true)
+          PED.SET_PED_CONFIG_FLAG(occupant, 398, true)
+          PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(occupant, true)
+        end
       end
     end
     if PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh) then
-      local ped_to_reset = VEHICLE.GET_PED_IN_VEHICLE_SEAT(thisVeh, -1, true)
-      if ped_to_reset ~= nil and ped_to_reset ~= self.get_ped() and not PED.IS_PED_A_PLAYER(ped_to_reset) then
-        if VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(thisVeh) > 1 then
-          show_npc_veh_ctrls = true
-        end
-        stop_searching = true
-        repeat
-          cp:sleep(100)
-        until PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh) == false
-        PED.SET_PED_CONFIG_FLAG(ped_to_reset, 251, false)
-        PED.SET_PED_CONFIG_FLAG(ped_to_reset, 255, false)
-        PED.SET_PED_CONFIG_FLAG(ped_to_reset, 398, false)
-        PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped_to_reset, false)
-        show_npc_veh_ctrls = false
-        stop_searching     = false
-      else
-        show_npc_veh_ctrls = false
+      if VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(thisVeh) > 1 then
+        show_npc_veh_ctrls = true
       end
+      stop_searching  = true
+      local Occupants = Game.Vehicle.getOccupants(thisVeh)
+      repeat
+        cp:sleep(100)
+      until not PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh)
+      for _, occupant in ipairs(Occupants) do
+        if occupant ~= nil and ENTITY.IS_ENTITY_A_PED(occupant) and not PED.IS_PED_A_PLAYER(occupant) then
+          PED.SET_PED_CONFIG_FLAG(occupant, 251, false)
+          PED.SET_PED_CONFIG_FLAG(occupant, 255, false)
+          PED.SET_PED_CONFIG_FLAG(occupant, 398, false)
+          PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(occupant, false)
+        end
+      end
+      show_npc_veh_ctrls = false
+      stop_searching     = false
+    else
+      show_npc_veh_ctrls = false
     end
   end
   cp:yield()
@@ -10650,7 +10655,7 @@ script.register_looped("Casino Pacino Thread", function(pacino)
       local minutes_left         = (cooldown_time - time_delta) / 60
       local chipswon_gd          = stats.get_int("MPPLY_CASINO_CHIPS_WON_GD")
       local max_chip_wins        = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_DAILY")
-      casino_cooldown_update_str = (chipswon_gd >= max_chip_wins and "Cooldown expires in approximately: " .. string.format("%.2f", minutes_left) .. " minute(s)." or "Off Cooldown")
+      casino_cooldown_update_str = chipswon_gd >= max_chip_wins and string.format("Cooldown expires in approximately: %.2f minute(s).", minutes_left) or "Off Cooldown"
     end
     if fm_mission_controller_cart_autograb then
       if locals.get_int("fm_mission_controller", fm_mission_controller_cart_grab) == 3 then
@@ -10682,9 +10687,11 @@ script.register_looped("OPI", function()
       godmode       = PLAYER.GET_PLAYER_INVINCIBLE(targetPlayerIndex)
       if PED.IS_PED_SITTING_IN_ANY_VEHICLE(targetPlayerPed) then
         player_in_veh = true
-        playerVeh = PED.GET_VEHICLE_PED_IS_IN(targetPlayerPed, true)
+        playerVeh     = PED.GET_VEHICLE_PED_IS_IN(targetPlayerPed, true)
+        playerVehName = vehicles.get_vehicle_display_name(ENTITY.GET_ENTITY_MODEL(playerVeh))
       else
         player_in_veh = false
+        playerVehName = ""
       end
     end
   end
@@ -10812,12 +10819,12 @@ script.register_looped("REOPT", function(ro)
     if missiledefense then
       missiledefense = false
       UI.widgetSound("Cancel")
-      gui.show_message("Samurai's Scripts", "Missile Defense disabled.")
+      gui.show_message("Samurai's Scripts", "Missile Defence disabled.")
       ro:sleep(100)
     else
       missiledefense = true
       UI.widgetSound("Notif")
-      gui.show_success("Samurai's Scripts", "Missile Defense enabled.")
+      gui.show_success("Samurai's Scripts", "Missile Defence enabled.")
       ro:sleep(100)
     end
     lua_cfg.save("missiledefense", missiledefense)
