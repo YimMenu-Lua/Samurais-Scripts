@@ -1,22 +1,21 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-SCRIPT_VERSION = '1.3.9'
+SCRIPT_NAME    = "samurais_scripts"
+SCRIPT_VERSION = '1.4.0'
 TARGET_BUILD   = '3351'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
 
-
 require('lib/samurais_utils')
-
 
 CURRENT_BUILD   = Game.GetBuildNumber()
 CURRENT_VERSION = Game.GetOnlineVersion()
+CFG             = require("lib/YimConfig")
 
-
-Samurais_scripts       = gui.add_tab("Samurai's Scripts")
+Samurais_scripts = gui.add_tab("Samurai's Scripts")
 loading_label          = ""
 start_loading_anim     = false
-default_config         = {
+DEFAULT_CONFIG         = {
   shortcut_anim           = {},
   saved_vehicles          = {},
   persist_attachments     = {},
@@ -186,128 +185,128 @@ default_config         = {
   current_lang            = 'English',
 }
 
-LANG                   = lua_cfg.read("LANG")
-current_lang           = lua_cfg.read("current_lang")
-keybinds               = lua_cfg.read("keybinds")
-gpad_keybinds          = lua_cfg.read("gpad_keybinds")
-Regen                  = lua_cfg.read("Regen")
--- objectiveTP              = lua_cfg.read("objectiveTP")
-phoneAnim              = lua_cfg.read("phoneAnim")
-sprintInside           = lua_cfg.read("sprintInside")
-lockPick               = lua_cfg.read("lockPick")
-replaceSneakAnim       = lua_cfg.read("replaceSneakAnim")
-replacePointAct        = lua_cfg.read("replacePointAct")
-disableActionMode      = lua_cfg.read("disableActionMode")
-hideFromCops           = lua_cfg.read("hideFromCops")
-favorite_actions       = lua_cfg.read("favorite_actions")
-rod                    = lua_cfg.read("rod")
-clumsy                 = lua_cfg.read("clumsy")
-ragdoll_sound          = lua_cfg.read("ragdoll_sound")
-manualFlags            = lua_cfg.read("manualFlags")
-controllable           = lua_cfg.read("controllable")
-looped                 = lua_cfg.read("looped")
-upperbody              = lua_cfg.read("upperbody")
-freeze                 = lua_cfg.read("freeze")
-disableProps           = lua_cfg.read("disableProps")
-npc_godMode            = lua_cfg.read("npc_godMode")
-usePlayKey             = lua_cfg.read("usePlayKey")
-shortcut_anim          = lua_cfg.read("shortcut_anim")
-Triggerbot             = lua_cfg.read("Triggerbot")
-aimEnemy               = lua_cfg.read("aimEnemy")
-autoKill               = lua_cfg.read("autoKill")
-runaway                = lua_cfg.read("runaway")
-laserSight             = lua_cfg.read("laserSight")
-laser_switch           = lua_cfg.read("laser_switch")
-laser_choice           = lua_cfg.read("laser_choice")
-driftMode              = lua_cfg.read("driftMode")
-DriftIntensity         = lua_cfg.read("DriftIntensity")
-DriftPowerIncrease     = lua_cfg.read("DriftPowerIncrease")
-DriftTires             = lua_cfg.read("DriftTires")
-driftSmokeIndex        = lua_cfg.read("driftSmokeIndex")
-customSmokeCol         = lua_cfg.read("customSmokeCol")
-driftSmoke_T           = lua_cfg.read("driftSmoke_T")
-DriftSmoke             = lua_cfg.read("DriftSmoke")
-BurnoutSmoke           = lua_cfg.read("BurnoutSmoke")
-driftMinigame          = lua_cfg.read("driftMinigame")
-driftPB                = lua_cfg.read("driftPB")
-speedBoost             = lua_cfg.read("speedBoost")
-nosvfx                 = lua_cfg.read("nosvfx")
-hornLight              = lua_cfg.read("hornLight")
-nosPurge               = lua_cfg.read("nosPurge")
-nosPower               = lua_cfg.read("nosPower")
-nosAudio               = lua_cfg.read("nosAudio")
-nosBtn                 = lua_cfg.read("nosBtn")
-nosFlames              = lua_cfg.read("nosFlames")
-lightSpeed             = lua_cfg.read("lightSpeed")
-loud_radio             = lua_cfg.read("loud_radio")
-launchCtrl             = lua_cfg.read("launchCtrl")
-popsNbangs             = lua_cfg.read("popsNbangs")
-louderPops             = lua_cfg.read("louderPops")
-limitVehOptions        = lua_cfg.read("limitVehOptions")
-missiledefense         = lua_cfg.read("missiledefense")
-autobrklight           = lua_cfg.read("autobrklight")
-rgbLights              = lua_cfg.read("rgbLights")
-holdF                  = lua_cfg.read("holdF")
-keepWheelsTurned       = lua_cfg.read("keepWheelsTurned")
-noJacking              = lua_cfg.read("noJacking")
-insta180               = lua_cfg.read("insta180")
-flares_forall          = lua_cfg.read("flares_forall")
-real_plane_speed       = lua_cfg.read("real_plane_speed")
-unbreakableWindows     = lua_cfg.read("unbreakableWindows")
-veh_mines              = lua_cfg.read("veh_mines")
-vmine_type             = lua_cfg.read("vmine_type")
-towEverything          = lua_cfg.read("towEverything")
-noEngineBraking        = lua_cfg.read("noEngineBraking")
-kersBoost              = lua_cfg.read("kersBoost")
-offroaderx2            = lua_cfg.read("offroaderx2")
-rallyTires             = lua_cfg.read("rallyTires")
-noTractionCtrl         = lua_cfg.read("noTractionCtrl")
-easyWheelie            = lua_cfg.read("easyWheelie")
-rwSteering             = lua_cfg.read("rwSteering")
-awSteering             = lua_cfg.read("awSteering")
-handbrakeSteering      = lua_cfg.read("handbrakeSteering")
-extend_world           = lua_cfg.read("extend_world")
-disableFlightMusic     = lua_cfg.read("disableFlightMusic")
-disable_quotes         = lua_cfg.read("disable_quotes")
-disable_mdef_logs      = lua_cfg.read("disable_mdef_logs")
-replace_pool_q         = lua_cfg.read("replace_pool_q")
-public_seats           = lua_cfg.read("public_seats")
-mc_work_cd             = lua_cfg.read("mc_work_cd")
-hangar_cd              = lua_cfg.read("hangar_cd")
-nc_management_cd       = lua_cfg.read("nc_management_cd")
-nc_vip_mission_chance  = lua_cfg.read("nc_vip_mission_chance")
-security_missions_cd   = lua_cfg.read("security_missions_cd")
-ie_vehicle_steal_cd    = lua_cfg.read("ie_vehicle_steal_cd")
-ie_vehicle_sell_cd     = lua_cfg.read("ie_vehicle_sell_cd")
-ceo_crate_buy_cd       = lua_cfg.read("ceo_crate_buy_cd")
-ceo_crate_sell_cd      = lua_cfg.read("ceo_crate_sell_cd")
-ceo_crate_buy_f_cd     = lua_cfg.read("ceo_crate_buy_f_cd")
-ceo_crate_sell_f_cd    = lua_cfg.read("ceo_crate_sell_f_cd")
-cashUpdgrade1          = lua_cfg.read("cashUpdgrade1")
-cashUpdgrade2          = lua_cfg.read("cashUpdgrade2")
-cokeUpdgrade1          = lua_cfg.read("cokeUpdgrade1")
-cokeUpdgrade2          = lua_cfg.read("cokeUpdgrade2")
-methUpdgrade1          = lua_cfg.read("methUpdgrade1")
-methUpdgrade2          = lua_cfg.read("methUpdgrade2")
-weedUpdgrade1          = lua_cfg.read("weedUpdgrade1")
-weedUpdgrade2          = lua_cfg.read("weedUpdgrade2")
-fdUpdgrade1            = lua_cfg.read("fdUpdgrade1")
-fdUpdgrade2            = lua_cfg.read("fdUpdgrade2")
-bunkerUpdgrade1        = lua_cfg.read("bunkerUpdgrade1")
-bunkerUpdgrade2        = lua_cfg.read("bunkerUpdgrade2")
-acidUpdgrade           = lua_cfg.read("acidUpdgrade")
-whouse_1_owned         = lua_cfg.read("whouse_1_owned")
-whouse_2_owned         = lua_cfg.read("whouse_2_owned")
-whouse_3_owned         = lua_cfg.read("whouse_3_owned")
-whouse_4_owned         = lua_cfg.read("whouse_4_owned")
-whouse_5_owned         = lua_cfg.read("whouse_5_owned")
-whouse_1_size          = lua_cfg.read("whouse_1_size")
-whouse_2_size          = lua_cfg.read("whouse_2_size")
-whouse_3_size          = lua_cfg.read("whouse_3_size")
-whouse_4_size          = lua_cfg.read("whouse_4_size")
-whouse_5_size          = lua_cfg.read("whouse_5_size")
-supply_autofill_delay  = lua_cfg.read("supply_autofill_delay")
-SS_debug               = lua_cfg.read("SS_debug")
+LANG                   = CFG.read("LANG")
+current_lang           = CFG.read("current_lang")
+keybinds               = CFG.read("keybinds")
+gpad_keybinds          = CFG.read("gpad_keybinds")
+Regen                  = CFG.read("Regen")
+-- objectiveTP            = CFG.read("objectiveTP")
+phoneAnim              = CFG.read("phoneAnim")
+sprintInside           = CFG.read("sprintInside")
+lockPick               = CFG.read("lockPick")
+replaceSneakAnim       = CFG.read("replaceSneakAnim")
+replacePointAct        = CFG.read("replacePointAct")
+disableActionMode      = CFG.read("disableActionMode")
+hideFromCops           = CFG.read("hideFromCops")
+favorite_actions       = CFG.read("favorite_actions")
+rod                    = CFG.read("rod")
+clumsy                 = CFG.read("clumsy")
+ragdoll_sound          = CFG.read("ragdoll_sound")
+manualFlags            = CFG.read("manualFlags")
+controllable           = CFG.read("controllable")
+looped                 = CFG.read("looped")
+upperbody              = CFG.read("upperbody")
+freeze                 = CFG.read("freeze")
+disableProps           = CFG.read("disableProps")
+npc_godMode            = CFG.read("npc_godMode")
+usePlayKey             = CFG.read("usePlayKey")
+shortcut_anim          = CFG.read("shortcut_anim")
+Triggerbot             = CFG.read("Triggerbot")
+aimEnemy               = CFG.read("aimEnemy")
+autoKill               = CFG.read("autoKill")
+runaway                = CFG.read("runaway")
+laserSight             = CFG.read("laserSight")
+laser_switch           = CFG.read("laser_switch")
+laser_choice           = CFG.read("laser_choice")
+driftMode              = CFG.read("driftMode")
+DriftIntensity         = CFG.read("DriftIntensity")
+DriftPowerIncrease     = CFG.read("DriftPowerIncrease")
+DriftTires             = CFG.read("DriftTires")
+driftSmokeIndex        = CFG.read("driftSmokeIndex")
+customSmokeCol         = CFG.read("customSmokeCol")
+driftSmoke_T           = CFG.read("driftSmoke_T")
+DriftSmoke             = CFG.read("DriftSmoke")
+BurnoutSmoke           = CFG.read("BurnoutSmoke")
+driftMinigame          = CFG.read("driftMinigame")
+driftPB                = CFG.read("driftPB")
+speedBoost             = CFG.read("speedBoost")
+nosvfx                 = CFG.read("nosvfx")
+hornLight              = CFG.read("hornLight")
+nosPurge               = CFG.read("nosPurge")
+nosPower               = CFG.read("nosPower")
+nosAudio               = CFG.read("nosAudio")
+nosBtn                 = CFG.read("nosBtn")
+nosFlames              = CFG.read("nosFlames")
+lightSpeed             = CFG.read("lightSpeed")
+loud_radio             = CFG.read("loud_radio")
+launchCtrl             = CFG.read("launchCtrl")
+popsNbangs             = CFG.read("popsNbangs")
+louderPops             = CFG.read("louderPops")
+limitVehOptions        = CFG.read("limitVehOptions")
+missiledefense         = CFG.read("missiledefense")
+autobrklight           = CFG.read("autobrklight")
+rgbLights              = CFG.read("rgbLights")
+holdF                  = CFG.read("holdF")
+keepWheelsTurned       = CFG.read("keepWheelsTurned")
+noJacking              = CFG.read("noJacking")
+insta180               = CFG.read("insta180")
+flares_forall          = CFG.read("flares_forall")
+real_plane_speed       = CFG.read("real_plane_speed")
+unbreakableWindows     = CFG.read("unbreakableWindows")
+veh_mines              = CFG.read("veh_mines")
+vmine_type             = CFG.read("vmine_type")
+towEverything          = CFG.read("towEverything")
+noEngineBraking        = CFG.read("noEngineBraking")
+kersBoost              = CFG.read("kersBoost")
+offroaderx2            = CFG.read("offroaderx2")
+rallyTires             = CFG.read("rallyTires")
+noTractionCtrl         = CFG.read("noTractionCtrl")
+easyWheelie            = CFG.read("easyWheelie")
+rwSteering             = CFG.read("rwSteering")
+awSteering             = CFG.read("awSteering")
+handbrakeSteering      = CFG.read("handbrakeSteering")
+extend_world           = CFG.read("extend_world")
+disableFlightMusic     = CFG.read("disableFlightMusic")
+disable_quotes         = CFG.read("disable_quotes")
+disable_mdef_logs      = CFG.read("disable_mdef_logs")
+replace_pool_q         = CFG.read("replace_pool_q")
+public_seats           = CFG.read("public_seats")
+mc_work_cd             = CFG.read("mc_work_cd")
+hangar_cd              = CFG.read("hangar_cd")
+nc_management_cd       = CFG.read("nc_management_cd")
+nc_vip_mission_chance  = CFG.read("nc_vip_mission_chance")
+security_missions_cd   = CFG.read("security_missions_cd")
+ie_vehicle_steal_cd    = CFG.read("ie_vehicle_steal_cd")
+ie_vehicle_sell_cd     = CFG.read("ie_vehicle_sell_cd")
+ceo_crate_buy_cd       = CFG.read("ceo_crate_buy_cd")
+ceo_crate_sell_cd      = CFG.read("ceo_crate_sell_cd")
+ceo_crate_buy_f_cd     = CFG.read("ceo_crate_buy_f_cd")
+ceo_crate_sell_f_cd    = CFG.read("ceo_crate_sell_f_cd")
+cashUpdgrade1          = CFG.read("cashUpdgrade1")
+cashUpdgrade2          = CFG.read("cashUpdgrade2")
+cokeUpdgrade1          = CFG.read("cokeUpdgrade1")
+cokeUpdgrade2          = CFG.read("cokeUpdgrade2")
+methUpdgrade1          = CFG.read("methUpdgrade1")
+methUpdgrade2          = CFG.read("methUpdgrade2")
+weedUpdgrade1          = CFG.read("weedUpdgrade1")
+weedUpdgrade2          = CFG.read("weedUpdgrade2")
+fdUpdgrade1            = CFG.read("fdUpdgrade1")
+fdUpdgrade2            = CFG.read("fdUpdgrade2")
+bunkerUpdgrade1        = CFG.read("bunkerUpdgrade1")
+bunkerUpdgrade2        = CFG.read("bunkerUpdgrade2")
+acidUpdgrade           = CFG.read("acidUpdgrade")
+whouse_1_owned         = CFG.read("whouse_1_owned")
+whouse_2_owned         = CFG.read("whouse_2_owned")
+whouse_3_owned         = CFG.read("whouse_3_owned")
+whouse_4_owned         = CFG.read("whouse_4_owned")
+whouse_5_owned         = CFG.read("whouse_5_owned")
+whouse_1_size          = CFG.read("whouse_1_size")
+whouse_2_size          = CFG.read("whouse_2_size")
+whouse_3_size          = CFG.read("whouse_3_size")
+whouse_4_size          = CFG.read("whouse_4_size")
+whouse_5_size          = CFG.read("whouse_5_size")
+supply_autofill_delay  = CFG.read("supply_autofill_delay")
+SS_debug               = CFG.read("SS_debug")
 current_vehicle        = self.get_veh()
 last_vehicle           = self.get_veh()
 tab1Sound              = true
@@ -705,13 +704,13 @@ Samurais_scripts:add_imgui(function()
       UI.widgetSound("Nav")
       log.debug("Debug mode activated.")
       SS_debug = true
-      lua_cfg.save("SS_debug", SS_debug)
+      CFG.save("SS_debug", SS_debug)
     elseif debug_counter > 7 then
       UI.widgetSound("Cancel")
       log.debug("Debug mode deactivated.")
       SS_debug      = false
       debug_counter = 0
-      lua_cfg.save("SS_debug", SS_debug)
+      CFG.save("SS_debug", SS_debug)
     end
   end
   ImGui.Dummy(1, 10); ImGui.SeparatorText("About")
@@ -733,56 +732,56 @@ self_tab:add_imgui(function()
   Regen, RegenUsed = ImGui.Checkbox(AUTOHEAL_, Regen)
   UI.helpMarker(false, AUTOHEAL_DESC_)
   if RegenUsed then
-    lua_cfg.save("Regen", Regen)
+    CFG.save("Regen", Regen)
     UI.widgetSound("Nav2")
   end
 
   -- objectiveTP, objectiveTPUsed = ImGui.Checkbox(OBJECTIVETP_, objectiveTP)
   -- UI.helpMarker(false, OBJECTIVETP_DESC_)
   -- if objectiveTPUsed then
-  --   lua_cfg.save("objectiveTP", objectiveTP)
+  --   CFG.save("objectiveTP", objectiveTP)
   --   UI.widgetSound("Nav2")
   -- end
 
   replaceSneakAnim, rsanimUsed = ImGui.Checkbox(CROUCHCB_, replaceSneakAnim)
   UI.helpMarker(false, CROUCH_DESC_)
   if rsanimUsed then
-    lua_cfg.save("replaceSneakAnim", replaceSneakAnim)
+    CFG.save("replaceSneakAnim", replaceSneakAnim)
     UI.widgetSound("Nav2")
   end
 
   replacePointAct, rpaUsed = ImGui.Checkbox(REPLACE_PA_CB_, replacePointAct)
   UI.helpMarker(false, REPLACE_PA_DESC_)
   if rpaUsed then
-    lua_cfg.save("replacePointAct", replacePointAct)
+    CFG.save("replacePointAct", replacePointAct)
     UI.widgetSound("Nav2")
   end
 
   phoneAnim, phoneAnimUsed = ImGui.Checkbox(PHONEANIMS_CB_, phoneAnim)
   UI.helpMarker(false, PHONEANIMS_DESC_)
   if phoneAnimUsed then
-    lua_cfg.save("phoneAnim", phoneAnim)
+    CFG.save("phoneAnim", phoneAnim)
     UI.widgetSound("Nav2")
   end
 
   sprintInside, sprintInsideUsed = ImGui.Checkbox(SPRINT_INSIDE_CB_, sprintInside)
   UI.helpMarker(false, SPRINT_INSIDE_DESC_)
   if sprintInsideUsed then
-    lua_cfg.save("sprintInside", sprintInside)
+    CFG.save("sprintInside", sprintInside)
     UI.widgetSound("Nav2")
   end
 
   lockPick, lockPickUsed = ImGui.Checkbox(LOCKPICK_CB_, lockPick)
   UI.helpMarker(false, LOCKPICK_DESC_)
   if lockPickUsed then
-    lua_cfg.save("lockPick", lockPick)
+    CFG.save("lockPick", lockPick)
     UI.widgetSound("Nav2")
   end
 
   disableActionMode, actionModeUsed = ImGui.Checkbox(ACTION_MODE_CB_, disableActionMode)
   UI.helpMarker(false, ACTION_MODE_DESC_)
   if actionModeUsed then
-    lua_cfg.save("disableActionMode", disableActionMode)
+    CFG.save("disableActionMode", disableActionMode)
     UI.widgetSound("Nav2")
   end
 
@@ -790,8 +789,8 @@ self_tab:add_imgui(function()
   UI.helpMarker(false, CLUMSY_DESC_)
   if clumsyUsed then
     rod = false
-    lua_cfg.save("rod", false)
-    lua_cfg.save("clumsy", clumsy)
+    CFG.save("rod", false)
+    CFG.save("clumsy", clumsy)
     UI.widgetSound("Nav2")
   end
   if clumsy and clumsyUsed then
@@ -807,8 +806,8 @@ self_tab:add_imgui(function()
   UI.helpMarker(false, ROD_DESC_)
   if rodUsed then
     clumsy = false
-    lua_cfg.save("rod", rod)
-    lua_cfg.save("clumsy", false)
+    CFG.save("rod", rod)
+    CFG.save("clumsy", false)
     UI.widgetSound("Nav2")
   end
   if rod and rodUsed then
@@ -825,7 +824,7 @@ self_tab:add_imgui(function()
     UI.helpMarker(false, RAGDOLL_SOUND_DESC_)
     if rgdlsnd then
       UI.widgetSound("Nav2")
-      lua_cfg.save("ragdoll_sound", ragdoll_sound)
+      CFG.save("ragdoll_sound", ragdoll_sound)
     end
   end
 
@@ -833,7 +832,7 @@ self_tab:add_imgui(function()
   UI.helpMarker(false, HIDENSEEK_DESC_)
   if hfcUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("hideFromCops", hideFromCops)
+    CFG.save("hideFromCops", hideFromCops)
   end
 end)
 
@@ -1095,13 +1094,13 @@ Actions:add_imgui(function()
     end
     ImGui.Separator(); manualFlags, used = ImGui.Checkbox("Edit Flags", manualFlags)
     if used then
-      lua_cfg.save("manualFlags", manualFlags)
+      CFG.save("manualFlags", manualFlags)
       UI.widgetSound("Nav2")
     end
     UI.helpMarker(false, ANIM_FLAGS_DESC_)
     ImGui.SameLine(); disableProps, used = ImGui.Checkbox("Disable Props", disableProps)
     if used then
-      lua_cfg.save("disableProps", disableProps)
+      CFG.save("disableProps", disableProps)
       UI.widgetSound("Nav2")
     end
     UI.helpMarker(false, ANIM_PROPS_DESC_)
@@ -1109,27 +1108,27 @@ Actions:add_imgui(function()
       ImGui.Separator()
       controllable, used = ImGui.Checkbox(ANIM_CONTROL_CB_, controllable)
       if used then
-        lua_cfg.save("controllable", controllable)
+        CFG.save("controllable", controllable)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, ANIM_CONTROL_DESC_)
       ImGui.SameLine(); ImGui.Dummy(27, 1); ImGui.SameLine()
       looped, used = ImGui.Checkbox("Loop", looped)
       if used then
-        lua_cfg.save("looped", looped)
+        CFG.save("looped", looped)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, ANIM_LOOP_DESC_)
       upperbody, used = ImGui.Checkbox(ANIM_UPPER_CB_, upperbody)
       if used then
-        lua_cfg.save("upperbody", upperbody)
+        CFG.save("upperbody", upperbody)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, ANIM_UPPER_DESC_)
       ImGui.SameLine(); ImGui.Dummy(1, 1); ImGui.SameLine()
       freeze, used = ImGui.Checkbox(ANIM_FREEZE_CB_, freeze)
       if used then
-        lua_cfg.save("freeze", freeze)
+        CFG.save("freeze", freeze)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, ANIM_FREEZE_DESC_)
@@ -1316,7 +1315,7 @@ Actions:add_imgui(function()
               end
               shortcut_anim     = chosen_anim
               shortcut_anim.btn = btn
-              lua_cfg.save("shortcut_anim", shortcut_anim)
+              CFG.save("shortcut_anim", shortcut_anim)
               gui.show_success("Samurais Scripts", string.format("%s %s %s", HOTKEY_SUCCESS1_, btn_name, HOTKEY_SUCCESS2_))
               btn, btn_name      = nil, nil
               is_setting_hotkeys = false
@@ -1337,7 +1336,7 @@ Actions:add_imgui(function()
         if ImGui.Button(ANIM_HOTKEY_DEL_) then
           UI.widgetSound("Delete")
           shortcut_anim = {}
-          lua_cfg.save("shortcut_anim", {})
+          CFG.save("shortcut_anim", {})
           gui.show_success("Samurais Scripts", "Animation shortcut has been reset.")
         end
         UI.toolTip(false, DEL_HOTKEY_DESC_)
@@ -1361,7 +1360,7 @@ Actions:add_imgui(function()
         if ImGui.Button(string.format("%s##anims", ADD_TO_FAVS_)) then
           UI.widgetSound("Select")
           table.insert(favorite_actions, info)
-          lua_cfg.save("favorite_actions", favorite_actions)
+          CFG.save("favorite_actions", favorite_actions)
         end
       else
         if ImGui.Button(REMOVE_FROM_FAVS_) then
@@ -1371,7 +1370,7 @@ Actions:add_imgui(function()
               table.remove(favorite_actions, k)
             end
           end
-          lua_cfg.save("favorite_actions", favorite_actions)
+          CFG.save("favorite_actions", favorite_actions)
         end
       end
     end
@@ -1428,7 +1427,7 @@ Actions:add_imgui(function()
     ImGui.SameLine()
     npc_godMode, used = ImGui.Checkbox("Invincible", npc_godMode)
     if used then
-      lua_cfg.save("npc_godMode", npc_godMode)
+      CFG.save("npc_godMode", npc_godMode)
       UI.widgetSound("Nav")
     end
     UI.toolTip(false, NPC_GODMODE_DESC_)
@@ -1555,7 +1554,7 @@ Actions:add_imgui(function()
     usePlayKey, upkUsed = ImGui.Checkbox("Enable Animation Hotkeys", usePlayKey)
     UI.toolTip(false, ANIM_HOTKEYS_DESC_)
     if upkUsed then
-      lua_cfg.save("usePlayKey", usePlayKey)
+      CFG.save("usePlayKey", usePlayKey)
       UI.widgetSound("Nav2")
     end
     ImGui.EndTabItem()
@@ -1624,7 +1623,7 @@ Actions:add_imgui(function()
       if ImGui.Button(string.format("%s##favs", ADD_TO_FAVS_)) then
         UI.widgetSound("Select")
         table.insert(favorite_actions, data)
-        lua_cfg.save("favorite_actions", favorite_actions)
+        CFG.save("favorite_actions", favorite_actions)
       end
     else
       if ImGui.Button(string.format("%s##favs", REMOVE_FROM_FAVS_)) then
@@ -1634,7 +1633,7 @@ Actions:add_imgui(function()
             table.remove(favorite_actions, k)
           end
         end
-        lua_cfg.save("favorite_actions", favorite_actions)
+        CFG.save("favorite_actions", favorite_actions)
       end
     end
     ImGui.Spacing(); ImGui.SeparatorText(NPC_SCENARIOS_)
@@ -1834,7 +1833,7 @@ Actions:add_imgui(function()
             table.remove(favorite_actions, k)
           end
         end
-        lua_cfg.save("favorite_actions", favorite_actions)
+        CFG.save("favorite_actions", favorite_actions)
       end
     else
       ImGui.Dummy(1, 5)
@@ -1934,26 +1933,26 @@ weapon_tab:add_imgui(function()
   if Triggerbot then
     ImGui.SameLine(); aimEnemy, aimEnemyUsed = ImGui.Checkbox(ENEMY_ONLY_CB_, aimEnemy)
     if aimEnemyUsed then
-      lua_cfg.save("aimEnemy", aimEnemy)
+      CFG.save("aimEnemy", aimEnemy)
       UI.widgetSound("Nav2")
     end
   end
   if TbUsed then
-    lua_cfg.save("Triggerbot", Triggerbot)
+    CFG.save("Triggerbot", Triggerbot)
     UI.widgetSound("Nav2")
   end
 
   autoKill, autoKillUsed = ImGui.Checkbox(AUTOKILL_CB_, autoKill)
   UI.helpMarker(false, AUTOKILL_DESC_)
   if autoKillUsed then
-    lua_cfg.save("autoKill", autoKill)
+    CFG.save("autoKill", autoKill)
     UI.widgetSound("Nav2")
   end
 
   runaway, runawayUsed = ImGui.Checkbox(ENEMIES_FLEE_CB_, runaway)
   UI.helpMarker(false, ENEMIES_FLEE_DESC_)
   if runawayUsed then
-    lua_cfg.save("runaway", runaway)
+    CFG.save("runaway", runaway)
     UI.widgetSound("Nav2")
     if runaway then
       publicEnemy = false
@@ -1963,14 +1962,14 @@ weapon_tab:add_imgui(function()
   replace_pool_q, rpqUsed = ImGui.Checkbox(KATANA_CB_, replace_pool_q)
   UI.helpMarker(false, KATANA_DESC_)
   if rpqUsed then
-    lua_cfg.save("replace_pool_q", replace_pool_q)
+    CFG.save("replace_pool_q", replace_pool_q)
     UI.widgetSound("Nav2")
   end
 
   laserSight, laserSightUSed = ImGui.Checkbox(LASER_SIGHT_CB_, laserSight)
   UI.helpMarker(false, LASER_SIGHT_DESC_)
   if laserSightUSed then
-    lua_cfg.save("laserSight", laserSight)
+    CFG.save("laserSight", laserSight)
     UI.widgetSound("Nav2")
   end
   if laserSight then
@@ -1979,13 +1978,13 @@ weapon_tab:add_imgui(function()
     ImGui.SameLine(); laser_switch, lsrswUsed_2 = ImGui.RadioButton("Green", laser_switch, 1)
     if lsrswUsed then
       UI.widgetSound("Nav")
-      lua_cfg.save("laser_switch", laser_switch)
-      lua_cfg.save("laser_choice", laser_choice)
+      CFG.save("laser_switch", laser_switch)
+      CFG.save("laser_choice", laser_choice)
     end
     if lsrswUsed_2 then
       UI.widgetSound("Nav")
-      lua_cfg.save("laser_switch", laser_switch)
-      lua_cfg.save("laser_choice", laser_choice)
+      CFG.save("laser_switch", laser_switch)
+      CFG.save("laser_choice", laser_choice)
     end
     if laser_switch == 0 then
       laser_choice = "proj_laser_enemy"
@@ -2208,14 +2207,14 @@ vehicle_tab:add_imgui(function()
   UI.toolTip(false, LIMIT_OPTIONS_DESC_)
   if lvoUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("limitVehOptions", limitVehOptions)
+    CFG.save("limitVehOptions", limitVehOptions)
   end
 
   ImGui.SameLine(); ImGui.Dummy(7, 1); ImGui.SameLine();
   missiledefense, mdefUsed = ImGui.Checkbox("Missile Defence", missiledefense)
   UI.toolTip(false, MISSILE_DEF_DESC_)
   if mdefUsed then
-    lua_cfg.save("missiledefense", missiledefense)
+    CFG.save("missiledefense", missiledefense)
     if missiledefense then
       UI.widgetSound("Radar")
       gui.show_success("Samurais Scripts", MISSILE_DEF_ON_)
@@ -2229,14 +2228,14 @@ vehicle_tab:add_imgui(function()
   UI.toolTip(false, LAUNCH_CTRL_DESC_)
   if lctrlUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("launchCtrl", launchCtrl)
+    CFG.save("launchCtrl", launchCtrl)
   end
 
   ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine(); speedBoost, spdbstUsed = ImGui.Checkbox("NOS", speedBoost)
   UI.toolTip(false, NOS_DESC_)
   if spdbstUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("speedBoost", speedBoost)
+    CFG.save("speedBoost", speedBoost)
   end
   if speedBoost then
     ImGui.SameLine()
@@ -2258,20 +2257,20 @@ vehicle_tab:add_imgui(function()
       nosAudio, nosaudioUsed = ImGui.Checkbox("NOS Sound", nosAudio)
       if nosaudioUsed then
         UI.widgetSound("Nav2")
-        lua_cfg.save("nosAudio", nosAudio)
+        CFG.save("nosAudio", nosAudio)
       end
 
       ImGui.SameLine(); nosFlames, nosflamesUsed = ImGui.Checkbox("NOS Flames", nosFlames)
       if nosflamesUsed then
         UI.widgetSound("Nav2")
-        lua_cfg.save("nosFlames", nosFlames)
+        CFG.save("nosFlames", nosFlames)
       end
 
       ImGui.SameLine(); nosvfx, nosvfxUsed = ImGui.Checkbox("Screen Effect", nosvfx)
       UI.toolTip(false, NOS_VFX_DESC_)
       if nosvfxUsed then
         UI.widgetSound("Nav2")
-        lua_cfg.save("nosvfx", nosvfx)
+        CFG.save("nosvfx", nosvfx)
       end
 
       ImGui.Dummy(1, 15); ImGui.Text(" Power:  "); ImGui.SameLine()
@@ -2283,7 +2282,7 @@ vehicle_tab:add_imgui(function()
       ImGui.Dummy(1, 20)
       if ImGui.Button(string.format(" %s ##nos_settings", GENERIC_SAVE_BTN_)) then
         UI.widgetSound("Select")
-        lua_cfg.save("nosPower", nosPower)
+        CFG.save("nosPower", nosPower)
         ImGui.CloseCurrentPopup()
       end
       ImGui.SameLine(); ImGui.Dummy(30, 1); ImGui.SameLine()
@@ -2299,7 +2298,7 @@ vehicle_tab:add_imgui(function()
   UI.toolTip(false, LOUD_RADIO_DESC_)
   if loudRadioUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("loud_radio", loud_radio)
+    CFG.save("loud_radio", loud_radio)
     if not loud_radio then
       script.run_in_fiber(function()
         AUDIO.SET_VEHICLE_RADIO_LOUD(current_vehicle, false)
@@ -2312,14 +2311,14 @@ vehicle_tab:add_imgui(function()
   UI.toolTip(false, NOS_PURGE_DESC_)
   if nosPurgeUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("nosPurge", nosPurge)
+    CFG.save("nosPurge", nosPurge)
   end
 
   popsNbangs, pnbUsed = ImGui.Checkbox("Pops & Bangs", popsNbangs)
   UI.toolTip(false, POPSNBANGS_DESC_)
   if pnbUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("popsNbangs", popsNbangs)
+    CFG.save("popsNbangs", popsNbangs)
   end
   if popsNbangs then
     ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine(); louderPops, louderPopsUsed = ImGui.Checkbox("Louder Pops",
@@ -2327,7 +2326,7 @@ vehicle_tab:add_imgui(function()
     UI.toolTip(false, LOUDER_POPS_DESC_)
     if louderPopsUsed then
       UI.widgetSound("Nav2")
-      lua_cfg.save("louderPops", louderPops)
+      CFG.save("louderPops", louderPops)
     end
   end
 
@@ -2335,21 +2334,21 @@ vehicle_tab:add_imgui(function()
   UI.toolTip(false, HIGH_BEAMS_DESC_)
   if hornLightUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("hornLight", hornLight)
+    CFG.save("hornLight", hornLight)
   end
 
   ImGui.SameLine(); autobrklight, autobrkUsed = ImGui.Checkbox("Auto Brake Lights", autobrklight)
   UI.toolTip(false, BRAKE_LIGHT_DESC_)
   if autobrkUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("autobrklight", autobrklight)
+    CFG.save("autobrklight", autobrklight)
   end
 
   holdF, holdFused = ImGui.Checkbox("Keep Engine On", holdF)
   UI.toolTip(false, IV_STYLE_EXIT_DESC_)
   if holdFused then
     UI.widgetSound("Nav2")
-    lua_cfg.save("holdF", holdF)
+    CFG.save("holdF", holdF)
   end
 
   ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); keepWheelsTurned, kwtrnd = ImGui.Checkbox(
@@ -2357,7 +2356,7 @@ vehicle_tab:add_imgui(function()
   UI.toolTip(false, KEEP_WHEELS_TURNED_DESC_)
   if kwtrnd then
     UI.widgetSound("Nav2")
-    lua_cfg.save("keepWheelsTurned", keepWheelsTurned)
+    CFG.save("keepWheelsTurned", keepWheelsTurned)
   end
 
   noJacking, noJackingUsed = ImGui.Checkbox(
@@ -2365,14 +2364,14 @@ vehicle_tab:add_imgui(function()
   UI.toolTip(false, CANT_TOUCH_THIS_DESC_)
   if noJackingUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("noJacking", noJacking)
+    CFG.save("noJacking", noJacking)
   end
 
   ImGui.SameLine(); ImGui.Dummy(15, 1); ImGui.SameLine(); insta180, insta180Used = ImGui.Checkbox("Instant 180°",
     insta180)
   if insta180Used then
     UI.widgetSound("Nav2")
-    lua_cfg.save("insta180", insta180)
+    CFG.save("insta180", insta180)
   end
   UI.toolTip(false, INSTA_180_DESC_)
 
@@ -2381,7 +2380,7 @@ vehicle_tab:add_imgui(function()
     UI.toolTip(false, FLARES_FOR_ALL_DESC_)
     if flaresUsed then
       UI.widgetSound("Nav2")
-      lua_cfg.save("flares_forall", flares_forall)
+      CFG.save("flares_forall", flares_forall)
     end
   else
     ImGui.BeginDisabled()
@@ -2395,14 +2394,14 @@ vehicle_tab:add_imgui(function()
   UI.toolTip(false, PLANE_SPEED_DESC_)
   if rpsUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("real_plane_speed", real_plane_speed)
+    CFG.save("real_plane_speed", real_plane_speed)
   end
 
   unbreakableWindows, ubwUsed = ImGui.Checkbox("Strong Windows", unbreakableWindows)
   UI.toolTip(false, STRONG_WINDOWS_DESC_)
   if ubwUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("unbreakableWindows", unbreakableWindows)
+    CFG.save("unbreakableWindows", unbreakableWindows)
     if not unbreakableWindows and ubwindowsToggled then
       VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS(current_vehicle, false)
       ubwindowsToggled = false
@@ -2413,13 +2412,13 @@ vehicle_tab:add_imgui(function()
     flappyDoors)
   if flappyDoorsUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("flappyDoors", flappyDoors)
+    CFG.save("flappyDoors", flappyDoors)
   end
 
   veh_mines, vmnsUsed = ImGui.Checkbox("Vehicle Mines", veh_mines)
   if vmnsUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("veh_mines", veh_mines)
+    CFG.save("veh_mines", veh_mines)
   end
   UI.toolTip(false, VEHICLE_MINES_DESC_)
   if veh_mines then
@@ -2439,7 +2438,7 @@ vehicle_tab:add_imgui(function()
         vmine_type.explosive = false
         vmine_type.emp       = false
         vmine_type.kinetic   = false
-        lua_cfg.save("vmine_type", vmine_type)
+        CFG.save("vmine_type", vmine_type)
       end
 
       ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
@@ -2450,7 +2449,7 @@ vehicle_tab:add_imgui(function()
         vmine_type.explosive = false
         vmine_type.emp       = false
         vmine_type.kinetic   = false
-        lua_cfg.save("vmine_type", vmine_type)
+        CFG.save("vmine_type", vmine_type)
       end
 
       ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
@@ -2461,7 +2460,7 @@ vehicle_tab:add_imgui(function()
         vmine_type.slick   = false
         vmine_type.emp     = false
         vmine_type.kinetic = false
-        lua_cfg.save("vmine_type", vmine_type)
+        CFG.save("vmine_type", vmine_type)
       end
 
       ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
@@ -2472,7 +2471,7 @@ vehicle_tab:add_imgui(function()
         vmine_type.slick     = false
         vmine_type.explosive = false
         vmine_type.kinetic   = false
-        lua_cfg.save("vmine_type", vmine_type)
+        CFG.save("vmine_type", vmine_type)
       end
 
       ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
@@ -2483,7 +2482,7 @@ vehicle_tab:add_imgui(function()
         vmine_type.slick     = false
         vmine_type.explosive = false
         vmine_type.emp       = false
-        lua_cfg.save("vmine_type", vmine_type)
+        CFG.save("vmine_type", vmine_type)
       end
 
       ImGui.Dummy(1, 5)
@@ -2496,7 +2495,7 @@ vehicle_tab:add_imgui(function()
       if vmine_type.spikes or vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic then
         if ImGui.Button("Confirm") then
           UI.widgetSound("Select")
-          lua_cfg.save("vmine_type", vmine_type)
+          CFG.save("vmine_type", vmine_type)
           ImGui.CloseCurrentPopup()
         end
       end
@@ -2507,7 +2506,7 @@ vehicle_tab:add_imgui(function()
   ImGui.Dummy(1, 5); rgbLights, rgbToggled = ImGui.Checkbox(RGB_LIGHTS_DESC_, rgbLights)
   if rgbToggled then
     UI.widgetSound("Nav2")
-    lua_cfg.save("rgbLights", rgbLights)
+    CFG.save("rgbLights", rgbLights)
     if rgbLights then
       script.run_in_fiber(function(rgbhl)
         if not VEHICLE.IS_TOGGLE_MOD_ON(current_vehicle, 22) then
@@ -2530,7 +2529,7 @@ vehicle_tab:add_imgui(function()
     ImGui.PopItemWidth()
     if lightSpeedUsed then
       UI.widgetSound("Nav")
-      lua_cfg.save("lightSpeed", lightSpeed)
+      CFG.save("lightSpeed", lightSpeed)
     end
   end
 
@@ -3110,8 +3109,8 @@ drift_mode_tab:add_imgui(function()
       UI.helpMarker(false, DRIFT_MODE_DESC_)
       if driftModeUsed then
         UI.widgetSound("Nav2")
-        lua_cfg.save("driftMode", driftMode)
-        lua_cfg.save("DriftTires", false)
+        CFG.save("driftMode", driftMode)
+        CFG.save("DriftTires", false)
       end
       if driftMode then
         DriftTires = false
@@ -3122,7 +3121,7 @@ drift_mode_tab:add_imgui(function()
         UI.toolTip(false, DRIFT_SLIDER_)
         if DriftIntensityUsed then
           UI.widgetSound("Nav")
-          lua_cfg.save("DriftIntensity", DriftIntensity)
+          CFG.save("DriftIntensity", DriftIntensity)
         end
       end
 
@@ -3133,8 +3132,8 @@ drift_mode_tab:add_imgui(function()
       end
       if DriftTiresUsed then
         UI.widgetSound("Nav2")
-        lua_cfg.save("DriftTires", DriftTires)
-        lua_cfg.save("driftMode", false)
+        CFG.save("DriftTires", DriftTires)
+        CFG.save("driftMode", false)
       end
 
       if driftMode or DriftTires then
@@ -3144,14 +3143,14 @@ drift_mode_tab:add_imgui(function()
         UI.toolTip(false, DRIFT_TORQUE_DESC_)
         if dpiUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("DriftPowerIncrease", DriftPowerIncrease)
+          CFG.save("DriftPowerIncrease", DriftPowerIncrease)
         end
 
         ImGui.Spacing(); DriftSmoke, dsmkUsed = ImGui.Checkbox("Drift Smoke", DriftSmoke)
         UI.toolTip(false, DRIFT_SMOKE_COL_DESC_)
         if dsmkUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("DriftSmoke", DriftSmoke)
+          CFG.save("DriftSmoke", DriftSmoke)
           if not BurnoutSmoke and not DriftSmoke then
             script.run_in_fiber(function()
               if not has_custom_tires then
@@ -3169,7 +3168,7 @@ drift_mode_tab:add_imgui(function()
       BurnoutSmoke, bsmkUsed = ImGui.Checkbox("Burnout Smoke", BurnoutSmoke)
       if bsmkUsed then
         UI.widgetSound("Nav2")
-        lua_cfg.save("BurnoutSmoke", BurnoutSmoke)
+        CFG.save("BurnoutSmoke", BurnoutSmoke)
         if not BurnoutSmoke and not DriftSmoke then
           script.run_in_fiber(function()
             if not has_custom_tires then
@@ -3190,12 +3189,12 @@ drift_mode_tab:add_imgui(function()
           driftSmokeIndex, dsiUsed = ImGui.Combo("##tireSmoke", driftSmokeIndex, driftSmokeColors, #driftSmokeColors)
           ImGui.SameLine()
           if dsiUsed then
-            lua_cfg.save("driftSmokeIndex", driftSmokeIndex)
+            CFG.save("driftSmokeIndex", driftSmokeIndex)
             selected_smoke_col = driftSmokeColors[driftSmokeIndex + 1]
             local r, g, b = UI.getColor(string.lower(selected_smoke_col))
             r, g, b = lua_Fn.round((r * 255), 2), lua_Fn.round((g * 255), 2), lua_Fn.round((b * 255), 2)
             driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = r, g, b
-            lua_cfg.save("driftSmoke_T", driftSmoke_T)
+            CFG.save("driftSmoke_T", driftSmoke_T)
             script.run_in_fiber(function()
               if not custom_tires_checked then
                 has_custom_tires = VEHICLE.IS_TOGGLE_MOD_ON(current_vehicle, 20)
@@ -3238,7 +3237,7 @@ drift_mode_tab:add_imgui(function()
                 else
                   UI.widgetSound("Select")
                   driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = lua_Fn.hexToRGB(smokeHex)
-                  lua_cfg.save("driftSmoke_T", driftSmoke_T)
+                  CFG.save("driftSmoke_T", driftSmoke_T)
                   script.run_in_fiber(function()
                     if not custom_tires_checked then
                       has_custom_tires = VEHICLE.IS_TOGGLE_MOD_ON(current_vehicle, 20)
@@ -3263,13 +3262,13 @@ drift_mode_tab:add_imgui(function()
         customSmokeCol, cscUsed = ImGui.Checkbox(GENERIC_CUSTOM_LABEL_, customSmokeCol)
         if cscUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("customSmokeCol", customSmokeCol)
+          CFG.save("customSmokeCol", customSmokeCol)
           if not customSmokeCol then
             selected_smoke_col = driftSmokeColors[driftSmokeIndex + 1]
             local r, g, b = UI.getColor(string.lower(selected_smoke_col))
             r, g, b = lua_Fn.round((r * 255), 2), lua_Fn.round((g * 255), 2), lua_Fn.round((b * 255), 2)
             driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = r, g, b
-            lua_cfg.save("driftSmoke_T", driftSmoke_T)
+            CFG.save("driftSmoke_T", driftSmoke_T)
           end
         end
       end
@@ -3280,7 +3279,7 @@ drift_mode_tab:add_imgui(function()
         UI.toolTip(false, DRIFT_GAME_DESC_)
         if drmgUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("driftMinigame", driftMinigame)
+          CFG.save("driftMinigame", driftMinigame)
         end
         if driftMinigame then
           ImGui.Dummy(1, 10)
@@ -3378,7 +3377,7 @@ flatbed:add_imgui(function()
     UI.helpMarker(false, FLTBD_TOW_ALL_DESC_)
     if towEverythingUsed then
       UI.widgetSound("Nav2")
-      lua_cfg.save("towEverything", towEverything)
+      CFG.save("towEverything", towEverything)
     end
     if towEverything then
       modelOverride = true
@@ -3528,7 +3527,7 @@ handling_tab:add_imgui(function()
   UI.toolTip(false, "Allows your vehicle to coast without losing so much speed when you're not accelerating.")
   if nebrUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("noEngineBraking", noEngineBraking)
+    CFG.save("noEngineBraking", noEngineBraking)
     if not noEngineBraking then
       if engine_brake_disabled then
         SS.setHandlingFlag(current_vehicle, HF._FREEWHEEL_NO_GAS, false)
@@ -3542,7 +3541,7 @@ handling_tab:add_imgui(function()
   UI.toolTip(false, "Equips your vehicle with KERS boost, similar to Open Wheel vehicles. Press [E] to use.")
   if kbUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("kersBoost", kersBoost)
+    CFG.save("kersBoost", kersBoost)
     if not kersBoost then
       if kers_boost_enabled then
         SS.setHandlingFlag(current_vehicle, HF._HAS_KERS, false)
@@ -3559,7 +3558,7 @@ handling_tab:add_imgui(function()
   UI.toolTip(false, "Greatly improves your vehicle's offroad capabilities.")
   if offroadrUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("offroaderx2", offroaderx2)
+    CFG.save("offroaderx2", offroaderx2)
     if not offroaderx2 then
       if offroader_enabled then
         SS.setHandlingFlag(current_vehicle, HF._OFFROAD_ABILITIES_X2, false)
@@ -3572,7 +3571,7 @@ handling_tab:add_imgui(function()
   UI.toolTip(false, "Equips your vehicle with rally tires. Improves offroad traction.")
   if rallytiresUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("rallyTires", rallyTires)
+    CFG.save("rallyTires", rallyTires)
     if not rallyTires then
       if rally_tires_enabled then
         SS.setHandlingFlag(current_vehicle, HF._HAS_RALLY_TYRES, false)
@@ -3584,7 +3583,7 @@ handling_tab:add_imgui(function()
   UI.toolTip(false, "Allows motorcycles to drift.")
   if notcUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("noTractionCtrl", noTractionCtrl)
+    CFG.save("noTractionCtrl", noTractionCtrl)
     if not noTractionCtrl then
       if traction_ctrl_disabled and (is_bike or is_quad) then
         SS.setHandlingFlag(current_vehicle, HF._FORCE_NO_TC_OR_SC, false)
@@ -3597,7 +3596,7 @@ handling_tab:add_imgui(function()
   UI.toolTip(false, "Allows you to pop wheelies at very low speeds, just like the Manchez.")
   if ezwUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("easyWheelie", easyWheelie)
+    CFG.save("easyWheelie", easyWheelie)
     if not easyWheelie then
       if easy_wheelie_enabled and (is_bike or is_quad) then
         SS.setHandlingFlag(current_vehicle, HF._LOW_SPEED_WHEELIES, false)
@@ -3611,21 +3610,21 @@ handling_tab:add_imgui(function()
   UI.toolTip(false, "Your vehicle will use the rear wheels to steer instead of the front.")
   if rwstrUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("rwSteering", rwSteering)
+    CFG.save("rwSteering", rwSteering)
   end
 
   ImGui.SameLine(); awSteering, awstrUsed = ImGui.Checkbox("All Wheels", awSteering)
   UI.toolTip(false, "Your vehicle will use all its wheels to steer.")
   if awstrUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("awSteering", awSteering)
+    CFG.save("awSteering", awSteering)
   end
 
   ImGui.SameLine(); handbrakeSteering, hbstrUsed = ImGui.Checkbox("Handbrake Steering", handbrakeSteering)
   UI.toolTip(false, "When you press the handbrake, your vehicle will use all its wheels to steer, similar to monster trucks.")
   if hbstrUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("handbrakeSteering", handbrakeSteering)
+    CFG.save("handbrakeSteering", handbrakeSteering)
   end
 
   ImGui.Spacing(); UI.wrappedText("[ ! ] NOTE: These options change your vehicle's steering behavior but you can not visually see the difference.", 25)
@@ -3661,7 +3660,7 @@ persist_names     = {}
 veh_attachments   = {}
 attached_vehicles = { entity = 0, hash = 0, mods = {}, color_1 = { r = 0, g = 0, b = 0 }, color_2 = { r = 0, g = 0, b = 0 }, tint = 0, posx = 0.0, posy = 0.0, posz = 0.0, rotx = 0.0, roty = 0.0, rotz = 0.0 }
 vehicle_creation  = { name = "", main_veh = 0, mods = {}, color_1 = { r = 0, g = 0, b = 0 }, color_2 = { r = 0, g = 0, b = 0 }, tint = 0, attachments = {} }
-saved_vehicles    = lua_cfg.read("saved_vehicles")
+saved_vehicles    = CFG.read("saved_vehicles")
 
 local function listVehicles()
   vehicle_list   = {}
@@ -3808,7 +3807,7 @@ local function createWideBodyCivic()
     }
   }
   table.insert(saved_vehicles, vehicle_creation)
-  lua_cfg.save("saved_vehicles", saved_vehicles)
+  CFG.save("saved_vehicles", saved_vehicles)
   vehicle_creation = {}
 end
 
@@ -4243,7 +4242,7 @@ vehicle_creator:add_imgui(function()
                 start_loading_anim = true
                 save:sleep(500)
                 table.insert(saved_vehicles, vehicle_creation)
-                lua_cfg.save("saved_vehicles", saved_vehicles)
+                CFG.save("saved_vehicles", saved_vehicles)
                 ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(main_vehicle)
                 for _, veh in ipairs(spawned_vehicles) do
                   ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(veh)
@@ -4299,7 +4298,7 @@ vehicle_creator:add_imgui(function()
           for key, value in ipairs(saved_vehicles) do
             if persist_info == value then
               table.remove(saved_vehicles, key)
-              lua_cfg.save("saved_vehicles", saved_vehicles)
+              CFG.save("saved_vehicles", saved_vehicles)
             end
           end
           if saved_vehicles[1] == nil then
@@ -4376,7 +4375,7 @@ business_tab:add_imgui(function()
             .SameLine()
         if wh1Used then
           UI.widgetSound("Nav2")
-          lua_cfg.save("whouse_1_owned", whouse_1_owned)
+          CFG.save("whouse_1_owned", whouse_1_owned)
         end
 
         ImGui.BeginDisabled(not whouse_1_owned)
@@ -4384,7 +4383,7 @@ business_tab:add_imgui(function()
             .SameLine()
         if wh2Used then
           UI.widgetSound("Nav2")
-          lua_cfg.save("whouse_2_owned", whouse_2_owned)
+          CFG.save("whouse_2_owned", whouse_2_owned)
         end
         ImGui.EndDisabled()
 
@@ -4393,7 +4392,7 @@ business_tab:add_imgui(function()
             .SameLine()
         if wh3Used then
           UI.widgetSound("Nav2")
-          lua_cfg.save("whouse_3_owned", whouse_3_owned)
+          CFG.save("whouse_3_owned", whouse_3_owned)
         end
         ImGui.EndDisabled()
 
@@ -4402,7 +4401,7 @@ business_tab:add_imgui(function()
             .SameLine()
         if wh4Used then
           UI.widgetSound("Nav2")
-          lua_cfg.save("whouse_4_owned", whouse_4_owned)
+          CFG.save("whouse_4_owned", whouse_4_owned)
         end
         ImGui.EndDisabled()
 
@@ -4410,7 +4409,7 @@ business_tab:add_imgui(function()
         whouse_5_owned, wh5Used = ImGui.Checkbox("5", whouse_5_owned)
         if wh5Used then
           UI.widgetSound("Nav2")
-          lua_cfg.save("whouse_5_owned", whouse_5_owned)
+          CFG.save("whouse_5_owned", whouse_5_owned)
         end
         ImGui.EndDisabled()
 
@@ -4429,21 +4428,21 @@ business_tab:add_imgui(function()
             UI.widgetSound("Nav2")
             whouse_1_size.medium = false
             whouse_1_size.large  = false
-            lua_cfg.save("whouse_1_size", whouse_1_size)
+            CFG.save("whouse_1_size", whouse_1_size)
           end
           whouse_1_size.medium, wh1mUsed = ImGui.Checkbox("Medium", whouse_1_size.medium); ImGui.SameLine()
           if wh1mUsed then
             UI.widgetSound("Nav2")
             whouse_1_size.small = false
             whouse_1_size.large = false
-            lua_cfg.save("whouse_1_size", whouse_1_size)
+            CFG.save("whouse_1_size", whouse_1_size)
           end
           whouse_1_size.large, wh1lUsed = ImGui.Checkbox("Large", whouse_1_size.large)
           if wh1lUsed then
             UI.widgetSound("Nav2")
             whouse_1_size.small = false
             whouse_1_size.medium = false
-            lua_cfg.save("whouse_1_size", whouse_1_size)
+            CFG.save("whouse_1_size", whouse_1_size)
           end
           if whouse_1_size.small then
             whouse1_max = 16
@@ -4508,21 +4507,21 @@ business_tab:add_imgui(function()
             UI.widgetSound("Nav2")
             whouse_2_size.medium = false
             whouse_2_size.large  = false
-            lua_cfg.save("whouse_2_size", whouse_2_size)
+            CFG.save("whouse_2_size", whouse_2_size)
           end
           whouse_2_size.medium, wh2mUsed = ImGui.Checkbox("Medium##wh2", whouse_2_size.medium); ImGui.SameLine()
           if wh2mUsed then
             UI.widgetSound("Nav2")
             whouse_2_size.small = false
             whouse_2_size.large = false
-            lua_cfg.save("whouse_2_size", whouse_2_size)
+            CFG.save("whouse_2_size", whouse_2_size)
           end
           whouse_2_size.large, wh2lUsed = ImGui.Checkbox("Large##wh2", whouse_2_size.large)
           if wh2lUsed then
             UI.widgetSound("Nav2")
             whouse_2_size.small = false
             whouse_2_size.medium = false
-            lua_cfg.save("whouse_2_size", whouse_2_size)
+            CFG.save("whouse_2_size", whouse_2_size)
           end
           if whouse_2_size.small then
             whouse2_max = 16
@@ -4587,21 +4586,21 @@ business_tab:add_imgui(function()
             UI.widgetSound("Nav2")
             whouse_3_size.medium = false
             whouse_3_size.large  = false
-            lua_cfg.save("whouse_3_size", whouse_3_size)
+            CFG.save("whouse_3_size", whouse_3_size)
           end
           whouse_3_size.medium, wh3mUsed = ImGui.Checkbox("Medium##wh3", whouse_3_size.medium); ImGui.SameLine()
           if wh3mUsed then
             UI.widgetSound("Nav2")
             whouse_3_size.small = false
             whouse_3_size.large = false
-            lua_cfg.save("whouse_3_size", whouse_3_size)
+            CFG.save("whouse_3_size", whouse_3_size)
           end
           whouse_3_size.large, wh3lUsed = ImGui.Checkbox("Large##wh3", whouse_3_size.large)
           if wh3lUsed then
             UI.widgetSound("Nav2")
             whouse_3_size.small  = false
             whouse_3_size.medium = false
-            lua_cfg.save("whouse_3_size", whouse_3_size)
+            CFG.save("whouse_3_size", whouse_3_size)
           end
           if whouse_3_size.small then
             whouse3_max = 16
@@ -4666,21 +4665,21 @@ business_tab:add_imgui(function()
             UI.widgetSound("Nav2")
             whouse_4_size.medium = false
             whouse_4_size.large  = false
-            lua_cfg.save("whouse_4_size", whouse_4_size)
+            CFG.save("whouse_4_size", whouse_4_size)
           end
           whouse_4_size.medium, wh4mUsed = ImGui.Checkbox("Medium##wh4", whouse_4_size.medium); ImGui.SameLine()
           if wh4mUsed then
             UI.widgetSound("Nav2")
             whouse_4_size.small = false
             whouse_4_size.large = false
-            lua_cfg.save("whouse_4_size", whouse_4_size)
+            CFG.save("whouse_4_size", whouse_4_size)
           end
           whouse_4_size.large, wh4lUsed = ImGui.Checkbox("Large##wh4", whouse_4_size.large)
           if wh4lUsed then
             UI.widgetSound("Nav2")
             whouse_4_size.small  = false
             whouse_4_size.medium = false
-            lua_cfg.save("whouse_4_size", whouse_4_size)
+            CFG.save("whouse_4_size", whouse_4_size)
           end
           if whouse_4_size.small then
             whouse4_max = 16
@@ -4745,21 +4744,21 @@ business_tab:add_imgui(function()
             UI.widgetSound("Nav2")
             whouse_5_size.medium = false
             whouse_5_size.large  = false
-            lua_cfg.save("whouse_5_size", whouse_5_size)
+            CFG.save("whouse_5_size", whouse_5_size)
           end
           whouse_5_size.medium, wh5mUsed = ImGui.Checkbox("Medium##wh5", whouse_5_size.medium); ImGui.SameLine()
           if wh5mUsed then
             UI.widgetSound("Nav2")
             whouse_5_size.small = false
             whouse_5_size.large = false
-            lua_cfg.save("whouse_5_size", whouse_5_size)
+            CFG.save("whouse_5_size", whouse_5_size)
           end
           whouse_5_size.large, wh5lUsed = ImGui.Checkbox("Large##wh5", whouse_5_size.large)
           if wh5lUsed then
             UI.widgetSound("Nav2")
             whouse_5_size.small  = false
             whouse_5_size.medium = false
-            lua_cfg.save("whouse_5_size", whouse_5_size)
+            CFG.save("whouse_5_size", whouse_5_size)
           end
           if whouse_5_size.small then
             whouse5_max = 16
@@ -4878,12 +4877,12 @@ business_tab:add_imgui(function()
           bunkerUpdgrade1, bu1Used = ImGui.Checkbox("Equipment Upgrade##bunker", bunkerUpdgrade1); ImGui.SameLine()
           if bu1Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("bunkerUpdgrade1", bunkerUpdgrade1)
+            CFG.save("bunkerUpdgrade1", bunkerUpdgrade1)
           end
           bunkerUpdgrade2, bu2Used = ImGui.Checkbox("Staff Upgrade##bunker", bunkerUpdgrade2)
           if bu2Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("bunkerUpdgrade2", bunkerUpdgrade2)
+            CFG.save("bunkerUpdgrade2", bunkerUpdgrade2)
           end
           if bunkerUpdgrade1 then
             bunkerOffset1 = globals.get_int(Global_262145.f_21256)
@@ -4942,12 +4941,12 @@ business_tab:add_imgui(function()
           cashUpdgrade1, cu1Used = ImGui.Checkbox("Equipment Upgrade##fcash", cashUpdgrade1); ImGui.SameLine()
           if cu1Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("cashUpdgrade1", cashUpdgrade1)
+            CFG.save("cashUpdgrade1", cashUpdgrade1)
           end
           cashUpdgrade2, cu2Used = ImGui.Checkbox("Staff Upgrade##fcash", cashUpdgrade2)
           if cu2Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("cashUpdgrade2", cashUpdgrade2)
+            CFG.save("cashUpdgrade2", cashUpdgrade2)
           end
           if cashUpdgrade1 then
             cashOffset1 = globals.get_int(Global_262145.f_17326)
@@ -4985,12 +4984,12 @@ business_tab:add_imgui(function()
           cokeUpdgrade1, co1Used = ImGui.Checkbox("Equipment Upgrade##coke", cokeUpdgrade1); ImGui.SameLine()
           if co1Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("cokeUpdgrade1", cokeUpdgrade1)
+            CFG.save("cokeUpdgrade1", cokeUpdgrade1)
           end
           cokeUpdgrade2, co2Used = ImGui.Checkbox("Staff Upgrade##coke", cokeUpdgrade2)
           if co2Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("cokeUpdgrade2", cokeUpdgrade2)
+            CFG.save("cokeUpdgrade2", cokeUpdgrade2)
           end
           if cokeUpdgrade1 then
             cokeOffset1 = globals.get_int(Global_262145.f_17327)
@@ -5028,12 +5027,12 @@ business_tab:add_imgui(function()
           methUpdgrade1, mu1Used = ImGui.Checkbox("Equipment Upgrade##meth", methUpdgrade1); ImGui.SameLine()
           if mu1Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("methUpdgrade1", methUpdgrade1)
+            CFG.save("methUpdgrade1", methUpdgrade1)
           end
           methUpdgrade2, mu2Used = ImGui.Checkbox("Staff Upgrade##meth", methUpdgrade2)
           if mu2Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("methUpdgrade2", methUpdgrade2)
+            CFG.save("methUpdgrade2", methUpdgrade2)
           end
           if methUpdgrade1 then
             methOffset1 = globals.get_int(Global_262145.f_17328)
@@ -5071,12 +5070,12 @@ business_tab:add_imgui(function()
           weedUpdgrade1, wu1Used = ImGui.Checkbox("Equipment Upgrade##weed", weedUpdgrade1); ImGui.SameLine()
           if wu1Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("weedUpdgrade1", weedUpdgrade1)
+            CFG.save("weedUpdgrade1", weedUpdgrade1)
           end
           weedUpdgrade2, wu2Used = ImGui.Checkbox("Staff Upgrade##weed", weedUpdgrade2)
           if wu2Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("weedUpdgrade2", weedUpdgrade2)
+            CFG.save("weedUpdgrade2", weedUpdgrade2)
           end
           if weedUpdgrade1 then
             weedOffset1 = globals.get_int(Global_262145.f_17329)
@@ -5114,12 +5113,12 @@ business_tab:add_imgui(function()
           fdUpdgrade1, fd1Used = ImGui.Checkbox("Equipment Upgrade##fd", fdUpdgrade1); ImGui.SameLine()
           if fd1Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("fdUpdgrade1", fdUpdgrade1)
+            CFG.save("fdUpdgrade1", fdUpdgrade1)
           end
           fdUpdgrade2, fd2Used = ImGui.Checkbox("Staff Upgrade##fd", fdUpdgrade2)
           if fd2Used then
             UI.widgetSound("Nav2")
-            lua_cfg.save("fdUpdgrade2", fdUpdgrade2)
+            CFG.save("fdUpdgrade2", fdUpdgrade2)
           end
           if fdUpdgrade1 then
             fdOffset1 = globals.get_int(Global_262145.f_17325)
@@ -5157,7 +5156,7 @@ business_tab:add_imgui(function()
           acidUpdgrade, auUsed = ImGui.Checkbox("Lab Upgrade##acid", acidUpdgrade)
           if auUsed then
             UI.widgetSound("Nav2")
-            lua_cfg.save("acidUpdgrade", acidUpdgrade)
+            CFG.save("acidUpdgrade", acidUpdgrade)
           end
           if acidUpdgrade then
             acidOffset = globals.get_int(Global_262145.f_17330)
@@ -5434,20 +5433,20 @@ business_tab:add_imgui(function()
         mc_work_cd, mcworkUsed = ImGui.Checkbox("MC Club Work", mc_work_cd)
         if mcworkUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("mc_work_cd", mc_work_cd)
+          CFG.save("mc_work_cd", mc_work_cd)
         end
 
         ImGui.SameLine(); ImGui.Dummy(58, 1); ImGui.SameLine()
         hangar_cd, hcdUsed = ImGui.Checkbox("Hangar Crate Steal", hangar_cd)
         if hcdUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("hangar_cd", hangar_cd)
+          CFG.save("hangar_cd", hangar_cd)
         end
 
         nc_management_cd, ncmanagementUsed = ImGui.Checkbox("Nightclub Management", nc_management_cd)
         if ncmanagementUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("nc_management_cd", nc_management_cd)
+          CFG.save("nc_management_cd", nc_management_cd)
         end
 
         ImGui.SameLine()
@@ -5456,49 +5455,51 @@ business_tab:add_imgui(function()
           "Always spawns the troublemaker nightclub missions and disables the knocked out VIP missions.")
         if nvipmcUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("nc_vip_mission_chance", nc_vip_mission_chance)
+          CFG.save("nc_vip_mission_chance", nc_vip_mission_chance)
         end
 
         ie_vehicle_steal_cd, ievstealUsed = ImGui.Checkbox("I/E Vehicle Sourcing", ie_vehicle_steal_cd)
         if ievstealUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
+          CFG.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
         end
 
         ImGui.SameLine(); ImGui.Dummy(12, 1); ImGui.SameLine()
         ie_vehicle_sell_cd, ievsellUsed = ImGui.Checkbox("I/E Vehicle Selling", ie_vehicle_sell_cd)
         if ievsellUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
+          CFG.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
         end
 
         ceo_crate_buy_cd, ceobUsed = ImGui.Checkbox("CEO Crate Buy", ceo_crate_buy_cd)
         if ceobUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
+          CFG.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
         end
 
         ImGui.SameLine(); ImGui.Dummy(55, 1); ImGui.SameLine()
         ceo_crate_sell_cd, ceosUsed = ImGui.Checkbox("CEO Crate Sell", ceo_crate_sell_cd)
         if ceosUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
+          CFG.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
         end
 
         security_missions_cd, smcdUsed = ImGui.Checkbox("Security Missions", security_missions_cd)
         if smcdUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("security_missions_cd", security_missions_cd)
+          CFG.save("security_missions_cd", security_missions_cd)
         end
 
         ImGui.SameLine(); ImGui.Dummy(29, 1); ImGui.SameLine()
         ImGui.BeginDisabled()
         payphone_hits_cd, _ = ImGui.Checkbox("Payphone Hits [x]", payphone_hits_cd)
+        UI.toolTip(false, "Use ShinyWasabi's Payphone Hits script instead. Press [TAB] to copy the GitHub link.")
+        UI.setClipBoard("https://github.com/YimMenu-Lua/PayphoneHits", ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and SS.isKeyJustPressed(0x09))
         ImGui.EndDisabled()
-        UI.toolTip(false, "Use ShinyWasabi's Payphone Hits script instead.")
 
         ImGui.Dummy(1, 5)
-        if mc_work_cd and hangar_cd and nc_management_cd and nc_vip_mission_chance and security_missions_cd and ie_vehicle_steal_cd and ie_vehicle_sell_cd and ceo_crate_buy_cd and ceo_crate_sell_cd then
+        if mc_work_cd and hangar_cd and nc_management_cd and nc_vip_mission_chance and security_missions_cd
+          and ie_vehicle_steal_cd and ie_vehicle_sell_cd and ceo_crate_buy_cd and ceo_crate_sell_cd then
           if ImGui.Button("Uncheck All", 120, 40) then
             UI.widgetSound("Cancel")
             mc_work_cd            = false
@@ -5510,15 +5511,15 @@ business_tab:add_imgui(function()
             ie_vehicle_sell_cd    = false
             ceo_crate_buy_cd      = false
             ceo_crate_sell_cd     = false
-            lua_cfg.save("mc_work_cd", mc_work_cd)
-            lua_cfg.save("hangar_cd", hangar_cd)
-            lua_cfg.save("nc_management_cd", nc_management_cd)
-            lua_cfg.save("nc_vip_mission_chance", nc_vip_mission_chance)
-            lua_cfg.save("security_missions_cd", security_missions_cd)
-            lua_cfg.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
-            lua_cfg.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
-            lua_cfg.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
-            lua_cfg.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
+            CFG.save("mc_work_cd", mc_work_cd)
+            CFG.save("hangar_cd", hangar_cd)
+            CFG.save("nc_management_cd", nc_management_cd)
+            CFG.save("nc_vip_mission_chance", nc_vip_mission_chance)
+            CFG.save("security_missions_cd", security_missions_cd)
+            CFG.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
+            CFG.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
+            CFG.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
+            CFG.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
           end
         else
           if ImGui.Button("Check All", 120, 40) then
@@ -5532,15 +5533,15 @@ business_tab:add_imgui(function()
             ie_vehicle_sell_cd    = true
             ceo_crate_buy_cd      = true
             ceo_crate_sell_cd     = true
-            lua_cfg.save("mc_work_cd", mc_work_cd)
-            lua_cfg.save("hangar_cd", hangar_cd)
-            lua_cfg.save("nc_management_cd", nc_management_cd)
-            lua_cfg.save("nc_vip_mission_chance", nc_vip_mission_chance)
-            lua_cfg.save("security_missions_cd", security_missions_cd)
-            lua_cfg.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
-            lua_cfg.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
-            lua_cfg.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
-            lua_cfg.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
+            CFG.save("mc_work_cd", mc_work_cd)
+            CFG.save("hangar_cd", hangar_cd)
+            CFG.save("nc_management_cd", nc_management_cd)
+            CFG.save("nc_vip_mission_chance", nc_vip_mission_chance)
+            CFG.save("security_missions_cd", security_missions_cd)
+            CFG.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
+            CFG.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
+            CFG.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
+            CFG.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
           end
         end
         ImGui.Spacing(); ImGui.SeparatorText("Sell Missions")
@@ -5648,15 +5649,15 @@ new_hacker                            = 0
 new_masks                             = 0
 casino_cooldown_update_str            = ""
 dealers_card_str                      = ""
-heist_cart_autograb                   = lua_cfg.read("heist_cart_autograb")
-bypass_casino_bans                    = lua_cfg.read("bypass_casino_bans")
-force_poker_cards                     = lua_cfg.read("bypass_casino_bans")
-set_dealers_poker_cards               = lua_cfg.read("bypass_casino_bans")
-force_roulette_wheel                  = lua_cfg.read("force_roulette_wheel")
-rig_slot_machine                      = lua_cfg.read("rig_slot_machine")
-autoplay_slots                        = lua_cfg.read("autoplay_slots")
-autoplay_cap                          = lua_cfg.read("autoplay_cap")
-autoplay_chips_cap                    = lua_cfg.read("autoplay_chips_cap")
+heist_cart_autograb                   = CFG.read("heist_cart_autograb")
+bypass_casino_bans                    = CFG.read("bypass_casino_bans")
+force_poker_cards                     = CFG.read("bypass_casino_bans")
+set_dealers_poker_cards               = CFG.read("bypass_casino_bans")
+force_roulette_wheel                  = CFG.read("force_roulette_wheel")
+rig_slot_machine                      = CFG.read("rig_slot_machine")
+autoplay_slots                        = CFG.read("autoplay_slots")
+autoplay_cap                          = CFG.read("autoplay_cap")
+autoplay_chips_cap                    = CFG.read("autoplay_chips_cap")
 
 local function set_poker_cards(player_id, players_current_table, card_one, card_two, card_three)
   locals.set_int("three_card_poker",
@@ -5721,7 +5722,7 @@ casino_pacino:add_imgui(function()
         bypass_casino_bans, bcbUsed = ImGui.Checkbox(CP_BYPASSCD_CP_, bypass_casino_bans)
         if bcbUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("bypass_casino_bans", bypass_casino_bans)
+          CFG.save("bypass_casino_bans", bypass_casino_bans)
         end
         if not bypass_casino_bans then
           UI.toolTip(true, CP_BYPASSCD_WARN_, "#FFCC00", 1)
@@ -5734,13 +5735,13 @@ casino_pacino:add_imgui(function()
         force_poker_cards, fpcUsed = ImGui.Checkbox(CP_FORCE_POKER_RF_CB_, force_poker_cards)
         if fpcUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("force_poker_cards", force_poker_cards)
+          CFG.save("force_poker_cards", force_poker_cards)
         end
 
         set_dealers_poker_cards, sdpcUsed = ImGui.Checkbox(CP_FORCE_BADBEAT_CB_, set_dealers_poker_cards)
         if sdpcUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("set_dealers_poker_cards", set_dealers_poker_cards)
+          CFG.save("set_dealers_poker_cards", set_dealers_poker_cards)
         end
 
         ImGui.Spacing(); ImGui.SeparatorText("Blackjack")
@@ -5770,27 +5771,27 @@ casino_pacino:add_imgui(function()
         force_roulette_wheel, frwUsed = ImGui.Checkbox(CP_FORCE_ROULETTE_CB_, force_roulette_wheel)
         if frwUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("force_roulette_wheel", force_roulette_wheel)
+          CFG.save("force_roulette_wheel", force_roulette_wheel)
         end
 
         ImGui.Spacing(); ImGui.SeparatorText("Slot Machines")
         rig_slot_machine, rsmUsed = ImGui.Checkbox(CP_RIG_SLOTS_CB_, rig_slot_machine)
         if rsmUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("rig_slot_machine", rig_slot_machine)
+          CFG.save("rig_slot_machine", rig_slot_machine)
         end
 
         autoplay_slots, apsUsed = ImGui.Checkbox(CP_AUTOPLAY_SLOTS_CB_, autoplay_slots); ImGui
             .SameLine()
         if apsUsed then
           UI.widgetSound("Nav2")
-          lua_cfg.save("autoplay_slots", autoplay_slots)
+          CFG.save("autoplay_slots", autoplay_slots)
         end
         if autoplay_slots then
           autoplay_cap, apcapUsed = ImGui.Checkbox(CP_AUTOPLAY_CAP_CB_, autoplay_cap); ImGui.SameLine()
           if apcapUsed then
             UI.widgetSound("Nav2")
-            lua_cfg.save("autoplay_cap", autoplay_cap)
+            CFG.save("autoplay_cap", autoplay_cap)
           end
           if autoplay_cap then
             ImGui.PushItemWidth(200)
@@ -5799,7 +5800,7 @@ casino_pacino:add_imgui(function()
             ImGui.PopItemWidth()
             if chipsCapUsed then
               UI.widgetSound("Nav2")
-              lua_cfg.save("autoplay_chips_cap", autoplay_chips_cap)
+              CFG.save("autoplay_chips_cap", autoplay_chips_cap)
             end
           end
         end
@@ -6062,7 +6063,7 @@ casino_pacino:add_imgui(function()
         heist_cart_autograb, hcagUsed = ImGui.Checkbox(CP_HEIST_AUTOGRAB_, heist_cart_autograb)
         if hcagUsed then
           UI.widgetSound("Nav2")
-          lua_cgf.save("heist_cart_autograb", heist_cart_autograb)
+          CFG.save("heist_cart_autograb", heist_cart_autograb)
         end
 
         if ImGui.Button(CP_HEIST_UNLOCK_ALL_BTN_) then
@@ -6495,14 +6496,14 @@ world_tab:add_imgui(function()
   UI.helpMarker(false, "Allows you to sit down on public benches and seats")
   if pseatsUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("public_seats", public_seats)
+    CFG.save("public_seats", public_seats)
   end
 
   extend_world, ewbUsed = ImGui.Checkbox(EXTEND_WORLD_CB_, extend_world)
   UI.helpMarker(false, EXTEND_WORLD_DESC_)
   if ewbUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("extend_world", extend_world)
+    CFG.save("extend_world", extend_world)
     if not extend_world then
       script.run_in_fiber(function()
         Game.World.extendBounds(false)
@@ -6572,7 +6573,7 @@ spawnDistance         = { x = 0, y = 0, z = 0 }
 spawnRot              = { x = 0, y = 0, z = 0 }
 prop_creation         = { name = "", props = {} }
 selfAttachments       = { entity = 0, hash = 0, bone = 0, posx = 0.0, posy = 0.0, posz = 0.0, rotx = 0.0, roty = 0.0, rotz = 0.0 }
-persist_attachments   = lua_cfg.read("persist_attachments")
+persist_attachments   = CFG.read("persist_attachments")
 
 local function resetSliders()
   spawnDistance = { x = 0, y = 0, z = 0 }
@@ -7285,7 +7286,7 @@ object_spawner:add_imgui(function()
               prop_creation.name  = saved_props_name
               prop_creation.props = attached_props
               table.insert(persist_attachments, prop_creation)
-              lua_cfg.save("persist_attachments", persist_attachments)
+              CFG.save("persist_attachments", persist_attachments)
               gui.show_success("Samurai's Scripts", string.format("Your [ %s ] has been saved", saved_props_name))
               repeat
                 timer = timer + 1
@@ -7293,7 +7294,7 @@ object_spawner:add_imgui(function()
               prop_creation       = { name = "", props = {} }
               persist_prop_index  = 0
               saved_props_name    = ""
-              persist_attachments = lua_cfg.read("persist_attachments")
+              persist_attachments = CFG.read("persist_attachments")
               if spawned_props[1] ~= nil then
                 script.run_in_fiber(function()
                   for _, p in ipairs(spawned_props) do
@@ -7376,7 +7377,7 @@ object_spawner:add_imgui(function()
           for key, value in ipairs(persist_attachments) do
             if persist_prop_info == value then
               table.remove(persist_attachments, key)
-              lua_cfg.save("persist_attachments", persist_attachments)
+              CFG.save("persist_attachments", persist_attachments)
             end
           end
           UI.widgetSound("Select")
@@ -7402,10 +7403,10 @@ end)
     *settings*
 ]]
 local settings_tab = Samurais_scripts:add_tab(SETTINGS_TAB_)
-lang_idx           = lua_cfg.read("lang_idx")
-disableTooltips    = lua_cfg.read("disableTooltips")
-disableUiSounds    = lua_cfg.read("disableUiSounds")
-useGameLang        = lua_cfg.read("useGameLang")
+lang_idx           = CFG.read("lang_idx")
+disableTooltips    = CFG.read("disableTooltips")
+disableUiSounds    = CFG.read("disableUiSounds")
+useGameLang        = CFG.read("useGameLang")
 local selected_lang
 local lang_T       = {
   { name = 'English',               iso = 'en-US' },
@@ -7435,21 +7436,21 @@ end
 settings_tab:add_imgui(function()
   disableTooltips, dtUsed = ImGui.Checkbox(DISABLE_TOOLTIPS_CB_, disableTooltips)
   if dtUsed then
-    lua_cfg.save("disableTooltips", disableTooltips)
+    CFG.save("disableTooltips", disableTooltips)
     UI.widgetSound("Nav2")
   end
 
   disableUiSounds, duisndUsed = ImGui.Checkbox(DISABLE_UISOUNDS_CB_, disableUiSounds)
   UI.toolTip(false, DISABLE_UISOUNDS_DESC_)
   if duisndUsed then
-    lua_cfg.save("disableUiSounds", disableUiSounds)
+    CFG.save("disableUiSounds", disableUiSounds)
     UI.widgetSound("Nav2")
   end
 
   disableFlightMusic, dpmUsed = ImGui.Checkbox(FLIGHT_MUSIC_CB_, disableFlightMusic)
   UI.toolTip(false, FLIGHT_MUSIC_DESC_)
   if dpmUsed then
-    lua_cfg.save("disableFlightMusic", disableFlightMusic)
+    CFG.save("disableFlightMusic", disableFlightMusic)
     UI.widgetSound("Nav2")
     if not disableFlightMusic then
       script.run_in_fiber(function()
@@ -7463,14 +7464,14 @@ settings_tab:add_imgui(function()
   UI.toolTip(false, DAILY_QUOTES_DESC_)
   if dqUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("disable_quotes", disable_quotes)
+    CFG.save("disable_quotes", disable_quotes)
   end
 
   disable_mdef_logs, dmlUsed = ImGui.Checkbox(MISSILE_DEF_LOGS_CB_, disable_mdef_logs)
   UI.toolTip(false, MISSILE_DEF_LOGS_DESC_)
   if dmlUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("disable_mdef_logs", disable_mdef_logs)
+    CFG.save("disable_mdef_logs", disable_mdef_logs)
   end
 
   ImGui.Spacing()
@@ -7478,7 +7479,7 @@ settings_tab:add_imgui(function()
     if ImGui.Button(ANIM_HOTKEY_DEL2_) then
       UI.widgetSound("Delete")
       shortcut_anim = {}
-      lua_cfg.save("shortcut_anim", {})
+      CFG.save("shortcut_anim", {})
       gui.show_success("Samurais Scripts", "Animation shortcut has been reset.")
     end
   else
@@ -7498,8 +7499,8 @@ settings_tab:add_imgui(function()
   ImGui.SameLine(); ImGui.Text(string.format("%.1f s", (supply_autofill_delay / 1000)))
   if safdUsed then
     UI.widgetSound("Nav")
-    lua_cfg.save("supply_autofill_delay", supply_autofill_delay)
-    supply_autofill_delay = lua_cfg.read("supply_autofill_delay")
+    CFG.save("supply_autofill_delay", supply_autofill_delay)
+    supply_autofill_delay = CFG.read("supply_autofill_delay")
   end
 
   ImGui.Dummy(1, 10); ImGui.SeparatorText(LANGUAGE_TXT_)
@@ -7511,10 +7512,10 @@ settings_tab:add_imgui(function()
   end
   if uglUsed then
     UI.widgetSound("Nav2")
-    lua_cfg.save("useGameLang", useGameLang)
-    lua_cfg.save("current_lang", current_lang)
-    lua_cfg.save("LANG", LANG)
-    lua_cfg.save("lang_idx", 0)
+    CFG.save("useGameLang", useGameLang)
+    CFG.save("current_lang", current_lang)
+    CFG.save("LANG", LANG)
+    CFG.save("lang_idx", 0)
     initStrings()
     gui.show_success("Samurai's Scripts", LANG_CHANGED_NOTIF_)
   end
@@ -7529,9 +7530,9 @@ settings_tab:add_imgui(function()
       UI.widgetSound("Select")
       LANG         = selected_lang.iso
       current_lang = selected_lang.name
-      lua_cfg.save("lang_idx", lang_idx)
-      lua_cfg.save("LANG", LANG)
-      lua_cfg.save("current_lang", current_lang)
+      CFG.save("lang_idx", lang_idx)
+      CFG.save("LANG", LANG)
+      CFG.save("current_lang", current_lang)
       initStrings()
       gui.show_success("Samurai's Scripts", LANG_CHANGED_NOTIF_)
     end
@@ -7619,9 +7620,13 @@ hotkeys_tab:add_imgui(function()
 end)
 
 
---[[
-    *Threads*
-]]
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------- Threads -----------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
 
 script.register_looped("basic ass loading text", function(balt)
   balt:yield()
@@ -9442,8 +9447,8 @@ script.register_looped("drift counter", function(dcounter)
                     end
                   end
                   if drift_points > driftPB then
-                    lua_cfg.save("driftPB", drift_points)
-                    driftPB = lua_cfg.read("driftPB")
+                    CFG.save("driftPB", drift_points)
+                    driftPB = CFG.read("driftPB")
                   end
                   dcounter:sleep(3000)
                   drift_points     = 0
@@ -9475,8 +9480,8 @@ script.register_looped("drift counter", function(dcounter)
                 end
               end
               if drift_points > driftPB then
-                lua_cfg.save("driftPB", drift_points)
-                driftPB = lua_cfg.read("driftPB")
+                CFG.save("driftPB", drift_points)
+                driftPB = CFG.read("driftPB")
               end
               dcounter:sleep(3000)
               drift_points     = 0
@@ -10801,7 +10806,7 @@ script.register_looped("REOPT", function(ro)
       gui.show_success("Samurai's Scripts", "Auto-Kill Enemies enabled.")
       ro:sleep(100)
     end
-    lua_cfg.save("autoKill", autoKill)
+    CFG.save("autoKill", autoKill)
   end
   if SS.isKeyJustPressed(keybinds.enemiesFlee.code) then
     if runaway then
@@ -10815,7 +10820,7 @@ script.register_looped("REOPT", function(ro)
       gui.show_success("Samurai's Scripts", "Enemies Flee enabled.")
       ro:sleep(100)
     end
-    lua_cfg.save("runaway", runaway)
+    CFG.save("runaway", runaway)
   end
   if SS.isKeyJustPressed(keybinds.missl_def.code) then
     if missiledefense then
@@ -10829,7 +10834,7 @@ script.register_looped("REOPT", function(ro)
       gui.show_success("Samurai's Scripts", "Missile Defence enabled.")
       ro:sleep(100)
     end
-    lua_cfg.save("missiledefense", missiledefense)
+    CFG.save("missiledefense", missiledefense)
   end
 end)
 

@@ -902,10 +902,20 @@ UI = {
       retBool = ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and ImGui.IsItemClicked(1)
     else
       error(
-        "error in function isItemClicked: Invalid mouse button. Correct inputs: 'lmb' as Left Mouse Button or 'rmb' as Right Mouse Button.",
+        string.format("Error in function isItemClicked(): Invalid param %s. Correct inputs: 'lmb' for Left Mouse Button or 'rmb' for Right Mouse Button.", mb),
         2)
     end
     return retBool
+  end,
+
+  -- Sets the clipboard text.
+  ---@param text string
+  ---@param alt_condition boolean
+  setClipBoard = function(text, alt_condition)
+    local cond = UI.isItemClicked("lmb") and true or alt_condition
+    if cond then
+      ImGui.SetClipboardText(text)
+    end
   end,
 
   -- Plays a sound when an ImGui widget is clicked.
@@ -1001,6 +1011,7 @@ SS                          = {
         return k.just_pressed
       end
     end
+    return false
   end,
 
   set_hotkey = function(keybind)
@@ -1035,7 +1046,7 @@ SS                          = {
       if ImGui.Button(translateLabel("generic_confirm_btn") .. "##keybinds") then
         UI.widgetSound("Select")
         keybind.code, keybind.name = key_code, key_name
-        lua_cfg.save("keybinds", keybinds)
+        CFG.save("keybinds", keybinds)
         key_code, key_name = nil, nil
         is_setting_hotkeys = false
         ImGui.CloseCurrentPopup()
@@ -1110,7 +1121,7 @@ SS                          = {
       if ImGui.Button(translateLabel("generic_confirm_btn") .. "##keybinds") then
         UI.widgetSound("Select")
         keybind.code, keybind.name = gpad_keyCode, gpad_keyName
-        lua_cfg.save("gpad_keybinds", gpad_keybinds)
+        CFG.save("gpad_keybinds", gpad_keybinds)
         gpad_keyCode, gpad_keyName = nil, nil
         is_setting_hotkeys = false
         ImGui.CloseCurrentPopup()
@@ -1154,7 +1165,7 @@ SS                          = {
 
   ---Seamlessly add/remove keyboard keybinds on script update without requiring a config reset.
   check_kb_keybinds = function()
-    local kb_keybinds_list = default_config.keybinds
+    local kb_keybinds_list = DEFAULT_CONFIG.keybinds
     local t_len            = lua_Fn.getTableLength
     if t_len(keybinds) == t_len(kb_keybinds_list) then
       SS.debug('No new keyboard keybinds.')
@@ -1165,8 +1176,8 @@ SS                          = {
         if kk == nil then -- removed keybind
           SS.debug('Removed keyboard keybind: ' .. tostring(keybinds[k]))
           keybinds[k] = nil
-          lua_cfg.save("keybinds", keybinds)  -- save
-          keybinds = lua_cfg.read("keybinds") -- refresh
+          CFG.save("keybinds", keybinds)  -- save
+          keybinds = CFG.read("keybinds") -- refresh
         end
       end
     else
@@ -1175,8 +1186,8 @@ SS                          = {
         if kk == nil then -- new keybind
           SS.debug('Added keyboard keybind: ' .. tostring(k))
           keybinds[k] = kb_keybinds_list[k]
-          lua_cfg.save("keybinds", keybinds)  -- save
-          keybinds = lua_cfg.read("keybinds") -- refresh
+          CFG.save("keybinds", keybinds)  -- save
+          keybinds = CFG.read("keybinds") -- refresh
         end
       end
     end
@@ -1184,7 +1195,7 @@ SS                          = {
 
   ---Seamlessly add/remove controller keybinds on script update without requiring a config reset.
   check_gpad_keybinds = function()
-    local gpad_keybinds_list = default_config.gpad_keybinds
+    local gpad_keybinds_list = DEFAULT_CONFIG.gpad_keybinds
     local t_len              = lua_Fn.getTableLength
     if t_len(gpad_keybinds) == t_len(gpad_keybinds_list) then
       SS.debug('No new gamepad keybinds.')
@@ -1195,8 +1206,8 @@ SS                          = {
         if kk == nil then -- removed keybind
           SS.debug('Removed gamepad keybind: ' .. tostring(gpad_keybinds[k]))
           gpad_keybinds[k] = nil
-          lua_cfg.save("gpad_keybinds", gpad_keybinds)  -- save
-          gpad_keybinds = lua_cfg.read("gpad_keybinds") -- refresh
+          CFG.save("gpad_keybinds", gpad_keybinds)  -- save
+          gpad_keybinds = CFG.read("gpad_keybinds") -- refresh
         end
       end
     else
@@ -1205,8 +1216,8 @@ SS                          = {
         if kk == nil then -- new keybind
           SS.debug('Added gamepad keybind: ' .. tostring(k))
           gpad_keybinds[k] = gpad_keybinds_list[k]
-          lua_cfg.save("gpad_keybinds", gpad_keybinds)  -- save
-          gpad_keybinds = lua_cfg.read("gpad_keybinds") -- refresh
+          CFG.save("gpad_keybinds", gpad_keybinds)  -- save
+          gpad_keybinds = CFG.read("gpad_keybinds") -- refresh
         end
       end
     end
@@ -1659,14 +1670,14 @@ SS                          = {
 
   ---Reset saved config without affecting custom outfits and custom vahicles.
   reset_settings = function()
-    shortcut_anim = {}; lua_cfg.save("shortcut_anim", shortcut_anim)
-    vmine_type = { spikes = false, slick = false, explosive = false, emp = false, kinetic = false }; lua_cfg.save(
+    shortcut_anim = {}; CFG.save("shortcut_anim", shortcut_anim)
+    vmine_type = { spikes = false, slick = false, explosive = false, emp = false, kinetic = false }; CFG.save(
       "vmine_type", vmine_type)
-    whouse_1_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_1_size", whouse_1_size)
-    whouse_2_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_2_size", whouse_2_size)
-    whouse_3_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_3_size", whouse_3_size)
-    whouse_4_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_4_size", whouse_4_size)
-    whouse_5_size = { small = false, medium = false, large = false }; lua_cfg.save("whouse_5_size", whouse_5_size)
+    whouse_1_size = { small = false, medium = false, large = false }; CFG.save("whouse_1_size", whouse_1_size)
+    whouse_2_size = { small = false, medium = false, large = false }; CFG.save("whouse_2_size", whouse_2_size)
+    whouse_3_size = { small = false, medium = false, large = false }; CFG.save("whouse_3_size", whouse_3_size)
+    whouse_4_size = { small = false, medium = false, large = false }; CFG.save("whouse_4_size", whouse_4_size)
+    whouse_5_size = { small = false, medium = false, large = false }; CFG.save("whouse_5_size", whouse_5_size)
     keybinds = {
       rodBtn        = { code = 0x58, name = "[X]" },
       tdBtn         = { code = 0x10, name = "[Shift]" },
@@ -1683,7 +1694,7 @@ SS                          = {
       vehicle_mine  = { code = 0x4E, name = "[N]" },
       triggerbotBtn = { code = 0x10, name = "[Shift]" },
       panik         = { code = 0x7B, name = "[F12]" },
-    }; lua_cfg.save("keybinds", keybinds)
+    }; CFG.save("keybinds", keybinds)
     gpad_keybinds = {
       rodBtn        = { code = 0, name = "[Unbound]" },
       tdBtn         = { code = 0, name = "[Unbound]" },
@@ -1692,129 +1703,129 @@ SS                          = {
       purgeBtn      = { code = 0, name = "[Unbound]" },
       vehicle_mine  = { code = 0, name = "[Unbound]" },
       triggerbotBtn = { code = 0, name = "[Unbound]" },
-    }; lua_cfg.save("gpad_keybinds", gpad_keybinds)
-    Regen = false; lua_cfg.save("Regen", Regen)
+    }; CFG.save("gpad_keybinds", gpad_keybinds)
+    Regen = false; CFG.save("Regen", Regen)
     -- objectiveTP             = false
-    disableTooltips         = false; lua_cfg.save("disableTooltips", disableTooltips)
-    phoneAnim               = false; lua_cfg.save("phoneAnim", phoneAnim)
-    sprintInside            = false; lua_cfg.save("sprintInside", sprintInside)
-    lockpick                = false; lua_cfg.save("lockpick", lockpick)
-    replaceSneakAnim        = false; lua_cfg.save("replaceSneakAnim", replaceSneakAnim)
-    replacePointAct         = false; lua_cfg.save("replacePointAct", replacePointAct)
-    disableSound            = false; lua_cfg.save("disableSound", disableSound)
-    disableActionMode       = false; lua_cfg.save("disableActionMode", disableActionMode)
-    hideFromCops            = false; lua_cfg.save("hideFromCops", hideFromCops)
-    rod                     = false; lua_cfg.save("rod", rod)
-    clumsy                  = false; lua_cfg.save("clumsy", clumsy)
-    ragdoll_sound           = false; lua_cfg.save("ragdoll_sound", ragdoll_sound)
-    Triggerbot              = false; lua_cfg.save("Triggerbot", Triggerbot)
-    aimEnemy                = false; lua_cfg.save("aimEnemy", aimEnemy)
-    autoKill                = false; lua_cfg.save("autoKill", autoKill)
-    runaway                 = false; lua_cfg.save("runaway", runaway)
-    laserSight              = false; lua_cfg.save("laserSight", laserSight)
-    disableUiSounds         = false; lua_cfg.save("disableUiSounds", disableUiSounds)
-    driftMode               = false; lua_cfg.save("driftMode", driftMode)
-    DriftTires              = false; lua_cfg.save("DriftTires", DriftTires)
-    DriftSmoke              = false; lua_cfg.save("DriftSmoke", DriftSmoke)
-    driftMinigame           = false; lua_cfg.save("driftMinigame", driftMinigame)
-    speedBoost              = false; lua_cfg.save("speedBoost", speedBoost)
-    nosvfx                  = false; lua_cfg.save("nosvfx", nosvfx)
-    nosAudio                = false; lua_cfg.save("nosAudio", nosAudio)
-    nosFlames               = false; lua_cfg.save("nosFlames", nosFlames)
-    hornLight               = false; lua_cfg.save("hornLight", hornLight)
-    nosPurge                = false; lua_cfg.save("nosPurge", nosPurge)
-    insta180                = false; lua_cfg.save("insta180", insta180)
-    flappyDoors             = false; lua_cfg.save("flappyDoors", flappyDoors)
-    rgbLights               = false; lua_cfg.save("rgbLights", rgbLights)
-    loud_radio              = false; lua_cfg.save("loud_radio", loud_radio)
-    launchCtrl              = false; lua_cfg.save("launchCtrl", launchCtrl)
-    popsNbangs              = false; lua_cfg.save("popsNbangs", popsNbangs)
-    limitVehOptions         = false; lua_cfg.save("limitVehOptions", limitVehOptions)
-    missiledefense          = false; lua_cfg.save("missiledefense", missiledefense)
-    louderPops              = false; lua_cfg.save("louderPops", louderPops)
-    autobrklight            = false; lua_cfg.save("autobrklight", autobrklight)
-    holdF                   = false; lua_cfg.save("holdF", holdF)
-    keepWheelsTurned        = false; lua_cfg.save("keepWheelsTurned", keepWheelsTurned)
-    towEverything           = false; lua_cfg.save("towEverything", towEverything)
-    noJacking               = false; lua_cfg.save("noJacking", noJacking)
-    noEngineBraking         = false; lua_cfg.save("noEngineBraking", noEngineBraking)
-    kersBoost               = false; lua_cfg.save("kersBoost", kersBoost)
-    offroaderx2             = false; lua_cfg.save("offroaderx2", offroaderx2)
-    rallyTires              = false; lua_cfg.save("rallyTires", rallyTires)
-    noTractionCtrl          = false; lua_cfg.save("noTractionCtrl", noTractionCtrl)
-    easyWheelie             = false; lua_cfg.save("easyWheelie", easyWheelie)
-    rwSteering              = false; lua_cfg.save("rwSteering", rwSteering)
-    awSteering              = false; lua_cfg.save("awSteering", awSteering)
-    handbrakeSteering       = false; lua_cfg.save("handbrakeSteering", handbrakeSteering)
-    useGameLang             = false; lua_cfg.save("useGameLang", useGameLang)
-    disableProps            = false; lua_cfg.save("disableProps", disableProps)
-    manualFlags             = false; lua_cfg.save("manualFlags", manualFlags)
-    controllable            = false; lua_cfg.save("controllable", controllable)
-    looped                  = false; lua_cfg.save("looped", looped)
-    upperbody               = false; lua_cfg.save("upperbody", upperbody)
-    freeze                  = false; lua_cfg.save("freeze", freeze)
-    usePlayKey              = false; lua_cfg.save("usePlayKey", usePlayKey)
-    npc_godMode             = false; lua_cfg.save("npc_godMode", npc_godMode)
-    bypass_casino_bans      = false; lua_cfg.save("bypass_casino_bans", bypass_casino_bans)
-    force_poker_cards       = false; lua_cfg.save("force_poker_cards", force_poker_cards)
-    set_dealers_poker_cards = false; lua_cfg.save("set_dealers_poker_cards", set_dealers_poker_cards)
-    force_roulette_wheel    = false; lua_cfg.save("force_roulette_wheel", force_roulette_wheel)
-    rig_slot_machine        = false; lua_cfg.save("rig_slot_machine", rig_slot_machine)
-    autoplay_slots          = false; lua_cfg.save("autoplay_slots", autoplay_slots)
-    autoplay_cap            = false; lua_cfg.save("autoplay_cap", autoplay_cap)
-    heist_cart_autograb     = false; lua_cfg.save("heist_cart_autograb", heist_cart_autograb)
-    flares_forall           = false; lua_cfg.save("flares_forall", flares_forall)
-    real_plane_speed        = false; lua_cfg.save("real_plane_speed", real_plane_speed)
-    extend_world            = false; lua_cfg.save("extend_world", extend_world)
-    unbreakableWindows      = false; lua_cfg.save("unbreakableWindows", unbreakableWindows)
-    disableFlightMusic      = false; lua_cfg.save("disableFlightMusic", disableFlightMusic)
-    disable_quotes          = false; lua_cfg.save("disable_quotes", disable_quotes)
-    disable_mdef_logs       = false; lua_cfg.save("disable_mdef_logs", disable_mdef_logs)
-    replace_pool_q          = false; lua_cfg.save("replace_pool_q", replace_pool_q)
-    public_seats            = false; lua_cfg.save("public_seats", public_seats)
-    mc_work_cd              = false; lua_cfg.save("mc_work_cd", mc_work_cd)
-    hangar_cd               = false; lua_cfg.save("hangar_cd", hangar_cd)
-    nc_management_cd        = false; lua_cfg.save("nc_management_cd", nc_management_cd)
-    nc_vip_mission_chance   = false; lua_cfg.save("nc_vip_mission_chance", nc_vip_mission_chance)
-    security_missions_cd    = false; lua_cfg.save("security_missions_cd", security_missions_cd)
-    ie_vehicle_steal_cd     = false; lua_cfg.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
-    ie_vehicle_sell_cd      = false; lua_cfg.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
-    ceo_crate_buy_cd        = false; lua_cfg.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
-    ceo_crate_sell_cd       = false; lua_cfg.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
-    ceo_crate_buy_f_cd      = false; lua_cfg.save("ceo_crate_buy_f_cd", ceo_crate_buy_f_cd)
-    ceo_crate_sell_f_cd     = false; lua_cfg.save("ceo_crate_sell_f_cd", ceo_crate_sell_f_cd)
-    cashUpdgrade1           = false; lua_cfg.save("cashUpdgrade1", cashUpdgrade1)
-    cashUpdgrade2           = false; lua_cfg.save("cashUpdgrade2", cashUpdgrade2)
-    cokeUpdgrade1           = false; lua_cfg.save("cokeUpdgrade1", cokeUpdgrade1)
-    cokeUpdgrade2           = false; lua_cfg.save("cokeUpdgrade2", cokeUpdgrade2)
-    methUpdgrade1           = false; lua_cfg.save("methUpdgrade1", methUpdgrade1)
-    methUpdgrade2           = false; lua_cfg.save("methUpdgrade2", methUpdgrade2)
-    weedUpdgrade1           = false; lua_cfg.save("weedUpdgrade1", weedUpdgrade1)
-    weedUpdgrade2           = false; lua_cfg.save("weedUpdgrade2", weedUpdgrade2)
-    fdUpdgrade1             = false; lua_cfg.save("fdUpdgrade1", fdUpdgrade1)
-    fdUpdgrade2             = false; lua_cfg.save("fdUpdgrade2", fdUpdgrade2)
-    bunkerUpdgrade1         = false; lua_cfg.save("bunkerUpdgrade1", bunkerUpdgrade1)
-    bunkerUpdgrade2         = false; lua_cfg.save("bunkerUpdgrade2", bunkerUpdgrade2)
-    acidUpdgrade            = false; lua_cfg.save("acidUpdgrade", acidUpdgrade)
-    whouse_1_owned          = false; lua_cfg.save("whouse_1_owned", whouse_1_owned)
-    whouse_2_owned          = false; lua_cfg.save("whouse_2_owned", whouse_2_owned)
-    whouse_3_owned          = false; lua_cfg.save("whouse_3_owned", whouse_3_owned)
-    whouse_4_owned          = false; lua_cfg.save("whouse_4_owned", whouse_4_owned)
-    whouse_5_owned          = false; lua_cfg.save("whouse_5_owned", whouse_5_owned)
-    veh_mines               = false; lua_cfg.save("veh_mines", veh_mines)
-    SS_debug                = false; lua_cfg.save("SS_debug", SS_debug)
-    laser_switch            = 0; lua_cfg.save("laser_switch", laser_switch)
-    DriftIntensity          = 0; lua_cfg.save("DriftIntensity", DriftIntensity)
-    lang_idx                = 0; lua_cfg.save("lang_idx", lang_idx)
-    autoplay_chips_cap      = 0; lua_cfg.save("autoplay_chips_cap", autoplay_chips_cap)
-    lightSpeed              = 1; lua_cfg.save("lightSpeed", lightSpeed)
-    DriftPowerIncrease      = 1; lua_cfg.save("DriftPowerIncrease", DriftPowerIncrease)
-    nosPower                = 10; lua_cfg.save("nosPower", nosPower)
-    nosBtn                  = 21; lua_cfg.save("nosBtn", nosBtn)
-    supply_autofill_delay   = 500; lua_cfg.save("supply_autofill_delay", supply_autofill_delay)
-    laser_choice            = "proj_laser_enemy"; lua_cfg.save("laser_choice", laser_choice)
-    LANG                    = "en-US"; lua_cfg.save("LANG", LANG)
-    current_lang            = "English"; lua_cfg.save("current_lang", current_lang)
+    disableTooltips         = false; CFG.save("disableTooltips", disableTooltips)
+    phoneAnim               = false; CFG.save("phoneAnim", phoneAnim)
+    sprintInside            = false; CFG.save("sprintInside", sprintInside)
+    lockpick                = false; CFG.save("lockpick", lockpick)
+    replaceSneakAnim        = false; CFG.save("replaceSneakAnim", replaceSneakAnim)
+    replacePointAct         = false; CFG.save("replacePointAct", replacePointAct)
+    disableSound            = false; CFG.save("disableSound", disableSound)
+    disableActionMode       = false; CFG.save("disableActionMode", disableActionMode)
+    hideFromCops            = false; CFG.save("hideFromCops", hideFromCops)
+    rod                     = false; CFG.save("rod", rod)
+    clumsy                  = false; CFG.save("clumsy", clumsy)
+    ragdoll_sound           = false; CFG.save("ragdoll_sound", ragdoll_sound)
+    Triggerbot              = false; CFG.save("Triggerbot", Triggerbot)
+    aimEnemy                = false; CFG.save("aimEnemy", aimEnemy)
+    autoKill                = false; CFG.save("autoKill", autoKill)
+    runaway                 = false; CFG.save("runaway", runaway)
+    laserSight              = false; CFG.save("laserSight", laserSight)
+    disableUiSounds         = false; CFG.save("disableUiSounds", disableUiSounds)
+    driftMode               = false; CFG.save("driftMode", driftMode)
+    DriftTires              = false; CFG.save("DriftTires", DriftTires)
+    DriftSmoke              = false; CFG.save("DriftSmoke", DriftSmoke)
+    driftMinigame           = false; CFG.save("driftMinigame", driftMinigame)
+    speedBoost              = false; CFG.save("speedBoost", speedBoost)
+    nosvfx                  = false; CFG.save("nosvfx", nosvfx)
+    nosAudio                = false; CFG.save("nosAudio", nosAudio)
+    nosFlames               = false; CFG.save("nosFlames", nosFlames)
+    hornLight               = false; CFG.save("hornLight", hornLight)
+    nosPurge                = false; CFG.save("nosPurge", nosPurge)
+    insta180                = false; CFG.save("insta180", insta180)
+    flappyDoors             = false; CFG.save("flappyDoors", flappyDoors)
+    rgbLights               = false; CFG.save("rgbLights", rgbLights)
+    loud_radio              = false; CFG.save("loud_radio", loud_radio)
+    launchCtrl              = false; CFG.save("launchCtrl", launchCtrl)
+    popsNbangs              = false; CFG.save("popsNbangs", popsNbangs)
+    limitVehOptions         = false; CFG.save("limitVehOptions", limitVehOptions)
+    missiledefense          = false; CFG.save("missiledefense", missiledefense)
+    louderPops              = false; CFG.save("louderPops", louderPops)
+    autobrklight            = false; CFG.save("autobrklight", autobrklight)
+    holdF                   = false; CFG.save("holdF", holdF)
+    keepWheelsTurned        = false; CFG.save("keepWheelsTurned", keepWheelsTurned)
+    towEverything           = false; CFG.save("towEverything", towEverything)
+    noJacking               = false; CFG.save("noJacking", noJacking)
+    noEngineBraking         = false; CFG.save("noEngineBraking", noEngineBraking)
+    kersBoost               = false; CFG.save("kersBoost", kersBoost)
+    offroaderx2             = false; CFG.save("offroaderx2", offroaderx2)
+    rallyTires              = false; CFG.save("rallyTires", rallyTires)
+    noTractionCtrl          = false; CFG.save("noTractionCtrl", noTractionCtrl)
+    easyWheelie             = false; CFG.save("easyWheelie", easyWheelie)
+    rwSteering              = false; CFG.save("rwSteering", rwSteering)
+    awSteering              = false; CFG.save("awSteering", awSteering)
+    handbrakeSteering       = false; CFG.save("handbrakeSteering", handbrakeSteering)
+    useGameLang             = false; CFG.save("useGameLang", useGameLang)
+    disableProps            = false; CFG.save("disableProps", disableProps)
+    manualFlags             = false; CFG.save("manualFlags", manualFlags)
+    controllable            = false; CFG.save("controllable", controllable)
+    looped                  = false; CFG.save("looped", looped)
+    upperbody               = false; CFG.save("upperbody", upperbody)
+    freeze                  = false; CFG.save("freeze", freeze)
+    usePlayKey              = false; CFG.save("usePlayKey", usePlayKey)
+    npc_godMode             = false; CFG.save("npc_godMode", npc_godMode)
+    bypass_casino_bans      = false; CFG.save("bypass_casino_bans", bypass_casino_bans)
+    force_poker_cards       = false; CFG.save("force_poker_cards", force_poker_cards)
+    set_dealers_poker_cards = false; CFG.save("set_dealers_poker_cards", set_dealers_poker_cards)
+    force_roulette_wheel    = false; CFG.save("force_roulette_wheel", force_roulette_wheel)
+    rig_slot_machine        = false; CFG.save("rig_slot_machine", rig_slot_machine)
+    autoplay_slots          = false; CFG.save("autoplay_slots", autoplay_slots)
+    autoplay_cap            = false; CFG.save("autoplay_cap", autoplay_cap)
+    heist_cart_autograb     = false; CFG.save("heist_cart_autograb", heist_cart_autograb)
+    flares_forall           = false; CFG.save("flares_forall", flares_forall)
+    real_plane_speed        = false; CFG.save("real_plane_speed", real_plane_speed)
+    extend_world            = false; CFG.save("extend_world", extend_world)
+    unbreakableWindows      = false; CFG.save("unbreakableWindows", unbreakableWindows)
+    disableFlightMusic      = false; CFG.save("disableFlightMusic", disableFlightMusic)
+    disable_quotes          = false; CFG.save("disable_quotes", disable_quotes)
+    disable_mdef_logs       = false; CFG.save("disable_mdef_logs", disable_mdef_logs)
+    replace_pool_q          = false; CFG.save("replace_pool_q", replace_pool_q)
+    public_seats            = false; CFG.save("public_seats", public_seats)
+    mc_work_cd              = false; CFG.save("mc_work_cd", mc_work_cd)
+    hangar_cd               = false; CFG.save("hangar_cd", hangar_cd)
+    nc_management_cd        = false; CFG.save("nc_management_cd", nc_management_cd)
+    nc_vip_mission_chance   = false; CFG.save("nc_vip_mission_chance", nc_vip_mission_chance)
+    security_missions_cd    = false; CFG.save("security_missions_cd", security_missions_cd)
+    ie_vehicle_steal_cd     = false; CFG.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
+    ie_vehicle_sell_cd      = false; CFG.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
+    ceo_crate_buy_cd        = false; CFG.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
+    ceo_crate_sell_cd       = false; CFG.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
+    ceo_crate_buy_f_cd      = false; CFG.save("ceo_crate_buy_f_cd", ceo_crate_buy_f_cd)
+    ceo_crate_sell_f_cd     = false; CFG.save("ceo_crate_sell_f_cd", ceo_crate_sell_f_cd)
+    cashUpdgrade1           = false; CFG.save("cashUpdgrade1", cashUpdgrade1)
+    cashUpdgrade2           = false; CFG.save("cashUpdgrade2", cashUpdgrade2)
+    cokeUpdgrade1           = false; CFG.save("cokeUpdgrade1", cokeUpdgrade1)
+    cokeUpdgrade2           = false; CFG.save("cokeUpdgrade2", cokeUpdgrade2)
+    methUpdgrade1           = false; CFG.save("methUpdgrade1", methUpdgrade1)
+    methUpdgrade2           = false; CFG.save("methUpdgrade2", methUpdgrade2)
+    weedUpdgrade1           = false; CFG.save("weedUpdgrade1", weedUpdgrade1)
+    weedUpdgrade2           = false; CFG.save("weedUpdgrade2", weedUpdgrade2)
+    fdUpdgrade1             = false; CFG.save("fdUpdgrade1", fdUpdgrade1)
+    fdUpdgrade2             = false; CFG.save("fdUpdgrade2", fdUpdgrade2)
+    bunkerUpdgrade1         = false; CFG.save("bunkerUpdgrade1", bunkerUpdgrade1)
+    bunkerUpdgrade2         = false; CFG.save("bunkerUpdgrade2", bunkerUpdgrade2)
+    acidUpdgrade            = false; CFG.save("acidUpdgrade", acidUpdgrade)
+    whouse_1_owned          = false; CFG.save("whouse_1_owned", whouse_1_owned)
+    whouse_2_owned          = false; CFG.save("whouse_2_owned", whouse_2_owned)
+    whouse_3_owned          = false; CFG.save("whouse_3_owned", whouse_3_owned)
+    whouse_4_owned          = false; CFG.save("whouse_4_owned", whouse_4_owned)
+    whouse_5_owned          = false; CFG.save("whouse_5_owned", whouse_5_owned)
+    veh_mines               = false; CFG.save("veh_mines", veh_mines)
+    SS_debug                = false; CFG.save("SS_debug", SS_debug)
+    laser_switch            = 0; CFG.save("laser_switch", laser_switch)
+    DriftIntensity          = 0; CFG.save("DriftIntensity", DriftIntensity)
+    lang_idx                = 0; CFG.save("lang_idx", lang_idx)
+    autoplay_chips_cap      = 0; CFG.save("autoplay_chips_cap", autoplay_chips_cap)
+    lightSpeed              = 1; CFG.save("lightSpeed", lightSpeed)
+    DriftPowerIncrease      = 1; CFG.save("DriftPowerIncrease", DriftPowerIncrease)
+    nosPower                = 10; CFG.save("nosPower", nosPower)
+    nosBtn                  = 21; CFG.save("nosBtn", nosBtn)
+    supply_autofill_delay   = 500; CFG.save("supply_autofill_delay", supply_autofill_delay)
+    laser_choice            = "proj_laser_enemy"; CFG.save("laser_choice", laser_choice)
+    LANG                    = "en-US"; CFG.save("LANG", LANG)
+    current_lang            = "English"; CFG.save("current_lang", current_lang)
     initStrings()
   end,
 }
@@ -2668,448 +2679,4 @@ Game                        = {
       end)
     end,
   },
-}
-
-
---[[
-  #### RXI JSON Library
-
-  <u>Credits:</u> [rxi's json.lua](https://github.com/rxi/json.lua).
-
-  *Permission is hereby granted, free of charge, to any person obtaining a copy of
-  this software and associated documentation files (the "Software"), to deal in
-  the Software without restriction, including without limitation the rights to
-  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-  of the Software, and to permit persons to whom the Software is furnished to do
-  so, subject to the following conditions:*
-
-  *- The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.*
-
-  *THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  SOFTWARE.*
-
-  Copyright (c) 2020 rxi
-]]
-function json()
-  local json = { _version = "0.1.2" }
-  --encode
-  local encode
-
-  local escape_char_map = {
-    ["\\"] = "\\",
-    ["\""] = "\"",
-    ["\b"] = "b",
-    ["\f"] = "f",
-    ["\n"] = "n",
-    ["\r"] = "r",
-    ["\t"] = "t",
-  }
-
-  local escape_char_map_inv = { ["/"] = "/" }
-  for k, v in pairs(escape_char_map) do
-    escape_char_map_inv[v] = k
-  end
-
-  local function escape_char(c)
-    return "\\" .. (escape_char_map[c] or string.format("u%04x", c:byte()))
-  end
-
-  local function encode_nil(val)
-    return "null"
-  end
-
-  local function encode_table(val, stack)
-    local res = {}
-    stack = stack or {}
-    if stack[val] then error("circular reference") end
-
-    stack[val] = true
-
-    if rawget(val, 1) ~= nil or next(val) == nil then
-      local n = 0
-      for k in pairs(val) do
-        if type(k) ~= "number" then
-          error("invalid table: mixed or invalid key types")
-        end
-        n = n + 1
-      end
-      if n ~= #val then
-        error("invalid table: sparse array")
-      end
-      for i, v in ipairs(val) do
-        table.insert(res, encode(v, stack))
-      end
-      stack[val] = nil
-      return "[" .. table.concat(res, ",") .. "]"
-    else
-      for k, v in pairs(val) do
-        if type(k) ~= "string" then
-          error("invalid table: mixed or invalid key types")
-        end
-        table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
-      end
-      stack[val] = nil
-      return "{" .. table.concat(res, ",") .. "}"
-    end
-  end
-
-  local function encode_string(val)
-    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
-  end
-
-  local function encode_number(val)
-    if val ~= val or val <= -math.huge or val >= math.huge then
-      error("unexpected number value '" .. tostring(val) .. "'")
-    end
-    return string.format("%.14g", val)
-  end
-
-  local type_func_map = {
-    ["nil"] = encode_nil,
-    ["table"] = encode_table,
-    ["string"] = encode_string,
-    ["number"] = encode_number,
-    ["boolean"] = tostring,
-  }
-
-  encode = function(val, stack)
-    local t = type(val)
-    local f = type_func_map[t]
-    if f then
-      return f(val, stack)
-    end
-    error("unexpected type '" .. t .. "'")
-  end
-
-  function json.encode(val)
-    return (encode(val))
-  end
-
-  --decode
-  local parse
-
-  local function create_set(...)
-    local res = {}
-    for i = 1, select("#", ...) do
-      res[select(i, ...)] = true
-    end
-    return res
-  end
-
-  local space_chars  = create_set(" ", "\t", "\r", "\n")
-  local delim_chars  = create_set(" ", "\t", "\r", "\n", "]", "}", ",")
-  local escape_chars = create_set("\\", "/", '"', "b", "f", "n", "r", "t", "u")
-  local literals     = create_set("true", "false", "null")
-
-  local literal_map  = {
-    ["true"] = true,
-    ["false"] = false,
-    ["null"] = nil,
-  }
-
-  local function next_char(str, idx, set, negate)
-    for i = idx, #str do
-      if set[str:sub(i, i)] ~= negate then
-        return i
-      end
-    end
-    return #str + 1
-  end
-
-  local function decode_error(str, idx, msg)
-    local line_count = 1
-    local col_count = 1
-    for i = 1, idx - 1 do
-      col_count = col_count + 1
-      if str:sub(i, i) == "\n" then
-        line_count = line_count + 1
-        col_count = 1
-      end
-    end
-    error(string.format("%s at line %d col %d", msg, line_count, col_count))
-  end
-
-  local function codepoint_to_utf8(n)
-    local f = math.floor
-    if n <= 0x7f then
-      return string.char(n)
-    elseif n <= 0x7ff then
-      return string.char(f(n / 64) + 192, n % 64 + 128)
-    elseif n <= 0xffff then
-      return string.char(f(n / 4096) + 224, f(n % 4096 / 64) + 128, n % 64 + 128)
-    elseif n <= 0x10ffff then
-      return string.char(f(n / 262144) + 240, f(n % 262144 / 4096) + 128,
-        f(n % 4096 / 64) + 128, n % 64 + 128)
-    end
-    error(string.format("invalid unicode codepoint '%x'", n))
-  end
-
-  local function parse_unicode_escape(s)
-    local n1 = tonumber(s:sub(1, 4), 16)
-    local n2 = tonumber(s:sub(7, 10), 16)
-    if n2 then
-      return codepoint_to_utf8((n1 - 0xd800) * 0x400 + (n2 - 0xdc00) + 0x10000)
-    else
-      return codepoint_to_utf8(n1)
-    end
-  end
-
-  local function parse_string(str, i)
-    local res = ""
-    local j = i + 1
-    local k = j
-
-    while j <= #str do
-      local x = str:byte(j)
-      if x < 32 then
-        decode_error(str, j, "control character in string")
-      elseif x == 92 then -- `\`: Escape
-        res = res .. str:sub(k, j - 1)
-        j = j + 1
-        local c = str:sub(j, j)
-        if c == "u" then
-          local hex = str:match("^[dD][89aAbB]%x%x\\u%x%x%x%x", j + 1)
-              or str:match("^%x%x%x%x", j + 1)
-              or decode_error(str, j - 1, "invalid unicode escape in string")
-          res = res .. parse_unicode_escape(hex)
-          j = j + #hex
-        else
-          if not escape_chars[c] then
-            decode_error(str, j - 1, "invalid escape char '" .. c .. "' in string")
-          end
-          res = res .. escape_char_map_inv[c]
-        end
-        k = j + 1
-      elseif x == 34 then -- `"`: End of string
-        res = res .. str:sub(k, j - 1)
-        return res, j + 1
-      end
-      j = j + 1
-    end
-    decode_error(str, i, "expected closing quote for string")
-  end
-
-  local function parse_number(str, i)
-    local x = next_char(str, i, delim_chars)
-    local s = str:sub(i, x - 1)
-    local n = tonumber(s)
-    if not n then
-      decode_error(str, i, "invalid number '" .. s .. "'")
-    end
-    return n, x
-  end
-
-  local function parse_literal(str, i)
-    local x = next_char(str, i, delim_chars)
-    local word = str:sub(i, x - 1)
-    if not literals[word] then
-      decode_error(str, i, "invalid literal '" .. word .. "'")
-    end
-    return literal_map[word], x
-  end
-
-  local function parse_array(str, i)
-    local res = {}
-    local n = 1
-    i = i + 1
-    while 1 do
-      local x
-      i = next_char(str, i, space_chars, true)
-      -- Empty / end of array?
-      if str:sub(i, i) == "]" then
-        i = i + 1
-        break
-      end
-      -- Read token
-      x, i = parse(str, i)
-      res[n] = x
-      n = n + 1
-      -- Next token
-      i = next_char(str, i, space_chars, true)
-      local chr = str:sub(i, i)
-      i = i + 1
-      if chr == "]" then break end
-      if chr ~= "," then decode_error(str, i, "expected ']' or ','") end
-    end
-    return res, i
-  end
-
-  local function parse_object(str, i)
-    local res = {}
-    i = i + 1
-    while 1 do
-      local key, val
-      i = next_char(str, i, space_chars, true)
-      -- Empty / end of object?
-      if str:sub(i, i) == "}" then
-        i = i + 1
-        break
-      end
-      -- Read key
-      if str:sub(i, i) ~= '"' then
-        decode_error(str, i, "expected string for key")
-      end
-      key, i = parse(str, i)
-      -- Read ':' delimiter
-      i = next_char(str, i, space_chars, true)
-      if str:sub(i, i) ~= ":" then
-        decode_error(str, i, "expected ':' after key")
-      end
-      i = next_char(str, i + 1, space_chars, true)
-      -- Read value
-      val, i = parse(str, i)
-      -- Set
-      res[key] = val
-      -- Next token
-      i = next_char(str, i, space_chars, true)
-      local chr = str:sub(i, i)
-      i = i + 1
-      if chr == "}" then break end
-      if chr ~= "," then decode_error(str, i, "expected '}' or ','") end
-    end
-    return res, i
-  end
-
-  local char_func_map = {
-    ['"'] = parse_string,
-    ["0"] = parse_number,
-    ["1"] = parse_number,
-    ["2"] = parse_number,
-    ["3"] = parse_number,
-    ["4"] = parse_number,
-    ["5"] = parse_number,
-    ["6"] = parse_number,
-    ["7"] = parse_number,
-    ["8"] = parse_number,
-    ["9"] = parse_number,
-    ["-"] = parse_number,
-    ["t"] = parse_literal,
-    ["f"] = parse_literal,
-    ["n"] = parse_literal,
-    ["["] = parse_array,
-    ["{"] = parse_object,
-  }
-
-  parse = function(str, idx)
-    local chr = str:sub(idx, idx)
-    local f = char_func_map[chr]
-    if f then
-      return f(str, idx)
-    end
-    decode_error(str, idx, "unexpected character '" .. chr .. "'")
-  end
-
-  function json.decode(str)
-    if type(str) ~= "string" then
-      error("expected argument of type string, got " .. type(str))
-    end
-    local res, idx = parse(str, next_char(str, 1, space_chars, true))
-    idx = next_char(str, idx, space_chars, true)
-    if idx <= #str then
-      decode_error(str, idx, "trailing garbage")
-    end
-    return res
-  end
-
-  return json
-end
-
-jsonConf = json()
---[[¤ Config System For Lua ¤
-
-  - Written by [Harmless](https://github.com/harmless05).
-
-  - Modified by [SAMURAI](https://github.com/xesdoog).
-
-  *Uses [RXI JSON Library](https://github.com/rxi/json.lua)*.
-]]
-lua_cfg = {
-
-  writeToFile = function(data)
-    local file, _ = io.open("samurais_scripts.json", "w")
-    if file == nil then
-      log.warning("Failed to write to " .. "samurais_scripts.json")
-      gui.show_error("Lua Config", "Failed to write to " .. "samurais_scripts.json")
-      return false
-    end
-    file:write(jsonConf.encode(data))
-    file:close()
-    return true
-  end,
-
-  readFromFile = function()
-    local file, _ = io.open("samurais_scripts.json", "r")
-    if file == nil then
-      return nil
-    end
-    local content = file:read("*all")
-    file:close()
-    return jsonConf.decode(content)
-  end,
-
-  checkAndCreateConfig = function(default_config)
-    local exists = io.exists("samurais_scripts.json")
-    local config
-    if not exists then
-      log.info("Config file not found, creating a default config")
-      if not lua_cfg.writeToFile(default_config) then
-        return false
-      end
-      config = default_config
-    else
-      config = lua_cfg.readFromFile()
-      if config == nil then
-        log.error("Failed to read config file")
-        return false
-      end
-    end
-
-    for key, defaultValue in pairs(default_config) do
-      if config[key] == nil then
-        config[key] = defaultValue
-      end
-    end
-
-    if not lua_cfg.writeToFile(config) then
-      return false
-    end
-    return true
-  end,
-
-  readAndDecodeConfig = function()
-    while not lua_cfg.checkAndCreateConfig(default_config) do
-      os.execute("sleep " .. tonumber(1))
-      log.info("Waiting for " .. "samurais_scripts.json" .. " to be created")
-    end
-    return lua_cfg.readFromFile()
-  end,
-
-  save = function(item_tag, value)
-    local t = lua_cfg.readAndDecodeConfig()
-    if t then
-      t[item_tag] = value
-      if not lua_cfg.writeToFile(t) then
-        log.error("Failed to save config to " .. "samurais_scripts.json")
-      end
-    end
-  end,
-
-  read = function(item_tag)
-    local t = lua_cfg.readAndDecodeConfig()
-    if t then
-      return t[item_tag]
-    else
-      log.error("Failed to read config from " .. "samurais_scripts.json")
-    end
-  end,
-
-  reset = function(default_config)
-    lua_cfg.writeToFile(default_config)
-  end,
 }
