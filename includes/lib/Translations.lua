@@ -3812,6 +3812,52 @@ Labels = {
 			text = "Prędkość RGB",
 		},
 	},
+	fenderBender_tt = {
+		{
+			iso = "en-US",
+			text = "Makes car crashes more realistic. If you crash your vehicle at a very high speed, you might die.",
+		},
+		{
+			iso = "de-DE",
+			text = "Macht Autounfälle realistischer. Wenn Sie mit Ihrem Fahrzeug bei sehr hoher Geschwindigkeit einen Unfall verursachen, könnten Sie sterben.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Rend les accidents de voiture plus réalistes. Si vous écrasez votre véhicule à très grande vitesse, vous risquez de mourir.",
+		},
+		{
+			iso = "it-IT",
+			text = "Rende gli incidenti automobilistici più realistici. Se ti schianti con il tuo veicolo a velocità molto elevata, potresti morire.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Torna os acidentes de carro mais realistas. Se você bater seu veículo em uma velocidade muito alta, você pode morrer.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Делает автомобильные аварии более реалистичными. Если вы разобьете свой автомобиль на очень высокой скорости, вы можете погибнуть.",
+		},
+		{
+			iso = "es-ES",
+			text = "Hace que los accidentes de tráfico parezcan más realistas. Si chocas tu vehículo a una velocidad muy alta, podrías morir.",
+		},
+		{
+			iso = "zh-CN",
+			text = "让车祸更加逼真。如果你以极高的速度撞车，你可能会丧命。",
+		},
+		{
+			iso = "zh-TW",
+			text = "讓車禍更加真實。如果您的車輛以非常高的速度相撞，您可能會死亡。",
+		},
+		{
+			iso = "ja-JP",
+			text = "車の衝突をよりリアルにします。非常に高速で車を衝突させると、死亡する可能性があります。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Sprawia, że ​​wypadki samochodowe są bardziej realistyczne. Jeśli rozbijesz swój pojazd przy bardzo dużej prędkości, możesz zginąć.",
+		},
+	},
 	autopilot_err_txt = {
 		{
 			iso = "en-US",

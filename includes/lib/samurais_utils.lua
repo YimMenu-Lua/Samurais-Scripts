@@ -226,6 +226,7 @@ function initStrings()
   FIX_ENGINE_              = translateLabel("Fix Engine")
   DESTROY_ENGINE_          = translateLabel("Destroy Engine")
   EJECTO_SEATO_DESC_       = translateLabel("ejecto_seato_tt")
+  FENDER_BENDER_DESC_      = translateLabel("fenderBender_tt")
   -- Flatbed
   GET_IN_FLATBED_         = translateLabel("getinsidefltbd")
   SPAWN_FLATBED_BTN_      = translateLabel("spawnfltbd")
@@ -1504,17 +1505,23 @@ SS                          = {
     return retBool, veh
   end,
 
+
   ---@param vehicle integer
-  getHandlingFlagsPtr = function(vehicle)
+  getVehicleInfo = function(vehicle)
+    local vehicleInfo = setmetatable({}, {})
     local vehPtr           = memory.handle_to_ptr(vehicle)
     local CHandlingData    = vehPtr:add(0x0960):deref()
-    local m_handling_flags = CHandlingData:add(0x0128)
-    return m_handling_flags
+    local CVehicleDamage   = vehPtr:add(0x0420)
+    local CDeformation     = CVehicleDamage:add(0x0010)
+    vehicleInfo.m_handling_flags = CHandlingData:add(0x0128)
+    vehicleInfo.m_deformation    = CDeformation:add(0x0000)
+    vehicleInfo.m_deform_god     = vehPtr:add(0x096C)
+    return vehicleInfo
   end,
 
   getHandlingFlagState = function(vehicle, flag)
     if vehicle ~= nil and vehicle > 0 then
-      local m_handling_flags = SS.getHandlingFlagsPtr(vehicle)
+      local m_handling_flags = SS.getVehicleInfo(vehicle).m_handling_flags
       local handling_flags   = m_handling_flags:get_dword()
       return lua_Fn.has_bit(handling_flags, flag)
     else
@@ -1526,7 +1533,7 @@ SS                          = {
   ---@param flag integer
   ---@param switch boolean
   setHandlingFlag = function(vehicle, flag, switch)
-    local m_handling_flags = SS.getHandlingFlagsPtr(vehicle)
+    local m_handling_flags = SS.getVehicleInfo(vehicle).m_handling_flags
     local handling_flags   = m_handling_flags:get_dword()
     local new_flag
     if switch then
@@ -1541,7 +1548,7 @@ SS                          = {
   ---@param default integer
   resetHandlingFlags = function(vehicle, default)
     if default ~= nil then
-      local m_handling_flags = SS.getHandlingFlagsPtr(vehicle)
+      local m_handling_flags = SS.getVehicleInfo(vehicle).m_handling_flags
       m_handling_flags:set_dword(default)
     end
   end,
@@ -1558,7 +1565,8 @@ SS                          = {
 
   ---@param ped integer
   getPlayerInfo = function(ped)
-    local enumGameState       = {
+    local ped_info_T    = setmetatable({}, {})
+    local enumGameState = {
       { str = "Invalid",       int = -1 },
       { str = "Playing",       int = 0 },
       { str = "Died",          int = 1 },
@@ -1568,7 +1576,6 @@ SS                          = {
       { str = "Respawn",       int = 5 },
       { str = "InMPCutscene",  int = 6 },
     }
-    local ped_info_T          = {}
     local pedPtr              = memory.handle_to_ptr(ped)
     local CPlayerInfo         = pedPtr:add(0x10A8):deref()
     local m_ped_type          = pedPtr:add(0x1098) -- uint32_t
@@ -1592,7 +1599,7 @@ SS                          = {
           return v.str
         end
       end
-    end
+    end;
     return ped_info_T
   end,
 
@@ -2366,6 +2373,12 @@ Game                        = {
     ---@return integer
     health = function()
       return ENTITY.GET_ENTITY_HEALTH(self.get_ped())
+    end,
+
+    -- Returns localPlayer's maximum armour.
+    ---@return integer
+    maxArmour = function()
+      return PLAYER.GET_PLAYER_MAX_ARMOUR(self.get_id())
     end,
 
     -- Returns localPlayer's current armour

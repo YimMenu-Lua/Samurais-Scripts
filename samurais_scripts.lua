@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.4.0'
+SCRIPT_VERSION = '1.4.1'
 TARGET_BUILD   = '3351'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -100,6 +100,7 @@ DEFAULT_CONFIG         = {
   insta180                = false,
   flappyDoors             = false,
   rgbLights               = false,
+  fender_bender           = false,
   loud_radio              = false,
   launchCtrl              = false,
   popsNbangs              = false,
@@ -246,6 +247,7 @@ limitVehOptions        = CFG.read("limitVehOptions")
 missiledefense         = CFG.read("missiledefense")
 autobrklight           = CFG.read("autobrklight")
 rgbLights              = CFG.read("rgbLights")
+fender_bender          = CFG.read("fender_bender")
 holdF                  = CFG.read("holdF")
 keepWheelsTurned       = CFG.read("keepWheelsTurned")
 noJacking              = CFG.read("noJacking")
@@ -636,7 +638,7 @@ function showDriftExtra(text)
   HUD.END_TEXT_COMMAND_DISPLAY_TEXT(screenX, (screenY - 0.5142), 0)
 end
 
-function checkDriftCollision()
+function checkVehicleCollision()
   local crashed     = false
   local text        = ""
   local entity      = ENTITY.GET_LAST_ENTITY_HIT_BY_ENTITY_(self.get_veh())
@@ -2503,7 +2505,7 @@ vehicle_tab:add_imgui(function()
     end
   end
 
-  ImGui.Dummy(1, 5); rgbLights, rgbToggled = ImGui.Checkbox(RGB_LIGHTS_DESC_, rgbLights)
+  rgbLights, rgbToggled = ImGui.Checkbox(RGB_LIGHTS_DESC_, rgbLights)
   if rgbToggled then
     UI.widgetSound("Nav2")
     CFG.save("rgbLights", rgbLights)
@@ -2531,6 +2533,13 @@ vehicle_tab:add_imgui(function()
       UI.widgetSound("Nav")
       CFG.save("lightSpeed", lightSpeed)
     end
+  end
+
+  fender_bender, fbenderUsed = ImGui.Checkbox("Dangerous Car Crashes", fender_bender)
+  UI.toolTip(false, FENDER_BENDER_DESC_)
+  if fbenderUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("fender_bender", fender_bender)
   end
 
   ImGui.Spacing(); ImGui.SeparatorText("Auto-Pilot")
@@ -4461,25 +4470,20 @@ business_tab:add_imgui(function()
                 stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
               end
               ImGui.EndDisabled()
-              -- ImGui.BeginDisabled(wh2_loop or wh3_loop or wh4_loop or wh5_loop)
               ImGui.SameLine(); wh1_loop, wh1lUsed = ImGui.Checkbox("Auto##wh1", wh1_loop)
-              -- ImGui.EndDisabled()
               if wh1lUsed then
                 UI.widgetSound("Nav2")
                 if wh1_loop then
-                  -- wh2_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
                   script.run_in_fiber(function(wh1l)
                     repeat
                       stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
                       wh1l:sleep(supply_autofill_delay)
-                    until
-                      wh1Supplies == whouse1_max or wh1_loop == false
+                    until wh1Supplies == whouse1_max or wh1_loop == false
+                    if wh1_loop then
+                      wh1_loop = false
+                    end
                   end)
                 end
-              end
-            else
-              if wh1_loop then
-                wh1_loop = false
               end
             end
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4540,25 +4544,20 @@ business_tab:add_imgui(function()
                 stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
               end
               ImGui.EndDisabled()
-              -- ImGui.BeginDisabled(wh1_loop or wh3_loop or wh4_loop or wh5_loop)
               ImGui.SameLine(); wh2_loop, wh2lUsed = ImGui.Checkbox("Auto##wh2", wh2_loop)
-              -- ImGui.EndDisabled()
               if wh2lUsed then
                 UI.widgetSound("Nav2")
                 if wh2_loop then
-                  -- wh1_loop, wh3_loop, wh4_loop, wh5_loop = false, false, false, false
                   script.run_in_fiber(function(wh2l)
                     repeat
                       stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
                       wh2l:sleep(supply_autofill_delay)
-                    until
-                      wh2Supplies == whouse2_max or wh2_loop == false
+                    until wh2Supplies == whouse2_max or wh2_loop == false
+                    if wh2_loop then
+                      wh2_loop = false
+                    end
                   end)
                 end
-              end
-            else
-              if wh2_loop then
-                wh2_loop = false
               end
             end
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4619,25 +4618,20 @@ business_tab:add_imgui(function()
                 stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
               end
               ImGui.EndDisabled()
-              -- ImGui.BeginDisabled(wh1_loop or wh2_loop or wh4_loop or wh5_loop)
               ImGui.SameLine(); wh3_loop, wh3lUsed = ImGui.Checkbox("Auto##wh3", wh3_loop)
-              -- ImGui.EndDisabled()
               if wh3lUsed then
                 UI.widgetSound("Nav2")
                 if wh3_loop then
-                  -- wh1_loop, wh2_loop, wh4_loop, wh5_loop = false, false, false, false
                   script.run_in_fiber(function(wh3l)
                     repeat
                       stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
                       wh3l:sleep(supply_autofill_delay)
-                    until
-                      wh3Supplies == whouse3_max or wh3_loop == false
+                    until wh3Supplies == whouse3_max or wh3_loop == false
+                    if wh3_loop then
+                      wh3_loop = false
+                    end
                   end)
                 end
-              end
-            else
-              if wh3_loop then
-                wh3_loop = false
               end
             end
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4698,25 +4692,20 @@ business_tab:add_imgui(function()
                 stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
               end
               ImGui.EndDisabled()
-              -- ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh5_loop)
               ImGui.SameLine(); wh4_loop, wh4lUsed = ImGui.Checkbox("Auto##wh4", wh4_loop)
-              -- ImGui.EndDisabled()
               if wh4lUsed then
                 UI.widgetSound("Nav2")
                 if wh4_loop then
-                  -- wh1_loop, wh2_loop, wh3_loop, wh5_loop = false, false, false, false
                   script.run_in_fiber(function(wh4l)
                     repeat
                       stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
                       wh4l:sleep(supply_autofill_delay)
-                    until
-                      wh4Supplies == whouse4_max or wh4_loop == false
+                    until wh4Supplies == whouse4_max or wh4_loop == false
+                    if wh4_loop then
+                      wh4_loop = false
+                    end
                   end)
                 end
-              end
-            else
-              if wh4_loop then
-                wh4_loop = false
               end
             end
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4777,25 +4766,20 @@ business_tab:add_imgui(function()
                 stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
               end
               ImGui.EndDisabled()
-              -- ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop)
               ImGui.SameLine(); wh5_loop, wh5lUsed = ImGui.Checkbox("Auto##wh5", wh5_loop)
-              -- ImGui.EndDisabled()
               if wh5lUsed then
                 UI.widgetSound("Nav2")
                 if wh5_loop then
-                  -- wh1_loop, wh2_loop, wh3_loop, wh4_loop = false, false, false, false
                   script.run_in_fiber(function(wh5l)
                     repeat
                       stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
                       wh5l:sleep(supply_autofill_delay)
-                    until
-                      wh5Supplies == whouse5_max or wh5_loop == false
+                    until wh5Supplies == whouse5_max or wh5_loop == false
+                    if wh5_loop then
+                      wh5_loop = false
+                    end
                   end)
                 end
-              end
-            else
-              if wh5_loop then
-                wh5_loop = false
               end
             end
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4840,10 +4824,6 @@ business_tab:add_imgui(function()
                   end
                 end)
               end
-            end
-          else
-            if hangarLoop then
-              hangarLoop = false
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -6352,7 +6332,7 @@ world_tab:add_imgui(function()
 
   if carpool then
     if show_npc_veh_ctrls and thisVeh ~= 0 then
-      if ImGui.Button(string.fomat("< %s", PREVIOUS_SEAT_BTN_)) then
+      if ImGui.Button(string.format("< %s", PREVIOUS_SEAT_BTN_)) then
         script.run_in_fiber(function()
           if PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh) then
             local numSeats = VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(thisVeh)
@@ -7817,9 +7797,10 @@ end)
 script.register_looped("auto-heal", function(ah)
   ah:yield()
   if Regen and Game.Self.isAlive() then
-    local maxHp  = Game.Self.maxHealth()
-    local myHp   = Game.Self.health()
-    local myArmr = Game.Self.armour()
+    local maxHp   = Game.Self.maxHealth()
+    local myHp    = Game.Self.health()
+    local maxArmr = Game.Self.maxArmour()
+    local myArmr  = Game.Self.armour()
     if myHp < maxHp and myHp > 0 then
       if PED.IS_PED_IN_COVER(self.get_ped(), false) then
         ENTITY.SET_ENTITY_HEALTH(self.get_ped(), myHp + 10, 0, 0)
@@ -7830,7 +7811,7 @@ script.register_looped("auto-heal", function(ah)
     if myArmr == nil then
       PED.SET_PED_ARMOUR(self.get_ped(), 10)
     end
-    if myArmr ~= nil and myArmr < 50 then
+    if myArmr ~= nil and myArmr < maxArmr then
       PED.ADD_ARMOUR_TO_PED(self.get_ped(), 0.5)
     end
   end
@@ -7996,12 +7977,7 @@ script.register_looped("Ragdoll Loop", function(rgdl)
   end
   if ragdoll_sound then
     if PED.IS_PED_RAGDOLL(self.get_ped()) and Game.isOnline() then
-      local soundName
-      if PED.IS_PED_MALE(self.get_ped()) then
-        soundName = "WAVELOAD_PAIN_MALE"
-      else
-        soundName = "WAVELOAD_PAIN_FEMALE"
-      end
+      local soundName = PED.IS_PED_MALE(self.get_ped()) and "WAVELOAD_PAIN_MALE" or "WAVELOAD_PAIN_FEMALE"
       rgdl:sleep(500)
       local myPos = ENTITY.GET_ENTITY_COORDS(self.get_ped(), true)
       AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE("SCREAM_PANIC_SHORT", soundName, myPos.x, myPos.y, myPos.z,
@@ -8039,25 +8015,31 @@ script.register_looped("Hide From Cops", function(hfc)
   if hideFromCops then
     local isWanted    = PLAYER.GET_PLAYER_WANTED_LEVEL(self.get_id()) > 0
     local was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(self.get_id())
-    local condition   = Game.Self.isDriving() and VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) or true
+    local cond
     if not is_hiding then
-      if current_vehicle ~= 0 and is_car and condition and not PAD.IS_CONTROL_PRESSED(0, 71)
-        and not PAD.IS_CONTROL_PRESSED(0, 72) and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle)
-        and isWanted and not was_spotted then
-        Game.showButtonPrompt("Press ~INPUT_FRONTEND_ACCEPT~ to hide inside your car.")
-        if PAD.IS_CONTROL_JUST_PRESSED(0, 201) and not HUD.IS_MP_TEXT_CHAT_TYPING() then
-          if is_handsUp then
-            TASK.CLEAR_PED_TASKS(self.get_ped())
-            is_handsUp = false
-          end
-          if Game.requestAnimDict("missmic3leadinout_mcs1") then
-            VEHICLE.SET_VEHICLE_IS_WANTED(current_vehicle, false)
-            TASK.TASK_PLAY_ANIM(self.get_ped(), "missmic3leadinout_mcs1", "cockpit_pilot", 6.0, 3.0, -1, 18, 1.0, false, false, false)
-            if Game.Self.isDriving() then
-              VEHICLE.SET_VEHICLE_ENGINE_ON(self.get_veh(), false, false, true)
+      if PED.IS_PED_IN_ANY_VEHICLE(self.get_ped(), false) and is_car then
+        if Game.Self.isDriving() then
+          cond = VEHICLE.IS_VEHICLE_STOPPED(current_vehicle)
+        else
+          cond = true
+        end
+        if cond and not PAD.IS_CONTROL_PRESSED(0, 71) and not PAD.IS_CONTROL_PRESSED(0, 72)
+          and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle) and isWanted and not was_spotted then
+          Game.showButtonPrompt("Press ~INPUT_FRONTEND_ACCEPT~ to hide inside the vehicle.")
+          if PAD.IS_CONTROL_JUST_PRESSED(0, 201) and not HUD.IS_MP_TEXT_CHAT_TYPING() then
+            if is_handsUp then
+              TASK.CLEAR_PED_TASKS(self.get_ped())
+              is_handsUp = false
             end
-            is_hiding, ducking_in_car = true, true
-            hfc:sleep(1000)
+            if Game.requestAnimDict("missmic3leadinout_mcs1") then
+              VEHICLE.SET_VEHICLE_IS_WANTED(current_vehicle, false)
+              TASK.TASK_PLAY_ANIM(self.get_ped(), "missmic3leadinout_mcs1", "cockpit_pilot", 6.0, 3.0, -1, 18, 1.0, false, false, false)
+              if Game.Self.isDriving() then
+                VEHICLE.SET_VEHICLE_ENGINE_ON(self.get_veh(), false, false, true)
+              end
+              is_hiding, ducking_in_car = true, true
+              hfc:sleep(1000)
+            end
           end
         end
       end
@@ -8221,6 +8203,7 @@ script.register_looped("Hide From Cops", function(hfc)
         ENTITY.SET_ENTITY_COORDS(self.get_ped(), my_pos.x + (my_fwd.x * 1.3),
         my_pos.y + (my_fwd.y * 1.3), ground_z, false, false, false, false)
         CAM.DO_SCREEN_FADE_IN(500)
+        AUDIO.PLAY_SOUND_FRONTEND(-1, "TRASH_BAG_LAND", "DLC_HEIST_SERIES_A_SOUNDS", true)
         if Game.requestAnimDict("move_m@_idles@shake_off") then
           TASK.TASK_PLAY_ANIM(self.get_ped(), "move_m@_idles@shake_off", "shakeoff_1", 4.0, -4.0, 3000, 48, 0.0, false, false, false)
         end
@@ -9432,7 +9415,7 @@ script.register_looped("drift counter", function(dcounter)
             if vehSpeedVec.x < 2 and vehSpeedVec.x > -2 then
               if straight_counter > 400 then
                 if ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) then
-                  if checkDriftCollision() then
+                  if checkVehicleCollision() then
                     drift_streak_text = 'Streak lost!'
                     drift_points      = 0
                     drift_multiplier  = 1
@@ -9461,7 +9444,7 @@ script.register_looped("drift counter", function(dcounter)
           end
           if not VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) then
             if ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) then
-              if checkDriftCollision() then
+              if checkVehicleCollision() then
                 drift_streak_text = 'Streak Lost!'
                 drift_points      = 0
                 drift_extra_pts   = 0
@@ -9488,7 +9471,7 @@ script.register_looped("drift counter", function(dcounter)
               drift_multiplier = 1
               is_drifting      = false
             else
-              if checkDriftCollision() then
+              if checkVehicleCollision() then
                 drift_streak_text = 'Streak Lost!'
                 drift_points      = 0
                 drift_extra_pts   = 0
@@ -9548,7 +9531,7 @@ script.register_looped("extra points checker", function(epc)
           end
         end
       else
-        local bool, txt = checkDriftCollision()
+        local bool, txt = checkVehicleCollision()
         if not bool and drift_streak_text ~= "" then
           drift_extra_pts  = drift_extra_pts + 1
           drift_points     = drift_points + drift_extra_pts
@@ -9782,6 +9765,47 @@ script.register_looped("no jacking", function(ctt)
     end
   end
   ctt:yield()
+end)
+script.register_looped("DIE", function(die)
+  if fender_bender then
+    if PED.IS_PED_IN_ANY_VEHICLE(self.get_ped(), false) then
+      local myPos      = self.get_pos()
+      local veh_speed  = ENTITY.GET_ENTITY_SPEED(current_vehicle)
+      local shake_amp  = veh_speed / 30
+      local soundName  = PED.IS_PED_MALE(self.get_ped()) and "WAVELOAD_PAIN_MALE" or "WAVELOAD_PAIN_FEMALE"
+      local Occupants  = Game.Vehicle.getOccupants(current_vehicle)
+      local crashed, _ = checkVehicleCollision()
+      if veh_speed >= 20 and ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) and crashed then
+        CAM.SHAKE_GAMEPLAY_CAM("GRENADE_EXPLOSION_SHAKE", shake_amp)
+        AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE("SCREAM_PANIC_SHORT", soundName, myPos.x, myPos.y, myPos.z,
+        "SPEECH_PARAMS_FORCE_SHOUTED")
+        if veh_speed > 33 and veh_speed < 45 then
+          GRAPHICS.ANIMPOSTFX_PLAY("ULP_PLAYERWAKEUP", 3000, false)
+          if not ENTITY.IS_ENTITY_A_MISSION_ENTITY(current_vehicle) then
+            VEHICLE.SET_VEHICLE_ENGINE_HEALTH(current_vehicle, (VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) - 100))
+          end
+          for _, ped in ipairs(Occupants) do
+            ENTITY.SET_ENTITY_HEALTH(ped, (ENTITY.GET_ENTITY_HEALTH(ped) - (20 + (shake_amp * 5))), 0, 0)
+          end
+        end
+        if veh_speed >= 45 then
+          die:sleep(200)
+          if ENTITY.GET_ENTITY_SPEED(current_vehicle) < veh_speed / 2 then
+            VEHICLE.SET_VEHICLE_OUT_OF_CONTROL(current_vehicle, true, false)
+            if not ENTITY.IS_ENTITY_A_MISSION_ENTITY(current_vehicle) then
+              VEHICLE.SET_VEHICLE_ENGINE_HEALTH(current_vehicle, -4000)
+            end
+            for _, ped in ipairs(Occupants) do
+              if not ENTITY.IS_ENTITY_DEAD(ped, true) then
+                ENTITY.SET_ENTITY_HEALTH(ped, 0, 0, 0)
+              end
+            end
+          end
+        end
+        die:sleep(3000)
+      end
+    end
+  end
 end)
 
 -- Planes & Helis
@@ -10517,7 +10541,7 @@ end)
 ---online
 
 -- Casino Pacino
-script.register_looped("Casino Pacino Thread", function(pacino)
+script.register_looped("Casino Pacino Thread", function(script)
   if Game.isOnline() then
     if force_poker_cards then
       local player_id = PLAYER.PLAYER_ID()

@@ -130,6 +130,12 @@
 
   - **Ejecto Seato Cuz!**
     - Press this button to eject all peds from your vehicle. Currently, this does not work on other players.
+  
+  - **Dangerous Car Crashes:**
+    - Makes car crashes a bit more dangerous in 3 steps:
+      1. **Crashing at a speed higher than 70km/h and less than 118km/h:** Shakes the gameplay camera.
+      2. **Crashing at a speed higher than 118km/h and less than 162km/h:** Applies damage to the vehicle and everyone inside it.
+      3. **Crashing at a speed higher than 162km/h:** Has a very high chance of destroying the engine and killing everyone in the vehicle.
 
 - **Custom Paint Jobs:**
   - Apply a custom paint job to your vehicle from a list of real-life OEM and custom colors.
