@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.4.1'
+SCRIPT_VERSION = '1.4.2'
 TARGET_BUILD   = '3351'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -314,6 +314,7 @@ last_vehicle           = self.get_veh()
 tab1Sound              = true
 tab2Sound              = true
 tab3Sound              = true
+tab4Sound              = true
 is_playing_anim        = false
 is_shortcut_anim       = false
 anim_music             = false
@@ -351,7 +352,11 @@ ped_grabbed            = false
 vehicleGrabber         = false
 vehicle_grabbed        = false
 carpool                = false
-show_npc_veh_ctrls     = false
+is_carpooling          = false
+show_npc_veh_seat_ctrl = false
+show_npc_veh_ui        = false
+npc_veh_radio_on       = false
+npc_veh_has_conv_roof  = false
 stop_searching         = false
 hijack_started         = false
 sound_btn_off          = false
@@ -384,11 +389,13 @@ mf_overwrite           = false
 is_primary             = false
 is_secondary           = false
 debug_counter          = not SS_debug and 0 or 7
-flag                   = 0
+anim_flag              = 0
+anim_sortby_idx        = 0
 grp_anim_index         = 0
 attached_ped           = 0
 grabbed_veh            = 0
 thisVeh                = 0
+npcDriver              = 0
 anim_index             = 0
 scenario_index         = 0
 recents_index          = 0
@@ -418,9 +425,14 @@ boot_vehicle           = 0
 thisDumpster           = 0
 thisSeat               = 0
 custom_paint_index     = 0
-sortby_idx             = 0
-sortbyMfr_idx          = 0
-sortby_switch          = 0
+paints_col_sort_idx    = 0
+paints_mfr_sort_idx    = 0
+paints_sortby_switch   = 0
+npc_veh_roof_state     = 0
+npc_veh_speed          = 0.0
+npcDriveSwitch         = 0
+npcDrivingFlags        = 803243
+npcDrivingSpeed        = 19
 drift_multiplier       = 1
 quote_alpha            = 1
 pedthrowF              = 10
@@ -434,6 +446,8 @@ search_term            = ""
 smokeHex               = ""
 random_quote           = ""
 custom_paints_sq       = ""
+npcDriveTask           = ""
+npcDriveDest           = vec3
 filteredPlayers        = {}
 recently_played_a      = {}
 selected_sound         = {}
@@ -639,34 +653,36 @@ function showDriftExtra(text)
 end
 
 function checkVehicleCollision()
-  local crashed     = false
-  local text        = ""
-  local entity      = ENTITY.GET_LAST_ENTITY_HIT_BY_ENTITY_(self.get_veh())
-  local entity_type = Game.getEntityTypeString(entity)
-  if ENTITY.IS_ENTITY_A_PED(entity) then
-    text = "Hit and run"
-    crashed = false
-  elseif entity_type == "Vehicle" then
-    text = "Samir, you're breaking the car!"
-    crashed = true
-  elseif entity_type == "Object" then
-    -- ENTITY.GET_ENTITY_MODEL(entity) ~= 3300474446 and ENTITY.GET_ENTITY_MODEL(entity) ~= 3231494328 and ENTITY.GET_ENTITY_MODEL(entity) ~= 3008087081 and ENTITY.GET_ENTITY_MODEL(entity) ~= 874602658
-    if ENTITY.GET_ENTITY_SPEED(self.get_veh()) > 5 then
-      text = "Wrecking ball"
-      crashed = false
+  if ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(self.get_veh()) then
+    local entity = ENTITY.GET_LAST_ENTITY_HIT_BY_ENTITY_(self.get_veh())
+    if entity ~= nil and entity ~= 0 then
+      local entity_type = SS.getEntityType(entity)
+      if entity_type == 6 then
+        return false, "Hit and run"
+      elseif entity_type == 5 or entity_type == 157 then
+        return true, "Samir, you're breaking the car!"
+      elseif entity_type == 1 or entity_type == 33 or entity_type == 7 then
+        if ENTITY.DOES_ENTITY_HAVE_PHYSICS(entity) then
+          local model = ENTITY.GET_ENTITY_MODEL(entity)
+          for _, m in ipairs(collision_invalid_models) do
+            if model == m then
+              return true, "Samir, you're breaking the car!"
+            end
+          end
+          return false, "Wrecking ball"
+        else
+          return true, "Samir, you're breaking the car!"
+        end
+      end
     else
-      text = "Samir, you're breaking the car!"
-      crashed = true
+      return true, "Samir, you're breaking the car!"
     end
-  elseif entity_type == "None" or entity_type == "Invalid" then
-    text = "Samir, you're breaking the car!"
-    crashed = true
   end
-  return crashed, text
+  return false, ""
 end
 
 function bankDriftPoints_SP(points)
-  local chars_T = {
+  local chars_T <const> = {
     { hash = 225514697,  int = 0 },
     { hash = 2602752943, int = 1 },
     { hash = 2608926626, int = 2 },
@@ -841,11 +857,30 @@ end)
 
 Actions = self_tab:add_tab("Actions ")
 
+local animSortbyList <const> = {
+  "All",
+  "Actions",
+  "Activities",
+  "Gestures",
+  "In-Vehicle",
+  "Movements",
+  "MISC",
+  "NSFW",
+}
+
 local function updatefilteredAnims()
   filteredAnims = {}
   for _, anim in ipairs(animlist) do
-    if string.find(string.lower(anim.name), string.lower(actions_search)) then
-      table.insert(filteredAnims, anim)
+    if anim_sortby_idx == 0 then
+      if string.find(string.lower(anim.name), string.lower(actions_search)) then
+        table.insert(filteredAnims, anim)
+      end
+    else
+      if anim.cat == animSortbyList[anim_sortby_idx + 1] then
+        if string.find(string.lower(anim.name), string.lower(actions_search)) then
+          table.insert(filteredAnims, anim)
+        end
+      end
     end
   end
   table.sort(animlist, function(a, b)
@@ -968,7 +1003,7 @@ local function setmanualflag()
   else
     flag_control = 0
   end
-  flag = flag_loop + flag_freeze + flag_upperbody + flag_control
+  return flag_loop + flag_freeze + flag_upperbody + flag_control
 end
 
 local function setdrunk()
@@ -1060,12 +1095,12 @@ end
 
 ---@param s script_util
 function onAnimInterrupt(s)
-  s:sleep(1000)
-  if is_playing_anim and not SS.isKeyJustPressed(keybinds.stop_anim.code) then
+  if is_playing_anim and Game.Self.isAlive() and not SS.isKeyJustPressed(keybinds.stop_anim.code)
+    and not ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, 3) then
     if Game.requestAnimDict(curr_playing_anim.dict) then
       TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
       TASK.TASK_PLAY_ANIM(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, 4.0, -4.0, -1,
-        curr_playing_anim.flag, 1.0, false, false, false)
+        anim_flag, 1.0, false, false, false)
     end
   end
 end
@@ -1087,8 +1122,16 @@ Actions:add_imgui(function()
       tab1Sound = false
       tab2Sound = true
       tab3Sound = true
+      tab4Sound = true
     end
-    ImGui.PushItemWidth(420) -- whatcha smokin'?
+    ImGui.Spacing(); ImGui.BulletText("Filter Animations: "); ImGui.SameLine()
+    ImGui.PushItemWidth(220)
+    anim_sortby_idx, animSortUsed = ImGui.Combo("##animCategories", anim_sortby_idx, animSortbyList, #animSortbyList)
+    ImGui.PopItemWidth()
+    if animSortUsed then
+      UI.widgetSound("Nav2")
+    end
+    ImGui.Spacing(); ImGui.Separator(); ImGui.PushItemWidth(420) -- whatcha smokin'?
     displayFilteredAnims()
     ImGui.PopItemWidth()
     if filteredAnims ~= nil then
@@ -1137,9 +1180,9 @@ Actions:add_imgui(function()
     end
     if ImGui.Button(string.format("%s##anim", GENERIC_PLAY_BTN_)) then
       if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
-        if lua_Fn.str_contains(string.lower(info.name), "in-car") and Game.Self.isOnFoot() then
+        if info.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
           UI.widgetSound("Error")
-          gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
+          gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle (cars and trucks only).")
           goto pass
         end
         UI.widgetSound("Select")
@@ -1151,12 +1194,12 @@ Actions:add_imgui(function()
           local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
           local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
           if manualFlags then
-            setmanualflag()
+            anim_flag= setmanualflag()
           else
-            flag = info.flag
+            anim_flag = info.flag
           end
           curr_playing_anim = info
-          if lua_Fn.str_contains(curr_playing_anim.name, "DJ") then
+          if Lua_fn.str_contains(curr_playing_anim.name, "DJ") then
             if not is_playing_radio and not anim_music then
               play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
               anim_music = true
@@ -1168,7 +1211,7 @@ Actions:add_imgui(function()
             end
           end
           playAnim(
-            info, self.get_ped(), flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, boneIndex, coords, heading,
+            info, self.get_ped(), anim_flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, boneIndex, coords, heading,
             forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pa)
           is_playing_anim = true
           addActionToRecents(info)
@@ -1180,6 +1223,7 @@ Actions:add_imgui(function()
       ::pass::
     end
     ImGui.SameLine()
+    ImGui.BeginDisabled(not is_playing_anim)
     if ImGui.Button(string.format("%s##anim", GENERIC_STOP_BTN_)) then
       if is_playing_anim then
         UI.widgetSound("Cancel")
@@ -1196,6 +1240,7 @@ Actions:add_imgui(function()
       end
     end
     UI.toolTip(false, ANIM_STOP_DESC_)
+    ImGui.EndDisabled()
     ImGui.SameLine(); ImGui.Dummy(12, 1); ImGui.SameLine()
     local errCol = {}
     local errSound = false
@@ -1311,9 +1356,9 @@ Actions:add_imgui(function()
             if ImGui.Button(string.format("%s##shortcut", GENERIC_CONFIRM_BTN_)) then
               UI.widgetSound("Select")
               if manualFlags then
-                setmanualflag()
+                anim_flag = setmanualflag()
               else
-                flag = chosen_anim.flag
+                anim_flag = chosen_anim.flag
               end
               shortcut_anim     = chosen_anim
               shortcut_anim.btn = btn
@@ -1381,14 +1426,16 @@ Actions:add_imgui(function()
     actions_switch, isChanged = ImGui.RadioButton("Normal", actions_switch, 0)
     if isChanged then
       UI.widgetSound("Nav")
-      PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0.3)
-      PED.RESET_PED_STRAFE_CLIPSET(self.get_ped())
-      PED.RESET_PED_WEAPON_MOVEMENT_CLIPSET(self.get_ped())
-      WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(self.get_ped(), 3839837909)
-      currentMvmt  = ""
-      currentStrf  = ""
-      currentWmvmt = ""
-      isChanged    = false
+      script.run_in_fiber(function()
+        PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0.3)
+        PED.RESET_PED_STRAFE_CLIPSET(self.get_ped())
+        PED.RESET_PED_WEAPON_MOVEMENT_CLIPSET(self.get_ped())
+        WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(self.get_ped(), 3839837909)
+        currentMvmt  = ""
+        currentStrf  = ""
+        currentWmvmt = ""
+        isChanged    = false
+      end)
     end
     ImGui.SameLine(); ImGui.Dummy(23, 1); ImGui.SameLine()
     actions_switch, isChanged = ImGui.RadioButton("Drunk", actions_switch, 1)
@@ -1427,10 +1474,19 @@ Actions:add_imgui(function()
       UI.widgetSound("Nav2")
     end
     ImGui.SameLine()
-    npc_godMode, used = ImGui.Checkbox("Invincible", npc_godMode)
-    if used then
+    npc_godMode, ngodused = ImGui.Checkbox("Invincible", npc_godMode)
+    if ngodused then
       CFG.save("npc_godMode", npc_godMode)
       UI.widgetSound("Nav")
+      if spawned_npcs[1] ~= nil then
+        script.run_in_fiber(function()
+          for _, npc in ipairs(spawned_npcs) do
+            if ENTITY.DOES_ENTITY_EXIST(npc) and not ENTITY.IS_ENTITY_DEAD(npc, true) then
+              ENTITY.SET_ENTITY_INVINCIBLE(npc, npc_godMode)
+            end
+          end
+        end)
+      end
     end
     UI.toolTip(false, NPC_GODMODE_DESC_)
     if ImGui.Button(string.format("%s##anims_npc", GENERIC_SPAWN_BTN_)) then
@@ -1512,9 +1568,9 @@ Actions:add_imgui(function()
     ImGui.SameLine()
     if ImGui.Button(string.format("%s##anim_npc", GENERIC_PLAY_BTN_)) then
       if spawned_npcs[1] ~= nil then
-        if lua_Fn.str_contains(string.lower(info.name), "in-car") and Game.Self.isOnFoot() then
+        if info.cat == "In-Vehicle" and( Game.Self.isOnFoot() or not is_car) then
           UI.widgetSound("Error")
-          gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
+          gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle (cars and trucks only).")
           goto pass
         end
         UI.widgetSound("Select")
@@ -1528,12 +1584,12 @@ Actions:add_imgui(function()
               local npcBoneIndex   = PED.GET_PED_BONE_INDEX(v, info.boneID)
               local npcBboneCoords = PED.GET_PED_BONE_COORDS(v, info.boneID, 0.0, 0.0, 0.0)
               if manualFlags then
-                setmanualflag()
+                anim_flag = setmanualflag()
               else
-                flag = info.flag
+                anim_flag = info.flag
               end
               playAnim(
-                info, v, flag, npcprop1, npcprop2, npcloopedFX, npcSexPed, npcBoneIndex, npcCoords, npcHeading,
+                info, v, anim_flag, npcprop1, npcprop2, npcloopedFX, npcSexPed, npcBoneIndex, npcCoords, npcHeading,
                 npcForwardX, npcForwardY, npcBboneCoords, "cunt", npcProps, npcPTFX, npca
               )
             end
@@ -1643,7 +1699,20 @@ Actions:add_imgui(function()
     displayNpcs()
     ImGui.PopItemWidth()
     ImGui.SameLine()
-    npc_godMode, used = ImGui.Checkbox("Invincible", npc_godMode)
+    npc_godMode, ngodused = ImGui.Checkbox("Invincible", npc_godMode)
+    if ngodused then
+      CFG.save("npc_godMode", npc_godMode)
+      UI.widgetSound("Nav")
+      if spawned_npcs[1] ~= nil then
+        script.run_in_fiber(function()
+          for _, npc in ipairs(spawned_npcs) do
+            if ENTITY.DOES_ENTITY_EXIST(npc) and not ENTITY.IS_ENTITY_DEAD(npc, true) then
+              ENTITY.SET_ENTITY_INVINCIBLE(npc, npc_godMode)
+            end
+          end
+        end)
+      end
+    end
     UI.toolTip(false, NPC_GODMODE_DESC_)
     local npcData = filteredNpcs[npc_index + 1]
     if ImGui.Button(string.format("%s##scenario_npc", GENERIC_SPAWN_BTN_)) then
@@ -1768,9 +1837,9 @@ Actions:add_imgui(function()
       if ImGui.Button(string.format("%s##favs", GENERIC_PLAY_BTN_)) then
         if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
           if selected_favorite.dict ~= nil then -- animation type
-            if lua_Fn.str_contains(string.lower(selected_favorite.name), "in-car") and Game.Self.isOnFoot() then
+            if selected_favorite.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
               UI.widgetSound("Error")
-              gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
+              gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle (cars and trucks only).")
             else
               UI.widgetSound("Select")
               script.run_in_fiber(function(pf)
@@ -1780,7 +1849,7 @@ Actions:add_imgui(function()
                 local forwardY   = Game.getForwardY(self.get_ped())
                 local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_favorite.boneID)
                 local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_favorite.boneID, 0.0, 0.0, 0.0)
-                if lua_Fn.str_contains(selected_favorite.name, "DJ") then
+                if Lua_fn.str_contains(selected_favorite.name, "DJ") then
                   if not is_playing_radio and not anim_music then
                     play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
                     anim_music = true
@@ -1852,9 +1921,9 @@ Actions:add_imgui(function()
       if ImGui.Button(string.format("%s##recents", GENERIC_PLAY_BTN_)) then
         if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
           if selected_recent.dict ~= nil then -- animation type
-            if lua_Fn.str_contains(string.lower(selected_recent.name), "in-car") and Game.Self.isOnFoot() then
+            if selected_recent.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
               UI.widgetSound("Error")
-              gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
+              gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle (cars and trucks only).")
             else
               UI.widgetSound("Select")
               script.run_in_fiber(function(pr)
@@ -1864,7 +1933,7 @@ Actions:add_imgui(function()
                 local forwardY   = Game.getForwardY(self.get_ped())
                 local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_recent.boneID)
                 local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_recent.boneID, 0.0, 0.0, 0.0)
-                if lua_Fn.str_contains(selected_recent.name, "DJ") then
+                if Lua_fn.str_contains(selected_recent.name, "DJ") then
                   if not is_playing_radio and not anim_music then
                     play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
                     anim_music = true
@@ -1876,7 +1945,7 @@ Actions:add_imgui(function()
                   end
                 end
                 playAnim(
-                  selected_recent, self.get_ped(), selected_recent.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
+                  selected_recent, self.get_ped(), anim_flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
                   boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pr
                 )
                 curr_playing_anim = selected_recent
@@ -2162,12 +2231,12 @@ local function onVehEnter()
   current_vehicle = self.get_veh()
   if Game.Self.isDriving() and (is_car or is_bike or is_quad)
     and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
-    engine_brake_disabled  = SS.getHandlingFlagState(current_vehicle, HF._FREEWHEEL_NO_GAS)
-    traction_ctrl_disabled = SS.getHandlingFlagState(current_vehicle, HF._FORCE_NO_TC_OR_SC)
-    kers_boost_enabled     = SS.getHandlingFlagState(current_vehicle, HF._HAS_KERS)
-    offroader_enabled      = SS.getHandlingFlagState(current_vehicle, HF._OFFROAD_ABILITIES_X2)
-    rally_tires_enabled    = SS.getHandlingFlagState(current_vehicle, HF._HAS_RALLY_TYRES)
-    easy_wheelie_enabled   = SS.getHandlingFlagState(current_vehicle, HF._LOW_SPEED_WHEELIES)
+    engine_brake_disabled  = SS.getHandlingFlagState(HF._FREEWHEEL_NO_GAS)
+    traction_ctrl_disabled = SS.getHandlingFlagState(HF._FORCE_NO_TC_OR_SC)
+    kers_boost_enabled     = SS.getHandlingFlagState(HF._HAS_KERS)
+    offroader_enabled      = SS.getHandlingFlagState(HF._OFFROAD_ABILITIES_X2)
+    rally_tires_enabled    = SS.getHandlingFlagState(HF._HAS_RALLY_TYRES)
+    easy_wheelie_enabled   = SS.getHandlingFlagState(HF._LOW_SPEED_WHEELIES)
   end
   if Game.Self.isDriving() and current_vehicle ~= last_vehicle then
     resetLastVehState()
@@ -2932,7 +3001,7 @@ vehicle_tab:add_imgui(function()
 end)
 
 custom_paints_tab = vehicle_tab:add_tab("Custom Paint Jobs")
-local sortByColors = {
+local paints_sortByColors <const> = {
   "All",
   "Beige",
   "Black",
@@ -2948,7 +3017,7 @@ local sortByColors = {
   "White",
   "Yellow",
 }
-local sortByMfrs = {
+local paints_sortByMfrs <const> = {
   "All",
   "Alfa Romeo",
   "AMC",
@@ -2988,25 +3057,25 @@ local sortByMfrs = {
 local function sortCustomPaints()
   filteredPaints = {}
   for _, v in ipairs(custom_paints_T) do
-    if sortby_switch == 0 then
-      if sortby_idx == 0 then
+    if paints_sortby_switch == 0 then
+      if paints_col_sort_idx == 0 then
         if string.find(string.lower(v.name), string.lower(custom_paints_sq)) then
           table.insert(filteredPaints, v)
         end
       else
-        if v.shade == sortByColors[sortby_idx + 1] then
+        if v.shade == paints_sortByColors[paints_col_sort_idx + 1] then
           if string.find(string.lower(v.name), string.lower(custom_paints_sq)) then
             table.insert(filteredPaints, v)
           end
         end
       end
-    elseif sortby_switch == 1 then
-      if sortbyMfr_idx == 0 then
+    elseif paints_sortby_switch == 1 then
+      if paints_mfr_sort_idx == 0 then
         if string.find(string.lower(v.name), string.lower(custom_paints_sq)) then
           table.insert(filteredPaints, v)
         end
       else
-        if v.manufacturer == sortByMfrs[sortbyMfr_idx + 1] then
+        if v.manufacturer == paints_sortByMfrs[paints_mfr_sort_idx + 1] then
           if string.find(string.lower(v.name), string.lower(custom_paints_sq)) then
             table.insert(filteredPaints, v)
           end
@@ -3038,18 +3107,18 @@ custom_paints_tab:add_imgui(function()
     ImGui.Dummy(1, 5);ImGui.Text(GET_IN_VEH_WARNING_)
   else
     ImGui.BulletText(SORT_BY_TXT_); ImGui.SameLine()
-    sortby_switch, isChanged = ImGui.RadioButton(SORT_BY_COLOR_TXT_, sortby_switch, 0); ImGui.SameLine(); ImGui.Dummy(35, 1)
+    paints_sortby_switch, isChanged = ImGui.RadioButton(SORT_BY_COLOR_TXT_, paints_sortby_switch, 0); ImGui.SameLine(); ImGui.Dummy(35, 1)
     if isChanged then
       UI.widgetSound("Nav")
     end
-    ImGui.SameLine(); sortby_switch, isChanged = ImGui.RadioButton(SORT_BY_MFR_TXT_, sortby_switch, 1)
+    ImGui.SameLine(); paints_sortby_switch, isChanged = ImGui.RadioButton(SORT_BY_MFR_TXT_, paints_sortby_switch, 1)
     if isChanged then
       UI.widgetSound("Nav")
     end
     ImGui.PushItemWidth(180)
-    if sortby_switch == 0 then
+    if paints_sortby_switch == 0 then
       ImGui.Dummy(20, 1); ImGui.SameLine()
-      sortby_idx, sortbyUsed = ImGui.Combo("##sortpaintjobs", sortby_idx, sortByColors, #sortByColors)
+      paints_col_sort_idx, sortbyUsed = ImGui.Combo("##sortpaintjobs", paints_col_sort_idx, paints_sortByColors, #paints_sortByColors)
       if sortbyUsed then
         UI.widgetSound("Nav")
         custom_paint_index = 0
@@ -3057,7 +3126,7 @@ custom_paints_tab:add_imgui(function()
       ImGui.SameLine(); showPaintsCount()
     else
       ImGui.Dummy(120, 1); ImGui.SameLine(); showPaintsCount(); ImGui.SameLine()
-      sortbyMfr_idx, sortbyMfrUsed = ImGui.Combo("##sortpaintjobs2", sortbyMfr_idx, sortByMfrs, #sortByMfrs)
+      paints_mfr_sort_idx, sortbyMfrUsed = ImGui.Combo("##sortpaintjobs2", paints_mfr_sort_idx, paints_sortByMfrs, #paints_sortByMfrs)
       if sortbyMfrUsed then
         UI.widgetSound("Nav")
         custom_paint_index = 0
@@ -3201,7 +3270,7 @@ drift_mode_tab:add_imgui(function()
             CFG.save("driftSmokeIndex", driftSmokeIndex)
             selected_smoke_col = driftSmokeColors[driftSmokeIndex + 1]
             local r, g, b = UI.getColor(string.lower(selected_smoke_col))
-            r, g, b = lua_Fn.round((r * 255), 2), lua_Fn.round((g * 255), 2), lua_Fn.round((b * 255), 2)
+            r, g, b = Lua_fn.round((r * 255), 2), Lua_fn.round((g * 255), 2), Lua_fn.round((b * 255), 2)
             driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = r, g, b
             CFG.save("driftSmoke_T", driftSmoke_T)
             script.run_in_fiber(function()
@@ -3245,7 +3314,7 @@ drift_mode_tab:add_imgui(function()
                       "' %s ' is not a valid HEX color code. Please enter either a short or a long HEX string.", smokeHex))
                 else
                   UI.widgetSound("Select")
-                  driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = lua_Fn.hexToRGB(smokeHex)
+                  driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = Lua_fn.hexToRGB(smokeHex)
                   CFG.save("driftSmoke_T", driftSmoke_T)
                   script.run_in_fiber(function()
                     if not custom_tires_checked then
@@ -3275,7 +3344,7 @@ drift_mode_tab:add_imgui(function()
           if not customSmokeCol then
             selected_smoke_col = driftSmokeColors[driftSmokeIndex + 1]
             local r, g, b = UI.getColor(string.lower(selected_smoke_col))
-            r, g, b = lua_Fn.round((r * 255), 2), lua_Fn.round((g * 255), 2), lua_Fn.round((b * 255), 2)
+            r, g, b = Lua_fn.round((r * 255), 2), Lua_fn.round((g * 255), 2), Lua_fn.round((b * 255), 2)
             driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b = r, g, b
             CFG.save("driftSmoke_T", driftSmoke_T)
           end
@@ -3293,7 +3362,7 @@ drift_mode_tab:add_imgui(function()
         if driftMinigame then
           ImGui.Dummy(1, 10)
           UI.coloredText("Your Highest Score: ", 'yellow', 0.92, 20); ImGui.SameLine()
-          ImGui.Text(string.format("%s Points", lua_Fn.separateInt(driftPB)))
+          ImGui.Text(string.format("%s Points", Lua_fn.separateInt(driftPB)))
         end
       end
     else
@@ -3539,8 +3608,7 @@ handling_tab:add_imgui(function()
     CFG.save("noEngineBraking", noEngineBraking)
     if not noEngineBraking then
       if engine_brake_disabled then
-        SS.setHandlingFlag(current_vehicle, HF._FREEWHEEL_NO_GAS, false)
-        log.debug('disabled')
+        SS.setHandlingFlag(HF._FREEWHEEL_NO_GAS, false)
       end
     end
   end
@@ -3553,7 +3621,7 @@ handling_tab:add_imgui(function()
     CFG.save("kersBoost", kersBoost)
     if not kersBoost then
       if kers_boost_enabled then
-        SS.setHandlingFlag(current_vehicle, HF._HAS_KERS, false)
+        SS.setHandlingFlag(HF._HAS_KERS, false)
         script.run_in_fiber(function()
           if VEHICLE.GET_VEHICLE_HAS_KERS(current_vehicle) then
             VEHICLE.SET_VEHICLE_KERS_ALLOWED(current_vehicle, false)
@@ -3570,7 +3638,7 @@ handling_tab:add_imgui(function()
     CFG.save("offroaderx2", offroaderx2)
     if not offroaderx2 then
       if offroader_enabled then
-        SS.setHandlingFlag(current_vehicle, HF._OFFROAD_ABILITIES_X2, false)
+        SS.setHandlingFlag(HF._OFFROAD_ABILITIES_X2, false)
       end
     end
   end
@@ -3583,7 +3651,7 @@ handling_tab:add_imgui(function()
     CFG.save("rallyTires", rallyTires)
     if not rallyTires then
       if rally_tires_enabled then
-        SS.setHandlingFlag(current_vehicle, HF._HAS_RALLY_TYRES, false)
+        SS.setHandlingFlag(HF._HAS_RALLY_TYRES, false)
       end
     end
   end
@@ -3595,7 +3663,7 @@ handling_tab:add_imgui(function()
     CFG.save("noTractionCtrl", noTractionCtrl)
     if not noTractionCtrl then
       if traction_ctrl_disabled and (is_bike or is_quad) then
-        SS.setHandlingFlag(current_vehicle, HF._FORCE_NO_TC_OR_SC, false)
+        SS.setHandlingFlag(HF._FORCE_NO_TC_OR_SC, false)
       end
     end
   end
@@ -3608,7 +3676,7 @@ handling_tab:add_imgui(function()
     CFG.save("easyWheelie", easyWheelie)
     if not easyWheelie then
       if easy_wheelie_enabled and (is_bike or is_quad) then
-        SS.setHandlingFlag(current_vehicle, HF._LOW_SPEED_WHEELIES, false)
+        SS.setHandlingFlag(HF._LOW_SPEED_WHEELIES, false)
       end
     end
   end
@@ -3906,7 +3974,7 @@ vehicle_creator:add_imgui(function()
           else
             table.insert(spawned_vehicles, spawned_vehicle)
             table.insert(spawned_vehNames, vehicleName)
-            local dupes = lua_Fn.getTableDupes(spawned_vehNames, vehicleName)
+            local dupes = Lua_fn.getTableDupes(spawned_vehNames, vehicleName)
             if dupes > 1 then
               newVehName = string.format("%s #%d", vehicleName, dupes)
               table.insert(filteredVehNames, newVehName)
@@ -4489,7 +4557,7 @@ business_tab:add_imgui(function()
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
             ImGui.ProgressBar((wh1Supplies / whouse1_max), 240, 30,
               tostring(wh1Supplies) .. " Crates (" .. tostring(math.floor((wh1Supplies / whouse1_max) * 100)) .. "%)")
-            ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh1Total))
+            ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(wh1Total))
           else
             ImGui.Text("Please select your warehouse size.")
           end
@@ -4563,7 +4631,7 @@ business_tab:add_imgui(function()
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
             ImGui.ProgressBar((wh2Supplies / whouse2_max), 240, 30,
               tostring(wh2Supplies) .. " Crates (" .. tostring(math.floor((wh2Supplies / whouse2_max) * 100)) .. "%)")
-            ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh2Total))
+            ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(wh2Total))
           else
             ImGui.Text("Please select your warehouse size.")
           end
@@ -4637,7 +4705,7 @@ business_tab:add_imgui(function()
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
             ImGui.ProgressBar((wh3Supplies / whouse3_max), 240, 30,
               tostring(wh3Supplies) .. " Crates (" .. tostring(math.floor((wh3Supplies / whouse3_max) * 100)) .. "%)")
-            ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh3Total))
+            ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(wh3Total))
           else
             ImGui.Text("Please select your warehouse size.")
           end
@@ -4711,7 +4779,7 @@ business_tab:add_imgui(function()
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
             ImGui.ProgressBar((wh4Supplies / whouse4_max), 240, 30,
               tostring(wh4Supplies) .. " Crates (" .. tostring(math.floor((wh4Supplies / whouse4_max) * 100)) .. "%)")
-            ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh4Total))
+            ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(wh4Total))
           else
             ImGui.Text("Please select your warehouse size.")
           end
@@ -4785,12 +4853,12 @@ business_tab:add_imgui(function()
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
             ImGui.ProgressBar((wh5Supplies / whouse5_max), 240, 30,
               tostring(wh5Supplies) .. " Crates (" .. tostring(math.floor((wh5Supplies / whouse5_max) * 100)) .. "%)")
-            ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(wh5Total))
+            ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(wh5Total))
           else
             ImGui.Text("Please select your warehouse size.")
           end
         end
-        ImGui.Separator(); ImGui.Spacing(); ImGui.Text("Total Value: " .. lua_Fn.formatMoney(ceo_moola))
+        ImGui.Separator(); ImGui.Spacing(); ImGui.Text("Total Value: " .. Lua_fn.formatMoney(ceo_moola))
         ImGui.EndTabItem()
       end
 
@@ -4829,7 +4897,7 @@ business_tab:add_imgui(function()
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
           ImGui.ProgressBar((hangarSupplies / 50), 240, 30,
             tostring(hangarSupplies) .. " Crates (" .. tostring(math.floor(hangarSupplies / 0.5)) .. "%)")
-          ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(hangarTotal))
+          ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(hangarTotal))
           if Game.Self.isOutside() then
             ImGui.Spacing(); ImGui.SeparatorText(QUICK_TP_TXT_)
             if ImGui.Button("Teleport To Hangar") then
@@ -4891,8 +4959,8 @@ business_tab:add_imgui(function()
             " Crates (" .. tostring(bunkerStock) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-            lua_Fn.formatMoney(bunkerTotal) ..
-            "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(bunkerTotal * 1.5)))
+            Lua_fn.formatMoney(bunkerTotal) ..
+            "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(bunkerTotal * 1.5)))
           if Game.Self.isOutside() then
             ImGui.Spacing(); ImGui.SeparatorText("Quick Teleport")
             if ImGui.Button("Teleport To Bunker") then
@@ -4954,7 +5022,7 @@ business_tab:add_imgui(function()
             tostring(fcashStock) .. " Boxes (" .. tostring(math.floor(fcashStock * 2.5)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-            lua_Fn.formatMoney(fcashTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(fcashTotal * 1.5)))
+            Lua_fn.formatMoney(fcashTotal) .. "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(fcashTotal * 1.5)))
         else
           ImGui.Text("You don't own a Fake Cash business.")
         end
@@ -4997,7 +5065,7 @@ business_tab:add_imgui(function()
             tostring(cokeStock) .. " Kilos (" .. tostring(cokeStock * 10) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-            lua_Fn.formatMoney(cokeTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(cokeTotal * 1.5)))
+            Lua_fn.formatMoney(cokeTotal) .. "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(cokeTotal * 1.5)))
         else
           ImGui.Text("You don't own a Cocaine business.")
         end
@@ -5040,7 +5108,7 @@ business_tab:add_imgui(function()
             tostring(methStock) .. " Pounds (" .. tostring(methStock * 5) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-            lua_Fn.formatMoney(methTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(methTotal * 1.5)))
+            Lua_fn.formatMoney(methTotal) .. "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(methTotal * 1.5)))
         else
           ImGui.Text("You don't own a Meth business.")
         end
@@ -5083,7 +5151,7 @@ business_tab:add_imgui(function()
             tostring(weedStock) .. " Pounds (" .. tostring(math.floor(weedStock / 8 * 10)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-            lua_Fn.formatMoney(weedTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(weedTotal * 1.5)))
+            Lua_fn.formatMoney(weedTotal) .. "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(weedTotal * 1.5)))
         else
           ImGui.Text("You don't own a Weed business.")
         end
@@ -5126,7 +5194,7 @@ business_tab:add_imgui(function()
             tostring(fdStock) .. " Boxes (" .. tostring(math.floor(fdStock / 6 * 10)) .. "%)")
           ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
           ImGui.Text("¤ Blaine County:  " ..
-            lua_Fn.formatMoney(fdTotal) .. "\n¤ Los Santos:      " .. lua_Fn.formatMoney(math.floor(fdTotal * 1.5)))
+            Lua_fn.formatMoney(fdTotal) .. "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(fdTotal * 1.5)))
         else
           ImGui.Text("You don't own a Document Forgery office.")
         end
@@ -5157,13 +5225,13 @@ business_tab:add_imgui(function()
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
           ImGui.ProgressBar((acidStock / 160), 240, 30,
             tostring(acidStock) .. " Sheets (" .. tostring(math.floor(acidStock / 16 * 10)) .. "%)")
-          ImGui.SameLine(); ImGui.Text("Value: " .. lua_Fn.formatMoney(acidTotal))
+          ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(acidTotal))
         else
           ImGui.Text("You don't own a Document Forgery office.")
         end
 
         ImGui.Separator(); ImGui.Spacing(); ImGui.Text("Total MC Business Value: " ..
-          lua_Fn.formatMoney(fcashTotal + cokeTotal + methTotal + weedTotal + fdTotal + acidTotal))
+          Lua_fn.formatMoney(fcashTotal + cokeTotal + methTotal + weedTotal + fdTotal + acidTotal))
 
         ------------------------MC Quick TP------------------------------
         if Game.Self.isOutside() then
@@ -5278,7 +5346,7 @@ business_tab:add_imgui(function()
             end
           end
           ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-          ImGui.ProgressBar(currNcSafeMoney / 250000, 240, 30, lua_Fn.formatMoney(currNcSafeMoney))
+          ImGui.ProgressBar(currNcSafeMoney / 250000, 240, 30, Lua_fn.formatMoney(currNcSafeMoney))
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##nc") then
@@ -5301,7 +5369,7 @@ business_tab:add_imgui(function()
           local currArSafeMoney = stats.get_int("MPX_ARCADE_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe: ")
           ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-          ImGui.ProgressBar(currArSafeMoney / 100000, 240, 30, lua_Fn.formatMoney(currArSafeMoney))
+          ImGui.ProgressBar(currArSafeMoney / 100000, 240, 30, Lua_fn.formatMoney(currArSafeMoney))
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##arcade") then
@@ -5322,7 +5390,7 @@ business_tab:add_imgui(function()
           ImGui.Spacing(); ImGui.SeparatorText("Agency")
           local currAgSafeMoney = stats.get_int("MPX_FIXER_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-          ImGui.ProgressBar(currAgSafeMoney / 250000, 240, 30, lua_Fn.formatMoney(currAgSafeMoney))
+          ImGui.ProgressBar(currAgSafeMoney / 250000, 240, 30, Lua_fn.formatMoney(currAgSafeMoney))
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##agnc") then
@@ -5343,7 +5411,7 @@ business_tab:add_imgui(function()
           ImGui.Spacing(); ImGui.SeparatorText("MC Clubhouse")
           local currClubHouseBarProfit = stats.get_int("MPX_BIKER_BAR_RESUPPLY_CASH")
           ImGui.BulletText("Bar Earnings:"); ImGui.SameLine(); ImGui.Dummy(2, 1); ImGui.SameLine();
-          ImGui.ProgressBar(currClubHouseBarProfit / 100000, 240, 30, lua_Fn.formatMoney(currClubHouseBarProfit))
+          ImGui.ProgressBar(currClubHouseBarProfit / 100000, 240, 30, Lua_fn.formatMoney(currClubHouseBarProfit))
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##mc") then
@@ -5364,7 +5432,7 @@ business_tab:add_imgui(function()
           ImGui.Spacing(); ImGui.SeparatorText("Bail Office")
           local currBailSafe = stats.get_int("MPX_BAIL_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe:"); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-          ImGui.ProgressBar(currBailSafe / 100000, 240, 30, lua_Fn.formatMoney(currBailSafe))
+          ImGui.ProgressBar(currBailSafe / 100000, 240, 30, Lua_fn.formatMoney(currBailSafe))
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##bail") then
@@ -5386,7 +5454,7 @@ business_tab:add_imgui(function()
           ImGui.Spacing(); ImGui.SeparatorText("Salvage Yard")
           local currSalvSafe = stats.get_int("MPX_SALVAGE_SAFE_CASH_VALUE")
           ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-          ImGui.ProgressBar(currSalvSafe / 250000, 240, 30, lua_Fn.formatMoney(currSalvSafe))
+          ImGui.ProgressBar(currSalvSafe / 250000, 240, 30, Lua_fn.formatMoney(currSalvSafe))
           if Game.Self.isOutside() then
             ImGui.SameLine()
             if ImGui.Button("Teleport##salvage") then
@@ -6115,7 +6183,7 @@ local playerVeh       = 0
 local player_name     = ""
 local playerWallet    = ""
 local playerBank      = ""
-local playerCoords    = vector3
+local playerCoords    = vec3:new(0.0, 0.0, 0.0)
 local godmode         = false
 local player_in_veh   = false
 local player_active   = false
@@ -6331,46 +6399,8 @@ world_tab:add_imgui(function()
   end
 
   if carpool then
-    if show_npc_veh_ctrls and thisVeh ~= 0 then
-      if ImGui.Button(string.format("< %s", PREVIOUS_SEAT_BTN_)) then
-        script.run_in_fiber(function()
-          if PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh) then
-            local numSeats = VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(thisVeh)
-            local mySeat   = Game.getPedVehicleSeat(self.get_ped())
-            if mySeat <= 0 then
-              mySeat = numSeats
-            end
-            mySeat = mySeat - 1
-            if VEHICLE.IS_VEHICLE_SEAT_FREE(thisVeh, mySeat, true) then
-              UI.widgetSound("Nav")
-              PED.SET_PED_INTO_VEHICLE(self.get_ped(), thisVeh, mySeat)
-            else
-              mySeat = mySeat - 1
-              return
-            end
-          end
-        end)
-      end
-      ImGui.SameLine()
-      if ImGui.Button(string.format("%s >", NEXT_SEAT_BTN_)) then
-        script.run_in_fiber(function()
-          if PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh) then
-            local numSeats = VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(thisVeh)
-            local mySeat   = Game.getPedVehicleSeat(self.get_ped())
-            if mySeat > numSeats then
-              mySeat = 0
-            end
-            mySeat = mySeat + 1
-            if VEHICLE.IS_VEHICLE_SEAT_FREE(thisVeh, mySeat, true) then
-              UI.widgetSound("Nav")
-              PED.SET_PED_INTO_VEHICLE(self.get_ped(), thisVeh, mySeat)
-            else
-              mySeat = mySeat + 1
-              return
-            end
-          end
-        end)
-      end
+    if show_npc_veh_ui then
+      SS.showNPCvehicleControls()
     end
   end
 
@@ -6971,7 +7001,7 @@ object_spawner:add_imgui(function()
         ImGui.PopItemWidth()
         boneData = filteredVehBones[selected_bone + 1]
         ImGui.SameLine()
-        if ImGui.Button(string.format(" %s ##veh"), GENERIC_ATTACH_BTN_) then
+        if ImGui.Button(string.format(" %s ##veh", GENERIC_ATTACH_BTN_)) then
           UI.widgetSound("Select2")
           script.run_in_fiber(function()
             ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject.entity, current_vehicle,
@@ -7040,7 +7070,7 @@ object_spawner:add_imgui(function()
       end
       UI.helpMarker(false, EDIT_MODE_DESC_)
       ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
-      if ImGui.Button(string.format("   %s   "), GENERIC_RESET_BTN_) then
+      if ImGui.Button(string.format("   %s   ", GENERIC_RESET_BTN_)) then
         UI.widgetSound("Select")
         script.run_in_fiber(function()
           if ENTITY.IS_ENTITY_ATTACHED(selected_att) then
@@ -7235,7 +7265,7 @@ object_spawner:add_imgui(function()
       end
       ImGui.Dummy(1, 5)
       if attachedToSelf and attached_props[1] ~= nil then
-        if ImGui.Button(string.format("  %s  ##obj"), GENERIC_SAVE_BTN_) then
+        if ImGui.Button(string.format("  %s  ##obj", GENERIC_SAVE_BTN_)) then
           UI.widgetSound("Select")
           ImGui.OpenPopup("persist props")
         end
@@ -7462,11 +7492,12 @@ settings_tab:add_imgui(function()
       CFG.save("shortcut_anim", {})
       gui.show_success("Samurais Scripts", "Animation shortcut has been reset.")
     end
+    UI.toolTip(false, DEL_HOTKEY_DESC_)
   else
     ImGui.BeginDisabled()
     ImGui.Button(ANIM_HOTKEY_DEL2_)
     ImGui.EndDisabled()
-    UI.toolTip(false, DEL_HOTKEY_DESC_)
+    UI.toolTip(false, NO_HOTKEY_TXT_)
   end
 
   ImGui.Spacing(); ImGui.Text("Supplies Autofill Delay:")
@@ -7696,6 +7727,9 @@ end)
 -- Game Input
 script.register_looped("GameInput", function()
   if is_typing or is_setting_hotkeys then
+    if not gui.is_open() then
+      is_typing, is_setting_hotkeys = false, false
+    end
     PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
   end
 
@@ -7714,6 +7748,10 @@ script.register_looped("GameInput", function()
 
   if ducking_in_car then
     PAD.DISABLE_CONTROL_ACTION(0, 73, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 75, true)
+  end
+
+  if is_carpooling then
     PAD.DISABLE_CONTROL_ACTION(0, 75, true)
   end
 
@@ -7912,6 +7950,11 @@ script.register_looped("self features", function(script)
       Game.Self.PhoneAnims(true)
       Game.Self.PlayPhoneGestures(script)
       phoneAnimsEnabled = true
+    else
+      if phoneAnimsEnabled then
+        Game.Self.PhoneAnims(false)
+        phoneAnimsEnabled = false
+      end
     end
   else
     if phoneAnimsEnabled then
@@ -8215,44 +8258,43 @@ script.register_looped("Hide From Cops", function(hfc)
 end)
 
 -- Actions
-script.register_looped("anim_interrupt_event", function(aiev)
+script.register_looped("AIEV", function(aiev) -- Anim Interrupt Event
   if is_playing_anim then
-    if curr_playing_anim.autoOff then
+    if Game.Self.isSwimming() then
+      cleanup(aiev)
+      is_playing_anim = false
+    end
+    local isLooped = Lua_fn.has_bit(anim_flag, 1)
+    local isFrozen = Lua_fn.has_bit(anim_flag, 2)
+    if not isLooped and not isFrozen then
+      repeat
+        aiev:sleep(200)
+      until not ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, 3)
       is_playing_anim = false
     end
     if Game.Self.isAlive() then
-      aiev:sleep(1000)
-      if is_playing_anim and not ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, 3) and not SS.isKeyJustPressed(keybinds.stop_anim.code) then
+      if is_playing_anim and not ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, 3)
+        and not SS.isKeyJustPressed(keybinds.stop_anim.code) then
+        aiev:sleep(1000)
+        if PED.IS_PED_FALLING(self.get_ped()) then
+          repeat
+            aiev:sleep(1000)
+          until not PED.IS_PED_FALLING(self.get_ped())
+          aiev:sleep(1000)
+          onAnimInterrupt(aiev)
+        end
         if PED.IS_PED_RAGDOLL(self.get_ped()) then
           repeat
-            aiev:sleep(500)
+            aiev:sleep(1000)
           until not PED.IS_PED_RAGDOLL(self.get_ped())
-          if Game.Self.isAlive() and not SS.isKeyJustPressed(keybinds.stop_anim.code) then -- we're still alive and we didn't manually stop it
-            onAnimInterrupt(aiev)
-          end
-        elseif PED.IS_PED_FALLING(self.get_ped()) then
-          repeat
-            aiev:sleep(500)
-          until not PED.IS_PED_FALLING(self.get_ped())
-          if Game.Self.isAlive() and not SS.isKeyJustPressed(keybinds.stop_anim.code) then
-            onAnimInterrupt(aiev)
-          end
-        else
-          aiev:sleep(100)
-          if Game.Self.isAlive() and not SS.isKeyJustPressed(keybinds.stop_anim.code) then
-            onAnimInterrupt(aiev)
-          end
+          aiev:sleep(1000)
+          onAnimInterrupt(aiev)
         end
+        onAnimInterrupt(aiev)
       end
     else
+      cleanup(aiev)
       is_playing_anim = false
-      if plyrProps[1] ~= nil then
-        for _, p in ipairs(plyrProps) do
-          if ENTITY.DOES_ENTITY_EXIST(p) then
-            ENTITY.DELETE_ENTITY(p)
-          end
-        end
-      end
     end
   end
 
@@ -8267,9 +8309,6 @@ script.register_looped("anim_interrupt_event", function(aiev)
 end)
 script.register_looped("MISC Anim Stuff", function(miscanim)
   if is_playing_anim or is_shortcut_anim then
-    if not curr_playing_anim.autoOff then
-      PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), false)
-    end
     if WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
       WEAPON.SET_CURRENT_PED_WEAPON(self.get_ped(), 0xA2719263, false)
     end
@@ -8291,7 +8330,7 @@ script.register_looped("MISC Anim Stuff", function(miscanim)
       miscanim:sleep(10)
     until is_playing_anim == false or is_shortcut_anim == false
     PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), true)
-    if lua_Fn.str_contains(string.lower(curr_playing_anim.name), "in-car") then
+    if curr_playing_anim.cat == "In-Vehicle" then
       if PAD.IS_CONTROL_PRESSED(0, 75) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) or Game.Self.isOnFoot() then
         cleanup(miscanim)
         is_playing_anim = false
@@ -8347,9 +8386,9 @@ script.register_looped("animation hotkey", function(script)
         if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
           if not is_playing_anim then
             if info ~= nil then
-              if lua_Fn.str_contains(string.lower(info.name), "in-car") and Game.Self.isOnFoot() then
+              if info.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
                 UI.widgetSound("Error")
-                gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle.")
+                gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle (cars and trucks only).")
               else
                 UI.widgetSound("Select")
                 local mycoords     = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
@@ -8359,16 +8398,16 @@ script.register_looped("animation hotkey", function(script)
                 local myboneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
                 local mybonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
                 if manualFlags then
-                  setmanualflag()
+                  anim_flag = setmanualflag()
                 else
-                  flag = info.flag
+                  anim_flag = info.flag
                 end
-                playAnim(info, self.get_ped(), flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, myboneIndex, mycoords,
+                playAnim(info, self.get_ped(), anim_flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, myboneIndex, mycoords,
                   myheading, myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX, script
                 )
                 curr_playing_anim = info
                 is_playing_anim   = true
-                if lua_Fn.str_contains(curr_playing_anim.name, "DJ") then
+                if Lua_fn.str_contains(curr_playing_anim.name, "DJ") then
                   if not is_playing_radio then
                     play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
                     anim_music = true
@@ -8400,9 +8439,13 @@ script.register_looped("animation hotkey", function(script)
       if HUD.DOES_BLIP_EXIST(b) then
         for _, npc in ipairs(spawned_npcs) do
           if PED.IS_PED_SITTING_IN_ANY_VEHICLE(npc) then
-            HUD.SET_BLIP_ALPHA(b, 0.0)
+            if HUD.GET_BLIP_ALPHA(b) > 1.0 then
+              HUD.SET_BLIP_ALPHA(b, 0.0)
+            end
           else
-            HUD.SET_BLIP_ALPHA(b, 1000.0)
+            if HUD.GET_BLIP_ALPHA(b) < 1000.0 then
+              HUD.SET_BLIP_ALPHA(b, 1000.0)
+            end
           end
         end
       end
@@ -8461,11 +8504,11 @@ script.register_looped("anim shortcut", function(animsc)
           animsc:sleep(500)
         end
         if Game.requestAnimDict(shortcut_anim.dict) then
-          playAnim(shortcut_anim, self.get_ped(), shortcut_anim.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
+          playAnim(shortcut_anim, self.get_ped(), anim_flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
             myboneIndex, mycoords, myheading, myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX, animsc
           )
           curr_playing_anim = shortcut_anim
-          if lua_Fn.str_contains(shortcut_anim.name, "DJ") then
+          if Lua_fn.str_contains(shortcut_anim.name, "DJ") then
             if not is_playing_radio then
               play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
               anim_music = true
@@ -8522,9 +8565,23 @@ script.register_looped("HashGrabber", function(hg)
     if WEAPON.IS_PED_ARMED(self.get_ped(), 4) and PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 24) then
       local ent  = Game.getAimedEntity()
       local hash = Game.getEntityModel(ent)
-      local type = Game.getEntityTypeString(ent)
-      log.debug("\n----- Info Gun -----" ..
-        "\n¤ Handle: " .. tostring(ent) .. "\n¤ Hash:   " .. tostring(hash) .. "\n¤ Type:   " .. tostring(type))
+      local type_index = SS.getEntityType(ent)
+      local eModelTypes <const> = {
+        [0]     = 'Invalid',
+        [1]     = 'Object',
+        [2]     = 'MLO',
+        [3]     = 'Time',
+        [4]     = 'Weapon',
+        [5]     = 'Vehicle',
+        [6]     = 'Ped',
+        [7]     = 'Destructible',
+        [33]    = 'Destructible',
+        [157]   = 'Building/Map Texture',
+        [43649] = 'Fixed Map Object',
+        [16385] = 'Fixed Map Object',
+      }
+      local type_name = eModelTypes[type_index] ~= nil and eModelTypes[type_index] or "Unk"
+      log.debug(string.format("\n----- Info Gun -----\n¤ Handle:      %d\n¤ Hash:        %d\n¤ Type Index:  %d\n¤ Type Name:   %s", ent, hash, type_index, type_name))
     end
   end
   hg:yield()
@@ -9426,7 +9483,7 @@ script.register_looped("drift counter", function(dcounter)
                   drift_streak_text = 'Banked Points: '
                   if not Game.isOnline() then
                     if drift_points > 100 then
-                      bankDriftPoints_SP(lua_Fn.round((drift_points / 10), 0))
+                      bankDriftPoints_SP(Lua_fn.round((drift_points / 10), 0))
                     end
                   end
                   if drift_points > driftPB then
@@ -9459,7 +9516,7 @@ script.register_looped("drift counter", function(dcounter)
               drift_streak_text = 'Banked Points: '
               if not Game.isOnline() then
                 if drift_points > 100 then
-                  bankDriftPoints_SP(lua_Fn.round((drift_points / 10), 0))
+                  bankDriftPoints_SP(Lua_fn.round((drift_points / 10), 0))
                 end
               end
               if drift_points > driftPB then
@@ -9512,7 +9569,7 @@ script.register_looped("extra points checker", function(epc)
       if not ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) then
         local vehicle_height = ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(current_vehicle)
         if vehicle_height > 0.8 and not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle) then
-          if vehicle_height >= 1.1 and vehicle_height <= 5 and not lua_Fn.str_contains(drift_extra_text, "Big Air!") then
+          if vehicle_height >= 1.1 and vehicle_height <= 5 and not Lua_fn.str_contains(drift_extra_text, "Big Air!") then
             drift_extra_pts  = drift_extra_pts + 1
             drift_points     = drift_points + drift_extra_pts
             drift_extra_text = string.format("Air  +%d pts", drift_extra_pts)
@@ -9580,7 +9637,7 @@ script.register_looped("drift multiplier", function(dmult)
 end)
 script.register_looped("drift points", function()
   if Game.Self.isDriving() and is_car and driftMinigame and is_drifting then
-    local diaplay_str = string.format("%s\n+%s pts", drift_streak_text, lua_Fn.separateInt(drift_points))
+    local diaplay_str = string.format("%s\n+%s pts", drift_streak_text, Lua_fn.separateInt(drift_points))
     showDriftCounter(diaplay_str)
     if drift_extra_pts > 0 or drift_extra_text ~= "" then
       showDriftExtra(drift_extra_text)
@@ -9768,30 +9825,46 @@ script.register_looped("no jacking", function(ctt)
 end)
 script.register_looped("DIE", function(die)
   if fender_bender then
-    if PED.IS_PED_IN_ANY_VEHICLE(self.get_ped(), false) then
-      local myPos      = self.get_pos()
-      local veh_speed  = ENTITY.GET_ENTITY_SPEED(current_vehicle)
-      local shake_amp  = veh_speed / 30
-      local soundName  = PED.IS_PED_MALE(self.get_ped()) and "WAVELOAD_PAIN_MALE" or "WAVELOAD_PAIN_FEMALE"
-      local Occupants  = Game.Vehicle.getOccupants(current_vehicle)
-      local crashed, _ = checkVehicleCollision()
+    if Game.Self.isDriving() and (is_car or is_bike or is_quad) then
+      local myPos       = self.get_pos()
+      local veh_speed   = ENTITY.GET_ENTITY_SPEED(current_vehicle)
+      local shake_amp   = veh_speed / 30
+      local soundName   = PED.IS_PED_MALE(self.get_ped()) and "WAVELOAD_PAIN_MALE" or "WAVELOAD_PAIN_FEMALE"
+      local Occupants   = Game.Vehicle.getOccupants(current_vehicle)
+      local crashed, _  = checkVehicleCollision()
+      local deform_mult = SS.getVehicleInfo().m_deformation_mult
+      if deform_mult:get_float() < 2.0 then
+        deform_mult:set_float(2.0)
+      end
       if veh_speed >= 20 and ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) and crashed then
         CAM.SHAKE_GAMEPLAY_CAM("GRENADE_EXPLOSION_SHAKE", shake_amp)
-        AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE("SCREAM_PANIC_SHORT", soundName, myPos.x, myPos.y, myPos.z,
-        "SPEECH_PARAMS_FORCE_SHOUTED")
-        if veh_speed > 33 and veh_speed < 45 then
-          GRAPHICS.ANIMPOSTFX_PLAY("ULP_PLAYERWAKEUP", 3000, false)
-          if not ENTITY.IS_ENTITY_A_MISSION_ENTITY(current_vehicle) then
-            VEHICLE.SET_VEHICLE_ENGINE_HEALTH(current_vehicle, (VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) - 100))
+        if veh_speed >= 33 and veh_speed < 50 then
+          die:sleep(100)
+          if ENTITY.GET_ENTITY_SPEED(current_vehicle) < veh_speed - 5 then
+            if not ENTITY.IS_ENTITY_A_MISSION_ENTITY(current_vehicle) then
+              VEHICLE.SET_VEHICLE_ENGINE_HEALTH(current_vehicle, (VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) - 200))
+            end
+            for _, ped in ipairs(Occupants) do
+              ENTITY.SET_ENTITY_HEALTH(ped, (ENTITY.GET_ENTITY_HEALTH(ped) - (20 + (shake_amp * 5))), 0, 0)
+            end
+            if not GRAPHICS.ANIMPOSTFX_IS_RUNNING("ULP_PLAYERWAKEUP") then
+              if Game.Self.isAlive() then
+                GRAPHICS.ANIMPOSTFX_PLAY("ULP_PLAYERWAKEUP", 5000, false)
+                if Game.isOnline() then
+                  AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE("SCREAM_PANIC_SHORT", soundName, myPos.x, myPos.y, myPos.z,
+                  "SPEECH_PARAMS_FORCE_SHOUTED")
+                end
+              end
+            end
           end
-          for _, ped in ipairs(Occupants) do
-            ENTITY.SET_ENTITY_HEALTH(ped, (ENTITY.GET_ENTITY_HEALTH(ped) - (20 + (shake_amp * 5))), 0, 0)
-          end
-        end
-        if veh_speed >= 45 then
+        elseif veh_speed >= 50 then
           die:sleep(200)
           if ENTITY.GET_ENTITY_SPEED(current_vehicle) < veh_speed / 2 then
             VEHICLE.SET_VEHICLE_OUT_OF_CONTROL(current_vehicle, true, false)
+            if Game.isOnline() then
+              AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE("DEATH_HIGH_MEDIUM", soundName, myPos.x, myPos.y, myPos.z,
+              "SPEECH_PARAMS_FORCE_SHOUTED")
+            end
             if not ENTITY.IS_ENTITY_A_MISSION_ENTITY(current_vehicle) then
               VEHICLE.SET_VEHICLE_ENGINE_HEALTH(current_vehicle, -4000)
             end
@@ -9802,7 +9875,7 @@ script.register_looped("DIE", function(die)
             end
           end
         end
-        die:sleep(3000)
+        die:sleep(1000)
       end
     end
   end
@@ -10005,21 +10078,21 @@ script.register_looped("TowPos Marker", function()
     end
   end
 end)
-script.register_looped("HFE", function(hfe)
+script.register_looped("HFE", function(hfe) -- Handling Flags Editor
   if Game.Self.isOutside() then
     if Game.Self.isDriving() and current_vehicle == last_vehicle
       and not is_plane and not is_heli and not is_boat
       and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
       if noEngineBraking then
         if not engine_brake_disabled then
-          SS.setHandlingFlag(current_vehicle, HF._FREEWHEEL_NO_GAS, true)
+          SS.setHandlingFlag(HF._FREEWHEEL_NO_GAS, true)
           hfe:sleep(100)
         end
       end
 
       if kersBoost then
         if not kers_boost_enabled and not VEHICLE.GET_VEHICLE_HAS_KERS(current_vehicle) then
-          SS.setHandlingFlag(current_vehicle, HF._HAS_KERS, true)
+          SS.setHandlingFlag(HF._HAS_KERS, true)
           VEHICLE.SET_VEHICLE_KERS_ALLOWED(current_vehicle, true)
           hfe:sleep(100)
         end
@@ -10027,14 +10100,14 @@ script.register_looped("HFE", function(hfe)
 
       if offroaderx2 then
         if not offroader_enabled then
-          SS.setHandlingFlag(current_vehicle, HF._OFFROAD_ABILITIES_X2, true)
+          SS.setHandlingFlag(HF._OFFROAD_ABILITIES_X2, true)
           hfe:sleep(100)
         end
       end
 
       if rallyTires then
         if not rally_tires_enabled then
-          SS.setHandlingFlag(current_vehicle, HF._HAS_RALLY_TYRES, true)
+          SS.setHandlingFlag(HF._HAS_RALLY_TYRES, true)
           hfe:sleep(100)
         end
       end
@@ -10042,14 +10115,14 @@ script.register_looped("HFE", function(hfe)
       if is_bike or is_quad then
         if noTractionCtrl then
           if not traction_ctrl_disabled then
-            SS.setHandlingFlag(current_vehicle, HF._FORCE_NO_TC_OR_SC, true)
+            SS.setHandlingFlag(HF._FORCE_NO_TC_OR_SC, true)
             hfe:sleep(100)
           end
         end
 
         if easyWheelie then
           if not easy_wheelie_enabled then
-            SS.setHandlingFlag(current_vehicle, HF._LOW_SPEED_WHEELIES, true)
+            SS.setHandlingFlag(HF._LOW_SPEED_WHEELIES, true)
             hfe:sleep(100)
           end
         end
@@ -10058,36 +10131,36 @@ script.register_looped("HFE", function(hfe)
       -- the ones below do work but the steering is not rendered.
       -- if rwSteering then
       --   if not rw_steering_enabled then
-      --     SS.setHandlingFlag(current_vehicle, HF._STEER_REARWHEELS, true)
+      --     SS.setHandlingFlag(HF._STEER_REARWHEELS, true)
       --     hfe:sleep(100)
       --   end
       -- else
       --   if rw_steering_enabled then
-      --     SS.setHandlingFlag(current_vehicle, HF._STEER_REARWHEELS, false)
+      --     SS.setHandlingFlag(HF._STEER_REARWHEELS, false)
       --     hfe:sleep(100)
       --   end
       -- end
 
       -- if awSteering then
       --   if not aw_steering_enabled then
-      --     SS.setHandlingFlag(current_vehicle, HF._STEER_ALL_WHEELS, true)
+      --     SS.setHandlingFlag(HF._STEER_ALL_WHEELS, true)
       --     hfe:sleep(100)
       --   end
       -- else
       --   if aw_steering_enabled then
-      --     SS.setHandlingFlag(current_vehicle, HF._STEER_ALL_WHEELS, false)
+      --     SS.setHandlingFlag(HF._STEER_ALL_WHEELS, false)
       --     hfe:sleep(100)
       --   end
       -- end
 
       -- if handbrakeSteering then
       --   if not hb_steering_enabled then
-      --     SS.setHandlingFlag(current_vehicle, HF._HANDBRAKE_REARWHEELSTEER, true)
+      --     SS.setHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER, true)
       --     hfe:sleep(100)
       --   end
       -- else
       --   if hb_steering_enabled then
-      --     SS.setHandlingFlag(current_vehicle, HF._HANDBRAKE_REARWHEELSTEER, false)
+      --     SS.setHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER, false)
       --     hfe:sleep(100)
       --   end
       -- end
@@ -10248,14 +10321,22 @@ script.register_looped("Carpool", function(cp)
       end
     end
     if PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh) then
-      if VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(thisVeh) > 1 then
-        show_npc_veh_ctrls = true
-      end
-      stop_searching  = true
-      local Occupants = Game.Vehicle.getOccupants(thisVeh)
+      is_carpooling          = true
+      local Occupants        = Game.Vehicle.getOccupants(thisVeh)
+      local numPassengers    = VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(thisVeh)
+      npcDriver              = VEHICLE.GET_PED_IN_VEHICLE_SEAT(thisVeh, -1, true)
+      npc_veh_has_conv_roof  = VEHICLE.IS_VEHICLE_A_CONVERTIBLE(thisVeh, false)
+      show_npc_veh_seat_ctrl = numPassengers > 1
+      stop_searching         = true
+      show_npc_veh_ui        = true
       repeat
+        npc_veh_radio_on = AUDIO.IS_VEHICLE_RADIO_ON(thisVeh)
+        npc_veh_speed    = ENTITY.GET_ENTITY_SPEED(thisVeh)
+        if npc_veh_has_conv_roof then
+          npc_veh_roof_state = VEHICLE.GET_CONVERTIBLE_ROOF_STATE(thisVeh)
+        end
         cp:sleep(100)
-      until not PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh)
+      until not PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh) or not PED.IS_PED_SITTING_IN_VEHICLE(npcDriver, thisVeh)
       for _, occupant in ipairs(Occupants) do
         if occupant ~= nil and ENTITY.IS_ENTITY_A_PED(occupant) and not PED.IS_PED_A_PLAYER(occupant) then
           PED.SET_PED_CONFIG_FLAG(occupant, 251, false)
@@ -10264,13 +10345,36 @@ script.register_looped("Carpool", function(cp)
           PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(occupant, false)
         end
       end
-      show_npc_veh_ctrls = false
-      stop_searching     = false
+      is_carpooling          = false
+      stop_searching         = false
+      show_npc_veh_ui        = false
+      show_npc_veh_seat_ctrl = false
+      thisVeh                = 0
+      npcDriver              = 0
+      npcDriveTask           = ""
     else
-      show_npc_veh_ctrls = false
+      is_carpooling = false
+      if show_npc_veh_ui then
+        show_npc_veh_ui = false
+      end
+      if show_npc_veh_seat_ctrl then
+        show_npc_veh_seat_ctrl = false
+      end
     end
   end
-  cp:yield()
+end)
+script.register_looped("CPEF", function(cpef) -- carpool exit fix
+  if is_carpooling then
+    if PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) then
+      if not VEHICLE.IS_VEHICLE_STOPPED(thisVeh) then
+        TASK.TASK_VEHICLE_TEMP_ACTION(npcDriver, thisVeh, 1, 3000)
+        repeat
+          cpef:sleep(10)
+        until VEHICLE.IS_VEHICLE_STOPPED(thisVeh)
+      end
+      TASK.TASK_LEAVE_VEHICLE(self.get_ped(), thisVeh, 0)
+    end
+  end
 end)
 script.register_looped("World Bounds", function()
   if extend_world then
@@ -10907,7 +11011,7 @@ event.register_handler(menu_event.Wndproc, function(hwnd, msg, wParam, lParam)
         if key.just_pressed then
           SS.debug(
             "\10--- Pressed Key ---" .. "\10 ¤ Name:       " .. key.name .. "\10 ¤ Keycode:    " ..
-            lua_Fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit 24 Set: " .. tostring((lParam & (0x1 << 24)) ~= 0)
+            Lua_fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit 24 Set: " .. tostring((lParam & (0x1 << 24)) ~= 0)
             .. "\10 ¤ SYSKEY:     " .. tostring(msg == WM._SYSKEYDOWN)
           )
         end

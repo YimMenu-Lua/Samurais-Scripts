@@ -464,5 +464,5 @@ local function YimConfig()
   end
   return yc
 end
-log.info(string.format("YimConfig v%s sucessfully loaded\n%s", YimConfig()._version, YimConfig()._credits))
+log.info(string.format("YimConfig v%s successfully loaded\n%s", YimConfig()._version, YimConfig()._credits))
 return YimConfig()

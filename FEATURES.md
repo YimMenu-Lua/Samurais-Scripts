@@ -46,6 +46,7 @@
 - **Actions:**
 
   - **An improved version of [YimActions](https://github.com/xesdoog/YimActions) with the side features moved into the main Self tab. The improvements include:**
+    - The ability to sort animations by category.
     - The ability to set a custom shortcut key for a specific animation so that you could play it any time you want.
     - Some animations produce sound (Sleeping, Crying, DJ *(plays loud music)*, some uh... uhm, NSFW animations also play sounds).
     - An option to browse and play animations using hotkeys. This option may interfere with gameplay so you can enable/disable it any time you want.

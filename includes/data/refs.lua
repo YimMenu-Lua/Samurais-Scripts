@@ -1469,3 +1469,16 @@ translations_button_map = {
   {name = "rod_tt",            kbm = KBM_ROD_BUTTON,        gpad = GPAD_ROD_BUTTON},
   {name = "triggerbot_tt",     kbm = KBM_TRIGGERBOT_BUTTON, gpad = GPAD_TRIGGERBOT_BUTTON},
 }
+
+collision_invalid_models = {
+  3008087081,
+  415536433,
+  874602658,
+  693843550,
+  4189527861,
+  1152297372,
+  3907562202,
+  2954040756,
+  1198649884,
+  1067874014,
+}

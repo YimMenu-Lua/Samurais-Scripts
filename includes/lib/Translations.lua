@@ -9013,7 +9013,7 @@ Labels = {
 	["Play Scenarios On NPCs:"] = {
 		{
 			iso = "en-US",
-			text = "Play Animations On NPCs:",
+			text = "Play Scenarios On NPCs:",
 		},
 		{
 			iso = "de-DE",
