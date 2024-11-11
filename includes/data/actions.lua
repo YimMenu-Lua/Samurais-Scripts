@@ -404,6 +404,7 @@ npcList = {
   { group = PED_TYPE._CIVMALE,    hash = 0x850446EC, name = "Lazlow" },
   { group = PED_TYPE._CIVMALE,    hash = 0xE80E9160, name = "Brucie Kibbutz" },
   { group = PED_TYPE._CIVMALE,    hash = 0x64611296, name = "Alien" },
+  { group = PED_TYPE._ANIMAL,     hash = 0x573201B8, name = "Cat <3" },
 }
 
 ---@param s script_util
@@ -436,6 +437,9 @@ function cleanup(s)
     local current_coords = self.get_pos()
     ENTITY.SET_ENTITY_COORDS_NO_OFFSET(self.get_ped(), current_coords.x, current_coords.y, current_coords.z, true,
       false, false)
+  end
+  if curr_playing_anim.dict ~= nil then
+    STREAMING.REMOVE_ANIM_DICT(curr_playing_anim.dict)
   end
 end
 

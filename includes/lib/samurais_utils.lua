@@ -126,6 +126,10 @@ function initStrings()
   ANIM_UPPER_DESC_   = translateLabel("UpperBodyOnly_tt")
   ANIM_FREEZE_CB_    = translateLabel("Freeze")
   ANIM_FREEZE_DESC_  = translateLabel("Freeze_tt")
+  ANIM_NO_COLL_CB_   = translateLabel("nocoll_cb")
+  ANIM_NO_COLL_DESC_ = translateLabel("nocoll_tt")
+  ANIM_KOE_CB_       = translateLabel("koe_cb")
+  ANIM_KOE_DESC_     = translateLabel("koe_tt")
   ANIM_GRAB_ERROR_   = translateLabel("You can not play animations while grabbing an NPC.")
   ANIM_STOP_DESC_    = translateLabel("stopAnims_tt")
   ANIM_DETACH_BTN_   = translateLabel("Remove Attachments")
@@ -210,7 +214,7 @@ function initStrings()
   HIGH_BEAMS_DESC_         = translateLabel("highbeams_tt")
   BRAKE_LIGHT_DESC_        = translateLabel("brakeLight_tt")
   IV_STYLE_EXIT_DESC_      = translateLabel("engineOn_tt")
-  KEEP_WHEELS_TURNED_DESC_ = translateLabel("engineOn_tt")
+  KEEP_WHEELS_TURNED_DESC_ = translateLabel("wheelsturned_tt")
   CANT_TOUCH_THIS_DESC_    = translateLabel("canttouchthis_tt")
   INSTA_180_DESC_          = translateLabel("insta180_tt")
   FLARES_FOR_ALL_DESC_     = translateLabel("flaresforall_tt")
@@ -786,6 +790,12 @@ Lua_fn.joaat = function(key)
   hash = hash + (hash << 15)
   hash = hash & 0xFFFFFFFF
   return hash
+end
+
+---@param vector3 vec3
+---@param includeZ boolean
+Lua_fn.inverseVec = function(vector3, includeZ)
+  return vec3:new(-vector3.x, -vector3.y, includeZ and -vector3.z or vector3.z)
 end
 
 
@@ -2111,6 +2121,8 @@ SS.reset_settings = function()
   looped                  = false; CFG.save("looped", looped)
   upperbody               = false; CFG.save("upperbody", upperbody)
   freeze                  = false; CFG.save("freeze", freeze)
+  noCollision             = false; CFG.save("noCollision", noCollision)
+  killOnEnd               = false; CFG.save("killOnEnd", killOnEnd)
   usePlayKey              = false; CFG.save("usePlayKey", usePlayKey)
   npc_godMode             = false; CFG.save("npc_godMode", npc_godMode)
   bypass_casino_bans      = false; CFG.save("bypass_casino_bans", bypass_casino_bans)
@@ -2810,8 +2822,7 @@ Game.Self.PlayPhoneGestures = function(s)
       )
       repeat
         s:sleep(10)
-      until
-        AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() == false
+      until not AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() or not SS.canUsePhoneAnims()
       TASK.TASK_STOP_PHONE_GESTURE_ANIMATION(self.get_ped(), 0.25)
     end
   end
@@ -2844,6 +2855,7 @@ Game.Self.isInCarModShop = function()
 end
 
 ---@class Vehicle
+-- Conflicts with YimLLS `Vehicle` alias.
 Game.Vehicle = {}
 Game.Vehicle.__index = Game.Vehicle
 
@@ -2961,7 +2973,7 @@ Game.Vehicle.setCustomPaint = function(veh, hex, p, m, is_primary, is_secondary)
   end
 end
 
----@class Game.World
+---@class World
 Game.World = {}
 Game.World.__index = Game.World
 

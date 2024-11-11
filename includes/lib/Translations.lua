@@ -8596,6 +8596,144 @@ Labels = {
 			text = "Zamraża animację na ostatniej klatce. Przydatne w animacjach ragdoll/sleeping/dead.",
 		},
 	},
+	koe_cb = {
+		{
+			iso = "en-US",
+			text = "Kill At The End",
+		},
+		{
+			iso = "de-DE",
+			text = "Töte am Ende",
+		},
+		{
+			iso = "fr-FR",
+			text = "Tuer A La Fin",
+		},
+		{
+			iso = "it-IT",
+			text = "Uccidi Alla Fine",
+		},
+		{
+			iso = "pt-BR",
+			text = "Mate No Final",
+		},
+		{
+			iso = "ru-RU",
+			text = "Убить в конце",
+		},
+		{
+			iso = "es-ES",
+			text = "Matar al final",
+		},
+		{
+			iso = "zh-CN",
+			text = "杀到最后",
+		},
+		{
+			iso = "zh-TW",
+			text = "殺到最後",
+		},
+		{
+			iso = "ja-JP",
+			text = "最後に殺す",
+		},
+		{
+			iso = "pl-PL",
+			text = "Zabij na końcu",
+		},
+	},
+	koe_tt = {
+		{
+			iso = "en-US",
+			text = "Kills the ped when the animation ends (Doesn't work with 'Loop').",
+		},
+		{
+			iso = "de-DE",
+			text = "Tötet den Fußgänger, wenn die Animation endet (Funktioniert nicht mit 'Loop').",
+		},
+		{
+			iso = "fr-FR",
+			text = "Tue le piéton lorsque l'animation se termine (Ne fonctionne pas avec 'Loop').",
+		},
+		{
+			iso = "it-IT",
+			text = "Uccide il pedone quando l'animazione finisce (Non funziona con 'Loop').",
+		},
+		{
+			iso = "pt-BR",
+			text = "Mata o ped quando a animação termina (Não funciona com 'Loop').",
+		},
+		{
+			iso = "ru-RU",
+			text = "Убивает пешехода по окончании анимации (Не работает с 'Loop').",
+		},
+		{
+			iso = "es-ES",
+			text = "Mata al peatón cuando termina la animación (No funciona con 'Loop').",
+		},
+		{
+			iso = "zh-CN",
+			text = "动画结束时杀死行人 (不适用于“循环”)。",
+		},
+		{
+			iso = "zh-TW",
+			text = "動畫結束時殺死玩家 (不適用於“循環”)。",
+		},
+		{
+			iso = "ja-JP",
+			text = "アニメーションが終了すると PED を終了します (「ループ」では動作しません)。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Zabija pieszego po zakończeniu animacji (Nie działa z 'Loop').",
+		},
+	},
+	nocoll_cb = {
+		{
+			iso = "en-US",
+			text = "Disable Collision",
+		},
+		{
+			iso = "de-DE",
+			text = "Kollision deaktivieren",
+		},
+		{
+			iso = "fr-FR",
+			text = "Désactiver La Collision",
+		},
+		{
+			iso = "it-IT",
+			text = "Disabilita Collisione",
+		},
+		{
+			iso = "pt-BR",
+			text = "Desabilitar Colisão",
+		},
+		{
+			iso = "ru-RU",
+			text = "Отключить столкновение",
+		},
+		{
+			iso = "es-ES",
+			text = "Desactivar Colisión",
+		},
+		{
+			iso = "zh-CN",
+			text = "禁用碰撞",
+		},
+		{
+			iso = "zh-TW",
+			text = "禁用碰撞",
+		},
+		{
+			iso = "ja-JP",
+			text = "衝突を無効にする",
+		},
+		{
+			iso = "pl-PL",
+			text = "Wyłącz kolizję",
+		},
+	},
 	["You can not play animations while grabbing an NPC."] = {
 		{
 			iso = "en-US",

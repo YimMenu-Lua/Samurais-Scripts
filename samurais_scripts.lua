@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.4.2'
+SCRIPT_VERSION = '1.4.3'
 TARGET_BUILD   = '3351'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -31,6 +31,7 @@ DEFAULT_CONFIG         = {
   whouse_3_size           = { small = false, medium = false, large = false },
   whouse_4_size           = { small = false, medium = false, large = false },
   whouse_5_size           = { small = false, medium = false, large = false },
+  -- my_pet_T                = { hash = nil, id = nil, name = nil, adoption_date = nil },
   keybinds                = {
     rodBtn        = { code = 0x58, name = "[X]" },
     tdBtn         = { code = 0x10, name = "[Shift]" },
@@ -73,6 +74,8 @@ DEFAULT_CONFIG         = {
   looped                  = false,
   upperbody               = false,
   freeze                  = false,
+  noCollision             = false,
+  killOnEnd               = false,
   usePlayKey              = false,
   replaceSneakAnim        = false,
   replacePointAct         = false,
@@ -208,10 +211,13 @@ controllable           = CFG.read("controllable")
 looped                 = CFG.read("looped")
 upperbody              = CFG.read("upperbody")
 freeze                 = CFG.read("freeze")
+noCollision            = CFG.read("noCollision")
+killOnEnd              = CFG.read("killOnEnd")
 disableProps           = CFG.read("disableProps")
 npc_godMode            = CFG.read("npc_godMode")
 usePlayKey             = CFG.read("usePlayKey")
 shortcut_anim          = CFG.read("shortcut_anim")
+-- my_pet_T               = CFG.read("my_pet_T")
 Triggerbot             = CFG.read("Triggerbot")
 aimEnemy               = CFG.read("aimEnemy")
 autoKill               = CFG.read("autoKill")
@@ -401,6 +407,8 @@ scenario_index         = 0
 recents_index          = 0
 fav_actions_index      = 0
 npc_index              = 0
+-- myPet                  = 0
+-- pet_index              = 0
 actions_switch         = 0
 Entity                 = 0
 timerA                 = 0
@@ -436,6 +444,7 @@ npcDrivingSpeed        = 19
 drift_multiplier       = 1
 quote_alpha            = 1
 pedthrowF              = 10
+-- pet_name               = ""
 drift_streak_text      = ""
 drift_extra_text       = ""
 actions_search         = ""
@@ -982,28 +991,15 @@ local function displayNpcs()
   npc_index, used = ImGui.Combo("##npcList", npc_index, npcNames, #filteredNpcs)
 end
 
-local function setmanualflag()
-  if looped then
-    flag_loop = 1
-  else
-    flag_loop = 0
-  end
-  if freeze then
-    flag_freeze = 2
-  else
-    flag_freeze = 0
-  end
-  if upperbody then
-    flag_upperbody = 16
-  else
-    flag_upperbody = 0
-  end
-  if controllable then
-    flag_control = 32
-  else
-    flag_control = 0
-  end
-  return flag_loop + flag_freeze + flag_upperbody + flag_control
+---@return number
+local function setAnimFlags()
+  local flag_loop      = Lua_fn.condReturn(looped, AF._LOOPING, 0)
+  local flag_freeze    = Lua_fn.condReturn(freeze, AF._HOLD_LAST_FRAME, 0)
+  local flag_upperbody = Lua_fn.condReturn(upperbody, AF._UPPERBODY, 0)
+  local flag_control   = Lua_fn.condReturn(controllable, AF._SECONDARY, 0)
+  local flag_collision = Lua_fn.condReturn(noCollision, AF._TURN_OFF_COLLISION, 0)
+  local flag_killOnEnd = Lua_fn.condReturn(killOnEnd, AF._ENDS_IN_DEAD_POSE, 0)
+  return flag_loop + flag_freeze + flag_upperbody + flag_control + flag_collision + flag_killOnEnd
 end
 
 local function setdrunk()
@@ -1093,14 +1089,14 @@ local function setballistic()
   end)
 end
 
----@param s script_util
-function onAnimInterrupt(s)
+function onAnimInterrupt()
   if is_playing_anim and Game.Self.isAlive() and not SS.isKeyJustPressed(keybinds.stop_anim.code)
     and not ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, 3) then
     if Game.requestAnimDict(curr_playing_anim.dict) then
-      TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+      local curr_flag = manualFlags and anim_flag or curr_playing_anim.flag
+      TASK.CLEAR_PED_TASKS(self.get_ped())
       TASK.TASK_PLAY_ANIM(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, 4.0, -4.0, -1,
-        anim_flag, 1.0, false, false, false)
+      curr_flag, 1.0, false, false, false)
     end
   end
 end
@@ -1137,46 +1133,68 @@ Actions:add_imgui(function()
     if filteredAnims ~= nil then
       info = filteredAnims[anim_index + 1]
     end
+
     ImGui.Separator(); manualFlags, used = ImGui.Checkbox("Edit Flags", manualFlags)
     if used then
       CFG.save("manualFlags", manualFlags)
       UI.widgetSound("Nav2")
     end
     UI.helpMarker(false, ANIM_FLAGS_DESC_)
+
     ImGui.SameLine(); disableProps, used = ImGui.Checkbox("Disable Props", disableProps)
     if used then
       CFG.save("disableProps", disableProps)
       UI.widgetSound("Nav2")
     end
     UI.helpMarker(false, ANIM_PROPS_DESC_)
+
     if manualFlags then
-      ImGui.Separator()
-      controllable, used = ImGui.Checkbox(ANIM_CONTROL_CB_, controllable)
-      if used then
+      controllable, controlUsed = ImGui.Checkbox(ANIM_CONTROL_CB_, controllable)
+      if controlUsed then
         CFG.save("controllable", controllable)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, ANIM_CONTROL_DESC_)
+
       ImGui.SameLine(); ImGui.Dummy(27, 1); ImGui.SameLine()
-      looped, used = ImGui.Checkbox("Loop", looped)
-      if used then
+      looped, loopUsed = ImGui.Checkbox("Loop", looped)
+      if loopUsed then
         CFG.save("looped", looped)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, ANIM_LOOP_DESC_)
-      upperbody, used = ImGui.Checkbox(ANIM_UPPER_CB_, upperbody)
-      if used then
+
+      upperbody, upperbodyUsed = ImGui.Checkbox(ANIM_UPPER_CB_, upperbody)
+      if upperbodyUsed then
         CFG.save("upperbody", upperbody)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, ANIM_UPPER_DESC_)
+
       ImGui.SameLine(); ImGui.Dummy(1, 1); ImGui.SameLine()
-      freeze, used = ImGui.Checkbox(ANIM_FREEZE_CB_, freeze)
-      if used then
+      freeze, freezeUsed = ImGui.Checkbox(ANIM_FREEZE_CB_, freeze)
+      if freezeUsed then
         CFG.save("freeze", freeze)
         UI.widgetSound("Nav2")
       end
       UI.helpMarker(false, ANIM_FREEZE_DESC_)
+
+      noCollision, noCollUsed = ImGui.Checkbox(ANIM_NO_COLL_CB_, noCollision)
+      if noCollUsed then
+        CFG.save("noCollision", noCollision)
+        UI.widgetSound("Nav2")
+      end
+
+      ImGui.SameLine(); ImGui.Dummy(35, 1); ImGui.SameLine()
+      ImGui.BeginDisabled(looped)
+      killOnEnd, koeUsed = ImGui.Checkbox(ANIM_KOE_CB_, killOnEnd)
+      if koeUsed then
+        CFG.save("killOnEnd", killOnEnd)
+        UI.widgetSound("Nav2")
+      end
+      ImGui.EndDisabled()
+      UI.helpMarker(false, ANIM_KOE_DESC_)
+      ImGui.Separator()
     end
     if ImGui.Button(string.format("%s##anim", GENERIC_PLAY_BTN_)) then
       if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
@@ -1194,7 +1212,7 @@ Actions:add_imgui(function()
           local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
           local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
           if manualFlags then
-            anim_flag= setmanualflag()
+            anim_flag= setAnimFlags()
           else
             anim_flag = info.flag
           end
@@ -1356,7 +1374,7 @@ Actions:add_imgui(function()
             if ImGui.Button(string.format("%s##shortcut", GENERIC_CONFIRM_BTN_)) then
               UI.widgetSound("Select")
               if manualFlags then
-                anim_flag = setmanualflag()
+                anim_flag = setAnimFlags()
               else
                 anim_flag = chosen_anim.flag
               end
@@ -1568,7 +1586,7 @@ Actions:add_imgui(function()
     ImGui.SameLine()
     if ImGui.Button(string.format("%s##anim_npc", GENERIC_PLAY_BTN_)) then
       if spawned_npcs[1] ~= nil then
-        if info.cat == "In-Vehicle" and( Game.Self.isOnFoot() or not is_car) then
+        if info.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
           UI.widgetSound("Error")
           gui.show_error("Samurai's Scripts", "This animation can only be played while sitting inside a vehicle (cars and trucks only).")
           goto pass
@@ -1584,7 +1602,7 @@ Actions:add_imgui(function()
               local npcBoneIndex   = PED.GET_PED_BONE_INDEX(v, info.boneID)
               local npcBboneCoords = PED.GET_PED_BONE_COORDS(v, info.boneID, 0.0, 0.0, 0.0)
               if manualFlags then
-                anim_flag = setmanualflag()
+                anim_flag = setAnimFlags()
               else
                 anim_flag = info.flag
               end
@@ -1623,6 +1641,7 @@ Actions:add_imgui(function()
       tab2Sound = false
       tab1Sound = true
       tab3Sound = true
+      tab4Sound = true
     end
     ImGui.PushItemWidth(420)
     displayFilteredScenarios()
@@ -1828,6 +1847,13 @@ Actions:add_imgui(function()
     ImGui.EndTabItem()
   end
   if ImGui.BeginTabItem(FAVORITES_TAB_) then
+    if tab3Sound then
+      UI.widgetSound("Nav")
+      tab3Sound = false
+      tab1Sound = true
+      tab2Sound = true
+      tab4Sound = true
+    end
     if favorite_actions[1] ~= nil then
       ImGui.PushItemWidth(420)
       displayFavoriteActions()
@@ -1913,6 +1939,13 @@ Actions:add_imgui(function()
     ImGui.EndTabItem()
   end
   if ImGui.BeginTabItem(RECENTS_TAB_) then
+    if tab4Sound then
+      UI.widgetSound("Nav")
+      tab4Sound = false
+      tab1Sound = true
+      tab2Sound = true
+      tab3Sound = true
+    end
     if recently_played_a[1] ~= nil then
       ImGui.PushItemWidth(420)
       displayRecentlyPlayed()
@@ -1945,7 +1978,7 @@ Actions:add_imgui(function()
                   end
                 end
                 playAnim(
-                  selected_recent, self.get_ped(), anim_flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
+                  selected_recent, self.get_ped(), selected_recent.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
                   boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pr
                 )
                 curr_playing_anim = selected_recent
@@ -2065,31 +2098,120 @@ weapon_tab:add_imgui(function()
   end
 end)
 
+
+-- personal_pet = self_tab:add_tab("Personal Pet")
+-- local function displayPets()
+--   petNames = {}
+--   for _, v in ipairs(pets_T) do
+--     table.insert(petNames, v.name)
+--   end
+--   pet_index, piused = ImGui.Combo("##petList", pet_index, petNames, #pets_T)
+-- end
+-- personal_pet:add_imgui(function()
+--   if my_pet_T.hash == nil or my_pet_T.name == nil then
+--     ImGui.Dummy(10, 1) ImGui.SeparatorText("Adopt a New Pet")
+--     ImGui.PushItemWidth(300)
+--     displayPets()
+--     ImGui.PopItemWidth()
+--     selected_pet = pets_T[pet_index + 1]
+--     ImGui.Spacing(); ImGui.Text("Give your new pet a name: ")
+--     ImGui.PushItemWidth(300)
+--     pet_name, pnUsed = ImGui.InputTextWithHint("##petName", "Pet Name", pet_name, 64)
+--     ImGui.PopItemWidth()
+--     if ImGui.IsItemActive() then
+--       is_typing = true
+--     else
+--       is_typing = false
+--     end
+--     ImGui.BeginDisabled(pet_name == "")
+--     if ImGui.Button("  Adopt  ") then
+--       script.run_in_fiber(function(adopt)
+--         local petModel = selected_pet.hash
+--         local petID    = selected_pet.id
+--         local petBreed = selected_pet.name
+--         local myCoords = self.get_pos()
+--         local myFwdVec = Game.getForwardVec(self.get_ped())
+--         local found, spawn_point = MISC.FIND_SPAWN_POINT_IN_DIRECTION(
+--           myCoords.x, myCoords.y, myCoords.z,
+--           myFwdVec.x, myFwdVec.y, myFwdVec.z,
+--           20.0, spawn_point
+--         )
+--         if found then
+--           if Game.requestModel(petModel) then
+--             myPet = PED.CREATE_PED(
+--               PED_TYPE._ANIMAL, petModel, spawn_point.x,
+--               spawn_point.y, spawn_point.z, math.random(0, 180),
+--               true, false
+--             )
+--           end
+--           adopt:sleep(200)
+--           if ENTITY.DOES_ENTITY_EXIST(myPet) and not ENTITY.IS_ENTITY_DEAD(myPet, true) then
+--             local myGroup = PED.GET_PED_GROUP_INDEX(self.get_ped())
+--             if not PED.DOES_GROUP_EXIST(myGroup) then
+--               myGroup = PED.CREATE_GROUP(0)
+--             end
+--             PED.SET_GROUP_SEPARATION_RANGE(myGroup, 16960)
+--             PED.SET_GROUP_FORMATION(myGroup, 2)
+--             PED.SET_GROUP_FORMATION_SPACING(myGroup, 2.0, 2.0, 0.0)
+--             PED.SET_PED_AS_GROUP_MEMBER(myPet, myGroup)
+--             PED.SET_PED_NEVER_LEAVES_GROUP(myPet, true)
+--             my_pet_T = {
+--               hash = petModel,
+--               id   = petID,
+--               name = pet_name,
+--               adoption_date = tostring(os.date("%d-%b-%Y"))
+--             }
+--             CFG.save("my_pet_T", my_pet_T)
+--             adopt:sleep(100)
+--             gui.show_success("Samurai's Scripts",
+--             string.format("Congratulations! You are now the proud owner of a beautiful %s named %s", petBreed, pet_name))
+--           end
+--         else
+--           gui.show_error("Samurai's Scripts", "Couldn't find a suitable spot for your pet! Please try again later.")
+--         end
+--       end)
+--     end
+--     ImGui.EndDisabled()
+--   else
+--     -- pet interactions and shit (feeding, petting, tricks, attacks...)
+--     -- call / dismiss button
+--     if ImGui.Button("Abandon") then
+--       my_pet_T = { hash = nil, id = nil, name = nil, adoption_date = nil}
+--       CFG.save("my_pet_T", my_pet_T)
+--       script.run_in_fiber(function()
+--         if myPet ~= 0 and ENTITY.DOES_ENTITY_EXIST(myPet) then
+--           PED.REMOVE_PED_FROM_GROUP(myPet)
+--           ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(myPet)
+--         end
+--       end)
+--       gui.show_error("Samurai's Scripts", "Wow! What a heartless monster!")
+--     end
+--   end
+-- end)
+
+
 sound_player = self_tab:add_tab(SOUND_PLAYER_)
-function displayMaleSounds()
+local function displayMaleSounds()
   filteredMaleSounds = {}
   for _, v in ipairs(male_sounds_T) do
     table.insert(filteredMaleSounds, v.name)
   end
   sound_index1, used = ImGui.Combo("##maleSounds", sound_index1, filteredMaleSounds, #male_sounds_T)
 end
-
-function displayFemaleSounds()
+local function displayFemaleSounds()
   filteredFemaleSounds = {}
   for _, v in ipairs(female_sounds_T) do
     table.insert(filteredFemaleSounds, v.name)
   end
   sound_index2, used = ImGui.Combo("##femaleSounds", sound_index2, filteredFemaleSounds, #female_sounds_T)
 end
-
-function displayRadioStations()
+local function displayRadioStations()
   filteredRadios = {}
   for _, v in ipairs(radio_stations) do
     table.insert(filteredRadios, v.name)
   end
   radio_index, used = ImGui.Combo("##radioStations", radio_index, filteredRadios, #radio_stations)
 end
-
 sound_player:add_imgui(function()
   ImGui.Spacing(); ImGui.SeparatorText("Human Sounds"); ImGui.Spacing()
   ImGui.Dummy(20, 1); ImGui.SameLine(); sound_switch, isChanged = ImGui.RadioButton(MALE_SOUNDS_, sound_switch, 0); ImGui.SameLine()
@@ -4272,7 +4394,7 @@ vehicle_creator:add_imgui(function()
           2, true, 1)
       end
       ImGui.Spacing()
-      if ImGui.Button(strinf.format("   %s   ##vehcreator1", GENERIC_SAVE_BTN_)) then
+      if ImGui.Button(string.format("   %s   ##vehcreator1", GENERIC_SAVE_BTN_)) then
         UI.widgetSound("Select2")
         ImGui.OpenPopup("Save Merged Vehicles")
       end
@@ -7639,7 +7761,7 @@ end)
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
 
-script.register_looped("basic ass loading text", function(balt)
+script.register_looped("BALT", function(balt) -- Basic Ass Loading Text
   balt:yield()
   if start_loading_anim then
     loading_label = "-   "
@@ -7661,7 +7783,7 @@ script.register_looped("basic ass loading text", function(balt)
     return
   end
 end)
-script.register_looped("shitty rgb text", function(rgbtxt)
+script.register_looped("SRGBT", function(rgbtxt) -- Shitty RGB Text
   if gui.is_open() and business_tab:is_selected() then
     rgbtxt:sleep(200)
     yrv2_color = { 0, 255, 255, 1 }
@@ -7689,7 +7811,7 @@ script.register_looped("shitty rgb text", function(rgbtxt)
     yrv2_color = { 0, 255, 127, 1 }
   end
 end)
-script.register_looped("Quote Of The Day", function(qotd)
+script.register_looped("QOTD", function(qotd) -- Quote Of The Day
   qotd:yield()
   if not disable_quotes then
     if gui.is_open() and Samurais_scripts:is_selected() then
@@ -7705,7 +7827,7 @@ script.register_looped("Quote Of The Day", function(qotd)
     end
   end
 end)
-script.register_looped("QBE", function(qbe)
+script.register_looped("QBE", function(qbe) -- Quote Breathe Effect
   qbe:yield()
   if not disable_quotes then
     if gui.is_open() and Samurais_scripts:is_selected() and random_quote ~= "" and quote_changed then
@@ -7724,8 +7846,7 @@ script.register_looped("QBE", function(qbe)
   end
 end)
 
--- Game Input
-script.register_looped("GameInput", function()
+script.register_looped("GINPUT", function() -- Game Input
   if is_typing or is_setting_hotkeys then
     if not gui.is_open() then
       is_typing, is_setting_hotkeys = false, false
@@ -7795,17 +7916,17 @@ script.register_looped("GameInput", function()
         end
       end
     end
-    if holdF then
-      if not is_typing and not is_setting_hotkeys and (is_car or is_quad) and not ducking_in_car
-        and Game.Self.isOutside() and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
+    if holdF and Game.Self.isOutside() then
+      if not is_typing and not is_setting_hotkeys and (is_car or is_bike or is_quad) and not ducking_in_car
+        and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
         PAD.DISABLE_CONTROL_ACTION(0, 75, true)
       else
         timerB = 0
       end
     end
-    if keepWheelsTurned then
+    if keepWheelsTurned and Game.Self.isOutside() then
       if not is_typing and not is_setting_hotkeys and (is_car or is_quad) and not ducking_in_car
-        and Game.Self.isOutside() and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
+        and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
         if PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
           PAD.DISABLE_CONTROL_ACTION(0, 75, true)
         end
@@ -7832,7 +7953,7 @@ script.register_looped("GameInput", function()
 end)
 
 -- self stuff
-script.register_looped("auto-heal", function(ah)
+script.register_looped("AHL", function(ah) -- Auto-Heal
   ah:yield()
   if Regen and Game.Self.isAlive() then
     local maxHp   = Game.Self.maxHealth()
@@ -7856,7 +7977,7 @@ script.register_looped("auto-heal", function(ah)
 end)
 
 --[[
-script.register_looped("objectiveTP", function()
+script.register_looped("OBJTP", function() -- Objective TP
   if objectiveTP then
     if PAD.IS_CONTROL_JUST_PRESSED(0, 57) then
       for _, n in pairs(objectives_T) do
@@ -7875,7 +7996,7 @@ script.register_looped("objectiveTP", function()
   end
 end)
 ]]
-script.register_looped("self features", function(script)
+script.register_looped("SELFFT", function(script) -- Self Features
   -- Crouch instead of sneak
     if replaceSneakAnim then
       if PAD.IS_DISABLED_CONTROL_PRESSED(0, 36) and SS.canCrouch() then
@@ -7985,7 +8106,7 @@ script.register_looped("self features", function(script)
     end
   end
 end)
-script.register_looped("Ragdoll Loop", function(rgdl)
+script.register_looped("RGDL", function(rgdl) -- Ragdoll
   rgdl:yield()
   if clumsy then
     if PED.IS_PED_RAGDOLL(self.get_ped()) then
@@ -8032,7 +8153,7 @@ script.register_looped("Ragdoll Loop", function(rgdl)
     end
   end
 end)
-script.register_looped("Anim S/VFX", function(animSfx)
+script.register_looped("ASVFX", function(animSfx) -- Anim FX
   if is_playing_anim then
     if curr_playing_anim.sfx ~= nil then
       local soundCoords = self.get_pos()
@@ -8044,17 +8165,17 @@ script.register_looped("Anim S/VFX", function(animSfx)
       local torch = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(myPos.x, myPos.y, myPos.z, 1, curr_playing_anim.prop1, false, false, false)
       if ENTITY.DOES_ENTITY_EXIST(torch) then
         local torchPos = ENTITY.GET_ENTITY_COORDS(torch, false)
-        local torchFwd = Game.getForwardVec(torch)
+        local torchFwd = Lua_fn.inverseVec(Game.getForwardVec(torch), false)
         GRAPHICS.DRAW_SPOT_LIGHT(
           torchPos.x, torchPos.y, torchPos.z - 0.2,
-          (torchFwd.x * -1), (torchFwd.y * -1), torchFwd.z, 226, 130, 78,
+          torchFwd.x, torchFwd.y, torchFwd.z, 226, 130, 78,
           100.0, 40.0, 1.0, 10.0, 0.0
         )
       end
     end
   end
 end)
-script.register_looped("Hide From Cops", function(hfc)
+script.register_looped("HFC", function(hfc) -- Hide From Cops
   if hideFromCops then
     local isWanted    = PLAYER.GET_PLAYER_WANTED_LEVEL(self.get_id()) > 0
     local was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(self.get_id())
@@ -8264,8 +8385,8 @@ script.register_looped("AIEV", function(aiev) -- Anim Interrupt Event
       cleanup(aiev)
       is_playing_anim = false
     end
-    local isLooped = Lua_fn.has_bit(anim_flag, 1)
-    local isFrozen = Lua_fn.has_bit(anim_flag, 2)
+    local isLooped = Lua_fn.has_bit(curr_playing_anim.flag, 1)
+    local isFrozen = Lua_fn.has_bit(curr_playing_anim.flag, 2)
     if not isLooped and not isFrozen then
       repeat
         aiev:sleep(200)
@@ -8281,16 +8402,16 @@ script.register_looped("AIEV", function(aiev) -- Anim Interrupt Event
             aiev:sleep(1000)
           until not PED.IS_PED_FALLING(self.get_ped())
           aiev:sleep(1000)
-          onAnimInterrupt(aiev)
+          onAnimInterrupt()
         end
         if PED.IS_PED_RAGDOLL(self.get_ped()) then
           repeat
             aiev:sleep(1000)
           until not PED.IS_PED_RAGDOLL(self.get_ped())
           aiev:sleep(1000)
-          onAnimInterrupt(aiev)
+          onAnimInterrupt()
         end
-        onAnimInterrupt(aiev)
+        onAnimInterrupt()
       end
     else
       cleanup(aiev)
@@ -8307,7 +8428,7 @@ script.register_looped("AIEV", function(aiev) -- Anim Interrupt Event
     end
   end
 end)
-script.register_looped("MISC Anim Stuff", function(miscanim)
+script.register_looped("MISCANIM", function(miscanim)
   if is_playing_anim or is_shortcut_anim then
     if WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
       WEAPON.SET_CURRENT_PED_WEAPON(self.get_ped(), 0xA2719263, false)
@@ -8339,7 +8460,7 @@ script.register_looped("MISC Anim Stuff", function(miscanim)
   end
 end)
 
-script.register_looped("animation hotkey", function(script)
+script.register_looped("AHK", function(script) -- Anim Hotkeys
   if not HUD.IS_PAUSE_MENU_ACTIVE() and not HUD.IS_MP_TEXT_CHAT_TYPING() then
     if is_playing_anim then
       if SS.isKeyJustPressed(keybinds.stop_anim.code) and not Game.Self.isBrowsingApps() then
@@ -8398,7 +8519,7 @@ script.register_looped("animation hotkey", function(script)
                 local myboneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
                 local mybonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
                 if manualFlags then
-                  anim_flag = setmanualflag()
+                  anim_flag = setAnimFlags()
                 else
                   anim_flag = info.flag
                 end
@@ -8482,7 +8603,7 @@ script.register_looped("animation hotkey", function(script)
 end)
 
 -- Animation Shotrcut
-script.register_looped("anim shortcut", function(animsc)
+script.register_looped("ANIMSC", function(animsc) -- Anim Shortcut
   if shortcut_anim.anim ~= nil and not gui.is_open() and not ped_grabbed and not vehicle_grabbed and not is_hiding then
     if SS.isKeyJustPressed(shortcut_anim.btn) and not is_typing and not is_setting_hotkeys and not is_playing_anim and not is_playing_scenario then
       if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
@@ -8533,7 +8654,7 @@ script.register_looped("anim shortcut", function(animsc)
 end)
 
 -- Action Mode
-script.register_looped("action mode", function(amode)
+script.register_looped("AMODE", function(amode)
   if disableActionMode then
     if PED.IS_PED_USING_ACTION_MODE(self.get_ped()) then
       PLAYER.SET_DISABLE_AMBIENT_MELEE_MOVE(self.get_id(), true)
@@ -8544,7 +8665,7 @@ script.register_looped("action mode", function(amode)
     amode:yield()
   end
 end)
-script.register_looped("npc stuff", function(npcStuff)
+script.register_looped("MISCNPC", function(npcStuff)
   if spawned_npcs[1] ~= nil then
     for k, v in ipairs(spawned_npcs) do
       if ENTITY.DOES_ENTITY_EXIST(v) then
@@ -8560,7 +8681,7 @@ script.register_looped("npc stuff", function(npcStuff)
 end)
 
 -- weapon stuff
-script.register_looped("HashGrabber", function(hg)
+script.register_looped("HG", function(hg) -- Hash Grabber
   if HashGrabber then
     if WEAPON.IS_PED_ARMED(self.get_ped(), 4) and PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 24) then
       local ent  = Game.getAimedEntity()
@@ -8586,7 +8707,7 @@ script.register_looped("HashGrabber", function(hg)
   end
   hg:yield()
 end)
-script.register_looped("TriggerBot", function(trgrbot)
+script.register_looped("TB", function(trgrbot) -- Triggerbot
   if Triggerbot then
     if PLAYER.IS_PLAYER_FREE_AIMING(PLAYER.PLAYER_ID()) then
       aimBool, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER.PLAYER_ID(), Entity)
@@ -8620,7 +8741,7 @@ script.register_looped("TriggerBot", function(trgrbot)
   end
   trgrbot:yield()
 end)
-script.register_looped("auto-kill-enemies", function(ak)
+script.register_looped("AKE", function(ak) -- Auto-kill enemies
   if autoKill then
     local myCoords = self.get_pos()
     local gta_peds = entities.get_all_peds_as_handles()
@@ -8651,7 +8772,7 @@ script.register_looped("auto-kill-enemies", function(ak)
     end
   end
 end)
-script.register_looped("enemies-flee", function(ef)
+script.register_looped("EF", function(ef) -- Enemies Flee
   if runaway then
     local myCoords = self.get_pos()
     local gta_peds = entities.get_all_peds_as_handles()
@@ -8682,7 +8803,7 @@ script.register_looped("enemies-flee", function(ef)
   end
   ef:yield()
 end)
-script.register_looped("Katana", function(rpq)
+script.register_looped("KATANA", function(rpq)
   rpq:yield()
   if replace_pool_q then
     if WEAPON.IS_PED_ARMED(self.get_ped(), 1) and WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped()) == 0xDD5DF8D9 then
@@ -8724,7 +8845,7 @@ script.register_looped("Katana", function(rpq)
     end
   end
 end)
-script.register_looped("laser_render", function(lsr)
+script.register_looped("LSR", function(lsr) -- Laser Sight
   if laserSight and WEAPON.IS_PED_ARMED(self.get_ped(), 4) and Game.Self.isOnFoot() then
     local wpn_hash = WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped())
     local wpn_idx  = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
@@ -8880,14 +9001,14 @@ script.register_looped("TDFT", function(script)
         end
       end
     end
-    if Game.Self.isDriving() and is_car and keepWheelsTurned and not holdF and not ducking_in_car then
+    if keepWheelsTurned and Game.Self.isDriving() and Game.Self.isOutside() and is_car and not holdF and not ducking_in_car then
       if PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) and (PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35))
         and not HUD.IS_MP_TEXT_CHAT_TYPING() then
         VEHICLE.SET_VEHICLE_ENGINE_ON(current_vehicle, false, true, false)
         TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 16)
       end
     end
-    if Game.Self.isDriving() and holdF then
+    if holdF and Game.Self.isDriving() and Game.Self.isOutside() then
       if PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) and not HUD.IS_MP_TEXT_CHAT_TYPING() then
         timerB = timerB + 1
         if timerB >= 15 then
@@ -8936,7 +9057,7 @@ script.register_looped("TDFT", function(script)
     end
   end
 end)
-script.register_looped("DSPTFX", function(dsptfx)
+script.register_looped("DSPTFX", function(dsptfx) -- Drift Sound/Partice FX
   if Game.Self.isDriving() then
     local dict = "scr_ba_bb"
     local wheels = { "wheel_lr", "wheel_rr" }
@@ -9017,7 +9138,7 @@ script.register_looped("DSPTFX", function(dsptfx)
     end
   end
 end)
-script.register_looped("LCTRL", function(lct)
+script.register_looped("LCTRL", function(lct) -- Launch Control
   if launchCtrl and Game.Self.isDriving() then
     if limitVehOptions then
       if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
@@ -9074,7 +9195,7 @@ script.register_looped("LCTRL", function(lct)
   end
   lct:yield()
 end)
-script.register_looped("MISC Vehicle Options", function(mvo)
+script.register_looped("MISCVEH", function(mvo)
   if Game.Self.isDriving() then
     if autobrklight then
       if VEHICLE.IS_VEHICLE_DRIVEABLE(current_vehicle, false) and VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
@@ -9126,7 +9247,7 @@ script.register_looped("MISC Vehicle Options", function(mvo)
     end
   end
 end)
-script.register_looped("NOS ptfx", function(spbptfx)
+script.register_looped("NOSPTFX", function(spbptfx)
   spbptfx:yield()
   if nosFlames then
     if speedBoost and Game.Self.isDriving() then
@@ -9134,25 +9255,17 @@ script.register_looped("NOS ptfx", function(spbptfx)
         if pressing_nos_button and PAD.IS_CONTROL_PRESSED(0, 71) then
           if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
             local effect  = "veh_xs_vehicle_mods"
-            local counter = 0
-            while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(effect) do
-              STREAMING.REQUEST_NAMED_PTFX_ASSET(effect)
-              spbptfx:yield()
-              if counter > 100 then
-                return
-              else
-                counter = counter + 1
-              end
-            end
-            local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
-            for i = 0, exhaustCount do
-              local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
-              if retBool then
-                GRAPHICS.USE_PARTICLE_FX_ASSET(effect)
-                nosPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_nitrous", current_vehicle, 0.0,
-                  0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 1.0, false, false, false, 0, 0, 0, 255)
-                table.insert(nosptfx_t, nosPtfx)
-                nos_started = true
+            if Game.requestNamedPtfxAsset(effect) then
+              local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
+              for i = 0, exhaustCount do
+                local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
+                if retBool then
+                  GRAPHICS.USE_PARTICLE_FX_ASSET(effect)
+                  nosPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_nitrous", current_vehicle, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 1.0, false, false, false, 0, 0, 0, 255)
+                  table.insert(nosptfx_t, nosPtfx)
+                  nos_started = true
+                end
               end
             end
             if nos_started then
@@ -9164,9 +9277,10 @@ script.register_looped("NOS ptfx", function(spbptfx)
                 if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(nos) then
                   GRAPHICS.STOP_PARTICLE_FX_LOOPED(nos, false)
                   GRAPHICS.REMOVE_PARTICLE_FX(nos, false)
-                  nos_started = false
                 end
               end
+              STREAMING.REMOVE_NAMED_PTFX_ASSET(effect)
+              nos_started = false
             end
           end
         end
@@ -9174,11 +9288,10 @@ script.register_looped("NOS ptfx", function(spbptfx)
     end
   end
 end)
-script.register_looped("2-step", function(twostep)
+script.register_looped("TWOSTEP", function(twostep)
   if launchCtrl and Game.Self.isDriving() then
     if limitVehOptions then
       if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
-        twostep:yield()
         return
       end
     end
@@ -9186,25 +9299,17 @@ script.register_looped("2-step", function(twostep)
       if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) and VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) >= 300 then
         if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
           local asset   = "core"
-          local counter = 0
-          while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(asset) do
-            STREAMING.REQUEST_NAMED_PTFX_ASSET(asset)
-            twostep:yield()
-            if counter > 100 then
-              return
-            else
-              counter = counter + 1
-            end
-          end
-          local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
-          for i = 0, exhaustCount do
-            local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
-            if retBool then
-              GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
-              lctPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_backfire", current_vehicle, 0.0,
-                0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 0.69420, false, false, false, 0, 0, 0, 255)
-              table.insert(lctPtfx_t, lctPtfx)
-              twostep_started = true
+          if Game.requestNamedPtfxAsset(asset) then
+            local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
+            for i = 0, exhaustCount do
+              local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
+              if retBool then
+                GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
+                lctPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_backfire", current_vehicle, 0.0,
+                  0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 0.69420, false, false, false, 0, 0, 0, 255)
+                table.insert(lctPtfx_t, lctPtfx)
+                twostep_started = true
+              end
             end
           end
           if twostep_started then
@@ -9217,6 +9322,7 @@ script.register_looped("2-step", function(twostep)
                 GRAPHICS.REMOVE_PARTICLE_FX(bfire, false)
               end
             end
+            STREAMING.REMOVE_NAMED_PTFX_ASSET(asset)
             twostep_started = false
           end
         end
@@ -9224,35 +9330,22 @@ script.register_looped("2-step", function(twostep)
     end
   end
 end)
-script.register_looped("LCTRL SFX", function(tstp)
+script.register_looped("LCSFX", function(tstp) -- Launch Contol SFX
   if Game.Self.isDriving() then
     if limitVehOptions then
       if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
-        tstp:yield()
         return
       end
     end
-    if launchCtrl then
-      if lctPtfx_t[1] ~= nil then
-        local popSound
-        if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
-          for _, p in ipairs(lctPtfx_t) do
-            if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(p) then
-              local randStime = math.random(60, 120)
-              popSound = AUDIO.PLAY_SOUND_FROM_ENTITY(-1, "BOOT_POP", current_vehicle, "DLC_VW_BODY_DISPOSAL_SOUNDS",
-                true, 0)
-              AUDIO.SET_AUDIO_SPECIAL_EFFECT_MODE(1)
-              table.insert(popSounds_t, popSound)
-              tstp:sleep(randStime)
-              started_popSound = true
-            end
-          end
-        end
-        if started_popSound then
-          if PAD.IS_CONTROL_RELEASED(0, 71) or PAD.IS_CONTROL_RELEASED(0, 72) then
-            for _, s in ipairs(popSounds_t) do
-              AUDIO.STOP_SOUND(s)
-            end
+    if launchCtrl and lctPtfx_t[1] ~= nil then
+      if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
+        for _, p in ipairs(lctPtfx_t) do
+          if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(p) then
+            local randStime = math.random(60, 120)
+            AUDIO.PLAY_SOUND_FROM_ENTITY(-1, "BOOT_POP", current_vehicle, "DLC_VW_BODY_DISPOSAL_SOUNDS",
+              true, 0)
+            tstp:sleep(randStime)
+            started_popSound = true
           end
         end
       end
@@ -9275,40 +9368,25 @@ script.register_looped("LCTRL SFX", function(tstp)
       local currRPM  = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
       local currGear = VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(current_vehicle)
       if PAD.IS_CONTROL_RELEASED(0, 71) and currRPM < 1.0 and currRPM > rpmThreshold and currGear ~= 0 then
-        local popSound2
         local randStime = math.random(60, 200)
-        popSound2 = AUDIO.PLAY_SOUND_FROM_ENTITY(-1, popsnd, current_vehicle, sndRef, true, 0)
-        table.insert(popSounds_t, popSound2)
+        AUDIO.PLAY_SOUND_FROM_ENTITY(-1, popsnd, current_vehicle, sndRef, true, 0)
         tstp:sleep(randStime)
         started_popSound2 = true
       end
-      if started_popSound2 then
-        currRPM = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
-        if PAD.IS_CONTROL_PRESSED(0, 71) or currRPM < rpmThreshold then
-          for _, s in ipairs(popSounds_t) do
-            AUDIO.STOP_SOUND(s)
-          end
-          started_popSound2 = false
-        end
-      end
     end
-  else
-    tstp:yield()
   end
 end)
-script.register_looped("pops&bangs", function(pnb)
+script.register_looped("PNB", function(pnb) -- Pops & Bangs
   if Game.Self.isDriving() and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
     if is_car or is_bike or is_quad then
       if popsNbangs then
         if limitVehOptions then
           if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
-            pnb:yield()
             return
           end
         end
         AUDIO.ENABLE_VEHICLE_EXHAUST_POPS(current_vehicle, false)
         default_pops_disabled = true
-        local counter         = 0
         local asset           = "core"
         local currRPM         = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
         local currGear        = VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(current_vehicle)
@@ -9319,28 +9397,21 @@ script.register_looped("pops&bangs", function(pnb)
         else
           rpmThreshold = 0.69
         end
-        while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(asset) do
-          STREAMING.REQUEST_NAMED_PTFX_ASSET(asset)
-          pnb:yield()
-          if counter > 100 then
-            return
-          else
-            counter = counter + 1
-          end
-        end
-        if PAD.IS_CONTROL_RELEASED(0, 71) and currRPM < 1.0 and currRPM > rpmThreshold and currGear ~= 0 then
-          local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
-          for i = 0, exhaustCount do
-            local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
-            if retBool then
-              currRPM = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
-              if currRPM < 1.0 and currRPM > 0.55 then
-                GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
-                popsPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_backfire", current_vehicle,
-                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, flame_size, false, false, false, 0, 0, 0, 255)
-                GRAPHICS.STOP_PARTICLE_FX_LOOPED(popsPtfx, false)
-                table.insert(popsPtfx_t, popsPtfx)
-                started_popSound2 = true
+        if Game.requestNamedPtfxAsset(asset) then
+          if PAD.IS_CONTROL_RELEASED(0, 71) and currRPM < 1.0 and currRPM > rpmThreshold and currGear ~= 0 then
+            local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
+            for i = 0, exhaustCount do
+              local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
+              if retBool then
+                currRPM = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
+                if currRPM < 1.0 and currRPM > 0.55 then
+                  GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
+                  popsPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_backfire", current_vehicle,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, flame_size, false, false, false, 0, 0, 0, 255)
+                  GRAPHICS.STOP_PARTICLE_FX_LOOPED(popsPtfx, false)
+                  table.insert(popsPtfx_t, popsPtfx)
+                  started_popSound2 = true
+                end
               end
             end
           end
@@ -9354,9 +9425,7 @@ script.register_looped("pops&bangs", function(pnb)
                 GRAPHICS.REMOVE_PARTICLE_FX(bfire, false)
               end
             end
-            for _, s in ipairs(popSounds_t) do
-              AUDIO.STOP_SOUND(s)
-            end
+            STREAMING.REMOVE_NAMED_PTFX_ASSET(asset)
             started_popSound2 = false
           end
         end
@@ -9367,11 +9436,9 @@ script.register_looped("pops&bangs", function(pnb)
         end
       end
     end
-  else
-    pnb:yield()
   end
 end)
-script.register_looped("PBSE", function(pnbse)
+script.register_looped("PNBSE", function(pnbse) -- Pops & Bangs Shocking Event
   if started_popSound2 and louderPops then
     local myPos = self.get_pos()
     if not EVENT.IS_SHOCKING_EVENT_IN_SPHERE(79, myPos.x, myPos.y, myPos.z, 50) then
@@ -9383,8 +9450,7 @@ script.register_looped("PBSE", function(pnbse)
     end
   end
 end)
--- vehicle mines
-script.register_looped("VEHMNS", function(vmns)
+script.register_looped("VEHMNS", function(vmns) -- Vehicle Mines
   if Game.Self.isDriving() then
     if veh_mines and current_vehicle ~= 0 and (is_car or is_bike or is_quad) then
       local bone_n = "chassis_dummy"
@@ -9428,7 +9494,7 @@ script.register_looped("VEHMNS", function(vmns)
   end
 end)
 -- drift minigame (WIP)
-script.register_looped("straight line counter", function()
+script.register_looped("SLCTR", function() -- Straight Line Counter
   if (driftMode or DriftTires) and driftMinigame and is_car then
     if Game.Self.isDriving() and is_drifting and driftMinigame then
       local vehSpeedVec = ENTITY.GET_ENTITY_SPEED_VECTOR(current_vehicle, true)
@@ -9442,7 +9508,7 @@ script.register_looped("straight line counter", function()
     end
   end
 end)
-script.register_looped("drift counter", function(dcounter)
+script.register_looped("DCTR", function(dcounter) -- Drift Counter
   if driftMinigame then
     if (driftMode or DriftTires) and is_car then
       if Game.Self.isDriving() then
@@ -9563,7 +9629,7 @@ script.register_looped("drift time counter", function(dtcounter)
     end
   end
 end)
-script.register_looped("extra points checker", function(epc)
+script.register_looped("EPC", function(epc) -- Extra Points Checker
   if Game.Self.isDriving and is_car and driftMinigame then
     if is_drifting and ENTITY.GET_ENTITY_SPEED(current_vehicle) > 7 then
       if not ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) then
@@ -9617,7 +9683,7 @@ script.register_looped("extra points checker", function(epc)
     end
   end
 end)
-script.register_looped("drift multiplier", function(dmult)
+script.register_looped("DMULT", function(dmult) -- Drift Multiplier
   if Game.Self.isDriving and is_car and driftMinigame and is_drifting then
     if drift_time >= 10 and drift_time < 30 then
       drift_multiplier = 1
@@ -9635,7 +9701,7 @@ script.register_looped("drift multiplier", function(dmult)
   end
   dmult:yield()
 end)
-script.register_looped("drift points", function()
+script.register_looped("DP", function() -- Drift Points
   if Game.Self.isDriving() and is_car and driftMinigame and is_drifting then
     local diaplay_str = string.format("%s\n+%s pts", drift_streak_text, Lua_fn.separateInt(drift_points))
     showDriftCounter(diaplay_str)
@@ -9644,8 +9710,7 @@ script.register_looped("drift points", function()
     end
   end
 end)
--- Missile defence
-script.register_looped("MDEF", function(md)
+script.register_looped("MDEF", function(md) -- Missile defence
   if missiledefense and current_vehicle ~= 0 then
     local missile
     local vehPos  = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
@@ -9694,7 +9759,7 @@ script.register_looped("MDEF", function(md)
     md:yield()
   end
 end)
-script.register_looped("Purge", function(nosprg)
+script.register_looped("NOSPRG", function(nosprg) -- NOS Purge
   if Game.Self.isDriving() then
     if nosPurge and validModel or nosPurge and is_bike then
       if pressing_purge_button and not is_in_flatbed then
@@ -9738,7 +9803,7 @@ script.register_looped("Purge", function(nosprg)
     nosprg:yield()
   end
 end)
-script.register_looped("rgbLights", function(rgb)
+script.register_looped("RGBL", function(rgb) -- RGB Lights
   if start_rgb_loop then
     for i = 0, 14 do
       if start_rgb_loop and not VEHICLE.GET_BOTH_VEHICLE_HEADLIGHTS_DAMAGED(current_vehicle) then
@@ -9801,7 +9866,7 @@ script.register_looped("rgbLights", function(rgb)
     rgb:yield()
   end
 end)
-script.register_looped("no jacking", function(ctt)
+script.register_looped("CTT", function(ctt) -- Can't Touch This
   if noJacking then
     if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 398, true) then
       PED.SET_PED_CAN_BE_DRAGGED_OUT(self.get_ped(), false)
@@ -9823,7 +9888,7 @@ script.register_looped("no jacking", function(ctt)
   end
   ctt:yield()
 end)
-script.register_looped("DIE", function(die)
+script.register_looped("DCC", function(die) -- Dangerous Car Crashes
   if fender_bender then
     if Game.Self.isDriving() and (is_car or is_bike or is_quad) then
       local myPos       = self.get_pos()
@@ -9882,7 +9947,7 @@ script.register_looped("DIE", function(die)
 end)
 
 -- Planes & Helis
-script.register_looped("Unlimited Flares", function(flrs)
+script.register_looped("FLRS", function(flrs) -- Flares
   flrs:yield()
   if flares_forall then
     if Game.Self.isDriving() and (is_plane or is_heli) then
@@ -9893,7 +9958,7 @@ script.register_looped("Unlimited Flares", function(flrs)
     end
   end
 end)
-script.register_looped("Real Jet Speed", function(rjspd)
+script.register_looped("RJS", function(rjspd) -- Real Jet Speed
   rjspd:yield()
   if real_plane_speed then
     if Game.Self.isDriving() and is_plane then
@@ -9925,7 +9990,7 @@ script.register_looped("UBWIN", function()
     end
   end
 end)
-script.register_looped("Auto-Pilot Keyboard Interrupt", function(apki)
+script.register_looped("APKI", function(apki) -- Auto Pilot Keyboard Interrupt
   if autopilot_waypoint or autopilot_objective or autopilot_random then
     if Game.Self.isDriving() then
       for _, ctrl in pairs(flight_controls_T) do
@@ -9949,7 +10014,7 @@ script.register_looped("Auto-Pilot Keyboard Interrupt", function(apki)
   end
   apki:yield()
 end)
-script.register_looped("flatbed script", function(script)
+script.register_looped("FLTBD", function(script) -- Flatbed Main
   local vehicleHandles  = entities.get_all_vehicles_as_handles()
   local current_vehicle = PED.GET_VEHICLE_PED_IS_USING(self.get_ped())
   local vehicle_model   = ENTITY.GET_ENTITY_MODEL(current_vehicle)
@@ -10066,7 +10131,7 @@ script.register_looped("flatbed script", function(script)
     end
   end
 end)
-script.register_looped("TowPos Marker", function()
+script.register_looped("FLTBDTPM", function() -- Flatbed Tow Pos Marker
   if towPos then
     if is_in_flatbed and towed_vehicle == 0 then
       local playerPosition = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
@@ -10167,7 +10232,7 @@ script.register_looped("HFE", function(hfe) -- Handling Flags Editor
     end
   end
 end)
-script.register_looped("vehicle creator organizer", function()
+script.register_looped("VCO", function() -- Vehicle Creator Organizer
   for k, v in ipairs(spawned_vehicles) do
     if not ENTITY.DOES_ENTITY_EXIST(v) then
       table.remove(spawned_vehicles, k)
@@ -10191,7 +10256,7 @@ end)
 
 
 -- World
-script.register_looped("Ped Grabber", function(pg)
+script.register_looped("PG", function(pg) -- Ped Grabber
   if pedGrabber and not vehicleGrabber and not HUD.IS_MP_TEXT_CHAT_TYPING() and not is_playing_anim
   and not is_playing_scenario and not isCrouched and not is_handsUp and not is_hiding then
     if Game.Self.isOnFoot() and not gui.is_open() and not WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
@@ -10250,7 +10315,7 @@ script.register_looped("Ped Grabber", function(pg)
   end
   pg:yield()
 end)
-script.register_looped("Vehicle Grabber", function(vg)
+script.register_looped("VG", function(vg) -- Vehicle Grabber
   if vehicleGrabber and not pedGrabber and not HUD.IS_MP_TEXT_CHAT_TYPING() and not is_playing_anim
     and not is_playing_scenario and not isCrouched and not is_handsUp and not is_hiding then
     if Game.Self.isOnFoot() and not gui.is_open() and not WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
@@ -10301,7 +10366,7 @@ script.register_looped("Vehicle Grabber", function(vg)
   end
   vg:yield()
 end)
-script.register_looped("Carpool", function(cp)
+script.register_looped("RWNPC", function(cp) -- Ride With NPCs
   if carpool then
     stop_searching = PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) and true or false
     if not stop_searching then
@@ -10376,7 +10441,7 @@ script.register_looped("CPEF", function(cpef) -- carpool exit fix
     end
   end
 end)
-script.register_looped("World Bounds", function()
+script.register_looped("WBNDS", function() -- World Bounds
   if extend_world then
     if not world_extended then
       Game.World.extendBounds(true)
@@ -10384,7 +10449,7 @@ script.register_looped("World Bounds", function()
     end
   end
 end)
-script.register_looped("Public Seats", function(pseats)
+script.register_looped("PSEATS", function(pseats) -- Public Seats
   if public_seats and Game.Self.isOutside() and Game.Self.isOnFoot() and not NETWORK.NETWORK_IS_ACTIVITY_SESSION() and not is_sitting then
     local near_seat, seat, x_offset, z_offset = SS.isNearPublicSeat()
     if near_seat and Game.Self.isAlive() and not PLAYER.IS_PLAYER_FREE_AIMING(self.get_id())
@@ -10455,7 +10520,7 @@ script.register_looped("Public Seats", function(pseats)
   end
 end)
 -- object spawner
-script.register_looped("Preview", function(preview)
+script.register_looped("PREVIEW", function(preview)
   if previewLoop and gui.is_open() then
     local currentHeading = ENTITY.GET_ENTITY_HEADING(previewEntity)
     if currentObjectPreview ~= previewEntity then
@@ -10513,7 +10578,7 @@ script.register_looped("Preview", function(preview)
     stopPreview()
   end
 end)
-script.register_looped("edit mode", function()
+script.register_looped("EM", function() -- Edit Mode
   if spawned_props[1] ~= nil then
     if edit_mode and not ENTITY.IS_ENTITY_ATTACHED(selectedObject.entity) then
       local current_coords   = ENTITY.GET_ENTITY_COORDS(selectedObject.entity, true)
@@ -10589,7 +10654,7 @@ script.register_looped("edit mode", function()
   end
 end)
 
-script.register_looped("KamikazeDrivers", function(rd)
+script.register_looped("KDRV", function() -- Kamikaze Drivers
   if kamikazeDrivers and Game.Self.isAlive() then
     local gta_peds = entities.get_all_peds_as_handles()
     local myGroup  = PED.GET_PED_GROUP_INDEX(self.get_ped())
@@ -10612,10 +10677,9 @@ script.register_looped("KamikazeDrivers", function(rd)
       end
     end
   end
-  rd:yield()
 end)
 
-script.register_looped("Public Enemy", function(pe)
+script.register_looped("PE", function() -- Public Enemies
   if publicEnemy and Game.Self.isAlive() then
     local myGroup  = PED.GET_PED_GROUP_INDEX(self.get_ped())
     local gta_peds = entities.get_all_peds_as_handles()
@@ -10639,13 +10703,12 @@ script.register_looped("Public Enemy", function(pe)
       end
     end
   end
-  pe:yield()
 end)
 
 ---online
 
 -- Casino Pacino
-script.register_looped("Casino Pacino Thread", function(script)
+script.register_looped("CASINO", function(script)
   if Game.isOnline() then
     if force_poker_cards then
       local player_id = PLAYER.PLAYER_ID()
@@ -10803,7 +10866,7 @@ script.register_looped("Casino Pacino Thread", function(script)
   end
 end)
 
-script.register_looped("OPI", function()
+script.register_looped("OPI", function() -- Online Player Info
   if Game.isOnline() and gui.is_open() and players_tab:is_selected() then
     playerCount       = Game.getPlayerCount()
     selectedPlayer    = filteredPlayers[playerIndex + 1]
@@ -10831,7 +10894,7 @@ script.register_looped("OPI", function()
     end
   end
 end)
-script.register_looped("CDK", function(cdk)
+script.register_looped("CDK", function(cdk) -- Cooldown Killer
   if Game.isOnline() and TARGET_BUILD == CURRENT_BUILD then
     cdk:sleep(15000)
     if mc_work_cd then
@@ -10911,7 +10974,7 @@ script.register_looped("CDK", function(cdk)
 end)
 
 ---MISC
-script.register_looped("Flight Music", function()
+script.register_looped("DFM", function() -- Disable Flight Music
   if disableFlightMusic then
     if not flight_music_off then
       AUDIO.SET_AUDIO_FLAG("DisableFlightMusic", true)
@@ -10920,8 +10983,7 @@ script.register_looped("Flight Music", function()
   end
 end)
 
----Remote Options
-script.register_looped("REOPT", function(ro)
+script.register_looped("REOPT", function(ro) -- Remote Options
   if SS.isKeyJustPressed(keybinds.autokill.code) then
     if autoKill then
       autoKill = false
@@ -10966,8 +11028,7 @@ script.register_looped("REOPT", function(ro)
   end
 end)
 
--- PANIK Button
-script.register_looped("PANIK", function(panik)
+script.register_looped("PANIK", function(panik) -- Panic Button
   if SS.isKeyJustPressed(keybinds.panik.code) and not HUD.IS_MP_TEXT_CHAT_TYPING() and not HUD.IS_PAUSE_MENU_ACTIVE()
   and not is_typing and not is_setting_hotkeys and not gui.is_open() and not script.is_active("CELLPHONE_FLASHHAND") then
     panik:sleep(200)
@@ -10980,8 +11041,7 @@ script.register_looped("PANIK", function(panik)
   end
 end)
 
----IsKeyJustPressed
-script.register_looped("IKJP", function(ikjp)
+script.register_looped("IKJP", function(ikjp) -- IsKeyJustPressed
   for _, k in ipairs(VK_T) do
     if k.just_pressed then
       ikjp:sleep(0.2)
