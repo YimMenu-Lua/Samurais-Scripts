@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.4.3'
+SCRIPT_VERSION = '1.4.4'
 TARGET_BUILD   = '3351'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
@@ -662,9 +662,9 @@ function showDriftExtra(text)
 end
 
 function checkVehicleCollision()
-  if ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(self.get_veh()) then
-    local entity = ENTITY.GET_LAST_ENTITY_HIT_BY_ENTITY_(self.get_veh())
-    if entity ~= nil and entity ~= 0 then
+  if ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) then
+    local entity = ENTITY.GET_LAST_ENTITY_HIT_BY_ENTITY_(current_vehicle)
+    if entity ~= nil and entity ~= 0 and ENTITY.DOES_ENTITY_EXIST(entity) then
       local entity_type = SS.getEntityType(entity)
       if entity_type == 6 then
         return false, "Hit and run"
@@ -723,7 +723,7 @@ Samurais_scripts:add_imgui(function()
   local date_str = os.date("\10    %d-%b-%Y    \10         %H:%M\10\10")
   ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
   ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
-  UI.coloredButton(tostring(date_str), '#A67C00', '#A67C00', '#A67C00', 0.15)
+  UI.coloredButton(date_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
   ImGui.PopStyleVar()
   if UI.isItemClicked('lmb') then
     debug_counter = debug_counter + 1
@@ -999,7 +999,7 @@ local function setAnimFlags()
   local flag_control   = Lua_fn.condReturn(controllable, AF._SECONDARY, 0)
   local flag_collision = Lua_fn.condReturn(noCollision, AF._TURN_OFF_COLLISION, 0)
   local flag_killOnEnd = Lua_fn.condReturn(killOnEnd, AF._ENDS_IN_DEAD_POSE, 0)
-  return flag_loop + flag_freeze + flag_upperbody + flag_control + flag_collision + flag_killOnEnd
+  return sum(flag_loop, flag_freeze, flag_upperbody, flag_control, flag_collision, flag_killOnEnd)
 end
 
 local function setdrunk()
@@ -1212,7 +1212,7 @@ Actions:add_imgui(function()
           local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), info.boneID)
           local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), info.boneID, 0.0, 0.0, 0.0)
           if manualFlags then
-            anim_flag= setAnimFlags()
+            anim_flag = setAnimFlags()
           else
             anim_flag = info.flag
           end
@@ -5773,7 +5773,7 @@ business_tab:add_imgui(function()
 end)
 
 -- Casino
-casino_pacino                         = online_tab:add_tab("Casino Pacino ") --IT'S NOT AL ANYMORE! IT'S DUNK!
+casino_pacino = online_tab:add_tab("Casino Pacino ") --IT'S NOT AL ANYMORE! IT'S DUNK!
 blackjack_cards                       = 116
 blackjack_decks                       = 846
 blackjack_table_players               = 1776
@@ -9897,9 +9897,13 @@ script.register_looped("DCC", function(die) -- Dangerous Car Crashes
       local soundName   = PED.IS_PED_MALE(self.get_ped()) and "WAVELOAD_PAIN_MALE" or "WAVELOAD_PAIN_FEMALE"
       local Occupants   = Game.Vehicle.getOccupants(current_vehicle)
       local crashed, _  = checkVehicleCollision()
-      local deform_mult = SS.getVehicleInfo().m_deformation_mult
-      if deform_mult:get_float() < 2.0 then
-        deform_mult:set_float(2.0)
+      if PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), current_vehicle) then
+        local deform_mult = SS.getVehicleInfo().m_deformation_mult
+        if deform_mult ~= nil and deform_mult:is_valid() then
+          if deform_mult:get_float() < 2.0 then
+            deform_mult:set_float(2.0)
+          end
+        end
       end
       if veh_speed >= 20 and ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) and crashed then
         CAM.SHAKE_GAMEPLAY_CAM("GRENADE_EXPLOSION_SHAKE", shake_amp)
@@ -10715,11 +10719,11 @@ script.register_looped("CASINO", function(script)
       if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("three_card_poker")) ~= 0 then
         while NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", -1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 0, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 2, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 3, 0) ~= player_id do
           network.force_script_host("three_card_poker")
-          gui.show_message("Samuai's Scripts", CP_TCC_CTRL_NOTIF_) --If you see this spammed, someone if fighting you for control.
-          pacino:sleep(500)
+          gui.show_message("Samuai's Scripts", CP_TCC_CTRL_NOTIF_) -- If you see this spammed, someone if fighting you for control.
+          script:sleep(500)
         end
         local players_current_table = locals.get_int("three_card_poker",
-          three_card_poker_table + 1 + (player_id * three_card_poker_table_size) + 2) --The Player's current table he is sitting at.
+          three_card_poker_table + 1 + (player_id * three_card_poker_table_size) + 2) -- The Player's current table he is sitting at.
         if (players_current_table ~= -1) then                                         -- If the player is sitting at a poker table
           local player_0_card_1 = locals.get_int("three_card_poker",
             (three_card_poker_cards) + (three_card_poker_current_deck) +
@@ -10849,7 +10853,7 @@ script.register_looped("CASINO", function(script)
       casino_heist_masks         = stats.get_int("MPX_H3OPT_MASKS")
       local cooldown_time        = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_LOSS_COOLDOWN")
       local time_delta           = os.time() -
-          stats.get_int("MPPLY_CASINO_CHIPS_WONTIM") --"I've won the jackpot, and it doesn't make me feel bad." ~Casino Pacino (He only cares about winners)
+          stats.get_int("MPPLY_CASINO_CHIPS_WONTIM") -- "I've won the jackpot, and it doesn't make me feel bad." ~Casino Pacino (He only cares about winners)
       local minutes_left         = (cooldown_time - time_delta) / 60
       local chipswon_gd          = stats.get_int("MPPLY_CASINO_CHIPS_WON_GD")
       local max_chip_wins        = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_DAILY")
@@ -10895,8 +10899,7 @@ script.register_looped("OPI", function() -- Online Player Info
   end
 end)
 script.register_looped("CDK", function(cdk) -- Cooldown Killer
-  if Game.isOnline() and TARGET_BUILD == CURRENT_BUILD then
-    cdk:sleep(15000)
+  if Game.isOnline() and TARGET_BUILD == CURRENT_BUILD and not script.is_active("maintransition") then
     if mc_work_cd then
       if globals.get_int(Global_262145.f_18571) > 0 then
         globals.set_int(Global_262145.f_18571, 0)
@@ -11062,7 +11065,7 @@ event.register_handler(menu_event.ScriptsReloaded, function()
   SS.handle_events()
 end)
 
-event.register_handler(menu_event.Wndproc, function(hwnd, msg, wParam, lParam)
+event.register_handler(menu_event.Wndproc, function(_, msg, wParam, lParam)
   if msg == WM._KEYDOWN or msg == WM._SYSKEYDOWN or msg == WM._XBUTTONDOWN then
     for _, key in ipairs(VK_T) do
       if wParam == key.code then
@@ -11071,7 +11074,7 @@ event.register_handler(menu_event.Wndproc, function(hwnd, msg, wParam, lParam)
         if key.just_pressed then
           SS.debug(
             "\10--- Pressed Key ---" .. "\10 ¤ Name:       " .. key.name .. "\10 ¤ Keycode:    " ..
-            Lua_fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit 24 Set: " .. tostring((lParam & (0x1 << 24)) ~= 0)
+            Lua_fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit24: " .. tostring((lParam & (1 << 24)) ~= 0)
             .. "\10 ¤ SYSKEY:     " .. tostring(msg == WM._SYSKEYDOWN)
           )
         end

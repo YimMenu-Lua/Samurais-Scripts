@@ -374,16 +374,13 @@ local function YimConfig()
       - Uses rxi's JSON Library: https://github.com/rxi/json.lua
         ]]
   }
+
   local writeToFile = function(data)
     local file, _ = io.open(script_json, "w")
     if file == nil then
       log.warning("Failed to write to " .. script_json)
       gui.show_error("YimConfig", "Failed to write to " .. script_json)
       return false
-    end
-    if DEFAULT_CONFIG == nil then
-      gui.show_error("YimConfig", "Missing default config! Please create a default config table in your main script.")
-      error("Missing default config! Please create a default config table in your main script.", 2)
     end
     file:write(json.encode(data))
     file:close()
@@ -401,38 +398,34 @@ local function YimConfig()
   end
 
   local checkAndCreateConfig = function()
+    if DEFAULT_CONFIG == nil then
+      gui.show_error("YimConfig",
+        "Missing default config! Please create a default config table in your main script.")
+      error("[FATAL] Missing default config! Please create a default config global table in your main script.")
+    end
     local exists = io.exists(script_json)
     local config
     if not exists then
-      log.info("Config file not found! Creating a default config...")
-      if not writeToFile(DEFAULT_CONFIG) then
-        return false
-      end
-      config = DEFAULT_CONFIG
+      log.debug("Config file not found! Creating a default config...")
+      return writeToFile(DEFAULT_CONFIG)
     else
       config = readFromFile()
       if config == nil then
-        log.warning("Failed to read config file")
-        return false
+        error("[FATAL] Failed to read config file!")
       end
-    end
 
-    for key, defaultValue in pairs(DEFAULT_CONFIG) do
-      if config[key] == nil then
-        config[key] = defaultValue
+      for key, defaultValue in pairs(DEFAULT_CONFIG) do
+        if config[key] == nil then
+          config[key] = defaultValue
+        end
       end
+      return writeToFile(config)
     end
-
-    if not writeToFile(config) then
-      return false
-    end
-    return true
   end
 
   local readAndDecodeConfig = function()
-    while not checkAndCreateConfig() do
-      os.execute("sleep " .. tonumber(1))
-      log.info("Waiting for " .. script_json .. " to be created")
+    if not checkAndCreateConfig() then
+      error("Failed to read config file!", 2)
     end
     return readFromFile()
   end

@@ -6,10 +6,10 @@ local online_version_offset = game_build_offset:add(0x20)
 
 --#region Global functions
 
--- Must be called from inside a coroutine. Input time is in milliseconds.
+-- Must be called from inside a coroutine. Input time is in seconds.
 ---@param s integer
 function sleep(s)
-  local ntime = os.clock() + (s / 1000)
+  local ntime = os.clock() + s
   repeat
     coroutine.yield()
   until
@@ -390,7 +390,7 @@ end
 
 --#region Classes
 
--- My shitty attempt at mimicking YimMenu's `atArray` template class.
+-- My shitty attempt at implementing YimMenu's `atArray` template class.
 ---@class atArray
 atArray = {}
 atArray.__index = atArray
@@ -526,6 +526,22 @@ Lua_fn.str_replace = function(str, old, new)
     local changed = str:sub(end_index + 1)
     result = str:sub(1, (start_index - 1)) .. new .. changed
     search_index = -1 * changed:len()
+  end
+  return result
+end
+
+---@param ... number
+---@return number
+sum = function(...)
+  local args, result = { ... }, 0
+  for i = 1, #args do
+    if type(args[i]) ~= 'number' then
+      error(string.format(
+        "Invalid argument '%s' at position (%d) in function sum(). The function only takes numbers as parameters.",
+        args[i], i
+      ))
+    end
+    result = result + args[i]
   end
   return result
 end
@@ -748,32 +764,36 @@ Lua_fn.Lua_bool = function(value)
   end
 end
 
----@param n number
-Lua_fn.get_bit = function(n)
-  return 2 ^ n - 1
+--
+-- Bitwise Operations
+--
+---@param num number
+---@param bit number
+Lua_fn.get_bit = function(num, bit)
+  return (num & (1 << bit)) >> bit
 end
 
----@param n number
----@param x number
-Lua_fn.has_bit = function(n, x)
-  return n & x > 0
+---@param num number
+---@param bit number
+Lua_fn.has_bit = function(num, bit)
+  return (num & (1 << bit)) ~= 0
 end
 
----@param n number
----@param x number
-Lua_fn.set_bit = function(n, x)
-  return Lua_fn.has_bit(n, x) and n or n + x
+---@param num number
+---@param bit number
+Lua_fn.set_bit = function(num, bit)
+  return num | (1 << bit)
 end
 
----@param n number
----@param x number
-Lua_fn.clear_bit = function(n, x)
-  return Lua_fn.has_bit(n, x) and n - x or n
+---@param num number
+---@param bit number
+Lua_fn.clear_bit = function(num, bit)
+  return num & ~(1 << bit)
 end
 
 -- Lua version of Bob Jenskins' "Jenkins One At A Time" hash function
 --
--- (https://en.wikipedia.org/wiki/Jenkins_hash_function).
+-- https://en.wikipedia.org/wiki/Jenkins_hash_function
 ---@param key string
 ---@return integer
 Lua_fn.joaat = function(key)
@@ -1829,13 +1849,11 @@ end
 
 -- Reads localPlayer's vehicle information from memory.
 SS.getVehicleInfo = function()
-  if Game.Self.isOnFoot() then
-    return error("localPlayer is not in a vehicle!", 2)
-  end
   local vehPtr = memory.handle_to_ptr(self.get_veh())
+  ---@class vehicleInfo
+  local vehicleInfo = {}
+  vehicleInfo.__index = vehicleInfo
   if vehPtr:is_valid() then
-    ---@class vehicleInfo
-    local vehicleInfo    = setmetatable({}, {})
     local CHandlingData  = vehPtr:add(0x0960):deref()
     local CVehicleDamage = vehPtr:add(0x0420)
     local CDeformation   = CVehicleDamage:add(0x0010)
@@ -1845,8 +1863,8 @@ SS.getVehicleInfo = function()
     vehicleInfo.m_sub_handling_data = CHandlingData:add(0x158):deref()
     vehicleInfo.m_deformation       = CDeformation:add(0x0000)
     vehicleInfo.m_deform_god        = vehPtr:add(0x096C)
-    return vehicleInfo
   end
+  return vehicleInfo
 end
 
 -- Checks if a handling flag is enabled or disabled
@@ -1868,12 +1886,8 @@ SS.setHandlingFlag = function(flag, switch)
   end
   local m_handling_flags = SS.getVehicleInfo().m_handling_flags
   local handling_flags   = m_handling_flags:get_dword()
-  local new_flag
-  if switch then
-    new_flag = Lua_fn.set_bit(handling_flags, flag)
-  else
-    new_flag = Lua_fn.clear_bit(handling_flags, flag)
-  end
+  local bitwiseOp = switch and Lua_fn.set_bit or Lua_fn.clear_bit
+  local new_flag  = bitwiseOp(handling_flags, flag)
   m_handling_flags:set_dword(new_flag)
 end
 
@@ -1893,7 +1907,7 @@ end
 -- Returns the model type of an entity (ped, object, vehicle, MLO, time, etc...)
 ---@param entity integer
 SS.getEntityType = function(entity)
-  if entity ~= nil and entity ~= 0 then
+  if ENTITY.DOES_ENTITY_EXIST(entity) then
     local entPtr = memory.handle_to_ptr(entity)
     if entPtr:is_valid() then
       local m_model_info = entPtr:add(0x0020):deref()
@@ -1955,7 +1969,7 @@ SS.get_ceo_global_offset = function(crates)
   local offset
   if crates ~= nil then
     if crates == 1 then
-      offset = 15732
+      offset = 15732 -- EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1
     end
     if crates == 2 then
       offset = 15733

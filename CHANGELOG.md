@@ -1,5 +1,3 @@
-### v1.4.3 Changelog
+### v1.4.4 Changelog
 
-- Fixed a typo. Again! -__-
-- Added 2 more custom animation flags.
-- General Fixes & improvements.
+Small changes. Nothing important.
