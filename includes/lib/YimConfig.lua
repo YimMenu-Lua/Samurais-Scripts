@@ -455,6 +455,9 @@ local function YimConfig()
   yc.reset = function()
     writeToFile(DEFAULT_CONFIG)
   end
+
+  yc.decode = json.decode
+
   return yc
 end
 log.info(string.format("YimConfig v%s successfully loaded\n%s", YimConfig()._version, YimConfig()._credits))

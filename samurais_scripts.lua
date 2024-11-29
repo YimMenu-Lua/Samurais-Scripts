@@ -1,13 +1,13 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.4.4'
+SCRIPT_VERSION = '1.4.5'
 TARGET_BUILD   = '3351'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
 
-require('lib/samurais_utils')
 
+require('lib/samurais_utils')
 CURRENT_BUILD   = Game.GetBuildNumber()
 CURRENT_VERSION = Game.GetOnlineVersion()
 CFG             = require("lib/YimConfig")
@@ -31,7 +31,6 @@ DEFAULT_CONFIG         = {
   whouse_3_size           = { small = false, medium = false, large = false },
   whouse_4_size           = { small = false, medium = false, large = false },
   whouse_5_size           = { small = false, medium = false, large = false },
-  -- my_pet_T                = { hash = nil, id = nil, name = nil, adoption_date = nil },
   keybinds                = {
     rodBtn        = { code = 0x58, name = "[X]" },
     tdBtn         = { code = 0x10, name = "[Shift]" },
@@ -48,6 +47,7 @@ DEFAULT_CONFIG         = {
     vehicle_mine  = { code = 0x4E, name = "[N]" },
     triggerbotBtn = { code = 0x10, name = "[Shift]" },
     panik         = { code = 0x7B, name = "[F12]" },
+    laser_sight   = { code = 0x4C, name = "[L]" },
   },
   gpad_keybinds           = {
     rodBtn        = { code = 0, name = "[Unbound]" },
@@ -57,9 +57,14 @@ DEFAULT_CONFIG         = {
     purgeBtn      = { code = 0, name = "[Unbound]" },
     vehicle_mine  = { code = 0, name = "[Unbound]" },
     triggerbotBtn = { code = 0, name = "[Unbound]" },
+    laser_sight   = { code = 0, name = "[Unbound]" },
+  },
+  laser_choice            = {
+    r = 237,
+    g = 47,
+    b = 50,
   },
   Regen                   = false,
-  -- objectiveTP             = false,
   disableTooltips         = false,
   phoneAnim               = false,
   disableProps            = false,
@@ -184,7 +189,6 @@ DEFAULT_CONFIG         = {
   DriftIntensity          = 0,
   autoplay_chips_cap      = 0,
   supply_autofill_delay   = 500,
-  laser_choice            = "proj_laser_enemy",
   LANG                    = 'en-US',
   current_lang            = 'English',
 }
@@ -194,7 +198,6 @@ current_lang           = CFG.read("current_lang")
 keybinds               = CFG.read("keybinds")
 gpad_keybinds          = CFG.read("gpad_keybinds")
 Regen                  = CFG.read("Regen")
--- objectiveTP            = CFG.read("objectiveTP")
 phoneAnim              = CFG.read("phoneAnim")
 sprintInside           = CFG.read("sprintInside")
 lockPick               = CFG.read("lockPick")
@@ -217,7 +220,6 @@ disableProps           = CFG.read("disableProps")
 npc_godMode            = CFG.read("npc_godMode")
 usePlayKey             = CFG.read("usePlayKey")
 shortcut_anim          = CFG.read("shortcut_anim")
--- my_pet_T               = CFG.read("my_pet_T")
 Triggerbot             = CFG.read("Triggerbot")
 aimEnemy               = CFG.read("aimEnemy")
 autoKill               = CFG.read("autoKill")
@@ -407,8 +409,6 @@ scenario_index         = 0
 recents_index          = 0
 fav_actions_index      = 0
 npc_index              = 0
--- myPet                  = 0
--- pet_index              = 0
 actions_switch         = 0
 Entity                 = 0
 timerA                 = 0
@@ -437,6 +437,7 @@ paints_col_sort_idx    = 0
 paints_mfr_sort_idx    = 0
 paints_sortby_switch   = 0
 npc_veh_roof_state     = 0
+perv                   = 0
 npc_veh_speed          = 0.0
 npcDriveSwitch         = 0
 npcDrivingFlags        = 803243
@@ -444,7 +445,6 @@ npcDrivingSpeed        = 19
 drift_multiplier       = 1
 quote_alpha            = 1
 pedthrowF              = 10
--- pet_name               = ""
 drift_streak_text      = ""
 drift_extra_text       = ""
 actions_search         = ""
@@ -456,7 +456,7 @@ smokeHex               = ""
 random_quote           = ""
 custom_paints_sq       = ""
 npcDriveTask           = ""
-npcDriveDest           = vec3
+npcDriveDest           = vec3:new(0.0, 0.0, 0.0)
 filteredPlayers        = {}
 recently_played_a      = {}
 selected_sound         = {}
@@ -474,8 +474,8 @@ npcProps               = {}
 selfPTFX               = {}
 npcPTFX                = {}
 curr_playing_anim      = {}
-laserPtfx_T            = {}
 chosen_anim            = {}
+depressorBanList       = {}
 default_tire_smoke     = {
   r = 255,
   g = 255,
@@ -723,7 +723,7 @@ Samurais_scripts:add_imgui(function()
   local date_str = os.date("\10    %d-%b-%Y    \10         %H:%M\10\10")
   ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
   ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
-  UI.coloredButton(date_str, '#A67C00', '#A67C00', '#A67C00', 0.15)
+  UI.coloredButton(tostring(date_str), '#A67C00', '#A67C00', '#A67C00', 0.15)
   ImGui.PopStyleVar()
   if UI.isItemClicked('lmb') then
     debug_counter = debug_counter + 1
@@ -762,13 +762,6 @@ self_tab:add_imgui(function()
     CFG.save("Regen", Regen)
     UI.widgetSound("Nav2")
   end
-
-  -- objectiveTP, objectiveTPUsed = ImGui.Checkbox(OBJECTIVETP_, objectiveTP)
-  -- UI.helpMarker(false, OBJECTIVETP_DESC_)
-  -- if objectiveTPUsed then
-  --   CFG.save("objectiveTP", objectiveTP)
-  --   UI.widgetSound("Nav2")
-  -- end
 
   replaceSneakAnim, rsanimUsed = ImGui.Checkbox(CROUCHCB_, replaceSneakAnim)
   UI.helpMarker(false, CROUCH_DESC_)
@@ -1275,56 +1268,56 @@ Actions:add_imgui(function()
       else
         UI.widgetSound("Error")
       end
-      script.run_in_fiber(function()
-        if all_objects == nil then
-          all_objects = entities.get_all_objects_as_handles()
-        end
-        for _, v in ipairs(all_objects) do
-          local modelHash      = ENTITY.GET_ENTITY_MODEL(v)
-          local attachedObject = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(self.get_ped(), modelHash)
-          if ENTITY.DOES_ENTITY_EXIST(attachedObject) then
-            ENTITY.DETACH_ENTITY(attachedObject, true, true)
-            ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(attachedObject)
-            TASK.CLEAR_PED_TASKS(self.get_ped())
+      script.run_in_fiber(function(detachProps)
+        if plyrProps[1] ~= nil then
+          for k, v in ipairs(plyrProps) do
+            if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(v, self.get_ped()) then
+              ENTITY.DETACH_ENTITY(v, true, true)
+              ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(v)
+              table.remove(plyrProps, k)
+            end
           end
-        end
-        if all_peds == nil then
-          all_peds = entities.get_all_peds_as_handles()
-        end
-        for _, p in ipairs(all_peds) do
-          local pedHash     = ENTITY.GET_ENTITY_MODEL(p)
-          local attachedPed = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(self.get_ped(), pedHash)
-          if ENTITY.DOES_ENTITY_EXIST(attachedPed) then
-            ENTITY.DETACH_ENTITY(attachedPed, true, true)
-            TASK.CLEAR_PED_TASKS(self.get_ped())
-            TASK.CLEAR_PED_TASKS(attachedPed)
-            ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(attachedPed)
+        else
+          if all_objects == nil then
+            all_objects = entities.get_all_objects_as_handles()
+          end
+          for _, v in ipairs(all_objects) do
+            local modelHash      = ENTITY.GET_ENTITY_MODEL(v)
+            local attachedObject = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(self.get_ped(), modelHash)
+            if ENTITY.DOES_ENTITY_EXIST(attachedObject) then
+              ENTITY.DETACH_ENTITY(attachedObject, true, true)
+              ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(attachedObject)
+              TASK.CLEAR_PED_TASKS(self.get_ped())
+            end
           end
         end
         is_playing_anim = false
         if is_playing_scenario then
-          if ENTITY.DOES_ENTITY_EXIST(bbq) then
-            ENTITY.DELETE_ENTITY(bbq)
-          end
-          is_playing_scenario = false
+          stopScenario(self.get_ped(), detachProps)
         end
         if ped_grabbed then
-          ENTITY.FREEZE_ENTITY_POSITION(attached_ped, false)
-          TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
-          PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
-          PED.SET_PED_TO_RAGDOLL(attached_ped, 1500, 0, 0, false, false, false)
-          TASK.CLEAR_PED_TASKS(self.get_ped())
-          PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), true)
-        end
-        if plyrProps[1] ~= nil then
-          for _, v in ipairs(plyrProps) do
-            table.remove(v)
+          if attached_ped ~= 0 and ENTITY.DOES_ENTITY_EXIST(attached_ped) then
+            ENTITY.FREEZE_ENTITY_POSITION(attached_ped, false)
+            TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
+            PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
+            PED.SET_PED_TO_RAGDOLL(attached_ped, 1500, 0, 0, false, false, false)
+            TASK.CLEAR_PED_TASKS(self.get_ped())
+            PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), true)
           end
+          ped_grabbed = false
         else
-          if not ped_grabbed then
-            gui.show_error("Samurais Scripts", "There are no objects or peds attached.")
-          else
-            ped_grabbed = false
+          if all_peds == nil then
+            all_peds = entities.get_all_peds_as_handles()
+          end
+          for _, p in ipairs(all_peds) do
+            local pedHash     = ENTITY.GET_ENTITY_MODEL(p)
+            local attachedPed = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(self.get_ped(), pedHash)
+            if ENTITY.DOES_ENTITY_EXIST(attachedPed) then
+              ENTITY.DETACH_ENTITY(attachedPed, true, true)
+              TASK.CLEAR_PED_TASKS(self.get_ped())
+              TASK.CLEAR_PED_TASKS(attachedPed)
+              ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(attachedPed)
+            end
           end
         end
       end)
@@ -2078,119 +2071,77 @@ weapon_tab:add_imgui(function()
   end
   if laserSight then
     ImGui.Text(LASER_CHOICE_TXT_)
-    ImGui.SameLine(); laser_switch, lsrswUsed = ImGui.RadioButton("Red", laser_switch, 0)
+    laser_switch, lsrswUsed = ImGui.RadioButton("Red", laser_switch, 0)
     ImGui.SameLine(); laser_switch, lsrswUsed_2 = ImGui.RadioButton("Green", laser_switch, 1)
-    if lsrswUsed then
+    ImGui.SameLine(); laser_switch, lsrswUsed_3 = ImGui.RadioButton("Blue", laser_switch, 2)
+    if lsrswUsed or lsrswUsed_2 or lsrswUsed_3 then
       UI.widgetSound("Nav")
+      if laser_switch == 0 then
+        laser_choice = {
+          r = 237,
+          g = 47,
+          b = 50,
+        }
+      elseif laser_switch == 1 then
+        laser_choice = {
+          r = 204,
+          g = 204,
+          b = 102,
+        }
+      else
+        laser_choice = {
+          r = 20,
+          g = 75,
+          b = 159,
+        }
+      end
       CFG.save("laser_switch", laser_switch)
       CFG.save("laser_choice", laser_choice)
-    end
-    if lsrswUsed_2 then
-      UI.widgetSound("Nav")
-      CFG.save("laser_switch", laser_switch)
-      CFG.save("laser_choice", laser_choice)
-    end
-    if laser_switch == 0 then
-      laser_choice = "proj_laser_enemy"
-    else
-      laser_choice = "proj_laser_player"
     end
   end
 end)
 
-
--- personal_pet = self_tab:add_tab("Personal Pet")
--- local function displayPets()
---   petNames = {}
---   for _, v in ipairs(pets_T) do
---     table.insert(petNames, v.name)
---   end
---   pet_index, piused = ImGui.Combo("##petList", pet_index, petNames, #pets_T)
--- end
--- personal_pet:add_imgui(function()
---   if my_pet_T.hash == nil or my_pet_T.name == nil then
---     ImGui.Dummy(10, 1) ImGui.SeparatorText("Adopt a New Pet")
---     ImGui.PushItemWidth(300)
---     displayPets()
---     ImGui.PopItemWidth()
---     selected_pet = pets_T[pet_index + 1]
---     ImGui.Spacing(); ImGui.Text("Give your new pet a name: ")
---     ImGui.PushItemWidth(300)
---     pet_name, pnUsed = ImGui.InputTextWithHint("##petName", "Pet Name", pet_name, 64)
---     ImGui.PopItemWidth()
---     if ImGui.IsItemActive() then
---       is_typing = true
---     else
---       is_typing = false
---     end
---     ImGui.BeginDisabled(pet_name == "")
---     if ImGui.Button("  Adopt  ") then
---       script.run_in_fiber(function(adopt)
---         local petModel = selected_pet.hash
---         local petID    = selected_pet.id
---         local petBreed = selected_pet.name
---         local myCoords = self.get_pos()
---         local myFwdVec = Game.getForwardVec(self.get_ped())
---         local found, spawn_point = MISC.FIND_SPAWN_POINT_IN_DIRECTION(
---           myCoords.x, myCoords.y, myCoords.z,
---           myFwdVec.x, myFwdVec.y, myFwdVec.z,
---           20.0, spawn_point
---         )
---         if found then
---           if Game.requestModel(petModel) then
---             myPet = PED.CREATE_PED(
---               PED_TYPE._ANIMAL, petModel, spawn_point.x,
---               spawn_point.y, spawn_point.z, math.random(0, 180),
---               true, false
---             )
---           end
---           adopt:sleep(200)
---           if ENTITY.DOES_ENTITY_EXIST(myPet) and not ENTITY.IS_ENTITY_DEAD(myPet, true) then
---             local myGroup = PED.GET_PED_GROUP_INDEX(self.get_ped())
---             if not PED.DOES_GROUP_EXIST(myGroup) then
---               myGroup = PED.CREATE_GROUP(0)
---             end
---             PED.SET_GROUP_SEPARATION_RANGE(myGroup, 16960)
---             PED.SET_GROUP_FORMATION(myGroup, 2)
---             PED.SET_GROUP_FORMATION_SPACING(myGroup, 2.0, 2.0, 0.0)
---             PED.SET_PED_AS_GROUP_MEMBER(myPet, myGroup)
---             PED.SET_PED_NEVER_LEAVES_GROUP(myPet, true)
---             my_pet_T = {
---               hash = petModel,
---               id   = petID,
---               name = pet_name,
---               adoption_date = tostring(os.date("%d-%b-%Y"))
---             }
---             CFG.save("my_pet_T", my_pet_T)
---             adopt:sleep(100)
---             gui.show_success("Samurai's Scripts",
---             string.format("Congratulations! You are now the proud owner of a beautiful %s named %s", petBreed, pet_name))
---           end
---         else
---           gui.show_error("Samurai's Scripts", "Couldn't find a suitable spot for your pet! Please try again later.")
---         end
---       end)
---     end
---     ImGui.EndDisabled()
---   else
---     -- pet interactions and shit (feeding, petting, tricks, attacks...)
---     -- call / dismiss button
---     if ImGui.Button("Abandon") then
---       my_pet_T = { hash = nil, id = nil, name = nil, adoption_date = nil}
---       CFG.save("my_pet_T", my_pet_T)
---       script.run_in_fiber(function()
---         if myPet ~= 0 and ENTITY.DOES_ENTITY_EXIST(myPet) then
---           PED.REMOVE_PED_FROM_GROUP(myPet)
---           ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(myPet)
---         end
---       end)
---       gui.show_error("Samurai's Scripts", "Wow! What a heartless monster!")
---     end
---   end
--- end)
-
-
 sound_player = self_tab:add_tab(SOUND_PLAYER_)
+local sound_id, sound_index = -1, 1
+local sound_search = ""
+local hasSoundFinished = false
+local function readSoundsFile()
+  if SS_debug then 
+    if io.exists("soundNames.json") then
+      local jsonFile, _ = io.open("soundNames.json", "r")
+      if jsonFile ~= nil then
+        local content = jsonFile:read("*all")
+        jsonFile:close()
+        return CFG.decode(content)
+      end
+    else
+      error("[FATAL] Json file not found!")
+    end
+  end
+  return nil
+end
+local all_sounds = readSoundsFile()
+
+local function filterFrontendSounds()
+  filteredSounds = {}
+  if all_sounds ~= nil then
+    for _, v in ipairs(all_sounds) do
+      if string.find(string.lower(v.AudioName), sound_search) then
+        table.insert(filteredSounds, v)
+      end
+    end
+  end
+end
+
+local function displayFrontendSounds()
+  filterFrontendSounds()
+  local allSoundNames = {}
+  for _, v in ipairs(filteredSounds) do
+    table.insert(allSoundNames, v.AudioName)
+  end
+  sound_index, siused = ImGui.ListBox("##sounds", sound_index, allSoundNames, #filteredSounds)
+end
+
 local function displayMaleSounds()
   filteredMaleSounds = {}
   for _, v in ipairs(male_sounds_T) do
@@ -2198,6 +2149,7 @@ local function displayMaleSounds()
   end
   sound_index1, used = ImGui.Combo("##maleSounds", sound_index1, filteredMaleSounds, #male_sounds_T)
 end
+
 local function displayFemaleSounds()
   filteredFemaleSounds = {}
   for _, v in ipairs(female_sounds_T) do
@@ -2205,6 +2157,7 @@ local function displayFemaleSounds()
   end
   sound_index2, used = ImGui.Combo("##femaleSounds", sound_index2, filteredFemaleSounds, #female_sounds_T)
 end
+
 local function displayRadioStations()
   filteredRadios = {}
   for _, v in ipairs(radio_stations) do
@@ -2212,6 +2165,7 @@ local function displayRadioStations()
   end
   radio_index, used = ImGui.Combo("##radioStations", radio_index, filteredRadios, #radio_stations)
 end
+
 sound_player:add_imgui(function()
   ImGui.Spacing(); ImGui.SeparatorText("Human Sounds"); ImGui.Spacing()
   ImGui.Dummy(20, 1); ImGui.SameLine(); sound_switch, isChanged = ImGui.RadioButton(MALE_SOUNDS_, sound_switch, 0); ImGui.SameLine()
@@ -2296,6 +2250,60 @@ sound_player:add_imgui(function()
     ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
     ImGui.BeginDisabled()
     ImGui.Button(string.format(" %s ", loading_label), 60, 30)
+    ImGui.EndDisabled()
+  end
+
+  if SS_debug then
+    ImGui.Dummy(1, 10); ImGui.SeparatorText("Frontend Sounds")
+    ImGui.PushItemWidth(420)
+    sound_search, sschanged = ImGui.InputTextWithHint("##search", "Search Sounds", sound_search, 64)
+    if ImGui.IsItemActive() then
+      is_typing = true
+    else
+      is_typing = false
+    end
+    displayFrontendSounds()
+    ImGui.PopItemWidth()
+    if filteredSounds ~= nil then
+      selected_sound = filteredSounds[sound_index + 1]
+    end
+    ImGui.Spacing(); ImGui.PushButtonRepeat(true)
+    if ImGui.Button(" + ") then
+      if sound_index == #filteredSounds - 1 then
+        sound_index = 0
+      end
+      sound_index = sound_index + 1
+    end
+    ImGui.SameLine()
+    if ImGui.Button(" - ") then
+      if sound_index == 0 then
+        sound_index = #filteredSounds
+      end
+      sound_index = sound_index - 1
+    end
+    ImGui.PopButtonRepeat()
+    ImGui.PopItemWidth()
+    ImGui.Spacing()
+    ImGui.BeginDisabled(selected_sound == nil or not hasSoundFinished)
+    if ImGui.Button("  Play  ") then
+      script.run_in_fiber(function()
+        sound_id = AUDIO.GET_SOUND_ID()
+        AUDIO.PLAY_SOUND_FRONTEND(sound_id, selected_sound.AudioName, selected_sound.AudioRef, true)
+      end)
+    end
+    ImGui.EndDisabled()
+    ImGui.SameLine(); ImGui.BeginDisabled(selected_sound == nil or hasSoundFinished)
+    if ImGui.Button("  Stop  ") then
+      script.run_in_fiber(function()
+        AUDIO.STOP_SOUND(sound_id)
+        AUDIO.RELEASE_SOUND_ID(sound_id)
+      end)
+    end
+    ImGui.EndDisabled()
+    ImGui.SameLine(); ImGui.BeginDisabled(selected_sound == nil)
+    if ImGui.Button("  Print  ") then
+      log.debug(string.format("\n\"%s\", \"%s\"", string.upper(selected_sound.AudioName), string.upper(selected_sound.AudioRef)))
+    end
     ImGui.EndDisabled()
   end
 end)
@@ -6305,68 +6313,163 @@ local playerVeh       = 0
 local player_name     = ""
 local playerWallet    = ""
 local playerBank      = ""
+local playerRank      = ""
 local playerCoords    = vec3:new(0.0, 0.0, 0.0)
 local godmode         = false
 local player_in_veh   = false
 local player_active   = false
 local targetPlayerIndex
 players_tab:add_imgui(function()
-  if Game.isOnline() then
+  if Game.isOnline() and not script.is_active("maintransition") then
+    local playerNames = Game.filterPlayerList()
     ImGui.Text(string.format("%s [ %s ]", TOTAL_PLAYERS_TXT_, playerCount))
-    ImGui.PushItemWidth(320)
-    Game.displayPlayerList()
-    ImGui.PopItemWidth()
-    ImGui.Spacing()
+    ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 10.0)
+    if ImGui.BeginChild("PlayerList", 240, 800, true) then
+      for i = 1, #playerNames do
+        local is_selected = (playerIndex == i - 1)
+        local color = filteredPlayers[i] == self.get_ped() and { 1, 1, 0.04 } or { 1, 1, 1 }
+        ImGui.PushStyleColor(ImGuiCol.Header, color[1], color[2], color[3], 0.1)
+        ImGui.PushStyleColor(ImGuiCol.HeaderHovered, color[1], color[2], color[3], 0.3)
+        ImGui.PushStyleColor(ImGuiCol.HeaderActive, color[1], color[2], color[3], 0.6)
+        if ImGui.Selectable(playerNames[i], is_selected) then
+          playerIndex = i - 1
+        end
+        ImGui.PopStyleColor(3)
+        if ImGui.IsItemHovered() then
+          local selectableWidth, _ = ImGui.GetItemRectSize()
+          if selectableWidth > 240 then
+            ImGui.SetTooltip(playerNames[i])
+          end
+        end
+        if is_selected then
+          ImGui.SetItemDefaultFocus()
+        end
+      end
+      ImGui.EndChild()
+    end
+    ImGui.PopStyleVar()
+    ImGui.SameLine(); ImGui.BeginChild("PlayerInfo", 400, 800, true)
     if player_active then
+      ImGui.Dummy(1, 10); ImGui.SeparatorText("Player Info")
       ImGui.Spacing()
-      ImGui.Text(string.format("Cash:         %s", playerWallet))
+      ImGui.BulletText(string.format("Cash:         %s", playerWallet))
       ImGui.Spacing()
-      ImGui.Text(string.format("Bank:         %s", playerBank))
+      ImGui.BulletText(string.format("Bank:         %s", playerBank))
       ImGui.Spacing()
-      ImGui.Text(string.format("Coords:      [X: %.3f] [Y: %.3f] [Z: %.3f]", playerCoords.x, playerCoords.y, playerCoords.z))
+      ImGui.BulletText(string.format("Rank:         %s", playerRank))
+      ImGui.Spacing()
+      ImGui.BulletText(string.format("Coords:      %.3f   %.3f   %.3f", playerCoords.x, playerCoords.y, playerCoords.z))
       if UI.isItemClicked('lmb') or UI.isItemClicked('rmb') then
+        UI.widgetSound("Click")
         log.debug(player_name .. "'s coords: " .. tostring(playerCoords))
         gui.show_message("Samurai's Scripts", player_name .. "'s coordinates logged to console.")
       end
+      UI.toolTip(false, "Press [LMB] or [RMB] to print the coordinates to console.")
       ImGui.Spacing()
-      ImGui.Text(string.format("Heading:     %d", playerHeading))
-      if ImGui.IsItemHovered() and ImGui.IsItemClicked(0) then
+      ImGui.BulletText(string.format("Heading:     %d", playerHeading))
+      if UI.isItemClicked('lmb') or UI.isItemClicked('rmb') then
+        UI.widgetSound("Click")
         log.debug(player_name .. "'s heading: " .. tostring(playerHeading))
         gui.show_message("Samurai's Scripts", player_name .. "'s heading logged to console.")
       end
+      UI.toolTip(false, "Press [LMB] or [RMB] to print the heading to console.")
       ImGui.Spacing()
-      ImGui.Text(string.format("Health:        %d", playerHealth))
-      if playerArmour ~= nil then
+      ImGui.BulletText("Health:      "); ImGui.SameLine()
+      UI.toolTip(false, string.format("Maximum Health: %d", playerMaxHealth))
+      if player_isDead then
+        ImGui.Text("Dead!  x__x")
+      else
+        ImGui.PushStyleColor(ImGuiCol.FrameBg, 0.90, 0, 0, 1)
+        ImGui.ProgressBar(playerHealth / playerMaxHealth, 150, 20)
+        ImGui.PopStyleColor()
+        UI.toolTip(false, string.format("Maximum Health: %d", playerMaxHealth))
+      end
+      if playerArmour ~= nil and not player_isDead then
         ImGui.Spacing()
-        ImGui.Text(string.format("Armour:      %d", playerArmour))
+        ImGui.BulletText("Armour     "); ImGui.SameLine()
+        UI.toolTip(false, string.format("Maximum Armour: %d", playerMaxArmour))
+        ImGui.PushStyleColor(ImGuiCol.FrameBg, 0.066, 0.64, 0.90, 1)
+        ImGui.ProgressBar(playerArmour / playerMaxArmour, 150, 20)
+        ImGui.PopStyleColor()
+        UI.toolTip(false, string.format("Maximum Armour: %d", playerMaxArmour))
       end
       ImGui.Spacing()
-      ImGui.Text(string.format("God Mode:  %s", godmode))
-      if player_in_veh then
-        ImGui.Spacing()
-        ImGui.Text(string.format("Vehicle:  %s", playerVehName))
-        if SS_debug then
-          if ImGui.Button("Delete Vehicle") then
-            script.run_in_fiber(function(del)
-              local pvCTRL = entities.take_control_of(playerVeh, 350)
-              if pvCTRL then
-                ENTITY.SET_ENTITY_AS_MISSION_ENTITY(playerVeh, true, true)
-                del:sleep(200)
-                VEHICLE.DELETE_VEHICLE(playerVeh)
-                gui.show_success("Samurai's Scripts", "" .. player_name .. "'s vehicle has been yeeted.")
-              else
-                gui.show_error("Samurai's Scripts",
-                  "Failed to delete the vehicle! " .. player_name .. " probably has protections on.")
-              end
-            end)
+      ImGui.BulletText(string.format("God Mode:  %s", godmode and "On" or "Off"))
+      ImGui.Spacing()
+      ImGui.BulletText(string.format("Wanted Level:  %s", doWantedStars(wanted_level)))
+
+      ImGui.Dummy(1, 10); ImGui.SeparatorText("Player Options"); ImGui.Spacing()
+      if ImGui.Button(string.format("Teleport To %s##playerlist", player_name)) then
+        UI.widgetSound("Select")
+        Game.Self.teleport(true, playerCoords)
+      end
+      ImGui.SameLine()
+      if ImGui.Button(string.format("Bring %s##playerlist", player_name)) then
+        UI.widgetSound("Select")
+        command.call("bring", {targetPlayerIndex})
+      end
+      if ImGui.Button("Spawn Pervert Stalker") then
+        script.run_in_fiber(function()
+          spawnPervert(targetPlayerPed, player_name)
+        end)
+      end
+      UI.toolTip(false, PERVERT_STALKER_DESC_)
+
+      ImGui.Dummy(1, 10); ImGui.SeparatorText("Vehicle Options")
+      ImGui.Spacing()
+      ImGui.BulletText(string.format("Vehicle:  %s", playerVehName))
+      if not Lua_fn.tableContains(depressorBanList, targetPlayerPed) then
+        if ImGui.Button("Depressor Ban") then
+          UI.widgetSound("Select")
+          table.insert(depressorBanList, targetPlayerPed)
+          gui.show_message(
+            "Samurai's Scripts", string.format(
+            "From now on, we will attempt to sabotage %s's flying mosquito each time they try to use one.", player_name
+            )
+          )
+        end
+      else
+        if ImGui.Button("Lift Depressor Ban") then
+          UI.widgetSound("Delete")
+          gui.show_message(
+            "Samurai's Scripts", string.format(
+            "%s is no longer banned from using flying mosquitos in this session.", player_name
+            )
+          )
+          for i = 0, #depressorBanList do
+            if depressorBanList[i] == targetPlayerPed then
+              table.remove(depressorBanList, i)
+              break
+            end
           end
         end
       end
+      ImGui.BeginDisabled(not player_in_veh)
+      if ImGui.Button("Delete Vehicle") then
+        script.run_in_fiber(function(del)
+          if entities.take_control_of(playerVeh, 350) then
+            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(playerVeh, true, true)
+            del:sleep(200)
+            VEHICLE.DELETE_VEHICLE(playerVeh)
+            gui.show_success("Samurai's Scripts", "" .. player_name .. "'s vehicle has been yeeted.")
+          else
+            gui.show_error("Samurai's Scripts",
+              "Failed to delete the vehicle! " .. player_name .. " probably has protections on.")
+          end
+        end)
+      end
+      ImGui.EndDisabled()
     else
       ImGui.Text("Player left the session.")
     end
+    ImGui.EndChild()
   else
-    ImGui.Dummy(1, 5); ImGui.Text(GENERIC_UNAVAILABLE_SP_)
+    ImGui.Dummy(1, 5)
+    if script.is_active("maintransition") then
+      ImGui.Text("Waiting for online transition...")
+    else
+      ImGui.Text(GENERIC_UNAVAILABLE_SP_)
+    end
   end
 end)
 
@@ -6959,7 +7062,7 @@ object_spawner:add_imgui(function()
     end
     if spawnForPlayer then
       ImGui.PushItemWidth(270)
-      Game.displayPlayerList()
+      Game.displayPlayerListCombo()
       ImGui.PopItemWidth()
       selectedPlayer = filteredPlayers[playerIndex + 1]
       coords         = ENTITY.GET_ENTITY_COORDS(selectedPlayer, false)
@@ -7700,35 +7803,37 @@ hotkeys_tab:add_imgui(function()
   if ImGui.BeginTabItem("Keyboard") then
     ImGui.Dummy(1, 5)
 
-    SS.openHotkeyWindow("Ragdoll On Demand       ", keybinds.rodBtn)
+    SS.openHotkeyWindow("Ragdoll On Demand        ", keybinds.rodBtn)
 
-    SS.openHotkeyWindow("Drift Button                    ", keybinds.tdBtn)
+    SS.openHotkeyWindow("Drift                                ", keybinds.tdBtn)
 
-    SS.openHotkeyWindow("NOS Button                    ", keybinds.nosBtn)
+    SS.openHotkeyWindow("NOS                                ", keybinds.nosBtn)
 
-    SS.openHotkeyWindow("Stop Anim Button          ", keybinds.stop_anim)
+    SS.openHotkeyWindow("Stop Animanimation       ", keybinds.stop_anim)
 
-    SS.openHotkeyWindow("Play Anim Button          ", keybinds.play_anim)
+    SS.openHotkeyWindow("Play Animanimation       ", keybinds.play_anim)
 
-    SS.openHotkeyWindow("Previous Anim Button   ", keybinds.previous_anim)
+    SS.openHotkeyWindow("Previous Animanimation", keybinds.previous_anim)
 
-    SS.openHotkeyWindow("Next Anim Button          ", keybinds.next_anim)
+    SS.openHotkeyWindow("Next Animanimation       ", keybinds.next_anim)
 
-    SS.openHotkeyWindow("Triggerbot Button          ", keybinds.triggerbotBtn)
+    SS.openHotkeyWindow("Triggerbot Button           ", keybinds.triggerbotBtn)
 
-    SS.openHotkeyWindow("Flatbed Button              ", keybinds.flatbedBtn)
+    SS.openHotkeyWindow("Flatbed Tow/Detach       ", keybinds.flatbedBtn)
 
-    SS.openHotkeyWindow("Purge Button                ", keybinds.purgeBtn)
+    SS.openHotkeyWindow("Purge                             ", keybinds.purgeBtn)
 
-    SS.openHotkeyWindow("Toggle Auto-Kill            ", keybinds.autokill)
+    SS.openHotkeyWindow("Toggle Auto-Kill             ", keybinds.autokill)
 
-    SS.openHotkeyWindow("Toggle Enemies Flee    ", keybinds.enemiesFlee)
+    SS.openHotkeyWindow("Toggle Enemies Flee     ", keybinds.enemiesFlee)
 
-    SS.openHotkeyWindow("Toggle Missile Defence", keybinds.missl_def)
+    SS.openHotkeyWindow("Toggle Missile Defence ", keybinds.missl_def)
 
-    SS.openHotkeyWindow("Vehicle Mine Button     ", keybinds.vehicle_mine)
+    SS.openHotkeyWindow("Vehicle Mine                 ", keybinds.vehicle_mine)
 
-    SS.openHotkeyWindow("PANIK!! Button             ", keybinds.panik)
+    SS.openHotkeyWindow("Laser Sights                 ", keybinds.laser_sight)
+
+    SS.openHotkeyWindow("PANIK!! Button              ", keybinds.panik)
     ImGui.EndTabItem()
   end
   if ImGui.BeginTabItem("Controller") then
@@ -7747,6 +7852,8 @@ hotkeys_tab:add_imgui(function()
     SS.gpadHotkeyWindow("Purge Button            ", gpad_keybinds.purgeBtn)
 
     SS.gpadHotkeyWindow("Vehicle Mine Button ", gpad_keybinds.vehicle_mine)
+
+    SS.gpadHotkeyWindow("Laser Sights             ", gpad_keybinds.laser_sight)
     ImGui.EndTabItem()
   end
   ImGui.EndTabBar()
@@ -7760,6 +7867,12 @@ end)
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
+
+if SS_debug then
+  script.register_looped("Sound Checker", function()
+    hasSoundFinished = AUDIO.HAS_SOUND_FINISHED(sound_id)
+  end)
+end
 
 script.register_looped("BALT", function(balt) -- Basic Ass Loading Text
   balt:yield()
@@ -7976,26 +8089,6 @@ script.register_looped("AHL", function(ah) -- Auto-Heal
   end
 end)
 
---[[
-script.register_looped("OBJTP", function() -- Objective TP
-  if objectiveTP then
-    if PAD.IS_CONTROL_JUST_PRESSED(0, 57) then
-      for _, n in pairs(objectives_T) do
-        local blip = HUD.GET_CLOSEST_BLIP_INFO_ID(n)
-        if HUD.DOES_BLIP_EXIST(blip) then
-          blipCoords = HUD.GET_BLIP_COORDS(blip)
-          break
-        end
-      end
-      if blipCoords ~= nil then
-        Game.Self.teleport(true, blipCoords)
-      else
-        gui.show_warning("Objective Teleport", "No objective found!")
-      end
-    end
-  end
-end)
-]]
 script.register_looped("SELFFT", function(script) -- Self Features
   -- Crouch instead of sneak
     if replaceSneakAnim then
@@ -8385,8 +8478,8 @@ script.register_looped("AIEV", function(aiev) -- Anim Interrupt Event
       cleanup(aiev)
       is_playing_anim = false
     end
-    local isLooped = Lua_fn.has_bit(curr_playing_anim.flag, 1)
-    local isFrozen = Lua_fn.has_bit(curr_playing_anim.flag, 2)
+    local isLooped = Lua_fn.has_bit(curr_playing_anim.flag, 0)
+    local isFrozen = Lua_fn.has_bit(curr_playing_anim.flag, 1)
     if not isLooped and not isFrozen then
       repeat
         aiev:sleep(200)
@@ -8845,53 +8938,34 @@ script.register_looped("KATANA", function(rpq)
     end
   end
 end)
+
 script.register_looped("LSR", function(lsr) -- Laser Sight
   if laserSight and WEAPON.IS_PED_ARMED(self.get_ped(), 4) and Game.Self.isOnFoot() then
-    local wpn_hash = WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped())
-    local wpn_idx  = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
-    local h, m, s  = NETWORK.NETWORK_GET_GLOBAL_MULTIPLAYER_CLOCK(h, m, s)
-    local laser_a  = 1.0
-    local wpn_bone = 0
-    if wpn_hash ~= 0x34A67B97 and wpn_hash ~= 0xBA536372 and wpn_hash ~= 0x184140A1 and wpn_hash ~= 0x060EC506 then
-      for _, bone in ipairs(weapbones_T) do
-        bone_check = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(wpn_idx, bone)
-        if bone_check ~= -1 then
-          wpn_bone = bone_check
-          break
-        end
-      end
-    end
-    if h ~= nil then
-      if h > 6 and h < 20 then
-        laser_a = 0.5
-      else
-        laser_a = 0.2
-      end
-    else
-      laser_a = 0.9
-    end
-    if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) and wpn_bone ~= 0 then
-      if Game.requestNamedPtfxAsset('core') then
-        lsr:sleep(300)
-        GRAPHICS.USE_PARTICLE_FX_ASSET('core')
-        laserPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(laser_choice, wpn_idx,
-          1.0, 0.0, -0.01, 0.0, 0.0, 90.0, wpn_bone, 0.20, false, false, false, 0, 0, 0, laser_a)
-        GRAPHICS.SET_PARTICLE_FX_LOOPED_ALPHA(laserPtfx, laser_a)
-        table.insert(laserPtfx_T, laserPtfx)
-        drew_laser = true
-      end
-      if drew_laser then
-        repeat
-          lsr:sleep(50)
-        until PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) == false
-        for _, laser in ipairs(laserPtfx_T) do
-          if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(laser) then
-            GRAPHICS.STOP_PARTICLE_FX_LOOPED(laser, false)
-            GRAPHICS.REMOVE_PARTICLE_FX(laser, false)
+    if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
+      local wpn_idx = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
+      local wpn_bone = 0
+      if wpn_hash ~= 0x34A67B97 and wpn_hash ~= 0xBA536372 and wpn_hash ~= 0x184140A1 and wpn_hash ~= 0x060EC506 then
+        for _, bone in ipairs(weapbones_T) do
+          bone_check = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(wpn_idx, bone)
+          if bone_check ~= -1 then
+            wpn_bone = bone_check
+            break
           end
-          drew_laser = false
         end
       end
+      local bone_pos    = ENTITY.GET_ENTITY_BONE_POSTION(wpn_idx, wpn_bone)
+      local camRotation = CAM.GET_GAMEPLAY_CAM_ROT(0)
+      local direction   = Lua_fn.RotToDir(camRotation)
+      local destination = vec3:new(
+        bone_pos.x + direction.x * 1000,
+        bone_pos.y + direction.y * 1000,
+        bone_pos.z + direction.z * 1000
+      )
+      GRAPHICS.DRAW_LINE(
+        bone_pos.x, bone_pos.y, bone_pos.z,
+        destination.x, destination.y, destination.z,
+        laser_choice.r, laser_choice.g, laser_choice.b, 255
+      )
     end
   end
 end)
@@ -10871,34 +10945,69 @@ script.register_looped("CASINO", function(script)
 end)
 
 script.register_looped("OPI", function() -- Online Player Info
-  if Game.isOnline() and gui.is_open() and players_tab:is_selected() then
-    playerCount       = Game.getPlayerCount()
+  if (Game.isOnline() and not script.is_active("maintransition")) and players_tab:is_selected() then
+    playerCount = Game.getPlayerCount()
+    if #filteredPlayers == 0 then
+      playerNames = Game.filterPlayerList()
+      return
+    end
     selectedPlayer    = filteredPlayers[playerIndex + 1]
     targetPlayerPed   = selectedPlayer
     targetPlayerIndex = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(targetPlayerPed)
     player_name       = PLAYER.GET_PLAYER_NAME(targetPlayerIndex)
-    local gameState   = SS.getPlayerInfo(targetPlayerPed).getGameState()
-    player_active     = gameState ~= "Invalid" and gameState ~= "LeftGame"
+    player_active     = Game.is_in_session(targetPlayerPed)
+    player_isDead     = ENTITY.IS_ENTITY_DEAD(targetPlayerPed, true)
     if player_active then
-      playerWallet  = Game.getPlayerWallet(targetPlayerIndex)
-      playerBank    = Game.getPlayerBank(targetPlayerIndex)
-      playerCoords  = Game.getCoords(targetPlayerPed, false)
-      playerHeading = math.floor(Game.getHeading(targetPlayerPed))
-      playerHealth  = ENTITY.GET_ENTITY_HEALTH(targetPlayerPed)
-      playerArmour  = PED.GET_PED_ARMOUR(targetPlayerPed)
-      godmode       = PLAYER.GET_PLAYER_INVINCIBLE(targetPlayerIndex)
+      playerWallet    = Game.getPlayerWallet(targetPlayerIndex)
+      playerBank      = Game.getPlayerBank(targetPlayerIndex)
+      playerRank      = tostring(Game.getPlayerRank(targetPlayerIndex))
+      playerCoords    = Game.getCoords(targetPlayerPed, false)
+      playerHeading   = math.floor(Game.getHeading(targetPlayerPed))
+      playerHealth    = ENTITY.GET_ENTITY_HEALTH(targetPlayerPed)
+      playerMaxHealth = ENTITY.GET_ENTITY_MAX_HEALTH(targetPlayerPed)
+      playerArmour    = PED.GET_PED_ARMOUR(targetPlayerPed)
+      playerMaxArmour = PLAYER.GET_PLAYER_MAX_ARMOUR(targetPlayerIndex)
+      godmode         = PLAYER.GET_PLAYER_INVINCIBLE(targetPlayerIndex)
+      wanted_level    = PLAYER.GET_PLAYER_WANTED_LEVEL(targetPlayerIndex)
       if PED.IS_PED_SITTING_IN_ANY_VEHICLE(targetPlayerPed) then
         player_in_veh = true
-        playerVeh     = PED.GET_VEHICLE_PED_IS_IN(targetPlayerPed, true)
-        playerVehName = vehicles.get_vehicle_display_name(ENTITY.GET_ENTITY_MODEL(playerVeh))
+        playerVeh     = PED.GET_VEHICLE_PED_IS_USING(targetPlayerPed)
+        playerVehName = string.format(
+          "%s %s (%s)",
+          Game.Vehicle.manufacturer(playerVeh),
+          Game.Vehicle.name(playerVeh),
+          Game.Vehicle.class(playerVeh)
+        )
       else
         player_in_veh = false
-        playerVehName = ""
+        playerVehName = "On Foot"
       end
+    else
+      table.remove(filteredPlayers, playerIndex + 1)
     end
   end
 end)
-script.register_looped("CDK", function(cdk) -- Cooldown Killer
+script.register_looped("DPMKIIB", function(dmpkb) -- Depressor MK2 Ban
+  if depressorBanList[1] ~= nil then
+    for _, v in pairs(depressorBanList) do
+      if PED.IS_PED_SITTING_IN_ANY_VEHICLE(v) then
+        local depressorBanVeh = PED.GET_VEHICLE_PED_IS_IN(v, true)
+        if (ENTITY.GET_ENTITY_MODEL(depressorBanVeh) == 0x7B54A9D3) then
+          command.call("vehkick", {targetPlayerIndex}) -- doesn't do shit
+          if entities.take_control_of(depressorBanVeh, 300) then
+            VEHICLE.SET_VEHICLE_ENGINE_HEALTH(depressorBanVeh, -4000)
+            if not VEHICLE.IS_VEHICLE_WEAPON_DISABLED(1966766321, depressorBanVeh, v) then
+              VEHICLE.DISABLE_VEHICLE_WEAPON(true, 1966766321, depressorBanVeh, v)
+            end
+          end
+        end
+      end
+    end
+    dmpkb:sleep(1000)
+  end
+end)
+
+script.register_looped("CDK", function() -- Cooldown Killer
   if Game.isOnline() and TARGET_BUILD == CURRENT_BUILD and not script.is_active("maintransition") then
     if mc_work_cd then
       if globals.get_int(Global_262145.f_18571) > 0 then
@@ -10987,47 +11096,67 @@ script.register_looped("DFM", function() -- Disable Flight Music
 end)
 
 script.register_looped("REOPT", function(ro) -- Remote Options
-  if SS.isKeyJustPressed(keybinds.autokill.code) then
-    if autoKill then
-      autoKill = false
-      UI.widgetSound("Cancel")
-      gui.show_message("Samurai's Scripts", "Auto-Kill Enemies disabled.")
-      ro:sleep(100)
-    else
-      autoKill = true
-      UI.widgetSound("Notif")
-      gui.show_success("Samurai's Scripts", "Auto-Kill Enemies enabled.")
-      ro:sleep(100)
+  if not is_typing and not is_setting_hotkeys and not Game.Self.isBrowsingApps()
+    and not HUD.IS_MP_TEXT_CHAT_TYPING() and not HUD.IS_PAUSE_MENU_ACTIVE() then
+    if SS.isKeyJustPressed(keybinds.autokill.code) then
+      if autoKill then
+        autoKill = false
+        UI.widgetSound("Cancel")
+        gui.show_message("Samurai's Scripts", "Auto-Kill Enemies disabled.")
+        ro:sleep(100)
+      else
+        autoKill = true
+        UI.widgetSound("Notif")
+        gui.show_success("Samurai's Scripts", "Auto-Kill Enemies enabled.")
+        ro:sleep(100)
+      end
+      CFG.save("autoKill", autoKill)
     end
-    CFG.save("autoKill", autoKill)
-  end
-  if SS.isKeyJustPressed(keybinds.enemiesFlee.code) then
-    if runaway then
-      runaway = false
-      UI.widgetSound("Cancel")
-      gui.show_message("Samurai's Scripts", "Enemies Flee disabled.")
-      ro:sleep(100)
-    else
-      runaway = true
-      UI.widgetSound("Notif")
-      gui.show_success("Samurai's Scripts", "Enemies Flee enabled.")
-      ro:sleep(100)
+
+    if SS.isKeyJustPressed(keybinds.enemiesFlee.code) then
+      if runaway then
+        runaway = false
+        UI.widgetSound("Cancel")
+        gui.show_message("Samurai's Scripts", "Enemies Flee disabled.")
+        ro:sleep(100)
+      else
+        runaway = true
+        UI.widgetSound("Notif")
+        gui.show_success("Samurai's Scripts", "Enemies Flee enabled.")
+        ro:sleep(100)
+      end
+      CFG.save("runaway", runaway)
     end
-    CFG.save("runaway", runaway)
-  end
-  if SS.isKeyJustPressed(keybinds.missl_def.code) then
-    if missiledefense then
-      missiledefense = false
-      UI.widgetSound("Cancel")
-      gui.show_message("Samurai's Scripts", "Missile Defence disabled.")
-      ro:sleep(100)
-    else
-      missiledefense = true
-      UI.widgetSound("Notif")
-      gui.show_success("Samurai's Scripts", "Missile Defence enabled.")
-      ro:sleep(100)
+
+    if SS.isKeyJustPressed(keybinds.missl_def.code) then
+      if missiledefense then
+        missiledefense = false
+        UI.widgetSound("Cancel")
+        gui.show_message("Samurai's Scripts", "Missile Defence disabled.")
+        ro:sleep(100)
+      else
+        missiledefense = true
+        UI.widgetSound("Notif")
+        gui.show_success("Samurai's Scripts", "Missile Defence enabled.")
+        ro:sleep(100)
+      end
+      CFG.save("missiledefense", missiledefense)
     end
-    CFG.save("missiledefense", missiledefense)
+
+    if SS.isKeyJustPressed(keybinds.laser_sight.code) then
+      if laserSight then
+        laserSight = false
+        AUDIO.PLAY_SOUND_FRONTEND(-1, "Target_Counter_Tick", "DLC_SM_Generic_Mission_Sounds", false)
+        gui.show_message("Samurai's Scripts", "Laser Sights disabled.")
+        ro:sleep(100)
+      else
+        laserSight = true
+        AUDIO.PLAY_SOUND_FRONTEND(-1, "Target_Counter_Tick", "DLC_SM_Generic_Mission_Sounds", false)
+        gui.show_success("Samurai's Scripts", "Laser Sights enabled.")
+        ro:sleep(100)
+      end
+      CFG.save("laserSight", laserSight)
+    end
   end
 end)
 
@@ -11071,13 +11200,13 @@ event.register_handler(menu_event.Wndproc, function(_, msg, wParam, lParam)
       if wParam == key.code then
         key.pressed      = true
         key.just_pressed = true
-        if key.just_pressed then
-          SS.debug(
-            "\10--- Pressed Key ---" .. "\10 ¤ Name:       " .. key.name .. "\10 ¤ Keycode:    " ..
-            Lua_fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit24: " .. tostring((lParam & (1 << 24)) ~= 0)
-            .. "\10 ¤ SYSKEY:     " .. tostring(msg == WM._SYSKEYDOWN)
-          )
-        end
+        -- if key.just_pressed then
+        --   SS.debug(
+        --     "\10--- Pressed Key ---" .. "\10 ¤ Name:       " .. key.name .. "\10 ¤ Keycode:    " ..
+        --     Lua_fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit24: " .. tostring((lParam & (1 << 24)) ~= 0)
+        --     .. "\10 ¤ SYSKEY:     " .. tostring(msg == WM._SYSKEYDOWN)
+        --   )
+        -- end
         break
       end
     end

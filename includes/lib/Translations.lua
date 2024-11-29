@@ -6940,6 +6940,52 @@ Labels = {
 			text = "Łączna liczba graczy:",
 		},
 	},
+	pervertStalker_tt = {
+		{
+			iso = "en-US",
+			text = "Spawns a pervert stalker who follows the target player and masturbates near them.",
+		},
+		{
+			iso = "de-DE",
+			text = "Erzeugt einen perversen Stalker, der dem Zielspieler folgt und in seiner Nähe masturbiert.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Fait apparaître un harceleur pervers qui suit le joueur ciblé et se masturbe près de lui.",
+		},
+		{
+			iso = "it-IT",
+			text = "Genera uno stalker pervertito che segue il giocatore bersaglio e si masturba vicino a lui.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Cria um perseguidor pervertido que segue o jogador alvo e se masturba perto dele.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Создает извращенца-преследователя, который следует за целевым игроком и мастурбирует рядом с ним.",
+		},
+		{
+			iso = "es-ES",
+			text = "Genera un acosador pervertido que sigue al jugador objetivo y se masturba cerca de él.",
+		},
+		{
+			iso = "zh-CN",
+			text = "产生一个跟踪目标玩家并在其附近自慰的变态跟踪者。",
+		},
+		{
+			iso = "zh-TW",
+			text = "產生一個變態追蹤者，追蹤目標玩家並在他們附近自慰。",
+		},
+		{
+			iso = "ja-JP",
+			text = "ターゲットプレイヤーを追いかけ、近くで自慰行為をする変態ストーカーを生成します。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Pojawia się zboczeniec, który podąża za graczem docelowym i masturbuje się w jego pobliżu.",
+		},
+	},
 	editMode = {
 		{
 			iso = "en-US",

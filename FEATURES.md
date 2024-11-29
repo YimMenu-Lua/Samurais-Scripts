@@ -73,10 +73,10 @@
   - All nearby enemies will drop their weapons and run away from you. Note that during some missions, enemies will be confused and sometimes stand still and scream in horror because the game is forcing them to attack and this script is forcing them to flee.
 
 - **Katana:**
-  - Replaces the *Machete* weapon with a Japanese katana. If you don't own a Machete, you can either buy one from Ammu-Nation or use YimMenu to equip a tempoary one. Once you have one equipped in your hands, it will be automatically replaced with a Katana.
+  - Replaces the *Machete* weapon with a Japanese katana. If you don't own a Machete, you can either buy one from Ammu-Nation or use YimMenu to equip a temporary one. Once you have one equipped in your hands, it will be automatically replaced with a Katana.
 
 - **Laser Sight:**
-  - Renders a laser sight on your weapons when you're aiming them. The laser doesn't look perfect and doesn't travel far either. You can choose between red and green lasers.
+  - Renders a laser sight on your weapons when you're aiming them. You can choose between Red, Green, and Blue lasers. Can be toggled on/off by pressing the assigned key *(default **[L]** on keyboard)*.
 
 ## Vehicle
 

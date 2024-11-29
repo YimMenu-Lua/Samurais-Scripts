@@ -320,9 +320,10 @@ function initStrings()
   QUICK_TP_WARN2_    = translateLabel("tp_warn_2")
   HANGAR_TXT_        = translateLabel("hangar_title")
   -- Players
-  PLAYERS_TAB_         = translateLabel("playersTab")
-  TOTAL_PLAYERS_TXT_   = translateLabel("Total Players:")
-  TEMP_DISABLED_NOTIF_ = translateLabel("temporarily disabled")
+  PLAYERS_TAB_          = translateLabel("playersTab")
+  TOTAL_PLAYERS_TXT_    = translateLabel("Total Players:")
+  TEMP_DISABLED_NOTIF_  = translateLabel("temporarily disabled")
+  PERVERT_STALKER_DESC_ = translateLabel("pervertStalker_tt")
   -- World
   WORLD_TAB_             = translateLabel("worldTab")
   NPC_CTRL_FAIL_         = translateLabel("failedToCtrlNPC")
@@ -384,6 +385,55 @@ function initStrings()
   RESET_SETTINGS_BTN_      = translateLabel("reset_settings_Btn")
   CONFIRM_PROMPT_          = translateLabel("confirm_txt")
   log.info(string.format("Loaded %d %s translations.", Lua_fn.getTableLength(Labels), current_lang))
+end
+
+---@param level integer
+doWantedStars = function(level)
+  local stars = ""
+  if level == 0 then
+    return "Clear"
+  end
+  for _ = 1, level do
+    stars = stars .. " *"
+  end
+  return stars
+end
+
+spawnPervert = function(playerPed, playerName)
+  if not Game.requestModel(0x55446010) then
+    return
+  end
+  local sequenceID = 0
+  local spawn_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
+    playerPed, math.random(3, 10), math.random(3, 10), 0.0
+  )
+
+  perv = PED.CREATE_PED(PED_TYPE._CIVMALE, 0x55446010, spawn_pos.x, spawn_pos.y, spawn_pos.z, math.random(1, 180), true, false)
+  if ENTITY.DOES_ENTITY_EXIST(perv) then
+    UI.widgetSound("Select")
+    gui.show_success("Samurai's Scripts", string.format("Spawned a stalker pervert for %s.", playerName))
+    TASK.OPEN_SEQUENCE_TASK(sequenceID)
+    TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(perv, true)
+    PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(perv, true)
+    TASK.TASK_FOLLOW_TO_OFFSET_OF_ENTITY(
+      perv, playerPed, 3.0, 3.0, 3.0,
+      20.0, -1, 10.0, true
+    )
+    if Game.requestAnimDict("switch@trevor@jerking_off") then
+      TASK.TASK_PLAY_ANIM(
+        perv, "switch@trevor@jerking_off", "trev_jerking_off_loop",
+        4.0, -4.0, -1, 196665, 1.0, false, false, false
+      )
+    end
+    TASK.SET_SEQUENCE_TO_REPEAT(sequenceID, true)
+    TASK.TASK_PERFORM_SEQUENCE(perv, sequenceID)
+    TASK.CLEAR_SEQUENCE_TASK(sequenceID)
+    STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(0x55446010)
+    ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(perv)
+  else
+    UI.widgetSound("Error")
+    gui.show_error("Samurai's Scripts", string.format("Failed to spawn a stalker pervert for %s.", playerName))
+  end
 end
 --#endregion
 
@@ -650,6 +700,18 @@ Lua_fn.decimalToHex = function(n, base)
   return '0x' .. str
 end
 
+Lua_fn.tableContains = function(tbl, value)
+  if #tbl == 0 then
+    return false
+  end
+  for i = 1, #tbl do
+    if tbl[i] == value then
+      return true
+    end
+  end
+  return false
+end
+
 -- Returns key, value pairs of a table.
 ---@param t table
 ---@param indent? integer
@@ -816,6 +878,24 @@ end
 ---@param includeZ boolean
 Lua_fn.inverseVec = function(vector3, includeZ)
   return vec3:new(-vector3.x, -vector3.y, includeZ and -vector3.z or vector3.z)
+end
+
+-- Converts a rotation vector to a direction vector.
+---@param rotation vec3
+Lua_fn.RotToDir = function(rotation)
+	local radians = vec3:new(
+    rotation.x * (math.pi / 180),
+    rotation.y * (math.pi / 180),
+    rotation.z * (math.pi / 180)
+  )
+
+	local direction = vec3:new(
+    -math.sin(radians.z) * math.abs(math.cos(radians.x)),
+    math.cos(radians.z) * math.abs(math.cos(radians.x)),
+    math.sin(radians.x)
+  )
+
+	return direction
 end
 
 
@@ -1057,6 +1137,7 @@ UI.widgetSound = function(sound)
       { name = "Pickup",    sound = "PICK_UP",             soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET" },
       { name = "W_Pickup",  sound = "PICK_UP_WEAPON",      soundRef = "HUD_FRONTEND_CUSTOM_SOUNDSET" },
       { name = "Fail",      sound = "CLICK_FAIL",          soundRef = "WEB_NAVIGATION_SOUNDS_PHONE" },
+      { name = "Click",     sound = "CLICK_LINK",          soundRef = "DLC_H3_ARCADE_LAPTOP_SOUNDS" },
       { name = "Notif",     sound = "LOSE_1ST",            soundRef = "GTAO_FM_EVENTS_SOUNDSET" },
       { name = "Delete",    sound = "DELETE",              soundRef = "HUD_DEATHMATCH_SOUNDSET" },
       { name = "Cancel",    sound = "CANCEL",              soundRef = "HUD_FREEMODE_SOUNDSET" },
@@ -2196,7 +2277,7 @@ SS.reset_settings = function()
   nosPower                = 10; CFG.save("nosPower", nosPower)
   nosBtn                  = 21; CFG.save("nosBtn", nosBtn)
   supply_autofill_delay   = 500; CFG.save("supply_autofill_delay", supply_autofill_delay)
-  laser_choice            = "proj_laser_enemy"; CFG.save("laser_choice", laser_choice)
+  laser_choice            = { r = 237, g = 47, b = 50 }; CFG.save("laser_choice", laser_choice)
   LANG                    = "en-US"; CFG.save("LANG", LANG)
   current_lang            = "English"; CFG.save("current_lang", current_lang)
   initStrings()
@@ -2356,11 +2437,12 @@ end
 
 ---@param ped integer
 Game.is_in_session = function(ped)
-  return SS.getPlayerInfo(ped).getGameState() ~= "Invalid"
+  return (Game.isOnline() and not script.is_active("maintransition"))
+    and SS.getPlayerInfo(ped).getGameState() ~= "Invalid"
     and SS.getPlayerInfo(ped).getGameState() ~= "LeftGame"
 end
 
-Game.updatePlayerList = function()
+Game.getPlayerList = function()
   filteredPlayers = {}
   local players = entities.get_all_peds_as_handles()
   for _, ped in ipairs(players) do
@@ -2370,9 +2452,8 @@ Game.updatePlayerList = function()
   end
 end
 
--- Grabs all players in a session and displays them inside an ImGui combo.
-Game.displayPlayerList = function()
-  Game.updatePlayerList()
+Game.filterPlayerList = function()
+  Game.getPlayerList()
   local playerNames = {}
   for _, player in ipairs(filteredPlayers) do
     local playerIdx   = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(player)
@@ -2389,6 +2470,13 @@ Game.displayPlayerList = function()
     end
     table.insert(playerNames, playerName)
   end
+  return playerNames
+end
+
+-- Displays all players in the session inside an ImGui Combo
+Game.displayPlayerListCombo = function()
+  Game.getPlayerList()
+  local playerNames = Game.filterPlayerList()
   playerIndex, used = ImGui.Combo("##playerList", playerIndex, playerNames, #filteredPlayers)
 end
 
@@ -2404,18 +2492,43 @@ end
 -- Returns the player's cash
 ---@param player integer
 Game.getPlayerWallet = function(player)
-  local wallet     = (tonumber(Lua_fn.str_replace(MONEY.NETWORK_GET_STRING_WALLET_BALANCE(player), "$", "")) * 1)
-  local wallet_int = wallet
-  local formatted  = Lua_fn.formatMoney(wallet)
+  if player ~= self.get_id() then
+    return Lua_fn.formatMoney(network.get_player_wallet(player)), 0
+  end
+
+  local wallet_int = (tonumber(Lua_fn.str_replace(MONEY.NETWORK_GET_STRING_WALLET_BALANCE(stats.get_character_index()), "$", "")) * 1)
+  local formatted  = Lua_fn.formatMoney(wallet_int)
   return formatted, wallet_int
 end
 
 -- Returns the player's bank balance
 ---@param player integer
 Game.getPlayerBank = function(player)
-  local _, wallet = Game.getPlayerWallet(player)
-  local bank = (tonumber(Lua_fn.str_replace(MONEY.NETWORK_GET_STRING_BANK_WALLET_BALANCE(player), "$", "")) - wallet)
+  if player ~= self.get_id() then
+    return Lua_fn.formatMoney(network.get_player_bank(player))
+  end
+
+  local _, wallet_int = Game.getPlayerWallet(self.get_id())
+  local bank = (tonumber(Lua_fn.str_replace(MONEY.NETWORK_GET_STRING_BANK_WALLET_BALANCE(stats.get_character_index()), "$", "")) - wallet_int)
   return Lua_fn.formatMoney(bank)
+end
+
+-- Returns the player's RP rank.
+---@param player integer
+Game.getPlayerRank = function(player)
+  if player ~= self.get_id() then
+    return tostring(network.get_player_rank(player))
+  end
+
+  local self_rp = stats.get_int("MPX_CHAR_XP_FM")
+  for i = 1, #rp_levels do
+    if i < #rp_levels then
+      if self_rp == rp_levels[i] or (self_rp > rp_levels[i] and self_rp < rp_levels[i+1]) then
+        return i
+      end
+    end
+  end
+  return 8000
 end
 
 ---@param text string
@@ -2682,6 +2795,32 @@ Game.findObjectiveBlip = function()
     end
   end
 end
+
+
+--[[
+-- Unused. Causes a crash on its first call then starts working fine.
+-- It was supposed to be used for the laser sights feature but I'm too stupid to fix it.
+
+-- Performs a raycast world probe shape test and returns its result.
+---@param src vec3
+---@param dest vec3
+---@param entity integer
+Game.shapeTest = function(src, dest, entity)
+  local shapeTestHandle = SHAPETEST.START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(
+    src.x, src.y, src.z,
+    dest.x, dest.y, dest.z,
+    511, entity, 4
+  )
+
+  local iParam1, hit, endCoords, surfaceNormal, iParam2 = SHAPETEST.GET_SHAPE_TEST_RESULT(
+    shapeTestHandle,
+    hit, endCoords,
+    surfaceNormal, iParam2
+  )
+
+  return (iParam1 == 2) and hit, endCoords or false
+end
+]]
 
 ---@class Self
 Game.Self = {}
