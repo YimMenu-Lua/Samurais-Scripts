@@ -1,13 +1,14 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.4.5'
+SCRIPT_VERSION = '1.4.6'
 TARGET_BUILD   = '3351'
 TARGET_VERSION = '1.69'
 log.info("version " .. SCRIPT_VERSION)
 
 
 require('lib/samurais_utils')
+
 CURRENT_BUILD   = Game.GetBuildNumber()
 CURRENT_VERSION = Game.GetOnlineVersion()
 CFG             = require("lib/YimConfig")
@@ -502,11 +503,7 @@ GPAD_PURGE_BUTTON      = gpad_keybinds.purgeBtn.name
 GPAD_TRIGGERBOT_BUTTON = gpad_keybinds.triggerbotBtn.name
 
 
-require('lib/Translations')
-require('data/objects')
-require('data/actions')
-require('data/refs')
-
+require('ss_init')
 initStrings()
 
 
@@ -3510,14 +3507,14 @@ tow_yAxis     = 0.0
 tow_zAxis     = 0.0
 modelOverride = false
 flatbed:add_imgui(function()
-  local window_size_x, window_size_y = ImGui.GetWindowSize()
-  local vehicleHandles               = entities.get_all_vehicles_as_handles()
-  local flatbedModel                 = 1353720154
-  local vehicle_model                = Game.getEntityModel(current_vehicle)
-  local playerPosition               = self.get_pos()
-  local flatbedPosition              = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
-  local flatbedForwardX              = Game.getForwardX(current_vehicle)
-  local flatbedForwardY              = Game.getForwardY(current_vehicle)
+  local window_size_x, _ = ImGui.GetWindowSize()
+  local vehicleHandles   = entities.get_all_vehicles_as_handles()
+  local flatbedModel     = 1353720154
+  local vehicle_model    = Game.getEntityModel(current_vehicle)
+  local playerPosition   = self.get_pos()
+  local flatbedPosition  = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
+  local flatbedForwardX  = Game.getForwardX(current_vehicle)
+  local flatbedForwardY  = Game.getForwardY(current_vehicle)
   for _, veh in ipairs(vehicleHandles) do
     script.run_in_fiber(function(detector)
       local detectPos = vec3:new(flatbedPosition.x - (flatbedForwardX * 10), flatbedPosition.y - (flatbedForwardY * 10),
@@ -8258,11 +8255,11 @@ script.register_looped("ASVFX", function(animSfx) -- Anim FX
       local torch = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(myPos.x, myPos.y, myPos.z, 1, curr_playing_anim.prop1, false, false, false)
       if ENTITY.DOES_ENTITY_EXIST(torch) then
         local torchPos = ENTITY.GET_ENTITY_COORDS(torch, false)
-        local torchFwd = Lua_fn.inverseVec(Game.getForwardVec(torch), false)
+        local torchFwd = (Game.getForwardVec(torch)):inverse()
         GRAPHICS.DRAW_SPOT_LIGHT(
           torchPos.x, torchPos.y, torchPos.z - 0.2,
           torchFwd.x, torchFwd.y, torchFwd.z, 226, 130, 78,
-          100.0, 40.0, 1.0, 10.0, 0.0
+          50.0, 8.0, 1.0, 10.0, 1.0
         )
       end
     end

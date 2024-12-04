@@ -16,6 +16,22 @@ function sleep(s)
     os.clock() > ntime
 end
 
+---@param ... number
+---@return number
+sum = function(...)
+  local args, result = { ... }, 0
+  for i = 1, #args do
+    if type(args[i]) ~= 'number' then
+      error(string.format(
+        "Invalid argument '%s' at position (%d) in function sum(). The function only takes numbers as parameters.",
+        args[i], i
+      ))
+    end
+    result = result + args[i]
+  end
+  return result
+end
+
 local logMsg = true
 -- Translates text to the user's language.
 --
@@ -438,82 +454,7 @@ end
 --#endregion
 
 
---#region Classes
-
--- My shitty attempt at implementing YimMenu's `atArray` template class.
----@class atArray
-atArray = {}
-atArray.__index = atArray
-
-function atArray:new()
-  local instance = {
-    m_data  = {},
-    m_count = 0,
-    m_size  = 0
-  }
-  setmetatable(instance, atArray)
-  return instance
-end
-
--- Expands the array size.
-function atArray:expand()
-  self.m_size = (self.m_size == 0) and 1 or (self.m_size * 2) -- If the size is bigger than 0, doble it. Otherwise, start from 1.
-  for i = self.m_count + 1, self.m_size do
-    self.m_data[i] = nil -- Set new elements to nil
-  end
-end
-
--- Adds a new value to the array.
---
--- If the current count reaches the allocated size, it calls `expand()` to double it.
-function atArray:append(value)
-  if self.m_count >= self.m_size then
-    self:expand()
-  end
-  self.m_data[self.m_count + 1] = value
-  self.m_count = self.m_count + 1
-end
-
--- Retrieves an array element at the provided index.
---
--- Returns an error if the element doesn't exist.
-function atArray:get(index)
-  if index < 1 or index > self.m_count then
-    error("Index out of bounds", 2)
-  end
-  return self.m_data[index]
-end
-
--- Clears the array.
-function atArray:clear()
-  self.m_data  = {}
-  self.m_count = 0
-  self.m_size  = 0
-end
-
--- Returns the array size.
-function atArray:size()
-  return self.m_count
-end
-
--- Checks if the array contains the provided value.
-function atArray:contains(value)
-  for i = 1, self.m_count do
-    if self.m_data[i] == value then
-      return true
-    end
-  end
-  return false
-end
-
--- Prints the array size and all its elements to the console.
-function atArray:print()
-  log.debug("Array Size: " .. self:size())
-  for i = 1, self.m_count do
-    log.info("\tArray Item: " .. tostring(self.m_data[i]))
-  end
-end
-
+--#region Helpers
 
 -- Lua helpers.
 ---@class Lua_fn
@@ -580,22 +521,6 @@ Lua_fn.str_replace = function(str, old, new)
   return result
 end
 
----@param ... number
----@return number
-sum = function(...)
-  local args, result = { ... }, 0
-  for i = 1, #args do
-    if type(args[i]) ~= 'number' then
-      error(string.format(
-        "Invalid argument '%s' at position (%d) in function sum(). The function only takes numbers as parameters.",
-        args[i], i
-      ))
-    end
-    result = result + args[i]
-  end
-  return result
-end
-
 -- Rounds n float to x number of decimals.
 --[[ -- Example:
 
@@ -606,6 +531,21 @@ end
 ---@param x integer
 Lua_fn.round = function(n, x)
   return tonumber(string.format("%." .. (x or 0) .. "f", n))
+end
+
+-- Helper function for printing
+-- floats with a maximum of 4 decimal fractions.
+---@param num number
+Lua_fn.floatPrecision = function(num)
+  if math.floor(num) == num then
+    return tostring(num)
+  else
+    if #tostring(math.fmod(num, 1)) < 6 then
+      return tostring(num)
+    else
+      return string.format("%.4f", num)
+    end
+  end
 end
 
 -- Returns a string containing the input value separated by the thousands.
@@ -872,12 +812,6 @@ Lua_fn.joaat = function(key)
   hash = hash + (hash << 15)
   hash = hash & 0xFFFFFFFF
   return hash
-end
-
----@param vector3 vec3
----@param includeZ boolean
-Lua_fn.inverseVec = function(vector3, includeZ)
-  return vec3:new(-vector3.x, -vector3.y, includeZ and -vector3.z or vector3.z)
 end
 
 -- Converts a rotation vector to a direction vector.
@@ -2636,7 +2570,8 @@ end
 ---@param entity integer
 ---@param isAlive boolean
 Game.getCoords = function(entity, isAlive)
-  return ENTITY.GET_ENTITY_COORDS(entity, isAlive)
+  local coords = ENTITY.GET_ENTITY_COORDS(entity, isAlive)
+  return vec3:new(coords.x, coords.y, coords.z)
 end
 
 ---@param entity integer
@@ -2656,7 +2591,8 @@ end
 
 ---@param entity integer
 Game.getForwardVec = function(entity)
-  return ENTITY.GET_ENTITY_FORWARD_VECTOR(entity)
+  local fwdVec = ENTITY.GET_ENTITY_FORWARD_VECTOR(entity)
+  return vec3:new(fwdVec.x, fwdVec.y, fwdVec.z)
 end
 
 ---@param ped integer

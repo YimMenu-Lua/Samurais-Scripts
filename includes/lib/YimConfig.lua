@@ -456,6 +456,7 @@ local function YimConfig()
     writeToFile(DEFAULT_CONFIG)
   end
 
+  yc.encode = json.encode
   yc.decode = json.decode
 
   return yc
