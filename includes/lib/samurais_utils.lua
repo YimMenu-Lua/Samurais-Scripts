@@ -537,15 +537,10 @@ end
 -- floats with a maximum of 4 decimal fractions.
 ---@param num number
 Lua_fn.floatPrecision = function(num)
-  if math.floor(num) == num then
-    return tostring(num)
-  else
-    if #tostring(math.fmod(num, 1)) < 6 then
-      return tostring(num)
-    else
-      return string.format("%.4f", num)
-    end
+  if #tostring(math.fmod(num, 1)) > 6 then
+    return string.format("%.4f", num)
   end
+  return string.format(num)
 end
 
 -- Returns a string containing the input value separated by the thousands.
