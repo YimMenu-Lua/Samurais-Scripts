@@ -442,6 +442,7 @@ perv                   = 0
 npc_veh_speed          = 0.0
 npcDriveSwitch         = 0
 npcDrivingFlags        = 803243
+pv_global              = 1572092
 npcDrivingSpeed        = 19
 drift_multiplier       = 1
 quote_alpha            = 1
@@ -3037,15 +3038,15 @@ vehicle_tab:add_imgui(function()
   end
   ImGui.EndDisabled()
   if Game.isOnline() then
-    if globals.get_int(1572056) > 0 and current_vehicle ~= globals.get_int(1572056) then
-      ImGui.BeginDisabled(Game.Self.isDriving() or not Game.Self.isOutside() or globals.get_int(1572056) <= 0)
+    if globals.get_int(pv_global) > 0 and current_vehicle ~= globals.get_int(pv_global) then
+      ImGui.BeginDisabled(Game.Self.isDriving() or not Game.Self.isOutside() or globals.get_int(pv_global) <= 0)
       if ImGui.Button("TP Into Personal Vehicle") then
         UI.widgetSound("Select")
         script.run_in_fiber(function()
-          if ENTITY.DOES_ENTITY_EXIST(globals.get_int(1572056)) then
-            if INTERIOR.GET_INTERIOR_FROM_ENTITY(globals.get_int(1572056)) == 0 then
+          if ENTITY.DOES_ENTITY_EXIST(globals.get_int(pv_global)) then
+            if INTERIOR.GET_INTERIOR_FROM_ENTITY(globals.get_int(pv_global)) == 0 then
               TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
-              PED.SET_PED_INTO_VEHICLE(self.get_ped(), globals.get_int(1572056), -1)
+              PED.SET_PED_INTO_VEHICLE(self.get_ped(), globals.get_int(pv_global), -1)
             else
               gui.show_error("Samurai's Scripts", "Your personal vehicle is not outside.")
             end
@@ -3058,9 +3059,9 @@ vehicle_tab:add_imgui(function()
       if ImGui.Button("Bring Personal Vehicle") then
         UI.widgetSound("Select")
         script.run_in_fiber(function(bpv)
-          if ENTITY.DOES_ENTITY_EXIST(globals.get_int(1572056)) then
-            if INTERIOR.GET_INTERIOR_FROM_ENTITY(globals.get_int(1572056)) == 0 then
-              local veh_coords  = ENTITY.GET_ENTITY_COORDS(globals.get_int(1572056), true)
+          if ENTITY.DOES_ENTITY_EXIST(globals.get_int(pv_global)) then
+            if INTERIOR.GET_INTERIOR_FROM_ENTITY(globals.get_int(pv_global)) == 0 then
+              local veh_coords  = ENTITY.GET_ENTITY_COORDS(globals.get_int(pv_global), true)
               local self_coords = self.get_pos()
               local distance    = MISC.GET_DISTANCE_BETWEEN_COORDS(veh_coords.x, veh_coords.y, veh_coords.z, self_coords.x,
                 self_coords.y, self_coords.z, false)
@@ -3068,11 +3069,11 @@ vehicle_tab:add_imgui(function()
                 gui.show_warning("Samurai's Scripts", "Your personal vehicle is already too close")
               else
                 local self_fwd   = ENTITY.GET_ENTITY_FORWARD_VECTOR(self.get_ped())
-                local veh_hash   = ENTITY.GET_ENTITY_MODEL(globals.get_int(1572056))
+                local veh_hash   = ENTITY.GET_ENTITY_MODEL(globals.get_int(pv_global))
                 local vmin, vmax = Game.getModelDimensions(veh_hash, bpv)
                 local veh_length = vmax.y - vmin.y
                 local tp_offset  = { x = self_fwd.x * veh_length, y = self_fwd.y * veh_length }
-                ENTITY.SET_ENTITY_COORDS(globals.get_int(1572056), self_coords.x + tp_offset.x, self_coords.y + tp_offset
+                ENTITY.SET_ENTITY_COORDS(globals.get_int(pv_global), self_coords.x + tp_offset.x, self_coords.y + tp_offset
                   .y, self_coords.z, false, false, false, true)
               end
             else
