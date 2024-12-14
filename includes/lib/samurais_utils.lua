@@ -1,9 +1,5 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-doc-name, undefined-field
 
-local gvov                  = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
-local game_build_offset     = gvov:add(0x24):rip()
-local online_version_offset = game_build_offset:add(0x20)
-
 --#region Global functions
 
 -- Must be called from inside a coroutine. Input time is in seconds.
@@ -50,7 +46,7 @@ function translateLabel(g)
       end
     end
     -- Replace "---" and "___" placeholders with button names.
-    if retStr ~= nil and retStr ~= "" then
+    if retStr ~= nil and #retStr > 0 then
       for _, tr in ipairs(translations_button_map) do
         if tr.name == g then
           if Lua_fn.str_contains(retStr, "___") then
@@ -74,7 +70,8 @@ function translateLabel(g)
   else
     retStr = string.format("%s [MISSING LABEL!]", g)
   end
-  return retStr ~= nil and retStr or string.format("%s [MISSING LABEL!]", g)
+
+  return retStr
 end
 
 -- Translate all strings once instead
@@ -1975,7 +1972,8 @@ SS.getPlayerInfo = function(ped)
   end
 end
 
-SS.get_ceo_global_offset = function(crates)
+---@param crates number
+SS.get_ceo_crates_offset = function(crates)
   local offset
   if crates ~= nil then
     if crates == 1 then
@@ -2218,31 +2216,18 @@ end
 Game = {}
 Game.__index = Game
 
---[[
-
-  Returns GTA V's current build number.
-
-  **Credits:** [tupoy-ya](https://github.com/tupoy-ya)
-
-]]
----@return string
-Game.GetBuildNumber = function()
-  return game_build_offset:get_string()
+Game.Version = function()
+  local pVers = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
+  local pBnum = pVers:add(0x24):rip()
+  local pOver = pBnum:add(0x20)
+  local rt = {
+    _build  = pBnum:get_string(),
+    _online = pOver:get_string()
+  }
+  return rt
 end
 
---[[
-
-  Returns GTA V's current online version.
-
-  **Credits:** [tupoy-ya](https://github.com/tupoy-ya)
-
-]]
----@return string
-Game.GetOnlineVersion = function()
-  return online_version_offset:get_string()
-end
-
-Game.GetLang = function()
+Game.Language = function()
   local language_codes_T <const> = {
     { name = "English",             id = 0,  iso = "en-US" },
     { name = "French",              id = 1,  iso = "fr-FR" },

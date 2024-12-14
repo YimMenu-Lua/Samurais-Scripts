@@ -1,16 +1,16 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.4.6'
-TARGET_BUILD   = '3351'
-TARGET_VERSION = '1.69'
+SCRIPT_VERSION = '1.4.7'
+TARGET_BUILD   = '3411'
+TARGET_VERSION = '1.70'
 log.info("version " .. SCRIPT_VERSION)
 
 
 require('lib/samurais_utils')
 
-CURRENT_BUILD   = Game.GetBuildNumber()
-CURRENT_VERSION = Game.GetOnlineVersion()
+CURRENT_BUILD   = Game.Version()._build
+CURRENT_VERSION = Game.Version()._online
 CFG             = require("lib/YimConfig")
 
 Samurais_scripts = gui.add_tab("Samurai's Scripts")
@@ -4528,7 +4528,6 @@ end)
     *online*
 ]]
 online_tab           = Samurais_scripts:add_tab("Online ")
-
 business_tab         = online_tab:add_tab("Business Manager (YRV2)")
 local wh1_loop       = false
 local wh2_loop       = false
@@ -4561,7 +4560,7 @@ business_tab:add_imgui(function()
   local window_width = ImGui.GetWindowWidth()
   ImGui.Spacing(); ImGui.Dummy((window_width / 2) - 110, 1); ImGui.SameLine(); UI.coloredText("- YimResupplier V2 -",
     yrv2_color, 1, 60)
-  if Game.isOnline() then
+  if Game.isOnline() and not script.is_active("maintransition") then
     local hangarOwned = stats.get_int("MPX_PROP_HANGAR") ~= 0
     local fCashOwned  = stats.get_int("MPX_PROP_FAC_SLOT0") ~= 0
     local cokeOwned   = stats.get_int("MPX_PROP_FAC_SLOT1") ~= 0
@@ -4620,7 +4619,7 @@ business_tab:add_imgui(function()
         if whouse_1_owned then
           wh1Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE0")
           if wh1Supplies ~= nil and wh1Supplies > 0 then
-            wh1Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh1Supplies)))
+            wh1Value = globals.get_int(262145 + (SS.get_ceo_crates_offset(wh1Supplies)))
           else
             wh1Value = 0
           end
@@ -4694,7 +4693,7 @@ business_tab:add_imgui(function()
         if whouse_2_owned then
           wh2Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE1")
           if wh2Supplies ~= nil and wh2Supplies > 0 then
-            wh2Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh2Supplies)))
+            wh2Value = globals.get_int(262145 + (SS.get_ceo_crates_offset(wh2Supplies)))
           else
             wh2Value = 0
           end
@@ -4768,7 +4767,7 @@ business_tab:add_imgui(function()
         if whouse_3_owned then
           wh3Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE2")
           if wh3Supplies ~= nil and wh3Supplies > 0 then
-            wh3Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh3Supplies)))
+            wh3Value = globals.get_int(262145 + (SS.get_ceo_crates_offset(wh3Supplies)))
           else
             wh3Value = 0
           end
@@ -4842,7 +4841,7 @@ business_tab:add_imgui(function()
         if whouse_4_owned then
           wh4Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE3")
           if wh4Supplies ~= nil and wh4Supplies > 0 then
-            wh4Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh4Supplies)))
+            wh4Value = globals.get_int(262145 + (SS.get_ceo_crates_offset(wh4Supplies)))
           else
             wh4Value = 0
           end
@@ -4916,7 +4915,7 @@ business_tab:add_imgui(function()
         if whouse_5_owned then
           wh5Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE4")
           if wh5Supplies ~= nil and wh5Supplies > 0 then
-            wh5Value = globals.get_int(262145 + (SS.get_ceo_global_offset(wh5Supplies)))
+            wh5Value = globals.get_int(262145 + (SS.get_ceo_crates_offset(wh5Supplies)))
           else
             wh5Value = 0
           end
@@ -5078,7 +5077,7 @@ business_tab:add_imgui(function()
           if bunkerSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##Bunker") then
-              globals.set_int(Global_1663174.f_5.f_1, 1)
+              globals.set_int(Global_1667995.f_5.f_1, 1)
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -5111,6 +5110,7 @@ business_tab:add_imgui(function()
 
       if ImGui.BeginTabItem("MC Businesses") then
         ImGui.Dummy(1, 5)
+        ImGui.Dummy(1, 5)
         ImGui.SeparatorText("Fake Cash")
         if fCashOwned then
           cashUpdgrade1, cu1Used = ImGui.Checkbox("Equipment Upgrade##fcash", cashUpdgrade1); ImGui.SameLine()
@@ -5141,7 +5141,7 @@ business_tab:add_imgui(function()
           if cashSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##FakeCash") then
-              globals.set_int(Global_1663174.f_0.f_1, 1)
+              globals.set_int(Global_1667995.f_0.f_1, 1)
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -5184,7 +5184,7 @@ business_tab:add_imgui(function()
           if cokeSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##blow") then
-              globals.set_int(Global_1663174.f_4.f_1, 1)
+              globals.set_int(Global_1667995.f_4.f_1, 1)
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -5227,7 +5227,7 @@ business_tab:add_imgui(function()
           if methSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##meth") then
-              globals.set_int(Global_1663174.f_2.f_1, 1)
+              globals.set_int(Global_1667995.f_2.f_1, 1)
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -5270,7 +5270,7 @@ business_tab:add_imgui(function()
           if weedSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##weed") then
-              globals.set_int(Global_1663174.f_3.f_1, 1)
+              globals.set_int(Global_1667995.f_3.f_1, 1)
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -5313,7 +5313,7 @@ business_tab:add_imgui(function()
           if fdSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##fd") then
-              globals.set_int(Global_1663174.f_1.f_1, 1)
+              globals.set_int(Global_1667995.f_1.f_1, 1)
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -5346,7 +5346,7 @@ business_tab:add_imgui(function()
           if acidSupplies < 100 then
             ImGui.SameLine()
             if ImGui.Button(" Fill Supplies ##acid") then
-              globals.set_int(Global_1663174.f_6.f_1, 1)
+              globals.set_int(Global_1667995.f_6.f_1, 1)
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -5778,29 +5778,29 @@ business_tab:add_imgui(function()
 end)
 
 -- Casino
-casino_pacino = online_tab:add_tab("Casino Pacino ") --IT'S NOT AL ANYMORE! IT'S DUNK!
-blackjack_cards                       = 116
+casino_pacino = online_tab:add_tab("Casino Pacino ") -- IT'S NOT AL ANYMORE! IT'S DUNK!
+blackjack_cards                       = 134
 blackjack_decks                       = 846
-blackjack_table_players               = 1776
+blackjack_table_players               = 1794
 blackjack_table_players_size          = 8
-three_card_poker_table                = 749
+three_card_poker_table                = 767
 three_card_poker_table_size           = 9
-three_card_poker_cards                = 116
+three_card_poker_cards                = 134
 three_card_poker_current_deck         = 168
-three_card_poker_anti_cheat           = 1038
+three_card_poker_anti_cheat           = 1056
 three_card_poker_anti_cheat_deck      = 799
 three_card_poker_deck_size            = 55
-roulette_master_table                 = 124
+roulette_master_table                 = 142
 roulette_outcomes_table               = 1357
 roulette_ball_table                   = 153
-slots_random_results_table            = 1348
-slots_slot_machine_state              = 1638
-prize_wheel_win_state                 = 280
+slots_random_results_table            = 1366
+slots_slot_machine_state              = 1656
+prize_wheel_win_state                 = 298
 prize_wheel_prize                     = 14
 prize_wheel_prize_state               = 45
-gb_casino_heist_planning              = 1964849
+gb_casino_heist_planning              = 1965614
 gb_casino_heist_planning_cut_offset   = 1497 + 736 + 92
-fm_mission_controller_cart_grab       = 10255
+fm_mission_controller_cart_grab       = 10289
 fm_mission_controller_cart_grab_speed = 14
 casino_heist_approach                 = 0
 casino_heist_target                   = 0
@@ -7741,7 +7741,7 @@ settings_tab:add_imgui(function()
   ImGui.Spacing(); useGameLang, uglUsed = ImGui.Checkbox(GAME_LANGUAGE_CB_, useGameLang)
   if useGameLang then
     UI.toolTip(false, GAME_LANGUAGE_DESC_)
-    LANG, current_lang = Game.GetLang()
+    LANG, current_lang = Game.Language()
   end
   if uglUsed then
     UI.widgetSound("Nav2")

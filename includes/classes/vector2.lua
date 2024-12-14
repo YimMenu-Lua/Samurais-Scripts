@@ -97,7 +97,7 @@ vec2.__eq = function(self, arg)
       arg = toVec2(arg)
     end
 
-    return getmetatable(arg) == vec2 and
+    return
     (self.x <= arg.x and (arg.x <= self.x)) and
     (self.y <= arg.y and (arg.y <= self.y))
 
@@ -116,7 +116,7 @@ vec2.__le = function(self, arg)
       arg = toVec2(arg)
     end
 
-    return getmetatable(arg) == vec2 and
+    return
     (self.x <= arg.x) and
     (self.y <= arg.y)
 
@@ -135,7 +135,7 @@ vec2.__lt = function(self, arg)
       arg = toVec2(arg)
     end
 
-    return getmetatable(arg) == vec2 and
+    return
     (self.x <= arg.x and not (arg.x <= self.x)) and
     (self.y <= arg.y and not (arg.y <= self.y))
 

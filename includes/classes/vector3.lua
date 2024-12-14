@@ -99,7 +99,7 @@ vec3.__eq = function(self, arg)
       arg = toVec3(arg)
     end
 
-    return getmetatable(arg) == vec3 and
+    return
     (self.x <= arg.x and (arg.x <= self.x)) and
     (self.y <= arg.y and (arg.y <= self.y)) and
     (self.z <= arg.z and (arg.z <= self.z))
@@ -119,7 +119,7 @@ vec3.__le = function(self, arg)
       arg = toVec3(arg)
     end
 
-    return getmetatable(arg) == vec3 and
+    return
     (self.x <= arg.x) and
     (self.y <= arg.y) and
     (self.z <= arg.z)
@@ -139,7 +139,7 @@ vec3.__lt = function(self, arg)
       arg = toVec3(arg)
     end
 
-    return getmetatable(arg) == vec3 and
+    return
     (self.x <= arg.x and not (arg.x <= self.x)) and
     (self.y <= arg.y and not (arg.y <= self.y)) and
     (self.z <= arg.z and not (arg.z <= self.z))

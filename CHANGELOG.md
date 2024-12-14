@@ -1,5 +1,5 @@
-### v1.4.6 Changelog
+### v1.4.7 Changelog
 
-#### Nothing to see here
+#### Main
 
-![gatto-cibo](https://github.com/user-attachments/assets/c960730e-aa9c-48bb-929e-a0da1c47868b)
+- Updated to v1.70 - b3411
