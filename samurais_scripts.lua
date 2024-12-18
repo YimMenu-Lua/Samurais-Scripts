@@ -468,7 +468,7 @@ random_quote            = ""
 custom_paints_sq        = ""
 npcDriveTask            = ""
 gb_scr_name             = "None"
-simplified_gb_scr_name  = "Nothing ya poor bastard"
+simplified_gb_scr_name  = "None"
 npcDriveDest            = vec3:new(0.0, 0.0, 0.0)
 filteredPlayers         = {}
 recently_played_a       = {}
@@ -11185,8 +11185,7 @@ script.register_looped("ISALE", function(isale)
       end
       break
     else
-      gb_scr_name, simplified_gb_scr_name, gb_scr_is_running = "None", "Nothing ya poor bastard", false
-      break
+      gb_scr_name, simplified_gb_scr_name, gb_scr_is_running = "None", "None", false
     end
   end
   isale:sleep(1000)
