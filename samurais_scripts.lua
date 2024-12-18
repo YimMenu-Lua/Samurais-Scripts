@@ -10655,7 +10655,7 @@ script.register_looped("AMBSCN", function(ambscn)
         if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 414, true) then
           PED.SET_PED_CONFIG_FLAG(self.get_ped(), 414, true)
         end
-        UseNearestScenarioCall(self.get_ped(), myPos.x, myPos.y, myPos.z, 2, 0)
+        UseNearestScenarioCall(self.get_ped(), myPos.x, myPos.y, myPos.z, 2, -1)
         ambscn:sleep(1500)
         gui.show_message("Samurai's Scripts", "If the ambient scenario glitches or fails to start, you can hold Left Shift and press E to force start/stop it.")
         is_playing_amb_scenario = true
