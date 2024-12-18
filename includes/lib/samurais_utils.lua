@@ -209,7 +209,7 @@ function initStrings()
   HEX_SMOKE_DESC_          = translateLabel("hex_tt")
   DRIFT_TIRES_CB_          = translateLabel("driftTiresCB")
   DRIFT_TIRES_DESC_        = translateLabel("driftTires_tt")
-  DRIFT_TORQUE_DESC_       = translateLabel("driftToruqe_tt")
+  DRIFT_TORQUE_DESC_       = translateLabel("driftTorque_tt")
   DRIFT_GAME_DESC_         = translateLabel("DriftGame_tt")
   DRIFT_INVALID_DESC_      = translateLabel("driftInvalidVehTxt")
   LIMIT_OPTIONS_CB_        = translateLabel("lvoCB")
@@ -448,6 +448,24 @@ spawnPervert = function(playerPed, playerName)
     gui.show_error("Samurai's Scripts", string.format("Failed to spawn a stalker pervert for %s.", playerName))
   end
 end
+
+function Disable_E()
+  PAD.DISABLE_CONTROL_ACTION(0, 38, true)
+  PAD.DISABLE_CONTROL_ACTION(0, 46, true)
+  PAD.DISABLE_CONTROL_ACTION(0, 51, true)
+  PAD.DISABLE_CONTROL_ACTION(0, 206, true)
+end
+
+---@param script_name string
+function FinishSale(script_name)
+  script.execute_as_script(script_name, function()
+    if gb_scripts[script_name] then
+      for _, data in pairs(gb_scripts[script_name]) do
+        locals.set_int(script_name, data.l + data.o, data.v)
+      end
+    end
+  end)
+end
 --#endregion
 
 
@@ -537,7 +555,7 @@ Lua_fn.floatPrecision = function(num)
   if #tostring(math.fmod(num, 1)) > 6 then
     return string.format("%.4f", num)
   end
-  return string.format(num)
+  return tostring(num)
 end
 
 -- Returns a string containing the input value separated by the thousands.
@@ -622,7 +640,7 @@ end
 
 ---@param n integer
 ---@param base integer
-Lua_fn.decimalToHex = function(n, base)
+Lua_fn.intToHex = function(n, base)
   local hex_rep, str, i, d = "0123456789ABCDEF", "", 0, 0
   while n > 0 do
     i = i + 1
@@ -722,24 +740,24 @@ end
     log.info("\10Duplicate Items:\10" .. tostring(Lua_fn.listIter(duplicate_items, 0)))
 ]]
 ---@param t table
----@param is_dev boolean
-Lua_fn.removeTableDupes = function(t, is_dev)
+---@param debug boolean
+Lua_fn.removeTableDupes = function(t, debug)
   local exists_T, clean_T, dupes_T, result_T = {}, {}, {}, {}
   for _, v in ipairs(t) do
     if not exists_T[v] then
       clean_T[#clean_T + 1] = v
       exists_T[v] = true
     else
-      if is_dev then
+      if debug then
         dupes_T[#dupes_T + 1] = v
       end
     end
   end
-  if is_dev then
+  if debug then
     result_T.clean_T = clean_T
     result_T.dupes_T = dupes_T
   end
-  return Lua_fn.condReturn(is_dev, result_T, clean_T)
+  return debug and result_T or clean_T
 end
 
 -- Converts 0 and 1 values to Lua booleans. Useful when working with memory.
@@ -1358,20 +1376,20 @@ end
 SS.canUsePhoneAnims = function ()
   return not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) and not is_playing_anim and not is_playing_scenario
   and not ped_grabbed and not vehicle_grabbed and not is_handsUp and not is_sitting
-  and not is_hiding and PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0
+  and not is_hiding and not is_playing_amb_scenario and PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0
 end
 
 SS.canCrouch = function ()
   return Game.Self.isOnFoot() and not Game.Self.isInWater() and not Game.Self.is_ragdoll()
   and not gui.is_open() and not ped_grabbed and not vehicle_grabbed and not is_playing_anim
-  and not is_playing_scenario and not is_typing and not is_sitting and not is_setting_hotkeys
+  and not is_playing_scenario and not is_playing_amb_scenario and not is_typing and not is_sitting and not is_setting_hotkeys
   and not is_hiding and not isCrouched and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Game.Self.isBrowsingApps()
 end
 
 SS.canUseHandsUp = function()
   return (Game.Self.isOnFoot() or is_car) and not gui.is_open() and not HUD.IS_MP_TEXT_CHAT_TYPING()
   and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario
-  and not is_typing and not is_setting_hotkeys and not is_hiding and not Game.Self.isBrowsingApps()
+  and not is_playing_amb_scenario and not is_typing and not is_setting_hotkeys and not is_hiding and not Game.Self.isBrowsingApps()
 end
 
 -- Reverts changes done by the script.
@@ -1579,8 +1597,11 @@ SS.isNearPublicSeat = function()
     prop = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(myCoords.x, myCoords.y, myCoords.z, 1.5, joaat(seat), false, false, false)
     if ENTITY.DOES_ENTITY_EXIST(prop) then
       seatPos = Game.getCoords(prop, false)
-      local distCalc = SYSTEM.VDIST2(myCoords.x, myCoords.y, myCoords.z, seatPos.x, seatPos.y, seatPos.z)
-      if distCalc <= 2 then
+      if ambient_scenarios and Game.DoesHumanScenarioExistInArea(seatPos, 1, true) then
+        return false, 0, 0, 0
+      end
+      local distance = vec3:distance(myCoords, seatPos)
+      if distance <= 2 then
         retBool = true
         if string.find(string.lower(seat), "bench") and seat ~= "prop_bench_07" then
           x_offset = -0.5
@@ -1607,8 +1628,8 @@ SS.isNearTrashBin = function()
     bin = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(myCoords.x, myCoords.y, myCoords.z, 1.5, joaat(trash), false, false, false)
     if ENTITY.DOES_ENTITY_EXIST(bin) then
       binPos = Game.getCoords(bin, false)
-      local distCalc = SYSTEM.VDIST2(myCoords.x, myCoords.y, myCoords.z, binPos.x, binPos.y, binPos.z)
-      if distCalc <= 3.3 then
+      local distance = vec3:distance(myCoords, binPos)
+      if distance <= 3.3 then
         retBool = true
         break
       end
@@ -2710,6 +2731,18 @@ Game.findObjectiveBlip = function()
       end
     end
   end
+end
+
+---@param area vec3
+---@param radius number
+---@param isFree boolean
+Game.DoesHumanScenarioExistInArea = function(area, radius, isFree)
+  for _, v in ipairs(ped_scenarios) do
+    if TASK.DOES_SCENARIO_OF_TYPE_EXIST_IN_AREA(area.x, area.y, area.z, v.scenario, radius, isFree) then
+      return true, v.name
+    end
+  end
+  return false
 end
 
 

@@ -198,6 +198,15 @@
 
   - **Public Seating:**
     - Allows you to sit down on public seats, chairs and benches found in the open world. While free roaming, approach a seat *(there are a bunch of them near Vespucci Beach)*, then when prompted, press **[E]** to sit down. You can sit up by pressing **[E]** again, aiming a weapon, or pressing **[B]** if you have the **Hands Up** feature enabled.
+  
+  - **Ambient Scenarios:**
+    - Allows you to play ambient scenarios that are scattered around in the open world, just like NPCs. These scenarios include taking photos, drinkig, smoking, working out, sitting on benches, chairs, sun loungers, etc...
+    These ambient scenarios have exact points on the map where they can be triggered. Once you are in the vicinity of one, a prompt will show up on your screen asking you to press **[E]** to play the scenario.
+    > **NOTE:** Because it makes no sense to mark all of them, I'll leave them to your exploration sense to find them.
+
+    > **NOTE:** Due to a few scenarios being in very close proximity to each other, the prompt to play them can become annoying. For this, I've added an option to disable the prompt (but you'll never know when you're near an ambient scenario).
+
+    > **NOTE:** Some ambient scenarios are programmed for NPCs to spawn directly onto them so playing them normally will most likely result in your ped bein in an awkward position *(example: sitting in the air)* or even fail to fully play. For this, I've added an option to **force** play or stop an ambient scenario by pressing **[Left Shift]** + **[E]**.
 
 - **Improved [Object Spawner](https://github.com/xesdoog/object-spawner):**
   - Fixed a few bugs in the main script and added the ability to attach objects to your vehicle.

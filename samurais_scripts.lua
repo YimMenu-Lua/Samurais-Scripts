@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.4.7'
+SCRIPT_VERSION = '1.4.8'
 TARGET_BUILD   = '3411'
 TARGET_VERSION = '1.70'
 log.info("version " .. SCRIPT_VERSION)
@@ -149,6 +149,8 @@ DEFAULT_CONFIG         = {
   disable_mdef_logs       = false,
   replace_pool_q          = false,
   public_seats            = false,
+  ambient_scenarios       = false,
+  ambient_scenario_prompt = false,
   mc_work_cd              = false,
   hangar_cd               = false,
   nc_management_cd        = false,
@@ -178,6 +180,7 @@ DEFAULT_CONFIG         = {
   whouse_3_owned          = false,
   whouse_4_owned          = false,
   whouse_5_owned          = false,
+  autosell                = false,
   SS_debug                = false,
   nosBtn                  = 21,
   nosPower                = 10,
@@ -194,291 +197,299 @@ DEFAULT_CONFIG         = {
   current_lang            = 'English',
 }
 
-LANG                   = CFG.read("LANG")
-current_lang           = CFG.read("current_lang")
-keybinds               = CFG.read("keybinds")
-gpad_keybinds          = CFG.read("gpad_keybinds")
-Regen                  = CFG.read("Regen")
-phoneAnim              = CFG.read("phoneAnim")
-sprintInside           = CFG.read("sprintInside")
-lockPick               = CFG.read("lockPick")
-replaceSneakAnim       = CFG.read("replaceSneakAnim")
-replacePointAct        = CFG.read("replacePointAct")
-disableActionMode      = CFG.read("disableActionMode")
-hideFromCops           = CFG.read("hideFromCops")
-favorite_actions       = CFG.read("favorite_actions")
-rod                    = CFG.read("rod")
-clumsy                 = CFG.read("clumsy")
-ragdoll_sound          = CFG.read("ragdoll_sound")
-manualFlags            = CFG.read("manualFlags")
-controllable           = CFG.read("controllable")
-looped                 = CFG.read("looped")
-upperbody              = CFG.read("upperbody")
-freeze                 = CFG.read("freeze")
-noCollision            = CFG.read("noCollision")
-killOnEnd              = CFG.read("killOnEnd")
-disableProps           = CFG.read("disableProps")
-npc_godMode            = CFG.read("npc_godMode")
-usePlayKey             = CFG.read("usePlayKey")
-shortcut_anim          = CFG.read("shortcut_anim")
-Triggerbot             = CFG.read("Triggerbot")
-aimEnemy               = CFG.read("aimEnemy")
-autoKill               = CFG.read("autoKill")
-runaway                = CFG.read("runaway")
-laserSight             = CFG.read("laserSight")
-laser_switch           = CFG.read("laser_switch")
-laser_choice           = CFG.read("laser_choice")
-driftMode              = CFG.read("driftMode")
-DriftIntensity         = CFG.read("DriftIntensity")
-DriftPowerIncrease     = CFG.read("DriftPowerIncrease")
-DriftTires             = CFG.read("DriftTires")
-driftSmokeIndex        = CFG.read("driftSmokeIndex")
-customSmokeCol         = CFG.read("customSmokeCol")
-driftSmoke_T           = CFG.read("driftSmoke_T")
-DriftSmoke             = CFG.read("DriftSmoke")
-BurnoutSmoke           = CFG.read("BurnoutSmoke")
-driftMinigame          = CFG.read("driftMinigame")
-driftPB                = CFG.read("driftPB")
-speedBoost             = CFG.read("speedBoost")
-nosvfx                 = CFG.read("nosvfx")
-hornLight              = CFG.read("hornLight")
-nosPurge               = CFG.read("nosPurge")
-nosPower               = CFG.read("nosPower")
-nosAudio               = CFG.read("nosAudio")
-nosBtn                 = CFG.read("nosBtn")
-nosFlames              = CFG.read("nosFlames")
-lightSpeed             = CFG.read("lightSpeed")
-loud_radio             = CFG.read("loud_radio")
-launchCtrl             = CFG.read("launchCtrl")
-popsNbangs             = CFG.read("popsNbangs")
-louderPops             = CFG.read("louderPops")
-limitVehOptions        = CFG.read("limitVehOptions")
-missiledefense         = CFG.read("missiledefense")
-autobrklight           = CFG.read("autobrklight")
-rgbLights              = CFG.read("rgbLights")
-fender_bender          = CFG.read("fender_bender")
-holdF                  = CFG.read("holdF")
-keepWheelsTurned       = CFG.read("keepWheelsTurned")
-noJacking              = CFG.read("noJacking")
-insta180               = CFG.read("insta180")
-flares_forall          = CFG.read("flares_forall")
-real_plane_speed       = CFG.read("real_plane_speed")
-unbreakableWindows     = CFG.read("unbreakableWindows")
-veh_mines              = CFG.read("veh_mines")
-vmine_type             = CFG.read("vmine_type")
-towEverything          = CFG.read("towEverything")
-noEngineBraking        = CFG.read("noEngineBraking")
-kersBoost              = CFG.read("kersBoost")
-offroaderx2            = CFG.read("offroaderx2")
-rallyTires             = CFG.read("rallyTires")
-noTractionCtrl         = CFG.read("noTractionCtrl")
-easyWheelie            = CFG.read("easyWheelie")
-rwSteering             = CFG.read("rwSteering")
-awSteering             = CFG.read("awSteering")
-handbrakeSteering      = CFG.read("handbrakeSteering")
-extend_world           = CFG.read("extend_world")
-disableFlightMusic     = CFG.read("disableFlightMusic")
-disable_quotes         = CFG.read("disable_quotes")
-disable_mdef_logs      = CFG.read("disable_mdef_logs")
-replace_pool_q         = CFG.read("replace_pool_q")
-public_seats           = CFG.read("public_seats")
-mc_work_cd             = CFG.read("mc_work_cd")
-hangar_cd              = CFG.read("hangar_cd")
-nc_management_cd       = CFG.read("nc_management_cd")
-nc_vip_mission_chance  = CFG.read("nc_vip_mission_chance")
-security_missions_cd   = CFG.read("security_missions_cd")
-ie_vehicle_steal_cd    = CFG.read("ie_vehicle_steal_cd")
-ie_vehicle_sell_cd     = CFG.read("ie_vehicle_sell_cd")
-ceo_crate_buy_cd       = CFG.read("ceo_crate_buy_cd")
-ceo_crate_sell_cd      = CFG.read("ceo_crate_sell_cd")
-ceo_crate_buy_f_cd     = CFG.read("ceo_crate_buy_f_cd")
-ceo_crate_sell_f_cd    = CFG.read("ceo_crate_sell_f_cd")
-cashUpdgrade1          = CFG.read("cashUpdgrade1")
-cashUpdgrade2          = CFG.read("cashUpdgrade2")
-cokeUpdgrade1          = CFG.read("cokeUpdgrade1")
-cokeUpdgrade2          = CFG.read("cokeUpdgrade2")
-methUpdgrade1          = CFG.read("methUpdgrade1")
-methUpdgrade2          = CFG.read("methUpdgrade2")
-weedUpdgrade1          = CFG.read("weedUpdgrade1")
-weedUpdgrade2          = CFG.read("weedUpdgrade2")
-fdUpdgrade1            = CFG.read("fdUpdgrade1")
-fdUpdgrade2            = CFG.read("fdUpdgrade2")
-bunkerUpdgrade1        = CFG.read("bunkerUpdgrade1")
-bunkerUpdgrade2        = CFG.read("bunkerUpdgrade2")
-acidUpdgrade           = CFG.read("acidUpdgrade")
-whouse_1_owned         = CFG.read("whouse_1_owned")
-whouse_2_owned         = CFG.read("whouse_2_owned")
-whouse_3_owned         = CFG.read("whouse_3_owned")
-whouse_4_owned         = CFG.read("whouse_4_owned")
-whouse_5_owned         = CFG.read("whouse_5_owned")
-whouse_1_size          = CFG.read("whouse_1_size")
-whouse_2_size          = CFG.read("whouse_2_size")
-whouse_3_size          = CFG.read("whouse_3_size")
-whouse_4_size          = CFG.read("whouse_4_size")
-whouse_5_size          = CFG.read("whouse_5_size")
-supply_autofill_delay  = CFG.read("supply_autofill_delay")
-SS_debug               = CFG.read("SS_debug")
-current_vehicle        = self.get_veh()
-last_vehicle           = self.get_veh()
-tab1Sound              = true
-tab2Sound              = true
-tab3Sound              = true
-tab4Sound              = true
-is_playing_anim        = false
-is_shortcut_anim       = false
-anim_music             = false
-is_playing_scenario    = false
-is_playing_radio       = false
-aimBool                = false
-HashGrabber            = false
-drew_laser             = false
-isCrouched             = false
-is_handsUp             = false
-phoneAnimsEnabled      = false
-is_car                 = false
-is_quad                = false
-is_boat                = false
-is_bike                = false
-validModel             = false
-has_xenon              = false
-has_custom_tires       = false
-custom_tires_checked   = false
-tire_smoke_col_checked = false
-tire_smoke             = false
-drift_started          = false
-purge_started          = false
-nos_started            = false
-twostep_started        = false
-is_typing              = false
-is_setting_hotkeys     = false
-open_sounds_window     = false
-started_lct            = false
-launch_active          = false
-started_popSound       = false
-started_popSound2      = false
-pedGrabber             = false
-ped_grabbed            = false
-vehicleGrabber         = false
-vehicle_grabbed        = false
-carpool                = false
-is_carpooling          = false
-show_npc_veh_seat_ctrl = false
-show_npc_veh_ui        = false
-npc_veh_radio_on       = false
-npc_veh_has_conv_roof  = false
-stop_searching         = false
-hijack_started         = false
-sound_btn_off          = false
-is_drifting            = false
-start_rgb_loop         = false
-ubwindowsToggled       = false
-default_pops_disabled  = false
-engine_brake_disabled  = false
-traction_ctrl_disabled = false
-kers_boost_enabled     = false
-offroader_enabled      = false
-rally_tires_enabled    = false
-easy_wheelie_enabled   = false
--- rw_steering_enabled      = false --[[
--- aw_steering_enabled      = false -- they work but the steering is not rendered.
--- hb_steering_enabled      = false --]]
-world_extended         = false
-autopilot_waypoint     = false
-autopilot_objective    = false
-autopilot_random       = false
-flight_music_off       = false
-loud_radio_enabled     = false
-q_replaced             = false
-is_sitting             = false
-is_hiding              = false
-ducking_in_car         = false
-hiding_in_boot         = false
-hiding_in_dumpster     = false
-mf_overwrite           = false
-is_primary             = false
-is_secondary           = false
-debug_counter          = not SS_debug and 0 or 7
-anim_flag              = 0
-anim_sortby_idx        = 0
-grp_anim_index         = 0
-attached_ped           = 0
-grabbed_veh            = 0
-thisVeh                = 0
-npcDriver              = 0
-anim_index             = 0
-scenario_index         = 0
-recents_index          = 0
-fav_actions_index      = 0
-npc_index              = 0
-actions_switch         = 0
-Entity                 = 0
-timerA                 = 0
-timerB                 = 0
-defaultXenon           = 0
-vehSound_index         = 0
-selected_smoke_col     = 0
-pBus                   = 0
-dummyDriver            = 0
-dummyCopCar            = 0
-sound_index1           = 0
-sound_index2           = 0
-sound_switch           = 0
-radio_index            = 0
-drift_points           = 0
-drift_extra_pts        = 0
-straight_counter       = 0
-drift_time             = 0
-loud_pops_event        = 0
-katana                 = 0
-boot_vehicle           = 0
-thisDumpster           = 0
-thisSeat               = 0
-custom_paint_index     = 0
-paints_col_sort_idx    = 0
-paints_mfr_sort_idx    = 0
-paints_sortby_switch   = 0
-npc_veh_roof_state     = 0
-perv                   = 0
-npc_veh_speed          = 0.0
-npcDriveSwitch         = 0
-npcDrivingFlags        = 803243
-pv_global              = 1572092
-npcDrivingSpeed        = 19
-drift_multiplier       = 1
-quote_alpha            = 1
-pedthrowF              = 10
-drift_streak_text      = ""
-drift_extra_text       = ""
-actions_search         = ""
-currentMvmt            = ""
-currentStrf            = ""
-currentWmvmt           = ""
-search_term            = ""
-smokeHex               = ""
-random_quote           = ""
-custom_paints_sq       = ""
-npcDriveTask           = ""
-npcDriveDest           = vec3:new(0.0, 0.0, 0.0)
-filteredPlayers        = {}
-recently_played_a      = {}
-selected_sound         = {}
-selected_radio         = {}
-smokePtfx_t            = {}
-nosptfx_t              = {}
-purgePtfx_t            = {}
-lctPtfx_t              = {}
-popSounds_t            = {}
-popsPtfx_t             = {}
-npc_blips              = {}
-spawned_npcs           = {}
-plyrProps              = {}
-npcProps               = {}
-selfPTFX               = {}
-npcPTFX                = {}
-curr_playing_anim      = {}
-chosen_anim            = {}
-depressorBanList       = {}
-default_tire_smoke     = {
+LANG                    = CFG.read("LANG")
+current_lang            = CFG.read("current_lang")
+keybinds                = CFG.read("keybinds")
+gpad_keybinds           = CFG.read("gpad_keybinds")
+Regen                   = CFG.read("Regen")
+phoneAnim               = CFG.read("phoneAnim")
+sprintInside            = CFG.read("sprintInside")
+lockPick                = CFG.read("lockPick")
+replaceSneakAnim        = CFG.read("replaceSneakAnim")
+replacePointAct         = CFG.read("replacePointAct")
+disableActionMode       = CFG.read("disableActionMode")
+hideFromCops            = CFG.read("hideFromCops")
+favorite_actions        = CFG.read("favorite_actions")
+rod                     = CFG.read("rod")
+clumsy                  = CFG.read("clumsy")
+ragdoll_sound           = CFG.read("ragdoll_sound")
+manualFlags             = CFG.read("manualFlags")
+controllable            = CFG.read("controllable")
+looped                  = CFG.read("looped")
+upperbody               = CFG.read("upperbody")
+freeze                  = CFG.read("freeze")
+noCollision             = CFG.read("noCollision")
+killOnEnd               = CFG.read("killOnEnd")
+disableProps            = CFG.read("disableProps")
+npc_godMode             = CFG.read("npc_godMode")
+usePlayKey              = CFG.read("usePlayKey")
+shortcut_anim           = CFG.read("shortcut_anim")
+Triggerbot              = CFG.read("Triggerbot")
+aimEnemy                = CFG.read("aimEnemy")
+autoKill                = CFG.read("autoKill")
+runaway                 = CFG.read("runaway")
+laserSight              = CFG.read("laserSight")
+laser_switch            = CFG.read("laser_switch")
+laser_choice            = CFG.read("laser_choice")
+driftMode               = CFG.read("driftMode")
+DriftIntensity          = CFG.read("DriftIntensity")
+DriftPowerIncrease      = CFG.read("DriftPowerIncrease")
+DriftTires              = CFG.read("DriftTires")
+driftSmokeIndex         = CFG.read("driftSmokeIndex")
+customSmokeCol          = CFG.read("customSmokeCol")
+driftSmoke_T            = CFG.read("driftSmoke_T")
+DriftSmoke              = CFG.read("DriftSmoke")
+BurnoutSmoke            = CFG.read("BurnoutSmoke")
+driftMinigame           = CFG.read("driftMinigame")
+driftPB                 = CFG.read("driftPB")
+speedBoost              = CFG.read("speedBoost")
+nosvfx                  = CFG.read("nosvfx")
+hornLight               = CFG.read("hornLight")
+nosPurge                = CFG.read("nosPurge")
+nosPower                = CFG.read("nosPower")
+nosAudio                = CFG.read("nosAudio")
+nosBtn                  = CFG.read("nosBtn")
+nosFlames               = CFG.read("nosFlames")
+lightSpeed              = CFG.read("lightSpeed")
+loud_radio              = CFG.read("loud_radio")
+launchCtrl              = CFG.read("launchCtrl")
+popsNbangs              = CFG.read("popsNbangs")
+louderPops              = CFG.read("louderPops")
+limitVehOptions         = CFG.read("limitVehOptions")
+missiledefense          = CFG.read("missiledefense")
+autobrklight            = CFG.read("autobrklight")
+rgbLights               = CFG.read("rgbLights")
+fender_bender           = CFG.read("fender_bender")
+holdF                   = CFG.read("holdF")
+keepWheelsTurned        = CFG.read("keepWheelsTurned")
+noJacking               = CFG.read("noJacking")
+insta180                = CFG.read("insta180")
+flares_forall           = CFG.read("flares_forall")
+real_plane_speed        = CFG.read("real_plane_speed")
+unbreakableWindows      = CFG.read("unbreakableWindows")
+veh_mines               = CFG.read("veh_mines")
+vmine_type              = CFG.read("vmine_type")
+towEverything           = CFG.read("towEverything")
+noEngineBraking         = CFG.read("noEngineBraking")
+kersBoost               = CFG.read("kersBoost")
+offroaderx2             = CFG.read("offroaderx2")
+rallyTires              = CFG.read("rallyTires")
+noTractionCtrl          = CFG.read("noTractionCtrl")
+easyWheelie             = CFG.read("easyWheelie")
+rwSteering              = CFG.read("rwSteering")
+awSteering              = CFG.read("awSteering")
+handbrakeSteering       = CFG.read("handbrakeSteering")
+extend_world            = CFG.read("extend_world")
+disableFlightMusic      = CFG.read("disableFlightMusic")
+disable_quotes          = CFG.read("disable_quotes")
+disable_mdef_logs       = CFG.read("disable_mdef_logs")
+replace_pool_q          = CFG.read("replace_pool_q")
+public_seats            = CFG.read("public_seats")
+ambient_scenarios       = CFG.read("ambient_scenarios")
+ambient_scenario_prompt = CFG.read("ambient_scenario_prompt")
+mc_work_cd              = CFG.read("mc_work_cd")
+hangar_cd               = CFG.read("hangar_cd")
+nc_management_cd        = CFG.read("nc_management_cd")
+nc_vip_mission_chance   = CFG.read("nc_vip_mission_chance")
+security_missions_cd    = CFG.read("security_missions_cd")
+ie_vehicle_steal_cd     = CFG.read("ie_vehicle_steal_cd")
+ie_vehicle_sell_cd      = CFG.read("ie_vehicle_sell_cd")
+ceo_crate_buy_cd        = CFG.read("ceo_crate_buy_cd")
+ceo_crate_sell_cd       = CFG.read("ceo_crate_sell_cd")
+ceo_crate_buy_f_cd      = CFG.read("ceo_crate_buy_f_cd")
+ceo_crate_sell_f_cd     = CFG.read("ceo_crate_sell_f_cd")
+cashUpdgrade1           = CFG.read("cashUpdgrade1")
+cashUpdgrade2           = CFG.read("cashUpdgrade2")
+cokeUpdgrade1           = CFG.read("cokeUpdgrade1")
+cokeUpdgrade2           = CFG.read("cokeUpdgrade2")
+methUpdgrade1           = CFG.read("methUpdgrade1")
+methUpdgrade2           = CFG.read("methUpdgrade2")
+weedUpdgrade1           = CFG.read("weedUpdgrade1")
+weedUpdgrade2           = CFG.read("weedUpdgrade2")
+fdUpdgrade1             = CFG.read("fdUpdgrade1")
+fdUpdgrade2             = CFG.read("fdUpdgrade2")
+bunkerUpdgrade1         = CFG.read("bunkerUpdgrade1")
+bunkerUpdgrade2         = CFG.read("bunkerUpdgrade2")
+acidUpdgrade            = CFG.read("acidUpdgrade")
+whouse_1_owned          = CFG.read("whouse_1_owned")
+whouse_2_owned          = CFG.read("whouse_2_owned")
+whouse_3_owned          = CFG.read("whouse_3_owned")
+whouse_4_owned          = CFG.read("whouse_4_owned")
+whouse_5_owned          = CFG.read("whouse_5_owned")
+autosell                = CFG.read("autosell")
+whouse_1_size           = CFG.read("whouse_1_size")
+whouse_2_size           = CFG.read("whouse_2_size")
+whouse_3_size           = CFG.read("whouse_3_size")
+whouse_4_size           = CFG.read("whouse_4_size")
+whouse_5_size           = CFG.read("whouse_5_size")
+supply_autofill_delay   = CFG.read("supply_autofill_delay")
+SS_debug                = CFG.read("SS_debug")
+current_vehicle         = self.get_veh()
+last_vehicle            = self.get_veh()
+tab1Sound               = true
+tab2Sound               = true
+tab3Sound               = true
+tab4Sound               = true
+is_playing_anim         = false
+is_shortcut_anim        = false
+anim_music              = false
+is_playing_scenario     = false
+is_playing_radio        = false
+aimBool                 = false
+HashGrabber             = false
+drew_laser              = false
+isCrouched              = false
+is_handsUp              = false
+phoneAnimsEnabled       = false
+is_car                  = false
+is_quad                 = false
+is_boat                 = false
+is_bike                 = false
+validModel              = false
+has_xenon               = false
+has_custom_tires        = false
+custom_tires_checked    = false
+tire_smoke_col_checked  = false
+tire_smoke              = false
+drift_started           = false
+purge_started           = false
+nos_started             = false
+twostep_started         = false
+is_typing               = false
+is_setting_hotkeys      = false
+open_sounds_window      = false
+started_lct             = false
+launch_active           = false
+started_popSound        = false
+started_popSound2       = false
+pedGrabber              = false
+ped_grabbed             = false
+vehicleGrabber          = false
+vehicle_grabbed         = false
+carpool                 = false
+is_carpooling           = false
+show_npc_veh_seat_ctrl  = false
+show_npc_veh_ui         = false
+npc_veh_radio_on        = false
+npc_veh_has_conv_roof   = false
+stop_searching          = false
+hijack_started          = false
+sound_btn_off           = false
+is_drifting             = false
+start_rgb_loop          = false
+ubwindowsToggled        = false
+default_pops_disabled   = false
+engine_brake_disabled   = false
+traction_ctrl_disabled  = false
+kers_boost_enabled      = false
+offroader_enabled       = false
+rally_tires_enabled     = false
+easy_wheelie_enabled    = false
+-- rw_steering_enabled       = false --[[
+-- aw_steering_enabled       = false -- they work but the steering is not rendered.
+-- hb_steering_enabled       = false --]]
+world_extended          = false
+autopilot_waypoint      = false
+autopilot_objective     = false
+autopilot_random        = false
+flight_music_off        = false
+loud_radio_enabled      = false
+q_replaced              = false
+is_sitting              = false
+is_playing_amb_scenario = false
+is_hiding               = false
+ducking_in_car          = false
+hiding_in_boot          = false
+hiding_in_dumpster      = false
+mf_overwrite            = false
+is_primary              = false
+is_secondary            = false
+gb_scr_is_running       = false
+autosell_was_triggered  = false
+debug_counter           = not SS_debug and 0 or 7
+anim_flag               = 0
+anim_sortby_idx         = 0
+grp_anim_index          = 0
+attached_ped            = 0
+grabbed_veh             = 0
+thisVeh                 = 0
+npcDriver               = 0
+anim_index              = 0
+scenario_index          = 0
+recents_index           = 0
+fav_actions_index       = 0
+npc_index               = 0
+actions_switch          = 0
+Entity                  = 0
+timerA                  = 0
+timerB                  = 0
+defaultXenon            = 0
+vehSound_index          = 0
+selected_smoke_col      = 0
+pBus                    = 0
+dummyDriver             = 0
+dummyCopCar             = 0
+sound_index1            = 0
+sound_index2            = 0
+sound_switch            = 0
+radio_index             = 0
+drift_points            = 0
+drift_extra_pts         = 0
+straight_counter        = 0
+drift_time              = 0
+loud_pops_event         = 0
+katana                  = 0
+boot_vehicle            = 0
+thisDumpster            = 0
+thisSeat                = 0
+custom_paint_index      = 0
+paints_col_sort_idx     = 0
+paints_mfr_sort_idx     = 0
+paints_sortby_switch    = 0
+npc_veh_roof_state      = 0
+perv                    = 0
+npc_veh_speed           = 0.0
+npcDriveSwitch          = 0
+npcDrivingFlags         = 803243
+pv_global               = 1572092
+npcDrivingSpeed         = 19
+drift_multiplier        = 1
+quote_alpha             = 1
+pedthrowF               = 10
+drift_streak_text       = ""
+drift_extra_text        = ""
+actions_search          = ""
+currentMvmt             = ""
+currentStrf             = ""
+currentWmvmt            = ""
+search_term             = ""
+smokeHex                = ""
+random_quote            = ""
+custom_paints_sq        = ""
+npcDriveTask            = ""
+gb_scr_name             = "None"
+simplified_gb_scr_name  = "Nothing ya poor bastard"
+npcDriveDest            = vec3:new(0.0, 0.0, 0.0)
+filteredPlayers         = {}
+recently_played_a       = {}
+selected_sound          = {}
+selected_radio          = {}
+smokePtfx_t             = {}
+nosptfx_t               = {}
+purgePtfx_t             = {}
+lctPtfx_t               = {}
+popSounds_t             = {}
+popsPtfx_t              = {}
+npc_blips               = {}
+spawned_npcs            = {}
+plyrProps               = {}
+npcProps                = {}
+selfPTFX                = {}
+npcPTFX                 = {}
+curr_playing_anim       = {}
+chosen_anim             = {}
+depressorBanList        = {}
+default_tire_smoke      = {
   r = 255,
   g = 255,
   b = 255,
@@ -837,13 +848,11 @@ self_tab:add_imgui(function()
     end)
   end
 
-  if rod or clumsy then
-    ragdoll_sound, rgdlsnd = ImGui.Checkbox("Ragdoll Sound", ragdoll_sound)
-    UI.helpMarker(false, RAGDOLL_SOUND_DESC_)
-    if rgdlsnd then
-      UI.widgetSound("Nav2")
-      CFG.save("ragdoll_sound", ragdoll_sound)
-    end
+  ragdoll_sound, rgdlsnd = ImGui.Checkbox("Ragdoll Sound", ragdoll_sound)
+  UI.helpMarker(false, RAGDOLL_SOUND_DESC_)
+  if rgdlsnd then
+    UI.widgetSound("Nav2")
+    CFG.save("ragdoll_sound", ragdoll_sound)
   end
 
   hideFromCops, hfcUsed = ImGui.Checkbox("Hide & Seek", hideFromCops)
@@ -1097,11 +1106,7 @@ Actions:add_imgui(function()
   ImGui.PushItemWidth(270)
   actions_search, used = ImGui.InputTextWithHint("##searchBar", GENERIC_SEARCH_HINT_, actions_search, 32)
   ImGui.PopItemWidth()
-  if ImGui.IsItemActive() then
-    is_typing = true
-  else
-    is_typing = false
-  end
+  is_typing = ImGui.IsItemActive()
   ImGui.BeginTabBar("Actionz", ImGuiTabBarFlags.None)
   if ImGui.BeginTabItem(ANIMATIONS_TAB_) then
     if tab1Sound then
@@ -2110,7 +2115,7 @@ local function readSoundsFile()
       if jsonFile ~= nil then
         local content = jsonFile:read("*all")
         jsonFile:close()
-        return CFG.decode(content)
+        return CFG:decode(content)
       end
     else
       error("[FATAL] Json file not found!")
@@ -2119,12 +2124,11 @@ local function readSoundsFile()
   return nil
 end
 local all_sounds = readSoundsFile()
-
 local function filterFrontendSounds()
   filteredSounds = {}
   if all_sounds ~= nil then
     for _, v in ipairs(all_sounds) do
-      if string.find(string.lower(v.AudioName), sound_search) then
+      if string.find(v.AudioName:lower(), sound_search) then
         table.insert(filteredSounds, v)
       end
     end
@@ -2255,11 +2259,7 @@ sound_player:add_imgui(function()
     ImGui.Dummy(1, 10); ImGui.SeparatorText("Frontend Sounds")
     ImGui.PushItemWidth(420)
     sound_search, sschanged = ImGui.InputTextWithHint("##search", "Search Sounds", sound_search, 64)
-    if ImGui.IsItemActive() then
-      is_typing = true
-    else
-      is_typing = false
-    end
+    is_typing = ImGui.IsItemActive()
     displayFrontendSounds()
     ImGui.PopItemWidth()
     if filteredSounds ~= nil then
@@ -2319,7 +2319,7 @@ local function filterVehNames()
   for _, veh in ipairs(gta_vehicles_T) do
     if VEHICLE.IS_THIS_MODEL_A_CAR(joaat(veh)) or VEHICLE.IS_THIS_MODEL_A_BIKE(joaat(veh)) or VEHICLE.IS_THIS_MODEL_A_QUADBIKE(joaat(veh)) then
       valid_veh = veh
-      if string.find(string.lower(valid_veh), string.lower(search_term)) then
+      if string.find(valid_veh:lower(), search_term:lower()) then
         table.insert(filteredNames, valid_veh)
       end
     end
@@ -3100,11 +3100,7 @@ vehicle_tab:add_imgui(function()
     ImGui.Spacing(); ImGui.Spacing()
     ImGui.PushItemWidth(250)
     search_term, used = ImGui.InputTextWithHint("", SEARCH_VEH_HINT_, search_term, 32)
-    if ImGui.IsItemActive() then
-      is_typing = true
-    else
-      is_typing = false
-    end
+    is_typing = ImGui.IsItemActive()
     ImGui.PushItemWidth(270)
     displayVehNames()
     ImGui.PopItemWidth()
@@ -3187,24 +3183,24 @@ local function sortCustomPaints()
   for _, v in ipairs(custom_paints_T) do
     if paints_sortby_switch == 0 then
       if paints_col_sort_idx == 0 then
-        if string.find(string.lower(v.name), string.lower(custom_paints_sq)) then
+        if string.find((v.name):lower(),custom_paints_sq:lower()) then
           table.insert(filteredPaints, v)
         end
       else
         if v.shade == paints_sortByColors[paints_col_sort_idx + 1] then
-          if string.find(string.lower(v.name), string.lower(custom_paints_sq)) then
+          if string.find((v.name):lower(), custom_paints_sq:lower()) then
             table.insert(filteredPaints, v)
           end
         end
       end
     elseif paints_sortby_switch == 1 then
       if paints_mfr_sort_idx == 0 then
-        if string.find(string.lower(v.name), string.lower(custom_paints_sq)) then
+        if string.find((v.name):lower(), custom_paints_sq:lower()) then
           table.insert(filteredPaints, v)
         end
       else
         if v.manufacturer == paints_sortByMfrs[paints_mfr_sort_idx + 1] then
-          if string.find(string.lower(v.name), string.lower(custom_paints_sq)) then
+          if string.find((v.name):lower(), custom_paints_sq:lower()) then
             table.insert(filteredPaints, v)
           end
         end
@@ -3263,11 +3259,7 @@ custom_paints_tab:add_imgui(function()
     ImGui.PopItemWidth()
     ImGui.PushItemWidth(420)
     custom_paints_sq, cpsqUsed = ImGui.InputTextWithHint("##custompaintssq", "Search", custom_paints_sq, 64)
-    if ImGui.IsItemActive() then
-      is_typing = true
-    else
-      is_typing = false
-    end
+    is_typing = ImGui.IsItemActive()
     displayCustomPaints()
     ImGui.PopItemWidth()
     local selected_paint = filteredPaints[custom_paint_index + 1]
@@ -3310,7 +3302,7 @@ drift_mode_tab:add_imgui(function()
     local vehicle_class = Game.Vehicle.class(current_vehicle)
     ImGui.Spacing()
     if validModel then
-      ImGui.SeparatorText(string.format("%s  (%s)", full_veh_name, vehicle_class))
+      ImGui.SeparatorText(string.format("%s  (%s)", full_veh_name, vehicle_class)); ImGui.Spacing()
       driftMode, driftModeUsed = ImGui.Checkbox(DRIFT_MODE_CB_, driftMode)
       UI.helpMarker(false, DRIFT_MODE_DESC_)
       if driftModeUsed then
@@ -3343,9 +3335,10 @@ drift_mode_tab:add_imgui(function()
       end
 
       if driftMode or DriftTires then
-        ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
-        ImGui.PushItemWidth(160)
-        DriftPowerIncrease, dpiUsed = ImGui.SliderInt("Torque", DriftPowerIncrease, 10, 100); ImGui.PopItemWidth()
+        ImGui.SeparatorText("Drift Options"); ImGui.Spacing()
+        ImGui.Text("Torque: "); ImGui.SameLine()
+        ImGui.PushItemWidth(210)
+        DriftPowerIncrease, dpiUsed = ImGui.SliderInt("##Torque", DriftPowerIncrease, 10, 100)
         UI.toolTip(false, DRIFT_TORQUE_DESC_)
         if dpiUsed then
           UI.widgetSound("Nav2")
@@ -3371,7 +3364,7 @@ drift_mode_tab:add_imgui(function()
         end
       end
 
-      BurnoutSmoke, bsmkUsed = ImGui.Checkbox("Burnout Smoke", BurnoutSmoke)
+      ImGui.SameLine(); BurnoutSmoke, bsmkUsed = ImGui.Checkbox("Burnout Smoke", BurnoutSmoke)
       if bsmkUsed then
         UI.widgetSound("Nav2")
         CFG.save("BurnoutSmoke", BurnoutSmoke)
@@ -3422,13 +3415,10 @@ drift_mode_tab:add_imgui(function()
           end
           smokeHex, smokeHexEntered = ImGui.InputTextWithHint("##customHex", "HEX", smokeHex, hex_len,
             ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.CharsNoBlank |
-            ImGuiInputTextFlags.CharsHexadecimal | ImGuiInputTextFlags.CharsUppercase); ImGui.SameLine()
-          if ImGui.IsItemActive() then
-            is_typing = true
-          else
-            is_typing = false
-          end
-          UI.toolTip(false, HEX_SMOKE_DESC_)
+            ImGuiInputTextFlags.CharsHexadecimal | ImGuiInputTextFlags.CharsUppercase
+          )
+          is_typing = ImGui.IsItemActive()
+          UI.toolTip(false, HEX_SMOKE_DESC_); ImGui.SameLine()
           if smokeHexEntered then
             if smokeHex ~= nil then
               if not smokeHex:find("^#") then
@@ -3881,7 +3871,7 @@ local function updatefilteredVehicles()
   listVehicles()
   filtered_vehicles = {}
   for _, veh in ipairs(vehicle_list) do
-    if string.find(string.lower(veh.name), string.lower(vCreator_searchQ)) then
+    if string.find(string.lower(veh.name), vCreator_searchQ:lower()) then
       table.insert(filtered_vehicles, veh)
     end
   end
@@ -4071,11 +4061,7 @@ vehicle_creator:add_imgui(function()
     vCreator_searchQ, used = ImGui.InputTextWithHint("##searchVehicles", GENERIC_SEARCH_HINT_, vCreator_searchQ,
       32)
     ImGui.PopItemWidth()
-    if ImGui.IsItemActive() then
-      is_typing = true
-    else
-      is_typing = false
-    end
+    is_typing = ImGui.IsItemActive()
     ImGui.PushItemWidth(350)
     displayFilteredList()
     ImGui.PopItemWidth()
@@ -4407,14 +4393,10 @@ vehicle_creator:add_imgui(function()
       ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
       ImGui.SetNextWindowBgAlpha(0.81)
       if ImGui.BeginPopupModal("Save Merged Vehicles", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-        creation_name, _ = ImGui.InputTextWithHint("##save_merge", VC_NAME_HINT_, creation_name,
-          128)
-        if ImGui.IsItemActive() then
-          is_typing = true
-        else
-          is_typing = false
-        end
-        ImGui.Spacing()
+        creation_name, _ = ImGui.InputTextWithHint(
+          "##save_merge", VC_NAME_HINT_, creation_name, 128
+        )
+        is_typing = ImGui.IsItemActive(); ImGui.Spacing()
         if not start_loading_anim then
           if ImGui.Button(string.format("%s##vehcreator2", GENERIC_SAVE_BTN_)) then
             script.run_in_fiber(function(save)
@@ -4672,6 +4654,7 @@ business_tab:add_imgui(function()
                   script.run_in_fiber(function(wh1l)
                     repeat
                       stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
+                      wh1Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE0")
                       wh1l:sleep(supply_autofill_delay)
                     until wh1Supplies == whouse1_max or wh1_loop == false
                     if wh1_loop then
@@ -4746,6 +4729,7 @@ business_tab:add_imgui(function()
                   script.run_in_fiber(function(wh2l)
                     repeat
                       stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
+                      wh2Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE1")
                       wh2l:sleep(supply_autofill_delay)
                     until wh2Supplies == whouse2_max or wh2_loop == false
                     if wh2_loop then
@@ -4820,6 +4804,7 @@ business_tab:add_imgui(function()
                   script.run_in_fiber(function(wh3l)
                     repeat
                       stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
+                      wh3Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE2")
                       wh3l:sleep(supply_autofill_delay)
                     until wh3Supplies == whouse3_max or wh3_loop == false
                     if wh3_loop then
@@ -4894,6 +4879,7 @@ business_tab:add_imgui(function()
                   script.run_in_fiber(function(wh4l)
                     repeat
                       stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
+                      wh4Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE3")
                       wh4l:sleep(supply_autofill_delay)
                     until wh4Supplies == whouse4_max or wh4_loop == false
                     if wh4_loop then
@@ -4968,6 +4954,7 @@ business_tab:add_imgui(function()
                   script.run_in_fiber(function(wh5l)
                     repeat
                       stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
+                      wh5Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE4")
                       wh5l:sleep(supply_autofill_delay)
                     until wh5Supplies == whouse5_max or wh5_loop == false
                     if wh5_loop then
@@ -5012,9 +4999,13 @@ business_tab:add_imgui(function()
                 script.run_in_fiber(function(hgl)
                   repeat
                     stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
+                    -- if the UI is closed, the loop won't exit when the supplies reach the max
+                    -- because it'll be reading the initial amount of supplies so we have to update it
+                    -- inside the repeat loop.
+                    hangarSupplies = stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
                     hgl:sleep(supply_autofill_delay)
                   until hangarSupplies == 50 or hangarLoop == false
-                  if hangarLoop then
+                  if hangarLoop then -- if it wasn't manually disabled then disable it.
                     hangarLoop = false
                   end
                 end)
@@ -5439,7 +5430,7 @@ business_tab:add_imgui(function()
           UI.helpMarker(true, QUICK_TP_WARN_, "#FFA134", 1)
           ImGui.SameLine()
           ImGui.BeginDisabled(not acidOwned)
-          if ImGui.Button("To Acid Lab") then
+          if ImGui.Button("To The Freak Shop") then
             UI.widgetSound("Select")
             script.run_in_fiber(function()
               local acid_blip = HUD.GET_FIRST_BLIP_INFO_ID(848)
@@ -5769,6 +5760,36 @@ business_tab:add_imgui(function()
           gui.show_success("Samurai's Scripts", "Successfully disabled the most annoying missions.")
         end
         ImGui.EndTabItem()
+      end
+      if ImGui.BeginTabItem("Sales") then
+        UI.wrappedText(
+          "This is shitty unreliable code with little to no effort put into it.\n\nOnly these businesses are supported and some may show a 'Mission failed' or similar message but still pay you the full amount:",
+          35
+        )
+        ImGui.BulletText("Bunker")
+        ImGui.BulletText("Hangar (Air sales only)")
+        ImGui.BulletText("CEO Warehouses")
+        ImGui.BulletText("MC Businesses")
+        ImGui.Dummy(1, 10)
+        ImGui.SeparatorText(string.format("Currently Selling: %s", simplified_gb_scr_name))
+        ImGui.BeginDisabled(autosell_was_triggered)
+        autosell, autosellUsed = ImGui.Checkbox("Auto-Sell", autosell)
+        if autosellUsed then
+          UI.widgetSound("Nav2")
+          CFG.save("autosell", autosell)
+        end
+        ImGui.EndDisabled()
+        UI.toolTip(false, "Automatically finishes a sale mission 20 seconds after it starts. Doesn't require you to interact with anything other than starting the mission.")
+        if script.is_active("fm_content_smuggler_sell") then
+          UI.coloredText("Land sales are currently not supported.", 'red', 0.8, 25)
+        else
+          ImGui.BeginDisabled(autosell or autosell_was_triggered or not gb_scr_is_running)
+          if ImGui.Button("Manually Finish Sale") then
+            FinishSale(gb_scr_name)
+            autosell_was_triggered = true
+          end
+          ImGui.EndDisabled()
+        end
       end
     else
       ImGui.Dummy(1, 5); ImGui.SameLine(); ImGui.Text("Outdated.")
@@ -6732,6 +6753,25 @@ world_tab:add_imgui(function()
     CFG.save("public_seats", public_seats)
   end
 
+  ambient_scenarios, ascnUsed = ImGui.Checkbox("Ambient Scenarios", ambient_scenarios)
+  UI.helpMarker(false,
+  "Many locations in Los Santos have Ambient Scenario triggers. These are places where you usuallly see NPCs doing random stuff like working out at the beach, sitting down, drinking, smoking, etc...\nIf you come across one of these spots in the open world, a prompt will show up asking you to press [E] to play the available scenario.\n\nNOTE: If a scenario glitches out or fails to start/stop, you can hold [Left Shift] and press [E] to force start or stop it."
+  )
+  if ascnUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("ambient_scenarios", ambient_scenarios)
+  end
+
+  if ambient_scenarios then
+    ImGui.SameLine()
+    ambient_scenario_prompt, ascnpUsed = ImGui.Checkbox("Show Prompt", ambient_scenario_prompt)
+    UI.helpMarker(false, "Enable or disable button prompts when near an ambient scenario location.")
+    if ascnpUsed then
+      UI.widgetSound("Nav2")
+      CFG.save("ambient_scenario_prompt", ambient_scenario_prompt)
+    end
+  end
+
   extend_world, ewbUsed = ImGui.Checkbox(EXTEND_WORLD_CB_, extend_world)
   UI.helpMarker(false, EXTEND_WORLD_DESC_)
   if ewbUsed then
@@ -6816,7 +6856,7 @@ end
 local function updateFilteredProps()
   filteredProps = {}
   for _, p in ipairs(custom_props) do
-    if string.find(string.lower(p.name), string.lower(objects_search)) then
+    if string.find(string.lower(p.name), objects_search:lower()) then
       table.insert(filteredProps, p)
     end
     table.sort(custom_props, function(a, b)
@@ -6843,7 +6883,7 @@ local function getAllObjects()
   filteredObjects = {}
   for _, object in ipairs(gta_objets) do
     if objects_search ~= "" then
-      if string.find(string.lower(object), string.lower(objects_search)) then
+      if string.find(string.lower(object), objects_search:lower()) then
         table.insert(filteredObjects, object)
       end
     else
@@ -6981,11 +7021,7 @@ object_spawner:add_imgui(function()
     ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); os_switch, os_switchUsed = ImGui.RadioButton(ALL_OBJECTS_TXT_, os_switch, 1)
     ImGui.PushItemWidth(360)
     objects_search, used = ImGui.InputTextWithHint("##searchObjects", GENERIC_SEARCH_HINT_, objects_search, 32)
-    if ImGui.IsItemActive() then
-      is_typing = true
-    else
-      is_typing = false
-    end
+    is_typing = ImGui.IsItemActive()
     if os_switchUsed then
       UI.widgetSound("Nav")
     end
@@ -7497,11 +7533,7 @@ object_spawner:add_imgui(function()
         if ImGui.BeginPopupModal("persist props", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
           ImGui.Dummy(1, 5); ImGui.Text("Give your creation a name and save it."); ImGui.Dummy(1, 5)
           saved_props_name, _ = ImGui.InputTextWithHint("##persistpropname", "Name", saved_props_name, 64)
-          if ImGui.IsItemActive() then
-            is_typing = true
-          else
-            is_typing = false
-          end
+          is_typing = ImGui.IsItemActive()
           ImGui.Dummy(1, 5)
           if ImGui.Button(string.format("  %s  ##obj2", GENERIC_SAVE_BTN_)) then
             local timer = 0
@@ -8937,7 +8969,7 @@ script.register_looped("KATANA", function(rpq)
   end
 end)
 
-script.register_looped("LSR", function(lsr) -- Laser Sight
+script.register_looped("LSR", function() -- Laser Sight
   if laserSight and WEAPON.IS_PED_ARMED(self.get_ped(), 4) and Game.Self.isOnFoot() then
     if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
       local wpn_idx = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
@@ -10528,9 +10560,9 @@ end)
 script.register_looped("PSEATS", function(pseats) -- Public Seats
   if public_seats and Game.Self.isOutside() and Game.Self.isOnFoot() and not NETWORK.NETWORK_IS_ACTIVITY_SESSION() and not is_sitting then
     local near_seat, seat, x_offset, z_offset = SS.isNearPublicSeat()
-    if near_seat and Game.Self.isAlive() and not PLAYER.IS_PLAYER_FREE_AIMING(self.get_id())
-    and not is_playing_anim and not is_playing_scenario and not ped_grabbed and not vehicle_grabbed
-    and not is_handsUp and not isCrouched and not ped_grabbed and not vehicle_grabbed and not is_hiding then
+    if near_seat and Game.Self.isAlive() and not PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) and not TASK.PED_HAS_USE_SCENARIO_TASK(self.get_ped())
+      and not is_playing_anim and not is_playing_scenario and not ped_grabbed and not vehicle_grabbed and not is_playing_amb_scenario
+      and not is_handsUp and not isCrouched and not ped_grabbed and not vehicle_grabbed and not is_hiding then
       Game.showButtonPrompt("Press ~INPUT_PICKUP~ to sit down")
       if PAD.IS_CONTROL_PRESSED(0, 38) then
         if Game.requestAnimDict("timetable@ron@ig_3_couch") then
@@ -10591,6 +10623,64 @@ script.register_looped("PSEATS", function(pseats) -- Public Seats
         end
         pseats:sleep(1000)
         is_sitting, thisSeat = false, 0
+      end
+    end
+  end
+end)
+-- ambient scenarios
+script.register_looped("AMBSCN", function(ambscn)
+  if ambient_scenarios and Game.Self.isOnFoot() then
+    local myPos = self.get_pos()
+    local amb_scenario_exists, amb_scenario_name = Game.DoesHumanScenarioExistInArea(myPos, 2, true)
+    local force_start = PAD.IS_CONTROL_PRESSED(0, 21)
+    if amb_scenario_exists and not is_playing_amb_scenario and not ped_grabbed
+      and not vehicle_grabbed and not is_sitting and not isCrouched
+      and not script.is_active("CELLPHONE_FLASHHAND") then
+      Disable_E()
+      if ambient_scenario_prompt then
+        Game.showButtonPrompt(
+          ("Press ~INPUT_PICKUP~ to play the nearest scenario (%s)."):format(amb_scenario_name)
+        )
+      end
+      local UseNearestScenarioCall = force_start and TASK.TASK_USE_NEAREST_SCENARIO_TO_COORD_WARP or TASK.TASK_USE_NEAREST_SCENARIO_TO_COORD
+      if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 38) then
+        if is_playing_anim then
+          cleanup(ambscn)
+          is_playing_anim = false
+        end
+        if is_handsUp then
+          TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+          is_handsUp = false
+        end
+        if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 414, true) then
+          PED.SET_PED_CONFIG_FLAG(self.get_ped(), 414, true)
+        end
+        UseNearestScenarioCall(self.get_ped(), myPos.x, myPos.y, myPos.z, 2, 0)
+        ambscn:sleep(1500)
+        gui.show_message("Samurai's Scripts", "If the ambient scenario glitches or fails to start, you can hold Left Shift and press E to force start/stop it.")
+        is_playing_amb_scenario = true
+      end
+    end
+    if is_playing_amb_scenario then
+      if not Game.Self.isAlive() or PED.IS_PED_RAGDOLL(self.get_ped()) then
+        is_playing_amb_scenario = false
+      end
+      Disable_E()
+      if ambient_scenario_prompt then
+        Game.showButtonPrompt("Press ~INPUT_PICKUP~ to stop.")
+      end
+      if PAD.IS_CONTROL_PRESSED(0, 21) then
+        if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 38) then
+          TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+          is_playing_amb_scenario = false
+          ambscn:sleep(1000)
+        end
+      else
+        if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 38) then
+          stopScenario(self.get_ped(), ambscn)
+          is_playing_amb_scenario = false
+          ambscn:sleep(1000)
+        end
       end
     end
   end
@@ -11083,6 +11173,38 @@ script.register_looped("CDK", function() -- Cooldown Killer
   end
 end)
 
+script.register_looped("ISALE", function(isale)
+  for script_name in pairs(gb_scripts) do
+    if script.is_active(script_name) then
+      gb_scr_name, gb_scr_is_running = script_name, true
+      for _, v in ipairs(simplified_gb_scr_names) do
+        if v.scr == script_name then
+          simplified_gb_scr_name = v.sn
+          break
+        end
+      end
+      break
+    else
+      gb_scr_name, simplified_gb_scr_name, gb_scr_is_running = "None", "Nothing ya poor bastard", false
+      break
+    end
+  end
+  isale:sleep(1000)
+end)
+script.register_looped("AUTOSELL", function(as)
+  if autosell and gb_scr_is_running then
+    autosell_was_triggered = true
+    gui.show_message("Samurai's Scripts", "Auto-Sell will start in 20 seconds.")
+    as:sleep(20000)
+    FinishSale(gb_scr_name)
+    repeat
+      as:sleep(1000)
+    until not gb_scr_is_running -- most scripts take a few seconds to terminate.
+    autosell_was_triggered = false
+  end
+end)
+
+
 ---MISC
 script.register_looped("DFM", function() -- Disable Flight Music
   if disableFlightMusic then
@@ -11201,7 +11323,7 @@ event.register_handler(menu_event.Wndproc, function(_, msg, wParam, lParam)
         -- if key.just_pressed then
         --   SS.debug(
         --     "\10--- Pressed Key ---" .. "\10 ¤ Name:       " .. key.name .. "\10 ¤ Keycode:    " ..
-        --     Lua_fn.decimalToHex(wParam, 16) .. "\10 ¤ Bit24: " .. tostring((lParam & (1 << 24)) ~= 0)
+        --     Lua_fn.intToHex(wParam, 16) .. "\10 ¤ Bit24: " .. tostring((lParam & (1 << 24)) ~= 0)
         --     .. "\10 ¤ SYSKEY:     " .. tostring(msg == WM._SYSKEYDOWN)
         --   )
         -- end

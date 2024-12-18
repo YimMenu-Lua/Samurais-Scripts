@@ -2437,10 +2437,10 @@ Labels = {
 			text = "Dzięki temu Twój samochód będzie wyposażony w opony driftowe za każdym razem, gdy naciśniesz ___. Twoje opony zostaną zresetowane, gdy zwolnisz przycisk.",
 		},
 	},
-	driftToruqe_tt = {
+	driftTorque_tt = {
 		{
 			iso = "en-US",
-			text = "Increases you vehicle's toruqe when drifting. Works for both 'Drift Mode' and 'Drift Tires'.",
+			text = "Increases you vehicle's torque when drifting. Works for both 'Drift Mode' and 'Drift Tires'.",
 		},
 		{
 			iso = "de-DE",

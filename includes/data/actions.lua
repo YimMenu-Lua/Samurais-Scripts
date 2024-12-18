@@ -241,7 +241,7 @@ ped_scenarios = {
   { scenario = "WORLD_HUMAN_WELDING",                    name = "Construction: Welding Torch" },
   { scenario = "PROP_HUMAN_BBQ",                         name = "Cook On BBQ" },
   { scenario = "WORLD_HUMAN_INSPECT_CROUCH",             name = "Crouch" },
-  { scenario = "WORLD_HUMAN_DRINKING",                   name = "Drink Beer" },
+  { scenario = "WORLD_HUMAN_DRINKING",                   name = "Drink Beer/Coffee" },
   { scenario = "WORLD_HUMAN_DRUG_DEALER",                name = "Drug Dealer Smoking" },
   { scenario = "WORLD_HUMAN_DRUG_DEALER_HARD",           name = "Drug Dealer Tough" },
   { scenario = "PROP_HUMAN_BUM_BIN",                     name = "Dumpster Dive" },
@@ -517,6 +517,10 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
   end
   if Info.atime ~= nil then
     duration = Info.atime
+  end
+  if is_playing_scenario or is_playing_amb_scenario then
+    TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+    is_playing_scenario, is_playing_amb_scenario = false, false
   end
   if Info.type == 1 then
     if ent == "self" then
@@ -812,6 +816,7 @@ function stopScenario(ped, s)
     until not PED.IS_PED_USING_ANY_SCENARIO(ped)
     Game.busySpinnerOff()
     is_playing_scenario = false
+    is_playing_amb_scenario = false
   end
 end
 
