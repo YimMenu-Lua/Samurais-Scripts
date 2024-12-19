@@ -11196,13 +11196,15 @@ script.register_looped("AUTOSELL", function(as)
     gui.show_message("Samurai's Scripts", "Auto-Sell will start in 20 seconds.")
     as:sleep(20000)
     FinishSale(gb_scr_name)
+  end
+
+  if autosell_was_triggered then
     repeat
-      as:sleep(1000)
+      as:sleep(100)
     until not gb_scr_is_running -- most scripts take a few seconds to terminate.
     autosell_was_triggered = false
   end
 end)
-
 
 ---MISC
 script.register_looped("DFM", function() -- Disable Flight Music
