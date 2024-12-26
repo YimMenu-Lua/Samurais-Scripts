@@ -548,7 +548,7 @@ flight_controls_T        = {
   112,
 }
 
--- HandlingFlags
+-- CVehicle::HandlingFlags
 HF                       = {
   _SMOOTHED_COMPRESSION                      = 0,
   _REDUCED_MOD_MASS                          = 1,
@@ -581,6 +581,42 @@ HF                       = {
   _SELF_RIGHTING_IN_WATER                    = 28,
   IMPROVED_RIGHTING_FORCE                    = 29,
   _LOW_SPEED_WHEELIES                        = 30,
+}
+
+-- CVehicle::ModelFlags
+MF = {
+  _IS_VAN                    = 0,
+  _IS_BUS                    = 1,
+  _IS_LOW                    = 2,
+  _IS_BIG                    = 3,
+  _ABS_STD                   = 4, -- abs standard
+  _ABS_OPTION                = 5, -- abs when upgraded
+  _ABS_ALT_STD               = 6, -- alternate abs standard
+  _ABS_ALT_OPTION            = 7, -- alternate abs when upgraded
+  _NO_DOORS                  = 8,
+  _TANDEM_SEATING            = 9,
+  _SIT_IN_BOAT               = 10,
+  _HAS_TRACKS                = 11,
+  _NO_EXHAUST                = 12,
+  _DOUBLE_EXHAUST            = 13,
+  _NO_1STPERSON_LOOKBEHIND   = 14,
+  _CAN_ENTER_IF_NO_DOOR      = 15,
+  _AXLE_F_TORSION            = 16,
+  _AXLE_F_SOLID              = 17,
+  _AXLE_F_MCPHERSON          = 18,
+  _ATTACH_PED_TO_BODYSHELL   = 19,
+  _AXLE_R_TORSION            = 20,
+  _AXLE_R_SOLID              = 21,
+  _AXLE_R_MCPHERSON          = 22,
+  _DONT_FORCE_GRND_CLEARANCE = 23,
+  _DONT_RENDER_STEER         = 24,
+  _NO_WHEEL_BURST            = 25,
+  _INDESTRUCTIBLE            = 26,
+  _DOUBLE_FRONT_WHEELS       = 27,
+  _IS_RC                     = 28,
+  _DOUBLE_REAR_WHEELS        = 29,
+  _NO_WHEEL_BREAK            = 30,
+  _EXTRA_CAMBER              = 31,
 }
 
 -- AnimFlags

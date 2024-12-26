@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.4.8'
+SCRIPT_VERSION = '1.4.9'
 TARGET_BUILD   = '3411'
 TARGET_VERSION = '1.70'
 log.info("version " .. SCRIPT_VERSION)
@@ -49,6 +49,7 @@ DEFAULT_CONFIG         = {
     triggerbotBtn = { code = 0x10, name = "[Shift]" },
     panik         = { code = 0x7B, name = "[F12]" },
     laser_sight   = { code = 0x4C, name = "[L]" },
+    commands      = { code = 0x67, name = "[NUMPAD 7]" },
   },
   gpad_keybinds           = {
     rodBtn        = { code = 0, name = "[Unbound]" },
@@ -117,6 +118,7 @@ DEFAULT_CONFIG         = {
   missiledefense          = false,
   louderPops              = false,
   autobrklight            = false,
+  abs_lights              = false,
   holdF                   = false,
   keepWheelsTurned        = false,
   noJacking               = false,
@@ -258,6 +260,7 @@ louderPops              = CFG.read("louderPops")
 limitVehOptions         = CFG.read("limitVehOptions")
 missiledefense          = CFG.read("missiledefense")
 autobrklight            = CFG.read("autobrklight")
+abs_lights              = CFG.read("abs_lights")
 rgbLights               = CFG.read("rgbLights")
 fender_bender           = CFG.read("fender_bender")
 holdF                   = CFG.read("holdF")
@@ -406,6 +409,9 @@ is_primary              = false
 is_secondary            = false
 gb_scr_is_running       = false
 autosell_was_triggered  = false
+should_flash_bl         = false
+cmd_ui_is_open          = false
+should_draw_cmd_ui      = false
 debug_counter           = not SS_debug and 0 or 7
 anim_flag               = 0
 anim_sortby_idx         = 0
@@ -467,6 +473,7 @@ smokeHex                = ""
 random_quote            = ""
 custom_paints_sq        = ""
 npcDriveTask            = ""
+user_command            = ""
 gb_scr_name             = "None"
 simplified_gb_scr_name  = "None"
 npcDriveDest            = vec3:new(0.0, 0.0, 0.0)
@@ -2732,7 +2739,14 @@ vehicle_tab:add_imgui(function()
     end
   end
 
-  fender_bender, fbenderUsed = ImGui.Checkbox("Dangerous Car Crashes", fender_bender)
+  abs_lights, abslUsed = ImGui.Checkbox("ABS Brake Lights", abs_lights)
+  UI.toolTip(false, "Flashes your brake lights repeatedly when braking at high speed (over 100km/h).\nOnly works on vehicles that have ABS.")
+  if abslUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("abs_lights", abs_lights)
+  end
+
+  ImGui.SameLine(); ImGui.Dummy(13, 1); ImGui.SameLine() fender_bender, fbenderUsed = ImGui.Checkbox("Better Car Crashes", fender_bender)
   UI.toolTip(false, FENDER_BENDER_DESC_)
   if fbenderUsed then
     UI.widgetSound("Nav2")
@@ -2958,7 +2972,7 @@ vehicle_tab:add_imgui(function()
             local player_index = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(ped)
             command.call("vehkick", {player_index})
             ejecto:sleep(1000)
-            if PED.IS_PED_SITTING_IN_VEHICLE(ped, current_vehicle) then -- player wasn't ejected. Try something else maybe?
+            if PED.IS_PED_SITTING_IN_VEHICLE(ped, current_vehicle) then
               gui.show_error("Samurai's Scripts", "Failed to eject the player from our vehicle!")
             end
           end
@@ -4650,18 +4664,6 @@ business_tab:add_imgui(function()
               ImGui.SameLine(); wh1_loop, wh1lUsed = ImGui.Checkbox("Auto##wh1", wh1_loop)
               if wh1lUsed then
                 UI.widgetSound("Nav2")
-                if wh1_loop then
-                  script.run_in_fiber(function(wh1l)
-                    repeat
-                      stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
-                      wh1Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE0")
-                      wh1l:sleep(supply_autofill_delay)
-                    until wh1Supplies == whouse1_max or wh1_loop == false
-                    if wh1_loop then
-                      wh1_loop = false
-                    end
-                  end)
-                end
               end
             end
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4725,18 +4727,6 @@ business_tab:add_imgui(function()
               ImGui.SameLine(); wh2_loop, wh2lUsed = ImGui.Checkbox("Auto##wh2", wh2_loop)
               if wh2lUsed then
                 UI.widgetSound("Nav2")
-                if wh2_loop then
-                  script.run_in_fiber(function(wh2l)
-                    repeat
-                      stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
-                      wh2Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE1")
-                      wh2l:sleep(supply_autofill_delay)
-                    until wh2Supplies == whouse2_max or wh2_loop == false
-                    if wh2_loop then
-                      wh2_loop = false
-                    end
-                  end)
-                end
               end
             end
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4800,18 +4790,6 @@ business_tab:add_imgui(function()
               ImGui.SameLine(); wh3_loop, wh3lUsed = ImGui.Checkbox("Auto##wh3", wh3_loop)
               if wh3lUsed then
                 UI.widgetSound("Nav2")
-                if wh3_loop then
-                  script.run_in_fiber(function(wh3l)
-                    repeat
-                      stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
-                      wh3Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE2")
-                      wh3l:sleep(supply_autofill_delay)
-                    until wh3Supplies == whouse3_max or wh3_loop == false
-                    if wh3_loop then
-                      wh3_loop = false
-                    end
-                  end)
-                end
               end
             end
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4875,18 +4853,6 @@ business_tab:add_imgui(function()
               ImGui.SameLine(); wh4_loop, wh4lUsed = ImGui.Checkbox("Auto##wh4", wh4_loop)
               if wh4lUsed then
                 UI.widgetSound("Nav2")
-                if wh4_loop then
-                  script.run_in_fiber(function(wh4l)
-                    repeat
-                      stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
-                      wh4Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE3")
-                      wh4l:sleep(supply_autofill_delay)
-                    until wh4Supplies == whouse4_max or wh4_loop == false
-                    if wh4_loop then
-                      wh4_loop = false
-                    end
-                  end)
-                end
               end
             end
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4950,18 +4916,6 @@ business_tab:add_imgui(function()
               ImGui.SameLine(); wh5_loop, wh5lUsed = ImGui.Checkbox("Auto##wh5", wh5_loop)
               if wh5lUsed then
                 UI.widgetSound("Nav2")
-                if wh5_loop then
-                  script.run_in_fiber(function(wh5l)
-                    repeat
-                      stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
-                      wh5Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE4")
-                      wh5l:sleep(supply_autofill_delay)
-                    until wh5Supplies == whouse5_max or wh5_loop == false
-                    if wh5_loop then
-                      wh5_loop = false
-                    end
-                  end)
-                end
               end
             end
             ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -4995,21 +4949,6 @@ business_tab:add_imgui(function()
             ImGui.SameLine(); hangarLoop, hlUsed = ImGui.Checkbox("Auto##hangar", hangarLoop)
             if hlUsed then
               UI.widgetSound("Nav2")
-              if hangarLoop then
-                script.run_in_fiber(function(hgl)
-                  repeat
-                    stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
-                    -- if the UI is closed, the loop won't exit when the supplies reach the max
-                    -- because it'll be reading the initial amount of supplies so we have to update it
-                    -- inside the repeat loop.
-                    hangarSupplies = stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
-                    hgl:sleep(supply_autofill_delay)
-                  until hangarSupplies == 50 or hangarLoop == false
-                  if hangarLoop then -- if it wasn't manually disabled then disable it.
-                    hangarLoop = false
-                  end
-                end)
-              end
             end
           end
           ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -5662,54 +5601,24 @@ business_tab:add_imgui(function()
         payphone_hits_cd, _ = ImGui.Checkbox("Payphone Hits [x]", payphone_hits_cd)
         UI.toolTip(false, "Use ShinyWasabi's Payphone Hits script instead. Press [TAB] to copy the GitHub link.")
         UI.setClipBoard("https://github.com/YimMenu-Lua/PayphoneHits", ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and SS.isKeyJustPressed(0x09))
-        ImGui.EndDisabled()
-
-        ImGui.Dummy(1, 5)
+        ImGui.EndDisabled(); ImGui.Dummy(1, 5)
         if mc_work_cd and hangar_cd and nc_management_cd and nc_vip_mission_chance and security_missions_cd
           and ie_vehicle_steal_cd and ie_vehicle_sell_cd and ceo_crate_buy_cd and ceo_crate_sell_cd then
-          if ImGui.Button("Uncheck All", 120, 40) then
-            UI.widgetSound("Cancel")
-            mc_work_cd            = false
-            hangar_cd             = false
-            nc_management_cd      = false
-            nc_vip_mission_chance = false
-            security_missions_cd  = false
-            ie_vehicle_steal_cd   = false
-            ie_vehicle_sell_cd    = false
-            ceo_crate_buy_cd      = false
-            ceo_crate_sell_cd     = false
-            CFG.save("mc_work_cd", mc_work_cd)
-            CFG.save("hangar_cd", hangar_cd)
-            CFG.save("nc_management_cd", nc_management_cd)
-            CFG.save("nc_vip_mission_chance", nc_vip_mission_chance)
-            CFG.save("security_missions_cd", security_missions_cd)
-            CFG.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
-            CFG.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
-            CFG.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
-            CFG.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
-          end
+          sBtnLabel, bParam = "Uncheck All", false
         else
-          if ImGui.Button("Check All", 120, 40) then
-            UI.widgetSound("Select")
-            mc_work_cd            = true
-            hangar_cd             = true
-            nc_management_cd      = true
-            nc_vip_mission_chance = true
-            security_missions_cd  = true
-            ie_vehicle_steal_cd   = true
-            ie_vehicle_sell_cd    = true
-            ceo_crate_buy_cd      = true
-            ceo_crate_sell_cd     = true
-            CFG.save("mc_work_cd", mc_work_cd)
-            CFG.save("hangar_cd", hangar_cd)
-            CFG.save("nc_management_cd", nc_management_cd)
-            CFG.save("nc_vip_mission_chance", nc_vip_mission_chance)
-            CFG.save("security_missions_cd", security_missions_cd)
-            CFG.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
-            CFG.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
-            CFG.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
-            CFG.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
-          end
+          sBtnLabel, bParam = "Check All", true
+        end
+        if ImGui.Button(sBtnLabel or "", 120, 40) then
+          UI.widgetSound("Select")
+          mc_work_cd            = bParam; CFG.save("mc_work_cd", mc_work_cd)
+          hangar_cd             = bParam; CFG.save("hangar_cd", hangar_cd)
+          nc_management_cd      = bParam; CFG.save("nc_management_cd", nc_management_cd)
+          nc_vip_mission_chance = bParam; CFG.save("nc_vip_mission_chance", nc_vip_mission_chance)
+          security_missions_cd  = bParam; CFG.save("security_missions_cd", security_missions_cd)
+          ie_vehicle_steal_cd   = bParam; CFG.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
+          ie_vehicle_sell_cd    = bParam; CFG.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
+          ceo_crate_buy_cd      = bParam; CFG.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
+          ceo_crate_sell_cd     = bParam; CFG.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
         end
         ImGui.Spacing(); ImGui.SeparatorText("Sell Missions")
         ImGui.Spacing(); UI.wrappedText(
@@ -5787,6 +5696,12 @@ business_tab:add_imgui(function()
           if ImGui.Button("Manually Finish Sale") then
             FinishSale(gb_scr_name)
             autosell_was_triggered = true
+            script.run_in_fiber(function(s)
+              repeat
+                s:sleep(100)
+              until not gb_scr_is_running
+              autosell_was_triggered = false
+            end)
           end
           ImGui.EndDisabled()
         end
@@ -7833,62 +7748,175 @@ hotkeys_tab:add_imgui(function()
   if ImGui.BeginTabItem("Keyboard") then
     ImGui.Dummy(1, 5)
 
-    SS.openHotkeyWindow("Ragdoll On Demand        ", keybinds.rodBtn)
+    SS.openHotkeyWindow("Ragdoll On Demand", keybinds.rodBtn)
 
-    SS.openHotkeyWindow("Drift                                ", keybinds.tdBtn)
+    SS.openHotkeyWindow("Drift", keybinds.tdBtn)
 
-    SS.openHotkeyWindow("NOS                                ", keybinds.nosBtn)
+    SS.openHotkeyWindow("NOS", keybinds.nosBtn)
 
-    SS.openHotkeyWindow("Stop Animanimation       ", keybinds.stop_anim)
+    SS.openHotkeyWindow("Stop Animanimation", keybinds.stop_anim)
 
-    SS.openHotkeyWindow("Play Animanimation       ", keybinds.play_anim)
+    SS.openHotkeyWindow("Play Animanimation", keybinds.play_anim)
 
     SS.openHotkeyWindow("Previous Animanimation", keybinds.previous_anim)
 
-    SS.openHotkeyWindow("Next Animanimation       ", keybinds.next_anim)
+    SS.openHotkeyWindow("Next Animanimation", keybinds.next_anim)
 
-    SS.openHotkeyWindow("Triggerbot Button           ", keybinds.triggerbotBtn)
+    SS.openHotkeyWindow("Triggerbot Button", keybinds.triggerbotBtn)
 
-    SS.openHotkeyWindow("Flatbed Tow/Detach       ", keybinds.flatbedBtn)
+    SS.openHotkeyWindow("Flatbed Tow/Detach", keybinds.flatbedBtn)
 
-    SS.openHotkeyWindow("Purge                             ", keybinds.purgeBtn)
+    SS.openHotkeyWindow("Purge", keybinds.purgeBtn)
 
-    SS.openHotkeyWindow("Toggle Auto-Kill             ", keybinds.autokill)
+    SS.openHotkeyWindow("Toggle Auto-Kill", keybinds.autokill)
 
-    SS.openHotkeyWindow("Toggle Enemies Flee     ", keybinds.enemiesFlee)
+    SS.openHotkeyWindow("Toggle Enemies Flee", keybinds.enemiesFlee)
 
-    SS.openHotkeyWindow("Toggle Missile Defence ", keybinds.missl_def)
+    SS.openHotkeyWindow("Toggle Missile Defence", keybinds.missl_def)
 
-    SS.openHotkeyWindow("Vehicle Mine                 ", keybinds.vehicle_mine)
+    SS.openHotkeyWindow("Vehicle Mine", keybinds.vehicle_mine)
 
-    SS.openHotkeyWindow("Laser Sights                 ", keybinds.laser_sight)
+    SS.openHotkeyWindow("Laser Sights", keybinds.laser_sight)
 
-    SS.openHotkeyWindow("PANIK!! Button              ", keybinds.panik)
+    SS.openHotkeyWindow("PANIK!! Button", keybinds.panik)
+
+    SS.openHotkeyWindow("Command Executor", keybinds.commands)
     ImGui.EndTabItem()
   end
+
   if ImGui.BeginTabItem("Controller") then
     ImGui.Dummy(1, 5)
 
-    SS.gpadHotkeyWindow("Ragdoll On Demand  ", gpad_keybinds.rodBtn)
+    SS.gpadHotkeyWindow("Ragdoll On Demand", gpad_keybinds.rodBtn)
 
-    SS.gpadHotkeyWindow("Triggerbot Button      ", gpad_keybinds.triggerbotBtn)
+    SS.gpadHotkeyWindow("Triggerbot Button", gpad_keybinds.triggerbotBtn)
 
-    SS.gpadHotkeyWindow("Drift Button               ", gpad_keybinds.tdBtn)
+    SS.gpadHotkeyWindow("Drift Button", gpad_keybinds.tdBtn)
 
-    SS.gpadHotkeyWindow("NOS Button               ", gpad_keybinds.nosBtn)
+    SS.gpadHotkeyWindow("NOS Button", gpad_keybinds.nosBtn)
 
-    SS.gpadHotkeyWindow("Flatbed Button          ", gpad_keybinds.flatbedBtn)
+    SS.gpadHotkeyWindow("Flatbed Button", gpad_keybinds.flatbedBtn)
 
-    SS.gpadHotkeyWindow("Purge Button            ", gpad_keybinds.purgeBtn)
+    SS.gpadHotkeyWindow("Purge Button", gpad_keybinds.purgeBtn)
 
-    SS.gpadHotkeyWindow("Vehicle Mine Button ", gpad_keybinds.vehicle_mine)
+    SS.gpadHotkeyWindow("Vehicle Mine Button", gpad_keybinds.vehicle_mine)
 
-    SS.gpadHotkeyWindow("Laser Sights             ", gpad_keybinds.laser_sight)
+    SS.gpadHotkeyWindow("Laser Sights", gpad_keybinds.laser_sight)
     ImGui.EndTabItem()
   end
   ImGui.EndTabBar()
 end)
 
+gui.add_always_draw_imgui(command_ui)
+
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------- Commands -----------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+
+RegisterCommand("autoheal", function()
+  gui.show_message("Samurai's Scripts", ("Autoheal %s."):format(Regen and "disabled" or "enabled"))
+  Regen = not Regen
+  CFG.save("Regen", Regen)
+end)
+
+RegisterCommand("rod", function()
+  gui.show_message("Samurai's Scripts", ("Ragdoll On Demand %s."):format(rod and "disabled" or "enabled"))
+  rod = not rod
+  CFG.save("rod", rod)
+end)
+
+RegisterCommand("autofill.hangar", function()
+  if Game.isOnline() then
+    gui.show_message("Samurai's Scripts", ("Hangar auto-fill %s."):format(hangarLoop and "disabled" or "enabled"))
+    hangarLoop = not hangarLoop
+  else
+    gui.show_error("Samurai's Scripts", "Unavailable in Single Player.")
+  end
+end)
+
+RegisterCommand("autofill.whouse1", function()
+  if Game.isOnline() then
+    gui.show_message("Samurai's Scripts", ("CEO Warehouse 1 auto-fill %s."):format(wh1_loop and "disabled" or "enabled"))
+    wh1_loop = not wh1_loop
+  else
+    gui.show_error("Samurai's Scripts", "Unavailable in Single Player.")
+  end
+end)
+
+RegisterCommand("autofill.whouse2", function()
+  if Game.isOnline() then
+    gui.show_message("Samurai's Scripts", ("CEO Warehouse 2 auto-fill %s."):format(wh2_loop and "disabled" or "enabled"))
+    wh2_loop = not wh2_loop
+  else
+    gui.show_error("Samurai's Scripts", "Unavailable in Single Player.")
+  end
+end)
+
+RegisterCommand("autofill.whouse3", function()
+  if Game.isOnline() then
+    gui.show_message("Samurai's Scripts", ("CEO Warehouse 3 auto-fill %s."):format(wh3_loop and "disabled" or "enabled"))
+    wh3_loop = not wh3_loop
+  else
+    gui.show_error("Samurai's Scripts", "Unavailable in Single Player.")
+  end
+end)
+
+RegisterCommand("autofill.whouse4", function()
+  if Game.isOnline() then
+    gui.show_message("Samurai's Scripts", ("CEO Warehouse 4 auto-fill %s."):format(wh4_loop and "disabled" or "enabled"))
+    wh4_loop = not wh4_loop
+  else
+    gui.show_error("Samurai's Scripts", "Unavailable in Single Player.")
+  end
+end)
+
+RegisterCommand("autofill.whouse5", function()
+  if Game.isOnline() then
+    gui.show_message("Samurai's Scripts", ("CEO Warehouse 5 auto-fill %s."):format(wh5_loop and "disabled" or "enabled"))
+    wh5_loop = not wh5_loop
+  else
+    gui.show_error("Samurai's Scripts", "Unavailable in Single Player.")
+  end
+end)
+
+RegisterCommand("finish_sale", function()
+  if Game.isOnline() then
+    if autosell then
+      gui.show_warning("Samurai's Scripts", "You aleady have 'Auto-Sell' enabled. No need to manually trigger it.")
+    else
+      if gb_scr_is_running then
+        FinishSale(gb_scr_name)
+      else
+        gui.show_warning("Samurai's Scripts", "No supported sale script is currently running.")
+      end
+    end
+  else
+    gui.show_error("Samurai's Scripts", "Unavailable in Single Player.")
+  end
+end)
+
+RegisterCommand("spawnmeaperv", function()
+  spawnPervert(self.get_ped(), "you")
+end)
+
+RegisterCommand("kys", function()
+  command.call("suicide", {})
+end)
+
+RegisterCommand("PANIK", function()
+  SS.handle_events()
+  AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(
+    "ELECTROCUTION", "MISTERK", self.get_pos().x,
+    self.get_pos().y, self.get_pos().z, "SPEECH_PARAMS_FORCE"
+  )
+  gui.show_message("PANIK!", "(Ó _ Ò )!!")
+end)
+
+RegisterCommand("resetcfg", SS.reset_settings)
 
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
@@ -8013,6 +8041,7 @@ script.register_looped("GINPUT", function() -- Game Input
   if ducking_in_car then
     PAD.DISABLE_CONTROL_ACTION(0, 73, true)
     PAD.DISABLE_CONTROL_ACTION(0, 75, true)
+    PAD.DISABLE_CONTROL_ACTION(0, 86, true)
   end
 
   if is_carpooling then
@@ -8020,11 +8049,16 @@ script.register_looped("GINPUT", function() -- Game Input
   end
 
   if PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
-    pressing_drift_button    = SS.isKeyPressed(keybinds.tdBtn.code)
-    pressing_nos_button      = SS.isKeyPressed(keybinds.nosBtn.code)
-    pressing_purge_button    = SS.isKeyPressed(keybinds.purgeBtn.code)
-    pressing_fltbd_button    = SS.isKeyJustPressed(keybinds.flatbedBtn.code)
-    pressing_vmine_button    = SS.isKeyJustPressed(keybinds.vehicle_mine.code)
+    pressing_drift_button    = SS.isKeyPressed(keybinds.tdBtn.code) and not
+    is_typing and not is_setting_hotkeys and not HUD.IS_MP_TEXT_CHAT_TYPING()
+    pressing_nos_button      = SS.isKeyPressed(keybinds.nosBtn.code) and not
+    is_typing and not is_setting_hotkeys and not HUD.IS_MP_TEXT_CHAT_TYPING()
+    pressing_purge_button    = SS.isKeyPressed(keybinds.purgeBtn.code) and not
+    is_typing and not is_setting_hotkeys and not HUD.IS_MP_TEXT_CHAT_TYPING()
+    pressing_fltbd_button    = SS.isKeyJustPressed(keybinds.flatbedBtn.code) and not
+    is_typing and not is_setting_hotkeys and not HUD.IS_MP_TEXT_CHAT_TYPING()
+    pressing_vmine_button    = SS.isKeyJustPressed(keybinds.vehicle_mine.code) and not
+    is_typing and not is_setting_hotkeys and not HUD.IS_MP_TEXT_CHAT_TYPING()
   else
     pressing_drift_button = gpad_keybinds.tdBtn.code ~= 0 and PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.tdBtn.code)
     pressing_nos_button   = gpad_keybinds.nosBtn.code ~= 0 and PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.nosBtn.code)
@@ -8092,6 +8126,10 @@ script.register_looped("GINPUT", function() -- Game Input
     PAD.DISABLE_CONTROL_ACTION(0, 68, true)
     PAD.DISABLE_CONTROL_ACTION(0, 91, true)
     PAD.DISABLE_CONTROL_ACTION(0, 257, true)
+  end
+
+  if cmd_ui_is_open then
+    PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
   end
 end)
 
@@ -9299,6 +9337,20 @@ script.register_looped("LCTRL", function(lct) -- Launch Control
   end
   lct:yield()
 end)
+script.register_looped("ABSPREP", function(abs)
+  if abs_lights and Game.Self.isDriving() and is_car then
+    if Game.Vehicle.hasABS() and PAD.IS_CONTROL_PRESSED(0, 72) then
+      if (ENTITY.GET_ENTITY_SPEED(self.get_veh()) * 3.6) > 100 then
+        repeat
+          should_flash_bl = not should_flash_bl
+          abs:sleep(100)
+        until (ENTITY.GET_ENTITY_SPEED(self.get_veh()) * 3.6) < 50 or not PAD.IS_CONTROL_PRESSED(0, 72) or
+        not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle)
+        should_flash_bl = false
+      end
+    end
+  end
+end)
 script.register_looped("MISCVEH", function(mvo)
   if Game.Self.isDriving() then
     if autobrklight then
@@ -9307,9 +9359,16 @@ script.register_looped("MISCVEH", function(mvo)
       end
     end
 
+    if abs_lights and is_car and Game.Vehicle.hasABS() and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle)
+      and not VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) then
+      if should_flash_bl then
+        VEHICLE.SET_VEHICLE_BRAKE_LIGHTS(current_vehicle, false)
+      end
+    end
+
     if insta180 then
       local vehRot = ENTITY.GET_ENTITY_ROTATION(current_vehicle, 2)
-      if PAD.IS_CONTROL_JUST_PRESSED(0, 97) then -- numpad + // mouse scroll down
+      if PAD.IS_CONTROL_JUST_PRESSED(0, 97) then -- numpad + || mouse scroll down
         if PAD.IS_CONTROL_PRESSED(0, 71) then
           local vehSpeed = ENTITY.GET_ENTITY_SPEED(current_vehicle)
           ENTITY.SET_ENTITY_ROTATION(current_vehicle, vehRot.x, vehRot.y, (vehRot.z - 180), 2, true)
@@ -9992,7 +10051,7 @@ script.register_looped("CTT", function(ctt) -- Can't Touch This
   end
   ctt:yield()
 end)
-script.register_looped("DCC", function(die) -- Dangerous Car Crashes
+script.register_looped("BCC", function(die) -- Better Car Crashes
   if fender_bender then
     if Game.Self.isDriving() and (is_car or is_bike or is_quad) then
       local myPos       = self.get_pos()
@@ -10629,7 +10688,7 @@ script.register_looped("PSEATS", function(pseats) -- Public Seats
 end)
 -- ambient scenarios
 script.register_looped("AMBSCN", function(ambscn)
-  if ambient_scenarios and Game.Self.isOnFoot() then
+  if ambient_scenarios and Game.Self.isOutside() and Game.Self.isOnFoot() then
     local myPos = self.get_pos()
     local amb_scenario_exists, amb_scenario_name = Game.DoesHumanScenarioExistInArea(myPos, 2, true)
     local force_start = PAD.IS_CONTROL_PRESSED(0, 21)
@@ -11191,7 +11250,7 @@ script.register_looped("ISALE", function(isale)
   isale:sleep(1000)
 end)
 script.register_looped("AUTOSELL", function(as)
-  if autosell and gb_scr_is_running then
+  if autosell and gb_scr_is_running and not autosell_was_triggered then
     autosell_was_triggered = true
     gui.show_message("Samurai's Scripts", "Auto-Sell will start in 20 seconds.")
     as:sleep(20000)
@@ -11220,63 +11279,205 @@ script.register_looped("REOPT", function(ro) -- Remote Options
   if not is_typing and not is_setting_hotkeys and not Game.Self.isBrowsingApps()
     and not HUD.IS_MP_TEXT_CHAT_TYPING() and not HUD.IS_PAUSE_MENU_ACTIVE() then
     if SS.isKeyJustPressed(keybinds.autokill.code) then
-      if autoKill then
-        autoKill = false
-        UI.widgetSound("Cancel")
-        gui.show_message("Samurai's Scripts", "Auto-Kill Enemies disabled.")
-        ro:sleep(100)
-      else
-        autoKill = true
-        UI.widgetSound("Notif")
-        gui.show_success("Samurai's Scripts", "Auto-Kill Enemies enabled.")
-        ro:sleep(100)
-      end
+      UI.widgetSound(autoKill and "Cancel" or "Notif")
+      gui.show_message("Samurai's Scripts", ("Auto-Kill Enemies %s."):format(autoKill and "disabled" or "enabled"))
+      autoKill = not autoKill
       CFG.save("autoKill", autoKill)
+      ro:sleep(200) -- iki
     end
 
     if SS.isKeyJustPressed(keybinds.enemiesFlee.code) then
-      if runaway then
-        runaway = false
-        UI.widgetSound("Cancel")
-        gui.show_message("Samurai's Scripts", "Enemies Flee disabled.")
-        ro:sleep(100)
-      else
-        runaway = true
-        UI.widgetSound("Notif")
-        gui.show_success("Samurai's Scripts", "Enemies Flee enabled.")
-        ro:sleep(100)
-      end
+      UI.widgetSound(runaway and "Cancel" or "Notif")
+      gui.show_message("Samurai's Scripts", ("Enemies Flee %s."):format(runaway and "disabled" or "enabled"))
+      runaway = not runaway
       CFG.save("runaway", runaway)
+      ro:sleep(200) -- iki
     end
 
     if SS.isKeyJustPressed(keybinds.missl_def.code) then
-      if missiledefense then
-        missiledefense = false
-        UI.widgetSound("Cancel")
-        gui.show_message("Samurai's Scripts", "Missile Defence disabled.")
-        ro:sleep(100)
-      else
-        missiledefense = true
-        UI.widgetSound("Notif")
-        gui.show_success("Samurai's Scripts", "Missile Defence enabled.")
-        ro:sleep(100)
-      end
+      UI.widgetSound(missiledefense and "Cancel" or "Notif")
+      gui.show_message("Samurai's Scripts", ("Missile Defence %s."):format(missiledefense and "disabled" or "enabled"))
+      missiledefense = not missiledefense
       CFG.save("missiledefense", missiledefense)
+      ro:sleep(200) -- iki
     end
 
-    if SS.isKeyJustPressed(keybinds.laser_sight.code) then
-      if laserSight then
-        laserSight = false
-        AUDIO.PLAY_SOUND_FRONTEND(-1, "Target_Counter_Tick", "DLC_SM_Generic_Mission_Sounds", false)
-        gui.show_message("Samurai's Scripts", "Laser Sights disabled.")
-        ro:sleep(100)
-      else
-        laserSight = true
-        AUDIO.PLAY_SOUND_FRONTEND(-1, "Target_Counter_Tick", "DLC_SM_Generic_Mission_Sounds", false)
-        gui.show_success("Samurai's Scripts", "Laser Sights enabled.")
-        ro:sleep(100)
-      end
+    if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) and SS.isKeyJustPressed(keybinds.laser_sight.code) then
+      AUDIO.PLAY_SOUND_FRONTEND(-1, "Target_Counter_Tick", "DLC_SM_Generic_Mission_Sounds", false)
+      gui.show_message("Samurai's Scripts", ("Laser Sights %s."):format(laserSight and "disabled" or "enabled"))
+      laserSight = not laserSight
       CFG.save("laserSight", laserSight)
+      ro:sleep(200) -- iki
+    end
+
+    if SS.isKeyJustPressed(keybinds.commands.code) and not cmd_ui_is_open then
+      should_draw_cmd_ui, cmd_ui_is_open = true, true
+      gui.override_mouse(true)
+    end
+    if SS.isKeyJustPressed(0x1B) and cmd_ui_is_open then -- ESC
+      should_draw_cmd_ui, cmd_ui_is_open = false, false
+      gui.override_mouse(false)
+    end
+  end
+  CommandExecutor()
+end)
+
+-- Business Autofill
+script.register_looped("HSUPP", function(hgl)
+  if hangarLoop then
+    if stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL") == 50 then
+      UI.widgetSound("Error")
+      gui.show_warning("Samurai's Scripts", "Your Hangar is already full! Option has been disabled.")
+      hangarLoop = false
+    else
+      repeat
+        stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
+        hangarSupplies = stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
+        hgl:sleep(supply_autofill_delay)
+      until hangarSupplies == 50 or hangarLoop == false
+      if hangarLoop then
+        hangarLoop = false
+      end
+    end
+  end
+end)
+
+script.register_looped("WH1SUPP", function(wh_1)
+  if wh1_loop then
+    if whouse1_max == nil then
+      if whouse_1_size.small then
+        whouse1_max = 16
+      elseif whouse_1_size.medium then
+        whouse1_max = 42
+      elseif whouse_1_size.large then
+        whouse1_max = 111
+      end
+    end
+    if stats.get_int("MPX_CONTOTALFORWHOUSE0") == whouse1_max then
+      UI.widgetSound("Error")
+      gui.show_warning("Samurai's Scripts", "Your Warehouse is already full! Option has been disabled.")
+      wh1_loop = false
+    else
+      repeat
+        stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
+        wh1Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE0")
+        wh_1:sleep(supply_autofill_delay)
+      until wh1Supplies == whouse1_max or wh1_loop == false
+      if wh1_loop then
+        wh1_loop = false
+      end
+    end
+  end
+end)
+
+script.register_looped("WH2SUPP", function(wh_2)
+  if wh2_loop then
+    if whouse2_max == nil then
+      if whouse_2_size.small then
+        whouse2_max = 16
+      elseif whouse_2_size.medium then
+        whouse2_max = 42
+      elseif whouse_2_size.large then
+        whouse2_max = 111
+      end
+    end
+    if stats.get_int("MPX_CONTOTALFORWHOUSE1") == whouse2_max then
+      UI.widgetSound("Error")
+      gui.show_warning("Samurai's Scripts", "Your Warehouse is already full! Option has been disabled.")
+      wh2_loop = false
+    else
+      repeat
+        stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
+        wh2Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE1")
+        wh_2:sleep(supply_autofill_delay)
+      until wh2Supplies == whouse2_max or wh2_loop == false
+      if wh2_loop then
+        wh2_loop = false
+      end
+    end
+  end
+end)
+
+script.register_looped("WH3SUPP", function(wh_3)
+  if wh3_loop then
+    if whouse3_max == nil then
+      if whouse_3_size.small then
+        whouse3_max = 16
+      elseif whouse_3_size.medium then
+        whouse3_max = 42
+      elseif whouse_3_size.large then
+        whouse3_max = 111
+      end
+    end
+    if stats.get_int("MPX_CONTOTALFORWHOUSE2") == whouse3_max then
+      UI.widgetSound("Error")
+      gui.show_warning("Samurai's Scripts", "Your Warehouse is already full! Option has been disabled.")
+      wh3_loop = false
+    else
+      repeat
+        stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
+        wh3Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE2")
+        wh_3:sleep(supply_autofill_delay)
+      until wh3Supplies == whouse3_max or wh3_loop == false
+      if wh3_loop then
+        wh3_loop = false
+      end
+    end
+  end
+end)
+
+script.register_looped("WH4SUPP", function(wh_4)
+  if wh4_loop then
+    if whouse4_max == nil then
+      if whouse_4_size.small then
+        whouse4_max = 16
+      elseif whouse_4_size.medium then
+        whouse4_max = 42
+      elseif whouse_4_size.large then
+        whouse4_max = 111
+      end
+    end
+    if stats.get_int("MPX_CONTOTALFORWHOUSE3") == whouse4_max then
+      UI.widgetSound("Error")
+      gui.show_warning("Samurai's Scripts", "Your Warehouse is already full! Option has been disabled.")
+      wh4_loop = false
+    else
+      repeat
+        stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
+        wh4Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE3")
+        wh_4:sleep(supply_autofill_delay)
+      until wh4Supplies == whouse4_max or wh4_loop == false
+      if wh4_loop then
+        wh4_loop = false
+      end
+    end
+  end
+end)
+
+script.register_looped("WH5SUPP", function(wh_5)
+  if wh5_loop then
+    if whouse5_max == nil then
+      if whouse_5_size.small then
+        whouse5_max = 16
+      elseif whouse_5_size.medium then
+        whouse5_max = 42
+      elseif whouse_5_size.large then
+        whouse5_max = 111
+      end
+    end
+    if stats.get_int("MPX_CONTOTALFORWHOUSE4") == whouse5_max then
+      UI.widgetSound("Error")
+      gui.show_warning("Samurai's Scripts", "Your Warehouse is already full! Option has been disabled.")
+      wh5_loop = false
+    else
+      repeat
+        stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
+        wh5Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE4")
+        wh_5:sleep(supply_autofill_delay)
+      until wh5Supplies == whouse5_max or wh5_loop == false
+      if wh5_loop then
+        wh5_loop = false
+      end
     end
   end
 end)
@@ -11294,15 +11495,6 @@ script.register_looped("PANIK", function(panik) -- Panic Button
   end
 end)
 
-script.register_looped("IKJP", function(ikjp) -- IsKeyJustPressed
-  for _, k in ipairs(VK_T) do
-    if k.just_pressed then
-      ikjp:sleep(0.2)
-      k.just_pressed = false
-    end
-  end
-end)
-
 
 --[[
    *event handlers*
@@ -11315,19 +11507,12 @@ event.register_handler(menu_event.ScriptsReloaded, function()
   SS.handle_events()
 end)
 
-event.register_handler(menu_event.Wndproc, function(_, msg, wParam, lParam)
+event.register_handler(menu_event.Wndproc, function(_, msg, wParam, _)
   if msg == WM._KEYDOWN or msg == WM._SYSKEYDOWN or msg == WM._XBUTTONDOWN then
     for _, key in ipairs(VK_T) do
       if wParam == key.code then
         key.pressed      = true
-        key.just_pressed = true
-        -- if key.just_pressed then
-        --   SS.debug(
-        --     "\10--- Pressed Key ---" .. "\10 ¤ Name:       " .. key.name .. "\10 ¤ Keycode:    " ..
-        --     Lua_fn.intToHex(wParam, 16) .. "\10 ¤ Bit24: " .. tostring((lParam & (1 << 24)) ~= 0)
-        --     .. "\10 ¤ SYSKEY:     " .. tostring(msg == WM._SYSKEYDOWN)
-        --   )
-        -- end
+        key.just_pressed = false
         break
       end
     end
@@ -11336,7 +11521,7 @@ event.register_handler(menu_event.Wndproc, function(_, msg, wParam, lParam)
       if wParam == key.code then
         if key.pressed then
           key.pressed      = false
-          key.just_pressed = false
+          key.just_pressed = true
           break
         end
       end

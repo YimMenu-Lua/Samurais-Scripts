@@ -1057,6 +1057,7 @@ end
 UI.setClipBoard = function(text, alt_condition)
   local cond = UI.isItemClicked("lmb") and true or alt_condition
   if cond then
+    UI.widgetSound("Click")
     ImGui.SetClipboardText(text)
   end
 end
@@ -1139,20 +1140,20 @@ end
 SS.isKeyPressed = function(key)
   for _, k in ipairs(VK_T) do
     if key == k.code then
-      if k.pressed then
-        return true
-      else
-        return false
-      end
+      return k.pressed
     end
   end
+  return false
 end
 
 ---@param key integer
 SS.isKeyJustPressed = function(key)
   for _, k in ipairs(VK_T) do
     if key == k.code then
-      return k.just_pressed
+      if k.just_pressed then
+        k.just_pressed = false -- reset the button
+        return true
+      end
     end
   end
   return false
@@ -1208,11 +1209,12 @@ SS.set_hotkey = function(keybind)
 end
 
 SS.openHotkeyWindow = function(window_name, keybind)
-  ImGui.PushItemWidth(120)
+  ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10)
   ImGui.BulletText(window_name)
-  ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+  local avail_x, _ = ImGui.GetContentRegionAvail()
+  ImGui.SameLine(avail_x / 1.7)
+  ImGui.SetNextItemWidth(120)
   keybind.name, _ = ImGui.InputText(string.format("##%s", window_name), keybind.name, 32, ImGuiInputTextFlags.ReadOnly)
-  ImGui.PopItemWidth()
   if UI.isItemClicked('lmb') then
     UI.widgetSound("Select2")
     ImGui.OpenPopup(window_name)
@@ -1233,6 +1235,7 @@ SS.openHotkeyWindow = function(window_name, keybind)
     SS.set_hotkey(keybind)
     ImGui.End()
   end
+  ImGui.PopStyleVar(1)
 end
 
 ---@param keybind table
@@ -1287,11 +1290,12 @@ end
 ---@param window_name string
 ---@param keybind table
 SS.gpadHotkeyWindow = function(window_name, keybind)
-  ImGui.PushItemWidth(120)
+  ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10)
   ImGui.BulletText(window_name)
-  ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
-  keybind.name, _ = ImGui.InputText("##" .. window_name, keybind.name, 32, ImGuiInputTextFlags.ReadOnly)
-  ImGui.PopItemWidth()
+  local avail_x, _ = ImGui.GetContentRegionAvail()
+  ImGui.SameLine(avail_x / 1.7)
+  ImGui.SetNextItemWidth(120)
+  keybind.name, _ = ImGui.InputText(string.format("##", window_name), keybind.name, 32, ImGuiInputTextFlags.ReadOnly)
   if UI.isItemClicked('lmb') then
     UI.widgetSound("Select2")
     ImGui.OpenPopup(window_name)
@@ -1311,6 +1315,7 @@ SS.gpadHotkeyWindow = function(window_name, keybind)
     SS.set_gpad_hotkey(keybind)
     ImGui.End()
   end
+  ImGui.PopStyleVar(1)
 end
 
 -- Seamlessly add/remove keyboard keybinds on script update without requiring a config reset.
@@ -1586,6 +1591,10 @@ SS.handle_events = function()
     is_hiding = false
   end
   TASK.CLEAR_PED_TASKS(self.get_ped())
+
+  if cmd_ui_is_open then
+    gui.override_mouse(false)
+  end
 end
 
 -- Checks if localPlayer is standing near a public seat
@@ -1629,7 +1638,7 @@ SS.isNearTrashBin = function()
     if ENTITY.DOES_ENTITY_EXIST(bin) then
       binPos = Game.getCoords(bin, false)
       local distance = vec3:distance(myCoords, binPos)
-      if distance <= 3.3 then
+      if distance <= 1.8 then
         retBool = true
         break
       end
@@ -1655,8 +1664,8 @@ SS.isNearCarTrunk = function()
       local bootBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, bootBoneName)
       if bootBone ~= -1 then
         local bonePos  = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, bootBone)
-        local distCalc = SYSTEM.VDIST2(bonePos.x, bonePos.y, bonePos.z, myCoords.x, myCoords.y, myCoords.z)
-        if distCalc <= 3.0 then
+        local distance = SYSTEM.VDIST2(bonePos.x, bonePos.y, bonePos.z, myCoords.x, myCoords.y, myCoords.z)
+        if distance <= 3.0 then
           retBool = true
         end
       end
@@ -2144,6 +2153,7 @@ SS.reset_settings = function()
   missiledefense          = false; CFG.save("missiledefense", missiledefense)
   louderPops              = false; CFG.save("louderPops", louderPops)
   autobrklight            = false; CFG.save("autobrklight", autobrklight)
+  abs_lights              = false; CFG.save("abs_lights", abs_lights)
   holdF                   = false; CFG.save("holdF", holdF)
   keepWheelsTurned        = false; CFG.save("keepWheelsTurned", keepWheelsTurned)
   towEverything           = false; CFG.save("towEverything", towEverything)
@@ -2185,6 +2195,8 @@ SS.reset_settings = function()
   disable_mdef_logs       = false; CFG.save("disable_mdef_logs", disable_mdef_logs)
   replace_pool_q          = false; CFG.save("replace_pool_q", replace_pool_q)
   public_seats            = false; CFG.save("public_seats", public_seats)
+  ambient_scenarios       = false; CFG.save("ambient_scenarios", ambient_scenarios)
+  ambient_scenario_prompt = false; CFG.save("ambient_scenario_prompt", ambient_scenario_prompt)
   mc_work_cd              = false; CFG.save("mc_work_cd", mc_work_cd)
   hangar_cd               = false; CFG.save("hangar_cd", hangar_cd)
   nc_management_cd        = false; CFG.save("nc_management_cd", nc_management_cd)
@@ -2214,6 +2226,7 @@ SS.reset_settings = function()
   whouse_3_owned          = false; CFG.save("whouse_3_owned", whouse_3_owned)
   whouse_4_owned          = false; CFG.save("whouse_4_owned", whouse_4_owned)
   whouse_5_owned          = false; CFG.save("whouse_5_owned", whouse_5_owned)
+  autosell                = false; CFG.save("autosell", autosell)
   veh_mines               = false; CFG.save("veh_mines", veh_mines)
   SS_debug                = false; CFG.save("SS_debug", SS_debug)
   laser_switch            = 0; CFG.save("laser_switch", laser_switch)
@@ -3044,7 +3057,7 @@ end
 
 -- Returns whether a vehicle has weapons or not.
 ---@return boolean
-Game.Vehicle.isWeaponized = function()
+Game.Vehicle.hasWeapons = function()
   return VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(self.get_veh())
 end
 
@@ -3056,11 +3069,8 @@ end
 ---@param is_primary boolean
 ---@param is_secondary boolean
 Game.Vehicle.setCustomPaint = function(veh, hex, p, m, is_primary, is_secondary)
-  local pt = 1
   if ENTITY.DOES_ENTITY_EXIST(veh) then
-    if m then
-      pt = 3
-    end
+    local pt = m and 3 or 1
     local r, g, b = Lua_fn.hexToRGB(hex)
     VEHICLE.SET_VEHICLE_MOD_KIT(veh, 0)
     if is_primary then
@@ -3073,6 +3083,17 @@ Game.Vehicle.setCustomPaint = function(veh, hex, p, m, is_primary, is_secondary)
       VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(veh, r, g, b)
     end
   end
+end
+
+Game.Vehicle.hasABS = function()
+  if Game.Self.isDriving() then
+    local m_model_flags = SS.getVehicleInfo().m_model_flags
+    if m_model_flags ~= nil then
+      local iModelFlags = m_model_flags:get_dword()
+      return Lua_fn.has_bit(iModelFlags, MF._ABS_STD)
+    end
+  end
+  return false
 end
 
 ---@class World

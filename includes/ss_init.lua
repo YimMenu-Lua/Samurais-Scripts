@@ -6,6 +6,7 @@ local packages = {
   'data/objects',
   'data/actions',
   'data/refs',
+  'data/commands',
   'classes/atArray',
   'classes/vector2',
   'classes/vector3',

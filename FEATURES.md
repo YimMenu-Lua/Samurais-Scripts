@@ -132,11 +132,14 @@
   - **Ejecto Seato Cuz!**
     - Press this button to eject all peds from your vehicle. Currently, this does not work on other players.
   
-  - **Dangerous Car Crashes:**
+  - **Better Car Crashes:**
     - Makes car crashes a bit more dangerous in 3 steps:
       1. **Crashing at a speed higher than 70km/h and less than 118km/h:** Shakes the gameplay camera.
       2. **Crashing at a speed higher than 118km/h and less than 162km/h:** Applies damage to the vehicle and everyone inside it.
       3. **Crashing at a speed higher than 162km/h:** Has a very high chance of destroying the engine and killing everyone in the vehicle.
+  
+  - **ABS Brake Lights:**
+    - Flashes your brake lights repeatedly when you apply the brakes at a speed higher than 100km/h, similar to modern sports cars *(Only works on cars that have ABS)*.
 
 - **Custom Paint Jobs:**
   - Apply a custom paint job to your vehicle from a list of real-life OEM and custom colors.
@@ -219,3 +222,21 @@
 ## Hotkeys
 
 - Here you can set or change keyboard and controller keybinds.
+
+## Command Executor
+
+- Allows you to execute a few commands on the fly. Wanna quickly full up your hangar? Open the Command Executor by pressing the assigned button and type `autofill.hangar`.
+- **Default Buttons:**
+  - **Open:** **[NUMPAD7]** (can be changed in the **Hotkeys** tab).
+  - **Close:** **[ESC]** (hardcoded).
+
+- **Full list of commands:**.
+  - `autoheal` : Enables/Disables the script's auto-heal feature.
+  - `rod` : Enables/Disables the **Ragdoll On Demand** feature.
+  - `autofill.hangar` : Starts auto-filling your hangar cargo.
+  - `autofill.whouse1` : Starts auto-filling your CEO Warehouse N°1 *(if oyu have more than one, use the same command with corresponding number. Ex: `autofill.whouse4`)*.
+  - `finish_sale` : Instantly finishes a sale mission (from a list of missions supported by the script). Will be skipped if you have the **Auto-Sell** option enabled.
+  - `spawnmeaperv` : No comment.
+  - `kys` : Kills you.
+  - `PANIK` : Resets all changes done by the script (same as the panic button).
+  - `resetcfg` : Resets the script and restores your saved config to default.
