@@ -455,17 +455,6 @@ function Disable_E()
   PAD.DISABLE_CONTROL_ACTION(0, 51, true)
   PAD.DISABLE_CONTROL_ACTION(0, 206, true)
 end
-
----@param script_name string
-function FinishSale(script_name)
-  script.execute_as_script(script_name, function()
-    if gb_scripts[script_name] then
-      for _, data in pairs(gb_scripts[script_name]) do
-        locals.set_int(script_name, data.l + data.o, data.v)
-      end
-    end
-  end)
-end
 --#endregion
 
 
@@ -1053,12 +1042,12 @@ end
 
 -- Sets the clipboard text.
 ---@param text string
----@param alt_condition boolean
-UI.setClipBoard = function(text, alt_condition)
-  local cond = UI.isItemClicked("lmb") and true or alt_condition
+---@param cond boolean
+UI.setClipBoard = function(text, cond)
   if cond then
     UI.widgetSound("Click")
     ImGui.SetClipboardText(text)
+    gui.show_message("Samurai's Scripts", "Link copied to clipboard.")
   end
 end
 
@@ -1150,13 +1139,113 @@ end
 SS.isKeyJustPressed = function(key)
   for _, k in ipairs(VK_T) do
     if key == k.code then
-      if k.just_pressed then
-        k.just_pressed = false -- reset the button
-        return true
-      end
+      return k.just_pressed
     end
   end
   return false
+end
+
+SS.resetMovement = function()
+  PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0.3)
+  PED.RESET_PED_STRAFE_CLIPSET(self.get_ped())
+  PED.RESET_PED_WEAPON_MOVEMENT_CLIPSET(self.get_ped())
+  WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(self.get_ped(), 3839837909) -- default
+  PED.CLEAR_PED_ALTERNATE_MOVEMENT_ANIM(self.get_ped(), 0, -8.0)
+  TASK.SET_PED_CAN_PLAY_AMBIENT_IDLES(self.get_ped(), false, false)
+  currentMvmt  = ""
+  currentStrf  = ""
+  currentWmvmt = ""
+end
+
+---@param data table
+---@param isJson boolean
+SS.setMovement = function(data, isJson)
+  local mvmtclipset = isJson and data.Name or data.mvmt
+  script.run_in_fiber(function(s)
+    SS.resetMovement()
+    s:sleep(100)
+    if mvmtclipset then
+      while not STREAMING.HAS_CLIP_SET_LOADED(mvmtclipset) do
+        STREAMING.REQUEST_CLIP_SET(mvmtclipset)
+        coroutine.yield()
+      end
+      PED.SET_PED_MOVEMENT_CLIPSET(self.get_ped(), mvmtclipset, 1.0)
+      PED.SET_PED_ALTERNATE_MOVEMENT_ANIM(self.get_ped(), 0, "move_clown@generic", "idle", 1090519040, true)
+      TASK.SET_PED_CAN_PLAY_AMBIENT_IDLES(self.get_ped(), true, true)
+      currentMvmt = mvmtclipset
+    end
+    if data.wmvmt then
+      PED.SET_PED_WEAPON_MOVEMENT_CLIPSET(self.get_ped(), data.wmvmt)
+      currentWmvmt = data.wmvmt
+    end
+    if data.strf then
+      while not STREAMING.HAS_CLIP_SET_LOADED(data.strf) do
+        STREAMING.REQUEST_CLIP_SET(data.strf)
+        coroutine.yield()
+      end
+      PED.SET_PED_STRAFE_CLIPSET(self.get_ped(), data.strf)
+      currentStrf = data.strf
+    end
+    if data.wanim then
+      WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(self.get_ped(), joaat(data.wanim))
+    end
+  end)
+end
+
+---@param warehouse table
+SS.getCEOwhouseInfo = function(warehouse)
+  script.run_in_fiber(function()
+    local property_index  = (stats.get_int(("MPX_PROP_WHOUSE_SLOT%d"):format(warehouse.id)) - 1)
+    warehouse.name        = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(("MP_WHOUSE_%d"):format(property_index))
+    warehouse.size.small  = Lua_fn.tableContains(ceo_warehouses_t.small, warehouse.name)
+    warehouse.size.medium = Lua_fn.tableContains(ceo_warehouses_t.medium, warehouse.name)
+    warehouse.size.large  = Lua_fn.tableContains(ceo_warehouses_t.large, warehouse.name)
+    if  warehouse.size.small then
+      warehouse.max = 16
+    elseif  warehouse.size.medium then
+      warehouse.max = 42
+    elseif  warehouse.size.large then
+      warehouse.max = 111
+    end
+  end)
+end
+
+---@param index number
+---@param entry table
+SS.getMCbusinessInfo = function(index, entry)
+  for _, v in ipairs(mc_business_ids_t) do
+    if Lua_fn.tableContains(v.possible_ids, index) then
+      entry.name       = v.name
+      entry.id         = v.id
+      entry.unit_max   = v.unit_max
+      entry.val_offset = v.val_offset
+      entry.blip       = v.blip
+    end
+  end
+end
+
+---@param scr_name string
+SS.FinishSale = function(scr_name)
+  script.execute_as_script(scr_name, function()
+    if supported_sale_scripts[scr_name] then
+      if not supported_sale_scripts[scr_name].b then -- gb_*
+        for _, data in pairs(supported_sale_scripts[scr_name]) do
+          locals.set_int(scr_name, data.l + data.o, data.v)
+        end
+      else -- fm_content_*
+        if not NETWORK.NETWORK_GET_HOST_OF_THIS_SCRIPT() == self.get_id() then
+          gui.show_warning("Samurai's Scripts", "Unable to finish sale mission because you are not host of this script.")
+        else
+          local val = locals.get_int(scr_name, supported_sale_scripts[scr_name].b + 1 + 0)
+          if not Lua_fn.has_bit(val, 11) then
+            val = Lua_fn.set_bit(val, 11)
+            locals.set_int(scr_name, supported_sale_scripts[scr_name].b + 1 + 0, val)
+          end
+          locals.set_int(scr_name, supported_sale_scripts[scr_name].l + supported_sale_scripts[scr_name].o, 3) -- End reason. Thanks ShinyWasabi! Now I know what 3 is 😅
+        end
+      end
+    end
+  end)
 end
 
 ---@param keybind table
@@ -1459,20 +1548,8 @@ SS.handle_events = function()
   end
 
   if currentMvmt ~= "" then
-    PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0.0)
-    currentMvmt = ""
+    SS.resetMovement()
   end
-
-  if currentWmvmt ~= "" then
-    PED.RESET_PED_WEAPON_MOVEMENT_CLIPSET(self.get_ped())
-    currentWmvmt = ""
-  end
-
-  if currentStrf ~= "" then
-    PED.RESET_PED_STRAFE_CLIPSET(self.get_ped())
-    currentStrf = ""
-  end
-  WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(self.get_ped(), 3839837909)
 
   if is_playing_anim then
     if anim_music then
@@ -2243,7 +2320,6 @@ SS.reset_settings = function()
   current_lang            = "English"; CFG.save("current_lang", current_lang)
   initStrings()
 end
-
 
 -- GTA helpers.
 ---@class Game

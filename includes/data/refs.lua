@@ -660,30 +660,6 @@ AF                       = {
   _USE_FULL_BLENDING                = 1 << 30,
 }
 
-Global_1667995           = {
-  f_0 = {
-    f_1 = 1667995 + 0 + 1
-  },
-  f_1 = {
-    f_1 = 1667995 + 1 + 1
-  },
-  f_2 = {
-    f_1 = 1667995 + 2 + 1
-  },
-  f_3 = {
-    f_1 = 1667995 + 3 + 1
-  },
-  f_4 = {
-    f_1 = 1667995 + 4 + 1
-  },
-  f_5 = {
-    f_1 = 1667995 + 5 + 1
-  },
-  f_6 = {
-    f_1 = 1667995 + 6 + 1
-  },
-}
-
 Global_262145            = {
   f_4413  = 262145 + 4413,  -- int Snow Weather
   f_13059 = 262145 + 13059, -- int VIP Work CD
@@ -1557,37 +1533,149 @@ collision_invalid_models = {
   1067874014,
 }
 
-gb_scripts = {
-  -- ["fm_content_smuggler_sell"] = { -- land
-  --   { l = 1985, o = 1035, v = 0 },
-  --   { l = 1985, o = 1078, v = 15 },
-  -- },
-  
+supported_sale_scripts = {
   ["gb_smuggler"] = { -- air
-    { l = 1985, o = 1035, v = 0 },
-    { l = 1985, o = 1078, v = 15 },
+    { -- (1.70) while .*?0 < func_.*?\(func_.*?, func_.*?, .*?Local_....?\.f_....?, -1
+      l = 1985,
+      o = 1035,
+      v = 0
+    },
+    { -- (1.70) if .*?Local_....?\.f_....? > 0 && func_.*?&.*?Local_....?\.f_....?\), 30000, 0
+      l = 1985,
+      o = 1078,
+      v = 15
+    },
   },
 
   ["gb_contraband_sell"] = {
-    { l = 563, o = 1, v = 99999 },
+    { -- (1.70) MISC::CLEAR_BIT\(.*?Local_...?\.f_1\), .*?Param0
+      l = 563,
+      o = 1,
+      v = 99999
+    },
   },
 
   ["gb_gunrunning"] = {
-    { l = 1262, o = 774, v = 0 },
+    { -- (1.70) .*?Local_1...?\.f_...? = func_.*?\(func_.*?\(\), .*?Local_1...?\.f_...?, .*?Param0, -1\);
+      l = 1262,
+      o = 774,
+      v = 0
+    },
   },
 
   ["gb_biker_contraband_sell"] = {
-    { l = 725, o = 122, v = 15 },
+    { -- (1.70) else if .*?!func_.*?\(1\) && .*?Local_...?\.f_...? > 0\)
+      l = 725,
+      o = 122,
+      v = 15
+    },
   },
 
+  ["fm_content_acid_lab_sell"] = {
+    b = 5557, -- GENERICBITSET_I_WON -- (1.70) if .*?func_...?\(&.*?Local_....?, .*?Param0 // (uLocal_5557 = 4;)
+    l = 5653, -- (1.70) if .*?Local_5...?\.f_....? == 0\)
+    o = 1309
+  },
+
+  ["fm_content_smuggler_sell"] = {
+    b = 3991, -- GENERICBITSET_I_WON -- (1.70) if .*?func_...?\(&.*?Local_....?, .*?Param0 // (uLocal_3991 = 4;)
+    l = 4133, -- (1.70) if .*?Local_4...?\.f_....? == 0\)
+    o = 489
+  },
+
+  ["fm_content_export_cargo"] = {
+    b = 2204,
+    l = 2263,
+    o = 191
+  },
 }
 
-simplified_gb_scr_names = {
-  -- { scr = "fm_content_smuggler_sell", sn = "Hangar (Land)" },
+simplified_scr_names = {
+  { scr = "fm_content_smuggler_sell", sn = "Hangar (Land)" },
   { scr = "gb_smuggler",              sn = "Hangar (Air)" },
   { scr = "gb_contraband_sell",       sn = "CEO" },
   { scr = "gb_gunrunning",            sn = "Bunker" },
   { scr = "gb_biker_contraband_sell", sn = "Biker Business" },
+  { scr = "fm_content_acid_lab_sell", sn = "Acid Lab" },
+}
+
+movement_options_t = {
+  {name = "Default",            mvmt = nil,                               wmvmt = nil,                         strf = nil,                              wanim = nil},
+  {name = "Arrogant (Female)",  mvmt = "move_f@arrogant@a",               wmvmt = nil,                         strf = nil,                              wanim = "Female"},
+  {name = "Bodybuilder",        mvmt = "move_m@muscle@a",                 wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "Businessman",        mvmt = "move_m@business@a",               wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "Ballistic",          mvmt = "anim_group_move_ballistic",       wmvmt = "anim_group_move_ballistic", strf = "move_strafe@ballistic",          wanim = "Ballistic"},
+  {name = "Cop",                mvmt = "move_m@intimidation@cop@unarmed", wmvmt = nil,                         strf = "move_strafe@cop",                wanim = "Default"},
+  {name = "Depressed (Male)",   mvmt = "move_m@depressed@a",              wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "Depressed (Female)", mvmt = "move_f@depressed@a",              wmvmt = nil,                         strf = nil,                              wanim = "Female"},
+  {name = "Drunk",              mvmt = "move_m@drunk@verydrunk",          wmvmt = "move_m@drunk@verydrunk",    strf = "move_strafe@first_person@drunk", wanim = "Hillbilly"},
+  {name = "Fatass (Male)",      mvmt = "move_m@fat@a",                    wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "Fatass (Female)",    mvmt = "move_f@fat@a",                    wmvmt = nil,                         strf = nil,                              wanim = "Female"},
+  {name = "Franklin",           mvmt = "move_p_m_one",                    wmvmt = nil,                         strf = nil,                              wanim = "Franklin"},
+  {name = "Gansta",             mvmt = "move_m@gangster@ng",              wmvmt = nil,                         strf = "move_strafe@gang",               wanim = "Gang1H"},
+  {name = "Heels 01",           mvmt = "move_f@heels@c",                  wmvmt = nil,                         strf = nil,                              wanim = "Female"},
+  {name = "Heels 02",           mvmt = "move_f@heels@d",                  wmvmt = nil,                         strf = nil,                              wanim = "Female"},
+  {name = "Hiker (Male)",       mvmt = "move_m@hiking",                   wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "Hiker (Female)",     mvmt = "move_f@hiking",                   wmvmt = nil,                         strf = nil,                              wanim = "Female"},
+  {name = "Hipster",            mvmt = "move_m@hipster@a",                wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "HOBO",               mvmt = "move_m@hobo@a",                   wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "Hoe",                mvmt = "move_f@maneater",                 wmvmt = nil,                         strf = nil,                              wanim = "Female"},
+  {name = "Injured (Male)",     mvmt = "move_m@injured",                  wmvmt = nil,                         strf = "move_strafe@injured",            wanim = "Default"},
+  {name = "Injured (Female)",   mvmt = "move_f@injured",                  wmvmt = nil,                         strf = "move_strafe@injured",            wanim = "Female"},
+  {name = "Jimmy",              mvmt = "move_characters@jimmy@slow@",     wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "Lamar",              mvmt = "ANIM_GROUP_MOVE_LEMAR_ALLEY",     wmvmt = nil,                         strf = nil,                              wanim = "Gang1H"},
+  {name = "Lester",             mvmt = "move_heist_lester",               wmvmt = nil,                         strf = nil,                              wanim = "Hillbilly"},
+  {name = "Michael",            mvmt = "move_p_m_zero",                   wmvmt = nil,                         strf = nil,                              wanim = "Michael"},
+  {name = "Sad",                mvmt = "move_m@sad@a",                    wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "Sexy",               mvmt = "move_f@sexy@a",                   wmvmt = nil,                         strf = nil,                              wanim = "Female"},
+  {name = "Swag",               mvmt = "move_m@swagger",                  wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "Tough",              mvmt = "move_m@tough_guy@",               wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+  {name = "Trevor",             mvmt = "move_p_m_two",                    wmvmt = nil,                         strf = nil,                              wanim = "Trevor"},
+  {name = "Upper Class",        mvmt = "move_m@posh@",                    wmvmt = nil,                         strf = nil,                              wanim = "Default"},
+}
+
+-- fuck it. I'll do it manually since my smol brain
+--
+-- Can not figure out a better way.
+ceo_warehouses_t = {
+  small = {
+    "Convenience Store Lockup",
+    "Celltowa Unit",
+    "White Widow Garage",
+    "Pacific Bait Storage",
+    "Pier 400 Utility Building",
+    "Foreclosed Garage",
+  },
+
+  medium = {
+    "GEE Warehouse",
+    "Derriere Lingerie Backlot",
+    "Fridgit Annexe",
+    "Discount Retail Unit",
+    "Disused Factory Outlet",
+    "LS Marine Building 3",
+    "Old Power Station",
+    "Railyard Warehouse",
+  },
+
+  large = {
+    "Wholesale Furniture",
+    "West Vinewood Backlot",
+    "Xero Gas Factory",
+    "Logistics Depot",
+    "Bilgeco Warehouse",
+    "Walker & Sons Warehouse",
+    "Cypress Warehouses",
+    "Darnell Bros Warehouse",
+  },
+}
+
+mc_business_ids_t = {
+  {name = "Fake Documents",  id = 0, unit_max = 60, val_offset = 17319, blip = 498, possible_ids = {5, 10, 15, 20}},
+  {name = "Weed",            id = 1, unit_max = 80, val_offset = 17323, blip = 496, possible_ids = {2, 7, 12, 17}},
+  {name = "Fake Cash",       id = 2, unit_max = 40, val_offset = 17320, blip = 500, possible_ids = {4, 9, 14, 19}},
+  {name = "Methamphetamine", id = 3, unit_max = 20, val_offset = 17322, blip = 499, possible_ids = {1, 6, 11, 16}},
+  {name = "Cocaine",         id = 4, unit_max = 10, val_offset = 17321, blip = 497, possible_ids = {3, 8, 13, 18}},
 }
 
 rp_levels                = {

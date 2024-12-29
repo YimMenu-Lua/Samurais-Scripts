@@ -50,6 +50,7 @@
     - The ability to set a custom shortcut key for a specific animation so that you could play it any time you want.
     - Some animations produce sound (Sleeping, Crying, DJ *(plays loud music)*, some uh... uhm, NSFW animations also play sounds).
     - An option to browse and play animations using hotkeys. This option may interfere with gameplay so you can enable/disable it any time you want.
+    - Reworked **Movement Options**.
     - New **Favorites** tab:
       - Save animations and scenarios to favorites then play them from this tab (they will persist even if you reset your config from the **Settings** tab).
     - New **Recently Played** tab:
@@ -76,17 +77,17 @@
   - Replaces the *Machete* weapon with a Japanese katana. If you don't own a Machete, you can either buy one from Ammu-Nation or use YimMenu to equip a temporary one. Once you have one equipped in your hands, it will be automatically replaced with a Katana.
 
 - **Laser Sight:**
-  - Renders a laser sight on your weapons when you're aiming them. You can choose between Red, Green, and Blue lasers. Can be toggled on/off by pressing the assigned key *(default **[L]** on keyboard)*.
+  - Renders a laser sight on your weapons when you're aiming them. You can choose between Red, Green, and Blue lasers. Can be toggled on/off by pressing the assigned key *(default **[L]** on keyboard)* while aiming.
 
 ## Vehicle
 
 - **All features from [TokyoDrift](https://github.com/YimMenu-Lua/TokyoDrift) with a few improvements and additions:**
 
   - **Better Drift Mode / Drift Tires:**
-    - Increased torque while drifting so that you could pick up speed faster and hold bigger angles. You can choose how much toruqe you want to gain.
+    - Increased torque while drifting so that you could pick up speed faster and hold bigger angles. You can choose how much torque you want to gain.
 
   - **Drift Smoke:**
-    - Your tires will now produce a lot more smoke when drifting. The smoke will appear when you're drifting at a speed higher than *approx: 15mph // 20km/h*. You can change the smoke color either from a drop down list of pre-defined colors or by inputting your own [HEX](https://www.color-hex.com/) color. Note that the drift smoke color has no relation to your actual tire smoke color but I can change that if desired, it's just one line of code.
+    - Your tires will now produce a lot more smoke when drifting. The smoke will appear when you're drifting at a speed higher than *approx: 15mph // 20km/h*. You can change the smoke color either from a drop down list of pre-defined colors or by inputting your own [HEX](https://www.color-hex.com/) color. *(Also changes the default tire smoke color)*
 
   - **Burnout Smoke:**
     - Same as **Drift Smoke** but for burnouts.
@@ -119,10 +120,10 @@
       > **NOTE:** This option will not do anything unless you're flying high enough, with your landing gear fully retracted, and at a speed of at least 260km/h. If for some reason you want to fly a Cropduster at 555km/h, fly high enough then nose-dive to hit 260km/h.
   
   - **Vehicle Mines:**
-    - Equip any land vehicle with mines. Enable the option then press the button to choose the type of mine you want *(Spike, Slick, Kinetic, EMP, Explosive)* Once everything is set, while driving a vehicle press the **Push To Talk** button *(default [N])* to deploy mines.
+    - Equip any land vehicle with mines. Enable the option then press the button to choose the type of mine you want *(Spike, Slick, Kinetic, EMP, Explosive)* Once everything is set, while driving a vehicle press the assigned button *(default [N])* to deploy mines.
 
   - **Auto-Pilot:**
-    - While flying a plane or a helicopter, open the UI and choose one of the auto-pilot options: Fly To Waypoint, Fly To Objective or Fly to random coordinates.
+    - While flying a plane or a helicopter, open the UI and choose one of the auto-pilot options: **Fly To Waypoint**, **Fly To Objective** or **Fly to random coordinates**.
   
   - **Fake Siren:**
     - Equip any land vehicle with a siren *(except of course, vehicles that already have one)*.
@@ -130,7 +131,7 @@
       > **NOTE:** If you use this in Online, your vehicle will appear glitched to other players.
 
   - **Ejecto Seato Cuz!**
-    - Press this button to eject all peds from your vehicle. Currently, this does not work on other players.
+    - Press this button to eject all peds from your vehicle. Currently, this does not work on other players or dead peds.
   
   - **Better Car Crashes:**
     - Makes car crashes a bit more dangerous in 3 steps:
@@ -139,7 +140,7 @@
       3. **Crashing at a speed higher than 162km/h:** Has a very high chance of destroying the engine and killing everyone in the vehicle.
   
   - **ABS Brake Lights:**
-    - Flashes your brake lights repeatedly when you apply the brakes at a speed higher than 100km/h, similar to modern sports cars *(Only works on cars that have ABS)*.
+    - Also known as **Brake Force Display** in German vehicles: Flashes your brake lights repeatedly when you apply the brakes at a speed higher than 100km/h, similar to modern sports cars *(Only works on cars that have ABS as standard)*.
 
 - **Custom Paint Jobs:**
   - Apply a custom paint job to your vehicle from a list of real-life OEM and custom colors.
@@ -161,7 +162,7 @@
   - An improved version of [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier) with a few more options and a redesigned UI.
 
 - **Casino Pacino**
-  - An implementation of gir489's [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) with translation support and a slightly altered UI.
+  - An implementation of gir489's [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino), as per their request, with translation support and a slightly altered UI.
 
 - **Players:**
   - For now this only displays information about players (money, health, coordinates, vehicle...). I don't know what I'm going to do here since Vehicle Gifting was patched and I don't like nor write toxic features and money drops so unless I can figure out something that can be used to help other players, this will be removed.
@@ -172,6 +173,7 @@
 
   - **Ped Grabber:**
     - Get close to an NPC then press **[LEFT MOUSE BUTTON]** to grab them. Once grabbed, press and hold **[RIGHT MOUSE BUTTON]** then press **[LEFT MOUSE BUTTON]** to throw them. You can change the throwing force using a slider in the UI.
+
       > NOTE 1: You have to be unarmed to be able to grab an NPC.
 
       > NOTE 2: While this option is enabled, you will not be able to use your fists (punch). You can still use all other weapons normally until you grab an NPC, then you will not be able to use any weapons until you throw the ped.
@@ -185,7 +187,7 @@
     - When enabled, you will no longer be able to jack NPC vehicles but instead, when you press **[F]** you'll get in as a passenger and all NPC passengers will be cool with it.
 
   - **Animate Nearby NPCs:**
-    - Activate the option then choose an action from the drop down list and press **Play** to make all nearby NPCs do that action.
+    - Activate the option then choose an action from the drop down list and press **Play** to make all nearby NPCs play it.
 
   - **Kamikaze Drivers:**
     - Turns all nearby NPC drivers into suicidal maniacs. Good luck trying to cross the road on foot.
@@ -209,7 +211,7 @@
 
     > **NOTE:** Due to a few scenarios being in very close proximity to each other, the prompt to play them can become annoying. For this, I've added an option to disable the prompt (but you'll never know when you're near an ambient scenario).
 
-    > **NOTE:** Some ambient scenarios are programmed for NPCs to spawn directly onto them so playing them normally will most likely result in your ped bein in an awkward position *(example: sitting in the air)* or even fail to fully play. For this, I've added an option to **force** play or stop an ambient scenario by pressing **[Left Shift]** + **[E]**.
+    > **NOTE:** Some ambient scenarios are programmed for NPCs to spawn directly onto them so playing them normally will most likely result in your ped being in an awkward position *(example: sitting in the air)* or even fail to fully play. For this, I've added an option to **force** play or stop an ambient scenario by pressing **[Left Shift]** + **[E]**.
 
 - **Improved [Object Spawner](https://github.com/xesdoog/object-spawner):**
   - Fixed a few bugs in the main script and added the ability to attach objects to your vehicle.
@@ -225,7 +227,7 @@
 
 ## Command Executor
 
-- Allows you to execute a few commands on the fly. Wanna quickly full up your hangar? Open the Command Executor by pressing the assigned button and type `autofill.hangar`.
+- Allows you to execute a few commands on the fly. Wanna quickly full up your hangar? Open the Command Executor by pressing the assigned button and type: `autofill.hangar`.
 - **Default Buttons:**
   - **Open:** **[NUMPAD7]** (can be changed in the **Hotkeys** tab).
   - **Close:** **[ESC]** (hardcoded).

@@ -28,7 +28,7 @@ function command_ui()
     local screen_h = ImGui.GetWindowHeight()
     ImGui.SetNextWindowSize(400, 180)
     ImGui.SetNextWindowPos(screen_w + 300, screen_h - 90)
-    ImGui.SetNextWindowBgAlpha(0.8)
+    ImGui.SetNextWindowBgAlpha(0.75)
     cmd_ui_is_open = ImGui.Begin(
       "Command Executor", cmd_ui_is_open,
       ImGuiWindowFlags.NoTitleBar |
@@ -64,6 +64,7 @@ function command_ui()
       end
     end
     if ucmdEntered then
+      UI.widgetSound("Click")
       should_draw_cmd_ui, cmd_ui_is_open = false, false
       gui.override_mouse(false)
     end
