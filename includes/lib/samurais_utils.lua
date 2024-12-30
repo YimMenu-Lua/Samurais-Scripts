@@ -2456,7 +2456,7 @@ Game.getKeyPressed = function()
 end
 
 Game.isOnline = function()
-  return network.is_session_started()
+  return network.is_session_started() and not script.is_active("maintransition")
 end
 
 ---@param ped integer
@@ -2597,44 +2597,33 @@ end
 
 ---@param model integer
 Game.requestModel = function(model)
-  local counter = 0
-  while not STREAMING.HAS_MODEL_LOADED(model) do
-    STREAMING.REQUEST_MODEL(model)
-    coroutine.yield()
-    if counter > 100 then
-      return
-    else
-      counter = counter + 1
+  if STREAMING.IS_MODEL_VALID(model) and STREAMING.IS_MODEL_IN_CDIMAGE(model) then
+    while not STREAMING.HAS_MODEL_LOADED(model) do
+      STREAMING.REQUEST_MODEL(model)
+      coroutine.yield()
     end
+    return STREAMING.HAS_MODEL_LOADED(model)
   end
-  return STREAMING.HAS_MODEL_LOADED(model)
+  return false
 end
 
 ---@param model integer
 ---@param s script_util
 Game.getModelDimensions = function(model, s)
-  local vmin, vmax = vec3:new(0.0, 0.0, 0.0), vec3:new(0.0, 0.0, 0.0)
-  if STREAMING.IS_MODEL_VALID(model) then
+  local vmin, vmax = vec3:new(0, 0, 0), vec3:new(0, 0, 0)
     if Game.requestModel(model) then
       vmin, vmax = MISC.GET_MODEL_DIMENSIONS(model, vmin, vmax)
       s:sleep(100)
       STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(model)
     end
-  end
   return vmin, vmax
 end
 
 ---@param dict string
 Game.requestNamedPtfxAsset = function(dict)
-  local counter = 0
   while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(dict) do
     STREAMING.REQUEST_NAMED_PTFX_ASSET(dict)
     coroutine.yield()
-    if counter > 100 then
-      return
-    else
-      counter = counter + 1
-    end
   end
   return STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(dict)
 end

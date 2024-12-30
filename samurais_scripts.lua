@@ -8628,7 +8628,7 @@ end)
 -- Action Mode
 script.register_looped("AMODE", function()
   if disableActionMode then
-    if PED.IS_PED_USING_ACTION_MODE(self.get_ped()) then
+    if PED.IS_PED_USING_ACTION_MODE(self.get_ped()) and not PED.GET_PED_STEALTH_MOVEMENT(self.get_ped()) then
       PED.SET_PED_USING_ACTION_MODE(self.get_ped(), true, -1, "MOVE_SUPERFAT_RPG")
     end
   end
@@ -8968,6 +8968,7 @@ script.register_looped("TDFT", function(script)
             TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 16)
             timerB = 0
           else
+            VEHICLE.SET_VEHICLE_ENGINE_ON(current_vehicle, false, false, false)
             PED.SET_PED_CONFIG_FLAG(self.get_ped(), 241, false)
             TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 0)
             timerB = 0
@@ -9867,7 +9868,8 @@ script.register_looped("BCC", function(die) -- Better Car Crashes
       local myPos      = self.get_pos()
       local veh_speed  = ENTITY.GET_ENTITY_SPEED(current_vehicle)
       local shake_amp  = veh_speed / 30
-      local soundName  = PED.IS_PED_MALE(self.get_ped()) and "WAVELOAD_PAIN_MALE" or "WAVELOAD_PAIN_FEMALE"
+      local soundName  = (ENTITY.GET_ENTITY_MODEL(self.get_ped()) == 0x705E61F2) and "WAVELOAD_PAIN_MALE" or
+      "WAVELOAD_PAIN_FEMALE"
       local Occupants  = Game.Vehicle.getOccupants(current_vehicle)
       local crashed, _ = checkVehicleCollision()
       if PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), current_vehicle) then
@@ -10292,7 +10294,6 @@ script.register_looped("PG", function(pg) -- Ped Grabber
       end
     end
   end
-  pg:yield()
 end)
 script.register_looped("VG", function(vg) -- Vehicle Grabber
   if vehicleGrabber and not pedGrabber and not HUD.IS_MP_TEXT_CHAT_TYPING() and not is_playing_anim
@@ -10343,7 +10344,6 @@ script.register_looped("VG", function(vg) -- Vehicle Grabber
       end
     end
   end
-  vg:yield()
 end)
 script.register_looped("RWNPC", function(cp) -- Ride With NPCs
   if carpool then

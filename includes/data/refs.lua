@@ -1582,12 +1582,6 @@ supported_sale_scripts = {
     l = 4133, -- (1.70) if .*?Local_4...?\.f_....? == 0\)
     o = 489
   },
-
-  ["fm_content_export_cargo"] = {
-    b = 2204,
-    l = 2263,
-    o = 191
-  },
 }
 
 simplified_scr_names = {

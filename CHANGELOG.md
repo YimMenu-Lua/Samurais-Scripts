@@ -14,3 +14,9 @@
 - Fixed MC businesses being in different orders for different users, which in turn broke all related features.
 - Improved **CEO Warehouses:** Users no longer have to manually set how many warehouses they own and their sizes. The script will automatically grab the necessary information.
 - Improved **Auto-Sell:** Added support for Acid Lab and Hangar **land** sales.
+
+#### Hotfix
+
+- Fixed **Disable Action Mode** not working when the player is wanted.
+- Fixed **Disable Action Mode** preventing the player from going into stealth mode.
+- Removed unused test script.
