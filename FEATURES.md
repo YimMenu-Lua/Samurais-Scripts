@@ -42,6 +42,12 @@
       3. **Only when you have a wanted level** -> Hide in your (or any) car: When you're wanted and not actively being seen by the cops, wait for the propt then press **[ENTER]** to hide inside your car.
 
       > **Note:** If you're driving then the prompt will only appear if the cops can't see you and you **stop your vehicle completely**. The vehicle doesn't have to be stopped if you're a passenger.
+  
+  - **Allow Hats In Vehicles:**
+    - Prevents the game from removing your hat or headgear/accessories when you enter a vehicle.
+
+  - **Don't Fall Off Vehicles:**
+    - Allows you to stand on top of vehicles without falling off when the vehicle moves.
 
 - **Actions:**
 
@@ -141,6 +147,17 @@
   
   - **ABS Brake Lights:**
     - Also known as **Brake Force Display** in German vehicles: Flashes your brake lights repeatedly when you apply the brakes at a speed higher than 100km/h, similar to modern sports cars *(Only works on cars that have ABS as standard)*.
+  
+  - **Door lock control:**
+    - Has 2 main options and one complementary option:
+      - Simple button to lock and unlock your vehicle.
+      - Automatic Mode: Automatically locks your vehicle when you move away from it and unlocks it when you try to enter it again.
+      - Auto-Raise Roof: Choose whether locking your vehicle also raises the convertible roof *(if, of course, your vehicle is a convertible)*.
+
+      > **Note:** The feature only works on cars and trucks.
+
+      > **Note:** If you lock a vehicle (or it gets automatically locked) then switch to a different vehicle, the previous one will be automatically unlocked.
+
 
 - **Custom Paint Jobs:**
   - Apply a custom paint job to your vehicle from a list of real-life OEM and custom colors.
@@ -164,8 +181,8 @@
 - **Casino Pacino**
   - An implementation of gir489's [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino), as per their request, with translation support and a slightly altered UI.
 
-- **Players:**
-  - For now this only displays information about players (money, health, coordinates, vehicle...). I don't know what I'm going to do here since Vehicle Gifting was patched and I don't like nor write toxic features and money drops so unless I can figure out something that can be used to help other players, this will be removed.
+- ~**Players:**~
+  - ~For now this only displays information about players (money, health, coordinates, vehicle...). I don't know what I'm going to do here since Vehicle Gifting was patched and I don't like nor write toxic features and money drops so unless I can figure out something that can be used to help other players, this will be removed.~
 
 ## World
 
@@ -240,5 +257,6 @@
   - `finish_sale` : Instantly finishes a sale mission (from a list of missions supported by the script). Will be skipped if you have the **Auto-Sell** option enabled.
   - `spawnmeaperv` : No comment.
   - `kys` : Kills you.
+  - `vehlock` : Locks/unlocks your vehicle.
   - `PANIK` : Resets all changes done by the script (same as the panic button).
   - `resetcfg` : Resets the script and restores your saved config to default.

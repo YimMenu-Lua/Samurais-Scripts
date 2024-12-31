@@ -123,6 +123,8 @@ function initStrings()
   ROD_DESC_           = translateLabel("rod_tt")
   RAGDOLL_SOUND_DESC_ = translateLabel("ragdoll_sound_tt")
   HIDENSEEK_DESC_     = translateLabel("hide&seek_tt")
+  HATSINVEHS_DESC_    = translateLabel("hatsinvehs_tt")
+  NOVEHRAGDOLL_DESC_  = translateLabel("novehragdoll_tt")
   -- Sound Player
   SOUND_PLAYER_        = translateLabel("soundplayer")
   MALE_SOUNDS_         = translateLabel("malesounds")
@@ -199,7 +201,7 @@ function initStrings()
   APPLY_MATTE_CB_    = translateLabel("apply_matte_CB")
   APPLY_MATTE_DESC_  = translateLabel("apply_matte_tt")
   SAVE_PAINT_DESC_   = translateLabel("save_paint_tt")
-  -- Drift tab
+  --
   DRIFT_MODE_CB_           = translateLabel("driftModeCB")
   DRIFT_MODE_DESC_         = translateLabel("driftMode_tt")
   DRIFT_SLIDER_            = translateLabel("driftSlider")
@@ -248,6 +250,8 @@ function initStrings()
   DESTROY_ENGINE_          = translateLabel("Destroy Engine")
   EJECTO_SEATO_DESC_       = translateLabel("ejecto_seato_tt")
   FENDER_BENDER_DESC_      = translateLabel("fenderBender_tt")
+  AUTOVEHLOCKS_DESC_       = translateLabel("autovehlocks_tt")
+  AUTO_RAISE_ROOF_DESC_    = translateLabel("autoraiseroof_tt")
   -- Flatbed
   GET_IN_FLATBED_         = translateLabel("getinsidefltbd")
   SPAWN_FLATBED_BTN_      = translateLabel("spawnfltbd")
@@ -1486,6 +1490,13 @@ SS.canUseHandsUp = function()
   and not is_playing_amb_scenario and not is_typing and not is_setting_hotkeys and not is_hiding and not Game.Self.isBrowsingApps()
 end
 
+SS.playKeyfobAnim = function()
+  if Game.requestAnimDict("anim@mp_player_intmenu@key_fob@") then
+    TASK.TASK_PLAY_ANIM(self.get_ped(), "anim@mp_player_intmenu@key_fob@", "fob_click", 4.0, -4.0, -1,
+      48, 0.0, false, false, false)
+  end
+end
+
 -- Reverts changes done by the script.
 SS.handle_events = function()
   if attached_ped ~= nil and attached_ped ~= 0 then
@@ -1671,6 +1682,10 @@ SS.handle_events = function()
 
   if cmd_ui_is_open then
     gui.override_mouse(false)
+  end
+
+  if VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(current_vehicle) ~= 1 then
+    VEHICLE.SET_VEHICLE_DOORS_LOCKED(current_vehicle, 1)
   end
 end
 
@@ -2180,6 +2195,7 @@ SS.reset_settings = function()
     vehicle_mine  = { code = 0x4E, name = "[N]" },
     triggerbotBtn = { code = 0x10, name = "[Shift]" },
     panik         = { code = 0x7B, name = "[F12]" },
+    commands      = { code = 0x67, name = "[NUMPAD 7]" },
   }; CFG.save("keybinds", keybinds)
   gpad_keybinds = {
     rodBtn        = { code = 0, name = "[Unbound]" },
@@ -2201,6 +2217,8 @@ SS.reset_settings = function()
   disableSound            = false; CFG.save("disableSound", disableSound)
   disableActionMode       = false; CFG.save("disableActionMode", disableActionMode)
   hideFromCops            = false; CFG.save("hideFromCops", hideFromCops)
+  hatsinvehs              = false; CFG.save("hatsinvehs", hatsinvehs)
+  novehragdoll            = false; CFG.save("novehragdoll", novehragdoll)
   rod                     = false; CFG.save("rod", rod)
   clumsy                  = false; CFG.save("clumsy", clumsy)
   ragdoll_sound           = false; CFG.save("ragdoll_sound", ragdoll_sound)
@@ -2305,6 +2323,8 @@ SS.reset_settings = function()
   whouse_5_owned          = false; CFG.save("whouse_5_owned", whouse_5_owned)
   autosell                = false; CFG.save("autosell", autosell)
   veh_mines               = false; CFG.save("veh_mines", veh_mines)
+  autovehlocks            = false; CFG.save("autovehlocks", autovehlocks)
+  autoraiseroof           = false; CFG.save("autoraiseroof", autoraiseroof)
   SS_debug                = false; CFG.save("SS_debug", SS_debug)
   laser_switch            = 0; CFG.save("laser_switch", laser_switch)
   DriftIntensity          = 0; CFG.save("DriftIntensity", DriftIntensity)
@@ -2975,7 +2995,7 @@ end
 ---Enables or disables physical phone intercations in GTA Online
 ---@param toggle boolean
 Game.Self.PhoneAnims = function(toggle)
-  for i = 242, 244 do
+  for i = 242, 244 do -- PCF_PhoneDisableTextingAnimations, PCF_PhoneDisableTalkingAnimations, PCF_PhoneDisableCameraAnimations
     if PED.GET_PED_CONFIG_FLAG(self.get_ped(), i, true) == toggle then
       PED.SET_PED_CONFIG_FLAG(self.get_ped(), i, not toggle)
     end
@@ -2985,12 +3005,8 @@ end
 ---Enables phone gestures in GTA Online.
 ---@param s script_util
 Game.Self.PlayPhoneGestures = function(s)
-  local is_phone_in_hand   = SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(
-    joaat("CELLPHONE_FLASHHAND")
-  ) > 0
-  local is_browsing_email  = SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(
-    joaat("APPMPEMAIL")
-  ) > 0
+  local is_phone_in_hand   = script.is_active("CELLPHONE_FLASHHAND")
+  local is_browsing_email  = script.is_active("APPMPEMAIL")
   local call_anim_dict     = "anim@scripted@freemode@ig19_mobile_phone@male@"
   local call_anim          = "base"
   local call_anim_boneMask = "BONEMASK_HEAD_NECK_AND_R_ARM"
@@ -3013,6 +3029,36 @@ Game.Self.PlayPhoneGestures = function(s)
         MOBILE.CELL_SET_INPUT(v.input)
       end
     end
+  end
+end
+
+Game.Self.NoJacking = function(toggle)
+  if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 26, false) ~= toggle then
+    PED.SET_PED_CONFIG_FLAG(self.get_ped(), 26, toggle)
+  end
+  if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 177, false) ~= toggle then
+    PED.SET_PED_CONFIG_FLAG(self.get_ped(), 177, toggle)
+  end
+  if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 398, false) ~= toggle then
+    PED.SET_PED_CONFIG_FLAG(self.get_ped(), 398, toggle)
+  end
+end
+
+Game.Self.DisableActionMode = function()
+  if not PED.GET_PED_RESET_FLAG(self.get_ped(), 200) then -- PRF_DisableActionMode
+    PED.SET_PED_RESET_FLAG(self.get_ped(), 200, true)
+  end
+end
+
+Game.Self.AllowHatsInVehicles = function()
+  if not PED.GET_PED_RESET_FLAG(self.get_ped(), 337) then -- PRF_AllowHeadPropInVehicle
+    PED.SET_PED_RESET_FLAG(self.get_ped(), 337, true)
+  end
+end
+
+Game.Self.NoRagdollOnVehRoof = function()
+  if not PED.GET_PED_RESET_FLAG(self.get_ped(), 274) then -- PRF_BlockRagdollFromVehicleFallOff
+    PED.SET_PED_RESET_FLAG(self.get_ped(), 274, true)
   end
 end
 
@@ -3159,6 +3205,41 @@ Game.Vehicle.hasABS = function()
     end
   end
   return false
+end
+
+---@param vehicle integer
+---@param s script_util
+Game.Vehicle.lockDoors = function(vehicle, toggle, s)
+  if entities.take_control_of(vehicle, 300) then
+    if toggle then
+      for i = 0, (VEHICLE.GET_NUMBER_OF_VEHICLE_DOORS(vehicle) + 1) do
+        if VEHICLE.GET_VEHICLE_DOOR_ANGLE_RATIO(vehicle, i) > 0.0 then
+          VEHICLE.SET_VEHICLE_DOORS_SHUT(vehicle, false)
+          break
+        end
+      end
+      if VEHICLE.IS_VEHICLE_A_CONVERTIBLE(vehicle, false) and autoraiseroof and
+      VEHICLE.GET_CONVERTIBLE_ROOF_STATE(vehicle) ~= 0 then
+        VEHICLE.RAISE_CONVERTIBLE_ROOF(vehicle, false)
+      else
+        for i = 0, 7 do
+          -- VEHICLE.FIX_VEHICLE_WINDOW(vehicle, i) -- Unnecessary. Locking your car doesn't magically fix its broken windows. *realism intensifies*
+          VEHICLE.ROLL_UP_WINDOW(vehicle, i)
+        end
+      end
+    end
+    -- these won't do anything if the engine is off --
+    VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true)
+    VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true)
+    --------------------------------------------------
+    AUDIO.SET_HORN_PERMANENTLY_ON_TIME(vehicle, 1000)
+    AUDIO.SET_HORN_PERMANENTLY_ON(vehicle)
+    VEHICLE.SET_VEHICLE_DOORS_LOCKED(vehicle, toggle and 2 or 1)
+    gui.show_message("Samurai's Scripts", ("Vehicle %s"):format(toggle and "locked." or "unlocked."))
+    s:sleep(696)
+    VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false)
+    VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false)
+  end
 end
 
 ---@class World

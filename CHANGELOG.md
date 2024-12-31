@@ -1,22 +1,35 @@
-### v1.5.0 Changelog
+### v1.5.1 Changelog
 
 #### Features
 
-**Self -> Actions:**
+#### Self
 
-- Reworked **Movement Options:**
-  - The feature now has 2 modes: A drop-down list of custom movement options and an option to browse all movement clipsets from a json file.
-  - Increased the number of custom movements from 6 to 32.
-  - To use the json option, you first need to download the file from [this link](https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json) then place it in `%AppData%\YimMenu\scripts_config`.
+🎉 **New Feature: Allow Hats In Vehicles:**
 
-**Business Manager:**
+- Prevents the game from removing your hat or headgear/accessories when you enter a vehicle.
 
-- Fixed MC businesses being in different orders for different users, which in turn broke all related features.
-- Improved **CEO Warehouses:** Users no longer have to manually set how many warehouses they own and their sizes. The script will automatically grab the necessary information.
-- Improved **Auto-Sell:** Added support for Acid Lab and Hangar **land** sales.
+🎉 **New Feature: Don't Fall Off Vehicles:**
+
+- Allows you to stand on top of vehicles without falling off when the vehicle moves.
+
+**Improvement: Actions -> Movement Options:**
+
+- Added a new movement style: **Zombie:**
+  - Has idle/walking/running/sprinting anims.
+
+#### Vehicle
+
+🎉 **New Feature: Vehicle door lock control:**
+
+- Has 2 main options and one complementary option:
+  - Simple button to lock and unlock your vehicle.
+  - Automatic Mode: Automatically locks your vehicle when you move away from it and unlocks it when you try to enter it again.
+  - Auto-Raise Roof: Choose whether locking your vehicle also raises the convertible roof *(if, of course, your vehicle is a convertible)*.
+
+  > **Note:** The feature only works on cars and trucks.
+  > **Note:** If you lock a vehicle (or it gets automatically locked) then switch to a different vehicle, the previous one will be automatically unlocked.
 
 #### Hotfix
 
-- Fixed **Disable Action Mode** not working when the player is wanted.
-- Fixed **Disable Action Mode** preventing the player from going into stealth mode.
-- Removed unused test script.
+- Fixed **Disable Action Mode** for good. I'm a lazy person and I didn't wanna do some research. It's properly implemented now instead of the previous broken hacky way of doing it.
+- Removed the stupid player tab *(it was very likely the cause of #27)*.

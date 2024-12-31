@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.5.0'
+SCRIPT_VERSION = '1.5.1'
 TARGET_BUILD   = '3411'
 TARGET_VERSION = '1.70'
 log.info("version " .. SCRIPT_VERSION)
@@ -71,6 +71,8 @@ DEFAULT_CONFIG          = {
   clumsy                  = false,
   ragdoll_sound           = false,
   hideFromCops            = false,
+  hatsinvehs              = false,
+  novehragdoll            = false,
   manualFlags             = false,
   controllable            = false,
   looped                  = false,
@@ -118,6 +120,8 @@ DEFAULT_CONFIG          = {
   keepWheelsTurned        = false,
   noJacking               = false,
   veh_mines               = false,
+  autovehlocks            = false,
+  autoraiseroof           = false,
   towEverything           = false,
   noEngineBraking         = false,
   kersBoost               = false,
@@ -191,6 +195,8 @@ replaceSneakAnim        = CFG.read("replaceSneakAnim")
 replacePointAct         = CFG.read("replacePointAct")
 disableActionMode       = CFG.read("disableActionMode")
 hideFromCops            = CFG.read("hideFromCops")
+hatsinvehs              = CFG.read("hatsinvehs")
+novehragdoll            = CFG.read("novehragdoll")
 favorite_actions        = CFG.read("favorite_actions")
 rod                     = CFG.read("rod")
 clumsy                  = CFG.read("clumsy")
@@ -252,6 +258,8 @@ real_plane_speed        = CFG.read("real_plane_speed")
 unbreakableWindows      = CFG.read("unbreakableWindows")
 veh_mines               = CFG.read("veh_mines")
 vmine_type              = CFG.read("vmine_type")
+autovehlocks            = CFG.read("autovehlocks")
+autoraiseroof           = CFG.read("autoraiseroof")
 towEverything           = CFG.read("towEverything")
 noEngineBraking         = CFG.read("noEngineBraking")
 kersBoost               = CFG.read("kersBoost")
@@ -375,6 +383,7 @@ should_draw_cmd_ui      = false
 mvmtSelected            = false
 jsonMvmt                = false
 debug_counter           = not SS_debug and 0 or 7
+vehicleLockStatus       = 0
 anim_flag               = 0
 anim_sortby_idx         = 0
 grp_anim_index          = 0
@@ -921,6 +930,20 @@ self_tab:add_imgui(function()
   if hfcUsed then
     UI.widgetSound("Nav2")
     CFG.save("hideFromCops", hideFromCops)
+  end
+
+  hatsinvehs, hvehsUsed = ImGui.Checkbox("Allow Hats In Vehicles", hatsinvehs)
+  UI.helpMarker(false, HATSINVEHS_DESC_)
+  if hvehsUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("hatsinvehs", hatsinvehs)
+  end
+
+  novehragdoll, nvrUsed = ImGui.Checkbox("Don't Fall Off Vehicles", novehragdoll)
+  UI.helpMarker(false, NOVEHRAGDOLL_DESC_)
+  if nvrUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("novehragdoll", novehragdoll)
   end
 end)
 
@@ -2378,6 +2401,9 @@ local function resetLastVehState()
       VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, default_tire_smoke.r, default_tire_smoke.g,
         default_tire_smoke.b)
     end
+    if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(last_vehicle)) and (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(last_vehicle) ~= 1) then
+      VEHICLE.SET_VEHICLE_DOORS_LOCKED(last_vehicle, 1)
+    end
   end
   loud_radio_enabled = false
   last_vehicle       = current_vehicle
@@ -3125,6 +3151,39 @@ vehicle_tab:add_imgui(function()
       end
       ImGui.EndDisabled()
     end
+  end
+
+  ImGui.BeginDisabled(Game.Self.isDriving() or not Game.Self.isOutside() or current_vehicle == 0)
+  if ImGui.Button(("%s Doors"):format(vehicleLockStatus <= 1 and "Lock" or "Unlock")) then
+    script.run_in_fiber(function(dlocks)
+      if current_vehicle ~= 0 and is_car then
+        if last_vehicle ~= 0 and last_vehicle ~= current_vehicle and
+        VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(last_vehicle)) and
+        (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(last_vehicle) ~= 1) then
+          VEHICLE.SET_VEHICLE_DOORS_LOCKED(last_vehicle, 1)
+        end
+        SS.playKeyfobAnim()
+        AUDIO.PLAY_SOUND_FRONTEND(-1, "REMOTE_CONTROL_FOB", "PI_MENU_SOUNDS", false)
+        dlocks:sleep(250)
+        local toggle = (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(current_vehicle) == 1) and true or false
+        vehicleLockStatus = toggle and 2 or 1
+        Game.Vehicle.lockDoors(current_vehicle, toggle, dlocks)
+      end
+    end)
+  end
+  ImGui.EndDisabled(); ImGui.SameLine()
+  autovehlocks, avlUsed = ImGui.Checkbox("Auto-Lock", autovehlocks)
+  UI.toolTip(false, AUTOVEHLOCKS_DESC_)
+  if avlUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("autovehlocks", autovehlocks)
+  end
+
+  ImGui.SameLine(); autoraiseroof, autoroofUsed = ImGui.Checkbox("Auto-Raise Roof", autoraiseroof)
+  UI.toolTip(false, AUTO_RAISE_ROOF_DESC_)
+  if autoroofUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("autoraiseroof", autoraiseroof)
   end
 
   if open_sounds_window then
@@ -4588,19 +4647,19 @@ business_tab:add_imgui(function()
   ImGui.Spacing(); ImGui.Dummy((window_width / 2) - 110, 1); ImGui.SameLine(); UI.coloredText("- YimResupplier V2 -",
     yrv2_color, 1, 60)
   if Game.isOnline() and not script.is_active("maintransition") then
-    local whouse_1_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT0") - 1) >= 0 -- 0 indexed
+    local whouse_1_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT0") - 1) >= 0
     local whouse_2_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT1") - 1) >= 0
     local whouse_3_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT2") - 1) >= 0
     local whouse_4_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT3") - 1) >= 0
     local whouse_5_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT4") - 1) >= 0
-    local hangarOwned    = stats.get_int("MPX_PROP_HANGAR") > 0
-    local slot0_owned    = stats.get_int("MPX_PROP_FAC_SLOT0") ~= 0 -- 1 indexed
+    local hangarOwned    = stats.get_int("MPX_HANGAR_OWNED") ~= 0 -- can be used to get the hangar name and allow TP to the correct hangar in public sessions. I'll probably do it tomorrow... 😴
+    local slot0_owned    = stats.get_int("MPX_PROP_FAC_SLOT0") ~= 0
     local slot1_owned    = stats.get_int("MPX_PROP_FAC_SLOT1") ~= 0
     local slot2_owned    = stats.get_int("MPX_PROP_FAC_SLOT2") ~= 0
     local slot3_owned    = stats.get_int("MPX_PROP_FAC_SLOT3") ~= 0
     local slot4_owned    = stats.get_int("MPX_PROP_FAC_SLOT4") ~= 0
     local bunkerOwned    = stats.get_int("MPX_PROP_FAC_SLOT5") ~= 0
-    local acidOwned      = stats.get_int("MPX_PROP_FAC_SLOT6") > 0
+    local acidOwned      = stats.get_int("MPX_XM22_LAB_OWNED") ~= 0
     if CURRENT_BUILD == TARGET_BUILD then
       ImGui.Spacing(); ImGui.BeginTabBar("##BusinessManager", ImGuiTabBarFlags.None)
       if whouse_1_owned or whouse_2_owned or whouse_3_owned or whouse_4_owned or whouse_5_owned then
@@ -5136,13 +5195,13 @@ business_tab:add_imgui(function()
         ImGui.EndTabItem()
       end
       if ImGui.BeginTabItem("Safes") then
-        local ncOwned = stats.get_int("MPX_PROP_NIGHTCLUB") > 0
-        local acOwned = stats.get_int("MPX_PROP_ARCADE") > 0
-        local agOwned = stats.get_int("MPX_PROP_SECURITY_OFFICE") > 0
-        local chOwned = stats.get_int("MPX_PROP_CLUBHOUSE") > 0
-        local boOwned = stats.get_int("MPX_PROP_BAIL_OFFICE") > 0
-        local syOwned = stats.get_int("MPX_SALVAGE_YARD_OWNED") > 0
-        local hdOwned = stats.get_int("MPX_PROP_HACKER_DEN") > 0
+        local ncOwned = stats.get_int("MPX_NIGHTCLUB_OWNED") ~= 0
+        local acOwned = stats.get_int("MPX_ARCADE_OWNED") ~= 0
+        local agOwned = stats.get_int("MPX_FIXER_HQ_OWNED") ~= 0
+        local chOwned = stats.get_int("MPX_PROP_CLUBHOUSE") ~= 0
+        local boOwned = stats.get_int("MPX_BAIL_OFFICE_OWNED") ~= 0
+        local syOwned = stats.get_int("MPX_SALVAGE_YARD_OWNED") ~= 0
+        local hdOwned = stats.get_int("MPX_HACKER_DEN_OWNED") ~= 0
         ImGui.Dummy(1, 10)
         if ncOwned then
           ImGui.Spacing(); ImGui.SeparatorText("Nightclub")
@@ -5223,6 +5282,7 @@ business_tab:add_imgui(function()
               end)
             end
           end
+        else
           ImGui.Text("You don't own an agency.")
         end
 
@@ -6029,177 +6089,177 @@ casino_pacino:add_imgui(function()
 end)
 
 -- Players
-players_tab           = online_tab:add_tab(PLAYERS_TAB_)
-playerIndex           = 0
-local selectedPlayer  = 0
-local playerCount     = 0
-local targetPlayerPed = 0
-local playerHeading   = 0
-local playerHealth    = 0
-local playerArmour    = 0
-local playerVeh       = 0
-local player_name     = ""
-local playerWallet    = ""
-local playerBank      = ""
-local playerRank      = ""
-local playerCoords    = vec3:new(0.0, 0.0, 0.0)
-local godmode         = false
-local player_in_veh   = false
-local player_active   = false
-local targetPlayerIndex
-players_tab:add_imgui(function()
-  if Game.isOnline() and not script.is_active("maintransition") then
-    local playerNames = Game.filterPlayerList()
-    ImGui.Text(string.format("%s [ %s ]", TOTAL_PLAYERS_TXT_, playerCount))
-    ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 10.0)
-    if ImGui.BeginChild("PlayerList", 240, 800, true) then
-      for i = 1, #playerNames do
-        local is_selected = (playerIndex == i - 1)
-        local color = filteredPlayers[i] == self.get_ped() and { 1, 1, 0.04 } or { 1, 1, 1 }
-        ImGui.PushStyleColor(ImGuiCol.Header, color[1], color[2], color[3], 0.1)
-        ImGui.PushStyleColor(ImGuiCol.HeaderHovered, color[1], color[2], color[3], 0.3)
-        ImGui.PushStyleColor(ImGuiCol.HeaderActive, color[1], color[2], color[3], 0.6)
-        if ImGui.Selectable(playerNames[i], is_selected) then
-          playerIndex = i - 1
-        end
-        ImGui.PopStyleColor(3)
-        if ImGui.IsItemHovered() then
-          local selectableWidth, _ = ImGui.GetItemRectSize()
-          if selectableWidth > 240 then
-            ImGui.SetTooltip(playerNames[i])
-          end
-        end
-        if is_selected then
-          ImGui.SetItemDefaultFocus()
-        end
-      end
-      ImGui.EndChild()
-    end
-    ImGui.PopStyleVar()
-    ImGui.SameLine(); ImGui.BeginChild("PlayerInfo", 400, 800, true)
-    if player_active then
-      ImGui.Dummy(1, 10); ImGui.SeparatorText("Player Info")
-      ImGui.Spacing()
-      ImGui.BulletText(string.format("Cash:         %s", playerWallet))
-      ImGui.Spacing()
-      ImGui.BulletText(string.format("Bank:         %s", playerBank))
-      ImGui.Spacing()
-      ImGui.BulletText(string.format("Rank:         %s", playerRank))
-      ImGui.Spacing()
-      ImGui.BulletText(string.format("Coords:      %.3f   %.3f   %.3f", playerCoords.x, playerCoords.y, playerCoords.z))
-      if UI.isItemClicked('lmb') or UI.isItemClicked('rmb') then
-        UI.widgetSound("Click")
-        log.debug(player_name .. "'s coords: " .. tostring(playerCoords))
-        gui.show_message("Samurai's Scripts", player_name .. "'s coordinates logged to console.")
-      end
-      UI.toolTip(false, "Press [LMB] or [RMB] to print the coordinates to console.")
-      ImGui.Spacing()
-      ImGui.BulletText(string.format("Heading:     %d", playerHeading))
-      if UI.isItemClicked('lmb') or UI.isItemClicked('rmb') then
-        UI.widgetSound("Click")
-        log.debug(player_name .. "'s heading: " .. tostring(playerHeading))
-        gui.show_message("Samurai's Scripts", player_name .. "'s heading logged to console.")
-      end
-      UI.toolTip(false, "Press [LMB] or [RMB] to print the heading to console.")
-      ImGui.Spacing()
-      ImGui.BulletText("Health:      "); ImGui.SameLine()
-      UI.toolTip(false, string.format("Maximum Health: %d", playerMaxHealth))
-      if player_isDead then
-        ImGui.Text("Dead!  x__x")
-      else
-        ImGui.PushStyleColor(ImGuiCol.FrameBg, 0.90, 0, 0, 1)
-        ImGui.ProgressBar(playerHealth / playerMaxHealth, 150, 20)
-        ImGui.PopStyleColor()
-        UI.toolTip(false, string.format("Maximum Health: %d", playerMaxHealth))
-      end
-      if playerArmour ~= nil and not player_isDead then
-        ImGui.Spacing()
-        ImGui.BulletText("Armour     "); ImGui.SameLine()
-        UI.toolTip(false, string.format("Maximum Armour: %d", playerMaxArmour))
-        ImGui.PushStyleColor(ImGuiCol.FrameBg, 0.066, 0.64, 0.90, 1)
-        ImGui.ProgressBar(playerArmour / playerMaxArmour, 150, 20)
-        ImGui.PopStyleColor()
-        UI.toolTip(false, string.format("Maximum Armour: %d", playerMaxArmour))
-      end
-      ImGui.Spacing()
-      ImGui.BulletText(string.format("God Mode:  %s", godmode and "On" or "Off"))
-      ImGui.Spacing()
-      ImGui.BulletText(string.format("Wanted Level:  %s", doWantedStars(wanted_level)))
+-- players_tab           = online_tab:add_tab(PLAYERS_TAB_)
+-- playerIndex           = 0
+-- local selectedPlayer  = 0
+-- local playerCount     = 0
+-- local targetPlayerPed = 0
+-- local playerHeading   = 0
+-- local playerHealth    = 0
+-- local playerArmour    = 0
+-- local playerVeh       = 0
+-- local player_name     = ""
+-- local playerWallet    = ""
+-- local playerBank      = ""
+-- local playerRank      = ""
+-- local playerCoords    = vec3:new(0.0, 0.0, 0.0)
+-- local godmode         = false
+-- local player_in_veh   = false
+-- local player_active   = false
+-- local targetPlayerIndex
+-- players_tab:add_imgui(function()
+--   if Game.isOnline() and not script.is_active("maintransition") then
+--     local playerNames = Game.filterPlayerList()
+--     ImGui.Text(string.format("%s [ %s ]", TOTAL_PLAYERS_TXT_, playerCount))
+--     ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 10.0)
+--     if ImGui.BeginChild("PlayerList", 240, 800, true) then
+--       for i = 1, #playerNames do
+--         local is_selected = (playerIndex == i - 1)
+--         local color = filteredPlayers[i] == self.get_ped() and { 1, 1, 0.04 } or { 1, 1, 1 }
+--         ImGui.PushStyleColor(ImGuiCol.Header, color[1], color[2], color[3], 0.1)
+--         ImGui.PushStyleColor(ImGuiCol.HeaderHovered, color[1], color[2], color[3], 0.3)
+--         ImGui.PushStyleColor(ImGuiCol.HeaderActive, color[1], color[2], color[3], 0.6)
+--         if ImGui.Selectable(playerNames[i], is_selected) then
+--           playerIndex = i - 1
+--         end
+--         ImGui.PopStyleColor(3)
+--         if ImGui.IsItemHovered() then
+--           local selectableWidth, _ = ImGui.GetItemRectSize()
+--           if selectableWidth > 240 then
+--             ImGui.SetTooltip(playerNames[i])
+--           end
+--         end
+--         if is_selected then
+--           ImGui.SetItemDefaultFocus()
+--         end
+--       end
+--       ImGui.EndChild()
+--     end
+--     ImGui.PopStyleVar()
+--     ImGui.SameLine(); ImGui.BeginChild("PlayerInfo", 400, 800, true)
+--     if player_active then
+--       ImGui.Dummy(1, 10); ImGui.SeparatorText("Player Info")
+--       ImGui.Spacing()
+--       ImGui.BulletText(string.format("Cash:         %s", playerWallet))
+--       ImGui.Spacing()
+--       ImGui.BulletText(string.format("Bank:         %s", playerBank))
+--       ImGui.Spacing()
+--       ImGui.BulletText(string.format("Rank:         %s", playerRank))
+--       ImGui.Spacing()
+--       ImGui.BulletText(string.format("Coords:      %.3f   %.3f   %.3f", playerCoords.x, playerCoords.y, playerCoords.z))
+--       if UI.isItemClicked('lmb') or UI.isItemClicked('rmb') then
+--         UI.widgetSound("Click")
+--         log.debug(player_name .. "'s coords: " .. tostring(playerCoords))
+--         gui.show_message("Samurai's Scripts", player_name .. "'s coordinates logged to console.")
+--       end
+--       UI.toolTip(false, "Press [LMB] or [RMB] to print the coordinates to console.")
+--       ImGui.Spacing()
+--       ImGui.BulletText(string.format("Heading:     %d", playerHeading))
+--       if UI.isItemClicked('lmb') or UI.isItemClicked('rmb') then
+--         UI.widgetSound("Click")
+--         log.debug(player_name .. "'s heading: " .. tostring(playerHeading))
+--         gui.show_message("Samurai's Scripts", player_name .. "'s heading logged to console.")
+--       end
+--       UI.toolTip(false, "Press [LMB] or [RMB] to print the heading to console.")
+--       ImGui.Spacing()
+--       ImGui.BulletText("Health:      "); ImGui.SameLine()
+--       UI.toolTip(false, string.format("Maximum Health: %d", playerMaxHealth))
+--       if player_isDead then
+--         ImGui.Text("Dead!  x__x")
+--       else
+--         ImGui.PushStyleColor(ImGuiCol.FrameBg, 0.90, 0, 0, 1)
+--         ImGui.ProgressBar(playerHealth / playerMaxHealth, 150, 20)
+--         ImGui.PopStyleColor()
+--         UI.toolTip(false, string.format("Maximum Health: %d", playerMaxHealth))
+--       end
+--       if playerArmour ~= nil and not player_isDead then
+--         ImGui.Spacing()
+--         ImGui.BulletText("Armour     "); ImGui.SameLine()
+--         UI.toolTip(false, string.format("Maximum Armour: %d", playerMaxArmour))
+--         ImGui.PushStyleColor(ImGuiCol.FrameBg, 0.066, 0.64, 0.90, 1)
+--         ImGui.ProgressBar(playerArmour / playerMaxArmour, 150, 20)
+--         ImGui.PopStyleColor()
+--         UI.toolTip(false, string.format("Maximum Armour: %d", playerMaxArmour))
+--       end
+--       ImGui.Spacing()
+--       ImGui.BulletText(string.format("God Mode:  %s", godmode and "On" or "Off"))
+--       ImGui.Spacing()
+--       ImGui.BulletText(string.format("Wanted Level:  %s", doWantedStars(wanted_level)))
 
-      ImGui.Dummy(1, 10); ImGui.SeparatorText("Player Options"); ImGui.Spacing()
-      if ImGui.Button(string.format("Teleport To %s##playerlist", player_name)) then
-        UI.widgetSound("Select")
-        Game.Self.teleport(true, playerCoords)
-      end
-      ImGui.SameLine()
-      if ImGui.Button(string.format("Bring %s##playerlist", player_name)) then
-        UI.widgetSound("Select")
-        command.call("bring", { targetPlayerIndex })
-      end
-      if ImGui.Button("Spawn Pervert Stalker") then
-        script.run_in_fiber(function()
-          spawnPervert(targetPlayerPed, player_name)
-        end)
-      end
-      UI.toolTip(false, PERVERT_STALKER_DESC_)
+--       ImGui.Dummy(1, 10); ImGui.SeparatorText("Player Options"); ImGui.Spacing()
+--       if ImGui.Button(string.format("Teleport To %s##playerlist", player_name)) then
+--         UI.widgetSound("Select")
+--         Game.Self.teleport(true, playerCoords)
+--       end
+--       ImGui.SameLine()
+--       if ImGui.Button(string.format("Bring %s##playerlist", player_name)) then
+--         UI.widgetSound("Select")
+--         command.call("bring", { targetPlayerIndex })
+--       end
+--       if ImGui.Button("Spawn Pervert Stalker") then
+--         script.run_in_fiber(function()
+--           spawnPervert(targetPlayerPed, player_name)
+--         end)
+--       end
+--       UI.toolTip(false, PERVERT_STALKER_DESC_)
 
-      ImGui.Dummy(1, 10); ImGui.SeparatorText("Vehicle Options")
-      ImGui.Spacing()
-      ImGui.BulletText(string.format("Vehicle:  %s", playerVehName))
-      if not Lua_fn.tableContains(depressorBanList, targetPlayerPed) then
-        if ImGui.Button("Depressor Ban") then
-          UI.widgetSound("Select")
-          table.insert(depressorBanList, targetPlayerPed)
-          gui.show_message(
-            "Samurai's Scripts", string.format(
-              "From now on, we will attempt to sabotage %s's flying mosquito each time they try to use one.", player_name
-            )
-          )
-        end
-      else
-        if ImGui.Button("Lift Depressor Ban") then
-          UI.widgetSound("Delete")
-          gui.show_message(
-            "Samurai's Scripts", string.format(
-              "%s is no longer banned from using flying mosquitos in this session.", player_name
-            )
-          )
-          for i = 0, #depressorBanList do
-            if depressorBanList[i] == targetPlayerPed then
-              table.remove(depressorBanList, i)
-              break
-            end
-          end
-        end
-      end
-      ImGui.BeginDisabled(not player_in_veh)
-      if ImGui.Button("Delete Vehicle") then
-        script.run_in_fiber(function(del)
-          if entities.take_control_of(playerVeh, 350) then
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(playerVeh, true, true)
-            del:sleep(200)
-            VEHICLE.DELETE_VEHICLE(playerVeh)
-            gui.show_success("Samurai's Scripts", "" .. player_name .. "'s vehicle has been yeeted.")
-          else
-            gui.show_error("Samurai's Scripts",
-              "Failed to delete the vehicle! " .. player_name .. " probably has protections on.")
-          end
-        end)
-      end
-      ImGui.EndDisabled()
-    else
-      ImGui.Text("Player left the session.")
-    end
-    ImGui.EndChild()
-  else
-    ImGui.Dummy(1, 5)
-    if script.is_active("maintransition") then
-      ImGui.Text("Waiting for online transition...")
-    else
-      ImGui.Text(GENERIC_UNAVAILABLE_SP_)
-    end
-  end
-end)
+--       ImGui.Dummy(1, 10); ImGui.SeparatorText("Vehicle Options")
+--       ImGui.Spacing()
+--       ImGui.BulletText(string.format("Vehicle:  %s", playerVehName))
+--       if not Lua_fn.tableContains(depressorBanList, targetPlayerPed) then
+--         if ImGui.Button("Depressor Ban") then
+--           UI.widgetSound("Select")
+--           table.insert(depressorBanList, targetPlayerPed)
+--           gui.show_message(
+--             "Samurai's Scripts", string.format(
+--               "From now on, we will attempt to sabotage %s's flying mosquito each time they try to use one.", player_name
+--             )
+--           )
+--         end
+--       else
+--         if ImGui.Button("Lift Depressor Ban") then
+--           UI.widgetSound("Delete")
+--           gui.show_message(
+--             "Samurai's Scripts", string.format(
+--               "%s is no longer banned from using flying mosquitos in this session.", player_name
+--             )
+--           )
+--           for i = 0, #depressorBanList do
+--             if depressorBanList[i] == targetPlayerPed then
+--               table.remove(depressorBanList, i)
+--               break
+--             end
+--           end
+--         end
+--       end
+--       ImGui.BeginDisabled(not player_in_veh)
+--       if ImGui.Button("Delete Vehicle") then
+--         script.run_in_fiber(function(del)
+--           if entities.take_control_of(playerVeh, 350) then
+--             ENTITY.SET_ENTITY_AS_MISSION_ENTITY(playerVeh, true, true)
+--             del:sleep(200)
+--             VEHICLE.DELETE_VEHICLE(playerVeh)
+--             gui.show_success("Samurai's Scripts", "" .. player_name .. "'s vehicle has been yeeted.")
+--           else
+--             gui.show_error("Samurai's Scripts",
+--               "Failed to delete the vehicle! " .. player_name .. " probably has protections on.")
+--           end
+--         end)
+--       end
+--       ImGui.EndDisabled()
+--     else
+--       ImGui.Text("Player left the session.")
+--     end
+--     ImGui.EndChild()
+--   else
+--     ImGui.Dummy(1, 5)
+--     if script.is_active("maintransition") then
+--       ImGui.Text("Waiting for online transition...")
+--     else
+--       ImGui.Text(GENERIC_UNAVAILABLE_SP_)
+--     end
+--   end
+-- end)
 
 --[[
     *world*
@@ -7702,6 +7762,24 @@ RegisterCommand("kys", function()
   command.call("suicide", {})
 end)
 
+RegisterCommand("vehlock", function()
+  script.run_in_fiber(function(vehlock)
+    if current_vehicle ~= 0 and is_car then
+      if last_vehicle ~= 0 and last_vehicle ~= current_vehicle and
+      VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(last_vehicle)) and
+      (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(last_vehicle) ~= 1) then
+        VEHICLE.SET_VEHICLE_DOORS_LOCKED(last_vehicle, 1)
+      end
+      SS.playKeyfobAnim()
+      AUDIO.PLAY_SOUND_FRONTEND(-1, "REMOTE_CONTROL_FOB", "PI_MENU_SOUNDS", false)
+      vehlock:sleep(250)
+      local toggle = (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(current_vehicle) == 1) and true or false
+      vehicleLockStatus = toggle and 2 or 1
+      Game.Vehicle.lockDoors(current_vehicle, toggle, vehlock)
+    end
+  end)
+end)
+
 RegisterCommand("PANIK", function()
   SS.handle_events()
   AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(
@@ -8264,32 +8342,44 @@ script.register_looped("HFC", function(hfc) -- Hide From Cops
   end
   if is_hiding then
     if not Game.Self.isAlive() then
-      is_hiding, ducking_in_car, hiding_in_boot, hiding_in_dumpster, boot_vehicle, thisDumpster = false, false, false,
-          false, 0, 0
+      is_hiding, ducking_in_car, hiding_in_boot, hiding_in_dumpster, boot_vehicle, thisDumpster = false, false, false, false, 0, 0
+      PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(self.get_id())
     end
     if ducking_in_car and not ENTITY.DOES_ENTITY_EXIST(self.get_veh()) then
-      TASK.CLEAR_PED_TASKS(self.get_ped())
       is_hiding, ducking_in_car = false, false
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(self.get_id())
     end
     if hiding_in_boot and not ENTITY.DOES_ENTITY_EXIST(boot_vehicle) then
-      TASK.CLEAR_PED_TASKS(self.get_ped())
       is_hiding, hiding_in_boot, boot_vehicle = false, false, 0
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(self.get_id())
     end
     if hiding_in_dumpster and not ENTITY.DOES_ENTITY_EXIST(thisDumpster) then
-      TASK.CLEAR_PED_TASKS(self.get_ped())
       is_hiding, hiding_in_dumpster, thisDumpster = false, false, 0
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(self.get_id())
     end
     local isWanted    = PLAYER.GET_PLAYER_WANTED_LEVEL(self.get_id()) > 0
     local was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(self.get_id())
+    local offsetCoords
+    if offsetCoords == nil then
+      offsetCoords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
+        self.get_ped(), math.random(10.0, 50.0),
+        math.random(10.0, 50.0), math.random(1.0, 10.0)
+      )
+    end
     if isWanted and not was_spotted then
       PED.SET_COP_PERCEPTION_OVERRIDES(40.0, 40.0, 40.0, 100.0, 100.0, 100.0, 0.0)
+      ---@diagnostic disable-next-line
+      PLAYER.SET_PLAYER_WANTED_CENTRE_POSITION(self.get_id(), offsetCoords)
     end
     if ducking_in_car then
       if was_spotted then
         gui.show_warning("Samurai's Scripts",
           "You have been spotted by the cops! You can't hide until they lose sight of you.")
-        TASK.CLEAR_PED_TASKS(self.get_ped())
         is_hiding, ducking_in_car = false, false
+        TASK.CLEAR_PED_TASKS(self.get_ped())
       end
       Game.showButtonPrompt(
       "Press ~INPUT_FRONTEND_ACCEPT~ or ~INPUT_VEH_ACCELERATE~ or ~INPUT_VEH_BRAKE~ to stop hiding.")
@@ -8343,6 +8433,10 @@ script.register_looped("HFC", function(hfc) -- Hide From Cops
         hfc:sleep(1000)
         is_hiding, hiding_in_dumpster = false, false
       end
+    end
+  else
+    if offsetCoords ~= nil then
+      offsetCoords = nil
     end
   end
 end)
@@ -8625,14 +8719,18 @@ script.register_looped("ANIMSC", function(animsc) -- Anim Shortcut
   end
 end)
 
--- Action Mode
-script.register_looped("AMODE", function()
+script.register_looped("PRF", function()
   if disableActionMode then
-    if PED.IS_PED_USING_ACTION_MODE(self.get_ped()) and not PED.GET_PED_STEALTH_MOVEMENT(self.get_ped()) then
-      PED.SET_PED_USING_ACTION_MODE(self.get_ped(), true, -1, "MOVE_SUPERFAT_RPG")
-    end
+    Game.Self.DisableActionMode()
+  end
+  if hatsinvehs then
+    Game.Self.AllowHatsInVehicles()
+  end
+  if novehragdoll then
+    Game.Self.NoRagdollOnVehRoof()
   end
 end)
+
 script.register_looped("MISCNPC", function(npcStuff)
   if spawned_npcs[1] ~= nil then
     for k, v in ipairs(spawned_npcs) do
@@ -8860,6 +8958,7 @@ script.register_looped("TDFT", function(script)
       and VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 13 and ENTITY.GET_ENTITY_MODEL(current_vehicle) ~= 0x7B54A9D3)
     is_boat         = (VEHICLE.IS_THIS_MODEL_A_BOAT(ENTITY.GET_ENTITY_MODEL(current_vehicle)) or
       VEHICLE.IS_THIS_MODEL_A_JETSKI(ENTITY.GET_ENTITY_MODEL(current_vehicle)))
+    vehicleLockStatus = (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(vehicle) == 1) and 2 or 1
     if is_car or is_quad or is_bike then
       validModel = true
     else
@@ -9153,7 +9252,7 @@ script.register_looped("ABSPREP", function(abs)
       if (ENTITY.GET_ENTITY_SPEED(self.get_veh()) * 3.6) > 100 then
         repeat
           should_flash_bl = not should_flash_bl
-          abs:sleep(100)
+          abs:sleep(80)
         until (ENTITY.GET_ENTITY_SPEED(self.get_veh()) * 3.6) < 50 or not PAD.IS_CONTROL_PRESSED(0, 72) or
           not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle)
         should_flash_bl = false
@@ -9217,6 +9316,22 @@ script.register_looped("MISCVEH", function(mvo)
       if loud_radio_enabled then
         loud_radio_enabled = false
       end
+    end
+  end
+
+  if autovehlocks then
+    if current_vehicle ~= 0 and is_car then
+      local vehPos   = Game.getCoords(current_vehicle, true)
+      local selfPos  = self.get_pos()
+      local distance = vec3:distance(vehPos, selfPos)
+      local isLocked = VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(current_vehicle) > 1
+      if not isLocked and distance > 20 then
+        Game.Vehicle.lockDoors(current_vehicle, true, mvo)
+      end
+      if isLocked and PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(self.get_ped()) == current_vehicle then
+        Game.Vehicle.lockDoors(current_vehicle, false, mvo)
+      end
+      vehicleLockStatus = isLocked and 2 or 1
     end
   end
 end)
@@ -9840,28 +9955,11 @@ script.register_looped("RGBL", function(rgb) -- RGB Lights
     rgb:yield()
   end
 end)
+
 script.register_looped("CTT", function(ctt) -- Can't Touch This
-  if noJacking then
-    if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 398, true) then
-      PED.SET_PED_CAN_BE_DRAGGED_OUT(self.get_ped(), false)
-      PED.SET_PED_CONFIG_FLAG(self.get_ped(), 398, true)
-    end
-    if not PED.GET_PED_CONFIG_FLAG(self.get_ped(), 177, true) then
-      PED.SET_PED_CAN_BE_DRAGGED_OUT(self.get_ped(), false)
-      PED.SET_PED_CONFIG_FLAG(self.get_ped(), 177, true)
-    end
-  else
-    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 398, true) then
-      PED.SET_PED_CAN_BE_DRAGGED_OUT(self.get_ped(), true)
-      PED.SET_PED_CONFIG_FLAG(self.get_ped(), 398, false)
-    end
-    if PED.GET_PED_CONFIG_FLAG(self.get_ped(), 177, true) then
-      PED.SET_PED_CAN_BE_DRAGGED_OUT(self.get_ped(), true)
-      PED.SET_PED_CONFIG_FLAG(self.get_ped(), 177, false)
-    end
-  end
-  ctt:yield()
+  Game.Self.NoJacking(noJacking)
 end)
+
 script.register_looped("BCC", function(die) -- Better Car Crashes
   if fender_bender then
     if Game.Self.isDriving() and (is_car or is_bike or is_quad) then
@@ -10262,17 +10360,22 @@ script.register_looped("PG", function(pg) -- Ped Grabber
         if not ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), "mp_missheist_countrybank@lift_hands", "lift_hands_in_air_outro", 3) then
           playHandsUp()
         end
-        if PED.IS_PED_RAGDOLL(self.get_ped()) then
-          repeat
-            pg:sleep(100)
-          until PED.IS_PED_RAGDOLL(self.get_ped()) == false
-          playHandsUp()
-        end
         if PED.IS_PED_USING_ACTION_MODE(self.get_ped()) then
           repeat
             pg:sleep(100)
-          until PED.IS_PED_USING_ACTION_MODE(self.get_ped()) == false
+          until not PED.IS_PED_USING_ACTION_MODE(self.get_ped())
           playHandsUp()
+        end
+        if PED.IS_PED_RAGDOLL(self.get_ped()) or Game.Self.isSwimming() or not Game.Self.isAlive() then
+          ENTITY.FREEZE_ENTITY_POSITION(attached_ped, false)
+          ENTITY.DETACH_ENTITY(attached_ped, true, true)
+          TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
+          PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(attached_ped, false)
+          PED.SET_PED_TO_RAGDOLL(attached_ped, 1500, 0, 0, false, false, false)
+          TASK.CLEAR_PED_TASKS(self.get_ped())
+          PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), true)
+          attached_ped = 0
+          ped_grabbed  = false
         end
         if PAD.IS_DISABLED_CONTROL_PRESSED(0, 25) then
           if PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257) then
@@ -10316,17 +10419,18 @@ script.register_looped("VG", function(vg) -- Vehicle Grabber
         if not ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), "mp_missheist_countrybank@lift_hands", "lift_hands_in_air_outro", 3) then
           playHandsUp()
         end
-        if PED.IS_PED_RAGDOLL(self.get_ped()) then
-          repeat
-            vg:sleep(100)
-          until PED.IS_PED_RAGDOLL(self.get_ped()) == false
-          playHandsUp()
-        end
         if PED.IS_PED_USING_ACTION_MODE(self.get_ped()) then
           repeat
             vg:sleep(100)
-          until PED.IS_PED_USING_ACTION_MODE(self.get_ped()) == false
+          until not PED.IS_PED_USING_ACTION_MODE(self.get_ped())
           playHandsUp()
+        end
+        if PED.IS_PED_RAGDOLL(self.get_ped()) or Game.Self.isSwimming() or not Game.Self.isAlive() then
+          ENTITY.DETACH_ENTITY(grabbed_veh, true, true)
+          TASK.CLEAR_PED_TASKS(self.get_ped())
+          PED.SET_PED_CAN_SWITCH_WEAPON(self.get_ped(), true)
+          grabbed_veh     = 0
+          vehicle_grabbed = false
         end
         if PAD.IS_DISABLED_CONTROL_PRESSED(0, 25) then
           if PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257) then
@@ -10725,6 +10829,7 @@ script.register_looped("PE", function() -- Public Enemies
     local gta_peds = entities.get_all_peds_as_handles()
     for _, ped in pairs(gta_peds) do
       if ped ~= self.get_ped() and not PED.IS_PED_A_PLAYER(ped) and not PED.IS_PED_GROUP_MEMBER(ped, myGroup) then
+        PED.SET_PED_RESET_FLAG(ped, 440, true)
         for _, attr in ipairs(pe_combat_attributes_T) do
           PED.SET_PED_COMBAT_ATTRIBUTES(ped, attr.id, attr.bool)
         end
@@ -10907,49 +11012,49 @@ script.register_looped("CASINO", function(script)
   end
 end)
 
-script.register_looped("OPI", function() -- Online Player Info
-  if (Game.isOnline() and not script.is_active("maintransition")) and players_tab:is_selected() then
-    playerCount = Game.getPlayerCount()
-    if #filteredPlayers == 0 then
-      playerNames = Game.filterPlayerList()
-      return
-    end
-    selectedPlayer    = filteredPlayers[playerIndex + 1]
-    targetPlayerPed   = selectedPlayer
-    targetPlayerIndex = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(targetPlayerPed)
-    player_name       = PLAYER.GET_PLAYER_NAME(targetPlayerIndex)
-    player_active     = Game.is_in_session(targetPlayerPed)
-    player_isDead     = ENTITY.IS_ENTITY_DEAD(targetPlayerPed, true)
-    if player_active then
-      playerWallet    = Game.getPlayerWallet(targetPlayerIndex)
-      playerBank      = Game.getPlayerBank(targetPlayerIndex)
-      playerRank      = tostring(Game.getPlayerRank(targetPlayerIndex))
-      playerCoords    = Game.getCoords(targetPlayerPed, false)
-      playerHeading   = math.floor(Game.getHeading(targetPlayerPed))
-      playerHealth    = ENTITY.GET_ENTITY_HEALTH(targetPlayerPed)
-      playerMaxHealth = ENTITY.GET_ENTITY_MAX_HEALTH(targetPlayerPed)
-      playerArmour    = PED.GET_PED_ARMOUR(targetPlayerPed)
-      playerMaxArmour = PLAYER.GET_PLAYER_MAX_ARMOUR(targetPlayerIndex)
-      godmode         = PLAYER.GET_PLAYER_INVINCIBLE(targetPlayerIndex)
-      wanted_level    = PLAYER.GET_PLAYER_WANTED_LEVEL(targetPlayerIndex)
-      if PED.IS_PED_SITTING_IN_ANY_VEHICLE(targetPlayerPed) then
-        player_in_veh = true
-        playerVeh     = PED.GET_VEHICLE_PED_IS_USING(targetPlayerPed)
-        playerVehName = string.format(
-          "%s %s (%s)",
-          Game.Vehicle.manufacturer(playerVeh),
-          Game.Vehicle.name(playerVeh),
-          Game.Vehicle.class(playerVeh)
-        )
-      else
-        player_in_veh = false
-        playerVehName = "On Foot"
-      end
-    else
-      table.remove(filteredPlayers, playerIndex + 1)
-    end
-  end
-end)
+-- script.register_looped("OPI", function() -- Online Player Info
+--   if (Game.isOnline() and not script.is_active("maintransition")) and players_tab:is_selected() then
+--     playerCount = Game.getPlayerCount()
+--     if #filteredPlayers == 0 then
+--       playerNames = Game.filterPlayerList()
+--       return
+--     end
+--     selectedPlayer    = filteredPlayers[playerIndex + 1]
+--     targetPlayerPed   = selectedPlayer
+--     targetPlayerIndex = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(targetPlayerPed)
+--     player_name       = PLAYER.GET_PLAYER_NAME(targetPlayerIndex)
+--     player_active     = Game.is_in_session(targetPlayerPed)
+--     player_isDead     = ENTITY.IS_ENTITY_DEAD(targetPlayerPed, true)
+--     if player_active then
+--       playerWallet    = Game.getPlayerWallet(targetPlayerIndex)
+--       playerBank      = Game.getPlayerBank(targetPlayerIndex)
+--       playerRank      = tostring(Game.getPlayerRank(targetPlayerIndex))
+--       playerCoords    = Game.getCoords(targetPlayerPed, false)
+--       playerHeading   = math.floor(Game.getHeading(targetPlayerPed))
+--       playerHealth    = ENTITY.GET_ENTITY_HEALTH(targetPlayerPed)
+--       playerMaxHealth = ENTITY.GET_ENTITY_MAX_HEALTH(targetPlayerPed)
+--       playerArmour    = PED.GET_PED_ARMOUR(targetPlayerPed)
+--       playerMaxArmour = PLAYER.GET_PLAYER_MAX_ARMOUR(targetPlayerIndex)
+--       godmode         = PLAYER.GET_PLAYER_INVINCIBLE(targetPlayerIndex)
+--       wanted_level    = PLAYER.GET_PLAYER_WANTED_LEVEL(targetPlayerIndex)
+--       if PED.IS_PED_SITTING_IN_ANY_VEHICLE(targetPlayerPed) then
+--         player_in_veh = true
+--         playerVeh     = PED.GET_VEHICLE_PED_IS_USING(targetPlayerPed)
+--         playerVehName = string.format(
+--           "%s %s (%s)",
+--           Game.Vehicle.manufacturer(playerVeh),
+--           Game.Vehicle.name(playerVeh),
+--           Game.Vehicle.class(playerVeh)
+--         )
+--       else
+--         player_in_veh = false
+--         playerVehName = "On Foot"
+--       end
+--     else
+--       table.remove(filteredPlayers, playerIndex + 1)
+--     end
+--   end
+-- end)
 script.register_looped("DPMKIIB", function(dmpkb) -- Depressor MK2 Ban
   if depressorBanList[1] ~= nil then
     for _, v in pairs(depressorBanList) do
@@ -11142,7 +11247,7 @@ end)
 script.register_looped("HSUPP", function(hgl)
   if hangarLoop then
     if hangarOwned == nil then
-      hangarOwned = stats.get_int("MPX_PROP_HANGAR") > 0
+      hangarOwned = stats.get_int("MPX_HANGAR_OWNED") ~= 0
     end
     if hangarOwned then
       if stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL") == 50 then

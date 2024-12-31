@@ -13702,4 +13702,188 @@ Labels = {
 			text = "Aby zachować ten kolor na swoim pojeździe, udaj się do sklepu z artykułami modowymi i kup coś w rodzaju przyciemnianych szyb, stylowych tablic rejestracyjnych lub czegokolwiek innego.",
 		},
 	},
+	hatsinvehs_tt = {
+		{
+			iso = "en-US",
+			text = "Stops the game from removing your hats and other headgear/accessories when getting inside vehicles.",
+		},
+		{
+			iso = "de-DE",
+			text = "Verhindert, dass das Spiel beim Einsteigen in Fahrzeuge Ihre Hüte und andere Kopfbedeckungen/Accessoires entfernt.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Empêche le jeu de retirer vos chapeaux et autres couvre-chefs/accessoires lorsque vous montez à bord des véhicules.",
+		},
+		{
+			iso = "it-IT",
+			text = "Impedisce al gioco di toglierti cappelli e altri copricapi/accessori quando sali a bordo di un veicolo.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Impede que o jogo remova seus chapéus e outros acessórios de cabeça ao entrar nos veículos.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Игра не позволяет вам снимать шляпы и другие головные уборы/аксессуары при входе в транспортные средства.",
+		},
+		{
+			iso = "es-ES",
+			text = "Impide que el juego te quite los sombreros y otros accesorios o accesorios para la cabeza cuando ingresas a los vehículos.",
+		},
+		{
+			iso = "zh-CN",
+			text = "阻止游戏在您进入车辆时摘下您的帽子和其他头饰/配饰。",
+		},
+		{
+			iso = "zh-TW",
+			text = "阻止遊戲在進入車輛時取下帽子和其他頭飾/配件。",
+		},
+		{
+			iso = "ja-JP",
+			text = "乗り物に乗るときに、ゲームが帽子やその他のヘッドギア/アクセサリを削除するのを防ぎます。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Uniemożliwia grze zdjęcie czapki i innego nakrycia głowy/akcesoriów podczas wsiadania do pojazdów.",
+		},
+	},
+	novehragdoll_tt = {
+		{
+			iso = "en-US",
+			text = "Allows you to stand on top of vehicles without falling off.",
+		},
+		{
+			iso = "de-DE",
+			text = "Ermöglicht es Ihnen, auf Fahrzeugen zu stehen, ohne herunterzufallen.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Permet de se tenir debout sur les véhicules sans tomber.",
+		},
+		{
+			iso = "it-IT",
+			text = "Permette di stare in cima ai veicoli senza cadere.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Permite que você fique em cima de veículos sem cair.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Позволяет стоять на крыше транспортного средства, не падая.",
+		},
+		{
+			iso = "es-ES",
+			text = "Le permite permanecer de pie sobre los vehículos sin caerse.",
+		},
+		{
+			iso = "zh-CN",
+			text = "使您能够站在车辆顶部而不会掉下来。",
+		},
+		{
+			iso = "zh-TW",
+			text = "讓您站在車輛頂部而不會跌落。",
+		},
+		{
+			iso = "ja-JP",
+			text = "落ちることなく車両の上に立つことができます。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Umożliwia stanie na pojazdach bez ryzyka upadku.",
+		},
+	},
+	autovehlocks_tt = {
+		{
+			iso = "en-US",
+			text = "Automatically locks and unlocks your vehicle.",
+		},
+		{
+			iso = "de-DE",
+			text = "Ver- und entriegelt Ihr Fahrzeug automatisch.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Verrouille et déverrouille automatiquement votre véhicule.",
+		},
+		{
+			iso = "it-IT",
+			text = "Blocca e sblocca automaticamente il tuo veicolo.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Bloqueia e desbloqueia seu veículo automaticamente.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Автоматически запирает и отпирает ваш автомобиль.",
+		},
+		{
+			iso = "es-ES",
+			text = "Bloquea y desbloquea automáticamente su vehículo.",
+		},
+		{
+			iso = "zh-CN",
+			text = "自动锁定和解锁您的车辆。",
+		},
+		{
+			iso = "zh-TW",
+			text = "自動鎖定和解鎖您的車輛。",
+		},
+		{
+			iso = "ja-JP",
+			text = "車両を自動的にロックおよびロック解除します。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Automatyczne blokowanie i odblokowywanie pojazdu.",
+		},
+	},
+	autoraiseroof_tt = {
+		{
+			iso = "en-US",
+			text = "If your vehicle is a convertible, Both Auto-Lock and pressing the lock button will also raise the roof when locking your vehicle.",
+		},
+		{
+			iso = "de-DE",
+			text = "Handelt es sich bei Ihrem Fahrzeug um ein Cabrio, wird beim Verriegeln Ihres Fahrzeugs durch die Funktion „Auto-Lock“ und das Drücken der Verriegelungstaste gleichzeitig das Dach angehoben.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Si votre véhicule est un cabriolet, « Auto-Lock » et le bouton de verrouillage soulèveront également le toit lors du verrouillage de votre véhicule.",
+		},
+		{
+			iso = "it-IT",
+			text = "Se il vostro veicolo è una decappottabile, sia la funzione 'Auto-Lock' sia la pressione del pulsante di bloccaggio solleveranno anche il tetto quando bloccate il veicolo.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Se o seu veículo for um conversível, tanto o 'Auto-Lock' quanto o pressionamento do botão de travamento também levantarão o teto ao trancar o veículo.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Если у вас кабриолет, то и функция «Автоблокировка», и нажатие кнопки блокировки также поднимут крышу при запирании автомобиля.",
+		},
+		{
+			iso = "es-ES",
+			text = "Si su vehículo es convertible, tanto la función 'Auto-Lock' como presionar el botón de bloqueo también levantarán el techo al bloquear su vehículo.",
+		},
+		{
+			iso = "zh-CN",
+			text = "如果您的车是敞篷车，则在锁定车辆时，‘自动锁定’和按下锁定按钮都会升起车顶。",
+		},
+		{
+			iso = "zh-TW",
+			text = "如果您的車輛是敞篷車，「自動鎖定」和按下鎖定按鈕也會在鎖定車輛時升起車頂。",
+		},
+		{
+			iso = "ja-JP",
+			text = "車両がコンバーチブルの場合、「自動ロック」とロック ボタンを押すと、車両をロックするときにルーフも上がります。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Jeśli posiadasz samochód z nadwoziem typu kabriolet, zarówno funkcja 'Auto-Lock', jak i naciśnięcie przycisku blokady spowodują także podniesienie dachu podczas blokowania pojazdu.",
+		},
+	},
 }
