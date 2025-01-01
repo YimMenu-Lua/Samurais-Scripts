@@ -2302,35 +2302,35 @@ Labels = {
 	driftSlider_tt = {
 		{
 			iso = "en-US",
-			text = "0: No Grip (very stiff).\\n1: Balanced (Recommended).\\n2: Weak Drift.\\n3: Weakest Drift.",
+			text = "0: No Grip (very stiff).\n1: Balanced (Recommended).\n2: Weak Drift.\n3: Weakest Drift.",
 		},
 		{
 			iso = "de-DE",
-			text = "0: Kein Grip (sehr steif).\\n1: Ausgewogen (empfohlen).\\n2: Schwacher Drift.\\n3: Schwächster Drift.",
+			text = "0: Kein Grip (sehr steif).\n1: Ausgewogen (empfohlen).\n2: Schwacher Drift.\n3: Schwächster Drift.",
 		},
 		{
 			iso = "fr-FR",
-			text = "0 : Pas d'adhérence (très rigide).\\n1 : Équilibré (recommandé).\\n2 : Dérive faible.\\n3 : Dérive la plus faible.",
+			text = "0 : Pas d'adhérence (très rigide).\n1 : Équilibré (recommandé).\n2 : Dérive faible.\n3 : Dérive la plus faible.",
 		},
 		{
 			iso = "it-IT",
-			text = "0: Nessuna presa (molto rigido).\\n1: Bilanciato (consigliato).\\n2: Drift debole.\\n3: Drift debolissimo.",
+			text = "0: Nessuna presa (molto rigido).\n1: Bilanciato (consigliato).\n2: Drift debole.\n3: Drift debolissimo.",
 		},
 		{
 			iso = "pt-BR",
-			text = "0: Sem aderência (muito rígido).\\n1: Equilibrado (recomendado).\\n2: Drift fraco.\\n3: Drift mais fraco.",
+			text = "0: Sem aderência (muito rígido).\n1: Equilibrado (recomendado).\n2: Drift fraco.\n3: Drift mais fraco.",
 		},
 		{
 			iso = "ru-RU",
-			text = "0: Нет сцепления (очень жесткое).\\n1: Сбалансированное (рекомендуется).\\n2: Слабый дрифт.\\n3: Самый слабый дрифт.",
+			text = "0: Нет сцепления (очень жесткое).\n1: Сбалансированное (рекомендуется).\n2: Слабый дрифт.\n3: Самый слабый дрифт.",
 		},
 		{
 			iso = "es-ES",
-			text = "0: Sin agarre (muy rígido).\\n1: Equilibrado (recomendado).\\n2: Deriva débil.\\n3: Deriva muy débil.",
+			text = "0: Sin agarre (muy rígido).\n1: Equilibrado (recomendado).\n2: Deriva débil.\n3: Deriva muy débil.",
 		},
 		{
 			iso = "zh-CN",
-			text = "0：无抓地力（非常僵硬）。\\n1：平衡（推荐）。\\n2：弱漂移。\\n3：最弱漂移。",
+			text = "0：无抓地力（非常僵硬）。\n1：平衡（推荐）。\n2：弱漂移。\n3：最弱漂移。",
 		},
 		{
 			iso = "zh-TW",
@@ -2338,11 +2338,11 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "0: グリップなし (非常に硬い)。\\n1: バランスが取れている (推奨)。\\n2: ドリフトが弱い。\\n3: 最も弱いドリフト。",
+			text = "0: グリップなし (非常に硬い)。\n1: バランスが取れている (推奨)。\n2: ドリフトが弱い。\n3: 最も弱いドリフト。",
 		},
 		{
 			iso = "pl-PL",
-			text = "0: Brak przyczepności (bardzo sztywny).\\n1: Zrównoważony (zalecany).\\n2: Słaby dryf.\\n3: Najsłabszy dryf.",
+			text = "0: Brak przyczepności (bardzo sztywny).\n1: Zrównoważony (zalecany).\n2: Słaby dryf.\n3: Najsłabszy dryf.",
 		},
 	},
 	driftTiresCB = {
@@ -2532,47 +2532,47 @@ Labels = {
 	DriftGame_tt = {
 		{
 			iso = "en-US",
-			text = "[WIP] Accumulate points for drifting around without crashing. Your points are automatically transformed into cash once you stop drifting and don't crash for 3 seconds.\\n\\nNOTE: The cashout feature is for Signle Player only.",
+			text = "[WIP] Accumulate points for drifting around without crashing. Your points are automatically transformed into cash once you stop drifting and don't crash for 3 seconds.\n\nNOTE: The cashout feature is for Single Player only.",
 		},
 		{
 			iso = "de-DE",
-			text = "[WIP] Sammle Punkte für das Driften, ohne zu crashen. Deine Punkte werden automatisch in Geld umgewandelt, sobald du aufhörst zu driften und 3 Sekunden lang keinen Unfall baust.\\n\\nHinweis: Die Auszahlungsfunktion ist nur für Signle Player.",
+			text = "[WIP] Sammle Punkte für das Driften, ohne zu crashen. Deine Punkte werden automatisch in Geld umgewandelt, sobald du aufhörst zu driften und 3 Sekunden lang keinen Unfall baust.\n\nHinweis: Die Auszahlungsfunktion ist nur für Einzelspieler verfügbar.",
 		},
 		{
 			iso = "fr-FR",
-			text = "[WIP] Accumulez des points en dérivant sans vous écraser. Vos points sont automatiquement transformés en argent dès que vous arrêtez de dériver et que vous ne vous écrasez pas pendant 3 secondes. REMARQUE : la fonction d'encaissement est réservée au joueur Signle.",
+			text = "[WIP] Accumulez des points en dérivant sans vous écraser. Vos points sont automatiquement transformés en argent dès que vous arrêtez de dériver et que vous ne vous écrasez pas pendant 3 secondes. REMARQUE : la fonction d'encaissement est réservée au au mode solo uniquement.",
 		},
 		{
 			iso = "it-IT",
-			text = "[WIP] Accumula punti per andare alla deriva senza schiantarsi. I punti si trasformano automaticamente in denaro quando si smette di derapare e non ci si schianta per 3 secondi.NOTA: la funzione di incasso è riservata al giocatore Signle.",
+			text = "[WIP] Accumula punti per andare alla deriva senza schiantarsi. I punti si trasformano automaticamente in denaro quando si smette di derapare e non ci si schianta per 3 secondi.NOTA: la funzione di incasso è disponibile solo per giocatore singolo.",
 		},
 		{
 			iso = "pt-BR",
-			text = "[WIP] Acumule pontos por andar à deriva sem bater. Seus pontos são automaticamente transformados em dinheiro quando você para de derrapar e não bate por 3 segundos.\\n\\nNOTA: O recurso de saque é apenas para o Signle Player.",
+			text = "[WIP] Acumule pontos por andar à deriva sem bater. Seus pontos são automaticamente transformados em dinheiro quando você para de derrapar e não bate por 3 segundos.\n\nNOTA: O recurso de saque é apenas para um jogador.",
 		},
 		{
 			iso = "ru-RU",
-			text = "[WIP] Накапливайте очки за дрифт без аварий. Очки автоматически превращаются в деньги, как только вы прекращаете дрифтовать и не разбиваетесь в течение 3 секунд.\\n\\nПРИМЕЧАНИЕ: Функция обналичивания денег предназначена только для Signle Player.",
+			text = "[WIP] Накапливайте очки за дрифт без аварий. Очки автоматически превращаются в деньги, как только вы прекращаете дрифтовать и не разбиваетесь в течение 3 секунд.\n\nПРИМЕЧАНИЕ: Функция вывода средств доступна только для одиночной игры.",
 		},
 		{
 			iso = "es-ES",
-			text = "[WIP] Acumula puntos por derrapar sin chocar. Tus puntos se transforman automáticamente en efectivo una vez que dejas de derrapar y no chocas durante 3 segundos.\\n\\nNOTA: La función de cobro de efectivo es solo para jugadores individuales.",
+			text = "[WIP] Acumula puntos por derrapar sin chocar. Tus puntos se transforman automáticamente en efectivo una vez que dejas de derrapar y no chocas durante 3 segundos.\n\nNOTA: La función de retiro es solo para un jugador.",
 		},
 		{
 			iso = "zh-CN",
-			text = "[WIP] 漂移而不撞车可积累积分。一旦您停止漂移并且 3 秒内不撞车，您的积分将自动转换为现金。\\n\\n注意：兑现功能仅适用于单人玩家。",
+			text = "[WIP] 漂移而不撞车可积累积分。一旦您停止漂移并且 3 秒内不撞车，您的积分将自动转换为现金。\n\n注意：兑现功能仅适用于单人游戏。",
 		},
 		{
 			iso = "zh-TW",
-			text = "[WIP] 累積積分以在不崩潰的情況下四處漂流。一旦您停止漂移且 3 秒內不崩潰，您的積分將自動轉換為現金。",
+			text = "[WIP] 累積積分以在不崩潰的情況下四處漂流。一旦您停止漂移且 3 秒內不崩潰，您的積分將自動轉換為現金 \n\n提現功能僅適用於單人遊戲。",
 		},
 		{
 			iso = "ja-JP",
-			text = "[WIP] クラッシュせずにドリフトするとポイントが貯まります。ドリフトをやめて 3 秒間クラッシュしないと、ポイントは自動的にキャッシュに変換されます。\\n\\n注: キャッシュアウト機能はシングル プレイヤー専用です。",
+			text = "[WIP] クラッシュせずにドリフトするとポイントが貯まります。ドリフトをやめて 3 秒間クラッシュしないと、ポイントは自動的にキャッシュに変換されます。\n\n注: キャッシュアウト機能はシングルプレイヤー専用です。",
 		},
 		{
 			iso = "pl-PL",
-			text = "[WIP] Zbieraj punkty za dryfowanie bez rozbijania się. Twoje punkty zostaną automatycznie zamienione na gotówkę, gdy przestaniesz dryfować i nie rozbijesz się przez 3 sekundy.\\n\\nUWAGA: Funkcja wypłaty jest dostępna tylko dla pojedynczego gracza.",
+			text = "[WIP] Zbieraj punkty za dryfowanie bez rozbijania się. Twoje punkty zostaną automatycznie zamienione na gotówkę, gdy przestaniesz dryfować i nie rozbijesz się przez 3 sekundy.\n\nUWAGA: Funkcja wypłaty środków dostępna jest wyłącznie dla jednego gracza.",
 		},
 	},
 	driftInvalidVehTxt = {

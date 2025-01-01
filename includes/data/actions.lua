@@ -226,6 +226,17 @@ animlist = {
   { dict = "anim@arena@celeb@flat@solo@no_props@",                        anim = "flip_a_player_a",                    name = "Backflip",                        flag = 32  , blendin = 2.69, blendout = 2.69, atime = 2000, cat = "Movements" },
 }
 
+animSortbyList = {
+  "All",
+  "Actions",
+  "Activities",
+  "Gestures",
+  "In-Vehicle",
+  "Movements",
+  "MISC",
+  "NSFW",
+}
+
 hijackOptions = {
   { name = "Dance Mode",           dict = "anim@amb@nightclub@mini@dance@dance_solo@shuffle@", anim = "high_center", },
   { name = "Perverts Everywhere!", dict = "switch@trevor@jerking_off",                         anim = "trev_jerking_off_loop", },

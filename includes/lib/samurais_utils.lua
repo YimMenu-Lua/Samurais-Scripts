@@ -4,7 +4,7 @@
 
 -- Must be called from inside a coroutine. Input time is in seconds.
 ---@param s integer
-function sleep(s)
+sleep = function(s)
   local ntime = os.clock() + s
   repeat
     coroutine.yield()
@@ -35,7 +35,7 @@ local logMsg = true
 --
 -- is invalid, it defaults to English (US).
 ---@param g string
-function translateLabel(g)
+translateLabel = function(g)
   ---@type string
   local retStr
   if Labels[g] then
@@ -79,7 +79,9 @@ end
 -- of calling `translateLabel()` inside the
 --
 -- GUI loop like a god damn retard.
-function initStrings()
+--
+-- PS: This is also bad so my logic is still retarded. Shocker!
+initStrings = function()
   -- Generic
   GENERIC_PLAY_BTN_          = translateLabel("generic_play_btn")
   GENERIC_STOP_BTN_          = translateLabel("generic_stop_btn")
@@ -95,7 +97,7 @@ function initStrings()
   GENERIC_CANCEL_BTN_        = translateLabel("generic_cancel_btn")
   GENERIC_DETACH_BTN_        = translateLabel("detachBtn")
   GENERIC_YES_               = translateLabel("yes")
-  GENERIC_NO_                = translateLabel("NO")
+  GENERIC_NO_                = translateLabel("no")
   GENERIC_SEARCH_HINT_       = translateLabel("search_hint")
   GENERIC_VEH_DELETE_ERROR_  = translateLabel("generic_veh_delete_fail")
   GENERIC_MULTIPLIER_LABEL_  = translateLabel("generic_multiplier_label")
@@ -404,6 +406,215 @@ function initStrings()
   log.info(string.format("Loaded %d %s translations.", Lua_fn.getTableLength(Labels), current_lang))
 end
 
+---@param musicSwitch string
+---@param station? string
+play_music = function(musicSwitch, station)
+  script.run_in_fiber(function(mp)
+    if musicSwitch == "start" then
+      local myPos       = self.get_pos()
+      local bone_idx    = PED.GET_PED_BONE_INDEX(self.get_ped(), 24818)
+      local pbus_model  = 345756458
+      local dummy_model = 0xE75B4B1C
+      if Game.requestModel(pbus_model) then
+        pBus = VEHICLE.CREATE_VEHICLE(pbus_model, myPos.x, myPos.y, (myPos.z - 30), 0, true, false, false)
+        ENTITY.SET_ENTITY_VISIBLE(pbus, false, false)
+        ENTITY.SET_ENTITY_ALPHA(pBus, 0.0, false)
+        ENTITY.FREEZE_ENTITY_POSITION(pBus, true)
+        ENTITY.SET_ENTITY_COLLISION(pBus, false, false)
+        ENTITY.SET_ENTITY_INVINCIBLE(pBus, true)
+        VEHICLE.SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(pBus, false, false)
+      end
+      mp:sleep(500)
+      if ENTITY.DOES_ENTITY_EXIST(pBus) then
+        entities.take_control_of(pBus, 300)
+        if Game.requestModel(dummy_model) then
+          dummyDriver = PED.CREATE_PED(4, dummy_model, myPos.x, myPos.y, (myPos.z + 40), 0, true, false)
+          if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
+            entities.take_control_of(dummyDriver, 300)
+            ENTITY.SET_ENTITY_ALPHA(dummyDriver, 0.0, false)
+            PED.SET_PED_INTO_VEHICLE(dummyDriver, pBus, -1)
+            PED.SET_PED_CONFIG_FLAG(dummyDriver, 402, true)
+            PED.SET_PED_CONFIG_FLAG(dummyDriver, 398, true)
+            PED.SET_PED_CONFIG_FLAG(dummyDriver, 167, true)
+            PED.SET_PED_CONFIG_FLAG(dummyDriver, 251, true)
+            PED.SET_PED_CONFIG_FLAG(dummyDriver, 255, true)
+            PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(dummyDriver, true)
+            AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(pBus, vehicles.get_vehicle_display_name(2765724541))
+            VEHICLE.SET_VEHICLE_ENGINE_ON(pBus, true, false, false)
+            AUDIO.SET_VEHICLE_RADIO_LOUD(pBus, true)
+            VEHICLE.SET_VEHICLE_LIGHTS(pBus, 1)
+            mp:sleep(500)
+            if station ~= nil then
+              AUDIO.SET_VEH_RADIO_STATION(pBus, station)
+            end
+            mp:sleep(500)
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(pBus, self.get_ped(), bone_idx, -14.0, -1.3, -1.0, 0.0, 90.0, -90.0, false,
+              true,
+              false, true, 1, true, 1)
+          else
+            gui.show_error("Samurais Scripts", "Failed to start music!")
+            return
+          end
+        end
+      else
+        gui.show_error("Samurais Scripts", "Failed to start music!")
+        return
+      end
+    elseif musicSwitch == "stop" then
+      if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
+        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(dummyDriver, true, true)
+        mp:sleep(200)
+        ENTITY.DELETE_ENTITY(dummyDriver)
+        dummyDriver = 0
+      end
+      if ENTITY.DOES_ENTITY_EXIST(pBus) then
+        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(pBus, true, true)
+        mp:sleep(200)
+        ENTITY.DELETE_ENTITY(pBus)
+        pBus = 0
+      end
+    end
+  end)
+end
+
+dummyCop = function()
+  script.run_in_fiber(function(dcop)
+    if current_vehicle ~= nil and current_vehicle ~= 0 then
+      local polhash, veh_bone1, veh_bone2, attach_mode
+      if is_car then
+        if VEHICLE.DOES_VEHICLE_HAVE_ROOF(current_vehicle) and not VEHICLE.IS_VEHICLE_A_CONVERTIBLE(current_vehicle, false) then
+          polhash, veh_bone1, veh_bone2, attach_mode = 0xD1E0B7D7, "interiorlight", "interiorlight", 1
+        else
+          polhash, veh_bone1, veh_bone2, attach_mode = 0xD1E0B7D7, "interiorlight", "dashglow", 2
+        end
+      elseif is_bike or is_quad then
+        polhash, veh_bone1, veh_bone2, attach_mode = 0xFDEFAEC3, "chassis_dummy", "chassis_dummy", 1
+      else
+        gui.show_error("Samurais Scripts", "Can not equip a fake siren on this vehicle.")
+      end
+      if Game.requestModel(polhash) then
+        dummyCopCar = VEHICLE.CREATE_VEHICLE(polhash, 0.0, 0.0, 0.0, 0, true, false, false)
+      end
+      if ENTITY.DOES_ENTITY_EXIST(dummyCopCar) then
+        if entities.take_control_of(dummyCopCar, 300) then
+          ENTITY.SET_ENTITY_COLLISION(dummyCopCar, false, false)
+          VEHICLE.SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(dummyCopCar, false, false)
+          VEHICLE.SET_VEHICLE_UNDRIVEABLE(dummyCopCar, true)
+          ENTITY.SET_ENTITY_ALPHA(dummyCopCar, 49.0, false)
+          ENTITY.SET_ENTITY_INVINCIBLE(dummyCopCar, true)
+          local boneidx1 = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(dummyCopCar, veh_bone1)
+          local boneidx2 = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, veh_bone2)
+          VEHICLE.SET_VEHICLE_LIGHTS(dummyCopCar, 1)
+          ENTITY.SET_ENTITY_HEADING(dummyCopCar, ENTITY.GET_ENTITY_HEADING(current_vehicle))
+          if attach_mode == 1 then
+            ENTITY.ATTACH_ENTITY_BONE_TO_ENTITY_BONE(dummyCopCar, current_vehicle, boneidx1, boneidx2, false, true)
+          else
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(dummyCopCar, current_vehicle, boneidx2, 0.46, 0.4, -0.9, 0.0, 0.0, 0.0, false,
+              true,
+              false, true, 1, true, 1)
+          end
+          dcop:sleep(500)
+          VEHICLE.SET_VEHICLE_SIREN(dummyCopCar, true)
+          VEHICLE.SET_VEHICLE_HAS_MUTED_SIRENS(dummyCopCar, false)
+          AUDIO.TRIGGER_SIREN_AUDIO(dummyCopCar)
+          VEHICLE.SET_VEHICLE_ACT_AS_IF_HAS_SIREN_ON(current_vehicle, true)
+          VEHICLE.SET_VEHICLE_CAUSES_SWERVING(current_vehicle, true)
+          VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 0, true)
+          VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 1, true)
+        end
+      end
+    end
+  end)
+end
+
+showDriftCounter = function(text)
+  wolrdPos = self.get_pos()
+  local _, screenX, screenY = HUD.GET_HUD_SCREEN_POSITION_FROM_WORLD_POSITION(wolrdPos.x, wolrdPos.y, wolrdPos.z, screenX,
+    screenY)
+  HUD.BEGIN_TEXT_COMMAND_DISPLAY_TEXT("TWOSTRINGS")
+  HUD.SET_TEXT_COLOUR(255, 192, 0, 200)
+  HUD.SET_TEXT_SCALE(1, 0.7)
+  HUD.SET_TEXT_OUTLINE()
+  HUD.SET_TEXT_FONT(7)
+  HUD.SET_TEXT_CENTRE(true)
+  HUD.SET_TEXT_DROP_SHADOW()
+  HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text)
+  HUD.END_TEXT_COMMAND_DISPLAY_TEXT(screenX, (screenY - 0.6), 0)
+end
+
+showDriftExtra = function(text)
+  wolrdPos = self.get_pos()
+  local _, screenX, screenY = HUD.GET_HUD_SCREEN_POSITION_FROM_WORLD_POSITION(wolrdPos.x, wolrdPos.y, wolrdPos.z, screenX,
+    screenY)
+  HUD.BEGIN_TEXT_COMMAND_DISPLAY_TEXT("TWOSTRINGS")
+  HUD.SET_TEXT_COLOUR(255, 192, 0, 200)
+  HUD.SET_TEXT_SCALE(1, 0.4)
+  HUD.SET_TEXT_OUTLINE()
+  HUD.SET_TEXT_FONT(7)
+  HUD.SET_TEXT_CENTRE(true)
+  HUD.SET_TEXT_DROP_SHADOW()
+  HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text)
+  HUD.END_TEXT_COMMAND_DISPLAY_TEXT(screenX, (screenY - 0.5142), 0)
+end
+
+checkVehicleCollision = function()
+  if ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) then
+    local entity = ENTITY.GET_LAST_ENTITY_HIT_BY_ENTITY_(current_vehicle)
+    if entity ~= nil and entity ~= 0 and ENTITY.DOES_ENTITY_EXIST(entity) then
+      local entity_type = SS.getEntityType(entity)
+      if entity_type == 6 then
+        return false, "Hit and run"
+      elseif entity_type == 5 or entity_type == 157 then
+        return true, "Samir, you're breaking the car!"
+      elseif entity_type == 1 or entity_type == 33 or entity_type == 7 then
+        if ENTITY.DOES_ENTITY_HAVE_PHYSICS(entity) then
+          local model = ENTITY.GET_ENTITY_MODEL(entity)
+          for _, m in ipairs(collision_invalid_models) do
+            if model == m then
+              return true, "Samir, you're breaking the car!"
+            end
+          end
+          return false, "Wrecking ball"
+        else
+          return true, "Samir, you're breaking the car!"
+        end
+      end
+    else
+      return true, "Samir, you're breaking the car!"
+    end
+  end
+  return false, ""
+end
+
+bankDriftPoints_SP = function(points)
+  local chars_T <const> = {
+    { hash = 225514697,  int = 0 },
+    { hash = 2602752943, int = 1 },
+    { hash = 2608926626, int = 2 },
+  }
+  script.run_in_fiber(function()
+    for _, v in ipairs(chars_T) do
+      if ENTITY.GET_ENTITY_MODEL(self.get_ped()) == v.hash then
+        stats.set_int("SP" .. tostring(v.int) .. "_TOTAL_CASH",
+          stats.get_int("SP" .. tostring(v.int) .. "_TOTAL_CASH") + points)
+        AUDIO.PLAY_SOUND_FRONTEND(-1, "LOCAL_PLYR_CASH_COUNTER_INCREASE", "DLC_HEISTS_GENERAL_FRONTEND_SOUNDS", true)
+      end
+    end
+  end)
+end
+
+standUp = function()
+  if is_sitting then
+    ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
+    TASK.CLEAR_PED_TASKS(self.get_ped())
+    if ENTITY.DOES_ENTITY_EXIST(thisSeat) then
+      ENTITY.FREEZE_ENTITY_POSITION(thisSeat, false)
+      thisSeat = 0
+    end
+    is_sitting = false
+  end
+end
+
 ---@param level integer
 doWantedStars = function(level)
   local stars = ""
@@ -453,14 +664,883 @@ spawnPervert = function(playerPed, playerName)
   end
 end
 
-function Disable_E()
+Disable_E = function()
   PAD.DISABLE_CONTROL_ACTION(0, 38, true)
   PAD.DISABLE_CONTROL_ACTION(0, 46, true)
   PAD.DISABLE_CONTROL_ACTION(0, 51, true)
   PAD.DISABLE_CONTROL_ACTION(0, 206, true)
 end
---#endregion
 
+updatefilteredAnims = function()
+  filteredAnims = {}
+  for _, anim in ipairs(animlist) do
+    if anim_sortby_idx == 0 then
+      if string.find(string.lower(anim.name), string.lower(actions_search)) then
+        table.insert(filteredAnims, anim)
+      end
+    else
+      if anim.cat == animSortbyList[anim_sortby_idx + 1] then
+        if string.find(string.lower(anim.name), string.lower(actions_search)) then
+          table.insert(filteredAnims, anim)
+        end
+      end
+    end
+  end
+  table.sort(animlist, function(a, b)
+    return a.name < b.name
+  end)
+end
+
+displayFilteredAnims = function()
+  updatefilteredAnims()
+  local animNames = {}
+  for _, anim in ipairs(filteredAnims) do
+    table.insert(animNames, anim.name)
+  end
+  anim_index, used = ImGui.ListBox("##animlistbox", anim_index, animNames, #filteredAnims)
+end
+
+updatefilteredScenarios = function()
+  filteredScenarios = {}
+  for _, scene in ipairs(ped_scenarios) do
+    if string.find(string.lower(scene.name), string.lower(actions_search)) then
+      table.insert(filteredScenarios, scene)
+    end
+  end
+end
+
+displayFilteredScenarios = function()
+  updatefilteredScenarios()
+  local scenarioNames = {}
+  for _, scene in ipairs(filteredScenarios) do
+    table.insert(scenarioNames, scene.name)
+  end
+  scenario_index, used = ImGui.ListBox("##scenarioList", scenario_index, scenarioNames, #filteredScenarios)
+end
+
+updateRecentlyPlayed = function()
+  filteredRecents = {}
+  for _, v in ipairs(recently_played_a) do
+    if string.find(string.lower(v.name), string.lower(actions_search)) then
+      table.insert(filteredRecents, v)
+    end
+  end
+end
+
+displayRecentlyPlayed = function()
+  updateRecentlyPlayed()
+  local recentNames = {}
+  for _, v in ipairs(filteredRecents) do
+    local recentName = v.name
+    if v.dict ~= nil then
+      recentName = string.format("[Animation]  %s", recentName)
+    elseif v.scenario ~= nil then
+      recentName = string.format("[Scenario]    %s", recentName)
+    end
+    table.insert(recentNames, recentName)
+  end
+  recents_index, used = ImGui.ListBox("##recentsList", recents_index, recentNames, #filteredRecents)
+end
+
+updateFavoriteActions = function()
+  filteredFavs = {}
+  for _, v in ipairs(favorite_actions) do
+    if string.find(string.lower(v.name), string.lower(actions_search)) then
+      table.insert(filteredFavs, v)
+    end
+  end
+end
+
+displayFavoriteActions = function()
+  updateFavoriteActions()
+  local favNames = {}
+  for _, v in ipairs(filteredFavs) do
+    local favName = v.name
+    if v.dict ~= nil then
+      favName = string.format("[Animation]  %s", favName)
+    elseif v.scenario ~= nil then
+      favName = string.format("[Scenario]    %s", favName)
+    end
+    table.insert(favNames, favName)
+  end
+  fav_actions_index, used = ImGui.ListBox("##favsList", fav_actions_index, favNames, #filteredFavs)
+end
+
+decodeJsonMvmts = function()
+  if io.exists("movementClipsetsCompact.json") then
+    local jsonFile = io.open("movementClipsetsCompact.json", "r")
+    if jsonFile then
+      local content = jsonFile:read("*all")
+      if not content or #content == 0 then
+        gui.show_error("Samurai's Scripts", "Failed to read Json data. The file is either empty or corrupted!")
+        jsonMvmt = false
+        return
+      end
+      jsonFile:flush()
+      jsonFile:close()
+      return CFG:decode(content, nil, false)
+    end
+  end
+end
+
+displayMvmts = function()
+  mvmtNames = {}
+  if jsonMvmt then
+    if not jsonMvmts_t or #jsonMvmts_t == 0 then
+      jsonMvmts_t = decodeJsonMvmts()
+    else
+      ---@diagnostic disable-next-line
+      for _, v in ipairs(jsonMvmts_t) do
+        if string.find((v.Name):lower(), jsonMvmtSearch:lower()) then
+          table.insert(mvmtNames, v)
+        end
+      end
+      ImGui.SetNextItemWidth(380)
+      jsonMvmtSearch, typed = ImGui.InputTextWithHint("##mvmtsearch", "Search", jsonMvmtSearch, 128)
+      is_typing = ImGui.IsItemActive()
+      if ImGui.BeginListBox("##jsonmvmtNames", 400, 100) then
+        for i = 1, #mvmtNames do
+          local is_selected = (mvmt_index == i)
+          if ImGui.Selectable(mvmtNames[i].Name, is_selected) then
+            mvmt_index = i
+          end
+          if UI.isItemClicked("lmb") then
+            SS.setMovement(mvmtNames[i], true)
+          end
+        end
+        ImGui.EndListBox()
+      end
+    end
+  else
+    for _, v in ipairs(movement_options_t) do
+      table.insert(mvmtNames, v.name)
+    end
+    ImGui.SetNextItemWidth(220)
+    mvmt_index, mvmtSelected = ImGui.Combo("##mvmt", mvmt_index, mvmtNames, #movement_options_t)
+    if mvmtSelected then
+      SS.setMovement(movement_options_t[mvmt_index + 1], false)
+    end
+  end
+end
+
+updateNpcs = function()
+  filteredNpcs = {}
+  for _, npc in ipairs(npcList) do
+    table.insert(filteredNpcs, npc)
+  end
+  table.sort(filteredNpcs, function(a, b)
+    return a.name < b.name
+  end)
+end
+
+displayNpcs = function()
+  updateNpcs()
+  local npcNames = {}
+  for _, npc in ipairs(filteredNpcs) do
+    table.insert(npcNames, npc.name)
+  end
+  npc_index, used = ImGui.Combo("##npcList", npc_index, npcNames, #filteredNpcs)
+end
+
+---@return number
+setAnimFlags = function()
+  local flag_loop      = Lua_fn.condReturn(looped, AF._LOOPING, 0)
+  local flag_freeze    = Lua_fn.condReturn(freeze, AF._HOLD_LAST_FRAME, 0)
+  local flag_upperbody = Lua_fn.condReturn(upperbody, AF._UPPERBODY, 0)
+  local flag_control   = Lua_fn.condReturn(controllable, AF._SECONDARY, 0)
+  local flag_collision = Lua_fn.condReturn(noCollision, AF._TURN_OFF_COLLISION, 0)
+  local flag_killOnEnd = Lua_fn.condReturn(killOnEnd, AF._ENDS_IN_DEAD_POSE, 0)
+  return sum(flag_loop, flag_freeze, flag_upperbody, flag_control, flag_collision, flag_killOnEnd)
+end
+
+onAnimInterrupt = function()
+  if is_playing_anim and Game.Self.isAlive() and not SS.isKeyJustPressed(keybinds.stop_anim.code)
+      and not ENTITY.IS_ENTITY_PLAYING_ANIM(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, 3) then
+    if Game.requestAnimDict(curr_playing_anim.dict) then
+      local curr_flag = manualFlags and anim_flag or curr_playing_anim.flag
+      TASK.CLEAR_PED_TASKS(self.get_ped())
+      TASK.TASK_PLAY_ANIM(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, 4.0, -4.0, -1,
+        curr_flag, 1.0, false, false, false)
+    end
+  end
+end
+
+displayMaleSounds = function()
+  filteredMaleSounds = {}
+  for _, v in ipairs(male_sounds_T) do
+    table.insert(filteredMaleSounds, v.name)
+  end
+  sound_index1, used = ImGui.Combo("##maleSounds", sound_index1, filteredMaleSounds, #male_sounds_T)
+end
+
+displayFemaleSounds = function()
+  filteredFemaleSounds = {}
+  for _, v in ipairs(female_sounds_T) do
+    table.insert(filteredFemaleSounds, v.name)
+  end
+  sound_index2, used = ImGui.Combo("##femaleSounds", sound_index2, filteredFemaleSounds, #female_sounds_T)
+end
+
+displayRadioStations = function()
+  filteredRadios = {}
+  for _, v in ipairs(radio_stations) do
+    table.insert(filteredRadios, v.name)
+  end
+  radio_index, used = ImGui.Combo("##radioStations", radio_index, filteredRadios, #radio_stations)
+end
+
+filterVehNames = function()
+  filteredNames = {}
+  for _, veh in ipairs(gta_vehicles_T) do
+    if VEHICLE.IS_THIS_MODEL_A_CAR(joaat(veh)) or VEHICLE.IS_THIS_MODEL_A_BIKE(joaat(veh)) or VEHICLE.IS_THIS_MODEL_A_QUADBIKE(joaat(veh)) then
+      valid_veh = veh
+      if string.find(valid_veh:lower(), search_term:lower()) then
+        table.insert(filteredNames, valid_veh)
+      end
+    end
+  end
+end
+
+displayVehNames = function()
+  filterVehNames()
+  local vehNames = {}
+  for _, veh in ipairs(filteredNames) do
+    local vehName = vehicles.get_vehicle_display_name(joaat(veh))
+    if string.find(string.lower(veh), "drift") then
+      vehName = string.format("%s  (Drift)", vehName)
+    end
+    table.insert(vehNames, vehName)
+  end
+  vehSound_index, used = ImGui.ListBox("##Vehicle Names", vehSound_index, vehNames, #filteredNames)
+end
+
+resetLastVehState = function()
+  if last_vehicle > 0 and ENTITY.DOES_ENTITY_EXIST(last_vehicle)
+      and ENTITY.IS_ENTITY_A_VEHICLE(last_vehicle) then
+    AUDIO.SET_VEHICLE_RADIO_LOUD(last_vehicle, false)
+    if not has_custom_tires then
+      VEHICLE.TOGGLE_VEHICLE_MOD(current_vehicle, 20, false)
+    end
+    if default_tire_smoke.r ~= driftSmoke_T.r or default_tire_smoke.g ~= driftSmoke_T.g or default_tire_smoke.b ~= driftSmoke_T.b then
+      VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, default_tire_smoke.r, default_tire_smoke.g,
+        default_tire_smoke.b)
+    end
+    if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(last_vehicle)) and (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(last_vehicle) ~= 1) then
+      VEHICLE.SET_VEHICLE_DOORS_LOCKED(last_vehicle, 1)
+    end
+  end
+  loud_radio_enabled = false
+  last_vehicle       = current_vehicle
+end
+
+onVehEnter = function()
+  current_vehicle = self.get_veh()
+  if Game.Self.isDriving() and (is_car or is_bike or is_quad)
+      and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
+    engine_brake_disabled  = SS.getHandlingFlagState(HF._FREEWHEEL_NO_GAS)
+    traction_ctrl_disabled = SS.getHandlingFlagState(HF._FORCE_NO_TC_OR_SC)
+    kers_boost_enabled     = SS.getHandlingFlagState(HF._HAS_KERS)
+    offroader_enabled      = SS.getHandlingFlagState(HF._OFFROAD_ABILITIES_X2)
+    rally_tires_enabled    = SS.getHandlingFlagState(HF._HAS_RALLY_TYRES)
+    easy_wheelie_enabled   = SS.getHandlingFlagState(HF._LOW_SPEED_WHEELIES)
+  end
+  if Game.Self.isDriving() and current_vehicle ~= last_vehicle then
+    resetLastVehState()
+  end
+  return current_vehicle
+end
+
+shoot_flares = function(s)
+  if Game.requestWeaponAsset(0x47757124) then
+    for _, bone in pairs(plane_bones_T) do
+      local bone_idx  = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(self.get_veh(), bone)
+      local jet_fwd_X = ENTITY.GET_ENTITY_FORWARD_X(self.get_veh())
+      local jet_fwd_Y = ENTITY.GET_ENTITY_FORWARD_Y(self.get_veh())
+      if bone_idx ~= -1 then
+        local bone_pos = ENTITY.GET_ENTITY_BONE_POSTION(self.get_veh(), bone_idx)
+        MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
+          ((bone_pos.x + 0.01) + (jet_fwd_X / 1.13)), ((bone_pos.y + 0.01) + jet_fwd_Y / 1.13), bone_pos.z,
+          ((bone_pos.x - 0.01) - (jet_fwd_X / 1.13)), ((bone_pos.y - 0.01) - jet_fwd_Y / 1.13), bone_pos.z + 0.06,
+          1.0, false, 0x47757124, self.get_ped(), true, false, 100.0
+        )
+        AUDIO.PLAY_SOUND_FRONTEND(-1, "HIT_OUT", "PLAYER_SWITCH_CUSTOM_SOUNDSET", true)
+        s:sleep(250)
+      end
+    end
+  end
+end
+
+sortCustomPaints = function()
+  filteredPaints = {}
+  for _, v in ipairs(custom_paints_T) do
+    if paints_sortby_switch == 0 then
+      if paints_col_sort_idx == 0 then
+        if string.find((v.name):lower(), custom_paints_sq:lower()) then
+          table.insert(filteredPaints, v)
+        end
+      else
+        if v.shade == paints_sortByColors[paints_col_sort_idx + 1] then
+          if string.find((v.name):lower(), custom_paints_sq:lower()) then
+            table.insert(filteredPaints, v)
+          end
+        end
+      end
+    elseif paints_sortby_switch == 1 then
+      if paints_mfr_sort_idx == 0 then
+        if string.find((v.name):lower(), custom_paints_sq:lower()) then
+          table.insert(filteredPaints, v)
+        end
+      else
+        if v.manufacturer == paints_sortByMfrs[paints_mfr_sort_idx + 1] then
+          if string.find((v.name):lower(), custom_paints_sq:lower()) then
+            table.insert(filteredPaints, v)
+          end
+        end
+      end
+    end
+  end
+  table.sort(filteredPaints, function(a, b)
+    return a.name < b.name
+  end)
+end
+
+displayCustomPaints = function()
+  sortCustomPaints()
+  local customPaintNames = {}
+  for _, v in ipairs(filteredPaints) do
+    table.insert(customPaintNames, v.name)
+  end
+  custom_paint_index, isChanged = ImGui.ListBox("##customPaintsList", custom_paint_index, customPaintNames,
+    #filteredPaints)
+end
+
+showPaintsCount = function()
+  if filteredPaints ~= nil then
+    ImGui.Text(string.format("[ %d ]", #filteredPaints))
+  else
+    ImGui.Text("[ 0 ]")
+  end
+end
+
+listVehicles = function()
+  vehicle_list   = {}
+  local this_veh = {}
+  for _, veh in ipairs(gta_vehicles_T) do
+    local vehicle_hash = joaat(veh)
+    local displayName  = vehicles.get_vehicle_display_name(veh)
+    this_veh           = { hash = vehicle_hash, name = displayName }
+    table.insert(vehicle_list, this_veh)
+  end
+end
+
+updatefilteredVehicles = function()
+  listVehicles()
+  filtered_vehicles = {}
+  for _, veh in ipairs(vehicle_list) do
+    if string.find(string.lower(veh.name), vCreator_searchQ:lower()) then
+      table.insert(filtered_vehicles, veh)
+    end
+  end
+  table.sort(filtered_vehicles, function(a, b)
+    return a.name < b.name
+  end)
+end
+
+displayFilteredList = function()
+  updatefilteredVehicles()
+  vehicle_names = {}
+  for _, veh in ipairs(filtered_vehicles) do
+    local displayName = veh.name
+    if string.find(string.lower(displayName), "drift") then
+      displayName = string.format("%s  (Drift)", displayName)
+    end
+    table.insert(vehicle_names, displayName)
+  end
+  vehicle_index, _ = ImGui.ListBox("##vehList", vehicle_index, vehicle_names, #filtered_vehicles)
+end
+
+showAttachedVehicles = function()
+  attachment_names = {}
+  for _, veh in pairs(veh_attachments) do
+    table.insert(attachment_names, veh.name)
+  end
+  attachment_index, _ = ImGui.Combo("##attached_vehs", attachment_index, attachment_names, #veh_attachments)
+end
+
+filterSavedVehicles = function()
+  filteredCreations = {}
+  if saved_vehicles[1] ~= nil then
+    for _, t in pairs(saved_vehicles) do
+      table.insert(filteredCreations, t)
+    end
+  end
+end
+
+showSavedVehicles = function()
+  filterSavedVehicles()
+  for _, veh in pairs(filteredCreations) do
+    table.insert(persist_names, veh.name)
+  end
+  persist_index, _ = ImGui.ListBox("##persist_vehs", persist_index, persist_names, #filteredCreations)
+end
+
+appendVehicleMods = function(v, t)
+  script.run_in_fiber(function()
+    for i = 0, 49 do
+      table.insert(t, VEHICLE.GET_VEHICLE_MOD(v, i))
+    end
+  end)
+end
+
+setVehicleMods = function(v, t)
+  script.run_in_fiber(function()
+    VEHICLE.SET_VEHICLE_MOD_KIT(v, 0)
+    for slot, mod in pairs(t) do
+      VEHICLE.SET_VEHICLE_MOD(v, (slot - 1), mod, true)
+    end
+  end)
+end
+
+---@param main integer
+---@param mods table
+---@param col_1 table
+---@param col_2 table
+---@param attachments table
+spawnPersistVeh = function(main, mods, col_1, col_2, tint, attachments)
+  script.run_in_fiber(function()
+    local Pos      = self.get_pos()
+    local forwardX = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
+    local forwardY = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+    local heading  = ENTITY.GET_ENTITY_HEADING(self.get_ped())
+    if Game.requestModel(main) then
+      spawned_persist = VEHICLE.CREATE_VEHICLE(main, Pos.x + (forwardX * 7), Pos.y + (forwardY * 7), Pos.z, heading, true,
+        false, false)
+      VEHICLE.SET_VEHICLE_IS_STOLEN(spawned_persist, false)
+      DECORATOR.DECOR_SET_INT(spawned_persist, "MPBitset", 0)
+      VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(spawned_persist, col_1.r, col_1.g, col_1.b)
+      VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(spawned_persist, col_2.r, col_2.g, col_2.b)
+      setVehicleMods(spawned_persist, mods)
+      VEHICLE.SET_VEHICLE_WINDOW_TINT(spawned_persist, tint)
+    end
+    for _, att in ipairs(attachments) do
+      if Game.requestModel(att.hash) then
+        local attach = VEHICLE.CREATE_VEHICLE(att.hash, Pos.x + (forwardX * 7), Pos.y + (forwardY * 7), Pos.z, heading,
+          true, false, false)
+        VEHICLE.SET_VEHICLE_IS_STOLEN(attach, false)
+        DECORATOR.DECOR_SET_INT(attach, "MPBitset", 0)
+        VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(attach, att.color_1.r, att.color_1.g, att.color_1.b)
+        VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(attach, att.color_2.r, att.color_2.g, att.color_2.b)
+        setVehicleMods(attach, att.mods)
+        VEHICLE.SET_VEHICLE_WINDOW_TINT(attach, att.tint)
+        if ENTITY.DOES_ENTITY_EXIST(spawned_persist) and ENTITY.DOES_ENTITY_EXIST(attach) then
+          local Bone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(spawned_persist, "chassis_dummy")
+          ENTITY.ATTACH_ENTITY_TO_ENTITY(attach, spawned_persist, Bone, att.posx, att.posy, att.posz, att.rotx, att.roty,
+            att.rotz, false, false, false, false, 2, true, 1)
+        end
+      end
+    end
+  end)
+end
+
+createWideBodyCivic = function()
+  vehicle_creation = {
+    name = "Widebody Civic",
+    main_veh = 1074745671,
+    mods = {},
+    color_1 = { r = 0, g = 0, b = 0 },
+    color_2 = { r = 0, g = 0, b = 0 },
+    tint = 1,
+    attachments = {
+      {
+        entity = 0,
+        hash = 987469656,
+        posx = 0.0,
+        posy = -0.075,
+        posz = 0.076,
+        rotx = 0.0,
+        roty = 0.0,
+        rotz = 0.0,
+        mods = { 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 3, 2, 2, -1, 4, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        color_1 = { r = 0, g = 0, b = 0 },
+        color_2 = { r = 0, g = 0, b = 0 },
+        tint = 1,
+      }
+    }
+  }
+  table.insert(saved_vehicles, vehicle_creation)
+  CFG.save("saved_vehicles", saved_vehicles)
+  vehicle_creation = {}
+end
+
+resetOnSave = function()
+  vehicleName       = ""
+  creation_name     = ""
+  main_vehicle_name = ""
+  veh_axisMult      = 1
+  vehicle_index     = 0
+  persist_index     = 0
+  spawned_veh_index = 0
+  vehicleHash       = 0
+  spawned_vehicle   = 0
+  main_vehicle      = 0
+  attachment_index  = 0
+  selected_attchmnt = 0
+  veh_attach_X      = 0.0
+  veh_attach_Y      = 0.0
+  veh_attach_Z      = 0.0
+  veh_attach_RX     = 0.0
+  veh_attach_RY     = 0.0
+  veh_attach_RZ     = 0.0
+  spawned_vehicles  = {}
+  spawned_vehNames  = {}
+  filteredVehNames  = {}
+  persist_names     = {}
+  veh_attachments   = {}
+  attachment_names  = {}
+  attached_vehicles = {}
+  vehicle_creation  = { name = "", main_veh = 0, mods = {}, color_1 = { r = 0, g = 0, b = 0 }, color_2 = { r = 0, g = 0, b = 0 }, tint = 0, attachments = {} }
+end
+
+set_poker_cards = function(player_id, players_current_table, card_one, card_two, card_three)
+  locals.set_int("three_card_poker",
+    (three_card_poker_cards) + (three_card_poker_current_deck) +
+    (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (1) + (player_id * 3), card_one)
+  locals.set_int("three_card_poker",
+    (three_card_poker_anti_cheat) + (three_card_poker_anti_cheat_deck) + (1) +
+    (1 + (players_current_table * three_card_poker_deck_size)) + (1) + (player_id * 3), card_one)
+  locals.set_int("three_card_poker",
+    (three_card_poker_cards) + (three_card_poker_current_deck) +
+    (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (2) + (player_id * 3), card_two)
+  locals.set_int("three_card_poker",
+    (three_card_poker_anti_cheat) + (three_card_poker_anti_cheat_deck) + (1) +
+    (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (player_id * 3), card_two)
+  locals.set_int("three_card_poker",
+    (three_card_poker_cards) + (three_card_poker_current_deck) +
+    (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (3) + (player_id * 3), card_three)
+  locals.set_int("three_card_poker",
+    (three_card_poker_anti_cheat) + (three_card_poker_anti_cheat_deck) + (1) +
+    (1 + (players_current_table * three_card_poker_deck_size)) + (3) + (player_id * 3), card_three)
+end
+
+get_cardname_from_index = function(card_index)
+  if card_index == 0 then
+    return "Rolling"
+  end
+
+  local card_number = math.fmod(card_index, 13)
+  local cardName = ""
+  local cardSuit = ""
+
+  if card_number == 1 then
+    cardName = "Ace"
+  elseif card_number == 11 then
+    cardName = "Jack"
+  elseif card_number == 12 then
+    cardName = "Queen"
+  elseif card_number == 0 then
+    cardName = "King"
+  else
+    cardName = tostring(card_number)
+  end
+
+  if card_index >= 1 and card_index <= 13 then
+    cardSuit = "Clubs"
+  elseif card_index >= 14 and card_index <= 26 then
+    cardSuit = "Diamonds"
+  elseif card_index >= 27 and card_index <= 39 then
+    cardSuit = "Hearts"
+  elseif card_index >= 40 and card_index <= 52 then
+    cardSuit = "Spades"
+  end
+
+  return string.format("%s of %s", cardName, cardSuit)
+end
+
+function playHandsUp()
+  script.run_in_fiber(function()
+    if Game.requestAnimDict("mp_missheist_countrybank@lift_hands") then
+      TASK.TASK_PLAY_ANIM(self.get_ped(), "mp_missheist_countrybank@lift_hands", "lift_hands_in_air_outro", 4.0, -4.0, -1,
+        50, 1.0, false, false, false)
+    end
+  end)
+end
+
+attachPed = function(ped)
+  local myBone = PED.GET_PED_BONE_INDEX(self.get_ped(), 6286)
+  script.run_in_fiber(function(ap)
+    if not ped_grabbed and not PED.IS_PED_A_PLAYER(ped) then
+      if entities.take_control_of(ped, 300) then
+        if is_handsUp then
+          TASK.CLEAR_PED_TASKS(self.get_ped())
+          is_handsUp = false
+        end
+        if is_playing_anim then
+          if anim_music then
+            play_music("stop")
+            anim_music = false
+          end
+          cleanup(ap)
+          is_playing_anim = false
+        end
+        if is_playing_scenario then
+          stopScenario(self.get_ped(), ap)
+          is_playing_scenario = false
+        end
+        TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, true)
+        PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, true)
+        TASK.CLEAR_PED_TASKS_IMMEDIATELY(ped)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(ped, self.get_ped(), myBone, 0.35, 0.3, -0.04, 100.0, 90.0, -10.0, false, true,
+          false, true, 1, true, 1)
+        ped_grabbed = true
+        attached_ped = ped
+      else
+        gui.show_error("Samurai's Scripts", NPC_CTRL_FAIL_)
+      end
+    end
+  end)
+  return ped_grabbed, attached_ped
+end
+
+attachVeh = function(veh)
+  local attach_X
+  local veh_class = Game.Vehicle.class(veh)
+  local myBone = PED.GET_PED_BONE_INDEX(self.get_ped(), 6286)
+  script.run_in_fiber(function(av)
+    if not vehicle_grabbed and not VEHICLE.IS_THIS_MODEL_A_TRAIN(veh_model) then
+      if entities.take_control_of(veh, 300) then
+        if is_handsUp then
+          TASK.CLEAR_PED_TASKS(self.get_ped())
+          is_handsUp = false
+        end
+        if is_playing_anim then
+          if anim_music then
+            play_music("stop")
+            anim_music = false
+          end
+          cleanup(av)
+          is_playing_anim = false
+        end
+        if is_playing_scenario then
+          stopScenario(self.get_ped(), ap)
+          is_playing_scenario = false
+        end
+        if isCrouched then
+          PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0.3)
+          isCrouched = false
+        end
+        if veh_class == "Commercial" or veh_class == "Industrial" or veh_class == "Utility" then
+          if VEHICLE.IS_BIG_VEHICLE(veh) then
+            attach_X  = 2.1
+            attach_RY = 0.0
+          else
+            attach_X  = 1.9
+            attach_RY = 0.0
+          end
+        elseif veh_class == "Cycles" or veh_class == "Motorcycles" then
+          attach_X  = 0.4
+          attach_RY = 0.0
+        elseif veh_class == "Planes" or veh_class == "Helicopters" then
+          attach_X  = 1.45
+          attach_RY = 90
+        else
+          attach_X  = 1.17
+          attach_RY = 0.0
+        end
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(veh, self.get_ped(), myBone, attach_X, 0.0, 0.0, 0.0, attach_RY, -16.0, false,
+          true,
+          false, true, 1, true, 1)
+        vehicle_grabbed = true
+        grabbed_veh     = veh
+      else
+        gui.show_error("Samurai's Scripts", NPC_CTRL_FAIL_)
+      end
+    end
+  end)
+  return vehicle_grabbed, grabbed_veh
+end
+
+displayHijackAnims = function()
+  local groupAnimNames = {}
+  for _, anim in ipairs(hijackOptions) do
+    table.insert(groupAnimNames, anim.name)
+  end
+  grp_anim_index, used = ImGui.Combo("##groupAnims", grp_anim_index, groupAnimNames, #hijackOptions)
+end
+
+resetSliders = function()
+  spawnDistance = vec3:new(0, 0, 0)
+  spawnRot      = vec3:new(0, 0, 0)
+end
+
+updateFilteredProps = function()
+  filteredProps = {}
+  for _, p in ipairs(custom_props) do
+    if string.find(string.lower(p.name), objects_search:lower()) then
+      table.insert(filteredProps, p)
+    end
+    table.sort(custom_props, function(a, b)
+      return a.name < b.name
+    end)
+  end
+end
+
+displayFilteredProps = function()
+  updateFilteredProps()
+  local propNames = {}
+  for _, p in ipairs(filteredProps) do
+    table.insert(propNames, p.name)
+  end
+  prop_index, used = ImGui.ListBox("##propList", prop_index, propNames, #filteredProps)
+  prop = filteredProps[prop_index + 1]
+  if prop ~= nil then
+    propHash = prop.hash
+    propName = prop.name
+  end
+end
+
+getAllObjects = function()
+  filteredObjects = {}
+  for _, object in ipairs(gta_objets) do
+    if objects_search ~= "" then
+      if string.find(string.lower(object), objects_search:lower()) then
+        table.insert(filteredObjects, object)
+      end
+    else
+      table.insert(filteredObjects, object)
+    end
+  end
+  objects_index, used = ImGui.ListBox("##gtaObjectsList", objects_index, filteredObjects, #filteredObjects)
+  prop                = filteredObjects[objects_index + 1]
+  propHash            = joaat(prop)
+  propName            = prop
+  if gui.is_open() and os_switch ~= 0 then
+    for _, b in ipairs(mp_blacklist) do
+      if propName == b then
+        showInvalidObjText = true
+        blacklisted_obj    = true
+        invalidType        = COCKSTAR_BLACKLIST_WARN_
+        break
+      else
+        showInvalidObjText = false
+        blacklisted_obj    = false
+      end
+      for _, c in ipairs(crash_objects) do
+        if propName == c then
+          showInvalidObjText = true
+          invalidType = CRASH_OBJECT_WARN_
+          break
+        else
+          showInvalidObjText = false
+        end
+      end
+    end
+  end
+end
+
+updateSelfBones = function()
+  filteredSelfBones = {}
+  for _, bone in ipairs(pedBones) do
+    table.insert(filteredSelfBones, bone)
+  end
+end
+
+displaySelfBones = function()
+  updateSelfBones()
+  local boneNames = {}
+  for _, bone in ipairs(filteredSelfBones) do
+    table.insert(boneNames, bone.name)
+  end
+  selected_bone, used = ImGui.Combo("##pedBones", selected_bone, boneNames, #filteredSelfBones)
+end
+
+updateVehBones = function()
+  filteredVehBones = {}
+  for _, bone in ipairs(vehBones) do
+    local bone_idx = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, bone)
+    if bone_idx ~= nil and bone_idx ~= -1 then
+      table.insert(filteredVehBones, bone)
+    end
+  end
+end
+
+displayVehBones = function()
+  updateVehBones()
+  local boneNames = {}
+  for _, bone in ipairs(filteredVehBones) do
+    table.insert(boneNames, bone)
+  end
+  selected_bone, used = ImGui.Combo("##vehBones", selected_bone, boneNames, #filteredVehBones)
+end
+
+stopPreview = function()
+  if previewStarted then
+    previewStarted = false
+  end
+  pedPreviewModel     = 0
+  vehiclePreviewModel = 0
+  objectPreviewModel  = 0
+  previewEntity       = 0
+end
+
+displaySpawnedObjects = function()
+  spawnedNames = {}
+  if spawned_props[1] ~= nil then
+    for _, v in ipairs(spawned_props) do
+      table.insert(spawnedNames, v.name)
+    end
+  end
+  spawned_index, spiUsed = ImGui.Combo("##spawnedProps", spawned_index, spawnedNames, #spawned_props)
+end
+
+displayAttachedObjects = function()
+  selfAttachNames = {}
+  if attached_props[1] ~= nil then
+    for _, v in ipairs(attached_props) do
+      table.insert(selfAttachNames, v.name)
+    end
+  end
+  attached_index, used = ImGui.Combo("##Attached Objects", attached_index, selfAttachNames, #attached_props)
+end
+
+displayVehAttachments = function()
+  vehAttachNames = {}
+  if vehicle_attachments[1] ~= nil then
+    for _, v in ipairs(vehicle_attachments) do
+      table.insert(vehAttachNames, v.name)
+    end
+  end
+  vattached_index, used = ImGui.Combo("##vehAttachedObjects", vattached_index, vehAttachNames, #vehicle_attachments)
+end
+
+filterPersistProps = function()
+  filteredPersistProps = {}
+  if persist_attachments[1] ~= nil then
+    for _, t in ipairs(persist_attachments) do
+      table.insert(filteredPersistProps, t)
+    end
+  end
+end
+
+showPersistProps = function()
+  filterPersistProps()
+  persist_prop_names = {}
+  for _, p in ipairs(filteredPersistProps) do
+    table.insert(persist_prop_names, p.name)
+  end
+  persist_prop_index, _ = ImGui.ListBox("##persist_props", persist_prop_index, persist_prop_names, #filteredPersistProps)
+end
+
+displayLangs = function()
+  filteredLangs = {}
+  for _, lang in ipairs(lang_T) do
+    table.insert(filteredLangs, lang.name)
+  end
+  lang_idx, lang_idxUsed = ImGui.Combo("##langs", lang_idx, filteredLangs, #lang_T)
+  if UI.isItemClicked("lmb") then
+    UI.widgetSound("Nav")
+  end
+end
+--#endregion
 
 --#region Helpers
 
@@ -1112,21 +2192,12 @@ SS.debug = function(data)
 end
 
 SS.isAnyKeyPressed = function()
-  ---@type boolean
-  local check
-  ---@type integer
-  local key_code
-  ---@type string
-  local key_name
   for _, k in ipairs(VK_T) do
-    if k.just_pressed then
-      check    = true
-      key_code = k.code
-      key_name = k.name
-      break
+    if SS.isKeyJustPressed(k.code) then
+      return true, k.code, k.name
     end
   end
-  return check, key_code, key_name
+  return nil, nil, nil
 end
 
 ---@param key integer
@@ -1491,8 +2562,13 @@ SS.canUseHandsUp = function()
 end
 
 SS.playKeyfobAnim = function()
-  if Game.requestAnimDict("anim@mp_player_intmenu@key_fob@") then
-    TASK.TASK_PLAY_ANIM(self.get_ped(), "anim@mp_player_intmenu@key_fob@", "fob_click", 4.0, -4.0, -1,
+  if is_playing_anim or is_playing_scenario or is_playing_amb_scenario or isCrouched or is_handsUp or ped_grabbed or
+  vehicle_grabbed or is_hiding or Game.Self.is_ragdoll() or Game.Self.isSwimming() or not Game.Self.isAlive() then
+    return -- early exit
+  end
+  local dict <const> = "anim@mp_player_intmenu@key_fob@"
+  if Game.requestAnimDict(dict) then
+    TASK.TASK_PLAY_ANIM(self.get_ped(), dict, "fob_click", 4.0, -4.0, -1,
       48, 0.0, false, false, false)
   end
 end
@@ -2169,175 +3245,16 @@ end
 
 -- Reset saved config without affecting
 --
--- custom outfits and custom vehicles.
+-- custom outfits, custom vehicles, and favorite actions.
 SS.reset_settings = function()
-  shortcut_anim = {}; CFG.save("shortcut_anim", shortcut_anim)
-  vmine_type = { spikes = false, slick = false, explosive = false, emp = false, kinetic = false }; CFG.save(
-    "vmine_type", vmine_type)
-  whouse_1_size = { small = false, medium = false, large = false }; CFG.save("whouse_1_size", whouse_1_size)
-  whouse_2_size = { small = false, medium = false, large = false }; CFG.save("whouse_2_size", whouse_2_size)
-  whouse_3_size = { small = false, medium = false, large = false }; CFG.save("whouse_3_size", whouse_3_size)
-  whouse_4_size = { small = false, medium = false, large = false }; CFG.save("whouse_4_size", whouse_4_size)
-  whouse_5_size = { small = false, medium = false, large = false }; CFG.save("whouse_5_size", whouse_5_size)
-  keybinds = {
-    rodBtn        = { code = 0x58, name = "[X]" },
-    tdBtn         = { code = 0x10, name = "[Shift]" },
-    nosBtn        = { code = 0x10, name = "[Shift]" },
-    stop_anim     = { code = 0x47, name = "[G]" },
-    play_anim     = { code = 0x2E, name = "[DEL]" },
-    previous_anim = { code = 0x21, name = "[PAGE UP]" },
-    next_anim     = { code = 0x22, name = "[PAGE DOWN]" },
-    flatbedBtn    = { code = 0x58, name = "[X]" },
-    purgeBtn      = { code = 0x58, name = "[X]" },
-    autokill      = { code = 0x76, name = "[F7]" },
-    enemiesFlee   = { code = 0x77, name = "[F8]" },
-    missl_def     = { code = 0x0,  name = "[Unbound]"},
-    vehicle_mine  = { code = 0x4E, name = "[N]" },
-    triggerbotBtn = { code = 0x10, name = "[Shift]" },
-    panik         = { code = 0x7B, name = "[F12]" },
-    commands      = { code = 0x67, name = "[NUMPAD 7]" },
-  }; CFG.save("keybinds", keybinds)
-  gpad_keybinds = {
-    rodBtn        = { code = 0, name = "[Unbound]" },
-    tdBtn         = { code = 0, name = "[Unbound]" },
-    nosBtn        = { code = 0, name = "[Unbound]" },
-    flatbedBtn    = { code = 0, name = "[Unbound]" },
-    purgeBtn      = { code = 0, name = "[Unbound]" },
-    vehicle_mine  = { code = 0, name = "[Unbound]" },
-    triggerbotBtn = { code = 0, name = "[Unbound]" },
-  }; CFG.save("gpad_keybinds", gpad_keybinds)
-  Regen = false; CFG.save("Regen", Regen)
-  -- objectiveTP             = false
-  disableTooltips         = false; CFG.save("disableTooltips", disableTooltips)
-  phoneAnim               = false; CFG.save("phoneAnim", phoneAnim)
-  sprintInside            = false; CFG.save("sprintInside", sprintInside)
-  lockpick                = false; CFG.save("lockpick", lockpick)
-  replaceSneakAnim        = false; CFG.save("replaceSneakAnim", replaceSneakAnim)
-  replacePointAct         = false; CFG.save("replacePointAct", replacePointAct)
-  disableSound            = false; CFG.save("disableSound", disableSound)
-  disableActionMode       = false; CFG.save("disableActionMode", disableActionMode)
-  hideFromCops            = false; CFG.save("hideFromCops", hideFromCops)
-  hatsinvehs              = false; CFG.save("hatsinvehs", hatsinvehs)
-  novehragdoll            = false; CFG.save("novehragdoll", novehragdoll)
-  rod                     = false; CFG.save("rod", rod)
-  clumsy                  = false; CFG.save("clumsy", clumsy)
-  ragdoll_sound           = false; CFG.save("ragdoll_sound", ragdoll_sound)
-  Triggerbot              = false; CFG.save("Triggerbot", Triggerbot)
-  aimEnemy                = false; CFG.save("aimEnemy", aimEnemy)
-  autoKill                = false; CFG.save("autoKill", autoKill)
-  runaway                 = false; CFG.save("runaway", runaway)
-  laserSight              = false; CFG.save("laserSight", laserSight)
-  disableUiSounds         = false; CFG.save("disableUiSounds", disableUiSounds)
-  driftMode               = false; CFG.save("driftMode", driftMode)
-  DriftTires              = false; CFG.save("DriftTires", DriftTires)
-  DriftSmoke              = false; CFG.save("DriftSmoke", DriftSmoke)
-  driftMinigame           = false; CFG.save("driftMinigame", driftMinigame)
-  speedBoost              = false; CFG.save("speedBoost", speedBoost)
-  nosvfx                  = false; CFG.save("nosvfx", nosvfx)
-  nosAudio                = false; CFG.save("nosAudio", nosAudio)
-  nosFlames               = false; CFG.save("nosFlames", nosFlames)
-  hornLight               = false; CFG.save("hornLight", hornLight)
-  nosPurge                = false; CFG.save("nosPurge", nosPurge)
-  insta180                = false; CFG.save("insta180", insta180)
-  flappyDoors             = false; CFG.save("flappyDoors", flappyDoors)
-  rgbLights               = false; CFG.save("rgbLights", rgbLights)
-  loud_radio              = false; CFG.save("loud_radio", loud_radio)
-  launchCtrl              = false; CFG.save("launchCtrl", launchCtrl)
-  popsNbangs              = false; CFG.save("popsNbangs", popsNbangs)
-  limitVehOptions         = false; CFG.save("limitVehOptions", limitVehOptions)
-  missiledefense          = false; CFG.save("missiledefense", missiledefense)
-  louderPops              = false; CFG.save("louderPops", louderPops)
-  autobrklight            = false; CFG.save("autobrklight", autobrklight)
-  abs_lights              = false; CFG.save("abs_lights", abs_lights)
-  holdF                   = false; CFG.save("holdF", holdF)
-  keepWheelsTurned        = false; CFG.save("keepWheelsTurned", keepWheelsTurned)
-  towEverything           = false; CFG.save("towEverything", towEverything)
-  noJacking               = false; CFG.save("noJacking", noJacking)
-  noEngineBraking         = false; CFG.save("noEngineBraking", noEngineBraking)
-  kersBoost               = false; CFG.save("kersBoost", kersBoost)
-  offroaderx2             = false; CFG.save("offroaderx2", offroaderx2)
-  rallyTires              = false; CFG.save("rallyTires", rallyTires)
-  noTractionCtrl          = false; CFG.save("noTractionCtrl", noTractionCtrl)
-  easyWheelie             = false; CFG.save("easyWheelie", easyWheelie)
-  rwSteering              = false; CFG.save("rwSteering", rwSteering)
-  awSteering              = false; CFG.save("awSteering", awSteering)
-  handbrakeSteering       = false; CFG.save("handbrakeSteering", handbrakeSteering)
-  useGameLang             = false; CFG.save("useGameLang", useGameLang)
-  disableProps            = false; CFG.save("disableProps", disableProps)
-  manualFlags             = false; CFG.save("manualFlags", manualFlags)
-  controllable            = false; CFG.save("controllable", controllable)
-  looped                  = false; CFG.save("looped", looped)
-  upperbody               = false; CFG.save("upperbody", upperbody)
-  freeze                  = false; CFG.save("freeze", freeze)
-  noCollision             = false; CFG.save("noCollision", noCollision)
-  killOnEnd               = false; CFG.save("killOnEnd", killOnEnd)
-  usePlayKey              = false; CFG.save("usePlayKey", usePlayKey)
-  npc_godMode             = false; CFG.save("npc_godMode", npc_godMode)
-  bypass_casino_bans      = false; CFG.save("bypass_casino_bans", bypass_casino_bans)
-  force_poker_cards       = false; CFG.save("force_poker_cards", force_poker_cards)
-  set_dealers_poker_cards = false; CFG.save("set_dealers_poker_cards", set_dealers_poker_cards)
-  force_roulette_wheel    = false; CFG.save("force_roulette_wheel", force_roulette_wheel)
-  rig_slot_machine        = false; CFG.save("rig_slot_machine", rig_slot_machine)
-  autoplay_slots          = false; CFG.save("autoplay_slots", autoplay_slots)
-  autoplay_cap            = false; CFG.save("autoplay_cap", autoplay_cap)
-  heist_cart_autograb     = false; CFG.save("heist_cart_autograb", heist_cart_autograb)
-  flares_forall           = false; CFG.save("flares_forall", flares_forall)
-  real_plane_speed        = false; CFG.save("real_plane_speed", real_plane_speed)
-  extend_world            = false; CFG.save("extend_world", extend_world)
-  unbreakableWindows      = false; CFG.save("unbreakableWindows", unbreakableWindows)
-  disableFlightMusic      = false; CFG.save("disableFlightMusic", disableFlightMusic)
-  disable_quotes          = false; CFG.save("disable_quotes", disable_quotes)
-  disable_mdef_logs       = false; CFG.save("disable_mdef_logs", disable_mdef_logs)
-  replace_pool_q          = false; CFG.save("replace_pool_q", replace_pool_q)
-  public_seats            = false; CFG.save("public_seats", public_seats)
-  ambient_scenarios       = false; CFG.save("ambient_scenarios", ambient_scenarios)
-  ambient_scenario_prompt = false; CFG.save("ambient_scenario_prompt", ambient_scenario_prompt)
-  mc_work_cd              = false; CFG.save("mc_work_cd", mc_work_cd)
-  hangar_cd               = false; CFG.save("hangar_cd", hangar_cd)
-  nc_management_cd        = false; CFG.save("nc_management_cd", nc_management_cd)
-  nc_vip_mission_chance   = false; CFG.save("nc_vip_mission_chance", nc_vip_mission_chance)
-  security_missions_cd    = false; CFG.save("security_missions_cd", security_missions_cd)
-  ie_vehicle_steal_cd     = false; CFG.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
-  ie_vehicle_sell_cd      = false; CFG.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
-  ceo_crate_buy_cd        = false; CFG.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
-  ceo_crate_sell_cd       = false; CFG.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
-  ceo_crate_buy_f_cd      = false; CFG.save("ceo_crate_buy_f_cd", ceo_crate_buy_f_cd)
-  ceo_crate_sell_f_cd     = false; CFG.save("ceo_crate_sell_f_cd", ceo_crate_sell_f_cd)
-  cashUpdgrade1           = false; CFG.save("cashUpdgrade1", cashUpdgrade1)
-  cashUpdgrade2           = false; CFG.save("cashUpdgrade2", cashUpdgrade2)
-  cokeUpdgrade1           = false; CFG.save("cokeUpdgrade1", cokeUpdgrade1)
-  cokeUpdgrade2           = false; CFG.save("cokeUpdgrade2", cokeUpdgrade2)
-  methUpdgrade1           = false; CFG.save("methUpdgrade1", methUpdgrade1)
-  methUpdgrade2           = false; CFG.save("methUpdgrade2", methUpdgrade2)
-  weedUpdgrade1           = false; CFG.save("weedUpdgrade1", weedUpdgrade1)
-  weedUpdgrade2           = false; CFG.save("weedUpdgrade2", weedUpdgrade2)
-  fdUpdgrade1             = false; CFG.save("fdUpdgrade1", fdUpdgrade1)
-  fdUpdgrade2             = false; CFG.save("fdUpdgrade2", fdUpdgrade2)
-  bunkerUpdgrade1         = false; CFG.save("bunkerUpdgrade1", bunkerUpdgrade1)
-  bunkerUpdgrade2         = false; CFG.save("bunkerUpdgrade2", bunkerUpdgrade2)
-  acidUpdgrade            = false; CFG.save("acidUpdgrade", acidUpdgrade)
-  whouse_1_owned          = false; CFG.save("whouse_1_owned", whouse_1_owned)
-  whouse_2_owned          = false; CFG.save("whouse_2_owned", whouse_2_owned)
-  whouse_3_owned          = false; CFG.save("whouse_3_owned", whouse_3_owned)
-  whouse_4_owned          = false; CFG.save("whouse_4_owned", whouse_4_owned)
-  whouse_5_owned          = false; CFG.save("whouse_5_owned", whouse_5_owned)
-  autosell                = false; CFG.save("autosell", autosell)
-  veh_mines               = false; CFG.save("veh_mines", veh_mines)
-  autovehlocks            = false; CFG.save("autovehlocks", autovehlocks)
-  autoraiseroof           = false; CFG.save("autoraiseroof", autoraiseroof)
-  SS_debug                = false; CFG.save("SS_debug", SS_debug)
-  laser_switch            = 0; CFG.save("laser_switch", laser_switch)
-  DriftIntensity          = 0; CFG.save("DriftIntensity", DriftIntensity)
-  lang_idx                = 0; CFG.save("lang_idx", lang_idx)
-  autoplay_chips_cap      = 0; CFG.save("autoplay_chips_cap", autoplay_chips_cap)
-  lightSpeed              = 1; CFG.save("lightSpeed", lightSpeed)
-  DriftPowerIncrease      = 1; CFG.save("DriftPowerIncrease", DriftPowerIncrease)
-  nosPower                = 10; CFG.save("nosPower", nosPower)
-  nosBtn                  = 21; CFG.save("nosBtn", nosBtn)
-  supply_autofill_delay   = 500; CFG.save("supply_autofill_delay", supply_autofill_delay)
-  laser_choice            = { r = 237, g = 47, b = 50 }; CFG.save("laser_choice", laser_choice)
-  LANG                    = "en-US"; CFG.save("LANG", LANG)
-  current_lang            = "English"; CFG.save("current_lang", current_lang)
+  for key, _ in pairs(DEFAULT_CONFIG) do
+    if key ~= "saved_vehicles" and
+    key ~= "persist_attachments" and
+    key ~= "favorite_actions" then
+      _G[key] = DEFAULT_CONFIG[key]
+      CFG.save(tostring(key), DEFAULT_CONFIG[key])
+    end
+  end
   initStrings()
 end
 
@@ -3210,7 +4127,8 @@ end
 ---@param vehicle integer
 ---@param s script_util
 Game.Vehicle.lockDoors = function(vehicle, toggle, s)
-  if entities.take_control_of(vehicle, 300) then
+  if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(vehicle)) and
+  entities.take_control_of(vehicle, 300) then
     if toggle then
       for i = 0, (VEHICLE.GET_NUMBER_OF_VEHICLE_DOORS(vehicle) + 1) do
         if VEHICLE.GET_VEHICLE_DOOR_ANGLE_RATIO(vehicle, i) > 0.0 then
