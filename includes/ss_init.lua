@@ -3,10 +3,10 @@
 local basePath = 'includes/'
 local packages = {
   'data/globals',
+  'data/refs',
   'data/actions',
   'data/commands',
   'data/objects',
-  'data/refs',
   'lib/samurais_utils',
   'lib/Translations',
   'classes/atArray',

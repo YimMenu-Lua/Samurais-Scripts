@@ -103,6 +103,39 @@ gta_vehicles_T  = {
   "zentorno", "zhaba", "zion", "zion2", "zion3", "zombiea", "zombieb", "zorrusso", "zr350", "zr380", "zr3802", "zr3803",
 }
 
+PED_TYPE   = {
+  _PLAYER_0              = 0,
+  _PLAYER_1              = 1,
+  _NETWORK_PLAYER        = 2,
+  _PLAYER_2              = 3,
+  _CIVMALE               = 4,
+  _CIVFEMALE             = 5,
+  _COP                   = 6,
+  _GANG_ALBANIAN         = 7,
+  _GANG_BIKER_1          = 8,
+  _GANG_BIKER_2          = 9,
+  _GANG_ITALIAN          = 10,
+  _GANG_RUSSIAN          = 11,
+  _GANG_RUSSIAN_2        = 12,
+  _GANG_IRISH            = 13,
+  _GANG_JAMAICAN         = 14,
+  _GANG_AFRICAN_AMERICAN = 15,
+  _GANG_KOREAN           = 16,
+  _GANG_CHINESE_JAPANESE = 17,
+  _GANG_PUERTO_RICAN     = 18,
+  _DEALER                = 19,
+  _MEDIC                 = 20,
+  _FIREMAN               = 21,
+  _CRIMINAL              = 22,
+  _BUM                   = 23,
+  _PROSTITUTE            = 24,
+  _SPECIAL               = 25,
+  _MISSION               = 26,
+  _SWAT                  = 27,
+  _ANIMAL                = 28,
+  _ARMY                  = 29,
+}
+
 pedBones        = {
   { name = "Root",       ID = 0 },
   { name = "Head",       ID = 12844 },
@@ -1574,6 +1607,32 @@ custom_paints_T          = {
   { name = "Hyper Red",                                hex = "#3C0612", p = 30,  m = false, manufacturer = "Aston Martin",      shade = "Red" },
 }
 
+vehicle_classes_t = {
+  [0] = "Compacts",
+  [1] = "Sedans",
+  [2] = "SUVs",
+  [3] = "Coupes",
+  [4] = "Muscle",
+  [5] = "Sports Classics",
+  [6] = "Sports",
+  [7] = "Super",
+  [8] = "Motorcycles",
+  [9] = "Off-road",
+  [10] = "Industrial",
+  [11] = "Utility",
+  [12] = "Vans",
+  [13] = "Cycles",
+  [14] = "Boats",
+  [15] = "Helicopters",
+  [16] = "Planes",
+  [17] = "Service",
+  [18] = "Emergency",
+  [19] = "Military",
+  [20] = "Commercial",
+  [21] = "Trains",
+  [22] = "Open Wheel"
+}
+
 translations_button_map  = {
   { name = "driftMode_tt",     kbm = keybinds.tdBtn.name },
   { name = "driftTires_tt",    kbm = keybinds.tdBtn.name },
@@ -1610,15 +1669,7 @@ supported_sale_scripts   = {
     { -- (1.70) if .*?Local_....?\.f_....? > 0 && func_.*?&.*?Local_....?\.f_....?\), 30000, 0
       l = 1985,
       o = 1078,
-      v = 15
-    },
-  },
-
-  ["gb_contraband_sell"] = {
-    { -- (1.70) MISC::CLEAR_BIT\(.*?Local_...?\.f_1\), .*?Param0
-      l = 563,
-      o = 1,
-      v = 99999
+      v = 1
     },
   },
 
@@ -1627,6 +1678,19 @@ supported_sale_scripts   = {
       l = 1262,
       o = 774,
       v = 0
+    },
+    { -- (1.70) if .*?Local_.*? != Local_....?\.f_...? && Local_....?\.f_...? > 0\)
+      l = 1262,
+      o = 816,
+      v = 1
+    },
+  },
+
+  ["gb_contraband_sell"] = {
+    { -- (1.70) MISC::CLEAR_BIT\(.*?Local_...?\.f_1\), .*?Param0
+      l = 563,
+      o = 1,
+      v = 99999
     },
   },
 
@@ -1644,15 +1708,15 @@ supported_sale_scripts   = {
     o = 1309
   },
 
-  ["fm_content_smuggler_sell"] = {
-    b = 3991, -- GENERICBITSET_I_WON -- (1.70) if .*?func_...?\(&.*?Local_....?, .*?Param0 // (uLocal_3991 = 4;)
-    l = 4133, -- (1.70) if .*?Local_4...?\.f_....? == 0\)
-    o = 489
-  },
+  -- ["fm_content_smuggler_sell"] = {
+  --   b = 3991, -- GENERICBITSET_I_WON -- (1.70) if .*?func_...?\(&.*?Local_....?, .*?Param0 // (uLocal_3991 = 4;)
+  --   l = 4133, -- (1.70) if .*?Local_4...?\.f_....? == 0\)
+  --   o = 489
+  -- },
 }
 
 simplified_scr_names     = {
-  { scr = "fm_content_smuggler_sell", sn = "Hangar (Land)" },
+  { scr = "fm_content_smuggler_sell", sn = "Hangar (Land. Not supported.)" },
   { scr = "gb_smuggler",              sn = "Hangar (Air)" },
   { scr = "gb_contraband_sell",       sn = "CEO" },
   { scr = "gb_gunrunning",            sn = "Bunker" },

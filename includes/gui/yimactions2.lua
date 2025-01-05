@@ -93,12 +93,6 @@ function actionsUI()
     end
     if ImGui.Button(string.format("%s##anim", GENERIC_PLAY_BTN_)) then
       if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
-        if info.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
-          UI.widgetSound("Error")
-          gui.show_error("Samurai's Scripts",
-            "This animation can only be played while sitting inside a vehicle (cars and trucks only).")
-          goto pass
-        end
         UI.widgetSound("Select")
         script.run_in_fiber(function(pa)
           local coords     = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
@@ -112,22 +106,11 @@ function actionsUI()
           else
             anim_flag = info.flag
           end
-          curr_playing_anim = info
-          if Lua_fn.str_contains(curr_playing_anim.name, "DJ") then
-            if not is_playing_radio and not anim_music then
-              play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-              anim_music = true
-            end
-          else
-            if anim_music then
-              play_music("stop")
-              anim_music = false
-            end
-          end
           playAnim(
             info, self.get_ped(), anim_flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, boneIndex, coords, heading,
-            forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pa)
+            forwardX, forwardY, bonecoords, plyrProps, selfPTFX, pa)
           is_playing_anim = true
+          curr_playing_anim = info
           addActionToRecents(info)
         end)
       else
@@ -135,7 +118,6 @@ function actionsUI()
         gui.show_error("Samurais Scripts",
           "You can not play animations while grabbing an NPC, grabbing a vehicle, sitting or hiding.")
       end
-      ::pass::
     end
     ImGui.SameLine()
     ImGui.BeginDisabled(not is_playing_anim)
@@ -145,10 +127,6 @@ function actionsUI()
         script.run_in_fiber(function(cu)
           cleanup(cu)
           is_playing_anim = false
-          if anim_music then
-            play_music("stop")
-            anim_music = false
-          end
         end)
       else
         UI.widgetSound("Error")
@@ -465,18 +443,11 @@ function actionsUI()
           end
           table.remove(spawned_npcs, k)
         end
-        is_playing_anim = false
       end)
     end
     ImGui.SameLine()
     if ImGui.Button(string.format("%s##anim_npc", GENERIC_PLAY_BTN_)) then
       if spawned_npcs[1] ~= nil then
-        if info.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
-          UI.widgetSound("Error")
-          gui.show_error("Samurai's Scripts",
-            "This animation can only be played while sitting inside a vehicle (cars and trucks only).")
-          goto pass
-        end
         UI.widgetSound("Select")
         script.run_in_fiber(function(npca)
           for _, v in ipairs(spawned_npcs) do
@@ -494,7 +465,7 @@ function actionsUI()
               end
               playAnim(
                 info, v, anim_flag, npcprop1, npcprop2, npcloopedFX, npcSexPed, npcBoneIndex, npcCoords, npcHeading,
-                npcForwardX, npcForwardY, npcBboneCoords, "cunt", npcProps, npcPTFX, npca
+                npcForwardX, npcForwardY, npcBboneCoords, npcProps, npcPTFX, npca
               )
             end
           end
@@ -503,14 +474,12 @@ function actionsUI()
         UI.widgetSound("Error")
         gui.show_error("Samurais Scripts", "Spawn an NPC first!")
       end
-      ::pass::
     end
     ImGui.SameLine()
     if ImGui.Button(string.format("%s##npc_anim", GENERIC_STOP_BTN_)) then
       UI.widgetSound("Cancel")
       script.run_in_fiber(function(npca)
         cleanupNPC(npca)
-        is_playing_anim = false
       end)
     end
     usePlayKey, upkUsed = ImGui.Checkbox("Enable Animation Hotkeys", usePlayKey)
@@ -523,7 +492,7 @@ function actionsUI()
   end
   if ImGui.BeginTabItem(SCENARIOS_TAB_) then
     if tab2Sound then
-      UI.widgetSound("Nav2")
+      UI.widgetSound("Nav")
       tab2Sound = false
       tab1Sound = true
       tab3Sound = true
@@ -749,7 +718,7 @@ function actionsUI()
       ImGui.Spacing()
       if ImGui.Button(string.format("%s##favs", GENERIC_PLAY_BTN_)) then
         if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
-          if selected_favorite.dict ~= nil then -- animation type
+          if selected_favorite.dict then -- anim type
             if selected_favorite.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
               UI.widgetSound("Error")
               gui.show_error("Samurai's Scripts",
@@ -763,26 +732,15 @@ function actionsUI()
                 local forwardY   = Game.getForwardY(self.get_ped())
                 local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_favorite.boneID)
                 local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_favorite.boneID, 0.0, 0.0, 0.0)
-                if Lua_fn.str_contains(selected_favorite.name, "DJ") then
-                  if not is_playing_radio and not anim_music then
-                    play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-                    anim_music = true
-                  end
-                else
-                  if anim_music then
-                    play_music("stop")
-                    anim_music = false
-                  end
-                end
                 playAnim(
                   selected_favorite, self.get_ped(), selected_favorite.flag, selfprop1, selfprop2, selfloopedFX,
-                  selfSexPed, boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pf
+                  selfSexPed, boneIndex, coords, heading, forwardX, forwardY, bonecoords, plyrProps, selfPTFX, pf
                 )
                 curr_playing_anim = selected_favorite
                 is_playing_anim   = true
               end)
             end
-          elseif selected_favorite.scenario ~= nil then -- scenario type
+          elseif selected_favorite.scenario then -- scenario type
             UI.widgetSound("Select")
             playScenario(selected_favorite, self.get_ped())
             is_playing_scenario = true
@@ -801,10 +759,6 @@ function actionsUI()
           if is_playing_anim then
             cleanup(fav)
             is_playing_anim = false
-            if anim_music then
-              play_music("stop")
-              anim_music = false
-            end
           elseif is_playing_scenario then
             stopScenario(self.get_ped(), fav)
             is_playing_scenario = false
@@ -856,20 +810,9 @@ function actionsUI()
                 local forwardY   = Game.getForwardY(self.get_ped())
                 local boneIndex  = PED.GET_PED_BONE_INDEX(self.get_ped(), selected_recent.boneID)
                 local bonecoords = PED.GET_PED_BONE_COORDS(self.get_ped(), selected_recent.boneID, 0.0, 0.0, 0.0)
-                if Lua_fn.str_contains(selected_recent.name, "DJ") then
-                  if not is_playing_radio and not anim_music then
-                    play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-                    anim_music = true
-                  end
-                else
-                  if anim_music then
-                    play_music("stop")
-                    anim_music = false
-                  end
-                end
                 playAnim(
                   selected_recent, self.get_ped(), selected_recent.flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
-                  boneIndex, coords, heading, forwardX, forwardY, bonecoords, "self", plyrProps, selfPTFX, pr
+                  boneIndex, coords, heading, forwardX, forwardY, bonecoords, plyrProps, selfPTFX, pr
                 )
                 curr_playing_anim = selected_recent
                 is_playing_anim   = true
@@ -893,10 +836,6 @@ function actionsUI()
           if is_playing_anim then
             cleanup(recent)
             is_playing_anim = false
-            if anim_music then
-              play_music("stop")
-              anim_music = false
-            end
           elseif is_playing_scenario then
             stopScenario(self.get_ped(), recent)
             is_playing_scenario = false

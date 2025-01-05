@@ -164,11 +164,6 @@ end)
 RegisterCommand("vehlock", function()
   script.run_in_fiber(function(vehlock)
     if current_vehicle ~= 0 and is_car then
-      if last_vehicle ~= 0 and last_vehicle ~= current_vehicle and
-      VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(last_vehicle)) and
-      (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(last_vehicle) ~= 1) then
-        VEHICLE.SET_VEHICLE_DOORS_LOCKED(last_vehicle, 1)
-      end
       SS.playKeyfobAnim()
       AUDIO.PLAY_SOUND_FRONTEND(-1, "REMOTE_CONTROL_FOB", "PI_MENU_SOUNDS", false)
       vehlock:sleep(250)
@@ -343,7 +338,7 @@ script.register_looped("GINPUT", function() -- Game Input
         (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.laser_sight.code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.laser_sight.code))
   end
 
-  if is_in_flatbed then
+  if is_using_flatbed then
     if keybinds.flatbedBtn.code == 0x58 or gpad_keybinds.flatbedBtn.code == 73 then
       PAD.DISABLE_CONTROL_ACTION(0, 73, true)
     end
@@ -640,12 +635,12 @@ script.register_looped("HFC", function(hfc) -- Hide From Cops
         end
       end
       if Game.Self.isOnFoot() then
-        local nearBoot, vehicle = SS.isNearCarTrunk()
+        local nearBoot, vehicle, isRearEngined = SS.isNearCarTrunk()
         local nearBin, bin      = SS.isNearTrashBin()
         if not nearBoot and not nearBin then
-          hfc:sleep(100)
+          hfc:sleep(1000)
         end
-        if nearBoot and not is_playing_anim and not is_playing_scenario and not ped_grabbed and not vehicle_grabbed then
+        if nearBoot and vehicle > 0 and not is_playing_anim and not is_playing_scenario and not ped_grabbed and not vehicle_grabbed then
           Game.showButtonPrompt("Press ~INPUT_PICKUP~ to hide in the trunk.")
           if PAD.IS_CONTROL_JUST_PRESSED(0, 38) then
             local z_offset = 0.93
@@ -659,35 +654,56 @@ script.register_looped("HFC", function(hfc) -- Hide From Cops
             end
             if not was_spotted then
               if Game.Vehicle.class(vehicle) == "Vans" then
-                bootDoorID = 3
                 z_offset = 1.1
               else
                 if Game.Vehicle.class(vehicle) == "SUVs" then
                   z_offset = 1.2
                 end
-                bootDoorID = 5
               end
-              ENTITY.FREEZE_ENTITY_POSITION(self.get_ped(), true)
-              ENTITY.SET_ENTITY_COLLISION(self.get_ped(), false, true)
-              hfc:sleep(50)
-              VEHICLE.SET_VEHICLE_DOOR_OPEN(vehicle, bootDoorID, false, false)
-              hfc:sleep(500)
-              ENTITY.FREEZE_ENTITY_POSITION(self.get_ped(), false)
-              local chassis_bone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(vehicle, "chassis_dummy")
-              local veh_hash     = ENTITY.GET_ENTITY_MODEL(vehicle)
-              local vmin, vmax   = Game.getModelDimensions(veh_hash, hfc)
-              local veh_len      = vmax.y - vmin.y
-              if Game.requestAnimDict("timetable@tracy@sleep@") then
-                TASK.TASK_PLAY_ANIM(self.get_ped(), "timetable@tracy@sleep@", "base", 4.0, -4.0, -1, 2, 1.0, false, false,
-                  false)
-                ENTITY.ATTACH_ENTITY_TO_ENTITY(self.get_ped(), vehicle, chassis_bone, -0.3, -veh_len / 3, z_offset, 180.0,
-                  0.0, 0.0, false,
-                  false, false, false, 20, true, 1)
+              if Game.requestAnimDict("rcmnigel3_trunk") then
+                if not ENTITY.HAS_ENTITY_CLEAR_LOS_TO_ENTITY_IN_FRONT(self.get_ped(), vehicle) then
+                  TASK.TASK_TURN_PED_TO_FACE_ENTITY(self.get_ped(), vehicle, 0)
+                  repeat
+                    hfc:sleep(10)
+                  until not TASK.GET_IS_TASK_ACTIVE(self.get_ped(), 225) -- CTaskTurnToFaceEntityOrCoord
+                end
+                TASK.TASK_PLAY_ANIM(
+                  self.get_ped(), "rcmnigel3_trunk", "out_trunk_trevor", 4.0, -4.0, 1500, 2, 0.0,
+                  false, false, false
+                )
+              end
+              hfc:sleep(800)
+              if VEHICLE.IS_VEHICLE_STOPPED(vehicle) then
+                ENTITY.FREEZE_ENTITY_POSITION(self.get_ped(), true)
+                ENTITY.SET_ENTITY_COLLISION(self.get_ped(), false, true)
+                hfc:sleep(50)
+                VEHICLE.SET_VEHICLE_DOOR_OPEN(vehicle, 5, false, false)
                 hfc:sleep(500)
-                VEHICLE.SET_VEHICLE_DOOR_SHUT(vehicle, bootDoorID, false)
-                ENTITY.SET_ENTITY_COLLISION(self.get_ped(), true, true)
-                is_hiding, hiding_in_boot, boot_vehicle = true, true, vehicle
-                hfc:sleep(1000)
+                ENTITY.FREEZE_ENTITY_POSITION(self.get_ped(), false)
+                local chassis_bone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(vehicle, "chassis_dummy")
+                if chassis_bone == nil or chassis_bone == -1 then
+                  chassis_bone = 0
+                end
+                local veh_hash   = ENTITY.GET_ENTITY_MODEL(vehicle)
+                local vmin, vmax = Game.getModelDimensions(veh_hash)
+                boot_vehicle_len = vmax.y - vmin.y
+                local attachPosY = isRearEngined and (boot_vehicle_len / 3) or (-boot_vehicle_len / 3)
+                if Game.requestAnimDict("timetable@tracy@sleep@") then
+                  TASK.TASK_PLAY_ANIM(self.get_ped(), "timetable@tracy@sleep@", "base", 4.0, -4.0, -1, 2, 1.0, false, false,
+                    false)
+                  ENTITY.ATTACH_ENTITY_TO_ENTITY(
+                  self.get_ped(), vehicle, chassis_bone, -0.3, attachPosY, z_offset,
+                    180.0, 0.0, 0.0, false, false, false, false, 20, true, 1
+                  )
+                  hfc:sleep(500)
+                  VEHICLE.SET_VEHICLE_DOOR_SHUT(vehicle, 5, false)
+                  ENTITY.SET_ENTITY_COLLISION(self.get_ped(), true, true)
+                  is_hiding, hiding_in_boot, boot_vehicle, boot_vehicle_re = true, true, vehicle, isRearEngined
+                  hfc:sleep(1000)
+                end
+              else
+                TASK.CLEAR_PED_TASKS(self.get_ped())
+                gui.show_warning("Samurai's Scripts", "Vehicle must be stopped.")
               end
             else
               gui.show_warning("Samurai's Scripts",
@@ -793,15 +809,27 @@ script.register_looped("HFC", function(hfc) -- Hide From Cops
         local my_pos      = self.get_pos()
         local veh_fwd     = ENTITY.GET_ENTITY_FORWARD_VECTOR(boot_vehicle)
         local _, ground_z = MISC.GET_GROUND_Z_FOR_3D_COORD(my_pos.x, my_pos.y, my_pos.z, ground_z, false, false)
-        VEHICLE.SET_VEHICLE_DOOR_OPEN(boot_vehicle, bootDoorID, false, false)
+        local outHeading  = boot_vehicle_re and ENTITY.GET_ENTITY_HEADING(boot_vehicle) or
+        (ENTITY.GET_ENTITY_HEADING(boot_vehicle) - 180)
+        local outPos = boot_vehicle_re and vec2:new(
+          my_pos.x + (veh_fwd.x * boot_vehicle_len / 3),
+          my_pos.y + (veh_fwd.y * boot_vehicle_len / 3)
+        ) or vec2:new(
+          my_pos.x - (veh_fwd.x * boot_vehicle_len / 3),
+          my_pos.y - (veh_fwd.y * boot_vehicle_len / 3)
+        )
+        VEHICLE.SET_VEHICLE_DOOR_OPEN(boot_vehicle, 5, false, false)
         hfc:sleep(500)
         TASK.CLEAR_PED_TASKS(self.get_ped())
         ENTITY.DETACH_ENTITY(self.get_ped(), true, false)
-        ENTITY.SET_ENTITY_COORDS(self.get_ped(), my_pos.x - (veh_fwd.x * 1.3),
-          my_pos.y - (veh_fwd.y * 1.3), ground_z, false, false, false, false)
-        ENTITY.SET_ENTITY_HEADING(self.get_ped(), (ENTITY.GET_ENTITY_HEADING(self.get_ped()) - 180))
-        VEHICLE.SET_VEHICLE_DOOR_SHUT(boot_vehicle, bootDoorID, false)
-        is_hiding, hiding_in_boot, boot_vehicle = false, false, 0
+        ENTITY.SET_ENTITY_COORDS(self.get_ped(), outPos.x, outPos.y, ground_z, false, false, false, false)
+        ENTITY.SET_ENTITY_HEADING(self.get_ped(), outHeading)
+        VEHICLE.SET_VEHICLE_DOOR_SHUT(boot_vehicle, 5, false)
+        hfc:sleep(200)
+        if ENTITY.GET_ENTITY_SPEED(boot_vehicle) > 4.0 then
+          PED.SET_PED_TO_RAGDOLL(self.get_ped(), 1500, 0, 0, false, false, false)
+        end
+        is_hiding, hiding_in_boot, boot_vehicle_re, boot_vehicle, boot_vehicle_len = false, false, false, 0, 0
         hfc:sleep(1000)
       end
     end
@@ -859,14 +887,12 @@ script.register_looped("AIEV", function(aiev) -- Anim Interrupt Event
             aiev:sleep(1000)
           until not PED.IS_PED_FALLING(self.get_ped())
           aiev:sleep(1000)
-          onAnimInterrupt()
         end
         if PED.IS_PED_RAGDOLL(self.get_ped()) then
           repeat
             aiev:sleep(1000)
           until not PED.IS_PED_RAGDOLL(self.get_ped())
           aiev:sleep(1000)
-          onAnimInterrupt()
         end
         onAnimInterrupt()
       end
@@ -925,10 +951,6 @@ script.register_looped("AHK", function(script) -- Anim Hotkeys
         cleanup(script)
         is_playing_anim  = false
         is_shortcut_anim = false
-        if anim_music then
-          play_music("stop")
-          anim_music = false
-        end
         if spawned_npcs[1] ~= nil then
           cleanupNPC(script)
         end
@@ -983,16 +1005,10 @@ script.register_looped("AHK", function(script) -- Anim Hotkeys
                 end
                 playAnim(info, self.get_ped(), anim_flag, selfprop1, selfprop2, selfloopedFX, selfSexPed, myboneIndex,
                   mycoords,
-                  myheading, myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX, script
+                  myheading, myforwardX, myforwardY, mybonecoords, plyrProps, selfPTFX, script
                 )
                 curr_playing_anim = info
                 is_playing_anim   = true
-                if Lua_fn.str_contains(curr_playing_anim.name, "DJ") then
-                  if not is_playing_radio then
-                    play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-                    anim_music = true
-                  end
-                end
               end
               script:sleep(200)
             end
@@ -1048,15 +1064,7 @@ script.register_looped("AHK", function(script) -- Anim Hotkeys
 
   if is_playing_scenario then
     if SS.isKeyJustPressed(keybinds.stop_anim.code) then
-      UI.widgetSound("Cancel")
-      Game.busySpinnerOn(SCN_STOP_SPINNER_, 3)
-      TASK.CLEAR_PED_TASKS(self.get_ped())
-      is_playing_scenario = false
-      script:sleep(1000)
-      Game.busySpinnerOff()
-      if ENTITY.DOES_ENTITY_EXIST(bbq) then
-        ENTITY.DELETE_ENTITY(bbq)
-      end
+      stopScenario(self.get_ped(), script)
     end
   end
 end)
@@ -1085,15 +1093,9 @@ script.register_looped("ANIMSC", function(animsc) -- Anim Shortcut
         end
         if Game.requestAnimDict(shortcut_anim.dict) then
           playAnim(shortcut_anim, self.get_ped(), anim_flag, selfprop1, selfprop2, selfloopedFX, selfSexPed,
-            myboneIndex, mycoords, myheading, myforwardX, myforwardY, mybonecoords, "self", plyrProps, selfPTFX, animsc
+            myboneIndex, mycoords, myheading, myforwardX, myforwardY, mybonecoords, plyrProps, selfPTFX, animsc
           )
           curr_playing_anim = shortcut_anim
-          if Lua_fn.str_contains(shortcut_anim.name, "DJ") then
-            if not is_playing_radio then
-              play_music("start", "RADIO_22_DLC_BATTLE_MIX1_RADIO")
-              anim_music = true
-            end
-          end
           animsc:sleep(100)
           curr_playing_anim = shortcut_anim
           is_playing_anim   = true
@@ -1125,23 +1127,20 @@ script.register_looped("PRF", function()
   end
 end)
 
-script.register_looped("MISCNPC", function(npcStuff)
+script.register_looped("MISCNPC", function()
   if spawned_npcs[1] ~= nil then
     for k, v in ipairs(spawned_npcs) do
-      if ENTITY.DOES_ENTITY_EXIST(v) then
-        if ENTITY.IS_ENTITY_DEAD(v, false) then
-          PED.REMOVE_PED_FROM_GROUP(v)
-          npcStuff:sleep(3000)
-          PED.DELETE_PED(v)
-          table.remove(spawned_npcs, k)
-        end
+      if ENTITY.DOES_ENTITY_EXIST(v) and ENTITY.IS_ENTITY_DEAD(v, false) then
+        PED.REMOVE_PED_FROM_GROUP(v)
+        ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(v)
+        table.remove(spawned_npcs, k)
       end
     end
   end
 end)
 
 -- weapon stuff
-script.register_looped("HG", function(hg) -- Hash Grabber
+script.register_looped("HG", function() -- Hash Grabber
   if HashGrabber then
     if WEAPON.IS_PED_ARMED(self.get_ped(), 4) and PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 24) then
       local ent                 = Game.getAimedEntity()
@@ -1167,41 +1166,31 @@ script.register_looped("HG", function(hg) -- Hash Grabber
         type_index, type_name))
     end
   end
-  hg:yield()
 end)
-script.register_looped("TB", function(trgrbot) -- Triggerbot
+script.register_looped("TB", function() -- Triggerbot
   if Triggerbot then
     if PLAYER.IS_PLAYER_FREE_AIMING(PLAYER.PLAYER_ID()) then
-      aimBool, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER.PLAYER_ID(), Entity)
-      if aimBool then
-        if ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
-          local bonePos = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(Entity,
-            ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Entity, "head"))
-          weapon = Game.Self.weapon()
-          if WEAPON.IS_PED_WEAPON_READY_TO_SHOOT(self.get_ped()) and Game.Self.isOnFoot() and not PED.IS_PED_RELOADING(self.get_ped()) then
-            if not ENTITY.IS_ENTITY_DEAD(Entity, false) then
-              if PAD.IS_CONTROL_PRESSED(0, 21) then
-                if aimEnemy then
-                  if PED.IS_PED_IN_COMBAT(Entity, self.get_ped()) then
-                    TASK.TASK_AIM_GUN_AT_COORD(self.get_ped(), bonePos.x, bonePos.y, bonePos.z, 250, true, false)
-                    TASK.TASK_SHOOT_AT_COORD(self.get_ped(), bonePos.x, bonePos.y, bonePos.z, 250, 2556319013)
-                  end
-                else
-                  TASK.TASK_AIM_GUN_AT_COORD(self.get_ped(), bonePos.x, bonePos.y, bonePos.z, 250, true, false)
-                  TASK.TASK_SHOOT_AT_COORD(self.get_ped(), bonePos.x, bonePos.y, bonePos.z, 250, 2556319013)
-                end
+      local aimBool, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER.PLAYER_ID(), Entity)
+      if aimBool and ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
+        local bonePos = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(Entity,
+          ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Entity, "head"))
+        weapon = Game.Self.weapon()
+        if WEAPON.IS_PED_WEAPON_READY_TO_SHOOT(self.get_ped()) and Game.Self.isOnFoot() and not PED.IS_PED_RELOADING(self.get_ped()) then
+          if PAD.IS_CONTROL_PRESSED(0, 21) and not ENTITY.IS_ENTITY_DEAD(Entity, false) then
+            if aimEnemy then
+              if PED.IS_PED_IN_COMBAT(Entity, self.get_ped()) then
+                TASK.TASK_AIM_GUN_AT_COORD(self.get_ped(), bonePos.x, bonePos.y, bonePos.z, 250, true, false)
+                TASK.TASK_SHOOT_AT_COORD(self.get_ped(), bonePos.x, bonePos.y, bonePos.z, 250, 2556319013)
               end
+            else
+              TASK.TASK_AIM_GUN_AT_COORD(self.get_ped(), bonePos.x, bonePos.y, bonePos.z, 250, true, false)
+              TASK.TASK_SHOOT_AT_COORD(self.get_ped(), bonePos.x, bonePos.y, bonePos.z, 250, 2556319013)
             end
           end
         end
-      else
-        Entity = 0
       end
-    else
-      bool = false
     end
   end
-  trgrbot:yield()
 end)
 script.register_looped("AKE", function(ak) -- Auto-kill enemies
   if autoKill then
@@ -1234,12 +1223,11 @@ script.register_looped("AKE", function(ak) -- Auto-kill enemies
     end
   end
 end)
-script.register_looped("EF", function(ef) -- Enemies Flee
+script.register_looped("EF", function() -- Enemies Flee
   if runaway then
     local myCoords = self.get_pos()
-    local gta_peds = entities.get_all_peds_as_handles()
     if (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET_WITHIN_RADIUS(self.get_ped(), myCoords.x, myCoords.y, myCoords.z, 100)) > 0 then
-      for _, p in pairs(gta_peds) do
+      for _, p in pairs(entities.get_all_peds_as_handles()) do
         if PED.IS_PED_HUMAN(p) and PED.IS_PED_IN_COMBAT(p, self.get_ped()) and not PED.IS_PED_A_PLAYER(p) then
           TASK.CLEAR_PED_SECONDARY_TASK(p)
           TASK.CLEAR_PED_TASKS(p)
@@ -1263,7 +1251,6 @@ script.register_looped("EF", function(ef) -- Enemies Flee
       end
     end
   end
-  ef:yield()
 end)
 script.register_looped("KATANA", function(rpq)
   rpq:yield()
@@ -1358,38 +1345,28 @@ script.register_looped("TDFT", function(script)
     else
       validModel = false
     end
-    if validModel and DriftTires then
+    if validModel and (driftMode or DriftTires) then
       if pressing_drift_button then
         if not drift_started then
-          VEHICLE.SET_DRIFT_TYRES(current_vehicle, true)
-          drift_started = true
-        end
-        VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, DriftPowerIncrease)
-      else
-        if drift_started then
-          VEHICLE.SET_DRIFT_TYRES(current_vehicle, false)
-          VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 1.0)
-          drift_started = false
-        end
-      end
-    end
-    script:yield()
-    if validModel and driftMode and not DriftTires then
-      if pressing_drift_button then
-        if not drift_started then
-          VEHICLE.SET_VEHICLE_REDUCE_GRIP(current_vehicle, true)
-          VEHICLE.SET_VEHICLE_REDUCE_GRIP_LEVEL(current_vehicle, DriftIntensity)
+          if driftMode then
+            VEHICLE.SET_VEHICLE_REDUCE_GRIP(current_vehicle, true)
+            VEHICLE.SET_VEHICLE_REDUCE_GRIP_LEVEL(current_vehicle, DriftIntensity)
+          elseif DriftTires then
+            VEHICLE.SET_DRIFT_TYRES(current_vehicle, true)
+          end
           drift_started = true
         end
         VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, DriftPowerIncrease)
       else
         if drift_started then
           VEHICLE.SET_VEHICLE_REDUCE_GRIP(current_vehicle, false)
+          VEHICLE.SET_DRIFT_TYRES(current_vehicle, false)
           VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 1.0)
           drift_started = false
         end
       end
     end
+
     if speedBoost then
       if validModel or is_boat then
         if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
@@ -1531,7 +1508,7 @@ script.register_looped("DSPTFX", function(dsptfx) -- Drift Sound/Partice FX
                 repeat
                   dsptfx:sleep(50)
                 until
-                  not pressing_drift_button or PAD.IS_CONTROL_RELEASED(0, 71)
+                  not pressing_drift_button or PAD.IS_CONTROL_RELEASED(0, 71) or VEHICLE.IS_VEHICLE_STOPPED(current_vehicle)
                 for _, smoke in ipairs(smokePtfx_t) do
                   if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(smoke) then
                     GRAPHICS.STOP_PARTICLE_FX_LOOPED(smoke, false)
@@ -1646,7 +1623,7 @@ script.register_looped("ABSPREP", function(abs)
       if (ENTITY.GET_ENTITY_SPEED(self.get_veh()) * 3.6) > 100 then
         repeat
           should_flash_bl = not should_flash_bl
-          abs:sleep(80)
+          abs:sleep(100)
         until (ENTITY.GET_ENTITY_SPEED(self.get_veh()) * 3.6) < 50 or not PAD.IS_CONTROL_PRESSED(0, 72) or
           not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle)
         should_flash_bl = false
@@ -1727,6 +1704,14 @@ script.register_looped("MISCVEH", function(mvo)
       end
       vehicleLockStatus = isLocked and 2 or 1
     end
+  end
+end)
+script.register_looped("ALARMMGR", function(amgr)
+  if vehicleLockStatus == 2 and VEHICLE.IS_VEHICLE_ALARM_ACTIVATED(current_vehicle) then
+    repeat
+      amgr:sleep(100)
+    until not VEHICLE.IS_VEHICLE_ALARM_ACTIVATED(current_vehicle)
+    VEHICLE.SET_VEHICLE_ALARM(current_vehicle, vehicleLockStatus == 2)
   end
 end)
 script.register_looped("NOSPTFX", function(spbptfx)
@@ -1959,7 +1944,7 @@ script.register_looped("VEHMNS", function(vmns) -- Vehicle Mines
             local veh_pos     = ENTITY.GET_ENTITY_COORDS(self.get_veh(), true)
             local veh_fwd     = ENTITY.GET_ENTITY_FORWARD_VECTOR(self.get_veh())
             local veh_hash    = ENTITY.GET_ENTITY_MODEL(self.get_veh())
-            local vmin, vmax  = Game.getModelDimensions(veh_hash, vmns)
+            local vmin, vmax  = Game.getModelDimensions(veh_hash)
             local veh_len     = vmax.y - vmin.y
             local _, ground_z = MISC.GET_GROUND_Z_FOR_3D_COORD(veh_pos.x, veh_pos.y, veh_pos.z, ground_z, false, false)
             local x_offset    = veh_fwd.x * (veh_len / 1.6)
@@ -2245,7 +2230,7 @@ end)
 script.register_looped("NOSPRG", function(nosprg) -- NOS Purge
   if Game.Self.isDriving() then
     if nosPurge and validModel or nosPurge and is_bike then
-      if pressing_purge_button and not is_in_flatbed then
+      if pressing_purge_button and not is_using_flatbed then
         local dict       = "core"
         local purgeBones = { "suspension_lf", "suspension_rf" }
         if not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(dict) then
@@ -2488,130 +2473,72 @@ script.register_looped("APKI", function(apki) -- Auto Pilot Keyboard Interrupt
   apki:yield()
 end)
 script.register_looped("FLTBD", function(script) -- Flatbed Main
-  local vehicleHandles  = entities.get_all_vehicles_as_handles()
-  local current_vehicle = PED.GET_VEHICLE_PED_IS_USING(self.get_ped())
-  local vehicle_model   = ENTITY.GET_ENTITY_MODEL(current_vehicle)
-  local flatbedHeading  = ENTITY.GET_ENTITY_HEADING(current_vehicle)
-  local flatbedBone     = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, "chassis")
-  local playerPosition  = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
-  local playerForwardX  = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-  local playerForwardY  = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
-  for _, veh in ipairs(vehicleHandles) do
-    local detectPos = vec3:new(playerPosition.x - (playerForwardX * 10), playerPosition.y - (playerForwardY * 10),
-      playerPosition.z)
-    local vehPos = ENTITY.GET_ENTITY_COORDS(veh, false)
-    local vDist = SYSTEM.VDIST(detectPos.x, detectPos.y, detectPos.z, vehPos.x, vehPos.y, vehPos.z)
-    if vDist <= 5 then
-      closestVehicle = veh
-    end
-  end
-  local closestVehicleModel = 0
-  if closestVehicle ~= nil then
-    closestVehicleModel = Game.getEntityModel(closestVehicle)
-  end
-  local iscar   = VEHICLE.IS_THIS_MODEL_A_CAR(closestVehicleModel)
-  local isbike  = VEHICLE.IS_THIS_MODEL_A_BIKE(closestVehicleModel)
-  local towable = false
-  if fb_model_override then
-    towable = true
-  else
-    towable = false
-  end
-  if iscar then
-    towable = true
-  end
-  if isbike then
-    towable = true
-  end
-  if closestVehicleModel == 745926877 then --Buzzard
-    towable = true
-  end
-  if closestVehicleModel == 1353720154 then
-    towable = false
-  end
-  if vehicle_model == 1353720154 then
-    is_in_flatbed = true
-  else
-    is_in_flatbed = false
-  end
-  if is_in_flatbed and towed_vehicle == 0 then
-    if pressing_fltbd_button and towable and closestVehicleModel ~= flatbedModel then
-      script:sleep(200)
-      local controlled = false
-      if closestVehicle ~= nil then
-        controlled = entities.take_control_of(closestVehicle, 350)
-      end
-      if controlled and closestVehicle ~= nil then
-        local vehicleClass = VEHICLE.GET_VEHICLE_CLASS(closestVehicle)
-        if vehicleClass == 1 then
-          tow_zAxis = 0.9
-          tow_yAxis = -2.3
-        elseif vehicleClass == 2 then
-          tow_zAxis = 0.993
-          tow_yAxis = -2.17046
-        elseif vehicleClass == 6 then
-          tow_zAxis = 1.00069420
-          tow_yAxis = -2.17046
-        elseif vehicleClass == 7 then
-          tow_zAxis = 1.009
-          tow_yAxis = -2.17036
-        elseif vehicleClass == 15 then
-          tow_zAxis = 1.3
-          tow_yAxis = -2.21069
-        elseif vehicleClass == 16 then
-          tow_zAxis = 1.5
-          tow_yAxis = -2.21069
-        else
-          tow_zAxis = 1.1
-          tow_yAxis = -2.0
-        end
-        ENTITY.SET_ENTITY_HEADING(closestVehicleModel, flatbedHeading)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(closestVehicle, current_vehicle, flatbedBone, 0.0, tow_yAxis, tow_zAxis, 0.0, 0.0,
-          0.0,
-          false, true, true, false, 1, true, 1)
-        towed_vehicle = closestVehicle
+  is_using_flatbed  = Game.getEntityModel(current_vehicle) == flatbedModel
+  if is_using_flatbed then
+    flatbedHeading  = ENTITY.GET_ENTITY_HEADING(current_vehicle)
+    flatbedPosition = ENTITY.GET_ENTITY_COORDS(current_vehicle, false)
+    flatbedForward  = ENTITY.GET_ENTITY_FORWARD_VECTOR(current_vehicle)
+    flatbedBone     = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, "chassis")
+    playerPosition  = ENTITY.GET_ENTITY_COORDS(self.get_ped(), true)
+    playerForwardX  = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
+    playerForwardY  = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+    detectPos       = vec3:new(
+      flatbedPosition.x - (flatbedForward.x * 10),
+      flatbedPosition.y - (flatbedForward.y * 10),
+      flatbedPosition.z
+    )
+    fb_closestVehicle = Game.getClosestVehicle(detectPos, 5, current_vehicle)
+    fb_closestVehicleModel = fb_closestVehicle ~= 0 and Game.getEntityModel(fb_closestVehicle) or 0
+    fb_closestVehicleName  = fb_closestVehicleModel ~= 0 and vehicles.get_vehicle_display_name(fb_closestVehicleModel) or ""
+    fb_isCar  = VEHICLE.IS_THIS_MODEL_A_CAR(fb_closestVehicleModel)
+    fb_isBike = VEHICLE.IS_THIS_MODEL_A_BIKE(fb_closestVehicleModel)
+    towable   = towEverything or fb_isCar or fb_isBike or fb_closestVehicleModel == 745926877
+    if towed_vehicle == 0 and fb_closestVehicle ~= nil then
+      if pressing_fltbd_button and towable and fb_closestVehicleModel ~= flatbedModel then
         script:sleep(200)
-      else
-        gui.show_error("Samurais Scripts", VEH_CTRL_FAIL_)
-      end
-    end
-    if pressing_fltbd_button and closestVehicle ~= nil and not towable then
-      gui.show_message("Samurais Scripts", FLTBD_CARS_ONLY_TXT_)
-      script:sleep(400)
-    end
-    if pressing_fltbd_button and closestVehicleModel == flatbedModel then
-      script:sleep(400)
-      gui.show_message("Samurais Scripts", FLTBD_NOT_ALLOWED_TXT_)
-    end
-  elseif is_in_flatbed and towed_vehicle ~= 0 then
-    if pressing_fltbd_button then
-      script:sleep(200)
-      for _, v in ipairs(vehicleHandles) do
-        local modelHash         = ENTITY.GET_ENTITY_MODEL(v)
-        local attachedVehicle   = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(current_vehicle, modelHash)
-        local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(towed_vehicle, false)
-        local controlled        = entities.take_control_of(attachedVehicle, 350)
-        if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) then
-          if controlled then
-            ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
-            ENTITY.SET_ENTITY_COORDS(attachedVehicle, attachedVehcoords.x - (playerForwardX * 10),
-              attachedVehcoords.y - (playerForwardY * 10), playerPosition.z, false, false, false, false)
-            VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(towed_vehicle, 5.0)
-            towed_vehicle = 0
-          end
+        local controlled = false
+        if fb_closestVehicle ~= nil and fb_closestVehicle > 0 then
+          controlled = entities.take_control_of(fb_closestVehicle, 350)
         end
+        if controlled and fb_closestVehicle ~= nil then
+          tow_zAxis, tow_yAxis = flatbed_getTowOffset()
+          ENTITY.SET_ENTITY_HEADING(fb_closestVehicleModel, flatbedHeading)
+          ENTITY.ATTACH_ENTITY_TO_ENTITY(fb_closestVehicle, current_vehicle, flatbedBone, 0.0, tow_yAxis, tow_zAxis, 0.0, 0.0,
+            0.0,
+            false, true, true, false, 1, true, 1)
+          towed_vehicle = fb_closestVehicle
+          script:sleep(200)
+        else
+          gui.show_error("Samurais Scripts", VEH_CTRL_FAIL_)
+        end
+      end
+      if pressing_fltbd_button and fb_closestVehicle ~= nil and not towable then
+        gui.show_message("Samurais Scripts", FLTBD_CARS_ONLY_TXT_)
+        script:sleep(400)
+      end
+      if pressing_fltbd_button and fb_closestVehicleModel == flatbedModel then
+        script:sleep(400)
+        gui.show_message("Samurais Scripts", FLTBD_NOT_ALLOWED_TXT_)
+      end
+    else
+      towed_vehicleModel = ENTITY.GET_ENTITY_MODEL(towed_vehicle)
+      if pressing_fltbd_button then
+        script:sleep(200)
+        flatbed_detach()
       end
     end
   end
 end)
 script.register_looped("FLTBDTPM", function() -- Flatbed Tow Pos Marker
   if towPos then
-    if is_in_flatbed and towed_vehicle == 0 then
-      local playerPosition = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
-      local playerForwardX = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-      local playerForwardY = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
-      local detectPos      = vec3:new(playerPosition.x - (playerForwardX * 10), playerPosition.y - (playerForwardY * 10),
-        playerPosition.z)
+    if is_using_flatbed and towed_vehicle == 0 then
+      local flatbedPos = ENTITY.GET_ENTITY_COORDS(current_vehicle, false)
+      local flatbedFwd = ENTITY.GET_ENTITY_FORWARD_VECTOR(current_vehicle)
+      local detectPos  = vec3:new(
+        flatbedPos.x - (flatbedFwd.x * 10),
+        flatbedPos.y - (flatbedFwd.y * 10),
+        flatbedPos.z
+      )
       GRAPHICS.DRAW_MARKER_SPHERE(detectPos.x, detectPos.y, detectPos.z, 2.5, 180, 128, 0, 0.115)
     end
   end
@@ -2733,7 +2660,7 @@ script.register_looped("PG", function(pg) -- Ped Grabber
   if pedGrabber and not vehicleGrabber and not HUD.IS_MP_TEXT_CHAT_TYPING() and not is_playing_anim
       and not is_playing_scenario and not isCrouched and not is_handsUp and not is_hiding then
     if Game.Self.isOnFoot() and not gui.is_open() and not WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
-      local nearestPed = Game.getClosestPed(self.get_ped(), 10)
+      local nearestPed = Game.getClosestPed(self.get_ped(), 10, true)
       local myGroup    = PED.GET_PED_GROUP_INDEX(self.get_ped())
       if not ped_grabbed and nearestPed ~= 0 then
         if PED.IS_PED_ON_FOOT(nearestPed) and not PED.IS_PED_A_PLAYER(nearestPed) and not PED.IS_PED_GROUP_MEMBER(nearestPed, myGroup) then
@@ -3547,7 +3474,7 @@ script.register_looped("DFM", function() -- Disable Flight Music
   end
 end)
 
-script.register_looped("REOPT", function(ro) -- Remote Options
+script.register_looped("REOPT", function(ro) -- Remote Options. Probably better to rewrite these to something similar to `RegisterCommand()` but I'm too lazy.
   if not is_typing and not is_setting_hotkeys and not Game.Self.isBrowsingApps()
       and not HUD.IS_MP_TEXT_CHAT_TYPING() and not HUD.IS_PAUSE_MENU_ACTIVE() then
     if SS.isKeyJustPressed(keybinds.autokill.code) then
@@ -3555,7 +3482,7 @@ script.register_looped("REOPT", function(ro) -- Remote Options
       gui.show_message("Samurai's Scripts", ("Auto-Kill Enemies %s."):format(autoKill and "disabled" or "enabled"))
       autoKill = not autoKill
       CFG.save("autoKill", autoKill)
-      ro:sleep(200) -- iki
+      ro:sleep(200)
     end
 
     if SS.isKeyJustPressed(keybinds.enemiesFlee.code) then
@@ -3563,7 +3490,7 @@ script.register_looped("REOPT", function(ro) -- Remote Options
       gui.show_message("Samurai's Scripts", ("Enemies Flee %s."):format(runaway and "disabled" or "enabled"))
       runaway = not runaway
       CFG.save("runaway", runaway)
-      ro:sleep(200) -- iki
+      ro:sleep(200)
     end
 
     if SS.isKeyJustPressed(keybinds.missl_def.code) then
@@ -3571,7 +3498,7 @@ script.register_looped("REOPT", function(ro) -- Remote Options
       gui.show_message("Samurai's Scripts", ("Missile Defence %s."):format(missiledefense and "disabled" or "enabled"))
       missiledefense = not missiledefense
       CFG.save("missiledefense", missiledefense)
-      ro:sleep(200) -- iki
+      ro:sleep(200)
     end
 
     if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) and pressing_laser_button then
@@ -3579,10 +3506,11 @@ script.register_looped("REOPT", function(ro) -- Remote Options
       gui.show_message("Samurai's Scripts", ("Laser Sights %s."):format(laserSight and "disabled" or "enabled"))
       laserSight = not laserSight
       CFG.save("laserSight", laserSight)
-      ro:sleep(200) -- iki
+      ro:sleep(200)
     end
 
-    if SS.isKeyJustPressed(keybinds.commands.code) and not cmd_ui_is_open then
+    if SS.isKeyJustPressed(keybinds.commands.code) and not cmd_ui_is_open and not gui.is_open() and not
+    HUD.IS_MP_TEXT_CHAT_TYPING() and not HUD.IS_PAUSE_MENU_ACTIVE() then
       should_draw_cmd_ui, cmd_ui_is_open = true, true
       gui.override_mouse(true)
     end

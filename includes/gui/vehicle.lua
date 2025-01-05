@@ -642,7 +642,7 @@ function vehicleUI()
         else
           local self_fwd   = ENTITY.GET_ENTITY_FORWARD_VECTOR(self.get_ped())
           local veh_hash   = ENTITY.GET_ENTITY_MODEL(current_vehicle)
-          local vmin, vmax = Game.getModelDimensions(veh_hash, blv)
+          local vmin, vmax = Game.getModelDimensions(veh_hash)
           local veh_length = vmax.y - vmin.y
           local tp_offset  = { x = self_fwd.x * veh_length, y = self_fwd.y * veh_length }
           ENTITY.SET_ENTITY_COORDS(current_vehicle, self_coords.x + tp_offset.x, self_coords.y + tp_offset.y,
@@ -688,12 +688,14 @@ function vehicleUI()
               else
                 local self_fwd   = ENTITY.GET_ENTITY_FORWARD_VECTOR(self.get_ped())
                 local veh_hash   = ENTITY.GET_ENTITY_MODEL(globals.get_int(pv_global))
-                local vmin, vmax = Game.getModelDimensions(veh_hash, bpv)
+                local vmin, vmax = Game.getModelDimensions(veh_hash)
                 local veh_length = vmax.y - vmin.y
-                local tp_offset  = { x = self_fwd.x * veh_length, y = self_fwd.y * veh_length }
-                ENTITY.SET_ENTITY_COORDS(globals.get_int(pv_global), self_coords.x + tp_offset.x,
-                  self_coords.y + tp_offset
-                  .y, self_coords.z, false, false, false, true)
+                local tp_offset  = vec2:new(self_fwd.x * veh_length, self_fwd.y * veh_length)
+                ENTITY.SET_ENTITY_COORDS(
+                  globals.get_int(pv_global), self_coords.x + tp_offset.x,
+                  self_coords.y + tp_offset.y, self_coords.z,
+                  false, false, false, true
+                )
               end
             else
               gui.show_error("Samurai's Scripts", "Your personal vehicle is not outside.")

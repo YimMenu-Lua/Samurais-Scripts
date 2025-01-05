@@ -179,10 +179,6 @@ function worldUI()
   UI.helpMarker(false, SMOOTH_WATERS_DESC_)
   if dowUsed then
     UI.widgetSound("Nav2")
-    if disable_waves then
-      Game.World.disableOceanWaves(true)
-    else
-      Game.World.disableOceanWaves(false)
-    end
+    Game.World.disableOceanWaves(disable_waves)
   end
 end

@@ -96,7 +96,7 @@ function soundPlayerUI()
       if ImGui.Button(string.format("%s##radio", GENERIC_PLAY_BTN_)) then
         script.run_in_fiber(function(rad)
           if not is_playing_anim then
-            play_music("start", selected_radio.station)
+            play_music(true, selected_radio.station)
             is_playing_radio   = true
             radio_btn_off      = true
             start_loading_anim = true
@@ -111,7 +111,7 @@ function soundPlayerUI()
     else
       if ImGui.Button(string.format("%s##sounds", GENERIC_STOP_BTN_)) then
         script.run_in_fiber(function(rad)
-          play_music("stop")
+          play_music(false)
           is_playing_radio   = false
           radio_btn_off      = true
           start_loading_anim = true

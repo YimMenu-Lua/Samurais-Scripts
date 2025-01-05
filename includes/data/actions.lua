@@ -1,8 +1,8 @@
 ---@diagnostic disable
 
 animlist = {
-  { dict = "rcmpaparazzo_2",                                              anim = "shag_loop_a",                        name = "Hit It From The Back 01",         flag = 47, type = 7,                         boneID = 0,                             pedType = "PED_TYPE_PROSTITUTE", pedHash = 1846523796, posx = 0.0,     posy = 0.2,           posz = 0.0,            rotx = 40.0,     roty = 0.0,                     rotz = 0.0,                              dict2 = "rcmpaparazzo_2",       anim2 = "shag_loop_poppy", sfx = "SEX_GENERIC_FEM",        sfxName = "S_F_Y_HOOKER_03_BLACK_FULL_01", sfxFlg = "SPEECH_PARAMS_FORCE", cat = "NSFW" },
-  { dict = "misscarsteal2pimpsex",                                        anim = "shagloop_pimp",                      name = "Hit It From The Front",           flag = 47, type = 7,                         boneID = 0,                             pedType = "PED_TYPE_PROSTITUTE", pedHash = 1846523796, posx = 0.05,    posy = 0.3,           posz = -0.2,           rotx = 27.0,     roty = 0.0,                     rotz = 190.0,                            dict2 = "misscarsteal2pimpsex", anim2 = "shagloop_hooker", sfx = "SEX_GENERIC_FEM",        sfxName = "S_F_Y_HOOKER_03_BLACK_FULL_01", sfxFlg = "SPEECH_PARAMS_FORCE", cat = "NSFW" },
+  { dict = "rcmpaparazzo_2",                                              anim = "shag_loop_a",                        name = "Hit It From The Back 01",         flag = 47, type = 7,                         boneID = 0,                             pedType = PED_TYPE._PROSTITUTE,  pedHash = 1846523796, posx = 0.0,     posy = 0.2,           posz = 0.0,            rotx = 40.0,     roty = 0.0,                     rotz = 0.0,                              dict2 = "rcmpaparazzo_2",       anim2 = "shag_loop_poppy", sfx = "SEX_GENERIC_FEM",        sfxName = "S_F_Y_HOOKER_03_BLACK_FULL_01", sfxFlg = "SPEECH_PARAMS_FORCE", cat = "NSFW" },
+  { dict = "misscarsteal2pimpsex",                                        anim = "shagloop_pimp",                      name = "Hit It From The Front",           flag = 47, type = 7,                         boneID = 0,                             pedType = PED_TYPE._PROSTITUTE,  pedHash = 1846523796, posx = 0.05,    posy = 0.3,           posz = -0.2,           rotx = 27.0,     roty = 0.0,                     rotz = 190.0,                            dict2 = "misscarsteal2pimpsex", anim2 = "shagloop_hooker", sfx = "SEX_GENERIC_FEM",        sfxName = "S_F_Y_HOOKER_03_BLACK_FULL_01", sfxFlg = "SPEECH_PARAMS_FORCE", cat = "NSFW" },
 
   { dict = "anim@scripted@ulp_missions@injured_agent@",                   anim = "idle_male",                          name = "Injured On The Ground",           flag = 47, ptfxdict = "core",                ptfxname = "ped_blood_drips",           ptfxdelay = 100,                 ptfxscale = 10,       ptfxOffx = 0.0, ptfxOffy = 0.0,       ptfxOffz = 0.0,        ptfxrotx = 0.0,  ptfxroty = 0.0,                 ptfxrotz = 0.0,                          type = 2, cat = "Movements" },
   { dict = "combat@damage@writheidle_a",                                  anim = "writhe_idle_a",                      name = "Injured On The Ground 2",         flag = 47, ptfxdict = "core",                ptfxname = "ped_blood_drips",           ptfxdelay = 100,                 ptfxscale = 1.0,      ptfxOffx = 0.0, ptfxOffy = 0.0,       ptfxOffz = 0.0,        ptfxrotx = 0.0,  ptfxroty = 0.0,                 ptfxrotz = 0.0,                          type = 2, cat = "Movements" },
@@ -336,39 +336,6 @@ ped_scenarios = {
   { scenario = "WORLD_HUMAN_YOGA",                       name = "Workout: Yoga" },
 }
 
-PED_TYPE   = {
-  _PLAYER_0              = 0,
-  _PLAYER_1              = 1,
-  _NETWORK_PLAYER        = 2,
-  _PLAYER_2              = 3,
-  _CIVMALE               = 4,
-  _CIVFEMALE             = 5,
-  _COP                   = 6,
-  _GANG_ALBANIAN         = 7,
-  _GANG_BIKER_1          = 8,
-  _GANG_BIKER_2          = 9,
-  _GANG_ITALIAN          = 10,
-  _GANG_RUSSIAN          = 11,
-  _GANG_RUSSIAN_2        = 12,
-  _GANG_IRISH            = 13,
-  _GANG_JAMAICAN         = 14,
-  _GANG_AFRICAN_AMERICAN = 15,
-  _GANG_KOREAN           = 16,
-  _GANG_CHINESE_JAPANESE = 17,
-  _GANG_PUERTO_RICAN     = 18,
-  _DEALER                = 19,
-  _MEDIC                 = 20,
-  _FIREMAN               = 21,
-  _CRIMINAL              = 22,
-  _BUM                   = 23,
-  _PROSTITUTE            = 24,
-  _SPECIAL               = 25,
-  _MISSION               = 26,
-  _SWAT                  = 27,
-  _ANIMAL                = 28,
-  _ARMY                  = 29,
-}
-
 npcList = {
   { group = PED_TYPE._PROSTITUTE, hash = 0x6E0FB794, name = "Hooker" },
   { group = PED_TYPE._PROSTITUTE, hash = 0x52580019, name = "Hooker 02" },
@@ -420,12 +387,20 @@ npcList = {
 
 ---@param s script_util
 function cleanup(s)
-  TASK.CLEAR_PED_TASKS(self.get_ped())
+  if is_playing_anim then
+    TASK.STOP_ANIM_TASK(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, -4.0)
+    STREAMING.REMOVE_ANIM_DICT(curr_playing_anim.dict)
+  end
+  if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
+    local mySeat = Game.getPedVehicleSeat(self.get_ped())
+    PED.SET_PED_INTO_VEHICLE(self.get_ped(), self.get_veh(), mySeat)
+  end
+  if anim_music and ENTITY.DOES_ENTITY_EXIST(pBus) and
+    ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(pBus, self.get_ped()) then
+    play_music(false)
+  end
   if plyrProps[1] ~= nil then
     for _, v in ipairs(plyrProps) do
-      if ENTITY.DOES_ENTITY_EXIST(v) then
-        PED.DELETE_PED(v)
-      end
       if ENTITY.DOES_ENTITY_EXIST(v) then
         ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v, false, false)
         s:sleep(100)
@@ -441,17 +416,6 @@ function cleanup(s)
   if ENTITY.DOES_ENTITY_EXIST(bbq) then
     ENTITY.DELETE_ENTITY(bbq)
   end
-  if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
-    local mySeat = Game.getPedVehicleSeat(self.get_ped())
-    PED.SET_PED_INTO_VEHICLE(self.get_ped(), self.get_veh(), mySeat)
-  else
-    local current_coords = self.get_pos()
-    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(self.get_ped(), current_coords.x, current_coords.y, current_coords.z, true,
-      false, false)
-  end
-  if curr_playing_anim.dict ~= nil then
-    STREAMING.REMOVE_ANIM_DICT(curr_playing_anim.dict)
-  end
 end
 
 ---@param s script_util
@@ -459,6 +423,10 @@ function cleanupNPC(s)
   for _, v in ipairs(spawned_npcs) do
     TASK.CLEAR_PED_TASKS(v)
     PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(v, true)
+    if anim_music and ENTITY.DOES_ENTITY_EXIST(pBus) and
+      ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(pBus, v) then
+      play_music(false)
+    end
     if PED.IS_PED_IN_ANY_VEHICLE(v, false) then
       local veh     = PED.GET_VEHICLE_PED_IS_IN(v, false)
       local npcSeat = Game.getPedVehicleSeat(v)
@@ -508,8 +476,15 @@ end
 ---@param ptfxTable table
 ---@param s script_util
 function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBone, targetCoords, targetHeading,
-  targetForwardX, targetForwardY, targetBoneCoords, ent, propTable, ptfxTable, s)
-  local blendInSpeed, blendOutSpeed, duration = 4.0, -4.0, -1
+  targetForwardX, targetForwardY, targetBoneCoords, propTable, ptfxTable, s)
+  if Info.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
+    UI.widgetSound("Error")
+    gui.show_error("Samurai's Scripts",
+      "This animation can only be played while sitting inside a vehicle (cars and trucks only).")
+    return
+  end
+  local playbackRate, blendInSpeed, blendOutSpeed, duration = 1.0, 4.0, -4.0, -1
+  local reset = target == self.get_ped() and cleanup or cleanupNPC
   if target == self.get_ped() then
     if is_handsUp then
       TASK.CLEAR_PED_TASKS(self.get_ped())
@@ -520,26 +495,34 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
       isCrouched = false
     end
   end
-  if Info.blendin ~= nil then
+  if Info.blendin then
     blendInSpeed = Info.blendin
   end
-  if Info.blendout ~= nil then
+  if Info.blendout then
     blendOutSpeed = Info.blendout
   end
-  if Info.atime ~= nil then
+  if Info.atime then
     duration = Info.atime
   end
   if is_playing_scenario or is_playing_amb_scenario then
     TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+    if ENTITY.DOES_ENTITY_EXIST(bbq) then
+      ENTITY.DELETE_ENTITY(bbq)
+    end
     is_playing_scenario, is_playing_amb_scenario = false, false
   end
-  if Info.type == 1 then
-    if ent == "self" then
-      cleanup(s)
-    elseif ent == "npc" then
-      cleanupNPC(s)
+  if Lua_fn.str_contains(Info.name, "DJ") then
+    if not is_playing_radio and not anim_music then
+      play_music(true, "RADIO_22_DLC_BATTLE_MIX1_RADIO", target)
     end
-    script.run_in_fiber(function()
+  end
+  reset(s)
+  script.run_in_fiber(function(pa)
+    while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
+      STREAMING.REQUEST_ANIM_DICT(Info.dict)
+      coroutine.yield()
+    end
+    if Info.type == 1 then
       if not disableProps then
         while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
           STREAMING.REQUEST_MODEL(Info.prop1)
@@ -551,45 +534,18 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         Info.rotz, false, false, false, false, 2, true, 1)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(prop1)
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(Info.dict)
-        coroutine.yield()
-      end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
-      PED.SET_PED_CONFIG_FLAG(target, 179, true)
-    end)
-  elseif Info.type == 2 then
-    if ent == "self" then
-      cleanup(s)
-    elseif ent == "npc" then
-      cleanupNPC(s)
-    end
-    script.run_in_fiber(function(type2)
+    elseif Info.type == 2 then
       while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(Info.ptfxdict) do
         STREAMING.REQUEST_NAMED_PTFX_ASSET(Info.ptfxdict)
         coroutine.yield()
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(Info.dict)
-        coroutine.yield()
-      end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 0, false, false, false)
-      PED.SET_PED_CONFIG_FLAG(target, 179, true)
-      
-      type2:sleep(Info.ptfxdelay)
+      pa:sleep(Info.ptfxdelay)
       GRAPHICS.USE_PARTICLE_FX_ASSET(Info.ptfxdict)
       loopedFX = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(Info.ptfxname, target, Info.ptfxOffx,
         Info.ptfxOffy, Info.ptfxOffz, Info.ptfxrotx, Info.ptfxroty, Info.ptfxrotz, targetBone, Info.ptfxscale, false,
         false, false, 0, 0, 0, 0)
       table.insert(ptfxTable, loopedFX)
-    end)
-  elseif Info.type == 3 then
-    if ent == "self" then
-      cleanup(s)
-    elseif ent == "npc" then
-      cleanupNPC(s)
-    end
-    script.run_in_fiber(function()
+    elseif Info.type == 3 then
       if not disableProps then
         while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
           STREAMING.REQUEST_MODEL(Info.prop1)
@@ -602,20 +558,7 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         OBJECT.PLACE_OBJECT_ON_GROUND_PROPERLY(prop1)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(prop1)
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(Info.dict)
-        coroutine.yield()
-      end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
-      PED.SET_PED_CONFIG_FLAG(target, 179, true)
-    end)
-  elseif Info.type == 4 then
-    if ent == "self" then
-      cleanup(s)
-    elseif ent == "npc" then
-      cleanupNPC(s)
-    end
-    script.run_in_fiber(function(type4)
+    elseif Info.type == 4 then
       if not disableProps then
         while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
           STREAMING.REQUEST_MODEL(Info.prop1)
@@ -625,31 +568,12 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         table.insert(propTable, prop1)
         ENTITY.SET_ENTITY_COORDS(prop1, targetBoneCoords.x + Info.posx, targetBoneCoords.y + Info.posy,
           targetBoneCoords.z + Info.posz, false, false, false, false)
-        type4:sleep(20)
+        pa:sleep(20)
         OBJECT.PLACE_OBJECT_ON_GROUND_PROPERLY(prop1)
         ENTITY.SET_ENTITY_COLLISION(prop1, Info.propColl, Info.propColl)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(prop1)
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(Info.dict)
-        coroutine.yield()
-      end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
-      PED.SET_PED_CONFIG_FLAG(target, 179, true)
-    end)
-  elseif Info.type == 5 then
-    if ent == "self" then
-      cleanup(s)
-    elseif ent == "npc" then
-      cleanupNPC(s)
-    end
-    script.run_in_fiber(function(type5)
-      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(Info.dict)
-        coroutine.yield()
-      end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 0.0, false, false, false)
-      PED.SET_PED_CONFIG_FLAG(target, 179, true)
+    elseif Info.type == 5 then
       if not disableProps then
         while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
           STREAMING.REQUEST_MODEL(Info.prop1)
@@ -660,25 +584,18 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         ENTITY.ATTACH_ENTITY_TO_ENTITY(prop1, target, targetBone, Info.posx, Info.posy, Info.posz, Info.rotx, Info.roty,
           Info.rotz, false, false, false, false, 2, true, 1)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(prop1)
-        type5:sleep(50)
+        pa:sleep(50)
         while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(Info.ptfxdict) do
           STREAMING.REQUEST_NAMED_PTFX_ASSET(Info.ptfxdict)
           coroutine.yield()
         end
-        type5:sleep(Info.ptfxdelay)
+        pa:sleep(Info.ptfxdelay)
         GRAPHICS.USE_PARTICLE_FX_ASSET(Info.ptfxdict)
         loopedFX = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY(Info.ptfxname, prop1, Info.ptfxOffx,
           Info.ptfxOffy, Info.ptfxOffz, Info.ptfxrotx, Info.ptfxroty, Info.ptfxrotz, Info.ptfxscale, false, false, false,
           0, 0, 0, 0)
       end
-    end)
-  elseif Info.type == 6 then
-    if ent == "self" then
-      cleanup(s)
-    elseif ent == "npc" then
-      cleanupNPC(s)
-    end
-    script.run_in_fiber(function()
+    elseif Info.type == 6 then
       if not disableProps then
         while not STREAMING.HAS_MODEL_LOADED(Info.prop1) do
           STREAMING.REQUEST_MODEL(Info.prop1)
@@ -698,20 +615,7 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
           Info.posz2, Info.rotx2, Info.roty2, Info.rotz2, false, false, false, false, 2, true, 1)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(prop2)
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(Info.dict)
-        coroutine.yield()
-      end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
-      PED.SET_PED_CONFIG_FLAG(target, 179, true)
-    end)
-  elseif Info.type == 7 then
-    if ent == "self" then
-      cleanup(s)
-    elseif ent == "npc" then
-      cleanupNPC(s)
-    end
-    script.run_in_fiber(function()
+    elseif Info.type == 7 then
       if not disableProps then
         while not STREAMING.HAS_MODEL_LOADED(Info.pedHash) do
           STREAMING.REQUEST_MODEL(Info.pedHash)
@@ -732,28 +636,12 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(propPed, true)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(propPed)
       end
-      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(Info.dict)
-        coroutine.yield()
-      end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 1.0, false, false, false)
-      PED.SET_PED_CONFIG_FLAG(target, 179, true)
-    end)
-  else
-    if ent == "self" then
-      cleanup(s)
-    elseif ent == "npc" then
-      cleanupNPC(s)
+    else
+      playbackRate = 0.0
     end
-    script.run_in_fiber(function()
-      while not STREAMING.HAS_ANIM_DICT_LOADED(Info.dict) do
-        STREAMING.REQUEST_ANIM_DICT(Info.dict)
-        coroutine.yield()
-      end
-      TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, 0.0, false, false, false)
-      PED.SET_PED_CONFIG_FLAG(target, 179, true)
-    end)
-  end
+    TASK.TASK_PLAY_ANIM(target, Info.dict, Info.anim, blendInSpeed, blendOutSpeed, duration, Flag, playbackRate, false, false, false)
+    PED.SET_PED_CONFIG_FLAG(target, 179, true)
+  end)
 end
 
 ---@param ref table

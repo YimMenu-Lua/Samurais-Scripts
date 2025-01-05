@@ -5,12 +5,12 @@ function yrv2UI()
   ImGui.Spacing(); ImGui.Dummy((window_width / 2) - 110, 1); ImGui.SameLine(); UI.coloredText("- YimResupplier V2 -",
     yrv2_color, 1, 60)
   if Game.isOnline() and not script.is_active("maintransition") then
-    local whouse_1_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT0") - 1) >= 0
-    local whouse_2_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT1") - 1) >= 0
-    local whouse_3_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT2") - 1) >= 0
-    local whouse_4_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT3") - 1) >= 0
-    local whouse_5_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT4") - 1) >= 0
-    local hangarOwned    = stats.get_int("MPX_HANGAR_OWNED") ~= 0 -- can be used to get the hangar name and allow TP to the correct hangar in public sessions. I'll probably do it never... 😴
+    local whouse_1_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT0") > 0
+    local whouse_2_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT1") > 0
+    local whouse_3_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT2") > 0
+    local whouse_4_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT3") > 0
+    local whouse_5_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT4") > 0
+    local hangarOwned    = stats.get_int("MPX_HANGAR_OWNED") ~= 0
     local slot0_owned    = stats.get_int("MPX_PROP_FAC_SLOT0") ~= 0
     local slot1_owned    = stats.get_int("MPX_PROP_FAC_SLOT1") ~= 0
     local slot2_owned    = stats.get_int("MPX_PROP_FAC_SLOT2") ~= 0
@@ -18,6 +18,7 @@ function yrv2UI()
     local slot4_owned    = stats.get_int("MPX_PROP_FAC_SLOT4") ~= 0
     local bunkerOwned    = stats.get_int("MPX_PROP_FAC_SLOT5") ~= 0
     local acidOwned      = stats.get_int("MPX_XM22_LAB_OWNED") ~= 0
+    local wh1Total, wh2Total, wh3Total, wh4Total, wh5Total, ceo_moola = 0, 0, 0, 0, 0, 0
     if CURRENT_BUILD == TARGET_BUILD then
       ImGui.Spacing(); ImGui.BeginTabBar("##BusinessManager", ImGuiTabBarFlags.None)
       if whouse_1_owned or whouse_2_owned or whouse_3_owned or whouse_4_owned or whouse_5_owned then
@@ -27,11 +28,9 @@ function yrv2UI()
             if whouse1.name == "" then SS.getCEOwhouseInfo(whouse1) end
             wh1Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE0")
             if wh1Supplies ~= nil and wh1Supplies > 0 then
-              wh1Value = globals.get_int(tun_global + (SS.get_ceo_crates_offset(wh1Supplies)))
-            else
-              wh1Value = 0
+              local wh1Value = globals.get_int(tun_global + SS.get_ceo_crates_offset(wh1Supplies))
+              wh1Total = wh1Value * wh1Supplies
             end
-            wh1Total  = wh1Value * wh1Supplies
             ceo_moola = wh1Total
             ImGui.SeparatorText(whouse1.name)
             if whouse1.size.small or whouse1.size.medium or whouse1.size.large then
@@ -60,11 +59,9 @@ function yrv2UI()
             if whouse2.name == "" then SS.getCEOwhouseInfo(whouse2) end
             wh2Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE1")
             if wh2Supplies ~= nil and wh2Supplies > 0 then
-              wh2Value = globals.get_int(tun_global + (SS.get_ceo_crates_offset(wh2Supplies)))
-            else
-              wh2Value = 0
+              local wh2Value = globals.get_int(tun_global + SS.get_ceo_crates_offset(wh2Supplies))
+              wh2Total = wh2Value * wh2Supplies
             end
-            wh2Total  = wh2Value * wh2Supplies
             ceo_moola = ceo_moola + wh2Total
             ImGui.SeparatorText(whouse2.name)
             if whouse2.size.small or whouse2.size.medium or whouse2.size.large then
@@ -93,11 +90,9 @@ function yrv2UI()
             if whouse3.name == "" then SS.getCEOwhouseInfo(whouse3) end
             wh3Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE2")
             if wh3Supplies ~= nil and wh3Supplies > 0 then
-              wh3Value = globals.get_int(tun_global + (SS.get_ceo_crates_offset(wh3Supplies)))
-            else
-              wh3Value = 0
+              local wh3Value = globals.get_int(tun_global + SS.get_ceo_crates_offset(wh3Supplies))
+              wh3Total = wh3Value * wh3Supplies
             end
-            wh3Total  = wh3Value * wh3Supplies
             ceo_moola = ceo_moola + wh3Total
             ImGui.SeparatorText(whouse3.name)
             if whouse3.size.small or whouse3.size.medium or whouse3.size.large then
@@ -126,11 +121,9 @@ function yrv2UI()
             if whouse4.name == "" then SS.getCEOwhouseInfo(whouse4) end
             wh4Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE3")
             if wh4Supplies ~= nil and wh4Supplies > 0 then
-              wh4Value = globals.get_int(tun_global + (SS.get_ceo_crates_offset(wh4Supplies)))
-            else
-              wh4Value = 0
+              local wh4Value = globals.get_int(tun_global + SS.get_ceo_crates_offset(wh4Supplies))
+              wh4Total = wh4Value * wh4Supplies
             end
-            wh4Total  = wh4Value * wh4Supplies
             ceo_moola = ceo_moola + wh4Total
             ImGui.SeparatorText(whouse4.name)
             if whouse4.size.small or whouse4.size.medium or whouse4.size.large then
@@ -159,11 +152,9 @@ function yrv2UI()
             if whouse5.name == "" then SS.getCEOwhouseInfo(whouse5) end
             wh5Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE4")
             if wh5Supplies ~= nil and wh5Supplies > 0 then
-              wh5Value = globals.get_int(tun_global + (SS.get_ceo_crates_offset(wh5Supplies)))
-            else
-              wh5Value = 0
+              local wh5Value = globals.get_int(tun_global + SS.get_ceo_crates_offset(wh5Supplies))
+              wh5Total = wh5Value * wh5Supplies
             end
-            wh5Total  = wh5Value * wh5Supplies
             ceo_moola = ceo_moola + wh5Total
             ImGui.SeparatorText(whouse5.name)
             if whouse5.size.small or whouse5.size.medium or whouse5.size.large then
@@ -886,7 +877,7 @@ function yrv2UI()
           35
         )
         ImGui.BulletText("Bunker")
-        ImGui.BulletText("Hangar (Air & Land)")
+        ImGui.BulletText("Hangar (Air only)")
         ImGui.BulletText("CEO Warehouses")
         ImGui.BulletText("MC Businesses")
         ImGui.BulletText("Acid Lab")

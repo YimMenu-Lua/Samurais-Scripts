@@ -80,7 +80,7 @@ end
 --
 -- GUI loop like a god damn retard.
 --
--- PS: This is also bad so my logic is still retarded. Shocker!
+-- *PS: This is also bad so my logic is still retarded. **Shocker!***
 initStrings = function()
   -- Generic
   GENERIC_PLAY_BTN_          = translateLabel("generic_play_btn")
@@ -193,8 +193,8 @@ initStrings = function()
   LASER_SIGHT_DESC_  = translateLabel("laserSight_tt")
   LASER_CHOICE_TXT_  = translateLabel("laserChoice_txt")
   -- Vehicle
-  VEHICLE_TAB_             = translateLabel("vehicleTab")
-  GET_IN_VEH_WARNING_      = translateLabel("getinveh")
+  VEHICLE_TAB_        = translateLabel("vehicleTab")
+  GET_IN_VEH_WARNING_ = translateLabel("getinveh")
   -- Custom Paint Jobs
   SORT_BY_TXT_       = translateLabel("sort_by_txt")
   SORT_BY_COLOR_TXT_ = translateLabel("color_txt")
@@ -406,17 +406,24 @@ initStrings = function()
   log.info(string.format("Loaded %d %s translations.", Lua_fn.getTableLength(Labels), current_lang))
 end
 
----@param musicSwitch string
+---@param toggle boolean
 ---@param station? string
-play_music = function(musicSwitch, station)
+---@param entity? integer
+play_music = function(toggle, station, entity)
   script.run_in_fiber(function(mp)
-    if musicSwitch == "start" then
-      local myPos       = self.get_pos()
-      local bone_idx    = PED.GET_PED_BONE_INDEX(self.get_ped(), 24818)
+    if toggle then
+      if not entity then
+        entity = self.get_ped()
+      end
+      if not station then
+        station = radio_stations[math.random(1, #radio_stations)].station
+      end
+      local coords      = ENTITY.GET_ENTITY_COORDS(entity, true)
+      local bone_idx    = PED.GET_PED_BONE_INDEX(entity, 24818)
       local pbus_model  = 345756458
       local dummy_model = 0xE75B4B1C
       if Game.requestModel(pbus_model) then
-        pBus = VEHICLE.CREATE_VEHICLE(pbus_model, myPos.x, myPos.y, (myPos.z - 30), 0, true, false, false)
+        pBus = VEHICLE.CREATE_VEHICLE(pbus_model, coords.x, coords.y, (coords.z - 30), 0, true, false, false)
         ENTITY.SET_ENTITY_VISIBLE(pbus, false, false)
         ENTITY.SET_ENTITY_ALPHA(pBus, 0.0, false)
         ENTITY.FREEZE_ENTITY_POSITION(pBus, true)
@@ -428,7 +435,7 @@ play_music = function(musicSwitch, station)
       if ENTITY.DOES_ENTITY_EXIST(pBus) then
         entities.take_control_of(pBus, 300)
         if Game.requestModel(dummy_model) then
-          dummyDriver = PED.CREATE_PED(4, dummy_model, myPos.x, myPos.y, (myPos.z + 40), 0, true, false)
+          dummyDriver = PED.CREATE_PED(4, dummy_model, coords.x, coords.y, (coords.z + 40), 0, true, false)
           if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
             entities.take_control_of(dummyDriver, 300)
             ENTITY.SET_ENTITY_ALPHA(dummyDriver, 0.0, false)
@@ -448,9 +455,10 @@ play_music = function(musicSwitch, station)
               AUDIO.SET_VEH_RADIO_STATION(pBus, station)
             end
             mp:sleep(500)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(pBus, self.get_ped(), bone_idx, -14.0, -1.3, -1.0, 0.0, 90.0, -90.0, false,
-              true,
-              false, true, 1, true, 1)
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              pBus, entity, bone_idx, -14.0, -1.3, -1.0, 0.0, 90.0, -90.0,
+              false, true, false, true, 1, true, 1
+            )
           else
             gui.show_error("Samurais Scripts", "Failed to start music!")
             return
@@ -460,7 +468,7 @@ play_music = function(musicSwitch, station)
         gui.show_error("Samurais Scripts", "Failed to start music!")
         return
       end
-    elseif musicSwitch == "stop" then
+    else
       if ENTITY.DOES_ENTITY_EXIST(dummyDriver) then
         ENTITY.SET_ENTITY_AS_MISSION_ENTITY(dummyDriver, true, true)
         mp:sleep(200)
@@ -474,6 +482,7 @@ play_music = function(musicSwitch, station)
         pBus = 0
       end
     end
+    anim_music = toggle
   end)
 end
 
@@ -919,14 +928,15 @@ resetLastVehState = function()
       and ENTITY.IS_ENTITY_A_VEHICLE(last_vehicle) then
     AUDIO.SET_VEHICLE_RADIO_LOUD(last_vehicle, false)
     if not has_custom_tires then
-      VEHICLE.TOGGLE_VEHICLE_MOD(current_vehicle, 20, false)
+      VEHICLE.TOGGLE_VEHICLE_MOD(last_vehicle, 20, false)
     end
     if default_tire_smoke.r ~= driftSmoke_T.r or default_tire_smoke.g ~= driftSmoke_T.g or default_tire_smoke.b ~= driftSmoke_T.b then
-      VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(current_vehicle, default_tire_smoke.r, default_tire_smoke.g,
+      VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(last_vehicle, default_tire_smoke.r, default_tire_smoke.g,
         default_tire_smoke.b)
     end
     if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(last_vehicle)) and (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(last_vehicle) ~= 1) then
       VEHICLE.SET_VEHICLE_DOORS_LOCKED(last_vehicle, 1)
+      VEHICLE.SET_VEHICLE_ALARM(last_vehicle, false)
     end
   end
   loud_radio_enabled = false
@@ -950,6 +960,7 @@ onVehEnter = function()
   return current_vehicle
 end
 
+---@param s script_util
 shoot_flares = function(s)
   if Game.requestWeaponAsset(0x47757124) then
     for _, bone in pairs(plane_bones_T) do
@@ -1276,7 +1287,7 @@ attachPed = function(ped)
         end
         if is_playing_anim then
           if anim_music then
-            play_music("stop")
+            play_music(false)
             anim_music = false
           end
           cleanup(ap)
@@ -1314,7 +1325,7 @@ attachVeh = function(veh)
         end
         if is_playing_anim then
           if anim_music then
-            play_music("stop")
+            play_music(false)
             anim_music = false
           end
           cleanup(av)
@@ -1538,6 +1549,57 @@ displayLangs = function()
   lang_idx, lang_idxUsed = ImGui.Combo("##langs", lang_idx, filteredLangs, #lang_T)
   if UI.isItemClicked("lmb") then
     UI.widgetSound("Nav")
+  end
+end
+
+flatbed_getTowOffset = function(vehToTow)
+  local vehicleClass = VEHICLE.GET_VEHICLE_CLASS(vehToTow)
+  if vehicleClass == 1 then
+    return 0.9, -2.3
+  elseif vehicleClass == 2 then
+    return 0.993, -2.17046
+  elseif vehicleClass == 6 then
+    return 1.00069420, -2.17046
+  elseif vehicleClass == 7 then
+    return 1.009, -2.17036
+  elseif vehicleClass == 15 then
+    return 1.3, -2.21069
+  elseif vehicleClass == 16 then
+    return 1.5, -2.21069
+  end
+
+  return 1.1, -2.0
+end
+
+flatbed_detach = function()
+  if is_using_flatbed then
+    if towed_vehicle ~= 0 and ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(towed_vehicle, current_vehicle) then
+      local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(towed_vehicle, false)
+      local flatbed_fwdVec = ENTITY.GET_ENTITY_FORWARD_VECTOR(current_vehicle)
+      local flatbed_Pos = ENTITY.GET_ENTITY_COORDS(current_vehicle, false)
+      if entities.take_control_of(towed_vehicle, 350) then
+        ENTITY.DETACH_ENTITY(towed_vehicle, true, true)
+        ENTITY.SET_ENTITY_COORDS(towed_vehicle, attachedVehcoords.x - (flatbed_fwdVec.x * 10),
+          attachedVehcoords.y - (flatbed_fwdVec.y * 10), flatbed_Pos.z, false, false, false, false)
+        VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(towed_vehicle, 5.0)
+        towed_vehicle = 0
+      end
+    else
+      for _, v in ipairs(entities.get_all_vehicles_as_handles()) do
+        local modelHash         = ENTITY.GET_ENTITY_MODEL(v)
+        local attachedVehicle   = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(current_vehicle, modelHash)
+        if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) then
+          local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(attachedVehicle, false)
+          if entities.take_control_of(attachedVehicle, 350) then
+            ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
+            ENTITY.SET_ENTITY_COORDS(attachedVehicle, attachedVehcoords.x - (playerForwardX * 10),
+              attachedVehcoords.y - (playerForwardY * 10), playerPosition.z, false, false, false, false)
+            VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(attachedVehicle, 5.0)
+            towed_vehicle = 0
+          end
+        end
+      end
+    end
   end
 end
 --#endregion
@@ -2762,6 +2824,7 @@ SS.handle_events = function()
 
   if VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(current_vehicle) ~= 1 then
     VEHICLE.SET_VEHICLE_DOORS_LOCKED(current_vehicle, 1)
+    VEHICLE.SET_VEHICLE_ALARM(current_vehicle, false)
   end
 end
 
@@ -2800,46 +2863,62 @@ end
 --
 -- and returns the entity handle of the bin if true.
 SS.isNearTrashBin = function()
-  local retBool, bin, binPos, myCoords = false, 0, vec3:new(0.0, 0.0, 0.0), self.get_pos()
+  local binPos, myCoords = vec3:new(0.0, 0.0, 0.0), self.get_pos()
   for _, trash in ipairs(trash_bins_T) do
     bin = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(myCoords.x, myCoords.y, myCoords.z, 1.5, joaat(trash), false, false, false)
     if ENTITY.DOES_ENTITY_EXIST(bin) then
       binPos = Game.getCoords(bin, false)
       local distance = vec3:distance(myCoords, binPos)
       if distance <= 1.8 then
-        retBool = true
-        break
+        return true, bin
       end
     end
   end
-  return retBool, bin
+
+  return fasle, 0
 end
 
 -- Checks if localPlayer is near any vehicle's trunk
 --
 -- and returns the vehicle handle if true.
 SS.isNearCarTrunk = function()
-  local retBool, veh, myCoords = false, Game.getClosestVehicle(self.get_ped(), 10), self.get_pos()
-  if veh ~= 0 and veh ~= nil then
-    if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(veh)) then
-      local vehClass = Game.Vehicle.class(veh)
-      local bootBoneName
-      if vehClass == "Vans" then
-        bootBoneName = "door_pside_r"
-      else
-        bootBoneName = "boot"
-      end
-      local bootBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, bootBoneName)
-      if bootBone ~= -1 then
-        local bonePos  = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, bootBone)
-        local distance = SYSTEM.VDIST2(bonePos.x, bonePos.y, bonePos.z, myCoords.x, myCoords.y, myCoords.z)
-        if distance <= 3.0 then
-          retBool = true
+  if Game.Self.isOnFoot() and not is_playing_anim and not is_playing_scenario and not is_playing_amb_scenario then
+    local veh = Game.getClosestVehicle(self.get_ped(), 30)
+    if veh ~= nil and veh > 0 then
+      if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(veh)) then
+        local bootBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "boot")
+        if bootBone ~= -1 then
+          local vehCoords = ENTITY.GET_ENTITY_COORDS(veh, false)
+          local vehFwdVec = ENTITY.GET_ENTITY_FORWARD_VECTOR(veh)
+
+          -- create a search area based on the vehicle's length and engine placement
+          local engineBone    = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "engine")
+          local hlightBone    = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "headlight_l")
+          local engBoneCoords = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, engineBone)
+          local hllBoneCoords = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, hlightBone)
+          local bonedistance  = vec3:distance(hllBoneCoords, engBoneCoords)
+          local isRearEngined = bonedistance > 2.2
+          local vmin, vmax    = Game.getModelDimensions(ENTITY.GET_ENTITY_MODEL(veh))
+          local veh_length    = vmax.y - vmin.y
+          local tempPos       = isRearEngined and vec2:new(
+            vehCoords.x + (vehFwdVec.x * (veh_length / 1.6)),
+            vehCoords.y + (vehFwdVec.y * (veh_length / 1.6))
+          ) or
+          vec2:new(
+            vehCoords.x - (vehFwdVec.x * (veh_length / 1.6)),
+            vehCoords.y - (vehFwdVec.y * (veh_length / 1.6))
+          )
+          local search_area = vec3:new(tempPos.x, tempPos.y, vehCoords.z)
+
+          if vec3:distance(self.get_pos(), search_area) <= 1 then
+            return true, veh, isRearEngined
+          end
         end
       end
     end
   end
-  return retBool, veh
+
+  return false, 0, false
 end
 
 -- Related to the Carpool option.
@@ -3172,75 +3251,72 @@ end
 
 ---@param crates number
 SS.get_ceo_crates_offset = function(crates)
-  local offset
-  if crates ~= nil then
+  if crates ~= nil and crates > 0 then
     if crates == 1 then
-      offset = 15732 -- EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1
+      return 15732 -- EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1
     end
     if crates == 2 then
-      offset = 15733
+      return 15733
     end
     if crates == 3 then
-      offset = 15734
+      return 15734
     end
     if crates == 4 or crates == 5 then
-      offset = 15735
+      return 15735
     end
     if crates == 6 or crates == 7 then
-      offset = 15736
+      return 15736
     end
     if crates == 8 or crates == 9 then
-      offset = 15737
+      return 15737
     end
     if crates >= 10 and crates <= 14 then
-      offset = 15738
+      return 15738
     end
     if crates >= 15 and crates <= 19 then
-      offset = 15739
+      return 15739
     end
     if crates >= 20 and crates <= 24 then
-      offset = 15740
+      return 15740
     end
     if crates >= 25 and crates <= 29 then
-      offset = 15741
+      return 15741
     end
     if crates >= 30 and crates <= 34 then
-      offset = 15742
+      return 15742
     end
     if crates >= 35 and crates <= 39 then
-      offset = 15743
+      return 15743
     end
     if crates >= 40 and crates <= 44 then
-      offset = 15744
+      return 15744
     end
     if crates >= 45 and crates <= 49 then
-      offset = 15745
+      return 15745
     end
     if crates >= 50 and crates <= 59 then
-      offset = 15746
+      return 15746
     end
     if crates >= 60 and crates <= 69 then
-      offset = 15747
+      return 15747
     end
     if crates >= 70 and crates <= 79 then
-      offset = 15748
+      return 15748
     end
     if crates >= 80 and crates <= 89 then
-      offset = 15749
+      return 15749
     end
     if crates >= 90 and crates <= 99 then
-      offset = 15750
+      return 15750
     end
     if crates >= 100 and crates <= 110 then
-      offset = 15751
+      return 15751
     end
     if crates == 111 then
-      offset = 15752
+      return 15752
     end
-  else
-    offset = 0
   end
-  return offset
+  return 0
 end
 
 -- Reset saved config without affecting
@@ -3545,12 +3621,10 @@ Game.requestModel = function(model)
 end
 
 ---@param model integer
----@param s script_util
-Game.getModelDimensions = function(model, s)
+Game.getModelDimensions = function(model)
   local vmin, vmax = vec3:new(0, 0, 0), vec3:new(0, 0, 0)
     if Game.requestModel(model) then
       vmin, vmax = MISC.GET_MODEL_DIMENSIONS(model, vmin, vmax)
-      s:sleep(100)
       STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(model)
     end
   return vmin, vmax
@@ -3691,43 +3765,60 @@ Game.getPedVehicleSeat = function(ped)
   end
 end
 
----Returns an entity handle for the closest vehicle to a provided entity.
----@param closeTo integer
+-- Returns a handle for the closest vehicle to a provided entity or coordinates.
+--
+-- Param `excludeEntity` is not necessary but can be used to ignore a specific vehicle
+--
+-- using its entity handle .
+---@param closeTo integer | vec3
 ---@param range integer
-Game.getClosestVehicle = function(closeTo, range)
-  local vehicleHandles = entities.get_all_vehicles_as_handles()
-  local closestVehicle = 0
-  for _, veh in ipairs(vehicleHandles) do
-    local thisPos = ENTITY.GET_ENTITY_COORDS(closeTo, true)
-    local vehPos  = ENTITY.GET_ENTITY_COORDS(veh, true)
-    local vDist   = SYSTEM.VDIST2(thisPos.x, thisPos.y, thisPos.z, vehPos.x, vehPos.y, vehPos.z)
-    if vDist <= range then
-      closestVehicle = veh
+---@param excludeEntity? integer
+Game.getClosestVehicle = function(closeTo, range, excludeEntity)
+  local thisPos = type(closeTo) == 'number' and ENTITY.GET_ENTITY_COORDS(closeTo, false) or closeTo
+  if VEHICLE.IS_ANY_VEHICLE_NEAR_POINT(thisPos.x, thisPos.y, thisPos.z, range) then
+    local veh_handles = entities.get_all_vehicles_as_handles()
+    for i = 0, #veh_handles do
+      if excludeEntity and veh_handles[i] == excludeEntity then
+        i = i + 1
+      end
+      local vehPos = ENTITY.GET_ENTITY_COORDS(veh_handles[i], true)
+      local vDist2 = SYSTEM.VDIST2(thisPos.x, thisPos.y, thisPos.z, vehPos.x, vehPos.y, vehPos.z)
+      if vDist2 <= range then
+        return veh_handles[i]
+      end
     end
   end
-  return closestVehicle
+
+  return 0
 end
 
----Returns an entity handle for the closest human ped to a provided entity.
----@param closeTo integer
+-- Returns a handle for the closest human ped to a provided entity or coordinates.
+--
+-- Does not return your own ped.
+---@param closeTo integer | vec3
 ---@param range integer
-Game.getClosestPed = function(closeTo, range)
-  local closestPed = 0
-  local gtaPeds = entities.get_all_peds_as_handles()
-  for _, ped in ipairs(gtaPeds) do
-    if PED.IS_PED_HUMAN(ped) and ped ~= self.get_ped() then
-      local thisPos      = ENTITY.GET_ENTITY_COORDS(closeTo, true)
-      local randomPedPos = ENTITY.GET_ENTITY_COORDS(ped, true)
-      local distCalc     = SYSTEM.VDIST2(thisPos.x, thisPos.y, thisPos.z, randomPedPos.x, randomPedPos.y,
-        randomPedPos.z)
-      if distCalc <= range then
-        if not ENTITY.IS_ENTITY_DEAD(ped, false) then
-          closestPed = ped
+---@param aliveOnly boolean
+Game.getClosestPed = function(closeTo, range, aliveOnly)
+  local thisPos = type(closeTo) == 'number' and ENTITY.GET_ENTITY_COORDS(closeTo, false) or closeTo
+  if PED.IS_ANY_PED_NEAR_POINT(thisPos.x, thisPos.y, thisPos.z, range) then
+    for _, ped in ipairs(entities.get_all_peds_as_handles()) do
+      if PED.IS_PED_HUMAN(ped) and ped ~= self.get_ped() then
+        local pedPos = ENTITY.GET_ENTITY_COORDS(ped, true)
+        local vDist2 = SYSTEM.VDIST2(thisPos.x, thisPos.y, thisPos.z, pedPos.x, pedPos.y, pedPos.z)
+        if vDist2 <= range then
+          if aliveOnly then
+            if not ENTITY.IS_ENTITY_DEAD(ped, false) then
+              return ped
+            end
+          else
+            return ped
+          end
         end
       end
     end
   end
-  return closestPed
+
+  return 0
 end
 
 -- Temporary workaround to fix auto-pilot's "fly to objective" option.
@@ -3982,9 +4073,7 @@ end
 -- Returns whether the player is currently using any mobile or computer app.
 Game.Self.isBrowsingApps = function()
   for _, v in ipairs(app_script_names_T) do
-    if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat(v)) > 0 then
-      return true
-    end
+    return script.is_active(v)
   end
   return false
 end
@@ -4005,71 +4094,38 @@ Game.Vehicle.__index = Game.Vehicle
 -- Returns the name of the specified vehicle.
 ---@param vehicle number
 Game.Vehicle.name = function(vehicle)
-  ---@type string
-  local retVal
   if ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
-    retVal = vehicles.get_vehicle_display_name(Game.getEntityModel(vehicle))
-  else
-    retVal = ""
+    return vehicles.get_vehicle_display_name(Game.getEntityModel(vehicle))
   end
-  return retVal
+  return ""
 end
 
 -- Returns the manufacturer's name of the specified vehicle.
 ---@param vehicle number
 Game.Vehicle.manufacturer = function(vehicle)
-  ---@type string
-  local retVal
   if ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
     local mfr = VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(Game.getEntityModel(vehicle))
-    retVal = (mfr:lower():gsub("^%l", string.upper))
-  else
-    retVal = ""
+    return (mfr:lower():gsub("^%l", string.upper))
   end
-  return retVal
+
+  return ""
 end
 
 -- Returns the class of the specified vehicle.
 Game.Vehicle.class = function(vehicle)
-  local class_T <const> = {
-    { class = 0,  name = "Compacts" },
-    { class = 1,  name = "Sedans" },
-    { class = 2,  name = "SUVs" },
-    { class = 3,  name = "Coupes" },
-    { class = 4,  name = "Muscle" },
-    { class = 5,  name = "Sports Classics" },
-    { class = 6,  name = "Sports" },
-    { class = 7,  name = "Super" },
-    { class = 8,  name = "Motorcycles" },
-    { class = 9,  name = "Off-road" },
-    { class = 10, name = "Industrial" },
-    { class = 11, name = "Utility" },
-    { class = 12, name = "Vans" },
-    { class = 13, name = "Cycles" },
-    { class = 14, name = "Boats" },
-    { class = 15, name = "Helicopters" },
-    { class = 16, name = "Planes" },
-    { class = 17, name = "Service" },
-    { class = 18, name = "Emergency" },
-    { class = 19, name = "Military" },
-    { class = 20, name = "Commercial" },
-    { class = 21, name = "Trains" },
-    { class = 22, name = "Open Wheel" },
-  }
-
-  for _, v in ipairs(class_T) do
-    if VEHICLE.GET_VEHICLE_CLASS(vehicle) == v.class then
-      return v.name
-    end
+  local vehClass = VEHICLE.GET_VEHICLE_CLASS(vehicle)
+  if vehicle_classes_t[vehClass] then
+    return vehicle_classes_t[vehClass]
   end
+
   return "Unknown" -- in case R* adds a new class.
 end
 
 -- Returns a table containing all occupants of a vehicle.
 ---@param vehicle integer
 Game.Vehicle.getOccupants = function(vehicle)
+  local passengers = {}
   if ENTITY.DOES_ENTITY_EXIST(vehicle) and ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
-    local passengers    = {}
     local maxPassengers = VEHICLE.GET_VEHICLE_MODEL_NUMBER_OF_SEATS(ENTITY.GET_ENTITY_MODEL(vehicle))
     for i = -1, maxPassengers do
       if not VEHICLE.IS_VEHICLE_SEAT_FREE(vehicle, i, true) then
@@ -4083,7 +4139,7 @@ Game.Vehicle.getOccupants = function(vehicle)
   end
 end
 
--- Returns whether a vehicle has weapons or not.
+-- Returns whether a vehicle is weaponized.
 ---@return boolean
 Game.Vehicle.hasWeapons = function()
   return VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(self.get_veh())
@@ -4125,6 +4181,7 @@ Game.Vehicle.hasABS = function()
 end
 
 ---@param vehicle integer
+---@param toggle boolean
 ---@param s script_util
 Game.Vehicle.lockDoors = function(vehicle, toggle, s)
   if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(vehicle)) and
@@ -4153,6 +4210,7 @@ Game.Vehicle.lockDoors = function(vehicle, toggle, s)
     AUDIO.SET_HORN_PERMANENTLY_ON_TIME(vehicle, 1000)
     AUDIO.SET_HORN_PERMANENTLY_ON(vehicle)
     VEHICLE.SET_VEHICLE_DOORS_LOCKED(vehicle, toggle and 2 or 1)
+    VEHICLE.SET_VEHICLE_ALARM(vehicle, toggle)
     gui.show_message("Samurai's Scripts", ("Vehicle %s"):format(toggle and "locked." or "unlocked."))
     s:sleep(696)
     VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false)
@@ -4183,22 +4241,17 @@ Game.World.disableOceanWaves = function(bool)
   end
 end
 
--- Shows a green chevron down element on top of an entity in the game world.
+-- Draws a green chevron down element on top of an entity in the game world.
 ---@param entity integer
 Game.World.markSelectedEntity = function(entity)
   script.run_in_fiber(function(mse)
     if not ENTITY.IS_ENTITY_ATTACHED(entity) then
       local entity_hash  = ENTITY.GET_ENTITY_MODEL(entity)
       local entity_pos   = ENTITY.GET_ENTITY_COORDS(entity, false)
-      local min, max     = Game.getModelDimensions(entity_hash, mse)
+      local min, max     = Game.getModelDimensions(entity_hash)
       local entityHeight = max.z - min.z
       GRAPHICS.DRAW_MARKER(2, entity_pos.x, entity_pos.y, entity_pos.z + (entityHeight + 0.4),
-      --[[
-        Using 0 for both textureDict and textureName works when drawing a chevron down but 
-        it causes an exception [ACESS_VIOLATION] (only once).
-        Using const char* for both params when using type 2 (chevron) crashes my game.
-        **Reference for textures: https://github.com/esc0rtd3w/illicit-sprx/blob/master/main/illicit/textures.h
-      ]]
+      -- Reference for textures: https://github.com/esc0rtd3w/illicit-sprx/blob/master/main/illicit/textures.h
       ---@diagnostic disable-next-line: param-type-mismatch
         0, 0, 0, 0, 180, 0, 0.3, 0.3, 0.3, 0, 255, 0, 100, true, true, 1, false, 0, 0, false)
     end
