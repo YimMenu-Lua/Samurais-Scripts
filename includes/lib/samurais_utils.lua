@@ -424,11 +424,10 @@ play_music = function(toggle, station, entity)
       local dummy_model = 0xE75B4B1C
       if Game.requestModel(pbus_model) then
         pBus = VEHICLE.CREATE_VEHICLE(pbus_model, coords.x, coords.y, (coords.z - 30), 0, true, false, false)
-        ENTITY.SET_ENTITY_VISIBLE(pbus, false, false)
-        ENTITY.SET_ENTITY_ALPHA(pBus, 0.0, false)
         ENTITY.FREEZE_ENTITY_POSITION(pBus, true)
         ENTITY.SET_ENTITY_COLLISION(pBus, false, false)
         ENTITY.SET_ENTITY_INVINCIBLE(pBus, true)
+        ENTITY.SET_ENTITY_ALPHA(pBus, 0.0, false)
         VEHICLE.SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(pBus, false, false)
       end
       mp:sleep(500)
@@ -456,9 +455,10 @@ play_music = function(toggle, station, entity)
             end
             mp:sleep(500)
             ENTITY.ATTACH_ENTITY_TO_ENTITY(
-              pBus, entity, bone_idx, -14.0, -1.3, -1.0, 0.0, 90.0, -90.0,
+              pBus, entity, bone_idx, -4.0, -1.3, -1.0, 0.0, 90.0, -90.0,
               false, true, false, true, 1, true, 1
             )
+            ENTITY.SET_ENTITY_VISIBLE(pBus, false, false)
           else
             gui.show_error("Samurais Scripts", "Failed to start music!")
             return
@@ -978,6 +978,34 @@ shoot_flares = function(s)
         s:sleep(250)
       end
     end
+  end
+end
+
+---@param bool boolean
+---@param startPos vec3
+---@param endPos_1 vec3
+---@param endPos_2 vec3
+---@param color table
+draw_laser = function(bool, startPos, endPos_1, endPos_2, color)
+  if bool then
+    GRAPHICS.DRAW_LINE(
+      startPos.x, startPos.y, startPos.z,
+      endPos_1.x, endPos_1.y, endPos_1.z,
+      color.r, color.g, color.b, 255
+    )
+    GRAPHICS.DRAW_MARKER(
+      28, endPos_1.x, endPos_1.y, endPos_1.z,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.01, 0.01,
+      color.r, color.g, color.b, 255,
+      ---@diagnostic disable-next-line
+      false, false, 2, false, 0, 0, false
+    )
+  else
+    GRAPHICS.DRAW_LINE(
+      startPos.x, startPos.y, startPos.z,
+      endPos_2.x, endPos_2.y, endPos_2.z,
+      color.r, color.g, color.b, 255
+    )
   end
 end
 
@@ -1590,10 +1618,11 @@ flatbed_detach = function()
         local attachedVehicle   = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(current_vehicle, modelHash)
         if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) then
           local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(attachedVehicle, false)
+          local flatbed_fwdVec = ENTITY.GET_ENTITY_FORWARD_VECTOR(current_vehicle)
           if entities.take_control_of(attachedVehicle, 350) then
             ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
-            ENTITY.SET_ENTITY_COORDS(attachedVehicle, attachedVehcoords.x - (playerForwardX * 10),
-              attachedVehcoords.y - (playerForwardY * 10), playerPosition.z, false, false, false, false)
+            ENTITY.SET_ENTITY_COORDS(attachedVehicle, attachedVehcoords.x - (flatbed_fwdVec * 10),
+              attachedVehcoords.y - (flatbed_fwdVec * 10), attachedVehcoords.z, false, false, false, false)
             VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(attachedVehicle, 5.0)
             towed_vehicle = 0
           end
@@ -2883,7 +2912,10 @@ end
 -- and returns the vehicle handle if true.
 SS.isNearCarTrunk = function()
   if Game.Self.isOnFoot() and not is_playing_anim and not is_playing_scenario and not is_playing_amb_scenario then
-    local veh = Game.getClosestVehicle(self.get_ped(), 30)
+    local selfPos = self.get_pos()
+    local selfFwd = Game.getForwardVec(self.get_ped())
+    local fwdPos  = vec3:new(selfPos.x + (selfFwd.x * 1.3), selfPos.y + (selfFwd.y * 1.3), selfPos.z)
+    local veh = Game.getClosestVehicle(fwdPos, 20)
     if veh ~= nil and veh > 0 then
       if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(veh)) then
         local bootBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "boot")
@@ -2893,11 +2925,11 @@ SS.isNearCarTrunk = function()
 
           -- create a search area based on the vehicle's length and engine placement
           local engineBone    = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "engine")
-          local hlightBone    = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "headlight_l")
+          local lfwheelBone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "wheel_lf")
           local engBoneCoords = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, engineBone)
-          local hllBoneCoords = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, hlightBone)
-          local bonedistance  = vec3:distance(hllBoneCoords, engBoneCoords)
-          local isRearEngined = bonedistance > 2.2
+          local lfwBoneCoords = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, lfwheelBone)
+          local bonedistance  = vec3:distance(lfwBoneCoords, engBoneCoords)
+          local isRearEngined = bonedistance > 2
           local vmin, vmax    = Game.getModelDimensions(ENTITY.GET_ENTITY_MODEL(veh))
           local veh_length    = vmax.y - vmin.y
           local tempPos       = isRearEngined and vec2:new(
@@ -3565,6 +3597,7 @@ Game.getPlayerRank = function(player)
       end
     end
   end
+
   return 8000
 end
 
@@ -3577,7 +3610,7 @@ Game.busySpinnerOn = function(text, type)
 end
 
 Game.busySpinnerOff = function()
-  return HUD.BUSYSPINNER_OFF()
+  HUD.BUSYSPINNER_OFF()
 end
 
 ---@param text string
@@ -3588,14 +3621,14 @@ Game.showButtonPrompt = function(text)
 end
 
 ---@param entity integer
-Game.createBlip = function(entity)
-  return HUD.ADD_BLIP_FOR_ENTITY(entity)
+Game.addBlipForEntity = function(entity)
+  HUD.ADD_BLIP_FOR_ENTITY(entity)
 end
 
 -- Full list of blip icon IDs: https://wiki.rage.mp/index.php?title=Blips
 ---@param blip integer
 ---@param icon integer
-Game.blipIcon = function(blip, icon)
+Game.setBlipIcon = function(blip, icon)
   HUD.SET_BLIP_SPRITE(blip, icon)
 end
 
@@ -3617,17 +3650,22 @@ Game.requestModel = function(model)
     end
     return STREAMING.HAS_MODEL_LOADED(model)
   end
+
   return false
 end
 
 ---@param model integer
 Game.getModelDimensions = function(model)
-  local vmin, vmax = vec3:new(0, 0, 0), vec3:new(0, 0, 0)
-    if Game.requestModel(model) then
-      vmin, vmax = MISC.GET_MODEL_DIMENSIONS(model, vmin, vmax)
-      STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(model)
-    end
-  return vmin, vmax
+  if STREAMING.IS_MODEL_VALID(model) then
+    local vmin = memory.allocate(12)
+    local vmax = memory.allocate(12)
+    ---@diagnostic disable-next-line
+    local retVecMin, retVecMax = MISC.GET_MODEL_DIMENSIONS(model, vmin, vmax) -- keeps yapping about assigning 'pointer' to param 'vec3'
+    memory.free(vmin); memory.free(vmax)
+    return retVecMin, retVecMax
+  end
+
+  return vec3:new(0, 0, 0), vec3:new(0, 0, 0)
 end
 
 ---@param dict string
@@ -3636,6 +3674,7 @@ Game.requestNamedPtfxAsset = function(dict)
     STREAMING.REQUEST_NAMED_PTFX_ASSET(dict)
     coroutine.yield()
   end
+
   return STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(dict)
 end
 
@@ -3783,7 +3822,7 @@ Game.getClosestVehicle = function(closeTo, range, excludeEntity)
       end
       local vehPos = ENTITY.GET_ENTITY_COORDS(veh_handles[i], true)
       local vDist2 = SYSTEM.VDIST2(thisPos.x, thisPos.y, thisPos.z, vehPos.x, vehPos.y, vehPos.z)
-      if vDist2 <= range then
+      if vDist2 <= range and math.floor(VEHICLE.GET_VEHICLE_BODY_HEALTH(veh_handles[i])) > 0 then
         return veh_handles[i]
       end
     end
@@ -3830,13 +3869,13 @@ Game.findObjectiveBlip = function()
     else
       local stdBlip    = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_STANDARD_BLIP_ENUM_ID())
       local blipCoords = HUD.GET_BLIP_INFO_ID_COORD(stdBlip)
-      if blipCoords ~= vec3:new(0.0, 0.0, 0.0) then
+      if blipCoords ~= vec3:new(0, 0, 0) then
         return true, blipCoords
-      else
-        return false, nil
       end
     end
   end
+
+  return false
 end
 
 ---@param area vec3
@@ -3848,34 +3887,29 @@ Game.DoesHumanScenarioExistInArea = function(area, radius, isFree)
       return true, v.name
     end
   end
+
   return false
 end
 
-
---[[
--- Unused. Causes a crash on its first call then starts working fine.
--- It was supposed to be used for the laser sights feature but I'm too stupid to fix it.
-
--- Performs a raycast world probe shape test and returns its result.
----@param src vec3
----@param dest vec3
----@param entity integer
-Game.shapeTest = function(src, dest, entity)
-  local shapeTestHandle = SHAPETEST.START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(
-    src.x, src.y, src.z,
-    dest.x, dest.y, dest.z,
-    511, entity, 4
+-- Starts a Level Of Sight probe test
+---@param startPos vec3
+---@param endPos vec3
+Game.rayCast = function(startPos, endPos)
+  local rayHandle = SHAPETEST.START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(
+    startPos.x, startPos.y, startPos.z,
+    endPos.x, endPos.y, endPos.z, -1, self.get_ped(), 1
   )
-
-  local iParam1, hit, endCoords, surfaceNormal, iParam2 = SHAPETEST.GET_SHAPE_TEST_RESULT(
-    shapeTestHandle,
-    hit, endCoords,
-    surfaceNormal, iParam2
+  local endCoords = memory.allocate(12)
+  local surfaceNormal = memory.allocate(12)
+  local _, hit, entityHit, retEndCoords = 0, false, 0, vec3:new(0, 0, 0)
+  _, hit, retEndCoords, _, _ = SHAPETEST.GET_SHAPE_TEST_RESULT(
+    ---@diagnostic disable-next-line
+    rayHandle, hit, endCoords, surfaceNormal, entityHit
   )
+  memory.free(endCoords); memory.free(surfaceNormal)
 
-  return (iParam1 == 2) and hit, endCoords or false
+  return hit, retEndCoords
 end
-]]
 
 ---@class Self
 Game.Self = {}
@@ -4244,7 +4278,7 @@ end
 -- Draws a green chevron down element on top of an entity in the game world.
 ---@param entity integer
 Game.World.markSelectedEntity = function(entity)
-  script.run_in_fiber(function(mse)
+  script.run_in_fiber(function()
     if not ENTITY.IS_ENTITY_ATTACHED(entity) then
       local entity_hash  = ENTITY.GET_ENTITY_MODEL(entity)
       local entity_pos   = ENTITY.GET_ENTITY_COORDS(entity, false)

@@ -1253,23 +1253,22 @@ script.register_looped("EF", function() -- Enemies Flee
   end
 end)
 script.register_looped("KATANA", function(rpq)
-  rpq:yield()
   if replace_pool_q then
-    if WEAPON.IS_PED_ARMED(self.get_ped(), 1) and WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped()) == 0xDD5DF8D9 then
-      local pool_q   = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
-      local q_coords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(pool_q, 0.0, 0.0, 0.0)
+    if WEAPON.IS_PED_ARMED(self.get_ped(), 1) and WEAPON.GET_SELECTED_PED_WEAPON(self.get_ped()) == katana_replace_model then
+      local pool_q = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self.get_ped(), 0)
       if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(pool_q, self.get_ped()) then
         if not ENTITY.DOES_ENTITY_EXIST(katana) then
           if Game.requestModel(0xE2BA016F) then
-            katana = OBJECT.CREATE_OBJECT(0xE2BA016F, q_coords.x, q_coords.y, q_coords.z + 50, true, false, true)
+            katana = OBJECT.CREATE_OBJECT(0xE2BA016F, 0, 0, 0, true, false, true)
             if ENTITY.DOES_ENTITY_EXIST(katana) then
               ENTITY.SET_ENTITY_COLLISION(katana, false, false)
-              ENTITY.SET_ENTITY_ALPHA(pool_q, 0, false)
+              ENTITY.SET_ENTITY_ALPHA(pool_q, 0.0, false)
               ENTITY.SET_ENTITY_VISIBLE(pool_q, false, false)
               rpq:sleep(100)
-              ENTITY.ATTACH_ENTITY_TO_ENTITY(katana, pool_q, 0, 0.0, 0.0, 0.025, 0.0, 0.0, 0.0, false, false, false,
-                false,
-                2, true, 0)
+              ENTITY.ATTACH_ENTITY_TO_ENTITY(
+              katana, pool_q, 0, 0.0, 0.0, 0.025, 0.0, 0.0, 0.0,
+              false, false, false, false, 2, true, 0
+              )
               q_replaced = true
             end
           end
@@ -1317,11 +1316,8 @@ script.register_looped("LSR", function() -- Laser Sight
         bone_pos.y + direction.y * 1000,
         bone_pos.z + direction.z * 1000
       )
-      GRAPHICS.DRAW_LINE(
-        bone_pos.x, bone_pos.y, bone_pos.z,
-        destination.x, destination.y, destination.z,
-        laser_choice.r, laser_choice.g, laser_choice.b, 255
-      )
+      local hit, endCoords = Game.rayCast(bone_pos, destination)
+      draw_laser(hit, bone_pos, endCoords, destination, laser_choice)
     end
   end
 end)
@@ -2418,24 +2414,20 @@ script.register_looped("FLRS", function(flrs) -- Flares
 end)
 script.register_looped("RJS", function(rjspd) -- Real Jet Speed
   rjspd:yield()
-  if real_plane_speed then
-    if Game.Self.isDriving() and is_plane then
-      local jet_increase
-      local current_speed = ENTITY.GET_ENTITY_SPEED(current_vehicle)
-      local jet_rotation  = ENTITY.GET_ENTITY_ROTATION(current_vehicle, 2)
-      if jet_rotation.x >= 30 then
-        jet_increase = 0.4
-      elseif jet_rotation.x >= 60 then
-        jet_increase = 0.8
-      else
-        jet_increase = 0.21
-      end
-      -- wait for the plane to go over the low altitude speed limit then start increasing its top speed and don't go over 500km/h
-      -- (555km/h is fast and safe. Higher speeds break the game)
-      if current_speed >= 73 and current_speed < 154.1666 then
-        if PAD.IS_CONTROL_PRESSED(0, 87) and VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) == 4 then
-          VEHICLE.SET_VEHICLE_FORWARD_SPEED(current_vehicle, (current_speed + jet_increase))
-        end
+  if real_plane_speed and Game.Self.isDriving() and is_plane then
+    local jet_increase = 0.21
+    local current_speed = ENTITY.GET_ENTITY_SPEED(current_vehicle)
+    local jet_rotation  = ENTITY.GET_ENTITY_ROTATION(current_vehicle, 2)
+    if jet_rotation.x >= 30 then
+      jet_increase = 0.4
+    elseif jet_rotation.x >= 60 then
+      jet_increase = 0.8
+    end
+    -- wait for the plane to go over the low altitude speed limit then start increasing its top speed and don't go over 500km/h
+    -- (555km/h is fast and safe. Higher speeds my break the game)
+    if current_speed >= 73 and current_speed < 154.1666 then
+      if PAD.IS_CONTROL_PRESSED(0, 87) and VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) == 4 then
+        VEHICLE.SET_VEHICLE_FORWARD_SPEED(current_vehicle, (current_speed + jet_increase))
       end
     end
   end
@@ -2501,7 +2493,7 @@ script.register_looped("FLTBD", function(script) -- Flatbed Main
           controlled = entities.take_control_of(fb_closestVehicle, 350)
         end
         if controlled and fb_closestVehicle ~= nil then
-          tow_zAxis, tow_yAxis = flatbed_getTowOffset()
+          tow_zAxis, tow_yAxis = flatbed_getTowOffset(fb_closestVehicle)
           ENTITY.SET_ENTITY_HEADING(fb_closestVehicleModel, flatbedHeading)
           ENTITY.ATTACH_ENTITY_TO_ENTITY(fb_closestVehicle, current_vehicle, flatbedBone, 0.0, tow_yAxis, tow_zAxis, 0.0, 0.0,
             0.0,
@@ -3150,7 +3142,7 @@ script.register_looped("PE", function() -- Public Enemies
     local gta_peds = entities.get_all_peds_as_handles()
     for _, ped in pairs(gta_peds) do
       if ped ~= self.get_ped() and not PED.IS_PED_A_PLAYER(ped) and not PED.IS_PED_GROUP_MEMBER(ped, myGroup) then
-        PED.SET_PED_RESET_FLAG(ped, 440, true)
+        PED.SET_PED_RESET_FLAG(ped, 440, true) -- PRF_IgnoreCombatManager so they can all gang up on you and beat your ass without waiting for their turns
         for _, attr in ipairs(pe_combat_attributes_T) do
           PED.SET_PED_COMBAT_ATTRIBUTES(ped, attr.id, attr.bool)
         end
@@ -3453,6 +3445,11 @@ script.register_looped("AUTOSELL", function(as)
     autosell_was_triggered = true
     gui.show_message("Samurai's Scripts", "Auto-Sell will start in 20 seconds.")
     as:sleep(20000)
+    if AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() then
+      repeat
+        as:sleep(100)
+      until not AUDIO.IS_MOBILE_PHONE_CALL_ONGOING()
+    end
     SS.FinishSale(script_name)
   end
 

@@ -41,7 +41,7 @@ function flatbedUI()
               local flatbedHeading = ENTITY.GET_ENTITY_HEADING(current_vehicle)
               local flatbedBone    = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, "chassis_dummy")
               local vehBone        = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(fb_closestVehicle, "chassis_dummy")
-              local tow_zAxis, tow_yAxis = flatbed_getTowOffset()
+              local tow_zAxis, tow_yAxis = flatbed_getTowOffset(fb_closestVehicle)
               ENTITY.SET_ENTITY_HEADING(fb_closestVehicleModel, flatbedHeading)
               ENTITY.ATTACH_ENTITY_TO_ENTITY(fb_closestVehicle, current_vehicle, flatbedBone, tow_xAxis, tow_yAxis,
                 tow_zAxis, 0.0, 0.0,

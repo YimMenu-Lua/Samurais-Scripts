@@ -1,7 +1,7 @@
 ---@diagnostic disable
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.5.3'
+SCRIPT_VERSION = '1.5.4'
 TARGET_BUILD   = '3411'
 TARGET_VERSION = '1.70'
 DEFAULT_CONFIG          = {
@@ -167,6 +167,8 @@ DEFAULT_CONFIG          = {
   DriftIntensity          = 0,
   autoplay_chips_cap      = 0,
   supply_autofill_delay   = 500,
+  katana_replace_model    = 0xDD5DF8D9,
+  katana_replace_index    = 0,
   LANG                    = 'en-US',
   current_lang            = 'English',
 }

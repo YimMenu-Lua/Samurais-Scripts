@@ -1888,47 +1888,47 @@ Labels = {
 	katana_tt = {
 		{
 			iso = "en-US",
-			text = "Terrorize the streets of Los Santos like a true Samurai by replacing the 'Machete' weapon with a Japanese Katana.\10\10If you don't own a Machete, you can either buy one from Ammu-Nation or use YimMenu to equip a temporary one.",
+			text = "Terrorize the streets of Los Santos like a true Samurai by replacing the selected weapon with a Japanese Katana.",
 		},
 		{
 			iso = "de-DE",
-			text = "Terrorisiere die Straßen von Los Santos wie ein echter Samurai, indem du die 'Machete'-Waffe durch ein japanisches Katana ersetzst.\10\10Wenn du keinen Machete besitzt, kannst du entweder einen von Ammu-Nation kaufen oder YimMenu benutzen, um einen temporären Queue zu besorgen.",
+			text = "Terrorisieren Sie die Straßen von Los Santos wie ein echter Samurai, indem Sie die ausgewählte Waffe durch ein japanisches Katana ersetzen.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Terrorisez les rues de Los Santos comme un vrai Samouraï en remplaçant l'arme 'Machete' par un Katana japonais.\10\10Si vous ne possédez pas de Machete, vous pouvez en acheter une auprès d'Ammu-Nation ou utiliser YimMenu pour en équiper une provisoire.",
+			text = "Terrorisez les rues de Los Santos comme un vrai samouraï en remplaçant l'arme sélectionnée par un Katana japonais.",
 		},
 		{
 			iso = "it-IT",
-			text = "Terrorizza le strade di Los Santos come un vero Samurai sostituendo l'arma 'Machete' con una Katana giapponese.\10\10Se non si possiede una Machete, è possibile acquistarne una da Ammu-Nation o utilizzare YimMenu per equipaggiarne una temporanea.",
+			text = "Terrorizza le strade di Los Santos come un vero samurai sostituendo l'arma selezionata con una katana giapponese.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Aterrorize as ruas de Los Santos como um verdadeiro samurai, substituindo a arma 'Machete' por uma Katana japonesa.\10\10Se você não tiver um Machete, poderá comprar um na Ammu-Nation ou usar o YimMenu para equipar um taco temporário.",
+			text = "Aterrorize as ruas de Los Santos como um verdadeiro samurai substituindo a arma selecionada por uma katana japonesa.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Наводите ужас на улицы Лос-Сантоса как настоящий самурай, заменив оружие 'мачете' на японскую катану.\10\10Если у вас нет мачете, вы можете купить его у Ammu-Nation или использовать YimMenu для создания временного кия.",
+			text = "Терроризируйте улицы Лос-Сантоса, как настоящий самурай, заменив выбранное оружие японской катаной.",
 		},
 		{
 			iso = "es-ES",
-			text = "Aterroriza las calles de Los Santos como un verdadero samurái reemplazando el arma 'Machete' con una Katana japonesa.\10\10Si no tienes un Machete, puedes comprar uno en Ammu-Nation o usar YimMenu para equipar uno temporal.",
+			text = "Aterroriza las calles de Los Santos como un auténtico samurái sustituyendo el arma seleccionada por una katana japonesa.",
 		},
 		{
 			iso = "zh-CN",
-			text = "用日本武士刀代替“砍刀”武器，像真正的武士一样恐吓洛圣都的街道。\10\10如果您没有砍刀，您可以从 Ammu-Nation 购买一把，也可以使用 YimMenu 装备一把临时的。",
+			text = "将选定的武器替换为日本武士刀，像真正的武士一样恐吓洛圣都的街道。",
 		},
 		{
 			iso = "zh-TW",
-			text = "用日本武士刀替換「彎刀」武器，像真正的武士一樣恐嚇洛桑托斯的街道。 \10\10如果你沒有彎刀，你可以從 Ammu-Nation 購買一把，也可以使用 YimMenu 裝備臨時武器一。",
+			text = "將選定的武器替換為日本武士刀，像真正的武士一樣恐嚇洛聖都的街道。",
 		},
 		{
 			iso = "ja-JP",
-			text = "「マチェーテ」武器を日本刀に置き換えて、真のサムライのようにロスサントスの街を恐怖に陥れましょう。\10\10マチェーテを持っていない場合は、Ammu-Nation から購入するか、YimMenu を使用して一時的に装備することができます。",
+			text = "選択した武器を日本刀に置き換えて、真のサムライのようにロスサントスの街を恐怖に陥れましょう。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Siej terror na ulicach Los Santos jak prawdziwy samuraj, zastępując broń „maczetę” japońską kataną.\10\10Jeśli nie posiadasz maczety, możesz kupić ją w Ammu-Nation lub skorzystać z YimMenu, aby wyposażyć się w tymczasową broń.",
+			text = "Siej terror na ulicach Los Santos jak prawdziwy samuraj, zastępując wybraną broń japońską kataną.",
 		},
 	},
 	laserSightCB = {

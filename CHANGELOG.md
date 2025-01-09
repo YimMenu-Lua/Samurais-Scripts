@@ -1,30 +1,32 @@
-### v1.5.3 Changelog
+### v1.5.4 Changelog
 
 #### Self -> Hide & Seek
 
-- Fixed and improved **Hide In Car Trunk:**
-  - The feature no longer prompts you when you're not standing near a vehicle's trunk.
-  - The feature now recognizes rear-engined vehicles and adjusts accordingly. *(it will no longer place you on top of a red hot engine 😅)*
-  - Your ped will now play a brief animation when opening the car's trunk.
-  - Your ped will now turn to face the vehicle if you're looking away from it.
-  - The feature no longer teleports you to the trunk of a vehicle if it starts moving right after you press **[E]**. The vehicle has to be stopped for you to be able to enter its trunk.
-  - Getting out of the trunk of a moving vehicle now ragdolls you if the vehicle's speed is higher than *approx* 14km/h.
+- Fixed **Hide In Car Trunk:**
+  - The feature no longer causes an `EXCEPTION_ACCESS_VIOLATION` on it's first call.
+  > *Other features that also use the same function like "Bring x Vehicle" are fixed as well.*
 
-#### Business Manager
+  - The feature now only detects vehicles that are in front of the player, as opposed to vehicles that are in a radius around the player.
+  - The feature now correctly determines engine placement *(it used to wrongly assume placement if a particular vehicle bone was broken off)*.
+  - The feature no longer works on destroyed vehicles.
 
-- Fixed bunker instant sell. The feature no longer shows a **Mission Failed** message.
-- Fixed hangar air cargo instant sell paying more than the actual amount of cargo sold.
-- Disabled instant sell for hangar land sales. The option was broken. It showed a success message and the amount of money supposedly gained but did not actually pay the player.
-- Added a **potential** fix for #28 . I said *potential* because I was never able to reproduce the issue.
+#### Weapon
+
+- **Improved Laser Sight:**
+  - The laser no longer goes through entities. It now detects them and adds a small visual enhancement.
+
+- **Improved Katana:**
+  - You can now choose which weapon to replace with a Katana: **Baseball Bat**, **Golf Club**, **Machete**, or **Pool Que**.
 
 #### Vehicle
 
-- Locking your vehicle now also sets its alarm.
-
-#### Flatbed
-
-- Refactored code and got rid of unnecessary bloat.
+- Fixed a small issue in "**Flatbed**" *(nothing major)*.
+- Fixed "**Bring Last Vehicle**" and "**Bring Personal Vehicle**": Both options no longer bring destroyed vehicles.
 
 #### Actions
 
-- Refactored code and got rid of *most of the* unnecessary bloat.
+- When playing one of the DJ animations or just playing radio music from the **SoundPlayer** tab, the music can now be heard a little bit louder especially from other players' perspective.
+
+#### Business Manager
+
+- Auto-Sell now waits for phone calls to end if a call is ongoing.

@@ -45,6 +45,35 @@ function weaponUI()
     UI.widgetSound("Nav2")
   end
 
+  if replace_pool_q then
+    ImGui.Text("Weapon to replace:"); ImGui.SameLine(); ImGui.SetNextItemWidth(140)
+    katana_replace_index, kriUsed = ImGui.Combo("##kri", katana_replace_index, {"Baseball Bat", "Golf Club", "Machete", "Pool Que"}, 4)
+    UI.toolTip(false, "If you already own the weapon, it will be automatically placed in your hands.")
+    if kriUsed then
+      UI.widgetSound("Nav")
+      if katana_replace_index == 0 then
+        katana_replace_model = 0x958A4A8F
+      elseif katana_replace_index == 1 then
+        katana_replace_model = 0x440E4788
+      elseif katana_replace_index == 2 then
+        katana_replace_model = 0xDD5DF8D9
+      elseif katana_replace_index == 3 then
+        katana_replace_model = 0x94117305
+      end
+      CFG.save("katana_replace_model", katana_replace_model)
+      CFG.save("katana_replace_index", katana_replace_index)
+      script.run_in_fiber(function(sw)
+        if WEAPON.IS_PED_ARMED(self.get_ped(), 7) then
+          WEAPON.SET_CURRENT_PED_WEAPON(self.get_ped(), 0xA2719263, true)
+        end
+        sw:sleep(300)
+        if WEAPON.HAS_PED_GOT_WEAPON(self.get_ped(), katana_replace_model, false) then
+          WEAPON.SET_CURRENT_PED_WEAPON(self.get_ped(), katana_replace_model, true)
+        end
+      end)
+    end
+  end
+
   laserSight, laserSightUSed = ImGui.Checkbox(LASER_SIGHT_CB_, laserSight)
   UI.helpMarker(false, LASER_SIGHT_DESC_)
   if laserSightUSed then

@@ -632,7 +632,8 @@ function vehicleUI()
   if ImGui.Button("Bring Last Vehicle") then
     UI.widgetSound("Select")
     script.run_in_fiber(function(blv)
-      if ENTITY.DOES_ENTITY_EXIST(current_vehicle) and ENTITY.IS_ENTITY_A_VEHICLE(current_vehicle) then
+      if ENTITY.DOES_ENTITY_EXIST(current_vehicle) and ENTITY.IS_ENTITY_A_VEHICLE(current_vehicle) and
+      math.floor(VEHICLE.GET_VEHICLE_BODY_HEALTH(current_vehicle)) > 0 then
         local veh_coords  = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
         local self_coords = self.get_pos()
         local distance    = MISC.GET_DISTANCE_BETWEEN_COORDS(veh_coords.x, veh_coords.y, veh_coords.z, self_coords.x,
@@ -644,9 +645,14 @@ function vehicleUI()
           local veh_hash   = ENTITY.GET_ENTITY_MODEL(current_vehicle)
           local vmin, vmax = Game.getModelDimensions(veh_hash)
           local veh_length = vmax.y - vmin.y
-          local tp_offset  = { x = self_fwd.x * veh_length, y = self_fwd.y * veh_length }
-          ENTITY.SET_ENTITY_COORDS(current_vehicle, self_coords.x + tp_offset.x, self_coords.y + tp_offset.y,
-            self_coords.z, false, false, false, true)
+          local tp_offset  = vec2:new(
+            self_coords.x + (self_fwd.x * veh_length),
+            self_coords.y + (self_fwd.y * veh_length)
+          )
+          ENTITY.SET_ENTITY_COORDS(
+            current_vehicle, tp_offset.x, tp_offset.y,
+            self_coords.z, false, false, false, true
+          )
         end
       else
         gui.show_error("Samurai's Scripts", "Your last vehicle no longer exists in the game world.")
@@ -676,13 +682,12 @@ function vehicleUI()
       if ImGui.Button("Bring Personal Vehicle") then
         UI.widgetSound("Select")
         script.run_in_fiber(function(bpv)
-          if ENTITY.DOES_ENTITY_EXIST(globals.get_int(pv_global)) then
+          if ENTITY.DOES_ENTITY_EXIST(globals.get_int(pv_global)) and
+          math.floor(VEHICLE.GET_VEHICLE_BODY_HEALTH(globals.get_int(pv_global))) > 0 then
             if INTERIOR.GET_INTERIOR_FROM_ENTITY(globals.get_int(pv_global)) == 0 then
               local veh_coords  = ENTITY.GET_ENTITY_COORDS(globals.get_int(pv_global), true)
               local self_coords = self.get_pos()
-              local distance    = MISC.GET_DISTANCE_BETWEEN_COORDS(veh_coords.x, veh_coords.y, veh_coords.z,
-                self_coords.x,
-                self_coords.y, self_coords.z, false)
+              local distance    = vec3:distance(veh_coords, self_coords)
               if distance <= 15 then
                 gui.show_warning("Samurai's Scripts", "Your personal vehicle is already too close")
               else
