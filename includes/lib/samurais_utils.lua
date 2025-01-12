@@ -74,336 +74,23 @@ translateLabel = function(g)
   return retStr
 end
 
--- Translate all strings once instead
---
--- of calling `translateLabel()` inside the
---
--- GUI loop like a god damn retard.
---
--- *PS: This is also bad so my logic is still retarded. **Shocker!***
+-- Translate all strings once.
 initStrings = function()
-  -- Generic
-  GENERIC_PLAY_BTN_          = translateLabel("generic_play_btn")
-  GENERIC_STOP_BTN_          = translateLabel("generic_stop_btn")
-  GENERIC_OPEN_BTN_          = translateLabel("openBtn")
-  GENERIC_CLOSE_BTN_         = translateLabel("closeBtn")
-  GENERIC_SAVE_BTN_          = translateLabel("saveBtn")
-  GENERIC_SPAWN_BTN_         = translateLabel("Spawn")
-  GENERIC_ATTACH_BTN_        = translateLabel("attachBtn")
-  GENERIC_DELETE_BTN_        = translateLabel("generic_delete")
-  GENERIC_RESET_BTN_         = translateLabel("generic_reset")
-  GENERIC_CONFIRM_BTN_       = translateLabel("generic_confirm_btn")
-  GENERIC_CLEAR_BTN_         = translateLabel("generic_clear_btn")
-  GENERIC_CANCEL_BTN_        = translateLabel("generic_cancel_btn")
-  GENERIC_DETACH_BTN_        = translateLabel("detachBtn")
-  GENERIC_YES_               = translateLabel("yes")
-  GENERIC_NO_                = translateLabel("no")
-  GENERIC_SEARCH_HINT_       = translateLabel("search_hint")
-  GENERIC_VEH_DELETE_ERROR_  = translateLabel("generic_veh_delete_fail")
-  GENERIC_MULTIPLIER_LABEL_  = translateLabel("generic_multiplier_label")
-  GENERIC_UNAVAILABLE_SP_    = translateLabel("Unavailable in Single Player")
-  GENERIC_CUSTOM_LABEL_      = translateLabel("generic_custom_label")
-  -- Self
-  SELF_TAB_           = translateLabel("Self")
-  AUTOHEAL_           = translateLabel("Auto-Heal")
-  AUTOHEAL_DESC_      = translateLabel("autoheal_tt")
-  OBJECTIVETP_        = translateLabel("objectiveTP")
-  OBJECTIVETP_DESC_   = translateLabel("objectiveTP_tt")
-  CROUCHCB_           = translateLabel("CrouchCB")
-  CROUCH_DESC_        = translateLabel("Crouch_tt")
-  REPLACE_PA_CB_      = translateLabel("rpaCB")
-  REPLACE_PA_DESC_    = translateLabel("rpa_tt")
-  PHONEANIMS_CB_      = translateLabel("PhoneAnimCB")
-  PHONEANIMS_DESC_    = translateLabel("PhoneAnim_tt")
-  SPRINT_INSIDE_CB_   = translateLabel("SprintInsideCB")
-  SPRINT_INSIDE_DESC_ = translateLabel("SprintInside_tt")
-  LOCKPICK_CB_        = translateLabel("LockpickCB")
-  LOCKPICK_DESC_      = translateLabel("Lockpick_tt")
-  ACTION_MODE_CB_     = translateLabel("ActionModeCB")
-  ACTION_MODE_DESC_   = translateLabel("ActionMode_tt")
-  CLUMSY_DESC_        = translateLabel("clumsy_tt")
-  ROD_DESC_           = translateLabel("rod_tt")
-  RAGDOLL_SOUND_DESC_ = translateLabel("ragdoll_sound_tt")
-  HIDENSEEK_DESC_     = translateLabel("hide&seek_tt")
-  HATSINVEHS_DESC_    = translateLabel("hatsinvehs_tt")
-  NOVEHRAGDOLL_DESC_  = translateLabel("novehragdoll_tt")
-  -- Sound Player
-  SOUND_PLAYER_        = translateLabel("soundplayer")
-  MALE_SOUNDS_         = translateLabel("malesounds")
-  FEMALE_SOUNDS_       = translateLabel("femalesounds")
-  RADIO_STATIONS_DESC_ = translateLabel("radioStations_tt")
-  -- Animations
-  ANIMATIONS_TAB_    = translateLabel("animations")
-  ANIM_FLAGS_DESC_   = translateLabel("flags_tt")
-  ANIM_PROPS_DESC_   = translateLabel("DisableProps_tt")
-  ANIM_CONTROL_CB_   = translateLabel("Allow Control")
-  ANIM_CONTROL_DESC_ = translateLabel("AllowControl_tt")
-  ANIM_LOOP_DESC_    = translateLabel("looped_tt")
-  ANIM_UPPER_CB_     = translateLabel("Upper Body Only")
-  ANIM_UPPER_DESC_   = translateLabel("UpperBodyOnly_tt")
-  ANIM_FREEZE_CB_    = translateLabel("Freeze")
-  ANIM_FREEZE_DESC_  = translateLabel("Freeze_tt")
-  ANIM_NO_COLL_CB_   = translateLabel("nocoll_cb")
-  ANIM_NO_COLL_DESC_ = translateLabel("nocoll_tt")
-  ANIM_KOE_CB_       = translateLabel("koe_cb")
-  ANIM_KOE_DESC_     = translateLabel("koe_tt")
-  ANIM_GRAB_ERROR_   = translateLabel("You can not play animations while grabbing an NPC.")
-  ANIM_STOP_DESC_    = translateLabel("stopAnims_tt")
-  ANIM_DETACH_BTN_   = translateLabel("Remove Attachments")
-  ANIM_DETACH_DESC_  = translateLabel("RemoveAttachments_tt")
-  ANIM_HOTKEYS_DESC_ = translateLabel("animKeys_tt")
-  MVMT_OPTIONS_TXT_  = translateLabel("Movement Options:")
-  ANIM_HOTKEY_BTN_   = translateLabel("animShortcut_btn")
-  ANIM_HOTKEY_DESC_  = translateLabel("animShortcut_tt")
-  ANIM_HOTKEY_DEL_   = translateLabel("removeShortcut_btn")
-  ANIM_HOTKEY_DEL2_  = translateLabel("removeShortcut_btn2")
-  DEL_HOTKEY_DESC_   = translateLabel("removeShortcut_tt")
-  NO_HOTKEY_TXT_     = translateLabel("no_shortcut_tt")
-  INPUT_WAIT_TXT_    = translateLabel("input_waiting")
-  HOTKEY_RESERVED_   = translateLabel("reserved_button")
-  HOTKEY_SUCCESS1_   = translateLabel("shortcut_success_1/2")
-  HOTKEY_SUCCESS2_   = translateLabel("shortcut_success_2/2")
-  NPC_ANIMS_TXT_     = translateLabel("Play Animations On NPCs:")
-  NPC_GODMODE_DESC_  = translateLabel("Spawn NPCs in God Mode.")
-  SCENARIOS_TAB_     = translateLabel("scenarios")
-  SCN_GRAB_ERROR_    = translateLabel("You can not play scenarios while grabbing an NPC.")
-  SCN_STOP_DESC_     = translateLabel("stopScenarios_tt")
-  SCN_STOP_SPINNER_  = translateLabel("scenarios_spinner")
-  NPC_SCENARIOS_     = translateLabel("Play Scenarios On NPCs:")
-  ADD_TO_FAVS_       = translateLabel("add_to_favs")
-  REMOVE_FROM_FAVS_  = translateLabel("remove_from_favs")
-  FAVORITES_TAB_     = translateLabel("favs_tab")
-  FAVS_NIL_TXT_      = translateLabel("favs_nil_txt")
-  RECENTS_TAB_       = translateLabel("recents_tab")
-  RECENTS_NIL_TXT_   = translateLabel("recents_nil_txt")
-  -- Weapons
-  WEAPON_TAB_        = translateLabel("weaponTab")
-  HASHGRABBER_CB_    = translateLabel("hashgrabberCB")
-  HASHGRABBER_DESC_  = translateLabel("hashgrabber_tt")
-  TRIGGERBOT_CB_     = translateLabel("triggerbotCB")
-  TRIGGERBOT_DESC_   = translateLabel("triggerbot_tt")
-  ENEMY_ONLY_CB_     = translateLabel("enemyonlyCB")
-  AUTOKILL_CB_       = translateLabel("autokillCB")
-  AUTOKILL_DESC_     = translateLabel("autokill_tt")
-  ENEMIES_FLEE_CB_   = translateLabel("runawayCB")
-  ENEMIES_FLEE_DESC_ = translateLabel("runaway_tt")
-  KATANA_CB_         = translateLabel("katanaCB")
-  KATANA_DESC_       = translateLabel("katana_tt")
-  LASER_SIGHT_CB_    = translateLabel("laserSightCB")
-  LASER_SIGHT_DESC_  = translateLabel("laserSight_tt")
-  LASER_CHOICE_TXT_  = translateLabel("laserChoice_txt")
-  -- Vehicle
-  VEHICLE_TAB_        = translateLabel("vehicleTab")
-  GET_IN_VEH_WARNING_ = translateLabel("getinveh")
-  -- Custom Paint Jobs
-  SORT_BY_TXT_       = translateLabel("sort_by_txt")
-  SORT_BY_COLOR_TXT_ = translateLabel("color_txt")
-  SORT_BY_MFR_TXT_   = translateLabel("manufacturer_txt")
-  REMOVE_MATTE_CB_   = translateLabel("remove_matte_CB")
-  APPLY_MATTE_CB_    = translateLabel("apply_matte_CB")
-  APPLY_MATTE_DESC_  = translateLabel("apply_matte_tt")
-  SAVE_PAINT_DESC_   = translateLabel("save_paint_tt")
-  --
-  DRIFT_MODE_CB_           = translateLabel("driftModeCB")
-  DRIFT_MODE_DESC_         = translateLabel("driftMode_tt")
-  DRIFT_SLIDER_            = translateLabel("driftSlider")
-  DRIFT_SLIDER_DESC        = translateLabel("driftSlider_tt")
-  DRIFT_SMOKE_COL_         = translateLabel("driftSmokeCol")
-  DRIFT_SMOKE_COL_DESC_    = translateLabel("DriftSmoke_tt")
-  HEX_SMOKE_DESC_          = translateLabel("hex_tt")
-  DRIFT_TIRES_CB_          = translateLabel("driftTiresCB")
-  DRIFT_TIRES_DESC_        = translateLabel("driftTires_tt")
-  DRIFT_TORQUE_DESC_       = translateLabel("driftTorque_tt")
-  DRIFT_GAME_DESC_         = translateLabel("DriftGame_tt")
-  DRIFT_INVALID_DESC_      = translateLabel("driftInvalidVehTxt")
-  LIMIT_OPTIONS_CB_        = translateLabel("lvoCB")
-  LIMIT_OPTIONS_DESC_      = translateLabel("lvo_tt")
-  MISSILE_DEF_DESC_        = translateLabel("missile_def_tt")
-  MISSILE_DEF_ON_          = translateLabel("missile_def_on_notif")
-  MISSILE_DEF_OFF_         = translateLabel("missile_def_off_notif")
-  LAUNCH_CTRL_DESC_        = translateLabel("lct_tt")
-  NOS_DESC_                = translateLabel("speedBoost_tt")
-  NOS_VFX_DESC_            = translateLabel("vfx_tt")
-  NOS_PURGE_DESC_          = translateLabel("purge_tt")
-  LOUD_RADIO_DESC_         = translateLabel("loudradio_tt")
-  POPSNBANGS_DESC_         = translateLabel("pnb_tt")
-  LOUDER_POPS_DESC_        = translateLabel("louderpnb_tt")
-  HIGH_BEAMS_DESC_         = translateLabel("highbeams_tt")
-  BRAKE_LIGHT_DESC_        = translateLabel("brakeLight_tt")
-  IV_STYLE_EXIT_DESC_      = translateLabel("engineOn_tt")
-  KEEP_WHEELS_TURNED_DESC_ = translateLabel("wheelsturned_tt")
-  CANT_TOUCH_THIS_DESC_    = translateLabel("canttouchthis_tt")
-  INSTA_180_DESC_          = translateLabel("insta180_tt")
-  FLARES_FOR_ALL_DESC_     = translateLabel("flaresforall_tt")
-  PLANE_SPEED_DESC_        = translateLabel("planeSpeed_tt")
-  STRONG_WINDOWS_DESC_     = translateLabel("strongWindows_tt")
-  VEHICLE_MINES_DESC_      = translateLabel("veh_mines_tt")
-  MINES_TYPE_BTN_          = translateLabel("mine_type_btn")
-  MINES_TYPE_DESC_         = translateLabel("mine_type_txt")
-  RGB_LIGHTS_DESC_         = translateLabel("rgbLights")
-  RGB_SPEED_TXT_           = translateLabel("rgbSlider")
-  AUTOPILOT_ERROR_TXT_     = translateLabel("autopilot_err_txt")
-  ENGINE_SOUND_BTN_        = translateLabel("engineSoundBtn")
-  ENGINE_SOUND_ERROR_TXT_  = translateLabel("engineSoundErr")
-  SEARCH_VEH_HINT_         = translateLabel("searchVeh_hint")
-  SELECT_SOUND_TXT_        = translateLabel("Use This Sound")
-  RESTORE_DEFAULT_         = translateLabel("Restore Default")
-  FIX_ENGINE_              = translateLabel("Fix Engine")
-  DESTROY_ENGINE_          = translateLabel("Destroy Engine")
-  EJECTO_SEATO_DESC_       = translateLabel("ejecto_seato_tt")
-  FENDER_BENDER_DESC_      = translateLabel("fenderBender_tt")
-  AUTOVEHLOCKS_DESC_       = translateLabel("autovehlocks_tt")
-  AUTO_RAISE_ROOF_DESC_    = translateLabel("autoraiseroof_tt")
-  -- Flatbed
-  GET_IN_FLATBED_         = translateLabel("getinsidefltbd")
-  SPAWN_FLATBED_BTN_      = translateLabel("spawnfltbd")
-  FLTBD_NO_VEH_TXT_       = translateLabel("fltbd_nonearbyvehTxt")
-  FLTBD_NOT_ALLOWED_TXT_  = translateLabel("fltbd_nootherfltbdTxt")
-  FLTBD_CARS_ONLY_TXT_    = translateLabel("fltbd_carsOnlyTxt")
-  FLTBD_NEARBY_VEH_TXT_   = translateLabel("fltbd_closest_veh")
-  FLTBD_TOWING_TXT_       = translateLabel("fltbd_towingTxt")
-  FLTBD_SHOW_TOWPOS_CB_   = translateLabel("Show Towing Position")
-  FLTBD_SHOW_TOWPOS_DESC_ = translateLabel("towpos_tt")
-  FLTBD_TOW_ALL_CB_       = translateLabel("Tow Everything")
-  FLTBD_TOW_ALL_DESC_     = translateLabel("TowEverything_tt")
-  FLTBD_TOW_BTN_          = translateLabel("towBtn")
-  FLTBD_ADJUST_POS_TXT_   = translateLabel("Adjust Vehicle Position")
-  FLTBD_ADJUST_POS_DESC_  = translateLabel("AdjustPosition_tt")
-  FLTBD_EXIT_VEH_ERROR_   = translateLabel("Exit your current vehicle first.")
-  FLTBD_INTERIOR_ERROR_   = translateLabel("noSpawnInside")
-  -- Vehicle Creator
-  CREATE_TXT_           = translateLabel("Create")
-  CREATOR_DESC_         = translateLabel("vcreator_tt")
-  SAVED_VEHS_TXT_       = translateLabel("vc_saved_vehs")
-  SAVED_VEHS_DESC_      = translateLabel("vc_saved_vehs_tt")
-  VC_DEMO_VEH_BTN_      = translateLabel("widebodycivic_Btn")
-  VC_DEMO_VEH_DESC_     = translateLabel("widebodycivic_tt")
-  VC_MAIN_VEH_TXT_      = translateLabel("vc_main_veh")
-  VC_SPAWNED_VEHS_TXT_  = translateLabel("vc_spawned_vehs")
-  VC_ATTACH_BTN_        = translateLabel("vc_attach_btn")
-  VC_ALREADY_ATTACHED_  = translateLabel("vc_alrattached_err")
-  VC_SELF_ATTACH_ERR_   = translateLabel("vc_selfattach_err")
-  VC_NAME_HINT_         = translateLabel("vc_choose_name_hint")
-  VC_NAME_ERROR_        = translateLabel("vc_same_name_err")
-  VC_SAVE_SUCCESS_      = translateLabel("vc_saved_msg")
-  VC_SAVE_ERROR_        = translateLabel("vc_save_err")
-  VC_SPAWN_PERSISTENT_  = translateLabel("vc_spawn_persist")
-  VC_DELETE_PERSISTENT_ = translateLabel("vc_delete_persist")
-  VC_DELETE_NOTIF_      = translateLabel("vc_delete_msg")
-  -- online
-  -- Casino Pacino
-  CP_GAMBLING_TXT_             = translateLabel("Gambling")
-  CP_BYPASSCD_CP_              = translateLabel("bypassCasinoCooldownCB")
-  CP_BYPASSCD_WARN_            = translateLabel("casinoCDwarn")
-  CP_COOLDOWN_STATUS_          = translateLabel("casinoCDstatus")
-  CP_FORCE_POKER_RF_CB_        = translateLabel("forcePokerCardsCB")
-  CP_FORCE_BADBEAT_CB_         = translateLabel("setDealersCardsCB")
-  CP_DEALER_FACEDOWN_TXT_      = translateLabel("faceDownCard")
-  CP_DEALER_BUST_BTN_          = translateLabel("dealerBustBtn")
-  CP_FORCE_ROULETTE_CB_        = translateLabel("forceRouletteCB")
-  CP_NOT_PLAYING_BJ_TXT_       = translateLabel("not_playing_bj_txt")
-  CP_NOT_IN_CASINO_TXT_        = translateLabel("not_in_casino_txt")
-  CP_ROULETTE_CTRL_NOTIF_      = translateLabel("roulette_ctrl_txt")
-  CP_TCC_CTRL_NOTIF_           = translateLabel("tcc_ctrl_txt")
-  CP_RIG_SLOTS_CB_             = translateLabel("rigSlotsCB")
-  CP_AUTOPLAY_SLOTS_CB_        = translateLabel("autoplaySlotsCB")
-  CP_AUTOPLAY_CAP_CB_          = translateLabel("autoplayCapCB")
-  CP_PODIUM_VEH_BTN_           = translateLabel("podiumVeh_Btn")
-  CP_MYSTERY_PRIZE_BTN_        = translateLabel("mysteryPrize_Btn")
-  CP_50K_BTN_                  = translateLabel("50k_Btn")
-  CP_25K_BTN_                  = translateLabel("25k_Btn")
-  CP_15K_BTN_                  = translateLabel("15k_Btn")
-  CP_DISCOUNT_BTN_             = translateLabel("%_Btn")
-  CP_CLOTHING_BTN_             = translateLabel("clothing_Btn")
-  CP_HEIST_APPROACH_TXT_       = translateLabel("approach")
-  CP_HEIST_LAST_APPROACH_TXT_  = translateLabel("last_approach")
-  CP_HEIST_HARD_APPROACH_TXT_  = translateLabel("hard_approach")
-  CP_HEIST_TARGET_TXT_         = translateLabel("target")
-  CP_HEIST_GUNMAN_TXT_         = translateLabel("gunman")
-  CP_HEIST_DRIVER_TXT_         = translateLabel("driver")
-  CP_HEIST_HACKER_TXT_         = translateLabel("hacker")
-  CP_HEIST_WEAPONS_TXT_        = translateLabel("unmarked_weapons")
-  CP_HEIST_GETAWAY_VEHS_TXT_   = translateLabel("getaways")
-  CP_HEIST_MASKS_TXT_          = translateLabel("masks")
-  CP_HEIST_AUTOGRAB_           = translateLabel("autograb")
-  CP_HEIST_UNLOCK_ALL_BTN_     = translateLabel("Unlock All Heist Options")
-  CP_HEIST_ZERO_AI_CUTS_BTN_   = translateLabel("%0_ai_cuts_Btn")
-  CP_HEIST_MAX_PLAYER_CUTS_BTN_= translateLabel("%100_p_cuts_Btn")
-  -- YimResupplierV2
-  CEO_WHOUSES_TXT_   = translateLabel("ceo_whouses_title")
-  CEO_WHOUSES_DESC_  = translateLabel("ceo_whouses_txt")
-  CEO_WAREHOUSE_     = translateLabel("Warehouse")
-  CEO_RANDOM_CRATES_ = translateLabel("random_crates")
-  QUICK_TP_TXT_      = translateLabel("quick_tp")
-  QUICK_TP_WARN_     = translateLabel("tp_warn")
-  QUICK_TP_WARN2_    = translateLabel("tp_warn_2")
-  HANGAR_TXT_        = translateLabel("hangar_title")
-  -- Players
-  PLAYERS_TAB_          = translateLabel("playersTab")
-  TOTAL_PLAYERS_TXT_    = translateLabel("Total Players:")
-  TEMP_DISABLED_NOTIF_  = translateLabel("temporarily disabled")
-  PERVERT_STALKER_DESC_ = translateLabel("pervertStalker_tt")
-  -- World
-  WORLD_TAB_             = translateLabel("worldTab")
-  NPC_CTRL_FAIL_         = translateLabel("failedToCtrlNPC")
-  VEH_CTRL_FAIL_         = translateLabel("failed_veh_ctrl")
-  PED_GRABBER_CB_        = translateLabel("pedGrabber")
-  PED_GRABBER_DESC_      = translateLabel("pedGrabber_tt")
-  THROW_FORCE_TXT_       = translateLabel("Throw Force")
-  CARPOOL_CB_            = translateLabel("carpool")
-  CARPOOL_DESC_          = translateLabel("carpool_tt")
-  PREVIOUS_SEAT_BTN_     = translateLabel("prevSeat")
-  NEXT_SEAT_BTN_         = translateLabel("nextSeat")
-  ANIMATE_NPCS_CB_       = translateLabel("animateNPCsCB")
-  ANIMATE_NPCS_DESC_     = translateLabel("animateNPCs_tt")
-  KAMIKAZE_DRIVERS_CB_   = translateLabel("kamikazeCB")
-  KAMIKAZE_DRIVERS_DESC_ = translateLabel("kamikazeDrivers_tt")
-  PUBLIC_ENEMY_CB_       = translateLabel("publicEnemyCB")
-  PUBLIC_ENEMY_DESC_     = translateLabel("publicEnemy_tt")
-  EXTEND_WORLD_CB_       = translateLabel("extendWorldCB")
-  EXTEND_WORLD_DESC_     = translateLabel("extendWorld_tt")
-  SMOOTH_WATERS_CB_      = translateLabel("smoothwatersCB")
-  SMOOTH_WATERS_DESC_    = translateLabel("smoothwaters_tt")
-  -- Object Spawner
-  EDIT_MODE_CB_            = translateLabel("editMode")
-  EDIT_MODE_DESC_          = translateLabel("editMode_tt")
-  COCKSTAR_BLACKLIST_WARN_ = translateLabel("R*_blacklist")
-  CRASH_OBJECT_WARN_       = translateLabel("crash_object")
-  CUSTOM_OBJECTS_TXT_      = translateLabel("Custom Objects")
-  ALL_OBJECTS_TXT_         = translateLabel("All Objects")
-  PREVIEW_OBJECTS_CB_      = translateLabel("Preview")
-  MOVE_OBJECTS_FB_         = translateLabel("Move_FB")
-  MOVE_OBJECTS_UD_         = translateLabel("Move_UD")
-  SPAWN_FOR_PLAYER_CB_     = translateLabel("Spawn For a Player")
-  INVALID_OBJECT_TXT_      = translateLabel("invalid_obj")
-  SPAWNED_OBJECTS_TXT_     = translateLabel("spawned_objects")
-  ATTACH_TO_SELF_CB_       = translateLabel("Attach To Self")
-  ATTACH_TO_VEH_CB_        = translateLabel("Attach To Vehicle")
-  ATTACHED_OBJECTS_TXT_    = translateLabel("attached_objects")
-  XYZ_MULTIPLIER_TXT_      = translateLabel("xyz_multiplier")
-  MOVE_OBJECT_TXT_         = translateLabel("Move Object:")
-  ROTATE_OBJECT_TXT_       = translateLabel("Rotate Object:")
-  RESET_OBJECT_DESC_       = translateLabel("resetSlider_tt")
-  -- Settings
-  SETTINGS_TAB_            = translateLabel("settingsTab")
-  DISABLE_TOOLTIPS_CB_     = translateLabel("Disable Tooltips")
-  DISABLE_UISOUNDS_CB_     = translateLabel("DisableSound")
-  DISABLE_UISOUNDS_DESC_   = translateLabel("DisableSound_tt")
-  FLIGHT_MUSIC_CB_         = translateLabel("flightMusicCB")
-  FLIGHT_MUSIC_DESC_       = translateLabel("flightMusic_tt")
-  DAILY_QUOTES_CB_         = translateLabel("dailyQuotesCB")
-  DAILY_QUOTES_DESC_       = translateLabel("dailyQuotes_tt")
-  MISSILE_DEF_LOGS_CB_     = translateLabel("missileLogsCB")
-  MISSILE_DEF_LOGS_DESC_   = translateLabel("missileLogs_tt")
-  AUTOFILL_TIMEDELAY_DESC_ = translateLabel("autofillDelay_tt")
-  LANGUAGE_TXT_            = translateLabel("langTitle")
-  CURRENT_LANGUAGE_TXT_    = translateLabel("currentLang_txt")
-  GAME_LANGUAGE_CB_        = translateLabel("gameLangCB")
-  GAME_LANGUAGE_DESC_      = translateLabel("gameLang_tt")
-  LANG_CHANGED_NOTIF_      = translateLabel("lang_success_msg")
-  RESET_SETTINGS_BTN_      = translateLabel("reset_settings_Btn")
-  CONFIRM_PROMPT_          = translateLabel("confirm_txt")
-  log.info(string.format("Loaded %d %s translations.", Lua_fn.getTableLength(Labels), current_lang))
+  local keys_t = {}
+  for key, _ in pairs(Labels) do
+    table.insert(keys_t, key)
+  end
+
+  local total = #keys_t
+  for i = 1, total do
+    local key = keys_t[i]
+    _G[key] = translateLabel(key)
+    if SS_debug then
+      gTranslatedString_t[key] = _G[key]
+    end
+  end
+  log.info(string.format("Loaded %d translations for %s.", total, current_lang))
+  keys_t, total = nil, 0
 end
 
 ---@param toggle boolean
@@ -509,7 +196,7 @@ dummyCop = function()
           ENTITY.SET_ENTITY_COLLISION(dummyCopCar, false, false)
           VEHICLE.SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(dummyCopCar, false, false)
           VEHICLE.SET_VEHICLE_UNDRIVEABLE(dummyCopCar, true)
-          ENTITY.SET_ENTITY_ALPHA(dummyCopCar, 49.0, false)
+          ENTITY.SET_ENTITY_ALPHA(dummyCopCar, 5.0, false)
           ENTITY.SET_ENTITY_INVINCIBLE(dummyCopCar, true)
           local boneidx1 = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(dummyCopCar, veh_bone1)
           local boneidx2 = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, veh_bone2)
@@ -530,6 +217,8 @@ dummyCop = function()
           VEHICLE.SET_VEHICLE_CAUSES_SWERVING(current_vehicle, true)
           VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 0, true)
           VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 1, true)
+          -- ENTITY.SET_ENTITY_VISIBLE(dummyCopCar, false, false) -- you can't see the lights anymore but the dummy police vehicle no longer appears to other players.
+          log.debug(tostring(dummyCopCar))
         end
       end
     end
@@ -1005,6 +694,49 @@ draw_laser = function(bool, startPos, endPos_1, endPos_2, color)
       startPos.x, startPos.y, startPos.z,
       endPos_2.x, endPos_2.y, endPos_2.z,
       color.r, color.g, color.b, 255
+    )
+  end
+end
+
+---@param enemiesOnly boolean
+---@param entity integer
+---@param coords vec3
+shoot_cannon = function(enemiesOnly, entity, coords)
+  if ENTITY.DOES_ENTITY_EXIST(entity) and (ENTITY.IS_ENTITY_A_VEHICLE(entity) or ENTITY.IS_ENTITY_A_PED(entity)) and not
+  ENTITY.IS_ENTITY_DEAD(entity, false) then
+    if not enemiesOnly then
+      VEHICLE.SET_VEHICLE_SHOOT_AT_TARGET(self.get_ped(), entity, coords.x, coords.y, coords.z)
+    else
+      if ENTITY.IS_ENTITY_A_PED(entity) then
+        if Game.Self.isPedEnemy(entity) and not ENTITY.IS_ENTITY_DEAD(entity, false) then
+          VEHICLE.SET_VEHICLE_SHOOT_AT_TARGET(self.get_ped(), entity, coords.x, coords.y, coords.z)
+        end
+      elseif ENTITY.IS_ENTITY_A_VEHICLE(entity) then
+        local occupants = Game.Vehicle.getOccupants(entity)
+        if #occupants > 0 then
+          for i = 1, #occupants do
+            if Game.Self.isPedEnemy(occupants[i]) and not ENTITY.IS_ENTITY_DEAD(occupants[i], false) then
+              VEHICLE.SET_VEHICLE_SHOOT_AT_TARGET(self.get_ped(), entity, coords.x, coords.y, coords.z)
+              break
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+---@param src vec3
+---@param dest vec3
+---@param dmg number
+---@param owner integer
+---@param speed number
+shoot_explosive_mg = function(src, dest, dmg, owner, speed)
+  if Game.requestWeaponAsset(3800181289) then
+    MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
+      src.x, src.y, src.z,
+      dest.x, dest.y, dest.z,
+      dmg, false, 3800181289, owner, true, false, speed
     )
   end
 end
@@ -2476,7 +2208,7 @@ SS.openHotkeyWindow = function(window_name, keybind)
     is_setting_hotkeys = true
   end
   ImGui.SameLine(); ImGui.BeginDisabled(keybind.code == 0x0)
-  if ImGui.Button(string.format("Remove##%s", window_name)) then
+  if ImGui.Button(string.format("%s##%s", GENERIC_UNBIND_LABEL_, window_name)) then
     UI.widgetSound("Delete")
     keybind.code, keybind.name = 0x0, "[Unbound]"
     CFG.save("keybinds", keybinds)
@@ -2557,7 +2289,7 @@ SS.gpadHotkeyWindow = function(window_name, keybind)
     is_setting_hotkeys = true
   end
   ImGui.SameLine(); ImGui.BeginDisabled(keybind.code == 0)
-  if ImGui.Button(string.format("Remove##%s", window_name)) then
+  if ImGui.Button(string.format("%s##%s", GENERIC_UNBIND_LABEL_, window_name)) then
     UI.widgetSound("Delete")
     keybind.code, keybind.name = 0, "[Unbound]"
     CFG.save("gpad_keybinds", gpad_keybinds)
@@ -2892,13 +2624,18 @@ end
 --
 -- and returns the entity handle of the bin if true.
 SS.isNearTrashBin = function()
-  local binPos, myCoords = vec3:new(0.0, 0.0, 0.0), self.get_pos()
+  local binPos, myCoords, myFwdVec = vec3:new(0.0, 0.0, 0.0), self.get_pos(), Game.getForwardVec(self.get_ped())
+  local searchPos = vec3:new(
+    myCoords.x + myFwdVec.x * 1.2,
+    myCoords.y + myFwdVec.y * 1.2,
+    myCoords.z + myFwdVec.z * 1.2
+  )
   for _, trash in ipairs(trash_bins_T) do
-    bin = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(myCoords.x, myCoords.y, myCoords.z, 1.5, joaat(trash), false, false, false)
+    bin = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(searchPos.x, searchPos.y, searchPos.z, 1.5, joaat(trash), false, false, false)
     if ENTITY.DOES_ENTITY_EXIST(bin) then
       binPos = Game.getCoords(bin, false)
-      local distance = vec3:distance(myCoords, binPos)
-      if distance <= 1.8 then
+      local distance = vec3:distance(searchPos, binPos)
+      if distance <= 1.3 then
         return true, bin
       end
     end
@@ -3366,6 +3103,20 @@ SS.reset_settings = function()
   initStrings()
 end
 
+SS.isUsingAirctaftMG = function()
+  if Game.Self.isDriving() and (is_plane or is_heli) and Game.Vehicle.hasWeapons() then
+    local bool, weapon = WEAPON.GET_CURRENT_PED_VEHICLE_WEAPON(self.get_ped(), weapon)
+    if bool then
+      for _, v in ipairs(aircraft_mgs_t) do
+        if weapon == joaat(v) then
+          return true, weapon
+        end
+      end
+    end
+  end
+  return false, 0
+end
+
 -- GTA helpers.
 ---@class Game
 Game = {}
@@ -3657,8 +3408,8 @@ end
 ---@param model integer
 Game.getModelDimensions = function(model)
   if STREAMING.IS_MODEL_VALID(model) then
-    local vmin = memory.allocate(12)
-    local vmax = memory.allocate(12)
+    local vmin = memory.allocate(0xC)
+    local vmax = memory.allocate(0xC)
     ---@diagnostic disable-next-line
     local retVecMin, retVecMax = MISC.GET_MODEL_DIMENSIONS(model, vmin, vmax) -- keeps yapping about assigning 'pointer' to param 'vec3'
     memory.free(vmin); memory.free(vmax)
@@ -3685,6 +3436,15 @@ Game.requestAnimDict = function(dict)
     coroutine.yield()
   end
   return STREAMING.HAS_ANIM_DICT_LOADED(dict)
+end
+
+---@param dict string
+Game.requestTextureDict = function(dict)
+  while not GRAPHICS.HAS_STREAMED_TEXTURE_DICT_LOADED(dict) do
+    GRAPHICS.REQUEST_STREAMED_TEXTURE_DICT(dict, false)
+    coroutine.yield()
+  end
+  return GRAPHICS.HAS_STREAMED_TEXTURE_DICT_LOADED(dict)
 end
 
 ---@param weapon integer
@@ -3891,24 +3651,27 @@ Game.DoesHumanScenarioExistInArea = function(area, radius, isFree)
   return false
 end
 
--- Starts a Level Of Sight probe test
----@param startPos vec3
----@param endPos vec3
-Game.rayCast = function(startPos, endPos)
+-- Starts a Line Of Sight probe test.
+---@param src vec3
+---@param dest vec3
+---@param traceFlags integer
+Game.rayCast = function(src, dest, traceFlags, entityToExclude)
   local rayHandle = SHAPETEST.START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(
-    startPos.x, startPos.y, startPos.z,
-    endPos.x, endPos.y, endPos.z, -1, self.get_ped(), 1
+    src.x, src.y, src.z,
+    dest.x, dest.y, dest.z,
+    traceFlags, entityToExclude, 4
   )
-  local endCoords = memory.allocate(12)
-  local surfaceNormal = memory.allocate(12)
-  local _, hit, entityHit, retEndCoords = 0, false, 0, vec3:new(0, 0, 0)
-  _, hit, retEndCoords, _, _ = SHAPETEST.GET_SHAPE_TEST_RESULT(
+  local endCoords     = memory.allocate(0xC)
+  local surfaceNormal = memory.allocate(0xC)
+  local entityHit     = 0
+  local _, hit, retEntityHit, retEndCoords = 0, false, 0, vec3:new(0, 0, 0)
+  _, hit, retEndCoords, _, retEntityHit = SHAPETEST.GET_SHAPE_TEST_RESULT(
     ---@diagnostic disable-next-line
     rayHandle, hit, endCoords, surfaceNormal, entityHit
   )
   memory.free(endCoords); memory.free(surfaceNormal)
 
-  return hit, retEndCoords
+  return hit, retEndCoords, retEntityHit
 end
 
 ---@class Self
@@ -4118,6 +3881,12 @@ Game.Self.isInCarModShop = function()
     return script.is_active(v)
   end
   return false
+end
+
+---@param ped integer
+Game.Self.isPedEnemy = function(ped)
+  local relationship = PED.GET_RELATIONSHIP_BETWEEN_PEDS(ped, self.get_ped())
+  return PED.IS_PED_IN_COMBAT(ped, self.get_ped()) or (relationship > 2 and relationship <= 5)
 end
 
 ---@class Vehicle

@@ -35,29 +35,30 @@ function customPaintsUI()
     end
     ImGui.PopItemWidth()
     ImGui.PushItemWidth(420)
-    custom_paints_sq, cpsqUsed = ImGui.InputTextWithHint("##custompaintssq", "Search", custom_paints_sq, 64)
+    custom_paints_sq, cpsqUsed = ImGui.InputTextWithHint("##custompaintssq", GENERIC_SEARCH_HINT_, custom_paints_sq, 64)
     is_typing = ImGui.IsItemActive()
     displayCustomPaints()
     ImGui.PopItemWidth()
     local selected_paint = filteredPaints[custom_paint_index + 1]
     ImGui.Spacing()
     ImGui.BeginDisabled(selected_paint == nil)
-    mf_overwrite, movwUsed = ImGui.Checkbox("Matte Finish", selected_paint ~= nil and selected_paint.m or false)
+    mf_overwrite, movwUsed = ImGui.Checkbox(CUSTOM_PAINT_MATTE_CB_, selected_paint ~= nil and selected_paint.m or false)
     UI.toolTip(false, APPLY_MATTE_DESC_)
     if movwUsed then
       UI.widgetSound("Nav2")
       selected_paint.m = not selected_paint.m
     end
     ImGui.Separator()
-    is_primary, isPused = ImGui.Checkbox("Primary", is_primary); ImGui.SameLine()
-    is_secondary, isSused = ImGui.Checkbox("Secondary", is_secondary)
+    is_primary, isPused = ImGui.Checkbox(COL_PRIMARY_CB_, is_primary); ImGui.SameLine()
+    is_secondary, isSused = ImGui.Checkbox(COL_SECONDARY_CB_, is_secondary)
     if isPused or isSused then
       UI.widgetSound("Nav2")
     end
-    if ImGui.Button(GENERIC_CONFIRM_BTN_, 80, 40) and selected_paint ~= nil then -- fine, sumneko! I submit to your needs.
+    local text_x, _ = ImGui.CalcTextSize(GENERIC_CONFIRM_BTN_)
+    if ImGui.Button(GENERIC_CONFIRM_BTN_, text_x + 20, 40) and selected_paint ~= nil then
       if not is_primary and not is_secondary then
         UI.widgetSound("Error")
-        gui.show_error("Samurai's Scripts", "Please select primary or secondary or both.")
+        gui.show_error("Samurai's Scripts", CUSTOM_PAINT_NOT_SELECTED_ERR_)
       else
         UI.widgetSound("Select")
         Game.Vehicle.setCustomPaint(current_vehicle, selected_paint.hex, selected_paint.p, selected_paint.m, is_primary,

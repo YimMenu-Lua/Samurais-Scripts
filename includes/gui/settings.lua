@@ -80,11 +80,16 @@ function settingsUI()
     LANG, current_lang = Game.Language()
   end
   if uglUsed then
+    if not useGameLang then
+      selected_lang = lang_T[lang_idx + 1]
+      LANG          = selected_lang.iso
+      current_lang  = selected_lang.name
+    end
     UI.widgetSound("Nav2")
     CFG.save("useGameLang", useGameLang)
     CFG.save("current_lang", current_lang)
     CFG.save("LANG", LANG)
-    CFG.save("lang_idx", 0)
+    CFG.save("lang_idx", lang_idx)
     initStrings()
     gui.show_success("Samurai's Scripts", LANG_CHANGED_NOTIF_)
   end
@@ -132,7 +137,7 @@ end
 
 function hotkeysUI()
   ImGui.BeginTabBar("Keyboard Hotkeys")
-  if ImGui.BeginTabItem("Keyboard") then
+  if ImGui.BeginTabItem(GENERIC_KEYBOARD_LABEL_) then
     ImGui.Dummy(1, 5)
 
     SS.openHotkeyWindow("Ragdoll On Demand", keybinds.rodBtn)
@@ -171,7 +176,7 @@ function hotkeysUI()
     ImGui.EndTabItem()
   end
 
-  if ImGui.BeginTabItem("Controller") then
+  if ImGui.BeginTabItem(GENERIC_CONTROLLER_LABEL_) then
     ImGui.Dummy(1, 5)
 
     SS.gpadHotkeyWindow("Ragdoll On Demand", gpad_keybinds.rodBtn)

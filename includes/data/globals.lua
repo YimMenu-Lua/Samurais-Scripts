@@ -1,7 +1,7 @@
 ---@diagnostic disable
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.5.4'
+SCRIPT_VERSION = '1.5.5'
 TARGET_BUILD   = '3411'
 TARGET_VERSION = '1.70'
 DEFAULT_CONFIG          = {
@@ -48,6 +48,11 @@ DEFAULT_CONFIG          = {
     r = 237,
     g = 47,
     b = 50,
+  },
+  cannon_marker_color     = {
+    0,
+    1,
+    0
   },
   Regen                   = false,
   disableTooltips         = false,
@@ -132,6 +137,10 @@ DEFAULT_CONFIG          = {
   flares_forall           = false,
   unbreakableWindows      = false,
   real_plane_speed        = false,
+  no_stall                = false,
+  cannon_triggerbot       = false,
+  cannon_enemies_only     = true,
+  cannon_manual_aim       = false,
   extend_world            = false,
   disableFlightMusic      = false,
   disable_quotes          = false,
@@ -166,6 +175,8 @@ DEFAULT_CONFIG          = {
   lang_idx                = 0,
   DriftIntensity          = 0,
   autoplay_chips_cap      = 0,
+  cannon_triggerbot_range = 1000,
+  cannon_marker_size      = 1.5,
   supply_autofill_delay   = 500,
   katana_replace_model    = 0xDD5DF8D9,
   katana_replace_index    = 0,
@@ -313,6 +324,8 @@ sound_index1            = 0
 sound_index2            = 0
 sound_switch            = 0
 radio_index             = 0
+cv_engineHealth         = 0
+cv_topSpeed             = 0
 drift_points            = 0
 drift_extra_pts         = 0
 straight_counter        = 0

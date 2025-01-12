@@ -2,7 +2,7 @@
 
 function handingEditorUI()
   ImGui.Spacing(); noEngineBraking, nebrUsed = ImGui.Checkbox("Disable Engine Braking", noEngineBraking)
-  UI.toolTip(false, "Allows your vehicle to coast without losing so much speed when you're not accelerating.")
+  UI.toolTip(false, NOENGINEBRAKING_DESC_)
   if nebrUsed then
     UI.widgetSound("Nav2")
     CFG.save("noEngineBraking", noEngineBraking)
@@ -15,7 +15,7 @@ function handingEditorUI()
 
   -- ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine();
   kersBoost, kbUsed = ImGui.Checkbox("KERS Boost", kersBoost)
-  UI.toolTip(false, "Equips your vehicle with KERS boost, similar to Open Wheel vehicles. Press [E] to use.")
+  UI.toolTip(false, KERSBOOST_DESC_)
   if kbUsed then
     UI.widgetSound("Nav2")
     CFG.save("kersBoost", kersBoost)
@@ -32,7 +32,7 @@ function handingEditorUI()
   end
 
   offroaderx2, offroadrUsed = ImGui.Checkbox("Better Offroad Capabilities", offroaderx2)
-  UI.toolTip(false, "Greatly improves your vehicle's offroad capabilities.")
+  UI.toolTip(false, OFFROADERX2_DESC_)
   if offroadrUsed then
     UI.widgetSound("Nav2")
     CFG.save("offroaderx2", offroaderx2)
@@ -45,7 +45,7 @@ function handingEditorUI()
 
   -- ImGui.SameLine(); ImGui.Dummy(15, 1); ImGui.SameLine();
   rallyTires, rallytiresUsed = ImGui.Checkbox("Rally Tires", rallyTires)
-  UI.toolTip(false, "Equips your vehicle with rally tires. Improves offroad traction.")
+  UI.toolTip(false, RALLYTIRES_DESC_)
   if rallytiresUsed then
     UI.widgetSound("Nav2")
     CFG.save("rallyTires", rallyTires)
@@ -57,7 +57,7 @@ function handingEditorUI()
   end
 
   noTractionCtrl, notcUsed = ImGui.Checkbox("Force No Traction Control", noTractionCtrl)
-  UI.toolTip(false, "Allows motorcycles to drift.")
+  UI.toolTip(false, FORCE_NO_TC_DESC_)
   if notcUsed then
     UI.widgetSound("Nav2")
     CFG.save("noTractionCtrl", noTractionCtrl)
@@ -70,7 +70,7 @@ function handingEditorUI()
 
   -- ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine();
   easyWheelie, ezwUsed = ImGui.Checkbox("Easy Wheelie", easyWheelie)
-  UI.toolTip(false, "Allows you to pop wheelies at very low speeds, just like the Manchez.")
+  UI.toolTip(false, EASYWHEELIE_DESC_)
   if ezwUsed then
     UI.widgetSound("Nav2")
     CFG.save("easyWheelie", easyWheelie)

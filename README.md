@@ -6,17 +6,17 @@
 
 ####    
 
-[![sv](https://img.shields.io/badge/Script%20Version-v1.5.3-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)   
+[![sv](https://img.shields.io/badge/Script%20Version-v1.5.5-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)   
 [![gv](https://img.shields.io/badge/Game%20Version-Online%201.70%20|%20Build%203411-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)   
 [![bm](https://img.shields.io/badge/Business%20Manager-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)   
 [![cp](https://img.shields.io/badge/Casino%20Pacino-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)   
 [![etc](https://img.shields.io/badge/All%20Other%20Features-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)
 ####    
 
-> [!NOTE]
+<!-- > [!NOTE]
 > **Discontinued** due to a series of unfortunate events including what happened to our beloved YimMenu as well as some shitty life circumstances.
 > 
-> Updates will no longer be as frequent as before but pull requests are still welcome.
+> Updates will no longer be as frequent as before but pull requests are still welcome. -->
 
 ####    
 
@@ -34,17 +34,38 @@
        %AppData%\YimMenu\scripts
 
 The folder structure should look like this
+
 ```bash
 ├── scripts
 │   └── Samurais Scripts
 |       ├── includes
 |       |   ├── data
 |       |   |   ├── actions.lua
+|       |   |   ├── commands.lua
+|       |   |   ├── globals.lua
 |       |   |   ├── objects.lua
 |       |   |   └── refs.lua
+|       |   ├── gui
+|       |   |   ├── custom_paints.lua
+|       |   |   ├── drift_mode.lua
+|       |   |   ├── dunk.lua
+|       |   |   ├── flatbed.lua
+|       |   |   ├── handling_editor.lua
+|       |   |   ├── main.lua
+|       |   |   ├── object_spawner.lua
+|       |   |   ├── self.lua
+|       |   |   ├── settings.lua
+|       |   |   ├── sound_player.lua
+|       |   |   ├── vehicle_creator.lua
+|       |   |   ├── vehicle.lua
+|       |   |   ├── weappon.lua
+|       |   |   ├── world.lua
+|       |   |   ├── yimactions2.lua
+|       |   |   └── yrv2.lua
 |       |   └── lib
+|       |       ├── samurais_utils
 |       |       ├── Translations.lua
-|       |       └── samurais_utils.lua
+|       |       └── YimConfig.lua
 │       └── samurais_scripts.lua
 ```
 

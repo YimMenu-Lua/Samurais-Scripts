@@ -1,32 +1,35 @@
-### v1.5.4 Changelog
+### v1.5.5 Changelog
 
 #### Self -> Hide & Seek
 
-- Fixed **Hide In Car Trunk:**
-  - The feature no longer causes an `EXCEPTION_ACCESS_VIOLATION` on it's first call.
-  > *Other features that also use the same function like "Bring x Vehicle" are fixed as well.*
+- Improved **Hide In Dumpster:**
+  - Decreased the distance at which a dumpster is detected.
+  - The feature will not prompt the player unless they're facing a dumpster.
 
-  - The feature now only detects vehicles that are in front of the player, as opposed to vehicles that are in a radius around the player.
-  - The feature now correctly determines engine placement *(it used to wrongly assume placement if a particular vehicle bone was broken off)*.
-  - The feature no longer works on destroyed vehicles.
+#### Vehicle -> Planes & Helis
 
-#### Weapon
+- Moved aircraft features into their own zone.
+- Increased top speed for the "**Real Jet Speed**" option to 576km/h (the game's max).
+- 🎉 Added 3 new features:
 
-- **Improved Laser Sight:**
-  - The laser no longer goes through entities. It now detects them and adds a small visual enhancement.
+  - **No Engine Stalling:** When flying planes and holding the brake button, your engine will not shut off.
+  
+  - **Cannon Triggerbot:** When using a weaponized plane or heli and having the machine gun selected, it will automatically shoot targets in front of you. Also has the option to only shoot enemies.
+  
+  - **Cannon Triggerbot:** When using a weaponized plane or heli and having the machine gun selected, it will automatically shoot targets in front of you. Also has the option to only shoot enemies.
+  
+  - **Cannon Manual Aim:** Gives you the ability to manually aim and shoot an explosive cannon. The only requirement is to be using an aircraft that has a machine gun (doesn't have to be an explosive MG) and the machine gun is the selected weapon. Also works with **Cannon Triggerbot**: if you manually aim at an entity while having the triggerbot enabled, it will automatically blast it wil explosive MG.
 
-- **Improved Katana:**
-  - You can now choose which weapon to replace with a Katana: **Baseball Bat**, **Golf Club**, **Machete**, or **Pool Que**.
+#### Translations
 
-#### Vehicle
+- Added missing translations.
+- Added Korean support.
 
-- Fixed a small issue in "**Flatbed**" *(nothing major)*.
-- Fixed "**Bring Last Vehicle**" and "**Bring Personal Vehicle**": Both options no longer bring destroyed vehicles.
+#### MISC
 
-#### Actions
+- Added missing objects.
+- Removed unused code.
 
-- When playing one of the DJ animations or just playing radio music from the **SoundPlayer** tab, the music can now be heard a little bit louder especially from other players' perspective.
+#### Devs
 
-#### Business Manager
-
-- Auto-Sell now waits for phone calls to end if a call is ongoing.
+- `generate_translations.py` now also adds new entries and translates them to all supported languages.

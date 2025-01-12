@@ -46,9 +46,9 @@ function weaponUI()
   end
 
   if replace_pool_q then
-    ImGui.Text("Weapon to replace:"); ImGui.SameLine(); ImGui.SetNextItemWidth(140)
+    ImGui.Text(KATANA_WPN_CHOICE_TXT_); ImGui.SameLine(); ImGui.SetNextItemWidth(140)
     katana_replace_index, kriUsed = ImGui.Combo("##kri", katana_replace_index, {"Baseball Bat", "Golf Club", "Machete", "Pool Que"}, 4)
-    UI.toolTip(false, "If you already own the weapon, it will be automatically placed in your hands.")
+    UI.toolTip(false, KATANA_WPN_CHOICE_DESC_)
     if kriUsed then
       UI.widgetSound("Nav")
       if katana_replace_index == 0 then

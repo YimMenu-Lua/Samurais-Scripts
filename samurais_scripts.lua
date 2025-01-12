@@ -52,13 +52,13 @@ casino_pacino:add_imgui(dunkUI)
 world_tab = Samurais_scripts:add_tab(WORLD_TAB_)
 world_tab:add_imgui(worldUI)
 
-object_spawner = world_tab:add_tab("Object Spawner")
+object_spawner = world_tab:add_tab("Object Spawner ")
 object_spawner:add_imgui(objectSpawnerUI)
 
 settings_tab = Samurais_scripts:add_tab(SETTINGS_TAB_)
 settings_tab:add_imgui(settingsUI)
 
-hotkeys_tab = settings_tab:add_tab("Hotkeys ")
+hotkeys_tab = settings_tab:add_tab(HOTKEYS_TAB_)
 hotkeys_tab:add_imgui(hotkeysUI)
 
 gui.add_always_draw_imgui(command_ui)
@@ -1178,7 +1178,7 @@ script.register_looped("TB", function() -- Triggerbot
         if WEAPON.IS_PED_WEAPON_READY_TO_SHOOT(self.get_ped()) and Game.Self.isOnFoot() and not PED.IS_PED_RELOADING(self.get_ped()) then
           if PAD.IS_CONTROL_PRESSED(0, 21) and not ENTITY.IS_ENTITY_DEAD(Entity, false) then
             if aimEnemy then
-              if PED.IS_PED_IN_COMBAT(Entity, self.get_ped()) then
+              if Game.Self.isPedEnemy(Entity) then
                 TASK.TASK_AIM_GUN_AT_COORD(self.get_ped(), bonePos.x, bonePos.y, bonePos.z, 250, true, false)
                 TASK.TASK_SHOOT_AT_COORD(self.get_ped(), bonePos.x, bonePos.y, bonePos.z, 250, 2556319013)
               end
@@ -1199,7 +1199,7 @@ script.register_looped("AKE", function(ak) -- Auto-kill enemies
     if (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET_WITHIN_RADIUS(self.get_ped(), myCoords.x, myCoords.y, myCoords.z, 500)) > 0 then
       ak:sleep(10)
       for _, p in pairs(gta_peds) do
-        if PED.IS_PED_HUMAN(p) and PED.IS_PED_IN_COMBAT(p, self.get_ped()) and not PED.IS_PED_A_PLAYER(p) then
+        if PED.IS_PED_HUMAN(p) and Game.Self.isPedEnemy(p) and not PED.IS_PED_A_PLAYER(p) then
           if PED.IS_PED_IN_ANY_VEHICLE(p, false) then
             local enemy_vehicle        = PED.GET_VEHICLE_PED_IS_IN(p, false)
             local enemy_vehicle_coords = ENTITY.GET_ENTITY_COORDS(enemy_vehicle, true)
@@ -1228,7 +1228,7 @@ script.register_looped("EF", function() -- Enemies Flee
     local myCoords = self.get_pos()
     if (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET_WITHIN_RADIUS(self.get_ped(), myCoords.x, myCoords.y, myCoords.z, 100)) > 0 then
       for _, p in pairs(entities.get_all_peds_as_handles()) do
-        if PED.IS_PED_HUMAN(p) and PED.IS_PED_IN_COMBAT(p, self.get_ped()) and not PED.IS_PED_A_PLAYER(p) then
+        if PED.IS_PED_HUMAN(p) and Game.Self.isPedEnemy(p) and not PED.IS_PED_A_PLAYER(p) then
           TASK.CLEAR_PED_SECONDARY_TASK(p)
           TASK.CLEAR_PED_TASKS(p)
           PED.SET_PED_KEEP_TASK(p, false)
@@ -1316,7 +1316,7 @@ script.register_looped("LSR", function() -- Laser Sight
         bone_pos.y + direction.y * 1000,
         bone_pos.z + direction.z * 1000
       )
-      local hit, endCoords = Game.rayCast(bone_pos, destination)
+      local hit, endCoords, _ = Game.rayCast(bone_pos, destination, -1, self.get_ped())
       draw_laser(hit, bone_pos, endCoords, destination, laser_choice)
     end
   end
@@ -1327,6 +1327,8 @@ script.register_looped("TDFT", function(script)
   script:yield()
   if PED.IS_PED_IN_ANY_VEHICLE(self.get_ped(), false) then
     current_vehicle = onVehEnter()
+    cv_engineHealth = VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle)
+    cv_topSpeed     = VEHICLE.GET_VEHICLE_ESTIMATED_MAX_SPEED(current_vehicle)
     is_car          = VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(current_vehicle))
     is_quad         = VEHICLE.IS_THIS_MODEL_A_QUADBIKE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
     is_plane        = VEHICLE.IS_THIS_MODEL_A_PLANE(ENTITY.GET_ENTITY_MODEL(current_vehicle))
@@ -2412,9 +2414,9 @@ script.register_looped("FLRS", function(flrs) -- Flares
     end
   end
 end)
-script.register_looped("RJS", function(rjspd) -- Real Jet Speed
-  rjspd:yield()
-  if real_plane_speed and Game.Self.isDriving() and is_plane then
+script.register_looped("MISCPLANES", function(miscp)
+  if real_plane_speed and Game.Self.isDriving() and is_plane
+  and VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(current_vehicle) ~= 1.0 then
     local jet_increase = 0.21
     local current_speed = ENTITY.GET_ENTITY_SPEED(current_vehicle)
     local jet_rotation  = ENTITY.GET_ENTITY_ROTATION(current_vehicle, 2)
@@ -2424,11 +2426,123 @@ script.register_looped("RJS", function(rjspd) -- Real Jet Speed
       jet_increase = 0.8
     end
     -- wait for the plane to go over the low altitude speed limit then start increasing its top speed and don't go over 500km/h
-    -- (555km/h is fast and safe. Higher speeds my break the game)
-    if current_speed >= 73 and current_speed < 154.1666 then
+    -- 576km/h is fast and safe (the game engine's max). Higher speeds my break the game
+    if current_speed >= 73 and current_speed < 160 then
       if PAD.IS_CONTROL_PRESSED(0, 87) and VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) == 4 then
         VEHICLE.SET_VEHICLE_FORWARD_SPEED(current_vehicle, (current_speed + jet_increase))
       end
+    end
+  end
+
+  if no_stall and Game.Self.isDriving() and is_plane then
+    if VEHICLE.IS_VEHICLE_DRIVEABLE(current_vehicle, true) and VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) > 350
+    and Game.Self.get_elevation() > 5.0 and not VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
+      VEHICLE.SET_VEHICLE_ENGINE_ON(current_vehicle, true, true, false)
+    end
+  end
+
+  if Game.Self.isDriving() and (is_plane or is_heli) and Game.Vehicle.hasWeapons()
+  and ENTITY.GET_ENTITY_MODEL(current_vehicle) ~= 0x96E24857 then
+    local armed, _ = SS.isUsingAirctaftMG()
+    if armed then
+      local pos = self.get_pos()
+      if cannon_triggerbot then
+        local rot  = ENTITY.GET_ENTITY_ROTATION(current_vehicle, 2)
+        local dir  = Lua_fn.RotToDir(rot)
+        local dest = vec3:new(
+          pos.x + dir.x * cannon_triggerbot_range,
+          pos.y + dir.y * cannon_triggerbot_range,
+          pos.z + dir.z * cannon_triggerbot_range
+        )
+        local hit, endCoords, _ = Game.rayCast(pos, dest, -1, current_vehicle)
+        if hit then
+          local ped, veh = Game.getClosestPed(endCoords, 50, true), Game.getClosestVehicle(endCoords, 50, self.get_veh())
+          if ped ~= 0 then
+            shoot_cannon(cannon_enemies_only, ped, ENTITY.GET_ENTITY_COORDS(ped, true))
+          end
+          if veh ~= 0 then
+            shoot_cannon(cannon_enemies_only, veh, ENTITY.GET_ENTITY_COORDS(veh, true))
+          end
+        end
+      end
+      if cannon_manual_aim then
+        local rot  = CAM.GET_GAMEPLAY_CAM_ROT(0)
+        local dir  = Lua_fn.RotToDir(rot)
+        local dest = vec3:new(
+          pos.x + dir.x * 500,
+          pos.y + dir.y * 500,
+          pos.z + dir.z * 500
+        )
+        local hit, endCoords, _ = Game.rayCast(pos, dest, -1, current_vehicle)
+        local endPos = hit and endCoords or vec3:new(
+          pos.x + dir.x * 5000,
+          pos.y + dir.y * 5000,
+          pos.z + dir.z * 5000
+        )
+        local markerDest = hit and endCoords or vec3:new(
+          pos.x + dir.x * 100,
+          pos.y + dir.y * 100,
+          (pos.z + dir.z * 100) + 1
+        )
+        local r, g, b = cannon_marker_color[1] * 255, cannon_marker_color[2] * 255, cannon_marker_color[3] * 255
+        local size = cannon_marker_size
+        GRAPHICS.DRAW_MARKER_EX(
+          3, markerDest.x, markerDest.y, markerDest.z,
+          0, 0, 0, 0, 0, 0, size, size, size, r, g, b, 255,
+        ---@diagnostic disable-next-line: param-type-mismatch
+          false, true, 1, false, nil, nil, true, true, false
+        )
+        if is_heli then
+          local camHeading = CAM.GET_GAMEPLAY_CAM_RELATIVE_HEADING()
+          if camHeading > 15 or camHeading < -15 then
+            if ENTITY.GET_ENTITY_ALPHA(current_vehicle) > 150 then
+              ENTITY.SET_ENTITY_ALPHA(current_vehicle, 150, false)
+            end
+          else
+            if ENTITY.GET_ENTITY_ALPHA(current_vehicle) < 255 then
+              ENTITY.RESET_ENTITY_ALPHA(current_vehicle)
+            end
+          end
+        end
+        if PAD.IS_CONTROL_PRESSED(0, 70) then
+          shoot_explosive_mg(pos, endPos, 1000, self.get_ped(), 300.0)
+        end
+        if cannon_triggerbot and hit then
+          local ped, veh = Game.getClosestPed(endCoords, 50, true), Game.getClosestVehicle(endCoords, 50, self.get_veh())
+          if not cannon_enemies_only then
+            if ped ~= 0 or veh ~= 0 then
+              local target = ped ~= 0 and ped or veh
+              shoot_cannon(false, target, ENTITY.GET_ENTITY_COORDS(target, true)) -- just for the MG sound
+              shoot_explosive_mg(pos, endPos, 1000, self.get_ped(), 300.0)
+            end
+          else
+            if ped ~= 0 and Game.Self.isPedEnemy(ped) and not ENTITY.IS_ENTITY_DEAD(ped, false) then
+              shoot_cannon(false, ped, ENTITY.GET_ENTITY_COORDS(ped, true))
+              shoot_explosive_mg(pos, ENTITY.GET_ENTITY_COORDS(ped, true), 1000, self.get_ped(), 300.0)
+            end
+            if veh ~= 0 then
+              local occupants = Game.Vehicle.getOccupants(veh)
+              if #occupants > 0 then
+                for _, p in ipairs(occupants) do
+                  if not ENTITY.IS_ENTITY_DEAD(p, false) and Game.Self.isPedEnemy(p) then
+                    shoot_cannon(false, veh, ENTITY.GET_ENTITY_COORDS(veh, true))
+                    shoot_explosive_mg(pos, ENTITY.GET_ENTITY_COORDS(veh, true), 1000, self.get_ped(), 300.0)
+                    break
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    else
+      if ENTITY.GET_ENTITY_ALPHA(current_vehicle) < 255 then
+        ENTITY.RESET_ENTITY_ALPHA(current_vehicle)
+      end
+    end
+  else
+    if ENTITY.GET_ENTITY_ALPHA(current_vehicle) < 255 then
+      ENTITY.RESET_ENTITY_ALPHA(current_vehicle)
     end
   end
 end)
@@ -2979,6 +3093,8 @@ end)
 -- object spawner
 script.register_looped("PREVIEW", function(preview)
   if previewLoop and gui.is_open() then
+    local coords = self.get_pos()
+    local fwdVec = Game.getForwardVec(self.get_ped())
     local currentHeading = ENTITY.GET_ENTITY_HEADING(previewEntity)
     if currentObjectPreview ~= previewEntity then
       ENTITY.DELETE_ENTITY(previewEntity)
@@ -2995,7 +3111,7 @@ script.register_looped("PREVIEW", function(preview)
       end
       if not previewStarted then
         previewEntity = OBJECT.CREATE_OBJECT(
-          propHash, coords.x + forwardX * 5, coords.y + forwardY * 5, coords.z, false, false, false
+          propHash, coords.x + fwdVec.x * 5, coords.y + fwdVec.y * 5, coords.z, false, false, false
         )
         ENTITY.SET_ENTITY_ALPHA(previewEntity, 200.0, false)
         ENTITY.SET_ENTITY_COLLISION(previewEntity, false, false)
@@ -3136,23 +3252,23 @@ script.register_looped("KDRV", function() -- Kamikaze Drivers
   end
 end)
 
-script.register_looped("PE", function() -- Public Enemies
+script.register_looped("PE", function() -- Public Enemy
   if publicEnemy and Game.Self.isAlive() then
     local myGroup  = PED.GET_PED_GROUP_INDEX(self.get_ped())
     local gta_peds = entities.get_all_peds_as_handles()
     for _, ped in pairs(gta_peds) do
       if ped ~= self.get_ped() and not PED.IS_PED_A_PLAYER(ped) and not PED.IS_PED_GROUP_MEMBER(ped, myGroup) then
-        PED.SET_PED_RESET_FLAG(ped, 440, true) -- PRF_IgnoreCombatManager so they can all gang up on you and beat your ass without waiting for their turns
         for _, attr in ipairs(pe_combat_attributes_T) do
           PED.SET_PED_COMBAT_ATTRIBUTES(ped, attr.id, attr.bool)
         end
         if not PED.IS_PED_IN_COMBAT(ped, self.get_ped()) then
           PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, true)
-          for _, cflg in ipairs(pe_config_flags_T) do
-            if not PED.GET_PED_CONFIG_FLAG(ped, cflg.id, cflg.bool) then
-              PED.SET_PED_CONFIG_FLAG(ped, cflg.id, cflg.bool)
+          for _, cflag in ipairs(pe_config_flags_T) do
+            if not PED.GET_PED_CONFIG_FLAG(ped, cflag.id, cflag.bool) then
+              PED.SET_PED_CONFIG_FLAG(ped, cflag.id, cflag.bool)
             end
           end
+          PED.SET_PED_RESET_FLAG(ped, 440, true) -- PRF_IgnoreCombatManager so they can all gang up on you and beat your ass without waiting for their turns
           TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, true)
           PLAYER.SET_POLICE_IGNORE_PLAYER(self.get_id(), true)
           PLAYER.SET_MAX_WANTED_LEVEL(0)
@@ -3322,26 +3438,6 @@ script.register_looped("CASINO", function(script)
           2)
       end
     end
-  end
-end)
-
-script.register_looped("DPMKIIB", function(dmpkb) -- Depressor MK2 Ban
-  if depressorBanList[1] ~= nil then
-    for _, v in pairs(depressorBanList) do
-      if PED.IS_PED_SITTING_IN_ANY_VEHICLE(v) then
-        local depressorBanVeh = PED.GET_VEHICLE_PED_IS_IN(v, true)
-        if (ENTITY.GET_ENTITY_MODEL(depressorBanVeh) == 0x7B54A9D3) then
-          command.call("vehkick", { targetPlayerIndex }) -- doesn't do shit
-          if entities.take_control_of(depressorBanVeh, 300) then
-            VEHICLE.SET_VEHICLE_ENGINE_HEALTH(depressorBanVeh, -4000)
-            if not VEHICLE.IS_VEHICLE_WEAPON_DISABLED(1966766321, depressorBanVeh, v) then
-              VEHICLE.DISABLE_VEHICLE_WEAPON(true, 1966766321, depressorBanVeh, v)
-            end
-          end
-        end
-      end
-    end
-    dmpkb:sleep(1000)
   end
 end)
 

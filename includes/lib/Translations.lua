@@ -1,5 +1,5 @@
 Labels = {
-	Self = {
+	SELF_TAB_ = {
 		{
 			iso = "en-US",
 			text = "Self ",
@@ -44,8 +44,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ja",
 		},
+		{
+			iso = "ko-KR",
+			text = "본인",
+		},
 	},
-	["Auto-Heal"] = {
+	AUTOHEAL_ = {
 		{
 			iso = "en-US",
 			text = "Auto-Heal",
@@ -90,8 +94,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Automatyczne leczenie",
 		},
+		{
+			iso = "ko-KR",
+			text = "자동 치유",
+		},
 	},
-	autoheal_tt = {
+	AUTOHEAL_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Automatically refill your health and armour.",
@@ -136,8 +144,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Automatycznie uzupełniaj swoje zdrowie i pancerz.",
 		},
+		{
+			iso = "ko-KR",
+			text = "자동으로 체력과 방어력을 회복합니다.",
+		},
 	},
-	objectiveTP = {
+	OBJECTIVETP_ = {
 		{
 			iso = "en-US",
 			text = "Teleport To Objective.",
@@ -182,8 +194,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Teleportuj się do celu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "목표 지점으로 순간이동합니다.",
+		},
 	},
-	objectiveTP_tt = {
+	OBJECTIVETP_DESC_ = {
 		{
 			iso = "en-US",
 			text = "While this option is enabled, press [F10] to teleport to mission objectives.",
@@ -228,8 +244,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Gdy ta opcja jest włączona, naciśnij [F10], aby teleportować się do celów misji.",
 		},
+		{
+			iso = "ko-KR",
+			text = "이 옵션이 활성화되어 있는 동안 [F10]을 눌러 임무 목표로 순간이동하세요.",
+		},
 	},
-	CrouchCB = {
+	CROUCHCB_ = {
 		{
 			iso = "en-US",
 			text = "Crouch Instead of Sneak",
@@ -274,8 +294,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Kucaj zamiast się skradać",
 		},
+		{
+			iso = "ko-KR",
+			text = "몰래 움직이는 대신 웅크리고 있어라",
+		},
 	},
-	Crouch_tt = {
+	CROUCH_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Replace stealth mode's sneaking animation (Left CTRL) with crouching.",
@@ -320,8 +344,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zastąp animację skradania się w trybie skradania (lewy CTRL) animacją kucania.",
 		},
+		{
+			iso = "ko-KR",
+			text = "스텔스 모드의 몰래 움직이는 애니메이션(왼쪽 CTRL)을 웅크리는 동작으로 바꿉니다.",
+		},
 	},
-	rpaCB = {
+	REPLACE_PA_CB_ = {
 		{
 			iso = "en-US",
 			text = "Replace 'Point' Action",
@@ -366,8 +394,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zastąp akcję „Punkt”",
 		},
+		{
+			iso = "ko-KR",
+			text = "'포인트' 작업 바꾸기",
+		},
 	},
-	rpa_tt = {
+	REPLACE_PA_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Replace the 'Point' action when pressing [B] with 'Hands Up' animation.",
@@ -412,8 +444,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zastąp akcję „Wskaż” po naciśnięciu [B] animacją „Ręce w górę”.",
 		},
+		{
+			iso = "ko-KR",
+			text = "[B]를 누를 때의 '포인트' 동작을 '손을 들어 올리기' 애니메이션으로 바꾸세요.",
+		},
 	},
-	PhoneAnimCB = {
+	PHONEANIMS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Enable Phone Animations",
@@ -458,8 +494,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Włącz animacje telefonu",
 		},
+		{
+			iso = "ko-KR",
+			text = "전화 애니메이션 활성화",
+		},
 	},
-	PhoneAnim_tt = {
+	PHONEANIMS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Restores the disabled phone animations from Single Player.",
@@ -504,8 +544,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Przywraca wyłączone animacje telefonu z trybu dla jednego gracza.",
 		},
+		{
+			iso = "ko-KR",
+			text = "싱글 플레이어에서 비활성화된 전화 애니메이션을 복원합니다.",
+		},
 	},
-	SprintInsideCB = {
+	SPRINT_INSIDE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Sprint Inside Interiors",
@@ -550,8 +594,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Sprint Wewnątrz Wnętrza",
 		},
+		{
+			iso = "ko-KR",
+			text = "스프린트 인사이드 인테리어",
+		},
 	},
-	SprintInside_tt = {
+	SPRINT_INSIDE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Allows you to sprint at full speed inside interiors that do not allow it like the Casino. Some interiors will still force you to run slowly.",
@@ -596,8 +644,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pozwala na sprint z pełną prędkością w pomieszczeniach, które na to nie pozwalają, jak np. Casino. Niektóre wnętrza nadal będą zmuszać do powolnego biegu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "카지노처럼 허용하지 않는 실내에서 최고 속도로 달릴 수 있습니다. 일부 실내에서는 여전히 천천히 달리도록 강요합니다.",
+		},
 	},
-	LockpickCB = {
+	LOCKPICK_CB_ = {
 		{
 			iso = "en-US",
 			text = "Use Lockpick Animation",
@@ -642,8 +694,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Użyj animacji otwierania zamków",
 		},
+		{
+			iso = "ko-KR",
+			text = "잠금 해제 애니메이션 사용",
+		},
 	},
-	Lockpick_tt = {
+	LOCKPICK_DESC_ = {
 		{
 			iso = "en-US",
 			text = "When stealing vehicles, your character will use the lockpick animation instead of breaking the window.",
@@ -688,8 +744,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Podczas kradzieży pojazdów Twoja postać będzie korzystać z animacji otwierania zamków zamiast wybijania szyb.",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량을 훔칠 때 캐릭터는 창문을 깨는 대신 잠금 해제 애니메이션을 사용합니다.",
+		},
 	},
-	ActionModeCB = {
+	ACTION_MODE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Disable Action Mode",
@@ -734,8 +794,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącz tryb akcji",
 		},
+		{
+			iso = "ko-KR",
+			text = "동작 모드 비활성화",
+		},
 	},
-	ActionMode_tt = {
+	ACTION_MODE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Disables the forced movement style the player uses after firing a weapon.",
@@ -780,8 +844,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącza wymuszony styl ruchu, z którego gracz korzysta po wystrzale z broni.",
 		},
+		{
+			iso = "ko-KR",
+			text = "무기를 발사한 후 플레이어가 사용하는 강제 이동 스타일을 비활성화합니다.",
+		},
 	},
-	ragdoll_sound_tt = {
+	RAGDOLL_SOUND_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Your online character will make a hurt/scared sound when ragdolling.",
@@ -826,54 +894,62 @@ Labels = {
 			iso = "pl-PL",
 			text = "Twoja postać online będzie wydawać odgłosy bólu/strachu podczas ragdollowania.",
 		},
+		{
+			iso = "ko-KR",
+			text = "래그돌링을 할 때 온라인 캐릭터가 상처받거나 무서워하는 소리를 냅니다.",
+		},
 	},
-	["hide&seek_tt"] = {
+	HIDENSEEK_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Allows you to hide inside the trunk of any vehicle (if the vehicle actually has a trunk of course), hide inside dumpsters, or when wanted by the cops, you can press [ENTER] when your vehicle is stopped to hide inside your car.\10\10¤ NOTE: All hiding options prevent the cops from seeing you but you can't use them if the cops are looking at you.",
+			text = "Allows you to hide inside the trunk of any vehicle (if the vehicle actually has a trunk of course), hide inside dumpsters, or when wanted by the cops, you can press [ENTER] when your vehicle is stopped to hide inside your car.\n\n¤ NOTE: All hiding options prevent the cops from seeing you but you can't use them if the cops are looking at you.",
 		},
 		{
 			iso = "de-DE",
-			text = "Ermöglicht Ihnen, sich im Kofferraum eines Fahrzeugs zu verstecken (sofern das Fahrzeug überhaupt einen Kofferraum hat), sich in Müllcontainern zu verstecken oder sich, wenn Sie von der Polizei gesucht werden, durch Drücken der [EINGABE]-Taste in Ihrem Auto zu verstecken, wenn Ihr Fahrzeug angehalten wird.\10\10¤ HINWEIS: Alle Versteckmöglichkeiten verhindern, dass die Polizei Sie sieht, aber Sie können sie nicht verwenden, wenn die Polizei Sie beobachtet.",
+			text = "Ermöglicht Ihnen, sich im Kofferraum eines Fahrzeugs zu verstecken (sofern das Fahrzeug überhaupt einen Kofferraum hat), sich in Müllcontainern zu verstecken oder sich, wenn Sie von der Polizei gesucht werden, durch Drücken der [EINGABE]-Taste in Ihrem Auto zu verstecken, wenn Ihr Fahrzeug angehalten wird.\n\n¤ HINWEIS: Alle Versteckmöglichkeiten verhindern, dass die Polizei Sie sieht, aber Sie können sie nicht verwenden, wenn die Polizei Sie beobachtet.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Vous permet de vous cacher dans le coffre de n'importe quel véhicule (si le véhicule a réellement un coffre bien sûr), de vous cacher dans des bennes à ordures, ou lorsque vous êtes recherché par la police, vous pouvez appuyer sur [ENTRÉE] lorsque votre véhicule est arrêté pour vous cacher à l'intérieur de votre voiture.\10\10¤ REMARQUE : toutes ces options empêchent les flics de vous voir, mais vous ne pouvez pas les utiliser si les flics vous regardent.",
+			text = "Vous permet de vous cacher dans le coffre de n'importe quel véhicule (si le véhicule a réellement un coffre bien sûr), de vous cacher dans des bennes à ordures, ou lorsque vous êtes recherché par la police, vous pouvez appuyer sur [ENTRÉE] lorsque votre véhicule est arrêté pour vous cacher à l'intérieur de votre voiture.\n\n¤ REMARQUE : toutes ces options empêchent les flics de vous voir, mais vous ne pouvez pas les utiliser si les flics vous regardent.",
 		},
 		{
 			iso = "it-IT",
-			text = "Ti consente di nasconderti nel bagagliaio di qualsiasi veicolo (se il veicolo ne ha effettivamente uno, ovviamente), di nasconderti nei cassonetti o, quando la polizia ti cerca, puoi premere [INVIO] quando il tuo veicolo è fermo per nasconderti all'interno della tua auto.\10\10¤ NOTA: tutte le opzioni per nasconderti impediscono alla polizia di vederti, ma non puoi usarle se la polizia ti sta guardando.",
+			text = "Ti consente di nasconderti nel bagagliaio di qualsiasi veicolo (se il veicolo ne ha effettivamente uno, ovviamente), di nasconderti nei cassonetti o, quando la polizia ti cerca, puoi premere [INVIO] quando il tuo veicolo è fermo per nasconderti all'interno della tua auto.\n\n¤ NOTA: tutte le opzioni per nasconderti impediscono alla polizia di vederti, ma non puoi usarle se la polizia ti sta guardando.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Permite que você se esconda dentro do porta-malas de qualquer veículo (se o veículo realmente tiver um porta-malas, é claro), se esconda dentro de caçambas ou, quando procurado pela polícia, você pode pressionar [ENTER] quando seu veículo estiver parado para se esconder dentro do carro.\10\10¤ NOTA: Todas as opções de esconderijo impedem que os policiais vejam você, mas você não pode usá-las se os policiais estiverem olhando para você.",
+			text = "Permite que você se esconda dentro do porta-malas de qualquer veículo (se o veículo realmente tiver um porta-malas, é claro), se esconda dentro de caçambas ou, quando procurado pela polícia, você pode pressionar [ENTER] quando seu veículo estiver parado para se esconder dentro do carro.\n\n¤ NOTA: Todas as opções de esconderijo impedem que os policiais vejam você, mas você não pode usá-las se os policiais estiverem olhando para você.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Позволяет вам прятаться в багажнике любого транспортного средства (конечно, если у транспортного средства действительно есть багажник), прятаться в мусорных контейнерах или, когда вас разыскивает полиция, вы можете нажать [ENTER], когда ваше транспортное средство остановлено, чтобы спрятаться внутри.\10\10¤ ПРИМЕЧАНИЕ: Все варианты укрытия не позволяют полицейским видеть вас, но вы не можете их использовать, если полицейские смотрят на вас.",
+			text = "Позволяет вам прятаться в багажнике любого транспортного средства (конечно, если у транспортного средства действительно есть багажник), прятаться в мусорных контейнерах или, когда вас разыскивает полиция, вы можете нажать [ENTER], когда ваше транспортное средство остановлено, чтобы спрятаться внутри.\n\n¤ ПРИМЕЧАНИЕ: Все варианты укрытия не позволяют полицейским видеть вас, но вы не можете их использовать, если полицейские смотрят на вас.",
 		},
 		{
 			iso = "es-ES",
-			text = "Te permite esconderte dentro del maletero de cualquier vehículo (si el vehículo tiene maletero, por supuesto), esconderte dentro de contenedores de basura o, cuando te busque la policía, puedes presionar [ENTER] cuando tu vehículo esté detenido para esconderte dentro de tu coche.\10\10¤ NOTA: Todas las opciones de ocultación evitan que la policía te vea, pero no puedes usarlas si la policía te está mirando.",
+			text = "Te permite esconderte dentro del maletero de cualquier vehículo (si el vehículo tiene maletero, por supuesto), esconderte dentro de contenedores de basura o, cuando te busque la policía, puedes presionar [ENTER] cuando tu vehículo esté detenido para esconderte dentro de tu coche.\n\n¤ NOTA: Todas las opciones de ocultación evitan que la policía te vea, pero no puedes usarlas si la policía te está mirando.",
 		},
 		{
 			iso = "zh-CN",
-			text = "允许您隐藏在任何车辆的后备箱内（当然，如果车辆确实有后备箱的话），隐藏在垃圾箱内，或者当警察通缉时，您可以在车辆停下时按 [ENTER] 隐藏在车内。\10\10¤ 注意：所有隐藏选项都可以防止警察看到您，但如果警察正在看着您，您就无法使用它们。",
+			text = "允许您隐藏在任何车辆的后备箱内（当然，如果车辆确实有后备箱的话），隐藏在垃圾箱内，或者当警察通缉时，您可以在车辆停下时按 [ENTER] 隐藏在车内。\n\n¤ 注意：所有隐藏选项都可以防止警察看到您，但如果警察正在看着您，您就无法使用它们。",
 		},
 		{
 			iso = "zh-TW",
-			text = "允許您隱藏在任何車輛的後備箱內（當然，如果車輛確實有後備箱）、隱藏在垃圾箱內，或者當警察通緝時，您可以在車輛停下來時按 [ENTER] 隱藏在車內。 10\10¤ 注意：所有隱藏選項都會阻止警察看到您，但如果警察正在看著您，您就無法使用它們。",
+			text = "允許您隱藏在任何車輛的後備箱內（當然，如果車輛確實有後備箱）、隱藏在垃圾箱內，或者當警察通緝時，您可以在車輛停下來時按 [ENTER] 隱藏在車內。 10\n¤ 注意：所有隱藏選項都會阻止警察看到您，但如果警察正在看著您，您就無法使用它們。",
 		},
 		{
 			iso = "ja-JP",
-			text = "あらゆる車両のトランクの中に隠れることができます (もちろん、車両にトランクが実際にある場合)。また、ゴミ箱の中に隠れたり、警察に指名手配されたときに車両が停止しているときに [ENTER] を押して車の中に隠れたりすることもできます。\10\10¤ 注: すべての隠れオプションは、警察に見られないようにしますが、警察に見られている場合は使用できません。",
+			text = "あらゆる車両のトランクの中に隠れることができます (もちろん、車両にトランクが実際にある場合)。また、ゴミ箱の中に隠れたり、警察に指名手配されたときに車両が停止しているときに [ENTER] を押して車の中に隠れたりすることもできます。\n\n¤ 注: すべての隠れオプションは、警察に見られないようにしますが、警察に見られている場合は使用できません。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Umożliwia ci ukrycie się w bagażniku dowolnego pojazdu (oczywiście, jeśli pojazd go posiada), ukrycie się w śmietniku lub, gdy policja cię szuka, możesz nacisnąć [ENTER], gdy twój pojazd stoi, aby schować się w środku samochodu.\10\10¤ UWAGA: Wszystkie opcje ukrywania się uniemożliwiają policji zobaczenie cię, ale nie możesz z nich skorzystać, jeśli policja na ciebie patrzy.",
+			text = "Umożliwia ci ukrycie się w bagażniku dowolnego pojazdu (oczywiście, jeśli pojazd go posiada), ukrycie się w śmietniku lub, gdy policja cię szuka, możesz nacisnąć [ENTER], gdy twój pojazd stoi, aby schować się w środku samochodu.\n\n¤ UWAGA: Wszystkie opcje ukrywania się uniemożliwiają policji zobaczenie cię, ale nie możesz z nich skorzystać, jeśli policja na ciebie patrzy.",
+		},
+		{
+			iso = "ko-KR",
+			text = "차량 트렁크에 숨을 수 있고(물론 차량에 트렁크가 있어야 함), 쓰레기통에 숨을 수 있으며, 경찰이 원할 경우 차량이 멈췄을 때 [ENTER]를 눌러 차량 안에 숨을 수 있습니다.\n\n¤ 참고: 모든 숨기기 옵션을 사용하면 경찰이 사용자를 보지 못하지만, 경찰이 사용자를 보고 있을 때는 이 옵션을 사용할 수 없습니다.",
 		},
 	},
-	soundplayer = {
+	SOUND_PLAYER_ = {
 		{
 			iso = "en-US",
 			text = "Sound Player",
@@ -918,8 +994,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Odtwarzacz dźwięku",
 		},
+		{
+			iso = "ko-KR",
+			text = "사운드 플레이어",
+		},
 	},
-	malesounds = {
+	MALE_SOUNDS_ = {
 		{
 			iso = "en-US",
 			text = "Male",
@@ -964,8 +1044,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Mężczyzna",
 		},
+		{
+			iso = "ko-KR",
+			text = "남성",
+		},
 	},
-	femalesounds = {
+	FEMALE_SOUNDS_ = {
 		{
 			iso = "en-US",
 			text = "Female",
@@ -1010,8 +1094,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Kobieta",
 		},
+		{
+			iso = "ko-KR",
+			text = "여성",
+		},
 	},
-	generic_play_btn = {
+	GENERIC_PLAY_BTN_ = {
 		{
 			iso = "en-US",
 			text = " Play ",
@@ -1056,8 +1144,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Grać",
 		},
+		{
+			iso = "ko-KR",
+			text = "놀다",
+		},
 	},
-	generic_stop_btn = {
+	GENERIC_STOP_BTN_ = {
 		{
 			iso = "en-US",
 			text = " Stop ",
@@ -1102,8 +1194,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zatrzymywać się",
 		},
+		{
+			iso = "ko-KR",
+			text = "멈추다",
+		},
 	},
-	add_to_favs = {
+	ADD_TO_FAVS_ = {
 		{
 			iso = "en-US",
 			text = "Add To Favorites",
@@ -1148,8 +1244,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Dodaj do ulubionych",
 		},
+		{
+			iso = "ko-KR",
+			text = "즐겨찾기에 추가",
+		},
 	},
-	remove_from_favs = {
+	REMOVE_FROM_FAVS_ = {
 		{
 			iso = "en-US",
 			text = "Remove From Favorites",
@@ -1194,8 +1294,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Usuń z ulubionych",
 		},
+		{
+			iso = "ko-KR",
+			text = "즐겨찾기에서 제거",
+		},
 	},
-	favs_tab = {
+	FAVORITES_TAB_ = {
 		{
 			iso = "en-US",
 			text = "Favorites",
@@ -1240,39 +1344,43 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ulubione",
 		},
+		{
+			iso = "ko-KR",
+			text = "즐겨찾기",
+		},
 	},
-	favs_nil_txt = {
+	FAVS_NIL_TXT_ = {
 		{
 			iso = "en-US",
-			text = "Nothing to show at the moment.\10\10Add some animations or scenarios to favorites to save them here.",
+			text = "Nothing to show at the moment.\n\nAdd some animations or scenarios to favorites to save them here.",
 		},
 		{
 			iso = "de-DE",
-			text = "Im Moment gibt es nichts zu zeigen.\10\10Fügen Sie einige Animationen oder Szenarien zu den Favoriten hinzu, um sie hier zu speichern.",
+			text = "Im Moment gibt es nichts zu zeigen.\n\nFügen Sie einige Animationen oder Szenarien zu den Favoriten hinzu, um sie hier zu speichern.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Rien à montrer pour l'instant.\10\10Ajouter des animations ou des scénarios aux favoris pour les sauvegarder ici.",
+			text = "Rien à montrer pour l'instant.\n\nAjouter des animations ou des scénarios aux favoris pour les sauvegarder ici.",
 		},
 		{
 			iso = "it-IT",
-			text = "Non c'è nulla da mostrare al momento.\10}Aggiungi alcune animazioni o scenari ai preferiti per salvarli qui.",
+			text = "Non c'è nulla da mostrare al momento.\n}Aggiungi alcune animazioni o scenari ai preferiti per salvarli qui.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Nada para mostrar no momento.\10\10Adicione algumas animações ou cenários aos favoritos para salvá-los aqui.",
+			text = "Nada para mostrar no momento.\n\nAdicione algumas animações ou cenários aos favoritos para salvá-los aqui.",
 		},
 		{
 			iso = "ru-RU",
-			text = "На данный момент показывать нечего.\10\10Добавьте несколько анимаций или сценариев в избранное, чтобы сохранить их здесь.",
+			text = "На данный момент показывать нечего.\n\nДобавьте несколько анимаций или сценариев в избранное, чтобы сохранить их здесь.",
 		},
 		{
 			iso = "es-ES",
-			text = "No hay nada que mostrar en este momento.\10\10Agrega algunas animaciones o escenarios a favoritos para guardarlos aquí.",
+			text = "No hay nada que mostrar en este momento.\n\nAgrega algunas animaciones o escenarios a favoritos para guardarlos aquí.",
 		},
 		{
 			iso = "zh-CN",
-			text = "目前还没有任何内容可显示。\10\10将一些动画或场景添加到收藏夹以在此处保存。",
+			text = "目前还没有任何内容可显示。\n\n将一些动画或场景添加到收藏夹以在此处保存。",
 		},
 		{
 			iso = "zh-TW",
@@ -1280,14 +1388,18 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "現時点では表示するものはありません。\10\10アニメーションやシナリオをお気に入りに追加して、ここに保存します。",
+			text = "現時点では表示するものはありません。\n\nアニメーションやシナリオをお気に入りに追加して、ここに保存します。",
 		},
 		{
 			iso = "pl-PL",
-			text = "W tej chwili nie ma nic do pokazania.\10\10Dodaj animacje lub scenariusze do ulubionych, aby je tutaj zapisać.",
+			text = "W tej chwili nie ma nic do pokazania.\n\nDodaj animacje lub scenariusze do ulubionych, aby je tutaj zapisać.",
+		},
+		{
+			iso = "ko-KR",
+			text = "지금은 보여줄 것이 없습니다.\n\n애니메이션이나 시나리오를 즐겨찾기에 추가해서 여기에 저장하세요.",
 		},
 	},
-	recents_tab = {
+	RECENTS_TAB_ = {
 		{
 			iso = "en-US",
 			text = "Recently Played",
@@ -1332,39 +1444,43 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ostatnio grane",
 		},
+		{
+			iso = "ko-KR",
+			text = "최근 플레이",
+		},
 	},
-	recents_nil_txt = {
+	RECENTS_NIL_TXT_ = {
 		{
 			iso = "en-US",
-			text = "Nothing to show at the moment.\10\10Play some animations or scenarios to find them here afterwards.",
+			text = "Nothing to show at the moment.\n\nPlay some animations or scenarios to find them here afterwards.",
 		},
 		{
 			iso = "de-DE",
-			text = "Im Moment gibt es nichts zu zeigen.\10\10Spielen Sie einige Animationen oder Szenarien, um sie anschließend hier zu finden.",
+			text = "Im Moment gibt es nichts zu zeigen.\n\nSpielen Sie einige Animationen oder Szenarien, um sie anschließend hier zu finden.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Rien à montrer pour le moment.\10\10Jouez quelques animations ou scénarios pour les retrouver ici par la suite.",
+			text = "Rien à montrer pour le moment.\n\nJouez quelques animations ou scénarios pour les retrouver ici par la suite.",
 		},
 		{
 			iso = "it-IT",
-			text = "Nulla da mostrare al momento.\10\10Gioca ad alcune animazioni o scenari per trovarli qui in seguito.",
+			text = "Nulla da mostrare al momento.\n\nGioca ad alcune animazioni o scenari per trovarli qui in seguito.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Nada para mostrar no momento.\10\10Jogue algumas animações ou cenários para encontrá-los aqui depois.",
+			text = "Nada para mostrar no momento.\n\nJogue algumas animações ou cenários para encontrá-los aqui depois.",
 		},
 		{
 			iso = "ru-RU",
-			text = "На данный момент показать нечего.\10\10Поиграйте в анимации или сценарии, чтобы потом найти их здесь.",
+			text = "На данный момент показать нечего.\n\nПоиграйте в анимации или сценарии, чтобы потом найти их здесь.",
 		},
 		{
 			iso = "es-ES",
-			text = "No hay nada que mostrar por el momento.\10\10Reproduce algunas animaciones o escenarios para encontrarlos aquí después.",
+			text = "No hay nada que mostrar por el momento.\n\nReproduce algunas animaciones o escenarios para encontrarlos aquí después.",
 		},
 		{
 			iso = "zh-CN",
-			text = "目前还没有任何内容可显示。\10\10播放一些动画或场景，然后在这里找到它们。",
+			text = "目前还没有任何内容可显示。\n\n播放一些动画或场景，然后在这里找到它们。",
 		},
 		{
 			iso = "zh-TW",
@@ -1372,14 +1488,18 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "現時点では表示するものはありません。\10\10いくつかのアニメーションまたはシナリオを再生して、後でここで見つけてください。",
+			text = "現時点では表示するものはありません。\n\nいくつかのアニメーションまたはシナリオを再生して、後でここで見つけてください。",
 		},
 		{
 			iso = "pl-PL",
-			text = "W tej chwili nie ma nic do pokazania.\10\10Odtwórz animacje lub scenariusze, aby później je tutaj znaleźć.",
+			text = "W tej chwili nie ma nic do pokazania.\n\nOdtwórz animacje lub scenariusze, aby później je tutaj znaleźć.",
+		},
+		{
+			iso = "ko-KR",
+			text = "지금은 보여줄 것이 없습니다.\n\n나중에 애니메이션이나 시나리오를 재생해서 여기에서 찾아보세요.",
 		},
 	},
-	weaponTab = {
+	WEAPON_TAB_ = {
 		{
 			iso = "en-US",
 			text = "Weapon ",
@@ -1424,8 +1544,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Broń",
 		},
+		{
+			iso = "ko-KR",
+			text = "무기",
+		},
 	},
-	hashgrabberCB = {
+	HASHGRABBER_CB_ = {
 		{
 			iso = "en-US",
 			text = "Info Gun",
@@ -1470,8 +1594,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Broń informacyjna",
 		},
+		{
+			iso = "ko-KR",
+			text = "정보총",
+		},
 	},
-	hashgrabber_tt = {
+	HASHGRABBER_DESC_ = {
 		{
 			iso = "en-US",
 			text = "This is mainly for developers. Aim your gun at a game entity and press [FIRE] to get information about it.",
@@ -1516,8 +1644,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "To jest głównie dla deweloperów. Wyceluj broń w jednostkę gry i naciśnij [FIRE], aby uzyskać o niej informacje.",
 		},
+		{
+			iso = "ko-KR",
+			text = "이것은 주로 개발자를 위한 것입니다. 게임 엔티티에 총을 겨누고 [발사]를 눌러 해당 엔티티에 대한 정보를 얻으십시오.",
+		},
 	},
-	triggerbotCB = {
+	TRIGGERBOT_CB_ = {
 		{
 			iso = "en-US",
 			text = "Trigger Bot",
@@ -1562,39 +1694,43 @@ Labels = {
 			iso = "pl-PL",
 			text = "Bot wyzwalający",
 		},
+		{
+			iso = "ko-KR",
+			text = "트리거 봇",
+		},
 	},
-	triggerbot_tt = {
+	TRIGGERBOT_DESC_ = {
 		{
 			iso = "en-US",
-			text = "A barebones triggerbot that uses game natives. No hackery involved.\10\10Press ___ on keyboard or --- on controller while aiming at a ped to automatically shoot them in the head. Only works on foot.",
+			text = "A barebones triggerbot that uses game natives. No hackery involved.\n\nPress ___ on keyboard or --- on controller while aiming at a ped to automatically shoot them in the head. Only works on foot.",
 		},
 		{
 			iso = "de-DE",
-			text = "Ein Triggerbot, der 'native Elemente' (RAGE natives) des Spiels verwendet. Keine Hacks involviert.\10\10Drücke die ___ auf der Tastatur oder  --- auf dem Controller, während des Zielen auf einen NPC, um diesen automatisch in den Kopf zu schießen. Funktioniert nur zu Fuß.",
+			text = "Ein Triggerbot, der 'native Elemente' (RAGE natives) des Spiels verwendet. Keine Hacks involviert.\n\nDrücke die ___ auf der Tastatur oder  --- auf dem Controller, während des Zielen auf einen NPC, um diesen automatisch in den Kopf zu schießen. Funktioniert nur zu Fuß.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Un triggerbot minimaliste qui utilise les natifs du jeu (RAGE natives). Aucun piratage n'est impliqué.\10\10Appuyez sur ___ sur le clavier ou --- sur le contrôleur tout en visant un piéton pour lui tirer automatiquement une balle dans la tête. Ne fonctionne qu'à pied.",
+			text = "Un triggerbot minimaliste qui utilise les natifs du jeu (RAGE natives). Aucun piratage n'est impliqué.\n\nAppuyez sur ___ sur le clavier ou --- sur le contrôleur tout en visant un piéton pour lui tirer automatiquement une balle dans la tête. Ne fonctionne qu'à pied.",
 		},
 		{
 			iso = "it-IT",
-			text = "Un triggerbot essenziale che usa i nativi del gioco. Nessun hackeraggio coinvolto.\10\10Premi ___ sulla tastiera o --- sul controller mentre miri a un pedone per sparargli automaticamente alla testa. Funziona solo a piedi.",
+			text = "Un triggerbot essenziale che usa i nativi del gioco. Nessun hackeraggio coinvolto.\n\nPremi ___ sulla tastiera o --- sul controller mentre miri a un pedone per sparargli automaticamente alla testa. Funziona solo a piedi.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Um triggerbot simples que usa nativos do jogo. Não há hackers envolvidos.\10\10Pressione ___ no teclado ou --- no controle ao mirar em um pedestre para atirar automaticamente na cabeça dele. Só funciona a pé.",
+			text = "Um triggerbot simples que usa nativos do jogo. Não há hackers envolvidos.\n\nPressione ___ no teclado ou --- no controle ao mirar em um pedestre para atirar automaticamente na cabeça dele. Só funciona a pé.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Базовый триггербот, использующий нативные игровые возможности. Никакого хакерства.\10\10Нажмите ___ на клавиатуре или --- на контроллере, нацелившись на пешехода, чтобы автоматически выстрелить ему в голову. Работает только на ногах.",
+			text = "Базовый триггербот, использующий нативные игровые возможности. Никакого хакерства.\n\nНажмите ___ на клавиатуре или --- на контроллере, нацелившись на пешехода, чтобы автоматически выстрелить ему в голову. Работает только на ногах.",
 		},
 		{
 			iso = "es-ES",
-			text = "Un bot de disparo básico que utiliza elementos nativos del juego. No requiere ningún tipo de piratería.\10\10Presiona ___ en el teclado o --- en el control mientras apuntas a un peatón para dispararle automáticamente en la cabeza. Solo funciona a pie.",
+			text = "Un bot de disparo básico que utiliza elementos nativos del juego. No requiere ningún tipo de piratería.\n\nPresiona ___ en el teclado o --- en el control mientras apuntas a un peatón para dispararle automáticamente en la cabeza. Solo funciona a pie.",
 		},
 		{
 			iso = "zh-CN",
-			text = "一款使用游戏原生代码的简易触发机器人。无需黑客技术。\10\10 瞄准行人时按下键盘上的 ___ 或控制器上的 --- 即可自动射击行人的头部。仅适用于步行。",
+			text = "一款使用游戏原生代码的简易触发机器人。无需黑客技术。\n\n 瞄准行人时按下键盘上的 ___ 或控制器上的 --- 即可自动射击行人的头部。仅适用于步行。",
 		},
 		{
 			iso = "zh-TW",
@@ -1602,14 +1738,18 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "ゲームネイティブを使用する必要最低限​​のトリガーボット。ハッキングは一切使用していません。\10\10歩行者を狙っているときにキーボードの ___ またはコントローラーの --- を押すと、歩行者の頭を自動的に撃ちます。徒歩でのみ機能します。",
+			text = "ゲームネイティブを使用する必要最低限​​のトリガーボット。ハッキングは一切使用していません。\n\n歩行者を狙っているときにキーボードの ___ またはコントローラーの --- を押すと、歩行者の頭を自動的に撃ちます。徒歩でのみ機能します。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Prosty triggerbot, który używa natywnych elementów gry. Bez żadnych sztuczek.\10\10Naciśnij ___ na klawiaturze lub --- na kontrolerze, celując w pieszego, aby automatycznie strzelić mu w głowę. Działa tylko pieszo.",
+			text = "Prosty triggerbot, który używa natywnych elementów gry. Bez żadnych sztuczek.\n\nNaciśnij ___ na klawiaturze lub --- na kontrolerze, celując w pieszego, aby automatycznie strzelić mu w głowę. Działa tylko pieszo.",
+		},
+		{
+			iso = "ko-KR",
+			text = "게임 네이티브를 사용하는 베어본 트리거봇입니다. 해커링은 없습니다.\n\n보행자를 조준하는 동안 키보드의 ___ 또는 컨트롤러의 ---를 눌러 자동으로 머리를 쏠 수 있습니다. 도보로만 작동합니다.",
 		},
 	},
-	enemyonlyCB = {
+	ENEMY_ONLY_CB_ = {
 		{
 			iso = "en-US",
 			text = "Enemies Only",
@@ -1654,8 +1794,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Tylko wrogowie",
 		},
+		{
+			iso = "ko-KR",
+			text = "적들만",
+		},
 	},
-	autokillCB = {
+	AUTOKILL_CB_ = {
 		{
 			iso = "en-US",
 			text = "Auto Kill Enemies",
@@ -1700,8 +1844,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Automatyczne zabijanie wrogów",
 		},
+		{
+			iso = "ko-KR",
+			text = "자동 적 사살",
+		},
 	},
-	autokill_tt = {
+	AUTOKILL_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Automatically kill all enemies in your proximity.",
@@ -1746,8 +1894,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Automatycznie zabijaj wszystkich wrogów w pobliżu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "근처의 모든 적을 자동으로 처치합니다.",
+		},
 	},
-	runawayCB = {
+	ENEMIES_FLEE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Enemies Flee",
@@ -1792,8 +1944,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wrogowie uciekają",
 		},
+		{
+			iso = "ko-KR",
+			text = "적들은 도망간다",
+		},
 	},
-	runaway_tt = {
+	ENEMIES_FLEE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Nearby enemies will run away from you.",
@@ -1838,8 +1994,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Znajdujący się w pobliżu wrogowie będą przed tobą uciekać.",
 		},
+		{
+			iso = "ko-KR",
+			text = "근처의 적들은 당신에게서 도망갈 것입니다.",
+		},
 	},
-	katanaCB = {
+	KATANA_CB_ = {
 		{
 			iso = "en-US",
 			text = "Katana",
@@ -1884,8 +2044,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Katana",
 		},
+		{
+			iso = "ko-KR",
+			text = "카타나",
+		},
 	},
-	katana_tt = {
+	KATANA_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Terrorize the streets of Los Santos like a true Samurai by replacing the selected weapon with a Japanese Katana.",
@@ -1930,8 +2094,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Siej terror na ulicach Los Santos jak prawdziwy samuraj, zastępując wybraną broń japońską kataną.",
 		},
+		{
+			iso = "ko-KR",
+			text = "선택한 무기를 일본식 카타나로 바꿔 진정한 사무라이처럼 로스 산토스의 거리를 공포에 떨게 하세요.",
+		},
 	},
-	laserSightCB = {
+	LASER_SIGHT_CB_ = {
 		{
 			iso = "en-US",
 			text = "Laser Sight",
@@ -1976,8 +2144,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Celownik laserowy",
 		},
+		{
+			iso = "ko-KR",
+			text = "레이저 사이트",
+		},
 	},
-	laserSight_tt = {
+	LASER_SIGHT_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Render a laser sight on your weapons.",
@@ -2022,8 +2194,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Dodaj celownik laserowy do swojej broni.",
 		},
+		{
+			iso = "ko-KR",
+			text = "무기에 레이저 조준기를 설치합니다.",
+		},
 	},
-	laserChoice_txt = {
+	LASER_CHOICE_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Laser Color: ",
@@ -2068,8 +2244,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Kolor lasera:",
 		},
+		{
+			iso = "ko-KR",
+			text = "레이저 컬러:",
+		},
 	},
-	vehicleTab = {
+	VEHICLE_TAB_ = {
 		{
 			iso = "en-US",
 			text = "Vehicle ",
@@ -2114,8 +2294,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pojazd",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량",
+		},
 	},
-	driftModeCB = {
+	DRIFT_MODE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Activate Drift Mode",
@@ -2160,8 +2344,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Aktywuj tryb Drift",
 		},
+		{
+			iso = "ko-KR",
+			text = "드리프트 모드 활성화",
+		},
 	},
-	driftMode_tt = {
+	DRIFT_MODE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "This will make your car lose grip. Hold ___ to drift.",
@@ -2206,8 +2394,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Spowoduje to utratę przyczepności samochodu. Przytrzymaj ___, aby dryfować.",
 		},
+		{
+			iso = "ko-KR",
+			text = "이렇게 하면 차가 그립력을 잃게 됩니다. 드리프트하려면 ___을 누르세요.",
+		},
 	},
-	driftSlider = {
+	DRIFT_SLIDER_ = {
 		{
 			iso = "en-US",
 			text = "Intensity",
@@ -2252,8 +2444,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Intensywność",
 		},
+		{
+			iso = "ko-KR",
+			text = "강함",
+		},
 	},
-	driftSmokeCol = {
+	DRIFT_SMOKE_COL_ = {
 		{
 			iso = "en-US",
 			text = "Tire Smoke Color",
@@ -2298,8 +2494,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Kolor dymu opon",
 		},
+		{
+			iso = "ko-KR",
+			text = "타이어 연기 색상",
+		},
 	},
-	driftSlider_tt = {
+	DRIFT_SLIDER_DESC = {
 		{
 			iso = "en-US",
 			text = "0: No Grip (very stiff).\n1: Balanced (Recommended).\n2: Weak Drift.\n3: Weakest Drift.",
@@ -2344,8 +2544,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "0: Brak przyczepności (bardzo sztywny).\n1: Zrównoważony (zalecany).\n2: Słaby dryf.\n3: Najsłabszy dryf.",
 		},
+		{
+			iso = "ko-KR",
+			text = "0: 그립 없음(매우 딱딱함).\n1: 균형 잡힘(권장).\n2: 약한 드리프트.\n3: 가장 약한 드리프트.",
+		},
 	},
-	driftTiresCB = {
+	DRIFT_TIRES_CB_ = {
 		{
 			iso = "en-US",
 			text = "Equip Drift Tires",
@@ -2390,8 +2594,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zamontuj opony Drift",
 		},
+		{
+			iso = "ko-KR",
+			text = "드리프트 타이어 장착",
+		},
 	},
-	driftTires_tt = {
+	DRIFT_TIRES_DESC_ = {
 		{
 			iso = "en-US",
 			text = "This will equip your car with drift tires whenever you press ___. Your tires will be reset when you release the button.",
@@ -2436,8 +2644,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Dzięki temu Twój samochód będzie wyposażony w opony driftowe za każdym razem, gdy naciśniesz ___. Twoje opony zostaną zresetowane, gdy zwolnisz przycisk.",
 		},
+		{
+			iso = "ko-KR",
+			text = "이렇게 하면 ___를 누를 때마다 차량에 드리프트 타이어가 장착됩니다. 버튼을 놓으면 타이어가 재설정됩니다.",
+		},
 	},
-	driftTorque_tt = {
+	DRIFT_TORQUE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Increases you vehicle's torque when drifting. Works for both 'Drift Mode' and 'Drift Tires'.",
@@ -2482,8 +2694,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zwiększa moment obrotowy pojazdu podczas driftu. Działa zarówno w trybie „Drift Mode”, jak i „Drift Tires”.",
 		},
+		{
+			iso = "ko-KR",
+			text = "드리프트 시 차량의 토크를 증가시킵니다. '드리프트 모드'와 '드리프트 타이어' 모두에 적용됩니다.",
+		},
 	},
-	DriftSmoke_tt = {
+	DRIFT_SMOKE_COL_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Creates a smoke effect when drifting.",
@@ -2528,8 +2744,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Tworzy efekt dymu podczas driftu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "드리프트할 때 연기 효과가 발생합니다.",
+		},
 	},
-	DriftGame_tt = {
+	DRIFT_GAME_DESC_ = {
 		{
 			iso = "en-US",
 			text = "[WIP] Accumulate points for drifting around without crashing. Your points are automatically transformed into cash once you stop drifting and don't crash for 3 seconds.\n\nNOTE: The cashout feature is for Single Player only.",
@@ -2574,8 +2794,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "[WIP] Zbieraj punkty za dryfowanie bez rozbijania się. Twoje punkty zostaną automatycznie zamienione na gotówkę, gdy przestaniesz dryfować i nie rozbijesz się przez 3 sekundy.\n\nUWAGA: Funkcja wypłaty środków dostępna jest wyłącznie dla jednego gracza.",
 		},
+		{
+			iso = "ko-KR",
+			text = "[WIP] 충돌 없이 표류하면 포인트를 모으세요. 표류를 멈추고 3초 동안 충돌하지 않으면 포인트가 자동으로 현금으로 전환됩니다.\n\n참고: 캐쉬아웃 기능은 싱글 플레이어 전용입니다.",
+		},
 	},
-	driftInvalidVehTxt = {
+	DRIFT_INVALID_DESC_ = {
 		{
 			iso = "en-US",
 			text = "You can only drift cars, trucks and quad bikes.",
@@ -2620,8 +2844,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Można driftować tylko samochodami osobowymi, ciężarówkami i quadami.",
 		},
+		{
+			iso = "ko-KR",
+			text = "드리프트는 자동차, 트럭, 사륜바이크만 가능합니다.",
+		},
 	},
-	lvoCB = {
+	LIMIT_OPTIONS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Sports/Super Only",
@@ -2666,8 +2894,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Tylko Sport/Super",
 		},
+		{
+			iso = "ko-KR",
+			text = "스포츠/슈퍼 전용",
+		},
 	},
-	lvo_tt = {
+	LIMIT_OPTIONS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Limit some options to performance vehicles only. For example, with this enabled slow and irrelevant vehicles will not have launch control or a crackle tune.",
@@ -2712,54 +2944,62 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ogranicz niektóre opcje tylko do pojazdów o wysokiej wydajności. Na przykład, gdy ta opcja jest włączona, wolne i nieistotne pojazdy nie będą miały kontroli startu ani trzaskającej melodii.",
 		},
+		{
+			iso = "ko-KR",
+			text = "일부 옵션은 성능 차량에만 제한합니다. 예를 들어, 이 기능을 활성화하면 느리고 관련 없는 차량은 런치 컨트롤이나 크랙클 튜닝을 사용할 수 없습니다.",
+		},
 	},
-	missile_def_tt = {
+	MISSILE_DEF_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Inrercepts any missiles near your vehicle including those fired by you.\10\10NOTE: If you fire any missiles from or near your vehicle, the defence will render them inert.",
+			text = "Inrercepts any missiles near your vehicle including those fired by you.\n\nNOTE: If you fire any missiles from or near your vehicle, the defence will render them inert.",
 		},
 		{
 			iso = "de-DE",
-			text = "Fängt alle Raketen in der Nähe Ihres Fahrzeugs ab, einschließlich der von Ihnen abgefeuerten.\10\10HINWEIS: Wenn Sie von Ihrem Fahrzeug aus oder in dessen Nähe Raketen abfeuern, werden diese durch die Verteidigung unschädlich gemacht.",
+			text = "Fängt alle Raketen in der Nähe Ihres Fahrzeugs ab, einschließlich der von Ihnen abgefeuerten.\n\nHINWEIS: Wenn Sie von Ihrem Fahrzeug aus oder in dessen Nähe Raketen abfeuern, werden diese durch die Verteidigung unschädlich gemacht.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Intercepte tous les missiles à proximité de votre véhicule, y compris ceux que vous avez tirés.\10\10REMARQUE : Si vous tirez des missiles depuis ou à proximité de votre véhicule, la défense les rendra inertes.",
+			text = "Intercepte tous les missiles à proximité de votre véhicule, y compris ceux que vous avez tirés.\n\nREMARQUE : Si vous tirez des missiles depuis ou à proximité de votre véhicule, la défense les rendra inertes.",
 		},
 		{
 			iso = "it-IT",
-			text = "Intercetta tutti i missili vicini al veicolo, compresi quelli lanciati dall'utente.\10\10NOTA: Se si lanciano missili dal veicolo o nelle sue vicinanze, la difesa li renderà inerti.",
+			text = "Intercetta tutti i missili vicini al veicolo, compresi quelli lanciati dall'utente.\n\nNOTA: Se si lanciano missili dal veicolo o nelle sue vicinanze, la difesa li renderà inerti.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Intercepta todos os mísseis próximos ao seu veículo, inclusive os disparados por você.\10\10NOTA: Se você disparar algum míssil do seu veículo ou próximo a ele, a defesa o tornará inerte.",
+			text = "Intercepta todos os mísseis próximos ao seu veículo, inclusive os disparados por você.\n\nNOTA: Se você disparar algum míssil do seu veículo ou próximo a ele, a defesa o tornará inerte.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Перехватывает любые ракеты, находящиеся рядом с машиной, в том числе и выпущенные вами.\10\10Примечание: Если вы выпустите ракеты из машины или рядом с ней, защита сделает их инертными.",
+			text = "Перехватывает любые ракеты, находящиеся рядом с машиной, в том числе и выпущенные вами.\n\nПримечание: Если вы выпустите ракеты из машины или рядом с ней, защита сделает их инертными.",
 		},
 		{
 			iso = "es-ES",
-			text = "Intercepta cualquier misil cerca de tu vehículo, incluidos aquellos disparados por ti.\10\10NOTA: Si disparas cualquier misil desde o cerca de tu vehículo, la defensa los dejará inertes.",
+			text = "Intercepta cualquier misil cerca de tu vehículo, incluidos aquellos disparados por ti.\n\nNOTA: Si disparas cualquier misil desde o cerca de tu vehículo, la defensa los dejará inertes.",
 		},
 		{
 			iso = "zh-CN",
-			text = "拦截您车辆附近的任何导弹，包括您发射的导弹。\10\10注意：如果您从车辆或车辆附近发射任何导弹，防御系统将使它们失效。",
+			text = "拦截您车辆附近的任何导弹，包括您发射的导弹。\n\n注意：如果您从车辆或车辆附近发射任何导弹，防御系统将使它们失效。",
 		},
 		{
 			iso = "zh-TW",
-			text = "攔截你的車輛附近的任何飛彈，包括你發射的飛彈。 \10\10注意：如果你從你的車輛或靠近你的車輛發射任何飛彈，防禦將使它們失效。",
+			text = "攔截你的車輛附近的任何飛彈，包括你發射的飛彈。 \n\n注意：如果你從你的車輛或靠近你的車輛發射任何飛彈，防禦將使它們失效。",
 		},
 		{
 			iso = "ja-JP",
-			text = "あなた自身が発射したミサイルも含め、あなたの車両の近くにあるミサイルをすべて迎撃します。\10\10注: 車両からまたは車両の近くでミサイルを発射した場合、防御によりミサイルは不活性化されます。",
+			text = "あなた自身が発射したミサイルも含め、あなたの車両の近くにあるミサイルをすべて迎撃します。\n\n注: 車両からまたは車両の近くでミサイルを発射した場合、防御によりミサイルは不活性化されます。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Wykrywa wszelkie pociski w pobliżu Twojego pojazdu, w tym te wystrzelone przez Ciebie.\10\10UWAGA: Jeśli wystrzelisz pociski ze swojego pojazdu lub w jego pobliżu, obrona unieruchomi je.",
+			text = "Wykrywa wszelkie pociski w pobliżu Twojego pojazdu, w tym te wystrzelone przez Ciebie.\n\nUWAGA: Jeśli wystrzelisz pociski ze swojego pojazdu lub w jego pobliżu, obrona unieruchomi je.",
+		},
+		{
+			iso = "ko-KR",
+			text = "차량 근처에 있는 모든 미사일(사용자가 발사한 미사일 포함)을 방어합니다.\n\n참고: 차량에서 또는 차량 근처에서 미사일을 발사하면 방어 시스템이 해당 미사일을 비활성화합니다.",
 		},
 	},
-	missile_def_on_notif = {
+	MISSILE_DEF_ON_ = {
 		{
 			iso = "en-US",
 			text = "Missile defence activated! Please note that firing any missiles from or near your vehicle will render them inert.",
@@ -2804,8 +3044,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Obrona przeciwrakietowa aktywowana! Należy pamiętać, że wystrzelenie jakichkolwiek pocisków z lub w pobliżu pojazdu spowoduje ich bezwładność.",
 		},
+		{
+			iso = "ko-KR",
+			text = "미사일 방어가 활성화되었습니다! 차량에서 또는 차량 근처에서 미사일을 발사하면 미사일이 비활성화됩니다.",
+		},
 	},
-	missile_def_off_notif = {
+	MISSILE_DEF_OFF_ = {
 		{
 			iso = "en-US",
 			text = "Missile defence deactivated.",
@@ -2850,8 +3094,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Obrona przeciwrakietowa wyłączona.",
 		},
+		{
+			iso = "ko-KR",
+			text = "미사일 방어가 비활성화되었습니다.",
+		},
 	},
-	lct_tt = {
+	LAUNCH_CTRL_DESC_ = {
 		{
 			iso = "en-US",
 			text = "When your vehicle is completely stopped, press and hold [Accelerate] + [Brake] for 3 seconds then let go of the brakes.",
@@ -2896,8 +3144,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Gdy pojazd całkowicie się zatrzyma, naciśnij i przytrzymaj przez 3 sekundy przyciski [Przyspieszenie] + [Hamulec], a następnie puść hamulec.",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량이 완전히 멈췄을 때 [가속] + [브레이크]를 3초간 누른 후 브레이크에서 발을 뗍니다.",
+		},
 	},
-	speedBoost_tt = {
+	NOS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "A speed boost that simulates nitrous. Gives you more power and increases your top speed when pressing ___.",
@@ -2942,8 +3194,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zwiększenie prędkości, które symuluje podtlenek azotu. Daje ci więcej mocy i zwiększa twoją prędkość maksymalną po naciśnięciu ___.",
 		},
+		{
+			iso = "ko-KR",
+			text = "질소를 시뮬레이션하는 속도 부스트. ___를 누를 때 더 많은 파워를 제공하고 최고 속도를 증가시킵니다.",
+		},
 	},
-	vfx_tt = {
+	NOS_VFX_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Activates a visual effect on your screen when using NOS.",
@@ -2988,8 +3244,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Aktywuje efekt wizualny na ekranie podczas korzystania z NOS.",
 		},
+		{
+			iso = "ko-KR",
+			text = "NOS를 사용하면 화면에 시각적 효과가 나타납니다.",
+		},
 	},
-	loudradio_tt = {
+	LOUD_RADIO_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Makes your vehicle's radio sound louder from the outside. To notice the difference, activate this option then stand close to your car while the engine is running and the radio is on.",
@@ -3034,8 +3294,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Sprawia, że ​​radio Twojego pojazdu brzmi głośniej z zewnątrz. Aby zauważyć różnicę, aktywuj tę opcję, a następnie stań blisko samochodu, gdy silnik pracuje, a radio jest włączone.",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량의 라디오 소리를 외부에서 더 크게 들리게 합니다. 차이를 알아차리려면 이 옵션을 활성화한 다음 엔진이 작동하고 라디오가 켜진 상태에서 차량 가까이에 서십시오.",
+		},
 	},
-	purge_tt = {
+	NOS_PURGE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Press ___ on keyboard or --- on controller to purge your NOS Fast & Furious style.",
@@ -3080,8 +3344,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Naciśnij ___ na klawiaturze lub --- na kontrolerze, aby usunąć styl NOS Fast & Furious.",
 		},
+		{
+			iso = "ko-KR",
+			text = "NOS Fast & Furious 스타일을 정화하려면 키보드의 ___ 또는 컨트롤러의 ---를 누르세요.",
+		},
 	},
-	pnb_tt = {
+	POPSNBANGS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Enables exhaust pops whenever you let go of [Accelerate] from high RPM.",
@@ -3101,7 +3369,8 @@ Labels = {
 		{
 			iso = "pt-BR",
 			text = "Habilita estalos de exaustão sempre que você solta [Acelerar] em alta rotação.",
-		},		{
+		},
+		{
 			iso = "ru-RU",
 			text = "Включает хлопки выхлопных газов, когда вы отпускаете кнопку [Accelerate] с высоких оборотов.",
 		},
@@ -3125,8 +3394,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Włącza trzaski wydechu przy każdym puszczeniu przycisku [Przyspiesz] przy wysokich obrotach.",
 		},
+		{
+			iso = "ko-KR",
+			text = "고속 RPM에서 [가속] 버튼을 놓으면 배기 팝이 활성화됩니다.",
+		},
 	},
-	louderpnb_tt = {
+	LOUDER_POPS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Makes your 'Pops & Bangs' sound extremely loud.",
@@ -3171,8 +3444,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Sprawia, że ​​Twoje „pops & bangs” brzmią niezwykle głośno.",
 		},
+		{
+			iso = "ko-KR",
+			text = "'Pops & Bangs' 소리가 매우 크게 들립니다.",
+		},
 	},
-	highbeams_tt = {
+	HIGH_BEAMS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Flash your high beams when honking.",
@@ -3217,8 +3494,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Mrugaj długimi światłami, gdy trąbisz.",
 		},
+		{
+			iso = "ko-KR",
+			text = "경적을 울릴 때 하이빔을 깜박이세요.",
+		},
 	},
-	brakeLight_tt = {
+	BRAKE_LIGHT_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Automatically turns on the brake lights when your car is stopped.",
@@ -3263,8 +3544,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Automatycznie włącza światła hamowania po zatrzymaniu samochodu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량이 멈추면 자동으로 브레이크 조명이 켜집니다.",
+		},
 	},
-	engineOn_tt = {
+	IV_STYLE_EXIT_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Brings back GTA IV's vehicle exit: Hold [F] to turn off the engine before exiting the vehicle or press normally to exit and keep it running.",
@@ -3309,8 +3594,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Przywraca opcję wychodzenia z pojazdu w GTA IV: przytrzymaj [F], aby wyłączyć silnik przed wyjściem z pojazdu lub naciśnij normalnie, aby wyjść i pozostawić silnik włączony.",
 		},
+		{
+			iso = "ko-KR",
+			text = "GTA IV의 차량 출구 기능을 다시 제공합니다. 차량에서 내리기 전에 엔진을 끄려면 [F]를 누르고, 그렇지 않으면 일반적으로 눌러서 차량에서 내리고 시동을 걸어 둡니다.",
+		},
 	},
-	wheelsturned_tt = {
+	KEEP_WHEELS_TURNED_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Keeps your wheels turned when you exit your vehicle while holding [A] or [D].",
@@ -3351,8 +3640,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Utrzymuje koła w ruchu po wyjściu z pojazdu, przytrzymując przycisk [A] lub [D].",
 		},
+		{
+			iso = "ko-KR",
+			text = "[A] 또는 [D] 버튼을 누른 상태에서 차량에서 나올 때 바퀴가 계속 돌도록 합니다.",
+		},
 	},
-	canttouchthis_tt = {
+	CANT_TOUCH_THIS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Prevent NPCs and players from carjacking you.",
@@ -3397,8 +3690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie dopuść, aby NPC-e i gracze ukradli ci samochód.",
 		},
+		{
+			iso = "ko-KR",
+			text = "NPC와 플레이어가 당신의 차를 강탈하는 것을 방지하세요.",
+		},
 	},
-	insta180_tt = {
+	INSTA_180_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Press [NUMPAD-] or [Mouse Scroll Down] to instantly turn your car 180 degrees.",
@@ -3443,39 +3740,43 @@ Labels = {
 			iso = "pl-PL",
 			text = "Naciśnij [NUMPAD-] lub [Przewijanie myszką w dół], aby natychmiast obrócić samochód o 180 stopni.",
 		},
+		{
+			iso = "ko-KR",
+			text = "[숫자패드-] 또는 [마우스 스크롤 다운]을 눌러 차량을 즉시 180도 회전하세요.",
+		},
 	},
-	flaresforall_tt = {
+	FLARES_FOR_ALL_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Equip all planes with unlimited flares.\10\10 ¤ NOTE: There is a 3 second delay between each use of these flares. The button is the same counter-measure button, default: [E].",
+			text = "Equip all planes with unlimited flares.\n\n ¤ NOTE: There is a 3 second delay between each use of these flares. The button is the same counter-measure button, default: [E].",
 		},
 		{
 			iso = "de-DE",
-			text = "Rüsten Sie alle Flugzeuge mit unbegrenzten Leuchtraketen aus.\10\10 ¤ HINWEIS: Es gibt eine 3-Sekunden-Verzögerung zwischen jedem Einsatz dieser Leuchtraketen. Die Taste ist die gleiche Taste für Gegenmaßnahmen, Standard: [E].",
+			text = "Rüsten Sie alle Flugzeuge mit unbegrenzten Leuchtraketen aus.\n\n ¤ HINWEIS: Es gibt eine 3-Sekunden-Verzögerung zwischen jedem Einsatz dieser Leuchtraketen. Die Taste ist die gleiche Taste für Gegenmaßnahmen, Standard: [E].",
 		},
 		{
 			iso = "fr-FR",
-			text = "Équiper tous les avions avec un nombre illimité de fusées éclairantes.\10\10 ¤ NOTE : Il y a un délai de 3 secondes entre chaque utilisation de ces fusées. Le bouton est le même que celui des contre-mesures, par défaut : [E].",
+			text = "Équiper tous les avions avec un nombre illimité de fusées éclairantes.\n\n ¤ NOTE : Il y a un délai de 3 secondes entre chaque utilisation de ces fusées. Le bouton est le même que celui des contre-mesures, par défaut : [E].",
 		},
 		{
 			iso = "it-IT",
-			text = "Equipaggia tutti gli aerei con razzi illimitati.\10\10 ¤ NOTA: c'è un ritardo di 3 secondi tra l'uso di questi razzi. Il pulsante è lo stesso pulsante di contromisura, predefinito: [E].",
+			text = "Equipaggia tutti gli aerei con razzi illimitati.\n\n ¤ NOTA: c'è un ritardo di 3 secondi tra l'uso di questi razzi. Il pulsante è lo stesso pulsante di contromisura, predefinito: [E].",
 		},
 		{
 			iso = "pt-BR",
-			text = "Equipe todos os aviões com sinalizadores ilimitados.\10\10 ¤ OBSERVAÇÃO: há um atraso de 3 segundos entre cada uso desses sinalizadores. O botão é o mesmo botão de contramedida, padrão: [E].",
+			text = "Equipe todos os aviões com sinalizadores ilimitados.\n\n ¤ OBSERVAÇÃO: há um atraso de 3 segundos entre cada uso desses sinalizadores. O botão é o mesmo botão de contramedida, padrão: [E].",
 		},
 		{
 			iso = "ru-RU",
-			text = "Оснастите все самолеты неограниченным количеством сигнальных ракет.\10\10 ¤ ПРИМЕЧАНИЕ: Между каждым использованием этих сигнальных ракет есть 3-секундная задержка. Кнопка - та же кнопка противодействия, по умолчанию: [E].",
+			text = "Оснастите все самолеты неограниченным количеством сигнальных ракет.\n\n ¤ ПРИМЕЧАНИЕ: Между каждым использованием этих сигнальных ракет есть 3-секундная задержка. Кнопка - та же кнопка противодействия, по умолчанию: [E].",
 		},
 		{
 			iso = "es-ES",
-			text = "Equipa todos los aviones con bengalas ilimitadas.\10\10 ¤ NOTA: Hay un retraso de 3 segundos entre cada uso de estas bengalas. El botón es el mismo botón de contramedida, predeterminado: [E].",
+			text = "Equipa todos los aviones con bengalas ilimitadas.\n\n ¤ NOTA: Hay un retraso de 3 segundos entre cada uso de estas bengalas. El botón es el mismo botón de contramedida, predeterminado: [E].",
 		},
 		{
 			iso = "zh-CN",
-			text = "为所有飞机配备无限数量的照明弹。\10\10 ¤ 注意：每次使用这些照明弹之间有 3 秒的延迟。按钮与反制措施按钮相同，默认：[E]。",
+			text = "为所有飞机配备无限数量的照明弹。\n\n ¤ 注意：每次使用这些照明弹之间有 3 秒的延迟。按钮与反制措施按钮相同，默认：[E]。",
 		},
 		{
 			iso = "zh-TW",
@@ -3483,45 +3784,49 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "すべての飛行機に無制限のフレアを装備します。\10\10 ¤ 注意: これらのフレアの使用には 3 秒の遅延があります。ボタンは対抗手段ボタンと同じです。デフォルト: [E]。",
+			text = "すべての飛行機に無制限のフレアを装備します。\n\n ¤ 注意: これらのフレアの使用には 3 秒の遅延があります。ボタンは対抗手段ボタンと同じです。デフォルト: [E]。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Wyposaż wszystkie samoloty w nieograniczoną liczbę flar.\10\10 ¤ UWAGA: Między każdym użyciem flar występuje 3-sekundowe opóźnienie. Przycisk jest tym samym przyciskiem przeciwdziałania, domyślnie: [E].",
+			text = "Wyposaż wszystkie samoloty w nieograniczoną liczbę flar.\n\n ¤ UWAGA: Między każdym użyciem flar występuje 3-sekundowe opóźnienie. Przycisk jest tym samym przyciskiem przeciwdziałania, domyślnie: [E].",
+		},
+		{
+			iso = "ko-KR",
+			text = "모든 비행기에 무제한 플레어 장착.\n\n ¤ 참고: 이 플레어를 사용할 때마다 3초의 지연이 발생합니다. 버튼은 동일한 대응책 버튼이며 기본값은 [E]입니다.",
 		},
 	},
-	planeSpeed_tt = {
+	PLANE_SPEED_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Increases the speed limit on planes.\10\10  ¤ Note 1: You must be flying at a reasonable altitude to gain speed, otherwise the game will force you to fly slowly if you're too low.\10\10  ¤ Note 2: Even with this option, we're still capping the speed at approximately 555km/h because anything over that will prevent textures from loading and eventually break your game, which is the reason why R* limited plane speeds in the first place.",
+			text = "Increases the speed limit on planes.\n\n  ¤ Note 1: You must be flying at a reasonable altitude to gain speed, otherwise the game will force you to fly slowly if you're too low.\n\n  ¤ Note 2: Even with this option, we're still capping the speed at approximately 555km/h because anything over that will prevent textures from loading and eventually break your game, which is the reason why R* limited plane speeds in the first place.",
 		},
 		{
 			iso = "de-DE",
-			text = "Erhöht die Geschwindigkeitsbegrenzung für Flugzeuge.\10\10 ¤ Hinweis 1: Ihr müsst in einer angemessenen Höhe fliegen, um Geschwindigkeit zu erreichen, sonst zwingt euch das Spiel, langsam zu fliegen, wenn ihr zu niedrig seid.\10\10 ¤ Hinweis 2: Auch mit dieser Option begrenzen wir die Geschwindigkeit auf etwa 555 km/h, weil alles, was darüber hinausgeht, das Laden von Texturen verhindert und schließlich euer Spiel kaputt macht, was der Grund dafür ist, dass R* die Geschwindigkeit von Flugzeugen überhaupt begrenzt hat.",
+			text = "Erhöht die Geschwindigkeitsbegrenzung für Flugzeuge.\n\n ¤ Hinweis 1: Ihr müsst in einer angemessenen Höhe fliegen, um Geschwindigkeit zu erreichen, sonst zwingt euch das Spiel, langsam zu fliegen, wenn ihr zu niedrig seid.\n\n ¤ Hinweis 2: Auch mit dieser Option begrenzen wir die Geschwindigkeit auf etwa 555 km/h, weil alles, was darüber hinausgeht, das Laden von Texturen verhindert und schließlich euer Spiel kaputt macht, was der Grund dafür ist, dass R* die Geschwindigkeit von Flugzeugen überhaupt begrenzt hat.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Augmente la vitesse limite des avions.\10\10- Note 1 : Vous devez voler à une altitude raisonnable pour gagner de la vitesse, sinon le jeu vous forcera à voler lentement si vous êtes trop bas.\10\10- Note 2 : Même avec cette option, nous limitons toujours la vitesse à environ 555km/h parce que tout ce qui dépasse cette vitesse empêchera le chargement des textures et finira par casser votre jeu, ce qui est la raison pour laquelle R* a limité la vitesse des avions en premier lieu.",
+			text = "Augmente la vitesse limite des avions.\n\n- Note 1 : Vous devez voler à une altitude raisonnable pour gagner de la vitesse, sinon le jeu vous forcera à voler lentement si vous êtes trop bas.\n\n- Note 2 : Même avec cette option, nous limitons toujours la vitesse à environ 555km/h parce que tout ce qui dépasse cette vitesse empêchera le chargement des textures et finira par casser votre jeu, ce qui est la raison pour laquelle R* a limité la vitesse des avions en premier lieu.",
 		},
 		{
 			iso = "it-IT",
-			text = "Aumenta il limite di velocità degli aerei.\10\10 ¤ Nota 1: per guadagnare velocità è necessario volare a un'altitudine ragionevole, altrimenti il gioco vi costringerà a volare lentamente se siete troppo bassi.\10\10 ¤ Nota 2: anche con questa opzione, limitiamo la velocità a circa 555 km/h, perché qualsiasi velocità superiore impedisce il caricamento delle texture e finisce per rompere il gioco, che è il motivo per cui R* ha limitato la velocità degli aerei in primo luogo.",
+			text = "Aumenta il limite di velocità degli aerei.\n\n ¤ Nota 1: per guadagnare velocità è necessario volare a un'altitudine ragionevole, altrimenti il gioco vi costringerà a volare lentamente se siete troppo bassi.\n\n ¤ Nota 2: anche con questa opzione, limitiamo la velocità a circa 555 km/h, perché qualsiasi velocità superiore impedisce il caricamento delle texture e finisce per rompere il gioco, che è il motivo per cui R* ha limitato la velocità degli aerei in primo luogo.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Aumenta o limite de velocidade dos aviões.\10\10 ¤ Nota 1: Você deve estar voando a uma altitude razoável para ganhar velocidade, caso contrário, o jogo o forçará a voar lentamente se estiver muito baixo.\10\10 ¤ Nota 2: Mesmo com essa opção, ainda estamos limitando a velocidade a aproximadamente 555 km/h, pois qualquer coisa acima disso impedirá que as texturas sejam carregadas e acabará quebrando o jogo, razão pela qual o R* limitou a velocidade dos aviões em primeiro lugar.",
+			text = "Aumenta o limite de velocidade dos aviões.\n\n ¤ Nota 1: Você deve estar voando a uma altitude razoável para ganhar velocidade, caso contrário, o jogo o forçará a voar lentamente se estiver muito baixo.\n\n ¤ Nota 2: Mesmo com essa opção, ainda estamos limitando a velocidade a aproximadamente 555 km/h, pois qualquer coisa acima disso impedirá que as texturas sejam carregadas e acabará quebrando o jogo, razão pela qual o R* limitou a velocidade dos aviões em primeiro lugar.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Увеличивает предельную скорость на самолетах.\10\10 ¤ Примечание 1: Вы должны лететь на разумной высоте, чтобы набрать скорость, иначе игра заставит вас лететь медленно, если вы слишком низко.\10\10 ¤ Примечание 2: Даже с этой опцией, мы все еще ограничиваем скорость примерно 555 км/ч, потому что все, что больше, будет препятствовать загрузке текстур и в конечном итоге сломает вашу игру, что является причиной, по которой R* ограничила скорость самолетов в первую очередь.",
+			text = "Увеличивает предельную скорость на самолетах.\n\n ¤ Примечание 1: Вы должны лететь на разумной высоте, чтобы набрать скорость, иначе игра заставит вас лететь медленно, если вы слишком низко.\n\n ¤ Примечание 2: Даже с этой опцией, мы все еще ограничиваем скорость примерно 555 км/ч, потому что все, что больше, будет препятствовать загрузке текстур и в конечном итоге сломает вашу игру, что является причиной, по которой R* ограничила скорость самолетов в первую очередь.",
 		},
 		{
 			iso = "es-ES",
-			text = "Aumenta el límite de velocidad de los aviones.\10\10 ¤ Nota 1: Debes volar a una altitud razonable para ganar velocidad, de lo contrario, el juego te obligará a volar lentamente si estás demasiado bajo.\10\10 ¤ Nota 2: Incluso con esta opción, seguimos limitando la velocidad a aproximadamente 555 km/h porque cualquier valor por encima de eso evitará que se carguen las texturas y, eventualmente, romperá el juego, que es la razón por la que R* limitó las velocidades de los aviones en primer lugar.",
+			text = "Aumenta el límite de velocidad de los aviones.\n\n ¤ Nota 1: Debes volar a una altitud razonable para ganar velocidad, de lo contrario, el juego te obligará a volar lentamente si estás demasiado bajo.\n\n ¤ Nota 2: Incluso con esta opción, seguimos limitando la velocidad a aproximadamente 555 km/h porque cualquier valor por encima de eso evitará que se carguen las texturas y, eventualmente, romperá el juego, que es la razón por la que R* limitó las velocidades de los aviones en primer lugar.",
 		},
 		{
 			iso = "zh-CN",
-			text = "提高飞机的速度限制。\10\10 ¤ 注1：您必须在合理的高度飞行才能获得速度，否则如果飞行高度太低，游戏会强迫您缓慢飞行。\10\10 ¤ 注2：即使使用此选项，我们仍然将速度限制在约 555 公里/小时，因为超过此速度会导致纹理无法加载并最终导致游戏中断，这也是 R* 首先限制飞机速度的原因。",
+			text = "提高飞机的速度限制。\n\n ¤ 注1：您必须在合理的高度飞行才能获得速度，否则如果飞行高度太低，游戏会强迫您缓慢飞行。\n\n ¤ 注2：即使使用此选项，我们仍然将速度限制在约 555 公里/小时，因为超过此速度会导致纹理无法加载并最终导致游戏中断，这也是 R* 首先限制飞机速度的原因。",
 		},
 		{
 			iso = "zh-TW",
@@ -3529,14 +3834,18 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "飛行機の速度制限を上げます。\10\10 ¤ 注 1: 速度を上げるには、適切な高度で飛行する必要があります。そうでない場合、高度が低すぎるとゲームによって低速飛行が強制されます。\10\10 ¤ 注 2: このオプションを使用しても、速度は約 555 km/h に制限されます。これを超えるとテクスチャが読み込まれなくなり、最終的にゲームが壊れるためです。これが、R* が飛行機の速度を制限した理由です。",
+			text = "飛行機の速度制限を上げます。\n\n ¤ 注 1: 速度を上げるには、適切な高度で飛行する必要があります。そうでない場合、高度が低すぎるとゲームによって低速飛行が強制されます。\n\n ¤ 注 2: このオプションを使用しても、速度は約 555 km/h に制限されます。これを超えるとテクスチャが読み込まれなくなり、最終的にゲームが壊れるためです。これが、R* が飛行機の速度を制限した理由です。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Zwiększa limit prędkości samolotów.\10\10 ¤ Uwaga 1: Aby nabrać prędkości, musisz lecieć na rozsądnej wysokości, w przeciwnym razie gra zmusi cię do powolnego lotu, jeżeli będziesz leciał zbyt nisko.\10\10 ¤ Uwaga 2: Nawet przy tej opcji nadal ograniczamy prędkość do około 555 km/h, ponieważ wszelkie wartości powyżej tej wartości uniemożliwią wczytywanie tekstur i ostatecznie spowodują uszkodzenie gry, co jest powodem, dla którego R* w pierwszej kolejności ogranicza prędkość samolotów.",
+			text = "Zwiększa limit prędkości samolotów.\n\n ¤ Uwaga 1: Aby nabrać prędkości, musisz lecieć na rozsądnej wysokości, w przeciwnym razie gra zmusi cię do powolnego lotu, jeżeli będziesz leciał zbyt nisko.\n\n ¤ Uwaga 2: Nawet przy tej opcji nadal ograniczamy prędkość do około 555 km/h, ponieważ wszelkie wartości powyżej tej wartości uniemożliwią wczytywanie tekstur i ostatecznie spowodują uszkodzenie gry, co jest powodem, dla którego R* w pierwszej kolejności ogranicza prędkość samolotów.",
+		},
+		{
+			iso = "ko-KR",
+			text = "비행기의 속도 제한을 높입니다.\n\n ¤ 참고 1: 속도를 얻으려면 적당한 고도에서 비행해야 합니다. 그렇지 않으면 너무 낮게 비행하면 게임에서 천천히 비행하도록 강제합니다.\n\n ¤ 참고 2: 이 옵션을 사용하더라도 속도 상한은 약 555km/h로 제한되어 있습니다. 그 이상에서는 텍스처가 로드되지 않고 결국 게임이 망가지기 때문입니다. 이것이 R*이 처음부터 비행기 속도를 제한한 이유입니다.",
 		},
 	},
-	strongWindows_tt = {
+	STRONG_WINDOWS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Prevents your vehicle's windows from breaking.",
@@ -3581,8 +3890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Chroni szyby w Twoim pojeździe przed stłuczeniem.",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량 창문이 깨지는 것을 방지합니다.",
+		},
 	},
-	veh_mines_tt = {
+	VEHICLE_MINES_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Equip any land vehicle with mines. Choose the type of mine you want then press ___ to use it.",
@@ -3627,8 +3940,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyposaż dowolny pojazd lądowy w miny. Wybierz rodzaj miny, którą chcesz, a następnie naciśnij ___, aby jej użyć.",
 		},
+		{
+			iso = "ko-KR",
+			text = "모든 지상 차량에 지뢰를 장착하세요. 원하는 지뢰 유형을 선택한 다음 ___를 눌러 사용하세요.",
+		},
 	},
-	mine_type_btn = {
+	MINES_TYPE_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Mine Type",
@@ -3673,8 +3990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Typ kopalni",
 		},
+		{
+			iso = "ko-KR",
+			text = "광산 유형",
+		},
 	},
-	mine_type_txt = {
+	MINES_TYPE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Choose which type of mine to equip:",
@@ -3719,8 +4040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wybierz typ miny, którą chcesz wyposażyć:",
 		},
+		{
+			iso = "ko-KR",
+			text = "어떤 유형의 지뢰를 장착할지 선택하세요:",
+		},
 	},
-	rgbLights = {
+	RGB_LIGHTS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "RGB Lights",
@@ -3765,8 +4090,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Światła RGB",
 		},
+		{
+			iso = "ko-KR",
+			text = "RGB 조명",
+		},
 	},
-	rgbSlider = {
+	RGB_SPEED_TXT_ = {
 		{
 			iso = "en-US",
 			text = "RGB Speed",
@@ -3811,8 +4140,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Prędkość RGB",
 		},
+		{
+			iso = "ko-KR",
+			text = "RGB 속도",
+		},
 	},
-	fenderBender_tt = {
+	FENDER_BENDER_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Makes car crashes more realistic. If you crash your vehicle at a very high speed, you might die.",
@@ -3857,8 +4190,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Sprawia, że ​​wypadki samochodowe są bardziej realistyczne. Jeśli rozbijesz swój pojazd przy bardzo dużej prędkości, możesz zginąć.",
 		},
+		{
+			iso = "ko-KR",
+			text = "자동차 충돌을 더욱 현실적으로 만듭니다. 매우 빠른 속도로 차량을 충돌시키면 죽을 수도 있습니다.",
+		},
 	},
-	autopilot_err_txt = {
+	AUTOPILOT_ERROR_TXT_ = {
 		{
 			iso = "en-US",
 			text = "You must be flying a plane or a helicopter to use this feature.",
@@ -3903,8 +4240,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Aby skorzystać z tej funkcji, musisz lecieć samolotem lub helikopterem.",
 		},
+		{
+			iso = "ko-KR",
+			text = "이 기능을 사용하려면 비행기나 헬리콥터를 이용해야 합니다.",
+		},
 	},
-	engineSoundBtn = {
+	ENGINE_SOUND_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Change Engine Sound",
@@ -3949,8 +4290,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zmień dźwięk silnika",
 		},
+		{
+			iso = "ko-KR",
+			text = "엔진 사운드 변경",
+		},
 	},
-	engineSoundErr = {
+	ENGINE_SOUND_ERROR_TXT_ = {
 		{
 			iso = "en-US",
 			text = "This option only works on road vehicles.",
@@ -3995,8 +4340,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Opcja ta działa tylko w przypadku pojazdów drogowych.",
 		},
+		{
+			iso = "ko-KR",
+			text = "이 옵션은 도로차량에만 적용됩니다.",
+		},
 	},
-	closeBtn = {
+	GENERIC_CLOSE_BTN_ = {
 		{
 			iso = "en-US",
 			text = " Close ",
@@ -4041,8 +4390,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zamknąć",
 		},
+		{
+			iso = "ko-KR",
+			text = "닫다",
+		},
 	},
-	openBtn = {
+	GENERIC_OPEN_BTN_ = {
 		{
 			iso = "en-US",
 			text = " Open ",
@@ -4087,8 +4440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Otwarte",
 		},
+		{
+			iso = "ko-KR",
+			text = "열려 있는",
+		},
 	},
-	searchVeh_hint = {
+	SEARCH_VEH_HINT_ = {
 		{
 			iso = "en-US",
 			text = "Search Vehicle Names",
@@ -4133,8 +4490,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyszukaj nazwy pojazdów",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량 이름 검색",
+		},
 	},
-	["Use This Sound"] = {
+	SELECT_SOUND_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Use This Sound",
@@ -4179,8 +4540,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Użyj tego dźwięku",
 		},
+		{
+			iso = "ko-KR",
+			text = "이 사운드를 사용하세요",
+		},
 	},
-	["Restore Default"] = {
+	RESTORE_DEFAULT_ = {
 		{
 			iso = "en-US",
 			text = "Restore Default",
@@ -4225,8 +4590,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Przywróć domyślne",
 		},
+		{
+			iso = "ko-KR",
+			text = "기본값 복원",
+		},
 	},
-	["Fix Engine"] = {
+	FIX_ENGINE_ = {
 		{
 			iso = "en-US",
 			text = "Fix Engine",
@@ -4271,8 +4640,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Napraw silnik",
 		},
+		{
+			iso = "ko-KR",
+			text = "엔진 수정",
+		},
 	},
-	["Destroy Engine"] = {
+	DESTROY_ENGINE_ = {
 		{
 			iso = "en-US",
 			text = "Destroy Engine",
@@ -4317,8 +4690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zniszcz silnik",
 		},
+		{
+			iso = "ko-KR",
+			text = "엔진 파괴",
+		},
 	},
-	ejecto_seato_tt = {
+	EJECTO_SEATO_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Ejects all passengers from your vehicle. Currently doesn't work against other players.",
@@ -4363,8 +4740,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyrzuca wszystkich pasażerów z pojazdu. Obecnie nie działa przeciwko innym graczom.",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량에서 모든 승객을 내립니다. 현재 다른 플레이어에게는 작동하지 않습니다.",
+		},
 	},
-	getinveh = {
+	GET_IN_VEH_WARNING_ = {
 		{
 			iso = "en-US",
 			text = "Please get in a vehicle!",
@@ -4409,8 +4790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Proszę wsiąść do pojazdu!",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량에 타세요!",
+		},
 	},
-	playersTab = {
+	PLAYERS_TAB_ = {
 		{
 			iso = "en-US",
 			text = "Players ",
@@ -4455,8 +4840,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Gracze",
 		},
+		{
+			iso = "ko-KR",
+			text = "플레이어",
+		},
 	},
-	worldTab = {
+	WORLD_TAB_ = {
 		{
 			iso = "en-US",
 			text = "World ",
@@ -4501,8 +4890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Świat",
 		},
+		{
+			iso = "ko-KR",
+			text = "세계",
+		},
 	},
-	failedToCtrlNPC = {
+	NPC_CTRL_FAIL_ = {
 		{
 			iso = "en-US",
 			text = "Failed to take control of the NPC!",
@@ -4547,8 +4940,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie udało się przejąć kontroli nad NPC!",
 		},
+		{
+			iso = "ko-KR",
+			text = "NPC를 제어하는 ​​데 실패했습니다!",
+		},
 	},
-	pedGrabber = {
+	PED_GRABBER_CB_ = {
 		{
 			iso = "en-US",
 			text = "Ped Grabber",
@@ -4593,8 +4990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Chwytak dla pieszych",
 		},
+		{
+			iso = "ko-KR",
+			text = "보행자 그래버",
+		},
 	},
-	pedGrabber_tt = {
+	PED_GRABBER_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Stand close to an NPC who's on foot then pess [FIRE] to grab them. Once they are grabbed, hold [AIM] then press [FIRE] again to throw them.",
@@ -4639,8 +5040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Stań blisko NPC, który jest na piechotę, a następnie naciśnij [OGIEŃ], aby go złapać. Gdy zostanie złapany, przytrzymaj [CEL], a następnie naciśnij [OGIEŃ] ponownie, aby go rzucić.",
 		},
+		{
+			iso = "ko-KR",
+			text = "도보로 이동하는 NPC 근처에 서서 [발사]를 눌러 잡으세요. 잡히면 [AIM]을 누른 채로 [발사]를 다시 눌러 던지세요.",
+		},
 	},
-	["Throw Force"] = {
+	THROW_FORCE_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Throw Force:",
@@ -4685,8 +5090,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Siła rzutu:",
 		},
+		{
+			iso = "ko-KR",
+			text = "던지는 힘:",
+		},
 	},
-	carpool = {
+	CARPOOL_CB_ = {
 		{
 			iso = "en-US",
 			text = "Ride With NPCs",
@@ -4731,8 +5140,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Jedź z NPC-ami",
 		},
+		{
+			iso = "ko-KR",
+			text = "NPC와 함께 타기",
+		},
 	},
-	carpool_tt = {
+	CARPOOL_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Allows you to get in NPC vehicles as passenger.",
@@ -4777,8 +5190,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pozwala wsiąść do pojazdu NPC jako pasażer.",
 		},
+		{
+			iso = "ko-KR",
+			text = "NPC 차량에 승객으로 탑승할 수 있습니다.",
+		},
 	},
-	prevSeat = {
+	PREVIOUS_SEAT_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Previous Seat",
@@ -4823,8 +5240,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Poprzednie miejsce",
 		},
+		{
+			iso = "ko-KR",
+			text = "이전 좌석",
+		},
 	},
-	nextSeat = {
+	NEXT_SEAT_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Next Seat",
@@ -4869,8 +5290,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Następne miejsce",
 		},
+		{
+			iso = "ko-KR",
+			text = "다음 좌석",
+		},
 	},
-	animateNPCsCB = {
+	ANIMATE_NPCS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Animate Nearby NPCs",
@@ -4915,8 +5340,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ożywiaj pobliskie postacie niezależne",
 		},
+		{
+			iso = "ko-KR",
+			text = "근처 NPC 애니메이션",
+		},
 	},
-	animateNPCs_tt = {
+	ANIMATE_NPCS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Make all nearby NPCs do one of the actions listed down below. This has no relation to the animations list and only works with NPCs that are on foot.",
@@ -4961,8 +5390,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Spraw, aby wszystkie pobliskie NPC wykonały jedną z akcji wymienionych poniżej. Nie ma to związku z listą animacji i działa tylko z NPC, które są na piechotę.",
 		},
+		{
+			iso = "ko-KR",
+			text = "근처 모든 NPC가 아래에 나열된 액션 중 하나를 하도록 합니다. 이것은 애니메이션 목록과 관련이 없으며 도보로 이동하는 NPC에게만 적용됩니다.",
+		},
 	},
-	kamikazeCB = {
+	KAMIKAZE_DRIVERS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Kamikaze Drivers",
@@ -5007,8 +5440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Kierowcy Kamikaze",
 		},
+		{
+			iso = "ko-KR",
+			text = "카미카제 드라이버",
+		},
 	},
-	publicEnemyCB = {
+	PUBLIC_ENEMY_CB_ = {
 		{
 			iso = "en-US",
 			text = "Public Enemy N°1",
@@ -5053,8 +5490,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wróg publiczny nr 1",
 		},
+		{
+			iso = "ko-KR",
+			text = "공공의 적 1호",
+		},
 	},
-	publicEnemy_tt = {
+	PUBLIC_ENEMY_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Everyone is out to get you. All nearby NPCs will attack you.",
@@ -5099,8 +5540,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wszyscy chcą cię dopaść. Wszyscy pobliscy NPC-e będą cię atakować.",
 		},
+		{
+			iso = "ko-KR",
+			text = "모두가 당신을 잡으려 하고 있습니다. 근처의 모든 NPC가 당신을 공격할 것입니다.",
+		},
 	},
-	extendWorldCB = {
+	EXTEND_WORLD_CB_ = {
 		{
 			iso = "en-US",
 			text = "Extend World Limits",
@@ -5145,39 +5590,43 @@ Labels = {
 			iso = "pl-PL",
 			text = "Rozszerz granice świata",
 		},
+		{
+			iso = "ko-KR",
+			text = "세계 한계를 확장하다",
+		},
 	},
-	extendWorld_tt = {
+	EXTEND_WORLD_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Travel farther across the ocean without dying.\10\10This does not remove the sky box.",
+			text = "Travel farther across the ocean without dying.\n\nThis does not remove the sky box.",
 		},
 		{
 			iso = "de-DE",
-			text = "Reise weiter über den Ozean, ohne zu sterben.\10\10Die Himmelsbox wird dadurch nicht entfernt.",
+			text = "Reise weiter über den Ozean, ohne zu sterben.\n\nDie Himmelsbox wird dadurch nicht entfernt.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Voyagez plus loin à travers l'océan sans mourir.\10\10Ceci ne supprime pas la boîte du ciel.",
+			text = "Voyagez plus loin à travers l'océan sans mourir.\n\nCeci ne supprime pas la boîte du ciel.",
 		},
 		{
 			iso = "it-IT",
-			text = "Viaggia più lontano attraverso l'oceano senza morire.\10\10Questo non rimuove la casella del cielo.",
+			text = "Viaggia più lontano attraverso l'oceano senza morire.\n\nQuesto non rimuove la casella del cielo.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Viaje mais longe no oceano sem morrer.\10\10Isso não remove a caixa do céu.",
+			text = "Viaje mais longe no oceano sem morrer.\n\nIsso não remove a caixa do céu.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Путешествуйте дальше через океан, не умирая.\10\10Это не убирает небесную коробку.",
+			text = "Путешествуйте дальше через океан, не умирая.\n\nЭто не убирает небесную коробку.",
 		},
 		{
 			iso = "es-ES",
-			text = "Viaja más lejos a través del océano sin morir.\10\10Esto no elimina la caja del cielo.",
+			text = "Viaja más lejos a través del océano sin morir.\n\nEsto no elimina la caja del cielo.",
 		},
 		{
 			iso = "zh-CN",
-			text = "跨越更远的海洋而不会死亡。\10\10这不会移除天空盒。",
+			text = "跨越更远的海洋而不会死亡。\n\n这不会移除天空盒。",
 		},
 		{
 			iso = "zh-TW",
@@ -5185,14 +5634,18 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "死なずに海を越えてさらに遠くまで旅しましょう。\10\10これによってスカイボックスは削除されません。",
+			text = "死なずに海を越えてさらに遠くまで旅しましょう。\n\nこれによってスカイボックスは削除されません。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Podróżuj dalej przez ocean, nie ginąc.\10\10To nie usuwa Sky Boxa.",
+			text = "Podróżuj dalej przez ocean, nie ginąc.\n\nTo nie usuwa Sky Boxa.",
+		},
+		{
+			iso = "ko-KR",
+			text = "죽지 않고 바다를 건너 더 멀리 여행하세요.\n\n이렇게 해도 하늘 상자는 제거되지 않습니다.",
 		},
 	},
-	smoothwatersCB = {
+	SMOOTH_WATERS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Smooth Waters",
@@ -5237,54 +5690,62 @@ Labels = {
 			iso = "pl-PL",
 			text = "Gładkie wody",
 		},
+		{
+			iso = "ko-KR",
+			text = "부드러운 물",
+		},
 	},
-	smoothwaters_tt = {
+	SMOOTH_WATERS_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Disables ocean waves. Especially useful when playing those awful boat sell missions -_-\10\10Although this is only local, but just to be safe this option will not be saved. You will have to manually enable it whenever you want to use it.",
+			text = "Disables ocean waves. Especially useful when playing those awful boat sell missions -_-\n\nAlthough this is only local, but just to be safe this option will not be saved. You will have to manually enable it whenever you want to use it.",
 		},
 		{
 			iso = "de-DE",
-			text = "Deaktiviert Meereswellen. Besonders nützlich, wenn man diese schrecklichen Bootsverkaufsmissionen spielt -_-\10\10Dies ist zwar nur lokal, aber um sicher zu gehen, wird diese Option nicht gespeichert. Ihr müsst sie manuell aktivieren, wenn ihr sie benutzen wollt.",
+			text = "Deaktiviert Meereswellen. Besonders nützlich, wenn man diese schrecklichen Bootsverkaufsmissionen spielt -_-\n\nDies ist zwar nur lokal, aber um sicher zu gehen, wird diese Option nicht gespeichert. Ihr müsst sie manuell aktivieren, wenn ihr sie benutzen wollt.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Désactive les vagues de l'océan. Particulièrement utile lorsque vous jouez ces horribles missions de vente en bateaux -_-\10\10Bien que ce ne soit que local, mais juste pour être sûr, cette option ne sera pas sauvegardée. Vous devrez l'activer manuellement chaque fois que vous voudrez l'utiliser.",
+			text = "Désactive les vagues de l'océan. Particulièrement utile lorsque vous jouez ces horribles missions de vente en bateaux -_-\n\nBien que ce ne soit que local, mais juste pour être sûr, cette option ne sera pas sauvegardée. Vous devrez l'activer manuellement chaque fois que vous voudrez l'utiliser.",
 		},
 		{
 			iso = "it-IT",
-			text = "Disattiva le onde oceaniche. Particolarmente utile quando si giocano quelle terribili missioni di vendita di barche -_-\10\10Anche se si tratta solo di un'opzione locale, per sicurezza questa opzione non verrà salvata. Dovrete attivarla manualmente ogni volta che vorrete utilizzarla.",
+			text = "Disattiva le onde oceaniche. Particolarmente utile quando si giocano quelle terribili missioni di vendita di barche -_-\n\nAnche se si tratta solo di un'opzione locale, per sicurezza questa opzione non verrà salvata. Dovrete attivarla manualmente ogni volta che vorrete utilizzarla.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Desativa as ondas do mar. Especialmente útil ao jogar aquelas terríveis missões de venda de barcos -_-\10\10Embora isso seja apenas local, mas por segurança, essa opção não será salva. Você terá de ativá-la manualmente sempre que quiser usá-la.",
+			text = "Desativa as ondas do mar. Especialmente útil ao jogar aquelas terríveis missões de venda de barcos -_-\n\nEmbora isso seja apenas local, mas por segurança, essa opção não será salva. Você terá de ativá-la manualmente sempre que quiser usá-la.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Отключает океанские волны. Особенно полезно, когда играешь в эти ужасные миссии по продаже лодок -_-\10\10Хотя это только локально, но на всякий случай эта опция не будет сохранена. Вам придется вручную включать ее всякий раз, когда вы захотите ее использовать.",
+			text = "Отключает океанские волны. Особенно полезно, когда играешь в эти ужасные миссии по продаже лодок -_-\n\nХотя это только локально, но на всякий случай эта опция не будет сохранена. Вам придется вручную включать ее всякий раз, когда вы захотите ее использовать.",
 		},
 		{
 			iso = "es-ES",
-			text = "Desactiva las olas del océano. Especialmente útil al jugar esas horribles misiones de venta de barcos -_-\10\10Aunque esto es solo local, por si acaso, esta opción no se guardará. Tendrás que habilitarla manualmente cada vez que quieras usarla.",
+			text = "Desactiva las olas del océano. Especialmente útil al jugar esas horribles misiones de venta de barcos -_-\n\nAunque esto es solo local, por si acaso, esta opción no se guardará. Tendrás que habilitarla manualmente cada vez que quieras usarla.",
 		},
 		{
 			iso = "zh-CN",
-			text = "禁用海浪。在玩那些可怕的船只出售任务时特别有用 -_-\10\10虽然这只是本地的，但为了安全起见，此选项不会被保存。每当您想使用它时，您都必须手动启用它。",
+			text = "禁用海浪。在玩那些可怕的船只出售任务时特别有用 -_-\n\n虽然这只是本地的，但为了安全起见，此选项不会被保存。每当您想使用它时，您都必须手动启用它。",
 		},
 		{
 			iso = "zh-TW",
-			text = "禁用海浪。在玩那些糟糕的賣船任務時特別有用 -_-\10\10雖然這只是本地的，但為了安全起見，這個選項不會被保存。每當您想使用它時，您都必須手動啟用它。",
+			text = "禁用海浪。在玩那些糟糕的賣船任務時特別有用 -_-\n\n雖然這只是本地的，但為了安全起見，這個選項不會被保存。每當您想使用它時，您都必須手動啟用它。",
 		},
 		{
 			iso = "ja-JP",
-			text = "海の波を無効にします。特に、ひどいボート販売ミッションをプレイするときに便利です -_-\10\10これはローカルのみですが、安全のためにこのオプションは保存されません。使用するたびに手動で有効にする必要があります。",
+			text = "海の波を無効にします。特に、ひどいボート販売ミッションをプレイするときに便利です -_-\n\nこれはローカルのみですが、安全のためにこのオプションは保存されません。使用するたびに手動で有効にする必要があります。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Wyłącza fale oceaniczne. Szczególnie przydatne podczas grania w te okropne misje sprzedaży łodzi -_-\10\10Chociaż jest to tylko lokalne, ale dla bezpieczeństwa ta opcja nie zostanie zapisana. Będziesz musiał ręcznie włączyć ją, kiedy tylko będziesz chciał jej użyć.",
+			text = "Wyłącza fale oceaniczne. Szczególnie przydatne podczas grania w te okropne misje sprzedaży łodzi -_-\n\nChociaż jest to tylko lokalne, ale dla bezpieczeństwa ta opcja nie zostanie zapisana. Będziesz musiał ręcznie włączyć ją, kiedy tylko będziesz chciał jej użyć.",
+		},
+		{
+			iso = "ko-KR",
+			text = "바다 파도를 비활성화합니다. 특히 끔찍한 보트 판매 미션을 플레이할 때 유용합니다 -_-\n\n이것은 로컬에서만 가능하지만 안전을 위해 이 옵션은 저장되지 않습니다. 사용하고 싶을 때마다 수동으로 활성화해야 합니다.",
 		},
 	},
-	settingsTab = {
+	SETTINGS_TAB_ = {
 		{
 			iso = "en-US",
 			text = "Settings ",
@@ -5329,8 +5790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ustawienia",
 		},
+		{
+			iso = "ko-KR",
+			text = "설정",
+		},
 	},
-	["Disable Tooltips"] = {
+	DISABLE_TOOLTIPS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Disable Tooltips",
@@ -5375,8 +5840,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącz podpowiedzi",
 		},
+		{
+			iso = "ko-KR",
+			text = "도구 설명 비활성화",
+		},
 	},
-	DisableSound = {
+	DISABLE_UISOUNDS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Disable UI Sounds",
@@ -5421,8 +5890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącz dźwięki interfejsu użytkownika",
 		},
+		{
+			iso = "ko-KR",
+			text = "UI 사운드 비활성화",
+		},
 	},
-	DisableSound_tt = {
+	DISABLE_UISOUNDS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Disable sound feedback from UI widgets.",
@@ -5467,8 +5940,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącz dźwiękowe potwierdzenia w widżetach interfejsu użytkownika.",
 		},
+		{
+			iso = "ko-KR",
+			text = "UI 위젯에서 사운드 피드백을 비활성화합니다.",
+		},
 	},
-	flightMusicCB = {
+	FLIGHT_MUSIC_CB_ = {
 		{
 			iso = "en-US",
 			text = "Disable Flight Music",
@@ -5513,8 +5990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącz muzykę w locie",
 		},
+		{
+			iso = "ko-KR",
+			text = "비행 음악 비활성화",
+		},
 	},
-	flightMusic_tt = {
+	FLIGHT_MUSIC_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Disables the ambient music that automatically plays when you're flying an aircraft.",
@@ -5559,8 +6040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącza muzykę otoczenia, która jest automatycznie odtwarzana podczas lotu samolotem.",
 		},
+		{
+			iso = "ko-KR",
+			text = "항공기 조종 시 자동으로 재생되는 주변 음악을 비활성화합니다.",
+		},
 	},
-	langTitle = {
+	LANGUAGE_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Language Settings",
@@ -5605,8 +6090,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ustawienia języka",
 		},
+		{
+			iso = "ko-KR",
+			text = "언어 설정",
+		},
 	},
-	currentLang_txt = {
+	CURRENT_LANGUAGE_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Current Language: ",
@@ -5651,8 +6140,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Aktualny język:",
 		},
+		{
+			iso = "ko-KR",
+			text = "현재 언어:",
+		},
 	},
-	gameLangCB = {
+	GAME_LANGUAGE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Use Game Language",
@@ -5697,8 +6190,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Użyj języka gry",
 		},
+		{
+			iso = "ko-KR",
+			text = "게임 언어 사용",
+		},
 	},
-	gameLang_tt = {
+	GAME_LANGUAGE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "To choose a different language, disable this option.",
@@ -5743,8 +6240,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Aby wybrać inny język, wyłącz tę opcję.",
 		},
+		{
+			iso = "ko-KR",
+			text = "다른 언어를 선택하려면 이 옵션을 비활성화하세요.",
+		},
 	},
-	generic_custom_label = {
+	GENERIC_CUSTOM_LABEL_ = {
 		{
 			iso = "en-US",
 			text = "Custom",
@@ -5789,8 +6290,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zwyczaj",
 		},
+		{
+			iso = "ko-KR",
+			text = "관습",
+		},
 	},
-	saveBtn = {
+	GENERIC_SAVE_BTN_ = {
 		{
 			iso = "en-US",
 			text = " Save ",
@@ -5835,8 +6340,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ratować",
 		},
+		{
+			iso = "ko-KR",
+			text = "구하다",
+		},
 	},
-	lang_success_msg = {
+	LANG_CHANGED_NOTIF_ = {
 		{
 			iso = "en-US",
 			text = "Language settings saved. Please reload the script to apply the changes.",
@@ -5881,8 +6390,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ustawienia języka zostały zapisane. Proszę ponownie załadować skrypt, aby zastosować zmiany.",
 		},
+		{
+			iso = "ko-KR",
+			text = "언어 설정이 저장되었습니다. 변경 사항을 적용하려면 스크립트를 다시 로드하세요.",
+		},
 	},
-	reset_settings_Btn = {
+	RESET_SETTINGS_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Reset Settings",
@@ -5927,8 +6440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Resetuj ustawienia",
 		},
+		{
+			iso = "ko-KR",
+			text = "설정 재설정",
+		},
 	},
-	confirm_txt = {
+	CONFIRM_PROMPT_ = {
 		{
 			iso = "en-US",
 			text = "Are you sure?",
@@ -5973,8 +6490,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Jesteś pewien?",
 		},
+		{
+			iso = "ko-KR",
+			text = "정말이에요?",
+		},
 	},
-	yes = {
+	GENERIC_YES_ = {
 		{
 			iso = "en-US",
 			text = "Yes",
@@ -6019,8 +6540,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Tak",
 		},
+		{
+			iso = "ko-KR",
+			text = "예",
+		},
 	},
-	no = {
+	GENERIC_NO_ = {
 		{
 			iso = "en-US",
 			text = "No",
@@ -6065,39 +6590,43 @@ Labels = {
 			iso = "pl-PL",
 			text = "NIE",
 		},
+		{
+			iso = "ko-KR",
+			text = "아니요",
+		},
 	},
-	getinsidefltbd = {
+	GET_IN_FLATBED_ = {
 		{
 			iso = "en-US",
-			text = "Please get inside a flatbed truck.\10You can use the button below to spawn one",
+			text = "Please get inside a flatbed truck.\nYou can use the button below to spawn one",
 		},
 		{
 			iso = "de-DE",
-			text = "Bitte steigen Sie in einen Pritschenwagen.\10Sie können die Schaltfläche unten verwenden, um einen zu erzeugen",
+			text = "Bitte steigen Sie in einen Pritschenwagen.\nSie können die Schaltfläche unten verwenden, um einen zu erzeugen",
 		},
 		{
 			iso = "fr-FR",
-			text = "Veuillez monter dans un camion à plate-forme.\10Vous pouvez utiliser le bouton ci-dessous pour en faire naître un.",
+			text = "Veuillez monter dans un camion à plate-forme.\nVous pouvez utiliser le bouton ci-dessous pour en faire naître un.",
 		},
 		{
 			iso = "it-IT",
-			text = "Entrare in un camion con pianale.\10Potete usare il pulsante qui sotto per generarne uno.",
+			text = "Entrare in un camion con pianale.\nPotete usare il pulsante qui sotto per generarne uno.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Entre em um caminhão-plataforma.\10Você pode usar o botão abaixo para gerar um.",
+			text = "Entre em um caminhão-plataforma.\nVocê pode usar o botão abaixo para gerar um.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Пожалуйста, сядьте в грузовик.\10Вы можете использовать кнопку ниже, чтобы разродиться.",
+			text = "Пожалуйста, сядьте в грузовик.\nВы можете использовать кнопку ниже, чтобы разродиться.",
 		},
 		{
 			iso = "es-ES",
-			text = "Por favor, entra en un camión de plataforma.\10Puedes usar el botón de abajo para generar uno.",
+			text = "Por favor, entra en un camión de plataforma.\nPuedes usar el botón de abajo para generar uno.",
 		},
 		{
 			iso = "zh-CN",
-			text = "请进入平板卡车。\10您可以使用下面的按钮来生成一个",
+			text = "请进入平板卡车。\n您可以使用下面的按钮来生成一个",
 		},
 		{
 			iso = "zh-TW",
@@ -6105,14 +6634,18 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "フラットベッドトラックに乗ってください。\10下のボタンを使ってトラックを1台スポーンできます",
+			text = "フラットベッドトラックに乗ってください。\n下のボタンを使ってトラックを1台スポーンできます",
 		},
 		{
 			iso = "pl-PL",
-			text = "Proszę wsiąść do ciężarówki z platformą.\10Możesz użyć poniższego przycisku, aby ją wygenerować",
+			text = "Proszę wsiąść do ciężarówki z platformą.\nMożesz użyć poniższego przycisku, aby ją wygenerować",
+		},
+		{
+			iso = "ko-KR",
+			text = "플랫베드 트럭 안으로 들어가세요.\n아래 버튼을 사용하여 하나를 생성할 수 있습니다.",
 		},
 	},
-	spawnfltbd = {
+	SPAWN_FLATBED_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Spawn Flatbed",
@@ -6157,8 +6690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Spawn Flatbed",
 		},
+		{
+			iso = "ko-KR",
+			text = "스폰 플랫베드",
+		},
 	},
-	fltbd_nonearbyvehTxt = {
+	FLTBD_NO_VEH_TXT_ = {
 		{
 			iso = "en-US",
 			text = "No nearby vehicles found!",
@@ -6203,8 +6740,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie znaleziono żadnych pojazdów w pobliżu!",
 		},
+		{
+			iso = "ko-KR",
+			text = "근처 차량을 찾을 수 없습니다!",
+		},
 	},
-	fltbd_nootherfltbdTxt = {
+	FLTBD_NOT_ALLOWED_TXT_ = {
 		{
 			iso = "en-US",
 			text = "You can not tow another flatbed truck.",
@@ -6249,8 +6790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie możesz holować innej ciężarówki z platformą.",
 		},
+		{
+			iso = "ko-KR",
+			text = "다른 플랫베드 트럭을 견인할 수 없습니다.",
+		},
 	},
-	fltbd_carsOnlyTxt = {
+	FLTBD_CARS_ONLY_TXT_ = {
 		{
 			iso = "en-US",
 			text = "You can only tow cars, trucks and bikes.",
@@ -6295,8 +6840,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Można holować wyłącznie samochody osobowe, ciężarowe i rowery.",
 		},
+		{
+			iso = "ko-KR",
+			text = "자동차, 트럭, 자전거만 견인할 수 있습니다.",
+		},
 	},
-	fltbd_closest_veh = {
+	FLTBD_NEARBY_VEH_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Closest Vehicle: ",
@@ -6341,8 +6890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Najbliższy pojazd:",
 		},
+		{
+			iso = "ko-KR",
+			text = "가장 가까운 차량:",
+		},
 	},
-	fltbd_towingTxt = {
+	FLTBD_TOWING_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Towed Vehicle: ",
@@ -6387,8 +6940,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pojazd holowany:",
 		},
+		{
+			iso = "ko-KR",
+			text = "견인 차량:",
+		},
 	},
-	["Show Towing Position"] = {
+	FLTBD_SHOW_TOWPOS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Show Towing Position",
@@ -6433,8 +6990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pokaż pozycję holowania",
 		},
+		{
+			iso = "ko-KR",
+			text = "견인 위치 표시",
+		},
 	},
-	towpos_tt = {
+	FLTBD_SHOW_TOWPOS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Marks the position at which the script detects nearby vehicles.",
@@ -6479,8 +7040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Oznacza pozycję, w której skrypt wykrywa pobliskie pojazdy.",
 		},
+		{
+			iso = "ko-KR",
+			text = "스크립트가 근처 차량을 감지하는 위치를 표시합니다.",
+		},
 	},
-	["Tow Everything"] = {
+	FLTBD_TOW_ALL_CB_ = {
 		{
 			iso = "en-US",
 			text = "Tow Everything",
@@ -6525,8 +7090,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Holowanie wszystkiego",
 		},
+		{
+			iso = "ko-KR",
+			text = "모든 것을 견인하다",
+		},
 	},
-	TowEverything_tt = {
+	FLTBD_TOW_ALL_DESC_ = {
 		{
 			iso = "en-US",
 			text = "By default, the script is limited to cars, trucks and bikes only. This option ignores that limit.",
@@ -6571,8 +7140,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Domyślnie skrypt jest ograniczony tylko do samochodów, ciężarówek i rowerów. Ta opcja ignoruje to ograniczenie.",
 		},
+		{
+			iso = "ko-KR",
+			text = "기본적으로 스크립트는 자동차, 트럭 및 자전거로만 제한됩니다. 이 옵션은 해당 제한을 무시합니다.",
+		},
 	},
-	towBtn = {
+	FLTBD_TOW_BTN_ = {
 		{
 			iso = "en-US",
 			text = "   Tow   ",
@@ -6617,8 +7190,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Holowniczy",
 		},
+		{
+			iso = "ko-KR",
+			text = "끌고 가다",
+		},
 	},
-	detachBtn = {
+	GENERIC_DETACH_BTN_ = {
 		{
 			iso = "en-US",
 			text = " Detach ",
@@ -6663,8 +7240,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Odłączyć",
 		},
+		{
+			iso = "ko-KR",
+			text = "분리하다",
+		},
 	},
-	failed_veh_ctrl = {
+	VEH_CTRL_FAIL_ = {
 		{
 			iso = "en-US",
 			text = "Unable to take control of the vehicle! Does the owner have protections?",
@@ -6709,8 +7290,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie można przejąć kontroli nad pojazdem! Czy właściciel ma zabezpieczenia?",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량을 제어할 수 없습니다! 소유자는 보호 장치가 있습니까?",
+		},
 	},
-	["Adjust Vehicle Position"] = {
+	FLTBD_ADJUST_POS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Adjust Vehicle Position",
@@ -6755,8 +7340,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Dostosuj położenie pojazdu",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량 위치 조정",
+		},
 	},
-	AdjustPosition_tt = {
+	FLTBD_ADJUST_POS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "For the arrows to make sense, move the game camera to the right. (Look right)",
@@ -6801,8 +7390,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Aby strzałki miały sens, przesuń kamerę gry w prawo. (Patrz w prawo)",
 		},
+		{
+			iso = "ko-KR",
+			text = "화살표가 의미를 갖도록 하려면 게임 카메라를 오른쪽으로 옮기세요. (오른쪽을 보세요)",
+		},
 	},
-	["Exit your current vehicle first."] = {
+	FLTBD_EXIT_VEH_ERROR_ = {
 		{
 			iso = "en-US",
 			text = "Exit your current vehicle first.",
@@ -6847,8 +7440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Najpierw wysiądź z obecnego pojazdu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "먼저 현재 차량에서 내리세요.",
+		},
 	},
-	noSpawnInside = {
+	FLTBD_INTERIOR_ERROR_ = {
 		{
 			iso = "en-US",
 			text = "You cannot spawn a flatbed truck inside interiors.",
@@ -6893,8 +7490,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie można utworzyć ciężarówki z platformą wewnątrz pojazdu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "플랫베드 트럭은 실내에 생성할 수 없습니다.",
+		},
 	},
-	["Total Players:"] = {
+	TOTAL_PLAYERS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Total Players:",
@@ -6939,8 +7540,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Łączna liczba graczy:",
 		},
+		{
+			iso = "ko-KR",
+			text = "총 플레이어:",
+		},
 	},
-	pervertStalker_tt = {
+	PERVERT_STALKER_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Spawns a pervert stalker who follows the target player and masturbates near them.",
@@ -6985,8 +7590,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pojawia się zboczeniec, który podąża za graczem docelowym i masturbuje się w jego pobliżu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "대상 플레이어를 쫓아가 그 근처에서 자위행위를 하는 변태 스토커를 생성합니다.",
+		},
 	},
-	editMode = {
+	EDIT_MODE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Edit Mode",
@@ -7031,8 +7640,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Tryb edycji",
 		},
+		{
+			iso = "ko-KR",
+			text = "편집 모드",
+		},
 	},
-	editMode_tt = {
+	EDIT_MODE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Reposition the prop after you spawn it.",
@@ -7077,8 +7690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Po pojawieniu się rekwizytu należy go ponownie umieścić.",
 		},
+		{
+			iso = "ko-KR",
+			text = "소품을 생성한 후 다시 배치하세요.",
+		},
 	},
-	search_hint = {
+	GENERIC_SEARCH_HINT_ = {
 		{
 			iso = "en-US",
 			text = "Search",
@@ -7123,8 +7740,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Szukaj",
 		},
+		{
+			iso = "ko-KR",
+			text = "찾다",
+		},
 	},
-	["R*_blacklist"] = {
+	COCKSTAR_BLACKLIST_WARN_ = {
 		{
 			iso = "en-US",
 			text = "is blacklisted by Rockstar and will not spawn.",
@@ -7169,8 +7790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "jest na czarnej liście Rockstar i nie pojawi się.",
 		},
+		{
+			iso = "ko-KR",
+			text = "Rockstar의 블랙리스트에 등록되어 더 이상 생성되지 않습니다.",
+		},
 	},
-	crash_object = {
+	CRASH_OBJECT_WARN_ = {
 		{
 			iso = "en-US",
 			text = "may crash your game. Proceed with caution!",
@@ -7215,8 +7840,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "może spowodować awarię gry. Postępuj ostrożnie!",
 		},
+		{
+			iso = "ko-KR",
+			text = "게임이 충돌할 수 있습니다. 주의해서 진행하세요!",
+		},
 	},
-	["Custom Objects"] = {
+	CUSTOM_OBJECTS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Custom Objects",
@@ -7261,8 +7890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Obiekty niestandardowe",
 		},
+		{
+			iso = "ko-KR",
+			text = "사용자 정의 객체",
+		},
 	},
-	["All Objects"] = {
+	ALL_OBJECTS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "All Objects",
@@ -7307,8 +7940,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wszystkie obiekty",
 		},
+		{
+			iso = "ko-KR",
+			text = "모든 객체",
+		},
 	},
-	Preview = {
+	PREVIEW_OBJECTS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Preview",
@@ -7353,8 +7990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zapowiedź",
 		},
+		{
+			iso = "ko-KR",
+			text = "시사",
+		},
 	},
-	Move_FB = {
+	MOVE_OBJECTS_FB_ = {
 		{
 			iso = "en-US",
 			text = "Move Front/Back:",
@@ -7399,8 +8040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Przesuń do przodu/do tyłu:",
 		},
+		{
+			iso = "ko-KR",
+			text = "앞/뒤로 이동:",
+		},
 	},
-	Move_UD = {
+	MOVE_OBJECTS_UD_ = {
 		{
 			iso = "en-US",
 			text = "Move Up/Down:",
@@ -7445,8 +8090,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Przesuń w górę/w dół:",
 		},
+		{
+			iso = "ko-KR",
+			text = "위로/아래로 이동:",
+		},
 	},
-	["Spawn For a Player"] = {
+	SPAWN_FOR_PLAYER_CB_ = {
 		{
 			iso = "en-US",
 			text = "Spawn For a Player",
@@ -7491,8 +8140,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pojawienie się gracza",
 		},
+		{
+			iso = "ko-KR",
+			text = "플레이어를 위한 스폰",
+		},
 	},
-	Spawn = {
+	GENERIC_SPAWN_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Spawn",
@@ -7537,8 +8190,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ikra",
 		},
+		{
+			iso = "ko-KR",
+			text = "알",
+		},
 	},
-	invalid_obj = {
+	INVALID_OBJECT_TXT_ = {
 		{
 			iso = "en-US",
 			text = "This object ",
@@ -7583,8 +8240,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ten obiekt",
 		},
+		{
+			iso = "ko-KR",
+			text = "이 객체",
+		},
 	},
-	spawned_objects = {
+	SPAWNED_OBJECTS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Spawned Objects:",
@@ -7629,8 +8290,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Powstałe obiekty:",
 		},
+		{
+			iso = "ko-KR",
+			text = "생성된 객체:",
+		},
 	},
-	generic_delete = {
+	GENERIC_DELETE_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Delete",
@@ -7675,8 +8340,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Usuwać",
 		},
+		{
+			iso = "ko-KR",
+			text = "삭제",
+		},
 	},
-	["Attach To Self"] = {
+	ATTACH_TO_SELF_CB_ = {
 		{
 			iso = "en-US",
 			text = "Attach To Self",
@@ -7721,8 +8390,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Dołącz do siebie",
 		},
+		{
+			iso = "ko-KR",
+			text = "자기에게 붙이기",
+		},
 	},
-	["Attach To Vehicle"] = {
+	ATTACH_TO_VEH_CB_ = {
 		{
 			iso = "en-US",
 			text = "Attach To Vehicle",
@@ -7767,8 +8440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Dołącz do pojazdu",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량에 부착",
+		},
 	},
-	attached_objects = {
+	ATTACHED_OBJECTS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Attached Objects:",
@@ -7813,8 +8490,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Dołączone obiekty:",
 		},
+		{
+			iso = "ko-KR",
+			text = "첨부된 객체:",
+		},
 	},
-	attachBtn = {
+	GENERIC_ATTACH_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Attach",
@@ -7859,8 +8540,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Przytwierdzać",
 		},
+		{
+			iso = "ko-KR",
+			text = "붙이다",
+		},
 	},
-	xyz_multiplier = {
+	XYZ_MULTIPLIER_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Multiply X, Y, and Z values:",
@@ -7905,8 +8590,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pomnóż wartości X, Y i Z:",
 		},
+		{
+			iso = "ko-KR",
+			text = "X, Y, Z 값을 곱합니다.",
+		},
 	},
-	["Move Object:"] = {
+	MOVE_OBJECT_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Move Object:",
@@ -7951,8 +8640,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Przesuń obiekt:",
 		},
+		{
+			iso = "ko-KR",
+			text = "객체 이동:",
+		},
 	},
-	["Rotate Object:"] = {
+	ROTATE_OBJECT_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Rotate Object:",
@@ -7997,8 +8690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Obróć obiekt:",
 		},
+		{
+			iso = "ko-KR",
+			text = "객체 회전:",
+		},
 	},
-	generic_reset = {
+	GENERIC_RESET_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Reset",
@@ -8043,8 +8740,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nastawić",
 		},
+		{
+			iso = "ko-KR",
+			text = "다시 놓기",
+		},
 	},
-	resetSlider_tt = {
+	RESET_OBJECT_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Reset the sliders to zero and the prop position to default.",
@@ -8089,8 +8790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zresetuj suwaki do zera i ustaw pozycję śmigła domyślną.",
 		},
+		{
+			iso = "ko-KR",
+			text = "슬라이더를 0으로 재설정하고 소품 위치를 기본값으로 설정합니다.",
+		},
 	},
-	hex_tt = {
+	HEX_SMOKE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Input your own custom Hex color then press [ENTER] to apply. Example: \"#FF0000\"",
@@ -8135,8 +8840,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wprowadź swój własny niestandardowy kolor szesnastkowy, a następnie naciśnij [ENTER], aby zastosować. Przykład: \"#FF0000\"",
 		},
+		{
+			iso = "ko-KR",
+			text = "사용자 정의 16진수 색상을 입력한 다음 [ENTER]를 눌러 적용합니다. 예: \"#FF0000\"",
+		},
 	},
-	animations = {
+	ANIMATIONS_TAB_ = {
 		{
 			iso = "en-US",
 			text = "Animations",
@@ -8181,8 +8890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Animacje",
 		},
+		{
+			iso = "ko-KR",
+			text = "애니메이션",
+		},
 	},
-	scenarios = {
+	SCENARIOS_TAB_ = {
 		{
 			iso = "en-US",
 			text = "Scenarios",
@@ -8227,39 +8940,43 @@ Labels = {
 			iso = "pl-PL",
 			text = "Scenariusze",
 		},
+		{
+			iso = "ko-KR",
+			text = "시나리오",
+		},
 	},
-	flags_tt = {
+	ANIM_FLAGS_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Allows you to customize how the animation plays.\10Example: if an animation is set to loop but you want it to freeze, activate this then choose your desired settings.",
+			text = "Allows you to customize how the animation plays.\nExample: if an animation is set to loop but you want it to freeze, activate this then choose your desired settings.",
 		},
 		{
 			iso = "de-DE",
-			text = "Ermöglicht es Ihnen, die Art und Weise, wie die Animation abgespielt wird, anzupassen.\10Beispiel: Wenn eine Animation als Schleife eingestellt ist, Sie sie aber einfrieren möchten, aktivieren Sie dies und wählen Sie dann die gewünschten Einstellungen.",
+			text = "Ermöglicht es Ihnen, die Art und Weise, wie die Animation abgespielt wird, anzupassen.\nBeispiel: Wenn eine Animation als Schleife eingestellt ist, Sie sie aber einfrieren möchten, aktivieren Sie dies und wählen Sie dann die gewünschten Einstellungen.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Permet de personnaliser la façon dont l'animation est jouée.\10Exemple : si une animation est réglée pour tourner en boucle mais que vous souhaitez qu'elle se fige, activez cette option puis choisissez les paramètres souhaités.",
+			text = "Permet de personnaliser la façon dont l'animation est jouée.\nExemple : si une animation est réglée pour tourner en boucle mais que vous souhaitez qu'elle se fige, activez cette option puis choisissez les paramètres souhaités.",
 		},
 		{
 			iso = "it-IT",
-			text = "Permette di personalizzare il modo in cui l'animazione viene riprodotta.\10Esempio: se un'animazione è impostata su loop ma si desidera che si blocchi, attivare questa opzione e scegliere le impostazioni desiderate.",
+			text = "Permette di personalizzare il modo in cui l'animazione viene riprodotta.\nEsempio: se un'animazione è impostata su loop ma si desidera che si blocchi, attivare questa opzione e scegliere le impostazioni desiderate.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Permite que você personalize a forma como a animação é reproduzida.\10Exemplo: se uma animação estiver definida para loop, mas você quiser que ela congele, ative essa opção e escolha as configurações desejadas.",
+			text = "Permite que você personalize a forma como a animação é reproduzida.\nExemplo: se uma animação estiver definida para loop, mas você quiser que ela congele, ative essa opção e escolha as configurações desejadas.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Позволяет настроить воспроизведение анимации.\10Например: если анимация зациклена, но вы хотите, чтобы она замерла, активируйте этот параметр и выберите нужные настройки.",
+			text = "Позволяет настроить воспроизведение анимации.\nНапример: если анимация зациклена, но вы хотите, чтобы она замерла, активируйте этот параметр и выберите нужные настройки.",
 		},
 		{
 			iso = "es-ES",
-			text = "Le permite personalizar cómo se reproduce la animación.\10Ejemplo: si una animación está configurada para repetirse pero desea que se congele, active esta opción y luego elija la configuración deseada.",
+			text = "Le permite personalizar cómo se reproduce la animación.\nEjemplo: si una animación está configurada para repetirse pero desea que se congele, active esta opción y luego elija la configuración deseada.",
 		},
 		{
 			iso = "zh-CN",
-			text = "允许您自定义动画的播放方式。\10示例：如果动画设置为循环播放但您希望它冻结，请激活此功能然后选择所需的设置。",
+			text = "允许您自定义动画的播放方式。\n示例：如果动画设置为循环播放但您希望它冻结，请激活此功能然后选择所需的设置。",
 		},
 		{
 			iso = "zh-TW",
@@ -8267,14 +8984,18 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "アニメーションの再生方法をカスタマイズできます。\10例: アニメーションがループするように設定されているが、それをフリーズさせたい場合は、これを有効にして、希望の設定を選択します。",
+			text = "アニメーションの再生方法をカスタマイズできます。\n例: アニメーションがループするように設定されているが、それをフリーズさせたい場合は、これを有効にして、希望の設定を選択します。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Umożliwia dostosowanie sposobu odtwarzania animacji.\10Przykład: jeśli animacja jest ustawiona na pętlę, ale chcesz, aby się zamroziła, aktywuj tę opcję, a następnie wybierz żądane ustawienia.",
+			text = "Umożliwia dostosowanie sposobu odtwarzania animacji.\nPrzykład: jeśli animacja jest ustawiona na pętlę, ale chcesz, aby się zamroziła, aktywuj tę opcję, a następnie wybierz żądane ustawienia.",
+		},
+		{
+			iso = "ko-KR",
+			text = "애니메이션 재생 방법을 사용자 지정할 수 있습니다.\n예: 애니메이션이 반복되도록 설정되어 있지만 정지하려면 이 기능을 활성화한 다음 원하는 설정을 선택합니다.",
 		},
 	},
-	DisableProps_tt = {
+	ANIM_PROPS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Choose whether to play animations with props or not. Check or Un-check this before playing the animation.",
@@ -8319,8 +9040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wybierz, czy chcesz odtwarzać animacje z rekwizytami, czy nie. Zaznacz lub odznacz to przed odtworzeniem animacji.",
 		},
+		{
+			iso = "ko-KR",
+			text = "소품과 함께 애니메이션을 재생할지 여부를 선택합니다. 애니메이션을 재생하기 전에 이것을 체크하거나 체크 해제합니다.",
+		},
 	},
-	["Allow Control"] = {
+	ANIM_CONTROL_CB_ = {
 		{
 			iso = "en-US",
 			text = "Allow Control",
@@ -8365,8 +9090,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zezwól na kontrolę",
 		},
+		{
+			iso = "ko-KR",
+			text = "제어 허용",
+		},
 	},
-	AllowControl_tt = {
+	ANIM_CONTROL_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Allows you to keep control of your character and/or vehicle. If paired with 'Upper Body Only', you can play animations and walk/run/drive around.",
@@ -8411,8 +9140,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pozwala zachować kontrolę nad postacią i/lub pojazdem. W połączeniu z 'Upper Body Only' możesz odtwarzać animacje i chodzić/biegać/jeździć.",
 		},
+		{
+			iso = "ko-KR",
+			text = "캐릭터 및/또는 차량을 제어할 수 있습니다. '상체 전용'과 페어링하면 애니메이션을 재생하고 걷거나 달리거나 운전할 수 있습니다.",
+		},
 	},
-	looped_tt = {
+	ANIM_LOOP_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Plays the animation forever until you manually stop it.",
@@ -8457,8 +9190,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Odtwarza animację w nieskończoność, dopóki nie zatrzymasz jej ręcznie.",
 		},
+		{
+			iso = "ko-KR",
+			text = "수동으로 중지할 때까지 애니메이션을 계속 재생합니다.",
+		},
 	},
-	["Upper Body Only"] = {
+	ANIM_UPPER_CB_ = {
 		{
 			iso = "en-US",
 			text = "Upper Body Only",
@@ -8503,8 +9240,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Tylko górna część ciała",
 		},
+		{
+			iso = "ko-KR",
+			text = "상체만",
+		},
 	},
-	UpperBodyOnly_tt = {
+	ANIM_UPPER_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Only plays the animation on your character's upperbody (from the waist up).",
@@ -8549,8 +9290,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Odtwarza tylko animację górnej części ciała Twojej postaci (od pasa w górę).",
 		},
+		{
+			iso = "ko-KR",
+			text = "캐릭터의 상체(허리 위)에만 애니메이션을 재생합니다.",
+		},
 	},
-	Freeze = {
+	ANIM_FREEZE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Freeze",
@@ -8595,8 +9340,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zamrażać",
 		},
+		{
+			iso = "ko-KR",
+			text = "꼭 매달리게 하다",
+		},
 	},
-	Freeze_tt = {
+	ANIM_FREEZE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Freezes the animation at the very last frame. Useful for ragdoll/sleeping/dead animations.",
@@ -8641,8 +9390,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zamraża animację na ostatniej klatce. Przydatne w animacjach ragdoll/sleeping/dead.",
 		},
+		{
+			iso = "ko-KR",
+			text = "애니메이션을 맨 마지막 프레임에서 정지시킵니다. 래그돌/잠자는/죽은 애니메이션에 유용합니다.",
+		},
 	},
-	koe_cb = {
+	ANIM_KOE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Kill At The End",
@@ -8687,8 +9440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zabij na końcu",
 		},
+		{
+			iso = "ko-KR",
+			text = "끝에서 죽여라",
+		},
 	},
-	koe_tt = {
+	ANIM_KOE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Kills the ped when the animation ends (Doesn't work with 'Loop').",
@@ -8733,8 +9490,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zabija pieszego po zakończeniu animacji (Nie działa z 'Loop').",
 		},
+		{
+			iso = "ko-KR",
+			text = "애니메이션이 끝나면 보행자를 죽입니다('루프'와 함께 작동하지 않습니다).",
+		},
 	},
-	nocoll_cb = {
+	ANIM_NO_COLL_CB_ = {
 		{
 			iso = "en-US",
 			text = "Disable Collision",
@@ -8779,8 +9540,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącz kolizję",
 		},
+		{
+			iso = "ko-KR",
+			text = "충돌 비활성화",
+		},
 	},
-	["You can not play animations while grabbing an NPC."] = {
+	ANIM_GRAB_ERROR_ = {
 		{
 			iso = "en-US",
 			text = "You can not play animations while grabbing an NPC.",
@@ -8825,8 +9590,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie można odtwarzać animacji podczas chwytania NPC.",
 		},
+		{
+			iso = "ko-KR",
+			text = "NPC를 잡는 동안에는 애니메이션을 재생할 수 없습니다.",
+		},
 	},
-	["You can not play scenarios while grabbing an NPC."] = {
+	SCN_GRAB_ERROR_ = {
 		{
 			iso = "en-US",
 			text = "You can not play scenarios while grabbing an NPC.",
@@ -8871,8 +9640,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie możesz rozgrywać scenariuszy, chwytając NPC.",
 		},
+		{
+			iso = "ko-KR",
+			text = "NPC를 잡는 동안에는 시나리오를 플레이할 수 없습니다.",
+		},
 	},
-	stopAnims_tt = {
+	ANIM_STOP_DESC_ = {
 		{
 			iso = "en-US",
 			text = "TIP: You can also stop Animations by pressing ___ on keyboard.",
@@ -8917,8 +9690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "WSKAZÓWKA: Animacje można również zatrzymać, naciskając ___ na klawiaturze.",
 		},
+		{
+			iso = "ko-KR",
+			text = "팁: 키보드의 ___를 눌러서 애니메이션을 중지할 수도 있습니다.",
+		},
 	},
-	stopScenarios_tt = {
+	SCN_STOP_DESC_ = {
 		{
 			iso = "en-US",
 			text = "TIP: You can also stop Scenarios by pressing ___ on keyboard.",
@@ -8963,8 +9740,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "WSKAZÓWKA: Scenariusze można również zatrzymać, naciskając ___ na klawiaturze.",
 		},
+		{
+			iso = "ko-KR",
+			text = "팁: 키보드의 ___을 눌러 시나리오를 중지할 수도 있습니다.",
+		},
 	},
-	scenarios_spinner = {
+	SCN_STOP_SPINNER_ = {
 		{
 			iso = "en-US",
 			text = "Stopping scenario...",
@@ -9009,8 +9790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Scenariusz zatrzymania...",
 		},
+		{
+			iso = "ko-KR",
+			text = "시나리오 중지 중...",
+		},
 	},
-	["Remove Attachments"] = {
+	ANIM_DETACH_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Drop Props",
@@ -9055,54 +9840,62 @@ Labels = {
 			iso = "pl-PL",
 			text = "Upuść rekwizyty",
 		},
+		{
+			iso = "ko-KR",
+			text = "드롭 프롭",
+		},
 	},
-	RemoveAttachments_tt = {
+	ANIM_DETACH_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Drops whatever is attached to you and stops the animation.\10This button could possibly remove attachments from other scripts or objects attached to you by other players.",
+			text = "Drops whatever is attached to you and stops the animation.\nThis button could possibly remove attachments from other scripts or objects attached to you by other players.",
 		},
 		{
 			iso = "de-DE",
-			text = "Lässt alles fallen, was an dir befestigt ist, und stoppt die Animation.\10Diese Schaltfläche kann eventuell Objekte entfernen, die von anderen Skripten oder anderen Spielern an Sie gebunden wurden.",
+			text = "Lässt alles fallen, was an dir befestigt ist, und stoppt die Animation.\nDiese Schaltfläche kann eventuell Objekte entfernen, die von anderen Skripten oder anderen Spielern an Sie gebunden wurden.",
 		},
 		{
 			iso = "fr-FR",
-			text = "Fait tomber ce qui est attaché à vous et arrête l'animation.\10Ce bouton peut éventuellement supprimer les objets attachés à vous par d'autres scripts ou par d'autres joueurs.",
+			text = "Fait tomber ce qui est attaché à vous et arrête l'animation.\nCe bouton peut éventuellement supprimer les objets attachés à vous par d'autres scripts ou par d'autres joueurs.",
 		},
 		{
 			iso = "it-IT",
-			text = "Fa cadere tutto ciò che è attaccato a voi e interrompe l'animazione.\10Questo pulsante può eliminare gli oggetti attaccati all'utente da altri script o da altri giocatori.",
+			text = "Fa cadere tutto ciò che è attaccato a voi e interrompe l'animazione.\nQuesto pulsante può eliminare gli oggetti attaccati all'utente da altri script o da altri giocatori.",
 		},
 		{
 			iso = "pt-BR",
-			text = "Solta o que estiver preso a você e interrompe a animação.\10Esse botão pode excluir objetos presos a você por outros scripts ou por outros jogadores.",
+			text = "Solta o que estiver preso a você e interrompe a animação.\nEsse botão pode excluir objetos presos a você por outros scripts ou por outros jogadores.",
 		},
 		{
 			iso = "ru-RU",
-			text = "Сбрасывает все, что к вам прикреплено, и останавливает анимацию.\10Эта кнопка может удалить прикрепления из других скриптов или объекты, прикрепленные к вам другими игроками.",
+			text = "Сбрасывает все, что к вам прикреплено, и останавливает анимацию.\nЭта кнопка может удалить прикрепления из других скриптов или объекты, прикрепленные к вам другими игроками.",
 		},
 		{
 			iso = "es-ES",
-			text = "Elimina todo lo que esté adjunto a ti y detiene la animación.\10Este botón podría eliminar archivos adjuntos de otros scripts u objetos adjuntos a ti por otros jugadores.",
+			text = "Elimina todo lo que esté adjunto a ti y detiene la animación.\nEste botón podría eliminar archivos adjuntos de otros scripts u objetos adjuntos a ti por otros jugadores.",
 		},
 		{
 			iso = "zh-CN",
-			text = "放下附着在您身上的任何东西并停止动画。\10此按钮可能会删除其他脚本的附件或其他玩家附着在您身上的对象。",
+			text = "放下附着在您身上的任何东西并停止动画。\n此按钮可能会删除其他脚本的附件或其他玩家附着在您身上的对象。",
 		},
 		{
 			iso = "zh-TW",
-			text = "刪除附加到您身上的任何內容並停止動畫。 \10此按鈕可能會刪除其他腳本中的附件或其他玩家附加到您身上的物件。",
+			text = "刪除附加到您身上的任何內容並停止動畫。 \n此按鈕可能會刪除其他腳本中的附件或其他玩家附加到您身上的物件。",
 		},
 		{
 			iso = "ja-JP",
-			text = "自分に添付されているものをすべて削除し、アニメーションを停止します。\10このボタンは、他のスクリプトからの添付物や、他のプレイヤーによって自分に添付されたオブジェクトを削除する可能性があります。",
+			text = "自分に添付されているものをすべて削除し、アニメーションを停止します。\nこのボタンは、他のスクリプトからの添付物や、他のプレイヤーによって自分に添付されたオブジェクトを削除する可能性があります。",
 		},
 		{
 			iso = "pl-PL",
-			text = "Usuwa wszystko, co jest do Ciebie dołączone i zatrzymuje animację.\10Ten przycisk może usuwać załączniki z innych skryptów lub obiekty dołączone do Ciebie przez innych graczy.",
+			text = "Usuwa wszystko, co jest do Ciebie dołączone i zatrzymuje animację.\nTen przycisk może usuwać załączniki z innych skryptów lub obiekty dołączone do Ciebie przez innych graczy.",
+		},
+		{
+			iso = "ko-KR",
+			text = "당신에게 부착된 모든 것을 제거하고 애니메이션을 멈춥니다.\n이 버튼을 누르면 다른 플레이어가 당신에게 부착한 다른 스크립트나 객체의 부착물이 제거될 수도 있습니다.",
 		},
 	},
-	["Movement Options:"] = {
+	MVMT_OPTIONS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Movement Options:",
@@ -9147,8 +9940,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Opcje ruchu:",
 		},
+		{
+			iso = "ko-KR",
+			text = "이동 옵션:",
+		},
 	},
-	["Play Animations On NPCs:"] = {
+	NPC_ANIMS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Play Animations On NPCs:",
@@ -9193,8 +9990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Odtwórz animacje dla NPC:",
 		},
+		{
+			iso = "ko-KR",
+			text = "NPC에서 애니메이션 재생:",
+		},
 	},
-	["Play Scenarios On NPCs:"] = {
+	NPC_SCENARIOS_ = {
 		{
 			iso = "en-US",
 			text = "Play Scenarios On NPCs:",
@@ -9239,8 +10040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Odtwórz animacje dla NPC:",
 		},
+		{
+			iso = "ko-KR",
+			text = "NPC에서 시나리오 플레이:",
+		},
 	},
-	["Spawn NPCs in God Mode."] = {
+	NPC_GODMODE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Spawn NPCs in God Mode.",
@@ -9285,8 +10090,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Przywołuje postacie niezależne w trybie Boga.",
 		},
+		{
+			iso = "ko-KR",
+			text = "신 모드에서 NPC를 생성합니다.",
+		},
 	},
-	animKeys_tt = {
+	ANIM_HOTKEYS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Use experimental hotkeys to play animations. These hotkeys may interfere with gameplay, hence why there is an option to disable them.p.",
@@ -9331,39 +10140,43 @@ Labels = {
 			iso = "pl-PL",
 			text = "Użyj eksperymentalnych klawiszy skrótu, aby odtwarzać animacje. Te klawisze skrótu mogą zakłócać rozgrywkę, stąd istnieje opcja ich wyłączenia.p.",
 		},
+		{
+			iso = "ko-KR",
+			text = "실험적 단축키를 사용하여 애니메이션을 재생합니다. 이러한 단축키는 게임 플레이를 방해할 수 있으므로 비활성화하는 옵션이 있습니다.p.",
+		},
 	},
-	clumsy_tt = {
+	CLUMSY_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Makes You trip and fall when you collide with any object.\10(Doesn't work with 'Ragdoll On Demand')",
+			text = "Makes You trip and fall when you collide with any object.\n(Doesn't work with 'Ragdoll On Demand')",
 		},
 		{
 			iso = "de-DE",
-			text = "Lässt dich stolpern und fallen, wenn du mit irgendeinem Objekt zusammenstößt.\10(Funktioniert nicht mit 'Ragdoll On Demand')",
+			text = "Lässt dich stolpern und fallen, wenn du mit irgendeinem Objekt zusammenstößt.\n(Funktioniert nicht mit 'Ragdoll On Demand')",
 		},
 		{
 			iso = "fr-FR",
-			text = "Vous fait trébucher et tomber lorsque vous entrez en collision avec n'importe quel objet.\10(Ne fonctionne pas avec 'Ragdoll On Demand')",
+			text = "Vous fait trébucher et tomber lorsque vous entrez en collision avec n'importe quel objet.\n(Ne fonctionne pas avec 'Ragdoll On Demand')",
 		},
 		{
 			iso = "it-IT",
-			text = "Ti fa inciampare e cadere quando ti scontri con qualsiasi oggetto.\10(Non funziona con 'Ragdoll On Demand')",
+			text = "Ti fa inciampare e cadere quando ti scontri con qualsiasi oggetto.\n(Non funziona con 'Ragdoll On Demand')",
 		},
 		{
 			iso = "pt-BR",
-			text = "Faz com que você tropece e caia ao colidir com qualquer objeto.\10(Não funciona com 'Ragdoll On Demand')",
+			text = "Faz com que você tropece e caia ao colidir com qualquer objeto.\n(Não funciona com 'Ragdoll On Demand')",
 		},
 		{
 			iso = "ru-RU",
-			text = "Заставляет вас спотыкаться и падать при столкновении с любым объектом.\10(Не работает с 'Ragdoll On Demand')",
+			text = "Заставляет вас спотыкаться и падать при столкновении с любым объектом.\n(Не работает с 'Ragdoll On Demand')",
 		},
 		{
 			iso = "es-ES",
-			text = "Te hace tropezar y caer cuando chocas con cualquier objeto.\10(No funciona con 'Ragdoll On Demand')",
+			text = "Te hace tropezar y caer cuando chocas con cualquier objeto.\n(No funciona con 'Ragdoll On Demand')",
 		},
 		{
 			iso = "zh-CN",
-			text = "与任何物体相撞时都会让你绊倒。\10（不适用于‘Ragdoll On Demand’）",
+			text = "与任何物体相撞时都会让你绊倒。\n（不适用于‘Ragdoll On Demand’）",
 		},
 		{
 			iso = "zh-TW",
@@ -9371,45 +10184,49 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "何かの物体に衝突すると、つまずいて転倒します。\10(「Ragdoll On Demand」では機能しません)",
+			text = "何かの物体に衝突すると、つまずいて転倒します。\n(「Ragdoll On Demand」では機能しません)",
 		},
 		{
 			iso = "pl-PL",
-			text = "Sprawia, że ​​potykasz się i upadasz, gdy zderzysz się z jakimś przedmiotem.\10(Nie działa z „Ragdoll On Demand”)",
+			text = "Sprawia, że ​​potykasz się i upadasz, gdy zderzysz się z jakimś przedmiotem.\n(Nie działa z „Ragdoll On Demand”)",
+		},
+		{
+			iso = "ko-KR",
+			text = "물체에 부딪히면 넘어지고 발이 묶이게 됩니다.\n(Ragdoll On Demand에서는 작동하지 않습니다)",
 		},
 	},
-	rod_tt = {
+	ROD_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Press ___ On Keyboard or --- On Controller To Instantly Ragdoll. The Longer You Hold The Button, The Longer You Stay On The Ground.\10(Doesn't work with 'Clumsy')",
+			text = "Press ___ On Keyboard or --- On Controller To Instantly Ragdoll. The Longer You Hold The Button, The Longer You Stay On The Ground.\n(Doesn't work with 'Clumsy')",
 		},
 		{
 			iso = "de-DE",
-			text = "Drücken Sie ___ auf der Tastatur oder --- auf dem Controller, um sofort Ragdoll zu spielen. Je länger du die Taste gedrückt hältst, desto länger bleibst du auf dem Boden.\10(Funktioniert nicht mit 'Clumsy')",
+			text = "Drücken Sie ___ auf der Tastatur oder --- auf dem Controller, um sofort Ragdoll zu spielen. Je länger du die Taste gedrückt hältst, desto länger bleibst du auf dem Boden.\n(Funktioniert nicht mit 'Clumsy')",
 		},
 		{
 			iso = "fr-FR",
-			text = "Appuyez sur ___ sur le clavier ou sur --- sur la manette pour ragdoller instantanément. Plus vous maintenez le bouton enfoncé, plus vous restez au sol.\10(Ne fonctionne pas avec 'Clumsy')",
+			text = "Appuyez sur ___ sur le clavier ou sur --- sur la manette pour ragdoller instantanément. Plus vous maintenez le bouton enfoncé, plus vous restez au sol.\n(Ne fonctionne pas avec 'Clumsy')",
 		},
 		{
 			iso = "it-IT",
-			text = "Premi ___ sulla tastiera o --- sul controller per fare immediatamente Ragdoll. Più a lungo tieni premuto il pulsante, più a lungo rimani a terra.\10(Non funziona con 'Maldestro')",
+			text = "Premi ___ sulla tastiera o --- sul controller per fare immediatamente Ragdoll. Più a lungo tieni premuto il pulsante, più a lungo rimani a terra.\n(Non funziona con 'Maldestro')",
 		},
 		{
 			iso = "pt-BR",
-			text = "Pressione ___ no teclado ou --- no controle para fazer Ragdoll instantaneamente. Quanto mais tempo você segurar o botão, mais tempo ficará no chão.\10(Não funciona com 'Clumsy')",
+			text = "Pressione ___ no teclado ou --- no controle para fazer Ragdoll instantaneamente. Quanto mais tempo você segurar o botão, mais tempo ficará no chão.\n(Não funciona com 'Clumsy')",
 		},
 		{
 			iso = "ru-RU",
-			text = "Нажмите ___ на клавиатуре или --- на контроллере, чтобы мгновенно превратиться в Ragdoll. Чем дольше вы держите кнопку, тем дольше вы остаетесь на земле.\10 (Не работает с «Неуклюжим»)",
+			text = "Нажмите ___ на клавиатуре или --- на контроллере, чтобы мгновенно превратиться в Ragdoll. Чем дольше вы держите кнопку, тем дольше вы остаетесь на земле.\n (Не работает с «Неуклюжим»)",
 		},
 		{
 			iso = "es-ES",
-			text = "Presiona ___ en el teclado o --- en el control para convertirte en un muñeco de trapo al instante. Cuanto más mantengas presionado el botón, más tiempo permanecerás en el suelo.\10(No funciona con 'Clumsy')",
+			text = "Presiona ___ en el teclado o --- en el control para convertirte en un muñeco de trapo al instante. Cuanto más mantengas presionado el botón, más tiempo permanecerás en el suelo.\n(No funciona con 'Clumsy')",
 		},
 		{
 			iso = "zh-CN",
-			text = "按键盘上的 ___ 或控制器上的 --- 即可立即进行布娃娃动作。按住按钮的时间越长，您在地面上停留的时间就越长。\10（不适用于“笨拙”）",
+			text = "按键盘上的 ___ 或控制器上的 --- 即可立即进行布娃娃动作。按住按钮的时间越长，您在地面上停留的时间就越长。\n（不适用于“笨拙”）",
 		},
 		{
 			iso = "zh-TW",
@@ -9417,14 +10234,18 @@ Labels = {
 		},
 		{
 			iso = "ja-JP",
-			text = "キーボードの ___ またはコントローラーの --- を押すと、即座にラグドールになります。ボタンを長く押し続けるほど、地面に長く留まります。\10(「Clumsy」では機能しません)",
+			text = "キーボードの ___ またはコントローラーの --- を押すと、即座にラグドールになります。ボタンを長く押し続けるほど、地面に長く留まります。\n(「Clumsy」では機能しません)",
 		},
 		{
 			iso = "pl-PL",
-			text = "Naciśnij ___ na klawiaturze lub --- na kontrolerze, aby natychmiast wykonać Ragdoll. Im dłużej przytrzymasz przycisk, tym dłużej pozostaniesz na ziemi.\10(Nie działa z 'Clumsy')",
+			text = "Naciśnij ___ na klawiaturze lub --- na kontrolerze, aby natychmiast wykonać Ragdoll. Im dłużej przytrzymasz przycisk, tym dłużej pozostaniesz na ziemi.\n(Nie działa z 'Clumsy')",
+		},
+		{
+			iso = "ko-KR",
+			text = "키보드에서 ___를 누르거나 컨트롤러에서 ---를 눌러 즉시 래그돌을 만듭니다. 버튼을 오래 누를수록 땅에 더 오래 머무릅니다.\n('Clumsy'에서는 작동하지 않음)",
 		},
 	},
-	radioStations_tt = {
+	RADIO_STATIONS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "This is not the same as 'Mobile Radio'. Everyone near you can hear the music, assuming you're not lagging and there are no radio sync issues caused by the game or the menu.",
@@ -9469,8 +10290,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "To nie to samo co „Mobile Radio”. Każdy w pobliżu może usłyszeć muzykę, zakładając, że nie masz opóźnień i nie ma problemów z synchronizacją radia spowodowanych przez grę lub menu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "이것은 '모바일 라디오'와 다릅니다. 게임이나 메뉴로 인해 지연이 없고 라디오 동기화 문제가 없다면, 주변의 모든 사람이 음악을 들을 수 있습니다.",
+		},
 	},
-	reserved_button = {
+	HOTKEY_RESERVED_ = {
 		{
 			iso = "en-US",
 			text = "The button you have chosen is reserved! Please choose a different one.",
@@ -9515,8 +10340,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wybrany przycisk jest zarezerwowany! Wybierz inny.",
 		},
+		{
+			iso = "ko-KR",
+			text = "선택한 버튼은 예약되어 있습니다! 다른 버튼을 선택해 주세요.",
+		},
 	},
-	animShortcut_btn = {
+	ANIM_HOTKEY_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Create Shortcut",
@@ -9561,8 +10390,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Utwórz skrót",
 		},
+		{
+			iso = "ko-KR",
+			text = "바로가기 만들기",
+		},
 	},
-	animShortcut_tt = {
+	ANIM_HOTKEY_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Keyboard & Mouse Only: Associate a button that will play the selected animation at any time.",
@@ -9607,8 +10440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Tylko klawiatura i mysz: Przypisz przycisk, który w dowolnym momencie odtworzy wybraną animację.",
 		},
+		{
+			iso = "ko-KR",
+			text = "키보드 및 마우스 전용: 언제든지 선택한 애니메이션을 재생할 버튼을 연결합니다.",
+		},
 	},
-	removeShortcut_btn = {
+	ANIM_HOTKEY_DEL_ = {
 		{
 			iso = "en-US",
 			text = "Remove Shortcut",
@@ -9653,8 +10490,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Usuń skrót",
 		},
+		{
+			iso = "ko-KR",
+			text = "바로가기 제거",
+		},
 	},
-	removeShortcut_btn2 = {
+	ANIM_HOTKEY_DEL2_ = {
 		{
 			iso = "en-US",
 			text = "Remove Animation Shortcut",
@@ -9699,8 +10540,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Usuń skrót animacji",
 		},
+		{
+			iso = "ko-KR",
+			text = "애니메이션 바로가기 제거",
+		},
 	},
-	removeShortcut_tt = {
+	DEL_HOTKEY_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Reset the shortcut button associated with this animation.",
@@ -9745,8 +10590,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zresetuj przycisk skrótu skojarzony z tą animacją.",
 		},
+		{
+			iso = "ko-KR",
+			text = "이 애니메이션과 관련된 바로가기 버튼을 재설정합니다.",
+		},
 	},
-	no_shortcut_tt = {
+	NO_HOTKEY_TXT_ = {
 		{
 			iso = "en-US",
 			text = "There is no button associated with an animation.",
@@ -9791,8 +10640,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Z animacją nie jest związany żaden przycisk.",
 		},
+		{
+			iso = "ko-KR",
+			text = "애니메이션과 연결된 버튼이 없습니다.",
+		},
 	},
-	input_waiting = {
+	INPUT_WAIT_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Press any key ",
@@ -9837,8 +10690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Naciśnij dowolny klawisz",
 		},
+		{
+			iso = "ko-KR",
+			text = "아무 키나 누르세요",
+		},
 	},
-	generic_confirm_btn = {
+	GENERIC_CONFIRM_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Confirm",
@@ -9883,8 +10740,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Potwierdzać",
 		},
+		{
+			iso = "ko-KR",
+			text = "확인하다",
+		},
 	},
-	generic_clear_btn = {
+	GENERIC_CLEAR_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Clear",
@@ -9929,8 +10790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Jasne",
 		},
+		{
+			iso = "ko-KR",
+			text = "분명한",
+		},
 	},
-	generic_cancel_btn = {
+	GENERIC_CANCEL_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Cancel",
@@ -9975,8 +10840,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Anulować",
 		},
+		{
+			iso = "ko-KR",
+			text = "취소",
+		},
 	},
-	["shortcut_success_1/2"] = {
+	HOTKEY_SUCCESS1_ = {
 		{
 			iso = "en-US",
 			text = "Animation shortcut has been successfully saved. You can now press ",
@@ -10021,8 +10890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Skrót animacji został pomyślnie zapisany. Teraz możesz nacisnąć",
 		},
+		{
+			iso = "ko-KR",
+			text = "애니메이션 바로가기가 성공적으로 저장되었습니다. 이제 누를 수 있습니다.",
+		},
 	},
-	["shortcut_success_2/2"] = {
+	HOTKEY_SUCCESS2_ = {
 		{
 			iso = "en-US",
 			text = " to play this animation at any time.",
@@ -10067,8 +10940,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "aby odtworzyć tę animację w dowolnym momencie.",
 		},
+		{
+			iso = "ko-KR",
+			text = "언제든지 이 애니메이션을 재생할 수 있습니다.",
+		},
 	},
-	kamikazeDrivers_tt = {
+	KAMIKAZE_DRIVERS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Turns all drivers near you into suicidal maniacs.",
@@ -10113,8 +10990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zmienia wszystkich kierowców w Twojej okolicy w maniaków-samobójców.",
 		},
+		{
+			iso = "ko-KR",
+			text = "주변의 모든 운전자를 자살광으로 만듭니다.",
+		},
 	},
-	Create = {
+	CREATE_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Create",
@@ -10159,54 +11040,62 @@ Labels = {
 			iso = "pl-PL",
 			text = "Tworzyć",
 		},
+		{
+			iso = "ko-KR",
+			text = "만들다",
+		},
 	},
-	vcreator_tt = {
+	CREATOR_DESC_ = {
 		{
 			iso = "en-US",
-			text = "Start by spawning a vehicle. The first one you spawn will always be the main vehicle that others will be attached to.\10Once you spawn more than one vehicle, other UI widgets will appear allowing you to manage all your spawned vehicles:\10 - Delete\10 - Attach\10 - Adjust attach position\10 - Save",
+			text = "Start by spawning a vehicle. The first one you spawn will always be the main vehicle that others will be attached to.\nOnce you spawn more than one vehicle, other UI widgets will appear allowing you to manage all your spawned vehicles:\n - Delete\n - Attach\n - Adjust attach position\n - Save",
 		},
 		{
 			iso = "de-DE",
-			text = "Beginnen Sie damit, ein Fahrzeug zu spawnen. Das erste, das Sie spawnen, wird immer das Hauptfahrzeug sein, an das die anderen angehängt werden.\10Wenn Sie mehr als ein Fahrzeug spawnen, erscheinen andere UI-Widgets, mit denen Sie alle Ihre gespawnten Fahrzeuge verwalten können:\10 - Löschen\10 - Anhängen\10 - Anhängeposition anpassen\10 - Speichern",
+			text = "Beginnen Sie damit, ein Fahrzeug zu spawnen. Das erste, das Sie spawnen, wird immer das Hauptfahrzeug sein, an das die anderen angehängt werden.\nWenn Sie mehr als ein Fahrzeug spawnen, erscheinen andere UI-Widgets, mit denen Sie alle Ihre gespawnten Fahrzeuge verwalten können:\n - Löschen\n - Anhängen\n - Anhängeposition anpassen\n - Speichern",
 		},
 		{
 			iso = "fr-FR",
-			text = "Commencez par créer un véhicule. Le premier que vous créez sera toujours le véhicule principal auquel les autres seront attachés.\10Lorsque vous créez plus d'un véhicule, d'autres widgets d'interface utilisateur apparaîtront pour vous permettre de gérer tous les véhicules créés:\10- Supprimer\10- Attacher\10- Ajuster la position de l'attache\10- Sauvegarder",
+			text = "Commencez par créer un véhicule. Le premier que vous créez sera toujours le véhicule principal auquel les autres seront attachés.\nLorsque vous créez plus d'un véhicule, d'autres widgets d'interface utilisateur apparaîtront pour vous permettre de gérer tous les véhicules créés:\n- Supprimer\n- Attacher\n- Ajuster la position de l'attache\n- Sauvegarder",
 		},
 		{
 			iso = "it-IT",
-			text = "Iniziare con la creazione di un veicolo. Il primo che viene generato sarà sempre il veicolo principale a cui verranno agganciati gli altri.\10Quando si genera più di un veicolo, appariranno altri widget dell'interfaccia utente che permetteranno di gestire tutti i veicoli generati:\10 - Elimina\10 - Attacca\10 - Regola la posizione di attacco\10 - Salva",
+			text = "Iniziare con la creazione di un veicolo. Il primo che viene generato sarà sempre il veicolo principale a cui verranno agganciati gli altri.\nQuando si genera più di un veicolo, appariranno altri widget dell'interfaccia utente che permetteranno di gestire tutti i veicoli generati:\n - Elimina\n - Attacca\n - Regola la posizione di attacco\n - Salva",
 		},
 		{
 			iso = "pt-BR",
-			text = "Comece gerando um veículo. O primeiro que você gerar será sempre o veículo principal ao qual os outros serão anexados.\10Quando você gerar mais de um veículo, outros widgets da interface do usuário aparecerão, permitindo que você gerencie todos os veículos gerados:\10 - Excluir\10 - Anexar\10 - Ajustar a posição de anexação\10 - Salvar",
+			text = "Comece gerando um veículo. O primeiro que você gerar será sempre o veículo principal ao qual os outros serão anexados.\nQuando você gerar mais de um veículo, outros widgets da interface do usuário aparecerão, permitindo que você gerencie todos os veículos gerados:\n - Excluir\n - Anexar\n - Ajustar a posição de anexação\n - Salvar",
 		},
 		{
 			iso = "ru-RU",
-			text = "Начните с порождения транспортного средства. Первая машина всегда будет основной, к которой будут прикрепляться остальные.\10Когда вы породите более одной машины, появятся другие виджеты пользовательского интерфейса, позволяющие управлять всеми порожденными машинами:\10 - Удалить\10 - Прикрепить\10 - Отрегулировать положение прикрепления\10 - Сохранить",
+			text = "Начните с порождения транспортного средства. Первая машина всегда будет основной, к которой будут прикрепляться остальные.\nКогда вы породите более одной машины, появятся другие виджеты пользовательского интерфейса, позволяющие управлять всеми порожденными машинами:\n - Удалить\n - Прикрепить\n - Отрегулировать положение прикрепления\n - Сохранить",
 		},
 		{
 			iso = "es-ES",
-			text = "Comienza generando un vehículo. El primero que generes siempre será el vehículo principal al que se unirán los demás.\10Una vez que generes más de un vehículo, aparecerán otros widgets de la interfaz de usuario que te permitirán administrar todos los vehículos generados:\10 - Eliminar\10 - Adjuntar\10 - Ajustar la posición de unión\10 - Guardar",
+			text = "Comienza generando un vehículo. El primero que generes siempre será el vehículo principal al que se unirán los demás.\nUna vez que generes más de un vehículo, aparecerán otros widgets de la interfaz de usuario que te permitirán administrar todos los vehículos generados:\n - Eliminar\n - Adjuntar\n - Ajustar la posición de unión\n - Guardar",
 		},
 		{
 			iso = "zh-CN",
-			text = "首先生成一辆车。您生成的第一辆车将始终是其他车辆将附着的主车辆。\10一旦您生成多辆车辆，将出现其他 UI 小部件，允许您管理所有生成的车辆：\10 - 删除\10 - 附着\10 - 调整附着位置\10 - 保存",
+			text = "首先生成一辆车。您生成的第一辆车将始终是其他车辆将附着的主车辆。\n一旦您生成多辆车辆，将出现其他 UI 小部件，允许您管理所有生成的车辆：\n - 删除\n - 附着\n - 调整附着位置\n - 保存",
 		},
 		{
 			iso = "zh-TW",
-			text = "首先生成車輛。您產生的第一個車輛將始終是其他車輛將附加到的主要車輛。 10 - 附加\\ 10 - 調整附加位置\10 - 儲存",
+			text = "首先生成車輛。您產生的第一個車輛將始終是其他車輛將附加到的主要車輛。 10 - 附加\\ 10 - 調整附加位置\n - 儲存",
 		},
 		{
 			iso = "ja-JP",
-			text = "まず車両をスポーンします。最初にスポーンした車両が常にメイン車両となり、他の車両がそれに取り付けられます。\10 複数の車両をスポーンすると、他の UI ウィジェットが表示され、スポーンしたすべての車両を管理できるようになります:\10 - 削除\10 - 取り付け\10 - 取り付け位置の調整\10 - 保存",
+			text = "まず車両をスポーンします。最初にスポーンした車両が常にメイン車両となり、他の車両がそれに取り付けられます。\n 複数の車両をスポーンすると、他の UI ウィジェットが表示され、スポーンしたすべての車両を管理できるようになります:\n - 削除\n - 取り付け\n - 取り付け位置の調整\n - 保存",
 		},
 		{
 			iso = "pl-PL",
-			text = "Zacznij od stworzenia pojazdu. Pierwszy, który stworzysz, zawsze będzie głównym pojazdem, do którego będą dołączane inne pojazdy.\10Gdy stworzysz więcej niż jeden pojazd, pojawią się inne widżety interfejsu użytkownika, które pozwolą Ci zarządzać wszystkimi stworzonymi pojazdami:\10 - Usuń\10 - Dołącz\10 - Dostosuj pozycję dołączania\10 - Zapisz",
+			text = "Zacznij od stworzenia pojazdu. Pierwszy, który stworzysz, zawsze będzie głównym pojazdem, do którego będą dołączane inne pojazdy.\nGdy stworzysz więcej niż jeden pojazd, pojawią się inne widżety interfejsu użytkownika, które pozwolą Ci zarządzać wszystkimi stworzonymi pojazdami:\n - Usuń\n - Dołącz\n - Dostosuj pozycję dołączania\n - Zapisz",
+		},
+		{
+			iso = "ko-KR",
+			text = "차량을 스폰하여 시작합니다. 스폰하는 첫 번째 차량은 항상 다른 차량이 부착되는 주요 차량이 됩니다.\n 차량을 두 대 이상 스폰하면 다른 UI 위젯이 나타나 스폰된 모든 차량을 관리할 수 있습니다.\n - 삭제\n - 부착\n - 부착 위치 조정\n - 저장",
 		},
 	},
-	vc_saved_vehs = {
+	SAVED_VEHS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Saved Vehicles",
@@ -10251,8 +11140,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zapisane pojazdy",
 		},
+		{
+			iso = "ko-KR",
+			text = "저장된 차량",
+		},
 	},
-	vc_saved_vehs_tt = {
+	SAVED_VEHS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "You do not have any saved vehicles. This option will be unlocked after you create and save a vehicle.",
@@ -10297,8 +11190,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie masz żadnych zapisanych pojazdów. Ta opcja zostanie odblokowana po utworzeniu i zapisaniu pojazdu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "저장된 차량이 없습니다. 차량을 생성하고 저장하면 이 옵션이 잠금 해제됩니다.",
+		},
 	},
-	widebodycivic_Btn = {
+	VC_DEMO_VEH_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Generate A 'Widebody Civic'",
@@ -10343,8 +11240,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wygeneruj „Szerokokadłubowego Civica”",
 		},
+		{
+			iso = "ko-KR",
+			text = "'와이드바디 시빅' 생성",
+		},
 	},
-	widebodycivic_tt = {
+	VC_DEMO_VEH_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Generates, spawns and saves a widebody Honda Civic (Sugoi) as a simple example of what the vehicle creator can do.",
@@ -10389,8 +11290,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Generuje, tworzy i zapisuje szerokokadłubowy samochód Honda Civic (Sugoi), co stanowi prosty przykład tego, co potrafi twórca pojazdu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량 제작자가 무엇을 할 수 있는지 보여주는 간단한 예로, 와이드바디 혼다 시빅(수고이)을 생성, 생성하고 저장합니다.",
+		},
 	},
-	vc_main_veh = {
+	VC_MAIN_VEH_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Main Vehicle: ",
@@ -10435,8 +11340,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Główny pojazd:",
 		},
+		{
+			iso = "ko-KR",
+			text = "주요 차량:",
+		},
 	},
-	vc_spawned_vehs = {
+	VC_SPAWNED_VEHS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Secondary Vehicles:",
@@ -10481,8 +11390,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pojazdy drugorzędne:",
 		},
+		{
+			iso = "ko-KR",
+			text = "2차 차량:",
+		},
 	},
-	vc_attach_btn = {
+	VC_ATTACH_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Attach To ",
@@ -10527,8 +11440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Dołącz do",
 		},
+		{
+			iso = "ko-KR",
+			text = "첨부하다",
+		},
 	},
-	generic_veh_delete_fail = {
+	GENERIC_VEH_DELETE_ERROR_ = {
 		{
 			iso = "en-US",
 			text = "Failed to delete the vehicle!",
@@ -10573,8 +11490,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie udało się usunąć pojazdu!",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량을 삭제하지 못했습니다!",
+		},
 	},
-	vc_alrattached_err = {
+	VC_ALREADY_ATTACHED_ = {
 		{
 			iso = "en-US",
 			text = "This vehicle is already attached.",
@@ -10619,8 +11540,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ten pojazd jest już dołączony.",
 		},
+		{
+			iso = "ko-KR",
+			text = "이 차량은 이미 연결되어 있습니다.",
+		},
 	},
-	vc_selfattach_err = {
+	VC_SELF_ATTACH_ERR_ = {
 		{
 			iso = "en-US",
 			text = "You cannot attach a vehicle to itself!",
@@ -10665,8 +11590,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie można przyczepić pojazdu do samego siebie!",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량을 자기 자신에 연결할 수 없습니다!",
+		},
 	},
-	generic_multiplier_label = {
+	GENERIC_MULTIPLIER_LABEL_ = {
 		{
 			iso = "en-US",
 			text = "Multiplier:",
@@ -10711,8 +11640,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Mnożnik:",
 		},
+		{
+			iso = "ko-KR",
+			text = "승수:",
+		},
 	},
-	vc_choose_name_hint = {
+	VC_NAME_HINT_ = {
 		{
 			iso = "en-US",
 			text = "Choose a name",
@@ -10757,8 +11690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wybierz nazwę",
 		},
+		{
+			iso = "ko-KR",
+			text = "이름을 선택하세요",
+		},
 	},
-	vc_same_name_err = {
+	VC_NAME_ERROR_ = {
 		{
 			iso = "en-US",
 			text = "You already have a vehicle with the same name!",
@@ -10803,8 +11740,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Masz już pojazd o tej samej nazwie!",
 		},
+		{
+			iso = "ko-KR",
+			text = "같은 이름의 차량이 이미 있습니다!",
+		},
 	},
-	vc_saved_msg = {
+	VC_SAVE_SUCCESS_ = {
 		{
 			iso = "en-US",
 			text = "Your vehicle has been saved.",
@@ -10849,8 +11790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Twój pojazd został zapisany.",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량이 저장되었습니다.",
+		},
 	},
-	vc_save_err = {
+	VC_SAVE_ERROR_ = {
 		{
 			iso = "en-US",
 			text = "Please choose a name for your vehicle!",
@@ -10895,8 +11840,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Proszę wybrać nazwę dla swojego pojazdu!",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량 이름을 선택해 주세요!",
+		},
 	},
-	vc_spawn_persist = {
+	VC_SPAWN_PERSISTENT_ = {
 		{
 			iso = "en-US",
 			text = "Spawn Persistent",
@@ -10941,8 +11890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Generuj trwałe",
 		},
+		{
+			iso = "ko-KR",
+			text = "지속적인 스폰",
+		},
 	},
-	vc_delete_persist = {
+	VC_DELETE_PERSISTENT_ = {
 		{
 			iso = "en-US",
 			text = "Remove From The List",
@@ -10987,8 +11940,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Usuń z listy",
 		},
+		{
+			iso = "ko-KR",
+			text = "목록에서 제거",
+		},
 	},
-	vc_delete_msg = {
+	VC_DELETE_NOTIF_ = {
 		{
 			iso = "en-US",
 			text = "Your saved vehicle has been deleted.",
@@ -11033,8 +11990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Twój zapisany pojazd został usunięty.",
 		},
+		{
+			iso = "ko-KR",
+			text = "저장된 차량이 삭제되었습니다.",
+		},
 	},
-	ceo_whouses_title = {
+	CEO_WHOUSES_TXT_ = {
 		{
 			iso = "en-US",
 			text = "CEO Warehouses",
@@ -11079,8 +12040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Magazyny CEO",
 		},
+		{
+			iso = "ko-KR",
+			text = "CEO 창고",
+		},
 	},
-	ceo_whouses_txt = {
+	CEO_WHOUSES_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Select the warehouses you own:",
@@ -11125,8 +12090,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wybierz magazyny, które posiadasz:",
 		},
+		{
+			iso = "ko-KR",
+			text = "귀하가 소유한 창고를 선택하세요:",
+		},
 	},
-	Warehouse = {
+	CEO_WAREHOUSE_ = {
 		{
 			iso = "en-US",
 			text = "Warehouse",
@@ -11171,8 +12140,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Magazyn",
 		},
+		{
+			iso = "ko-KR",
+			text = "창고",
+		},
 	},
-	random_crates = {
+	CEO_RANDOM_CRATES_ = {
 		{
 			iso = "en-US",
 			text = "Source Random Crate(s)",
@@ -11217,8 +12190,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Źródło Losowa skrzynia(y)",
 		},
+		{
+			iso = "ko-KR",
+			text = "소스 랜덤 상자(들)",
+		},
 	},
-	quick_tp = {
+	QUICK_TP_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Quick Teleport",
@@ -11263,8 +12240,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Szybka teleportacja",
 		},
+		{
+			iso = "ko-KR",
+			text = "빠른 순간이동",
+		},
 	},
-	hangar_title = {
+	HANGAR_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Hangar",
@@ -11309,100 +12290,112 @@ Labels = {
 			iso = "pl-PL",
 			text = "Hangar",
 		},
+		{
+			iso = "ko-KR",
+			text = "격납고",
+		},
 	},
-	tp_warn = {
+	QUICK_TP_WARN_ = {
 		{
 			iso = "en-US",
-			text = "[ ! ] WARNING\10\10This works for solo players. It may teleport you to a different location if you are in a public session.",
+			text = "[ ! ] WARNING\n\nThis works for solo players. It may teleport you to a different location if you are in a public session.",
 		},
 		{
 			iso = "de-DE",
-			text = "[ ! ] WARNUNG\10\10Dies funktioniert für Einzelspieler. Es kann Sie an einen anderen Ort teleportieren, wenn Sie sich in einer öffentlichen Sitzung befinden.",
+			text = "[ ! ] WARNUNG\n\nDies funktioniert für Einzelspieler. Es kann Sie an einen anderen Ort teleportieren, wenn Sie sich in einer öffentlichen Sitzung befinden.",
 		},
 		{
 			iso = "fr-FR",
-			text = "[ ! ] ATTENTION\10\10Cela fonctionne pour les joueurs solitaires. Il se peut que vous soyez téléporté à un autre endroit si vous participez à une session publique.",
+			text = "[ ! ] ATTENTION\n\nCela fonctionne pour les joueurs solitaires. Il se peut que vous soyez téléporté à un autre endroit si vous participez à une session publique.",
 		},
 		{
 			iso = "it-IT",
-			text = "[ ! ] AVVISO\10\10Funziona per i giocatori solitari. Potrebbe teletrasportarvi in una posizione diversa se siete in una sessione pubblica.",
+			text = "[ ! ] AVVISO\n\nFunziona per i giocatori solitari. Potrebbe teletrasportarvi in una posizione diversa se siete in una sessione pubblica.",
 		},
 		{
 			iso = "pt-BR",
-			text = "[ ! ] AVISO\10\10Isso funciona para jogadores individuais. Ele pode teletransportá-lo para um local diferente se você estiver em uma sessão pública.",
+			text = "[ ! ] AVISO\n\nIsso funciona para jogadores individuais. Ele pode teletransportá-lo para um local diferente se você estiver em uma sessão pública.",
 		},
 		{
 			iso = "ru-RU",
-			text = "[ ! ] ПРЕДУПРЕЖДЕНИЕ\10\10Это работает для одиночных игроков. Он может телепортировать вас в другое место, если вы находитесь в публичной сессии.",
+			text = "[ ! ] ПРЕДУПРЕЖДЕНИЕ\n\nЭто работает для одиночных игроков. Он может телепортировать вас в другое место, если вы находитесь в публичной сессии.",
 		},
 		{
 			iso = "es-ES",
-			text = "[ ! ] ADVERTENCIA\10\10Esto funciona para jugadores individuales. Puede teletransportarte a una ubicación diferente si estás en una sesión pública.",
+			text = "[ ! ] ADVERTENCIA\n\nEsto funciona para jugadores individuales. Puede teletransportarte a una ubicación diferente si estás en una sesión pública.",
 		},
 		{
 			iso = "zh-CN",
-			text = "[ ! ] 警告\10\10这适用于单人玩家。如果您处于公开会话中，它可能会将您传送到其他位置。",
+			text = "[ ! ] 警告\n\n这适用于单人玩家。如果您处于公开会话中，它可能会将您传送到其他位置。",
 		},
 		{
 			iso = "zh-TW",
-			text = "[！ ] 警告\10\10這適用於單人玩家。如果您在公共會話中，它可能會將您傳送到不同的位置。",
+			text = "[！ ] 警告\n\n這適用於單人玩家。如果您在公共會話中，它可能會將您傳送到不同的位置。",
 		},
 		{
 			iso = "ja-JP",
-			text = "[ ! ] 警告\10\10これはソロ プレイヤーに有効です。パブリック セッションの場合は、別の場所にテレポートする可能性があります。",
+			text = "[ ! ] 警告\n\nこれはソロ プレイヤーに有効です。パブリック セッションの場合は、別の場所にテレポートする可能性があります。",
 		},
 		{
 			iso = "pl-PL",
-			text = "[ ! ] WARNING\10\10Działa to na graczy solo. Może cię teleportować do innej lokalizacji, jeśli jesteś w sesji publicznej.",
+			text = "[ ! ] WARNING\n\nDziała to na graczy solo. Może cię teleportować do innej lokalizacji, jeśli jesteś w sesji publicznej.",
+		},
+		{
+			iso = "ko-KR",
+			text = "[ ! ] 경고\n\n이것은 솔로 플레이어에게 유효합니다. 공개 세션에 있는 경우 다른 위치로 순간이동할 수 있습니다.",
 		},
 	},
-	tp_warn_2 = {
+	QUICK_TP_WARN2_ = {
 		{
 			iso = "en-US",
-			text = "[ ! ] WARNING\10\10Teleport buttons might be broken in public sessions.",
+			text = "[ ! ] WARNING\n\nTeleport buttons might be broken in public sessions.",
 		},
 		{
 			iso = "de-DE",
-			text = "[ ! ] WARNUNG\10\10Teleport-Schaltflächen können in öffentlichen Sitzungen defekt sein.",
+			text = "[ ! ] WARNUNG\n\nTeleport-Schaltflächen können in öffentlichen Sitzungen defekt sein.",
 		},
 		{
 			iso = "fr-FR",
-			text = "[ ! ] ATTENTION\10\10Les boutons de téléportation risquent de ne plus fonctionner lors des sessions publiques.",
+			text = "[ ! ] ATTENTION\n\nLes boutons de téléportation risquent de ne plus fonctionner lors des sessions publiques.",
 		},
 		{
 			iso = "it-IT",
-			text = "[ ! ] AVVISO\10\10I pulsanti per il teletrasporto potrebbero essere interrotti nelle sessioni pubbliche.",
+			text = "[ ! ] AVVISO\n\nI pulsanti per il teletrasporto potrebbero essere interrotti nelle sessioni pubbliche.",
 		},
 		{
 			iso = "pt-BR",
-			text = "[ ! ] AVISO\10\10Os botões de teletransporte podem estar quebrados em sessões públicas.",
+			text = "[ ! ] AVISO\n\nOs botões de teletransporte podem estar quebrados em sessões públicas.",
 		},
 		{
 			iso = "ru-RU",
-			text = "[ ! ] ПРЕДУПРЕЖДЕНИЕ\10\10Кнопки телепортации могут быть сломаны в публичных сессиях.",
+			text = "[ ! ] ПРЕДУПРЕЖДЕНИЕ\n\nКнопки телепортации могут быть сломаны в публичных сессиях.",
 		},
 		{
 			iso = "es-ES",
-			text = "[ ! ] ADVERTENCIA\10\10Los botones de teletransporte podrían no funcionar en sesiones públicas.",
+			text = "[ ! ] ADVERTENCIA\n\nLos botones de teletransporte podrían no funcionar en sesiones públicas.",
 		},
 		{
 			iso = "zh-CN",
-			text = "[ ！] 警告\10\10传送按钮在公共会话中可能会损坏。",
+			text = "[ ！] 警告\n\n传送按钮在公共会话中可能会损坏。",
 		},
 		{
 			iso = "zh-TW",
-			text = "[！ ] 警告\10\10傳送按鈕在公共會話中可能會損壞。",
+			text = "[！ ] 警告\n\n傳送按鈕在公共會話中可能會損壞。",
 		},
 		{
 			iso = "ja-JP",
-			text = "[ ! ] 警告\10\10パブリック セッションではテレポート ボタンが壊れる可能性があります。",
+			text = "[ ! ] 警告\n\nパブリック セッションではテレポート ボタンが壊れる可能性があります。",
 		},
 		{
 			iso = "pl-PL",
-			text = "[ ! ] OSTRZEŻENIE\10\10Przyciski teleportacji mogą być uszkodzone w sesjach publicznych.",
+			text = "[ ! ] OSTRZEŻENIE\n\nPrzyciski teleportacji mogą być uszkodzone w sesjach publicznych.",
+		},
+		{
+			iso = "ko-KR",
+			text = "[ ! ] 경고\n\n공개 세션에서는 순간이동 버튼이 손상될 수 있습니다.",
 		},
 	},
-	Gambling = {
+	CP_GAMBLING_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Casino Games",
@@ -11447,8 +12440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Gry kasynowe",
 		},
+		{
+			iso = "ko-KR",
+			text = "카지노 게임",
+		},
 	},
-	bypassCasinoCooldownCB = {
+	CP_BYPASSCD_CP_ = {
 		{
 			iso = "en-US",
 			text = "Bypass Casino Cooldown",
@@ -11493,54 +12490,62 @@ Labels = {
 			iso = "pl-PL",
 			text = "Omiń czas odnowienia kasyna",
 		},
+		{
+			iso = "ko-KR",
+			text = "카지노 쿨다운 우회",
+		},
 	},
-	casinoCDwarn = {
+	CP_BYPASSCD_WARN_ = {
 		{
 			iso = "en-US",
-			text = "WARINIG!\10\10Winning too much too quickly might get you banned. Enable this at your own risk.",
+			text = "WARINIG!\n\nWinning too much too quickly might get you banned. Enable this at your own risk.",
 		},
 		{
 			iso = "de-DE",
-			text = "ACHTUNG\10\10Wenn Sie zu schnell zu viel gewinnen, können Sie gesperrt werden. Aktivieren Sie dies auf eigenes Risiko.",
+			text = "ACHTUNG\n\nWenn Sie zu schnell zu viel gewinnen, können Sie gesperrt werden. Aktivieren Sie dies auf eigenes Risiko.",
 		},
 		{
 			iso = "fr-FR",
-			text = "ATTENTION!\10\10Si vous gagnez trop et trop vite, vous risquez d'être banni. Activez cette option à vos risques et périls.",
+			text = "ATTENTION!\n\nSi vous gagnez trop et trop vite, vous risquez d'être banni. Activez cette option à vos risques et périls.",
 		},
 		{
 			iso = "it-IT",
-			text = "ATTENZIONE!\10\10Vincere troppo e troppo in fretta potrebbe farvi bannare. Quindi attivatevi a vostro rischio e pericolo.",
+			text = "ATTENZIONE!\n\nVincere troppo e troppo in fretta potrebbe farvi bannare. Quindi attivatevi a vostro rischio e pericolo.",
 		},
 		{
 			iso = "pt-BR",
-			text = "ATENÇÃO!\10\10Ganhar muito rapidamente pode fazer com que você seja banido. Ative isso por sua própria conta e risco.",
+			text = "ATENÇÃO!\n\nGanhar muito rapidamente pode fazer com que você seja banido. Ative isso por sua própria conta e risco.",
 		},
 		{
 			iso = "ru-RU",
-			text = "ВНИМАНИЕ!\10\10Обильные и частые выигрыши могут привести к бану. Включайте на свой страх и риск.",
+			text = "ВНИМАНИЕ!\n\nОбильные и частые выигрыши могут привести к бану. Включайте на свой страх и риск.",
 		},
 		{
 			iso = "es-ES",
-			text = "¡ATENCIÓN!\10\10Si ganas demasiado y demasiado rápido, podrías ser baneado. Activa esta opción bajo tu propio riesgo.",
+			text = "¡ATENCIÓN!\n\nSi ganas demasiado y demasiado rápido, podrías ser baneado. Activa esta opción bajo tu propio riesgo.",
 		},
 		{
 			iso = "zh-CN",
-			text = "警告！\10\10获胜次数过多或过快可能会导致您被禁赛。启用此功能风险自负。",
+			text = "警告！\n\n获胜次数过多或过快可能会导致您被禁赛。启用此功能风险自负。",
 		},
 		{
 			iso = "zh-TW",
-			text = "警告！ \10\10贏得太多太快可能會讓你被禁止。啟用此功能需要您自擔風險。",
+			text = "警告！ \n\n贏得太多太快可能會讓你被禁止。啟用此功能需要您自擔風險。",
 		},
 		{
 			iso = "ja-JP",
-			text = "警告!\10\10あまりにも早く勝ちすぎると、禁止される可能性があります。自己責任でこれを有効にしてください。",
+			text = "警告!\n\nあまりにも早く勝ちすぎると、禁止される可能性があります。自己責任でこれを有効にしてください。",
 		},
 		{
 			iso = "pl-PL",
-			text = "UWAGA!\10\10Zbyt szybkie wygranie może skutkować banem. Włącz to na własne ryzyko.",
+			text = "UWAGA!\n\nZbyt szybkie wygranie może skutkować banem. Włącz to na własne ryzyko.",
+		},
+		{
+			iso = "ko-KR",
+			text = "WARINIG!\n\n너무 빨리 너무 많이 이기면 금지될 수 있습니다. 본인의 책임 하에 이것을 활성화하세요.",
 		},
 	},
-	casinoCDstatus = {
+	CP_COOLDOWN_STATUS_ = {
 		{
 			iso = "en-US",
 			text = "Casino Cooldown Status:",
@@ -11585,8 +12590,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Status odnowienia kasyna:",
 		},
+		{
+			iso = "ko-KR",
+			text = "카지노 쿨다운 상태:",
+		},
 	},
-	forcePokerCardsCB = {
+	CP_FORCE_POKER_RF_CB_ = {
 		{
 			iso = "en-US",
 			text = "Force all Players Hands to Royal Flush",
@@ -11631,8 +12640,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zmuś wszystkich graczy do gry w pokera królewskiego",
 		},
+		{
+			iso = "ko-KR",
+			text = "모든 플레이어의 핸드를 로얄 플러시로 강제 설정",
+		},
 	},
-	setDealersCardsCB = {
+	CP_FORCE_BADBEAT_CB_ = {
 		{
 			iso = "en-US",
 			text = "Force Dealer's Hand to 'Bad Beat'",
@@ -11677,8 +12690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zmuszenie krupiera do „złego wyniku”",
 		},
+		{
+			iso = "ko-KR",
+			text = "딜러의 핸드를 '배드 비트'로 강제로 전환",
+		},
 	},
-	faceDownCard = {
+	CP_DEALER_FACEDOWN_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Dealer's face down card: ",
@@ -11723,8 +12740,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zakryta karta krupiera:",
 		},
+		{
+			iso = "ko-KR",
+			text = "딜러의 뒤집힌 카드:",
+		},
 	},
-	dealerBustBtn = {
+	CP_DEALER_BUST_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Set Dealer's Hand To Bust",
@@ -11769,8 +12790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ustaw rękę krupiera na Bust",
 		},
+		{
+			iso = "ko-KR",
+			text = "딜러의 손을 망가뜨리다",
+		},
 	},
-	forceRouletteCB = {
+	CP_FORCE_ROULETTE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Force The Ball To Land On Red 18",
@@ -11815,8 +12840,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zmuś piłkę, aby wylądowała na czerwonym polu 18",
 		},
+		{
+			iso = "ko-KR",
+			text = "공을 레드 18에 떨어지게 하세요",
+		},
 	},
-	not_playing_bj_txt = {
+	CP_NOT_PLAYING_BJ_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Not sitting at a Blackjack table.",
@@ -11861,8 +12890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie siedzenie przy stole do gry w Blackjacka.",
 		},
+		{
+			iso = "ko-KR",
+			text = "블랙잭 테이블에 앉지 마세요.",
+		},
 	},
-	not_in_casino_txt = {
+	CP_NOT_IN_CASINO_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Not inside the Casino",
@@ -11907,8 +12940,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nie w kasynie",
 		},
+		{
+			iso = "ko-KR",
+			text = "카지노 내부가 아닙니다",
+		},
 	},
-	roulette_ctrl_txt = {
+	CP_ROULETTE_CTRL_NOTIF_ = {
 		{
 			iso = "en-US",
 			text = "Taking control of the 'Casino Roulette' script...",
@@ -11953,8 +12990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Przejęcie kontroli nad scenariuszem „Ruletki kasynowej”...",
 		},
+		{
+			iso = "ko-KR",
+			text = "'카지노 룰렛' 스크립트를 제어하세요...",
+		},
 	},
-	tcc_ctrl_txt = {
+	CP_TCC_CTRL_NOTIF_ = {
 		{
 			iso = "en-US",
 			text = "Taking control of the 'Three Card Poker' script...",
@@ -11999,8 +13040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Przejęcie kontroli nad scenariuszem „Three Card Poker”...",
 		},
+		{
+			iso = "ko-KR",
+			text = "'쓰리 카드 포커' 대본을 장악하다...",
+		},
 	},
-	rigSlotsCB = {
+	CP_RIG_SLOTS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Rig Slot Machines",
@@ -12045,8 +13090,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Automaty do gry Rig",
 		},
+		{
+			iso = "ko-KR",
+			text = "리그 슬롯 머신",
+		},
 	},
-	autoplaySlotsCB = {
+	CP_AUTOPLAY_SLOTS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Autoplay",
@@ -12091,8 +13140,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Automatyczne odtwarzanie",
 		},
+		{
+			iso = "ko-KR",
+			text = "자동 재생",
+		},
 	},
-	autoplayCapCB = {
+	CP_AUTOPLAY_CAP_CB_ = {
 		{
 			iso = "en-US",
 			text = "Max Chips",
@@ -12137,8 +13190,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Maksymalne chipsy",
 		},
+		{
+			iso = "ko-KR",
+			text = "맥스 칩스",
+		},
 	},
-	podiumVeh_Btn = {
+	CP_PODIUM_VEH_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Give Podium Vehicle",
@@ -12183,8 +13240,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Podaj pojazd podium",
 		},
+		{
+			iso = "ko-KR",
+			text = "포디엄 차량 제공",
+		},
 	},
-	mysteryPrize_Btn = {
+	CP_MYSTERY_PRIZE_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Give Mystery Prize",
@@ -12229,8 +13290,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Podaruj tajemniczą nagrodę",
 		},
+		{
+			iso = "ko-KR",
+			text = "미스터리 상을 주세요",
+		},
 	},
-	["50k_Btn"] = {
+	CP_50K_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Give $50,000",
@@ -12275,8 +13340,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Podaruj 50 000 dolarów",
 		},
+		{
+			iso = "ko-KR",
+			text = "5만달러를 주세요",
+		},
 	},
-	["25k_Btn"] = {
+	CP_25K_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Give 25000 Chips",
@@ -12321,8 +13390,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Daj 25000 żetonów",
 		},
+		{
+			iso = "ko-KR",
+			text = "25000개의 칩을 주세요",
+		},
 	},
-	["15k_Btn"] = {
+	CP_15K_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Give 15000 RP",
@@ -12367,8 +13440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Daj 15000 RP",
 		},
+		{
+			iso = "ko-KR",
+			text = "15000 RP를 주세요",
+		},
 	},
-	["%_Btn"] = {
+	CP_DISCOUNT_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Give Discount",
@@ -12413,8 +13490,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Daj rabat",
 		},
+		{
+			iso = "ko-KR",
+			text = "할인을 주세요",
+		},
 	},
-	clothing_Btn = {
+	CP_CLOTHING_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Give Clothing",
@@ -12459,8 +13540,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Daj Ubranie",
 		},
+		{
+			iso = "ko-KR",
+			text = "의류를 주세요",
+		},
 	},
-	approach = {
+	CP_HEIST_APPROACH_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Approach",
@@ -12505,8 +13590,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Zbliżać się",
 		},
+		{
+			iso = "ko-KR",
+			text = "접근하다",
+		},
 	},
-	target = {
+	CP_HEIST_TARGET_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Target",
@@ -12551,8 +13640,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Cel",
 		},
+		{
+			iso = "ko-KR",
+			text = "목표",
+		},
 	},
-	last_approach = {
+	CP_HEIST_LAST_APPROACH_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Last Approach",
@@ -12597,8 +13690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ostatnie podejście",
 		},
+		{
+			iso = "ko-KR",
+			text = "마지막 접근",
+		},
 	},
-	hard_approach = {
+	CP_HEIST_HARD_APPROACH_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Hard Approach",
@@ -12643,8 +13740,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Trudne podejście",
 		},
+		{
+			iso = "ko-KR",
+			text = "하드 어프로치",
+		},
 	},
-	gunman = {
+	CP_HEIST_GUNMAN_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Gunman",
@@ -12689,8 +13790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Bandyta",
 		},
+		{
+			iso = "ko-KR",
+			text = "총기 경비원",
+		},
 	},
-	driver = {
+	CP_HEIST_DRIVER_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Driver",
@@ -12735,8 +13840,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Kierowca",
 		},
+		{
+			iso = "ko-KR",
+			text = "운전사",
+		},
 	},
-	hacker = {
+	CP_HEIST_HACKER_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Hacker",
@@ -12781,8 +13890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Haker",
 		},
+		{
+			iso = "ko-KR",
+			text = "해커",
+		},
 	},
-	unmarked_weapons = {
+	CP_HEIST_WEAPONS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Unmarked Weapons",
@@ -12826,6 +13939,10 @@ Labels = {
 		{
 			iso = "pl-PL",
 			text = "Broń nieoznakowana",
+		},
+		{
+			iso = "ko-KR",
+			text = "표시되지 않은 무기",
 		},
 	},
 	getaways = {
@@ -12873,8 +13990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Pojazdy do ucieczki",
 		},
+		{
+			iso = "ko-KR",
+			text = "탈출 차량",
+		},
 	},
-	masks = {
+	CP_HEIST_MASKS_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Masks",
@@ -12919,8 +14040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Maski",
 		},
+		{
+			iso = "ko-KR",
+			text = "마스크",
+		},
 	},
-	autograb = {
+	CP_HEIST_AUTOGRAB_ = {
 		{
 			iso = "en-US",
 			text = "Auto Grab Cash/Gold/Diamonds",
@@ -12965,8 +14090,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Automatyczne zbieranie gotówki/złota/diamentów",
 		},
+		{
+			iso = "ko-KR",
+			text = "자동 획득 현금/골드/다이아몬드",
+		},
 	},
-	["Unlock All Heist Options"] = {
+	CP_HEIST_UNLOCK_ALL_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Unlock All Heist Options",
@@ -13011,8 +14140,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Odblokuj wszystkie opcje napadu",
 		},
+		{
+			iso = "ko-KR",
+			text = "모든 강도 옵션 잠금 해제",
+		},
 	},
-	["%0_ai_cuts_Btn"] = {
+	CP_HEIST_ZERO_AI_CUTS_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Set AI Crew Cuts to %0",
@@ -13057,8 +14190,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ustaw AI Crew Cuts na %0",
 		},
+		{
+			iso = "ko-KR",
+			text = "AI 크루 컷을 %0으로 설정",
+		},
 	},
-	["%100_p_cuts_Btn"] = {
+	CP_HEIST_MAX_PLAYER_CUTS_BTN_ = {
 		{
 			iso = "en-US",
 			text = "Set All Cuts to 100%",
@@ -13103,8 +14240,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Ustaw wszystkie cięcia na 100%",
 		},
+		{
+			iso = "ko-KR",
+			text = "모든 컷을 100%로 설정",
+		},
 	},
-	["Unavailable in Single Player"] = {
+	GENERIC_UNAVAILABLE_SP_ = {
 		{
 			iso = "en-US",
 			text = "Unavailable in Single Player.",
@@ -13149,8 +14290,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Niedostępne w trybie jednego gracza.",
 		},
+		{
+			iso = "ko-KR",
+			text = "싱글 플레이어에서는 이용할 수 없습니다.",
+		},
 	},
-	dailyQuotesCB = {
+	DAILY_QUOTES_CB_ = {
 		{
 			iso = "en-US",
 			text = "Disable Daily Quotes",
@@ -13195,8 +14340,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącz codzienne cytaty",
 		},
+		{
+			iso = "ko-KR",
+			text = "일일 견적 비활성화",
+		},
 	},
-	dailyQuotes_tt = {
+	DAILY_QUOTES_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Disable the 'Quote Of The Day' element in the script's welcome window.",
@@ -13241,8 +14390,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącz element „Cytat dnia” w oknie powitalnym skryptu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "스크립트의 시작 창에서 '오늘의 명언' 요소를 비활성화합니다.",
+		},
 	},
-	missileLogsCB = {
+	MISSILE_DEF_LOGS_CB_ = {
 		{
 			iso = "en-US",
 			text = "Disable 'Missile Defence' Logs",
@@ -13287,8 +14440,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącz logi „Obrony przeciwrakietowej”",
 		},
+		{
+			iso = "ko-KR",
+			text = "'미사일 방어' 로그 비활성화",
+		},
 	},
-	missileLogs_tt = {
+	MISSILE_DEF_LOGS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Disables the console logs from the 'Missile Defence' feature.",
@@ -13333,8 +14490,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Wyłącza logi konsoli dla funkcji „Obrona przeciwrakietowa”.",
 		},
+		{
+			iso = "ko-KR",
+			text = "'미사일 방어' 기능의 콘솔 로그를 비활성화합니다.",
+		},
 	},
-	autofillDelay_tt = {
+	AUTOFILL_TIMEDELAY_DESC_ = {
 		{
 			iso = "en-US",
 			text = "A global delay for all 'autofill' options in Business Manager. The delay is in milliseconds.",
@@ -13379,8 +14540,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Globalne opóźnienie dla wszystkich opcji „autouzupełniania” w Business Manager. Opóźnienie jest w milisekundach.",
 		},
+		{
+			iso = "ko-KR",
+			text = "Business Manager의 모든 '자동 채우기' 옵션에 대한 글로벌 지연. 지연은 밀리초 단위입니다.",
+		},
 	},
-	sort_by_txt = {
+	SORT_BY_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Sort By: ",
@@ -13425,8 +14590,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Sortuj według:",
 		},
+		{
+			iso = "ko-KR",
+			text = "정렬 기준:",
+		},
 	},
-	color_txt = {
+	SORT_BY_COLOR_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Color",
@@ -13471,8 +14640,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Kolor",
 		},
+		{
+			iso = "ko-KR",
+			text = "색상",
+		},
 	},
-	manufacturer_txt = {
+	SORT_BY_MFR_TXT_ = {
 		{
 			iso = "en-US",
 			text = "Manufacturer",
@@ -13517,8 +14690,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Producent",
 		},
+		{
+			iso = "ko-KR",
+			text = "제조업체",
+		},
 	},
-	remove_matte_CB = {
+	REMOVE_MATTE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Remove Matte Finish",
@@ -13563,8 +14740,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Usuń matowe wykończenie",
 		},
+		{
+			iso = "ko-KR",
+			text = "매트 마감 제거",
+		},
 	},
-	apply_matte_CB = {
+	APPLY_MATTE_CB_ = {
 		{
 			iso = "en-US",
 			text = "Apply Matte Finish",
@@ -13609,8 +14790,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nałóż matowe wykończenie",
 		},
+		{
+			iso = "ko-KR",
+			text = "매트 마감을 적용하세요",
+		},
 	},
-	apply_matte_tt = {
+	APPLY_MATTE_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Applies/removes a matte finish to/from the selected paint job.",
@@ -13655,8 +14840,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Nakłada/usuwa matowe wykończenie na wybraną powierzchnię lakierowaną.",
 		},
+		{
+			iso = "ko-KR",
+			text = "선택한 페인트 작업에 무광 마감을 적용하거나 제거합니다.",
+		},
 	},
-	save_paint_tt = {
+	SAVE_PAINT_DESC_ = {
 		{
 			iso = "en-US",
 			text = "To save this color on a personal vehicle, go to a modshop and buy something like window tint or plate style or anything.",
@@ -13701,8 +14890,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Aby zachować ten kolor na swoim pojeździe, udaj się do sklepu z artykułami modowymi i kup coś w rodzaju przyciemnianych szyb, stylowych tablic rejestracyjnych lub czegokolwiek innego.",
 		},
+		{
+			iso = "ko-KR",
+			text = "이 색상을 개인 차량에 적용하려면 모드숍에 가서 창문 필름이나 번호판 스타일 등을 구매하세요.",
+		},
 	},
-	hatsinvehs_tt = {
+	HATSINVEHS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Stops the game from removing your hats and other headgear/accessories when getting inside vehicles.",
@@ -13747,8 +14940,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Uniemożliwia grze zdjęcie czapki i innego nakrycia głowy/akcesoriów podczas wsiadania do pojazdów.",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량에 탑승할 때 모자나 기타 머리 장비/액세서리를 벗는 것을 방지합니다.",
+		},
 	},
-	novehragdoll_tt = {
+	NOVEHRAGDOLL_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Allows you to stand on top of vehicles without falling off.",
@@ -13793,8 +14990,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Umożliwia stanie na pojazdach bez ryzyka upadku.",
 		},
+		{
+			iso = "ko-KR",
+			text = "떨어지지 않고 차량 위에 설 수 있습니다.",
+		},
 	},
-	autovehlocks_tt = {
+	AUTOVEHLOCKS_DESC_ = {
 		{
 			iso = "en-US",
 			text = "Automatically locks and unlocks your vehicle.",
@@ -13839,8 +15040,12 @@ Labels = {
 			iso = "pl-PL",
 			text = "Automatyczne blokowanie i odblokowywanie pojazdu.",
 		},
+		{
+			iso = "ko-KR",
+			text = "차량을 자동으로 잠그고 잠금 해제합니다.",
+		},
 	},
-	autoraiseroof_tt = {
+	AUTO_RAISE_ROOF_DESC_ = {
 		{
 			iso = "en-US",
 			text = "If your vehicle is a convertible, Both Auto-Lock and pressing the lock button will also raise the roof when locking your vehicle.",
@@ -13884,6 +15089,1660 @@ Labels = {
 		{
 			iso = "pl-PL",
 			text = "Jeśli posiadasz samochód z nadwoziem typu kabriolet, zarówno funkcja 'Auto-Lock', jak i naciśnięcie przycisku blokady spowodują także podniesienie dachu podczas blokowania pojazdu.",
+		},
+		{
+			iso = "ko-KR",
+			text = "차량이 컨버터블인 경우, 자동 잠금 기능과 잠금 버튼을 누르면 차량을 잠글 때 지붕이 올라갑니다.",
+		},
+	},
+	KATANA_WPN_CHOICE_TXT_ = {
+		{
+			iso = "en-US",
+			text = "Weapon to replace:",
+		},
+		{
+			iso = "de-DE",
+			text = "Zu ersetzende Waffe:",
+		},
+		{
+			iso = "fr-FR",
+			text = "Arme à remplacer :",
+		},
+		{
+			iso = "it-IT",
+			text = "Arma da sostituire:",
+		},
+		{
+			iso = "pt-BR",
+			text = "Arma para substituir:",
+		},
+		{
+			iso = "ru-RU",
+			text = "Оружие для замены:",
+		},
+		{
+			iso = "es-ES",
+			text = "Arma a reemplazar:",
+		},
+		{
+			iso = "zh-CN",
+			text = "更换武器：",
+		},
+		{
+			iso = "zh-TW",
+			text = "更換武器：",
+		},
+		{
+			iso = "ja-JP",
+			text = "交換する武器:",
+		},
+		{
+			iso = "pl-PL",
+			text = "Broń do zastąpienia:",
+		},
+		{
+			iso = "ko-KR",
+			text = "교체할 무기:",
+		},
+	},
+	KATANA_WPN_CHOICE_DESC_ = {
+		{
+			iso = "en-US",
+			text = "If you already own the weapon, it will be automatically placed in your hands.",
+		},
+		{
+			iso = "de-DE",
+			text = "Wenn Sie die Waffe bereits besitzen, wird sie Ihnen automatisch in die Hände gelegt.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Si vous possédez déjà l'arme, elle sera automatiquement placée entre vos mains.",
+		},
+		{
+			iso = "it-IT",
+			text = "Se possiedi già l'arma, questa ti verrà automaticamente consegnata.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Se você já possui a arma, ela será automaticamente colocada em suas mãos.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Если у вас уже есть оружие, оно автоматически перейдет вам в руки.",
+		},
+		{
+			iso = "es-ES",
+			text = "Si ya posees el arma, se colocará automáticamente en tus manos.",
+		},
+		{
+			iso = "zh-CN",
+			text = "如果您已经拥有该武器，它将自动放在您的手中。",
+		},
+		{
+			iso = "zh-TW",
+			text = "如果您已經擁有該武器，它將自動放在您的手中。",
+		},
+		{
+			iso = "ja-JP",
+			text = "すでに武器を所有している場合は、自動的に手に入ります。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Jeśli już posiadasz broń, zostanie ona automatycznie przekazana w Twoje ręce.",
+		},
+		{
+			iso = "ko-KR",
+			text = "이미 해당 무기를 소유하고 있다면 자동으로 당신의 손에 들어오게 됩니다.",
+		},
+	},
+	VEH_MINES_MDEF_WARN_ = {
+		{
+			iso = "en-US",
+			text = "[ ! ] NOTE: You have 'Missile Defence' activated which will automatically destroy / remove these mines. If you still want to use them, please disable 'Missile Defence'.",
+		},
+		{
+			iso = "de-DE",
+			text = "[ ! ] HINWEIS: Sie haben die Raketenabwehr aktiviert, die diese Minen automatisch zerstört/entfernt. Wenn Sie sie dennoch nutzen möchten, deaktivieren Sie die Raketenabwehr.",
+		},
+		{
+			iso = "fr-FR",
+			text = "[ ! ] REMARQUE : vous avez activé la « Défense anti-missile » qui détruira/supprimera automatiquement ces mines. Si vous souhaitez toujours les utiliser, veuillez désactiver la « Défense anti-missile ».",
+		},
+		{
+			iso = "it-IT",
+			text = "[ ! ] NOTA: hai attivato 'Difesa missilistica' che distruggerà/rimuoverà automaticamente queste mine. Se vuoi comunque usarle, disattiva 'Difesa missilistica'.",
+		},
+		{
+			iso = "pt-BR",
+			text = "[ ! ] NOTA: Você ativou 'Missile Defence', que destruirá/removerá automaticamente essas minas. Se você ainda quiser usá-las, desabilite 'Missile Defence'.",
+		},
+		{
+			iso = "ru-RU",
+			text = "[ ! ] ПРИМЕЧАНИЕ: У вас активирована «Противоракетная оборона», которая автоматически уничтожит/удалит эти мины. Если вы все еще хотите их использовать, отключите «Противоракетную оборону».",
+		},
+		{
+			iso = "es-ES",
+			text = "[ ! ] NOTA: Tienes activada la \"Defensa contra misiles\", que destruirá o eliminará automáticamente estas minas. Si aún quieres usarlas, desactiva la \"Defensa contra misiles\".",
+		},
+		{
+			iso = "zh-CN",
+			text = "[ ! ] 注意：您已激活“导弹防御”，它将自动摧毁/移除这些地雷。如果您仍想使用它们，请禁用“导弹防御”。",
+		},
+		{
+			iso = "zh-TW",
+			text = "[！ ] 注意：您已啟動“導彈防禦”，它將自動摧毀/移除這些地雷。如果您仍想使用它們，請停用“導彈防禦”。",
+		},
+		{
+			iso = "ja-JP",
+			text = "[ ! ] 注意: 「ミサイル防御」が有効になっているため、これらの地雷は自動的に破壊/除去されます。引き続き地雷を使用する場合は、「ミサイル防御」を無効にしてください。",
+		},
+		{
+			iso = "pl-PL",
+			text = "[ ! ] UWAGA: Aktywowałeś 'Obronę Przeciwrakietową', która automatycznie zniszczy / usunie te miny. Jeśli nadal chcesz ich używać, wyłącz 'Obronę Przeciwrakietową'.",
+		},
+		{
+			iso = "ko-KR",
+			text = "[ ! ] 참고: '미사일 방어'가 활성화되어 있어 이러한 지뢰를 자동으로 파괴/제거합니다. 여전히 사용하고 싶다면 '미사일 방어'를 비활성화하세요.",
+		},
+	},
+	ABS_LIGHTS_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Flashes your brake lights repeatedly when braking at high speed (over 100km/h).\nOnly works on vehicles that have ABS.",
+		},
+		{
+			iso = "de-DE",
+			text = "Beim Bremsen aus hoher Geschwindigkeit (über 100 km/h) blinken Ihre Bremslichter wiederholt. Funktioniert nur bei Fahrzeugen mit ABS.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Fait clignoter vos feux stop de manière répétée lors d'un freinage à grande vitesse (plus de 100 km/h).\nFonctionne uniquement sur les véhicules équipés d'ABS.",
+		},
+		{
+			iso = "it-IT",
+			text = "Fa lampeggiare ripetutamente le luci dei freni quando si frena ad alta velocità (oltre 100 km/h).\nFunziona solo su veicoli dotati di ABS.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Pisca as luzes de freio repetidamente ao frear em alta velocidade (acima de 100 km/h).\nFunciona somente em veículos com ABS.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Многократное мигание стоп-сигналов при торможении на высокой скорости (более 100 км/ч).\nРаботает только на автомобилях с ABS.",
+		},
+		{
+			iso = "es-ES",
+			text = "Hace parpadear las luces de freno repetidamente al frenar a alta velocidad (más de 100 km/h).\nSolo funciona en vehículos que tienen ABS.",
+		},
+		{
+			iso = "zh-CN",
+			text = "高速（超过 100 公里/小时）刹车时反复闪烁刹车灯。\n仅适用于具有 ABS 的车辆。",
+		},
+		{
+			iso = "zh-TW",
+			text = "高速（超過 100 公里/小時）煞車時重複閃爍煞車燈。",
+		},
+		{
+			iso = "ja-JP",
+			text = "高速（時速 100 km 以上）でブレーキをかけると、ブレーキ ライトが繰り返し点滅します。\nABS 搭載車両でのみ機能します。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Wielokrotne miganie światłami hamowania podczas hamowania z dużej prędkości (ponad 100 km/h).\nDziała wyłącznie w pojazdach wyposażonych w ABS.",
+		},
+		{
+			iso = "ko-KR",
+			text = "고속(100km/h 이상)으로 제동할 때 브레이크 표시등이 반복적으로 깜박입니다.\nABS가 장착된 차량에만 작동합니다.",
+		},
+	},
+	NO_ENGINE_STALL_DESC_ = {
+		{
+			iso = "en-US",
+			text = "When flying a plane and holding the brake button, your engine will not turn off.",
+		},
+		{
+			iso = "de-DE",
+			text = "Wenn Sie ein Flugzeug fliegen und die Bremstaste gedrückt halten, schaltet sich Ihr Motor nicht ab.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Lorsque vous pilotez un avion et que vous maintenez le bouton de frein enfoncé, votre moteur ne s'éteindra pas.",
+		},
+		{
+			iso = "it-IT",
+			text = "Quando si pilota un aereo e si tiene premuto il pulsante del freno, il motore non si spegne.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Ao pilotar um avião e segurar o botão do freio, o motor não desliga.",
+		},
+		{
+			iso = "ru-RU",
+			text = "При управлении самолетом и удерживании кнопки тормоза двигатель не выключится.",
+		},
+		{
+			iso = "es-ES",
+			text = "Al volar un avión y mantener presionado el botón del freno, el motor no se apagará.",
+		},
+		{
+			iso = "zh-CN",
+			text = "驾驶飞机时按住刹车按钮，发动机不会关闭。",
+		},
+		{
+			iso = "zh-TW",
+			text = "駕駛飛機時按住煞車按鈕，引擎不會關閉。",
+		},
+		{
+			iso = "ja-JP",
+			text = "飛行機を操縦中にブレーキボタンを押しても、エンジンは止まりません。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Kiedy lecisz samolotem i przytrzymujesz przycisk hamulca, silnik nie wyłączy się.",
+		},
+		{
+			iso = "ko-KR",
+			text = "비행기를 조종할 때 브레이크 버튼을 누르고 있어도 엔진은 꺼지지 않습니다.",
+		},
+	},
+	CANNON_TRIGGERBOT_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Automatically shoots your cannon when an entity is in your crosshair",
+		},
+		{
+			iso = "de-DE",
+			text = "Schießt automatisch mit Ihrer Kanone, wenn sich ein Objekt in Ihrem Fadenkreuz befindet",
+		},
+		{
+			iso = "fr-FR",
+			text = "Tire automatiquement avec votre canon lorsqu'une entité se trouve dans votre réticule",
+		},
+		{
+			iso = "it-IT",
+			text = "Spara automaticamente il tuo cannone quando un'entità è nel tuo mirino",
+		},
+		{
+			iso = "pt-BR",
+			text = "Dispara seu canhão automaticamente quando uma entidade está na sua mira",
+		},
+		{
+			iso = "ru-RU",
+			text = "Автоматически стреляет из пушки, когда существо попадает в перекрестье прицела.",
+		},
+		{
+			iso = "es-ES",
+			text = "Dispara automáticamente tu cañón cuando una entidad está en tu punto de mira.",
+		},
+		{
+			iso = "zh-CN",
+			text = "当一个实体进入你的十字准线时，自动发射大炮",
+		},
+		{
+			iso = "zh-TW",
+			text = "當一個實體進入你的十字準線時，自動發射大砲",
+		},
+		{
+			iso = "ja-JP",
+			text = "エンティティが照準線内にある場合、自動的に大砲を発射します",
+		},
+		{
+			iso = "pl-PL",
+			text = "Automatycznie strzela z armaty, gdy jakiś byt znajdzie się na twoim celowniku",
+		},
+		{
+			iso = "ko-KR",
+			text = "엔티티가 조준선에 있을 때 자동으로 대포를 발사합니다.",
+		},
+	},
+	CANNON_MANUAL_AIM_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Manually aim and shoot aircraft cannons.\nAs a bonus, Manual Aim shoots explosive ammo.",
+		},
+		{
+			iso = "de-DE",
+			text = "Flugzeugkanonen manuell zielen und abfeuern.\nAls Bonus schießt die Funktion „Manuelles Zielen“ explosive Munition.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Visez et tirez manuellement avec les canons des avions.\nEn prime, la visée manuelle tire des munitions explosives.",
+		},
+		{
+			iso = "it-IT",
+			text = "Prendi la mira manualmente e spara ai cannoni degli aerei.\nCome bonus, la mira manuale spara munizioni esplosive.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Mire e atire manualmente nos canhões da aeronave.\nComo bônus, a Mira Manual dispara munição explosiva.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Вручную прицельтесь и стреляйте из авиационных пушек.\nВ качестве бонуса, ручное прицеливание стреляет разрывными боеприпасами.",
+		},
+		{
+			iso = "es-ES",
+			text = "Apunta y dispara manualmente los cañones de las aeronaves. Como beneficio adicional, la puntería manual dispara munición explosiva.",
+		},
+		{
+			iso = "zh-CN",
+			text = "手动瞄准和射击航空炮。\n作为奖励，手动瞄准可以发射爆炸性弹药。",
+		},
+		{
+			iso = "zh-TW",
+			text = "手動瞄準和射擊航空砲。",
+		},
+		{
+			iso = "ja-JP",
+			text = "航空機の大砲を手動で狙い撃ちします。\nボーナスとして、手動狙い撃ちでは爆発弾を発射します。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Ręczne celowanie i strzelanie z działek lotniczych.\nJako bonus, funkcja ręcznego celowania strzela amunicją wybuchową.",
+		},
+		{
+			iso = "ko-KR",
+			text = "수동으로 항공기 대포를 조준하고 발사합니다.\n보너스로, 수동 조준은 폭발성 탄약을 발사합니다.",
+		},
+	},
+	EDIT_AIM_MARKER_BTN_ = {
+		{
+			iso = "en-US",
+			text = "Edit Aim Marker",
+		},
+		{
+			iso = "de-DE",
+			text = "Zielmarkierung bearbeiten",
+		},
+		{
+			iso = "fr-FR",
+			text = "Modifier le marqueur de visée",
+		},
+		{
+			iso = "it-IT",
+			text = "Modifica indicatore di mira",
+		},
+		{
+			iso = "pt-BR",
+			text = "Editar marcador de mira",
+		},
+		{
+			iso = "ru-RU",
+			text = "Изменить маркер цели",
+		},
+		{
+			iso = "es-ES",
+			text = "Editar marcador de puntería",
+		},
+		{
+			iso = "zh-CN",
+			text = "编辑目标标记",
+		},
+		{
+			iso = "zh-TW",
+			text = "編輯目標標記",
+		},
+		{
+			iso = "ja-JP",
+			text = "照準マーカーを編集",
+		},
+		{
+			iso = "pl-PL",
+			text = "Edytuj znacznik celu",
+		},
+		{
+			iso = "ko-KR",
+			text = "에임 마커 편집",
+		},
+	},
+	AIM_MARKER_SIZE_TXT_ = {
+		{
+			iso = "en-US",
+			text = "Marker Size:",
+		},
+		{
+			iso = "de-DE",
+			text = "Markergröße:",
+		},
+		{
+			iso = "fr-FR",
+			text = "Taille du marqueur :",
+		},
+		{
+			iso = "it-IT",
+			text = "Dimensione del pennarello:",
+		},
+		{
+			iso = "pt-BR",
+			text = "Tamanho do marcador:",
+		},
+		{
+			iso = "ru-RU",
+			text = "Размер маркера:",
+		},
+		{
+			iso = "es-ES",
+			text = "Tamaño del marcador:",
+		},
+		{
+			iso = "zh-CN",
+			text = "标记尺寸：",
+		},
+		{
+			iso = "zh-TW",
+			text = "標記尺寸：",
+		},
+		{
+			iso = "ja-JP",
+			text = "マーカーサイズ:",
+		},
+		{
+			iso = "pl-PL",
+			text = "Rozmiar znacznika:",
+		},
+		{
+			iso = "ko-KR",
+			text = "마커 크기:",
+		},
+	},
+	AIM_MARKER_COL_TXT_ = {
+		{
+			iso = "en-US",
+			text = "Marker Color:",
+		},
+		{
+			iso = "de-DE",
+			text = "Markierungsfarbe:",
+		},
+		{
+			iso = "fr-FR",
+			text = "Couleur du marqueur :",
+		},
+		{
+			iso = "it-IT",
+			text = "Colore del pennarello:",
+		},
+		{
+			iso = "pt-BR",
+			text = "Cor do marcador:",
+		},
+		{
+			iso = "ru-RU",
+			text = "Цвет маркера:",
+		},
+		{
+			iso = "es-ES",
+			text = "Color del marcador:",
+		},
+		{
+			iso = "zh-CN",
+			text = "标记颜色：",
+		},
+		{
+			iso = "zh-TW",
+			text = "標記顏色：",
+		},
+		{
+			iso = "ja-JP",
+			text = "マーカーの色:",
+		},
+		{
+			iso = "pl-PL",
+			text = "Kolor znacznika:",
+		},
+		{
+			iso = "ko-KR",
+			text = "마커 색상:",
+		},
+	},
+	CANNON_TRIGGERBOT_OPTIONS_TXT_ = {
+		{
+			iso = "en-US",
+			text = "Cannon Triggerbot Options",
+		},
+		{
+			iso = "de-DE",
+			text = "Kanonen-Triggerbot-Optionen",
+		},
+		{
+			iso = "fr-FR",
+			text = "Options du Triggerbot Cannon",
+		},
+		{
+			iso = "it-IT",
+			text = "Opzioni del cannone Triggerbot",
+		},
+		{
+			iso = "pt-BR",
+			text = "Opções do Cannon Triggerbot",
+		},
+		{
+			iso = "ru-RU",
+			text = "Варианты триггербота Cannon",
+		},
+		{
+			iso = "es-ES",
+			text = "Opciones de Cannon Triggerbot",
+		},
+		{
+			iso = "zh-CN",
+			text = "Cannon Triggerbot 选项",
+		},
+		{
+			iso = "zh-TW",
+			text = "Cannon Triggerbot 選項",
+		},
+		{
+			iso = "ja-JP",
+			text = "キャノントリガーボットオプション",
+		},
+		{
+			iso = "pl-PL",
+			text = "Opcje Cannon Triggerbot",
+		},
+		{
+			iso = "ko-KR",
+			text = "캐논 트리거봇 옵션",
+		},
+	},
+	CANNON_TRIGGERBOT_RANGE_ = {
+		{
+			iso = "en-US",
+			text = "Triggerbot Range:",
+		},
+		{
+			iso = "de-DE",
+			text = "Triggerbot-Reichweite:",
+		},
+		{
+			iso = "fr-FR",
+			text = "Portée du Triggerbot :",
+		},
+		{
+			iso = "it-IT",
+			text = "Portata del Triggerbot:",
+		},
+		{
+			iso = "pt-BR",
+			text = "Alcance do Triggerbot:",
+		},
+		{
+			iso = "ru-RU",
+			text = "Диапазон триггербота:",
+		},
+		{
+			iso = "es-ES",
+			text = "Alcance del Triggerbot:",
+		},
+		{
+			iso = "zh-CN",
+			text = "Triggerbot 范围：",
+		},
+		{
+			iso = "zh-TW",
+			text = "Triggerbot 範圍：",
+		},
+		{
+			iso = "ja-JP",
+			text = "トリガーボット範囲:",
+		},
+		{
+			iso = "pl-PL",
+			text = "Zasięg Triggerbota:",
+		},
+		{
+			iso = "ko-KR",
+			text = "Triggerbot 범위:",
+		},
+	},
+	CANNON_TRIGGERBOT_RANGE_DESC_ = {
+		{
+			iso = "en-US",
+			text = "The triggerbot range is still limited by the aircraft's weapon range. Setting it to max does not guarantee that you will hit the target.",
+		},
+		{
+			iso = "de-DE",
+			text = "Die Reichweite des Triggerbots ist immer noch durch die Waffenreichweite des Flugzeugs begrenzt. Wenn Sie den Maximalwert einstellen, ist das keine Garantie dafür, dass Sie das Ziel treffen.",
+		},
+		{
+			iso = "fr-FR",
+			text = "La portée du Triggerbot est toujours limitée par la portée de l'arme de l'avion. Le régler au maximum ne garantit pas que vous atteindrez la cible.",
+		},
+		{
+			iso = "it-IT",
+			text = "La portata del triggerbot è comunque limitata dalla portata dell'arma dell'aereo. Impostarla al massimo non garantisce che colpirai il bersaglio.",
+		},
+		{
+			iso = "pt-BR",
+			text = "O alcance do triggerbot ainda é limitado pelo alcance da arma da aeronave. Defini-lo para o máximo não garante que você atingirá o alvo.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Радиус действия триггербота по-прежнему ограничен радиусом действия оружия самолета. Установка его на максимум не гарантирует попадания в цель.",
+		},
+		{
+			iso = "es-ES",
+			text = "El alcance del gatillo aún está limitado por el alcance del arma de la aeronave. Configurarlo al máximo no garantiza que alcances el objetivo.",
+		},
+		{
+			iso = "zh-CN",
+			text = "触发机器人的射程仍然受到飞机武器射程的限制。将其设置为最大并不能保证您能击中目标。",
+		},
+		{
+			iso = "zh-TW",
+			text = "觸發機器人的射程仍受到飛機武器射程的限制。將其設為最大值並不能保證您會達到目標。",
+		},
+		{
+			iso = "ja-JP",
+			text = "トリガーボットの範囲は、航空機の武器の射程範囲によって制限されます。最大に設定しても、ターゲットに命中することが保証されるわけではありません。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Zasięg triggerbota jest nadal ograniczony zasięgiem broni samolotu. Ustawienie go na maksimum nie gwarantuje trafienia w cel.",
+		},
+		{
+			iso = "ko-KR",
+			text = "트리거봇 범위는 여전히 항공기의 무기 범위에 의해 제한됩니다. 최대로 설정해도 타겟을 맞출 수 있다는 보장은 없습니다.",
+		},
+	},
+	GENERIC_ENEMIES_ONLY_TXT_ = {
+		{
+			iso = "en-US",
+			text = "Enemies Only",
+		},
+		{
+			iso = "de-DE",
+			text = "Nur Feinde",
+		},
+		{
+			iso = "fr-FR",
+			text = "Ennemis seulement",
+		},
+		{
+			iso = "it-IT",
+			text = "Solo nemici",
+		},
+		{
+			iso = "pt-BR",
+			text = "Somente inimigos",
+		},
+		{
+			iso = "ru-RU",
+			text = "Только враги",
+		},
+		{
+			iso = "es-ES",
+			text = "Solo enemigos",
+		},
+		{
+			iso = "zh-CN",
+			text = "仅限敌人",
+		},
+		{
+			iso = "zh-TW",
+			text = "僅限敵人",
+		},
+		{
+			iso = "ja-JP",
+			text = "敵のみ",
+		},
+		{
+			iso = "pl-PL",
+			text = "Tylko wrogowie",
+		},
+		{
+			iso = "ko-KR",
+			text = "적들만",
+		},
+	},
+	COL_PRIMARY_CB_ = {
+		{
+			iso = "en-US",
+			text = "Primary",
+		},
+		{
+			iso = "de-DE",
+			text = "Primär",
+		},
+		{
+			iso = "fr-FR",
+			text = "Primaire",
+		},
+		{
+			iso = "it-IT",
+			text = "Primario",
+		},
+		{
+			iso = "pt-BR",
+			text = "Primário",
+		},
+		{
+			iso = "ru-RU",
+			text = "Начальный",
+		},
+		{
+			iso = "es-ES",
+			text = "Primario",
+		},
+		{
+			iso = "zh-CN",
+			text = "基本的",
+		},
+		{
+			iso = "zh-TW",
+			text = "基本的",
+		},
+		{
+			iso = "ja-JP",
+			text = "主要な",
+		},
+		{
+			iso = "pl-PL",
+			text = "Podstawowy",
+		},
+		{
+			iso = "ko-KR",
+			text = "주요한",
+		},
+	},
+	COL_SECONDARY_CB_ = {
+		{
+			iso = "en-US",
+			text = "Secondary",
+		},
+		{
+			iso = "de-DE",
+			text = "Sekundär",
+		},
+		{
+			iso = "fr-FR",
+			text = "Secondaire",
+		},
+		{
+			iso = "it-IT",
+			text = "Secondario",
+		},
+		{
+			iso = "pt-BR",
+			text = "Secundário",
+		},
+		{
+			iso = "ru-RU",
+			text = "Вторичный",
+		},
+		{
+			iso = "es-ES",
+			text = "Secundario",
+		},
+		{
+			iso = "zh-CN",
+			text = "次要",
+		},
+		{
+			iso = "zh-TW",
+			text = "次要",
+		},
+		{
+			iso = "ja-JP",
+			text = "二次",
+		},
+		{
+			iso = "pl-PL",
+			text = "Wtórny",
+		},
+		{
+			iso = "ko-KR",
+			text = "반성",
+		},
+	},
+	CUSTOM_PAINT_NOT_SELECTED_ERR_ = {
+		{
+			iso = "en-US",
+			text = "Please select primary or secondary or both.",
+		},
+		{
+			iso = "de-DE",
+			text = "Bitte wählen Sie primär oder sekundär oder beides aus.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Veuillez sélectionner primaire ou secondaire ou les deux.",
+		},
+		{
+			iso = "it-IT",
+			text = "Selezionare primario o secondario o entrambi.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Selecione primário ou secundário ou ambos.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Пожалуйста, выберите основной или дополнительный вариант или оба варианта.",
+		},
+		{
+			iso = "es-ES",
+			text = "Seleccione primaria o secundaria o ambas.",
+		},
+		{
+			iso = "zh-CN",
+			text = "请选择主要或次要或两者。",
+		},
+		{
+			iso = "zh-TW",
+			text = "請選擇主要或次要或兩者。",
+		},
+		{
+			iso = "ja-JP",
+			text = "プライマリ、セカンダリ、またはその両方を選択してください。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Proszę wybrać opcję podstawową lub średnią, lub obie.",
+		},
+		{
+			iso = "ko-KR",
+			text = "1차, 2차, 또는 둘 다 선택해 주세요.",
+		},
+	},
+	CUSTOM_PAINT_MATTE_CB_ = {
+		{
+			iso = "en-US",
+			text = "Matte Paint",
+		},
+		{
+			iso = "de-DE",
+			text = "Matte Farbe",
+		},
+		{
+			iso = "fr-FR",
+			text = "Peinture mate",
+		},
+		{
+			iso = "it-IT",
+			text = "Vernice opaca",
+		},
+		{
+			iso = "pt-BR",
+			text = "Tinta fosca",
+		},
+		{
+			iso = "ru-RU",
+			text = "Матовая краска",
+		},
+		{
+			iso = "es-ES",
+			text = "Pintura mate",
+		},
+		{
+			iso = "zh-CN",
+			text = "哑光漆",
+		},
+		{
+			iso = "zh-TW",
+			text = "霧面漆",
+		},
+		{
+			iso = "ja-JP",
+			text = "マットペイント",
+		},
+		{
+			iso = "pl-PL",
+			text = "Farba matowa",
+		},
+		{
+			iso = "ko-KR",
+			text = "매트 페인트",
+		},
+	},
+	DRIFT_GAME_EXPERIMENTAL_TXT_ = {
+		{
+			iso = "en-US",
+			text = "[Experimental]",
+		},
+		{
+			iso = "de-DE",
+			text = "[Experimental]",
+		},
+		{
+			iso = "fr-FR",
+			text = "[Expérimental]",
+		},
+		{
+			iso = "it-IT",
+			text = "[Sperimentale]",
+		},
+		{
+			iso = "pt-BR",
+			text = "[Experimental]",
+		},
+		{
+			iso = "ru-RU",
+			text = "[Экспериментальный]",
+		},
+		{
+			iso = "es-ES",
+			text = "[Experimental]",
+		},
+		{
+			iso = "zh-CN",
+			text = "[实验]",
+		},
+		{
+			iso = "zh-TW",
+			text = "[實驗]",
+		},
+		{
+			iso = "ja-JP",
+			text = "[実験的]",
+		},
+		{
+			iso = "pl-PL",
+			text = "[Eksperymentalny]",
+		},
+		{
+			iso = "ko-KR",
+			text = "[실험적]",
+		},
+	},
+	NOENGINEBRAKING_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Allows your vehicle to coast without losing so much speed when you're not accelerating.",
+		},
+		{
+			iso = "de-DE",
+			text = "Ermöglicht Ihrem Fahrzeug, auszurollen, ohne viel Geschwindigkeit zu verlieren, wenn Sie nicht beschleunigen.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Permet à votre véhicule de rouler en roue libre sans perdre beaucoup de vitesse lorsque vous n'accélérez pas.",
+		},
+		{
+			iso = "it-IT",
+			text = "Permette al veicolo di procedere per inerzia senza perdere troppa velocità quando non si accelera.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Permite que seu veículo deslize sem perder tanta velocidade quando você não estiver acelerando.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Позволяет автомобилю двигаться по инерции, не теряя при этом значительной скорости, когда вы не ускоряетесь.",
+		},
+		{
+			iso = "es-ES",
+			text = "Permite que su vehículo avance sin perder tanta velocidad cuando no está acelerando.",
+		},
+		{
+			iso = "zh-CN",
+			text = "当您不加速时，可让您的车辆滑行且速度不会损失太多。",
+		},
+		{
+			iso = "zh-TW",
+			text = "當您不加速時，可讓您的車輛滑行且速度不會損失太多。",
+		},
+		{
+			iso = "ja-JP",
+			text = "加速していないときに、車両が速度をあまり落とさずに惰性走行できるようにします。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Umożliwia jazdę bez utraty prędkości, gdy pojazd nie przyspiesza.",
+		},
+		{
+			iso = "ko-KR",
+			text = "가속하지 않을 때에도 속도를 크게 잃지 않고 차량이 관성 주행할 수 있게 해줍니다.",
+		},
+	},
+	KERSBOOST_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Equips your vehicle with KERS boost, similar to Open Wheel vehicles. Press [E] to use.",
+		},
+		{
+			iso = "de-DE",
+			text = "Stattet Ihr Fahrzeug mit einem KERS-Boost aus, ähnlich wie bei Open-Wheel-Fahrzeugen. Drücken Sie zur Verwendung [E].",
+		},
+		{
+			iso = "fr-FR",
+			text = "Équipe votre véhicule d'un système KERS, similaire à celui des véhicules Open Wheel. Appuyez sur [E] pour l'utiliser.",
+		},
+		{
+			iso = "it-IT",
+			text = "Equipaggia il tuo veicolo con un potenziamento KERS, simile ai veicoli Open Wheel. Premi [E] per usarlo.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Equipa seu veículo com KERS boost, similar aos veículos Open Wheel. Pressione [E] para usar.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Оснащает ваш автомобиль системой KERS boost, аналогичной автомобилям с открытыми колесами. Нажмите [E] для использования.",
+		},
+		{
+			iso = "es-ES",
+			text = "Equipa tu vehículo con el sistema de refuerzo KERS, similar a los vehículos de ruedas abiertas. Pulsa [E] para usarlo.",
+		},
+		{
+			iso = "zh-CN",
+			text = "为您的车辆配备 KERS 加速器，类似于 Open Wheel 车辆。按 [E] 使用。",
+		},
+		{
+			iso = "zh-TW",
+			text = "為您的車輛配備 KERS 助推器，類似於 Open Wheel 車輛。按[E]使用。",
+		},
+		{
+			iso = "ja-JP",
+			text = "オープンホイール車両と同様に、車両に KERS ブーストを装備します。使用するには [E] を押します。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Wyposaż swój pojazd w KERS boost, podobnie jak pojazdy Open Wheel. Naciśnij [E], aby użyć.",
+		},
+		{
+			iso = "ko-KR",
+			text = "Open Wheel 차량과 유사한 KERS 부스트를 차량에 장착합니다. 사용하려면 [E]를 누르세요.",
+		},
+	},
+	OFFROADERX2_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Greatly improves your vehicle's offroad capabilities.",
+		},
+		{
+			iso = "de-DE",
+			text = "Verbessert die Geländegängigkeit Ihres Fahrzeugs erheblich.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Améliore considérablement les capacités tout-terrain de votre véhicule.",
+		},
+		{
+			iso = "it-IT",
+			text = "Migliora notevolmente le capacità fuoristrada del tuo veicolo.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Melhora muito as capacidades offroad do seu veículo.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Значительно улучшает внедорожные возможности вашего автомобиля.",
+		},
+		{
+			iso = "es-ES",
+			text = "Mejora enormemente las capacidades todoterreno de su vehículo.",
+		},
+		{
+			iso = "zh-CN",
+			text = "大大提高您的车辆的越野能力。",
+		},
+		{
+			iso = "zh-TW",
+			text = "大大提升您的車輛的越野能力。",
+		},
+		{
+			iso = "ja-JP",
+			text = "車両のオフロード性能を大幅に向上します。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Znacznie zwiększa możliwości pojazdu w terenie.",
+		},
+		{
+			iso = "ko-KR",
+			text = "차량의 오프로드 성능이 크게 향상됩니다.",
+		},
+	},
+	RALLYTIRES_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Equips your vehicle with rally tires. Improves offroad traction.",
+		},
+		{
+			iso = "de-DE",
+			text = "Stattet Ihr Fahrzeug mit Rallyereifen aus. Verbessert die Traktion im Gelände.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Equipez votre véhicule de pneus rallye. Améliore la traction hors route.",
+		},
+		{
+			iso = "it-IT",
+			text = "Equipaggia il tuo veicolo con pneumatici da rally. Migliora la trazione fuoristrada.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Equipa seu veículo com pneus de rally. Melhora a tração offroad.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Оснащает ваш автомобиль шинами для ралли. Улучшает сцепление на бездорожье.",
+		},
+		{
+			iso = "es-ES",
+			text = "Equipa tu vehículo con neumáticos de rally. Mejora la tracción todoterreno.",
+		},
+		{
+			iso = "zh-CN",
+			text = "为您的车辆配备拉力轮胎。提高越野牵引力。",
+		},
+		{
+			iso = "zh-TW",
+			text = "為您的車輛配備拉力輪胎。提高越野牽引力。",
+		},
+		{
+			iso = "ja-JP",
+			text = "車両にラリータイヤを装備します。オフロードでのトラクションが向上します。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Wyposaż swój pojazd w opony rajdowe. Poprawia przyczepność w terenie.",
+		},
+		{
+			iso = "ko-KR",
+			text = "차량에 랠리 타이어를 장착합니다. 오프로드 주행력을 향상시킵니다.",
+		},
+	},
+	NOTRACTIONCTRL_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Force disables traction control. Mainly important for motorcycles because it allows you to drift them.",
+		},
+		{
+			iso = "de-DE",
+			text = "Force deaktiviert die Traktionskontrolle. Dies ist vor allem für Motorräder wichtig, da man damit driften kann.",
+		},
+		{
+			iso = "fr-FR",
+			text = "La force désactive le contrôle de traction. Principalement important pour les motos car cela vous permet de les faire déraper.",
+		},
+		{
+			iso = "it-IT",
+			text = "Force disattiva il controllo della trazione. Importante soprattutto per le motociclette perché consente di farle derapare.",
+		},
+		{
+			iso = "pt-BR",
+			text = "A força desabilita o controle de tração. Principalmente importante para motocicletas porque permite que você faça drift com elas.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Force отключает контроль тяги. В основном важно для мотоциклов, так как позволяет дрифтовать.",
+		},
+		{
+			iso = "es-ES",
+			text = "La fuerza desactiva el control de tracción. Esto es importante sobre todo en el caso de las motocicletas, ya que permite derrapar.",
+		},
+		{
+			iso = "zh-CN",
+			text = "力量会禁用牵引力控制。这对摩托车来说非常重要，因为它允许你漂移摩托车。",
+		},
+		{
+			iso = "zh-TW",
+			text = "力量會使牽引力控制失效。這對摩托車來說尤其重要，因為它可以讓你漂移它們。",
+		},
+		{
+			iso = "ja-JP",
+			text = "強制的にトラクション コントロールを無効にします。これは主にバイクでドリフトできるようになるため重要です。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Force wyłącza kontrolę trakcji. Głównie ważne dla motocykli, ponieważ pozwala na drift.",
+		},
+		{
+			iso = "ko-KR",
+			text = "힘은 트랙션 컨트롤을 비활성화합니다. 주로 오토바이에 중요한데, 오토바이를 드리프트할 수 있기 때문입니다.",
+		},
+	},
+	EASYWHEELIE_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Allows you to pop wheelies at very low speeds, just like the 'Manchez'.",
+		},
+		{
+			iso = "de-DE",
+			text = "Ermöglicht Ihnen, Wheelies bei sehr niedriger Geschwindigkeit zu machen, genau wie mit dem „Manchez“.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Permet de faire des wheelies à très basse vitesse, tout comme le « Manchez ».",
+		},
+		{
+			iso = "it-IT",
+			text = "Permette di impennare a velocità molto basse, proprio come la \"Manchez\".",
+		},
+		{
+			iso = "pt-BR",
+			text = "Permite que você faça cavalinhos em velocidades muito baixas, assim como o 'Manchez'.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Позволяет делать вилли на очень низкой скорости, как на «Manchez».",
+		},
+		{
+			iso = "es-ES",
+			text = "Permite hacer caballitos a velocidades muy bajas, al igual que el 'Manchez'.",
+		},
+		{
+			iso = "zh-CN",
+			text = "允许您以非常低的速度弹出前轮，就像‘Manchez’一样。",
+		},
+		{
+			iso = "zh-TW",
+			text = "讓您以非常低的速度彈出前輪，就像‘Manchez’一樣。",
+		},
+		{
+			iso = "ja-JP",
+			text = "「Manchez」のように、非常に低速でウイリーすることができます。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Umożliwia wykonywanie wheelie'ów przy bardzo niskich prędkościach, podobnie jak „Manchez”.",
+		},
+		{
+			iso = "ko-KR",
+			text = "'맨체스'처럼 매우 낮은 속도에서도 윌리를 할 수 있습니다.",
+		},
+	},
+	FORCE_NO_TC_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Disables traction control. Mainly important for motorcycles because it allows you to drift them.",
+		},
+		{
+			iso = "de-DE",
+			text = "Deaktiviert die Traktionskontrolle. Dies ist vor allem für Motorräder wichtig, da Sie damit driften können.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Désactive le contrôle de traction. Principalement important pour les motos car cela permet de les faire déraper.",
+		},
+		{
+			iso = "it-IT",
+			text = "Disattiva il controllo della trazione. Importante soprattutto per le motociclette perché consente di farle derapare.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Desabilita o controle de tração. Importante principalmente para motocicletas porque permite que você faça drift com elas.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Отключает контроль тяги. В основном важно для мотоциклов, так как позволяет дрифтовать.",
+		},
+		{
+			iso = "es-ES",
+			text = "Desactiva el control de tracción. Es importante sobre todo para las motocicletas porque permite derrapar.",
+		},
+		{
+			iso = "zh-CN",
+			text = "禁用牵引力控制。这对摩托车来说非常重要，因为它允许你漂移摩托车。",
+		},
+		{
+			iso = "zh-TW",
+			text = "禁用牽引力控制。這對摩托車來說尤其重要，因為它可以讓你漂移它們。",
+		},
+		{
+			iso = "ja-JP",
+			text = "トラクション コントロールを無効にします。これは主にバイクでドリフトを行えるため重要です。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Wyłącza kontrolę trakcji. Głównie ważne dla motocykli, ponieważ pozwala na drift.",
+		},
+		{
+			iso = "ko-KR",
+			text = "트랙션 컨트롤을 비활성화합니다. 주로 오토바이에 중요한데, 오토바이를 드리프트할 수 있기 때문입니다.",
+		},
+	},
+	VEH_GRABBER_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Same as 'Ped Grabber' but with vehicles.",
+		},
+		{
+			iso = "de-DE",
+			text = "Dasselbe wie „Ped Grabber“, aber mit Fahrzeugen.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Identique à « Ped Grabber » mais avec des véhicules.",
+		},
+		{
+			iso = "it-IT",
+			text = "Uguale a \"Ped Grabber\", ma con veicoli.",
+		},
+		{
+			iso = "pt-BR",
+			text = "O mesmo que 'Ped Grabber', mas com veículos.",
+		},
+		{
+			iso = "ru-RU",
+			text = "То же, что и «Ped Grabber», но с транспортными средствами.",
+		},
+		{
+			iso = "es-ES",
+			text = "Igual que 'Ped Grabber' pero con vehículos.",
+		},
+		{
+			iso = "zh-CN",
+			text = "与“Ped Grabber”相同，但涉及车辆。",
+		},
+		{
+			iso = "zh-TW",
+			text = "與“Ped Grabber”相同，但涉及車輛。",
+		},
+		{
+			iso = "ja-JP",
+			text = "「Ped Grabber」と同じですが、車両を使用します。",
+		},
+		{
+			iso = "pl-PL",
+			text = "To samo co „Ped Grabber”, ale z pojazdami.",
+		},
+		{
+			iso = "ko-KR",
+			text = "'Ped Grabber'와 동일하지만 차량을 이용합니다.",
+		},
+	},
+	PUBLIC_SEATS_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Allows you to sit down on public benches and seats.",
+		},
+		{
+			iso = "de-DE",
+			text = "Ermöglicht das Sitzen auf öffentlichen Bänken und Sitzgelegenheiten.",
+		},
+		{
+			iso = "fr-FR",
+			text = "Permet de s'asseoir sur les bancs et sièges publics.",
+		},
+		{
+			iso = "it-IT",
+			text = "Consente di sedersi su panchine e sedili pubblici.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Permite que você se sente em bancos e assentos públicos.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Позволяет сидеть на общественных скамейках и сиденьях.",
+		},
+		{
+			iso = "es-ES",
+			text = "Permite sentarse en bancos y asientos públicos.",
+		},
+		{
+			iso = "zh-CN",
+			text = "允许您坐在公共长椅和座位上。",
+		},
+		{
+			iso = "zh-TW",
+			text = "允許您坐在公共長椅和座位上。",
+		},
+		{
+			iso = "ja-JP",
+			text = "公共のベンチや座席に座ることができます。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Umożliwia siadanie na publicznych ławkach i krzesłach.",
+		},
+		{
+			iso = "ko-KR",
+			text = "공공 벤치와 좌석에 앉을 수 있습니다.",
+		},
+	},
+	AMB_SCN_DESC_ = {
+		{
+			iso = "en-US",
+			text = "Many locations in Los Santos have Ambient Scenario triggers. These are places where you usuallly see NPCs doing random stuff like working out at the beach, sitting down, drinking, smoking, etc...\nIf you come across one of these spots in the open world, a prompt will show up asking you to press [E] to play the available scenario.\n\nNOTE: If a scenario glitches out or fails to start/stop, you can hold [Left Shift] and press [E] to force start or stop it.",
+		},
+		{
+			iso = "de-DE",
+			text = "Viele Orte in Los Santos haben Auslöser für Umgebungsszenarien. Das sind Orte, an denen Sie normalerweise NPCs sehen, die zufällige Dinge tun, wie am Strand trainieren, sich hinsetzen, trinken, rauchen usw.\nWenn Sie in der offenen Welt auf einen dieser Orte stoßen, werden Sie aufgefordert, [E] zu drücken, um das verfügbare Szenario abzuspielen.\n\nHINWEIS: Wenn ein Szenario einen Fehler aufweist oder nicht gestartet/gestoppt werden kann, können Sie [Linke Umschalttaste] gedrückt halten und [E] drücken, um es zu starten oder zu stoppen.",
+		},
+		{
+			iso = "fr-FR",
+			text = "De nombreux endroits de Los Santos ont des déclencheurs de scénario ambiant. Ce sont des endroits où vous voyez généralement des PNJ faire des choses aléatoires comme s'entraîner à la plage, s'asseoir, boire, fumer, etc...\nSi vous tombez sur l'un de ces endroits dans le monde ouvert, une invite s'affichera vous demandant d'appuyer sur [E] pour jouer le scénario disponible.\n\nREMARQUE : si un scénario rencontre un problème ou ne démarre/s'arrête pas, vous pouvez maintenir la touche [Maj gauche] enfoncée et appuyer sur [E] pour le forcer à démarrer ou à l'arrêter.",
+		},
+		{
+			iso = "it-IT",
+			text = "Molte location a Los Santos hanno trigger di Scenario Ambientale. Si tratta di luoghi in cui solitamente vedi PNG fare cose casuali come allenarsi in spiaggia, sedersi, bere, fumare, ecc...\nSe ti imbatti in uno di questi punti nel mondo aperto, apparirà un messaggio che ti chiederà di premere [E] per riprodurre lo scenario disponibile.\n\nNOTA: se uno scenario si blocca o non si avvia/ferma, puoi tenere premuto [Maiusc sinistro] e premere [E] per forzare l'avvio o l'arresto.",
+		},
+		{
+			iso = "pt-BR",
+			text = "Muitos locais em Los Santos têm gatilhos de Cenários Ambientais. Esses são lugares onde você normalmente vê NPCs fazendo coisas aleatórias, como malhar na praia, sentar, beber, fumar, etc...\nSe você encontrar um desses lugares no mundo aberto, um prompt aparecerá pedindo para você pressionar [E] para reproduzir o cenário disponível.\n\nNOTA: Se um cenário falhar ou não iniciar/parar, você pode segurar [Shift esquerdo] e pressionar [E] para forçar o início ou pará-lo.",
+		},
+		{
+			iso = "ru-RU",
+			text = "Во многих местах Лос-Сантоса есть триггеры сценария окружения. Это места, где вы обычно видите NPC, занимающихся случайными вещами, например, тренирующихся на пляже, сидящих, пьющих, курящих и т. д...\nЕсли вы наткнетесь на одно из таких мест в открытом мире, появится подсказка с просьбой нажать [E], чтобы воспроизвести доступный сценарий.\n\nПРИМЕЧАНИЕ: Если сценарий глючит или не запускается/не останавливается, вы можете удерживать [левый Shift] и нажать [E], чтобы принудительно запустить или остановить его.",
+		},
+		{
+			iso = "es-ES",
+			text = "Muchos lugares de Los Santos tienen activadores de escenarios ambientales. Son lugares en los que normalmente ves a los PNJ haciendo cosas al azar, como hacer ejercicio en la playa, sentarse, beber, fumar, etc. Si te encuentras con uno de estos lugares en el mundo abierto, aparecerá un mensaje que te pedirá que presiones [E] para jugar el escenario disponible. NOTA: Si un escenario falla o no se inicia o detiene, puedes mantener presionada la tecla [Mayúscula izquierda] y presionar [E] para forzar su inicio o detención.",
+		},
+		{
+			iso = "zh-CN",
+			text = "洛圣都的许多地方都有环境场景触发器。在这些地方，您通常会看到 NPC 做一些随机的事情，比如在沙滩上锻炼、坐下、喝酒、抽烟等……\n如果您在开放世界中遇到这些地点之一，则会显示一个提示，要求您按 [E] 播放可用的场景。\n\n注意：如果场景出现故障或无法启动/停止，您可以按住 [左 Shift] 并按 [E] 强制启动或停止它。",
+		},
+		{
+			iso = "zh-TW",
+			text = "洛聖都的許多地方都有環境場景觸發器。這些地方通常會看到NPC 做一些隨機的事情，例如在沙灘上運動、坐下、喝酒、抽煙等等...\n如果你在開放世界中遇到這些地點之一，就會出現一個提示，問你按 [E] 播放可用場景。",
+		},
+		{
+			iso = "ja-JP",
+			text = "ロスサントスの多くの場所には、アンビエント シナリオ トリガーがあります。これらは通常、ビーチで運動したり、座ったり、飲んだり、喫煙したりなど、NPC がランダムなことをしているのを目にする場所です...\nオープン ワールドでこれらのスポットの 1 つに遭遇すると、利用可能なシナリオを再生するには [E] キーを押すように求めるプロンプトが表示されます。\n\n注: シナリオがグリッチしたり、開始/停止に失敗したりした場合は、[左シフト] キーを押したまま [E] キーを押すと、強制的に開始または停止できます。",
+		},
+		{
+			iso = "pl-PL",
+			text = "Wiele lokacji w Los Santos ma wyzwalacze scenariuszy otoczenia. Są to miejsca, w których zazwyczaj widzisz NPC wykonujących losowe czynności, takie jak ćwiczenia na plaży, siedzenie, picie, palenie itp.\nJeśli natkniesz się na jedno z tych miejsc w otwartym świecie, pojawi się monit z prośbą o naciśnięcie [E], aby rozegrać dostępny scenariusz.\n\nUWAGA: Jeśli scenariusz ulegnie awarii lub nie uruchomi się/nie zatrzyma, możesz przytrzymać [Lewy Shift] i nacisnąć [E], aby wymusić jego rozpoczęcie lub zatrzymanie.",
+		},
+		{
+			iso = "ko-KR",
+			text = "로스 산토스의 많은 장소에는 앰비언트 시나리오 트리거가 있습니다. 이는 NPC가 해변에서 운동하거나, 앉거나, 술을 마시거나, 담배를 피우는 등 무작위적인 행동을 하는 것을 일반적으로 볼 수 있는 장소입니다...\n오픈 월드에서 이러한 장소 중 하나를 발견하면 [E]를 눌러 사용 가능한 시나리오를 플레이하라는 메시지가 표시됩니다.\n\n참고: 시나리오에 오류가 발생하거나 시작/중지에 실패하면 [왼쪽 Shift]를 누른 상태에서 [E]를 눌러 강제로 시작하거나 중지할 수 있습니다.",
+		},
+	},
+	GENERIC_KEYBOARD_LABEL_ = {
+		{
+			iso = "en-US",
+			text = "Keyboard",
+		},
+		{
+			iso = "de-DE",
+			text = "Tastatur",
+		},
+		{
+			iso = "fr-FR",
+			text = "Clavier",
+		},
+		{
+			iso = "it-IT",
+			text = "Tastiera",
+		},
+		{
+			iso = "pt-BR",
+			text = "Teclado",
+		},
+		{
+			iso = "ru-RU",
+			text = "Клавиатура",
+		},
+		{
+			iso = "es-ES",
+			text = "Teclado",
+		},
+		{
+			iso = "zh-CN",
+			text = "键盘",
+		},
+		{
+			iso = "zh-TW",
+			text = "鍵盤",
+		},
+		{
+			iso = "ja-JP",
+			text = "キーボード",
+		},
+		{
+			iso = "pl-PL",
+			text = "Klawiatura",
+		},
+		{
+			iso = "ko-KR",
+			text = "건반",
+		},
+	},
+	GENERIC_CONTROLLER_LABEL_ = {
+		{
+			iso = "en-US",
+			text = "Controller",
+		},
+		{
+			iso = "de-DE",
+			text = "Regler",
+		},
+		{
+			iso = "fr-FR",
+			text = "Contrôleur",
+		},
+		{
+			iso = "it-IT",
+			text = "Controllore",
+		},
+		{
+			iso = "pt-BR",
+			text = "Controlador",
+		},
+		{
+			iso = "ru-RU",
+			text = "Контроллер",
+		},
+		{
+			iso = "es-ES",
+			text = "Controlador",
+		},
+		{
+			iso = "zh-CN",
+			text = "控制器",
+		},
+		{
+			iso = "zh-TW",
+			text = "控制器",
+		},
+		{
+			iso = "ja-JP",
+			text = "コントローラ",
+		},
+		{
+			iso = "pl-PL",
+			text = "Kontroler",
+		},
+		{
+			iso = "ko-KR",
+			text = "제어 장치",
+		},
+	},
+	GENERIC_UNBIND_LABEL_ = {
+		{
+			iso = "en-US",
+			text = "Unbind",
+		},
+		{
+			iso = "de-DE",
+			text = "Lösen",
+		},
+		{
+			iso = "fr-FR",
+			text = "Délier",
+		},
+		{
+			iso = "it-IT",
+			text = "Slegare",
+		},
+		{
+			iso = "pt-BR",
+			text = "Desvincular",
+		},
+		{
+			iso = "ru-RU",
+			text = "Отвязать",
+		},
+		{
+			iso = "es-ES",
+			text = "Desatar",
+		},
+		{
+			iso = "zh-CN",
+			text = "解除绑定",
+		},
+		{
+			iso = "zh-TW",
+			text = "解綁",
+		},
+		{
+			iso = "ja-JP",
+			text = "バインド解除",
+		},
+		{
+			iso = "pl-PL",
+			text = "Rozwiązać",
+		},
+		{
+			iso = "ko-KR",
+			text = "해제",
+		},
+	},
+	HOTKEYS_TAB_ = {
+		{
+			iso = "en-US",
+			text = "Keymapping",
+		},
+		{
+			iso = "de-DE",
+			text = "Tastenbelegung",
+		},
+		{
+			iso = "fr-FR",
+			text = "Mappage des touches",
+		},
+		{
+			iso = "it-IT",
+			text = "Mappatura dei tasti",
+		},
+		{
+			iso = "pt-BR",
+			text = "Mapeamento de teclas",
+		},
+		{
+			iso = "ru-RU",
+			text = "Раскладка клавиатуры",
+		},
+		{
+			iso = "es-ES",
+			text = "Mapeo de teclas",
+		},
+		{
+			iso = "zh-CN",
+			text = "键盘映射",
+		},
+		{
+			iso = "zh-TW",
+			text = "鍵盤映射",
+		},
+		{
+			iso = "ja-JP",
+			text = "キーマッピング",
+		},
+		{
+			iso = "pl-PL",
+			text = "Mapowanie klawiszy",
+		},
+		{
+			iso = "ko-KR",
+			text = "키맵핑",
 		},
 	},
 }

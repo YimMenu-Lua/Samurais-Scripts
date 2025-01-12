@@ -41,7 +41,7 @@
 1. Fork the repo.
 2. Locate `generate_translations.py`
 3. Install all requirements by either manually installing each module in the `modules` list at line 3 in the Python file or un-commenting lines 1 to 10 and running the script.
-4. Run the script if it's not already running and once prompted, enter your language code.
+4. Run the script if it's not already running and once prompted, choose the first option then enter your language code.
 
 > [!NOTE]
 > both `fr` and `fr-FR` are valid for French but just `zh` will throw an error because you have to specify which Chinese dialect you want: `zh-CN` for simplified and `zh-TW` for traditional. Same thing applies for all languages with multiple dialects.
@@ -52,6 +52,16 @@
 5. Open `Translations.lua` and make sure your new language was correctly added and most importantly, double check the `iso` field. If it says `iso = ja-JA` then it will not work because that's not the correct iso code for Japanese, `ja-JP` is. This happens because the py script tries to set the iso country code if you don't provide one but it doesn't know that `JP` is the correct one so it simply adds a dash and an upper-case version of the iso code you provided.
 6. Open `samurais_scripts.lua` and check if your new language exists in the `lang_T` table. If it doesn't then simply add it by following the same structure.
 7. Open a PR.
+
+### Adding a new label
+
+1. Run `generate_translations.py` and choose the second option.
+2. Enter a global name in all uppercase and ending with an underscore (Example: `MY_NEW_LABEL_`). This will be used as both the Lua table key and the global variable that you can then pass to your new addition (text, button, tooltip, etc...)
+3. Enter the string that will be added and translated (Example: `This is a generic text.`).
+4. Wait for it to finish and then your new global can be used in the script. (Example: `ImGui.Text(MY_NEW_LABEL_)`).
+5. If your string has a line break escape code, go to `includes/lib/Translations.lua` and remove the excess escape char. *(it will look like this: `\\n` and it's a small issue with the Lua parser. Just search and replace and you're good to go)*.
+
+> Optional: If you have `pyperclip` installed, your new global variable's name will be automatically copied to clipboard.
 
 ## Main Script
 

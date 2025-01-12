@@ -54,11 +54,15 @@ function vehicleUI()
     ImGui.SetNextWindowBgAlpha(0.9)
     ImGui.SetNextWindowSize(450, 260)
     if ImGui.BeginPopupModal("Nos Settings", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-      ImGui.Spacing(); ImGui.Text("NOS Settings"); ImGui.SameLine(); ImGui.Dummy(256, 1); ImGui.SameLine()
+      is_typing = true
+      ImGui.Spacing(); ImGui.Text("NOS Settings"); ImGui.SameLine()
+      local avail_x, _ = ImGui.GetContentRegionAvail()
+      ImGui.Dummy(avail_x - 55, 1) ImGui.SameLine()
       ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
       if ImGui.Button("  X  ##nos_settings") then
         UI.widgetSound("Cancel")
         ImGui.CloseCurrentPopup()
+        is_typing = false
       end
       ImGui.PopStyleVar(); ImGui.Separator(); ImGui.Dummy(1, 10)
       nosAudio, nosaudioUsed = ImGui.Checkbox("NOS Sound", nosAudio)
@@ -91,11 +95,13 @@ function vehicleUI()
         UI.widgetSound("Select")
         CFG.save("nosPower", nosPower)
         ImGui.CloseCurrentPopup()
+        is_typing = false
       end
       ImGui.SameLine(); ImGui.Dummy(30, 1); ImGui.SameLine()
       if ImGui.Button(string.format(" %s ##nos_settings", GENERIC_CANCEL_BTN_)) then
         UI.widgetSound("Cancel")
         ImGui.CloseCurrentPopup()
+        is_typing = false
       end
       ImGui.End()
     end
@@ -182,28 +188,6 @@ function vehicleUI()
   end
   UI.toolTip(false, INSTA_180_DESC_)
 
-  if Game.isOnline() then
-    flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall)
-    UI.toolTip(false, FLARES_FOR_ALL_DESC_)
-    if flaresUsed then
-      UI.widgetSound("Nav2")
-      CFG.save("flares_forall", flares_forall)
-    end
-  else
-    ImGui.BeginDisabled()
-    flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall)
-    ImGui.EndDisabled()
-    UI.toolTip(true, GENERIC_UNAVAILABLE_SP_, '#FF3333', 1)
-  end
-
-  ImGui.SameLine(); ImGui.Dummy(46, 1); ImGui.SameLine(); real_plane_speed, rpsUsed = ImGui.Checkbox(
-    "Higher Plane Speeds", real_plane_speed)
-  UI.toolTip(false, PLANE_SPEED_DESC_)
-  if rpsUsed then
-    UI.widgetSound("Nav2")
-    CFG.save("real_plane_speed", real_plane_speed)
-  end
-
   unbreakableWindows, ubwUsed = ImGui.Checkbox("Strong Windows", unbreakableWindows)
   UI.toolTip(false, STRONG_WINDOWS_DESC_)
   if ubwUsed then
@@ -237,6 +221,7 @@ function vehicleUI()
     ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
     ImGui.SetNextWindowBgAlpha(0.81)
     if ImGui.BeginPopupModal("Mine Types", true, ImGuiWindowFlags.AlwaysAutoResize) then
+      is_typing = true
       ImGui.Dummy(1, 5); ImGui.Text(MINES_TYPE_DESC_); ImGui.Dummy(1, 5)
       vmine_type.spikes, spikeUsed = ImGui.Checkbox("Spike", vmine_type.spikes)
       if spikeUsed then
@@ -294,9 +279,7 @@ function vehicleUI()
 
       ImGui.Dummy(1, 5)
       if missiledefense and (vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic) then
-        UI.coloredText(
-          "[ ! ] NOTE: You have 'Missile Defence' activated which will automatically destroy / remove these mines. If you still want to use them, please disable 'Missile Defence'.",
-          "yellow", 0.69, 30)
+        UI.coloredText(VEH_MINES_MDEF_WARN_, "yellow", 0.69, 30)
       end
       ImGui.Dummy(1, 5)
       if vmine_type.spikes or vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic then
@@ -304,6 +287,7 @@ function vehicleUI()
           UI.widgetSound("Select")
           CFG.save("vmine_type", vmine_type)
           ImGui.CloseCurrentPopup()
+          is_typing = false
         end
       end
       ImGui.End()
@@ -341,8 +325,7 @@ function vehicleUI()
   end
 
   abs_lights, abslUsed = ImGui.Checkbox("ABS Brake Lights", abs_lights)
-  UI.toolTip(false,
-    "Flashes your brake lights repeatedly when braking at high speed (over 100km/h).\nOnly works on vehicles that have ABS.")
+  UI.toolTip(false, ABS_LIGHTS_DESC_)
   if abslUsed then
     UI.widgetSound("Nav2")
     CFG.save("abs_lights", abs_lights)
@@ -356,110 +339,158 @@ function vehicleUI()
     CFG.save("fender_bender", fender_bender)
   end
 
-  ImGui.Spacing(); ImGui.SeparatorText("Auto-Pilot")
-  if current_vehicle ~= nil and current_vehicle ~= 0 then
-    local aircraft_check = Game.Self.isDriving() and (is_plane or is_heli)
-    ImGui.BeginDisabled(not aircraft_check)
-    if ImGui.Button(" Fly To Waypoint ") then
+  ImGui.Spacing(); ImGui.SeparatorText("Planes & Helicopters")
+  if Game.isOnline() then
+    flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall)
+    UI.toolTip(false, FLARES_FOR_ALL_DESC_)
+    if flaresUsed then
+      UI.widgetSound("Nav2")
+      CFG.save("flares_forall", flares_forall)
+    end
+  else
+    ImGui.BeginDisabled()
+    flares_forall, _ = ImGui.Checkbox("Flares For All", flares_forall)
+    ImGui.EndDisabled()
+    UI.toolTip(true, GENERIC_UNAVAILABLE_SP_, '#FF3333', 1)
+  end
+  
+  ImGui.SameLine(); ImGui.Dummy(46, 1); ImGui.SameLine(); real_plane_speed, rpsUsed = ImGui.Checkbox(
+    "Higher Jet Speed", real_plane_speed
+  )
+  UI.toolTip(false, PLANE_SPEED_DESC_)
+  if rpsUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("real_plane_speed", real_plane_speed)
+  end
+
+  no_stall, nostallUsed = ImGui.Checkbox("No Engine Stalling", no_stall)
+  UI.toolTip(false, NO_ENGINE_STALL_DESC_)
+  if nostallUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("no_stall", no_stall)
+  end
+
+  ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); cannon_triggerbot, cantrgrUsed = ImGui.Checkbox("Cannon Triggerbot", cannon_triggerbot)
+  UI.toolTip(false, CANNON_TRIGGERBOT_DESC_)
+  if cantrgrUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("cannon_triggerbot", cannon_triggerbot)
+  end
+
+  if cannon_triggerbot then
+    ImGui.SameLine()
+    if ImGui.Button("Options##cannonBot") then
       UI.widgetSound("Select")
-      script.run_in_fiber(function(ap)
-        local wp = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_WAYPOINT_BLIP_ENUM_ID())
-        if HUD.DOES_BLIP_EXIST(wp) then
-          local waypoint_coords = HUD.GET_BLIP_COORDS(wp)
-          if autopilot_objective or autopilot_random then
-            TASK.CLEAR_PED_TASKS(self.get_ped())
-            TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+      ImGui.OpenPopup("Cannon Options")
+    end
+    ImGui.SetNextWindowPos(820, 400, ImGuiCond.Appearing)
+    ImGui.SetNextWindowBgAlpha(0.9)
+    ImGui.SetNextWindowSize(420, 220)
+    if ImGui.BeginPopupModal("Cannon Options", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
+      is_typing = true
+      ImGui.Spacing(); ImGui.Text(CANNON_TRIGGERBOT_OPTIONS_TXT_); ImGui.SameLine()
+      local avail_x, _ = ImGui.GetContentRegionAvail()
+      ImGui.Dummy(avail_x - 55, 1) ImGui.SameLine()
+      ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
+      if ImGui.Button("  X  ##Cannon Options") then
+        UI.widgetSound("Cancel")
+        ImGui.CloseCurrentPopup()
+        is_typing = false
+      end
+      ImGui.PopStyleVar(); ImGui.Separator(); ImGui.Dummy(1, 10)
+      ImGui.Text(CANNON_TRIGGERBOT_RANGE_); ImGui.SameLine() ImGui.SetNextItemWidth(200)
+      cannon_triggerbot_range, ctrUsed = ImGui.SliderInt("##cannon_triggerbot_range", cannon_triggerbot_range, 1000, 5000)
+      UI.toolTip(false, CANNON_TRIGGERBOT_RANGE_DESC_)
+      if ctrUsed then
+        UI.widgetSound("Nav")
+        CFG.save("cannon_triggerbot_range", cannon_triggerbot_range)
+      end
+      ImGui.Dummy(1, 10)
+      cannon_enemies_only, ceonlyUSed = ImGui.Checkbox(ENEMY_ONLY_CB_, cannon_enemies_only)
+      if ceonlyUSed then
+        UI.widgetSound("Nav2")
+        CFG.save("cannon_enemies_only", cannon_enemies_only)
+      end
+      ImGui.End()
+    end
+  end
+
+  cannon_manual_aim, cmaimUsed = ImGui.Checkbox("Cannon Manual Aim", cannon_manual_aim)
+  UI.toolTip(false, CANNON_MANUAL_AIM_DESC_)
+  if cmaimUsed then
+    UI.widgetSound("Nav2")
+    CFG.save("cannon_manual_aim", cannon_manual_aim)
+    if not cannon_manual_aim then
+      script.run_in_fiber(function()
+        if Game.Self.isDriving() and is_heli then
+          if ENTITY.GET_ENTITY_ALPHA(current_vehicle) < 255 then
+            ENTITY.RESET_ENTITY_ALPHA(current_vehicle)
           end
-          autopilot_waypoint  = true
-          autopilot_objective = false
-          autopilot_random    = false
-          gui.show_success("Samurai's Scripts", "Flying towards your waypoint")
-          if is_plane then
-            TASK.TASK_PLANE_MISSION(
-              self.get_ped(), current_vehicle, 0, 0, waypoint_coords.x, waypoint_coords.y, waypoint_coords.z + 600,
-              4, 100.0, 0, 90, 0, 0, true
-            )
-            if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
-              if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
-                if Game.Self.get_elevation() >= 15 then
-                  VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
-                else
-                  repeat
-                    ap:sleep(10)
-                  until Game.Self.get_elevation() >= 15
-                  VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
-                end
-              end
-            end
-          elseif is_heli then
-            TASK.TASK_HELI_MISSION(
-              self.get_ped(), current_vehicle, 0, 0, waypoint_coords.x, waypoint_coords.y, waypoint_coords.z,
-              4, 50.0, 4.0, -1, -1, 100, 100.0, 0
-            )
-          end
-        else
-          gui.show_warning("Samurai's Scripts", "Please set a waypoint on the map first!")
         end
       end)
     end
+  end
+
+  if cannon_manual_aim then
     ImGui.SameLine()
-    if ImGui.Button(" Fly To Objective ") then
+    if ImGui.Button(EDIT_AIM_MARKER_BTN_) then
       UI.widgetSound("Select")
-      script.run_in_fiber(function(ap)
-        local objective_found, objective_coords = Game.findObjectiveBlip()
-        if objective_found and objective_coords ~= nil then
-          if autopilot_waypoint or autopilot_random then
-            TASK.CLEAR_PED_TASKS(self.get_ped())
-            TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
-          end
-          autopilot_waypoint  = false
-          autopilot_objective = true
-          autopilot_random    = false
-          gui.show_success("Samurai's Scripts", "Flying towards objective")
-          if is_plane then
-            TASK.TASK_PLANE_MISSION(
-              self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z + 600,
-              4, 100.0, 0, 90, 0, 0, true
-            )
-            if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
-              if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
-                if Game.Self.get_elevation() >= 15 then
-                  VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
-                else
-                  repeat
-                    ap:sleep(10)
-                  until Game.Self.get_elevation() >= 15
-                  VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
-                end
-              end
-            end
-          elseif is_heli then
-            TASK.TASK_HELI_MISSION(
-              self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z,
-              4, 50.0, 4.0, -1, -1, 100, 100.0, 0
-            )
-          end
-        else
-          gui.show_warning("Samurai's Scripts", "No objective found!")
-        end
-      end)
+      ImGui.OpenPopup("Cannon Aim Marker")
     end
-    ImGui.SameLine()
-    if ImGui.Button(" Random ") then
-      UI.widgetSound("Select")
-      script.run_in_fiber(function(ap)
-        if autopilot_waypoint or autopilot_objective then
+    ImGui.SetNextWindowPos(820, 400, ImGuiCond.Appearing)
+    ImGui.SetNextWindowBgAlpha(0.9)
+    ImGui.SetNextWindowSize(420, 220)
+    if ImGui.BeginPopupModal("Cannon Aim Marker", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
+      is_typing = true
+      ImGui.CalcTextSize(EDIT_AIM_MARKER_BTN_)
+      ImGui.Spacing(); ImGui.Text(EDIT_AIM_MARKER_BTN_); ImGui.SameLine();
+      local avail_x, _ = ImGui.GetContentRegionAvail()
+      ImGui.Dummy(avail_x - 55, 1) ImGui.SameLine()
+      ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
+      if ImGui.Button("  X  ##CannonAimMarker") then
+        UI.widgetSound("Cancel")
+        ImGui.CloseCurrentPopup()
+        is_typing = false
+      end
+      ImGui.PopStyleVar(); ImGui.Separator(); ImGui.Dummy(1, 10)
+      ImGui.Text(AIM_MARKER_SIZE_TXT_); ImGui.SameLine() ImGui.SetNextItemWidth(220)
+      cannon_marker_size, cmsUsed = ImGui.SliderFloat("##cannon_marker_size", cannon_marker_size, 0.1, 10.0)
+      if cmsUsed then
+        UI.widgetSound("Nav")
+        CFG.save("cannon_marker_size", cannon_marker_size)
+      end
+      ImGui.Dummy(1, 10)
+      ImGui.Text(AIM_MARKER_COL_TXT_); cannon_marker_color, cmcUsed = ImGui.ColorEdit3("##markerCol", cannon_marker_color)
+      if cmcUsed then
+        UI.widgetSound("Nav2")
+        CFG.save("cannon_marker_color", cannon_marker_color)
+      end
+      ImGui.End()
+    end
+  end
+
+  local aircraft_check = Game.Self.isDriving() and (is_plane or is_heli)
+  ImGui.Spacing(); ImGui.BeginDisabled(not aircraft_check)
+  ImGui.Text("- Auto-Pilot -")
+  if ImGui.Button(" Fly To Waypoint ") then
+    UI.widgetSound("Select")
+    script.run_in_fiber(function(ap)
+      local wp = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_WAYPOINT_BLIP_ENUM_ID())
+      if HUD.DOES_BLIP_EXIST(wp) then
+        local waypoint_coords = HUD.GET_BLIP_COORDS(wp)
+        if autopilot_objective or autopilot_random then
           TASK.CLEAR_PED_TASKS(self.get_ped())
           TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
         end
-        autopilot_waypoint  = false
+        autopilot_waypoint  = true
         autopilot_objective = false
-        autopilot_random    = true
-        gui.show_success("Samurai's Scripts", "Flying towards some random coordinates")
+        autopilot_random    = false
+        gui.show_success("Samurai's Scripts", "Flying towards your waypoint")
         if is_plane then
+          local initialHoverModeState = VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(current_vehicle)
           TASK.TASK_PLANE_MISSION(
-            self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000),
-            math.random(400, 900), 4, 100.0, 0, 90, 0, 0, true
+            self.get_ped(), current_vehicle, 0, 0, waypoint_coords.x, waypoint_coords.y, waypoint_coords.z + 600,
+            4, 100.0, 0, 90, 0, 0, true
           )
           if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
             if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
@@ -473,35 +504,127 @@ function vehicleUI()
               end
             end
           end
+          ap:sleep(500)
+          if VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(current_vehicle) ~= initialHoverModeState then -- TASK_PLANE_MISSION always reverts to hover mode if available.
+            VEHICLE.SET_VEHICLE_FLIGHT_NOZZLE_POSITION_IMMEDIATE(current_vehicle, initialHoverModeState)
+          end
         elseif is_heli then
           TASK.TASK_HELI_MISSION(
-            self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000),
-            math.random(10, 300),
+            self.get_ped(), current_vehicle, 0, 0, waypoint_coords.x, waypoint_coords.y, waypoint_coords.z,
             4, 50.0, 4.0, -1, -1, 100, 100.0, 0
           )
         end
-      end)
-    end
-    if autopilot_waypoint or autopilot_objective or autopilot_random then
-      ImGui.Dummy(160, 1); ImGui.SameLine()
-      if ImGui.Button("Stop", 60, 35) then
-        UI.widgetSound("Cancel")
-        script.run_in_fiber(function()
+      else
+        gui.show_warning("Samurai's Scripts", "Please set a waypoint on the map first!")
+      end
+    end)
+  end
+  ImGui.SameLine()
+  if ImGui.Button(" Fly To Objective ") then
+    UI.widgetSound("Select")
+    script.run_in_fiber(function(ap)
+      local objective_found, objective_coords = Game.findObjectiveBlip()
+      if objective_found and objective_coords ~= nil then
+        if autopilot_waypoint or autopilot_random then
           TASK.CLEAR_PED_TASKS(self.get_ped())
           TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
-          autopilot_waypoint  = false
-          autopilot_objective = false
-          autopilot_random    = false
-        end)
+        end
+        autopilot_waypoint  = false
+        autopilot_objective = true
+        autopilot_random    = false
+        gui.show_success("Samurai's Scripts", "Flying towards objective")
+        if is_plane then
+          local initialHoverModeState = VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(current_vehicle)
+          TASK.TASK_PLANE_MISSION(
+            self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z + 600,
+            4, 100.0, 0, 90, 0, 0, true
+          )
+          if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
+            if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
+              if Game.Self.get_elevation() >= 15 then
+                VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+              else
+                repeat
+                  ap:sleep(10)
+                until Game.Self.get_elevation() >= 15
+                VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+              end
+            end
+          end
+          ap:sleep(500)
+          if VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(current_vehicle) ~= initialHoverModeState then -- TASK_PLANE_MISSION always reverts to hover mode if available.
+            VEHICLE.SET_VEHICLE_FLIGHT_NOZZLE_POSITION_IMMEDIATE(current_vehicle, initialHoverModeState)
+          end
+        elseif is_heli then
+          TASK.TASK_HELI_MISSION(
+            self.get_ped(), current_vehicle, 0, 0, objective_coords.x, objective_coords.y, objective_coords.z,
+            4, 50.0, 4.0, -1, -1, 100, 100.0, 0
+          )
+        end
+      else
+        gui.show_warning("Samurai's Scripts", "No objective found!")
       end
-    end
-    ImGui.EndDisabled()
-    if not aircraft_check then
-      UI.coloredText(AUTOPILOT_ERROR_TXT_, 'yellow', 0.87, 20)
-    end
-  else
-    UI.coloredText(AUTOPILOT_ERROR_TXT_, 'yellow', 0.87, 20)
+    end)
   end
+  ImGui.SameLine()
+  if ImGui.Button(" Random ") then
+    UI.widgetSound("Select")
+    script.run_in_fiber(function(ap)
+      if autopilot_waypoint or autopilot_objective then
+        TASK.CLEAR_PED_TASKS(self.get_ped())
+        TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+      end
+      autopilot_waypoint  = false
+      autopilot_objective = false
+      autopilot_random    = true
+      gui.show_success("Samurai's Scripts", "Flying towards some random coordinates")
+      if is_plane then
+        local initialHoverModeState = VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(current_vehicle)
+        TASK.TASK_PLANE_MISSION(
+          self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000),
+          math.random(400, 900), 4, 100.0, 0, 90, 0, 0, true
+        )
+        if VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(current_vehicle) and VEHICLE.IS_PLANE_LANDING_GEAR_INTACT(current_vehicle) then
+          if VEHICLE.GET_LANDING_GEAR_STATE(current_vehicle) ~= 4 then
+            if Game.Self.get_elevation() >= 15 then
+              VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+            else
+              repeat
+                ap:sleep(10)
+              until Game.Self.get_elevation() >= 15
+              VEHICLE.CONTROL_LANDING_GEAR(current_vehicle, 1)
+            end
+          end
+        end
+        ap:sleep(500)
+        if VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(current_vehicle) ~= initialHoverModeState then -- TASK_PLANE_MISSION always reverts to hover mode if available.
+          VEHICLE.SET_VEHICLE_FLIGHT_NOZZLE_POSITION_IMMEDIATE(current_vehicle, initialHoverModeState)
+        end
+      elseif is_heli then
+        TASK.TASK_HELI_MISSION(
+          self.get_ped(), current_vehicle, 0, 0, math.random(-3000, 3000), math.random(-3000, 3000),
+          math.random(10, 300),
+          4, 50.0, 4.0, -1, -1, 100, 100.0, 0
+        )
+      end
+    end)
+  end
+  if autopilot_waypoint or autopilot_objective or autopilot_random then
+    ImGui.SameLine()
+    if ImGui.Button(GENERIC_STOP_BTN_) then
+      UI.widgetSound("Cancel")
+      gui.show_message("Samurai's Scripts", "Auto-Pilot canceled.")
+      script.run_in_fiber(function()
+        TASK.CLEAR_PED_TASKS(self.get_ped())
+        TASK.CLEAR_PRIMARY_VEHICLE_TASK(current_vehicle)
+        autopilot_waypoint  = false
+        autopilot_objective = false
+        autopilot_random    = false
+      end)
+    end
+  end
+  ImGui.EndDisabled()
+
   ImGui.Dummy(1, 5); ImGui.SeparatorText("MISC")
   ImGui.BeginDisabled(current_vehicle == 0)
   if ImGui.Button(string.format(" %s ", ENGINE_SOUND_BTN_)) then
@@ -587,12 +710,7 @@ function vehicleUI()
   UI.toolTip(false, EJECTO_SEATO_DESC_)
 
   if current_vehicle ~= 0 then
-    local engineHealth = VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle)
-    if engineHealth <= 300 then
-      engineDestroyed = true
-    else
-      engineDestroyed = false
-    end
+    local engineDestroyed = cv_engineHealth <= 300
   end
   if engineDestroyed then
     engineButton_label = FIX_ENGINE_
@@ -620,11 +738,12 @@ function vehicleUI()
   if ImGui.Button("TP Into Last Vehicle") then
     UI.widgetSound("Select")
     script.run_in_fiber(function()
-      if ENTITY.DOES_ENTITY_EXIST(current_vehicle) and ENTITY.IS_ENTITY_A_VEHICLE(current_vehicle) then
+      if ENTITY.DOES_ENTITY_EXIST(current_vehicle) and ENTITY.IS_ENTITY_A_VEHICLE(current_vehicle) and
+      VEHICLE.IS_VEHICLE_DRIVEABLE(current_vehicle, true) then
         TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
         PED.SET_PED_INTO_VEHICLE(self.get_ped(), current_vehicle, -1)
       else
-        gui.show_error("Samurai's Scripts", "Your last vehicle no longer exists in the game world.")
+        gui.show_error("Samurai's Scripts", "Your last vehicle was either destroyed or no longer exists in the game world.")
       end
     end)
   end
@@ -633,7 +752,7 @@ function vehicleUI()
     UI.widgetSound("Select")
     script.run_in_fiber(function(blv)
       if ENTITY.DOES_ENTITY_EXIST(current_vehicle) and ENTITY.IS_ENTITY_A_VEHICLE(current_vehicle) and
-      math.floor(VEHICLE.GET_VEHICLE_BODY_HEALTH(current_vehicle)) > 0 then
+      VEHICLE.IS_VEHICLE_DRIVEABLE(current_vehicle, true) then
         local veh_coords  = ENTITY.GET_ENTITY_COORDS(current_vehicle, true)
         local self_coords = self.get_pos()
         local distance    = MISC.GET_DISTANCE_BETWEEN_COORDS(veh_coords.x, veh_coords.y, veh_coords.z, self_coords.x,
@@ -655,7 +774,7 @@ function vehicleUI()
           )
         end
       else
-        gui.show_error("Samurai's Scripts", "Your last vehicle no longer exists in the game world.")
+        gui.show_error("Samurai's Scripts", "Your last vehicle was either destroyed or no longer exists in the game world.")
       end
     end)
   end
@@ -666,7 +785,8 @@ function vehicleUI()
       if ImGui.Button("TP Into Personal Vehicle") then
         UI.widgetSound("Select")
         script.run_in_fiber(function()
-          if ENTITY.DOES_ENTITY_EXIST(globals.get_int(pv_global)) then
+          if ENTITY.DOES_ENTITY_EXIST(globals.get_int(pv_global)) and ENTITY.IS_ENTITY_A_VEHICLE(current_vehicle) and
+          VEHICLE.IS_VEHICLE_DRIVEABLE(current_vehicle, true) then
             if INTERIOR.GET_INTERIOR_FROM_ENTITY(globals.get_int(pv_global)) == 0 then
               TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
               PED.SET_PED_INTO_VEHICLE(self.get_ped(), globals.get_int(pv_global), -1)
@@ -674,7 +794,7 @@ function vehicleUI()
               gui.show_error("Samurai's Scripts", "Your personal vehicle is not outside.")
             end
           else
-            gui.show_error("Samurai's Scripts", "Your personal vehicle no longer exists in the game world.")
+            gui.show_error("Samurai's Scripts", "Your personal vehicle was either destroyed or no longer exists in the game world.")
           end
         end)
       end
@@ -682,8 +802,8 @@ function vehicleUI()
       if ImGui.Button("Bring Personal Vehicle") then
         UI.widgetSound("Select")
         script.run_in_fiber(function(bpv)
-          if ENTITY.DOES_ENTITY_EXIST(globals.get_int(pv_global)) and
-          math.floor(VEHICLE.GET_VEHICLE_BODY_HEALTH(globals.get_int(pv_global))) > 0 then
+          if ENTITY.DOES_ENTITY_EXIST(globals.get_int(pv_global)) and ENTITY.IS_ENTITY_A_VEHICLE(current_vehicle) and
+          VEHICLE.IS_VEHICLE_DRIVEABLE(current_vehicle, true) then
             if INTERIOR.GET_INTERIOR_FROM_ENTITY(globals.get_int(pv_global)) == 0 then
               local veh_coords  = ENTITY.GET_ENTITY_COORDS(globals.get_int(pv_global), true)
               local self_coords = self.get_pos()
@@ -706,7 +826,7 @@ function vehicleUI()
               gui.show_error("Samurai's Scripts", "Your personal vehicle is not outside.")
             end
           else
-            gui.show_error("Samurai's Scripts", "Your personal vehicle no longer exists in the game world.")
+            gui.show_error("Samurai's Scripts", "Your personal vehicle was either destroyed or no longer exists in the game world.")
           end
         end)
       end

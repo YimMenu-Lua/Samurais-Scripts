@@ -9,7 +9,7 @@ function worldUI()
     vehicleGrabber = false
   end
   vehicleGrabber, vgUsed = ImGui.Checkbox("Vehicle Grabber", vehicleGrabber)
-  UI.helpMarker(false, "Same as 'Ped Grabber' but with vehicles.")
+  UI.helpMarker(false, VEH_GRABBER_DESC_)
   if vgUsed then
     UI.widgetSound("Nav2")
     pedGrabber = false
@@ -137,16 +137,14 @@ function worldUI()
   end
 
   public_seats, pseatsUsed = ImGui.Checkbox("Public Seating", public_seats)
-  UI.helpMarker(false, "Allows you to sit down on public benches and seats")
+  UI.helpMarker(false, PUBLIC_SEATS_DESC_)
   if pseatsUsed then
     UI.widgetSound("Nav2")
     CFG.save("public_seats", public_seats)
   end
 
   ambient_scenarios, ascnUsed = ImGui.Checkbox("Ambient Scenarios", ambient_scenarios)
-  UI.helpMarker(false,
-    "Many locations in Los Santos have Ambient Scenario triggers. These are places where you usuallly see NPCs doing random stuff like working out at the beach, sitting down, drinking, smoking, etc...\nIf you come across one of these spots in the open world, a prompt will show up asking you to press [E] to play the available scenario.\n\nNOTE: If a scenario glitches out or fails to start/stop, you can hold [Left Shift] and press [E] to force start or stop it."
-  )
+  UI.helpMarker(false, AMB_SCN_DESC_)
   if ascnUsed then
     UI.widgetSound("Nav2")
     CFG.save("ambient_scenarios", ambient_scenarios)

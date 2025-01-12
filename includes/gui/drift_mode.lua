@@ -176,7 +176,7 @@ function driftModeUI()
       end
 
       if driftMode or DriftTires then
-        ImGui.Dummy(1, 10); ImGui.SeparatorText("[Experimental]")
+        ImGui.Dummy(1, 10); ImGui.SeparatorText(DRIFT_GAME_EXPERIMENTAL_TXT_)
         ImGui.Spacing(); driftMinigame, drmgUsed = ImGui.Checkbox("Drift Minigame", driftMinigame)
         UI.toolTip(false, DRIFT_GAME_DESC_)
         if drmgUsed then

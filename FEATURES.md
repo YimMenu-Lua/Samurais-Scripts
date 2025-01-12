@@ -80,7 +80,7 @@
   - All nearby enemies will drop their weapons and run away from you. Note that during some missions, enemies will be confused and sometimes stand still and scream in horror because the game is forcing them to attack and this script is forcing them to flee.
 
 - **Katana:**
-  - Replaces the *Machete* weapon with a Japanese katana. If you don't own a Machete, you can either buy one from Ammu-Nation or use YimMenu to equip a temporary one. Once you have one equipped in your hands, it will be automatically replaced with a Katana.
+  - Replaces one of these melee weapons: **Baseball Bat**, **Golf Club**, **Machete**, or **Pool Que** with a Japanese katana. If you don't own the weapon, you can either buy one from Ammu-Nation or use YimMenu to equip a temporary one. Once you have one equipped in your hands, it will be automatically replaced with a Katana.
 
 - **Laser Sight:**
   - Renders a laser sight on your weapons when you're aiming them. You can choose between Red, Green, and Blue lasers. Can be toggled on/off by pressing the assigned key *(default **[L]** on keyboard)* while aiming.
@@ -117,19 +117,31 @@
   
   - **Strong Windows:**
     - Prevents your vehicle's windows from breaking.
-
+  
+  - **Vehicle Mines:**
+    - Equip any land vehicle with mines. Enable the option then press the button to choose the type of mine you want *(**Spike**, **Slick**, **Kinetic**, **EMP**, **Explosive**)* Once everything is set, while driving a vehicle press the assigned button *(default [N])* to deploy mines.
+  
   - **Flares For All:**
     - This option equips any plane or helicopter you fly with unlimited flares. Just use the same counter-measure button you use on your weaponized planes *(default: [E] on keyboard)* to fire flares. And yes, they do work as counter-measures same as the ones in weaponized planes, there's just a 3 second delay between each use to prevent unexpected issues.
 
   - **Higher Plane Speeds:**
-    - Increases the speed limit on planes to 555km/h. Just enable the option and the rest will take care of itself.
-      > **NOTE:** This option will not do anything unless you're flying high enough, with your landing gear fully retracted, and at a speed of at least 260km/h. If for some reason you want to fly a Cropduster at 555km/h, fly high enough then nose-dive to hit 260km/h.
+    - Increases the speed limit on planes to 576km/h (the game's max). Just enable the option and the rest will take care of itself.
+      > **NOTE:** This option will not do anything unless you're flying high enough, with your landing gear fully retracted, and at a speed of at least 260km/h. If for some reason you want to fly a Cropduster at max speed, fly high enough then nose-dive to hit 260km/h.
+
+      >**NOTE:** Pairing this option with "**Extend World Limits**" from the **World** tab allows you to fly out of the sky box. *(if you wanna meet Jesus)*. Beware though, the camera will stop following you once you go past the sky limit. *(so you can't actually see Jesus after all)*.
   
-  - **Vehicle Mines:**
-    - Equip any land vehicle with mines. Enable the option then press the button to choose the type of mine you want *(Spike, Slick, Kinetic, EMP, Explosive)* Once everything is set, while driving a vehicle press the assigned button *(default [N])* to deploy mines.
+  - **No Engine Stalling:**
+    - When flying planes and holding the brake button, your engine will not shut off.
+  
+  - **Cannon Triggerbot:**
+    - When using a weaponized plane or heli and having the machine gun selected, it will automatically shoot targets in front of you. Also has the option to only shoot enemies.
+
+  - **Cannon Manual Aim:**
+    - Gives you the ability to manually aim and shoot an explosive cannon. The only requirement is to be using an aircraft that has a machine gun (doesn't have to be an explosive MG) and the machine gun is the selected weapon.
+    - Also works with **Cannon Triggerbot**: if you manually aim at an entity while having the triggerbot enabled, it will automatically blast it wil explosive MG.
 
   - **Auto-Pilot:**
-    - While flying a plane or a helicopter, open the UI and choose one of the auto-pilot options: **Fly To Waypoint**, **Fly To Objective** or **Fly to random coordinates**.
+    - While flying a plane or a helicopter, open the UI and choose one of the auto-pilot options: **Fly To Waypoint**, **Fly To Objective** or **Random**.
   
   - **Fake Siren:**
     - Equip any land vehicle with a siren *(except of course, vehicles that already have one)*.
