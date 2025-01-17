@@ -707,8 +707,10 @@ script.register_looped("HFC", function(hfc) -- Hide From Cops
                 boot_vehicle_len = vmax.y - vmin.y
                 local attachPosY = isRearEngined and (boot_vehicle_len / 3) or (-boot_vehicle_len / 3)
                 if Game.requestAnimDict("timetable@tracy@sleep@") then
-                  TASK.TASK_PLAY_ANIM(self.get_ped(), "timetable@tracy@sleep@", "base", 4.0, -4.0, -1, 2, 1.0, false, false,
-                    false)
+                  TASK.TASK_PLAY_ANIM(
+                    self.get_ped(), "timetable@tracy@sleep@", "base",
+                    4.0, -4.0, -1, 2, 1.0, false, false, false
+                  )
                   ENTITY.ATTACH_ENTITY_TO_ENTITY(
                   self.get_ped(), vehicle, chassis_bone, -0.3, attachPosY, z_offset,
                     180.0, 0.0, 0.0, false, false, false, false, 20, true, 1
@@ -3579,7 +3581,7 @@ script.register_looped("ISALE", function(isale)
       end
     end
     if (CAM.IS_SCREEN_FADING_OUT() or CAM.IS_SCREEN_FADED_OUT()) then
-      as:sleep(6969)
+      isale:sleep(6969)
       if CAM.IS_SCREEN_FADED_OUT() and not CAM.IS_SCREEN_FADING_IN() then -- step bro I'm stuck
         CAM.DO_SCREEN_FADE_IN(100)
       end
