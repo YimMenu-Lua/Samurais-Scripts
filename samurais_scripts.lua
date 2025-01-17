@@ -137,7 +137,13 @@ RegisterCommand("autofill.whouse5", function()
   end
 end)
 
-RegisterCommand("finish_sale", function()
+RegisterCommand("yrv2.fillall", function()
+  script.run_in_fiber(function(fa)
+    SS.fillAll(fa)
+  end)
+end)
+
+RegisterCommand("finishsale", function()
   if Game.isOnline() then
     if autosell then
       gui.show_warning("Samurai's Scripts", "You aleady have 'Auto-Sell' enabled. No need to manually trigger it.")
@@ -184,6 +190,16 @@ RegisterCommand("PANIK", function()
 end)
 
 RegisterCommand("resetcfg", SS.reset_settings)
+
+RegisterCommand("fastvehs", function()
+  fast_vehicles = not fast_vehicles
+  gui.show_message("Samurai's Scripts", ("Fast Vehicles %s"):format(fast_vehicles and "enabled" or "disabled"))
+  if not fast_vehicles and current_vehicle ~= 0 and (is_car or is_bike or is_quad) then
+    script.run_in_fiber(function()
+      VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, 0)
+    end)
+  end
+end)
 
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
@@ -280,7 +296,7 @@ end)
 script.register_looped("GINPUT", function() -- Game Input
   if is_typing or is_setting_hotkeys then
     if not gui.is_open() then
-      is_typing, is_setting_hotkeys = false, false -- these sometimes get stuck
+      is_typing, is_setting_hotkeys = false, false
     end
     PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
   end
@@ -362,15 +378,15 @@ script.register_looped("GINPUT", function() -- Game Input
       end
     end
     if holdF and Game.Self.isOutside() then
-      if not is_typing and not is_setting_hotkeys and (is_car or is_bike or is_quad) and not ducking_in_car
-          and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
+      if not ducking_in_car and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh())
+      and not is_typing and not is_setting_hotkeys and not cmd_ui_is_open then
         PAD.DISABLE_CONTROL_ACTION(0, 75, true)
       else
         timerB = 0
       end
     end
     if keepWheelsTurned and Game.Self.isOutside() then
-      if not is_typing and not is_setting_hotkeys and (is_car or is_quad) and not ducking_in_car
+      if (is_car or is_quad) and not ducking_in_car
           and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh()) then
         if PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35) then
           PAD.DISABLE_CONTROL_ACTION(0, 75, true)
@@ -550,7 +566,9 @@ script.register_looped("RGDL", function(rgdl) -- Ragdoll
     end
   elseif rod and Game.Self.isOnFoot() and pressing_rod_button and not is_hiding then
     if PED.CAN_PED_RAGDOLL(self.get_ped()) then
-      PED.SET_PED_TO_RAGDOLL(self.get_ped(), 1500, 0, 0, false, false, false)
+      if not Game.Self.isBrowsingApps() then
+        PED.SET_PED_TO_RAGDOLL(self.get_ped(), 1500, 0, 0, false, false, false)
+      end
       if isCrouched then
         isCrouched = false
       end
@@ -724,7 +742,6 @@ script.register_looped("HFC", function(hfc) -- Hide From Cops
             end
             if not was_spotted then
               if ENTITY.DOES_ENTITY_EXIST(bin) then
-                -- should I add screen fade in/out to make it fancier? hmm! probably not.
                 TASK.TASK_TURN_PED_TO_FACE_ENTITY(self.get_ped(), bin, 10)
                 CAM.DO_SCREEN_FADE_OUT(500)
                 hfc:sleep(1000)
@@ -1324,7 +1341,6 @@ end)
 
 -- vehicle stuff
 script.register_looped("TDFT", function(script)
-  script:yield()
   if PED.IS_PED_IN_ANY_VEHICLE(self.get_ped(), false) then
     current_vehicle = onVehEnter()
     cv_engineHealth = VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle)
@@ -1420,9 +1436,10 @@ script.register_looped("TDFT", function(script)
         end
       end
     end
-    if keepWheelsTurned and Game.Self.isDriving() and Game.Self.isOutside() and is_car and not holdF and not ducking_in_car then
+    if keepWheelsTurned and Game.Self.isDriving() and Game.Self.isOutside() and is_car and not holdF and not ducking_in_car
+    and not is_typing and not is_setting_hotkeys then
       if PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) and (PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35))
-          and not HUD.IS_MP_TEXT_CHAT_TYPING() then
+      and not HUD.IS_MP_TEXT_CHAT_TYPING() then
         VEHICLE.SET_VEHICLE_ENGINE_ON(current_vehicle, false, true, false)
         TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 16)
       end
@@ -1444,7 +1461,7 @@ script.register_looped("TDFT", function(script)
         end
       end
       if timerB >= 1 and timerB <= 10 then
-        if PAD.IS_DISABLED_CONTROL_RELEASED(0, 75) and not HUD.IS_MP_TEXT_CHAT_TYPING() then
+        if PAD.IS_DISABLED_CONTROL_RELEASED(0, 75) and not HUD.IS_MP_TEXT_CHAT_TYPING() and not is_typing and not is_setting_hotkeys then
           if keepWheelsTurned and (PAD.IS_CONTROL_PRESSED(0, 34) or PAD.IS_CONTROL_PRESSED(0, 35)) and is_car and not ducking_in_car then
             TASK.TASK_LEAVE_VEHICLE(self.get_ped(), current_vehicle, 16)
             timerB = 0
@@ -1701,6 +1718,12 @@ script.register_looped("MISCVEH", function(mvo)
         Game.Vehicle.lockDoors(current_vehicle, false, mvo)
       end
       vehicleLockStatus = isLocked and 2 or 1
+    end
+  end
+
+  if fast_vehicles and current_vehicle ~= 0 and (is_car or is_bike or is_quad) then
+    if cv_topSpeed <= 50 then
+      VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, 100)
     end
   end
 end)
@@ -2469,20 +2492,20 @@ script.register_looped("MISCPLANES", function(miscp)
         local rot  = CAM.GET_GAMEPLAY_CAM_ROT(0)
         local dir  = Lua_fn.RotToDir(rot)
         local dest = vec3:new(
-          pos.x + dir.x * 500,
-          pos.y + dir.y * 500,
-          pos.z + dir.z * 500
+          pos.x + dir.x * 200,
+          pos.y + dir.y * 200,
+          pos.z + dir.z * 200
         )
         local hit, endCoords, _ = Game.rayCast(pos, dest, -1, current_vehicle)
         local endPos = hit and endCoords or vec3:new(
-          pos.x + dir.x * 5000,
-          pos.y + dir.y * 5000,
-          pos.z + dir.z * 5000
+          pos.x + dir.x * 1000,
+          pos.y + dir.y * 1000,
+          pos.z + dir.z * 1000
         )
         local markerDest = hit and endCoords or vec3:new(
-          pos.x + dir.x * 100,
-          pos.y + dir.y * 100,
-          (pos.z + dir.z * 100) + 1
+          pos.x + dir.x * 50,
+          pos.y + dir.y * 50,
+          (pos.z + dir.z * 50) + 1
         )
         local r, g, b = cannon_marker_color[1] * 255, cannon_marker_color[2] * 255, cannon_marker_color[3] * 255
         local size = cannon_marker_size
@@ -3444,76 +3467,88 @@ end)
 script.register_looped("CDK", function() -- Cooldown Killer
   if Game.isOnline() and TARGET_BUILD == CURRENT_BUILD and not script.is_active("maintransition") then
     if mc_work_cd then
-      if globals.get_int(Global_262145.f_18571) > 0 then
-        globals.set_int(Global_262145.f_18571, 0)
+      if tunables.get_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL") > 0 then
+        tunables.set_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL", 0)
       end
     end
     if hangar_cd then
-      if globals.get_int(Global_262145.f_22433) > 0 then
-        globals.set_int(Global_262145.f_22433, 0)
+      if tunables.get_int("SMUG_STEAL_EASY_COOLDOWN_TIMER") > 0 then
+        tunables.set_int("SMUG_STEAL_EASY_COOLDOWN_TIMER", 0)
       end
-      if globals.get_int(Global_262145.f_22434) > 0 then
-        globals.set_int(Global_262145.f_22434, 0)
+      if tunables.get_int("SMUG_STEAL_MED_COOLDOWN_TIMER") > 0 then
+        tunables.set_int("SMUG_STEAL_MED_COOLDOWN_TIMER", 0)
       end
-      if globals.get_int(Global_262145.f_22435) > 0 then
-        globals.set_int(Global_262145.f_22435, 0)
+      if tunables.get_int("SMUG_STEAL_HARD_COOLDOWN_TIMER") > 0 then
+        tunables.set_int("SMUG_STEAL_HARD_COOLDOWN_TIMER", 0)
       end
     end
     if nc_management_cd then
-      if globals.get_int(Global_262145.f_24026) > 0 then
-        globals.set_int(Global_262145.f_24026, 0)
+      if tunables.get_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN") > 0 then
+        tunables.set_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN", 0)
       end
     end
     if nc_vip_mission_chance then
-      if globals.get_int(Global_262145.f_31882) > 0 then
-        globals.set_int(Global_262145.f_31882, 0)
+      if tunables.get_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT") > 0 then
+        tunables.set_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT", 0)
       end
     else
-      if globals.get_int(Global_262145.f_31882) == 0 then
-        globals.set_int(Global_262145.f_31882, 50)
+      if tunables.get_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT") == 0 then
+        tunables.set_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT", 50)
       end
     end
     if security_missions_cd then
-      if globals.get_int(Global_262145.f_31038) > 0 then
-        globals.set_int(Global_262145.f_31038, 0)
+      if tunables.get_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME") > 0 then
+        tunables.set_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME", 0)
       end
     end
     if ie_vehicle_steal_cd then
-      if globals.get_int(Global_262145.f_19077) > 0 then
-        globals.set_int(Global_262145.f_19077, 0)
+      if tunables.get_int("IMPEXP_STEAL_COOLDOWN") > 0 then
+        tunables.set_int("IMPEXP_STEAL_COOLDOWN", 0)
       end
     end
     if ie_vehicle_sell_cd then
-      if globals.get_int(Global_262145.f_19153) > 0 then
-        globals.set_int(Global_262145.f_19153, 0)
+      if tunables.get_int("IMPEXP_SELL_COOLDOWN") > 0 then
+        tunables.set_int("IMPEXP_SELL_COOLDOWN", 0)
       end
-      if globals.get_int(Global_262145.f_19432) > 0 then
-        globals.set_int(Global_262145.f_19432, 0)
+      if tunables.get_int("IMPEXP_SELL_1_CAR_COOLDOWN") > 0 then
+        tunables.set_int("IMPEXP_SELL_1_CAR_COOLDOWN", 0)
       end
-      if globals.get_int(Global_262145.f_19433) > 0 then
-        globals.set_int(Global_262145.f_19433, 0)
+      if tunables.get_int("IMPEXP_SELL_2_CAR_COOLDOWN") > 0 then
+        tunables.set_int("IMPEXP_SELL_2_CAR_COOLDOWN", 0)
       end
-      if globals.get_int(Global_262145.f_19434) > 0 then
-        globals.set_int(Global_262145.f_19434, 0)
+      if tunables.get_int("IMPEXP_SELL_3_CAR_COOLDOWN") > 0 then
+        tunables.set_int("IMPEXP_SELL_3_CAR_COOLDOWN", 0)
       end
-      if globals.get_int(Global_262145.f_19435) > 0 then
-        globals.set_int(Global_262145.f_19435, 0)
+      if tunables.get_int("IMPEXP_SELL_4_CAR_COOLDOWN") > 0 then
+        tunables.set_int("IMPEXP_SELL_4_CAR_COOLDOWN", 0)
       end
     end
     if ceo_crate_buy_cd then
-      if globals.get_int(Global_262145.f_15499) > 0 then
-        globals.set_int(Global_262145.f_15499, 0)
+      if tunables.get_int("EXEC_BUY_COOLDOWN") > 0 then
+        tunables.set_int("EXEC_BUY_COOLDOWN", 0)
       end
-      if globals.get_int(Global_262145.f_15501) > 0 then
-        globals.set_int(Global_262145.f_15501, 0)
+      if tunables.get_int("EXEC_BUY_FAIL_COOLDOWN") > 0 then
+        tunables.set_int("EXEC_BUY_FAIL_COOLDOWN", 0)
       end
     end
     if ceo_crate_sell_cd then
-      if globals.get_int(Global_262145.f_15500) > 0 then
-        globals.set_int(Global_262145.f_15500, 0)
+      if tunables.get_int("EXEC_SELL_COOLDOWN") > 0 then
+        tunables.set_int("EXEC_SELL_COOLDOWN", 0)
       end
-      if globals.get_int(Global_262145.f_15502) > 0 then
-        globals.set_int(Global_262145.f_15502, 0)
+      if tunables.get_int("EXEC_SELL_FAIL_COOLDOWN") > 0 then
+        tunables.set_int("EXEC_SELL_FAIL_COOLDOWN", 0)
+      end
+    end
+
+    if dax_work_cd then
+      if stats.get_int("MPX_XM22JUGGALOWORKCDTIMER") > 0 then
+        stats.set_int("MPX_XM22JUGGALOWORKCDTIMER", 0)
+      end
+    end
+
+    if garment_rob_cd then
+      if stats.get_int("MPX_HACKER24_ROBBERY_CD") > 0 then
+        stats.set_int("MPX_HACKER24_ROBBERY_CD", 0)
       end
     end
   end
@@ -3534,10 +3569,26 @@ script.register_looped("ISALE", function(isale)
       script_name, simplified_scr_name, scr_is_running = "None", "None", false
     end
   end
+  if scr_is_running and abhubScriptHandle ~= 0 then
+    for _, scr in pairs(should_terminate_scripts) do
+      if script.is_active(scr) then -- was triggered from the mct
+        PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 202, 1.0)
+        isale:sleep(200)
+        PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 202, 1.0)
+        break
+      end
+    end
+    if (CAM.IS_SCREEN_FADING_OUT() or CAM.IS_SCREEN_FADED_OUT()) then
+      as:sleep(6969)
+      if CAM.IS_SCREEN_FADED_OUT() and not CAM.IS_SCREEN_FADING_IN() then -- step bro I'm stuck
+        CAM.DO_SCREEN_FADE_IN(100)
+      end
+    end
+  end
   isale:sleep(1000)
 end)
 script.register_looped("AUTOSELL", function(as)
-  if autosell and scr_is_running and not autosell_was_triggered then
+  if autosell and scr_is_running and not autosell_was_triggered and not CAM.IS_SCREEN_FADED_OUT() then
     autosell_was_triggered = true
     gui.show_message("Samurai's Scripts", "Auto-Sell will start in 20 seconds.")
     as:sleep(20000)
@@ -3654,7 +3705,7 @@ script.register_looped("WH1SUPP", function(wh_1)
       end
       if stats.get_int("MPX_CONTOTALFORWHOUSE0") == whouse1.max then
         UI.widgetSound("Error")
-        gui.show_warning("Samurai's Scripts", "Your Warehouse is already full! Option has been disabled.")
+        gui.show_warning("Samurai's Scripts", "Warehouse N°1 is already full! Option has been disabled.")
         wh1_loop = false
       else
         repeat
@@ -3685,7 +3736,7 @@ script.register_looped("WH2SUPP", function(wh_2)
       end
       if stats.get_int("MPX_CONTOTALFORWHOUSE1") == whouse2.max then
         UI.widgetSound("Error")
-        gui.show_warning("Samurai's Scripts", "Your Warehouse is already full! Option has been disabled.")
+        gui.show_warning("Samurai's Scripts", "Warehouse N°2 is already full! Option has been disabled.")
         wh2_loop = false
       else
         repeat
@@ -3716,7 +3767,7 @@ script.register_looped("WH3SUPP", function(wh_3)
       end
       if stats.get_int("MPX_CONTOTALFORWHOUSE2") == whouse3.max then
         UI.widgetSound("Error")
-        gui.show_warning("Samurai's Scripts", "Your Warehouse is already full! Option has been disabled.")
+        gui.show_warning("Samurai's Scripts", "Warehouse N°3 is already full! Option has been disabled.")
         wh3_loop = false
       else
         repeat
@@ -3747,7 +3798,7 @@ script.register_looped("WH4SUPP", function(wh_4)
       end
       if stats.get_int("MPX_CONTOTALFORWHOUSE3") == whouse4.max then
         UI.widgetSound("Error")
-        gui.show_warning("Samurai's Scripts", "Your Warehouse is already full! Option has been disabled.")
+        gui.show_warning("Samurai's Scripts", "Warehouse N°4 is already full! Option has been disabled.")
         wh4_loop = false
       else
         repeat
@@ -3778,7 +3829,7 @@ script.register_looped("WH5SUPP", function(wh_5)
       end
       if stats.get_int("MPX_CONTOTALFORWHOUSE4") == whouse5.max then
         UI.widgetSound("Error")
-        gui.show_warning("Samurai's Scripts", "Your Warehouse is already full! Option has been disabled.")
+        gui.show_warning("Samurai's Scripts", "Warehouse N°5 is already full! Option has been disabled.")
         wh5_loop = false
       else
         repeat

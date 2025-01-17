@@ -86,7 +86,7 @@ initStrings = function()
     local key = keys_t[i]
     _G[key] = translateLabel(key)
     if SS_debug then
-      gTranslatedString_t[key] = _G[key]
+      gTranslatedStrings_t[key] = _G[key]
     end
   end
   log.info(string.format("Loaded %d translations for %s.", total, current_lang))
@@ -218,7 +218,6 @@ dummyCop = function()
           VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 0, true)
           VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(current_vehicle, 1, true)
           -- ENTITY.SET_ENTITY_VISIBLE(dummyCopCar, false, false) -- you can't see the lights anymore but the dummy police vehicle no longer appears to other players.
-          log.debug(tostring(dummyCopCar))
         end
       end
     end
@@ -1546,13 +1545,27 @@ Lua_fn.intToHex = function(n, base)
   return '0x' .. str
 end
 
+---@param tbl table
+---@param value any
 Lua_fn.tableContains = function(tbl, value)
   if #tbl == 0 then
     return false
   end
   for i = 1, #tbl do
-    if tbl[i] == value then
-      return true
+    if type(tbl[i]) == 'table' then
+      for _, entry in pairs(tbl[i]) do
+        if type(entry) == type(value) then
+          if entry == value then
+            return true
+          end
+        end
+      end
+    else
+      if type(tbl[i]) == type(value) then
+        if tbl[i] == value then
+          return true
+        end
+      end
     end
   end
   return false
@@ -2093,17 +2106,14 @@ end
 ---@param warehouse table
 SS.getCEOwhouseInfo = function(warehouse)
   script.run_in_fiber(function()
-    local property_index  = (stats.get_int(("MPX_PROP_WHOUSE_SLOT%d"):format(warehouse.id)) - 1)
-    warehouse.name        = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(("MP_WHOUSE_%d"):format(property_index))
-    warehouse.size.small  = Lua_fn.tableContains(ceo_warehouses_t.small, warehouse.name)
-    warehouse.size.medium = Lua_fn.tableContains(ceo_warehouses_t.medium, warehouse.name)
-    warehouse.size.large  = Lua_fn.tableContains(ceo_warehouses_t.large, warehouse.name)
-    if  warehouse.size.small then
-      warehouse.max = 16
-    elseif  warehouse.size.medium then
-      warehouse.max = 42
-    elseif  warehouse.size.large then
-      warehouse.max = 111
+    local property_index = (stats.get_int(("MPX_PROP_WHOUSE_SLOT%d"):format(warehouse.id)) - 1)
+    warehouse.name       = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(("MP_WHOUSE_%d"):format(property_index))
+    if ceo_warehouses_t[warehouse.name] then
+      warehouse.size.small  = ceo_warehouses_t[warehouse.name].size == 0
+      warehouse.size.medium = ceo_warehouses_t[warehouse.name].size == 1
+      warehouse.size.large  = ceo_warehouses_t[warehouse.name].size == 2
+      warehouse.max         = ceo_warehouses_t[warehouse.name].max
+      warehouse.pos         = ceo_warehouses_t[warehouse.name].coords
     end
   end)
 end
@@ -2144,6 +2154,105 @@ SS.FinishSale = function(scr_name)
       end
     end
   end)
+end
+
+SS.finishCargoSourceMission = function()
+  if script.is_active("gb_contraband_buy") then
+    script.execute_as_script("gb_contraband_buy", function()
+      if not NETWORK.NETWORK_IS_HOST_OF_THIS_SCRIPT() then
+        gui.show_error("Samurai's Scripts", "You are not host of this script.")
+        return
+      end
+      locals.set_int("gb_contraband_buy", 621 + 5, 1)   -- 1.70 -- case -1: return "INVALID - UNSET";
+      locals.set_int("gb_contraband_buy", 621 + 191, 6) -- 1.70 -- func_40 Local_621.f_191 = iParam0;
+      locals.set_int("gb_contraband_buy", 621 + 192, 4) -- 1.70 -- func_15 Local_621.f_192 = iParam0;
+    end)
+  elseif script.is_active("fm_content_cargo") then
+    script.execute_as_script("fm_content_cargo", function()
+      if not NETWORK.NETWORK_IS_HOST_OF_THIS_SCRIPT() then
+        gui.show_error("Samurai's Scripts", "You are not host of this script.")
+        return
+      end
+      local val = locals.get_int("fm_content_cargo", 5883 + 1 + 0) -- GENERIC_BITSET_I_WON -- 1.70 -- var uLocal_5883 = 4;
+      if not Lua_fn.has_bit(val, 11) then
+        val = Lua_fn.set_bit(val, 11)
+        locals.set_int("fm_content_cargo", 5883 + 1 + 0, val)
+      end
+      locals.set_int("fm_content_cargo", 5979 + 1157, 3) -- EndReason -- 1.70 -- func_8 Local_5979.f_1157 = iParam0;
+    end)
+  end
+end
+
+---@param s script_util
+SS.fillAll = function(s)
+  if not Game.isOnline() then
+    gui.show_error("Samurai's Scripts", GENERIC_UNAVAILABLE_SP_)
+    return
+  end
+  if stats.get_int("MPX_HANGAR_OWNED") ~= 0 then
+    if not hangarLoop then
+      hangarLoop = true
+      s:sleep(300)
+    end
+  end
+  if stats.get_int("MPX_PROP_WHOUSE_SLOT0") > 0 then
+    if not wh1_loop then
+      wh1_loop = true
+      s:sleep(300)
+    end
+  end
+  if stats.get_int("MPX_PROP_WHOUSE_SLOT1") > 0 then
+    if not wh2_loop then
+      wh2_loop = true
+      s:sleep(300)
+    end
+  end
+  if stats.get_int("MPX_PROP_WHOUSE_SLOT2") > 0 then
+    if not wh3_loop then
+      wh3_loop = true
+      s:sleep(300)
+    end
+  end
+  if stats.get_int("MPX_PROP_WHOUSE_SLOT3") > 0 then
+    if not wh4_loop then
+      wh4_loop = true
+      s:sleep(300)
+    end
+  end
+  if stats.get_int("MPX_PROP_WHOUSE_SLOT4") > 0 then
+    if not wh5_loop then
+      wh5_loop = true
+      s:sleep(300)
+    end
+  end
+  if stats.get_int("MPX_PROP_FAC_SLOT0") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY0") < 100 then
+    globals.set_int(gb_global + 0 + 1, 1)
+    s:sleep(300)
+  end
+  if stats.get_int("MPX_PROP_FAC_SLOT1") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY1") < 100 then
+    globals.set_int(gb_global + 1 + 1, 1)
+    s:sleep(300)
+  end
+  if stats.get_int("MPX_PROP_FAC_SLOT2") and stats.get_int("MPX_MATTOTALFORFACTORY2") < 100 then
+    globals.set_int(gb_global + 2 + 1, 1)
+    s:sleep(300)
+  end
+  if stats.get_int("MPX_PROP_FAC_SLOT3") and stats.get_int("MPX_MATTOTALFORFACTORY3") < 100 then
+    globals.set_int(gb_global + 3 + 1, 1)
+    s:sleep(300)
+  end
+  if stats.get_int("MPX_PROP_FAC_SLOT4") and stats.get_int("MPX_MATTOTALFORFACTORY4") < 100 then
+    globals.set_int(gb_global + 4 + 1, 1)
+    s:sleep(300)
+  end
+  if stats.get_int("MPX_PROP_FAC_SLOT5") and stats.get_int("MPX_MATTOTALFORFACTORY5") < 100 then
+    globals.set_int(gb_global + 5 + 1, 1)
+    s:sleep(300)
+  end
+  if stats.get_int("MPX_XM22_LAB_OWNED") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY6") < 100 then
+    globals.set_int(gb_global + 6 + 1, 1)
+    s:sleep(300)
+  end
 end
 
 ---@param keybind table
@@ -3366,9 +3475,11 @@ end
 
 ---@param text string
 Game.showButtonPrompt = function(text)
-  HUD.BEGIN_TEXT_COMMAND_DISPLAY_HELP("STRING")
-  HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text)
-  HUD.END_TEXT_COMMAND_DISPLAY_HELP(0, false, true, -1)
+  if not HUD.IS_HELP_MESSAGE_ON_SCREEN() then
+    HUD.BEGIN_TEXT_COMMAND_DISPLAY_HELP("STRING")
+    HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text)
+    HUD.END_TEXT_COMMAND_DISPLAY_HELP(0, false, true, -1)
+  end
 end
 
 ---@param entity integer
@@ -3454,6 +3565,15 @@ Game.requestWeaponAsset = function(weapon)
     coroutine.yield()
   end
   return WEAPON.HAS_WEAPON_ASSET_LOADED(weapon)
+end
+
+---@param scr string
+Game.requestScript = function(scr)
+  while not SCRIPT.HAS_SCRIPT_LOADED(scr) do
+    SCRIPT.REQUEST_SCRIPT(scr)
+    coroutine.yield()
+  end
+  return SCRIPT.HAS_SCRIPT_LOADED(scr)
 end
 
 ---@param entity integer
@@ -3651,7 +3771,7 @@ Game.DoesHumanScenarioExistInArea = function(area, radius, isFree)
   return false
 end
 
--- Starts a Line Of Sight probe test.
+-- Starts a Line Of Sight world probe shape test.
 ---@param src vec3
 ---@param dest vec3
 ---@param traceFlags integer
@@ -3659,7 +3779,7 @@ Game.rayCast = function(src, dest, traceFlags, entityToExclude)
   local rayHandle = SHAPETEST.START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(
     src.x, src.y, src.z,
     dest.x, dest.y, dest.z,
-    traceFlags, entityToExclude, 4
+    traceFlags, entityToExclude, 7
   )
   local endCoords     = memory.allocate(0xC)
   local surfaceNormal = memory.allocate(0xC)
@@ -3870,7 +3990,9 @@ end
 -- Returns whether the player is currently using any mobile or computer app.
 Game.Self.isBrowsingApps = function()
   for _, v in ipairs(app_script_names_T) do
-    return script.is_active(v)
+    if script.is_active(v) then
+      return true
+    end
   end
   return false
 end

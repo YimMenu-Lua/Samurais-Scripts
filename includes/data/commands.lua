@@ -4,6 +4,8 @@ commands_t  = {}
 local ucmdEntered   = false
 local command_index = 0
 
+---@param arg string
+---@param callback function
 function RegisterCommand(arg, callback)
   table.insert(commands_t, { arg = arg, callback = callback })
 end

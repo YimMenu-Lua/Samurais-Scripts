@@ -6,7 +6,7 @@
 
 ####    
 
-[![sv](https://img.shields.io/badge/Script%20Version-v1.5.5-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)   
+[![sv](https://img.shields.io/badge/Script%20Version-v1.5.6-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)   
 [![gv](https://img.shields.io/badge/Game%20Version-Online%201.70%20|%20Build%203411-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)   
 [![bm](https://img.shields.io/badge/Business%20Manager-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)   
 [![cp](https://img.shields.io/badge/Casino%20Pacino-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)   
@@ -79,6 +79,25 @@ The folder structure should look like this
 - [x] Improve and merge [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier). ✔️ Done.
 
 ####    
+
+####    
+
+## Commands
+
+> *Default command executor button: **[NUMPAD7]***
+
+- `autoheal` : Enables/Disables the script's auto-heal feature.
+- `rod` : Enables/Disables the **Ragdoll On Demand** feature.
+- `autofill.hangar` : Starts auto-filling your hangar cargo.
+- `autofill.whouse1` : Starts auto-filling your CEO Warehouse N°1 *(if oyu have more than one, use the same command with the corresponding number. Ex: `autofill.whouse4`)*.
+- `yrv2.fillall` : Fills all your owned businesses with supplies.
+- `finishsale` : Instantly finishes a sale mission (from a list of missions supported by the script). Will be skipped if you have the **Auto-Sell** option enabled.
+- `fastvehs` : Increases the top speed of any *land* vehicle you drive.
+- `spawnmeaperv` : No comment.
+- `kys` : Kills you.
+- `vehlock` : Locks/unlocks your vehicle.
+- `PANIK` : Resets all changes done by the script (same as the panic button).
+- `resetcfg` : Resets the script and restores your saved config to default.
 
 ## Credits
 

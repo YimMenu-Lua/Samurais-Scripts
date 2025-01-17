@@ -705,7 +705,7 @@ end
 ---@param s script_util
 function stopScenario(ped, s)
   if PED.IS_PED_USING_ANY_SCENARIO(ped) then
-    Game.busySpinnerOn(translateLabel("scenarios_spinner"), 3)
+    Game.busySpinnerOn(SCN_STOP_SPINNER_, 3)
     TASK.CLEAR_PED_TASKS(ped)
     if ENTITY.DOES_ENTITY_EXIST(bbq) then
       ENTITY.DELETE_ENTITY(bbq)

@@ -1,35 +1,21 @@
-### v1.5.5 Changelog
+### v1.5.6 Changelog
 
 #### Self -> Hide & Seek
 
-- Improved **Hide In Dumpster:**
-  - Decreased the distance at which a dumpster is detected.
-  - The feature will not prompt the player unless they're facing a dumpster.
+- Prompts from all 3 sub-features no longer interfere with gameplay.
 
-#### Vehicle -> Planes & Helis
+#### Online -> Business Manager
 
-- Moved aircraft features into their own zone.
-- Increased top speed for the "**Real Jet Speed**" option to 576km/h (the game's max).
-- 🎉 Added 3 new features:
+- Added teleport buttons for CEO Warehouses.
+- Added a button to instantly finish CEO cargo source missions.
+- Fixed hangar and bunker teleport buttons and removed the public session tp warning tooltip *(both don't use blips anymore so now they work correctly in public sessions)*.
+- Bunker and Acid Lab upgrades are now automatically read instead of relying on the user to tick a box.
+- Added a buton to open the **Master Control Terminal** so you can easily source cargo or sell stock from anywhere.
+- Changed cooldowns to tunables instead of globals.
+- Added Dax Work and Garment Factory cooldowns.
 
-  - **No Engine Stalling:** When flying planes and holding the brake button, your engine will not shut off.
-  
-  - **Cannon Triggerbot:** When using a weaponized plane or heli and having the machine gun selected, it will automatically shoot targets in front of you. Also has the option to only shoot enemies.
-  
-  - **Cannon Triggerbot:** When using a weaponized plane or heli and having the machine gun selected, it will automatically shoot targets in front of you. Also has the option to only shoot enemies.
-  
-  - **Cannon Manual Aim:** Gives you the ability to manually aim and shoot an explosive cannon. The only requirement is to be using an aircraft that has a machine gun (doesn't have to be an explosive MG) and the machine gun is the selected weapon. Also works with **Cannon Triggerbot**: if you manually aim at an entity while having the triggerbot enabled, it will automatically blast it wil explosive MG.
+#### Commands
 
-#### Translations
-
-- Added missing translations.
-- Added Korean support.
-
-#### MISC
-
-- Added missing objects.
-- Removed unused code.
-
-#### Devs
-
-- `generate_translations.py` now also adds new entries and translates them to all supported languages.
+- Added a new command: `fastvehs`: Increases the top speed of any *land* vehicle you drive.
+- Added a new command: `yrv2.fillall`: Fills all your owned businesses with supplies.
+- Renamed the `finish_sale` command to `finishsale`.

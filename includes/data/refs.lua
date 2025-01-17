@@ -1170,17 +1170,45 @@ trash_bins_T             = {
 }
 
 app_script_names_T       = {
-  "appArcadeBusiness",
-  "appArcadeBusinessHub",
-  "appAvengerOperations",
-  "appBikerBusiness",
-  "appBunkerBusiness",
-  "appBusinessHub",
-  "appFixerSecurity",
-  "appHackerTruck",
-  "appHackerTruck",
-  "appInternet",
-  "appSmuggler",
+  "apparcadebusiness",
+  "apparcadebusinesshub",
+  "appavengeroperations",
+  "appbailoffice",
+  "appbikerbusiness",
+  "appbroadcast",
+  "appbunkerbusiness",
+  "appbusinesshub",
+  "appcamera",
+  "appchecklist",
+  "appcontacts",
+  "appcovertops",
+  "appemail",
+  "appextraction",
+  "appfixersecurity",
+  "apphackertruck",
+  "apphackerden",
+  "apphs_sleep",
+  "appimportexport",
+  "appinternet",
+  "appjipmp",
+  "appmedia",
+  "appmpbossagency",
+  "appmpemail",
+  "appmpjoblistnew",
+  "apporganiser",
+  "appprogresshub",
+  "apprepeatplay",
+  "appsecurohack",
+  "appsecuroserv",
+  "appsettings",
+  "appsidetask",
+  "appsmuggler",
+  "apptextmessage",
+  "apptrackify",
+  "appvinewoodmenu",
+  "appvlsi",
+  "appzit",
+  -- "debug_app_select_screen",
 }
 
 modshop_script_names     = {
@@ -1637,7 +1665,7 @@ vehicle_classes_t = {
 translations_button_map  = {
   { name = "DRIFT_MODE_DESC_",    kbm = keybinds.tdBtn.name },
   { name = "DRIFT_TIRES_DESC_",   kbm = keybinds.tdBtn.name },
-  { name = "NOS_DESC_    ",       kbm = keybinds.nosBtn.name },
+  { name = "NOS_DESC_",           kbm = keybinds.nosBtn.name },
   { name = "VEHICLE_MINES_DESC_", kbm = keybinds.vehicle_mine.name },
   { name = "ANIM_STOP_DESC_",     kbm = keybinds.stop_anim.name },
   { name = "SCN_STOP_DESC_",      kbm = keybinds.stop_anim.name },
@@ -1724,6 +1752,14 @@ simplified_scr_names     = {
   { scr = "fm_content_acid_lab_sell", sn = "Acid Lab" },
 }
 
+should_terminate_scripts = {
+  "appArcadeBusinessHub",
+  "appsmuggler",
+  "appbikerbusiness",
+  "appbunkerbusiness",
+  "appbusinesshub"
+}
+
 movement_options_t       = {
   { name = "Default",            mvmt = nil,                                      wmvmt = nil,                         strf = nil,                                        wanim = nil },
   { name = "Arrogant (Female)",  mvmt = "move_f@arrogant@a",                      wmvmt = nil,                         strf = nil,                                        wanim = "Female" },
@@ -1763,36 +1799,72 @@ movement_options_t       = {
 -- fuck it. I'll do it manually since my smol brain
 --
 -- Can not figure out a better way.
-ceo_warehouses_t         = {
-  small = {
-    "Convenience Store Lockup",
-    "Celltowa Unit",
-    "White Widow Garage",
-    "Pacific Bait Storage",
-    "Pier 400 Utility Building",
-    "Foreclosed Garage",
+ceo_warehouses_t = {
+  ["Convenience Store Lockup"] = {
+    size = 0, max = 16, coords = vec3:new(249.246918, -1955.651978, 23.161957)
   },
-
-  medium = {
-    "GEE Warehouse",
-    "Derriere Lingerie Backlot",
-    "Fridgit Annexe",
-    "Discount Retail Unit",
-    "Disused Factory Outlet",
-    "LS Marine Building 3",
-    "Old Power Station",
-    "Railyard Warehouse",
+  ["Celltowa Unit"] = {
+    size = 0, max = 16, coords = vec3:new(898.484314, -1031.882446, 34.966454)
   },
-
-  large = {
-    "Wholesale Furniture",
-    "West Vinewood Backlot",
-    "Xero Gas Factory",
-    "Logistics Depot",
-    "Bilgeco Warehouse",
-    "Walker & Sons Warehouse",
-    "Cypress Warehouses",
-    "Darnell Bros Warehouse",
+  ["White Widow Garage"] = {
+    size = 0, max = 16, coords = vec3:new(-1081.083740, -1261.013184, 5.648909)
+  },
+  ["Pacific Bait Storage"] = {
+    size = 0, max = 16, coords = vec3:new(51.311188, -2568.470947, 6.004591)
+  },
+  ["Pier 400 Utility Building"] = {
+    size = 0, max = 16, coords = vec3:new(272.409424, -3015.267090, 5.707359)
+  },
+  ["Foreclosed Garage"] = {
+    size = 0, max = 16, coords = vec3:new(-424.773499, 184.146530, 80.752899)
+  },
+  ["GEE Warehouse"] = {
+    size = 1, max = 42, coords = vec3:new(1563.832031, -2135.110840, 77.616447)
+  },
+  ["Derriere Lingerie Backlot"] = {
+    size = 1, max = 42, coords = vec3:new(-1269.286133, -813.215820, 17.107399)
+  },
+  ["Fridgit Annexe"] = {
+    size = 1, max = 42, coords = vec3:new(-528.074585, -1782.701904, 21.483055)
+  },
+  ["Discount Retail Unit"] = {
+    size = 1, max = 42, coords = vec3:new(349.901184, 327.976440, 104.303856)
+  },
+  ["Disused Factory Outlet"] = {
+    size = 1, max = 42, coords = vec3:new(-328.013458, -1354.755371, 31.296524)
+  },
+  ["LS Marine Building 3"] = {
+    size = 1, max = 42, coords = vec3:new(-308.772247, -2698.393799, 6.000292)
+  },
+  ["Old Power Station"] = {
+    size = 1, max = 42, coords = vec3:new(541.587646, -1944.362793, 24.985096)
+  },
+  ["Railyard Warehouse"] = {
+    size = 1, max = 42, coords = vec3:new(503.738037, -653.082642, 24.751144)
+  },
+  ["Wholesale Furniture"] = {
+    size = 2, max = 111, coords = vec3:new(1041.059814, -2172.653076, 31.488876)
+  },
+  ["West Vinewood Backlot"] = {
+    size = 2, max = 111, coords = vec3:new(-245.651718, 202.504669, 83.792648)
+  },
+  ["Xero Gas Factory"] = {
+    size = 2, max = 111, coords = vec3:new(-1045.004395, -2023.150146, 13.161570)
+  },
+  ["Logistics Depot"] = {
+    size = 2, max = 111, coords = vec3:new(922.555481, -1560.048950, 30.756647)
+  },
+  ["Bilgeco Warehouse"] = {
+    size = 2, max = 111, coords = vec3:new(-876.108032, -2734.502930, 13.844264)
+  },
+  ["Walker & Sons Warehouse"] = {
+    size = 2, max = 111, coords = vec3:new(93.278641, -2216.144775, 6.033320)
+  },
+  ["Cypress Warehouses"] = {
+    size = 2, max = 111, coords = vec3:new(1015.361633, -2510.986572, 28.302608)
+  },
+  ["Darnell Bros Warehouse"] = {
+    size = 2, max = 111, coords = vec3:new(762.672363, -909.193054, 25.250854)
   },
 }
 
@@ -1802,6 +1874,28 @@ mc_business_ids_t        = {
   { name = "Fake Cash",       id = 2, unit_max = 40, val_offset = 17320, blip = 500, possible_ids = { 4, 9, 14, 19 } },
   { name = "Methamphetamine", id = 3, unit_max = 20, val_offset = 17322, blip = 499, possible_ids = { 1, 6, 11, 16 } },
   { name = "Cocaine",         id = 4, unit_max = 10, val_offset = 17321, blip = 497, possible_ids = { 3, 8, 13, 18 } },
+}
+
+hangar_info_t = {
+  [1] = { name = "LSIA Hangar 1",            coords = vec3:new(-1148.908447, -3406.064697, 13.945053) },
+  [2] = { name = "LSIA Hangar A17",          coords = vec3:new(-1393.322021, -3262.968262, 13.944828) },
+  [3] = { name = "Fort Zancudo Hangar A2",   coords = vec3:new(-2022.336304, 3154.936768, 32.810272) },
+  [4] = { name = "Fort Zancudo Hangar 3497", coords = vec3:new(-1879.105957, 3106.792969, 32.810234) },
+  [5] = { name = "Fort Zancudo Hangar 3499", coords = vec3:new(-2470.278076, 3274.427734, 32.835461) },
+}
+
+bunker_info_t = {
+  [21] = { name = "Grand Senora Oilfields Bunker", coords = vec3:new(494.680878, 3015.895996, 41.041725) },
+  [22] = { name = "Grand Senora Desert Bunker",    coords = vec3:new(849.619812, 3024.425781, 41.266800) },
+  [23] = { name = "Route 68 Bunker",               coords = vec3:new(40.422565, 2929.004395, 55.746357) },
+  [24] = { name = "Farmhouse Bunker",              coords = vec3:new(1571.949341, 2224.597168, 78.350952) },
+  [25] = { name = "Smoke Tree Road Bunker",        coords = vec3:new(2107.135254, 3324.630615, 45.371754) },
+  [26] = { name = "Thomson Scrapyard Bunker",      coords = vec3:new(2488.706055, 3164.616699, 49.080124) },
+  [27] = { name = "Grapeseed Bunker",              coords = vec3:new(1798.502930, 4704.956543, 39.995476) },
+  [28] = { name = "Paleto Forest Bunker",          coords = vec3:new(-754.225769, 5944.171875, 19.836382) },
+  [29] = { name = "Raton Canyon Bunker",           coords = vec3:new(-388.333160, 4338.322754, 56.103130) },
+  [30] = { name = "Lago Zancudo Bunker",           coords = vec3:new(-3030.341797, 3334.570068, 10.105902) },
+  [31] = { name = "Chumash Bunker",                coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
 }
 
 aircraft_mgs_t = {

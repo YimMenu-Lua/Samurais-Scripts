@@ -4,19 +4,21 @@ function yrv2UI()
   local window_width = ImGui.GetWindowWidth()
   ImGui.Spacing(); ImGui.Dummy((window_width / 2) - 110, 1); ImGui.SameLine(); UI.coloredText("- YimResupplier V2 -",
     yrv2_color, 1, 60)
-  if Game.isOnline() and not script.is_active("maintransition") then
+  if Game.isOnline() then
+    local hangar_index   = stats.get_int("MPX_HANGAR_OWNED")
+    local bunker_index   = stats.get_int("MPX_PROP_FAC_SLOT5")
+    local hangarOwned    = hangar_index ~= 0
+    local bunkerOwned    = bunker_index ~= 0
     local whouse_1_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT0") > 0
     local whouse_2_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT1") > 0
     local whouse_3_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT2") > 0
     local whouse_4_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT3") > 0
     local whouse_5_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT4") > 0
-    local hangarOwned    = stats.get_int("MPX_HANGAR_OWNED") ~= 0
     local slot0_owned    = stats.get_int("MPX_PROP_FAC_SLOT0") ~= 0
     local slot1_owned    = stats.get_int("MPX_PROP_FAC_SLOT1") ~= 0
     local slot2_owned    = stats.get_int("MPX_PROP_FAC_SLOT2") ~= 0
     local slot3_owned    = stats.get_int("MPX_PROP_FAC_SLOT3") ~= 0
     local slot4_owned    = stats.get_int("MPX_PROP_FAC_SLOT4") ~= 0
-    local bunkerOwned    = stats.get_int("MPX_PROP_FAC_SLOT5") ~= 0
     local acidOwned      = stats.get_int("MPX_XM22_LAB_OWNED") ~= 0
     local wh1Total, wh2Total, wh3Total, wh4Total, wh5Total, ceo_moola = 0, 0, 0, 0, 0, 0
     if CURRENT_BUILD == TARGET_BUILD then
@@ -34,24 +36,32 @@ function yrv2UI()
             ceo_moola = wh1Total
             ImGui.SeparatorText(whouse1.name)
             if whouse1.size.small or whouse1.size.medium or whouse1.size.large then
-              ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-                (wh1Supplies / whouse1.max), 240, 30)
-              if wh1Supplies < whouse1.max then
+              ImGui.BulletText("Cargo Held:"); ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
+              ImGui.ProgressBar((wh1Supplies / whouse1.max), 240, 30,
+                tostring(wh1Supplies) .. " Crates (" .. tostring(math.floor((wh1Supplies / whouse1.max) * 100)) .. "%)")
+              ImGui.SameLine(); ImGui.Text(Lua_fn.formatMoney(wh1Total))
+              if whouse1.pos and Game.Self.isOutside() then
+                if ImGui.Button("Teleport##wh1") then
+                  if vec3:distance(self.get_pos(), whouse1.pos) < 10 then
+                    UI.widgetSound("Error")
+                    gui.show_warning("Samurai's Scripts", "It's right there bruh!")
+                  else
+                    UI.widgetSound("Select")
+                    Game.Self.teleport(true, whouse1.pos)
+                  end
+                end
                 ImGui.SameLine()
-                ImGui.BeginDisabled(wh1_loop or wh2_loop or wh3_loop or wh4_loop or wh5_loop)
+              end
+              if wh1Supplies < whouse1.max then
+                ImGui.BeginDisabled(wh1_loop)
                 if ImGui.Button(string.format("%s##wh1", CEO_RANDOM_CRATES_)) then
                   stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
                 end
-                ImGui.EndDisabled()
-                ImGui.SameLine(); wh1_loop, wh1lUsed = ImGui.Checkbox("Auto##wh1", wh1_loop)
+                ImGui.EndDisabled(); ImGui.SameLine(); wh1_loop, wh1lUsed = ImGui.Checkbox("Auto##wh1", wh1_loop)
                 if wh1lUsed then
                   UI.widgetSound("Nav2")
                 end
               end
-              ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-              ImGui.ProgressBar((wh1Supplies / whouse1.max), 240, 30,
-                tostring(wh1Supplies) .. " Crates (" .. tostring(math.floor((wh1Supplies / whouse1.max) * 100)) .. "%)")
-              ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(wh1Total))
             end
           end
           -- 2
@@ -65,24 +75,32 @@ function yrv2UI()
             ceo_moola = ceo_moola + wh2Total
             ImGui.SeparatorText(whouse2.name)
             if whouse2.size.small or whouse2.size.medium or whouse2.size.large then
-              ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-                (wh2Supplies / whouse2.max), 240, 30)
-              if wh2Supplies < whouse2.max then
+              ImGui.BulletText("Cargo Held:"); ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
+              ImGui.ProgressBar((wh2Supplies / whouse2.max), 240, 30,
+                tostring(wh2Supplies) .. " Crates (" .. tostring(math.floor((wh2Supplies / whouse2.max) * 100)) .. "%)")
+              ImGui.SameLine(); ImGui.Text(Lua_fn.formatMoney(wh2Total))
+              if whouse2.pos and Game.Self.isOutside() then
+                if ImGui.Button("Teleport##wh2") then
+                  if vec3:distance(self.get_pos(), whouse2.pos) < 10 then
+                    UI.widgetSound("Error")
+                    gui.show_warning("Samurai's Scripts", "It's right there bruh!")
+                  else
+                    UI.widgetSound("Select")
+                    Game.Self.teleport(true, whouse2.pos)
+                  end
+                end
                 ImGui.SameLine()
-                ImGui.BeginDisabled(wh2_loop or wh3_loop or wh4_loop or wh5_loop)
+              end
+              if wh2Supplies < whouse2.max then
+                ImGui.BeginDisabled(wh2_loop)
                 if ImGui.Button(string.format("%s##wh2", CEO_RANDOM_CRATES_)) then
                   stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
                 end
-                ImGui.EndDisabled()
-                ImGui.SameLine(); wh2_loop, wh2lUsed = ImGui.Checkbox("Auto##wh2", wh2_loop)
+                ImGui.EndDisabled(); ImGui.SameLine(); wh2_loop, wh2lUsed = ImGui.Checkbox("Auto##wh2", wh2_loop)
                 if wh2lUsed then
                   UI.widgetSound("Nav2")
                 end
               end
-              ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-              ImGui.ProgressBar((wh2Supplies / whouse2.max), 240, 30,
-                tostring(wh2Supplies) .. " Crates (" .. tostring(math.floor((wh2Supplies / whouse2.max) * 100)) .. "%)")
-              ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(wh2Total))
             end
           end
           -- 3
@@ -96,24 +114,32 @@ function yrv2UI()
             ceo_moola = ceo_moola + wh3Total
             ImGui.SeparatorText(whouse3.name)
             if whouse3.size.small or whouse3.size.medium or whouse3.size.large then
-              ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-                (wh3Supplies / whouse3.max), 240, 30)
-              if wh3Supplies < whouse3.max then
+              ImGui.BulletText("Cargo Held:"); ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
+              ImGui.ProgressBar((wh3Supplies / whouse3.max), 240, 30,
+                tostring(wh3Supplies) .. " Crates (" .. tostring(math.floor((wh3Supplies / whouse3.max) * 100)) .. "%)")
+              ImGui.SameLine(); ImGui.Text(Lua_fn.formatMoney(wh3Total))
+              if whouse3.pos and Game.Self.isOutside() then
+                if ImGui.Button("Teleport##wh3") then
+                  if vec3:distance(self.get_pos(), whouse3.pos) < 10 then
+                    UI.widgetSound("Error")
+                    gui.show_warning("Samurai's Scripts", "It's right there bruh!")
+                  else
+                    UI.widgetSound("Select")
+                    Game.Self.teleport(true, whouse3.pos)
+                  end
+                end
                 ImGui.SameLine()
-                ImGui.BeginDisabled(wh3_loop or wh4_loop or wh5_loop)
+              end
+              if wh3Supplies < whouse3.max then
+                ImGui.BeginDisabled(wh3_loop)
                 if ImGui.Button(string.format("%s##wh3", CEO_RANDOM_CRATES_)) then
                   stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
                 end
-                ImGui.EndDisabled()
-                ImGui.SameLine(); wh3_loop, wh3lUsed = ImGui.Checkbox("Auto##wh3", wh3_loop)
+                ImGui.EndDisabled(); ImGui.SameLine(); wh3_loop, wh3lUsed = ImGui.Checkbox("Auto##wh3", wh3_loop)
                 if wh3lUsed then
                   UI.widgetSound("Nav2")
                 end
               end
-              ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-              ImGui.ProgressBar((wh3Supplies / whouse3.max), 240, 30,
-                tostring(wh3Supplies) .. " Crates (" .. tostring(math.floor((wh3Supplies / whouse3.max) * 100)) .. "%)")
-              ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(wh3Total))
             end
           end
           -- 4
@@ -127,24 +153,32 @@ function yrv2UI()
             ceo_moola = ceo_moola + wh4Total
             ImGui.SeparatorText(whouse4.name)
             if whouse4.size.small or whouse4.size.medium or whouse4.size.large then
-              ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-                (wh4Supplies / whouse4.max), 240, 30)
-              if wh4Supplies < whouse4.max then
+              ImGui.BulletText("Cargo Held:"); ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
+              ImGui.ProgressBar((wh4Supplies / whouse4.max), 240, 30,
+                tostring(wh4Supplies) .. " Crates (" .. tostring(math.floor((wh4Supplies / whouse4.max) * 100)) .. "%)")
+              ImGui.SameLine(); ImGui.Text(Lua_fn.formatMoney(wh4Total))
+              if whouse4.pos and Game.Self.isOutside() then
+                if ImGui.Button("Teleport##wh4") then
+                  if vec3:distance(self.get_pos(), whouse4.pos) < 10 then
+                    UI.widgetSound("Error")
+                    gui.show_warning("Samurai's Scripts", "It's right there bruh!")
+                  else
+                    UI.widgetSound("Select")
+                    Game.Self.teleport(true, whouse4.pos)
+                  end
+                end
                 ImGui.SameLine()
-                ImGui.BeginDisabled(wh4_loop or wh5_loop)
+              end
+              if wh4Supplies < whouse4.max then
+                ImGui.BeginDisabled(wh4_loop)
                 if ImGui.Button(string.format("%s##wh4", CEO_RANDOM_CRATES_)) then
                   stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
                 end
-                ImGui.EndDisabled()
-                ImGui.SameLine(); wh4_loop, wh4lUsed = ImGui.Checkbox("Auto##wh4", wh4_loop)
+                ImGui.EndDisabled(); ImGui.SameLine(); wh4_loop, wh4lUsed = ImGui.Checkbox("Auto##wh4", wh4_loop)
                 if wh4lUsed then
                   UI.widgetSound("Nav2")
                 end
               end
-              ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-              ImGui.ProgressBar((wh4Supplies / whouse4.max), 240, 30,
-                tostring(wh4Supplies) .. " Crates (" .. tostring(math.floor((wh4Supplies / whouse4.max) * 100)) .. "%)")
-              ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(wh4Total))
             end
           end
           -- 5
@@ -158,27 +192,46 @@ function yrv2UI()
             ceo_moola = ceo_moola + wh5Total
             ImGui.SeparatorText(whouse5.name)
             if whouse5.size.small or whouse5.size.medium or whouse5.size.large then
-              ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
-                (wh5Supplies / whouse5.max), 240, 30)
-              if wh5Supplies < whouse5.max then
+              ImGui.BulletText("Cargo Held:"); ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
+              ImGui.ProgressBar((wh5Supplies / whouse5.max), 240, 30,
+                tostring(wh5Supplies) .. " Crates (" .. tostring(math.floor((wh5Supplies / whouse5.max) * 100)) .. "%)")
+              ImGui.SameLine(); ImGui.Text(Lua_fn.formatMoney(wh5Total))
+              if whouse5.pos and Game.Self.isOutside() then
+                if ImGui.Button("Teleport##wh5") then
+                  if vec3:distance(self.get_pos(), whouse5.pos) < 10 then
+                    UI.widgetSound("Error")
+                    gui.show_warning("Samurai's Scripts", "It's right there bruh!")
+                  else
+                    UI.widgetSound("Select")
+                    Game.Self.teleport(true, whouse5.pos)
+                  end
+                end
                 ImGui.SameLine()
+              end
+              if wh5Supplies < whouse5.max then
                 ImGui.BeginDisabled(wh5_loop)
                 if ImGui.Button(string.format("%s##wh5", CEO_RANDOM_CRATES_)) then
                   stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
                 end
-                ImGui.EndDisabled()
-                ImGui.SameLine(); wh5_loop, wh5lUsed = ImGui.Checkbox("Auto##wh5", wh5_loop)
+                ImGui.EndDisabled(); ImGui.SameLine(); wh5_loop, wh5lUsed = ImGui.Checkbox("Auto##wh5", wh5_loop)
                 if wh5lUsed then
                   UI.widgetSound("Nav2")
                 end
               end
-              ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
-              ImGui.ProgressBar((wh5Supplies / whouse5.max), 240, 30,
-                tostring(wh5Supplies) .. " Crates (" .. tostring(math.floor((wh5Supplies / whouse5.max) * 100)) .. "%)")
-              ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(wh5Total))
             end
           end
-          ImGui.Separator(); ImGui.Spacing(); ImGui.Text("Total Value: " .. Lua_fn.formatMoney(ceo_moola))
+          ImGui.SeparatorText("MISC"); ImGui.Spacing()
+          local bCond = not script.is_active("gb_contraband_buy") and not script.is_active("fm_content_cargo")
+          ImGui.BeginDisabled(bCond)
+          if ImGui.Button("Finish Cargo Source Mission") then
+            UI.widgetSound("Select")
+            SS.finishCargoSourceMission()
+          end
+          ImGui.EndDisabled()
+          if bCond then
+            UI.toolTip(false, "Start a source mission then press this button to finish it.")
+          end
+          ImGui.BulletText("Total Value: " .. Lua_fn.formatMoney(ceo_moola))
           ImGui.EndTabItem()
         end
       end
@@ -186,6 +239,9 @@ function yrv2UI()
       if ImGui.BeginTabItem(HANGAR_TXT_) then
         ImGui.Dummy(1, 5)
         if hangarOwned then
+          local hangar_name = hangar_info_t[hangar_index].name
+          local hangar_pos  = hangar_info_t[hangar_index].coords
+          ImGui.SeparatorText(hangar_name)
           hangarSupplies = stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
           hangarTotal    = hangarSupplies * 30000
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
@@ -212,16 +268,8 @@ function yrv2UI()
             ImGui.Spacing(); ImGui.SeparatorText(QUICK_TP_TXT_)
             if ImGui.Button("Teleport To Hangar") then
               UI.widgetSound("Select")
-              script.run_in_fiber(function()
-                local h_blip = HUD.GET_FIRST_BLIP_INFO_ID(569)
-                local h_coords
-                if HUD.DOES_BLIP_EXIST(h_blip) then
-                  h_coords = HUD.GET_BLIP_COORDS(h_blip)
-                  Game.Self.teleport(true, h_coords)
-                end
-              end)
+              Game.Self.teleport(true, hangar_pos)
             end
-            UI.helpMarker(true, QUICK_TP_WARN_, "#FFA134", 1)
           end
         else
           ImGui.Text("You don't own a hangar.")
@@ -232,29 +280,32 @@ function yrv2UI()
       if ImGui.BeginTabItem("Bunker") then
         ImGui.Dummy(1, 5)
         if bunkerOwned then
-          bunkerUpdgrade1, bu1Used = ImGui.Checkbox("Equipment Upgrade##bunker", bunkerUpdgrade1); ImGui.SameLine()
-          if bu1Used then
-            UI.widgetSound("Nav2")
-            CFG.save("bunkerUpdgrade1", bunkerUpdgrade1)
-          end
-          bunkerUpdgrade2, bu2Used = ImGui.Checkbox("Staff Upgrade##bunker", bunkerUpdgrade2)
-          if bu2Used then
-            UI.widgetSound("Nav2")
-            CFG.save("bunkerUpdgrade2", bunkerUpdgrade2)
-          end
+          ImGui.SeparatorText(bunker_info_t[bunker_index].name)
+          local bunkerUpdgrade1  = stats.get_int("MPX_BUNKER_EQUIPMENT") == 1
+          local bunkerUpdgrade2  = stats.get_int("MPX_BUNKER_STAFF") == 1
+          local bunkerEqLabelCol = "white"
+          local bunkerStLabelCol = "white"
           if bunkerUpdgrade1 then
+            bunkerEqLabelCol = "green"
             bunkerOffset1 = globals.get_int(tun_global + 21256)
           else
+            bunkerEqLabelCol = "red"
             bunkerOffset1 = 0
           end
           if bunkerUpdgrade2 then
+            bunkerStLabelCol = "green"
             bunkerOffset2 = globals.get_int(tun_global + 21255)
           else
+            bunkerStLabelCol = "red"
             bunkerOffset2 = 0
           end
           local bunkerSupplies = stats.get_int("MPX_MATTOTALFORFACTORY5")
           local bunkerStock    = stats.get_int("MPX_PRODTOTALFORFACTORY5")
           bunkerTotal          = ((globals.get_int(tun_global + 21254) + bunkerOffset1 + bunkerOffset2) * bunkerStock)
+          ImGui.BulletText("Equipment Upgrade: "); ImGui.SameLine()
+          UI.coloredText(bunkerUpdgrade1 and "Active" or "Inactive", bunkerEqLabelCol, 0.9, 35); ImGui.SameLine()
+          ImGui.BulletText("Staff Upgrade: "); ImGui.SameLine()
+          UI.coloredText(bunkerUpdgrade2 and "Active" or "Inactive", bunkerStLabelCol, 0.9, 35)
           ImGui.Spacing()
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui.ProgressBar(
             (bunkerSupplies / 100), 240, 30)
@@ -275,16 +326,8 @@ function yrv2UI()
             ImGui.Spacing(); ImGui.SeparatorText("Quick Teleport")
             if ImGui.Button("Teleport To Bunker") then
               UI.widgetSound("Select")
-              script.run_in_fiber(function()
-                local b_blip = HUD.GET_FIRST_BLIP_INFO_ID(557)
-                local b_coords
-                if HUD.DOES_BLIP_EXIST(b_blip) then
-                  b_coords = HUD.GET_BLIP_COORDS(b_blip)
-                  Game.Self.teleport(true, b_coords)
-                end
-              end)
+              Game.Self.teleport(true, bunker_info_t[bunker_index].coords)
             end
-            UI.helpMarker(true, QUICK_TP_WARN_, "#FFA134", 1)
           end
         else
           ImGui.Text("You don't own a bunker.")
@@ -421,19 +464,20 @@ function yrv2UI()
 
         if acidOwned then
           ImGui.SeparatorText("Acid Lab")
-          acidUpdgrade, auUsed = ImGui.Checkbox("Lab Upgrade##acid", acidUpdgrade)
-          if auUsed then
-            UI.widgetSound("Nav2")
-            CFG.save("acidUpdgrade", acidUpdgrade)
-          end
+          local acidUpdgrade = stats.get_int("MPX_AWD_CALLME") >= 10 and stats.get_int("MPX_XM22_LAB_EQUIP_UPGRADED") == 1
+          local acidUpgradeLabelCol = "white"
           if acidUpdgrade then
+            acidUpgradeLabelCol = "green"
             acidOffset = globals.get_int(tun_global + 17330)
           else
+            acidUpgradeLabelCol= "red"
             acidOffset = 0
           end
           local acidSupplies = stats.get_int("MPX_MATTOTALFORFACTORY6")
           local acidStock    = stats.get_int("MPX_PRODTOTALFORFACTORY6")
           acidTotal          = ((globals.get_int(tun_global + 17324) + acidOffset) * acidStock)
+          ImGui.BulletText("Equipment Upgrade: "); ImGui.SameLine()
+          UI.coloredText(acidUpdgrade and "Active" or "Inactive", acidUpgradeLabelCol, 0.9, 35)
           ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine();
           ImGui.ProgressBar((acidSupplies / 100), 240, 30)
           if acidSupplies < 100 then
@@ -459,10 +503,10 @@ function yrv2UI()
           ImGui.Spacing(); ImGui.SeparatorText("Quick Teleport")
           ImGui.BeginDisabled(not slot0_owned)
           if ImGui.Button(("To %s"):format(bb.slot0.name)) then
-            UI.widgetSound("Select")
             script.run_in_fiber(function()
               local blip = HUD.GET_FIRST_BLIP_INFO_ID(bb.slot0.blip)
               if HUD.DOES_BLIP_EXIST(blip) then
+                UI.widgetSound("Select")
                 local coords = HUD.GET_BLIP_COORDS(blip)
                 Game.Self.teleport(false, coords)
               end
@@ -473,10 +517,10 @@ function yrv2UI()
           ImGui.SameLine()
           ImGui.BeginDisabled(not slot1_owned)
           if ImGui.Button(("To %s"):format(bb.slot1.name)) then
-            UI.widgetSound("Select")
             script.run_in_fiber(function()
               local blip = HUD.GET_FIRST_BLIP_INFO_ID(bb.slot1.blip)
               if HUD.DOES_BLIP_EXIST(blip) then
+                UI.widgetSound("Select")
                 local coords = HUD.GET_BLIP_COORDS(blip)
                 Game.Self.teleport(false, coords)
               end
@@ -487,10 +531,10 @@ function yrv2UI()
           ImGui.SameLine()
           ImGui.BeginDisabled(not slot2_owned)
           if ImGui.Button(("To %s"):format(bb.slot2.name)) then
-            UI.widgetSound("Select")
             script.run_in_fiber(function()
               local blip = HUD.GET_FIRST_BLIP_INFO_ID(bb.slot2.blip)
               if HUD.DOES_BLIP_EXIST(m_blip) then
+                UI.widgetSound("Select")
                 local coords = HUD.GET_BLIP_COORDS(blip)
                 Game.Self.teleport(false, coords)
               end
@@ -500,10 +544,10 @@ function yrv2UI()
           UI.helpMarker(true, QUICK_TP_WARN_, "#FFA134", 1)
           ImGui.BeginDisabled(not slot3_owned)
           if ImGui.Button(("To %s"):format(bb.slot3.name)) then
-            UI.widgetSound("Select")
             script.run_in_fiber(function()
               local blip = HUD.GET_FIRST_BLIP_INFO_ID(bb.slot3.blip)
               if HUD.DOES_BLIP_EXIST(blip) then
+                UI.widgetSound("Select")
                 local coords = HUD.GET_BLIP_COORDS(blip)
                 Game.Self.teleport(false, coords)
               end
@@ -514,10 +558,10 @@ function yrv2UI()
           ImGui.SameLine()
           ImGui.BeginDisabled(not slot4_owned)
           if ImGui.Button(("To %s"):format(bb.slot4.name)) then
-            UI.widgetSound("Select")
             script.run_in_fiber(function()
               local blip = HUD.GET_FIRST_BLIP_INFO_ID(bb.slot4.blip)
               if HUD.DOES_BLIP_EXIST(blip) then
+                UI.widgetSound("Select")
                 local coords = HUD.GET_BLIP_COORDS(blip)
                 Game.Self.teleport(false, coords)
               end
@@ -528,11 +572,11 @@ function yrv2UI()
           ImGui.SameLine()
           ImGui.BeginDisabled(not acidOwned)
           if ImGui.Button("To The Freak Shop") then
-            UI.widgetSound("Select")
             script.run_in_fiber(function()
               local acid_blip = HUD.GET_FIRST_BLIP_INFO_ID(848)
               local acid_coords
               if HUD.DOES_BLIP_EXIST(acid_blip) then
+                UI.widgetSound("Select")
                 acid_coords = HUD.GET_BLIP_COORDS(acid_blip)
                 Game.Self.teleport(false, acid_coords)
               end
@@ -734,8 +778,38 @@ function yrv2UI()
         ImGui.EndTabItem()
       end
 
-      if ImGui.BeginTabItem("Cooldowns") then
-        ImGui.Dummy(1, 5)
+      if ImGui.BeginTabItem("MISC") then
+        ImGui.Dummy(1, 5); ImGui.SeparatorText("Business Hub")
+        if ImGui.Button("Master Control Terminal") then
+          if not Game.Self.isBrowsingApps() then
+            script.run_in_fiber(function(mct)
+              if globals.get_int(1943773) ~= 0 then
+                globals.set_int(1943773, 0)
+              end
+              if Game.requestScript("appArcadeBusinessHub") then
+                UI.widgetSound("Select")
+                abhubScriptHandle = SYSTEM.START_NEW_SCRIPT("appArcadeBusinessHub", 1424) -- STACK_SIZE_DEFAULT
+                SCRIPT.SET_SCRIPT_AS_NO_LONGER_NEEDED("appArcadeBusinessHub")
+                mct:sleep(100)
+                gui.toggle(false)
+                while script.is_active("appArcadeBusinessHub") do
+                  if globals.get_int(1963766) == -1 then -- func_1()
+                    globals.set_int(1943773, 0)
+                  end
+                  mct:yield()
+                end
+                repeat
+                  mct:sleep(10)
+                until not Game.Self.isBrowsingApps()
+                globals.set_int(1943773, 0)
+                abhubScriptHandle = 0
+              end
+            end)
+          else
+            UI.widgetSound("Error")
+          end
+        end
+        ImGui.SeparatorText("Cooldowns")
         mc_work_cd, mcworkUsed = ImGui.Checkbox("MC Club Work", mc_work_cd)
         if mcworkUsed then
           UI.widgetSound("Nav2")
@@ -799,28 +873,48 @@ function yrv2UI()
         ImGui.SameLine(); ImGui.Dummy(29, 1); ImGui.SameLine()
         ImGui.BeginDisabled()
         payphone_hits_cd, _ = ImGui.Checkbox("Payphone Hits [x]", payphone_hits_cd)
-        UI.toolTip(false, "Use ShinyWasabi's Payphone Hits script instead. Press [TAB] to copy the GitHub link.")
         UI.setClipBoard("https://github.com/YimMenu-Lua/PayphoneHits",
-          ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and SS.isKeyJustPressed(0x09))
-        ImGui.EndDisabled(); ImGui.Dummy(1, 5)
-        if mc_work_cd and hangar_cd and nc_management_cd and nc_vip_mission_chance and security_missions_cd
-            and ie_vehicle_steal_cd and ie_vehicle_sell_cd and ceo_crate_buy_cd and ceo_crate_sell_cd then
+          ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and SS.isKeyJustPressed(0x09)
+        )
+        ImGui.EndDisabled();
+        UI.toolTip(false, "Use ShinyWasabi's Payphone Hits script instead. Press [TAB] to copy the GitHub link.")
+
+        dax_work_cd, dwcdUsed = ImGui.Checkbox("Dax Work Cooldown", dax_work_cd)
+        if dwcdUsed then
+          UI.widgetSound("Nav2")
+          CFG.save("dax_work_cd", dax_work_cd)
+        end
+
+        ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
+        garment_rob_cd, grcdUsed = ImGui.Checkbox("Garment Factory Files", garment_rob_cd)
+        if grcdUsed then
+          UI.widgetSound("Nav2")
+          CFG.save("garment_rob_cd", garment_rob_cd)
+        end
+
+        ImGui.Dummy(1, 5)
+        if mc_work_cd and hangar_cd and nc_management_cd and nc_vip_mission_chance and security_missions_cd and
+        ie_vehicle_steal_cd and ie_vehicle_sell_cd and ceo_crate_buy_cd and ceo_crate_sell_cd and dax_work_cd and
+        garment_rob_cd then
           sBtnLabel, bParam = "Uncheck All", false
         else
           sBtnLabel, bParam = "Check All", true
         end
         if ImGui.Button(sBtnLabel or "", 120, 40) then
           UI.widgetSound("Select")
-          mc_work_cd = bParam; CFG.save("mc_work_cd", mc_work_cd)
-          hangar_cd = bParam; CFG.save("hangar_cd", hangar_cd)
-          nc_management_cd = bParam; CFG.save("nc_management_cd", nc_management_cd)
+          mc_work_cd            = bParam; CFG.save("mc_work_cd", mc_work_cd)
+          hangar_cd             = bParam; CFG.save("hangar_cd", hangar_cd)
+          nc_management_cd      = bParam; CFG.save("nc_management_cd", nc_management_cd)
           nc_vip_mission_chance = bParam; CFG.save("nc_vip_mission_chance", nc_vip_mission_chance)
-          security_missions_cd = bParam; CFG.save("security_missions_cd", security_missions_cd)
-          ie_vehicle_steal_cd = bParam; CFG.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
-          ie_vehicle_sell_cd = bParam; CFG.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
-          ceo_crate_buy_cd = bParam; CFG.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
-          ceo_crate_sell_cd = bParam; CFG.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
+          security_missions_cd  = bParam; CFG.save("security_missions_cd", security_missions_cd)
+          ie_vehicle_steal_cd   = bParam; CFG.save("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
+          ie_vehicle_sell_cd    = bParam; CFG.save("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
+          ceo_crate_buy_cd      = bParam; CFG.save("ceo_crate_buy_cd", ceo_crate_buy_cd)
+          ceo_crate_sell_cd     = bParam; CFG.save("ceo_crate_sell_cd", ceo_crate_sell_cd)
+          dax_work_cd           = bParam; CFG.save("dax_work_cd", dax_work_cd)
+          garment_rob_cd        = bParam; CFG.save("garment_rob_cd", dax_work_cd)
         end
+
         ImGui.Spacing(); ImGui.SeparatorText("Sell Missions")
         ImGui.Spacing(); UI.wrappedText(
           "These options will not be saved. Each button disables the most tedious sell missions for that business.", 32)
@@ -852,8 +946,8 @@ function yrv2UI()
         if ImGui.Button("Easy Nightclub Sell Missions") then
           UI.widgetSound("Select")
           for _, index in pairs(nc_sell_mission_types_T) do
-            if globals.get_int(index) > 0.0 then
-              globals.set_int(index, 0.0)
+            if globals.get_float(index) > 0.0 then
+              globals.get_float(index, 0.0)
             end
           end
           gui.show_success("Samurai's Scripts", "Successfully disabled the most annoying missions.")
@@ -863,8 +957,8 @@ function yrv2UI()
         if ImGui.Button("Easy Hangar Sell Missions") then
           UI.widgetSound("Select")
           for _, index in pairs(hg_sell_mission_types_T) do
-            if globals.get_int(index) > 0.0 then
-              globals.set_int(index, 0.0)
+            if globals.get_float(index) > 0.0 then
+              globals.get_float(index, 0.0)
             end
           end
           gui.show_success("Samurai's Scripts", "Successfully disabled the most annoying missions.")
@@ -873,7 +967,7 @@ function yrv2UI()
       end
       if ImGui.BeginTabItem("Sales") then
         UI.wrappedText(
-          "This is shitty unreliable code with little to no effort put into it.\n\nOnly these businesses are supported and some may show a 'Mission failed' or similar message but still pay you the full amount:",
+          "This is shitty unreliable code with little to no effort put into it.\n\nOnly these businesses are supported:",
           35
         )
         ImGui.BulletText("Bunker")
@@ -897,6 +991,7 @@ function yrv2UI()
         else
           ImGui.BeginDisabled(autosell or autosell_was_triggered or not scr_is_running)
           if ImGui.Button("Manually Finish Sale") then
+            UI.widgetSound("Select")
             SS.FinishSale(script_name)
             autosell_was_triggered = true
             script.run_in_fiber(function(s)
