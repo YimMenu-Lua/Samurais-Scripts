@@ -50,10 +50,9 @@ function yrv2UI()
                     Game.Self.teleport(true, whouse1.pos)
                   end
                 end
-                ImGui.SameLine()
               end
               if wh1Supplies < whouse1.max then
-                ImGui.BeginDisabled(wh1_loop)
+                ImGui.SameLine(); ImGui.BeginDisabled(wh1_loop)
                 if ImGui.Button(string.format("%s##wh1", CEO_RANDOM_CRATES_)) then
                   stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
                 end
@@ -89,10 +88,9 @@ function yrv2UI()
                     Game.Self.teleport(true, whouse2.pos)
                   end
                 end
-                ImGui.SameLine()
               end
               if wh2Supplies < whouse2.max then
-                ImGui.BeginDisabled(wh2_loop)
+                ImGui.SameLine(); ImGui.BeginDisabled(wh2_loop)
                 if ImGui.Button(string.format("%s##wh2", CEO_RANDOM_CRATES_)) then
                   stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
                 end
@@ -128,10 +126,9 @@ function yrv2UI()
                     Game.Self.teleport(true, whouse3.pos)
                   end
                 end
-                ImGui.SameLine()
               end
               if wh3Supplies < whouse3.max then
-                ImGui.BeginDisabled(wh3_loop)
+                ImGui.SameLine(); ImGui.BeginDisabled(wh3_loop)
                 if ImGui.Button(string.format("%s##wh3", CEO_RANDOM_CRATES_)) then
                   stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
                 end
@@ -167,10 +164,9 @@ function yrv2UI()
                     Game.Self.teleport(true, whouse4.pos)
                   end
                 end
-                ImGui.SameLine()
               end
               if wh4Supplies < whouse4.max then
-                ImGui.BeginDisabled(wh4_loop)
+                ImGui.SameLine(); ImGui.BeginDisabled(wh4_loop)
                 if ImGui.Button(string.format("%s##wh4", CEO_RANDOM_CRATES_)) then
                   stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
                 end
@@ -206,10 +202,9 @@ function yrv2UI()
                     Game.Self.teleport(true, whouse5.pos)
                   end
                 end
-                ImGui.SameLine()
               end
               if wh5Supplies < whouse5.max then
-                ImGui.BeginDisabled(wh5_loop)
+                ImGui.SameLine(); ImGui.BeginDisabled(wh5_loop)
                 if ImGui.Button(string.format("%s##wh5", CEO_RANDOM_CRATES_)) then
                   stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
                 end
