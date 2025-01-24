@@ -9,6 +9,11 @@ function weaponUI()
 
   Triggerbot, TbUsed = ImGui.Checkbox(TRIGGERBOT_CB_, Triggerbot)
   UI.helpMarker(false, TRIGGERBOT_DESC_)
+  if TbUsed then
+    CFG.save("Triggerbot", Triggerbot)
+    UI.widgetSound("Nav2")
+  end
+
   if Triggerbot then
     ImGui.SameLine(); aimEnemy, aimEnemyUsed = ImGui.Checkbox(ENEMY_ONLY_CB_, aimEnemy)
     if aimEnemyUsed then
@@ -16,8 +21,11 @@ function weaponUI()
       UI.widgetSound("Nav2")
     end
   end
-  if TbUsed then
-    CFG.save("Triggerbot", Triggerbot)
+
+  MagicBullet, mbUsed = ImGui.Checkbox(MAGIC_BULLET_CB_, MagicBullet)
+  UI.helpMarker(false, MAGIC_BULLET_DESC_)
+  if mbUsed then
+    CFG.save("MagicBullet", MagicBullet)
     UI.widgetSound("Nav2")
   end
 

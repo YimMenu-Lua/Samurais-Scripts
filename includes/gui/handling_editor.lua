@@ -13,7 +13,7 @@ function handingEditorUI()
     end
   end
 
-  -- ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine();
+  ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine();
   kersBoost, kbUsed = ImGui.Checkbox("KERS Boost", kersBoost)
   UI.toolTip(false, KERSBOOST_DESC_)
   if kbUsed then
@@ -43,7 +43,7 @@ function handingEditorUI()
     end
   end
 
-  -- ImGui.SameLine(); ImGui.Dummy(15, 1); ImGui.SameLine();
+  ImGui.SameLine(); ImGui.Dummy(15, 1); ImGui.SameLine();
   rallyTires, rallytiresUsed = ImGui.Checkbox("Rally Tires", rallyTires)
   UI.toolTip(false, RALLYTIRES_DESC_)
   if rallytiresUsed then
@@ -68,7 +68,7 @@ function handingEditorUI()
     end
   end
 
-  -- ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine();
+  ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine();
   easyWheelie, ezwUsed = ImGui.Checkbox("Easy Wheelie", easyWheelie)
   UI.toolTip(false, EASYWHEELIE_DESC_)
   if ezwUsed then
@@ -81,29 +81,107 @@ function handingEditorUI()
     end
   end
 
-  --[[
-  ImGui.Spacing(); ImGui.SeparatorText("Steering")
-  rwSteering, rwstrUsed = ImGui.Checkbox("Rear Wheels", rwSteering)
-  UI.toolTip(false, "Your vehicle will use the rear wheels to steer instead of the front.")
-  if rwstrUsed then
-    UI.widgetSound("Nav2")
-    CFG.save("rwSteering", rwSteering)
-  end
+  ImGui.Spacing(); ImGui.SeparatorText("MISC")
+  if self.get_veh() ~= 0 then
+    rocketBoost, rbUsed = ImGui.Checkbox("Rocket Boost", SS.getVehicleModelFlag(VMF._HAS_ROCKET_BOOST))
+    UI.toolTip(false, ROCKET_BOOST_DESC_)
+    if rbUsed then
+      UI.widgetSound("Nav2")
+      if not rocketBoost and (is_car or is_bike or is_quad) then
+        SS.setVehicleModelFlag(VMF._HAS_ROCKET_BOOST, false)
+        script.run_in_fiber(function()
+          STREAMING.REMOVE_NAMED_PTFX_ASSET("veh_impexp_rocket")
+        end)
+      end
+    end
+  
+    ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine();
+    vehJump, vjUsed = ImGui.Checkbox("Vehicle Jump", SS.getVehicleModelFlag(VMF._JUMPING_CAR))
+    UI.toolTip(false, VEH_JUMP_DESC_)
+    if vjUsed then
+      UI.widgetSound("Nav2")
+      if (is_car or is_bike or is_quad) then
+        SS.setVehicleModelFlag(VMF._JUMPING_CAR, vehJump)
+        script.run_in_fiber(function()
+          VEHICLE.SET_USE_HIGHER_CAR_JUMP(current_vehicle, vehJump)
+        end)
+      end
+    end
+  
+    if vehJump then
+      ImGui.SameLine(); ImGui.Dummy(28, 1); ImGui.SameLine();
+      vehChute, vehChuteUsed = ImGui.Checkbox("Parachute", SS.getVehicleModelFlag(VMF._HAS_PARACHUTE))
+      UI.toolTip(false, VEH_PARACHUTE_DESC_)
+      if vehChuteUsed then
+        UI.widgetSound("Nav2")
+        if is_car then
+          SS.setVehicleModelFlag(VMF._HAS_PARACHUTE, vehChute)
+        end
+      end
+    else
+      if vehChute then
+        vehChute = false
+      end
+    end
 
-  ImGui.SameLine(); awSteering, awstrUsed = ImGui.Checkbox("All Wheels", awSteering)
-  UI.toolTip(false, "Your vehicle will use all its wheels to steer.")
-  if awstrUsed then
-    UI.widgetSound("Nav2")
-    CFG.save("awSteering", awSteering)
-  end
+    rwSteering, rwstrUsed = ImGui.Checkbox("Rear Wheel Steering", SS.getVehicleHandlingFlag(HF._STEER_REARWHEELS))
+    UI.toolTip(false, REAR_WHEEL_STEERING_DESC_)
+    if rwstrUsed then
+      UI.widgetSound("Nav2")
+      if rwSteering and (is_car or is_bike or is_quad) then
+        if awSteering then
+          SS.setHandlingFlag(HF._STEER_ALL_WHEELS, false)
+          awSteering = false
+        end
+        if handbrakeSteering then
+          SS.setHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER, false)
+          handbrakeSteering = false
+        end
+        SS.setHandlingFlag(HF._STEER_REARWHEELS, true)
+      else
+        SS.setHandlingFlag(HF._STEER_REARWHEELS, false)
+      end
+    end
 
-  ImGui.SameLine(); handbrakeSteering, hbstrUsed = ImGui.Checkbox("Handbrake Steering", handbrakeSteering)
-  UI.toolTip(false, "When you press the handbrake, your vehicle will use all its wheels to steer, similar to monster trucks.")
-  if hbstrUsed then
-    UI.widgetSound("Nav2")
-    CFG.save("handbrakeSteering", handbrakeSteering)
-  end
+    ImGui.SameLine(); awSteering, awstrUsed = ImGui.Checkbox("All Wheel Steering", SS.getVehicleHandlingFlag(HF._STEER_ALL_WHEELS))
+    UI.toolTip(false, ALL_WHEEL_STEERING_DESC_)
+    if awstrUsed then
+      UI.widgetSound("Nav2")
+      if awSteering and (is_car or is_bike or is_quad) then
+        if rwSteering then
+          SS.setHandlingFlag(HF._STEER_REARWHEELS, false)
+          rwSteering = false
+        end
+        if handbrakeSteering then
+          SS.setHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER, false)
+          handbrakeSteering = false
+        end
+        SS.setHandlingFlag(HF._STEER_ALL_WHEELS, true)
+      else
+        SS.setHandlingFlag(HF._STEER_ALL_WHEELS, false)
+      end
+    end
 
-  ImGui.Spacing(); UI.wrappedText("[ ! ] NOTE: These options change your vehicle's steering behavior but you can not visually see the difference.", 25)
-  ]]
+    ImGui.SameLine(); handbrakeSteering, hbstrUsed = ImGui.Checkbox("Handbrake Steering", SS.getVehicleHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER))
+    UI.toolTip(false, HANDBRAKE_STEERING_DESC_)
+    if hbstrUsed then
+      UI.widgetSound("Nav2")
+      if handbrakeSteering and (is_car or is_bike or is_quad) then
+        if rwSteering then
+          SS.setHandlingFlag(HF._STEER_REARWHEELS, false)
+          rwSteering = false
+        end
+        if awSteering then
+          SS.setHandlingFlag(HF._STEER_ALL_WHEELS, false)
+          awSteering = false
+        end
+        SS.setHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER, true)
+      else
+        SS.setHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER, false)
+      end
+    end
+    ImGui.Spacing(); UI.coloredText(STEERING_FLAGS_NOTE_TXT_, 'orange', 0.8, 25)
+  else
+    ImGui.Text(GET_IN_VEH_WARNING_)
+  end
 end

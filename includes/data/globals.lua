@@ -1,7 +1,7 @@
 ---@diagnostic disable
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.5.6'
+SCRIPT_VERSION = '1.5.7'
 TARGET_BUILD   = '3411'
 TARGET_VERSION = '1.70'
 DEFAULT_CONFIG          = {
@@ -80,6 +80,7 @@ DEFAULT_CONFIG          = {
   disableSound            = false,
   npc_godMode             = false,
   Triggerbot              = false,
+  MagicBullet             = false,
   aimEnemy                = false,
   autoKill                = false,
   runaway                 = false,
@@ -122,9 +123,6 @@ DEFAULT_CONFIG          = {
   rallyTires              = false,
   noTractionCtrl          = false,
   easyWheelie             = false,
-  rwSteering              = false,
-  awSteering              = false,
-  handbrakeSteering       = false,
   useGameLang             = false,
   bypass_casino_bans      = false,
   force_poker_cards       = false,
@@ -246,9 +244,6 @@ kers_boost_enabled      = false
 offroader_enabled       = false
 rally_tires_enabled     = false
 easy_wheelie_enabled    = false
--- rw_steering_enabled       = false --[[
--- aw_steering_enabled       = false -- they work but the steering is not rendered.
--- hb_steering_enabled       = false --]]
 wh1_loop                = false
 wh2_loop                = false
 wh3_loop                = false
@@ -295,7 +290,11 @@ blacklisted_obj         = false
 spawned_persist_props   = false
 boot_vehicle_re         = false
 fast_vehicles           = false
+rwSteering              = false
+awSteering              = false
+handbrakeSteering       = false
 debug_counter           = not SS_debug and 0 or 7
+last_aimed_at_ped       = 0
 vehicleLockStatus       = 0
 anim_flag               = 0
 anim_sortby_idx         = 0
@@ -678,9 +677,8 @@ selfAttachments       = {
   roty   = 0.0,
   rotz   = 0.0
 }
-CFG = require("lib/YimConfig")
 
- -- read global vars from config
+CFG = require("lib/YimConfig")
 for key, _ in pairs(DEFAULT_CONFIG) do
   _G[key] = CFG.read(key)
 end

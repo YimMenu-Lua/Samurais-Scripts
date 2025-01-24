@@ -59,7 +59,6 @@
 2. Enter a global name in all uppercase and ending with an underscore (Example: `MY_NEW_LABEL_`). This will be used as both the Lua table key and the global variable that you can then pass to your new addition (text, button, tooltip, etc...)
 3. Enter the string that will be added and translated (Example: `This is a generic text.`).
 4. Wait for it to finish and then your new global can be used in the script. (Example: `ImGui.Text(MY_NEW_LABEL_)`).
-5. If your string has a line break escape code, go to `includes/lib/Translations.lua` and remove the excess escape char. *(it will look like this: `\\n` and it's a small issue with the Lua parser. Just search and replace and you're good to go)*.
 
 > Optional: If you have `pyperclip` installed, your new global variable's name will be automatically copied to clipboard.
 

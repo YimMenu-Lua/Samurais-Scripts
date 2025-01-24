@@ -1,21 +1,27 @@
-### v1.5.6 Changelog
+### v1.5.7 Changelog
 
-#### Self -> Hide & Seek
+#### 🎉 New Feature: Weapon -> Magic Bullet
 
-- Prompts from all 3 sub-features no longer interfere with gameplay.
+- Different from an aimbot, this feature automatically shoots the last ped you aimed at in the head when you press [FIRE], regardless of whether your crosshair is still on the ped or not. The only requirement is that the ped has to be in your field of view and not too far away from you.
+- If you aim at a vehicle that has a driver, the magic bullet will automatically hit the driver in the head as soon as you fire your weapon.
 
-#### Online -> Business Manager
+#### Vehicle
 
-- Added teleport buttons for CEO Warehouses.
-- Added a button to instantly finish CEO cargo source missions.
-- Fixed hangar and bunker teleport buttons and removed the public session tp warning tooltip *(both don't use blips anymore so now they work correctly in public sessions)*.
-- Bunker and Acid Lab upgrades are now automatically read instead of relying on the user to tick a box.
-- Added a buton to open the **Master Control Terminal** so you can easily source cargo or sell stock from anywhere.
-- Changed cooldowns to tunables instead of globals.
-- Added Dax Work and Garment Factory cooldowns.
+- **Handling Editor:**
+  - Restored the 3 Steering options. I removed them a long time ago because they required you to delete your vehicle then spawn it again to be able to **visually** see the changes. After some feedback, it seemed that most of my script users weren't bothered by it so all 3 options are back.
 
-#### Commands
+  > **NOTE:** The actual changes are applied instantly but the steering will not be rendered unless you respawn the vehicle.
 
-- Added a new command: `fastvehs`: Increases the top speed of any *land* vehicle you drive.
-- Added a new command: `yrv2.fillall`: Fills all your owned businesses with supplies.
-- Renamed the `finish_sale` command to `finishsale`.
+  - Added **Rocket Boost**, similar to the Vigilante.
+  - Added **Vehicle Jump**, similar to the Ruiner 2000.
+  - Added **Parachute**, similar to the Ruiner 2000. *(requires **Vehicle Jump**)*
+
+- **Launch Control:**
+  - Added an indicator that shows the charging progress of the launch control system. (appears at the bottom of the screen when holding **[ACCELERATE]** + **[Brake]**)
+
+- NOS and similar features no longer work on electric vehicles.
+
+#### MISC
+
+- Fixed wrong variable name in Casino Pacino that caused the "**Cart Autograb**" feature to stop working. (#31)
+- Fixed new line parsing issue in `generate_translations.py`.

@@ -1186,11 +1186,12 @@ script.register_looped("HG", function() -- Hash Grabber
     end
   end
 end)
+
 script.register_looped("TB", function() -- Triggerbot
   if Triggerbot then
-    if PLAYER.IS_PLAYER_FREE_AIMING(PLAYER.PLAYER_ID()) then
-      local aimBool, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER.PLAYER_ID(), Entity)
-      if aimBool and ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
+    if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
+      local isAiming, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(self.get_id(), Entity)
+      if isAiming and ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
         local bonePos = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(Entity,
           ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Entity, "head"))
         weapon = Game.Self.weapon()
@@ -1211,6 +1212,40 @@ script.register_looped("TB", function() -- Triggerbot
     end
   end
 end)
+
+script.register_looped("MB", function(mb)
+  if MagicBullet then
+    if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
+      local isAiming, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(self.get_id(), Entity)
+      if isAiming and ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
+        local pedPos   = Game.getCoords(Entity, true)
+        if Entity ~= 0 then
+          last_aimed_at_ped = Entity
+        end
+        if not PED.HAS_PED_CLEAR_LOS_TO_ENTITY_(self.get_ped(), last_aimed_at_ped, pedPos.x, pedPos.y, pedPos.z, 0, false, false) then
+          last_aimed_at_ped = 0
+        end
+      end
+    end
+    if last_aimed_at_ped ~= 0 and not ENTITY.IS_ENTITY_DEAD(last_aimed_at_ped, false) then
+      local pedBonePos = PED.GET_PED_BONE_COORDS(
+        last_aimed_at_ped, 0x796E, 0, 0, 0
+      )
+      local wpn_hash   = Game.Self.weapon()
+      if PAD.IS_CONTROL_PRESSED(0, 24) and not PED.IS_PED_RELOADING(self.get_ped()) then
+        if Game.requestWeaponAsset(wpn_hash) then
+          MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
+            pedBonePos.x - 1.0, pedBonePos.y - 1.0, pedBonePos.z,
+            pedBonePos.x + 1.0, pedBonePos.y + 1.0, pedBonePos.z,
+            300, false, wpn_hash, self.get_ped(), true, false, -1082130432
+          )
+          mb:sleep(150)
+        end
+      end
+    end
+  end
+end)
+
 script.register_looped("AKE", function(ak) -- Auto-kill enemies
   if autoKill then
     local myCoords = self.get_pos()
@@ -1383,27 +1418,25 @@ script.register_looped("TDFT", function(script)
       end
     end
 
-    if speedBoost then
-      if validModel or is_boat then
-        if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
-          if pressing_nos_button and PAD.IS_CONTROL_PRESSED(0, 71) then
-            VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, (nosPower) / 5)
-            VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, nosPower)
-            if nosAudio then
-              AUDIO.SET_VEHICLE_BOOST_ACTIVE(current_vehicle, true)
-            end
-            if nosvfx then
-              GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrous", 0, false)
-            end
-            using_nos = true
+    if speedBoost and (validModel or is_boat) and not Game.Vehicle.isElectric() then
+      if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
+        if pressing_nos_button and PAD.IS_CONTROL_PRESSED(0, 71) then
+          VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, (nosPower) / 5)
+          VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, nosPower)
+          if nosAudio then
+            AUDIO.SET_VEHICLE_BOOST_ACTIVE(current_vehicle, true)
           end
-        else
-          if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
-            if pressing_nos_button and PAD.IS_CONTROL_PRESSED(0, 71) then
-              if VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) < 300 then
-                AUDIO.PLAY_SOUND_FROM_ENTITY(-1, "Engine_fail", current_vehicle,
-                  "DLC_PILOT_ENGINE_FAILURE_SOUNDS", true, 0)
-              end
+          if nosvfx then
+            GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrous", 0, false)
+          end
+          using_nos = true
+        end
+      else
+        if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
+          if pressing_nos_button and PAD.IS_CONTROL_PRESSED(0, 71) then
+            if VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) < 300 then
+              AUDIO.PLAY_SOUND_FROM_ENTITY(-1, "Engine_fail", current_vehicle,
+                "DLC_PILOT_ENGINE_FAILURE_SOUNDS", true, 0)
             end
           end
         end
@@ -1578,9 +1611,11 @@ script.register_looped("DSPTFX", function(dsptfx) -- Drift Sound/Partice FX
   end
 end)
 script.register_looped("LCTRL", function(lct) -- Launch Control
-  if launchCtrl and Game.Self.isDriving() then
+  if launchCtrl and Game.Self.isDriving() and (validModel or is_bike or is_quad) then
     if limitVehOptions then
-      if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
+      if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and
+      VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and
+      VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
         lct:yield()
         return
       end
@@ -1591,57 +1626,76 @@ script.register_looped("LCTRL", function(lct) -- Launch Control
     else
       notif_sound, notif_ref = "MP_5_SECOND_TIMER", "HUD_FRONTEND_DEFAULT_SOUNDSET"
     end
-    if validModel or is_bike or is_quad then
-      if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) and VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) > 300 then
-        if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
-          started_lct = true
-          ENTITY.FREEZE_ENTITY_POSITION(current_vehicle, true)
-          timerA = timerA + 1
-          if timerA >= 100 then
-            gui.show_success("Samurais Scripts", "Launch Control Activated!")
-            AUDIO.PLAY_SOUND_FRONTEND(-1, notif_sound, notif_ref, true)
-            repeat
-              lct:sleep(100)
-            until PAD.IS_CONTROL_RELEASED(0, 72)
-            launch_active = true
-          end
-        elseif started_lct and timerA > 0 and timerA < 150 then
-          if PAD.IS_CONTROL_RELEASED(0, 71) or PAD.IS_CONTROL_RELEASED(0, 72) then
-            timerA = 0
-            ENTITY.FREEZE_ENTITY_POSITION(current_vehicle, false)
-            started_lct = false
-          end
+    if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and
+    VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) and
+    VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) > 300 then
+      if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
+        started_lct = true
+        ENTITY.FREEZE_ENTITY_POSITION(current_vehicle, true)
+        local fgCol = {r = 255, g = 255, b = 255, a = 255}
+        local _, x, y = GRAPHICS.GET_SCREEN_COORD_FROM_WORLD_COORD(
+          self.get_pos().x, self.get_pos().y, self.get_pos().z, x, y
+        )
+        if timerA < 1 then
+          timerA = timerA + 0.005
         end
-      end
-      if launch_active then
-        if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_RELEASED(0, 72) then
-          PHYSICS.SET_IN_ARENA_MODE(true)
-          VEHICLE.SET_VEHICLE_MAX_LAUNCH_ENGINE_REVS_(current_vehicle, -1)
-          VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 10)
-          VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, 100.0)
-          ENTITY.FREEZE_ENTITY_POSITION(current_vehicle, false)
-          VEHICLE.SET_VEHICLE_FORWARD_SPEED(current_vehicle, 9.3)
-          lct:sleep(4269)
-          VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, -1)
-          VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 1.0)
-          VEHICLE.SET_VEHICLE_MAX_LAUNCH_ENGINE_REVS_(current_vehicle, 1.0)
-          PHYSICS.SET_IN_ARENA_MODE(false)
-          launch_active = false
+        if timerA >= 1 then
+          fgCol = { r = 111, g = 194, b = 118, a = 255}
+        end
+        Game.drawText(0.44, 0.936, "Launch Control", fgCol, vec2:new(1, 0.4), 2)
+        Game.drawBar(0.53, 0.95, 0.1, 0.01, fgCol, {r = 0, g = 0, b = 0, a = 150}, timerA)
+        if timerA >= 1 then
+          if not launch_active then
+            gui.show_success("Samurais Scripts", "Launch Control Ready!")
+            AUDIO.PLAY_SOUND_FRONTEND(-1, notif_sound, notif_ref, true)
+          end
+          launch_active = true
+        end
+      elseif started_lct and timerA > 0 and timerA < 1 then
+        if PAD.IS_CONTROL_RELEASED(0, 71) or PAD.IS_CONTROL_RELEASED(0, 72) then
+          fgCol = {r = 255, g = 255, b = 255, a = 255}
           timerA = 0
+          ENTITY.FREEZE_ENTITY_POSITION(current_vehicle, false)
+          started_lct = false
+          launch_active = false
         end
       end
     end
+    if launch_active then
+      if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_RELEASED(0, 72) then
+        PHYSICS.SET_IN_ARENA_MODE(true)
+        VEHICLE.SET_VEHICLE_MAX_LAUNCH_ENGINE_REVS_(current_vehicle, -1)
+        VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 10)
+        VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, 100.0)
+        ENTITY.FREEZE_ENTITY_POSITION(current_vehicle, false)
+        VEHICLE.SET_VEHICLE_FORWARD_SPEED(current_vehicle, 9.3)
+        lct:sleep(4269)
+        VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, -1)
+        VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, 1.0)
+        VEHICLE.SET_VEHICLE_MAX_LAUNCH_ENGINE_REVS_(current_vehicle, 1.0)
+        PHYSICS.SET_IN_ARENA_MODE(false)
+        launch_active = false
+        timerA = 0
+      end
+    end
   end
-  lct:yield()
 end)
 script.register_looped("ABSPREP", function(abs)
   if abs_lights and Game.Self.isDriving() and is_car then
+    if limitVehOptions then
+      if VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 4 and
+      VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 6 and
+      VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 7 and
+      VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 22 then
+        return
+      end
+    end
     if Game.Vehicle.hasABS() and PAD.IS_CONTROL_PRESSED(0, 72) then
       if (ENTITY.GET_ENTITY_SPEED(self.get_veh()) * 3.6) > 100 then
         repeat
           should_flash_bl = not should_flash_bl
           abs:sleep(100)
-        until (ENTITY.GET_ENTITY_SPEED(self.get_veh()) * 3.6) < 50 or not PAD.IS_CONTROL_PRESSED(0, 72) or
+        until (ENTITY.GET_ENTITY_SPEED(self.get_veh()) * 3.6) < 10 or PAD.IS_CONTROL_RELEASED(0, 72) or
           not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle)
         should_flash_bl = false
       end
@@ -1780,55 +1834,59 @@ script.register_looped("NOSPTFX", function(spbptfx)
   end
 end)
 script.register_looped("TWOSTEP", function(twostep)
-  if launchCtrl and Game.Self.isDriving() then
+  if launchCtrl and Game.Self.isDriving() and (validModel or is_bike or is_quad)
+  and not Game.Vehicle.isElectric() then
     if limitVehOptions then
-      if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
+      if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and
+      VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and
+      VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
         return
       end
     end
-    if validModel or is_bike or is_quad then
-      if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) and VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) >= 300 then
-        if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
-          local asset = "core"
-          if Game.requestNamedPtfxAsset(asset) then
-            local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
-            for i = 0, exhaustCount do
-              local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
-              if retBool then
-                GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
-                lctPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_backfire", current_vehicle, 0.0,
-                  0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 0.69420, false, false, false, 0, 0, 0, 255)
-                table.insert(lctPtfx_t, lctPtfx)
-                twostep_started = true
-              end
+    if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) and
+    VEHICLE.GET_VEHICLE_ENGINE_HEALTH(current_vehicle) >= 300 then
+      if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
+        local asset = "core"
+        if Game.requestNamedPtfxAsset(asset) then
+          local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
+          for i = 0, exhaustCount do
+            local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
+            if retBool then
+              GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
+              lctPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_backfire", current_vehicle, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, 0.69420, false, false, false, 0, 0, 0, 255)
+              table.insert(lctPtfx_t, lctPtfx)
+              twostep_started = true
             end
           end
-          if twostep_started then
-            repeat
-              twostep:sleep(50)
-            until PAD.IS_CONTROL_RELEASED(0, 72) or launch_active == false
-            for _, bfire in ipairs(lctPtfx_t) do
-              if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(bfire) then
-                GRAPHICS.STOP_PARTICLE_FX_LOOPED(bfire, false)
-                GRAPHICS.REMOVE_PARTICLE_FX(bfire, false)
-              end
+        end
+        if twostep_started then
+          repeat
+            twostep:sleep(50)
+          until PAD.IS_CONTROL_RELEASED(0, 72) or launch_active == false
+          for _, bfire in ipairs(lctPtfx_t) do
+            if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(bfire) then
+              GRAPHICS.STOP_PARTICLE_FX_LOOPED(bfire, false)
+              GRAPHICS.REMOVE_PARTICLE_FX(bfire, false)
             end
-            STREAMING.REMOVE_NAMED_PTFX_ASSET(asset)
-            twostep_started = false
           end
+          STREAMING.REMOVE_NAMED_PTFX_ASSET(asset)
+          twostep_started = false
         end
       end
     end
   end
 end)
 script.register_looped("LCSFX", function(tstp) -- Launch Contol SFX
-  if Game.Self.isDriving() then
+  if launchCtrl and Game.Self.isDriving() and not Game.Vehicle.isElectric() then
     if limitVehOptions then
-      if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
+      if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and
+      VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and
+      VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
         return
       end
     end
-    if launchCtrl and lctPtfx_t[1] ~= nil then
+    if lctPtfx_t[1] ~= nil then
       if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) and PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
         for _, p in ipairs(lctPtfx_t) do
           if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(p) then
@@ -1867,64 +1925,63 @@ script.register_looped("LCSFX", function(tstp) -- Launch Contol SFX
     end
   end
 end)
-script.register_looped("PNB", function(pnb) -- Pops & Bangs
-  if Game.Self.isDriving() and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
-    if is_car or is_bike or is_quad then
-      if popsNbangs then
-        if limitVehOptions then
-          if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
-            return
-          end
+script.register_looped("PNB", function() -- Pops & Bangs
+  if Game.Self.isDriving() and not Game.Vehicle.isElectric() and (is_car or is_bike) and
+  VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
+    if popsNbangs then
+      if limitVehOptions then
+        if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 7 then
+          return
         end
-        AUDIO.ENABLE_VEHICLE_EXHAUST_POPS(current_vehicle, false)
-        default_pops_disabled = true
-        local asset           = "core"
-        local currRPM         = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
-        local currGear        = VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(current_vehicle)
-        if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) then
-          rpmThreshold = 0.45
-        elseif noEngineBraking then
-          rpmThreshold = 0.80
-        else
-          rpmThreshold = 0.69
-        end
-        if Game.requestNamedPtfxAsset(asset) then
-          if PAD.IS_CONTROL_RELEASED(0, 71) and currRPM < 1.0 and currRPM > rpmThreshold and currGear ~= 0 then
-            local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
-            for i = 0, exhaustCount do
-              local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
-              if retBool then
-                currRPM = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
-                if currRPM < 1.0 and currRPM > 0.55 then
-                  GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
-                  popsPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_backfire", current_vehicle,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, flame_size, false, false, false, 0, 0, 0, 255)
-                  GRAPHICS.STOP_PARTICLE_FX_LOOPED(popsPtfx, false)
-                  table.insert(popsPtfx_t, popsPtfx)
-                  started_popSound2 = true
-                end
-              end
-            end
-          end
-        end
-        if started_popSound2 then
-          currRPM = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
-          if PAD.IS_CONTROL_PRESSED(0, 71) or currRPM < rpmThreshold then
-            for _, bfire in ipairs(popsPtfx_t) do
-              if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(bfire) then
-                GRAPHICS.STOP_PARTICLE_FX_LOOPED(bfire, false)
-                GRAPHICS.REMOVE_PARTICLE_FX(bfire, false)
-              end
-            end
-            STREAMING.REMOVE_NAMED_PTFX_ASSET(asset)
-            started_popSound2 = false
-          end
-        end
+      end
+      AUDIO.ENABLE_VEHICLE_EXHAUST_POPS(current_vehicle, false)
+      default_pops_disabled = true
+      local asset           = "core"
+      local currRPM         = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
+      local currGear        = VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(current_vehicle)
+      if VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) then
+        rpmThreshold = 0.45
+      elseif noEngineBraking then
+        rpmThreshold = 0.80
       else
-        if default_pops_disabled then
-          AUDIO.ENABLE_VEHICLE_EXHAUST_POPS(current_vehicle, true)
-          default_pops_disabled = false
+        rpmThreshold = 0.69
+      end
+      if Game.requestNamedPtfxAsset(asset) then
+        if PAD.IS_CONTROL_RELEASED(0, 71) and currRPM < 1.0 and currRPM > rpmThreshold and currGear ~= 0 then
+          local exhaustCount = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
+          for i = 0, exhaustCount do
+            local retBool, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(current_vehicle, i, retBool, boneIndex)
+            if retBool then
+              currRPM = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
+              if currRPM < 1.0 and currRPM > 0.55 then
+                GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
+                popsPtfx = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE("veh_backfire", current_vehicle,
+                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, boneIndex, flame_size, false, false, false, 0, 0, 0, 255)
+                GRAPHICS.STOP_PARTICLE_FX_LOOPED(popsPtfx, false)
+                table.insert(popsPtfx_t, popsPtfx)
+                started_popSound2 = true
+              end
+            end
+          end
         end
+      end
+      if started_popSound2 then
+        currRPM = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(current_vehicle)
+        if PAD.IS_CONTROL_PRESSED(0, 71) or currRPM < rpmThreshold then
+          for _, bfire in ipairs(popsPtfx_t) do
+            if GRAPHICS.DOES_PARTICLE_FX_LOOPED_EXIST(bfire) then
+              GRAPHICS.STOP_PARTICLE_FX_LOOPED(bfire, false)
+              GRAPHICS.REMOVE_PARTICLE_FX(bfire, false)
+            end
+          end
+          STREAMING.REMOVE_NAMED_PTFX_ASSET(asset)
+          started_popSound2 = false
+        end
+      end
+    else
+      if default_pops_disabled then
+        AUDIO.ENABLE_VEHICLE_EXHAUST_POPS(current_vehicle, true)
+        default_pops_disabled = false
       end
     end
   end
@@ -2192,12 +2249,18 @@ script.register_looped("DMULT", function(dmult) -- Drift Multiplier
   end
   dmult:yield()
 end)
+
 script.register_looped("DP", function() -- Drift Points
   if Game.Self.isDriving() and is_car and driftMinigame and is_drifting then
-    local diaplay_str = string.format("%s\n+%s pts", drift_streak_text, Lua_fn.separateInt(drift_points))
-    showDriftCounter(diaplay_str)
+    local driftText    = string.format("%s\n+%s pts", drift_streak_text, Lua_fn.separateInt(drift_points))
+    local driftTextCol = { r = 255, g = 192, b = 0, a = 200 }
+    local _, x, y = HUD.GET_HUD_SCREEN_POSITION_FROM_WORLD_POSITION(
+      self.get_pos().x, self.get_pos().y, self.get_pos().z, x, y
+    )
+    Game.drawText(x, y - 0.6, driftText, driftTextCol, vec2:new(1, 0.7), 7)
+
     if drift_extra_pts > 0 or drift_extra_text ~= "" then
-      showDriftExtra(drift_extra_text)
+      Game.drawText(x, y - 0.5142, drift_extra_text, driftTextCol, vec2:new(1, 0.4), 7)
     end
   end
 end)
@@ -2466,7 +2529,7 @@ script.register_looped("MISCPLANES", function(miscp)
     end
   end
 
-  if Game.Self.isDriving() and (is_plane or is_heli) and Game.Vehicle.hasWeapons()
+  if Game.Self.isDriving() and (is_plane or is_heli) and Game.Vehicle.hasWeapons(self.get_veh())
   and ENTITY.GET_ENTITY_MODEL(current_vehicle) ~= 0x96E24857 then
     local armed, _ = SS.isUsingAirctaftMG()
     if armed then
@@ -2541,21 +2604,13 @@ script.register_looped("MISCPLANES", function(miscp)
               shoot_explosive_mg(pos, endPos, 1000, self.get_ped(), 300.0)
             end
           else
-            if ped ~= 0 and Game.Self.isPedEnemy(ped) and not ENTITY.IS_ENTITY_DEAD(ped, false) then
+            if ped ~= 0 and not ENTITY.IS_ENTITY_DEAD(ped, false) and Game.Self.isPedEnemy(ped) then
               shoot_cannon(false, ped, ENTITY.GET_ENTITY_COORDS(ped, true))
               shoot_explosive_mg(pos, ENTITY.GET_ENTITY_COORDS(ped, true), 1000, self.get_ped(), 300.0)
             end
-            if veh ~= 0 then
-              local occupants = Game.Vehicle.getOccupants(veh)
-              if #occupants > 0 then
-                for _, p in ipairs(occupants) do
-                  if not ENTITY.IS_ENTITY_DEAD(p, false) and Game.Self.isPedEnemy(p) then
-                    shoot_cannon(false, veh, ENTITY.GET_ENTITY_COORDS(veh, true))
-                    shoot_explosive_mg(pos, ENTITY.GET_ENTITY_COORDS(veh, true), 1000, self.get_ped(), 300.0)
-                    break
-                  end
-                end
-              end
+            if veh ~= 0 and not ENTITY.IS_ENTITY_DEAD(veh, false) and Game.Vehicle.isEnemyVehicle(veh) then
+              shoot_cannon(false, veh, ENTITY.GET_ENTITY_COORDS(veh, true))
+              shoot_explosive_mg(pos, ENTITY.GET_ENTITY_COORDS(veh, true), 1000, self.get_ped(), 300.0)
             end
           end
         end
@@ -2723,43 +2778,6 @@ script.register_looped("HFE", function(hfe) -- Handling Flags Editor
           end
         end
       end
-
-      -- the ones below do work but the steering is not rendered.
-      -- if rwSteering then
-      --   if not rw_steering_enabled then
-      --     SS.setHandlingFlag(HF._STEER_REARWHEELS, true)
-      --     hfe:sleep(100)
-      --   end
-      -- else
-      --   if rw_steering_enabled then
-      --     SS.setHandlingFlag(HF._STEER_REARWHEELS, false)
-      --     hfe:sleep(100)
-      --   end
-      -- end
-
-      -- if awSteering then
-      --   if not aw_steering_enabled then
-      --     SS.setHandlingFlag(HF._STEER_ALL_WHEELS, true)
-      --     hfe:sleep(100)
-      --   end
-      -- else
-      --   if aw_steering_enabled then
-      --     SS.setHandlingFlag(HF._STEER_ALL_WHEELS, false)
-      --     hfe:sleep(100)
-      --   end
-      -- end
-
-      -- if handbrakeSteering then
-      --   if not hb_steering_enabled then
-      --     SS.setHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER, true)
-      --     hfe:sleep(100)
-      --   end
-      -- else
-      --   if hb_steering_enabled then
-      --     SS.setHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER, false)
-      --     hfe:sleep(100)
-      --   end
-      -- end
     end
   end
 end)
@@ -3310,7 +3328,7 @@ end)
 script.register_looped("CASINO", function(script)
   if Game.isOnline() then
     if force_poker_cards then
-      local player_id = PLAYER.PLAYER_ID()
+      local player_id = self.get_id()
       if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("three_card_poker")) ~= 0 then
         while NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", -1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 0, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 2, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 3, 0) ~= player_id do
           network.force_script_host("three_card_poker")
@@ -3352,7 +3370,7 @@ script.register_looped("CASINO", function(script)
     if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("blackjack")) ~= 0 then
       local dealers_card = 0
       local blackjack_table = locals.get_int("blackjack",
-        blackjack_table_players + 1 + (PLAYER.PLAYER_ID() * blackjack_table_players_size) + 4)                             --The Player's current table he is sitting at.
+        blackjack_table_players + 1 + (self.get_id() * blackjack_table_players_size) + 4)                             --The Player's current table he is sitting at.
       if blackjack_table ~= -1 then
         dealers_card     = locals.get_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1) --Dealer's facedown card.
         dealers_card_str = get_cardname_from_index(dealers_card)
@@ -3364,7 +3382,7 @@ script.register_looped("CASINO", function(script)
     end
 
     if force_roulette_wheel then
-      local player_id = PLAYER.PLAYER_ID()
+      local player_id = self.get_id()
       if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casinoroulette")) ~= 0 then
         while NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", -1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 0, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 2, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 3, 0) ~= player_id do
           network.force_script_host("casinoroulette")
@@ -3455,7 +3473,7 @@ script.register_looped("CASINO", function(script)
       casino_cooldown_update_str = chipswon_gd >= max_chip_wins and
       string.format("Cooldown expires in approximately: %.2f minute(s).", minutes_left) or "Off Cooldown"
     end
-    if fm_mission_controller_cart_autograb then
+    if heist_cart_autograb then
       if locals.get_int("fm_mission_controller", fm_mission_controller_cart_grab) == 3 then
         locals.set_int("fm_mission_controller", fm_mission_controller_cart_grab, 4)
       elseif locals.get_int("fm_mission_controller", fm_mission_controller_cart_grab) == 4 then

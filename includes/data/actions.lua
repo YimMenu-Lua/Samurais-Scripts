@@ -1,5 +1,38 @@
 ---@diagnostic disable
 
+local PED_TYPE   = {
+  _PLAYER_0              = 0,
+  _PLAYER_1              = 1,
+  _NETWORK_PLAYER        = 2,
+  _PLAYER_2              = 3,
+  _CIVMALE               = 4,
+  _CIVFEMALE             = 5,
+  _COP                   = 6,
+  _GANG_ALBANIAN         = 7,
+  _GANG_BIKER_1          = 8,
+  _GANG_BIKER_2          = 9,
+  _GANG_ITALIAN          = 10,
+  _GANG_RUSSIAN          = 11,
+  _GANG_RUSSIAN_2        = 12,
+  _GANG_IRISH            = 13,
+  _GANG_JAMAICAN         = 14,
+  _GANG_AFRICAN_AMERICAN = 15,
+  _GANG_KOREAN           = 16,
+  _GANG_CHINESE_JAPANESE = 17,
+  _GANG_PUERTO_RICAN     = 18,
+  _DEALER                = 19,
+  _MEDIC                 = 20,
+  _FIREMAN               = 21,
+  _CRIMINAL              = 22,
+  _BUM                   = 23,
+  _PROSTITUTE            = 24,
+  _SPECIAL               = 25,
+  _MISSION               = 26,
+  _SWAT                  = 27,
+  _ANIMAL                = 28,
+  _ARMY                  = 29,
+}
+
 animlist = {
   { dict = "rcmpaparazzo_2",                                              anim = "shag_loop_a",                        name = "Hit It From The Back 01",         flag = 47, type = 7,                         boneID = 0,                             pedType = PED_TYPE._PROSTITUTE,  pedHash = 1846523796, posx = 0.0,     posy = 0.2,           posz = 0.0,            rotx = 40.0,     roty = 0.0,                     rotz = 0.0,                              dict2 = "rcmpaparazzo_2",       anim2 = "shag_loop_poppy", sfx = "SEX_GENERIC_FEM",        sfxName = "S_F_Y_HOOKER_03_BLACK_FULL_01", sfxFlg = "SPEECH_PARAMS_FORCE", cat = "NSFW" },
   { dict = "misscarsteal2pimpsex",                                        anim = "shagloop_pimp",                      name = "Hit It From The Front",           flag = 47, type = 7,                         boneID = 0,                             pedType = PED_TYPE._PROSTITUTE,  pedHash = 1846523796, posx = 0.05,    posy = 0.3,           posz = -0.2,           rotx = 27.0,     roty = 0.0,                     rotz = 190.0,                            dict2 = "misscarsteal2pimpsex", anim2 = "shagloop_hooker", sfx = "SEX_GENERIC_FEM",        sfxName = "S_F_Y_HOOKER_03_BLACK_FULL_01", sfxFlg = "SPEECH_PARAMS_FORCE", cat = "NSFW" },

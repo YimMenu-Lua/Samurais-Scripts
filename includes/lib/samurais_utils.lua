@@ -224,36 +224,6 @@ dummyCop = function()
   end)
 end
 
-showDriftCounter = function(text)
-  wolrdPos = self.get_pos()
-  local _, screenX, screenY = HUD.GET_HUD_SCREEN_POSITION_FROM_WORLD_POSITION(wolrdPos.x, wolrdPos.y, wolrdPos.z, screenX,
-    screenY)
-  HUD.BEGIN_TEXT_COMMAND_DISPLAY_TEXT("TWOSTRINGS")
-  HUD.SET_TEXT_COLOUR(255, 192, 0, 200)
-  HUD.SET_TEXT_SCALE(1, 0.7)
-  HUD.SET_TEXT_OUTLINE()
-  HUD.SET_TEXT_FONT(7)
-  HUD.SET_TEXT_CENTRE(true)
-  HUD.SET_TEXT_DROP_SHADOW()
-  HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text)
-  HUD.END_TEXT_COMMAND_DISPLAY_TEXT(screenX, (screenY - 0.6), 0)
-end
-
-showDriftExtra = function(text)
-  wolrdPos = self.get_pos()
-  local _, screenX, screenY = HUD.GET_HUD_SCREEN_POSITION_FROM_WORLD_POSITION(wolrdPos.x, wolrdPos.y, wolrdPos.z, screenX,
-    screenY)
-  HUD.BEGIN_TEXT_COMMAND_DISPLAY_TEXT("TWOSTRINGS")
-  HUD.SET_TEXT_COLOUR(255, 192, 0, 200)
-  HUD.SET_TEXT_SCALE(1, 0.4)
-  HUD.SET_TEXT_OUTLINE()
-  HUD.SET_TEXT_FONT(7)
-  HUD.SET_TEXT_CENTRE(true)
-  HUD.SET_TEXT_DROP_SHADOW()
-  HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text)
-  HUD.END_TEXT_COMMAND_DISPLAY_TEXT(screenX, (screenY - 0.5142), 0)
-end
-
 checkVehicleCollision = function()
   if ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(current_vehicle) then
     local entity = ENTITY.GET_LAST_ENTITY_HIT_BY_ENTITY_(current_vehicle)
@@ -635,12 +605,12 @@ onVehEnter = function()
   current_vehicle = self.get_veh()
   if Game.Self.isDriving() and (is_car or is_bike or is_quad)
       and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
-    engine_brake_disabled  = SS.getHandlingFlagState(HF._FREEWHEEL_NO_GAS)
-    traction_ctrl_disabled = SS.getHandlingFlagState(HF._FORCE_NO_TC_OR_SC)
-    kers_boost_enabled     = SS.getHandlingFlagState(HF._HAS_KERS)
-    offroader_enabled      = SS.getHandlingFlagState(HF._OFFROAD_ABILITIES_X2)
-    rally_tires_enabled    = SS.getHandlingFlagState(HF._HAS_RALLY_TYRES)
-    easy_wheelie_enabled   = SS.getHandlingFlagState(HF._LOW_SPEED_WHEELIES)
+    engine_brake_disabled  = SS.getVehicleHandlingFlag(HF._FREEWHEEL_NO_GAS)
+    traction_ctrl_disabled = SS.getVehicleHandlingFlag(HF._FORCE_NO_TC_OR_SC)
+    kers_boost_enabled     = SS.getVehicleHandlingFlag(HF._HAS_KERS)
+    offroader_enabled      = SS.getVehicleHandlingFlag(HF._OFFROAD_ABILITIES_X2)
+    rally_tires_enabled    = SS.getVehicleHandlingFlag(HF._HAS_RALLY_TYRES)
+    easy_wheelie_enabled   = SS.getVehicleHandlingFlag(HF._LOW_SPEED_WHEELIES)
   end
   if Game.Self.isDriving() and current_vehicle ~= last_vehicle then
     resetLastVehState()
@@ -711,14 +681,8 @@ shoot_cannon = function(enemiesOnly, entity, coords)
           VEHICLE.SET_VEHICLE_SHOOT_AT_TARGET(self.get_ped(), entity, coords.x, coords.y, coords.z)
         end
       elseif ENTITY.IS_ENTITY_A_VEHICLE(entity) then
-        local occupants = Game.Vehicle.getOccupants(entity)
-        if #occupants > 0 then
-          for i = 1, #occupants do
-            if Game.Self.isPedEnemy(occupants[i]) and not ENTITY.IS_ENTITY_DEAD(occupants[i], false) then
-              VEHICLE.SET_VEHICLE_SHOOT_AT_TARGET(self.get_ped(), entity, coords.x, coords.y, coords.z)
-              break
-            end
-          end
+        if Game.Vehicle.isEnemyVehicle(entity) then
+          VEHICLE.SET_VEHICLE_SHOOT_AT_TARGET(self.get_ped(), entity, coords.x, coords.y, coords.z)
         end
       end
     end
@@ -2775,7 +2739,7 @@ SS.isNearCarTrunk = function()
           local engBoneCoords = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, engineBone)
           local lfwBoneCoords = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, lfwheelBone)
           local bonedistance  = vec3:distance(lfwBoneCoords, engBoneCoords)
-          local isRearEngined = bonedistance > 2
+          local isRearEngined = bonedistance > 2 -- Can also read vehicle model flag FRONT_BOOT
           local vmin, vmax    = Game.getModelDimensions(ENTITY.GET_ENTITY_MODEL(veh))
           local veh_length    = vmax.y - vmin.y
           local tempPos       = isRearEngined and vec2:new(
@@ -2799,7 +2763,6 @@ SS.isNearCarTrunk = function()
   return false, 0, false
 end
 
--- Related to the Carpool option.
 SS.updateNPCdriveTask = function()
   TASK.CLEAR_PED_TASKS(npcDriver)
   TASK.CLEAR_PED_SECONDARY_TASK(npcDriver)
@@ -2813,7 +2776,6 @@ SS.updateNPCdriveTask = function()
   gui.show_message("Samurai's Scripts", string.format("NPC driving style changed to %s.", npcDriveSwitch == 0 and "Normal" or "Aggressive"))
 end
 
--- Related to the Carpool option.
 SS.showNPCvehicleControls = function()
   ImGui.SeparatorText("NPC Vehicle Options")
   if show_npc_veh_seat_ctrl and thisVeh ~= 0 then
@@ -3012,28 +2974,30 @@ end
 -- Reads localPlayer's vehicle information from memory.
 SS.getVehicleInfo = function()
   local vehPtr = memory.handle_to_ptr(self.get_veh())
-  ---@class vehicleInfo
-  local vehicleInfo = {}
-  vehicleInfo.__index = vehicleInfo
+  ---@class CVehicle
+  local CVehicle = setmetatable({}, {})
+  CVehicle.__index = CVehicle
   if vehPtr:is_valid() then
-    local CHandlingData  = vehPtr:add(0x0960):deref()
-    local CVehicleDamage = vehPtr:add(0x0420)
-    local CDeformation   = CVehicleDamage:add(0x0010)
-    vehicleInfo.m_model_flags       = CHandlingData:add(0x0124)
-    vehicleInfo.m_handling_flags    = CHandlingData:add(0x0128)
-    vehicleInfo.m_deformation_mult  = CHandlingData:add(0x00F8)
-    vehicleInfo.m_sub_handling_data = CHandlingData:add(0x158):deref()
-    vehicleInfo.m_deformation       = CDeformation:add(0x0000)
-    vehicleInfo.m_deform_god        = vehPtr:add(0x096C)
+    local CHandlingData     = vehPtr:add(0x0960):deref()
+    local CVehicleModelInfo = vehPtr:add(0x20):deref()
+    local CVehicleDamage    = vehPtr:add(0x0420)
+    local CDeformation      = CVehicleDamage:add(0x0010)
+    CVehicle.m_model_info_flags  = CVehicleModelInfo:add(0x057C)
+    CVehicle.m_model_flags       = CHandlingData:add(0x0124)
+    CVehicle.m_handling_flags    = CHandlingData:add(0x0128)
+    CVehicle.m_deformation_mult  = CHandlingData:add(0x00F8)
+    CVehicle.m_sub_handling_data = CHandlingData:add(0x158):deref()
+    CVehicle.m_deformation       = CDeformation:add(0x0000)
+    CVehicle.m_deform_god        = vehPtr:add(0x096C)
   end
-  return vehicleInfo
+  return CVehicle
 end
 
--- Checks if a handling flag is enabled or disabled
+-- Checks if a handling flag is set
 --
--- for localPlayer's current vehicle.
+-- in localPlayer's current vehicle.
 ---@param flag number
-SS.getHandlingFlagState = function(flag)
+SS.getVehicleHandlingFlag = function(flag)
   local m_handling_flags = SS.getVehicleInfo().m_handling_flags
   local handling_flags   = m_handling_flags:get_dword()
   return Lua_fn.has_bit(handling_flags, flag)
@@ -3041,16 +3005,39 @@ end
 
 -- Enables or disables a handling flag for localPlayer's vehicle.
 ---@param flag number
----@param switch boolean
-SS.setHandlingFlag = function(flag, switch)
+---@param toggle boolean
+SS.setHandlingFlag = function(flag, toggle)
   if not is_car and not is_bike and not is_quad then
     return
   end
   local m_handling_flags = SS.getVehicleInfo().m_handling_flags
   local handling_flags   = m_handling_flags:get_dword()
-  local bitwiseOp = switch and Lua_fn.set_bit or Lua_fn.clear_bit
+  local bitwiseOp = toggle and Lua_fn.set_bit or Lua_fn.clear_bit
   local new_flag  = bitwiseOp(handling_flags, flag)
   m_handling_flags:set_dword(new_flag)
+end
+
+---@param flag integer
+SS.getVehicleModelFlag = function(flag)
+  local base_ptr = SS.getVehicleInfo().m_model_info_flags -- array of 7 uint32_t (7 * 32 = 224 flags total. Outdated ref: https://gtamods.com/wiki/Vehicles.meta)
+  local index    = math.floor(flag / 32)
+  local bitPos   = flag % 32
+  local flag_ptr = base_ptr:add(index * 4)
+  local dword    = flag_ptr:get_dword()
+  return Lua_fn.has_bit(dword, bitPos)
+end
+
+---@param flag integer
+---@param toggle boolean
+SS.setVehicleModelFlag = function(flag, toggle)
+  local base_ptr  = SS.getVehicleInfo().m_model_info_flags
+  local index     = math.floor(flag / 32)
+  local bitPos    = flag % 32
+  local flag_ptr  = base_ptr:add(index * 4)
+  local dword     = flag_ptr:get_dword()
+  local bitwiseOp = toggle and Lua_fn.set_bit or Lua_fn.clear_bit
+  local new_flag  = bitwiseOp(dword, bitPos)
+  flag_ptr:set_dword(new_flag)
 end
 
 ---@unused
@@ -3087,43 +3074,33 @@ end
 SS.getPlayerInfo = function(ped)
   local pedPtr = memory.handle_to_ptr(ped)
   if pedPtr:is_valid() then
-    ---@class pedInfo
-    local pedInfo   = setmetatable({}, {})
-    pedInfo.__index = pedInfo
-    local gameState <const> = {
-      { str = "Invalid",       int = -1 },
-      { str = "Playing",       int = 0 },
-      { str = "Died",          int = 1 },
-      { str = "Arrested",      int = 2 },
-      { str = "FailedMission", int = 3 },
-      { str = "LeftGame",      int = 4 },
-      { str = "Respawn",       int = 5 },
-      { str = "InMPCutscene",  int = 6 },
-    }
-    local CPlayerInfo         = pedPtr:add(0x10A8):deref()
-    local m_ped_type          = pedPtr:add(0x1098) -- uint32_t
-    local m_ped_task_flag     = pedPtr:add(0x144B) -- uint8_t
-    local m_seatbelt          = pedPtr:add(0x143C):get_word() -- uint8_t
-    pedInfo.ped_type          = m_ped_type:get_dword()
-    pedInfo.task_flag         = m_ped_task_flag:get_word()
-    pedInfo.swim_speed_ptr    = CPlayerInfo:add(0x01C8)
-    pedInfo.run_speed_ptr     = CPlayerInfo:add(0x0D50)
-    pedInfo.velocity_ptr      = CPlayerInfo:add(0x0300)
-    pedInfo.canPedRagdoll = function()
-      return (pedInfo.ped_type & 0x20) > 0
+    ---@class CPed
+    local CPed   = setmetatable({}, {})
+    CPed.__index = CPed
+    local CPlayerInfo     = pedPtr:add(0x10A8):deref()
+    local m_ped_type      = pedPtr:add(0x1098) -- uint32_t
+    local m_ped_task_flag = pedPtr:add(0x144B) -- uint8_t
+    local m_seatbelt      = pedPtr:add(0x143C):get_word() -- uint8_t
+    CPed.ped_type         = m_ped_type:get_dword()
+    CPed.task_flag        = m_ped_task_flag:get_word()
+    CPed.swim_speed_ptr   = CPlayerInfo:add(0x01C8)
+    CPed.run_speed_ptr    = CPlayerInfo:add(0x0D50)
+    CPed.velocity_ptr     = CPlayerInfo:add(0x0300)
+
+    CPed.canPedRagdoll = function()
+      return Lua_fn.has_bit(pedInfo.ped_type, 0x20)
     end;
-    pedInfo.hasSeatbelt = function()
-      return (m_seatbelt & 0x3) > 0
+
+    CPed.hasSeatbelt = function()
+      return Lua_fn.has_bit(m_seatbelt, 0x3)
     end;
-    pedInfo.getGameState = function()
+
+    CPed.getGameState = function()
       local m_game_state = CPlayerInfo:add(0x0230):get_dword()
-      for _, v in ipairs(gameState) do
-        if m_game_state == v.int then
-          return v.str
-        end
-      end
+      return eGameState[m_game_state + 2]
     end;
-    return pedInfo
+
+    return CPed
   end
 end
 
@@ -3206,16 +3183,16 @@ SS.reset_settings = function()
     key ~= "persist_attachments" and
     key ~= "favorite_actions" then
       _G[key] = DEFAULT_CONFIG[key]
-      CFG.save(tostring(key), DEFAULT_CONFIG[key])
+      CFG.save(key, DEFAULT_CONFIG[key])
     end
   end
   initStrings()
 end
 
 SS.isUsingAirctaftMG = function()
-  if Game.Self.isDriving() and (is_plane or is_heli) and Game.Vehicle.hasWeapons() then
-    local bool, weapon = WEAPON.GET_CURRENT_PED_VEHICLE_WEAPON(self.get_ped(), weapon)
-    if bool then
+  if Game.Self.isDriving() and (is_plane or is_heli) and Game.Vehicle.hasWeapons(self.get_veh()) then
+    local armed, weapon = WEAPON.GET_CURRENT_PED_VEHICLE_WEAPON(self.get_ped(), weapon)
+    if armed then
       for _, v in ipairs(aircraft_mgs_t) do
         if weapon == joaat(v) then
           return true, weapon
@@ -3482,6 +3459,41 @@ Game.showButtonPrompt = function(text)
   end
 end
 
+---@param posX float
+---@param posY float
+---@param width float
+---@param height float
+---@param fgCol table
+---@param bgCol table
+---@param value number
+Game.drawBar = function(posX, posY, width, height, fgCol, bgCol, value)
+  local bgPaddingX = 0.005
+  local bgPaddingY = 0.01
+  -- background
+  GRAPHICS.DRAW_RECT(posX, posY, width + bgPaddingX, height + bgPaddingY, bgCol.r, bgCol.g, bgCol.b, bgCol.a, false)
+
+ -- foreground
+  GRAPHICS.DRAW_RECT(posX - width * 0.5 + value * width * 0.5, posY, width * value, height, fgCol.r, fgCol.g, fgCol.b, fgCol.a, false)
+end
+
+---@param posX float
+---@param PosY float
+---@param text string
+---@param col table
+---@param scale vec2 | table
+---@param font number
+Game.drawText = function(posX, PosY, text, col, scale, font)
+  HUD.BEGIN_TEXT_COMMAND_DISPLAY_TEXT("TWOSTRINGS")
+  HUD.SET_TEXT_COLOUR(col.r, col.g, col.b, col.a)
+  HUD.SET_TEXT_SCALE(scale.x, scale.y)
+  HUD.SET_TEXT_OUTLINE()
+  HUD.SET_TEXT_FONT(font)
+  HUD.SET_TEXT_CENTRE(true)
+  HUD.SET_TEXT_DROP_SHADOW()
+  HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text)
+  HUD.END_TEXT_COMMAND_DISPLAY_TEXT(posX, PosY, 0)
+end
+
 ---@param entity integer
 Game.addBlipForEntity = function(entity)
   HUD.ADD_BLIP_FOR_ENTITY(entity)
@@ -3497,7 +3509,7 @@ end
 -- Sets a custom name for a blip. Custom names appear on the pause menu and the world map.
 ---@param blip integer
 ---@param name string
-Game.blipName = function(blip, name)
+Game.setBlipName = function(blip, name)
   HUD.BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING")
   HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(name)
   HUD.END_TEXT_COMMAND_SET_BLIP_NAME(blip)
@@ -3834,11 +3846,7 @@ end
 
 -- Checks if localPlayer is alive.
 Game.Self.isAlive = function()
-  if ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) then
-    return false
-  else
-    return true
-  end
+  return not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false)
 end
 
 -- Checks if localPlayer is on foot.
@@ -3859,44 +3867,28 @@ end
 
 -- Checks if localPlayer is outside.
 Game.Self.isOutside = function()
-  if INTERIOR.GET_INTERIOR_FROM_ENTITY(self.get_ped()) == 0 then
-    return true
-  else
-    return false
-  end
+  return INTERIOR.GET_INTERIOR_FROM_ENTITY(self.get_ped()) == 0
 end
 
 Game.Self.isMoving = function()
-  if PED.IS_PED_STOPPED(self.get_ped()) then
-    return false
-  else
-    return true
-  end
+  return not PED.IS_PED_STOPPED(self.get_ped())
 end
 
 Game.Self.isDriving = function()
-  local retBool
-  if not Game.Self.isOnFoot() then
-    if Game.getPedVehicleSeat(self.get_ped()) == -1 then
-      retBool = true
-    else
-      retBool = false
-    end
-  else
-    retBool = false
+  if self.get_veh() == 0 then
+    return false
   end
-  return retBool
+  return VEHICLE.GET_PED_IN_VEHICLE_SEAT(self.get_veh(), -1, false) == self.get_ped()
 end
 
 -- Returns the hash of localPlayer's selected weapon.
 ---@return integer
 Game.Self.weapon = function()
-  local weaponHash
-  check, weapon = WEAPON.GET_CURRENT_PED_WEAPON(self.get_ped(), weapon, false)
-  if check then
-    weaponHash = weapon
+  local armed, weaponHash = WEAPON.GET_CURRENT_PED_WEAPON(self.get_ped(), weaponHash, false)
+  if armed then
+    return weaponHash
   end
-  return weaponHash
+  return 0
 end
 
 -- Teleports localPlayer to the provided coordinates.
@@ -4000,7 +3992,9 @@ end
 -- Returns whether the player is currently modifying their vehicle in a modshop. <- Also returns true when just near a mod shop and not actually inside (tested with LS Customs).
 Game.Self.isInCarModShop = function()
   for _, v in ipairs(modshop_script_names) do
-    return script.is_active(v)
+    if script.is_active(v) then
+      return true
+    end
   end
   return false
 end
@@ -4008,7 +4002,12 @@ end
 ---@param ped integer
 Game.Self.isPedEnemy = function(ped)
   local relationship = PED.GET_RELATIONSHIP_BETWEEN_PEDS(ped, self.get_ped())
-  return PED.IS_PED_IN_COMBAT(ped, self.get_ped()) or (relationship > 2 and relationship <= 5)
+  local pedCoords = Game.getCoords(ped, true)
+  return PED.IS_PED_IN_COMBAT(ped, self.get_ped()) or
+  (relationship > 2 and relationship <= 5) or
+  PED.IS_ANY_HOSTILE_PED_NEAR_POINT(
+    self.get_ped(), pedCoords.x, pedCoords.y, pedCoords.z, 1
+  )
 end
 
 ---@class Vehicle
@@ -4064,10 +4063,63 @@ Game.Vehicle.getOccupants = function(vehicle)
   end
 end
 
+---@param vehicle integer
+Game.Vehicle.isEnemyVehicle = function(vehicle)
+  if ENTITY.DOES_ENTITY_EXIST(vehicle) and ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+    local occupants = Game.Vehicle.getOccupants(vehicle)
+    if #occupants > 0 then
+      for _, p in ipairs(occupants) do
+        if not ENTITY.IS_ENTITY_DEAD(p, false) and Game.Self.isPedEnemy(p) then
+          return true
+        end
+      end
+    end
+  end
+  return false
+end
+
 -- Returns whether a vehicle is weaponized.
----@return boolean
-Game.Vehicle.hasWeapons = function()
-  return VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(self.get_veh())
+---@param vehicle integer
+Game.Vehicle.hasWeapons = function(vehicle)
+  return VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(vehicle)
+end
+
+-- Returns whether local player's vehicle has ABS as standard.
+Game.Vehicle.hasABS = function()
+  if Game.Self.isDriving() and is_car then
+    local m_model_flags = SS.getVehicleInfo().m_model_flags
+    if m_model_flags ~= nil then
+      local iModelFlags = m_model_flags:get_dword()
+      return Lua_fn.has_bit(iModelFlags, MF._ABS_STD)
+    end
+  end
+  return false
+end
+
+-- Returns whether local player's vehicle is a sports car.
+--
+-- *(different from the Sports class)*.
+Game.Vehicle.isSportsCar = function()
+  return SS.getVehicleModelFlag(VMF._SPORTS)
+end
+
+-- Returns whether local player's vehicle is a pussy shaver.
+Game.Vehicle.isElectric = function()
+  return SS.getVehicleModelFlag(VMF._IS_ELECTRIC)
+end
+
+-- Returns whether local player's vehicle is an F1 race car.
+Game.Vehicle.isFormulaOne = function()
+  return SS.getVehicleModelFlag(VMF._IS_FORMULA_VEHICLE) or
+  Game.Vehicle.class(self.get_veh()) == "Open Wheel"
+end
+
+-- Returns whether local player's vehicle is a lowrider
+--
+-- equipped with hydraulic suspension.
+Game.Vehicle.isLowrider = function()
+  return SS.getVehicleModelFlag(VMF._HAS_LOWRIDER_HYDRAULICS) or
+  SS.getVehicleModelFlag(VMF._HAS_LOWRIDER_DONK_HYDRAULICS)
 end
 
 -- Applies a custom paint job to the vehicle
@@ -4092,17 +4144,6 @@ Game.Vehicle.setCustomPaint = function(veh, hex, p, m, is_primary, is_secondary)
       VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(veh, r, g, b)
     end
   end
-end
-
-Game.Vehicle.hasABS = function()
-  if Game.Self.isDriving() then
-    local m_model_flags = SS.getVehicleInfo().m_model_flags
-    if m_model_flags ~= nil then
-      local iModelFlags = m_model_flags:get_dword()
-      return Lua_fn.has_bit(iModelFlags, MF._ABS_STD)
-    end
-  end
-  return false
 end
 
 ---@param vehicle integer

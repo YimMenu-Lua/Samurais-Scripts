@@ -15,6 +15,17 @@ lang_T          = {
   { name = 'Korean',                iso = 'ko-KR' },
 }
 
+eGameState = {
+  "Invalid",
+  "Playing",
+  "Died",
+  "Arrested",
+  "FailedMission",
+  "LeftGame",
+  "Respawn",
+  "InMPCutscene",
+}
+
 gta_vehicles_T  = {
   "AMBULANCE", "BARRACKS", "BARRACKS2", "BARRACKS3", "BLIMP", "BLIMP2", "BMX", "BUS", "Baller", "Benson", "BfInjection",
   "Biff", "Bison2", "Bison3", "BjXL", "Bodhi2", "Burrito", "Burrito4", "Buzzard2", "CAMPER", "CRUSADER", "Caddy2",
@@ -663,6 +674,58 @@ MF                       = {
   _DOUBLE_REAR_WHEELS        = 29,
   _NO_WHEEL_BREAK            = 30,
   _EXTRA_CAMBER              = 31,
+}
+
+-- CVehicle::ModelInfoFlags
+VMF = {
+  _HAS_LIVERY                                  = 7,
+  _SPORTS                                      = 9,
+  _DONT_ROTATE_TAIL_ROTOR                      = 26,
+  _PARKING_SENSORS                             = 27,
+  _PEDS_CAN_STAND_ON_TOP                       = 28,
+  _LAW_ENFORCEMENT                             = 31,
+  _EMERGENCY_SERVICE                           = 32,
+  _RICH_CAR                                    = 36,
+  _AVERAGE_CAR                                 = 37,
+  _POOR_CAR                                    = 38,
+  _ALLOWS_RAPPEL                               = 39,
+  _IS_ELECTRIC                                 = 43,
+  _CANNOT_BE_MODDED                            = 54,
+  _HAS_NO_ROOF                                 = 64,
+  _HAS_BULLETPROOF_GLASS                       = 76,
+  _CANNOT_BE_PICKUP_BY_CARGOBOB                = 95,
+  _DISABLE_BUSTING                             = 112,
+  _ALLOW_HATS_NO_ROOF                          = 117,
+  _HAS_LOWRIDER_HYDRAULICS                     = 119,
+  _HAS_BULLET_RESISTANT_GLASS                  = 120,
+  _HAS_INCREASED_RAMMING_FORCE                 = 121,
+  _HAS_LOWRIDER_DONK_HYDRAULICS                = 123,
+  _JUMPING_CAR                                 = 125,
+  _HAS_ROCKET_BOOST                            = 126,
+  _RAMMING_SCOOP                               = 127,
+  _HAS_PARACHUTE                               = 128,
+  _HAS_RAMP                                    = 129,
+  _FRONT_BOOT                                  = 131,
+  _DONT_HOLD_LOW_GEARS_WHEN_ENGINE_UNDER_LOAD  = 136,
+  _HAS_GLIDER                                  = 137,
+  _INCREASE_LOW_SPEED_TORQUE                   = 138,
+  _EQUIP_UNARMED_ON_ENTER                      = 152,
+  _HAS_VERTICAL_FLIGHT_MODE                    = 154,
+  _DROP_SUSPENSION_WHEN_STOPPED                = 157,
+  _HAS_VERTICAL_ROCKET_BOOST                   = 161,
+  _NO_HEAVY_BRAKE_ANIMATION                    = 168,
+  _HAS_INCREASED_RAMMING_FORCE_VS_ALL_VEHICLES = 172,
+  _HAS_NITROUS_MOD                             = 174,
+  _HAS_JUMP_MOD                                = 175,
+  _HAS_RAMMING_SCOOP_MOD                       = 176,
+  _HAS_SUPER_BRAKES_MOD                        = 177,
+  _CRUSHES_OTHER_VEHICLES                      = 178,
+  _RAMP_MOD                                    = 182,
+  _HAS_SIDE_SHUNT                              = 184,
+  _HAS_SUPERCHARGER                            = 188,
+  _SPOILER_MOD_DOESNT_INCREASE_GRIP            = 194,
+  _NO_REVERSING_ANIMATION                      = 195,
+  _IS_FORMULA_VEHICLE                          = 197,
 }
 
 -- AnimFlags
