@@ -73,6 +73,10 @@
 - **Trigger Bot:**
   - A barebones and janky triggerbot. *Kinda works?* Only on foot though.
 
+- **Magic Bullet:**
+  - Different from an aimbot, this feature automatically shoots the last ped you aimed at in the head when you press [FIRE], regardless of whether your crosshair is still on the ped or not. The only requirement is that the ped has to be in your field of view and not too far away from you.
+  - If you aim at a vehicle that has a driver, the magic bullet will automatically hit the driver in the head as soon as you fire your weapon.
+
 - **Autokill Enemies:**
   - Automatically kills nearby enemies and destroys their vehicle if they are inside one.
 
