@@ -2803,7 +2803,6 @@ script.register_looped("VCO", function() -- Vehicle Creator Organizer
   end
 end)
 
-
 -- World
 script.register_looped("PG", function(pg) -- Ped Grabber
   if pedGrabber and not vehicleGrabber and not HUD.IS_MP_TEXT_CHAT_TYPING() and not is_playing_anim

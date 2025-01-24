@@ -85,12 +85,16 @@ function handingEditorUI()
   if self.get_veh() ~= 0 then
     rocketBoost, rbUsed = ImGui.Checkbox("Rocket Boost", SS.getVehicleModelFlag(VMF._HAS_ROCKET_BOOST))
     UI.toolTip(false, ROCKET_BOOST_DESC_)
-    if rbUsed then
+    if rbUsed and (is_car or is_bike or is_quad) then
       UI.widgetSound("Nav2")
-      if not rocketBoost and (is_car or is_bike or is_quad) then
-        SS.setVehicleModelFlag(VMF._HAS_ROCKET_BOOST, false)
+      SS.setVehicleModelFlag(VMF._HAS_ROCKET_BOOST, rocketBoost)
+      if not Game.Vehicle.isElectric() then
         script.run_in_fiber(function()
-          STREAMING.REMOVE_NAMED_PTFX_ASSET("veh_impexp_rocket")
+          if not rocketBoost and (is_car or is_bike or is_quad) then
+            STREAMING.REMOVE_NAMED_PTFX_ASSET("veh_impexp_rocket")
+          else
+            Game.requestNamedPtfxAsset("veh_impexp_rocket")
+          end
         end)
       end
     end
@@ -109,8 +113,9 @@ function handingEditorUI()
     end
   
     if vehJump then
-      ImGui.SameLine(); ImGui.Dummy(28, 1); ImGui.SameLine();
+      ImGui.SameLine(); ImGui.Dummy(28, 1); ImGui.SameLine(); ImGui.BeginDisabled(not is_car)
       vehChute, vehChuteUsed = ImGui.Checkbox("Parachute", SS.getVehicleModelFlag(VMF._HAS_PARACHUTE))
+      ImGui.EndDisabled()
       UI.toolTip(false, VEH_PARACHUTE_DESC_)
       if vehChuteUsed then
         UI.widgetSound("Nav2")
