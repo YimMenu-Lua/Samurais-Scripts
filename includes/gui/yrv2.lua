@@ -998,7 +998,9 @@ function yrv2UI()
           end
           ImGui.EndDisabled()
         end
+        ImGui.EndTabItem()
       end
+      ImGui.EndTabBar()
     else
       ImGui.Dummy(1, 5); ImGui.SameLine(); ImGui.Text("Outdated.")
     end

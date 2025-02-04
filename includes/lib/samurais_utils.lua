@@ -2269,7 +2269,6 @@ SS.set_hotkey = function(keybind)
 end
 
 SS.openHotkeyWindow = function(window_name, keybind)
-  ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10)
   ImGui.BulletText(window_name)
   local avail_x, _ = ImGui.GetContentRegionAvail()
   ImGui.SameLine(avail_x / 1.7)
@@ -2295,7 +2294,6 @@ SS.openHotkeyWindow = function(window_name, keybind)
     SS.set_hotkey(keybind)
     ImGui.End()
   end
-  ImGui.PopStyleVar(1)
 end
 
 ---@param keybind table
@@ -2350,7 +2348,6 @@ end
 ---@param window_name string
 ---@param keybind table
 SS.gpadHotkeyWindow = function(window_name, keybind)
-  ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10)
   ImGui.BulletText(window_name)
   local avail_x, _ = ImGui.GetContentRegionAvail()
   ImGui.SameLine(avail_x / 1.7)
@@ -2375,7 +2372,6 @@ SS.gpadHotkeyWindow = function(window_name, keybind)
     SS.set_gpad_hotkey(keybind)
     ImGui.End()
   end
-  ImGui.PopStyleVar(1)
 end
 
 -- Seamlessly add/remove keyboard keybinds on script update without requiring a config reset.

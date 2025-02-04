@@ -21,7 +21,6 @@ function objectSpawnerUI()
     end
     if os_switch == 0 then
       displayFilteredProps()
-      ImGui.PopItemWidth()
     else
       getAllObjects()
     end
