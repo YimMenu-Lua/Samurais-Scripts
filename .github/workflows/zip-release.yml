@@ -13,6 +13,12 @@ jobs:
   Main:
     runs-on: ubuntu-latest
     steps:
+
+    - name: Checkout Repo
+      uses: actions/checkout@master
+      with:
+        fetch-depth: 0
+
     - name: Increment Tag
       id: increment_tag
       uses: actions/github-script@v7
@@ -56,7 +62,13 @@ jobs:
           core.setOutput("version_number", new_tag);
           core.setOutput("old_tag", old_tag);
 
-    - uses: actions/checkout@master
+    - name: Update Changelog
+      run: |
+          $commitMessage = git log -1 --pretty=format:"%s"
+          $commitBody = git log -1 --pretty=format:"%b"
+          "### ${{steps.increment_tag.outputs.version_number}} Changelog`n`n#### $commitMessage`n`n$commitBody" | Out-File -FilePath "./CHANGELOG.md" -Encoding UTF8
+      shell: pwsh
+
     - name: Create Archive
       uses: thedoctor0/zip-release@0.7.6
       with:
@@ -71,3 +83,12 @@ jobs:
         bodyFile: ./CHANGELOG.md
         name: Samurai's Scripts ${{steps.increment_tag.outputs.version_number}}
         tag: ${{steps.increment_tag.outputs.version_number}}
+    
+    - name: Update README.md
+      run: |
+        sed -i "s|https://img.shields.io/badge/Script%20Version-v[0-9]\+\.[0-9]\+\.[0-9]\+-blue|https://img.shields.io/badge/Script%20Version-${{steps.increment_tag.outputs.version_number}}-blue|g" README.md
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add README.md
+        git commit -m "Update README version badge to ${{steps.increment_tag.outputs.version_number}}"
+        git push

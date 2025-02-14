@@ -65,3 +65,6 @@
 ## Main Script
 
 - If you have any feature you want to add to the script, feel free to open a PR. If the feature code is not yours, make sure you have permission from the author before contributing it.
+
+> [!IMPORTANT]
+> Make sure to add a commit message and description to your PR. The release changelog depends on that.
