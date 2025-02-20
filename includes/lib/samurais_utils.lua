@@ -1937,42 +1937,10 @@ end
 
 -- Plays a sound when an ImGui widget is clicked.
 ---@param sound string
---[[
-
-**Sound strings:**
-
-"Select" | "Select2"  | "Cancel"   | "Error"  | "Nav" |
-
-"Nav2"   | "Pickup"   | "Radar"    | "Delete" | "W_Pickup" |
-
-"Fail"   | "Focus_In" | "Focus_Out" | "Notif"
-]]
 UI.widgetSound = function(sound)
   if not disableUiSounds then
-    local sounds_T <const> = {
-      { name = "Radar",     sound = "RADAR_ACTIVATE",      soundRef = "DLC_BTL_SECURITY_VANS_RADAR_PING_SOUNDS" },
-      { name = "Select",    sound = "SELECT",              soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET" },
-      { name = "Pickup",    sound = "PICK_UP",             soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET" },
-      { name = "W_Pickup",  sound = "PICK_UP_WEAPON",      soundRef = "HUD_FRONTEND_CUSTOM_SOUNDSET" },
-      { name = "Fail",      sound = "CLICK_FAIL",          soundRef = "WEB_NAVIGATION_SOUNDS_PHONE" },
-      { name = "Click",     sound = "CLICK_LINK",          soundRef = "DLC_H3_ARCADE_LAPTOP_SOUNDS" },
-      { name = "Notif",     sound = "LOSE_1ST",            soundRef = "GTAO_FM_EVENTS_SOUNDSET" },
-      { name = "Delete",    sound = "DELETE",              soundRef = "HUD_DEATHMATCH_SOUNDSET" },
-      { name = "Cancel",    sound = "CANCEL",              soundRef = "HUD_FREEMODE_SOUNDSET" },
-      { name = "Error",     sound = "ERROR",               soundRef = "HUD_FREEMODE_SOUNDSET" },
-      { name = "Nav",       sound = "NAV_LEFT_RIGHT",      soundRef = "HUD_FREEMODE_SOUNDSET" },
-      { name = "Nav2",      sound = "NAV_UP_DOWN",         soundRef = "HUD_FREEMODE_SOUNDSET" },
-      { name = "Select2",   sound = "CHANGE_STATION_LOUD", soundRef = "RADIO_SOUNDSET" },
-      { name = "Focus_In",  sound = "FOCUSIN",             soundRef = "HINTCAMSOUNDS" },
-      { name = "Focus_Out", sound = "FOCUSOUT",            soundRef = "HINTCAMSOUNDS" },
-    }
     script.run_in_fiber(function()
-      for _, snd in ipairs(sounds_T) do
-        if sound == snd.name then
-          AUDIO.PLAY_SOUND_FRONTEND(-1, snd.sound, snd.soundRef, false)
-          break
-        end
-      end
+      AUDIO.PLAY_SOUND_FRONTEND(-1, ui_sounds_T[sound].soundName, ui_sounds_T[sound].soundRef, false)
     end)
   end
 end

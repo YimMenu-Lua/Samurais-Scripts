@@ -1,9 +1,9 @@
 ---@diagnostic disable
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = '1.5.7'
-TARGET_BUILD   = '3411'
-TARGET_VERSION = '1.70'
+SCRIPT_VERSION = "1.5.9"
+TARGET_BUILD   = "3442"
+TARGET_VERSION = "1.70"
 DEFAULT_CONFIG          = {
   shortcut_anim           = {},
   saved_vehicles          = {},

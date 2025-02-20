@@ -15,6 +15,69 @@ lang_T          = {
   { name = 'Korean',                iso = 'ko-KR' },
 }
 
+ui_sounds_T     = {
+  ["Radar"] = {
+    soundName = "RADAR_ACTIVATE",
+    soundRef = "DLC_BTL_SECURITY_VANS_RADAR_PING_SOUNDS"
+  },
+  ["Select"] = {
+    soundName = "SELECT",
+    soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET"
+  },
+  ["Pickup"] = {
+    soundName = "PICK_UP",
+    soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET"
+  },
+  ["W_Pickup"] = {
+    soundName = "PICK_UP_WEAPON",
+    soundRef = "HUD_FRONTEND_CUSTOM_SOUNDSET"
+  },
+  ["Fail"] = {
+    soundName = "CLICK_FAIL",
+    soundRef = "WEB_NAVIGATION_SOUNDS_PHONE"
+  },
+  ["Click"] = {
+    soundName = "CLICK_LINK",
+    soundRef = "DLC_H3_ARCADE_LAPTOP_SOUNDS"
+  },
+  ["Notif"] = {
+    soundName = "LOSE_1ST",
+    soundRef = "GTAO_FM_EVENTS_SOUNDSET"
+  },
+  ["Delete"] = {
+    soundName = "DELETE",
+    soundRef = "HUD_DEATHMATCH_SOUNDSET"
+  },
+  ["Cancel"] = {
+    soundName = "CANCEL",
+    soundRef = "HUD_FREEMODE_SOUNDSET"
+  },
+  ["Error"] = {
+    soundName = "ERROR",
+    soundRef = "HUD_FREEMODE_SOUNDSET"
+  },
+  ["Nav"] = {
+    soundName = "NAV_LEFT_RIGHT",
+    soundRef = "HUD_FREEMODE_SOUNDSET"
+  },
+  ["Nav2"] = {
+    soundName = "NAV_UP_DOWN",
+    soundRef = "HUD_FREEMODE_SOUNDSET"
+  },
+  ["Select2"] = {
+    soundName = "CHANGE_STATION_LOUD",
+    soundRef = "RADIO_SOUNDSET"
+  },
+  ["Focus_In"] = {
+    soundName = "FOCUSIN",
+    soundRef = "HINTCAMSOUNDS"
+  },
+  ["Focus_Out"] = {
+    soundName = "FOCUSOUT",
+    soundRef = "HINTCAMSOUNDS"
+  },
+}
+
 eGameState = {
   "Invalid",
   "Playing",
