@@ -8,7 +8,6 @@ local packages = {
     "data.objects",
     "lib.samurais_utils",
     "lib.Translations",
-    "classes.atArray",
     "classes.vector2",
     "classes.vector3",
     "gui.main",
