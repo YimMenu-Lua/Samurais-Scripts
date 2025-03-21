@@ -39,6 +39,10 @@ The folder structure should look like this
 ├── scripts
 │   └── Samurais Scripts
 |       ├── includes
+|       |   ├── classes
+|       |   |   ├── hotkeys.lua
+|       |   |   ├── vector2.lua
+|       |   |   └── vector3.lua
 |       |   ├── data
 |       |   |   ├── actions.lua
 |       |   |   ├── commands.lua
@@ -63,9 +67,11 @@ The folder structure should look like this
 |       |   |   ├── yimactions2.lua
 |       |   |   └── yrv2.lua
 |       |   └── lib
-|       |       ├── samurais_utils
-|       |       ├── Translations.lua
-|       |       └── YimConfig.lua
+|       |   |   ├── samurais_utils.lua
+|       |   |   ├── Translations.lua
+|       |   |   ├── YimConfig.lua
+|       |   |   └── YimToast.lua
+|       |   └── ss_init.lua
 │       └── samurais_scripts.lua
 ```
 
