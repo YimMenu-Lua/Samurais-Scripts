@@ -64,15 +64,15 @@ jobs:
 
     - name: Update Changelog
       run: |
-        $commitMessage = git log -1 --pretty=format:"%s"
-        $commitBody = git log -1 --pretty=format:"%b"
-        @"
-        changelog_body<<EOF
-        $commitMessage
-      
-        $commitBody
-        EOF
-        "@ | Out-File -FilePath "./CHANGELOG.md" -Encoding UTF8
+          $commitMessage = git log -1 --pretty=format:"%s"
+          $commitBody = git log -1 --pretty=format:"%b"
+          @"
+          ### ${{steps.increment_tag.outputs.version_number}} Changelog<<EOF
+          $commitMessage
+
+          $commitBody
+          EOF
+          "@ | Out-File -FilePath "./CHANGELOG.md" -Encoding UTF8
       shell: pwsh
 
     - name: Create Archive
