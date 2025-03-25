@@ -30,7 +30,7 @@ with open(Lua_path, "r", encoding = "utf-8") as Lua_file:
     raw = Lua_file.read()
     Lua_file.close()
 
-match = re.search(r"Labels\s*=\s*(\{.*\})", raw, re.DOTALL)
+match = re.search(r"return\s*(\{.*\})", raw, re.DOTALL)
 if match:
     Lua_data = match.group(1)
 else:
@@ -49,7 +49,7 @@ clear      = lambda: os.system("cls" if os.name == "nt" else "clear")
 
 def Lua_write(data):
     with open(Lua_path, "w", encoding = "utf-8") as Lua_file:
-        Lua_file.write("Labels = ")
+        Lua_file.write("return ")
         Lua_file.write(Lua.encode(data))
         Lua_file.write("\n")
         Lua_file.flush()
@@ -147,8 +147,8 @@ def add_new_label():
     Lua_write(Labels)
 
     if "pyperclip" in sys.modules:
-        pyperclip.copy(new_label)
-        print(f"\n{new_label} copied to clipboard.")
+        pyperclip.copy(f"_T(\"{new_label}\")")
+        print(f"\nLua function call copied to clipboard with {new_label} param.")
 
     print("\nDone!")
     print("")

@@ -2,21 +2,21 @@
 
 local selected_lang
 function settingsUI()
-    disableTooltips, dtUsed = ImGui.Checkbox(translateLabel("DISABLE_TOOLTIPS_CB_"), disableTooltips)
+    disableTooltips, dtUsed = ImGui.Checkbox(_T("DISABLE_TOOLTIPS_CB_"), disableTooltips)
     if dtUsed then
         CFG:SaveItem("disableTooltips", disableTooltips)
         UI.widgetSound("Nav2")
     end
 
-    disableUiSounds, duisndUsed = ImGui.Checkbox(translateLabel("DISABLE_UISOUNDS_CB_"), disableUiSounds)
-    UI.toolTip(false, translateLabel("DISABLE_UISOUNDS_DESC_"))
+    disableUiSounds, duisndUsed = ImGui.Checkbox(_T("DISABLE_UISOUNDS_CB_"), disableUiSounds)
+    UI.toolTip(false, _T("DISABLE_UISOUNDS_DESC_"))
     if duisndUsed then
         CFG:SaveItem("disableUiSounds", disableUiSounds)
         UI.widgetSound("Nav2")
     end
 
-    disableFlightMusic, dpmUsed = ImGui.Checkbox(translateLabel("FLIGHT_MUSIC_CB_"), disableFlightMusic)
-    UI.toolTip(false, translateLabel("FLIGHT_MUSIC_DESC_"))
+    disableFlightMusic, dpmUsed = ImGui.Checkbox(_T("FLIGHT_MUSIC_CB_"), disableFlightMusic)
+    UI.toolTip(false, _T("FLIGHT_MUSIC_DESC_"))
     if dpmUsed then
         CFG:SaveItem("disableFlightMusic", disableFlightMusic)
         UI.widgetSound("Nav2")
@@ -28,15 +28,15 @@ function settingsUI()
         end
     end
 
-    disable_quotes, dqUsed = ImGui.Checkbox(translateLabel("DAILY_QUOTES_CB_"), disable_quotes)
-    UI.toolTip(false, translateLabel("DAILY_QUOTES_DESC_"))
+    disable_quotes, dqUsed = ImGui.Checkbox(_T("DAILY_QUOTES_CB_"), disable_quotes)
+    UI.toolTip(false, _T("DAILY_QUOTES_DESC_"))
     if dqUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("disable_quotes", disable_quotes)
     end
 
-    disable_mdef_logs, dmlUsed = ImGui.Checkbox(translateLabel("MISSILE_DEF_LOGS_CB_"), disable_mdef_logs)
-    UI.toolTip(false, translateLabel("MISSILE_DEF_LOGS_DESC_"))
+    disable_mdef_logs, dmlUsed = ImGui.Checkbox(_T("MISSILE_DEF_LOGS_CB_"), disable_mdef_logs)
+    UI.toolTip(false, _T("MISSILE_DEF_LOGS_DESC_"))
     if dmlUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("disable_mdef_logs", disable_mdef_logs)
@@ -44,18 +44,18 @@ function settingsUI()
 
     ImGui.Spacing()
     if shortcut_anim.anim ~= nil then
-        if ImGui.Button(translateLabel("ANIM_HOTKEY_DEL2_")) then
+        if ImGui.Button(_T("ANIM_HOTKEY_DEL2_")) then
             UI.widgetSound("Delete")
             shortcut_anim = {}
             CFG:SaveItem("shortcut_anim", {})
             YimToast:ShowSuccess("Samurais Scripts", "Animation shortcut has been reset.")
         end
-        UI.toolTip(false, translateLabel("DEL_HOTKEY_DESC_"))
+        UI.toolTip(false, _T("DEL_HOTKEY_DESC_"))
     else
         ImGui.BeginDisabled()
-        ImGui.Button(translateLabel("ANIM_HOTKEY_DEL2_"))
+        ImGui.Button(_T("ANIM_HOTKEY_DEL2_"))
         ImGui.EndDisabled()
-        UI.toolTip(false, translateLabel("NO_HOTKEY_TXT_"))
+        UI.toolTip(false, _T("NO_HOTKEY_TXT_"))
     end
 
     ImGui.Spacing(); ImGui.Text("Supplies Autofill Delay:")
@@ -64,7 +64,7 @@ function settingsUI()
     supply_autofill_delay, safdUsed = ImGui.SliderInt("##autofillDelay", supply_autofill_delay, 500, 60000)
     ImGui.PopItemWidth()
     ImGui.EndDisabled()
-    UI.toolTip(false, translateLabel("AUTOFILL_TIMEDELAY_DESC_"))
+    UI.toolTip(false, _T("AUTOFILL_TIMEDELAY_DESC_"))
     ImGui.SameLine(); ImGui.Text(string.format("%.1f s", (supply_autofill_delay / 1000)))
     if safdUsed then
         UI.widgetSound("Nav")
@@ -72,11 +72,11 @@ function settingsUI()
         supply_autofill_delay = CFG:ReadItem("supply_autofill_delay")
     end
 
-    ImGui.Dummy(1, 10); ImGui.SeparatorText(translateLabel("LANGUAGE_TXT_"))
-    ImGui.Spacing(); ImGui.BulletText(string.format("%s %s", translateLabel("CURRENT_LANGUAGE_TXT_"), current_lang))
-    ImGui.Spacing(); useGameLang, uglUsed = ImGui.Checkbox(translateLabel("GAME_LANGUAGE_CB_"), useGameLang)
+    ImGui.Dummy(1, 10); ImGui.SeparatorText(_T("LANGUAGE_TXT_"))
+    ImGui.Spacing(); ImGui.BulletText(string.format("%s %s", _T("CURRENT_LANGUAGE_TXT_"), current_lang))
+    ImGui.Spacing(); useGameLang, uglUsed = ImGui.Checkbox(_T("GAME_LANGUAGE_CB_"), useGameLang)
     if useGameLang then
-        UI.toolTip(false, translateLabel("GAME_LANGUAGE_DESC_"))
+        UI.toolTip(false, _T("GAME_LANGUAGE_DESC_"))
         LANG, current_lang = Game.Language()
     end
     if uglUsed then
@@ -91,11 +91,11 @@ function settingsUI()
         CFG:SaveItem("LANG", LANG)
         CFG:SaveItem("lang_idx", lang_idx)
         initStrings()
-        YimToast:ShowSuccess("Samurai's Scripts", translateLabel("LANG_CHANGED_NOTIF_"))
+        YimToast:ShowSuccess("Samurai's Scripts", _T("LANG_CHANGED_NOTIF_"))
     end
 
     if not useGameLang then
-        ImGui.Text(translateLabel("GENERIC_CUSTOM_LABEL_"))
+        ImGui.Text(_T("GENERIC_CUSTOM_LABEL_"))
         ImGui.PushItemWidth(260)
         displayLangs()
         ImGui.PopItemWidth()
@@ -108,26 +108,26 @@ function settingsUI()
             CFG:SaveItem("LANG", LANG)
             CFG:SaveItem("current_lang", current_lang)
             initStrings()
-            YimToast:ShowSuccess("Samurai's Scripts", translateLabel("LANG_CHANGED_NOTIF_"))
+            YimToast:ShowSuccess("Samurai's Scripts", _T("LANG_CHANGED_NOTIF_"))
         end
     end
 
     ImGui.Dummy(10, 1)
-    if UI.coloredButton(translateLabel("RESET_SETTINGS_BTN_"), "#FF0000", "#EE4B2B", "#880808", 1) then
+    if UI.coloredButton(_T("RESET_SETTINGS_BTN_"), "#FF0000", "#EE4B2B", "#880808", 1) then
         UI.widgetSound("Focus_In")
         ImGui.OpenPopup("Confirm")
     end
     ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
     ImGui.SetNextWindowBgAlpha(0.8)
     if ImGui.BeginPopupModal("Confirm", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-        UI.coloredText(translateLabel("CONFIRM_PROMPT_"), "yellow", 1, 20)
-        if ImGui.Button(string.format("  %s  ", translateLabel("GENERIC_YES_"))) then
+        UI.coloredText(_T("CONFIRM_PROMPT_"), "yellow", 1, 20)
+        if ImGui.Button(string.format("  %s  ", _T("GENERIC_YES_"))) then
             UI.widgetSound("Select2")
             SS.reset_settings()
             ImGui.CloseCurrentPopup()
         end
         ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
-        if ImGui.Button(string.format("  %s  ", translateLabel("GENERIC_NO_"))) then
+        if ImGui.Button(string.format("  %s  ", _T("GENERIC_NO_"))) then
             UI.widgetSound("Cancel")
             ImGui.CloseCurrentPopup()
         end
@@ -137,7 +137,7 @@ end
 
 function hotkeysUI()
     ImGui.BeginTabBar("Keyboard Hotkeys")
-    if ImGui.BeginTabItem(translateLabel("GENERIC_KEYBOARD_LABEL_")) then
+    if ImGui.BeginTabItem(_T("GENERIC_KEYBOARD_LABEL_")) then
         ImGui.Dummy(1, 5)
 
         SS.openHotkeyWindow("Ragdoll On Demand", keybinds.rodBtn)
@@ -176,7 +176,7 @@ function hotkeysUI()
         ImGui.EndTabItem()
     end
 
-    if ImGui.BeginTabItem(translateLabel("GENERIC_CONTROLLER_LABEL_")) then
+    if ImGui.BeginTabItem(_T("GENERIC_CONTROLLER_LABEL_")) then
         ImGui.Dummy(1, 5)
 
         SS.gpadHotkeyWindow("Ragdoll On Demand", gpad_keybinds.rodBtn)

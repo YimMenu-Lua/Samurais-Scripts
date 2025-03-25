@@ -2,7 +2,7 @@
 
 function handingEditorUI()
     ImGui.Spacing(); noEngineBraking, nebrUsed = ImGui.Checkbox("Disable Engine Braking", noEngineBraking)
-    UI.toolTip(false, translateLabel("NOENGINEBRAKING_DESC_"))
+    UI.toolTip(false, _T("NOENGINEBRAKING_DESC_"))
     if nebrUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("noEngineBraking", noEngineBraking)
@@ -15,7 +15,7 @@ function handingEditorUI()
 
     ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine();
     kersBoost, kbUsed = ImGui.Checkbox("KERS Boost", kersBoost)
-    UI.toolTip(false, translateLabel("KERSBOOST_DESC_"))
+    UI.toolTip(false, _T("KERSBOOST_DESC_"))
     if kbUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("kersBoost", kersBoost)
@@ -32,7 +32,7 @@ function handingEditorUI()
     end
 
     offroaderx2, offroadrUsed = ImGui.Checkbox("Better Offroad Capabilities", offroaderx2)
-    UI.toolTip(false, translateLabel("OFFROADERX2_DESC_"))
+    UI.toolTip(false, _T("OFFROADERX2_DESC_"))
     if offroadrUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("offroaderx2", offroaderx2)
@@ -45,7 +45,7 @@ function handingEditorUI()
 
     ImGui.SameLine(); ImGui.Dummy(15, 1); ImGui.SameLine();
     rallyTires, rallytiresUsed = ImGui.Checkbox("Rally Tires", rallyTires)
-    UI.toolTip(false, translateLabel("RALLYTIRES_DESC_"))
+    UI.toolTip(false, _T("RALLYTIRES_DESC_"))
     if rallytiresUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("rallyTires", rallyTires)
@@ -57,7 +57,7 @@ function handingEditorUI()
     end
 
     noTractionCtrl, notcUsed = ImGui.Checkbox("Force No Traction Control", noTractionCtrl)
-    UI.toolTip(false, translateLabel("FORCE_NO_TC_DESC_"))
+    UI.toolTip(false, _T("FORCE_NO_TC_DESC_"))
     if notcUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("noTractionCtrl", noTractionCtrl)
@@ -70,7 +70,7 @@ function handingEditorUI()
 
     ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine();
     easyWheelie, ezwUsed = ImGui.Checkbox("Easy Wheelie", easyWheelie)
-    UI.toolTip(false, translateLabel("EASYWHEELIE_DESC_"))
+    UI.toolTip(false, _T("EASYWHEELIE_DESC_"))
     if ezwUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("easyWheelie", easyWheelie)
@@ -84,7 +84,7 @@ function handingEditorUI()
     ImGui.Spacing(); ImGui.SeparatorText("MISC")
     if self.get_veh() ~= 0 then
         rocketBoost, rbUsed = ImGui.Checkbox("Rocket Boost", SS.getVehicleModelFlag(VMF._HAS_ROCKET_BOOST))
-        UI.toolTip(false, translateLabel("ROCKET_BOOST_DESC_"))
+        UI.toolTip(false, _T("ROCKET_BOOST_DESC_"))
         if rbUsed and (is_car or is_bike or is_quad) then
             UI.widgetSound("Nav2")
             SS.setVehicleModelFlag(VMF._HAS_ROCKET_BOOST, rocketBoost)
@@ -101,7 +101,7 @@ function handingEditorUI()
 
         ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine();
         vehJump, vjUsed = ImGui.Checkbox("Vehicle Jump", SS.getVehicleModelFlag(VMF._JUMPING_CAR))
-        UI.toolTip(false, translateLabel("VEH_JUMP_DESC_"))
+        UI.toolTip(false, _T("VEH_JUMP_DESC_"))
         if vjUsed then
             UI.widgetSound("Nav2")
             if (is_car or is_bike or is_quad) then
@@ -116,7 +116,7 @@ function handingEditorUI()
             ImGui.SameLine(); ImGui.Dummy(28, 1); ImGui.SameLine(); ImGui.BeginDisabled(not is_car)
             vehChute, vehChuteUsed = ImGui.Checkbox("Parachute", SS.getVehicleModelFlag(VMF._HAS_PARACHUTE))
             ImGui.EndDisabled()
-            UI.toolTip(false, translateLabel("VEH_PARACHUTE_DESC_"))
+            UI.toolTip(false, _T("VEH_PARACHUTE_DESC_"))
             if vehChuteUsed then
                 UI.widgetSound("Nav2")
                 if is_car then
@@ -130,7 +130,7 @@ function handingEditorUI()
         end
 
         rwSteering, rwstrUsed = ImGui.Checkbox("Rear Wheel Steering", SS.getVehicleHandlingFlag(HF._STEER_REARWHEELS))
-        UI.toolTip(false, translateLabel("REAR_WHEEL_STEERING_DESC_"))
+        UI.toolTip(false, _T("REAR_WHEEL_STEERING_DESC_"))
         if rwstrUsed then
             UI.widgetSound("Nav2")
             if rwSteering and (is_car or is_bike or is_quad) then
@@ -150,7 +150,7 @@ function handingEditorUI()
 
         ImGui.SameLine(); awSteering, awstrUsed = ImGui.Checkbox("All Wheel Steering",
             SS.getVehicleHandlingFlag(HF._STEER_ALL_WHEELS))
-        UI.toolTip(false, translateLabel("ALL_WHEEL_STEERING_DESC_"))
+        UI.toolTip(false, _T("ALL_WHEEL_STEERING_DESC_"))
         if awstrUsed then
             UI.widgetSound("Nav2")
             if awSteering and (is_car or is_bike or is_quad) then
@@ -170,7 +170,7 @@ function handingEditorUI()
 
         ImGui.SameLine(); handbrakeSteering, hbstrUsed = ImGui.Checkbox("Handbrake Steering",
             SS.getVehicleHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER))
-        UI.toolTip(false, translateLabel("HANDBRAKE_STEERING_DESC_"))
+        UI.toolTip(false, _T("HANDBRAKE_STEERING_DESC_"))
         if hbstrUsed then
             UI.widgetSound("Nav2")
             if handbrakeSteering and (is_car or is_bike or is_quad) then
@@ -187,8 +187,8 @@ function handingEditorUI()
                 SS.setHandlingFlag(HF._HANDBRAKE_REARWHEELSTEER, false)
             end
         end
-        ImGui.Spacing(); UI.coloredText(translateLabel("STEERING_FLAGS_NOTE_TXT_"), 'orange', 0.8, 25)
+        ImGui.Spacing(); UI.coloredText(_T("STEERING_FLAGS_NOTE_TXT_"), 'orange', 0.8, 25)
     else
-        ImGui.Text(translateLabel("GET_IN_VEH_WARNING_"))
+        ImGui.Text(_T("GET_IN_VEH_WARNING_"))
     end
 end

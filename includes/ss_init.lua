@@ -1,15 +1,14 @@
-require("includes.data.globals")
-
 local basePath = "includes"
 local packages = {
-    "data.refs",
-    "data.actions",
-    "data.commands",
-    "data.objects",
-    "lib.samurais_utils",
-    "lib.Translations",
+    "data.globals",
+    "classes.commands",
+    "classes.translator",
     "classes.vector2",
     "classes.vector3",
+    "data.refs",
+    "data.actions",
+    "data.objects",
+    "lib.samurais_utils",
     "gui.main",
     "gui.self",
     "gui.yimactions2",
@@ -28,17 +27,6 @@ local packages = {
     "gui.settings",
 }
 
-local __init = coroutine.create(function()
-    for key, _ in pairs(DEFAULT_CONFIG) do
-        _G[key] = CFG:ReadItem(key)
-        coroutine.yield()
-    end
-
-    for _, package in pairs(packages) do
-        require(string.format("%s.%s", basePath, package))
-    end
-end)
-
-while coroutine.status(__init) ~= "dead" do
-    coroutine.resume(__init)
+for _, package in pairs(packages) do
+    require(string.format("%s.%s", basePath, package))
 end

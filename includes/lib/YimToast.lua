@@ -115,7 +115,7 @@ function Toast:Draw()
     end
 
     ImGui.SetNextWindowSizeConstraints(self.ui_width, 100, self.ui_width, 400)
-    ImGui.SetNextWindowBgAlpha(0.64)
+    ImGui.SetNextWindowBgAlpha(0.8)
     ImGui.SetNextWindowPos(self.ui_pos_x, self.ui_pos_y)
     ImGui.PushStyleColor(
         ImGuiCol.WindowBg,
@@ -142,7 +142,9 @@ function Toast:Draw()
             ImGuiWindowFlags.NoScrollWithMouse
     ) then
         ImGui.PushTextWrapPos(self.ui_width - (ImGui.GetFontSize() / 2))
+        ImGui.SetWindowFontScale(1.2)
         ImGui.SeparatorText(__caller__)
+        ImGui.SetWindowFontScale(1)
         ImGui.Spacing()
         ImGui.Text(self.message)
         ImGui.Dummy(1, 10)

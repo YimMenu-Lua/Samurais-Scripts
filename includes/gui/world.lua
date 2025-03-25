@@ -2,14 +2,14 @@
 
 function worldUI()
     ImGui.BeginDisabled(ped_grabbed or vehicle_grabbed)
-    pedGrabber, pgUsed = ImGui.Checkbox(translateLabel("PED_GRABBER_CB_"), pedGrabber)
-    UI.helpMarker(false, translateLabel("PED_GRABBER_DESC_"))
+    pedGrabber, pgUsed = ImGui.Checkbox(_T("PED_GRABBER_CB_"), pedGrabber)
+    UI.helpMarker(false, _T("PED_GRABBER_DESC_"))
     if pgUsed then
         UI.widgetSound("Nav2")
         vehicleGrabber = false
     end
     vehicleGrabber, vgUsed = ImGui.Checkbox("Vehicle Grabber", vehicleGrabber)
-    UI.helpMarker(false, translateLabel("VEH_GRABBER_DESC_"))
+    UI.helpMarker(false, _T("VEH_GRABBER_DESC_"))
     if vgUsed then
         UI.widgetSound("Nav2")
         pedGrabber = false
@@ -17,7 +17,7 @@ function worldUI()
     ImGui.EndDisabled()
 
     if pedGrabber or vehicleGrabber then
-        ImGui.Text(translateLabel("THROW_FORCE_TXT_"))
+        ImGui.Text(_T("THROW_FORCE_TXT_"))
         ImGui.PushItemWidth(220)
         pedthrowF, ptfUsed = ImGui.SliderInt("##throw_force", pedthrowF, 10, 100, "%d", 0)
         ImGui.PopItemWidth()
@@ -26,8 +26,8 @@ function worldUI()
         end
     end
 
-    carpool, carpoolUsed = ImGui.Checkbox(translateLabel("CARPOOL_CB_"), carpool)
-    UI.helpMarker(false, translateLabel("CARPOOL_DESC_"))
+    carpool, carpoolUsed = ImGui.Checkbox(_T("CARPOOL_CB_"), carpool)
+    UI.helpMarker(false, _T("CARPOOL_DESC_"))
     if carpoolUsed then
         UI.widgetSound("Nav2")
     end
@@ -38,11 +38,11 @@ function worldUI()
         end
     end
 
-    animateNPCs, used = ImGui.Checkbox(translateLabel("ANIMATE_NPCS_CB_"), animateNPCs)
+    animateNPCs, used = ImGui.Checkbox(_T("ANIMATE_NPCS_CB_"), animateNPCs)
     if used then
         UI.widgetSound("Nav")
     end
-    UI.helpMarker(false, translateLabel("ANIMATE_NPCS_DESC_"))
+    UI.helpMarker(false, _T("ANIMATE_NPCS_DESC_"))
     if animateNPCs then
         ImGui.PushItemWidth(220)
         displayHijackAnims()
@@ -50,7 +50,7 @@ function worldUI()
         local hijackData = hijackOptions[grp_anim_index + 1]
         ImGui.SameLine()
         if not hijack_started then
-            if ImGui.Button(string.format("  %s  ##hjStart", translateLabel("GENERIC_PLAY_BTN_"))) then
+            if ImGui.Button(string.format("  %s  ##hjStart", _T("GENERIC_PLAY_BTN_"))) then
                 UI.widgetSound("Select")
                 script.run_in_fiber(function(hjk)
                     local gta_peds = entities.get_all_peds_as_handles()
@@ -73,7 +73,7 @@ function worldUI()
                 end)
             end
         else
-            if ImGui.Button(string.format("  %s  ##hjStop", translateLabel("GENERIC_STOP_BTN_"))) then
+            if ImGui.Button(string.format("  %s  ##hjStop", _T("GENERIC_STOP_BTN_"))) then
                 UI.widgetSound("Cancel")
                 script.run_in_fiber(function()
                     local gta_peds = entities.get_all_peds_as_handles()
@@ -90,8 +90,8 @@ function worldUI()
         end
     end
 
-    kamikazeDrivers, kdUsed = ImGui.Checkbox(translateLabel("KAMIKAZE_DRIVERS_CB_"), kamikazeDrivers)
-    UI.helpMarker(false, translateLabel("KAMIKAZE_DRIVERS_DESC_"))
+    kamikazeDrivers, kdUsed = ImGui.Checkbox(_T("KAMIKAZE_DRIVERS_CB_"), kamikazeDrivers)
+    UI.helpMarker(false, _T("KAMIKAZE_DRIVERS_DESC_"))
     if kdUsed then
         UI.widgetSound("Nav2")
         if kamikazeDrivers then
@@ -99,8 +99,8 @@ function worldUI()
         end
     end
 
-    publicEnemy, peUsed = ImGui.Checkbox(translateLabel("PUBLIC_ENEMY_CB_"), publicEnemy)
-    UI.helpMarker(false, translateLabel("PUBLIC_ENEMY_DESC_"))
+    publicEnemy, peUsed = ImGui.Checkbox(_T("PUBLIC_ENEMY_CB_"), publicEnemy)
+    UI.helpMarker(false, _T("PUBLIC_ENEMY_DESC_"))
     if peUsed then
         UI.widgetSound("Nav2")
         if publicEnemy then
@@ -138,14 +138,14 @@ function worldUI()
     end
 
     public_seats, pseatsUsed = ImGui.Checkbox("Public Seating", public_seats)
-    UI.helpMarker(false, translateLabel("PUBLIC_SEATS_DESC_"))
+    UI.helpMarker(false, _T("PUBLIC_SEATS_DESC_"))
     if pseatsUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("public_seats", public_seats)
     end
 
     ambient_scenarios, ascnUsed = ImGui.Checkbox("Ambient Scenarios", ambient_scenarios)
-    UI.helpMarker(false, translateLabel("AMB_SCN_DESC_"))
+    UI.helpMarker(false, _T("AMB_SCN_DESC_"))
     if ascnUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("ambient_scenarios", ambient_scenarios)
@@ -161,8 +161,8 @@ function worldUI()
         end
     end
 
-    extend_world, ewbUsed = ImGui.Checkbox(translateLabel("EXTEND_WORLD_CB_"), extend_world)
-    UI.helpMarker(false, translateLabel("EXTEND_WORLD_DESC_"))
+    extend_world, ewbUsed = ImGui.Checkbox(_T("EXTEND_WORLD_CB_"), extend_world)
+    UI.helpMarker(false, _T("EXTEND_WORLD_DESC_"))
     if ewbUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("extend_world", extend_world)
@@ -174,8 +174,8 @@ function worldUI()
         end
     end
 
-    disable_waves, dowUsed = ImGui.Checkbox(translateLabel("SMOOTH_WATERS_CB_"), disable_waves)
-    UI.helpMarker(false, translateLabel("SMOOTH_WATERS_DESC_"))
+    disable_waves, dowUsed = ImGui.Checkbox(_T("SMOOTH_WATERS_CB_"), disable_waves)
+    UI.helpMarker(false, _T("SMOOTH_WATERS_DESC_"))
     if dowUsed then
         UI.widgetSound("Nav2")
         Game.World.disableOceanWaves(disable_waves)

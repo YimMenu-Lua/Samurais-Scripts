@@ -89,6 +89,22 @@ eGameState      = {
     "InMPCutscene",
 }
 
+rgb_loop_colors = {
+    { 0, 255, 255, 1 },
+    { 0, 127, 255, 1 },
+    { 0, 0, 255, 1 },
+    { 127, 0, 255, 1 },
+    { 255, 0, 255, 1 },
+    { 255, 0, 127, 1 },
+    { 255, 0, 0, 1 },
+    { 255, 127, 0, 1 },
+    { 255, 255, 0, 1 },
+    { 127, 255, 0, 1 },
+    { 0, 255, 0, 1 },
+    { 0, 255, 127, 1 }
+    
+}
+
 gta_vehicles_T  = {
     "AMBULANCE", "BARRACKS", "BARRACKS2", "BARRACKS3", "BLIMP", "BLIMP2", "BMX", "BUS", "Baller", "Benson", "BfInjection",
     "Biff", "Bison2", "Bison3", "BjXL", "Bodhi2", "Burrito", "Burrito4", "Buzzard2", "CAMPER", "CRUSADER", "Caddy2",
@@ -1639,18 +1655,6 @@ vehicle_classes_t        = {
     [20] = "Commercial",
     [21] = "Trains",
     [22] = "Open Wheel"
-}
-
-translations_button_map  = {
-    { name = "DRIFT_MODE_DESC_",    kbm = keybinds.tdBtn.name },
-    { name = "DRIFT_TIRES_DESC_",   kbm = keybinds.tdBtn.name },
-    { name = "NOS_DESC_",           kbm = keybinds.nosBtn.name },
-    { name = "VEHICLE_MINES_DESC_", kbm = keybinds.vehicle_mine.name },
-    { name = "ANIM_STOP_DESC_",     kbm = keybinds.stop_anim.name },
-    { name = "SCN_STOP_DESC_",      kbm = keybinds.stop_anim.name },
-    { name = "NOS_PURGE_DESC_",     kbm = keybinds.purgeBtn.name,      gpad = gpad_keybinds.purgeBtn.name },
-    { name = "ROD_DESC_",           kbm = keybinds.rodBtn.name,        gpad = gpad_keybinds.rodBtn.name },
-    { name = "TRIGGERBOT_DESC_",    kbm = keybinds.triggerbotBtn.name, gpad = gpad_keybinds.triggerbotBtn.name },
 }
 
 collision_invalid_models = {

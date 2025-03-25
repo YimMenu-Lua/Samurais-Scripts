@@ -2,14 +2,36 @@
 
 --#region Global functions
 
--- Must be called from inside a coroutine. Input time is in seconds.
+GetGameVersion = function()
+    local pVers = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
+    local pBnum = pVers:add(0x24):rip()
+    local pOver = pBnum:add(0x20)
+    local ret = {
+        _build  = pBnum:get_string(),
+        _online = pOver:get_string()
+    }
+    return ret
+end
+
+-- #### Wrapper for `Translator:Translate`
+--________________________________________
+-- Translates text to the user's language.
+--
+-- If the label to translate is missing or the language
+--
+-- is invalid, it defaults to English (US).
+---@param label string
+function _T(label)
+    return Translator:Translate(label)
+end
+
+-- Must be called from a coroutine. Input time is in seconds.
 ---@param s integer
 sleep = function(s)
     local ntime = os.clock() + s
-    repeat
+    while os.clock() < ntime do
         coroutine.yield()
-    until
-        os.clock() > ntime
+    end
 end
 
 ---@param ... number
@@ -28,50 +50,23 @@ sum = function(...)
     return result
 end
 
-local logMsg = true
--- Translates text to the user's language.
---
--- If the label to translate is missing or the language
---
--- is invalid, it defaults to English (US).
----@param g string
-translateLabel = function(g)
-    ---@type string
-    local retStr
-    if Labels[g] then
-        for _, v in pairs(Labels[g]) do
-            if LANG == v.iso then
-                retStr = v.text
-                break
-            end
-        end
-        -- Replace "---" and "___" placeholders with button names.
-        if retStr ~= nil and #retStr > 0 then
-            for _, tr in ipairs(translations_button_map) do
-                if tr.name == g then
-                    if Lua_fn.str_contains(retStr, "___") then
-                        retStr = Lua_fn.str_replace(retStr, "___", tr.kbm)
-                    end
-                    if Lua_fn.str_contains(retStr, "---") then
-                        retStr = Lua_fn.str_replace(retStr, "---", tr.gpad)
-                    end
-                end
-            end
-        else
-            if logMsg then
-                YimToast:ShowWarning("Samurai's Scripts",
-                    "Unsupported language or missing label(s) detected! Defaulting to English.")
-                log.warning("Unsupported language or missing label(s) detected! Defaulting to English.")
-                retStr = Labels[g][1].text
-                logMsg = false
-            end
-            SS.debug('Missing: ' .. Labels[g][1].text)
-        end
-    else
-        retStr = string.format("%s [MISSING LABEL!]", g)
+---@param ptr pointer
+---@param size integer
+function memory_hex_dump(ptr, size)
+    local result = {}
+    for i = 0, size - 1 do
+        local byte = ptr:add(i):get_byte()
+        table.insert(result, string.format("%02X", byte))
     end
+    log.debug("Memory Dump: " .. table.concat(result, " "))
+end
 
-    return retStr
+---@param ptr pointer
+function memory_get_vec3(ptr)
+    local x = ptr:get_float()
+    local y = ptr:add(0x4):get_float()
+    local z = ptr:add(0x8):get_float()
+    return vec3:new(x, y, z)
 end
 
 ---@param toggle boolean
@@ -431,7 +426,7 @@ decodeJsonMvmts = function()
             end
             jsonFile:flush()
             jsonFile:close()
-            return CFG:Decode(content, nil, false)
+            return CFG:Decode(content)
         end
     end
 end
@@ -568,29 +563,56 @@ displayVehNames = function()
 end
 
 resetLastVehState = function()
-    if last_vehicle > 0 and ENTITY.DOES_ENTITY_EXIST(last_vehicle)
-        and ENTITY.IS_ENTITY_A_VEHICLE(last_vehicle) then
-        AUDIO.SET_VEHICLE_RADIO_LOUD(last_vehicle, false)
+    if (
+        (last_vehicle > 0) and
+        ENTITY.DOES_ENTITY_EXIST(last_vehicle) and
+        ENTITY.IS_ENTITY_A_VEHICLE(last_vehicle)
+    ) then
+        if loud_radio_enabled then
+            AUDIO.SET_VEHICLE_RADIO_LOUD(last_vehicle, false)
+            loud_radio_enabled = false
+        end
+
         if not has_custom_tires then
             VEHICLE.TOGGLE_VEHICLE_MOD(last_vehicle, 20, false)
         end
-        if default_tire_smoke.r ~= driftSmoke_T.r or default_tire_smoke.g ~= driftSmoke_T.g or default_tire_smoke.b ~= driftSmoke_T.b then
-            VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(last_vehicle, default_tire_smoke.r, default_tire_smoke.g,
-                default_tire_smoke.b)
+
+        if (
+            (default_tire_smoke.r ~= driftSmoke_T.r) or
+            (default_tire_smoke.g ~= driftSmoke_T.g) or
+            (default_tire_smoke.b ~= driftSmoke_T.b)
+        ) then
+            VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(
+                last_vehicle,
+                default_tire_smoke.r,
+                default_tire_smoke.g,
+                default_tire_smoke.b
+            )
         end
-        if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(last_vehicle)) and (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(last_vehicle) ~= 1) then
+
+        if (
+            VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(last_vehicle)) and
+            (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(last_vehicle) ~= 1)
+        ) then
             VEHICLE.SET_VEHICLE_DOORS_LOCKED(last_vehicle, 1)
             VEHICLE.SET_VEHICLE_ALARM(last_vehicle, false)
         end
+
+        if ubwindowsToggled then
+            VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS(last_vehicle, false)
+            ubwindowsToggled = false
+        end
     end
-    loud_radio_enabled = false
-    last_vehicle       = current_vehicle
+    last_vehicle = current_vehicle
 end
 
 onVehEnter = function()
     current_vehicle = self.get_veh()
-    if Game.Self.isDriving() and (is_car or is_bike or is_quad)
-        and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
+    if (
+        Game.Self.isDriving() and
+        (is_car or is_bike or is_quad) and
+        VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle)
+    ) then
         engine_brake_disabled  = SS.getVehicleHandlingFlag(HF._FREEWHEEL_NO_GAS)
         traction_ctrl_disabled = SS.getVehicleHandlingFlag(HF._FORCE_NO_TC_OR_SC)
         kers_boost_enabled     = SS.getVehicleHandlingFlag(HF._HAS_KERS)
@@ -598,9 +620,11 @@ onVehEnter = function()
         rally_tires_enabled    = SS.getVehicleHandlingFlag(HF._HAS_RALLY_TYRES)
         easy_wheelie_enabled   = SS.getVehicleHandlingFlag(HF._LOW_SPEED_WHEELIES)
     end
-    if Game.Self.isDriving() and current_vehicle ~= last_vehicle then
+
+    if Game.Self.isDriving() and (current_vehicle ~= last_vehicle) then
         resetLastVehState()
     end
+
     return current_vehicle
 end
 
@@ -1020,7 +1044,7 @@ attachPed = function(ped)
                 ped_grabbed = true
                 attached_ped = ped
             else
-                YimToast:ShowError("Samurai's Scripts", translateLabel("NPC_CTRL_FAIL_"))
+                YimToast:ShowError("Samurai's Scripts", _T("NPC_CTRL_FAIL_"))
             end
         end
     end)
@@ -1079,7 +1103,7 @@ attachVeh = function(veh)
                 vehicle_grabbed = true
                 grabbed_veh     = veh
             else
-                YimToast:ShowError("Samurai's Scripts", translateLabel("NPC_CTRL_FAIL_"))
+                YimToast:ShowError("Samurai's Scripts", _T("NPC_CTRL_FAIL_"))
             end
         end
     end)
@@ -1145,7 +1169,7 @@ getAllObjects = function()
             if propName == b then
                 showInvalidObjText = true
                 blacklisted_obj    = true
-                invalidType        = translateLabel("COCKSTAR_BLACKLIST_WARN_")
+                invalidType        = _T("COCKSTAR_BLACKLIST_WARN_")
                 break
             else
                 showInvalidObjText = false
@@ -1154,7 +1178,7 @@ getAllObjects = function()
             for _, c in ipairs(crash_objects) do
                 if propName == c then
                     showInvalidObjText = true
-                    invalidType = translateLabel("CRASH_OBJECT_WARN_")
+                    invalidType = _T("CRASH_OBJECT_WARN_")
                     break
                 else
                     showInvalidObjText = false
@@ -1913,7 +1937,7 @@ UI.isItemClicked = function(mb)
     else
         error(
             string.format(
-            "Error in function isItemClicked(): Invalid param %s. Correct inputs: 'lmb' for Left Mouse Button or 'rmb' for Right Mouse Button.",
+                "Error in function isItemClicked(): Invalid param %s. Correct inputs: 'lmb' for Left Mouse Button or 'rmb' for Right Mouse Button.",
                 mb),
             2)
     end
@@ -2077,7 +2101,7 @@ SS.finishCargoSourceMission = function()
                 YimToast:ShowError("Samurai's Scripts", "You are not host of this script.")
                 return
             end
-            locals.set_int("gb_contraband_buy", 621 + 5, 1) -- 1.70 -- case -1: return "INVALID - UNSET";
+            locals.set_int("gb_contraband_buy", 621 + 5, 1)   -- 1.70 -- case -1: return "INVALID - UNSET";
             locals.set_int("gb_contraband_buy", 621 + 191, 6) -- 1.70 -- func_40 Local_621.f_191 = iParam0;
             locals.set_int("gb_contraband_buy", 621 + 192, 4) -- 1.70 -- func_15 Local_621.f_192 = iParam0;
         end)
@@ -2100,7 +2124,7 @@ end
 ---@param s script_util
 SS.fillAll = function(s)
     if not Game.isOnline() then
-        YimToast:ShowError("Samurai's Scripts", translateLabel("GENERIC_UNAVAILABLE_SP_"))
+        YimToast:ShowError("Samurai's Scripts", _T("GENERIC_UNAVAILABLE_SP_"))
         return
     end
     if stats.get_int("MPX_HANGAR_OWNED") ~= 0 then
@@ -2174,7 +2198,7 @@ SS.set_hotkey = function(keybind)
     ImGui.Dummy(1, 10)
     if key_name == nil then
         start_loading_anim = true
-        UI.coloredText(string.format("%s%s", translateLabel("INPUT_WAIT_TXT_"), loading_label), "#FFFFFF", 0.75, 20)
+        UI.coloredText(string.format("%s%s", _T("INPUT_WAIT_TXT_"), loading_label), "#FFFFFF", 0.75, 20)
         key_pressed, key_code, key_name = SS.isAnyKeyPressed()
     else
         start_loading_anim = false
@@ -2192,13 +2216,13 @@ SS.set_hotkey = function(keybind)
             ImGui.SameLine()
             ImGui.Text(string.format("[%s]", key_name))
         else
-            UI.coloredText(translateLabel("HOTKEY_RESERVED_"), "red", 0.86, 20)
+            UI.coloredText(_T("HOTKEY_RESERVED_"), "red", 0.86, 20)
         end
 
         ImGui.SameLine()
         ImGui.Dummy(5, 1)
         ImGui.SameLine()
-        if UI.coloredButton(string.format(" %s ##Shortcut", translateLabel("GENERIC_CLEAR_BTN_")), "#FFDB58", "#FFFAA0", "#FFFFF0", 0.7) then
+        if UI.coloredButton(string.format(" %s ##Shortcut", _T("GENERIC_CLEAR_BTN_")), "#FFDB58", "#FFFAA0", "#FFFFF0", 0.7) then
             UI.widgetSound("Cancel")
             key_code, key_name = nil, nil
         end
@@ -2206,7 +2230,7 @@ SS.set_hotkey = function(keybind)
 
     ImGui.Dummy(1, 10)
     if not _reserved and key_code ~= nil then
-        if ImGui.Button(string.format("%s##keybinds", translateLabel("GENERIC_CONFIRM_BTN_"))) then
+        if ImGui.Button(string.format("%s##keybinds", _T("GENERIC_CONFIRM_BTN_"))) then
             UI.widgetSound("Select")
             keybind.code, keybind.name = key_code, string.format("[%s]", key_name)
             CFG:SaveItem("keybinds", keybinds)
@@ -2217,7 +2241,7 @@ SS.set_hotkey = function(keybind)
         ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
     end
 
-    if ImGui.Button(string.format("%s##keybinds", translateLabel("GENERIC_CANCEL_BTN_"))) then
+    if ImGui.Button(string.format("%s##keybinds", _T("GENERIC_CANCEL_BTN_"))) then
         UI.widgetSound("Cancel")
         key_code, key_name = nil, nil
         start_loading_anim = false
@@ -2246,7 +2270,7 @@ SS.openHotkeyWindow = function(window_name, keybind)
 
     ImGui.SameLine()
     ImGui.BeginDisabled(keybind.code == 0x0)
-    if ImGui.Button(string.format("%s##%s", translateLabel("GENERIC_UNBIND_LABEL_"), window_name)) then
+    if ImGui.Button(string.format("%s##%s", _T("GENERIC_UNBIND_LABEL_"), window_name)) then
         UI.widgetSound("Delete")
         keybind.code, keybind.name = 0x0, "[Unbound]"
         CFG:SaveItem("keybinds", keybinds)
@@ -2272,7 +2296,7 @@ SS.set_gpad_hotkey = function(keybind)
     ImGui.Dummy(1, 10)
     if gpad_keyName == nil then
         start_loading_anim = true
-        UI.coloredText(string.format("%s%s", translateLabel("INPUT_WAIT_TXT_"), loading_label), "#FFFFFF", 0.75, 20)
+        UI.coloredText(string.format("%s%s", _T("INPUT_WAIT_TXT_"), loading_label), "#FFFFFF", 0.75, 20)
         gpad_keyCode, gpad_keyName = Game.getKeyPressed()
     else
         start_loading_anim = false
@@ -2287,18 +2311,18 @@ SS.set_gpad_hotkey = function(keybind)
         if not _reserved then
             ImGui.Text("New Key: "); ImGui.SameLine(); ImGui.Text(gpad_keyName)
         else
-            UI.coloredText(translateLabel("HOTKEY_RESERVED_"), "red", 0.86, 20)
+            UI.coloredText(_T("HOTKEY_RESERVED_"), "red", 0.86, 20)
         end
         ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
         if UI.coloredButton(
-            string.format(
-                " %s ##gpadkeybinds",
-                translateLabel("GENERIC_CLEAR_BTN_")
-            ),
-            "#FFDB58",
-            "#FFFAA0",
-            "#FFFFF0", 0.7
-        ) then
+                string.format(
+                    " %s ##gpadkeybinds",
+                    _T("GENERIC_CLEAR_BTN_")
+                ),
+                "#FFDB58",
+                "#FFFAA0",
+                "#FFFFF0", 0.7
+            ) then
             UI.widgetSound("Cancel")
             gpad_keyCode, gpad_keyName = nil, nil
         end
@@ -2306,7 +2330,7 @@ SS.set_gpad_hotkey = function(keybind)
 
     ImGui.Dummy(1, 10)
     if not _reserved and gpad_keyCode ~= nil then
-        if ImGui.Button(string.format("%s##gpadkeybinds", translateLabel("GENERIC_CONFIRM_BTN_"))) then
+        if ImGui.Button(string.format("%s##gpadkeybinds", _T("GENERIC_CONFIRM_BTN_"))) then
             UI.widgetSound("Select")
             keybind.code, keybind.name = gpad_keyCode, gpad_keyName
             CFG:SaveItem("gpad_keybinds", gpad_keybinds)
@@ -2317,7 +2341,7 @@ SS.set_gpad_hotkey = function(keybind)
         ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
     end
 
-    if ImGui.Button(string.format("%s##gpadkeybinds", translateLabel("GENERIC_CANCEL_BTN_"))) then
+    if ImGui.Button(string.format("%s##gpadkeybinds", _T("GENERIC_CANCEL_BTN_"))) then
         UI.widgetSound("Cancel")
         gpad_keyCode, gpad_keyName = nil, nil
         start_loading_anim = false
@@ -2351,7 +2375,7 @@ SS.gpadHotkeyWindow = function(window_name, keybind)
 
     ImGui.SameLine()
     ImGui.BeginDisabled(keybind.code == 0)
-    if ImGui.Button(string.format("%s##%s", translateLabel("GENERIC_UNBIND_LABEL_"), window_name)) then
+    if ImGui.Button(string.format("%s##%s", _T("GENERIC_UNBIND_LABEL_"), window_name)) then
         UI.widgetSound("Delete")
         keybind.code, keybind.name = 0, "[Unbound]"
         CFG:SaveItem("gpad_keybinds", gpad_keybinds)
@@ -2362,11 +2386,11 @@ SS.gpadHotkeyWindow = function(window_name, keybind)
     ImGui.SetNextWindowSizeConstraints(240, 60, 600, 400)
     ImGui.SetNextWindowBgAlpha(0.8)
     if ImGui.BeginPopupModal(
-        window_name,
-        true,
-        ImGuiWindowFlags.AlwaysAutoResize |
-        ImGuiWindowFlags.NoTitleBar
-    ) then
+            window_name,
+            true,
+            ImGuiWindowFlags.AlwaysAutoResize |
+            ImGuiWindowFlags.NoTitleBar
+        ) then
         SS.set_gpad_hotkey(keybind)
         ImGui.End()
     end
@@ -2385,7 +2409,7 @@ SS.check_kb_keybinds = function()
             if kk == nil then -- removed keybind
                 SS.debug('Removed keyboard keybind: ' .. tostring(keybinds[k]))
                 keybinds[k] = nil
-                CFG:SaveItem("keybinds", keybinds) -- save
+                CFG:SaveItem("keybinds", keybinds)  -- save
                 keybinds = CFG:ReadItem("keybinds") -- refresh
             end
         end
@@ -2395,7 +2419,7 @@ SS.check_kb_keybinds = function()
             if kk == nil then -- new keybind
                 SS.debug('Added keyboard keybind: ' .. tostring(k))
                 keybinds[k] = kb_keybinds_list[k]
-                CFG:SaveItem("keybinds", keybinds) -- save
+                CFG:SaveItem("keybinds", keybinds)  -- save
                 keybinds = CFG:ReadItem("keybinds") -- refresh
             end
         end
@@ -2415,7 +2439,7 @@ SS.check_gpad_keybinds = function()
             if kk == nil then -- removed keybind
                 SS.debug('Removed gamepad keybind: ' .. tostring(gpad_keybinds[k]))
                 gpad_keybinds[k] = nil
-                CFG:SaveItem("gpad_keybinds", gpad_keybinds) -- save
+                CFG:SaveItem("gpad_keybinds", gpad_keybinds)  -- save
                 gpad_keybinds = CFG:ReadItem("gpad_keybinds") -- refresh
             end
         end
@@ -2425,32 +2449,74 @@ SS.check_gpad_keybinds = function()
             if kk == nil then -- new keybind
                 SS.debug('Added gamepad keybind: ' .. tostring(k))
                 gpad_keybinds[k] = gpad_keybinds_list[k]
-                CFG:SaveItem("gpad_keybinds", gpad_keybinds) -- save
+                CFG:SaveItem("gpad_keybinds", gpad_keybinds)  -- save
                 gpad_keybinds = CFG:ReadItem("gpad_keybinds") -- refresh
             end
         end
     end
 end
 
+SS.canUseKeybinds = function()
+    return (
+        not is_typing and not
+        is_setting_hotkeys and not
+        Game.Self.isBrowsingApps() and not
+        HUD.IS_MP_TEXT_CHAT_TYPING() and not
+        HUD.IS_PAUSE_MENU_ACTIVE()
+    )
+end
+
 SS.canUsePhoneAnims = function()
-    return not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) and not is_playing_anim and not is_playing_scenario
-        and not ped_grabbed and not vehicle_grabbed and not is_handsUp and not is_sitting
-        and not is_hiding and not is_playing_amb_scenario and PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0
+    return (
+        not ENTITY.IS_ENTITY_DEAD(self.get_ped(), false) and not
+        is_playing_anim and not
+        is_playing_scenario and not
+        ped_grabbed and not
+        vehicle_grabbed and not 
+        is_handsUp and not
+        is_sitting and not
+        is_hiding and not
+        is_playing_amb_scenario
+        and (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self.get_ped()) == 0)
+    )
 end
 
 SS.canCrouch = function()
-    return Game.Self.isOnFoot() and not Game.Self.isInWater() and not Game.Self.is_ragdoll()
-        and not gui.is_open() and not ped_grabbed and not vehicle_grabbed and not is_playing_anim
-        and not is_playing_scenario and not is_playing_amb_scenario and not is_typing and not is_sitting and
-        not is_setting_hotkeys
-        and not is_hiding and not isCrouched and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Game.Self.isBrowsingApps()
+    return (
+        Game.Self.isOnFoot() and not
+        Game.Self.isInWater() and not
+        Game.Self.is_ragdoll() and not
+        gui.is_open() and not
+        ped_grabbed and not
+        vehicle_grabbed and not
+        is_playing_anim and not
+        is_playing_scenario and not
+        is_playing_amb_scenario and not
+        is_typing and not
+        is_sitting and not
+        is_setting_hotkeys and not
+        is_hiding and not
+        isCrouched and not
+        HUD.IS_MP_TEXT_CHAT_TYPING() and not
+        Game.Self.isBrowsingApps()
+    )
 end
 
 SS.canUseHandsUp = function()
-    return (Game.Self.isOnFoot() or is_car) and not gui.is_open() and not HUD.IS_MP_TEXT_CHAT_TYPING()
-        and not ped_grabbed and not vehicle_grabbed and not is_playing_anim and not is_playing_scenario
-        and not is_playing_amb_scenario and not is_typing and not is_setting_hotkeys and not is_hiding and
-        not Game.Self.isBrowsingApps()
+    return (
+        (Game.Self.isOnFoot() or is_car) and not
+        gui.is_open() and not
+        HUD.IS_MP_TEXT_CHAT_TYPING() and not
+        ped_grabbed and not
+        vehicle_grabbed and not
+        is_playing_anim and not
+        is_playing_scenario and not
+        is_playing_amb_scenario and not
+        is_typing and not
+        is_setting_hotkeys and not
+        is_hiding and not
+        Game.Self.isBrowsingApps()
+    )
 end
 
 SS.playKeyfobAnim = function()
@@ -2781,7 +2847,7 @@ SS.showNPCvehicleControls = function()
     ImGui.SeparatorText("NPC Vehicle Options")
     if show_npc_veh_seat_ctrl and thisVeh ~= 0 then
         ImGui.Text("Seats:")
-        if ImGui.Button(string.format("< %s", translateLabel("PREVIOUS_SEAT_BTN_"))) then
+        if ImGui.Button(string.format("< %s", _T("PREVIOUS_SEAT_BTN_"))) then
             script.run_in_fiber(function()
                 if PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh) then
                     local numSeats = VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(thisVeh)
@@ -2801,7 +2867,7 @@ SS.showNPCvehicleControls = function()
             end)
         end
         ImGui.SameLine()
-        if ImGui.Button(string.format("%s >", translateLabel("NEXT_SEAT_BTN_"))) then
+        if ImGui.Button(string.format("%s >", _T("NEXT_SEAT_BTN_"))) then
             script.run_in_fiber(function()
                 if PED.IS_PED_SITTING_IN_VEHICLE(self.get_ped(), thisVeh) then
                     local numSeats = VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(thisVeh)
@@ -2826,7 +2892,7 @@ SS.showNPCvehicleControls = function()
         ImGui.Spacing(); ImGui.Text("Radio:")
         local mainRadioButtonLabel = npc_veh_radio_on and "Turn Off" or "Turn On"
         local mainRadioButtonParam = npc_veh_radio_on and "OFF" or
-        radio_stations[math.random(1, (#radio_stations - 1))].station
+            radio_stations[math.random(1, (#radio_stations - 1))].station
         if ImGui.Button(mainRadioButtonLabel) then
             UI.widgetSound("Select2")
             script.run_in_fiber(function()
@@ -3025,7 +3091,7 @@ end
 ---@param flag integer
 SS.getVehicleModelFlag = function(flag)
     local base_ptr = SS.getVehicleInfo()
-    .m_model_info_flags                                   -- array of 7 uint32_t (7 * 32 = 224 flags total. Outdated ref: https://gtamods.com/wiki/Vehicles.meta)
+        .m_model_info_flags -- array of 7 uint32_t (7 * 32 = 224 flags total. Outdated ref: https://gtamods.com/wiki/Vehicles.meta)
     local index    = math.floor(flag / 32)
     local bitPos   = flag % 32
     local flag_ptr = base_ptr:add(index * 4)
@@ -3084,21 +3150,22 @@ SS.getPlayerInfo = function(ped)
         local CPed            = setmetatable({}, {})
         CPed.__index          = CPed
         local CPlayerInfo     = pedPtr:add(0x10A8):deref()
-        local m_ped_type      = pedPtr:add(0x1098)        -- uint32_t
-        local m_ped_task_flag = pedPtr:add(0x144B)        -- uint8_t
+        local m_ped_type      = pedPtr:add(0x1098)            -- uint32_t
+        local m_ped_task_flag = pedPtr:add(0x144B)            -- uint8_t
         local m_seatbelt      = pedPtr:add(0x143C):get_word() -- uint8_t
+
         CPed.ped_type         = m_ped_type:get_dword()
         CPed.task_flag        = m_ped_task_flag:get_word()
         CPed.swim_speed_ptr   = CPlayerInfo:add(0x01C8)
         CPed.run_speed_ptr    = CPlayerInfo:add(0x0D50)
-        CPed.velocity_ptr     = CPlayerInfo:add(0x0300)
+        CPed.velocity_ptr     = CPlayerInfo:add(0x0300) -- rage::fvector3
 
         CPed.canPedRagdoll    = function()
-            return Lua_fn.has_bit(pedInfo.ped_type, 0x20)
+            return (CPed.ped_type & 0x20) ~= 0
         end;
 
         CPed.hasSeatbelt      = function()
-            return Lua_fn.has_bit(m_seatbelt, 0x3)
+            return (m_seatbelt & 0x3) ~= 0
         end;
 
         CPed.getGameState     = function()
@@ -3213,17 +3280,7 @@ end
 ---@class Game
 Game = {}
 Game.__index = Game
-
-Game.Version = function()
-    local pVers = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
-    local pBnum = pVers:add(0x24):rip()
-    local pOver = pBnum:add(0x20)
-    local rt = {
-        _build  = pBnum:get_string(),
-        _online = pOver:get_string()
-    }
-    return rt
-end
+Game.Version = GetGameVersion()
 
 Game.Language = function()
     local language_codes_T <const> = {
@@ -3345,103 +3402,6 @@ end
 
 Game.isOnline = function()
     return network.is_session_started() and not script.is_active("maintransition")
-end
-
----@param ped integer
-Game.is_in_session = function(ped)
-    return (Game.isOnline() and not script.is_active("maintransition"))
-        and SS.getPlayerInfo(ped).getGameState() ~= "Invalid"
-        and SS.getPlayerInfo(ped).getGameState() ~= "LeftGame"
-end
-
-Game.getPlayerList = function()
-    filteredPlayers = {}
-    local players = entities.get_all_peds_as_handles()
-    for _, ped in ipairs(players) do
-        if PED.IS_PED_A_PLAYER(ped) and Game.is_in_session(ped) then
-            table.insert(filteredPlayers, ped)
-        end
-    end
-end
-
-Game.filterPlayerList = function()
-    Game.getPlayerList()
-    local playerNames = {}
-    for _, player in ipairs(filteredPlayers) do
-        local playerIdx  = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(player)
-        local playerName = PLAYER.GET_PLAYER_NAME(playerIdx)
-        local playerHost = NETWORK.NETWORK_GET_HOST_PLAYER_INDEX()
-        if playerIdx == self.get_id() then
-            playerName = playerName .. "  [You]"
-        end
-        if network.is_player_friend(playerIdx) then
-            playerName = playerName .. "  [Friend]"
-        end
-        if playerHost == playerIdx then
-            playerName = playerName .. "  [Host]"
-        end
-        table.insert(playerNames, playerName)
-    end
-    return playerNames
-end
-
--- Displays all players in the session inside an ImGui Combo
-Game.displayPlayerListCombo = function()
-    Game.getPlayerList()
-    local playerNames = Game.filterPlayerList()
-    playerIndex, used = ImGui.Combo("##playerList", playerIndex, playerNames, #filteredPlayers)
-end
-
--- Returns the number of players in an online session.
----@return number
-Game.getPlayerCount = function()
-    if Game.isOnline() then
-        return NETWORK.NETWORK_GET_NUM_CONNECTED_PLAYERS()
-    end
-    return 0
-end
-
--- Returns the player's cash
----@param player integer
-Game.getPlayerWallet = function(player)
-    if player ~= self.get_id() then
-        return Lua_fn.formatMoney(network.get_player_wallet(player)), 0
-    end
-
-    local wallet_int = (tonumber(Lua_fn.str_replace(MONEY.NETWORK_GET_STRING_WALLET_BALANCE(stats.get_character_index()), "$", "")) * 1)
-    local formatted  = Lua_fn.formatMoney(wallet_int)
-    return formatted, wallet_int
-end
-
--- Returns the player's bank balance
----@param player integer
-Game.getPlayerBank = function(player)
-    if player ~= self.get_id() then
-        return Lua_fn.formatMoney(network.get_player_bank(player))
-    end
-
-    local _, wallet_int = Game.getPlayerWallet(self.get_id())
-    local bank = (tonumber(Lua_fn.str_replace(MONEY.NETWORK_GET_STRING_BANK_WALLET_BALANCE(stats.get_character_index()), "$", "")) - wallet_int)
-    return Lua_fn.formatMoney(bank)
-end
-
--- Returns the player's RP rank.
----@param player integer
-Game.getPlayerRank = function(player)
-    if player ~= self.get_id() then
-        return tostring(network.get_player_rank(player))
-    end
-
-    local self_rp = stats.get_int("MPX_CHAR_XP_FM")
-    for i = 1, #rp_levels do
-        if i < #rp_levels then
-            if self_rp == rp_levels[i] or (self_rp > rp_levels[i] and self_rp < rp_levels[i + 1]) then
-                return i
-            end
-        end
-    end
-
-    return 8000
 end
 
 ---@param text string

@@ -4,27 +4,27 @@ function dunkUI()
     if Game.isOnline() then
         if CURRENT_BUILD == TARGET_BUILD then
             ImGui.BeginTabBar("Dunk Pacino")
-            if ImGui.BeginTabItem(translateLabel("CP_GAMBLING_TXT_")) then
-                bypass_casino_bans, bcbUsed = ImGui.Checkbox(translateLabel("CP_BYPASSCD_CP_"), bypass_casino_bans)
+            if ImGui.BeginTabItem(_T("CP_GAMBLING_TXT_")) then
+                bypass_casino_bans, bcbUsed = ImGui.Checkbox(_T("CP_BYPASSCD_CP_"), bypass_casino_bans)
                 if bcbUsed then
                     UI.widgetSound("Nav2")
                     CFG:SaveItem("bypass_casino_bans", bypass_casino_bans)
                 end
                 if not bypass_casino_bans then
-                    UI.toolTip(true, translateLabel("CP_BYPASSCD_WARN_"), "#FFCC00", 1)
+                    UI.toolTip(true, _T("CP_BYPASSCD_WARN_"), "#FFCC00", 1)
                 end
 
-                ImGui.Spacing(); ImGui.Text(translateLabel("CP_COOLDOWN_STATUS_")); ImGui.SameLine()
+                ImGui.Spacing(); ImGui.Text(_T("CP_COOLDOWN_STATUS_")); ImGui.SameLine()
                 ImGui.BulletText(casino_cooldown_update_str)
 
                 ImGui.Spacing(); ImGui.SeparatorText("Poker")
-                force_poker_cards, fpcUsed = ImGui.Checkbox(translateLabel("CP_FORCE_POKER_RF_CB_"), force_poker_cards)
+                force_poker_cards, fpcUsed = ImGui.Checkbox(_T("CP_FORCE_POKER_RF_CB_"), force_poker_cards)
                 if fpcUsed then
                     UI.widgetSound("Nav2")
                     CFG:SaveItem("force_poker_cards", force_poker_cards)
                 end
 
-                set_dealers_poker_cards, sdpcUsed = ImGui.Checkbox(translateLabel("CP_FORCE_BADBEAT_CB_"),
+                set_dealers_poker_cards, sdpcUsed = ImGui.Checkbox(_T("CP_FORCE_BADBEAT_CB_"),
                     set_dealers_poker_cards)
                 if sdpcUsed then
                     UI.widgetSound("Nav2")
@@ -32,10 +32,10 @@ function dunkUI()
                 end
 
                 ImGui.Spacing(); ImGui.SeparatorText("Blackjack")
-                ImGui.Spacing(); ImGui.BulletText(translateLabel("CP_DEALER_FACEDOWN_TXT_")); ImGui.SameLine(); ImGui
+                ImGui.Spacing(); ImGui.BulletText(_T("CP_DEALER_FACEDOWN_TXT_")); ImGui.SameLine(); ImGui
                     .Text(dealers_card_str); ImGui
                     .Spacing()
-                if ImGui.Button(translateLabel("CP_DEALER_BUST_BTN_")) then
+                if ImGui.Button(_T("CP_DEALER_BUST_BTN_")) then
                     UI.widgetSound("Select")
                     script.run_in_fiber(function(script)
                         local player_id = PLAYER.PLAYER_ID()
@@ -63,7 +63,7 @@ function dunkUI()
                 end
 
                 ImGui.Spacing(); ImGui.SeparatorText("Roulette")
-                force_roulette_wheel, frwUsed = ImGui.Checkbox(translateLabel("CP_FORCE_ROULETTE_CB_"),
+                force_roulette_wheel, frwUsed = ImGui.Checkbox(_T("CP_FORCE_ROULETTE_CB_"),
                     force_roulette_wheel)
                 if frwUsed then
                     UI.widgetSound("Nav2")
@@ -71,20 +71,20 @@ function dunkUI()
                 end
 
                 ImGui.Spacing(); ImGui.SeparatorText("Slot Machines")
-                rig_slot_machine, rsmUsed = ImGui.Checkbox(translateLabel("CP_RIG_SLOTS_CB_"), rig_slot_machine)
+                rig_slot_machine, rsmUsed = ImGui.Checkbox(_T("CP_RIG_SLOTS_CB_"), rig_slot_machine)
                 if rsmUsed then
                     UI.widgetSound("Nav2")
                     CFG:SaveItem("rig_slot_machine", rig_slot_machine)
                 end
 
-                autoplay_slots, apsUsed = ImGui.Checkbox(translateLabel("CP_AUTOPLAY_SLOTS_CB_"), autoplay_slots); ImGui
+                autoplay_slots, apsUsed = ImGui.Checkbox(_T("CP_AUTOPLAY_SLOTS_CB_"), autoplay_slots); ImGui
                     .SameLine()
                 if apsUsed then
                     UI.widgetSound("Nav2")
                     CFG:SaveItem("autoplay_slots", autoplay_slots)
                 end
                 if autoplay_slots then
-                    autoplay_cap, apcapUsed = ImGui.Checkbox(translateLabel("CP_AUTOPLAY_CAP_CB_"), autoplay_cap); ImGui
+                    autoplay_cap, apcapUsed = ImGui.Checkbox(_T("CP_AUTOPLAY_CAP_CB_"), autoplay_cap); ImGui
                         .SameLine()
                     if apcapUsed then
                         UI.widgetSound("Nav2")
@@ -103,7 +103,7 @@ function dunkUI()
                 end
 
                 ImGui.Spacing(); ImGui.SeparatorText("Lucky Wheel")
-                if ImGui.Button(translateLabel("CP_PODIUM_VEH_BTN_")) then
+                if ImGui.Button(_T("CP_PODIUM_VEH_BTN_")) then
                     script.run_in_fiber(function()
                         if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
                             UI.widgetSound("Select")
@@ -115,7 +115,7 @@ function dunkUI()
                     end)
                 end
                 ImGui.SameLine()
-                if ImGui.Button(translateLabel("CP_MYSTERY_PRIZE_BTN_")) then
+                if ImGui.Button(_T("CP_MYSTERY_PRIZE_BTN_")) then
                     script.run_in_fiber(function()
                         if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
                             UI.widgetSound("Select")
@@ -128,7 +128,7 @@ function dunkUI()
                 end
 
                 ImGui.SameLine()
-                if ImGui.Button(translateLabel("CP_50K_BTN_")) then
+                if ImGui.Button(_T("CP_50K_BTN_")) then
                     script.run_in_fiber(function()
                         if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
                             UI.widgetSound("Select")
@@ -140,7 +140,7 @@ function dunkUI()
                     end)
                 end
 
-                if ImGui.Button(translateLabel("CP_25K_BTN_")) then
+                if ImGui.Button(_T("CP_25K_BTN_")) then
                     script.run_in_fiber(function()
                         if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
                             UI.widgetSound("Select")
@@ -153,7 +153,7 @@ function dunkUI()
                 end
 
                 ImGui.SameLine(); ImGui.Dummy(6, 1); ImGui.SameLine()
-                if ImGui.Button(translateLabel("CP_15K_BTN_")) then
+                if ImGui.Button(_T("CP_15K_BTN_")) then
                     script.run_in_fiber(function()
                         if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
                             UI.widgetSound("Select")
@@ -166,7 +166,7 @@ function dunkUI()
                 end
 
                 ImGui.SameLine(); ImGui.Dummy(21, 1); ImGui.SameLine()
-                if ImGui.Button(translateLabel("CP_DISCOUNT_BTN_")) then
+                if ImGui.Button(_T("CP_DISCOUNT_BTN_")) then
                     script.run_in_fiber(function()
                         if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
                             UI.widgetSound("Select")
@@ -178,7 +178,7 @@ function dunkUI()
                     end)
                 end
 
-                if ImGui.Button(translateLabel("CP_CLOTHING_BTN_")) then
+                if ImGui.Button(_T("CP_CLOTHING_BTN_")) then
                     script.run_in_fiber(function()
                         if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_lucky_wheel")) ~= 0 then
                             UI.widgetSound("Select")
@@ -193,7 +193,7 @@ function dunkUI()
             end
             if ImGui.BeginTabItem("Casino Heist") then
                 ImGui.PushItemWidth(165)
-                new_approach, approach_clicked = ImGui.Combo(translateLabel("CP_HEIST_APPROACH_TXT_"),
+                new_approach, approach_clicked = ImGui.Combo(_T("CP_HEIST_APPROACH_TXT_"),
                     casino_heist_approach,
                     { "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" }, 4) --You gotta sneak the word in there, like you're sneaking in food to a movie theater. Tuck it in your jacket for later, then when they least suspect it, deploy the word.
                 if approach_clicked then
@@ -202,7 +202,7 @@ function dunkUI()
                     end)
                 end
                 ImGui.SameLine(); ImGui.Dummy(24, 0); ImGui.SameLine()
-                local new_target, target_clicked = ImGui.Combo(translateLabel("CP_HEIST_TARGET_TXT_"),
+                local new_target, target_clicked = ImGui.Combo(_T("CP_HEIST_TARGET_TXT_"),
                     casino_heist_target,
                     { "Money", "Gold", "Art", "Diamonds" }, 4)
                 if target_clicked then
@@ -211,7 +211,7 @@ function dunkUI()
                     end)
                 end
                 local new_last_approach, last_approach_clicked = ImGui.Combo(
-                    translateLabel("CP_HEIST_LAST_APPROACH_TXT_"),
+                    _T("CP_HEIST_LAST_APPROACH_TXT_"),
                     casino_heist_last_approach, { "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" }, 4)
                 if last_approach_clicked then
                     script.run_in_fiber(function()
@@ -220,7 +220,7 @@ function dunkUI()
                 end
                 ImGui.SameLine()
                 local new_hard_approach, hard_approach_clicked = ImGui.Combo(
-                    translateLabel("CP_HEIST_HARD_APPROACH_TXT_"), casino_heist_hard,
+                    _T("CP_HEIST_HARD_APPROACH_TXT_"), casino_heist_hard,
                     { "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" }, 4)
                 if hard_approach_clicked then
                     script.run_in_fiber(function()
@@ -231,7 +231,7 @@ function dunkUI()
 
                 ImGui.Spacing()
                 ImGui.PushItemWidth(165)
-                local new_gunman, gunman_clicked = ImGui.Combo(translateLabel("CP_HEIST_GUNMAN_TXT_"),
+                local new_gunman, gunman_clicked = ImGui.Combo(_T("CP_HEIST_GUNMAN_TXT_"),
                     casino_heist_gunman,
                     { "Unselected", "Karl Abolaji", "Gustavo Mota", "Charlie Reed", "Chester McCoy", "Patrick McReary" },
                     6)
@@ -243,7 +243,7 @@ function dunkUI()
                 if casino_heist_gunman == 1 then --Karl Abolaji
                     ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
                     local karl_gun_list = { { '##1", "##2' }, { "Micro SMG Loadout", "Machine Pistol Loadout" }, { "Micro SMG Loadout", "Shotgun Loadout" }, { "Shotgun Loadout", "Revolver Loadout" } }
-                    local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("CP_HEIST_WEAPONS_TXT_"),
+                    local new_weapons, weapons_clicked = ImGui.Combo(_T("CP_HEIST_WEAPONS_TXT_"),
                         casino_heist_weapons,
                         karl_gun_list[casino_heist_approach + 1], 2)
                     if weapons_clicked then
@@ -253,7 +253,7 @@ function dunkUI()
                     end
                 elseif casino_heist_gunman == 2 then --Gustavo Fring
                     ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
-                    local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("CP_HEIST_WEAPONS_TXT_"),
+                    local new_weapons, weapons_clicked = ImGui.Combo(_T("CP_HEIST_WEAPONS_TXT_"),
                         casino_heist_weapons,
                         { "Rifle Loadout", "Shotgun Loadout" }, 2)
                     if weapons_clicked then
@@ -264,7 +264,7 @@ function dunkUI()
                 elseif casino_heist_gunman == 3 then --Charlie Reed
                     ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
                     local charlie_gun_list = { { '##1", "##2' }, { "SMG Loadout", "Shotgun Loadout" }, { "Machine Pistol Loadout", "Shotgun Loadout" }, { "SMG Loadout", "Shotgun Loadout" } }
-                    local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("CP_HEIST_WEAPONS_TXT_"),
+                    local new_weapons, weapons_clicked = ImGui.Combo(_T("CP_HEIST_WEAPONS_TXT_"),
                         casino_heist_weapons,
                         charlie_gun_list[casino_heist_approach + 1], 2)
                     if weapons_clicked then
@@ -275,7 +275,7 @@ function dunkUI()
                 elseif casino_heist_gunman == 4 then --Chester McCoy
                     ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
                     local chester_gun_list = { { '##1", "##2' }, { "MK II Shotgun Loadout", "MK II Rifle Loadout" }, { "MK II SMG Loadout", "MK II Rifle Loadout" }, { "MK II Shotgun Loadout", "MK II Rifle Loadout" } }
-                    local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("CP_HEIST_WEAPONS_TXT_"),
+                    local new_weapons, weapons_clicked = ImGui.Combo(_T("CP_HEIST_WEAPONS_TXT_"),
                         casino_heist_weapons,
                         chester_gun_list[casino_heist_approach + 1], 2)
                     if weapons_clicked then
@@ -286,7 +286,7 @@ function dunkUI()
                 elseif casino_heist_gunman == 5 then --Laddie Paddie Sadie Enweird
                     ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine()
                     local laddie_paddie_gun_list = { { '##1", "##2' }, { "Combat PDW Loadout", "Rifle Loadout" }, { "Shotgun Loadout", "Rifle Loadout" }, { "Shotgun Loadout", "Combat MG Loadout" } }
-                    local new_weapons, weapons_clicked = ImGui.Combo(translateLabel("CP_HEIST_WEAPONS_TXT_"),
+                    local new_weapons, weapons_clicked = ImGui.Combo(_T("CP_HEIST_WEAPONS_TXT_"),
                         casino_heist_weapons,
                         laddie_paddie_gun_list[casino_heist_approach + 1], 2)
                     if weapons_clicked then
@@ -296,7 +296,7 @@ function dunkUI()
                     end
                 end
 
-                local new_driver, driver_clicked = ImGui.Combo(translateLabel("CP_HEIST_DRIVER_TXT_"),
+                local new_driver, driver_clicked = ImGui.Combo(_T("CP_HEIST_DRIVER_TXT_"),
                     casino_heist_driver,
                     { "Unselected", "Karim Deniz", "Taliana Martinez", "Eddie Toh", "Zach Nelson", "Chester McCoy" }, 6)
                 if driver_clicked then
@@ -352,7 +352,7 @@ function dunkUI()
                     end
                 end
 
-                local new_hacker, hacker_clicked = ImGui.Combo(translateLabel("CP_HEIST_HACKER_TXT_"),
+                local new_hacker, hacker_clicked = ImGui.Combo(_T("CP_HEIST_HACKER_TXT_"),
                     casino_heist_hacker,
                     { "Unselected", "Rickie Lukens", "Christian Feltz", "Yohan Blair", "Avi Schwartzman", "Page Harris" },
                     6)
@@ -362,7 +362,7 @@ function dunkUI()
                     end)
                 end
 
-                local new_masks, masks_clicked = ImGui.Combo(translateLabel("CP_HEIST_MASKS_TXT_"), casino_heist_masks,
+                local new_masks, masks_clicked = ImGui.Combo(_T("CP_HEIST_MASKS_TXT_"), casino_heist_masks,
                     { "Unselected", "Geometric Set", "Hunter Set", "Oni Half Mask Set", "Emoji Set", "Ornate Skull Set",
                         "Lucky Fruit Set", "Gurilla Set", "Clown Set", "Animal Set", "Riot Set", "Oni Set", "Hockey Set" },
                     13)
@@ -372,13 +372,13 @@ function dunkUI()
                     end)
                 end
 
-                heist_cart_autograb, hcagUsed = ImGui.Checkbox(translateLabel("CP_HEIST_AUTOGRAB_"), heist_cart_autograb)
+                heist_cart_autograb, hcagUsed = ImGui.Checkbox(_T("CP_HEIST_AUTOGRAB_"), heist_cart_autograb)
                 if hcagUsed then
                     UI.widgetSound("Nav2")
                     CFG:SaveItem("heist_cart_autograb", heist_cart_autograb)
                 end
 
-                if ImGui.Button(translateLabel("CP_HEIST_UNLOCK_ALL_BTN_")) then
+                if ImGui.Button(_T("CP_HEIST_UNLOCK_ALL_BTN_")) then
                     UI.widgetSound("Select")
                     script.run_in_fiber(function()
                         stats.set_int("MPX_H3OPT_ACCESSPOINTS", -1)
@@ -395,7 +395,7 @@ function dunkUI()
                     end)
                 end
 
-                if ImGui.Button(translateLabel("CP_HEIST_ZERO_AI_CUTS_BTN_")) then
+                if ImGui.Button(_T("CP_HEIST_ZERO_AI_CUTS_BTN_")) then
                     UI.widgetSound("Select")
                     tunables.set_int("CH_LESTER_CUT", 0)
                     tunables.set_int("HEIST3_PREPBOARD_GUNMEN_KARL_CUT", 0)
@@ -417,7 +417,7 @@ function dunkUI()
                     tunables.set_int("HEIST3_FINALE_DECOY_GUNMAN", 0)
                 end
 
-                if ImGui.Button(translateLabel("CP_HEIST_MAX_PLAYER_CUTS_BTN_")) then
+                if ImGui.Button(_T("CP_HEIST_MAX_PLAYER_CUTS_BTN_")) then
                     UI.widgetSound("Select")
                     for i = 1, 4, 1 do
                         globals.set_int(gb_casino_heist_planning + gb_casino_heist_planning_cut_offset + i, 100)
@@ -430,6 +430,6 @@ function dunkUI()
             ImGui.Dummy(1, 5); ImGui.Text("Outdated.")
         end
     else
-        ImGui.Dummy(1, 5); ImGui.Text(translateLabel("GENERIC_UNAVAILABLE_SP_"))
+        ImGui.Dummy(1, 5); ImGui.Text(_T("GENERIC_UNAVAILABLE_SP_"))
     end
 end

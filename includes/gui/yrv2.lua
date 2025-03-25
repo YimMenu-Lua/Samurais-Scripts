@@ -2,29 +2,36 @@
 
 function yrv2UI()
     local window_width = ImGui.GetWindowWidth()
-    ImGui.Spacing(); ImGui.Dummy((window_width / 2) - 110, 1); ImGui.SameLine(); UI.coloredText("- YimResupplier V2 -",
-        yrv2_color, 1, 60)
+    ImGui.Spacing()
+    ImGui.Dummy((window_width / 2) - 110, 1)
+    ImGui.SameLine()
+    UI.coloredText(
+        "- YimResupplier V2 -",
+        yrv2_color,
+        1,
+        60
+    )
     if Game.isOnline() then
-        local hangar_index                                                = stats.get_int("MPX_HANGAR_OWNED")
-        local bunker_index                                                = stats.get_int("MPX_PROP_FAC_SLOT5")
-        local hangarOwned                                                 = hangar_index ~= 0
-        local bunkerOwned                                                 = bunker_index ~= 0
-        local whouse_1_owned                                              = stats.get_int("MPX_PROP_WHOUSE_SLOT0") > 0
-        local whouse_2_owned                                              = stats.get_int("MPX_PROP_WHOUSE_SLOT1") > 0
-        local whouse_3_owned                                              = stats.get_int("MPX_PROP_WHOUSE_SLOT2") > 0
-        local whouse_4_owned                                              = stats.get_int("MPX_PROP_WHOUSE_SLOT3") > 0
-        local whouse_5_owned                                              = stats.get_int("MPX_PROP_WHOUSE_SLOT4") > 0
-        local slot0_owned                                                 = stats.get_int("MPX_PROP_FAC_SLOT0") ~= 0
-        local slot1_owned                                                 = stats.get_int("MPX_PROP_FAC_SLOT1") ~= 0
-        local slot2_owned                                                 = stats.get_int("MPX_PROP_FAC_SLOT2") ~= 0
-        local slot3_owned                                                 = stats.get_int("MPX_PROP_FAC_SLOT3") ~= 0
-        local slot4_owned                                                 = stats.get_int("MPX_PROP_FAC_SLOT4") ~= 0
-        local acidOwned                                                   = stats.get_int("MPX_XM22_LAB_OWNED") ~= 0
+        local hangar_index   = stats.get_int("MPX_HANGAR_OWNED")
+        local bunker_index   = stats.get_int("MPX_PROP_FAC_SLOT5")
+        local hangarOwned    = hangar_index ~= 0
+        local bunkerOwned    = bunker_index ~= 0
+        local whouse_1_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT0") > 0
+        local whouse_2_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT1") > 0
+        local whouse_3_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT2") > 0
+        local whouse_4_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT3") > 0
+        local whouse_5_owned = stats.get_int("MPX_PROP_WHOUSE_SLOT4") > 0
+        local slot0_owned    = stats.get_int("MPX_PROP_FAC_SLOT0") ~= 0
+        local slot1_owned    = stats.get_int("MPX_PROP_FAC_SLOT1") ~= 0
+        local slot2_owned    = stats.get_int("MPX_PROP_FAC_SLOT2") ~= 0
+        local slot3_owned    = stats.get_int("MPX_PROP_FAC_SLOT3") ~= 0
+        local slot4_owned    = stats.get_int("MPX_PROP_FAC_SLOT4") ~= 0
+        local acidOwned      = stats.get_int("MPX_XM22_LAB_OWNED") ~= 0
         local wh1Total, wh2Total, wh3Total, wh4Total, wh5Total, ceo_moola = 0, 0, 0, 0, 0, 0
         if CURRENT_BUILD == TARGET_BUILD then
             ImGui.Spacing(); ImGui.BeginTabBar("##BusinessManager", ImGuiTabBarFlags.None)
             if whouse_1_owned or whouse_2_owned or whouse_3_owned or whouse_4_owned or whouse_5_owned then
-                if ImGui.BeginTabItem(translateLabel("CEO_WHOUSES_TXT_")) then
+                if ImGui.BeginTabItem(_T("CEO_WHOUSES_TXT_")) then
                     ImGui.Spacing()
                     if whouse_1_owned then
                         if whouse1.name == "" then SS.getCEOwhouseInfo(whouse1) end
@@ -54,7 +61,7 @@ function yrv2UI()
                             end
                             if wh1Supplies < whouse1.max then
                                 ImGui.SameLine(); ImGui.BeginDisabled(wh1_loop)
-                                if ImGui.Button(string.format("%s##wh1", translateLabel("CEO_RANDOM_CRATES_"))) then
+                                if ImGui.Button(string.format("%s##wh1", _T("CEO_RANDOM_CRATES_"))) then
                                     stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
                                 end
                                 ImGui.EndDisabled(); ImGui.SameLine(); wh1_loop, wh1lUsed = ImGui.Checkbox("Auto##wh1",
@@ -94,7 +101,7 @@ function yrv2UI()
                             end
                             if wh2Supplies < whouse2.max then
                                 ImGui.SameLine(); ImGui.BeginDisabled(wh2_loop)
-                                if ImGui.Button(string.format("%s##wh2", translateLabel("CEO_RANDOM_CRATES_"))) then
+                                if ImGui.Button(string.format("%s##wh2", _T("CEO_RANDOM_CRATES_"))) then
                                     stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
                                 end
                                 ImGui.EndDisabled(); ImGui.SameLine(); wh2_loop, wh2lUsed = ImGui.Checkbox("Auto##wh2",
@@ -134,7 +141,7 @@ function yrv2UI()
                             end
                             if wh3Supplies < whouse3.max then
                                 ImGui.SameLine(); ImGui.BeginDisabled(wh3_loop)
-                                if ImGui.Button(string.format("%s##wh3", translateLabel("CEO_RANDOM_CRATES_"))) then
+                                if ImGui.Button(string.format("%s##wh3", _T("CEO_RANDOM_CRATES_"))) then
                                     stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
                                 end
                                 ImGui.EndDisabled(); ImGui.SameLine(); wh3_loop, wh3lUsed = ImGui.Checkbox("Auto##wh3",
@@ -174,7 +181,7 @@ function yrv2UI()
                             end
                             if wh4Supplies < whouse4.max then
                                 ImGui.SameLine(); ImGui.BeginDisabled(wh4_loop)
-                                if ImGui.Button(string.format("%s##wh4", translateLabel("CEO_RANDOM_CRATES_"))) then
+                                if ImGui.Button(string.format("%s##wh4", _T("CEO_RANDOM_CRATES_"))) then
                                     stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
                                 end
                                 ImGui.EndDisabled(); ImGui.SameLine(); wh4_loop, wh4lUsed = ImGui.Checkbox("Auto##wh4",
@@ -214,7 +221,7 @@ function yrv2UI()
                             end
                             if wh5Supplies < whouse5.max then
                                 ImGui.SameLine(); ImGui.BeginDisabled(wh5_loop)
-                                if ImGui.Button(string.format("%s##wh5", translateLabel("CEO_RANDOM_CRATES_"))) then
+                                if ImGui.Button(string.format("%s##wh5", _T("CEO_RANDOM_CRATES_"))) then
                                     stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
                                 end
                                 ImGui.EndDisabled(); ImGui.SameLine(); wh5_loop, wh5lUsed = ImGui.Checkbox("Auto##wh5",
@@ -241,7 +248,7 @@ function yrv2UI()
                 end
             end
 
-            if ImGui.BeginTabItem(translateLabel("HANGAR_TXT_")) then
+            if ImGui.BeginTabItem(_T("HANGAR_TXT_")) then
                 ImGui.Dummy(1, 5)
                 if hangarOwned then
                     local hangar_name = hangar_info_t[hangar_index].name
@@ -255,7 +262,7 @@ function yrv2UI()
                     if hangarSupplies < 50 then
                         ImGui.SameLine()
                         ImGui.BeginDisabled(hangarLoop)
-                        if ImGui.Button(string.format("%s##hangar", translateLabel("CEO_RANDOM_CRATES_"))) then
+                        if ImGui.Button(string.format("%s##hangar", _T("CEO_RANDOM_CRATES_"))) then
                             script.run_in_fiber(function()
                                 stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
                             end)
@@ -271,7 +278,7 @@ function yrv2UI()
                         tostring(hangarSupplies) .. " Crates (" .. tostring(math.floor(hangarSupplies / 0.5)) .. "%)")
                     ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(hangarTotal))
                     if Game.Self.isOutside() then
-                        ImGui.Spacing(); ImGui.SeparatorText(translateLabel("QUICK_TP_TXT_"))
+                        ImGui.Spacing(); ImGui.SeparatorText(_T("QUICK_TP_TXT_"))
                         if ImGui.Button("Teleport To Hangar") then
                             UI.widgetSound("Select")
                             Game.Self.teleport(true, hangar_pos)
@@ -523,7 +530,7 @@ function yrv2UI()
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, translateLabel("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
                     ImGui.SameLine()
                     ImGui.BeginDisabled(not slot1_owned)
                     if ImGui.Button(("To %s"):format(bb.slot1.name)) then
@@ -537,7 +544,7 @@ function yrv2UI()
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, translateLabel("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
                     ImGui.SameLine()
                     ImGui.BeginDisabled(not slot2_owned)
                     if ImGui.Button(("To %s"):format(bb.slot2.name)) then
@@ -551,7 +558,7 @@ function yrv2UI()
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, translateLabel("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
                     ImGui.BeginDisabled(not slot3_owned)
                     if ImGui.Button(("To %s"):format(bb.slot3.name)) then
                         script.run_in_fiber(function()
@@ -564,7 +571,7 @@ function yrv2UI()
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, translateLabel("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
                     ImGui.SameLine()
                     ImGui.BeginDisabled(not slot4_owned)
                     if ImGui.Button(("To %s"):format(bb.slot4.name)) then
@@ -578,7 +585,7 @@ function yrv2UI()
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, translateLabel("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
                     ImGui.SameLine()
                     ImGui.BeginDisabled(not acidOwned)
                     if ImGui.Button("To The Freak Shop") then
@@ -593,7 +600,7 @@ function yrv2UI()
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, translateLabel("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
                 end
                 ImGui.EndTabItem()
             end
@@ -783,7 +790,7 @@ function yrv2UI()
 
                 if ncOwned or acOwned or agOwned or chOwned or boOwned or syOwned or hdOwned then
                     if Game.Self.isOutside() then
-                        ImGui.Dummy(1, 10); UI.coloredText(translateLabel("QUICK_TP_WARN2_"), "#FFA134", 1, 40)
+                        ImGui.Dummy(1, 10); UI.coloredText(_T("QUICK_TP_WARN2_"), "#FFA134", 1, 40)
                     end
                 end
                 ImGui.EndTabItem()
@@ -1022,6 +1029,6 @@ function yrv2UI()
             ImGui.Dummy(1, 5); ImGui.SameLine(); ImGui.Text("Outdated.")
         end
     else
-        ImGui.Dummy(1, 5); ImGui.Text(translateLabel("GENERIC_UNAVAILABLE_SP_"))
+        ImGui.Dummy(1, 5); ImGui.Text(_T("GENERIC_UNAVAILABLE_SP_"))
     end
 end

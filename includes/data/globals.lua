@@ -1,10 +1,10 @@
 ---@diagnostic disable
 
-SCRIPT_NAME                           = "samurais_scripts"
-SCRIPT_VERSION                        = "1.6.0"
-TARGET_BUILD                          = "3442"
-TARGET_VERSION                        = "1.70"
-DEFAULT_CONFIG                        = {
+SCRIPT_NAME    = "samurais_scripts"
+SCRIPT_VERSION = "1.6.1"
+TARGET_BUILD   = "3442"
+TARGET_VERSION = "1.70"
+DEFAULT_CONFIG = {
     shortcut_anim           = {},
     saved_vehicles          = {},
     persist_attachments     = {},
@@ -685,8 +685,22 @@ selfAttachments                       = {
 }
 
 
+KeyManager = require("includes.classes.hotkeys")
+YimToast   = require("includes.lib.YimToast")
+CFG        = require("includes.lib.YimConfig"):New(
+    SCRIPT_NAME,
+    DEFAULT_CONFIG,
+    true,
+    4
+)
 
-KeyManager = require("classes.hotkeys")
-YimToast   = require("lib.YimToast")
-YimConfig  = require("lib.YimConfig")
-CFG        = YimConfig:New(SCRIPT_NAME, DEFAULT_CONFIG, true, 4)
+local _init_G = coroutine.create(function()
+    for key, _ in pairs(DEFAULT_CONFIG) do
+        _G[key] = CFG:ReadItem(key)
+        coroutine.yield()
+    end
+end)
+
+while coroutine.status(_init_G) ~= "dead" do
+    coroutine.resume(_init_G)
+end

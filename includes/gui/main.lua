@@ -1,5 +1,6 @@
 ---@diagnostic disable: undefined-global, lowercase-global
 
+
 function mainUI()
     local date_str = os.date("\10    %d-%b-%Y    \10         %H:%M\10\10")
     ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();

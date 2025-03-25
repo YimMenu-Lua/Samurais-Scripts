@@ -3,12 +3,12 @@
 function actionsUI()
     ImGui.Dummy(60, 1); ImGui.SameLine()
     ImGui.PushItemWidth(270)
-    actions_search, used = ImGui.InputTextWithHint("##searchBar", translateLabel("GENERIC_SEARCH_HINT_"), actions_search,
+    actions_search, used = ImGui.InputTextWithHint("##searchBar", _T("GENERIC_SEARCH_HINT_"), actions_search,
         32)
     ImGui.PopItemWidth()
     is_typing = ImGui.IsItemActive()
     ImGui.BeginTabBar("Actionz", ImGuiTabBarFlags.None)
-    if ImGui.BeginTabItem(translateLabel("ANIMATIONS_TAB_")) then
+    if ImGui.BeginTabItem(_T("ANIMATIONS_TAB_")) then
         if tab1Sound then
             UI.widgetSound("Nav")
             tab1Sound = false
@@ -35,22 +35,22 @@ function actionsUI()
             CFG:SaveItem("manualFlags", manualFlags)
             UI.widgetSound("Nav2")
         end
-        UI.helpMarker(false, translateLabel("ANIM_FLAGS_DESC_"))
+        UI.helpMarker(false, _T("ANIM_FLAGS_DESC_"))
 
         ImGui.SameLine(); disableProps, used = ImGui.Checkbox("Disable Props", disableProps)
         if used then
             CFG:SaveItem("disableProps", disableProps)
             UI.widgetSound("Nav2")
         end
-        UI.helpMarker(false, translateLabel("ANIM_PROPS_DESC_"))
+        UI.helpMarker(false, _T("ANIM_PROPS_DESC_"))
 
         if manualFlags then
-            controllable, controlUsed = ImGui.Checkbox(translateLabel("ANIM_CONTROL_CB_"), controllable)
+            controllable, controlUsed = ImGui.Checkbox(_T("ANIM_CONTROL_CB_"), controllable)
             if controlUsed then
                 CFG:SaveItem("controllable", controllable)
                 UI.widgetSound("Nav2")
             end
-            UI.helpMarker(false, translateLabel("ANIM_CONTROL_DESC_"))
+            UI.helpMarker(false, _T("ANIM_CONTROL_DESC_"))
 
             ImGui.SameLine(); ImGui.Dummy(27, 1); ImGui.SameLine()
             looped, loopUsed = ImGui.Checkbox("Loop", looped)
@@ -58,24 +58,24 @@ function actionsUI()
                 CFG:SaveItem("looped", looped)
                 UI.widgetSound("Nav2")
             end
-            UI.helpMarker(false, translateLabel("ANIM_LOOP_DESC_"))
+            UI.helpMarker(false, _T("ANIM_LOOP_DESC_"))
 
-            upperbody, upperbodyUsed = ImGui.Checkbox(translateLabel("ANIM_UPPER_CB_"), upperbody)
+            upperbody, upperbodyUsed = ImGui.Checkbox(_T("ANIM_UPPER_CB_"), upperbody)
             if upperbodyUsed then
                 CFG:SaveItem("upperbody", upperbody)
                 UI.widgetSound("Nav2")
             end
-            UI.helpMarker(false, translateLabel("ANIM_UPPER_DESC_"))
+            UI.helpMarker(false, _T("ANIM_UPPER_DESC_"))
 
             ImGui.SameLine(); ImGui.Dummy(1, 1); ImGui.SameLine()
-            freeze, freezeUsed = ImGui.Checkbox(translateLabel("ANIM_FREEZE_CB_"), freeze)
+            freeze, freezeUsed = ImGui.Checkbox(_T("ANIM_FREEZE_CB_"), freeze)
             if freezeUsed then
                 CFG:SaveItem("freeze", freeze)
                 UI.widgetSound("Nav2")
             end
-            UI.helpMarker(false, translateLabel("ANIM_FREEZE_DESC_"))
+            UI.helpMarker(false, _T("ANIM_FREEZE_DESC_"))
 
-            noCollision, noCollUsed = ImGui.Checkbox(translateLabel("ANIM_NO_COLL_CB_"), noCollision)
+            noCollision, noCollUsed = ImGui.Checkbox(_T("ANIM_NO_COLL_CB_"), noCollision)
             if noCollUsed then
                 CFG:SaveItem("noCollision", noCollision)
                 UI.widgetSound("Nav2")
@@ -83,16 +83,16 @@ function actionsUI()
 
             ImGui.SameLine(); ImGui.Dummy(35, 1); ImGui.SameLine()
             ImGui.BeginDisabled(looped)
-            killOnEnd, koeUsed = ImGui.Checkbox(translateLabel("ANIM_KOE_CB_"), killOnEnd)
+            killOnEnd, koeUsed = ImGui.Checkbox(_T("ANIM_KOE_CB_"), killOnEnd)
             if koeUsed then
                 CFG:SaveItem("killOnEnd", killOnEnd)
                 UI.widgetSound("Nav2")
             end
             ImGui.EndDisabled()
-            UI.helpMarker(false, translateLabel("ANIM_KOE_DESC_"))
+            UI.helpMarker(false, _T("ANIM_KOE_DESC_"))
             ImGui.Separator()
         end
-        if ImGui.Button(string.format("%s##anim", translateLabel("GENERIC_PLAY_BTN_"))) then
+        if ImGui.Button(string.format("%s##anim", _T("GENERIC_PLAY_BTN_"))) then
             if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
                 UI.widgetSound("Select")
                 script.run_in_fiber(function(pa)
@@ -123,7 +123,7 @@ function actionsUI()
         end
         ImGui.SameLine()
         ImGui.BeginDisabled(not is_playing_anim)
-        if ImGui.Button(string.format("%s##anim", translateLabel("GENERIC_STOP_BTN_"))) then
+        if ImGui.Button(string.format("%s##anim", _T("GENERIC_STOP_BTN_"))) then
             if is_playing_anim then
                 UI.widgetSound("Cancel")
                 script.run_in_fiber(function(cu)
@@ -134,7 +134,7 @@ function actionsUI()
                 UI.widgetSound("Error")
             end
         end
-        UI.toolTip(false, translateLabel("ANIM_STOP_DESC_"))
+        UI.toolTip(false, _T("ANIM_STOP_DESC_"))
         ImGui.EndDisabled()
         ImGui.SameLine(); ImGui.Dummy(12, 1); ImGui.SameLine()
         local errCol = {}
@@ -146,7 +146,7 @@ function actionsUI()
             errCol = { 225, 0, 0, 0.5 }
             errSound = true
         end
-        if UI.coloredButton(translateLabel("ANIM_DETACH_BTN_"), { 104, 247, 114 }, { 104, 247, 114 }, errCol, 0.6) then
+        if UI.coloredButton(_T("ANIM_DETACH_BTN_"), { 104, 247, 114 }, { 104, 247, 114 }, errCol, 0.6) then
             if not errSound then
                 UI.widgetSound("Cancel")
             else
@@ -206,16 +206,16 @@ function actionsUI()
                 end
             end)
         end
-        UI.toolTip(false, translateLabel("ANIM_DETACH_DESC_"))
+        UI.toolTip(false, _T("ANIM_DETACH_DESC_"))
         if info ~= nil then
             if shortcut_anim.name ~= info.name then
-                if ImGui.Button(translateLabel("ANIM_HOTKEY_BTN_")) then
+                if ImGui.Button(_T("ANIM_HOTKEY_BTN_")) then
                     chosen_anim        = info
                     is_setting_hotkeys = true
                     UI.widgetSound("Select2")
                     ImGui.OpenPopup("Set Shortcut")
                 end
-                UI.toolTip(false, translateLabel("ANIM_HOTKEY_DESC_"))
+                UI.toolTip(false, _T("ANIM_HOTKEY_DESC_"))
                 ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
                 ImGui.SetNextWindowBgAlpha(0.9)
                 if ImGui.BeginPopupModal("Set Shortcut", true, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
@@ -225,7 +225,7 @@ function actionsUI()
                     ImGui.Dummy(1, 10)
                     if btn_name == nil then
                         start_loading_anim = true
-                        UI.coloredText(string.format("%s %s", translateLabel("INPUT_WAIT_TXT_"), loading_label),
+                        UI.coloredText(string.format("%s %s", _T("INPUT_WAIT_TXT_"), loading_label),
                             "#FFFFFF", 0.75, 20)
                         is_pressed, btn, btn_name = SS.isAnyKeyPressed()
                     else
@@ -241,17 +241,17 @@ function actionsUI()
                         if not _reserved then
                             ImGui.Text("Shortcut Button: "); ImGui.SameLine(); ImGui.Text(btn_name)
                         else
-                            UI.coloredText(translateLabel("HOTKEY_RESERVED_"), "red", 0.86, 20)
+                            UI.coloredText(_T("HOTKEY_RESERVED_"), "red", 0.86, 20)
                         end
                         ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
-                        if UI.coloredButton(string.format("%s##shortcut", translateLabel("GENERIC_CLEAR_BTN_")), "#FFDB58", "#FFFAA0", "#FFFFF0", 0.7) then
+                        if UI.coloredButton(string.format("%s##shortcut", _T("GENERIC_CLEAR_BTN_")), "#FFDB58", "#FFFAA0", "#FFFFF0", 0.7) then
                             UI.widgetSound("Error")
                             btn, btn_name = nil, nil
                         end
                     end
                     ImGui.Dummy(1, 10)
                     if not _reserved and btn ~= nil then
-                        if ImGui.Button(string.format("%s##shortcut", translateLabel("GENERIC_CONFIRM_BTN_"))) then
+                        if ImGui.Button(string.format("%s##shortcut", _T("GENERIC_CONFIRM_BTN_"))) then
                             UI.widgetSound("Select")
                             if manualFlags then
                                 anim_flag = setAnimFlags()
@@ -262,15 +262,15 @@ function actionsUI()
                             shortcut_anim.btn = btn
                             CFG:SaveItem("shortcut_anim", shortcut_anim)
                             YimToast:ShowSuccess("Samurais Scripts",
-                                string.format("%s %s %s", translateLabel("HOTKEY_SUCCESS1_"), btn_name,
-                                    translateLabel("HOTKEY_SUCCESS2_")))
+                                string.format("%s %s %s", _T("HOTKEY_SUCCESS1_"), btn_name,
+                                    _T("HOTKEY_SUCCESS2_")))
                             btn, btn_name      = nil, nil
                             is_setting_hotkeys = false
                             ImGui.CloseCurrentPopup()
                         end
                         ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
                     end
-                    if ImGui.Button(string.format("%s##shortcut", translateLabel("GENERIC_CANCEL_BTN_"))) then
+                    if ImGui.Button(string.format("%s##shortcut", _T("GENERIC_CANCEL_BTN_"))) then
                         UI.widgetSound("Cancel")
                         btn, btn_name      = nil, nil
                         start_loading_anim = false
@@ -280,13 +280,13 @@ function actionsUI()
                     ImGui.End()
                 end
             else
-                if ImGui.Button(translateLabel("ANIM_HOTKEY_DEL_")) then
+                if ImGui.Button(_T("ANIM_HOTKEY_DEL_")) then
                     UI.widgetSound("Delete")
                     shortcut_anim = {}
                     CFG:SaveItem("shortcut_anim", {})
                     YimToast:ShowSuccess("Samurais Scripts", "Animation shortcut has been reset.")
                 end
-                UI.toolTip(false, translateLabel("DEL_HOTKEY_DESC_"))
+                UI.toolTip(false, _T("DEL_HOTKEY_DESC_"))
             end
             ImGui.SameLine(); ImGui.Dummy(4, 1); ImGui.SameLine()
             if favorite_actions[1] ~= nil then
@@ -304,13 +304,13 @@ function actionsUI()
                 end
             end
             if not fav_exists then
-                if ImGui.Button(string.format("%s##anims", translateLabel("ADD_TO_FAVS_"))) then
+                if ImGui.Button(string.format("%s##anims", _T("ADD_TO_FAVS_"))) then
                     UI.widgetSound("Select")
                     table.insert(favorite_actions, info)
                     CFG:SaveItem("favorite_actions", favorite_actions)
                 end
             else
-                if ImGui.Button(translateLabel("REMOVE_FROM_FAVS_")) then
+                if ImGui.Button(_T("REMOVE_FROM_FAVS_")) then
                     UI.widgetSound("Delete")
                     for k, v in ipairs(favorite_actions) do
                         if v == info then
@@ -321,7 +321,7 @@ function actionsUI()
                 end
             end
         end
-        ImGui.Spacing(); ImGui.SeparatorText(translateLabel("MVMT_OPTIONS_TXT_")); ImGui.Spacing()
+        ImGui.Spacing(); ImGui.SeparatorText(_T("MVMT_OPTIONS_TXT_")); ImGui.Spacing()
         jsonMvmt, jsonMvmtUsed = ImGui.Checkbox("Read From Json", jsonMvmt)
         UI.setClipBoard(
             "https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json",
@@ -346,13 +346,13 @@ function actionsUI()
             UI.widgetSound("Nav")
         end
         ImGui.BeginDisabled(currentMvmt == "")
-        if ImGui.Button(translateLabel("GENERIC_RESET_BTN_")) then
+        if ImGui.Button(_T("GENERIC_RESET_BTN_")) then
             UI.widgetSound("Cancel")
             mvmt_index = 0
             SS.resetMovement()
         end
         ImGui.EndDisabled()
-        ImGui.Spacing(); ImGui.SeparatorText(translateLabel("NPC_ANIMS_TXT_"))
+        ImGui.Spacing(); ImGui.SeparatorText(_T("NPC_ANIMS_TXT_"))
         ImGui.PushItemWidth(220)
         displayNpcs()
         ImGui.PopItemWidth()
@@ -374,8 +374,8 @@ function actionsUI()
                 end)
             end
         end
-        UI.toolTip(false, translateLabel("NPC_GODMODE_DESC_"))
-        if ImGui.Button(string.format("%s##anims_npc", translateLabel("GENERIC_SPAWN_BTN_"))) then
+        UI.toolTip(false, _T("NPC_GODMODE_DESC_"))
+        if ImGui.Button(string.format("%s##anims_npc", _T("GENERIC_SPAWN_BTN_"))) then
             UI.widgetSound("Select")
             script.run_in_fiber(function()
                 local npcData     = filteredNpcs[npc_index + 1]
@@ -437,7 +437,7 @@ function actionsUI()
             end)
         end
         ImGui.SameLine()
-        if ImGui.Button(string.format("%s##anim_npc", translateLabel("GENERIC_DELETE_BTN_"))) then
+        if ImGui.Button(string.format("%s##anim_npc", _T("GENERIC_DELETE_BTN_"))) then
             UI.widgetSound("Delete")
             script.run_in_fiber(function(cu)
                 cleanupNPC(cu)
@@ -451,7 +451,7 @@ function actionsUI()
             end)
         end
         ImGui.SameLine()
-        if ImGui.Button(string.format("%s##anim_npc", translateLabel("GENERIC_PLAY_BTN_"))) then
+        if ImGui.Button(string.format("%s##anim_npc", _T("GENERIC_PLAY_BTN_"))) then
             if spawned_npcs[1] ~= nil then
                 UI.widgetSound("Select")
                 script.run_in_fiber(function(npca)
@@ -482,21 +482,21 @@ function actionsUI()
             end
         end
         ImGui.SameLine()
-        if ImGui.Button(string.format("%s##npc_anim", translateLabel("GENERIC_STOP_BTN_"))) then
+        if ImGui.Button(string.format("%s##npc_anim", _T("GENERIC_STOP_BTN_"))) then
             UI.widgetSound("Cancel")
             script.run_in_fiber(function(npca)
                 cleanupNPC(npca)
             end)
         end
         usePlayKey, upkUsed = ImGui.Checkbox("Enable Animation Hotkeys", usePlayKey)
-        UI.toolTip(false, translateLabel("ANIM_HOTKEYS_DESC_"))
+        UI.toolTip(false, _T("ANIM_HOTKEYS_DESC_"))
         if upkUsed then
             CFG:SaveItem("usePlayKey", usePlayKey)
             UI.widgetSound("Nav2")
         end
         ImGui.EndTabItem()
     end
-    if ImGui.BeginTabItem(translateLabel("SCENARIOS_TAB_")) then
+    if ImGui.BeginTabItem(_T("SCENARIOS_TAB_")) then
         if tab2Sound then
             UI.widgetSound("Nav")
             tab2Sound = false
@@ -511,7 +511,7 @@ function actionsUI()
             data = filteredScenarios[scenario_index + 1]
         end
         ImGui.Separator()
-        if ImGui.Button(string.format("%s##scenarios", translateLabel("GENERIC_PLAY_BTN_"))) then
+        if ImGui.Button(string.format("%s##scenarios", _T("GENERIC_PLAY_BTN_"))) then
             if not ped_grabbed and not vehicle_grabbed and not is_hiding then
                 UI.widgetSound("Select")
                 script.run_in_fiber(function(psc)
@@ -532,7 +532,7 @@ function actionsUI()
             end
         end
         ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine()
-        if ImGui.Button(string.format("%s##scenarios", translateLabel("GENERIC_STOP_BTN_"))) then
+        if ImGui.Button(string.format("%s##scenarios", _T("GENERIC_STOP_BTN_"))) then
             if is_playing_scenario then
                 UI.widgetSound("Cancel")
                 script.run_in_fiber(function(stp)
@@ -542,7 +542,7 @@ function actionsUI()
                 UI.widgetSound("Error")
             end
         end
-        UI.toolTip(false, translateLabel("SCN_STOP_DESC_"))
+        UI.toolTip(false, _T("SCN_STOP_DESC_"))
         ImGui.Spacing()
         if favorite_actions[1] ~= nil and filteredScenarios[1] ~= nil then
             for _, v in ipairs(favorite_actions) do
@@ -559,13 +559,13 @@ function actionsUI()
             end
         end
         if not fav_exists then
-            if ImGui.Button(string.format("%s##favs", translateLabel("ADD_TO_FAVS_"))) then
+            if ImGui.Button(string.format("%s##favs", _T("ADD_TO_FAVS_"))) then
                 UI.widgetSound("Select")
                 table.insert(favorite_actions, data)
                 CFG:SaveItem("favorite_actions", favorite_actions)
             end
         else
-            if ImGui.Button(string.format("%s##favs", translateLabel("REMOVE_FROM_FAVS_"))) then
+            if ImGui.Button(string.format("%s##favs", _T("REMOVE_FROM_FAVS_"))) then
                 UI.widgetSound("Delete")
                 for k, v in ipairs(favorite_actions) do
                     if v == data then
@@ -575,7 +575,7 @@ function actionsUI()
                 CFG:SaveItem("favorite_actions", favorite_actions)
             end
         end
-        ImGui.Spacing(); ImGui.SeparatorText(translateLabel("NPC_SCENARIOS_"))
+        ImGui.Spacing(); ImGui.SeparatorText(_T("NPC_SCENARIOS_"))
         ImGui.PushItemWidth(220)
         displayNpcs()
         ImGui.PopItemWidth()
@@ -594,9 +594,9 @@ function actionsUI()
                 end)
             end
         end
-        UI.toolTip(false, translateLabel("NPC_GODMODE_DESC_"))
+        UI.toolTip(false, _T("NPC_GODMODE_DESC_"))
         local npcData = filteredNpcs[npc_index + 1]
-        if ImGui.Button(string.format("%s##scenario_npc", translateLabel("GENERIC_SPAWN_BTN_"))) then
+        if ImGui.Button(string.format("%s##scenario_npc", _T("GENERIC_SPAWN_BTN_"))) then
             UI.widgetSound("Select")
             script.run_in_fiber(function()
                 local pedCoords = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
@@ -660,7 +660,7 @@ function actionsUI()
             end)
         end
         ImGui.SameLine()
-        if ImGui.Button(string.format("%s##scenarios", translateLabel("GENERIC_DELETE_BTN_"))) then
+        if ImGui.Button(string.format("%s##scenarios", _T("GENERIC_DELETE_BTN_"))) then
             UI.widgetSound("Delete")
             script.run_in_fiber(function()
                 for k, v in ipairs(spawned_npcs) do
@@ -673,7 +673,7 @@ function actionsUI()
             end)
         end
         ImGui.SameLine()
-        if ImGui.Button(string.format("%s##npc_scenarios", translateLabel("GENERIC_PLAY_BTN_"))) then
+        if ImGui.Button(string.format("%s##npc_scenarios", _T("GENERIC_PLAY_BTN_"))) then
             if spawned_npcs[1] ~= nil then
                 UI.widgetSound("Select")
                 script.run_in_fiber(function(npcsc)
@@ -695,7 +695,7 @@ function actionsUI()
             end
         end
         ImGui.SameLine()
-        if ImGui.Button(string.format("%s##npc_scenarios", translateLabel("GENERIC_STOP_BTN_"))) then
+        if ImGui.Button(string.format("%s##npc_scenarios", _T("GENERIC_STOP_BTN_"))) then
             if is_playing_scenario then
                 UI.widgetSound("Cancel")
                 script.run_in_fiber(function(stp)
@@ -708,7 +708,7 @@ function actionsUI()
         end
         ImGui.EndTabItem()
     end
-    if ImGui.BeginTabItem(translateLabel("FAVORITES_TAB_")) then
+    if ImGui.BeginTabItem(_T("FAVORITES_TAB_")) then
         if tab3Sound then
             UI.widgetSound("Nav")
             tab3Sound = false
@@ -722,7 +722,7 @@ function actionsUI()
             ImGui.PopItemWidth()
             local selected_favorite = filteredFavs[fav_actions_index + 1]
             ImGui.Spacing()
-            if ImGui.Button(string.format("%s##favs", translateLabel("GENERIC_PLAY_BTN_"))) then
+            if ImGui.Button(string.format("%s##favs", _T("GENERIC_PLAY_BTN_"))) then
                 if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
                     if selected_favorite.dict then -- anim type
                         if selected_favorite.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
@@ -762,7 +762,7 @@ function actionsUI()
                 end
             end
             ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine()
-            if ImGui.Button(string.format("%s##favs", translateLabel("GENERIC_STOP_BTN_"))) then
+            if ImGui.Button(string.format("%s##favs", _T("GENERIC_STOP_BTN_"))) then
                 UI.widgetSound("Cancel")
                 script.run_in_fiber(function(fav)
                     if is_playing_anim then
@@ -775,7 +775,7 @@ function actionsUI()
                 end)
             end
             ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine()
-            if UI.coloredButton(string.format("%s##favs", translateLabel("REMOVE_FROM_FAVS_")), "#FF0000", "#B30000", "#FF8080", 1) then
+            if UI.coloredButton(string.format("%s##favs", _T("REMOVE_FROM_FAVS_")), "#FF0000", "#B30000", "#FF8080", 1) then
                 UI.widgetSound("Delete")
                 for k, v in ipairs(favorite_actions) do
                     if v == selected_favorite then
@@ -786,11 +786,11 @@ function actionsUI()
             end
         else
             ImGui.Dummy(1, 5)
-            UI.wrappedText(translateLabel("FAVS_NIL_TXT_"), 20)
+            UI.wrappedText(_T("FAVS_NIL_TXT_"), 20)
         end
         ImGui.EndTabItem()
     end
-    if ImGui.BeginTabItem(translateLabel("RECENTS_TAB_")) then
+    if ImGui.BeginTabItem(_T("RECENTS_TAB_")) then
         if tab4Sound then
             UI.widgetSound("Nav")
             tab4Sound = false
@@ -803,7 +803,7 @@ function actionsUI()
             displayRecentlyPlayed()
             ImGui.PopItemWidth()
             local selected_recent = filteredRecents[recents_index + 1]
-            if ImGui.Button(string.format("%s##recents", translateLabel("GENERIC_PLAY_BTN_"))) then
+            if ImGui.Button(string.format("%s##recents", _T("GENERIC_PLAY_BTN_"))) then
                 if not ped_grabbed and not vehicle_grabbed and not is_hiding and not is_sitting then
                     if selected_recent.dict ~= nil then -- animation type
                         if selected_recent.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
@@ -841,7 +841,7 @@ function actionsUI()
                 end
             end
             ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine()
-            if ImGui.Button(string.format("%s##recents", translateLabel("GENERIC_STOP_BTN_"))) then
+            if ImGui.Button(string.format("%s##recents", _T("GENERIC_STOP_BTN_"))) then
                 UI.widgetSound("Cancel")
                 script.run_in_fiber(function(recent)
                     if is_playing_anim then
@@ -854,7 +854,7 @@ function actionsUI()
                 end)
             end
         else
-            ImGui.Dummy(1, 5); UI.wrappedText(translateLabel("RECENTS_NIL_TXT_"), 20)
+            ImGui.Dummy(1, 5); UI.wrappedText(_T("RECENTS_NIL_TXT_"), 20)
         end
         ImGui.EndTabItem()
     end

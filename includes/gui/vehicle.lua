@@ -10,8 +10,8 @@ function vehicleUI()
     else
         ImGui.SeparatorText("On Foot")
     end
-    ImGui.Spacing(); limitVehOptions, lvoUsed = ImGui.Checkbox(translateLabel("LIMIT_OPTIONS_CB_"), limitVehOptions)
-    UI.toolTip(false, translateLabel("LIMIT_OPTIONS_DESC_"))
+    ImGui.Spacing(); limitVehOptions, lvoUsed = ImGui.Checkbox(_T("LIMIT_OPTIONS_CB_"), limitVehOptions)
+    UI.toolTip(false, _T("LIMIT_OPTIONS_DESC_"))
     if lvoUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("limitVehOptions", limitVehOptions)
@@ -19,27 +19,27 @@ function vehicleUI()
 
     ImGui.SameLine(); ImGui.Dummy(7, 1); ImGui.SameLine();
     missiledefense, mdefUsed = ImGui.Checkbox("Missile Defence", missiledefense)
-    UI.toolTip(false, translateLabel("MISSILE_DEF_DESC_"))
+    UI.toolTip(false, _T("MISSILE_DEF_DESC_"))
     if mdefUsed then
         CFG:SaveItem("missiledefense", missiledefense)
         if missiledefense then
             UI.widgetSound("Radar")
-            YimToast:ShowSuccess("Samurais Scripts", translateLabel("MISSILE_DEF_ON_"))
+            YimToast:ShowSuccess("Samurais Scripts", _T("MISSILE_DEF_ON_"))
         else
             UI.widgetSound("Delete")
-            YimToast:ShowMessage("Samurais Scripts", translateLabel("MISSILE_DEF_OFF_"))
+            YimToast:ShowMessage("Samurais Scripts", _T("MISSILE_DEF_OFF_"))
         end
     end
 
     launchCtrl, lctrlUsed = ImGui.Checkbox("Launch Control", launchCtrl)
-    UI.toolTip(false, translateLabel("LAUNCH_CTRL_DESC_"))
+    UI.toolTip(false, _T("LAUNCH_CTRL_DESC_"))
     if lctrlUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("launchCtrl", launchCtrl)
     end
 
     ImGui.SameLine(); ImGui.Dummy(31, 1); ImGui.SameLine(); speedBoost, spdbstUsed = ImGui.Checkbox("NOS", speedBoost)
-    UI.toolTip(false, translateLabel("NOS_DESC_"))
+    UI.toolTip(false, _T("NOS_DESC_"))
     if spdbstUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("speedBoost", speedBoost)
@@ -79,7 +79,7 @@ function vehicleUI()
             end
 
             ImGui.SameLine(); nosvfx, nosvfxUsed = ImGui.Checkbox("Screen Effect", nosvfx)
-            UI.toolTip(false, translateLabel("NOS_VFX_DESC_"))
+            UI.toolTip(false, _T("NOS_VFX_DESC_"))
             if nosvfxUsed then
                 UI.widgetSound("Nav2")
                 CFG:SaveItem("nosvfx", nosvfx)
@@ -92,14 +92,14 @@ function vehicleUI()
                 UI.widgetSound("Nav")
             end
             ImGui.Dummy(1, 20)
-            if ImGui.Button(string.format(" %s ##nos_settings", translateLabel("GENERIC_SAVE_BTN_"))) then
+            if ImGui.Button(string.format(" %s ##nos_settings", _T("GENERIC_SAVE_BTN_"))) then
                 UI.widgetSound("Select")
                 CFG:SaveItem("nosPower", nosPower)
                 ImGui.CloseCurrentPopup()
                 is_typing = false
             end
             ImGui.SameLine(); ImGui.Dummy(30, 1); ImGui.SameLine()
-            if ImGui.Button(string.format(" %s ##nos_settings", translateLabel("GENERIC_CANCEL_BTN_"))) then
+            if ImGui.Button(string.format(" %s ##nos_settings", _T("GENERIC_CANCEL_BTN_"))) then
                 UI.widgetSound("Cancel")
                 ImGui.CloseCurrentPopup()
                 is_typing = false
@@ -109,7 +109,7 @@ function vehicleUI()
     end
 
     loud_radio, loudRadioUsed = ImGui.Checkbox("Big Subwoofer", loud_radio)
-    UI.toolTip(false, translateLabel("LOUD_RADIO_DESC_"))
+    UI.toolTip(false, _T("LOUD_RADIO_DESC_"))
     if loudRadioUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("loud_radio", loud_radio)
@@ -122,14 +122,14 @@ function vehicleUI()
     end
 
     ImGui.SameLine(); ImGui.Dummy(32, 1); ImGui.SameLine(); nosPurge, nosPurgeUsed = ImGui.Checkbox("NOS Purge", nosPurge)
-    UI.toolTip(false, translateLabel("NOS_PURGE_DESC_"))
+    UI.toolTip(false, _T("NOS_PURGE_DESC_"))
     if nosPurgeUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("nosPurge", nosPurge)
     end
 
     popsNbangs, pnbUsed = ImGui.Checkbox("Pops & Bangs", popsNbangs)
-    UI.toolTip(false, translateLabel("POPSNBANGS_DESC_"))
+    UI.toolTip(false, _T("POPSNBANGS_DESC_"))
     if pnbUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("popsNbangs", popsNbangs)
@@ -138,7 +138,7 @@ function vehicleUI()
         ImGui.SameLine(); ImGui.Dummy(37, 1); ImGui.SameLine(); louderPops, louderPopsUsed = ImGui.Checkbox(
             "Louder Pops",
             louderPops)
-        UI.toolTip(false, translateLabel("LOUDER_POPS_DESC_"))
+        UI.toolTip(false, _T("LOUDER_POPS_DESC_"))
         if louderPopsUsed then
             UI.widgetSound("Nav2")
             CFG:SaveItem("louderPops", louderPops)
@@ -146,21 +146,21 @@ function vehicleUI()
     end
 
     hornLight, hornLightUsed = ImGui.Checkbox("High Beams on Horn", hornLight)
-    UI.toolTip(false, translateLabel("HIGH_BEAMS_DESC_"))
+    UI.toolTip(false, _T("HIGH_BEAMS_DESC_"))
     if hornLightUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("hornLight", hornLight)
     end
 
     ImGui.SameLine(); autobrklight, autobrkUsed = ImGui.Checkbox("Auto Brake Lights", autobrklight)
-    UI.toolTip(false, translateLabel("BRAKE_LIGHT_DESC_"))
+    UI.toolTip(false, _T("BRAKE_LIGHT_DESC_"))
     if autobrkUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("autobrklight", autobrklight)
     end
 
     holdF, holdFused = ImGui.Checkbox("Keep Engine On", holdF)
-    UI.toolTip(false, translateLabel("IV_STYLE_EXIT_DESC_"))
+    UI.toolTip(false, _T("IV_STYLE_EXIT_DESC_"))
     if holdFused then
         UI.widgetSound("Nav2")
         CFG:SaveItem("holdF", holdF)
@@ -168,7 +168,7 @@ function vehicleUI()
 
     ImGui.SameLine(); ImGui.Dummy(25, 1); ImGui.SameLine(); keepWheelsTurned, kwtrnd = ImGui.Checkbox(
         "Keep Wheels Turned", keepWheelsTurned)
-    UI.toolTip(false, translateLabel("KEEP_WHEELS_TURNED_DESC_"))
+    UI.toolTip(false, _T("KEEP_WHEELS_TURNED_DESC_"))
     if kwtrnd then
         UI.widgetSound("Nav2")
         CFG:SaveItem("keepWheelsTurned", keepWheelsTurned)
@@ -176,7 +176,7 @@ function vehicleUI()
 
     noJacking, noJackingUsed = ImGui.Checkbox(
         "Can't Touch This!", noJacking)
-    UI.toolTip(false, translateLabel("CANT_TOUCH_THIS_DESC_"))
+    UI.toolTip(false, _T("CANT_TOUCH_THIS_DESC_"))
     if noJackingUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("noJacking", noJacking)
@@ -188,10 +188,10 @@ function vehicleUI()
         UI.widgetSound("Nav2")
         CFG:SaveItem("insta180", insta180)
     end
-    UI.toolTip(false, translateLabel("INSTA_180_DESC_"))
+    UI.toolTip(false, _T("INSTA_180_DESC_"))
 
     unbreakableWindows, ubwUsed = ImGui.Checkbox("Strong Windows", unbreakableWindows)
-    UI.toolTip(false, translateLabel("STRONG_WINDOWS_DESC_"))
+    UI.toolTip(false, _T("STRONG_WINDOWS_DESC_"))
     if ubwUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("unbreakableWindows", unbreakableWindows)
@@ -213,10 +213,10 @@ function vehicleUI()
         UI.widgetSound("Nav2")
         CFG:SaveItem("veh_mines", veh_mines)
     end
-    UI.toolTip(false, translateLabel("VEHICLE_MINES_DESC_"))
+    UI.toolTip(false, _T("VEHICLE_MINES_DESC_"))
     if veh_mines then
         ImGui.SameLine(); ImGui.Dummy(35, 1); ImGui.SameLine();
-        if ImGui.Button(translateLabel("MINES_TYPE_BTN_")) then
+        if ImGui.Button(_T("MINES_TYPE_BTN_")) then
             UI.widgetSound("Select")
             ImGui.OpenPopup("Mine Types")
         end
@@ -224,7 +224,7 @@ function vehicleUI()
         ImGui.SetNextWindowBgAlpha(0.81)
         if ImGui.BeginPopupModal("Mine Types", true, ImGuiWindowFlags.AlwaysAutoResize) then
             is_typing = true
-            ImGui.Dummy(1, 5); ImGui.Text(translateLabel("MINES_TYPE_DESC_")); ImGui.Dummy(1, 5)
+            ImGui.Dummy(1, 5); ImGui.Text(_T("MINES_TYPE_DESC_")); ImGui.Dummy(1, 5)
             vmine_type.spikes, spikeUsed = ImGui.Checkbox("Spike", vmine_type.spikes)
             if spikeUsed then
                 UI.widgetSound("Nav2")
@@ -281,7 +281,7 @@ function vehicleUI()
 
             ImGui.Dummy(1, 5)
             if missiledefense and (vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic) then
-                UI.coloredText(translateLabel("VEH_MINES_MDEF_WARN_"), "yellow", 0.69, 30)
+                UI.coloredText(_T("VEH_MINES_MDEF_WARN_"), "yellow", 0.69, 30)
             end
             ImGui.Dummy(1, 5)
             if vmine_type.spikes or vmine_type.slick or vmine_type.explosive or vmine_type.emp or vmine_type.kinetic then
@@ -296,7 +296,7 @@ function vehicleUI()
         end
     end
 
-    rgbLights, rgbToggled = ImGui.Checkbox(translateLabel("RGB_LIGHTS_DESC_"), rgbLights)
+    rgbLights, rgbToggled = ImGui.Checkbox(_T("RGB_LIGHTS_DESC_"), rgbLights)
     if rgbToggled then
         UI.widgetSound("Nav2")
         CFG:SaveItem("rgbLights", rgbLights)
@@ -318,7 +318,7 @@ function vehicleUI()
     if rgbLights then
         ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
         ImGui.PushItemWidth(150)
-        lightSpeed, lightSpeedUsed = ImGui.SliderInt(translateLabel("RGB_SPEED_TXT_"), lightSpeed, 1, 3)
+        lightSpeed, lightSpeedUsed = ImGui.SliderInt(_T("RGB_SPEED_TXT_"), lightSpeed, 1, 3)
         ImGui.PopItemWidth()
         if lightSpeedUsed then
             UI.widgetSound("Nav")
@@ -327,7 +327,7 @@ function vehicleUI()
     end
 
     abs_lights, abslUsed = ImGui.Checkbox("ABS Brake Lights", abs_lights)
-    UI.toolTip(false, translateLabel("ABS_LIGHTS_DESC_"))
+    UI.toolTip(false, _T("ABS_LIGHTS_DESC_"))
     if abslUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("abs_lights", abs_lights)
@@ -335,7 +335,7 @@ function vehicleUI()
 
     ImGui.SameLine(); ImGui.Dummy(13, 1); ImGui.SameLine()
     fender_bender, fbenderUsed = ImGui.Checkbox("Better Car Crashes", fender_bender)
-    UI.toolTip(false, translateLabel("FENDER_BENDER_DESC_"))
+    UI.toolTip(false, _T("FENDER_BENDER_DESC_"))
     if fbenderUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("fender_bender", fender_bender)
@@ -344,7 +344,7 @@ function vehicleUI()
     ImGui.Spacing(); ImGui.SeparatorText("Planes & Helicopters")
     if Game.isOnline() then
         flares_forall, flaresUsed = ImGui.Checkbox("Flares For All", flares_forall)
-        UI.toolTip(false, translateLabel("FLARES_FOR_ALL_DESC_"))
+        UI.toolTip(false, _T("FLARES_FOR_ALL_DESC_"))
         if flaresUsed then
             UI.widgetSound("Nav2")
             CFG:SaveItem("flares_forall", flares_forall)
@@ -353,20 +353,20 @@ function vehicleUI()
         ImGui.BeginDisabled()
         flares_forall, _ = ImGui.Checkbox("Flares For All", flares_forall)
         ImGui.EndDisabled()
-        UI.toolTip(true, translateLabel("GENERIC_UNAVAILABLE_SP_"), '#FF3333', 1)
+        UI.toolTip(true, _T("GENERIC_UNAVAILABLE_SP_"), '#FF3333', 1)
     end
 
     ImGui.SameLine(); ImGui.Dummy(46, 1); ImGui.SameLine(); real_plane_speed, rpsUsed = ImGui.Checkbox(
         "Higher Jet Speed", real_plane_speed
     )
-    UI.toolTip(false, translateLabel("PLANE_SPEED_DESC_"))
+    UI.toolTip(false, _T("PLANE_SPEED_DESC_"))
     if rpsUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("real_plane_speed", real_plane_speed)
     end
 
     no_stall, nostallUsed = ImGui.Checkbox("No Engine Stalling", no_stall)
-    UI.toolTip(false, translateLabel("NO_ENGINE_STALL_DESC_"))
+    UI.toolTip(false, _T("NO_ENGINE_STALL_DESC_"))
     if nostallUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("no_stall", no_stall)
@@ -374,7 +374,7 @@ function vehicleUI()
 
     ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); cannon_triggerbot, cantrgrUsed = ImGui.Checkbox(
     "Cannon Triggerbot", cannon_triggerbot)
-    UI.toolTip(false, translateLabel("CANNON_TRIGGERBOT_DESC_"))
+    UI.toolTip(false, _T("CANNON_TRIGGERBOT_DESC_"))
     if cantrgrUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("cannon_triggerbot", cannon_triggerbot)
@@ -391,7 +391,7 @@ function vehicleUI()
         ImGui.SetNextWindowSize(420, 220)
         if ImGui.BeginPopupModal("Cannon Options", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
             is_typing = true
-            ImGui.Spacing(); ImGui.Text(translateLabel("CANNON_TRIGGERBOT_OPTIONS_TXT_")); ImGui.SameLine()
+            ImGui.Spacing(); ImGui.Text(_T("CANNON_TRIGGERBOT_OPTIONS_TXT_")); ImGui.SameLine()
             local avail_x, _ = ImGui.GetContentRegionAvail()
             ImGui.Dummy(avail_x - 55, 1)
             ImGui.SameLine()
@@ -402,17 +402,17 @@ function vehicleUI()
                 is_typing = false
             end
             ImGui.PopStyleVar(); ImGui.Separator(); ImGui.Dummy(1, 10)
-            ImGui.Text(translateLabel("CANNON_TRIGGERBOT_RANGE_")); ImGui.SameLine()
+            ImGui.Text(_T("CANNON_TRIGGERBOT_RANGE_")); ImGui.SameLine()
             ImGui.SetNextItemWidth(200)
             cannon_triggerbot_range, ctrUsed = ImGui.SliderInt("##cannon_triggerbot_range", cannon_triggerbot_range, 1000,
                 5000)
-            UI.toolTip(false, translateLabel("CANNON_TRIGGERBOT_RANGE_DESC_"))
+            UI.toolTip(false, _T("CANNON_TRIGGERBOT_RANGE_DESC_"))
             if ctrUsed then
                 UI.widgetSound("Nav")
                 CFG:SaveItem("cannon_triggerbot_range", cannon_triggerbot_range)
             end
             ImGui.Dummy(1, 10)
-            cannon_enemies_only, ceonlyUSed = ImGui.Checkbox(translateLabel("ENEMY_ONLY_CB_"), cannon_enemies_only)
+            cannon_enemies_only, ceonlyUSed = ImGui.Checkbox(_T("ENEMY_ONLY_CB_"), cannon_enemies_only)
             if ceonlyUSed then
                 UI.widgetSound("Nav2")
                 CFG:SaveItem("cannon_enemies_only", cannon_enemies_only)
@@ -422,7 +422,7 @@ function vehicleUI()
     end
 
     cannon_manual_aim, cmaimUsed = ImGui.Checkbox("Cannon Manual Aim", cannon_manual_aim)
-    UI.toolTip(false, translateLabel("CANNON_MANUAL_AIM_DESC_"))
+    UI.toolTip(false, _T("CANNON_MANUAL_AIM_DESC_"))
     if cmaimUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("cannon_manual_aim", cannon_manual_aim)
@@ -439,7 +439,7 @@ function vehicleUI()
 
     if cannon_manual_aim then
         ImGui.SameLine()
-        if ImGui.Button(translateLabel("EDIT_AIM_MARKER_BTN_")) then
+        if ImGui.Button(_T("EDIT_AIM_MARKER_BTN_")) then
             UI.widgetSound("Select")
             ImGui.OpenPopup("Cannon Aim Marker")
         end
@@ -448,8 +448,8 @@ function vehicleUI()
         ImGui.SetNextWindowSize(420, 220)
         if ImGui.BeginPopupModal("Cannon Aim Marker", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
             is_typing = true
-            ImGui.CalcTextSize(translateLabel("EDIT_AIM_MARKER_BTN_"))
-            ImGui.Spacing(); ImGui.Text(translateLabel("EDIT_AIM_MARKER_BTN_")); ImGui.SameLine();
+            ImGui.CalcTextSize(_T("EDIT_AIM_MARKER_BTN_"))
+            ImGui.Spacing(); ImGui.Text(_T("EDIT_AIM_MARKER_BTN_")); ImGui.SameLine();
             local avail_x, _ = ImGui.GetContentRegionAvail()
             ImGui.Dummy(avail_x - 55, 1)
             ImGui.SameLine()
@@ -460,7 +460,7 @@ function vehicleUI()
                 is_typing = false
             end
             ImGui.PopStyleVar(); ImGui.Separator(); ImGui.Dummy(1, 10)
-            ImGui.Text(translateLabel("AIM_MARKER_SIZE_TXT_")); ImGui.SameLine()
+            ImGui.Text(_T("AIM_MARKER_SIZE_TXT_")); ImGui.SameLine()
             ImGui.SetNextItemWidth(220)
             cannon_marker_size, cmsUsed = ImGui.SliderFloat("##cannon_marker_size", cannon_marker_size, 0.1, 10.0)
             if cmsUsed then
@@ -468,7 +468,7 @@ function vehicleUI()
                 CFG:SaveItem("cannon_marker_size", cannon_marker_size)
             end
             ImGui.Dummy(1, 10)
-            ImGui.Text(translateLabel("AIM_MARKER_COL_TXT_")); cannon_marker_color, cmcUsed = ImGui.ColorEdit3(
+            ImGui.Text(_T("AIM_MARKER_COL_TXT_")); cannon_marker_color, cmcUsed = ImGui.ColorEdit3(
             "##markerCol", cannon_marker_color)
             if cmcUsed then
                 UI.widgetSound("Nav2")
@@ -623,7 +623,7 @@ function vehicleUI()
     end
     if autopilot_waypoint or autopilot_objective or autopilot_random then
         ImGui.SameLine()
-        if ImGui.Button(translateLabel("GENERIC_STOP_BTN_")) then
+        if ImGui.Button(_T("GENERIC_STOP_BTN_")) then
             UI.widgetSound("Cancel")
             YimToast:ShowMessage("Samurai's Scripts", "Auto-Pilot canceled.")
             script.run_in_fiber(function()
@@ -639,14 +639,14 @@ function vehicleUI()
 
     ImGui.Dummy(1, 5); ImGui.SeparatorText("MISC")
     ImGui.BeginDisabled(current_vehicle == 0)
-    if ImGui.Button(string.format(" %s ", translateLabel("ENGINE_SOUND_BTN_"))) then
+    if ImGui.Button(string.format(" %s ", _T("ENGINE_SOUND_BTN_"))) then
         if is_car or is_bike or is_quad then
             UI.widgetSound("Select")
             open_sounds_window = true
         else
             open_sounds_window = false
             UI.widgetSound("Error")
-            YimToast:ShowError("Samurais Scripts", translateLabel("ENGINE_SOUND_ERROR_TXT_"))
+            YimToast:ShowError("Samurais Scripts", _T("ENGINE_SOUND_ERROR_TXT_"))
         end
     end
 
@@ -719,19 +719,19 @@ function vehicleUI()
             ::pass::
         end)
     end
-    UI.toolTip(false, translateLabel("EJECTO_SEATO_DESC_"))
+    UI.toolTip(false, _T("EJECTO_SEATO_DESC_"))
 
     if current_vehicle ~= 0 then
         local engineDestroyed = cv_engineHealth <= 300
     end
     if engineDestroyed then
-        engineButton_label = translateLabel("FIX_ENGINE_")
+        engineButton_label = _T("FIX_ENGINE_")
         engine_hp          = 1000
         button_color_1     = "#008000"
         button_color_2     = "#005A00"
         button_color_3     = "#BFFFBF"
     else
-        engineButton_label = translateLabel("DESTROY_ENGINE_")
+        engineButton_label = _T("DESTROY_ENGINE_")
         engine_hp          = -4000
         button_color_1     = "#FF0000"
         button_color_2     = "#B30000"
@@ -875,14 +875,14 @@ function vehicleUI()
     end
     ImGui.SameLine()
     autovehlocks, avlUsed = ImGui.Checkbox("Auto-Lock", autovehlocks)
-    UI.toolTip(false, translateLabel("AUTOVEHLOCKS_DESC_"))
+    UI.toolTip(false, _T("AUTOVEHLOCKS_DESC_"))
     if avlUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("autovehlocks", autovehlocks)
     end
 
     ImGui.SameLine(); autoraiseroof, autoroofUsed = ImGui.Checkbox("Auto-Raise Roof", autoraiseroof)
-    UI.toolTip(false, translateLabel("AUTO_RAISE_ROOF_DESC_"))
+    UI.toolTip(false, _T("AUTO_RAISE_ROOF_DESC_"))
     if autoroofUsed then
         UI.widgetSound("Nav2")
         CFG:SaveItem("autoraiseroof", autoraiseroof)
@@ -893,27 +893,27 @@ function vehicleUI()
         ImGui.SetNextWindowSizeConstraints(100, 100, 600, 800)
         ImGui.Begin("Vehicle Sounds",
             ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse)
-        if ImGui.Button(translateLabel("GENERIC_CLOSE_BTN_")) then
+        if ImGui.Button(_T("GENERIC_CLOSE_BTN_")) then
             UI.widgetSound("Cancel")
             open_sounds_window = false
         end
         ImGui.Spacing(); ImGui.Spacing()
         ImGui.PushItemWidth(250)
-        search_term, used = ImGui.InputTextWithHint("", translateLabel("SEARCH_VEH_HINT_"), search_term, 32)
+        search_term, used = ImGui.InputTextWithHint("", _T("SEARCH_VEH_HINT_"), search_term, 32)
         is_typing = ImGui.IsItemActive()
         ImGui.PushItemWidth(270)
         displayVehNames()
         ImGui.PopItemWidth()
         local selected_name = filteredNames[vehSound_index + 1]
         ImGui.Spacing()
-        if ImGui.Button(translateLabel("SELECT_SOUND_TXT_")) then
+        if ImGui.Button(_T("SELECT_SOUND_TXT_")) then
             UI.widgetSound("Select")
             script.run_in_fiber(function()
                 AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(current_vehicle, selected_name)
             end)
         end
         ImGui.SameLine()
-        if ImGui.Button(translateLabel("RESTORE_DEFAULT_")) then
+        if ImGui.Button(_T("RESTORE_DEFAULT_")) then
             UI.widgetSound("Delete")
             script.run_in_fiber(function()
                 AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(current_vehicle,

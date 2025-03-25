@@ -42,13 +42,13 @@ end
 
 function soundPlayerUI()
     ImGui.Spacing(); ImGui.SeparatorText("Human Sounds"); ImGui.Spacing()
-    ImGui.Dummy(20, 1); ImGui.SameLine(); sound_switch, isChanged = ImGui.RadioButton(translateLabel("MALE_SOUNDS_"),
+    ImGui.Dummy(20, 1); ImGui.SameLine(); sound_switch, isChanged = ImGui.RadioButton(_T("MALE_SOUNDS_"),
         sound_switch, 0); ImGui
         .SameLine()
     if isChanged then
         UI.widgetSound("Nav")
     end
-    ImGui.Dummy(20, 1); ImGui.SameLine(); sound_switch, isChanged = ImGui.RadioButton(translateLabel("FEMALE_SOUNDS_"),
+    ImGui.Dummy(20, 1); ImGui.SameLine(); sound_switch, isChanged = ImGui.RadioButton(_T("FEMALE_SOUNDS_"),
         sound_switch, 1)
     if isChanged then
         UI.widgetSound("Nav")
@@ -71,7 +71,7 @@ function soundPlayerUI()
         ImGui.Button(string.format(" %s ", loading_label), 60, 30)
         ImGui.EndDisabled()
     else
-        if ImGui.Button(string.format("%s##sounds", translateLabel("GENERIC_PLAY_BTN_"))) then
+        if ImGui.Button(string.format("%s##sounds", _T("GENERIC_PLAY_BTN_"))) then
             script.run_in_fiber(function(playsnd)
                 local myCoords = Game.getCoords(self.get_ped(), true)
                 AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(selected_sound.soundName, selected_sound.soundRef,
@@ -87,7 +87,7 @@ function soundPlayerUI()
     end
 
     ImGui.Dummy(1, 10); ImGui.SeparatorText("Radio Stations")
-    UI.toolTip(false, translateLabel("RADIO_STATIONS_DESC_"))
+    UI.toolTip(false, _T("RADIO_STATIONS_DESC_"))
     ImGui.Spacing()
     ImGui.PushItemWidth(280)
     displayRadioStations()
@@ -96,7 +96,7 @@ function soundPlayerUI()
     if not radio_btn_off then
         ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
         if not is_playing_radio then
-            if ImGui.Button(string.format("%s##radio", translateLabel("GENERIC_PLAY_BTN_"))) then
+            if ImGui.Button(string.format("%s##radio", _T("GENERIC_PLAY_BTN_"))) then
                 script.run_in_fiber(function(rad)
                     if not is_playing_anim then
                         play_music(true, selected_radio.station)
@@ -113,7 +113,7 @@ function soundPlayerUI()
                 end)
             end
         else
-            if ImGui.Button(string.format("%s##sounds", translateLabel("GENERIC_STOP_BTN_"))) then
+            if ImGui.Button(string.format("%s##sounds", _T("GENERIC_STOP_BTN_"))) then
                 script.run_in_fiber(function(rad)
                     play_music(false)
                     is_playing_radio   = false

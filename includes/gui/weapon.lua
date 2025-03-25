@@ -1,43 +1,43 @@
 ---@diagnostic disable
 
 function weaponUI()
-    HashGrabber, HgUsed = ImGui.Checkbox(translateLabel("HASHGRABBER_CB_"), HashGrabber)
-    UI.helpMarker(false, translateLabel("HASHGRABBER_DESC_"))
+    HashGrabber, HgUsed = ImGui.Checkbox(_T("HASHGRABBER_CB_"), HashGrabber)
+    UI.helpMarker(false, _T("HASHGRABBER_DESC_"))
     if HgUsed then
         UI.widgetSound("Nav2")
     end
 
-    Triggerbot, TbUsed = ImGui.Checkbox(translateLabel("TRIGGERBOT_CB_"), Triggerbot)
-    UI.helpMarker(false, translateLabel("TRIGGERBOT_DESC_"))
+    Triggerbot, TbUsed = ImGui.Checkbox(_T("TRIGGERBOT_CB_"), Triggerbot)
+    UI.helpMarker(false, _T("TRIGGERBOT_DESC_"))
     if TbUsed then
         CFG:SaveItem("Triggerbot", Triggerbot)
         UI.widgetSound("Nav2")
     end
 
     if Triggerbot then
-        ImGui.SameLine(); aimEnemy, aimEnemyUsed = ImGui.Checkbox(translateLabel("ENEMY_ONLY_CB_"), aimEnemy)
+        ImGui.SameLine(); aimEnemy, aimEnemyUsed = ImGui.Checkbox(_T("ENEMY_ONLY_CB_"), aimEnemy)
         if aimEnemyUsed then
             CFG:SaveItem("aimEnemy", aimEnemy)
             UI.widgetSound("Nav2")
         end
     end
 
-    MagicBullet, mbUsed = ImGui.Checkbox(translateLabel("MAGIC_BULLET_CB_"), MagicBullet)
-    UI.helpMarker(false, translateLabel("MAGIC_BULLET_DESC_"))
+    MagicBullet, mbUsed = ImGui.Checkbox(_T("MAGIC_BULLET_CB_"), MagicBullet)
+    UI.helpMarker(false, _T("MAGIC_BULLET_DESC_"))
     if mbUsed then
         CFG:SaveItem("MagicBullet", MagicBullet)
         UI.widgetSound("Nav2")
     end
 
-    autoKill, autoKillUsed = ImGui.Checkbox(translateLabel("AUTOKILL_CB_"), autoKill)
-    UI.helpMarker(false, translateLabel("AUTOKILL_DESC_"))
+    autoKill, autoKillUsed = ImGui.Checkbox(_T("AUTOKILL_CB_"), autoKill)
+    UI.helpMarker(false, _T("AUTOKILL_DESC_"))
     if autoKillUsed then
         CFG:SaveItem("autoKill", autoKill)
         UI.widgetSound("Nav2")
     end
 
-    runaway, runawayUsed = ImGui.Checkbox(translateLabel("ENEMIES_FLEE_CB_"), runaway)
-    UI.helpMarker(false, translateLabel("ENEMIES_FLEE_DESC_"))
+    runaway, runawayUsed = ImGui.Checkbox(_T("ENEMIES_FLEE_CB_"), runaway)
+    UI.helpMarker(false, _T("ENEMIES_FLEE_DESC_"))
     if runawayUsed then
         CFG:SaveItem("runaway", runaway)
         UI.widgetSound("Nav2")
@@ -46,18 +46,18 @@ function weaponUI()
         end
     end
 
-    replace_pool_q, rpqUsed = ImGui.Checkbox(translateLabel("KATANA_CB_"), replace_pool_q)
-    UI.helpMarker(false, translateLabel("KATANA_DESC_"))
+    replace_pool_q, rpqUsed = ImGui.Checkbox(_T("KATANA_CB_"), replace_pool_q)
+    UI.helpMarker(false, _T("KATANA_DESC_"))
     if rpqUsed then
         CFG:SaveItem("replace_pool_q", replace_pool_q)
         UI.widgetSound("Nav2")
     end
 
     if replace_pool_q then
-        ImGui.Text(translateLabel("KATANA_WPN_CHOICE_TXT_")); ImGui.SameLine(); ImGui.SetNextItemWidth(140)
+        ImGui.Text(_T("KATANA_WPN_CHOICE_TXT_")); ImGui.SameLine(); ImGui.SetNextItemWidth(140)
         katana_replace_index, kriUsed = ImGui.Combo("##kri", katana_replace_index,
             { "Baseball Bat", "Golf Club", "Machete", "Pool Que" }, 4)
-        UI.toolTip(false, translateLabel("KATANA_WPN_CHOICE_DESC_"))
+        UI.toolTip(false, _T("KATANA_WPN_CHOICE_DESC_"))
         if kriUsed then
             UI.widgetSound("Nav")
             if katana_replace_index == 0 then
@@ -83,14 +83,14 @@ function weaponUI()
         end
     end
 
-    laserSight, laserSightUSed = ImGui.Checkbox(translateLabel("LASER_SIGHT_CB_"), laserSight)
-    UI.helpMarker(false, translateLabel("LASER_SIGHT_DESC_"))
+    laserSight, laserSightUSed = ImGui.Checkbox(_T("LASER_SIGHT_CB_"), laserSight)
+    UI.helpMarker(false, _T("LASER_SIGHT_DESC_"))
     if laserSightUSed then
         CFG:SaveItem("laserSight", laserSight)
         UI.widgetSound("Nav2")
     end
     if laserSight then
-        ImGui.Text(translateLabel("LASER_CHOICE_TXT_"))
+        ImGui.Text(_T("LASER_CHOICE_TXT_"))
         laser_switch, lsrswUsed = ImGui.RadioButton("Red", laser_switch, 0)
         ImGui.SameLine(); laser_switch, lsrswUsed_2 = ImGui.RadioButton("Green", laser_switch, 1)
         ImGui.SameLine(); laser_switch, lsrswUsed_3 = ImGui.RadioButton("Blue", laser_switch, 2)

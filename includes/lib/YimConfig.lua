@@ -1,4 +1,4 @@
----@diagnostic disable: lowercase-global, undefined-global
+---@diagnostic disable
 
 --#region json
 --
@@ -1144,7 +1144,7 @@ YimConfig._credits_ = [[
       |                                                                                        |
       |      - Inspired by Harmless: https://github.com/harmless05                             |
       |                                                                                        |
-      |      - Rewritten from scratch by [SAMURAI (xesdoog)](https://github.com/xesdoog)       |
+      |      - Rewritten from scratch by SAMURAI (xesdoog): https://github.com/xesdoog)        |
       |                                                                                        |
       |      - Uses JSON.lua package by Jeffrey Friedl: http://regex.info/blog/lua/json        |
       |                                                                                        |
@@ -1154,10 +1154,10 @@ YimConfig._credits_ = [[
 
 ---@param script_name string Used to create and interact with the `.json` file.
 ---@param default_config table | string | number A default value or table with default values to be saved/loaded/overwritten.
----@param pretty_json? boolean Pretty encoding *(defaults to true)*.
----@param indent? number Number of indentations if Pretty Encoding is enabled.
----@param strict_parsing? boolean Strict parsing *(defaults to true)*.
----@param encryption_key? string Used for encrypted configs. Ignore if you only need normal use.
+---@param pretty_json? boolean **Optional:** Pretty encoding *(defaults to true)*.
+---@param indent? number **Optional:** Number of indentations if **Pretty Encoding** is enabled *(defaults to 2)*.
+---@param strict_parsing? boolean **Optional:** Strict Json parsing *(defaults to false)*.
+---@param encryption_key? string **Optional:** Used to encrypt/decrypt config data.
 function YimConfig:New(script_name, default_config, pretty_json, indent, strict_parsing, encryption_key)
     local instance = setmetatable({}, self)
     self.default_config = default_config
@@ -1185,8 +1185,21 @@ function YimConfig:New(script_name, default_config, pretty_json, indent, strict_
     return instance
 end
 
+---@param data any
+---@param etc? any
+function YimConfig:Encode(data, etc)
+    return self.json:encode(data, etc, { pretty = self.pretty })
+end
+
+---@param data any
+---@param etc? any
+function YimConfig:Decode(data, etc)
+    return self.json:decode(data, etc, { strictParsing = self.strict_parsing or false })
+end
+
+---@param data any
 function YimConfig:Save(data)
-    local file, err = io.open(self.file_name, "w")
+    local file, _ = io.open(self.file_name, "w")
     if not file then
         log.warning(
             "[ERROR] (YimConfig): Failed to open config file! YimConfig will not be able to read/write data. Your config will not be saved."
@@ -1194,11 +1207,12 @@ function YimConfig:Save(data)
         return
     end
 
-    file:write(self.json:encode(data, nil, { pretty = self.pretty or true, indent = self.indent or "  " }))
+    file:write(self:Encode(data))
     file:flush()
     file:close()
 end
 
+---@return any
 function YimConfig:Read()
     if not io.exists(self.file_name) then
         log.warning(
@@ -1207,7 +1221,7 @@ function YimConfig:Read()
         return self.default_config
     end
 
-    local file, err = io.open(self.file_name, "r")
+    local file, _ = io.open(self.file_name, "r")
     if not file then
         log.warning(
             "[ERROR] (YimConfig): Failed to open config file! YimConfig will not be able to read/write data. Your config will not be saved."
@@ -1231,7 +1245,7 @@ function YimConfig:Read()
         return decrypted_data
     end
 
-    return self.json:decode(data, nil, { strictParsing = self.strict_parsing })
+    return self:Decode(data)
 end
 
 ---@param item_name string
@@ -1261,19 +1275,6 @@ end
 
 function YimConfig:Reset()
     self:Save(self.default_config)
-end
-
----@param data any
----@param etc? any
-function YimConfig:Encode(data, etc)
-    return self.json:encode(data, etc, { pretty = self.pretty })
-end
-
----@param data any
----@param etc? any
----@param strict_parsing? boolean
-function YimConfig:Decode(data, etc, strict_parsing)
-    return self.json:decode(data, etc, { strictParsing = strict_parsing or false })
 end
 
 function YimConfig:b64_encode(input)

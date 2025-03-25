@@ -1,4 +1,4 @@
-Labels = {
+return {
 	["SELF_TAB_"] = {
 			{
 			["iso"] = "en-US",

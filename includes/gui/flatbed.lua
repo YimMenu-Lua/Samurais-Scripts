@@ -3,29 +3,29 @@
 function flatbedUI()
     local window_size_x, _ = ImGui.GetWindowSize()
     if fb_closestVehicleName == "" or fb_closestVehicleName == nil then
-        displayText = translateLabel("FLTBD_NO_VEH_TXT_")
+        displayText = _T("FLTBD_NO_VEH_TXT_")
     elseif tostring(fb_closestVehicleName) == "Flatbed" then
-        displayText = translateLabel("FLTBD_NOT_ALLOWED_TXT_")
+        displayText = _T("FLTBD_NOT_ALLOWED_TXT_")
     else
-        displayText = string.format("%s %s", translateLabel("FLTBD_NEARBY_VEH_TXT_"), fb_closestVehicleName)
+        displayText = string.format("%s %s", _T("FLTBD_NEARBY_VEH_TXT_"), fb_closestVehicleName)
     end
     if towed_vehicle ~= 0 then
-        displayText = string.format("%s %s.", translateLabel("FLTBD_TOWING_TXT_"),
+        displayText = string.format("%s %s.", _T("FLTBD_TOWING_TXT_"),
             vehicles.get_vehicle_display_name(towed_vehicleModel))
     end
     if is_using_flatbed then
         ImGui.Dummy(1, 10); ImGui.SeparatorText(displayText)
         ImGui.Dummy(1, 10);
         ImGui.BeginDisabled(not Game.Self.isDriving() or towed_vehicle ~= 0)
-        towPos, towPosUsed = ImGui.Checkbox(translateLabel("FLTBD_SHOW_TOWPOS_CB_"), towPos)
+        towPos, towPosUsed = ImGui.Checkbox(_T("FLTBD_SHOW_TOWPOS_CB_"), towPos)
         ImGui.EndDisabled()
-        UI.helpMarker(false, translateLabel("FLTBD_SHOW_TOWPOS_DESC_"))
+        UI.helpMarker(false, _T("FLTBD_SHOW_TOWPOS_DESC_"))
         if towPosUsed then
             UI.widgetSound("Nav2")
         end
 
-        towEverything, towEverythingUsed = ImGui.Checkbox(translateLabel("FLTBD_TOW_ALL_CB_"), towEverything)
-        UI.helpMarker(false, translateLabel("FLTBD_TOW_ALL_DESC_"))
+        towEverything, towEverythingUsed = ImGui.Checkbox(_T("FLTBD_TOW_ALL_CB_"), towEverything)
+        UI.helpMarker(false, _T("FLTBD_TOW_ALL_DESC_"))
         if towEverythingUsed then
             UI.widgetSound("Nav2")
             CFG:SaveItem("towEverything", towEverything)
@@ -33,7 +33,7 @@ function flatbedUI()
 
         ImGui.Dummy(1, 10); ImGui.Dummy((window_size_x // 2) - 65, 1); ImGui.SameLine()
         if towed_vehicle == 0 then
-            if ImGui.Button(translateLabel("FLTBD_TOW_BTN_"), 80, 40) then
+            if ImGui.Button(_T("FLTBD_TOW_BTN_"), 80, 40) then
                 UI.widgetSound("Select")
                 if towable and fb_closestVehicle ~= nil and fb_closestVehicleModel ~= flatbedModel then
                     script.run_in_fiber(function()
@@ -52,26 +52,26 @@ function flatbedUI()
                             towed_vehicle = fb_closestVehicle
                             ENTITY.SET_ENTITY_CANT_CAUSE_COLLISION_DAMAGED_ENTITY(towed_vehicle, current_vehicle)
                         else
-                            YimToast:ShowError("Samurais Scripts", translateLabel("VEH_CTRL_FAIL_"))
+                            YimToast:ShowError("Samurais Scripts", _T("VEH_CTRL_FAIL_"))
                         end
                     end)
                 end
                 if fb_closestVehicle ~= nil and fb_closestVehicleModel ~= flatbedModel and not towable then
-                    YimToast:ShowMessage("Samurais Scripts", translateLabel("FLTBD_CARS_ONLY_TXT_"))
+                    YimToast:ShowMessage("Samurais Scripts", _T("FLTBD_CARS_ONLY_TXT_"))
                 end
                 if fb_closestVehicle ~= nil and fb_closestVehicleModel == flatbedModel then
-                    YimToast:ShowMessage("Samurais Scripts", translateLabel("FLTBD_NOT_ALLOWED_TXT_"))
+                    YimToast:ShowMessage("Samurais Scripts", _T("FLTBD_NOT_ALLOWED_TXT_"))
                 end
             end
         else
-            if ImGui.Button(translateLabel("GENERIC_DETACH_BTN_"), 80, 40) then
+            if ImGui.Button(_T("GENERIC_DETACH_BTN_"), 80, 40) then
                 UI.widgetSound("Select2")
                 script.run_in_fiber(function()
                     flatbed_detach()
                 end)
             end
-            ImGui.Dummy(1, 5); ImGui.SeparatorText(translateLabel("FLTBD_ADJUST_POS_TXT_"))
-            UI.toolTip(false, translateLabel("FLTBD_ADJUST_POS_DESC_"))
+            ImGui.Dummy(1, 5); ImGui.SeparatorText(_T("FLTBD_ADJUST_POS_TXT_"))
+            UI.toolTip(false, _T("FLTBD_ADJUST_POS_DESC_"))
             ImGui.Spacing(); ImGui.Dummy((window_size_x // 2) - 40, 1); ImGui.SameLine()
             ImGui.ArrowButton("##Up", 2)
             if ImGui.IsItemActive() then
@@ -110,8 +110,8 @@ function flatbedUI()
             end
         end
     else
-        UI.wrappedText(translateLabel("GET_IN_FLATBED_"), 20)
-        if ImGui.Button(translateLabel("SPAWN_FLATBED_BTN_")) then
+        UI.wrappedText(_T("GET_IN_FLATBED_"), 20)
+        if ImGui.Button(_T("SPAWN_FLATBED_BTN_")) then
             script.run_in_fiber(function(script)
                 if Game.Self.isOnFoot() then
                     if Game.Self.isOutside() then
@@ -125,10 +125,10 @@ function flatbedUI()
                         PED.SET_PED_INTO_VEHICLE(self.get_ped(), fltbd, -1)
                         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(fltbd)
                     else
-                        YimToast:ShowError("Samurais Scripts", translateLabel("FLTBD_INTERIOR_ERROR_"))
+                        YimToast:ShowError("Samurais Scripts", _T("FLTBD_INTERIOR_ERROR_"))
                     end
                 else
-                    YimToast:ShowError("Samurais Scripts", translateLabel("FLTBD_EXIT_VEH_ERROR_"))
+                    YimToast:ShowError("Samurais Scripts", _T("FLTBD_EXIT_VEH_ERROR_"))
                 end
             end)
         end

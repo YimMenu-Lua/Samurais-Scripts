@@ -2,28 +2,28 @@
 
 function vCreatorUI()
     ImGui.Dummy(1, 10)
-    persist_switch, pswChanged = ImGui.RadioButton(translateLabel("CREATE_TXT_"), persist_switch, 0)
-    UI.helpMarker(false, translateLabel("CREATOR_DESC_"))
+    persist_switch, pswChanged = ImGui.RadioButton(_T("CREATE_TXT_"), persist_switch, 0)
+    UI.helpMarker(false, _T("CREATOR_DESC_"))
     if pswChanged then
         UI.widgetSound("Nav")
     end
     if saved_vehicles[1] ~= nil then
         ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); persist_switch, pswChanged = ImGui.RadioButton(
-            translateLabel("SAVED_VEHS_TXT_"), persist_switch, 1)
+            _T("SAVED_VEHS_TXT_"), persist_switch, 1)
         if pswChanged then
             UI.widgetSound("Nav")
         end
     else
         ImGui.BeginDisabled()
         ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); persist_switch, pswChanged = ImGui.RadioButton(
-            translateLabel("SAVED_VEHS_TXT_"), persist_switch, 1)
+            _T("SAVED_VEHS_TXT_"), persist_switch, 1)
         ImGui.EndDisabled()
-        UI.toolTip(false, translateLabel("SAVED_VEHS_DESC_"))
+        UI.toolTip(false, _T("SAVED_VEHS_DESC_"))
     end
     if persist_switch == 0 then
         ImGui.Spacing()
         ImGui.PushItemWidth(350)
-        vCreator_searchQ, used = ImGui.InputTextWithHint("##searchVehicles", translateLabel("GENERIC_SEARCH_HINT_"),
+        vCreator_searchQ, used = ImGui.InputTextWithHint("##searchVehicles", _T("GENERIC_SEARCH_HINT_"),
             vCreator_searchQ,
             32)
         ImGui.PopItemWidth()
@@ -36,7 +36,7 @@ function vCreatorUI()
             vehicleHash = filtered_vehicles[vehicle_index + 1].hash
             vehicleName = filtered_vehicles[vehicle_index + 1].name
         end
-        if ImGui.Button(string.format("   %s   ##vehcreator", translateLabel("GENERIC_SPAWN_BTN_"))) then
+        if ImGui.Button(string.format("   %s   ##vehcreator", _T("GENERIC_SPAWN_BTN_"))) then
             UI.widgetSound("Select")
             script.run_in_fiber(function()
                 local plyrCoords   = self.get_pos()
@@ -68,20 +68,20 @@ function vCreatorUI()
         end
         if saved_vehicles[1] == nil then
             ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
-            if ImGui.Button(translateLabel("VC_DEMO_VEH_BTN_")) then
+            if ImGui.Button(_T("VC_DEMO_VEH_BTN_")) then
                 UI.widgetSound("Select")
                 createWideBodyCivic()
                 spawnPersistVeh(saved_vehicles[1].main_veh, saved_vehicles[1].mods, saved_vehicles[1].color_1,
                     saved_vehicles[1].color_2, saved_vehicles[1].tint, saved_vehicles[1].attachments)
             end
-            UI.toolTip(false, translateLabel("VC_DEMO_VEH_DESC_"))
+            UI.toolTip(false, _T("VC_DEMO_VEH_DESC_"))
         end
         if main_vehicle ~= 0 then
             ImGui.Separator()
-            UI.coloredText(translateLabel("VC_MAIN_VEH_TXT_"), 'green', 0.9, 20); ImGui.SameLine(); ImGui.Text(
+            UI.coloredText(_T("VC_MAIN_VEH_TXT_"), 'green', 0.9, 20); ImGui.SameLine(); ImGui.Text(
             main_vehicle_name); ImGui
                 .SameLine()
-            if ImGui.Button(string.format(" %s ##mainVeh", translateLabel("GENERIC_DELETE_BTN_"))) then
+            if ImGui.Button(string.format(" %s ##mainVeh", _T("GENERIC_DELETE_BTN_"))) then
                 UI.widgetSound("Delete")
                 script.run_in_fiber(function(delmv)
                     if entities.take_control_of(main_vehicle, 300) then
@@ -108,14 +108,14 @@ function vCreatorUI()
             end
         end
         if spawned_vehicles[1] ~= nil then
-            ImGui.SeparatorText(translateLabel("VC_SPAWNED_VEHS_TXT_"))
+            ImGui.SeparatorText(_T("VC_SPAWNED_VEHS_TXT_"))
             ImGui.PushItemWidth(230)
             spawned_veh_index, _ = ImGui.Combo("##Spawned Vehicles", spawned_veh_index, filteredVehNames,
                 #spawned_vehicles)
             ImGui.PopItemWidth()
             selectedVeh = spawned_vehicles[spawned_veh_index + 1]
             ImGui.SameLine()
-            if ImGui.Button(string.format("   %s   ##spawnedVeh", translateLabel("GENERIC_DELETE_BTN_"))) then
+            if ImGui.Button(string.format("   %s   ##spawnedVeh", _T("GENERIC_DELETE_BTN_"))) then
                 UI.widgetSound("Delete")
                 script.run_in_fiber(function(del)
                     if entities.take_control_of(selectedVeh, 300) then
@@ -132,11 +132,11 @@ function vCreatorUI()
                             attachment_index = 0
                         end
                     else
-                        YimToast:ShowError("Samurais Scripts", translateLabel("GENERIC_VEH_DELETE_ERROR_"))
+                        YimToast:ShowError("Samurais Scripts", _T("GENERIC_VEH_DELETE_ERROR_"))
                     end
                 end)
             end
-            if ImGui.Button(string.format("%s%s", translateLabel("VC_ATTACH_BTN_"), main_vehicle_name)) then
+            if ImGui.Button(string.format("%s%s", _T("VC_ATTACH_BTN_"), main_vehicle_name)) then
                 if selectedVeh ~= main_vehicle then
                     script.run_in_fiber(function()
                         if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedVeh, main_vehicle) then
@@ -175,12 +175,12 @@ function vCreatorUI()
                             attached_vehicles = { entity = 0, hash = 0, mods = {}, color_1 = { r = 0, g = 0, b = 0 }, color_2 = { r = 0, g = 0, b = 0 }, tint = 0, posx = 0.0, posy = 0.0, posz = 0.0, rotx = 0.0, roty = 0.0, rotz = 0.0 }
                         else
                             UI.widgetSound("Error")
-                            YimToast:ShowError("Samurais Scripts", translateLabel("VC_ALREADY_ATTACHED_"))
+                            YimToast:ShowError("Samurais Scripts", _T("VC_ALREADY_ATTACHED_"))
                         end
                     end)
                 else
                     UI.widgetSound("Error")
-                    YimToast:ShowError("Samurais Scripts", translateLabel("VC_SELF_ATTACH_ERR_"))
+                    YimToast:ShowError("Samurais Scripts", _T("VC_SELF_ATTACH_ERR_"))
                 end
             end
         end
@@ -190,7 +190,7 @@ function vCreatorUI()
             showAttachedVehicles()
             ImGui.PopItemWidth()
             selected_attchmnt = veh_attachments[attachment_index + 1]
-            ImGui.Text(translateLabel("GENERIC_MULTIPLIER_LABEL_"))
+            ImGui.Text(_T("GENERIC_MULTIPLIER_LABEL_"))
             ImGui.PushItemWidth(271)
             veh_axisMult, _ = ImGui.InputInt("##AttachMultiplier", veh_axisMult, 1, 2)
             ImGui.PopItemWidth()
@@ -371,7 +371,7 @@ function vCreatorUI()
                     2, true, 1)
             end
             ImGui.Spacing()
-            if ImGui.Button(string.format("   %s   ##vehcreator1", translateLabel("GENERIC_SAVE_BTN_"))) then
+            if ImGui.Button(string.format("   %s   ##vehcreator1", _T("GENERIC_SAVE_BTN_"))) then
                 UI.widgetSound("Select2")
                 ImGui.OpenPopup("Save Merged Vehicles")
             end
@@ -379,18 +379,18 @@ function vCreatorUI()
             ImGui.SetNextWindowBgAlpha(0.81)
             if ImGui.BeginPopupModal("Save Merged Vehicles", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
                 creation_name, _ = ImGui.InputTextWithHint(
-                    "##save_merge", translateLabel("VC_NAME_HINT_"), creation_name, 128
+                    "##save_merge", _T("VC_NAME_HINT_"), creation_name, 128
                 )
                 is_typing = ImGui.IsItemActive(); ImGui.Spacing()
                 if not start_loading_anim then
-                    if ImGui.Button(string.format("%s##vehcreator2", translateLabel("GENERIC_SAVE_BTN_"))) then
+                    if ImGui.Button(string.format("%s##vehcreator2", _T("GENERIC_SAVE_BTN_"))) then
                         script.run_in_fiber(function(save)
                             if creation_name ~= "" then
                                 if saved_vehicles[1] ~= nil then
                                     for _, v in pairs(saved_vehicles) do
                                         if creation_name == v.name then
                                             UI.widgetSound("Error")
-                                            YimToast:ShowError("Samurai's Scripts", translateLabel("VC_NAME_ERROR_"))
+                                            YimToast:ShowError("Samurai's Scripts", _T("VC_NAME_ERROR_"))
                                             return
                                         end
                                     end
@@ -421,13 +421,13 @@ function vCreatorUI()
                                 for _, veh in ipairs(spawned_vehicles) do
                                     ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(veh)
                                 end
-                                YimToast:ShowSuccess("Samurais Scripts", translateLabel("VC_SAVE_SUCCESS_"))
+                                YimToast:ShowSuccess("Samurais Scripts", _T("VC_SAVE_SUCCESS_"))
                                 resetOnSave()
                                 start_loading_anim = false
                                 ImGui.CloseCurrentPopup()
                             else
                                 UI.widgetSound("Error")
-                                YimToast:ShowWarning("Samurais Scripts", translateLabel("VC_SAVE_ERROR_"))
+                                YimToast:ShowWarning("Samurais Scripts", _T("VC_SAVE_ERROR_"))
                             end
                         end)
                     end
@@ -437,7 +437,7 @@ function vCreatorUI()
                     ImGui.EndDisabled()
                 end
                 ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
-                if ImGui.Button(string.format("%s##vehcreator", translateLabel("GENERIC_CANCEL_BTN_"))) then
+                if ImGui.Button(string.format("%s##vehcreator", _T("GENERIC_CANCEL_BTN_"))) then
                     UI.widgetSound("Cancel")
                     creation_name = ""
                     ImGui.CloseCurrentPopup()
@@ -452,13 +452,13 @@ function vCreatorUI()
             ImGui.PopItemWidth()
             persist_info = filteredCreations[persist_index + 1]
             ImGui.Spacing()
-            if ImGui.Button(string.format("%s##vehcreator", translateLabel("VC_SPAWN_PERSISTENT_"))) then
+            if ImGui.Button(string.format("%s##vehcreator", _T("VC_SPAWN_PERSISTENT_"))) then
                 UI.widgetSound("Select")
                 spawnPersistVeh(persist_info.main_veh, persist_info.mods, persist_info.color_1, persist_info.color_2,
                     persist_info.tint, persist_info.attachments)
             end
             ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
-            if UI.coloredButton(translateLabel("VC_DELETE_PERSISTENT_"), "#E40000", "#FF3F3F", "#FF8080", 0.87) then
+            if UI.coloredButton(_T("VC_DELETE_PERSISTENT_"), "#E40000", "#FF3F3F", "#FF8080", 0.87) then
                 UI.widgetSound("Focus_In")
                 ImGui.OpenPopup("Remove Persistent")
             end
@@ -466,9 +466,9 @@ function vCreatorUI()
             ImGui.SetNextWindowSizeConstraints(200, 100, 400, 400)
             ImGui.SetNextWindowBgAlpha(0.7)
             if ImGui.BeginPopupModal("Remove Persistent", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-                UI.coloredText(translateLabel("CONFIRM_PROMPT_"), "yellow", 0.91, 35)
+                UI.coloredText(_T("CONFIRM_PROMPT_"), "yellow", 0.91, 35)
                 ImGui.Dummy(1, 20)
-                if ImGui.Button(string.format("   %s   ##vehcreator", translateLabel("GENERIC_YES_"))) then
+                if ImGui.Button(string.format("   %s   ##vehcreator", _T("GENERIC_YES_"))) then
                     for key, value in ipairs(saved_vehicles) do
                         if persist_info == value then
                             table.remove(saved_vehicles, key)
@@ -480,10 +480,10 @@ function vCreatorUI()
                     end
                     UI.widgetSound("Select")
                     ImGui.CloseCurrentPopup()
-                    YimToast:ShowSuccess("Samurais Scripts", translateLabel("VC_DELETE_NOTIF_"))
+                    YimToast:ShowSuccess("Samurais Scripts", _T("VC_DELETE_NOTIF_"))
                 end
                 ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
-                if ImGui.Button(string.format("   %s   ##vehcreator", translateLabel("GENERIC_NO_"))) then
+                if ImGui.Button(string.format("   %s   ##vehcreator", _T("GENERIC_NO_"))) then
                     UI.widgetSound("Cancel")
                     ImGui.CloseCurrentPopup()
                 end

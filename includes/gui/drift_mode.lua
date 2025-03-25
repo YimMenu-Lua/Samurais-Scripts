@@ -9,8 +9,8 @@ function driftModeUI()
         ImGui.Spacing()
         if validModel then
             ImGui.SeparatorText(string.format("%s  (%s)", full_veh_name, vehicle_class)); ImGui.Spacing()
-            driftMode, driftModeUsed = ImGui.Checkbox(translateLabel("DRIFT_MODE_CB_"), driftMode)
-            UI.helpMarker(false, translateLabel("DRIFT_MODE_DESC_"))
+            driftMode, driftModeUsed = ImGui.Checkbox(_T("DRIFT_MODE_CB_"), driftMode)
+            UI.helpMarker(false, _T("DRIFT_MODE_DESC_"))
             if driftModeUsed then
                 UI.widgetSound("Nav2")
                 CFG:SaveItem("driftMode", driftMode)
@@ -22,15 +22,15 @@ function driftModeUI()
                 ImGui.PushItemWidth(160)
                 DriftIntensity, DriftIntensityUsed = ImGui.SliderInt("##Intensity", DriftIntensity, 0, 3)
                 ImGui.PopItemWidth()
-                UI.toolTip(false, translateLabel("DRIFT_SLIDER_"))
+                UI.toolTip(false, _T("DRIFT_SLIDER_"))
                 if DriftIntensityUsed then
                     UI.widgetSound("Nav")
                     CFG:SaveItem("DriftIntensity", DriftIntensity)
                 end
             end
 
-            DriftTires, DriftTiresUsed = ImGui.Checkbox(translateLabel("DRIFT_TIRES_CB_"), DriftTires)
-            UI.helpMarker(false, translateLabel("DRIFT_TIRES_DESC_"))
+            DriftTires, DriftTiresUsed = ImGui.Checkbox(_T("DRIFT_TIRES_CB_"), DriftTires)
+            UI.helpMarker(false, _T("DRIFT_TIRES_DESC_"))
             if DriftTires then
                 driftMode = false
             end
@@ -45,14 +45,14 @@ function driftModeUI()
                 ImGui.Text("Torque: "); ImGui.SameLine()
                 ImGui.PushItemWidth(210)
                 DriftPowerIncrease, dpiUsed = ImGui.SliderInt("##Torque", DriftPowerIncrease, 10, 100)
-                UI.toolTip(false, translateLabel("DRIFT_TORQUE_DESC_"))
+                UI.toolTip(false, _T("DRIFT_TORQUE_DESC_"))
                 if dpiUsed then
                     UI.widgetSound("Nav2")
                     CFG:SaveItem("DriftPowerIncrease", DriftPowerIncrease)
                 end
 
                 ImGui.Spacing(); DriftSmoke, dsmkUsed = ImGui.Checkbox("Drift Smoke", DriftSmoke)
-                UI.toolTip(false, translateLabel("DRIFT_SMOKE_COL_DESC_"))
+                UI.toolTip(false, _T("DRIFT_SMOKE_COL_DESC_"))
                 if dsmkUsed then
                     UI.widgetSound("Nav2")
                     CFG:SaveItem("DriftSmoke", DriftSmoke)
@@ -90,7 +90,7 @@ function driftModeUI()
                 end
             end
             if DriftSmoke or BurnoutSmoke then
-                ImGui.Spacing(); UI.coloredText(translateLabel("DRIFT_SMOKE_COL_"),
+                ImGui.Spacing(); UI.coloredText(_T("DRIFT_SMOKE_COL_"),
                     { driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T
                         .b }, 1, 35)
                 if not customSmokeCol then
@@ -129,7 +129,7 @@ function driftModeUI()
                         ImGuiInputTextFlags.CharsHexadecimal | ImGuiInputTextFlags.CharsUppercase
                     )
                     is_typing = ImGui.IsItemActive()
-                    UI.toolTip(false, translateLabel("HEX_SMOKE_DESC_")); ImGui.SameLine()
+                    UI.toolTip(false, _T("HEX_SMOKE_DESC_")); ImGui.SameLine()
                     if smokeHexEntered then
                         if smokeHex ~= nil then
                             if not smokeHex:find("^#") then
@@ -170,7 +170,7 @@ function driftModeUI()
                         end
                     end
                 end
-                customSmokeCol, cscUsed = ImGui.Checkbox(translateLabel("GENERIC_CUSTOM_LABEL_"), customSmokeCol)
+                customSmokeCol, cscUsed = ImGui.Checkbox(_T("GENERIC_CUSTOM_LABEL_"), customSmokeCol)
                 if cscUsed then
                     UI.widgetSound("Nav2")
                     CFG:SaveItem("customSmokeCol", customSmokeCol)
@@ -185,9 +185,9 @@ function driftModeUI()
             end
 
             if driftMode or DriftTires then
-                ImGui.Dummy(1, 10); ImGui.SeparatorText(translateLabel("DRIFT_GAME_EXPERIMENTAL_TXT_"))
+                ImGui.Dummy(1, 10); ImGui.SeparatorText(_T("DRIFT_GAME_EXPERIMENTAL_TXT_"))
                 ImGui.Spacing(); driftMinigame, drmgUsed = ImGui.Checkbox("Drift Minigame", driftMinigame)
-                UI.toolTip(false, translateLabel("DRIFT_GAME_DESC_"))
+                UI.toolTip(false, _T("DRIFT_GAME_DESC_"))
                 if drmgUsed then
                     UI.widgetSound("Nav2")
                     CFG:SaveItem("driftMinigame", driftMinigame)
@@ -199,9 +199,9 @@ function driftModeUI()
                 end
             end
         else
-            UI.wrappedText(translateLabel("DRIFT_INVALID_DESC_"), 15)
+            UI.wrappedText(_T("DRIFT_INVALID_DESC_"), 15)
         end
     else
-        ImGui.Dummy(1, 5); ImGui.Text(translateLabel("GET_IN_VEH_WARNING_"))
+        ImGui.Dummy(1, 5); ImGui.Text(_T("GET_IN_VEH_WARNING_"))
     end
 end

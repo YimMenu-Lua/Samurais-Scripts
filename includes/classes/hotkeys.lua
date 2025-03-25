@@ -1,4 +1,4 @@
-VIRTUAL_KEYCODES = {
+local VIRTUAL_KEYCODES <const> = {
     { code = 0x08,    name = "BACKSPACE", },
     { code = 0x09,    name = "TAB", },
     { code = 0x0C,    name = "CLEAR", },
@@ -165,23 +165,23 @@ VIRTUAL_KEYCODES = {
     { code = 0xFB,    name = "VK_ZOOM", },
     { code = 0xFD,    name = "VK_PA1", },
     { code = 0xFE,    name = "VK_OEM_CLEAR", },
-    { code = 0x10020, name = "MOUSE 4", },
-    { code = 0x20040, name = "MOUSE 5", },
+    { code = 0x10020, name = "MOUSE4", },
+    { code = 0x20040, name = "MOUSE5", },
 }
 
-WM_KEYDOWN     = 0x0100
-WM_KEYUP       = 0x0101
-WM_LBUTTONDOWN = 0x0201
-WM_LBUTTONUP   = 0x0202
-WM_MBUTTONDOWN = 0x0207
-WM_MBUTTONUP   = 0x0208
-WM_MOUSEWHEEL  = 0x020A
-WM_RBUTTONDOWN = 0x0204
-WM_RBUTTONUP   = 0x0205
-WM_SYSKEYDOWN  = 0x0104
-WM_SYSKEYUP    = 0x0105
-WM_XBUTTONDOWN = 0x020B
-WM_XBUTTONUP   = 0x020C
+local WM_KEYDOWN     <const> = 0x0100
+local WM_KEYUP       <const> = 0x0101
+local WM_LBUTTONDOWN <const> = 0x0201
+local WM_LBUTTONUP   <const> = 0x0202
+local WM_MBUTTONDOWN <const> = 0x0207
+local WM_MBUTTONUP   <const> = 0x0208
+local WM_MOUSEWHEEL  <const> = 0x020A
+local WM_RBUTTONDOWN <const> = 0x0204
+local WM_RBUTTONUP   <const> = 0x0205
+local WM_SYSKEYDOWN  <const> = 0x0104
+local WM_SYSKEYUP    <const> = 0x0105
+local WM_XBUTTONDOWN <const> = 0x020B
+local WM_XBUTTONUP   <const> = 0x020C
 
 
 ---@class Key
@@ -216,18 +216,17 @@ function Key:UpdateState(keydown, keyup)
 end
 
 ---@class KeyManager
----@field keys table
 KeyManager = {}
 KeyManager.__index = KeyManager
+KeyManager.keys = {}
 
 function KeyManager:Init()
-    local self = setmetatable({}, KeyManager)
-    self.keys = {}
+    local insatnce = setmetatable({}, KeyManager)
     for _, k in ipairs(VIRTUAL_KEYCODES) do
-        table.insert(self.keys, Key:New(k.code, k.name))
+        table.insert(insatnce.keys, Key:New(k.code, k.name))
     end
 
-    return self
+    return insatnce
 end
 
 ---@param code integer
@@ -299,29 +298,32 @@ function KeyManager:HandleEvent(msg, wParam)
     if (msg == WM_KEYDOWN or msg == WM_SYSKEYDOWN or msg == WM_XBUTTONDOWN) then
         key:UpdateState(true, false)
     elseif (msg == WM_KEYUP or msg == WM_SYSKEYUP or msg == WM_XBUTTONUP) then
-        key:UpdateState(false, msg and true)
+        key:UpdateState(false, true)
     end
 end
 
 -- Hardcoded keybinds. Not persistent.
 ---@param key integer | string
 ---@param callback function
-function KeyManager:RegisterKeybind(key, callback)
+---@param onKeyDown? boolean Set to true to loop the callback. Ignore or set to false to execute only once.
+function KeyManager:RegisterKeybind(key, callback, onKeyDown)
     for _, k in ipairs(self.keys) do
         if (key == k.name or key == k.code) then
+            if k.callback and k.callback ~= callback then
+                gui.show_warning("Hotkey Manager", ("[%s] was already assigned to a different function!"):format(k.name))
+                log.warning(("[WARNING] (Hotkey Manager): [%s] was already assigned to a different function!"):format(k.name))
+            end
             k.callback = callback
+            k.on_hold = onKeyDown or false
         end
     end
 end
 
--- __@param `onKeyDownOnly`: Set to true to loop the callback for as long
---
--- as the key is held down. Ignore or set to false to execute only once.
----@param onKeyDownOnly? boolean
-function KeyManager:HandleCallbacks(onKeyDownOnly)
+
+function KeyManager:HandleCallbacks()
     for _, k in ipairs(self.keys) do
         if k.callback then
-            if not onKeyDownOnly then
+            if not k.on_hold then
                 if k.just_pressed then
                     k.callback()
                 end
@@ -335,7 +337,7 @@ function KeyManager:HandleCallbacks(onKeyDownOnly)
 end
 
 
-local Keymgr = KeyManager:Init()
+local KeyMgr = KeyManager:Init()
 event.register_handler(menu_event.Wndproc, function(_, msg, wParam, _)
     if msg == WM_XBUTTONDOWN or msg == WM_XBUTTONUP then
         -- the value for secondary mouse buttons is different between keydown and keyup events
@@ -346,8 +348,11 @@ event.register_handler(menu_event.Wndproc, function(_, msg, wParam, _)
             wParam = 0x20040
         end
     end
-
-    Keymgr:HandleEvent(msg, wParam)
+    KeyManager:HandleEvent(msg, wParam)
 end)
 
-return Keymgr
+-- script.register_looped("SS_KEYMANAGER", function()
+--     KeyMgr:HandleCallbacks()
+-- end)
+
+return KeyMgr
