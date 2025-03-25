@@ -40,12 +40,13 @@ The folder structure should look like this
 │   └── Samurais Scripts
 |       ├── includes
 |       |   ├── classes
+|       |   |   ├── commands.lua
 |       |   |   ├── hotkeys.lua
+|       |   |   ├── translator.lua
 |       |   |   ├── vector2.lua
 |       |   |   └── vector3.lua
 |       |   ├── data
 |       |   |   ├── actions.lua
-|       |   |   ├── commands.lua
 |       |   |   ├── globals.lua
 |       |   |   ├── objects.lua
 |       |   |   └── refs.lua
