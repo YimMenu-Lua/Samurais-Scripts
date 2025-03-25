@@ -89,20 +89,35 @@ eGameState      = {
     "InMPCutscene",
 }
 
+eModelTypes     = {
+    [0]     = 'Invalid',
+    [1]     = 'Object',
+    [2]     = 'MLO',
+    [3]     = 'Time',
+    [4]     = 'Weapon',
+    [5]     = 'Vehicle',
+    [6]     = 'Ped',
+    [7]     = 'Destructible',
+    [33]    = 'Destructible',
+    [157]   = 'Building/Map Texture',
+    [43649] = 'Fixed Map Object',
+    [16385] = 'Fixed Map Object',
+}
+
 rgb_loop_colors = {
-    { 0, 255, 255, 1 },
-    { 0, 127, 255, 1 },
-    { 0, 0, 255, 1 },
-    { 127, 0, 255, 1 },
-    { 255, 0, 255, 1 },
-    { 255, 0, 127, 1 },
-    { 255, 0, 0, 1 },
-    { 255, 127, 0, 1 },
-    { 255, 255, 0, 1 },
-    { 127, 255, 0, 1 },
-    { 0, 255, 0, 1 },
-    { 0, 255, 127, 1 }
-    
+    { 0,   255, 255, 1 },
+    { 0,   127, 255, 1 },
+    { 0,   0,   255, 1 },
+    { 127, 0,   255, 1 },
+    { 255, 0,   255, 1 },
+    { 255, 0,   127, 1 },
+    { 255, 0,   0,   1 },
+    { 255, 127, 0,   1 },
+    { 255, 255, 0,   1 },
+    { 127, 255, 0,   1 },
+    { 0,   255, 0,   1 },
+    { 0,   255, 127, 1 }
+
 }
 
 gta_vehicles_T  = {
@@ -873,7 +888,7 @@ AF                       = {
 }
 
 Global_262145            = {
-    f_4413  = 262145 + 4413, -- int Snow Weather
+    f_4413  = 262145 + 4413,  -- int Snow Weather
     f_13059 = 262145 + 13059, -- int VIP Work CD
     f_13060 = 262145 + 13060, -- int VIP Challenge CD
     f_15397 = 262145 + 15397, -- int Hangar CD_1 *(600000ms)*
@@ -1672,7 +1687,7 @@ collision_invalid_models = {
 
 supported_sale_scripts   = {
     ["gb_smuggler"] = { -- air
-        {             -- (1.70) while .*?0 < func_.*?\(func_.*?, func_.*?, .*?Local_....?\.f_....?, -1
+        {               -- (1.70) while .*?0 < func_.*?\(func_.*?, func_.*?, .*?Local_....?\.f_....?, -1
             l = 1985,
             o = 1035,
             v = 0

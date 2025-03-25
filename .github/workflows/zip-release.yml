@@ -62,18 +62,21 @@ jobs:
           core.setOutput("version_number", new_tag);
           core.setOutput("old_tag", old_tag);
 
-    - name: Update Changelog
+    - name: Write Changelog
+      id: write_changelog
       run: |
-          $commitMessage = git log -1 --pretty=format:"%s"
-          $commitBody = git log -1 --pretty=format:"%b"
-          @"
-          ### ${{steps.increment_tag.outputs.version_number}} Changelog<<EOF
-          $commitMessage
-
-          $commitBody
-          EOF
-          "@ | Out-File -FilePath "./CHANGELOG.md" -Encoding UTF8
-      shell: pwsh
+          commitMessage=$(git log -1 --pretty=format:"%s")
+          commitBody=$(git log -1 --pretty=format:"%b")
+          echo "Commit Message: $commitMessage"
+          echo "Commit Body: $commitBody"
+          {
+            echo "changelog_body<<EOF"
+            echo "$commitMessage"
+            echo ""
+            echo "$commitBody"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+      shell: bash
 
     - name: Create Archive
       uses: thedoctor0/zip-release@0.7.6
@@ -83,12 +86,15 @@ jobs:
         exclusions: /.git* *.json *.md *.editorconfig *.py
 
     - name: Upload Release
-      uses: ncipollo/release-action@v1.14.0
+      uses: softprops/action-gh-release@v2
       with:
-        artifacts: "Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip"
-        bodyFile: ./CHANGELOG.md
         name: Samurai's Scripts ${{steps.increment_tag.outputs.version_number}}
-        tag: ${{steps.increment_tag.outputs.version_number}}
+        tag_name: ${{steps.increment_tag.outputs.version_number}}
+        body: |
+            ### {{steps.increment_tag.outputs.version_number}} Changelog
+            ${{ env.changelog_body }}
+        files: |
+          Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip
     
     - name: Update README.md
       run: |
