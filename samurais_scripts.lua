@@ -5,8 +5,7 @@ CURRENT_BUILD   = Game.Version._build
 CURRENT_VERSION = Game.Version._online
 
 log.info("version " .. SCRIPT_VERSION)
-SS.check_kb_keybinds()
-SS.check_gpad_keybinds()
+SS.sync_config(CFG:Read(), DEFAULT_CONFIG)
 
 Samurais_scripts = gui.add_tab("Samurai's Scripts")
 Samurais_scripts:add_imgui(mainUI)
@@ -167,13 +166,22 @@ end)
 CommandExecutor:RegisterCommand("finishsale", function()
     if Game.isOnline() then
         if autosell then
-            YimToast:ShowWarning("Samurai's Scripts",
-                "You aleady have 'Auto-Sell' enabled. No need to manually trigger it.", false, 1.5)
+            YimToast:ShowWarning(
+                "Samurai's Scripts",
+                "You aleady have 'Auto-Sell' enabled. No need to manually trigger it.",
+                false,
+                1.5
+            )
         else
             if scr_is_running then
                 SS.FinishSale(script_name)
             else
-                YimToast:ShowWarning("Samurai's Scripts", "No supported sale script is currently running.", false, 1.5)
+                YimToast:ShowWarning(
+                    "Samurai's Scripts",
+                    "No supported sale script is currently running.",
+                    false,
+                    1.5
+                )
             end
         end
     else
@@ -195,7 +203,9 @@ CommandExecutor:RegisterCommand("vehlock", function()
             SS.playKeyfobAnim()
             AUDIO.PLAY_SOUND_FRONTEND(-1, "REMOTE_CONTROL_FOB", "PI_MENU_SOUNDS", false)
             vehlock:sleep(250)
-            local toggle = (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(current_vehicle) == 1) and true or false
+            local toggle = (
+                VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(current_vehicle) == 1
+            ) and true or false
             vehicleLockStatus = toggle and 2 or 1
             Game.Vehicle.lockDoors(current_vehicle, toggle, vehlock)
         end
@@ -205,24 +215,37 @@ end)
 CommandExecutor:RegisterCommand("PANIK", function()
     SS.handle_events()
     AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(
-        "ELECTROCUTION", "MISTERK", self.get_pos().x,
-        self.get_pos().y, self.get_pos().z, "SPEECH_PARAMS_FORCE"
+        "ELECTROCUTION",
+        "MISTERK",
+        self.get_pos().x,
+        self.get_pos().y,
+        self.get_pos().z,
+        "SPEECH_PARAMS_FORCE"
     )
     YimToast:ShowWarning("PANIK!", "(Ó _ Ò )!!")
 end)
 
-CommandExecutor:RegisterCommand("resetcfg", SS.reset_settings)
-
 CommandExecutor:RegisterCommand("fastvehs", function()
     fast_vehicles = not fast_vehicles
-    YimToast:ShowMessage("Samurai's Scripts", ("Fast Vehicles %s"):format(fast_vehicles and "enabled" or "disabled"),
-        false, 1.5)
-    if not fast_vehicles and current_vehicle ~= 0 and (is_car or is_bike or is_quad) then
+    YimToast:ShowMessage(
+        "Samurai's Scripts",
+        ("Fast Vehicles %s"):format(fast_vehicles and "enabled" or "disabled"),
+        false,
+        1.5
+    )
+    if (
+        not fast_vehicles and
+        current_vehicle ~= 0 and
+        (is_car or is_bike or is_quad)
+    ) then
         script.run_in_fiber(function()
             VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, 0)
         end)
     end
+    CFG:SaveItem("fast_vehicles", fast_vehicles)
 end)
+
+CommandExecutor:RegisterCommand("resetcfg", SS.reset_settings)
 
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -232,6 +255,7 @@ end)
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
+
 KeyManager:RegisterKeybind(keybinds.autokill.code, function()
     if SS.canUseKeybinds() then
         autoKill = not autoKill
@@ -1618,11 +1642,13 @@ script.register_looped("SS_TOKYODRIFT", function(script)
             VEHICLE.IS_THIS_MODEL_A_JETSKI(ENTITY.GET_ENTITY_MODEL(current_vehicle)))
         vehicleLockStatus = (VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(current_vehicle) <= 1) and 1 or 2
         is_using_flatbed  = Game.getEntityModel(current_vehicle) == flatbedModel
+
         if is_car or is_quad or is_bike then
             validModel = true
         else
             validModel = false
         end
+
         if validModel and (driftMode or DriftTires) then
             if pressing_drift_button then
                 if not drift_started then
@@ -1645,7 +1671,7 @@ script.register_looped("SS_TOKYODRIFT", function(script)
             end
         end
 
-        if speedBoost and (validModel or is_boat) and not Game.Vehicle.isElectric() then
+        if speedBoost and (validModel or is_boat) and not Game.Vehicle.isElectric(current_vehicle) then
             if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
                 if pressing_nos_button and PAD.IS_CONTROL_PRESSED(0, 71) then
                     VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(current_vehicle, (nosPower) / 5)
@@ -1926,7 +1952,7 @@ script.register_looped("SS_ABSLIGHTS", function(abs)
                 return
             end
         end
-        if Game.Vehicle.hasABS() and PAD.IS_CONTROL_PRESSED(0, 72) then
+        if Game.Vehicle.hasABS(current_vehicle) and PAD.IS_CONTROL_PRESSED(0, 72) then
             if (ENTITY.GET_ENTITY_SPEED(self.get_veh()) * 3.6) > 100 then
                 repeat
                     should_flash_bl = not should_flash_bl
@@ -1947,7 +1973,7 @@ script.register_looped("SS_MISC_VEH", function(mvo)
             end
         end
 
-        if abs_lights and is_car and Game.Vehicle.hasABS() and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle)
+        if abs_lights and is_car and Game.Vehicle.hasABS(current_vehicle) and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(current_vehicle)
             and not VEHICLE.IS_VEHICLE_STOPPED(current_vehicle) then
             if should_flash_bl then
                 VEHICLE.SET_VEHICLE_BRAKE_LIGHTS(current_vehicle, false)
@@ -2076,7 +2102,7 @@ end)
 
 script.register_looped("SS_TWOSTEP", function(twostep)
     if launchCtrl and Game.Self.isDriving() and (validModel or is_bike or is_quad)
-        and not Game.Vehicle.isElectric() then
+        and not Game.Vehicle.isElectric(current_vehicle) then
         if limitVehOptions then
             if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and
                 VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and
@@ -2122,7 +2148,7 @@ script.register_looped("SS_TWOSTEP", function(twostep)
 end)
 
 script.register_looped("SS_LCTRLSFX", function(tstp) -- Launch Contol SFX
-    if launchCtrl and Game.Self.isDriving() and not Game.Vehicle.isElectric() then
+    if launchCtrl and Game.Self.isDriving() and not Game.Vehicle.isElectric(current_vehicle) then
         if limitVehOptions then
             if VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 4 and
                 VEHICLE.GET_VEHICLE_CLASS(self.get_veh()) ~= 6 and
@@ -2171,7 +2197,7 @@ script.register_looped("SS_LCTRLSFX", function(tstp) -- Launch Contol SFX
 end)
 
 script.register_looped("SS_PNB", function() -- Pops & Bangs
-    if Game.Self.isDriving() and not Game.Vehicle.isElectric() and (is_car or is_bike) and
+    if Game.Self.isDriving() and not Game.Vehicle.isElectric(current_vehicle) and (is_car or is_bike) and
         VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle) then
         if popsNbangs then
             if limitVehOptions then
@@ -4072,7 +4098,7 @@ script.register_looped("SS_TOGGLABLES", function(hfe) -- Misc toggleables
         VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle)
     ) then
         if noEngineBraking and not engine_brake_disabled then
-            SS.setHandlingFlag(HF._FREEWHEEL_NO_GAS, true)
+            SS.setHandlingFlag(current_vehicle, HF._FREEWHEEL_NO_GAS, true)
             hfe:sleep(100)
         end
 
@@ -4081,29 +4107,29 @@ script.register_looped("SS_TOGGLABLES", function(hfe) -- Misc toggleables
             kers_boost_enabled and not
             VEHICLE.GET_VEHICLE_HAS_KERS(current_vehicle)
         ) then
-            SS.setHandlingFlag(HF._HAS_KERS, true)
+            SS.setHandlingFlag(current_vehicle, HF._HAS_KERS, true)
             VEHICLE.SET_VEHICLE_KERS_ALLOWED(current_vehicle, true)
             hfe:sleep(100)
         end
 
         if offroaderx2 and not offroader_enabled then
-            SS.setHandlingFlag(HF._OFFROAD_ABILITIES_X2, true)
+            SS.setHandlingFlag(current_vehicle, HF._OFFROAD_ABILITIES_X2, true)
             hfe:sleep(100)
         end
 
         if rallyTires and not rally_tires_enabled then
-            SS.setHandlingFlag(HF._HAS_RALLY_TYRES, true)
+            SS.setHandlingFlag(current_vehicle, HF._HAS_RALLY_TYRES, true)
             hfe:sleep(100)
         end
 
         if (is_bike or is_quad) then
             if noTractionCtrl and not traction_ctrl_disabled then
-                SS.setHandlingFlag(HF._FORCE_NO_TC_OR_SC, true)
+                SS.setHandlingFlag(current_vehicle, HF._FORCE_NO_TC_OR_SC, true)
                 hfe:sleep(100)
             end
 
             if easyWheelie and not easy_wheelie_enabled then
-                SS.setHandlingFlag(HF._LOW_SPEED_WHEELIES, true)
+                SS.setHandlingFlag(current_vehicle, HF._LOW_SPEED_WHEELIES, true)
                 hfe:sleep(100)
             end
         end

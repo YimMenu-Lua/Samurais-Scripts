@@ -1,7 +1,7 @@
 ---@diagnostic disable
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = "1.6.1"
+SCRIPT_VERSION = "1.6.2"
 TARGET_BUILD   = "3442"
 TARGET_VERSION = "1.70"
 DEFAULT_CONFIG = {
@@ -19,7 +19,7 @@ DEFAULT_CONFIG = {
         slick = false,
         explosive = false,
         emp = false,
-        kinetic = false 
+        kinetic = false
     },
     keybinds                = {
         rodBtn        = { code = 0x58, name = "[X]" },
@@ -120,6 +120,7 @@ DEFAULT_CONFIG = {
     keepWheelsTurned        = false,
     noJacking               = false,
     veh_mines               = false,
+    fast_vehicles           = false,
     autovehlocks            = false,
     autoraiseroof           = false,
     towEverything           = false,
@@ -183,8 +184,8 @@ DEFAULT_CONFIG = {
     supply_autofill_delay   = 500,
     katana_replace_model    = 0xDD5DF8D9,
     katana_replace_index    = 0,
-    LANG                    = 'en-US',
-    current_lang            = 'English',
+    LANG                    = "en-US",
+    current_lang            = "English",
 }
 
 current_vehicle                       = 0
@@ -222,7 +223,9 @@ nos_started                           = false
 twostep_started                       = false
 is_typing                             = false
 is_setting_hotkeys                    = false
+engine_sound_changed                  = false
 open_sounds_window                    = false
+open_engine_swap_window               = false
 started_lct                           = false
 launch_active                         = false
 started_popSound                      = false
@@ -295,7 +298,6 @@ showInvalidObjText                    = false
 blacklisted_obj                       = false
 spawned_persist_props                 = false
 boot_vehicle_re                       = false
-fast_vehicles                         = false
 rwSteering                            = false
 awSteering                            = false
 handbrakeSteering                     = false
@@ -547,6 +549,7 @@ attached_vehicles                     = {
     roty    = 0.0,
     rotz    = 0.0
 }
+
 vehicle_creation                      = {
     name = "",
     main_veh = 0,
@@ -564,17 +567,20 @@ vehicle_creation                      = {
     tint = 0,
     attachments = {}
 }
+
 default_tire_smoke                    = {
     r = 255,
     g = 255,
     b = 255,
 }
+
 yrv2_color                            = {
     0,
     255,
     255,
     1
 }
+
 whouse1                               = {
     id   = 0,
     max  = 0,
@@ -586,6 +592,7 @@ whouse1                               = {
         large  = false,
     }
 }
+
 whouse2                               = {
     id   = 1,
     max  = 0,
@@ -597,6 +604,7 @@ whouse2                               = {
         large  = false,
     }
 }
+
 whouse3                               = {
     id   = 2,
     max  = 0,
@@ -608,6 +616,7 @@ whouse3                               = {
         large  = false,
     }
 }
+
 whouse4                               = {
     id   = 3,
     max  = 0,
@@ -619,6 +628,7 @@ whouse4                               = {
         large  = false,
     }
 }
+
 whouse5                               = {
     id   = 4,
     max  = 0,
@@ -630,6 +640,7 @@ whouse5                               = {
         large  = false,
     }
 }
+
 -- biker businesses
 bb                                    = {
     slot0 = {
@@ -668,10 +679,12 @@ bb                                    = {
         val_offset = 0,
     },
 }
+
 prop_creation                         = {
     name  = "",
     props = {}
 }
+
 selfAttachments                       = {
     entity = 0,
     hash   = 0,

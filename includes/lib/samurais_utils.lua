@@ -602,6 +602,17 @@ resetLastVehState = function()
             VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS(last_vehicle, false)
             ubwindowsToggled = false
         end
+
+        if engine_sound_changed then
+            AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(
+                last_vehicle,
+                vehicles.get_vehicle_display_name(
+                    ENTITY.GET_ENTITY_MODEL(last_vehicle)
+                )
+            )
+            Game.Vehicle.setAcceleration(last_vehicle, 1.0)
+            engine_sound_changed = false
+        end
     end
     last_vehicle = current_vehicle
 end
@@ -613,12 +624,12 @@ onVehEnter = function()
         (is_car or is_bike or is_quad) and
         VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(current_vehicle)
     ) then
-        engine_brake_disabled  = SS.getVehicleHandlingFlag(HF._FREEWHEEL_NO_GAS)
-        traction_ctrl_disabled = SS.getVehicleHandlingFlag(HF._FORCE_NO_TC_OR_SC)
-        kers_boost_enabled     = SS.getVehicleHandlingFlag(HF._HAS_KERS)
-        offroader_enabled      = SS.getVehicleHandlingFlag(HF._OFFROAD_ABILITIES_X2)
-        rally_tires_enabled    = SS.getVehicleHandlingFlag(HF._HAS_RALLY_TYRES)
-        easy_wheelie_enabled   = SS.getVehicleHandlingFlag(HF._LOW_SPEED_WHEELIES)
+        engine_brake_disabled  = SS.getVehicleHandlingFlag(current_vehicle, HF._FREEWHEEL_NO_GAS)
+        traction_ctrl_disabled = SS.getVehicleHandlingFlag(current_vehicle, HF._FORCE_NO_TC_OR_SC)
+        kers_boost_enabled     = SS.getVehicleHandlingFlag(current_vehicle, HF._HAS_KERS)
+        offroader_enabled      = SS.getVehicleHandlingFlag(current_vehicle, HF._OFFROAD_ABILITIES_X2)
+        rally_tires_enabled    = SS.getVehicleHandlingFlag(current_vehicle, HF._HAS_RALLY_TYRES)
+        easy_wheelie_enabled   = SS.getVehicleHandlingFlag(current_vehicle, HF._LOW_SPEED_WHEELIES)
     end
 
     if Game.Self.isDriving() and (current_vehicle ~= last_vehicle) then
@@ -2396,64 +2407,26 @@ SS.gpadHotkeyWindow = function(window_name, keybind)
     end
 end
 
--- Seamlessly add/remove keyboard keybinds on script update without requiring a config reset.
-SS.check_kb_keybinds = function()
-    local kb_keybinds_list = DEFAULT_CONFIG.keybinds
-    local t_len            = Lua_fn.getTableLength
-    if t_len(keybinds) == t_len(kb_keybinds_list) then
-        SS.debug('No new keyboard keybinds.')
-        return false -- early exit
-    elseif t_len(keybinds) > t_len(kb_keybinds_list) then
-        for k, _ in pairs(keybinds) do
-            local kk = kb_keybinds_list[k]
-            if kk == nil then -- removed keybind
-                SS.debug('Removed keyboard keybind: ' .. tostring(keybinds[k]))
-                keybinds[k] = nil
-                CFG:SaveItem("keybinds", keybinds)  -- save
-                keybinds = CFG:ReadItem("keybinds") -- refresh
-            end
-        end
-    else
-        for k, _ in pairs(kb_keybinds_list) do
-            local kk = keybinds[k]
-            if kk == nil then -- new keybind
-                SS.debug('Added keyboard keybind: ' .. tostring(k))
-                keybinds[k] = kb_keybinds_list[k]
-                CFG:SaveItem("keybinds", keybinds)  -- save
-                keybinds = CFG:ReadItem("keybinds") -- refresh
-            end
+-- Handle config key addition/removal
+---@param saved table
+---@param default table
+SS.sync_config = function(saved, default)
+    for k, v in pairs(default) do
+        if saved[k] == nil then
+            saved[k] = v
+            SS.debug(string.format("Added missing config key: '%s'", k))
+        elseif (type(v) == "table") and (type(saved[k]) == "table") then
+            SS.sync_config(saved[k], v)
         end
     end
-end
 
--- Seamlessly add/remove controller keybinds on script update without requiring a config reset.
-SS.check_gpad_keybinds = function()
-    local gpad_keybinds_list = DEFAULT_CONFIG.gpad_keybinds
-    local t_len              = Lua_fn.getTableLength
-    if t_len(gpad_keybinds) == t_len(gpad_keybinds_list) then
-        SS.debug('No new gamepad keybinds.')
-        return false -- early exit
-    elseif t_len(gpad_keybinds) > t_len(gpad_keybinds_list) then
-        for k, _ in pairs(gpad_keybinds) do
-            local kk = gpad_keybinds_list[k]
-            if kk == nil then -- removed keybind
-                SS.debug('Removed gamepad keybind: ' .. tostring(gpad_keybinds[k]))
-                gpad_keybinds[k] = nil
-                CFG:SaveItem("gpad_keybinds", gpad_keybinds)  -- save
-                gpad_keybinds = CFG:ReadItem("gpad_keybinds") -- refresh
-            end
-        end
-    else
-        for k, _ in pairs(gpad_keybinds_list) do
-            local kk = gpad_keybinds[k]
-            if kk == nil then -- new keybind
-                SS.debug('Added gamepad keybind: ' .. tostring(k))
-                gpad_keybinds[k] = gpad_keybinds_list[k]
-                CFG:SaveItem("gpad_keybinds", gpad_keybinds)  -- save
-                gpad_keybinds = CFG:ReadItem("gpad_keybinds") -- refresh
-            end
+    for k in pairs(saved) do
+        if default[k] == nil then
+            saved[k] = nil
+            SS.debug(string.format("Removed redundant config key: '%s'", k))
         end
     end
+    CFG:Save(saved)
 end
 
 SS.canUseKeybinds = function()
@@ -2472,7 +2445,7 @@ SS.canUsePhoneAnims = function()
         is_playing_anim and not
         is_playing_scenario and not
         ped_grabbed and not
-        vehicle_grabbed and not 
+        vehicle_grabbed and not
         is_handsUp and not
         is_sitting and not
         is_hiding and not
@@ -2721,6 +2694,16 @@ SS.handle_events = function()
     if VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(current_vehicle) ~= 1 then
         VEHICLE.SET_VEHICLE_DOORS_LOCKED(current_vehicle, 1)
         VEHICLE.SET_VEHICLE_ALARM(current_vehicle, false)
+    end
+
+    if engine_sound_changed then
+        AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(
+            current_vehicle,
+            vehicles.get_vehicle_display_name(
+                ENTITY.GET_ENTITY_MODEL(current_vehicle)
+            )
+        )
+        Game.Vehicle.setAcceleration(current_vehicle, 1.0)
     end
 end
 
@@ -3043,8 +3026,16 @@ SS.showNPCvehicleControls = function()
 end
 
 -- Reads localPlayer's vehicle information from memory.
-SS.getVehicleInfo = function()
-    local vehPtr = memory.handle_to_ptr(self.get_veh())
+SS.getVehicleInfo = function(vehicle)
+    if (
+        not ENTITY.DOES_ENTITY_EXIST(vehicle) or
+        not ENTITY.IS_ENTITY_A_VEHICLE(vehicle) or
+        not entities.take_control_of(vehicle, 500)
+    ) then
+        return
+    end
+
+    local vehPtr = memory.handle_to_ptr(vehicle)
     ---@class CVehicle
     local CVehicle = setmetatable({}, {})
     CVehicle.__index = CVehicle
@@ -3054,6 +3045,7 @@ SS.getVehicleInfo = function()
         local CVehicleDamage         = vehPtr:add(0x0420)
         local CDeformation           = CVehicleDamage:add(0x0010)
         CVehicle.m_model_info_flags  = CVehicleModelInfo:add(0x057C)
+        CVehicle.m_acceleration      = CHandlingData:add(0x004C)
         CVehicle.m_model_flags       = CHandlingData:add(0x0124)
         CVehicle.m_handling_flags    = CHandlingData:add(0x0128)
         CVehicle.m_deformation_mult  = CHandlingData:add(0x00F8)
@@ -3064,52 +3056,88 @@ SS.getVehicleInfo = function()
     return CVehicle
 end
 
--- Checks if a handling flag is set
---
--- in localPlayer's current vehicle.
+-- Checks if a vehicle's handling flag is set.
+---@param vehicle number
 ---@param flag number
-SS.getVehicleHandlingFlag = function(flag)
-    local m_handling_flags = SS.getVehicleInfo().m_handling_flags
-    local handling_flags   = m_handling_flags:get_dword()
-    return Lua_fn.has_bit(handling_flags, flag)
-end
-
--- Enables or disables a handling flag for localPlayer's vehicle.
----@param flag number
----@param toggle boolean
-SS.setHandlingFlag = function(flag, toggle)
-    if not is_car and not is_bike and not is_quad then
+SS.getVehicleHandlingFlag = function(vehicle, flag)
+    if (
+        not ENTITY.DOES_ENTITY_EXIST(vehicle) or not
+        ENTITY.IS_ENTITY_A_VEHICLE(vehicle)
+    ) then
         return
     end
-    local m_handling_flags = SS.getVehicleInfo().m_handling_flags
-    local handling_flags   = m_handling_flags:get_dword()
-    local bitwiseOp        = toggle and Lua_fn.set_bit or Lua_fn.clear_bit
-    local new_flag         = bitwiseOp(handling_flags, flag)
-    m_handling_flags:set_dword(new_flag)
+    local m_handling_flags = SS.getVehicleInfo(vehicle).m_handling_flags
+    if m_handling_flags:is_valid() then
+        return Lua_fn.has_bit(m_handling_flags:get_dword(), flag)
+    end
 end
 
+-- Enables or disables a vehicle's handling flag.
+---@param vehicle number
+---@param flag number
+---@param toggle boolean
+SS.setHandlingFlag = function(vehicle, flag, toggle)
+    if (
+        not VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(vehicle)) and not
+        VEHICLE.IS_THIS_MODEL_A_BIKE(ENTITY.GET_ENTITY_MODEL(vehicle)) and not
+        VEHICLE.IS_THIS_MODEL_A_QUADBIKE(ENTITY.GET_ENTITY_MODEL(vehicle))
+    ) then
+        return
+    end
+
+    local m_handling_flags = SS.getVehicleInfo(vehicle).m_handling_flags
+    if m_handling_flags:is_valid() then
+        local handling_flags = m_handling_flags:get_dword()
+        local bitwiseOp      = toggle and Lua_fn.set_bit or Lua_fn.clear_bit
+        local new_flag       = bitwiseOp(handling_flags, flag)
+        m_handling_flags:set_dword(new_flag)
+    end
+end
+
+---@param vehicle integer
 ---@param flag integer
-SS.getVehicleModelFlag = function(flag)
-    local base_ptr = SS.getVehicleInfo()
-        .m_model_info_flags -- array of 7 uint32_t (7 * 32 = 224 flags total. Outdated ref: https://gtamods.com/wiki/Vehicles.meta)
-    local index    = math.floor(flag / 32)
-    local bitPos   = flag % 32
-    local flag_ptr = base_ptr:add(index * 4)
-    local dword    = flag_ptr:get_dword()
-    return Lua_fn.has_bit(dword, bitPos)
+SS.getVehicleModelFlag = function(vehicle, flag)
+    if (
+        not ENTITY.DOES_ENTITY_EXIST(vehicle) or not
+        ENTITY.IS_ENTITY_A_VEHICLE(vehicle)
+    ) then
+        return
+    end
+    -- array of 7 uint32_t (7 * 32 = 224 flags total).
+    --
+    -- Outdated ref: https://gtamods.com/wiki/Vehicles.meta
+    local base_ptr = SS.getVehicleInfo(vehicle).m_model_info_flags
+    if base_ptr:is_valid() then
+        local index    = math.floor(flag / 32)
+        local bitPos   = flag % 32
+        local flag_ptr = base_ptr:add(index * 4)
+        local dword    = flag_ptr:get_dword()
+        return Lua_fn.has_bit(dword, bitPos)
+    end
 end
 
+---@param vehicle integer
 ---@param flag integer
 ---@param toggle boolean
-SS.setVehicleModelFlag = function(flag, toggle)
-    local base_ptr  = SS.getVehicleInfo().m_model_info_flags
-    local index     = math.floor(flag / 32)
-    local bitPos    = flag % 32
-    local flag_ptr  = base_ptr:add(index * 4)
-    local dword     = flag_ptr:get_dword()
-    local bitwiseOp = toggle and Lua_fn.set_bit or Lua_fn.clear_bit
-    local new_flag  = bitwiseOp(dword, bitPos)
-    flag_ptr:set_dword(new_flag)
+SS.setVehicleModelFlag = function(vehicle, flag, toggle)
+    if (
+        not ENTITY.DOES_ENTITY_EXIST(vehicle) or not
+        ENTITY.IS_ENTITY_A_VEHICLE(vehicle)
+    ) then
+        return
+    end
+    local base_ptr  = SS.getVehicleInfo(vehicle).m_model_info_flags
+    if base_ptr:is_valid() then
+        local index    = math.floor(flag / 32)
+        local bitPos   = flag % 32
+        local flag_ptr = base_ptr:add(index * 4)
+        if flag_ptr:is_valid() then
+            local dword     = flag_ptr:get_dword()
+            local bitwiseOp = toggle and Lua_fn.set_bit or Lua_fn.clear_bit
+            local new_flag  = bitwiseOp(dword, bitPos)
+            flag_ptr:set_dword(new_flag)
+        end
+    end
 end
 
 ---@unused
@@ -4051,10 +4079,10 @@ Game.Vehicle.hasWeapons = function(vehicle)
     return VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(vehicle)
 end
 
--- Returns whether local player's vehicle has ABS as standard.
-Game.Vehicle.hasABS = function()
+-- Returns whether the vehicle has ABS as standard.
+Game.Vehicle.hasABS = function(vehicle)
     if Game.Self.isDriving() and is_car then
-        local m_model_flags = SS.getVehicleInfo().m_model_flags
+        local m_model_flags = SS.getVehicleInfo(vehicle).m_model_flags
         if m_model_flags ~= nil then
             local iModelFlags = m_model_flags:get_dword()
             return Lua_fn.has_bit(iModelFlags, MF._ABS_STD)
@@ -4063,30 +4091,34 @@ Game.Vehicle.hasABS = function()
     return false
 end
 
--- Returns whether local player's vehicle is a sports car.
+-- Returns whether the vehicle is a sports car.
 --
 -- *(different from the Sports class)*.
-Game.Vehicle.isSportsCar = function()
-    return SS.getVehicleModelFlag(VMF._SPORTS)
+---@param vehicle integer
+Game.Vehicle.isSportsCar = function(vehicle)
+    return SS.getVehicleModelFlag(vehicle, VMF._SPORTS)
 end
 
--- Returns whether local player's vehicle is a pussy shaver.
-Game.Vehicle.isElectric = function()
-    return SS.getVehicleModelFlag(VMF._IS_ELECTRIC)
+-- Returns whether the vehicle is a pussy shaver.
+---@param vehicle integer
+Game.Vehicle.isElectric = function(vehicle)
+    return SS.getVehicleModelFlag(vehicle, VMF._IS_ELECTRIC)
 end
 
--- Returns whether local player's vehicle is an F1 race car.
-Game.Vehicle.isFormulaOne = function()
-    return SS.getVehicleModelFlag(VMF._IS_FORMULA_VEHICLE) or
-        Game.Vehicle.class(self.get_veh()) == "Open Wheel"
+-- Returns whether the vehicle is an F1 race car.
+---@param vehicle integer
+Game.Vehicle.isFormulaOne = function(vehicle)
+    return SS.getVehicleModelFlag(vehicle, VMF._IS_FORMULA_VEHICLE) or
+        Game.Vehicle.class(vehicle) == "Open Wheel"
 end
 
--- Returns whether local player's vehicle is a lowrider
+-- Returns whether the vehicle is a lowrider
 --
 -- equipped with hydraulic suspension.
-Game.Vehicle.isLowrider = function()
-    return SS.getVehicleModelFlag(VMF._HAS_LOWRIDER_HYDRAULICS) or
-        SS.getVehicleModelFlag(VMF._HAS_LOWRIDER_DONK_HYDRAULICS)
+---@param vehicle integer
+Game.Vehicle.isLowrider = function(vehicle)
+    return SS.getVehicleModelFlag(vehicle, VMF._HAS_LOWRIDER_HYDRAULICS) or
+        SS.getVehicleModelFlag(vehicle, VMF._HAS_LOWRIDER_DONK_HYDRAULICS)
 end
 
 -- Applies a custom paint job to the vehicle
@@ -4148,6 +4180,23 @@ Game.Vehicle.lockDoors = function(vehicle, toggle, s)
         s:sleep(696)
         VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false)
         VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false)
+    end
+end
+
+---@param vehicle integer
+---@param multiplier float
+Game.Vehicle.setAcceleration = function(vehicle, multiplier)
+    if (
+        not ENTITY.DOES_ENTITY_EXIST(vehicle) or
+        not ENTITY.IS_ENTITY_A_VEHICLE(vehicle) or
+        (math.type(multiplier) ~= "float")
+    ) then
+        return
+    end
+
+    acc_ptr = SS.getVehicleInfo(vehicle).m_acceleration
+    if acc_ptr:is_valid() then
+        acc_ptr:set_float(multiplier)
     end
 end
 

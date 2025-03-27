@@ -1646,6 +1646,17 @@ custom_paints_T          = {
     { name = "Hyper Red",                                hex = "#3C0612", p = 30,  m = false, manufacturer = "Aston Martin",      shade = "Red" },
 }
 
+engine_swaps_t           = {
+    { name = "GM LS1 5.7L V8",              audioname = "coquette3", acc_mult = 4.556,   tt = "Its power is measured in freedoms per football field." },
+    { name = "Subaru EJ15 1.5L F4",         audioname = "sultan2",   acc_mult = 2.82,    tt = "For the adventurous." },
+    { name = "BMW N54B30 3.0L I6",          audioname = "sentinel",  acc_mult = 1.966,   tt = "Can't keep its oil inside." },
+    { name = "Toyota 2JZ GTE 3.0L I6",      audioname = "jester3",   acc_mult = 8.69420, tt = "OP because Supra, bro!" },
+    { name = "Nissan RB26DETT 2.6L I6",     audioname = "elegy",     acc_mult = 6.42,    tt = "Less OP but still, JDM FTW!" },
+    { name = "Mercedes-Benz M275 6.0L V12", audioname = "schafter3", acc_mult = 4.87,    tt = "Peak German engineering: Powerful, and sounds like a beast!" },
+    { name = "Ferrari F136 4.5L V8",        audioname = "turismo3",  acc_mult = 5.4,     tt = "VIP exclusive." },
+    { name = "Lamborghini 6.5L V12",        audioname = "tempesta",  acc_mult = 6.8,     tt = "Pineapple on pizza." },
+}
+
 vehicle_classes_t        = {
     [0] = "Compacts",
     [1] = "Sedans",

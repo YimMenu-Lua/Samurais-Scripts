@@ -102,13 +102,13 @@ function Translator:Translate(label)
                 end
             end
         else
-            logmsg = "Unsupported language! Defaulting to English (US)."
+            logmsg = "Missing or unsupported language! Defaulting to English (US)."
             if not self:was_logged(logmsg) then
                 YimToast:ShowWarning("Translator", logmsg, true)
                 table.insert(self.log_history, logmsg)
             end
             retStr = Labels[label][1].text
-            SS.debug("Missing: " .. Labels[label][1].text)
+            SS.debug(string.format("Missing translation for: %s in (%s)", label, self.lang))
         end
     else
         logmsg = "Missing label!"
@@ -117,6 +117,7 @@ function Translator:Translate(label)
             table.insert(self.log_history, logmsg)
         end
         retStr = string.format("[!MISSING LABEL]: %s", label)
+        SS.debug(string.format("Missing label: %s", label))
     end
 
     if not self.cache[label] then

@@ -146,7 +146,7 @@
 
   - **Auto-Pilot:**
     - While flying a plane or a helicopter, open the UI and choose one of the auto-pilot options: **Fly To Waypoint**, **Fly To Objective** or **Random**.
-  
+
   - **Fake Siren:**
     - Equip any land vehicle with a siren *(except of course, vehicles that already have one)*.
 
@@ -154,16 +154,16 @@
 
   - **Ejecto Seato Cuz!**
     - Press this button to eject all peds from your vehicle. Currently, this does not work on other players or dead peds.
-  
+
   - **Better Car Crashes:**
     - Makes car crashes a bit more dangerous in 3 steps:
       1. **Crashing at a speed higher than 70km/h and less than 118km/h:** Shakes the gameplay camera.
       2. **Crashing at a speed higher than 118km/h and less than 162km/h:** Applies damage to the vehicle and everyone inside it.
       3. **Crashing at a speed higher than 162km/h:** Has a very high chance of destroying the engine and killing everyone in the vehicle.
-  
+
   - **ABS Brake Lights:**
     - Also known as **Brake Force Display** in German vehicles: Flashes your brake lights repeatedly when you apply the brakes at a speed higher than 100km/h, similar to modern sports cars *(Only works on cars that have ABS as standard)*.
-  
+
   - **Door lock control:**
     - Has 2 main options and one complementary option:
       - Simple button to lock and unlock your vehicle.
@@ -173,6 +173,12 @@
       > **Note:** The feature only works on cars and trucks.
 
       > **Note:** If you lock a vehicle (or it gets automatically locked) then switch to a different vehicle, the previous one will be automatically unlocked.
+
+  - **Engine Swap:**
+    - Changes the sound of your vehicle's engine and increases its power.
+
+  - **Fast Vehicles:**
+    - Increases the top speed of any *land* vehicle you drive.
 
 
 - **Custom Paint Jobs:**

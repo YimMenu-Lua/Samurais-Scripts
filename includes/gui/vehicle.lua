@@ -1,5 +1,8 @@
 ---@diagnostic disable
 
+local engine_swap_index = 0
+local selected_engine
+
 function vehicleUI()
     if current_vehicle ~= nil and current_vehicle ~= 0 then
         local manufacturer  = Game.Vehicle.manufacturer(current_vehicle)
@@ -10,7 +13,8 @@ function vehicleUI()
     else
         ImGui.SeparatorText("On Foot")
     end
-    ImGui.Spacing(); limitVehOptions, lvoUsed = ImGui.Checkbox(_T("LIMIT_OPTIONS_CB_"), limitVehOptions)
+    ImGui.Spacing()
+    limitVehOptions, lvoUsed = ImGui.Checkbox(_T("LIMIT_OPTIONS_CB_"), limitVehOptions)
     UI.toolTip(false, _T("LIMIT_OPTIONS_DESC_"))
     if lvoUsed then
         UI.widgetSound("Nav2")
@@ -637,7 +641,8 @@ function vehicleUI()
     end
     ImGui.EndDisabled()
 
-    ImGui.Dummy(1, 5); ImGui.SeparatorText("MISC")
+    ImGui.Dummy(1, 5)
+    ImGui.SeparatorText("MISC")
     ImGui.BeginDisabled(current_vehicle == 0)
     if ImGui.Button(string.format(" %s ", _T("ENGINE_SOUND_BTN_"))) then
         if is_car or is_bike or is_quad then
@@ -650,7 +655,36 @@ function vehicleUI()
         end
     end
 
-    ImGui.SameLine(); ImGui.Dummy(30, 1); ImGui.SameLine()
+    ImGui.SameLine()
+    ImGui.BeginDisabled(Game.Vehicle.isElectric(current_vehicle) or not is_car)
+    if ImGui.Button(_T("ENGINE_SWAP_BTN_")) then
+        UI.widgetSound("Select")
+        open_engine_swap_window = true
+    end
+    ImGui.EndDisabled()
+    UI.toolTip(false, _T("NON_ELECTRIC_CARS_TXT_"))
+
+    ImGui.SameLine()
+    if cv_engineHealth <= 300 then
+        engineButton_label = _T("FIX_ENGINE_")
+        engine_hp          = 1000
+        button_color_1     = "#008000"
+        button_color_2     = "#005A00"
+        button_color_3     = "#BFFFBF"
+    else
+        engineButton_label = _T("DESTROY_ENGINE_")
+        engine_hp          = -4000
+        button_color_1     = "#FF0000"
+        button_color_2     = "#B30000"
+        button_color_3     = "#FF8080"
+    end
+    if UI.coloredButton(engineButton_label, button_color_1, button_color_2, button_color_3, 1) then
+        UI.widgetSound("Select")
+        script.run_in_fiber(function()
+            VEHICLE.SET_VEHICLE_ENGINE_HEALTH(current_vehicle, engine_hp)
+        end)
+    end
+
     if dummyCopCar == 0 then
         if VEHICLE.GET_VEHICLE_CLASS(current_vehicle) ~= 18 then
             if ImGui.Button(" Equip Fake Siren ") then
@@ -689,18 +723,17 @@ function vehicleUI()
         end
     end
 
+    ImGui.SameLine()
+
     if ImGui.Button("Ejecto Seato Cuz") then
         UI.widgetSound("Select")
         script.run_in_fiber(function(ejecto)
             local passengers = Game.Vehicle.getOccupants(current_vehicle)
-            if #passengers == 1 then
-                if passengers[1] == self.get_ped() then
-                    YimToast:ShowError("Samurai's Scripts", "You can not ejecto seato on yourself, cuz!")
-                    goto pass
-                end
-            elseif #passengers >= 1 then
-                YimToast:ShowMessage("Samurai's Scripts", "YEET!")
+            if (#passengers == 1) and (passengers[1] == self.get_ped()) then
+                YimToast:ShowError("Samurai's Scripts", "You can not ejecto seato on yourself, cuz!")
+                return
             end
+
             for _, ped in ipairs(passengers) do
                 if ped ~= self.get_ped() then
                     if not PED.IS_PED_A_PLAYER(ped) then
@@ -716,35 +749,27 @@ function vehicleUI()
                     end
                 end
             end
-            ::pass::
-        end)
-    end
-    UI.toolTip(false, _T("EJECTO_SEATO_DESC_"))
-
-    if current_vehicle ~= 0 then
-        local engineDestroyed = cv_engineHealth <= 300
-    end
-    if engineDestroyed then
-        engineButton_label = _T("FIX_ENGINE_")
-        engine_hp          = 1000
-        button_color_1     = "#008000"
-        button_color_2     = "#005A00"
-        button_color_3     = "#BFFFBF"
-    else
-        engineButton_label = _T("DESTROY_ENGINE_")
-        engine_hp          = -4000
-        button_color_1     = "#FF0000"
-        button_color_2     = "#B30000"
-        button_color_3     = "#FF8080"
-    end
-    ImGui.SameLine(); ImGui.Dummy(97, 1); ImGui.SameLine()
-    if UI.coloredButton(engineButton_label, button_color_1, button_color_2, button_color_3, 1) then
-        UI.widgetSound("Select")
-        script.run_in_fiber(function()
-            VEHICLE.SET_VEHICLE_ENGINE_HEALTH(current_vehicle, engine_hp)
         end)
     end
     ImGui.EndDisabled()
+    UI.toolTip(false, _T("EJECTO_SEATO_DESC_"))
+
+    ImGui.SameLine()
+    fast_vehicles, fastvehsUsed = ImGui.Checkbox(_T("FAST_VEHS_CB_"), fast_vehicles)
+    UI.toolTip(false, _T("FAST_VEHS_TXT_"))
+    if fastvehsUsed then
+        UI.widgetSound("Nav2")
+        if (
+            not fast_vehicles and
+            current_vehicle ~= 0 and
+            (is_car or is_bike or is_quad)
+        ) then
+            script.run_in_fiber(function()
+                VEHICLE.MODIFY_VEHICLE_TOP_SPEED(current_vehicle, 0)
+            end)
+        end
+        CFG:SaveItem("fast_vehicles", fast_vehicles)
+    end
 
     ImGui.BeginDisabled(Game.Self.isDriving() or not Game.Self.isOutside() or current_vehicle == 0)
     if ImGui.Button("TP Into Last Vehicle") then
@@ -760,7 +785,7 @@ function vehicleUI()
             end
         end)
     end
-    ImGui.SameLine(); ImGui.Dummy(55, 1); ImGui.SameLine()
+    ImGui.SameLine()
     if ImGui.Button("Bring Last Vehicle") then
         UI.widgetSound("Select")
         script.run_in_fiber(function(blv)
@@ -794,65 +819,16 @@ function vehicleUI()
         end)
     end
     ImGui.EndDisabled()
-    if Game.isOnline() then
-        if globals.get_int(pv_global) > 0 and current_vehicle ~= globals.get_int(pv_global) then
-            ImGui.BeginDisabled(Game.Self.isDriving() or not Game.Self.isOutside() or globals.get_int(pv_global) <= 0)
-            if ImGui.Button("TP Into Personal Vehicle") then
-                UI.widgetSound("Select")
-                script.run_in_fiber(function()
-                    if ENTITY.DOES_ENTITY_EXIST(globals.get_int(pv_global)) and ENTITY.IS_ENTITY_A_VEHICLE(current_vehicle) and
-                        VEHICLE.IS_VEHICLE_DRIVEABLE(current_vehicle, true) then
-                        if INTERIOR.GET_INTERIOR_FROM_ENTITY(globals.get_int(pv_global)) == 0 then
-                            TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
-                            PED.SET_PED_INTO_VEHICLE(self.get_ped(), globals.get_int(pv_global), -1)
-                        else
-                            YimToast:ShowError("Samurai's Scripts", "Your personal vehicle is not outside.")
-                        end
-                    else
-                        YimToast:ShowError("Samurai's Scripts",
-                            "Your personal vehicle was either destroyed or no longer exists in the game world.")
-                    end
-                end)
-            end
-            ImGui.SameLine()
-            if ImGui.Button("Bring Personal Vehicle") then
-                UI.widgetSound("Select")
-                script.run_in_fiber(function(bpv)
-                    if ENTITY.DOES_ENTITY_EXIST(globals.get_int(pv_global)) and ENTITY.IS_ENTITY_A_VEHICLE(current_vehicle) and
-                        VEHICLE.IS_VEHICLE_DRIVEABLE(current_vehicle, true) then
-                        if INTERIOR.GET_INTERIOR_FROM_ENTITY(globals.get_int(pv_global)) == 0 then
-                            local veh_coords  = ENTITY.GET_ENTITY_COORDS(globals.get_int(pv_global), true)
-                            local self_coords = self.get_pos()
-                            local distance    = vec3:distance(veh_coords, self_coords)
-                            if distance <= 15 then
-                                YimToast:ShowWarning("Samurai's Scripts", "Your personal vehicle is already too close")
-                            else
-                                local self_fwd   = ENTITY.GET_ENTITY_FORWARD_VECTOR(self.get_ped())
-                                local veh_hash   = ENTITY.GET_ENTITY_MODEL(globals.get_int(pv_global))
-                                local vmin, vmax = Game.getModelDimensions(veh_hash)
-                                local veh_length = vmax.y - vmin.y
-                                local tp_offset  = vec2:new(self_fwd.x * veh_length, self_fwd.y * veh_length)
-                                ENTITY.SET_ENTITY_COORDS(
-                                    globals.get_int(pv_global), self_coords.x + tp_offset.x,
-                                    self_coords.y + tp_offset.y, self_coords.z,
-                                    false, false, false, true
-                                )
-                            end
-                        else
-                            YimToast:ShowError("Samurai's Scripts", "Your personal vehicle is not outside.")
-                        end
-                    else
-                        YimToast:ShowError("Samurai's Scripts",
-                            "Your personal vehicle was either destroyed or no longer exists in the game world.")
-                    end
-                end)
-            end
-            ImGui.EndDisabled()
-        end
-    end
 
-    ImGui.BeginDisabled(Game.Self.isDriving() or not Game.Self.isOutside() or current_vehicle == 0 or not is_car)
-    if ImGui.Button(("%s Doors"):format(vehicleLockStatus <= 1 and "Lock" or "Unlock")) then
+    ImGui.BeginDisabled(
+        Game.Self.isDriving() or not
+        Game.Self.isOutside() or
+        (current_vehicle == 0) or not
+        is_car
+    )
+    if ImGui.Button(("%s Doors"):format(
+        _T(vehicleLockStatus <= 1 and "LOCK_CAR_BTN_" or "UNLOCK_CAR_BTN_")
+    )) then
         script.run_in_fiber(function(dlocks)
             if current_vehicle ~= 0 and is_car then
                 if last_vehicle ~= 0 and last_vehicle ~= current_vehicle and
@@ -871,7 +847,7 @@ function vehicleUI()
     end
     ImGui.EndDisabled();
     if current_vehicle ~= 0 and not is_car then
-        UI.toolTip(false, "You can only lock/unlock cars and trucks.")
+        UI.toolTip(false, _T("LOCK_CARS_ONLY_TXT_"))
     end
     ImGui.SameLine()
     autovehlocks, avlUsed = ImGui.Checkbox("Auto-Lock", autovehlocks)
@@ -881,7 +857,7 @@ function vehicleUI()
         CFG:SaveItem("autovehlocks", autovehlocks)
     end
 
-    ImGui.SameLine(); autoraiseroof, autoroofUsed = ImGui.Checkbox("Auto-Raise Roof", autoraiseroof)
+    ImGui.SameLine(); autoraiseroof, autoroofUsed = ImGui.Checkbox(_T("AUTO_RAISE_ROOF_CB_"), autoraiseroof)
     UI.toolTip(false, _T("AUTO_RAISE_ROOF_DESC_"))
     if autoroofUsed then
         UI.widgetSound("Nav2")
@@ -889,7 +865,7 @@ function vehicleUI()
     end
 
     if open_sounds_window then
-        ImGui.SetNextWindowPos(740, 300, ImGuiCond.Appearing)
+        ImGui.SetNextWindowPos(820, 300, ImGuiCond.Appearing)
         ImGui.SetNextWindowSizeConstraints(100, 100, 600, 800)
         ImGui.Begin("Vehicle Sounds",
             ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse)
@@ -898,28 +874,100 @@ function vehicleUI()
             open_sounds_window = false
         end
         ImGui.Spacing(); ImGui.Spacing()
-        ImGui.PushItemWidth(250)
+        ImGui.SetNextItemWidth(250)
         search_term, used = ImGui.InputTextWithHint("", _T("SEARCH_VEH_HINT_"), search_term, 32)
         is_typing = ImGui.IsItemActive()
-        ImGui.PushItemWidth(270)
+        ImGui.SetNextItemWidth(270)
         displayVehNames()
-        ImGui.PopItemWidth()
         local selected_name = filteredNames[vehSound_index + 1]
         ImGui.Spacing()
         if ImGui.Button(_T("SELECT_SOUND_TXT_")) then
             UI.widgetSound("Select")
             script.run_in_fiber(function()
                 AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(current_vehicle, selected_name)
+                engine_sound_changed = true
             end)
         end
         ImGui.SameLine()
         if ImGui.Button(_T("RESTORE_DEFAULT_")) then
             UI.widgetSound("Delete")
             script.run_in_fiber(function()
-                AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(current_vehicle,
-                    vehicles.get_vehicle_display_name(ENTITY.GET_ENTITY_MODEL(current_vehicle)))
+                AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(
+                    current_vehicle,
+                    vehicles.get_vehicle_display_name(
+                        ENTITY.GET_ENTITY_MODEL(current_vehicle)
+                    )
+                )
+                engine_sound_changed = false
             end)
         end
+        ImGui.End()
+    end
+
+    if open_engine_swap_window then
+        ImGui.SetNextWindowPos(820, 300, ImGuiCond.Appearing)
+        ImGui.SetNextWindowSizeConstraints(100, 100, 600, 800)
+        ImGui.Begin(
+            "Engine Swap",
+            ImGuiWindowFlags.AlwaysAutoResize |
+            ImGuiWindowFlags.NoTitleBar |
+            ImGuiWindowFlags.NoCollapse
+        )
+        if ImGui.Button(_T("GENERIC_CLOSE_BTN_")) then
+            UI.widgetSound("Cancel")
+            open_engine_swap_window = false
+        end
+        ImGui.Dummy(1, 10)
+        is_typing = ImGui.IsItemActive()
+        ImGui.SetNextItemWidth(300)
+        if ImGui.BeginListBox("##engines", -1, 240) then
+            for i = 1, #engine_swaps_t do
+                local is_selected = (engine_swap_index == i - 1)
+                if ImGui.Selectable(engine_swaps_t[i].name, is_selected) then
+                    engine_swap_index = i - 1
+                end
+                UI.toolTip(false, engine_swaps_t[i].tt)
+
+                if is_selected then
+                    selected_engine = engine_swaps_t[engine_swap_index + 1]
+                    ImGui.SetItemDefaultFocus()
+                end
+            end
+            ImGui.EndListBox()
+        end
+        ImGui.Spacing()
+        ImGui.BeginDisabled(Game.Vehicle.isElectric(current_vehicle) or not is_car)
+        if ImGui.Button(_T("SELECT_ENGINE_BTN_")) then
+            UI.widgetSound("Select")
+            script.run_in_fiber(function(engineswap)
+                AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(current_vehicle, selected_engine.audioname)
+                Game.Vehicle.setAcceleration(current_vehicle, selected_engine.acc_mult)
+                engineswap:sleep(150)
+                if AUDIO.IS_VEHICLE_RADIO_ON(current_vehicle) then
+                    AUDIO.SET_VEH_RADIO_STATION(current_vehicle, "OFF")
+                end
+                engine_sound_changed = true
+            end)
+        end
+        ImGui.SameLine()
+        if ImGui.Button(_T("RESTORE_DEFAULT_")) then
+            UI.widgetSound("Delete")
+            script.run_in_fiber(function(enginerestore)
+                AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(
+                    current_vehicle,
+                    vehicles.get_vehicle_display_name(
+                        ENTITY.GET_ENTITY_MODEL(current_vehicle)
+                    )
+                )
+                Game.Vehicle.setAcceleration(current_vehicle, 1.0)
+                enginerestore:sleep(150)
+                if AUDIO.IS_VEHICLE_RADIO_ON(current_vehicle) then
+                    AUDIO.SET_VEH_RADIO_STATION(current_vehicle, "OFF")
+                end
+                engine_sound_changed = false
+            end)
+        end
+        ImGui.EndDisabled()
         ImGui.End()
     end
 end

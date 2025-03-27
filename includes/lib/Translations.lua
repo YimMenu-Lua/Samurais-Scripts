@@ -17244,5 +17244,455 @@ return {
 			["iso"] = "ko-KR",
 			["text"] = "Ruiner 2000과 유사한 점프 능력을 차량에 장착합니다. 사용하려면 [E]를 누르세요."
 		}
+	},
+	["ENGINE_SWAP_BTN_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Engine Swap"
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Motorwechsel"
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Échange de moteur"
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Swap del motore"
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Troca de motor"
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Обмен двигателем"
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Intercambio de motor"
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "引擎交换"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "引擎交換"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "エンジンスワップ"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Wymiana silnika"
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "엔진 스왑"
+		}
+	},
+	["NON_ELECTRIC_CARS_TXT_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Non-electric cars only."
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Nur nicht elektrische Autos."
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Voitures non électriques uniquement."
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Solo auto non elettriche."
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Apenas carros não elétricos."
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Только не электрические автомобили."
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Solo automóviles no eléctricos."
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "仅非电动汽车。"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "僅非電動汽車。"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "非電気車のみ。"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Tylko nieelektryczne samochody."
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "전기 자동차 만."
+		}
+	},
+	["SELECT_ENGINE_BTN_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Select Engine"
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Motor auswählen"
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Sélectionner le moteur"
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Seleziona motore"
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Selecione o motor"
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Выберите двигатель"
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Seleccionar motor"
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "选择引擎"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "選擇引擎"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "エンジンを選択します"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Wybierz silnik"
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "엔진을 선택하십시오"
+		}
+	},
+	["LOCK_CARS_ONLY_TXT_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "You can only lock/unlock cars and trucks."
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Sie können nur Autos und Lastwagen sperren/entsperren."
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Vous ne pouvez que verrouiller / déverrouiller les voitures et les camions."
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Puoi solo bloccare/sbloccare auto e camion."
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Você só pode bloquear/desbloquear carros e caminhões."
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Вы можете заблокировать/разблокировать автомобили и грузовики."
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Solo puede bloquear/desbloquear autos y camiones."
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "您只能锁定/解锁汽车和卡车。"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "您只能鎖定/解鎖汽車和卡車。"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "車やトラックのロック/ロックを解除することしかできません。"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Możesz tylko zablokować/odblokowywać samochody i ciężarówki."
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "자동차와 트럭 만 잠금/잠금 해제 할 수 있습니다."
+		}
+	},
+	["LOCK_CAR_BTN_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Lock"
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Sperren"
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Verrouiller"
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Serratura"
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Trancar"
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Замок"
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Cerrar"
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "锁"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "鎖"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "ロック"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Zamek"
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "잠그다"
+		}
+	},
+	["UNLOCK_CAR_BTN_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Unlock"
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Entsperren"
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Déverrouiller"
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Sbloccare"
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Desbloquear"
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Разблокировать"
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Descubrir"
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "开锁"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "開鎖"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "ロックを解除します"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Odblokować"
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "터놓다"
+		}
+	},
+	["AUTO_RAISE_ROOF_CB_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Auto-Raise Roof"
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Autodach"
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Toit automatique"
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Tetto automatico"
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Telhado de levantamento automático"
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Автооражая крыша"
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Techo automático"
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "自动屋顶"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "自動屋頂"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "屋根を自動化します"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Auto-Raise Dach"
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "자동 레이즈 지붕"
+		}
+	},
+	["FAST_VEHS_CB_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Fast Vehicles"
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Schnelle Fahrzeuge"
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Véhicules rapides"
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Veicoli veloci"
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Veículos rápidos"
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Быстрые транспортные средства"
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Vehículos rápidos"
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "快速车辆"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "快速車輛"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "高速車両"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Szybkie pojazdy"
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "빠른 차량"
+		}
+	},
+	["FAST_VEHS_TXT_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Increases the acceleration and top speed of any land vehicle you drive."
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Erhöht die Beschleunigung und Höchstgeschwindigkeit jedes Landfahrzeugs, das Sie fahren."
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Augmente l'accélération et la vitesse de pointe de tout véhicule terrestre que vous conduisez."
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Aumenta l'accelerazione e la velocità massima di qualsiasi veicolo terrestre guidato."
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Aumenta a aceleração e a velocidade máxima de qualquer veículo terrestre que você dirige."
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Увеличивает ускорение и максимальную скорость любого наземного автомобиля, на котором вы водите."
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Aumenta la aceleración y la velocidad máxima de cualquier vehículo terrestre que conduzca."
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "增加您驾驶的任何陆路车辆的加速度和最高速度。"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "增加您駕駛的任何陸路車輛的加速度和最高速度。"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "運転する陸上車両の加速度と最高速度を向上させます。"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Zwiększa przyspieszenie i maksymalną prędkość każdego pojazdu lądowego."
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "운전하는 모든 육상 차량의 가속도와 최고 속도를 증가시킵니다."
+		}
 	}
 }

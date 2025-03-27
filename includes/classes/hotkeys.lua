@@ -302,10 +302,9 @@ function KeyManager:HandleEvent(msg, wParam)
     end
 end
 
--- Hardcoded keybinds. Not persistent.
 ---@param key integer | string
 ---@param callback function
----@param onKeyDown? boolean Set to true to loop the callback. Ignore or set to false to execute only once.
+---@param onKeyDown? boolean Set to true to loop the callback on key down. Ignore or set to false to execute once on key up only.
 function KeyManager:RegisterKeybind(key, callback, onKeyDown)
     for _, k in ipairs(self.keys) do
         if (key == k.name or key == k.code) then

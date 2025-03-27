@@ -1135,7 +1135,7 @@ end
 ---@class YimConfig
 YimConfig = {}
 YimConfig.__index = YimConfig
-YimConfig._version_ = "1.0.3"
+YimConfig._version_ = "1.0.4"
 YimConfig._credits_ = [[
       +----------------------------------------------------------------------------------------+
       |                                                                                        |
@@ -1188,7 +1188,7 @@ end
 ---@param data any
 ---@param etc? any
 function YimConfig:Encode(data, etc)
-    return self.json:encode(data, etc, { pretty = self.pretty })
+    return self.json:encode(data, etc, { pretty = self.pretty, indent = self.indent })
 end
 
 ---@param data any
