@@ -1,4 +1,15 @@
+---@diagnostic disable: lowercase-global
+
 local Labels = require("lib.Translations")
+
+if not keybinds then
+    keybinds = CFG:ReadItem("keybinds")
+end
+
+if not gpad_keybinds then
+    gpad_keybinds = CFG:ReadItem("gpad_keybinds")
+end
+
 
 ---@class Translator
 Translator = {}

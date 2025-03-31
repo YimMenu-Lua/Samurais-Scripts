@@ -2,49 +2,42 @@
    Samurai's-Scripts
 </h1>
 
-#### A Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and [Tupoye-Menu](https://github.com/TupoyeMenu/TupoyeMenu), centered around roleplaying and having fun in a game full of ad bots and toxic cheaters.
+#### A Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and [Tupoye-Menu](https://github.com/TupoyeMenu/TupoyeMenu), centered around roleplaying and having fun in a game full of ad bots and toxic cheaters
 
-####    
+[![sv](https://img.shields.io/badge/Script%20Version-v1.6.2-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
+[![gv](https://img.shields.io/badge/Game%20Version-Online%201.70%20|%20Build%203411-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
 
-[![sv](https://img.shields.io/badge/Script%20Version-v1.6.2-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)   
-[![gv](https://img.shields.io/badge/Game%20Version-Online%201.70%20|%20Build%203411-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)   
-[![bm](https://img.shields.io/badge/Business%20Manager-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)   
-[![cp](https://img.shields.io/badge/Casino%20Pacino-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)   
-[![etc](https://img.shields.io/badge/All%20Other%20Features-Working-green)](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/FEATURES.md)
-####    
-
-<!-- > [!NOTE]
-> **Discontinued** due to a series of unfortunate events including what happened to our beloved YimMenu as well as some shitty life circumstances.
-> 
-> Updates will no longer be as frequent as before but pull requests are still welcome. -->
-
-####    
+> [!Important]
+> **Legacy Only.**
+>
 
 ## Features
 
 - Full list of features is documented [here](FEATURES.md).  
 
-####    
-
 ## Setup
 
 1. Download the latest zip archive from the [releases section](https://github.com/YimMenu-Lua/Samurais-Scripts/releases).
 2. Extract the archive to YimMenu's `scripts` folder:
-   
+
        %AppData%\YimMenu\scripts
 
-The folder structure should look like this
+The folder structure should look like this:
 
 ```bash
 ├── scripts
 │   └── Samurais Scripts
 |       ├── includes
 |       |   ├── classes
+|       |   |   ├── cGame.lua
+|       |   |   ├── cSelf.lua
+|       |   |   ├── cVehicle.lua
 |       |   |   ├── commands.lua
 |       |   |   ├── hotkeys.lua
-|       |   |   ├── translator.lua
+|       |   |   ├── memory.lua
 |       |   |   ├── vector2.lua
-|       |   |   └── vector3.lua
+|       |   |   ├── vector3.lua
+|       |   |   └── VehicleManager.lua
 |       |   ├── data
 |       |   |   ├── actions.lua
 |       |   |   ├── globals.lua
@@ -55,6 +48,7 @@ The folder structure should look like this
 |       |   |   ├── drift_mode.lua
 |       |   |   ├── dunk.lua
 |       |   |   ├── flatbed.lua
+|       |   |   ├── grid_renderer.lua
 |       |   |   ├── handling_editor.lua
 |       |   |   ├── main.lua
 |       |   |   ├── object_spawner.lua
@@ -76,16 +70,12 @@ The folder structure should look like this
 │       └── samurais_scripts.lua
 ```
 
-####    
-
-## TODO:
+## TODO
 
 - [x] Improve and merge [YimActions](https://github.com/xesdoog/YimActions). ✔️ Done.
 - [x] Improve and merge [TokyoDrift](https://github.com/YimMenu-Lua/TokyoDrift). ✔️ Done.
 - [x] Improve and merge [Object Spawner](https://github.com/xesdoog/object-spawner). ✔️ Done.
 - [x] Improve and merge [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier). ✔️ Done.
-
-####    
 
 ## Commands
 
@@ -103,8 +93,6 @@ The folder structure should look like this
 - `vehlock` : Locks/unlocks your vehicle.
 - `PANIK` : Resets all changes done by the script (same as the panic button).
 - `resetcfg` : Resets the script and restores your saved config to default.
-
-####    
 
 ## Credits
 

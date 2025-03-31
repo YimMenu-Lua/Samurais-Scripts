@@ -4045,7 +4045,7 @@ return {
 			["text"] = "어떤 유형의 지뢰를 장착할지 선택하세요:"
 		}
 	},
-	["RGB_LIGHTS_DESC_"] = {
+	["RGB_LIGHTS_CB_"] = {
 			{
 			["iso"] = "en-US",
 			["text"] = "RGB Lights"
@@ -17693,6 +17693,106 @@ return {
 			{
 			["iso"] = "ko-KR",
 			["text"] = "운전하는 모든 육상 차량의 가속도와 최고 속도를 증가시킵니다."
+		}
+	},
+	["HATSINVEHS_CB_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Allow Hats In Vehicles"
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Hüte in Fahrzeugen zulassen"
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Permettre des chapeaux dans les véhicules"
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Consenti cappelli nei veicoli"
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Permitir chapéus em veículos"
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Разрешить шляпы в транспортных средствах"
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Permitir sombreros en los vehículos"
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "允许帽子里的车辆"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "允許帽子裡的車輛"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "車両の帽子をかぶってください"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Pozwól czapkom w pojazdach"
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "차량에 모자를 허용하십시오"
+		}
+	},
+	["NOVEHRAGDOLL_CB_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Don't Fall Off Vehicles"
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Fallen Sie keine Fahrzeuge aus"
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Ne tombez pas des véhicules"
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Non cadere dai veicoli"
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Não caia de veículos"
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Не падай с транспортных средств"
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "No te caigas de los vehículos"
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "不要掉下车辆"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "不要掉下車輛"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "車両から落ちないでください"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Nie spada z pojazdów"
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "차량을 떨어 뜨리지 마십시오"
 		}
 	}
 }

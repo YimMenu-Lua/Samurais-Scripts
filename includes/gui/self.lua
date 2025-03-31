@@ -1,118 +1,177 @@
 ---@diagnostic disable: undefined-global, lowercase-global
 
-function selfUI()
-    Regen, RegenUsed = ImGui.Checkbox(_T("AUTOHEAL_"), Regen)
-    UI.helpMarker(false, _T("AUTOHEAL_DESC_"))
-    if RegenUsed then
-        CFG:SaveItem("Regen", Regen)
-        UI.widgetSound("Nav2")
+local SelfGrid = GridRenderer:New(2, 25, 25)
+SelfGrid:AddCheckbox(
+    _T("AUTOHEAL_"),
+    "Regen",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("AUTOHEAL_DESC_"))
     end
+)
 
-    replaceSneakAnim, rsanimUsed = ImGui.Checkbox(_T("CROUCHCB_"), replaceSneakAnim)
-    UI.helpMarker(false, _T("CROUCH_DESC_"))
-    if rsanimUsed then
-        CFG:SaveItem("replaceSneakAnim", replaceSneakAnim)
-        UI.widgetSound("Nav2")
+SelfGrid:AddCheckbox(
+    _T("CROUCHCB_"),
+    "replaceSneakAnim",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("CROUCH_DESC_"))
     end
+)
 
-    replacePointAct, rpaUsed = ImGui.Checkbox(_T("REPLACE_PA_CB_"), replacePointAct)
-    UI.helpMarker(false, _T("REPLACE_PA_DESC_"))
-    if rpaUsed then
-        CFG:SaveItem("replacePointAct", replacePointAct)
-        UI.widgetSound("Nav2")
+SelfGrid:AddCheckbox(
+    _T("REPLACE_PA_CB_"),
+    "replacePointAct",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("REPLACE_PA_DESC_"))
     end
+)
 
-    phoneAnim, phoneAnimUsed = ImGui.Checkbox(_T("PHONEANIMS_CB_"), phoneAnim)
-    UI.helpMarker(false, _T("PHONEANIMS_DESC_"))
-    if phoneAnimUsed then
-        CFG:SaveItem("phoneAnim", phoneAnim)
-        UI.widgetSound("Nav2")
+SelfGrid:AddCheckbox(
+    _T("PHONEANIMS_CB_"),
+    "phoneAnim",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("PHONEANIMS_DESC_"))
     end
+)
 
-    sprintInside, sprintInsideUsed = ImGui.Checkbox(_T("SPRINT_INSIDE_CB_"), sprintInside)
-    UI.helpMarker(false, _T("SPRINT_INSIDE_DESC_"))
-    if sprintInsideUsed then
-        CFG:SaveItem("sprintInside", sprintInside)
-        UI.widgetSound("Nav2")
+SelfGrid:AddCheckbox(
+    _T("SPRINT_INSIDE_CB_"),
+    "sprintInside",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("SPRINT_INSIDE_DESC_"))
     end
+)
 
-    lockPick, lockPickUsed = ImGui.Checkbox(_T("LOCKPICK_CB_"), lockPick)
-    UI.helpMarker(false, _T("LOCKPICK_DESC_"))
-    if lockPickUsed then
-        CFG:SaveItem("lockPick", lockPick)
-        UI.widgetSound("Nav2")
+SelfGrid:AddCheckbox(
+    _T("LOCKPICK_CB_"),
+    "lockPick",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("LOCKPICK_DESC_"))
     end
+)
 
-    disableActionMode, actionModeUsed = ImGui.Checkbox(_T("ACTION_MODE_CB_"), disableActionMode)
-    UI.helpMarker(false, _T("ACTION_MODE_DESC_"))
-    if actionModeUsed then
-        CFG:SaveItem("disableActionMode", disableActionMode)
-        UI.widgetSound("Nav2")
+SelfGrid:AddCheckbox(
+    _T("ACTION_MODE_CB_"),
+    "disableActionMode",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("ACTION_MODE_DESC_"))
     end
+)
 
-    clumsy, clumsyUsed = ImGui.Checkbox("Clumsy", clumsy)
-    UI.helpMarker(false, _T("CLUMSY_DESC_"))
-    if clumsyUsed then
+SelfGrid:AddCheckbox(
+    "Clumsy",
+    "clumsy",
+    function()
         rod = false
         CFG:SaveItem("rod", false)
-        CFG:SaveItem("clumsy", clumsy)
-        UI.widgetSound("Nav2")
+        if clumsy then
+            script.run_in_fiber(function()
+                if not PED.CAN_PED_RAGDOLL(Self.GetPedID()) then
+                    YimToast:ShowWarning(
+                        "Samurais Scripts",
+                        "This option will not work if you're blocking ragdoll. Please make sure 'No Ragdoll' option is disabled in YimMennu."
+                    )
+                end
+            end)
+        end
+    end,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("CLUMSY_DESC_"))
     end
-    if clumsy and clumsyUsed then
-        script.run_in_fiber(function()
-            if not PED.CAN_PED_RAGDOLL(self.get_ped()) then
-                YimToast:ShowWarning(
-                    "Samurais Scripts",
-                    "This option will not work if you're blocking ragdoll. Please make sure 'No Ragdoll' option is disabled in YimMennu."
-                )
-            end
-        end)
-    end
+)
 
-    rod, rodUsed = ImGui.Checkbox("Ragdoll On Demand", rod)
-    UI.helpMarker(false, _T("ROD_DESC_"))
-    if rodUsed then
+SelfGrid:AddCheckbox(
+    "Ragdoll On Demand",
+    "rod",
+    function()
         clumsy = false
-        CFG:SaveItem("rod", rod)
         CFG:SaveItem("clumsy", false)
-        UI.widgetSound("Nav2")
+        if rod then
+            script.run_in_fiber(function()
+                if not PED.CAN_PED_RAGDOLL(Self.GetPedID()) then
+                    YimToast:ShowWarning(
+                        "Samurais Scripts",
+                        "This option will not work if you're blocking ragdoll. Please make sure 'No Ragdoll' option is disabled in YimMennu."
+                    )
+                end
+            end)
+        end
+    end,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("ROD_DESC_"))
     end
-    if rod and rodUsed then
-        script.run_in_fiber(function()
-            if not PED.CAN_PED_RAGDOLL(self.get_ped()) then
-                YimToast:ShowWarning(
-                    "Samurais Scripts",
-                    "This option will not work if you're blocking ragdoll. Please make sure 'No Ragdoll' option is disabled in YimMennu."
-                )
-            end
-        end)
-    end
+)
 
-    ragdoll_sound, rgdlsnd = ImGui.Checkbox("Ragdoll Sound", ragdoll_sound)
-    UI.helpMarker(false, _T("RAGDOLL_SOUND_DESC_"))
-    if rgdlsnd then
-        UI.widgetSound("Nav2")
-        CFG:SaveItem("ragdoll_sound", ragdoll_sound)
+SelfGrid:AddCheckbox(
+    "Ragdoll Sound",
+    "ragdoll_sound",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("RAGDOLL_SOUND_DESC_"))
     end
+)
 
-    hideFromCops, hfcUsed = ImGui.Checkbox("Hide & Seek", hideFromCops)
-    UI.helpMarker(false, _T("HIDENSEEK_DESC_"))
-    if hfcUsed then
-        UI.widgetSound("Nav2")
-        CFG:SaveItem("hideFromCops", hideFromCops)
+SelfGrid:AddCheckbox(
+    "Hide & Seek",
+    "hideFromCops",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("HIDENSEEK_DESC_"))
     end
+)
 
-    hatsinvehs, hvehsUsed = ImGui.Checkbox("Allow Hats In Vehicles", hatsinvehs)
-    UI.helpMarker(false, _T("HATSINVEHS_DESC_"))
-    if hvehsUsed then
-        UI.widgetSound("Nav2")
-        CFG:SaveItem("hatsinvehs", hatsinvehs)
+SelfGrid:AddCheckbox(
+    _T("HATSINVEHS_CB_"),
+    "hatsinvehs",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("HATSINVEHS_DESC_"))
     end
+)
 
-    novehragdoll, nvrUsed = ImGui.Checkbox("Don't Fall Off Vehicles", novehragdoll)
-    UI.helpMarker(false, _T("NOVEHRAGDOLL_DESC_"))
-    if nvrUsed then
-        UI.widgetSound("Nav2")
-        CFG:SaveItem("novehragdoll", novehragdoll)
+SelfGrid:AddCheckbox(
+    _T("NOVEHRAGDOLL_CB_"),
+    "novehragdoll",
+    nil,
+    nil,
+    true,
+    function()
+        UI.Tooltip(_T("NOVEHRAGDOLL_DESC_"))
     end
+)
+
+function selfUI()
+    ImGui.BeginChild("SelfChild", 500, 500, true)
+    SelfGrid:Draw()
+    ImGui.EndChild()
 end

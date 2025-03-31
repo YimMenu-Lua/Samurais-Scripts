@@ -1193,6 +1193,7 @@ end
 
 ---@param data any
 ---@param etc? any
+---@return any
 function YimConfig:Decode(data, etc)
     return self.json:decode(data, etc, { strictParsing = self.strict_parsing or false })
 end

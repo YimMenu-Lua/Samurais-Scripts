@@ -33,7 +33,7 @@ local PED_TYPE = {
     _ARMY                  = 29,
 }
 
-animlist       = {
+t_AnimList       = {
     { dict = "rcmpaparazzo_2",                                              anim = "shag_loop_a",                        name = "Hit It From The Back 01",         flag = 47,   type = 7,                         boneID = 0,                             pedType = PED_TYPE._PROSTITUTE, pedHash = 1846523796, posx = 0.0,     posy = 0.2,           posz = 0.0,            rotx = 40.0,     roty = 0.0,                     rotz = 0.0,                              dict2 = "rcmpaparazzo_2",       anim2 = "shag_loop_poppy", sfx = "SEX_GENERIC_FEM",        sfxName = "S_F_Y_HOOKER_03_BLACK_FULL_01", sfxFlg = "SPEECH_PARAMS_FORCE", cat = "NSFW" },
     { dict = "misscarsteal2pimpsex",                                        anim = "shagloop_pimp",                      name = "Hit It From The Front",           flag = 47,   type = 7,                         boneID = 0,                             pedType = PED_TYPE._PROSTITUTE, pedHash = 1846523796, posx = 0.05,    posy = 0.3,           posz = -0.2,           rotx = 27.0,     roty = 0.0,                     rotz = 190.0,                            dict2 = "misscarsteal2pimpsex", anim2 = "shagloop_hooker", sfx = "SEX_GENERIC_FEM",        sfxName = "S_F_Y_HOOKER_03_BLACK_FULL_01", sfxFlg = "SPEECH_PARAMS_FORCE", cat = "NSFW" },
 
@@ -259,7 +259,7 @@ animlist       = {
     { dict = "anim@arena@celeb@flat@solo@no_props@",                        anim = "flip_a_player_a",                    name = "Backflip",                        flag = 32,   blendin = 2.69,                   blendout = 2.69,                        atime = 2000,                   cat = "Movements" },
 }
 
-animSortbyList = {
+t_AnimSortbyList = {
     "All",
     "Actions",
     "Activities",
@@ -270,14 +270,14 @@ animSortbyList = {
     "NSFW",
 }
 
-hijackOptions  = {
+t_HijackOptions  = {
     { name = "Dance Mode",           dict = "anim@amb@nightclub@mini@dance@dance_solo@shuffle@", anim = "high_center", },
     { name = "Perverts Everywhere!", dict = "switch@trevor@jerking_off",                         anim = "trev_jerking_off_loop", },
     { name = "Vanilla Unicorn",      dict = "mini@strip_club@private_dance@part3",               anim = "priv_dance_p3", },
     { name = "Zombie Mode",          dict = "special_ped@zombie@monologue_1@monologue_1b",       anim = "iamundead_1", },
 }
 
-ped_scenarios  = {
+t_PedScenarios  = {
     { scenario = "WORLD_HUMAN_STAND_MOBILE",               name = "Browse Phone" },
     { scenario = "WORLD_HUMAN_CHEERING",                   name = "Clap" },
     { scenario = "WORLD_HUMAN_CONST_DRILL",                name = "Construction: Drill" },
@@ -369,7 +369,7 @@ ped_scenarios  = {
     { scenario = "WORLD_HUMAN_YOGA",                       name = "Workout: Yoga" },
 }
 
-npcList        = {
+t_NPClist        = {
     { group = PED_TYPE._PROSTITUTE, hash = 0x6E0FB794, name = "Hooker" },
     { group = PED_TYPE._PROSTITUTE, hash = 0x52580019, name = "Hooker 02" },
     { group = PED_TYPE._CIVFEMALE,  hash = 0x780C01BD, name = "VU Bartender" },
@@ -421,16 +421,16 @@ npcList        = {
 ---@param s script_util
 function cleanup(s)
     if is_playing_anim then
-        TASK.STOP_ANIM_TASK(self.get_ped(), curr_playing_anim.dict, curr_playing_anim.anim, -4.0)
+        TASK.STOP_ANIM_TASK(Self.GetPedID(), curr_playing_anim.dict, curr_playing_anim.anim, -4.0)
         STREAMING.REMOVE_ANIM_DICT(curr_playing_anim.dict)
     end
-    if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.get_ped()) then
-        local mySeat = Game.getPedVehicleSeat(self.get_ped())
-        PED.SET_PED_INTO_VEHICLE(self.get_ped(), self.get_veh(), mySeat)
+    if PED.IS_PED_SITTING_IN_ANY_VEHICLE(Self.GetPedID()) then
+        local mySeat = Game.GetPedVehicleSeat(Self.GetPedID())
+        PED.SET_PED_INTO_VEHICLE(Self.GetPedID(), self.get_veh(), mySeat)
     end
     if anim_music and ENTITY.DOES_ENTITY_EXIST(pBus) and
-        ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(pBus, self.get_ped()) then
-        play_music(false)
+        ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(pBus, Self.GetPedID()) then
+        PlayMusic(false)
     end
     if plyrProps[1] ~= nil then
         for _, v in ipairs(plyrProps) do
@@ -458,11 +458,11 @@ function cleanupNPC(s)
         PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(v, true)
         if anim_music and ENTITY.DOES_ENTITY_EXIST(pBus) and
             ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(pBus, v) then
-            play_music(false)
+            PlayMusic(false)
         end
         if PED.IS_PED_IN_ANY_VEHICLE(v, false) then
             local veh     = PED.GET_VEHICLE_PED_IS_IN(v, false)
-            local npcSeat = Game.getPedVehicleSeat(v)
+            local npcSeat = Game.GetPedVehicleSeat(v)
             PED.SET_PED_INTO_VEHICLE(v, veh, npcSeat)
         end
     end
@@ -510,7 +510,7 @@ end
 ---@param s script_util
 function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBone, targetCoords, targetHeading,
                   targetForwardX, targetForwardY, targetBoneCoords, propTable, ptfxTable, s)
-    if Info.cat == "In-Vehicle" and (Game.Self.isOnFoot() or not is_car) then
+    if Info.cat == "In-Vehicle" and (Self.IsOnFoot() or not Self.Vehicle.IsCar) then
         UI.widgetSound("Error")
         YimToast:ShowError(
             "Samurai's Scripts",
@@ -519,14 +519,14 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         return
     end
     local playbackRate, blendInSpeed, blendOutSpeed, duration = 1.0, 4.0, -4.0, -1
-    local reset = target == self.get_ped() and cleanup or cleanupNPC
-    if target == self.get_ped() then
+    local reset = target == Self.GetPedID() and cleanup or cleanupNPC
+    if target == Self.GetPedID() then
         if is_handsUp then
-            TASK.CLEAR_PED_TASKS(self.get_ped())
+            TASK.CLEAR_PED_TASKS(Self.GetPedID())
             is_handsUp = false
         end
         if isCrouched then
-            PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
+            PED.RESET_PED_MOVEMENT_CLIPSET(Self.GetPedID(), 0)
             isCrouched = false
         end
     end
@@ -540,7 +540,7 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
         duration = Info.atime
     end
     if is_playing_scenario or is_playing_amb_scenario then
-        TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.get_ped())
+        TASK.CLEAR_PED_TASKS_IMMEDIATELY(Self.GetPedID())
         if ENTITY.DOES_ENTITY_EXIST(bbq) then
             ENTITY.DELETE_ENTITY(bbq)
         end
@@ -548,7 +548,7 @@ function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBon
     end
     if Lua_fn.str_contains(Info.name, "DJ") then
         if not is_playing_radio and not anim_music then
-            play_music(true, "RADIO_22_DLC_BATTLE_MIX1_RADIO", target)
+            PlayMusic(true, "RADIO_22_DLC_BATTLE_MIX1_RADIO", target)
         end
     end
     reset(s)
@@ -696,28 +696,28 @@ function playScenario(ref, target)
         local heading  = ENTITY.GET_ENTITY_HEADING(target)
         local forwardX = ENTITY.GET_ENTITY_FORWARD_X(target)
         local forwardY = ENTITY.GET_ENTITY_FORWARD_Y(target)
-        if target == self.get_ped() then
+        if target == Self.GetPedID() then
             if is_playing_anim then
                 cleanup(script)
                 is_playing_anim = false
             end
             if is_sitting then
-                TASK.CLEAR_PED_TASKS(self.get_ped())
+                TASK.CLEAR_PED_TASKS(Self.GetPedID())
                 if ENTITY.DOES_ENTITY_EXIST(thisSeat) then
                     ENTITY.FREEZE_ENTITY_POSITION(thisSeat, false)
-                    if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(self.get_ped(), thisSeat) then
-                        ENTITY.DETACH_ENTITY(self.get_ped(), true, true)
+                    if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(Self.GetPedID(), thisSeat) then
+                        ENTITY.DETACH_ENTITY(Self.GetPedID(), true, true)
                     end
                     thisSeat = 0
                 end
                 is_sitting = false
             end
             if is_handsUp then
-                TASK.CLEAR_PED_TASKS(self.get_ped())
+                TASK.CLEAR_PED_TASKS(Self.GetPedID())
                 is_handsUp = false
             end
             if isCrouched then
-                PED.RESET_PED_MOVEMENT_CLIPSET(self.get_ped(), 0)
+                PED.RESET_PED_MOVEMENT_CLIPSET(Self.GetPedID(), 0)
             end
         else
             cleanupNPC(script)
@@ -749,7 +749,7 @@ end
 ---@param s script_util
 function stopScenario(ped, s)
     if PED.IS_PED_USING_ANY_SCENARIO(ped) then
-        Game.busySpinnerOn(_T("SCN_STOP_SPINNER_"), 3)
+        Game.BusySpinnerOn(_T("SCN_STOP_SPINNER_"), 3)
         TASK.CLEAR_PED_TASKS(ped)
         if ENTITY.DOES_ENTITY_EXIST(bbq) then
             ENTITY.DELETE_ENTITY(bbq)
@@ -757,7 +757,7 @@ function stopScenario(ped, s)
         repeat
             s:sleep(10)
         until not PED.IS_PED_USING_ANY_SCENARIO(ped)
-        Game.busySpinnerOff()
+        Game.BusySpinnerOff()
         is_playing_scenario = false
         is_playing_amb_scenario = false
     end

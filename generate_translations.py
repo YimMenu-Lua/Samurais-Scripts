@@ -217,17 +217,18 @@ def add_new_lang():
 def main_loop():
     while True:
         try:
-            choice = input("Choose an option then press enter to proceed:\n- Type 1 to add a new language.\n- Type 2 to add a new label.\n- Type 0 to exit.\n")
-            if choice == "0":
-                quit(0)
-            elif choice == "1":
-                add_new_lang()
-            elif choice == "2":
-                add_new_label()
-            else:
-                clear()
-                print('Invalid choice.')
-
+            match int(input(
+                "Choose an option then press enter to proceed:\n- Type 1 to add a new language.\n- Type 2 to add a new label.\n- Type 0 to exit.\n"
+            )):
+                case 0:
+                    quit(0)
+                case 1:
+                    add_new_lang()
+                case 2:
+                    add_new_label()
+                case _:
+                    clear()
+                    print('Invalid choice.')
         except KeyboardInterrupt:
             clear()
             print("Operation canceled by the user.")

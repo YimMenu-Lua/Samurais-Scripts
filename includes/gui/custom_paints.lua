@@ -1,38 +1,99 @@
 ---@diagnostic disable
 
-function customPaintsUI()
-    if current_vehicle == 0 then
+local i_CustomPaintIndex   = 0
+local i_PaintsColSortIndex = 0
+local i_PaintsMfrSortIndex = 0
+local i_PaintsSortbySwitch = 0
+
+local function SortCustomPaints()
+    filteredPaints = {}
+    for _, v in ipairs(t_CustomPaints) do
+        if i_PaintsSortbySwitch == 0 then
+            if i_PaintsColSortIndex == 0 then
+                if string.find((v.name):lower(), custom_paints_sq:lower()) then
+                    table.insert(filteredPaints, v)
+                end
+            else
+                if v.shade == t_CustomPintShades[i_PaintsColSortIndex + 1] then
+                    if string.find((v.name):lower(), custom_paints_sq:lower()) then
+                        table.insert(filteredPaints, v)
+                    end
+                end
+            end
+        elseif i_PaintsSortbySwitch == 1 then
+            if i_PaintsMfrSortIndex == 0 then
+                if string.find((v.name):lower(), custom_paints_sq:lower()) then
+                    table.insert(filteredPaints, v)
+                end
+            else
+                if v.manufacturer == t_CustomPaintsManufacturers[i_PaintsMfrSortIndex + 1] then
+                    if string.find((v.name):lower(), custom_paints_sq:lower()) then
+                        table.insert(filteredPaints, v)
+                    end
+                end
+            end
+        end
+    end
+    table.sort(filteredPaints, function(a, b)
+        return a.name < b.name
+    end)
+end
+
+local function DisplayCustomPaints()
+    SortCustomPaints()
+    local customPaintNames = {}
+    for _, v in ipairs(filteredPaints) do
+        table.insert(customPaintNames, v.name)
+    end
+    i_CustomPaintIndex, isChanged = ImGui.ListBox(
+        "##customPaintsList",
+        i_CustomPaintIndex,
+        customPaintNames,
+        #filteredPaints
+    )
+end
+
+local function ShowCustomPaintsCount()
+    if filteredPaints ~= nil then
+        ImGui.Text(string.format("[ %d ]", #filteredPaints))
+    else
+        ImGui.Text("[ 0 ]")
+    end
+end
+
+function CustomPaintsUI()
+    if Self.Vehicle.Current == 0 then
         ImGui.Dummy(1, 5); ImGui.Text(_T("GET_IN_VEH_WARNING_"))
     else
         ImGui.BulletText(_T("SORT_BY_TXT_")); ImGui.SameLine()
-        paints_sortby_switch, isChanged = ImGui.RadioButton(_T("SORT_BY_COLOR_TXT_"), paints_sortby_switch, 0); ImGui
+        i_PaintsSortbySwitch, isChanged = ImGui.RadioButton(_T("SORT_BY_COLOR_TXT_"), i_PaintsSortbySwitch, 0); ImGui
             .SameLine(); ImGui
             .Dummy(35, 1)
         if isChanged then
             UI.widgetSound("Nav")
         end
-        ImGui.SameLine(); paints_sortby_switch, isChanged = ImGui.RadioButton(_T("SORT_BY_MFR_TXT_"),
-            paints_sortby_switch, 1)
+        ImGui.SameLine(); i_PaintsSortbySwitch, isChanged = ImGui.RadioButton(_T("SORT_BY_MFR_TXT_"),
+            i_PaintsSortbySwitch, 1)
         if isChanged then
             UI.widgetSound("Nav")
         end
         ImGui.PushItemWidth(180)
-        if paints_sortby_switch == 0 then
+        if i_PaintsSortbySwitch == 0 then
             ImGui.Dummy(20, 1); ImGui.SameLine()
-            paints_col_sort_idx, sortbyUsed = ImGui.Combo("##sortpaintjobs", paints_col_sort_idx, paints_sortByColors,
-                #paints_sortByColors)
+            i_PaintsColSortIndex, sortbyUsed = ImGui.Combo("##sortpaintjobs", i_PaintsColSortIndex, t_CustomPintShades,
+                #t_CustomPintShades)
             if sortbyUsed then
                 UI.widgetSound("Nav")
-                custom_paint_index = 0
+                i_CustomPaintIndex = 0
             end
-            ImGui.SameLine(); showPaintsCount()
+            ImGui.SameLine(); ShowCustomPaintsCount()
         else
-            ImGui.Dummy(120, 1); ImGui.SameLine(); showPaintsCount(); ImGui.SameLine()
-            paints_mfr_sort_idx, sortbyMfrUsed = ImGui.Combo("##sortpaintjobs2", paints_mfr_sort_idx, paints_sortByMfrs,
-                #paints_sortByMfrs)
+            ImGui.Dummy(120, 1); ImGui.SameLine(); ShowCustomPaintsCount(); ImGui.SameLine()
+            i_PaintsMfrSortIndex, sortbyMfrUsed = ImGui.Combo("##sortpaintjobs2", i_PaintsMfrSortIndex, t_CustomPaintsManufacturers,
+                #t_CustomPaintsManufacturers)
             if sortbyMfrUsed then
                 UI.widgetSound("Nav")
-                custom_paint_index = 0
+                i_CustomPaintIndex = 0
             end
         end
         ImGui.PopItemWidth()
@@ -40,14 +101,14 @@ function customPaintsUI()
         custom_paints_sq, cpsqUsed = ImGui.InputTextWithHint("##custompaintssq", _T("GENERIC_SEARCH_HINT_"),
             custom_paints_sq, 64)
         is_typing = ImGui.IsItemActive()
-        displayCustomPaints()
+        DisplayCustomPaints()
         ImGui.PopItemWidth()
-        local selected_paint = filteredPaints[custom_paint_index + 1]
+        local selected_paint = filteredPaints[i_CustomPaintIndex + 1]
         ImGui.Spacing()
         ImGui.BeginDisabled(selected_paint == nil)
         mf_overwrite, movwUsed = ImGui.Checkbox(_T("CUSTOM_PAINT_MATTE_CB_"),
             selected_paint ~= nil and selected_paint.m or false)
-        UI.toolTip(false, _T("APPLY_MATTE_DESC_"))
+        UI.Tooltip(_T("APPLY_MATTE_DESC_"))
         if movwUsed then
             UI.widgetSound("Nav2")
             selected_paint.m = not selected_paint.m
@@ -65,14 +126,14 @@ function customPaintsUI()
                 YimToast:ShowError("Samurai's Scripts", _T("CUSTOM_PAINT_NOT_SELECTED_ERR_"))
             else
                 UI.widgetSound("Select")
-                Game.Vehicle.setCustomPaint(current_vehicle, selected_paint.hex, selected_paint.p, selected_paint.m,
+                Game.Vehicle.SetCustomPaint(Self.Vehicle.Current, selected_paint.hex, selected_paint.p, selected_paint.m,
                     is_primary,
                     is_secondary)
             end
         end
         ImGui.EndDisabled()
         if selected_paint ~= nil then
-            UI.toolTip(false, _T("SAVE_PAINT_DESC_"))
+            UI.Tooltip(_T("SAVE_PAINT_DESC_"))
         end
     end
 end

@@ -4,6 +4,165 @@ local coords   = self.get_pos()
 local heading  = 0.0
 local forwardX = 0.0
 local forwardY = 0.0
+
+local function ResetSliders()
+    spawnDistance = vec3:new(0, 0, 0)
+    spawnRot      = vec3:new(0, 0, 0)
+end
+
+function UpdateFilteredProps()
+    filteredProps = {}
+    for _, p in ipairs(custom_props) do
+        if string.find(string.lower(p.name), objects_search:lower()) then
+            table.insert(filteredProps, p)
+        end
+        table.sort(custom_props, function(a, b)
+            return a.name < b.name
+        end)
+    end
+end
+
+function DisplayFilteredProps()
+    UpdateFilteredProps()
+    local propNames = {}
+    for _, p in ipairs(filteredProps) do
+        table.insert(propNames, p.name)
+    end
+    prop_index, used = ImGui.ListBox("##propList", prop_index, propNames, #filteredProps)
+    prop = filteredProps[prop_index + 1]
+    if prop ~= nil then
+        propHash = prop.hash
+        propName = prop.name
+    end
+end
+
+function GetAllObjects()
+    filteredObjects = {}
+    for _, object in ipairs(gta_objets) do
+        if objects_search ~= "" then
+            if string.find(string.lower(object), objects_search:lower()) then
+                table.insert(filteredObjects, object)
+            end
+        else
+            table.insert(filteredObjects, object)
+        end
+    end
+    objects_index, used = ImGui.ListBox("##gtaObjectsList", objects_index, filteredObjects, #filteredObjects)
+    prop                = filteredObjects[objects_index + 1]
+    propHash            = joaat(prop)
+    propName            = prop
+    if gui.is_open() and os_switch ~= 0 then
+        for _, b in ipairs(mp_blacklist) do
+            if propName == b then
+                showInvalidObjText = true
+                blacklisted_obj    = true
+                invalidType        = _T("COCKSTAR_BLACKLIST_WARN_")
+                break
+            else
+                showInvalidObjText = false
+                blacklisted_obj    = false
+            end
+            for _, c in ipairs(crash_objects) do
+                if propName == c then
+                    showInvalidObjText = true
+                    invalidType = _T("CRASH_OBJECT_WARN_")
+                    break
+                else
+                    showInvalidObjText = false
+                end
+            end
+        end
+    end
+end
+
+function UpdateSelfBones()
+    filteredSelfBones = {}
+    for _, bone in ipairs(t_PedBones) do
+        table.insert(filteredSelfBones, bone)
+    end
+end
+
+function DisplaySelfBones()
+    UpdateSelfBones()
+    local boneNames = {}
+    for _, bone in ipairs(filteredSelfBones) do
+        table.insert(boneNames, bone.name)
+    end
+    selected_bone, used = ImGui.Combo("##pedBones", selected_bone, boneNames, #filteredSelfBones)
+end
+
+function UpdateVehBones()
+    filteredVehBones = {}
+    for _, bone in ipairs(t_VehicleBones) do
+        local bone_idx = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Self.Vehicle.Current, bone)
+        if bone_idx ~= nil and bone_idx ~= -1 then
+            table.insert(filteredVehBones, bone)
+        end
+    end
+end
+
+function DisplayVehBones()
+    UpdateVehBones()
+    local boneNames = {}
+    for _, bone in ipairs(filteredVehBones) do
+        table.insert(boneNames, bone)
+    end
+    selected_bone, used = ImGui.Combo("##vehBones", selected_bone, boneNames, #filteredVehBones)
+end
+
+function DisplaySpawnedObjects()
+    spawnedNames = {}
+    if spawned_props[1] ~= nil then
+        for _, v in ipairs(spawned_props) do
+            table.insert(spawnedNames, v.name)
+        end
+    end
+    spawned_index, spiUsed = ImGui.Combo("##spawnedProps", spawned_index, spawnedNames, #spawned_props)
+end
+
+function DisplayAttachedObjects()
+    selfAttachNames = {}
+    if attached_props[1] ~= nil then
+        for _, v in ipairs(attached_props) do
+            table.insert(selfAttachNames, v.name)
+        end
+    end
+    attached_index, used = ImGui.Combo("##Attached Objects", attached_index, selfAttachNames, #attached_props)
+end
+
+function DisplayVehAttachments()
+    vehAttachNames = {}
+    if vehicle_attachments[1] ~= nil then
+        for _, v in ipairs(vehicle_attachments) do
+            table.insert(vehAttachNames, v.name)
+        end
+    end
+    vattached_index, used = ImGui.Combo("##vehAttachedObjects", vattached_index, vehAttachNames, #vehicle_attachments)
+end
+
+function FilterPersistProps()
+    filteredPersistProps = {}
+    if persist_attachments[1] ~= nil then
+        for _, t in ipairs(persist_attachments) do
+            table.insert(filteredPersistProps, t)
+        end
+    end
+end
+
+function ShowPersistProps()
+    FilterPersistProps()
+    persist_prop_names = {}
+    for _, p in ipairs(filteredPersistProps) do
+        table.insert(persist_prop_names, p.name)
+    end
+    persist_prop_index, _ = ImGui.ListBox(
+        "##persist_props",
+        persist_prop_index,
+        persist_prop_names,
+        #filteredPersistProps
+    )
+end
+
 function objectSpawnerUI()
     ImGui.BeginTabBar("Object Spawner")
     if ImGui.BeginTabItem("Spawn & Create") then
@@ -21,9 +180,9 @@ function objectSpawnerUI()
             UI.widgetSound("Nav")
         end
         if os_switch == 0 then
-            displayFilteredProps()
+            DisplayFilteredProps()
         else
-            getAllObjects()
+            GetAllObjects()
         end
         ImGui.PopItemWidth()
         ImGui.Spacing()
@@ -77,8 +236,8 @@ function objectSpawnerUI()
             previewStarted = false
             previewLoop    = false
             zOffset        = 0.0
-            forwardX       = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-            forwardY       = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+            forwardX       = ENTITY.GET_ENTITY_FORWARD_X(Self.GetPedID())
+            forwardY       = ENTITY.GET_ENTITY_FORWARD_Y(Self.GetPedID())
         end
         if NETWORK.NETWORK_IS_SESSION_ACTIVE() then
             if not preview then
@@ -102,10 +261,10 @@ function objectSpawnerUI()
             forwardY       = ENTITY.GET_ENTITY_FORWARD_Y(selectedPlayer)
             ImGui.SameLine()
         else
-            coords   = ENTITY.GET_ENTITY_COORDS(self.get_ped(), false)
-            heading  = ENTITY.GET_ENTITY_HEADING(self.get_ped())
-            forwardX = ENTITY.GET_ENTITY_FORWARD_X(self.get_ped())
-            forwardY = ENTITY.GET_ENTITY_FORWARD_Y(self.get_ped())
+            coords   = ENTITY.GET_ENTITY_COORDS(Self.GetPedID(), false)
+            heading  = ENTITY.GET_ENTITY_HEADING(Self.GetPedID())
+            forwardX = ENTITY.GET_ENTITY_FORWARD_X(Self.GetPedID())
+            forwardY = ENTITY.GET_ENTITY_FORWARD_Y(Self.GetPedID())
         end
         ImGui.SameLine(); ImGui.BeginDisabled(blacklisted_obj)
         if ImGui.Button(string.format("%s##obj", _T("GENERIC_SPAWN_BTN_"))) then
@@ -136,16 +295,16 @@ function objectSpawnerUI()
         end
         ImGui.EndDisabled()
         if showInvalidObjText then
-            UI.coloredText(string.format("%s%s", _T("INVALID_OBJECT_TXT_"), invalidType), "#EED202", 1, 15)
+            UI.ColoredText(string.format("%s%s", _T("INVALID_OBJECT_TXT_"), invalidType), "#EED202", nil, 15)
         end
         if spawned_props[1] ~= nil then
             ImGui.Text(_T("SPAWNED_OBJECTS_TXT_"))
             ImGui.PushItemWidth(270)
-            displaySpawnedObjects()
+            DisplaySpawnedObjects()
             ImGui.PopItemWidth()
             selectedObject = spawned_props[spawned_index + 1]
             if #spawned_props > 1 then
-                Game.World.markSelectedEntity(selectedObject.entity)
+                Game.World.MarkSelectedEntity(selectedObject.entity)
             end
             ImGui.SameLine()
             if ImGui.Button(string.format(" %s ##obj", _T("GENERIC_DELETE_BTN_"))) then
@@ -167,7 +326,7 @@ function objectSpawnerUI()
             if attachToSelfUsed then
                 UI.widgetSound("Nav2")
             end
-            if current_vehicle ~= nil and current_vehicle ~= 0 then
+            if Self.Vehicle.Current ~= nil and Self.Vehicle.Current ~= 0 then
                 ImGui.SameLine(); attachToVeh, attachToVehUsed = ImGui.Checkbox(_T("ATTACH_TO_VEH_CB_"),
                     attachToVeh)
                 if attachToVehUsed then
@@ -178,21 +337,21 @@ function objectSpawnerUI()
                 ImGui.BeginDisabled()
                 ImGui.SameLine(); attachToVeh, _ = ImGui.Checkbox(_T("ATTACH_TO_VEH_CB_"), attachToVeh)
                 ImGui.EndDisabled()
-                UI.toolTip(false, _T("GET_IN_VEH_WARNING_"))
+                UI.Tooltip(_T("GET_IN_VEH_WARNING_"))
             end
             if attachToSelf then
                 attachToVeh = false
                 ImGui.PushItemWidth(230)
-                displaySelfBones()
+                DisplaySelfBones()
                 ImGui.PopItemWidth()
                 boneData = filteredSelfBones[selected_bone + 1]
                 ImGui.SameLine()
                 if ImGui.Button(string.format(" %s ##self", _T("GENERIC_ATTACH_BTN_"))) then
                     script.run_in_fiber(function()
-                        if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, self.get_ped()) then
+                        if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, Self.GetPedID()) then
                             UI.widgetSound("Select2")
-                            ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject.entity, self.get_ped(),
-                                PED.GET_PED_BONE_INDEX(self.get_ped(), boneData.ID), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false,
+                            ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject.entity, Self.GetPedID(),
+                                PED.GET_PED_BONE_INDEX(Self.GetPedID(), boneData.ID), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false,
                                 false, false,
                                 false,
                                 2, true, 1)
@@ -201,7 +360,7 @@ function objectSpawnerUI()
                                 for _, v in ipairs(selfAttachments) do
                                     if selectedObject.entity ~= v.entity then
                                         selfAttachments.entity = selectedObject.entity
-                                        selfAttachments.hash   = Game.getEntityModel(selectedObject.entity)
+                                        selfAttachments.hash   = Game.GetEntityModel(selectedObject.entity)
                                         selfAttachments.name   = selectedObject.name
                                         selfAttachments.bone   = boneData.ID
                                         selfAttachments.posx   = 0.0
@@ -214,7 +373,7 @@ function objectSpawnerUI()
                                 end
                             else
                                 selfAttachments.entity = selectedObject.entity
-                                selfAttachments.hash   = Game.getEntityModel(selectedObject.entity)
+                                selfAttachments.hash   = Game.GetEntityModel(selectedObject.entity)
                                 selfAttachments.name   = selectedObject.name
                                 selfAttachments.bone   = boneData.ID
                                 selfAttachments.posx   = 0.0
@@ -237,7 +396,7 @@ function objectSpawnerUI()
                 if attached_props[1] ~= nil then
                     ImGui.Text(_T("ATTACHED_OBJECTS_TXT_"))
                     ImGui.PushItemWidth(230)
-                    displayAttachedObjects()
+                    DisplayAttachedObjects()
                     ImGui.PopItemWidth()
                     selectedAttachment = attached_props[attached_index + 1]
                     ImGui.SameLine()
@@ -257,15 +416,15 @@ function objectSpawnerUI()
             if attachToVeh then
                 attachToSelf = false
                 ImGui.PushItemWidth(230)
-                displayVehBones()
+                DisplayVehBones()
                 ImGui.PopItemWidth()
                 boneData = filteredVehBones[selected_bone + 1]
                 ImGui.SameLine()
                 if ImGui.Button(string.format(" %s ##veh", _T("GENERIC_ATTACH_BTN_"))) then
                     UI.widgetSound("Select2")
                     script.run_in_fiber(function()
-                        ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject.entity, current_vehicle,
-                            ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject.entity, Self.Vehicle.Current,
+                            ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Self.Vehicle.Current, boneData), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                             false, false,
                             false,
                             false,
@@ -276,9 +435,9 @@ function objectSpawnerUI()
                             for _, v in ipairs(vehAttachments) do
                                 if selectedObject.entity ~= v.entity then
                                     vehAttachments.entity = selectedObject.entity
-                                    vehAttachments.hash   = Game.getEntityModel(selectedObject.entity)
+                                    vehAttachments.hash   = Game.GetEntityModel(selectedObject.entity)
                                     vehAttachments.name   = selectedObject.name
-                                    vehAttachments.bone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle,
+                                    vehAttachments.bone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Self.Vehicle.Current,
                                         boneData)
                                     vehAttachments.posx   = 0.0
                                     vehAttachments.posy   = 0.0
@@ -290,9 +449,9 @@ function objectSpawnerUI()
                             end
                         else
                             vehAttachments.entity = selectedObject.entity
-                            vehAttachments.hash   = Game.getEntityModel(selectedObject.entity)
+                            vehAttachments.hash   = Game.GetEntityModel(selectedObject.entity)
                             vehAttachments.name   = selectedObject.name
-                            vehAttachments.bone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData)
+                            vehAttachments.bone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Self.Vehicle.Current, boneData)
                             vehAttachments.posx   = 0.0
                             vehAttachments.posy   = 0.0
                             vehAttachments.posz   = 0.0
@@ -309,7 +468,7 @@ function objectSpawnerUI()
                 if vehicle_attachments[1] ~= nil then
                     ImGui.Text(_T("ATTACHED_OBJECTS_TXT_"))
                     ImGui.PushItemWidth(230)
-                    displayVehAttachments()
+                    DisplayVehAttachments()
                     ImGui.PopItemWidth()
                     selectedAttachment = vehicle_attachments[attached_index + 1]
                     ImGui.SameLine()
@@ -330,7 +489,7 @@ function objectSpawnerUI()
             if edit_modeUsed then
                 UI.widgetSound("Nav2")
             end
-            UI.helpMarker(false, _T("EDIT_MODE_DESC_"))
+            UI.HelpMarker(_T("EDIT_MODE_DESC_"))
             ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
             if ImGui.Button(string.format("   %s   ", _T("GENERIC_RESET_BTN_"))) then
                 UI.widgetSound("Select")
@@ -342,7 +501,7 @@ function objectSpawnerUI()
                         ENTITY.ATTACH_ENTITY_TO_ENTITY(selected_att, target, attachBone, 0.0, 0.0, 0.0,
                             0.0, 0.0, 0.0, false, false, false, false, 2, true, 1)
                     else
-                        resetSliders()
+                        ResetSliders()
                         ENTITY.SET_ENTITY_COORDS(selectedObject.entity, coords.x + (forwardX * 3),
                             coords.y + (forwardY * 3),
                             coords.z, false,
@@ -352,7 +511,7 @@ function objectSpawnerUI()
                     end
                 end)
             end
-            UI.helpMarker(false, _T("RESET_OBJECT_DESC_"))
+            UI.HelpMarker(_T("RESET_OBJECT_DESC_"))
             if edit_mode and not ENTITY.IS_ENTITY_ATTACHED(selectedObject.entity) then
                 ImGui.Text(_T("XYZ_MULTIPLIER_TXT_"))
                 ImGui.PushItemWidth(280)
@@ -383,13 +542,13 @@ function objectSpawnerUI()
                 ImGui.PopItemWidth()
             else
                 if edit_mode and attached_props[1] ~= nil or edit_mode and vehicle_attachments[1] ~= nil then
-                    if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, self.get_ped()) then
-                        target       = self.get_ped()
-                        attachBone   = PED.GET_PED_BONE_INDEX(self.get_ped(), selectedAttachment.bone)
+                    if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, Self.GetPedID()) then
+                        target       = Self.GetPedID()
+                        attachBone   = PED.GET_PED_BONE_INDEX(Self.GetPedID(), selectedAttachment.bone)
                         selected_att = selectedAttachment.entity
                     elseif ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, self.get_veh()) then
-                        target       = current_vehicle
-                        attachBone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(current_vehicle, boneData)
+                        target       = Self.Vehicle.Current
+                        attachBone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Self.Vehicle.Current, boneData)
                         selected_att = selectedAttachment.entity
                     end
                     ImGui.Text(_T("XYZ_MULTIPLIER_TXT_"))
@@ -599,7 +758,7 @@ function objectSpawnerUI()
     if ImGui.BeginTabItem("Saved Creations") then
         if persist_attachments[1] ~= nil then
             ImGui.PushItemWidth(360)
-            showPersistProps()
+            ShowPersistProps()
             ImGui.PopItemWidth()
             local persist_prop_info = filteredPersistProps[persist_prop_index + 1]
             ImGui.Dummy(1, 5)
@@ -608,13 +767,13 @@ function objectSpawnerUI()
                     UI.widgetSound("Select")
                     script.run_in_fiber(function(pers)
                         for _, p in ipairs(persist_prop_info.props) do
-                            if Game.requestModel(p.hash) then
+                            if Game.RequestModel(p.hash) then
                                 local persist_prop = OBJECT.CREATE_OBJECT(p.hash, 0.0, 0.0, 0.0, true, true, false)
                                 pers:sleep(200)
                                 if ENTITY.DOES_ENTITY_EXIST(persist_prop) then
                                     table.insert(spawned_persist_T, persist_prop)
-                                    ENTITY.ATTACH_ENTITY_TO_ENTITY(persist_prop, self.get_ped(),
-                                        PED.GET_PED_BONE_INDEX(self.get_ped(), p.bone), p.posx, p.posy, p.posz, p.rotx,
+                                    ENTITY.ATTACH_ENTITY_TO_ENTITY(persist_prop, Self.GetPedID(),
+                                        PED.GET_PED_BONE_INDEX(Self.GetPedID(), p.bone), p.posx, p.posy, p.posz, p.rotx,
                                         p.roty, p.rotz,
                                         false, false, false, false, 2, true, 1)
                                 end
@@ -637,7 +796,7 @@ function objectSpawnerUI()
                 end
             end
             ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine()
-            if UI.coloredButton(string.format("%s##vcreator", _T("VC_DELETE_PERSISTENT_")), "#E40000", "#FF3F3F", "#FF8080", 0.87) then
+            if UI.ColoredButton(string.format("%s##vcreator", _T("VC_DELETE_PERSISTENT_")), "#E40000", "#FF3F3F", "#FF8080", 0.87) then
                 UI.widgetSound("Focus_In")
                 ImGui.OpenPopup("Remove Persistent Props")
             end
@@ -645,7 +804,7 @@ function objectSpawnerUI()
             ImGui.SetNextWindowSizeConstraints(200, 100, 400, 400)
             ImGui.SetNextWindowBgAlpha(0.7)
             if ImGui.BeginPopupModal("Remove Persistent Props", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
-                UI.coloredText(_T("CONFIRM_PROMPT_"), "yellow", 0.91, 35)
+                UI.ColoredText(_T("CONFIRM_PROMPT_"), "yellow", 0.91, 35)
                 ImGui.Dummy(1, 20)
                 if ImGui.Button(string.format("   %s   ##selfprops", _T("GENERIC_YES_"))) then
                     for key, value in ipairs(persist_attachments) do
@@ -665,7 +824,7 @@ function objectSpawnerUI()
                 ImGui.End()
             end
         else
-            ImGui.Dummy(1, 10); UI.wrappedText(
+            ImGui.Dummy(1, 10); UI.WrappedText(
                 "Attach some objects to yourself then save them to be able to spawn them from this tab.", 20)
         end
         ImGui.EndTabItem()

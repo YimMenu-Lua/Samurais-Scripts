@@ -1,7 +1,7 @@
 ---@diagnostic disable
 
 function dunkUI()
-    if Game.isOnline() then
+    if Game.IsOnline() then
         if CURRENT_BUILD == TARGET_BUILD then
             ImGui.BeginTabBar("Dunk Pacino")
             if ImGui.BeginTabItem(_T("CP_GAMBLING_TXT_")) then
@@ -11,7 +11,7 @@ function dunkUI()
                     CFG:SaveItem("bypass_casino_bans", bypass_casino_bans)
                 end
                 if not bypass_casino_bans then
-                    UI.toolTip(true, _T("CP_BYPASSCD_WARN_"), "#FFCC00", 1)
+                    UI.Tooltip(_T("CP_BYPASSCD_WARN_"), "#FFCC00")
                 end
 
                 ImGui.Spacing(); ImGui.Text(_T("CP_COOLDOWN_STATUS_")); ImGui.SameLine()
@@ -306,8 +306,10 @@ function dunkUI()
                 end
 
                 if casino_heist_driver == 1 then --Karim Deniz
-                    ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
-                    local new_car, car_clicked = ImGui.Combo(CP_HEIST_GETAWAY_VEHS_TXT_, casino_heist_cars,
+                    ImGui.SameLine()
+                    ImGui.Dummy(50, 1)
+                    ImGui.SameLine()
+                    local new_car, car_clicked = ImGui.Combo(_T("CP_HEIST_GETAWAY_VEHS_TXT_"), casino_heist_cars,
                         { "Issi Classic", "Asbo", "Kanjo", "Sentinel Classic" }, 4)
                     if car_clicked then
                         script.run_in_fiber(function()
@@ -316,7 +318,7 @@ function dunkUI()
                     end
                 elseif casino_heist_driver == 2 then --Taliana Martinez
                     ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
-                    local new_car, car_clicked = ImGui.Combo(CP_HEIST_GETAWAY_VEHS_TXT_, casino_heist_cars,
+                    local new_car, car_clicked = ImGui.Combo(_T("CP_HEIST_GETAWAY_VEHS_TXT_"), casino_heist_cars,
                         { "Retinue MK II", "Drift Yosemite", "Sugoi", "Jugular" }, 4)
                     if car_clicked then
                         script.run_in_fiber(function()
@@ -325,7 +327,7 @@ function dunkUI()
                     end
                 elseif casino_heist_driver == 3 then --Eddie Toh
                     ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
-                    local new_car, car_clicked = ImGui.Combo(CP_HEIST_GETAWAY_VEHS_TXT_, casino_heist_cars,
+                    local new_car, car_clicked = ImGui.Combo(_T("CP_HEIST_GETAWAY_VEHS_TXT_"), casino_heist_cars,
                         { "Sultan Classic", "Guantlet Classic", "Ellie", "Komoda" }, 4)
                     if car_clicked then
                         script.run_in_fiber(function()
@@ -334,7 +336,7 @@ function dunkUI()
                     end
                 elseif casino_heist_driver == 4 then --Zach Nelson
                     ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
-                    local new_car, car_clicked = ImGui.Combo(CP_HEIST_GETAWAY_VEHS_TXT_, casino_heist_cars,
+                    local new_car, car_clicked = ImGui.Combo(_T("CP_HEIST_GETAWAY_VEHS_TXT_"), casino_heist_cars,
                         { "Manchez", "Stryder", "Defiler", "Lectro" }, 4)
                     if car_clicked then
                         script.run_in_fiber(function()
@@ -343,7 +345,7 @@ function dunkUI()
                     end
                 elseif casino_heist_driver == 5 then --Chester McCoy
                     ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
-                    local new_car, car_clicked = ImGui.Combo(CP_HEIST_GETAWAY_VEHS_TXT_, casino_heist_cars,
+                    local new_car, car_clicked = ImGui.Combo(_T("CP_HEIST_GETAWAY_VEHS_TXT_"), casino_heist_cars,
                         { "Zhaba", "Vagrant", "Outlaw", "Everon" }, 4)
                     if car_clicked then
                         script.run_in_fiber(function()

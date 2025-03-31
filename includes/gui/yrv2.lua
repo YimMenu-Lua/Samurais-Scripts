@@ -5,13 +5,13 @@ function yrv2UI()
     ImGui.Spacing()
     ImGui.Dummy((window_width / 2) - 110, 1)
     ImGui.SameLine()
-    UI.coloredText(
+    UI.ColoredText(
         "- YimResupplier V2 -",
         yrv2_color,
         1,
         60
     )
-    if Game.isOnline() then
+    if Game.IsOnline() then
         local hangar_index   = stats.get_int("MPX_HANGAR_OWNED")
         local bunker_index   = stats.get_int("MPX_PROP_FAC_SLOT5")
         local hangarOwned    = hangar_index ~= 0
@@ -34,10 +34,10 @@ function yrv2UI()
                 if ImGui.BeginTabItem(_T("CEO_WHOUSES_TXT_")) then
                     ImGui.Spacing()
                     if whouse_1_owned then
-                        if whouse1.name == "" then SS.getCEOwhouseInfo(whouse1) end
+                        if whouse1.name == "" then SS.GetCEOwhouseInfo(whouse1) end
                         wh1Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE0")
                         if wh1Supplies ~= nil and wh1Supplies > 0 then
-                            local wh1Value = globals.get_int(tun_global + SS.get_ceo_crates_offset(wh1Supplies))
+                            local wh1Value = globals.get_int(tun_global + SS.GetCEOCratesOffset(wh1Supplies))
                             wh1Total = wh1Value * wh1Supplies
                         end
                         ceo_moola = wh1Total
@@ -47,15 +47,15 @@ function yrv2UI()
                             ImGui.ProgressBar((wh1Supplies / whouse1.max), 240, 30,
                                 tostring(wh1Supplies) ..
                                 " Crates (" .. tostring(math.floor((wh1Supplies / whouse1.max) * 100)) .. "%)")
-                            ImGui.SameLine(); ImGui.Text(Lua_fn.formatMoney(wh1Total))
-                            if whouse1.pos and Game.Self.isOutside() then
+                            ImGui.SameLine(); ImGui.Text(Lua_fn.FormatMoney(wh1Total))
+                            if whouse1.pos and Self.IsOutside() then
                                 if ImGui.Button("Teleport##wh1") then
                                     if vec3:distance(self.get_pos(), whouse1.pos) < 10 then
                                         UI.widgetSound("Error")
                                         YimToast:ShowWarning("Samurai's Scripts", "It's right there bruh!")
                                     else
                                         UI.widgetSound("Select")
-                                        Game.Self.teleport(true, whouse1.pos)
+                                        Self.Teleport(true, whouse1.pos)
                                     end
                                 end
                             end
@@ -74,10 +74,10 @@ function yrv2UI()
                     end
                     -- 2
                     if whouse_2_owned then
-                        if whouse2.name == "" then SS.getCEOwhouseInfo(whouse2) end
+                        if whouse2.name == "" then SS.GetCEOwhouseInfo(whouse2) end
                         wh2Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE1")
                         if wh2Supplies ~= nil and wh2Supplies > 0 then
-                            local wh2Value = globals.get_int(tun_global + SS.get_ceo_crates_offset(wh2Supplies))
+                            local wh2Value = globals.get_int(tun_global + SS.GetCEOCratesOffset(wh2Supplies))
                             wh2Total = wh2Value * wh2Supplies
                         end
                         ceo_moola = ceo_moola + wh2Total
@@ -87,15 +87,15 @@ function yrv2UI()
                             ImGui.ProgressBar((wh2Supplies / whouse2.max), 240, 30,
                                 tostring(wh2Supplies) ..
                                 " Crates (" .. tostring(math.floor((wh2Supplies / whouse2.max) * 100)) .. "%)")
-                            ImGui.SameLine(); ImGui.Text(Lua_fn.formatMoney(wh2Total))
-                            if whouse2.pos and Game.Self.isOutside() then
+                            ImGui.SameLine(); ImGui.Text(Lua_fn.FormatMoney(wh2Total))
+                            if whouse2.pos and Self.IsOutside() then
                                 if ImGui.Button("Teleport##wh2") then
                                     if vec3:distance(self.get_pos(), whouse2.pos) < 10 then
                                         UI.widgetSound("Error")
                                         YimToast:ShowWarning("Samurai's Scripts", "It's right there bruh!")
                                     else
                                         UI.widgetSound("Select")
-                                        Game.Self.teleport(true, whouse2.pos)
+                                        Self.Teleport(true, whouse2.pos)
                                     end
                                 end
                             end
@@ -114,10 +114,10 @@ function yrv2UI()
                     end
                     -- 3
                     if whouse_3_owned then
-                        if whouse3.name == "" then SS.getCEOwhouseInfo(whouse3) end
+                        if whouse3.name == "" then SS.GetCEOwhouseInfo(whouse3) end
                         wh3Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE2")
                         if wh3Supplies ~= nil and wh3Supplies > 0 then
-                            local wh3Value = globals.get_int(tun_global + SS.get_ceo_crates_offset(wh3Supplies))
+                            local wh3Value = globals.get_int(tun_global + SS.GetCEOCratesOffset(wh3Supplies))
                             wh3Total = wh3Value * wh3Supplies
                         end
                         ceo_moola = ceo_moola + wh3Total
@@ -127,15 +127,15 @@ function yrv2UI()
                             ImGui.ProgressBar((wh3Supplies / whouse3.max), 240, 30,
                                 tostring(wh3Supplies) ..
                                 " Crates (" .. tostring(math.floor((wh3Supplies / whouse3.max) * 100)) .. "%)")
-                            ImGui.SameLine(); ImGui.Text(Lua_fn.formatMoney(wh3Total))
-                            if whouse3.pos and Game.Self.isOutside() then
+                            ImGui.SameLine(); ImGui.Text(Lua_fn.FormatMoney(wh3Total))
+                            if whouse3.pos and Self.IsOutside() then
                                 if ImGui.Button("Teleport##wh3") then
                                     if vec3:distance(self.get_pos(), whouse3.pos) < 10 then
                                         UI.widgetSound("Error")
                                         YimToast:ShowWarning("Samurai's Scripts", "It's right there bruh!")
                                     else
                                         UI.widgetSound("Select")
-                                        Game.Self.teleport(true, whouse3.pos)
+                                        Self.Teleport(true, whouse3.pos)
                                     end
                                 end
                             end
@@ -154,10 +154,10 @@ function yrv2UI()
                     end
                     -- 4
                     if whouse_4_owned then
-                        if whouse4.name == "" then SS.getCEOwhouseInfo(whouse4) end
+                        if whouse4.name == "" then SS.GetCEOwhouseInfo(whouse4) end
                         wh4Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE3")
                         if wh4Supplies ~= nil and wh4Supplies > 0 then
-                            local wh4Value = globals.get_int(tun_global + SS.get_ceo_crates_offset(wh4Supplies))
+                            local wh4Value = globals.get_int(tun_global + SS.GetCEOCratesOffset(wh4Supplies))
                             wh4Total = wh4Value * wh4Supplies
                         end
                         ceo_moola = ceo_moola + wh4Total
@@ -167,15 +167,15 @@ function yrv2UI()
                             ImGui.ProgressBar((wh4Supplies / whouse4.max), 240, 30,
                                 tostring(wh4Supplies) ..
                                 " Crates (" .. tostring(math.floor((wh4Supplies / whouse4.max) * 100)) .. "%)")
-                            ImGui.SameLine(); ImGui.Text(Lua_fn.formatMoney(wh4Total))
-                            if whouse4.pos and Game.Self.isOutside() then
+                            ImGui.SameLine(); ImGui.Text(Lua_fn.FormatMoney(wh4Total))
+                            if whouse4.pos and Self.IsOutside() then
                                 if ImGui.Button("Teleport##wh4") then
                                     if vec3:distance(self.get_pos(), whouse4.pos) < 10 then
                                         UI.widgetSound("Error")
                                         YimToast:ShowWarning("Samurai's Scripts", "It's right there bruh!")
                                     else
                                         UI.widgetSound("Select")
-                                        Game.Self.teleport(true, whouse4.pos)
+                                        Self.Teleport(true, whouse4.pos)
                                     end
                                 end
                             end
@@ -194,10 +194,10 @@ function yrv2UI()
                     end
                     -- 5
                     if whouse_5_owned then
-                        if whouse5.name == "" then SS.getCEOwhouseInfo(whouse5) end
+                        if whouse5.name == "" then SS.GetCEOwhouseInfo(whouse5) end
                         wh5Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE4")
                         if wh5Supplies ~= nil and wh5Supplies > 0 then
-                            local wh5Value = globals.get_int(tun_global + SS.get_ceo_crates_offset(wh5Supplies))
+                            local wh5Value = globals.get_int(tun_global + SS.GetCEOCratesOffset(wh5Supplies))
                             wh5Total = wh5Value * wh5Supplies
                         end
                         ceo_moola = ceo_moola + wh5Total
@@ -207,15 +207,15 @@ function yrv2UI()
                             ImGui.ProgressBar((wh5Supplies / whouse5.max), 240, 30,
                                 tostring(wh5Supplies) ..
                                 " Crates (" .. tostring(math.floor((wh5Supplies / whouse5.max) * 100)) .. "%)")
-                            ImGui.SameLine(); ImGui.Text(Lua_fn.formatMoney(wh5Total))
-                            if whouse5.pos and Game.Self.isOutside() then
+                            ImGui.SameLine(); ImGui.Text(Lua_fn.FormatMoney(wh5Total))
+                            if whouse5.pos and Self.IsOutside() then
                                 if ImGui.Button("Teleport##wh5") then
                                     if vec3:distance(self.get_pos(), whouse5.pos) < 10 then
                                         UI.widgetSound("Error")
                                         YimToast:ShowWarning("Samurai's Scripts", "It's right there bruh!")
                                     else
                                         UI.widgetSound("Select")
-                                        Game.Self.teleport(true, whouse5.pos)
+                                        Self.Teleport(true, whouse5.pos)
                                     end
                                 end
                             end
@@ -237,13 +237,13 @@ function yrv2UI()
                     ImGui.BeginDisabled(bCond)
                     if ImGui.Button("Finish Cargo Source Mission") then
                         UI.widgetSound("Select")
-                        SS.finishCargoSourceMission()
+                        SS.FinishCargoSourceMission()
                     end
                     ImGui.EndDisabled()
                     if bCond then
-                        UI.toolTip(false, "Start a source mission then press this button to finish it.")
+                        UI.Tooltip("Start a source mission then press this button to finish it.")
                     end
-                    ImGui.BulletText("Total Value: " .. Lua_fn.formatMoney(ceo_moola))
+                    ImGui.BulletText("Total Value: " .. Lua_fn.FormatMoney(ceo_moola))
                     ImGui.EndTabItem()
                 end
             end
@@ -251,8 +251,8 @@ function yrv2UI()
             if ImGui.BeginTabItem(_T("HANGAR_TXT_")) then
                 ImGui.Dummy(1, 5)
                 if hangarOwned then
-                    local hangar_name = hangar_info_t[hangar_index].name
-                    local hangar_pos  = hangar_info_t[hangar_index].coords
+                    local hangar_name = t_Hangars[hangar_index].name
+                    local hangar_pos  = t_Hangars[hangar_index].coords
                     ImGui.SeparatorText(hangar_name)
                     hangarSupplies = stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
                     hangarTotal    = hangarSupplies * 30000
@@ -276,12 +276,12 @@ function yrv2UI()
                     ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
                     ImGui.ProgressBar((hangarSupplies / 50), 240, 30,
                         tostring(hangarSupplies) .. " Crates (" .. tostring(math.floor(hangarSupplies / 0.5)) .. "%)")
-                    ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(hangarTotal))
-                    if Game.Self.isOutside() then
+                    ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.FormatMoney(hangarTotal))
+                    if Self.IsOutside() then
                         ImGui.Spacing(); ImGui.SeparatorText(_T("QUICK_TP_TXT_"))
                         if ImGui.Button("Teleport To Hangar") then
                             UI.widgetSound("Select")
-                            Game.Self.teleport(true, hangar_pos)
+                            Self.Teleport(true, hangar_pos)
                         end
                     end
                 else
@@ -293,7 +293,7 @@ function yrv2UI()
             if ImGui.BeginTabItem("Bunker") then
                 ImGui.Dummy(1, 5)
                 if bunkerOwned then
-                    ImGui.SeparatorText(bunker_info_t[bunker_index].name)
+                    ImGui.SeparatorText(t_Bunkers[bunker_index].name)
                     local bunkerUpdgrade1  = stats.get_int("MPX_BUNKER_EQUIPMENT") == 1
                     local bunkerUpdgrade2  = stats.get_int("MPX_BUNKER_STAFF") == 1
                     local bunkerEqLabelCol = "white"
@@ -316,14 +316,17 @@ function yrv2UI()
                     local bunkerStock    = stats.get_int("MPX_PRODTOTALFORFACTORY5")
                     bunkerTotal          = ((globals.get_int(tun_global + 21254) + bunkerOffset1 + bunkerOffset2) * bunkerStock)
                     ImGui.BulletText("Equipment Upgrade: "); ImGui.SameLine()
-                    UI.coloredText(bunkerUpdgrade1 and "Active" or "Inactive", bunkerEqLabelCol, 0.9, 35); ImGui
-                        .SameLine()
+                    UI.ColoredText(bunkerUpdgrade1 and "Active" or "Inactive", bunkerEqLabelCol, 0.9, 35)
+                    ImGui.SameLine()
                     ImGui.BulletText("Staff Upgrade: "); ImGui.SameLine()
-                    UI.coloredText(bunkerUpdgrade2 and "Active" or "Inactive", bunkerStLabelCol, 0.9, 35)
+                    UI.ColoredText(bunkerUpdgrade2 and "Active" or "Inactive", bunkerStLabelCol, 0.9, 35)
                     ImGui.Spacing()
-                    ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine(); ImGui
-                        .ProgressBar(
-                            (bunkerSupplies / 100), 240, 30)
+                    ImGui.BulletText("Supplies:")
+                    ImGui.SameLine()
+                    ImGui.Dummy(10, 1)
+                    ImGui.SameLine()
+                    ImGui.ProgressBar((bunkerSupplies / 100), 240, 30)
+
                     if bunkerSupplies < 100 then
                         ImGui.SameLine()
                         if ImGui.Button(" Fill Supplies ##Bunker") then
@@ -335,13 +338,13 @@ function yrv2UI()
                         " Crates (" .. tostring(bunkerStock) .. "%)")
                     ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
                     ImGui.Text("¤ Blaine County:  " ..
-                        Lua_fn.formatMoney(bunkerTotal) ..
-                        "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(bunkerTotal * 1.5)))
-                    if Game.Self.isOutside() then
+                        Lua_fn.FormatMoney(bunkerTotal) ..
+                        "\n¤ Los Santos:      " .. Lua_fn.FormatMoney(math.floor(bunkerTotal * 1.5)))
+                    if Self.IsOutside() then
                         ImGui.Spacing(); ImGui.SeparatorText("Quick Teleport")
                         if ImGui.Button("Teleport To Bunker") then
                             UI.widgetSound("Select")
-                            Game.Self.teleport(true, bunker_info_t[bunker_index].coords)
+                            Self.Teleport(true, t_Bunkers[bunker_index].coords)
                         end
                     end
                 else
@@ -353,7 +356,7 @@ function yrv2UI()
             if ImGui.BeginTabItem("MC Businesses") then
                 -- 0
                 if slot0_owned then
-                    if bb.slot0.name == "Unknown" then SS.getMCbusinessInfo(stats.get_int("MPX_FACTORYSLOT0"), bb.slot0) end
+                    if bb.slot0.name == "Unknown" then SS.GetMCbusinessInfo(stats.get_int("MPX_FACTORYSLOT0"), bb.slot0) end
                     ImGui.Dummy(1, 10); ImGui.SeparatorText(bb.slot0.name)
                     local slot0_supp  = stats.get_int("MPX_MATTOTALFORFACTORY0")
                     local slot0_stock = stats.get_int("MPX_PRODTOTALFORFACTORY0")
@@ -371,14 +374,14 @@ function yrv2UI()
                         tostring(math.floor(slot0_stock * (100 / bb.slot0.unit_max))) .. "%")
                     ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
                     ImGui.Text("¤ Blaine County:  " ..
-                        Lua_fn.formatMoney(slot0_total) ..
-                        "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(slot0_total * 1.5)))
+                        Lua_fn.FormatMoney(slot0_total) ..
+                        "\n¤ Los Santos:      " .. Lua_fn.FormatMoney(math.floor(slot0_total * 1.5)))
                 else
                     ImGui.Text("You don't own this business.")
                 end
                 -- 1
                 if slot1_owned then
-                    if bb.slot1.name == "Unknown" then SS.getMCbusinessInfo(stats.get_int("MPX_FACTORYSLOT1"), bb.slot1) end
+                    if bb.slot1.name == "Unknown" then SS.GetMCbusinessInfo(stats.get_int("MPX_FACTORYSLOT1"), bb.slot1) end
                     ImGui.Dummy(1, 10); ImGui.SeparatorText(bb.slot1.name)
                     local slot1_supp  = stats.get_int("MPX_MATTOTALFORFACTORY1")
                     local slot1_stock = stats.get_int("MPX_PRODTOTALFORFACTORY1")
@@ -396,14 +399,14 @@ function yrv2UI()
                         tostring(math.floor(slot1_stock * (100 / bb.slot1.unit_max))) .. "%")
                     ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
                     ImGui.Text("¤ Blaine County:  " ..
-                        Lua_fn.formatMoney(slot1_total) ..
-                        "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(slot1_total * 1.5)))
+                        Lua_fn.FormatMoney(slot1_total) ..
+                        "\n¤ Los Santos:      " .. Lua_fn.FormatMoney(math.floor(slot1_total * 1.5)))
                 else
                     ImGui.Text("You don't own this business.")
                 end
                 -- 2
                 if slot2_owned then
-                    if bb.slot2.name == "Unknown" then SS.getMCbusinessInfo(stats.get_int("MPX_FACTORYSLOT2"), bb.slot2) end
+                    if bb.slot2.name == "Unknown" then SS.GetMCbusinessInfo(stats.get_int("MPX_FACTORYSLOT2"), bb.slot2) end
                     ImGui.Dummy(1, 10); ImGui.SeparatorText(bb.slot2.name)
                     local slot2_supp  = stats.get_int("MPX_MATTOTALFORFACTORY2")
                     local slot2_stock = stats.get_int("MPX_PRODTOTALFORFACTORY2")
@@ -421,14 +424,14 @@ function yrv2UI()
                         tostring(math.floor(slot2_stock * (100 / bb.slot2.unit_max))) .. "%")
                     ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
                     ImGui.Text("¤ Blaine County:  " ..
-                        Lua_fn.formatMoney(slot2_total) ..
-                        "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(slot2_total * 1.5)))
+                        Lua_fn.FormatMoney(slot2_total) ..
+                        "\n¤ Los Santos:      " .. Lua_fn.FormatMoney(math.floor(slot2_total * 1.5)))
                 else
                     ImGui.Text("You don't own this business.")
                 end
                 -- 3
                 if slot3_owned then
-                    if bb.slot3.name == "Unknown" then SS.getMCbusinessInfo(stats.get_int("MPX_FACTORYSLOT3"), bb.slot3) end
+                    if bb.slot3.name == "Unknown" then SS.GetMCbusinessInfo(stats.get_int("MPX_FACTORYSLOT3"), bb.slot3) end
                     ImGui.Dummy(1, 10); ImGui.SeparatorText(bb.slot3.name)
                     local slot3_supp  = stats.get_int("MPX_MATTOTALFORFACTORY3")
                     local slot3_stock = stats.get_int("MPX_PRODTOTALFORFACTORY3")
@@ -446,14 +449,14 @@ function yrv2UI()
                         tostring(math.floor(slot3_stock * (100 / bb.slot3.unit_max))) .. "%")
                     ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
                     ImGui.Text("¤ Blaine County:  " ..
-                        Lua_fn.formatMoney(slot3_total) ..
-                        "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(slot3_total * 1.5)))
+                        Lua_fn.FormatMoney(slot3_total) ..
+                        "\n¤ Los Santos:      " .. Lua_fn.FormatMoney(math.floor(slot3_total * 1.5)))
                 else
                     ImGui.Text("You don't own this business.")
                 end
                 -- 4
                 if slot4_owned then
-                    if bb.slot4.name == "Unknown" then SS.getMCbusinessInfo(stats.get_int("MPX_FACTORYSLOT4"), bb.slot4) end
+                    if bb.slot4.name == "Unknown" then SS.GetMCbusinessInfo(stats.get_int("MPX_FACTORYSLOT4"), bb.slot4) end
                     ImGui.Dummy(1, 10); ImGui.SeparatorText(bb.slot4.name)
                     local slot4_supp  = stats.get_int("MPX_MATTOTALFORFACTORY4")
                     local slot4_stock = stats.get_int("MPX_PRODTOTALFORFACTORY4")
@@ -471,8 +474,8 @@ function yrv2UI()
                         tostring(math.floor(slot4_stock * (100 / bb.slot4.unit_max))) .. "%")
                     ImGui.SameLine(); ImGui.Text("Value:"); ImGui.SameLine();
                     ImGui.Text("¤ Blaine County:  " ..
-                        Lua_fn.formatMoney(slot4_total) ..
-                        "\n¤ Los Santos:      " .. Lua_fn.formatMoney(math.floor(slot4_total * 1.5)))
+                        Lua_fn.FormatMoney(slot4_total) ..
+                        "\n¤ Los Santos:      " .. Lua_fn.FormatMoney(math.floor(slot4_total * 1.5)))
                 else
                     ImGui.Text("You don't own this business.")
                 end
@@ -493,30 +496,35 @@ function yrv2UI()
                     local acidStock    = stats.get_int("MPX_PRODTOTALFORFACTORY6")
                     acidTotal          = ((globals.get_int(tun_global + 17324) + acidOffset) * acidStock)
                     ImGui.BulletText("Equipment Upgrade: "); ImGui.SameLine()
-                    UI.coloredText(acidUpdgrade and "Active" or "Inactive", acidUpgradeLabelCol, 0.9, 35)
-                    ImGui.BulletText("Supplies:"); ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine();
+                    UI.ColoredText(acidUpdgrade and "Active" or "Inactive", acidUpgradeLabelCol, 0.9, 35)
+                    ImGui.BulletText("Supplies:")
+                    ImGui.SameLine()
+                    ImGui.Dummy(10, 1)
+                    ImGui.SameLine()
                     ImGui.ProgressBar((acidSupplies / 100), 240, 30)
+
                     if acidSupplies < 100 then
                         ImGui.SameLine()
                         if ImGui.Button(" Fill Supplies ##acid") then
                             globals.set_int(gb_global + 6 + 1, 1)
                         end
                     end
+
                     ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
                     ImGui.ProgressBar((acidStock / 160), 240, 30,
                         tostring(acidStock) .. " Sheets (" .. tostring(math.floor(acidStock / 16 * 10)) .. "%)")
-                    ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.formatMoney(acidTotal))
+                    ImGui.SameLine(); ImGui.Text("Value: " .. Lua_fn.FormatMoney(acidTotal))
                 else
                     ImGui.Text("You don't own an acid lab.")
                 end
                 if slot0_owned or slot1_owned or slot2_owned or slot3_owned or slot4_owned or acidOwned then
                     ImGui.Separator(); ImGui.Spacing(); ImGui.Text("Approximate Total MC Business Value: " ..
-                        Lua_fn.formatMoney(slot0_total + slot1_total + slot2_total + slot3_total + slot4_total +
+                        Lua_fn.FormatMoney(slot0_total + slot1_total + slot2_total + slot3_total + slot4_total +
                         acidTotal))
-                    UI.toolTip(false, "Prices may be higher depending on your business upgrades.")
+                    UI.Tooltip("Prices may be higher depending on your business upgrades.")
                 end
                 ------------------------MC Quick TP------------------------------
-                if Game.Self.isOutside() then
+                if Self.IsOutside() then
                     ImGui.Spacing(); ImGui.SeparatorText("Quick Teleport")
                     ImGui.BeginDisabled(not slot0_owned)
                     if ImGui.Button(("To %s"):format(bb.slot0.name)) then
@@ -525,12 +533,12 @@ function yrv2UI()
                             if HUD.DOES_BLIP_EXIST(blip) then
                                 UI.widgetSound("Select")
                                 local coords = HUD.GET_BLIP_COORDS(blip)
-                                Game.Self.teleport(false, coords)
+                                Self.Teleport(false, coords)
                             end
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.HelpMarker(_T("QUICK_TP_WARN_"), "#FFA134")
                     ImGui.SameLine()
                     ImGui.BeginDisabled(not slot1_owned)
                     if ImGui.Button(("To %s"):format(bb.slot1.name)) then
@@ -539,12 +547,12 @@ function yrv2UI()
                             if HUD.DOES_BLIP_EXIST(blip) then
                                 UI.widgetSound("Select")
                                 local coords = HUD.GET_BLIP_COORDS(blip)
-                                Game.Self.teleport(false, coords)
+                                Self.Teleport(false, coords)
                             end
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.HelpMarker(_T("QUICK_TP_WARN_"), "#FFA134")
                     ImGui.SameLine()
                     ImGui.BeginDisabled(not slot2_owned)
                     if ImGui.Button(("To %s"):format(bb.slot2.name)) then
@@ -553,12 +561,12 @@ function yrv2UI()
                             if HUD.DOES_BLIP_EXIST(m_blip) then
                                 UI.widgetSound("Select")
                                 local coords = HUD.GET_BLIP_COORDS(blip)
-                                Game.Self.teleport(false, coords)
+                                Self.Teleport(false, coords)
                             end
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.HelpMarker(_T("QUICK_TP_WARN_"), "#FFA134")
                     ImGui.BeginDisabled(not slot3_owned)
                     if ImGui.Button(("To %s"):format(bb.slot3.name)) then
                         script.run_in_fiber(function()
@@ -566,12 +574,12 @@ function yrv2UI()
                             if HUD.DOES_BLIP_EXIST(blip) then
                                 UI.widgetSound("Select")
                                 local coords = HUD.GET_BLIP_COORDS(blip)
-                                Game.Self.teleport(false, coords)
+                                Self.Teleport(false, coords)
                             end
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.HelpMarker(_T("QUICK_TP_WARN_"), "#FFA134")
                     ImGui.SameLine()
                     ImGui.BeginDisabled(not slot4_owned)
                     if ImGui.Button(("To %s"):format(bb.slot4.name)) then
@@ -580,12 +588,12 @@ function yrv2UI()
                             if HUD.DOES_BLIP_EXIST(blip) then
                                 UI.widgetSound("Select")
                                 local coords = HUD.GET_BLIP_COORDS(blip)
-                                Game.Self.teleport(false, coords)
+                                Self.Teleport(false, coords)
                             end
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.HelpMarker(_T("QUICK_TP_WARN_"), "#FFA134")
                     ImGui.SameLine()
                     ImGui.BeginDisabled(not acidOwned)
                     if ImGui.Button("To The Freak Shop") then
@@ -595,12 +603,12 @@ function yrv2UI()
                             if HUD.DOES_BLIP_EXIST(acid_blip) then
                                 UI.widgetSound("Select")
                                 acid_coords = HUD.GET_BLIP_COORDS(acid_blip)
-                                Game.Self.teleport(false, acid_coords)
+                                Self.Teleport(false, acid_coords)
                             end
                         end)
                     end
                     ImGui.EndDisabled()
-                    UI.helpMarker(true, _T("QUICK_TP_WARN_"), "#FFA134", 1)
+                    UI.HelpMarker(_T("QUICK_TP_WARN_"), "#FFA134")
                 end
                 ImGui.EndTabItem()
             end
@@ -629,8 +637,8 @@ function yrv2UI()
                         end
                     end
                     ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-                    ImGui.ProgressBar(currNcSafeMoney / 250000, 240, 30, Lua_fn.formatMoney(currNcSafeMoney))
-                    if Game.Self.isOutside() then
+                    ImGui.ProgressBar(currNcSafeMoney / 250000, 240, 30, Lua_fn.FormatMoney(currNcSafeMoney))
+                    if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##nc") then
                             UI.widgetSound("Select")
@@ -639,7 +647,7 @@ function yrv2UI()
                                 local ncLoc
                                 if HUD.DOES_BLIP_EXIST(ncBlip) then
                                     ncLoc = HUD.GET_BLIP_COORDS(ncBlip)
-                                    Game.Self.teleport(false, ncLoc)
+                                    Self.Teleport(false, ncLoc)
                                 end
                             end)
                         end
@@ -654,8 +662,8 @@ function yrv2UI()
                     local currArSafeMoney = stats.get_int("MPX_ARCADE_SAFE_CASH_VALUE")
                     ImGui.BulletText("Safe: ")
                     ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-                    ImGui.ProgressBar(currArSafeMoney / 100000, 240, 30, Lua_fn.formatMoney(currArSafeMoney))
-                    if Game.Self.isOutside() then
+                    ImGui.ProgressBar(currArSafeMoney / 100000, 240, 30, Lua_fn.FormatMoney(currArSafeMoney))
+                    if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##arcade") then
                             UI.widgetSound("Select")
@@ -664,7 +672,7 @@ function yrv2UI()
                                 local arLoc
                                 if HUD.DOES_BLIP_EXIST(arBlip) then
                                     arLoc = HUD.GET_BLIP_COORDS(arBlip)
-                                    Game.Self.teleport(false, arLoc)
+                                    Self.Teleport(false, arLoc)
                                 end
                             end)
                         end
@@ -677,8 +685,8 @@ function yrv2UI()
                     ImGui.Spacing(); ImGui.SeparatorText("Agency")
                     local currAgSafeMoney = stats.get_int("MPX_FIXER_SAFE_CASH_VALUE")
                     ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-                    ImGui.ProgressBar(currAgSafeMoney / 250000, 240, 30, Lua_fn.formatMoney(currAgSafeMoney))
-                    if Game.Self.isOutside() then
+                    ImGui.ProgressBar(currAgSafeMoney / 250000, 240, 30, Lua_fn.FormatMoney(currAgSafeMoney))
+                    if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##agnc") then
                             UI.widgetSound("Select")
@@ -687,7 +695,7 @@ function yrv2UI()
                                 local agncLoc
                                 if HUD.DOES_BLIP_EXIST(agncBlip) then
                                     agncLoc = HUD.GET_BLIP_COORDS(agncBlip)
-                                    Game.Self.teleport(false, agncLoc)
+                                    Self.Teleport(false, agncLoc)
                                 end
                             end)
                         end
@@ -701,8 +709,8 @@ function yrv2UI()
                     local currClubHouseBarProfit = stats.get_int("MPX_BIKER_BAR_RESUPPLY_CASH")
                     ImGui.BulletText("Bar Earnings:"); ImGui.SameLine(); ImGui.Dummy(2, 1); ImGui.SameLine();
                     ImGui.ProgressBar(currClubHouseBarProfit / 100000, 240, 30,
-                        Lua_fn.formatMoney(currClubHouseBarProfit))
-                    if Game.Self.isOutside() then
+                        Lua_fn.FormatMoney(currClubHouseBarProfit))
+                    if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##mc") then
                             UI.widgetSound("Select")
@@ -711,7 +719,7 @@ function yrv2UI()
                                 local mcLoc
                                 if HUD.DOES_BLIP_EXIST(mcBlip) then
                                     mcLoc = HUD.GET_BLIP_COORDS(mcBlip)
-                                    Game.Self.teleport(false, mcLoc)
+                                    Self.Teleport(false, mcLoc)
                                 end
                             end)
                         end
@@ -724,8 +732,8 @@ function yrv2UI()
                     ImGui.Spacing(); ImGui.SeparatorText("Bail Office")
                     local currBailSafe = stats.get_int("MPX_BAIL_SAFE_CASH_VALUE")
                     ImGui.BulletText("Safe:"); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-                    ImGui.ProgressBar(currBailSafe / 100000, 240, 30, Lua_fn.formatMoney(currBailSafe))
-                    if Game.Self.isOutside() then
+                    ImGui.ProgressBar(currBailSafe / 100000, 240, 30, Lua_fn.FormatMoney(currBailSafe))
+                    if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##bail") then
                             UI.widgetSound("Select")
@@ -735,7 +743,7 @@ function yrv2UI()
                                 if HUD.DOES_BLIP_EXIST(bailBlip) then
                                     bailLoc   = HUD.GET_BLIP_COORDS(bailBlip)
                                     bailLoc.y = bailLoc.y + 1.2
-                                    Game.Self.teleport(false, bailLoc)
+                                    Self.Teleport(false, bailLoc)
                                 end
                             end)
                         end
@@ -748,8 +756,8 @@ function yrv2UI()
                     ImGui.Spacing(); ImGui.SeparatorText("Salvage Yard")
                     local currSalvSafe = stats.get_int("MPX_SALVAGE_SAFE_CASH_VALUE")
                     ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-                    ImGui.ProgressBar(currSalvSafe / 250000, 240, 30, Lua_fn.formatMoney(currSalvSafe))
-                    if Game.Self.isOutside() then
+                    ImGui.ProgressBar(currSalvSafe / 250000, 240, 30, Lua_fn.FormatMoney(currSalvSafe))
+                    if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##salvage") then
                             UI.widgetSound("Select")
@@ -757,7 +765,7 @@ function yrv2UI()
                                 local slvgBlip = HUD.GET_FIRST_BLIP_INFO_ID(867)
                                 if HUD.DOES_BLIP_EXIST(slvgBlip) then
                                     local slvgLoc = HUD.GET_BLIP_COORDS(slvgBlip)
-                                    Game.Self.teleport(false, slvgLoc)
+                                    Self.Teleport(false, slvgLoc)
                                 end
                             end)
                         end
@@ -770,8 +778,8 @@ function yrv2UI()
                     ImGui.Spacing(); ImGui.SeparatorText("Garment Factory")
                     local currH24Safe = stats.get_int("MPX_HDEN24_SAFE_CASH_VALUE")
                     ImGui.BulletText("Safe: "); ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine();
-                    ImGui.ProgressBar(currH24Safe / 100000, 240, 30, Lua_fn.formatMoney(currH24Safe))
-                    if Game.Self.isOutside() then
+                    ImGui.ProgressBar(currH24Safe / 100000, 240, 30, Lua_fn.FormatMoney(currH24Safe))
+                    if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##H24") then
                             UI.widgetSound("Select")
@@ -779,7 +787,7 @@ function yrv2UI()
                                 local H24Blip = HUD.GET_FIRST_BLIP_INFO_ID(900)
                                 if HUD.DOES_BLIP_EXIST(H24Blip) then
                                     local H24Loc = HUD.GET_BLIP_COORDS(H24Blip)
-                                    Game.Self.teleport(false, H24Loc)
+                                    Self.Teleport(false, H24Loc)
                                 end
                             end)
                         end
@@ -789,8 +797,9 @@ function yrv2UI()
                 end
 
                 if ncOwned or acOwned or agOwned or chOwned or boOwned or syOwned or hdOwned then
-                    if Game.Self.isOutside() then
-                        ImGui.Dummy(1, 10); UI.coloredText(_T("QUICK_TP_WARN2_"), "#FFA134", 1, 40)
+                    if Self.IsOutside() then
+                        ImGui.Dummy(1, 10)
+                        UI.ColoredText(_T("QUICK_TP_WARN2_"), "#FFA134", 1, 40)
                     end
                 end
                 ImGui.EndTabItem()
@@ -799,12 +808,12 @@ function yrv2UI()
             if ImGui.BeginTabItem("MISC") then
                 ImGui.Dummy(1, 5); ImGui.SeparatorText("Business Hub")
                 if ImGui.Button("Master Control Terminal") then
-                    if not Game.Self.isBrowsingApps() then
+                    if not Self.IsBrowsingApps() then
                         script.run_in_fiber(function(mct)
                             if globals.get_int(1943773) ~= 0 then
                                 globals.set_int(1943773, 0)
                             end
-                            if Game.requestScript("appArcadeBusinessHub") then
+                            if Game.RequestScript("appArcadeBusinessHub") then
                                 UI.widgetSound("Select")
                                 abhubScriptHandle = SYSTEM.START_NEW_SCRIPT("appArcadeBusinessHub", 1424) -- STACK_SIZE_DEFAULT
                                 SCRIPT.SET_SCRIPT_AS_NO_LONGER_NEEDED("appArcadeBusinessHub")
@@ -818,7 +827,7 @@ function yrv2UI()
                                 end
                                 repeat
                                     mct:sleep(10)
-                                until not Game.Self.isBrowsingApps()
+                                until not Self.IsBrowsingApps()
                                 globals.set_int(1943773, 0)
                                 abhubScriptHandle = 0
                             end
@@ -849,7 +858,7 @@ function yrv2UI()
 
                 ImGui.SameLine()
                 nc_vip_mission_chance, nvipmcUsed = ImGui.Checkbox("Always Troublemaker", nc_vip_mission_chance)
-                UI.helpMarker(false,
+                UI.HelpMarker(false,
                     "Always spawns the troublemaker nightclub missions and disables the knocked out VIP missions.")
                 if nvipmcUsed then
                     UI.widgetSound("Nav2")
@@ -891,11 +900,11 @@ function yrv2UI()
                 ImGui.SameLine(); ImGui.Dummy(29, 1); ImGui.SameLine()
                 ImGui.BeginDisabled()
                 payphone_hits_cd, _ = ImGui.Checkbox("Payphone Hits [x]", payphone_hits_cd)
-                UI.setClipBoard("https://github.com/YimMenu-Lua/PayphoneHits",
-                    ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and SS.isKeyJustPressed(0x09)
+                UI.SetClipBoard("https://github.com/YimMenu-Lua/PayphoneHits",
+                    ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and SS.IsKeyJustPressed(0x09)
                 )
                 ImGui.EndDisabled();
-                UI.toolTip(false, "Use ShinyWasabi's Payphone Hits script instead. Press [TAB] to copy the GitHub link.")
+                UI.Tooltip("Use ShinyWasabi's Payphone Hits script instead. Press [TAB] to copy the GitHub link.")
 
                 dax_work_cd, dwcdUsed = ImGui.Checkbox("Dax Work Cooldown", dax_work_cd)
                 if dwcdUsed then
@@ -934,16 +943,16 @@ function yrv2UI()
                 end
 
                 ImGui.Spacing(); ImGui.SeparatorText("Sell Missions")
-                ImGui.Spacing(); UI.wrappedText(
+                ImGui.Spacing(); UI.WrappedText(
                     "These options will not be saved. Each button disables the most tedious sell missions for that business.",
                     32)
-                ImGui.Spacing(); UI.coloredText(
+                ImGui.Spacing(); UI.ColoredText(
                     "[ ! ] NOTE: If you plan on selling more than once for the same business (example: MC businesses or more than one CEO warehouse), please switch sessions after finishing the first sale to reset the missions, otherwise a sesond sell mission may fail to start.",
                     'yellow', 0.69, 30)
 
                 if ImGui.Button("Easy Biker Sell Missions") then
                     UI.widgetSound("Select")
-                    for _, index in pairs(mc_sell_mission_types_T) do
+                    for _, index in pairs(t_mc_sell_mission_types) do
                         if globals.get_int(index) == 0 then
                             globals.set_int(index, 1)
                         end
@@ -954,7 +963,7 @@ function yrv2UI()
                 ImGui.SameLine(); ImGui.Dummy(41, 1); ImGui.SameLine()
                 if ImGui.Button("Easy CEO Sell Missions") then
                     UI.widgetSound("Select")
-                    for _, index in pairs(ceo_sell_mission_types_T) do
+                    for _, index in pairs(t_ceo_sell_mission_types) do
                         if globals.get_int(index) == 0 then
                             globals.set_int(index, 1)
                         end
@@ -964,7 +973,7 @@ function yrv2UI()
 
                 if ImGui.Button("Easy Nightclub Sell Missions") then
                     UI.widgetSound("Select")
-                    for _, index in pairs(nc_sell_mission_types_T) do
+                    for _, index in pairs(t_nc_sell_mission_types) do
                         if globals.get_float(index) > 0.0 then
                             globals.get_float(index, 0.0)
                         end
@@ -975,7 +984,7 @@ function yrv2UI()
                 ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
                 if ImGui.Button("Easy Hangar Sell Missions") then
                     UI.widgetSound("Select")
-                    for _, index in pairs(hg_sell_mission_types_T) do
+                    for _, index in pairs(t_hangar_sell_mission_types) do
                         if globals.get_float(index) > 0.0 then
                             globals.get_float(index, 0.0)
                         end
@@ -985,7 +994,7 @@ function yrv2UI()
                 ImGui.EndTabItem()
             end
             if ImGui.BeginTabItem("Sales") then
-                UI.wrappedText(
+                UI.WrappedText(
                     "This is shitty unreliable code with little to no effort put into it.\n\nOnly these businesses are supported:",
                     35
                 )
@@ -1003,10 +1012,11 @@ function yrv2UI()
                     CFG:SaveItem("autosell", autosell)
                 end
                 ImGui.EndDisabled()
-                UI.toolTip(false,
-                    "Automatically finishes a sale mission 20 seconds after it starts. Doesn't require you to interact with anything other than starting the mission.")
+                UI.Tooltip(
+                    "Automatically finishes a sale mission 20 seconds after it starts. Doesn't require you to interact with anything other than starting the mission."
+                )
                 if script.is_active("fm_content_smuggler_sell") then
-                    UI.coloredText("Land sales are currently not supported.", 'red', 0.8, 25)
+                    UI.ColoredText("Land sales are currently not supported.", 'red', 0.8, 25)
                 else
                     ImGui.BeginDisabled(autosell or autosell_was_triggered or not scr_is_running)
                     if ImGui.Button("Manually Finish Sale") then

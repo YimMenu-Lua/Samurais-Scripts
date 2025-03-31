@@ -180,6 +180,13 @@
   - **Fast Vehicles:**
     - Increases the top speed of any *land* vehicle you drive.
 
+  - **Speedometer:**
+    - A speedometer and tachometer combo with Gear, ABS, NOS, and ESC indicators:
+      - The speedometer has both a digital and an analog display simultaneously. The analog one adapts to the vehicle's maximum speed.
+      - The gear indicator changes depending on the vehicle's class: D for normal drive mode, S for sport.
+      - The ABS and ESC indicators will not flash if the vehicle doesn't have ABS as standard.
+      - The NOS indicator is self explanatory: It lights up when you're using NOS.
+
 
 - **Custom Paint Jobs:**
   - Apply a custom paint job to your vehicle from a list of real-life OEM and custom colors.

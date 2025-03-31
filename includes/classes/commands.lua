@@ -91,7 +91,7 @@ function CommandExecutor:Draw()
                     self.cmd_index = i
                 end
                 if ImGui.IsItemHovered() then
-                    UI.toolTip(false, "Click to execute this command.")
+                    UI.Tooltip("Click to execute this command.")
                 end
             end
         end

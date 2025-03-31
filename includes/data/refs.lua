@@ -1,6 +1,58 @@
 ---@diagnostic disable
 
-lang_T          = {
+eGameState      = {
+    "Invalid",
+    "Playing",
+    "Died",
+    "Arrested",
+    "FailedMission",
+    "LeftGame",
+    "Respawn",
+    "InMPCutscene",
+}
+
+eModelTypes     = {
+    [0]     = 'Invalid',
+    [1]     = 'Object',
+    [2]     = 'MLO',
+    [3]     = 'Time',
+    [4]     = 'Weapon',
+    [5]     = 'Vehicle',
+    [6]     = 'Ped',
+    [7]     = 'Destructible',
+    [33]    = 'Destructible',
+    [157]   = 'Building/Map Texture',
+    [43649] = 'Fixed Map Object',
+    [16385] = 'Fixed Map Object',
+}
+
+eVehicleClasses        = {
+    "Compacts",
+    "Sedans",
+    "SUVs",
+    "Coupes",
+    "Muscle",
+    "Sports Classics",
+    "Sports",
+    "Super",
+    "Motorcycles",
+    "Off-road",
+    "Industrial",
+    "Utility",
+    "Vans",
+    "Cycles",
+    "Boats",
+    "Helicopters",
+    "Planes",
+    "Service",
+    "Emergency",
+    "Military",
+    "Commercial",
+    "Trains",
+    "Open Wheel"
+}
+
+t_Langs          = {
     { name = 'English', iso = 'en-US' },
     { name = 'Français', iso = 'fr-FR' },
     { name = 'Deütsch', iso = 'de-DE' },
@@ -15,7 +67,78 @@ lang_T          = {
     { name = 'Korean', iso = 'ko-KR' },
 }
 
-ui_sounds_T     = {
+t_GamepadControls = {
+    { ctrl = 7,   gpad = "[R3]" },
+    { ctrl = 10,  gpad = "[LT]" },
+    { ctrl = 11,  gpad = "[RT]" },
+    { ctrl = 14,  gpad = "[DPAD RIGHT]" },
+    { ctrl = 15,  gpad = "[DPAD LEFT]" },
+    { ctrl = 19,  gpad = "[DPAD DOWN]" },
+    { ctrl = 20,  gpad = "[DPAD DOWN]" },
+    { ctrl = 21,  gpad = "[A]" },
+    { ctrl = 22,  gpad = "[X]" },
+    { ctrl = 23,  gpad = "[Y]" },
+    { ctrl = 27,  gpad = "[DPAD UP]" },
+    { ctrl = 29,  gpad = "[R3]" },
+    { ctrl = 30,  gpad = "[LEFT STICK]" },
+    { ctrl = 34,  gpad = "[LEFT STICK]" },
+    { ctrl = 36,  gpad = "[L3]" },
+    { ctrl = 37,  gpad = "[LB]" },
+    { ctrl = 38,  gpad = "[LB]" },
+    { ctrl = 42,  gpad = "[DPAD UP]" },
+    { ctrl = 43,  gpad = "[DPAD DOWN]" },
+    { ctrl = 44,  gpad = "[RB]" },
+    { ctrl = 45,  gpad = "[B]" },
+    { ctrl = 46,  gpad = "[DPAD RIGHT]" },
+    { ctrl = 47,  gpad = "[DPAD LEFT]" },
+    { ctrl = 56,  gpad = "[Y]" },
+    { ctrl = 57,  gpad = "[B]" },
+    { ctrl = 70,  gpad = "[A]" },
+    { ctrl = 71,  gpad = "[RT]" },
+    { ctrl = 72,  gpad = "[LT]" },
+    { ctrl = 73,  gpad = "[A]" },
+    { ctrl = 74,  gpad = "[DPAD RIGHT]" },
+    { ctrl = 75,  gpad = "[Y]" },
+    { ctrl = 76,  gpad = "[RB]" },
+    { ctrl = 79,  gpad = "[R3]" },
+    { ctrl = 81,  gpad = "(NONE)" },
+    { ctrl = 82,  gpad = "(NONE)" },
+    { ctrl = 83,  gpad = "(NONE)" },
+    { ctrl = 84,  gpad = "(NONE)" },
+    { ctrl = 84,  gpad = "[DPAD LEFT]" },
+    { ctrl = 96,  gpad = "(NONE)" },
+    { ctrl = 97,  gpad = "(NONE)" },
+    { ctrl = 124, gpad = "[LEFT STICK]" },
+    { ctrl = 125, gpad = "[LEFT STICK]" },
+    { ctrl = 112, gpad = "[LEFT STICK]" },
+    { ctrl = 127, gpad = "[LEFT STICK]" },
+    { ctrl = 117, gpad = "[LB]" },
+    { ctrl = 118, gpad = "[RB]" },
+    { ctrl = 167, gpad = "(NONE)" },
+    { ctrl = 168, gpad = "(NONE)" },
+    { ctrl = 169, gpad = "(NONE)" },
+    { ctrl = 170, gpad = "[B]" },
+    { ctrl = 172, gpad = "[DPAD UP]" },
+    { ctrl = 173, gpad = "[DPAD DOWN]" },
+    { ctrl = 174, gpad = "[DPAD LEFT]" },
+    { ctrl = 175, gpad = "[DPAD RIGHT]" },
+    { ctrl = 178, gpad = "[Y]" },
+    { ctrl = 194, gpad = "[B]" },
+    { ctrl = 243, gpad = "(NONE)" },
+    { ctrl = 244, gpad = "[BACK]" },
+    { ctrl = 249, gpad = "(NONE)" },
+    { ctrl = 288, gpad = "[A]" },
+    { ctrl = 289, gpad = "[X]" },
+    { ctrl = 303, gpad = "[DPAD UP]" },
+    { ctrl = 307, gpad = "[DPAD RIGHT]" },
+    { ctrl = 308, gpad = "[DPAD LEFT]" },
+    { ctrl = 311, gpad = "[DPAD DOWN]" },
+    { ctrl = 318, gpad = "[START]" },
+    { ctrl = 322, gpad = "(NONE)" },
+    { ctrl = 344, gpad = "[DPAD RIGHT]" },
+}
+
+t_UISounds     = {
     ["Radar"] = {
         soundName = "RADAR_ACTIVATE",
         soundRef = "DLC_BTL_SECURITY_VANS_RADAR_PING_SOUNDS"
@@ -78,33 +201,7 @@ ui_sounds_T     = {
     },
 }
 
-eGameState      = {
-    "Invalid",
-    "Playing",
-    "Died",
-    "Arrested",
-    "FailedMission",
-    "LeftGame",
-    "Respawn",
-    "InMPCutscene",
-}
-
-eModelTypes     = {
-    [0]     = 'Invalid',
-    [1]     = 'Object',
-    [2]     = 'MLO',
-    [3]     = 'Time',
-    [4]     = 'Weapon',
-    [5]     = 'Vehicle',
-    [6]     = 'Ped',
-    [7]     = 'Destructible',
-    [33]    = 'Destructible',
-    [157]   = 'Building/Map Texture',
-    [43649] = 'Fixed Map Object',
-    [16385] = 'Fixed Map Object',
-}
-
-rgb_loop_colors = {
+t_RGBloopColors = {
     { 0,   255, 255, 1 },
     { 0,   127, 255, 1 },
     { 0,   0,   255, 1 },
@@ -120,7 +217,7 @@ rgb_loop_colors = {
 
 }
 
-gta_vehicles_T  = {
+t_VehicleNames  = {
     "AMBULANCE", "BARRACKS", "BARRACKS2", "BARRACKS3", "BLIMP", "BLIMP2", "BMX", "BUS", "Baller", "Benson", "BfInjection",
     "Biff", "Bison2", "Bison3", "BjXL", "Bodhi2", "Burrito", "Burrito4", "Buzzard2", "CAMPER", "CRUSADER", "Caddy2",
     "Cargobob", "Cargobob3", "Cargobob4", "Dinghy", "Dominator", "Dynasty", "Emperor2", "Euros", "FBI", "FBI2", "FLATBED",
@@ -223,40 +320,7 @@ gta_vehicles_T  = {
     "zentorno", "zhaba", "zion", "zion2", "zion3", "zombiea", "zombieb", "zorrusso", "zr350", "zr380", "zr3802", "zr3803",
 }
 
-PED_TYPE        = {
-    _PLAYER_0              = 0,
-    _PLAYER_1              = 1,
-    _NETWORK_PLAYER        = 2,
-    _PLAYER_2              = 3,
-    _CIVMALE               = 4,
-    _CIVFEMALE             = 5,
-    _COP                   = 6,
-    _GANG_ALBANIAN         = 7,
-    _GANG_BIKER_1          = 8,
-    _GANG_BIKER_2          = 9,
-    _GANG_ITALIAN          = 10,
-    _GANG_RUSSIAN          = 11,
-    _GANG_RUSSIAN_2        = 12,
-    _GANG_IRISH            = 13,
-    _GANG_JAMAICAN         = 14,
-    _GANG_AFRICAN_AMERICAN = 15,
-    _GANG_KOREAN           = 16,
-    _GANG_CHINESE_JAPANESE = 17,
-    _GANG_PUERTO_RICAN     = 18,
-    _DEALER                = 19,
-    _MEDIC                 = 20,
-    _FIREMAN               = 21,
-    _CRIMINAL              = 22,
-    _BUM                   = 23,
-    _PROSTITUTE            = 24,
-    _SPECIAL               = 25,
-    _MISSION               = 26,
-    _SWAT                  = 27,
-    _ANIMAL                = 28,
-    _ARMY                  = 29,
-}
-
-pedBones        = {
+t_PedBones        = {
     { name = "Root",       ID = 0 },
     { name = "Head",       ID = 12844 },
     { name = "Spine 00",   ID = 23553 },
@@ -269,101 +333,7 @@ pedBones        = {
     { name = "Left Foot",  ID = 14201 },
 }
 
-vehBones        = {
-    "chassis", "chassis_lowlod", "chassis_dummy", "seat_dside_f", "seat_dside_r",
-    "seat_dside_r1", "seat_dside_r2", "seat_dside_r3", "seat_dside_r4", "seat_dside_r5", "seat_dside_r6", "seat_dside_r7",
-    "seat_pside_f", "seat_pside_r", "seat_pside_r1", "seat_pside_r2", "seat_pside_r3", "seat_pside_r4", "seat_pside_r5",
-    "seat_pside_r6", "seat_pside_r7", "window_lf1", "window_lf2", "window_lf3", "window_rf1", "window_rf2", "window_rf3",
-    "window_lr1", "window_lr2", "window_lr3", "window_rr1", "window_rr2", "window_rr3", "door_dside_f", "door_dside_r",
-    "door_pside_f", "door_pside_r", "handle_dside_f", "handle_dside_r", "handle_pside_f", "handle_pside_r", "wheel_lf",
-    "wheel_rf", "wheel_lm1", "wheel_rm1", "wheel_lm2", "wheel_rm2", "wheel_lm3", "wheel_rm3", "wheel_lr", "wheel_rr",
-    "suspension_lf", "suspension_rf", "suspension_lm", "suspension_rm", "suspension_lr", "suspension_rr", "spring_rf",
-    "spring_lf", "spring_rr", "spring_lr", "transmission_f", "transmission_m", "transmission_r", "hub_lf", "hub_rf",
-    "hub_lm1", "hub_rm1", "hub_lm2", "hub_rm2", "hub_lm3", "hub_rm3", "hub_lr", "hub_rr", "windscreen", "windscreen_r",
-    "window_lf", "window_rf", "window_lr", "window_rr", "window_lm", "window_rm", "bodyshell", "bumper_f", "bumper_r",
-    "wing_rf", "wing_lf", "bonnet", "boot", "exhaust", "exhaust_2", "exhaust_3", "exhaust_4", "exhaust_5", "exhaust_6",
-    "exhaust_7", "exhaust_8", "exhaust_9", "exhaust_10", "exhaust_11", "exhaust_12", "exhaust_13", "exhaust_14",
-    "exhaust_15", "exhaust_16", "engine", "overheat", "overheat_2", "petrolcap", "petroltank", "petroltank_l",
-    "petroltank_r", "steering", "hbgrip_l", "hbgrip_r", "headlight_l", "headlight_r", "taillight_l", "taillight_r",
-    "indicator_lf", "indicator_rf", "indicator_lr", "indicator_rr", "brakelight_l", "brakelight_r", "brakelight_m",
-    "reversinglight_l", "reversinglight_r", "extralight_1", "extralight_2", "extralight_3", "extralight_4", "numberplate",
-    "interiorlight", "siren1", "siren2", "siren3", "siren4", "siren5", "siren6", "siren7", "siren8", "siren9", "siren10",
-    "siren11", "siren12", "siren13", "siren14", "siren15", "siren16", "siren17", "siren18", "siren19", "siren20",
-    "siren_glass1", "siren_glass2", "siren_glass3", "siren_glass4", "siren_glass5", "siren_glass6", "siren_glass7",
-    "siren_glass8", "siren_glass9", "siren_glass10", "siren_glass11", "siren_glass12", "siren_glass13", "siren_glass14",
-    "siren_glass15", "siren_glass16", "siren_glass17", "siren_glass18", "siren_glass19", "siren_glass20", "spoiler",
-    "struts", "misc_a", "misc_b", "misc_c", "misc_d", "misc_e", "misc_f", "misc_g", "misc_h", "misc_i", "misc_j",
-    "misc_k",
-    "misc_l", "misc_m", "misc_n", "misc_o", "misc_p", "misc_q", "misc_r", "misc_s", "misc_t", "misc_u", "misc_v",
-    "misc_w",
-    "misc_x", "misc_y", "misc_z", "misc_1", "misc_2", "weapon_1a", "weapon_1b", "weapon_1c", "weapon_1d", "weapon_1a_rot",
-    "weapon_1b_rot", "weapon_1c_rot", "weapon_1d_rot", "weapon_2a", "weapon_2b", "weapon_2c", "weapon_2d",
-    "weapon_2a_rot",
-    "weapon_2b_rot", "weapon_2c_rot", "weapon_2d_rot", "weapon_3a", "weapon_3b", "weapon_3c", "weapon_3d",
-    "weapon_3a_rot",
-    "weapon_3b_rot", "weapon_3c_rot", "weapon_3d_rot", "weapon_4a", "weapon_4b", "weapon_4c", "weapon_4d",
-    "weapon_4a_rot",
-    "weapon_4b_rot", "weapon_4c_rot", "weapon_4d_rot", "turret_1base", "turret_1barrel", "turret_2base", "turret_2barrel",
-    "turret_3base", "turret_3barrel", "ammobelt", "searchlight_base", "searchlight_light", "attach_female", "roof",
-    "roof2",
-    "soft_1", "soft_2", "soft_3", "soft_4", "soft_5", "soft_6", "soft_7", "soft_8", "soft_9", "soft_10", "soft_11",
-    "soft_12", "soft_13", "forks", "mast", "carriage", "fork_l", "fork_r", "forks_attach", "frame_1", "frame_2",
-    "frame_3",
-    "frame_pickup_1", "frame_pickup_2", "frame_pickup_3", "frame_pickup_4", "freight_cont", "freight_bogey",
-    "freightgrain_slidedoor", "door_hatch_r", "door_hatch_l", "tow_arm", "tow_mount_a", "tow_mount_b", "tipper",
-    "combine_reel", "combine_auger", "slipstream_l", "slipstream_r", "arm_1", "arm_2", "arm_3", "arm_4", "scoop", "boom",
-    "stick", "bucket", "shovel_2", "shovel_3", "Lookat_UpprPiston_head", "Lookat_LowrPiston_boom", "Boom_Driver",
-    "cutter_driver", "vehicle_blocker", "extra_1", "extra_2", "extra_3", "extra_4", "extra_5", "extra_6", "extra_7",
-    "extra_8", "extra_9", "extra_ten", "extra_11", "extra_12", "break_extra_1", "break_extra_2", "break_extra_3",
-    "break_extra_4", "break_extra_5", "break_extra_6", "break_extra_7", "break_extra_8", "break_extra_9",
-    "break_extra_10",
-    "mod_col_1", "mod_col_2", "mod_col_3", "mod_col_4", "mod_col_5", "handlebars", "forks_u", "forks_l", "wheel_f",
-    "swingarm", "wheel_r", "crank", "pedal_r", "pedal_l", "static_prop", "moving_prop", "static_prop2", "moving_prop2",
-    "rudder", "rudder2", "wheel_rf1_dummy", "wheel_rf2_dummy", "wheel_rf3_dummy", "wheel_rb1_dummy", "wheel_rb2_dummy",
-    "wheel_rb3_dummy", "wheel_lf1_dummy", "wheel_lf2_dummy", "wheel_lf3_dummy", "wheel_lb1_dummy", "wheel_lb2_dummy",
-    "wheel_lb3_dummy", "bogie_front", "bogie_rear", "rotor_main", "rotor_rear", "rotor_main_2", "rotor_rear_2",
-    "elevators",
-    "tail", "outriggers_l", "outriggers_r", "rope_attach_a", "rope_attach_b", "prop_1", "prop_2", "elevator_l",
-    "elevator_r", "rudder_l", "rudder_r", "prop_3", "prop_4", "prop_5", "prop_6", "prop_7", "prop_8", "rudder_2",
-    "aileron_l", "aileron_r", "airbrake_l", "airbrake_r", "wing_l", "wing_r", "wing_lr", "wing_rr", "engine_l",
-    "engine_r",
-    "nozzles_f", "nozzles_r", "afterburner", "wingtip_1", "wingtip_2", "gear_door_fl", "gear_door_fr", "gear_door_rl1",
-    "gear_door_rr1", "gear_door_rl2", "gear_door_rr2", "gear_door_rml", "gear_door_rmr", "gear_f", "gear_rl", "gear_lm1",
-    "gear_rr", "gear_rm1", "gear_rm", "prop_left", "prop_right", "legs", "attach_male", "draft_animal_attach_lr",
-    "draft_animal_attach_rr", "draft_animal_attach_lm", "draft_animal_attach_rm", "draft_animal_attach_lf",
-    "draft_animal_attach_rf", "wheelcover_l", "wheelcover_r", "barracks", "pontoon_l", "pontoon_r", "no_ped_col_step_l",
-    "no_ped_col_strut_1_l", "no_ped_col_strut_2_l", "no_ped_col_step_r", "no_ped_col_strut_1_r", "no_ped_col_strut_2_r",
-    "light_cover", "emissives", "neon_l", "neon_r", "neon_f", "neon_b", "dashglow", "doorlight_lf", "doorlight_rf",
-    "doorlight_lr", "doorlight_rr", "unknown_id", "dials", "engineblock", "bobble_head", "bobble_base", "bobble_hand",
-    "chassis_Control",
-}
-
-reserved_keys_T = {
-    kb   = {
-        0x01,
-        0x07,
-        0x0A,
-        0x0B,
-        0x1B,
-        0x24,
-        0x2C,
-        0x2D,
-        0x46,
-        0x5B,
-        0x5C,
-        0x5E,
-    },
-    gpad = {
-        23,
-        24,
-        25,
-        71,
-        75,
-    }
-}
-
-
-weapbones_T              = {
+t_WeaponBones              = {
     "WAPLasr",
     "WAPLasr_2",
     "WAPFlshLasr",
@@ -374,7 +344,7 @@ weapbones_T              = {
     "gun_muzzle"
 }
 
-plane_bones_T            = {
+t_PlaneBones            = {
     "afterburner",
     "aileron_l",
     "aileron_r",
@@ -444,7 +414,101 @@ plane_bones_T            = {
     "wingtip_2",
 }
 
-driftSmokeColors         = {
+t_VehicleBones        = {
+    "chassis", "chassis_lowlod", "chassis_dummy", "seat_dside_f", "seat_dside_r",
+    "seat_dside_r1", "seat_dside_r2", "seat_dside_r3", "seat_dside_r4", "seat_dside_r5", "seat_dside_r6", "seat_dside_r7",
+    "seat_pside_f", "seat_pside_r", "seat_pside_r1", "seat_pside_r2", "seat_pside_r3", "seat_pside_r4", "seat_pside_r5",
+    "seat_pside_r6", "seat_pside_r7", "window_lf1", "window_lf2", "window_lf3", "window_rf1", "window_rf2", "window_rf3",
+    "window_lr1", "window_lr2", "window_lr3", "window_rr1", "window_rr2", "window_rr3", "door_dside_f", "door_dside_r",
+    "door_pside_f", "door_pside_r", "handle_dside_f", "handle_dside_r", "handle_pside_f", "handle_pside_r", "wheel_lf",
+    "wheel_rf", "wheel_lm1", "wheel_rm1", "wheel_lm2", "wheel_rm2", "wheel_lm3", "wheel_rm3", "wheel_lr", "wheel_rr",
+    "suspension_lf", "suspension_rf", "suspension_lm", "suspension_rm", "suspension_lr", "suspension_rr", "spring_rf",
+    "spring_lf", "spring_rr", "spring_lr", "transmission_f", "transmission_m", "transmission_r", "hub_lf", "hub_rf",
+    "hub_lm1", "hub_rm1", "hub_lm2", "hub_rm2", "hub_lm3", "hub_rm3", "hub_lr", "hub_rr", "windscreen", "windscreen_r",
+    "window_lf", "window_rf", "window_lr", "window_rr", "window_lm", "window_rm", "bodyshell", "bumper_f", "bumper_r",
+    "wing_rf", "wing_lf", "bonnet", "boot", "exhaust", "exhaust_2", "exhaust_3", "exhaust_4", "exhaust_5", "exhaust_6",
+    "exhaust_7", "exhaust_8", "exhaust_9", "exhaust_10", "exhaust_11", "exhaust_12", "exhaust_13", "exhaust_14",
+    "exhaust_15", "exhaust_16", "engine", "overheat", "overheat_2", "petrolcap", "petroltank", "petroltank_l",
+    "petroltank_r", "steering", "hbgrip_l", "hbgrip_r", "headlight_l", "headlight_r", "taillight_l", "taillight_r",
+    "indicator_lf", "indicator_rf", "indicator_lr", "indicator_rr", "brakelight_l", "brakelight_r", "brakelight_m",
+    "reversinglight_l", "reversinglight_r", "extralight_1", "extralight_2", "extralight_3", "extralight_4", "numberplate",
+    "interiorlight", "siren1", "siren2", "siren3", "siren4", "siren5", "siren6", "siren7", "siren8", "siren9", "siren10",
+    "siren11", "siren12", "siren13", "siren14", "siren15", "siren16", "siren17", "siren18", "siren19", "siren20",
+    "siren_glass1", "siren_glass2", "siren_glass3", "siren_glass4", "siren_glass5", "siren_glass6", "siren_glass7",
+    "siren_glass8", "siren_glass9", "siren_glass10", "siren_glass11", "siren_glass12", "siren_glass13", "siren_glass14",
+    "siren_glass15", "siren_glass16", "siren_glass17", "siren_glass18", "siren_glass19", "siren_glass20", "spoiler",
+    "struts", "misc_a", "misc_b", "misc_c", "misc_d", "misc_e", "misc_f", "misc_g", "misc_h", "misc_i", "misc_j",
+    "misc_k",
+    "misc_l", "misc_m", "misc_n", "misc_o", "misc_p", "misc_q", "misc_r", "misc_s", "misc_t", "misc_u", "misc_v",
+    "misc_w",
+    "misc_x", "misc_y", "misc_z", "misc_1", "misc_2", "weapon_1a", "weapon_1b", "weapon_1c", "weapon_1d", "weapon_1a_rot",
+    "weapon_1b_rot", "weapon_1c_rot", "weapon_1d_rot", "weapon_2a", "weapon_2b", "weapon_2c", "weapon_2d",
+    "weapon_2a_rot",
+    "weapon_2b_rot", "weapon_2c_rot", "weapon_2d_rot", "weapon_3a", "weapon_3b", "weapon_3c", "weapon_3d",
+    "weapon_3a_rot",
+    "weapon_3b_rot", "weapon_3c_rot", "weapon_3d_rot", "weapon_4a", "weapon_4b", "weapon_4c", "weapon_4d",
+    "weapon_4a_rot",
+    "weapon_4b_rot", "weapon_4c_rot", "weapon_4d_rot", "turret_1base", "turret_1barrel", "turret_2base", "turret_2barrel",
+    "turret_3base", "turret_3barrel", "ammobelt", "searchlight_base", "searchlight_light", "attach_female", "roof",
+    "roof2",
+    "soft_1", "soft_2", "soft_3", "soft_4", "soft_5", "soft_6", "soft_7", "soft_8", "soft_9", "soft_10", "soft_11",
+    "soft_12", "soft_13", "forks", "mast", "carriage", "fork_l", "fork_r", "forks_attach", "frame_1", "frame_2",
+    "frame_3",
+    "frame_pickup_1", "frame_pickup_2", "frame_pickup_3", "frame_pickup_4", "freight_cont", "freight_bogey",
+    "freightgrain_slidedoor", "door_hatch_r", "door_hatch_l", "tow_arm", "tow_mount_a", "tow_mount_b", "tipper",
+    "combine_reel", "combine_auger", "slipstream_l", "slipstream_r", "arm_1", "arm_2", "arm_3", "arm_4", "scoop", "boom",
+    "stick", "bucket", "shovel_2", "shovel_3", "Lookat_UpprPiston_head", "Lookat_LowrPiston_boom", "Boom_Driver",
+    "cutter_driver", "vehicle_blocker", "extra_1", "extra_2", "extra_3", "extra_4", "extra_5", "extra_6", "extra_7",
+    "extra_8", "extra_9", "extra_ten", "extra_11", "extra_12", "break_extra_1", "break_extra_2", "break_extra_3",
+    "break_extra_4", "break_extra_5", "break_extra_6", "break_extra_7", "break_extra_8", "break_extra_9",
+    "break_extra_10",
+    "mod_col_1", "mod_col_2", "mod_col_3", "mod_col_4", "mod_col_5", "handlebars", "forks_u", "forks_l", "wheel_f",
+    "swingarm", "wheel_r", "crank", "pedal_r", "pedal_l", "static_prop", "moving_prop", "static_prop2", "moving_prop2",
+    "rudder", "rudder2", "wheel_rf1_dummy", "wheel_rf2_dummy", "wheel_rf3_dummy", "wheel_rb1_dummy", "wheel_rb2_dummy",
+    "wheel_rb3_dummy", "wheel_lf1_dummy", "wheel_lf2_dummy", "wheel_lf3_dummy", "wheel_lb1_dummy", "wheel_lb2_dummy",
+    "wheel_lb3_dummy", "bogie_front", "bogie_rear", "rotor_main", "rotor_rear", "rotor_main_2", "rotor_rear_2",
+    "elevators",
+    "tail", "outriggers_l", "outriggers_r", "rope_attach_a", "rope_attach_b", "prop_1", "prop_2", "elevator_l",
+    "elevator_r", "rudder_l", "rudder_r", "prop_3", "prop_4", "prop_5", "prop_6", "prop_7", "prop_8", "rudder_2",
+    "aileron_l", "aileron_r", "airbrake_l", "airbrake_r", "wing_l", "wing_r", "wing_lr", "wing_rr", "engine_l",
+    "engine_r",
+    "nozzles_f", "nozzles_r", "afterburner", "wingtip_1", "wingtip_2", "gear_door_fl", "gear_door_fr", "gear_door_rl1",
+    "gear_door_rr1", "gear_door_rl2", "gear_door_rr2", "gear_door_rml", "gear_door_rmr", "gear_f", "gear_rl", "gear_lm1",
+    "gear_rr", "gear_rm1", "gear_rm", "prop_left", "prop_right", "legs", "attach_male", "draft_animal_attach_lr",
+    "draft_animal_attach_rr", "draft_animal_attach_lm", "draft_animal_attach_rm", "draft_animal_attach_lf",
+    "draft_animal_attach_rf", "wheelcover_l", "wheelcover_r", "barracks", "pontoon_l", "pontoon_r", "no_ped_col_step_l",
+    "no_ped_col_strut_1_l", "no_ped_col_strut_2_l", "no_ped_col_step_r", "no_ped_col_strut_1_r", "no_ped_col_strut_2_r",
+    "light_cover", "emissives", "neon_l", "neon_r", "neon_f", "neon_b", "dashglow", "doorlight_lf", "doorlight_rf",
+    "doorlight_lr", "doorlight_rr", "unknown_id", "dials", "engineblock", "bobble_head", "bobble_base", "bobble_hand",
+    "chassis_Control",
+}
+
+t_ReservedKeys = {
+    kb   = {
+        0x01,
+        0x07,
+        0x0A,
+        0x0B,
+        0x1B,
+        0x24,
+        0x2C,
+        0x2D,
+        0x46,
+        0x5B,
+        0x5C,
+        0x5E,
+    },
+    gpad = {
+        23,
+        24,
+        25,
+        71,
+        75,
+    }
+}
+
+
+t_DriftSmokeColors         = {
     "White",
     "Black",
     "Red",
@@ -456,7 +520,7 @@ driftSmokeColors         = {
     "Purple"
 }
 
-objectives_T             = {
+t_ObjectiveBlipIDs             = {
     1,
     9,
     143,
@@ -474,7 +538,7 @@ objectives_T             = {
     542,
 }
 
-vehOffsets_T             = {
+t_VehicleOffsets             = {
     fc   = 0x001C,
     ft   = 0x0014,
     rc   = 0x0020,
@@ -489,7 +553,7 @@ vehOffsets_T             = {
     cofm = 0x0020,
 }
 
-handguns_T               = {
+t_Handguns               = {
     0x1B06D571,
     0xBFE256D4,
     0x5EF9FEC4,
@@ -510,7 +574,7 @@ handguns_T               = {
     0x917F6C8C
 }
 
-cell_inputs_T            = {
+t_CellInputs            = {
     { control = 172, input = 1 },
     { control = 173, input = 2 },
     { control = 174, input = 3 },
@@ -523,7 +587,7 @@ cell_inputs_T            = {
     { control = 181, input = 2 },
 }
 
-radio_stations           = {
+t_RadioStations           = {
     { station = "RADIO_11_TALK_02",               name = "Blaine County Radio" },
     { station = "RADIO_21_DLC_XM17",              name = "Blonded Los Santos 97.8 FM" },
     { station = "RADIO_04_PUNK",                  name = "Channel X" },
@@ -552,7 +616,7 @@ radio_stations           = {
     { station = "RADIO_13_JAZZ",                  name = "Worldwide FM" },
 }
 
-male_sounds_T            = {
+t_MaleSounds            = {
     { name = "Angry Chinese",     soundName = "GENERIC_INSULT_HIGH",      soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
     { name = "Begging Chinese",   soundName = "GUN_BEG",                  soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
     { name = "Call The Cops!",    soundName = "PHONE_CALL_COPS",          soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
@@ -570,7 +634,7 @@ male_sounds_T            = {
     { name = "You Look Stupid!",  soundName = "FRIEND_LOOKS_STUPID",      soundRef = "FRANKLIN_DRUNK" },
 }
 
-female_sounds_T          = {
+t_FemaleSounds          = {
     { name = "Blowjob",        soundName = "SEX_ORAL",                   soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
     { name = "Call The Cops!", soundName = "PHONE_CALL_COPS",            soundRef = "A_F_M_SALTON_01_WHITE_FULL_01" },
     { name = "Hooker Offer",   soundName = "HOOKER_OFFER_SERVICE",       soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
@@ -582,7 +646,7 @@ female_sounds_T          = {
     { name = "Threaten",       soundName = "CHALLENGE_THREATEN",         soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
 }
 
-projectile_types_T       = {
+t_ProjectileTypes       = {
     0xB1CA77B1,
     0xA284510B,
     0x4DD2DC56,
@@ -656,7 +720,7 @@ projectile_types_T       = {
     -1538514291,
 }
 
-pe_combat_attributes_T   = {
+t_PEcombatAttributes   = {
     { id = 5,  bool = true },
     { id = 13, bool = true },
     { id = 21, bool = true },
@@ -671,7 +735,7 @@ pe_combat_attributes_T   = {
     { id = 63, bool = false },
 }
 
-pe_config_flags_T        = {
+t_PEconfigFlags        = {
     { id = 128, bool = true },
     { id = 140, bool = true },
     { id = 141, bool = true },
@@ -681,7 +745,7 @@ pe_config_flags_T        = {
     { id = 435, bool = true },
 }
 
-random_quotes_T          = {
+t_RandomQuotes          = {
     "FACT: AWD drifting isn't drifting.",
     "People who put M badges on a non-M BMW should go to prison.",
     "Speed has never killed anyone. Suddenly becoming stationary, that's what gets you.",
@@ -707,7 +771,7 @@ random_quotes_T          = {
     "What's the difference between your job and your wife? Your job still sucks after 5 years.",
 }
 
-flight_controls_T        = {
+t_FlightControls        = {
     72,
     75,
     87,
@@ -721,170 +785,6 @@ flight_controls_T        = {
     110,
     111,
     112,
-}
-
--- CVehicle::HandlingFlags
-HF                       = {
-    _SMOOTHED_COMPRESSION                      = 0,
-    _REDUCED_MOD_MASS                          = 1,
-    _HAS_KERS                                  = 2,
-    _HAS_RALLY_TYRES                           = 3,
-    _NO_HANDBRAKE                              = 4,
-    _STEER_REARWHEELS                          = 5,
-    _HANDBRAKE_REARWHEELSTEER                  = 6,
-    _STEER_ALL_WHEELS                          = 7,
-    _FREEWHEEL_NO_GAS                          = 8,
-    _NO_REVERSE                                = 9,
-    _REDUCED_RIGHTING_FORCE                    = 10,
-    _STEER_NO_WHEELS                           = 11,
-    _CVT                                       = 12,
-    _ALT_EXT_WHEEL_BOUNDS_BEH                  = 13,
-    _DONT_RAISE_BOUNDS_AT_SPEED                = 14,
-    _EXT_WHEEL_BOUNDS_COL                      = 15,
-    _LESS_SNOW_SINK                            = 16,
-    _TYRES_CAN_CLIP                            = 17,
-    _REDUCED_DRIVE_OVER_DAMAGE                 = 18,
-    _ALT_EXT_WHEEL_BOUNDS_SHRINK               = 19,
-    _OFFROAD_ABILITIES                         = 20,
-    _OFFROAD_ABILITIES_X2                      = 21,
-    _TYRES_RAISE_SIDE_IMPACT_THRESHOLD         = 22,
-    _OFFROAD_INCREASED_GRAVITY_NO_FOLIAGE_DRAG = 23,
-    _ENABLE_LEAN                               = 24,
-    _FORCE_NO_TC_OR_SC                         = 25,
-    _HEAVYARMOUR                               = 26,
-    _ARMOURED                                  = 27,
-    _SELF_RIGHTING_IN_WATER                    = 28,
-    IMPROVED_RIGHTING_FORCE                    = 29,
-    _LOW_SPEED_WHEELIES                        = 30,
-}
-
--- CVehicle::ModelFlags
-MF                       = {
-    _IS_VAN                    = 0,
-    _IS_BUS                    = 1,
-    _IS_LOW                    = 2,
-    _IS_BIG                    = 3,
-    _ABS_STD                   = 4, -- abs standard
-    _ABS_OPTION                = 5, -- abs when upgraded
-    _ABS_ALT_STD               = 6, -- alternate abs standard
-    _ABS_ALT_OPTION            = 7, -- alternate abs when upgraded
-    _NO_DOORS                  = 8,
-    _TANDEM_SEATING            = 9,
-    _SIT_IN_BOAT               = 10,
-    _HAS_TRACKS                = 11,
-    _NO_EXHAUST                = 12,
-    _DOUBLE_EXHAUST            = 13,
-    _NO_1STPERSON_LOOKBEHIND   = 14,
-    _CAN_ENTER_IF_NO_DOOR      = 15,
-    _AXLE_F_TORSION            = 16,
-    _AXLE_F_SOLID              = 17,
-    _AXLE_F_MCPHERSON          = 18,
-    _ATTACH_PED_TO_BODYSHELL   = 19,
-    _AXLE_R_TORSION            = 20,
-    _AXLE_R_SOLID              = 21,
-    _AXLE_R_MCPHERSON          = 22,
-    _DONT_FORCE_GRND_CLEARANCE = 23,
-    _DONT_RENDER_STEER         = 24,
-    _NO_WHEEL_BURST            = 25,
-    _INDESTRUCTIBLE            = 26,
-    _DOUBLE_FRONT_WHEELS       = 27,
-    _IS_RC                     = 28,
-    _DOUBLE_REAR_WHEELS        = 29,
-    _NO_WHEEL_BREAK            = 30,
-    _EXTRA_CAMBER              = 31,
-}
-
--- CVehicle::ModelInfoFlags
-VMF                      = {
-    _HAS_LIVERY                                  = 7,
-    _SPORTS                                      = 9,
-    _DONT_ROTATE_TAIL_ROTOR                      = 26,
-    _PARKING_SENSORS                             = 27,
-    _PEDS_CAN_STAND_ON_TOP                       = 28,
-    _LAW_ENFORCEMENT                             = 31,
-    _EMERGENCY_SERVICE                           = 32,
-    _RICH_CAR                                    = 36,
-    _AVERAGE_CAR                                 = 37,
-    _POOR_CAR                                    = 38,
-    _ALLOWS_RAPPEL                               = 39,
-    _IS_ELECTRIC                                 = 43,
-    _CANNOT_BE_MODDED                            = 54,
-    _HAS_NO_ROOF                                 = 64,
-    _HAS_BULLETPROOF_GLASS                       = 76,
-    _CANNOT_BE_PICKUP_BY_CARGOBOB                = 95,
-    _DISABLE_BUSTING                             = 112,
-    _ALLOW_HATS_NO_ROOF                          = 117,
-    _HAS_LOWRIDER_HYDRAULICS                     = 119,
-    _HAS_BULLET_RESISTANT_GLASS                  = 120,
-    _HAS_INCREASED_RAMMING_FORCE                 = 121,
-    _HAS_LOWRIDER_DONK_HYDRAULICS                = 123,
-    _JUMPING_CAR                                 = 125,
-    _HAS_ROCKET_BOOST                            = 126,
-    _RAMMING_SCOOP                               = 127,
-    _HAS_PARACHUTE                               = 128,
-    _HAS_RAMP                                    = 129,
-    _FRONT_BOOT                                  = 131,
-    _DONT_HOLD_LOW_GEARS_WHEN_ENGINE_UNDER_LOAD  = 136,
-    _HAS_GLIDER                                  = 137,
-    _INCREASE_LOW_SPEED_TORQUE                   = 138,
-    _EQUIP_UNARMED_ON_ENTER                      = 152,
-    _HAS_VERTICAL_FLIGHT_MODE                    = 154,
-    _DROP_SUSPENSION_WHEN_STOPPED                = 157,
-    _HAS_VERTICAL_ROCKET_BOOST                   = 161,
-    _NO_HEAVY_BRAKE_ANIMATION                    = 168,
-    _HAS_INCREASED_RAMMING_FORCE_VS_ALL_VEHICLES = 172,
-    _HAS_NITROUS_MOD                             = 174,
-    _HAS_JUMP_MOD                                = 175,
-    _HAS_RAMMING_SCOOP_MOD                       = 176,
-    _HAS_SUPER_BRAKES_MOD                        = 177,
-    _CRUSHES_OTHER_VEHICLES                      = 178,
-    _RAMP_MOD                                    = 182,
-    _HAS_SIDE_SHUNT                              = 184,
-    _HAS_SUPERCHARGER                            = 188,
-    _SPOILER_MOD_DOESNT_INCREASE_GRIP            = 194,
-    _NO_REVERSING_ANIMATION                      = 195,
-    _IS_FORMULA_VEHICLE                          = 197,
-}
-
--- AnimFlags
-AF                       = {
-
-    -- TODO:
-    -- Rework Anim Flags in the Actions section
-    -- to bitwise operations instead of simple
-    -- arithmetic additions.
-
-    _LOOPING                          = 1 << 0,
-    _HOLD_LAST_FRAME                  = 1 << 1,
-    _REPOSITION_WHEN_FINISHED         = 1 << 2,
-    _NOT_INTERRUPTABLE                = 1 << 3,
-    _UPPERBODY                        = 1 << 4,
-    _SECONDARY                        = 1 << 5,
-    _REORIENT_WHEN_FINISHED           = 1 << 6,
-    _ABORT_ON_PED_MOVEMENT            = 1 << 7,
-    _ADDITIVE                         = 1 << 8,
-    _TURN_OFF_COLLISION               = 1 << 9,
-    _OVERRIDE_PHYSICS                 = 1 << 10,
-    _IGNORE_GRAVITY                   = 1 << 11,
-    _EXTRACT_INITIAL_OFFSET           = 1 << 12,
-    _EXIT_AFTER_INTERRUPTED           = 1 << 13,
-    _TAG_SYNC_IN                      = 1 << 14,
-    _TAG_SYNC_OUT                     = 1 << 15,
-    _TAG_SYNC_CONTINUOUS              = 1 << 16,
-    _FORCE_START                      = 1 << 17,
-    _USE_KINEMATIC_PHYSICS            = 1 << 18,
-    _USE_MOVER_EXTRACTION             = 1 << 19,
-    _HIDE_WEAPON                      = 1 << 20,
-    _ENDS_IN_DEAD_POSE                = 1 << 21,
-    _ACTIVATE_RAGDOLL_ON_COLLISION    = 1 << 22,
-    _DONT_EXIT_ON_DEATH               = 1 << 23,
-    _ABORT_ON_WEAPON_DAMAGE           = 1 << 24,
-    _DISABLE_FORCED_PHYSICS_UPDATE    = 1 << 25,
-    _PROCESS_ATTACHMENTS_ON_START     = 1 << 26,
-    _EXPAND_PED_CAPSULE_FROM_SKELETON = 1 << 27,
-    _USE_ALTERNATIVE_FP_ANIM          = 1 << 28,
-    _BLENDOUT_WRT_LAST_FRAME          = 1 << 29,
-    _USE_FULL_BLENDING                = 1 << 30,
 }
 
 Global_262145            = {
@@ -1006,7 +906,7 @@ Global_262145            = {
 }
 
 -- boolean
-ceo_sell_mission_types_T = {
+t_ceo_sell_mission_types = {
     f_15624 = 262145 + 15624, -- bool CEO Disable Air Attacked Sell Mission *(false)*
     f_15636 = 262145 + 15636, -- bool CEO Disable Air Drop Sell Mission *(false)*
     f_15642 = 262145 + 15642, -- bool CEO Disable Fly Low Sell Mission *(false)*
@@ -1021,7 +921,7 @@ ceo_sell_mission_types_T = {
 }
 
 -- boolean
-mc_sell_mission_types_T  = {
+t_mc_sell_mission_types  = {
     f_18356 = 262145 + 18356, -- bool MC Disable Convoy Sell Mission *(false)*
     -- f_18358 = 262145 + 18358, -- bool MC Disable Trashmaster Sell Mission *(false)*
     f_18361 = 262145 + 18361, -- bool MC Disable Proven Sell Mission *(false)*
@@ -1036,7 +936,7 @@ mc_sell_mission_types_T  = {
 }
 
 -- float
-nc_sell_mission_types_T  = {
+t_nc_sell_mission_types  = {
     f_24048 = 262145 + 24048, -- float Nightclub Sell Mission Multi Drop *(1.0)*
     f_24049 = 262145 + 24049, -- float Nightclub Sell Mission Hack Drop *(1.0)*
     f_24050 = 262145 + 24050, -- float Nightclub Sell Mission Roadblock *(1.0)*
@@ -1049,7 +949,7 @@ nc_sell_mission_types_T  = {
 }
 
 -- float
-hg_sell_mission_types_T  = {
+t_hangar_sell_mission_types  = {
     f_22472 = 262145 + 22472, -- float Hangar Heavy Lifting Sell Mission *(1.0)*
     f_22509 = 262145 + 22509, -- float Hangar Contested Sell Mission *(1.0)*
     -- f_22511 = 262145 + 22511, -- float Hangar Agile Delivery Sell Mission *(1.0)*
@@ -1061,7 +961,7 @@ hg_sell_mission_types_T  = {
     f_22523 = 262145 + 22523, -- float Hangar Under The Radar Sell Mission *(1.0)*
 }
 
-world_seats_T            = {
+t_WorldSeats            = {
     "prop_bench_01a",
     "prop_table_01_chr_b",
     "prop_bench_05",
@@ -1167,7 +1067,7 @@ world_seats_T            = {
     "h4_int_04_desk_chair"
 }
 
-trash_bins_T             = {
+t_TrashBins             = {
     "m23_2_prop_m32_dumpster_01a",
     "prop_cs_dumpster_01a",
     "prop_dumpster_01a",
@@ -1179,7 +1079,7 @@ trash_bins_T             = {
     "p_dumpster_t",
 }
 
-app_script_names_T       = {
+t_AppScriptNames       = {
     "apparcadebusiness",
     "apparcadebusinesshub",
     "appavengeroperations",
@@ -1221,7 +1121,7 @@ app_script_names_T       = {
     -- "debug_app_select_screen",
 }
 
-modshop_script_names     = {
+t_ModshopScriptNames     = {
     "arena_carmod",
     "armory_aircraft_carmod",
     "base_carmod",
@@ -1237,7 +1137,7 @@ modshop_script_names     = {
     -- "vinewood_premium_garage_carmod",
 }
 
-paints_sortByColors      = {
+t_CustomPintShades      = {
     "All",
     "Beige",
     "Black",
@@ -1254,7 +1154,7 @@ paints_sortByColors      = {
     "Yellow",
 }
 
-paints_sortByMfrs        = {
+t_CustomPaintsManufacturers        = {
     "All",
     "Alfa Romeo",
     "AMC",
@@ -1292,7 +1192,7 @@ paints_sortByMfrs        = {
     "Volkswagen",
 }
 
-custom_paints_T          = {
+t_CustomPaints          = {
     { name = "AMG Matte Grey",                           hex = "#171717", p = 7,   m = true,  manufacturer = "Mercedes-AMG",      shade = "Grey" },
     { name = "AMG Matte Light Grey",                     hex = "#2B2B2B", p = 8,   m = true,  manufacturer = "Mercedes-AMG",      shade = "Grey" },
     { name = "Green Hell Magno",                         hex = "#00661F", p = 5,   m = true,  manufacturer = "Mercedes-AMG",      shade = "Green" },
@@ -1646,7 +1546,7 @@ custom_paints_T          = {
     { name = "Hyper Red",                                hex = "#3C0612", p = 30,  m = false, manufacturer = "Aston Martin",      shade = "Red" },
 }
 
-engine_swaps_t           = {
+t_EngineSwaps           = {
     { name = "GM LS1 5.7L V8",              audioname = "coquette3", acc_mult = 4.556,   tt = "Its power is measured in freedoms per football field." },
     { name = "Subaru EJ15 1.5L F4",         audioname = "sultan2",   acc_mult = 2.82,    tt = "For the adventurous." },
     { name = "BMW N54B30 3.0L I6",          audioname = "sentinel",  acc_mult = 1.966,   tt = "Can't keep its oil inside." },
@@ -1657,33 +1557,24 @@ engine_swaps_t           = {
     { name = "Lamborghini 6.5L V12",        audioname = "tempesta",  acc_mult = 6.8,     tt = "Pineapple on pizza." },
 }
 
-vehicle_classes_t        = {
-    [0] = "Compacts",
-    [1] = "Sedans",
-    [2] = "SUVs",
-    [3] = "Coupes",
-    [4] = "Muscle",
-    [5] = "Sports Classics",
-    [6] = "Sports",
-    [7] = "Super",
-    [8] = "Motorcycles",
-    [9] = "Off-road",
-    [10] = "Industrial",
-    [11] = "Utility",
-    [12] = "Vans",
-    [13] = "Cycles",
-    [14] = "Boats",
-    [15] = "Helicopters",
-    [16] = "Planes",
-    [17] = "Service",
-    [18] = "Emergency",
-    [19] = "Military",
-    [20] = "Commercial",
-    [21] = "Trains",
-    [22] = "Open Wheel"
+
+t_languageCodes = {
+    { name = "English",             id = 0,  iso = "en-US" },
+    { name = "French",              id = 1,  iso = "fr-FR" },
+    { name = "German",              id = 2,  iso = "de-DE" },
+    { name = "Italian",             id = 3,  iso = "it-IT" },
+    { name = "Spanish, Spain",      id = 4,  iso = "es-ES" },
+    { name = "Portugese",           id = 5,  iso = "pt-BR" },
+    { name = "Polish",              id = 6,  iso = "pl-PL" },
+    { name = "Russian",             id = 7,  iso = "ru-RU" },
+    { name = "Korean",              id = 8,  iso = "ko-KR" },
+    { name = "Chinese Traditional", id = 9,  iso = "zh-TW" },
+    { name = "Japanese",            id = 10, iso = "ja-JP" },
+    { name = "Spanish, Mexico",     id = 11, iso = "es-MX" },
+    { name = "Chinese Simplified",  id = 12, iso = "zh-CN" },
 }
 
-collision_invalid_models = {
+t_CollisionInvalidModels = {
     3008087081,
     415536433,
     874602658,
@@ -1696,7 +1587,7 @@ collision_invalid_models = {
     1067874014,
 }
 
-supported_sale_scripts   = {
+t_SellScripts   = {
     ["gb_smuggler"] = { -- air
         {               -- (1.70) while .*?0 < func_.*?\(func_.*?, func_.*?, .*?Local_....?\.f_....?, -1
             l = 1985,
@@ -1752,7 +1643,7 @@ supported_sale_scripts   = {
     -- },
 }
 
-simplified_scr_names     = {
+t_SellScriptsDisplayNames     = {
     { scr = "fm_content_smuggler_sell", sn = "Hangar (Land. Not supported.)" },
     { scr = "gb_smuggler",              sn = "Hangar (Air)" },
     { scr = "gb_contraband_sell",       sn = "CEO" },
@@ -1761,7 +1652,7 @@ simplified_scr_names     = {
     { scr = "fm_content_acid_lab_sell", sn = "Acid Lab" },
 }
 
-should_terminate_scripts = {
+t_ShouldTerminateScripts = {
     "appArcadeBusinessHub",
     "appsmuggler",
     "appbikerbusiness",
@@ -1769,7 +1660,7 @@ should_terminate_scripts = {
     "appbusinesshub"
 }
 
-movement_options_t       = {
+t_MovementOptions       = {
     { name = "Default",            mvmt = nil,                                      wmvmt = nil,                         strf = nil,                                        wanim = nil },
     { name = "Arrogant (Female)",  mvmt = "move_f@arrogant@a",                      wmvmt = nil,                         strf = nil,                                        wanim = "Female" },
     { name = "Bodybuilder",        mvmt = "move_m@muscle@a",                        wmvmt = nil,                         strf = nil,                                        wanim = "Default" },
@@ -1808,7 +1699,7 @@ movement_options_t       = {
 -- fuck it. I'll do it manually since my smol brain
 --
 -- Can not figure out a better way.
-ceo_warehouses_t         = {
+t_CEOwarehouses         = {
     ["Convenience Store Lockup"] = {
         size = 0, max = 16, coords = vec3:new(249.246918, -1955.651978, 23.161957)
     },
@@ -1877,7 +1768,7 @@ ceo_warehouses_t         = {
     },
 }
 
-mc_business_ids_t        = {
+t_MCbusinessIDs        = {
     { name = "Fake Documents",  id = 0, unit_max = 60, val_offset = 17319, blip = 498, possible_ids = { 5, 10, 15, 20 } },
     { name = "Weed",            id = 1, unit_max = 80, val_offset = 17323, blip = 496, possible_ids = { 2, 7, 12, 17 } },
     { name = "Fake Cash",       id = 2, unit_max = 40, val_offset = 17320, blip = 500, possible_ids = { 4, 9, 14, 19 } },
@@ -1885,7 +1776,7 @@ mc_business_ids_t        = {
     { name = "Cocaine",         id = 4, unit_max = 10, val_offset = 17321, blip = 497, possible_ids = { 3, 8, 13, 18 } },
 }
 
-hangar_info_t            = {
+t_Hangars            = {
     [1] = { name = "LSIA Hangar 1", coords = vec3:new(-1148.908447, -3406.064697, 13.945053) },
     [2] = { name = "LSIA Hangar A17", coords = vec3:new(-1393.322021, -3262.968262, 13.944828) },
     [3] = { name = "Fort Zancudo Hangar A2", coords = vec3:new(-2022.336304, 3154.936768, 32.810272) },
@@ -1893,7 +1784,7 @@ hangar_info_t            = {
     [5] = { name = "Fort Zancudo Hangar 3499", coords = vec3:new(-2470.278076, 3274.427734, 32.835461) },
 }
 
-bunker_info_t            = {
+t_Bunkers            = {
     [21] = { name = "Grand Senora Oilfields Bunker", coords = vec3:new(494.680878, 3015.895996, 41.041725) },
     [22] = { name = "Grand Senora Desert Bunker", coords = vec3:new(849.619812, 3024.425781, 41.266800) },
     [23] = { name = "Route 68 Bunker", coords = vec3:new(40.422565, 2929.004395, 55.746357) },
@@ -1907,7 +1798,7 @@ bunker_info_t            = {
     [31] = { name = "Chumash Bunker", coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
 }
 
-aircraft_mgs_t           = {
+t_AircraftMGs           = {
     "VEHICLE_WEAPON_DOGFIGHTER_MG",
     "VEHICLE_WEAPON_HUNTER_MG",
     "VEHICLE_WEAPON_MICROLIGHT_MG",
@@ -1931,4 +1822,201 @@ aircraft_mgs_t           = {
     "VEHICLE_WEAPON_PLAYER_SAVAGE",
     "VEHICLE_WEAPON_PLAYER_HUNTER",
     "VEHICLE_WEAPON_PLAYER_BUZZARD",
+}
+
+PED_TYPE        = {
+    _PLAYER_0              = 0,
+    _PLAYER_1              = 1,
+    _NETWORK_PLAYER        = 2,
+    _PLAYER_2              = 3,
+    _CIVMALE               = 4,
+    _CIVFEMALE             = 5,
+    _COP                   = 6,
+    _GANG_ALBANIAN         = 7,
+    _GANG_BIKER_1          = 8,
+    _GANG_BIKER_2          = 9,
+    _GANG_ITALIAN          = 10,
+    _GANG_RUSSIAN          = 11,
+    _GANG_RUSSIAN_2        = 12,
+    _GANG_IRISH            = 13,
+    _GANG_JAMAICAN         = 14,
+    _GANG_AFRICAN_AMERICAN = 15,
+    _GANG_KOREAN           = 16,
+    _GANG_CHINESE_JAPANESE = 17,
+    _GANG_PUERTO_RICAN     = 18,
+    _DEALER                = 19,
+    _MEDIC                 = 20,
+    _FIREMAN               = 21,
+    _CRIMINAL              = 22,
+    _BUM                   = 23,
+    _PROSTITUTE            = 24,
+    _SPECIAL               = 25,
+    _MISSION               = 26,
+    _SWAT                  = 27,
+    _ANIMAL                = 28,
+    _ARMY                  = 29,
+}
+
+-- CVehicle::HandlingFlags
+HF                       = {
+    _SMOOTHED_COMPRESSION                      = 0,
+    _REDUCED_MOD_MASS                          = 1,
+    _HAS_KERS                                  = 2,
+    _HAS_RALLY_TYRES                           = 3,
+    _NO_HANDBRAKE                              = 4,
+    _STEER_REARWHEELS                          = 5,
+    _HANDBRAKE_REARWHEELSTEER                  = 6,
+    _STEER_ALL_WHEELS                          = 7,
+    _FREEWHEEL_NO_GAS                          = 8,
+    _NO_REVERSE                                = 9,
+    _REDUCED_RIGHTING_FORCE                    = 10,
+    _STEER_NO_WHEELS                           = 11,
+    _CVT                                       = 12,
+    _ALT_EXT_WHEEL_BOUNDS_BEH                  = 13,
+    _DONT_RAISE_BOUNDS_AT_SPEED                = 14,
+    _EXT_WHEEL_BOUNDS_COL                      = 15,
+    _LESS_SNOW_SINK                            = 16,
+    _TYRES_CAN_CLIP                            = 17,
+    _REDUCED_DRIVE_OVER_DAMAGE                 = 18,
+    _ALT_EXT_WHEEL_BOUNDS_SHRINK               = 19,
+    _OFFROAD_ABILITIES                         = 20,
+    _OFFROAD_ABILITIES_X2                      = 21,
+    _TYRES_RAISE_SIDE_IMPACT_THRESHOLD         = 22,
+    _OFFROAD_INCREASED_GRAVITY_NO_FOLIAGE_DRAG = 23,
+    _ENABLE_LEAN                               = 24,
+    _FORCE_NO_TC_OR_SC                         = 25,
+    _HEAVYARMOUR                               = 26,
+    _ARMOURED                                  = 27,
+    _SELF_RIGHTING_IN_WATER                    = 28,
+    IMPROVED_RIGHTING_FORCE                    = 29,
+    _LOW_SPEED_WHEELIES                        = 30,
+}
+
+-- CVehicle::ModelFlags
+MF                       = {
+    _IS_VAN                    = 0,
+    _IS_BUS                    = 1,
+    _IS_LOW                    = 2,
+    _IS_BIG                    = 3,
+    _ABS_STD                   = 4, -- abs standard
+    _ABS_OPTION                = 5, -- abs when upgraded
+    _ABS_ALT_STD               = 6, -- alternate abs standard
+    _ABS_ALT_OPTION            = 7, -- alternate abs when upgraded
+    _NO_DOORS                  = 8,
+    _TANDEM_SEATING            = 9,
+    _SIT_IN_BOAT               = 10,
+    _HAS_TRACKS                = 11,
+    _NO_EXHAUST                = 12,
+    _DOUBLE_EXHAUST            = 13,
+    _NO_1STPERSON_LOOKBEHIND   = 14,
+    _CAN_ENTER_IF_NO_DOOR      = 15,
+    _AXLE_F_TORSION            = 16,
+    _AXLE_F_SOLID              = 17,
+    _AXLE_F_MCPHERSON          = 18,
+    _ATTACH_PED_TO_BODYSHELL   = 19,
+    _AXLE_R_TORSION            = 20,
+    _AXLE_R_SOLID              = 21,
+    _AXLE_R_MCPHERSON          = 22,
+    _DONT_FORCE_GRND_CLEARANCE = 23,
+    _DONT_RENDER_STEER         = 24,
+    _NO_WHEEL_BURST            = 25,
+    _INDESTRUCTIBLE            = 26,
+    _DOUBLE_FRONT_WHEELS       = 27,
+    _IS_RC                     = 28,
+    _DOUBLE_REAR_WHEELS        = 29,
+    _NO_WHEEL_BREAK            = 30,
+    _EXTRA_CAMBER              = 31,
+}
+
+-- CVehicle::ModelInfoFlags
+VMF                      = {
+    _HAS_LIVERY                                  = 7,
+    _SPORTS                                      = 9,
+    _DONT_ROTATE_TAIL_ROTOR                      = 26,
+    _PARKING_SENSORS                             = 27,
+    _PEDS_CAN_STAND_ON_TOP                       = 28,
+    _LAW_ENFORCEMENT                             = 31,
+    _EMERGENCY_SERVICE                           = 32,
+    _RICH_CAR                                    = 36,
+    _AVERAGE_CAR                                 = 37,
+    _POOR_CAR                                    = 38,
+    _ALLOWS_RAPPEL                               = 39,
+    _IS_ELECTRIC                                 = 43,
+    _CANNOT_BE_MODDED                            = 54,
+    _HAS_NO_ROOF                                 = 64,
+    _HAS_BULLETPROOF_GLASS                       = 76,
+    _CANNOT_BE_PICKUP_BY_CARGOBOB                = 95,
+    _DISABLE_BUSTING                             = 112,
+    _ALLOW_HATS_NO_ROOF                          = 117,
+    _HAS_LOWRIDER_HYDRAULICS                     = 119,
+    _HAS_BULLET_RESISTANT_GLASS                  = 120,
+    _HAS_INCREASED_RAMMING_FORCE                 = 121,
+    _HAS_LOWRIDER_DONK_HYDRAULICS                = 123,
+    _JUMPING_CAR                                 = 125,
+    _HAS_ROCKET_BOOST                            = 126,
+    _RAMMING_SCOOP                               = 127,
+    _HAS_PARACHUTE                               = 128,
+    _HAS_RAMP                                    = 129,
+    _FRONT_BOOT                                  = 131,
+    _DONT_HOLD_LOW_GEARS_WHEN_ENGINE_UNDER_LOAD  = 136,
+    _HAS_GLIDER                                  = 137,
+    _INCREASE_LOW_SPEED_TORQUE                   = 138,
+    _EQUIP_UNARMED_ON_ENTER                      = 152,
+    _HAS_VERTICAL_FLIGHT_MODE                    = 154,
+    _DROP_SUSPENSION_WHEN_STOPPED                = 157,
+    _HAS_VERTICAL_ROCKET_BOOST                   = 161,
+    _NO_HEAVY_BRAKE_ANIMATION                    = 168,
+    _HAS_INCREASED_RAMMING_FORCE_VS_ALL_VEHICLES = 172,
+    _HAS_NITROUS_MOD                             = 174,
+    _HAS_JUMP_MOD                                = 175,
+    _HAS_RAMMING_SCOOP_MOD                       = 176,
+    _HAS_SUPER_BRAKES_MOD                        = 177,
+    _CRUSHES_OTHER_VEHICLES                      = 178,
+    _RAMP_MOD                                    = 182,
+    _HAS_SIDE_SHUNT                              = 184,
+    _HAS_SUPERCHARGER                            = 188,
+    _SPOILER_MOD_DOESNT_INCREASE_GRIP            = 194,
+    _NO_REVERSING_ANIMATION                      = 195,
+    _IS_FORMULA_VEHICLE                          = 197,
+}
+
+-- AnimFlags
+AF                       = {
+
+    -- TODO:
+    -- Rework Anim Flags in the Actions section
+    -- to bitwise operations instead of simple
+    -- arithmetic additions.
+
+    _LOOPING                          = 1 << 0,
+    _HOLD_LAST_FRAME                  = 1 << 1,
+    _REPOSITION_WHEN_FINISHED         = 1 << 2,
+    _NOT_INTERRUPTABLE                = 1 << 3,
+    _UPPERBODY                        = 1 << 4,
+    _SECONDARY                        = 1 << 5,
+    _REORIENT_WHEN_FINISHED           = 1 << 6,
+    _ABORT_ON_PED_MOVEMENT            = 1 << 7,
+    _ADDITIVE                         = 1 << 8,
+    _TURN_OFF_COLLISION               = 1 << 9,
+    _OVERRIDE_PHYSICS                 = 1 << 10,
+    _IGNORE_GRAVITY                   = 1 << 11,
+    _EXTRACT_INITIAL_OFFSET           = 1 << 12,
+    _EXIT_AFTER_INTERRUPTED           = 1 << 13,
+    _TAG_SYNC_IN                      = 1 << 14,
+    _TAG_SYNC_OUT                     = 1 << 15,
+    _TAG_SYNC_CONTINUOUS              = 1 << 16,
+    _FORCE_START                      = 1 << 17,
+    _USE_KINEMATIC_PHYSICS            = 1 << 18,
+    _USE_MOVER_EXTRACTION             = 1 << 19,
+    _HIDE_WEAPON                      = 1 << 20,
+    _ENDS_IN_DEAD_POSE                = 1 << 21,
+    _ACTIVATE_RAGDOLL_ON_COLLISION    = 1 << 22,
+    _DONT_EXIT_ON_DEATH               = 1 << 23,
+    _ABORT_ON_WEAPON_DAMAGE           = 1 << 24,
+    _DISABLE_FORCED_PHYSICS_UPDATE    = 1 << 25,
+    _PROCESS_ATTACHMENTS_ON_START     = 1 << 26,
+    _EXPAND_PED_CAPSULE_FROM_SKELETON = 1 << 27,
+    _USE_ALTERNATIVE_FP_ANIM          = 1 << 28,
+    _BLENDOUT_WRT_LAST_FRAME          = 1 << 29,
+    _USE_FULL_BLENDING                = 1 << 30,
 }
