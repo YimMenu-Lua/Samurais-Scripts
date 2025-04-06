@@ -2,8 +2,8 @@
 
 local s_SelectedSmokeColor = 0
 
-function driftModeUI()
-    local f_PosY = 20
+function DriftModeUI()
+    local f_PosY = 100
     if self.get_veh() ~= 0 then
         f_PosY = 600
     end
@@ -27,7 +27,7 @@ function driftModeUI()
             driftMode, driftModeUsed = ImGui.Checkbox(_T("DRIFT_MODE_CB_"), driftMode)
             UI.HelpMarker(_T("DRIFT_MODE_DESC_"))
             if driftModeUsed then
-                UI.widgetSound("Nav2")
+                UI.WidgetSound("Nav2")
                 CFG:SaveItem("driftMode", driftMode)
                 CFG:SaveItem("DriftTires", false)
             end
@@ -39,7 +39,7 @@ function driftModeUI()
                 ImGui.PopItemWidth()
                 UI.Tooltip(_T("DRIFT_SLIDER_"))
                 if DriftIntensityUsed then
-                    UI.widgetSound("Nav")
+                    UI.WidgetSound("Nav")
                     CFG:SaveItem("DriftIntensity", DriftIntensity)
                 end
             end
@@ -50,7 +50,7 @@ function driftModeUI()
                 driftMode = false
             end
             if DriftTiresUsed then
-                UI.widgetSound("Nav2")
+                UI.WidgetSound("Nav2")
                 CFG:SaveItem("DriftTires", DriftTires)
                 CFG:SaveItem("driftMode", false)
             end
@@ -64,14 +64,14 @@ function driftModeUI()
                 DriftPowerIncrease, dpiUsed = ImGui.SliderInt("##Torque", DriftPowerIncrease, 10, 100)
                 UI.Tooltip(_T("DRIFT_TORQUE_DESC_"))
                 if dpiUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("DriftPowerIncrease", DriftPowerIncrease)
                 end
 
                 ImGui.Spacing(); DriftSmoke, dsmkUsed = ImGui.Checkbox("Drift Smoke", DriftSmoke)
                 UI.Tooltip(_T("DRIFT_SMOKE_COL_DESC_"))
                 if dsmkUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("DriftSmoke", DriftSmoke)
                     if not BurnoutSmoke and not DriftSmoke then
                         script.run_in_fiber(function()
@@ -90,7 +90,7 @@ function driftModeUI()
 
             ImGui.SameLine(); BurnoutSmoke, bsmkUsed = ImGui.Checkbox("Burnout Smoke", BurnoutSmoke)
             if bsmkUsed then
-                UI.widgetSound("Nav2")
+                UI.WidgetSound("Nav2")
                 CFG:SaveItem("BurnoutSmoke", BurnoutSmoke)
                 if not BurnoutSmoke and not DriftSmoke then
                     script.run_in_fiber(function()
@@ -114,7 +114,7 @@ function driftModeUI()
                     if dsiUsed then
                         CFG:SaveItem("driftSmokeIndex", driftSmokeIndex)
                         s_SelectedSmokeColor = t_DriftSmokeColors[driftSmokeIndex + 1]
-                        driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, _ = Col(s_SelectedSmokeColor:lower()):ToRGBA()
+                        driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, _ = Col(s_SelectedSmokeColor:lower()):AsRGBA()
                         CFG:SaveItem("driftSmoke_T", driftSmoke_T)
                         script.run_in_fiber(function()
                             if not custom_tires_checked then
@@ -150,7 +150,7 @@ function driftModeUI()
 
                         if #smokeHex > 1 then
                             if #smokeHex:gsub("#", "") ~= 6 and #smokeHex:gsub("#", "") ~= 8 then
-                                UI.widgetSound("Error")
+                                UI.WidgetSound("Error")
                                 YimToast:ShowWarning(
                                     "Samurais Scripts",
                                     string.format(
@@ -158,8 +158,8 @@ function driftModeUI()
                                         smokeHex)
                                 )
                             else
-                                UI.widgetSound("Select")
-                                driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, _ = Col(smokeHex):ToRGBA()
+                                UI.WidgetSound("Select")
+                                driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, _ = Col(smokeHex):AsRGBA()
                                 CFG:SaveItem("driftSmoke_T", driftSmoke_T)
                                 script.run_in_fiber(function()
                                     if not custom_tires_checked then
@@ -177,18 +177,18 @@ function driftModeUI()
                                 YimToast:ShowMessage("Samurais Scripts", "Drift smoke color changed", false, 1.5)
                             end
                         else
-                            UI.widgetSound("Error")
+                            UI.WidgetSound("Error")
                             YimToast:ShowMWarning("Samurais Scripts", "Please enter a valid HEX color code.")
                         end
                     end
                 end
                 customSmokeCol, cscUsed = ImGui.Checkbox(_T("GENERIC_CUSTOM_LABEL_"), customSmokeCol)
                 if cscUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("customSmokeCol", customSmokeCol)
                     if not customSmokeCol then
                         s_SelectedSmokeColor = t_DriftSmokeColors[driftSmokeIndex + 1]
-                        driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, _ = Col(s_SelectedSmokeColor:lower()):ToRGBA()
+                        driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, _ = Col(s_SelectedSmokeColor:lower()):AsRGBA()
                         CFG:SaveItem("driftSmoke_T", driftSmoke_T)
                     end
                 end
@@ -200,7 +200,7 @@ function driftModeUI()
                 driftMinigame, drmgUsed = ImGui.Checkbox("Drift Minigame", driftMinigame)
                 UI.Tooltip(_T("DRIFT_GAME_DESC_"))
                 if drmgUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("driftMinigame", driftMinigame)
                 end
                 if driftMinigame then

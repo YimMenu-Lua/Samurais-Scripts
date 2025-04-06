@@ -9,7 +9,7 @@ local function DisplayLangs()
     end
     lang_idx, lang_idxUsed = ImGui.Combo("##langs", lang_idx, filteredLangs, #t_Langs)
     if UI.IsItemClicked("lmb") then
-        UI.widgetSound("Nav")
+        UI.WidgetSound("Nav")
     end
 end
 
@@ -24,21 +24,21 @@ function SettingsUI()
     disableTooltips, dtUsed = ImGui.Checkbox(_T("DISABLE_TOOLTIPS_CB_"), disableTooltips)
     if dtUsed then
         CFG:SaveItem("disableTooltips", disableTooltips)
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
     end
 
     disableUiSounds, duisndUsed = ImGui.Checkbox(_T("DISABLE_UISOUNDS_CB_"), disableUiSounds)
     UI.Tooltip(_T("DISABLE_UISOUNDS_DESC_"))
     if duisndUsed then
         CFG:SaveItem("disableUiSounds", disableUiSounds)
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
     end
 
     disableFlightMusic, dpmUsed = ImGui.Checkbox(_T("FLIGHT_MUSIC_CB_"), disableFlightMusic)
     UI.Tooltip(_T("FLIGHT_MUSIC_DESC_"))
     if dpmUsed then
         CFG:SaveItem("disableFlightMusic", disableFlightMusic)
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         if not disableFlightMusic then
             script.run_in_fiber(function()
                 AUDIO.SET_AUDIO_FLAG("DisableFlightMusic", false)
@@ -50,20 +50,20 @@ function SettingsUI()
     disable_quotes, dqUsed = ImGui.Checkbox(_T("DAILY_QUOTES_CB_"), disable_quotes)
     UI.Tooltip(_T("DAILY_QUOTES_DESC_"))
     if dqUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         CFG:SaveItem("disable_quotes", disable_quotes)
     end
 
     disable_mdef_logs, dmlUsed = ImGui.Checkbox(_T("MISSILE_DEF_LOGS_CB_"), disable_mdef_logs)
     UI.Tooltip(_T("MISSILE_DEF_LOGS_DESC_"))
     if dmlUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         CFG:SaveItem("disable_mdef_logs", disable_mdef_logs)
     end
 
     if shortcut_anim.anim ~= nil then
         if ImGui.Button(_T("ANIM_HOTKEY_DEL2_")) then
-            UI.widgetSound("Delete")
+            UI.WidgetSound("Delete")
             shortcut_anim = {}
             CFG:SaveItem("shortcut_anim", {})
             YimToast:ShowSuccess("Samurais Scripts", "Animation shortcut has been reset.")
@@ -86,7 +86,7 @@ function SettingsUI()
     ImGui.SameLine()
     ImGui.Text(string.format("%.1f s", (supply_autofill_delay / 1000)))
     if safdUsed then
-        UI.widgetSound("Nav")
+        UI.WidgetSound("Nav")
         CFG:SaveItem("supply_autofill_delay", supply_autofill_delay)
         supply_autofill_delay = CFG:ReadItem("supply_autofill_delay")
     end
@@ -108,7 +108,7 @@ function SettingsUI()
             LANG          = selected_lang.iso
             current_lang  = selected_lang.name
         end
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         CFG:SaveItem("useGameLang", useGameLang)
         CFG:SaveItem("current_lang", current_lang)
         CFG:SaveItem("LANG", LANG)
@@ -123,7 +123,7 @@ function SettingsUI()
         ImGui.PopItemWidth()
         selected_lang = t_Langs[lang_idx + 1]
         if lang_idxUsed then
-            UI.widgetSound("Select")
+            UI.WidgetSound("Select")
             LANG         = selected_lang.iso
             current_lang = selected_lang.name
             CFG:SaveItem("lang_idx", lang_idx)
@@ -135,7 +135,7 @@ function SettingsUI()
 
     ImGui.Dummy(10, 1)
     if UI.ColoredButton(_T("RESET_SETTINGS_BTN_"), "#FF0000", "#EE4B2B", "#880808") then
-        UI.widgetSound("Focus_In")
+        UI.WidgetSound("Focus_In")
         ImGui.OpenPopup("Confirm")
     end
     ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
@@ -143,13 +143,13 @@ function SettingsUI()
     if ImGui.BeginPopupModal("Confirm", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar) then
         UI.ColoredText(_T("CONFIRM_PROMPT_"), "yellow", 1, 20)
         if ImGui.Button(string.format("  %s  ", _T("GENERIC_YES_"))) then
-            UI.widgetSound("Select2")
+            UI.WidgetSound("Select2")
             SS.ResetSettings()
             ImGui.CloseCurrentPopup()
         end
         ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
         if ImGui.Button(string.format("  %s  ", _T("GENERIC_NO_"))) then
-            UI.widgetSound("Cancel")
+            UI.WidgetSound("Cancel")
             ImGui.CloseCurrentPopup()
         end
         ImGui.EndPopup()

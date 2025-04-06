@@ -39,27 +39,6 @@ function Sum(...)
     return result
 end
 
--- [[
----@param ptr pointer
----@param size integer
-function memory_hex_dump(ptr, size)
-    local result = {}
-    for i = 0, size - 1 do
-        local byte = ptr:add(i):get_byte()
-        table.insert(result, string.format("%02X", byte))
-    end
-    log.debug("Memory Dump: " .. table.concat(result, " "))
-end
-
----@param ptr pointer
-function memory_get_vec3(ptr)
-    local x = ptr:get_float()
-    local y = ptr:add(0x4):get_float()
-    local z = ptr:add(0x8):get_float()
-    return vec3:new(x, y, z)
-end
--- ]]
-
 ---@param toggle boolean
 ---@param station? string
 ---@param entity? integer
@@ -144,13 +123,13 @@ function DummyCop()
     script.run_in_fiber(function(dcop)
         if Self.Vehicle.Current ~= nil and Self.Vehicle.Current ~= 0 then
             local polhash, veh_bone1, veh_bone2, attach_mode
-            if is_car then
+            if Self.Vehicle.IsCar then
                 if VEHICLE.DOES_VEHICLE_HAVE_ROOF(Self.Vehicle.Current) and not VEHICLE.IS_VEHICLE_A_CONVERTIBLE(Self.Vehicle.Current, false) then
                     polhash, veh_bone1, veh_bone2, attach_mode = 0xD1E0B7D7, "interiorlight", "interiorlight", 1
                 else
                     polhash, veh_bone1, veh_bone2, attach_mode = 0xD1E0B7D7, "interiorlight", "dashglow", 2
                 end
-            elseif is_bike or is_quad then
+            elseif Self.Vehicle.IsBike or Self.Vehicle.IsQuad then
                 polhash, veh_bone1, veh_bone2, attach_mode = 0xFDEFAEC3, "chassis_dummy", "chassis_dummy", 1
             else
                 YimToast:ShowError("Samurais Scripts", "Can not equip a fake siren on this vehicle.")
@@ -253,17 +232,22 @@ function StandUp()
 end
 
 ---@param level integer
-function DoWantedStars(level)
+---@return string
+function WantedLevelToStars(level)
     local stars = ""
     if level == 0 then
         return "Clear"
     end
+
     for _ = 1, level do
         stars = stars .. " *"
     end
+
     return stars
 end
 
+---@param playerPed integer
+---@param playerName string
 function SpawnPervert(playerPed, playerName)
     if not Game.RequestModel(0x55446010) then
         return
@@ -277,7 +261,7 @@ function SpawnPervert(playerPed, playerName)
     perv = PED.CREATE_PED(PED_TYPE._CIVMALE, 0x55446010, spawn_pos.x, spawn_pos.y, spawn_pos.z, math.random(1, 180), true,
         false)
     if not ENTITY.DOES_ENTITY_EXIST(perv) then
-        UI.widgetSound("Error")
+        UI.WidgetSound("Error")
         YimToast:ShowError(
             "Samurai's Scripts",
             string.format("Failed to spawn a stalker pervert for %s.", playerName)
@@ -285,7 +269,7 @@ function SpawnPervert(playerPed, playerName)
         return
     end
 
-    UI.widgetSound("Select")
+    UI.WidgetSound("Select")
     YimToast:ShowSuccess(
         "Samurai's Scripts",
         string.format("Spawned a stalker pervert for %s.", playerName)
@@ -338,12 +322,12 @@ end
 
 ---@return number
 function SetAnimFlags()
-    local flag_loop      = Lua_fn.cond_return(looped, AF._LOOPING, 0)
-    local flag_freeze    = Lua_fn.cond_return(freeze, AF._HOLD_LAST_FRAME, 0)
-    local flag_upperbody = Lua_fn.cond_return(upperbody, AF._UPPERBODY, 0)
-    local flag_control   = Lua_fn.cond_return(controllable, AF._SECONDARY, 0)
-    local flag_collision = Lua_fn.cond_return(noCollision, AF._TURN_OFF_COLLISION, 0)
-    local flag_killOnEnd = Lua_fn.cond_return(killOnEnd, AF._ENDS_IN_DEAD_POSE, 0)
+    local flag_loop      = Lua_fn.CondReturn(looped, AF._LOOPING, 0)
+    local flag_freeze    = Lua_fn.CondReturn(freeze, AF._HOLD_LAST_FRAME, 0)
+    local flag_upperbody = Lua_fn.CondReturn(upperbody, AF._UPPERBODY, 0)
+    local flag_control   = Lua_fn.CondReturn(controllable, AF._SECONDARY, 0)
+    local flag_collision = Lua_fn.CondReturn(noCollision, AF._TURN_OFF_COLLISION, 0)
+    local flag_killOnEnd = Lua_fn.CondReturn(killOnEnd, AF._ENDS_IN_DEAD_POSE, 0)
     return Sum(flag_loop, flag_freeze, flag_upperbody, flag_control, flag_collision, flag_killOnEnd)
 end
 
@@ -367,6 +351,7 @@ function ShootFlares(s)
             local jet_fwd_X = ENTITY.GET_ENTITY_FORWARD_X(self.get_veh())
             local jet_fwd_Y = ENTITY.GET_ENTITY_FORWARD_Y(self.get_veh())
             if bone_idx ~= -1 then
+                is_shooting_flares = true
                 local bone_pos = ENTITY.GET_ENTITY_BONE_POSTION(self.get_veh(), bone_idx)
                 MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
                     ((bone_pos.x + 0.01) + (jet_fwd_X / 1.13)), ((bone_pos.y + 0.01) + jet_fwd_Y / 1.13), bone_pos.z,
@@ -378,6 +363,7 @@ function ShootFlares(s)
                 s:sleep(250)
             end
         end
+        is_shooting_flares = false
     end
 end
 
@@ -435,39 +421,60 @@ end
 ---@param dest vec3
 ---@param dmg number
 ---@param owner integer
----@param speed number
+---@param speed integer
 function ShootExplosiveMG(src, dest, dmg, owner, speed)
     if Game.RequestWeaponAsset(3800181289) then
         MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
-            src.x, src.y, src.z,
-            dest.x, dest.y, dest.z,
-            dmg, false, 3800181289, owner, true, false, speed
+            src.x,
+            src.y,
+            src.z,
+            dest.x,
+            dest.y,
+            dest.z,
+            dmg,
+            false,
+            3800181289,
+            owner,
+            true,
+            false,
+            speed
         )
     end
 end
 
-set_poker_cards = function(player_id, players_current_table, card_one, card_two, card_three)
+---@param player_id integer
+---@param players_current_table integer
+---@param card_one integer
+---@param card_two integer
+---@param card_three integer
+SetPokerCards = function(player_id, players_current_table, card_one, card_two, card_three)
     locals.set_int("three_card_poker",
         (three_card_poker_cards) + (three_card_poker_current_deck) +
         (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (1) + (player_id * 3), card_one)
+
     locals.set_int("three_card_poker",
         (three_card_poker_anti_cheat) + (three_card_poker_anti_cheat_deck) + (1) +
         (1 + (players_current_table * three_card_poker_deck_size)) + (1) + (player_id * 3), card_one)
+
     locals.set_int("three_card_poker",
         (three_card_poker_cards) + (three_card_poker_current_deck) +
         (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (2) + (player_id * 3), card_two)
+
     locals.set_int("three_card_poker",
         (three_card_poker_anti_cheat) + (three_card_poker_anti_cheat_deck) + (1) +
         (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (player_id * 3), card_two)
+
     locals.set_int("three_card_poker",
         (three_card_poker_cards) + (three_card_poker_current_deck) +
         (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (3) + (player_id * 3), card_three)
+
     locals.set_int("three_card_poker",
         (three_card_poker_anti_cheat) + (three_card_poker_anti_cheat_deck) + (1) +
         (1 + (players_current_table * three_card_poker_deck_size)) + (3) + (player_id * 3), card_three)
 end
 
-get_cardname_from_index = function(card_index)
+---@param card_index integer
+GetCardNameFromIndex = function(card_index)
     if card_index == 0 then
         return "Rolling"
     end
@@ -511,6 +518,7 @@ function PlayHandsUp()
     end)
 end
 
+---@param ped integer
 function AttachPed(ped)
     local myBone = PED.GET_PED_BONE_INDEX(Self.GetPedID(), 6286)
     script.run_in_fiber(function(ap)
@@ -638,6 +646,7 @@ function StopPreview()
     previewEntity       = 0
 end
 
+---@param vehToTow integer
 function Flatbed_GetTowOffset(vehToTow)
     local vehicleClass = VEHICLE.GET_VEHICLE_CLASS(vehToTow)
     if vehicleClass == 1 then
@@ -702,7 +711,7 @@ Lua_fn.__index = Lua_fn
 ---@param cond boolean
 ---@param ifTrue any
 ---@param ifFalse any
-Lua_fn.cond_return = function(cond, ifTrue, ifFalse)
+Lua_fn.CondReturn = function(cond, ifTrue, ifFalse)
     return cond and ifTrue or ifFalse
 end
 
@@ -803,14 +812,6 @@ Lua_fn.FormatMoney = function(value)
     return "$" .. tostring(Lua_fn.SeparateInt(value))
 end
 
-
----@param r number
----@param g number
----@param b number
-Lua_fn.RGBtoHex = function(r, g, b)
-    return string.format("#%02X%02X%02X", r, g, b)
-end
-
 --[[ Decodes hex to string.
 
 HEX must be provided in a string format.
@@ -867,6 +868,7 @@ Lua_fn.TableContains = function(tbl, value)
             end
         end
     end
+
     return false
 end
 
@@ -875,7 +877,7 @@ end
 ---@param indent? integer
 ---@param seen? table
 ---@return string
-Lua_fn.ListIter = function(t, indent, seen)
+Lua_fn.PrintTable = function(t, indent, seen)
     if not indent then
         indent = 2
     end
@@ -909,7 +911,7 @@ Lua_fn.ListIter = function(t, indent, seen)
         elseif type(v) == "string" then
             ret_str = ret_str .. "\"" .. v .. "\",\r\n"
         elseif type(v) == "table" then
-            ret_str = ret_str .. Lua_fn.ListIter(v, indent + 2, seen) .. ",\r\n"
+            ret_str = ret_str .. Lua_fn.PrintTable(v, indent + 2, seen) .. ",\r\n"
         else
             ret_str = ret_str .. "\"" .. tostring(v) .. "\",\r\n"
         end
@@ -946,50 +948,35 @@ end
 
 -- Removes duplicate items from a table and returns a new one with the results.
 --
--- If `is_dev` is set to `true`, it adds a table with duplicate items to the return as well.
---
--- If you use the dev flag then you will need to specify which table you want to use (clean items or duplicates)
---
---[[
-  **Example:**
-
-  case1:
-
-    local clean_items = Lua_fn.removeTableDupes(yourTable, false) -- when set to false it only returns a table with clean items (no duplicates)
-    log.info(tostring(Lua_fn.listIter(clean_items, 0)))
-
-  case2:
-
-    local results = Lua_fn.removeTableDupes(yourTable, true) -- when set to true it returns a table containing both clean items and duplicates.
-    local clean_items = results.clean_T
-    local duplicate_items = results.dupes_T
-    log.info("\10Clean Items:\10" .. tostring(Lua_fn.listIter(clean_items, 0)))
-    log.info("\10Duplicate Items:\10" .. tostring(Lua_fn.listIter(duplicate_items, 0)))
-]]
+-- If `debug` is set to `true`, it adds a table with duplicate items to the return as well.
 ---@param t table
----@param debug boolean
+---@param debug? boolean
 Lua_fn.RemoveTableDupes = function(t, debug)
-    local exists_T, clean_T, dupes_T, result_T = {}, {}, {}, {}
+    local t_exists, t_clean, t_dupes, t_result = {}, {}, {}, {}
+
     for _, v in ipairs(t) do
-        if not exists_T[v] then
-            clean_T[#clean_T + 1] = v
-            exists_T[v] = true
+        if not t_exists[v] then
+            t_clean[#t_clean + 1] = v
+            t_exists[v] = true
         else
             if debug then
-                dupes_T[#dupes_T + 1] = v
+                t_dupes[#t_dupes + 1] = v
             end
         end
     end
+
     if debug then
-        result_T.clean_T = clean_T
-        result_T.dupes_T = dupes_T
+        t_result.clean = t_clean
+        t_result.dupes = t_dupes
     end
-    return debug and result_T or clean_T
+
+    return debug and t_result or t_clean
 end
 
 --
 -- Bitwise Operations
 --
+
 ---@param num number
 ---@param bit number
 Lua_fn.get_bit = function(num, bit)
@@ -1078,7 +1065,7 @@ end
 ---@param alpha? number
 ---@param wrap_size number
 UI.ColoredText = function(text, color, alpha, wrap_size)
-    local r, g, b, a = Col(color):ToFloat()
+    local r, g, b, a = Col(color):AsFloat()
     ImGui.PushStyleColor(ImGuiCol.Text, r, g, b, alpha or a)
     ImGui.PushTextWrapPos(ImGui.GetFontSize() * wrap_size)
     ImGui.TextWrapped(text)
@@ -1094,9 +1081,9 @@ end
 ---@param alpha? number
 ---@return boolean
 UI.ColoredButton = function(text, color, hovercolor, activecolor, alpha)
-    local buttonR, buttonG, buttonB, buttonA = Col(color):ToFloat()
-    local hoveredR, hoveredG, hoveredB, hoveredA = Col(hovercolor):ToFloat()
-    local activeR, activeG, activeB, activeA = Col(activecolor):ToFloat()
+    local buttonR, buttonG, buttonB, buttonA = Col(color):AsFloat()
+    local hoveredR, hoveredG, hoveredB, hoveredA = Col(hovercolor):AsFloat()
+    local activeR, activeG, activeB, activeA = Col(activecolor):AsFloat()
 
     ImGui.PushStyleColor(ImGuiCol.Button, buttonR, buttonG, buttonB, buttonA)
     ImGui.PushStyleColor(ImGuiCol.ButtonHovered, hoveredR, hoveredG, hoveredB, hoveredA)
@@ -1152,28 +1139,17 @@ UI.Tooltip = function(text, color)
     end
 end
 
----Checks if an ImGui widget was clicked with either the left or the right mouse button.
----@param mb string
+-- Checks if an ImGui widget was clicked.
+---@param button string A string representing a mouse button: `lmb` for Left Mouse Button or `rmb` for Right Mouse Button.
 ---@return boolean
---[[
-
-**Usage:**
-- mb: A string representing a mouse button. Can be either "lmb" for Left Mouse Button or "rmb" for Right Mouse Button.
-]]
-UI.IsItemClicked = function(mb)
-    local retBool = false
+UI.IsItemClicked = function(button)
     if mb == "lmb" then
-        retBool = ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and ImGui.IsItemClicked(0)
+        return (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and ImGui.IsItemClicked(0))
     elseif mb == "rmb" then
-        retBool = ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and ImGui.IsItemClicked(1)
-    else
-        error(
-            string.format(
-                "Error in function isItemClicked(): Invalid param %s. Correct inputs: 'lmb' for Left Mouse Button or 'rmb' for Right Mouse Button.",
-                mb),
-            2)
+        return (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and ImGui.IsItemClicked(1))
     end
-    return retBool
+
+    return false
 end
 
 -- Sets the clipboard text.
@@ -1181,7 +1157,7 @@ end
 ---@param cond boolean
 UI.SetClipBoard = function(text, cond)
     if cond then
-        UI.widgetSound("Click")
+        UI.WidgetSound("Click")
         ImGui.SetClipboardText(text)
         YimToast:ShowMessage("Samurai's Scripts", "Link copied to clipboard.")
     end
@@ -1189,12 +1165,14 @@ end
 
 -- Plays a sound when an ImGui widget is clicked.
 ---@param sound string
-UI.widgetSound = function(sound)
-    if not disableUiSounds then
-        script.run_in_fiber(function()
-            AUDIO.PLAY_SOUND_FRONTEND(-1, t_UISounds[sound].soundName, t_UISounds[sound].soundRef, false)
-        end)
+UI.WidgetSound = function(sound)
+    if disableUiSounds or not t_UISounds[sound] then
+        return
     end
+
+    script.run_in_fiber(function()
+        AUDIO.PLAY_SOUND_FRONTEND(-1, t_UISounds[sound].soundName, t_UISounds[sound].soundRef, false)
+    end)
 end
 
 
@@ -1273,7 +1251,7 @@ SS.SetMovement = function(data, isJson)
 end
 
 ---@param warehouse table
-SS.GetCEOwhouseInfo = function(warehouse)
+SS.GetCEOwarehouseInfo = function(warehouse)
     script.run_in_fiber(function()
         local property_index = (stats.get_int(("MPX_PROP_WHOUSE_SLOT%d"):format(warehouse.id)) - 1)
         warehouse.name       = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(("MP_WHOUSE_%d"):format(property_index))
@@ -1455,7 +1433,7 @@ SS.SetKeyboardHotkey = function(keybind)
         ImGui.Dummy(5, 1)
         ImGui.SameLine()
         if UI.ColoredButton(string.format(" %s ##Shortcut", _T("GENERIC_CLEAR_BTN_")), "#FFDB58", "#FFFAA0", "#FFFFF0", 0.7) then
-            UI.widgetSound("Cancel")
+            UI.WidgetSound("Cancel")
             key_code, key_name = nil, nil
         end
     end
@@ -1463,7 +1441,7 @@ SS.SetKeyboardHotkey = function(keybind)
     ImGui.Dummy(1, 10)
     if not _reserved and key_code ~= nil then
         if ImGui.Button(string.format("%s##keybinds", _T("GENERIC_CONFIRM_BTN_"))) then
-            UI.widgetSound("Select")
+            UI.WidgetSound("Select")
             keybind.code, keybind.name = key_code, string.format("[%s]", key_name)
             CFG:SaveItem("keybinds", keybinds)
             key_code, key_name = nil, nil
@@ -1474,7 +1452,7 @@ SS.SetKeyboardHotkey = function(keybind)
     end
 
     if ImGui.Button(string.format("%s##keybinds", _T("GENERIC_CANCEL_BTN_"))) then
-        UI.widgetSound("Cancel")
+        UI.WidgetSound("Cancel")
         key_code, key_name = nil, nil
         start_loading_anim = false
         is_setting_hotkeys = false
@@ -1495,7 +1473,7 @@ SS.OpenKeyboardHotkeysWindow = function(window_name, keybind)
     )
 
     if UI.IsItemClicked('lmb') then
-        UI.widgetSound("Select2")
+        UI.WidgetSound("Select2")
         ImGui.OpenPopup(window_name)
         is_setting_hotkeys = true
     end
@@ -1503,7 +1481,7 @@ SS.OpenKeyboardHotkeysWindow = function(window_name, keybind)
     ImGui.SameLine()
     ImGui.BeginDisabled(keybind.code == 0x0)
     if ImGui.Button(string.format("%s##%s", _T("GENERIC_UNBIND_LABEL_"), window_name)) then
-        UI.widgetSound("Delete")
+        UI.WidgetSound("Delete")
         keybind.code, keybind.name = 0x0, "[Unbound]"
         CFG:SaveItem("keybinds", keybinds)
     end
@@ -1556,7 +1534,7 @@ SS.SetControllerHotkey = function(keybind)
                 "#FFFFF0",
                 0.7
             ) then
-            UI.widgetSound("Cancel")
+            UI.WidgetSound("Cancel")
             gpad_keyCode, gpad_keyName = nil, nil
         end
     end
@@ -1564,7 +1542,7 @@ SS.SetControllerHotkey = function(keybind)
     ImGui.Dummy(1, 10)
     if not _reserved and gpad_keyCode ~= nil then
         if ImGui.Button(string.format("%s##gpadkeybinds", _T("GENERIC_CONFIRM_BTN_"))) then
-            UI.widgetSound("Select")
+            UI.WidgetSound("Select")
             keybind.code, keybind.name = gpad_keyCode, gpad_keyName
             CFG:SaveItem("gpad_keybinds", gpad_keybinds)
             gpad_keyCode, gpad_keyName = nil, nil
@@ -1575,7 +1553,7 @@ SS.SetControllerHotkey = function(keybind)
     end
 
     if ImGui.Button(string.format("%s##gpadkeybinds", _T("GENERIC_CANCEL_BTN_"))) then
-        UI.widgetSound("Cancel")
+        UI.WidgetSound("Cancel")
         gpad_keyCode, gpad_keyName = nil, nil
         start_loading_anim = false
         is_setting_hotkeys = false
@@ -1601,7 +1579,7 @@ SS.OpenControllerHotkeysWindow = function(window_name, keybind)
     )
 
     if UI.IsItemClicked('lmb') then
-        UI.widgetSound("Select2")
+        UI.WidgetSound("Select2")
         ImGui.OpenPopup(window_name)
         is_setting_hotkeys = true
     end
@@ -1609,7 +1587,7 @@ SS.OpenControllerHotkeysWindow = function(window_name, keybind)
     ImGui.SameLine()
     ImGui.BeginDisabled(keybind.code == 0)
     if ImGui.Button(string.format("%s##%s", _T("GENERIC_UNBIND_LABEL_"), window_name)) then
-        UI.widgetSound("Delete")
+        UI.WidgetSound("Delete")
         keybind.code, keybind.name = 0, "[Unbound]"
         CFG:SaveItem("gpad_keybinds", gpad_keybinds)
     end
@@ -1629,7 +1607,7 @@ SS.OpenControllerHotkeysWindow = function(window_name, keybind)
     end
 end
 
--- Handle config key addition/removal
+-- Handles config key addition/removal.
 ---@param saved table
 ---@param default table
 SS.SyncConfing = function(saved, default)
@@ -1649,6 +1627,7 @@ SS.SyncConfing = function(saved, default)
             SS.debug(string.format("Removed redundant config key: '%s'", k))
         end
     end
+
     CFG:Save(saved)
 end
 
@@ -1832,8 +1811,12 @@ SS.HandleEvents = function()
         is_sitting, thisSeat = false, 0
     end
 
-    Self.Vehicle.IsEngineBrakeDisabled, Self.Vehicle.HasKersBoost, Self.Vehicle.IsOffroaderEnabled,
-    Self.Vehicle.HasRallyTires, Self.Vehicle.IsTractionControlDisabled, Self.Vehicle.IsLowSpeedWheelieEnabled = false, false, false, false, false, false
+    Self.Vehicle.IsEngineBrakeDisabled = false
+    Self.Vehicle.HasKersBoost = false
+    Self.Vehicle.IsOffroaderEnabled = false
+    Self.Vehicle.HasRallyTires = false
+    Self.Vehicle.IsTractionControlDisabled = false
+    Self.Vehicle.IsLowSpeedWheelieEnabled = false
 
     if is_hiding then
         if hiding_in_boot or hiding_in_dumpster then
@@ -1876,77 +1859,46 @@ SS.UpdateNPCdriveTask = function()
     else
         TASK.TASK_VEHICLE_DRIVE_WANDER(i_NpcDriver, i_ThisVeh, npcDrivingSpeed, npcDrivingFlags)
     end
-    YimToast:ShowMessage("Samurai's Scripts",
-        string.format("NPC driving style changed to %s.", npcDriveSwitch == 0 and "Normal" or "Aggressive"))
+    YimToast:ShowMessage(
+        "Samurai's Scripts",
+        string.format("NPC driving style changed to %s.", npcDriveSwitch == 0 and "Normal" or "Aggressive")
+    )
 end
 
 ---@param crates number
 SS.GetCEOCratesOffset = function(crates)
-    if crates ~= nil and crates > 0 then
-        if crates == 1 then
-            return 15732 -- EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1
-        end
-        if crates == 2 then
-            return 15733
-        end
-        if crates == 3 then
-            return 15734
-        end
-        if crates == 4 or crates == 5 then
-            return 15735
-        end
-        if crates == 6 or crates == 7 then
-            return 15736
-        end
-        if crates == 8 or crates == 9 then
-            return 15737
-        end
-        if crates >= 10 and crates <= 14 then
-            return 15738
-        end
-        if crates >= 15 and crates <= 19 then
-            return 15739
-        end
-        if crates >= 20 and crates <= 24 then
-            return 15740
-        end
-        if crates >= 25 and crates <= 29 then
-            return 15741
-        end
-        if crates >= 30 and crates <= 34 then
-            return 15742
-        end
-        if crates >= 35 and crates <= 39 then
-            return 15743
-        end
-        if crates >= 40 and crates <= 44 then
-            return 15744
-        end
-        if crates >= 45 and crates <= 49 then
-            return 15745
-        end
-        if crates >= 50 and crates <= 59 then
-            return 15746
-        end
-        if crates >= 60 and crates <= 69 then
-            return 15747
-        end
-        if crates >= 70 and crates <= 79 then
-            return 15748
-        end
-        if crates >= 80 and crates <= 89 then
-            return 15749
-        end
-        if crates >= 90 and crates <= 99 then
-            return 15750
-        end
-        if crates >= 100 and crates <= 110 then
-            return 15751
-        end
-        if crates == 111 then
-            return 15752
-        end
+    if not crates or crates <= 0 then
+        return 0
     end
+
+    if crates == 1 then
+        return 15732 -- EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1
+    end
+
+    if crates == 2 then
+        return 15733
+    end
+
+    if crates == 3 then
+        return 15734
+    end
+
+    if crates == 4 or crates == 5 then
+        return 15735
+    end
+
+    if crates >= 6 and crates <= 9 then
+        return 15735 + math.floor((crates - 4) / 2)
+    end
+
+    if crates >= 10 and crates <= 110 then
+        return 15738 + math.floor((crates - 10) / 5)
+    end
+
+    if crates == 111 then
+        return 15752
+    end
+
     return 0
 end
 
@@ -1967,7 +1919,7 @@ SS.ResetSettings = function()
 end
 
 SS.IsUsingAirctaftMG = function()
-    if Self.IsDriving() and (is_plane or is_heli) and Game.Vehicle.IsWeaponized(self.get_veh()) then
+    if Self.IsDriving() and (Self.Vehicle.IsPlane or Self.Vehicle.IsHeli) and Game.Vehicle.IsWeaponized(self.get_veh()) then
         local armed, weapon = WEAPON.GET_CURRENT_PED_VEHICLE_WEAPON(Self.GetPedID(), weapon)
         if armed then
             for _, v in ipairs(t_AircraftMGs) do

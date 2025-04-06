@@ -8,51 +8,51 @@ log.info("version " .. SCRIPT_VERSION)
 SS.SyncConfing(CFG:Read(), DEFAULT_CONFIG)
 
 Samurais_scripts = gui.add_tab("Samurai's Scripts")
-Samurais_scripts:add_imgui(mainUI)
+Samurais_scripts:add_imgui(MainUI)
 
 self_tab = Samurais_scripts:add_tab(_T("SELF_TAB_"))
-self_tab:add_imgui(selfUI)
+self_tab:add_imgui(SelfUI)
 
 Actions = self_tab:add_tab("Actions ")
-Actions:add_imgui(actionsUI)
+Actions:add_imgui(YimActionsUI)
 
 sound_player = self_tab:add_tab(_T("SOUND_PLAYER_"))
 sound_player:add_imgui(SoundPlayerUI)
 
 weapon_tab = Samurais_scripts:add_tab(_T("WEAPON_TAB_"))
-weapon_tab:add_imgui(weaponUI)
+weapon_tab:add_imgui(WeaponsUI)
 
 vehicle_tab = Samurais_scripts:add_tab(_T("VEHICLE_TAB_"))
-vehicle_tab:add_imgui(vehicleUI)
+vehicle_tab:add_imgui(VehicleUI)
 
 custom_paints_tab = vehicle_tab:add_tab("Custom Paint Jobs")
 custom_paints_tab:add_imgui(CustomPaintsUI)
 
 drift_mode_tab = vehicle_tab:add_tab("Drift Mode")
-drift_mode_tab:add_imgui(driftModeUI)
+drift_mode_tab:add_imgui(DriftModeUI)
 
 flatbed_tab = vehicle_tab:add_tab("Flatbed")
-flatbed_tab:add_imgui(flatbedUI)
+flatbed_tab:add_imgui(FlatbedUI)
 
 handling_tab = vehicle_tab:add_tab("Handling Editor")
-handling_tab:add_imgui(handingEditorUI)
+handling_tab:add_imgui(HandingEditorUI)
 
 vehicle_creator = vehicle_tab:add_tab("Vehicle Creator")
-vehicle_creator:add_imgui(vCreatorUI)
+vehicle_creator:add_imgui(VehicleCreatorUI)
 
 online_tab = Samurais_scripts:add_tab("Online ")
 
 business_tab = online_tab:add_tab("Business Manager (YRV2)")
-business_tab:add_imgui(yrv2UI)
+business_tab:add_imgui(YRV2UI)
 
 casino_pacino = online_tab:add_tab("Casino Pacino ") -- IT'S NOT AL ANYMORE! IT'S DUNK!
-casino_pacino:add_imgui(dunkUI)
+casino_pacino:add_imgui(DunkUI)
 
 world_tab = Samurais_scripts:add_tab(_T("WORLD_TAB_"))
-world_tab:add_imgui(worldUI)
+world_tab:add_imgui(WorldUI)
 
 object_spawner = world_tab:add_tab("Object Spawner ")
-object_spawner:add_imgui(objectSpawnerUI)
+object_spawner:add_imgui(ObjectSpawnerUI)
 
 settings_tab = Samurais_scripts:add_tab(_T("SETTINGS_TAB_"))
 settings_tab:add_imgui(SettingsUI)
@@ -69,6 +69,9 @@ gui.add_always_draw_imgui(function()
         Self.Vehicle.Speed * i_SpeedometerUnitModifier,
         math.floor((Self.Vehicle.MaxSpeed * (not fast_vehicles and 1.4 or 1.2)) * i_SpeedometerUnitModifier),
         speedometer_gear_display,
+        Self.Vehicle.Altitude,
+        2500,
+        Self.Vehicle.LandingGearState,
         0.0
     )
 end)
@@ -1214,7 +1217,7 @@ script.register_looped("SS_ANIM_HK", function(script) -- Anim Hotkeys
     if not HUD.IS_PAUSE_MENU_ACTIVE() and not HUD.IS_MP_TEXT_CHAT_TYPING() then
         if is_playing_anim then
             if SS.IsKeyJustPressed(keybinds.stop_anim.code) and not Self.IsBrowsingApps() then
-                UI.widgetSound("Cancel")
+                UI.WidgetSound("Cancel")
                 cleanup(script)
                 is_playing_anim  = false
                 is_shortcut_anim = false
@@ -1228,7 +1231,7 @@ script.register_looped("SS_ANIM_HK", function(script) -- Anim Hotkeys
                 UpdatefilteredAnims()
             end
             if SS.IsKeyJustPressed(keybinds.next_anim.code) and not Self.IsBrowsingApps() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 if i_AnimIndex < #t_FilteredAnims - 1 then
                     i_AnimIndex = i_AnimIndex + 1
                 else
@@ -1239,7 +1242,7 @@ script.register_looped("SS_ANIM_HK", function(script) -- Anim Hotkeys
                 script:sleep(200)
             end
             if SS.IsKeyJustPressed(keybinds.previous_anim.code) and not Self.IsBrowsingApps() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 if i_AnimIndex <= 0 then
                     i_AnimIndex = #t_FilteredAnims - 1
                 else
@@ -1254,11 +1257,11 @@ script.register_looped("SS_ANIM_HK", function(script) -- Anim Hotkeys
                     if not is_playing_anim then
                         if info ~= nil then
                             if info.cat == "In-Vehicle" and (Self.IsOnFoot() or not Self.Vehicle.IsCar) then
-                                UI.widgetSound("Error")
+                                UI.WidgetSound("Error")
                                 YimToast:ShowError("Samurai's Scripts",
                                     "This animation can only be played while sitting inside a vehicle (cars and trucks only).")
                             else
-                                UI.widgetSound("Select")
+                                UI.WidgetSound("Select")
                                 local mycoords     = ENTITY.GET_ENTITY_COORDS(Self.GetPedID(), false)
                                 local myheading    = ENTITY.GET_ENTITY_HEADING(Self.GetPedID())
                                 local myforwardX   = ENTITY.GET_ENTITY_FORWARD_X(Self.GetPedID())
@@ -1282,7 +1285,7 @@ script.register_looped("SS_ANIM_HK", function(script) -- Anim Hotkeys
                             script:sleep(200)
                         end
                     else
-                        UI.widgetSound("Error")
+                        UI.WidgetSound("Error")
                         if not PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
                             PAD.SET_CONTROL_SHAKE(0, 500, 250)
                         end
@@ -1298,7 +1301,7 @@ script.register_looped("SS_ANIM_HK", function(script) -- Anim Hotkeys
                         script:sleep(800)
                     end
                 else
-                    UI.widgetSound("Error")
+                    UI.WidgetSound("Error")
                     YimToast:ShowError("Samurais Scripts",
                         "You can not play animations while grabbing an NPC, grabbing a vehicle or hiding.")
                     script:sleep(800)
@@ -1648,9 +1651,7 @@ script.register_looped("SS_VEHICLE", function(script)
         speedometer.enabled and
         Self.IsDriving() and
         (Self.Vehicle.BodyHealth > 0) and not
-        HUD.IS_PAUSE_MENU_ACTIVE() and not
-        Self.Vehicle.IsPlane and not
-        Self.Vehicle.IsHeli
+        HUD.IS_PAUSE_MENU_ACTIVE()
     )
 
     if PED.IS_PED_IN_ANY_VEHICLE(Self.GetPedID(), false) then
@@ -1676,6 +1677,7 @@ script.register_looped("SS_VEHICLE", function(script)
         end
 
         validModel = (Self.Vehicle.IsCar or Self.Vehicle.IsQuad or Self.Vehicle.IsBike)
+
         if validModel and (driftMode or DriftTires) then
             if pressing_drift_button then
                 if not drift_started then
@@ -2799,8 +2801,8 @@ script.register_looped("SS_CARCRASH", function(die) -- Better Car Crashes
         local crashed, _ = CheckVehicleCollision()
 
         if PED.IS_PED_SITTING_IN_VEHICLE(Self.GetPedID(), Self.Vehicle.Current) then
-            local deform_mult = Memory.GetVehicleInfo().m_deformation_mult
-            if deform_mult ~= nil and deform_mult:is_valid() then
+            local deform_mult = Memory.GetVehicleInfo(Self.Vehicle.Current).m_deformation_mult
+            if deform_mult and deform_mult:is_valid() then
                 if deform_mult:get_float() < 2.0 then
                     deform_mult:set_float(2.0)
                 end
@@ -2890,7 +2892,7 @@ script.register_looped("SS_MISC_PLANES", function()
         -- wait for the plane to go over the low altitude speed limit then start increasing its top speed and don't go over 500km/h
         -- 576km/h is fast and safe (the game engine's max). Higher speeds my break the game.
         if Self.Vehicle.Speed >= 73 and Self.Vehicle.Speed < 160 then
-            if PAD.IS_CONTROL_PRESSED(0, 87) and VEHICLE.GET_LANDING_GEAR_STATE(Self.Vehicle.Current) == 4 then
+            if PAD.IS_CONTROL_PRESSED(0, 87) and Self.Vehicle.LandingGearState == 4 then
                 VEHICLE.SET_VEHICLE_FORWARD_SPEED(Self.Vehicle.Current, (Self.Vehicle.Speed + jet_increase))
             end
         end
@@ -3741,10 +3743,10 @@ script.register_looped("SS_CASINOPACINO", function(script)
                             end
                         end
                         for playing_player_iter = 0, total_players, 1 do
-                            set_poker_cards(playing_player_iter, players_current_table, 50, 51, 52)
+                            SetPokerCards(playing_player_iter, players_current_table, 50, 51, 52)
                         end
                         if set_dealers_poker_cards then
-                            set_poker_cards(total_players + 1, players_current_table, 1, 8, 22)
+                            SetPokerCards(total_players + 1, players_current_table, 1, 8, 22)
                         end
                     end
                 end
@@ -3758,7 +3760,7 @@ script.register_looped("SS_CASINOPACINO", function(script)
             if blackjack_table ~= -1 then
                 dealers_card     = locals.get_int("blackjack",
                     blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1) --Dealer's facedown card.
-                dealers_card_str = get_cardname_from_index(dealers_card)
+                dealers_card_str = GetCardNameFromIndex(dealers_card)
             else
                 dealers_card_str = _T("CP_NOT_PLAYING_BJ_TXT_")
             end
@@ -3933,7 +3935,7 @@ script.register_looped("SS_HSUPP", function(hgl)
         end
         if hangarOwned then
             if stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL") == 50 then
-                UI.widgetSound("Error")
+                UI.WidgetSound("Error")
                 YimToast:ShowWarning("Samurai's Scripts", "Your Hangar is already full! Option has been disabled.", false,
                     1.5)
                 hangarLoop = false
@@ -3962,10 +3964,10 @@ script.register_looped("SS_WH1SUPP", function(wh_1)
         end
         if whouse_1_owned then
             if whouse1.name == "" then
-                SS.GetCEOwhouseInfo(whouse1)
+                SS.GetCEOwarehouseInfo(whouse1)
             end
             if stats.get_int("MPX_CONTOTALFORWHOUSE0") == whouse1.max then
-                UI.widgetSound("Error")
+                UI.WidgetSound("Error")
                 YimToast:ShowWarning("Samurai's Scripts", "Warehouse N°1 is already full! Option has been disabled.",
                     false, 1.5)
                 wh1_loop = false
@@ -3980,7 +3982,7 @@ script.register_looped("SS_WH1SUPP", function(wh_1)
                 end
             end
         else
-            UI.widgetSound("Error")
+            UI.WidgetSound("Error")
             YimToast:ShowWarning("Samurai's Scripts", "No warehouse found at this slot!", false, 1.5)
             wh1_loop = false
         end
@@ -3994,10 +3996,10 @@ script.register_looped("SS_WH2SUPP", function(wh_2)
         end
         if whouse_2_owned then
             if whouse2.name == "" then
-                SS.GetCEOwhouseInfo(whouse2)
+                SS.GetCEOwarehouseInfo(whouse2)
             end
             if stats.get_int("MPX_CONTOTALFORWHOUSE1") == whouse2.max then
-                UI.widgetSound("Error")
+                UI.WidgetSound("Error")
                 YimToast:ShowWarning("Samurai's Scripts", "Warehouse N°2 is already full! Option has been disabled.",
                     false, 1.5)
                 wh2_loop = false
@@ -4012,7 +4014,7 @@ script.register_looped("SS_WH2SUPP", function(wh_2)
                 end
             end
         else
-            UI.widgetSound("Error")
+            UI.WidgetSound("Error")
             YimToast:ShowWarning("Samurai's Scripts", "No warehouse found at this slot!", false, 1.5)
             wh2_loop = false
         end
@@ -4026,10 +4028,10 @@ script.register_looped("SS_WH3SUPP", function(wh_3)
         end
         if whouse_3_owned then
             if whouse3.name == "" then
-                SS.GetCEOwhouseInfo(whouse3)
+                SS.GetCEOwarehouseInfo(whouse3)
             end
             if stats.get_int("MPX_CONTOTALFORWHOUSE2") == whouse3.max then
-                UI.widgetSound("Error")
+                UI.WidgetSound("Error")
                 YimToast:ShowWarning("Samurai's Scripts", "Warehouse N°3 is already full! Option has been disabled.",
                     false, 1.5)
                 wh3_loop = false
@@ -4044,7 +4046,7 @@ script.register_looped("SS_WH3SUPP", function(wh_3)
                 end
             end
         else
-            UI.widgetSound("Error")
+            UI.WidgetSound("Error")
             YimToast:ShowWarning("Samurai's Scripts", "No warehouse found at this slot!", false, 1.5)
             wh3_loop = false
         end
@@ -4058,10 +4060,10 @@ script.register_looped("SS_WH4SUPP", function(wh_4)
         end
         if whouse_4_owned then
             if whouse4.name == "" then
-                SS.GetCEOwhouseInfo(whouse4)
+                SS.GetCEOwarehouseInfo(whouse4)
             end
             if stats.get_int("MPX_CONTOTALFORWHOUSE3") == whouse4.max then
-                UI.widgetSound("Error")
+                UI.WidgetSound("Error")
                 YimToast:ShowWarning("Samurai's Scripts", "Warehouse N°4 is already full! Option has been disabled.",
                     false, 1.5)
                 wh4_loop = false
@@ -4076,7 +4078,7 @@ script.register_looped("SS_WH4SUPP", function(wh_4)
                 end
             end
         else
-            UI.widgetSound("Error")
+            UI.WidgetSound("Error")
             YimToast:ShowWarning("Samurai's Scripts", "No warehouse found at this slot!", false, 1.5)
             wh4_loop = false
         end
@@ -4090,10 +4092,10 @@ script.register_looped("SS_WH5SUPP", function(wh_5)
         end
         if whouse_5_owned then
             if whouse5.name == "" then
-                SS.GetCEOwhouseInfo(whouse5)
+                SS.GetCEOwarehouseInfo(whouse5)
             end
             if stats.get_int("MPX_CONTOTALFORWHOUSE4") == whouse5.max then
-                UI.widgetSound("Error")
+                UI.WidgetSound("Error")
                 YimToast:ShowWarning("Samurai's Scripts", "Warehouse N°5 is already full! Option has been disabled.",
                     false, 1.5)
                 wh5_loop = false
@@ -4108,7 +4110,7 @@ script.register_looped("SS_WH5SUPP", function(wh_5)
                 end
             end
         else
-            UI.widgetSound("Error")
+            UI.WidgetSound("Error")
             YimToast:ShowWarning("Samurai's Scripts", "No warehouse found at this slot!", false, 1.5)
             wh5_loop = false
         end

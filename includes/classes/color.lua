@@ -36,8 +36,8 @@ Color.__tostring = function(self)
     )
     end
 
-    local f_r, f_g, f_b, f_a = self:ToFloat()
-    local i_r, i_g, i_b, i_a = self:ToRGBA()
+    local f_r, f_g, f_b, f_a = self:AsFloat()
+    local i_r, i_g, i_b, i_a = self:AsRGBA()
     return string.format(
         [[
 
@@ -55,12 +55,14 @@ Color.__tostring = function(self)
         i_g,
         i_b,
         i_a,
-        self:ToImU32(),
-        self:ToHex()
+        self:AsU32(),
+        self:AsHex()
     )
 end
 
-Color.print = Color.__tostring
+function Color:print()
+    log.debug(tostring(self))
+end
 
 function Color:GetValue()
     if not self.type or not self.arg or not self.arg[1] then
@@ -80,6 +82,7 @@ function Color:GetValue()
         return ret_str:gsub(", $", "")
     end
 end
+
 -- Constructor
 --
 -- Returns a `Color` instance.
@@ -139,7 +142,7 @@ function Color:New(...)
         if type(args[1]) == "string" then
             if args[1]:match("^#?%x%x%x%x%x%x$") or args[1]:match("^#?%x%x%x%x%x%x%x%x$") then
                 instance.type = "hex"
-                instance.r, instance.g, instance.b, instance.a = instance:ToRGBA()
+                instance.r, instance.g, instance.b, instance.a = instance:AsRGBA()
             else
                 if self.string_colors[args[1]] then
                     local _arg = self.string_colors[args[1]]
@@ -168,7 +171,7 @@ end
 
 -- Returns a color in **RGBA** format.
 ---@return number, number, number, number
-function Color:ToRGBA()
+function Color:AsRGBA()
     if self.type then
         if self.type:lower() == "rgba" then
             return self()
@@ -182,23 +185,25 @@ function Color:ToRGBA()
             local hex = self.value:gsub("#", "")
 
             if #hex ~= 6 and #hex ~= 8 then
-                log.warning("[Color Error]: Invalid hex color format. Expected 6 or 8 characters.")
+                log.warning(
+                    ("[Color Error]: Invalid hex format! Expected 6 or 8 characters, got %d instead."):format(#hex)
+                )
                 return 0, 0, 0, 0
             end
 
             local r = tonumber(hex:sub(1, 2), 16)
             local g = tonumber(hex:sub(3, 4), 16)
             local b = tonumber(hex:sub(5, 6), 16)
-            local a = #hex == 8 and tonumber(hex:sub(7, 8), 16) or 255
+            local a = (#hex == 8) and tonumber(hex:sub(7, 8), 16) or 255
 
             return r, g, b, a
         end
 
         if self.type:lower() == "imu32" then
-            local r = (self.value >> 0) & 0xFF
-            local g = (self.value >> 8) & 0xFF
-            local b = (self.value >> 16) & 0xFF
-            local a = (self.value >> 24) & 0xFF
+            local r = (self.value >> 0x0) & 0xFF
+            local g = (self.value >> 0x8) & 0xFF
+            local b = (self.value >> 0x10) & 0xFF
+            local a = (self.value >> 0x18) & 0xFF
             return r, g, b, a
         end
     end
@@ -208,7 +213,7 @@ function Color:ToRGBA()
 end
 
 -- Returns a color in float format.
-function Color:ToFloat()
+function Color:AsFloat()
     if not self.type then
         return
     end
@@ -216,12 +221,12 @@ function Color:ToFloat()
     if self.type:lower() == "float" then
         return self()
     else
-        local r, g, b, a = self:ToRGBA()
+        local r, g, b, a = self:AsRGBA()
         return r / 255, g / 255, b / 255, a / 255
     end
 end
 
-function Color:ToHex()
+function Color:AsHex()
     if not self.type then
         return
     end
@@ -229,14 +234,14 @@ function Color:ToHex()
     if self.type:lower() == "hex" then
         return self:GetValue()
     else
-        local r, g, b, a = self:ToRGBA()
+        local r, g, b, a = self:AsRGBA()
         return string.format("#%02X%02X%02X%02X", r, g, b, a)
     end
 end
 
 -- Returns a uint32 color in **ABGR** format.
 ---@return number
-function Color:ToImU32()
+function Color:AsU32()
     if not self.type then
         return 0x0
     end
@@ -244,28 +249,9 @@ function Color:ToImU32()
     if self.type:lower() == "imu32" then
         return self.value
     else
-        local r, g, b, a = self:ToRGBA()
+        local r, g, b, a = self:AsRGBA()
         return (a << 0x18) | (b << 0x10) | (g << 0x8) | r
     end
-end
-
--- Wrapper for `Color:ToImU32()`
---
-----------------------------------
--- Returns a uint32 color in **ABGR** format.
----@return number
-function ImU32(...)
-    local color = Color:New(...)
-    return color:ToImU32()
-end
-
--- Wrapper for `Color:ToFloat()`
---
-----------------------------------
--- Returns ImGui color floats in **RGBA** format.
-function ImCol(...)
-    local color = Color:New(...)
-    return color:ToFloat()
 end
 
 -- Wrapper for `Color:New()`
@@ -274,4 +260,21 @@ end
 -- Returns a `Color` instance.
 function Col(...)
     return Color:New(...)
+end
+
+-- Wrapper for `Color:ToImU32()`
+--
+----------------------------------
+-- Returns a uint32 color in **ABGR** format.
+---@return number
+function ImU32(...)
+    return Col(...):AsU32()
+end
+
+-- Wrapper for `Color:ToFloat()`
+--
+----------------------------------
+-- Returns ImGui color floats in **RGBA** format.
+function ImCol(...)
+    return Col(...):AsFloat()
 end

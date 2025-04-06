@@ -73,6 +73,15 @@ function VehicleManager.OnEnter()
         end
     end
 
+    if Self.Vehicle.IsPlane or Self.Vehicle.IsHeli and Self.IsDriving() then
+        Self.Vehicle.LandingGearState = VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(Self.Vehicle.Current) and VEHICLE.GET_LANDING_GEAR_STATE(Self.Vehicle.Current) or -1
+        Self.Vehicle.Altitude = ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(Self.Vehicle.Current)
+        Self.Vehicle.Throttle = VEHICLE.GET_VEHICLE_THROTTLE_(Self.Vehicle.Current)
+        if Self.Vehicle.Throttle <= 0 then
+            Self.Vehicle.Throttle = 0.05
+        end
+    end
+
     if Self.IsDriving() and (Self.Vehicle.Current ~= Self.Vehicle.Previous) then
         VehicleManager.OnSwitch()
     end

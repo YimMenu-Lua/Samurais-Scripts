@@ -97,7 +97,7 @@ function CommandExecutor:Draw()
         end
 
         if self.cmd_entered then
-            UI.widgetSound("Click")
+            UI.WidgetSound("Click")
             should_draw_cmd_ui = false
             cmd_ui_is_open = false
             gui.override_mouse(false)

@@ -129,20 +129,22 @@ end
 ---@param is_primary boolean
 ---@param is_secondary boolean
 Game.Vehicle.SetCustomPaint = function(vehicle, hex, p, m, is_primary, is_secondary)
-    if ENTITY.DOES_ENTITY_EXIST(vehicle) then
-        local pt = m and 3 or 1
-        local r, g, b = Lua_fn.HexToRGB(hex)
-        VEHICLE.SET_VEHICLE_MOD_KIT(vehicle, 0)
-        if is_primary then
-            VEHICLE.SET_VEHICLE_MOD_COLOR_1(vehicle, pt, 0, p)
-            VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, r, g, b)
-            VEHICLE.SET_VEHICLE_EXTRA_COLOURS(vehicle, p, 0)
+    script.run_in_fiber(function()
+        if ENTITY.DOES_ENTITY_EXIST(vehicle) then
+            local pt = m and 3 or 1
+            local r, g, b, _ = Col(hex):AsRGBA()
+            VEHICLE.SET_VEHICLE_MOD_KIT(vehicle, 0)
+            if is_primary then
+                VEHICLE.SET_VEHICLE_MOD_COLOR_1(vehicle, pt, 0, p)
+                VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(vehicle, r, g, b)
+                VEHICLE.SET_VEHICLE_EXTRA_COLOURS(vehicle, p, 0)
+            end
+            if is_secondary then
+                VEHICLE.SET_VEHICLE_MOD_COLOR_2(vehicle, pt, 0)
+                VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, r, g, b)
+            end
         end
-        if is_secondary then
-            VEHICLE.SET_VEHICLE_MOD_COLOR_2(vehicle, pt, 0)
-            VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(vehicle, r, g, b)
-        end
-    end
+    end)
 end
 
 ---@param vehicle integer

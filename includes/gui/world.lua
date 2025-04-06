@@ -30,7 +30,7 @@ local ShowNPCvehicleControls = function()
                         end
                         mySeat = mySeat - 1
                         if VEHICLE.IS_VEHICLE_SEAT_FREE(i_ThisVeh, mySeat, true) then
-                            UI.widgetSound("Nav")
+                            UI.WidgetSound("Nav")
                             PED.SET_PED_INTO_VEHICLE(Self.GetPedID(), i_ThisVeh, mySeat)
                         else
                             mySeat = mySeat - 1
@@ -50,7 +50,7 @@ local ShowNPCvehicleControls = function()
                         end
                         mySeat = mySeat + 1
                         if VEHICLE.IS_VEHICLE_SEAT_FREE(i_ThisVeh, mySeat, true) then
-                            UI.widgetSound("Nav")
+                            UI.WidgetSound("Nav")
                             PED.SET_PED_INTO_VEHICLE(Self.GetPedID(), i_ThisVeh, mySeat)
                         else
                             mySeat = mySeat + 1
@@ -68,7 +68,7 @@ local ShowNPCvehicleControls = function()
             local mainRadioButtonParam = npc_veh_radio_on and "OFF" or
                 t_RadioStations[math.random(1, (#t_RadioStations - 1))].station
             if ImGui.Button(mainRadioButtonLabel) then
-                UI.widgetSound("Select2")
+                UI.WidgetSound("Select2")
                 script.run_in_fiber(function()
                     AUDIO.SET_VEH_RADIO_STATION(i_ThisVeh, mainRadioButtonParam)
                 end)
@@ -76,14 +76,14 @@ local ShowNPCvehicleControls = function()
             if npc_veh_radio_on then
                 ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
                 if ImGui.Button("< Previous Station") then
-                    UI.widgetSound("Nav")
+                    UI.WidgetSound("Nav")
                     script.run_in_fiber(function()
                         AUDIO.SET_RADIO_RETUNE_DOWN()
                     end)
                 end
                 ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
                 if ImGui.Button("Next Station >") then
-                    UI.widgetSound("Nav")
+                    UI.WidgetSound("Nav")
                     script.run_in_fiber(function()
                         AUDIO.SET_RADIO_RETUNE_UP()
                     end)
@@ -107,10 +107,10 @@ local ShowNPCvehicleControls = function()
                 ImGui.BeginDisabled(npc_veh_roof_state == 1 or npc_veh_roof_state == 3)
                 if ImGui.Button(roofButtonLabel) then
                     if npc_veh_speed > 6.66 then
-                        UI.widgetSound("Error")
+                        UI.WidgetSound("Error")
                         YimToast:ShowError("Samurai's Scripts", "You can not operate the convertible roof at this speed.")
                     end
-                    UI.widgetSound("Select")
+                    UI.WidgetSound("Select")
                     script.run_in_fiber(function()
                         if npc_veh_roof_state == 0 then
                             VEHICLE.LOWER_CONVERTIBLE_ROOF(i_ThisVeh, false)
@@ -126,7 +126,7 @@ local ShowNPCvehicleControls = function()
             ImGui.BulletText("Driving Style:"); ImGui.SameLine(); npcDriveSwitch, isChanged = ImGui.RadioButton("Chill",
                 npcDriveSwitch, 0)
             if isChanged then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 npcDrivingFlags = 803243
                 npcDrivingSpeed = 19
                 script.run_in_fiber(function()
@@ -138,7 +138,7 @@ local ShowNPCvehicleControls = function()
             ImGui.SameLine()
             npcDriveSwitch, isChanged = ImGui.RadioButton("Aggressive", npcDriveSwitch, 1)
             if isChanged then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 npcDrivingFlags = 787324
                 npcDrivingSpeed = 70.0
                 script.run_in_fiber(function()
@@ -183,11 +183,11 @@ local ShowNPCvehicleControls = function()
                 script.run_in_fiber(function()
                     local waypoint = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_WAYPOINT_BLIP_ENUM_ID())
                     if not HUD.DOES_BLIP_EXIST(waypoint) then
-                        UI.widgetSound("Error")
+                        UI.WidgetSound("Error")
                         YimToast:ShowError("Samurai's Scripts", "Please set a waypoint on the map first!")
                         return
                     else
-                        UI.widgetSound("Select")
+                        UI.WidgetSound("Select")
                         if npcDriveTask ~= "" then
                             TASK.CLEAR_PED_TASKS(i_NpcDriver)
                             TASK.CLEAR_PED_SECONDARY_TASK(i_NpcDriver)
@@ -205,7 +205,7 @@ local ShowNPCvehicleControls = function()
             if ImGui.Button("Drive To Objective") then
                 local objective_found, objective_coords = Game.FindObjectiveBlip()
                 if not objective_found then
-                    UI.widgetSound("Error")
+                    UI.WidgetSound("Error")
                     YimToast:ShowError("Samurai's Scripts", "No objective found!")
                 else
                     npcDriveDest = objective_coords
@@ -221,7 +221,7 @@ local ShowNPCvehicleControls = function()
     end
 end
 
-function worldUI()
+function WorldUI()
     f_PosY = 560
     if pedGrabber or vehicleGrabber then
         f_PosY = f_PosY + 60
@@ -236,13 +236,13 @@ function worldUI()
     pedGrabber, pgUsed = ImGui.Checkbox(_T("PED_GRABBER_CB_"), pedGrabber)
     UI.HelpMarker(_T("PED_GRABBER_DESC_"))
     if pgUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         vehicleGrabber = false
     end
     vehicleGrabber, vgUsed = ImGui.Checkbox("Vehicle Grabber", vehicleGrabber)
     UI.HelpMarker(_T("VEH_GRABBER_DESC_"))
     if vgUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         pedGrabber = false
     end
     ImGui.EndDisabled()
@@ -254,19 +254,19 @@ function worldUI()
         pedthrowF, ptfUsed = ImGui.SliderInt("##throw_force", pedthrowF, 10, 100, "%d", 0)
         ImGui.PopItemWidth()
         if ptfUsed then
-            UI.widgetSound("Nav")
+            UI.WidgetSound("Nav")
         end
     end
 
     carpool, carpoolUsed = ImGui.Checkbox(_T("CARPOOL_CB_"), carpool)
     UI.HelpMarker(_T("CARPOOL_DESC_"))
     if carpoolUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
     end
 
     animateNPCs, used = ImGui.Checkbox(_T("ANIMATE_NPCS_CB_"), animateNPCs)
     if used then
-        UI.widgetSound("Nav")
+        UI.WidgetSound("Nav")
     end
     UI.HelpMarker(_T("ANIMATE_NPCS_DESC_"))
     if animateNPCs then
@@ -277,7 +277,7 @@ function worldUI()
         ImGui.SameLine()
         if not hijack_started then
             if ImGui.Button(string.format("  %s  ##hjStart", _T("GENERIC_PLAY_BTN_"))) then
-                UI.widgetSound("Select")
+                UI.WidgetSound("Select")
                 script.run_in_fiber(function(hjk)
                     local gta_peds = entities.get_all_peds_as_handles()
                     while not STREAMING.HAS_ANIM_DICT_LOADED(hijackData.dict) do
@@ -300,7 +300,7 @@ function worldUI()
             end
         else
             if ImGui.Button(string.format("  %s  ##hjStop", _T("GENERIC_STOP_BTN_"))) then
-                UI.widgetSound("Cancel")
+                UI.WidgetSound("Cancel")
                 script.run_in_fiber(function()
                     local gta_peds = entities.get_all_peds_as_handles()
                     for _, npc in ipairs(gta_peds) do
@@ -319,7 +319,7 @@ function worldUI()
     kamikazeDrivers, kdUsed = ImGui.Checkbox(_T("KAMIKAZE_DRIVERS_CB_"), kamikazeDrivers)
     UI.HelpMarker(_T("KAMIKAZE_DRIVERS_DESC_"))
     if kdUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         if kamikazeDrivers then
             publicEnemy = false
         end
@@ -328,7 +328,7 @@ function worldUI()
     publicEnemy, peUsed = ImGui.Checkbox(_T("PUBLIC_ENEMY_CB_"), publicEnemy)
     UI.HelpMarker(_T("PUBLIC_ENEMY_DESC_"))
     if peUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         if publicEnemy then
             kamikazeDrivers = false
             runaway         = false
@@ -366,14 +366,14 @@ function worldUI()
     public_seats, pseatsUsed = ImGui.Checkbox("Public Seating", public_seats)
     UI.HelpMarker(_T("PUBLIC_SEATS_DESC_"))
     if pseatsUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         CFG:SaveItem("public_seats", public_seats)
     end
 
     ambient_scenarios, ascnUsed = ImGui.Checkbox("Ambient Scenarios", ambient_scenarios)
     UI.HelpMarker(_T("AMB_SCN_DESC_"))
     if ascnUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         CFG:SaveItem("ambient_scenarios", ambient_scenarios)
     end
 
@@ -382,7 +382,7 @@ function worldUI()
         ambient_scenario_prompt, ascnpUsed = ImGui.Checkbox("Show Prompt", ambient_scenario_prompt)
         UI.HelpMarker("Enable or disable button prompts when near an ambient scenario location.")
         if ascnpUsed then
-            UI.widgetSound("Nav2")
+            UI.WidgetSound("Nav2")
             CFG:SaveItem("ambient_scenario_prompt", ambient_scenario_prompt)
         end
     end
@@ -390,7 +390,7 @@ function worldUI()
     extend_world, ewbUsed = ImGui.Checkbox(_T("EXTEND_WORLD_CB_"), extend_world)
     UI.HelpMarker(_T("EXTEND_WORLD_DESC_"))
     if ewbUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         CFG:SaveItem("extend_world", extend_world)
         if not extend_world then
             script.run_in_fiber(function()
@@ -403,7 +403,7 @@ function worldUI()
     disable_waves, dowUsed = ImGui.Checkbox(_T("SMOOTH_WATERS_CB_"), disable_waves)
     UI.HelpMarker(_T("SMOOTH_WATERS_DESC_"))
     if dowUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         Game.World.DisableOceanWaves(disable_waves)
     end
     ImGui.PopStyleVar()

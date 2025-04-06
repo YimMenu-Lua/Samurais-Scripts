@@ -78,12 +78,12 @@ function SoundPlayerUI()
         i_SoundSwitch, 0); ImGui
         .SameLine()
     if isChanged then
-        UI.widgetSound("Nav")
+        UI.WidgetSound("Nav")
     end
     ImGui.Dummy(20, 1); ImGui.SameLine(); i_SoundSwitch, isChanged = ImGui.RadioButton(_T("FEMALE_SOUNDS_"),
         i_SoundSwitch, 1)
     if isChanged then
-        UI.widgetSound("Nav")
+        UI.WidgetSound("Nav")
     end
     ImGui.Spacing()
     if i_SoundSwitch == 0 then

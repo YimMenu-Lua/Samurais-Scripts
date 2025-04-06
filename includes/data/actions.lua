@@ -511,7 +511,7 @@ end
 function playAnim(Info, target, Flag, prop1, prop2, loopedFX, propPed, targetBone, targetCoords, targetHeading,
                   targetForwardX, targetForwardY, targetBoneCoords, propTable, ptfxTable, s)
     if Info.cat == "In-Vehicle" and (Self.IsOnFoot() or not Self.Vehicle.IsCar) then
-        UI.widgetSound("Error")
+        UI.WidgetSound("Error")
         YimToast:ShowError(
             "Samurai's Scripts",
             "This animation can only be played while sitting inside a vehicle (cars and trucks only)."

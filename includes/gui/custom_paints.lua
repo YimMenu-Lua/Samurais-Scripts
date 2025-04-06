@@ -1,12 +1,13 @@
 ---@diagnostic disable
 
+local selected_paint
 local i_CustomPaintIndex   = 0
 local i_PaintsColSortIndex = 0
 local i_PaintsMfrSortIndex = 0
 local i_PaintsSortbySwitch = 0
 
 local function SortCustomPaints()
-    filteredPaints = {}
+    local filteredPaints = {}
     for _, v in ipairs(t_CustomPaints) do
         if i_PaintsSortbySwitch == 0 then
             if i_PaintsColSortIndex == 0 then
@@ -37,28 +38,50 @@ local function SortCustomPaints()
     table.sort(filteredPaints, function(a, b)
         return a.name < b.name
     end)
+
+    return filteredPaints
 end
 
 local function DisplayCustomPaints()
-    SortCustomPaints()
-    local customPaintNames = {}
-    for _, v in ipairs(filteredPaints) do
-        table.insert(customPaintNames, v.name)
+    filteredPaints = SortCustomPaints()
+    if ImGui.BeginListBox("##CustomPaints", 420, 0) then
+        for i = 1, #filteredPaints do
+            local is_selected = (i_CustomPaintIndex == i - 1)
+            if ImGui.Selectable(filteredPaints[i].name, is_selected) then
+                i_CustomPaintIndex = i - 1
+            end
+            if ImGui.IsItemHovered() then
+                ImGui.SetNextWindowSize(220, 140)
+                ImGui.BeginTooltip()
+                local r, g, b, a = ImCol(filteredPaints[i].hex)
+                ImGui.SetNextWindowBgAlpha(1.0)
+                ImGui.PushStyleColor(ImGuiCol.ChildBg, r, g, b, a)
+                ImGui.BeginChild("##colDisplay", 0, 80)
+                ImGui.EndChild()
+                ImGui.PopStyleColor()
+                ImGui.Spacing()
+                ImGui.SetWindowFontScale(0.7)
+                ImGui.BulletText("Colors look different in-game.")
+                ImGui.SetWindowFontScale(1.0)
+                ImGui.EndTooltip()
+            end
+
+            if is_selected then
+                selected_paint = filteredPaints[i_CustomPaintIndex + 1]
+                ImGui.SetItemDefaultFocus()
+            end
+        end
+        ImGui.EndListBox()
     end
-    i_CustomPaintIndex, isChanged = ImGui.ListBox(
-        "##customPaintsList",
-        i_CustomPaintIndex,
-        customPaintNames,
-        #filteredPaints
-    )
 end
 
 local function ShowCustomPaintsCount()
-    if filteredPaints ~= nil then
-        ImGui.Text(string.format("[ %d ]", #filteredPaints))
-    else
-        ImGui.Text("[ 0 ]")
-    end
+    ImGui.Text(
+        string.format(
+            "[ %d ]",
+            filteredPaints and #filteredPaints or 0
+        )
+    )
 end
 
 function CustomPaintsUI()
@@ -66,16 +89,16 @@ function CustomPaintsUI()
         ImGui.Dummy(1, 5); ImGui.Text(_T("GET_IN_VEH_WARNING_"))
     else
         ImGui.BulletText(_T("SORT_BY_TXT_")); ImGui.SameLine()
-        i_PaintsSortbySwitch, isChanged = ImGui.RadioButton(_T("SORT_BY_COLOR_TXT_"), i_PaintsSortbySwitch, 0); ImGui
-            .SameLine(); ImGui
-            .Dummy(35, 1)
+        i_PaintsSortbySwitch, isChanged = ImGui.RadioButton(_T("SORT_BY_COLOR_TXT_"), i_PaintsSortbySwitch, 0)
+        ImGui.SameLine()
+        ImGui.Dummy(35, 1)
         if isChanged then
-            UI.widgetSound("Nav")
+            UI.WidgetSound("Nav")
         end
         ImGui.SameLine(); i_PaintsSortbySwitch, isChanged = ImGui.RadioButton(_T("SORT_BY_MFR_TXT_"),
             i_PaintsSortbySwitch, 1)
         if isChanged then
-            UI.widgetSound("Nav")
+            UI.WidgetSound("Nav")
         end
         ImGui.PushItemWidth(180)
         if i_PaintsSortbySwitch == 0 then
@@ -83,7 +106,7 @@ function CustomPaintsUI()
             i_PaintsColSortIndex, sortbyUsed = ImGui.Combo("##sortpaintjobs", i_PaintsColSortIndex, t_CustomPintShades,
                 #t_CustomPintShades)
             if sortbyUsed then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_CustomPaintIndex = 0
             end
             ImGui.SameLine(); ShowCustomPaintsCount()
@@ -92,7 +115,7 @@ function CustomPaintsUI()
             i_PaintsMfrSortIndex, sortbyMfrUsed = ImGui.Combo("##sortpaintjobs2", i_PaintsMfrSortIndex, t_CustomPaintsManufacturers,
                 #t_CustomPaintsManufacturers)
             if sortbyMfrUsed then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_CustomPaintIndex = 0
             end
         end
@@ -101,34 +124,38 @@ function CustomPaintsUI()
         custom_paints_sq, cpsqUsed = ImGui.InputTextWithHint("##custompaintssq", _T("GENERIC_SEARCH_HINT_"),
             custom_paints_sq, 64)
         is_typing = ImGui.IsItemActive()
-        DisplayCustomPaints()
         ImGui.PopItemWidth()
-        local selected_paint = filteredPaints[i_CustomPaintIndex + 1]
+        DisplayCustomPaints()
         ImGui.Spacing()
         ImGui.BeginDisabled(selected_paint == nil)
         mf_overwrite, movwUsed = ImGui.Checkbox(_T("CUSTOM_PAINT_MATTE_CB_"),
             selected_paint ~= nil and selected_paint.m or false)
         UI.Tooltip(_T("APPLY_MATTE_DESC_"))
         if movwUsed then
-            UI.widgetSound("Nav2")
+            UI.WidgetSound("Nav2")
             selected_paint.m = not selected_paint.m
         end
         ImGui.Separator()
         is_primary, isPused = ImGui.Checkbox(_T("COL_PRIMARY_CB_"), is_primary); ImGui.SameLine()
         is_secondary, isSused = ImGui.Checkbox(_T("COL_SECONDARY_CB_"), is_secondary)
         if isPused or isSused then
-            UI.widgetSound("Nav2")
+            UI.WidgetSound("Nav2")
         end
         local text_x, _ = ImGui.CalcTextSize(_T("GENERIC_CONFIRM_BTN_"))
         if ImGui.Button(_T("GENERIC_CONFIRM_BTN_"), text_x + 20, 40) and selected_paint ~= nil then
             if not is_primary and not is_secondary then
-                UI.widgetSound("Error")
+                UI.WidgetSound("Error")
                 YimToast:ShowError("Samurai's Scripts", _T("CUSTOM_PAINT_NOT_SELECTED_ERR_"))
             else
-                UI.widgetSound("Select")
-                Game.Vehicle.SetCustomPaint(Self.Vehicle.Current, selected_paint.hex, selected_paint.p, selected_paint.m,
+                UI.WidgetSound("Select")
+                Game.Vehicle.SetCustomPaint(
+                    Self.Vehicle.Current,
+                    selected_paint.hex,
+                    selected_paint.p,
+                    selected_paint.m,
                     is_primary,
-                    is_secondary)
+                    is_secondary
+                )
             end
         end
         ImGui.EndDisabled()

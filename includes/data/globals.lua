@@ -1,7 +1,7 @@
 ---@diagnostic disable
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = "1.6.3"
+SCRIPT_VERSION = "1.6.4"
 TARGET_BUILD   = "3442"
 TARGET_VERSION = "1.70"
 DEFAULT_CONFIG = {
@@ -232,6 +232,7 @@ nos_started                           = false
 twostep_started                       = false
 is_typing                             = false
 is_setting_hotkeys                    = false
+is_shooting_flares                    = false
 engine_sound_changed                  = false
 open_sounds_window                    = false
 open_engine_swap_window               = false

@@ -1,26 +1,26 @@
 ---@diagnostic disable
 
-function weaponUI()
+function WeaponsUI()
     ImGui.BeginChild("WeaponChild", 340, 480, true)
     ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 25, 25)
     HashGrabber, HgUsed = ImGui.Checkbox(_T("HASHGRABBER_CB_"), HashGrabber)
     UI.Tooltip(_T("HASHGRABBER_DESC_"))
     if HgUsed then
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
     end
 
     Triggerbot, TbUsed = ImGui.Checkbox(_T("TRIGGERBOT_CB_"), Triggerbot)
     UI.Tooltip(_T("TRIGGERBOT_DESC_"))
     if TbUsed then
         CFG:SaveItem("Triggerbot", Triggerbot)
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
     end
 
     if Triggerbot then
         ImGui.SameLine(); aimEnemy, aimEnemyUsed = ImGui.Checkbox(_T("ENEMY_ONLY_CB_"), aimEnemy)
         if aimEnemyUsed then
             CFG:SaveItem("aimEnemy", aimEnemy)
-            UI.widgetSound("Nav2")
+            UI.WidgetSound("Nav2")
         end
     end
 
@@ -28,21 +28,21 @@ function weaponUI()
     UI.Tooltip(_T("MAGIC_BULLET_DESC_"))
     if mbUsed then
         CFG:SaveItem("MagicBullet", MagicBullet)
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
     end
 
     autoKill, autoKillUsed = ImGui.Checkbox(_T("AUTOKILL_CB_"), autoKill)
     UI.Tooltip(_T("AUTOKILL_DESC_"))
     if autoKillUsed then
         CFG:SaveItem("autoKill", autoKill)
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
     end
 
     runaway, runawayUsed = ImGui.Checkbox(_T("ENEMIES_FLEE_CB_"), runaway)
     UI.Tooltip(_T("ENEMIES_FLEE_DESC_"))
     if runawayUsed then
         CFG:SaveItem("runaway", runaway)
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
         if runaway then
             publicEnemy = false
         end
@@ -52,7 +52,7 @@ function weaponUI()
     UI.Tooltip(_T("KATANA_DESC_"))
     if rpqUsed then
         CFG:SaveItem("replace_pool_q", replace_pool_q)
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
     end
 
     if replace_pool_q then
@@ -61,7 +61,7 @@ function weaponUI()
             { "Baseball Bat", "Golf Club", "Machete", "Pool Que" }, 4)
         UI.Tooltip(_T("KATANA_WPN_CHOICE_DESC_"))
         if kriUsed then
-            UI.widgetSound("Nav")
+            UI.WidgetSound("Nav")
             if katana_replace_index == 0 then
                 katana_replace_model = 0x958A4A8F
             elseif katana_replace_index == 1 then
@@ -89,7 +89,7 @@ function weaponUI()
     UI.Tooltip(_T("LASER_SIGHT_DESC_"))
     if laserSightUSed then
         CFG:SaveItem("laserSight", laserSight)
-        UI.widgetSound("Nav2")
+        UI.WidgetSound("Nav2")
     end
     if laserSight then
         ImGui.Text(_T("LASER_CHOICE_TXT_"))
@@ -97,7 +97,7 @@ function weaponUI()
         ImGui.SameLine(); laser_switch, lsrswUsed_2 = ImGui.RadioButton("Green", laser_switch, 1)
         ImGui.SameLine(); laser_switch, lsrswUsed_3 = ImGui.RadioButton("Blue", laser_switch, 2)
         if lsrswUsed or lsrswUsed_2 or lsrswUsed_3 then
-            UI.widgetSound("Nav")
+            UI.WidgetSound("Nav")
             if laser_switch == 0 then
                 laser_choice = {
                     r = 237,

@@ -1,6 +1,6 @@
 ---@diagnostic disable
----@meta
----Class representing a 3D vector.
+
+-- Class representing a 3D vector.
 ---@class vec3
 ---@field x float x component of the vector.
 ---@field y float y component of the vector.

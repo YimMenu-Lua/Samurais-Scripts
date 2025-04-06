@@ -1,6 +1,6 @@
 ---@diagnostic disable
 
-function yrv2UI()
+function YRV2UI()
     local window_width = ImGui.GetWindowWidth()
     ImGui.Spacing()
     ImGui.Dummy((window_width / 2) - 110, 1)
@@ -34,7 +34,7 @@ function yrv2UI()
                 if ImGui.BeginTabItem(_T("CEO_WHOUSES_TXT_")) then
                     ImGui.Spacing()
                     if whouse_1_owned then
-                        if whouse1.name == "" then SS.GetCEOwhouseInfo(whouse1) end
+                        if whouse1.name == "" then SS.GetCEOwarehouseInfo(whouse1) end
                         wh1Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE0")
                         if wh1Supplies ~= nil and wh1Supplies > 0 then
                             local wh1Value = globals.get_int(tun_global + SS.GetCEOCratesOffset(wh1Supplies))
@@ -51,10 +51,10 @@ function yrv2UI()
                             if whouse1.pos and Self.IsOutside() then
                                 if ImGui.Button("Teleport##wh1") then
                                     if vec3:distance(self.get_pos(), whouse1.pos) < 10 then
-                                        UI.widgetSound("Error")
+                                        UI.WidgetSound("Error")
                                         YimToast:ShowWarning("Samurai's Scripts", "It's right there bruh!")
                                     else
-                                        UI.widgetSound("Select")
+                                        UI.WidgetSound("Select")
                                         Self.Teleport(true, whouse1.pos)
                                     end
                                 end
@@ -67,14 +67,14 @@ function yrv2UI()
                                 ImGui.EndDisabled(); ImGui.SameLine(); wh1_loop, wh1lUsed = ImGui.Checkbox("Auto##wh1",
                                     wh1_loop)
                                 if wh1lUsed then
-                                    UI.widgetSound("Nav2")
+                                    UI.WidgetSound("Nav2")
                                 end
                             end
                         end
                     end
                     -- 2
                     if whouse_2_owned then
-                        if whouse2.name == "" then SS.GetCEOwhouseInfo(whouse2) end
+                        if whouse2.name == "" then SS.GetCEOwarehouseInfo(whouse2) end
                         wh2Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE1")
                         if wh2Supplies ~= nil and wh2Supplies > 0 then
                             local wh2Value = globals.get_int(tun_global + SS.GetCEOCratesOffset(wh2Supplies))
@@ -91,10 +91,10 @@ function yrv2UI()
                             if whouse2.pos and Self.IsOutside() then
                                 if ImGui.Button("Teleport##wh2") then
                                     if vec3:distance(self.get_pos(), whouse2.pos) < 10 then
-                                        UI.widgetSound("Error")
+                                        UI.WidgetSound("Error")
                                         YimToast:ShowWarning("Samurai's Scripts", "It's right there bruh!")
                                     else
-                                        UI.widgetSound("Select")
+                                        UI.WidgetSound("Select")
                                         Self.Teleport(true, whouse2.pos)
                                     end
                                 end
@@ -107,14 +107,14 @@ function yrv2UI()
                                 ImGui.EndDisabled(); ImGui.SameLine(); wh2_loop, wh2lUsed = ImGui.Checkbox("Auto##wh2",
                                     wh2_loop)
                                 if wh2lUsed then
-                                    UI.widgetSound("Nav2")
+                                    UI.WidgetSound("Nav2")
                                 end
                             end
                         end
                     end
                     -- 3
                     if whouse_3_owned then
-                        if whouse3.name == "" then SS.GetCEOwhouseInfo(whouse3) end
+                        if whouse3.name == "" then SS.GetCEOwarehouseInfo(whouse3) end
                         wh3Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE2")
                         if wh3Supplies ~= nil and wh3Supplies > 0 then
                             local wh3Value = globals.get_int(tun_global + SS.GetCEOCratesOffset(wh3Supplies))
@@ -131,10 +131,10 @@ function yrv2UI()
                             if whouse3.pos and Self.IsOutside() then
                                 if ImGui.Button("Teleport##wh3") then
                                     if vec3:distance(self.get_pos(), whouse3.pos) < 10 then
-                                        UI.widgetSound("Error")
+                                        UI.WidgetSound("Error")
                                         YimToast:ShowWarning("Samurai's Scripts", "It's right there bruh!")
                                     else
-                                        UI.widgetSound("Select")
+                                        UI.WidgetSound("Select")
                                         Self.Teleport(true, whouse3.pos)
                                     end
                                 end
@@ -147,14 +147,14 @@ function yrv2UI()
                                 ImGui.EndDisabled(); ImGui.SameLine(); wh3_loop, wh3lUsed = ImGui.Checkbox("Auto##wh3",
                                     wh3_loop)
                                 if wh3lUsed then
-                                    UI.widgetSound("Nav2")
+                                    UI.WidgetSound("Nav2")
                                 end
                             end
                         end
                     end
                     -- 4
                     if whouse_4_owned then
-                        if whouse4.name == "" then SS.GetCEOwhouseInfo(whouse4) end
+                        if whouse4.name == "" then SS.GetCEOwarehouseInfo(whouse4) end
                         wh4Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE3")
                         if wh4Supplies ~= nil and wh4Supplies > 0 then
                             local wh4Value = globals.get_int(tun_global + SS.GetCEOCratesOffset(wh4Supplies))
@@ -171,10 +171,10 @@ function yrv2UI()
                             if whouse4.pos and Self.IsOutside() then
                                 if ImGui.Button("Teleport##wh4") then
                                     if vec3:distance(self.get_pos(), whouse4.pos) < 10 then
-                                        UI.widgetSound("Error")
+                                        UI.WidgetSound("Error")
                                         YimToast:ShowWarning("Samurai's Scripts", "It's right there bruh!")
                                     else
-                                        UI.widgetSound("Select")
+                                        UI.WidgetSound("Select")
                                         Self.Teleport(true, whouse4.pos)
                                     end
                                 end
@@ -187,14 +187,14 @@ function yrv2UI()
                                 ImGui.EndDisabled(); ImGui.SameLine(); wh4_loop, wh4lUsed = ImGui.Checkbox("Auto##wh4",
                                     wh4_loop)
                                 if wh4lUsed then
-                                    UI.widgetSound("Nav2")
+                                    UI.WidgetSound("Nav2")
                                 end
                             end
                         end
                     end
                     -- 5
                     if whouse_5_owned then
-                        if whouse5.name == "" then SS.GetCEOwhouseInfo(whouse5) end
+                        if whouse5.name == "" then SS.GetCEOwarehouseInfo(whouse5) end
                         wh5Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE4")
                         if wh5Supplies ~= nil and wh5Supplies > 0 then
                             local wh5Value = globals.get_int(tun_global + SS.GetCEOCratesOffset(wh5Supplies))
@@ -211,10 +211,10 @@ function yrv2UI()
                             if whouse5.pos and Self.IsOutside() then
                                 if ImGui.Button("Teleport##wh5") then
                                     if vec3:distance(self.get_pos(), whouse5.pos) < 10 then
-                                        UI.widgetSound("Error")
+                                        UI.WidgetSound("Error")
                                         YimToast:ShowWarning("Samurai's Scripts", "It's right there bruh!")
                                     else
-                                        UI.widgetSound("Select")
+                                        UI.WidgetSound("Select")
                                         Self.Teleport(true, whouse5.pos)
                                     end
                                 end
@@ -227,7 +227,7 @@ function yrv2UI()
                                 ImGui.EndDisabled(); ImGui.SameLine(); wh5_loop, wh5lUsed = ImGui.Checkbox("Auto##wh5",
                                     wh5_loop)
                                 if wh5lUsed then
-                                    UI.widgetSound("Nav2")
+                                    UI.WidgetSound("Nav2")
                                 end
                             end
                         end
@@ -236,7 +236,7 @@ function yrv2UI()
                     local bCond = not script.is_active("gb_contraband_buy") and not script.is_active("fm_content_cargo")
                     ImGui.BeginDisabled(bCond)
                     if ImGui.Button("Finish Cargo Source Mission") then
-                        UI.widgetSound("Select")
+                        UI.WidgetSound("Select")
                         SS.FinishCargoSourceMission()
                     end
                     ImGui.EndDisabled()
@@ -270,7 +270,7 @@ function yrv2UI()
                         ImGui.EndDisabled()
                         ImGui.SameLine(); hangarLoop, hlUsed = ImGui.Checkbox("Auto##hangar", hangarLoop)
                         if hlUsed then
-                            UI.widgetSound("Nav2")
+                            UI.WidgetSound("Nav2")
                         end
                     end
                     ImGui.BulletText("Stock:"); ImGui.SameLine(); ImGui.Dummy(33, 1); ImGui.SameLine();
@@ -280,7 +280,7 @@ function yrv2UI()
                     if Self.IsOutside() then
                         ImGui.Spacing(); ImGui.SeparatorText(_T("QUICK_TP_TXT_"))
                         if ImGui.Button("Teleport To Hangar") then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             Self.Teleport(true, hangar_pos)
                         end
                     end
@@ -343,7 +343,7 @@ function yrv2UI()
                     if Self.IsOutside() then
                         ImGui.Spacing(); ImGui.SeparatorText("Quick Teleport")
                         if ImGui.Button("Teleport To Bunker") then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             Self.Teleport(true, t_Bunkers[bunker_index].coords)
                         end
                     end
@@ -531,7 +531,7 @@ function yrv2UI()
                         script.run_in_fiber(function()
                             local blip = HUD.GET_FIRST_BLIP_INFO_ID(bb.slot0.blip)
                             if HUD.DOES_BLIP_EXIST(blip) then
-                                UI.widgetSound("Select")
+                                UI.WidgetSound("Select")
                                 local coords = HUD.GET_BLIP_COORDS(blip)
                                 Self.Teleport(false, coords)
                             end
@@ -545,7 +545,7 @@ function yrv2UI()
                         script.run_in_fiber(function()
                             local blip = HUD.GET_FIRST_BLIP_INFO_ID(bb.slot1.blip)
                             if HUD.DOES_BLIP_EXIST(blip) then
-                                UI.widgetSound("Select")
+                                UI.WidgetSound("Select")
                                 local coords = HUD.GET_BLIP_COORDS(blip)
                                 Self.Teleport(false, coords)
                             end
@@ -559,7 +559,7 @@ function yrv2UI()
                         script.run_in_fiber(function()
                             local blip = HUD.GET_FIRST_BLIP_INFO_ID(bb.slot2.blip)
                             if HUD.DOES_BLIP_EXIST(m_blip) then
-                                UI.widgetSound("Select")
+                                UI.WidgetSound("Select")
                                 local coords = HUD.GET_BLIP_COORDS(blip)
                                 Self.Teleport(false, coords)
                             end
@@ -572,7 +572,7 @@ function yrv2UI()
                         script.run_in_fiber(function()
                             local blip = HUD.GET_FIRST_BLIP_INFO_ID(bb.slot3.blip)
                             if HUD.DOES_BLIP_EXIST(blip) then
-                                UI.widgetSound("Select")
+                                UI.WidgetSound("Select")
                                 local coords = HUD.GET_BLIP_COORDS(blip)
                                 Self.Teleport(false, coords)
                             end
@@ -586,7 +586,7 @@ function yrv2UI()
                         script.run_in_fiber(function()
                             local blip = HUD.GET_FIRST_BLIP_INFO_ID(bb.slot4.blip)
                             if HUD.DOES_BLIP_EXIST(blip) then
-                                UI.widgetSound("Select")
+                                UI.WidgetSound("Select")
                                 local coords = HUD.GET_BLIP_COORDS(blip)
                                 Self.Teleport(false, coords)
                             end
@@ -601,7 +601,7 @@ function yrv2UI()
                             local acid_blip = HUD.GET_FIRST_BLIP_INFO_ID(848)
                             local acid_coords
                             if HUD.DOES_BLIP_EXIST(acid_blip) then
-                                UI.widgetSound("Select")
+                                UI.WidgetSound("Select")
                                 acid_coords = HUD.GET_BLIP_COORDS(acid_blip)
                                 Self.Teleport(false, acid_coords)
                             end
@@ -631,7 +631,7 @@ function yrv2UI()
                     if currentNcPop < 1000 then
                         ImGui.SameLine()
                         if ImGui.Button("Max Popularity") then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             stats.set_int("MPX_CLUB_POPULARITY", currentNcPop + popDiff)
                             YimToast:ShowSuccess("Samurai's Scripts", "Nightclub popularity increased.")
                         end
@@ -641,7 +641,7 @@ function yrv2UI()
                     if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##nc") then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             script.run_in_fiber(function()
                                 local ncBlip = HUD.GET_FIRST_BLIP_INFO_ID(614)
                                 local ncLoc
@@ -666,7 +666,7 @@ function yrv2UI()
                     if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##arcade") then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             script.run_in_fiber(function()
                                 local arBlip = HUD.GET_FIRST_BLIP_INFO_ID(740)
                                 local arLoc
@@ -689,7 +689,7 @@ function yrv2UI()
                     if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##agnc") then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             script.run_in_fiber(function()
                                 local agncBlip = HUD.GET_FIRST_BLIP_INFO_ID(826)
                                 local agncLoc
@@ -713,7 +713,7 @@ function yrv2UI()
                     if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##mc") then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             script.run_in_fiber(function()
                                 local mcBlip = HUD.GET_FIRST_BLIP_INFO_ID(492)
                                 local mcLoc
@@ -736,7 +736,7 @@ function yrv2UI()
                     if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##bail") then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             script.run_in_fiber(function()
                                 local bailBlip = HUD.GET_FIRST_BLIP_INFO_ID(893)
                                 local bailLoc
@@ -760,7 +760,7 @@ function yrv2UI()
                     if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##salvage") then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             script.run_in_fiber(function()
                                 local slvgBlip = HUD.GET_FIRST_BLIP_INFO_ID(867)
                                 if HUD.DOES_BLIP_EXIST(slvgBlip) then
@@ -782,7 +782,7 @@ function yrv2UI()
                     if Self.IsOutside() then
                         ImGui.SameLine()
                         if ImGui.Button("Teleport##H24") then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             script.run_in_fiber(function()
                                 local H24Blip = HUD.GET_FIRST_BLIP_INFO_ID(900)
                                 if HUD.DOES_BLIP_EXIST(H24Blip) then
@@ -814,7 +814,7 @@ function yrv2UI()
                                 globals.set_int(1943773, 0)
                             end
                             if Game.RequestScript("appArcadeBusinessHub") then
-                                UI.widgetSound("Select")
+                                UI.WidgetSound("Select")
                                 abhubScriptHandle = SYSTEM.START_NEW_SCRIPT("appArcadeBusinessHub", 1424) -- STACK_SIZE_DEFAULT
                                 SCRIPT.SET_SCRIPT_AS_NO_LONGER_NEEDED("appArcadeBusinessHub")
                                 mct:sleep(100)
@@ -833,26 +833,26 @@ function yrv2UI()
                             end
                         end)
                     else
-                        UI.widgetSound("Error")
+                        UI.WidgetSound("Error")
                     end
                 end
                 ImGui.SeparatorText("Cooldowns")
                 mc_work_cd, mcworkUsed = ImGui.Checkbox("MC Club Work", mc_work_cd)
                 if mcworkUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("mc_work_cd", mc_work_cd)
                 end
 
                 ImGui.SameLine(); ImGui.Dummy(58, 1); ImGui.SameLine()
                 hangar_cd, hcdUsed = ImGui.Checkbox("Hangar Crate Steal", hangar_cd)
                 if hcdUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("hangar_cd", hangar_cd)
                 end
 
                 nc_management_cd, ncmanagementUsed = ImGui.Checkbox("Nightclub Management", nc_management_cd)
                 if ncmanagementUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("nc_management_cd", nc_management_cd)
                 end
 
@@ -861,39 +861,39 @@ function yrv2UI()
                 UI.HelpMarker(false,
                     "Always spawns the troublemaker nightclub missions and disables the knocked out VIP missions.")
                 if nvipmcUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("nc_vip_mission_chance", nc_vip_mission_chance)
                 end
 
                 ie_vehicle_steal_cd, ievstealUsed = ImGui.Checkbox("I/E Vehicle Sourcing", ie_vehicle_steal_cd)
                 if ievstealUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("ie_vehicle_steal_cd", ie_vehicle_steal_cd)
                 end
 
                 ImGui.SameLine(); ImGui.Dummy(12, 1); ImGui.SameLine()
                 ie_vehicle_sell_cd, ievsellUsed = ImGui.Checkbox("I/E Vehicle Selling", ie_vehicle_sell_cd)
                 if ievsellUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("ie_vehicle_sell_cd", ie_vehicle_sell_cd)
                 end
 
                 ceo_crate_buy_cd, ceobUsed = ImGui.Checkbox("CEO Crate Buy", ceo_crate_buy_cd)
                 if ceobUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("ceo_crate_buy_cd", ceo_crate_buy_cd)
                 end
 
                 ImGui.SameLine(); ImGui.Dummy(55, 1); ImGui.SameLine()
                 ceo_crate_sell_cd, ceosUsed = ImGui.Checkbox("CEO Crate Sell", ceo_crate_sell_cd)
                 if ceosUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("ceo_crate_sell_cd", ceo_crate_sell_cd)
                 end
 
                 security_missions_cd, smcdUsed = ImGui.Checkbox("Security Missions", security_missions_cd)
                 if smcdUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("security_missions_cd", security_missions_cd)
                 end
 
@@ -908,14 +908,14 @@ function yrv2UI()
 
                 dax_work_cd, dwcdUsed = ImGui.Checkbox("Dax Work Cooldown", dax_work_cd)
                 if dwcdUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("dax_work_cd", dax_work_cd)
                 end
 
                 ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
                 garment_rob_cd, grcdUsed = ImGui.Checkbox("Garment Factory Files", garment_rob_cd)
                 if grcdUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("garment_rob_cd", garment_rob_cd)
                 end
 
@@ -928,7 +928,7 @@ function yrv2UI()
                     sBtnLabel, bParam = "Check All", true
                 end
                 if ImGui.Button(sBtnLabel or "", 120, 40) then
-                    UI.widgetSound("Select")
+                    UI.WidgetSound("Select")
                     mc_work_cd = bParam; CFG:SaveItem("mc_work_cd", mc_work_cd)
                     hangar_cd = bParam; CFG:SaveItem("hangar_cd", hangar_cd)
                     nc_management_cd = bParam; CFG:SaveItem("nc_management_cd", nc_management_cd)
@@ -951,7 +951,7 @@ function yrv2UI()
                     'yellow', 0.69, 30)
 
                 if ImGui.Button("Easy Biker Sell Missions") then
-                    UI.widgetSound("Select")
+                    UI.WidgetSound("Select")
                     for _, index in pairs(t_mc_sell_mission_types) do
                         if globals.get_int(index) == 0 then
                             globals.set_int(index, 1)
@@ -962,7 +962,7 @@ function yrv2UI()
 
                 ImGui.SameLine(); ImGui.Dummy(41, 1); ImGui.SameLine()
                 if ImGui.Button("Easy CEO Sell Missions") then
-                    UI.widgetSound("Select")
+                    UI.WidgetSound("Select")
                     for _, index in pairs(t_ceo_sell_mission_types) do
                         if globals.get_int(index) == 0 then
                             globals.set_int(index, 1)
@@ -972,7 +972,7 @@ function yrv2UI()
                 end
 
                 if ImGui.Button("Easy Nightclub Sell Missions") then
-                    UI.widgetSound("Select")
+                    UI.WidgetSound("Select")
                     for _, index in pairs(t_nc_sell_mission_types) do
                         if globals.get_float(index) > 0.0 then
                             globals.get_float(index, 0.0)
@@ -983,7 +983,7 @@ function yrv2UI()
 
                 ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
                 if ImGui.Button("Easy Hangar Sell Missions") then
-                    UI.widgetSound("Select")
+                    UI.WidgetSound("Select")
                     for _, index in pairs(t_hangar_sell_mission_types) do
                         if globals.get_float(index) > 0.0 then
                             globals.get_float(index, 0.0)
@@ -1008,7 +1008,7 @@ function yrv2UI()
                 ImGui.BeginDisabled(autosell_was_triggered)
                 autosell, autosellUsed = ImGui.Checkbox("Auto-Sell", autosell)
                 if autosellUsed then
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                     CFG:SaveItem("autosell", autosell)
                 end
                 ImGui.EndDisabled()
@@ -1020,7 +1020,7 @@ function yrv2UI()
                 else
                     ImGui.BeginDisabled(autosell or autosell_was_triggered or not scr_is_running)
                     if ImGui.Button("Manually Finish Sale") then
-                        UI.widgetSound("Select")
+                        UI.WidgetSound("Select")
                         SS.FinishSale(script_name)
                         autosell_was_triggered = true
                         script.run_in_fiber(function(s)

@@ -181,12 +181,16 @@
     - Increases the top speed of any *land* vehicle you drive.
 
   - **Speedometer:**
-    - A speedometer and tachometer combo with Gear, ABS, NOS, and ESC indicators:
+    - **Vehicles: A speedometer and tachometer combo with Gear, ABS, NOS, and ESC indicators:**
       - The speedometer has both a digital and an analog display simultaneously. The analog one adapts to the vehicle's maximum speed.
       - The gear indicator changes depending on the vehicle's class: D for normal drive mode, S for sport.
       - The ABS and ESC indicators will not flash if the vehicle doesn't have ABS as standard.
       - The NOS indicator is self explanatory: It lights up when you're using NOS.
-
+    - **Aircraft: When flying planes and helicopters, the speedometer automatically switches modes:**
+      - The analog display becomes an altimeter and the RPM gauge becomes a throttle indicator.
+      - The speed display in the middle stays the same.
+      - The lower indicators show Flares *(from the **Flares For All** feature)* and Landing Gear state.
+      - The highest altitude that the altimeter's needle can reach is 2500 meters but there's also an auxiliary text display that shows the exact altitue.
 
 - **Custom Paint Jobs:**
   - Apply a custom paint job to your vehicle from a list of real-life OEM and custom colors.

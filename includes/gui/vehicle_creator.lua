@@ -200,18 +200,18 @@ function VehicleCreator_ResetOnSave()
     vehicle_creation  = { name = "", main_veh = 0, mods = {}, color_1 = { r = 0, g = 0, b = 0 }, color_2 = { r = 0, g = 0, b = 0 }, tint = 0, attachments = {} }
 end
 
-function vCreatorUI()
+function VehicleCreatorUI()
     ImGui.Dummy(1, 10)
     i_PersistSwitch, pswChanged = ImGui.RadioButton(_T("CREATE_TXT_"), i_PersistSwitch, 0)
     UI.HelpMarker(_T("CREATOR_DESC_"))
     if pswChanged then
-        UI.widgetSound("Nav")
+        UI.WidgetSound("Nav")
     end
     if saved_vehicles[1] ~= nil then
         ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); i_PersistSwitch, pswChanged = ImGui.RadioButton(
             _T("SAVED_VEHS_TXT_"), i_PersistSwitch, 1)
         if pswChanged then
-            UI.widgetSound("Nav")
+            UI.WidgetSound("Nav")
         end
     else
         ImGui.BeginDisabled()
@@ -237,7 +237,7 @@ function vCreatorUI()
             vehicleName = t_FilteredVehicles[i_VehicleIndex + 1].name
         end
         if ImGui.Button(string.format("   %s   ##vehcreator", _T("GENERIC_SPAWN_BTN_"))) then
-            UI.widgetSound("Select")
+            UI.WidgetSound("Select")
             script.run_in_fiber(function()
                 local plyrCoords   = self.get_pos()
                 local plyrForwardX = Game.GetForwardX(Self.GetPedID())
@@ -269,7 +269,7 @@ function vCreatorUI()
         if saved_vehicles[1] == nil then
             ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
             if ImGui.Button(_T("VC_DEMO_VEH_BTN_")) then
-                UI.widgetSound("Select")
+                UI.WidgetSound("Select")
                 VehicleCreator_CreateWideBodyCivic()
                 VehicleCreator_SpawnPersistVeh(saved_vehicles[1].main_veh, saved_vehicles[1].mods, saved_vehicles[1].color_1,
                     saved_vehicles[1].color_2, saved_vehicles[1].tint, saved_vehicles[1].attachments)
@@ -283,7 +283,7 @@ function vCreatorUI()
             ImGui.Text(main_vehicle_name)
             ImGui.SameLine()
             if ImGui.Button(string.format(" %s ##mainVeh", _T("GENERIC_DELETE_BTN_"))) then
-                UI.widgetSound("Delete")
+                UI.WidgetSound("Delete")
                 script.run_in_fiber(function(delmv)
                     if entities.take_control_of(i_MainVehicle, 300) then
                         ENTITY.SET_ENTITY_AS_MISSION_ENTITY(i_MainVehicle, true, true)
@@ -319,7 +319,7 @@ function vCreatorUI()
             selectedVeh = spawned_vehicles[i_SpawnedVehIndex + 1]
             ImGui.SameLine()
             if ImGui.Button(string.format("   %s   ##spawnedVeh", _T("GENERIC_DELETE_BTN_"))) then
-                UI.widgetSound("Delete")
+                UI.WidgetSound("Delete")
                 script.run_in_fiber(function(del)
                     if entities.take_control_of(selectedVeh, 300) then
                         ENTITY.SET_ENTITY_AS_MISSION_ENTITY(selectedVeh, true, true)
@@ -343,7 +343,7 @@ function vCreatorUI()
                 if selectedVeh ~= i_MainVehicle then
                     script.run_in_fiber(function()
                         if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedVeh, i_MainVehicle) then
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedVeh, i_MainVehicle,
                                 ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), f_VehAttach_X,
                                 f_VehAttach_Y,
@@ -377,12 +377,12 @@ function vCreatorUI()
                             table.insert(veh_attachments, attached_vehicles)
                             attached_vehicles = { entity = 0, hash = 0, mods = {}, color_1 = { r = 0, g = 0, b = 0 }, color_2 = { r = 0, g = 0, b = 0 }, tint = 0, posx = 0.0, posy = 0.0, posz = 0.0, rotx = 0.0, roty = 0.0, rotz = 0.0 }
                         else
-                            UI.widgetSound("Error")
+                            UI.WidgetSound("Error")
                             YimToast:ShowError("Samurais Scripts", _T("VC_ALREADY_ATTACHED_"))
                         end
                     end)
                 else
-                    UI.widgetSound("Error")
+                    UI.WidgetSound("Error")
                     YimToast:ShowError("Samurais Scripts", _T("VC_SELF_ATTACH_ERR_"))
                 end
             end
@@ -403,7 +403,7 @@ function vCreatorUI()
             ImGui.Dummy(25, 1); ImGui.SameLine(); ImGui.Text("Z Axis :")
             ImGui.ArrowButton("##Xleft", 0)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.posx = i_SelectedAttachment.posx + 0.001 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -417,7 +417,7 @@ function vCreatorUI()
             ImGui.SameLine()
             ImGui.ArrowButton("##XRight", 1)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.posx = i_SelectedAttachment.posx - 0.001 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -432,7 +432,7 @@ function vCreatorUI()
             ImGui.Dummy(5, 1); ImGui.SameLine()
             ImGui.ArrowButton("##Yleft", 0)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.posy = i_SelectedAttachment.posy + 0.001 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -446,7 +446,7 @@ function vCreatorUI()
             ImGui.SameLine()
             ImGui.ArrowButton("##YRight", 1)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.posy = i_SelectedAttachment.posy - 0.001 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -461,7 +461,7 @@ function vCreatorUI()
             ImGui.Dummy(5, 1); ImGui.SameLine()
             ImGui.ArrowButton("##zUp", 2)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.posz = i_SelectedAttachment.posz + 0.001 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -475,7 +475,7 @@ function vCreatorUI()
             ImGui.SameLine()
             ImGui.ArrowButton("##zDown", 3)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.posz = i_SelectedAttachment.posz - 0.001 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -490,7 +490,7 @@ function vCreatorUI()
                 "Z Rotation :")
             ImGui.ArrowButton("##rotXleft", 0)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.rotx = i_SelectedAttachment.rotx + 0.01 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -504,7 +504,7 @@ function vCreatorUI()
             ImGui.SameLine()
             ImGui.ArrowButton("##rotXright", 1)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.rotx = i_SelectedAttachment.rotx - 0.01 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -519,7 +519,7 @@ function vCreatorUI()
             ImGui.Dummy(5, 1); ImGui.SameLine()
             ImGui.ArrowButton("##rotYleft", 0)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.roty = i_SelectedAttachment.roty + 0.01 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -533,7 +533,7 @@ function vCreatorUI()
             ImGui.SameLine()
             ImGui.ArrowButton("##rotYright", 1)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.roty = i_SelectedAttachment.roty - 0.01 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -548,7 +548,7 @@ function vCreatorUI()
             ImGui.Dummy(5, 1); ImGui.SameLine()
             ImGui.ArrowButton("##rotZup", 2)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.rotz = i_SelectedAttachment.rotz + 0.01 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -562,7 +562,7 @@ function vCreatorUI()
             ImGui.SameLine()
             ImGui.ArrowButton("##rotZdown", 3)
             if ImGui.IsItemActive() then
-                UI.widgetSound("Nav")
+                UI.WidgetSound("Nav")
                 i_SelectedAttachment.rotz = i_SelectedAttachment.rotz - 0.01 * f_VehAxisMult
                 ENTITY.ATTACH_ENTITY_TO_ENTITY(i_SelectedAttachment.entity, i_MainVehicle,
                     ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(i_MainVehicle, "chassis_dummy"), i_SelectedAttachment.posx,
@@ -575,7 +575,7 @@ function vCreatorUI()
             end
             ImGui.Spacing()
             if ImGui.Button(string.format("   %s   ##vehcreator1", _T("GENERIC_SAVE_BTN_"))) then
-                UI.widgetSound("Select2")
+                UI.WidgetSound("Select2")
                 ImGui.OpenPopup("Save Merged Vehicles")
             end
             ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
@@ -592,13 +592,13 @@ function vCreatorUI()
                                 if saved_vehicles[1] ~= nil then
                                     for _, v in pairs(saved_vehicles) do
                                         if creation_name == v.name then
-                                            UI.widgetSound("Error")
+                                            UI.WidgetSound("Error")
                                             YimToast:ShowError("Samurai's Scripts", _T("VC_NAME_ERROR_"))
                                             return
                                         end
                                     end
                                 end
-                                UI.widgetSound("Select")
+                                UI.WidgetSound("Select")
                                 vehicle_creation.name                                                              = creation_name
                                 vehicle_creation.main_veh                                                          = ENTITY
                                     .GET_ENTITY_MODEL(i_MainVehicle)
@@ -629,7 +629,7 @@ function vCreatorUI()
                                 start_loading_anim = false
                                 ImGui.CloseCurrentPopup()
                             else
-                                UI.widgetSound("Error")
+                                UI.WidgetSound("Error")
                                 YimToast:ShowWarning("Samurais Scripts", _T("VC_SAVE_ERROR_"))
                             end
                         end)
@@ -641,7 +641,7 @@ function vCreatorUI()
                 end
                 ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
                 if ImGui.Button(string.format("%s##vehcreator", _T("GENERIC_CANCEL_BTN_"))) then
-                    UI.widgetSound("Cancel")
+                    UI.WidgetSound("Cancel")
                     creation_name = ""
                     ImGui.CloseCurrentPopup()
                 end
@@ -656,13 +656,13 @@ function vCreatorUI()
             persist_info = filteredCreations[i_PersistIndex + 1]
             ImGui.Spacing()
             if ImGui.Button(string.format("%s##vehcreator", _T("VC_SPAWN_PERSISTENT_"))) then
-                UI.widgetSound("Select")
+                UI.WidgetSound("Select")
                 VehicleCreator_SpawnPersistVeh(persist_info.main_veh, persist_info.mods, persist_info.color_1, persist_info.color_2,
                     persist_info.tint, persist_info.attachments)
             end
             ImGui.SameLine(); ImGui.Dummy(5, 1); ImGui.SameLine()
             if UI.ColoredButton(_T("VC_DELETE_PERSISTENT_"), "#E40000", "#FF3F3F", "#FF8080", 0.87) then
-                UI.widgetSound("Focus_In")
+                UI.WidgetSound("Focus_In")
                 ImGui.OpenPopup("Remove Persistent")
             end
             ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
@@ -681,13 +681,13 @@ function vCreatorUI()
                     if saved_vehicles[1] == nil then
                         i_PersistSwitch = 0
                     end
-                    UI.widgetSound("Select")
+                    UI.WidgetSound("Select")
                     ImGui.CloseCurrentPopup()
                     YimToast:ShowSuccess("Samurais Scripts", _T("VC_DELETE_NOTIF_"))
                 end
                 ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
                 if ImGui.Button(string.format("   %s   ##vehcreator", _T("GENERIC_NO_"))) then
-                    UI.widgetSound("Cancel")
+                    UI.WidgetSound("Cancel")
                     ImGui.CloseCurrentPopup()
                 end
                 ImGui.End()

@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global, lowercase-global
 
 
-function mainUI()
+function MainUI()
     local date_str = os.date("\10    %d-%b-%Y    \10         %H:%M\10\10")
     ImGui.Dummy(1, 10); ImGui.Dummy(150, 1); ImGui.SameLine();
     ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 80)
@@ -10,12 +10,12 @@ function mainUI()
     if UI.IsItemClicked('lmb') then
         debug_counter = debug_counter + 1
         if debug_counter == 7 then
-            UI.widgetSound("Nav")
+            UI.WidgetSound("Nav")
             log.debug("Debug mode activated.")
             SS_debug = true
             CFG:SaveItem("SS_debug", SS_debug)
         elseif debug_counter > 7 then
-            UI.widgetSound("Cancel")
+            UI.WidgetSound("Cancel")
             log.debug("Debug mode deactivated.")
             SS_debug      = false
             debug_counter = 0

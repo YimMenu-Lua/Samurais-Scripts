@@ -14,7 +14,7 @@ local t_packages = {
     "data.refs",
     "data.actions",
     "data.objects",
-    "lib.samurais_utils",
+    "lib.ss_utils",
     "gui.grid_renderer",
     "gui.main",
     "gui.self",

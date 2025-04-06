@@ -170,7 +170,7 @@ SelfGrid:AddCheckbox(
     end
 )
 
-function selfUI()
+function SelfUI()
     ImGui.BeginChild("SelfChild", 500, 500, true)
     SelfGrid:Draw()
     ImGui.EndChild()

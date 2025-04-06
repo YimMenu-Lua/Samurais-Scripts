@@ -4,7 +4,7 @@
 
 #### A Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and [Tupoye-Menu](https://github.com/TupoyeMenu/TupoyeMenu), centered around roleplaying and having fun in a game full of ad bots and toxic cheaters
 
-[![sv](https://img.shields.io/badge/Script%20Version-v1.6.3-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
+[![sv](https://img.shields.io/badge/Script%20Version-v1.6.2-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
 [![gv](https://img.shields.io/badge/Game%20Version-Online%201.70%20|%20Build%203411-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
 
 > [!Important]
@@ -32,9 +32,11 @@ The folder structure should look like this:
 |       |   |   ├── cGame.lua
 |       |   |   ├── cSelf.lua
 |       |   |   ├── cVehicle.lua
+|       |   |   ├── color.lua
 |       |   |   ├── commands.lua
 |       |   |   ├── hotkeys.lua
 |       |   |   ├── memory.lua
+|       |   |   ├── translator.lua
 |       |   |   ├── vector2.lua
 |       |   |   ├── vector3.lua
 |       |   |   └── VehicleManager.lua
@@ -62,7 +64,7 @@ The folder structure should look like this:
 |       |   |   ├── yimactions2.lua
 |       |   |   └── yrv2.lua
 |       |   └── lib
-|       |   |   ├── samurais_utils.lua
+|       |   |   ├── ss_utils.lua
 |       |   |   ├── Translations.lua
 |       |   |   ├── YimConfig.lua
 |       |   |   └── YimToast.lua

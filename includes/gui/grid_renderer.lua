@@ -1,6 +1,7 @@
 ---@diagnostic disable
 
----@class GridItem A table representing an ImGui widget item.
+-- Class representing an ImGui widget item.
+---@class GridItem
 ---@field type string
 ---@field label string
 ---@field gvar string
@@ -39,6 +40,7 @@ function GridItem:New(
     return instance
 end
 
+-- Renders ImGui widgets (buttons, checkboxes, radio buttons) in a grid layout.
 ---@class GridRenderer
 ---@field columns number
 ---@field padding_x number
@@ -72,7 +74,7 @@ end
 ---@param item_name string
 ---@param global_variable? string
 ---@param on_clicked? function
-function GridRenderer:ItemExists(item_name, global_variable, on_clicked)
+function GridRenderer:DoesItemExist(item_name, global_variable, on_clicked)
     if #self.elements > 0 then
         for _, item in ipairs(self.elements) do
             if item_name == item.name then
@@ -112,7 +114,7 @@ function GridRenderer:AddItem(
     tooltip,
     disabled
 )
-    if self:ItemExists(item_label, global_variable) then
+    if self:DoesItemExist(item_label, global_variable) then
         return
     end
 
@@ -149,7 +151,7 @@ function GridRenderer:AddCheckbox(
     tooltip,
     disabled
 )
-    if self:ItemExists(label, global_variable) then
+    if self:DoesItemExist(label, global_variable) then
         return
     end
 
@@ -181,7 +183,7 @@ function GridRenderer:AddButton(label,
                                 tooltip,
                                 disabled
 )
-    if self:ItemExists(label, nil, on_clicked) then
+    if self:DoesItemExist(label, nil, on_clicked) then
         return
     end
 
@@ -216,7 +218,7 @@ function GridRenderer:AddRadioButton(
     tooltip,
     disabled
 )
-    if self:ItemExists(label, nil, on_clicked) then
+    if self:DoesItemExist(label, nil, on_clicked) then
         return
     end
 
@@ -315,7 +317,7 @@ function GridRenderer:Draw()
 
         if result then
             if (item.type:lower() == "checkbox") or (item.type:lower() == "radio") then
-                UI.widgetSound("Nav2")
+                UI.WidgetSound("Nav2")
                 if item.persistent then
                     CFG:SaveItem(item.gvar, _G[item.gvar])
                 end

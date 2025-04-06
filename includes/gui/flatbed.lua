@@ -26,7 +26,8 @@ local function Flatbed_Attach(vehicle)
                 )
     end)
 end
-function flatbedUI()
+
+function FlatbedUI()
     local f_PosY = 360
     if towed_vehicle ~= 0 then
         f_PosY = f_PosY * 1.7
@@ -59,13 +60,13 @@ function flatbedUI()
         ImGui.EndDisabled()
         UI.HelpMarker(_T("FLTBD_SHOW_TOWPOS_DESC_"))
         if towPosUsed then
-            UI.widgetSound("Nav2")
+            UI.WidgetSound("Nav2")
         end
 
         towEverything, towEverythingUsed = ImGui.Checkbox(_T("FLTBD_TOW_ALL_CB_"), towEverything)
         UI.HelpMarker(_T("FLTBD_TOW_ALL_DESC_"))
         if towEverythingUsed then
-            UI.widgetSound("Nav2")
+            UI.WidgetSound("Nav2")
             CFG:SaveItem("towEverything", towEverything)
         end
 
@@ -74,7 +75,7 @@ function flatbedUI()
         ImGui.SameLine()
         if towed_vehicle == 0 then
             if ImGui.Button(_T("FLTBD_TOW_BTN_"), 80, 40) then
-                UI.widgetSound("Select")
+                UI.WidgetSound("Select")
                 if towable and fb_closestVehicle ~= nil and fb_closestVehicleModel ~= flatbedModel then
                     script.run_in_fiber(function()
                         if entities.take_control_of(fb_closestVehicle, 300) then
@@ -101,7 +102,7 @@ function flatbedUI()
             end
         else
             if ImGui.Button(_T("GENERIC_DETACH_BTN_"), 80, 40) then
-                UI.widgetSound("Select2")
+                UI.WidgetSound("Select2")
                 script.run_in_fiber(function()
                     Flatbed_Detach()
                 end)

@@ -163,12 +163,12 @@ function ShowPersistProps()
     )
 end
 
-function objectSpawnerUI()
+function ObjectSpawnerUI()
     ImGui.BeginTabBar("Object Spawner")
     if ImGui.BeginTabItem("Spawn & Create") then
         ImGui.Spacing(); os_switch, os_switchUsed = ImGui.RadioButton(_T("CUSTOM_OBJECTS_TXT_"), os_switch, 0)
         if os_switchUsed then
-            UI.widgetSound("Nav")
+            UI.WidgetSound("Nav")
         end
         ImGui.SameLine(); ImGui.Dummy(40, 1); ImGui.SameLine(); os_switch, os_switchUsed = ImGui.RadioButton(
             _T("ALL_OBJECTS_TXT_"), os_switch, 1)
@@ -177,7 +177,7 @@ function objectSpawnerUI()
             objects_search, 32)
         is_typing = ImGui.IsItemActive()
         if os_switchUsed then
-            UI.widgetSound("Nav")
+            UI.WidgetSound("Nav")
         end
         if os_switch == 0 then
             DisplayFilteredProps()
@@ -190,7 +190,7 @@ function objectSpawnerUI()
         preview, _ = ImGui.Checkbox(_T("PREVIEW_OBJECTS_CB_"), preview)
         ImGui.EndDisabled()
         if previewUsed then
-            UI.widgetSound("Nav2")
+            UI.WidgetSound("Nav2")
         end
         if preview then
             spawnCoords            = ENTITY.GET_ENTITY_COORDS(previewEntity, false)
@@ -246,7 +246,7 @@ function objectSpawnerUI()
             ImGui.BeginDisabled(blacklisted_obj)
             spawnForPlayer, _ = ImGui.Checkbox(_T("SPAWN_FOR_PLAYER_CB_"), spawnForPlayer)
             if spawnForPlayerUsed then
-                UI.widgetSound("Nav2")
+                UI.WidgetSound("Nav2")
             end
             ImGui.EndDisabled()
         end
@@ -268,7 +268,7 @@ function objectSpawnerUI()
         end
         ImGui.SameLine(); ImGui.BeginDisabled(blacklisted_obj)
         if ImGui.Button(string.format("%s##obj", _T("GENERIC_SPAWN_BTN_"))) then
-            UI.widgetSound("Select")
+            UI.WidgetSound("Select")
             script.run_in_fiber(function()
                 while not STREAMING.HAS_MODEL_LOADED(propHash) do
                     STREAMING.REQUEST_MODEL(propHash)
@@ -308,7 +308,7 @@ function objectSpawnerUI()
             end
             ImGui.SameLine()
             if ImGui.Button(string.format(" %s ##obj", _T("GENERIC_DELETE_BTN_"))) then
-                UI.widgetSound("Delete")
+                UI.WidgetSound("Delete")
                 script.run_in_fiber(function(script)
                     if ENTITY.DOES_ENTITY_EXIST(selectedObject.entity) then
                         ENTITY.SET_ENTITY_AS_MISSION_ENTITY(selectedObject.entity, true, true)
@@ -324,14 +324,14 @@ function objectSpawnerUI()
             ImGui.Separator()
             attachToSelf, attachToSelfUsed = ImGui.Checkbox(_T("ATTACH_TO_SELF_CB_"), attachToSelf)
             if attachToSelfUsed then
-                UI.widgetSound("Nav2")
+                UI.WidgetSound("Nav2")
             end
             if Self.Vehicle.Current ~= nil and Self.Vehicle.Current ~= 0 then
                 ImGui.SameLine(); attachToVeh, attachToVehUsed = ImGui.Checkbox(_T("ATTACH_TO_VEH_CB_"),
                     attachToVeh)
                 if attachToVehUsed then
                     attachToSelf = false
-                    UI.widgetSound("Nav2")
+                    UI.WidgetSound("Nav2")
                 end
             else
                 ImGui.BeginDisabled()
@@ -349,7 +349,7 @@ function objectSpawnerUI()
                 if ImGui.Button(string.format(" %s ##self", _T("GENERIC_ATTACH_BTN_"))) then
                     script.run_in_fiber(function()
                         if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(selectedObject.entity, Self.GetPedID()) then
-                            UI.widgetSound("Select2")
+                            UI.WidgetSound("Select2")
                             ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject.entity, Self.GetPedID(),
                                 PED.GET_PED_BONE_INDEX(Self.GetPedID(), boneData.ID), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false,
                                 false, false,
@@ -388,7 +388,7 @@ function objectSpawnerUI()
                             attached        = true
                             attachedToSelf  = true
                         else
-                            UI.widgetSound("Error")
+                            UI.WidgetSound("Error")
                             YimToast:ShowError("Samurai's Scripts", "This object is already attached!")
                         end
                     end)
@@ -401,7 +401,7 @@ function objectSpawnerUI()
                     selectedAttachment = attached_props[attached_index + 1]
                     ImGui.SameLine()
                     if ImGui.Button(string.format("%s##self", _T("GENERIC_DETACH_BTN_"))) then
-                        UI.widgetSound("Cancel")
+                        UI.WidgetSound("Cancel")
                         script.run_in_fiber(function()
                             ENTITY.DETACH_ENTITY(selectedAttachment.entity, true, true)
                             for k, v in ipairs(attached_props) do
@@ -421,7 +421,7 @@ function objectSpawnerUI()
                 boneData = filteredVehBones[selected_bone + 1]
                 ImGui.SameLine()
                 if ImGui.Button(string.format(" %s ##veh", _T("GENERIC_ATTACH_BTN_"))) then
-                    UI.widgetSound("Select2")
+                    UI.WidgetSound("Select2")
                     script.run_in_fiber(function()
                         ENTITY.ATTACH_ENTITY_TO_ENTITY(selectedObject.entity, Self.Vehicle.Current,
                             ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Self.Vehicle.Current, boneData), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -473,7 +473,7 @@ function objectSpawnerUI()
                     selectedAttachment = vehicle_attachments[attached_index + 1]
                     ImGui.SameLine()
                     if ImGui.Button(string.format("%s##veh", _T("GENERIC_DETACH_BTN_"))) then
-                        UI.widgetSound("Cancel")
+                        UI.WidgetSound("Cancel")
                         script.run_in_fiber(function()
                             ENTITY.DETACH_ENTITY(selectedAttachment.entity, true, true)
                             for k, v in ipairs(vehicle_attachments) do
@@ -487,12 +487,12 @@ function objectSpawnerUI()
             end
             edit_mode, edit_modeUsed = ImGui.Checkbox(_T("EDIT_MODE_CB_"), edit_mode)
             if edit_modeUsed then
-                UI.widgetSound("Nav2")
+                UI.WidgetSound("Nav2")
             end
             UI.HelpMarker(_T("EDIT_MODE_DESC_"))
             ImGui.SameLine(); ImGui.Dummy(10, 1); ImGui.SameLine()
             if ImGui.Button(string.format("   %s   ", _T("GENERIC_RESET_BTN_"))) then
-                UI.widgetSound("Select")
+                UI.WidgetSound("Select")
                 script.run_in_fiber(function()
                     if ENTITY.IS_ENTITY_ATTACHED(selected_att) then
                         selectedAttachment.posx, selectedAttachment.posy, selectedAttachment.posz,
@@ -690,7 +690,7 @@ function objectSpawnerUI()
             ImGui.Dummy(1, 5)
             if attachedToSelf and attached_props[1] ~= nil then
                 if ImGui.Button(string.format("  %s  ##obj", _T("GENERIC_SAVE_BTN_"))) then
-                    UI.widgetSound("Select")
+                    UI.WidgetSound("Select")
                     ImGui.OpenPopup("persist props")
                 end
                 ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
@@ -706,14 +706,14 @@ function objectSpawnerUI()
                             if persist_attachments[1] ~= nil then
                                 for _, v in pairs(persist_attachments) do
                                     if saved_props_name == v.name then
-                                        UI.widgetSound("Error")
+                                        UI.WidgetSound("Error")
                                         YimToast:ShowError("Samurai's Scripts",
                                             "You already have an outfit with the same name.")
                                         return
                                     end
                                 end
                             end
-                            UI.widgetSound("Select")
+                            UI.WidgetSound("Select")
                             prop_creation.name  = saved_props_name
                             prop_creation.props = attached_props
                             table.insert(persist_attachments, prop_creation)
@@ -738,14 +738,14 @@ function objectSpawnerUI()
                                 end)
                             end
                         else
-                            UI.widgetSound("Error")
+                            UI.WidgetSound("Error")
                             YimToast:ShowError("Samurai's Scripts", "Please enter a name")
                         end
                         ImGui.CloseCurrentPopup()
                     end
                     ImGui.SameLine(); ImGui.Dummy(50, 1); ImGui.SameLine()
                     if ImGui.Button(_T("GENERIC_CANCEL_BTN_")) then
-                        UI.widgetSound("Cancel")
+                        UI.WidgetSound("Cancel")
                         saved_props_name = ""
                         ImGui.CloseCurrentPopup()
                     end
@@ -764,7 +764,7 @@ function objectSpawnerUI()
             ImGui.Dummy(1, 5)
             if spawned_persist_T[1] == nil then
                 if ImGui.Button(_T("GENERIC_SPAWN_BTN_"), 80, 32) then
-                    UI.widgetSound("Select")
+                    UI.WidgetSound("Select")
                     script.run_in_fiber(function(pers)
                         for _, p in ipairs(persist_prop_info.props) do
                             if Game.RequestModel(p.hash) then
@@ -783,7 +783,7 @@ function objectSpawnerUI()
                 end
             else
                 if ImGui.Button(string.format("%s##persist_props", _T("GENERIC_DELETE_BTN_")), 80, 32) then
-                    UI.widgetSound("Delete")
+                    UI.WidgetSound("Delete")
                     script.run_in_fiber(function(del)
                         for _, p in ipairs(spawned_persist_T) do
                             if ENTITY.DOES_ENTITY_EXIST(p) then
@@ -797,7 +797,7 @@ function objectSpawnerUI()
             end
             ImGui.SameLine(); ImGui.Dummy(60, 1); ImGui.SameLine()
             if UI.ColoredButton(string.format("%s##vcreator", _T("VC_DELETE_PERSISTENT_")), "#E40000", "#FF3F3F", "#FF8080", 0.87) then
-                UI.widgetSound("Focus_In")
+                UI.WidgetSound("Focus_In")
                 ImGui.OpenPopup("Remove Persistent Props")
             end
             ImGui.SetNextWindowPos(760, 400, ImGuiCond.Appearing)
@@ -813,12 +813,12 @@ function objectSpawnerUI()
                             CFG:SaveItem("persist_attachments", persist_attachments)
                         end
                     end
-                    UI.widgetSound("Select")
+                    UI.WidgetSound("Select")
                     ImGui.CloseCurrentPopup()
                 end
                 ImGui.SameLine(); ImGui.Dummy(20, 1); ImGui.SameLine()
                 if ImGui.Button(string.format("   %s   ##selfprops", _T("GENERIC_NO_"))) then
-                    UI.widgetSound("Cancel")
+                    UI.WidgetSound("Cancel")
                     ImGui.CloseCurrentPopup()
                 end
                 ImGui.End()

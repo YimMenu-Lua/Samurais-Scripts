@@ -483,9 +483,13 @@ Self.Vehicle.Previous = 0
 Self.Vehicle.Speed = 0
 Self.Vehicle.Gear = 0
 Self.Vehicle.RPM = 0
+Self.Vehicle.Throttle = 0
 Self.Vehicle.MaxSpeed = 0
 Self.Vehicle.EngineHealth = 0
 Self.Vehicle.BodyHealth = 0
+Self.Vehicle.Altitude = -1
+Self.Vehicle.LandingGearState = -1
+Self.Vehicle.DefaultHandling = nil
 Self.Vehicle.DoorLockState = nil
 Self.Vehicle.IsEngineOn = false
 Self.Vehicle.IsCar = false
@@ -506,3 +510,21 @@ Self.Vehicle.HasRallyTires = false
 Self.Vehicle.HasKersBoost = false
 Self.Vehicle.HasLoudRadio = false
 Self.Vehicle.HasUnbreakableWindows = false
+
+---@param vehicle integer
+Self.Vehicle.ResetHandling = function(vehicle)
+    if vehicle == 0 or not Self.Vehicle.DefaultHandling then
+        return
+    end
+
+    local _origin = Self.Vehicle.DefaultHandling
+    local CVehicle = Memory.GetVehicleInfo(vehicle)
+    if CVehicle then
+        CVehicle.m_acceleration:set_float(_origin.f_AccelerationMultiplier)
+        CVehicle.m_initial_drag_coeff:set_float(_origin.f_InitialDragCoeff)
+        CVehicle.m_initial_drive_force:set_float(_origin.f_InitialDriveForce)
+        CVehicle.m_drive_max_flat_velocity:set_float(_origin.f_DriveMaxFlatVel)
+        CVehicle.m_initial_drive_max_flat_vel:set_float(_origin.f_InitialDriveMaxFlatVel)
+    end
+    Self.Vehicle.DefaultHandling = nil
+end
