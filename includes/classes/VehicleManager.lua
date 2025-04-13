@@ -43,7 +43,7 @@ function VehicleManager.OnEnter()
         Self.Vehicle.RPM   = VEHICLE.GET_VEHICLE_CURRENT_REV_RATIO_(Self.Vehicle.Current)
 
         
-        if not using_nos then
+        if not using_nos and not launch_active then
             Self.Vehicle.MaxSpeed = VEHICLE.GET_VEHICLE_ESTIMATED_MAX_SPEED(Self.Vehicle.Current)
         end
     end

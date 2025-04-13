@@ -5,7 +5,7 @@
 #### A Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and [Tupoye-Menu](https://github.com/TupoyeMenu/TupoyeMenu), centered around roleplaying and having fun in a game full of ad bots and toxic cheaters
 
 [![sv](https://img.shields.io/badge/Script%20Version-v1.6.4-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
-[![gv](https://img.shields.io/badge/Game%20Version-Online%201.70%20|%20Build%203411-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
+[![gv](https://img.shields.io/badge/Game%20Version-Online%201.70%20|%20Build%203504-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
 
 > [!Important]
 > **Legacy Only.**
@@ -21,56 +21,6 @@
 2. Extract the archive to YimMenu's `scripts` folder:
 
        %AppData%\YimMenu\scripts
-
-The folder structure should look like this:
-
-```bash
-├── scripts
-│   └── Samurais Scripts
-|       ├── includes
-|       |   ├── classes
-|       |   |   ├── cGame.lua
-|       |   |   ├── cSelf.lua
-|       |   |   ├── cVehicle.lua
-|       |   |   ├── color.lua
-|       |   |   ├── commands.lua
-|       |   |   ├── hotkeys.lua
-|       |   |   ├── memory.lua
-|       |   |   ├── translator.lua
-|       |   |   ├── vector2.lua
-|       |   |   ├── vector3.lua
-|       |   |   └── VehicleManager.lua
-|       |   ├── data
-|       |   |   ├── actions.lua
-|       |   |   ├── globals.lua
-|       |   |   ├── objects.lua
-|       |   |   └── refs.lua
-|       |   ├── gui
-|       |   |   ├── custom_paints.lua
-|       |   |   ├── drift_mode.lua
-|       |   |   ├── dunk.lua
-|       |   |   ├── flatbed.lua
-|       |   |   ├── grid_renderer.lua
-|       |   |   ├── handling_editor.lua
-|       |   |   ├── main.lua
-|       |   |   ├── object_spawner.lua
-|       |   |   ├── self.lua
-|       |   |   ├── settings.lua
-|       |   |   ├── sound_player.lua
-|       |   |   ├── vehicle_creator.lua
-|       |   |   ├── vehicle.lua
-|       |   |   ├── weappon.lua
-|       |   |   ├── world.lua
-|       |   |   ├── yimactions2.lua
-|       |   |   └── yrv2.lua
-|       |   └── lib
-|       |   |   ├── ss_utils.lua
-|       |   |   ├── Translations.lua
-|       |   |   ├── YimConfig.lua
-|       |   |   └── YimToast.lua
-|       |   └── ss_init.lua
-│       └── samurais_scripts.lua
-```
 
 ## TODO
 

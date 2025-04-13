@@ -203,9 +203,6 @@
 - **Handling Editor:**
   - A tab with a few options that change your vehicle's handling behavior like for example disabling the engine brake (I hate it with a passion 😡) and allowing motorcycles to lose traction so you can drift them. This has been a thorn in my side for longer than I would like to admit. Thanks to [tupoy-ya](https://github.com/tupoy-ya) for helping me finally figure it out.
 
-- **Vehicle Creator:**
-  - Spawn and merge two or more vehicles into one then save it as a custom vehicle. Wanna create a widebody Futo? A Sentinel XS with 2 BMXs on the roof? A driveable skyscraper made out of tanks? Feel free.
-
 ## Online
 
 - **Business Manager**
@@ -263,9 +260,19 @@
 
     > **NOTE:** Some ambient scenarios are programmed for NPCs to spawn directly onto them so playing them normally will most likely result in your ped being in an awkward position *(example: sitting in the air)* or even fail to fully play. For this, I've added an option to **force** play or stop an ambient scenario by pressing **[Left Shift]** + **[E]**.
 
-- **Improved [Object Spawner](https://github.com/xesdoog/object-spawner):**
-  - Fixed a few bugs in the main script and added the ability to attach objects to your vehicle.
-  - Added an option to save self attachments. This gives you the ability to create outfits for yourself made out of objects then spawn them at any time in the future.
+- **EntityForge:**
+  - A powerful object/vehicle/ped spawner and creator:
+    - Spawn and attach entities (peds, vehicles, objects) to other entities, including yourself.
+    - Add object/vehicle/ped models to `Favorites` with custom names.
+    - Save whatever abomination you end up creating and spawn it at any time in the future.
+    - Add scenario tasks to ped entities before saving them in an attachment.
+    - Customize ped entities (clothing, appearance...).
+    - Grab entities from the game wrorld using an `Entity Gun`
+    - Save models from world entities to `Favorites` and rename/spawn them later.
+    - Move and rotate entities in real time using mouse and keyboard.
+    - Attached peds automatically play the saved scenario when spawned in a "forged creation".
+    - Attached vehicles preserve whatever modifications and colors they had before they were saved.
+    - Entities in the `Forge` are **invincible** until removed/dismissed/detached.
 
 ## Settings
 

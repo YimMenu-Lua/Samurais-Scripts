@@ -11,7 +11,7 @@ local PlaneGridCB          = GridRenderer:New(2, 25, 10)
 
 local function FilterVehNames()
     t_FilteredNames = {}
-    for _, veh in ipairs(t_VehicleNames) do
+    for _, veh in ipairs(t_GameVehicles) do
         if VEHICLE.IS_THIS_MODEL_A_CAR(joaat(veh)) or VEHICLE.IS_THIS_MODEL_A_BIKE(joaat(veh)) or VEHICLE.IS_THIS_MODEL_A_QUADBIKE(joaat(veh)) then
             valid_veh = veh
             if string.find(valid_veh:lower(), search_term:lower()) then

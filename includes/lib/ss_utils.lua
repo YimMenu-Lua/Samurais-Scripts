@@ -14,7 +14,24 @@ function _T(label)
     return Translator:Translate(label)
 end
 
--- Must be called from a coroutine. Input time is in seconds.
+---@param t table
+---@return table
+function ConstEnum(t)
+    return setmetatable({}, {
+        __index = t,
+        __newindex = function(_, key)
+            log.warning(
+                string.format(
+                    "Attempt to modify read-only enum: '%s'", key
+                )
+            )
+            return key
+        end,
+        __metatable = false
+    })
+end
+
+-- Must be called in a coroutine. Input time is in seconds.
 ---@param s integer
 function Sleep(s)
     local ntime = os.clock() + s
@@ -636,16 +653,6 @@ function AttachVeh(veh)
     return vehicle_grabbed, i_GrabbedVeh
 end
 
-function StopPreview()
-    if previewStarted then
-        previewStarted = false
-    end
-    pedPreviewModel     = 0
-    vehiclePreviewModel = 0
-    objectPreviewModel  = 0
-    previewEntity       = 0
-end
-
 ---@param vehToTow integer
 function Flatbed_GetTowOffset(vehToTow)
     local vehicleClass = VEHICLE.GET_VEHICLE_CLASS(vehToTow)
@@ -1063,13 +1070,20 @@ end
 ---@param text string
 ---@param color any
 ---@param alpha? number
----@param wrap_size number
+---@param wrap_size? number
 UI.ColoredText = function(text, color, alpha, wrap_size)
     local r, g, b, a = Col(color):AsFloat()
     ImGui.PushStyleColor(ImGuiCol.Text, r, g, b, alpha or a)
-    ImGui.PushTextWrapPos(ImGui.GetFontSize() * wrap_size)
+
+    if wrap_size then
+        ImGui.PushTextWrapPos(ImGui.GetFontSize() * wrap_size)
+    end
+
     ImGui.TextWrapped(text)
-    ImGui.PopTextWrapPos()
+
+    if wrap_size then
+        ImGui.PopTextWrapPos()
+    end
     ImGui.PopStyleColor(1)
 end
 
@@ -1143,9 +1157,9 @@ end
 ---@param button string A string representing a mouse button: `lmb` for Left Mouse Button or `rmb` for Right Mouse Button.
 ---@return boolean
 UI.IsItemClicked = function(button)
-    if mb == "lmb" then
+    if button == "lmb" then
         return (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and ImGui.IsItemClicked(0))
-    elseif mb == "rmb" then
+    elseif button == "rmb" then
         return (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and ImGui.IsItemClicked(1))
     end
 
@@ -1193,12 +1207,12 @@ SS.IsAnyKeyPressed = function()
     return KeyManager:IsAnyKeyPressed()
 end
 
----@param key integer
+---@param key integer | string
 SS.IsKeyPressed = function(key)
     return KeyManager:IsKeyPressed(key)
 end
 
----@param key integer
+---@param key integer | string
 SS.IsKeyJustPressed = function(key)
     return KeyManager:IsKeyJustPressed(key)
 end
@@ -1616,8 +1630,6 @@ SS.SyncConfing = function(saved, default)
             saved[k] = v
             _G[k] = v
             SS.debug(string.format("Added missing config key: '%s'", k))
-        elseif (type(v) == "table") and (type(saved[k]) == "table") then
-            SS.SyncConfing(saved[k], v)
         end
     end
 
@@ -1678,29 +1690,6 @@ SS.HandleEvents = function()
         attached_vehicle = 0
     end
 
-    if spawned_props[1] ~= nil then
-        for i, v in ipairs(spawned_props) do
-            if ENTITY.DOES_ENTITY_EXIST(v.entity) then
-                ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v.entity, false, false)
-                ENTITY.DELETE_ENTITY(v.entity)
-                table.remove(spawned_props, i)
-            end
-        end
-    end
-
-    if selfAttachments[1] ~= nil then
-        for i, v in ipairs(selfAttachments) do
-            ENTITY.DETACH_ENTITY(v.entity, true, true)
-            table.remove(selfAttachments, i)
-        end
-    end
-
-    if vehAttachments[1] ~= nil then
-        for i, v in ipairs(vehAttachments) do
-            ENTITY.DETACH_ENTITY(v.entity, true, true)
-            table.remove(vehAttachments, i)
-        end
-    end
 
     if currentMvmt ~= "" then
         SS.ResetMovement()
@@ -1792,16 +1781,6 @@ SS.HandleEvents = function()
         end
     end
 
-    if spawned_persist_T[1] ~= nil then
-        for i, v in ipairs(spawned_persist_T) do
-            if ENTITY.DOES_ENTITY_EXIST(v) then
-                ENTITY.SET_ENTITY_AS_MISSION_ENTITY(v, true, true)
-                ENTITY.DELETE_ENTITY(v)
-                table.remove(spawned_persist_T, i)
-            end
-        end
-    end
-
     if is_sitting or ENTITY.IS_ENTITY_PLAYING_ANIM(Self.GetPedID(), "timetable@ron@ig_3_couch", "base", 3) then
         ENTITY.DETACH_ENTITY(Self.GetPedID(), true, false)
         TASK.CLEAR_PED_TASKS_IMMEDIATELY(Self.GetPedID())
@@ -1846,6 +1825,9 @@ SS.HandleEvents = function()
         )
         Game.Vehicle.SetAcceleration(Self.Vehicle.Current, 1.0)
     end
+
+    EntityForge:ForceCleanup()
+    PreviewService:Clear()
 end
 
 SS.UpdateNPCdriveTask = function()
@@ -1908,8 +1890,8 @@ end
 SS.ResetSettings = function()
     for key, _ in pairs(DEFAULT_CONFIG) do
         if (
-            key ~= "saved_vehicles" and
-            key ~= "persist_attachments" and
+            key ~= "forged_entities" and
+            key ~= "favorite_entities" and
             key ~= "favorite_actions"
         ) then
             _G[key] = DEFAULT_CONFIG[key]

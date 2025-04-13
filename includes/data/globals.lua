@@ -1,14 +1,14 @@
 ---@diagnostic disable
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = "1.6.4"
-TARGET_BUILD   = "3442"
+SCRIPT_VERSION = "1.6.5"
+TARGET_BUILD   = "3504"
 TARGET_VERSION = "1.70"
 DEFAULT_CONFIG = {
     shortcut_anim           = {},
-    saved_vehicles          = {},
-    persist_attachments     = {},
     favorite_actions        = {},
+    favorite_entities       = {},
+    forged_entities         = {},
     driftSmoke_T            = {
         r = 255,
         g = 255,
@@ -284,21 +284,7 @@ cmd_ui_is_open                        = false
 should_draw_cmd_ui                    = false
 mvmtSelected                          = false
 jsonMvmt                              = false
-edit_mode                             = false
-activeX                               = false
-activeY                               = false
-activeZ                               = false
-rotX                                  = false
-rotY                                  = false
-rotZ                                  = false
-attached                              = false
-attachToSelf                          = false
-attachToVeh                           = false
-previewStarted                        = false
 isChanged                             = false
-showInvalidObjText                    = false
-blacklisted_obj                       = false
-spawned_persist_props                 = false
 boot_vehicle_re                       = false
 rwSteering                            = false
 awSteering                            = false
@@ -352,21 +338,6 @@ wh3Value                              = 0
 wh4Value                              = 0
 wh5Value                              = 0
 ceo_moola                             = 0
-prop                                  = 0
-propHash                              = 0
-os_switch                             = 0
-prop_index                            = 0
-objects_index                         = 0
-spawned_index                         = 0
-selectedObject                        = 0
-axisMult                              = 1
-selected_bone                         = 0
-previewEntity                         = 0
-currentObjectPreview                  = 0
-attached_index                        = 0
-vattached_index                       = 0
-zOffset                               = 0
-persist_prop_index                    = 0
 boot_vehicle                          = 0
 boot_vehicle_len                      = 0
 thisDumpster                          = 0
@@ -408,7 +379,7 @@ prize_wheel_prize                     = 14
 prize_wheel_prize_state               = 45
 gb_casino_heist_planning              = 1965614
 gb_casino_heist_planning_cut_offset   = 1497 + 736 + 92
-fm_mission_controller_cart_grab       = 10289
+fm_mission_controller_cart_grab       = 10289 -- 10291
 fm_mission_controller_cart_grab_speed = 14
 casino_heist_approach                 = 0
 casino_heist_target                   = 0
@@ -447,24 +418,13 @@ search_term                           = ""
 smokeHex                              = ""
 random_quote                          = ""
 custom_paints_sq                      = ""
-vCreator_searchQ                      = ""
-vehicleName                           = ""
-creation_name                         = ""
-main_vehicle_name                     = ""
 npcDriveTask                          = ""
 user_command                          = ""
 jsonMvmtSearch                        = ""
-objects_search                        = ""
-propName                              = ""
-invalidType                           = ""
-saved_props_name                      = ""
 speedometer_gear_display              = ""
 script_name                           = "None"
 simplified_scr_name                   = "None"
-spawnDistance                         = vec3:new(0, 0, 0)
-spawnRot                              = vec3:new(0, 0, 0)
-npcDriveDest                          = vec3:new(0, 0, 0)
-filteredPlayers                       = {}
+npcDriveDest                          = vec3:zero()
 recently_played_a                     = {}
 selected_sound                        = {}
 selected_radio                        = {}
@@ -482,60 +442,7 @@ selfPTFX                              = {}
 npcPTFX                               = {}
 curr_playing_anim                     = {}
 chosen_anim                           = {}
-depressorBanList                      = {}
 jsonMvmts_t                           = {}
-spawned_vehicles                      = {}
-spawned_vehNames                      = {}
-filteredVehNames                      = {}
-persist_names                         = {}
-veh_attachments                       = {}
-spawned_props                         = {}
-vehAttachments                        = {}
-vehicle_attachments                   = {}
-spawned_persist_T                     = {}
-attached_props                        = {}
-selfAttachNames                       = {}
-attached_vehicles                     = {
-    entity  = 0,
-    hash    = 0,
-    mods    = {},
-    color_1 = {
-        r = 0,
-        g = 0,
-        b = 0
-    },
-    color_2 = {
-        r = 0,
-        g = 0,
-        b = 0
-    },
-    tint    = 0,
-    posx    = 0.0,
-    posy    = 0.0,
-    posz    = 0.0,
-    rotx    = 0.0,
-    roty    = 0.0,
-    rotz    = 0.0
-}
-
-vehicle_creation                      = {
-    name = "",
-    main_veh = 0,
-    mods = {},
-    color_1 = {
-        r = 0,
-        g = 0,
-        b = 0
-    },
-    color_2 = {
-        r = 0,
-        g = 0,
-        b = 0
-    },
-    tint = 0,
-    attachments = {}
-}
-
 default_tire_smoke                    = {
     r = 255,
     g = 255,
@@ -647,24 +554,6 @@ bb                                    = {
         val_offset = 0,
     },
 }
-
-prop_creation                         = {
-    name  = "",
-    props = {}
-}
-
-selfAttachments                       = {
-    entity = 0,
-    hash   = 0,
-    bone   = 0,
-    posx   = 0.0,
-    posy   = 0.0,
-    posz   = 0.0,
-    rotx   = 0.0,
-    roty   = 0.0,
-    rotz   = 0.0
-}
-
 
 KeyManager = require("includes.classes.hotkeys")
 YimToast   = require("includes.lib.YimToast")

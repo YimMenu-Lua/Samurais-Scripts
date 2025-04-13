@@ -10,55 +10,37 @@ SS.SyncConfing(CFG:Read(), DEFAULT_CONFIG)
 Samurais_scripts = gui.add_tab("Samurai's Scripts")
 Samurais_scripts:add_imgui(MainUI)
 
-self_tab = Samurais_scripts:add_tab(_T("SELF_TAB_"))
+local self_tab = Samurais_scripts:add_tab(_T("SELF_TAB_"))
 self_tab:add_imgui(SelfUI)
+self_tab:add_tab("Actions "):add_imgui(YimActionsUI)
+self_tab:add_tab(_T("SOUND_PLAYER_")):add_imgui(SoundPlayerUI)
 
-Actions = self_tab:add_tab("Actions ")
-Actions:add_imgui(YimActionsUI)
-
-sound_player = self_tab:add_tab(_T("SOUND_PLAYER_"))
-sound_player:add_imgui(SoundPlayerUI)
-
-weapon_tab = Samurais_scripts:add_tab(_T("WEAPON_TAB_"))
-weapon_tab:add_imgui(WeaponsUI)
-
-vehicle_tab = Samurais_scripts:add_tab(_T("VEHICLE_TAB_"))
+local vehicle_tab = Samurais_scripts:add_tab(_T("VEHICLE_TAB_"))
 vehicle_tab:add_imgui(VehicleUI)
+vehicle_tab:add_tab("Custom Paint Jobs"):add_imgui(CustomPaintsUI)
+vehicle_tab:add_tab("Drift Mode"):add_imgui(DriftModeUI)
+vehicle_tab:add_tab("Flatbed"):add_imgui(FlatbedUI)
+vehicle_tab:add_tab("Handling Editor"):add_imgui(HandingEditorUI)
 
-custom_paints_tab = vehicle_tab:add_tab("Custom Paint Jobs")
-custom_paints_tab:add_imgui(CustomPaintsUI)
+Samurais_scripts:add_tab(_T("WEAPON_TAB_")):add_imgui(WeaponsUI)
 
-drift_mode_tab = vehicle_tab:add_tab("Drift Mode")
-drift_mode_tab:add_imgui(DriftModeUI)
+local world_tab = Samurais_scripts:add_tab(_T("WORLD_TAB_"))
+world_tab:add_imgui(WorldUI)
+world_tab:add_tab("EntityForge"):add_imgui(EntityForgeUI)
 
-flatbed_tab = vehicle_tab:add_tab("Flatbed")
-flatbed_tab:add_imgui(FlatbedUI)
-
-handling_tab = vehicle_tab:add_tab("Handling Editor")
-handling_tab:add_imgui(HandingEditorUI)
-
-vehicle_creator = vehicle_tab:add_tab("Vehicle Creator")
-vehicle_creator:add_imgui(VehicleCreatorUI)
-
-online_tab = Samurais_scripts:add_tab("Online ")
-
-business_tab = online_tab:add_tab("Business Manager (YRV2)")
+local online_tab = Samurais_scripts:add_tab("Online ")
+local business_tab = online_tab:add_tab("Business Manager (YRV2)")
 business_tab:add_imgui(YRV2UI)
 
-casino_pacino = online_tab:add_tab("Casino Pacino ") -- IT'S NOT AL ANYMORE! IT'S DUNK!
+local casino_pacino = online_tab:add_tab("Casino Pacino ") -- IT'S NOT AL ANYMORE! IT'S DUNK!
 casino_pacino:add_imgui(DunkUI)
 
-world_tab = Samurais_scripts:add_tab(_T("WORLD_TAB_"))
-world_tab:add_imgui(WorldUI)
-
-object_spawner = world_tab:add_tab("Object Spawner ")
-object_spawner:add_imgui(ObjectSpawnerUI)
-
-settings_tab = Samurais_scripts:add_tab(_T("SETTINGS_TAB_"))
+local settings_tab = Samurais_scripts:add_tab(_T("SETTINGS_TAB_"))
 settings_tab:add_imgui(SettingsUI)
+settings_tab:add_tab(_T("HOTKEYS_TAB_")):add_imgui(HotkeysUI)
 
-hotkeys_tab = settings_tab:add_tab(_T("HOTKEYS_TAB_"))
-hotkeys_tab:add_imgui(HotkeysUI)
+gui.add_always_draw_imgui(ForgeAxisWindow)
+gui.add_always_draw_imgui(ForgeChildCustomizationWindow)
 
 gui.add_always_draw_imgui(function()
     CommandExecutor:Draw()
@@ -354,6 +336,7 @@ end)
 script.register_looped("SS_HANDLERS", function()
     KeyManager:HandleCallbacks()
     CommandExecutor:HandleCallbacks()
+    PreviewService:Update()
 end)
 
 script.register_looped("SS_ANIMATED_LABEL", function(balt) -- Basic loading text
@@ -1408,47 +1391,31 @@ script.register_looped("SS_MISC_NPC", function()
     end
 end)
 
-script.register_looped("SS_HG", function() -- Hash Grabber
-    if (
-            HashGrabber and
-            WEAPON.IS_PED_ARMED(Self.GetPedID(), 4) and
-            PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) and
-            PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 24)
-        ) then
-        local entity     = Game.GetEntityPlayerIsFreeAimingAt()
-        local model_hash = Game.GetEntityModel(entity)
-        local type_index = Memory.GetEntityType(entity)
-        local type_name  = eModelTypes[type_index] ~= nil and eModelTypes[type_index] or "Unk"
-        log.debug(string.format(
-            "\n----- Info Gun -----\n¤ Handle:      %d\n¤ Hash:        %d\n¤ Type Index:  %d\n¤ Type Name:   %s",
-            entity,
-            model_hash,
-            type_index, type_name)
-        )
+script.register_looped("SS_ENTITY_GRABBER", function()
+    if HashGrabber and WEAPON.IS_PED_ARMED(Self.GetPedID(), 4) then
+        EntityForge:EntityGun()
     end
 end)
 
 script.register_looped("SS_TRIGGERBOT", function() -- Triggerbot
-    if Triggerbot then
-        if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
-            local isAiming, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(self.get_id(), i_Entity)
-            if isAiming and ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
-                local bonePos = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(Entity,
-                    ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Entity, "head"))
-                weapon = Self.Weapon()
-                if WEAPON.IS_PED_WEAPON_READY_TO_SHOOT(Self.GetPedID()) and Self.IsOnFoot() and not PED.IS_PED_RELOADING(Self.GetPedID()) then
-                    if PAD.IS_CONTROL_PRESSED(0, 21) and not ENTITY.IS_ENTITY_DEAD(Entity, false) then
-                        if aimEnemy then
-                            if Self.IsPedMyEnemy(Entity) then
-                                TASK.TASK_AIM_GUN_AT_COORD(Self.GetPedID(), bonePos.x, bonePos.y, bonePos.z, 250, true,
-                                    false)
-                                TASK.TASK_SHOOT_AT_COORD(Self.GetPedID(), bonePos.x, bonePos.y, bonePos.z, 250,
-                                    2556319013)
-                            end
-                        else
-                            TASK.TASK_AIM_GUN_AT_COORD(Self.GetPedID(), bonePos.x, bonePos.y, bonePos.z, 250, true, false)
-                            TASK.TASK_SHOOT_AT_COORD(Self.GetPedID(), bonePos.x, bonePos.y, bonePos.z, 250, 2556319013)
+    if Triggerbot and PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
+        local Entity = Self.GetEntityInCrosshairs()
+        if Entity and ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
+            local bonePos = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(Entity,
+                ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(Entity, "head"))
+            weapon = Self.Weapon()
+            if WEAPON.IS_PED_WEAPON_READY_TO_SHOOT(Self.GetPedID()) and Self.IsOnFoot() and not PED.IS_PED_RELOADING(Self.GetPedID()) then
+                if PAD.IS_CONTROL_PRESSED(0, 21) and not ENTITY.IS_ENTITY_DEAD(Entity, false) then
+                    if aimEnemy then
+                        if Self.IsPedMyEnemy(Entity) then
+                            TASK.TASK_AIM_GUN_AT_COORD(Self.GetPedID(), bonePos.x, bonePos.y, bonePos.z, 250, true,
+                                false)
+                            TASK.TASK_SHOOT_AT_COORD(Self.GetPedID(), bonePos.x, bonePos.y, bonePos.z, 250,
+                                2556319013)
                         end
+                    else
+                        TASK.TASK_AIM_GUN_AT_COORD(Self.GetPedID(), bonePos.x, bonePos.y, bonePos.z, 250, true, false)
+                        TASK.TASK_SHOOT_AT_COORD(Self.GetPedID(), bonePos.x, bonePos.y, bonePos.z, 250, 2556319013)
                     end
                 end
             end
@@ -1461,7 +1428,7 @@ script.register_looped("SS_MAGICBULLET", function(mb)
         if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
             local isAiming, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(self.get_id(), i_Entity)
             if isAiming and ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
-                local pedPos = Game.GetCoords(Entity, true)
+                local pedPos = Game.GetEntityCoords(Entity, true)
                 if Entity ~= 0 then
                     i_LastAimedAtPed = Entity
                 end
@@ -1490,34 +1457,42 @@ script.register_looped("SS_MAGICBULLET", function(mb)
 end)
 
 script.register_looped("SS_AUTOKILL", function(ak) -- Auto-kill enemies
-    if autoKill then
-        local myCoords = self.get_pos()
-        local gta_peds = entities.get_all_peds_as_handles()
-        if (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET_WITHIN_RADIUS(Self.GetPedID(), myCoords.x, myCoords.y, myCoords.z, 500)) > 0 then
-            ak:sleep(10)
-            for _, p in pairs(gta_peds) do
-                if PED.IS_PED_HUMAN(p) and Self.IsPedMyEnemy(p) and not PED.IS_PED_A_PLAYER(p) then
-                    if PED.IS_PED_IN_ANY_VEHICLE(p, false) then
-                        local enemy_vehicle        = PED.GET_VEHICLE_PED_IS_IN(p, false)
-                        local enemy_vehicle_coords = ENTITY.GET_ENTITY_COORDS(enemy_vehicle, true)
-                        local dist                 = SYSTEM.VDIST(enemy_vehicle_coords.x, enemy_vehicle_coords.y,
-                            enemy_vehicle_coords.z, myCoords.x, myCoords.y, myCoords.z)
-                        if dist >= 20 then
-                            VEHICLE.SET_VEHICLE_ENGINE_HEALTH(enemy_vehicle, -4000)
-                            if VEHICLE.IS_THIS_MODEL_A_BIKE(ENTITY.GET_ENTITY_MODEL(enemy_vehicle)) or VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(enemy_vehicle)) then
-                                for i = 0, 7 do
-                                    VEHICLE.SET_VEHICLE_TYRE_BURST(enemy_vehicle, i, false, 1000.0)
-                                end
+    if (autoKill and
+        (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET_WITHIN_RADIUS(
+            Self.GetPedID(),
+            self.get_pos().x,
+            self.get_pos().y,
+            self.get_pos().z,
+            500
+        )) > 0
+    ) then
+        for _, p in pairs(entities.get_all_peds_as_handles()) do
+            if PED.IS_PED_HUMAN(p) and Self.IsPedMyEnemy(p) and not PED.IS_PED_A_PLAYER(p) then
+                if PED.IS_PED_IN_ANY_VEHICLE(p, false) then
+                    local enemy_vehicle = PED.GET_VEHICLE_PED_IS_IN(p, false)
+                    local enemy_vehicle_coords = Game.GetEntityCoords(enemy_vehicle, true)
+                    local dist = vec3:distance(enemy_vehicle_coords, Self.GetPos())
+
+                    if dist >= 20 then
+                        VEHICLE.SET_VEHICLE_ENGINE_HEALTH(enemy_vehicle, -4000)
+                        if (
+                            Game.Vehicle.IsBike(enemy_vehicle) or
+                            Game.Vehicle.IsCar(enemy_vehicle)
+                        ) then
+                            for i = 0, 7 do
+                                VEHICLE.SET_VEHICLE_TYRE_BURST(enemy_vehicle, i, false, 1000.0)
                             end
-                            PED.APPLY_DAMAGE_TO_PED(p, 100000, true, 0, 0x7FD62962)
-                            -- NETWORK.NETWORK_EXPLODE_VEHICLE(enemy_vehicle, true, false, 0)
                         end
-                    else
+
                         PED.APPLY_DAMAGE_TO_PED(p, 100000, true, 0, 0x7FD62962)
+                        -- NETWORK.NETWORK_EXPLODE_VEHICLE(enemy_vehicle, true, false, 0)
                     end
+                else
+                    PED.APPLY_DAMAGE_TO_PED(p, 100000, true, 0, 0x7FD62962)
                 end
             end
         end
+        ak:sleep(10)
     end
 end)
 
@@ -1917,24 +1892,41 @@ script.register_looped("SS_LCTRL", function(lct) -- Launch Control
         else
             notif_sound, notif_ref = "MP_5_SECOND_TIMER", "HUD_FRONTEND_DEFAULT_SOUNDSET"
         end
+
         if VEHICLE.IS_VEHICLE_STOPPED(Self.Vehicle.Current) and
             VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(Self.Vehicle.Current) and
             VEHICLE.GET_VEHICLE_ENGINE_HEALTH(Self.Vehicle.Current) > 300 then
             if PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not pressing_drift_button then
+                local fgCol = Col(255, 255, 255, 255)
+
                 started_lct = true
                 ENTITY.FREEZE_ENTITY_POSITION(Self.Vehicle.Current, true)
-                local fgCol = { r = 255, g = 255, b = 255, a = 255 }
-                local _, x, y = GRAPHICS.GET_SCREEN_COORD_FROM_WORLD_COORD(
-                    self.get_pos().x, self.get_pos().y, self.get_pos().z, x, y
-                )
+
                 if i_TimerA < 1 then
                     i_TimerA = i_TimerA + 0.005
                 end
+
                 if i_TimerA >= 1 then
-                    fgCol = { r = 111, g = 194, b = 118, a = 255 }
+                    fgCol = Col(111, 194, 118, 255)
                 end
-                Game.DrawText(0.44, 0.936, "Launch Control", fgCol, vec2:new(1, 0.4), 2)
-                Game.DrawBar(0.53, 0.95, 0.1, 0.01, fgCol, { r = 0, g = 0, b = 0, a = 150 }, i_TimerA)
+
+                Game.DrawText(
+                    vec2:new(0.44, 0.936),
+                    "Launch Control",
+                    fgCol,
+                    vec2:new(1, 0.4),
+                    2
+                )
+
+                Game.DrawBar(
+                    vec2:new(0.53, 0.95),
+                    0.1,
+                    0.01,
+                    fgCol,
+                    Col(0, 0, 0, 150),
+                    i_TimerA
+                )
+
                 if i_TimerA >= 1 then
                     if not launch_active then
                         YimToast:ShowSuccess("Samurais Scripts", "Launch Control Ready!")
@@ -1944,7 +1936,7 @@ script.register_looped("SS_LCTRL", function(lct) -- Launch Control
                 end
             elseif started_lct and i_TimerA > 0 and i_TimerA < 1 then
                 if PAD.IS_CONTROL_RELEASED(0, 71) or PAD.IS_CONTROL_RELEASED(0, 72) then
-                    fgCol = { r = 255, g = 255, b = 255, a = 255 }
+                    fgCol = Col(255, 255, 255, 255)
                     i_TimerA = 0
                     ENTITY.FREEZE_ENTITY_POSITION(Self.Vehicle.Current, false)
                     started_lct = false
@@ -2080,7 +2072,7 @@ script.register_looped("SS_MISC_VEH", function(mvo)
     end
 
     if autovehlocks and (Self.Vehicle.Current ~= 0) and Self.Vehicle.IsCar then
-        local vehPos   = Game.GetCoords(Self.Vehicle.Current, true)
+        local vehPos   = Game.GetEntityCoords(Self.Vehicle.Current, true)
         local selfPos  = self.get_pos()
         local distance = vec3:distance(vehPos, selfPos)
         local isLocked = VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(Self.Vehicle.Current) > 1
@@ -2599,14 +2591,31 @@ end)
 script.register_looped("SS_DRIFTPTS", function() -- Drift Points
     if Self.IsDriving() and Self.Vehicle.IsCar and driftMinigame and is_drifting then
         local driftText    = string.format("%s\n+%s pts", drift_streak_text, Lua_fn.SeparateInt(drift_points))
-        local driftTextCol = { r = 255, g = 192, b = 0, a = 200 }
+        local driftTextCol = Col(255, 192, 0, 200)
         local _, x, y      = HUD.GET_HUD_SCREEN_POSITION_FROM_WORLD_POSITION(
-            self.get_pos().x, self.get_pos().y, self.get_pos().z, x, y
+            self.get_pos().x,
+            self.get_pos().y,
+            self.get_pos().z,
+            x,
+            y
         )
-        Game.DrawText(x, y - 0.6, driftText, driftTextCol, vec2:new(1, 0.7), 7)
+
+        Game.DrawText(
+            vec2:new(x, y - 0.6),
+            driftText,
+            driftTextCol,
+            vec2:new(1, 0.7),
+            7
+        )
 
         if drift_extra_pts > 0 or drift_extra_text ~= "" then
-            Game.DrawText(x, y - 0.5142, drift_extra_text, driftTextCol, vec2:new(1, 0.4), 7)
+            Game.DrawText(
+                vec2:new(x, y - 0.5142),
+                drift_extra_text,
+                driftTextCol,
+                vec2:new(1, 0.4),
+                7
+            )
         end
     end
 end)
@@ -3109,28 +3118,6 @@ script.register_looped("SS_FLATBED", function()
     end
 end)
 
-script.register_looped("SS_VCO", function() -- Vehicle Creator Organizer
-    for k, v in ipairs(spawned_vehicles) do
-        if not ENTITY.DOES_ENTITY_EXIST(v) then
-            table.remove(spawned_vehicles, k)
-            table.remove(spawned_vehNames, k)
-            table.remove(filteredVehNames, k)
-        end
-    end
-
-    for k, v in ipairs(veh_attachments) do
-        if not ENTITY.DOES_ENTITY_EXIST(v.entity) then
-            table.remove(veh_attachments, k)
-        end
-    end
-
-    if main_vehicle ~= 0 then
-        if not ENTITY.DOES_ENTITY_EXIST(main_vehicle) then
-            main_vehicle = 0
-        end
-    end
-end)
-
 -- World
 script.register_looped("SS_PEDGRABBER", function(pg)
     if (
@@ -3505,143 +3492,6 @@ script.register_looped("SS_AMBSCN", function(ambscn) -- Ambient Scenarios
                     is_playing_amb_scenario = false
                     ambscn:sleep(1000)
                 end
-            end
-        end
-    end
-end)
-
-script.register_looped("SS_OBJPREVIEW", function(preview)
-    if previewLoop and gui.is_open() then
-        local coords = self.get_pos()
-        local fwdVec = Game.GetForwardVector(Self.GetPedID())
-        local currentHeading = ENTITY.GET_ENTITY_HEADING(previewEntity)
-        if currentObjectPreview ~= previewEntity then
-            ENTITY.DELETE_ENTITY(previewEntity)
-            previewStarted = false
-        end
-        if isChanged then
-            ENTITY.DELETE_ENTITY(previewEntity)
-            previewStarted = false
-        end
-        if not ENTITY.IS_ENTITY_DEAD(Self.GetPedID(), false) then
-            while not STREAMING.HAS_MODEL_LOADED(propHash) do
-                STREAMING.REQUEST_MODEL(propHash)
-                coroutine.yield()
-            end
-            if not previewStarted then
-                previewEntity = OBJECT.CREATE_OBJECT(
-                    propHash, coords.x + fwdVec.x * 5, coords.y + fwdVec.y * 5, coords.z, false, false, false
-                )
-                ENTITY.SET_ENTITY_ALPHA(previewEntity, 200.0, false)
-                ENTITY.SET_ENTITY_COLLISION(previewEntity, false, false)
-                ENTITY.SET_ENTITY_CAN_BE_DAMAGED(previewEntity, false)
-                ENTITY.SET_ENTITY_PROOFS(previewEntity, true, true, true, true, true, true, true, true)
-                ENTITY.SET_CAN_CLIMB_ON_ENTITY(previewEntity, false)
-                OBJECT.SET_OBJECT_ALLOW_LOW_LOD_BUOYANCY(previewEntity, false)
-                currentObjectPreview = ENTITY.GET_ENTITY_MODEL(previewEntity)
-                previewStarted = true
-            end
-            if PED.IS_PED_STOPPED(Self.GetPedID()) then
-                while true do
-                    preview:yield()
-                    if gui.is_open() and object_spawner:is_selected() then
-                        currentHeading = currentHeading + 1
-                        ENTITY.SET_ENTITY_HEADING(previewEntity, currentHeading)
-                        preview:sleep(10)
-                        if currentObjectPreview ~= ENTITY.GET_ENTITY_MODEL(previewEntity) then
-                            ENTITY.DELETE_ENTITY(previewEntity)
-                            previewStarted = false
-                        end
-                        if not PED.IS_PED_STOPPED(Self.GetPedID()) or not previewStarted then
-                            previewStarted = false
-                            break
-                        end
-                    else
-                        ENTITY.DELETE_ENTITY(previewEntity)
-                        previewStarted = false
-                    end
-                end
-            else
-                return
-            end
-        end
-    else
-        ENTITY.DELETE_ENTITY(previewEntity)
-        StopPreview()
-    end
-end)
-
-script.register_looped("SS_EDITMODE", function() -- Edit Mode
-    if spawned_props[1] ~= nil then
-        if edit_mode and not ENTITY.IS_ENTITY_ATTACHED(selectedObject.entity) then
-            local current_coords   = ENTITY.GET_ENTITY_COORDS(selectedObject.entity, true)
-            local current_rotation = ENTITY.GET_ENTITY_ROTATION(selectedObject.entity, 2)
-            if activeX then
-                ENTITY.SET_ENTITY_COORDS(selectedObject.entity, current_coords.x + spawnDistance.x, current_coords.y,
-                    current_coords.z,
-                    false, false, false, false)
-            end
-            if activeY then
-                ENTITY.SET_ENTITY_COORDS(selectedObject.entity, current_coords.x, current_coords.y + spawnDistance.y,
-                    current_coords.z,
-                    false, false, false, false)
-            end
-            if activeZ then
-                ENTITY.SET_ENTITY_COORDS(selectedObject.entity, current_coords.x, current_coords.y,
-                    current_coords.z + spawnDistance.z,
-                    false, false, false, false)
-            end
-            if rotX then
-                ENTITY.SET_ENTITY_ROTATION(selectedObject.entity, current_rotation.x + spawnRot.x, current_rotation.y,
-                    current_rotation.z, 2, true)
-            end
-            if rotY then
-                ENTITY.SET_ENTITY_ROTATION(selectedObject.entity, current_rotation.x, current_rotation.y + spawnRot.y,
-                    current_rotation.z, 2, true)
-            end
-            if rotZ then
-                ENTITY.SET_ENTITY_ROTATION(selectedObject.entity, current_rotation.x, current_rotation.y,
-                    current_rotation.z + spawnRot.z, 2, true)
-            end
-        end
-        for k, v in ipairs(spawned_props) do
-            if not ENTITY.DOES_ENTITY_EXIST(v.entity) then
-                table.remove(spawned_props, k)
-            end
-        end
-    end
-    if attached_props[1] ~= nil then
-        for i, v in ipairs(attached_props) do
-            if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(v.entity, Self.GetPedID()) then
-                table.remove(attached_props, i)
-            end
-        end
-    end
-    if vehicle_attachments[1] ~= nil then
-        for i, v in ipairs(vehicle_attachments) do
-            if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(v.entity, self.get_veh()) then
-                table.remove(vehicle_attachments, i)
-            end
-        end
-    end
-    if spawned_persist_T[1] ~= nil then
-        for k, v in ipairs(spawned_persist_T) do
-            if not ENTITY.DOES_ENTITY_EXIST(v) then
-                table.remove(spawned_persist_T, k)
-            end
-        end
-    end
-    if vehAttachments[1] ~= nil then
-        for index, entity in ipairs(vehAttachments) do
-            if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(entity, Self.Vehicle.Current) then
-                table.remove(vehAttachments, index)
-            end
-        end
-    end
-    if selfAttachments[1] ~= nil then
-        for k, v in ipairs(selfAttachments) do
-            if not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(v.entity, Self.GetPedID()) then
-                table.remove(selfAttachments, k)
             end
         end
     end
@@ -4302,9 +4152,6 @@ script.register_looped("SS_TOGGLABLES", function(hfe) -- Misc toggleables
 end)
 
 
---
--- event handlers
---
 event.register_handler(menu_event.MenuUnloaded, function()
     SS.HandleEvents()
 end)

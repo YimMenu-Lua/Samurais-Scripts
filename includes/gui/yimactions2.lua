@@ -27,7 +27,7 @@ function UpdatefilteredAnims()
     end)
 end
 
-local function DisplayFilteredAnims()
+function DisplayFilteredAnims()
     UpdatefilteredAnims()
     local t_AnimNames = {}
     for _, anim in ipairs(t_FilteredAnims) do
@@ -36,7 +36,7 @@ local function DisplayFilteredAnims()
     i_AnimIndex, used = ImGui.ListBox("##animlistbox", i_AnimIndex, t_AnimNames, #t_FilteredAnims)
 end
 
-local function UpdatefilteredScenarios()
+function UpdatefilteredScenarios()
     t_FilteredScenarios = {}
     for _, scene in ipairs(t_PedScenarios) do
         if string.find(string.lower(scene.name), string.lower(actions_search)) then
@@ -45,7 +45,7 @@ local function UpdatefilteredScenarios()
     end
 end
 
-local function DisplayFilteredScenarios()
+function DisplayFilteredScenarios()
     UpdatefilteredScenarios()
     local t_ScenarioNames = {}
     for _, scene in ipairs(t_FilteredScenarios) do

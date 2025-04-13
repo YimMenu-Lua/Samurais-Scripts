@@ -7,6 +7,7 @@
 ---@field z float z component of the vector.
 vec3 = {}
 vec3.__index = vec3
+
 vec3.__tostring = function(self)
     return string.format(
         "(%s, %s, %s)",
@@ -139,7 +140,7 @@ end
 
 -- Constructor
 
----Returns: `vec3`: a vector containing x, y, and z values.
+-- Returns: `vec3`: a vector containing x, y, and z values.
 ---**Example Usage:**
 ---```lua
 ---myInstance = vec3:new(x, y, z)
@@ -157,19 +158,42 @@ function vec3:new(x, y, z)
     return instance
 end
 
+-- Returns a zero vector.
+function vec3:zero()
+    return vec3:new(0, 0, 0)
+end
+
 ---@param includeZ? boolean
 function vec3:inverse(includeZ)
     return vec3:new(-self.x, -self.y, includeZ and -self.z or self.z)
 end
 
----@param this vec3
----@param that vec3
-function vec3:distance(this, that)
-    local dist_x = (that.x - this.x) ^ 2
-    local dist_y = (that.y - this.y) ^ 2
-    local dist_z = (that.z - this.z) ^ 2
+-- Calculates the distance between two 3D vectors
+---@param from vec3
+---@param to vec3
+function vec3:distance(from, to)
+    local dist_x = (to.x - from.x) ^ 2
+    local dist_y = (to.y - from.y) ^ 2
+    local dist_z = (to.z - from.z) ^ 2
 
     return math.sqrt(dist_x + dist_y + dist_z)
+end
+
+-- Performs linear interpolation between source and destination vectors
+---@param dest vec3
+---@param deltaTime integer
+function vec3:lerp(src, dest, deltaTime)
+    return vec3:new(
+        src.x + (dest.x - src.x) * deltaTime,
+        src.y + (dest.y - src.y) * deltaTime,
+        src.z + (dest.z - src.z) * deltaTime
+    )
+end
+
+-- Returns a 2D vector from a 3D vector.
+---@return vec2
+function vec3:as_vec2()
+    return vec2:new(self.x, self.y)
 end
 
 --
@@ -177,13 +201,9 @@ end
 -- helpers
 --
 
--- Converts vector3 objects to a custom vec3 class.
+-- Allows arithmetic and relational operations
 --
--- You can perform arithmetic and relational operations
---
--- directly on vector3 tables or vector3 returns from
---
--- GTA native calls.
+-- between 3D vectors.
 --
 ---@param arg table | userdata
 function toVec3(arg)

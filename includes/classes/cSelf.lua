@@ -1,4 +1,5 @@
 ---@class Self
+-- LocalPlayer
 Self = {}
 Self.__index = Self
 
@@ -26,6 +27,16 @@ Self.GetPos = function()
     )
 end
 
+Self.GetRot = function()
+    local vec_Rot = ENTITY.GET_ENTITY_ROTATION(self.get_ped(), 2)
+    return vec3:new(vec_Rot.x, vec_Rot.y, vec_Rot.z)
+end
+
+---@return integer
+Self.GetHeading = function()
+   return ENTITY.GET_ENTITY_HEADING(self.get_ped())
+end
+
 ---@return vec3
 Self.GetForwardVector = function()
     local fwdvec = ENTITY.GET_ENTITY_FORWARD_VECTOR(Self.GetPedID())
@@ -45,6 +56,36 @@ end
 ---@return number
 Self.GetElevation = function()
     return ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(Self.GetPedID())
+end
+
+-- Returns the entity localPlayer is aiming at.
+---@param skipPlayers? boolean
+---@return integer | nil
+Self.GetEntityInCrosshairs = function(skipPlayers)
+    local bIsAiming, Entity = false, 0
+
+    if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
+        bIsAiming, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(self.get_id(), Entity)
+    end
+
+    if bIsAiming and ENTITY.DOES_ENTITY_EXIST(Entity) then
+        if ENTITY.IS_ENTITY_A_PED(Entity) then
+            if PED.IS_PED_A_PLAYER(Entity) and skipPlayers then
+                return
+            end
+
+            if PED.IS_PED_IN_ANY_VEHICLE(Entity, false) then
+                return PED.GET_VEHICLE_PED_IS_IN(Entity, false)
+            end
+        end
+    end
+
+    return bIsAiming and Entity or nil
+end
+
+---@return integer
+Self.GetDeltaTime = function()
+    return MISC.GET_FRAME_TIME()
 end
 
 ---@return boolean
@@ -236,7 +277,7 @@ end
 ---@param ped integer
 Self.IsPedMyEnemy = function(ped)
     local relationship = PED.GET_RELATIONSHIP_BETWEEN_PEDS(ped, Self.GetPedID())
-    local pedCoords = Game.GetCoords(ped, true)
+    local pedCoords = Game.GetEntityCoords(ped, true)
     return (
         PED.IS_PED_IN_COMBAT(ped, Self.GetPedID()) or
         (relationship > 2 and relationship <= 5) or
@@ -311,7 +352,7 @@ Self.IsNearPublicSeat = function()
     local prop     = 0
     local x_offset = 0.0
     local z_offset = 1.0
-    local seatPos  = vec3:new(0, 0, 0)
+    local seatPos  = vec3:zero()
     local myCoords = Self.GetPos()
 
     for _, seat in ipairs(t_WorldSeats) do
@@ -327,7 +368,7 @@ Self.IsNearPublicSeat = function()
         )
 
         if ENTITY.DOES_ENTITY_EXIST(prop) then
-            seatPos = Game.GetCoords(prop, false)
+            seatPos = Game.GetEntityCoords(prop, false)
             if ambient_scenarios and Game.DoesHumanScenarioExistInArea(seatPos, 1, true) then
                 return false, 0, 0, 0
             end
@@ -355,7 +396,7 @@ end
 --
 -- and returns the entity handle of the bin if true.
 Self.IsNearTrashBin = function()
-    local binPos = vec3:new(0, 0, 0)
+    local binPos = vec3:zero()
     local myCoords = Self.GetPos()
     local myFwdVec = Self.GetForwardVector()
     local searchPos = vec3:new(
@@ -377,7 +418,7 @@ Self.IsNearTrashBin = function()
         )
 
         if ENTITY.DOES_ENTITY_EXIST(bin) then
-            binPos = Game.GetCoords(bin, false)
+            binPos = Game.GetEntityCoords(bin, false)
             if vec3:distance(searchPos, binPos) <= 1.3 then
                 return true, bin
             end

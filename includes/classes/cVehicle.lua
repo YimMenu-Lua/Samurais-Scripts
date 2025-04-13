@@ -8,6 +8,7 @@ Game.Vehicle.Name = function(vehicle)
     if ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
         return vehicles.get_vehicle_display_name(Game.GetEntityModel(vehicle))
     end
+
     return ""
 end
 
@@ -46,6 +47,7 @@ Game.Vehicle.GetOccupants = function(vehicle)
 end
 
 ---@param vehicle integer
+---@return boolean
 Game.Vehicle.IsEnemyVehicle = function(vehicle)
     if ENTITY.DOES_ENTITY_EXIST(vehicle) and ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
         local occupants = Game.Vehicle.GetOccupants(vehicle)
@@ -57,21 +59,97 @@ Game.Vehicle.IsEnemyVehicle = function(vehicle)
             end
         end
     end
+
     return false
 end
 
 -- Returns whether a vehicle is weaponized.
 ---@param vehicle integer
+---@return boolean
 Game.Vehicle.IsWeaponized = function(vehicle)
     return VEHICLE.DOES_VEHICLE_HAVE_WEAPONS(vehicle)
+end
+
+---@param vehicle integer
+---@return boolean
+Game.Vehicle.IsCar = function(vehicle)
+    if not vehicle or vehicle == 0 then
+        return false
+    end
+
+    return VEHICLE.IS_THIS_MODEL_A_CAR(Game.EnsureModelHash(vehicle))
+end
+
+---@param vehicle integer
+---@return boolean
+Game.Vehicle.IsBike = function(vehicle)
+    if not vehicle or vehicle == 0 then
+        return false
+    end
+
+    return VEHICLE.IS_THIS_MODEL_A_BIKE(Game.EnsureModelHash(vehicle))
+end
+
+---@param vehicle integer
+---@return boolean
+Game.Vehicle.IsQuad = function(vehicle)
+    if not vehicle or vehicle == 0 then
+        return false
+    end
+
+    return (
+        VEHICLE.IS_THIS_MODEL_A_QUADBIKE(Game.EnsureModelHash(vehicle)) or
+        VEHICLE.IS_THIS_MODEL_AN_AMPHIBIOUS_QUADBIKE(Game.EnsureModelHash(vehicle))
+    )
+end
+
+---@param vehicle integer
+---@return boolean
+Game.Vehicle.IsPlane = function(vehicle)
+    if not vehicle or vehicle == 0 then
+        return false
+    end
+
+    return VEHICLE.IS_THIS_MODEL_A_PLANE(Game.EnsureModelHash(vehicle))
+end
+
+---@param vehicle integer
+---@return boolean
+Game.Vehicle.IsHeli = function(vehicle)
+    if not vehicle or vehicle == 0 then
+        return false
+    end
+
+    return VEHICLE.IS_THIS_MODEL_A_HELI(Game.EnsureModelHash(vehicle))
+end
+
+---@param vehicle integer
+---@return boolean
+Game.Vehicle.IsSubmersible = function(vehicle)
+    if not vehicle or vehicle == 0 then
+        return false
+    end
+
+    return VEHICLE.IS_THIS_MODEL_AN_AMPHIBIOUS_CAR(Game.EnsureModelHash(vehicle))
+end
+
+
+---@param vehicle integer
+---@return boolean
+Game.Vehicle.IsBicycle = function(vehicle)
+    if not vehicle or vehicle == 0 then
+        return false
+    end
+
+    return VEHICLE.IS_THIS_MODEL_A_BICYCLE(Game.EnsureModelHash(vehicle))
 end
 
 -- Returns whether the vehicle has ABS as standard.
 Game.Vehicle.HasABS = function(vehicle)
     if Self.IsDriving() and Self.Vehicle.IsCar then
-        local m_model_flags = Memory.GetVehicleInfo(vehicle).m_model_flags
-        if m_model_flags ~= nil then
-            local iModelFlags = m_model_flags:get_dword()
+        local pModelFlags = Memory.GetVehicleInfo(vehicle).m_model_flags
+        if pModelFlags:is_valid() then
+            local iModelFlags = pModelFlags:get_dword()
             return Lua_fn.has_bit(iModelFlags, MF._ABS_STD)
         end
     end
@@ -200,8 +278,71 @@ Game.Vehicle.SetAcceleration = function(vehicle, multiplier)
         return
     end
 
-    local acc_ptr = Memory.GetVehicleInfo(vehicle).m_acceleration
-    if acc_ptr:is_valid() then
-        acc_ptr:set_float(multiplier)
+    local pAcceleration = Memory.GetVehicleInfo(vehicle).m_acceleration
+    if pAcceleration:is_valid() then
+        pAcceleration:set_float(multiplier)
     end
+end
+
+---@param vehicle integer
+Game.Vehicle.GetVehicleMods = function(vehicle)
+    local t = {}
+
+    for i = 0, 49 do
+        table.insert(t, VEHICLE.GET_VEHICLE_MOD(vehicle, i))
+    end
+
+    return t
+end
+
+Game.Vehicle.PreloadMod = function(vehicle, type, index)
+    VEHICLE.PRELOAD_VEHICLE_MOD(vehicle, type, index)
+
+    while not VEHICLE.HAS_PRELOAD_MODS_FINISHED(vehicle) do
+        VEHICLE.PRELOAD_VEHICLE_MOD(vehicle, type, index)
+        coroutine.yield()
+    end
+
+    return VEHICLE.HAS_PRELOAD_MODS_FINISHED(vehicle)
+end
+
+---@param vehicle integer
+---@param t table
+Game.Vehicle.ApplyVehicleMods = function(vehicle, t)
+    script.run_in_fiber(function()
+        VEHICLE.SET_VEHICLE_MOD_KIT(vehicle, 0)
+
+        if t.mods then
+            for slot, mod in ipairs(t.mods) do
+                if mod ~= -1 then
+                    if Game.Vehicle.PreloadMod(vehicle, (slot - 1), mod) then
+                        VEHICLE.SET_VEHICLE_MOD(vehicle, (slot - 1), mod, true)
+                    end
+                end
+            end
+            VEHICLE.RELEASE_PRELOAD_MODS(vehicle)
+        end
+
+        if t.primary_color then
+            VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(
+                vehicle,
+                t.primary_color.r,
+                t.primary_color.g,
+                t.primary_color.b
+            )
+        end
+
+        if t.secondary_color then
+            VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(
+                vehicle,
+                t.secondary_color.r,
+                t.secondary_color.g,
+                t.secondary_color.b
+            )
+        end
+
+        if t.window_tint then
+            VEHICLE.SET_VEHICLE_WINDOW_TINT(vehicle, t.window_tint)
+        end
+    end)
 end

@@ -44,7 +44,7 @@ Color.__tostring = function(self)
         <class Color>
             - Float: %.3f, %.3f, %.3f, %.3f
             - RGBA: %d, %d, %d, %d
-            - ImU32: 0x%X
+            - U32: 0x%X
             - Hex: %s
         ]],
         f_r,
@@ -144,13 +144,15 @@ function Color:New(...)
                 instance.type = "hex"
                 instance.r, instance.g, instance.b, instance.a = instance:AsRGBA()
             else
-                if self.string_colors[args[1]] then
-                    local _arg = self.string_colors[args[1]]
+                if self.string_colors[args[1]:lower()] then
+                    local _arg = self.string_colors[args[1]:lower()]
                     instance.type = "float"
+
                     instance.r = _arg[1]
                     instance.g = _arg[2]
                     instance.b = _arg[3]
                     instance.a = _arg[4]
+
                 else
                     log.warning(("[Color Error]: Invalid parameter: '%s'"):format(args[1]))
                     instance.type = nil
@@ -262,7 +264,7 @@ function Col(...)
     return Color:New(...)
 end
 
--- Wrapper for `Color:ToImU32()`
+-- Wrapper for `Color:AsU32()`
 --
 ----------------------------------
 -- Returns a uint32 color in **ABGR** format.
@@ -271,7 +273,7 @@ function ImU32(...)
     return Col(...):AsU32()
 end
 
--- Wrapper for `Color:ToFloat()`
+-- Wrapper for `Color:AsFloat()`
 --
 ----------------------------------
 -- Returns ImGui color floats in **RGBA** format.

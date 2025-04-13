@@ -318,6 +318,15 @@ function KeyManager:RegisterKeybind(key, callback, onKeyDown)
     end
 end
 
+---@param key integer | string
+function KeyManager:RemoveKeybind(key)
+    for i, v in ipairs(self.keys) do
+        if (key == v.name or key == v.code) then
+            table.remove(self.keys, i)
+            break
+        end
+    end
+end
 
 function KeyManager:HandleCallbacks()
     for _, k in ipairs(self.keys) do

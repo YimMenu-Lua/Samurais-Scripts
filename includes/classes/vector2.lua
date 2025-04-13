@@ -160,13 +160,9 @@ end
 -- helpers
 --
 
--- Converts vector2 objects to a custom vec2 class.
+-- Allows arithmetic and relational operations
 --
--- You can perform arithmetic and relational operations
---
--- directly on vector2 tables or vector2 returns from
---
--- GTA native calls.
+-- between 2D vectors.
 --
 ---@param arg table | userdata
 function toVec2(arg)

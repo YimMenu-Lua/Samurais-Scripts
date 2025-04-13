@@ -20,7 +20,7 @@ end
 ---@return vec3
 Memory.GetVec3 = function(ptr)
     if ptr:is_null() then
-        return vec3:new(0, 0, 0)
+        return vec3:zero()
     end
 
     return vec3:new(
@@ -145,6 +145,9 @@ Memory.GetVehicleModelFlag = function(vehicle, flag)
     end
 end
 
+-- ### Unsafe for non-scripted entities.
+--______________________________________
+--
 -- Returns the model type of an entity (ped, object, vehicle, MLO, time, etc...)
 ---@param entity integer
 ---@return number

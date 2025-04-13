@@ -1181,7 +1181,7 @@ function YimConfig:New(script_name, default_config, pretty_json, indent, strict_
         instance.default_config ~= nil,
         "YimConfig failed to load! Persistent config will be disabled for this script."
     )
-    log.info(string.format("YimConfig v%s successfully loaded\n%s", YimConfig._version_, YimConfig._credits_))
+    -- log.info(string.format("YimConfig v%s successfully loaded\n%s", YimConfig._version_, YimConfig._credits_))
     return instance
 end
 

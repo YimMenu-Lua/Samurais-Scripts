@@ -3,11 +3,6 @@
 function WeaponsUI()
     ImGui.BeginChild("WeaponChild", 340, 480, true)
     ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 25, 25)
-    HashGrabber, HgUsed = ImGui.Checkbox(_T("HASHGRABBER_CB_"), HashGrabber)
-    UI.Tooltip(_T("HASHGRABBER_DESC_"))
-    if HgUsed then
-        UI.WidgetSound("Nav2")
-    end
 
     Triggerbot, TbUsed = ImGui.Checkbox(_T("TRIGGERBOT_CB_"), Triggerbot)
     UI.Tooltip(_T("TRIGGERBOT_DESC_"))

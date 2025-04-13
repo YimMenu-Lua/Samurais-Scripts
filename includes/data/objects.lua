@@ -1,5 +1,6 @@
 ---@diagnostic disable
-custom_props  = {
+
+t_CustomProps  = {
     { hash = 1524959858, name = "Microphone" },
     { hash = 2473946431, name = "TV Camera" },
     { hash = 1903501406, name = "Barbeque 1" },
@@ -90,7 +91,8 @@ custom_props  = {
     { hash = 2307648186, name = "Statue: Cherries" },
     { hash = 1203231469, name = "Backpack" },
 }
-gta_objets    = {
+
+t_GameObjects    = {
     "02gate3_l", "apa_heist_apart2_door", "apa_mp_apa_crashed_usaf_01a", "apa_mp_apa_y1_l1a", "apa_mp_apa_y1_l1b",
     "apa_mp_apa_y1_l1c", "apa_mp_apa_y1_l1d", "apa_mp_apa_y1_l2a", "apa_mp_apa_y1_l2b", "apa_mp_apa_y1_l2c",
     "apa_mp_apa_y1_l2d", "apa_mp_apa_y2_l1a", "apa_mp_apa_y2_l1b", "apa_mp_apa_y2_l1c", "apa_mp_apa_y2_l1d",
@@ -4932,7 +4934,8 @@ gta_objets    = {
     "xs_terrain_set_dystopian_09", "xs_terrain_set_dystopian_10", "xs_wasteland_pitstop", "xs_wasteland_pitstop_aniem",
     "xs_x18intvip_vip_light_dummy", "xs3_prop_int_xmas_tree_01", "zprop_bin_01a_old",
 }
-mp_blacklist  = {
+
+t_mpBlacklistedObjects  = {
     "ng_proc_temp",
     "proc_brittlebush_01",
     "proc_desert_sage_01",
@@ -5293,7 +5296,8 @@ mp_blacklist  = {
     "m24_1_prop_m41_licence_frame_01a",
     "m24_1_prop_m41_shield_trophy_01a",
 }
-crash_objects = {
+
+t_UnsafeObjects = {
     "prop_dummy_01",
     "prop_dummy_car",
     "prop_dummy_light",
@@ -5330,6 +5334,7 @@ crash_objects = {
     "v_res_d_dildo_e",
     "v_res_d_dildo_f",
     "v_res_skateboard",
+    "v_61_bth_mesh_sexdoll",
     "prop_battery_01",
     "prop_barbell_01",
     "prop_barbell_02",

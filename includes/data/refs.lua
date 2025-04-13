@@ -1,6 +1,6 @@
 ---@diagnostic disable
 
-eGameState      = {
+eGameState        = {
     "Invalid",
     "Playing",
     "Died",
@@ -11,22 +11,22 @@ eGameState      = {
     "InMPCutscene",
 }
 
-eModelTypes     = {
-    [0]     = 'Invalid',
-    [1]     = 'Object',
-    [2]     = 'MLO',
-    [3]     = 'Time',
-    [4]     = 'Weapon',
-    [5]     = 'Vehicle',
-    [6]     = 'Ped',
-    [7]     = 'Destructible',
-    [33]    = 'Destructible',
-    [157]   = 'Building/Map Texture',
-    [43649] = 'Fixed Map Object',
-    [16385] = 'Fixed Map Object',
+eModelTypes       = {
+    [0]     = "Invalid",
+    [1]     = "Object",
+    [2]     = "MLO",
+    [3]     = "Time",
+    [4]     = "Weapon",
+    [5]     = "Vehicle",
+    [6]     = "Ped",
+    [7]     = "Destructible",
+    [33]    = "Destructible",
+    [157]   = "Building/Map Texture",
+    [16385] = "Fixed Map Object",
+    [43649] = "Fixed Map Object",
 }
 
-eVehicleClasses        = {
+eVehicleClasses   = {
     "Compacts",
     "Sedans",
     "SUVs",
@@ -52,7 +52,22 @@ eVehicleClasses        = {
     "Open Wheel"
 }
 
-t_Langs          = {
+ePedComponents = {
+    "Face",
+    "Mask",
+    "Hair",
+    "Torso",
+    "Legs",
+    "Bags/Parachutes",
+    "Shoes",
+    "Accessories",
+    "Undershirts",
+    "Body Armor",
+    "Decals",
+    "Tops"
+}
+
+t_Langs           = {
     { name = 'English', iso = 'en-US' },
     { name = 'Français', iso = 'fr-FR' },
     { name = 'Deütsch', iso = 'de-DE' },
@@ -138,7 +153,7 @@ t_GamepadControls = {
     { ctrl = 344, gpad = "[DPAD RIGHT]" },
 }
 
-t_UISounds     = {
+t_UISounds        = {
     ["Radar"] = {
         soundName = "RADAR_ACTIVATE",
         soundRef = "DLC_BTL_SECURITY_VANS_RADAR_PING_SOUNDS"
@@ -201,7 +216,7 @@ t_UISounds     = {
     },
 }
 
-t_RGBloopColors = {
+t_RGBloopColors   = {
     { 0,   255, 255, 1 },
     { 0,   127, 255, 1 },
     { 0,   0,   255, 1 },
@@ -217,109 +232,6 @@ t_RGBloopColors = {
 
 }
 
-t_VehicleNames  = {
-    "AMBULANCE", "BARRACKS", "BARRACKS2", "BARRACKS3", "BLIMP", "BLIMP2", "BMX", "BUS", "Baller", "Benson", "BfInjection",
-    "Biff", "Bison2", "Bison3", "BjXL", "Bodhi2", "Burrito", "Burrito4", "Buzzard2", "CAMPER", "CRUSADER", "Caddy2",
-    "Cargobob", "Cargobob3", "Cargobob4", "Dinghy", "Dominator", "Dynasty", "Emperor2", "Euros", "FBI", "FBI2", "FLATBED",
-    "FORKLIFT", "Frogger", "GRANGER", "Gauntlet", "Hauler", "Hauler2", "Lazer", "MESA", "MESA3", "Miljet", "Mixer",
-    "Mixer2", "Mower", "Mule", "Mule2", "Mule3", "Novak", "Packer", "Phantom", "Phantom4", "Phoenix", "Pounder",
-    "Predator",
-    "RHINO", "RIOT", "RancherXL", "RapidGT", "RapidGT2", "Rebel", "Rentalbus", "Ripley", "Rubble", "SEVEN70", "SHERIFF",
-    "SPECTER", "SPECTER2", "SURFER", "Sadler", "Sanchez", "Seminole", "Shamal", "Stryder", "Stunt", "Sugoi", "Suntrap",
-    "Surano", "Surfer2", "TOURBUS", "TOWTRUCK", "TRACTOR", "Taco", "TipTruck", "TipTruck2", "Towtruck2", "Trash",
-    "Utillitruck3", "Vader", "Ztype", "adder", "airbus", "airtug", "akula", "akuma", "aleutian", "alkonost", "alpha",
-    "alphaz1", "annihilator", "annihilator2", "apc", "ardent", "armytanker", "armytrailer", "armytrailer2", "asbo",
-    "asea",
-    "asea2", "asterope", "asterope2", "astron", "autarch", "avarus", "avenger", "avenger2", "avenger3", "avenger4",
-    "avisa",
-    "bagger", "baletrailer", "baller2", "baller3", "baller4", "baller5", "baller6", "baller7", "baller8", "banshee",
-    "banshee2", "banshee3", "barrage", "bati", "bati2", "benson2", "besra", "bestiagts", "bf400", "bifta", "bison",
-    "blade",
-    "blazer", "blazer2", "blazer3", "blazer4", "blazer5", "blimp3", "blista", "blista2", "blista3", "boattrailer",
-    "boattrailer2", "boattrailer3", "bobcatXL", "bombushka", "boor", "boxville", "boxville2", "boxville3", "boxville4",
-    "boxville5", "boxville6", "brawler", "brickade", "brickade2", "brigham", "brioso", "brioso2", "brioso3", "broadway",
-    "bruiser", "bruiser2", "bruiser3", "brutus", "brutus2", "brutus3", "btype", "btype2", "btype3", "buccaneer",
-    "buccaneer2", "buffalo", "buffalo2", "buffalo3", "buffalo4", "buffalo5", "bulldozer", "bullet", "burrito2",
-    "burrito3",
-    "burrito5", "buzzard", "cablecar", "caddy", "caddy3", "calico", "caracara", "caracara2", "carbonizzare", "carbonrs",
-    "cargobob2", "cargobob5", "cargoplane", "cargoplane2", "casco", "castigator", "cavalcade", "cavalcade2", "cavalcade3",
-    "cerberus", "cerberus2", "cerberus3", "champion", "chavosv6", "cheburek", "cheetah", "cheetah2", "chernobog",
-    "chimera",
-    "chino", "chino2", "cinquemila", "cliffhanger", "clique", "clique2", "club", "coach", "cog55", "cog552", "cogcabrio",
-    "cognoscenti", "cognoscenti2", "comet2", "comet3", "comet4", "comet5", "comet6", "comet7", "conada", "conada2",
-    "contender", "coquette", "coquette2", "coquette3", "coquette4", "coquette5", "coquette6", "corsita", "coureur",
-    "cruiser", "cuban800", "cutter", "cyclone", "cypher", "daemon", "daemon2", "deathbike", "deathbike2", "deathbike3",
-    "defiler", "deity", "deluxo", "deveste", "deviant", "diablous", "diablous2", "dilettante", "dilettante2", "dinghy2",
-    "dinghy3", "dinghy4", "dinghy5", "dloader", "docktrailer", "docktug", "dodo", "dominator10", "dominator2",
-    "dominator3",
-    "dominator4", "dominator5", "dominator6", "dominator7", "dominator8", "dominator9", "dorado", "double", "drafter",
-    "draugur", "driftcheburek", "driftcypher", "drifteuros", "driftfr36", "driftfuto", "driftfuto2", "driftjester",
-    "driftjester3", "driftnebula", "driftremus", "driftsentinel", "drifttampa", "driftvorschlag", "driftyosemite",
-    "driftzr350", "dubsta", "dubsta2", "dubsta3", "dukes", "dukes2", "dukes3", "dump", "dune", "dune2", "dune3", "dune4",
-    "dune5", "duster", "duster2", "elegy", "elegy2", "ellie", "emerus", "emperor", "emperor3", "enduro", "entity2",
-    "entity3", "entityxf", "envisage", "esskey", "eudora", "eurosx32", "everon", "everon2", "exemplar", "f620", "faction",
-    "faction2", "faction3", "fagaloa", "faggio", "faggio2", "faggio3", "fcr", "fcr2", "felon", "felon2", "feltzer2",
-    "feltzer3", "firebolt", "firetruk", "fixter", "flashgt", "fmj", "formula", "formula2", "fq2", "fr36", "freecrawler",
-    "freight", "freight2", "freightcar", "freightcar2", "freightcar3", "freightcont1", "freightcont2", "freightgrain",
-    "frogger2", "fugitive", "furia", "furoregt", "fusilade", "futo", "futo2", "gargoyle", "gauntlet2", "gauntlet3",
-    "gauntlet4", "gauntlet5", "gauntlet6", "gb200", "gburrito", "gburrito2", "glendale", "glendale2", "gp1",
-    "graintrailer",
-    "granger2", "greenwood", "gresley", "growler", "gt500", "guardian", "habanero", "hakuchou", "hakuchou2", "halftrack",
-    "handler", "havok", "hellion", "hermes", "hexer", "hotknife", "hotring", "howard", "hunter", "huntley", "hustler",
-    "hydra", "imorgon", "impaler", "impaler2", "impaler3", "impaler4", "impaler5", "impaler6", "imperator", "imperator2",
-    "imperator3", "inductor", "inductor2", "infernus", "infernus2", "ingot", "innovation", "insurgent", "insurgent2",
-    "insurgent3", "intruder", "issi2", "issi3", "issi4", "issi5", "issi6", "issi7", "issi8", "italigtb", "italigtb2",
-    "italigto", "italirsx", "iwagen", "jackal", "jb700", "jb7002", "jester", "jester2", "jester3", "jester4", "jester5",
-    "jet", "jetmax", "journey", "journey2", "jubilee", "jugular", "kalahari", "kamacho", "kanjo", "kanjosj", "khamelion",
-    "khanjali", "komoda", "kosatka", "krieger", "kuruma", "kuruma2", "l35", "landstalker", "landstalker2", "le7b",
-    "lectro",
-    "lguard", "limo2", "lm87", "locust", "longfin", "lurcher", "luxor", "luxor2", "lynx", "mamba", "mammatus", "manana",
-    "manana2", "manchez", "manchez2", "manchez3", "marquis", "marshall", "massacro", "massacro2", "maverick", "menacer",
-    "mesa2", "metrotrain", "michelli", "microlight", "minitank", "minivan", "minivan2", "mogul", "molotok", "monroe",
-    "monster", "monster3", "monster4", "monster5", "monstrociti", "moonbeam", "moonbeam2", "mule4", "mule5", "nebula",
-    "nemesis", "neo", "neon", "nero", "nero2", "nightblade", "nightshade", "nightshark", "nimbus", "ninef", "ninef2",
-    "niobe", "nokota", "omnis", "omnisegt", "openwheel1", "openwheel2", "oppressor", "oppressor2", "oracle", "oracle2",
-    "osiris", "outlaw", "pRanger", "panthere", "panto", "paradise", "paragon", "paragon2", "paragon3", "pariah",
-    "patriot",
-    "patriot2", "patriot3", "patrolboat", "pbus", "pbus2", "pcj", "penetrator", "penumbra", "penumbra2", "peyote",
-    "peyote2", "peyote3", "pfister811", "phantom2", "phantom3", "picador", "pigalle", "pipistrello", "pizzaboy",
-    "polcaracara", "polcoquette4", "poldominator10", "poldorado", "polfaction2", "polgauntlet", "polgreenwood", "police",
-    "police2", "police3", "police4", "police5", "policeb", "policeold1", "policeold2", "policet", "policet3",
-    "polimpaler5",
-    "polimpaler6", "polmav", "polterminus", "pony", "pony2", "postlude", "pounder2", "powersurge", "prairie", "premier",
-    "previon", "primo", "primo2", "proptrailer", "prototipo", "pyro", "r300", "radi", "raiden", "raiju", "raketrailer",
-    "rallytruck", "rancherxl2", "rapidgt3", "raptor", "ratbike", "ratel", "ratloader", "ratloader2", "rcbandito",
-    "reaper",
-    "rebel2", "rebla", "reever", "regina", "remus", "retinue", "retinue2", "revolter", "rhapsody", "rhinehart", "riata",
-    "riot2", "rocoto", "rogue", "romero", "rrocket", "rt3000", "ruffian", "ruiner", "ruiner2", "ruiner3", "ruiner4",
-    "rumpo", "rumpo2", "rumpo3", "ruston", "s80", "sabregt", "sabregt2", "sadler2", "sanchez2", "sanctus", "sandking",
-    "sandking2", "savage", "savestra", "sc1", "scarab", "scarab2", "scarab3", "schafter2", "schafter3", "schafter4",
-    "schafter5", "schafter6", "schlagen", "schwarzer", "scorcher", "scramjet", "scrap", "seabreeze", "seashark",
-    "seashark2", "seashark3", "seasparrow", "seasparrow2", "seasparrow3", "seminole2", "sentinel", "sentinel2",
-    "sentinel3",
-    "sentinel4", "serrano", "sheava", "sheriff2", "shinobi", "shotaro", "skylift", "slamtruck", "slamvan", "slamvan2",
-    "slamvan3", "slamvan4", "slamvan5", "slamvan6", "sm722", "sovereign", "speeder", "speeder2", "speedo", "speedo2",
-    "speedo4", "speedo5", "squaddie", "squalo", "stafford", "stalion", "stalion2", "stanier", "starling", "stinger",
-    "stingergt", "stingertt", "stockade", "stockade3", "stratum", "streamer216", "streiter", "stretch", "strikeforce",
-    "stromberg", "submersible", "submersible2", "sultan", "sultan2", "sultan3", "sultanrs", "superd", "supervolito",
-    "supervolito2", "surfer3", "surge", "swift", "swift2", "swinger", "t20", "tahoma", "tailgater", "tailgater2",
-    "taipan",
-    "tampa", "tampa2", "tampa3", "tanker", "tanker2", "tankercar", "taxi", "technical", "technical2", "technical3",
-    "tempesta", "tenf", "tenf2", "terbyte", "terminus", "tezeract", "thrax", "thrust", "thruster", "tigon", "titan",
-    "titan2", "toreador", "torero", "torero2", "tornado", "tornado2", "tornado3", "tornado4", "tornado5", "tornado6",
-    "toro", "toro2", "toros", "towtruck3", "towtruck4", "tr2", "tr3", "tr4", "tractor2", "tractor3", "trailerlarge",
-    "trailerlogs", "trailers", "trailers2", "trailers3", "trailers4", "trailers5", "trailersmall", "trailersmall2",
-    "trash2", "trflat", "tribike", "tribike2", "tribike3", "trophytruck", "trophytruck2", "tropic", "tropic2", "tropos",
-    "tug", "tula", "tulip", "tulip2", "turismo2", "turismo3", "turismor", "tvtrailer", "tvtrailer2", "tyrant", "tyrus",
-    "uranus", "utillitruck", "utillitruck2", "vacca", "vagner", "vagrant", "valkyrie", "valkyrie2", "vamos", "vectre",
-    "velum", "velum2", "verlierer2", "verus", "vestra", "vetir", "veto", "veto2", "vigero", "vigero2", "vigero3",
-    "vigilante", "vindicator", "virgo", "virgo2", "virgo3", "virtue", "viseris", "visione", "vivanite", "volatol",
-    "volatus", "voltic", "voltic2", "voodoo", "voodoo2", "vorschlaghammer", "vortex", "vstr", "warrener", "warrener2",
-    "washington", "wastelander", "weevil", "weevil2", "windsor", "windsor2", "winky", "wolfsbane", "xa21", "xls", "xls2",
-    "yosemite", "yosemite1500", "yosemite2", "yosemite3", "youga", "youga2", "youga3", "youga4", "youga5", "z190", "zeno",
-    "zentorno", "zhaba", "zion", "zion2", "zion3", "zombiea", "zombieb", "zorrusso", "zr350", "zr380", "zr3802", "zr3803",
-}
-
 t_PedBones        = {
     { name = "Root",       ID = 0 },
     { name = "Head",       ID = 12844 },
@@ -333,7 +245,7 @@ t_PedBones        = {
     { name = "Left Foot",  ID = 14201 },
 }
 
-t_WeaponBones              = {
+t_WeaponBones     = {
     "WAPLasr",
     "WAPLasr_2",
     "WAPFlshLasr",
@@ -344,7 +256,7 @@ t_WeaponBones              = {
     "gun_muzzle"
 }
 
-t_PlaneBones            = {
+t_PlaneBones      = {
     "afterburner",
     "aileron_l",
     "aileron_r",
@@ -414,7 +326,7 @@ t_PlaneBones            = {
     "wingtip_2",
 }
 
-t_VehicleBones        = {
+t_VehicleBones    = {
     "chassis", "chassis_lowlod", "chassis_dummy", "seat_dside_f", "seat_dside_r",
     "seat_dside_r1", "seat_dside_r2", "seat_dside_r3", "seat_dside_r4", "seat_dside_r5", "seat_dside_r6", "seat_dside_r7",
     "seat_pside_f", "seat_pside_r", "seat_pside_r1", "seat_pside_r2", "seat_pside_r3", "seat_pside_r4", "seat_pside_r5",
@@ -483,7 +395,7 @@ t_VehicleBones        = {
     "chassis_Control",
 }
 
-t_ReservedKeys = {
+t_ReservedKeys    = {
     kb   = {
         0x01,
         0x07,
@@ -508,7 +420,7 @@ t_ReservedKeys = {
 }
 
 
-t_DriftSmokeColors         = {
+t_DriftSmokeColors          = {
     "White",
     "Black",
     "Red",
@@ -520,7 +432,7 @@ t_DriftSmokeColors         = {
     "Purple"
 }
 
-t_ObjectiveBlipIDs             = {
+t_ObjectiveBlipIDs          = {
     1,
     9,
     143,
@@ -538,7 +450,7 @@ t_ObjectiveBlipIDs             = {
     542,
 }
 
-t_VehicleOffsets             = {
+t_VehicleOffsets            = {
     fc   = 0x001C,
     ft   = 0x0014,
     rc   = 0x0020,
@@ -553,7 +465,7 @@ t_VehicleOffsets             = {
     cofm = 0x0020,
 }
 
-t_Handguns               = {
+t_Handguns                  = {
     0x1B06D571,
     0xBFE256D4,
     0x5EF9FEC4,
@@ -574,7 +486,7 @@ t_Handguns               = {
     0x917F6C8C
 }
 
-t_CellInputs            = {
+t_CellInputs                = {
     { control = 172, input = 1 },
     { control = 173, input = 2 },
     { control = 174, input = 3 },
@@ -587,7 +499,7 @@ t_CellInputs            = {
     { control = 181, input = 2 },
 }
 
-t_RadioStations           = {
+t_RadioStations             = {
     { station = "RADIO_11_TALK_02",               name = "Blaine County Radio" },
     { station = "RADIO_21_DLC_XM17",              name = "Blonded Los Santos 97.8 FM" },
     { station = "RADIO_04_PUNK",                  name = "Channel X" },
@@ -616,7 +528,7 @@ t_RadioStations           = {
     { station = "RADIO_13_JAZZ",                  name = "Worldwide FM" },
 }
 
-t_MaleSounds            = {
+t_MaleSounds                = {
     { name = "Angry Chinese",     soundName = "GENERIC_INSULT_HIGH",      soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
     { name = "Begging Chinese",   soundName = "GUN_BEG",                  soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
     { name = "Call The Cops!",    soundName = "PHONE_CALL_COPS",          soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
@@ -634,7 +546,7 @@ t_MaleSounds            = {
     { name = "You Look Stupid!",  soundName = "FRIEND_LOOKS_STUPID",      soundRef = "FRANKLIN_DRUNK" },
 }
 
-t_FemaleSounds          = {
+t_FemaleSounds              = {
     { name = "Blowjob",        soundName = "SEX_ORAL",                   soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
     { name = "Call The Cops!", soundName = "PHONE_CALL_COPS",            soundRef = "A_F_M_SALTON_01_WHITE_FULL_01" },
     { name = "Hooker Offer",   soundName = "HOOKER_OFFER_SERVICE",       soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
@@ -646,7 +558,7 @@ t_FemaleSounds          = {
     { name = "Threaten",       soundName = "CHALLENGE_THREATEN",         soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
 }
 
-t_ProjectileTypes       = {
+t_ProjectileTypes           = {
     0xB1CA77B1,
     0xA284510B,
     0x4DD2DC56,
@@ -720,7 +632,7 @@ t_ProjectileTypes       = {
     -1538514291,
 }
 
-t_PEcombatAttributes   = {
+t_PEcombatAttributes        = {
     { id = 5,  bool = true },
     { id = 13, bool = true },
     { id = 21, bool = true },
@@ -735,7 +647,7 @@ t_PEcombatAttributes   = {
     { id = 63, bool = false },
 }
 
-t_PEconfigFlags        = {
+t_PEconfigFlags             = {
     { id = 128, bool = true },
     { id = 140, bool = true },
     { id = 141, bool = true },
@@ -745,7 +657,7 @@ t_PEconfigFlags        = {
     { id = 435, bool = true },
 }
 
-t_RandomQuotes          = {
+t_RandomQuotes              = {
     "FACT: AWD drifting isn't drifting.",
     "People who put M badges on a non-M BMW should go to prison.",
     "Speed has never killed anyone. Suddenly becoming stationary, that's what gets you.",
@@ -771,7 +683,7 @@ t_RandomQuotes          = {
     "What's the difference between your job and your wife? Your job still sucks after 5 years.",
 }
 
-t_FlightControls        = {
+t_FlightControls            = {
     72,
     75,
     87,
@@ -787,7 +699,7 @@ t_FlightControls        = {
     112,
 }
 
-Global_262145            = {
+Global_262145               = {
     f_4413  = 262145 + 4413,  -- int Snow Weather
     f_13059 = 262145 + 13059, -- int VIP Work CD
     f_13060 = 262145 + 13060, -- int VIP Challenge CD
@@ -906,7 +818,7 @@ Global_262145            = {
 }
 
 -- boolean
-t_ceo_sell_mission_types = {
+t_ceo_sell_mission_types    = {
     f_15624 = 262145 + 15624, -- bool CEO Disable Air Attacked Sell Mission *(false)*
     f_15636 = 262145 + 15636, -- bool CEO Disable Air Drop Sell Mission *(false)*
     f_15642 = 262145 + 15642, -- bool CEO Disable Fly Low Sell Mission *(false)*
@@ -921,7 +833,7 @@ t_ceo_sell_mission_types = {
 }
 
 -- boolean
-t_mc_sell_mission_types  = {
+t_mc_sell_mission_types     = {
     f_18356 = 262145 + 18356, -- bool MC Disable Convoy Sell Mission *(false)*
     -- f_18358 = 262145 + 18358, -- bool MC Disable Trashmaster Sell Mission *(false)*
     f_18361 = 262145 + 18361, -- bool MC Disable Proven Sell Mission *(false)*
@@ -936,7 +848,7 @@ t_mc_sell_mission_types  = {
 }
 
 -- float
-t_nc_sell_mission_types  = {
+t_nc_sell_mission_types     = {
     f_24048 = 262145 + 24048, -- float Nightclub Sell Mission Multi Drop *(1.0)*
     f_24049 = 262145 + 24049, -- float Nightclub Sell Mission Hack Drop *(1.0)*
     f_24050 = 262145 + 24050, -- float Nightclub Sell Mission Roadblock *(1.0)*
@@ -949,7 +861,7 @@ t_nc_sell_mission_types  = {
 }
 
 -- float
-t_hangar_sell_mission_types  = {
+t_hangar_sell_mission_types = {
     f_22472 = 262145 + 22472, -- float Hangar Heavy Lifting Sell Mission *(1.0)*
     f_22509 = 262145 + 22509, -- float Hangar Contested Sell Mission *(1.0)*
     -- f_22511 = 262145 + 22511, -- float Hangar Agile Delivery Sell Mission *(1.0)*
@@ -961,7 +873,7 @@ t_hangar_sell_mission_types  = {
     f_22523 = 262145 + 22523, -- float Hangar Under The Radar Sell Mission *(1.0)*
 }
 
-t_WorldSeats            = {
+t_WorldSeats                = {
     "prop_bench_01a",
     "prop_table_01_chr_b",
     "prop_bench_05",
@@ -1067,7 +979,7 @@ t_WorldSeats            = {
     "h4_int_04_desk_chair"
 }
 
-t_TrashBins             = {
+t_TrashBins                 = {
     "m23_2_prop_m32_dumpster_01a",
     "prop_cs_dumpster_01a",
     "prop_dumpster_01a",
@@ -1079,7 +991,7 @@ t_TrashBins             = {
     "p_dumpster_t",
 }
 
-t_AppScriptNames       = {
+t_AppScriptNames            = {
     "apparcadebusiness",
     "apparcadebusinesshub",
     "appavengeroperations",
@@ -1121,7 +1033,7 @@ t_AppScriptNames       = {
     -- "debug_app_select_screen",
 }
 
-t_ModshopScriptNames     = {
+t_ModshopScriptNames        = {
     "arena_carmod",
     "armory_aircraft_carmod",
     "base_carmod",
@@ -1137,7 +1049,7 @@ t_ModshopScriptNames     = {
     -- "vinewood_premium_garage_carmod",
 }
 
-t_CustomPintShades      = {
+t_CustomPintShades          = {
     "All",
     "Beige",
     "Black",
@@ -1154,7 +1066,7 @@ t_CustomPintShades      = {
     "Yellow",
 }
 
-t_CustomPaintsManufacturers        = {
+t_CustomPaintsManufacturers = {
     "All",
     "Alfa Romeo",
     "AMC",
@@ -1192,7 +1104,7 @@ t_CustomPaintsManufacturers        = {
     "Volkswagen",
 }
 
-t_CustomPaints          = {
+t_CustomPaints              = {
     { name = "AMG Matte Grey",                           hex = "#171717", p = 7,   m = true,  manufacturer = "Mercedes-AMG",      shade = "Grey" },
     { name = "AMG Matte Light Grey",                     hex = "#2B2B2B", p = 8,   m = true,  manufacturer = "Mercedes-AMG",      shade = "Grey" },
     { name = "Green Hell Magno",                         hex = "#00661F", p = 5,   m = true,  manufacturer = "Mercedes-AMG",      shade = "Green" },
@@ -1546,7 +1458,7 @@ t_CustomPaints          = {
     { name = "Hyper Red",                                hex = "#3C0612", p = 30,  m = false, manufacturer = "Aston Martin",      shade = "Red" },
 }
 
-t_EngineSwaps           = {
+t_EngineSwaps               = {
     { name = "GM LS1 5.7L V8",              audioname = "coquette3", acc_mult = 4.556,   tt = "Its power is measured in freedoms per football field." },
     { name = "Subaru EJ15 1.5L F4",         audioname = "sultan2",   acc_mult = 2.82,    tt = "For the adventurous." },
     { name = "BMW N54B30 3.0L I6",          audioname = "sentinel",  acc_mult = 1.966,   tt = "Can't keep its oil inside." },
@@ -1558,7 +1470,7 @@ t_EngineSwaps           = {
 }
 
 
-t_languageCodes = {
+t_languageCodes           = {
     { name = "English",             id = 0,  iso = "en-US" },
     { name = "French",              id = 1,  iso = "fr-FR" },
     { name = "German",              id = 2,  iso = "de-DE" },
@@ -1574,7 +1486,7 @@ t_languageCodes = {
     { name = "Chinese Simplified",  id = 12, iso = "zh-CN" },
 }
 
-t_CollisionInvalidModels = {
+t_CollisionInvalidModels  = {
     3008087081,
     415536433,
     874602658,
@@ -1587,7 +1499,7 @@ t_CollisionInvalidModels = {
     1067874014,
 }
 
-t_SellScripts   = {
+t_SellScripts             = {
     ["gb_smuggler"] = { -- air
         {               -- (1.70) while .*?0 < func_.*?\(func_.*?, func_.*?, .*?Local_....?\.f_....?, -1
             l = 1985,
@@ -1643,7 +1555,7 @@ t_SellScripts   = {
     -- },
 }
 
-t_SellScriptsDisplayNames     = {
+t_SellScriptsDisplayNames = {
     { scr = "fm_content_smuggler_sell", sn = "Hangar (Land. Not supported.)" },
     { scr = "gb_smuggler",              sn = "Hangar (Air)" },
     { scr = "gb_contraband_sell",       sn = "CEO" },
@@ -1652,7 +1564,7 @@ t_SellScriptsDisplayNames     = {
     { scr = "fm_content_acid_lab_sell", sn = "Acid Lab" },
 }
 
-t_ShouldTerminateScripts = {
+t_ShouldTerminateScripts  = {
     "appArcadeBusinessHub",
     "appsmuggler",
     "appbikerbusiness",
@@ -1660,7 +1572,7 @@ t_ShouldTerminateScripts = {
     "appbusinesshub"
 }
 
-t_MovementOptions       = {
+t_MovementOptions         = {
     { name = "Default",            mvmt = nil,                                      wmvmt = nil,                         strf = nil,                                        wanim = nil },
     { name = "Arrogant (Female)",  mvmt = "move_f@arrogant@a",                      wmvmt = nil,                         strf = nil,                                        wanim = "Female" },
     { name = "Bodybuilder",        mvmt = "move_m@muscle@a",                        wmvmt = nil,                         strf = nil,                                        wanim = "Default" },
@@ -1699,7 +1611,7 @@ t_MovementOptions       = {
 -- fuck it. I'll do it manually since my smol brain
 --
 -- Can not figure out a better way.
-t_CEOwarehouses         = {
+t_CEOwarehouses           = {
     ["Convenience Store Lockup"] = {
         size = 0, max = 16, coords = vec3:new(249.246918, -1955.651978, 23.161957)
     },
@@ -1768,7 +1680,7 @@ t_CEOwarehouses         = {
     },
 }
 
-t_MCbusinessIDs        = {
+t_MCbusinessIDs           = {
     { name = "Fake Documents",  id = 0, unit_max = 60, val_offset = 17319, blip = 498, possible_ids = { 5, 10, 15, 20 } },
     { name = "Weed",            id = 1, unit_max = 80, val_offset = 17323, blip = 496, possible_ids = { 2, 7, 12, 17 } },
     { name = "Fake Cash",       id = 2, unit_max = 40, val_offset = 17320, blip = 500, possible_ids = { 4, 9, 14, 19 } },
@@ -1776,7 +1688,7 @@ t_MCbusinessIDs        = {
     { name = "Cocaine",         id = 4, unit_max = 10, val_offset = 17321, blip = 497, possible_ids = { 3, 8, 13, 18 } },
 }
 
-t_Hangars            = {
+t_Hangars                 = {
     [1] = { name = "LSIA Hangar 1", coords = vec3:new(-1148.908447, -3406.064697, 13.945053) },
     [2] = { name = "LSIA Hangar A17", coords = vec3:new(-1393.322021, -3262.968262, 13.944828) },
     [3] = { name = "Fort Zancudo Hangar A2", coords = vec3:new(-2022.336304, 3154.936768, 32.810272) },
@@ -1784,7 +1696,7 @@ t_Hangars            = {
     [5] = { name = "Fort Zancudo Hangar 3499", coords = vec3:new(-2470.278076, 3274.427734, 32.835461) },
 }
 
-t_Bunkers            = {
+t_Bunkers                 = {
     [21] = { name = "Grand Senora Oilfields Bunker", coords = vec3:new(494.680878, 3015.895996, 41.041725) },
     [22] = { name = "Grand Senora Desert Bunker", coords = vec3:new(849.619812, 3024.425781, 41.266800) },
     [23] = { name = "Route 68 Bunker", coords = vec3:new(40.422565, 2929.004395, 55.746357) },
@@ -1798,7 +1710,7 @@ t_Bunkers            = {
     [31] = { name = "Chumash Bunker", coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
 }
 
-t_AircraftMGs           = {
+t_AircraftMGs             = {
     "VEHICLE_WEAPON_DOGFIGHTER_MG",
     "VEHICLE_WEAPON_HUNTER_MG",
     "VEHICLE_WEAPON_MICROLIGHT_MG",
@@ -1824,7 +1736,7 @@ t_AircraftMGs           = {
     "VEHICLE_WEAPON_PLAYER_BUZZARD",
 }
 
-PED_TYPE        = {
+PED_TYPE                  = {
     _PLAYER_0              = 0,
     _PLAYER_1              = 1,
     _NETWORK_PLAYER        = 2,
@@ -1858,7 +1770,7 @@ PED_TYPE        = {
 }
 
 -- CVehicle::HandlingFlags
-HF                       = {
+HF                        = {
     _SMOOTHED_COMPRESSION                      = 0,
     _REDUCED_MOD_MASS                          = 1,
     _HAS_KERS                                  = 2,
@@ -1893,7 +1805,7 @@ HF                       = {
 }
 
 -- CVehicle::ModelFlags
-MF                       = {
+MF                        = {
     _IS_VAN                    = 0,
     _IS_BUS                    = 1,
     _IS_LOW                    = 2,
@@ -1929,7 +1841,7 @@ MF                       = {
 }
 
 -- CVehicle::ModelInfoFlags
-VMF                      = {
+VMF                       = {
     _HAS_LIVERY                                  = 7,
     _SPORTS                                      = 9,
     _DONT_ROTATE_TAIL_ROTOR                      = 26,
@@ -1981,7 +1893,7 @@ VMF                      = {
 }
 
 -- AnimFlags
-AF                       = {
+AF                        = {
 
     -- TODO:
     -- Rework Anim Flags in the Actions section

@@ -1,13 +1,20 @@
 ---@diagnostic disable: undefined-global, lowercase-global
 
+---@alias ToastLevel integer
+---| 0 # Default
+---| 1 # Success
+---| 2 # Warning
+---| 3 # Error
+
+
 local __init__ = false
 local __instance__ = nil
 
 local bgColors = {
     [0] = {r = 0.15, g = 0.15, b = 0.15, a = 1.0},
-    [1] = {r = 0.1, g = 0.6, b = 0.1, a = 0.8},
-    [2] = {r = 0.8, g = 0.6, b = 0.1, a = 0.8},
-    [3] = {r = 0.8, g = 0.0, b = 0.0, a = 0.8},
+    [1] = {r = 0.1, g = 0.6, b = 0.1, a = 0.5},
+    [2] = {r = 0.8, g = 0.6, b = 0.1, a = 0.5},
+    [3] = {r = 0.8, g = 0.1, b = 0.1, a = 0.5},
 }
 
 local textColors = {
@@ -59,13 +66,6 @@ local function GetScreenResolution()
 end
 
 local SCREEN_RES <const> = GetScreenResolution()
-
-
----@alias ToastLevel integer
----| 0 # Default
----| 1 # Success
----| 2 # Warning
----| 3 # Error
 
 ---@class Toast
 ---@field caller string The notification title.

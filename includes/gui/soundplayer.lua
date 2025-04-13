@@ -105,7 +105,7 @@ function SoundPlayerUI()
     else
         if ImGui.Button(string.format("%s##sounds", _T("GENERIC_PLAY_BTN_"))) then
             script.run_in_fiber(function(playsnd)
-                local myCoords = Game.GetCoords(Self.GetPedID(), true)
+                local myCoords = Game.GetEntityCoords(Self.GetPedID(), true)
                 AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(selected_sound.soundName, selected_sound.soundRef,
                     myCoords.x,
                     myCoords.y, myCoords.z, "SPEECH_PARAMS_FORCE")
