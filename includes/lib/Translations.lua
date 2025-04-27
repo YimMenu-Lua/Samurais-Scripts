@@ -17444,5 +17444,205 @@ return {
 			["iso"] = "ko-KR",
 			["text"] = "차량을 떨어 뜨리지 마십시오"
 		}
+	},
+	["AUTO_CLEAN_ENTITIES_CB_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "To prevent messing up lobbies and ruining sessions, this script has a limit to the number of entities you can spawn (vehicles, objects, peds). This option allows the script to automatically delete and replace old entities once you reach the limit."
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Um zu verhindern, dass Lobbys und ruinierte Sitzungen durcheinander gebracht werden, hat dieses Skript eine Grenze dafür, wie viele Entitäten Sie laichen können (Fahrzeuge, Objekte, PEDs). Mit dieser Option kann das Skript alte Entitäten automatisch löschen und ersetzen, sobald Sie das Limit erreicht haben."
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Pour éviter de gâcher les lobbies et de ruiner les séances, ce script a une limite du nombre d'entités que vous pouvez engendrer (véhicules, objets, PED). Cette option permet au script de supprimer et de remplacer automatiquement les anciennes entités une fois que vous avez atteint la limite."
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Per evitare che il casino di lobby e sessioni di rovina, questa sceneggiatura ha un limite di quante entità puoi generare (veicoli, oggetti, PED). Questa opzione consente allo script di eliminare e sostituire automaticamente le vecchie entità una volta raggiunto il limite."
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Para evitar bagunçar lobbies e arruinar as sessões, esse script tem um limite de quantas entidades você pode gerar (veículos, objetos, peds). Esta opção permite que o script exclua e substitua automaticamente as entidades antigas quando você atingir o limite."
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Чтобы предотвратить испорчение лобби и разрушения сеансов, этот сценарий имеет предел того, сколько сущностей вы можете появиться (транспортные средства, объекты, PED). Эта опция позволяет сценарию автоматически удалять и заменить старые сущности после достижения предела."
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Para evitar estropear los vestíbulos y la arruinación de las sesiones, este guión tiene un límite de cuántas entidades puede generar (vehículos, objetos, PED). Esta opción permite que el script elimine y reemplace automáticamente las entidades antiguas una vez que alcance el límite."
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "为了防止大厅弄乱大厅并破坏会议，该脚本具有您可以产生多少实体（车辆，物体，PED）的限制。此选项允许脚本在达到限制后自动删除并替换旧实体。"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "為了防止大廳弄亂大廳並破壞會議，該腳本具有您可以產生多少實體（車輛，物體，PED）的限制。此選項允許腳本在達到限制後自動刪除並替換舊實體。"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "ロビーを台無しにし、セッションを台無しにするのを防ぐために、このスクリプトには、スポーンできるエンティティの数（車両、オブジェクト、PED）の制限があります。このオプションを使用すると、制限に達したら、スクリプトが古いエンティティを自動的に削除および交換できます。"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Aby zapobiec psom lobby i rujnowaniu sesji, ten skrypt ma limit liczby bytów, które można się odrodzić (pojazdy, obiekty, PED). Ta opcja pozwala skryptowi automatyczne usuwanie i wymianę starych jednostek po osiągnięciu limitu."
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "로비를 엉망으로 만들고 세션을 망치는 것을 방지하기 위해이 스크립트에는 스폰 할 수있는 엔티티 수 (차량, 물건, PED)의 한계가 있습니다. 이 옵션을 사용하면 한계에 도달하면 스크립트가 이전 엔티티를 자동으로 삭제하고 교체 할 수 있습니다."
+		}
+	},
+	["CP_HEIST_GETAWAY_VEHS_TXT_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Getaway Vehicles"
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Fluchtfahrzeuge"
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Véhicules de fuite"
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Veicoli di fuga"
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Veículos de fuga"
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Бегство транспортных средств"
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Vehículos de escape"
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "度假车"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "度假車"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "逃走車"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Pojazdy ucieczki"
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "도주 차량"
+		}
+	},
+	["COBRA_MANEUVER_DESC_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Press ___ to perform a Cobra Maneuver (an evasive technique used in air combat). Press any key during the maneuver to cancel it and take back control of the plane."
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Drücken Sie ___, um ein Cobra -Manöver durchzuführen (eine Ausweichungstechnik, die im Luftkampf verwendet wird). Drücken Sie während des Manövers eine Taste, um es abzusagen und die Kontrolle über das Flugzeug zurück zu übernehmen."
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Appuyez sur ___ pour effectuer une manœuvre de cobra (une technique évasive utilisée dans le combat aérien). Appuyez sur n'importe quelle touche pendant la manœuvre pour l'annuler et reprendre le contrôle de l'avion."
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Premere ___ per eseguire una manovra Cobra (una tecnica evasiva utilizzata nel combattimento aereo). Premere qualsiasi tasto durante la manovra per annullarlo e riprendere il controllo del piano."
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Pressione ___ para executar uma manobra cobra (uma técnica evasiva usada no combate aéreo). Pressione qualquer tecla durante a manobra para cancelá -la e retomar o controle do avião."
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Нажмите ___, чтобы выполнить маневр кобры (уклончивая техника, используемая в воздушном бою). Нажмите любую клавишу во время маневра, чтобы отменить его и вернуть управление самолетом."
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Presione ___ para realizar una maniobra Cobra (una técnica evasiva utilizada en el combate de aire). Presione cualquier tecla durante la maniobra para cancelarla y recuperar el control del avión."
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "按___执行眼镜蛇动作（空战中使用的回避技术）。在操纵过程中按任何键，以取消它，然后撤回对飞机的控制。"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "按___執行眼鏡蛇動作（空戰中使用的迴避技術）。在操縱過程中按任何鍵，以取消它，然後撤回對飛機的控制。"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "___を押して、Cobra Maneuver（Air Combatで使用される回避技術）を実行します。操作中に任意のキーを押して、それをキャンセルし、飛行機の制御を取り戻します。"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Naciśnij ___, aby wykonać manewr Cobra (technika wymijająca stosowana w walce powietrznej). Naciśnij dowolny klawisz podczas manewru, aby go anulować i zabrać kontrolę nad samolotem."
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "___을 눌러 코브라 기동 (항공 전투에 사용 된 회피 기술)을 수행하십시오. 기동 중에 키를 눌러 취소하고 비행기를 다시 제어하십시오."
+		}
+	},
+	["EF_ENTITY_GUN_DESC_"] = {
+			{
+			["iso"] = "en-US",
+			["text"] = "Aim your weapon at an entity in the game world and press [E] to add it to the forge pool. Once added, you'll be able to use your mouse to move and manipulate it."
+		},
+			{
+			["iso"] = "de-DE",
+			["text"] = "Zielen Sie Ihre Waffe auf ein Unternehmen in der Spielwelt und drücken Sie [e], um sie dem Schmiedetool hinzuzufügen. Sobald Sie hinzugefügt sind, können Sie Ihre Maus verwenden, um sie zu bewegen und zu manipulieren."
+		},
+			{
+			["iso"] = "fr-FR",
+			["text"] = "Visez votre arme sur une entité dans le monde du jeu et appuyez sur [e] pour l'ajouter à la piscine Forge. Une fois ajouté, vous pourrez utiliser votre souris pour se déplacer et la manipuler."
+		},
+			{
+			["iso"] = "it-IT",
+			["text"] = "Punta la tua arma in un'entità nel mondo del gioco e premi [e] per aggiungerla al pool di forge. Una volta aggiunto, sarai in grado di utilizzare il mouse per spostarlo e manipolarlo."
+		},
+			{
+			["iso"] = "pt-BR",
+			["text"] = "Aponte sua arma em uma entidade no mundo do jogo e pressione [e] para adicioná -la ao pool forge. Uma vez adicionado, você poderá usar o mouse para mover e manipulá -lo."
+		},
+			{
+			["iso"] = "ru-RU",
+			["text"] = "Нажмите свое оружие в сущности в игровом мире и нажмите [E], чтобы добавить его в пул кузниц. После добавления вы сможете использовать свою мышь для перемещения и манипулирования ее."
+		},
+			{
+			["iso"] = "es-ES",
+			["text"] = "Apunte su arma en una entidad en el mundo del juego y presione [E] para agregarla al grupo de forja. Una vez agregado, podrá usar su mouse para moverse y manipularlo."
+		},
+			{
+			["iso"] = "zh-CN",
+			["text"] = "将您的武器瞄准游戏世界中的实体，然后按[E]将其添加到Forge池中。添加后，您将能够使用鼠标移动和操纵它。"
+		},
+			{
+			["iso"] = "zh-TW",
+			["text"] = "將您的武器瞄準遊戲世界中的實體，然後按[E]將其添加到Forge池中。添加後，您將能夠使用鼠標移動和操縱它。"
+		},
+			{
+			["iso"] = "ja-JP",
+			["text"] = "ゲームの世界のエンティティに武器を向け、押してフォージプールに追加します。追加すると、マウスを使用して移動して操作できます。"
+		},
+			{
+			["iso"] = "pl-PL",
+			["text"] = "Skieruj swoją broń na jednostkę w świecie gry i naciśnij [E], aby dodać ją do puli Forge. Po dodaniu będziesz mógł użyć myszy do jej poruszania i manipulowania."
+		},
+			{
+			["iso"] = "ko-KR",
+			["text"] = "게임 세계의 엔티티에서 무기를 조준하고 [E]를 눌러 포장 풀에 추가하십시오. 추가하면 마우스를 사용하여 움직이고 조작 할 수 있습니다."
+		}
 	}
 }

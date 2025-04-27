@@ -1,5 +1,7 @@
 ---@diagnostic disable
 
+debug_counter = not SS_debug and 0 or 7
+
 local function DrawClock()
     local now = os.date("*t")
     local month = os.date("%b")
@@ -148,28 +150,32 @@ end
 
 function MainUI()
     DrawClock()
+    ImGui.Dummy(1, 10)
+    ImGui.SeparatorText("About")
+
     if UI.IsItemClicked('lmb') then
         debug_counter = debug_counter + 1
         if debug_counter == 7 then
             UI.WidgetSound("Nav")
             log.debug("Debug mode activated.")
             SS_debug = true
-            CFG:SaveItem("SS_debug", SS_debug)
+            CFG:SaveItem("SS_debug", true)
         elseif debug_counter > 7 then
             UI.WidgetSound("Cancel")
             log.debug("Debug mode deactivated.")
-            SS_debug      = false
+            SS_debug = false
             debug_counter = 0
-            CFG:SaveItem("SS_debug", SS_debug)
+            CFG:SaveItem("SS_debug", false)
         end
     end
-    ImGui.Dummy(1, 10); ImGui.SeparatorText("About")
+
     UI.WrappedText("A collection of scripts aimed towards adding some roleplaying and fun elements to the game.", 25)
     ImGui.Dummy(1, 10)
     ImGui.BulletText(string.format("Script Version:   v%s", SCRIPT_VERSION))
     ImGui.BulletText(string.format("Game Version:   b%s   Online %s", TARGET_BUILD, TARGET_VERSION))
+
     if not disable_quotes then
         ImGui.Dummy(1, 20); ImGui.SeparatorText("Quote Of The Day"); ImGui.Spacing()
-        UI.ColoredText(random_quote, "white", quote_alpha, 24)
+        UI.ColoredText(s_RandomDailyQuote, "white", f_DailyQuoteTextAlpha, 24)
     end
 end

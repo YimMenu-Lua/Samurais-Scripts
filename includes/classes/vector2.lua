@@ -1,188 +1,141 @@
 ---@diagnostic disable
 
--- Class representing a 2D vector.
 ---@class vec2
----@field x float x component of the vector.
----@field y float y component of the vector.
+---@field x float
+---@field y float
 vec2 = {}
 vec2.__index = vec2
-vec2.__tostring = function(self)
-    return string.format(
-        "(%s, %s)",
-        Lua_fn.floatPrecision(self.x),
-        Lua_fn.floatPrecision(self.y)
+
+setmetatable(vec2, {
+    __call = function(_, arg)
+        return vec2:new(arg.x, arg.y)
+    end
+})
+
+---@param x float
+---@param y float
+function vec2:new(x, y)
+    return setmetatable(
+        {
+            x = x or 0,
+            y = y or 0
+        },
+        self
     )
 end
 
----@param arg vec2 | number
----@return vec2
-vec2.__add = function(self, arg)
-    if isVector2Type(arg) then
-        if not getmetatable(arg) == vec2 then
-            arg = toVec2(arg)
-        end
-
-        return vec2:new(self.x + arg.x, self.y + arg.y)
-    elseif type(arg) == 'number' then
-        return vec2:new(self.x + arg, self.y + arg)
-    else
-        error(string.format("Attempt to perform arithmetic on a %s value", type(arg)))
-    end
+function vec2:__tostring()
+    return string.format(
+        "(%.3f, %.3f)",
+        self.x,
+        self.y
+    )
 end
 
----@param arg vec2 | number
+---@param b number|vec3
 ---@return vec2
-vec2.__sub = function(self, arg)
-    if isVector2Type(arg) then
-        if not getmetatable(arg) == vec2 then
-            arg = toVec2(arg)
-        end
-
-        return vec2:new(self.x - arg.x, self.y - arg.y)
-    elseif type(arg) == 'number' then
-        return vec2:new(self.x - arg, self.y - arg)
-    else
-        error(string.format("Attempt to perform arithmetic on a %s value", type(arg)))
+function vec2:__add(b)
+    if type(b) == "number" then
+        return vec2:new(self.x + b, self.y + b)
     end
+
+    b = toVec2(b)
+    return vec2:new(self.x + b.x, self.y + b.y)
 end
 
----@param arg vec2 | number
+---@param b number|vec3
 ---@return vec2
-vec2.__mul = function(self, arg)
-    if isVector2Type(arg) then
-        if not getmetatable(arg) == vec2 then
-            arg = toVec2(arg)
-        end
-
-        return vec2:new(self.x * arg.x, self.y * arg.y)
-    elseif type(arg) == 'number' then
-        return vec2:new(self.x * arg, self.y * arg)
-    else
-        error(string.format("Attempt to perform arithmetic on a %s value", type(arg)))
+function vec2:__sub(b)
+    if type(b) == "number" then
+        return vec2:new(self.x - b, self.y - b)
     end
+
+    b = toVec2(b)
+    return vec2:new(self.x - b.x, self.y - b.y)
 end
 
----@param arg vec2 | number
+---@param b number|vec3
 ---@return vec2
-vec2.__div = function(self, arg)
-    if isVector2Type(arg) then
-        if not getmetatable(arg) == vec2 then
-            arg = toVec2(arg)
-        end
-
-        return vec2:new(self.x / arg.x, self.y / arg.y)
-    elseif type(arg) == 'number' then
-        return vec2:new(self.x / arg, self.y / arg)
-    else
-        error(string.format("Attempt to perform arithmetic on a %s value", type(arg)))
+function vec2:__mul(b)
+    if type(b) == "number" then
+        return vec2:new(self.x * b, self.y * b)
     end
+
+    b = toVec2(b)
+    return vec2:new(self.x * b.x, self.y * b.y)
 end
 
----@param arg vec2
+---@param b number|vec3
+---@return vec2
+function vec2:__div(b)
+    if type(b) == "number" then
+        return vec2:new(self.x / b, self.y / b)
+    end
+
+    b = toVec2(b)
+    return vec2:new(self.x / b.x, self.y / b.y)
+end
+
+---@param b number|vec3
+---@return vec2
+function vec2:__eq(b)
+    b = toVec2(b)
+    return self.x == b.x and self.y == b.y
+end
+
+---@param b number|vec3
+---@return vec2
+function vec2:__lt(b)
+    b = toVec2(b)
+    return self.x < b.x and self.y < b.y
+end
+
+---@param b number|vec3
+---@return vec2
+function vec2:__le(b)
+    b = toVec2(b)
+    return self.x <= b.x and self.y <= b.y
+end
+
+---@return number
+function vec2:length()
+    return math.sqrt(self.x * self.x + self.y * self.y)
+end
+
+---@return number
+function vec2:dot(b)
+    b = toVec2(b)
+    return self.x * b.x + self.y * b.y
+end
+
+---@return vec2
+function vec2:normalize()
+    local len = self:length()
+
+    if len < 1e-8 then
+        return vec2:new(0, 0)
+    end
+
+    return self / len
+end
+
+---@return vec2
+function vec2:clone()
+    return vec2:new(self.x, self.y)
+end
+
 ---@return boolean
-vec2.__eq = function(self, arg)
-    if isVector2Type(arg) then
-        if not getmetatable(arg) == vec2 then
-            arg = toVec2(arg)
-        end
-
-        return
-            (self.x <= arg.x and (arg.x <= self.x)) and
-            (self.y <= arg.y and (arg.y <= self.y))
-    else
-        error(string.format("Attempt to compare 2D vector with %s value", type(arg)))
-    end
-
-    return false
+function vec2:is_zero()
+    return self.x == 0 and self.y == 0
 end
 
----@param arg vec2
----@return boolean
-vec2.__le = function(self, arg)
-    if isVector2Type(arg) then
-        if not getmetatable(arg) == vec2 then
-            arg = toVec2(arg)
-        end
-
-        return
-            (self.x <= arg.x) and
-            (self.y <= arg.y)
-    else
-        error(string.format("Attempt to compare 2D vector with %s value", type(arg)))
-    end
-
-    return false
-end
-
----@param arg vec2
----@return boolean
-vec2.__lt = function(self, arg)
-    if isVector2Type(arg) then
-        if not getmetatable(arg) == vec2 then
-            arg = toVec2(arg)
-        end
-
-        return
-            (self.x <= arg.x and not (arg.x <= self.x)) and
-            (self.y <= arg.y and not (arg.y <= self.y))
-    else
-        error(string.format("Attempt to compare 2D vector with %s value", type(arg)))
-    end
-
-    return false
-end
-
--- Constructor
---
--- Returns `vec2`: A 2D vector containing x and y values.
---
--- **Example Usage:**
--- ```lua
--- myInstance = vec2:new(x, y)
--- ```
----@param x float x component of the vector.
----@param y float y component of the vector.
 ---@return vec2
-function vec2:new(x, y)
-    local instance = setmetatable({}, vec2)
-    instance.x = x or 0
-    instance.y = y or 0
-
-    return instance
-end
-
-function vec2:inverse()
-    return vec2:new(-self.x, -self.y)
-end
-
---
---#region
--- helpers
---
-
--- Allows arithmetic and relational operations
---
--- between 2D vectors.
---
----@param arg table | userdata
 function toVec2(arg)
-    if not getmetatable(arg) and type(arg) ~= 'table' then
-        error(string.format("Expected sol.rage::scrVector or table value, got %s instead.", type(arg)), 2)
+    if (type(arg) == "table" or type(arg) == "userdata") and arg.x and arg.y then
+        return vec2:new(arg.x, arg.y)
+    else
+        error(
+            string.format("Invalid argument. Expected 2D vector, got %s instead", type(arg))
+        )
     end
-
-    if (type(arg.x) ~= 'number' and type(arg.y) ~= 'number') then
-        error("Argument is not a 2D vector.")
-    end
-
-    return vec2:new(arg.x, arg.y)
 end
-
-function isVector2Type(arg)
-    return
-        (type(arg) == 'table' or type(arg) == 'userdata') and
-        (type(arg.x) == 'number' and type(arg.y) == 'number')
-end
-
---
---#endregion
---

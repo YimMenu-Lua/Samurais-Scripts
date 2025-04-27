@@ -1,9 +1,14 @@
 ---@diagnostic disable
 
-local i_SoundIndex1 = 0
-local i_SoundIndex2 = 0
-local i_SoundSwitch = 0
-local i_RadioIndex  = 0
+local s_SoundSearchQuery   = ""
+local i_SoundIndex1        = 0
+local i_SoundIndex2        = 0
+local i_SoundSwitch        = 0
+local i_RadioIndex         = 0
+local b_DisableRadioButton = false
+local b_IsPlayingRadio     = false
+local t_SelectedSound      = {}
+local s_SelectedRadio      = {}
 
 local function DisplayMaleSounds()
     t_FilteredMaleSounds = {}
@@ -55,7 +60,7 @@ local function FilterFrontendSounds()
     t_FilteredFrontendSounds = {}
     if t_AllFrontendSounds ~= nil then
         for _, v in ipairs(t_AllFrontendSounds) do
-            if string.find(v.AudioName:lower(), sound_search) then
+            if string.find(v.AudioName:lower(), s_SoundSearchQuery) then
                 table.insert(t_FilteredFrontendSounds, v)
             end
         end
@@ -90,30 +95,30 @@ function SoundPlayerUI()
         ImGui.PushItemWidth(280)
         DisplayMaleSounds()
         ImGui.PopItemWidth()
-        selected_sound = t_MaleSounds[i_SoundIndex1 + 1]
+        t_SelectedSound = t_MaleSounds[i_SoundIndex1 + 1]
     else
         ImGui.PushItemWidth(280)
         DisplayFemaleSounds()
         ImGui.PopItemWidth()
-        selected_sound = t_FemaleSounds[i_SoundIndex2 + 1]
+        t_SelectedSound = t_FemaleSounds[i_SoundIndex2 + 1]
     end
     ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
     if sound_btn_off then
         ImGui.BeginDisabled()
-        ImGui.Button(string.format(" %s ", loading_label), 60, 30)
+        ImGui.Button(string.format(" %s ", s_LoadingLabel), 60, 30)
         ImGui.EndDisabled()
     else
         if ImGui.Button(string.format("%s##sounds", _T("GENERIC_PLAY_BTN_"))) then
             script.run_in_fiber(function(playsnd)
                 local myCoords = Game.GetEntityCoords(Self.GetPedID(), true)
-                AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(selected_sound.soundName, selected_sound.soundRef,
+                AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(t_SelectedSound.soundName, t_SelectedSound.soundRef,
                     myCoords.x,
                     myCoords.y, myCoords.z, "SPEECH_PARAMS_FORCE")
                 sound_btn_off = true
-                start_loading_anim = true
+                b_ShouldAnimateLoadingLabel = true
                 playsnd:sleep(5000)
                 sound_btn_off = false
-                start_loading_anim = false
+                b_ShouldAnimateLoadingLabel = false
             end)
         end
     end
@@ -121,66 +126,77 @@ function SoundPlayerUI()
     ImGui.Dummy(1, 10); ImGui.SeparatorText("Radio Stations")
     UI.Tooltip(_T("RADIO_STATIONS_DESC_"))
     ImGui.Spacing()
-    ImGui.PushItemWidth(280)
+    ImGui.SetNextItemWidth(280)
     DisplayRadioStations()
-    ImGui.PopItemWidth()
-    selected_radio = t_RadioStations[i_RadioIndex + 1]
-    if not radio_btn_off then
-        ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
-        if not is_playing_radio then
+
+    s_SelectedRadio = t_RadioStations[i_RadioIndex + 1]
+
+    ImGui.SameLine()
+    ImGui.Spacing()
+    ImGui.SameLine()
+
+    if not b_DisableRadioButton then
+        if not b_IsPlayingRadio then
             if ImGui.Button(string.format("%s##radio", _T("GENERIC_PLAY_BTN_"))) then
                 script.run_in_fiber(function(rad)
-                    if not is_playing_anim then
-                        PlayMusic(true, selected_radio.station)
-                        is_playing_radio   = true
-                        radio_btn_off      = true
-                        start_loading_anim = true
-                        rad:sleep(3000)
-                        radio_btn_off      = false
-                        start_loading_anim = false
-                    else
-                        YimToast:ShowError("Samurais Scripts",
-                            "This option is disabled while playing animations to prevent bugs.")
+                    if YimActions:IsPedPlaying(self.get_ped()) then
+                        YimToast:ShowError(
+                            "Samurais Scripts",
+                            "This option is disabled while using YimActions."
+                        )
+                        return
                     end
+
+                    Game.Audio:BlastRadio(true, s_SelectedRadio.station)
+                    b_IsPlayingRadio = true
+                    b_DisableRadioButton = true
+                    b_ShouldAnimateLoadingLabel = true
+                    rad:sleep(1500)
+                    b_DisableRadioButton = false
+                    b_ShouldAnimateLoadingLabel = false
                 end)
             end
         else
             if ImGui.Button(string.format("%s##sounds", _T("GENERIC_STOP_BTN_"))) then
                 script.run_in_fiber(function(rad)
-                    PlayMusic(false)
-                    is_playing_radio   = false
-                    radio_btn_off      = true
-                    start_loading_anim = true
+                    Game.Audio:BlastRadio(false)
+                    b_IsPlayingRadio = false
+                    b_DisableRadioButton = true
+                    b_ShouldAnimateLoadingLabel = true
                     rad:sleep(1500)
-                    radio_btn_off      = false
-                    start_loading_anim = false
+                    b_DisableRadioButton = false
+                    b_ShouldAnimateLoadingLabel = false
                 end)
             end
         end
     else
-        ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
         ImGui.BeginDisabled()
-        ImGui.Button(string.format(" %s ", loading_label), 60, 30)
+        ImGui.Button(string.format(" %s ", s_LoadingLabel), 60, 30)
         ImGui.EndDisabled()
     end
 
     if SS_debug then
-        ImGui.Dummy(1, 10); ImGui.SeparatorText("Frontend Sounds")
+        ImGui.Dummy(1, 10)
+        ImGui.SeparatorText("Frontend Sounds")
         ImGui.PushItemWidth(420)
-        sound_search, sschanged = ImGui.InputTextWithHint("##search", "Search Sounds", sound_search, 64)
-        is_typing = ImGui.IsItemActive()
+        s_SoundSearchQuery, _ = ImGui.InputTextWithHint("##search", "Search Sounds", s_SoundSearchQuery, 64)
+        b_IsTyping = ImGui.IsItemActive()
         DisplayFrontendSounds()
         ImGui.PopItemWidth()
-        if t_FilteredFrontendSounds ~= nil then
-            selected_sound = t_FilteredFrontendSounds[i_SoundIndex + 1]
+
+        if t_FilteredFrontendSounds then
+            t_SelectedSound = t_FilteredFrontendSounds[i_SoundIndex + 1]
         end
-        ImGui.Spacing(); ImGui.PushButtonRepeat(true)
+
+        ImGui.Spacing()
+        ImGui.PushButtonRepeat(true)
         if ImGui.Button(" + ") then
             if i_SoundIndex == #t_FilteredFrontendSounds - 1 then
                 i_SoundIndex = 0
             end
             i_SoundIndex = i_SoundIndex + 1
         end
+
         ImGui.SameLine()
         if ImGui.Button(" - ") then
             if i_SoundIndex == 0 then
@@ -188,30 +204,37 @@ function SoundPlayerUI()
             end
             i_SoundIndex = i_SoundIndex - 1
         end
+
         ImGui.PopButtonRepeat()
         ImGui.PopItemWidth()
         ImGui.Spacing()
-        ImGui.BeginDisabled(selected_sound == nil or not b_HasSoundFinished)
-        if ImGui.Button("  Play  ") then
-            script.run_in_fiber(function()
-                i_SoundID = AUDIO.GET_SOUND_ID()
-                AUDIO.PLAY_SOUND_FRONTEND(i_SoundID, selected_sound.AudioName, selected_sound.AudioRef, true)
-            end)
-        end
-        ImGui.EndDisabled()
-        ImGui.SameLine(); ImGui.BeginDisabled(selected_sound == nil or b_HasSoundFinished)
-        if ImGui.Button("  Stop  ") then
-            script.run_in_fiber(function()
-                AUDIO.STOP_SOUND(i_SoundID)
-                AUDIO.RELEASE_SOUND_ID(i_SoundID)
-            end)
-        end
-        ImGui.EndDisabled()
-        ImGui.SameLine(); ImGui.BeginDisabled(selected_sound == nil)
-        if ImGui.Button("  Print  ") then
-            log.debug(string.format("\n\"%s\", \"%s\"", string.upper(selected_sound.AudioName),
-                string.upper(selected_sound.AudioRef)))
-        end
+        ImGui.BeginDisabled(not t_SelectedSound)
+            ImGui.BeginDisabled(b_HasSoundFinished)
+            if ImGui.Button("  Play  ") then
+                script.run_in_fiber(function()
+                    i_SoundID = AUDIO.GET_SOUND_ID()
+                    AUDIO.PLAY_SOUND_FRONTEND(i_SoundID, t_SelectedSound.AudioName, t_SelectedSound.AudioRef, true)
+                end)
+            end
+            ImGui.EndDisabled()
+
+            ImGui.SameLine()
+            ImGui.BeginDisabled(b_HasSoundFinished)
+            if ImGui.Button("  Stop  ") then
+                script.run_in_fiber(function()
+                    AUDIO.STOP_SOUND(i_SoundID)
+                    AUDIO.RELEASE_SOUND_ID(i_SoundID)
+                end)
+            end
+            ImGui.EndDisabled()
+
+            if ImGui.Button("  Print  ") then
+                log.debug(
+                string.format(
+                    "\n\"%s\", \"%s\"",
+                        string.upper(t_SelectedSound.AudioName),
+                        string.upper(t_SelectedSound.AudioRef)))
+            end
         ImGui.EndDisabled()
     end
 end

@@ -28,7 +28,6 @@ except ModuleNotFoundError:
 
 with open(Lua_path, "r", encoding = "utf-8") as Lua_file:
     raw = Lua_file.read()
-    Lua_file.close()
 
 match = re.search(r"return\s*(\{.*\})", raw, re.DOTALL)
 if match:
@@ -52,8 +51,6 @@ def Lua_write(data):
         Lua_file.write("return ")
         Lua_file.write(Lua.encode(data))
         Lua_file.write("\n")
-        Lua_file.flush()
-        Lua_file.close()
 
 
 def get_n_strings(labels, iso):
@@ -214,7 +211,8 @@ def add_new_lang():
             return
 
 
-def main_loop():
+
+if __name__ == "__main__":
     while True:
         try:
             match int(input(
@@ -228,12 +226,8 @@ def main_loop():
                     add_new_label()
                 case _:
                     clear()
-                    print('Invalid choice.')
+                    print('Invalid input.')
         except KeyboardInterrupt:
             clear()
             print("Operation canceled by the user.")
             quit(0)
-
-
-if __name__ == "__main__":
-    main_loop()

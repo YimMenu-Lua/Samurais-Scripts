@@ -10,6 +10,9 @@ if not gpad_keybinds then
     gpad_keybinds = CFG:ReadItem("gpad_keybinds")
 end
 
+SS.check_kb_keybinds()
+SS.check_gpad_keybinds()
+
 
 ---@class Translator
 Translator = {}
@@ -41,6 +44,10 @@ Translator.button_map = {
     {
         name = "SCN_STOP_DESC_",
         kbm = keybinds.stop_anim.name
+    },
+    {
+        name = "COBRA_MANEUVER_DESC_",
+        kbm = keybinds.cobra_maneuver.name,
     },
     {
         name = "NOS_PURGE_DESC_",
@@ -136,4 +143,16 @@ function Translator:Translate(label)
     end
 
     return retStr
+end
+
+-- #### Wrapper for `Translator:Translate`
+--________________________________________
+-- Translates text to the user's language.
+--
+-- If the label to translate is missing or the language
+--
+-- is invalid, it defaults to English (US).
+---@param label string
+function _T(label)
+    return Translator:Translate(label)
 end

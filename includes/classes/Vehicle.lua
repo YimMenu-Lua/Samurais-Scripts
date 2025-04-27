@@ -285,6 +285,52 @@ Game.Vehicle.SetAcceleration = function(vehicle, multiplier)
 end
 
 ---@param vehicle integer
+---@return float|nil
+Game.Vehicle.GetDeformation = function(vehicle)
+    if not ENTITY.DOES_ENTITY_EXIST(vehicle) or not ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+        return nil
+    end
+
+    local pDeformMult = Memory.GetVehicleInfo(vehicle).m_deformation_mult
+    if pDeformMult:is_valid() then
+        return pDeformMult:get_float()
+    end
+
+    return nil
+end
+
+---@param vehicle integer
+---@param multiplier float
+Game.Vehicle.SetDeformation = function(vehicle, multiplier)
+    if not ENTITY.DOES_ENTITY_EXIST(vehicle) or not ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+        return
+    end
+
+    local pDeformMult = Memory.GetVehicleInfo(vehicle).m_deformation_mult
+    if pDeformMult:is_valid() then
+        pDeformMult:set_float(multiplier)
+    end
+end
+
+---@param vehicle integer
+---@return table
+Game.Vehicle.GetVehicleExhaustBones = function(vehicle)
+    local bones = {}
+    local bParam = false
+    local count = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() - 1
+    local boneIndex
+
+    for i = 0, count do
+        bParam, boneIndex = VEHICLE.GET_VEHICLE_EXHAUST_BONE_(vehicle, i, boneIndex, bParam)
+        if bParam then
+            table.insert(bones, boneIndex)
+        end
+    end
+
+    return bones
+end
+
+---@param vehicle integer
 Game.Vehicle.GetVehicleMods = function(vehicle)
     local t = {}
 
@@ -344,5 +390,60 @@ Game.Vehicle.ApplyVehicleMods = function(vehicle, t)
         if t.window_tint then
             VEHICLE.SET_VEHICLE_WINDOW_TINT(vehicle, t.window_tint)
         end
+
+        if t.window_states then
+            for i = 1, #t.window_states do
+                if not t.window_states[i] then
+                    VEHICLE.ROLL_DOWN_WINDOW(vehicle, i - 1)
+                end
+            end
+        end
+
+        if t.plate_text and type(t.plate_text) == "string" then
+            VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, t.plate_text)
+        end
     end)
+end
+
+Game.Vehicle.HasCrashed = function()
+    if not ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(Self.Vehicle.Current) then
+        return false, ""
+    end
+
+    local entity = ENTITY.GET_LAST_ENTITY_HIT_BY_ENTITY_(Self.Vehicle.Current)
+
+    if not entity or (entity == 0) or not ENTITY.DOES_ENTITY_EXIST(entity) then
+        return false, ""
+    end
+
+    if (not ENTITY.IS_ENTITY_A_PED(entity) and
+        not ENTITY.IS_ENTITY_A_VEHICLE(entity) and
+        not ENTITY.IS_ENTITY_AN_OBJECT(entity)
+    ) then
+        return true, "Samir, you're breaking the car!"
+    end
+
+    local entity_type = Memory.GetEntityType(entity)
+
+    if entity_type == 0 then
+        return false, ""
+    elseif entity_type == 6 then
+        return false, "Hit and run"
+    elseif (entity_type == 5) or (entity_type == 157) then
+        return true, "Samir, you're breaking the car!"
+    elseif (entity_type == 1) or (entity_type == 33) or (entity_type == 7) then
+        if ENTITY.DOES_ENTITY_HAVE_PHYSICS(entity) then
+            local model = ENTITY.GET_ENTITY_MODEL(entity)
+            for _, m in ipairs(t_CollisionInvalidModels) do
+                if model == m then
+                    return true, "Samir, you're breaking the car!"
+                end
+            end
+            return false, "Wrecking ball"
+        else
+            return true, "Samir, you're breaking the car!"
+        end
+    else
+        return false, ""
+    end
 end

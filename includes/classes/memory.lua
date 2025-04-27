@@ -152,15 +152,23 @@ end
 ---@param entity integer
 ---@return number
 Memory.GetEntityType = function(entity)
-    if ENTITY.DOES_ENTITY_EXIST(entity) then
+    if not ENTITY.DOES_ENTITY_EXIST(entity) then
+        return 0
+    end
+
+    local b_IsMemSafe, i_EntityType = pcall(function()
         local pEntity = memory.handle_to_ptr(entity)
+
         if pEntity:is_valid() then
             local m_model_info = pEntity:add(0x0020):deref()
             local m_model_type = m_model_info:add(0x009D)
+
             return m_model_type:get_word()
         end
-    end
-    return 0
+        return 0
+    end)
+
+    return b_IsMemSafe and i_EntityType or 0
 end
 
 -- Reads information about the player from memory.

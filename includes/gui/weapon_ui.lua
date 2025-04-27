@@ -1,7 +1,7 @@
 ---@diagnostic disable
 
 function WeaponsUI()
-    ImGui.BeginChild("WeaponChild", 340, 480, true)
+    ImGui.BeginChild("WeaponChild", 400, 500, true)
     ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 25, 25)
 
     Triggerbot, TbUsed = ImGui.Checkbox(_T("TRIGGERBOT_CB_"), Triggerbot)

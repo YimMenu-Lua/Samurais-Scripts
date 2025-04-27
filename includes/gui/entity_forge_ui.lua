@@ -27,6 +27,8 @@ local s_ObjectSearch               = ""
 local s_VehicleSearch              = ""
 local s_PedSearch                  = ""
 local s_NewEntityNameBuffer        = ""
+local s_EncodedShareableCreation   = ""
+local s_WrappedBase64String        = ""
 local t_FilteredObjects            = t_GameObjects
 local t_FilteredPeds               = t_GamePeds
 local t_FilteredVehicles           = {}
@@ -41,6 +43,7 @@ local hoveredThisFrame
 local s_SelectedVehBone
 local unk_AttachBone
 local unk_SelectedEntity
+local unk_ImportedCreation
 local t_SelectedPedBone
 local t_SelectedSpawnedEntity
 local t_SelectedFavoriteEntity
@@ -50,22 +53,6 @@ local t_SelectedChild
 local t_SelectedCanvasChild
 local t_ForgeCustomizationTarget
 local t_SelectedForgeScenario
-
----@param lookup_table table
----@param name string
-local function MatchName(lookup_table, name)
-    if not lookup_table or (#lookup_table == 0) then
-        return false
-    end
-
-    for _, v in ipairs(lookup_table) do
-        if v and v.name and (v.name == name) then
-            return true
-        end
-    end
-
-    return false
-end
 
 local function FilterObjects()
     if #s_ObjectSearch > 0 then
@@ -99,8 +86,8 @@ local function GetAllVehicles()
     script.run_in_fiber(function()
         local s_VehicleName
         for _, veh in ipairs(t_GameVehicles) do
-            start_loading_anim = true
-            s_SidebarLowerText = string.format("Loading Vehicles %s", loading_label)
+            b_ShouldAnimateLoadingLabel = true
+            s_SidebarLowerText = string.format("Loading Vehicles %s", s_LoadingLabel)
 
             if string.find(veh:lower(), "drift") then
                 s_VehicleName = vehicles.get_vehicle_display_name(veh) .. " (Drift)"
@@ -118,7 +105,7 @@ local function GetAllVehicles()
         end
 
         b_VehicleListCreated = true
-        start_loading_anim = false
+        b_ShouldAnimateLoadingLabel = false
         s_SidebarLowerText = ""
     end)
 end
@@ -181,7 +168,7 @@ local function DrawObjects()
         s_ObjectSearch,
         128
     )
-    is_typing = ImGui.IsItemActive()
+    b_IsTyping = ImGui.IsItemActive()
 
     if b_ObjectsSearch_used then
         FilterObjects()
@@ -199,7 +186,7 @@ local function DrawObjects()
             end
 
             if ImGui.IsItemHovered() then
-                if Lua_fn.TableContains(t_UnsafeObjects, t_FilteredObjects[i]) then
+                if table.Find(t_UnsafeObjects, t_FilteredObjects[i]) then
                     UI.Tooltip(
                         string.format(
                             "%s%s",
@@ -208,7 +195,7 @@ local function DrawObjects()
                         ),
                         "yellow"
                     )
-                elseif Lua_fn.TableContains(t_mpBlacklistedObjects, t_FilteredObjects[i]) then
+                elseif table.Find(t_mpBlacklistedObjects, t_FilteredObjects[i]) then
                     UI.Tooltip(
                         string.format(
                             "%s%s",
@@ -250,7 +237,7 @@ local function DrawVehicles()
         s_VehicleSearch,
         128
     )
-    is_typing = ImGui.IsItemActive()
+    b_IsTyping = ImGui.IsItemActive()
 
     if b_VehicleSearch_used then
         FilterVehicles()
@@ -295,7 +282,7 @@ local function DrawPeds()
         s_PedSearch,
         128
     )
-    is_typing = ImGui.IsItemActive()
+    b_IsTyping = ImGui.IsItemActive()
 
     if b_PedSearch_used then
         FilterPeds()
@@ -312,7 +299,7 @@ local function DrawPeds()
 
             if ImGui.IsItemHovered() then
                 if b_PreviewSelectedEntity then
-                    hoveredThisFrame = joaat(t_FilteredPeds[i])
+                    hoveredThisFrame = Game.GetPedHash(t_FilteredPeds[i])
                 end
             end
 
@@ -481,7 +468,6 @@ local function DrawCreatorUI()
 
     if ImGui.Button(string.format("%s ->", _T("GENERIC_ATTACH_BTN_")), 100, 40) then
         if t_SelectedParent and t_SelectedChild and (t_SelectedParent ~= t_SelectedChild) then
-            UI.WidgetSound("Select")
             script.run_in_fiber(function()
                 EntityForge:AttachEntity(
                     t_SelectedChild,
@@ -489,7 +475,7 @@ local function DrawCreatorUI()
                     unk_AttachBone,
                     vec3:zero(),
                     vec3:zero()
-                ) 
+                )
             end)
         end
     end
@@ -815,38 +801,12 @@ local function DrawCreatorUI()
             end
             ImGui.EndDisabled()
 
-            if ImGui.BeginPopupModal(
+            UI.ConfirmPopup(
                 "confirm overwrite",
-                ImGuiWindowFlags.NoTitleBar |
-                ImGuiWindowFlags.AlwaysAutoResize
-            ) then
-                ImGui.Spacing()
-                ImGui.Text(_T("CONFIRM_PROMPT_"))
-                ImGui.Dummy(1, 40)
-
-                if ImGui.Button(_T("GENERIC_YES_"), 80, 30) then
-                    UI.WidgetSound("Select")
-                    for i, entity in ipairs(forged_entities) do
-                        if entity.name == EntityForge.currentParent.name then
-                            forged_entities[i] = EntityForge.currentParent:AsTable()
-                            break
-                        end
-                    end
-                    CFG:SaveItem("forged_entities", forged_entities)
-                    YimToast:ShowMessage("EntityForge", "Changes saved.")
-                    ImGui.CloseCurrentPopup()
+                function()
+                    EntityForge:OverwriteSavedAbomination()
                 end
-
-                ImGui.SameLine()
-                ImGui.Dummy(60, 1)
-                ImGui.SameLine()
-
-                if ImGui.Button(_T("GENERIC_NO_"), 80, 30) then
-                    UI.WidgetSound("Cancel")
-                    ImGui.CloseCurrentPopup()
-                end
-                ImGui.EndPopup()
-            end
+            )
 
             if ImGui.BeginPopupModal(
                 "confirm save creation",
@@ -864,14 +824,14 @@ local function DrawCreatorUI()
                     s_NewEntityNameBuffer,
                     128
                 )
-                is_typing = ImGui.IsItemActive()
+                b_IsTyping = ImGui.IsItemActive()
 
                 ImGui.Spacing()
                 ImGui.Text("NOTE:\n\nEverything will be deleted once you save.\nYou can spawn your creation later.")
                 ImGui.Dummy(1, 10)
 
                 if ImGui.Button(_T("GENERIC_CONFIRM_BTN_"), 80, 30) then
-                    if MatchName(forged_entities, s_NewEntityNameBuffer) then
+                    if table.MatchByKey(forged_entities, "name", s_NewEntityNameBuffer) then
                         YimToast:ShowError(
                             "EntityForge",
                             "This name already exists. Please choose a different one!"
@@ -879,40 +839,61 @@ local function DrawCreatorUI()
                         return
                     end
 
+                    UI.WidgetSound("Select")
+
                     local new_creation = EntityForge.currentParent:AsTable()
                     new_creation.name = s_NewEntityNameBuffer
 
                     script.run_in_fiber(function(save)
-                        if new_creation.type == 1 then
-                            local col1 = {}
-                            local col2 = {}
+                        local function GetVehicleProperties(vehicleEntity)
+                            if vehicleEntity.type == 1 then
+                                local col1 = {}
+                                local col2 = {}
+                                vehicleEntity.properties.window_states = {}
 
-                            new_creation.properties.mods = Game.Vehicle.GetVehicleMods(
-                                EntityForge.currentParent.handle
-                            )
-                            new_creation.properties.window_tint = VEHICLE.GET_VEHICLE_WINDOW_TINT(
-                                EntityForge.currentParent.handle
-                            )
+                                vehicleEntity.properties.mods = Game.Vehicle.GetVehicleMods(
+                                    vehicleEntity.handle
+                                )
+                                vehicleEntity.properties.window_tint = VEHICLE.GET_VEHICLE_WINDOW_TINT(
+                                    vehicleEntity.handle
+                                )
 
-                            col1.r, col1.g, col1.b = VEHICLE.GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(
-                                EntityForge.currentParent.handle,
-                                col1.r,
-                                col1.g,
-                                col1.b
-                            )
+                                col1.r, col1.g, col1.b = VEHICLE.GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(
+                                    vehicleEntity.handle,
+                                    col1.r,
+                                    col1.g,
+                                    col1.b
+                                )
 
-                            col2.r, col2.g, col2.b = VEHICLE.GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(
-                                EntityForge.currentParent.handle,
-                                col2.r,
-                                col2.g,
-                                col2.b
-                            )
+                                col2.r, col2.g, col2.b = VEHICLE.GET_VEHICLE_CUSTOM_SECONDARY_COLOUR(
+                                    vehicleEntity.handle,
+                                    col2.r,
+                                    col2.g,
+                                    col2.b
+                                )
 
-                            new_creation.properties.primary_color = col1
-                            new_creation.properties.secondary_color = col2
+                                vehicleEntity.properties.primary_color = col1
+                                vehicleEntity.properties.secondary_color = col2
+                                vehicleEntity.properties.plate_text = VEHICLE.GET_VEHICLE_NUMBER_PLATE_TEXT(vehicleEntity.handle)
+
+                                for i = 1, 4 do
+                                    vehicleEntity.properties.window_states[i] = VEHICLE.IS_VEHICLE_WINDOW_INTACT(vehicleEntity.handle, i - 1)
+                                end
+                            end
+
+                            if vehicleEntity.children then
+                                for _, child in ipairs(vehicleEntity.children) do
+                                    GetVehicleProperties(child)
+                                end
+                            end
+
+                            return true
                         end
 
-                        UI.WidgetSound("Select")
+                        while not GetVehicleProperties(new_creation) do
+                            coroutine.yield()
+                        end
+
                         table.insert(forged_entities, new_creation)
                         CFG:SaveItem("forged_entities", forged_entities)
                         YimToast:ShowSuccess(
@@ -923,7 +904,7 @@ local function DrawCreatorUI()
                             )
                         )
 
-                        save:sleep(250)
+                        save:sleep(300)
                         s_NewEntityNameBuffer = ""
                         EntityForge:Cleanup()
                     end)
@@ -1095,8 +1076,8 @@ local function DrawSpawnedEntities()
     ImGui.Spacing()
     ImGui.SameLine()
 
-    HashGrabber, HgUsed = ImGui.Checkbox("Entity Grabber", HashGrabber)
-    UI.Tooltip("Aim your weapon at an entity in the game world and press [E] to add it to the forge pool. Once added, you'll be able to use your mouse to move it freely.")
+    EntityForge.EntityGunEnabled, HgUsed = ImGui.Checkbox("Entity Grabber", EntityForge.EntityGunEnabled)
+    UI.Tooltip(_T("EF_ENTITY_GUN_DESC_"))
     if HgUsed then
         UI.WidgetSound("Nav2")
     end
@@ -1211,7 +1192,7 @@ local function DrawFavoriteEntities()
             s_NewEntityNameBuffer,
             128
         )
-        is_typing = ImGui.IsItemActive()
+        b_IsTyping = ImGui.IsItemActive()
 
         ImGui.Spacing()
 
@@ -1258,51 +1239,32 @@ local function DrawFavoriteEntities()
 
     if ImGui.Button(_T("REMOVE_FROM_FAVS_")) then
         UI.WidgetSound("Delete")
-        for i, v in ipairs(favorite_entities) do
-            if v.name == t_SelectedFavoriteEntity.name then
-                table.remove(favorite_entities, i)
-                break
-            end
-        end
-        CFG:SaveItem("favorite_entities", favorite_entities)
+        ImGui.OpenPopup("confirm remove from favorites")
     end
     ImGui.EndDisabled()
+
+    UI.ConfirmPopup(
+        "confirm remove from favorites",
+        function()
+            EntityForge:RemoveFromFavorites(t_SelectedFavoriteEntity)
+        end
+    )
 
     ImGui.SameLine()
 
     ImGui.BeginDisabled(#favorite_entities == 0)
     if ImGui.Button("Remove All Favorites") then
         UI.WidgetSound("Delete")
-        ImGui.OpenPopup("confirm remove all")
+        ImGui.OpenPopup("confirm remove all favorites")
     end
     ImGui.EndDisabled()
 
-    if ImGui.BeginPopupModal(
-        "confirm remove all",
-        ImGuiWindowFlags.NoTitleBar |
-        ImGuiWindowFlags.AlwaysAutoResize
-    ) then
-        UI.ColoredText(_T("CONFIRM_PROMPT_"), "yellow", 1, 30)
-        ImGui.Spacing()
-
-        if ImGui.Button(_T("GENERIC_YES_"), 80, 30) then
-            UI.WidgetSound("Select")
-            favorite_entities = {}
-            CFG:SaveItem("favorite_entities", favorite_entities)
-            ImGui.CloseCurrentPopup()
+    UI.ConfirmPopup(
+        "confirm remove all favorites",
+        function()
+            EntityForge:RemoveAllFavorites()
         end
-
-        ImGui.SameLine()
-        ImGui.Spacing()
-        ImGui.SameLine()
-
-        if ImGui.Button(_T("GENERIC_NO_"), 80, 30) then
-            UI.WidgetSound("Cancel")
-            ImGui.CloseCurrentPopup()
-        end
-
-        ImGui.EndPopup()
-    end
+    )
 end
 
 local function DrawSavedEntities()
@@ -1362,7 +1324,7 @@ local function DrawSavedEntities()
             s_NewEntityNameBuffer,
             128
         )
-        is_typing = ImGui.IsItemActive()
+        b_IsTyping = ImGui.IsItemActive()
 
         ImGui.Spacing()
 
@@ -1407,17 +1369,170 @@ local function DrawSavedEntities()
         ImGui.EndPopup()
     end
 
-    if ImGui.Button("Remove From Saved Creations") then
-        UI.WidgetSound("Delete")
-        for i, v in ipairs(forged_entities) do
-            if v.name == t_SelectedSavedEntity.name then
-                table.remove(forged_entities, i)
-                break
-            end
-        end
-        CFG:SaveItem("forged_entities", forged_entities)
+    ImGui.SameLine()
+
+    if ImGui.Button("Share") then
+        UI.WidgetSound("Select")
+        s_EncodedShareableCreation = CFG:b64_encode(CFG:xor_(CFG:Encode(t_SelectedSavedEntity)))
+        s_WrappedBase64String, _ = Lua_fn.wrap_b64_string(s_EncodedShareableCreation, 40)
+        ImGui.OpenPopup("share creation")
     end
     ImGui.EndDisabled()
+
+
+    if ImGui.BeginPopupModal(
+        "share creation",
+        ImGuiWindowFlags.AlwaysAutoResize |
+        ImGuiWindowFlags.NoTitleBar
+    ) then
+        ImGui.Spacing()
+        ImGui.BulletText(string.format("Name: %s", t_SelectedSavedEntity.name))
+        ImGui.BulletText(string.format("N° Of Attachments: [ %d ]", #t_SelectedSavedEntity.children))
+        ImGui.BulletText(string.format("Nested Child Attachments: [ %s ]", t_SelectedSavedEntity.children.children and "Yes" or "No"))
+
+        ImGui.Separator()
+        ImGui.Spacing()
+        ImGui.Spacing()
+
+        ImGui.Text("Forge Data: ")
+        ImGui.InputTextMultiline(
+            "##b64",
+            s_WrappedBase64String,
+            #s_EncodedShareableCreation,
+            440, 150,
+            ImGuiInputTextFlags.ReadOnly
+        )
+        b_IsTyping = ImGui.IsItemActive()
+
+        ImGui.Spacing()
+        ImGui.Spacing()
+
+        if ImGui.Button("Copy & Exit") then
+            UI.WidgetSound("Click")
+            ImGui.SetClipboardText(s_EncodedShareableCreation)
+            YimToast:ShowSuccess(
+                "EntityForge",
+                "Your saved creation was copied to clipboard. Other users of this script can now import it into their saved creations."
+            )
+            s_EncodedShareableCreation = ""
+            s_WrappedBase64String = ""
+            ImGui.CloseCurrentPopup()
+        end
+        ImGui.SameLine()
+        ImGui.Dummy(20, 1)
+        ImGui.SameLine()
+
+        if ImGui.Button("Cancel") then
+            UI.WidgetSound("Cancel")
+            s_EncodedShareableCreation = ""
+            s_WrappedBase64String = ""
+            ImGui.CloseCurrentPopup()
+        end
+        ImGui.EndPopup()
+    end
+    ImGui.SameLine()
+
+    if ImGui.Button("Import") then
+        UI.WidgetSound("Select")
+        ImGui.OpenPopup("import creation")
+    end
+
+    if ImGui.BeginPopupModal(
+        "import creation",
+        ImGuiWindowFlags.AlwaysAutoResize |
+        ImGuiWindowFlags.NoTitleBar
+    ) then
+        if unk_ImportedCreation and unk_ImportedCreation.name and unk_ImportedCreation.children then
+            ImGui.Spacing()
+            ImGui.BulletText(string.format("Name: %s", unk_ImportedCreation.name))
+            ImGui.BulletText(string.format("N° Of Attachments: [ %d ]", #unk_ImportedCreation.children))
+            ImGui.BulletText(string.format("Nested Child Attachments: [ %s ]", unk_ImportedCreation.children.children and "Yes" or "No"))
+
+            ImGui.Separator()
+            ImGui.Spacing()
+            ImGui.Spacing()
+        else
+            ImGui.Text("Paste The Forge Data Here: ")
+        end
+        ImGui.InputTextMultiline(
+            "##b64",
+            s_WrappedBase64String,
+            0xFFFF,
+            440, 150,
+            ImGuiInputTextFlags.ReadOnly
+        )
+        b_IsTyping = ImGui.IsItemActive()
+
+        ImGui.Spacing()
+        ImGui.Spacing()
+
+        if not unk_ImportedCreation or type(unk_ImportedCreation) ~= "table" or not unk_ImportedCreation.name then
+            if ImGui.Button("Paste From Clipboard") then
+                UI.WidgetSound("Click")
+                s_EncodedShareableCreation = ImGui.GetClipboardText()
+                if type(s_EncodedShareableCreation) ~= "string" then
+                    YimToast:ShowError(
+                        "EntityForge",
+                        "Your clipboard is empty!"
+                    )
+                    return
+                end
+
+                s_WrappedBase64String = Lua_fn.wrap_b64_string(s_EncodedShareableCreation, 40)
+                unk_ImportedCreation = EntityForge:ImportCreation(s_EncodedShareableCreation)
+            end
+        else
+            if ImGui.Button("Add To Saved Creations & Exit") then
+                UI.WidgetSound("Select")
+
+                if table.MatchByKey(forged_entities, "name", unk_ImportedCreation.name) then
+                    YimToast:ShowWarning(
+                        "EntityForge",
+                        "You have a creation with the same name. An [import] tag will be added to the name. You can to rename it later."
+                    )
+                    unk_ImportedCreation.name = unk_ImportedCreation.name .. " [import]"
+                end
+
+                table.insert(forged_entities, unk_ImportedCreation)
+                s_WrappedBase64String = ""
+                s_EncodedShareableCreation = ""
+                unk_ImportedCreation = nil
+                YimToast:ShowSuccess(
+                    "EntityForge",
+                    "Import successful!"
+                )
+                ImGui.CloseCurrentPopup()
+            end
+        end
+
+        ImGui.SameLine()
+        ImGui.Dummy(20, 1)
+        ImGui.SameLine()
+
+        if ImGui.Button("Cancel") then
+            UI.WidgetSound("Cancel")
+            s_WrappedBase64String = ""
+            s_EncodedShareableCreation = ""
+            unk_ImportedCreation = nil
+            ImGui.CloseCurrentPopup()
+        end
+
+        ImGui.EndPopup()
+    end
+
+    ImGui.BeginDisabled(not t_SelectedSavedEntity)
+    if ImGui.Button("Remove From Saved Creations") then
+        UI.WidgetSound("Delete")
+        ImGui.OpenPopup("confirm remove saved creation")
+    end
+    ImGui.EndDisabled()
+
+    UI.ConfirmPopup(
+        "confirm remove saved creation",
+        function()
+            EntityForge:RemoveSavedAbomination(t_SelectedSavedEntity)
+        end
+    )
 
     ImGui.SameLine()
 
@@ -1428,32 +1543,12 @@ local function DrawSavedEntities()
     end
     ImGui.EndDisabled()
 
-    if ImGui.BeginPopupModal(
+    UI.ConfirmPopup(
         "confirm remove all saved",
-        ImGuiWindowFlags.NoTitleBar |
-        ImGuiWindowFlags.AlwaysAutoResize
-    ) then
-        UI.ColoredText(_T("CONFIRM_PROMPT_"), "yellow", 1, 30)
-        ImGui.Spacing()
-
-        if ImGui.Button(_T("GENERIC_YES_"), 80, 30) then
-            UI.WidgetSound("Select")
-            forged_entities = {}
-            CFG:SaveItem("forged_entities", forged_entities)
-            ImGui.CloseCurrentPopup()
+        function()
+            EntityForge:RemoveAllSavedAbominations()
         end
-
-        ImGui.SameLine()
-        ImGui.Spacing()
-        ImGui.SameLine()
-
-        if ImGui.Button(_T("GENERIC_NO_"), 80, 30) then
-            UI.WidgetSound("Cancel")
-            ImGui.CloseCurrentPopup()
-        end
-
-        ImGui.EndPopup()
-    end
+    )
 end
 
 
@@ -1466,7 +1561,7 @@ function EntityForgeUI()
             DrawSpanwerItems()
             ImGui.Spacing()
             if i_SelectedSidebarItem == 2 and not b_VehicleListCreated then
-                ImGui.Button(loading_label, 120, 35)
+                ImGui.Button(s_LoadingLabel, 120, 35)
             else
                 ImGui.BeginDisabled(not unk_SelectedEntity)
                 if ImGui.Button(_T("GENERIC_SPAWN_BTN_"), 120, 35) then
@@ -1529,7 +1624,7 @@ function EntityForgeUI()
                         s_NewEntityNameBuffer,
                         128
                     )
-                    is_typing = ImGui.IsItemHovered()
+                    b_IsTyping = ImGui.IsItemActive()
 
                     ImGui.Dummy(1, 10)
 
@@ -1555,7 +1650,7 @@ function EntityForgeUI()
                                 return
                             end
 
-                            if MatchName(favorite_entities, s_NewEntityNameBuffer) then
+                            if table.MatchByKey(forged_entities, "name", s_NewEntityNameBuffer) then
                                 YimToast:ShowError(
                                     "EntityForge",
                                     "You already have a favorite with this name. Please choose a different one!"
@@ -1600,12 +1695,12 @@ function EntityForgeUI()
             ImGui.Dummy(1, 10)
             ImGui.SeparatorText("Preferences")
 
-            b_PreviewSelectedEntity, b_PreviewChecked = ImGui.Checkbox(
+            b_PreviewSelectedEntity, _ = ImGui.Checkbox(
                 _T("PREVIEW_OBJECTS_CB_"),
                 b_PreviewSelectedEntity
             )
 
-            if b_PreviewChecked then
+            if UI.IsItemClicked("lmb") then
                 UI.WidgetSound("Nav2")
             end
 
@@ -1613,8 +1708,8 @@ function EntityForgeUI()
             ImGui.Spacing()
             ImGui.SameLine()
 
-            HashGrabber, HgUsed = ImGui.Checkbox("Entity Grabber", HashGrabber)
-            UI.Tooltip("Aim your weapon at an entity in the game world and press [E] to add it to the forge pool. Once added, you'll be able to use your mouse to move it freely.")
+            EntityForge.EntityGunEnabled, HgUsed = ImGui.Checkbox("Entity Grabber", EntityForge.EntityGunEnabled)
+            UI.Tooltip(_T("EF_ENTITY_GUN_DESC_"))
             if HgUsed then
                 UI.WidgetSound("Nav2")
             end
@@ -1774,6 +1869,7 @@ function ForgeChildCustomizationWindow()
                     }
 
                     script.run_in_fiber(function()
+                        TASK.CLEAR_PED_TASKS_IMMEDIATELY(t_ForgeCustomizationTarget.handle)
                         TASK.TASK_START_SCENARIO_IN_PLACE(
                             t_ForgeCustomizationTarget.handle,
                             t_SelectedForgeScenario.scenario,

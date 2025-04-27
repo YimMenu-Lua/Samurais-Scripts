@@ -10,6 +10,10 @@ local TYPE_PED     <const> = 2
 ---| 2 # TYPE_PED
 
 
+-----------------------------------------------------
+-- SpawnedEntity Struct
+-----------------------------------------------------
+-- Represents an entity spawned with `EntityForge` (ped, vehicle, object).
 ---@class SpawnedEntity
 ---@field handle integer
 ---@field name string
@@ -70,6 +74,7 @@ function SpawnedEntity:AsTable()
 
     return {
         name = self.name,
+        handle = self.handle,
         modelHash = self.modelHash,
         type = self.type,
         alpha = self.alpha,
@@ -108,6 +113,11 @@ function SpawnedEntity:FromTable(data)
     return instance
 end
 
+
+-----------------------------------------------------
+-- EntityForge Class
+-----------------------------------------------------
+-- *Spawn, merge, create.*
 ---@class EntityForge
 ---@field PlayerEntity SpawnedEntity
 ---@field AllEntities SpawnedEntity[]
@@ -121,7 +131,9 @@ end
 ---@field currentParent SpawnedEntity
 ---@field lastParent SpawnedEntity
 ---@field GrabbedEntity SpawnedEntity
+---@field EntityGunEnabled boolean
 ---@field EntityGunDistance integer
+---@field EntityGunRotMult integer EntityGun's rotation multiplier
 EntityForge = {}
 EntityForge.__index = EntityForge
 EntityForge.PlayerEntity = nil
@@ -134,6 +146,7 @@ EntityForge.SpawnedPeds = {}
 EntityForge.WorldEntities = {}
 EntityForge.childCandidates = {}
 EntityForge.parentCandidates = {}
+EntityForge.EntityGunEnabled = false
 EntityForge.EntityGunDistance = 7
 
 
@@ -164,6 +177,19 @@ end
 ---@return SpawnedEntity | nil
 function EntityForge:FindEntity(handle)
     return self.EntityMap[handle]
+end
+
+---@param entity SpawnedEntity
+function EntityForge:GetCategoryFromType(entity)
+    if entity.type == TYPE_OBJECT then
+        return "objects"
+    elseif entity.type == TYPE_PED then
+        return "peds"
+    elseif entity.type == TYPE_VEHICLE then
+        return "vehicles"
+    else
+        return "Unknown"
+    end
 end
 
 ---@param entity SpawnedEntity
@@ -200,25 +226,24 @@ function EntityForge:AddEntity(entity, isWorldEntity)
     end
 end
 
----@param entity SpawnedEntity
-function EntityForge:RemoveEntityByHandle(entity)
+---@param handle SpawnedEntity
+function EntityForge:RemoveEntityByHandle(handle)
     for _, list in pairs({self.AllEntities, self.SpawnedObjects, self.SpawnedVehicles, self.SpawnedPeds}) do
         for i = #list, 1, -1 do
-            if (list[i].handle == entity.handle) or (list[i].modelHash == -1) then
+            if (list[i].handle == handle) or (list[i].modelHash == -1) then
                 table.remove(list, i)
             end
         end
     end
 
-    if (entity.isPlayer or entity.modelHash == -1) then
+    if hanlde == Self.GetPlayerID() then
         self.PlayerEntity = nil
     end
 
     self:UpdateAttachmentCandidates()
-    self.EntityMap[entity.handle] = nil
+    self.EntityMap[handle] = nil
 end
 
-local i_RotMultiplier = 1
 ---@param entity SpawnedEntity
 ---@param deltaTime integer
 function EntityForge:MoveEntityWithGun(entity, deltaTime)
@@ -249,12 +274,12 @@ function EntityForge:MoveEntityWithGun(entity, deltaTime)
     )
 
     if not entity.last_pos then
-        entity.last_pos = ENTITY.GET_ENTITY_COORDS(entity.handle, false)
+        entity.last_pos = Game.GetEntityCoords(entity.handle, false)
     end
 
-    entity.last_pos        = vec3:lerp(entity.last_pos, v_TargetPos, i_Timedelta)
-    entity.position        = entity.last_pos
-    entity.target_pos      = v_TargetPos
+    entity.last_pos = entity.last_pos:lerp(v_TargetPos, i_Timedelta)
+    entity.position = entity.last_pos
+    entity.target_pos = v_TargetPos
     self.EntityGunDistance = math.max(1.0, math.min(self.EntityGunDistance, 50.0))
 
     if entity.last_pos.z < f_GroundZ + 0.5 then
@@ -281,23 +306,23 @@ function EntityForge:MoveEntityWithGun(entity, deltaTime)
     end
 
     if SS.IsKeyJustPressed("VK_ADD") or SS.IsKeyJustPressed("MOUSE5") then
-        i_RotMultiplier = i_RotMultiplier == 1 and 10 or i_RotMultiplier + 10
+        self.EntityGunRotMult = self.EntityGunRotMult == 1 and 10 or self.EntityGunRotMult + 10
         YimToast:ShowMessage(
             "EntityForge",
             string.format(
                 "Rotation multiplier set to %d",
-                i_RotMultiplier
+                self.EntityGunRotMult
             )
         )
     end
 
     if SS.IsKeyJustPressed("VK_SUBTRACT") or SS.IsKeyJustPressed("MOUSE4") then
-        i_RotMultiplier = i_RotMultiplier <= 10 and 1 or i_RotMultiplier - 10
+        self.EntityGunRotMult = self.EntityGunRotMult <= 10 and 1 or self.EntityGunRotMult - 10
         YimToast:ShowMessage(
             "EntityForge",
             string.format(
                 "Rotation multiplier set to %d",
-                i_RotMultiplier
+                self.EntityGunRotMult
             )
         )
     end
@@ -306,7 +331,7 @@ function EntityForge:MoveEntityWithGun(entity, deltaTime)
         self:RotateEntity(
             entity,
             0.0,
-            -0.1 * i_YawMultiplier * i_RotMultiplier,
+            -0.1 * i_YawMultiplier * self.EntityGunRotMult,
             0.0
         )
     end
@@ -315,35 +340,36 @@ function EntityForge:MoveEntityWithGun(entity, deltaTime)
         self:RotateEntity(
             entity,
             0.0,
-            0.1 * i_YawMultiplier * i_RotMultiplier,
+            0.1 * i_YawMultiplier * self.EntityGunRotMult,
             0.0
         )
     end
 
     if SS.IsKeyPressed("Numpad8") then
-        self:RotateEntity(entity, 0.1 * i_RotMultiplier, 0.0, 0.0)
+        self:RotateEntity(entity, 0.1 * self.EntityGunRotMult, 0.0, 0.0)
     end
 
     if SS.IsKeyPressed("Numpad2") then
-        self:RotateEntity(entity, -0.1 * i_RotMultiplier, 0.0, 0.0)
+        self:RotateEntity(entity, -0.1 * self.EntityGunRotMult, 0.0, 0.0)
     end
 
     if SS.IsKeyPressed("Numpad1") then
-        self:RotateEntity(entity, 0.0, 0.0, -0.1 * i_RotMultiplier)
+        self:RotateEntity(entity, 0.0, 0.0, -0.1 * self.EntityGunRotMult)
     end
 
     if SS.IsKeyPressed("Numpad3") then
-        self:RotateEntity(entity, 0.0, 0.0, 0.1 * i_RotMultiplier)
+        self:RotateEntity(entity, 0.0, 0.0, 0.1 * self.EntityGunRotMult)
     end
 
 end
 
+-- Grabs and manipulates world entities.
 function EntityForge:EntityGun()
     if PLAYER.IS_PLAYER_FREE_AIMING(Self.GetPlayerID()) then
         local i_AimedAtEntity = Self.GetEntityInCrosshairs(true)
         local existing_entity
 
-        if ENTITY.IS_ENTITY_ATTACHED(i_AimedAtEntity) then
+        if ENTITY.IS_ENTITY_ATTACHED(i_AimedAtEntity) or (i_AimedAtEntity == Flatbed.handle) or ENTITY.IS_ENTITY_DEAD(i_AimedAtEntity, false) then
             i_AimedAtEntity = nil
         end
 
@@ -403,6 +429,14 @@ function EntityForge:EntityGun()
                 4
             )
 
+            Game.DrawText(
+                vec2:new(f_ScreenX + 0.31, f_ScreenY - 0.08),
+                "- Press [Back Space] to delete this entity.",
+                Col(255, 255, 255, 220),
+                vec2:new(0.2, 0.38),
+                4
+            )
+
             EntityForge:MoveEntityWithGun(self.GrabbedEntity, Self.GetDeltaTime())
         end
 
@@ -418,6 +452,11 @@ function EntityForge:EntityGun()
                 )
 
                 self:ReleaseWorldEntity(self.GrabbedEntity)
+                self.GrabbedEntity = nil
+            end
+
+            if SS.IsKeyJustPressed("BACKSPACE") and not self.GrabbedEntity.isForged then
+                self:DeleteEntity(self.GrabbedEntity)
                 self.GrabbedEntity = nil
             end
 
@@ -453,7 +492,14 @@ function EntityForge:EntityGun()
             end
 
             if PAD.IS_DISABLED_CONTROL_JUST_RELEASED(0, 24) then
+                ENTITY.FREEZE_ENTITY_POSITION(self.GrabbedEntity.handle, false)
                 ENTITY.SET_ENTITY_COLLISION(self.GrabbedEntity.handle, true, true)
+                PHYSICS.ACTIVATE_PHYSICS(self.GrabbedEntity.handle)
+
+                if self.GrabbedEntity.type == TYPE_OBJECT then
+                    OBJECT.SET_ACTIVATE_OBJECT_PHYSICS_AS_SOON_AS_IT_IS_UNFROZEN(self.GrabbedEntity.handle, true)
+                end
+
                 self.GrabbedEntity = nil
             end
         end
@@ -468,6 +514,9 @@ function EntityForge:EntityGun()
 
                 if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 24) then
                     self.GrabbedEntity = existing_entity
+                    local v_SelfPos = Self.GetPos()
+                    local v_EntityPos = Game.GetEntityCoords(self.GrabbedEntity.handle, false)
+                    self.EntityGunDistance = v_SelfPos:distance(v_EntityPos)
                     ENTITY.SET_ENTITY_COLLISION(self.GrabbedEntity.handle, false, true)
 
                     if self.GrabbedEntity and self.GrabbedEntity.last_pos then
@@ -560,6 +609,10 @@ function EntityForge:ReleaseWorldEntity(entity)
         return
     end
 
+    ENTITY.SET_ENTITY_COLLISION(entity.handle, true, true)
+    ENTITY.SET_ENTITY_INVINCIBLE(entity.handle, false)
+    PHYSICS.ACTIVATE_PHYSICS(entity.handle)
+
     if entity.type == TYPE_PED then
         TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(entity.handle, false)
         PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(entity.handle, false)
@@ -567,9 +620,11 @@ function EntityForge:ReleaseWorldEntity(entity)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(entity.handle)
     end
 
-    ENTITY.SET_ENTITY_COLLISION(entity.handle, true, true)
-    ENTITY.SET_ENTITY_INVINCIBLE(entity.handle, false)
-    self:RemoveEntityByHandle(entity)
+    if entity.type == TYPE_OBJECT then
+        OBJECT.SET_ACTIVATE_OBJECT_PHYSICS_AS_SOON_AS_IT_IS_UNFROZEN(entity.handle, true)
+    end
+
+    self:RemoveEntityByHandle(entity.handle)
 end
 
 ---@param entity integer
@@ -593,99 +648,79 @@ function EntityForge:GetTypeFromGameType(entity)
     end
 end
 
----@param model_hash integer
----@param name string
----@param entity_type EntityType
----@param coords vec3
----@param ped_type? integer
----@param alpha? integer
----@param isForged? boolean
+---@param i_ModelHash integer
+---@param s_Name string
+---@param i_EntityType EntityType
+---@param v_Coords vec3
+---@param i_PedType? integer
+---@param i_Alpha? integer
+---@param b_IsForged? boolean
 ---@return integer | nil
-function EntityForge:CreateEntity(model_hash, name, entity_type, coords, ped_type, alpha, isForged)
-    local handle = nil
+function EntityForge:CreateEntity(i_ModelHash, s_Name, i_EntityType, v_Coords, i_PedType, i_Alpha, b_IsForged)
+    local i_Handle   = nil
+    local _, groundZ = MISC.GET_GROUND_Z_EXCLUDING_OBJECTS_FOR_3D_COORD(v_Coords.x, v_Coords.y, v_Coords.z, groundZ, false, false)
+    local v_SpawnPos = vec3:new(v_Coords.x, v_Coords.y, groundZ)
 
-    if Game.RequestModel(model_hash) then
-        local groundZ = 0
-        _, groundZ = MISC.GET_GROUND_Z_EXCLUDING_OBJECTS_FOR_3D_COORD(coords.x, coords.y, coords.z, groundZ, false, false)
+    if i_EntityType == TYPE_OBJECT then
+        i_Handle = Game.CreateObject(
+            i_ModelHash,
+            v_SpawnPos,
+            true,
+            false,
+            true,
+            true,
+            Self.GetHeading()
+        )
+    elseif i_EntityType == TYPE_VEHICLE then
+        i_Handle = Game.CreateVehicle(
+            i_ModelHash,
+            v_SpawnPos,
+            Self.GetHeading() - 90,
+            true,
+            false
+        )
+    elseif i_EntityType == TYPE_PED then
+        i_Handle = Game.CreatePed(
+            i_ModelHash,
+            v_SpawnPos,
+            Self.GetHeading() - 90,
+            true,
+            false
+        )
 
-        if entity_type == TYPE_OBJECT then
-            handle = OBJECT.CREATE_OBJECT(
-                model_hash,
-                coords.x,
-                coords.y,
-                groundZ,
-                true,
-                true,
-                false
-            )
-
-            if ENTITY.DOES_ENTITY_EXIST(handle) then
-                ENTITY.SET_ENTITY_HEADING(handle, Self.GetHeading())
-                OBJECT.PLACE_OBJECT_ON_GROUND_OR_OBJECT_PROPERLY(handle)
-            end
-        elseif entity_type == TYPE_VEHICLE then
-            handle = VEHICLE.CREATE_VEHICLE(
-                model_hash,
-                coords.x,
-                coords.y,
-                groundZ,
-                Self.GetHeading() - 90,
-                true,
-                false,
-                false
-            )
-
-            if ENTITY.DOES_ENTITY_EXIST(handle) then
-                DECORATOR.DECOR_SET_INT(handle, "MPBitset", 0)
-                VEHICLE.SET_VEHICLE_IS_STOLEN(handle, false)
-                VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(handle, 5.0)
-            end
-        elseif entity_type == TYPE_PED then
-            handle = PED.CREATE_PED(
-                ped_type or PED_TYPE._CIVMALE,
-                model_hash,
-                coords.x,
-                coords.y,
-                groundZ,
-                Self.GetHeading(),
-                true,
-                false
-            )
-
-            TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(handle, true)
-            PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(handle, true)
-            PED.SET_PED_KEEP_TASK(handle, false)
-            TASK.TASK_STAND_STILL(handle, -1)
-        end
-
-        if (handle == nil) or (handle == 0) or not ENTITY.DOES_ENTITY_EXIST(handle) then
-            YimToast:ShowError(
-                "EntityForge",
-                ("Failed to create entity:\n[%s]"):format(name)
-            )
-            return
-        end
-
-        if alpha then
-            ENTITY.SET_ENTITY_ALPHA(handle, alpha, false)
-        end
-
-        if not isForged then
-            self:AddEntity(
-                SpawnedEntity:New(
-                    handle,
-                    name,
-                    model_hash,
-                    entity_type,
-                    alpha,
-                    Game.GetEntityCoords(handle, false),
-                    Game.GetEntityRotation(handle, 2)
-                )
-            )
-        end
+        TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_Handle, true)
+        PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_Handle, true)
+        PED.SET_PED_KEEP_TASK(i_Handle, false)
+        TASK.TASK_STAND_STILL(i_Handle, -1)
     end
 
-    return handle
+    if not i_Handle or (i_Handle <= 0) or not ENTITY.DOES_ENTITY_EXIST(i_Handle) then
+        YimToast:ShowError(
+            "EntityForge",
+            ("Failed to create entity:\n[%s]"):format(s_Name)
+        )
+        return
+    end
+
+    if i_Alpha then
+        ENTITY.SET_ENTITY_ALPHA(i_Handle, i_Alpha, false)
+    end
+
+    if not b_IsForged then
+        self:AddEntity(
+            SpawnedEntity:New(
+                i_Handle,
+                s_Name,
+                i_ModelHash,
+                i_EntityType,
+                i_Alpha,
+                Game.GetEntityCoords(i_Handle, false),
+                Game.GetEntityRotation(i_Handle, 2)
+            )
+        )
+    end
+
+    return i_Handle
 end
 
 ---@param entity SpawnedEntity
@@ -705,8 +740,8 @@ function EntityForge:DeleteEntity(entity)
         end
     end
 
-    Game.DeleteEntity(entity.handle)
-    EntityForge:RemoveEntityByHandle(entity)
+    Game.DeleteEntity(entity.handle, self:GetCategoryFromType(entity))
+    self:RemoveEntityByHandle(entity.handle)
 
     if self.currentParent then
         if self.currentParent.handle ~= self.lastParent.handle then
@@ -755,12 +790,15 @@ function EntityForge:SpawnSavedAbomination(abomination)
 
                             if entityData.properties.action then
                                 if entityData.properties.action.scenario then
-                                    TASK.TASK_START_SCENARIO_IN_PLACE(
-                                        handle,
-                                        entityData.properties.action.scenario,
-                                        -1,
-                                        false
-                                    )
+                                    while not PED.IS_PED_USING_ANY_SCENARIO(handle) do
+                                        TASK.TASK_START_SCENARIO_IN_PLACE(
+                                            handle,
+                                            entityData.properties.action.scenario,
+                                            -1,
+                                            false
+                                        )
+                                        coroutine.yield()
+                                    end
                                 end
                             end
                         end
@@ -775,6 +813,8 @@ function EntityForge:SpawnSavedAbomination(abomination)
                         ENTITY.GET_ENTITY_COORDS(handle, false),
                         ENTITY.GET_ENTITY_ROTATION(handle, 2)
                     )
+
+                    ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(handle)
                 end
             else
                 entity = self:GetPlayerInstance()
@@ -818,8 +858,8 @@ end
 function EntityForge:DeleteAbomination(abomination)
     if abomination.children then
         for _, child in ipairs(abomination.children) do
-            Game.DeleteEntity(child.handle)
-            EntityForge:RemoveEntityByHandle(child)
+            Game.DeleteEntity(child.handle, self:GetCategoryFromType(child))
+            self:RemoveEntityByHandle(child.handle)
         end
     end
 
@@ -832,8 +872,8 @@ function EntityForge:DeleteAbomination(abomination)
         end
     end
 
-    Game.DeleteEntity(abomination.handle)
-    EntityForge:RemoveEntityByHandle(abomination)
+    Game.DeleteEntity(abomination.handle, self:GetCategoryFromType(abomination))
+    EntityForge:RemoveEntityByHandle(abomination.handle)
 end
 
 ---@param selectedChild? any
@@ -880,9 +920,28 @@ function EntityForge:AttachEntity(child, parent, unk_bone, v_AttachPos, v_Attach
         return
     end
 
-    local i_BoneIndex = 0
+    if not ENTITY.DOES_ENTITY_EXIST(child.handle) then
+        UI.WidgetSound("Error")
+        YimToast:ShowError(
+            "EntityForge",
+            "This entity no longer exists in the game world and will be removed from the forge."
+        )
+        self:DeleteEntity(child)
+        return
+    end
 
-    -- script.run_in_fiber(function()
+    if not ENTITY.DOES_ENTITY_EXIST(parent.handle) then
+        UI.WidgetSound("Error")
+        YimToast:ShowError(
+            "EntityForge",
+            "The parent entity no longer exists in the game world and will be removed from the forge."
+        )
+        self:DeleteEntity(parent)
+        return
+    end
+
+    UI.WidgetSound("Select")
+    local i_BoneIndex = 0
     local parent_handle
 
     if parent.isPlayer then
@@ -910,9 +969,9 @@ function EntityForge:AttachEntity(child, parent, unk_bone, v_AttachPos, v_Attach
         v_AttachRot.y,
         v_AttachRot.z,
         false,
+        true,
         false,
-        false,
-        false,
+        ENTITY.IS_ENTITY_A_PED(child.handle),
         2,
         true,
         1
@@ -943,7 +1002,6 @@ function EntityForge:AttachEntity(child, parent, unk_bone, v_AttachPos, v_Attach
     end
 
     self:UpdateAttachmentCandidates(child)
-    -- end)
 end
 
 ---@param attachment? SpawnedEntity
@@ -1100,7 +1158,7 @@ end
 ---@param entity SpawnedEntity
 ---@param position? vec3
 function EntityForge:ResetEntityPosition(entity, position)
-    script.run_in_fiber(function ()
+    script.run_in_fiber(function()
         if not position then
             position = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(entity.handle, 1, 2, 0)
         end
@@ -1164,7 +1222,7 @@ function EntityForge:DetachEntity(parent, child)
 
         if self.currentParent and #self.currentParent.children == 0 then
             if parent.modelHash == -1 and (#parent.children == 0) then
-                self:RemoveEntityByHandle(parent)
+                self:RemoveEntityByHandle(parent.handle)
                 self.PlayerEntity = nil
             end
             self.currentParent = self.lastParent
@@ -1174,8 +1232,18 @@ function EntityForge:DetachEntity(parent, child)
     end)
 end
 
----@param parent SpawnedEntity
+---@param parent? SpawnedEntity
 function EntityForge:DetachAllEntities(parent)
+    if not parent then
+        if self.currentParent then
+            parent = self.currentParent
+        elseif self.lastParent then
+            parent = self.lastParent
+        else
+            return
+        end
+    end
+
     script.run_in_fiber(function(detachall)
         if not parent.children or #parent.children == 0 then
             parent.children = {}
@@ -1220,7 +1288,7 @@ function EntityForge:DetachAllEntities(parent)
         end
 
         if parent.modelHash == -1 and (#parent.children == 0) then
-            self:RemoveEntityByHandle(parent)
+            self:RemoveEntityByHandle(parent.handle)
             self.PlayerEntity = nil
         end
 
@@ -1256,8 +1324,8 @@ function EntityForge:Cleanup()
     script.run_in_fiber(function(cleanup)
         cleanup:sleep(200)
 
-        for _, handle in ipairs(to_remove) do
-            self:RemoveEntityByHandle(handle)
+        for _, entity in ipairs(to_remove) do
+            self:RemoveEntityByHandle(entity.handle)
         end
 
         self:UpdateAttachmentCandidates()
@@ -1309,4 +1377,83 @@ function EntityForge:IsModelInFavorites(input)
             return v.name
         end
     end
+end
+
+---@param input table
+function EntityForge:RemoveFromFavorites(input)
+    if not input or not favorite_entities or #favorite_entities == 0 then
+        return
+    end
+
+    for i, v in ipairs(favorite_entities) do
+        if v.name == input.name then
+            table.remove(favorite_entities, i)
+            break
+        end
+    end
+
+    CFG:SaveItem("favorite_entities", favorite_entities)
+end
+
+function EntityForge:RemoveAllFavorites()
+    favorite_entities = {}
+    CFG:SaveItem("favorite_entities", favorite_entities)
+end
+
+function EntityForge:OverwriteSavedAbomination()
+    for i, entity in ipairs(forged_entities) do
+        if entity.name == EntityForge.currentParent.name then
+            forged_entities[i] = EntityForge.currentParent:AsTable()
+            break
+        end
+    end
+
+    CFG:SaveItem("forged_entities", forged_entities)
+    YimToast:ShowMessage("EntityForge", "Changes saved.")
+end
+
+---@param abomination SpawnedEntity
+function EntityForge:RemoveSavedAbomination(abomination)
+    if not abomination or not forged_entities or #forged_entities == 0 then
+        return
+    end
+
+    for i, v in ipairs(forged_entities) do
+        if v.name == abomination.name then
+            table.remove(forged_entities, i)
+            break
+        end
+    end
+    CFG:SaveItem("forged_entities", forged_entities)
+end
+
+function EntityForge:RemoveAllSavedAbominations()
+    forged_entities = {}
+    CFG:SaveItem("forged_entities", forged_entities)
+end
+
+---@param data any
+function EntityForge:ImportCreation(data)
+    if not data or not CFG.is_base64(data) then
+        YimToast:ShowError(
+            "EntityForge",
+            "Import Error: Incorrect data type!",
+            true,
+            5.0
+        )
+        return
+    end
+
+    local abomination = CFG:Decode(CFG:xor_(CFG:b64_decode(data)))
+    if type(abomination) ~= "table" then
+        YimToast:ShowError(
+            "EntityForge",
+            "Import Error: Incorrect data type!",
+            true,
+            5.0
+        )
+        return
+    end
+
+    return abomination
 end

@@ -1114,16 +1114,6 @@ end
 
 --#region YimConfig
 
-local function SetIndentation(n)
-    local retStr = ""
-    if n > 0 then
-        for _ = 1, n do
-            retStr = retStr .. " "
-        end
-    end
-    return retStr
-end
-
 --[[**¤ Universal Config System For YimMenu-Lua ¤**
 
   - Inspired by by [Harmless](https://github.com/harmless05)'s config system.
@@ -1163,7 +1153,7 @@ function YimConfig:New(script_name, default_config, pretty_json, indent, strict_
     self.default_config = default_config
     self.file_name = string.format("%s.json", script_name:lower():gsub(" ", "_"))
     self.pretty = pretty_json or true
-    self.indent = SetIndentation(indent or 2)
+    self.indent = string.rep(" ", indent or 4)
     self.strict_parsing = strict_parsing or false
     self.json = JSON()
     self.xor_key = encryption_key or "\xA3\x4F\xD2\x9B\x7E\xC1\xE8\x36\x5D\x0A\xF7\xB4\x6C\x2D\x89\x50\x1E\x73\xC9\xAF\x3B\x92\x58\xE0\x14\x7D\xA6\xCB\x81\x3F\xD5\x67"
@@ -1274,8 +1264,33 @@ function YimConfig:SaveItem(item_name, value)
     self:Save(data)
 end
 
-function YimConfig:Reset()
-    self:Save(self.default_config)
+---@param exceptions? table A table of config keys to ignore.
+function YimConfig:Reset(exceptions)
+    if type(self.default_config) ~= "table" then
+        self:Save(self.default_config)
+        return
+    end
+
+    exceptions = exceptions or {}
+    local data = self:Read()
+
+    if type(data) ~= "table" then
+        log.warning("[ERROR] (YimConfig): Invalid data type!")
+        return
+    end
+
+    local temp = {}
+
+    for key, value in pairs(self.default_config) do
+        if not exceptions[key] then
+            temp[key] = value
+            _G[key] = value
+        else
+            temp[key] = data[key] or value
+        end
+    end
+
+    self:Save(temp)
 end
 
 function YimConfig:b64_encode(input)
@@ -1287,6 +1302,7 @@ function YimConfig:b64_encode(input)
         local b = input:byte(i + 1) or 0
         local c = input:byte(i + 2) or 0
         local triple = (a << 16) | (b << 8) | c
+
         output[#output + 1] = self.b64_chars:sub(((triple >> 18) & 63) + 1, ((triple >> 18) & 63) + 1)
         output[#output + 1] = self.b64_chars:sub(((triple >> 12) & 63) + 1, ((triple >> 12) & 63) + 1)
         output[#output + 1] = (i + 1 <= n) and self.b64_chars:sub(((triple >> 6) & 63) + 1, ((triple >> 6) & 63) + 1) or "="
@@ -1351,7 +1367,9 @@ function YimConfig:Encrypt()
 
     local xord = self:xor_(data)
     local b64 = self:b64_encode(xord)
+
     file, _ = io.open(self.file_name, "w")
+
     if file then
         file:write(b64)
         file:flush()

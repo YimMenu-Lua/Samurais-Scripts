@@ -1,14 +1,20 @@
 ---@diagnostic disable
 
 SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = "1.6.5"
+SCRIPT_VERSION = "1.6.6"
 TARGET_BUILD   = "3504"
 TARGET_VERSION = "1.70"
 DEFAULT_CONFIG = {
-    shortcut_anim           = {},
-    favorite_actions        = {},
     favorite_entities       = {},
     forged_entities         = {},
+    yav3_saved_peds         = {},
+    yav3_shortcut           = {},
+    yav3_favorites          = {
+        anims = {},
+        scenarios = {},
+        clipsets = {},
+        scenes = {},
+    },
     driftSmoke_T            = {
         r = 255,
         g = 255,
@@ -22,23 +28,24 @@ DEFAULT_CONFIG = {
         kinetic = false
     },
     keybinds                = {
-        rodBtn        = { code = 0x58, name = "[X]" },
-        tdBtn         = { code = 0x10, name = "[Shift]" },
-        nosBtn        = { code = 0x10, name = "[Shift]" },
-        stop_anim     = { code = 0x47, name = "[G]" },
-        play_anim     = { code = 0x2E, name = "[DEL]" },
-        previous_anim = { code = 0x21, name = "[PAGE UP]" },
-        next_anim     = { code = 0x22, name = "[PAGE DOWN]" },
-        flatbedBtn    = { code = 0x58, name = "[X]" },
-        purgeBtn      = { code = 0x58, name = "[X]" },
-        autokill      = { code = 0x76, name = "[F7]" },
-        enemiesFlee   = { code = 0x77, name = "[F8]" },
-        missl_def     = { code = 0x0, name = "[Unbound]" },
-        vehicle_mine  = { code = 0x4E, name = "[N]" },
-        triggerbotBtn = { code = 0x10, name = "[Shift]" },
-        panik         = { code = 0x7B, name = "[F12]" },
-        laser_sight   = { code = 0x4C, name = "[L]" },
-        commands      = { code = 0x67, name = "[NUMPAD 7]" },
+        rodBtn         = { code = 0x58, name = "[X]" },
+        tdBtn          = { code = 0x10, name = "[Shift]" },
+        nosBtn         = { code = 0x10, name = "[Shift]" },
+        stop_anim      = { code = 0x47, name = "[G]" },
+        play_anim      = { code = 0x2E, name = "[DEL]" },
+        previous_anim  = { code = 0x21, name = "[PAGE UP]" },
+        next_anim      = { code = 0x22, name = "[PAGE DOWN]" },
+        flatbedBtn     = { code = 0x58, name = "[X]" },
+        purgeBtn       = { code = 0x58, name = "[X]" },
+        autokill       = { code = 0x76, name = "[F7]" },
+        enemiesFlee    = { code = 0x77, name = "[F8]" },
+        missl_def      = { code = 0x0,  name = "[Unbound]" },
+        vehicle_mine   = { code = 0x4E, name = "[N]" },
+        triggerbotBtn  = { code = 0x10, name = "[Shift]" },
+        panik          = { code = 0x7B, name = "[F12]" },
+        laser_sight    = { code = 0x4C, name = "[L]" },
+        commands       = { code = 0x67, name = "[NUMPAD 7]" },
+        cobra_maneuver = { code = 0x4D, name = "[M]" },
     },
     gpad_keybinds           = {
         rodBtn        = { code = 0, name = "[Unbound]" },
@@ -75,6 +82,7 @@ DEFAULT_CONFIG = {
         needle_color = 0xFF3636FF,
         needle_base_color = 0xFF111111,
     },
+    b_AutoCleanupEntities   = false,
     Regen                   = false,
     disableTooltips         = false,
     phoneAnim               = false,
@@ -113,6 +121,7 @@ DEFAULT_CONFIG = {
     BurnoutSmoke            = false,
     customSmokeCol          = false,
     driftMinigame           = false,
+    driftScoreSound         = false,
     speedBoost              = false,
     nosvfx                  = false,
     nosAudio                = false,
@@ -139,6 +148,8 @@ DEFAULT_CONFIG = {
     autovehlocks            = false,
     autoraiseroof           = false,
     towEverything           = false,
+    towPos                  = false,
+    towBox                  = false,
     noEngineBraking         = false,
     kersBoost               = false,
     offroaderx2             = false,
@@ -157,6 +168,7 @@ DEFAULT_CONFIG = {
     flares_forall           = false,
     unbreakableWindows      = false,
     real_plane_speed        = false,
+    cobra_maneuver          = false,
     no_stall                = false,
     cannon_triggerbot       = false,
     cannon_enemies_only     = true,
@@ -203,160 +215,124 @@ DEFAULT_CONFIG = {
     current_lang            = "English",
 }
 
-tab1Sound                             = true
-tab2Sound                             = true
-tab3Sound                             = true
-tab4Sound                             = true
-start_loading_anim                    = false
-is_playing_anim                       = false
-is_shortcut_anim                      = false
-anim_music                            = false
-is_playing_scenario                   = false
-is_playing_radio                      = false
-aimBool                               = false
-HashGrabber                           = false
-drew_laser                            = false
-isCrouched                            = false
-is_handsUp                            = false
-phoneAnimsEnabled                     = false
-validModel                            = false
-fb_model_override                     = false
-has_xenon                             = false
-has_custom_tires                      = false
-custom_tires_checked                  = false
-tire_smoke_col_checked                = false
+b_ShouldAnimateLoadingLabel           = false
+b_IsCrouched                          = false
+b_IsHandsUp                           = false
+b_PhoneAnimsEnabled                   = false
+b_HasXenonLights                      = false
+b_HasCustomTires                      = false
+b_CustomTiresChecked                  = false
+b_TireSmokeColChecked                 = false
 tire_smoke                            = false
 drift_started                         = false
-purge_started                         = false
-nos_started                           = false
-twostep_started                       = false
-is_typing                             = false
-is_setting_hotkeys                    = false
-is_shooting_flares                    = false
-engine_sound_changed                  = false
-open_sounds_window                    = false
-open_engine_swap_window               = false
-started_lct                           = false
-launch_active                         = false
-started_popSound                      = false
-started_popSound2                     = false
+b_IsTyping                            = false
+b_IsSettingHotkeys                    = false
+b_EngineSoundChanged                  = false
+b_LaunchControlReady                  = false
+b_LaunchControlActive                 = false
 pedGrabber                            = false
-ped_grabbed                           = false
+b_PedGrabbed                          = false
 vehicleGrabber                        = false
-vehicle_grabbed                       = false
+b_VehicleGrabbed                      = false
 carpool                               = false
-isCarpooling                          = false
-show_npc_veh_seat_ctrl                = false
-show_npc_veh_ui                       = false
-npc_veh_radio_on                      = false
-npc_veh_has_conv_roof                 = false
-stop_searching                        = false
-hijack_started                        = false
+b_IsCarpooling                        = false
+b_ShowCarpoolSeatControls             = false
+b_ShowCarpoolUI                       = false
+b_CarpoolVehRadioEnabled              = false
+b_CarpoolVehIsConvertible             = false
+b_StopCarpoolSearch                   = false
+b_NPCAnimStarted                      = false
 sound_btn_off                         = false
-is_drifting                           = false
-start_rgb_loop                        = false
-default_pops_disabled                 = false
-wh1_loop                              = false
-wh2_loop                              = false
-wh3_loop                              = false
-wh4_loop                              = false
-wh5_loop                              = false
-hangarLoop                            = false
-world_extended                        = false
+b_IsDrifting                          = false
+b_StartRGBLoop                        = false
+b_DefaultPopsDisabled                 = false
+b_Warehouse1Loop                      = false
+b_Warehouse2Loop                      = false
+b_Warehouse3Loop                      = false
+b_Warehouse4Loop                      = false
+b_Warehouse5Loop                      = false
+b_HangarLoop                          = false
+b_WorldBoundsExtended                 = false
 autopilot_waypoint                    = false
 autopilot_objective                   = false
 autopilot_random                      = false
-flight_music_off                      = false
-q_replaced                            = false
-is_sitting                            = false
-is_playing_amb_scenario               = false
-is_hiding                             = false
-ducking_in_car                        = false
-hiding_in_boot                        = false
-hiding_in_dumpster                    = false
-mf_overwrite                          = false
-is_primary                            = false
-is_secondary                          = false
-scr_is_running                        = false
-autosell_was_triggered                = false
-should_flash_bl                       = false
-cmd_ui_is_open                        = false
-should_draw_cmd_ui                    = false
-mvmtSelected                          = false
+b_FlightMusicDisabled                 = false
+b_SpawnedKatana                       = false
+b_IsSitting                           = false
+b_IsPlayingAmbientScenario            = false
+b_IsHiding                            = false
+b_IsDuckingInVehicle                  = false
+b_IsHidingInTrunk                     = false
+b_IsHidingInDumpster                  = false
+b_SellScriptIsRunning                 = false
+b_HasTriggeredAutosell                = false
+b_ShouldFlashBrakeLights              = false
+b_IsCommandsUIOpen                    = false
+b_ShouldDrawCommandsUI                = false
 jsonMvmt                              = false
-isChanged                             = false
-boot_vehicle_re                       = false
+b_BootVehicleRearEngined              = false
 rwSteering                            = false
 awSteering                            = false
 handbrakeSteering                     = false
-should_draw_speedometer               = false
-debug_counter                         = not SS_debug and 0 or 7
+b_ShouldDrawSpeedometer               = false
 i_SpeedometerUnitModifier             = 1
 i_LastAimedAtPed                      = 0
 i_AnimFlag                            = 0
-i_AttachedPed                         = 0
+i_GrabbedPed                          = 0
 i_GrabbedVeh                          = 0
-i_ThisVeh                             = 0
-i_NpcDriver                           = 0
 i_AnimIndex                           = 0
 i_Entity                              = 0
 i_TimerA                              = 0
 i_TimerB                              = 0
-i_FlameSize                           = 0
-i_DefaultXenon                        = 0
-pBus                                  = 0
-dummyDriver                           = 0
-dummyCopCar                           = 0
-drift_points                          = 0
-drift_extra_pts                       = 0
+i_DefaultXenonLightsIndex             = 0
+i_DummyCopCar                         = 0
+i_DriftModePoints                     = 0
+i_DriftModeExtraPoints                = 0
 straight_counter                      = 0
-drift_time                            = 0
-loud_pops_event                       = 0
-towed_vehicle                         = 0
-towed_vehicleModel                    = 0
-f_tow_xAxis                           = 0.0
-f_tow_yAxis                           = 0.0
-f_tow_zAxis                           = 0.0
-katana                                = 0
-hangarTotal                           = 0
-slot0_total                           = 0
-slot1_total                           = 0
-slot2_total                           = 0
-slot3_total                           = 0
-slot4_total                           = 0
-bunkerTotal                           = 0
-acidTotal                             = 0
-wh1Supplies                           = 0
-wh2Supplies                           = 0
-wh3Supplies                           = 0
-wh4Supplies                           = 0
-wh5Supplies                           = 0
-hangarSupplies                        = 0
-wh1Value                              = 0
-wh2Value                              = 0
-wh3Value                              = 0
-wh4Value                              = 0
-wh5Value                              = 0
+i_DriftTime                           = 0
+i_Katana                              = 0
+i_HangarTotalValue                    = 0
+i_BikerSlot0TotalValue                = 0
+i_BikerSlot1TotalValue                = 0
+i_BikerSlot2TotalValue                = 0
+i_BikerSlot3TotalValue                = 0
+i_BikerSlot4TotalValue                = 0
+i_BunkerTotalValue                    = 0
+i_AcidLabTotalValue                   = 0
+i_Warehouse1Supplies                  = 0
+i_Warehouse2Supplies                  = 0
+i_Warehouse3Supplies                  = 0
+i_Warehouse4Supplies                  = 0
+i_Warehouse5Supplies                  = 0
+i_HangarSupplies                      = 0
+i_Warehouse1Value                     = 0
+i_Warehouse2Value                     = 0
+i_Warehouse3Value                     = 0
+i_Warehouse4Value                     = 0
+i_Warehouse5Value                     = 0
 ceo_moola                             = 0
-boot_vehicle                          = 0
-boot_vehicle_len                      = 0
-thisDumpster                          = 0
-thisSeat                              = 0
-npc_veh_roof_state                    = 0
-perv                                  = 0
-abhubScriptHandle                     = 0
-npc_veh_speed                         = 0
-npcDriveSwitch                        = 0
-npcDrivingFlags                       = 803243
-pv_global                             = 1572092
-gb_global                             = 1667995
-tun_global                            = 262145
-flatbedModel                          = 1353720154
-npcDrivingSpeed                       = 19
-drift_multiplier                      = 1
-quote_alpha                           = 1
-pedthrowF                             = 10
-default_wanted_lvl                    = 5
+i_HnSVehicle                          = 0
+f_HnSVehicleLength                    = 0
+i_HnSDumpster                         = 0
+i_PublicSeat                          = 0
+i_StalkingPervert                     = 0
+i_BhubScriptHandle                    = 0
+i_CarpoolVehicle                      = 0
+i_CarpoolDriver                       = 0
+i_CarpoolVehRoofState                 = 0
+f_CarpoolVehicleCurrentSpeed          = 0
+i_CarpoolDefaultDrivingSpeed          = 19
+i_CarpoolDrivingStyleSwitch           = 0
+i_CarpoolDrivingFlags                 = 803243
+i_DriftMultiplier                     = 1
+f_DailyQuoteTextAlpha                 = 1.0
+i_PedThrowForce                       = 10
+i_DefaultWantedLevel                  = 5
+FreemodeGlobal1                       = 262145
+FreemodeGlobal2                       = 1667996
+BusinessHubGlobal1                    = 1943773
+BusinessHubGlobal2                    = 1963766
+PersonalVehicleGlobal                 = 1572092
 ------------------- Casino Pacino -------------------
 blackjack_cards                       = 134
 blackjack_decks                       = 846
@@ -378,8 +354,8 @@ prize_wheel_win_state                 = 298
 prize_wheel_prize                     = 14
 prize_wheel_prize_state               = 45
 gb_casino_heist_planning              = 1965614
-gb_casino_heist_planning_cut_offset   = 1497 + 736 + 92
-fm_mission_controller_cart_grab       = 10289 -- 10291
+gb_casino_heist_planning_cut_offset   = 1497 + 736 + 92 -- .*?0->f_....?\.f_...?\.f_..?\[4\] > 0
+fm_mission_controller_cart_grab       = 10291
 fm_mission_controller_cart_grab_speed = 14
 casino_heist_approach                 = 0
 casino_heist_target                   = 0
@@ -404,45 +380,16 @@ new_masks                             = 0
 casino_cooldown_update_str            = ""
 dealers_card_str                      = ""
 -----------------------------------------------------
-loading_label                         = ""
-sound_search                          = ""
-popsnd                                = ""
-sndRef                                = ""
-drift_streak_text                     = ""
-drift_extra_text                      = ""
-actions_search                        = ""
-currentMvmt                           = ""
-currentStrf                           = ""
-currentWmvmt                          = ""
-search_term                           = ""
-smokeHex                              = ""
-random_quote                          = ""
-custom_paints_sq                      = ""
-npcDriveTask                          = ""
-user_command                          = ""
-jsonMvmtSearch                        = ""
-speedometer_gear_display              = ""
-script_name                           = "None"
-simplified_scr_name                   = "None"
-npcDriveDest                          = vec3:zero()
-recently_played_a                     = {}
-selected_sound                        = {}
-selected_radio                        = {}
-smokePtfx_t                           = {}
-nosptfx_t                             = {}
-purgePtfx_t                           = {}
-lctPtfx_t                             = {}
-popSounds_t                           = {}
-popsPtfx_t                            = {}
-npc_blips                             = {}
-spawned_npcs                          = {}
-plyrProps                             = {}
-npcProps                              = {}
-selfPTFX                              = {}
-npcPTFX                               = {}
-curr_playing_anim                     = {}
-chosen_anim                           = {}
-jsonMvmts_t                           = {}
+s_LoadingLabel                        = ""
+s_CurrentMovementClipset              = ""
+s_CurrentStrafeClipset                = ""
+s_CurrentWeaponMovement               = ""
+s_RandomDailyQuote                    = ""
+s_NpcDriveTask                        = ""
+s_SpeedometerGearDisplay              = ""
+s_SellScriptName                      = "None"
+s_SellScriptDisplayName               = "None"
+v_NpcDriveDestination                 = vec3:zero()
 default_tire_smoke                    = {
     r = 255,
     g = 255,
@@ -555,7 +502,17 @@ bb                                    = {
     },
 }
 
-KeyManager = require("includes.classes.hotkeys")
+g_WompusHasRisen   = false
+g_CreatedBlips     = {}
+g_AttachedEntities = {}
+g_SpawnedEntities  = {
+    peds = {},
+    vehicles = {},
+    objects = {},
+}
+
+Time       = require("includes.classes.Time")
+KeyManager = require("includes.services.Hotkeys")
 YimToast   = require("includes.lib.YimToast")
 CFG        = require("includes.lib.YimConfig"):New(
     SCRIPT_NAME,
@@ -564,10 +521,14 @@ CFG        = require("includes.lib.YimConfig"):New(
     4
 )
 
+Timer = Time.Timer
+yield = coroutine.yield
+Sleep = Time.Sleep
+
 local _init_G = coroutine.create(function()
     for key, _ in pairs(DEFAULT_CONFIG) do
-        _G[key] = CFG:ReadItem(key)
-        coroutine.yield()
+        _G[key] = CFG:ReadItem(key) or DEFAULT_CONFIG[key]
+        yield()
     end
 end)
 

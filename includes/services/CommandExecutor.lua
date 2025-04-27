@@ -41,15 +41,16 @@ end
 
 
 function CommandExecutor:Draw()
-    if should_draw_cmd_ui then
+    if b_ShouldDrawCommandsUI then
         local screen_w = ImGui.GetWindowWidth()
         local screen_h = ImGui.GetWindowHeight()
-        ImGui.SetNextWindowSize(400, 180)
+
+        ImGui.SetNextWindowSize(400, 200)
         ImGui.SetNextWindowPos(screen_w + 300, screen_h - 90)
         ImGui.SetNextWindowBgAlpha(0.75)
-        should_draw_cmd_ui, cmd_ui_is_open = ImGui.Begin(
+        b_ShouldDrawCommandsUI, b_IsCommandsUIOpen = ImGui.Begin(
             "Command Executor",
-            cmd_ui_is_open,
+            b_IsCommandsUIOpen,
             ImGuiWindowFlags.NoTitleBar |
             ImGuiWindowFlags.NoMove |
             ImGuiWindowFlags.NoResize
@@ -67,12 +68,12 @@ function CommandExecutor:Draw()
             ~ImGuiInputTextFlags.AllowTabInput
         )
 
-        is_typing = ImGui.IsItemActive()
+        b_IsTyping = ImGui.IsItemActive()
 
         if self.commands[1] and #self.user_cmd > 0 then
             self.suggestions = {}
             for _, entry in pairs(self.commands) do
-                if string.find((entry.arg):lower(), self.user_cmd:lower()) then
+                if string.find(entry.arg:lower(), self.user_cmd:lower()) then
                     table.insert(self.suggestions, entry)
                 end
             end
@@ -81,25 +82,28 @@ function CommandExecutor:Draw()
         end
 
         if self.suggestions and self.suggestions[1] then
-            for i = 1, #self.suggestions do
-                local is_selected = (self.cmd_index == i)
-                if ImGui.Selectable(self.suggestions[i].arg, is_selected) then
-                    self.user_cmd = self.suggestions[i].arg:lower()
-                    self.cmd_entered  = true
+            ImGui.SetNextWindowBgAlpha(0.0)
+            ImGui.BeginChild("##suggestions", 370, -1)
+                for i = 1, #self.suggestions do
+                    local is_selected = (self.cmd_index == i)
+                    if ImGui.Selectable(self.suggestions[i].arg, is_selected) then
+                        self.user_cmd = self.suggestions[i].arg:lower()
+                        self.cmd_entered = true
+                    end
+                    if is_selected then
+                        self.cmd_index = i
+                    end
+                    if ImGui.IsItemHovered() then
+                        UI.Tooltip("Click to execute this command.")
+                    end
                 end
-                if is_selected then
-                    self.cmd_index = i
-                end
-                if ImGui.IsItemHovered() then
-                    UI.Tooltip("Click to execute this command.")
-                end
-            end
+            ImGui.EndChild()
         end
 
         if self.cmd_entered then
             UI.WidgetSound("Click")
-            should_draw_cmd_ui = false
-            cmd_ui_is_open = false
+            b_ShouldDrawCommandsUI = false
+            b_IsCommandsUIOpen = false
             gui.override_mouse(false)
         end
         ImGui.End()

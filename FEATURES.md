@@ -49,18 +49,8 @@
   - **Don't Fall Off Vehicles:**
     - Allows you to stand on top of vehicles without falling off when the vehicle moves.
 
-- **Actions:**
-
-  - **An improved version of [YimActions](https://github.com/xesdoog/YimActions) with the side features moved into the main Self tab. The improvements include:**
-    - The ability to sort animations by category.
-    - The ability to set a custom shortcut key for a specific animation so that you could play it any time you want.
-    - Some animations produce sound (Sleeping, Crying, DJ *(plays loud music)*, some uh... uhm, NSFW animations also play sounds).
-    - An option to browse and play animations using hotkeys. This option may interfere with gameplay so you can enable/disable it any time you want.
-    - Reworked **Movement Options**.
-    - New **Favorites** tab:
-      - Save animations and scenarios to favorites then play them from this tab (they will persist even if you reset your config from the **Settings** tab).
-    - New **Recently Played** tab:
-      - A new tab that shows recently played animations and scenarios and allows you to play/stop them from there.
+- **YimActions V3:**
+  - [YimActions](https://github.com/xesdoog/YimActions) rebuilt from scratch.
 
 - **Sound Player:**
   - Plays either human speeches or loud radio music that players nearby can hear (assuming you're not lagging and there are no sync issues).
@@ -135,7 +125,10 @@
       >**NOTE:** Pairing this option with "**Extend World Limits**" from the **World** tab allows you to fly out of the sky box. *(if you wanna meet Jesus)*. Beware though, the camera will stop following you once you go past the sky limit. *(so you can't actually see Jesus after all)*.
   
   - **No Engine Stalling:**
-    - When flying planes and holding the brake button, your engine will not shut off.
+    - When flying planes and holding the brake button, your engine will not shut off.camera will stop following you once you go past the sky limit. *(so you can't actually see Jesus after all)*.
+  
+  - **Cobra Maneuver:**
+    - While flying a plane *(preferably a jet)*, press the assigned key (default [M]) to perform a [Cobra Maneuver](https://www.youtube.com/shorts/H0X7D3Ga4mo). Press any key during the maneuver to cancel it and take back control of the plane.
   
   - **Cannon Triggerbot:**
     - When using a weaponized plane or heli and having the machine gun selected, it will automatically shoot targets in front of you. Also has the option to only shoot enemies.

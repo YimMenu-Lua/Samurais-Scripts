@@ -144,8 +144,8 @@ function Color:New(...)
                 instance.type = "hex"
                 instance.r, instance.g, instance.b, instance.a = instance:AsRGBA()
             else
-                if self.string_colors[args[1]:lower()] then
-                    local _arg = self.string_colors[args[1]:lower()]
+                if self.string_colors[string.lower(args[1])] then
+                    local _arg = self.string_colors[string.lower(args[1])]
                     instance.type = "float"
 
                     instance.r = _arg[1]
@@ -162,6 +162,8 @@ function Color:New(...)
             if math.type(args[1]) == "integer" and args[1] >= 0 and args[1] <= 0xFFFFFFFF then
                 instance.type = "ImU32"
             end
+
+            instance.r, instance.g, instance.b, instance.a = self:AsFloat()
         else
             log.warning(("[Color Error]: Invalid parameter: '%s'"):format(args[1]))
             instance.type = nil
@@ -180,7 +182,11 @@ function Color:AsRGBA()
         end
 
         if self.type:lower() == "float" then
-            return math.floor(self.r * 255), math.floor(self.g * 255), math.floor(self.b * 255), math.floor(self.a * 255)
+            return
+            math.floor(self.r * 255),
+            math.floor(self.g * 255),
+            math.floor(self.b * 255),
+            math.floor(self.a * 255)
         end
 
         if self.type:lower() == "hex" then
@@ -206,6 +212,7 @@ function Color:AsRGBA()
             local g = (self.value >> 0x8) & 0xFF
             local b = (self.value >> 0x10) & 0xFF
             local a = (self.value >> 0x18) & 0xFF
+
             return r, g, b, a
         end
     end
@@ -217,7 +224,7 @@ end
 -- Returns a color in float format.
 function Color:AsFloat()
     if not self.type then
-        return
+        return 0, 0, 0, 0
     end
 
     if self.type:lower() == "float" then

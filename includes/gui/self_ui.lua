@@ -174,4 +174,11 @@ function SelfUI()
     ImGui.BeginChild("SelfChild", 500, 500, true)
     SelfGrid:Draw()
     ImGui.EndChild()
+    ImGui.Spacing()
+    if ImGui.Button("Get This **** Off Me!") then
+        script.run_in_fiber(function()
+            SS.DetachPlayerAttachments()
+        end)
+    end
+    UI.Tooltip("Detaches anything that's attached to you. Only use this in extreme cases where something is stuck on you. DO NOT SPAM IT.")
 end

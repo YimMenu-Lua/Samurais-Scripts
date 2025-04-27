@@ -221,12 +221,12 @@ KeyManager.__index = KeyManager
 KeyManager.keys = {}
 
 function KeyManager:Init()
-    local insatnce = setmetatable({}, KeyManager)
+    local instance = setmetatable({}, KeyManager)
     for _, k in ipairs(VIRTUAL_KEYCODES) do
-        table.insert(insatnce.keys, Key:New(k.code, k.name))
+        table.insert(instance.keys, Key:New(k.code, k.name))
     end
 
-    return insatnce
+    return instance
 end
 
 ---@param code integer
@@ -291,6 +291,7 @@ end
 ---@param wParam integer
 function KeyManager:HandleEvent(msg, wParam)
     local key = self:GetKeyByCode(wParam)
+
     if not key then
         return
     end
@@ -309,20 +310,39 @@ function KeyManager:RegisterKeybind(key, callback, onKeyDown)
     for _, k in ipairs(self.keys) do
         if (key == k.name or key == k.code) then
             if k.callback and k.callback ~= callback then
-                gui.show_warning("Hotkey Manager", ("[%s] was already assigned to a different function!"):format(k.name))
-                log.warning(("[WARNING] (Hotkey Manager): [%s] was already assigned to a different function!"):format(k.name))
+                gui.show_warning(
+                    "Hotkey Manager",
+                    ("[%s] was already assigned to a different function!"):format(k.name)
+                )
+                log.warning(
+                    ("[WARNING] (Hotkey Manager): [%s] was already assigned to a different function!"):format(k.name)
+                )
             end
+
             k.callback = callback
             k.on_hold = onKeyDown or false
         end
     end
 end
 
+---@param oldKey integer | string
+---@param newKey table
+function KeyManager:UpdateKeybind(oldKey, newKey)
+    for _, v in ipairs(self.keys) do
+        if (oldKey == v.name) or (oldKey == v.code) then
+            v.code = newKey.code
+            v.name = newKey.name
+            break
+        end
+    end
+end
+
 ---@param key integer | string
 function KeyManager:RemoveKeybind(key)
-    for i, v in ipairs(self.keys) do
-        if (key == v.name or key == v.code) then
-            table.remove(self.keys, i)
+    for _, v in ipairs(self.keys) do
+        if (key == v.name) or (key == v.code) then
+            v.callback = nil
+            v.on_hold = false
             break
         end
     end
@@ -356,6 +376,7 @@ event.register_handler(menu_event.Wndproc, function(_, msg, wParam, _)
             wParam = 0x20040
         end
     end
+
     KeyManager:HandleEvent(msg, wParam)
 end)
 

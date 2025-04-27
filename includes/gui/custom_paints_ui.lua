@@ -5,30 +5,35 @@ local i_CustomPaintIndex   = 0
 local i_PaintsColSortIndex = 0
 local i_PaintsMfrSortIndex = 0
 local i_PaintsSortbySwitch = 0
+local s_PaintSearchQuery   = ""
+local b_MattePaint         = false
+local b_IsPrimary          = false
+local b_IsSecondary        = false
+
 
 local function SortCustomPaints()
     local filteredPaints = {}
     for _, v in ipairs(t_CustomPaints) do
         if i_PaintsSortbySwitch == 0 then
             if i_PaintsColSortIndex == 0 then
-                if string.find((v.name):lower(), custom_paints_sq:lower()) then
+                if string.find((v.name):lower(), s_PaintSearchQuery:lower()) then
                     table.insert(filteredPaints, v)
                 end
             else
                 if v.shade == t_CustomPintShades[i_PaintsColSortIndex + 1] then
-                    if string.find((v.name):lower(), custom_paints_sq:lower()) then
+                    if string.find((v.name):lower(), s_PaintSearchQuery:lower()) then
                         table.insert(filteredPaints, v)
                     end
                 end
             end
         elseif i_PaintsSortbySwitch == 1 then
             if i_PaintsMfrSortIndex == 0 then
-                if string.find((v.name):lower(), custom_paints_sq:lower()) then
+                if string.find((v.name):lower(), s_PaintSearchQuery:lower()) then
                     table.insert(filteredPaints, v)
                 end
             else
                 if v.manufacturer == t_CustomPaintsManufacturers[i_PaintsMfrSortIndex + 1] then
-                    if string.find((v.name):lower(), custom_paints_sq:lower()) then
+                    if string.find((v.name):lower(), s_PaintSearchQuery:lower()) then
                         table.insert(filteredPaints, v)
                     end
                 end
@@ -121,14 +126,14 @@ function CustomPaintsUI()
         end
         ImGui.PopItemWidth()
         ImGui.PushItemWidth(420)
-        custom_paints_sq, cpsqUsed = ImGui.InputTextWithHint("##custompaintssq", _T("GENERIC_SEARCH_HINT_"),
-            custom_paints_sq, 64)
-        is_typing = ImGui.IsItemActive()
+        s_PaintSearchQuery, cpsqUsed = ImGui.InputTextWithHint("##custompaintssq", _T("GENERIC_SEARCH_HINT_"),
+            s_PaintSearchQuery, 64)
+        b_IsTyping = ImGui.IsItemActive()
         ImGui.PopItemWidth()
         DisplayCustomPaints()
         ImGui.Spacing()
         ImGui.BeginDisabled(selected_paint == nil)
-        mf_overwrite, movwUsed = ImGui.Checkbox(_T("CUSTOM_PAINT_MATTE_CB_"),
+        b_MattePaint, movwUsed = ImGui.Checkbox(_T("CUSTOM_PAINT_MATTE_CB_"),
             selected_paint ~= nil and selected_paint.m or false)
         UI.Tooltip(_T("APPLY_MATTE_DESC_"))
         if movwUsed then
@@ -136,14 +141,14 @@ function CustomPaintsUI()
             selected_paint.m = not selected_paint.m
         end
         ImGui.Separator()
-        is_primary, isPused = ImGui.Checkbox(_T("COL_PRIMARY_CB_"), is_primary); ImGui.SameLine()
-        is_secondary, isSused = ImGui.Checkbox(_T("COL_SECONDARY_CB_"), is_secondary)
+        b_IsPrimary, isPused = ImGui.Checkbox(_T("COL_PRIMARY_CB_"), b_IsPrimary); ImGui.SameLine()
+        b_IsSecondary, isSused = ImGui.Checkbox(_T("COL_SECONDARY_CB_"), b_IsSecondary)
         if isPused or isSused then
             UI.WidgetSound("Nav2")
         end
         local text_x, _ = ImGui.CalcTextSize(_T("GENERIC_CONFIRM_BTN_"))
         if ImGui.Button(_T("GENERIC_CONFIRM_BTN_"), text_x + 20, 40) and selected_paint ~= nil then
-            if not is_primary and not is_secondary then
+            if not b_IsPrimary and not b_IsSecondary then
                 UI.WidgetSound("Error")
                 YimToast:ShowError("Samurai's Scripts", _T("CUSTOM_PAINT_NOT_SELECTED_ERR_"))
             else
@@ -153,8 +158,8 @@ function CustomPaintsUI()
                     selected_paint.hex,
                     selected_paint.p,
                     selected_paint.m,
-                    is_primary,
-                    is_secondary
+                    b_IsPrimary,
+                    b_IsSecondary
                 )
             end
         end
