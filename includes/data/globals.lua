@@ -1,7 +1,5 @@
 ---@diagnostic disable
 
-require("includes.classes.GlobalProxy")
-
 local SCRIPT_NAME    <const> = "samurais_scripts"
 local SCRIPT_VERSION <const> = "1.6.7"
 local TARGET_BUILD   <const> = "3521"
