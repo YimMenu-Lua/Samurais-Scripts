@@ -397,7 +397,7 @@ local function drawBikerBusiness()
                 ImGui.SameLine()
                 ImGui.BeginDisabled(data.i_TotalSupplies >= business.unit_max)
                     if ImGui.Button((" Fill Supplies ##%d"):format(i)) then
-                        globals.set_int(FreemodeGlobal1 + slot + 1, 1)
+                        globals.set_int(FreemodeGlobal2 + slot + 1, 1)
                     end
                 ImGui.EndDisabled()
 

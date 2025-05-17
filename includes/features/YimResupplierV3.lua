@@ -5,18 +5,22 @@ local t_WarehouseData = {
         autoFill = false
     },
     [2] = {
+        wasChecked = false,
         isOwned = false,
         autoFill = false
     },
     [3] = {
+        wasChecked = false,
         isOwned = false,
         autoFill = false
     },
     [4] = {
+        wasChecked = false,
         isOwned = false,
         autoFill = false
     },
     [5] = {
+        wasChecked = false,
         isOwned = false,
         autoFill = false
     },
@@ -53,9 +57,11 @@ local eShouldTerminateScripts <const> = {
     "appbusinesshub"
 }
 
+
 ---@class YRV3
 YRV3 = {}
 YRV3.__index = YRV3
+
 YRV3.i_TotalSum = 0
 YRV3.i_CEOvalueSum = 0
 YRV3.i_BikerValueSum = 0
@@ -78,6 +84,7 @@ YRV3.SellScriptsDisplayNames = {
     ["gb_biker_contraband_sell"] = "Biker Business",
     ["fm_content_acid_lab_sell"] = "Acid Lab",
 }
+
 
 ---@param where integer|vec3
 ---@param keepVehicle? boolean

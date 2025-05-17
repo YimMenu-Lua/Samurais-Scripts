@@ -1,7 +1,7 @@
 ---@diagnostic disable
 
 local SCRIPT_NAME    <const> = "samurais_scripts"
-local SCRIPT_VERSION <const> = "1.6.7"
+local SCRIPT_VERSION <const> = "1.6.8"
 local TARGET_BUILD   <const> = "3521"
 local TARGET_VERSION <const> = "1.70"
 local DEFAULT_CONFIG <const> = {
