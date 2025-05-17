@@ -93,6 +93,7 @@ function Flatbed:Spawn()
             return
         end
 
+        Decorator:RegisterEntity(self.handle, "Flatbed", true)
         PED.SET_PED_INTO_VEHICLE(Self.GetPedID(), self.handle, -1)
         ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(self.handle)
     end)
@@ -261,6 +262,7 @@ function Flatbed:Attach(s)
         tries = tries + 1
         final_z = final_z + step
     until success or tries > (maxLift / step)
+    Decorator:RegisterEntity(self.towedVehicle.handle, "Flatbed", true)
 end
 
 ---@param x float
@@ -404,6 +406,8 @@ function Flatbed:Detach()
             VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(self.towedVehicle.handle, 5.0)
             self.towedVehicle = nil
         end
+
+        Decorator:RemoveEntity(self.towedVehicle.handle, "Flatbed")
     end
 end
 
@@ -427,6 +431,7 @@ function Flatbed:ForceCleanup()
                 false
             )
             VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(attachedVehicle, 5.0)
+            Decorator:RemoveEntity(self.towedVehicle.handle, "Flatbed")
             self.towedVehicle = nil
         end
     end
@@ -509,6 +514,11 @@ function Flatbed:Reset()
         name = "",
     }
 
+    if self.towedVehicle then
+        Decorator:RemoveEntity(self.towedVehicle.handle, "Flatbed")
+    end
+
+    Decorator:RemoveEntity(self.handle, "Flatbed")
     self.previousHandle = 0
     self.searchPosition = vec3:zero()
     self.forwardVector = vec3:zero()

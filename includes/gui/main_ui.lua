@@ -33,15 +33,7 @@ local function DrawClock()
         center.x - 20,
         center.y + 15,
         ImGui.GetColorU32(255, 255, 255, 255),
-        month
-    )
-
-    ImGui.ImDrawListAddText(
-        ImDrawList,
-        center.x + 5,
-        center.y + 15,
-        ImGui.GetColorU32(255, 0, 0, 255),
-        tostring(day)
+        string.format("%s %s", month, day)
     )
     ImGui.SetWindowFontScale(1.0)
 
@@ -171,8 +163,8 @@ function MainUI()
 
     UI.WrappedText("A collection of scripts aimed towards adding some roleplaying and fun elements to the game.", 25)
     ImGui.Dummy(1, 10)
-    ImGui.BulletText(string.format("Script Version:   v%s", SCRIPT_VERSION))
-    ImGui.BulletText(string.format("Game Version:   b%s   Online %s", TARGET_BUILD, TARGET_VERSION))
+    ImGui.BulletText(string.format("Script Version:   v%s", SS.script_version))
+    ImGui.BulletText(string.format("Game Version:   b%s   Online %s", SS.target_build, SS.target_version))
 
     if not disable_quotes then
         ImGui.Dummy(1, 20); ImGui.SeparatorText("Quote Of The Day"); ImGui.Spacing()

@@ -20,7 +20,7 @@ function FlareCountermeasures:Deploy()
     self.shots = {}
     self.nextShotTime = MISC.GET_GAME_TIMER() + firstDelay
 
-    for _, bone in pairs(t_PlaneBones) do
+    for _, bone in pairs(ePlaneBones) do
         local bone_idx = Game.GetEntityBoneIndexByName(veh, bone)
 
         if bone_idx ~= -1 then

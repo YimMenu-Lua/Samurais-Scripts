@@ -125,7 +125,7 @@
       >**NOTE:** Pairing this option with "**Extend World Limits**" from the **World** tab allows you to fly out of the sky box. *(if you wanna meet Jesus)*. Beware though, the camera will stop following you once you go past the sky limit. *(so you can't actually see Jesus after all)*.
   
   - **No Engine Stalling:**
-    - When flying planes and holding the brake button, your engine will not shut off.camera will stop following you once you go past the sky limit. *(so you can't actually see Jesus after all)*.
+    - When flying planes and holding the brake button, your engine will not shut off.
   
   - **Cobra Maneuver:**
     - While flying a plane *(preferably a jet)*, press the assigned key (default [M]) to perform a [Cobra Maneuver](https://www.youtube.com/shorts/H0X7D3Ga4mo). Press any key during the maneuver to cancel it and take back control of the plane.
@@ -198,7 +198,7 @@
 
 ## Online
 
-- **Business Manager**
+- **YimResupplier V3**
   - An improved version of [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier) with a few more options and a redesigned UI.
 
 - **Casino Pacino**
@@ -266,6 +266,19 @@
     - Attached peds automatically play the saved scenario when spawned in a "forged creation".
     - Attached vehicles preserve whatever modifications and colors they had before they were saved.
     - Entities in the `Forge` are **invincible** until removed/dismissed/detached.
+  
+- **Billionaire Services V2:**
+  - [Billionare Services](https://github.com/YimMenu-Lua/Billionare-Services) rewritten from scratch:
+    - Spawn as many bodyguards and escort Groups as you want *(the script still limits the total number of entities you can spawn in all features)*.
+    - More intuitive UI.
+    - Removed childish and offensive options.
+    - Removed some of the old Escort Group options (burnouts, donuts, driveby shootings, shouting insults) to make escort groups feel more professional and lore-friendly.
+    - Removed LEO escort groups.
+    - The ability to add your own custom Escort Groups and save/load them will be added in the future. Don't know when, I'm too tired of this.
+    - Private Jets are limited to only 2 models: **Nimbus** and **Luxor Deluxe**. The rest are broken *(yes, I tested all of them)*.
+    - Added a couple more limousine models with custom paint jobs and modifications.
+    - All peds in this script no longer use the player's group and rely on the game to handle group behavior. It now has its own custom group manager.
+    - When you have bodyguards around and get in a vehicle, those who manage to find a free seat will enter your vehicle while the rest will first try to jack a nearby vehicle and if that fails, they will spawn their own crotch rocket (Bati 801) and follow you. Please note that this process may take a few seconds depending on how many bodyguards you have *(they don't all think or react at the same time to prevent killing your FPS)*.
 
 ## Settings
 

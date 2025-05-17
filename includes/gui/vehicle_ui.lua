@@ -1,16 +1,17 @@
 ---@diagnostic disable
 
 local t_SelectedEngine
-local i_LastMaxSpeed       = -1
-local i_EngineSwapIndex    = 0
-local i_VehSoundIndex      = 0
+local i_LastMaxSpeed = -1
+local i_EngineSwapIndex = 0
+local i_VehSoundIndex = 0
+local i_DefaultXenonLightsIndex = 0
 local s_VehicleSearchQuery = ""
 local t_EngineSoundsWindow = { should_draw = false }
-local t_EngineSwapsWindow  = { should_draw = false }
-local t_SpeedometerWindow  = { should_draw = false }
-local t_CachedTicks        = {fraction = {}, half = {}, speed = {}}
-local VehCBGrid            = GridRenderer:New(2, 25, 10)
-local PlaneGridCB          = GridRenderer:New(2, 25, 10)
+local t_EngineSwapsWindow = { should_draw = false }
+local t_SpeedometerWindow = { should_draw = false }
+local t_CachedTicks = {fraction = {}, half = {}, speed = {}}
+local VehCBGrid = GridRenderer:New(2, 25, 10)
+local PlaneGridCB = GridRenderer:New(2, 25, 10)
 
 local function FilterVehNames()
     t_FilteredNames = {}
@@ -167,7 +168,7 @@ VehCBGrid:AddCheckbox(
 VehCBGrid:AddCheckbox(
     "Can't Touch This!",
     "noJacking",
-    nil,
+    Self.CantTouchThis,
     nil,
     true,
     function()
@@ -380,13 +381,13 @@ function VehicleUI()
             local wp = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_WAYPOINT_BLIP_ENUM_ID())
             if HUD.DOES_BLIP_EXIST(wp) then
                 local waypoint_coords = HUD.GET_BLIP_COORDS(wp)
-                if autopilot_objective or autopilot_random then
+                if b_AutopilotObjective or b_AutopilotRandom then
                     TASK.CLEAR_PED_TASKS(Self.GetPedID())
                     TASK.CLEAR_PRIMARY_VEHICLE_TASK(Self.Vehicle.Current)
                 end
-                autopilot_waypoint  = true
-                autopilot_objective = false
-                autopilot_random    = false
+                b_AutopilotWaypoint  = true
+                b_AutopilotObjective = false
+                b_AutopilotRandom    = false
                 YimToast:ShowSuccess("Samurai's Scripts", "Flying towards your waypoint")
                 if Self.Vehicle.IsPlane then
                     local initialHoverModeState = VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(Self.Vehicle.Current)
@@ -427,15 +428,15 @@ function VehicleUI()
     if ImGui.Button(" Fly To Objective ") then
         UI.WidgetSound("Select")
         script.run_in_fiber(function(ap)
-            local objective_found, objective_coords = Game.FindObjectiveBlip()
+            local objective_found, objective_coords = Game.GetObjectiveBlipCoords()
             if objective_found and objective_coords ~= nil then
-                if autopilot_waypoint or autopilot_random then
+                if b_AutopilotWaypoint or b_AutopilotRandom then
                     TASK.CLEAR_PED_TASKS(Self.GetPedID())
                     TASK.CLEAR_PRIMARY_VEHICLE_TASK(Self.Vehicle.Current)
                 end
-                autopilot_waypoint  = false
-                autopilot_objective = true
-                autopilot_random    = false
+                b_AutopilotWaypoint  = false
+                b_AutopilotObjective = true
+                b_AutopilotRandom    = false
                 YimToast:ShowSuccess("Samurai's Scripts", "Flying towards objective")
                 if Self.Vehicle.IsPlane then
                     local initialHoverModeState = VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(Self.Vehicle.Current)
@@ -477,13 +478,13 @@ function VehicleUI()
     if ImGui.Button(" Random ") then
         UI.WidgetSound("Select")
         script.run_in_fiber(function(ap)
-            if autopilot_waypoint or autopilot_objective then
+            if b_AutopilotWaypoint or b_AutopilotObjective then
                 TASK.CLEAR_PED_TASKS(Self.GetPedID())
                 TASK.CLEAR_PRIMARY_VEHICLE_TASK(Self.Vehicle.Current)
             end
-            autopilot_waypoint  = false
-            autopilot_objective = false
-            autopilot_random    = true
+            b_AutopilotWaypoint  = false
+            b_AutopilotObjective = false
+            b_AutopilotRandom    = true
             YimToast:ShowSuccess("Samurai's Scripts", "Flying towards some random coordinates")
             if Self.Vehicle.IsPlane then
                 local initialHoverModeState = VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(Self.Vehicle.Current)
@@ -516,7 +517,7 @@ function VehicleUI()
             end
         end)
     end
-    if autopilot_waypoint or autopilot_objective or autopilot_random then
+    if b_AutopilotWaypoint or b_AutopilotObjective or b_AutopilotRandom then
         ImGui.SameLine()
         if ImGui.Button(_T("GENERIC_STOP_BTN_")) then
             UI.WidgetSound("Cancel")
@@ -524,9 +525,9 @@ function VehicleUI()
             script.run_in_fiber(function()
                 TASK.CLEAR_PED_TASKS(Self.GetPedID())
                 TASK.CLEAR_PRIMARY_VEHICLE_TASK(Self.Vehicle.Current)
-                autopilot_waypoint  = false
-                autopilot_objective = false
-                autopilot_random    = false
+                b_AutopilotWaypoint  = false
+                b_AutopilotObjective = false
+                b_AutopilotRandom    = false
             end)
         end
     end
@@ -563,13 +564,13 @@ function VehicleUI()
     end
 
     ImGui.SameLine()
-    speedometer.enabled, speedometerChecked = ImGui.Checkbox("Speedometer", speedometer.enabled)
+    speedometer_cfg.enabled, speedometerChecked = ImGui.Checkbox("Speedometer", speedometer_cfg.enabled)
     if speedometerChecked then
         UI.WidgetSound("Nav2")
-        CFG:SaveItem("speedometer", speedometer)
+        CFG:SaveItem("speedometer_cfg", speedometer_cfg)
     end
 
-    if speedometer.enabled then
+    if speedometer_cfg.enabled then
         ImGui.SameLine()
         if ImGui.Button("Speedometer Options") then
             UI.WidgetSound("Select")
@@ -1202,126 +1203,86 @@ function VehicleUI()
 
         ImGui.Dummy(1, 10)
         ImGui.SeparatorText("Speed Unit")
-        speedometer.speed_unit, mps = ImGui.RadioButton("M/s", speedometer.speed_unit, 0)
+        speedometer_cfg.speed_unit, mps = ImGui.RadioButton("M/s", speedometer_cfg.speed_unit, 0)
         ImGui.SameLine()
-        speedometer.speed_unit, kmph = ImGui.RadioButton("Km/h", speedometer.speed_unit, 1)
+        speedometer_cfg.speed_unit, kmph = ImGui.RadioButton("Km/h", speedometer_cfg.speed_unit, 1)
         ImGui.SameLine()
-        speedometer.speed_unit, mph = ImGui.RadioButton("Mi/h", speedometer.speed_unit, 2)
+        speedometer_cfg.speed_unit, mph = ImGui.RadioButton("Mi/h", speedometer_cfg.speed_unit, 2)
         if (mps or kmph or mph) then
             UI.WidgetSound("Nav2")
-            CFG:SaveItem("speedometer", speedometer)
+            CFG:SaveItem("speedometer_cfg", speedometer_cfg)
         end
 
         ImGui.SeparatorText("Position")
         ImGui.PushItemWidth(300)
-        speedometer.pos.x, _ = ImGui.SliderFloat(
+        speedometer_cfg.pos.x, _ = ImGui.SliderFloat(
             "Left/Right",
-            speedometer.pos.x,
+            speedometer_cfg.pos.x,
             0.0,
-            Game.ScreenResolution.x - (speedometer.radius * 2.5)
+            Game.ScreenResolution.x - (speedometer_cfg.radius * 2.5)
         )
-        speedometer.pos.y, _ = ImGui.SliderFloat("Up/Down", speedometer.pos.y, 0.0,
-            Game.ScreenResolution.y - (speedometer.radius * 3.0))
+        speedometer_cfg.pos.y, _ = ImGui.SliderFloat("Up/Down", speedometer_cfg.pos.y, 0.0,
+            Game.ScreenResolution.y - (speedometer_cfg.radius * 3.0))
         ImGui.PopItemWidth()
 
         ImGui.SeparatorText("Colors")
-        speedometercircle_color = {Col(speedometer.circle_color):AsFloat()}
+        speedometercircle_color = {Col(speedometer_cfg.circle_color):AsFloat()}
         speedometercircle_color, circlecolused = ImGui.ColorEdit4("Circle", speedometercircle_color)
         if circlecolused then
-            speedometer.circle_color = ImU32(speedometercircle_color)
-            CFG:SaveItem("speedometer", speedometer)
+            speedometer_cfg.circle_color = ImU32(speedometercircle_color)
+            CFG:SaveItem("speedometer_cfg", speedometer_cfg)
         end
 
-        speedometertext_color = {Col(speedometer.text_color):AsFloat()}
+        speedometertext_color = {Col(speedometer_cfg.text_color):AsFloat()}
         speedometertext_color, textcolused = ImGui.ColorEdit4("Text", speedometertext_color)
         if textcolused then
-            speedometer.text_color = ImU32(speedometertext_color)
-            CFG:SaveItem("speedometer", speedometer)
+            speedometer_cfg.text_color = ImU32(speedometertext_color)
+            CFG:SaveItem("speedometer_cfg", speedometer_cfg)
         end
 
-        speedometermarkings_color = {Col(speedometer.markings_color):AsFloat()}
+        speedometermarkings_color = {Col(speedometer_cfg.markings_color):AsFloat()}
         speedometermarkings_color, markingsused = ImGui.ColorEdit4("Speed Markings", speedometermarkings_color)
         if markingsused then
-            speedometer.markings_color = ImU32(speedometermarkings_color)
-            CFG:SaveItem("speedometer", speedometer)
+            speedometer_cfg.markings_color = ImU32(speedometermarkings_color)
+            CFG:SaveItem("speedometer_cfg", speedometer_cfg)
         end
 
-        speedometerneedle_color = {Col(speedometer.needle_color):AsFloat()}
+        speedometerneedle_color = {Col(speedometer_cfg.needle_color):AsFloat()}
         speedometerneedle_color, needlecolused = ImGui.ColorEdit4("Needle", speedometerneedle_color)
         if needlecolused then
-            speedometer.needle_color = ImU32(speedometerneedle_color)
-            CFG:SaveItem("speedometer", speedometer)
+            speedometer_cfg.needle_color = ImU32(speedometerneedle_color)
+            CFG:SaveItem("speedometer_cfg", speedometer_cfg)
         end
 
-        speedometerneedle_base_color = {Col(speedometer.needle_base_color):AsFloat()}
+        speedometerneedle_base_color = {Col(speedometer_cfg.needle_base_color):AsFloat()}
         if #speedometerneedle_base_color == 4 then
             speedometerneedle_base_color[4] = nil
         end
         speedometerneedle_base_color, needlebaseused = ImGui.ColorEdit3("Needle Base", speedometerneedle_base_color)
         if needlebaseused then
-            speedometer.needle_base_color = ImU32(speedometerneedle_base_color)
-            CFG:SaveItem("speedometer", speedometer)
+            speedometer_cfg.needle_base_color = ImU32(speedometerneedle_base_color)
+            CFG:SaveItem("speedometer_cfg", speedometer_cfg)
         end
 
         ImGui.Dummy(1, 10)
         ImGui.Separator()
         if ImGui.Button(_T("GENERIC_SAVE_BTN_")) then
             UI.WidgetSound("Select")
-            CFG:SaveItem("speedometer", speedometer)
+            CFG:SaveItem("speedometer_cfg", speedometer_cfg)
             t_SpeedometerWindow.should_draw = false
         end
 
         ImGui.SameLine()
         if ImGui.Button(_T("GENERIC_RESET_BTN_")) then
             UI.WidgetSound("Cancel")
-            speedometer = DEFAULT_CONFIG.speedometer
-            speedometer.enabled = true
-            CFG:SaveItem("speedometer", speedometer)
+            speedometer_cfg = SS.default_config.speedometer_cfg
+            speedometer_cfg.enabled = true
+            CFG:SaveItem("speedometer_cfg", speedometer_cfg)
         end
         ImGui.End()
     end
 end
 
----@param max_speed number
----@param radius number
----@param start_angle number
----@param end_angle number
-local function GenerateSpeedometerTicks(max_speed, radius, start_angle, end_angle)
-    if max_speed == i_LastMaxSpeed then
-        return
-    end
-
-    local steps = max_speed < 500 and max_speed or max_speed / 10
-
-    i_LastMaxSpeed = max_speed
-    t_CachedTicks.fraction = {}
-    t_CachedTicks.half = {}
-    t_CachedTicks.speed = {}
-
-    for i = 0, steps do
-        local percent = i / steps
-        local angle = start_angle + (end_angle - start_angle) * percent
-        local cosA, sinA = math.cos(angle), math.sin(angle)
-
-        local function push(offset, category)
-            table.insert(t_CachedTicks[category], {
-                x1 = cosA * (radius - offset),
-                y1 = sinA * (radius - offset),
-                x2 = cosA * radius,
-                y2 = sinA * radius,
-                angle = angle
-            })
-        end
-
-        if i % 10 == 0 then
-            push(12, "speed")
-        elseif i % 5 == 0 then
-            push(8, "half")
-        else
-            push(4, "fraction")
-        end
-    end
-end
 
 ---@param current_speed number
 ---@param max_speed number
@@ -1337,12 +1298,14 @@ function DrawSpeedometer(
     max_altitude,
     offset
 )
+
     if b_ShouldDrawSpeedometer then
-        local radius = 160
+        local radius = 150
+
         ImGui.SetNextWindowBgAlpha(0.0)
         ImGui.SetNextWindowSize(radius * 2.5, radius * 2.5)
         if ImGui.Begin(
-            "Speedometer",
+            "SpeedometerWindow",
             ImGuiWindowFlags.NoTitleBar |
             ImGuiWindowFlags.NoResize |
             ImGuiWindowFlags.NoScrollbar |
@@ -1350,315 +1313,23 @@ function DrawSpeedometer(
             ImGuiWindowFlags.NoCollapse |
             ImGuiWindowFlags.NoMove
         ) then
-            if speedometer.pos.x == 0 and speedometer.pos.y == 0 then
-                speedometer.pos.x = Game.ScreenResolution.x - (radius * 2.5)
-                speedometer.pos.y = Game.ScreenResolution.y - (radius * 3.5)
+
+            if (speedometer_cfg.pos.x == 0 and speedometer_cfg.pos.y == 0) then
+                speedometer_cfg.pos.x = Game.ScreenResolution.x - (radius * 2.5)
+                speedometer_cfg.pos.y = Game.ScreenResolution.y - (radius * 3.5)
+                CFG:SaveItem("speedometer_cfg", speedometer_cfg)
             end
 
-            ImGui.SetWindowPos("Speedometer", speedometer.pos.x, speedometer.pos.y)
+            ImGui.SetWindowPos("SpeedometerWindow", speedometer_cfg.pos.x, speedometer_cfg.pos.y)
             pos_offset = offset or 0.0
 
             local ImDrawList = ImGui.GetWindowDrawList()
             local window_pos = vec2:new(ImGui.GetWindowPos())
             local window_size = vec2:new(ImGui.GetWindowSize())
-            local line_thickness = 3.0
-            local start_angle = -math.pi * 1.25
-            local end_angle = math.pi * 0.25
-            local center = vec2:new(
-                window_pos.x + window_size.x * 0.5 + pos_offset,
-                window_pos.y + window_size.y * 0.5 + pos_offset
-            )
+            local center = window_pos + window_size * 0.5 + pos_offset
 
-            -- background
-            ImGui.ImDrawListAddCircleFilled(
-                ImDrawList,
-                center.x,
-                center.y,
-                radius,
-                speedometer.circle_bgcolor
-            )
+            Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, current_altitude, max_altitude)
 
-            -- analog circle
-            ImGui.ImDrawListAddCircle(
-                ImDrawList,
-                center.x,
-                center.y,
-                radius,
-                speedometer.circle_color,
-                100,
-                line_thickness
-            )
-
-            if Self.Vehicle.IsPlane or Self.Vehicle.IsHeli then
-                local altitude_text_offset = vec2:new(-43, -80)
-                ImGui.SetWindowFontScale(0.77)
-                ImGui.ImDrawListAddText(
-                    ImDrawList,
-                    center.x + altitude_text_offset.x,
-                    center.y + altitude_text_offset.y,
-                    speedometer.text_color,
-                    string.format("Altitude [%.0fm]", current_altitude)
-                )
-                ImGui.SetWindowFontScale(1.0)
-            end
-
-            local max_fractions = (Self.Vehicle.IsPlane or Self.Vehicle.IsHeli) and max_altitude or max_speed
-            local step_0 = (Self.Vehicle.IsPlane or Self.Vehicle.IsHeli) and 10 or 1
-            local step_1 = (Self.Vehicle.IsPlane or Self.Vehicle.IsHeli) and 100 or 10
-            local step_2 = (Self.Vehicle.IsPlane or Self.Vehicle.IsHeli) and 500 or 20
-
-            GenerateSpeedometerTicks(max_fractions, radius, start_angle, end_angle)
-
-            -- fractions
-            for _, tick in ipairs(t_CachedTicks.fraction) do
-                ImGui.ImDrawListAddLine(
-                    ImDrawList,
-                    center.x + tick.x1,
-                    center.y + tick.y1,
-                    center.x + tick.x2,
-                    center.y + tick.y2,
-                    speedometer.markings_color,
-                    line_thickness * 0.2
-                )
-            end
-
-            -- halfway fractions
-            for _, tick in ipairs(t_CachedTicks.half) do
-                ImGui.ImDrawListAddLine(
-                    ImDrawList,
-                    center.x + tick.x1,
-                    center.y + tick.y1,
-                    center.x + tick.x2,
-                    center.y + tick.y2,
-                    speedometer.markings_color,
-                    line_thickness * 0.5
-                )
-            end
-
-            -- speed/altitude markings
-            for i, tick in ipairs(t_CachedTicks.speed) do
-                ImGui.ImDrawListAddLine(
-                    ImDrawList,
-                    center.x + tick.x1,
-                    center.y + tick.y1,
-                    center.x + tick.x2,
-                    center.y + tick.y2,
-                    speedometer.markings_color,
-                    line_thickness * 0.5
-                )
-
-                local speedModifier = (Self.Vehicle.IsPlane or Self.Vehicle.IsHeli) and 100 or 10
-                local mark_buff = ""
-
-                if speedModifier == 100 then
-                    mark_buff = string.format("%d", i == 1 and 0 or i * speedModifier)
-                else
-                    mark_buff = string.format("%d", i * speedModifier - 10)
-                end
-
-                local text_radius = radius - 35
-                local label_x = center.x + math.cos(tick.angle) * text_radius
-                local label_y = center.y + math.sin(tick.angle) * text_radius
-                local text_size = vec2:new(ImGui.CalcTextSize(mark_buff))
-                local txt_draw_pos = vec2:new(
-                    label_x - text_size.x * 0.5,
-                    label_y - text_size.y * 0.5
-                )
-                if (i ~= 1) and (i * speedModifier % step_2 == 0) then
-                    ImGui.SetWindowFontScale(0.9)
-                    ImGui.ImDrawListAddText(
-                        ImDrawList,
-                        txt_draw_pos.x,
-                        txt_draw_pos.y,
-                        speedometer.text_color,
-                        mark_buff
-                    )
-                    ImGui.SetWindowFontScale(1.0)
-                end
-
-                -- analog needle
-                local speed_ratio = (Self.Vehicle.IsPlane or Self.Vehicle.IsHeli) and
-                    math.min(current_altitude / max_altitude, 1) or
-                    math.min(current_speed / max_speed, 1)
-                local speed_angle = start_angle + (end_angle - start_angle) * speed_ratio
-                local needle_end = center + vec2:new(math.cos(speed_angle) * radius, math.sin(speed_angle) * radius)
-                local start_thickness = line_thickness
-                local end_thickness = line_thickness * 0.5
-
-                for t = 0.0, 1.0, 0.05 do
-                    local segment_point = center + (needle_end - center) * t
-                    local thickness = start_thickness + (end_thickness - start_thickness) * t
-
-                    ImGui.ImDrawListAddLine(
-                        ImDrawList,
-                        center.x,
-                        center.y,
-                        segment_point.x,
-                        segment_point.y,
-                        speedometer.needle_color,
-                        thickness
-                    )
-                end
-
-                -- needle base
-                ImGui.ImDrawListAddCircleFilled(
-                    ImDrawList,
-                    center.x,
-                    center.y,
-                    line_thickness * 17.0,
-                    speedometer.needle_base_color
-                )
-
-                -- digital speed & speed unit
-                local speed_buff = string.format("%.0f", current_speed)
-                local speed_text_size = vec2:new(ImGui.CalcTextSize(speed_buff))
-                local unit_buff = string.format(
-                    "%s",
-                    (speedometer.speed_unit == 0 and "M/s") or
-                    (speedometer.speed_unit == 1 and "Km/h") or
-                    "Mi/h"
-                )
-                local unit_text_size = vec2:new(ImGui.CalcTextSize(unit_buff))
-                ImGui.SetWindowFontScale(1.5)
-                ImGui.ImDrawListAddText(
-                    ImDrawList,
-                    center.x - (speed_text_size.x / 1.5),
-                    center.y - (speed_text_size.y * 0.8),
-                    speedometer.text_color,
-                    speed_buff
-                )
-                ImGui.SetWindowFontScale(1.0)
-                ImGui.ImDrawListAddText(
-                    ImDrawList,
-                    center.x - (unit_text_size.x / 2),
-                    center.y + (unit_text_size.y * 0.8),
-                    speedometer.text_color,
-                    unit_buff
-                )
-
-                if not Self.Vehicle.IsPlane and not Self.Vehicle.IsHeli then
-                    -- driving gear indicator
-                    local gear_text_offset = vec2:new(0, 69)
-                    local gear_text_size = vec2:new(-10, -10)
-                    ImGui.SetWindowFontScale(1.2)
-                    ImGui.ImDrawListAddText(
-                        ImDrawList,
-                        center.x + gear_text_size.x + gear_text_offset.x,
-                        center.y + gear_text_size.y + gear_text_offset.y,
-                        Self.Vehicle.IsSportsCar and
-                        ImU32({ 1.0, 0.215, 0.215, 1.0 }) or
-                        speedometer.text_color,
-                        gear or ""
-                    )
-                    ImGui.SetWindowFontScale(1.0)
-                end
-
-                -- RPM/throttle indicator
-                local rpm_angle_range = start_angle - end_angle
-                local rpm_indicator = (Self.Vehicle.IsPlane or Self.Vehicle.IsHeli) and Self.Vehicle.Throttle or Self.Vehicle.RPM
-                local num_active_segments = math.floor(30 * (rpm_indicator))
-
-                for offset = -1.5, 1.5, 1 do
-                    local prev_x, prev_y
-                    for i = 0, num_active_segments do
-                        local rpm_angle = (start_angle + (rpm_angle_range * (i / 30)) - 0.07)
-                        local rpm_x = center.x + math.cos(rpm_angle) * (50 + offset)
-                        local rpm_y = center.y + math.sin(rpm_angle) * (50 + offset)
-
-                        if prev_x and prev_y then
-                            ImGui.ImDrawListAddLine(
-                                ImDrawList,
-                                prev_x,
-                                prev_y,
-                                rpm_x,
-                                rpm_y,
-                                speedometer.needle_color
-                            )
-                        end
-                        prev_x, prev_y = rpm_x, rpm_y
-                    end
-                end
-
-                -- abs, esc, nos indicators
-                if not Self.Vehicle.IsPlane and not Self.Vehicle.IsHeli then
-                    if Game.Vehicle.HasABS(Self.Vehicle.Current) then
-                        local abs_text_offset = vec2:new(-50, 100)
-                        ImGui.SetWindowFontScale(0.77)
-                        ImGui.ImDrawListAddText(
-                            ImDrawList,
-                            center.x + abs_text_offset.x,
-                            center.y + abs_text_offset.y,
-                            ImU32(
-                                b_ShouldFlashBrakeLights and
-                                { 1.0, 0.8, 0.0, 1.0 } or
-                                { 0.1, 0.1, 0.1, 0.05 }
-                            ),
-                            "ABS"
-                        )
-                        ImGui.SetWindowFontScale(1.0)
-
-                        local esc_text_offset = vec2:new(30, 100)
-                        ImGui.SetWindowFontScale(0.77)
-                        ImGui.ImDrawListAddText(
-                            ImDrawList,
-                            center.x + esc_text_offset.x,
-                            center.y + esc_text_offset.y,
-                            ImU32(
-                                Self.Vehicle.ShouldFlashESC and
-                                { 1.0, 0.215, 0.215, 1.0 } or
-                                { 0.1, 0.1, 0.1, 0.05 }
-                            ),
-                            "ESC"
-                        )
-                        ImGui.SetWindowFontScale(1.0)
-                    end
-
-                    local nos_text_offset = vec2:new(-10, 100)
-                    ImGui.SetWindowFontScale(0.77)
-                    ImGui.ImDrawListAddText(
-                        ImDrawList,
-                        center.x + nos_text_offset.x,
-                        center.y + nos_text_offset.y,
-                        ImU32(
-                            using_nos
-                            and { 0.0, 0.215, 1.0, 1.0 }
-                            or { 0.1, 0.1, 0.1, 0.05 }
-                        ),
-                        "NOS"
-                    )
-                    ImGui.SetWindowFontScale(1.0)
-                else
-                    local flares_text_offset = vec2:new(-50, 100)
-                    ImGui.SetWindowFontScale(0.77)
-                    ImGui.ImDrawListAddText(
-                        ImDrawList,
-                        center.x + flares_text_offset.x,
-                        center.y + flares_text_offset.y,
-                        ImU32(
-                            FlareCountermeasures.active
-                            and { 0.1, 0.91, 0.0, 1.0 }
-                            or { 0.1, 0.1, 0.1, 0.05 }
-                        ),
-                        "FLRS"
-                    )
-                    ImGui.SetWindowFontScale(1.0)
-
-                    local gear_text_offset = vec2:new(30, 100)
-                    ImGui.SetWindowFontScale(0.77)
-                    ImGui.ImDrawListAddText(
-                        ImDrawList,
-                        center.x + gear_text_offset.x,
-                        center.y + gear_text_offset.y,
-                        ImU32(
-                            (Self.Vehicle.LandingGearState > -1 and Self.Vehicle.LandingGearState < 4)
-                            and { 0.91, 0.1, 0.0, 1.0 }
-                            or { 0.1, 0.1, 0.1, 0.05 }
-                        ),
-                        "GEAR"
-                    )
-                    ImGui.SetWindowFontScale(1.0)
-                end
-            end
             ImGui.End()
         end
     end

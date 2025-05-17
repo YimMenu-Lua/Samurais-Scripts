@@ -14,6 +14,7 @@ setmetatable(vec2, {
 
 ---@param x float
 ---@param y float
+---@return vec2
 function vec2:new(x, y)
     return setmetatable(
         {
@@ -22,6 +23,11 @@ function vec2:new(x, y)
         },
         self
     )
+end
+
+---@return vec2
+function vec2:zero()
+    return vec2:new(0, 0)
 end
 
 function vec2:__tostring()
@@ -117,6 +123,11 @@ function vec2:normalize()
     end
 
     return self / len
+end
+
+---@return vec2
+function vec2:inverse()
+    return ve2:new(-self.x, -self.y)
 end
 
 ---@return vec2

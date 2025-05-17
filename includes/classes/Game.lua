@@ -6,8 +6,8 @@ Game.__index = Game
 Game.Version = Memory.GetGameVersion()
 Game.ScreenResolution = Memory.GetScreenResolution()
 Game.MaxEntities = {
-    objects = 50,
-    peds = 25,
+    objects = 75,
+    peds = 50,
     vehicles = 25,
 }
 
@@ -258,12 +258,23 @@ Game.CreateObject = function(i_ModelHash, v_SpawnPos, b_Networked, b_SriptHostPe
     return i_Handle
 end
 
+Game.SafeRemovePedFromGroup = function(ped)
+    local groupID = PED.GET_PED_GROUP_INDEX(Self.GetPedID())
+    if PED.DOES_GROUP_EXIST(groupID) and PED.IS_PED_GROUP_MEMBER(ped, groupID) then
+        PED.REMOVE_PED_FROM_GROUP(ped)
+    end
+end
+
 ---@param entity integer
 ---@param category string | number
 Game.DeleteEntity = function(entity, category)
     script.run_in_fiber(function(del)
         if not entity or (entity == 0) or (entity == self.get_ped()) or not ENTITY.DOES_ENTITY_EXIST(entity) then
             return
+        end
+
+        if ENTITY.IS_ENTITY_A_PED(entity) then
+            Game.SafeRemovePedFromGroup(entity)
         end
 
         ENTITY.DELETE_ENTITY(entity)
@@ -298,12 +309,7 @@ Game.DeleteEntity = function(entity, category)
             g_SpawnedEntities[category][entity] = nil
         end
 
-        if g_CreatedBlips[entity] then
-            if HUD.DOES_BLIP_EXIST(g_CreatedBlips[entity]) then
-                HUD.REMOVE_BLIP(g_CreatedBlips[entity])
-            end
-            g_CreatedBlips[entity] = nil
-        end
+        Game.RemoveBlip(entity)
     end)
 end
 
@@ -463,15 +469,19 @@ Game.AddBlipForEntity = function(entity, scale, isFriendly, showHeading, name)
         Game.SetBlipName(blip, name)
     end
 
-    g_CreatedBlips[entity] = blip
+    g_CreatedBlips[entity] = {
+        handle = blip,
+        owner = entity,
+        alpha = 255
+    }
 
     return blip
 end
 
--- Blip Icons: https://wiki.rage.mp/index.php?title=Blips
+-- Blip Sprites: https://wiki.rage.mp/index.php?title=Blips
 ---@param blip integer
 ---@param icon integer
-Game.SetBlipIcon = function(blip, icon)
+Game.SetBlipSprite = function(blip, icon)
     if not blip or not HUD.DOES_BLIP_EXIST(blip) then
         return
     end
@@ -490,6 +500,25 @@ Game.SetBlipName = function(blip, name)
     HUD.BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING")
     HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(name)
     HUD.END_TEXT_COMMAND_SET_BLIP_NAME(blip)
+end
+
+---@param handle integer
+Game.RemoveBlip = function(handle)
+    local blip = g_CreatedBlips[handle]
+    if blip and HUD.DOES_BLIP_EXIST(blip.handle) then
+        HUD.REMOVE_BLIP(blip.handle)
+        g_CreatedBlips[handle] = nil
+    end
+end
+
+---@param i_entity integer
+---@param i_heading integer
+Game.SetEntityHeading = function(i_entity, i_heading)
+    if not Game.IsScriptHandle(i_entity) then
+        return
+    end
+
+    ENTITY.SET_ENTITY_HEADING(i_entity, i_heading)
 end
 
 ---@param i_entity integer
@@ -547,6 +576,13 @@ end
 Game.RequestNamedPtfxAsset = function(dict)
     STREAMING.REQUEST_NAMED_PTFX_ASSET(dict)
     return STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(dict)
+end
+
+---@param clipset string
+---@return boolean
+Game.RequestClipSet = function(clipset)
+    STREAMING.REQUEST_CLIP_SET(clipset)
+    return STREAMING.HAS_CLIP_SET_LOADED(clipset)
 end
 
 ---@param dict string
@@ -770,12 +806,13 @@ Game.GetPedVehicleSeat = function(ped)
     end
 end
 
+---@param netID integer
 Game.SyncNetworkID = function(netID)
     if not Game.IsOnline() or not NETWORK.NETWORK_DOES_NETWORK_ID_EXIST(netID) then
-        return
+        return false
     end
 
-    local timer = Timer.new(1)
+    local timer = Timer.new(250)
     NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
     while not NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) and not timer:isDone() do
         NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
@@ -793,7 +830,7 @@ Game.DesyncNetworkID = function(netID)
         return
     end
 
-    local timer = Timer.new(1)
+    local timer = Timer.new(250)
     NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
     while not NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) and timer:isDone() do
         NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
@@ -803,7 +840,6 @@ Game.DesyncNetworkID = function(netID)
     NETWORK.SET_NETWORK_ID_CAN_MIGRATE(netID, false)
     NETWORK.SET_NETWORK_ID_CAN_BE_REASSIGNED(netID, false)
     NETWORK.SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(netID, false)
-    NETWORK.NETWORK_SET_ENTITY_ONLY_EXISTS_FOR_PARTICIPANTS(NETWORK.NET_TO_ENT(netID), true)
 
     return NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID)
 end
@@ -827,6 +863,7 @@ function Game.StartSyncedPtfxLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s_Pt
     Await(Game.RequestNamedPtfxAsset, s_PtfxDict)
     local r, g, b, a = color and color:AsRGBA() or 0, 0, 0, 255
     local boneList = {}
+    local isRightBone = false
 
     if Game.IsOnline() and (i_EntityHandle ~= Self.GetPedID()) and entities.take_control_of(i_EntityHandle, 300) then
         Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(i_EntityHandle))
@@ -842,6 +879,7 @@ function Game.StartSyncedPtfxLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s_Pt
         local boneIndex = v
 
         if type(v) == "string" then
+            isRightBone = (string.find(v, "_rf") ~= nil) or (string.find(v, "_rr") ~= nil)
             boneIndex = Game.GetEntityBoneIndexByName(i_EntityHandle, v)
         end
 
@@ -850,7 +888,7 @@ function Game.StartSyncedPtfxLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s_Pt
             local fxHandle = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(
                 s_PtfxName,
                 i_EntityHandle,
-                v_Pos.x,
+                isRightBone and -v_Pos.x or v_Pos.x,
                 v_Pos.y,
                 v_Pos.z,
                 v_Rot.x,
@@ -993,50 +1031,64 @@ function Game.ApplyPedComponents(ped, components)
 end
 
 -- Returns a handle for the closest vehicle to a provided entity or coordinates.
---
--- Param `excludeEntity` is not necessary but can be used to ignore a specific vehicle
---
--- using its entity handle .
----@param closeTo integer | vec3
----@param range integer
----@param excludeEntity? integer
----@return integer
-Game.GetClosestVehicle = function(closeTo, range, excludeEntity)
-    local thisPos = type(closeTo) == "number" and ENTITY.GET_ENTITY_COORDS(closeTo, false) or closeTo
+---@param closeTo integer|vec3
+---@param range number
+---@param excludeEntity? integer **Optional**: a specific vehicle to ignore.
+---@param nonPlayerVehicle? boolean -- **Optional**: if true, ignores player vehicles
+---@param maxSpeed? number  -- **Optional**: if set, skips vehicles faster than this speed (m/s)
+---@return integer -- vehicle handle or 0
+Game.GetClosestVehicle = function(closeTo, range, excludeEntity, nonPlayerVehicle, maxSpeed)
+    local thisPos = type(closeTo) == "number" and Game.GetEntityCoords(closeTo, false) or closeTo
+    local closestVeh = 0
+    local closestDist = range * range
+
     if VEHICLE.IS_ANY_VEHICLE_NEAR_POINT(thisPos.x, thisPos.y, thisPos.z, range) then
         local veh_handles = entities.get_all_vehicles_as_handles()
 
-        for i = 0, #veh_handles do
-            if excludeEntity and veh_handles[i] == excludeEntity then
-                i = i + 1
-            end
-            local vehPos = ENTITY.GET_ENTITY_COORDS(veh_handles[i], true)
-            local vDist2 = SYSTEM.VDIST2(thisPos.x, thisPos.y, thisPos.z, vehPos.x, vehPos.y, vehPos.z)
-            if vDist2 <= range and math.floor(VEHICLE.GET_VEHICLE_BODY_HEALTH(veh_handles[i])) > 0 then
-                return veh_handles[i]
+        for _, veh in ipairs(veh_handles) do
+            if veh ~= excludeEntity then
+                local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(veh, -1, true)
+
+                if not (nonPlayerVehicle and PED.IS_PED_A_PLAYER(driver)) then
+                    local vehPos = Game.GetEntityCoords(veh, true)
+                    local distance = thisPos:distance(vehPos)
+
+                    if distance <= closestDist and math.floor(VEHICLE.GET_VEHICLE_BODY_HEALTH(veh)) > 0 then
+                        if maxSpeed then
+                            local vehSpeed = ENTITY.GET_ENTITY_SPEED(veh)
+                            if vehSpeed <= maxSpeed then
+                                closestVeh = veh
+                                closestDist = distance
+                            end
+                        else
+                            closestVeh = veh
+                            closestDist = distance
+                        end
+                    end
+                end
             end
         end
     end
 
-    return 0
+    return closestVeh
 end
 
 -- Returns a handle for the closest human ped to a provided entity or coordinates.
---
--- Does not return your own ped.
----@param closeTo integer | vec3
+---@param closeTo integer|vec3
 ---@param range integer
----@param aliveOnly boolean
+---@param aliveOnly boolean **Optional**: if true, ignores dead peds.
 ---@return integer
 Game.GetClosestPed = function(closeTo, range, aliveOnly)
-    local thisPos = type(closeTo) == 'number' and ENTITY.GET_ENTITY_COORDS(closeTo, false) or closeTo
+    local thisPos = type(closeTo) == 'number' and Game.GetEntityCoords(closeTo, false) or closeTo
+    local closestDist = range * range
 
     if PED.IS_ANY_PED_NEAR_POINT(thisPos.x, thisPos.y, thisPos.z, range) then
         for _, ped in ipairs(entities.get_all_peds_as_handles()) do
             if PED.IS_PED_HUMAN(ped) and (ped ~= Self.GetPedID()) then
-                local pedPos = ENTITY.GET_ENTITY_COORDS(ped, true)
-                local vDist2 = SYSTEM.VDIST2(thisPos.x, thisPos.y, thisPos.z, pedPos.x, pedPos.y, pedPos.z)
-                if vDist2 <= range then
+                local pedPos = Game.GetEntityCoords(ped, true)
+                local distance = thisPos:distance(pedPos)
+
+                if distance <= closestDist then
                     if aliveOnly then
                         if not ENTITY.IS_ENTITY_DEAD(ped, false) then
                             return ped
@@ -1054,8 +1106,8 @@ end
 
 -- Temporary workaround to fix auto-pilot's "fly to objective" option.
 ---@return boolean, vec3
-Game.FindObjectiveBlip = function()
-    for _, v in ipairs(t_ObjectiveBlipIDs) do
+Game.GetObjectiveBlipCoords = function()
+    for _, v in ipairs(eObjectiveBlips) do
         if HUD.DOES_BLIP_EXIST(HUD.GET_FIRST_BLIP_INFO_ID(v)) then
             return true, HUD.GET_BLIP_INFO_ID_COORD(HUD.GET_FIRST_BLIP_INFO_ID(v))
         else
@@ -1069,6 +1121,15 @@ Game.FindObjectiveBlip = function()
     end
 
     return false, vec3:zero()
+end
+
+---@return vec3|nil
+Game.GetWaypointCoords = function()
+    local waypoint = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_WAYPOINT_BLIP_ENUM_ID())
+
+    if HUD.DOES_BLIP_EXIST(waypoint) then
+        return HUD.GET_BLIP_COORDS(waypoint)
+    end
 end
 
 ---@param area vec3
@@ -1085,7 +1146,7 @@ Game.DoesHumanScenarioExistInArea = function(area, radius, isFree)
             radius,
             isFree
         ) then
-            return true, v.name
+            return true, v.label
         end
     end
 
@@ -1191,7 +1252,7 @@ end
 
 ---@param modelName string
 Game.GetPedHash = function(modelName)
-    return t_PedLookup[modelName].hash
+    return t_PedLookup[modelName].hash -- not sure if this is faster than simply calling `joaat` on the model name.
 end
 
 ---@param modelHash integer
@@ -1202,6 +1263,107 @@ end
 ---@param model integer|string
 Game.GetPedTypeFromModel = function(model)
     return t_PedLookup[model].ped_type or PED_TYPE._CIVMALE
+end
+
+---@param model integer|string
+Game.GetPedGenderFromModel = function(model)
+    return t_PedLookup[model].gender or "unknown"
+end
+
+---@param model integer|string
+Game.IsPedModelHuman = function(model)
+    return t_PedLookup[model].is_human
+end
+
+---@param coords vec3
+---@param forwardVector vec3
+---@param distance integer
+Game.FindSpawnPointInDirection = function(coords, forwardVector, distance)
+    local pVector = memory.allocate(0xC)
+
+    local bFound, vSpawnPos = MISC.FIND_SPAWN_POINT_IN_DIRECTION(
+        coords.x,
+        coords.y,
+        coords.z,
+        forwardVector.x,
+        forwardVector.y,
+        forwardVector.z,
+        distance,
+        pVector
+    )
+
+    memory.free(pVector)
+    return bFound and vSpawnPos or nil
+end
+
+---@param distance integer
+Game.FindSpawnPointNearPlayer = function(distance)
+    return Game.FindSpawnPointInDirection(
+        Self.GetPos(),
+        Self.GetForwardVector(),
+        distance
+    )
+end
+
+---@param coords vec3
+---@param nodeType integer
+---@return vec3, integer
+Game.GetClosestVehicleNodeWithHeading = function(coords, nodeType)
+    local outPos = memory.allocate(0xC)
+    local outHeading = 0
+    local retVec = vec3:zero()
+
+    _, retVec, outHeading = PATHFIND.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING(
+        coords.x,
+        coords.y,
+        coords.z,
+        outPos,
+        outHeading,
+        nodeType,
+        3,
+        0
+    )
+
+    memory.free(outPos)
+    return retVec, outHeading
+end
+
+---@param entity integer | table
+Game.FadeOutEntity = function(entity)
+    if not Game.IsOnline() then
+        return
+    end
+
+    if type(entity) == "number" then
+        if ENTITY.DOES_ENTITY_EXIST(entity) then
+            NETWORK.NETWORK_FADE_OUT_ENTITY(entity, false, true)
+        end
+    elseif type(entity) == "table" then
+        for i = 1, #entity do
+            if ENTITY.DOES_ENTITY_EXIST(entity[i]) then
+                NETWORK.NETWORK_FADE_OUT_ENTITY(entity[i], false, true)
+            end
+        end
+    end
+end
+
+---@param entity integer | table
+Game.FadeInEntity = function(entity)
+    if not Game.IsOnline() then
+        return
+    end
+
+    if type(entity) == "number" then
+        if ENTITY.DOES_ENTITY_EXIST(entity) then
+            NETWORK.NETWORK_FADE_IN_ENTITY(entity, false, true)
+        end
+    elseif type(entity) == "table" then
+        for i = 1, #entity do
+            if ENTITY.DOES_ENTITY_EXIST(entity[i]) then
+                NETWORK.NETWORK_FADE_IN_ENTITY(entity[i], false, true)
+            end
+        end
+    end
 end
 
 ---@class Game.Audio

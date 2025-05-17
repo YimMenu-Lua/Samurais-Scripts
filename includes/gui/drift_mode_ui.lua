@@ -138,12 +138,12 @@ function DriftModeUI()
         ImGui.Spacing()
         UI.ColoredText(_T("DRIFT_SMOKE_COL_"), {math.floor(driftSmoke_T.r), math.floor(driftSmoke_T.g), math.floor(driftSmoke_T.b), 255}, nil, 35)
         if not customSmokeCol then
-            driftSmokeIndex, dsiUsed = ImGui.Combo("##tireSmoke", driftSmokeIndex, t_DriftSmokeColors, #t_DriftSmokeColors)
+            driftSmokeIndex, dsiUsed = ImGui.Combo("##tireSmoke", driftSmokeIndex, eDriftSmokeColors, #eDriftSmokeColors)
             ImGui.SameLine()
             if dsiUsed then
                 UI.WidgetSound("Nav")
                 CFG:SaveItem("driftSmokeIndex", driftSmokeIndex)
-                s_SelectedSmokeColor = t_DriftSmokeColors[driftSmokeIndex + 1]
+                s_SelectedSmokeColor = eDriftSmokeColors[driftSmokeIndex + 1]
                 driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, _ = Col(string.lower(s_SelectedSmokeColor)):AsRGBA()
                 CFG:SaveItem("driftSmoke_T", driftSmoke_T)
 
@@ -254,7 +254,7 @@ function DriftModeUI()
             UI.WidgetSound("Nav2")
             CFG:SaveItem("customSmokeCol", customSmokeCol)
             if not customSmokeCol then
-                s_SelectedSmokeColor = t_DriftSmokeColors[driftSmokeIndex + 1]
+                s_SelectedSmokeColor = eDriftSmokeColors[driftSmokeIndex + 1]
                 driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b, _ = Col(s_SelectedSmokeColor:lower()):AsRGBA()
                 CFG:SaveItem("driftSmoke_T", driftSmoke_T)
             end

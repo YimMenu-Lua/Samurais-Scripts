@@ -154,21 +154,21 @@ function HandingEditorUI()
             end
         end
 
-        rwSteering, rwstrUsed = ImGui.Checkbox(
+        b_RwSteering, rwstrUsed = ImGui.Checkbox(
             "Rear Wheel Steering",
             Memory.GetVehicleHandlingFlag(Self.Vehicle.Current, HF._STEER_REARWHEELS)
         )
         UI.Tooltip(_T("REAR_WHEEL_STEERING_DESC_"))
         if rwstrUsed then
             UI.WidgetSound("Nav2")
-            if rwSteering and (Self.Vehicle.IsCar or Self.Vehicle.IsBike or Self.Vehicle.IsQuad) then
-                if awSteering then
+            if b_RwSteering and (Self.Vehicle.IsCar or Self.Vehicle.IsBike or Self.Vehicle.IsQuad) then
+                if b_AwSteering then
                     Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._STEER_ALL_WHEELS, false)
-                    awSteering = false
+                    b_AwSteering = false
                 end
-                if handbrakeSteering then
+                if b_HandbrakeSteering then
                     Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._HANDBRAKE_REARWHEELSTEER, false)
-                    handbrakeSteering = false
+                    b_HandbrakeSteering = false
                 end
                 Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._STEER_REARWHEELS, true)
             else
@@ -177,19 +177,19 @@ function HandingEditorUI()
         end
 
         ImGui.SameLine()
-        awSteering, awstrUsed = ImGui.Checkbox("All Wheel Steering",
+        b_AwSteering, awstrUsed = ImGui.Checkbox("All Wheel Steering",
             Memory.GetVehicleHandlingFlag(Self.Vehicle.Current, HF._STEER_ALL_WHEELS))
         UI.Tooltip(_T("ALL_WHEEL_STEERING_DESC_"))
         if awstrUsed then
             UI.WidgetSound("Nav2")
-            if awSteering and (Self.Vehicle.IsCar or Self.Vehicle.IsBike or Self.Vehicle.IsQuad) then
-                if rwSteering then
+            if b_AwSteering and (Self.Vehicle.IsCar or Self.Vehicle.IsBike or Self.Vehicle.IsQuad) then
+                if b_RwSteering then
                     Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._STEER_REARWHEELS, false)
-                    rwSteering = false
+                    b_RwSteering = false
                 end
-                if handbrakeSteering then
+                if b_HandbrakeSteering then
                     Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._HANDBRAKE_REARWHEELSTEER, false)
-                    handbrakeSteering = false
+                    b_HandbrakeSteering = false
                 end
                 Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._STEER_ALL_WHEELS, true)
             else
@@ -197,19 +197,19 @@ function HandingEditorUI()
             end
         end
 
-        handbrakeSteering, hbstrUsed = ImGui.Checkbox("Handbrake Steering",
+        b_HandbrakeSteering, hbstrUsed = ImGui.Checkbox("Handbrake Steering",
             Memory.GetVehicleHandlingFlag(Self.Vehicle.Current, HF._HANDBRAKE_REARWHEELSTEER))
         UI.Tooltip(_T("HANDBRAKE_STEERING_DESC_"))
         if hbstrUsed then
             UI.WidgetSound("Nav2")
-            if handbrakeSteering and (Self.Vehicle.IsCar or Self.Vehicle.IsBike or Self.Vehicle.IsQuad) then
-                if rwSteering then
+            if b_HandbrakeSteering and (Self.Vehicle.IsCar or Self.Vehicle.IsBike or Self.Vehicle.IsQuad) then
+                if b_RwSteering then
                     Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._STEER_REARWHEELS, false)
-                    rwSteering = false
+                    b_RwSteering = false
                 end
-                if awSteering then
+                if b_AwSteering then
                     Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._STEER_ALL_WHEELS, false)
-                    awSteering = false
+                    b_AwSteering = false
                 end
                 Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._HANDBRAKE_REARWHEELSTEER, true)
             else

@@ -1,7 +1,7 @@
 -----------------------------------------------------
 -- CompanionManager Class
 -----------------------------------------------------
--- Handles comanions (NPCs).
+-- Handles comanions (NPCs) for YimActions.
 ---@class CompanionManager
 ---@field Companions Companion[]
 ---@field PedCombatAttributes table<integer, integer>
@@ -16,11 +16,22 @@ CompanionManager.PedConfigFlags = {
     118, 141, 179, 188, 193, 208, 261, 268, 286, 294, 301, 364, 398, 401, 443
 }
 
-function CompanionManager:New()
-    local instance = setmetatable({}, CompanionManager)
-    instance.Companions = {}
 
-    return instance
+function CompanionManager.new()
+    return setmetatable(
+        {Companions = {}},
+        CompanionManager
+    )
+end
+
+---@param entity integer
+function CompanionManager:RegisterEntity(entity)
+    Decorator:RegisterEntity(entity, "YimActions", true)
+end
+
+---@param entity integer
+function CompanionManager:UnregisterEntity(entity)
+    Decorator:RemoveEntity(entity, "YimActions")
 end
 
 ---@param pedModel integer|string
@@ -57,13 +68,14 @@ function CompanionManager:SpawnCompanion(pedModel, s_Name, b_IsInvincible, b_IsA
     )
 
     entities.take_control_of(i_Handle, 300)
+    Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(i_Handle))
+    GroupManager:AddPedToGroup(i_Handle)
     PED.SET_PED_AS_GROUP_MEMBER(i_Handle, playerGroup)
     PED.SET_PED_NEVER_LEAVES_GROUP(i_Handle, true)
     PED.SET_PED_CAN_TELEPORT_TO_GROUP_LEADER(i_Handle, playerGroup, true)
     PED.SET_PED_CONFIG_FLAG(i_Handle, 167, false)
     PED.SET_PED_FLEE_ATTRIBUTES(i_Handle, 1 << 15, false)
     ENTITY.SET_ENTITY_INVINCIBLE(i_Handle, b_IsInvincible or false)
-
 
     for _, flag in ipairs(self.PedConfigFlags) do
         PED.SET_PED_CONFIG_FLAG(i_Handle, flag, true)
@@ -84,7 +96,7 @@ function CompanionManager:SpawnCompanion(pedModel, s_Name, b_IsInvincible, b_IsA
         end
     end
 
-    local i_Blip = Game.AddBlipForEntity(i_Handle, 0.8, true, true, "YAV3 Companion")
+    local i_Blip = Game.AddBlipForEntity(i_Handle, 0.8, true, true, "YimActions Companion")
     table.insert(
         self.Companions,
             Companion.new(
@@ -98,6 +110,7 @@ function CompanionManager:SpawnCompanion(pedModel, s_Name, b_IsInvincible, b_IsA
         )
     )
 
+    self:RegisterEntity(i_Handle)
     return i_Handle
 end
 
@@ -199,6 +212,8 @@ function CompanionManager:RemoveCompanion(companion)
                 break
             end
         end
+
+        self:UnregisterEntity(companion.handle)
     end
 end
 
@@ -208,35 +223,48 @@ function CompanionManager:Wipe()
     end
 
     for _, companion in pairs(self.Companions) do
+        self:UnregisterEntity(companion.handle)
         Game.DeleteEntity(companion.handle, "peds")
     end
 
     self.Companions = {}
 end
 
--- Handles dead and/or stale companions and their map blips.
+---@param handle integer
+function CompanionManager:RemoveCompanionByHandle(handle)
+    if next(self.Companions) == nil then
+        return
+    end
+
+    for i = #self.Companions, 1, -1 do
+        if self.Companions[i].handle == handle then
+            self:RemoveCompanion(self.Companions[i])
+            self.Companions[i] = nil
+        end
+    end
+end
+
+-- Handles dead and/or stale companions and their map blips. (redundant)
 function CompanionManager:Watchdog()
     if next(self.Companions) == nil then
         return
     end
 
     for i = #self.Companions, 1, -1 do
-        if not ENTITY.DOES_ENTITY_EXIST(self.Companions[i].handle) then
+        if not ENTITY.DOES_ENTITY_EXIST(self.Companions[i].handle)
+        or ENTITY.IS_ENTITY_DEAD(self.Companions[i].handle, false) then
+            self:RemoveCompanion(self.Companions[i])
             self.Companions[i] = nil
         else
-            if ENTITY.IS_ENTITY_DEAD(self.Companions[i].handle, false) then
-                self:RemoveCompanion(self.Companions[i])
+            if PED.IS_PED_IN_ANY_VEHICLE(self.Companions[i].handle, true) then
+                if self.Companions[i].blip.alpha > 0 then
+                    self.Companions[i].blip.alpha = 0
+                    HUD.SET_BLIP_ALPHA(self.Companions[i].blip.handle, 0)
+                end
             else
-                if PED.IS_PED_IN_ANY_VEHICLE(self.Companions[i].handle, true) then
-                    if self.Companions[i].blip.alpha > 0 then
-                        self.Companions[i].blip.alpha = 0
-                        HUD.SET_BLIP_ALPHA(self.Companions[i].blip.handle, 0)
-                    end
-                else
-                    if self.Companions[i].blip.alpha < 255 then
-                        self.Companions[i].blip.alpha = 255
-                        HUD.SET_BLIP_ALPHA(self.Companions[i].blip.handle, 255)
-                    end
+                if self.Companions[i].blip.alpha < 255 then
+                    self.Companions[i].blip.alpha = 255
+                    HUD.SET_BLIP_ALPHA(self.Companions[i].blip.handle, 255)
                 end
             end
         end
@@ -245,9 +273,8 @@ end
 
 
 -----------------------------------------------------
--- Companion Class
+-- Companion Struct
 -----------------------------------------------------
--- Represents a companion (NPC).
 ---@class Companion
 ---@field name string
 ---@field handle integer script handle
@@ -320,7 +347,7 @@ function CompanionManager:FulfillTheProphecy()
             joaat("A_C_Boar_02")
         )
 
-        -- TODO: RNG to decide whether to spawn wholesome or evil Wompus. For now it's just evil Wompus blowing you and himself up
+        -- TODO: RNG to decide whether to spawn wholesome or evil Wompus. For now it's just evil Wompus blowing the player and himself up
         MinimusWompusMeridius:AD_MORTEM_INIMICUS()
     end)
 end
@@ -410,7 +437,6 @@ function Companion:AD_MORTEM_INIMICUS()
     Sleep(2500)
 
     local timer = Timer.new(5000)
-
     while ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(self.handle) > 1 and not timer:isDone() do
         local tDelta = math.min(1, Self.GetDeltaTime() * 10)
         local lastPos = Game.GetEntityCoords(self.handle, false)

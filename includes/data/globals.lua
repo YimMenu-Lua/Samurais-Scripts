@@ -1,10 +1,12 @@
 ---@diagnostic disable
 
-SCRIPT_NAME    = "samurais_scripts"
-SCRIPT_VERSION = "1.6.6"
-TARGET_BUILD   = "3504"
-TARGET_VERSION = "1.70"
-DEFAULT_CONFIG = {
+require("includes.classes.GlobalProxy")
+
+local SCRIPT_NAME    <const> = "samurais_scripts"
+local SCRIPT_VERSION <const> = "1.6.7"
+local TARGET_BUILD   <const> = "3521"
+local TARGET_VERSION <const> = "1.70"
+local DEFAULT_CONFIG <const> = {
     favorite_entities       = {},
     forged_entities         = {},
     yav3_saved_peds         = {},
@@ -67,7 +69,7 @@ DEFAULT_CONFIG = {
         1,
         0
     },
-    speedometer             = {
+    speedometer_cfg             = {
         enabled = false,
         speed_unit = 0,
         radius = 160,
@@ -81,6 +83,113 @@ DEFAULT_CONFIG = {
         text_color = 0xDDFFFFFF,
         needle_color = 0xFF3636FF,
         needle_base_color = 0xFF111111,
+    },
+    saved_escort_groups = {
+        {
+            name = "Armenian Mobsters",
+            vehicleModel = 83136452,
+            members = {
+                {
+                    modelHash = 0xE7714013,
+                    name = "Levon Termendzhyan",
+                    weapon = 0x1B06D571,
+                },
+                {
+                    modelHash = 0xFDA94268,
+                    name = "Armen Petrosyan",
+                    weapon = 0x1B06D571,
+                },
+                {
+                    modelHash = 0xF1E823A2,
+                    name = "Yanni",
+                    weapon = 0x1B06D571,
+                },
+            }
+        },
+        {
+            name = "Bad Bitches",
+            vehicleModel = 461465043,
+            members = {
+                {
+                    modelHash = 0x28ABF95,
+                    name = "Beretta Von PewPew",
+                    weapon = 0xBFEFFF6D,
+                },
+                {
+                    modelHash = 0x81441B71,
+                    name = "Big Booty Iggy",
+                    weapon = 0xBFEFFF6D,
+                },
+                {
+                    modelHash = 0xAEEA76B5,
+                    name = "Sasha Slasha",
+                    weapon = 0xBFEFFF6D,
+                },
+            }
+        },
+        {
+            name = "Private Mercenaries",
+            vehicleModel = 2370534026,
+            members = {
+                {
+                    modelHash = 0x613E626C,
+                    name = "Jack Reacher",
+                    weapon = 0x83BF0278,
+                },
+                {
+                    modelHash = 0x5076A73B,
+                    name = "Ethan Hunt",
+                    weapon = 0x83BF0278,
+                },
+                {
+                    modelHash = 0xB3F3EE34,
+                    name = "Sam Fisher",
+                    weapon = 0x83BF0278,
+                },
+            }
+        },
+        {
+            name = "Sicarios",
+            vehicleModel = 1254014755,
+            members = {
+                {
+                    modelHash = 0x995B3F9F,
+                    name = "Ovidio Guzman",
+                    weapon = 0xBFEFFF6D,
+                },
+                {
+                    modelHash = 0x7ED5AD78,
+                    name = "Popeye",
+                    weapon = 0xBFEFFF6D,
+                },
+                {
+                    modelHash = 0xE6AC74A4,
+                    name = "El Sueno",
+                    weapon = 0xBFEFFF6D,
+                },
+            }
+        },
+        {
+            name = "VIP Security",
+            vehicleModel = 666166960,
+            members = {
+                {
+                    modelHash = 0xF161D212,
+                    name = "Arthur Bishop",
+                    weapon = 0x83BF0278,
+                },
+                {
+                    modelHash = 0x2930C1AB,
+                    name = "Luke Wright",
+                    weapon = 0x83BF0278,
+                },
+                {
+                    modelHash = 0x55FE9B46,
+                    name = "Frank Martin",
+                    weapon = 0x83BF0278,
+                },
+            }
+        },
     },
     b_AutoCleanupEntities   = false,
     Regen                   = false,
@@ -215,6 +324,21 @@ DEFAULT_CONFIG = {
     current_lang            = "English",
 }
 
+
+-----------------------------------------------------
+-- SS Utils
+-----------------------------------------------------
+-- `SS` as in Samurai's Scripts, not Schutzstaffel... 🙄
+---@class SS
+SS = {}
+SS.__index = SS
+
+SS.script_version = SCRIPT_VERSION
+SS.target_build   = TARGET_BUILD
+SS.target_version = TARGET_VERSION
+SS.default_config = DEFAULT_CONFIG
+----------------------------------------------
+----------------------------------------------
 b_ShouldAnimateLoadingLabel           = false
 b_IsCrouched                          = false
 b_IsHandsUp                           = false
@@ -230,52 +354,30 @@ b_IsSettingHotkeys                    = false
 b_EngineSoundChanged                  = false
 b_LaunchControlReady                  = false
 b_LaunchControlActive                 = false
-pedGrabber                            = false
+b_PedGrabber                          = false
 b_PedGrabbed                          = false
-vehicleGrabber                        = false
+b_VehicleGrabber                      = false
 b_VehicleGrabbed                      = false
-carpool                               = false
-b_IsCarpooling                        = false
-b_ShowCarpoolSeatControls             = false
-b_ShowCarpoolUI                       = false
-b_CarpoolVehRadioEnabled              = false
-b_CarpoolVehIsConvertible             = false
-b_StopCarpoolSearch                   = false
-b_NPCAnimStarted                      = false
-sound_btn_off                         = false
-b_IsDrifting                          = false
+b_Carpool                             = false
 b_StartRGBLoop                        = false
 b_DefaultPopsDisabled                 = false
-b_Warehouse1Loop                      = false
-b_Warehouse2Loop                      = false
-b_Warehouse3Loop                      = false
-b_Warehouse4Loop                      = false
-b_Warehouse5Loop                      = false
-b_HangarLoop                          = false
 b_WorldBoundsExtended                 = false
-autopilot_waypoint                    = false
-autopilot_objective                   = false
-autopilot_random                      = false
+b_AutopilotWaypoint                   = false
+b_AutopilotObjective                  = false
+b_AutopilotRandom                     = false
 b_FlightMusicDisabled                 = false
 b_SpawnedKatana                       = false
-b_IsSitting                           = false
 b_IsPlayingAmbientScenario            = false
-b_IsHiding                            = false
-b_IsDuckingInVehicle                  = false
-b_IsHidingInTrunk                     = false
-b_IsHidingInDumpster                  = false
-b_SellScriptIsRunning                 = false
-b_HasTriggeredAutosell                = false
 b_ShouldFlashBrakeLights              = false
 b_IsCommandsUIOpen                    = false
 b_ShouldDrawCommandsUI                = false
-jsonMvmt                              = false
 b_BootVehicleRearEngined              = false
-rwSteering                            = false
-awSteering                            = false
-handbrakeSteering                     = false
+b_RwSteering                          = false
+b_AwSteering                          = false
+b_HandbrakeSteering                   = false
 b_ShouldDrawSpeedometer               = false
 i_SpeedometerUnitModifier             = 1
+i_RadioStationIndex                   = 1
 i_LastAimedAtPed                      = 0
 i_AnimFlag                            = 0
 i_GrabbedPed                          = 0
@@ -284,55 +386,20 @@ i_AnimIndex                           = 0
 i_Entity                              = 0
 i_TimerA                              = 0
 i_TimerB                              = 0
-i_DefaultXenonLightsIndex             = 0
 i_DummyCopCar                         = 0
-i_DriftModePoints                     = 0
-i_DriftModeExtraPoints                = 0
-straight_counter                      = 0
-i_DriftTime                           = 0
 i_Katana                              = 0
-i_HangarTotalValue                    = 0
-i_BikerSlot0TotalValue                = 0
-i_BikerSlot1TotalValue                = 0
-i_BikerSlot2TotalValue                = 0
-i_BikerSlot3TotalValue                = 0
-i_BikerSlot4TotalValue                = 0
-i_BunkerTotalValue                    = 0
-i_AcidLabTotalValue                   = 0
-i_Warehouse1Supplies                  = 0
-i_Warehouse2Supplies                  = 0
-i_Warehouse3Supplies                  = 0
-i_Warehouse4Supplies                  = 0
-i_Warehouse5Supplies                  = 0
-i_HangarSupplies                      = 0
-i_Warehouse1Value                     = 0
-i_Warehouse2Value                     = 0
-i_Warehouse3Value                     = 0
-i_Warehouse4Value                     = 0
-i_Warehouse5Value                     = 0
-ceo_moola                             = 0
 i_HnSVehicle                          = 0
 f_HnSVehicleLength                    = 0
 i_HnSDumpster                         = 0
-i_PublicSeat                          = 0
 i_StalkingPervert                     = 0
-i_BhubScriptHandle                    = 0
-i_CarpoolVehicle                      = 0
-i_CarpoolDriver                       = 0
-i_CarpoolVehRoofState                 = 0
-f_CarpoolVehicleCurrentSpeed          = 0
-i_CarpoolDefaultDrivingSpeed          = 19
-i_CarpoolDrivingStyleSwitch           = 0
-i_CarpoolDrivingFlags                 = 803243
-i_DriftMultiplier                     = 1
 f_DailyQuoteTextAlpha                 = 1.0
 i_PedThrowForce                       = 10
 i_DefaultWantedLevel                  = 5
 FreemodeGlobal1                       = 262145
 FreemodeGlobal2                       = 1667996
+PVGLobal                              = 1572092
 BusinessHubGlobal1                    = 1943773
 BusinessHubGlobal2                    = 1963766
-PersonalVehicleGlobal                 = 1572092
 ------------------- Casino Pacino -------------------
 blackjack_cards                       = 134
 blackjack_decks                       = 846
@@ -387,8 +454,6 @@ s_CurrentWeaponMovement               = ""
 s_RandomDailyQuote                    = ""
 s_NpcDriveTask                        = ""
 s_SpeedometerGearDisplay              = ""
-s_SellScriptName                      = "None"
-s_SellScriptDisplayName               = "None"
 v_NpcDriveDestination                 = vec3:zero()
 default_tire_smoke                    = {
     r = 255,
@@ -396,110 +461,42 @@ default_tire_smoke                    = {
     b = 255,
 }
 
-yrv2_color                            = {
+yrv2_color = {
     0,
     255,
     255,
     1
 }
 
-whouse1                               = {
-    id   = 0,
-    max  = 0,
-    name = "",
-    pos  = nil,
-    size = {
-        small  = false,
-        medium = false,
-        large  = false,
-    }
+t_CEOwarehouseData = {
+    [1] = {
+        isOwned = false,
+        autoFill = false
+    },
+    [2] = {
+        isOwned = false,
+        autoFill = false
+    },
+    [3] = {
+        isOwned = false,
+        autoFill = false
+    },
+    [4] = {
+        isOwned = false,
+        autoFill = false
+    },
+    [5] = {
+        isOwned = false,
+        autoFill = false
+    },
 }
 
-whouse2                               = {
-    id   = 1,
-    max  = 0,
-    name = "",
-    pos  = nil,
-    size = {
-        small  = false,
-        medium = false,
-        large  = false,
-    }
-}
-
-whouse3                               = {
-    id   = 2,
-    max  = 0,
-    name = "",
-    pos  = nil,
-    size = {
-        small  = false,
-        medium = false,
-        large  = false,
-    }
-}
-
-whouse4                               = {
-    id   = 3,
-    max  = 0,
-    name = "",
-    pos  = nil,
-    size = {
-        small  = false,
-        medium = false,
-        large  = false,
-    }
-}
-
-whouse5                               = {
-    id   = 4,
-    max  = 0,
-    name = "",
-    pos  = nil,
-    size = {
-        small  = false,
-        medium = false,
-        large  = false,
-    }
-}
-
--- biker businesses
-bb                                    = {
-    slot0 = {
-        name       = "Unknown",
-        id         = 0,
-        blip       = 0,
-        unit_max   = 0,
-        val_offset = 0,
-    },
-    slot1 = {
-        name       = "Unknown",
-        id         = 0,
-        blip       = 0,
-        unit_max   = 0,
-        val_offset = 0,
-    },
-    slot2 = {
-        name       = "Unknown",
-        id         = 0,
-        blip       = 0,
-        unit_max   = 0,
-        val_offset = 0,
-    },
-    slot3 = {
-        name       = "Unknown",
-        id         = 0,
-        blip       = 0,
-        unit_max   = 0,
-        val_offset = 0,
-    },
-    slot4 = {
-        name       = "Unknown",
-        id         = 0,
-        blip       = 0,
-        unit_max   = 0,
-        val_offset = 0,
-    },
+t_BikerBusinessData = {
+    [1] = {isOwned = false},
+    [2] = {isOwned = false},
+    [3] = {isOwned = false},
+    [4] = {isOwned = false},
+    [5] = {isOwned = false},
 }
 
 g_WompusHasRisen   = false
@@ -511,6 +508,7 @@ g_SpawnedEntities  = {
     objects = {},
 }
 
+
 Time       = require("includes.classes.Time")
 KeyManager = require("includes.services.Hotkeys")
 YimToast   = require("includes.lib.YimToast")
@@ -520,10 +518,10 @@ CFG        = require("includes.lib.YimConfig"):New(
     true,
     4
 )
-
 Timer = Time.Timer
 yield = coroutine.yield
 Sleep = Time.Sleep
+
 
 local _init_G = coroutine.create(function()
     for key, _ in pairs(DEFAULT_CONFIG) do

@@ -170,18 +170,6 @@ function BankDriftPoints_SP(points)
     end)
 end
 
-function StandUp()
-    if b_IsSitting then
-        ENTITY.DETACH_ENTITY(Self.GetPedID(), true, false)
-        TASK.CLEAR_PED_TASKS(Self.GetPedID())
-        if ENTITY.DOES_ENTITY_EXIST(i_PublicSeat) then
-            ENTITY.FREEZE_ENTITY_POSITION(i_PublicSeat, false)
-            i_PublicSeat = 0
-        end
-        b_IsSitting = false
-    end
-end
-
 ---@param level integer
 ---@return string
 function WantedLevelToStars(level)
@@ -1230,6 +1218,33 @@ UI.ConfirmPopup = function(name, callback, ...)
     end
 end
 
+---@param vehicle integer
+---@param comboName string
+---@param stationName? string
+UI.VehicleRadioCombo = function(vehicle, comboName, stationName)
+    local comboPeek = selectedStation or t_RadioStations[i_RadioStationIndex].name
+    if ImGui.BeginCombo(("##%s"):format(comboName), comboPeek) then
+        for i, radio in ipairs(t_RadioStations) do
+            if ImGui.Selectable(radio.name, (i_RadioStationIndex == i)) then
+                i_RadioStationIndex = i
+                selectedStation = radio.name
+            end
+
+            if UI.IsItemClicked("lmb") then
+                UI.WidgetSound("Click")
+                script.run_in_fiber(function()
+                    AUDIO.SET_VEH_RADIO_STATION(vehicle, radio.station)
+                end)
+            end
+        end
+        ImGui.EndCombo()
+    end
+
+    ImGui.SetWindowFontScale(0.8)
+    ImGui.BulletText(("Now Playing: %s"):format(stationName or "Unknown station."))
+    ImGui.SetWindowFontScale(1)
+end
+
 -- Checks if an ImGui widget was clicked.
 ---@param button string A string representing a mouse button: `lmb` for Left Mouse Button or `rmb` for Right Mouse Button.
 ---@return boolean
@@ -1317,16 +1332,38 @@ UI.HotkeyPrompt = function(window_name, keybind, isController)
 end
 
 
--- Script-specific helpers.
---
--- SS as in Samurai's Scripts, not Schutzstaffel... 🙄
-SS = {}
-SS.__index = SS
+-----------------------------------------------------
+-- SS Utils
+-----------------------------------------------------
 
 ---@param data string
 SS.debug = function(data)
     if SS_debug then
         log.debug(data)
+    end
+end
+
+SS.IsUpToDate = function()
+    return Game.Version._build and (SS.target_build == Game.Version._build)
+end
+
+---@param handle integer
+SS.IsScriptEntity = function(handle)
+    return Decorator:Validate(handle)
+end
+
+---@param handle integer
+SS.CheckFeatureEntities = function(handle)
+    if Decorator:IsEntityRegistered(handle, "EntityForge") then
+        EntityForge:RemoveEntityByHandle(handle)
+    end
+
+    if Decorator:IsEntityRegistered(handle, "BillionaireServices") then
+        BillionaireServices:RemoveEntityByHandle(handle)
+    end
+
+    if Decorator:IsEntityRegistered(handle, "YimActions") then
+        YimActions.CompanionManager:RemoveCompanionByHandle(handle)
     end
 end
 
@@ -1394,161 +1431,6 @@ SS.SetMovement = function(data, isJson)
             WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(Self.GetPedID(), joaat(data.wanim))
         end
     end)
-end
-
----@param warehouse table
-SS.GetCEOwarehouseInfo = function(warehouse)
-    script.run_in_fiber(function()
-        local property_index = (stats.get_int(("MPX_PROP_WHOUSE_SLOT%d"):format(warehouse.id)) - 1)
-        warehouse.name       = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(("MP_WHOUSE_%d"):format(property_index))
-        if t_CEOwarehouses[warehouse.name] then
-            warehouse.size.small  = t_CEOwarehouses[warehouse.name].size == 0
-            warehouse.size.medium = t_CEOwarehouses[warehouse.name].size == 1
-            warehouse.size.large  = t_CEOwarehouses[warehouse.name].size == 2
-            warehouse.max         = t_CEOwarehouses[warehouse.name].max
-            warehouse.pos         = t_CEOwarehouses[warehouse.name].coords
-        end
-    end)
-end
-
----@param index number
----@param entry table
-SS.GetMCbusinessInfo = function(index, entry)
-    for _, v in ipairs(t_BikerBusinessIDs) do
-        if table.Find(v.possible_ids, index) then
-            entry.name       = v.name
-            entry.id         = v.id
-            entry.unit_max   = v.unit_max
-            entry.val_offset = v.val_offset
-            entry.blip       = v.blip
-        end
-    end
-end
-
----@param scr_name string
-SS.FinishSale = function(scr_name)
-    script.execute_as_script(scr_name, function()
-        if t_SellScripts[scr_name] then
-            if not t_SellScripts[scr_name].b then -- gb_*
-                for _, data in pairs(t_SellScripts[scr_name]) do
-                    locals.set_int(scr_name, data.l + data.o, data.v)
-                end
-            else -- fm_content_*
-                if not NETWORK.NETWORK_GET_HOST_OF_THIS_SCRIPT() == self.get_id() then
-                    YimToast:ShowWarning("Samurai's Scripts",
-                        "Unable to finish sale mission because you are not host of this script.")
-                else
-                    local val = locals.get_int(scr_name, t_SellScripts[scr_name].b + 1 + 0)
-                    if not Lua_fn.has_bit(val, 11) then
-                        val = Lua_fn.set_bit(val, 11)
-                        locals.set_int(scr_name, t_SellScripts[scr_name].b + 1 + 0, val)
-                    end
-                    locals.set_int(scr_name, t_SellScripts[scr_name].l + t_SellScripts[scr_name].o, 3) -- End reason. Thanks ShinyWasabi! Now I know what 3 is 😅
-                end
-            end
-        end
-    end)
-end
-
-SS.FinishCargoSourceMission = function()
-    if script.is_active("gb_contraband_buy") then
-        script.execute_as_script("gb_contraband_buy", function()
-            if not NETWORK.NETWORK_IS_HOST_OF_THIS_SCRIPT() then
-                YimToast:ShowError("Samurai's Scripts", "You are not host of this script.")
-                return
-            end
-
-            locals.set_int("gb_contraband_buy", 621 + 5, 1)   -- 1.70 b3442 -- case -1: return "INVALID - UNSET";
-            locals.set_int("gb_contraband_buy", 621 + 191, 6) -- 1.70 b3442 -- func_40 Local_621.f_191 = iParam0;
-            locals.set_int("gb_contraband_buy", 621 + 192, 4) -- 1.70 b3442 -- func_15 Local_621.f_192 = iParam0;
-        end)
-    elseif script.is_active("fm_content_cargo") then
-        script.execute_as_script("fm_content_cargo", function()
-            if not NETWORK.NETWORK_IS_HOST_OF_THIS_SCRIPT() then
-                YimToast:ShowError("Samurai's Scripts", "You are not host of this script.")
-                return
-            end
-
-            local val = locals.get_int("fm_content_cargo", 5883 + 1 + 0) -- GENERIC_BITSET_I_WON -- 1.70 b3442 -- var uLocal_5883 = 4;
-            if not Lua_fn.has_bit(val, 11) then
-                val = Lua_fn.set_bit(val, 11)
-                locals.set_int("fm_content_cargo", 5883 + 1 + 0, val)
-            end
-            locals.set_int("fm_content_cargo", 5979 + 1157, 3) -- EndReason -- 1.70 b3442 -- func_8 Local_5979.f_1157 = iParam0;
-        end)
-    end
-end
-
----@param s script_util
-SS.FillAll = function(s)
-    if not Game.IsOnline() then
-        YimToast:ShowError("Samurai's Scripts", _T("GENERIC_UNAVAILABLE_SP_"))
-        return
-    end
-    if stats.get_int("MPX_HANGAR_OWNED") ~= 0 then
-        if not b_HangarLoop then
-            b_HangarLoop = true
-            s:sleep(300)
-        end
-    end
-    if stats.get_int("MPX_PROP_WHOUSE_SLOT0") > 0 then
-        if not b_Warehouse1Loop then
-            b_Warehouse1Loop = true
-            s:sleep(300)
-        end
-    end
-    if stats.get_int("MPX_PROP_WHOUSE_SLOT1") > 0 then
-        if not b_Warehouse2Loop then
-            b_Warehouse2Loop = true
-            s:sleep(300)
-        end
-    end
-    if stats.get_int("MPX_PROP_WHOUSE_SLOT2") > 0 then
-        if not b_Warehouse3Loop then
-            b_Warehouse3Loop = true
-            s:sleep(300)
-        end
-    end
-    if stats.get_int("MPX_PROP_WHOUSE_SLOT3") > 0 then
-        if not b_Warehouse4Loop then
-            b_Warehouse4Loop = true
-            s:sleep(300)
-        end
-    end
-    if stats.get_int("MPX_PROP_WHOUSE_SLOT4") > 0 then
-        if not b_Warehouse5Loop then
-            b_Warehouse5Loop = true
-            s:sleep(300)
-        end
-    end
-    if stats.get_int("MPX_PROP_FAC_SLOT0") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY0") < 100 then
-        globals.set_int(FreemodeGlobal2 + 0 + 1, 1)
-        s:sleep(300)
-    end
-    if stats.get_int("MPX_PROP_FAC_SLOT1") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY1") < 100 then
-        globals.set_int(FreemodeGlobal2 + 1 + 1, 1)
-        s:sleep(300)
-    end
-    if stats.get_int("MPX_PROP_FAC_SLOT2") and stats.get_int("MPX_MATTOTALFORFACTORY2") < 100 then
-        globals.set_int(FreemodeGlobal2 + 2 + 1, 1)
-        s:sleep(300)
-    end
-    if stats.get_int("MPX_PROP_FAC_SLOT3") and stats.get_int("MPX_MATTOTALFORFACTORY3") < 100 then
-        globals.set_int(FreemodeGlobal2 + 3 + 1, 1)
-        s:sleep(300)
-    end
-    if stats.get_int("MPX_PROP_FAC_SLOT4") and stats.get_int("MPX_MATTOTALFORFACTORY4") < 100 then
-        globals.set_int(FreemodeGlobal2 + 4 + 1, 1)
-        s:sleep(300)
-    end
-    if stats.get_int("MPX_PROP_FAC_SLOT5") and stats.get_int("MPX_MATTOTALFORFACTORY5") < 100 then
-        globals.set_int(FreemodeGlobal2 + 5 + 1, 1)
-        s:sleep(300)
-    end
-    if stats.get_int("MPX_XM22_LAB_OWNED") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY6") < 100 then
-        globals.set_int(FreemodeGlobal2 + 6 + 1, 1)
-        s:sleep(300)
-    end
 end
 
 ---@param keybind table
@@ -1633,7 +1515,7 @@ end
 
 -- Seamlessly add/remove keyboard keybinds on script update without requiring a config reset.
 SS.check_kb_keybinds = function()
-    local kb_keybinds_list = DEFAULT_CONFIG.keybinds
+    local kb_keybinds_list = SS.default_config.keybinds
     local t_len            = table.GetLength
     if t_len(keybinds) == t_len(kb_keybinds_list) then
         SS.debug('No new keyboard keybinds.')
@@ -1665,8 +1547,9 @@ end
 
 -- Seamlessly add/remove controller keybinds on script update without requiring a config reset.
 SS.check_gpad_keybinds = function()
-    local gpad_keybinds_list = DEFAULT_CONFIG.gpad_keybinds
+    local gpad_keybinds_list = SS.default_config.gpad_keybinds
     local t_len              = table.GetLength
+
     if t_len(gpad_keybinds) == t_len(gpad_keybinds_list) then
         SS.debug('No new gamepad keybinds.')
         return
@@ -1801,10 +1684,10 @@ SS.Cleanup = function()
         disable_waves = false
     end
 
-    if (autopilot_waypoint or autopilot_objective or autopilot_random) then
+    if (b_AutopilotWaypoint or b_AutopilotObjective or b_AutopilotRandom) then
         TASK.CLEAR_PED_TASKS(Self.GetPedID())
         TASK.CLEAR_PRIMARY_VEHICLE_TASK(Self.Vehicle.Current)
-        autopilot_waypoint, autopilot_objective, autopilot_random = false, false, false
+        b_AutopilotWaypoint, b_AutopilotObjective, b_AutopilotRandom = false, false, false
     end
 
     if b_IsCommandsUIOpen then
@@ -1829,20 +1712,36 @@ SS.Cleanup = function()
         b_EngineSoundChanged = false
     end
 
+    if HNS.isHiding then
+        HNS:Reset()
+    end
+
+    Game.Audio:StopAllEmitters()
     PreviewService:Clear()
+
+    BillionaireServices:ForceCleanup()
     EntityForge:ForceCleanup()
     Flatbed:ForceCleanup()
     YimActions:ForceCleanup()
-    Game.Audio:StopAllEmitters()
+    YRV3:Reset()
 
-    for _, category in ipairs({ g_SpawnedEntities.objects, g_SpawnedEntities.peds, g_SpawnedEntities.vehicles }) do
+    for _, category in ipairs({g_SpawnedEntities.objects, g_SpawnedEntities.peds, g_SpawnedEntities.vehicles}) do
         if next(category) ~= nil then
             for handle in pairs(category) do
                 if ENTITY.DOES_ENTITY_EXIST(category[handle]) then
                     ENTITY.SET_ENTITY_AS_MISSION_ENTITY(category[handle], true, true)
                     ENTITY.DELETE_ENTITY(category[handle])
+                    Game.RemoveBlip(category[handle])
                     category[handle] = nil
                 end
+            end
+        end
+    end
+
+    if next(g_CreatedBlips) ~= nil then
+        for _, blip in pairs(g_CreatedBlips) do
+            if HUD.DOES_BLIP_EXIST(blip.handle) then
+                HUD.REMOVE_BLIP(blip.handle)
             end
         end
     end
@@ -1856,7 +1755,6 @@ SS.OnSessionSwitch = function(s)
             s:sleep(100)
         until not script.is_active("maintransition")
         s:sleep(1000)
-        return
     end
 end
 
@@ -1868,7 +1766,6 @@ SS.OnPlayerSwitch = function(s)
             s:sleep(100)
         until not Self.IsSwitchingPlayers()
         s:sleep(1000)
-        return
     end
 end
 
@@ -1972,44 +1869,6 @@ SS.HandleVehicleCrash = function(level, vehicle)
             VEHICLE.SET_VEHICLE_DOOR_BROKEN(vehicle, i, true)
         end
     end
-end
-
-
----@param crates number
-SS.GetCEOCratesOffset = function(crates)
-    if not crates or crates <= 0 then
-        return 0
-    end
-
-    if crates == 1 then
-        return 15732 -- EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1
-    end
-
-    if crates == 2 then
-        return 15733
-    end
-
-    if crates == 3 then
-        return 15734
-    end
-
-    if crates == 4 or crates == 5 then
-        return 15735
-    end
-
-    if crates >= 6 and crates <= 9 then
-        return 15735 + math.floor((crates - 4) / 2)
-    end
-
-    if crates >= 10 and crates <= 110 then
-        return 15738 + math.floor((crates - 10) / 5)
-    end
-
-    if crates == 111 then
-        return 15752
-    end
-
-    return 0
 end
 
 -- Reset saved config without affecting

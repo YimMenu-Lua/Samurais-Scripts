@@ -808,7 +808,7 @@ local function DrawCustomMovementClipsets()
             end
 
             if UI.IsItemClicked("lmb") then
-                SS.SetMovement(t_FilteredMovementClipsets[i_MovementIndex], false)
+                SS.SetMovement(t_FilteredMovementClipsets[i], false)
             end
 
             if UI.IsItemClicked("rmb") then
@@ -822,7 +822,7 @@ local function DrawCustomMovementClipsets()
                         UI.WidgetSound("Click")
                         YimActions:RemoveFromFavorites(
                             "clipsets",
-                            t_FilteredMovementClipsets[i_MovementIndex].Name
+                            t_FilteredMovementClipsets[i].Name
                         )
                     end
                 else
@@ -830,8 +830,8 @@ local function DrawCustomMovementClipsets()
                         UI.WidgetSound("Click")
                         YimActions:AddToFavorites(
                             "clipsets",
-                            t_FilteredMovementClipsets[i_MovementIndex].Name,
-                            t_FilteredMovementClipsets[i_MovementIndex],
+                            t_FilteredMovementClipsets[i].Name,
+                            t_FilteredMovementClipsets[i],
                             YimActions.ACTION_TYPES.UNK
                         )
                     end
@@ -916,7 +916,7 @@ local function DrawJsonMovementClipsets()
                 end
 
                 if UI.IsItemClicked("lmb") then
-                    SS.SetMovement(t_FilteredMovementClipsets[i_MovementIndex], true)
+                    SS.SetMovement(t_FilteredMovementClipsets[i], true)
                 end
 
                 if UI.IsItemClicked("rmb") then
@@ -931,7 +931,7 @@ local function DrawJsonMovementClipsets()
                             UI.WidgetSound("Click")
                             YimActions:RemoveFromFavorites(
                                 "clipsets",
-                                t_FilteredMovementClipsets[i_MovementIndex].Name
+                                t_FilteredMovementClipsets[i].Name
                             )
                         end
                     else
@@ -939,8 +939,8 @@ local function DrawJsonMovementClipsets()
                             UI.WidgetSound("Click")
                             YimActions:AddToFavorites(
                                 "clipsets",
-                                t_FilteredMovementClipsets[i_MovementIndex].Name,
-                                t_FilteredMovementClipsets[i_MovementIndex],
+                                t_FilteredMovementClipsets[i].Name,
+                                t_FilteredMovementClipsets[i],
                                 YimActions.ACTION_TYPES.UNK
                             )
                         end
@@ -1127,7 +1127,7 @@ local function DrawCompanions()
 
                     if UI.IsItemClicked("rmb") then
                         ImGui.OpenPopup("##companion_controls_" .. i)
-                        i_MovementIndex = i
+                        i_CompanionIndex = i
                     end
 
                     if ImGui.BeginPopup("##companion_controls_" .. i) then
@@ -1452,7 +1452,7 @@ function YimActionsV3UI()
 
         if SS_debug then
             if ImGui.BeginTabItem("Debug") then
-                s_CurrentTab = "dbg"
+                s_CurrentTab = "yav3_dbg"
                 YimActions.Debugger:Draw()
                 ImGui.EndTabItem()
             end

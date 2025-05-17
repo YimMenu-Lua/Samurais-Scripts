@@ -154,7 +154,7 @@ function Color:New(...)
                     instance.a = _arg[4]
 
                 else
-                    log.warning(("[Color Error]: Invalid parameter: '%s'"):format(args[1]))
+                    log.warning(("[Color Error]: Invalid argument: '%s'"):format(args[1]))
                     instance.type = nil
                 end
             end
@@ -165,7 +165,7 @@ function Color:New(...)
 
             instance.r, instance.g, instance.b, instance.a = self:AsFloat()
         else
-            log.warning(("[Color Error]: Invalid parameter: '%s'"):format(args[1]))
+            log.warning(("[Color Error]: Invalid argument: '%s'"):format(args[1]))
             instance.type = nil
         end
     end

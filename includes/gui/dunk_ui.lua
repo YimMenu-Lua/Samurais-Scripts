@@ -2,7 +2,7 @@
 
 function DunkUI()
     if Game.IsOnline() then
-        if CURRENT_BUILD == TARGET_BUILD then
+        if SS.IsUpToDate() then
             ImGui.BeginTabBar("Dunk Pacino")
             if ImGui.BeginTabItem(_T("CP_GAMBLING_TXT_")) then
                 bypass_casino_bans, bcbUsed = ImGui.Checkbox(_T("CP_BYPASSCD_CP_"), bypass_casino_bans)

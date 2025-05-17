@@ -141,7 +141,7 @@ end
 local function UpdateVehBones(vehicle)
     t_FilteredVehBones = {}
 
-    for _, bone in ipairs(t_VehicleBones) do
+    for _, bone in ipairs(eVehicleBones) do
         local bone_idx = Game.GetEntityBoneIndexByName(vehicle, bone)
         if bone_idx and bone_idx ~= -1 then
             table.insert(t_FilteredVehBones, bone)

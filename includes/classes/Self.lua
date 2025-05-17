@@ -34,9 +34,14 @@ Self.GetRot = function(rotationOrder)
     return vec3(ENTITY.GET_ENTITY_ROTATION(self.get_ped(), rotationOrder or 2))
 end
 
+---@param offset? integer
 ---@return integer
-Self.GetHeading = function()
-   return ENTITY.GET_ENTITY_HEADING(self.get_ped())
+Self.GetHeading = function(offset)
+    if not offset then
+        offset = 0
+    end
+
+    return ENTITY.GET_ENTITY_HEADING(self.get_ped() + offset)
 end
 
 ---@return vec3
@@ -193,7 +198,7 @@ Self.IsUsingAirctaftMG = function()
     if Self.IsDriving() and (Self.Vehicle.IsPlane or Self.Vehicle.IsHeli) and Game.Vehicle.IsWeaponized(self.get_veh()) then
         local armed, weapon = WEAPON.GET_CURRENT_PED_VEHICLE_WEAPON(Self.GetPedID(), weapon)
         if armed then
-            for _, v in ipairs(t_AircraftMGs) do
+            for _, v in ipairs(eAircraftMGs) do
                 if weapon == joaat(v) then
                     return true, weapon
                 end
@@ -213,20 +218,42 @@ Self.Weapon = function()
 end
 
 -- Teleports localPlayer to the provided coordinates.
----@param keepVehicle boolean
----@param coords vec3
-Self.Teleport = function(keepVehicle, coords)
+---@param where integer|vec3 -- blip or coordinates
+---@param keepVehicle? boolean
+Self.Teleport = function(where, keepVehicle)
     script.run_in_fiber(function(selftp)
+        local coords
+
+        if not keepVehicle and not Self.IsOnFoot() then
+            TASK.CLEAR_PED_TASKS_IMMEDIATELY(Self.GetPedID())
+            selftp:sleep(50)
+        end
+
+        if (type(where) == "number") then
+            local blip = HUD.GET_FIRST_BLIP_INFO_ID(where)
+
+            if not HUD.DOES_BLIP_EXIST(blip) then
+                YimToast:ShowError(
+                    "Samurai's Scripts",
+                    "Invalid teleport coordinates!"
+                )
+                return
+            end
+
+            coords = HUD.GET_BLIP_COORDS(blip)
+        elseif ((type(where) == "table") or (type(where) == "userdata")) and where.x then
+            coords = where
+        else
+            YimToast:ShowError(
+                "Samurai's Scripts",
+                "Invalid teleport coordinates!"
+            )
+            return
+        end
+
         STREAMING.REQUEST_COLLISION_AT_COORD(coords.x, coords.y, coords.z)
         selftp:sleep(200)
-        if keepVehicle then
-            PED.SET_PED_COORDS_KEEP_VEHICLE(Self.GetPedID(), coords.x, coords.y, coords.z)
-        else
-            if not Self.IsOnFoot() then
-                TASK.CLEAR_PED_TASKS_IMMEDIATELY(Self.GetPedID())
-            end
-            ENTITY.SET_ENTITY_COORDS(Self.GetPedID(), coords.x, coords.y, coords.z, false, false, true, false)
-        end
+        PED.SET_PED_COORDS_KEEP_VEHICLE(Self.GetPedID(), coords.x, coords.y, coords.z)
     end)
 end
 
@@ -271,7 +298,9 @@ Self.PlayPhoneGestures = function(s)
     end
 end
 
-Self.CantTouchThis = function(toggle)
+Self.CantTouchThis = function()
+    local toggle = noJacking
+
     if PED.GET_PED_CONFIG_FLAG(Self.GetPedID(), 26, false) ~= toggle then
         PED.SET_PED_CONFIG_FLAG(Self.GetPedID(), 26, toggle)
     end
@@ -307,7 +336,7 @@ end
 
 -- Returns whether the player is currently using any mobile or computer app.
 Self.IsBrowsingApps = function()
-    for _, v in ipairs(t_AppScriptNames) do
+    for _, v in ipairs(eAppScriptNames) do
         if script.is_active(v) then
             return true
         end
@@ -319,7 +348,7 @@ end
 -- Returns whether the player is inside a modshop.
 Self.IsInCarModShop = function()
     if not Self.IsOutside() then
-        for _, v in ipairs(t_ModshopScriptNames) do
+        for _, v in ipairs(eModshopScriptNames) do
             if script.is_active(v) then
                 return true
             end
@@ -350,58 +379,99 @@ end
 --
 -- and returns the vehicle handle if true.
 Self.IsNearCarTrunk = function()
-    if (
-        Self.IsOnFoot() and not
-        YimActions:IsPedPlaying(self.get_ped()) and not
-        b_IsPlayingAmbientScenario
-    ) then
+    if Self.IsOnFoot() 
+    and not YimActions:IsPedPlaying(self.get_ped())
+    and not b_IsPlayingAmbientScenario then
         local selfPos = self.get_pos()
         local selfFwd = Game.GetForwardVector(Self.GetPedID())
-        local fwdPos  = vec3:new(selfPos.x + (selfFwd.x * 1.3), selfPos.y + (selfFwd.y * 1.3), selfPos.z)
-        local veh     = Game.GetClosestVehicle(fwdPos, 20)
+        local fwdPos = vec3:new(selfPos.x + (selfFwd.x * 1.3), selfPos.y + (selfFwd.y * 1.3), selfPos.z)
+        local veh = Game.GetClosestVehicle(fwdPos, 20, nil, false, 2)
 
         if veh ~= nil and veh > 0 then
-            if VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(veh)) then
-                local bootBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "boot")
-                if bootBone ~= -1 then
-                    local vehCoords     = ENTITY.GET_ENTITY_COORDS(veh, false)
-                    local vehFwdVec     = ENTITY.GET_ENTITY_FORWARD_VECTOR(veh)
+            if not VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(veh)) then
+                return false, 0, false
+            end
 
-                    -- create a search area based on the vehicle's length and engine placement
-                    local engineBone    = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "engine")
-                    local lfwheelBone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "wheel_lf")
-                    local engBoneCoords = vec3(ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, engineBone))
-                    local lfwBoneCoords = vec3(ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, lfwheelBone))
-                    local bonedistance  = lfwBoneCoords:distance(engBoneCoords)
-                    local isRearEngined = bonedistance > 2 -- Can also read vehicle model flag FRONT_BOOT
-                    local vmin, vmax    = Game.GetModelDimensions(ENTITY.GET_ENTITY_MODEL(veh))
-                    local veh_length    = vmax.y - vmin.y
-                    local tempPos       = isRearEngined and vec2:new(
-                            vehCoords.x + (vehFwdVec.x * (veh_length / 1.6)),
-                            vehCoords.y + (vehFwdVec.y * (veh_length / 1.6))
-                        ) or
-                        vec2:new(
-                            vehCoords.x - (vehFwdVec.x * (veh_length / 1.6)),
-                            vehCoords.y - (vehFwdVec.y * (veh_length / 1.6))
-                        )
+            local bootBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "boot")
 
-                    local search_area = vec3:new(tempPos.x, tempPos.y, vehCoords.z)
+            if bootBone ~= -1 then
+                local vehCoords = ENTITY.GET_ENTITY_COORDS(veh, false)
+                local vehFwdVec = ENTITY.GET_ENTITY_FORWARD_VECTOR(veh)
 
-                    if search_area:distance(Self.GetPos()) <= 1 then
-                        return true, veh, isRearEngined
-                    end
+                -- create a search area based on the vehicle's length and engine placement
+                local engineBone    = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "engine")
+                local lfwheelBone   = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "wheel_lf")
+                local engBoneCoords = vec3(ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, engineBone))
+                local lfwBoneCoords = vec3(ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, lfwheelBone))
+                local bonedistance  = lfwBoneCoords:distance(engBoneCoords)
+                local isRearEngined = bonedistance > 2 -- Can also read vehicle model flag FRONT_BOOT
+                local vmin, vmax    = Game.GetModelDimensions(ENTITY.GET_ENTITY_MODEL(veh))
+                local veh_length    = vmax.y - vmin.y
+
+                local tempPos = isRearEngined
+                and vec2:new(
+                    vehCoords.x + (vehFwdVec.x * (veh_length / 1.6)),
+                    vehCoords.y + (vehFwdVec.y * (veh_length / 1.6))
+                )
+                or vec2:new(
+                    vehCoords.x - (vehFwdVec.x * (veh_length / 1.6)),
+                    vehCoords.y - (vehFwdVec.y * (veh_length / 1.6))
+                )
+
+                local search_area = vec3:new(tempPos.x, tempPos.y, vehCoords.z)
+
+                if search_area:distance(Self.GetPos()) <= 1.5 then
+                    return true, veh, isRearEngined
                 end
             end
         end
+        yield()
     end
 
     return false, 0, false
 end
 
+-- Checks if localPlayer is near a trash bin
+--
+-- and returns the entity handle of the bin if true.
+Self.IsNearTrashBin = function()
+    local binPos = vec3:zero()
+    local myCoords = Self.GetPos()
+    local myFwdVec = Self.GetForwardVector()
+    local searchPos = vec3:new(
+        myCoords.x + myFwdVec.x * 1.2,
+        myCoords.y + myFwdVec.y * 1.2,
+        myCoords.z + myFwdVec.z * 1.2
+    )
+
+    for _, trash in ipairs(eTrashBins) do
+        local bin = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(
+            searchPos.x,
+            searchPos.y,
+            searchPos.z,
+            1.5,
+            joaat(trash),
+            false,
+            false,
+            false
+        )
+
+        if ENTITY.DOES_ENTITY_EXIST(bin) then
+            binPos = Game.GetEntityCoords(bin, false)
+            if searchPos:distance(binPos) <= 1.3 then
+                return true, bin
+            end
+        end
+    end
+
+    return false, 0
+end
+
 -- Checks if localPlayer is standing near a public seat
 --
--- and returns its position and rotation vectors.
-Self.IsNearPublicSeat = function()
+-- and returns its handle and position offsets (x, z).
+---@param s script_util
+Self.IsNearPublicSeat = function(s)
     local retBool  = false
     local prop     = 0
     local x_offset = 0.0
@@ -409,7 +479,7 @@ Self.IsNearPublicSeat = function()
     local seatPos  = vec3:zero()
     local myCoords = Self.GetPos()
 
-    for _, seat in ipairs(t_WorldSeats) do
+    for _, seat in ipairs(eWorldSeats) do
         prop = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(
             myCoords.x,
             myCoords.y,
@@ -443,45 +513,11 @@ Self.IsNearPublicSeat = function()
                 break
             end
         end
+
+        s:sleep(1)
     end
 
     return retBool, prop, x_offset, z_offset
-end
-
--- Checks if localPlayer is near a trash bin
---
--- and returns the entity handle of the bin if true.
-Self.IsNearTrashBin = function()
-    local binPos = vec3:zero()
-    local myCoords = Self.GetPos()
-    local myFwdVec = Self.GetForwardVector()
-    local searchPos = vec3:new(
-        myCoords.x + myFwdVec.x * 1.2,
-        myCoords.y + myFwdVec.y * 1.2,
-        myCoords.z + myFwdVec.z * 1.2
-    )
-
-    for _, trash in ipairs(t_TrashBins) do
-        local bin = OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(
-            searchPos.x,
-            searchPos.y,
-            searchPos.z,
-            1.5,
-            joaat(trash),
-            false,
-            false,
-            false
-        )
-
-        if ENTITY.DOES_ENTITY_EXIST(bin) then
-            binPos = Game.GetEntityCoords(bin, false)
-            if searchPos:distance(binPos) <= 1.3 then
-                return true, bin
-            end
-        end
-    end
-
-    return false, 0
 end
 
 Self.CanUsePhoneAnims = function()
@@ -697,7 +733,7 @@ function Self.Vehicle:OnTick(s)
             self.Throttle = VEHICLE.GET_VEHICLE_THROTTLE_(self.Current)
 
             if self.Throttle <= 0 then
-                self.Throttle = 0.05 -- just to show a tiny bit of throttle in the speedometer
+                self.Throttle = 0.05
             end
         end
     else

@@ -1,23 +1,22 @@
 ---@diagnostic disable: undefined-global, lowercase-global
 
 ---@class CommandExecutor
-CommandExecutor             = {}
-CommandExecutor.__index     = CommandExecutor
-CommandExecutor.commands    = {}
-CommandExecutor.user_cmd    = ""
-CommandExecutor.cmd_index   = 0
+CommandExecutor = {}
+CommandExecutor.__index = CommandExecutor
+
+CommandExecutor.user_cmd = ""
+CommandExecutor.cmd_index = 0
 CommandExecutor.cmd_entered = false
 CommandExecutor.suggestions = nil
+
 
 ---@param arg string
 ---@param callback function
 function CommandExecutor:RegisterCommand(arg, callback)
-    if (
-        not arg or
-        (type(arg) ~= "string") or not
-        callback or
-        (type(callback) ~= "function")
-    ) then
+    if not arg
+    or (type(arg) ~= "string")
+    or not callback
+    or (type(callback) ~= "function") then
         return
     end
 
@@ -26,19 +25,16 @@ end
 
 function CommandExecutor:HandleCallbacks()
     for _, v in ipairs(self.commands) do
-        if (
-            #self.user_cmd > 0 and
-            self.cmd_entered and
-            (self.user_cmd:lower() == v.arg:lower()) and
-            (type(v.callback) == "function")
-        ) then
+        if  #self.user_cmd > 0
+        and self.cmd_entered
+        and (self.user_cmd:lower() == v.arg:lower())
+        and (type(v.callback) == "function") then
             v.callback()
             CommandExecutor.user_cmd = ""
             break
         end
     end
 end
-
 
 function CommandExecutor:Draw()
     if b_ShouldDrawCommandsUI then
@@ -113,3 +109,7 @@ end
 -- script.register_looped("SS_COMMAND_EXECUTOR", function()
 --     CommandExecutor:HandleCallbacks()
 -- end)
+
+CommandExecutor.commands = {
+
+}

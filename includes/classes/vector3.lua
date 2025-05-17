@@ -164,6 +164,12 @@ function vec3:lerp(to, alpha)
     )
 end
 
+---@param includeZ? boolean
+---@return vec3
+function vec3:inverse(includeZ)
+    return vec3:new(-self.x, -self.y, includeZ and -self.z or self.z)
+end
+
 ---@return vec3
 function vec3:copy()
     return vec3:new(self.x, self.y, self.z)

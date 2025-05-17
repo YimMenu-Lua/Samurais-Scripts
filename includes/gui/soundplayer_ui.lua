@@ -7,23 +7,54 @@ local i_SoundSwitch        = 0
 local i_RadioIndex         = 0
 local b_DisableRadioButton = false
 local b_IsPlayingRadio     = false
+local b_SoundBtnOff        = false
 local t_SelectedSound      = {}
 local s_SelectedRadio      = {}
+local t_PedSpeeches <const> = {
+    male = {
+        { name = "Angry Chinese",     soundName = "GENERIC_INSULT_HIGH",      soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
+        { name = "Begging Chinese",   soundName = "GUN_BEG",                  soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
+        { name = "Call The Cops!",    soundName = "PHONE_CALL_COPS",          soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
+        { name = "CHARGE!!",          soundName = "GENERIC_WAR_CRY",          soundRef = "S_M_Y_BLACKOPS_01_BLACK_MINI_01" },
+        { name = "Creep",             soundName = "SHOUT_PERV_AT_WOMAN_PERV", soundRef = "A_M_Y_MEXTHUG_01_LATINO_FULL_01" },
+        { name = "Clown Dying",       soundName = "CLOWN_DEATH",              soundRef = "CLOWNS" },
+        { name = "Clown Laughing",    soundName = "CLOWN_LAUGH",              soundRef = "CLOWNS" },
+        { name = "Franklin Laughing", soundName = "LAUGH",                    soundRef = "WAVELOAD_PAIN_FRANKLIN" },
+        { name = "How are you?",      soundName = "GENERIC_HOWS_IT_GOING",    soundRef = "S_M_M_PILOT_01_WHITE_FULL_01" },
+        { name = "Insult",            soundName = "GENERIC_INSULT_HIGH",      soundRef = "S_M_Y_SHERIFF_01_WHITE_FULL_01" },
+        { name = "Insult 02",         soundName = "GENERIC_FUCK_YOU",         soundRef = "FRANKLIN_DRUNK" },
+        { name = "Pain",              soundName = "ELECTROCUTION",            soundRef = "MISTERK" },
+        { name = "Pain 02",           soundName = "TOOTHPULL_PAIN",           soundRef = "MISTERK" },
+        { name = "Threaten",          soundName = "CHALLENGE_THREATEN",       soundRef = "S_M_Y_BLACKOPS_01_BLACK_MINI_01" },
+        { name = "You Look Stupid!",  soundName = "FRIEND_LOOKS_STUPID",      soundRef = "FRANKLIN_DRUNK" },
+    },
+    female = {
+        { name = "Blowjob",        soundName = "SEX_ORAL",                   soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
+        { name = "Call The Cops!", soundName = "PHONE_CALL_COPS",            soundRef = "A_F_M_SALTON_01_WHITE_FULL_01" },
+        { name = "Hooker Offer",   soundName = "HOOKER_OFFER_SERVICE",       soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
+        { name = "How are you?",   soundName = "GENERIC_HOWS_IT_GOING",      soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
+        { name = "Insult",         soundName = "GENERIC_INSULT_HIGH",        soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
+        { name = "Let's Go!",      soundName = "CHALLENGE_ACCEPTED_GENERIC", soundRef = "A_F_M_SALTON_01_WHITE_FULL_01" },
+        { name = "Moan",           soundName = "SEX_GENERIC_FEM",            soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
+        { name = "Roast",          soundName = "GAME_HECKLE",                soundRef = "A_F_M_SALTON_01_WHITE_FULL_01" },
+        { name = "Threaten",       soundName = "CHALLENGE_THREATEN",         soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
+    }
+}
 
 local function DisplayMaleSounds()
     t_FilteredMaleSounds = {}
-    for _, v in ipairs(t_MaleSounds) do
+    for _, v in ipairs(t_PedSpeeches.male) do
         table.insert(t_FilteredMaleSounds, v.name)
     end
-    i_SoundIndex1, used = ImGui.Combo("##maleSounds", i_SoundIndex1, t_FilteredMaleSounds, #t_MaleSounds)
+    i_SoundIndex1, used = ImGui.Combo("##maleSounds", i_SoundIndex1, t_FilteredMaleSounds, #t_PedSpeeches.male)
 end
 
 local function DisplayFemaleSounds()
     t_FilteredFemaleSounds = {}
-    for _, v in ipairs(t_FemaleSounds) do
+    for _, v in ipairs(t_PedSpeeches.female) do
         table.insert(t_FilteredFemaleSounds, v.name)
     end
-    i_SoundIndex2, used = ImGui.Combo("##femaleSounds", i_SoundIndex2, t_FilteredFemaleSounds, #t_FemaleSounds)
+    i_SoundIndex2, used = ImGui.Combo("##femaleSounds", i_SoundIndex2, t_FilteredFemaleSounds, #t_PedSpeeches.female)
 end
 
 local function DisplayRadioStations()
@@ -95,15 +126,18 @@ function SoundPlayerUI()
         ImGui.PushItemWidth(280)
         DisplayMaleSounds()
         ImGui.PopItemWidth()
-        t_SelectedSound = t_MaleSounds[i_SoundIndex1 + 1]
+        t_SelectedSound = t_PedSpeeches.male[i_SoundIndex1 + 1]
     else
         ImGui.PushItemWidth(280)
         DisplayFemaleSounds()
         ImGui.PopItemWidth()
-        t_SelectedSound = t_FemaleSounds[i_SoundIndex2 + 1]
+        t_SelectedSound = t_PedSpeeches.female[i_SoundIndex2 + 1]
     end
-    ImGui.SameLine(); ImGui.Spacing(); ImGui.SameLine()
-    if sound_btn_off then
+    ImGui.SameLine()
+    ImGui.Spacing()
+    ImGui.SameLine()
+
+    if b_SoundBtnOff then
         ImGui.BeginDisabled()
         ImGui.Button(string.format(" %s ", s_LoadingLabel), 60, 30)
         ImGui.EndDisabled()
@@ -114,10 +148,10 @@ function SoundPlayerUI()
                 AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(t_SelectedSound.soundName, t_SelectedSound.soundRef,
                     myCoords.x,
                     myCoords.y, myCoords.z, "SPEECH_PARAMS_FORCE")
-                sound_btn_off = true
+                b_SoundBtnOff = true
                 b_ShouldAnimateLoadingLabel = true
                 playsnd:sleep(5000)
-                sound_btn_off = false
+                b_SoundBtnOff = false
                 b_ShouldAnimateLoadingLabel = false
             end)
         end

@@ -20,7 +20,7 @@ local function SortCustomPaints()
                     table.insert(filteredPaints, v)
                 end
             else
-                if v.shade == t_CustomPintShades[i_PaintsColSortIndex + 1] then
+                if v.shade == eCustomPintShades[i_PaintsColSortIndex + 1] then
                     if string.find((v.name):lower(), s_PaintSearchQuery:lower()) then
                         table.insert(filteredPaints, v)
                     end
@@ -32,7 +32,7 @@ local function SortCustomPaints()
                     table.insert(filteredPaints, v)
                 end
             else
-                if v.manufacturer == t_CustomPaintsManufacturers[i_PaintsMfrSortIndex + 1] then
+                if v.manufacturer == eCustomPaintsManufacturers[i_PaintsMfrSortIndex + 1] then
                     if string.find((v.name):lower(), s_PaintSearchQuery:lower()) then
                         table.insert(filteredPaints, v)
                     end
@@ -108,8 +108,8 @@ function CustomPaintsUI()
         ImGui.PushItemWidth(180)
         if i_PaintsSortbySwitch == 0 then
             ImGui.Dummy(20, 1); ImGui.SameLine()
-            i_PaintsColSortIndex, sortbyUsed = ImGui.Combo("##sortpaintjobs", i_PaintsColSortIndex, t_CustomPintShades,
-                #t_CustomPintShades)
+            i_PaintsColSortIndex, sortbyUsed = ImGui.Combo("##sortpaintjobs", i_PaintsColSortIndex, eCustomPintShades,
+                #eCustomPintShades)
             if sortbyUsed then
                 UI.WidgetSound("Nav")
                 i_CustomPaintIndex = 0
@@ -117,8 +117,8 @@ function CustomPaintsUI()
             ImGui.SameLine(); ShowCustomPaintsCount()
         else
             ImGui.Dummy(120, 1); ImGui.SameLine(); ShowCustomPaintsCount(); ImGui.SameLine()
-            i_PaintsMfrSortIndex, sortbyMfrUsed = ImGui.Combo("##sortpaintjobs2", i_PaintsMfrSortIndex, t_CustomPaintsManufacturers,
-                #t_CustomPaintsManufacturers)
+            i_PaintsMfrSortIndex, sortbyMfrUsed = ImGui.Combo("##sortpaintjobs2", i_PaintsMfrSortIndex, eCustomPaintsManufacturers,
+                #eCustomPaintsManufacturers)
             if sortbyMfrUsed then
                 UI.WidgetSound("Nav")
                 i_CustomPaintIndex = 0

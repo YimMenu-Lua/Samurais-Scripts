@@ -1,6 +1,6 @@
 ---@diagnostic disable
 
-eGameState        = {
+eGameState = {
     "Invalid",
     "Playing",
     "Died",
@@ -11,7 +11,37 @@ eGameState        = {
     "InMPCutscene",
 }
 
-eModelTypes       = {
+eDriftSmokeColors = {
+    "White",
+    "Black",
+    "Red",
+    "Green",
+    "Blue",
+    "Yellow",
+    "Orange",
+    "Pink",
+    "Purple"
+}
+
+eObjectiveBlips = {
+    1,
+    9,
+    143,
+    144,
+    145,
+    146,
+    306,
+    535,
+    536,
+    537,
+    538,
+    539,
+    540,
+    541,
+    542,
+}
+
+eModelTypes = {
     [0]     = "Invalid",
     [1]     = "Object",
     [2]     = "MLO",
@@ -88,185 +118,187 @@ ePedComponents = {
     "Tops"
 }
 
-t_Langs           = {
-    { name = 'English',               iso = 'en-US' },
-    { name = 'Français',              iso = 'fr-FR' },
-    { name = 'Deütsch',               iso = 'de-DE' },
-    { name = 'Español',               iso = 'es-ES' },
-    { name = 'Italiano',              iso = 'it-IT' },
-    { name = 'Português (Brasil)',    iso = 'pt-BR' },
-    { name = 'Русский (Russian)',     iso = 'ru-RU' },
-    { name = 'Chinese (Traditional)', iso = 'zh-TW' },
-    { name = 'Chinese (Simplified)',  iso = 'zh-CN' },
-    { name = 'Japanese',              iso = 'ja-JP' },
-    { name = 'Polish',                iso = 'pl-PL' },
-    { name = 'Korean',                iso = 'ko-KR' },
+eCollisionInvalidModels = {
+    3008087081,
+    415536433,
+    874602658,
+    693843550,
+    4189527861,
+    1152297372,
+    3907562202,
+    2954040756,
+    1198649884,
+    1067874014,
 }
 
-t_GamepadControls = {
-    { ctrl = 7,   gpad = "R3" },
-    { ctrl = 10,  gpad = "LT" },
-    { ctrl = 11,  gpad = "RT" },
-    { ctrl = 14,  gpad = "DPAD RIGHT" },
-    { ctrl = 15,  gpad = "DPAD LEFT" },
-    { ctrl = 19,  gpad = "DPAD DOWN" },
-    { ctrl = 20,  gpad = "DPAD DOWN" },
-    { ctrl = 21,  gpad = "A" },
-    { ctrl = 22,  gpad = "X" },
-    { ctrl = 23,  gpad = "Y" },
-    { ctrl = 27,  gpad = "DPAD UP" },
-    { ctrl = 29,  gpad = "R3" },
-    { ctrl = 30,  gpad = "LEFT STICK" },
-    { ctrl = 34,  gpad = "LEFT STICK" },
-    { ctrl = 36,  gpad = "L3" },
-    { ctrl = 37,  gpad = "LB" },
-    { ctrl = 38,  gpad = "LB" },
-    { ctrl = 42,  gpad = "DPAD UP" },
-    { ctrl = 43,  gpad = "DPAD DOWN" },
-    { ctrl = 44,  gpad = "RB" },
-    { ctrl = 45,  gpad = "B" },
-    { ctrl = 46,  gpad = "DPAD RIGHT" },
-    { ctrl = 47,  gpad = "DPAD LEFT" },
-    { ctrl = 56,  gpad = "Y" },
-    { ctrl = 57,  gpad = "B" },
-    { ctrl = 70,  gpad = "A" },
-    { ctrl = 71,  gpad = "RT" },
-    { ctrl = 72,  gpad = "LT" },
-    { ctrl = 73,  gpad = "A" },
-    { ctrl = 74,  gpad = "DPAD RIGHT" },
-    { ctrl = 75,  gpad = "Y" },
-    { ctrl = 76,  gpad = "RB" },
-    { ctrl = 79,  gpad = "R3" },
-    { ctrl = 81,  gpad = "(NONE)" },
-    { ctrl = 82,  gpad = "(NONE)" },
-    { ctrl = 83,  gpad = "(NONE)" },
-    { ctrl = 84,  gpad = "(NONE)" },
-    { ctrl = 84,  gpad = "DPAD LEFT" },
-    { ctrl = 96,  gpad = "(NONE)" },
-    { ctrl = 97,  gpad = "(NONE)" },
-    { ctrl = 124, gpad = "LEFT STICK" },
-    { ctrl = 125, gpad = "LEFT STICK" },
-    { ctrl = 112, gpad = "LEFT STICK" },
-    { ctrl = 127, gpad = "LEFT STICK" },
-    { ctrl = 117, gpad = "LB" },
-    { ctrl = 118, gpad = "RB" },
-    { ctrl = 167, gpad = "(NONE)" },
-    { ctrl = 168, gpad = "(NONE)" },
-    { ctrl = 169, gpad = "(NONE)" },
-    { ctrl = 170, gpad = "B" },
-    { ctrl = 172, gpad = "DPAD UP" },
-    { ctrl = 173, gpad = "DPAD DOWN" },
-    { ctrl = 174, gpad = "DPAD LEFT" },
-    { ctrl = 175, gpad = "DPAD RIGHT" },
-    { ctrl = 178, gpad = "Y" },
-    { ctrl = 194, gpad = "B" },
-    { ctrl = 243, gpad = "(NONE)" },
-    { ctrl = 244, gpad = "BACK" },
-    { ctrl = 249, gpad = "(NONE)" },
-    { ctrl = 288, gpad = "A" },
-    { ctrl = 289, gpad = "X" },
-    { ctrl = 303, gpad = "DPAD UP" },
-    { ctrl = 307, gpad = "DPAD RIGHT" },
-    { ctrl = 308, gpad = "DPAD LEFT" },
-    { ctrl = 311, gpad = "DPAD DOWN" },
-    { ctrl = 318, gpad = "START" },
-    { ctrl = 322, gpad = "(NONE)" },
-    { ctrl = 344, gpad = "DPAD RIGHT" },
+eAircraftMGs = {
+    "VEHICLE_WEAPON_DOGFIGHTER_MG",
+    "VEHICLE_WEAPON_HUNTER_MG",
+    "VEHICLE_WEAPON_MICROLIGHT_MG",
+    "VEHICLE_WEAPON_ROGUE_MG",
+    "VEHICLE_WEAPON_SEABREEZE_MG",
+    "VEHICLE_WEAPON_TULA_MG",
+    "VEHICLE_WEAPON_TULA_NOSEMG",
+    "VEHICLE_WEAPON_AVENGER_CANNON",
+    "VEHICLE_WEAPON_BOMBUSHKA_CANNON",
+    "VEHICLE_WEAPON_HUNTER_CANNON",
+    "VEHICLE_WEAPON_ROGUE_CANNON",
+    "VEHICLE_WEAPON_STRIKEFORCE_CANNON",
+    "VEHICLE_WEAPON_RAIJU_CANNONS",
+    "VEHICLE_WEAPON_AKULA_TURRET_SINGLE",
+    "VEHICLE_WEAPON_AKULA_TURRET_DUAL",
+    "VEHICLE_WEAPON_MOGUL_TURRET",
+    "VEHICLE_WEAPON_MOGUL_DUALTURRET",
+    "VEHICLE_WEAPON_NOSE_TURRET_VALKYRIE",
+    "VEHICLE_WEAPON_TURRET_VALKYRIE",
+    "VEHICLE_WEAPON_PLAYER_LAZER",
+    "VEHICLE_WEAPON_PLAYER_SAVAGE",
+    "VEHICLE_WEAPON_PLAYER_HUNTER",
+    "VEHICLE_WEAPON_PLAYER_BUZZARD",
 }
 
-t_UISounds        = {
-    ["Radar"] = {
-        soundName = "RADAR_ACTIVATE",
-        soundRef = "DLC_BTL_SECURITY_VANS_RADAR_PING_SOUNDS"
-    },
-    ["Select"] = {
-        soundName = "SELECT",
-        soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET"
-    },
-    ["Pickup"] = {
-        soundName = "PICK_UP",
-        soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET"
-    },
-    ["W_Pickup"] = {
-        soundName = "PICK_UP_WEAPON",
-        soundRef = "HUD_FRONTEND_CUSTOM_SOUNDSET"
-    },
-    ["Fail"] = {
-        soundName = "CLICK_FAIL",
-        soundRef = "WEB_NAVIGATION_SOUNDS_PHONE"
-    },
-    ["Click"] = {
-        soundName = "CLICK_LINK",
-        soundRef = "DLC_H3_ARCADE_LAPTOP_SOUNDS"
-    },
-    ["Notif"] = {
-        soundName = "LOSE_1ST",
-        soundRef = "GTAO_FM_EVENTS_SOUNDSET"
-    },
-    ["Delete"] = {
-        soundName = "DELETE",
-        soundRef = "HUD_DEATHMATCH_SOUNDSET"
-    },
-    ["Cancel"] = {
-        soundName = "CANCEL",
-        soundRef = "HUD_FREEMODE_SOUNDSET"
-    },
-    ["Error"] = {
-        soundName = "ERROR",
-        soundRef = "HUD_FREEMODE_SOUNDSET"
-    },
-    ["Nav"] = {
-        soundName = "NAV_LEFT_RIGHT",
-        soundRef = "HUD_FREEMODE_SOUNDSET"
-    },
-    ["Nav2"] = {
-        soundName = "NAV_UP_DOWN",
-        soundRef = "HUD_FREEMODE_SOUNDSET"
-    },
-    ["Select2"] = {
-        soundName = "CHANGE_STATION_LOUD",
-        soundRef = "RADIO_SOUNDSET"
-    },
-    ["Focus_In"] = {
-        soundName = "FOCUSIN",
-        soundRef = "HINTCAMSOUNDS"
-    },
-    ["Focus_Out"] = {
-        soundName = "FOCUSOUT",
-        soundRef = "HINTCAMSOUNDS"
-    },
+eFlightControls = {
+    72,
+    75,
+    87,
+    88,
+    89,
+    90,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
 }
 
-t_RGBloopColors   = {
-    { 0,   255, 255, 255 },
-    { 0,   127, 255, 255 },
-    { 0,   0,   255, 255 },
-    { 127, 0,   255, 255 },
-    { 255, 0,   255, 255 },
-    { 255, 0,   127, 255 },
-    { 255, 0,   0,   255 },
-    { 255, 127, 0,   255 },
-    { 255, 255, 0,   255 },
-    { 127, 255, 0,   255 },
-    { 0,   255, 0,   255 },
-    { 0,   255, 127, 255 }
-
+eTrashBins = {
+    "m23_2_prop_m32_dumpster_01a",
+    "prop_cs_dumpster_01a",
+    "prop_dumpster_01a",
+    "prop_dumpster_02a",
+    "prop_dumpster_02b",
+    "prop_dumpster_3a",
+    "prop_dumpster_4a",
+    "prop_dumpster_4b",
+    "p_dumpster_t",
 }
 
-t_PedBones        = {
-    { name = "Root",       ID = 0 },
-    { name = "Head",       ID = 12844 },
-    { name = "Spine 00",   ID = 23553 },
-    { name = "Spine 01",   ID = 24816 },
-    { name = "Spine 02",   ID = 24817 },
-    { name = "Spine 03",   ID = 24818 },
-    { name = "Right Hand", ID = 6286 },
-    { name = "Left Hand",  ID = 18905 },
-    { name = "Right Foot", ID = 35502 },
-    { name = "Left Foot",  ID = 14201 },
+eAppScriptNames = {
+    "apparcadebusiness",
+    "apparcadebusinesshub",
+    "appavengeroperations",
+    "appbailoffice",
+    "appbikerbusiness",
+    "appbroadcast",
+    "appbunkerbusiness",
+    "appbusinesshub",
+    "appcamera",
+    "appchecklist",
+    "appcontacts",
+    "appcovertops",
+    "appemail",
+    "appextraction",
+    "appfixersecurity",
+    "apphackertruck",
+    "apphackerden",
+    "apphs_sleep",
+    "appimportexport",
+    "appinternet",
+    "appjipmp",
+    "appmedia",
+    "appmpbossagency",
+    "appmpemail",
+    "appmpjoblistnew",
+    "apporganiser",
+    "appprogresshub",
+    "apprepeatplay",
+    "appsecurohack",
+    "appsecuroserv",
+    "appsettings",
+    "appsidetask",
+    "appsmuggler",
+    "apptextmessage",
+    "apptrackify",
+    "appvinewoodmenu",
+    "appvlsi",
+    "appzit",
+    -- "debug_app_select_screen",
 }
 
-t_WeaponBones     = {
+eModshopScriptNames = {
+    "arena_carmod",
+    "armory_aircraft_carmod",
+    "base_carmod",
+    "business_hub_carmod",
+    "car_meet_carmod",
+    "carmod_shop",
+    "fixer_hq_carmod",
+    "hacker_truck_carmod",
+    "hangar_carmod",
+    "juggalo_hideout_carmod",
+    "personal_carmod_shop",
+    "tuner_property_carmod",
+    -- "vinewood_premium_garage_carmod",
+}
+
+eCustomPintShades = {
+    "All",
+    "Beige",
+    "Black",
+    "Blue",
+    "Brown",
+    "Gold",
+    "Green",
+    "Grey",
+    "Orange",
+    "Pink",
+    "Purple",
+    "Red",
+    "White",
+    "Yellow",
+}
+
+eCustomPaintsManufacturers = {
+    "All",
+    "Alfa Romeo",
+    "AMC",
+    "Apollo Automobili",
+    "Aston Martin",
+    "Audi",
+    "Austin/Morris",
+    "Bentley",
+    "BMW",
+    "Bugatti",
+    "Chevrolet",
+    "Dodge",
+    "Ferrari",
+    "Ford",
+    "Honda",
+    "Jaguar",
+    "Koeniggsegg",
+    "Lamborghini",
+    "Land Rover",
+    "Lexus",
+    "Lotus",
+    "Mazda",
+    "McLaren",
+    "Mercedes-AMG",
+    "Mercedes-Benz",
+    "Nissan",
+    "Pagani",
+    "Plymouth",
+    "Porsche",
+    "Rimac Automobili",
+    "Rolls-Royce",
+    "Spyker",
+    "Top Secret Jpn",
+    "Toyota",
+    "Volkswagen",
+}
+
+eWeaponBones = {
     "WAPLasr",
     "WAPLasr_2",
     "WAPFlshLasr",
@@ -277,7 +309,7 @@ t_WeaponBones     = {
     "gun_muzzle"
 }
 
-t_PlaneBones      = {
+ePlaneBones = {
     "afterburner",
     "aileron_l",
     "aileron_r",
@@ -347,7 +379,7 @@ t_PlaneBones      = {
     "wingtip_2",
 }
 
-t_VehicleBones    = {
+eVehicleBones = {
     "chassis", "chassis_lowlod", "chassis_dummy", "seat_dside_f", "seat_dside_r",
     "seat_dside_r1", "seat_dside_r2", "seat_dside_r3", "seat_dside_r4", "seat_dside_r5", "seat_dside_r6", "seat_dside_r7",
     "seat_pside_f", "seat_pside_r", "seat_pside_r1", "seat_pside_r2", "seat_pside_r3", "seat_pside_r4", "seat_pside_r5",
@@ -416,157 +448,7 @@ t_VehicleBones    = {
     "chassis_Control",
 }
 
-t_ReservedKeys    = {
-    kb   = {
-        0x01,
-        0x07,
-        0x0A,
-        0x0B,
-        0x1B,
-        0x24,
-        0x2C,
-        0x2D,
-        0x46,
-        0x5B,
-        0x5C,
-        0x5E,
-    },
-    gpad = {
-        23,
-        24,
-        25,
-        71,
-        75,
-    }
-}
-
-
-t_DriftSmokeColors          = {
-    "White",
-    "Black",
-    "Red",
-    "Green",
-    "Blue",
-    "Yellow",
-    "Orange",
-    "Pink",
-    "Purple"
-}
-
-t_ObjectiveBlipIDs          = {
-    1,
-    9,
-    143,
-    144,
-    145,
-    146,
-    306,
-    535,
-    536,
-    537,
-    538,
-    539,
-    540,
-    541,
-    542,
-}
-
-t_Handguns                  = {
-    0x1B06D571,
-    0xBFE256D4,
-    0x5EF9FEC4,
-    0x22D8FE39,
-    0x3656C8C1,
-    0x99AEEB3B,
-    0xBFD21232,
-    0x88374054,
-    0xD205520E,
-    0x83839C4,
-    0x47757124,
-    0xDC4DB296,
-    0xC1B3C3D1,
-    0xCB96392F,
-    0x97EA20B8,
-    0xAF3696A1,
-    0x2B5EF5EC,
-    0x917F6C8C
-}
-
-t_CellInputs                = {
-    { control = 172, input = 1 },
-    { control = 173, input = 2 },
-    { control = 174, input = 3 },
-    { control = 175, input = 4 },
-    { control = 176, input = 5 },
-    { control = 177, input = 5 },
-    { control = 178, input = 5 },
-    { control = 179, input = 5 },
-    { control = 180, input = 1 },
-    { control = 181, input = 2 },
-}
-
-t_RadioStations             = {
-    { station = "RADIO_11_TALK_02",               name = "Blaine County Radio" },
-    { station = "RADIO_21_DLC_XM17",              name = "Blonded Los Santos 97.8 FM" },
-    { station = "RADIO_04_PUNK",                  name = "Channel X" },
-    { station = "RADIO_08_MEXICAN",               name = "East Los FM" },
-    { station = "RADIO_14_DANCE_02",              name = "FlyLo FM" },
-    { station = "RADIO_23_DLC_XM19_RADIO",        name = "iFruit Radio" },
-    { station = "RADIO_34_DLC_HEI4_KULT",         name = "Kult FM" },
-    { station = "RADIO_01_CLASS_ROCK",            name = "Los Santos Rock Radio" },
-    { station = "RADIO_22_DLC_BATTLE_MIX1_RADIO", name = "Los Santos Underground Radio" },
-    { station = "RADIO_36_AUDIOPLAYER",           name = "Media Player" },
-    { station = "RADIO_02_POP",                   name = "Non-Stop-Pop FM" },
-    { station = "RADIO_03_HIPHOP_NEW",            name = "Radio Los Santos" },
-    { station = "RADIO_16_SILVERLAKE",            name = "Radio Mirror Park" },
-    { station = "RADIO_30_DLC_HEI4_MIX1_REVERB",  name = "Rave DJ Set" },
-    { station = "RADIO_06_COUNTRY",               name = "Rebel Radio" },
-    { station = "RADIO_19_USER",                  name = "Self Radio" },
-    { station = "RADIO_07_DANCE_01",              name = "Soulwax FM" },
-    { station = "RADIO_17_FUNK",                  name = "Space 103.2" },
-    { station = "RADIO_27_DLC_PRHEI4",            name = "Still Slipping Los Santos" },
-    { station = "RADIO_12_REGGAE",                name = "The Blue Ark" },
-    { station = "RADIO_20_THELAB",                name = "The Lab" },
-    { station = "RADIO_15_MOTOWN",                name = "The Lowdown 9.11" },
-    { station = "RADIO_35_DLC_HEI4_MLR",          name = "The Music Locker" },
-    { station = "HIDDEN_RADIO_STRIP_CLUB",        name = "Vanilla Unicorn" },
-    { station = "RADIO_18_90S_ROCK",              name = "Vinewood Boulevard Radio" },
-    { station = "RADIO_09_HIPHOP_OLD",            name = "West Coast Classics" },
-    { station = "RADIO_05_TALK_01",               name = "West Coast Talk Radio" },
-    { station = "RADIO_13_JAZZ",                  name = "Worldwide FM" },
-}
-
-t_MaleSounds                = {
-    { name = "Angry Chinese",     soundName = "GENERIC_INSULT_HIGH",      soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
-    { name = "Begging Chinese",   soundName = "GUN_BEG",                  soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
-    { name = "Call The Cops!",    soundName = "PHONE_CALL_COPS",          soundRef = "MP_M_SHOPKEEP_01_CHINESE_MINI_01" },
-    { name = "CHARGE!!",          soundName = "GENERIC_WAR_CRY",          soundRef = "S_M_Y_BLACKOPS_01_BLACK_MINI_01" },
-    { name = "Creep",             soundName = "SHOUT_PERV_AT_WOMAN_PERV", soundRef = "A_M_Y_MEXTHUG_01_LATINO_FULL_01" },
-    { name = "Clown Dying",       soundName = "CLOWN_DEATH",              soundRef = "CLOWNS" },
-    { name = "Clown Laughing",    soundName = "CLOWN_LAUGH",              soundRef = "CLOWNS" },
-    { name = "Franklin Laughing", soundName = "LAUGH",                    soundRef = "WAVELOAD_PAIN_FRANKLIN" },
-    { name = "How are you?",      soundName = "GENERIC_HOWS_IT_GOING",    soundRef = "S_M_M_PILOT_01_WHITE_FULL_01" },
-    { name = "Insult",            soundName = "GENERIC_INSULT_HIGH",      soundRef = "S_M_Y_SHERIFF_01_WHITE_FULL_01" },
-    { name = "Insult 02",         soundName = "GENERIC_FUCK_YOU",         soundRef = "FRANKLIN_DRUNK" },
-    { name = "Pain",              soundName = "ELECTROCUTION",            soundRef = "MISTERK" },
-    { name = "Pain 02",           soundName = "TOOTHPULL_PAIN",           soundRef = "MISTERK" },
-    { name = "Threaten",          soundName = "CHALLENGE_THREATEN",       soundRef = "S_M_Y_BLACKOPS_01_BLACK_MINI_01" },
-    { name = "You Look Stupid!",  soundName = "FRIEND_LOOKS_STUPID",      soundRef = "FRANKLIN_DRUNK" },
-}
-
-t_FemaleSounds              = {
-    { name = "Blowjob",        soundName = "SEX_ORAL",                   soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
-    { name = "Call The Cops!", soundName = "PHONE_CALL_COPS",            soundRef = "A_F_M_SALTON_01_WHITE_FULL_01" },
-    { name = "Hooker Offer",   soundName = "HOOKER_OFFER_SERVICE",       soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
-    { name = "How are you?",   soundName = "GENERIC_HOWS_IT_GOING",      soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
-    { name = "Insult",         soundName = "GENERIC_INSULT_HIGH",        soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
-    { name = "Let's Go!",      soundName = "CHALLENGE_ACCEPTED_GENERIC", soundRef = "A_F_M_SALTON_01_WHITE_FULL_01" },
-    { name = "Moan",           soundName = "SEX_GENERIC_FEM",            soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
-    { name = "Roast",          soundName = "GAME_HECKLE",                soundRef = "A_F_M_SALTON_01_WHITE_FULL_01" },
-    { name = "Threaten",       soundName = "CHALLENGE_THREATEN",         soundRef = "S_F_Y_HOOKER_03_BLACK_FULL_01" },
-}
-
-t_ProjectileTypes           = {
+eProjectileTypes = {
     0xB1CA77B1,
     0xA284510B,
     0x4DD2DC56,
@@ -640,7 +522,276 @@ t_ProjectileTypes           = {
     -1538514291,
 }
 
-t_PEcombatAttributes        = {
+-- Custom vehicle tasks for Billionaire Services V2.
+eVehicleTask = {
+    NONE           = -1,
+    GOTO           = 0,
+    WANDER         = 1,
+    PLANE_TAXI     = 2, -- jets only
+    TAKE_OFF       = 3, -- aircraft only
+    LAND           = 4, -- aircraft only
+    HOVER_IN_PLACE = 5, -- helicopters onyl
+    GO_HOME        = 6,
+    OVERRIDE       = 99,
+}
+
+eVehicleTaskToString = {
+    [eVehicleTask.NONE]           = "Idle.",
+    [eVehicleTask.GOTO]           = "Going to destination.",
+    [eVehicleTask.WANDER]         = "Cruising around.",
+    [eVehicleTask.TAKE_OFF]       = "Taking off.",
+    [eVehicleTask.LAND]           = "Landing at destination.",
+    [eVehicleTask.HOVER_IN_PLACE] = "Hovering.",
+    [eVehicleTask.GO_HOME]        = "Going home.",
+}
+
+t_Langs = {
+    { name = "English",               iso = "en-US" },
+    { name = "Français",              iso = "fr-FR" },
+    { name = "Deütsch",               iso = "de-DE" },
+    { name = "Español",               iso = "es-ES" },
+    { name = "Italiano",              iso = "it-IT" },
+    { name = "Português (Brasil)",    iso = "pt-BR" },
+    { name = "Русский (Russian)",     iso = "ru-RU" },
+    { name = "Chinese (Traditional)", iso = "zh-TW" },
+    { name = "Chinese (Simplified)",  iso = "zh-CN" },
+    { name = "Japanese",              iso = "ja-JP" },
+    { name = "Polish",                iso = "pl-PL" },
+    { name = "Korean",                iso = "ko-KR" },
+}
+
+t_GamepadControls = {
+    { ctrl = 7,   gpad = "R3" },
+    { ctrl = 10,  gpad = "LT" },
+    { ctrl = 11,  gpad = "RT" },
+    { ctrl = 14,  gpad = "DPAD RIGHT" },
+    { ctrl = 15,  gpad = "DPAD LEFT" },
+    { ctrl = 19,  gpad = "DPAD DOWN" },
+    { ctrl = 20,  gpad = "DPAD DOWN" },
+    { ctrl = 21,  gpad = "A" },
+    { ctrl = 22,  gpad = "X" },
+    { ctrl = 23,  gpad = "Y" },
+    { ctrl = 27,  gpad = "DPAD UP" },
+    { ctrl = 29,  gpad = "R3" },
+    { ctrl = 30,  gpad = "LEFT STICK" },
+    { ctrl = 34,  gpad = "LEFT STICK" },
+    { ctrl = 36,  gpad = "L3" },
+    { ctrl = 37,  gpad = "LB" },
+    { ctrl = 38,  gpad = "LB" },
+    { ctrl = 42,  gpad = "DPAD UP" },
+    { ctrl = 43,  gpad = "DPAD DOWN" },
+    { ctrl = 44,  gpad = "RB" },
+    { ctrl = 45,  gpad = "B" },
+    { ctrl = 46,  gpad = "DPAD RIGHT" },
+    { ctrl = 47,  gpad = "DPAD LEFT" },
+    { ctrl = 56,  gpad = "Y" },
+    { ctrl = 57,  gpad = "B" },
+    { ctrl = 70,  gpad = "A" },
+    { ctrl = 71,  gpad = "RT" },
+    { ctrl = 72,  gpad = "LT" },
+    { ctrl = 73,  gpad = "A" },
+    { ctrl = 74,  gpad = "DPAD RIGHT" },
+    { ctrl = 75,  gpad = "Y" },
+    { ctrl = 76,  gpad = "RB" },
+    { ctrl = 79,  gpad = "R3" },
+    { ctrl = 81,  gpad = "(NONE)" },
+    { ctrl = 82,  gpad = "(NONE)" },
+    { ctrl = 83,  gpad = "(NONE)" },
+    { ctrl = 84,  gpad = "(NONE)" },
+    { ctrl = 84,  gpad = "DPAD LEFT" },
+    { ctrl = 96,  gpad = "(NONE)" },
+    { ctrl = 97,  gpad = "(NONE)" },
+    { ctrl = 124, gpad = "LEFT STICK" },
+    { ctrl = 125, gpad = "LEFT STICK" },
+    { ctrl = 112, gpad = "LEFT STICK" },
+    { ctrl = 127, gpad = "LEFT STICK" },
+    { ctrl = 117, gpad = "LB" },
+    { ctrl = 118, gpad = "RB" },
+    { ctrl = 167, gpad = "(NONE)" },
+    { ctrl = 168, gpad = "(NONE)" },
+    { ctrl = 169, gpad = "(NONE)" },
+    { ctrl = 170, gpad = "B" },
+    { ctrl = 172, gpad = "DPAD UP" },
+    { ctrl = 173, gpad = "DPAD DOWN" },
+    { ctrl = 174, gpad = "DPAD LEFT" },
+    { ctrl = 175, gpad = "DPAD RIGHT" },
+    { ctrl = 178, gpad = "Y" },
+    { ctrl = 194, gpad = "B" },
+    { ctrl = 243, gpad = "(NONE)" },
+    { ctrl = 244, gpad = "BACK" },
+    { ctrl = 249, gpad = "(NONE)" },
+    { ctrl = 288, gpad = "A" },
+    { ctrl = 289, gpad = "X" },
+    { ctrl = 303, gpad = "DPAD UP" },
+    { ctrl = 307, gpad = "DPAD RIGHT" },
+    { ctrl = 308, gpad = "DPAD LEFT" },
+    { ctrl = 311, gpad = "DPAD DOWN" },
+    { ctrl = 318, gpad = "START" },
+    { ctrl = 322, gpad = "(NONE)" },
+    { ctrl = 344, gpad = "DPAD RIGHT" },
+}
+
+t_UISounds = {
+    ["Radar"] = {
+        soundName = "RADAR_ACTIVATE",
+        soundRef = "DLC_BTL_SECURITY_VANS_RADAR_PING_SOUNDS"
+    },
+    ["Select"] = {
+        soundName = "SELECT",
+        soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET"
+    },
+    ["Pickup"] = {
+        soundName = "PICK_UP",
+        soundRef = "HUD_FRONTEND_DEFAULT_SOUNDSET"
+    },
+    ["W_Pickup"] = {
+        soundName = "PICK_UP_WEAPON",
+        soundRef = "HUD_FRONTEND_CUSTOM_SOUNDSET"
+    },
+    ["Fail"] = {
+        soundName = "CLICK_FAIL",
+        soundRef = "WEB_NAVIGATION_SOUNDS_PHONE"
+    },
+    ["Click"] = {
+        soundName = "CLICK_LINK",
+        soundRef = "DLC_H3_ARCADE_LAPTOP_SOUNDS"
+    },
+    ["Notif"] = {
+        soundName = "LOSE_1ST",
+        soundRef = "GTAO_FM_EVENTS_SOUNDSET"
+    },
+    ["Delete"] = {
+        soundName = "DELETE",
+        soundRef = "HUD_DEATHMATCH_SOUNDSET"
+    },
+    ["Cancel"] = {
+        soundName = "CANCEL",
+        soundRef = "HUD_FREEMODE_SOUNDSET"
+    },
+    ["Error"] = {
+        soundName = "ERROR",
+        soundRef = "HUD_FREEMODE_SOUNDSET"
+    },
+    ["Nav"] = {
+        soundName = "NAV_LEFT_RIGHT",
+        soundRef = "HUD_FREEMODE_SOUNDSET"
+    },
+    ["Nav2"] = {
+        soundName = "NAV_UP_DOWN",
+        soundRef = "HUD_FREEMODE_SOUNDSET"
+    },
+    ["Select2"] = {
+        soundName = "CHANGE_STATION_LOUD",
+        soundRef = "RADIO_SOUNDSET"
+    },
+    ["Focus_In"] = {
+        soundName = "FOCUSIN",
+        soundRef = "HINTCAMSOUNDS"
+    },
+    ["Focus_Out"] = {
+        soundName = "FOCUSOUT",
+        soundRef = "HINTCAMSOUNDS"
+    },
+}
+
+t_RGBloopColors = {
+    { 0,   255, 255, 255 },
+    { 0,   127, 255, 255 },
+    { 0,   0,   255, 255 },
+    { 127, 0,   255, 255 },
+    { 255, 0,   255, 255 },
+    { 255, 0,   127, 255 },
+    { 255, 0,   0,   255 },
+    { 255, 127, 0,   255 },
+    { 255, 255, 0,   255 },
+    { 127, 255, 0,   255 },
+    { 0,   255, 0,   255 },
+    { 0,   255, 127, 255 }
+
+}
+
+t_PedBones = {
+    { name = "Root",       ID = 0 },
+    { name = "Head",       ID = 12844 },
+    { name = "Spine 00",   ID = 23553 },
+    { name = "Spine 01",   ID = 24816 },
+    { name = "Spine 02",   ID = 24817 },
+    { name = "Spine 03",   ID = 24818 },
+    { name = "Right Hand", ID = 6286 },
+    { name = "Left Hand",  ID = 18905 },
+    { name = "Right Foot", ID = 35502 },
+    { name = "Left Foot",  ID = 14201 },
+}
+
+t_ReservedKeys = {
+    kb   = {
+        0x01,
+        0x07,
+        0x0A,
+        0x0B,
+        0x1B,
+        0x24,
+        0x2C,
+        0x2D,
+        0x46,
+        0x5B,
+        0x5C,
+        0x5E,
+    },
+    gpad = {
+        23,
+        24,
+        25,
+        71,
+        75,
+    }
+}
+
+t_CellInputs = {
+    { control = 172, input = 1 },
+    { control = 173, input = 2 },
+    { control = 174, input = 3 },
+    { control = 175, input = 4 },
+    { control = 176, input = 5 },
+    { control = 177, input = 5 },
+    { control = 178, input = 5 },
+    { control = 179, input = 5 },
+    { control = 180, input = 1 },
+    { control = 181, input = 2 },
+}
+
+t_RadioStations = {
+    { station = "RADIO_11_TALK_02",               name = "Blaine County Radio" },
+    { station = "RADIO_21_DLC_XM17",              name = "Blonded Los Santos 97.8 FM" },
+    { station = "RADIO_04_PUNK",                  name = "Channel X" },
+    { station = "RADIO_08_MEXICAN",               name = "East Los FM" },
+    { station = "RADIO_14_DANCE_02",              name = "FlyLo FM" },
+    { station = "RADIO_23_DLC_XM19_RADIO",        name = "iFruit Radio" },
+    { station = "RADIO_34_DLC_HEI4_KULT",         name = "Kult FM" },
+    { station = "RADIO_01_CLASS_ROCK",            name = "Los Santos Rock Radio" },
+    { station = "RADIO_22_DLC_BATTLE_MIX1_RADIO", name = "Los Santos Underground Radio" },
+    { station = "RADIO_36_AUDIOPLAYER",           name = "Media Player" },
+    { station = "RADIO_02_POP",                   name = "Non-Stop-Pop FM" },
+    { station = "RADIO_03_HIPHOP_NEW",            name = "Radio Los Santos" },
+    { station = "RADIO_16_SILVERLAKE",            name = "Radio Mirror Park" },
+    { station = "RADIO_30_DLC_HEI4_MIX1_REVERB",  name = "Rave DJ Set" },
+    { station = "RADIO_06_COUNTRY",               name = "Rebel Radio" },
+    { station = "RADIO_19_USER",                  name = "Self Radio" },
+    { station = "RADIO_07_DANCE_01",              name = "Soulwax FM" },
+    { station = "RADIO_17_FUNK",                  name = "Space 103.2" },
+    { station = "RADIO_27_DLC_PRHEI4",            name = "Still Slipping Los Santos" },
+    { station = "RADIO_12_REGGAE",                name = "The Blue Ark" },
+    { station = "RADIO_20_THELAB",                name = "The Lab" },
+    { station = "RADIO_15_MOTOWN",                name = "The Lowdown 9.11" },
+    { station = "RADIO_35_DLC_HEI4_MLR",          name = "The Music Locker" },
+    { station = "HIDDEN_RADIO_STRIP_CLUB",        name = "Vanilla Unicorn" },
+    { station = "RADIO_18_90S_ROCK",              name = "Vinewood Boulevard Radio" },
+    { station = "RADIO_09_HIPHOP_OLD",            name = "West Coast Classics" },
+    { station = "RADIO_05_TALK_01",               name = "West Coast Talk Radio" },
+    { station = "RADIO_13_JAZZ",                  name = "Worldwide FM" },
+}
+
+t_PEcombatAttributes = {
     { id = 5,  bool = true },
     { id = 13, bool = true },
     { id = 21, bool = true },
@@ -655,7 +806,7 @@ t_PEcombatAttributes        = {
     { id = 63, bool = false },
 }
 
-t_PEconfigFlags             = {
+t_PEconfigFlags = {
     { id = 128, bool = true },
     { id = 140, bool = true },
     { id = 141, bool = true },
@@ -665,7 +816,7 @@ t_PEconfigFlags             = {
     { id = 435, bool = true },
 }
 
-t_RandomQuotes = {
+eRandomQuotes = {
     "The Civic owner in your lobby is already removing the limiter as you read this.",
     "Miata is always the answer. Except when it's not.",
     "Fun Fact: DeadlineEm is actually my grandfather.",
@@ -708,430 +859,73 @@ t_RandomQuotes = {
     "Fun Fact: The inventor of the Pringles can is now buried in one.",
     "The most reliable part of your build is your regrets.",
     "Fun Fact: Bananas are berries, but strawberries aren't.",
+    "Wompus XVI never returned from that Faggio jack mission... Some say he ascended. Others say... memory pool limit.",
 }
 
-t_FlightControls            = {
-    72,
-    75,
-    87,
-    88,
-    89,
-    90,
-    106,
-    107,
-    108,
-    109,
-    110,
-    111,
-    112,
+t_AnnoyingSellMissions = {
+    ["CEO"] = {
+        type = "bool",
+        idx = {
+            f_15624 = 262145 + 15624, -- bool CEO Disable Air Attacked Sell Mission *(false)*
+            f_15636 = 262145 + 15636, -- bool CEO Disable Air Drop Sell Mission *(false)*
+            f_15642 = 262145 + 15642, -- bool CEO Disable Fly Low Sell Mission *(false)*
+            f_15643 = 262145 + 15643, -- bool CEO Disable Restricted Airspace Sell Mission *(false)*
+            f_15649 = 262145 + 15649, -- bool CEO Disable Attacked Sell Mission *(false)*
+            f_15651 = 262145 + 15651, -- bool CEO Disable Defend Sell Mission *(false)*
+            f_15679 = 262145 + 15679, -- bool CEO Disable No-Damage Sell Mission *(false)*
+            f_15680 = 262145 + 15680, -- bool CEO Disable Sea Attacked Sell Mission *(false)*
+            f_15686 = 262145 + 15686, -- bool CEO Disable Sea Defend Sell Mission *(false)*
+            f_15692 = 262145 + 15692, -- bool CEO Disable Sting Operation Sell Mission *(false)*
+            f_15698 = 262145 + 15698, -- bool CEO Disable Trackify Sell Mission *(false)*
+        }
+    },
+    ["Biker"] = {
+        type = "bool",
+        idx = {
+            f_18356 = 262145 + 18356, -- bool MC Disable Convoy Sell Mission *(false)*
+            -- f_18358 = 262145 + 18358, -- bool MC Disable Trashmaster Sell Mission *(false)*
+            f_18361 = 262145 + 18361, -- bool MC Disable Proven Sell Mission *(false)*
+            f_18363 = 262145 + 18363, -- bool MC Disable Friends In Need Sell Mission *(false)*
+            f_18366 = 262145 + 18366, -- bool MC Disable Border Patrol Sell Mission *(false)*
+            f_18388 = 262145 + 18388, -- bool MC Disable Heli Drop Sell Mission *(false)*
+            f_18391 = 262145 + 18391, -- bool MC Disable Post OP Sell Mission *(false)*
+            f_18393 = 262145 + 18393, -- bool MC Disable Air Drop Sell Mission *(false)*
+            f_18398 = 262145 + 18398, -- bool MC Disable Sting Operation Sell Mission *(false)*
+            -- f_18400 = 262145 + 18400, -- bool MC Disable Benson Sell Mission *(false)*
+            f_18408 = 262145 + 18408, -- bool MC Disable Race Sell Mission *(false)*
+        }
+    },
+    ["Nightclub"] = {
+        type = "float",
+        idx = {
+            f_24048 = 262145 + 24048, -- float Nightclub Sell Mission Multi Drop *(1.0)*
+            f_24049 = 262145 + 24049, -- float Nightclub Sell Mission Hack Drop *(1.0)*
+            f_24050 = 262145 + 24050, -- float Nightclub Sell Mission Roadblock *(1.0)*
+            f_24051 = 262145 + 24051, -- float Nightclub Sell Mission Protect Buyer *(1.0)*
+            f_24052 = 262145 + 24052, -- float Nightclub Sell Mission Undercover Cops *(1.0)*
+            f_24053 = 262145 + 24053, -- float Nightclub Sell Mission Offshore Transfer *(1.0)*
+            f_24054 = 262145 + 24054, -- float Nightclub Sell Mission Not a Scratch *(1.0)*
+            f_24055 = 262145 + 24055, -- float Nightclub Sell Mission Follow Heli *(1.0)*
+            f_24056 = 262145 + 24056, -- float Nightclub Sell Mission Find Buyer *(1.0)*
+        },
+    },
+    ["Hangar"] = {
+        type = "float",
+        idx = {
+            f_22472 = 262145 + 22472, -- float Hangar Heavy Lifting Sell Mission *(1.0)*
+            f_22509 = 262145 + 22509, -- float Hangar Contested Sell Mission *(1.0)*
+            -- f_22511 = 262145 + 22511, -- float Hangar Agile Delivery Sell Mission *(1.0)*
+            -- f_22513 = 262145 + 22513, -- float Hangar Precision Delivery Sell Mission *(1.0)*
+            f_22515 = 262145 + 22515, -- float Hangar Flying Fortress Sell Mission *(1.0)*
+            -- f_22517 = 262145 + 22517, -- float Hangar Fly Low Sell Mission *(1.0)*
+            f_22519 = 262145 + 22519, -- float Hangar Air Delivery Sell Mission *(1.0)*
+            f_22521 = 262145 + 22521, -- float Hangar Air Police Sell Mission *(1.0)*
+            f_22523 = 262145 + 22523, -- float Hangar Under The Radar Sell Mission *(1.0)*
+        },
+    },
 }
 
-Global_262145               = {
-    f_4413  = 262145 + 4413,  -- int Snow Weather
-    f_13059 = 262145 + 13059, -- int VIP Work CD
-    f_13060 = 262145 + 13060, -- int VIP Challenge CD
-    f_15397 = 262145 + 15397, -- int Hangar CD_1 *(600000ms)*
-    f_15499 = 262145 + 15499, -- int CEO Buy CD *(300000ms)*
-    f_15500 = 262145 + 15500, -- int CEO Sell CD *(1800000ms)*
-    f_15501 = 262145 + 15501, -- int CEO Buy Failure CD *(off)*
-    f_15502 = 262145 + 15502, -- int CEO Sell Failure CD *(off)*
-    f_15624 = 262145 + 15624, -- bool CEO Disable Air Attacked Sell Mission *(false)*
-    f_15636 = 262145 + 15636, -- bool CEO Disable Air Drop Sell Mission *(false)*
-    f_15642 = 262145 + 15642, -- bool CEO Disable Fly Low Sell Mission *(false)*
-    f_15643 = 262145 + 15643, -- bool CEO Disable Restricted Airspace Sell Mission *(false)*
-    f_15649 = 262145 + 15649, -- bool CEO Disable Attacked Sell Mission *(false)*
-    f_15651 = 262145 + 15651, -- bool CEO Disable Defend Sell Mission *(false)*
-    f_15679 = 262145 + 15679, -- bool CEO Disable No-Damage Sell Mission *(false)*
-    f_15680 = 262145 + 15680, -- bool CEO Disable Sea Attacked Sell Mission *(false)*
-    f_15686 = 262145 + 15686, -- bool CEO Disable Sea Defend Sell Mission *(false)*
-    f_15692 = 262145 + 15692, -- bool CEO Disable Sting Operation Sell Mission *(false)*
-    f_15698 = 262145 + 15698, -- bool CEO Disable Trackify Sell Mission *(false)*
-    f_17290 = 262145 + 17290, -- int Weed Production Time *(360000ms)*
-    f_17291 = 262145 + 17291, -- int Meth Production Time *(180000ms)*
-    f_17292 = 262145 + 17292, -- int Coke Production Time *(3000000ms)*
-    f_17293 = 262145 + 17293, -- int Fake Documents Production Time *(300000ms)*
-    f_17294 = 262145 + 17294, -- int Fake Cash Production Time *(720000ms)*
-    f_17319 = 262145 + 17319, -- int Fake Documents Unit Value
-    f_17320 = 262145 + 17320, -- int Cash Factory Unit Value
-    f_17321 = 262145 + 17321, -- int Cocaine Unit Value
-    f_17322 = 262145 + 17322, -- int Meth Unit Value
-    f_17323 = 262145 + 17323, -- int Weed Unit Value
-    f_17324 = 262145 + 17324, -- int Acid Unit Value
-    f_17325 = 262145 + 17325, -- int Fake Documents Equipment Upgrade Boost Amount
-    f_17326 = 262145 + 17326, -- int Cash Factory Equipment Upgrade Boost Amount
-    f_17327 = 262145 + 17327, -- int Cocaine Equipment Upgrade Boost Amount
-    f_17328 = 262145 + 17328, -- int Meth Equipment Upgrade Boost Amount
-    f_17329 = 262145 + 17329, -- int Weed Equipment Upgrade Boost Amount
-    f_17330 = 262145 + 17330, -- int Acid Lab Upgrade Boost Amount
-    f_17331 = 262145 + 17331, -- int Fake Documents Staff Upgrade Boost Amount
-    f_17332 = 262145 + 17332, -- int Cash Factory Staff Upgrade Boost Amount
-    f_17333 = 262145 + 17333, -- int Cocaine Staff Upgrade Boost Amount
-    f_17334 = 262145 + 17334, -- int Meth Staff Upgrade Boost Amount
-    f_17335 = 262145 + 17335, -- int Weed Staff Upgrade Boost Amount
-    f_18356 = 262145 + 18356, -- bool MC Disable Convoy Sell Mission *(false)*
-    f_18358 = 262145 + 18358, -- bool MC Disable Trashmaster Sell Mission *(false)*
-    f_18361 = 262145 + 18361, -- bool MC Disable Proven Sell Mission *(false)*
-    f_18363 = 262145 + 18363, -- bool MC Disable Friends In Need Sell Mission *(false)*
-    f_18366 = 262145 + 18366, -- bool MC Disable Border Patrol Sell Mission *(false)*
-    f_18388 = 262145 + 18388, -- bool MC Disable Heli Drop Sell Mission *(false)*
-    f_18391 = 262145 + 18391, -- bool MC Disable Post OP Sell Mission *(false)*
-    f_18393 = 262145 + 18393, -- bool MC Disable Air Drop Sell Mission *(false)*
-    f_18398 = 262145 + 18398, -- bool MC Disable Sting Operation Sell Mission *(false)*
-    f_18400 = 262145 + 18400, -- bool MC Disable Benson Sell Mission *(false)*
-    f_18408 = 262145 + 18408, -- bool MC Disable Race Sell Mission *(false)*
-    f_18571 = 262145 + 18571, -- int MC Work CD *(180000ms)*
-    f_19077 = 262145 + 19077, -- int I/E Vehicle Source CD *(180000ms)*
-    f_19153 = 262145 + 19153, -- int I/E Vehicle Sell CD *(180000ms)*
-    f_19432 = 262145 + 19432, -- int I/E Vehicle Sell CD_1 *(1200000ms)*
-    f_19433 = 262145 + 19433, -- int I/E Vehicle Sell CD_2 *(1680000ms)*
-    f_19434 = 262145 + 19434, -- int I/E Vehicle Sell CD_3 *(2340000ms)*
-    f_19435 = 262145 + 19435, -- int I/E Vehicle Sell CD_4 *(2880000ms)*
-    f_21254 = 262145 + 21254, -- int Bunker Crate Value
-    f_21255 = 262145 + 21255, -- int Bunker Equipment Upgrade Boost Amount
-    f_21256 = 262145 + 21256, -- int Bunker Staff Upgrade Boost Amount
-    f_21286 = 262145 + 21286, -- int MOC Request CD *(120000)*
-    f_21573 = 262145 + 21573, -- int Acid Lab Request CD *(300000)*
-    f_22433 = 262145 + 22433, -- int Hangar Steal CD_1 *(120000ms)*
-    f_22434 = 262145 + 22434, -- int Hangar Steal CD_2 *(180000ms)*
-    f_22435 = 262145 + 22435, -- int Hangar Steal CD_3 *(240000ms)*
-    f_22472 = 262145 + 22472, -- int Hangar Heavy Lifting Sell Mission *(1.0)*
-    f_22474 = 262145 + 22474, -- int Hangar Sell CD *(180000ms)*
-    f_22509 = 262145 + 22509, -- int Hangar Contested Sell Mission *(1.0)*
-    f_22511 = 262145 + 22511, -- int Hangar Agile Delivery Sell Mission *(1.0)*
-    f_22513 = 262145 + 22513, -- int Hangar Precision Delivery Sell Mission *(1.0)*
-    f_22515 = 262145 + 22515, -- int Hangar Flying Fortress Sell Mission *(1.0)*
-    f_22517 = 262145 + 22517, -- int Hangar Fly Low Sell Mission *(1.0)*
-    f_22519 = 262145 + 22519, -- int Hangar Air Delivery Sell Mission *(1.0)*
-    f_22521 = 262145 + 22521, -- int Hangar Air Police Sell Mission *(1.0)*
-    f_22523 = 262145 + 22523, -- int Hangar Under The Radar Sell Mission *(1.0)*
-    f_22732 = 262145 + 22732, -- int Orbital Cannon CD *(2880000ms)*
-    f_24026 = 262145 + 24026, -- int Nightclub Management CD *(300000ms)*
-    f_24047 = 262145 + 24047, -- int Nightclub Sell Mission Single Drop *(1.0)*
-    f_24048 = 262145 + 24048, -- int Nightclub Sell Mission Multi Drop *(1.0)*
-    f_24049 = 262145 + 24049, -- int Nightclub Sell Mission Hack Drop *(1.0)*
-    f_24050 = 262145 + 24050, -- int Nightclub Sell Mission Roadblock *(1.0)*
-    f_24051 = 262145 + 24051, -- int Nightclub Sell Mission Protect Buyer *(1.0)*
-    f_24052 = 262145 + 24052, -- int Nightclub Sell Mission Undercover Cops *(1.0)*
-    f_24053 = 262145 + 24053, -- int Nightclub Sell Mission Offshore Transfer *(1.0)*
-    f_24054 = 262145 + 24054, -- int Nightclub Sell Mission Not a Scratch *(1.0)*
-    f_24055 = 262145 + 24055, -- int Nightclub Sell Mission Follow Heli *(1.0)*
-    f_24056 = 262145 + 24056, -- int Nightclub Sell Mission Find Buyer *(1.0)*
-    f_24208 = 262145 + 24208, -- int Terrorbyte Jobs Global CD *(300000ms)*
-    f_24209 = 262145 + 24209, -- int Terrorbyte Bank Job CD *(1800000ms)*
-    f_24210 = 262145 + 24210, -- int Terrorbyte Data Hack CD *(1800000ms)*
-    f_24211 = 262145 + 24211, -- int Terrorbyte Infiltration CD *(1800000ms)*
-    f_24212 = 262145 + 24212, -- int Terrorbyte Jewel Store CD *(1800000ms)*
-    f_24234 = 262145 + 24234, -- int Terrorbyte Drone CD *(60000ms)*
-    f_24235 = 262145 + 24235, -- int Terrorbyte Drone Shock CD *(12000ms)*
-    f_24236 = 262145 + 24236, -- int Terrorbyte Drone Shock Damage To Players *(1)*
-    f_24237 = 262145 + 24237, -- int Terrorbyte Drone Shock Damage To NPCs *(250)*
-    f_24238 = 262145 + 24238, -- int Terrorbyte Drone Detonate Time *(7000ms)*
-    f_24239 = 262145 + 24239, -- int Terrorbyte Drone Boost Duration *(4000ms)*
-    f_24240 = 262145 + 24240, -- int Terrorbyte Drone Boost Recharge Time *(15000ms)*
-    f_24241 = 262145 + 24241, -- int Terrorbyte Drone Health *(100)*
-    f_24242 = 262145 + 24242, -- int Terrorbyte Drone Height Limit *(200)*
-    f_24243 = 262145 + 24243, -- int Terrorbyte Drone Distance Limit *(500.0)*
-    f_24244 = 262145 + 24244, -- int Terrorbyte Drone Speed *(35.0)*
-    f_24266 = 262145 + 24266, -- int Terrorbyte Request CD *(120000ms)*
-    f_24282 = 262145 + 24282, -- int Submarine Request CD *(120000ms)*
-    f_26794 = 262145 + 26794, -- int Casino Work Request CD *(180000ms)*
-    f_30357 = 262145 + 30357, -- int Autoshop Robbery CD *(3600s)*
-    f_31038 = 262145 + 31038, -- int Security Missions CD *(600000ms)*
-    f_31118 = 262145 + 31118, -- int Payphone Hits CD *(600000ms)*
-    f_31119 = 262145 + 31118, -- int Agency SUV Request CD *(120000ms)*
-    f_31882 = 262145 + 31882, -- int NC VIP Mission Spawn Chance% *(50)*
-    f_31914 = 262145 + 31914, -- int NC Source Truck CD *(960000ms)*
-    f_32158 = 262145 + 32158, -- int Halloween Weather
-}
-
--- boolean
-t_ceo_sell_mission_types    = {
-    f_15624 = 262145 + 15624, -- bool CEO Disable Air Attacked Sell Mission *(false)*
-    f_15636 = 262145 + 15636, -- bool CEO Disable Air Drop Sell Mission *(false)*
-    f_15642 = 262145 + 15642, -- bool CEO Disable Fly Low Sell Mission *(false)*
-    f_15643 = 262145 + 15643, -- bool CEO Disable Restricted Airspace Sell Mission *(false)*
-    f_15649 = 262145 + 15649, -- bool CEO Disable Attacked Sell Mission *(false)*
-    f_15651 = 262145 + 15651, -- bool CEO Disable Defend Sell Mission *(false)*
-    f_15679 = 262145 + 15679, -- bool CEO Disable No-Damage Sell Mission *(false)*
-    f_15680 = 262145 + 15680, -- bool CEO Disable Sea Attacked Sell Mission *(false)*
-    f_15686 = 262145 + 15686, -- bool CEO Disable Sea Defend Sell Mission *(false)*
-    f_15692 = 262145 + 15692, -- bool CEO Disable Sting Operation Sell Mission *(false)*
-    f_15698 = 262145 + 15698, -- bool CEO Disable Trackify Sell Mission *(false)*
-}
-
--- boolean
-t_mc_sell_mission_types     = {
-    f_18356 = 262145 + 18356, -- bool MC Disable Convoy Sell Mission *(false)*
-    -- f_18358 = 262145 + 18358, -- bool MC Disable Trashmaster Sell Mission *(false)*
-    f_18361 = 262145 + 18361, -- bool MC Disable Proven Sell Mission *(false)*
-    f_18363 = 262145 + 18363, -- bool MC Disable Friends In Need Sell Mission *(false)*
-    f_18366 = 262145 + 18366, -- bool MC Disable Border Patrol Sell Mission *(false)*
-    f_18388 = 262145 + 18388, -- bool MC Disable Heli Drop Sell Mission *(false)*
-    f_18391 = 262145 + 18391, -- bool MC Disable Post OP Sell Mission *(false)*
-    f_18393 = 262145 + 18393, -- bool MC Disable Air Drop Sell Mission *(false)*
-    f_18398 = 262145 + 18398, -- bool MC Disable Sting Operation Sell Mission *(false)*
-    -- f_18400 = 262145 + 18400, -- bool MC Disable Benson Sell Mission *(false)*
-    f_18408 = 262145 + 18408, -- bool MC Disable Race Sell Mission *(false)*
-}
-
--- float
-t_nc_sell_mission_types     = {
-    f_24048 = 262145 + 24048, -- float Nightclub Sell Mission Multi Drop *(1.0)*
-    f_24049 = 262145 + 24049, -- float Nightclub Sell Mission Hack Drop *(1.0)*
-    f_24050 = 262145 + 24050, -- float Nightclub Sell Mission Roadblock *(1.0)*
-    f_24051 = 262145 + 24051, -- float Nightclub Sell Mission Protect Buyer *(1.0)*
-    f_24052 = 262145 + 24052, -- float Nightclub Sell Mission Undercover Cops *(1.0)*
-    f_24053 = 262145 + 24053, -- float Nightclub Sell Mission Offshore Transfer *(1.0)*
-    f_24054 = 262145 + 24054, -- float Nightclub Sell Mission Not a Scratch *(1.0)*
-    f_24055 = 262145 + 24055, -- float Nightclub Sell Mission Follow Heli *(1.0)*
-    f_24056 = 262145 + 24056, -- float Nightclub Sell Mission Find Buyer *(1.0)*
-}
-
--- float
-t_hangar_sell_mission_types = {
-    f_22472 = 262145 + 22472, -- float Hangar Heavy Lifting Sell Mission *(1.0)*
-    f_22509 = 262145 + 22509, -- float Hangar Contested Sell Mission *(1.0)*
-    -- f_22511 = 262145 + 22511, -- float Hangar Agile Delivery Sell Mission *(1.0)*
-    -- f_22513 = 262145 + 22513, -- float Hangar Precision Delivery Sell Mission *(1.0)*
-    f_22515 = 262145 + 22515, -- float Hangar Flying Fortress Sell Mission *(1.0)*
-    -- f_22517 = 262145 + 22517, -- float Hangar Fly Low Sell Mission *(1.0)*
-    f_22519 = 262145 + 22519, -- float Hangar Air Delivery Sell Mission *(1.0)*
-    f_22521 = 262145 + 22521, -- float Hangar Air Police Sell Mission *(1.0)*
-    f_22523 = 262145 + 22523, -- float Hangar Under The Radar Sell Mission *(1.0)*
-}
-
-t_WorldSeats                = {
-    "prop_bench_01a",
-    "prop_table_01_chr_b",
-    "prop_bench_05",
-    "prop_rub_couch02",
-    "prop_hobo_seat_01",
-    "prop_skid_chair_02",
-    "prop_bench_02",
-    "prop_bench_09",
-    "prop_waiting_seat_01",
-    "prop_table_06_chr",
-    "prop_bench_10",
-    "prop_chair_04b",
-    "prop_rub_couch03",
-    "prop_table_03_chr",
-    "prop_bench_03",
-    "prop_table_01_chr_a",
-    "prop_table_02_chr",
-    "prop_chair_01b",
-    "prop_bench_11",
-    "prop_rub_couch01",
-    "prop_chair_01a",
-    "prop_chair_06",
-    "prop_table_03b_chr",
-    "prop_old_deck_chair",
-    "prop_rub_couch04",
-    "prop_skid_chair_01",
-    "prop_table_05_chr",
-    "prop_chair_03",
-    "prop_bench_08",
-    "v_club_officechair",
-    "v_corp_cd_chair",
-    "prop_off_chair_03",
-    "prop_skid_chair_03",
-    "prop_chair_02",
-    "prop_chair_05",
-    "prop_chateau_chair_01",
-    "prop_bench_06",
-    "prop_bench_07",
-    "prop_wait_bench_01",
-    "prop_off_chair_04",
-    "v_serv_ct_chair02",
-    "prop_table_04_chr",
-    "v_corp_offchair",
-    "prop_off_chair_05",
-    "prop_roller_car_01",
-    "prop_roller_car_02",
-    "prop_yacht_seat_01",
-    "prop_yacht_seat_02",
-    "prop_yacht_seat_03",
-    "prop_chair_08",
-    "prop_chair_10",
-    "prop_ld_bench01",
-    "prop_chair_04a",
-    "prop_off_chair_01",
-    "prop_bench_04",
-    "prop_chair_09",
-    "prop_rock_chair_01",
-    "hei_prop_yah_seat_02",
-    "hei_prop_yah_seat_03",
-    "hei_prop_yah_seat_01",
-    "h4_prop_h4_chair_01a",
-    "h4_prop_h4_couch_01a",
-    "h4_prop_h4_weed_chair_01a",
-    "prop_fib_3b_bench",
-    "v_ilev_ph_bench",
-    "v_ilev_leath_chr",
-    "v_corp_bk_chair3",
-    "prop_gc_chair02",
-    "v_ilev_fh_dineeamesa",
-    "v_ilev_hd_chair",
-    "v_ilev_m_sofa",
-    "v_ilev_chair02_ped",
-    "v_ilev_p_easychair",
-    "v_ilev_fh_kitchenstool",
-    "prop_off_chair_04_s",
-    "prop_ld_farm_couch01",
-    "prop_ld_farm_couch02",
-    "prop_ld_farm_chair01",
-    "v_ret_gc_chair03",
-    "prop_old_wood_chair",
-    "prop_off_chair_04b",
-    "ch_prop_casino_chair_01a",
-    "ch_chint01_gamingr1_sofa",
-    "ch_prop_casino_track_chair_01",
-    "ch_chint03_sofas",
-    "ch_chint07_foyer_sofa_01",
-    "ch_chint07_foyer_sofa_03",
-    "ch_chint07_foyer_sofa_004",
-    "h4_mp_h_yacht_armchair_01",
-    "h4_mp_h_yacht_armchair_03",
-    "h4_mp_h_yacht_armchair_04",
-    "h4_mp_h_yacht_sofa_02",
-    "h4_mp_h_yacht_sofa_01",
-    "h4_mp_h_yacht_strip_chair_01",
-    "h4_int_05_wooden_chairs_2",
-    "h4_int_05_wood_chair_2",
-    "h4_int_05_wooden_chairs_3",
-    "h4_int_05_wood_chair_003",
-    "h4_int_05_wood_chair_1",
-    "h4_int_04_armchair_fireplace",
-    "h4_int_04_arm_chair",
-    "h4_int_04_chair_chesterfield_01a",
-    "h4_int_04_desk_chair"
-}
-
-t_TrashBins                 = {
-    "m23_2_prop_m32_dumpster_01a",
-    "prop_cs_dumpster_01a",
-    "prop_dumpster_01a",
-    "prop_dumpster_02a",
-    "prop_dumpster_02b",
-    "prop_dumpster_3a",
-    "prop_dumpster_4a",
-    "prop_dumpster_4b",
-    "p_dumpster_t",
-}
-
-t_AppScriptNames            = {
-    "apparcadebusiness",
-    "apparcadebusinesshub",
-    "appavengeroperations",
-    "appbailoffice",
-    "appbikerbusiness",
-    "appbroadcast",
-    "appbunkerbusiness",
-    "appbusinesshub",
-    "appcamera",
-    "appchecklist",
-    "appcontacts",
-    "appcovertops",
-    "appemail",
-    "appextraction",
-    "appfixersecurity",
-    "apphackertruck",
-    "apphackerden",
-    "apphs_sleep",
-    "appimportexport",
-    "appinternet",
-    "appjipmp",
-    "appmedia",
-    "appmpbossagency",
-    "appmpemail",
-    "appmpjoblistnew",
-    "apporganiser",
-    "appprogresshub",
-    "apprepeatplay",
-    "appsecurohack",
-    "appsecuroserv",
-    "appsettings",
-    "appsidetask",
-    "appsmuggler",
-    "apptextmessage",
-    "apptrackify",
-    "appvinewoodmenu",
-    "appvlsi",
-    "appzit",
-    -- "debug_app_select_screen",
-}
-
-t_ModshopScriptNames        = {
-    "arena_carmod",
-    "armory_aircraft_carmod",
-    "base_carmod",
-    "business_hub_carmod",
-    "car_meet_carmod",
-    "carmod_shop",
-    "fixer_hq_carmod",
-    "hacker_truck_carmod",
-    "hangar_carmod",
-    "juggalo_hideout_carmod",
-    "personal_carmod_shop",
-    "tuner_property_carmod",
-    -- "vinewood_premium_garage_carmod",
-}
-
-t_CustomPintShades          = {
-    "All",
-    "Beige",
-    "Black",
-    "Blue",
-    "Brown",
-    "Gold",
-    "Green",
-    "Grey",
-    "Orange",
-    "Pink",
-    "Purple",
-    "Red",
-    "White",
-    "Yellow",
-}
-
-t_CustomPaintsManufacturers = {
-    "All",
-    "Alfa Romeo",
-    "AMC",
-    "Apollo Automobili",
-    "Aston Martin",
-    "Audi",
-    "Austin/Morris",
-    "Bentley",
-    "BMW",
-    "Bugatti",
-    "Chevrolet",
-    "Dodge",
-    "Ferrari",
-    "Ford",
-    "Honda",
-    "Jaguar",
-    "Koeniggsegg",
-    "Lamborghini",
-    "Land Rover",
-    "Lexus",
-    "Lotus",
-    "Mazda",
-    "McLaren",
-    "Mercedes-AMG",
-    "Mercedes-Benz",
-    "Nissan",
-    "Pagani",
-    "Plymouth",
-    "Porsche",
-    "Rimac Automobili",
-    "Rolls-Royce",
-    "Spyker",
-    "Top Secret Jpn",
-    "Toyota",
-    "Volkswagen",
-}
-
-t_CustomPaints              = {
+t_CustomPaints = {
     { name = "AMG Matte Grey",                           hex = "#171717", p = 7,   m = true,  manufacturer = "Mercedes-AMG",      shade = "Grey" },
     { name = "AMG Matte Light Grey",                     hex = "#2B2B2B", p = 8,   m = true,  manufacturer = "Mercedes-AMG",      shade = "Grey" },
     { name = "Green Hell Magno",                         hex = "#00661F", p = 5,   m = true,  manufacturer = "Mercedes-AMG",      shade = "Green" },
@@ -1485,7 +1279,7 @@ t_CustomPaints              = {
     { name = "Hyper Red",                                hex = "#3C0612", p = 30,  m = false, manufacturer = "Aston Martin",      shade = "Red" },
 }
 
-t_EngineSwaps               = {
+t_EngineSwaps = {
     { name = "GM LS1 5.7L V8",              audioname = "coquette3", acc_mult = 4.556,   tt = "Its power is measured in freedoms per football field." },
     { name = "Subaru EJ15 1.5L F4",         audioname = "sultan2",   acc_mult = 2.82,    tt = "For the adventurous." },
     { name = "BMW N54B30 3.0L I6",          audioname = "sentinel",  acc_mult = 1.966,   tt = "Can't keep its oil inside." },
@@ -1496,8 +1290,7 @@ t_EngineSwaps               = {
     { name = "Lamborghini 6.5L V12",        audioname = "tempesta",  acc_mult = 6.8,     tt = "Pineapple on pizza." },
 }
 
-
-t_Locales           = {
+t_Locales = {
     { name = "English",             id = 0,  iso = "en-US" },
     { name = "French",              id = 1,  iso = "fr-FR" },
     { name = "German",              id = 2,  iso = "de-DE" },
@@ -1513,93 +1306,14 @@ t_Locales           = {
     { name = "Chinese Simplified",  id = 12, iso = "zh-CN" },
 }
 
-t_CollisionInvalidModels  = {
-    3008087081,
-    415536433,
-    874602658,
-    693843550,
-    4189527861,
-    1152297372,
-    3907562202,
-    2954040756,
-    1198649884,
-    1067874014,
+t_HijackOptions  = {
+    { name = "Dance Mode",           dict = "anim@amb@nightclub@mini@dance@dance_solo@shuffle@", anim = "high_center", },
+    { name = "Perverts Everywhere!", dict = "switch@trevor@jerking_off",                         anim = "trev_jerking_off_loop", },
+    { name = "Vanilla Unicorn",      dict = "mini@strip_club@private_dance@part3",               anim = "priv_dance_p3", },
+    { name = "Zombie Mode",          dict = "special_ped@zombie@monologue_1@monologue_1b",       anim = "iamundead_1", },
 }
 
-t_SellScripts             = {
-    ["gb_smuggler"] = { -- air
-        {               -- (1.70) while .*?0 < func_.*?\(func_.*?, func_.*?, .*?Local_....?\.f_....?, -1
-            l = 1985,
-            o = 1035,
-            v = 0
-        },
-        { -- (1.70) if .*?Local_....?\.f_....? > 0 && func_.*?&.*?Local_....?\.f_....?\), 30000, 0
-            l = 1985,
-            o = 1078,
-            v = 1
-        },
-    },
-
-    ["gb_gunrunning"] = {
-        { -- (1.70) .*?Local_1...?\.f_...? = func_.*?\(func_.*?\(\), .*?Local_1...?\.f_...?, .*?Param0, -1\);
-            l = 1262,
-            o = 774,
-            v = 0
-        },
-        { -- (1.70) func_....?\(Local_1...?\.f_...?, .*?1, \"GR_HUD_TOT\", .*?4, 1, 4, 0, 0, 0, 0, 0, 1, 1, 0, 255, 0\);
-            l = 1262,
-            o = 816,
-            v = 1
-        },
-    },
-
-    ["gb_contraband_sell"] = {
-        { -- (1.70) MISC::CLEAR_BIT\(.*?Local_...?\.f_1\), .*?Param0
-            l = 563,
-            o = 1,
-            v = 99999
-        },
-    },
-
-    ["gb_biker_contraband_sell"] = {
-        { -- (1.70) else if .*?!func_.*?\(1\) && .*?Local_...?\.f_...? > 0\)
-            l = 725,
-            o = 122,
-            v = 15
-        },
-    },
-
-    ["fm_content_acid_lab_sell"] = {
-        b = 5557, -- GENERICBITSET_I_WON -- (1.70) if .*?func_...?\(&.*?Local_....?, .*?Param0 // (uLocal_5557 = 4;)
-        l = 5653, -- (1.70) if .*?Local_5...?\.f_....? == 0\)
-        o = 1309
-    },
-
-    -- ["fm_content_smuggler_sell"] = {
-    --   b = 3991, -- GENERICBITSET_I_WON -- (1.70) if .*?func_...?\(&.*?Local_....?, .*?Param0 // (uLocal_3991 = 4;)
-    --   l = 4133, -- (1.70) if .*?Local_4...?\.f_....? == 0\)
-    --   o = 489
-    -- },
-}
-
-t_SellScriptsDisplayNames = {
-    { scr = "fm_content_smuggler_sell", sn = "Hangar (Land. Not supported.)" },
-    { scr = "gb_smuggler",              sn = "Hangar (Air)" },
-    { scr = "gb_contraband_sell",       sn = "CEO" },
-    { scr = "gb_gunrunning",            sn = "Bunker" },
-    { scr = "gb_biker_contraband_sell", sn = "Biker Business" },
-    { scr = "fm_content_acid_lab_sell", sn = "Acid Lab" },
-}
-
-t_ShouldTerminateScripts  = {
-    "appArcadeBusinessHub",
-    "appsmuggler",
-    "appbikerbusiness",
-    "appbunkerbusiness",
-    "appbusinesshub"
-}
-
-t_MovementOptions         = {
+t_MovementOptions = {
     { Name = "Arrogant (Female)",  mvmt = "move_f@arrogant@a",                      wmvmt = nil,                         strf = nil,                                        wanim = "Female" },
     { Name = "Bodybuilder",        mvmt = "move_m@muscle@a",                        wmvmt = nil,                         strf = nil,                                        wanim = "Default" },
     { Name = "Businessman",        mvmt = "move_m@business@a",                      wmvmt = nil,                         strf = nil,                                        wanim = "Default" },
@@ -1637,7 +1351,7 @@ t_MovementOptions         = {
 -- fuck it. I'll do it manually since my smol brain
 --
 -- Can not figure out a better way.
-t_CEOwarehouses           = {
+t_CEOwarehouses = {
     ["Convenience Store Lockup"] = {
         size = 0, max = 16, coords = vec3:new(249.246918, -1955.651978, 23.161957)
     },
@@ -1706,7 +1420,7 @@ t_CEOwarehouses           = {
     },
 }
 
-t_BikerBusinessIDs        = {
+t_BikerBusinessIDs = {
     { name = "Fake Documents",  id = 0, unit_max = 60, val_offset = 17319, blip = 498, possible_ids = { 5, 10, 15, 20 } },
     { name = "Weed",            id = 1, unit_max = 80, val_offset = 17323, blip = 496, possible_ids = { 2, 7, 12, 17 } },
     { name = "Fake Cash",       id = 2, unit_max = 40, val_offset = 17320, blip = 500, possible_ids = { 4, 9, 14, 19 } },
@@ -1714,7 +1428,7 @@ t_BikerBusinessIDs        = {
     { name = "Cocaine",         id = 4, unit_max = 10, val_offset = 17321, blip = 497, possible_ids = { 3, 8, 13, 18 } },
 }
 
-t_Hangars                 = {
+t_Hangars = {
     [1] = { name = "LSIA Hangar 1", coords = vec3:new(-1148.908447, -3406.064697, 13.945053) },
     [2] = { name = "LSIA Hangar A17", coords = vec3:new(-1393.322021, -3262.968262, 13.944828) },
     [3] = { name = "Fort Zancudo Hangar A2", coords = vec3:new(-2022.336304, 3154.936768, 32.810272) },
@@ -1722,7 +1436,7 @@ t_Hangars                 = {
     [5] = { name = "Fort Zancudo Hangar 3499", coords = vec3:new(-2470.278076, 3274.427734, 32.835461) },
 }
 
-t_Bunkers                 = {
+t_Bunkers = {
     [21] = { name = "Grand Senora Oilfields Bunker", coords = vec3:new(494.680878, 3015.895996, 41.041725) },
     [22] = { name = "Grand Senora Desert Bunker", coords = vec3:new(849.619812, 3024.425781, 41.266800) },
     [23] = { name = "Route 68 Bunker", coords = vec3:new(40.422565, 2929.004395, 55.746357) },
@@ -1736,30 +1450,137 @@ t_Bunkers                 = {
     [31] = { name = "Chumash Bunker", coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
 }
 
-t_AircraftMGs             = {
-    "VEHICLE_WEAPON_DOGFIGHTER_MG",
-    "VEHICLE_WEAPON_HUNTER_MG",
-    "VEHICLE_WEAPON_MICROLIGHT_MG",
-    "VEHICLE_WEAPON_ROGUE_MG",
-    "VEHICLE_WEAPON_SEABREEZE_MG",
-    "VEHICLE_WEAPON_TULA_MG",
-    "VEHICLE_WEAPON_TULA_NOSEMG",
-    "VEHICLE_WEAPON_AVENGER_CANNON",
-    "VEHICLE_WEAPON_BOMBUSHKA_CANNON",
-    "VEHICLE_WEAPON_HUNTER_CANNON",
-    "VEHICLE_WEAPON_ROGUE_CANNON",
-    "VEHICLE_WEAPON_STRIKEFORCE_CANNON",
-    "VEHICLE_WEAPON_RAIJU_CANNONS",
-    "VEHICLE_WEAPON_AKULA_TURRET_SINGLE",
-    "VEHICLE_WEAPON_AKULA_TURRET_DUAL",
-    "VEHICLE_WEAPON_MOGUL_TURRET",
-    "VEHICLE_WEAPON_MOGUL_DUALTURRET",
-    "VEHICLE_WEAPON_NOSE_TURRET_VALKYRIE",
-    "VEHICLE_WEAPON_TURRET_VALKYRIE",
-    "VEHICLE_WEAPON_PLAYER_LAZER",
-    "VEHICLE_WEAPON_PLAYER_SAVAGE",
-    "VEHICLE_WEAPON_PLAYER_HUNTER",
-    "VEHICLE_WEAPON_PLAYER_BUZZARD",
+t_BusinessSafeData = {
+    ["Nightclub"] = {
+        isOwned = function()
+            return stats.get_int("MPX_NIGHTCLUB_OWNED") ~= 0
+        end,
+        cashValue = function()
+            return stats.get_int("MPX_CLUB_SAFE_CASH_VALUE")
+        end,
+        max_cash = 25e4,
+        blip = 614,
+        popularity = function()
+            return stats.get_int("MPX_CLUB_POPULARITY")
+        end,
+        maxPop = function()
+            if stats.get_int("MPX_CLUB_POPULARITY") >= 1e3 then
+                return
+            end
+            stats.set_int("MPX_CLUB_POPULARITY", 1e3)
+        end
+    },
+    ["Arcade"] = {
+        isOwned = function()
+            return stats.get_int("MPX_ARCADE_OWNED") ~= 0
+        end,
+        cashValue = function()
+            return stats.get_int("MPX_ARCADE_SAFE_CASH_VALUE")
+        end,
+        max_cash = 1e5,
+        blip = 740,
+    },
+    ["Agency"] = {
+        isOwned = function()
+            return stats.get_int("MPX_FIXER_HQ_OWNED") ~= 0
+        end,
+        cashValue = function()
+            return stats.get_int("MPX_FIXER_SAFE_CASH_VALUE")
+        end,
+        max_cash = 25e4,
+        blip = 826,
+    },
+    ["MC Clubhouse"] = {
+        isOwned = function()
+            return stats.get_int("MPX_PROP_CLUBHOUSE") ~= 0
+        end,
+        cashValue = function()
+            return stats.get_int("MPX_BIKER_BAR_RESUPPLY_CASH")
+        end,
+        max_cash = 1e5,
+        blip = 492,
+    },
+    ["Bail Office"] = {
+        isOwned = function()
+            return stats.get_int("MPX_BAIL_OFFICE_OWNED") ~= 0
+        end,
+        cashValue = function()
+            return stats.get_int("MPX_BAIL_SAFE_CASH_VALUE")
+        end,
+        max_cash = 1e5,
+        blip = 893,
+    },
+    ["Salvage Yard"] = {
+        isOwned = function()
+            return stats.get_int("MPX_SALVAGE_YARD_OWNED") ~= 0
+        end,
+        cashValue = function()
+            return stats.get_int("MPX_SALVAGE_SAFE_CASH_VALUE")
+        end,
+        max_cash = 25e4,
+        blip = 867,
+    },
+    ["Garment Factory"] = {
+        isOwned = function()
+            return stats.get_int("MPX_HACKER_DEN_OWNED") ~= 0
+        end,
+        cashValue = function()
+            return stats.get_int("MPX_HDEN24_SAFE_CASH_VALUE")
+        end,
+        max_cash = 1e5,
+        blip = 900,
+    },
+}
+
+t_SellScripts = {
+    ["gb_smuggler"] = { -- air
+        {               -- (1.70) while .*?0 < func_.*?\(func_.*?, func_.*?, .*?Local_....?\.f_....?, -1
+            l = 1985,
+            o = 1035,
+            v = 0
+        },
+        { -- (1.70) if .*?Local_....?\.f_....? > 0 && func_.*?&.*?Local_....?\.f_....?\), 30000, 0
+            l = 1985,
+            o = 1078,
+            v = 1
+        },
+    },
+    ["gb_gunrunning"] = {
+        { -- (1.70) .*?Local_1...?\.f_...? = func_.*?\(func_.*?\(\), .*?Local_1...?\.f_...?, .*?Param0, -1\);
+            l = 1262,
+            o = 774,
+            v = 0
+        },
+        { -- (1.70) func_....?\(Local_1...?\.f_...?, .*?1, \"GR_HUD_TOT\", .*?4, 1, 4, 0, 0, 0, 0, 0, 1, 1, 0, 255, 0\);
+            l = 1262,
+            o = 816,
+            v = 1
+        },
+    },
+    ["gb_contraband_sell"] = {
+        { -- (1.70) MISC::CLEAR_BIT\(.*?Local_...?\.f_1\), .*?Param0
+            l = 563,
+            o = 1,
+            v = 99999
+        },
+    },
+    ["gb_biker_contraband_sell"] = {
+        { -- (1.70) else if .*?!func_.*?\(1\) && .*?Local_...?\.f_...? > 0\)
+            l = 725,
+            o = 122,
+            v = 15
+        },
+    },
+    ["fm_content_acid_lab_sell"] = {
+        b = 5557, -- GENERICBITSET_I_WON -- (1.70) if .*?func_...?\(&.*?Local_....?, .*?Param0 // (uLocal_5557 = 4;)
+        l = 5653, -- (1.70) if .*?Local_5...?\.f_....? == 0\)
+        o = 1309
+    },
+    -- ["fm_content_smuggler_sell"] = {
+    --   b = 3991, -- GENERICBITSET_I_WON -- (1.70) if .*?func_...?\(&.*?Local_....?, .*?Param0 // (uLocal_3991 = 4;)
+    --   l = 4133, -- (1.70) if .*?Local_4...?\.f_....? == 0\)
+    --   o = 489
+    -- },
 }
 
 PED_TYPE                  = {
@@ -1918,6 +1739,93 @@ VMF                       = {
     _IS_FORMULA_VEHICLE                          = 197,
 }
 
+t_RandomPedNames = {
+    ["male"] = {
+        "Long Johnsson",
+        "Wayne 'The Wok' Ferguson",
+        "Hugh G. Rection",
+        "Hugh Janus",
+        "Maxx Tamina",
+        "Thicc Rick",
+        "Buck Nekkid",
+        "Brock Lee",
+        "Lube Skyballer",
+        "Steve Snobs",
+        "Barry McCockiner",
+        "Randy Meatwagon",
+        "Peter Draggin",
+        "Mick Lickalot",
+        "Carl 'Crackshot' Van Dangle",
+        "Hannibal Barca",
+        "Elawn Musty",
+        "Sammy 'The Rat' Gravano",
+        "Billy The Elder",
+        "John 'Babayaga' Brick",
+        "Alexander The Mediocre",
+        "Quagmire",
+        "Bill Fates",
+        "Clint Beefwood",
+        "Leroy NoScope",
+        "Sir Shootsalot",
+        "Captain Girth",
+        "Vincent Van Gun",
+        "Tony Pepperoni",
+        "Rektimus Prime",
+        "Dumptruck Chuck",
+        "Ezio Auditore Da Firenze",
+        "Unlucky Luciano",
+        "Don Linguine",
+        "Tony Baloney", -- 🤌
+        "Zark Muckerburg", -- 🤖
+        "Samurai L. Jackson",
+        "Scipio Africanus",
+        "Willy Wanker",
+        "Luigi Mangione",
+        "Doc Holliday",
+        "Pee Diddler",
+        "Noscope Pope",
+        "Edward Kennway",
+    },
+    ["female"] = {
+        "Laquisha",
+        "Nicky Lewinsky",
+        "Apollymom",
+        "Big Booty Iggy",
+        "Anita Hardcock",
+        "Bambi Slapz",
+        "LaTittya Jackson",
+        "Faye Talblow",
+        "Mary Magdalene",
+        "Sasha Slasha",
+        "Thotarella",
+        "Queen Dido",
+        "Juicy McThundercheeks",
+        "Calamity Jane",
+        "Cleopatra",
+        "Rhonda Rumpus",
+        "Skinny Vicky",
+        "Chardonnay Glockson",
+        "Trixie Thunderdome",
+        "Anita Clipz",
+        "Boudicca",
+        "Beretta Von PewPew",
+        "Gloria Whole",
+        "Giorgia Meloni", -- 💖
+        "Ivana Humpalot",
+        "Clitonia Spankwell",
+        "Busty McThiccums",
+        "Nadya Cummings",
+        "Lucrezia Borgia",
+        "Whitney Compton",
+        "Big Nose Kate",
+        "Zonda Anaconda",
+        "Lois Griffin",
+        "Griselda Blanco",
+        "Lola Packin'",
+        "Thusnelda",
+    },
+}
+
 -- *SI VIS PACEM PARA WOMPUS*
 WompusChronicles = [[
 
@@ -1928,7 +1836,7 @@ WompusChronicles = [[
     His name is Minimus Wompus Meridius,
     Raver of the end times,
     Passenger of all seats,
-    Sitter of none.
+    Sitter of nil.
 
     Only once per epoch shall he descend; randomly chosen,
     yet eternally significant.
@@ -1937,6 +1845,6 @@ WompusChronicles = [[
     He shall not obey.
     He shall burst.
 
-    And Lo, he shall have his vengeance, in this life or the next.
+    And Lo, he shall have his vengeance in this session or the next.
 
 ]]

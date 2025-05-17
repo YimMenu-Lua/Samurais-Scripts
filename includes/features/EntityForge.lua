@@ -150,6 +150,16 @@ EntityForge.EntityGunEnabled = false
 EntityForge.EntityGunDistance = 7
 
 
+---@param entity integer
+function EntityForge:RegisterEntity(entity)
+    Decorator:RegisterEntity(entity, "EntityForge", true)
+end
+
+---@param entity integer
+function EntityForge:UnregisterEntity(entity)
+    Decorator:RemoveEntity(entity, "EntityForge")
+end
+
 ---@return SpawnedEntity
 function EntityForge:GetPlayerInstance()
     if not self.PlayerEntity then
@@ -222,6 +232,7 @@ function EntityForge:AddEntity(entity, isWorldEntity)
 
         table.insert(self.AllEntities, entity)
         self.EntityMap[entity.handle] = entity
+        self:RegisterEntity(entity)
         self:UpdateAttachmentCandidates()
     end
 end
@@ -240,6 +251,7 @@ function EntityForge:RemoveEntityByHandle(handle)
         self.PlayerEntity = nil
     end
 
+    self:UnregisterEntity(entity)
     self:UpdateAttachmentCandidates()
     self.EntityMap[handle] = nil
 end
@@ -369,12 +381,16 @@ function EntityForge:EntityGun()
         local i_AimedAtEntity = Self.GetEntityInCrosshairs(true)
         local existing_entity
 
-        if ENTITY.IS_ENTITY_ATTACHED(i_AimedAtEntity) or (i_AimedAtEntity == Flatbed.handle) or ENTITY.IS_ENTITY_DEAD(i_AimedAtEntity, false) then
+        if ENTITY.IS_ENTITY_DEAD(i_AimedAtEntity, false) or SS.IsScriptEntity(i_AimedAtEntity) then
             i_AimedAtEntity = nil
         end
 
-        if i_AimedAtEntity and ENTITY.DOES_ENTITY_EXIST(i_AimedAtEntity) then
+        if i_AimedAtEntity and ENTITY.DOES_ENTITY_EXIST(i_AimedAtEntity) and not SS.IsScriptEntity(i_AimedAtEntity) then
             existing_entity = EntityForge:FindEntity(i_AimedAtEntity)
+        end
+
+        if i_AimedAtEntity then
+            SS.debug(tostring(SS.IsScriptEntity(i_AimedAtEntity)))
         end
 
         if self.GrabbedEntity and PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) then
@@ -455,7 +471,9 @@ function EntityForge:EntityGun()
                 self.GrabbedEntity = nil
             end
 
-            if SS.IsKeyJustPressed("BACKSPACE") and not self.GrabbedEntity.isForged then
+            if SS.IsKeyJustPressed("BACKSPACE")
+            and not self.GrabbedEntity.isForged
+            and not SS.IsScriptEntity(self.GrabbedEntity.handle) then
                 self:DeleteEntity(self.GrabbedEntity)
                 self.GrabbedEntity = nil
             end
@@ -720,6 +738,7 @@ function EntityForge:CreateEntity(i_ModelHash, s_Name, i_EntityType, v_Coords, i
         )
     end
 
+    self:RegisterEntity(i_Handle)
     return i_Handle
 end
 
@@ -728,6 +747,7 @@ function EntityForge:DeleteEntity(entity)
     if entity.children and #entity.children > 0 then
         for i = #entity.children, 1, -1 do
             self:DetachEntity(entity, entity.children[i])
+            self:UnregisterEntity(entity.handle)
             table.remove(entity.children, i)
         end
     end
@@ -735,12 +755,14 @@ function EntityForge:DeleteEntity(entity)
     if entity.parent and (entity.parent.modelHash == -1) then
         for i = #self.PlayerEntity.children, 1, -1 do
             if entity.handle == self.PlayerEntity.children[i].handle then
+                self:UnregisterEntity(entity.handle)
                 table.remove(self.PlayerEntity.children, i)
             end
         end
     end
 
     Game.DeleteEntity(entity.handle, self:GetCategoryFromType(entity))
+    self:UnregisterEntity(entity.handle)
     self:RemoveEntityByHandle(entity.handle)
 
     if self.currentParent then
@@ -758,6 +780,7 @@ function EntityForge:SpawnSavedAbomination(abomination)
     script.run_in_fiber(function()
         local function recurse(entityData, parent)
             local entity
+
             if not entityData.isPlayer and entityData.modelHash ~= -1 then
                 local handle = self:CreateEntity(
                     entityData.modelHash,
@@ -872,8 +895,8 @@ function EntityForge:DeleteAbomination(abomination)
         end
     end
 
+    self:RemoveEntityByHandle(abomination.handle)
     Game.DeleteEntity(abomination.handle, self:GetCategoryFromType(abomination))
-    EntityForge:RemoveEntityByHandle(abomination.handle)
 end
 
 ---@param selectedChild? any
@@ -1350,6 +1373,7 @@ function EntityForge:ForceCleanup(reference)
 
     for _, entity in pairs(reference) do
         if entity.handle and (entity.handle ~= Self.GetPedID()) and not entity.isPlayer then
+            self:UnregisterEntity(entity.handle)
             ENTITY.DELETE_ENTITY(entity.handle)
         end
 

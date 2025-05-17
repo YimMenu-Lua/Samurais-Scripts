@@ -1,42 +1,41 @@
 ---@diagnostic disable: undefined-global, lowercase-global, undefined-field
 
-require('ss_init')
-CURRENT_BUILD   = Game.Version._build
-CURRENT_VERSION = Game.Version._online
-
-log.info("version " .. SCRIPT_VERSION)
-SS.SyncConfing(CFG:Read(), DEFAULT_CONFIG)
-
+require("ss_init")
+log.info("version " .. SS.script_version)
+SS.SyncConfing(CFG:Read(), SS.default_config)
 
 local Samurais_scripts <const> = gui.add_tab("Samurai's Scripts")
-local self_tab         <const> = Samurais_scripts:add_tab(_T("SELF_TAB_"))
-local vehicle_tab      <const> = Samurais_scripts:add_tab(_T("VEHICLE_TAB_"))
-local world_tab        <const> = Samurais_scripts:add_tab(_T("WORLD_TAB_"))
-local online_tab       <const> = Samurais_scripts:add_tab("Online ")
-local business_tab     <const> = online_tab:add_tab("Business Manager (YRV2)")
-local casino_pacino    <const> = online_tab:add_tab("Casino Pacino ") -- IT'S NOT AL ANYMORE! IT'S DUNK!
-local settings_tab     <const> = Samurais_scripts:add_tab(_T("SETTINGS_TAB_"))
-
 Samurais_scripts:add_imgui(MainUI)
 
+local self_tab <const> = Samurais_scripts:add_tab(_T("SELF_TAB_"))
 self_tab:add_imgui(SelfUI)
 self_tab:add_tab("YimActions V3"):add_imgui(YimActionsV3UI)
 self_tab:add_tab(_T("SOUND_PLAYER_")):add_imgui(SoundPlayerUI)
 self_tab:add_tab(_T("WEAPON_TAB_")):add_imgui(WeaponsUI)
 
+local vehicle_tab <const> = Samurais_scripts:add_tab(_T("VEHICLE_TAB_"))
 vehicle_tab:add_imgui(VehicleUI)
 vehicle_tab:add_tab("Custom Paint Jobs"):add_imgui(CustomPaintsUI)
 vehicle_tab:add_tab("Drift Mode"):add_imgui(DriftModeUI)
 vehicle_tab:add_tab("Flatbed"):add_imgui(FlatbedUI)
 vehicle_tab:add_tab("Handling Editor"):add_imgui(HandingEditorUI)
 
+local world_tab <const> = Samurais_scripts:add_tab(_T("WORLD_TAB_"))
 world_tab:add_imgui(WorldUI)
 world_tab:add_tab("EntityForge"):add_imgui(EntityForgeUI)
-business_tab:add_imgui(YRV2UI)
+world_tab:add_tab("Billionare Services V2"):add_imgui(BSV2UI)
+
+local online_tab <const> = Samurais_scripts:add_tab("Online ")
+local casino_pacino <const> = online_tab:add_tab("Casino Pacino ") -- IT'S NOT AL ANYMORE! IT'S DUNK!
 casino_pacino:add_imgui(DunkUI)
 
+local business_tab <const> = online_tab:add_tab("YimResupplier V3")
+business_tab:add_imgui(YRV3UI)
+
+local settings_tab <const> = Samurais_scripts:add_tab(_T("SETTINGS_TAB_"))
 settings_tab:add_imgui(SettingsUI)
 settings_tab:add_tab(_T("HOTKEYS_TAB_")):add_imgui(HotkeysUI)
+
 
 
 gui.add_always_draw_imgui(ForgeAxisWindow)
@@ -80,106 +79,40 @@ end)
 
 CommandExecutor:RegisterCommand("autofill.hangar", function()
     if Game.IsOnline() then
-        YimToast:ShowMessage("Samurai's Scripts", ("Hangar auto-fill %s."):format(b_HangarLoop and "disabled" or "enabled"),
+        YimToast:ShowMessage("Samurai's Scripts", ("Hangar auto-fill %s."):format(YRV3.b_HangarLoop and "disabled" or "enabled"),
             false, 1.5)
-        b_HangarLoop = not b_HangarLoop
+        YRV3.b_HangarLoop = not YRV3.b_HangarLoop
     else
         YimToast:ShowError("Samurai's Scripts", "Unavailable in Single Player!")
     end
 end)
 
 CommandExecutor:RegisterCommand("autofill.whouse1", function()
-    if Game.IsOnline() then
-        YimToast:ShowMessage("Samurai's Scripts",
-            ("CEO Warehouse 1 auto-fill %s."):format(b_Warehouse1Loop and "disabled" or "enabled"), false, 1.5)
-        b_Warehouse1Loop = not b_Warehouse1Loop
-    else
-        YimToast:ShowError("Samurai's Scripts", "Unavailable in Single Player.")
-    end
+    YRV3:WarehouseAutofillOnCommand(1)
 end)
 
 CommandExecutor:RegisterCommand("autofill.whouse2", function()
-    if Game.IsOnline() then
-        YimToast:ShowMessage("Samurai's Scripts",
-            ("CEO Warehouse 2 auto-fill %s."):format(b_Warehouse2Loop and "disabled" or "enabled"), false, 1.5)
-        b_Warehouse2Loop = not b_Warehouse2Loop
-    else
-        YimToast:ShowError("Samurai's Scripts", "Unavailable in Single Player.")
-    end
+    YRV3:WarehouseAutofillOnCommand(2)
 end)
 
 CommandExecutor:RegisterCommand("autofill.whouse3", function()
-    if Game.IsOnline() then
-        YimToast:ShowMessage(
-            "Samurai's Scripts",
-            ("CEO Warehouse 3 auto-fill %s."):format(b_Warehouse3Loop and "disabled" or "enabled"),
-            false,
-            1.5
-        )
-        b_Warehouse3Loop = not b_Warehouse3Loop
-    else
-        YimToast:ShowError("Samurai's Scripts", "Unavailable in Single Player.")
-    end
+    YRV3:WarehouseAutofillOnCommand(3)
 end)
 
 CommandExecutor:RegisterCommand("autofill.whouse4", function()
-    if Game.IsOnline() then
-        YimToast:ShowMessage(
-            "Samurai's Scripts",
-            ("CEO Warehouse 4 auto-fill %s."):format(b_Warehouse4Loop and "disabled" or "enabled"),
-            false,
-            1.5
-        )
-        b_Warehouse4Loop = not b_Warehouse4Loop
-    else
-        YimToast:ShowError("Samurai's Scripts", "Unavailable in Single Player.")
-    end
+    YRV3:WarehouseAutofillOnCommand(4)
 end)
 
 CommandExecutor:RegisterCommand("autofill.whouse5", function()
-    if Game.IsOnline() then
-        YimToast:ShowMessage(
-            "Samurai's Scripts",
-            ("CEO Warehouse 5 auto-fill %s."):format(b_Warehouse5Loop and "disabled" or "enabled"),
-            false,
-            1.5
-        )
-        b_Warehouse5Loop = not b_Warehouse5Loop
-    else
-        YimToast:ShowError("Samurai's Scripts", "Unavailable in Single Player.")
-    end
+    YRV3:WarehouseAutofillOnCommand(5)
 end)
 
-CommandExecutor:RegisterCommand("yrv2.fillall", function()
-    script.run_in_fiber(function(fa)
-        SS.FillAll(fa)
-    end)
+CommandExecutor:RegisterCommand("yrv3.fillall", function()
+    YRV3:FillAll()
 end)
 
 CommandExecutor:RegisterCommand("finishsale", function()
-    if Game.IsOnline() then
-        if autosell then
-            YimToast:ShowWarning(
-                "Samurai's Scripts",
-                "You aleady have 'Auto-Sell' enabled. No need to manually trigger it.",
-                false,
-                1.5
-            )
-        else
-            if b_SellScriptIsRunning then
-                SS.FinishSale(s_SellScriptName)
-            else
-                YimToast:ShowWarning(
-                    "Samurai's Scripts",
-                    "No supported sale script is currently running.",
-                    false,
-                    1.5
-                )
-            end
-        end
-    else
-        YimToast:ShowError("Samurai's Scripts", "Unavailable in Single Player.")
-    end
+    YRV3:FinishSaleOnCommand()
 end)
 
 CommandExecutor:RegisterCommand("spawnmeaperv", function()
@@ -220,22 +153,13 @@ end)
 
 CommandExecutor:RegisterCommand("fastvehs", function()
     fast_vehicles = not fast_vehicles
+    CFG:SaveItem("fast_vehicles", fast_vehicles)
     YimToast:ShowMessage(
         "Samurai's Scripts",
         ("Fast Vehicles %s"):format(fast_vehicles and "enabled" or "disabled"),
         false,
         1.5
     )
-    if (
-            not fast_vehicles and
-            Self.Vehicle.Current ~= 0 and
-            (Self.Vehicle.IsCar or Self.Vehicle.IsBike or Self.Vehicle.IsQuad)
-        ) then
-        script.run_in_fiber(function()
-            VEHICLE.MODIFY_VEHICLE_TOP_SPEED(Self.Vehicle.Current, 0)
-        end)
-    end
-    CFG:SaveItem("fast_vehicles", fast_vehicles)
 end)
 
 CommandExecutor:RegisterCommand("resetcfg", SS.ResetSettings)
@@ -362,40 +286,94 @@ script.register_looped("SS_HANDLERS", function(ss)
 end)
 
 script.register_looped("SS_POOLMGR", function(poolmgr)
-    local sleepTime = SS_debug and 500 or 5000
+    local sleepTime = SS_debug and 500 or 5e3
 
-    for i, category in ipairs({g_SpawnedEntities.objects, g_SpawnedEntities.peds, g_SpawnedEntities.vehicles}) do
+    for _, category in ipairs({g_SpawnedEntities.objects, g_SpawnedEntities.peds, g_SpawnedEntities.vehicles}) do
         if next(category) ~= nil then
             for handle in pairs(category) do
-                if (category[handle] == nil) or not ENTITY.DOES_ENTITY_EXIST(category[handle]) then
-                    if EntityForge.EntityMap[category[handle]] then
-                        EntityForge:RemoveEntityByHandle(category[handle])
-                    end
+                local bExists = ENTITY.DOES_ENTITY_EXIST(handle)
 
-                    category[handle] = nil
+                if not handle or not bExists then
+                    SS.CheckFeatureEntities(handle)
+                    Game.DeleteEntity(handle, Game.GetCategoryFromEntityType(handle))
                 end
 
-                if ENTITY.IS_ENTITY_DEAD(category[handle], false) then
-                    Game.DeleteEntity(category[handle], i)
-                    if EntityForge.EntityMap[category[handle]] then
-                        EntityForge:RemoveEntityByHandle(category[handle])
+                if ENTITY.IS_ENTITY_DEAD(handle, false) then
+                    SS.CheckFeatureEntities(handle)
+                    Game.DeleteEntity(handle, Game.GetCategoryFromEntityType(handle))
+                elseif ENTITY.IS_ENTITY_A_PED(handle) and g_CreatedBlips[handle] then
+                    local blip = g_CreatedBlips[handle]
+                    if PED.IS_PED_IN_ANY_VEHICLE(handle, true) then
+                        if blip.alpha > 0 then
+                            HUD.SET_BLIP_ALPHA(blip.handle, 0)
+                            blip.alpha = 0
+                        end
+                    else
+                        if blip.alpha < 255 then
+                            HUD.SET_BLIP_ALPHA(blip.handle, 255)
+                            blip.alpha = 255
+                        end
                     end
-
-                    category[handle] = nil
                 end
             end
         end
     end
 
     poolmgr:sleep(sleepTime)
-    YimActions.CompanionManager:Watchdog()
 end)
 
 script.register_looped("SS_VEHMGR", function(vehmgr)
     Self.Vehicle:OnTick(vehmgr)
 end)
 
-script.register_looped("SS_ANIMATED_LABEL", function(s) -- Basic loading label
+-- BillionaireServices V2
+script.register_looped("SS_BILLIONAIRE", function(grpmgr)
+    BillionaireServices.GroupManager:OnTick(grpmgr)
+end)
+
+-- EntityForge
+script.register_looped("SS_ENTITY_GRABBER", function()
+    if EntityForge.EntityGunEnabled and WEAPON.IS_PED_ARMED(Self.GetPedID(), 4) then
+        EntityForge:EntityGun()
+    end
+end)
+
+-- Flatbed
+script.register_looped("SS_FLATBED", function(fltbd)
+    Flatbed:BackgroundWorker(fltbd)
+end)
+
+-- YimActions V3
+script.register_looped("SS_MISC_ANIM", function(misc)
+    YimActions:BackgroundWorker(misc)
+end)
+
+-- YimResupplier V3
+script.register_looped("SS_AUTOSELL", function(as)
+    YRV3:AutoSell(as)
+end)
+script.register_looped("SS_HSUPP", function(hsupp)
+    YRV3:HangarAutofill(hsupp)
+end)
+script.register_looped("SS_WH_AUTOFILL", function(whaf)
+    YRV3:WarehouseAutofill(whaf)
+end)
+
+-- Carpool
+script.register_looped("SS_CARPOOL", function(cp)
+    if b_Carpool then
+        Carpool:Main(cp)
+    end
+end)
+
+-- PublicSeating
+script.register_looped("SS_PUBLICSEATS", function(s)
+    if public_seats then
+        PublicSeating:Update(s)
+    end
+end)
+
+script.register_looped("SS_ANIMATED_LABEL", function(s) -- basic ass loading label
     if b_ShouldAnimateLoadingLabel then
         s_LoadingLabel = "-   "
         s:sleep(80)
@@ -417,28 +395,17 @@ script.register_looped("SS_ANIMATED_LABEL", function(s) -- Basic loading label
     end
 end)
 
-script.register_looped("SS_RGB_TEXT", function(rgbtxt)
-    if gui.is_open() and business_tab:is_selected() then
-        for i = 1, #t_RGBloopColors do
-            rgbtxt:sleep(200)
-            yrv2_color = t_RGBloopColors[i]
-        end
-    end
-end)
-
-s_RandomDailyQuote = t_RandomQuotes[math.random(1, #t_RandomQuotes)]
+s_RandomDailyQuote = eRandomQuotes[math.random(1, #eRandomQuotes)]
 script.register_looped("SS_DAILYQUOTE", function(qotd)
-    if (
-        not disable_quotes and
-        gui.is_open() and
-        Samurais_scripts:is_selected()
-    ) then
+    if not disable_quotes
+    and gui.is_open()
+    and Samurais_scripts:is_selected() then
         if f_DailyQuoteTextAlpha > 0.1 then
             repeat
                 f_DailyQuoteTextAlpha = f_DailyQuoteTextAlpha - 0.01
                 qotd:sleep(20)
             until f_DailyQuoteTextAlpha <= 0.1
-            s_RandomDailyQuote = t_RandomQuotes[math.random(1, #t_RandomQuotes)]
+            s_RandomDailyQuote = eRandomQuotes[math.random(1, #eRandomQuotes)]
         end
 
         if f_DailyQuoteTextAlpha < 1.0 then
@@ -456,6 +423,7 @@ script.register_looped("SS_INPUT", function() -- controls
         if not gui.is_open() then
             b_IsTyping, b_IsSettingHotkeys = false, false
         end
+
         PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
     end
 
@@ -498,34 +466,45 @@ script.register_looped("SS_INPUT", function() -- controls
         pressing_laser_button = SS.IsKeyJustPressed(keybinds.laser_sight.code) and not
             b_IsTyping and not b_IsSettingHotkeys and not HUD.IS_MP_TEXT_CHAT_TYPING()
     else
-        pressing_drift_button = gpad_keybinds.tdBtn.code ~= 0 and PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.tdBtn.code)
-        pressing_nos_button   = gpad_keybinds.nosBtn.code ~= 0 and PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.nosBtn.code)
-        pressing_purge_button = gpad_keybinds.purgeBtn.code ~= 0 and
-            (PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.purgeBtn.code) or PAD.IS_DISABLED_CONTROL_PRESSED(0, gpad_keybinds.purgeBtn.code))
-        pressing_fltbd_button = gpad_keybinds.flatbedBtn.code ~= 0 and
-            (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.flatbedBtn.code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.flatbedBtn.code))
-        pressing_vmine_button = gpad_keybinds.vehicle_mine.code ~= 0 and
-            (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.vehicle_mine.code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.vehicle_mine.code))
-        pressing_rod_button   = gpad_keybinds.rodBtn.code ~= 0 and
-            (PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.rodBtn.code) or PAD.IS_DISABLED_CONTROL_PRESSED(0, gpad_keybinds.rodBtn.code))
-        pressing_laser_button = gpad_keybinds.laser_sight.code ~= 0 and
-            (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.laser_sight.code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.laser_sight.code))
+        pressing_drift_button = (gpad_keybinds.tdBtn.code ~= 0)
+        and PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.tdBtn.code)
+
+        pressing_nos_button = (gpad_keybinds.nosBtn.code ~= 0)
+        and PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.nosBtn.code)
+
+        pressing_purge_button = (gpad_keybinds.purgeBtn.code ~= 0)
+        and (PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.purgeBtn.code)
+        or PAD.IS_DISABLED_CONTROL_PRESSED(0, gpad_keybinds.purgeBtn.code))
+
+        pressing_fltbd_button = (gpad_keybinds.flatbedBtn.code ~= 0)
+        and (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.flatbedBtn.code)
+        or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.flatbedBtn.code))
+
+        pressing_vmine_button = (gpad_keybinds.vehicle_mine.code ~= 0)
+        and (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.vehicle_mine.code)
+        or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.vehicle_mine.code))
+
+        pressing_rod_button = (gpad_keybinds.rodBtn.code ~= 0)
+        and (PAD.IS_CONTROL_PRESSED(0, gpad_keybinds.rodBtn.code)
+        or PAD.IS_DISABLED_CONTROL_PRESSED(0, gpad_keybinds.rodBtn.code))
+
+        pressing_laser_button = (gpad_keybinds.laser_sight.code ~= 0)
+        and (PAD.IS_CONTROL_JUST_PRESSED(0, gpad_keybinds.laser_sight.code)
+        or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, gpad_keybinds.laser_sight.code))
     end
 
-    if Self.Vehicle.IsFlatbed then
-        if keybinds.flatbedBtn.code == 0x58 or gpad_keybinds.flatbedBtn.code == 73 then
-            PAD.DISABLE_CONTROL_ACTION(0, 73, true)
-        end
+    if Self.Vehicle.IsFlatbed
+    and ((keybinds.flatbedBtn.code == 0x58) or (gpad_keybinds.flatbedBtn.code == 73)) then
+        PAD.DISABLE_CONTROL_ACTION(0, 73, true)
     end
 
-    if nosPurge and Self.IsDriving() then
-        if Self.Vehicle.IsValidLandVehicle and keybinds.purgeBtn.code == 0x58 or gpad_keybinds.purgeBtn.code == 73 then
-            PAD.DISABLE_CONTROL_ACTION(0, 73, true)
-        end
+    if nosPurge and Self.IsDriving() and Self.Vehicle.IsValidLandVehicle
+    and ((keybinds.purgeBtn.code == 0x58) or( gpad_keybinds.purgeBtn.code == 73)) then
+        PAD.DISABLE_CONTROL_ACTION(0, 73, true)
     end
 
     if Self.IsDriving() then
-        if speedBoost and (keybinds.nosBtn.code == 0x10 or gpad_keybinds.nosBtn.code == 21) then
+        if speedBoost and ((keybinds.nosBtn.code == 0x10) or (gpad_keybinds.nosBtn.code == 21)) then
             if PAD.IS_CONTROL_PRESSED(0, 71) and pressing_nos_button then
                 if Self.Vehicle.IsValidLandVehicle or Self.Vehicle.IsBoat or Self.Vehicle.IsBike then
                     -- prevent face planting when using NOS mid-air
@@ -537,8 +516,11 @@ script.register_looped("SS_INPUT", function() -- controls
         end
 
         if holdF and Self.IsOutside() then
-            if not b_IsDuckingInVehicle and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh())
-                and not b_IsTyping and not b_IsSettingHotkeys and not b_IsCommandsUIOpen then
+            if not b_IsDuckingInVehicle
+            and VEHICLE.IS_VEHICLE_STOPPED(self.get_veh())
+            and not b_IsTyping
+            and not b_IsSettingHotkeys
+            and not b_IsCommandsUIOpen then
                 PAD.DISABLE_CONTROL_ACTION(0, 75, true)
             else
                 i_TimerB = 0
@@ -555,15 +537,9 @@ script.register_looped("SS_INPUT", function() -- controls
         end
     end
 
-    if (pedGrabber or vehicleGrabber) and Self.IsOnFoot() and not WEAPON.IS_PED_ARMED(Self.GetPedID(), 7) then
-        PAD.DISABLE_CONTROL_ACTION(0, 24, true)
-        PAD.DISABLE_CONTROL_ACTION(0, 25, true)
-        PAD.DISABLE_CONTROL_ACTION(0, 50, true)
-        PAD.DISABLE_CONTROL_ACTION(0, 68, true)
-        PAD.DISABLE_CONTROL_ACTION(0, 91, true)
-        PAD.DISABLE_CONTROL_ACTION(0, 257, true)
-    end
-    if b_PedGrabbed or b_VehicleGrabbed then
+    if (b_PedGrabber or b_PedGrabbed or b_VehicleGrabber or b_VehicleGrabbed)
+    and Self.IsOnFoot()
+    and not WEAPON.IS_PED_ARMED(Self.GetPedID(), 7) then
         PAD.DISABLE_CONTROL_ACTION(0, 24, true)
         PAD.DISABLE_CONTROL_ACTION(0, 25, true)
         PAD.DISABLE_CONTROL_ACTION(0, 50, true)
@@ -580,10 +556,11 @@ end)
 script.register_looped("SS_SELF", function(script) -- Self Features
     -- Auto-Heal
     if Regen and Self.IsAlive() then
-        local maxHp   = Self.MaxHealth()
-        local myHp    = Self.Health()
+        local maxHp = Self.MaxHealth()
+        local myHp = Self.Health()
         local maxArmr = Self.MaxArmour()
-        local myArmr  = Self.Armour()
+        local myArmr = Self.Armour()
+
         if myHp < maxHp and myHp > 0 then
             if PED.IS_PED_IN_COVER(Self.GetPedID(), false) then
                 ENTITY.SET_ENTITY_HEALTH(Self.GetPedID(), myHp + 10, 0, 0)
@@ -591,59 +568,63 @@ script.register_looped("SS_SELF", function(script) -- Self Features
                 ENTITY.SET_ENTITY_HEALTH(Self.GetPedID(), myHp + 1, 0, 0)
             end
         end
-        if myArmr == nil then
+
+        if (myArmr == nil) then
             PED.SET_PED_ARMOUR(Self.GetPedID(), 10)
         end
-        if myArmr ~= nil and myArmr < maxArmr then
+
+        if myArmr and myArmr < maxArmr then
             PED.ADD_ARMOUR_TO_PED(Self.GetPedID(), 0.5)
         end
     end
 
     -- Crouch
-    if replaceSneakAnim then
-        if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 36) and Self.CanCrouch() then
-            if b_IsHandsUp then
-                b_IsHandsUp = false
-                TASK.CLEAR_PED_TASKS(Self.GetPedID())
-            end
+    if replaceSneakAnim
+    and not b_IsCrouched
+    and PAD.IS_DISABLED_CONTROL_PRESSED(0, 36)
+    and Self.CanCrouch() then
+        Await(Game.RequestClipSet, "move_ped_crouched")
+        -- Await(Game.RequestClipSet, "move_aim_strafe_crouch_2h")
 
-            while not STREAMING.HAS_CLIP_SET_LOADED("move_ped_crouched") and not STREAMING.HAS_CLIP_SET_LOADED("move_aim_strafe_crouch_2h") do
-                STREAMING.REQUEST_CLIP_SET("move_ped_crouched")
-                STREAMING.REQUEST_CLIP_SET("move_aim_strafe_crouch_2h")
-                coroutine.yield()
-            end
-
-            PED.SET_PED_MOVEMENT_CLIPSET(Self.GetPedID(), "move_ped_crouched", 0.3)
-            PED.SET_PED_STRAFE_CLIPSET(Self.GetPedID(), "move_aim_strafe_crouch_2h")
-            script:sleep(250)
-            b_IsCrouched = true
+        if b_IsHandsUp then
+            b_IsHandsUp = false
+            TASK.CLEAR_PED_TASKS(Self.GetPedID())
         end
+
+        PED.SET_PED_MOVEMENT_CLIPSET(Self.GetPedID(), "move_ped_crouched", 0.3)
+        PED.SET_PED_STRAFE_CLIPSET(Self.GetPedID(), "move_aim_strafe_crouch_2h")
+        script:sleep(250)
+        b_IsCrouched = true
     end
 
-    if b_IsCrouched and PAD.IS_DISABLED_CONTROL_PRESSED(0, 36)
-        and not HUD.IS_MP_TEXT_CHAT_TYPING() and not Self.IsBrowsingApps() then
+    if b_IsCrouched
+    and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 36)
+    and not HUD.IS_MP_TEXT_CHAT_TYPING() then
+        log.debug("pressed")
         PED.RESET_PED_MOVEMENT_CLIPSET(Self.GetPedID(), 0.3)
+        PED.RESET_PED_STRAFE_CLIPSET(Self.GetPedID())
+        script:sleep(250)
         b_IsCrouched = false
     end
 
     -- Replace 'Point At' Action
     if replacePointAct then
         if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29) then
-            if not b_IsHandsUp and Self.CanUseHandsUp() then
-                script:sleep(200)
-                if b_IsCrouched then
-                    b_IsCrouched = false
-                    PED.RESET_PED_MOVEMENT_CLIPSET(Self.GetPedID(), 0)
+            PublicSeating:Cleanup()
+
+            if not b_IsHandsUp then
+                if Self.CanUseHandsUp() then
+                    if b_IsCrouched then
+                        b_IsCrouched = false
+                        PED.RESET_PED_MOVEMENT_CLIPSET(Self.GetPedID(), 0)
+                        PED.RESET_PED_STRAFE_CLIPSET(Self.GetPedID())
+                    end
                 end
-                if b_IsSitting then
-                    StandUp()
-                end
+
                 PlayHandsUp()
                 b_IsHandsUp = true
             else
-                script:sleep(200)
                 TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                script:sleep(500)
                 b_IsHandsUp = false
             end
         end
@@ -725,7 +706,7 @@ script.register_looped("SS_RAGDOLL", function(rgdl) -- Ragdoll
         if b_IsHandsUp then
             b_IsHandsUp = false
         end
-    elseif rod and Self.IsOnFoot() and pressing_rod_button and not b_IsHiding then
+    elseif rod and Self.IsOnFoot() and pressing_rod_button and not HNS.isHiding then
         if PED.CAN_PED_RAGDOLL(Self.GetPedID()) then
             if not Self.IsBrowsingApps() then
                 PED.SET_PED_TO_RAGDOLL(Self.GetPedID(), 1500, 0, 0, false, false, false)
@@ -769,432 +750,7 @@ end)
 
 script.register_looped("SS_HNS", function(hns) -- Hide & Seek
     if hideFromCops then
-        local isWanted = PLAYER.GET_PLAYER_WANTED_LEVEL(self.get_id()) > 0
-        local was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(self.get_id())
-        local cond
-
-        if not b_IsHiding then
-            if PED.IS_PED_IN_ANY_VEHICLE(Self.GetPedID(), false) and Self.Vehicle.IsCar then
-                if Self.IsDriving() then
-                    cond = VEHICLE.IS_VEHICLE_STOPPED(Self.Vehicle.Current)
-                else
-                    cond = true
-                end
-                if cond and not PAD.IS_CONTROL_PRESSED(0, 71) and not PAD.IS_CONTROL_PRESSED(0, 72)
-                    and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(Self.Vehicle.Current) and isWanted and not was_spotted then
-                    Game.ShowButtonPrompt("Press ~INPUT_FRONTEND_ACCEPT~ to hide inside the vehicle.")
-                    if PAD.IS_CONTROL_JUST_PRESSED(0, 201) and not HUD.IS_MP_TEXT_CHAT_TYPING() then
-                        if b_IsHandsUp then
-                            TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                            b_IsHandsUp = false
-                        end
-
-                        Await(Game.RequestAnimDict, "missmic3leadinout_mcs1")
-                        VEHICLE.SET_VEHICLE_IS_WANTED(Self.Vehicle.Current, false)
-                        TASK.TASK_PLAY_ANIM(
-                            Self.GetPedID(),
-                            "missmic3leadinout_mcs1",
-                            "cockpit_pilot",
-                            6.0,
-                            3.0,
-                            -1,
-                            18,
-                            1.0,
-                            false,
-                            false,
-                            false
-                        )
-
-                        if Self.IsDriving() then
-                            VEHICLE.SET_VEHICLE_ENGINE_ON(self.get_veh(), false, false, true)
-                        end
-
-                        b_IsHiding, b_IsDuckingInVehicle = true, true
-                        hns:sleep(1000)
-                    end
-                end
-            end
-
-            if Self.IsOnFoot() then
-                local nearBoot, vehicle, isRearEngined = Self.IsNearCarTrunk()
-                local nearBin, bin                     = Self.IsNearTrashBin()
-                if not nearBoot and not nearBin then
-                    hns:sleep(1000)
-                end
-                if (
-                    nearBoot and
-                    (vehicle > 0) and not
-                    YimActions:IsPedPlaying(self.get_ped()) and not
-                    b_PedGrabbed and not
-                    b_VehicleGrabbed
-                ) then
-                    Game.ShowButtonPrompt("Press ~INPUT_PICKUP~ to hide in the trunk.")
-                    if PAD.IS_CONTROL_JUST_PRESSED(0, 38) then
-                        local z_offset = 0.93
-
-                        if b_IsHandsUp then
-                            TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                            b_IsHandsUp = false
-                        end
-
-                        if b_IsCrouched then
-                            PED.RESET_PED_MOVEMENT_CLIPSET(Self.GetPedID(), 0)
-                            b_IsCrouched = false
-                        end
-
-                        if not was_spotted then
-                            if Game.Vehicle.Class(vehicle) == "Vans" then
-                                z_offset = 1.1
-                            else
-                                if Game.Vehicle.Class(vehicle) == "SUVs" then
-                                    z_offset = 1.2
-                                end
-                            end
-
-                            Await(Game.RequestAnimDict, "rcmnigel3_trunk")
-
-                            if not ENTITY.HAS_ENTITY_CLEAR_LOS_TO_ENTITY_IN_FRONT(Self.GetPedID(), vehicle) then
-                                TASK.TASK_TURN_PED_TO_FACE_ENTITY(Self.GetPedID(), vehicle, 0)
-                                repeat
-                                    hns:sleep(10)
-                                until not TASK.GET_IS_TASK_ACTIVE(Self.GetPedID(), 225) -- CTaskTurnToFaceEntityOrCoord
-                            end
-
-                            TASK.TASK_PLAY_ANIM(
-                                Self.GetPedID(),
-                                "rcmnigel3_trunk",
-                                "out_trunk_trevor",
-                                4.0,
-                                -4.0,
-                                1500,
-                                2,
-                                0.0,
-                                false,
-                                false,
-                                false
-                            )
-                            hns:sleep(800)
-
-                            if VEHICLE.IS_VEHICLE_STOPPED(vehicle) then
-                                ENTITY.FREEZE_ENTITY_POSITION(Self.GetPedID(), true)
-                                ENTITY.SET_ENTITY_COLLISION(Self.GetPedID(), false, true)
-                                hns:sleep(50)
-                                VEHICLE.SET_VEHICLE_DOOR_OPEN(vehicle, 5, false, false)
-                                hns:sleep(500)
-                                ENTITY.FREEZE_ENTITY_POSITION(Self.GetPedID(), false)
-                                local chassis_bone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(vehicle, "chassis_dummy")
-                                if chassis_bone == nil or chassis_bone == -1 then
-                                    chassis_bone = 0
-                                end
-                                local veh_hash   = ENTITY.GET_ENTITY_MODEL(vehicle)
-                                local vmin, vmax = Game.GetModelDimensions(veh_hash)
-                                f_HnSVehicleLength = vmax.y - vmin.y
-                                local attachPosY = isRearEngined and (f_HnSVehicleLength / 3) or (-f_HnSVehicleLength / 3)
-
-                                Await(Game.RequestAnimDict, "timetable@tracy@sleep@")
-                                TASK.TASK_PLAY_ANIM(
-                                    Self.GetPedID(),
-                                    "timetable@tracy@sleep@",
-                                    "base",
-                                    4.0,
-                                    -4.0,
-                                    -1,
-                                    2,
-                                    1.0,
-                                    false,
-                                    false,
-                                    false
-                                )
-
-                                ENTITY.ATTACH_ENTITY_TO_ENTITY(
-                                    Self.GetPedID(),
-                                    vehicle,
-                                    chassis_bone,
-                                    -0.3,
-                                    attachPosY,
-                                    z_offset,
-                                    180.0,
-                                    0.0,
-                                    0.0,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    20,
-                                    true,
-                                    1
-                                )
-
-                                hns:sleep(500)
-                                VEHICLE.SET_VEHICLE_DOOR_SHUT(vehicle, 5, false)
-                                ENTITY.SET_ENTITY_COLLISION(Self.GetPedID(), true, true)
-                                b_IsHiding, b_IsHidingInTrunk, i_HnSVehicle, b_BootVehicleRearEngined = true, true, vehicle,
-                                    isRearEngined
-                                hns:sleep(1000)
-                            else
-                                TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                                YimToast:ShowWarning(
-                                    "Samurai's Scripts",
-                                    "Vehicle must be stopped.",
-                                    false,
-                                    1.5
-                                )
-                            end
-                        else
-                            YimToast:ShowWarning(
-                                "Samurai's Scripts",
-                                "The cops have spotted you. You can't hide until they lose sight of you.",
-                                false,
-                                1.5
-                            )
-                        end
-                    end
-                end
-
-                if (
-                    nearBin and not
-                    YimActions:IsPedPlaying(self.get_ped()) and not
-                    b_PedGrabbed and not
-                    b_VehicleGrabbed
-                ) then
-                    Game.ShowButtonPrompt("Press ~INPUT_PICKUP~ to hide in the dumpster")
-                    if PAD.IS_CONTROL_JUST_PRESSED(0, 38) then
-                        if b_IsHandsUp then
-                            TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                            b_IsHandsUp = false
-                        end
-                        if b_IsCrouched then
-                            PED.RESET_PED_MOVEMENT_CLIPSET(Self.GetPedID(), 0)
-                            b_IsCrouched = false
-                        end
-                        if not was_spotted then
-                            if ENTITY.DOES_ENTITY_EXIST(bin) then
-                                TASK.TASK_TURN_PED_TO_FACE_ENTITY(Self.GetPedID(), bin, 10)
-                                CAM.DO_SCREEN_FADE_OUT(500)
-                                hns:sleep(1000)
-                                ENTITY.ATTACH_ENTITY_TO_ENTITY(
-                                    Self.GetPedID(),
-                                    bin,
-                                    -1,
-                                    0.0,
-                                    0.12,
-                                    1.13,
-                                    0.0,
-                                    0.0,
-                                    90.0,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    20,
-                                    true,
-                                    1
-                                )
-
-                                Await(Game.RequestAnimDict, "anim@amb@inspect@crouch@male_a@base")
-                                TASK.TASK_PLAY_ANIM(
-                                    Self.GetPedID(),
-                                    "anim@amb@inspect@crouch@male_a@base",
-                                    "base",
-                                    4.0,
-                                    -4.0,
-                                    -1,
-                                    1,
-                                    1.0,
-                                    false,
-                                    false,
-                                    false
-                                )
-
-                                hns:sleep(200)
-                                CAM.DO_SCREEN_FADE_IN(500)
-                                hns:sleep(200)
-                                AUDIO.PLAY_SOUND_FRONTEND(
-                                    -1,
-                                    "TRASH_BAG_LAND",
-                                    "DLC_HEIST_SERIES_A_SOUNDS",
-                                    true
-                                )
-                                hns:sleep(1000)
-                                b_IsHiding, b_IsHidingInDumpster, i_HnSDumpster = true, true, bin
-                            end
-                        else
-                            YimToast:ShowWarning(
-                                "Samurai's Scripts",
-                                "The cops have spotted you! You can't hide until they lose sight of you.",
-                                false,
-                                1.5
-                            )
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    if b_IsHiding then
-        if not Self.IsAlive() then
-            b_IsHiding, b_IsDuckingInVehicle, b_IsHidingInTrunk, b_IsHidingInDumpster, i_HnSVehicle, i_HnSDumpster = false, false,
-                false, false, 0, 0
-            PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(self.get_id())
-        end
-
-        if b_IsDuckingInVehicle and not ENTITY.DOES_ENTITY_EXIST(self.get_veh()) then
-            b_IsHiding, b_IsDuckingInVehicle = false, false
-            TASK.CLEAR_PED_TASKS(Self.GetPedID())
-            PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(self.get_id())
-        end
-
-        if b_IsHidingInTrunk and not ENTITY.DOES_ENTITY_EXIST(i_HnSVehicle) then
-            b_IsHiding, b_IsHidingInTrunk, i_HnSVehicle = false, false, 0
-            TASK.CLEAR_PED_TASKS(Self.GetPedID())
-            PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(self.get_id())
-        end
-
-        if b_IsHidingInDumpster and not ENTITY.DOES_ENTITY_EXIST(i_HnSDumpster) then
-            b_IsHiding, b_IsHidingInDumpster, i_HnSDumpster = false, false, 0
-            TASK.CLEAR_PED_TASKS(Self.GetPedID())
-            PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(self.get_id())
-        end
-
-        local isWanted    = PLAYER.GET_PLAYER_WANTED_LEVEL(self.get_id()) > 0
-        local was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(self.get_id())
-        local offsetCoords
-
-        if not offsetCoords then
-            offsetCoords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-                Self.GetPedID(),
-                math.random(-20.0, 20.0),
-                math.random(-20.0, 20.0),
-                math.random(-3.0, 3.0)
-            )
-        end
-
-        if isWanted and not was_spotted then
-            PED.SET_COP_PERCEPTION_OVERRIDES(40.0, 40.0, 40.0, 100.0, 100.0, 100.0, 0.0)
-            ---@diagnostic disable-next-line
-            PLAYER.SET_PLAYER_WANTED_CENTRE_POSITION(self.get_id(), offsetCoords)
-        end
-
-        if b_IsDuckingInVehicle then
-            if was_spotted then
-                YimToast:ShowWarning(
-                    "Samurai's Scripts",
-                    "You have been spotted by the cops! You can't hide until they lose sight of you.",
-                    false,
-                    1.5
-                )
-                b_IsHiding, b_IsDuckingInVehicle = false, false
-                TASK.CLEAR_PED_TASKS(Self.GetPedID())
-            end
-
-            Game.ShowButtonPrompt(
-                "Press ~INPUT_FRONTEND_ACCEPT~ or ~INPUT_VEH_ACCELERATE~ or ~INPUT_VEH_BRAKE~ to stop hiding."
-            )
-            if (
-                    (PAD.IS_CONTROL_JUST_PRESSED(0, 201) or
-                        PAD.IS_CONTROL_PRESSED(0, 71) or
-                        PAD.IS_CONTROL_PRESSED(0, 72)) and not
-                    HUD.IS_MP_TEXT_CHAT_TYPING()
-                ) then
-                TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                if Self.IsDriving() then
-                    VEHICLE.SET_VEHICLE_ENGINE_ON(self.get_veh(), true, false, false)
-                end
-                b_IsHiding, b_IsDuckingInVehicle = false, false
-                hns:sleep(1000)
-            end
-        end
-
-        if b_IsHidingInTrunk then
-            Game.ShowButtonPrompt("Press ~INPUT_PICKUP~ to get out.")
-            if PAD.IS_CONTROL_JUST_PRESSED(0, 38) then
-                local my_pos      = self.get_pos()
-                local veh_fwd     = ENTITY.GET_ENTITY_FORWARD_VECTOR(i_HnSVehicle)
-                local _, ground_z = MISC.GET_GROUND_Z_FOR_3D_COORD(
-                    my_pos.x,
-                    my_pos.y,
-                    my_pos.z,
-                    ground_z,
-                    false,
-                    false
-                )
-                local outHeading  = b_BootVehicleRearEngined and
-                    ENTITY.GET_ENTITY_HEADING(i_HnSVehicle) or
-                    (ENTITY.GET_ENTITY_HEADING(i_HnSVehicle) - 180)
-                local outPos      = b_BootVehicleRearEngined and vec2:new(
-                    my_pos.x + (veh_fwd.x * f_HnSVehicleLength / 3),
-                    my_pos.y + (veh_fwd.y * f_HnSVehicleLength / 3)
-                ) or vec2:new(
-                    my_pos.x - (veh_fwd.x * f_HnSVehicleLength / 3),
-                    my_pos.y - (veh_fwd.y * f_HnSVehicleLength / 3)
-                )
-                VEHICLE.SET_VEHICLE_DOOR_OPEN(i_HnSVehicle, 5, false, false)
-                hns:sleep(500)
-                TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                ENTITY.DETACH_ENTITY(Self.GetPedID(), true, false)
-                ENTITY.SET_ENTITY_COORDS(Self.GetPedID(), outPos.x, outPos.y, ground_z, false, false, false, false)
-                ENTITY.SET_ENTITY_HEADING(Self.GetPedID(), outHeading)
-                VEHICLE.SET_VEHICLE_DOOR_SHUT(i_HnSVehicle, 5, false)
-                hns:sleep(200)
-                if ENTITY.GET_ENTITY_SPEED(i_HnSVehicle) > 4.0 then
-                    PED.SET_PED_TO_RAGDOLL(Self.GetPedID(), 1500, 0, 0, false, false, false)
-                end
-                b_IsHiding, b_IsHidingInTrunk, b_BootVehicleRearEngined, i_HnSVehicle, f_HnSVehicleLength = false, false, false, 0, 0
-                hns:sleep(1000)
-            end
-        end
-
-        if b_IsHidingInDumpster then
-            Game.ShowButtonPrompt("Press ~INPUT_PICKUP~ to get out.")
-            if PAD.IS_CONTROL_JUST_PRESSED(0, 38) then
-                CAM.DO_SCREEN_FADE_OUT(500)
-                hns:sleep(1000)
-                local my_pos      = self.get_pos()
-                local _, ground_z = MISC.GET_GROUND_Z_FOR_3D_COORD(my_pos.x, my_pos.y, my_pos.z, ground_z, false, false)
-                ENTITY.DETACH_ENTITY(Self.GetPedID(), true, false)
-                ENTITY.SET_ENTITY_HEADING(Self.GetPedID(), (ENTITY.GET_ENTITY_HEADING(Self.GetPedID()) + 90))
-                TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                local my_fwd = Game.GetForwardVector(Self.GetPedID())
-                ENTITY.SET_ENTITY_COORDS(Self.GetPedID(), my_pos.x + (my_fwd.x * 1.3),
-                    my_pos.y + (my_fwd.y * 1.3), ground_z, false, false, false, false)
-                CAM.DO_SCREEN_FADE_IN(500)
-                AUDIO.PLAY_SOUND_FRONTEND(-1, "TRASH_BAG_LAND", "DLC_HEIST_SERIES_A_SOUNDS", true)
-
-                Await(Game.RequestAnimDict, "move_m@_idles@shake_off")
-                TASK.TASK_PLAY_ANIM(
-                    Self.GetPedID(),
-                    "move_m@_idles@shake_off",
-                    "shakeoff_1",
-                    4.0,
-                    -4.0,
-                    3000,
-                    48,
-                    0.0,
-                    false,
-                    false,
-                    false
-                )
-
-                hns:sleep(1000)
-                b_IsHiding, b_IsHidingInDumpster = false, false
-            end
-        end
-    else
-        if offsetCoords ~= nil then
-            offsetCoords = nil
-        end
-    end
-end)
-
--- Actions
-script.register_looped("SS_MISC_ANIM", function(misc)
-    YimActions:BackgroundWorker(misc)
-end)
-
-script.register_looped("SS_ENTITY_GRABBER", function()
-    if EntityForge.EntityGunEnabled and WEAPON.IS_PED_ARMED(Self.GetPedID(), 4) then
-        EntityForge:EntityGun()
+        HNS:Main()
     end
 end)
 
@@ -1228,16 +784,20 @@ script.register_looped("SS_MAGICBULLET", function(mb)
     if MagicBullet then
         if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
             local isAiming, Entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(self.get_id(), i_Entity)
+
             if isAiming and ENTITY.IS_ENTITY_A_PED(Entity) and PED.IS_PED_HUMAN(Entity) then
                 local pedPos = Game.GetEntityCoords(Entity, true)
+
                 if Entity ~= 0 then
                     i_LastAimedAtPed = Entity
                 end
+
                 if not PED.HAS_PED_CLEAR_LOS_TO_ENTITY_(Self.GetPedID(), i_LastAimedAtPed, pedPos.x, pedPos.y, pedPos.z, 0, false, false) then
                     i_LastAimedAtPed = 0
                 end
             end
         end
+
         if i_LastAimedAtPed ~= 0 and not ENTITY.IS_ENTITY_DEAD(i_LastAimedAtPed, false) then
             local pedBonePos = PED.GET_PED_BONE_COORDS(i_LastAimedAtPed, 0x796E, 0, 0, 0)
             local wpn_hash = Self.Weapon()
@@ -1430,7 +990,7 @@ script.register_looped("SS_RENDERLASER", function() -- Laser Sight
         and (wpn_hash ~= 0xBA536372)
         and (wpn_hash ~= 0x184140A1)
         and (wpn_hash ~= 0x060EC506) then
-            for _, bone in ipairs(t_WeaponBones) do
+            for _, bone in ipairs(eWeaponBones) do
                 local boneIndex = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(wpn_idx, bone)
                 if boneIndex ~= -1 then
                     wpn_bone = boneIndex
@@ -1455,31 +1015,20 @@ end)
 
 script.register_looped("SS_VEHICLE", function(ssveh)
     b_ShouldDrawSpeedometer = (
-        speedometer.enabled
+        speedometer_cfg.enabled
         and Self.IsDriving()
         and (Self.Vehicle.BodyHealth > 0)
         and not HUD.IS_PAUSE_MENU_ACTIVE()
-        and not Self.IsBrowsingApps()
     )
 
     if Self.IsDriving() then
         if b_ShouldDrawSpeedometer then
-            if speedometer.speed_unit == 0 then
+            if speedometer_cfg.speed_unit == 0 then
                 i_SpeedometerUnitModifier = 1
-            elseif speedometer.speed_unit == 1 then
+            elseif speedometer_cfg.speed_unit == 1 then
                 i_SpeedometerUnitModifier = 3.6
             else
                 i_SpeedometerUnitModifier = 2.236936
-            end
-
-            if Self.Vehicle.Gear == 0 then
-                s_SpeedometerGearDisplay = Self.Vehicle.RPM > 0.29 and "R" or "N"
-            elseif Self.Vehicle.Gear > 0 then
-                s_SpeedometerGearDisplay = string.format(
-                    "%s %d",
-                    Self.Vehicle.IsSportsCar and "S" or "D",
-                    Self.Vehicle.Gear
-                )
             end
         end
 
@@ -1566,8 +1115,7 @@ script.register_looped("SS_VEHICLE", function(ssveh)
             Self.IsOutside() and
             Self.Vehicle.IsCar and not
             holdF and not
-            b_IsDuckingInVehicle
-            and not
+            b_IsDuckingInVehicle and not
             b_IsTyping and not
             b_IsSettingHotkeys and
             PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) and
@@ -1634,9 +1182,13 @@ script.register_looped("SS_VEHICLE", function(ssveh)
     end
 end)
 
-script.register_looped("SS_DSPTFX", function(dsptfx) -- Drift Smoke FX
+script.register_looped("SS_DSPTFX", function() -- Drift Smoke FX
     if Self.IsDriving() and Self.Vehicle.IsCar then
-        local wheels = { "wheel_lr", "wheel_rr" }
+        local fxBones = { "suspension_lr", "suspension_rr" }
+        local vmin, vmax = Game.GetModelDimensions(Self.Vehicle:GetModel())
+        local height = vmax.z - vmin.z
+        local f_BoneZoffset = height / 4
+
         if not VEHICLE.IS_VEHICLE_STOPPED(Self.Vehicle.Current) then
             if (
                 DriftSmoke and
@@ -1656,9 +1208,9 @@ script.register_looped("SS_DSPTFX", function(dsptfx) -- Drift Smoke FX
                         Self.Vehicle.Current,
                         "scr_ba_bb",
                         "scr_ba_bb_plane_smoke_trail",
-                        wheels,
+                        fxBones,
                         f_FxScale,
-                        vec3:new(-0.4, 0.0, 0.0),
+                        vec3:new(1.2, 0.0, -f_BoneZoffset),
                         vec3:zero(),
                         Col(driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b)
                     )
@@ -1670,7 +1222,6 @@ script.register_looped("SS_DSPTFX", function(dsptfx) -- Drift Smoke FX
         else
             if BurnoutSmoke and (Self.Vehicle.RPM >= 0.9) then
                 if VEHICLE.IS_VEHICLE_IN_BURNOUT(Self.Vehicle.Current) then
-                    dsptfx:sleep(1000)
                     if not b_HasCustomTires then
                         VEHICLE.TOGGLE_VEHICLE_MOD(Self.Vehicle.Current, 20, true)
                     end
@@ -1680,9 +1231,9 @@ script.register_looped("SS_DSPTFX", function(dsptfx) -- Drift Smoke FX
                             Self.Vehicle.Current,
                             "scr_ba_bb",
                             "scr_ba_bb_plane_smoke_trail",
-                            wheels,
-                            0.269,
-                            vec3:new(-0.4, 0.0, 0.0),
+                            fxBones,
+                            0.4,
+                            vec3:new(1.2, 0.0, -f_BoneZoffset),
                             vec3:zero(),
                             Col(driftSmoke_T.r, driftSmoke_T.g, driftSmoke_T.b)
                         )
@@ -1725,8 +1276,8 @@ end)
 -- elecronic stability control indicator for the speedometer
 script.register_looped("SS_ESC_INDICATOR", function(esc)
     if (
-        speedometer and
-        speedometer.enabled and
+        speedometer_cfg and
+        speedometer_cfg.enabled and
         Self.IsDriving() and
         Self.Vehicle.IsCar
     )then
@@ -1830,14 +1381,14 @@ script.register_looped("SS_MISC_VEH", function(mvo)
     end
 end)
 
-script.register_looped("SS_VEHALARM", function(amgr)
-    if Self.Vehicle.DoorLockState == 2 and VEHICLE.IS_VEHICLE_ALARM_ACTIVATED(Self.Vehicle.Current) then
-        repeat
-            amgr:sleep(100)
-        until not VEHICLE.IS_VEHICLE_ALARM_ACTIVATED(Self.Vehicle.Current)
-        VEHICLE.SET_VEHICLE_ALARM(Self.Vehicle.Current, Self.Vehicle.DoorLockState == 2)
-    end
-end)
+-- script.register_looped("SS_VEHALARM", function(amgr)
+--     if Self.Vehicle.DoorLockState == 2 and VEHICLE.IS_VEHICLE_ALARM_ACTIVATED(Self.Vehicle.Current) then
+--         repeat
+--             amgr:sleep(100)
+--         until not VEHICLE.IS_VEHICLE_ALARM_ACTIVATED(Self.Vehicle.Current)
+--         VEHICLE.SET_VEHICLE_ALARM(Self.Vehicle.Current, Self.Vehicle.DoorLockState == 2)
+--     end
+-- end)
 
 script.register_looped("SS_VEHICLEFX", function()
     if (
@@ -2039,8 +1590,6 @@ script.register_looped("SS_PNB", function(pnp) -- Pops & Bangs
         VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(Self.Vehicle.Current)
     ) then
         if popsNbangs then
-            local s_PopSoundName, s_PopSoundRef, i_FlameSize
-
             if limitVehOptions and not Game.Vehicle.IsSportsOrSuper(Self.Vehicle.Current) then
                 return
             end
@@ -2143,7 +1692,7 @@ script.register_looped("SS_VEHMINES", function(vmns) -- Vehicle Mines
                     veh_pos.x,
                     veh_pos.y,
                     veh_pos.z,
-                    ground_z,
+                    groundZ,
                     false,
                     false
                 )
@@ -2168,7 +1717,7 @@ script.register_looped("SS_MISSILEDEFENCE", function() -- Missile defence
         local vehPos  = ENTITY.GET_ENTITY_COORDS(Self.Vehicle.Current, true)
         local selfPos = self.get_pos()
 
-        for _, p in pairs(t_ProjectileTypes) do
+        for _, p in pairs(eProjectileTypes) do
             if MISC.IS_PROJECTILE_TYPE_IN_AREA(
                 vehPos.x + 500,
                 vehPos.y + 500,
@@ -2485,7 +2034,7 @@ script.register_looped("SS_MISC_PLANES", function()
 end)
 
 script.register_looped("SS_AUTOPILOT_INTERRUPT", function(apki) -- Auto Pilot Keyboard Interrupt
-    if (autopilot_waypoint or autopilot_objective or autopilot_random) then
+    if (b_AutopilotWaypoint or b_AutopilotObjective or b_AutopilotRandom) then
         if (
             not Self.IsDriving() or
             not Self.Vehicle.IsHeli or
@@ -2496,13 +2045,13 @@ script.register_looped("SS_AUTOPILOT_INTERRUPT", function(apki) -- Auto Pilot Ke
         ) then
             TASK.CLEAR_PED_TASKS(Self.GetPedID())
             TASK.CLEAR_PRIMARY_VEHICLE_TASK(Self.Vehicle.Current)
-            autopilot_waypoint  = false
-            autopilot_objective = false
-            autopilot_random    = false
+            b_AutopilotWaypoint  = false
+            b_AutopilotObjective = false
+            b_AutopilotRandom    = false
             apki:sleep(50)
         end
 
-        for _, ctrl in pairs(t_FlightControls) do
+        for _, ctrl in pairs(eFlightControls) do
             if PAD.IS_CONTROL_PRESSED(0, ctrl) then
                 TASK.CLEAR_PED_TASKS(Self.GetPedID())
                 TASK.CLEAR_PRIMARY_VEHICLE_TASK(Self.Vehicle.Current)
@@ -2513,481 +2062,317 @@ script.register_looped("SS_AUTOPILOT_INTERRUPT", function(apki) -- Auto Pilot Ke
                     2
                 )
 
-                autopilot_waypoint  = false
-                autopilot_objective = false
-                autopilot_random    = false
+                b_AutopilotWaypoint  = false
+                b_AutopilotObjective = false
+                b_AutopilotRandom    = false
                 break
             end
         end
     end
 end)
 
-script.register_looped("SS_FLATBED", function(fltbd)
-    Flatbed:BackgroundWorker(fltbd)
-end)
-
 -- World
 script.register_looped("SS_PEDGRABBER", function(pg)
-    if (
-        pedGrabber and not
-        vehicleGrabber and not
-        HUD.IS_MP_TEXT_CHAT_TYPING() and not
-        YimActions:IsPedPlaying(self.get_ped()) and not
-        b_IsCrouched and not
-        b_IsHandsUp and not
-        b_IsHiding
-    ) then
-        if (
-            Self.IsOnFoot() and not
-            gui.is_open() and not
-            WEAPON.IS_PED_ARMED(Self.GetPedID(), 7)
+    if b_PedGrabber
+    and Self.IsOnFoot()
+    and not b_VehicleGrabber
+    and not HUD.IS_MP_TEXT_CHAT_TYPING()
+    and not YimActions:IsPedPlaying(self.get_ped())
+    and not b_IsCrouched
+    and not b_IsHandsUp
+    and not HNS.isHiding
+    and not gui.is_open()
+    and not WEAPON.IS_PED_ARMED(Self.GetPedID(), 7) then
+        local nearestPed = Game.GetClosestPed(Self.GetPedID(), 10, true)
+        local myGroup = Self.GetGroupIndex()
+
+        if not b_PedGrabbed
+        and (nearestPed ~= 0) 
+        and PED.IS_PED_ON_FOOT(nearestPed)
+        and not PED.IS_PED_A_PLAYER(nearestPed)
+        and not PED.IS_PED_GROUP_MEMBER(nearestPed, myGroup)
+        and (PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257))
+        and not Self.IsBrowsingApps() then
+            b_PedGrabbed, i_GrabbedPed = AttachPed(nearestPed)
+            pg:sleep(200)
+
+            if i_GrabbedPed ~= 0 then
+                PlayHandsUp()
+                ENTITY.FREEZE_ENTITY_POSITION(i_GrabbedPed, true)
+                PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), false)
+                b_PedGrabbed = true
+            end
+        end
+    end
+
+    if b_PedGrabbed and (i_GrabbedPed ~= 0) then
+        PED.FORCE_PED_MOTION_STATE(i_GrabbedPed, 0x0EC17E58, false, 0, false)
+
+        if not ENTITY.IS_ENTITY_PLAYING_ANIM(
+            Self.GetPedID(),
+            "mp_missheist_countrybank@lift_hands",
+            "lift_hands_in_air_outro", 3
         ) then
-            local nearestPed = Game.GetClosestPed(Self.GetPedID(), 10, true)
-            local myGroup = PED.GET_PED_GROUP_INDEX(Self.GetPedID())
+            PlayHandsUp()
+        end
 
-            if (
-                not b_PedGrabbed and
-                nearestPed ~= 0 and
-                PED.IS_PED_ON_FOOT(nearestPed) and not
-                PED.IS_PED_A_PLAYER(nearestPed) and not
-                PED.IS_PED_GROUP_MEMBER(nearestPed, myGroup) and
-                (PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257)) and not
-                Self.IsBrowsingApps()
-            ) then
-                b_PedGrabbed, i_GrabbedPed = AttachPed(nearestPed)
-                pg:sleep(200)
+        if PED.IS_PED_USING_ACTION_MODE(Self.GetPedID()) then
+            repeat
+                pg:sleep(100)
+            until not PED.IS_PED_USING_ACTION_MODE(Self.GetPedID())
+            PlayHandsUp()
+        end
 
-                if i_GrabbedPed ~= 0 then
-                    PlayHandsUp()
-                    ENTITY.FREEZE_ENTITY_POSITION(i_GrabbedPed, true)
-                    PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), false)
-                    b_PedGrabbed = true
-                end
-            end
+        if PED.IS_PED_RAGDOLL(Self.GetPedID()) or Self.IsSwimming() or not Self.IsAlive() then
+            ENTITY.FREEZE_ENTITY_POSITION(i_GrabbedPed, false)
+            ENTITY.DETACH_ENTITY(i_GrabbedPed, true, true)
+            TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_GrabbedPed, false)
+            PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_GrabbedPed, false)
+            PED.SET_PED_TO_RAGDOLL(i_GrabbedPed, 1500, 0, 0, false, false, false)
+            TASK.CLEAR_PED_TASKS(Self.GetPedID())
+            PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), true)
+            i_GrabbedPed = 0
+            b_PedGrabbed = false
+        end
 
-            if b_PedGrabbed and i_GrabbedPed ~= 0 then
-                PED.FORCE_PED_MOTION_STATE(i_GrabbedPed, 0x0EC17E58, false, 0, false)
+        if PAD.IS_DISABLED_CONTROL_PRESSED(0, 25)
+        and (PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257)) then
+            local myFwdX = Game.GetForwardX(Self.GetPedID())
+            local myFwdY = Game.GetForwardY(Self.GetPedID())
 
-                if not ENTITY.IS_ENTITY_PLAYING_ANIM(
-                    Self.GetPedID(),
-                    "mp_missheist_countrybank@lift_hands",
-                    "lift_hands_in_air_outro", 3
-                ) then
-                    PlayHandsUp()
-                end
-
-                if PED.IS_PED_USING_ACTION_MODE(Self.GetPedID()) then
-                    repeat
-                        pg:sleep(100)
-                    until not PED.IS_PED_USING_ACTION_MODE(Self.GetPedID())
-                    PlayHandsUp()
-                end
-
-                if PED.IS_PED_RAGDOLL(Self.GetPedID()) or Self.IsSwimming() or not Self.IsAlive() then
-                    ENTITY.FREEZE_ENTITY_POSITION(i_GrabbedPed, false)
-                    ENTITY.DETACH_ENTITY(i_GrabbedPed, true, true)
-                    TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_GrabbedPed, false)
-                    PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_GrabbedPed, false)
-                    PED.SET_PED_TO_RAGDOLL(i_GrabbedPed, 1500, 0, 0, false, false, false)
-                    TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                    PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), true)
-                    i_GrabbedPed = 0
-                    b_PedGrabbed  = false
-                end
-
-                if PAD.IS_DISABLED_CONTROL_PRESSED(0, 25) then
-                    if PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257) then
-                        local myFwdX = Game.GetForwardX(Self.GetPedID())
-                        local myFwdY = Game.GetForwardY(Self.GetPedID())
-                        ENTITY.FREEZE_ENTITY_POSITION(i_GrabbedPed, false)
-                        ENTITY.DETACH_ENTITY(i_GrabbedPed, true, true)
-                        TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_GrabbedPed, false)
-                        PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_GrabbedPed, false)
-                        PED.SET_PED_TO_RAGDOLL(i_GrabbedPed, 1500, 0, 0, false, false, false)
-                        ENTITY.SET_ENTITY_VELOCITY(i_GrabbedPed, (i_PedThrowForce * myFwdX), (i_PedThrowForce * myFwdY), 0)
-                        TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                        PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), true)
-                        pg:sleep(200)
-                        i_GrabbedPed = 0
-                        b_PedGrabbed  = false
-                    end
-                end
-            end
+            ENTITY.FREEZE_ENTITY_POSITION(i_GrabbedPed, false)
+            ENTITY.DETACH_ENTITY(i_GrabbedPed, true, true)
+            TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_GrabbedPed, false)
+            PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_GrabbedPed, false)
+            PED.SET_PED_TO_RAGDOLL(i_GrabbedPed, 1500, 0, 0, false, false, false)
+            ENTITY.SET_ENTITY_VELOCITY(i_GrabbedPed, (i_PedThrowForce * myFwdX), (i_PedThrowForce * myFwdY), 0)
+            TASK.CLEAR_PED_TASKS(Self.GetPedID())
+            PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), true)
+            pg:sleep(200)
+            i_GrabbedPed = 0
+            b_PedGrabbed = false
         end
     end
 end)
 
 script.register_looped("SS_VEHICLEGRABBER", function(vg)
-    if (
-        vehicleGrabber and not
-        pedGrabber and not
-        HUD.IS_MP_TEXT_CHAT_TYPING() and not
-        YimActions:IsPedPlaying(self.get_ped()) and not
-        YimActions:IsPlayerBusy()
-    ) then
-        if (
-            Self.IsOnFoot() and not
-            gui.is_open() and not
-            WEAPON.IS_PED_ARMED(Self.GetPedID(), 7)
+    if b_VehicleGrabber
+    and Self.IsOnFoot()
+    and not b_PedGrabber
+    and not HUD.IS_MP_TEXT_CHAT_TYPING()
+    and not YimActions:IsPedPlaying(self.get_ped())
+    and not gui.is_open()
+    and not WEAPON.IS_PED_ARMED(Self.GetPedID(), 7) then
+        local nearestVeh = Game.GetClosestVehicle(Self.GetPedID(), 10)
+
+        if not b_VehicleGrabbed
+        and (nearestVeh ~= 0)
+        and (PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257))
+        and not Self.IsBrowsingApps() then
+            b_VehicleGrabbed, i_GrabbedVeh = AttachVeh(nearestVeh)
+            vg:sleep(200)
+
+            if i_GrabbedVeh ~= 0 then
+                PlayHandsUp()
+                PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), false)
+                b_VehicleGrabbed = true
+            end
+        end
+    end
+
+    if b_VehicleGrabbed and (i_GrabbedVeh ~= 0) then
+        if not ENTITY.IS_ENTITY_PLAYING_ANIM(
+            Self.GetPedID(),
+            "mp_missheist_countrybank@lift_hands",
+            "lift_hands_in_air_outro",
+            3
         ) then
-
-            local nearestVeh = Game.GetClosestVehicle(Self.GetPedID(), 10)
-
-            if (
-                not b_VehicleGrabbed and
-                nearestVeh ~= 0 and
-                (PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257)) and not
-                Self.IsBrowsingApps()
-            ) then
-                b_VehicleGrabbed, i_GrabbedVeh = AttachVeh(nearestVeh)
-                vg:sleep(200)
-
-                if i_GrabbedVeh ~= 0 then
-                    PlayHandsUp()
-                    PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), false)
-                    b_VehicleGrabbed = true
-                end
-            end
-
-            if b_VehicleGrabbed and i_GrabbedVeh ~= 0 then
-                if not ENTITY.IS_ENTITY_PLAYING_ANIM(Self.GetPedID(), "mp_missheist_countrybank@lift_hands", "lift_hands_in_air_outro", 3) then
-                    PlayHandsUp()
-                end
-
-                if PED.IS_PED_USING_ACTION_MODE(Self.GetPedID()) then
-                    repeat
-                        vg:sleep(100)
-                    until not PED.IS_PED_USING_ACTION_MODE(Self.GetPedID())
-                    PlayHandsUp()
-                end
-
-                if PED.IS_PED_RAGDOLL(Self.GetPedID()) or Self.IsSwimming() or not Self.IsAlive() then
-                    ENTITY.DETACH_ENTITY(i_GrabbedVeh, true, true)
-                    TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                    PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), true)
-                    i_GrabbedVeh    = 0
-                    b_VehicleGrabbed = false
-                end
-
-                if PAD.IS_DISABLED_CONTROL_PRESSED(0, 25) then
-                    if PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257) then
-                        local myFwdX = Game.GetForwardX(Self.GetPedID())
-                        local myFwdY = Game.GetForwardY(Self.GetPedID())
-                        ENTITY.DETACH_ENTITY(i_GrabbedVeh, true, true)
-                        ENTITY.SET_ENTITY_VELOCITY(i_GrabbedVeh, (i_PedThrowForce * myFwdX), (i_PedThrowForce * myFwdY), 0)
-                        TASK.CLEAR_PED_TASKS(Self.GetPedID())
-                        PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), true)
-                        vg:sleep(200)
-                        i_GrabbedVeh    = 0
-                        b_VehicleGrabbed = false
-                    end
-                end
-            end
-        end
-    end
-end)
-
-script.register_looped("SS_CARPOOL", function(cp) -- Ride With NPCs
-    if carpool then
-        b_StopCarpoolSearch = PED.IS_PED_SITTING_IN_ANY_VEHICLE(Self.GetPedID()) and true or false
-        if not b_StopCarpoolSearch then
-            nearestVeh = Game.GetClosestVehicle(Self.GetPedID(), 10)
+            PlayHandsUp()
         end
 
-        local trying_to_enter = PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Self.GetPedID())
-        if trying_to_enter ~= 0 and trying_to_enter == nearestVeh and VEHICLE.ARE_ANY_VEHICLE_SEATS_FREE(trying_to_enter) then
-            local Occupants = Game.Vehicle.GetOccupants(trying_to_enter)
-            for _, occupant in ipairs(Occupants) do
-                if occupant ~= nil and ENTITY.IS_ENTITY_A_PED(occupant) and not PED.IS_PED_A_PLAYER(occupant) then
-                    i_CarpoolVehicle = trying_to_enter
-                    PED.SET_PED_CONFIG_FLAG(occupant, 251, true)
-                    PED.SET_PED_CONFIG_FLAG(occupant, 255, true)
-                    PED.SET_PED_CONFIG_FLAG(occupant, 398, true)
-                    PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(occupant, true)
-                end
-            end
-        end
-
-        if PED.IS_PED_SITTING_IN_VEHICLE(Self.GetPedID(), i_CarpoolVehicle) then
-            b_IsCarpooling = true
-            local Occupants = Game.Vehicle.GetOccupants(i_CarpoolVehicle)
-            local numPassengers = VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(i_CarpoolVehicle)
-            i_CarpoolDriver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(i_CarpoolVehicle, -1, true)
-            b_CarpoolVehIsConvertible = VEHICLE.IS_VEHICLE_A_CONVERTIBLE(i_CarpoolVehicle, false)
-            b_ShowCarpoolSeatControls = numPassengers > 1
-            b_StopCarpoolSearch = true
-            b_ShowCarpoolUI = true
-
+        if PED.IS_PED_USING_ACTION_MODE(Self.GetPedID()) then
             repeat
-                b_CarpoolVehRadioEnabled = AUDIO.IS_VEHICLE_RADIO_ON(i_CarpoolVehicle)
-                f_CarpoolVehicleCurrentSpeed = ENTITY.GET_ENTITY_SPEED(i_CarpoolVehicle)
-
-                if b_CarpoolVehIsConvertible then
-                    i_CarpoolVehRoofState = VEHICLE.GET_CONVERTIBLE_ROOF_STATE(i_CarpoolVehicle)
-                end
-
-                cp:sleep(100)
-            until not PED.IS_PED_SITTING_IN_VEHICLE(Self.GetPedID(), i_CarpoolVehicle) or not PED.IS_PED_SITTING_IN_VEHICLE(i_CarpoolDriver, i_CarpoolVehicle)
-
-            for _, occupant in ipairs(Occupants) do
-                if occupant ~= nil and ENTITY.IS_ENTITY_A_PED(occupant) and not PED.IS_PED_A_PLAYER(occupant) then
-                    PED.SET_PED_CONFIG_FLAG(occupant, 251, false)
-                    PED.SET_PED_CONFIG_FLAG(occupant, 255, false)
-                    PED.SET_PED_CONFIG_FLAG(occupant, 398, false)
-                    PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(occupant, false)
-                end
-            end
-
-            b_IsCarpooling = false
-            b_StopCarpoolSearch = false
-            b_ShowCarpoolUI = false
-            b_ShowCarpoolSeatControls = false
-            i_CarpoolVehicle = 0
-            i_CarpoolDriver = 0
-            s_NpcDriveTask = ""
-        else
-            b_IsCarpooling = false
-            if b_ShowCarpoolUI then
-                b_ShowCarpoolUI = false
-            end
-            if b_ShowCarpoolSeatControls then
-                b_ShowCarpoolSeatControls = false
-            end
+                vg:sleep(100)
+            until not PED.IS_PED_USING_ACTION_MODE(Self.GetPedID())
+            PlayHandsUp()
         end
-    end
-end)
 
-script.register_looped("SS_CPEXITFIX", function(cpef) -- carpool exit fix
-    if b_IsCarpooling and PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) then
-        if not VEHICLE.IS_VEHICLE_STOPPED(i_CarpoolVehicle) then
-            TASK.TASK_VEHICLE_TEMP_ACTION(i_CarpoolDriver, i_CarpoolVehicle, 1, 3000)
-            repeat
-                cpef:sleep(10)
-            until VEHICLE.IS_VEHICLE_STOPPED(i_CarpoolVehicle)
+        if PED.IS_PED_RAGDOLL(Self.GetPedID()) or Self.IsSwimming() or not Self.IsAlive() then
+            ENTITY.DETACH_ENTITY(i_GrabbedVeh, true, true)
+            TASK.CLEAR_PED_TASKS(Self.GetPedID())
+            PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), true)
+            i_GrabbedVeh = 0
+            b_VehicleGrabbed = false
         end
-        TASK.TASK_LEAVE_VEHICLE(Self.GetPedID(), i_CarpoolVehicle, 0)
-    end
-end)
 
-script.register_looped("SS_PUBLICSEATS", function(pseats)
-    if (
-        public_seats and
-        Self.IsOutside() and
-        Self.IsOnFoot() and not
-        NETWORK.NETWORK_IS_ACTIVITY_SESSION() and not
-        b_IsSitting
-    ) then
-        local near_seat, seat, x_offset, z_offset = Self.IsNearPublicSeat()
-        if (near_seat and Self.IsAlive() and Self.CanSit()) then
-            Game.ShowButtonPrompt("Press ~INPUT_PICKUP~ to sit down")
-            if PAD.IS_CONTROL_PRESSED(0, 38) then
-                Await(Game.RequestAnimDict, "timetable@ron@ig_3_couch")
+        if PAD.IS_DISABLED_CONTROL_PRESSED(0, 25)
+        and (PAD.IS_DISABLED_CONTROL_PRESSED(0, 24) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 257)) then
+            local myFwdX = Game.GetForwardX(Self.GetPedID())
+            local myFwdY = Game.GetForwardY(Self.GetPedID())
 
-                if ENTITY.DOES_ENTITY_EXIST(seat) then
-                    ENTITY.FREEZE_ENTITY_POSITION(seat, true)
-                    TASK.TASK_TURN_PED_TO_FACE_ENTITY(Self.GetPedID(), seat, 100)
-                    pseats:sleep(150)
-                    TASK.TASK_PLAY_ANIM(
-                        Self.GetPedID(),
-                        "timetable@ron@ig_3_couch",
-                        "base",
-                        1.69,
-                        4.0,
-                        -1,
-                        33,
-                        1.0,
-                        false,
-                        false,
-                        false
-                    )
-
-                    local bone_index = PED.GET_PED_BONE_INDEX(Self.GetPedID(), 0)
-                    ENTITY.ATTACH_ENTITY_TO_ENTITY(
-                        Self.GetPedID(),
-                        seat,
-                        bone_index,
-                        x_offset,
-                        -0.6,
-                        z_offset,
-                        0.0,
-                        0.0,
-                        180.0,
-                        false,
-                        false,
-                        false,
-                        false,
-                        20,
-                        true,
-                        1
-                    )
-                    pseats:sleep(1000)
-                    b_IsSitting, i_PublicSeat = true, seat
-                end
-            end
-        else
-            pseats:sleep(1000)
-        end
-    end
-
-    if b_IsSitting then
-        if PED.IS_PED_IN_MELEE_COMBAT(Self.GetPedID()) then
-            StandUp()
-        end
-        if PED.IS_PED_RAGDOLL(Self.GetPedID()) then
-            StandUp()
-        end
-        if PLAYER.IS_PLAYER_FREE_AIMING(self.get_id()) then
-            StandUp()
-        end
-        if not Self.IsAlive() then
-            if ENTITY.DOES_ENTITY_EXIST(i_PublicSeat) then
-                ENTITY.FREEZE_ENTITY_POSITION(i_PublicSeat, false)
-                if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(Self.GetPedID(), i_PublicSeat) then
-                    ENTITY.DETACH_ENTITY(Self.GetPedID(), true, true)
-                end
-                i_PublicSeat = 0
-            end
-            b_IsSitting = false
-        end
-        if not ENTITY.IS_ENTITY_PLAYING_ANIM(Self.GetPedID(), "timetable@ron@ig_3_couch", "base", 3) then
-            if ENTITY.DOES_ENTITY_EXIST(i_PublicSeat) then
-                ENTITY.FREEZE_ENTITY_POSITION(i_PublicSeat, false)
-                if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(Self.GetPedID(), i_PublicSeat) then
-                    ENTITY.DETACH_ENTITY(Self.GetPedID(), true, true)
-                end
-                i_PublicSeat = 0
-            end
-            b_IsSitting = false
-        else
-            Game.ShowButtonPrompt("Press ~INPUT_PICKUP~ to get up")
-            if PAD.IS_CONTROL_PRESSED(0, 38) then
-                ENTITY.DETACH_ENTITY(Self.GetPedID(), true, false)
-                TASK.STOP_ANIM_TASK(Self.GetPedID(), "timetable@ron@ig_3_couch", "base", -2.69)
-                if ENTITY.DOES_ENTITY_EXIST(i_PublicSeat) then
-                    ENTITY.FREEZE_ENTITY_POSITION(i_PublicSeat, false)
-                end
-                pseats:sleep(1000)
-                b_IsSitting, i_PublicSeat = false, 0
-            end
+            ENTITY.DETACH_ENTITY(i_GrabbedVeh, true, true)
+            ENTITY.SET_ENTITY_VELOCITY(
+                i_GrabbedVeh,
+                (i_PedThrowForce * myFwdX),
+                (i_PedThrowForce * myFwdY),
+                0
+            )
+            TASK.CLEAR_PED_TASKS(Self.GetPedID())
+            PED.SET_PED_CAN_SWITCH_WEAPON(Self.GetPedID(), true)
+            vg:sleep(200)
+            i_GrabbedVeh = 0
+            b_VehicleGrabbed = false
         end
     end
 end)
 
 script.register_looped("SS_AMBSCN", function(ambscn) -- Ambient Scenarios
     if ambient_scenarios and Self.IsOutside() and Self.IsOnFoot() then
-        local myPos = self.get_pos()
-        local amb_scenario_exists, amb_scenario_name = Game.DoesHumanScenarioExistInArea(myPos, 2, true)
-        local force_start = PAD.IS_CONTROL_PRESSED(0, 21)
-        if amb_scenario_exists and not b_IsPlayingAmbientScenario and not b_PedGrabbed
-            and not b_VehicleGrabbed and not b_IsSitting and not b_IsCrouched
+        if not b_IsPlayingAmbientScenario then
+            local myPos = self.get_pos()
+            local amb_scenario_exists, amb_scenario_name = Game.DoesHumanScenarioExistInArea(myPos, 2, true)
+            local force_start = PAD.IS_CONTROL_PRESSED(0, 21)
+
+            if amb_scenario_exists
+            and not PublicSeating.isSitting
+            and not b_IsPlayingAmbientScenario
+            and not b_PedGrabbed
+            and not b_VehicleGrabbed
+            and not b_IsCrouched
             and not script.is_active("CELLPHONE_FLASHHAND") then
+                Disable_E()
+
+                if ambient_scenario_prompt then
+                    Game.ShowButtonPrompt(
+                        string.format(
+                            "Press ~INPUT_PICKUP~ to play the nearest scenario (%s).",
+                            amb_scenario_name
+                        )
+                    )
+                end
+
+                local UseNearestScenarioCall = force_start
+                and TASK.TASK_USE_NEAREST_SCENARIO_TO_COORD_WARP
+                or TASK.TASK_USE_NEAREST_SCENARIO_TO_COORD
+
+                if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 38) then
+                    YimActions:ResetPlayer()
+
+                    if not PED.GET_PED_CONFIG_FLAG(Self.GetPedID(), 414, true) then
+                        PED.SET_PED_CONFIG_FLAG(Self.GetPedID(), 414, true)
+                    end
+
+                    UseNearestScenarioCall(Self.GetPedID(), myPos.x, myPos.y, myPos.z, 2, -1)
+                    ambscn:sleep(1500)
+
+                    if not force_start then
+                        YimToast:ShowMessage(
+                            "Samurai's Scripts",
+                            "If the ambient scenario glitches or fails to start, you can hold [Left Shift] and press [E] to force start or stop it.",
+                            false,
+                            10
+                        )
+                    end
+
+                    b_IsPlayingAmbientScenario = true
+                end
+            end
+        else
             Disable_E()
-            if ambient_scenario_prompt then
-                Game.ShowButtonPrompt(
-                    ("Press ~INPUT_PICKUP~ to play the nearest scenario (%s)."):format(amb_scenario_name)
-                )
-            end
-            local UseNearestScenarioCall = force_start and TASK.TASK_USE_NEAREST_SCENARIO_TO_COORD_WARP or
-                TASK.TASK_USE_NEAREST_SCENARIO_TO_COORD
-            if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 38) then
-                if is_playing_anim then
-                    cleanup(ambscn)
-                    is_playing_anim = false
-                end
-                if b_IsHandsUp then
-                    TASK.CLEAR_PED_TASKS_IMMEDIATELY(Self.GetPedID())
-                    b_IsHandsUp = false
-                end
-                if not PED.GET_PED_CONFIG_FLAG(Self.GetPedID(), 414, true) then
-                    PED.SET_PED_CONFIG_FLAG(Self.GetPedID(), 414, true)
-                end
-                UseNearestScenarioCall(Self.GetPedID(), myPos.x, myPos.y, myPos.z, 2, -1)
-                ambscn:sleep(1500)
-                YimToast:ShowMessage(
-                    "Samurai's Scripts",
-                    "If the ambient scenario glitches or fails to start, you can hold [Left Shift] and press [E] to force start or stop it.",
-                    false,
-                    5
-                )
-                b_IsPlayingAmbientScenario = true
-            end
-        end
-        if b_IsPlayingAmbientScenario then
-            if not Self.IsAlive() or PED.IS_PED_RAGDOLL(Self.GetPedID()) then
+            Game.ShowButtonPrompt("Press ~INPUT_PICKUP~ or ~INPUT_AIM~ to stop.")
+
+            if not Self.IsAlive() then
                 b_IsPlayingAmbientScenario = false
             end
-            Disable_E()
-            if ambient_scenario_prompt then
-                Game.ShowButtonPrompt("Press ~INPUT_PICKUP~ to stop.")
+
+            if Self.IsRagdolling()
+            or Self.IsInCombat()
+            or PLAYER.IS_PLAYER_FREE_AIMING(Self.GetPlayerID()) then
+                TASK.CLEAR_PED_TASKS_IMMEDIATELY(Self.GetPedID())
+                b_IsPlayingAmbientScenario = false
             end
-            if PAD.IS_CONTROL_PRESSED(0, 21) then
-                if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 38) then
+
+            if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 38) or PAD.IS_CONTROL_JUST_PRESSED(0, 25) then
+                if PAD.IS_CONTROL_PRESSED(0, 21) then  -- force stop
                     TASK.CLEAR_PED_TASKS_IMMEDIATELY(Self.GetPedID())
-                    b_IsPlayingAmbientScenario = false
-                    ambscn:sleep(1000)
+                else
+                    TASK.CLEAR_PED_TASKS(Self.GetPedID())
+
+                    if PED.IS_PED_USING_ANY_SCENARIO(Self.GetPedID()) then
+                        Game.BusySpinnerOn(_T("SCN_STOP_SPINNER_"), 3)
+                        repeat
+                            Sleep(10)
+                        until not PED.IS_PED_USING_ANY_SCENARIO(Self.GetPedID())
+                        Game.BusySpinnerOff()
+                    end
                 end
-            else
-                if PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 38) then
-                    stopScenario(Self.GetPedID(), ambscn)
-                    b_IsPlayingAmbientScenario = false
-                    ambscn:sleep(1000)
-                end
+
+                ambscn:sleep(1000)
+                b_IsPlayingAmbientScenario = false
             end
         end
     end
 end)
 
-script.register_looped("SS_KAMIKAZE", function()
+script.register_looped("SS_KAMIKAZE", function(s)
     if kamikazeDrivers and Self.IsAlive() then
         local gta_peds = entities.get_all_peds_as_handles()
         local myGroup  = PED.GET_PED_GROUP_INDEX(Self.GetPedID())
+
         for _, ped in pairs(gta_peds) do
-            if (
-                    ped ~= Self.GetPedID() and not
-                    PED.IS_PED_A_PLAYER(ped) and not
-                    PED.IS_PED_GROUP_MEMBER(ped, myGroup) and
-                    PED.IS_PED_SITTING_IN_ANY_VEHICLE(ped)
-                ) then
+            if (ped ~= Self.GetPedID())
+            and PED.IS_PED_SITTING_IN_ANY_VEHICLE(ped)
+            and not PED.IS_PED_A_PLAYER(ped)
+            and not PED.IS_PED_GROUP_MEMBER(ped, myGroup)
+            and not SS.IsScriptEntity(ped) then
                 local ped_veh = PED.GET_VEHICLE_PED_IS_USING(ped)
+
                 if VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(ped_veh) then
                     if VEHICLE.IS_VEHICLE_STOPPED(ped_veh) then
                         TASK.TASK_VEHICLE_TEMP_ACTION(ped, ped_veh, 23, 1000)
                     end
-                    if (
-                            ENTITY.GET_ENTITY_SPEED(ped_veh) > 1.8 and
-                            ENTITY.GET_ENTITY_SPEED(ped_veh) < 70 and
-                            VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(ped_veh) and not
-                            ENTITY.IS_ENTITY_DEAD(ped, false)
-                        ) then
+
+                    if ENTITY.GET_ENTITY_SPEED(ped_veh) > 1.8
+                    and ENTITY.GET_ENTITY_SPEED(ped_veh) < 70
+                    and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(ped_veh)
+                    and not ENTITY.IS_ENTITY_DEAD(ped, false) then
                         VEHICLE.SET_VEHICLE_BRAKE(ped_veh, false)
                         VEHICLE.SET_VEHICLE_FORWARD_SPEED(ped_veh, (ENTITY.GET_ENTITY_SPEED(ped_veh) + 0.7))
                     end
                 end
             end
+            s:sleep(1)
         end
     end
 end)
 
-script.register_looped("SS_PUBLICENEMY", function() -- Public Enemy
+script.register_looped("SS_PUBLICENEMY", function(s) -- Public Enemy
     if publicEnemy and Self.IsAlive() then
-        local myGroup  = PED.GET_PED_GROUP_INDEX(Self.GetPedID())
+        local myGroup = Self.GetGroupIndex()
         local gta_peds = entities.get_all_peds_as_handles()
+
         for _, ped in pairs(gta_peds) do
-            if (
-                    ped ~= Self.GetPedID() and not
-                    PED.IS_PED_A_PLAYER(ped) and not
-                    PED.IS_PED_GROUP_MEMBER(ped, myGroup)
-                ) then
+            if (ped ~= Self.GetPedID())
+            and not PED.IS_PED_A_PLAYER(ped)
+            and not PED.IS_PED_GROUP_MEMBER(ped, myGroup)
+            and not SS.IsScriptEntity(ped) then
                 for _, attr in ipairs(t_PEcombatAttributes) do
                     PED.SET_PED_COMBAT_ATTRIBUTES(ped, attr.id, attr.bool)
                 end
+
                 if not PED.IS_PED_IN_COMBAT(ped, Self.GetPedID()) then
                     PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, true)
+
                     for _, cflag in ipairs(t_PEconfigFlags) do
                         if not PED.GET_PED_CONFIG_FLAG(ped, cflag.id, cflag.bool) then
                             PED.SET_PED_CONFIG_FLAG(ped, cflag.id, cflag.bool)
                         end
                     end
+
+                    if WEAPON.IS_PED_ARMED(ped, 7) then
+                        WEAPON.SET_PED_DROPS_WEAPON(ped)
+                    end
+
                     PED.SET_PED_RESET_FLAG(ped, 440, true) -- PRF_IgnoreCombatManager so they can all gang up on you and beat your ass without waiting for their turns
                     TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, true)
                     PLAYER.SET_POLICE_IGNORE_PLAYER(self.get_id(), true)
@@ -2995,420 +2380,239 @@ script.register_looped("SS_PUBLICENEMY", function() -- Public Enemy
                     TASK.TASK_COMBAT_PED(ped, Self.GetPedID(), 0, 16)
                 end
             end
+            s:sleep(3)
         end
     end
 end)
 
---
 -- Casino Pacino
-script.register_looped("SS_CASINOPACINO", function(script)
-    if Game.IsOnline() then
-        if force_poker_cards then
-            local player_id = self.get_id()
-            if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("three_card_poker")) ~= 0 then
-                while NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", -1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 0, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 2, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 3, 0) ~= player_id do
-                    network.force_script_host("three_card_poker")
-                    YimToast:ShowMessage("Samuai's Scripts", _T("CP_TCC_CTRL_NOTIF_")) -- If you see this spammed, someone if fighting you for control.
-                    script:sleep(500)
-                end
-                local players_current_table = locals.get_int("three_card_poker",
-                    three_card_poker_table + 1 + (player_id * three_card_poker_table_size) + 2) -- The Player's current table he is sitting at.
-                if (players_current_table ~= -1) then                                           -- If the player is sitting at a poker table
-                    local player_0_card_1 = locals.get_int("three_card_poker",
-                        (three_card_poker_cards) + (three_card_poker_current_deck) +
-                        (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (1) + (0 * 3))
-                    local player_0_card_2 = locals.get_int("three_card_poker",
-                        (three_card_poker_cards) + (three_card_poker_current_deck) +
-                        (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (2) + (0 * 3))
-                    local player_0_card_3 = locals.get_int("three_card_poker",
-                        (three_card_poker_cards) + (three_card_poker_current_deck) +
-                        (1 + (players_current_table * three_card_poker_deck_size)) + (2) + (3) + (0 * 3))
-                    if player_0_card_1 ~= 50 or player_0_card_2 ~= 51 or player_0_card_3 ~= 52 then --Check if we need to overwrite the deck.
-                        local total_players = 0
-                        for player_iter = 0, 31, 1 do
-                            local player_table = locals.get_int("three_card_poker",
-                                three_card_poker_table + 1 + (player_iter * three_card_poker_table_size) + 2)
-                            if player_iter ~= player_id and player_table == players_current_table then --An additional player is sitting at the user's table.
-                                total_players = total_players + 1
-                            end
+script.register_looped("SS_CASINOPACINO", function(dunk)
+    if not Game.IsOnline() or not SS.IsUpToDate() then
+        return
+    end
+
+    if force_poker_cards then
+        local player_id = self.get_id()
+
+        if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("three_card_poker")) ~= 0 then
+            while (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", -1, 0) ~= player_id)
+            and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 0, 0) ~= player_id)
+            and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 1, 0) ~= player_id)
+            and( NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 2, 0) ~= player_id)
+            and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 3, 0) ~= player_id) do
+                network.force_script_host("three_card_poker")
+                YimToast:ShowMessage(
+                    "Samuai's Scripts",
+                    _T("CP_TCC_CTRL_NOTIF_")
+                ) -- If you see this spammed, someone if fighting you for control. -- YimToast has a 3s cooldown before showing the same notification again
+                dunk:sleep(500)
+            end
+
+            local players_current_table = locals.get_int(
+                "three_card_poker",
+                three_card_poker_table
+                + 1
+                + (player_id * three_card_poker_table_size)
+                + 2
+            ) -- The Player's current table he is sitting at.
+
+            if (players_current_table ~= -1) then -- If the player is sitting at a poker table
+                local player_0_card_1 = locals.get_int(
+                    "three_card_poker",
+                    (three_card_poker_cards)
+                    + (three_card_poker_current_deck)
+                    + (1 + (players_current_table * three_card_poker_deck_size))
+                    + (2)
+                    + (1)
+                    + (0 * 3)
+                )
+
+                local player_0_card_2 = locals.get_int(
+                    "three_card_poker",
+                    (three_card_poker_cards)
+                    + (three_card_poker_current_deck)
+                    + (1 + (players_current_table * three_card_poker_deck_size))
+                    + (2)
+                    + (2)
+                    + (0 * 3)
+                )
+
+                local player_0_card_3 = locals.get_int(
+                    "three_card_poker",
+                    (three_card_poker_cards)
+                    + (three_card_poker_current_deck)
+                    + (1 + (players_current_table * three_card_poker_deck_size))
+                    + (2)
+                    + (3)
+                    + (0 * 3)
+                )
+
+                if (player_0_card_1 ~= 50) or (player_0_card_2 ~= 51) or (player_0_card_3 ~= 52) then --Check if we need to overwrite the deck.
+                    local total_players = 0
+
+                    for player_iter = 0, 31, 1 do
+                        local player_table = locals.get_int(
+                            "three_card_poker",
+                            three_card_poker_table
+                            + 1
+                            + (player_iter * three_card_poker_table_size)
+                            + 2
+                        )
+
+                        if (player_iter ~= player_id) and (player_table == players_current_table) then --An additional player is sitting at the user's table.
+                            total_players = total_players + 1
                         end
-                        for playing_player_iter = 0, total_players, 1 do
-                            SetPokerCards(playing_player_iter, players_current_table, 50, 51, 52)
-                        end
-                        if set_dealers_poker_cards then
-                            SetPokerCards(total_players + 1, players_current_table, 1, 8, 22)
-                        end
+                    end
+
+                    for playing_player_iter = 0, total_players, 1 do
+                        SetPokerCards(playing_player_iter, players_current_table, 50, 51, 52)
+                    end
+
+                    if set_dealers_poker_cards then
+                        SetPokerCards(total_players + 1, players_current_table, 1, 8, 22)
                     end
                 end
             end
         end
+    end
 
-        if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("blackjack")) ~= 0 then
-            local dealers_card = 0
-            local blackjack_table = locals.get_int("blackjack",
-                blackjack_table_players + 1 + (self.get_id() * blackjack_table_players_size) + 4) --The Player's current table he is sitting at.
-            if blackjack_table ~= -1 then
-                dealers_card     = locals.get_int("blackjack",
-                    blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1) --Dealer's facedown card.
-                dealers_card_str = GetCardNameFromIndex(dealers_card)
-            else
-                dealers_card_str = _T("CP_NOT_PLAYING_BJ_TXT_")
-            end
+    if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("blackjack")) ~= 0 then
+        local dealers_card = 0
+        local blackjack_table = locals.get_int("blackjack",
+            blackjack_table_players + 1 + (self.get_id() * blackjack_table_players_size) + 4) --The Player's current table he is sitting at.
+        if blackjack_table ~= -1 then
+            dealers_card     = locals.get_int("blackjack",
+                blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1) --Dealer's facedown card.
+            dealers_card_str = GetCardNameFromIndex(dealers_card)
         else
-            dealers_card_str = _T("CP_NOT_IN_CASINO_TXT_")
+            dealers_card_str = _T("CP_NOT_PLAYING_BJ_TXT_")
         end
+    else
+        dealers_card_str = _T("CP_NOT_IN_CASINO_TXT_")
+    end
 
-        if force_roulette_wheel then
-            local player_id = self.get_id()
-            if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casinoroulette")) ~= 0 then
-                while NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", -1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 0, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 2, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 3, 0) ~= player_id do
-                    network.force_script_host("casinoroulette")
-                    YimToast:ShowMessage("Samurai's Scripts", _T("CP_ROULETTE_CTRL_NOTIF_")) --If you see this spammed, someone if fighting you for control.
-                    script:sleep(500)
-                end
-                for tabler_iter = 0, 6, 1 do
-                    locals.set_int("casinoroulette",
-                        (roulette_master_table) + (roulette_outcomes_table) + (roulette_ball_table) + (tabler_iter), 18)
-                end
+    if force_roulette_wheel then
+        local player_id = self.get_id()
+        if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casinoroulette")) ~= 0 then
+            while NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", -1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 0, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 1, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 2, 0) ~= player_id and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 3, 0) ~= player_id do
+                network.force_script_host("casinoroulette")
+                YimToast:ShowMessage("Samurai's Scripts", _T("CP_ROULETTE_CTRL_NOTIF_")) --If you see this spammed, someone if fighting you for control.
+                dunk:sleep(500)
+            end
+
+            for tabler_iter = 0, 6, 1 do
+                locals.set_int(
+                    "casinoroulette",
+                    (roulette_master_table)
+                    + (roulette_outcomes_table)
+                    + (roulette_ball_table)
+                    + (tabler_iter),
+                    18
+                )
             end
         end
+    end
 
-        if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_slots")) ~= 0 then
-            local needs_run = false
-            if rig_slot_machine then
-                for slots_iter = 3, 196, 1 do
-                    if slots_iter ~= 67 and slots_iter ~= 132 then
-                        if locals.get_int("casino_slots", (slots_random_results_table) + (slots_iter)) ~= 6 then
-                            needs_run = true
-                        end
-                    end
-                end
-            else
-                local sum = 0
-                for slots_iter = 3, 196, 1 do
-                    if slots_iter ~= 67 and slots_iter ~= 132 then
-                        sum = sum + locals.get_int("casino_slots", (slots_random_results_table) + (slots_iter))
-                    end
-                end
-                needs_run = sum == 1152
-            end
-            if needs_run then
-                for slots_iter = 3, 196, 1 do
-                    if slots_iter ~= 67 and slots_iter ~= 132 then
-                        local slot_result = 6
-                        if not rig_slot_machine then
-                            math.randomseed(os.time() + slots_iter)
-                            slot_result = math.random(0, 7)
-                        end
-                        locals.set_int("casino_slots", (slots_random_results_table) + (slots_iter), slot_result)
+    if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(joaat("casino_slots")) ~= 0 then
+        local needs_run = false
+
+        if rig_slot_machine then
+            for slots_iter = 3, 196, 1 do
+                if slots_iter ~= 67 and slots_iter ~= 132 then
+                    if locals.get_int("casino_slots", (slots_random_results_table) + (slots_iter)) ~= 6 then
+                        needs_run = true
                     end
                 end
             end
-            if autoplay_slots then
-                local slotstate = locals.get_int("casino_slots", slots_slot_machine_state) --Local Laddie️™®️© is a product of Limited Laddies LLC, all rights reserved.
-                if slotstate & (1 << 0) == 1 then                                          --The user is sitting at a slot machine.
-                    local chips = stats.get_int('MPX_CASINO_CHIPS')
-                    local chip_cap = autoplay_chips_cap
-                    if (autoplay_cap and chips < chip_cap) or not autoplay_cap then
-                        if (slotstate & (1 << 24) == 0) then --The slot machine is not currently spinning.
-                            script:yield()                   -- Wait for the previous spin to clean up, if we just came from a spin.
-                            slotstate = slotstate | (1 << 3) -- Bitwise set the 3rd bit (begin playing)
-                            locals.set_int("casino_slots", slots_slot_machine_state, slotstate)
-                            script:sleep(500)                --If we rewrite the begin playing bit again, the machine will get stuck.
-                        end
+        else
+            local sum = 0
+            for slots_iter = 3, 196, 1 do
+                if slots_iter ~= 67 and slots_iter ~= 132 then
+                    sum = sum + locals.get_int("casino_slots", (slots_random_results_table) + (slots_iter))
+                end
+            end
+            needs_run = sum == 1152
+        end
+
+        if needs_run then
+            for slots_iter = 3, 196, 1 do
+                if slots_iter ~= 67 and slots_iter ~= 132 then
+                    local slot_result = 6
+                    if not rig_slot_machine then
+                        math.randomseed(os.time() + slots_iter)
+                        slot_result = math.random(0, 7)
+                    end
+                    locals.set_int("casino_slots", (slots_random_results_table) + (slots_iter), slot_result)
+                end
+            end
+        end
+
+        if autoplay_slots then
+            local slotstate = locals.get_int("casino_slots", slots_slot_machine_state) --Local Laddie️™®️© is a product of Limited Laddies LLC, all rights reserved.
+
+            if slotstate & (1 << 0) == 1 then --The user is sitting at a slot machine.
+                local chips = stats.get_int('MPX_CASINO_CHIPS')
+                local chip_cap = autoplay_chips_cap
+                if (autoplay_cap and chips < chip_cap) or not autoplay_cap then
+                    if (slotstate & (1 << 24) == 0) then --The slot machine is not currently spinning.
+                        dunk:yield() -- Wait for the previous spin to clean up, if we just came from a spin.
+                        slotstate = slotstate | (1 << 3) -- Bitwise set the 3rd bit (begin playing)
+                        locals.set_int("casino_slots", slots_slot_machine_state, slotstate)
+                        dunk:sleep(500) -- If we rewrite the begin playing bit again, the machine will get stuck.
                     end
                 end
             end
         end
-        if bypass_casino_bans then
-            stats.set_int("MPPLY_CASINO_CHIPS_WON_GD", 0)
-            stats.set_int("MPPLY_CASINO_CHIPS_WONTIM", 0)
-            stats.set_int("MPPLY_CASINO_GMBLNG_GD", 0)
-            stats.set_int("MPPLY_CASINO_BAN_TIME", 0)
-            stats.set_int("MPPLY_CASINO_CHIPS_PURTIM", 0)
-            stats.set_int("MPPLY_CASINO_CHIPS_PUR_GD", 0)
-            stats.set_int("MPPLY_CASINO_CHIPS_SOLD", 0)
-            stats.set_int("MPPLY_CASINO_CHIPS_SELTIM", 0)
-        end
-        if gui.is_open() and casino_pacino:is_selected() then
-            casino_heist_approach      = stats.get_int("MPX_H3OPT_APPROACH")
-            casino_heist_target        = stats.get_int("MPX_H3OPT_TARGET")
-            casino_heist_last_approach = stats.get_int("MPX_H3_LAST_APPROACH")
-            casino_heist_hard          = stats.get_int("MPX_H3_HARD_APPROACH")
-            casino_heist_gunman        = stats.get_int("MPX_H3OPT_CREWWEAP")
-            casino_heist_driver        = stats.get_int("MPX_H3OPT_CREWDRIVER")
-            casino_heist_hacker        = stats.get_int("MPX_H3OPT_CREWHACKER")
-            casino_heist_weapons       = stats.get_int("MPX_H3OPT_WEAPS")
-            casino_heist_cars          = stats.get_int("MPX_H3OPT_VEHS")
-            casino_heist_masks         = stats.get_int("MPX_H3OPT_MASKS")
-            local cooldown_time        = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_LOSS_COOLDOWN")
-            local time_delta           = os.time() - stats.get_int("MPPLY_CASINO_CHIPS_WONTIM") -- "I've won the jackpot, and it doesn't make me feel bad." ~Casino Pacino (He only cares about winners)
-            local minutes_left         = (cooldown_time - time_delta) / 60
-            local chipswon_gd          = stats.get_int("MPPLY_CASINO_CHIPS_WON_GD")
-            local max_chip_wins        = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_DAILY")
-            casino_cooldown_update_str = chipswon_gd >= max_chip_wins and
-                string.format("Cooldown expires in approximately: %.2f minute(s).", minutes_left) or "Off Cooldown"
-        end
-        if heist_cart_autograb then
-            if locals.get_int("fm_mission_controller", fm_mission_controller_cart_grab) == 3 then
-                locals.set_int("fm_mission_controller", fm_mission_controller_cart_grab, 4)
-            elseif locals.get_int("fm_mission_controller", fm_mission_controller_cart_grab) == 4 then
-                locals.set_float("fm_mission_controller",
-                    fm_mission_controller_cart_grab + fm_mission_controller_cart_grab_speed,
-                    2)
-            end
+    end
+
+    if bypass_casino_bans then
+        stats.set_int("MPPLY_CASINO_CHIPS_WON_GD", 0)
+        stats.set_int("MPPLY_CASINO_CHIPS_WONTIM", 0)
+        stats.set_int("MPPLY_CASINO_GMBLNG_GD", 0)
+        stats.set_int("MPPLY_CASINO_BAN_TIME", 0)
+        stats.set_int("MPPLY_CASINO_CHIPS_PURTIM", 0)
+        stats.set_int("MPPLY_CASINO_CHIPS_PUR_GD", 0)
+        stats.set_int("MPPLY_CASINO_CHIPS_SOLD", 0)
+        stats.set_int("MPPLY_CASINO_CHIPS_SELTIM", 0)
+    end
+
+    if gui.is_open() and casino_pacino:is_selected() then
+        casino_heist_approach      = stats.get_int("MPX_H3OPT_APPROACH")
+        casino_heist_target        = stats.get_int("MPX_H3OPT_TARGET")
+        casino_heist_last_approach = stats.get_int("MPX_H3_LAST_APPROACH")
+        casino_heist_hard          = stats.get_int("MPX_H3_HARD_APPROACH")
+        casino_heist_gunman        = stats.get_int("MPX_H3OPT_CREWWEAP")
+        casino_heist_driver        = stats.get_int("MPX_H3OPT_CREWDRIVER")
+        casino_heist_hacker        = stats.get_int("MPX_H3OPT_CREWHACKER")
+        casino_heist_weapons       = stats.get_int("MPX_H3OPT_WEAPS")
+        casino_heist_cars          = stats.get_int("MPX_H3OPT_VEHS")
+        casino_heist_masks         = stats.get_int("MPX_H3OPT_MASKS")
+
+        local cooldown_time = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_LOSS_COOLDOWN")
+        local time_delta    = os.time() - stats.get_int("MPPLY_CASINO_CHIPS_WONTIM") -- "I've won the jackpot, and it doesn't make me feel bad." ~Casino Pacino (He only cares about winners)
+        local minutes_left  = (cooldown_time - time_delta) / 60
+        local chipswon_gd   = stats.get_int("MPPLY_CASINO_CHIPS_WON_GD")
+        local max_chip_wins = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_DAILY")
+
+        casino_cooldown_update_str = chipswon_gd >= max_chip_wins
+        and string.format("Cooldown expires in approximately: %.2f minute(s).", minutes_left) or "Off Cooldown"
+    end
+
+    if heist_cart_autograb then
+        if locals.get_int("fm_mission_controller", fm_mission_controller_cart_grab) == 3 then
+            locals.set_int("fm_mission_controller", fm_mission_controller_cart_grab, 4)
+        elseif locals.get_int("fm_mission_controller", fm_mission_controller_cart_grab) == 4 then
+            locals.set_float(
+                "fm_mission_controller",
+                fm_mission_controller_cart_grab + fm_mission_controller_cart_grab_speed,
+                2
+            )
         end
     end
 end)
 
-script.register_looped("SS_INSTASELL", function(isale)
-    for sn in pairs(t_SellScripts) do
-        if script.is_active(sn) then
-            s_SellScriptName, b_SellScriptIsRunning = sn, true
-            for _, v in ipairs(t_SellScriptsDisplayNames) do
-                if v.scr == s_SellScriptName then
-                    s_SellScriptDisplayName = v.sn
-                    break
-                end
-            end
-            break
-        else
-            s_SellScriptName, s_SellScriptDisplayName, b_SellScriptIsRunning = "None", "None", false
-        end
-    end
-    if b_SellScriptIsRunning and i_BhubScriptHandle ~= 0 then
-        for _, scr in pairs(t_ShouldTerminateScripts) do
-            if script.is_active(scr) then -- was triggered from the mct
-                PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 202, 1.0)
-                isale:sleep(200)
-                PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 202, 1.0)
-                break
-            end
-        end
-        if (CAM.IS_SCREEN_FADING_OUT() or CAM.IS_SCREEN_FADED_OUT()) then
-            isale:sleep(6969)
-            if CAM.IS_SCREEN_FADED_OUT() and not CAM.IS_SCREEN_FADING_IN() then -- step bro I'm stuck
-                CAM.DO_SCREEN_FADE_IN(100)
-            end
-        end
-    end
-    isale:sleep(1000)
-end)
-
-script.register_looped("SS_AUTOSELL", function(as)
-    if autosell and b_SellScriptIsRunning and not b_HasTriggeredAutosell and not CAM.IS_SCREEN_FADED_OUT() then
-        b_HasTriggeredAutosell = true
-        YimToast:ShowSuccess("Samurai's Scripts", "Auto-Sell will start in 20 seconds.")
-        as:sleep(20000)
-        if AUDIO.IS_MOBILE_PHONE_CALL_ONGOING() then
-            repeat
-                as:sleep(100)
-            until not AUDIO.IS_MOBILE_PHONE_CALL_ONGOING()
-        end
-        SS.FinishSale(s_SellScriptName)
-    end
-
-    if b_HasTriggeredAutosell then
-        repeat
-            as:sleep(100) -- wait for the script to terminate.
-        until not b_SellScriptIsRunning
-        b_HasTriggeredAutosell = false
-    end
-end)
-
--- Business Autofill
-script.register_looped("SS_HSUPP", function(hgl)
-    if b_HangarLoop then
-        if hangarOwned == nil then
-            hangarOwned = stats.get_int("MPX_HANGAR_OWNED") ~= 0
-        end
-        if hangarOwned then
-            if stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL") == 50 then
-                UI.WidgetSound("Error")
-                YimToast:ShowWarning("Samurai's Scripts", "Your Hangar is already full! Option has been disabled.", false,
-                    1.5)
-                b_HangarLoop = false
-            else
-                repeat
-                    stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
-                    i_HangarSupplies = stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
-                    hgl:sleep(supply_autofill_delay)
-                until i_HangarSupplies == 50 or b_HangarLoop == false
-                if b_HangarLoop then
-                    b_HangarLoop = false
-                end
-            end
-        else
-            YimToast:ShowWarning("Samurai's Scripts", "You don't seem to own a hangar. Option has been disabled.", false,
-                1.5)
-            b_HangarLoop = false
-        end
-    end
-end)
-
-script.register_looped("SS_WH1SUPP", function(wh_1)
-    if b_Warehouse1Loop then
-        if whouse_1_owned == nil then
-            whouse_1_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT0") - 1) >= 0
-        end
-        if whouse_1_owned then
-            if whouse1.name == "" then
-                SS.GetCEOwarehouseInfo(whouse1)
-            end
-            if stats.get_int("MPX_CONTOTALFORWHOUSE0") == whouse1.max then
-                UI.WidgetSound("Error")
-                YimToast:ShowWarning("Samurai's Scripts", "Warehouse N°1 is already full! Option has been disabled.",
-                    false, 1.5)
-                b_Warehouse1Loop = false
-            else
-                repeat
-                    stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 12)
-                    i_Warehouse1Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE0")
-                    wh_1:sleep(supply_autofill_delay)
-                until i_Warehouse1Supplies == whouse1.max or b_Warehouse1Loop == false
-                if b_Warehouse1Loop then
-                    b_Warehouse1Loop = false
-                end
-            end
-        else
-            UI.WidgetSound("Error")
-            YimToast:ShowWarning("Samurai's Scripts", "No warehouse found at this slot!", false, 1.5)
-            b_Warehouse1Loop = false
-        end
-    end
-end)
-
-script.register_looped("SS_WH2SUPP", function(wh_2)
-    if b_Warehouse2Loop then
-        if whouse_2_owned == nil then
-            whouse_2_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT1") - 1) >= 0
-        end
-        if whouse_2_owned then
-            if whouse2.name == "" then
-                SS.GetCEOwarehouseInfo(whouse2)
-            end
-            if stats.get_int("MPX_CONTOTALFORWHOUSE1") == whouse2.max then
-                UI.WidgetSound("Error")
-                YimToast:ShowWarning("Samurai's Scripts", "Warehouse N°2 is already full! Option has been disabled.",
-                    false, 1.5)
-                b_Warehouse2Loop = false
-            else
-                repeat
-                    stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 13)
-                    i_Warehouse2Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE1")
-                    wh_2:sleep(supply_autofill_delay)
-                until i_Warehouse2Supplies == whouse2.max or b_Warehouse2Loop == false
-                if b_Warehouse2Loop then
-                    b_Warehouse2Loop = false
-                end
-            end
-        else
-            UI.WidgetSound("Error")
-            YimToast:ShowWarning("Samurai's Scripts", "No warehouse found at this slot!", false, 1.5)
-            b_Warehouse2Loop = false
-        end
-    end
-end)
-
-script.register_looped("SS_WH3SUPP", function(wh_3)
-    if b_Warehouse3Loop then
-        if whouse_3_owned == nil then
-            whouse_3_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT2") - 1) >= 0
-        end
-        if whouse_3_owned then
-            if whouse3.name == "" then
-                SS.GetCEOwarehouseInfo(whouse3)
-            end
-            if stats.get_int("MPX_CONTOTALFORWHOUSE2") == whouse3.max then
-                UI.WidgetSound("Error")
-                YimToast:ShowWarning("Samurai's Scripts", "Warehouse N°3 is already full! Option has been disabled.",
-                    false, 1.5)
-                b_Warehouse3Loop = false
-            else
-                repeat
-                    stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 14)
-                    i_Warehouse3Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE2")
-                    wh_3:sleep(supply_autofill_delay)
-                until i_Warehouse3Supplies == whouse3.max or b_Warehouse3Loop == false
-                if b_Warehouse3Loop then
-                    b_Warehouse3Loop = false
-                end
-            end
-        else
-            UI.WidgetSound("Error")
-            YimToast:ShowWarning("Samurai's Scripts", "No warehouse found at this slot!", false, 1.5)
-            b_Warehouse3Loop = false
-        end
-    end
-end)
-
-script.register_looped("SS_WH4SUPP", function(wh_4)
-    if b_Warehouse4Loop then
-        if whouse_4_owned == nil then
-            whouse_4_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT3") - 1) >= 0
-        end
-        if whouse_4_owned then
-            if whouse4.name == "" then
-                SS.GetCEOwarehouseInfo(whouse4)
-            end
-            if stats.get_int("MPX_CONTOTALFORWHOUSE3") == whouse4.max then
-                UI.WidgetSound("Error")
-                YimToast:ShowWarning("Samurai's Scripts", "Warehouse N°4 is already full! Option has been disabled.",
-                    false, 1.5)
-                b_Warehouse4Loop = false
-            else
-                repeat
-                    stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 15)
-                    i_Warehouse4Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE3")
-                    wh_4:sleep(supply_autofill_delay)
-                until i_Warehouse4Supplies == whouse4.max or b_Warehouse4Loop == false
-                if b_Warehouse4Loop then
-                    b_Warehouse4Loop = false
-                end
-            end
-        else
-            UI.WidgetSound("Error")
-            YimToast:ShowWarning("Samurai's Scripts", "No warehouse found at this slot!", false, 1.5)
-            b_Warehouse4Loop = false
-        end
-    end
-end)
-
-script.register_looped("SS_WH5SUPP", function(wh_5)
-    if b_Warehouse5Loop then
-        if whouse_5_owned == nil then
-            whouse_5_owned = (stats.get_int("MPX_PROP_WHOUSE_SLOT4") - 1) >= 0
-        end
-        if whouse_5_owned then
-            if whouse5.name == "" then
-                SS.GetCEOwarehouseInfo(whouse5)
-            end
-            if stats.get_int("MPX_CONTOTALFORWHOUSE4") == whouse5.max then
-                UI.WidgetSound("Error")
-                YimToast:ShowWarning("Samurai's Scripts", "Warehouse N°5 is already full! Option has been disabled.",
-                    false, 1.5)
-                b_Warehouse5Loop = false
-            else
-                repeat
-                    stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, 16)
-                    i_Warehouse5Supplies = stats.get_int("MPX_CONTOTALFORWHOUSE4")
-                    wh_5:sleep(supply_autofill_delay)
-                until i_Warehouse5Supplies == whouse5.max or b_Warehouse5Loop == false
-                if b_Warehouse5Loop then
-                    b_Warehouse5Loop = false
-                end
-            end
-        else
-            UI.WidgetSound("Error")
-            YimToast:ShowWarning("Samurai's Scripts", "No warehouse found at this slot!", false, 1.5)
-            b_Warehouse5Loop = false
-        end
-    end
-end)
-
-script.register_looped("SS_TOGGLABLES", function(hfe) -- Misc toggleables
-    Self.CantTouchThis(noJacking)
-
+-- Misc toggleables
+script.register_looped("SS_TOGGLABLES", function(hfe)
     if disableActionMode then
         Self.DisableActionMode()
     end
@@ -3431,34 +2635,26 @@ script.register_looped("SS_TOGGLABLES", function(hfe) -- Misc toggleables
         b_WorldBoundsExtended = true
     end
 
-    if (
-            unbreakableWindows and
-            (Self.Vehicle.Current ~= 0) and not
-            Self.Vehicle.HasUnbreakableWindows
-        ) then
+    if unbreakableWindows
+    and (Self.Vehicle.Current ~= 0)
+    and not Self.Vehicle.HasUnbreakableWindows then
         VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS(Self.Vehicle.Current, true)
         Self.Vehicle.HasUnbreakableWindows = true
     end
 
-    if (
-            Self.IsOutside() and
-            Self.IsDriving() and
-            Self.Vehicle.Current == Self.Vehicle.Previous and not
-            Self.Vehicle.IsPlane and not
-            Self.Vehicle.IsHeli and not
-            Self.Vehicle.IsBoat and
-            VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(Self.Vehicle.Current)
-        ) then
+    if Self.IsOutside()
+    and Self.IsDriving()
+    and VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(Self.Vehicle.Current)
+    and (Self.Vehicle.Current == Self.Vehicle.Previous)
+    and not Self.Vehicle.IsPlane
+    and not Self.Vehicle.IsHeli
+    and not Self.Vehicle.IsBoat then
         if noEngineBraking and not Self.Vehicle.IsEngineBrakeDisabled then
             Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._FREEWHEEL_NO_GAS, true)
             hfe:sleep(100)
         end
 
-        if (
-                kersBoost and not
-                Self.Vehicle.HasKersBoost and not
-                VEHICLE.GET_VEHICLE_HAS_KERS(Self.Vehicle.Current)
-            ) then
+        if kersBoost and not Self.Vehicle.HasKersBoost and not VEHICLE.GET_VEHICLE_HAS_KERS(Self.Vehicle.Current) then
             Memory.SetVehicleHandlingFlag(Self.Vehicle.Current, HF._HAS_KERS, true)
             VEHICLE.SET_VEHICLE_KERS_ALLOWED(Self.Vehicle.Current, true)
             hfe:sleep(100)
@@ -3487,11 +2683,8 @@ script.register_looped("SS_TOGGLABLES", function(hfe) -- Misc toggleables
         end
     end
 
-    if Game.IsOnline() and (TARGET_BUILD == CURRENT_BUILD) then
-        if (
-            mc_work_cd and
-            (tunables.get_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL") > 0)
-        ) then
+    if Game.IsOnline() and SS.IsUpToDate() then
+        if mc_work_cd and (tunables.get_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL") > 0) then
             tunables.set_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL", 0)
         end
 
@@ -3507,10 +2700,7 @@ script.register_looped("SS_TOGGLABLES", function(hfe) -- Misc toggleables
             end
         end
 
-        if (
-            nc_management_cd and
-            (tunables.get_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN") > 0)
-        ) then
+        if nc_management_cd and (tunables.get_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN") > 0) then
             tunables.set_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN", 0)
         end
 
@@ -3524,17 +2714,11 @@ script.register_looped("SS_TOGGLABLES", function(hfe) -- Misc toggleables
             end
         end
 
-        if (
-            security_missions_cd and
-            (tunables.get_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME") > 0)
-        ) then
+        if security_missions_cd and (tunables.get_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME") > 0) then
             tunables.set_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME", 0)
         end
 
-        if (
-            ie_vehicle_steal_cd and
-            (tunables.get_int("IMPEXP_STEAL_COOLDOWN") > 0)
-        ) then
+        if ie_vehicle_steal_cd and (tunables.get_int("IMPEXP_STEAL_COOLDOWN") > 0) then
             tunables.set_int("IMPEXP_STEAL_COOLDOWN", 0)
         end
 
@@ -3574,17 +2758,11 @@ script.register_looped("SS_TOGGLABLES", function(hfe) -- Misc toggleables
             end
         end
 
-        if (
-            dax_work_cd and
-            (stats.get_int("MPX_XM22JUGGALOWORKCDTIMER") > 0)
-        ) then
+        if dax_work_cd and (stats.get_int("MPX_XM22JUGGALOWORKCDTIMER") > 0) then
             stats.set_int("MPX_XM22JUGGALOWORKCDTIMER", 0)
         end
 
-        if (
-            garment_rob_cd and
-            (stats.get_int("MPX_HACKER24_ROBBERY_CD") > 0)
-        ) then
+        if garment_rob_cd and (stats.get_int("MPX_HACKER24_ROBBERY_CD") > 0) then
             stats.set_int("MPX_HACKER24_ROBBERY_CD", 0)
         end
     end

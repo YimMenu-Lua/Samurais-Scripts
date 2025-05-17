@@ -73,16 +73,7 @@ function SettingsUI()
 
         ImGui.Text("Supplies Autofill Delay:")
         ImGui.SetNextItemWidth(200)
-        ImGui.BeginDisabled(
-            b_Warehouse1Loop
-            or b_Warehouse2Loop
-            or b_Warehouse3Loop
-            or b_Warehouse4Loop
-            or b_Warehouse5Loop
-            or b_HangarLoop
-        )
-            supply_autofill_delay, safdUsed = ImGui.SliderInt("##autofillDelay", supply_autofill_delay, 500, 60000)
-        ImGui.EndDisabled()
+        supply_autofill_delay, safdUsed = ImGui.SliderInt("##autofillDelay", supply_autofill_delay, 500, 60000)
         UI.Tooltip(_T("AUTOFILL_TIMEDELAY_DESC_"))
 
         ImGui.SameLine()

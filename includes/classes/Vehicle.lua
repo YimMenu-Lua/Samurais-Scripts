@@ -28,6 +28,15 @@ Game.Vehicle.Class = function(vehicle)
     return eVehicleClasses[VEHICLE.GET_VEHICLE_CLASS(vehicle) + 1] or "Unknown"
 end
 
+---@param vehicle integer
+Game.Vehicle.IsAnySeatFree = function(vehicle)
+    if not vehicle or not ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+        return false
+    end
+
+    return VEHICLE.ARE_ANY_VEHICLE_SEATS_FREE(vehicle)
+end
+
 -- Returns a table containing all occupants of a vehicle.
 ---@param vehicle integer
 Game.Vehicle.GetOccupants = function(vehicle)
@@ -199,6 +208,56 @@ Game.Vehicle.IsLowrider = function(vehicle)
         Memory.GetVehicleModelFlag(vehicle, VMF._HAS_LOWRIDER_DONK_HYDRAULICS)
 end
 
+---@param vehicle integer
+Game.Vehicle.MaxPerformance = function(vehicle)
+    if not vehicle
+    or not VEHICLE.IS_VEHICLE_DRIVEABLE(vehicle, false)
+    or not ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+        return
+    end
+
+    local maxArmor = VEHICLE.GET_NUM_VEHICLE_MODS(vehicle, 16) - 1
+    while VEHICLE.IS_VEHICLE_MOD_GEN9_EXCLUSIVE(vehicle, 16, maxArmor) do
+        maxArmor = maxArmor - 1
+        yield()
+    end
+    VEHICLE.SET_VEHICLE_MOD(vehicle, 16, maxArmor, false)
+
+    local maxEngine = VEHICLE.GET_NUM_VEHICLE_MODS(vehicle, 11) - 1
+    while VEHICLE.IS_VEHICLE_MOD_GEN9_EXCLUSIVE(vehicle, 11, maxEngine) do
+        maxEngine = maxEngine - 1
+        yield()
+    end
+    VEHICLE.SET_VEHICLE_MOD(vehicle, 11, maxEngine, false)
+
+    local maxBrakes = VEHICLE.GET_NUM_VEHICLE_MODS(vehicle, 12) - 1
+    while VEHICLE.IS_VEHICLE_MOD_GEN9_EXCLUSIVE(vehicle, 12, maxBrakes) do
+        maxBrakes = maxBrakes - 1
+        yield()
+    end
+    VEHICLE.SET_VEHICLE_MOD(vehicle, 12, maxBrakes, false)
+
+    local maxTrans = VEHICLE.GET_NUM_VEHICLE_MODS(vehicle, 13) - 1
+    while VEHICLE.IS_VEHICLE_MOD_GEN9_EXCLUSIVE(vehicle, 13, maxTrans) do
+        maxTrans = maxTrans - 1
+        yield()
+    end
+    VEHICLE.SET_VEHICLE_MOD(vehicle, 13, maxTrans, false)
+
+    local maxSusp = VEHICLE.GET_NUM_VEHICLE_MODS(vehicle, 15) - 1
+    while VEHICLE.IS_VEHICLE_MOD_GEN9_EXCLUSIVE(vehicle, 15, maxSusp) do
+        maxSusp = maxSusp - 1
+        yield()
+    end
+    VEHICLE.SET_VEHICLE_MOD(vehicle, 15, maxSusp, false)
+
+    VEHICLE.TOGGLE_VEHICLE_MOD(vehicle, 18, true)
+    VEHICLE.SET_VEHICLE_FIXED(vehicle)
+    VEHICLE.SET_VEHICLE_DEFORMATION_FIXED(vehicle)
+    VEHICLE.SET_VEHICLE_BODY_HEALTH(vehicle, 1000)
+    VEHICLE.SET_VEHICLE_STRONG(vehicle, true)
+end
+
 -- Applies a custom paint job to the vehicle
 ---@param vehicle integer
 ---@param hex string
@@ -223,6 +282,30 @@ Game.Vehicle.SetCustomPaint = function(vehicle, hex, p, m, is_primary, is_second
             end
         end
     end)
+end
+
+---@param vehicle integer
+Game.Vehicle.RepairVehicle = function(vehicle)
+    if not Game.IsScriptHandle(vehicle) then
+        return
+    end
+
+    VEHICLE.SET_VEHICLE_FIXED(vehicle)
+    VEHICLE.SET_VEHICLE_DEFORMATION_FIXED(vehicle)
+    VEHICLE.SET_VEHICLE_DIRT_LEVEL(vehicle, 0)
+
+    local pCVehicle = memory.handle_to_ptr(vehicle)
+
+    if pCVehicle:is_null() then
+        return
+    end
+
+    local m_water_damage = pCVehicle:add(0xD8)
+    local value = m_water_damage:get_int()
+
+    if value and type(value) == "number" then
+        m_water_damage:set_int(Lua_fn.clear_bit(value, 0))
+    end
 end
 
 ---@param vehicle integer
@@ -341,6 +424,53 @@ Game.Vehicle.GetVehicleMods = function(vehicle)
     return t
 end
 
+---@param vehicle integer
+Game.Vehicle.GetVehicleColors = function(vehicle)
+    local col1 = {r = 0, g = 0, b = 0}
+    local col2 = {r = 0, g = 0, b = 0}
+
+    if VEHICLE.GET_IS_VEHICLE_PRIMARY_COLOUR_CUSTOM(vehicle) then
+        col1.r, col1.g, col1.b = VEHICLE.GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(
+            vehicle,
+            col1.r,
+            col1.g,
+            col1.b
+        )
+    else
+        col1.r, col1.g, col1.b = VEHICLE.GET_VEHICLE_COLOR(
+            vehicle,
+            col1.r,
+            col1.g,
+            col1.b
+        )
+    end
+
+    if VEHICLE.GET_IS_VEHICLE_SECONDARY_COLOUR_CUSTOM(vehicle) then
+        col2.r, col2.g, col2.b = VEHICLE.GET_VEHICLE_CUSTOM_PRIMARY_COLOUR(
+            vehicle,
+            col2.r,
+            col2.g,
+            col2.b
+        )
+    else
+        col2.r, col2.g, col2.b = VEHICLE.GET_VEHICLE_COLOR(
+            vehicle,
+            col2.r,
+            col2.g,
+            col2.b
+        )
+    end
+
+    return col1, col2
+end
+
+Game.Vehicle.GetCustomWheels = function(vehicle)
+    local wheel_type = VEHICLE.GET_VEHICLE_WHEEL_TYPE(vehicle)
+    local wheel_index = VEHICLE.GET_VEHICLE_MOD_VARIATION(vehicle, 23)
+
+    return wheel_type, wheel_index
+end
+
 Game.Vehicle.PreloadMod = function(vehicle, type, index)
     VEHICLE.PRELOAD_VEHICLE_MOD(vehicle, type, index)
 
@@ -405,6 +535,26 @@ Game.Vehicle.ApplyVehicleMods = function(vehicle, t)
     end)
 end
 
+Game.Vehicle.Clone = function(vehicle, cloneSpawnPos)
+    local prevMods = Game.Vehicle.GetVehicleMods(vehicle)
+    local col1, col2 = Game.Vehicle.GetVehicleColors(vehicle)
+    local licensePlate = VEHICLE.GET_VEHICLE_NUMBER_PLATE_TEXT(vehicle)
+    local clone = Game.CreateVehicle(Game.GetEntityModel(vehicle), cloneSpawnPos)
+
+    Game.Vehicle.ApplyVehicleMods(
+        clone,
+        {
+            mods = prevMods,
+            primary_color = col1,
+            secondary_color = col2,
+            window_tint = VEHICLE.GET_VEHICLE_WINDOW_TINT(vehicle),
+            plate_text =  licensePlate or "clone"
+        }
+    )
+
+    return clone
+end
+
 Game.Vehicle.HasCrashed = function()
     if not ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(Self.Vehicle.Current) then
         return false, ""
@@ -434,7 +584,7 @@ Game.Vehicle.HasCrashed = function()
     elseif (entity_type == 1) or (entity_type == 33) or (entity_type == 7) then
         if ENTITY.DOES_ENTITY_HAVE_PHYSICS(entity) then
             local model = ENTITY.GET_ENTITY_MODEL(entity)
-            for _, m in ipairs(t_CollisionInvalidModels) do
+            for _, m in ipairs(eCollisionInvalidModels) do
                 if model == m then
                     return true, "Samir, you're breaking the car!"
                 end

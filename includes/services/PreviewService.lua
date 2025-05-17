@@ -69,6 +69,8 @@ function PreviewService:Preview(i_ModelHash, i_EntityType)
                 false,
                 false
             )
+            PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_Handle, true)
+            TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(i_Handle, true)
         end
 
         ENTITY.SET_ENTITY_ALPHA(i_Handle, 127, false)

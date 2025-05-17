@@ -61,7 +61,7 @@ end
 ---@field SceneManager SceneManager
 YimActions = {}
 YimActions.__index = YimActions
-YimActions.CompanionManager = CompanionManager:New()
+YimActions.CompanionManager = CompanionManager.new()
 YimActions.SceneManager = SceneManager
 YimActions.CurrentlyPlaying = {}
 YimActions.LastPlayed = {}
@@ -75,6 +75,7 @@ YimActions.ACTION_TYPES = { -- expose action types for future stuff that I have 
     -- Synchronized Scene (WIP)
     SCENE = TYPE_SCENE,
 }
+
 
 ---@param ped? integer
 function YimActions:GetPed(ped)
@@ -153,9 +154,9 @@ function YimActions:IsPlayerBusy()
     return
     b_PedGrabbed or
     b_VehicleGrabbed or
-    b_IsHiding or
+    HNS.isHiding or
     b_IsHandsUp or
-    b_IsSitting or
+    PublicSeating.isSitting or
     b_IsPlayingAmbientScenario or
     b_IsSettingHotkeys or
     CUTSCENE.IS_CUTSCENE_ACTIVE() or
@@ -338,22 +339,10 @@ end
 function YimActions:ResetPlayer()
     TASK.CLEAR_PED_TASKS(Self.GetPedID())
     SS.ResetMovement()
+    PublicSeating:Cleanup()
 
-    if b_IsSitting then
-        if i_PublicSeat ~= 0 and ENTITY.DOES_ENTITY_EXIST(i_PublicSeat) then
-            ENTITY.FREEZE_ENTITY_POSITION(i_PublicSeat, false)
-
-            if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(Self.GetPedID(), i_PublicSeat) then
-                ENTITY.DETACH_ENTITY(Self.GetPedID(), true, true)
-            end
-        end
-    end
-
-    if b_IsHiding then
-        if b_IsHidingInTrunk or b_IsHidingInDumpster then
-            ENTITY.DETACH_ENTITY(Self.GetPedID(), false, false)
-            b_IsHidingInTrunk, b_IsHidingInDumpster = false, false
-        end
+    if HNS.isHiding then
+        HNS:Reset()
     end
 
     if b_PedGrabbed and (i_GrabbedPed ~= 0) and ENTITY.IS_ENTITY_ATTACHED(i_GrabbedPed) then
@@ -378,15 +367,12 @@ function YimActions:ResetPlayer()
         end
     end
 
-    b_IsHiding = false
-    b_IsSitting = false
     b_IsHandsUp = false
-    b_PedGrabbed = false
     b_IsCrouched = false
-    i_PublicSeat = 0
+    b_PedGrabbed = false
+    b_VehicleGrabbed = false
     i_GrabbedPed = 0
     i_GrabbedVeh = 0
-    b_VehicleGrabbed = false
 end
 
 ---@param ped? integer
@@ -560,9 +546,9 @@ function YimActions:BackgroundWorker(s, ped)
 
         -- this is very stupid but it works. kinda...
         if ENTITY.IS_ENTITY_PLAYING_ANIM(ped, "mp_suicide", "pistol", 3) then
-            for _, w in ipairs(t_Handguns) do
-                if WEAPON.HAS_PED_GOT_WEAPON(ped, w, false) then
-                    WEAPON.SET_CURRENT_PED_WEAPON(ped, w, true)
+            for _, w in ipairs(weapons.get_all_weapons_of_group_type(416676503)) do
+                if WEAPON.HAS_PED_GOT_WEAPON(ped, joaat(w), false) then
+                    WEAPON.SET_CURRENT_PED_WEAPON(ped, joaat(w), true)
                     break
                 end
             end
