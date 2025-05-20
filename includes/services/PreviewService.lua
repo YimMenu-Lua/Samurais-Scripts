@@ -1,5 +1,7 @@
 ---@class PreviewService
 PreviewService = {}
+PreviewService.__index = PreviewService
+
 PreviewService.current = nil
 PreviewService.currentModel = nil
 PreviewService.currentPosition = nil
@@ -14,7 +16,7 @@ PreviewService.awaitSpawn = false
 function PreviewService:Preview(i_ModelHash, i_EntityType)
     script.run_in_fiber(function()
         if self.current then
-            ENTITY.DELETE_ENTITY(self.current)
+            Game.DeleteEntity(self.current, Game.GetCategoryFromEntityType(self.current))
             self.current = nil
             self.currentPosition = nil
         end
@@ -132,9 +134,9 @@ function PreviewService:OnTick(i_HoveredModelHash, i_EntityType)
     local now = Time.millis()
 
     if i_HoveredModelHash ~= self.lastHovered then
-        self.lastHovered    = i_HoveredModelHash
+        self.lastHovered = i_HoveredModelHash
         self.hoverStartTime = now
-        self.awaitSpawn     = true
+        self.awaitSpawn = true
     end
 
     if self.awaitSpawn and (now - self.hoverStartTime >= self.delay) then
@@ -150,16 +152,15 @@ end
 function PreviewService:Clear()
     script.run_in_fiber(function()
         if self.current and ENTITY.DOES_ENTITY_EXIST(self.current) then
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(self.current, true, true)
-            ENTITY.DELETE_ENTITY(self.current)
+            Game.DeleteEntity(self.current, Game.GetCategoryFromEntityType(self.current))
         end
 
-        self.current         = nil
-        self.current_model   = nil
+        self.current = nil
+        self.current_model = nil
         self.currentPosition = nil
-        self.lastHovered     = nil
-        self.awaitSpawn      = false
-        self.hoverStartTime  = 0
+        self.lastHovered = nil
+        self.awaitSpawn = false
+        self.hoverStartTime = 0
     end)
 end
 

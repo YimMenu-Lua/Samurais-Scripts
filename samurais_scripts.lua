@@ -600,7 +600,6 @@ script.register_looped("SS_SELF", function(script) -- Self Features
     if b_IsCrouched
     and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 36)
     and not HUD.IS_MP_TEXT_CHAT_TYPING() then
-        log.debug("pressed")
         PED.RESET_PED_MOVEMENT_CLIPSET(Self.GetPedID(), 0.3)
         PED.RESET_PED_STRAFE_CLIPSET(Self.GetPedID())
         script:sleep(250)

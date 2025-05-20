@@ -347,13 +347,15 @@ end
 
 function HNS:GetHidingContext()
     if Self.IsOnFoot() then
-        self:WhileOnFoot()
+        return
+        -- temporarily disabled
+        -- self:WhileOnFoot()
 
-        if self.trashBin ~= 0 then
-            self:HideInTrash()
-        elseif self.bootVehicle.handle ~= 0 then
-            self:HideInTrunk()
-        end
+        -- if self.trashBin ~= 0 then
+        --     self:HideInTrash()
+        -- elseif self.bootVehicle.handle ~= 0 then
+        --     self:HideInTrunk()
+        -- end
     elseif self.isWanted and not self.wasSpotted then
         self:HideInVehicle()
     end

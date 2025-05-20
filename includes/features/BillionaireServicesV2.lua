@@ -291,7 +291,7 @@ end
 ---@param godMode? boolean
 ---@param noRagdoll? boolean
 function BillionaireServices:RespawnEscortGroup(group, godMode, noRagdoll)
-    if not group.members or table.GetLength(group.members) == 0 then
+    if not group.members or (table.GetLength(group.members) == 0) then
         return
     end
 

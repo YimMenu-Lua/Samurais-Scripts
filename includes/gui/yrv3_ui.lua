@@ -392,10 +392,10 @@ local function drawBikerBusiness()
                 ImGui.SameLine()
                 ImGui.Dummy(10, 1)
                 ImGui.SameLine()
-                ImGui.ProgressBar((data.i_TotalSupplies / business.unit_max), 240, 30)
+                ImGui.ProgressBar(data.i_TotalSupplies / 100, 240, 30)
 
                 ImGui.SameLine()
-                ImGui.BeginDisabled(data.i_TotalSupplies >= business.unit_max)
+                ImGui.BeginDisabled(data.i_TotalSupplies >= 100)
                     if ImGui.Button((" Fill Supplies ##%d"):format(i)) then
                         globals.set_int(FreemodeGlobal2 + slot + 1, 1)
                     end
@@ -799,10 +799,9 @@ function YRV3UI()
         ImGui.EndChild()
     end
 
-    if ImGui.BeginChild("footer", 0, 80) then
+    if ImGui.BeginChild("yrv3_footer", 0, 80) then
         ImGui.Separator()
         ImGui.Spacing()
-
         ImGui.Dummy(1, 1)
         ImGui.SameLine()
 
@@ -810,12 +809,14 @@ function YRV3UI()
             YRV3:MCT()
         end
 
-        ImGui.SetWindowFontScale(0.8)
-        ImGui.BulletText("Approximate Income From All Businesses: ")
-        UI.Tooltip("Cycle through all tabs to update the total amount.")
-        ImGui.SameLine()
-        UI.ColoredText(Lua_fn.FormatMoney(CalcTotalBusinessIncome()), "#85BB65")
-        UI.Tooltip("Cycle through all tabs to update the total amount.")
+        ImGui.SetWindowFontScale(0.85)
+            ImGui.BulletText("Approximate Income From All Businesses: ")
+            UI.Tooltip("Cycle through all tabs to update the total amount.")
+
+            ImGui.SameLine()
+
+            UI.ColoredText(Lua_fn.FormatMoney(CalcTotalBusinessIncome()), "#85BB65")
+            UI.Tooltip("Cycle through all tabs to update the total amount.")
         ImGui.SetWindowFontScale(1)
         ImGui.EndChild()
     end

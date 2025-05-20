@@ -252,6 +252,7 @@ Game.Vehicle.MaxPerformance = function(vehicle)
     VEHICLE.SET_VEHICLE_MOD(vehicle, 15, maxSusp, false)
 
     VEHICLE.TOGGLE_VEHICLE_MOD(vehicle, 18, true)
+    VEHICLE.TOGGLE_VEHICLE_MOD(vehicle, 22, true)
     VEHICLE.SET_VEHICLE_FIXED(vehicle)
     VEHICLE.SET_VEHICLE_DEFORMATION_FIXED(vehicle)
     VEHICLE.SET_VEHICLE_BODY_HEALTH(vehicle, 1000)

@@ -652,11 +652,11 @@ function VehicleUI()
                 VEHICLE.SET_VEHICLE_CAUSES_SWERVING(Self.Vehicle.Current, false)
                 VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(Self.Vehicle.Current, 0, false)
                 VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(Self.Vehicle.Current, 1, false)
+
                 if ENTITY.DOES_ENTITY_EXIST(i_DummyCopCar) then
-                    ENTITY.SET_ENTITY_AS_MISSION_ENTITY(i_DummyCopCar, true, true)
-                    deletecop:sleep(200)
-                    ENTITY.DELETE_ENTITY(i_DummyCopCar)
+                    Game.DeleteEntity(i_DummyCopCar, "vehicles")
                 end
+
                 i_DummyCopCar = 0
             end)
         end

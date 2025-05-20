@@ -82,7 +82,7 @@ Bodyguard.ROLE = {
     ESCORT_PASSENGER = 2
 }
 Bodyguard.ConfigFlags = {
-    [1] = {118, 141, 179, 188, 193, 208, 251, 255, 261, 268, 286, 294, 301, 364, 398, 401, 443} -- aggressive *(I don't think I'll provide a choice for behavior and will only use aggressive instead)*
+    [1] = {113, 118, 141, 179, 188, 193, 208, 251, 255, 261, 268, 286, 294, 301, 364, 398, 401, 443} -- aggressive *(I don't think I'll provide a choice for behavior and will only use aggressive instead)*
 }
 Bodyguard.CombatAttributes = {
     [1] = {1, 2, 3, 4, 5, 13, 20, 21, 22, 27, 28, 31, 34, 38, 41, 42, 46, 50, 54, 55, 58, 61, 68, 71} -- aggressive //
@@ -171,7 +171,7 @@ function Bodyguard.new(modelHash, name, spawnPos, weapon, godmode, noRagdoll, be
             handle = handle,
             model = modelHash,
             gender = Game.GetPedGenderFromModel(modelHash),
-            name = name,
+            name = string.format("%s [%s]", name, handle),
             isInvincible = godmode or false,
             hasAllWeapons = ((type(weapon) == "boolean") and (weapon == true)),
             weapon = weapon,
@@ -344,10 +344,14 @@ function Bodyguard:Bring(pos, allowInside)
         return
     end
 
-    if not pos then
-        local yOffset = Self.IsOnFoot() and 2 or 6.9
+    if PED.IS_PED_SITTING_IN_VEHICLE(self.handle, Self.GetVehicle()) then
+        return
+    end
 
-        if self:GetVeh() ~= 0 then
+    if not pos then
+        local yOffset = Self.IsOnFoot() and math.random(2, 4) or math.random(6, 8)
+
+        if (self:GetVeh() ~= 0) then
             yOffset = -yOffset
         end
 
@@ -360,6 +364,25 @@ function Bodyguard:Bring(pos, allowInside)
     end
 
     PED.SET_PED_COORDS_KEEP_VEHICLE(self.handle, pos.x, pos.y, pos.z)
+end
+
+function Bodyguard:WarpIntoPlayerVeh()
+    if Self.IsOnFoot()
+    or PED.IS_PED_SITTING_IN_VEHICLE(self.handle, Self.GetVehicle()) then
+        UI.WidgetSound("Error")
+        return
+    end
+
+    if not Game.Vehicle.IsAnySeatFree(Self.GetVehicle()) then
+        YimToast:ShowError(
+            "Samueai's Scripts",
+            "There are no free seats to warp your bodyguard into!"
+        )
+        return
+    end
+
+    UI.WidgetSound("Select")
+    PED.SET_PED_INTO_VEHICLE(self.handle, Self.GetVehicle(), -2)
 end
 
 ---@param allowInside? boolean
@@ -703,7 +726,7 @@ function Bodyguard:ExecuteTask(taskType, OnCall)
         return
     end
 
-    if type(OnCall) == "function" then
+    if OnCall and type(OnCall) == "function" then
         self:SetTask(taskType)
         entities.take_control_of(self.handle, 300)
         OnCall()
@@ -1461,7 +1484,7 @@ EscortGroup.currentDrivingMode = 1
 EscortGroup.task = eVehicleTask.NONE
 EscortGroup.drivingModes = {
     {drivingFlags = 786603, speed = 19},
-    {drivingFlags = 2886204, speed = 60}
+    {drivingFlags = 527164, speed = 60}
 }
 
 
@@ -1471,7 +1494,11 @@ EscortGroup.drivingModes = {
 function EscortGroup.new(groupName, members, vehicle)
     return setmetatable(
         {
-            name = groupName,
+            name = string.format(
+                "%s [%d]",
+                string.gsub(groupName, " %[%d+%]", ""),
+                vehicle.handle
+            ),
             members = members,
             vehicle = vehicle
         },
@@ -1713,15 +1740,14 @@ function EscortGroup:Bring()
 end
 
 function EscortGroup:BringPlayer()
-    if not Self.IsOutside() and not Self.IsOnFoot() then
-        YimToast:ShowError(
-            "Samurai's Scripts",
-            "You must be outside and standing on foot to teleport to your escort group."
-        )
-        return
-    end
-
     script.run_in_fiber(function()
+        if not Self.IsOutside() or not Self.IsOnFoot() then
+            YimToast:ShowError(
+                "Samurai's Scripts",
+                "You must be outside and standing on foot to teleport to your escort group."
+            )
+            return
+        end
         local veh = self.vehicle
 
         if not veh:Exists() then

@@ -33,7 +33,10 @@ local b_BodyguardNoRagdoll       = false
 local b_BodyguardAllWeapons      = false
 local b_PedPreview               = false
 local b_HeliGodMode              = false
-local b_LimoWasCalled            = false -- prevent spawn button spam
+local b_LimoWasCalled            = false
+local b_SearchBarUsed            = false
+local b_BodyguardInputText1      = false
+local b_BodyguardInputText2      = false
 local i_HoveredPedModelThisFrame = nil
 local unk_EscortGroupHeaderName  = nil
 local unk_JetAirportData         = nil
@@ -174,7 +177,6 @@ local function OnTabItemSwitch()
 end
 
 local function BodyguardSpawnFooter()
-    -- ImGui.Dummy(1, 10)
     ImGui.SetNextWindowBgAlpha(0)
     ImGui.BeginChild("##bgFooter", 0, i_BSUIHeight * 0.6)
         ImGui.SetWindowFontScale(1.12)
@@ -193,7 +195,7 @@ local function BodyguardSpawnFooter()
                 s_BodyguardNameBuffer,
                 128
             )
-            b_IsTyping = ImGui.IsItemActive()
+            b_BodyguardInputText2 = ImGui.IsItemActive()
 
             ImGui.SameLine()
 
@@ -394,6 +396,8 @@ local function SpawnedEscortGroupsFooter()
 end
 
 local function DrawBodyguards()
+    b_IsTyping = b_BodyguardInputText1 or b_BodyguardInputText2
+
     if ImGui.BeginTabBar("bodyguards UI") then
         if ImGui.BeginTabItem("Spawn") then
             if #t_CustomPedList == 0 then
@@ -411,7 +415,7 @@ local function DrawBodyguards()
                 s_SearchBuffer,
                 128
             )
-            b_IsTyping = ImGui.IsItemActive()
+            b_BodyguardInputText1 = ImGui.IsItemActive()
 
             ImGui.BulletText("Gender: ")
             ImGui.SameLine()
@@ -472,17 +476,51 @@ local function DrawBodyguards()
                 for i, guard in pairs(BS.Bodyguards) do
                     local is_selected = (i_SpawnedBodyguardIndex == i)
 
-                    if ImGui.Selectable(string.format("%s [%d]", guard.name, guard.handle), is_selected) then
+                    if ImGui.Selectable(guard.name, is_selected) then
                         i_SpawnedBodyguardIndex = i
                     end
+                    UI.Tooltip("Right click for more options")
 
                     if UI.IsItemClicked("lmb") then
                         UI.WidgetSound("Nav")
                     end
 
+                    if UI.IsItemClicked("rmb") then
+                        UI.WidgetSound("Click")
+                        ImGui.OpenPopup(("bodyguard_options##"):format(i))
+                    end
+
                     if is_selected then
                         unk_SelectedBodyguard = guard
                         ImGui.SetItemDefaultFocus()
+                    end
+
+                    if ImGui.BeginPopup(("bodyguard_options##"):format(i)) then
+                        if ImGui.MenuItem("Bring") then
+                            UI.WidgetSound("Select")
+                            script.run_in_fiber(function()
+                                guard:Bring(nil, true)
+                            end)
+                        end
+
+                        if ImGui.MenuItem("Warp Into Vehicle") then
+                            script.run_in_fiber(function()
+                                guard:WarpIntoPlayerVeh()
+                            end)
+                        end
+
+                        if ImGui.MenuItem("Kill") then
+                            UI.WidgetSound("Select")
+                            script.run_in_fiber(function()
+                                ENTITY.SET_ENTITY_HEALTH(guard.handle, 0, 0, 0)
+                            end)
+                        end
+
+                        if ImGui.MenuItem("Dismiss") then
+                            UI.WidgetSound("Cancel")
+                            BS:DismissBodyguard(guard)
+                        end
+                        ImGui.EndPopup()
                     end
                 end
                 ImGui.EndListBox()
@@ -511,6 +549,7 @@ local function DrawEscorts()
             if ImGui.BeginListBox("##escortGroupList", -1, -1) then
                 for i, group in ipairs(t_FilteredEscortGroups) do
                     local is_selected = (i_EscortGroupIndex == i)
+
                     if ImGui.Selectable(group.name, is_selected) then
                         i_EscortGroupIndex = i
                     end
@@ -523,6 +562,7 @@ local function DrawEscorts()
                         t_SelectedEscortGroup = group
                     end
                 end
+
                 ImGui.EndListBox()
             end
             ImGui.EndTabItem()
@@ -543,10 +583,11 @@ local function DrawEscorts()
 
                     if ImGui.Selectable(
                         string.format(
-                            "[%s] %s [%d]", isOpen and "-" or "+",
-                            group.name,
-                            group.vehicle.handle
-                        ), isOpen
+                            "[%s] %s",
+                            isOpen and "-" or "+",
+                            group.name
+                        ),
+                        isOpen
                     ) then
                         unk_EscortGroupHeaderName = group.name
                     end
@@ -570,7 +611,7 @@ local function DrawEscorts()
 
                             for _, member in ipairs(group.members) do
                                 if member and member.name then
-                                    ImGui.BulletText(string.format("%s", member.name))
+                                    ImGui.BulletText(member.name)
                                     UI.HelpMarker(member:GetTaskAsString())
                                 end
                             end
