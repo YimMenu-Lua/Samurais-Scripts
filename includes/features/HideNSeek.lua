@@ -319,13 +319,25 @@ function HNS:WhileOnFoot()
         return
     end
 
-    if (self.bootVehicle.handle == 0) then
-        _, self.bootVehicle.handle, self.bootVehicle.isRearEngined = Self.IsNearCarTrunk()
+    local currentTime = MISC.GET_GAME_TIMER()
+    if currentTime - self.lastCheckTime < 1000 then
+        return
     end
+    self.lastCheckTime = currentTime
 
-    if (self.trashBin == 0) then
-        _, self.trashBin = Self.IsNearTrashBin()
-    end
+    script.run_in_fiber(function(s)
+        s:sleep(1)
+
+        if (self.bootVehicle.handle == 0) then
+            _, self.bootVehicle.handle, self.bootVehicle.isRearEngined = Self.IsNearCarTrunk()
+        end
+
+        s:sleep(1)
+
+        if (self.trashBin == 0) then
+            _, self.trashBin = Self.IsNearTrashBin()
+        end
+    end)
 
     if (self.bootVehicle.handle ~= 0) then
         if Self.GetPos():distance(Game.GetEntityCoords(self.bootVehicle.handle, false)) >= 3.5 then
@@ -347,15 +359,13 @@ end
 
 function HNS:GetHidingContext()
     if Self.IsOnFoot() then
-        return
-        -- temporarily disabled
-        -- self:WhileOnFoot()
+        self:WhileOnFoot()
 
-        -- if self.trashBin ~= 0 then
-        --     self:HideInTrash()
-        -- elseif self.bootVehicle.handle ~= 0 then
-        --     self:HideInTrunk()
-        -- end
+        if self.trashBin ~= 0 then
+            self:HideInTrash()
+        elseif self.bootVehicle.handle ~= 0 then
+            self:HideInTrunk()
+        end
     elseif self.isWanted and not self.wasSpotted then
         self:HideInVehicle()
     end
@@ -419,6 +429,7 @@ function HNS:WhileIsHiding()
             Game.ShowButtonPrompt(
                 "Press ~INPUT_FRONTEND_ACCEPT~ or ~INPUT_VEH_ACCELERATE~ or ~INPUT_VEH_BRAKE~ to stop hiding."
             )
+
             if (PAD.IS_CONTROL_JUST_PRESSED(0, 201)
             or PAD.IS_CONTROL_PRESSED(0, 71)
             or PAD.IS_CONTROL_PRESSED(0, 72))

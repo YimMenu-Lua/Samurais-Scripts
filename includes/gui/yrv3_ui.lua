@@ -1,11 +1,13 @@
 ---@diagnostic disable: undefined-global, lowercase-global
 
 local sCooldownButtonLabel, bCooldownParam
-local i_HangarSupplies = 0
-local i_HangarTotalValue = 0
-local i_BunkerTotalValue = 0
+local i_HangarSupplies    = 0
+local i_HangarTotalValue  = 0
+local i_BunkerTotalValue  = 0
 local i_AcidLabTotalValue = 0
-local b_AcidLabOwned = false
+local b_AcidLabOwned      = false
+local b_OwnsWarehouse     = false
+local b_OwnsBikerBusiness = false
 
 local function CalcTotalBusinessIncome()
     return Sum(
@@ -34,105 +36,105 @@ end
 
 local function drawCEOwarehouses()
     if not YRV3:DoesPlayerOwnAnyWarehouse() then
-        ImGui.Text("You don't own any CEO warehouses")
+        ImGui.Text("You don't own any CEO warehouses.")
         return
     end
 
     YRV3.i_CEOvalueSum = 0
-
     ImGui.SetWindowFontScale(0.9)
-    for i, data in ipairs(YRV3.OwnedWarehouseData) do
-        local slot = i - 1
-        data.isOwned = stats.get_int(("MPX_PROP_WHOUSE_SLOT%d"):format(slot)) > 0
+        for i, data in ipairs(YRV3.OwnedWarehouseData) do
+            local slot = i - 1
+            data.isOwned = stats.get_int(("MPX_PROP_WHOUSE_SLOT%d"):format(slot)) > 0
 
-        if data.isOwned then
+            if data.isOwned then
+                b_OwnsWarehouse = true
 
-            if not YRV3.OwnedWarehouseData[i].wasChecked then
-                YRV3:PopulateCEOwarehouseSlot(i)
-            else
-                ImGui.Dummy(1, 5)
-                local warehouse = YRV3.OwnedWarehouseData[i]
+                if not YRV3.OwnedWarehouseData[i].wasChecked then
+                    YRV3:PopulateCEOwarehouseSlot(i)
+                else
+                    ImGui.Dummy(1, 5)
+                    local warehouse = YRV3.OwnedWarehouseData[i]
 
-                data.i_TotalSupplies = stats.get_int(("MPX_CONTOTALFORWHOUSE%d"):format(slot))
-                data.i_TotalValue = YRV3:GetCEOCratesValue(data.i_TotalSupplies or 0)
-                YRV3.i_CEOvalueSum = YRV3.i_CEOvalueSum + data.i_TotalValue
+                    data.i_TotalSupplies = stats.get_int(("MPX_CONTOTALFORWHOUSE%d"):format(slot))
+                    data.i_TotalValue = YRV3:GetCEOCratesValue(data.i_TotalSupplies or 0)
+                    YRV3.i_CEOvalueSum = YRV3.i_CEOvalueSum + data.i_TotalValue
 
-                if warehouse.name and warehouse.size and warehouse.max then
-                    ImGui.PushID(("warehouse##"):format(i))
-                    ImGui.SeparatorText(tostring(warehouse.name))
-                    ImGui.BulletText("Cargo Held:")
-                    ImGui.SameLine()
-                    ImGui.Dummy(20, 1)
-                    ImGui.SameLine()
+                    if warehouse.name and warehouse.size and warehouse.max then
+                        ImGui.PushID(("warehouse##"):format(i))
+                        ImGui.SeparatorText(tostring(warehouse.name))
+                        ImGui.BulletText("Cargo Held:")
+                        ImGui.SameLine()
+                        ImGui.Dummy(20, 1)
+                        ImGui.SameLine()
 
-                    ImGui.ProgressBar(
-                        (data.i_TotalSupplies / warehouse.max),
-                        240,
-                        30,
-                        string.format(
-                            "%d Crates (%d%%)",
-                            data.i_TotalSupplies,
-                            (math.floor(data.i_TotalSupplies / warehouse.max) * 100)
+                        ImGui.ProgressBar(
+                            (data.i_TotalSupplies / warehouse.max),
+                            240,
+                            30,
+                            string.format(
+                                "%d Crates (%d%%)",
+                                data.i_TotalSupplies,
+                                (math.floor(data.i_TotalSupplies / warehouse.max) * 100)
+                            )
                         )
-                    )
-
-                    ImGui.SameLine()
-                    ImGui.Text(Lua_fn.FormatMoney(data.i_TotalValue))
-
-                    if warehouse.pos then
-                        if ImGui.Button(("Teleport##"):format(i)) then
-                            YRV3:Teleport(warehouse.pos)
-                        end
-                    end
-
-                    ImGui.SameLine()
-                    ImGui.BeginDisabled(data.i_TotalSupplies >= warehouse.max)
-                        ImGui.BeginDisabled(warehouse.autoFill)
-                            if ImGui.Button(string.format("%s##wh%d", _T("CEO_RANDOM_CRATES_"), i)) then
-                                stats.set_bool_masked(
-                                    "MPX_FIXERPSTAT_BOOL1",
-                                    true,
-                                    i + 11
-                                )
-                            end
-                        ImGui.EndDisabled()
 
                         ImGui.SameLine()
-                        YRV3.OwnedWarehouseData[i].autoFill, _ = ImGui.Checkbox(("Auto##wh%d"):format(i), YRV3.OwnedWarehouseData[i].autoFill)
+                        ImGui.Text(Lua_fn.FormatMoney(data.i_TotalValue))
 
-                        if UI.IsItemClicked("lmb") then
-                            UI.WidgetSound("Nav2")
+                        if warehouse.pos then
+                            if ImGui.Button(("Teleport##"):format(i)) then
+                                YRV3:Teleport(warehouse.pos)
+                            end
                         end
-                    ImGui.EndDisabled()
-                    ImGui.PopID()
+
+                        ImGui.SameLine()
+                        ImGui.BeginDisabled(data.i_TotalSupplies >= warehouse.max)
+                            ImGui.BeginDisabled(warehouse.autoFill)
+                                if ImGui.Button(string.format("%s##wh%d", _T("CEO_RANDOM_CRATES_"), i)) then
+                                    stats.set_bool_masked(
+                                        "MPX_FIXERPSTAT_BOOL1",
+                                        true,
+                                        i + 11
+                                    )
+                                end
+                            ImGui.EndDisabled()
+
+                            ImGui.SameLine()
+                            YRV3.OwnedWarehouseData[i].autoFill, _ = ImGui.Checkbox(("Auto##wh%d"):format(i), YRV3.OwnedWarehouseData[i].autoFill)
+
+                            if UI.IsItemClicked("lmb") then
+                                UI.WidgetSound("Nav2")
+                            end
+                        ImGui.EndDisabled()
+                        ImGui.PopID()
+                    end
                 end
             end
         end
-    end
 
-    if YRV3:DoesPlayerOwnAnyWarehouse() then
-        ImGui.Dummy(1, 5)
-        ImGui.SeparatorText("MISC")
-        ImGui.Spacing()
+        if b_OwnsWarehouse then
+            ImGui.Dummy(1, 5)
+            ImGui.SeparatorText("MISC")
+            ImGui.Spacing()
 
-        local bCond = not (
-            script.is_active("gb_contraband_buy")
-            and script.is_active("fm_content_cargo")
-        )
+            local bCond = not (
+                script.is_active("gb_contraband_buy")
+                and script.is_active("fm_content_cargo")
+            )
 
-        ImGui.BeginDisabled(bCond)
-            if ImGui.Button("Finish Cargo Source Mission") then
-                UI.WidgetSound("Select")
-                YRV3:FinishCEOCargoSourceMission()
+            ImGui.BeginDisabled(bCond)
+                if ImGui.Button("Finish Cargo Source Mission") then
+                    UI.WidgetSound("Select")
+                    YRV3:FinishCEOCargoSourceMission()
+                end
+            ImGui.EndDisabled()
+
+            if bCond then
+                UI.Tooltip("Start a source mission then press this button to finish it.")
             end
-        ImGui.EndDisabled()
 
-        if bCond then
-            UI.Tooltip("Start a source mission then press this button to finish it.")
+            ImGui.BulletText("Total Value: " .. Lua_fn.FormatMoney(YRV3.i_CEOvalueSum))
         end
-
-        ImGui.BulletText("Total Value: " .. Lua_fn.FormatMoney(YRV3.i_CEOvalueSum))
-    end
     ImGui.SetWindowFontScale(1)
 end
 
@@ -145,8 +147,8 @@ local function drawHangar()
         return
     end
 
-    local hangar_name = t_Hangars[hangar_index].name
-    local hangar_pos = t_Hangars[hangar_index].coords
+    local hangar_name = YRV3.t_Hangars[hangar_index].name
+    local hangar_pos = YRV3.t_Hangars[hangar_index].coords
 
     ImGui.SeparatorText(hangar_name)
     i_HangarSupplies = stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
@@ -174,9 +176,9 @@ local function drawHangar()
         ImGui.EndDisabled()
 
         ImGui.SameLine()
-        YRV3.b_HangarLoop, hlUsed = ImGui.Checkbox("Auto##hangar", YRV3.b_HangarLoop)
+        YRV3.b_HangarLoop, _ = ImGui.Checkbox("Auto##hangar", YRV3.b_HangarLoop)
 
-        if hlUsed then
+        if UI.IsItemClicked("lmb") then
             UI.WidgetSound("Nav2")
         end
     end
@@ -213,10 +215,12 @@ local function drawBunker()
         return
     end
 
-    ImGui.SeparatorText(t_Bunkers[bunker_index].name)
+    ImGui.SeparatorText(YRV3.t_Bunkers[bunker_index].name)
 
-    local bunkerUpdgrade1 = stats.get_int("MPX_BUNKER_EQUIPMENT") == 1
-    local bunkerUpdgrade2 = stats.get_int("MPX_BUNKER_STAFF") == 1
+    local bunkerUpdgrade1  = stats.get_int("MPX_BUNKER_EQUIPMENT") == 1
+    local bunkerUpdgrade2  = stats.get_int("MPX_BUNKER_STAFF") == 1
+    local bunkerOffset1    = 0
+    local bunkerOffset2    = 0
     local bunkerEqLabelCol = "white"
     local bunkerStLabelCol = "white"
 
@@ -295,7 +299,7 @@ local function drawBunker()
     ImGui.SeparatorText("Quick Teleport")
 
     if ImGui.Button("Teleport To Bunker") then
-        YRV3:Teleport(t_Bunkers[bunker_index].coords, true)
+        YRV3:Teleport(YRV3.t_Bunkers[bunker_index].coords, true)
     end
 end
 
@@ -312,6 +316,7 @@ local function drawAcidLab()
     (stats.get_int("MPX_XM22_LAB_EQUIP_UPGRADED") == 1)
 
     local acidUpgradeLabelCol = "white"
+    local acidOffset = 0
 
     if acidUpdgrade then
         acidUpgradeLabelCol = "green"
@@ -368,6 +373,11 @@ local function drawAcidLab()
 end
 
 local function drawBikerBusiness()
+    if not YRV3:DoesPlayerOwnAnyBikerBusiness() then
+        ImGui.Text("You don't own any biker businesses.")
+        return
+    end
+
     YRV3.i_BikerValueSum = 0
 
     for i, data in ipairs(YRV3.OwnedBikerBusinessData) do
@@ -376,6 +386,8 @@ local function drawBikerBusiness()
         data.isOwned = stats.get_int(("MPX_PROP_FAC_SLOT%d"):format(slot)) ~= 0
 
         if data.isOwned then
+            b_OwnsBikerBusiness = true
+
             if not business.wasChecked then
                 YRV3:PopulateBikerBusinessSlot(i)
             elseif business.name and business.val_offset then
@@ -445,7 +457,7 @@ local function drawBikerBusiness()
         end
     end
 
-    if YRV3:DoesPlayerOwnAnyBikerBusiness() then
+    if b_OwnsBikerBusiness then
         ImGui.Separator()
         ImGui.Spacing()
         ImGui.BulletText(
