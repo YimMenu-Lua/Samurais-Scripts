@@ -7,9 +7,18 @@
 [![sv](https://img.shields.io/badge/Script%20Version-v1.7.0-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
 [![gv](https://img.shields.io/badge/Game%20Version-Online%201.70%20|%20Build%203521-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
 
-> [!Important]
+###  
+
+> [!Note]
 > **Legacy Only.**
 >
+
+> [!Important]
+> **Discontinued.** I can no longer maintain this project.
+> Pull requests are still welcome if any other dev wants to maintain it. There are a few minor errors that need to be fixed *(few missing symbols in `string.format`, I forgot what else)* and only globals and locals for CasinoPacino and YimResupplierV3 need to be updated. I can provide a json and a small Python script that will update them for you if you have decompiled scripts *(you don't need all of them, reading the json file gives you an idea of what files are needed.)*.
+>
+
+###  
 
 ## Features
 
