@@ -156,15 +156,15 @@ function YRV3:PopulateCEOwarehouseSlot(index)
         local property_index = (stats.get_int(("MPX_PROP_WHOUSE_SLOT%d"):format(index-1))) - 1
         local warehouseName = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(("MP_WHOUSE_%d"):format(property_index))
 
-        if self.t_CEOwarehouses[warehouseName] then
+        if self.t_CEOwarehouses[property_index] then
             self.OwnedWarehouseData[index] = {
                 wasChecked = true,
                 isOwned = true,
                 autoFill = false,
                 name = warehouseName,
-                size = self.t_CEOwarehouses[warehouseName].size,
-                max = self.t_CEOwarehouses[warehouseName].max,
-                pos = self.t_CEOwarehouses[warehouseName].coords,
+                size = self.t_CEOwarehouses[property_index].size,
+                max = self.t_CEOwarehouses[property_index].max,
+                pos = self.t_CEOwarehouses[property_index].coords,
             }
         end
     end)
@@ -674,72 +674,28 @@ YRV3.t_SellScripts = {
 }
 
 YRV3.t_CEOwarehouses = {
-    ["Convenience Store Lockup"] = {
-        size = 0, max = 16, coords = vec3:new(249.246918, -1955.651978, 23.161957)
-    },
-    ["Celltowa Unit"] = {
-        size = 0, max = 16, coords = vec3:new(898.484314, -1031.882446, 34.966454)
-    },
-    ["White Widow Garage"] = {
-        size = 0, max = 16, coords = vec3:new(-1081.083740, -1261.013184, 5.648909)
-    },
-    ["Pacific Bait Storage"] = {
-        size = 0, max = 16, coords = vec3:new(51.311188, -2568.470947, 6.004591)
-    },
-    ["Pier 400 Utility Building"] = {
-        size = 0, max = 16, coords = vec3:new(272.409424, -3015.267090, 5.707359)
-    },
-    ["Foreclosed Garage"] = {
-        size = 0, max = 16, coords = vec3:new(-424.773499, 184.146530, 80.752899)
-    },
-    ["GEE Warehouse"] = {
-        size = 1, max = 42, coords = vec3:new(1563.832031, -2135.110840, 77.616447)
-    },
-    ["Derriere Lingerie Backlot"] = {
-        size = 1, max = 42, coords = vec3:new(-1269.286133, -813.215820, 17.107399)
-    },
-    ["Fridgit Annexe"] = {
-        size = 1, max = 42, coords = vec3:new(-528.074585, -1782.701904, 21.483055)
-    },
-    ["Discount Retail Unit"] = {
-        size = 1, max = 42, coords = vec3:new(349.901184, 327.976440, 104.303856)
-    },
-    ["Disused Factory Outlet"] = {
-        size = 1, max = 42, coords = vec3:new(-328.013458, -1354.755371, 31.296524)
-    },
-    ["LS Marine Building 3"] = {
-        size = 1, max = 42, coords = vec3:new(-308.772247, -2698.393799, 6.000292)
-    },
-    ["Old Power Station"] = {
-        size = 1, max = 42, coords = vec3:new(541.587646, -1944.362793, 24.985096)
-    },
-    ["Railyard Warehouse"] = {
-        size = 1, max = 42, coords = vec3:new(503.738037, -653.082642, 24.751144)
-    },
-    ["Wholesale Furniture"] = {
-        size = 2, max = 111, coords = vec3:new(1041.059814, -2172.653076, 31.488876)
-    },
-    ["West Vinewood Backlot"] = {
-        size = 2, max = 111, coords = vec3:new(-245.651718, 202.504669, 83.792648)
-    },
-    ["Xero Gas Factory"] = {
-        size = 2, max = 111, coords = vec3:new(-1045.004395, -2023.150146, 13.161570)
-    },
-    ["Logistics Depot"] = {
-        size = 2, max = 111, coords = vec3:new(922.555481, -1560.048950, 30.756647)
-    },
-    ["Bilgeco Warehouse"] = {
-        size = 2, max = 111, coords = vec3:new(-876.108032, -2734.502930, 13.844264)
-    },
-    ["Walker & Sons Warehouse"] = {
-        size = 2, max = 111, coords = vec3:new(93.278641, -2216.144775, 6.033320)
-    },
-    ["Cypress Warehouses"] = {
-        size = 2, max = 111, coords = vec3:new(1015.361633, -2510.986572, 28.302608)
-    },
-    ["Darnell Bros Warehouse"] = {
-        size = 2, max = 111, coords = vec3:new(762.672363, -909.193054, 25.250854)
-    },
+    { id = 1, size = 0, max = 16, coords = vec3:new(51.311188, -2568.470947, 6.004591) },
+    { id = 2, size = 0, max = 16, coords = vec3:new(-1081.083740, -1261.013184, 5.648909) },
+    { id = 3, size = 0, max = 16, coords = vec3:new(898.484314, -1031.882446, 34.966454) },
+    { id = 4, size = 0, max = 16, coords = vec3:new(249.246918, -1955.651978, 23.161957) },
+    { id = 5, size = 0, max = 16, coords = vec3:new(-424.773499, 184.146530, 80.752899) },
+    { id = 6, size = 2, max = 111, coords = vec3:new(-1045.004395, -2023.150146, 13.161570) },
+    { id = 7, size = 1, max = 42, coords = vec3:new(-1269.286133, -813.215820, 17.107399) },
+    { id = 8, size = 2, max = 111, coords = vec3:new(-876.108032, -2734.502930, 13.844264) },
+    { id = 9, size = 0, max = 16, coords = vec3:new(272.409424, -3015.267090, 5.707359) },
+    { id = 10, size = 1, max = 42, coords = vec3:new(1563.832031, -2135.110840, 77.616447) },
+    { id = 11, size = 1, max = 42, coords = vec3:new(-308.772247, -2698.393799, 6.000292) },
+    { id = 12, size = 1, max = 42, coords = vec3:new(503.738037, -653.082642, 24.751144) },
+    { id = 13, size = 1, max = 42, coords = vec3:new(-528.074585, -1782.701904, 21.483055) },
+    { id = 14, size = 1, max = 42, coords = vec3:new(-328.013458, -1354.755371, 31.296524) },
+    { id = 15, size = 1, max = 42, coords = vec3:new(349.901184, 327.976440, 104.303856) },
+    { id = 16, size = 2, max = 111, coords = vec3:new(922.555481, -1560.048950, 30.756647) },
+    { id = 17, size = 2, max = 111, coords = vec3:new(762.672363, -909.193054, 25.250854) },
+    { id = 18, size = 2, max = 111, coords = vec3:new(1041.059814, -2172.653076, 31.488876) },
+    { id = 19, size = 2, max = 111, coords = vec3:new(1015.361633, -2510.986572, 28.302608) },
+    { id = 20, size = 2, max = 111, coords = vec3:new(-245.651718, 202.504669, 83.792648) },
+    { id = 21, size = 1, max = 42, coords = vec3:new(541.587646, -1944.362793, 24.985096) },
+    { id = 22, size = 2, max = 111, coords = vec3:new(93.278641, -2216.144775, 6.033320) },
 }
 
 YRV3.t_BikerBusinessIDs = {
