@@ -649,14 +649,14 @@ YRV3.t_SellScripts = {
     },
     ["gb_contraband_sell"] = {
         { -- (1.70) MISC::CLEAR_BIT\(.*?Local_...?\.f_1\), .*?Param0
-            l = 563,
+            l = 565,
             o = 1,
             v = 99999
         },
     },
     ["gb_biker_contraband_sell"] = {
         { -- (1.70) else if .*?!func_.*?\(1\) && .*?Local_...?\.f_...? > 0\)
-            l = 725,
+            l = 727,
             o = 122,
             v = 15
         },
