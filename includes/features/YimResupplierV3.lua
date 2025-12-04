@@ -808,4 +808,14 @@ YRV3.t_BusinessSafeData = {
         max_cash = 1e5,
         blip = 900,
     },
+    ["Car Wash"] = {
+        isOwned = function()
+            return stats.get_int("MPX_SB_CAR_WASH_OWNED") ~= 0
+        end,
+        cashValue = function()
+            return stats.get_int("MPX_CWASH_SAFE_CASH_VALUE")
+        end,
+        max_cash = 1e5,
+        blip = 931,
+    },
 }
