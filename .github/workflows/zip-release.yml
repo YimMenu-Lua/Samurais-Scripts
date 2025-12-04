@@ -9,8 +9,12 @@ on:
       - '*'
   workflow_dispatch:
 
+concurrency:
+  group: ss_ci-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  Main:
+  main:
     runs-on: ubuntu-latest
     steps:
 
@@ -83,7 +87,7 @@ jobs:
       with:
         type: 'zip'
         filename: "Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip"
-        exclusions: /.git* *.json *.md *.editorconfig *.py
+        exclusions: /.git* /scripts* *.json *.md *.editorconfig *.py
 
     - name: Upload Release
       uses: softprops/action-gh-release@v2
@@ -102,5 +106,5 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add README.md
-        git commit -m "Update README version badge to ${{steps.increment_tag.outputs.version_number}}"
+        git diff --cached --quiet || git commit -m "Update README version badge to ${{steps.increment_tag.outputs.version_number}}"
         git push

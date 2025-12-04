@@ -1,157 +1,118 @@
 ---@diagnostic disable: lowercase-global
 
-local Labels = require("lib.Translations")
+local en_loaded, en = pcall(require, "lib.translations.en-US")
+local locales_loaded, t = pcall(require, "lib.translations.__locales")
 
-if not keybinds then
-    keybinds = CFG:ReadItem("keybinds")
-end
-
-if not gpad_keybinds then
-    gpad_keybinds = CFG:ReadItem("gpad_keybinds")
-end
-
-SS.check_kb_keybinds()
-SS.check_gpad_keybinds()
-
-
+--------------------------------------
+-- Class: Translator
+--------------------------------------
+--**Global Singleton.**
 ---@class Translator
+---@field labels table<string, string>
+---@field lang_code string
+---@field private m_log_history table
+---@field private m_cache table<string, table<string, string>>
+---@field private m_last_load_time Time.TimePoint
 Translator = {}
 Translator.__index = Translator
-Translator.lang = LANG
-Translator.log_history = {}
-Translator.cache = {}
-Translator.button_map = {
-    {
-        name = "DRIFT_MODE_DESC_",
-        kbm = keybinds.tdBtn.name
-    },
-    {
-        name = "DRIFT_TIRES_DESC_",
-        kbm = keybinds.tdBtn.name
-    },
-    {
-        name = "NOS_DESC_",
-        kbm = keybinds.nosBtn.name
-    },
-    {
-        name = "VEHICLE_MINES_DESC_",
-        kbm = keybinds.vehicle_mine.name
-    },
-    {
-        name = "ANIM_STOP_DESC_",
-        kbm = keybinds.stop_anim.name
-    },
-    {
-        name = "SCN_STOP_DESC_",
-        kbm = keybinds.stop_anim.name
-    },
-    {
-        name = "COBRA_MANEUVER_DESC_",
-        kbm = keybinds.cobra_maneuver.name,
-    },
-    {
-        name = "NOS_PURGE_DESC_",
-        kbm = keybinds.purgeBtn.name,
-        gpad = gpad_keybinds.purgeBtn.name
-    },
-    {
-        name = "ROD_DESC_",
-        kbm = keybinds.rodBtn.name,
-        gpad = gpad_keybinds.rodBtn.name
-    },
-    {
-        name = "TRIGGERBOT_DESC_",
-        kbm = keybinds.triggerbotBtn.name,
-        gpad = gpad_keybinds.triggerbotBtn.name
-    },
-}
+Translator.default_labels = en_loaded and en or {}
+Translator.m_last_load_time = TimePoint.new()
+Translator.m_cache = {}
+Translator.locales = locales_loaded and t or {{ name = "English", iso = "en-US" }}
+
+function Translator:Load()
+    local iso = GVars.backend.language_code or "en-US"
+    local ok, res -- fwd decl
+
+    if (iso ~= "en-US") then -- skip already loaded default
+        local path = _F("lib.translations.%s", iso)
+        ok, res = pcall(require, path)
+    end
+
+    self.labels = (ok and (type(res) == "table")) and res or self.default_labels
+    self.lang_code = iso
+    self.m_log_history = {}
+    self.m_last_load_time:reset()
+end
 
 ---@param msg string
-function Translator:was_logged(msg)
-    if #self.log_history == 0 then
+---@return boolean
+function Translator:WasLogged(msg)
+    if (#self.m_log_history == 0) then
+        return false
+    end
+
+    return table.find(self.m_log_history, msg)
+end
+
+function Translator:Notify(message)
+    if self:WasLogged(message) then
         return
     end
 
-    for _, v in ipairs(self.log_history) do
-        if v == msg then
-            return true
-        end
+    Toast:ShowWarning("Translator", message, true)
+    table.insert(self.m_log_history, message)
+end
+
+function Translator:Reload()
+    if (not self.m_last_load_time:has_elapsed(3e3)) then
+        return
     end
-    return false
+
+    -- We can't even unload files because package is fully disabled. loadfile? in your dreams... 🥲
+    self:Load()
+    Toast:ShowMessage("Translator", "Reloaded.")
+end
+
+---@param label string
+---@return string
+function Translator:GetCache(label)
+    self.m_cache[self.lang_code] = self.m_cache[self.lang_code] or {}
+    return self.m_cache[self.lang_code][label]
+end
+
+---@param label string
+---@param text string
+function Translator:SetCache(label, text)
+    self.m_cache[self.lang_code] = self.m_cache[self.lang_code] or {}
+    self.m_cache[self.lang_code][label] = text
 end
 
 -- Translates text to the user's language.
---
--- If the label to translate is missing or the language
---
--- is invalid, it defaults to English (US).
 ---@param label string
 ---@return string
 function Translator:Translate(label)
-    if #self.cache > 0 and self.lang ~= LANG then
-        self.cache = {}
-        self.lang = LANG
+    if (self.lang_code ~= GVars.backend.language_code) then
+        self:Reload()
+        return ""
     end
 
-    if self.cache[label] and self.lang == LANG then
-        return self.cache[label]
+    local cached = self:GetCache(label)
+    if (cached) then
+        return cached
     end
 
-    ---@type string, string
-    local retStr, logmsg
-    if Labels[label] then
-        for _, v in pairs(Labels[label]) do
-            if LANG == v.iso then
-                retStr = v.text
-                break
-            end
-        end
-
-        -- Replace "---" and "___" placeholders with button names.
-        if retStr ~= nil and #retStr > 0 then
-            for _, tr in ipairs(self.button_map) do
-                if tr.name == label then
-                    if Lua_fn.str_contains(retStr, "___") then
-                        retStr = Lua_fn.str_replace(retStr, "___", tr.kbm)
-                    end
-                    if Lua_fn.str_contains(retStr, "---") then
-                        retStr = Lua_fn.str_replace(retStr, "---", tr.gpad)
-                    end
-                end
-            end
-        else
-            logmsg = "Missing or unsupported language! Defaulting to English (US)."
-            if not self:was_logged(logmsg) then
-                YimToast:ShowWarning("Translator", logmsg, true)
-                table.insert(self.log_history, logmsg)
-            end
-            retStr = Labels[label][1].text
-            SS.debug(string.format("Missing translation for: %s in (%s)", label, self.lang))
-        end
-    else
-        logmsg = "Missing label!"
-        if not self:was_logged(logmsg) then
-            YimToast:ShowWarning("Translator", logmsg, true)
-            table.insert(self.log_history, logmsg)
-        end
-        retStr = string.format("[!MISSING LABEL]: %s", label)
-        SS.debug(string.format("Missing label: %s", label))
+    local text = self.labels[label]
+    if (not text) then
+        self:Notify("Missing label!")
+        Backend:debug("Missing label: %s", label)
+        return _F("[!MISSING LABEL]: %s", label)
     end
 
-    if not self.cache[label] then
-        self.cache[label] = retStr
+    if (string.isnullorempty(text)) then
+        self:Notify("Missing or unsupported language!")
+        Backend:debug("Missing translation for: %s in (%s)", label, self.lang_code)
+        return "[!MISSING TRANSLATION]"
     end
 
-    return retStr
+    if (not cached) then
+        self:SetCache(label, text)
+    end
+
+    return text
 end
 
--- #### Wrapper for `Translator:Translate`
---________________________________________
--- Translates text to the user's language.
---
--- If the label to translate is missing or the language
---
--- is invalid, it defaults to English (US).
+-- Wrapper for `Translator:Translate`
 ---@param label string
 function _T(label)
     return Translator:Translate(label)

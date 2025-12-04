@@ -1,7 +1,4 @@
----@diagnostic disable
-
-debug_counter = not SS_debug and 0 or 7
-
+local debug_counter = GVars.backend.debug_mode and 7 or 0
 local function DrawClock()
     local now = os.date("*t")
     local month = os.date("%b")
@@ -33,7 +30,7 @@ local function DrawClock()
         center.x - 20,
         center.y + 15,
         ImGui.GetColorU32(255, 255, 255, 255),
-        string.format("%s %s", month, day)
+        _F("%s %s", month, day)
     )
     ImGui.SetWindowFontScale(1.0)
 
@@ -58,7 +55,7 @@ local function DrawClock()
         local text_width, text_height = ImGui.CalcTextSize(label)
         local text_x = center.x + math.cos(angle) * (radius - 22) - text_width / 2
         local text_y = center.y + math.sin(angle) * (radius - 22) - text_height / 2
-    
+
         ImGui.ImDrawListAddText(
             ImDrawList,
             text_x,
@@ -74,7 +71,7 @@ local function DrawClock()
         local y1 = center.y + math.sin(angle) * (radius - 2.5)
         local x2 = center.x + math.cos(angle) * radius
         local y2 = center.y + math.sin(angle) * radius
-    
+
         ImGui.ImDrawListAddLine(
             ImDrawList,
             x1,
@@ -140,34 +137,33 @@ local function DrawClock()
     ImGui.Dummy(size, size)
 end
 
-function MainUI()
+GUI:GetMainTab():RegisterGUI(function()
     DrawClock()
     ImGui.Dummy(1, 10)
     ImGui.SeparatorText("About")
 
-    if UI.IsItemClicked('lmb') then
+    if GUI:IsItemClicked(GUI.MouseButtons.LEFT) then
         debug_counter = debug_counter + 1
-        if debug_counter == 7 then
-            UI.WidgetSound("Nav")
+        if (debug_counter == 7) then
+            GUI:PlaySound(GUI.Sounds.Nav)
             log.debug("Debug mode activated.")
-            SS_debug = true
-            CFG:SaveItem("SS_debug", true)
+            GVars.backend.debug_mode = true
         elseif debug_counter > 7 then
-            UI.WidgetSound("Cancel")
+            GUI:PlaySound(GUI.Sounds.Cancel)
             log.debug("Debug mode deactivated.")
-            SS_debug = false
+            GVars.backend.debug_mode = false
             debug_counter = 0
-            CFG:SaveItem("SS_debug", false)
         end
     end
 
-    UI.WrappedText("A collection of scripts aimed towards adding some roleplaying and fun elements to the game.", 25)
+    ImGui.Text("A Lua base for YimMenu V1.\nCross-compatibility with V2 may be added in the future.")
     ImGui.Dummy(1, 10)
-    ImGui.BulletText(string.format("Script Version:   v%s", SS.script_version))
-    ImGui.BulletText(string.format("Game Version:   b%s   Online %s", SS.target_build, SS.target_version))
+    ImGui.Separator()
 
-    if not disable_quotes then
-        ImGui.Dummy(1, 20); ImGui.SeparatorText("Quote Of The Day"); ImGui.Spacing()
-        UI.ColoredText(s_RandomDailyQuote, "white", f_DailyQuoteTextAlpha, 24)
+    ImGui.SetNextWindowBgAlpha(0)
+    if ImGui.BeginChild("footer", -1, 40, false) then
+        ImGui.Spacing()
+        ImGui.TextDisabled(("v%s"):format(Backend.__version))
+        ImGui.EndChild()
     end
-end
+end)

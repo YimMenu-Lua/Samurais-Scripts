@@ -4,7 +4,7 @@
 
 #### A Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and [Tupoye-Menu](https://github.com/TupoyeMenu/TupoyeMenu), centered around roleplaying and having fun in a game full of ad bots and toxic cheaters
 
-[![sv](https://img.shields.io/badge/Script%20Version-v1.7.3-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
+[![sv](https://img.shields.io/badge/Script%20Version-v1.0.0-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
 [![gv](https://img.shields.io/badge/Game%20Version-Online%201.71%20|%20Build%203586-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
 
 ###  
@@ -56,8 +56,6 @@
 |     :---:                                         | :---:                                                                          |
 | [Harmless](https://github.com/harmless05)         | Config system *(now YimConfig)* & Shift-Drift                                  |
 | [NiiV3AU](https://github.com/NiiV3AU)             | German translations                                                            |
-| [xiaoxiao](https://github.com/xiaoxiao921)        | YimMenu's Lua API                                                              |
-| [YimMenu](https://github.com/YimMenu/YimMenu)     | I was never fond of any other project. It's just beautiful!                    |
 | [gir489returns](https://github.com/gir489returns) | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino)                  |
 | [tupoy-ya](https://github.com/tupoy-ya)           | Bugfixes, better date&time, helped me finally figure out handling flags in Lua |
-| [szalikdev](https://github.com/szalikdev)         | Revived the project |
+| [szalikdev](https://github.com/szalikdev)         | Revived the project                                                            |
