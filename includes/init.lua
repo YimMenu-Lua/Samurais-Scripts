@@ -100,6 +100,8 @@ CommandExecutor = require("includes.services.CommandExecutor").new()
 ------------------- Features ------------------------------------
 
 YRV3 = require("includes.features.yrv3"):init()
+CasinoPacino = require("includes.features.casino"):init()
+
 ------------------------------------------------------------------
 
 local base_path = "includes"
@@ -126,6 +128,7 @@ local packages = {
     "gui.main_ui",
     "gui.settings_ui",
     "gui.yrv3_ui",
+    "gui.casino_ui",
 }
 
 for _, package in ipairs(packages) do

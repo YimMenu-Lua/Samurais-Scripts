@@ -459,15 +459,16 @@ function GUI:Tooltip(text, opts)
         return
     end
 
-    opts = opts or { wrap_pos = ImGui.GetFontSize() * 25 }
+    opts = opts or {}
+    wrap_pos = opts.wrap_pos or ImGui.GetFontSize() * 25
 
     if ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) then
         ImGui.SetNextWindowBgAlpha(0.75)
         ImGui.BeginTooltip()
         if IsInstance(opts.color, Color) then
-            self:TextColored(text, opts.color, opts.wrap_pos)
+            self:TextColored(text, opts.color, wrap_pos)
         else
-            ImGui.PushTextWrapPos(opts.wrap_pos)
+            ImGui.PushTextWrapPos(wrap_pos)
             ImGui.TextWrapped(text)
             ImGui.PopTextWrapPos()
         end

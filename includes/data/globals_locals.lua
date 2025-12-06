@@ -201,4 +201,459 @@ return {
         },
         ENHANCED = {}
     },
+
+    --------- BEGIN CASINO PACINO ---------
+
+    three_card_poker_table = {
+        description = "Three Card Poker Table",
+        file = "casino_poker.c",
+        LEGACY = {
+            value = 769,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    three_card_poker_table_size = {
+        description = "Three Card Poker Table Size",
+        file = "casino_poker.c",
+        LEGACY = {
+            value = 9,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    three_card_poker_cards = {
+        description = "Three Card Poker Cards",
+        file = "casino_poker.c",
+        LEGACY = {
+            value = 136,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    three_card_poker_current_deck = {
+        description = "Three Card Poker Current Deck",
+        file = "casino_poker.c",
+        LEGACY = {
+            value = 168,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    three_card_poker_deck_size = {
+        description = "Three Card Poker Deck Size",
+        file = "casino_poker.c",
+        LEGACY = {
+            value = 55,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    three_card_poker_anti_cheat = {
+        description = "Three Card Poker Anti Cheat",
+        file = "casino_poker.c",
+        LEGACY = {
+            value = 1058,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    three_card_poker_anti_cheat_deck = {
+        description = "Three Card Poker Anti Cheat Deck",
+        file = "casino_poker.c",
+        LEGACY = {
+            value = 856,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    blackjack_table_players = {
+        description = "Blackjack Table Players",
+        file = "casino_blackjack.c",
+        LEGACY = {
+            value = 1796,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    blackjack_table_players_size = {
+        description = "Blackjack Table Players Size",
+        file = "casino_blackjack.c",
+        LEGACY = {
+            value = 8,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    blackjack_cards = {
+        description = "Blackjack Cards",
+        file = "casino_blackjack.c",
+        LEGACY = {
+            value = 136,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    blackjack_decks = {
+        description = "Blackjack Decks",
+        file = "casino_blackjack.c",
+        LEGACY = {
+            value = 846,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    roulette_master_table = {
+        description = "Roulette Master Table",
+        file = "casino_roulette.c",
+        LEGACY = {
+            value = 144,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    roulette_outcomes_table = {
+        description = "Roulette Outcomes Table",
+        file = "casino_roulette.c",
+        LEGACY = {
+            value = 1357,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    roulette_ball_table = {
+        description = "Roulette Ball Table",
+        file = "casino_roulette.c",
+        LEGACY = {
+            value = 153,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    slots_random_result_table = {
+        description = "Slots Random Results Table",
+        file = "casino_slots.c",
+        LEGACY = {
+            value = 1348,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    slots_slot_machine_state = {
+        description = "Slots Slot Machine State",
+        file = "casino_slots.c",
+        LEGACY = {
+            value = 1638,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    prize_wheel_win_state = {
+        description = "Prize Wheel Win State",
+        file = "casino_prize_wheel.c",
+        LEGACY = {
+            value = 300,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    prize_wheel_prize = {
+        description = "Prize Wheel Prize",
+        file = "casino_prize_wheel.c",
+        LEGACY = {
+            value = 14,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    prize_wheel_prize_state = {
+        description = "Prize Wheel Prize State",
+        file = "casino_prize_wheel.c",
+        LEGACY = {
+            value = 45,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    gb_casino_heist_planning = {
+        description = "Casino Heist Planning Global",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 1967717,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    gb_casino_heist_planning_cut_offset = {
+        description = "Casino Heist Planning Cut Offset",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 1497 + 736 + 92,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    fm_mission_controller_cart_grab = {
+        description = "FM Mission Controller Cart Grab",
+        file = "fm_mission_controller.c",
+        LEGACY = {
+            value = 10293,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    fm_mission_controller_cart_grab_speed = {
+        description = "FM Mission Controller Cart Grab Speed",
+        file = "fm_mission_controller.c",
+        LEGACY = {
+            value = 14,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_heist_approach = {
+        description = "Casino Heist Approach Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_heist_target = {
+        description = "Casino Heist Target Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_heist_last_approach = {
+        description = "Casino Heist Last Approach Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_heist_hard = {
+        description = "Casino Heist Hard Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_heist_gunman = {
+        description = "Casino Heist Gunman Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_heist_driver = {
+        description = "Casino Heist Driver Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_heist_hacker = {
+        description = "Casino Heist Hacker Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_heist_weapons = {
+        description = "Casino Heist Weapons Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_heist_cars = {
+        description = "Casino Heist Cars Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_heist_masks = {
+        description = "Casino Heist Masks Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    new_approach = {
+        description = "New Approach Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    new_target = {
+        description = "New Target Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    new_last_approach = {
+        description = "New Last Approach Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    new_hard_approach = {
+        description = "New Hard Approach Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    new_gunman = {
+        description = "New Gunman Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    new_weapons = {
+        description = "New Weapons Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    new_driver = {
+        description = "New Driver Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    new_car = {
+        description = "New Car Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    new_hacker = {
+        description = "New Hacker Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    new_masks = {
+        description = "New Masks Local",
+        file = "gb_casino_heist_planning.c",
+        LEGACY = {
+            value = 0,
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    casino_cooldown_update_str = {
+        description = "Casino Cooldown Update String Local",
+        file = "casino_heist_planning.c",
+        LEGACY = {
+            value = "",
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    },
+    dealers_card_str = {
+        description = "Dealers Card String Local",
+        file = "casino_poker.c",
+        LEGACY = {
+            value = "",
+            pattern = [[TBA]],
+            capture_group = 1,
+        },
+        ENHANCED = {}
+    }
+
+    --------- END CASINO PACINO ---------
 }
