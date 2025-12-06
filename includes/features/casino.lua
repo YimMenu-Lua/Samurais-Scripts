@@ -45,52 +45,52 @@ function CasinoPacino:GiveWheelPrize(prizeType)
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 18)
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
         else
-            Toast:ShowMessage("CasinoPacino", "You must be at the Lucky Wheel to receive this prize!")
+            Toast:ShowMessage("CasinoPacino", _T("CP_MUST_BE_AT_WHEEL"))
         end
     elseif prizeType == "mystery" then
         if script.is_active("casino_lucky_wheel") then
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 11)
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
         else
-            Toast:ShowMessage("CasinoPacino", "You must be at the Lucky Wheel to receive this prize!")
+            Toast:ShowMessage("CasinoPacino", _T("CP_MUST_BE_AT_WHEEL"))
         end
     elseif prizeType == "cash" then
         if script.is_active("casino_lucky_wheel") then
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 19)
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
         else
-            Toast:ShowMessage("CasinoPacino", "You must be at the Lucky Wheel to receive this prize!")
+            Toast:ShowMessage("CasinoPacino", _T("CP_MUST_BE_AT_WHEEL"))
         end
     elseif prizeType == "chips" then
         if script.is_active("casino_lucky_wheel") then
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 15)
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
         else
-            Toast:ShowMessage("CasinoPacino", "You must be at the Lucky Wheel to receive this prize!")
+            Toast:ShowMessage("CasinoPacino", _T("CP_MUST_BE_AT_WHEEL"))
         end
     elseif prizeType == "rp" then
         if script.is_active("casino_lucky_wheel") then
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 17)
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
         else
-            Toast:ShowMessage("CasinoPacino", "You must be at the Lucky Wheel to receive this prize!")
+            Toast:ShowMessage("CasinoPacino", _T("CP_MUST_BE_AT_WHEEL"))
         end
     elseif prizeType == "discount" then
         if script.is_active("casino_lucky_wheel") then
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 4)
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
         else
-            Toast:ShowMessage("CasinoPacino", "You must be at the Lucky Wheel to receive this prize!")
+            Toast:ShowMessage("CasinoPacino", _T("CP_MUST_BE_AT_WHEEL"))
         end
     elseif prizeType == "clothing" then
         if script.is_active("casino_lucky_wheel") then
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 8)
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
         else
-            Toast:ShowMessage("CasinoPacino", "You must be at the Lucky Wheel to receive this prize!")
+            Toast:ShowMessage("CasinoPacino", _T("CP_MUST_BE_AT_WHEEL"))
         end
     elseif prizeType == "surprise" then
-        Toast:ShowMessage("CasinoPacino", "This feature is currently disabled!")
+        Toast:ShowMessage("CasinoPacino", _T("CP_FEATURE_DISABLED"))
     end
 end
 
@@ -104,25 +104,25 @@ function CasinoPacino:GetCardNameFromIndex(card_index)
     local cardSuit = ""
 
     if card_number == 1 then
-        cardName = "Ace"
+        cardName = _T("CP_CARD_ACE")
     elseif card_number == 11 then
-        cardName = "Jack"
+        cardName = _T("CP_CARD_JACK")
     elseif card_number == 12 then
-        cardName = "Queen"
+        cardName = _T("CP_CARD_QUEEN")
     elseif card_number == 0 then
-        cardName = "King"
+        cardName = _T("CP_CARD_KING")
     else
         cardName = tostring(card_number)
     end
 
     if card_index >= 1 and card_index <= 13 then
-        cardSuit = "Clubs"
+        cardSuit = _T("CP_CARD_CLUBS")
     elseif card_index >= 14 and card_index <= 26 then
-        cardSuit = "Diamonds"
+        cardSuit = _T("CP_CARD_DIAMONDS")
     elseif card_index >= 27 and card_index <= 39 then
-        cardSuit = "Hearts"
+        cardSuit = _T("CP_CARD_HEARTS")
     elseif card_index >= 40 and card_index <= 52 then
-        cardSuit = "Spades"
+        cardSuit = _T("CP_CARD_SPADES")
     end
 
     return string.format("%s of %s", cardName, cardSuit)
@@ -164,7 +164,7 @@ function CasinoPacino:ForceDealerBust()
             (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 3, 0) ~= player_id)
         ) do
             network.force_script_host("blackjack")
-            Toast:ShowMessage("CasinoPacino", "Taking control of the blackjack script...") --If you see this spammed, someone is fighting you for control.
+            Toast:ShowMessage("CasinoPacino", _T("CP_BLACKJACK_SCRIPT_CONTROL")) --If you see this spammed, someone is fighting you for control.
             script:yield()
         end
 
@@ -187,7 +187,7 @@ function CasinoPacino:ForcePokerCards()
         and( NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 2, 0) ~= player_id)
         and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 3, 0) ~= player_id) do
             network.force_script_host("three_card_poker")
-            Toast:ShowMessage("CasinoPacino", "Taking control of the 'Three Card Poker' script...")
+            Toast:ShowMessage("CasinoPacino", _T("CP_POKER_SCRIPT_CONTROL"))
             sleep(500)
         end
 
@@ -238,7 +238,7 @@ function CasinoPacino:ForceRouletteWheel()
             and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 2, 0) ~= player_id
             and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 3, 0) ~= player_id do
             network.force_script_host("casinoroulette")
-            Toast:ShowMessage("CasinoPacino", "Taking control of the 'Casino Roulette' script...") --If you see this spammed, someone if fighting you for control.
+            Toast:ShowMessage("CasinoPacino", _T("CP_ROULETTE_SCRIPT_CONTROL")) --If you see this spammed, someone if fighting you for control.
             sleep(500)
         end
 
@@ -303,7 +303,7 @@ function CasinoPacino:SetCooldownString()
     local chipswon_gd               = stats.get_int("MPPLY_CASINO_CHIPS_WON_GD")
     local max_chip_wins             = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_DAILY")
     self.casino_cooldown_update_str = chipswon_gd >= max_chip_wins
-    and string.format("Cooldown for %.2f minute(s).", minutes_left) or "Off Cooldown"
+    and string.format(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left) or _T("CP_COOLDOWN_BYPASS_STATUS_OFF")
 end
 
 ---@return string
@@ -324,10 +324,10 @@ function CasinoPacino:SetBlackjackString()
             dealers_card = locals.get_int("blackjack", blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1)
             self.dealers_card_str = self:GetCardNameFromIndex(dealers_card)
         else
-            self.dealers_card_str = "Not Playing Blackjack"
+            self.dealers_card_str = _T("CP_NOT_PLAYING_BLACKJACK")
         end
     else
-        self.dealers_card_str = "Not in Casino"
+        self.dealers_card_str = _T("CP_NOT_IN_CASINO")
     end
 end
 
