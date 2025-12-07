@@ -101,6 +101,7 @@ CommandExecutor = require("includes.services.CommandExecutor").new()
 
 YRV3 = require("includes.features.yrv3"):init()
 CasinoPacino = require("includes.features.casino"):init()
+SalvageYard = require("includes.features.salvage"):init()
 
 ------------------------------------------------------------------
 
@@ -129,6 +130,7 @@ local packages = {
     "gui.settings_ui",
     "gui.yrv3_ui",
     "gui.casino_ui",
+    "gui.salvage_ui",
 }
 
 for _, package in ipairs(packages) do
