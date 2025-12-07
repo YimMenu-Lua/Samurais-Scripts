@@ -12,7 +12,7 @@ return {
 	["GENERIC_UNAVAILABLE"] = "Actuellement indisponible.",
 	["OFFLINE_OR_OUTDATED"] = "Vous devez être en ligne et disposer de la dernière version du script pour accéder à cette fonctionnalité !",
 	["CP_CASINO_TAB_BAR"] = "Casino",
-	["CP_CASINO_FEATURES_TAB"] = "Caractéristiques du casino",
+	["CP_CASINO_FEATURES_TAB"] = "Fonctionnalités du casino",
 	["CP_CASINO_HEIST_TAB"] = "Vol de casino",
 	["CP_MUST_BE_AT_WHEEL"] = "Vous devez être à la Lucky Wheel pour recevoir ce prix !",
 	["CP_FEATURE_DISABLED"] = "Cette fonctionnalité est actuellement désactivée !",

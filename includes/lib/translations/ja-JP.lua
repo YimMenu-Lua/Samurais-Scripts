@@ -26,7 +26,7 @@ return {
 	["CP_CARD_SPADES"] = "スペード",
 	["CP_COOLDOWN_BYPASS"] = "カジノのクールダウン",
 	["CP_COOLDOWN_BYPASS_ENABLE"] = "バイパスを有効にする",
-	["CP_COOLDOWN_BYPASS_TOOLTIP"] = "カジノのクールダウンを無効にし、禁止される可能性があります。ご自身の責任でご使用ください。",
+	["CP_COOLDOWN_BYPASS_TOOLTIP"] = "カジノのクールダウンを無効にし、BANされる可能性があります。ご自身の責任でご使用ください。",
 	["CP_COOLDOWN_BYPASS_STATUS"] = "状態：",
 	["CP_COOLDOWN_BYPASS_STATUS_OFF"] = "オフクールダウン",
 	["CP_COOLDOWN_BYPASS_STATUS_FORMAT"] = "%.2f 分のクールダウン。",

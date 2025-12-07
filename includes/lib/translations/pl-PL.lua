@@ -45,7 +45,7 @@ return {
 	["CP_ROULETTE_SCRIPT_CONTROL"] = "Przejęcie kontroli nad skryptem „Casino Roulette”...",
 	["CP_SLOT_MACHINES_SETTINGS"] = "Automaty do gier",
 	["CP_SLOT_MACHINES_RIG"] = "Automaty do gry Rig",
-	["CP_SLOT_MACHINES_AUTOPLAY"] = "Automaty do gry z automatyczną grą",
+	["CP_SLOT_MACHINES_AUTOPLAY"] = "Automaty do gier z automatyczną grą",
 	["CP_SLOT_MACHINES_CAP_CHIPS"] = "Ogranicz maksymalną liczbę żetonów do:",
 	["CP_LUCKY_WHEEL_SETTINGS"] = "Szczęśliwe koło",
 	["CP_LUCKY_WHEEL_GIVE_VEHICLE"] = "Daj pojazd",
