@@ -1,7 +1,10 @@
-local settings_tab = GUI:GetMainTab():RegisterSubtab("Settings ", function()
-    ImGui.SeparatorText("Backend")
-    GVars.backend.auto_cleanup_entities = GUI:Checkbox("Auto Cleanup Entities", GVars.backend.auto_cleanup_entities)
+---@diagnostic disable: lowercase-global
 
+local default_cfg <const> = require("includes.data.config")
+local ThemeManager = require("includes.services.ThemeManager")
+
+local settings_tab = GUI:RegisterNewTab(eTabID.TAB_SETTINGS, "General", function()
+    GVars.backend.auto_cleanup_entities = GUI:Checkbox("Auto Cleanup Entities", GVars.backend.auto_cleanup_entities)
     ImGui.Spacing()
     ImGui.BulletText(_F("Language: %s (%s)", GVars.backend.language_name, GVars.backend.language_code))
     ImGui.Spacing()
@@ -23,14 +26,103 @@ local settings_tab = GUI:GetMainTab():RegisterSubtab("Settings ", function()
     end
 
     ImGui.Dummy(1, 10)
-
-    ImGui.SeparatorText("GUI")
-    GVars.ui.disable_tooltips = GUI:Checkbox("Disable Tooltips", GVars.ui.disable_tooltips)
-    ImGui.SameLine()
-    GVars.ui.disable_sound_feedback = GUI:Checkbox("Disable Sound Feedback", GVars.ui.disable_sound_feedback)
 end)
 
+local _col1 = {
+    GVars.ui.style.theme.TopBarFrameCol1.x,
+    GVars.ui.style.theme.TopBarFrameCol1.y,
+    GVars.ui.style.theme.TopBarFrameCol1.z,
+    GVars.ui.style.theme.TopBarFrameCol1.w,
+}
+local _col2 = {
+    GVars.ui.style.theme.TopBarFrameCol2.x,
+    GVars.ui.style.theme.TopBarFrameCol2.y,
+    GVars.ui.style.theme.TopBarFrameCol2.z,
+    GVars.ui.style.theme.TopBarFrameCol2.w,
+}
+local col1_changed = false
+local col2_changed = false
+
+---@type Theme
+local selected_theme
+
+local function DrawGuiSettings()
+    ImGui.SeparatorText("General")
+
+    GVars.ui.disable_tooltips = GUI:Checkbox("Disable Tooltips", GVars.ui.disable_tooltips)
+
+    ImGui.SameLine()
+    GVars.ui.disable_sound_feedback = GUI:Checkbox("Disable Sound Feedback", GVars.ui.disable_sound_feedback)
+
+    ImGui.SeparatorText("Geometry")
+    GVars.ui.moveable, _ = GUI:Checkbox("Moveable Window", GVars.ui.moveable, { tooltip = "Allows you to freely move the window" })
+
+    if (GVars.ui.moveable) then
+        ImGui.SameLine()
+        if (GUI:Button("Reset Position", { tooltip = "Resets the window to default screen position" })) then
+            GUI:Snap()
+        end
+    end
+
+    local resolution = Game.GetScreenResolution()
+    GVars.ui.window_size.x, _ = ImGui.SliderFloat("Window Width",  GVars.ui.window_size.x, 200, resolution.x)
+    ImGui.SameLine()
+    if GUI:Button("Reset##width") then
+        GVars.ui.window_size.x = default_cfg.ui.window_size.x
+    end
+
+    GVars.ui.window_size.y, _ = ImGui.SliderFloat("Window Height",  GVars.ui.window_size.y, 200, resolution.y)
+    ImGui.SameLine()
+    if GUI:Button("Reset##height") then
+        GVars.ui.window_size.y = default_cfg.ui.window_size.y
+    end
+
+    ImGui.BeginDisabled()
+        GVars.ui.window_pos.x, _  = ImGui.SliderFloat("X Position",  GVars.ui.window_pos.x, 0, resolution.x)
+        GUI:Tooltip("These are display only. Enable 'Moveable Window' then drag the window to freely move it.")
+        GVars.ui.window_pos.y, _  = ImGui.SliderFloat("Y Position",  GVars.ui.window_pos.y, 0, resolution.y)
+        GUI:Tooltip("These are display only. Enable 'Moveable Window' then drag the window to freely move it.")
+    ImGui.EndDisabled()
+
+    ImGui.SeparatorText("Style")
+
+    if (ImGui.BeginCombo("##uitheme", GVars.ui.style.theme.Name or "Theme")) then
+        for name, theme in pairs(ThemeManager:GetThemes()) do
+            local is_selected = selected_theme and selected_theme.Name == name or false
+            if (ImGui.Selectable(name, is_selected)) then
+                selected_theme = theme
+                GVars.ui.style.theme = theme
+                ThemeManager:SetCurrentTheme(theme)
+            end
+        end
+        ImGui.EndCombo()
+    end
+
+    ImGui.Spacing()
+
+    GVars.ui.style.bg_alpha, _ = ImGui.SliderFloat("Background Alpha", GVars.ui.style.bg_alpha, 0.01, 1.0)
+
+    ImGui.SameLine()
+    ImGui.Text(_F("(%d%%)", math.floor(GVars.ui.style.bg_alpha * 100)))
+
+    _col1, col1_changed = ImGui.ColorEdit4("Category Frame Color 1", _col1)
+    if (col1_changed) then
+        GVars.ui.style.theme.TopBarFrameCol1 = vec4:new(_col1[1], _col1[2], _col1[3], _col1[4])
+    end
+
+    _col2, col2_changed = ImGui.ColorEdit4("Category Frame Color 2", _col2)
+    if (col2_changed) then
+        GVars.ui.style.theme.TopBarFrameCol2 = vec4:new(_col2[1], _col2[2], _col2[3], _col2[4])
+    end
+end
+
+settings_tab:RegisterSubtab("Gui", DrawGuiSettings)
+
 --#region debug
+
+if (not GVars.backend.debug_mode) then
+    return
+end
 
 local debug_tab = settings_tab:RegisterSubtab("Debug")
 local RED <const> = Color("red")
@@ -112,7 +204,7 @@ local function DrawEntities()
 
     if (selected_entity_type and Backend.SpawnedEntities[selected_entity_type]) then
         ImGui.SameLine()
-        ImGui.BeginChild("##entitydetails", 600, 400, true)
+        ImGui.BeginChild("##entitydetails", 0, 0, true)
         ---@diagnostic disable-next-line: undefined-global
         if ImGui.BeginTable("entity_table", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders) then
             ImGui.TableSetupColumn("Handle")
@@ -160,10 +252,10 @@ end
 local function DrawThreads()
     local thread_list = ThreadManager:ListThreads()
     local thread_count = table.getlen(thread_list)
-    local child_height = math.min(thread_count * 30, 300)
+    local child_height = math.min(thread_count * 30, GVars.ui.window_size.y - 20)
 
     ImGui.BulletText(_F("Thread Count: [%d]", thread_count))
-    ImGui.BeginChild("##threadlist", 400, child_height)
+    ImGui.BeginChild("##threadlist", ImGui.GetContentRegionAvail() - 200, child_height)
     ImGui.SetNextWindowBgAlpha(0)
     if ImGui.BeginListBox("##thread_listbox", -1, -1) then
         for name, thread in pairs(thread_list) do
@@ -216,9 +308,8 @@ end
 local function DrawPointers()
     local ptr_list, failed_ptr_list = PatternScanner:ListPointers()
     local total_count, failed_count = table.getlen(ptr_list), #failed_ptr_list
-    local resolution = Game.GetScreenResolution()
-    local child_width = resolution.x * 0.36
-    local child_height = math.min(total_count * 30, resolution.y * 0.3)
+    local child_width = GVars.ui.window_size.x
+    local child_height = math.min(total_count * 30,  GVars.ui.window_size.y - 80)
 
     ImGui.BulletText(_F("Total Count: [%d]", total_count))
     ImGui.BeginChild("##ptr_list", child_width, child_height, true)
@@ -409,7 +500,7 @@ local function DrawGlobalsAndLocals()
 end
 
 local function DrawSerializerDebug()
-    local eState = ThreadManager:GetThreadState("SB_SERIALIZER")
+    local eState = ThreadManager:GetThreadState("SS_SERIALIZER")
 
     ImGui.BulletText("Thread State:")
     ImGui.SameLine()
@@ -499,9 +590,6 @@ local function DrawDummyVehSpawnMenu()
             end
         end)
     end
-end
-
-local function DrawMiscTests()
 end
 
 debug_tab:RegisterGUI(function()

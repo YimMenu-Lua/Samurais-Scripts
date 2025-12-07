@@ -1,4 +1,5 @@
 return {
+    --#region generic
     ["WARN_PED_SPAWN_LIMIT"]                = "Ped spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
     ["WARN_VEH_SPAWN_LIMIT"]                = "Vehicle spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
     ["WARN_OBJ_SPAWN_LIMIT"]                = "Object spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
@@ -11,15 +12,14 @@ return {
     ["SUPPLIES_FILL"]                       = "Fill Supplies",
     ["GENERIC_UNAVAILABLE"]                 = "Currently unavailable.",
     ["OFFLINE_OR_OUTDATED"]                 = "You need to be online and have the latest version of the script to access this feature!",
+    --#endregion
 
-
-
+    --#region CasinoPacino
     ["CP_CASINO_TAB_BAR"]                   = "Casino",
     ["CP_CASINO_FEATURES_TAB"]              = "Casino Features",
     ["CP_CASINO_HEIST_TAB"]                 = "Casino Heist",
     ["CP_MUST_BE_AT_WHEEL"]                 = "You must be at the Lucky Wheel to receive this prize!",
     ["CP_FEATURE_DISABLED"]                 = "This feature is currently disabled!",
-
     ["CP_CARD_ACE"]                         = "Ace",
     ["CP_CARD_JACK"]                        = "Jack",
     ["CP_CARD_QUEEN"]                       = "Queen",
@@ -28,19 +28,16 @@ return {
     ["CP_CARD_DIAMONDS"]                    = "Diamonds",
     ["CP_CARD_HEARTS"]                      = "Hearts",
     ["CP_CARD_SPADES"]                      = "Spades",
-
     ["CP_COOLDOWN_BYPASS"]                  = "Casino Cooldown",
     ["CP_COOLDOWN_BYPASS_ENABLE"]           = "Enable Bypass",
     ["CP_COOLDOWN_BYPASS_TOOLTIP"]          = "Disables casino cooldown, may result in ban. Use at your own risk.",
     ["CP_COOLDOWN_BYPASS_STATUS"]           = "Status:",
     ["CP_COOLDOWN_BYPASS_STATUS_OFF"]       = "Off Cooldown",
     ["CP_COOLDOWN_BYPASS_STATUS_FORMAT"]    = "Cooldown for %.2f minute(s).",
-
     ["CP_POKER_SETTINGS"]                   = "Three Card Poker",
     ["CP_POKER_FORCE_ROYAL_FLUSH"]          = "Force all Players Hands to Royal Flush",
     ["CP_POKER_FORCE_BAD_BEAT"]             = "Force Dealer's Hand to 'Bad Beat'",
     ["CP_POKER_SCRIPT_CONTROL"]             = "Taking control of the Three Card Poker script...",
-
     ["CP_BLACKJACK_SETTINGS"]               = "Blackjack",
     ["CP_BLACKJACK_DEALER_FACE_DOWN_CARD"]  = "Dealer's Face Down Card:",
     ["CP_BLACKJACK_FORCE_DEALER_BUST"]      = "Force Dealer to Bust",
@@ -50,12 +47,10 @@ return {
     ["CP_ROULETTE_SETTINGS"]                = "Roulette",
     ["CP_ROULETTE_FORCE_RED_18"]            = "Force Roulette Wheel to Land on Red 18",
     ["CP_ROULETTE_SCRIPT_CONTROL"]          = "Taking control of the 'Casino Roulette' script...",
-
     ["CP_SLOT_MACHINES_SETTINGS"]           = "Slot Machines",
     ["CP_SLOT_MACHINES_RIG"]                = "Rig Slot Machines",
     ["CP_SLOT_MACHINES_AUTOPLAY"]           = "Autoplay Slot Machines",
     ["CP_SLOT_MACHINES_CAP_CHIPS"]          = "Cap Maximum Chips to:",
-
     ["CP_LUCKY_WHEEL_SETTINGS"]             = "Lucky Wheel",
     ["CP_LUCKY_WHEEL_GIVE_VEHICLE"]         = "Give Vehicle",
     ["CP_LUCKY_WHEEL_GIVE_MYSTERY"]         = "Give Mystery Prize",
@@ -65,9 +60,9 @@ return {
     ["CP_LUCKY_WHEEL_GIVE_DISCOUNT"]        = "Give Discount",
     ["CP_LUCKY_WHEEL_GIVE_CLOTHING"]        = "Give Clothing",
     ["CP_LUCKY_WHEEL_GIVE_SURPRISE"]        = "Surprise Me",
+    --#endregion
 
-
-    
+    --#region SalvageYard
     ["SY_VEHICLES"]                         = "Salvage Yard Vehicles",
     ["SY_VEH_SLOT"]                         = "Slot %s:",
     ["SY_EMPTY"]                            = "Empty",
@@ -93,4 +88,5 @@ return {
     ["SY_CD_ACTIVE"]                        = "Cooldown Active",
     ["SY_CD_DISABLED"]                      = "Cooldown Disabled",
     ["SY_PREP_SKIP"]                        = "Skiping Preparations..."
+    --#endregion
 }

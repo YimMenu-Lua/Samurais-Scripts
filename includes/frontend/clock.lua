@@ -1,4 +1,3 @@
-local debug_counter = GVars.backend.debug_mode and 7 or 0
 local function DrawClock()
     local now = os.date("*t")
     local month = os.date("%b")
@@ -137,33 +136,4 @@ local function DrawClock()
     ImGui.Dummy(size, size)
 end
 
-GUI:GetMainTab():RegisterGUI(function()
-    DrawClock()
-    ImGui.Dummy(1, 10)
-    ImGui.SeparatorText("About")
-
-    if GUI:IsItemClicked(GUI.MouseButtons.LEFT) then
-        debug_counter = debug_counter + 1
-        if (debug_counter == 7) then
-            GUI:PlaySound(GUI.Sounds.Nav)
-            log.debug("Debug mode activated.")
-            GVars.backend.debug_mode = true
-        elseif debug_counter > 7 then
-            GUI:PlaySound(GUI.Sounds.Cancel)
-            log.debug("Debug mode deactivated.")
-            GVars.backend.debug_mode = false
-            debug_counter = 0
-        end
-    end
-
-    ImGui.Text("A Lua base for YimMenu V1.\nCross-compatibility with V2 may be added in the future.")
-    ImGui.Dummy(1, 10)
-    ImGui.Separator()
-
-    ImGui.SetNextWindowBgAlpha(0)
-    if ImGui.BeginChild("footer", -1, 40, false) then
-        ImGui.Spacing()
-        ImGui.TextDisabled(("v%s"):format(Backend.__version))
-        ImGui.EndChild()
-    end
-end)
+return DrawClock

@@ -312,7 +312,7 @@ function Backend:RegisterHandlers()
     self.debug_mode = self:IsMockEnv() or GVars.backend.debug_mode or false
 
     if (self:GetAPIVersion() ~= eAPIVersion.L54) then
-        ThreadManager:CreateNewThread("SB_CTRLS", function()
+        ThreadManager:CreateNewThread("SS_CTRLS", function()
             if (self.disable_input) then
                 PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
             end
@@ -320,7 +320,7 @@ function Backend:RegisterHandlers()
     end
 
     if (self:GetAPIVersion() == eAPIVersion.V1) then
-        ThreadManager:CreateNewThread("SB_BACKEND", function()
+        ThreadManager:CreateNewThread("SS_BACKEND", function()
             self:OnPlayerSwitch()
             self:OnSessionSwitch()
             yield()

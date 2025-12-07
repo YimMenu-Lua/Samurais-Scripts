@@ -1,5 +1,35 @@
----@class StructWarehouses
-local StructWarehouses = {
+---@class WarehouseStruct
+---@field wasChecked boolean
+---@field isOwned boolean
+---@field autoFill boolean
+---@field name? string
+---@field max? integer
+---@field size? integer
+---@field pos? vec3
+---@field totalSupplies? integer
+---@field totalValue? integer
+
+---@class BikerBusinessStruct
+---@field wasChecked boolean
+---@field isOwned boolean
+---@field unit_max? integer
+---@field name? string
+---@field value_offset? integer
+---@field totalSupplies? integer
+---@field totalStock? integer
+---@field totalValue? integer
+---@field blip? integer
+
+---@class BusinessSafeStruct
+---@field isOwned fun(): bool
+---@field cashValue fun(): integer
+---@field max_cash integer
+---@field blip integer
+---@field popularity? fun(): integer
+---@field maxPop? fun()
+
+---@type array<WarehouseStruct>
+local Wh_Default = {
     [1] = {
         wasChecked = false,
         isOwned = false,
@@ -27,8 +57,8 @@ local StructWarehouses = {
     },
 }
 
----@class StructBikerBusiness
-local StructBikerBusiness = {
+---@type array<BikerBusinessStruct>
+local BB_Default = {
     [1] = {
         wasChecked = false,
         isOwned = false,
@@ -51,8 +81,8 @@ local StructBikerBusiness = {
     },
 }
 
----@class StructBusinessSafes
-local StructBusinessSafes = {
+---@type dict<BusinessSafeStruct>
+local BS_Default = {
     ["Nightclub"] = {
         isOwned = function()
             return stats.get_int("MPX_NIGHTCLUB_OWNED") ~= 0
@@ -168,9 +198,9 @@ local eShouldTerminateScripts <const> = {
 ---@field m_biker_value_sum number
 ---@field m_safe_cash_sum number
 ---@field m_bhub_script_handle number
----@field m_warehouse_data StructWarehouses
----@field m_biker_data StructBikerBusiness
----@field m_safe_cash_data StructBusinessSafes
+---@field m_warehouse_data array<WarehouseStruct>
+---@field m_biker_data array<BikerBusinessStruct>
+---@field m_safe_cash_data dict<BusinessSafeStruct>
 ---@field m_hangar_loop boolean
 ---@field m_has_triggered_autosell boolean
 ---@field m_sell_script_running boolean
@@ -195,9 +225,9 @@ function YRV3:init()
         m_sell_script_running = false,
         m_sell_script_name = nil,
         m_sell_script_disp_name = "None",
-        m_warehouse_data = StructWarehouses,
-        m_biker_data = StructBikerBusiness,
-        m_safe_cash_data = StructBusinessSafes,
+        m_warehouse_data = Wh_Default,
+        m_biker_data = BB_Default,
+        m_safe_cash_data = BS_Default,
         m_display_names = StructScriptDisplayNames,
     }, self)
 
@@ -286,7 +316,7 @@ function YRV3:PopulateBikerBusinessSlot(index)
                     name = v.name,
                     id = v.id,
                     unit_max = v.unit_max,
-                    val_offset = v.val_offset,
+                    value_offset = v.val_offset,
                     blip = v.blip,
                 }
             end
@@ -300,8 +330,8 @@ function YRV3:PopulateCEOwarehouseSlot(index)
     end
 
     script.run_in_fiber(function()
-        local property_index = (stats.get_int(_F("MPX_PROP_WHOUSE_SLOT%d", index-1))) - 1
-        local warehouseName = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_WHOUSE_%d", property_index))
+        local property_index = (stats.get_int(_F("MPX_PROP_WHOUSE_SLOT%d", index-1)))
+        local warehouseName = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_WHOUSE_%d", property_index - 1))
 
         if self.t_CEOwarehouses[property_index] then
             self.m_warehouse_data[index] = {
@@ -426,7 +456,7 @@ function YRV3:WarehouseAutofill()
             end
 
             stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, i+11)
-            sleep(GVars.autofill_delay or 100)
+            sleep(GVars.features.yrv3.autofill_delay or 100)
         end
 
         ::continue::
@@ -469,7 +499,7 @@ function YRV3:HangarAutofill()
         end
 
         stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
-        sleep(GVars.autofill_delay or 100)
+        sleep(GVars.features.yrv3.autofill_delay or 100)
     end
 
     self.m_hangar_loop = false
@@ -480,7 +510,7 @@ function YRV3:FinishSaleOnCommand()
         return
     end
 
-    if (GVars.autosell) then
+    if (GVars.features.yrv3.autosell) then
         Toast:ShowWarning(
             "YRV3",
             "You aleady have 'Auto-Sell' enabled. No need to manually trigger it.",
@@ -693,7 +723,11 @@ function YRV3:Start()
 
     self:BackgroundWorker()
 
-    if (GVars.autosell and self.m_sell_script_running and not self.m_has_triggered_autosell and not CAM.IS_SCREEN_FADED_OUT()) then
+    if (GVars.features.yrv3.autosell
+        and self.m_sell_script_running
+        and not self.m_has_triggered_autosell
+        and not CAM.IS_SCREEN_FADED_OUT()
+    ) then
         self.m_has_triggered_autosell = true
         Toast:ShowSuccess("YRV3", "Auto-Sell will start in 20 seconds.")
         sleep(2e4)
@@ -769,9 +803,9 @@ function YRV3:Reset()
     self.m_ceo_value_sum = 0
     self.m_biker_value_sum = 0
     self.m_safe_cash_sum = 0
-    self.m_warehouse_data = StructWarehouses
-    self.m_biker_data = StructBikerBusiness
-    self.m_safe_cash_data = StructBusinessSafes
+    self.m_warehouse_data = Wh_Default
+    self.m_biker_data = BB_Default
+    self.m_safe_cash_data = BS_Default
 end
 
 

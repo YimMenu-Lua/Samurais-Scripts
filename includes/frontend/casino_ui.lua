@@ -1,18 +1,23 @@
 ---@diagnostic disable
 
-local function drawCasinoUI()
-    ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 5, 5)
+local function CasinoUI()
+    ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
 
     ImGui.SeparatorText(_T("CP_COOLDOWN_BYPASS"))
-    GVars.bypass_casino_bans, _ = GUI:Checkbox(_T("CP_COOLDOWN_BYPASS_ENABLE"), GVars.bypass_casino_bans, { tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"), color = Color("#AA0000") } )
+    GVars.features.dunk.bypass_casino_bans, _ = GUI:Checkbox(_T("CP_COOLDOWN_BYPASS_ENABLE"), 
+        GVars.features.dunk.bypass_casino_bans, { 
+            tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"), 
+            color = Color("#AA0000") 
+        })
+
     ImGui.SameLine()
     ImGui.BulletText(_T("CP_COOLDOWN_BYPASS_STATUS"))
     ImGui.SameLine()
     ImGui.Text(CasinoPacino:GetCooldownString())
 
     ImGui.SeparatorText(_T("CP_POKER_SETTINGS"))
-    GVars.force_poker_cards, _ = GUI:Checkbox(_T("CP_POKER_FORCE_ROYAL_FLUSH"), GVars.force_poker_cards)
-    GVars.set_dealers_poker_cards, _ = GUI:Checkbox(_T("CP_POKER_FORCE_BAD_BEAT"), GVars.set_dealers_poker_cards)
+    GVars.features.dunk.force_poker_cards, _ = GUI:Checkbox(_T("CP_POKER_FORCE_ROYAL_FLUSH"), GVars.features.dunk.force_poker_cards)
+    GVars.features.dunk.set_dealers_poker_cards, _ = GUI:Checkbox(_T("CP_POKER_FORCE_BAD_BEAT"), GVars.features.dunk.set_dealers_poker_cards)
 
     ImGui.SeparatorText(_T("CP_BLACKJACK_SETTINGS"))
     ImGui.BulletText(_T("CP_BLACKJACK_DEALER_FACE_DOWN_CARD"))
@@ -23,46 +28,48 @@ local function drawCasinoUI()
     end
 
     ImGui.SeparatorText(_T("CP_ROULETTE_SETTINGS"))
-    GVars.force_roulette_wheel, _ = GUI:Checkbox(_T("CP_ROULETTE_FORCE_RED_18"), GVars.force_roulette_wheel)
+    GVars.features.dunk.force_roulette_wheel, _ = GUI:Checkbox(_T("CP_ROULETTE_FORCE_RED_18"), GVars.features.dunk.force_roulette_wheel)
 
     ImGui.SeparatorText(_T("CP_SLOT_MACHINES_SETTINGS"))
-    GVars.rig_slot_machine, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_RIG"), GVars.rig_slot_machine)
-    -- GVars.autoplay_slots, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_AUTOPLAY"), GVars.autoplay_slots)
-    -- if GVars.autoplay_slots then
-    --     GVars.cap_slot_machine_chips, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_CAP_CHIPS"), GVars.cap_slot_machine_chips)
+    GVars.features.dunk.rig_slot_machine, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_RIG"), GVars.features.dunk.rig_slot_machine)
+    -- GVars.features.dunk.autoplay_slots, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_AUTOPLAY"), GVars.features.dunk.autoplay_slots)
+    -- if GVars.features.dunk.autoplay_slots then
+    --     GVars.features.dunk.cap_slot_machine_chips, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_CAP_CHIPS"), GVars.features.dunk.cap_slot_machine_chips)
     -- end
 
     ImGui.SeparatorText(_T("CP_LUCKY_WHEEL_SETTINGS"))
     if GUI:Button(_T("CP_LUCKY_WHEEL_GIVE_VEHICLE")) then
-        CasinoPacino:GiveWheelPrize("vehicle")
+        CasinoPacino:GiveWheelPrize(eCasinoPrize.VEHICLE)
     end
+    
     ImGui.SameLine()
     if GUI:Button(_T("CP_LUCKY_WHEEL_GIVE_MYSTERY")) then
-        CasinoPacino:GiveWheelPrize("mystery")
+        CasinoPacino:GiveWheelPrize(eCasinoPrize.MYSTERY)
     end
     
     if GUI:Button(_T("CP_LUCKY_WHEEL_GIVE_CASH")) then
-        CasinoPacino:GiveWheelPrize("cash")
+        CasinoPacino:GiveWheelPrize(eCasinoPrize.CASH)
     end
     ImGui.SameLine()
     if GUI:Button(_T("CP_LUCKY_WHEEL_GIVE_CHIPS")) then
-        CasinoPacino:GiveWheelPrize("chips")
+        CasinoPacino:GiveWheelPrize(eCasinoPrize.CHIPS)
     end
     
     if GUI:Button(_T("CP_LUCKY_WHEEL_GIVE_RP")) then
-        CasinoPacino:GiveWheelPrize("rp")
+        CasinoPacino:GiveWheelPrize(eCasinoPrize.RP)
     end
+
     ImGui.SameLine()
     if GUI:Button(_T("CP_LUCKY_WHEEL_GIVE_DISCOUNT")) then
-        CasinoPacino:GiveWheelPrize("discount")
+        CasinoPacino:GiveWheelPrize(eCasinoPrize.DISCOUNT)
     end
     
     if GUI:Button(_T("CP_LUCKY_WHEEL_GIVE_CLOTHING")) then
-        CasinoPacino:GiveWheelPrize("clothing")
+        CasinoPacino:GiveWheelPrize(eCasinoPrize.CLOSTHING)
     end
     ImGui.SameLine()
     if GUI:Button(_T("CP_LUCKY_WHEEL_GIVE_SURPRISE")) then
-        CasinoPacino:GiveWheelPrize("surprise")
+        CasinoPacino:GiveWheelPrize(eCasinoPrize.RANDOM)
     end
 
     ImGui.PopStyleVar()
@@ -75,8 +82,8 @@ local function drawCasinoHeistUI()
     ImGui.PopStyleVar()
 end
 
-function CasinoUI()
-    if not Game.IsOnline() and not Backend:IsUpToDate() then
+function DrawDunk()
+    if (not Game.IsOnline() or not Backend:IsUpToDate()) then
         ImGui.Text(_T("OFFLINE_OR_OUTDATED"))
         return
     end
@@ -84,7 +91,7 @@ function CasinoUI()
     ImGui.BeginTabBar(_T("CP_CASINO_TAB_BAR"))
 
     if ImGui.BeginTabItem(_T("CP_CASINO_FEATURES_TAB")) then
-        drawCasinoUI()
+        CasinoUI()
         ImGui.EndTabItem()
     end
 
@@ -92,7 +99,8 @@ function CasinoUI()
         drawCasinoHeistUI()
         ImGui.EndTabItem()
     end
+
     ImGui.EndTabBar()
 end
 
-GUI:GetMainTab():RegisterSubtab("Casino", CasinoUI)
+GUI:RegisterNewTab(eTabID.TAB_ONLINE, "Casino Pacino", DrawDunk)

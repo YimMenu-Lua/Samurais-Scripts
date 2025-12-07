@@ -401,9 +401,13 @@ function Vehicle:LockDoors(toggle)
     end
 end
 
+function Vehicle:GetMaxSpeed()
+    return VEHICLE.GET_VEHICLE_ESTIMATED_MAX_SPEED(self:GetHandle())
+end
+
 -- Gets the vehicle's acceleration multiplier.
 ---@return float
-function Vehicle:GetAcceleration(multiplier)
+function Vehicle:GetAcceleration()
     if not self:IsValid() then
         return 0.0
     end

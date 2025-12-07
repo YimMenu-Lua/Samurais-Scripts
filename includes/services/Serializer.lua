@@ -91,7 +91,7 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
         return instance
     end
 
-    if not runtime_vars then
+    if (not runtime_vars) then
         runtime_vars = _ENV.GVars or {}
         _ENV.GVars = runtime_vars
     end
@@ -109,11 +109,16 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
                 end
 
                 value = config_data[k]
+                local saved = instance.default_config[value]
                 if (value ~= nil) then
                     runtime_vars[k] = value
                     instance.m_key_states[k] = value
                     instance.m_dirty = true
                     return value
+                elseif (saved ~= nil) then
+                    runtime_vars[k] = saved
+                    instance.m_key_states[k] = saved
+                    instance.m_dirty = true
                 end
 
                 return nil
@@ -145,6 +150,29 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
         runtime_vars[key] = saved_value
     end
 
+    if (default_config and runtime_vars["__config_version"] ~= default_config.__config_version) then
+        local function deep_merge(default, target, path, visited)
+            if (visited[default]) then
+                return
+            end
+            visited[default] = true
+
+            for k, v in pairs(default) do
+                local current_path = path and (path .. "." .. tostring(k)) or tostring(k)
+
+                if (target[k] == nil) then
+                    Backend:debug("[Serializer]: Added missing config key %s", current_path)
+                    target[k] = v
+                elseif (type(v) == "table" and type(target[k]) == "table") then
+                    deep_merge(v, target[k], current_path, visited)
+                end
+            end
+        end
+
+        deep_merge(default_config, runtime_vars, nil, {})
+        runtime_vars["__config_version"] = default_config.__config_version
+    end
+
     -- inline
     instance.TickHandler = function()
         instance:OnTick()
@@ -161,7 +189,7 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
         instance:SyncKeys()
     end
 
-    ThreadManager:CreateNewThread("SB_SERIALIZER", instance.TickHandler)
+    ThreadManager:CreateNewThread("SS_SERIALIZER", instance.TickHandler)
     Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, instance.ShutdownHandler)
     return instance
 end
@@ -625,20 +653,48 @@ function Serializer:ReadFromFile(filename)
     return self:Decode(data)
 end
 
+---@param object table
+function Serializer:Reconstruct(object)
+    if (type(object) ~= "table") then
+        return object
+    end
+
+    if (object.__type) then
+        local name  = tostring(object.__type):lower()
+        local entry = self.class_types[name]
+
+        if (entry and type(entry.constructor) == "function") then
+            local ok, result = pcall(entry.constructor, object)
+            if (ok and result) then
+                -- Backend:debug("Reconstructed object: %s", name)
+                return result
+            else
+                -- Backend:debug("Constructor failed for object '%s' error: ", name, result)
+                return object
+            end
+        end
+    end
+
+    if (table.isarray(object)) then
+        local out = {}
+        for i = 1, #object do
+            out[i] = self:Reconstruct(object[i])
+        end
+        return out
+    else
+        local out = {}
+        for k, v in pairs(object) do
+            out[k] = self:Reconstruct(v)
+        end
+        return out
+    end
+end
+
 function Serializer:FlushObjectQueue()
     for _, t in ipairs(self.deferred_objects) do
-        local name  = t.__type:lower():trim()
-        local entry = self.class_types[name]
-        local ctor  = entry and entry.constructor
-
-        if type(ctor) == "function" then
-            local ok, result = pcall(ctor, t)
-            if ok and result then
-                for k, v in pairs(self.m_key_states) do
-                    if (v == t) then
-                        self.m_key_states[k] = result
-                    end
-                end
+        for k, v in pairs(self.m_key_states) do
+            if ((type(v == "table") and (type(t) == "table"))) then
+                self.m_key_states[k] = self:Reconstruct(v)
             end
         end
     end

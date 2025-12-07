@@ -6,29 +6,11 @@
 ---@module "init"
 
 
-local SCRIPT_NAME    <const> = "Samurai's Scripts"
-local SCRIPT_VERSION <const> = "1.7.2"
+local SCRIPT_NAME    <const> = "SSV2"
+local SCRIPT_VERSION <const> = "1.7.4"
 local TARGET_BUILD   <const> = "3586.0"
 local TARGET_VERSION <const> = "1.71"
-local DEFAULT_CONFIG <const> = {
-    backend = {
-        auto_cleanup_entities = false,
-        language_index = 1,
-        language_code = "en-US",
-        language_name = "English"
-    },
-    ui = {
-        disable_tooltips = false,
-        disable_sound_feedback = false,
-    },
-    commands_console = {
-        key = "F5",
-        auto_close = false,
-    },
-    keyboard_keybinds = {},
-    gamepad_keybinds = {},
-    autofill_delay = 500,
-}
+local DEFAULT_CONFIG <const> = require("includes.data.config")
 
 require("includes.backend")
 Backend:init(SCRIPT_NAME, SCRIPT_VERSION, TARGET_BUILD, TARGET_VERSION)
@@ -38,9 +20,7 @@ require("includes.lib.utils")
 require("includes.lib.class")
 require("includes.lib.enum")
 require("includes.classes.Range")
-require("includes.classes.Vector2")
-require("includes.classes.Vector3")
-require("includes.classes.Vector4")
+require("includes.classes.Rect")
 require("includes.classes.fMatrix44")
 require("includes.classes.atArray")
 require("includes.data.pointers")
@@ -89,8 +69,13 @@ SG_SL = require("includes.data.globals_locals")
 -- These services must be loaded before any class that registers with/uses them -------------------
 ThreadManager = require("includes.services.ThreadManager"):init()
 GPointers:Init() -- needs ThreadManager
-
 Serializer      = require("includes.services.Serializer"):init(SCRIPT_NAME, DEFAULT_CONFIG, GVars)
+
+-- I know this looks bad but these can be serialized/deserialized and need Serializer to register functions
+require("includes.classes.Vector2")
+require("includes.classes.Vector3")
+require("includes.classes.Vector4")
+
 KeyManager      = require("includes.services.KeyManager"):init()
 GUI             = require("includes.services.GUI"):init()
 Toast           = require("includes.services.ToastNotifier").new()
@@ -99,10 +84,10 @@ CommandExecutor = require("includes.services.CommandExecutor").new()
 
 ------------------- Features ------------------------------------
 
-YRV3 = require("includes.features.yrv3"):init()
-CasinoPacino = require("includes.features.casino"):init()
-SalvageYard = require("includes.features.salvage"):init()
-
+require("includes.features.Speedometer")
+CasinoPacino = require("includes.features.CasinoPacino"):init()
+SalvageYard  = require("includes.features.SalvageYard"):init()
+YRV3         = require("includes.features.YRV3"):init()
 ------------------------------------------------------------------
 
 local base_path = "includes"
@@ -113,6 +98,8 @@ local packages = {
     "data.vehicles",
     "data.weapons",
 
+    "structs.StateMachine",
+
     "modules.Accessor",
     "modules.Decorator",
     "modules.Color",
@@ -120,24 +107,19 @@ local packages = {
     "modules.Object",
     "modules.Ped",
     "modules.Player",
-    "modules.Self",
     "modules.Vehicle",
+    "modules.Self",
 
     "services.GridRenderer",
     "services.Translator",
 
-    "gui.main_ui",
-    "gui.settings_ui",
-    "gui.yrv3_ui",
-    "gui.casino_ui",
-    "gui.salvage_ui",
+    "frontend.casino_ui",
+    "frontend.salvage_ui",
+    "frontend.settings_ui",
+    "frontend.vehicle_ui",
+    "frontend.yrv3_ui",
 }
 
 for _, package in ipairs(packages) do
     require(_F("%s.%s", base_path, package))
 end
-
-Serializer:FlushObjectQueue()
-Backend:RegisterHandlers()
-Translator:Load()
-GUI:Draw()

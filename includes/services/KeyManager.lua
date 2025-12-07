@@ -127,6 +127,8 @@ eVirtualKeyCodes       = {
     VK_CRSEL               = 0xF7,
     VK_EREOF               = 0xF9,
     VK_EXSEL               = 0xF8,
+    VK_LBUTTON             = 0x1,
+    VK_RBUTTON             = 0x2,
     VK_LAUNCH_APP1         = 0xB6,
     VK_LAUNCH_APP2         = 0xB7,
     VK_LAUNCH_MAIL         = 0xB4,
@@ -261,7 +263,7 @@ function KeyManager:init()
         instance:EventHandler(_, msg, wParam, _)
     end)
 
-    ThreadManager:CreateNewThread("SB_KEYMGR", function()
+    ThreadManager:CreateNewThread("SS_KEYMGR", function()
         instance:HandleCallbacks()
     end)
 
@@ -322,9 +324,19 @@ function KeyManager:OnEvent(msg, wParam)
         return
     end
 
-    if (msg == WM_KEYDOWN or msg == WM_SYSKEYDOWN or msg == WM_XBUTTONDOWN) then
+    if (msg == WM_KEYDOWN or
+        msg == WM_SYSKEYDOWN or
+        msg == WM_XBUTTONDOWN or
+        msg == WM_LBUTTONDOWN or
+        msg == WM_RBUTTONDOWN
+    ) then
         key:UpdateState(true, false)
-    elseif (msg == WM_KEYUP or msg == WM_SYSKEYUP or msg == WM_XBUTTONUP) then
+    elseif (msg == WM_KEYUP or
+        msg == WM_SYSKEYUP or
+        msg == WM_XBUTTONUP or
+        msg == WM_LBUTTONUP or
+        msg == WM_RBUTTONUP
+    ) then
         key:UpdateState(false, true)
     end
 end
@@ -396,13 +408,18 @@ function KeyManager:EventHandler(_, msg, wParam, _)
     if (msg == WM_XBUTTONDOWN or msg == WM_XBUTTONUP) then
         -- the value for secondary mouse buttons is different between keydown and keyup events
         local xButton = (wParam >> 16)
-        if xButton == 1 then
+        if (xButton == 1) then
             wParam = 0x10020
-        elseif xButton == 2 then
+        elseif (xButton == 2) then
             wParam = 0x20040
         end
     end
 
+    if (msg == WM_LBUTTONUP) then
+        wParam = 0x1
+    elseif (msg == WM_LBUTTONUP) then
+        wParam = 0x2
+    end
     self:OnEvent(msg, wParam)
 end
 

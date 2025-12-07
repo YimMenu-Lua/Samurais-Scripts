@@ -1,5 +1,6 @@
 ---@diagnostic disable: param-type-mismatch
 
+local PlayerVehicle = require("includes.features.PlayerVehicle")
 --------------------------------------
 -- Class: Self
 --------------------------------------
@@ -9,11 +10,12 @@
 -- A global singleton that always resolves to the current local player.
 ---@class Self: Player
 ---@field private m_internal CPed
----@field private m_vehicle? Vehicle
+---@field private m_vehicle PlayerVehicle
 ---@field private m_last_vehicle? Vehicle
 ---@field Resolve fun(self: Self) : CPed
 ---@overload fun(): Self
 Self = Class("Self", Player)
+Self.m_vehicle = PlayerVehicle:init(0)
 
 ---@override
 Self.new = nil
@@ -38,7 +40,7 @@ function Self:GetModelHash()
 end
 
 ---@override
----@return Vehicle|nil
+---@return PlayerVehicle
 function Self:GetVehicle()
     return self.m_vehicle
 end
@@ -61,8 +63,8 @@ function Self:OnVehicleSwitch()
 
 
     -- keep this at the bottom
-    self.m_last_vehicle = self.m_vehicle
-    self.m_vehicle = Vehicle(self:GetVehicleNative())
+    self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
+    self.m_vehicle:Set(self:GetVehicleNative())
 end
 
 -- A function to handle custom logic when exiting your vehicle (do nothing, destroy the reference, restore, etc.)
@@ -72,8 +74,8 @@ function Self:OnVehicleExit()
     -- Your logic goes here //
 
     -- keep this at the bottom
-    self.m_last_vehicle = self.m_vehicle
-    self.m_vehicle = nil
+    self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
+    self.m_vehicle:Reset()
 end
 
 -- Returns the entity local player is aiming at.
@@ -270,7 +272,7 @@ end
 function Self:Destroy()
     ---@diagnostic disable-next-line
     self:super():Destroy()
-    self.m_vehicle = nil
+    self.m_vehicle:Reset()
     self.m_last_vehicle = nil
 end
 
@@ -285,7 +287,7 @@ end)
 -- An example thread to handle custom local player logic.
 -- Create and cache a new `Vehicle` instance only once if it either
 -- doesn't already exist or doesn't match the player's current vehicle.
-ThreadManager:CreateNewThread("SB_SELF", function()
+ThreadManager:CreateNewThread("SS_SELF", function()
     if (Self.m_vehicle and Self.m_vehicle:IsValid()) then
         if (Self:IsOnFoot()) then
             Self:OnVehicleExit()
@@ -293,7 +295,7 @@ ThreadManager:CreateNewThread("SB_SELF", function()
             Self:OnVehicleSwitch()
         end
     elseif (not Self:IsOnFoot()) then
-        Self.m_vehicle = Vehicle(Self:GetVehicleNative())
+        Self.m_vehicle:Set(Self:GetVehicleNative())
     end
     sleep(500)
 end)

@@ -35,11 +35,12 @@ local NamedColors = {
 ---@field g float
 ---@field b float
 ---@field a float
+---@overload fun(...): Color
 Color = Class("Color")
 Color.m_string_colors = NamedColors
 
 local function clamp_byte(n)
-    return math.max(0, math.min(255, n))
+    return math.floor(math.max(0, math.min(255, n)))
 end
 
 local function parse_hex(str)

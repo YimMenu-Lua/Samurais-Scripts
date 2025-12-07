@@ -179,7 +179,7 @@ function SizeOf(T, seen)
     end
 
     if (T_type == "string") then
-        return #T
+        return #T + 1
     end
 
     if (T_type == "number") then
@@ -754,6 +754,11 @@ table.getlen = function(t)
     return count
 end
 
+---@return boolean
+table.isarray = function(t)
+    return #t > 0
+end
+
 -- Calculates an estimate of a table's size in memory.
 --
 -- NOTE: This is **VERY** inaccurate.
@@ -1229,5 +1234,16 @@ math.sizeof = function(n)
     end
 
     return 0x4
+end
+
+---@param a number
+---@param b number
+---@param t number delta
+function math.lerp(a, b, t)
+    if (t > 1) then
+        t = 1
+    end
+
+    return a + (b - a) * t
 end
 --#endregion
