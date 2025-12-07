@@ -39,7 +39,7 @@ function CasinoPacino:GiveWheelPrize(prizeType)
     local prize_wheel_win_state     = GetScriptGlobalOrLocal("prize_wheel_win_state")
     local prize_wheel_prize         = GetScriptGlobalOrLocal("prize_wheel_prize")
     local prize_wheel_prize_state   = GetScriptGlobalOrLocal("prize_wheel_prize_state")
-    --add logic to give prize based on type
+    
     if prizeType == "vehicle" then
         if script.is_active("casino_lucky_wheel") then
             locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), 18)

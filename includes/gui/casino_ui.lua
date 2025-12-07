@@ -4,7 +4,7 @@ local function drawCasinoUI()
     ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 5, 5)
 
     ImGui.SeparatorText(_T("CP_COOLDOWN_BYPASS"))
-    GVars.bypass_casino_bans, _ = GUI:Checkbox(_T("CP_COOLDOWN_BYPASS_ENABLE"), GVars.bypass_casino_bans, { tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"), color = "#AA0000" } )
+    GVars.bypass_casino_bans, _ = GUI:Checkbox(_T("CP_COOLDOWN_BYPASS_ENABLE"), GVars.bypass_casino_bans, { tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"), color = Color("#AA0000") } )
     ImGui.SameLine()
     ImGui.BulletText(_T("CP_COOLDOWN_BYPASS_STATUS"))
     ImGui.SameLine()
@@ -27,7 +27,10 @@ local function drawCasinoUI()
 
     ImGui.SeparatorText(_T("CP_SLOT_MACHINES_SETTINGS"))
     GVars.rig_slot_machine, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_RIG"), GVars.rig_slot_machine)
-    -- GVars.autoplay_slots, _ = GUI:Checkbox("Autoplay", GVars.autoplay_slots)
+    -- GVars.autoplay_slots, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_AUTOPLAY"), GVars.autoplay_slots)
+    -- if GVars.autoplay_slots then
+    --     GVars.cap_slot_machine_chips, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_CAP_CHIPS"), GVars.cap_slot_machine_chips)
+    -- end
 
     ImGui.SeparatorText(_T("CP_LUCKY_WHEEL_SETTINGS"))
     if GUI:Button(_T("CP_LUCKY_WHEEL_GIVE_VEHICLE")) then
@@ -66,12 +69,15 @@ local function drawCasinoUI()
 end
 
 local function drawCasinoHeistUI()
-    ImGui.Text("Coming Soon!")
+    ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 5, 5)
+
+    ImGui.SeparatorText(_T("CP_COOLDOWN_BYPASS"))
+    ImGui.PopStyleVar()
 end
 
 function CasinoUI()
     if not Game.IsOnline() and not Backend:IsUpToDate() then
-        ImGui.Text(_T("CP_CASINO_UI_OFFLINE_OR_OUTDATED"))
+        ImGui.Text(_T("OFFLINE_OR_OUTDATED"))
         return
     end
 
