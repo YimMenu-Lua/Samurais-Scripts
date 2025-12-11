@@ -90,6 +90,9 @@ function IsInstance(obj, T)
 
     local obj_type<const> = type(obj)
     local T_type<const>   = type(T)
+    if (T_type == "string" and T == "pointer" and obj_type == "userdata") then
+        return (type(obj.rip) == "function")
+    end
     local obj_mt = getmetatable(obj)
     local T_mt = getmetatable(T)
 
@@ -124,10 +127,6 @@ function IsInstance(obj, T)
     end
 
     if (T_type == "string") then
-        if (T == "pointer") then
-            return (type(obj.rip) == "function")
-        end
-
         if ((obj_type) == "number" and math_types[T]) then
             return math.type(obj) == T
         end
@@ -297,12 +296,33 @@ function GetScriptGlobalOrLocal(name)
     SG_SL = SG_SL or require("includes.data.globals_locals")
     local T = SG_SL[name]
     if (not T) then
-        log.fwarning("GetScriptGlobalOrLocal(): Unknown script global/local name '%s'", name)
+        log.fwarning("GetScriptGlobalOrLocal: Unknown script global/local name '%s'", name)
         return 0
     end
 
     local entry = Backend:GetAPIVersion() == eAPIVersion.V1 and T.LEGACY or T.ENHANCED
     return entry.value
+end
+
+---@param name string The global or local's name. See: data/globals_locals.lua
+---@param offset_index? number
+---@return number
+function GetScriptGlobalOrLocalOffset(name, offset_index)
+    SG_SL = SG_SL or require("includes.data.globals_locals")
+    local T = SG_SL[name]
+    if (not T) then
+        log.fwarning("GetScriptGlobalOrLocal: Unknown script global/local name '%s'", name)
+        return 0
+    end
+
+    offset_index = offset_index or 1
+    local entry = Backend:GetAPIVersion() == eAPIVersion.V1 and T.LEGACY or T.ENHANCED
+    if (not entry.offsets) then
+        log.fwarning("GetScriptGlobalOrLocal: '%s' has no offset table!", name)
+        return 0
+    end
+
+    return entry.offsets[offset_index].value
 end
 
 ---@param name string The global or local's name. See: data/globals_locals.lua
@@ -886,6 +906,42 @@ function table.is_equal(a, b, seen)
     return true
 end
 
+---@param t table
+---@param path string
+---@return any
+function table.get_nested_key(t, path)
+    local current = t
+    for key in path:gmatch("[^%.]+") do
+        current = current[key]
+        if (current == nil) then
+            return nil
+        end
+    end
+
+    return current
+end
+
+---@param t table
+---@param path string
+---@param value any
+function table.set_nested_key(t, path, value)
+    local parts = {}
+    for key in path:gmatch("[^%.]+") do
+        parts[#parts + 1] = key
+    end
+
+    local current = t
+    for i = 1, #parts - 1 do
+        local key = parts[i]
+        if (type(current[key]) ~= "table") then
+            current[key] = {}
+        end
+        current = current[key]
+    end
+
+    current[parts[#parts]] = value
+end
+
 -- Generates a random string.
 ---@param size? number
 ---@param isalnum? boolean Alphanumeric
@@ -1246,4 +1302,43 @@ function math.lerp(a, b, t)
 
     return a + (b - a) * t
 end
+--#endregion
+
+--#region ImGui // TODO
+
+-- Wrapper for `ImGui.ColorEdit4` that takes a vec4 and mutates it in place.
+---@param label string
+---@param outVector vec4
+---@return boolean
+function ImGui.ColorEditVec4(label, outVector)
+    if (not IsInstance(outVector, vec4)) then
+        Toast:ShowError("ImGui", _F("Invalid argument #2: vec4 expected, got %s instead.", type(vec4)), true)
+        return false
+    end
+
+    local temp, changed = { outVector:unpack() }, false
+    temp, changed = ImGui.ColorEdit4(label, temp)
+    if (changed) then
+        outVector.x = temp[1]
+        outVector.y = temp[2]
+        outVector.z = temp[3]
+        outVector.w = temp[4]
+    end
+
+    return changed
+end
+
+---@param label string
+---@param inColor uint32_t
+---@return uint32_t
+function ImGui.ColorEditU32(label, inColor)
+    local temp, changed = {Color(inColor):AsFloat()}, false
+    temp, changed = ImGui.ColorEdit4(label, temp)
+    if (changed) then
+        return Color(temp):AsU32()
+    end
+
+    return inColor
+end
+
 --#endregion

@@ -48,6 +48,8 @@ local function SetAllCDCheckboxes(value)
     GVars.features.yrv3.ceo_crate_sell_cd = value
     GVars.features.yrv3.dax_work_cd = value
     GVars.features.yrv3.garment_rob_cd = value
+
+    YRV3:SetAllCooldownStatesDirty(true)
 end
 
 local function drawCEOwarehouses()
@@ -542,36 +544,54 @@ local function YRV3UI()
                 ImGui.Dummy(1, 5)
                 ImGui.SeparatorText("Cooldowns")
 
-                GVars.features.yrv3.mc_work_cd, _ = GUI:Checkbox("MC Club Work", GVars.features.yrv3.mc_work_cd)
+                GVars.features.yrv3.mc_work_cd, _ = GUI:Checkbox("MC Club Work", GVars.features.yrv3.mc_work_cd, { onClick = function()
+                    YRV3:SetCooldownStateDirty("mc_work_cd", true)
+                end })
+
                 ImGui.SameLine()
                 ImGui.Dummy(58, 1)
                 ImGui.SameLine()
 
-                GVars.features.yrv3.hangar_cd, _ = GUI:Checkbox("Hangar Crate Steal", GVars.features.yrv3.hangar_cd)
+                GVars.features.yrv3.hangar_cd, _ = GUI:Checkbox("Hangar Crate Steal", GVars.features.yrv3.hangar_cd, { onClick = function()
+                    YRV3:SetCooldownStateDirty("hangar_cd", true)
+                end })
 
-                GVars.features.yrv3.nc_management_cd, _ = GUI:Checkbox("Nightclub Management", GVars.features.yrv3.nc_management_cd)
+                GVars.features.yrv3.nc_management_cd, _ = GUI:Checkbox("Nightclub Management", GVars.features.yrv3.nc_management_cd, { onClick = function()
+                    YRV3:SetCooldownStateDirty("nc_management_cd", true)
+                end })
 
                 ImGui.SameLine()
-                GVars.features.yrv3.nc_vip_mission_chance, _ = GUI:Checkbox("Always Troublemaker", GVars.features.yrv3.nc_vip_mission_chance)
-                GUI:HelpMarker("Always spawns the troublemaker nightclub missions and disables the knocked out VIP missions.")
+                GVars.features.yrv3.nc_vip_mission_chance, _ = GUI:Checkbox("Always Troublemaker", GVars.features.yrv3.nc_vip_mission_chance, { onClick = function()
+                    YRV3:SetCooldownStateDirty("nc_vip_mission_chance", true)
+                end, tooltip = "Always spawns the troublemaker nightclub missions and disables the knocked out VIP missions." })
 
-                GVars.features.yrv3.ie_vehicle_steal_cd, _ = GUI:Checkbox("I/E Vehicle Sourcing", GVars.features.yrv3.ie_vehicle_steal_cd)
+                GVars.features.yrv3.ie_vehicle_steal_cd, _ = GUI:Checkbox("I/E Vehicle Sourcing", GVars.features.yrv3.ie_vehicle_steal_cd, { onClick = function()
+                    YRV3:SetCooldownStateDirty("ie_vehicle_steal_cd", true)
+                end })
 
                 ImGui.SameLine()
                 ImGui.Dummy(12, 1)
                 ImGui.SameLine()
 
-                GVars.features.yrv3.ie_vehicle_sell_cd, _ = GUI:Checkbox("I/E Vehicle Selling", GVars.features.yrv3.ie_vehicle_sell_cd)
+                GVars.features.yrv3.ie_vehicle_sell_cd, _ = GUI:Checkbox("I/E Vehicle Selling", GVars.features.yrv3.ie_vehicle_sell_cd, { onClick = function()
+                    YRV3:SetCooldownStateDirty("ie_vehicle_sell_cd", true)
+                end })
 
-                GVars.features.yrv3.ceo_crate_buy_cd, _ = GUI:Checkbox("CEO Crate Buy", GVars.features.yrv3.ceo_crate_buy_cd)
+                GVars.features.yrv3.ceo_crate_buy_cd, _ = GUI:Checkbox("CEO Crate Buy", GVars.features.yrv3.ceo_crate_buy_cd, { onClick = function()
+                    YRV3:SetCooldownStateDirty("ceo_crate_buy_cd", true)
+                end })
 
                 ImGui.SameLine()
                 ImGui.Dummy(55, 1)
                 ImGui.SameLine()
 
-                GVars.features.yrv3.ceo_crate_sell_cd, _ = GUI:Checkbox("CEO Crate Sell", GVars.features.yrv3.ceo_crate_sell_cd)
+                GVars.features.yrv3.ceo_crate_sell_cd, _ = GUI:Checkbox("CEO Crate Sell", GVars.features.yrv3.ceo_crate_sell_cd, { onClick = function()
+                    YRV3:SetCooldownStateDirty("ceo_crate_sell_cd", true)
+                end })
 
-                GVars.features.yrv3.security_missions_cd, _ = GUI:Checkbox("Security Missions", GVars.features.yrv3.security_missions_cd)
+                GVars.features.yrv3.security_missions_cd, _ = GUI:Checkbox("Security Missions", GVars.features.yrv3.security_missions_cd, { onClick = function()
+                    YRV3:SetCooldownStateDirty("security_missions_cd", true)
+                end })
 
                 ImGui.SameLine()
                 ImGui.Dummy(29, 1)
@@ -585,13 +605,17 @@ local function YRV3UI()
                 ImGui.EndDisabled()
                 GUI:Tooltip("Use ShinyWasabi's Payphone Hits script instead. Press [TAB] to copy the GitHub link.")
 
-                GVars.features.yrv3.dax_work_cd, _ = GUI:Checkbox("Dax Work Cooldown", GVars.features.yrv3.dax_work_cd)
+                GVars.features.yrv3.dax_work_cd, _ = GUI:Checkbox("Dax Work Cooldown", GVars.features.yrv3.dax_work_cd, { onClick = function()
+                    YRV3:SetCooldownStateDirty("dax_work_cd", true)
+                end })
 
                 ImGui.SameLine()
                 ImGui.Dummy(10, 1)
                 ImGui.SameLine()
 
-                GVars.features.yrv3.garment_rob_cd, _ = GUI:Checkbox("Garment Factory Files", GVars.features.yrv3.garment_rob_cd)
+                GVars.features.yrv3.garment_rob_cd, _ = GUI:Checkbox("Garment Factory Files", GVars.features.yrv3.garment_rob_cd, { onClick = function()
+                    YRV3:SetCooldownStateDirty("garment_rob_cd", true)
+                end })
 
                 ImGui.Dummy(1, 5)
                 if (GetAllCDCheckboxes()) then
@@ -600,7 +624,7 @@ local function YRV3UI()
                     sCooldownButtonLabel, bCooldownParam = "Check All", true
                 end
 
-                if (GUI:Button(sCooldownButtonLabel or "", {size = vec2:new(120, 40)})) then
+                if (GUI:Button(sCooldownButtonLabel or "", { size = vec2:new(120, 40) })) then
                     SetAllCDCheckboxes(bCooldownParam)
                 end
 
@@ -637,7 +661,7 @@ local function YRV3UI()
 
             if (ImGui.BeginTabItem("Settings")) then
                 ImGui.SeparatorText("Auto Sell")
-                ImGui.TextWrapped("Note: This is bad, unreliable code with little to no effort put into it.\n\nOnly these businesses are supported:")
+                ImGui.TextWrapped("Note: Only these businesses are supported:")
                 ImGui.BulletText("Bunker")
                 ImGui.BulletText("Hangar (Air only)")
                 ImGui.BulletText("CEO Warehouses")
@@ -651,7 +675,7 @@ local function YRV3UI()
                     "Automatically finishes a sale mission 20 seconds after it starts. Doesn't require you to interact with anything other than starting the mission."
                 )
 
-                if script.is_active("fm_content_smuggler_sell") then
+                if (script.is_active("fm_content_smuggler_sell")) then
                     GUI:TextColored("Land sales are currently not supported.", Color("red"))
                 else
                     ImGui.BeginDisabled(GVars.features.yrv3.autosell or YRV3.m_has_triggered_autosell or not YRV3.m_sell_script_running)

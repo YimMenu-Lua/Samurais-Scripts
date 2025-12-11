@@ -1,10 +1,10 @@
 return {
-    --#region generic
+    --#region generics
     ["WARN_PED_SPAWN_LIMIT"]                = "Ped spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
     ["WARN_VEH_SPAWN_LIMIT"]                = "Vehicle spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
     ["WARN_OBJ_SPAWN_LIMIT"]                = "Object spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
     ["INF_ATTACHMENT_NONE"]                 = "There doesn't seem to be anything attached to us.",
-    ["INF_ATTACHMENT_DROP"]                 = "There doesn't seem to be anything attached to us.",
+    ["INF_ATTACHMENT_DROP"]                 = "Attachments dropped.",
     ["GET_RANDOM_CRATES"]                   = "Get Random Crates",
     ["QUICK_TP_TXT"]                        = "Quick Teleport",
     ["TP_HANGAR"]                           = "Teleport To Hangar",
@@ -12,11 +12,11 @@ return {
     ["SUPPLIES_FILL"]                       = "Fill Supplies",
     ["GENERIC_UNAVAILABLE"]                 = "Currently unavailable.",
     ["OFFLINE_OR_OUTDATED"]                 = "You need to be online and have the latest version of the script to access this feature!",
+    ["GENERIC_OPTIONS_LABEL"]               = "Options",
     --#endregion
 
     --#region CasinoPacino
-    ["CP_CASINO_TAB_BAR"]                   = "Casino",
-    ["CP_CASINO_FEATURES_TAB"]              = "Casino Features",
+    ["CASINO_GAMBLING_TAB"]                 = "Gambling",
     ["CP_CASINO_HEIST_TAB"]                 = "Casino Heist",
     ["CP_MUST_BE_AT_WHEEL"]                 = "You must be at the Lucky Wheel to receive this prize!",
     ["CP_FEATURE_DISABLED"]                 = "This feature is currently disabled!",
@@ -28,7 +28,7 @@ return {
     ["CP_CARD_DIAMONDS"]                    = "Diamonds",
     ["CP_CARD_HEARTS"]                      = "Hearts",
     ["CP_CARD_SPADES"]                      = "Spades",
-    ["CP_COOLDOWN_BYPASS"]                  = "Casino Cooldown",
+    ["CP_COOLDOWN_BYPASS"]                  = "Bypass Casino Chips Cooldown",
     ["CP_COOLDOWN_BYPASS_ENABLE"]           = "Enable Bypass",
     ["CP_COOLDOWN_BYPASS_TOOLTIP"]          = "Disables casino cooldown, may result in ban. Use at your own risk.",
     ["CP_COOLDOWN_BYPASS_STATUS"]           = "Status:",
@@ -60,6 +60,22 @@ return {
     ["CP_LUCKY_WHEEL_GIVE_DISCOUNT"]        = "Give Discount",
     ["CP_LUCKY_WHEEL_GIVE_CLOTHING"]        = "Give Clothing",
     ["CP_LUCKY_WHEEL_GIVE_SURPRISE"]        = "Surprise Me",
+    ["CP_HEIST_APPROACH"]                   = "Approach",
+    ["CP_HEIST_LAST_APPROACH"]              = "Last Approach",
+    ["CP_HEIST_HARD_APPROACH"]              = "Hard Approach",
+    ["CP_HEIST_TARGET"]                     = "Heist Target",
+    ["CP_HEIST_GUNMAN"]                     = "Crew Gunman",
+    ["CP_HEIST_WEAPONS"]                    = "Crew Weapons",
+    ["CP_HEIST_DRIVER"]                     = "Getaway Driver",
+    ["CP_HEIST_GETAWAY_VEHS"]               = "Getaway Vehicles",
+    ["CP_HEIST_HACKER"]                     = "Crew Hacker",
+    ["CP_HEIST_MASKS"]                      = "Crew Masks",
+    ["CP_HEIST_AUTOGRAB"]                   = "Auto Collect Loot", -- Translator chokes on "Auto Grab" with some languages
+    ["CP_HEIST_UNLOCK_ALL"]                 = "Unlock All Heist Options",
+    ["CP_HEIST_ZERO_AI_CUTS"]               = "Zero Crew Cuts",
+    ["CP_HEIST_MAX_PLAYER_CUTS"]            = "Max All Player Cuts",
+    ["CP_HEIST_COOLDOWN_DISABLE"]           = "Disable Heist Cooldown",
+    ["CP_HEIST_SETUP"]                      = "Heist Setup",
     --#endregion
 
     --#region SalvageYard

@@ -121,8 +121,6 @@ function Game.CreatePed(model_hash, spawn_pos, heading, is_networked, is_sriptho
             return 0
         end
 
-        -- Not sure why this code even exists. SpawnedEntities is a dict, not an array.
-        -- TODO: Fix this by keeping a reference to the last spawned entity in eah category and move the logic to Backend
         local oldest = table.remove(Backend.SpawnedEntities[eEntityType.Ped], 1)
         Game.DeleteEntity(oldest, eEntityType.Ped)
     end
@@ -160,7 +158,7 @@ function Game.CreateVehicle(model_hash, spawn_pos, heading, is_networked, is_scr
             return 0
         end
 
-        local oldest = table.remove(Backend.SpawnedEntities.vehicles, 1)
+        local oldest = table.remove(Backend.SpawnedEntities[eEntityType.Vehicle], 1)
         Game.DeleteEntity(oldest, eEntityType.Vehicle)
     end
 
@@ -206,7 +204,7 @@ function Game.CreateObject(model_hash, spawn_pos, is_networked, is_scripthost_ob
             return 0
         end
 
-        local oldest = table.remove(Backend.SpawnedEntities.objects, 1)
+        local oldest = table.remove(Backend.SpawnedEntities[eEntityType.Object], 1)
         Game.DeleteEntity(oldest, eEntityType.Object)
     end
 
@@ -353,16 +351,9 @@ end
 ---@param font number
 ---@param center? boolean
 function Game.DrawText(position, text, color, scale, font, center)
-    local col = {}
-
-    if type(color) == "table" and color.r then
-        col = color
-    else
-        col.r, col.g, col.b, col.a = color:AsRGBA()
-    end
-
+    local r, g, b, a = color:AsRGBA()
     HUD.BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING")
-    HUD.SET_TEXT_COLOUR(col.r, col.g, col.b, col.a)
+    HUD.SET_TEXT_COLOUR(r, g, b, a)
     HUD.SET_TEXT_SCALE(scale.x, scale.y)
     HUD.SET_TEXT_OUTLINE()
     HUD.SET_TEXT_FONT(font)

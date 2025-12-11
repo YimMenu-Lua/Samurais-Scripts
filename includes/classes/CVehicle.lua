@@ -164,6 +164,7 @@ end
 ---@field public m_is_targetable pointer<byte> `bool`
 ---@field public m_door_lock_status pointer<uint32_t>
 ---@field public m_model_info_flags pointer<uint32_t>
+---@field public m_mass pointer<float> -- //0x000C
 ---@field public m_initial_drag_coeff pointer<float>
 ---@field public m_drive_bias_rear pointer<float>
 ---@field public m_drive_bias_front pointer<float>
@@ -172,6 +173,9 @@ end
 ---@field public m_initial_drive_force pointer<float>
 ---@field public m_drive_max_flat_velocity pointer<float>
 ---@field public m_initial_drive_max_flat_vel pointer<float>
+---@field public m_steering_lock pointer<float>
+---@field public m_steering_lock_ratio pointer<float>
+---@field public m_traction_curve_max pointer<float>
 ---@field public m_monetary_value pointer<uint32_t>
 ---@field public m_model_flags pointer<uint32_t>
 ---@field public m_handling_flags pointer<uint32_t>
@@ -188,7 +192,7 @@ CVehicle = Class("CVehicle", CEntity, 0xC40)
 ---@param vehicle handle
 ---@return CVehicle
 function CVehicle:init(vehicle)
-    if not ENTITY.DOES_ENTITY_EXIST(vehicle) or not ENTITY.IS_ENTITY_A_VEHICLE(vehicle) then
+    if (not ENTITY.DOES_ENTITY_EXIST(vehicle) or not ENTITY.IS_ENTITY_A_VEHICLE(vehicle)) then
         error("Invalid entity!")
     end
 
@@ -217,6 +221,7 @@ function CVehicle:init(vehicle)
     instance.m_top_gear = ptr:add(0x0886)
     instance.m_engine_health = ptr:add(0x0910)
     instance.m_model_info_flags = instance.m_model_info:add(0x057C)
+    instance.m_mass = instance.m_handling_data:add(0x000C)
     instance.m_initial_drag_coeff = instance.m_handling_data:add(0x0010)
     instance.m_drive_bias_rear = instance.m_handling_data:add(0x0044)
     instance.m_drive_bias_front = instance.m_handling_data:add(0x0048)
@@ -225,6 +230,9 @@ function CVehicle:init(vehicle)
     instance.m_initial_drive_force = instance.m_handling_data:add(0x0060)
     instance.m_drive_max_flat_velocity = instance.m_handling_data:add(0x0064)
     instance.m_initial_drive_max_flat_vel = instance.m_handling_data:add(0x0068)
+    instance.m_steering_lock = instance.m_handling_data:add(0x0080)
+    instance.m_steering_lock_ratio = instance.m_handling_data:add(0x0084)
+    instance.m_traction_curve_max = instance.m_handling_data:add(0x0088)
     instance.m_monetary_value = instance.m_handling_data:add(0x0118)
     instance.m_model_flags = instance.m_handling_data:add(0x0124)
     instance.m_handling_flags = instance.m_handling_data:add(0x0128)
@@ -240,7 +248,7 @@ end
 
 ---@return float
 function CVehicle:GetAcceleration()
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         return 0.0
     end
 
@@ -249,7 +257,7 @@ end
 
 ---@param value float
 function CVehicle:SetAcceleration(value)
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         return
     end
 
@@ -258,7 +266,7 @@ end
 
 ---@return float
 function CVehicle:GetDeformMultiplier()
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         return 0.0
     end
 
@@ -267,7 +275,7 @@ end
 
 ---@param value float
 function CVehicle:SetDeformMultiplier(value)
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         return
     end
 
@@ -293,7 +301,7 @@ end
 
 ---@return CCarHandlingData|nil
 function CVehicle:GetCarHandlingData()
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         return nil
     end
 
@@ -307,11 +315,11 @@ end
 ---@param flag eVehicleHandlingFlags
 ---@return boolean
 function CVehicle:GetHandlingFlag(flag)
-    if not self:IsValid() then
+    if (not self:IsValid() or type(flag) ~= "number") then
         return false
     end
 
-    if self.m_handling_flags:is_null() then
+    if (self.m_handling_flags:is_null()) then
         return false
     end
 
@@ -322,11 +330,11 @@ end
 ---@param flag eVehicleHandlingFlags
 ---@param toggle boolean
 function CVehicle:SetHandlingFlag(flag, toggle)
-    if not self:IsValid() then
+    if (not self:IsValid() or type(flag) ~= "number" or type(toggle) ~= "boolean") then
         return
     end
 
-    if self.m_handling_flags:is_null() then
+    if (self.m_handling_flags:is_null()) then
         return
     end
 
@@ -339,7 +347,7 @@ end
 
 ---@param flag eVehicleModelFlags
 function CVehicle:GetModelFlag(flag)
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         return false
     end
 
@@ -354,7 +362,7 @@ end
 ---@param flag eVehicleModelInfoFlags
 ---@return boolean
 function CVehicle:GetModelInfoFlag(flag)
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         return false
     end
 
@@ -373,7 +381,7 @@ end
 ---@param flag eVehicleModelInfoFlags
 ---@param toggle boolean
 function CVehicle:SetModelInfoFlag(flag, toggle)
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         return
     end
 
@@ -393,7 +401,7 @@ end
 ---@param flag eVehicleAdvancedFlags
 ---@return boolean
 function CVehicle:GetAdvancedFlag(flag)
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         return false
     end
 
@@ -402,13 +410,14 @@ function CVehicle:GetAdvancedFlag(flag)
         return false
     end
 
-    return Bit.is_set(ccarhandlingdata.m_advanced_flags, flag)
+    local dword_flags = ccarhandlingdata.m_advanced_flags:get_dword()
+    return Bit.is_set(dword_flags, flag)
 end
 
 ---@param flag eVehicleAdvancedFlags
 ---@param toggle boolean
 function CVehicle:SetAdvancedFlag(flag, toggle)
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         return false
     end
 
@@ -429,7 +438,7 @@ end
 ---@param enum_flags Enum
 ---@param get_func fun(self: CVehicle, flag: integer): boolean
 function CVehicle:DumpFlags(enum_flags, get_func)
-    if not self:IsValid() then
+    if (not self:IsValid()) then
         log.warning("Invalid vehicle pointer!")
         return
     end
@@ -440,6 +449,10 @@ function CVehicle:DumpFlags(enum_flags, get_func)
         if (get_func(self, flag)) then
             out[#out+1] = _F("%s (1 << %d)", name, flag)
         end
+    end
+
+    if (#out == 0) then
+        out[1] = "No enabled flags."
     end
 
     print(out)

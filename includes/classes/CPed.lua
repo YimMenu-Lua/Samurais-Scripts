@@ -20,7 +20,7 @@
 ---@field m_seatbelt pointer<uint8_t>
 ---@field m_armor pointer<float>
 ---@field m_cash pointer<uint16_t> // 0x1614
----@overload fun(ped: handle): CPed
+---@overload fun(ped: handle): CPed|nil
 CPed = Class("CPed", CEntity, 0x161C)
 
 ---@param ped handle

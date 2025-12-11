@@ -1,10 +1,9 @@
-return { -- NOTTE: if a value isn't needed, use a default of the same type (int: 0, string: "", etc.) do not mix types
-    --#region YRV3
+return {
     tuneables_global = {
         description = "Tuneables",
         file = "tuneables_processing.c",
         LEGACY = {
-            value = 262145, -- never changed
+            value = 262145,
             pattern = [[switch \((Global_......?)\.f_....?\)]],
             capture_group = 1
         },
@@ -14,7 +13,7 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Freemode Business Global",
         file = "freemode.c",
         LEGACY = {
-            value = 1668000,
+            value = 1673807,
             pattern = [[if \(\((Global_.......?)\[\w+0\] != 0 && func_.....?\(\w+0\)\) && \w+2\)]],
             capture_group = 1
         },
@@ -24,7 +23,7 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Personal Vehicle Global",
         file = "freemode.c",
         LEGACY = {
-            value = 1572094,
+            value = 1572199,
             pattern = [[if \(VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING\((Global_.......?)\)\)]],
             capture_group = 1
         },
@@ -34,8 +33,8 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Business Hub Global 1",
         file = "apparcadebusinesshub.c",
         LEGACY = {
-            value = 1945779,
-            pattern = [[else if \(Global_19.....?\)]], -- returns 2 matches, we want the first
+            value = 1950053,
+            pattern = [[else if \(Global_19.....?\)]],
             capture_group = 1
         },
         ENHANCED = {}
@@ -44,7 +43,7 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Business Hub Global 2",
         file = "apparcadebusinesshub.c",
         LEGACY = {
-            value = 1965869,
+            value = 1970093,
             pattern = [[if \(MISC::IS_STRING_NULL_OR_EMPTY\(\w+\) \|\| (Global_.......?) == -1\)]],
             capture_group = 1
         },
@@ -54,8 +53,8 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Contraband Buy Local 1",
         file = "gb_contraband_buy.c",
         LEGACY = {
-            value = 623,
-            pattern = [[switch \((Local_...?)\.f_5\)]],
+            value = 625,
+            pattern = [[switch \((.*?Local_...?)\.f_5\)]],
             capture_group = 1
         },
         ENHANCED = {}
@@ -64,8 +63,8 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Contraband Buy Local 2",
         file = "fm_content_cargo.c",
         LEGACY = {
-            value = 5973,
-            pattern = [[if \(func_..?\(&.*?(Local_[5-7]...?), \w+?\)\)]], -- multiple matches but we need the first
+            value = 5991,
+            pattern = [[if \(func_..?\(&.*?(Local_[5-7]...?), \w+?\)\)]],
             capture_group = 1
         },
         ENHANCED = {}
@@ -74,14 +73,14 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Contraband Buy Local 3",
         file = "fm_content_cargo.c",
         LEGACY = {
-            value = 6092,
-            pattern = [[if \((Local_[5-9]...?)\.(f_1...?) == 0\)]], -- multiple matches but we need the first
+            value = 6110,
+            pattern = [[if \((.*?Local_[5-9]...?)(\.f_1...?) == 0\)]],
             capture_group = 1,
             offsets = {
                 {
                     value = 1180,
                     capture_group = 2
-                },
+                }
             }
         },
         ENHANCED = {}
@@ -90,9 +89,9 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Contraband Sell Local",
         file = "gb_contraband_sell.c",
         LEGACY = {
-            value = 565,
+            value = 567,
             pattern = [[MISC::CLEAR_BIT\(.*?(Local_...?)\.f_1\), .*?Param0]],
-            capture_group = 1,
+            capture_group = 1
         },
         ENHANCED = {}
     },
@@ -100,14 +99,14 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Biker Contraband Sell Local",
         file = "gb_biker_contraband_sell.c",
         LEGACY = {
-            value = 727,
+            value = 729,
             pattern = [[else if \(.*?!func_.*?\(1\) && .*?(Local_...?)(\.f_...?) > 0\)]],
             capture_group = 1,
             offsets = {
                 {
                     value = 122,
                     capture_group = 2
-                },
+                }
             }
         },
         ENHANCED = {}
@@ -116,14 +115,14 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Hangar Sell Local 1 (air)",
         file = "gb_smuggler.c",
         LEGACY = {
-            value = 1987,
-            pattern = [[while \(bVar0 < func_..?\(func_....?\(\), func_..?\(\), (Local_....?)\(\.f_....?), -1]],
+            value = 1989,
+            pattern = [[while .*? < func_..?\(func_....?\(\), func_..?\(\), (.*?Local_....?)(\.f_....?), -1]],
             capture_group = 1,
             offsets = {
                 {
                     value = 1035,
                     capture_group = 2
-                },
+                }
             }
         },
         ENHANCED = {}
@@ -132,14 +131,14 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Hangar Sell Local 2 (air)",
         file = "gb_smuggler.c",
         LEGACY = {
-            value = 1987,
+            value = 1989,
             pattern = [[if .*?(Local_....?)(\.f_....?) > 0 && func_.*?&.*?Local_....?\.f_....?\), 30000, 0]],
             capture_group = 1,
             offsets = {
                 {
                     value = 1078,
                     capture_group = 2
-                },
+                }
             }
         },
         ENHANCED = {}
@@ -148,14 +147,14 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Bunker Sell Local 1",
         file = "gb_gunrunning.c",
         LEGACY = {
-            value = 1264,
+            value = 1266,
             pattern = [[.*?(Local_1...?)(\.f_...?) = func_.*?\(func_.*?\(\), .*?Local_1...?\.f_...?, .*?Param0, -1\);]],
             capture_group = 1,
             offsets = {
                 {
                     value = 774,
                     capture_group = 2
-                },
+                }
             }
         },
         ENHANCED = {}
@@ -164,14 +163,14 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Bunker Sell Local 2",
         file = "gb_gunrunning.c",
         LEGACY = {
-            value = 1264,
+            value = 1266,
             pattern = [[func_....?\(.*?(Local_....?)(\.f_...?), \w+, "GR_HUD_TOT", \w+, 1, 4, 0, 0, 0, 0, 0, 1, 1, 0, 255, 0\);]],
             capture_group = 1,
             offsets = {
                 {
                     value = 816,
                     capture_group = 2
-                },
+                }
             }
         },
         ENHANCED = {}
@@ -180,14 +179,14 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Acid Lab Sell Local",
         file = "fm_content_acid_lab_sell.c",
         LEGACY = {
-            value = 5708,
+            value = 5723,
             pattern = [[if \(.*?(Local_5...?)(\.f_....?) == 0\)]],
             capture_group = 1,
             offsets = {
                 {
                     value = 1339,
                     capture_group = 2
-                },
+                }
             }
         },
         ENHANCED = {}
@@ -196,162 +195,141 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Acid Lab Sell Generic Bitset",
         file = "fm_content_acid_lab_sell.c",
         LEGACY = {
-            value = 5582,
+            value = 5597,
             pattern = [[if \(func_..?\((.*?Local_5...?), \w+\)\)]],
-            capture_group = 1,
+            capture_group = 1
         },
         ENHANCED = {}
     },
-    --#endregion
-
-    --#region Casino Pacino
     three_card_poker_table = {
-        description = "Three Card Poker Table",
-        file = "casino_poker.c",
+        description = "Three Card Poker Table Local",
+        file = "three_card_poker.c",
         LEGACY = {
-            value = 769,
-            pattern = [[TBA]],
+            value = 771,
+            pattern = [[if \((.*?Local_...?)\[.*? /\*(\d+)\*/\]\.f_\d+ == \w+ && \(.*?Local_...?\[.*?\]\.f_\d+ > 0 \|\| .*?Local_...?\[.*?\]\.f_\d+ > 0\)\)]],
             capture_group = 1,
-        },
-        ENHANCED = {}
-    },
-    three_card_poker_table_size = {
-        description = "Three Card Poker Table Size",
-        file = "casino_poker.c",
-        LEGACY = {
-            value = 9,
-            pattern = [[TBA]],
-            capture_group = 1,
+            offsets = {
+                {
+                    value = 9,
+                    capture_group = 2
+                }
+            }
         },
         ENHANCED = {}
     },
     three_card_poker_cards = {
-        description = "Three Card Poker Cards",
-        file = "casino_poker.c",
+        description = "Three Card Poker Cards Local",
+        file = "three_card_poker.c",
         LEGACY = {
-            value = 136,
-            pattern = [[TBA]],
+            value = 138,
+            pattern = [[STREAMING::REQUEST_MODEL\(func_\d+\(.*?(Local_...?)(\.f_...?)\[.*?\]\.f_\d+\[.*?\], .*?Local_....?\.f_\d+\)\);]],
             capture_group = 1,
-        },
-        ENHANCED = {}
-    },
-    three_card_poker_current_deck = {
-        description = "Three Card Poker Current Deck",
-        file = "casino_poker.c",
-        LEGACY = {
-            value = 168,
-            pattern = [[TBA]],
-            capture_group = 1,
+            offsets = {
+                {
+                    value = 168,
+                    capture_group = 2
+                }
+            }
         },
         ENHANCED = {}
     },
     three_card_poker_deck_size = {
         description = "Three Card Poker Deck Size",
-        file = "casino_poker.c",
+        file = "three_card_poker.c",
         LEGACY = {
-            value = 55,
-            pattern = [[TBA]],
+            value = 138,
+            pattern = [[if \(!NETWORK::NETWORK_HAS_CONTROL_OF_NETWORK_ID\(.*?(Local_...?)(\.f_..?)\[\w+\(\w+, 0\)\]\)\)]],
             capture_group = 1,
+            offsets = {
+                {
+                    value = 55,
+                    capture_group = 2
+                }
+            }
         },
         ENHANCED = {}
     },
     three_card_poker_anti_cheat = {
         description = "Three Card Poker Anti Cheat",
-        file = "casino_poker.c",
+        file = "three_card_poker.c",
         LEGACY = {
-            value = 1058,
-            pattern = [[TBA]],
+            value = 1060,
+            pattern = [[if \(.*?(Local_....?)(\.f_...?)\.f_\d+\[.*?\] != Local_...?\.f_\d+\[PLAYER::PLAYER_ID\(\) .*?\]\.f_1\[.*?\]\)]],
             capture_group = 1,
-        },
-        ENHANCED = {}
-    },
-    three_card_poker_anti_cheat_deck = {
-        description = "Three Card Poker Anti Cheat Deck",
-        file = "casino_poker.c",
-        LEGACY = {
-            value = 856,
-            pattern = [[TBA]],
-            capture_group = 1,
+            offsets = {
+                {
+                    value = 856,
+                    capture_group = 2
+                }
+            }
         },
         ENHANCED = {}
     },
     blackjack_table_players = {
-        description = "Blackjack Table Players",
-        file = "casino_blackjack.c",
+        description = "Blackjack Table Players Local",
+        file = "blackjack.c",
         LEGACY = {
-            value = 1796,
-            pattern = [[TBA]],
-            capture_group = 1,
-        },
-        ENHANCED = {}
-    },
-    blackjack_table_players_size = {
-        description = "Blackjack Table Players Size",
-        file = "casino_blackjack.c",
-        LEGACY = {
-            value = 8,
-            pattern = [[TBA]],
-            capture_group = 1,
+            value = 1798,
+            pattern = [[if \(.*?Local_....?\[.*?/\*(\d+)\*/\]\.f_\d+ == \w+ && \w+\(.*?Local_....?\[.*?\], \d+\)\)]],
+            capture_group = 2,
+            offsets = {
+                {
+                    value = 8,
+                    capture_group = 1
+                }
+            }
         },
         ENHANCED = {}
     },
     blackjack_cards = {
-        description = "Blackjack Cards",
-        file = "casino_blackjack.c",
+        description = "Blackjack Cards Local",
+        file = "blackjack.c",
         LEGACY = {
-            value = 136,
-            pattern = [[TBA]],
+            value = 138,
+            pattern = [[if \(func_\d+\(.*?(Local_...?)(\.f_...)\[.*?\]\) == 10 \|\| func_\d+\(.*?Local_...?\.f_...?\[.*?\]\) == 11\)]],
             capture_group = 1,
-        },
-        ENHANCED = {}
-    },
-    blackjack_decks = {
-        description = "Blackjack Decks",
-        file = "casino_blackjack.c",
-        LEGACY = {
-            value = 846,
-            pattern = [[TBA]],
-            capture_group = 1,
+            offsets = {
+                {
+                    value = 846,
+                    capture_group = 2
+                }
+            }
         },
         ENHANCED = {}
     },
     roulette_master_table = {
-        description = "Roulette Master Table",
-        file = "casino_roulette.c",
+        description = "Roulette Master Table Local",
+        file = "casinoroulette.c",
         LEGACY = {
-            value = 144,
-            pattern = [[TBA]],
+            value = 146,
+            pattern = [[NETWORK::NETWORK_REGISTER_HOST_BROADCAST_VARIABLES\(&\(.*?(Local_...?)(\.f_....?)\), 295, 0\);]],
             capture_group = 1,
+            offsets = {
+                {
+                    value = 1357,
+                    capture_group = 2
+                }
+            }
         },
         ENHANCED = {}
     },
-    roulette_outcomes_table = {
-        description = "Roulette Outcomes Table",
-        file = "casino_roulette.c",
-        LEGACY = {
-            value = 1357,
-            pattern = [[TBA]],
-            capture_group = 1,
-        },
-        ENHANCED = {}
-    },
-    roulette_ball_table = {
+    roulette_ball_table_offset = {
         description = "Roulette Ball Table",
-        file = "casino_roulette.c",
+        file = "casinoroulette.c",
         LEGACY = {
             value = 153,
-            pattern = [[TBA]],
-            capture_group = 1,
+            pattern = [[\w+\.f_1 = \w+->f_....?(\.f_...?)\[.*?\];]],
+            capture_group = 1
         },
         ENHANCED = {}
     },
     slots_random_result_table = {
-        description = "Slots Random Results Table",
+        description = "Slots Random Results Table Local",
         file = "casino_slots.c",
         LEGACY = {
-            value = 1348,
-            pattern = [[TBA]],
-            capture_group = 1,
+            value = 1372,
+            pattern = [[\w+ = func_\d+\(.*?(Local_....?)\.f_1\[.*?\]\[.*?Local_\d+\[0\]\], .*?Local_\d+?\.f_1\[.*?\]\[.*?Local_\d+\[1\]\], .*?Local_....?\.f_1\[.*?\]\[.*?Local_\d+\[2\]\]\);]],
+            capture_group = 1
         },
         ENHANCED = {}
     },
@@ -359,39 +337,41 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Slots Slot Machine State",
         file = "casino_slots.c",
         LEGACY = {
-            value = 1638,
-            pattern = [[TBA]],
-            capture_group = 1,
+            value = 1662,
+            pattern = [[MISC::CLEAR_BIT\(&.*?(Local_....?), 18\)]],
+            capture_group = 1
         },
         ENHANCED = {}
     },
     prize_wheel_win_state = {
-        description = "Prize Wheel Win State",
-        file = "casino_prize_wheel.c",
+        description = "Prize Wheel Win State Local",
+        file = "casino_lucky_wheel.c",
         LEGACY = {
-            value = 300,
-            pattern = [[TBA]],
+            value = 302,
+            pattern = [[.*?(.*?Local_...?)(\.f_..?) = \(.*?Local_...?\.f_..? % 20\);]],
             capture_group = 1,
-        },
-        ENHANCED = {}
-    },
-    prize_wheel_prize = {
-        description = "Prize Wheel Prize",
-        file = "casino_prize_wheel.c",
-        LEGACY = {
-            value = 14,
-            pattern = [[TBA]],
-            capture_group = 1,
+            offsets = {
+                {
+                    value = 14,
+                    capture_group = 2
+                }
+            }
         },
         ENHANCED = {}
     },
     prize_wheel_prize_state = {
-        description = "Prize Wheel Prize State",
-        file = "casino_prize_wheel.c",
+        description = "Prize Wheel Prize State Offset",
+        file = "casino_lucky_wheel.c",
         LEGACY = {
-            value = 45,
-            pattern = [[TBA]],
+            value = 302,
+            pattern = [[if \(.*?(Local_...?)(\.f_..) >= 5 && Local_...?\.f_..? <= 12\)]],
             capture_group = 1,
+            offsets = {
+                {
+                    value = 45,
+                    capture_group = 2
+                }
+            }
         },
         ENHANCED = {}
     },
@@ -399,9 +379,9 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Casino Heist Planning Global",
         file = "gb_casino_heist_planning.c",
         LEGACY = {
-            value = 1967717,
-            pattern = [[TBA]],
-            capture_group = 1,
+            value = 1971951,
+            pattern = [[if \(Global_.......?\.f_....? == func_..?\(\) \|\| !NETWORK::NETWORK_IS_PLAYER_ACTIVE\(Global_.......?\.f_....?\)\)]],
+            capture_group = 1
         },
         ENHANCED = {}
     },
@@ -409,31 +389,36 @@ return { -- NOTTE: if a value isn't needed, use a default of the same type (int:
         description = "Casino Heist Planning Cut Offset",
         file = "gb_casino_heist_planning.c",
         LEGACY = {
-            value = 1497 + 736 + 92,
-            pattern = [[TBA]],
+            value = 1497,
+            pattern = [[\w+->(f_....?)(\.f_...?)(\.f_..?)\[4\] > 0]],
             capture_group = 1,
+            offsets = {
+                {
+                    value = 736,
+                    capture_group = 2
+                },
+                {
+                    value = 92,
+                    capture_group = 3
+                }
+            }
         },
         ENHANCED = {}
     },
     fm_mission_controller_cart_grab = {
-        description = "FM Mission Controller Cart Grab",
+        description = "FM Mission Controller Cart Grab Local",
         file = "fm_mission_controller.c",
         LEGACY = {
-            value = 10293,
-            pattern = [[TBA]],
+            value = 10295,
+            pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.*?Local_.....?\.f_\d+\), .*?(Local_.....?)(\.f_\d+\))]],
             capture_group = 1,
+            offsets = {
+                {
+                    value = 14,
+                    capture_group = 2
+                }
+            }
         },
         ENHANCED = {}
-    },
-    fm_mission_controller_cart_grab_speed = {
-        description = "FM Mission Controller Cart Grab Speed",
-        file = "fm_mission_controller.c",
-        LEGACY = {
-            value = 14,
-            pattern = [[TBA]],
-            capture_group = 1,
-        },
-        ENHANCED = {}
-    },
-    --#endregion
+    }
 }

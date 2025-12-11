@@ -57,7 +57,7 @@ GridRenderer = Class("GridRenderer")
 ---@return GridRenderer
 function GridRenderer.new(columns, padding_x, padding_y)
     local instance = setmetatable({}, GridRenderer)
-    instance.columns      = columns or 2
+    instance.columns      = columns or 1
     instance.padding_x    = padding_x or 10
     instance.padding_y    = padding_y or 10
     instance.elements     = {}
@@ -193,8 +193,10 @@ end
 
 function GridRenderer:Draw()
     local item_count = 0
+    local win_width = ImGui.GetWindowWidth()
     local current_x = ImGui.GetCursorPosX()
     local current_y = ImGui.GetCursorPosY()
+    local start_x   = current_x
 
     for _, item in ipairs(self.elements) do
         local item_size
@@ -202,7 +204,7 @@ function GridRenderer:Draw()
 
         if (item.item_type:lower() == "checkbox") then
             item_size   = vec2:new(ImGui.CalcTextSize(item.label))
-            item_size.x = item_size.x + self.padding_x
+            item_size.x = item_size.x + self.padding_x + 30
         elseif (item.item_type == "button") then
             item_size = vec2:new(ImGui.GetItemRectSize())
         elseif (item.item_type:lower() == "radio") then
@@ -216,8 +218,13 @@ function GridRenderer:Draw()
             self.max_width = item_width
         end
 
-        if (item_count % self.columns == 0 and item_count > 0) then
-            current_x = ImGui.GetCursorPosX()
+        if (self.columns > 1) then
+            if (item_count % self.columns == 0 and item_count > 0) then
+                current_x = ImGui.GetCursorPosX()
+                current_y = current_y + item_height + self.padding_y
+            end
+        elseif current_x + item_width >= win_width - 10 then
+            current_x = start_x
             current_y = current_y + item_height + self.padding_y
         end
 
@@ -228,37 +235,25 @@ function GridRenderer:Draw()
             ImGui.BeginDisabled(item.opts.disabled) -- condition
         end
 
+        local config_value = table.get_nested_key(global_table, item.gvar)
         if (item.item_type:lower() == "checkbox") then
-            global_table[item.gvar] = global_table[item.gvar] or false
-            global_table[item.gvar], result = ImGui.Checkbox(item.label, global_table[item.gvar])
-
-            if (item.opts.tooltip) then
-                GUI:Tooltip(item.opts.tooltip)
+            config_value = config_value or false
+            config_value, result = GUI:Checkbox(item.label, config_value, { tooltip = item.opts.tooltip })
+            if (result) then
+                table.set_nested_key(global_table, item.gvar, config_value)
             end
         elseif (item.item_type:lower() == "button") then
-            if (item.opts.buttonRepeat) then
-                ImGui.PushButtonRepeat(true)
-            end
-
-            result = ImGui.Button(item.label)
-
-            if (item.opts.tooltip) then
-                GUI:Tooltip(item.opts.tooltip)
-            end
-
-            if (item.opts.buttonRepeat) then
-                ImGui.PopButtonRepeat()
-            end
+            result = GUI:Button(item.label, {tooltip = item.opts.tooltip, repeatable = item.opts.buttonRepeat})
         elseif (item.item_type:lower() == "radio") then
-            global_table[item.gvar] = global_table[item.gvar] or 0
-            global_table[item.gvar], result = ImGui.RadioButton(item.label, global_table[item.gvar], item.opts.finalValue)
+            config_value = config_value or 0
+            config_value, result = ImGui.RadioButton(item.label, config_value, item.opts.finalValue)
 
             if (item.opts.tooltip) then
                 GUI:Tooltip(item.opts.tooltip)
             end
 
             if (result) then
-                global_table[item.gvar] = item.opts.finalValue
+                table.set_nested_key(global_table, item.gvar, config_value)
             end
         elseif (item.item_type:lower() == "newline") then
             ImGui.NewLine()
@@ -274,7 +269,7 @@ function GridRenderer:Draw()
             end
         end
 
-        if (global_table[item.gvar] and type(item.opts.onTrue) == "function") then
+        if (config_value and type(item.opts.onTrue) == "function") then
             item.opts.onTrue()
         end
 

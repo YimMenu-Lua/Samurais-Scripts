@@ -111,19 +111,6 @@ local commandRegistry <const> = {
             description = "Spawns a vehicle from JSON."
         }
     },
-
-    ["fastvehs"] = {
-        callback = function(_)
-            GVars.features.vehicle.fast_vehicles = not GVars.features.vehicle.fast_vehicles
-            Toast:ShowMessage(
-                    "Samurai's Scripts",
-                    ("Fast Vehicles %s"):format(GVars.features.vehicle.fast_vehicles and "enabled" or "disabled"),
-                    false,
-                    1.5
-                )
-        end,
-        opts = { description = "Increases the top speed of any land vehicle you drive." }
-    }
 }
 
 return commandRegistry

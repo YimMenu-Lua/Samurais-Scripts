@@ -8,7 +8,7 @@
 ---@ignore
 ---@class Tab : ClassMeta<Tab>
 ---@field private m_name string
----@field private m_selected_subtab Tab
+---@field private m_selected_tab_name string
 ---@field private m_callback? GuiCallback
 ---@field private m_subtabs? table<string, Tab>
 ---@field private m_grid_layout? GridRenderer
@@ -74,6 +74,11 @@ function Tab:HasGridLayout()
     return self.m_grid_layout ~= nil
 end
 
+---@return number
+function Tab:GetTabCount()
+    return table.getlen(self.m_subtabs)
+end
+
 ---@param name string
 ---@return Tab?
 function Tab:GetSubtab(name)
@@ -106,10 +111,11 @@ end
 ---@return GridRenderer
 function Tab:GetOrCreateGrid(columns, padding_x, padding_y)
     if (not self.m_grid_layout) then
+        local spacing = ImGui.GetStyle().ItemSpacing
         self.m_grid_layout = GridRenderer.new(
-            columns or 5,
-            padding_x or 25,
-            padding_y or 25
+            columns or 1,
+            padding_x or spacing.x,
+            padding_y or spacing.y
         )
     end
 
@@ -129,9 +135,22 @@ end
 ---@param on_enable? function
 ---@param on_disable? function
 ---@param meta? CommandMeta
-function Tab:AddBoolCommand(label, gvar_key, on_enable, on_disable, meta)
+---@param noCommand? boolean
+function Tab:AddBoolCommand(label, gvar_key, on_enable, on_disable, meta, noCommand)
     if (type(label) ~= "string" or type(gvar_key) ~= "string") then
         error("AddBoolCommand requires a label and global variable key string.")
+    end
+
+    local function onClick(value)
+        if (type(value) ~= "boolean") then
+            return
+        end
+
+        if (value and type(on_enable) == "function") then
+            on_enable()
+        elseif (not value and type(on_disable) == "function") then
+            on_disable()
+        end
     end
 
     meta = meta or {}
@@ -142,36 +161,26 @@ function Tab:AddBoolCommand(label, gvar_key, on_enable, on_disable, meta)
             persistent = true,
             tooltip = meta.description,
             onClick = function()
-                if (GVars[gvar_key] and type(on_enable) == "function") then
-                    on_enable()
-                end
-                if (not GVars[gvar_key] and type(on_disable) == "function") then
-                    on_disable()
-                end
+                local v = table.get_nested_key(GVars, gvar_key)
+                onClick(v)
             end,
         }
     )
 
-    if (not CommandExecutor) then
+    if (noCommand or not CommandExecutor or type(table.get_nested_key(GVars, gvar_key)) ~= "boolean") then
         return
     end
 
     local command_name = label:lower():gsub("%s+", "_")
     CommandExecutor:RegisterCommand(command_name, function()
-        GVars[gvar_key] = not GVars[gvar_key]
-
-        if (GVars[gvar_key] and type(on_enable) == "function") then
-            on_enable()
-        end
-
-        if (not GVars[gvar_key] and type(on_disable) == "function") then
-            on_disable()
-        end
-
+        local v = table.get_nested_key(GVars, gvar_key)
+        v = not v
+        table.set_nested_key(GVars, gvar_key, v)
+        onClick(v)
         CommandExecutor:notify(
             "%s %s",
             label,
-            GVars[gvar_key] and "Enabled" or "Disabled"
+            v and "Enabled" or "Disabled"
         )
     end, meta)
 end
@@ -181,18 +190,20 @@ end
 ---@param callback function
 ---@param on_disable? function
 ---@param meta? CommandMeta
-function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta)
+---@param noCommand? boolean
+function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta, noCommand)
     if (type(label) ~= "string" or type(gvar_key) ~= "string") then
         error("AddBoolCommand requires a label and global variable key string.")
     end
 
     meta = meta or {}
     local command_name = label:lower():gsub("%s+", ""):trim()
-    local suspended_thread = not GVars[gvar_key]
-    local thread = ThreadManager:CreateNewThread(command_name:upper(), callback, suspended_thread)
+    local config_value = table.get_nested_key(GVars, gvar_key)
+    local suspended_thread = not config_value
+    local thread = ThreadManager:CreateNewThread(_F("SS_%s", command_name:upper()), callback, suspended_thread)
 
     local function toggle()
-        if GVars[gvar_key] then
+        if (table.get_nested_key(GVars, gvar_key)) then
             if thread then thread:Resume() end
         else
             if thread then thread:Suspend() end
@@ -202,7 +213,7 @@ function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta)
         CommandExecutor:notify(
             "%s %s.",
             label,
-            GVars[gvar_key] and "Enabled" or "Disabled"
+            config_value and "Enabled" or "Disabled"
         )
     end
 
@@ -216,12 +227,13 @@ function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta)
         }
     )
 
-    if (not CommandExecutor) then
+    if (noCommand or not CommandExecutor) then
         return
     end
 
     local command_callback = function()
-        GVars[gvar_key] = not GVars[gvar_key]
+        local v = table.get_nested_key(GVars, gvar_key)
+        table.get_nested_key(GVars, not v)
         toggle()
     end
 
@@ -251,7 +263,7 @@ function Tab:DrawInternal()
 end
 
 function Tab:Draw()
-    if (table.getlen(self.m_subtabs) == 0) then
+    if (not self:HasSubtabs()) then
         self:DrawInternal()
         return
     end
@@ -264,7 +276,14 @@ function Tab:Draw()
 
     for name, tab in pairs(self.m_subtabs) do
         if (ImGui.BeginTabItem(name)) then
-            tab:Draw()
+            if (tab:HasSubtabs()) then
+                ImGui.EndTabItem()
+                ImGui.EndTabBar()
+                tab:Draw()
+                return
+            end
+
+            tab:DrawInternal()
             ImGui.EndTabItem()
         end
     end

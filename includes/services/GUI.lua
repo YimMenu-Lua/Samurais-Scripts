@@ -2,9 +2,18 @@
 
 GVars.keyboard_keybinds.gui_toggle = GVars.keyboard_keybinds.gui_toggle or "F5"
 local Tab = require("includes.modules.Tab")
+local WindowAnimator = require("includes.structs.WindowAnimator")
 local ThemeManager = require("includes.services.ThemeManager")
 local debug_counter = GVars.backend.debug_mode and 7 or 0
 local DrawClock = require("includes.frontend.clock")
+
+---@class WindowRequest
+---@field m_should_draw boolean
+---@field m_label string
+---@field m_callback GuiCallback
+---@field m_flags? integer
+---@field m_size? vec2
+---@field m_pos? vec2
 
 ---@enum eTabID
 eTabID = {
@@ -32,32 +41,36 @@ end
 -- GUI Class
 --------------------------------------
 ---@class GUI : ClassMeta<GUI>
+---@field private m_main_window_label string
 ---@field private m_seleted_tab Tab
 ---@field private m_selected_category eTabID
----@field private m_selected_category_tabs array<pair<string, Tab>>
+---@field private m_selected_category_tabs array<Pair<string, Tab>>
 ---@field private m_dummy_tab tab -- default YimMenu API tab object
----@field private m_tabs table<eTabID, array<pair<string, Tab>>>
----@field private m_gui_callbacks GuiCallback[] -- Independent GUIs
+---@field private m_tabs table<eTabID, array<Pair<string, Tab>>>
+---@field private m_independent_windows array<GuiCallback>
+---@field private m_requested_windows table<string, WindowRequest>
 ---@field private m_screen_resolution vec2
----@field private m_is_open boolean
 ---@field private m_should_draw boolean
 ---@field private m_is_drawing_sidebar boolean
 ---@field private m_cursor_pos vec2
 ---@field private m_sidebar_width number
+---@field private m_snap_animator WindowAnimator
 local GUI = Class("GUI")
 
 ---@return GUI
 function GUI:init()
     ---@type GUI
     local instance = setmetatable({
-        m_tabs = defaultTabs,
-        m_gui_callbacks = {},
+        m_main_window_label = "##ss_main_window",
         m_should_draw = false,
-        m_is_open = false,
         m_is_drawing_sidebar = false,
         m_cb_window_pos = vec2:zero(),
         m_screen_resolution = Game.GetScreenResolution(),
-        m_sidebar_width = 200
+        m_sidebar_width = 200,
+        m_tabs = defaultTabs,
+        m_independent_windows = {},
+        m_requested_windows = {},
+        m_snap_animator = WindowAnimator()
     }, GUI)
 
     if (not GVars.ui.style.theme or not GVars.ui.style.theme.Colors) then
@@ -75,17 +88,19 @@ function GUI:init()
         instance:DrawDummyTab()
     end)
 
-    ThreadManager:CreateNewThread("SS_GUI", function()
-        if (KeyManager:IsKeyJustPressed(GVars.keyboard_keybinds.gui_toggle)) then
-            instance:Toggle()
-        end
+    KeyManager:RegisterKeybind(GVars.keyboard_keybinds.gui_toggle, function()
+        instance:Toggle()
+    end)
+
+    Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
+        instance:Close()
     end)
 
     return instance
 end
 
 function GUI:LateInit()
-    for _, drawfunc in ipairs(self.m_gui_callbacks) do
+    for _, drawfunc in ipairs(self.m_independent_windows) do
         gui.add_always_draw_imgui(drawfunc)
     end
 end
@@ -97,19 +112,55 @@ function GUI:Toggle()
     end
 end
 
-function GUI:Snap()
-    local _, default_pos = self:GetNewWindowSizeAndCenterPos(0.45, 0.8)
-    GVars.ui.window_pos = default_pos
-    ImGui.SetWindowPos("##ss_main_window", default_pos.x, 0, ImGuiCond.Always)
+function GUI:Close()
+    self.m_should_draw = false
+    gui.override_mouse(false)
+end
+
+---@param align? number -- 0: top center | 1: bottom center | 2: left center | 3: right center | 4: center
+function GUI:Snap(align)
+    align = align or 0
+    local size = GVars.ui.window_size
+    local resolution = Game.GetScreenResolution()
+    local _, center = self:GetNewWindowSizeAndCenterPos(0.5, 0.8, size)
+    local top_center = vec2:new(center.x, 0)
+    local endPos = Switch(align) {
+        [0] = top_center,
+        [1] = vec2:new(center.x, resolution.y - size.y),
+        [2] = vec2:new(0, center.y),
+        [3] = vec2:new(resolution.x - size.x, center.y),
+        [4] = center,
+        default = top_center
+    }
+
+    self.m_snap_animator:Init(self.m_main_window_label, GVars.ui.window_pos, endPos, 0.3)
+    self:PlaySound(self.Sounds.Nav)
+end
+
+function GUI:ResetWidth()
+    local default_size, _ = self:GetNewWindowSizeAndCenterPos(0.45, 0.8)
+    ImGui.SetWindowSize(self.m_main_window_label, default_size.x, GVars.ui.window_size.y, ImGuiCond.Always)
+    GVars.ui.window_size.x = default_size.x
+end
+
+function GUI:ResetHeight()
+    local default_size, _ = self:GetNewWindowSizeAndCenterPos(0.45, 0.8)
+    ImGui.SetWindowSize(self.m_main_window_label, GVars.ui.window_size.x, default_size.y, ImGuiCond.Always)
+    GVars.ui.window_size.y = default_size.y
 end
 
 function GUI:ResetSize()
     local default_size, _ = self:GetNewWindowSizeAndCenterPos(0.45, 0.8)
+    ImGui.SetWindowSize(self.m_main_window_label, default_size.x, default_size.y, ImGuiCond.Always)
     GVars.ui.window_size = default_size
 end
 
 function GUI:IsOpen()
-    return self.m_is_open
+    return self.m_should_draw
+end
+
+function GUI:GetCurrentTab()
+    return self.m_seleted_tab
 end
 
 ---@param id eTabID Category
@@ -137,7 +188,7 @@ function GUI:RegisterNewTab(id, name, drawable, subtabs)
         error(_F("Tab '%s' already exists.", name))
     end
 
-    local newtab  = { first = name, second = Tab(name, drawable, subtabs)}
+    local newtab = Pair:new(name, Tab(name, drawable, subtabs))
     table.insert(self.m_tabs[id], newtab)
 
     return newtab.second
@@ -174,6 +225,34 @@ function GUI:GetSubtab(id, name, parent_name)
     return child
 end
 
+-- Registers an independent window that can only be drawn when the menu is open.
+---@param windowData WindowRequest
+function GUI:RequestWindow(windowData)
+    if (type(windowData.m_label) ~= "string" or windowData.m_label:isnullorempty()) then
+        log.warning("[GUI]: Failed to register window request. Invalid window name")
+        return
+    end
+
+    if (self.m_requested_windows[windowData.m_label]) then
+        log.fwarning("[GUI]: Failed to register window request. A window with the name %s already exists!", windowData.m_label)
+        return
+    end
+
+    self.m_requested_windows[windowData.m_label] = windowData
+end
+
+---@param label string
+---@param toggle boolean
+function GUI:SetRequestedWindowDraw(label, toggle)
+    local req = self.m_requested_windows[label]
+    if (not req) then
+        return
+    end
+
+    req.m_should_draw = toggle
+end
+
+-- Registers an independent window that can be drawn without the menu open.
 ---@param drawfunc function
 function GUI:RegisterIndependentGUI(drawfunc)
     if (type(drawfunc) ~= "function") then
@@ -181,7 +260,7 @@ function GUI:RegisterIndependentGUI(drawfunc)
         return
     end
 
-    table.insert(self.m_gui_callbacks, drawfunc)
+    table.insert(self.m_independent_windows, drawfunc)
 end
 
 ---@param fmt string
@@ -195,13 +274,14 @@ end
 -- Calculates a new window size and center position vectors in relation to the screen resolution.
 ---@param x_mod float x modifier (ex: 0.5)
 ---@param y_mod float y modifier (ex: 0.3)
+---@param custom_size? vec2
 ---@return vec2, vec2 -- size, center position
-function GUI:GetNewWindowSizeAndCenterPos(x_mod, y_mod)
+function GUI:GetNewWindowSizeAndCenterPos(x_mod, y_mod, custom_size)
     if (self.m_screen_resolution:is_zero()) then
         self.m_screen_resolution = Game.GetScreenResolution()
     end
 
-    local size = vec2:new(
+    local size = custom_size or vec2:new(
         self.m_screen_resolution.x * x_mod,
         self.m_screen_resolution.y * y_mod
     )
@@ -253,18 +333,10 @@ function GUI:DrawDummyTab()
     end
 end
 
-function GUI:GetBrightness(r, g, b, _)
-    return (0.299 * r) + (0.587 * g) + (0.114 * b)
-end
-
 ---@param bgColor Color
+---@return Color
 function GUI:GetAutoTextColor(bgColor)
-    local brightness = self:GetBrightness(bgColor:AsFloat())
-    if (brightness > 0.5) then
-        return Color("black")
-    else
-        return Color("white")
-    end
+    return bgColor:IsDark() and Color("white") or Color("black")
 end
 
 local underlineX = 0.0
@@ -354,6 +426,7 @@ function GUI:DrawTopBar()
 
             self.m_selected_category = i
             self.m_selected_category_tabs = self.m_tabs[i]
+            self:PlaySound(self.Sounds.Nav)
             underlineTargetX = rect.min.x
             underlineTargetW = elemWidth
         end
@@ -403,10 +476,10 @@ function GUI:DrawSideBar()
         local selectableSize = vec2:new(self.m_sidebar_width - 30, 32)
         local style = ImGui.GetStyle()
 
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 5)
         ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
         ImGui.SetNextWindowPos(GVars.ui.window_pos.x + (style.FramePadding.x * 3), self.m_cursor_pos.y, ImGuiCond.Always)
         ImGui.SetNextWindowSizeConstraints(self.m_sidebar_width, 0, self.m_sidebar_width, GVars.ui.window_size.y)
+        ThemeManager:PushTheme()
         if (ImGui.Begin("##ss_side_bar",
             ImGuiWindowFlags.NoTitleBar |
             ImGuiWindowFlags.NoResize |
@@ -417,13 +490,14 @@ function GUI:DrawSideBar()
                 if (pair and pair.second) then
                     local tab = pair.second
                     if (self:Selectable2(pair.first, self.m_seleted_tab == tab, selectableSize)) then
+                        self:PlaySound(self.Sounds.Nav)
                         self.m_seleted_tab = tab
                     end
                 end
             end
         end
-        ImGui.PopStyleVar()
         ImGui.End()
+        ThemeManager:PopTheme()
         self.m_is_drawing_sidebar = true
     elseif (ctabsCount == 1) then
         self.m_seleted_tab = self.m_selected_category_tabs[1].second
@@ -433,13 +507,16 @@ end
 
 function GUI:Draw()
     if (not self.m_should_draw) then
-        self.m_is_open = false
         return
+    end
+
+    if (not gui.mouse_override()) then
+        gui.override_mouse(true)
     end
 
     local default_size, default_pos = self:GetNewWindowSizeAndCenterPos(0.45, 0.8)
     default_pos.y = 0
-    local windowFlags =  ImGuiWindowFlags.NoTitleBar
+    local windowFlags = ImGuiWindowFlags.NoTitleBar
                     | ImGuiWindowFlags.NoResize
                     | ImGuiWindowFlags.NoBackground
                     | ImGuiWindowFlags.NoBringToFrontOnFocus
@@ -464,11 +541,11 @@ function GUI:Draw()
         ImGui.SetNextWindowSize(GVars.ui.window_size.x, GVars.ui.window_size.y, ImGuiCond.Always)
     end
 
+    self.m_snap_animator:Apply()
+    
     ThemeManager:PushTheme()
     ImGui.SetNextWindowBgAlpha(0)
-    if (ImGui.Begin("##ss_main_window", windowFlags)) then
-        self.m_is_open = true
-
+    if (ImGui.Begin(self.m_main_window_label, windowFlags)) then
         ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
         ImGui.BeginChild("##ss_top_bar", 0, 110)
         local fontScale = 1.5
@@ -485,6 +562,7 @@ function GUI:Draw()
         GVars.ui.window_pos = vec2:new(ImGui.GetWindowPos())
         ImGui.End()
     end
+    ThemeManager:PopTheme()
 
     if (self.m_is_drawing_sidebar) then
         self.m_cursor_pos.x = self.m_cursor_pos.x + self.m_sidebar_width + 10
@@ -495,10 +573,10 @@ function GUI:Draw()
         local fixedWidth = self.m_is_drawing_sidebar and (GVars.ui.window_size.x - self.m_sidebar_width - 40) or GVars.ui.window_size.x - 30
         ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
         ImGui.SetNextWindowPos(self.m_cursor_pos.x, self.m_cursor_pos.y, ImGuiCond.Always)
-        ImGui.SetNextWindowSizeConstraints(fixedWidth, -1, fixedWidth, GVars.ui.window_size.y - 10)
+        ImGui.SetNextWindowSizeConstraints(fixedWidth, 20, fixedWidth, GVars.ui.window_size.y - 10)
+        ThemeManager:PushTheme()
         if (ImGui.Begin("##ss_callback_window",
             ImGuiWindowFlags.NoTitleBar |
-            ImGuiWindowFlags.NoResize |
             ImGuiWindowFlags.NoMove |
             ImGuiWindowFlags.AlwaysAutoResize)
         ) then
@@ -507,10 +585,28 @@ function GUI:Draw()
             ImGui.PopTextWrapPos()
             ImGui.End()
         end
+        ThemeManager:PopTheme()
     end
 
     self:DrawSideBar()
-    ThemeManager:PopTheme()
+
+    for label, window in pairs(self.m_requested_windows) do
+        if (window.m_should_draw) then
+            -- if (window.m_pos) then
+            --     ImGui.SetNextWindowPos(window.m_pos.x, window.m_pos.y, ImGuiCond.Always)
+            -- end
+            if (window.m_size) then
+                ImGui.SetNextWindowSize(window.m_size.x, window.m_size.y, ImGuiCond.Always)
+            end
+
+            ThemeManager:PushTheme()
+            if (ImGui.Begin(label, window.m_flags)) then
+                window.m_callback()
+                ImGui.End()
+            end
+            ThemeManager:PopTheme()
+        end
+    end
 end
 
 --#region Wrappers
@@ -543,34 +639,6 @@ function GUI:TextColored(text, color, opts)
     end
 end
 
--- Creates a help marker `(?)` symbol in front of the widget this function is called after.
---
--- When the symbol is hovered, it displays a tooltip.
----@param text string
----@param opts? { color: Color, alpha: number, wrap_pos: number }
-function GUI:HelpMarker(text, opts)
-    if (GVars.ui.disable_tooltips) then
-        return
-    end
-
-    opts = opts or { wrap_pos = ImGui.GetFontSize() * 25 }
-
-    ImGui.SameLine()
-    ImGui.TextDisabled("(?)")
-    if ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) then
-        ImGui.SetNextWindowBgAlpha(0.75)
-        ImGui.BeginTooltip()
-        if IsInstance(opts.color, Color) then
-            self:TextColored(text, opts.color, opts)
-        else
-            ImGui.PushTextWrapPos(opts.wrap_pos)
-            ImGui.TextWrapped(text)
-            ImGui.PopTextWrapPos()
-        end
-        ImGui.EndTooltip()
-    end
-end
-
 -- Displays a tooltip whenever the widget this function is called after is hovered.
 ---@param text string
 ---@param opts? { color: Color, alpha: number, wrap_pos: number }
@@ -583,7 +651,7 @@ function GUI:Tooltip(text, opts)
     wrap_pos = opts.wrap_pos or ImGui.GetFontSize() * 25
 
     if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) then
-        ImGui.SetNextWindowBgAlpha(0.75)
+        ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
         ImGui.BeginTooltip()
         if IsInstance(opts.color, Color) then
             self:TextColored(text, opts.color, wrap_pos)
@@ -594,6 +662,21 @@ function GUI:Tooltip(text, opts)
         end
         ImGui.EndTooltip()
     end
+end
+
+-- Creates a help marker `(?)` symbol in front of the widget this function is called after.
+--
+-- When the symbol is hovered, it displays a tooltip.
+---@param text string
+---@param opts? { color: Color, alpha: number, wrap_pos: number }
+function GUI:HelpMarker(text, opts)
+    if (GVars.ui.disable_tooltips) then
+        return
+    end
+
+    ImGui.SameLine()
+    ImGui.TextDisabled("(?)")
+    self:Tooltip(text, opts)
 end
 
 -- Displays a multiline tooltip when the ImGui widget this function is called after is hovered.
@@ -607,12 +690,12 @@ function GUI:TooltipMultiline(lines, wrap_pos)
     wrap_pos = wrap_pos or (ImGui.GetFontSize() * 25)
 
     if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) then
-        ImGui.SetNextWindowBgAlpha(0.75)
+        ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
         ImGui.BeginTooltip()
         ImGui.PushTextWrapPos(wrap_pos)
         for _, line in pairs(lines) do
-            if not string.isnullorwhitespace(line) then
-                ImGui.TextWrapped(line)
+            if not string.iswhitespace(line) then
+                ImGui.Text(line)
                 ImGui.Spacing()
             end
         end
@@ -633,15 +716,12 @@ function GUI:ConfirmPopup(name, callback, ...)
         ImGuiWindowFlags.NoTitleBar |
         ImGuiWindowFlags.AlwaysAutoResize
     ) then
-        if not YELLOW then
-            YELLOW = Color("yellow")
-        end
+        local buttonSize = vec2:new(80, 30)
         ImGui.PushTextWrapPos(ImGui.GetWindowWidth() - 10)
         self:TextColored("Are you sure?", Color("yellow"), { alpha = 0.9 })
         ImGui.Spacing()
 
-        if ImGui.Button("Yes", 80, 30) then
-            self:PlaySound(self.Sounds.Button)
+        if (self:Button("Yes", { size = buttonSize })) then
             callback(...)
             ImGui.CloseCurrentPopup()
         end
@@ -650,8 +730,7 @@ function GUI:ConfirmPopup(name, callback, ...)
         ImGui.Dummy(20, 1)
         ImGui.SameLine()
 
-        if ImGui.Button("No", 80, 30) then
-            self:PlaySound(self.Sounds.Cancel)
+        if (self:Button("No", { size = buttonSize })) then
             ImGui.CloseCurrentPopup()
         end
 
@@ -659,6 +738,30 @@ function GUI:ConfirmPopup(name, callback, ...)
         ImGui.EndPopup()
         return true
     end
+end
+
+-- A simple window for features to draw further customizations (drift power, NOS effects, engine swap, etc.)
+---@param label string
+---@param callback GuiCallback
+---@param onClose function -- Close button callback
+function GUI:QuickConfigWindow(label, callback, onClose)
+    local size = vec2:new(ImGui.GetWindowSize())
+    local _, center = self:GetNewWindowSizeAndCenterPos(0.5, 0.5, size)
+    ImGui.SetWindowPos(center.x, center.y)
+
+    ImGui.SeparatorText(label)
+    if (self:Button("Close")) then
+        onClose()
+        return
+    end
+
+    if (type(callback) ~= "function") then
+        return
+    end
+
+    ImGui.Separator()
+    ImGui.Dummy(0, 10)
+    callback()
 end
 
 -- Checks if an ImGui widget was clicked.
@@ -706,7 +809,7 @@ end
 
 ---@param label string
 ---@param bool boolean
----@param opts? { tooltip?: string, color?: Color }
+---@param opts? { tooltip?: string, color?: Color, onClick?: function }
 ---@return boolean, boolean
 function GUI:Checkbox(label, bool, opts)
     local clicked = false
@@ -714,6 +817,9 @@ function GUI:Checkbox(label, bool, opts)
 
     if (clicked) then
         self:PlaySound(self.Sounds.Checkbox)
+        if (opts and type(opts.onClick) == "function") then
+            opts.onClick()
+        end
     end
 
     if (opts and opts.tooltip) then
@@ -843,7 +949,7 @@ function GUI:Selectable2(label, selected, size, shouldHighlight, highlightColor)
     local textPos = pos + vec2:new((size.x - textSizeX) * 0.5, (size.y - textSizeY) * 0.5)
     local indicatorPos = pos + vec2:new(max.x - 40.0, (size.y - textSizeY) * 0.5)
     local windowBg = Color(GVars.ui.style.theme.Colors.WindowBg:unpack())
-    local textCol = selected and Color(70, 140, 255, 255) or self:GetAutoTextColor(windowBg)
+    local textCol = selected and Color(GVars.ui.style.theme.TopBarFrameCol1:unpack()) or self:GetAutoTextColor(windowBg)
 
     ImGui.ImDrawListAddText(
         drawList,
@@ -867,8 +973,28 @@ function GUI:Selectable2(label, selected, size, shouldHighlight, highlightColor)
     return clicked
 end
 
+-- ---@param label string
+-- ---@param outVector vec4
+-- ---@return boolean
+-- function GUI:ColorEditVec4(label, outVector)
+--     if (not IsInstance(outVector, vec4)) then
+--         self:Notify("Invalid argument #2: vec4 expected, got %s instead.", type(vec4))
+--     end
+
+--     local temp, changed = {}, false
+--     temp, changed = ImGui.ColorEdit4(label, temp)
+--     if (changed) then
+--         outVector.x = temp[1]
+--         outVector.y = temp[2]
+--         outVector.z = temp[3]
+--         outVector.w = temp[4]
+--     end
+--     return changed
+-- end
+
 --#endregion
 
+--#region metadata
 GUI.Sounds = {
     Radar = {
         soundName = "RADAR_ACTIVATE",
@@ -938,6 +1064,6 @@ GUI.MouseButtons = {
     RIGHT = 0x1
 }
 
-return GUI
-
 --#endregion
+
+return GUI

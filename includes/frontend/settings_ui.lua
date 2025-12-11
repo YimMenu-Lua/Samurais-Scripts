@@ -2,6 +2,7 @@
 
 local default_cfg <const> = require("includes.data.config")
 local ThemeManager = require("includes.services.ThemeManager")
+local selected_theme = ThemeManager:GetCurrentTheme()
 
 local settings_tab = GUI:RegisterNewTab(eTabID.TAB_SETTINGS, "General", function()
     GVars.backend.auto_cleanup_entities = GUI:Checkbox("Auto Cleanup Entities", GVars.backend.auto_cleanup_entities)
@@ -28,24 +29,6 @@ local settings_tab = GUI:RegisterNewTab(eTabID.TAB_SETTINGS, "General", function
     ImGui.Dummy(1, 10)
 end)
 
-local _col1 = {
-    GVars.ui.style.theme.TopBarFrameCol1.x,
-    GVars.ui.style.theme.TopBarFrameCol1.y,
-    GVars.ui.style.theme.TopBarFrameCol1.z,
-    GVars.ui.style.theme.TopBarFrameCol1.w,
-}
-local _col2 = {
-    GVars.ui.style.theme.TopBarFrameCol2.x,
-    GVars.ui.style.theme.TopBarFrameCol2.y,
-    GVars.ui.style.theme.TopBarFrameCol2.z,
-    GVars.ui.style.theme.TopBarFrameCol2.w,
-}
-local col1_changed = false
-local col2_changed = false
-
----@type Theme
-local selected_theme
-
 local function DrawGuiSettings()
     ImGui.SeparatorText("General")
 
@@ -62,31 +45,77 @@ local function DrawGuiSettings()
         if (GUI:Button("Reset Position", { tooltip = "Resets the window to default screen position" })) then
             GUI:Snap()
         end
+
+        ImGui.SameLine()
+        if (GUI:Button("Snap To Position")) then
+            ImGui.OpenPopup("##snapMainWindow")
+        end
+    end
+
+    if (ImGui.BeginPopupModal("##snapMainWindow",
+        ImGuiWindowFlags.NoMove
+        | ImGuiWindowFlags.NoTitleBar
+        | ImGuiWindowFlags.NoResize
+        | ImGuiWindowFlags.AlwaysAutoResize)
+    ) then
+        GUI:QuickConfigWindow("Snap",
+            function()
+                ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 35, 30)
+                ImGui.InvisibleButton("##dummy0", 30, 30)
+                ImGui.SameLine()
+                if (ImGui.ArrowButton("##top", 2)) then
+                    GUI:Snap(0)
+                end
+                if (ImGui.ArrowButton("##left", 0)) then
+                    GUI:Snap(2)
+                end
+                ImGui.SameLine()
+                if (ImGui.Button("O", 30, 30)) then
+                    GUI:Snap(4)
+                end
+                ImGui.SameLine()
+                if (ImGui.ArrowButton("##right", 1)) then
+                    GUI:Snap(3)
+                end
+                ImGui.InvisibleButton("##dummy1", 30, 30)
+                ImGui.SameLine()
+                if (ImGui.ArrowButton("##bottom", 3)) then
+                    GUI:Snap(1)
+                end
+                ImGui.PopStyleVar()
+            end,
+            ImGui.CloseCurrentPopup
+        )
+        ImGui.EndPopup()
     end
 
     local resolution = Game.GetScreenResolution()
-    GVars.ui.window_size.x, _ = ImGui.SliderFloat("Window Width",  GVars.ui.window_size.x, 200, resolution.x)
+
+    ---@diagnostic disable-next-line
+    GVars.ui.window_size.x, _ = ImGui.SliderFloat("Window Width",  GVars.ui.window_size.x, 200, resolution.x, "%.0f", ImGuiSliderFlags.NoInput)
     ImGui.SameLine()
     if GUI:Button("Reset##width") then
-        GVars.ui.window_size.x = default_cfg.ui.window_size.x
+        GUI:ResetWidth()
     end
 
-    GVars.ui.window_size.y, _ = ImGui.SliderFloat("Window Height",  GVars.ui.window_size.y, 200, resolution.y)
+    ---@diagnostic disable-next-line
+    GVars.ui.window_size.y, changed = ImGui.SliderFloat("Max Window Height",  GVars.ui.window_size.y, 200, resolution.y, "%.0f", ImGuiSliderFlags.NoInput)
+    GUI:HelpMarker("The window is dynamic, it resizes itself vertically based on content.\n\nThis option allows you to set the maximum allowed height.")
     ImGui.SameLine()
-    if GUI:Button("Reset##height") then
-        GVars.ui.window_size.y = default_cfg.ui.window_size.y
+    if (GUI:Button("Reset##height")) then
+        GUI:ResetHeight()
     end
 
     ImGui.BeginDisabled()
         GVars.ui.window_pos.x, _  = ImGui.SliderFloat("X Position",  GVars.ui.window_pos.x, 0, resolution.x)
-        GUI:Tooltip("These are display only. Enable 'Moveable Window' then drag the window to freely move it.")
+        GUI:Tooltip("These are display only. Enable 'Moveable Window' then drag the top bar to freely move the window.")
         GVars.ui.window_pos.y, _  = ImGui.SliderFloat("Y Position",  GVars.ui.window_pos.y, 0, resolution.y)
-        GUI:Tooltip("These are display only. Enable 'Moveable Window' then drag the window to freely move it.")
+        GUI:Tooltip("These are display only. Enable 'Moveable Window' then drag the top bar to freely move the window.")
     ImGui.EndDisabled()
 
     ImGui.SeparatorText("Style")
 
-    if (ImGui.BeginCombo("##uitheme", GVars.ui.style.theme.Name or "Theme")) then
+    if (ImGui.BeginCombo("##uitheme", selected_theme and selected_theme.Name or "Theme")) then
         for name, theme in pairs(ThemeManager:GetThemes()) do
             local is_selected = selected_theme and selected_theme.Name == name or false
             if (ImGui.Selectable(name, is_selected)) then
@@ -100,20 +129,13 @@ local function DrawGuiSettings()
 
     ImGui.Spacing()
 
-    GVars.ui.style.bg_alpha, _ = ImGui.SliderFloat("Background Alpha", GVars.ui.style.bg_alpha, 0.01, 1.0)
+    GVars.ui.style.bg_alpha, _ = ImGui.SliderFloat("Window Transparency", GVars.ui.style.bg_alpha, 0.01, 1.0)
 
     ImGui.SameLine()
     ImGui.Text(_F("(%d%%)", math.floor(GVars.ui.style.bg_alpha * 100)))
 
-    _col1, col1_changed = ImGui.ColorEdit4("Category Frame Color 1", _col1)
-    if (col1_changed) then
-        GVars.ui.style.theme.TopBarFrameCol1 = vec4:new(_col1[1], _col1[2], _col1[3], _col1[4])
-    end
-
-    _col2, col2_changed = ImGui.ColorEdit4("Category Frame Color 2", _col2)
-    if (col2_changed) then
-        GVars.ui.style.theme.TopBarFrameCol2 = vec4:new(_col2[1], _col2[2], _col2[3], _col2[4])
-    end
+    ImGui.ColorEditVec4("Accent Color", GVars.ui.style.theme.TopBarFrameCol1)
+    ImGui.ColorEditVec4("Top Bar Button Gradient", GVars.ui.style.theme.TopBarFrameCol2)
 end
 
 settings_tab:RegisterSubtab("Gui", DrawGuiSettings)
@@ -259,7 +281,7 @@ local function DrawThreads()
     ImGui.SetNextWindowBgAlpha(0)
     if ImGui.BeginListBox("##thread_listbox", -1, -1) then
         for name, thread in pairs(thread_list) do
-            if thread then
+            if (thread) then
                 ImGui.PushStyleColor(ImGuiCol.Text, state_colors[thread:GetState()]:AsRGBA())
                 if ImGui.Selectable(name, (name == thread_name)) then
                     thread_name     = name
@@ -268,51 +290,53 @@ local function DrawThreads()
                 end
                 ImGui.PopStyleColor()
 
-                GUI:Tooltip(("CPU time: %s"):format(thread:GetRunningTime()))
+                GUI:Tooltip(_F("CPU time: %s", thread:GetRunningTime()))
             end
         end
         ImGui.EndListBox()
     end
     ImGui.EndChild()
 
-    ImGui.SameLine()
-    ImGui.BeginChild("##threadctrls", 170, 155, true)
     if selected_thread then
-        if GUI:Button("Remove", { size = side_button_size }) then
-            ThreadManager:RemoveThread(thread_name)
-        end
-
-        if (thread_state == eThreadState.RUNNING) then
-            if GUI:Button("Suspend", { size = side_button_size }) then
-                ThreadManager:SuspendThread(thread_name)
+        ImGui.SameLine()
+        ImGui.BeginChild("##threadctrls", 170, 155, true)
+            if GUI:Button("Remove", { size = side_button_size }) then
+                ThreadManager:RemoveThread(thread_name)
             end
 
-            if GUI:Button("Kill", { size = side_button_size }) then
-                ThreadManager:StopThread(thread_name)
-            end
-        else
-            if (thread_state == eThreadState.SUSPENDED) then
-                if GUI:Button("Resume", { size = side_button_size }) then
-                    ThreadManager:ResumeThread(thread_name)
+            if (thread_state == eThreadState.RUNNING) then
+                if GUI:Button("Suspend", { size = side_button_size }) then
+                    ThreadManager:SuspendThread(thread_name)
                 end
-            elseif (thread_state == eThreadState.DEAD) then
-                if GUI:Button("Start", { size = side_button_size }) then
-                    ThreadManager:StartThread(thread_name)
+
+                if GUI:Button("Kill", { size = side_button_size }) then
+                    ThreadManager:StopThread(thread_name)
+                end
+            else
+                if (thread_state == eThreadState.SUSPENDED) then
+                    if GUI:Button("Resume", { size = side_button_size }) then
+                        ThreadManager:ResumeThread(thread_name)
+                    end
+                elseif (thread_state == eThreadState.DEAD) then
+                    if GUI:Button("Start", { size = side_button_size }) then
+                        ThreadManager:StartThread(thread_name)
+                    end
                 end
             end
-        end
+        ImGui.EndChild()
+
+        ImGui.BulletText(_F("Internal State: %s", EnumTostring(eInternalThreadState, selected_thread:GetInternalState())))
+        ImGui.BulletText(_F("Average Load: %.1fms", selected_thread:GetLoadAvg()))
     end
-    ImGui.EndChild()
 end
 
 local function DrawPointers()
     local ptr_list, failed_ptr_list = PatternScanner:ListPointers()
     local total_count, failed_count = table.getlen(ptr_list), #failed_ptr_list
-    local child_width = GVars.ui.window_size.x
-    local child_height = math.min(total_count * 30,  GVars.ui.window_size.y - 80)
+    local child_height = math.min(total_count * 65,  GVars.ui.window_size.y - 30)
 
     ImGui.BulletText(_F("Total Count: [%d]", total_count))
-    ImGui.BeginChild("##ptr_list", child_width, child_height, true)
+    ImGui.BeginChild("##ptr_list", 0, child_height, true)
     ImGui.SetNextWindowBgAlpha(0)
     if ImGui.BeginListBox("##ptr_listbox", -1, -1) then
         for name, ptr in pairs(ptr_list) do
@@ -514,9 +538,8 @@ local function DrawSerializerDebug()
 end
 
 local function DrawTranslatorDebug()
-    ImGui.TextDisabled("You can switch between available test languages in the settings tab.")
+    ImGui.TextDisabled("You can switch between available languages in Settings -> General.")
     ImGui.Spacing()
-    ImGui.BulletText(_F("%s %s.", _T("TEST"), GVars.backend.language_name))
 
     if GUI:Button("Reload Translator") then
         Translator:Reload()
@@ -592,6 +615,50 @@ local function DrawDummyVehSpawnMenu()
     end
 end
 
+local function DrawMiscTests()
+    ImGui.SeparatorText("Vehicle Flag Dump")
+
+    if (ImGui.Button("Handling Flags")) then
+        script.run_in_fiber(function()
+            local PV = Self:GetVehicle()
+            if (not PV:IsValid()) then
+                return
+            end
+            PV:Resolve():DumpHandlingFlags()
+        end)
+    end
+    ImGui.SameLine()
+    if (ImGui.Button("Model Flags")) then
+        script.run_in_fiber(function()
+            local PV = Self:GetVehicle()
+            if (not PV:IsValid()) then
+                return
+            end
+            PV:Resolve():DumpModelFlags()
+        end)
+    end
+    ImGui.SameLine()
+    if (ImGui.Button("Model Info Flags")) then
+        script.run_in_fiber(function()
+            local PV = Self:GetVehicle()
+            if (not PV:IsValid()) then
+                return
+            end
+            PV:Resolve():DumpModelInfoFlags()
+        end)
+    end
+    ImGui.SameLine()
+    if (ImGui.Button("Advanced Flags")) then
+        script.run_in_fiber(function()
+            local PV = Self:GetVehicle()
+            if (not PV:IsValid()) then
+                return
+            end
+            PV:Resolve():DumpAdvancedFlags()
+        end)
+    end
+end
+
 debug_tab:RegisterGUI(function()
     ImGui.BeginTabBar("##debug")
     ImGui.PushTextWrapPos(ImGui.GetFontSize() * 35)
@@ -631,10 +698,10 @@ debug_tab:RegisterGUI(function()
         ImGui.EndTabItem()
     end
 
-    -- if ImGui.BeginTabItem("Misc Tests") then
-    --     DrawMiscTests()
-    --     ImGui.EndTabItem()
-    -- end
+    if ImGui.BeginTabItem("Misc Tests") then
+        DrawMiscTests()
+        ImGui.EndTabItem()
+    end
 
     ImGui.PopTextWrapPos()
     ImGui.EndTabBar()

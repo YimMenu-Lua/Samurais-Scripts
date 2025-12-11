@@ -10,6 +10,18 @@ eThreadState = {
     SUSPENDED = 2,
 }
 
+---@enum eInternalThreadState
+eInternalThreadState = {
+    NORMAL     = 0,
+    STALLED    = 1,
+    HUNG       = 2,
+    BURSTING   = 3,
+    TOO_FAST   = 4,
+    TOO_SLOW   = 5,
+    STARVED    = 5,
+    DEADLOCKED = 5,
+}
+
 --#region Thread
 
 --------------------------------------
@@ -24,6 +36,11 @@ eThreadState = {
 ---@field private m_state eThreadState
 ---@field private m_time_created Time.TimePoint
 ---@field private m_time_started seconds
+---@field private m_last_entry_at seconds
+---@field private m_last_exit_at seconds
+---@field private m_last_yield_at seconds
+---@field private m_avg_work_ms milliseconds
+---@field private m_avg_cycle_ms milliseconds
 ---@overload fun(name: string, callback: function): Thread
 local Thread = Class("Thread")
 function Thread.new(name, callback)
@@ -33,13 +50,18 @@ function Thread.new(name, callback)
 
     return setmetatable(
         {
-            m_name         = name,
-            m_callback     = callback,
-            m_can_run      = false,
-            m_should_pause = false,
-            m_state        = eThreadState.UNK,
-            m_time_created = TimePoint.new(),
-            m_time_started = 0
+            m_name          = name,
+            m_callback      = callback,
+            m_can_run       = false,
+            m_should_pause  = false,
+            m_state         = eThreadState.UNK,
+            m_time_created  = TimePoint.new(),
+            m_time_started  = 0,
+            m_last_entry_at = 0,
+            m_last_exit_at  = 0,
+            m_last_yield_at = 0,
+            m_avg_work_ms   = 0,
+            m_avg_cycle_ms  = 0,
         },
         Thread
     )
@@ -98,31 +120,50 @@ end
 ---@param s? script_util
 function Thread:Tick(s)
     self.m_can_run = (type(self.m_callback) == "function")
-    if not self.m_can_run then
+    if (not self.m_can_run) then
         log.fwarning("Thread %s was terminated because it has no callback", self.m_name)
         self:Stop()
         return
     end
 
-    self.m_time_started = Time.now()
+    self.m_time_started  = Time.now()
+    self.m_last_entry_at = Time.now()
     Backend:debug("Started thread %s", self.m_name)
-    while self.m_can_run do
-        if self.m_should_pause then
+
+    while (self.m_can_run) do
+        if (self.m_should_pause) then
             self.m_state = eThreadState.SUSPENDED
-            self.m_time_started = 0
+            self.m_last_entry_at = 0
             repeat
+                self.m_last_yield_at = Time.now()
                 yield()
             until not self.m_should_pause
             self.m_time_started = Time.now()
+            self.m_last_entry_at = Time.now()
         end
 
         self.m_state = eThreadState.RUNNING
+
+        local cycle_start = Time.now()
+        self.m_last_entry_at = cycle_start
+
+        local work_start = cycle_start
         local ok, err = pcall(self.m_callback, s)
-        if not ok then
+        local work_end = Time.now()
+        local work_ms = (work_end - work_start) * 1000
+        self.m_avg_work_ms = self.m_avg_work_ms * 0.9 + work_ms * 0.1
+
+        if (not ok) then
             log.fwarning("Thread %s was terminated due to an unhandled exception: %s", self.m_name, err)
             self:Stop()
             return
         end
+
+        self.m_last_exit_at = Time.now()
+        self.m_last_yield_at = self.m_last_exit_at
+        local cycle_ms = (self.m_last_exit_at - cycle_start) * 1000
+        self.m_avg_cycle_ms = self.m_avg_cycle_ms * 0.9 + cycle_ms * 0.1
+
         yield()
     end
 end
@@ -165,6 +206,38 @@ end
 function Thread:Resume()
     self.m_should_pause = false
     self.m_time_started = Time.now()
+end
+
+---@return eInternalThreadState
+function Thread:GetInternalState()
+    local now = Time.now()
+
+    if (now - self.m_last_entry_at > 5.0) then
+        return eInternalThreadState.STALLED
+    end
+
+    if (now - self.m_last_exit_at > 2.0) then
+        return eInternalThreadState.STARVED
+    end
+
+    if (self.m_avg_cycle_ms < 0.02) then
+        return eInternalThreadState.TOO_FAST
+    end
+
+    if (self.m_avg_work_ms < 0.1) then
+        return eInternalThreadState.BURSTING
+    end
+
+    return eInternalThreadState.NORMAL
+end
+
+---@return milliseconds
+function Thread:GetLoadAvg()
+    if (self.m_avg_cycle_ms == 0) then
+        return 0
+    end
+
+    return self.m_avg_work_ms / self.m_avg_cycle_ms
 end
 
 --#endregion

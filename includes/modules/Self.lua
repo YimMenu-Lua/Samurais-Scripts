@@ -16,7 +16,6 @@ local PlayerVehicle = require("includes.features.PlayerVehicle")
 ---@overload fun(): Self
 Self = Class("Self", Player)
 Self.m_vehicle = PlayerVehicle:init(0)
-
 ---@override
 Self.new = nil
 
@@ -50,32 +49,32 @@ function Self:GetLastVehicle()
     return self.m_last_vehicle
 end
 
--- A function to handle custom logic when switching vehicles (delete, restore, reset states/state flags, etc.)
---
--- A tangeled spaghetti example can be found [here](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/includes/classes/Self.lua#L744).
 function Self:OnVehicleSwitch()
-    -- Your logic goes here //
+    if (self.m_last_vehicle and self.m_last_vehicle:IsValid()) then
+        if (self.m_vehicle:HasLoudRadio()) then
+            self.m_vehicle:ToggleSubwoofer(false)
+            AUDIO.SET_VEHICLE_RADIO_LOUD(self.m_last_vehicle:GetHandle(), false)
+        end
 
-    -- Ex:
-    -- if (self.m_last_vehicle ~= self.m_vehicle) then
-    --     -- reset last vehicle before setting it to current.
-    -- end
+        if (self.m_last_vehicle:IsLocked()) then
+            self.m_last_vehicle:LockDoors(false)
+        end
+    end
 
-
-    -- keep this at the bottom
     self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
+    self.m_vehicle:Reset()
+    sleep(250)
     self.m_vehicle:Set(self:GetVehicleNative())
 end
 
--- A function to handle custom logic when exiting your vehicle (do nothing, destroy the reference, restore, etc.)
---
--- A tangeled spaghetti example can be found [here](https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/includes/classes/Self.lua#L799).
 function Self:OnVehicleExit()
-    -- Your logic goes here //
+    if (not self.m_last_vehicle or self.m_last_vehicle:GetHandle() ~= self.m_vehicle:GetHandle()) then
+        self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
+    end
 
-    -- keep this at the bottom
-    self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
-    self.m_vehicle:Reset()
+    if (not self.m_vehicle:IsValid()) then
+        self.m_vehicle:Reset()
+    end
 end
 
 -- Returns the entity local player is aiming at.
@@ -297,5 +296,10 @@ ThreadManager:CreateNewThread("SS_SELF", function()
     elseif (not Self:IsOnFoot()) then
         Self.m_vehicle:Set(Self:GetVehicleNative())
     end
-    sleep(500)
+
+    if (Self.m_vehicle and Self.m_vehicle:IsAnyThreadRunning() and not Self.m_vehicle:IsValid()) then
+        Self:OnVehicleExit()
+    end
+
+    sleep(250)
 end)

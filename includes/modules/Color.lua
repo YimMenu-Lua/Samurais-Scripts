@@ -180,6 +180,35 @@ function Color:AsHex()
     return string.format("#%02X%02X%02X%02X", r,g,b,a)
 end
 
+---@return float
+function Color:GetBrightness()
+    return (0.299 * self.r) + (0.587 * self.g) + (0.114 * self.b)
+end
+
+function Color:IsBright()
+    local brightness = self:GetBrightness()
+    return brightness > 0.5
+end
+
+function Color:IsDark()
+    return not self:IsBright()
+end
+
+-- Static Method.
+--
+-- Calculates the brightness of any given color in normalized RGBA format
+---@param r float
+---@param g float
+---@param b float
+---@return float
+function Color:CalculateBrightness(r, g, b, _)
+    return (0.299 * r) + (0.587 * g) + (0.114 * b)
+end
+
+---------------------------------------------------------------------------------
+-- Math Operators
+---------------------------------------------------------------------------------
+
 ---@param right Color
 ---@return boolean
 function Color:__eq(right)

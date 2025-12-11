@@ -37,27 +37,6 @@ local robbery_status_tostring <const> = { "Available", "In Progress", "Completed
 local SalvageYard = {}
 SalvageYard.__index = SalvageYard
 
----@return SalvageYard
-function SalvageYard:init()
-    local instance = setmetatable({
-        robbery_cooldown_string = "Unknown.",
-    }, self)
-
-    ThreadManager:CreateNewThread("SS_SALVAGE", function()
-        instance:Start()
-    end)
-
-    Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
-        instance:Reset()
-    end)
-
-    Backend:RegisterEventCallback(eBackendEvent.SESSION_SWITCH, function()
-        instance:Reset()
-    end)
-
-    return instance
-end
-
 ---@return boolean
 function SalvageYard:OwnsSalvageYard()
     return stats.get_int("MPX_SALVAGE_YARD_OWNED") ~= 0
@@ -66,56 +45,55 @@ end
 ---@param slot integer
 ---@return string|nil
 function SalvageYard:CheckWeeklyRobberyStatus(slot)
-    local statName  = "MPX_SALV23_VEHROB_STATUS" .. slot
-    local status    = stats.get_int(statName)
+    local statName = _F("%s%d", "MPX_SALV23_VEHROB_STATUS", slot)
+    local status   = stats.get_int(statName)
     return robbery_status_tostring[status+1]
 end
 
 ---@param slot integer
 ---@return boolean
 function SalvageYard:IsLiftTaken(slot)
-    local statName = "MPX_MPSV_MODEL_SALVAGE_LIFT" .. slot
+    local statName = _F("%s%d", "MPX_MPSV_MODEL_SALVAGE_LIFT", slot)
     return stats.get_int(statName) ~= 0
 end
 
-function SalvageYard:SetCooldownString()
-    local cooldown = stats.get_int("MPX_SALV23_VEHROB_CD")
-    if cooldown <= 0 then
-        self.robbery_cooldown_string = _T("SY_CD_NONE")
-    else
-        self.robbery_cooldown_string = _T("SY_CD_ACTIVE")
-    end
+function SalvageYard:IsRobberyActive()
+    return self:GetRobberyType() >= 0
 end
 
 ---@return string
 function SalvageYard:GetCooldownString()
-    return self.robbery_cooldown_string
+    local cd = stats.get_int("MPX_SALV23_VEHROB_CD")
+    return cd <= 0 and _T("SY_CD_NONE") or _T("SY_CD_ACTIVE")
 end
 
 function SalvageYard:DisableCooldown()
     stats.set_int("MPX_SALV23_VEHROB_CD", 0)
-    self.robbery_cooldown_string = _T("SY_CD_DISABLED")
 end
 
 function SalvageYard:DisableWeeklyCooldown()
     local week = stats.get_int("MPX_SALV23_WEEK_SYNC")
-    --
+    tunables.set_int(488207018, week + 1)
+    Toast:ShowSuccess("Salvage Yard", "Weekly cooldown skipped.")
 end
 
 ---@param slot integer
----@return string|nil
+---@return string
 function SalvageYard:GetCarFromSlot(slot)
-    local modelStat = "MPX_MODEL_SALVAGE_VEH" .. slot
-    local model = stats.get_int(modelStat)
-    if model == 0 then return nil end
+    local enum = stats.get_int(_F("%s%d", "MPX_MPSV_MODEL_SALVAGE_VEH", slot))
+	local modelName = self.RobberyTargets[enum]
+	if (not modelName) then
+		return "Unknown"
+	end
 
-    return VEHICLE.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model)
+    return vehicles.get_vehicle_display_name(modelName)
 end
 
 ---@return string
 function SalvageYard:GetRobberyTypeName()
     local id = stats.get_int("MPX_SALV23_VEH_ROB")
-    return robbery_types[id+1].name or "Unknown"
+    local stringtype = robbery_types[id+1]
+    return stringtype and stringtype.name or "None"
 end
 
 function SalvageYard:GetRobberyType()
@@ -144,6 +122,11 @@ function SalvageYard:CompletePreparation()
     Toast:ShowSuccess("Salvage Yard", _T("SY_PREP_SKIP"))
 end
 
+---@return boolean
+function SalvageYard:ArePrepsCompleted()
+    return Bit.is_set(stats.get_int("MPX_SALV23_GEN_BS"), 0)
+end
+
 function SalvageYard:DoubleCarWorth()
     local current_worth = stats.get_int("MPX_SALV23_SALE_VAL")
     stats.set_int("MPX_SALV23_SALE_VAL", current_worth * 2)
@@ -154,12 +137,507 @@ function SalvageYard:GetCarNameFromHash(hash)
     return VEHICLE.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash)
 end
 
-function SalvageYard:Start()
-    self:SetCooldownString()
-end
-
-function SalvageYard:Reset()
-    self.robbery_cooldown_string = "Unknown."
-end
+SalvageYard.RobberyTargets = {
+	"lm87",
+	"cinquemila",
+	"autarch",
+	"tigon",
+	"champion",
+	"tenf",
+	"sm722",
+	"omnisegt",
+	"growler",
+	"deity",
+	"italirsx",
+	"coquette4",
+	"jubilee",
+	"astron",
+	"comet7",
+	"torero",
+	"cheetah2",
+	"turismo2",
+	"infernus2",
+	"stafford",
+	"gt500",
+	"viseris",
+	"mamba",
+	"coquette3",
+	"stingergt",
+	"ztype",
+	"broadway",
+	"vigero2",
+	"buffalo4",
+	"ruston",
+	"gauntlet4",
+	"dominator8",
+	"btype3",
+	"swinger",
+	"feltzer3",
+	"omnis",
+	"tropos",
+	"jugular",
+	"patriot3",
+	"toros",
+	"caracara2",
+	"sentinel3",
+	"weevil",
+	"kanjo",
+	"eudora",
+	"kamacho",
+	"hellion",
+	"ellie",
+	"hermes",
+	"hustler",
+	"turismo3",
+	"buffalo5",
+	"stingertt",
+	"virtue",
+	"ignus",
+	"zentorno",
+	"neon",
+	"furia",
+	"zorrusso",
+	"thrax",
+	"vagner",
+	"panthere",
+	"italigto",
+	"s80",
+	"tyrant",
+	"entity3",
+	"torero2",
+	"neo",
+	"corsita",
+	"paragon",
+	"btype2",
+	"comet4",
+	"fr36",
+	"everon2",
+	"komoda",
+	"tailgater2",
+	"jester3",
+	"jester4",
+	"euros",
+	"zr350",
+	"cypher",
+	"dominator7",
+	"baller8",
+	"casco",
+	"yosemite2",
+	"everon",
+	"penumbra2",
+	"vstr",
+	"dominator9",
+	"schlagen",
+	"cavalcade3",
+	"clique",
+	"boor",
+	"sugoi",
+	"greenwood",
+	"brigham",
+	"issi8",
+	"seminole2",
+	"kanjosj",
+	"previon",
+	"lm87",
+	"cinquemila",
+	"autarch",
+	"tigon",
+	"champion",
+	"tenf",
+	"sm722",
+	"omnisegt",
+	"growler",
+	"deity",
+	"italirsx",
+	"coquette4",
+	"jubilee",
+	"astron",
+	"comet7",
+	"torero",
+	"cheetah2",
+	"turismo2",
+	"infernus2",
+	"stafford",
+	"gt500",
+	"viseris",
+	"mamba",
+	"coquette3",
+	"stingergt",
+	"ztype",
+	"broadway",
+	"vigero2",
+	"buffalo4",
+	"ruston",
+	"gauntlet4",
+	"dominator8",
+	"btype3",
+	"swinger",
+	"feltzer3",
+	"omnis",
+	"tropos",
+	"jugular",
+	"patriot3",
+	"toros",
+	"caracara2",
+	"sentinel3",
+	"weevil",
+	"kanjo",
+	"eudora",
+	"kamacho",
+	"hellion",
+	"ellie",
+	"hermes",
+	"hustler",
+	"turismo3",
+	"buffalo5",
+	"stingertt",
+	"virtue",
+	"ignus",
+	"zentorno",
+	"neon",
+	"furia",
+	"zorrusso",
+	"thrax",
+	"vagner",
+	"panthere",
+	"italigto",
+	"s80",
+	"tyrant",
+	"entity3",
+	"torero2",
+	"neo",
+	"corsita",
+	"paragon",
+	"btype2",
+	"comet4",
+	"fr36",
+	"everon2",
+	"komoda",
+	"tailgater2",
+	"jester3",
+	"jester4",
+	"euros",
+	"zr350",
+	"cypher",
+	"dominator7",
+	"baller8",
+	"casco",
+	"yosemite2",
+	"everon",
+	"penumbra2",
+	"vstr",
+	"dominator9",
+	"schlagen",
+	"cavalcade3",
+	"clique",
+	"boor",
+	"sugoi",
+	"greenwood",
+	"brigham",
+	"issi8",
+	"seminole2",
+	"kanjosj",
+	"previon",
+	"lm87",
+	"cinquemila",
+	"autarch",
+	"tigon",
+	"champion",
+	"tenf",
+	"sm722",
+	"omnisegt",
+	"growler",
+	"deity",
+	"italirsx",
+	"coquette4",
+	"jubilee",
+	"astron",
+	"comet7",
+	"torero",
+	"cheetah2",
+	"turismo2",
+	"infernus2",
+	"stafford",
+	"gt500",
+	"viseris",
+	"mamba",
+	"coquette3",
+	"stingergt",
+	"ztype",
+	"broadway",
+	"vigero2",
+	"buffalo4",
+	"ruston",
+	"gauntlet4",
+	"dominator8",
+	"btype3",
+	"swinger",
+	"feltzer3",
+	"omnis",
+	"tropos",
+	"jugular",
+	"patriot3",
+	"toros",
+	"caracara2",
+	"sentinel3",
+	"weevil",
+	"kanjo",
+	"eudora",
+	"kamacho",
+	"hellion",
+	"ellie",
+	"hermes",
+	"hustler",
+	"turismo3",
+	"buffalo5",
+	"stingertt",
+	"virtue",
+	"ignus",
+	"zentorno",
+	"neon",
+	"furia",
+	"zorrusso",
+	"thrax",
+	"vagner",
+	"panthere",
+	"italigto",
+	"s80",
+	"tyrant",
+	"entity3",
+	"torero2",
+	"neo",
+	"corsita",
+	"paragon",
+	"btype2",
+	"comet4",
+	"fr36",
+	"everon2",
+	"komoda",
+	"tailgater2",
+	"jester3",
+	"jester4",
+	"euros",
+	"zr350",
+	"cypher",
+	"dominator7",
+	"baller8",
+	"casco",
+	"yosemite2",
+	"everon",
+	"penumbra2",
+	"vstr",
+	"dominator9",
+	"schlagen",
+	"cavalcade3",
+	"clique",
+	"boor",
+	"sugoi",
+	"greenwood",
+	"brigham",
+	"issi8",
+	"seminole2",
+	"kanjosj",
+	"previon",
+	"lm87",
+	"cinquemila",
+	"autarch",
+	"tigon",
+	"champion",
+	"tenf",
+	"sm722",
+	"omnisegt",
+	"growler",
+	"deity",
+	"italirsx",
+	"coquette4",
+	"jubilee",
+	"astron",
+	"comet7",
+	"torero",
+	"cheetah2",
+	"turismo2",
+	"infernus2",
+	"stafford",
+	"gt500",
+	"viseris",
+	"mamba",
+	"coquette3",
+	"stingergt",
+	"ztype",
+	"broadway",
+	"vigero2",
+	"buffalo4",
+	"ruston",
+	"gauntlet4",
+	"dominator8",
+	"btype3",
+	"swinger",
+	"feltzer3",
+	"omnis",
+	"tropos",
+	"jugular",
+	"patriot3",
+	"toros",
+	"caracara2",
+	"sentinel3",
+	"weevil",
+	"kanjo",
+	"eudora",
+	"kamacho",
+	"hellion",
+	"ellie",
+	"hermes",
+	"hustler",
+	"turismo3",
+	"buffalo5",
+	"stingertt",
+	"virtue",
+	"ignus",
+	"zentorno",
+	"neon",
+	"furia",
+	"zorrusso",
+	"thrax",
+	"vagner",
+	"panthere",
+	"italigto",
+	"s80",
+	"tyrant",
+	"entity3",
+	"torero2",
+	"neo",
+	"corsita",
+	"paragon",
+	"btype2",
+	"comet4",
+	"fr36",
+	"everon2",
+	"komoda",
+	"tailgater2",
+	"jester3",
+	"jester4",
+	"euros",
+	"zr350",
+	"cypher",
+	"dominator7",
+	"baller8",
+	"casco",
+	"yosemite2",
+	"everon",
+	"penumbra2",
+	"vstr",
+	"dominator9",
+	"schlagen",
+	"cavalcade3",
+	"clique",
+	"boor",
+	"sugoi",
+	"greenwood",
+	"brigham",
+	"issi8",
+	"seminole2",
+	"kanjosj",
+	"previon",
+	"lm87",
+	"cinquemila",
+	"autarch",
+	"tigon",
+	"champion",
+	"tenf",
+	"sm722",
+	"omnisegt",
+	"growler",
+	"deity",
+	"italirsx",
+	"coquette4",
+	"jubilee",
+	"astron",
+	"comet7",
+	"torero",
+	"cheetah2",
+	"turismo2",
+	"infernus2",
+	"stafford",
+	"gt500",
+	"viseris",
+	"mamba",
+	"coquette3",
+	"stingergt",
+	"ztype",
+	"broadway",
+	"vigero2",
+	"buffalo4",
+	"ruston",
+	"gauntlet4",
+	"dominator8",
+	"btype3",
+	"swinger",
+	"feltzer3",
+	"omnis",
+	"tropos",
+	"jugular",
+	"patriot3",
+	"toros",
+	"caracara2",
+	"sentinel3",
+	"weevil",
+	"kanjo",
+	"eudora",
+	"kamacho",
+	"hellion",
+	"ellie",
+	"hermes",
+	"hustler",
+	"turismo3",
+	"buffalo5",
+	"stingertt",
+	"virtue",
+	"ignus",
+	"zentorno",
+	"neon",
+	"furia",
+	"zorrusso",
+	"thrax",
+	"vagner",
+	"panthere",
+	"italigto",
+	"s80",
+	"tyrant",
+	"entity3",
+	"torero2",
+	"neo",
+	"corsita",
+	"paragon",
+	"btype2",
+	"comet4",
+	"fr36",
+	"everon2",
+	"komoda",
+	"tailgater2",
+	"jester3",
+	"jester4",
+	"euros",
+	"zr350",
+	"cypher",
+	"dominator7",
+	"baller8",
+	"casco",
+	"yosemite2",
+	"everon",
+	"penumbra2",
+	"vstr",
+	"dominator9",
+	"schlagen",
+	"cavalcade3",
+	"clique",
+	"boor",
+	"sugoi",
+	"greenwood",
+	"brigham",
+	"issi8",
+	"seminole2",
+	"kanjosj",
+	"previon"
+}
 
 return SalvageYard

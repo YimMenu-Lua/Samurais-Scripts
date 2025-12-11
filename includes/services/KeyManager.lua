@@ -2,8 +2,15 @@
 
 --#region consts
 
+
+---@enum eControlType
+eControlType = {
+    KEYBOARD = 1,
+    CONTROLLER = 2
+}
+
 ---@enum eVirtualKeyCodes
-eVirtualKeyCodes       = {
+eVirtualKeyCodes = {
     DIGIT_0                = 0x30,
     DIGIT_1                = 0x31,
     DIGIT_2                = 0x32,
@@ -225,7 +232,7 @@ function Key:UpdateState(keydown, keyup)
     self.just_pressed = keyup
     self.pressed = keydown
 
-    if self.just_pressed then
+    if (self.just_pressed) then
         ThreadManager:RunInFiber(function()
             self.just_pressed = false
         end)
@@ -250,6 +257,7 @@ KeyManager.key_map_by_code = {}
 KeyManager.key_map_by_name = {}
 
 function KeyManager:init()
+    ---@type KeyManager
     local instance = setmetatable({}, KeyManager)
 
     for name, code in pairs(eVirtualKeyCodes) do
@@ -291,6 +299,11 @@ function KeyManager:GetKey(key)
     end
 end
 
+---@return eControlType
+function KeyManager:GetCurrentControlType()
+    return PAD.IS_USING_KEYBOARD_AND_MOUSE(0) and eControlType.KEYBOARD or eControlType.CONTROLLER
+end
+
 ---@param key eVirtualKeyCodes|string
 ---@return boolean
 function KeyManager:IsKeyPressed(key)
@@ -314,6 +327,24 @@ function KeyManager:IsAnyKeyPressed()
     end
 
     return false, nil, nil
+end
+
+---@param keyboadKey string|eVirtualKeyCodes
+---@param controllerKey { name: string, code: number }
+function KeyManager:IsFeatureButtonPressed(keyboadKey, controllerKey)
+    local control = self:GetCurrentControlType()
+    if (control == eControlType.KEYBOARD) then
+        return KeyManager:IsKeyPressed(keyboadKey)
+    end
+
+    if (control == eControlType.CONTROLLER) then
+        if (type(controllerKey) ~= "table" or not controllerKey.code or controllerKey.code == 0) then
+            return false
+        end
+        return PAD.IS_CONTROL_PRESSED(0, controllerKey.code)
+    end
+
+    return false
 end
 
 ---@param msg integer

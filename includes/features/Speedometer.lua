@@ -1,3 +1,27 @@
+local should_draw = false
+local speed_modifier = 1
+
+local PV
+local IsEngineOn = false
+local HasABS = false
+local IsABSEngaged = false
+local IsESCEngaged = false
+local IsNOSActive = false
+local IsAircraft = false
+local IsSports = false
+local CurrentSpeed = 0
+local CurrentAltitude = 0
+local MaxSpeed = 0
+local Throttle = 0
+local RPM = 0
+local Gear = 0
+local EngineHealth = 0
+local UnitCases = {
+    [0] = 1,
+    [1] = 3.6,
+    default = 2.236936
+}
+
 ---@class Speedometer
 Speedometer = {}
 Speedometer.__index = Speedometer
@@ -14,9 +38,9 @@ Speedometer.font_scale = 1.0
 ---@param start_angle number
 ---@param end_angle number
 ---@param max_value number
----@param is_flying boolean
-function Speedometer:GenerateTicks(radius, start_angle, end_angle, max_value, is_flying)
-    local tick_step = not is_flying and 20 or 500
+---@param IsAircraft boolean
+function Speedometer:GenerateTicks(radius, start_angle, end_angle, max_value, IsAircraft)
+    local tick_step = not IsAircraft and 20 or 500
     local max_fractions = math.ceil(max_value / tick_step) * tick_step
 
     if (self.last_max_fractions == max_fractions) and (self.last_max_value == max_value) then
@@ -46,13 +70,12 @@ end
 ---@param ImDrawlist userdata
 ---@param center vec2
 function Speedometer:DrawABSNOSESCIndicators(ImDrawlist, center)
-    local PV = Self:GetVehicle()
     if (not PV) then
         return
     end
 
-    if (PV:HasABS()) then
-        local abs_color = PV:IsABSEngaged() and Color(1.0, 0.8, 0.0, 1.0):AsU32() or Color(0.1, 0.1, 0.1, 0.5):AsU32()
+    if (HasABS) then
+        local abs_color = IsABSEngaged and Color(1.0, 0.8, 0.0, 1.0):AsU32() or Color(0.1, 0.1, 0.1, 0.5):AsU32()
 
         ImGui.ImDrawListAddText(
             ImDrawlist,
@@ -62,7 +85,7 @@ function Speedometer:DrawABSNOSESCIndicators(ImDrawlist, center)
             "ABS"
         )
 
-        local esc_color = PV:IsESCEngaged() and Color(1.0, 0.215, 0.215, 1.0):AsU32() or Color(0.1, 0.1, 0.1, 0.5):AsU32()
+        local esc_color = IsESCEngaged and Color(1.0, 0.215, 0.215, 1.0):AsU32() or Color(0.1, 0.1, 0.1, 0.5):AsU32()
 
         ImGui.ImDrawListAddText(
             ImDrawlist,
@@ -73,7 +96,7 @@ function Speedometer:DrawABSNOSESCIndicators(ImDrawlist, center)
         )
     end
 
-    if (PV:IsNOSActive()) then
+    if (IsNOSActive) then
         ImGui.ImDrawListAddText(
             ImDrawlist,
             center.x - 12.5,
@@ -152,11 +175,27 @@ function Speedometer:DrawLowerIndicators(ImDrawlist, center)
         self.font_scale = 0.77
     end
 
-    local PV = Self:GetVehicle()
-    if (PV:IsPlane() or PV:IsHeli()) then
+    if (IsAircraft) then
         self:DrawAirplaneIndicators(ImDrawlist, center)
     else
         self:DrawABSNOSESCIndicators(ImDrawlist, center)
+    end
+end
+
+---@param ImDrawList userdata
+---@param center vec2
+---@param radius number
+function Speedometer:DrawEngineWarning(ImDrawList, center, radius)
+    if (EngineHealth < 800) then
+        local pulse = 0.5 + 0.5 * math.sin(Time.now() * 5)
+        local color = Color(1, EngineHealth < 400 and pulse or 0.9, 0, 1):AsU32()
+        local offset = vec2:new(0, - radius + 57)
+        local p1 = center + offset + vec2:new(0, -8)
+        local p2 = center + offset + vec2:new(-12, 12)
+        local p3 = center + offset + vec2:new(12, 12)
+        ImGui.ImDrawListAddTriangle(ImDrawList, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, color)
+        ImGui.ImDrawListAddText(ImDrawList, center.x - 1, center.y - radius + 51, color, "!")
+        ImGui.ImDrawListAddText(ImDrawList, center.x - 40, center.y - radius + 72, color, "CHECK ENGINE")
     end
 end
 
@@ -167,15 +206,13 @@ end
 ---@param max_speed number
 ---@param current_altitude number
 ---@param max_altitude number
-function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, current_altitude, max_altitude)
-    local PV = Self:GetVehicle()
-    local is_flying = PV:IsPlane() or PV:IsHeli()
-    local value = is_flying and current_altitude or current_speed
-    local max_value = is_flying and max_altitude or max_speed
+function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_speed, current_altitude, max_altitude)
+    local value = IsAircraft and current_altitude or current_speed
+    local max_value = IsAircraft and max_altitude or max_speed
     local max_fractions = self.tick_marks or 10
     local start_angle, end_angle = -math.pi * 1.25, math.pi * 0.25
 
-    self:GenerateTicks(radius, start_angle, end_angle, max_value, is_flying)
+    self:GenerateTicks(radius, start_angle, end_angle, max_value, IsAircraft)
 
     local ratio = math.min(value / max_value, 1.0)
     local angle = start_angle + (end_angle - start_angle) * ratio
@@ -188,7 +225,7 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
         center.x,
         center.y,
         radius + 10,
-        GVars.features.speedometer.circle_bgcolor
+        GVars.features.speedometer.colors.circle_bg
     )
 
     -- outer circle
@@ -197,10 +234,18 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
         center.x,
         center.y,
         radius + 10,
-        GVars.features.speedometer.circle_color,
+        GVars.features.speedometer.colors.circle,
         100,
         self.line_thickness
     )
+
+    -- if IsNOSActive() then -- TODO: Replace with crash detection + red-ish color
+    --     local alpha = 0.3 + 0.2 * math.sin(Time.now() * 8)
+    --     ImGui.ImDrawListAddCircleFilled(ImDrawList, center.x, center.y, radius + 10, Color(0.215, 0.315, 1, alpha):AsU32())
+    -- end
+
+    -- check engine
+    self:DrawEngineWarning(ImDrawList, center, radius)
 
     -- fractions
     for _, tick in ipairs(self.cached_ticks or {}) do
@@ -213,7 +258,7 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
             p1.y,
             p2.x,
             p2.y,
-            GVars.features.speedometer.markings_color,
+            GVars.features.speedometer.colors.markings,
             1.5
         )
 
@@ -232,7 +277,7 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
             ImDrawList,
             txt_draw_pos.x,
             txt_draw_pos.y,
-            GVars.features.speedometer.text_color,
+            GVars.features.speedometer.colors.text,
             label
         )
     end
@@ -248,7 +293,7 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
             center.y,
             segment.x,
             segment.y,
-            GVars.features.speedometer.needle_color,
+            GVars.features.speedometer.colors.needle,
             thickness
         )
     end
@@ -259,7 +304,7 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
         center.x,
         center.y,
         self.line_thickness * 17.0,
-        GVars.features.speedometer.needle_base_color
+        GVars.features.speedometer.colors.needle_base
     )
 
     local unit_buff = (GVars.features.speedometer.speed_unit == 0 and "M/s") or (GVars.features.speedometer.speed_unit == 1 and "Km/h") or "Mi/h"
@@ -283,7 +328,7 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
         ImDrawList,
         center.x - (value_text_size.x * 0.5),
         center.y - 20,
-        GVars.features.speedometer.text_color,
+        GVars.features.speedometer.colors.text,
         value_str
     )
 
@@ -296,13 +341,13 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
         ImDrawList,
         center.x - unit_size.x * 0.5,
         center.y + 15,
-        GVars.features.speedometer.text_color,
+        GVars.features.speedometer.colors.text,
         unit_buff
     )
 
-    if (PV:IsEngineOn()) then
+    if (IsEngineOn) then
         -- rpm/jet throttle
-        local rpm_ratio = is_flying and PV:GetThrottle() or PV:GetRPM()
+        local rpm_ratio = IsAircraft and Throttle or RPM
         local max_segments = 12
         local active_segments = math.floor(max_segments * rpm_ratio)
         local normalized_rpm = math.min(math.max(rpm_ratio, 0.0), 1.0)
@@ -329,7 +374,7 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
         end
     end
 
-    if (is_flying) then
+    if (IsAircraft) then
         if self.font_scale ~= 0.77 then
             ImGui.SetWindowFontScale(0.77)
             self.font_scale = 0.77
@@ -339,19 +384,17 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
             ImDrawList,
             center.x - 43,
             center.y -80,
-            GVars.features.speedometer.text_color,
+            GVars.features.speedometer.colors.text,
             _F("Altitude [%.0fm]", current_altitude)
         )
-    elseif (PV:GetCurrentGear()) then
-        if self.font_scale ~= 1.5 then
+    elseif (Gear) then
+        if (self.font_scale ~= 1.5) then
             ImGui.SetWindowFontScale(1.5)
             self.font_scale = 1.5
         end
 
-        local isSports = PV:IsSports()
-        local gear = PV:GetCurrentGear()
-        local gear_str = (gear == 0) and ((current_speed > 1 and "R") or "N") or _F("%s%d", isSports and "S" or "D", gear)
-        local gear_color = isSports and Color(1.0, 0.3, 0.3, 1.0):AsU32() or GVars.features.speedometer.text_color
+        local gear_str = (Gear == 0) and ((current_speed > 1 and "R") or "N") or _F("%s%d", IsSports and "S" or "D", Gear)
+        local gear_color = IsSports and Color(1.0, 0.3, 0.3, 1.0):AsU32() or GVars.features.speedometer.colors.text
         local gear_text_width, _ = ImGui.CalcTextSize(gear_str)
 
         ImGui.ImDrawListAddText(
@@ -366,21 +409,8 @@ function Speedometer:Draw(ImDrawList, center, radius, current_speed, max_speed, 
     self:DrawLowerIndicators(ImDrawList, center)
 end
 
-local PV
-local current_speed
-local current_altitude
-local max_speed
-local should_draw = false
-local speed_modifier = 1
-
-local UnitCases = {
-    [0] = 1,
-    [1] = 3.6,
-    default = 2.236936
-}
-
 ---@param offset? float
-function Speedometer:DrawUI(offset)
+function Speedometer:Draw(offset)
     if (not Self:IsDriving() or not GVars.features.speedometer.enabled) then
         return
     end
@@ -388,17 +418,28 @@ function Speedometer:DrawUI(offset)
     script.run_in_fiber(function()
         PV = Self:GetVehicle()
         speed_modifier = Match(GVars.features.speedometer.speed_unit, UnitCases)
-        current_speed = PV:GetSpeed() * speed_modifier
-        max_speed = math.floor(( PV:GetMaxSpeed() * (not GVars.features.vehicle.fast_vehicles and 1.4 or 1.2)) * speed_modifier)
-        current_altitude = PV:GetHeightAboveGround()
-        should_draw = not HUD.IS_PAUSE_MENU_ACTIVE()
+        CurrentSpeed = PV:GetSpeed() * speed_modifier
+        MaxSpeed = math.floor((PV:GetDefaultMaxSpeed() * (GVars.features.vehicle.fast_vehicles and 1.8 or 1)) * speed_modifier)
+        CurrentAltitude = PV:GetHeightAboveGround()
+        IsEngineOn = PV:IsEngineOn()
+        HasABS = PV:HasABS()
+        IsABSEngaged = PV:IsABSEngaged()
+        IsESCEngaged = PV:IsESCEngaged()
+        IsNOSActive = PV:IsNOSActive()
+        IsAircraft = PV:IsPlane() or PV:IsHeli()
+        IsSports = PV:IsSportsOrSuper()
+        Throttle = PV:GetThrottle()
+        RPM = PV:GetRPM()
+        Gear = PV:GetCurrentGear()
+        EngineHealth = PV:GetEngineHealth()
+        should_draw = PV:IsValid() and IsEngineOn and Self:IsDriving() and not HUD.IS_PAUSE_MENU_ACTIVE() and not CAM.IS_SCREEN_FADED_OUT()
     end)
 
     local radius = 150
     ImGui.SetNextWindowBgAlpha(0.0)
-    ImGui.SetNextWindowSize(radius * 2.5, radius * 2.5)
+    ImGui.SetNextWindowSize(radius * 2.5, radius * 2)
     if ImGui.Begin(
-        "SpeedometerWindow",
+        "##SpeedometerWindow",
         ImGuiWindowFlags.NoTitleBar |
         ImGuiWindowFlags.NoResize |
         ImGuiWindowFlags.NoScrollbar |
@@ -406,28 +447,28 @@ function Speedometer:DrawUI(offset)
         ImGuiWindowFlags.NoCollapse |
         ImGuiWindowFlags.NoMove
     ) then
-
         local resolution = Game.GetScreenResolution()
-        if (GVars.features.speedometer.pos.x == 0 and GVars.features.speedometer.pos.y == 0) then
+        if (GVars.features.speedometer.pos:is_zero()) then
             GVars.features.speedometer.pos.x = resolution.x - (radius * 2.5)
             GVars.features.speedometer.pos.y = resolution.y - (radius * 3.5)
         end
 
-        ImGui.SetWindowPos("##SpeedometerWindow", GVars.features.speedometer.pos.x, GVars.features.speedometer.pos.y)
+        ImGui.SetWindowPos("##SpeedometerWindow", GVars.features.speedometer.pos.x, GVars.features.speedometer.pos.y, ImGuiCond.Always)
         local pos_offset = offset or 0.0
         local ImDrawList = ImGui.GetWindowDrawList()
         local window_pos = vec2:new(ImGui.GetWindowPos())
         local window_size = vec2:new(ImGui.GetWindowSize())
         local center = window_pos + window_size * 0.5 + pos_offset
         local max_altitude = 2500
+        center.y = center.y + 11
 
         if (should_draw) then
-            self:Draw(ImDrawList, center, radius, current_speed, max_speed, current_altitude, max_altitude)
+            self:DrawImpl(ImDrawList, center, radius, CurrentSpeed, MaxSpeed, CurrentAltitude, max_altitude)
         end
         ImGui.End()
     end
 end
 
 GUI:RegisterIndependentGUI(function()
-    Speedometer:DrawUI()
+    Speedometer:Draw()
 end)

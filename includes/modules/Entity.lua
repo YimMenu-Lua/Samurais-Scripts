@@ -8,8 +8,8 @@
 ---@field private m_handle handle
 ---@field private m_modelhash joaat_t
 ---@field private m_ptr pointer
----@field private m_internal CEntity
----@overload fun(handle: integer): Entity
+---@field private m_internal? CEntity
+---@overload fun(handle: integer): Entity?
 Entity = Class("Entity")
 
 function Entity:__eq(right)
@@ -27,7 +27,7 @@ end
 ---@param handle number
 ---@return Entity|nil
 function Entity.new(handle)
-    if not Game.IsScriptHandle(handle) then
+    if (not Game.IsScriptHandle(handle)) then
         return
     end
 
@@ -55,7 +55,7 @@ end
 -- print(Self:Resolve().m_max_health:get_float()) -- -> 200.0 (Single Player Michael)
 --
 -- local veh = Self:GetVehicle()
--- if veh then
+-- if (veh:IsValid()) then
 --      local cvehicle = veh:Resolve()
 --      print(cvehicle.m_max_health:get_float()) -- -> 1000.0
 --      print(cvehicle.m_handling_flags:get_dword()) -- -> dword flags (depends on the vehicle)
@@ -69,19 +69,21 @@ function Entity:Resolve()
     end
 
     -- **DO NOT REMOVE. THIS IS NOT USELESS CODE.**
-    -- We have to do this because `Self` inherits from `Entity` but doesn't have a constructor
-    -- and doesn't store handles as members (because they can change).
+    -- We have to do this because `Self` is static, it inherits from `Entity` but doesn't have a constructor
+    -- and doesn't store handles or hashes as members (because they can change on player switch).
 
     local hndl = self:GetHandle() -- This is overridden in `Self` to always invoke `PLAYER.PLAYER_PED_ID()`
     local ent_type = Game.GetEntityType(hndl)
 
     if (ent_type == eEntityType.Ped) then
-        return CPed(hndl)
+        self.m_internal = CPed(hndl)
     elseif (ent_type == eEntityType.Vehicle) then
-        return CVehicle(hndl)
+        self.m_internal = CVehicle(hndl)
+    else
+        self.m_internal = CEntity(hndl)
     end
 
-    return CEntity(hndl)
+    return self.m_internal
 end
 
 function Entity:Destroy()
@@ -89,8 +91,7 @@ function Entity:Destroy()
     self.m_modelhash = nil
     self.m_internal  = nil
     self.m_ptr       = nil
-
-    return nil
+    return nil -- if you want to invalidate the caller as well.
 end
 
 ---@param modelHash hash

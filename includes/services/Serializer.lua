@@ -80,7 +80,12 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
         self
     )
 
-    if not io.exists(instance.file_name) then
+    if (not io.exists(instance.file_name)) then
+        instance:Parse(instance.default_config)
+    end
+
+    if (instance.default_config.__dev_reset) then
+        self:notify("Your saved config has been force-reset due to a config mismatch.")
         instance:Parse(instance.default_config)
     end
 
@@ -714,6 +719,7 @@ end
 
 function Serializer:OnTick()
     if (not self.m_dirty and not self.m_last_write_time:has_elapsed(5e3)) then
+        yield()
         return
     end
 

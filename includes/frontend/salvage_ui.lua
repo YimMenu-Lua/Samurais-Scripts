@@ -1,16 +1,17 @@
-function DrawSalvageYardUI()
+local SalvageYard = require("includes.features.SalvageYard")
+
+local function DrawSalvageYardUI()
     ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
 
     ImGui.SeparatorText(_T("SY_VEHICLES"))
     for i = 1, 4 do
+        local carname = SalvageYard:GetCarFromSlot(i)
         ImGui.Text(_F(_T("SY_VEH_SLOT"), i))
         ImGui.SameLine()
-        ImGui.BulletText((SalvageYard:GetCarFromSlot(i) or _T("SY_EMPTY")))
-        if SalvageYard:GetCarFromSlot(i) then
-            ImGui.SameLine()
-            local value = stats.get_int(_F("%s%d", "MPX_SAL23_VALUE_VEH", i))
-            GUI:TextColored(string.formatmoney(value), Color("#00aa00"))
-        end
+        ImGui.BulletText(carname or _T("SY_EMPTY"))
+        ImGui.SameLine()
+        local value = stats.get_int(_F("MPX_SAL23_VALUE_VEH%d", i))
+        GUI:TextColored(string.formatmoney(value), Color("#00aa00"))
     end
 
     ImGui.SeparatorText(_T("SY_LIFTS"))
@@ -18,12 +19,12 @@ function DrawSalvageYardUI()
         if SalvageYard:IsLiftTaken(i) then
             ImGui.Text(_F(_T("SY_LIFT"), 1))
             ImGui.SameLine()
-            local hash = _F("%s%d", stats.get_int("MPX_MPSV_MODEL_SALVAGE_LIFT"), 1)
+            local hash = stats.get_int(_F("MPX_MPSV_MODEL_SALVAGE_LIFT%d", 1))
             ImGui.BulletText(SalvageYard:GetCarNameFromHash(hash))
             ImGui.SameLine()
-            local value = _F("%s%d", stats.get_int("MPX_MPSV_VALUE_SALVAGE_LIFT"), i)
+            local value = stats.get_int(_F("MPX_MPSV_VALUE_SALVAGE_LIFT%d", i))
             GUI:TextColored(string.formatmoney(value), Color("#00aa00"))
-            local posix = stats.get_int(_F("%s%d", "MPX_SALVAGING_POSIX_LIFT", i))
+            local posix = stats.get_int(_F("MPX_SALVAGING_POSIX_LIFT%d", i))
             ImGui.Text(_F("SALVAGING_POSIX_LIFT: %d", posix)) -- time to be done?
         else
             ImGui.Text(_F(_T("SY_LIFT_AVAILABLE"), i))
@@ -38,13 +39,15 @@ function DrawSalvageYardUI()
     end
 end
 
-function DrawRobberiesUI()
-    ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 5, 5)
+local function DrawRobberiesUI()
+    ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 5, 5) -- style vars are now handled by ThemeManager. We should remove this
 
     ImGui.SeparatorText(_T("SY_ROBBERY_COOLDOWN"))
+
     if GUI:Button(_T("SY_DISABLE_COOLDOWN")) then
         SalvageYard:DisableCooldown()
     end
+
     ImGui.SameLine()
     if GUI:Button(_T("SY_DISABLE_WEEKLY_COOLDOWN")) then
         SalvageYard:DisableWeeklyCooldown()
@@ -56,22 +59,39 @@ function DrawRobberiesUI()
     ImGui.Text(_F(_T("SY_WEEKLY_CAR_STATUS"), SalvageYard:CheckWeeklyRobberyStatus(2)))
 
     ImGui.Dummy(5, 5)
-    ImGui.Text(_F(_T("SY_ROBBERY_ACTIVE_CAR"), SalvageYard:GetCarNameFromHash(stats.get_int("MPX_SALV23_VEH_MODEL"))))
-    ImGui.Text(_F(_T("SY_ROBBERY_TYPE"), SalvageYard:GetRobberyTypeName()))
-    ImGui.Text(_F(_T("SY_ROBBERY_CAR_VALUE"), SalvageYard:GetRobberyValue()))
-    ImGui.Text(_F(_T("SY_ROBBERY_CAN_KEEP_CAR"), tostring(SalvageYard:GetRobberyKeepState())))
-    if GUI:Button(_T("SY_DOUBLE_CAR_WORTH")) then
-        SalvageYard:DoubleCarWorth()
+    if (not SalvageYard:IsRobberyActive()) then
+        ImGui.Text("No Active Robbery")
+        ImGui.Text(SalvageYard:GetCooldownString())
+    else
+        ImGui.Text(_F(_T("SY_ROBBERY_ACTIVE_CAR"), SalvageYard:GetCarNameFromHash(stats.get_int("MPX_SALV23_VEH_MODEL"))))
+        ImGui.Text(_F(_T("SY_ROBBERY_TYPE"), SalvageYard:GetRobberyTypeName()))
+        ImGui.Text(_F(_T("SY_ROBBERY_CAR_VALUE"), SalvageYard:GetRobberyValue()))
+        ImGui.Text(_F(_T("SY_ROBBERY_CAN_KEEP_CAR"), tostring(SalvageYard:GetRobberyKeepState())))
+
+        if GUI:Button(_T("SY_DOUBLE_CAR_WORTH")) then
+            SalvageYard:DoubleCarWorth()
+        end
+
+        ImGui.SameLine()
+        ImGui.BeginDisabled(SalvageYard:ArePrepsCompleted())
+        if GUI:Button(_T("SY_COMPLETE_PREPARATIONS")) then
+            SalvageYard:CompletePreparation()
+        end
+        ImGui.EndDisabled()
     end
-    ImGui.SameLine()
-    if GUI:Button(_T("SY_COMPLETE_PREPARATIONS")) then
-        SalvageYard:CompletePreparation()
+
+    if (GUI:Button("Reset Everything")) then
+        local bitset = stats.get_int("MPX_SALV23_GEN_BS")
+        stats.set_int("MPX_SALV23_GEN_BS", Bit.clear(bitset, 0))
+        stats.set_int("MPX_SALV23_INST_PROG", 0)
+        stats.set_int("MPX_SALV23_SCOPE_BS", 0)
+        Toast:ShowMessage("Savage Yard", "Your Salvage Yard robbery has been reset")
     end
 
     ImGui.PopStyleVar()
 end
 
-function SalvageYardUI()
+local function SalvageYardUI()
     if (not Game.IsOnline() or not Backend:IsUpToDate()) then
         ImGui.Text(_T("OFFLINE_OR_OUTDATED"))
         return

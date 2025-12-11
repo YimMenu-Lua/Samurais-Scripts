@@ -7,6 +7,7 @@
 ---@field private m_class_id number
 ---@field private m_num_seats number
 ---@field private m_max_passengers number
+---@field private m_has_loud_radio boolean
 ---@field Resolve fun() : CVehicle
 ---@field Create fun(_, modelHash: joaat_t, entityType: eEntityType, pos?: vec3, heading?: number, isNetwork?: boolean, isScriptHostPed?: boolean): Vehicle
 ---@overload fun(handle: handle): Vehicle
@@ -57,6 +58,10 @@ function Vehicle:GetClassName()
     end
 
     return EnumTostring(eVehicleClasses, clsid)
+end
+
+function Vehicle:GetEngineHealth()
+    return VEHICLE.GET_VEHICLE_ENGINE_HEALTH(self:GetHandle())
 end
 
 ---@return array<handle>
@@ -230,6 +235,16 @@ function Vehicle:IsHeli()
 end
 
 ---@return boolean
+function Vehicle:IsBoat()
+    if not self:IsValid() then
+        return false
+    end
+
+    local model = self:GetModelHash()
+    return VEHICLE.IS_THIS_MODEL_A_BOAT(model) or VEHICLE.IS_THIS_MODEL_A_JETSKI(model)
+end
+
+---@return boolean
 function Vehicle:IsSubmersible()
     if not self:IsValid() then
         return false
@@ -272,6 +287,38 @@ function Vehicle:IsSportsOrSuper()
     )
 end
 
+---@return boolean
+function Vehicle:IsPerformanceCar()
+    if (not self:IsCar()) then
+        return false
+    end
+
+    local cvehicle = self:Resolve()
+    if (not cvehicle) then
+        return false
+    end
+
+    local drive_force = cvehicle.m_initial_drive_force:get_float()
+    local flat_velocity = cvehicle.m_drive_max_flat_velocity:get_float()
+    local dummyHP = drive_force * flat_velocity
+    -- local p2w = (drive_force * 1000) / cvehicle.m_mass:get_float()
+    -- if (p2w < 0.1) then
+    --     return false
+    -- end
+    -- print(dummyHP)
+    if (dummyHP < 10) then
+        return false
+    end
+
+    local perf = (drive_force * 100)
+        + (cvehicle.m_initial_drive_max_flat_vel:get_float() * 0.5)
+        + (cvehicle.m_traction_curve_max:get_float() * 14)
+        - (cvehicle.m_initial_drag_coeff:get_float() * 10)
+        - (cvehicle.m_mass:get_float() * 0.005)
+
+    return perf >= 60.0
+end
+
 -- Returns whether the vehicle is a pubic hair shaver.
 ---@return boolean
 function Vehicle:IsElectric()
@@ -288,6 +335,10 @@ end
 function Vehicle:IsLowrider()
     return self:GetModelInfoFlag(eVehicleModelInfoFlags.HAS_LOWRIDER_HYDRAULICS)
         or self:GetModelInfoFlag(eVehicleModelInfoFlags.HAS_LOWRIDER_DONK_HYDRAULICS)
+end
+
+function Vehicle:IsLocked()
+    return VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(self:GetHandle()) > 1
 end
 
 function Vehicle:Clean()
@@ -366,10 +417,13 @@ end
 
 ---@param toggle boolean
 function Vehicle:LockDoors(toggle)
-    local handle = self:GetHandle()
+    if (not self:IsValid()) then
+        return
+    end
 
-    if self:IsCar() and entities.take_control_of(handle, 300) then
-        if toggle then
+    local handle = self:GetHandle()
+    if (self:IsCar() and entities.take_control_of(handle, 300)) then
+        if (toggle) then
             for i = 0, (VEHICLE.GET_NUMBER_OF_VEHICLE_DOORS(handle) + 1) do
                 if VEHICLE.GET_VEHICLE_DOOR_ANGLE_RATIO(handle, i) > 0.0 then
                     VEHICLE.SET_VEHICLE_DOORS_SHUT(handle, false)
@@ -377,7 +431,7 @@ function Vehicle:LockDoors(toggle)
                 end
             end
 
-            if VEHICLE.IS_VEHICLE_A_CONVERTIBLE(handle, false) and VEHICLE.GET_CONVERTIBLE_ROOF_STATE(handle) ~= 0 then
+            if (VEHICLE.IS_VEHICLE_A_CONVERTIBLE(handle, false) and VEHICLE.GET_CONVERTIBLE_ROOF_STATE(handle) ~= 0) then
                 VEHICLE.RAISE_CONVERTIBLE_ROOF(handle, false)
             else
                 for i = 0, 7 do
@@ -386,10 +440,14 @@ function Vehicle:LockDoors(toggle)
             end
         end
 
-        -- these won't do anything if the engine is off --
+        local engineWasRunning = VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(handle)
+        VEHICLE.SET_VEHICLE_ENGINE_ON(handle, true, true, false)
         VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(handle, 0, true)
         VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(handle, 1, true)
-        --------------------------------------------------
+        sleep(150)
+        if (not engineWasRunning) then
+            VEHICLE.SET_VEHICLE_ENGINE_ON(handle, false, true, false)
+        end
 
         AUDIO.SET_HORN_PERMANENTLY_ON_TIME(handle, 1000)
         AUDIO.SET_HORN_PERMANENTLY_ON(handle)
@@ -401,7 +459,24 @@ function Vehicle:LockDoors(toggle)
     end
 end
 
+function Vehicle:CloseDoors()
+    if (not self:IsValid()) then
+        return
+    end
+
+    local handle = self:GetHandle()
+    for i = 0, VEHICLE.GET_NUMBER_OF_VEHICLE_DOORS(handle) + 1 do
+        if (VEHICLE.GET_IS_DOOR_VALID(handle, i) and VEHICLE.GET_VEHICLE_DOOR_ANGLE_RATIO(handle, i) > 0) then
+            VEHICLE.SET_VEHICLE_DOOR_SHUT(handle, i, false)
+        end
+    end
+end
+
+---@return number
 function Vehicle:GetMaxSpeed()
+    if not self:IsValid() then
+        return 0
+    end
     return VEHICLE.GET_VEHICLE_ESTIMATED_MAX_SPEED(self:GetHandle())
 end
 

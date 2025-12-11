@@ -1,3 +1,5 @@
+local ThemeManager = require("includes.services.ThemeManager")
+
 ---@param instance CommandExecutor
 local function get_default_commands(instance)
     return {
@@ -294,6 +296,11 @@ function CommandExecutor:ParseCommand(input)
 end
 
 function CommandExecutor:HandleCallbacks()
+    if (not self.gui.should_draw) then
+        sleep(500)
+        return
+    end
+
     if (self.cmd_entered and not string.isnullorwhitespace(self.user_cmd)) then
         GUI:PlaySound(GUI.Sounds.Click)
 
@@ -364,7 +371,8 @@ function CommandExecutor:HandleCallbacks()
         end
 
         if ((KeyManager:IsKeyPressed(eVirtualKeyCodes.TAB)
-        or KeyManager:IsKeyPressed(eVirtualKeyCodes.ENTER)) and self.suggestions[self.cmd_index]) then
+        or KeyManager:IsKeyPressed(eVirtualKeyCodes.ENTER))
+        and self.suggestions[self.cmd_index]) then
             self.mutation_request = self.suggestions[self.cmd_index].name .. " "
             self.cmd_index = 0
         end
@@ -472,7 +480,7 @@ end
 
 function CommandExecutor:Draw()
     if self.gui.should_draw then
-        if self.screen_size:is_zero() or self.window_size:is_zero() then
+        if (self.screen_size:is_zero() or self.window_size:is_zero()) then
             self.screen_size = Game.GetScreenResolution()
             self.window_size, self.window_pos = GUI:GetNewWindowSizeAndCenterPos(0.3, 0.37)
         end
@@ -482,7 +490,7 @@ function CommandExecutor:Draw()
             self.screen_size.x / 2 - (self.window_size.x / 2),
             self.screen_size.y / 2 - (self.window_size.y / 2)
         )
-        ImGui.SetNextWindowBgAlpha(0.95)
+        ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
 
         if ImGui.Begin(
             "Command Executor",
@@ -491,6 +499,7 @@ function CommandExecutor:Draw()
             ImGuiWindowFlags.NoResize |
             ImGuiWindowFlags.NoScrollbar
         ) then
+            ThemeManager:PushTheme()
             ImGui.SetNextWindowBgAlpha(0)
             ImGui.BeginChild("main", 0, self.window_size.y * 0.7)
             ImGui.Spacing()
@@ -558,6 +567,7 @@ function CommandExecutor:Draw()
             end
 
             self:DrawCommandDump()
+            ThemeManager:PopTheme()
             ImGui.End()
         end
     end
@@ -579,7 +589,10 @@ function CommandExecutor:Close()
     self.user_cmd = ""
     self.hint_text = ">_"
 
-    gui.override_mouse(false)
+    if (not GUI:IsOpen() and not gui.is_open()) then
+        gui.override_mouse(false)
+    end
+
     Backend.disable_input = false
 end
 

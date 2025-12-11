@@ -19,6 +19,7 @@ require("includes.lib.types")
 require("includes.lib.utils")
 require("includes.lib.class")
 require("includes.lib.enum")
+require("includes.classes.Pair")
 require("includes.classes.Range")
 require("includes.classes.Rect")
 require("includes.classes.fMatrix44")
@@ -85,9 +86,7 @@ CommandExecutor = require("includes.services.CommandExecutor").new()
 ------------------- Features ------------------------------------
 
 require("includes.features.Speedometer")
-CasinoPacino = require("includes.features.CasinoPacino"):init()
-SalvageYard  = require("includes.features.SalvageYard"):init()
-YRV3         = require("includes.features.YRV3"):init()
+YRV3 = require("includes.features.YRV3"):init()
 ------------------------------------------------------------------
 
 local base_path = "includes"
@@ -101,6 +100,7 @@ local packages = {
     "structs.StateMachine",
 
     "modules.Accessor",
+    "modules.Audio",
     "modules.Decorator",
     "modules.Color",
     "modules.Entity",

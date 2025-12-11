@@ -30,25 +30,35 @@ eEntityType = {
 ---@class Backend
 ---@field private api_version eAPIVersion
 Backend = {
-    __version          = "",
-    target_build       = "",
-    target_version     = "",
-    disable_input      = false, -- Never serialize this runtime variable!
+    __version           = "",
+    target_build        = "",
+    target_version      = "",
+    disable_input       = false, -- Never serialize this runtime variable!
 
-    ---@type table<integer, table<integer, function>>
+    ---@type table<integer, integer>
+    ControlsToDisable  = {},
+
+    ---@type table<integer, BlipData>
+    CreatedBlips       = {},
+
+    ---@type array<handle>
+    AttachedEntities   = {},
+
+    ---@type table<eBackendEvent, array<function>>
     EventCallbacks     = {
         [eBackendEvent.RELOAD_UNLOAD]  = {},
         [eBackendEvent.SESSION_SWITCH] = {},
         [eBackendEvent.PLAYER_SWITCH]  = {}
     },
-    ---@type table<integer, BlipData>
-    CreatedBlips       = {},
-    AttachedEntities   = {},
+
+    ---@type table<eEntityType, array<handle>>
     SpawnedEntities    = {
         [eEntityType.Ped]     = {},
         [eEntityType.Vehicle] = {},
         [eEntityType.Object]  = {},
     },
+
+    ---@type table<eEntityType, integer>
     MaxAllowedEntities = {
         [eEntityType.Ped]     = 50,
         [eEntityType.Vehicle] = 25,
@@ -96,6 +106,11 @@ end
 ---@return boolean
 function Backend:IsMockEnv()
     return self:GetAPIVersion() == eAPIVersion.L54
+end
+
+---@return boolean
+function Backend:AreControlsDisabled()
+    return self.disable_input
 end
 
 ---@param data string
@@ -268,11 +283,32 @@ function Backend:RegisterEventCallback(event, func)
     table.insert(evnt, func)
 end
 
+---@param key integer
+function Backend:RegisterDisabledControl(key)
+    if (self.ControlsToDisable[key]) then
+        return
+    end
+
+    self.ControlsToDisable[key] = key
+end
+
+---@param key integer
+function Backend:RemoveDisabledControl(key)
+    if (not self.ControlsToDisable[key]) then
+        return
+    end
+
+    self.ControlsToDisable[key] = nil
+end
+
 ---@param event eBackendEvent
 function Backend:TriggerEventCallbacks(event)
     for _, fn in ipairs(self.EventCallbacks[event] or {}) do
         if (type(fn) == "function") then
-            fn()
+            local ok, err = pcall(fn)
+            if (not ok) then
+                log.fwarning("[Backend]: Callback error for event %s: %s", EnumTostring(eBackendEvent, event), err)
+            end
         end
     end
 end
@@ -316,6 +352,10 @@ function Backend:RegisterHandlers()
             if (self.disable_input) then
                 PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
             end
+
+            for _, control in pairs(self.ControlsToDisable) do
+                PAD.DISABLE_CONTROL_ACTION(0, control, true)
+            end
         end)
     end
 
@@ -323,7 +363,7 @@ function Backend:RegisterHandlers()
         ThreadManager:CreateNewThread("SS_BACKEND", function()
             self:OnPlayerSwitch()
             self:OnSessionSwitch()
-            yield()
+            sleep(200)
         end)
 
         event.register_handler(menu_event.MenuUnloaded, function() self:Cleanup() end)

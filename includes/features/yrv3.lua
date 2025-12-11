@@ -207,7 +207,8 @@ local eShouldTerminateScripts <const> = {
 ---@field m_sell_script_name string?
 ---@field m_sell_script_disp_name string
 ---@field m_display_names StructScriptDisplayNames
----@field private m_autosell_check_time number
+---@field private m_last_as_check_time number
+---@field private m_cooldown_state_dirty boolean
 local YRV3 = {}
 YRV3.__index = YRV3
 
@@ -229,11 +230,14 @@ function YRV3:init()
         m_biker_data = BB_Default,
         m_safe_cash_data = BS_Default,
         m_display_names = StructScriptDisplayNames,
+        m_cooldown_state_dirty = true,
     }, self)
 
-    ThreadManager:CreateNewThread("SS_YRV3", function()
-        instance:Start()
-    end)
+    if (Backend:IsUpToDate()) then
+        ThreadManager:CreateNewThread("SS_YRV3", function()
+            instance:Main()
+        end)
+    end
 
     Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
         instance:Reset()
@@ -258,15 +262,10 @@ end
 ---@param keepVehicle? boolean
 function YRV3:Teleport(where, keepVehicle)
     if not Self:IsOutside() then
-        GUI:PlaySound(GUI.Sounds.Error)
-        Toast:ShowError(
-            "YRV3",
-            "Please go outdside first!"
-        )
+        Toast:ShowError("YRV3", "Please go outdside first!")
         return
     end
 
-    GUI:PlaySound(GUI.Sounds.Select_alt)
     Self:Teleport(where, keepVehicle)
 end
 
@@ -668,8 +667,65 @@ function YRV3:GetRunningSellScriptDisplayName()
     return self.m_display_names[self.m_sell_script_name] or "None"
 end
 
-function YRV3:BackgroundWorker()
-    if (Time.now() < self.m_autosell_check_time) then
+---@param key string
+---@param state boolean
+function YRV3:SetCooldownStateDirty(key, state)
+    local data = self.t_CooldownData[key]
+    if (not data) then
+        return
+    end
+
+    data.dirty = state
+end
+
+---@param state boolean
+function YRV3:SetAllCooldownStatesDirty(state)
+    self.m_cooldown_state_dirty = state
+end
+
+function YRV3:CheckAllCooldowns()
+    if (not self.m_cooldown_state_dirty) then
+        return
+    end
+
+    for _, data in pairs(self.t_CooldownData) do
+        local gvar = data.gstate()
+        if (gvar and data.onEnable) then
+            data.onEnable()
+        elseif (not gvar and type(data.onDisable) == "function") then
+            data.onDisable()
+        end
+        data.dirty = false
+    end
+
+    self.m_cooldown_state_dirty = false
+end
+
+function YRV3:CooldownHandler()
+    if (self.m_cooldown_state_dirty) then
+        self:CheckAllCooldowns()
+        return
+    end
+
+    for _, data in pairs(self.t_CooldownData) do
+        if (not data.dirty) then
+            goto continue
+        end
+
+        local gvar = data.gstate()
+        if (gvar and data.onEnable) then
+            data.onEnable()
+        elseif (not gvar and type(data.onDisable) == "function") then
+            data.onDisable()
+        end
+        data.dirty = false
+
+        ::continue::
+    end
+end
+
+function YRV3:SetupAutosell()
+    if (Time.now() < self.m_last_as_check_time) then
         return
     end
 
@@ -713,15 +769,11 @@ function YRV3:BackgroundWorker()
         end
     end
 
-    self.m_autosell_check_time = Time.now() + 1
+    self.m_last_as_check_time = Time.now() + 1
 end
 
-function YRV3:Start()
-    if (not self:CanAccess()) then
-        return
-    end
-
-    self:BackgroundWorker()
+function YRV3:AutoSellHandler()
+    self:SetupAutosell()
 
     if (GVars.features.yrv3.autosell
         and self.m_sell_script_running
@@ -729,7 +781,7 @@ function YRV3:Start()
         and not CAM.IS_SCREEN_FADED_OUT()
     ) then
         self.m_has_triggered_autosell = true
-        Toast:ShowSuccess("YRV3", "Auto-Sell will start in 20 seconds.")
+        Toast:ShowMessage("YRV3", "Auto-Sell will start in 20 seconds.")
         sleep(2e4)
 
         while (AUDIO.IS_MOBILE_PHONE_CALL_ONGOING()) do
@@ -746,9 +798,17 @@ function YRV3:Start()
 
         yield()
     end
-
     self.m_has_triggered_autosell = false
+end
 
+function YRV3:Main()
+    if (not self:CanAccess()) then
+        sleep(250)
+        return
+    end
+
+    self:AutoSellHandler()
+    self:CooldownHandler()
     self:HangarAutofill()
     self:WarehouseAutofill()
 end
@@ -771,7 +831,7 @@ function YRV3:MCT()
     local BusinessHubGlobal2 = ScriptGlobal(bhubG2)
 
     script.run_in_fiber(function()
-        if BusinessHubGlobal1:ReadInt() ~= 0 then
+        if (BusinessHubGlobal1:ReadInt() ~= 0) then
             BusinessHubGlobal1:WriteInt(0)
         end
 
@@ -782,7 +842,7 @@ function YRV3:MCT()
         sleep(100)
         gui.toggle(false)
 
-        while script.is_active("appArcadeBusinessHub") do
+        while (script.is_active("appArcadeBusinessHub")) do
             if (BusinessHubGlobal2:ReadInt() == -1) then
                 BusinessHubGlobal2:WriteInt(0)
             end
@@ -806,12 +866,161 @@ function YRV3:Reset()
     self.m_warehouse_data = Wh_Default
     self.m_biker_data = BB_Default
     self.m_safe_cash_data = BS_Default
+    self.m_cooldown_state_dirty = true
 end
 
 
 ------------------------------------------------------------------------
 --- Data
 ------------------------------------------------------------------------
+
+YRV3.t_CooldownData = {
+    ["mc_work_cd"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.mc_work_cd
+        end,
+        onEnable = function ()
+            if (tunables.get_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL") > 0) then
+                tunables.set_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL", 0)
+            end
+        end
+    },
+    ["hangar_cd"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.hangar_cd
+        end,
+        onEnable = function ()
+            local t = {
+                "SMUG_STEAL_EASY_COOLDOWN_TIMER",
+                "SMUG_STEAL_MED_COOLDOWN_TIMER",
+                "SMUG_STEAL_HARD_COOLDOWN_TIMER",
+            }
+            for _, str in ipairs(t) do
+                if (tunables.get_int(str) > 0) then
+                    tunables.set_int(str, 0)
+                end
+            end
+        end
+    },
+    ["nc_management_cd"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.nc_management_cd
+        end,
+        onEnable = function ()
+            if (tunables.get_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN") > 0) then
+                tunables.set_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN", 0)
+            end
+        end
+    },
+    ["nc_vip_mission_chance"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.nc_vip_mission_chance
+        end,
+        onEnable = function ()
+            if (tunables.get_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT") > 0) then
+                tunables.set_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT", 0)
+            end
+        end,
+        onDisable = function ()
+            if (tunables.get_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT") == 0) then
+                tunables.set_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT", 50)
+            end
+        end
+    },
+    ["security_missions_cd"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.security_missions_cd
+        end,
+        onEnable = function ()
+            if (tunables.get_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME") > 0) then
+                tunables.set_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME", 0)
+            end
+        end
+    },
+    ["ie_vehicle_steal_cd"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.ie_vehicle_steal_cd
+        end,
+        onEnable = function ()
+            if (tunables.get_int("IMPEXP_STEAL_COOLDOWN") > 0) then
+                tunables.set_int("IMPEXP_STEAL_COOLDOWN", 0)
+            end
+        end
+    },
+    ["ie_vehicle_sell_cd"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.ie_vehicle_sell_cd
+        end,
+        onEnable = function ()
+            if (tunables.get_int("IMPEXP_SELL_COOLDOWN") > 0) then
+                tunables.set_int("IMPEXP_SELL_COOLDOWN", 0)
+            end
+            for i = 1, 4, 1 do
+                local __t = _F("IMPEXP_SELL_%d_CAR_COOLDOWN", i)
+                if (tunables.get_int(__t) > 0) then
+                    tunables.set_int(__t, 0)
+                end
+            end
+        end
+    },
+    ["ceo_crate_buy_cd"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.ceo_crate_buy_cd
+        end,
+        onEnable = function ()
+            if (tunables.get_int("EXEC_BUY_COOLDOWN") > 0) then
+                tunables.set_int("EXEC_BUY_COOLDOWN", 0)
+            end
+            if (tunables.get_int("EXEC_BUY_FAIL_COOLDOWN") > 0) then
+                tunables.set_int("EXEC_BUY_FAIL_COOLDOWN", 0)
+            end
+        end
+    },
+    ["ceo_crate_sell_cd"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.ceo_crate_sell_cd
+        end,
+        onEnable = function ()
+            if (tunables.get_int("EXEC_SELL_COOLDOWN") > 0) then
+                tunables.set_int("EXEC_SELL_COOLDOWN", 0)
+            end
+            if tunables.get_int("EXEC_SELL_FAIL_COOLDOWN") > 0 then
+                tunables.set_int("EXEC_SELL_FAIL_COOLDOWN", 0)
+            end
+        end
+    },
+    ["dax_work_cd"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.dax_work_cd
+        end,
+        onEnable = function ()
+            if (stats.get_int("MPX_XM22JUGGALOWORKCDTIMER") > 0) then
+                stats.set_int("MPX_XM22JUGGALOWORKCDTIMER", 0)
+            end
+        end
+    },
+    ["garment_rob_cd"] = {
+        dirty = false,
+        gstate = function()
+            return GVars.features.yrv3.garment_rob_cd
+        end,
+        onEnable = function ()
+            if (stats.get_int("MPX_HACKER24_ROBBERY_CD") > 0) then
+                stats.set_int("MPX_HACKER24_ROBBERY_CD", 0)
+            end
+        end
+    },
+}
 
 YRV3.t_SellScripts = {
     ["gb_smuggler"] = { -- air
