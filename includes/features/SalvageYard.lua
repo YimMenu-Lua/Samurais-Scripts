@@ -1,34 +1,34 @@
 local robbery_types <const> = {
-    {
-        name = "The Cargo Ship",
-        fm_prog = 126,
-        scope_bs = 1,
-        disrupt = 3,
-    },
-    {
-        name = "The Gangbanger",
-        fm_prog = 126,
-        scope_bs = 3,
-        disrupt = 3,
-    },
-    {
-        name = "The Duggan",
-        fm_prog = 126,
-        scope_bs = 4,
-        disrupt = 3,
-    },
-    {
-        name = "The Podium",
-        fm_prog = 126,
-        scope_bs = 8,
-        disrupt = 3,
-    },
-    {
-        name = "The McTony",
-        fm_prog = 126,
-        scope_bs = 16,
-        disrupt = 3,
-    },
+	{
+		name = "The Cargo Ship",
+		fm_prog = 126,
+		scope_bs = 1,
+		disrupt = 3,
+	},
+	{
+		name = "The Gangbanger",
+		fm_prog = 126,
+		scope_bs = 3,
+		disrupt = 3,
+	},
+	{
+		name = "The Duggan",
+		fm_prog = 126,
+		scope_bs = 4,
+		disrupt = 3,
+	},
+	{
+		name = "The Podium",
+		fm_prog = 126,
+		scope_bs = 8,
+		disrupt = 3,
+	},
+	{
+		name = "The McTony",
+		fm_prog = 126,
+		scope_bs = 16,
+		disrupt = 3,
+	},
 }
 
 local robbery_status_tostring <const> = { "Available", "In Progress", "Completed" }
@@ -39,102 +39,102 @@ SalvageYard.__index = SalvageYard
 
 ---@return boolean
 function SalvageYard:OwnsSalvageYard()
-    return stats.get_int("MPX_SALVAGE_YARD_OWNED") ~= 0
+	return stats.get_int("MPX_SALVAGE_YARD_OWNED") ~= 0
 end
 
 ---@param slot integer
 ---@return string|nil
 function SalvageYard:CheckWeeklyRobberyStatus(slot)
-    local statName = _F("%s%d", "MPX_SALV23_VEHROB_STATUS", slot)
-    local status   = stats.get_int(statName)
-    return robbery_status_tostring[status+1]
+	local statName = _F("%s%d", "MPX_SALV23_VEHROB_STATUS", slot)
+	local status   = stats.get_int(statName)
+	return robbery_status_tostring[status + 1]
 end
 
 ---@param slot integer
 ---@return boolean
 function SalvageYard:IsLiftTaken(slot)
-    local statName = _F("%s%d", "MPX_MPSV_MODEL_SALVAGE_LIFT", slot)
-    return stats.get_int(statName) ~= 0
+	local statName = _F("%s%d", "MPX_MPSV_MODEL_SALVAGE_LIFT", slot)
+	return stats.get_int(statName) ~= 0
 end
 
 function SalvageYard:IsRobberyActive()
-    return self:GetRobberyType() >= 0
+	return self:GetRobberyType() >= 0
 end
 
 ---@return string
 function SalvageYard:GetCooldownString()
-    local cd = stats.get_int("MPX_SALV23_VEHROB_CD")
-    return cd <= 0 and _T("SY_CD_NONE") or _T("SY_CD_ACTIVE")
+	local cd = stats.get_int("MPX_SALV23_VEHROB_CD")
+	return cd <= 0 and _T("SY_CD_NONE") or _T("SY_CD_ACTIVE")
 end
 
 function SalvageYard:DisableCooldown()
-    stats.set_int("MPX_SALV23_VEHROB_CD", 0)
+	stats.set_int("MPX_SALV23_VEHROB_CD", 0)
 end
 
 function SalvageYard:DisableWeeklyCooldown()
-    local week = stats.get_int("MPX_SALV23_WEEK_SYNC")
-    tunables.set_int(488207018, week + 1)
-    Toast:ShowSuccess("Salvage Yard", "Weekly cooldown skipped.")
+	local week = stats.get_int("MPX_SALV23_WEEK_SYNC")
+	tunables.set_int(488207018, week + 1)
+	Toast:ShowSuccess("Salvage Yard", "Weekly cooldown skipped.")
 end
 
 ---@param slot integer
 ---@return string
 function SalvageYard:GetCarFromSlot(slot)
-    local enum = stats.get_int(_F("%s%d", "MPX_MPSV_MODEL_SALVAGE_VEH", slot))
+	local enum = stats.get_int(_F("%s%d", "MPX_MPSV_MODEL_SALVAGE_VEH", slot))
 	local modelName = self.RobberyTargets[enum]
 	if (not modelName) then
 		return "Unknown"
 	end
 
-    return vehicles.get_vehicle_display_name(modelName)
+	return vehicles.get_vehicle_display_name(modelName)
 end
 
 ---@return string
 function SalvageYard:GetRobberyTypeName()
-    local id = stats.get_int("MPX_SALV23_VEH_ROB")
-    local stringtype = robbery_types[id+1]
-    return stringtype and stringtype.name or "None"
+	local id = stats.get_int("MPX_SALV23_VEH_ROB")
+	local stringtype = robbery_types[id + 1]
+	return stringtype and stringtype.name or "None"
 end
 
 function SalvageYard:GetRobberyType()
-    return stats.get_int("MPX_SALV23_VEH_ROB")
+	return stats.get_int("MPX_SALV23_VEH_ROB")
 end
 
 function SalvageYard:GetRobberyValue()
-    return stats.get_int("MPX_SALV23_SALE_VAL")
+	return stats.get_int("MPX_SALV23_SALE_VAL")
 end
 
 function SalvageYard:GetRobberyKeepState()
-    return stats.get_bool("MPX_SALV23_CAN_KEEP")
+	return stats.get_bool("MPX_SALV23_CAN_KEEP")
 end
 
 function SalvageYard:CompletePreparation()
-    local current = self:GetRobberyType()
-    local info = robbery_types[current+1]
-    if (not info) then
-        Toast:ShowError("Salvage Yard", "Failed to get current robbery. Are you sure you started one?")
-        return
-    end
+	local current = self:GetRobberyType()
+	local info = robbery_types[current + 1]
+	if (not info) then
+		Toast:ShowError("Salvage Yard", "Failed to get current robbery. Are you sure you started one?")
+		return
+	end
 
-    stats.set_int("MPX_SALV23_FM_PROG", info.fm_prog)
-    stats.set_int("MPX_SALV23_SCOPE_BS", info.scope_bs)
-    stats.set_int("MPX_SALV23_DISRUPT", info.disrupt)
-    Toast:ShowSuccess("Salvage Yard", _T("SY_PREP_SKIP"))
+	stats.set_int("MPX_SALV23_FM_PROG", info.fm_prog)
+	stats.set_int("MPX_SALV23_SCOPE_BS", info.scope_bs)
+	stats.set_int("MPX_SALV23_DISRUPT", info.disrupt)
+	Toast:ShowSuccess("Salvage Yard", _T("SY_PREP_SKIP"))
 end
 
 ---@return boolean
 function SalvageYard:ArePrepsCompleted()
-    return Bit.is_set(stats.get_int("MPX_SALV23_GEN_BS"), 0)
+	return Bit.is_set(stats.get_int("MPX_SALV23_GEN_BS"), 0)
 end
 
 function SalvageYard:DoubleCarWorth()
-    local current_worth = stats.get_int("MPX_SALV23_SALE_VAL")
-    stats.set_int("MPX_SALV23_SALE_VAL", current_worth * 2)
+	local current_worth = stats.get_int("MPX_SALV23_SALE_VAL")
+	stats.set_int("MPX_SALV23_SALE_VAL", current_worth * 2)
 end
 
 ---@return string
 function SalvageYard:GetCarNameFromHash(hash)
-    return VEHICLE.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash)
+	return VEHICLE.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash)
 end
 
 SalvageYard.RobberyTargets = {

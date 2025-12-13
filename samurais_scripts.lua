@@ -7,7 +7,7 @@ Translator:Load()
 GUI:LateInit()
 
 script.run_in_fiber(function()
-    for name, cmd in pairs(commandRegistry) do
-        CommandExecutor:RegisterCommand(name, cmd.callback, cmd.opts)
-    end
+	for name, cmd in pairs(commandRegistry) do
+		CommandExecutor:RegisterCommand(name, cmd.callback, cmd.opts)
+	end
 end)

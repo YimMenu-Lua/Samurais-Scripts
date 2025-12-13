@@ -26,62 +26,62 @@ CPed = Class("CPed", CEntity, 0x161C)
 ---@param ped handle
 ---@return CPed
 function CPed:init(ped)
-    if not ENTITY.DOES_ENTITY_EXIST(ped) or not ENTITY.IS_ENTITY_A_PED(ped) then
-        error("Invalid entity!")
-    end
+	if not ENTITY.DOES_ENTITY_EXIST(ped) or not ENTITY.IS_ENTITY_A_PED(ped) then
+		error("Invalid entity!")
+	end
 
-    self:super().init(self, ped)
-    local ptr = memory.handle_to_ptr(ped)
+	self:super().init(self, ped)
+	local ptr = memory.handle_to_ptr(ped)
 
-    ---@type CPed
-    local instance = setmetatable({}, CPed)
-    instance.m_ptr = ptr
-    instance.m_ped_intelligence = ptr:add(0x10A0)
-    instance.m_ped_inventory = ptr:add(0x10B0)
-    instance.m_ped_weapon_mgr = ptr:add(0x10B8)
-    instance.m_velocity = ptr:add(0x0300)
-    instance.m_ped_type = ptr:add(0x1098)
-    instance.m_ped_task_flag = ptr:add(0x144B)
-    instance.m_seatbelt = ptr:add(0x143C)
-    instance.m_armor = ptr:add(0x150C)
-    instance.m_cash = ptr:add(0x1614)
+	---@type CPed
+	local instance = setmetatable({}, CPed)
+	instance.m_ptr = ptr
+	instance.m_ped_intelligence = ptr:add(0x10A0)
+	instance.m_ped_inventory = ptr:add(0x10B0)
+	instance.m_ped_weapon_mgr = ptr:add(0x10B8)
+	instance.m_velocity = ptr:add(0x0300)
+	instance.m_ped_type = ptr:add(0x1098)
+	instance.m_ped_task_flag = ptr:add(0x144B)
+	instance.m_seatbelt = ptr:add(0x143C)
+	instance.m_armor = ptr:add(0x150C)
+	instance.m_cash = ptr:add(0x1614)
 
-    if (PED.IS_PED_A_PLAYER(ped)) then
-        instance.m_player_info = CPlayerInfo(ptr:add(0x10A8):deref())
-    end
+	if (PED.IS_PED_A_PLAYER(ped)) then
+		instance.m_player_info = CPlayerInfo(ptr:add(0x10A8):deref())
+	end
 
-    return instance
+	return instance
 end
 
 ---@return boolean
 function CPed:CanRagdoll()
-    if not self:IsValid() then
-        return false
-    end
+	if not self:IsValid() then
+		return false
+	end
 
-    return (self.m_ped_type & 0x20) ~= 0
+	return (self.m_ped_type & 0x20) ~= 0
 end
 
 ---@return boolean
 function CPed:HasSeatbelt()
-    if not self:IsValid() then
-        return false
-    end
+	if not self:IsValid() then
+		return false
+	end
 
-    return (self.m_seatbelt & 0x3) ~= 0
+	return (self.m_seatbelt & 0x3) ~= 0
 end
 
 ---@return float
 function CPed:GetSpeed()
-    if not self:IsValid() then
-        return 0.0
-    end
+	if not self:IsValid() then
+		return 0.0
+	end
 
-    local speed_vec = self.m_velocity:get_vec3()
-    return speed_vec:mag()
+	local speed_vec = self.m_velocity:get_vec3()
+	return speed_vec:mag()
 end
 
 ---@return ePedType
 function CPed:GetPedType()
-   return (self.m_ped_type:get_word() << 11 >> 25)
+	return (self.m_ped_type:get_word() << 11 >> 25)
 end

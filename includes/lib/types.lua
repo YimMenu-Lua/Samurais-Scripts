@@ -15,11 +15,11 @@
 ---@class GenericClass<T>
 ---@field m_size uint16_t
 GenericClass = setmetatable({}, {
-    __index = { m_size = 0x40, __type = "GenericClass" },
-    __newindex = function(...)
-        error("Attempt to modify read-only Generic Class!")
-    end,
-    __metatable = false
+	__index = { m_size = 0x40, __type = "GenericClass" },
+	__newindex = function(...)
+		error("Attempt to modify read-only Generic Class!")
+	end,
+	__metatable = false
 })
 
 ---@class Enum

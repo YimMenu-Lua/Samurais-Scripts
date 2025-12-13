@@ -16,15 +16,15 @@
 local WindowAnimator = {}
 WindowAnimator.__index = WindowAnimator
 setmetatable(WindowAnimator, {
-    __call = function (...)
-        return setmetatable({
-            m_active     = false,
-            m_start_time = 0,
-            m_start_pos  = vec2:zero(),
-            m_end_pos    = vec2:zero(),
-            m_duration   = 0.18
-        }, WindowAnimator)
-    end
+	__call = function(...)
+		return setmetatable({
+			m_active     = false,
+			m_start_time = 0,
+			m_start_pos  = vec2:zero(),
+			m_end_pos    = vec2:zero(),
+			m_duration   = 0.18
+		}, WindowAnimator)
+	end
 })
 
 ---@param windowLabel string
@@ -33,47 +33,47 @@ setmetatable(WindowAnimator, {
 ---@param duration? seconds
 ---@param easeOut? number
 function WindowAnimator:Init(windowLabel, startPos, endPos, duration, easeOut)
-    self.m_window_label = windowLabel
-    self.m_active       = true
-    self.m_start_time   = Time.now()
-    self.m_start_pos    = startPos
-    self.m_end_pos      = endPos
-    self.m_duration     = duration or 0.18
+	self.m_window_label = windowLabel
+	self.m_active       = true
+	self.m_start_time   = Time.now()
+	self.m_start_pos    = startPos
+	self.m_end_pos      = endPos
+	self.m_duration     = duration or 0.18
 
-    if (easeOut) then
-        self.m_ease = easeOut
-    end
+	if (easeOut) then
+		self.m_ease = easeOut
+	end
 end
 
 ---@return boolean
 function WindowAnimator:IsActive()
-    return self.m_active
+	return self.m_active
 end
 
 ---@param t number time delta
 function WindowAnimator:EaseOutQuad(t)
-    return 1 - (1 - t) * (1 - t)
+	return 1 - (1 - t) * (1 - t)
 end
 
 function WindowAnimator:Apply()
-    if (not self.m_active) then
-        return
-    end
+	if (not self.m_active) then
+		return
+	end
 
-    local t = (Time.now() - self.m_start_time) / self.m_duration
-    if (t >= 1) then
-        self.m_active = false
-        ImGui.SetWindowPos(self.m_window_label, self.m_end_pos.x, self.m_end_pos.y, ImGuiCond.Always)
-        return
-    end
+	local t = (Time.now() - self.m_start_time) / self.m_duration
+	if (t >= 1) then
+		self.m_active = false
+		ImGui.SetWindowPos(self.m_window_label, self.m_end_pos.x, self.m_end_pos.y, ImGuiCond.Always)
+		return
+	end
 
-    local ease = self.m_ease or self:EaseOutQuad(t)
-    local target = self.m_start_pos:lerp(self.m_end_pos, ease)
-    ImGui.SetWindowPos(self.m_window_label, target.x, target.y, ImGuiCond.Always)
+	local ease = self.m_ease or self:EaseOutQuad(t)
+	local target = self.m_start_pos:lerp(self.m_end_pos, ease)
+	ImGui.SetWindowPos(self.m_window_label, target.x, target.y, ImGuiCond.Always)
 end
 
 function WindowAnimator:Cancel()
-    self.m_active = false
+	self.m_active = false
 end
 
 return WindowAnimator
