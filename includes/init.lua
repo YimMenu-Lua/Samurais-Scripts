@@ -22,10 +22,11 @@ require("includes.lib.enum")
 require("includes.classes.Pair")
 require("includes.classes.Range")
 require("includes.classes.Rect")
+require("includes.classes.Set")
 require("includes.classes.fMatrix44")
 require("includes.classes.atArray")
-require("includes.data.pointers")
 
+GPointers = require("includes.data.pointers")
 Memory = require("includes.modules.Memory")
 require("includes.modules.Game")
 
@@ -34,7 +35,7 @@ require("includes.modules.Game")
 --
 -- Used for persistent state that should be saved between sessions.
 --
--- Any value assigned to GVars is automatically serialized to JSON (via __index | __newindex).
+-- Any value assigned to GVars is automatically serialized to JSON.
 --
 -- For temporary or internal state that should not be saved, use `_G` directly.
 ---@class GVars : Config
@@ -73,7 +74,6 @@ ThreadManager = require("includes.services.ThreadManager"):init()
 GPointers:Init() -- needs ThreadManager
 Serializer = require("includes.services.Serializer"):init(SCRIPT_NAME, DEFAULT_CONFIG, GVars)
 
--- I know this looks bad but these can be serialized/deserialized and need Serializer to register functions
 require("includes.classes.Vector2")
 require("includes.classes.Vector3")
 require("includes.classes.Vector4")
@@ -84,11 +84,10 @@ Toast           = require("includes.services.ToastNotifier").new()
 CommandExecutor = require("includes.services.CommandExecutor").new()
 ----------------------------------------------------------------------------------------------------
 
-------------------- Features ------------------------------------
-
+------------------- Features -----------------------------------------------------------------------
 require("includes.features.Speedometer")
 YRV3 = require("includes.features.YRV3"):init()
-------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 
 local base_path = "includes"
 local packages = {
@@ -116,6 +115,7 @@ local packages = {
 
 	"frontend.casino_ui",
 	"frontend.salvage_ui",
+	"frontend.self_ui",
 	"frontend.settings_ui",
 	"frontend.vehicle_ui",
 	"frontend.yrv3_ui",

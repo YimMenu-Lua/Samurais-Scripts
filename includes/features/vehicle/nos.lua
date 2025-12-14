@@ -1,20 +1,20 @@
 ---@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
 
-local VehicleFeatureBase = require("VehicleFeatureBase")
+local FeatureBase = require("includes.modules.FeatureBase")
 
----@class NosMgr : VehicleFeatureBase
----@field private m_pv PlayerVehicle -- Reference to PlayerVehicle
+---@class NosMgr : FeatureBase
+---@field private m_entity PlayerVehicle
 ---@field private m_nos_fx array<handle>|nil
 ---@field private m_purge_fx_l array<handle>|nil
 ---@field private m_purge_fx_r array<handle>|nil
 ---@field private m_is_active boolean
-local NosMgr = setmetatable({}, VehicleFeatureBase)
+local NosMgr = setmetatable({}, FeatureBase)
 NosMgr.__index = NosMgr
 
 ---@param pv PlayerVehicle
 ---@return NosMgr
 function NosMgr.new(pv)
-	local self = VehicleFeatureBase.new(pv)
+	local self = FeatureBase.new(pv)
 	return setmetatable(self, NosMgr)
 end
 
@@ -40,11 +40,12 @@ function NosMgr:Cleanup()
 end
 
 function NosMgr:ShouldRun()
-	return (self.m_pv
-		and self.m_pv:IsValid()
-		and self.m_pv:IsLandVehicle()
+	return (self.m_entity
+		and self.m_entity:IsValid()
+		and self.m_entity:IsLandVehicle()
+		and self.m_entity:IsEngineOn()
 		and Self:IsDriving()
-		and not self.m_pv:IsElectric())
+		and not self.m_entity:IsElectric())
 end
 
 ---@return boolean
@@ -69,8 +70,12 @@ function NosMgr:IsPurgeButtonPressed()
 end
 
 function NosMgr:UpdateFX()
-	local PV = self.m_pv
-	if (self.m_is_active and self.m_pv:IsEngineOn()) then
+	local PV = self.m_entity
+	if (PV:IsElectric()) then
+		return
+	end
+
+	if (self.m_is_active and PV:IsEngineOn()) then
 		if (not self.m_nos_fx) then
 			local bones = PV:GetExhaustBones()
 			self.m_nos_fx = Game.StartSyncedPtfxLoopedOnEntityBone(
@@ -90,13 +95,13 @@ function NosMgr:UpdateFX()
 end
 
 function NosMgr:UpdatePurgeFX()
-	local PV = self.m_pv
-	if (not PV or PV:IsBoat()) then
+	local PV = self.m_entity
+	if (PV:IsBoat() or PV:IsElectric()) then
 		return
 	end
 
 	local handle = PV:GetHandle()
-	if (self:IsPurgeButtonPressed() and self.m_pv:IsEngineOn()) then
+	if (self:IsPurgeButtonPressed() and PV:IsEngineOn()) then
 		if (not self.m_purge_fx_l) then
 			self.m_purge_fx_l = Game.StartSyncedPtfxLoopedOnEntityBone(
 				handle,
@@ -134,7 +139,7 @@ function NosMgr:UpdatePurgeFX()
 end
 
 function NosMgr:Update()
-	local PV = self.m_pv
+	local PV = self.m_entity
 	if (GVars.features.vehicle.nos.enabled) then
 		local handle = PV:GetHandle()
 		local buttonPressed = self:IsNOSButtonPressed()

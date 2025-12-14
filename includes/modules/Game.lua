@@ -1,3 +1,6 @@
+local ped_list <const> = require("includes.data.peds")
+local ped_lookup_table <const> = require("includes.data.ped_reverse_lookup")
+
 --------------------------------------
 -- Class: Game
 --------------------------------------
@@ -1145,27 +1148,44 @@ end
 
 ---@param modelName string
 function Game.GetPedHash(modelName)
-	return t_PedLookup[modelName].hash -- not sure if this is faster than simply calling `joaat` on the model name.
+	return joaat(modelName)
 end
 
 ---@param modelHash integer
+---@return string
 function Game.GetPedName(modelHash)
-	return t_PedLookup[modelHash].name or _F("0x%X", modelHash)
+	return ped_lookup_table[modelHash] or _F("0x%X", modelHash)
 end
 
 ---@param model integer|string
 function Game.GetPedTypeFromModel(model)
-	return t_PedLookup[model].ped_type or ePedType.CIVMALE
+	if (type(model) == "string") then
+		model = joaat(model)
+	end
+
+	return ped_list[model].model_hash or ePedType.CIVMALE
 end
 
 ---@param model integer|string
+---@return ePedGender
 function Game.GetPedGenderFromModel(model)
-	return t_PedLookup[model].gender or "unknown"
+	if (type(model) == "integer") then
+		model = Game.GetPedName(model)
+	end
+
+	local found = ped_list[model]
+	---@diagnostic disable-next-line
+	return found and found.ped_gender or ePedGender.UNK
 end
 
 ---@param model integer|string
 function Game.IsPedModelHuman(model)
-	return t_PedLookup[model].is_human
+	if (type(model) == "integer") then
+		model = Game.GetPedName(model)
+	end
+
+	local found = ped_list[model]
+	return found and found.is_human or false
 end
 
 ---@param coords vec3

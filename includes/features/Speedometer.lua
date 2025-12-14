@@ -190,13 +190,13 @@ function Speedometer:DrawEngineWarning(ImDrawList, center, radius)
 	if (EngineHealth < 800) then
 		local pulse = 0.5 + 0.5 * math.sin(Time.now() * 5)
 		local color = Color(1, EngineHealth < 400 and pulse or 0.9, 0, 1):AsU32()
-		local offset = vec2:new(-radius + 65, 0)
-		local p1 = center + offset + vec2:new(0, -8)
+		local offset = vec2:new(-radius + 72, 15)
+		local p1 = center + offset + vec2:new(0, -7)
 		local p2 = center + offset + vec2:new(-12, 12)
 		local p3 = center + offset + vec2:new(12, 12)
 		ImGui.ImDrawListAddTriangle(ImDrawList, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, color)
-		ImGui.ImDrawListAddText(ImDrawList, p1.x - 1, p1.y + 2, color, "!")
-		ImGui.ImDrawListAddText(ImDrawList, 12, p1.x - 30, p1.y + 25, color, "CHECK ENGINE")
+		ImGui.ImDrawListAddText(ImDrawList, p1.x - 1, p1.y + 2.8, color, "!")
+		ImGui.ImDrawListAddText(ImDrawList, 11.2, p1.x - 30, p1.y + 25, color, "CHECK ENGINE")
 	end
 end
 
@@ -249,8 +249,14 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 	if (not IsAircraft) then
 		if (type(Manufacturer) == "string") then
 			local textWidth = ImGui.CalcTextSize(Manufacturer)
-			ImGui.ImDrawListAddText(ImDrawList, 21, center.x - 5 - (textWidth / 2), center.y - 15 - (radius / 2),
-				GVars.features.speedometer.colors.needle_base, Manufacturer)
+			ImGui.ImDrawListAddText(
+				ImDrawList,
+				21,
+				center.x - 5 - (textWidth / 2),
+				center.y - 15 - (radius / 2),
+				GVars.features.speedometer.colors.text - (math.pi * 10),
+				Manufacturer
+			)
 		end
 		self:DrawEngineWarning(ImDrawList, center, radius)
 	end
@@ -316,7 +322,7 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 	)
 
 	local unit_buff = (GVars.features.speedometer.speed_unit == 0 and "M/s") or
-	(GVars.features.speedometer.speed_unit == 1 and "Km/h") or "Mi/h"
+		(GVars.features.speedometer.speed_unit == 1 and "Km/h") or "Mi/h"
 	local display_value = math.floor(current_speed)
 	local value_str = tostring(display_value)
 	local unit_size = self.cached_unit_sizes[unit_buff]
@@ -403,7 +409,7 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 		end
 
 		local gear_str = (Gear == 0) and ((current_speed > 1 and "R") or "N") or
-		_F("%s%d", IsSports and "S" or "D", Gear)
+			_F("%s%d", IsSports and "S" or "D", Gear)
 		local gear_color = IsSports and Color(1.0, 0.3, 0.3, 1.0):AsU32() or GVars.features.speedometer.colors.text
 		local gear_text_width, _ = ImGui.CalcTextSize(gear_str)
 
@@ -430,7 +436,7 @@ function Speedometer:Draw(offset)
 		speed_modifier = Match(GVars.features.speedometer.speed_unit, UnitCases)
 		CurrentSpeed = PV:GetSpeed() * speed_modifier
 		MaxSpeed = math.floor((PV:GetDefaultMaxSpeed() * (GVars.features.vehicle.fast_vehicles and 1.8 or 1)) *
-		speed_modifier)
+			speed_modifier)
 		CurrentAltitude = PV:GetHeightAboveGround()
 		Manufacturer = PV:GetManufacturer()
 		IsEngineOn = PV:IsEngineOn()

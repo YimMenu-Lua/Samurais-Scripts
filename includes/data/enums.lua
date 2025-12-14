@@ -321,6 +321,13 @@ ePedType = {
 	ARMY = 29,
 }
 
+---@enum ePedGender
+ePedGender = {
+	MALE = 0,
+	FEMALE = 1,
+	UNK = 2
+}
+
 ---@enum ePedComponents
 ePedComponents = {
 	Face = 1,

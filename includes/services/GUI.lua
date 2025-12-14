@@ -42,7 +42,7 @@ end
 --------------------------------------
 ---@class GUI : ClassMeta<GUI>
 ---@field private m_main_window_label string
----@field private m_seleted_tab Tab
+---@field private m_selected_tab Tab
 ---@field private m_selected_category eTabID
 ---@field private m_selected_category_tabs array<Pair<string, Tab>>
 ---@field private m_dummy_tab tab -- default YimMenu API tab object
@@ -67,6 +67,7 @@ function GUI:init()
 		m_cb_window_pos = vec2:zero(),
 		m_screen_resolution = Game.GetScreenResolution(),
 		m_sidebar_width = 200,
+		m_selected_category = eTabID.TAB_SELF,
 		m_tabs = defaultTabs,
 		m_independent_windows = {},
 		m_requested_windows = {},
@@ -103,6 +104,8 @@ function GUI:LateInit()
 	for _, drawfunc in ipairs(self.m_independent_windows) do
 		gui.add_always_draw_imgui(drawfunc)
 	end
+
+	self.m_selected_tab = self.m_tabs[eTabID.TAB_SELF][1].second
 end
 
 function GUI:Toggle()
@@ -115,42 +118,48 @@ function GUI:Close()
 	gui.override_mouse(false)
 end
 
+---@return float
+function GUI:GetMaxTopBarHeight()
+	return Game.GetScreenResolution().y * 0.115
+end
+
 ---@param align? number -- 0: top center | 1: bottom center | 2: left center | 3: right center | 4: center
 function GUI:Snap(align)
 	align = align or 0
-	local size = GVars.ui.window_size
 	local resolution = Game.GetScreenResolution()
+	local top_bar_height = resolution.y * 0.12
+	local size = vec2:new(GVars.ui.window_size.x, GVars.ui.window_size.y + top_bar_height + 10)
 	local _, center = self:GetNewWindowSizeAndCenterPos(0.5, 0.8, size)
-	local top_center = vec2:new(center.x, 0)
+	local top_center = vec2:new(center.x, 1)
 	local endPos = Switch(align) {
 		[0] = top_center,
 		[1] = vec2:new(center.x, resolution.y - size.y),
-		[2] = vec2:new(0, center.y),
-		[3] = vec2:new(resolution.x - size.x, center.y),
+		[2] = vec2:new(1, center.y),
+		[3] = vec2:new(resolution.x - size.x - 1, center.y),
 		[4] = center,
 		default = top_center
 	}
 
-	self.m_snap_animator:Init(self.m_main_window_label, GVars.ui.window_pos, endPos, 0.3)
+	self.m_snap_animator:Init(self.m_main_window_label, GVars.ui.window_pos, endPos, 3)
 	self:PlaySound(self.Sounds.Nav)
 end
 
 function GUI:ResetWidth()
 	local default_size, _ = self:GetNewWindowSizeAndCenterPos(0.45, 0.8)
-	ImGui.SetWindowSize(self.m_main_window_label, default_size.x, GVars.ui.window_size.y, ImGuiCond.Always)
+	ImGui.SetWindowSize(self.m_main_window_label, default_size.x, self:GetMaxTopBarHeight(), ImGuiCond.Always)
 	GVars.ui.window_size.x = default_size.x
 end
 
 function GUI:ResetHeight()
 	local default_size, _ = self:GetNewWindowSizeAndCenterPos(0.45, 0.8)
-	ImGui.SetWindowSize(self.m_main_window_label, GVars.ui.window_size.x, default_size.y, ImGuiCond.Always)
+	ImGui.SetWindowSize(self.m_main_window_label, GVars.ui.window_size.x, self:GetMaxTopBarHeight(), ImGuiCond.Always)
 	GVars.ui.window_size.y = default_size.y
 end
 
 function GUI:ResetSize()
 	local default_size, _ = self:GetNewWindowSizeAndCenterPos(0.45, 0.8)
-	ImGui.SetWindowSize(self.m_main_window_label, default_size.x, default_size.y, ImGuiCond.Always)
-	GVars.ui.window_size = default_size
+	ImGui.SetWindowSize(self.m_main_window_label, default_size.x, self:GetMaxTopBarHeight(), ImGuiCond.Always)
+	GVars.ui.window_size.x, GVars.ui.window_size.y = default_size.x, default_size.y
 end
 
 function GUI:IsOpen()
@@ -158,7 +167,7 @@ function GUI:IsOpen()
 end
 
 function GUI:GetCurrentTab()
-	return self.m_seleted_tab
+	return self.m_selected_tab
 end
 
 ---@param id eTabID Category
@@ -350,7 +359,7 @@ function GUI:DrawTopBar()
 	local availWidth, _ = ImGui.GetContentRegionAvail()
 	local elemWidth = 90.0
 	local elemHeight = 40.0
-	local tabHeight = 50.0
+	local tabHeight = 55.0
 	local tabCount = table.getlen(tabIdToString)
 	local totalWidth = tabCount * elemWidth + (tabCount - 1) * spacing
 	local startX = (availWidth - totalWidth) * 0.5
@@ -420,8 +429,8 @@ function GUI:DrawTopBar()
 		)
 
 		if (clicked) then
-			if (self.m_selected_category ~= i and self.m_seleted_tab) then
-				self.m_seleted_tab = nil
+			if (self.m_selected_category ~= i and self.m_selected_tab) then
+				self.m_selected_tab = nil
 			end
 
 			self.m_selected_category = i
@@ -443,10 +452,10 @@ function GUI:DrawTopBar()
 		end
 	end
 
-	underlineX = underlineX + (underlineTargetX - underlineX) * 0.15
+	underlineX = underlineX + (underlineTargetX - underlineX - 0.5) * 0.15
 	underlineW = underlineW + (underlineTargetW - underlineW) * 0.15
 
-	local underlineHeight = 3.0
+	local underlineHeight = 4.0
 	local underlinePos = vec2:new(underlineX, cursorPos.y + tabHeight - underlineHeight)
 	local underlineEnd = vec2:new(underlineX + underlineW, underlinePos.y + underlineHeight)
 	local underlineCol = Color(_col1.x, _col1.y, _col1.z, 255):AsU32()
@@ -464,7 +473,8 @@ function GUI:DrawTopBar()
 	self.m_cursor_pos = vec2:new(ImGui.GetCursorScreenPos())
 end
 
-function GUI:DrawSideBar()
+---@param yPos float
+function GUI:DrawSideBar(yPos)
 	if (not self.m_selected_category or not tabIdToString[self.m_selected_category]) then
 		self.m_is_drawing_sidebar = false
 		return
@@ -474,24 +484,23 @@ function GUI:DrawSideBar()
 	local ctabsCount = #self.m_selected_category_tabs
 	if (ctabsCount > 1) then
 		local selectableSize = vec2:new(self.m_sidebar_width - 30, 32)
-		local style = ImGui.GetStyle()
-
 		ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
-		ImGui.SetNextWindowPos(GVars.ui.window_pos.x + (style.FramePadding.x * 3), self.m_cursor_pos.y, ImGuiCond.Always)
+		ImGui.SetNextWindowPos(GVars.ui.window_pos.x, yPos, ImGuiCond.Always)
 		ImGui.SetNextWindowSizeConstraints(self.m_sidebar_width, 0, self.m_sidebar_width, GVars.ui.window_size.y)
 		ThemeManager:PushTheme()
 		if (ImGui.Begin("##ss_side_bar",
 				ImGuiWindowFlags.NoTitleBar |
 				ImGuiWindowFlags.NoResize |
 				ImGuiWindowFlags.NoMove |
+				ImGuiWindowFlags.NoBringToFrontOnFocus |
 				ImGuiWindowFlags.AlwaysAutoResize)
 			) then
 			for _, pair in ipairs(self.m_selected_category_tabs or {}) do
 				if (pair and pair.second) then
 					local tab = pair.second
-					if (self:Selectable2(pair.first, self.m_seleted_tab == tab, selectableSize)) then
+					if (self:Selectable2(pair.first, self.m_selected_tab == tab, selectableSize)) then
 						self:PlaySound(self.Sounds.Nav)
-						self.m_seleted_tab = tab
+						self.m_selected_tab = tab
 					end
 				end
 			end
@@ -500,8 +509,30 @@ function GUI:DrawSideBar()
 		ThemeManager:PopTheme()
 		self.m_is_drawing_sidebar = true
 	elseif (ctabsCount == 1) then
-		self.m_seleted_tab = self.m_selected_category_tabs[1].second
+		self.m_selected_tab = self.m_selected_category_tabs[1].second
 		self.m_is_drawing_sidebar = false
+	end
+end
+
+function GUI:ShowWindowHeightLimit()
+	local windowFlags = ImGuiWindowFlags.NoTitleBar
+		| ImGuiWindowFlags.NoResize
+		| ImGuiWindowFlags.NoBringToFrontOnFocus
+		| ImGuiWindowFlags.NoScrollbar
+		| ImGuiWindowFlags.AlwaysAutoResize
+		| ImGuiWindowFlags.NoBackground
+
+	local color = Color(GVars.ui.style.theme.TopBarFrameCol1:unpack())
+	local top_height = self:GetMaxTopBarHeight()
+	local pos = vec2:new(GVars.ui.window_pos.x, GVars.ui.window_pos.y + GVars.ui.window_size.y + top_height - 10)
+	ImGui.SetNextWindowSize(GVars.ui.window_size.x + 10, 0)
+	ImGui.SetNextWindowPos(pos.x - 10, pos.y)
+	if (ImGui.Begin("##indicator", windowFlags)) then
+		local ImDrawList = ImGui.GetWindowDrawList()
+		local cursorPos = vec2:new(ImGui.GetCursorScreenPos())
+		local p2 = vec2:new(cursorPos.x + GVars.ui.window_size.x, cursorPos.y)
+		ImGui.ImDrawListAddLine(ImDrawList, cursorPos.x, cursorPos.y, p2.x, p2.y, color:AsU32(), 3)
+		ImGui.End()
 	end
 end
 
@@ -515,11 +546,12 @@ function GUI:Draw()
 	end
 
 	local default_size, default_pos = self:GetNewWindowSizeAndCenterPos(0.45, 0.8)
-	default_pos.y = 0
+	default_pos.y = 1
+
 	local windowFlags = ImGuiWindowFlags.NoTitleBar
 		| ImGuiWindowFlags.NoResize
-		| ImGuiWindowFlags.NoBackground
 		| ImGuiWindowFlags.NoBringToFrontOnFocus
+		| ImGuiWindowFlags.NoScrollbar
 
 	if (GVars.ui.moveable) then
 		windowFlags = Bit.clear(windowFlags, ImGuiWindowFlags.NoMove)
@@ -535,20 +567,19 @@ function GUI:Draw()
 			GVars.ui.moveable and ImGuiCond.FirstUseEver or ImGuiCond.Always)
 	end
 
+	local fixed_height = self:GetMaxTopBarHeight()
 	if (GVars.ui.window_size:is_zero()) then
-		ImGui.SetNextWindowSize(default_size.x, default_size.y, ImGuiCond.Always)
+		ImGui.SetNextWindowSize(default_size.x, fixed_height, ImGuiCond.Always)
 		GVars.ui.window_size = default_size
 	else
-		ImGui.SetNextWindowSize(GVars.ui.window_size.x, GVars.ui.window_size.y, ImGuiCond.Always)
+		ImGui.SetNextWindowSize(GVars.ui.window_size.x, fixed_height, ImGuiCond.Always)
 	end
 
 	self.m_snap_animator:Apply()
 
 	ThemeManager:PushTheme()
-	ImGui.SetNextWindowBgAlpha(0)
+	ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
 	if (ImGui.Begin(self.m_main_window_label, windowFlags)) then
-		ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
-		ImGui.BeginChild("##ss_top_bar", 0, 110)
 		local fontScale = 1.5
 		local titleWidth = ImGui.CalcTextSize("Samurai's Scripts") * fontScale
 		local winWidth = ImGui.GetWindowWidth()
@@ -558,45 +589,50 @@ function GUI:Draw()
 		ImGui.SetWindowFontScale(1)
 		ImGui.Spacing()
 		self:DrawTopBar()
-		ImGui.EndChild()
 
-		GVars.ui.window_pos = vec2:new(ImGui.GetWindowPos())
+		local current_pos = vec2:new(ImGui.GetWindowPos())
+		GVars.ui.window_pos.x, GVars.ui.window_pos.y = current_pos.x, current_pos.y
 		ImGui.End()
 	end
 	ThemeManager:PopTheme()
 
+	local next_y_pos = GVars.ui.window_pos.y + fixed_height + 10
+	local cb_window_pos_x = GVars.ui.window_pos.x
 	if (self.m_is_drawing_sidebar) then
-		self.m_cursor_pos.x = self.m_cursor_pos.x + self.m_sidebar_width + 10
+		cb_window_pos_x = cb_window_pos_x + self.m_sidebar_width + 10
 	end
 
-	self.m_cursor_pos.y = self.m_cursor_pos.y + 7 -- the fuck is this weird padding bruh
-	if (self.m_seleted_tab) then
-		local fixedWidth = self.m_is_drawing_sidebar and (GVars.ui.window_size.x - self.m_sidebar_width - 40) or
-		GVars.ui.window_size.x - 30
+	if (self.m_selected_tab) then
+		local fixedWidth = self.m_is_drawing_sidebar
+			and (GVars.ui.window_size.x - self.m_sidebar_width - 10)
+			or GVars.ui.window_size.x
+
 		ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
-		ImGui.SetNextWindowPos(self.m_cursor_pos.x, self.m_cursor_pos.y, ImGuiCond.Always)
+		ImGui.SetNextWindowPos(cb_window_pos_x, next_y_pos, ImGuiCond.Always)
 		ImGui.SetNextWindowSizeConstraints(fixedWidth, 20, fixedWidth, GVars.ui.window_size.y - 10)
 		ThemeManager:PushTheme()
 		if (ImGui.Begin("##ss_callback_window",
 				ImGuiWindowFlags.NoTitleBar |
 				ImGuiWindowFlags.NoMove |
+				ImGuiWindowFlags.NoBringToFrontOnFocus |
 				ImGuiWindowFlags.AlwaysAutoResize)
 			) then
 			ImGui.PushTextWrapPos(fixedWidth - 10)
-			self.m_seleted_tab:Draw()
+			self.m_selected_tab:Draw()
 			ImGui.PopTextWrapPos()
 			ImGui.End()
 		end
 		ThemeManager:PopTheme()
 	end
 
-	self:DrawSideBar()
+	self:DrawSideBar(next_y_pos)
 
 	for label, window in pairs(self.m_requested_windows) do
 		if (window.m_should_draw) then
-			-- if (window.m_pos) then
-			--     ImGui.SetNextWindowPos(window.m_pos.x, window.m_pos.y, ImGuiCond.Always)
-			-- end
+			if (window.m_pos) then
+				ImGui.SetNextWindowPos(window.m_pos.x, window.m_pos.y, ImGuiCond.Always)
+			end
+
 			if (window.m_size) then
 				ImGui.SetNextWindowSize(window.m_size.x, window.m_size.y, ImGuiCond.Always)
 			end

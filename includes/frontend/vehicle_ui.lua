@@ -1,4 +1,5 @@
 local default_cfg = require("includes.data.config")
+local vehicleTab = GUI:RegisterNewTab(eTabID.TAB_VEHICLE, "Cars")
 
 ---@type WindowRequest
 local speedometerOptionsWindow
@@ -8,30 +9,6 @@ local nosOptionsWindow
 
 ---@type WindowRequest
 local driftOptionsWindow
-
----@param label string
----@param callback GuiCallback
----@param onClose function
-local function QuickConfigWindow(label, callback, onClose)
-	local size = vec2:new(ImGui.GetWindowSize())
-	local _, center = GUI:GetNewWindowSizeAndCenterPos(0.5, 0.5, size)
-	ImGui.SetWindowPos(center.x, center.y,
-		ImGuiCond.Once | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoCollapse)
-
-	ImGui.SeparatorText(label)
-	if (GUI:Button("Close")) then
-		onClose()
-		return
-	end
-
-	if (type(callback) ~= "function") then
-		return
-	end
-
-	ImGui.Separator()
-	ImGui.Dummy(0, 10)
-	callback()
-end
 
 --#region cars
 local function speedoOptions()
@@ -80,14 +57,25 @@ local function speedoOptions()
 end
 
 local function driftOptions()
-	GVars.features.vehicle.drift.mode, _ = ImGui.Combo("Mode", GVars.features.vehicle.drift.mode, "Strong\0Slippery\0")
-	GVars.features.vehicle.drift.power, _ = ImGui.SliderInt("Torque Increase", GVars.features.vehicle.drift.power, 10,
-		100)
+	GVars.features.vehicle.drift.mode, _ = ImGui.Combo("Mode",
+		GVars.features.vehicle.drift.mode,
+		"Strong\0Slippery\0Mixed\0"
+	)
 
-	ImGui.BeginDisabled(GVars.features.vehicle.drift.mode ~= 1)
-	GVars.features.vehicle.drift.intensity, _ = ImGui.SliderInt("Strong Mode Intensity",
-		GVars.features.vehicle.drift.intensity, 1, 3)
+	GVars.features.vehicle.drift.power, _ = ImGui.SliderInt("Torque Increase",
+		GVars.features.vehicle.drift.power,
+		10,
+		100
+	)
+
+	ImGui.BeginDisabled(GVars.features.vehicle.drift.mode == 1)
+	GVars.features.vehicle.drift.intensity, _ = ImGui.SliderInt("Intensity",
+		GVars.features.vehicle.drift.intensity,
+		0,
+		3
+	)
 	ImGui.EndDisabled()
+	GUI:HelpMarker("Only applies to 'Strong' or 'Mixed' modes")
 end
 
 local function nosOptions()
@@ -123,8 +111,6 @@ local function RestoreExhaustPops()
 	end)
 end
 
-local vehicleTab = GUI:RegisterNewTab(eTabID.TAB_VEHICLE, "Cars")
-
 vehicleTab:AddBoolCommand("Brake Force Display", "features.vehicle.abs_lights",
 	nil, nil,
 	{ description = "Flashes your brake lights when braking from high speed. Only for vehicles equipped with ABS." },
@@ -149,15 +135,39 @@ vehicleTab:AddBoolCommand("High Beams on Horn", "features.vehicle.horn_beams", n
 	true)
 vehicleTab:AddBoolCommand("Auto Brake Lights", "features.vehicle.auto_brake_lights", nil, nil,
 	{ description = "placeholder" }, true)
+
 -- vehicleTab:AddBoolCommand("Can't Touch This!", "features.vehicle.no_carjacking", nil, nil, { description = "placeholder" }, true) -- most NPC's can't car jack you unless scripted to ignore ped flags
 -- vehicleTab:AddBoolCommand("Unbreakable Windows", "features.vehicle.unbreakable_windows", nil, nil, { description = "placeholder" }, true)
 -- vehicleTab:AddBoolCommand("Vehicle Mines", "features.vehicle.mines", nil, nil, { description = "placeholder" }, true)
--- vehicleTab:AddBoolCommand("Stronger Crashes", "features.vehicle.strong_crash", nil, nil, { description = "placeholder" }, true) -- makes car crashes actually scary
--- vehicleTab:AddBoolCommand("RGB Headlights", "features.vehicle.rgb_lights", nil, nil, { description = "placeholder" }, true)
+
+vehicleTab:AddBoolCommand("Stronger Crashes",
+	"features.vehicle.strong_crash",
+	nil,
+	function()
+		local PV = Self:GetVehicle()
+		local deform_mult = PV:Resolve().m_deform_mult
+		Self:GetVehicle():RestorePointer(deform_mult)
+	end,
+	{ description = "Makes car crashes actually scary" },
+	true
+)
+
+vehicleTab:AddBoolCommand("RGB Headlights", "features.vehicle.rgb_lights.enabled", nil,
+	function()
+		script.run_in_fiber(function()
+			Self:GetVehicle():RestoreHeadlights()
+		end)
+	end,
+	{ description = "placeholder" },
+	true
+)
+
 vehicleTab:AddBoolCommand("Flappy Doors", "features.vehicle.flappy_doors", nil, CloseDoors,
 	{ description = "placeholder" })
+
 vehicleTab:AddBoolCommand("Auto Lock Doors", "features.vehicle.auto_lock_doors", nil, nil,
 	{ description = "placeholder" }, true)
+
 vehicleTab:AddBoolCommand("Launch Control", "features.vehicle.launch_control", nil, nil,
 	{ description = "Simulates launch control. Only available for performance cars." }, true)
 
@@ -184,7 +194,7 @@ end, { description = "placeholder" }, true)
 speedometerOptionsWindow = {
 	m_label = "##speedometerOptionsWindow",
 	m_callback = function()
-		QuickConfigWindow("Speedometer Options", speedoOptions, function()
+		GUI:QuickConfigWindow("Speedometer Options", speedoOptions, function()
 			GUI:SetRequestedWindowDraw("##speedometerOptionsWindow", false)
 		end)
 	end,
@@ -195,7 +205,7 @@ speedometerOptionsWindow = {
 driftOptionsWindow = {
 	m_label = "##driftOptionsWindow",
 	m_callback = function()
-		QuickConfigWindow("Drift Options", driftOptions, function()
+		GUI:QuickConfigWindow("Drift Options", driftOptions, function()
 			GUI:SetRequestedWindowDraw("##driftOptionsWindow", false)
 		end)
 	end,
@@ -206,7 +216,7 @@ driftOptionsWindow = {
 nosOptionsWindow = {
 	m_label = "##nosOptionsWindow",
 	m_callback = function()
-		QuickConfigWindow("NOS Options", nosOptions, function()
+		GUI:QuickConfigWindow("NOS Options", nosOptions, function()
 			GUI:SetRequestedWindowDraw("##nosOptionsWindow", false)
 		end)
 	end,
@@ -214,8 +224,8 @@ nosOptionsWindow = {
 	m_should_draw = false,
 }
 
-GUI:RequestWindow(speedometerOptionsWindow) -- since we're drawing everything inside a main independent window, we can't call ImGui.Begin(...)
-GUI:RequestWindow(driftOptionsWindow)       -- so we only register then flip a flag and let GUI handle drawing our external windows
+GUI:RequestWindow(speedometerOptionsWindow)
+GUI:RequestWindow(driftOptionsWindow)
 GUI:RequestWindow(nosOptionsWindow)
 
 vehicleTab:RegisterGUI(function()
@@ -228,6 +238,15 @@ vehicleTab:RegisterGUI(function()
 		GVars.features.vehicle.performance_only,
 		{ tooltip = "Limits some features to performance cars only (Launch Control, Pops & Bangs, etc.)" }
 	)
+
+	if (GVars.features.vehicle.rgb_lights.enabled) then
+		GVars.features.vehicle.rgb_lights.speed, _ = ImGui.SliderInt("RGB Lights Speed",
+			GVars.features.vehicle.rgb_lights.speed,
+			1,
+			5
+		)
+	end
+
 	if (GVars.features.speedometer.enabled) then
 		if (GUI:Button("Speedometer##settings")) then
 			speedometerOptionsWindow.m_should_draw = true
@@ -252,7 +271,7 @@ end)
 
 
 --#region planes
--- local planesTab = vehicleTab:RegisterSubtab("Planes", function()
---     ImGui.Text("TODO")
--- end)
+local planesTab = vehicleTab:RegisterSubtab("Planes", function()
+	ImGui.Text("TODO")
+end)
 --#endregion

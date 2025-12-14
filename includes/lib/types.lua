@@ -4,7 +4,6 @@
 
 ---@class array<T> : { [integer]: T }
 ---@class dict<T> : { [string]: T }
----@class set<T> : { [T]: true }
 ---@class pair<K, V>: { first: K, second: V }
 ---@class tuple<T1, T2>: { [1]: T1, [2]: T2 }
 

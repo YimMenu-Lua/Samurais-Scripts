@@ -467,3 +467,12 @@ function Entity:DrawBoundingBox(color)
 		)
 	end
 end
+
+---@return boolean
+function Entity:HasCollidedWithAnything()
+	if (not self:Exists()) then
+		return false
+	end
+
+	return ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(self:GetHandle())
+end

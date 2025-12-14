@@ -1,6 +1,6 @@
 ---@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
 
-local VehicleFeatureBase = require("VehicleFeatureBase")
+local FeatureBase = require("includes.modules.FeatureBase")
 
 ---@enum eLaunchControlState
 local eLaunchControlState <const> = {
@@ -12,7 +12,7 @@ local eLaunchControlState <const> = {
 }
 
 ---@class LaunchControlMgr
----@field private m_pv PlayerVehicle -- Reference to PlayerVehicle
+---@field private m_entity PlayerVehicle
 ---@field private m_is_active boolean
 ---@field private m_thread Thread
 ---@field private m_state eLaunchControlState
@@ -21,12 +21,12 @@ local eLaunchControlState <const> = {
 ---@field private m_default_pops_off boolean
 ---@field private m_shocking_event_handle? handle
 ---@overload fun(pv: PlayerVehicle): LaunchControlMgr
-local LaunchControl = setmetatable({}, VehicleFeatureBase)
+local LaunchControl = setmetatable({}, FeatureBase)
 LaunchControl.__index = LaunchControl
 
 ---@param pv PlayerVehicle
 function LaunchControl.new(pv)
-	local self = VehicleFeatureBase.new(pv)
+	local self = FeatureBase.new(pv)
 	return setmetatable(self, LaunchControl)
 end
 
@@ -41,29 +41,33 @@ function LaunchControl:Init()
 end
 
 function LaunchControl:ShouldRun()
-	return self.m_pv
-		and self.m_pv:IsValid()
-		and self.m_pv:IsCar()
-		and (not GVars.features.vehicle.performance_only or self.m_pv:IsPerformanceCar())
+	return self.m_entity
+		and self.m_entity:IsValid()
+		and self.m_entity:IsCar()
+		and (not GVars.features.vehicle.performance_only or self.m_entity:IsPerformanceCar())
 		and GVars.features.vehicle.launch_control
 		and GVars.features.vehicle.burble_tune
-		and not self.m_pv:IsElectric()
+		and not self.m_entity:IsElectric()
 end
 
-function LaunchControl:OnEnterVehicle()
-	if (self.m_thread and not self.m_thread:IsRunning()) then
-		self.m_thread:Resume()
-	end
-end
+-- function LaunchControl:OnEnable()
+-- 	if (self.m_thread and not self.m_thread:IsRunning()) then
+-- 		self.m_thread:Resume()
+-- 	end
+-- end
 
-function LaunchControl:OnLeaveVehicle()
-	if (self.m_thread and self.m_thread:IsRunning()) then
-		self.m_thread:Suspend()
-	end
-end
+-- function LaunchControl:OnDisable()
+-- 	if (self.m_thread and self.m_thread:IsRunning()) then
+-- 		self.m_thread:Suspend()
+-- 	end
+-- end
 
 function LaunchControl:Update()
-	local PV = self.m_pv
+	local PV = self.m_entity
+	if (PV:IsElectric()) then
+		return
+	end
+
 	local handle = PV:GetHandle()
 	local rpmThreshold
 
@@ -136,7 +140,7 @@ function LaunchControl:Update()
 end
 
 function LaunchControl:RestoreExhaustPops()
-	local PV = self.m_pv
+	local PV = self.m_entity
 	if (not self.m_default_pops_off or not PV or not PV:IsValid()) then
 		return
 	end
@@ -145,17 +149,13 @@ function LaunchControl:RestoreExhaustPops()
 end
 
 function LaunchControl:Mainthread()
-	local PV = self.m_pv
+	local PV = self.m_entity
 	if (not PV or not PV:IsValid() or not GVars.features.vehicle.launch_control) then
 		sleep(250)
 		return
 	end
 
-	if (not Self:IsDriving()
-			or not PV:IsCar()
-			or not PV:IsPerformanceCar()
-			or PV:IsElectric()
-		) then
+	if (not Self:IsDriving()) then
 		sleep(250)
 		return
 	end

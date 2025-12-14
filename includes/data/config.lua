@@ -1,6 +1,6 @@
 ---@class Config
 local Config <const> = {
-	__config_version = "0.1b",
+	__config_version = "0.1c",
 	__dev_reset = false,
 	backend = {
 		debug_mode = false,
@@ -82,6 +82,12 @@ local Config <const> = {
 		}
 	},
 	features = {
+		self = {
+			autoheal = {
+				enabled = false,
+				regen_speed = 1
+			},
+		},
 		dunk = {
 			bypass_casino_bans = false,
 			force_poker_cards = false,
@@ -107,7 +113,7 @@ local Config <const> = {
 			},
 			drift = {
 				enabled = false,
-				mode = 1,
+				mode = 0,
 				intensity = 1,
 				power = 50,
 			},
@@ -124,7 +130,10 @@ local Config <const> = {
 			no_carjacking = false,
 			unbreakable_windows = false,
 			flappy_doors = false,
-			rgb_lights = false,
+			rgb_lights = {
+				enabled = false,
+				speed = 1,
+			},
 			cobra_maneuver = false,
 			missile_defence = false,
 			mines = false,

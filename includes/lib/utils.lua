@@ -72,8 +72,7 @@ function IsInstance(obj, T)
 		return T == "nil"
 	end
 
-	---@type set
-	local std_types <const> = {
+	local std_types <const>  = {
 		["table"]    = true,
 		["string"]   = true,
 		["number"]   = true,
@@ -82,14 +81,13 @@ function IsInstance(obj, T)
 		["userdata"] = true
 	}
 
-	---@type set
 	local math_types <const> = {
 		["integer"] = true,
 		["float"]   = true
 	}
 
-	local obj_type <const>  = type(obj)
-	local T_type <const>    = type(T)
+	local obj_type <const>   = type(obj)
+	local T_type <const>     = type(T)
 	if (T_type == "string" and T == "pointer" and obj_type == "userdata") then
 		return (type(obj.rip) == "function")
 	end
@@ -145,7 +143,7 @@ end
 
 -- A poor man's `sizeof` 🥲
 ---@param T any
----@param seen? set<table> Circular reference
+---@param seen? table Circular reference
 ---@return number
 function SizeOf(T, seen)
 	local types <const> = {
@@ -655,7 +653,7 @@ end
 ---@param tbl table
 ---@param indent? number
 ---@param key_order? table
----@param seen? set
+---@param seen? table
 table.serialize = function(tbl, indent, key_order, seen)
 	indent = indent or 2
 	seen = seen or {}
@@ -785,7 +783,7 @@ end
 --
 -- NOTE: This is **VERY** inaccurate.
 ---@param t table
----@param seen? set<table>
+---@param seen? table
 ---@return number
 table.sizeof = function(t, seen)
 	if (type(t) ~= "table") then
@@ -849,7 +847,7 @@ table.removeduplicates = function(t, debug)
 end
 
 ---@param t table
----@param seen? set
+---@param seen? table
 table.copy = function(t, seen)
 	seen = seen or {}
 	if seen[t] then
@@ -872,7 +870,7 @@ end
 
 ---@param a table
 ---@param b table
----@param seen? set<table, true>
+---@param seen? table
 ---@return boolean
 function table.is_equal(a, b, seen)
 	if (a == b) then

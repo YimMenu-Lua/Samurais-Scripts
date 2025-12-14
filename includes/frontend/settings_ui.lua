@@ -82,7 +82,9 @@ local function DrawGuiSettings()
 				if (ImGui.ArrowButton("##bottom", 3)) then
 					GUI:Snap(1)
 				end
+
 				ImGui.PopStyleVar()
+				GUI:ShowWindowHeightLimit()
 			end,
 			ImGui.CloseCurrentPopup
 		)
@@ -91,19 +93,32 @@ local function DrawGuiSettings()
 
 	local resolution = Game.GetScreenResolution()
 
-	GVars.ui.window_size.x, _ = ImGui.SliderFloat("Window Width", GVars.ui.window_size.x, 200, resolution.x, "%.0f",
+	GVars.ui.window_size.x, _ = ImGui.SliderFloat("Window Width",
+		GVars.ui.window_size.x,
+		GUI:GetMaxTopBarHeight(),
+		resolution.x, "%.0f",
 		---@diagnostic disable-next-line
-		ImGuiSliderFlags.NoInput)
+		ImGuiSliderFlags.NoInput
+	)
+
 	ImGui.SameLine()
 	if GUI:Button("Reset##width") then
 		GUI:ResetWidth()
 	end
 
-	GVars.ui.window_size.y, changed = ImGui.SliderFloat("Max Window Height", GVars.ui.window_size.y, 200, resolution.y,
+	local top_bar_height = GUI:GetMaxTopBarHeight() + 10
+	GVars.ui.window_size.y, _ = ImGui.SliderFloat("Max Window Height",
+		GVars.ui.window_size.y,
+		top_bar_height, resolution.y - top_bar_height,
 		---@diagnostic disable-next-line
-		"%.0f", ImGuiSliderFlags.NoInput)
+		"%.0f", ImGuiSliderFlags.NoInput
+	)
+	if (ImGui.IsItemHovered()) then
+		GUI:ShowWindowHeightLimit()
+	end
 	GUI:HelpMarker(
 		"The window is dynamic, it resizes itself vertically based on content.\n\nThis option allows you to set the maximum allowed height.")
+
 	ImGui.SameLine()
 	if (GUI:Button("Reset##height")) then
 		GUI:ResetHeight()

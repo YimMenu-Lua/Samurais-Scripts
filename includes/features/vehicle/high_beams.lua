@@ -1,17 +1,17 @@
 ---@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
 
-local VehicleFeatureBase = require("VehicleFeatureBase")
+local FeatureBase = require("includes.modules.FeatureBase")
 
----@class HighBeams : VehicleFeatureBase
----@field private m_pv PlayerVehicle -- Reference to PlayerVehicle
+---@class HighBeams : FeatureBase
+---@field private m_entity PlayerVehicle
 ---@field private m_is_active boolean
-local HighBeams = setmetatable({}, VehicleFeatureBase)
+local HighBeams = setmetatable({}, FeatureBase)
 HighBeams.__index = HighBeams
 
 ---@param pv PlayerVehicle
 ---@return HighBeams
 function HighBeams.new(pv)
-	local self = VehicleFeatureBase.new(pv)
+	local self = FeatureBase.new(pv)
 	return setmetatable(self, HighBeams)
 end
 
@@ -20,17 +20,17 @@ function HighBeams:Init()
 end
 
 function HighBeams:ShouldRun()
-	return (self.m_pv
-		and self.m_pv:IsValid()
-		and self.m_pv:IsLandVehicle()
-		and self.m_pv:IsEngineOn()
+	return (self.m_entity
+		and self.m_entity:IsValid()
+		and self.m_entity:IsLandVehicle()
+		and self.m_entity:IsEngineOn()
 		and Self:IsDriving()
 		and GVars.features.vehicle.horn_beams
-		and not VEHICLE.GET_BOTH_VEHICLE_HEADLIGHTS_DAMAGED(self.m_pv:GetHandle()))
+		and not VEHICLE.GET_BOTH_VEHICLE_HEADLIGHTS_DAMAGED(self.m_entity:GetHandle()))
 end
 
 function HighBeams:Update()
-	local handle = self.m_pv:GetHandle()
+	local handle = self.m_entity:GetHandle()
 	local pressed = PAD.IS_CONTROL_PRESSED(0, 86)
 	if (pressed ~= self.m_is_active) then
 		self.m_is_active = pressed

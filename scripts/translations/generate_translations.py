@@ -1,9 +1,9 @@
 # Samurai's Scripts Translation Generator
 #
 # Usage:
-#   python generate_translations.py           : normal run (just hit F5 if in VS Code and have Python Debugger installed)
-#   python generate_translations.py --dry-run : don't write files, just show diff summary (CLI)
-#   python generate_translations.py --diff    : print diff summary only (CLI)
+#	python generate_translations.py				: normal run (just hit F5 if in VS Code and have Python Debugger installed)
+#	python generate_translations.py --dry-run	: don't write files, just show diff summary (CLI)
+#	python generate_translations.py --diff		: print diff summary only (CLI)
 #
 #	CI Run: Don't pass any arguments
 
@@ -129,6 +129,7 @@ def get_translator(iso: str):
 		except Exception:
 			FAILED_LANGS.add(iso)
 			return None
+
 
 def translate_text(iso: str, text: str) -> str:
 	tr = get_translator(iso)

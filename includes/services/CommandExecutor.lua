@@ -495,6 +495,7 @@ function CommandExecutor:Draw()
 			gui.override_mouse(true)
 		end
 
+		ThemeManager:PushTheme()
 		if ImGui.Begin(
 				"Command Executor",
 				ImGuiWindowFlags.NoTitleBar |
@@ -502,7 +503,6 @@ function CommandExecutor:Draw()
 				ImGuiWindowFlags.NoResize |
 				ImGuiWindowFlags.NoScrollbar
 			) then
-			ThemeManager:PushTheme()
 			ImGui.SetNextWindowBgAlpha(0)
 			ImGui.BeginChild("main", 0, self.window_size.y * 0.7)
 			ImGui.Spacing()
@@ -570,8 +570,8 @@ function CommandExecutor:Draw()
 			end
 
 			self:DrawCommandDump()
-			ThemeManager:PopTheme()
 			ImGui.End()
+			ThemeManager:PopTheme()
 		end
 	end
 end

@@ -1,20 +1,20 @@
 ---@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
 
-local VehicleFeatureBase = require("VehicleFeatureBase")
+local FeatureBase = require("includes.modules.FeatureBase")
 
----@class DriftMode : VehicleFeatureBase
----@field private m_pv PlayerVehicle -- Reference to PlayerVehicle
+---@class DriftMode : FeatureBase
+---@field private m_entity PlayerVehicle -- Reference to PlayerVehicle
 ---@field private m_smoke_fx_l array<handle>|nil
 ---@field private m_smoke_fx_r array<handle>|nil
 ---@field private m_is_active boolean
 ---@overload fun(pv: PlayerVehicle): DriftMode
-local DriftMode = setmetatable({}, VehicleFeatureBase)
+local DriftMode = setmetatable({}, FeatureBase)
 DriftMode.__index = DriftMode
 
 ---@param pv PlayerVehicle
 ---@return DriftMode
 function DriftMode.new(pv)
-	local self = VehicleFeatureBase.new(pv)
+	local self = FeatureBase.new(pv)
 	return setmetatable(self, DriftMode)
 end
 
@@ -23,10 +23,10 @@ function DriftMode:Init()
 end
 
 function DriftMode:ShouldRun()
-	return (self.m_pv
-		and self.m_pv:IsValid()
-		and self.m_pv:IsLandVehicle()
-		and self.m_pv:IsEngineOn()
+	return (self.m_entity
+		and self.m_entity:IsValid()
+		and self.m_entity:IsLandVehicle()
+		and self.m_entity:IsEngineOn()
 		and Self:IsDriving()
 		and GVars.features.vehicle.drift.enabled)
 end
@@ -41,7 +41,7 @@ end
 -- end
 
 function DriftMode:Update()
-	local PV = self.m_pv
+	local PV = self.m_entity
 	local handle = PV:GetHandle()
 
 	if (PV:IsDriftButtonPressed()) then
@@ -50,10 +50,12 @@ function DriftMode:Update()
 		local powerIncrease = GVars.features.vehicle.drift.power
 
 		if (not self.m_active) then
-			if (mode == 1) then
+			if (mode == 0 or mode == 2) then
 				VEHICLE.SET_VEHICLE_REDUCE_GRIP(handle, true)
 				VEHICLE.SET_VEHICLE_REDUCE_GRIP_LEVEL(handle, intensty)
-			else
+			end
+
+			if (mode >= 1) then
 				VEHICLE.SET_DRIFT_TYRES(handle, true)
 			end
 		end

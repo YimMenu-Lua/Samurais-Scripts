@@ -1,6 +1,9 @@
 ---@diagnostic disable: param-type-mismatch
 
-local PlayerVehicle = require("includes.features.PlayerVehicle")
+local PlayerVehicle = require("includes.modules.PlayerVehicle")
+local FeatureMgr = require("includes.services.FeatureManager")
+local autoHeal = require("includes.features.self.autoheal")
+
 --------------------------------------
 -- Class: Self
 --------------------------------------
@@ -12,10 +15,14 @@ local PlayerVehicle = require("includes.features.PlayerVehicle")
 ---@field private m_internal CPed
 ---@field private m_vehicle PlayerVehicle
 ---@field private m_last_vehicle? Vehicle
+---@field private m_feat_mgr FeatureManager
 ---@field Resolve fun(self: Self) : CPed
 ---@overload fun(): Self
 Self = Class("Self", Player)
 Self.m_vehicle = PlayerVehicle:init(0)
+Self.m_feat_mgr = FeatureMgr.new(Self)
+Self.m_feat_mgr:Add(autoHeal.new(Self))
+
 ---@override
 Self.new = nil
 
@@ -44,24 +51,27 @@ function Self:GetVehicle()
 	return self.m_vehicle
 end
 
+function Self:GetMaxArmour()
+	return PLAYER.GET_PLAYER_MAX_ARMOUR(PLAYER.PLAYER_ID())
+end
+
 ---@return Vehicle|nil
 function Self:GetLastVehicle()
 	return self.m_last_vehicle
 end
 
 function Self:OnVehicleSwitch()
-	if (self.m_last_vehicle and self.m_last_vehicle:IsValid()) then
-		if (self.m_vehicle:HasLoudRadio()) then
-			self.m_vehicle:ToggleSubwoofer(false)
-			AUDIO.SET_VEHICLE_RADIO_LOUD(self.m_last_vehicle:GetHandle(), false)
+	if (self.m_vehicle:IsValid()) then
+		self.m_vehicle:ToggleSubwoofer(false)
+		self.m_vehicle:RestoreHeadlights()
+
+		if (self.m_vehicle:IsLocked()) then
+			self.m_vehicle:LockDoors(false)
 		end
 
-		if (self.m_last_vehicle:IsLocked()) then
-			self.m_last_vehicle:LockDoors(false)
-		end
+		self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
 	end
 
-	self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
 	self.m_vehicle:Reset()
 	sleep(500)
 	self.m_vehicle:Set(self:GetVehicleNative())
@@ -273,10 +283,10 @@ function Self:RemoveAttachments(lookup_table)
 end
 
 function Self:Destroy()
-	---@diagnostic disable-next-line
-	self:super():Destroy()
 	self.m_vehicle:Reset()
 	self.m_last_vehicle = nil
+	---@diagnostic disable-next-line
+	self:super():Destroy()
 end
 
 Backend:RegisterEventCallback(eBackendEvent.PLAYER_SWITCH, function()
@@ -287,10 +297,8 @@ Backend:RegisterEventCallback(eBackendEvent.SESSION_SWITCH, function()
 	Self:Destroy()
 end)
 
--- An example thread to handle custom local player logic.
--- Create and cache a new `Vehicle` instance only once if it either
--- doesn't already exist or doesn't match the player's current vehicle.
-ThreadManager:CreateNewThread("SS_SELF", function()
+
+ThreadManager:CreateNewThread("SS_PV_HANDLER", function()
 	if (Self.m_vehicle and Self.m_vehicle:IsValid()) then
 		if (Self:IsOnFoot()) then
 			Self:OnVehicleExit()
@@ -305,4 +313,8 @@ ThreadManager:CreateNewThread("SS_SELF", function()
 		Self.m_vehicle:Reset()
 		sleep(1000)
 	end
+end)
+
+ThreadManager:CreateNewThread("SS_SELF", function()
+	Self.m_feat_mgr:Update()
 end)

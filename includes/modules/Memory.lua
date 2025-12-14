@@ -158,7 +158,7 @@ end
 -- Returns the model type of an entity (ped, object, vehicle, MLO, time, etc...)
 ---@param entity handle
 ---@return eModelType
-function Memory:GetEntityType(entity)
+function Memory:GetEntityModelType(entity)
 	if not ENTITY.DOES_ENTITY_EXIST(entity) then
 		return eModelType.Invalid
 	end

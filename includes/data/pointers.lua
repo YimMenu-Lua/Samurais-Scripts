@@ -13,7 +13,7 @@ PatternScanner = require("includes.services.PatternScanner"):init()
 ---@class GPointers
 ---@field GameState pointer<byte>
 ---@field GameTime pointer<uint32_t>
-GPointers = {
+local GPointers = {
 	Init = function()
 		PatternScanner:Scan()
 	end,
@@ -78,3 +78,5 @@ PatternScanner:Add("ScreenResolution", "66 0F 6E 0D ? ? ? ? 0F B7 3D", function(
 		ptr:add(0x4):rip():get_word()
 	)
 end)
+
+return GPointers

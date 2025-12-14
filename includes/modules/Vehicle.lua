@@ -1,3 +1,16 @@
+local collisionInvalidModels = Set.new(
+	3008087081,
+	415536433,
+	874602658,
+	693843550,
+	4189527861,
+	1152297372,
+	3907562202,
+	2954040756,
+	1198649884,
+	1067874014
+)
+
 --------------------------------------
 -- Class: Vehicle
 --------------------------------------
@@ -267,6 +280,48 @@ function Vehicle:HasABS()
 	return self:GetModelFlag(eVehicleModelFlags.ABS_STD)
 end
 
+function Vehicle:HasCrashed()
+	if (not self:HasCollidedWithAnything()) then
+		return false, ""
+	end
+
+	local handle = self:GetHandle()
+	local last = ENTITY.GET_LAST_ENTITY_HIT_BY_ENTITY_(handle)
+
+	if (not last or (last == 0) or not ENTITY.DOES_ENTITY_EXIST(last)) then
+		return false, ""
+	end
+
+	if (not ENTITY.IS_ENTITY_A_PED(last)
+			and not ENTITY.IS_ENTITY_A_VEHICLE(last)
+			and not ENTITY.IS_ENTITY_AN_OBJECT(last)
+		) then
+		return true, "Samir, you're breaking the car!"
+	end
+
+	local entity_type = Memory:GetEntityModelType(last)
+
+	if (entity_type == eModelType.Invalid) then
+		return false, ""
+	elseif (entity_type == eModelType.Ped) then
+		return false, "Hit and run"
+	elseif (entity_type == eModelType.Vehicle) then
+		return true, "Samir, you're breaking the car!"
+	elseif (entity_type == eModelType.Object or entity_type == eModelType.Destructible) then
+		if (ENTITY.DOES_ENTITY_HAVE_PHYSICS(last)) then
+			local model = ENTITY.GET_ENTITY_MODEL(last)
+			if collisionInvalidModels:Contains(model) then
+				return true, "Samir, you're breaking the car!"
+			end
+			return false, "Wrecking ball"
+		else
+			return true, "Samir, you're breaking the car!"
+		end
+	else
+		return false, ""
+	end
+end
+
 ---@return boolean
 function Vehicle:IsSports()
 	return self:GetModelInfoFlag(eVehicleModelInfoFlags.SPORTS)
@@ -293,9 +348,9 @@ function Vehicle:IsPerformanceCar()
 		return false
 	end
 
-	local cvehicle = self:Resolve()
-	if (not cvehicle) then
-		return false
+	local cls = self:GetClassID()
+	if (cls == eVehicleClasses.Sports or cls == eVehicleClasses.Super) then
+		return true
 	end
 
 	local allowedClasses <const> = {
@@ -308,7 +363,12 @@ function Vehicle:IsPerformanceCar()
 		eVehicleClasses.Super,
 	}
 
-	if not allowedClasses[self:GetClassID()] then
+	if not allowedClasses[cls] then
+		return false
+	end
+
+	local cvehicle = self:Resolve()
+	if (not cvehicle) then
 		return false
 	end
 
@@ -544,7 +604,7 @@ function Vehicle:GetExhaustBones()
 
 	local bones   = {}
 	local count   = VEHICLE.GET_VEHICLE_MAX_EXHAUST_BONE_COUNT_() -
-	1                                                              -- all vehicles have an additional exhaust bone sticking out of the top of the engine.
+		1 -- all vehicles have an additional exhaust bone sticking out of the top of the engine.
 	local bParam  = false
 	local boneIdx = -1
 
@@ -1142,6 +1202,14 @@ function Vehicle.CreateFromJSON(filename, warp_into)
 	end
 
 	return new_veh
+end
+
+function Vehicle:Destroy()
+	self.m_handle    = nil
+	self.m_modelhash = nil
+	self.m_internal  = nil
+	self.m_ptr       = nil
+	return nil
 end
 
 -------------------------

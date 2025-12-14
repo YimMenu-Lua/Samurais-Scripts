@@ -1,11 +1,13 @@
 ---@diagnostic disable: param-type-mismatch
 
-local VehicleFeatureMgr = require("VehicleFeatureMgr")
+local FeatureMgr = require("includes.services.FeatureManager")
 local NosMgr = require("includes.features.vehicle.nos")
 local LaunchControlMgr = require("includes.features.vehicle.launch_control")
 local DriftMode = require("includes.features.vehicle.drift_mode")
 local HighBeams = require("includes.features.vehicle.high_beams")
 local IVExit = require("includes.features.vehicle.iv_style_exit")
+local RGBLights = require("includes.features.vehicle.rgb_lights")
+local CarCrash = require("includes.features.vehicle.car_crashes")
 
 -- Singleton
 ---@class PlayerVehicle : Vehicle
@@ -14,7 +16,7 @@ local IVExit = require("includes.features.vehicle.iv_style_exit")
 ---@field private m_abs_sm StateMachine
 ---@field private m_esc_sm StateMachine
 ---@field private m_flappy_doors_sm StateMachine
----@field private m_feat_mgr VehicleFeatureMgr
+---@field private m_feat_mgr FeatureManager
 ---@field private m_nos_mgr NosMgr
 ---@field private m_lctrl_mgr LaunchControlMgr
 ---@field private m_door_lock_state integer
@@ -23,6 +25,8 @@ local IVExit = require("includes.features.vehicle.iv_style_exit")
 ---@field private m_handling_flags_to_change table<string, { flag : eVehicleHandlingFlags, bikes_only : boolean }>
 ---@field private m_default_max_speed float
 ---@field private m_has_loud_radio boolean
+---@field private m_default_pointers table<pointer, { set_func: fun(self: pointer, v: anyval), default_value: anyval }>
+---@field public m_default_xenon_lights { enabled: boolean, index: integer }
 ---@overload fun(handle: handle): PlayerVehicle
 local PlayerVehicle = Class("PlayerVehicle", Vehicle)
 PlayerVehicle.m_handling_flags_to_change = {
@@ -40,13 +44,15 @@ function PlayerVehicle:GetLaunchControlMgr()
 end
 
 function PlayerVehicle:InitFeatures()
-	self.m_feat_mgr  = VehicleFeatureMgr.new(self)
+	self.m_feat_mgr  = FeatureMgr.new(self)
 	self.m_lctrl_mgr = self.m_feat_mgr:Add(LaunchControlMgr.new(self))
 	self.m_nos_mgr   = self.m_feat_mgr:Add(NosMgr.new(self))
 
 	self.m_feat_mgr:Add(DriftMode.new(self))
 	self.m_feat_mgr:Add(HighBeams.new(self))
 	self.m_feat_mgr:Add(IVExit.new(self))
+	self.m_feat_mgr:Add(RGBLights.new(self))
+	self.m_feat_mgr:Add(CarCrash.new(self))
 end
 
 ---@return PlayerVehicle
@@ -57,6 +63,8 @@ function PlayerVehicle:init(handle)
 		m_handle = handle,
 		m_threads = {},
 		m_default_handling_flags = {},
+		m_default_pointers = {},
+		m_default_xenon_lights = { enabled = false, index = 0 },
 		m_default_max_speed = 0,
 	}, PlayerVehicle)
 
@@ -108,6 +116,94 @@ function PlayerVehicle:init(handle)
 	return instance
 end
 
+---@param handle handle
+function PlayerVehicle:Set(handle)
+	if (handle == self.m_handle) then
+		return
+	end
+
+	local shouldReadFlags = false
+	local new_model = ENTITY.GET_ENTITY_MODEL(handle)
+	shouldReadFlags = self.m_last_model ~= new_model
+
+	self.m_default_max_speed = VEHICLE.GET_VEHICLE_MODEL_ESTIMATED_MAX_SPEED(new_model)
+	self.m_last_model = new_model
+	self.m_handle = handle
+	---@diagnostic disable-next-line
+
+	if (shouldReadFlags) then
+		self:GetDefaultHandlingFlags()
+	end
+
+	self.m_default_xenon_lights.enabled = VEHICLE.IS_TOGGLE_MOD_ON(handle, 22)
+	self.m_default_xenon_lights.index = VEHICLE.GET_VEHICLE_XENON_LIGHT_COLOR_INDEX(handle)
+	-- self:ResumeThreads()
+	-- self.m_feat_mgr:OnEnable()
+end
+
+function PlayerVehicle:Reset()
+	-- self.m_feat_mgr:OnDisable()
+	-- self:SuspendThreads()
+	self:RestoreHeadlights()
+	self:RestoreExhaustPops()
+	self:ResetHandlingFlags()
+	self:ResetPointers()
+
+	self.m_last_model = self:GetModelHash()
+	self:Destroy()
+	self.m_handle = 0
+end
+
+---@return hash
+function PlayerVehicle:GetModelHash()
+	return ENTITY.GET_ENTITY_MODEL(self:GetHandle())
+end
+
+function PlayerVehicle:GetDefaultMaxSpeed()
+	return self.m_default_max_speed
+end
+
+---@param ptr pointer
+---@param getFunc fun(self: pointer): anyval
+---@param setFunc fun(self: pointer, v: anyval)
+---@param value anyval
+function PlayerVehicle:WriteMemory(ptr, getFunc, setFunc, value)
+	if (ptr:is_null()) then
+		return
+	end
+
+	if (not self.m_default_pointers[ptr]) then
+		self.m_default_pointers[ptr] = { set_func = setFunc, default_value = getFunc(ptr) }
+	end
+
+	setFunc(ptr, value)
+end
+
+---@param ptr pointer
+function PlayerVehicle:RestorePointer(ptr)
+	local data = self.m_default_pointers[ptr]
+	if (ptr:is_null() or not data) then
+		return
+	end
+
+	data.set_func(ptr, data.default_value)
+	self.m_default_pointers[ptr] = nil
+end
+
+function PlayerVehicle:ResetPointers()
+	if (next(self.m_default_pointers) == nil) then
+		return
+	end
+
+	for ptr, data in pairs(self.m_default_pointers) do
+		if (ptr:is_valid() and data.default_value ~= nil and type(data.set_func) == "function") then
+			data.set_func(ptr, data.default_value)
+		end
+	end
+
+	self.m_default_pointers = {}
+end
+
 ---@return boolean
 function PlayerVehicle:IsAnyThreadRunning()
 	for _, thread in ipairs(self.m_threads) do
@@ -133,46 +229,6 @@ function PlayerVehicle:ResumeThreads()
 			thread:Resume()
 		end
 	end
-end
-
-function PlayerVehicle:GetModelHash()
-	return ENTITY.GET_ENTITY_MODEL(self:GetHandle())
-end
-
-function PlayerVehicle:GetDefaultMaxSpeed()
-	return self.m_default_max_speed
-end
-
----@param handle handle
-function PlayerVehicle:Set(handle)
-	local shouldReadFlags = false
-	local new_model = ENTITY.GET_ENTITY_MODEL(handle)
-	shouldReadFlags = self.m_last_model ~= new_model
-
-	self.m_default_max_speed = VEHICLE.GET_VEHICLE_MODEL_ESTIMATED_MAX_SPEED(new_model)
-	self.m_last_model = new_model
-	self.m_handle = handle
-
-	if (shouldReadFlags) then
-		self:GetDefaultHandlingFlags()
-	end
-
-	self:ResumeThreads()
-	self.m_feat_mgr:OnEnterVehicle()
-end
-
-function PlayerVehicle:Reset()
-	self:ResetHandlingFlags()
-	self.m_last_model = self:GetModelHash()
-	self.m_handle = 0
-	self.m_feat_mgr:OnLeaveVehicle()
-	self:SuspendThreads()
-
-	-- `super()` doesn't give type inference so the language server doesn't know that it's a Vehicle class.
-	-- We need to call `Destroy` to invalidate cached pointers and internal data, otherwise when swapping vehicles
-	-- we'll be stuck with the previous vehicle's internal data. See Entity:Resolve() for more information
-	---@diagnostic disable-next-line
-	self:super():Destroy()
 end
 
 ---@return boolean
@@ -260,6 +316,17 @@ end
 function PlayerVehicle:ToggleSubwoofer(toggle)
 	AUDIO.SET_VEHICLE_RADIO_LOUD(self:GetHandle(), toggle)
 	self.m_has_loud_radio = toggle
+end
+
+function PlayerVehicle:RestoreHeadlights()
+	if (not self:IsValid()) then
+		return
+	end
+
+	local handle = self:GetHandle()
+	VEHICLE.SET_VEHICLE_XENON_LIGHT_COLOR_INDEX(handle, self.m_default_xenon_lights.index)
+	VEHICLE.TOGGLE_VEHICLE_MOD(handle, 22, self.m_default_xenon_lights.enabled)
+	VEHICLE.SET_VEHICLE_LIGHT_MULTIPLIER(handle, 1.0)
 end
 
 ---@return boolean
