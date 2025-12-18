@@ -140,7 +140,7 @@ function YRV3:PopulateBikerBusinessSlot(index)
                 name = v.name,
                 id = v.id,
                 unit_max = v.unit_max,
-                val_offset = v.val_offset,
+                value_tunable = v.val_tunable,
                 blip = v.blip,
             }
         end
@@ -176,35 +176,35 @@ function YRV3:GetCEOCratesValue(crates)
         return 0
     end
 
-    if crates == 1 then
-        return globals.get_int(FreemodeGlobal1 + 15732) -- EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1
-    end
+	if (crates == 1) then
+		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1") -- EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1
+	end
 
-    if crates == 2 then
-        return globals.get_int(FreemodeGlobal1 + 15733) * 2
-    end
+	if (crates == 2) then
+		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD2") * 2 -- +1
+	end
 
-    if crates == 3 then
-        return globals.get_int(FreemodeGlobal1 + 15734) * 3
-    end
+	if (crates == 3) then
+		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD3") * 3 -- +1
+	end
 
-    if crates == 4 or crates == 5 then
-        return globals.get_int(FreemodeGlobal1 + 15735) * crates
-    end
+	if (crates == 4 or crates == 5) then
+		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD4") * crates -- +1
+	end
 
-    if crates >= 6 and crates <= 9 then
-        return (globals.get_int(FreemodeGlobal1 + 15735) + math.floor((crates - 4) / 2)) * crates
-    end
+	if (crates >= 6 and crates <= 9) then
+		return (tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD4") + math.floor((crates - 4) / 2)) * crates -- +0
+	end
 
-    if crates >= 10 and crates <= 110 then
-        return (globals.get_int(FreemodeGlobal1 + 15738) + math.floor((crates - 10) / 5)) * crates
-    end
+	if (crates >= 10 and crates <= 110) then
+		return (tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD7") + math.floor((crates - 10) / 5)) * crates -- +3
+	end
 
-    if crates == 111 then
-        return globals.get_int(FreemodeGlobal1 + 15752) * 111
-    end
+	if (crates == 111) then
+		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD21") * 111 -- + 14
+	end
 
-    return 0
+	return 0
 end
 
 function YRV3:FinishCEOCargoSourceMission()
@@ -674,36 +674,36 @@ YRV3.t_SellScripts = {
 }
 
 YRV3.t_CEOwarehouses = {
-    { id = 1, size = 0, max = 16, coords = vec3:new(51.311188, -2568.470947, 6.004591) },
-    { id = 2, size = 0, max = 16, coords = vec3:new(-1081.083740, -1261.013184, 5.648909) },
-    { id = 3, size = 0, max = 16, coords = vec3:new(898.484314, -1031.882446, 34.966454) },
-    { id = 4, size = 0, max = 16, coords = vec3:new(249.246918, -1955.651978, 23.161957) },
-    { id = 5, size = 0, max = 16, coords = vec3:new(-424.773499, 184.146530, 80.752899) },
-    { id = 6, size = 2, max = 111, coords = vec3:new(-1045.004395, -2023.150146, 13.161570) },
-    { id = 7, size = 1, max = 42, coords = vec3:new(-1269.286133, -813.215820, 17.107399) },
-    { id = 8, size = 2, max = 111, coords = vec3:new(-876.108032, -2734.502930, 13.844264) },
-    { id = 9, size = 0, max = 16, coords = vec3:new(272.409424, -3015.267090, 5.707359) },
-    { id = 10, size = 1, max = 42, coords = vec3:new(1563.832031, -2135.110840, 77.616447) },
-    { id = 11, size = 1, max = 42, coords = vec3:new(-308.772247, -2698.393799, 6.000292) },
-    { id = 12, size = 1, max = 42, coords = vec3:new(503.738037, -653.082642, 24.751144) },
-    { id = 13, size = 1, max = 42, coords = vec3:new(-528.074585, -1782.701904, 21.483055) },
-    { id = 14, size = 1, max = 42, coords = vec3:new(-328.013458, -1354.755371, 31.296524) },
-    { id = 15, size = 1, max = 42, coords = vec3:new(349.901184, 327.976440, 104.303856) },
-    { id = 16, size = 2, max = 111, coords = vec3:new(922.555481, -1560.048950, 30.756647) },
-    { id = 17, size = 2, max = 111, coords = vec3:new(762.672363, -909.193054, 25.250854) },
-    { id = 18, size = 2, max = 111, coords = vec3:new(1041.059814, -2172.653076, 31.488876) },
-    { id = 19, size = 2, max = 111, coords = vec3:new(1015.361633, -2510.986572, 28.302608) },
-    { id = 20, size = 2, max = 111, coords = vec3:new(-245.651718, 202.504669, 83.792648) },
-    { id = 21, size = 1, max = 42, coords = vec3:new(541.587646, -1944.362793, 24.985096) },
-    { id = 22, size = 2, max = 111, coords = vec3:new(93.278641, -2216.144775, 6.033320) },
+    { id = 1,  size = 0, max = 16,  coords = vec3:new(51.311188, -2568.470947, 6.004591) },
+	{ id = 2,  size = 0, max = 16,  coords = vec3:new(-1081.083740, -1261.013184, 5.648909) },
+	{ id = 3,  size = 0, max = 16,  coords = vec3:new(898.484314, -1031.882446, 34.966454) },
+	{ id = 4,  size = 0, max = 16,  coords = vec3:new(249.246918, -1955.651978, 23.161957) },
+	{ id = 5,  size = 0, max = 16,  coords = vec3:new(-424.773499, 184.146530, 80.752899) },
+	{ id = 6,  size = 2, max = 111, coords = vec3:new(-1045.004395, -2023.150146, 13.161570) },
+	{ id = 7,  size = 1, max = 42,  coords = vec3:new(-1269.286133, -813.215820, 17.107399) },
+	{ id = 8,  size = 2, max = 111, coords = vec3:new(-876.108032, -2734.502930, 13.844264) },
+	{ id = 9,  size = 0, max = 16,  coords = vec3:new(272.409424, -3015.267090, 5.707359) },
+	{ id = 10, size = 1, max = 42,  coords = vec3:new(1563.832031, -2135.110840, 77.616447) },
+	{ id = 11, size = 1, max = 42,  coords = vec3:new(-308.772247, -2698.393799, 6.000292) },
+	{ id = 12, size = 1, max = 42,  coords = vec3:new(503.738037, -653.082642, 24.751144) },
+	{ id = 13, size = 1, max = 42,  coords = vec3:new(-528.074585, -1782.701904, 21.483055) },
+	{ id = 14, size = 1, max = 42,  coords = vec3:new(-328.013458, -1354.755371, 31.296524) },
+	{ id = 15, size = 1, max = 42,  coords = vec3:new(349.901184, 327.976440, 104.303856) },
+	{ id = 16, size = 2, max = 111, coords = vec3:new(922.555481, -1560.048950, 30.756647) },
+	{ id = 17, size = 2, max = 111, coords = vec3:new(762.672363, -909.193054, 25.250854) },
+	{ id = 18, size = 2, max = 111, coords = vec3:new(1041.059814, -2172.653076, 31.488876) },
+	{ id = 19, size = 2, max = 111, coords = vec3:new(1015.361633, -2510.986572, 28.302608) },
+	{ id = 20, size = 2, max = 111, coords = vec3:new(-245.651718, 202.504669, 83.792648) },
+	{ id = 21, size = 1, max = 42,  coords = vec3:new(541.587646, -1944.362793, 24.985096) },
+	{ id = 22, size = 2, max = 111, coords = vec3:new(93.278641, -2216.144775, 6.033320) },
 }
 
 YRV3.t_BikerBusinessIDs = {
-    { name = "Fake Documents",  id = 0, unit_max = 60, val_offset = 17319, blip = 498, possible_ids = { 5, 10, 15, 20 } },
-    { name = "Weed",            id = 1, unit_max = 80, val_offset = 17323, blip = 496, possible_ids = { 2, 7, 12, 17 } },
-    { name = "Fake Cash",       id = 2, unit_max = 40, val_offset = 17320, blip = 500, possible_ids = { 4, 9, 14, 19 } },
-    { name = "Methamphetamine", id = 3, unit_max = 20, val_offset = 17322, blip = 499, possible_ids = { 1, 6, 11, 16 } },
-    { name = "Cocaine",         id = 4, unit_max = 10, val_offset = 17321, blip = 497, possible_ids = { 3, 8, 13, 18 } },
+    { name = "Fake Documents",  id = 0, unit_max = 60, val_tunable = "BIKER_FAKEIDS_PRODUCT_VALUE",		blip = 498, possible_ids = { 5, 10, 15, 20 } },
+    { name = "Weed",            id = 1, unit_max = 80, val_tunable = "BIKER_WEED_PRODUCT_VALUE",		blip = 496, possible_ids = { 2, 7, 12, 17 } },
+    { name = "Fake Cash",       id = 2, unit_max = 40, val_tunable = "BIKER_COUNTERCASH_PRODUCT_VALUE",	blip = 500, possible_ids = { 4, 9, 14, 19 } },
+    { name = "Methamphetamine", id = 3, unit_max = 20, val_tunable = "BIKER_METH_PRODUCT_VALUE",		blip = 499, possible_ids = { 1, 6, 11, 16 } },
+    { name = "Cocaine",         id = 4, unit_max = 10, val_tunable = "BIKER_CRACK_PRODUCT_VALUE",		blip = 497, possible_ids = { 3, 8, 13, 18 } },
 }
 
 YRV3.t_Hangars = {

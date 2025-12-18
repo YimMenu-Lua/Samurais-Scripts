@@ -218,31 +218,31 @@ local function drawBunker()
     ImGui.SeparatorText(YRV3.t_Bunkers[bunker_index].name)
 
     local bunkerUpdgrade1  = stats.get_int("MPX_BUNKER_EQUIPMENT") == 1
-    local bunkerUpdgrade2  = stats.get_int("MPX_BUNKER_STAFF") == 1
-    local bunkerOffset1    = 0
-    local bunkerOffset2    = 0
-    local bunkerEqLabelCol = "white"
-    local bunkerStLabelCol = "white"
+	local bunkerUpdgrade2  = stats.get_int("MPX_BUNKER_STAFF") == 1
+	local bunkerOffset1    = 0
+	local bunkerOffset2    = 0
+	local bunkerEqLabelCol = "white"
+	local bunkerStLabelCol = "white"
 
-    if bunkerUpdgrade1 then
-        bunkerOffset1 = globals.get_int(FreemodeGlobal1 + 21256)
-        bunkerEqLabelCol = "green"
-    else
-        bunkerOffset1 = 0
-        bunkerEqLabelCol = "red"
-    end
+	if (bunkerUpdgrade1) then
+		bunkerOffset1 = tunables.get_int("GR_MANU_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
+		bunkerEqLabelCol = "green"
+	else
+		bunkerOffset1 = 0
+		bunkerEqLabelCol = "red"
+	end
 
-    if bunkerUpdgrade2 then
-        bunkerOffset2 = globals.get_int(FreemodeGlobal1 + 21255)
-        bunkerStLabelCol = "green"
-    else
-        bunkerOffset2 = 0
-        bunkerStLabelCol = "red"
-    end
+	if (bunkerUpdgrade2) then
+		bunkerOffset2 = tunables.get_int("GR_MANU_PRODUCT_VALUE_STAFF_UPGRADE")
+		bunkerStLabelCol = "green"
+	else
+		bunkerOffset2 = 0
+		bunkerStLabelCol = "red"
+	end
 
-    local bunkerSupplies = stats.get_int("MPX_MATTOTALFORFACTORY5")
-    local bunkerStock = stats.get_int("MPX_PRODTOTALFORFACTORY5")
-    i_BunkerTotalValue = (globals.get_int(FreemodeGlobal1 + 21254) + bunkerOffset1 + bunkerOffset2) * bunkerStock
+	local bunkerSupplies = stats.get_int("MPX_MATTOTALFORFACTORY5")
+	local bunkerStock = stats.get_int("MPX_PRODTOTALFORFACTORY5")
+	i_BunkerTotalValue = (tunables.get_int("GR_MANU_PRODUCT_VALUE") + bunkerOffset1 + bunkerOffset2) * bunkerStock
 
     ImGui.BulletText("Equipment Upgrade: ")
 
@@ -305,30 +305,29 @@ end
 
 local function drawAcidLab()
     b_AcidLabOwned = stats.get_int("MPX_XM22_LAB_OWNED") ~= 0
-
     if not b_AcidLabOwned then
         ImGui.Text("You don't own an acid lab.")
         return
     end
 
     ImGui.SeparatorText("Acid Lab")
-    local acidUpdgrade = (stats.get_int("MPX_AWD_CALLME") >= 10) and
-    (stats.get_int("MPX_XM22_LAB_EQUIP_UPGRADED") == 1)
+    local acidUpdgrade = (stats.get_int("MPX_AWD_CALLME") >= 10)
+		and (stats.get_int("MPX_XM22_LAB_EQUIP_UPGRADED") == 1)
 
-    local acidUpgradeLabelCol = "white"
-    local acidOffset = 0
+	local acidUpgradeLabelCol = "white"
+	local acidOffset = 0
 
-    if acidUpdgrade then
-        acidUpgradeLabelCol = "green"
-        acidOffset = globals.get_int(FreemodeGlobal1 + 17330)
-    else
-        acidUpgradeLabelCol = "red"
-        acidOffset = 0
-    end
+	if (acidUpdgrade) then
+		acidUpgradeLabelCol = "green"
+		acidOffset = tunables.get_int("BIKER_ACID_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
+	else
+		acidUpgradeLabelCol = "red"
+		acidOffset = 0
+	end
 
     local acidSupplies = stats.get_int("MPX_MATTOTALFORFACTORY6")
     local acidStock = stats.get_int("MPX_PRODTOTALFORFACTORY6")
-    i_AcidLabTotalValue = globals.get_int(FreemodeGlobal1 + 17324) + acidOffset * acidStock
+    i_AcidLabTotalValue = tunables.get_int("BIKER_ACID_PRODUCT_VALUE") + acidOffset * acidStock
 
     ImGui.BulletText("Equipment Upgrade: ")
     ImGui.SameLine()
@@ -390,14 +389,14 @@ local function drawBikerBusiness()
 
             if not business.wasChecked then
                 YRV3:PopulateBikerBusinessSlot(i)
-            elseif business.name and business.val_offset then
+            elseif business.name and business.value_tunable then
                 ImGui.PushID(string.format("bb##", i))
                 ImGui.Dummy(1, 5)
                 ImGui.SeparatorText(business.name)
 
                 data.i_TotalSupplies = stats.get_int(("MPX_MATTOTALFORFACTORY%d"):format(slot))
                 data.i_TotalStock = stats.get_int(("MPX_PRODTOTALFORFACTORY%d"):format(slot))
-                data.i_TotalValue = globals.get_int(FreemodeGlobal1 + business.val_offset) * data.i_TotalStock
+                data.i_TotalValue = tunables.get_int(business.value_tunable) * data.i_TotalStock
                 YRV3.i_BikerValueSum = YRV3.i_BikerValueSum + data.i_TotalValue
 
                 ImGui.BulletText("Supplies:")
