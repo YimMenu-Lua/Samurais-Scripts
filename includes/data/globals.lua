@@ -1,9 +1,9 @@
 ---@diagnostic disable
 
 local SCRIPT_NAME    <const> = "samurais_scripts"
-local SCRIPT_VERSION <const> = "1.7.1"
-local TARGET_BUILD   <const> = "3586.0"
-local TARGET_VERSION <const> = "1.71"
+local SCRIPT_VERSION <const> = "1.7.4"
+local TARGET_BUILD   <const> = "3725.0"
+local TARGET_VERSION <const> = "1.72"
 local DEFAULT_CONFIG <const> = {
     favorite_entities       = {},
     forged_entities         = {},
@@ -394,7 +394,7 @@ f_DailyQuoteTextAlpha                 = 1.0
 i_PedThrowForce                       = 10
 i_DefaultWantedLevel                  = 5
 FreemodeGlobal1                       = 262145
-FreemodeGlobal2                       = 1668000
+FreemodeGlobal2                       = 1673807
 PVGLobal                              = 1572092
 BusinessHubGlobal1                    = 1965869
 BusinessHubGlobal2                    = 1963766
