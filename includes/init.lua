@@ -7,8 +7,8 @@
 
 
 local SCRIPT_NAME <const> = "SSV2"
-local SCRIPT_VERSION <const> = "1.7.4"
-local TARGET_BUILD <const> = "3717.0"
+local SCRIPT_VERSION <const> = "1.7.4 beta"
+local TARGET_BUILD <const> = "3725.0"
 local TARGET_VERSION <const> = "1.72"
 local DEFAULT_CONFIG <const> = require("includes.data.config")
 
