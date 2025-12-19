@@ -58,8 +58,6 @@ function CasinoPacino:GiveWheelPrize(prizeID)
 	local prize_wheel_win_state   = GetScriptGlobalOrLocal("prize_wheel_win_state") -- this function always returns a number even when it fails
 	local prize_wheel_prize       = GetScriptGlobalOrLocalOffset("prize_wheel_win_state", 1)
 	local prize_wheel_prize_state = GetScriptGlobalOrLocalOffset("prize_wheel_prize_state", 1)
-	printf("prize_wheel_win_state %d | prize_wheel_prize %d | prize_wheel_prize_state %d", prize_wheel_win_state,
-		prize_wheel_prize, prize_wheel_prize_state)
 
 	-- avoid writing garbage data and exit early
 	if (not prize_wheel_win_state or not prize_wheel_prize or not prize_wheel_prize_state) then
