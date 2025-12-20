@@ -41,6 +41,21 @@ function Entity.new(handle)
 	return instance
 end
 
+---@generic T
+---@param obj ClassMeta<T>
+---@return T?
+function Entity:As(obj)
+	if (IsInstance(obj, self)) then
+		log.fwarning("Ignored illegal casting of class %s as %s", self.__type, obj.__type or "Unknown type")
+		return
+	end
+
+	setmetatable(self, obj)
+	self.__type = obj.__type
+
+	return self
+end
+
 -- Resolves this entity to its corresponding internal game class (`CEntity`, `CPed`, or `CVehicle`).
 --
 -- If already resolved, returns the cached instance.
@@ -169,7 +184,7 @@ end
 
 ---@param rotationOrder? integer
 ---@return vec3
-function Entity:GetRot(rotationOrder)
+function Entity:GetRotation(rotationOrder)
 	return self:Exists() and ENTITY.GET_ENTITY_ROTATION(self:GetHandle(), rotationOrder or 2) or vec3:zero()
 end
 
@@ -409,63 +424,9 @@ function Entity:Unfreeze()
 	ENTITY.FREEZE_ENTITY_POSITION(self:GetHandle(), false)
 end
 
-function Entity:GetBoxCorners()
-	if not self:Exists() then
-		return {}
-	end
-
-	local corners = {}
-	local vmin, vmax = self:GetModelDimensions()
-
-	for x = 0, 1 do
-		for y = 0, 1 do
-			for z = 0, 1 do
-				local offset_vector = vec3:new(
-					x == 0 and vmin.x or vmax.x,
-					y == 0 and vmin.y or vmax.y,
-					z == 0 and vmin.z or vmax.z
-				)
-
-				local world_pos = self:GetOffsetInWorldCoords(
-					offset_vector.x,
-					offset_vector.y,
-					offset_vector.z
-				)
-				table.insert(corners, world_pos)
-			end
-		end
-	end
-
-	return corners
-end
-
 ---@param color Color
 function Entity:DrawBoundingBox(color)
-	local r, g, b, a = color:AsRGBA()
-	local corners = self:GetBoxCorners()
-	local connections = {
-		{ 1, 2 }, { 2, 4 }, { 4, 3 }, { 3, 1 },
-		{ 5, 6 }, { 6, 8 }, { 8, 7 }, { 7, 5 },
-		{ 1, 5 }, { 2, 6 }, { 3, 7 }, { 4, 8 },
-	}
-
-	for _, pair in ipairs(connections) do
-		local corner_a = corners[pair[1]]
-		local corner_b = corners[pair[2]]
-
-		GRAPHICS.DRAW_LINE(
-			corner_a.x,
-			corner_a.y,
-			corner_a.z,
-			corner_b.x,
-			corner_b.y,
-			corner_b.z,
-			r,
-			g,
-			b,
-			a or 255
-		)
-	end
+	Game.DrawBoundingBox(self:GetHandle(), color)
 end
 
 ---@return boolean

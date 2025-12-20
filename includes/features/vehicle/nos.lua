@@ -7,6 +7,7 @@ local FeatureBase = require("includes.modules.FeatureBase")
 ---@field private m_nos_fx array<handle>|nil
 ---@field private m_purge_fx_l array<handle>|nil
 ---@field private m_purge_fx_r array<handle>|nil
+---@field private m_engine_danger_ratio float
 ---@field private m_is_active boolean
 local NosMgr = setmetatable({}, FeatureBase)
 NosMgr.__index = NosMgr
@@ -20,6 +21,7 @@ end
 
 function NosMgr:Init()
 	self.m_is_active = false
+	self.m_engine_danger_ratio = 0.0
 end
 
 function NosMgr:Cleanup()
@@ -43,7 +45,6 @@ function NosMgr:ShouldRun()
 	return (self.m_entity
 		and self.m_entity:IsValid()
 		and self.m_entity:IsLandVehicle()
-		and self.m_entity:IsEngineOn()
 		and Self:IsDriving()
 		and not self.m_entity:IsElectric())
 end
@@ -53,20 +54,22 @@ function NosMgr:IsActive()
 	return self.m_is_active
 end
 
+function NosMgr:GetDangerRatio()
+	if (not GVars.features.vehicle.nos.can_damage_engine) then
+		return 0.0
+	end
+
+	return self.m_engine_danger_ratio
+end
+
 ---@return boolean
 function NosMgr:IsNOSButtonPressed()
-	return KeyManager:IsFeatureButtonPressed(
-		GVars.keyboard_keybinds.nos,
-		GVars.gamepad_keybinds.nos
-	)
+	return KeyManager:IsKeybindPressed("nos")
 end
 
 ---@return boolean
 function NosMgr:IsPurgeButtonPressed()
-	return KeyManager:IsFeatureButtonPressed(
-		GVars.keyboard_keybinds.nos_purge,
-		GVars.gamepad_keybinds.nos_purge
-	)
+	return KeyManager:IsKeybindPressed("nos_purge")
 end
 
 function NosMgr:UpdateFX()
@@ -138,13 +141,39 @@ function NosMgr:UpdatePurgeFX()
 	end
 end
 
+function NosMgr:UpdateEngineDamage()
+	local PV = self.m_entity
+	if (PV:GetEngineHealth() <= 50 or not self.m_is_active) then
+		self.m_engine_danger_ratio = 0.0
+		return
+	end
+
+	local current_speed = PV:GetSpeed()
+	local threshold = PV:GetMaxSpeed() * 2.1
+	self.m_engine_danger_ratio = math.min(1, math.max(0, current_speed / threshold))
+
+	if (current_speed > threshold) then
+		local handle = PV:GetHandle()
+		VEHICLE.SET_VEHICLE_ENGINE_HEALTH(handle, 50)
+		AUDIO.PLAY_SOUND_FROM_ENTITY(
+			-1,
+			"DRILL_PIN_BREAK",
+			handle,
+			"DLC_HEIST_FLEECA_SOUNDSET",
+			true,
+			0
+		)
+		return
+	end
+end
+
 function NosMgr:Update()
 	local PV = self.m_entity
-	if (GVars.features.vehicle.nos.enabled) then
+	if (GVars.features.vehicle.nos.enabled and PV:IsEngineOn()) then
 		local handle = PV:GetHandle()
 		local buttonPressed = self:IsNOSButtonPressed()
 
-		if (buttonPressed and PAD.IS_CONTROL_PRESSED(0, 71)) then
+		if (buttonPressed and PAD.IS_CONTROL_PRESSED(0, 71) and PV:GetEngineHealth() > 50) then
 			VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(handle, GVars.features.vehicle.nos.power / 5)
 			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, GVars.features.vehicle.nos.power)
 			if (GVars.features.vehicle.nos.sound_effect) then
@@ -183,6 +212,10 @@ function NosMgr:Update()
 
 	if (GVars.features.vehicle.nos.purge) then
 		self:UpdatePurgeFX()
+	end
+
+	if (GVars.features.vehicle.nos.can_damage_engine) then
+		self:UpdateEngineDamage()
 	end
 end
 

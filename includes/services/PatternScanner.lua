@@ -132,7 +132,7 @@ function PatternScanner:Scan()
 		return
 	end
 
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		self.m_state = eScannerState.BUSY
 
 		for _, ptr in pairs(self.m_pointers) do
@@ -162,7 +162,7 @@ function PatternScanner:RetryScan()
 		return
 	end
 
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		local success = 0
 		self.m_state = eScannerState.BUSY
 

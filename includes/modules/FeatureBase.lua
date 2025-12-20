@@ -1,15 +1,15 @@
 ---@class FeatureBase
----@field protected m_entity PlayerVehicle | Self -- reference to the entity that owns the features
+---@field protected m_entity Entity? -- reference to the entity if one owns the feature
 ---@field protected m_active boolean
 local FeatureBase = {}
 FeatureBase.__index = FeatureBase
 setmetatable(FeatureBase, {
-	__call = function(_, pv)
-		return FeatureBase.new(pv)
+	__call = function(_, entity)
+		return FeatureBase.new(entity)
 	end
 })
 
----@param entity PlayerVehicle | Self
+---@param entity Entity?
 function FeatureBase.new(entity)
 	return setmetatable({
 		m_entity = entity,
@@ -19,7 +19,7 @@ end
 
 ---@return boolean
 function FeatureBase:IsActive()
-	return self.m_active and self.m_entity and self.m_entity:IsValid()
+	return self.m_active
 end
 
 function FeatureBase:Init() end

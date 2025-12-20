@@ -33,7 +33,7 @@ function CasinoPacino:init()
 		m_tab = GUI:RegisterNewTab(eTabID.TAB_ONLINE, "Casino Pacino")
 	}, self)
 
-	instance.m_thread = ThreadManager:CreateNewThread("SS_DUNK", function()
+	instance.m_thread = ThreadManager:RegisterLooped("SS_DUNK", function()
 		instance:Main()
 	end)
 
@@ -409,7 +409,7 @@ function CasinoPacino:GetBJDealerCard()
 			or not blackjack_table_players
 			or not blackjack_table_players_size
 		) then
-		return "Failed to read data!"
+		return _T("GENERIC_SG_SL_READ_FAIL")
 	end
 
 	if (blackjack_table ~= -1) then

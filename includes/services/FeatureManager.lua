@@ -1,15 +1,18 @@
+-----------------------------------------
+-- Feature Manager
+-----------------------------------------
 -- Registers and runs lightweight features.
 --
 -- If your feature has a function that needs to yield or sleep, have it register its own thread in its Init() method *(refer to FeatureBase)*
 --
 -- and name your function that will run in a thread anything other than `Update()`.
 ---@class FeatureManager
----@field private m_entity PlayerVehicle | Self -- reference to the entity that owns the features
----@field private m_features FeatureBase[]
+---@field private m_entity Entity|any -- reference to the entity that owns the feature(s)
+---@field private m_features array<FeatureBase>
 local FeatureManager = {}
 FeatureManager.__index = FeatureManager
 
----@param entity PlayerVehicle | Self
+---@param entity Entity|any
 function FeatureManager.new(entity)
 	local instane = setmetatable({
 		m_entity = entity,

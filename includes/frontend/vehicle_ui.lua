@@ -1,4 +1,16 @@
-local default_cfg = require("includes.data.config")
+local selected_mine_name
+local autopilot_labels
+
+local default_cfg             = require("includes.data.config")
+local Flares                  = require("includes.features.vehicle.flares").new(Self:GetVehicle())
+local Flatbed                 = require("includes.features.vehicle.flatbed")
+local autopilot_state_idx     = 0
+local autopilot_index_changed = false
+local flare_cb_clicked        = false
+local turb_cb_clicked         = false
+
+
+--#region cars
 local vehicleTab = GUI:RegisterNewTab(eTabID.TAB_VEHICLE, "Cars")
 
 ---@type WindowRequest
@@ -10,10 +22,9 @@ local nosOptionsWindow
 ---@type WindowRequest
 local driftOptionsWindow
 
---#region cars
 local function speedoOptions()
 	local resolution = Game.GetScreenResolution()
-	ImGui.Text("Speed Unit")
+	ImGui.Text(_T("VEH_SPEED_UNIT"))
 	ImGui.Separator()
 	GVars.features.speedometer.speed_unit, _ = ImGui.RadioButton("M/s", GVars.features.speedometer.speed_unit, 0)
 	ImGui.SameLine()
@@ -22,74 +33,98 @@ local function speedoOptions()
 	GVars.features.speedometer.speed_unit, _ = ImGui.RadioButton("Mi/h", GVars.features.speedometer.speed_unit, 2)
 
 	ImGui.Spacing()
-	ImGui.Text("Position")
+	ImGui.Text(_T("GENERIC_POSITION_LABEL"))
 	ImGui.Separator()
 	GVars.features.speedometer.pos.x, _ = ImGui.SliderFloat(
-		"Left/Right",
+		_T("GENERIC_LEFT_RIGHT_LABEL"),
 		GVars.features.speedometer.pos.x,
 		0.0,
 		resolution.x - (GVars.features.speedometer.radius * 2.2)
 	)
 	GVars.features.speedometer.pos.y, _ = ImGui.SliderFloat(
-		"Up/Down",
+		_T("GENERIC_UP_DOWN_LABEL"),
 		GVars.features.speedometer.pos.y, 0.0,
 		resolution.y - (GVars.features.speedometer.radius * 2)
 	)
 
 	ImGui.Spacing()
-	ImGui.Text("Colors")
+	ImGui.Text(_T("GENERIC_COLORS_LABEL"))
 	ImGui.Separator()
-	GVars.features.speedometer.colors.circle, _ = ImGui.ColorEditU32("Circle Color",
+	GVars.features.speedometer.colors.circle, _ = ImGui.ColorEditU32(_T("VEH_SPEED_CIRCLE"),
 		GVars.features.speedometer.colors.circle)
-	GVars.features.speedometer.colors.circle_bg, _ = ImGui.ColorEditU32("Circle Background Color",
+	GVars.features.speedometer.colors.circle_bg, _ = ImGui.ColorEditU32(_T("VEH_SPEED_BG"),
 		GVars.features.speedometer.colors.circle_bg)
-	GVars.features.speedometer.colors.text, _ = ImGui.ColorEditU32("Text Color", GVars.features.speedometer.colors.text)
-	GVars.features.speedometer.colors.markings, _ = ImGui.ColorEditU32("Markings Color",
+	GVars.features.speedometer.colors.text, _ = ImGui.ColorEditU32(_T("VEH_SPEED_TEXT"),
+		GVars.features.speedometer.colors.text)
+	GVars.features.speedometer.colors.markings, _ = ImGui.ColorEditU32(_T("VEH_SPEED_MARK"),
 		GVars.features.speedometer.colors.markings)
-	GVars.features.speedometer.colors.needle, _ = ImGui.ColorEditU32("Needle Color",
+	GVars.features.speedometer.colors.needle, _ = ImGui.ColorEditU32(_T("VEH_SPEED_NEEDLE"),
 		GVars.features.speedometer.colors.needle)
-	GVars.features.speedometer.colors.needle_base, _ = ImGui.ColorEditU32("Needle Base Color",
+	GVars.features.speedometer.colors.needle_base, _ = ImGui.ColorEditU32(_T("VEH_SPEED_NEEDLE_BASE"),
 		GVars.features.speedometer.colors.needle_base)
 
-	if GUI:Button("Reset Colors") then
+	if GUI:Button(_T("GENERIC_RESET")) then
 		GVars.features.speedometer.colors = default_cfg.features.speedometer.colors
 	end
 end
 
 local function driftOptions()
-	GVars.features.vehicle.drift.mode, _ = ImGui.Combo("Mode",
+	GVars.features.vehicle.drift.mode, _ = ImGui.Combo(_T("VEH_DRIFT_MODE"),
 		GVars.features.vehicle.drift.mode,
-		"Strong\0Slippery\0Mixed\0"
+		_F("%s\0%s\0%s\0", _T("VEH_DRIFT_MODE_STRONG"), _T("VEH_DRIFT_MODE_SLIPPERY"), _T("VEH_DRIFT_MODE_MIXED"))
 	)
 
-	GVars.features.vehicle.drift.power, _ = ImGui.SliderInt("Torque Increase",
+	GVars.features.vehicle.drift.power, _ = ImGui.SliderInt(_T("VEH_POWER_GAIN"),
 		GVars.features.vehicle.drift.power,
 		10,
 		100
 	)
 
 	ImGui.BeginDisabled(GVars.features.vehicle.drift.mode == 1)
-	GVars.features.vehicle.drift.intensity, _ = ImGui.SliderInt("Intensity",
+	GVars.features.vehicle.drift.intensity, _ = ImGui.SliderInt(_T("VEH_DRIFT_MODE_INTENSITY"),
 		GVars.features.vehicle.drift.intensity,
 		0,
 		3
 	)
 	ImGui.EndDisabled()
-	GUI:HelpMarker("Only applies to 'Strong' or 'Mixed' modes")
+	GUI:HelpMarker(_T("VEH_DRIFT_MODE_INTENSITY_TT"))
+
+	GVars.features.vehicle.drift.smoke_fx.enabled = GUI:Checkbox(_T("VEH_DRIFT_SMOKE"),
+		GVars.features.vehicle.drift.smoke_fx.enabled,
+		{
+			tooltip = _T("VEH_DRIFT_SMOKE_TT"),
+			onClick = function()
+				if (not GVars.features.vehicle.drift.smoke_fx.enabled) then
+					ThreadManager:Run(function()
+						Self:GetVehicle():RestoreTireSmoke()
+					end)
+				end
+			end
+		}
+	)
+
+	ImGui.ColorEditVec3(_T("VEH_DRIFT_SMOKE_COL"), GVars.features.vehicle.drift.smoke_fx.color)
 end
 
 local function nosOptions()
-	GVars.features.vehicle.nos.power, _ = ImGui.SliderInt("Power Gain", GVars.features.vehicle.nos.power, 10, 100)
-	GVars.features.vehicle.nos.screen_effect, _ = GUI:Checkbox("Screen Effect", GVars.features.vehicle.nos.screen_effect)
-	GVars.features.vehicle.nos.sound_effect, _ = GUI:Checkbox("Sound Effect", GVars.features.vehicle.nos.sound_effect)
-	GVars.features.vehicle.nos.can_damage_engine, _ = GUI:Checkbox("Can Damage Engine",
+	GVars.features.vehicle.nos.power, _ = ImGui.SliderInt(_T("VEH_POWER_GAIN"), GVars.features.vehicle.nos.power, 10, 100)
+
+	GVars.features.vehicle.nos.screen_effect, _ = GUI:Checkbox(_T("VEH_NOS_SCREEN_FX"),
+		GVars.features.vehicle.nos.screen_effect
+	)
+
+	GVars.features.vehicle.nos.sound_effect, _ = GUI:Checkbox(_T("VEH_NOS_SOUND_FX"),
+		GVars.features.vehicle.nos.sound_effect
+	)
+
+	GVars.features.vehicle.nos.can_damage_engine, _ = GUI:Checkbox(_T("VEH_NOS_DAMAGE_CB"),
 		GVars.features.vehicle.nos.can_damage_engine,
-		{ tooltip = "Damages your engine if you push it too hard." }
+		{ tooltip = _T("VEH_NOS_DAMAGE_TT") }
 	)
 end
 
 local function ToggleSubwoofer(toggle)
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		if (not Self:IsDriving()) then
 			return
 		end
@@ -99,97 +134,216 @@ local function ToggleSubwoofer(toggle)
 end
 
 local function CloseDoors()
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		s:sleep(100)
 		Self:GetVehicle():CloseDoors()
 	end)
 end
 
 local function RestoreExhaustPops()
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		Self:GetVehicle():RestoreExhaustPops()
 	end)
 end
 
-vehicleTab:AddBoolCommand("Brake Force Display", "features.vehicle.abs_lights",
-	nil, nil,
-	{ description = "Flashes your brake lights when braking from high speed. Only for vehicles equipped with ABS." },
-	true -- last param means don't register a command with CommandExecutor
+vehicleTab:AddBoolCommand("VEH_SPEEDOMETER",
+	"features.speedometer.enabled", -- GVars index key
+	nil,                         -- onEnable callback
+	nil,                         -- onDisable callback
+	nil,                         -- CommandMeta
+	true,                        -- optional flag to decide whether to register a command with CommandExecutor or not
+	true
 )
 
-vehicleTab:AddBoolCommand("Fast Vehicles",
+vehicleTab:AddBoolCommand("VEH_ABS_LIGHTS",
+	"features.vehicle.abs_lights",
+	nil,
+	nil,
+	{ description = "VEH_ABS_LIGHTS_TT" },
+	true,
+	true
+)
+
+vehicleTab:AddBoolCommand("VEH_FAST_AF",
 	"features.vehicle.fast_vehicles",
-	nil, nil,
-	{ description = "Increases the top speed of any land vehicle you drive." }
+	nil,
+	nil,
+	{ description = "VEH_FAST_AF_TT" },
+	true,
+	true
 )
 
-vehicleTab:AddBoolCommand("Speedometer", "features.speedometer.enabled", nil, nil, nil, true)
-vehicleTab:AddBoolCommand("NOS", "features.vehicle.nos.enabled", nil, nil, nil, true)
-vehicleTab:AddBoolCommand("NOS Purge", "features.vehicle.nos.purge", nil, nil, { description = "placeholder" }, true) -- description is used for both the UI tooltip and the command description in the CommandExecutor window
-vehicleTab:AddBoolCommand("Pops & Bangs", "features.vehicle.burble_tune", nil, RestoreExhaustPops,
-	{ description = "placeholder", alias = { "pops" } })
-vehicleTab:AddBoolCommand("Drift Mode", "features.vehicle.drift.enabled", nil, nil, { description = "placeholder" }, true)
-vehicleTab:AddBoolCommand("Big Subwoofer", "features.vehicle.subwoofer", nil, ToggleSubwoofer(false),
-	{ description = "placeholder" }, true)
-vehicleTab:AddBoolCommand("High Beams on Horn", "features.vehicle.horn_beams", nil, nil, { description = "placeholder" },
-	true)
-vehicleTab:AddBoolCommand("Auto Brake Lights", "features.vehicle.auto_brake_lights", nil, nil,
-	{ description = "placeholder" }, true)
+vehicleTab:AddBoolCommand("VEH_NOS",
+	"features.vehicle.nos.enabled",
+	nil,
+	nil,
+	nil,
+	true,
+	true
+)
 
--- vehicleTab:AddBoolCommand("Can't Touch This!", "features.vehicle.no_carjacking", nil, nil, { description = "placeholder" }, true) -- most NPC's can't car jack you unless scripted to ignore ped flags
--- vehicleTab:AddBoolCommand("Unbreakable Windows", "features.vehicle.unbreakable_windows", nil, nil, { description = "placeholder" }, true)
--- vehicleTab:AddBoolCommand("Vehicle Mines", "features.vehicle.mines", nil, nil, { description = "placeholder" }, true)
+vehicleTab:AddBoolCommand("VEH_NOS_PURGE",
+	"features.vehicle.nos.purge",
+	nil,
+	nil,
+	{ description = "VEH_NOS_PURGE_TT" },
+	true,
+	true
+)
 
-vehicleTab:AddBoolCommand("Stronger Crashes",
+vehicleTab:AddBoolCommand("VEH_POPS_N_BANGS",
+	"features.vehicle.burble_tune",
+	nil,
+	RestoreExhaustPops,
+	{
+		description = "VEH_POPS_N_BANGS_TT",
+		alias = { "pops" }
+	},
+	true,
+	true
+)
+
+vehicleTab:AddBoolCommand("VEH_DRIFT_MODE",
+	"features.vehicle.drift.enabled",
+	nil,
+	nil,
+	nil,
+	true,
+	true
+)
+
+vehicleTab:AddBoolCommand("VEH_SUBWOOFER",
+	"features.vehicle.subwoofer",
+	nil,
+	ToggleSubwoofer(false),
+	{ description = "VEH_SUBWOOFER_TT" },
+	true,
+	true
+)
+
+vehicleTab:AddBoolCommand("VEH_HIGH_BEAMS",
+	"features.vehicle.horn_beams",
+	nil,
+	nil,
+	{ description = "VEH_HIGH_BEAMS_TT" },
+	true,
+	true
+)
+
+vehicleTab:AddBoolCommand("VEH_AUTO_BRAKE_LIGHTS",
+	"features.vehicle.auto_brake_lights",
+	nil,
+	nil,
+	{ description = "VEH_AUTO_BRAKE_LIGHTS_TT" },
+	true,
+	true
+)
+
+vehicleTab:AddBoolCommand("VEH_STRONG_WINDOWS",
+	"features.vehicle.unbreakable_windows",
+	nil,
+	function()
+		ThreadManager:Run(function()
+			local PV = Self:GetVehicle()
+			if (not PV:IsValid()) then
+				return
+			end
+
+			VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS(PV:GetHandle(), false)
+		end)
+	end,
+	{ description = "VEH_STRONG_WINDOWS_TT" },
+	true,
+	true
+)
+
+vehicleTab:AddBoolCommand("VEH_STRONG_CRASH",
 	"features.vehicle.strong_crash",
 	nil,
 	function()
 		local PV = Self:GetVehicle()
-		local deform_mult = PV:Resolve().m_deform_mult
-		Self:GetVehicle():RestorePointer(deform_mult)
+		PV:RestorePatch(PV.MemoryPatches.DeformMult)
 	end,
-	{ description = "Makes car crashes actually scary" },
+	{ description = "VEH_STRONG_CRASH_TT" },
+	true,
 	true
 )
 
-vehicleTab:AddBoolCommand("RGB Headlights", "features.vehicle.rgb_lights.enabled", nil,
+vehicleTab:AddBoolCommand("VEH_RGB_LIGHTS",
+	"features.vehicle.rgb_lights.enabled",
+	nil,
 	function()
-		script.run_in_fiber(function()
+		ThreadManager:Run(function()
 			Self:GetVehicle():RestoreHeadlights()
 		end)
 	end,
-	{ description = "placeholder" },
+	{ description = "VEH_RGB_LIGHTS_TT" },
+	true,
 	true
 )
 
-vehicleTab:AddBoolCommand("Flappy Doors", "features.vehicle.flappy_doors", nil, CloseDoors,
-	{ description = "placeholder" })
+vehicleTab:AddBoolCommand("VEH_FLAPPY_DOORS",
+	"features.vehicle.flappy_doors",
+	nil,
+	CloseDoors,
+	{ description = "VEH_FLAPPY_DOORS_TT" },
+	true,
+	true
+)
 
-vehicleTab:AddBoolCommand("Auto Lock Doors", "features.vehicle.auto_lock_doors", nil, nil,
-	{ description = "placeholder" }, true)
+vehicleTab:AddBoolCommand("VEH_AUTO_LOCK",
+	"features.vehicle.auto_lock_doors",
+	nil,
+	function()
+		Self:GetVehicle():ResetGenericToggleable("autolockdoors")
+	end,
+	{ description = "VEH_AUTO_LOCK_TT" },
+	true,
+	true
+)
 
-vehicleTab:AddBoolCommand("Launch Control", "features.vehicle.launch_control", nil, nil,
-	{ description = "Simulates launch control. Only available for performance cars." }, true)
+vehicleTab:AddBoolCommand("VEH_LAUNCH_CTRL",
+	"features.vehicle.launch_control",
+	nil,
+	nil,
+	{ description = "VEH_LAUNCH_CTRL_TT" },
+	true,
+	true
+)
 
-vehicleTab:AddBoolCommand("IV-Style Exit", "features.vehicle.iv_exit", nil, function()
-		script.run_in_fiber(function()
-			PED.SET_PED_CONFIG_FLAG(Self:GetHandle(), 241, false)
+vehicleTab:AddBoolCommand("VEH_IV_EXIT",
+	"features.vehicle.iv_exit",
+	nil,
+	function()
+		ThreadManager:Run(function()
+			Self:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
 			if (not GVars.features.vehicle.no_wheel_recenter) then
 				Backend:RemoveDisabledControl(75)
 			end
 		end)
 	end,
-	{
-		description =
-		"Imitates GTA IV's vehicle exit style: Hold [F] for one second to turn off the engine or normal press to leave it running."
-	},
-	true)
+	{ description = "VEH_IV_EXIT_TT" },
+	true,
+	true
+)
 
-vehicleTab:AddBoolCommand("Keep Wheels Turned", "features.vehicle.no_wheel_recenter", nil, function()
-	if (not GVars.features.vehicle.iv_exit) then
-		Backend:RemoveDisabledControl(75)
-	end
-end, { description = "placeholder" }, true)
+vehicleTab:AddBoolCommand("VEH_KEEP_WHEELS_TURNED",
+	"features.vehicle.no_wheel_recenter",
+	nil,
+	nil,
+	{ description = "VEH_KEEP_WHEELS_TURNED_TT" },
+	true,
+	true
+)
+
+vehicleTab:AddBoolCommand("VEH_MINES",
+	"features.vehicle.mines.enabled",
+	nil,
+	nil,
+	{ description = "VEH_MINES_TT" },
+	true,
+	true
+)
 
 speedometerOptionsWindow = {
 	m_label = "##speedometerOptionsWindow",
@@ -247,6 +401,20 @@ vehicleTab:RegisterGUI(function()
 		)
 	end
 
+	if (GVars.features.vehicle.mines.enabled) then
+		if (ImGui.BeginCombo("Vehicle Mine Type", selected_mine_name or "Unselected")) then
+			for _, pair in pairs(Self:GetVehicle().mines) do
+				local selected = GVars.features.vehicle.mines.selected_type_hash == pair.second
+				if (ImGui.Selectable(pair.first, selected)) then
+					GVars.features.vehicle.mines.selected_type_hash = pair.second
+					selected_mine_name = pair.first
+				end
+			end
+
+			ImGui.EndCombo()
+		end
+	end
+
 	if (GVars.features.speedometer.enabled) then
 		if (GUI:Button("Speedometer##settings")) then
 			speedometerOptionsWindow.m_should_draw = true
@@ -271,7 +439,199 @@ end)
 
 
 --#region planes
-local planesTab = vehicleTab:RegisterSubtab("Planes", function()
-	ImGui.Text("TODO")
+Flares:Init()
+
+GUI:RegisterNewTab(eTabID.TAB_VEHICLE, "Planes", function()
+	GVars.features.vehicle.fast_jets, _ = GUI:Checkbox(_T("VEH_FAST_JETS"),
+		GVars.features.vehicle.fast_jets,
+		{ tooltip = _T("VEH_FAST_JETS_TT") }
+	)
+
+	GVars.features.vehicle.no_jet_stall, _ = GUI:Checkbox(_T("VEH_NO_JET_STALL"),
+		GVars.features.vehicle.no_jet_stall,
+		{ tooltip = _T("VEH_NO_JET_STALL_TT") }
+	)
+
+	GVars.features.vehicle.no_turbulence, turb_cb_clicked = GUI:Checkbox(_T("VEH_NO_TURBULENCE"),
+		GVars.features.vehicle.no_turbulence
+	)
+
+	if (turb_cb_clicked and not GVars.features.vehicle.no_turbulence) then
+		local PV = Self:GetVehicle()
+		PV:RestorePatch(PV.MemoryPatches.Turbulence)
+		PV:RestorePatch(PV.MemoryPatches.WindMult)
+	end
+
+	GVars.features.vehicle.flares, flare_cb_clicked = GUI:Checkbox(_T("VEH_FLARES"),
+		GVars.features.vehicle.flares,
+		{ tooltip = _T("VEH_FLARES_TT") }
+	)
+
+	if (flare_cb_clicked) then
+		if (GVars.features.vehicle.flares) then
+			Flares:OnEnable()
+		else
+			Flares:OnDisable()
+		end
+	end
+
+	GVars.features.vehicle.aircraft_mg.triggerbot, _ = GUI:Checkbox(_T("VEH_MG_TRIGGERBOT"),
+		GVars.features.vehicle.aircraft_mg.triggerbot,
+		{ tooltip = _T("VEH_MG_TRIGGERBOT_TT") }
+	)
+
+	if (GVars.features.vehicle.aircraft_mg.triggerbot) then
+		GVars.features.vehicle.aircraft_mg.enemies_only, _ = GUI:Checkbox(_T("VEH_MG_TRIGGERBOT_ENEMY"),
+			GVars.features.vehicle.aircraft_mg.enemies_only,
+			{ tooltip = _T("VEH_MG_TRIGGERBOT_ENEMY_TT") }
+		)
+
+		GVars.features.vehicle.aircraft_mg.tiggerbot_range, _ = ImGui.SliderFloat(_T("VEH_MG_TRIGGERBOT_RANGE"),
+			GVars.features.vehicle.aircraft_mg.tiggerbot_range,
+			100.0,
+			1000.0,
+			"%.0f"
+		)
+	end
+
+	GVars.features.vehicle.aircraft_mg.manual_aim, _ = GUI:Checkbox(_T("VEH_MG_MANUAL_AIM"),
+		GVars.features.vehicle.aircraft_mg.manual_aim,
+		{ tooltip = _T("VEH_MG_MANUAL_AIM_TT") }
+	)
+
+	if (GVars.features.vehicle.aircraft_mg.manual_aim) then
+		GVars.features.vehicle.aircraft_mg.marker_size, _ = ImGui.SliderFloat(_T("VEH_MG_MARKER_SIZE"),
+			GVars.features.vehicle.aircraft_mg.marker_size,
+			1.0,
+			10.0
+		)
+
+		ImGui.ColorEditVec4(_T("VEH_MG_MARKER_COL"), GVars.features.vehicle.aircraft_mg.marker_color)
+	end
+
+	ImGui.SeparatorText(_T("VEH_AUTOPILOT"))
+	ImGui.BeginDisabled(not Self:GetVehicle().m_autopilot.eligible)
+	if (not autopilot_labels) then
+		autopilot_labels = {
+			_T("GENERIC_NONE"),
+			_T("GENERIC_WAYPOINT"),
+			_T("GENERIC_OBJECTIVE"),
+			_T("GENERIC_RANDOM")
+		}
+	else
+		autopilot_state_idx, autopilot_index_changed = ImGui.Combo(
+			"##autopilotdest",
+			autopilot_state_idx,
+			autopilot_labels,
+			4
+		)
+
+		if (autopilot_index_changed) then
+			ThreadManager:Run(function()
+				Self:GetVehicle():UpdateAutopilotState(autopilot_state_idx)
+			end)
+		end
+
+		autopilot_state_idx = Self:GetVehicle().m_autopilot.state
+	end
+	ImGui.EndDisabled()
 end)
+--#endregion
+
+--#region Flatbed
+local function FlatbedUI()
+	if (not GVars.features.flatbed.enabled) then
+		return
+	end
+
+	local window_size_x, _ = ImGui.GetContentRegionAvail()
+
+	if (not Self:GetVehicle().m_is_flatbed) then
+		ImGui.TextWrapped(_T("FTLBD_GET_IN_MSG"))
+
+		if GUI:Button(_T("GENERIC_SPAWN")) then
+			Flatbed:Spawn()
+		end
+
+		return
+	end
+	ImGui.Dummy(1, 10)
+	ImGui.BulletText(Flatbed.displayText)
+	ImGui.Dummy(1, 10)
+
+	GVars.features.flatbed.show_towing_position, _ = GUI:Checkbox(_T("FLTBD_SHOW_TOWPOS_CB"),
+		GVars.features.flatbed.show_towing_position
+	)
+	GUI:HelpMarker(_T("FLTBD_SHOW_TOWPOS_TT"))
+
+	GVars.features.flatbed.show_esp, _ = GUI:Checkbox(_T("FLTBD_SHOW_TOWBOX_CB"), GVars.features.flatbed.show_esp)
+	GUI:HelpMarker(_T("FLTBD_SHOW_TOWBOX_TT"))
+
+	GVars.features.flatbed.tow_everything, _ = GUI:Checkbox(_T("FLTBD_TOW_ALL_CB"),
+		GVars.features.flatbed.tow_everything
+	)
+	GUI:HelpMarker(_T("FLTBD_TOW_ALL_TT"))
+
+	ImGui.Dummy(1, 10)
+	ImGui.Dummy((window_size_x / 2) - 60, 1)
+	ImGui.SameLine()
+
+	if GUI:Button(not Flatbed.m_towed_vehicle and _T("FLTBD_TOW_BTN") or _T("GENERIC_DETACH"), { size = vec2:new(80, 40) }) then
+		ThreadManager:Run(function()
+			Flatbed:OnKeyPress()
+		end)
+	end
+
+	if (Flatbed.m_towed_vehicle) then
+		ImGui.Dummy(1, 5)
+		ImGui.SeparatorText(_T("FLTBD_ADJUST_POS_TXT"))
+		GUI:Tooltip(_T("FLTBD_ADJUST_POS_TT"))
+		ImGui.SetWindowFontScale(0.8)
+		ImGui.BulletText(_T("FLTBD_FAST_ADJUST_TXT"))
+		ImGui.SetWindowFontScale(1.0)
+		ImGui.Dummy((window_size_x / 2) - 40, 1)
+		ImGui.SameLine()
+
+		ImGui.PushButtonRepeat(true)
+		if ImGui.ArrowButton("##Up", 2) then
+			Flatbed:MoveAttachment(0.0, 0.0, 0.01)
+		end
+
+		ImGui.Dummy((window_size_x / 2) - 80, 1)
+		ImGui.SameLine()
+		if ImGui.ArrowButton("##Left", 0) then
+			Flatbed:MoveAttachment(0.0, 0.01, 0.0)
+		end
+
+		ImGui.SameLine()
+		ImGui.Dummy(1, 1)
+		ImGui.SameLine()
+		if ImGui.ArrowButton("##Right", 1) then
+			Flatbed:MoveAttachment(0.0, -0.01, 0.0)
+		end
+
+		ImGui.Dummy((window_size_x / 2) - 40, 1)
+		ImGui.SameLine()
+		if ImGui.ArrowButton("##Down", 3) then
+			Flatbed:MoveAttachment(0.0, 0.0, -0.01)
+		end
+		ImGui.PopButtonRepeat()
+	end
+end
+
+local flatbed_tab = GUI:RegisterNewTab(eTabID.TAB_VEHICLE, "Flatbed")
+flatbed_tab:AddLoopedCommand("FLTBD_MAIN_CB",
+	"features.flatbed.enabled",
+	function()
+		Flatbed:Main()
+	end,
+	function()
+		Flatbed:Reset()
+	end,
+	nil,
+	true,
+	true
+)
+
+flatbed_tab:RegisterGUI(FlatbedUI)
 --#endregion

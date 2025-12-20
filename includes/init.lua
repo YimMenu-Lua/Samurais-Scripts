@@ -6,17 +6,23 @@
 ---@module "init"
 
 
-local SCRIPT_NAME <const> = "SSV2"
-local SCRIPT_VERSION <const> = "1.7.4 beta"
-local TARGET_BUILD <const> = "3725.0"
+local SCRIPT_NAME <const>    = "SSV2"
+local SCRIPT_VERSION <const> = "1.7.4"
+local TARGET_BUILD <const>   = "3725.0"
 local TARGET_VERSION <const> = "1.72"
 local DEFAULT_CONFIG <const> = require("includes.data.config")
 
 require("includes.backend")
 Backend:init(SCRIPT_NAME, SCRIPT_VERSION, TARGET_BUILD, TARGET_VERSION)
 
+-- ### Enums Namespace.
+--
+-- All enums are stored here to avoid polluting the Lua global table.
+Enums = require("includes.data.enums.__init")
+
 require("includes.lib.types")
 require("includes.lib.utils")
+require("includes.lib.imgui_ext")
 require("includes.lib.class")
 require("includes.lib.enum")
 require("includes.classes.Pair")
@@ -86,15 +92,14 @@ CommandExecutor = require("includes.services.CommandExecutor").new()
 
 ------------------- Features -----------------------------------------------------------------------
 require("includes.features.Speedometer")
-YRV3 = require("includes.features.YRV3"):init()
+YRV3                = require("includes.features.YRV3"):init()
+YimActions          = require("includes.features.YimActionsV3"):init()
+BillionaireServices = require("includes.features.BillionaireServicesV2"):init()
 ----------------------------------------------------------------------------------------------------
 
-local base_path = "includes"
-local packages = {
-	"data.enums",
+local base_path     = "includes"
+local packages      = {
 	"data.refs",
-	"data.peds",
-	"data.vehicles",
 	"data.weapons",
 
 	"structs.StateMachine",
@@ -113,11 +118,14 @@ local packages = {
 	"services.GridRenderer",
 	"services.Translator",
 
+	"frontend.bsv2_ui",
 	"frontend.casino_ui",
 	"frontend.salvage_ui",
 	"frontend.self_ui",
 	"frontend.settings_ui",
 	"frontend.vehicle_ui",
+	"frontend.world_ui",
+	"frontend.yav3_ui",
 	"frontend.yrv3_ui",
 }
 

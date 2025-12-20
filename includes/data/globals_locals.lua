@@ -73,12 +73,12 @@ return {
 		description = "Contraband Buy Local 3",
 		file = "fm_content_cargo.c",
 		LEGACY = {
-			value = 6110,
+			value = 1180,
 			pattern = [[if \((?:[buisf]?Local_[5-9]\d{3})(\.f_\d{4}) == 0]],
 			capture_group = 1,
 			offsets = {
 				{
-					value = 1180,
+					value = 6110,
 					capture_group = 2
 				}
 			}
@@ -148,13 +148,13 @@ return {
 		description = "Bunker Sell Local 1",
 		file = "gb_gunrunning.c",
 		LEGACY = {
-			value = 1266,
+			value = 774,
 			pattern =
 			[[(?:[buisf]?Local_1\d{3}?)(\.f_\d{3}) = func_\w+\(func_\w+\(\),.*?Local_1\d{3}\.f_\d{3}, \w+, -1\);]],
 			capture_group = 1,
 			offsets = {
 				{
-					value = 774,
+					value = 1266,
 					capture_group = 2
 				}
 			}
@@ -165,13 +165,13 @@ return {
 		description = "Bunker Sell Local 2",
 		file = "gb_gunrunning.c",
 		LEGACY = {
-			value = 1266,
+			value = 816,
 			pattern =
 			[[func_\w+\((?:[buisf]?Local_\d{4})(\.f_\d{3}), \w+, "GR_HUD_TOT", \w+, 1, 4, 0, 0, 0, 0, 0, 1, 1, 0, 255, 0\);]],
 			capture_group = 1,
 			offsets = {
 				{
-					value = 816,
+					value = 2976,
 					capture_group = 2
 				}
 			}
@@ -182,12 +182,12 @@ return {
 		description = "Acid Lab Sell Local",
 		file = "fm_content_acid_lab_sell.c",
 		LEGACY = {
-			value = 5723,
+			value = 1339,
 			pattern = [[if \((?:[buisf]?Local_5\d{3})(\.f_\d{4}) == 0\)]],
 			capture_group = 1,
 			offsets = {
 				{
-					value = 1339,
+					value = 5723,
 					capture_group = 2
 				}
 			}
@@ -198,7 +198,7 @@ return {
 		description = "Acid Lab Sell Generic Bitset",
 		file = "fm_content_acid_lab_sell.c",
 		LEGACY = {
-			value = 5597,
+			value = 7613,
 			pattern = [[if \(func_\w+\((?:[buisf]?Local_5\d{3}), \w+\)\)]],
 			capture_group = 1
 		},
@@ -246,7 +246,7 @@ return {
 			value = 55,
 			pattern =
 			[[if \(!NETWORK::NETWORK_HAS_CONTROL_OF_NETWORK_ID\(.*?Local_\d{3}(\.f_\d{2})\[\w+\(\w+, 0\)\]\)\)]],
-			capture_group = 1,
+			capture_group = 1
 		},
 		ENHANCED = {}
 	},
@@ -353,12 +353,12 @@ return {
 		description = "Prize Wheel Win State Local",
 		file = "casino_lucky_wheel.c",
 		LEGACY = {
-			value = 302,
+			value = 14,
 			pattern = [[(?:[buisf]?Local_\d{3})(\.f_\d{2}) = \(.*?Local_\d{3}\.f_\d{2} % 20\);]],
 			capture_group = 1,
 			offsets = {
 				{
-					value = 14,
+					value = 302,
 					capture_group = 2
 				}
 			}
@@ -385,7 +385,7 @@ return {
 		description = "Casino Heist Planning Global",
 		file = "gb_casino_heist_planning.c",
 		LEGACY = {
-			value = 1971951,
+			value = 1971952,
 			pattern =
 			[[if \(Global_\d{7}\.f_\d{4} == func_\d{2}\(\) \|\| !NETWORK::NETWORK_IS_PLAYER_ACTIVE\(Global_\d{7}\.f_\d{4}\)\)]],
 			capture_group = 1

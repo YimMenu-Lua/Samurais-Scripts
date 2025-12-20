@@ -1,3 +1,5 @@
+require "includes.modules.Entity"
+
 --------------------------------------
 -- Class: Ped
 --------------------------------------
@@ -83,13 +85,12 @@ end
 
 ---@return boolean
 function Ped:IsDriving()
-	local veh = self:GetVehicle()
-
-	if not veh then
+	local veh = self:GetVehicleNative()
+	if (veh == 0) then
 		return false
 	end
 
-	return (VEHICLE.GET_PED_IN_VEHICLE_SEAT(veh:GetHandle(), -1, false) == self:GetHandle())
+	return (VEHICLE.GET_PED_IN_VEHICLE_SEAT(veh, -1, false) == self:GetHandle())
 end
 
 ---@return boolean
@@ -135,7 +136,7 @@ end
 -- Bypasses `Vehicle` instance creation and directly returns the handle of the ped's vehicle or 0.
 ---@return handle
 function Ped:GetVehicleNative()
-	return PED.GET_VEHICLE_PED_IS_IN(self:GetHandle(), false)
+	return PED.GET_VEHICLE_PED_IS_USING(self:GetHandle())
 end
 
 ---@return Vehicle|nil -- A `Vehicle` instance or `nil`, not a vehicle handle.
@@ -281,4 +282,45 @@ function Ped:Clean()
 	for i = 0, 5, 1 do
 		PED.CLEAR_PED_DAMAGE_DECAL_BY_ZONE(hndl, i, "ALL")
 	end
+end
+
+---@param flag_id ePedConfigFlags
+---@param pBoolParam? boolean
+---@return boolean
+function Ped:GetConfigFlag(flag_id, pBoolParam)
+	return PED.GET_PED_CONFIG_FLAG(Self:GetHandle(), flag_id, pBoolParam or true)
+end
+
+---@param flag_id ePedConfigFlags
+---@param value boolean
+function Ped:SetConfigFlag(flag_id, value)
+	PED.SET_PED_CONFIG_FLAG(self:GetHandle(), flag_id, value)
+end
+
+---@param flag_id ePedResetFlags
+---@return boolean
+function Ped:GetPedResetFlag(flag_id)
+	return PED.GET_PED_RESET_FLAG(self:GetHandle(), flag_id)
+end
+
+---@param flag_id ePedResetFlags
+---@param value boolean
+function Ped:SetPedResetFlag(flag_id, value)
+	PED.SET_PED_RESET_FLAG(self:GetHandle(), flag_id, value)
+end
+
+function Ped:ClearTasks()
+	TASK.CLEAR_PED_TASKS(self:GetHandle())
+end
+
+function Ped:ClearTasksImmediately()
+	TASK.CLEAR_PED_TASKS_IMMEDIATELY(self:GetHandle())
+end
+
+function Ped:ClearSecondaryTask()
+	TASK.CLEAR_PED_SECONDARY_TASK(self:GetHandle())
+end
+
+function Ped:ClearDefaultPrimaryTask()
+	TASK.CLEAR_DEFAULT_PRIMARY_TASK(self:GetHandle())
 end

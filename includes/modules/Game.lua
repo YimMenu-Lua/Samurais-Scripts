@@ -43,7 +43,7 @@ function Game.GetLanguage()
 end
 
 ---@return integer
-function Game.GetDeltaTime()
+function Game.GetFrameTime()
 	return MISC.GET_FRAME_TIME()
 end
 
@@ -235,7 +235,7 @@ function Game.CreateObject(model_hash, spawn_pos, is_networked, is_scripthost_ob
 	return i_Handle
 end
 
-function Game.SafeRemovePedFromGroup(ped)
+function Game.RemovePedFromGroup(ped)
 	local groupID = PED.GET_PED_GROUP_INDEX(Self:GetHandle())
 	if PED.DOES_GROUP_EXIST(groupID) and PED.IS_PED_GROUP_MEMBER(ped, groupID) then
 		PED.REMOVE_PED_FROM_GROUP(ped)
@@ -245,20 +245,21 @@ end
 ---@param entity integer
 ---@param entity_type? eEntityType
 function Game.DeleteEntity(entity, entity_type)
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		entity_type = entity_type or Game.GetEntityType(entity)
-		if not Game.IsScriptHandle(entity) or (entity == self.get_ped()) then
+		if (not Game.IsScriptHandle(entity) or entity == Self:GetHandle()) then
 			return
 		end
 
 		if ENTITY.IS_ENTITY_A_PED(entity) then
-			Game.SafeRemovePedFromGroup(entity)
+			Game.RemovePedFromGroup(entity)
 		end
 
 		if Backend:IsBlipRegistered(entity) then
 			Game.RemoveBlipFromEntity(entity)
 		end
 
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(Game.GetEntityModel(entity))
 		ENTITY.DELETE_ENTITY(entity)
 		sleep(50)
 
@@ -267,7 +268,7 @@ function Game.DeleteEntity(entity, entity_type)
 			ENTITY.DELETE_ENTITY(entity)
 			sleep(50)
 
-			if ENTITY.DOES_ENTITY_EXIST(entity) and Game.IsOnline() then
+			if (ENTITY.DOES_ENTITY_EXIST(entity) and Game.IsOnline()) then
 				Await(entities.take_control_of, { entity, 300 }, 500)
 				ENTITY.DELETE_ENTITY(entity)
 			end
@@ -276,7 +277,7 @@ function Game.DeleteEntity(entity, entity_type)
 			if ENTITY.DOES_ENTITY_EXIST(entity) then
 				Toast:ShowError(
 					"Samurai's Scripts",
-					("Failed to delete entity: [%d]"):format(entity)
+					_F("Failed to delete entity: [%d]", entity)
 				)
 				return
 			end
@@ -455,7 +456,7 @@ end
 ---@param z_axis? boolean
 ---@param should_clear_area? boolean
 function Game.SetEntityCoords(handle, coords, x_axis, y_axis, z_axis, should_clear_area)
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		ENTITY.SET_ENTITY_COORDS(
 			handle,
 			coords.x,
@@ -475,7 +476,7 @@ end
 ---@param y_axis? boolean
 ---@param z_axis? boolean
 function Game.SetEntityCoordsNoOffset(handle, coords, x_axis, y_axis, z_axis)
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		ENTITY.SET_ENTITY_COORDS_NO_OFFSET(
 			handle,
 			coords.x,
@@ -677,8 +678,7 @@ end
 ---@return vec3, vec3
 function Game.GetModelDimensions(model)
 	local vmin, vmax = vec3:zero(), vec3:zero()
-
-	if STREAMING.IS_MODEL_VALID(model) then
+	if (STREAMING.IS_MODEL_VALID(model)) then
 		vmin, vmax = MISC.GET_MODEL_DIMENSIONS(model, vmin, vmax)
 	end
 
@@ -1032,101 +1032,21 @@ end
 function Game.GetWaypointCoords()
 	local waypoint = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_WAYPOINT_BLIP_ENUM_ID())
 
-	if HUD.DOES_BLIP_EXIST(waypoint) then
+	if (HUD.DOES_BLIP_EXIST(waypoint)) then
 		return HUD.GET_BLIP_COORDS(waypoint)
 	end
 end
 
--- Starts a Line Of Sight world probe shape test.
----@param src vec3
----@param dest vec3
----@param traceFlags integer
----@return boolean, vec3, integer
-function Game.RayCast(src, dest, traceFlags, entityToExclude)
-	local rayHandle = SHAPETEST.START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(
-		src.x,
-		src.y,
-		src.z,
-		dest.x,
-		dest.y,
-		dest.z,
-		traceFlags,
-		entityToExclude,
-		7
+---@param vecMin vec3
+---@param vecMax vec3
+---@return vec3
+function Game.GetRandomCoordsInRange(vecMin, vecMax)
+	math.randomseed(os.time())
+	return vec3:new(
+		math.random(vecMin.x, vecMax.x),
+		math.random(vecMin.y, vecMax.y),
+		math.random(vecMin.z, vecMax.z)
 	)
-
-	local endCoords = vec3:zero()
-	local surfaceNormal = vec3:zero()
-	local hit = false
-	local entityHit = 0
-
-	_, hit, endCoords, _, entityHit = SHAPETEST.GET_SHAPE_TEST_RESULT(
-		rayHandle,
-		hit,
-		endCoords,
-		surfaceNormal,
-		entityHit
-	)
-
-	return hit, endCoords, entityHit
-end
-
----@param toggle boolean
-function Game.ExtendWorldBounds(toggle)
-	if toggle then
-		PLAYER.EXTEND_WORLD_BOUNDARY_FOR_PLAYER(-42069420.0, -42069420.0, -42069420.0)
-		PLAYER.EXTEND_WORLD_BOUNDARY_FOR_PLAYER(42069420.0, 42069420.0, 42069420.0)
-	else
-		PLAYER.RESET_WORLD_BOUNDARY_FOR_PLAYER()
-	end
-end
-
----@param toggle boolean
-function Game.DisableOceanWaves(toggle)
-	MISC.WATER_OVERRIDE_SET_STRENGTH(toggle and 1.0 or -1)
-end
-
--- Draws a green chevron down element on top of an entity in the game world.
----@param entity integer
----@param offset? float
-function Game.MarkSelectedEntity(entity, offset)
-	ThreadManager:RunInFiber(function()
-		local entity_hash  = ENTITY.GET_ENTITY_MODEL(entity)
-		local entity_pos   = ENTITY.GET_ENTITY_COORDS(entity, false)
-		local min, max     = Game.GetModelDimensions(entity_hash)
-		local entityHeight = max.z - min.z
-
-		if not offset then
-			offset = 0.4
-		end
-
-		GRAPHICS.DRAW_MARKER(
-			2,
-			entity_pos.x,
-			entity_pos.y,
-			entity_pos.z + entityHeight + offset,
-			0,
-			0,
-			0,
-			0,
-			180,
-			0,
-			0.3,
-			0.3,
-			0.3,
-			0,
-			255,
-			0,
-			100,
-			true,
-			true,
-			1,
-			false,
-			---@diagnostic disable-next-line
-			0, 0,
-			false
-		)
-	end)
 end
 
 ---@param modelHash number|string
@@ -1159,29 +1079,29 @@ end
 
 ---@param model integer|string
 function Game.GetPedTypeFromModel(model)
-	if (type(model) == "string") then
-		model = joaat(model)
+	if (type(model) == "number") then
+		model = ped_lookup_table[model]
 	end
 
-	return ped_list[model].model_hash or ePedType.CIVMALE
+	return ped_list[model].ped_type or Enums.ePedType.CIVMALE
 end
 
 ---@param model integer|string
 ---@return ePedGender
 function Game.GetPedGenderFromModel(model)
-	if (type(model) == "integer") then
-		model = Game.GetPedName(model)
+	if (type(model) == "number") then
+		model = ped_lookup_table[model]
 	end
 
 	local found = ped_list[model]
 	---@diagnostic disable-next-line
-	return found and found.ped_gender or ePedGender.UNK
+	return found and found.ped_gender or Enums.ePedGender.UNK
 end
 
 ---@param model integer|string
 function Game.IsPedModelHuman(model)
-	if (type(model) == "integer") then
-		model = Game.GetPedName(model)
+	if (type(model) == "number") then
+		model = ped_lookup_table[model]
 	end
 
 	local found = ped_list[model]
@@ -1311,4 +1231,90 @@ function Game.LoadGroundAtCoord(coords)
 	end
 
 	return true
+end
+
+---@param weaponHash hash
+---@param startPos vec3
+---@param endPos vec3
+---@param damage number
+---@param owner integer
+---@param speed integer
+function Game.ShootBulletBetweenCoords(weaponHash, startPos, endPos, damage, owner, speed)
+	Await(Game.RequestWeaponAsset, weaponHash)
+	MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
+		startPos.x,
+		startPos.y,
+		startPos.z,
+		endPos.x,
+		endPos.y,
+		endPos.z,
+		damage,
+		false,
+		weaponHash,
+		owner,
+		true,
+		false,
+		speed
+	)
+end
+
+---@param entity handle
+function Game.GetBoxCorners(entity)
+	local corners = {}
+	local vmin, vmax = Game.GetModelDimensions(Game.GetEntityModel(entity))
+
+	for x = 0, 1 do
+		for y = 0, 1 do
+			for z = 0, 1 do
+				local offset_vector = vec3:new(
+					x == 0 and vmin.x or vmax.x,
+					y == 0 and vmin.y or vmax.y,
+					z == 0 and vmin.z or vmax.z
+				)
+
+				local world_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
+					entity,
+					offset_vector.x,
+					offset_vector.y,
+					offset_vector.z
+				)
+				table.insert(corners, world_pos)
+			end
+		end
+	end
+
+	return corners
+end
+
+---@param entity handle
+---@param color Color
+function Game.DrawBoundingBox(entity, color)
+	if (not ENTITY.DOES_ENTITY_EXIST(entity)) then
+		return
+	end
+	local r, g, b, a = color:AsRGBA()
+	local corners = Game.GetBoxCorners(entity)
+	local connections = {
+		{ 1, 2 }, { 2, 4 }, { 4, 3 }, { 3, 1 },
+		{ 5, 6 }, { 6, 8 }, { 8, 7 }, { 7, 5 },
+		{ 1, 5 }, { 2, 6 }, { 3, 7 }, { 4, 8 },
+	}
+
+	for _, pair in ipairs(connections) do
+		local corner_a = corners[pair[1]]
+		local corner_b = corners[pair[2]]
+
+		GRAPHICS.DRAW_LINE(
+			corner_a.x,
+			corner_a.y,
+			corner_a.z,
+			corner_b.x,
+			corner_b.y,
+			corner_b.z,
+			r,
+			g,
+			b,
+			a or 255
+		)
+	end
 end

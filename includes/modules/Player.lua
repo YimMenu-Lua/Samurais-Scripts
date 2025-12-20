@@ -37,12 +37,12 @@ end
 ---@return eGameState
 function Player:GetGameState()
 	if (not self:IsValid()) then
-		return eGameState.Invalid
+		return Enums.eGameState.Invalid
 	end
 
 	local cplayerinfo = self:Resolve().m_player_info
 	if (not cplayerinfo or not cplayerinfo:IsValid()) then
-		return eGameState.Invalid
+		return Enums.eGameState.Invalid
 	end
 
 	return cplayerinfo:GetGameState()
@@ -52,7 +52,12 @@ end
 ---@return boolean
 function Player:IsPlaying()
 	local state = self:GetGameState()
-	return (state ~= eGameState.Invalid and state ~= eGameState.LeftGame)
+	return (state ~= Enums.eGameState.Invalid and state ~= Enums.eGameState.LeftGame)
+end
+
+---@return boolean
+function Player:IsMale()
+	return self:GetModelHash() == 0x705E61F2
 end
 
 -- [WIP]

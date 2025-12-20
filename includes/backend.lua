@@ -1,5 +1,10 @@
 ---@diagnostic disable: lowercase-global
 
+local PreviewService = require("includes.services.PreviewService")
+local function ClearPreview()
+	PreviewService:Clear()
+end
+
 ---@class BlipData
 ---@field handle integer
 ---@field owner integer
@@ -7,8 +12,8 @@
 
 ---@enum eAPIVersion
 eAPIVersion = {
-	V1  = 1,  -- YimMenu V1 (Lua54)
-	V2  = 2,  -- YimMenu V2 (LuaJIT) // placeholder
+	V1  = 1, -- YimMenu V1 (Lua54)
+	V2  = 2, -- YimMenu V2 (LuaJIT) // placeholder
 	L54 = 99, -- Mock environment (Lua54)
 }
 
@@ -33,7 +38,7 @@ Backend = {
 	__version          = "",
 	target_build       = "",
 	target_version     = "",
-	disable_input      = false,  -- Never serialize this runtime variable!
+	disable_input      = false, -- Never serialize this runtime variable!
 
 	---@type table<integer, integer>
 	ControlsToDisable  = {},
@@ -46,12 +51,12 @@ Backend = {
 
 	---@type table<eBackendEvent, array<function>>
 	EventCallbacks     = {
-		[eBackendEvent.RELOAD_UNLOAD]  = {},
-		[eBackendEvent.SESSION_SWITCH] = {},
-		[eBackendEvent.PLAYER_SWITCH]  = {}
+		[eBackendEvent.RELOAD_UNLOAD]  = { ClearPreview },
+		[eBackendEvent.SESSION_SWITCH] = { ClearPreview },
+		[eBackendEvent.PLAYER_SWITCH]  = { ClearPreview }
 	},
 
-	---@type table<eEntityType, array<handle>>
+	---@type table<eEntityType, table<handle, handle>>
 	SpawnedEntities    = {
 		[eEntityType.Ped]     = {},
 		[eEntityType.Vehicle] = {},
@@ -241,9 +246,24 @@ function Backend:RemoveBlip(owner)
 	self.CreatedBlips[owner] = nil
 end
 
+---@param handle integer
+function Backend:CheckFeatureEntities(handle)
+	-- if Decorator:IsEntityRegistered(handle, "EntityForge") then
+	-- 	EntityForge:RemoveEntityByHandle(handle)
+	-- end
+
+	if Decorator:IsEntityRegistered(handle, "BillionaireServices") then
+		BillionaireServices:RemoveEntityByHandle(handle)
+	end
+
+	if Decorator:IsEntityRegistered(handle, "YimActions") then
+		YimActions.CompanionManager:RemoveCompanionByHandle(handle)
+	end
+end
+
 -- TODO: Refactor this
 function Backend:EntitySweep()
-	for _, category in ipairs(self.SpawnedEntities) do
+	for _, category in pairs(self.SpawnedEntities) do
 		if next(category) ~= nil then
 			for handle in pairs(category) do
 				if ENTITY.DOES_ENTITY_EXIST(category[handle]) then
@@ -264,6 +284,47 @@ function Backend:EntitySweep()
 			self:RemoveBlip(blip.owner)
 		end
 	end
+end
+
+function Backend:PoolMgr()
+	local timeout = self.debug_mode and 500 or 5e3
+
+	for index, category in ipairs({ self.SpawnedEntities[eEntityType.Object], self.SpawnedEntities[eEntityType.Ped], self.SpawnedEntities[eEntityType.Vehicle] }) do
+		if (next(category) == nil) then
+			goto continue
+		end
+
+		for handle in pairs(category) do
+			local bExists = ENTITY.DOES_ENTITY_EXIST(handle)
+
+			if (not bExists) then
+				self:CheckFeatureEntities(handle)
+				Game.DeleteEntity(handle, index)
+			end
+
+			if (ENTITY.IS_ENTITY_DEAD(handle, false)) then
+				self:CheckFeatureEntities(handle)
+				Game.DeleteEntity(handle, index)
+			elseif (ENTITY.IS_ENTITY_A_PED(handle) and self.CreatedBlips[handle]) then
+				local blip = self.CreatedBlips[handle]
+				if (PED.IS_PED_IN_ANY_VEHICLE(handle, true)) then
+					if (blip.alpha > 0) then
+						HUD.SET_BLIP_ALPHA(blip.handle, 0)
+						blip.alpha = 0
+					end
+				else
+					if (blip.alpha < 255) then
+						HUD.SET_BLIP_ALPHA(blip.handle, 255)
+						blip.alpha = 255
+					end
+				end
+			end
+		end
+
+		::continue::
+	end
+
+	sleep(timeout)
 end
 
 ---@param event eBackendEvent
@@ -348,9 +409,28 @@ function Backend:RegisterHandlers()
 	self.debug_mode = self:IsMockEnv() or GVars.backend.debug_mode or false
 
 	if (self:GetAPIVersion() ~= eAPIVersion.L54) then
-		ThreadManager:CreateNewThread("SS_CTRLS", function()
+		ThreadManager:RegisterLooped("SS_CTRLS", function()
 			if (self.disable_input) then
 				PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
+			end
+
+			if ((gui.is_open() or GUI:IsOpen()) and not self.disable_input) then
+				PAD.DISABLE_CONTROL_ACTION(0, 18, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 24, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 25, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 69, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 70, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 106, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 122, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 135, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 142, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 144, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 176, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 223, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 229, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 237, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 257, true)
+				PAD.DISABLE_CONTROL_ACTION(0, 294, true)
 			end
 
 			for _, control in pairs(self.ControlsToDisable) do
@@ -360,10 +440,16 @@ function Backend:RegisterHandlers()
 	end
 
 	if (self:GetAPIVersion() == eAPIVersion.V1) then
-		ThreadManager:CreateNewThread("SS_BACKEND", function()
+		ThreadManager:RegisterLooped("SS_BACKEND", function()
 			self:OnPlayerSwitch()
 			self:OnSessionSwitch()
-			sleep(200)
+			PreviewService:Update()
+
+			yield()
+		end)
+
+		ThreadManager:RegisterLooped("SS_POOLMGR", function()
+			self:PoolMgr()
 		end)
 
 		event.register_handler(menu_event.MenuUnloaded, function() self:Cleanup() end)
@@ -377,7 +463,7 @@ end
 --
 -- You can only restart (re-register) them by reloading the script.
 function Backend:PANIQUE()
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		self:Cleanup()
 		for i = eBackendEvent.SESSION_SWITCH, eBackendEvent.PLAYER_SWITCH do
 			self:TriggerEventCallbacks(i)

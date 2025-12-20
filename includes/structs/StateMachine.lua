@@ -14,10 +14,10 @@ local StateMachineParams = {}
 ---@field private m_interval seconds
 ---@field private m_next_update seconds
 ---@overload fun(opts?: StateMachineParams) : StateMachine
-StateMachine = {}
+local StateMachine = {}
 StateMachine.__index = StateMachine
 setmetatable(StateMachine, {
-	__call = function(t, ...)
+	__call = function(_, ...)
 		return StateMachine:new(...)
 	end
 })
@@ -100,3 +100,5 @@ end
 function StateMachine:IsToggled()
 	return self.m_is_toggled
 end
+
+return StateMachine

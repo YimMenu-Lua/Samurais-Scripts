@@ -195,7 +195,7 @@ function GUI:RegisterNewTab(id, name, drawable, subtabs)
 		error(_F("Tab '%s' already exists.", name))
 	end
 
-	local newtab = Pair:new(name, Tab(name, drawable, subtabs))
+	local newtab = Pair.new(name, Tab(name, drawable, subtabs))
 	table.insert(self.m_tabs[id], newtab)
 
 	return newtab.second
@@ -342,12 +342,6 @@ function GUI:DrawDummyTab()
 	end
 end
 
----@param bgColor Color
----@return Color
-function GUI:GetAutoTextColor(bgColor)
-	return bgColor:IsDark() and Color("white") or Color("black")
-end
-
 local underlineX = 0.0
 local underlineW = 0.0
 local underlineTargetX = 0.0
@@ -419,7 +413,7 @@ function GUI:DrawTopBar()
 		)
 
 		local bg = (hovered or selected) and col1 or Color(GVars.ui.style.theme.Colors.WindowBg:unpack())
-		local textColor = self:GetAutoTextColor(bg)
+		local textColor = ImGui.GetAutoTextColor(bg)
 		ImGui.ImDrawListAddText(
 			drawList,
 			textPos.x,
@@ -498,7 +492,7 @@ function GUI:DrawSideBar(yPos)
 			for _, pair in ipairs(self.m_selected_category_tabs or {}) do
 				if (pair and pair.second) then
 					local tab = pair.second
-					if (self:Selectable2(pair.first, self.m_selected_tab == tab, selectableSize)) then
+					if (ImGui.Selectable2(pair.first, self.m_selected_tab == tab, selectableSize)) then
 						self:PlaySound(self.Sounds.Nav)
 						self.m_selected_tab = tab
 					end
@@ -840,7 +834,7 @@ function GUI:PlaySound(sound)
 		return
 	end
 
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		AUDIO.PLAY_SOUND_FRONTEND(-1, _sound.soundName, _sound.soundRef, false)
 	end)
 end
@@ -920,129 +914,33 @@ function GUI:ConditionalItem(ImGuiItem, condition, ...)
 	return table.unpack(ret)
 end
 
----@param label string
----@param stringBuffer string
----@param maxWidth? number
----@param flags? ImGuiInputTextFlags
----@return string, boolean
-function GUI:SearchBar(label, stringBuffer, maxWidth, flags)
-	if (maxWidth) then
-		ImGui.SetNextItemWidth(maxWidth)
+local radioStationIdx = 1
+---@param vehicle integer
+---@param comboName string
+---@param stationName? string
+function GUI:VehicleRadioCombo(vehicle, comboName, stationName)
+	local comboPeek = selectedStation or Audio.RadioStations[radioStationIdx].name
+	if ImGui.BeginCombo(("##%s"):format(comboName), comboPeek) then
+		for i, radio in ipairs(Audio.RadioStations) do
+			if ImGui.Selectable(radio.name, (radioStationIdx == i)) then
+				radioStationIdx = i
+				selectedStation = radio.name
+			end
+
+			if self:IsItemClicked(0) then
+				self:PlaySound("Click")
+				script.run_in_fiber(function()
+					AUDIO.SET_VEH_RADIO_STATION(vehicle, radio.station)
+				end)
+			end
+		end
+		ImGui.EndCombo()
 	end
 
-	local out, changed = ImGui.InputTextWithHint(label, "Search", stringBuffer, SizeOf(stringBuffer), flags or 0)
-	return out, changed
+	ImGui.SetWindowFontScale(0.8)
+	ImGui.BulletText(_F("Now Playing: %s", stationName or "Unknown station."))
+	ImGui.SetWindowFontScale(1)
 end
-
----@param label string
----@param selected boolean
----@param size vec2
----@param shouldHighlight? boolean
----@param highlightColor? Color
----@return boolean
-function GUI:Selectable2(label, selected, size, shouldHighlight, highlightColor)
-	local drawList = ImGui.GetWindowDrawList()
-	local pos = vec2:new(ImGui.GetCursorScreenPos())
-	local max = pos + size
-	local rect = Rect(pos, vec2:new(pos.x + size.x, pos.y + size.y))
-	local rectSize = rect:GetSize()
-	ImGui.InvisibleButton(label, rectSize.x, rectSize.y)
-	local hovered = ImGui.IsItemHovered()
-	-- local hovered = ImGui.IsMouseHoveringRect(pos.x, pos.y, max.x, max.y)
-	local clicked = hovered and ImGui.IsItemClicked(0)
-	local pressed = hovered and KeyManager:IsKeyPressed(eVirtualKeyCodes.VK_LBUTTON)
-
-	if (shouldHighlight) then
-		ImGui.ImDrawListAddRectFilled(
-			drawList,
-			pos.x,
-			pos.y,
-			max.x,
-			max.y,
-			highlightColor,
-			8.0
-		)
-	end
-
-	local accent = Color(0, 0, 0, 60):AsU32()
-	local bg = selected and Color(95, 95, 95, 255):AsU32() or Color(100, 100, 100, 255):AsU32()
-
-	if (hovered) then
-		bg = Color(105, 105, 105, 255):AsU32()
-	end
-
-	if (pressed or clicked) then
-		bg = Color(65, 65, 65, 255):AsU32()
-	end
-
-	if (hovered or pressed or selected) then
-		ImGui.ImDrawListAddRectFilled(
-			drawList,
-			pos.x,
-			pos.y + 2,
-			max.x,
-			max.y + 2,
-			accent,
-			8.0
-		)
-
-		ImGui.ImDrawListAddRectFilled(
-			drawList,
-			pos.x,
-			pos.y,
-			max.x,
-			max.y,
-			bg,
-			8.0
-		)
-	end
-
-	local textSizeX, textSizeY = ImGui.CalcTextSize(label)
-	local textPos = pos + vec2:new((size.x - textSizeX) * 0.5, (size.y - textSizeY) * 0.5)
-	local indicatorPos = pos + vec2:new(max.x - 40.0, (size.y - textSizeY) * 0.5)
-	local windowBg = Color(GVars.ui.style.theme.Colors.WindowBg:unpack())
-	local textCol = selected and Color(GVars.ui.style.theme.TopBarFrameCol1:unpack()) or self:GetAutoTextColor(windowBg)
-
-	ImGui.ImDrawListAddText(
-		drawList,
-		textPos.x,
-		textPos.y,
-		textCol:AsU32(),
-		label
-	)
-
-	if (shouldHighlight) then
-		ImGui.ImDrawListAddText(
-			drawList,
-			indicatorPos.x,
-			indicatorPos.y,
-			Color(204, 204, 55, 255):AsU32(),
-			"!"
-		)
-	end
-
-	ImGui.Dummy(0, 0)
-	return clicked
-end
-
--- ---@param label string
--- ---@param outVector vec4
--- ---@return boolean
--- function GUI:ColorEditVec4(label, outVector)
---     if (not IsInstance(outVector, vec4)) then
---         self:Notify("Invalid argument #2: vec4 expected, got %s instead.", type(vec4))
---     end
-
---     local temp, changed = {}, false
---     temp, changed = ImGui.ColorEdit4(label, temp)
---     if (changed) then
---         outVector.x = temp[1]
---         outVector.y = temp[2]
---         outVector.z = temp[3]
---         outVector.w = temp[4]
---     end
---     return changed
--- end
 
 --#endregion
 

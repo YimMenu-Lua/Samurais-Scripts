@@ -13,6 +13,7 @@
 ---@field private m_subtabs? table<string, Tab>
 ---@field private m_grid_layout? GridRenderer
 ---@field private m_has_error boolean
+---@field private m_traceback string
 ---@overload fun(name: string, drawable?: GuiCallback, subtabs?: Tab) : Tab
 local Tab = Class("Tab")
 
@@ -136,7 +137,8 @@ end
 ---@param on_disable? function
 ---@param meta? CommandMeta
 ---@param noCommand? boolean
-function Tab:AddBoolCommand(label, gvar_key, on_enable, on_disable, meta, noCommand)
+---@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
+function Tab:AddBoolCommand(label, gvar_key, on_enable, on_disable, meta, noCommand, isTranslatorLabel)
 	if (type(label) ~= "string" or type(gvar_key) ~= "string") then
 		error("AddBoolCommand requires a label and global variable key string.")
 	end
@@ -160,6 +162,7 @@ function Tab:AddBoolCommand(label, gvar_key, on_enable, on_disable, meta, noComm
 		{
 			persistent = true,
 			tooltip = meta.description,
+			isTranslatorLabel = isTranslatorLabel,
 			onClick = function()
 				local v = table.get_nested_key(GVars, gvar_key)
 				onClick(v)
@@ -191,7 +194,8 @@ end
 ---@param on_disable? function
 ---@param meta? CommandMeta
 ---@param noCommand? boolean
-function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta, noCommand)
+---@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
+function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta, noCommand, isTranslatorLabel)
 	if (type(label) ~= "string" or type(gvar_key) ~= "string") then
 		error("AddBoolCommand requires a label and global variable key string.")
 	end
@@ -200,9 +204,10 @@ function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta, noCom
 	local command_name = label:lower():gsub("%s+", ""):trim()
 	local config_value = table.get_nested_key(GVars, gvar_key)
 	local suspended_thread = not config_value
-	local thread = ThreadManager:CreateNewThread(_F("SS_%s", command_name:upper()), callback, suspended_thread)
+	local thread = ThreadManager:RegisterLooped(_F("SS_%s", command_name:upper()), callback, suspended_thread)
 
 	local function toggle()
+		local v = table.get_nested_key(GVars, gvar_key)
 		if (table.get_nested_key(GVars, gvar_key)) then
 			if thread then thread:Resume() end
 		else
@@ -210,11 +215,13 @@ function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta, noCom
 			if on_disable then on_disable() end
 		end
 
-		CommandExecutor:notify(
-			"%s %s.",
-			label,
-			config_value and "Enabled" or "Disabled"
-		)
+		if (not noCommand) then
+			CommandExecutor:notify(
+				"%s %s.",
+				label,
+				v and "Enabled" or "Disabled"
+			)
+		end
 	end
 
 	self:GetOrCreateGrid():AddCheckbox(
@@ -223,6 +230,7 @@ function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta, noCom
 		{
 			persistent = true,
 			tooltip = meta.description,
+			isTranslatorLabel = isTranslatorLabel,
 			onClick = toggle,
 		}
 	)
@@ -251,13 +259,25 @@ function Tab:DrawInternal()
 	end
 
 	if (self.m_has_error) then
-		ImGui.Text(_F("Tab %s has crashed. Please contact the developer.", self.m_name))
+		ImGui.TextColored(0.8, 0.8, 0, 1, _F("Tab '%s' has crashed. Please contact the developer.", self.m_name))
+		if (self.m_traceback) then
+			ImGui.Spacing()
+			ImGui.BulletText("Traceback most recent call:")
+			ImGui.Indent()
+			ImGui.TextColored(1, 0, 0, 1, self.m_traceback)
+			ImGui.Unindent()
+			if (ImGui.Button("Copy Trace")) then
+				ImGui.SetClipboardText(self.m_traceback)
+			end
+		end
+		return
 	end
 
 	local ok, err = pcall(self.m_callback)
 	if (not ok) then
 		log.fwarning("[%s]: Callback error: %s", self.m_name, err)
 		self.m_has_error = true
+		self.m_traceback = err
 		return
 	end
 end

@@ -1,14 +1,6 @@
 ---@diagnostic disable: lowercase-global
 math.randomseed(os.time())
 
----@class SGSLEntry
----@field value number
----@field pattern string
----@field capture_group number
----@field bit_index number
----@field offsets array<{value: number, capture_group: number}>
-local SGSLEntry = {}
-
 local LUA_TABLE_OVERHEAD <const> = 3 * 0x8 -- 0x18
 
 INT_SIZES = {
@@ -363,9 +355,9 @@ function Joaat(key)
 	return hash
 end
 
--- `Await` is not a true asynchronous function. Instead, it is designed to be called within a coroutine to pause execution until a condition becomes true.
+-- `Await` is not a true asynchronous function. Instead, it is designed to be called within a coroutine to pause execution until a condition is met.
 --
--- All logic after the `Await` call will only execute once the provided function returns true.
+-- All logic after the `Await` call will only execute once the provided function returns a truthy value.
 --
 -- If the condition isn't met before the optional timeout is reached, `Await` throws an error to prevent further execution.
 ---@param func fun(args: any): boolean
@@ -1301,45 +1293,6 @@ function math.lerp(a, b, t)
 	end
 
 	return a + (b - a) * t
-end
-
---#endregion
-
---#region ImGui // TODO
-
--- Wrapper for `ImGui.ColorEdit4` that takes a vec4 and mutates it in place.
----@param label string
----@param outVector vec4
----@return boolean
-function ImGui.ColorEditVec4(label, outVector)
-	if (not IsInstance(outVector, vec4)) then
-		Toast:ShowError("ImGui", _F("Invalid argument #2: vec4 expected, got %s instead.", type(outVector)), true)
-		return false
-	end
-
-	local temp, changed = { outVector:unpack() }, false
-	temp, changed = ImGui.ColorEdit4(label, temp)
-	if (changed) then
-		outVector.x = temp[1]
-		outVector.y = temp[2]
-		outVector.z = temp[3]
-		outVector.w = temp[4]
-	end
-
-	return changed
-end
-
----@param label string
----@param inColor uint32_t
----@return uint32_t, boolean
-function ImGui.ColorEditU32(label, inColor)
-	local temp, changed = { Color(inColor):AsFloat() }, false
-	temp, changed = ImGui.ColorEdit4(label, temp)
-	if (changed) then
-		return Color(temp):AsU32(), changed
-	end
-
-	return inColor, changed
 end
 
 --#endregion

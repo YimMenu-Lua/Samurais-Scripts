@@ -1,6 +1,6 @@
 ---@class Config
 local Config <const> = {
-	__config_version = "0.1c",
+	__config_version = "0.2",
 	__dev_reset = false,
 	backend = {
 		debug_mode = false,
@@ -46,6 +46,7 @@ local Config <const> = {
 		drift_mode = "SHIFT",
 		trigger_bot = "SHIFT",
 		veh_mine = "NUMPAD0",
+		stop_anim = "G"
 	},
 	gamepad_keybinds = {
 		flatbed = {
@@ -79,28 +80,30 @@ local Config <const> = {
 		veh_mine = {
 			code = 0,
 			name = "Unbound"
+		},
+		stop_anim = {
+			code = 0,
+			name = "Unbound"
 		}
 	},
 	features = {
 		self = {
+			phone_anims = false,
+			sprint_inside_interiors = false,
+			jacking_always_lockpick_anim = false,
+			disable_action_mode = false,
+			allow_headprops_in_vehicles = false,
+			stand_on_veh_roof = false,
+			no_carjacking = false,
+			crouch = false,
+			hands_up = false,
+			rod = false,
+			clumsy = false,
+			ragdoll_sound = false,
 			autoheal = {
 				enabled = false,
 				regen_speed = 1
 			},
-		},
-		dunk = {
-			bypass_casino_bans = false,
-			force_poker_cards = false,
-			set_dealers_poker_cards = false,
-			force_roulette_wheel = false,
-			rig_slot_machine = false,
-			autoplay_slots = false,
-			cap_slot_machine_chips = false,
-			ch_cart_autograb = false,
-		},
-		yrv3 = {
-			auto_sell = false,
-			autofill_delay = 500,
 		},
 		vehicle = {
 			nos = {
@@ -116,6 +119,15 @@ local Config <const> = {
 				mode = 0,
 				intensity = 1,
 				power = 50,
+				smoke_fx = {
+					enabled = false,
+					color = {
+						__type = "vec3",
+						x = 1,
+						y = 1,
+						z = 1,
+					}
+				},
 			},
 			performance_only = false,
 			burble_tune = false,
@@ -134,12 +146,33 @@ local Config <const> = {
 				enabled = false,
 				speed = 1,
 			},
-			cobra_maneuver = false,
+			mines = {
+				enabled = false,
+				selected_type_hash = -647126932, -- spike mines default
+			},
 			missile_defence = false,
-			mines = false,
 			strong_crash = false,
 			flatbed = false,
 			auto_lock_doors = false,
+			cobra_maneuver = false,
+			fast_jets = false,
+			no_jet_stall = false,
+			no_turbulence = false,
+			aircraft_mg = {
+				triggerbot = false,
+				tiggerbot_range = 200.0,
+				manual_aim = false,
+				enemies_only = false,
+				marker_size = 1.6,
+				marker_color = {
+					__type = "vec4",
+					x = 0,
+					y = 1,
+					z = 0,
+					w = 1,
+				}
+			},
+			flares = false,
 		},
 		speedometer = {
 			enabled = false,
@@ -159,6 +192,157 @@ local Config <const> = {
 				needle_base = 0xFF111111,
 			},
 		},
+		flatbed = {
+			enabled = false,
+			tow_everything = false,
+			show_towing_position = false,
+			show_esp = false,
+		},
+		weapon = {},
+		world = {
+			hide_n_seek = false,
+			disable_ocean_waves = false,
+			extend_bounds = false,
+			disable_flight_music = false,
+			disable_wanted_music = false,
+			carpool = false,
+		},
+		dunk = {
+			bypass_casino_bans = false,
+			force_poker_cards = false,
+			set_dealers_poker_cards = false,
+			force_roulette_wheel = false,
+			rig_slot_machine = false,
+			autoplay_slots = false,
+			cap_slot_machine_chips = false,
+			ch_cart_autograb = false,
+		},
+		yrv3 = {
+			auto_sell = false,
+			autofill_delay = 500,
+		},
+		bsv2 = {
+			escort_groups = {
+				{
+					members = {
+						{
+							modelHash = 3882958867,
+							name = "Levon Termendzhyan",
+							weapon = 453432689
+						},
+						{
+							modelHash = 4255728232,
+							name = "Armen Petrosyan",
+							weapon = 453432689
+						},
+						{
+							modelHash = 4058522530,
+							name = "Yanni",
+							weapon = 453432689
+						}
+					},
+					name = "Armenian Mobsters",
+					vehicleModel = 83136452
+				},
+				{
+					members = {
+						{
+							modelHash = 42647445,
+							name = "Beretta Von PewPew",
+							weapon = 3220176749
+						},
+						{
+							modelHash = 2168724337,
+							name = "Big Booty Iggy",
+							weapon = 3220176749
+						},
+						{
+							modelHash = 2934601397,
+							name = "Sasha Slasha",
+							weapon = 3220176749
+						}
+					},
+					name = "Bad Bitches",
+					vehicleModel = 461465043
+				},
+				{
+					members = {
+						{
+							modelHash = 1631478380,
+							name = "Jack Reacher",
+							weapon = 2210333304
+						},
+						{
+							modelHash = 1349953339,
+							name = "Ethan Hunt",
+							weapon = 2210333304
+						},
+						{
+							modelHash = 3019107892,
+							name = "Sam Fisher",
+							weapon = 2210333304
+						}
+					},
+					name = "Private Mercenaries",
+					vehicleModel = 2370534026
+				},
+				{
+					members = {
+						{
+							modelHash = 2572894111,
+							name = "Ovidio Guzman",
+							weapon = 3220176749
+						},
+						{
+							modelHash = 2127932792,
+							name = "Popeye",
+							weapon = 3220176749
+						},
+						{
+							modelHash = 3870061732,
+							name = "El Sueno",
+							weapon = 3220176749
+						}
+					},
+					name = "Sicarios",
+					vehicleModel = 1254014755
+				},
+				{
+					members = {
+						{
+							modelHash = 4049719826,
+							name = "Arthur Bishop",
+							weapon = 2210333304
+						},
+						{
+							modelHash = 691061163,
+							name = "Luke Wright",
+							weapon = 2210333304
+						},
+						{
+							modelHash = 1442749254,
+							name = "Frank Martin",
+							weapon = 2210333304
+						}
+					},
+					name = "VIP Security",
+					vehicleModel = 666166960
+				}
+			},
+		},
+		yim_actions = {
+			auto_close_ped_window = false,
+			favorites = {
+				---@type table<string, AnimData>
+				anims = {},
+				---@type table<string, ScenarioData>
+				scenarios = {},
+				---@type table<string, SyncedSceneData>
+				scenes = {},
+				clipsets = {},
+			},
+		},
+		entity_forge = {},
 	},
 }
 

@@ -64,7 +64,7 @@ end
 ---@return eModelType
 function CEntity:GetModelType()
 	if not self:IsValid() then
-		return eModelType.Invalid
+		return Enums.eModelType.Invalid
 	end
 
 	return (self.m_model_type:get_word() & 0x1F)

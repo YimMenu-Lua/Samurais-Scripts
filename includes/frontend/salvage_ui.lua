@@ -1,8 +1,6 @@
 local SalvageYard = require("includes.features.SalvageYard")
 
 local function DrawSalvageYardUI()
-	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
-
 	ImGui.SeparatorText(_T("SY_VEHICLES"))
 	for i = 1, 4 do
 		local carname = SalvageYard:GetCarFromSlot(i)
@@ -24,8 +22,11 @@ local function DrawSalvageYardUI()
 			ImGui.SameLine()
 			local value = stats.get_int(_F("MPX_MPSV_VALUE_SALVAGE_LIFT%d", i))
 			GUI:TextColored(string.formatmoney(value), Color("#00aa00"))
-			local posix = stats.get_int(_F("MPX_SALVAGING_POSIX_LIFT%d", i))
-			ImGui.Text(_F("SALVAGING_POSIX_LIFT: %d", posix)) -- time to be done?
+
+			ImGui.SameLine()
+			if (ImGui.Button(_T("SY_INSTANT_SALVAGE"))) then
+				SalvageYard:InstantSalvage(i)
+			end
 		else
 			ImGui.Text(_F(_T("SY_LIFT_AVAILABLE"), i))
 		end
@@ -35,13 +36,12 @@ local function DrawSalvageYardUI()
 
 	if (GVars.backend.debug_mode) then
 		ImGui.SeparatorText(_T("SY_INFORMATION"))
-		ImGui.Text(_F("SALVAGE_POPULAR_TIME_LEFT : %d", stats.get_int("MPX_SALVAGE_POPULAR_TIME_LEFT"))) -- how long popular? -- more than likely yes and if so then you can figure out the max and lock it there to always get max payout
+		local pop_posix = stats.get_int("MPX_SALVAGE_POPULAR_TIME_LEFT")
+		ImGui.Text(_F("SALVAGE_POPULAR_TIME_LEFT : %d (%s)", pop_posix, Time.format_time_ms(pop_posix))) -- how long popular? -- Time left in milliseconds. It updates every 15 seconds. We can lock it to a big value in a dedicated thread.
 	end
 end
 
 local function DrawRobberiesUI()
-	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 5, 5) -- style vars are now handled by ThemeManager. We should remove this
-
 	ImGui.SeparatorText(_T("SY_ROBBERY_COOLDOWN"))
 
 	if GUI:Button(_T("SY_DISABLE_COOLDOWN")) then
@@ -87,13 +87,11 @@ local function DrawRobberiesUI()
 		stats.set_int("MPX_SALV23_SCOPE_BS", 0)
 		Toast:ShowMessage("Savage Yard", "Your Salvage Yard robbery has been reset")
 	end
-
-	ImGui.PopStyleVar()
 end
 
 local function SalvageYardUI()
 	if (not Game.IsOnline() or not Backend:IsUpToDate()) then
-		ImGui.Text(_T("OFFLINE_OR_OUTDATED"))
+		ImGui.Text(_T("GENERIC_OFFLINE_OR_OUTDATED"))
 		return
 	end
 

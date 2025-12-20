@@ -1,7 +1,7 @@
----@diagnostic disable: param-type-mismatch, return-type-mismatch
+---@diagnostic disable: param-type-mismatch, return-type-mismatch, lowercase-global
 
 ---@enum eAccessorType
-local eAccessorType <const> = {
+eAccessorType = {
 	GLOBAL = 0,
 	LOCAL = 1
 }

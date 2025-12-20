@@ -8,6 +8,11 @@
 ---@field super fun(self: T): ClassMeta<T>
 ---@field isinstance fun(self: any, class: any): boolean
 ---@field notify fun(_, fmt: string, ...?: any) : nil
+---@field __name string
+---@field __type string
+---@field __base? ClassMeta<T>
+
+-- TODO: refactor this into forward declarations and lazy base class resolution because I'm done juggling Lua require order. IM DONE
 
 -- All class-level helper methods use lowercase: new, init, extend, serialize, isinstance, super, etc.
 --

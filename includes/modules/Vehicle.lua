@@ -1,3 +1,14 @@
+require("includes.modules.Entity")
+
+---@enum eConvertibleRoofState
+Enums.eConvertibleRoofState = {
+	INVALID  = -1,
+	RAISED   = 0,
+	LOWERING = 1,
+	LOWERED  = 2,
+	RAISING  = 3
+}
+
 local collisionInvalidModels = Set.new(
 	3008087081,
 	415536433,
@@ -41,7 +52,7 @@ function Vehicle:GetName()
 end
 
 ---@return string
-function Vehicle:GetManufacturer()
+function Vehicle:GetManufacturerName()
 	if not self:IsValid() then
 		return ""
 	end
@@ -70,7 +81,7 @@ function Vehicle:GetClassName()
 		return "Unknown"
 	end
 
-	return EnumTostring(eVehicleClasses, clsid)
+	return EnumTostring(Enums.eVehicleClasses, clsid)
 end
 
 function Vehicle:GetEngineHealth()
@@ -124,6 +135,47 @@ function Vehicle:GetNumberOfSeats()
 	end
 
 	return self.m_num_seats
+end
+
+---@return eLandingGearState
+function Vehicle:GetLandingGearState()
+	if not (self:IsAircraft() and self:HasLandingGear()) then
+		return 0
+	end
+
+	return VEHICLE.GET_LANDING_GEAR_STATE(self:GetHandle())
+end
+
+---@return eConvertibleRoofState
+function Vehicle:GetConvertibleRoofState()
+	if (not self:IsConvertible()) then
+		return Enums.eConvertibleRoofState.INVALID
+	end
+
+	return VEHICLE.GET_CONVERTIBLE_ROOF_STATE(self:GetHandle())
+end
+
+---@return string
+function Vehicle:GetRadioStationName()
+	if (not self:IsRadioOn()) then
+		return "OFF"
+	end
+
+	return HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+end
+
+---@return boolean
+function Vehicle:IsRadioOn()
+	return AUDIO.IS_VEHICLE_RADIO_ON(self:GetHandle())
+end
+
+---@return boolean
+function Vehicle:IsConvertible()
+	if (not self:IsCar()) then
+		return false
+	end
+
+	return VEHICLE.IS_VEHICLE_A_CONVERTIBLE(self:GetHandle(), false)
 end
 
 ---@param seatIndex number
@@ -276,8 +328,49 @@ function Vehicle:IsBicycle()
 end
 
 ---@return boolean
+function Vehicle:IsLandVehicle()
+	return self:IsCar() or self:IsQuad() or self:IsBike()
+end
+
+---@return boolean
+function Vehicle:IsAircraft()
+	return self:IsPlane() or self:IsHeli()
+end
+
+---@return boolean
+function Vehicle:IsDriveable()
+	return VEHICLE.IS_VEHICLE_DRIVEABLE(self:GetHandle(), false)
+end
+
+---@return boolean
+function Vehicle:IsEngineOn()
+	return VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(self:GetHandle())
+end
+
+---@return boolean
+function Vehicle:IsStopped()
+	return VEHICLE.IS_VEHICLE_STOPPED(self:GetHandle())
+end
+
+---@return boolean
+function Vehicle:IsMoving()
+	return not self:IsStopped()
+end
+
+---@param ped handle
+---@return boolean
+function Vehicle:IsPedInVehicle(ped)
+	return PED.IS_PED_SITTING_IN_VEHICLE(ped, self:GetHandle())
+end
+
+---@return boolean
 function Vehicle:HasABS()
-	return self:GetModelFlag(eVehicleModelFlags.ABS_STD)
+	return self:GetModelFlag(Enums.eVehicleModelFlags.ABS_STD)
+end
+
+---@return boolean
+function Vehicle:HasLandingGear()
+	return VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(self:GetHandle())
 end
 
 function Vehicle:HasCrashed()
@@ -301,13 +394,13 @@ function Vehicle:HasCrashed()
 
 	local entity_type = Memory:GetEntityModelType(last)
 
-	if (entity_type == eModelType.Invalid) then
+	if (entity_type == Enums.eModelType.Invalid) then
 		return false, ""
-	elseif (entity_type == eModelType.Ped) then
+	elseif (entity_type == Enums.eModelType.Ped) then
 		return false, "Hit and run"
-	elseif (entity_type == eModelType.Vehicle) then
+	elseif (entity_type == Enums.eModelType.Vehicle) then
 		return true, "Samir, you're breaking the car!"
-	elseif (entity_type == eModelType.Object or entity_type == eModelType.Destructible) then
+	elseif (entity_type == Enums.eModelType.Object or entity_type == Enums.eModelType.Destructible) then
 		if (ENTITY.DOES_ENTITY_HAVE_PHYSICS(last)) then
 			local model = ENTITY.GET_ENTITY_MODEL(last)
 			if collisionInvalidModels:Contains(model) then
@@ -324,7 +417,7 @@ end
 
 ---@return boolean
 function Vehicle:IsSports()
-	return self:GetModelInfoFlag(eVehicleModelInfoFlags.SPORTS)
+	return self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.SPORTS)
 end
 
 ---@return boolean
@@ -349,70 +442,77 @@ function Vehicle:IsPerformanceCar()
 	end
 
 	local cls = self:GetClassID()
-	if (cls == eVehicleClasses.Sports or cls == eVehicleClasses.Super) then
+	if (cls == Enums.eVehicleClasses.Sports or cls == Enums.eVehicleClasses.Super) then
 		return true
 	end
 
-	local allowedClasses <const> = {
-		eVehicleClasses.Coupes,
-		eVehicleClasses.Sedans,
-		eVehicleClasses.Muscle,
-		eVehicleClasses.OpenWheel,
-		eVehicleClasses.SUVs,
-		eVehicleClasses.Sports,
-		eVehicleClasses.Super,
-	}
+	-- local allowedClasses <const> = {
+	-- 	eVehicleClasses.Sedans,
+	-- 	eVehicleClasses.SUVs,
+	-- 	eVehicleClasses.Coupes,
+	-- 	eVehicleClasses.Muscle,
+	-- 	eVehicleClasses.OpenWheel,
+	-- }
 
-	if not allowedClasses[cls] then
-		return false
-	end
-
-	local cvehicle = self:Resolve()
-	if (not cvehicle) then
-		return false
-	end
-
-	local drive_force = cvehicle.m_initial_drive_force:get_float()
-	local flat_velocity = cvehicle.m_drive_max_flat_velocity:get_float()
-	local dummyHP = drive_force * flat_velocity
-	-- local p2w = (drive_force * 1000) / cvehicle.m_mass:get_float()
-	-- if (p2w < 0.1) then
-	--     return false
+	-- if (not allowedClasses[cls]) then
+	-- 	return false
 	-- end
-	-- print(dummyHP)
-	if (dummyHP < 10) then
-		return false
-	end
 
-	local perf = (drive_force * 100)
-		+ (cvehicle.m_initial_drive_max_flat_vel:get_float() * 0.5)
-		+ (cvehicle.m_traction_curve_max:get_float() * 14)
-		- (cvehicle.m_initial_drag_coeff:get_float() * 10)
-		- (cvehicle.m_mass:get_float() * 0.005)
+	-- local cvehicle = self:Resolve()
+	-- if (not cvehicle) then
+	-- 	return false
+	-- end
 
-	return perf >= 60.0
+	-- local drive_force = cvehicle.m_initial_drive_force:get_float()
+	-- local flat_velocity = cvehicle.m_drive_max_flat_velocity:get_float()
+	-- local dummyHP = drive_force * flat_velocity
+	-- -- local p2w = (drive_force * 1000) / cvehicle.m_mass:get_float()
+	-- -- if (p2w < 0.1) then
+	-- --     return false
+	-- -- end
+	-- -- print(dummyHP)
+	-- if (dummyHP < 10) then
+	-- 	return false
+	-- end
+
+	-- local perf = (drive_force * 100)
+	-- 	+ (cvehicle.m_initial_drive_max_flat_vel:get_float() * 0.5)
+	-- 	+ (cvehicle.m_traction_curve_max:get_float() * 14)
+	-- 	- (cvehicle.m_initial_drag_coeff:get_float() * 10)
+	-- 	- (cvehicle.m_mass:get_float() * 0.005)
+
+	-- return perf >= 70.0
+	return false
+end
+
+function Vehicle:IsFlatbedTruck()
+	return self:GetModelHash() == 1353720154
 end
 
 -- Returns whether the vehicle is a pubic hair shaver.
 ---@return boolean
 function Vehicle:IsElectric()
-	return self:GetModelInfoFlag(eVehicleModelInfoFlags.IS_ELECTRIC)
+	return self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.IS_ELECTRIC)
 end
 
 -- Returns whether the vehicle is an F1 race car.
 function Vehicle:IsFormulaOne()
-	return self:GetModelInfoFlag(eVehicleModelInfoFlags.IS_FORMULA_VEHICLE)
-		or (self:GetClassID() == eVehicleClasses.OpenWheel)
+	return self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.IS_FORMULA_VEHICLE)
+		or (self:GetClassID() == Enums.eVehicleClasses.OpenWheel)
 end
 
 -- Returns whether the vehicle is a lowrider equipped with hydraulic suspension.
 function Vehicle:IsLowrider()
-	return self:GetModelInfoFlag(eVehicleModelInfoFlags.HAS_LOWRIDER_HYDRAULICS)
-		or self:GetModelInfoFlag(eVehicleModelInfoFlags.HAS_LOWRIDER_DONK_HYDRAULICS)
+	return self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.HAS_LOWRIDER_HYDRAULICS)
+		or self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.HAS_LOWRIDER_DONK_HYDRAULICS)
 end
 
 function Vehicle:IsLocked()
 	return VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(self:GetHandle()) > 1
+end
+
+function Vehicle:ClearPrimaryTask()
+	TASK.CLEAR_PRIMARY_VEHICLE_TASK(self:GetHandle())
 end
 
 function Vehicle:Clean()
@@ -505,7 +605,7 @@ function Vehicle:LockDoors(toggle)
 				end
 			end
 
-			if (VEHICLE.IS_VEHICLE_A_CONVERTIBLE(handle, false) and VEHICLE.GET_CONVERTIBLE_ROOF_STATE(handle) ~= 0) then
+			if (self:IsConvertible() and self:GetConvertibleRoofState() ~= 0) then
 				VEHICLE.RAISE_CONVERTIBLE_ROOF(handle, false)
 			else
 				for i = 0, 7 do
@@ -845,11 +945,10 @@ end
 function Vehicle:ApplyMods(tModData)
 	local handle = self:GetHandle()
 	if not self:IsValid() then
-		print("invalid")
 		return
 	end
 
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		VEHICLE.SET_VEHICLE_MOD_KIT(handle, 0)
 
 		if tModData.mods then
@@ -983,7 +1082,7 @@ end
 
 ---@param step integer 1 next seat|-1 previous seat
 function Vehicle:ShuffleSeats(step)
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		if not self:IsLocalPlayerInVehicle() then
 			return
 		end
@@ -1128,13 +1227,193 @@ function Vehicle:SetBoneMatrix(bone_index, matrix)
 	self:Resolve():SetBoneMatrix(bone_index, matrix)
 end
 
----@return CCarHandlingData|nil
+---@return CBaseSubHandlingData|any
 function Vehicle:GetHandlingData()
-	if not (self:IsValid() and self:IsCar()) then
+	if (not self:IsValid()) then
+		return nil
+	end
+	local handlingType = Enums.eHandlingType.CAR
+
+	-- this is bad but whatever
+	if (self:IsBike()) then
+		handlingType = Enums.eHandlingType.BIKE
+	elseif self:IsPlane() or self:IsHeli() then
+		handlingType = Enums.eHandlingType.FLYING
+	end
+
+	return self:Resolve():GetSubHandlingData(handlingType)
+end
+
+function Vehicle:GetMaxPassengers()
+	return VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(self:GetHandle())
+end
+
+---@param seatIndex integer
+---@param atGetIn? boolean
+---@return handle
+function Vehicle:GetPedInSeat(seatIndex, atGetIn)
+	if (seatIndex > self:GetMaxPassengers()) then
+		log.warning("[Vehicle]: Seat index out of bounds.")
+		return 0
+	end
+
+	return VEHICLE.GET_PED_IN_VEHICLE_SEAT(self:GetHandle(), seatIndex, atGetIn or false)
+end
+
+-- Applies a custom paint job to the vehicle
+---@param hex string Hexadecimal color string
+---@param p integer Pearlescent index
+---@param m boolean Matte color
+---@param is_primary boolean
+---@param is_secondary boolean
+function Vehicle:SetCustomPaint(hex, p, m, is_primary, is_secondary)
+	script.run_in_fiber(function()
+		if (not self:Exists()) then
+			return
+		end
+
+		local pt = m and 3 or 1
+		local r, g, b, _ = Color(hex):AsRGBA()
+		local handle = self:GetHandle()
+		VEHICLE.SET_VEHICLE_MOD_KIT(handle, 0)
+
+		if (is_primary) then
+			VEHICLE.SET_VEHICLE_MOD_COLOR_1(handle, pt, 0, p)
+			VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(handle, r, g, b)
+			VEHICLE.SET_VEHICLE_EXTRA_COLOURS(handle, p, 0)
+		end
+
+		if is_secondary then
+			VEHICLE.SET_VEHICLE_MOD_COLOR_2(handle, pt, 0)
+			VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(handle, r, g, b)
+		end
+	end)
+end
+
+---@param targetEntity integer
+---@param enemiesOnly? boolean
+function Vehicle:ShootAtTarget(targetEntity, enemiesOnly)
+	if (not self:IsWeaponized()) then
 		return
 	end
 
-	return self:Resolve():GetCarHandlingData()
+	if (not ENTITY.DOES_ENTITY_EXIST(targetEntity)
+			or ENTITY.IS_ENTITY_DEAD(targetEntity, false)
+			or ENTITY.IS_ENTITY_AN_OBJECT(targetEntity)) then
+		return
+	end
+
+	local targetCoords = ENTITY.GET_ENTITY_COORDS(targetEntity, true)
+	local playerHandle = Self:GetHandle()
+	local isEnemy = (ENTITY.IS_ENTITY_A_PED(targetEntity) and Self:IsPedMyEnemy(targetEntity))
+		or (ENTITY.IS_ENTITY_A_VEHICLE(targetEntity) and Vehicle(targetEntity):IsEnemyVehicle())
+
+	if (enemiesOnly and not isEnemy) then
+		return
+	end
+
+	VEHICLE.SET_VEHICLE_SHOOT_AT_TARGET(
+		playerHandle,
+		targetEntity,
+		targetCoords.x,
+		targetCoords.y,
+		targetCoords.z
+	)
+end
+
+---@param coords vec3
+---@param opts? { speed?: number, drivingFlags?: eDrivingFlags, cruiseAltitude?: number, landAtDestination: boolean } optional parameters
+function Vehicle:GoTo(coords, opts)
+	if (not self:IsValid()) then
+		return
+	end
+
+	if (self:IsBoat()) then
+		-- requires PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS so Im skipping it for now
+		return
+	end
+
+	opts = opts or {}
+	local driver = self:GetPedInSeat(-1)
+	if (not Game.IsScriptHandle(driver)) then
+		return
+	end
+
+	self:ClearPrimaryTask()
+	TASK.CLEAR_PED_TASKS(driver)
+	TASK.CLEAR_PED_SECONDARY_TASK(driver)
+
+	if (self:IsLandVehicle()) then
+		local speed = opts.speed or 25
+		local flags = opts.drivingFlags or 786603
+		TASK.TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(
+			driver,
+			self:GetHandle(),
+			coords.x,
+			coords.y,
+			coords.z,
+			speed,
+			flags,
+			25
+		)
+	elseif (self:IsPlane()) then
+		local cruiseAltitude = opts.cruiseAltitude or 800
+		TASK.TASK_PLANE_MISSION(
+			driver,
+			self:GetHandle(),
+			0,
+			0,
+			coords.x,
+			coords.y,
+			coords.z + cruiseAltitude,
+			4,
+			100.0,
+			0.0,
+			90.0,
+			5000,
+			200.0,
+			true
+		)
+	elseif (self:IsHeli()) then
+		local landOnArrival = opts.landAtDestination or false
+		TASK.TASK_HELI_MISSION(
+			driver,
+			self:GetHandle(),
+			0,
+			0,
+			coords.x,
+			coords.y,
+			coords.z,
+			4,
+			self:GetMaxSpeed(),
+			4.0,
+			-1,
+			-1,
+			100,
+			100.0,
+			landOnArrival and 32 or 0
+		)
+	end
+end
+
+---@param opts? { speed?: number, drivingFlags?: eDrivingFlags } optional parameters
+function Vehicle:Wander(opts)
+	if (not self:IsValid() or not self:IsLandVehicle()) then
+		return
+	end
+
+	opts = opts or {}
+	local driver = self:GetPedInSeat(-1)
+	if (not Game.IsScriptHandle(driver)) then
+		return
+	end
+
+	TASK.TASK_VEHICLE_DRIVE_WANDER(
+		driver,
+		self:GetHandle(),
+		opts.speed or 20,
+		opts.drivingFlags or 786603
+	)
 end
 
 -- Serializes a vehicle to JSON.

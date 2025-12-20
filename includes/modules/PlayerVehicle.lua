@@ -1,91 +1,123 @@
 ---@diagnostic disable: param-type-mismatch
 
+local StateMachine = require("includes.structs.StateMachine")
+local Speedometer = require("includes.features.Speedometer")
 local FeatureMgr = require("includes.services.FeatureManager")
 local NosMgr = require("includes.features.vehicle.nos")
+local FlappyDoors = require("includes.features.vehicle.flappy_doors")
+local BFD = require("includes.features.vehicle.brake_force_display")
 local LaunchControlMgr = require("includes.features.vehicle.launch_control")
 local DriftMode = require("includes.features.vehicle.drift_mode")
 local HighBeams = require("includes.features.vehicle.high_beams")
 local IVExit = require("includes.features.vehicle.iv_style_exit")
 local RGBLights = require("includes.features.vehicle.rgb_lights")
 local CarCrash = require("includes.features.vehicle.car_crashes")
+local VehMines = require("includes.features.vehicle.mines")
+local MiscVehicle = require("includes.features.vehicle.misc_vehicle")
 
--- Singleton
+---@class GenericToggleable
+---@field is_toggled boolean
+---@field onDisable fun(...): any
+---@field args? table
+
+
+-----------------------------------------
+-- PlayerVehicle Module
+-----------------------------------------
+-- Singleton controller for the player’s vehicle that manages features, state machines, threads, and ensures
+--
+-- all temporary modifications (handling flags, memory writes, toggles, visuals, audio, etc.) are safely restored
+--
+-- when the vehicle changes or resets.
 ---@class PlayerVehicle : Vehicle
 ---@field private m_handle handle
 ---@field private m_last_model hash
----@field private m_abs_sm StateMachine
 ---@field private m_esc_sm StateMachine
----@field private m_flappy_doors_sm StateMachine
 ---@field private m_feat_mgr FeatureManager
 ---@field private m_nos_mgr NosMgr
+---@field private m_abs_mgr BFD
 ---@field private m_lctrl_mgr LaunchControlMgr
----@field private m_door_lock_state integer
 ---@field private m_threads array<Thread>
 ---@field private m_default_handling_flags table<eVehicleHandlingFlags, boolean>
 ---@field private m_handling_flags_to_change table<string, { flag : eVehicleHandlingFlags, bikes_only : boolean }>
 ---@field private m_default_max_speed float
 ---@field private m_has_loud_radio boolean
----@field private m_default_pointers table<pointer, { set_func: fun(self: pointer, v: anyval), default_value: anyval }>
+---@field private m_generic_toggleables table<string, GenericToggleable>
 ---@field public m_default_xenon_lights { enabled: boolean, index: integer }
+---@field public m_default_tire_smoke { enabled: boolean, color: vec3 }
+---@field public m_autopilot { eligible: boolean, state: eAutoPilotState, initial_nozzle_pos: integer }
+---@field public m_is_shooting_flares boolean
+---@field public m_is_flatbed boolean cache it so we don't have to call natives in UI threads
 ---@overload fun(handle: handle): PlayerVehicle
 local PlayerVehicle = Class("PlayerVehicle", Vehicle)
 PlayerVehicle.m_handling_flags_to_change = {
-	["features.vehicle.no_engine_brake"] = { flag = eVehicleHandlingFlags.FREEWHEEL_NO_GAS, bikes_only = false },
-	["features.vehicle.kers_boost"] = { flag = eVehicleHandlingFlags.HAS_KERS, bikes_only = false },
-	["features.vehicle.offroad_abilities"] = { flag = eVehicleHandlingFlags.OFFROAD_ABILITIES_X2, bikes_only = false },
-	["features.vehicle.rallye_tyres"] = { flag = eVehicleHandlingFlags.HAS_RALLY_TYRES, bikes_only = false },
-	["features.vehicle.no_traction_control"] = { flag = eVehicleHandlingFlags.FORCE_NO_TC_OR_SC, bikes_only = true },
-	["features.vehicle.low_speed_wheelies"] = { flag = eVehicleHandlingFlags.LOW_SPEED_WHEELIES, bikes_only = true },
+	["features.vehicle.no_engine_brake"] = { flag = Enums.eVehicleHandlingFlags.FREEWHEEL_NO_GAS, bikes_only = false },
+	["features.vehicle.kers_boost"] = { flag = Enums.eVehicleHandlingFlags.HAS_KERS, bikes_only = false },
+	["features.vehicle.offroad_abilities"] = { flag = Enums.eVehicleHandlingFlags.OFFROAD_ABILITIES_X2, bikes_only = false },
+	["features.vehicle.rallye_tyres"] = { flag = Enums.eVehicleHandlingFlags.HAS_RALLY_TYRES, bikes_only = false },
+	["features.vehicle.no_traction_control"] = { flag = Enums.eVehicleHandlingFlags.FORCE_NO_TC_OR_SC, bikes_only = true },
+	["features.vehicle.low_speed_wheelies"] = { flag = Enums.eVehicleHandlingFlags.LOW_SPEED_WHEELIES, bikes_only = true },
 }
-
----@return LaunchControlMgr
-function PlayerVehicle:GetLaunchControlMgr()
-	return self.m_lctrl_mgr
-end
+PlayerVehicle.mines = {
+	Pair.new("Spikes", -647126932),
+	Pair.new("Slick", 1459276487),
+	Pair.new("Explosive", 1508567460),
+	Pair.new("EMP", 1776356704),
+	Pair.new("Kinetic", 1007245390),
+}
+---@enum eAutoPilotState
+PlayerVehicle.eAutoPilotState = {
+	NONE      = 0,
+	WAYPOINT  = 1,
+	OBJECTIVE = 2,
+	RANDOM    = 3
+}
+PlayerVehicle.FlightControls = {
+	72,
+	75,
+	87,
+	88,
+	89,
+	90,
+	106,
+	107,
+	108,
+	109,
+	110,
+	111,
+	112,
+}
 
 function PlayerVehicle:InitFeatures()
 	self.m_feat_mgr  = FeatureMgr.new(self)
 	self.m_lctrl_mgr = self.m_feat_mgr:Add(LaunchControlMgr.new(self))
 	self.m_nos_mgr   = self.m_feat_mgr:Add(NosMgr.new(self))
+	self.m_abs_mgr   = self.m_feat_mgr:Add(BFD.new(self))
 
+	self.m_feat_mgr:Add(FlappyDoors.new(self))
 	self.m_feat_mgr:Add(DriftMode.new(self))
 	self.m_feat_mgr:Add(HighBeams.new(self))
 	self.m_feat_mgr:Add(IVExit.new(self))
 	self.m_feat_mgr:Add(RGBLights.new(self))
 	self.m_feat_mgr:Add(CarCrash.new(self))
+	self.m_feat_mgr:Add(VehMines.new(self))
+	self.m_feat_mgr:Add(MiscVehicle.new(self))
 end
 
 ---@return PlayerVehicle
-function PlayerVehicle:init(handle)
+function PlayerVehicle.new(handle)
 	---@type PlayerVehicle
 	local instance = setmetatable({
 		m_is_nos_active = false,
 		m_handle = handle,
 		m_threads = {},
 		m_default_handling_flags = {},
-		m_default_pointers = {},
+		m_generic_toggleables = {},
 		m_default_xenon_lights = { enabled = false, index = 0 },
+		m_default_tire_smoke = { enabled = false, color = vec3:zero() },
+		m_autopilot = { eligible = false, state = PlayerVehicle.eAutoPilotState.NONE, initial_nozzle_pos = 1 },
 		m_default_max_speed = 0,
 	}, PlayerVehicle)
-
-	instance.m_abs_sm = StateMachine({
-		predicate = function(_, veh)
-			return Self:IsDriving()
-				and veh:IsCar()
-				and veh:HasABS()
-				and (not GVars.features.vehicle.performance_only or veh:IsPerformanceCar())
-				and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(veh:GetHandle())
-				and PAD.IS_CONTROL_PRESSED(0, 72)
-				and ((veh:GetSpeed() * 3.6) >= 70)
-		end,
-		interval = 0.1,
-		callback = function(_, veh)
-			VEHICLE.SET_VEHICLE_BRAKE_LIGHTS(
-				veh:GetHandle(),
-				false
-			)
-		end
-	})
 
 	instance.m_esc_sm = StateMachine({
 		predicate = function(_, veh)
@@ -97,16 +129,9 @@ function PlayerVehicle:init(handle)
 		interval = 0.1
 	})
 
-	instance.m_flappy_doors_sm = StateMachine({
-		predicate = function(_, veh)
-			return Self:IsDriving() and veh:IsCar()
-		end,
-		interval = 0.6,
-	})
-
 	instance:InitFeatures()
 
-	local main_thread = ThreadManager:CreateNewThread("SS_VEHICLE", function()
+	local main_thread = ThreadManager:RegisterLooped("SS_VEHICLE", function()
 		instance:Main()
 	end)
 
@@ -135,8 +160,12 @@ function PlayerVehicle:Set(handle)
 		self:GetDefaultHandlingFlags()
 	end
 
+	local temp                          = vec3:zero()
 	self.m_default_xenon_lights.enabled = VEHICLE.IS_TOGGLE_MOD_ON(handle, 22)
-	self.m_default_xenon_lights.index = VEHICLE.GET_VEHICLE_XENON_LIGHT_COLOR_INDEX(handle)
+	self.m_default_xenon_lights.index   = VEHICLE.GET_VEHICLE_XENON_LIGHT_COLOR_INDEX(handle)
+	self.m_default_tire_smoke.enabled   = VEHICLE.IS_TOGGLE_MOD_ON(handle, 20)
+	self.m_default_tire_smoke.color     = vec3:new(VEHICLE.GET_VEHICLE_TYRE_SMOKE_COLOR(handle, temp.x, temp.y, temp.z))
+	self.m_autopilot.eligible           = self:IsAircraft()
 	-- self:ResumeThreads()
 	-- self.m_feat_mgr:OnEnable()
 end
@@ -144,11 +173,19 @@ end
 function PlayerVehicle:Reset()
 	-- self.m_feat_mgr:OnDisable()
 	-- self:SuspendThreads()
+	if (self:IsLocked()) then
+		VEHICLE.SET_VEHICLE_DOORS_LOCKED(self:GetHandle(), 1)
+		self.m_generic_toggleables["autolockdoors"] = nil
+	end
+
 	self:RestoreHeadlights()
+	self:RestoreTireSmoke()
 	self:RestoreExhaustPops()
 	self:ResetHandlingFlags()
-	self:ResetPointers()
+	self:RestoreAllPatches()
+	self:ResetAllGenericToggleables()
 
+	self.m_autopilot = { eligible = false, state = self.eAutoPilotState.NONE, initial_nozzle_pos = 1 }
 	self.m_last_model = self:GetModelHash()
 	self:Destroy()
 	self.m_handle = 0
@@ -163,45 +200,72 @@ function PlayerVehicle:GetDefaultMaxSpeed()
 	return self.m_default_max_speed
 end
 
----@param ptr pointer
----@param getFunc fun(self: pointer): anyval
----@param setFunc fun(self: pointer, v: anyval)
----@param value anyval
-function PlayerVehicle:WriteMemory(ptr, getFunc, setFunc, value)
-	if (ptr:is_null()) then
-		return
-	end
-
-	if (not self.m_default_pointers[ptr]) then
-		self.m_default_pointers[ptr] = { set_func = setFunc, default_value = getFunc(ptr) }
-	end
-
-	setFunc(ptr, value)
+-- Patches your current vehicle's memory once and automatically resets it on cleanup.
+---@param data PatchData
+function PlayerVehicle:AddMemoryPatch(data)
+	Memory:AddPatch(self, data, false)
 end
 
----@param ptr pointer
-function PlayerVehicle:RestorePointer(ptr)
-	local data = self.m_default_pointers[ptr]
-	if (ptr:is_null() or not data) then
-		return
-	end
-
-	data.set_func(ptr, data.default_value)
-	self.m_default_pointers[ptr] = nil
+---@param patchName string
+function PlayerVehicle:ApplyPatch(patchName)
+	Memory:ApplyPatch(self, patchName)
 end
 
-function PlayerVehicle:ResetPointers()
-	if (next(self.m_default_pointers) == nil) then
+---@param patchName string
+function PlayerVehicle:RestorePatch(patchName)
+	Memory:RestorePatch(self, patchName)
+end
+
+function PlayerVehicle:RestoreAllPatches()
+	Memory:RestoreAllPatchesByRef(self)
+end
+
+---@param name string
+---@param onEnable? function
+---@param onDisable fun(...)
+---@param args? table
+function PlayerVehicle:AddGenericToggleable(name, onEnable, onDisable, args)
+	if (self.m_generic_toggleables[name]) then
 		return
 	end
 
-	for ptr, data in pairs(self.m_default_pointers) do
-		if (ptr:is_valid() and data.default_value ~= nil and type(data.set_func) == "function") then
-			data.set_func(ptr, data.default_value)
+	args = args or {}
+	if (type(onEnable) == "function") then
+		onEnable()
+	end
+
+	self.m_generic_toggleables[name] = {
+		is_toggled = true,
+		onDisable = onDisable,
+		args = args
+	}
+end
+
+function PlayerVehicle:ResetGenericToggleable(name)
+	local generic = self.m_generic_toggleables[name]
+	if (not generic or type(generic.onDisable) ~= "function") then
+		return
+	end
+
+	generic.onDisable(table.unpack(generic.args))
+	self.m_generic_toggleables[name] = nil
+end
+
+function PlayerVehicle:ResetAllGenericToggleables()
+	if (next(self.m_generic_toggleables) == nil) then
+		return
+	end
+
+	for name, generic in pairs(self.m_generic_toggleables) do
+		local toggled = generic.is_toggled
+		local func = generic.onDisable
+		local args = generic.args
+		if (toggled and type(generic.onDisable) == "function") then
+			func(table.unpack(args))
 		end
 	end
 
-	self.m_default_pointers = {}
+	self.m_generic_toggleables = {}
 end
 
 ---@return boolean
@@ -232,31 +296,8 @@ function PlayerVehicle:ResumeThreads()
 end
 
 ---@return boolean
-function PlayerVehicle:IsDrivable()
-	return VEHICLE.IS_VEHICLE_DRIVEABLE(self:GetHandle(), false)
-end
-
----@return boolean
-function PlayerVehicle:IsLandVehicle()
-	return self:IsCar() or self:IsQuad() or self:IsBike()
-end
-
----@return boolean
-function PlayerVehicle:IsEngineOn()
-	return VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(self:GetHandle())
-end
-
----@return boolean
-function PlayerVehicle:IsMoving()
-	return not VEHICLE.IS_VEHICLE_STOPPED(self:GetHandle())
-end
-
----@return boolean
 function PlayerVehicle:IsDriftButtonPressed()
-	return KeyManager:IsFeatureButtonPressed(
-		GVars.keyboard_keybinds.drift_mode,
-		GVars.gamepad_keybinds.drift_mode
-	)
+	return KeyManager:IsKeybindPressed("drift_mode")
 end
 
 ---@return boolean
@@ -276,7 +317,7 @@ end
 
 ---@return boolean
 function PlayerVehicle:IsABSEngaged()
-	return self.m_abs_sm:IsActive()
+	return self.m_abs_mgr:IsToggled()
 end
 
 ---@return boolean
@@ -287,6 +328,11 @@ end
 ---@return boolean
 function PlayerVehicle:IsNOSActive()
 	return self.m_nos_mgr:IsActive()
+end
+
+---@return float
+function PlayerVehicle:GetNOSDangerRatio()
+	return self.m_nos_mgr:GetDangerRatio()
 end
 
 ---@return number
@@ -302,14 +348,6 @@ end
 ---@return number
 function PlayerVehicle:GetCurrentGear()
 	return VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(self:GetHandle())
-end
-
-function PlayerVehicle:UpdateABS()
-	if (not GVars.features.vehicle.abs_lights) then
-		return
-	end
-
-	self.m_abs_sm:Update(self)
 end
 
 ---@param toggle boolean
@@ -329,6 +367,17 @@ function PlayerVehicle:RestoreHeadlights()
 	VEHICLE.SET_VEHICLE_LIGHT_MULTIPLIER(handle, 1.0)
 end
 
+function PlayerVehicle:RestoreTireSmoke()
+	if (not self:IsValid()) then
+		return
+	end
+
+	local handle = self:GetHandle()
+	local col = self.m_default_tire_smoke.color
+	VEHICLE.SET_VEHICLE_TYRE_SMOKE_COLOR(handle, col.x, col.y, col.z)
+	VEHICLE.TOGGLE_VEHICLE_MOD(handle, 20, self.m_default_tire_smoke.enabled)
+end
+
 ---@return boolean
 function PlayerVehicle:HasLoudRadio()
 	return self.m_has_loud_radio
@@ -342,37 +391,6 @@ function PlayerVehicle:UpdateESC()
 	self.m_esc_sm:Update(self)
 end
 
-function PlayerVehicle:UpdateFlappyDoors()
-	if (not GVars.features.vehicle.flappy_doors) then
-		return
-	end
-
-	local handle = self:GetHandle()
-	self.m_flappy_doors_sm:Update(self)
-	if (not self.m_flappy_doors_sm:IsActive()) then
-		return
-	end
-
-	for i = 0, VEHICLE.GET_NUMBER_OF_VEHICLE_DOORS(handle) + 1 do
-		if (not VEHICLE.GET_IS_DOOR_VALID(handle, i)) then
-			goto continue
-		end
-
-		local angle = VEHICLE.GET_VEHICLE_DOOR_ANGLE_RATIO(handle, i)
-		if (self.m_flappy_doors_sm:IsToggled()) then
-			if (angle < 1) then
-				VEHICLE.SET_VEHICLE_DOOR_OPEN(handle, i, false, false)
-			end
-		else
-			if (angle > 0) then
-				VEHICLE.SET_VEHICLE_DOOR_SHUT(handle, i, false)
-			end
-		end
-
-		::continue::
-	end
-end
-
 function PlayerVehicle:AutolockDoors()
 	if (not GVars.features.vehicle.auto_lock_doors) then
 		return
@@ -383,18 +401,23 @@ function PlayerVehicle:AutolockDoors()
 	local distance = vehPos:distance(Self:GetPos())
 	local isLocked = VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(handle) > 1
 
-	if (not isLocked and distance > 20) then
-		self:LockDoors(true)
+	if (not isLocked
+			and distance > 20
+			and Self:IsOutside()
+			and PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Self:GetHandle()) ~= handle
+		) then
+		self:AddGenericToggleable("autolockdoors", function()
+			self:LockDoors(true)
+		end, self.LockDoors, { self, false })
 	end
 
 	if (isLocked and PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Self:GetHandle()) == handle) then
-		self:LockDoors(false)
+		self:ResetGenericToggleable("autolockdoors")
 	end
-	self.m_door_lock_state = isLocked and 2 or 1
 end
 
 function PlayerVehicle:GetDefaultHandlingFlags()
-	for _, value in pairs(eVehicleHandlingFlags) do
+	for _, value in pairs(Enums.eVehicleHandlingFlags) do
 		self.m_default_handling_flags[value] = self:GetHandlingFlag(value)
 	end
 end
@@ -429,6 +452,84 @@ function PlayerVehicle:RestoreExhaustPops()
 	self.m_lctrl_mgr:RestoreExhaustPops()
 end
 
+function PlayerVehicle:ResetAutopilot()
+	self.m_autopilot.state = self.eAutoPilotState.NONE
+	self:ClearPrimaryTask()
+	Self:ClearTasks()
+	Self:ClearSecondaryTask()
+end
+
+---@param newState eAutoPilotState
+function PlayerVehicle:UpdateAutopilotState(newState)
+	if (newState == self.m_autopilot.state) then
+		return
+	end
+
+	if (not Self:IsDriving()) then
+		Toast:ShowError("Autopilot", "You are not in an aircraft.")
+		return
+	end
+
+	self.m_autopilot.state = newState
+	if (newState == self.eAutoPilotState.NONE) then
+		self:ResetAutopilot()
+		return
+	end
+
+	local destination
+	if (newState == self.eAutoPilotState.RANDOM) then
+		destination = Game.GetRandomCoordsInRange(vec3:new(-2000, -3000, 0), vec3:new(2000, 3500, 100))
+	elseif (newState == self.eAutoPilotState.WAYPOINT) then
+		destination = Game.GetWaypointCoords()
+	elseif (newState == self.eAutoPilotState.OBJECTIVE) then
+		destination = Game.GetObjectiveBlipCoords()
+	end
+
+	if (not destination or destination:is_zero()) then
+		Toast:ShowError("Autopilot", "Failed to get autopilot coordinates!")
+		self:ResetAutopilot()
+		return
+	end
+
+	self.m_autopilot.initial_nozzle_pos = VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(self:GetHandle())
+	self:GoTo(destination)
+end
+
+function PlayerVehicle:HandleAutopilot()
+	if (self.m_autopilot.state == self.eAutoPilotState.NONE) then
+		return
+	end
+
+	if (not Self:IsDriving() or not Self:IsAlive()) then
+		self:ResetAutopilot()
+		return
+	end
+
+	for _, ctrl in ipairs(self.FlightControls) do
+		if (PAD.IS_CONTROL_PRESSED(0, ctrl)) then
+			self:ResetAutopilot()
+			Toast:ShowMessage(
+				"Samurai's Scripts",
+				"Autopilot interrupted! Giving back control to the player.",
+				false,
+				4
+			)
+			break
+		end
+	end
+
+	if (self:GetHeightAboveGround() > 15) then
+		local gs = self:GetLandingGearState()
+		if (gs ~= Enums.eLandingGearState.RETRACTED and gs ~= Enums.eLandingGearState.RETRACTING) then
+			VEHICLE.CONTROL_LANDING_GEAR(self:GetHandle(), Enums.eLandingGearState.RETRACTING)
+		end
+
+		if (VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(self:GetHandle()) ~= self.m_autopilot.initial_nozzle_pos) then
+			VEHICLE.SET_VEHICLE_FLIGHT_NOZZLE_POSITION(self:GetHandle(), self.m_autopilot.initial_nozzle_pos)
+		end
+	end
+end
+
 function PlayerVehicle:Main()
 	if (not self:IsValid()) then
 		sleep(500)
@@ -438,28 +539,49 @@ function PlayerVehicle:Main()
 	local handle = self:GetHandle()
 
 	if (GVars.features.vehicle.fast_vehicles) then
-		if (self:GetMaxSpeed() <= 50) then
+		if (self:GetMaxSpeed() <= 80) then
 			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, 100)
 		end
-	elseif (self:GetMaxSpeed() >= 50) then
+	elseif (self:GetMaxSpeed() >= 80) then
 		VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, -1)
 	end
 
-	if (GVars.features.vehicle.subwoofer and not self:HasLoudRadio()) then
-		self:ToggleSubwoofer(true)
+	if (GVars.features.vehicle.subwoofer and (not self:HasLoudRadio() or not self.m_generic_toggleables["subwoofer"])) then
+		self:AddGenericToggleable("subwoofer", function()
+			self:ToggleSubwoofer(true)
+		end, self.ToggleSubwoofer, { self, false })
+	end
+
+	if (GVars.features.vehicle.unbreakable_windows) then
+		local native = VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS
+		self:AddGenericToggleable("strongwindows", function()
+			native(handle, true)
+		end, native, { handle, false })
 	end
 
 	if (GVars.features.vehicle.auto_brake_lights) then
-		if (self:IsDrivable() and self:IsEngineOn() and not self:IsMoving() and not PAD.IS_CONTROL_PRESSED(0, 72)) then
+		if (self:IsDriveable() and self:IsEngineOn() and not self:IsMoving() and not PAD.IS_CONTROL_PRESSED(0, 72)) then
 			VEHICLE.SET_VEHICLE_BRAKE_LIGHTS(handle, true)
 		end
 	end
 
+	self.m_is_flatbed = self:IsFlatbedTruck()
 	self.m_feat_mgr:Update()
-	self:UpdateABS()
 	self:UpdateESC()
-	self:UpdateFlappyDoors()
 	self:AutolockDoors()
+	self:HandleAutopilot()
+	Speedometer:UpdateState()
 end
 
-return PlayerVehicle
+-- Just for convenience so we don't have to remember patch names.
+--
+-- If we want auto-complete, we have to first define the patch name here.
+--
+-- We can still ignore this and memorize patch names and directly use them to apply/restore.
+PlayerVehicle.MemoryPatches = {
+	DeformMult = "DeformMult",
+	Turbulence = "Turbulence",
+	WindMult   = "WindMult",
+}
+
+return PlayerVehicle.new(0)

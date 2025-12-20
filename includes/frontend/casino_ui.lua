@@ -71,7 +71,7 @@ local function drawGamblingTab()
 	end
 	ImGui.SameLine()
 	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_SURPRISE") then
-		ThreadManager:RunInFiber(function()
+		ThreadManager:Run(function()
 			math.randomseed(Time.now() * 69)
 			local id = math.random(eCasinoPrize.VEHICLE, eCasinoPrize.CLOTHING)
 			CasinoPacino:GiveWheelPrize(id)
@@ -415,7 +415,7 @@ end
 
 local function DrawDunk()
 	if (not Game.IsOnline() or not Backend:IsUpToDate()) then
-		ImGui.Text(_T "OFFLINE_OR_OUTDATED")
+		ImGui.Text(_T "GENERIC_OFFLINE_OR_OUTDATED")
 		return
 	end
 

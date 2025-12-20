@@ -97,6 +97,16 @@ function Time.elapsed_ms(since)
 	return Time.millis() - since
 end
 
+function Time.format_time_seconds(seconds)
+	local h = math.floor(seconds / 3600)
+	local m = math.floor((seconds % 3600) / 60)
+	return _F("%02d:%02d:%02d", h, m, seconds % 60)
+end
+
+function Time.format_time_ms(ms)
+	return Time.format_time_seconds(math.floor(ms / 1000))
+end
+
 ---@param seconds seconds
 ---@return string `HH:MM:SS`
 function Time.format_time_since(seconds)

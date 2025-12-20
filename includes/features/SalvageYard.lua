@@ -45,7 +45,7 @@ end
 ---@param slot integer
 ---@return string|nil
 function SalvageYard:CheckWeeklyRobberyStatus(slot)
-	local statName = _F("%s%d", "MPX_SALV23_VEHROB_STATUS", slot)
+	local statName = _F("MPX_SALV23_VEHROB_STATUS%d", slot)
 	local status   = stats.get_int(statName)
 	return robbery_status_tostring[status + 1]
 end
@@ -53,8 +53,18 @@ end
 ---@param slot integer
 ---@return boolean
 function SalvageYard:IsLiftTaken(slot)
-	local statName = _F("%s%d", "MPX_MPSV_MODEL_SALVAGE_LIFT", slot)
+	local statName = _F("MPX_MPSV_MODEL_SALVAGE_LIFT%d", slot)
 	return stats.get_int(statName) ~= 0
+end
+
+---@param slot integer
+function SalvageYard:InstantSalvage(slot)
+	if (not self:IsLiftTaken(slot)) then
+		return
+	end
+
+	local statName = _F("MPX_SALVAGING_POSIX_LIFT%d", slot)
+	stats.set_int(statName, stats.get_int(statName) - 7200) -- takes 48 minutes with upgrades and 96 minutes without
 end
 
 function SalvageYard:IsRobberyActive()

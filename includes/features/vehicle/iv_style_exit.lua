@@ -32,33 +32,34 @@ function IVStyleExit:ShouldRun()
 		and not HUD.IS_MP_TEXT_CHAT_TYPING()
 end
 
----@param toggle boolean
-function IVStyleExit:TogglePedFlag(toggle)
-	PED.SET_PED_CONFIG_FLAG(Self:GetHandle(), 241, toggle)
-end
-
 function IVStyleExit:Cleanup()
 	self.m_triggered = false
 	self.m_timer:reset()
 	self.m_timer:pause()
 end
 
+---@param keepEngineOn boolean
 function IVStyleExit:LeaveVehicle(keepEngineOn)
-	PED.SET_PED_CONFIG_FLAG(Self:GetHandle(), 241, keepEngineOn or false)
+	local vehHandle = self.m_entity:GetHandle()
 	local leftPressed = PAD.IS_CONTROL_PRESSED(0, 34)
 	local rightPressed = PAD.IS_CONTROL_PRESSED(0, 35)
 	local enabled = GVars.features.vehicle.no_wheel_recenter and (leftPressed or rightPressed)
-	local vehHandle = self.m_entity:GetHandle()
+	Self:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, keepEngineOn)
 	TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), vehHandle, enabled and 16 or 0) -- 16=tp outside. goofy because I don't feel like patching memory 🤷‍♂️
-	VEHICLE.SET_VEHICLE_ENGINE_ON(vehHandle, keepEngineOn or false, false, false)
 	self:Cleanup()
 end
 
 function IVStyleExit:Update()
-	Backend:RegisterDisabledControl(75)
+	PAD.DISABLE_CONTROL_ACTION(0, 75, true)
 
 	local exitPressed = PAD.IS_DISABLED_CONTROL_PRESSED(0, 75)
 	if (exitPressed) then
+		if (self.m_entity:GetSpeed() > 15) then
+			TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), self.m_entity:GetHandle(), 4160)
+			self:Cleanup()
+			return
+		end
+
 		if (not GVars.features.vehicle.iv_exit) then
 			self:LeaveVehicle(false)
 			return
@@ -79,7 +80,7 @@ function IVStyleExit:Update()
 	end
 
 	if (self.m_triggered and not Self:IsDriving()) then
-		PED.SET_PED_CONFIG_FLAG(Self:GetHandle(), 241, false)
+		PED.SET_PED_CONFIG_FLAG(Self:GetHandle(), Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
 		self:Cleanup()
 		return
 	end

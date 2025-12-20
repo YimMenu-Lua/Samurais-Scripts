@@ -1,0 +1,57 @@
+---@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
+
+local FeatureBase = require("includes.modules.FeatureBase")
+
+---@class BFD : FeatureBase
+---@field private m_entity PlayerVehicle
+---@field private m_is_toggled boolean
+---@field private m_last_update_time milliseconds
+local BFD = setmetatable({}, FeatureBase)
+BFD.__index = BFD
+
+---@param pv PlayerVehicle
+---@return BFD
+function BFD.new(pv)
+	local self = FeatureBase.new(pv)
+	return setmetatable(self, BFD)
+end
+
+function BFD:Init()
+	self.m_is_toggled = false
+	self.m_last_update_time = 0
+end
+
+function BFD:ShouldRun()
+	return (self.m_entity
+		and self.m_entity:IsValid()
+		and self.m_entity:IsCar()
+		and self.m_entity:HasABS()
+		and GVars.features.vehicle.abs_lights
+	)
+end
+
+function BFD:IsToggled()
+	return self:IsActive() and self.m_is_toggled
+end
+
+function BFD:Update()
+	local PV = self.m_entity
+	if (Time.millis() < self.m_last_update_time) then
+		return
+	end
+
+	if VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(PV:GetHandle())
+		and PAD.IS_CONTROL_PRESSED(0, 72)
+		and (PV:GetSpeed() >= 19.44) then
+		if (not GVars.features.vehicle.performance_only or PV:IsPerformanceCar()) then
+			VEHICLE.SET_VEHICLE_BRAKE_LIGHTS(PV:GetHandle(), false)
+		end
+
+		self.m_is_toggled = not self.m_is_toggled
+		self.m_last_update_time = Time.millis() + 100
+	else
+		self.m_is_toggled = false
+	end
+end
+
+return BFD

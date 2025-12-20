@@ -246,7 +246,7 @@ local function DrawEntities()
 		ImGui.SameLine()
 		ImGui.BeginChild("##entitydetails", 0, 0, true)
 		---@diagnostic disable-next-line: undefined-global
-		if ImGui.BeginTable("entity_table", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders) then
+		if ImGui.BeginTable("entity_table", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.BordersInner) then
 			ImGui.TableSetupColumn("Handle")
 			ImGui.TableSetupColumn("Model Hash")
 			ImGui.TableSetupColumn("Type")
@@ -263,26 +263,25 @@ local function DrawEntities()
 				ImGui.Text(EnumTostring(eEntityType, selected_entity_type))
 				ImGui.TableSetColumnIndex(3)
 
-				ImGui.SameLine()
 				if (selected_entity_type == eEntityType.Ped) then
-					if GUI:Button("Kill##" .. handle) then
-						ThreadManager:RunInFiber(function()
+					if GUI:Button(_F(" K ##%d", handle)) then
+						ThreadManager:Run(function()
 							Ped(handle):Kill()
 						end)
 					end
 				elseif (selected_entity_type == eEntityType.Vehicle) then
-					if GUI:Button("Clone##" .. handle) then
-						ThreadManager:RunInFiber(function()
+					if GUI:Button(_F(" C ##%d", handle)) then
+						ThreadManager:Run(function()
 							Vehicle(handle):Clone()
 						end)
 					end
-					ImGui.SameLine()
 				end
-				if GUI:Button("Delete##" .. handle) then
+
+				ImGui.SameLine()
+				if GUI:Button(_F(" D ##%d", handle)) then
 					Game.DeleteEntity(handle)
 				end
 			end
-
 			ImGui.EndTable()
 		end
 		ImGui.EndChild()
@@ -292,7 +291,7 @@ end
 local function DrawThreads()
 	local thread_list = ThreadManager:ListThreads()
 	local thread_count = table.getlen(thread_list)
-	local child_height = math.min(thread_count * 30, GVars.ui.window_size.y - 20)
+	local child_height = math.min(thread_count * 20, GVars.ui.window_size.y - 60)
 
 	ImGui.BulletText(_F("Thread Count: [%d]", thread_count))
 	ImGui.BeginChild("##threadlist", ImGui.GetContentRegionAvail() - 200, child_height)
@@ -569,7 +568,7 @@ local function PopulateVehlistOnce()
 		return
 	end
 
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		for name, _ in pairs(TVehTextureLookup) do
 			table.insert(
 				TVehList,
@@ -583,11 +582,12 @@ local function PopulateVehlistOnce()
 		table.sort(TVehList, function(a, b)
 			return a.displayname < b.displayname
 		end)
-		sleep(10)
+		yield()
 	end)
 end
 
 local function DrawDummyVehSpawnMenu()
+	local resolution = Game.GetScreenResolution()
 	ImGui.Text("Lightweight Vehicle Preview Test")
 	PopulateVehlistOnce()
 
@@ -610,14 +610,14 @@ local function DrawDummyVehSpawnMenu()
 		local texture_name = selected_veh_name
 		local window_pos   = vec2:new(ImGui.GetWindowPos())
 		local abs_pos      = vec2:new(window_pos.x + ImGui.GetWindowWidth(), hovered_y)
-		local draw_pos     = abs_pos / Game.GetScreenResolution()
+		local draw_pos     = abs_pos / resolution
 
-		ThreadManager:RunInFiber(function()
+		ThreadManager:Run(function()
 			if Game.RequestTextureDict(texture_dict) then
 				local sprite_w = 256
 				local sprite_h = 128
-				local norm_w   = sprite_w / Game.GetScreenResolution().x
-				local norm_h   = sprite_h / Game.GetScreenResolution().y
+				local norm_w   = sprite_w / resolution.x
+				local norm_h   = sprite_h / resolution.y
 
 				GRAPHICS.DRAW_SPRITE(
 					texture_dict,
@@ -675,6 +675,60 @@ local function DrawMiscTests()
 			PV:Resolve():DumpAdvancedFlags()
 		end)
 	end
+
+	if (ImGui.Button("Get Subhandling Data")) then
+		script.run_in_fiber(function()
+			local PV = Self:GetVehicle()
+			if (not PV:IsValid()) then
+				return
+			end
+
+			print(PV:GetHandlingData())
+		end)
+	end
+end
+
+local selectedPatchTable
+local selectedPatchName = ""
+local function DrawPatches()
+	local patch_list <const> = Memory:ListPatches()
+	local thread_count = table.getlen(patch_list)
+	local child_width = selectedPatchTable and ImGui.GetContentRegionAvail() * 0.4 or 0
+
+	if (thread_count == 0) then
+		ImGui.Text("No registered memory patches.")
+		return
+	end
+
+	ImGui.BeginChild("##patchlist", child_width, 0)
+	ImGui.SetNextWindowBgAlpha(0)
+	if ImGui.BeginListBox("##patches", -1, 0) then
+		for owner, patchTable in pairs(patch_list) do
+			local count = table.getlen(patchTable)
+			local label = _F("%s [%d]",
+				(owner.__type or owner.__name or owner.m_name or tostring(patchTable)),
+				count
+			)
+			if (ImGui.Selectable(label, selectedPatchTable == patchTable)) then
+				selectedPatchTable = patchTable
+			end
+		end
+		ImGui.EndListBox()
+	end
+	ImGui.EndChild()
+	if (not selectedPatchTable) then
+		return
+	end
+
+	ImGui.SameLine()
+	ImGui.BeginChild("##patchesbyowner", 0, 0, true)
+	for name, patch in pairs(selectedPatchTable) do
+		local label = _F("%s (%s)", name, patch:IsEnabled() and "Applied" or "Not applied")
+		if (ImGui.Selectable(label, selectedPatchName == name)) then
+			selectedPatchName = name
+		end
+	end
+	ImGui.EndChild()
 end
 
 debug_tab:RegisterGUI(function()
@@ -693,6 +747,11 @@ debug_tab:RegisterGUI(function()
 
 	if ImGui.BeginTabItem("Pointers") then
 		DrawPointers()
+		ImGui.EndTabItem()
+	end
+
+	if ImGui.BeginTabItem("Patches") then
+		DrawPatches()
 		ImGui.EndTabItem()
 	end
 

@@ -86,16 +86,16 @@ eVirtualKeyCodes = { -- https://learn.microsoft.com/en-us/windows/win32/inputdev
 	MULTIPLY               = 0x6A,
 	N                      = 0x4E,
 	NUMLOCK                = 0x90,
-	Numpad0                = 0x60,
-	Numpad1                = 0x61,
-	Numpad2                = 0x62,
-	Numpad3                = 0x63,
-	Numpad4                = 0x64,
-	Numpad5                = 0x65,
-	Numpad6                = 0x66,
-	Numpad7                = 0x67,
-	Numpad8                = 0x68,
-	Numpad9                = 0x69,
+	NUMPAD0                = 0x60,
+	NUMPAD1                = 0x61,
+	NUMPAD2                = 0x62,
+	NUMPAD3                = 0x63,
+	NUMPAD4                = 0x64,
+	NUMPAD5                = 0x65,
+	NUMPAD6                = 0x66,
+	NUMPAD7                = 0x67,
+	NUMPAD8                = 0x68,
+	NUMPAD9                = 0x69,
 	O                      = 0x4F,
 	P                      = 0x50,
 	PAGEDOWN               = 0x22,
@@ -286,7 +286,7 @@ function KeyManager:init()
 		instance:EventHandler(_, msg, wParam, _)
 	end)
 
-	ThreadManager:CreateNewThread("SS_KEYMGR", function()
+	ThreadManager:RegisterLooped("SS_KEYMGR", function()
 		instance:BeginFrame()
 		instance:HandleCallbacks()
 		instance:EndFrame()
@@ -355,19 +355,41 @@ function KeyManager:IsAnyKeyPressed()
 	return false, nil, nil
 end
 
----@param keyboadKey string|eVirtualKeyCodes
----@param controllerKey { name: string, code: number }
-function KeyManager:IsFeatureButtonPressed(keyboadKey, controllerKey)
+---@param keybindName string
+function KeyManager:IsKeybindPressed(keybindName)
 	local control = self:GetCurrentControlType()
 	if (control == eControlType.KEYBOARD) then
-		return KeyManager:IsKeyPressed(keyboadKey)
+		local kbKeyStr = GVars.keyboard_keybinds[keybindName]
+		return kbKeyStr and KeyManager:IsKeyPressed(kbKeyStr) or false
 	end
 
 	if (control == eControlType.CONTROLLER) then
-		if (type(controllerKey) ~= "table" or not controllerKey.code or controllerKey.code == 0) then
+		local gpad_t = GVars.gamepad_keybinds[keybindName]
+		if (type(gpad_t) ~= "table" or not gpad_t.code or gpad_t.code == 0) then
 			return false
 		end
-		return PAD.IS_CONTROL_PRESSED(0, controllerKey.code)
+
+		return PAD.IS_CONTROL_PRESSED(0, gpad_t.code)
+	end
+
+	return false
+end
+
+---@param keybindName string
+function KeyManager:IsKeybindJustPressed(keybindName)
+	local control = self:GetCurrentControlType()
+	if (control == eControlType.KEYBOARD) then
+		local kbKeyStr = GVars.keyboard_keybinds[keybindName]
+		return kbKeyStr and KeyManager:IsKeyJustPressed(kbKeyStr) or false
+	end
+
+	if (control == eControlType.CONTROLLER) then
+		local gpad_t = GVars.gamepad_keybinds[keybindName]
+		if (type(gpad_t) ~= "table" or not gpad_t.code or gpad_t.code == 0) then
+			return false
+		end
+
+		return PAD.IS_CONTROL_JUST_PRESSED(0, gpad_t.code)
 	end
 
 	return false

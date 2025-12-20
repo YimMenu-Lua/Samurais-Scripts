@@ -21,6 +21,8 @@ GenericClass = setmetatable({}, {
 	__metatable = false
 })
 
+---@alias Obj table|metatable|userdata
+
 ---@class Enum
 ---@field public First fun(self: Enum): integer Returns the first value of the enum.
 ---@field public Keys fun(self: Enum): string[] Returns an array of all enum keys.

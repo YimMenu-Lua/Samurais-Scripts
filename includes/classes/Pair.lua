@@ -57,7 +57,7 @@ end
 ---@param a K
 ---@param b V
 ---@return Pair<K, V>
-function Pair:new(a, b)
+function Pair.new(a, b)
 	local obj = { _raw = { a, b } }
 	return setmetatable(obj, _mt)
 end

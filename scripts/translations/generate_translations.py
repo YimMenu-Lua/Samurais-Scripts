@@ -153,6 +153,7 @@ def translate_text(iso: str, text: str) -> str:
 
 
 def write_hashmap():
+	print("Updating hashmap")
 	with open(HASHMAP_PATH, "w", encoding="utf-8") as f:
 		json.dump(HASHMAP, f, indent=4)
 

@@ -31,8 +31,10 @@ local commandRegistry <const> = {
 			local business = args[1]
 			local arg2 = args[2]
 			if (type(business) ~= "string") then
-				Toast:ShowError("CommandExecutor",
-					_F("Invalid command argument %s. Argmuments are: hangar | warehouse <number>", business))
+				Toast:ShowError(
+					"CommandExecutor",
+					_F("Invalid command argument %s. Argmuments are: hangar | warehouse <number>", business)
+				)
 				return
 			end
 
@@ -60,7 +62,7 @@ local commandRegistry <const> = {
 
 	["clonepv"] = {
 		callback = function(args)
-			ThreadManager:RunInFiber(function()
+			ThreadManager:Run(function()
 				local PV = Self:GetVehicle()
 				if not PV then
 					Toast:ShowError("CommandExecutor", "You are not in a vehicle.")
@@ -80,7 +82,7 @@ local commandRegistry <const> = {
 
 	["savepv"] = {
 		callback = function(args)
-			ThreadManager:RunInFiber(function()
+			ThreadManager:Run(function()
 				local PV = Self:GetVehicle()
 				if not PV then
 					Toast:ShowError("CommandExecutor", "You are not in a vehicle.")
@@ -99,7 +101,7 @@ local commandRegistry <const> = {
 
 	["spawnjsonveh"] = {
 		callback = function(args)
-			ThreadManager:RunInFiber(function()
+			ThreadManager:Run(function()
 				if (type(args) ~= "table") then
 					Toast:ShowError("CommandExecutor", "Missing parameter. Usage: spawnjsonveh MyCustomVehicle.json",
 						true)

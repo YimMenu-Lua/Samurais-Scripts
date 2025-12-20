@@ -167,7 +167,7 @@ function CommandExecutor.new()
 		end
 	end
 
-	ThreadManager:CreateNewThread("SS_COMMANDS", function()
+	ThreadManager:RegisterLooped("SS_COMMANDS", function()
 		instance:HandleCallbacks()
 	end)
 

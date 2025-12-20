@@ -206,7 +206,7 @@ function Notifier.new()
 		instance:Draw()
 	end)
 
-	ThreadManager:CreateNewThread("SS_TOAST", function()
+	ThreadManager:RegisterLooped("SS_TOAST", function()
 		instance:Update()
 		sleep(1)
 	end)

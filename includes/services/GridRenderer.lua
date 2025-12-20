@@ -1,9 +1,10 @@
 ---@class GridItemOpts
----@field onClick? function
----@field onTrue? function
----@field finalValue? number
----@field buttonRepeat? boolean
----@field persistent? boolean
+---@field onClick? function Callback to execute when the item is clicked
+---@field onTrue? function Callback to execute when the item is enabled
+---@field finalValue? number Exclusive to radio buttons
+---@field buttonRepeat? boolean Exclusive to buttons
+---@field persistent? boolean Whether the passe global key should be serialized to JSON
+---@field isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@field tooltip? string
 ---@field disabled? boolean
 
@@ -129,6 +130,7 @@ function GridRenderer:AddCheckbox(label, global_variable, opts)
 				finalValue = nil,
 				buttonRepeat = nil,
 				persistent = opts.persistent,
+				isTranslatorLabel = opts.isTranslatorLabel,
 				tooltip = opts.tooltip,
 				disabled = opts.disabled
 			}
@@ -156,6 +158,7 @@ function GridRenderer:AddButton(label, opts)
 				finalValue = nil,
 				buttonRepeat = opts.buttonRepeat,
 				persistent = nil,
+				isTranslatorLabel = opts.isTranslatorLabel,
 				tooltip = opts.tooltip,
 				disabled = opts.disabled
 			}
@@ -183,6 +186,7 @@ function GridRenderer:AddRadioButton(label, opts)
 				finalValue = opts.finalValue,
 				buttonRepeat = nil,
 				persistent = opts.persistent,
+				isTranslatorLabel = opts.isTranslatorLabel,
 				tooltip = opts.tooltip,
 				disabled = opts.disabled
 			}
@@ -204,14 +208,22 @@ function GridRenderer:Draw()
 	for _, item in ipairs(self.elements) do
 		local item_size
 		local global_table = item.opts.persistent and GVars or _G
+		local label = item.opts.isTranslatorLabel and _T(item.label)
+			or item.label
+
+		local tooltip
+		if (item.opts.tooltip) then
+			tooltip = item.opts.isTranslatorLabel and _T(item.opts.tooltip)
+				or item.opts.tooltip
+		end
 
 		if (item.item_type:lower() == "checkbox") then
-			item_size   = vec2:new(ImGui.CalcTextSize(item.label))
+			item_size   = vec2:new(ImGui.CalcTextSize(label))
 			item_size.x = item_size.x + self.padding_x + 30
 		elseif (item.item_type == "button") then
 			item_size = vec2:new(ImGui.GetItemRectSize())
 		elseif (item.item_type:lower() == "radio") then
-			item_size = vec2:new(ImGui.CalcTextSize(item.label))
+			item_size = vec2:new(ImGui.CalcTextSize(label))
 		end
 
 		local item_width  = item_size.x + self.padding_x
@@ -241,18 +253,17 @@ function GridRenderer:Draw()
 		local config_value = table.get_nested_key(global_table, item.gvar)
 		if (item.item_type:lower() == "checkbox") then
 			config_value = config_value or false
-			config_value, result = GUI:Checkbox(item.label, config_value, { tooltip = item.opts.tooltip })
+			config_value, result = GUI:Checkbox(label, config_value, { tooltip = tooltip })
 			if (result) then
 				table.set_nested_key(global_table, item.gvar, config_value)
 			end
 		elseif (item.item_type:lower() == "button") then
-			result = GUI:Button(item.label, { tooltip = item.opts.tooltip, repeatable = item.opts.buttonRepeat })
+			result = GUI:Button(label, { tooltip = tooltip, repeatable = item.opts.buttonRepeat })
 		elseif (item.item_type:lower() == "radio") then
 			config_value = config_value or 0
-			config_value, result = ImGui.RadioButton(item.label, config_value, item.opts.finalValue)
-
-			if (item.opts.tooltip) then
-				GUI:Tooltip(item.opts.tooltip)
+			config_value, result = ImGui.RadioButton(label, config_value, item.opts.finalValue)
+			if (tooltip) then
+				GUI:Tooltip(tooltip)
 			end
 
 			if (result) then

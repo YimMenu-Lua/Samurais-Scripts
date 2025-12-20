@@ -69,8 +69,11 @@ end
 ---@return Color
 function Color.new(...)
 	local args = { ... }
-	local self = setmetatable({}, Color)
+	if (IsInstance(args[1], vec4)) then
+		args = { args[1]:unpack() }
+	end
 
+	local self = setmetatable({}, Color)
 	self.m_type = eColorType.UNK
 	self.m_source = args
 

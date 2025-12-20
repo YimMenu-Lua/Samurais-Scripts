@@ -118,7 +118,7 @@ function Thread:IsSuspended()
 end
 
 ---@param s? script_util
-function Thread:Tick(s)
+function Thread:OnTick(s)
 	self.m_can_run = (type(self.m_callback) == "function")
 	if (not self.m_can_run) then
 		log.fwarning("Thread %s was terminated because it has no callback", self.m_name)
@@ -176,7 +176,7 @@ function Thread:Start()
 
 	self.m_can_run = (type(self.m_callback) == "function")
 	if not self.m_can_run then
-		log.fwarning("Thread %s was killed because it has no callback", self.m_name)
+		log.fwarning("Thread %s was terminated because it had no callback", self.m_name)
 		self.m_state = eThreadState.DEAD
 		return false
 	end
@@ -297,8 +297,9 @@ function ThreadManager:init()
 	return instance
 end
 
+-- Runs a callback once in a fiber.
 ---@param func function
-function ThreadManager:RunInFiber(func)
+function ThreadManager:Run(func)
 	if (type(func) ~= "function") then
 		Backend:debug("[ThreadManager] Invalid parameter! Expected function, got %s instead.", type(func))
 		return
@@ -313,11 +314,12 @@ function ThreadManager:RunInFiber(func)
 	handler.dispatch(func)
 end
 
+-- Creates a thread that runs in a loop.
 ---@param name string
 ---@param func function
 ---@param suspended? boolean
 ---@param is_debug_thread? boolean
-function ThreadManager:CreateNewThread(name, func, suspended, is_debug_thread)
+function ThreadManager:RegisterLooped(name, func, suspended, is_debug_thread)
 	if (API_VER == eAPIVersion.L54 and not is_debug_thread) then
 		return
 	end
@@ -326,12 +328,12 @@ function ThreadManager:CreateNewThread(name, func, suspended, is_debug_thread)
 		return
 	end
 
-	if string.isnullorwhitespace(name) then
+	if (string.isempty(name) or string.iswhitespace(name)) then
 		name = string.random(5, true):upper()
 	end
 
-	if self:IsThreadRegistered(name) then
-		log.fwarning("Thread '%s' is already registered!", name)
+	if (self:IsThreadRegistered(name)) then
+		log.fwarning("a thread with the name '%s' is already registered!", name)
 		return
 	end
 
@@ -341,8 +343,8 @@ function ThreadManager:CreateNewThread(name, func, suspended, is_debug_thread)
 	end
 
 	self.m_threads[name] = thread
-	self:RunInFiber(function(s)
-		thread:Tick(s)
+	self:Run(function(s)
+		thread:OnTick(s)
 	end)
 
 	return thread
@@ -393,8 +395,8 @@ function ThreadManager:StartThread(name)
 		local new_thread = Thread(name, func)
 
 		self.m_threads[name] = new_thread
-		self:RunInFiber(function(s)
-			new_thread:Tick(s)
+		self:Run(function(s)
+			new_thread:OnTick(s)
 		end)
 	end
 end

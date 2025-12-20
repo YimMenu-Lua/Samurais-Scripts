@@ -234,7 +234,7 @@ function YRV3:init()
 		m_cooldown_state_dirty = true,
 	}, self)
 
-	self.m_thread = ThreadManager:CreateNewThread("SS_YRV3", function()
+	self.m_thread = ThreadManager:RegisterLooped("SS_YRV3", function()
 		instance:Main()
 	end)
 
@@ -442,24 +442,27 @@ function YRV3:WarehouseAutofill()
 			sleep(500)
 		end
 
-		if (stats.get_int(("MPX_CONTOTALFORWHOUSE%d"):format(i - 1))) == v.max then
+		if (stats.get_int(_F("MPX_CONTOTALFORWHOUSE%d", i - 1))) == v.max then
 			GUI:PlaySound(GUI.Sounds.Error)
 			Toast:ShowWarning("YRV3", _F("Warehouse N°%d is already full! Option has been disabled.", i))
 			v.autoFill = false
 			goto continue
 		end
 
-		while ((stats.get_int(_F("MPX_CONTOTALFORWHOUSE%d", i - 1))) < v.max) do
-			if (not v.autoFill) then
-				break
+		ThreadManager:Run(function()
+			while ((stats.get_int(_F("MPX_CONTOTALFORWHOUSE%d", i - 1))) < v.max) do
+				if (not v.autoFill) then
+					break
+				end
+
+				stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, i + 11)
+				sleep(GVars.features.yrv3.autofill_delay or 100)
 			end
 
-			stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, i + 11)
-			sleep(GVars.features.yrv3.autofill_delay or 100)
-		end
+			v.autoFill = false
+		end)
 
 		::continue::
-		v.autoFill = false
 	end
 
 	sleep(1000)
@@ -492,16 +495,18 @@ function YRV3:HangarAutofill()
 		return
 	end
 
-	while stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL") < 50 do
-		if (not self.m_hangar_loop) then
-			break
+	ThreadManager:Run(function()
+		while stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL") < 50 do
+			if (not self.m_hangar_loop) then
+				break
+			end
+
+			stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
+			sleep(GVars.features.yrv3.autofill_delay or 100)
 		end
 
-		stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
-		sleep(GVars.features.yrv3.autofill_delay or 100)
-	end
-
-	self.m_hangar_loop = false
+		self.m_hangar_loop = false
+	end)
 end
 
 function YRV3:FinishSaleOnCommand()
@@ -519,7 +524,7 @@ function YRV3:FinishSaleOnCommand()
 		return
 	end
 
-	if (not YRV3.m_sell_script_running) then
+	if (not self.m_sell_script_running) then
 		Toast:ShowWarning(
 			"YRV3",
 			"No supported sale script is currently running.",
@@ -573,10 +578,23 @@ function YRV3:FillAll()
 		return
 	end
 
-	script.run_in_fiber(function()
-		if (stats.get_int("MPX_HANGAR_OWNED") ~= 0 and not YRV3.m_hangar_loop) then
-			YRV3.m_hangar_loop = true
+	ThreadManager:Run(function()
+		if (stats.get_int("MPX_HANGAR_OWNED") ~= 0 and not self.m_hangar_loop) then
+			self.m_hangar_loop = true
 			sleep(math.random(100, 300))
+		end
+
+		for i, v in ipairs(self.m_warehouse_data) do
+			if (not v.wasChecked or not v.max) then
+				self:PopulateCEOwarehouseSlot(i)
+				sleep(100)
+			end
+		end
+
+		for _, v in ipairs(self.m_warehouse_data) do
+			if (v.isOwned) then
+				v.autoFill = true
+			end
 		end
 
 		local businessGlobal = GetScriptGlobalOrLocal("freemode_business_global")
@@ -594,19 +612,6 @@ function YRV3:FillAll()
 		if (stats.get_int("MPX_XM22_LAB_OWNED") ~= 0) and (stats.get_int("MPX_MATTOTALFORFACTORY6") < 100) then
 			FMG:At(6):At(1):WriteInt(1)
 			sleep(math.random(100, 300))
-		end
-
-		for i, v in ipairs(self.m_warehouse_data) do
-			if (not v.wasChecked or not v.max) then
-				self:PopulateCEOwarehouseSlot(i)
-				sleep(100)
-			end
-		end
-
-		for _, v in ipairs(self.m_warehouse_data) do
-			if (v.isOwned) then
-				v.autoFill = true
-			end
 		end
 
 		for i, v in ipairs(self.m_biker_data) do
@@ -692,10 +697,8 @@ function YRV3:CheckAllCooldowns()
 		local gvar = data.gstate()
 		if (gvar and data.onEnable) then
 			data.onEnable()
-			Backend:debug("disabled cooldown for %s", _)
 		elseif (not gvar and type(data.onDisable) == "function") then
 			data.onDisable()
-			Backend:debug("restored cooldown for %s", _)
 		end
 		data.dirty = false
 	end
@@ -717,9 +720,7 @@ function YRV3:CooldownHandler()
 		local gvar = data.gstate()
 		if (gvar and data.onEnable) then
 			data.onEnable()
-			Backend:debug("disabled cooldown for %s", _)
 		elseif (not gvar and type(data.onDisable) == "function") then
-			Backend:debug("restored cooldown for %s", _)
 			data.onDisable()
 		end
 		data.dirty = false
@@ -728,6 +729,7 @@ function YRV3:CooldownHandler()
 	end
 end
 
+local fadedOutTimer = Timer.new(1e4)
 function YRV3:SetupAutosell()
 	if (Time.now() < self.m_last_as_check_time) then
 		return
@@ -756,13 +758,14 @@ function YRV3:SetupAutosell()
 			end
 		end
 
-		if (CAM.IS_SCREEN_FADING_OUT() or CAM.IS_SCREEN_FADED_OUT()) then
-			local fadedOutTimer = Timer.new(6969)
+		sleep(1000)
 
+		if (CAM.IS_SCREEN_FADING_OUT() or CAM.IS_SCREEN_FADED_OUT()) then
 			while (not fadedOutTimer:is_done()) do
 				if (not CAM.IS_SCREEN_FADED_OUT() or CAM.IS_SCREEN_FADING_IN()) then
 					break
 				end
+
 				yield()
 			end
 
@@ -771,6 +774,8 @@ function YRV3:SetupAutosell()
 				CAM.DO_SCREEN_FADE_IN(100)
 			end
 		end
+
+		fadedOutTimer:reset()
 	end
 
 	self.m_last_as_check_time = Time.now() + 1

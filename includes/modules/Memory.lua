@@ -5,7 +5,13 @@ require("includes.classes.CPlayerInfo")
 require("includes.classes.CPed")
 require("includes.classes.CWheel")
 require("includes.classes.CVehicle")
+local MemoryPatch = require("includes.structs.MemoryPatch")
 
+
+---@class PatchData
+---@field name string
+---@field onEnable fun(patch: MemoryPatch, ...): any
+---@field onDisable fun(patch: MemoryPatch, ...): any
 
 --------------------------------------
 -- Class: Memory
@@ -15,14 +21,23 @@ require("includes.classes.CVehicle")
 --
 -- Handles most interactions with the game's memory.
 ---@class Memory : ClassMeta<Memory>
+---@field private m_patches table<Obj, table<string, MemoryPatch>>
 ---@overload fun(_: any): Memory
 local Memory = Class("Memory")
 
 ---@return Memory
 function Memory:init()
-	return setmetatable({}, Memory)
+	---@type Memory
+	local instance = setmetatable({ m_patches = {} }, Memory)
+
+	Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
+		instance:RestoreAllPatches()
+	end)
+
+	return instance
 end
 
+-- Since PatternScanner runs in a fiber, we can't get pointer values on file load.
 local function SafeGetVersion()
 	if (not GPointers.GameVersion) then
 		local ptr = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
@@ -65,6 +80,111 @@ function Memory:GetScreenResolution()
 	return GPointers.ScreenResolution
 end
 
+---@param obj Obj
+---@param data PatchData
+---@param apply? boolean
+function Memory:AddPatch(obj, data, apply)
+	local patch = MemoryPatch.new(data.name, data.onEnable, data.onDisable)
+	if (not self.m_patches[obj]) then
+		self.m_patches[obj] = {}
+	end
+
+	if (self.m_patches[obj][data.name]) then
+		self:RestorePatch(obj, data.name, true)
+	end
+
+	self.m_patches[obj][data.name] = patch
+
+	if (apply) then
+		patch:Apply()
+	end
+end
+
+---@param obj Obj
+---@param patchName string
+function Memory:RemovePatch(obj, patchName)
+	local _t = self.m_patches[obj]
+	if (_t and _t[patchName]) then
+		_t[patchName]:Restore()
+		_t[patchName] = nil
+	end
+end
+
+---@generic T
+---@param obj Obj The object that owns the patch
+---@param patchName string
+---@return T
+function Memory:ApplyPatch(obj, patchName)
+	local _t = self.m_patches[obj]
+	local res = nil
+
+	if (_t and _t[patchName]) then
+		res = _t[patchName]:Apply()
+	end
+
+	return res
+end
+
+---@generic T
+---@param obj Obj The object that owns the patch
+---@param patchName string
+---@param remove? boolean Optional: remove after restoring
+---@return T
+function Memory:RestorePatch(obj, patchName, remove)
+	local _t = self.m_patches[obj]
+	local res = nil
+
+	if (_t and _t[patchName]) then
+		res = _t[patchName]:Restore()
+
+		if (remove) then
+			_t[patchName] = nil
+		end
+	end
+
+	return res
+end
+
+---@param obj Obj
+---@param remove? boolean
+function Memory:RestoreAllPatchesByRef(obj, remove)
+	local batch = self.m_patches[obj]
+	if (not batch) then
+		return
+	end
+
+	if (remove) then
+		local names = {}
+		for name, patch in pairs(batch) do
+			patch:Restore()
+			names[#names + 1] = name
+		end
+
+		for _, name in ipairs(names) do
+			batch[name] = nil
+		end
+	else
+		for _, patch in pairs(batch) do
+			patch:Restore()
+		end
+	end
+end
+
+function Memory:RestoreAllPatches()
+	for _, batch in pairs(self.m_patches) do
+		for _, patch in pairs(batch) do
+			patch:Restore()
+		end
+	end
+
+	self.m_patches = {}
+end
+
+---@return table<Obj, table<string, MemoryPatch>>
+function Memory:ListPatches()
+	return self.m_patches
+end
+
 -- Theory: Get a pattern for a script global -> scan it -> get the address and pass it to this function -> get the index.
 --
 -- We can even directly wrap the return in a `ScriptGlobal` instance, essentially no longer needing to update script globals after game updates.
@@ -74,7 +194,7 @@ end
 ---@return integer -- Script global index. Example: 262145
 function Memory:GlobalIndexFromAddress(addr)
 	local sg_base = GPointers.ScriptGlobals
-	if sg_base:is_null() then
+	if (sg_base:is_null()) then
 		log.warning("Script Globals base pointer is null!")
 		return 0
 	end
@@ -159,15 +279,14 @@ end
 ---@param entity handle
 ---@return eModelType
 function Memory:GetEntityModelType(entity)
-	if not ENTITY.DOES_ENTITY_EXIST(entity) then
-		return eModelType.Invalid
+	if (not ENTITY.DOES_ENTITY_EXIST(entity)) then
+		return Enums.eModelType.Invalid
 	end
 
-	local b_IsMemSafe, i_EntityType = pcall(function()
+	local isMemSafe, entityType = pcall(function()
 		local pEntity = memory.handle_to_ptr(entity)
-
-		if pEntity:is_null() then
-			return eModelType.Invalid
+		if (pEntity:is_null()) then
+			return Enums.eModelType.Invalid
 		end
 
 		local m_model_info = pEntity:add(0x0020):deref()
@@ -175,7 +294,7 @@ function Memory:GetEntityModelType(entity)
 		return m_model_type:get_word()
 	end)
 
-	return b_IsMemSafe and i_EntityType or eModelType.Invalid
+	return isMemSafe and entityType or Enums.eModelType.Invalid
 end
 
 --[[

@@ -1,8 +1,8 @@
 ---@diagnostic disable: param-type-mismatch
 
-local PlayerVehicle = require("includes.modules.PlayerVehicle")
-local FeatureMgr = require("includes.services.FeatureManager")
-local autoHeal = require("includes.features.self.autoheal")
+local FeatureMgr   = require("includes.services.FeatureManager")
+local miscFeatures = require("includes.features.self.miscellaneous")
+local Ragdoll      = require("includes.features.self.ragdoll")
 
 --------------------------------------
 -- Class: Self
@@ -16,12 +16,17 @@ local autoHeal = require("includes.features.self.autoheal")
 ---@field private m_vehicle PlayerVehicle
 ---@field private m_last_vehicle? Vehicle
 ---@field private m_feat_mgr FeatureManager
+---@field public CurrentMovementClipset? string
+---@field public CurrentStrafeClipset? string
+---@field public CurrentWeaponMovementClipset? string
 ---@field Resolve fun(self: Self) : CPed
 ---@overload fun(): Self
-Self = Class("Self", Player)
-Self.m_vehicle = PlayerVehicle:init(0)
-Self.m_feat_mgr = FeatureMgr.new(Self)
-Self.m_feat_mgr:Add(autoHeal.new(Self))
+Self               = Class("Self", Player)
+Self.m_vehicle     = require("includes.modules.PlayerVehicle")
+Self.m_feat_mgr    = FeatureMgr.new(Self)
+
+Self.m_feat_mgr:Add(miscFeatures.new(Self))
+Self.m_feat_mgr:Add(Ragdoll.new(Self))
 
 ---@override
 Self.new = nil
@@ -45,10 +50,17 @@ function Self:GetModelHash()
 	return ENTITY.GET_ENTITY_MODEL(self:GetHandle())
 end
 
+-- Returns the vehicle you're driving, not just sitting in.
 ---@override
 ---@return PlayerVehicle
 function Self:GetVehicle()
 	return self.m_vehicle
+end
+
+-- Returns the vehicle you're currently sitting in whether you're driving or not.
+---@return Vehicle
+function Self:GetVehiclePlayerIsIn()
+	return Vehicle(self:GetVehicleNative())
 end
 
 function Self:GetMaxArmour()
@@ -62,12 +74,7 @@ end
 
 function Self:OnVehicleSwitch()
 	if (self.m_vehicle:IsValid()) then
-		self.m_vehicle:ToggleSubwoofer(false)
 		self.m_vehicle:RestoreHeadlights()
-
-		if (self.m_vehicle:IsLocked()) then
-			self.m_vehicle:LockDoors(false)
-		end
 
 		self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
 	end
@@ -148,11 +155,15 @@ function Self:IsUsingAirctaftMG()
 	return false, 0
 end
 
+function Self:IsBeingArrested()
+	return PLAYER.IS_PLAYER_BEING_ARRESTED(self:GetPlayerID(), true)
+end
+
 -- Teleports local player to the provided coordinates.
 ---@param where integer|vec3 -- [blip ID](https://wiki.rage.mp/wiki/Blips) or vector3 coordinates
 ---@param keep_vehicle? boolean
 function Self:Teleport(where, keep_vehicle)
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		local coords -- fwd decl
 
 		if (not keep_vehicle and not Self:IsOnFoot()) then
@@ -231,10 +242,94 @@ function Self:IsUsingPhone()
 	return script.is_active("CELLPHONE_FLASHHAND")
 end
 
+function Self:IsPlayingHandsUpAnim()
+	return ENTITY.IS_ENTITY_PLAYING_ANIM(
+		self:GetHandle(),
+		"mp_missheist_countrybank@lift_hands",
+		"lift_hands_in_air_outro",
+		3
+	)
+end
+
+function Self:CanUsePhoneAnims()
+	return
+		not ENTITY.IS_ENTITY_DEAD(self:GetHandle(), false)
+		and not YimActions:IsPedPlaying()
+		and not YimActions:IsPlayerBusy()
+		and (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self:GetHandle()) == 0)
+end
+
+function Self:CanCrouch()
+	return
+		Self:IsOnFoot()
+		and not gui.is_open()
+		and not GUI:IsOpen()
+		and not HUD.IS_PAUSE_MENU_ACTIVE()
+		and not YimActions:IsPedPlaying()
+		and not YimActions:IsPlayerBusy()
+		and not Backend:AreControlsDisabled()
+end
+
+function Self:CanPutHandsUp()
+	return
+		(Self:IsOnFoot() or Self:GetVehicle():IsCar())
+		and not gui.is_open()
+		and not GUI:IsOpen()
+		and not YimActions:IsPedPlaying()
+		and not YimActions:IsPlayerBusy()
+		and not Backend:AreControlsDisabled()
+		and not HUD.IS_PAUSE_MENU_ACTIVE()
+		and not HUD.IS_MP_TEXT_CHAT_TYPING()
+end
+
+-- Enables or disables physical phone interactions in GTA Online.
+--
+-- Internally, these flags **DISABLE** animations when set to true,
+--
+-- so we invert the value to preserve sane semantics at the API level.
+---@param value boolean
+function Self:ToggleMpPhoneAnims(value)
+	-- ePedConfigFlags (see includes/data/enums.lua)
+	-- 242 = PhoneDisableTextingAnimations
+	-- 243 = PhoneDisableTalkingAnimations
+	-- 244 = PhoneDisableCameraAnimations
+	for i = 242, 244 do
+		if (self:GetConfigFlag(i, value) == value) then
+			self:SetConfigFlag(i, not value)
+		end
+	end
+end
+
+function Self:PlayKeyfobAnim()
+	if (Self:IsSwimming()
+			or not Self:IsAlive()
+			or YimActions:IsPedPlaying()
+			or YimActions:IsPlayerBusy()
+		) then
+		return
+	end
+
+
+	Await(Game.RequestAnimDict, "anim@mp_player_intmenu@key_fob@")
+	TASK.TASK_PLAY_ANIM(
+		Self:GetHandle(),
+		"anim@mp_player_intmenu@key_fob@",
+		"fob_click",
+		4.0,
+		-4.0,
+		-1,
+		48,
+		0.0,
+		false,
+		false,
+		false
+	)
+end
+
 -- A helper method to quickly remove player attachments
 ---@param lookup_table? table
 function Self:RemoveAttachments(lookup_table)
-	ThreadManager:RunInFiber(function()
+	ThreadManager:Run(function()
 		local had_attachments = false
 
 		local function _detach(entity)
@@ -282,30 +377,90 @@ function Self:RemoveAttachments(lookup_table)
 	end)
 end
 
-function Self:Destroy()
+---@param data table
+---@param isJson boolean
+function Self:SetMovementClipset(data, isJson)
+	local mvmtclipset = isJson and data.Name or data.mvmt
+
+	script.run_in_fiber(function(s)
+		Self:ResetMovementClipsets()
+		s:sleep(100)
+
+		local handle = Self:GetHandle()
+		if mvmtclipset then
+			Await(Game.RequestClipSet, mvmtclipset)
+			PED.SET_PED_MOVEMENT_CLIPSET(handle, mvmtclipset, 1.0)
+			PED.SET_PED_ALTERNATE_MOVEMENT_ANIM(handle, 0, "move_clown@generic", "idle", 1090519040, true)
+			TASK.SET_PED_CAN_PLAY_AMBIENT_IDLES(handle, true, true)
+			self.CurrentMovementClipset = mvmtclipset
+		end
+
+		if data.wmvmt then
+			PED.SET_PED_WEAPON_MOVEMENT_CLIPSET(handle, data.wmvmt)
+			self.CurrentWeaponMovementClipset = data.wmvmt
+		end
+
+		if data.strf then
+			while not STREAMING.HAS_CLIP_SET_LOADED(data.strf) do
+				STREAMING.REQUEST_CLIP_SET(data.strf)
+				coroutine.yield()
+			end
+			PED.SET_PED_STRAFE_CLIPSET(handle, data.strf)
+			self.CurrentStrafeClipset = data.strf
+		end
+
+		if data.wanim then
+			WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(handle, joaat(data.wanim))
+		end
+	end)
+end
+
+function Self:ResetMovementClipsets()
+	local handle = Self:GetHandle()
+
+	PED.RESET_PED_MOVEMENT_CLIPSET(handle, 0.3)
+	PED.RESET_PED_STRAFE_CLIPSET(handle)
+	PED.RESET_PED_WEAPON_MOVEMENT_CLIPSET(handle)
+	PED.CLEAR_PED_ALTERNATE_MOVEMENT_ANIM(handle, 0, -8.0)
+	WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(handle, 3839837909) -- default
+
+	self.CurrentMovementClipset       = nil
+	self.CurrentStrafeClipset         = nil
+	self.CurrentWeaponMovementClipset = nil
+end
+
+function Self:Cleanup()
+	Self:ResetMovementClipsets()
+	Self.m_feat_mgr:Cleanup()
+end
+
+function Self:Reset()
+	self:Cleanup()
 	self.m_vehicle:Reset()
 	self.m_last_vehicle = nil
-	---@diagnostic disable-next-line
-	self:super():Destroy()
+	self:Destroy()
 end
 
 Backend:RegisterEventCallback(eBackendEvent.PLAYER_SWITCH, function()
-	Self:Destroy()
+	Self:Reset()
 end)
 
 Backend:RegisterEventCallback(eBackendEvent.SESSION_SWITCH, function()
-	Self:Destroy()
+	Self:Reset()
 end)
 
+Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
+	Self:Reset()
+end)
 
-ThreadManager:CreateNewThread("SS_PV_HANDLER", function()
+ThreadManager:RegisterLooped("SS_PV_HANDLER", function()
 	if (Self.m_vehicle and Self.m_vehicle:IsValid()) then
 		if (Self:IsOnFoot()) then
 			Self:OnVehicleExit()
 		elseif (Self.m_vehicle:GetHandle() ~= Self:GetVehicleNative()) then
 			Self:OnVehicleSwitch()
 		end
-	elseif (not Self:IsOnFoot()) then
+	elseif (Self:IsDriving()) then
 		Self.m_vehicle:Set(Self:GetVehicleNative())
 	end
 
@@ -315,6 +470,12 @@ ThreadManager:CreateNewThread("SS_PV_HANDLER", function()
 	end
 end)
 
-ThreadManager:CreateNewThread("SS_SELF", function()
+ThreadManager:RegisterLooped("SS_SELF", function()
 	Self.m_feat_mgr:Update()
+
+	-- for i = 0, 360 do
+	-- 	if PAD.IS_CONTROL_PRESSED(0, i) then
+	-- 		print(i)
+	-- 	end
+	-- end
 end)

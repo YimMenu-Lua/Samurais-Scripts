@@ -35,7 +35,7 @@ function LaunchControl:Init()
 	self.m_timer = Timer.new(3000)
 	self.m_timer:pause()
 	self.m_last_pop_time = 0
-	self.m_thread = ThreadManager:CreateNewThread("SS_LAUNCH_CTRL", function()
+	self.m_thread = ThreadManager:RegisterLooped("SS_LAUNCH_CTRL", function()
 		self:Mainthread()
 	end)
 end
@@ -96,7 +96,7 @@ function LaunchControl:Update()
 
 		if (not PV:IsMoving()) then
 			rpmThreshold = 0.45
-		elseif (not PV:GetHandlingFlag(eVehicleHandlingFlags.FREEWHEEL_NO_GAS)) then
+		elseif (not PV:GetHandlingFlag(Enums.eVehicleHandlingFlags.FREEWHEEL_NO_GAS)) then
 			rpmThreshold = 0.80
 		else
 			rpmThreshold = 0.69
@@ -151,6 +151,11 @@ end
 function LaunchControl:Mainthread()
 	local PV = self.m_entity
 	if (not PV or not PV:IsValid() or not GVars.features.vehicle.launch_control) then
+		sleep(250)
+		return
+	end
+
+	if (GVars.features.vehicle.performance_only and not self.m_entity:IsPerformanceCar()) then
 		sleep(250)
 		return
 	end

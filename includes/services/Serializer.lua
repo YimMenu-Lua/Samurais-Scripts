@@ -195,7 +195,7 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 		instance:SyncKeys()
 	end
 
-	ThreadManager:CreateNewThread("SS_SERIALIZER", instance.TickHandler)
+	ThreadManager:RegisterLooped("SS_SERIALIZER", instance.TickHandler)
 	Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, instance.ShutdownHandler)
 	return instance
 end
@@ -240,10 +240,10 @@ function Serializer:Preprocess(value, seen)
 	end
 
 	local t = type(value)
-	if (t == "table") or (t == "userdata") then
+	if (t == "table" or t == "userdata") then
 		seen[value] = {}
 
-		local type_name = rawget(value, "__type")
+		local type_name = value.__type
 		if type_name then
 			local name = tostring(type_name):lower():trim()
 			local fallback = self.class_types[name] and self.class_types[name].serializer
@@ -473,7 +473,6 @@ function Serializer:SyncKeys(runtime_vars)
 	--[[
 	for k in pairs(saved) do
 	    if (k ~= "__version" and default[k] == nil) then
-	        print(k)
 	        saved[k] = nil
 	        runtime_vars[k] = nil
 	        Backend:debug(_F("[Serializer]: Removed deprecated config key: '%s'", k))
@@ -506,7 +505,7 @@ function Serializer:B64Encode(input)
 		output[#output + 1] = self.b64_chars:sub(((triple >> 18) & 63) + 1, ((triple >> 18) & 63) + 1)
 		output[#output + 1] = self.b64_chars:sub(((triple >> 12) & 63) + 1, ((triple >> 12) & 63) + 1)
 		output[#output + 1] = (i + 1 <= n) and self.b64_chars:sub(((triple >> 6) & 63) + 1, ((triple >> 6) & 63) + 1) or
-		"="
+			"="
 		output[#output + 1] = (i + 2 <= n) and self.b64_chars:sub((triple & 63) + 1, (triple & 63) + 1) or "="
 	end
 
