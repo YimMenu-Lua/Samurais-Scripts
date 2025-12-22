@@ -34,7 +34,7 @@ function BFD:IsToggled()
 	return self:IsActive() and self.m_is_toggled
 end
 
-function BFD:Update()
+function BFD:Toggle()
 	local PV = self.m_entity
 	if (Time.millis() < self.m_last_update_time) then
 		return
@@ -43,14 +43,20 @@ function BFD:Update()
 	if VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(PV:GetHandle())
 		and PAD.IS_CONTROL_PRESSED(0, 72)
 		and (PV:GetSpeed() >= 19.44) then
-		if (not GVars.features.vehicle.performance_only or PV:IsPerformanceCar()) then
-			VEHICLE.SET_VEHICLE_BRAKE_LIGHTS(PV:GetHandle(), false)
-		end
-
 		self.m_is_toggled = not self.m_is_toggled
-		self.m_last_update_time = Time.millis() + 100
 	else
 		self.m_is_toggled = false
+	end
+
+	self.m_last_update_time = Time.millis() + 100
+end
+
+function BFD:Update()
+	self:Toggle()
+	if (self.m_is_toggled) then
+		if (not GVars.features.vehicle.performance_only or self.m_entity:IsPerformanceCar()) then
+			VEHICLE.SET_VEHICLE_BRAKE_LIGHTS(self.m_entity:GetHandle(), false)
+		end
 	end
 end
 

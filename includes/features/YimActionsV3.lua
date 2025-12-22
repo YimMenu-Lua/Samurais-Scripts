@@ -991,7 +991,7 @@ function YimActions.Debugger:Draw()
 		ImGui.BeginChild("##debugPropInfo", 250, 200)
 		ImGui.SeparatorText("Prop Info")
 		if (not self.selectedProp) then
-			GUI:TextColored("Not Selected.", Color("yellow"))
+			GUI:Text("Not Selected.", Color("yellow"))
 		else
 			ImGui.BulletText(("Prop Type: [ %s ]"):format(self.selectedProp.type))
 			ImGui.BulletText(("Is Attached: [ %s ]"):format(self.selectedProp.attached))

@@ -1,10 +1,7 @@
 ---@diagnostic disable: param-type-mismatch
 
-require("includes.classes.CEntity")
-require("includes.classes.CPlayerInfo")
-require("includes.classes.CPed")
-require("includes.classes.CWheel")
-require("includes.classes.CVehicle")
+local CPed        = require("includes.classes.CPed")
+local CVehicle    = require("includes.classes.CVehicle")
 local MemoryPatch = require("includes.structs.MemoryPatch")
 
 

@@ -83,10 +83,20 @@ def read_lua_table(path: str):
 
 
 def write_lua_table(path: str, table: dict):
-	with open(path, "w", encoding="utf-8") as Lua_file:
-		Lua_file.write("return ")
-		Lua_file.write(Lua.encode(table))
-		Lua_file.write("\n")
+	newdata = table
+
+	if os.path.exists(path):
+		existing = read_lua_table(path)
+		if existing:
+			for k, v in table.items():
+				if k not in existing or existing[k] != v:
+					existing[k] = v
+			newdata = existing
+
+	with open(path, "w", encoding="utf-8") as f:
+		f.write("return ")
+		f.write(Lua.encode(newdata))
+		f.write("\n")
 
 
 def get_lang_name(iso: str) -> str:
@@ -105,57 +115,69 @@ def get_lang_name(iso: str) -> str:
 			return f"({iso})"
 
 
-def create_translator(iso: str):
-	iso_norm = iso.strip()
-	return GoogleTranslator(source="en", target=iso_norm)
+# def create_translator(iso: str):
+# 	iso_norm = iso.strip()
+# 	return GoogleTranslator(source="en", target=iso_norm)
 
 
-def get_translator(iso: str):
-	iso = iso.strip()
-	if iso in FAILED_LANGS:
-		return None
+# def get_translator(iso: str):
+# 	iso = iso.strip()
+# 	if iso in FAILED_LANGS:
+# 		return None
 
-	with TRANSLATOR_LOCK:
-		if iso in TRANSLATORS:
-			return TRANSLATORS[iso]
+# 	with TRANSLATOR_LOCK:
+# 		if iso in TRANSLATORS:
+# 			return TRANSLATORS[iso]
 
-		try:
-			tr = create_translator(iso)
-			TRANSLATORS[iso] = tr
-			return tr
-		except deep_translator.exceptions.LanguageNotSupportedException:
-			FAILED_LANGS.add(iso)
-			return None
-		except Exception:
-			FAILED_LANGS.add(iso)
-			return None
+# 		try:
+# 			tr = create_translator(iso)
+# 			TRANSLATORS[iso] = tr
+# 			return tr
+# 		except deep_translator.exceptions.LanguageNotSupportedException:
+# 			FAILED_LANGS.add(iso)
+# 			return None
+# 		except Exception:
+# 			FAILED_LANGS.add(iso)
+# 			return None
 
+
+# def translate_text(iso: str, text: str) -> str:
+# 	tr = get_translator(iso)
+# 	if tr is not None:
+# 		try:
+# 			return tr.translate(text)
+# 		except deep_translator.exceptions.LanguageNotSupportedException:
+# 			FAILED_LANGS.add(iso)
+# 		except Exception:
+# 			pass
+
+# 	short = iso[:2]
+# 	tr2 = get_translator(short)
+# 	if tr2 is not None:
+# 		try:
+# 			return tr2.translate(text)
+# 		except Exception:
+# 			pass
+
+# 	return text
 
 def translate_text(iso: str, text: str) -> str:
-	tr = get_translator(iso)
-	if tr is not None:
-		try:
-			return tr.translate(text)
-		except deep_translator.exceptions.LanguageNotSupportedException:
-			FAILED_LANGS.add(iso)
-		except Exception:
-			pass
+	try:
+		return GoogleTranslator(source="en", target=iso).translate(text)
+	except Exception:
+		pass
 
-	short = iso[:2]
-	tr2 = get_translator(short)
-	if tr2 is not None:
-		try:
-			return tr2.translate(text)
-		except Exception:
-			pass
-
-	return text
+	try:
+		return GoogleTranslator(source="en", target=iso[:2]).translate(text)
+	except Exception:
+		return text
 
 
 def write_hashmap():
 	print("Updating hashmap")
 	with open(HASHMAP_PATH, "w", encoding="utf-8") as f:
 		json.dump(HASHMAP, f, indent=4)
+	print("Done.")
 
 
 def generate_translations(dry_run: bool = False, diff_only: bool = False):

@@ -1,7 +1,7 @@
 local World     = require("includes.modules.World")
 local HideNSeek = require("includes.features.world.HideNSeek").new()
 local Carpool   = require("includes.features.world.carpool").new()
-local world_tab = GUI:RegisterNewTab(eTabID.TAB_WORLD, "World")
+local world_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_WORLD, "World")
 
 world_tab:AddBoolCommand("WRLD_DISABLE_WAVES",
 	"features.world.disable_ocean_waves",
@@ -58,7 +58,7 @@ world_tab:AddBoolCommand("WRLD_WANTED_MUSIC",
 world_tab:AddLoopedCommand("WRLD_HNS",
 	"features.world.hide_n_seek",
 	function()
-		HideNSeek:Main()
+		HideNSeek:OnTick()
 	end,
 	function()
 		ThreadManager:Run(function()
@@ -73,7 +73,7 @@ world_tab:AddLoopedCommand("WRLD_HNS",
 world_tab:AddLoopedCommand("WRLD_CARPOOL",
 	"features.world.carpool",
 	function()
-		Carpool:Main()
+		Carpool:OnTick()
 	end,
 	function()
 		ThreadManager:Run(function()
@@ -86,7 +86,8 @@ world_tab:AddLoopedCommand("WRLD_CARPOOL",
 )
 
 local carpoolDrivingStyleSwitch = 1
-local drivingStyleClicked = false
+local drivingStyle1Clicked = false
+local drivingStyle2Clicked = false
 local carpoolRoofStateCases <const> = {
 	[Enums.eConvertibleRoofState.RAISED]   = "Lower",
 	[Enums.eConvertibleRoofState.LOWERING] = "Lowering",
@@ -110,13 +111,13 @@ local function ShowCarpoolControls()
 
 	ImGui.BulletText("Driving Style:")
 	ImGui.SameLine()
-	carpoolDrivingStyleSwitch, drivingStyleClicked = ImGui.RadioButton("Chill", carpoolDrivingStyleSwitch, 1)
+	carpoolDrivingStyleSwitch, drivingStyle1Clicked = ImGui.RadioButton("Chill", carpoolDrivingStyleSwitch, 1)
 
 	ImGui.SameLine()
 
-	carpoolDrivingStyleSwitch, drivingStyleClicked = ImGui.RadioButton("Aggressive", carpoolDrivingStyleSwitch, 2)
+	carpoolDrivingStyleSwitch, drivingStyle2Clicked = ImGui.RadioButton("Aggressive", carpoolDrivingStyleSwitch, 2)
 
-	if (drivingStyleClicked) then
+	if (drivingStyle1Clicked or drivingStyle2Clicked) then
 		Carpool:SetDrivingStyle(carpoolDrivingStyleSwitch)
 	end
 

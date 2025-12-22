@@ -1,6 +1,6 @@
 ---@class Config
 local Config <const> = {
-	__config_version = "0.2",
+	__config_version = "0.2a",
 	__dev_reset = false,
 	backend = {
 		debug_mode = false,
@@ -12,10 +12,10 @@ local Config <const> = {
 	ui = {
 		disable_tooltips = false,
 		disable_sound_feedback = false,
+		moveable = false,
 		style = {
 			bg_alpha = 0.7,
 		},
-		moveable = false,
 		window_size = {
 			__type = "vec2",
 			x = 864,
@@ -26,6 +26,10 @@ local Config <const> = {
 			x = 0,
 			y = 0,
 		},
+		last_tab = {
+			tab_id = 1,
+			array_index = 1,
+		}
 	},
 	commands_console = {
 		key = "F4",
@@ -129,6 +133,8 @@ local Config <const> = {
 					}
 				},
 			},
+			bangs_rpm_max = 9000.0,
+			bangs_rpm_min = 4000.0,
 			performance_only = false,
 			burble_tune = false,
 			launch_control = false,
@@ -152,7 +158,6 @@ local Config <const> = {
 			},
 			missile_defence = false,
 			strong_crash = false,
-			flatbed = false,
 			auto_lock_doors = false,
 			cobra_maneuver = false,
 			fast_jets = false,
@@ -216,6 +221,9 @@ local Config <const> = {
 			autoplay_slots = false,
 			cap_slot_machine_chips = false,
 			ch_cart_autograb = false,
+			autoplay_slots_delay_random = false,
+			slot_machine_cap = 0,
+			autoplay_slots_delay = 500,
 		},
 		yrv3 = {
 			auto_sell = false,

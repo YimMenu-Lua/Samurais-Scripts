@@ -838,7 +838,7 @@ local function DrawJsonMovementClipsets()
 		if not exists then
 			ImGui.TextWrapped("You must download the clipsets Json file and save it to the 'scripts_config' folder.")
 			ImGui.SetWindowFontScale(0.8)
-			GUI:TextColored(s_MovementClipsetsGitHub, Color(s_GitHubLinkColor))
+			GUI:Text(s_MovementClipsetsGitHub, Color(s_GitHubLinkColor))
 			ImGui.SetWindowFontScale(1.0)
 			GUI:Tooltip("Right click to copy the link.")
 
@@ -1433,4 +1433,4 @@ local function YAV3UI()
 	end
 end
 
-GUI:RegisterNewTab(eTabID.TAB_EXTRA, "YimActions", YAV3UI)
+GUI:RegisterNewTab(Enums.eTabID.TAB_EXTRA, "YimActions", YAV3UI)

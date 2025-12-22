@@ -86,7 +86,7 @@ function SGSLEntry:AsLocal()
 end
 
 -----------------------------------------------------
--- SGSL Class
+-- SGSL
 -----------------------------------------------------
 -- Fetches script globals, locals, and their offsets.
 --
@@ -100,7 +100,7 @@ if (ImGui.Button("Write value at offset")) then
 	local obj 	 = SGSL:Get(SGSL.data.fm_mission_controller_cart_grab) -- returns an SGSLEntry struct
 	local FMMCCG = obj:AsGlobal() -- Wrap in a ScriptGlobal instance.
 	local offset = obj:GetOffset(1) -- Get first offset in the struct.
-	FMMCCG:At(offset):WriteFloat(0.42069) -- Write data using the ScriptGlobal accessor.
+	FMMCCG:At(offset):WriteFloat(0.123) -- Write data using the ScriptGlobal accessor.
 end
 ]]
 --```

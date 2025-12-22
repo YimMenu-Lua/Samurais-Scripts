@@ -1,17 +1,10 @@
 local selected_mine_name
-local autopilot_labels
+local Refs              = require("includes.data.refs")
+local default_cfg       = require("includes.data.config")
+local customPaintsUI    = require("includes.frontend.vehicle.custom_paints_ui")
+local engine_swap_index = 1
 
-local default_cfg             = require("includes.data.config")
-local Flares                  = require("includes.features.vehicle.flares").new(Self:GetVehicle())
-local Flatbed                 = require("includes.features.vehicle.flatbed")
-local autopilot_state_idx     = 0
-local autopilot_index_changed = false
-local flare_cb_clicked        = false
-local turb_cb_clicked         = false
-
-
---#region cars
-local vehicleTab = GUI:RegisterNewTab(eTabID.TAB_VEHICLE, "Cars")
+local vehicleTab        = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
 
 ---@type WindowRequest
 local speedometerOptionsWindow
@@ -393,6 +386,20 @@ vehicleTab:RegisterGUI(function()
 		{ tooltip = "Limits some features to performance cars only (Launch Control, Pops & Bangs, etc.)" }
 	)
 
+	GVars.features.vehicle.bangs_rpm_min, _ = ImGui.SliderFloat("Pops & Bangs RPM Min",
+		GVars.features.vehicle.bangs_rpm,
+		2000.0,
+		GVars.features.vehicle.bangs_rpm_max - 1000.0,
+		"%.0f RPM", GVars.features.vehicle.bangs_rpm_min
+	)
+
+	GVars.features.vehicle.bangs_rpm_max, _ = ImGui.SliderFloat("Pops & Bangs RPM Max",
+		GVars.features.vehicle.bangs_rpm_max,
+		GVars.features.vehicle.bangs_rpm_min + 1000.0,
+		9000.0,
+		"%.0f RPM", GVars.features.vehicle.bangs_rpm_max
+	)
+
 	if (GVars.features.vehicle.rgb_lights.enabled) then
 		GVars.features.vehicle.rgb_lights.speed, _ = ImGui.SliderInt("RGB Lights Speed",
 			GVars.features.vehicle.rgb_lights.speed,
@@ -435,203 +442,118 @@ vehicleTab:RegisterGUI(function()
 		end
 	end
 end)
---#endregion
 
-
---#region planes
-Flares:Init()
-
-GUI:RegisterNewTab(eTabID.TAB_VEHICLE, "Planes", function()
-	GVars.features.vehicle.fast_jets, _ = GUI:Checkbox(_T("VEH_FAST_JETS"),
-		GVars.features.vehicle.fast_jets,
-		{ tooltip = _T("VEH_FAST_JETS_TT") }
-	)
-
-	GVars.features.vehicle.no_jet_stall, _ = GUI:Checkbox(_T("VEH_NO_JET_STALL"),
-		GVars.features.vehicle.no_jet_stall,
-		{ tooltip = _T("VEH_NO_JET_STALL_TT") }
-	)
-
-	GVars.features.vehicle.no_turbulence, turb_cb_clicked = GUI:Checkbox(_T("VEH_NO_TURBULENCE"),
-		GVars.features.vehicle.no_turbulence
-	)
-
-	if (turb_cb_clicked and not GVars.features.vehicle.no_turbulence) then
-		local PV = Self:GetVehicle()
-		PV:RestorePatch(PV.MemoryPatches.Turbulence)
-		PV:RestorePatch(PV.MemoryPatches.WindMult)
-	end
-
-	GVars.features.vehicle.flares, flare_cb_clicked = GUI:Checkbox(_T("VEH_FLARES"),
-		GVars.features.vehicle.flares,
-		{ tooltip = _T("VEH_FLARES_TT") }
-	)
-
-	if (flare_cb_clicked) then
-		if (GVars.features.vehicle.flares) then
-			Flares:OnEnable()
-		else
-			Flares:OnDisable()
-		end
-	end
-
-	GVars.features.vehicle.aircraft_mg.triggerbot, _ = GUI:Checkbox(_T("VEH_MG_TRIGGERBOT"),
-		GVars.features.vehicle.aircraft_mg.triggerbot,
-		{ tooltip = _T("VEH_MG_TRIGGERBOT_TT") }
-	)
-
-	if (GVars.features.vehicle.aircraft_mg.triggerbot) then
-		GVars.features.vehicle.aircraft_mg.enemies_only, _ = GUI:Checkbox(_T("VEH_MG_TRIGGERBOT_ENEMY"),
-			GVars.features.vehicle.aircraft_mg.enemies_only,
-			{ tooltip = _T("VEH_MG_TRIGGERBOT_ENEMY_TT") }
-		)
-
-		GVars.features.vehicle.aircraft_mg.tiggerbot_range, _ = ImGui.SliderFloat(_T("VEH_MG_TRIGGERBOT_RANGE"),
-			GVars.features.vehicle.aircraft_mg.tiggerbot_range,
-			100.0,
-			1000.0,
-			"%.0f"
-		)
-	end
-
-	GVars.features.vehicle.aircraft_mg.manual_aim, _ = GUI:Checkbox(_T("VEH_MG_MANUAL_AIM"),
-		GVars.features.vehicle.aircraft_mg.manual_aim,
-		{ tooltip = _T("VEH_MG_MANUAL_AIM_TT") }
-	)
-
-	if (GVars.features.vehicle.aircraft_mg.manual_aim) then
-		GVars.features.vehicle.aircraft_mg.marker_size, _ = ImGui.SliderFloat(_T("VEH_MG_MARKER_SIZE"),
-			GVars.features.vehicle.aircraft_mg.marker_size,
-			1.0,
-			10.0
-		)
-
-		ImGui.ColorEditVec4(_T("VEH_MG_MARKER_COL"), GVars.features.vehicle.aircraft_mg.marker_color)
-	end
-
-	ImGui.SeparatorText(_T("VEH_AUTOPILOT"))
-	ImGui.BeginDisabled(not Self:GetVehicle().m_autopilot.eligible)
-	if (not autopilot_labels) then
-		autopilot_labels = {
-			_T("GENERIC_NONE"),
-			_T("GENERIC_WAYPOINT"),
-			_T("GENERIC_OBJECTIVE"),
-			_T("GENERIC_RANDOM")
-		}
-	else
-		autopilot_state_idx, autopilot_index_changed = ImGui.Combo(
-			"##autopilotdest",
-			autopilot_state_idx,
-			autopilot_labels,
-			4
-		)
-
-		if (autopilot_index_changed) then
-			ThreadManager:Run(function()
-				Self:GetVehicle():UpdateAutopilotState(autopilot_state_idx)
-			end)
-		end
-
-		autopilot_state_idx = Self:GetVehicle().m_autopilot.state
-	end
-	ImGui.EndDisabled()
-end)
---#endregion
-
---#region Flatbed
-local function FlatbedUI()
-	if (not GVars.features.flatbed.enabled) then
+local swap_btn_size = vec2:new(140, 35)
+local swap_wnd_height = 260
+vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
+	if (Self:GetVehicle():GetHandle() == 0) then
+		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
 		return
 	end
 
-	local window_size_x, _ = ImGui.GetContentRegionAvail()
-
-	if (not Self:GetVehicle().m_is_flatbed) then
-		ImGui.TextWrapped(_T("FTLBD_GET_IN_MSG"))
-
-		if GUI:Button(_T("GENERIC_SPAWN")) then
-			Flatbed:Spawn()
-		end
-
+	if (not Self:GetVehicle().m_engine_swap_compatible) then
+		ImGui.Text(_T("VEH_ENGINE_SWAP_INCOMPATIBE"))
 		return
 	end
-	ImGui.Dummy(1, 10)
-	ImGui.BulletText(Flatbed.displayText)
-	ImGui.Dummy(1, 10)
 
-	GVars.features.flatbed.show_towing_position, _ = GUI:Checkbox(_T("FLTBD_SHOW_TOWPOS_CB"),
-		GVars.features.flatbed.show_towing_position
-	)
-	GUI:HelpMarker(_T("FLTBD_SHOW_TOWPOS_TT"))
+	ImGui.SetNextWindowBgAlpha(0)
+	ImGui.BeginChild("##engines_c", ImGui.GetContentRegionAvail() - 180, swap_wnd_height)
+	if (ImGui.BeginListBox("##engines", ImGui.GetContentRegionAvail() - 1, -1)) then
+		for i, v in ipairs(Refs.engineSwaps) do
+			local is_selected = engine_swap_index == i
+			if (ImGui.Selectable(v.name, is_selected)) then
+				engine_swap_index = i
+			end
+		end
+		ImGui.EndListBox()
+	end
+	ImGui.EndChild()
 
-	GVars.features.flatbed.show_esp, _ = GUI:Checkbox(_T("FLTBD_SHOW_TOWBOX_CB"), GVars.features.flatbed.show_esp)
-	GUI:HelpMarker(_T("FLTBD_SHOW_TOWBOX_TT"))
-
-	GVars.features.flatbed.tow_everything, _ = GUI:Checkbox(_T("FLTBD_TOW_ALL_CB"),
-		GVars.features.flatbed.tow_everything
-	)
-	GUI:HelpMarker(_T("FLTBD_TOW_ALL_TT"))
-
-	ImGui.Dummy(1, 10)
-	ImGui.Dummy((window_size_x / 2) - 60, 1)
 	ImGui.SameLine()
-
-	if GUI:Button(not Flatbed.m_towed_vehicle and _T("FLTBD_TOW_BTN") or _T("GENERIC_DETACH"), { size = vec2:new(80, 40) }) then
+	ImGui.SetNextWindowBgAlpha(0)
+	ImGui.BeginChild("##engine_s_btns", 0, swap_wnd_height)
+	if (GUI:Button(_T("GENERIC_CONFIRM"), { size = swap_btn_size })) then
 		ThreadManager:Run(function()
-			Flatbed:OnKeyPress()
+			local PV = Self:GetVehicle()
+			if (PV:GetModelHash() == joaat(Refs.engineSwaps[engine_swap_index].audioname)) then
+				Toast:ShowError(_T("VEH_ENGINE_SWAP"), _T("VEH_ENGINE_SWAP_SAME_ERR"), false, 5)
+				return
+			end
+			PV:ResetGenericToggleable("engine_swap")
+			sleep(20)
+
+			PV:AddGenericToggleable("engine_swap", function()
+				AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(PV:GetHandle(),
+					Refs.engineSwaps[engine_swap_index].audioname
+				)
+
+				PV:AddMemoryPatch({
+					name = PV.MemoryPatches.Acceleration,
+					onEnable = function(patch)
+						local cvehicle = PV:Resolve()
+						if (not cvehicle) then
+							error("Handling data is null!")
+						end
+
+						local fAccelMult = cvehicle.m_acceleration
+						patch.m_state    = {
+							ptr = fAccelMult,
+							default_value = fAccelMult:get_float()
+						}
+
+						if (fAccelMult:is_valid()) then
+							fAccelMult:set_float(Refs.engineSwaps[engine_swap_index].acc_mult)
+						end
+					end,
+					onDisable = function(patch)
+						if (not patch.m_state or patch.m_state.default_value == nil) then
+							return
+						end
+
+						local ptr = patch.m_state.ptr
+						if (not ptr or ptr:is_null()) then
+							error("pointer is null")
+						end
+
+						ptr:set_float(patch.m_state.default_value)
+					end
+				}, true)
+				sleep(150)
+				if (PV:IsRadioOn()) then
+					AUDIO.SET_VEH_RADIO_STATION(PV:GetHandle(), "OFF")
+				end
+			end, function()
+				local PV = Self:GetVehicle()
+				PV:RestorePatch(PV.MemoryPatches.Acceleration)
+				AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(PV:GetHandle(),
+					vehicles.get_vehicle_display_name(PV:GetModelHash())
+				)
+			end)
 		end)
 	end
 
-	if (Flatbed.m_towed_vehicle) then
-		ImGui.Dummy(1, 5)
-		ImGui.SeparatorText(_T("FLTBD_ADJUST_POS_TXT"))
-		GUI:Tooltip(_T("FLTBD_ADJUST_POS_TT"))
-		ImGui.SetWindowFontScale(0.8)
-		ImGui.BulletText(_T("FLTBD_FAST_ADJUST_TXT"))
-		ImGui.SetWindowFontScale(1.0)
-		ImGui.Dummy((window_size_x / 2) - 40, 1)
-		ImGui.SameLine()
-
-		ImGui.PushButtonRepeat(true)
-		if ImGui.ArrowButton("##Up", 2) then
-			Flatbed:MoveAttachment(0.0, 0.0, 0.01)
-		end
-
-		ImGui.Dummy((window_size_x / 2) - 80, 1)
-		ImGui.SameLine()
-		if ImGui.ArrowButton("##Left", 0) then
-			Flatbed:MoveAttachment(0.0, 0.01, 0.0)
-		end
-
-		ImGui.SameLine()
-		ImGui.Dummy(1, 1)
-		ImGui.SameLine()
-		if ImGui.ArrowButton("##Right", 1) then
-			Flatbed:MoveAttachment(0.0, -0.01, 0.0)
-		end
-
-		ImGui.Dummy((window_size_x / 2) - 40, 1)
-		ImGui.SameLine()
-		if ImGui.ArrowButton("##Down", 3) then
-			Flatbed:MoveAttachment(0.0, 0.0, -0.01)
-		end
-		ImGui.PopButtonRepeat()
+	if (GUI:Button(_T("GENERIC_RESET"), { size = swap_btn_size })) then
+		ThreadManager:Run(function()
+			local PV = Self:GetVehicle()
+			PV:ResetGenericToggleable("engine_swap")
+		end)
 	end
-end
+	ImGui.EndChild()
 
-local flatbed_tab = GUI:RegisterNewTab(eTabID.TAB_VEHICLE, "Flatbed")
-flatbed_tab:AddLoopedCommand("FLTBD_MAIN_CB",
-	"features.flatbed.enabled",
-	function()
-		Flatbed:Main()
-	end,
-	function()
-		Flatbed:Reset()
-	end,
-	nil,
-	true,
-	true
-)
+	ImGui.Spacing()
+	ImGui.SetWindowFontScale(0.9)
+	ImGui.BulletText(Refs.engineSwaps[engine_swap_index].tt)
+	ImGui.SetWindowFontScale(1)
+end, nil, true)
 
-flatbed_tab:RegisterGUI(FlatbedUI)
---#endregion
+vehicleTab:RegisterSubtab("SUBTAB_PAINTS", function()
+	if (Self:GetVehicle():GetHandle() == 0) then
+		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
+		return
+	end
+
+	customPaintsUI()
+end, nil, true)
+
+require("includes.frontend.vehicle.flatbed_ui")
+require("includes.frontend.vehicle.aircraft_ui")

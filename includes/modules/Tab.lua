@@ -14,20 +14,23 @@
 ---@field private m_grid_layout? GridRenderer
 ---@field private m_has_error boolean
 ---@field private m_traceback string
----@overload fun(name: string, drawable?: GuiCallback, subtabs?: Tab) : Tab
+---@field public m_has_translator_label boolean
+---@overload fun(name: string, drawable?: GuiCallback, subtabs?: Tab, isTranslatorLabel?: boolean) : Tab
 local Tab = Class("Tab")
 
 ---@param name string
 ---@param drawable? GuiCallback
 ---@param subtabs? Tab[]
+---@param isTranslatorLabel? boolean
 ---@return Tab
-function Tab.new(name, drawable, subtabs)
+function Tab.new(name, drawable, subtabs, isTranslatorLabel)
 	return setmetatable(
 		{
-			m_name      = name,
-			m_callback  = drawable,
-			m_subtabs   = subtabs or {},
-			m_has_error = false
+			m_name                 = name,
+			m_callback             = drawable,
+			m_subtabs              = subtabs or {},
+			m_has_error            = false,
+			m_has_translator_label = isTranslatorLabel or false
 		},
 		Tab
 	)
@@ -36,13 +39,14 @@ end
 ---@param name string
 ---@param drawable? GuiCallback
 ---@param subtabs? Tab[]
+---@param isTranslatorLabel? boolean
 ---@return Tab
-function Tab:RegisterSubtab(name, drawable, subtabs)
+function Tab:RegisterSubtab(name, drawable, subtabs, isTranslatorLabel)
 	assert((type(name) == "string" and #name > 0),
 		"Attempt to register a new tab with no name."
 	)
 
-	local subtab = Tab(name, drawable, subtabs)
+	local subtab = Tab(name, drawable, subtabs, isTranslatorLabel)
 	self.m_subtabs[name] = subtab
 	return subtab
 end
@@ -88,7 +92,7 @@ end
 
 ---@return string
 function Tab:GetName()
-	return self.m_name
+	return self.m_has_translator_label and _T(self.m_name) or self.m_name
 end
 
 ---@return GuiCallback
@@ -259,14 +263,14 @@ function Tab:DrawInternal()
 	end
 
 	if (self.m_has_error) then
-		ImGui.TextColored(0.8, 0.8, 0, 1, _F("Tab '%s' has crashed. Please contact the developer.", self.m_name))
+		ImGui.TextColored(0.8, 0.8, 0, 1, _F("Tab '%s' has crashed. Please contact a developer.", self.m_name))
 		if (self.m_traceback) then
 			ImGui.Spacing()
-			ImGui.BulletText("Traceback most recent call:")
+			ImGui.BulletText("Traceback most recent call:") -- not an actual trace because Lua's debug is disabled in this sandbox
 			ImGui.Indent()
 			ImGui.TextColored(1, 0, 0, 1, self.m_traceback)
 			ImGui.Unindent()
-			if (ImGui.Button("Copy Trace")) then
+			if (GUI:Button("Copy Trace")) then
 				ImGui.SetClipboardText(self.m_traceback)
 			end
 		end
@@ -289,13 +293,14 @@ function Tab:Draw()
 	end
 
 	ImGui.BeginTabBar(_F("##sutab_selector%s", self.m_name))
-	if (ImGui.BeginTabItem(self.m_name)) then
+	if (ImGui.BeginTabItem(self:GetName())) then
 		self:DrawInternal()
 		ImGui.EndTabItem()
 	end
 
-	for name, tab in pairs(self.m_subtabs) do
-		if (ImGui.BeginTabItem(name)) then
+	for _, tab in pairs(self.m_subtabs) do
+		local label = tab:GetName()
+		if (ImGui.BeginTabItem(label)) then
 			if (tab:HasSubtabs()) then
 				ImGui.EndTabItem()
 				ImGui.EndTabBar()

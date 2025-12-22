@@ -1,4 +1,5 @@
 local sCooldownButtonLabel, bCooldownParam
+local SGSL                     = require("includes.structs.SGSL")
 local hangarSupplies           = 0
 local hangarTotalValue         = 0
 local bunkerTotalValue         = 0
@@ -25,14 +26,7 @@ local tabNames <const>         = {
 }
 
 local selectedTabName          = tabNames[1]
-local fmbg                     = GetScriptGlobalOrLocal("freemode_business_global")
-if (not fmbg) then
-	yrv3_state.disabled = true
-	yrv3_state.reason = _T("GENERIC_SG_SL_READ_FAIL")
-	return
-end
-
-local FreemodeGlobal = ScriptGlobal(fmbg)
+local FreemodeGlobal           = SGSL:Get(SGSL.data.freemode_business_global):AsGlobal()
 
 local function CalcTotalBusinessIncome()
 	return math.sum(
@@ -278,12 +272,12 @@ local function drawBunker()
 
 	ImGui.BulletText(_T("YRV3_EQUIP_UPGDRADE"))
 	ImGui.SameLine()
-	GUI:TextColored(bunkerUpdgrade1 and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), Color(bunkerEqLabelCol))
+	GUI:Text(bunkerUpdgrade1 and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), Color(bunkerEqLabelCol))
 
 	ImGui.SameLine()
 	ImGui.BulletText(_T("YRV3_STAFF_UPGDRADE"))
 	ImGui.SameLine()
-	GUI:TextColored(bunkerUpdgrade2 and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), Color(bunkerStLabelCol))
+	GUI:Text(bunkerUpdgrade2 and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), Color(bunkerStLabelCol))
 
 	ImGui.Spacing()
 	ImGui.BulletText(_T("YRV3_SUPPLIES_LABEL"))
@@ -349,7 +343,7 @@ local function drawAcidLab()
 
 	ImGui.BulletText(_T("YRV3_EQUIP_UPGDRADE"))
 	ImGui.SameLine()
-	GUI:TextColored(acidUpdgrade and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), Color(acidUpgradeLabelCol))
+	GUI:Text(acidUpdgrade and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), Color(acidUpgradeLabelCol))
 	ImGui.BulletText(_T("YRV3_SUPPLIES_LABEL"))
 	ImGui.SameLine()
 	ImGui.Dummy(10, 1)
@@ -671,7 +665,7 @@ local function drawMisc()
 	ImGui.TextWrapped(_T("YRV3_SELL_MISSIONS_TT"))
 
 	ImGui.Spacing()
-	GUI:TextColored(_T("YRV3_SELL_MISSIONS_NOTE"), Color("yellow"))
+	GUI:Text(_T("YRV3_SELL_MISSIONS_NOTE"), Color("yellow"))
 
 	for name, data in pairs(YRV3.t_ShittyMissions) do
 		local isFloat      = (data.type == "float")
@@ -717,7 +711,7 @@ local function drawSettings()
 	GUI:Tooltip(_T("YRV3_AUTOSELL_TT"))
 
 	if (script.is_active("fm_content_smuggler_sell")) then
-		GUI:TextColored(_T("YRV3_HANGAR_LAND_ERR"), Color("red"))
+		GUI:Text(_T("YRV3_HANGAR_LAND_ERR"), Color("red"))
 	else
 		ImGui.BeginDisabled(GVars.features.yrv3.autosell or YRV3.m_has_triggered_autosell or
 			not YRV3.m_sell_script_running)
@@ -792,7 +786,7 @@ local function YRV3UI()
 		ImGui.BulletText(_T("YRV3_INCOME_APPROX_ALL"))
 		GUI:Tooltip(tooltip)
 		ImGui.SameLine()
-		GUI:TextColored(string.formatmoney(CalcTotalBusinessIncome()), Color("#85BB65"))
+		GUI:Text(string.formatmoney(CalcTotalBusinessIncome()), Color("#85BB65"))
 		GUI:Tooltip(tooltip)
 		ImGui.SetWindowFontScale(1)
 		ImGui.EndChild()
@@ -825,4 +819,4 @@ local function YRV3UI()
 	end
 end
 
-GUI:RegisterNewTab(eTabID.TAB_ONLINE, "YRV3", YRV3UI)
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YRV3", YRV3UI)

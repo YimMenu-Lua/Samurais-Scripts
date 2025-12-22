@@ -1,5 +1,6 @@
 local ped_list <const> = require("includes.data.peds")
 local ped_lookup_table <const> = require("includes.data.ped_reverse_lookup")
+local Refs = require("includes.data.refs")
 
 --------------------------------------
 -- Class: Game
@@ -27,7 +28,7 @@ function Game.GetLanguage()
 	local lang_name = "English"
 	local i_LangID = LOCALIZATION.GET_CURRENT_LANGUAGE()
 
-	for _, _lang in ipairs(t_Locales) do
+	for _, _lang in ipairs(Refs.locales) do
 		if i_LangID == _lang.id then
 			lang_iso = _lang.iso
 			lang_name = _lang.name
@@ -53,7 +54,7 @@ function Game.GetKeyPressed()
 		return nil, nil
 	end
 
-	for _, v in ipairs(t_GamepadControls) do
+	for _, v in ipairs(Refs.gamepadControls) do
 		if PAD.IS_CONTROL_JUST_PRESSED(0, v.ctrl) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, v.ctrl) then
 			return v.ctrl, v.gpad
 		end
@@ -1012,7 +1013,7 @@ end
 -- Temporary workaround to fix auto-pilot's "fly to objective" option.
 ---@return boolean, vec3
 function Game.GetObjectiveBlipCoords()
-	for _, v in ipairs(t_ObjectiveBlips) do
+	for _, v in ipairs(Refs.objectiveBlips) do
 		if HUD.DOES_BLIP_EXIST(HUD.GET_FIRST_BLIP_INFO_ID(v)) then
 			return true, HUD.GET_BLIP_INFO_ID_COORD(HUD.GET_FIRST_BLIP_INFO_ID(v))
 		else

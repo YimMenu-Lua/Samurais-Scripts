@@ -1,4 +1,5 @@
 local CasinoPacino = require("includes.features.CasinoPacino"):init()
+local SGSL         = require("includes.structs.SGSL")
 
 local function drawGamblingTab()
 	ImGui.SeparatorText(_T "CP_COOLDOWN_BYPASS")
@@ -28,52 +29,88 @@ local function drawGamblingTab()
 	end
 
 	ImGui.SeparatorText(_T "CP_ROULETTE_SETTINGS")
-	GVars.features.dunk.force_roulette_wheel, _ = GUI:Checkbox(_T "CP_ROULETTE_FORCE_RED_18",
-		GVars.features.dunk.force_roulette_wheel)
+	GVars.features.dunk.force_roulette_wheel, _ = GUI:Checkbox(_T("CP_ROULETTE_FORCE_RED_18"),
+		GVars.features.dunk.force_roulette_wheel
+	)
 
 	ImGui.SeparatorText(_T "CP_SLOT_MACHINES_SETTINGS")
-	GVars.features.dunk.rig_slot_machine, _ = GUI:Checkbox(_T "CP_SLOT_MACHINES_RIG",
-		GVars.features.dunk.rig_slot_machine)
-	-- GVars.features.dunk.autoplay_slots, _ = GUI:Checkbox(_T"CP_SLOT_MACHINES_AUTOPLAY", GVars.features.dunk.autoplay_slots)
-	-- if GVars.features.dunk.autoplay_slots then
-	--     GVars.features.dunk.cap_slot_machine_chips, _ = GUI:Checkbox(_T"CP_SLOT_MACHINES_CAP_CHIPS", GVars.features.dunk.cap_slot_machine_chips)
-	-- end
+	GVars.features.dunk.rig_slot_machine, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_RIG"),
+		GVars.features.dunk.rig_slot_machine
+	)
+
+	GVars.features.dunk.autoplay_slots, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_AUTOPLAY"),
+		GVars.features.dunk.autoplay_slots
+	)
+
+	if (GVars.features.dunk.autoplay_slots) then
+		GVars.features.dunk.cap_slot_machine_chips, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_CAP_CHIPS"),
+			GVars.features.dunk.cap_slot_machine_chips
+		)
+
+		if (GVars.features.dunk.cap_slot_machine_chips) then
+			ImGui.SameLine()
+			ImGui.PushItemWidth(200)
+			GVars.features.dunk.slot_machine_cap, _ = ImGui.SliderInt("##chips_cap",
+				GVars.features.dunk.slot_machine_cap,
+				1e3,
+				1e5
+			)
+			ImGui.PopItemWidth()
+		end
+
+		ImGui.Text(_T("CP_AUTOPLAY_SLOTS_TIME_DELAY"))
+		ImGui.SameLine()
+		if (not GVars.features.dunk.autoplay_slots_delay_random) then
+			ImGui.PushItemWidth(200)
+			GVars.features.dunk.autoplay_slots_delay, _ = ImGui.SliderInt("##delay_time",
+				GVars.features.dunk.autoplay_slots_delay,
+				500,
+				1e4,
+				"%d ms"
+			)
+			ImGui.SameLine()
+		end
+
+		GVars.features.dunk.autoplay_slots_delay_random, _ = GUI:Checkbox(_T("GENERIC_RANDOM"),
+			GVars.features.dunk.autoplay_slots_delay_random
+		)
+	end
 
 	ImGui.SeparatorText(_T "CP_LUCKY_WHEEL_SETTINGS")
 	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_VEHICLE") then
-		CasinoPacino:GiveWheelPrize(eCasinoPrize.VEHICLE)
+		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.VEHICLE)
 	end
 
 	ImGui.SameLine()
 	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_MYSTERY") then
-		CasinoPacino:GiveWheelPrize(eCasinoPrize.MYSTERY)
+		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.MYSTERY)
 	end
 
 	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_CASH") then
-		CasinoPacino:GiveWheelPrize(eCasinoPrize.CASH)
+		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.CASH)
 	end
 	ImGui.SameLine()
 	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_CHIPS") then
-		CasinoPacino:GiveWheelPrize(eCasinoPrize.CHIPS)
+		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.CHIPS)
 	end
 
 	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_RP") then
-		CasinoPacino:GiveWheelPrize(eCasinoPrize.RP)
+		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.RP)
 	end
 
 	ImGui.SameLine()
 	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_DISCOUNT") then
-		CasinoPacino:GiveWheelPrize(eCasinoPrize.DISCOUNT)
+		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.DISCOUNT)
 	end
 
 	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_CLOTHING") then
-		CasinoPacino:GiveWheelPrize(eCasinoPrize.CLOTHING)
+		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.CLOTHING)
 	end
 	ImGui.SameLine()
 	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_SURPRISE") then
 		ThreadManager:Run(function()
-			math.randomseed(Time.now() * 69)
-			local id = math.random(eCasinoPrize.VEHICLE, eCasinoPrize.CLOTHING)
+			math.randomseed(os.time() * 60)
+			local id = math.random(Enums.eCasinoPrize.VEHICLE, Enums.eCasinoPrize.CLOTHING)
 			CasinoPacino:GiveWheelPrize(id)
 		end)
 	end
@@ -399,35 +436,30 @@ local function drawHeistTab()
 		tunables.set_int("HEIST3_FINALE_DECOY_GUNMAN", 0)
 	end
 
-	if (GUI:Button(_T "CP_HEIST_MAX_PLAYER_CUTS")) then
-		local gbchp = GetScriptGlobalOrLocal("gb_casino_heist_planning")
-		local bgchpco = GetScriptGlobalOrLocal("gb_casino_heist_planning_cut_offset")
-		if (gbchp == 0 or bgchpco == 0) then
-			Toast:ShowError("Casino Pacino", "Failed to set player cuts! Unable to read script local.")
-			return
-		end
-
+	if (GUI:Button(_T("CP_HEIST_MAX_PLAYER_CUTS"))) then
+		local bgchpco = SGSL:Get(SGSL.data.gb_casino_heist_planning_cut_offset):GetValue()
+		local gbchp = SGSL:Get(SGSL.data.gb_casino_heist_planning):AsGlobal():At(bgchpco)
 		for i = 1, 4, 1 do
-			globals.set_int(gbchp + bgchpco + i, 100)
+			gbchp:At(i):WriteInt(100)
 		end
 	end
 end
 
 local function DrawDunk()
 	if (not Game.IsOnline() or not Backend:IsUpToDate()) then
-		ImGui.Text(_T "GENERIC_OFFLINE_OR_OUTDATED")
+		ImGui.Text(_T("GENERIC_OFFLINE_OR_OUTDATED"))
 		return
 	end
 
 	if (ImGui.BeginTabBar("##dunkBar")) then
 		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
 
-		if ImGui.BeginTabItem(_T "CASINO_GAMBLING_TAB") then
+		if ImGui.BeginTabItem(_T("CASINO_GAMBLING_TAB")) then
 			drawGamblingTab()
 			ImGui.EndTabItem()
 		end
 
-		if ImGui.BeginTabItem(_T "CP_CASINO_HEIST_TAB") then
+		if ImGui.BeginTabItem(_T("CP_CASINO_HEIST_TAB")) then
 			drawHeistTab()
 			ImGui.EndTabItem()
 		end

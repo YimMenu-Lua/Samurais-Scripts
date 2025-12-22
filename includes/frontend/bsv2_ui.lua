@@ -1661,4 +1661,4 @@ local function BSV2UI()
 	end
 end
 
-GUI:RegisterNewTab(eTabID.TAB_EXTRA, "Billionaire Services", BSV2UI)
+GUI:RegisterNewTab(Enums.eTabID.TAB_EXTRA, "Billionaire Services", BSV2UI)

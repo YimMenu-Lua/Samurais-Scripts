@@ -1,5 +1,8 @@
 ---@diagnostic disable: param-type-mismatch
 
+local CEntity     = require("includes.classes.CEntity")
+local CPlayerInfo = require("includes.classes.CPlayerInfo")
+
 ---@class CPedIntelligence
 ---@class CPedInventory
 ---@class CPedWeaponManager
@@ -21,7 +24,7 @@
 ---@field m_armor pointer<float>
 ---@field m_cash pointer<uint16_t> // 0x1614
 ---@overload fun(ped: handle): CPed|nil
-CPed = Class("CPed", CEntity, 0x161C)
+local CPed        = Class("CPed", CEntity, 0x161C)
 
 ---@param ped handle
 ---@return CPed
@@ -85,3 +88,5 @@ end
 function CPed:GetPedType()
 	return (self.m_ped_type:get_word() << 11 >> 25)
 end
+
+return CPed

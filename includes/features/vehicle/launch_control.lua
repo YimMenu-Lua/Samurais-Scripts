@@ -36,7 +36,7 @@ function LaunchControl:Init()
 	self.m_timer:pause()
 	self.m_last_pop_time = 0
 	self.m_thread = ThreadManager:RegisterLooped("SS_LAUNCH_CTRL", function()
-		self:Mainthread()
+		self:OnTick()
 	end)
 end
 
@@ -45,8 +45,7 @@ function LaunchControl:ShouldRun()
 		and self.m_entity:IsValid()
 		and self.m_entity:IsCar()
 		and (not GVars.features.vehicle.performance_only or self.m_entity:IsPerformanceCar())
-		and GVars.features.vehicle.launch_control
-		and GVars.features.vehicle.burble_tune
+		and (GVars.features.vehicle.launch_control or GVars.features.vehicle.burble_tune)
 		and not self.m_entity:IsElectric()
 end
 
@@ -69,7 +68,10 @@ function LaunchControl:Update()
 	end
 
 	local handle = PV:GetHandle()
-	local rpmThreshold
+	local rpmThreshold = {
+		min = GVars.features.vehicle.bangs_rpm_min / 1e4,
+		max = GVars.features.vehicle.bangs_rpm_max / 1e4
+	}
 
 	if (self.m_state == eLaunchControlState.LOADING or self.m_state == eLaunchControlState.READY) then
 		local bones = PV:GetExhaustBones()
@@ -89,23 +91,29 @@ function LaunchControl:Update()
 		self.m_last_pop_time = Time.millis() + math.random(60, 120)
 		Audio.PlayExhaustPop(handle, false)
 	else
+		if (not GVars.features.vehicle.burble_tune) then
+			return
+		end
+
+		local gear = PV:GetCurrentGear()
+		if (gear == 0) then
+			return
+		end
+
 		if (not self.m_default_pops_off) then
 			AUDIO.ENABLE_VEHICLE_EXHAUST_POPS(handle, false)
 			self.m_default_pops_off = true
 		end
 
 		if (not PV:IsMoving()) then
-			rpmThreshold = 0.45
-		elseif (not PV:GetHandlingFlag(Enums.eVehicleHandlingFlags.FREEWHEEL_NO_GAS)) then
-			rpmThreshold = 0.80
-		else
-			rpmThreshold = 0.69
+			rpmThreshold.min = rpmThreshold.min - 0.15
+		elseif (PV:GetHandlingFlag(Enums.eVehicleHandlingFlags.FREEWHEEL_NO_GAS)) then
+			rpmThreshold.min = rpmThreshold.min + 0.2
 		end
 
 		local rpm = PV:GetRPM()
-		local gear = PV:GetCurrentGear()
 
-		if (PAD.IS_CONTROL_RELEASED(0, 71) and (rpm < 1.0) and (rpm > rpmThreshold) and (gear ~= 0)) then
+		if (PAD.IS_CONTROL_RELEASED(0, 71) and (rpm < 1.0) and math.inrange(rpm, rpmThreshold.min, rpmThreshold.max) and (gear ~= 0)) then
 			if (Time.millis() < self.m_last_pop_time) then
 				return
 			end
@@ -148,7 +156,7 @@ function LaunchControl:RestoreExhaustPops()
 	AUDIO.ENABLE_VEHICLE_EXHAUST_POPS(PV:GetHandle(), true)
 end
 
-function LaunchControl:Mainthread()
+function LaunchControl:OnTick()
 	local PV = self.m_entity
 	if (not PV or not PV:IsValid() or not GVars.features.vehicle.launch_control) then
 		sleep(250)

@@ -1,10 +1,21 @@
 ---@diagnostic disable: lowercase-global
 
-local default_cfg <const> = require("includes.data.config")
 local ThemeManager = require("includes.services.ThemeManager")
 local selected_theme = ThemeManager:GetCurrentTheme()
+local draw_cfg_reset_window = false
 
-local settings_tab = GUI:RegisterNewTab(eTabID.TAB_SETTINGS, "General", function()
+---@type Set<string>
+local cfg_reset_exceptions = Set.new()
+local cfg_exc_keys = {
+	{ pair = Pair.new("YimActions Favorites", "features.yim_actions.favorites"), clicked = false, selected = false },
+	{ pair = Pair.new("YimResupplier", "features.yrv3"),                         clicked = false, selected = false },
+	{ pair = Pair.new("Casino Pacino", "features.dunk"),                         clicked = false, selected = false },
+	{ pair = Pair.new("Keyboard Keybinds", "keyboard_keybinds"),                 clicked = false, selected = false },
+	{ pair = Pair.new("Controller Keybinds", "gamepad_keybinds"),                clicked = false, selected = false },
+	-- { pair = Pair.new("EntityForge", "features.entity_forge"),                   selected = false },
+}
+
+local settings_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_SETTINGS, "General", function()
 	GVars.backend.auto_cleanup_entities = GUI:Checkbox("Auto Cleanup Entities", GVars.backend.auto_cleanup_entities)
 	ImGui.Spacing()
 	ImGui.BulletText(_F("Language: %s (%s)", GVars.backend.language_name, GVars.backend.language_code))
@@ -18,13 +29,60 @@ local settings_tab = GUI:RegisterNewTab(eTabID.TAB_SETTINGS, "General", function
 			local is_selected = (i == GVars.backend.language_index)
 			if ImGui.Selectable(_F("%s (%s)", lang.name, lang.iso), is_selected) then
 				GVars.backend.language_index = i
-				GVars.backend.language_name = lang.name
-				GVars.backend.language_code = lang.iso
+				GVars.backend.language_name  = lang.name
+				GVars.backend.language_code  = lang.iso
 			end
 		end
 		ImGui.EndCombo()
 	end
 
+	ImGui.Spacing()
+
+	if ImGui.Button(_T("SETTINGS_CFG_RESET")) then
+		draw_cfg_reset_window = true
+	end
+
+	if (draw_cfg_reset_window) then
+		if (ImGui.Begin("##cfg_reset",
+				ImGuiWindowFlags.NoTitleBar
+				| ImGuiWindowFlags.NoMove
+				| ImGuiWindowFlags.NoResize
+				| ImGuiWindowFlags.AlwaysAutoResize
+			)) then
+			GUI:QuickConfigWindow(_T("SETTINGS_CFG_RESET"), function()
+				ImGui.Text(_T("SETTINGS_RESET_PRESERVE_KEYS"))
+				ImGui.Spacing()
+				for _, v in pairs(cfg_exc_keys) do
+					local label = v.pair.first
+					local gvar_key = v.pair.second
+					v.selected, v.clicked = ImGui.Checkbox(label, v.selected)
+					if (v.clicked) then
+						if (v.selected) then
+							cfg_reset_exceptions:Push(gvar_key)
+						else
+							cfg_reset_exceptions:Pop(gvar_key)
+						end
+					end
+				end
+				ImGui.Separator()
+				ImGui.Spacing()
+				if ImGui.Button(_T("GENERIC_RESET")) then
+					ImGui.OpenPopup("##confirm_cfg_reset")
+				end
+				if GUI:ConfirmPopup("##confirm_cfg_reset") then
+					Serializer:Reset(cfg_reset_exceptions)
+				end
+			end, function()
+				cfg_reset_exceptions:Clear()
+				for _, v in pairs(cfg_exc_keys) do
+					v.clicked = false
+					v.selected = false
+				end
+				draw_cfg_reset_window = false
+			end)
+			ImGui.End()
+		end
+	end
 	ImGui.Dummy(1, 10)
 end)
 
@@ -545,7 +603,7 @@ local function DrawSerializerDebug()
 
 	ImGui.BulletText("Thread State:")
 	ImGui.SameLine()
-	GUI:TextColored(EnumTostring(eThreadState, eState), state_colors[eState])
+	GUI:Text(EnumTostring(eThreadState, eState), state_colors[eState])
 	ImGui.BulletText(_F("Is Disabled: %s", not Serializer:CanAccess()))
 	ImGui.BulletText(_F("Time Since Last Flush: %.0f seconds ago.", Serializer:GetTimeSinceLastFlush() / 1e3))
 
@@ -685,6 +743,14 @@ local function DrawMiscTests()
 
 			print(PV:GetHandlingData())
 		end)
+	end
+
+	if (ImGui.Button("Test Confirm Popup")) then
+		ImGui.OpenPopup("testPopup")
+	end
+
+	if (GUI:ConfirmPopup("testPopup")) then
+		print("confirmed")
 	end
 end
 

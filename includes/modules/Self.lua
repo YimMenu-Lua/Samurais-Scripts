@@ -1,5 +1,6 @@
 ---@diagnostic disable: param-type-mismatch
 
+local Refs         = require("includes.data.refs")
 local FeatureMgr   = require("includes.services.FeatureManager")
 local miscFeatures = require("includes.features.self.miscellaneous")
 local Ragdoll      = require("includes.features.self.ragdoll")
@@ -146,7 +147,7 @@ function Self:IsUsingAirctaftMG()
 	end
 
 	weapon = Cast(weapon):AsUint32_t()
-	for _, v in ipairs(t_AircraftMGs) do
+	for _, v in ipairs(Refs.aircraftMGs) do
 		if weapon == joaat(v) then
 			return true, weapon
 		end
@@ -201,7 +202,7 @@ end
 -- Returns whether the player is currently using any mobile or computer app.
 ---@return boolean
 function Self:IsBrowsingApps()
-	for _, v in ipairs(t_AppScriptNames) do
+	for _, v in ipairs(Refs.appScriptNames) do
 		if script.is_active(v) then
 			return true
 		end
@@ -217,7 +218,7 @@ function Self:IsInCarModShop()
 		return false
 	end
 
-	for _, v in ipairs(t_ModshopScriptNames) do
+	for _, v in ipairs(Refs.modshopScriptNames) do
 		if script.is_active(v) then
 			return true
 		end

@@ -47,33 +47,6 @@ require("includes.modules.Game")
 ---@class GVars : Config
 GVars = {}
 
--- ### Script Globals & Script Locals
---
--- It is highly recommended to not index `SG_SL` directly and instead use the `GetScriptGlobalOrLocal` function.
--- ___
--- - Example 1:
---
---```lua
--- local pv_global = GetScriptGlobalOrLocal("personal_vehicle_global") -- returns the value of the script global/local
--- -- create your script global object
--- local pv_global_object = ScriptGlobal(pv_global)
---```
---
--- - Example 2:
---
---```lua
--- local pv_global_table = GetScriptGlobalOrLocal("personal_vehicle_global", true) -- returns the full table.
--- -- create your script global object
--- local pv_global_object = ScriptGlobal(pv_global_table.value)
---```
---
--- - Not Recommended:
---
---```lua
--- local pv_global = SG_SL.personal_vehicle_global.LEGACY.value -- direct indexing is not recommended.
---```
-SG_SL = require("includes.data.globals_locals")
-
 ----------------------------------------------------------------------------------------------------
 -- These services must be loaded before any class that registers with/uses them -------------------
 ThreadManager = require("includes.services.ThreadManager"):init()
@@ -123,7 +96,7 @@ local packages      = {
 	"frontend.salvage_ui",
 	"frontend.self_ui",
 	"frontend.settings_ui",
-	"frontend.vehicle_ui",
+	"frontend.vehicle.vehicle_ui",
 	"frontend.world_ui",
 	"frontend.yav3_ui",
 	"frontend.yrv3_ui",

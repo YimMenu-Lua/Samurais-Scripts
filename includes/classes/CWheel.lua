@@ -30,7 +30,7 @@
 ---@field m_is_in_air pointer<byte> // 0x1F3 `bool`
 ---@field m_is_burst pointer<byte> // 0x1F4 `bool`
 ---@overload fun(addr: pointer): CWheel|nil
-CWheel = { m_size = 0x1FC }
+local CWheel = { m_size = 0x1FC }
 CWheel.__index = CWheel
 CWheel.__type = "CWheel"
 setmetatable(CWheel, {
@@ -136,3 +136,5 @@ function CWheel:GetTiltAngle()
 
 	return math.deg(math.acos(dot / mag))
 end
+
+return CWheel

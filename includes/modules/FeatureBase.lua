@@ -34,6 +34,8 @@ function FeatureBase:OnEnable() end
 
 function FeatureBase:OnDisable() end
 
+function FeatureBase:OnTick() end
+
 function FeatureBase:Cleanup() end
 
 return FeatureBase

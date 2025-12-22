@@ -1,4 +1,4 @@
-local self_tab = GUI:RegisterNewTab(eTabID.TAB_SELF, "Self")
+local self_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_SELF, "Self")
 
 local function CheckIfRagdollBlocked()
 	ThreadManager:Run(function()

@@ -401,7 +401,7 @@ end
 function Serializer:SaveItem(item_name, value)
 	local data = self:Read()
 
-	if type(data) ~= "table" then
+	if (type(data) ~= "table") then
 		log.warning("[Serializer]: Invalid data type!")
 		return
 	end
@@ -410,34 +410,56 @@ function Serializer:SaveItem(item_name, value)
 	self:Parse(data)
 end
 
----@param exceptions? table A table of config keys to ignore.
+---@param defaults table
+---@param current table
+---@param out table
+---@param exceptions Set<string>
+---@param prefix? string
+local function deep_reset(defaults, current, out, exceptions, prefix)
+	for key, def_val in pairs(defaults) do
+		local path = prefix and (prefix .. "." .. key) or key
+
+		if (type(def_val) == "table") then
+			out[key] = {}
+			deep_reset(
+				def_val,
+				type(current) == "table" and current[key] or nil,
+				out[key],
+				exceptions,
+				path
+			)
+		else
+			if exceptions[path] then
+				local preserved = table.get_nested_key(current or {}, path)
+				out[key] = preserved ~= nil and preserved or def_val
+			else
+				out[key] = def_val
+			end
+
+			if _ENV.GVars then
+				table.set_nested_key(_ENV.GVars, path, out[key])
+			end
+		end
+	end
+end
+
+---@param exceptions? Set<string>
 function Serializer:Reset(exceptions)
 	if not self:CanAccess() then
+		self:notify(_T("GENERIC_UNAVAILABLE"))
 		return
 	end
 
 	exceptions = exceptions or {}
-	local data = self:Read()
 
+	local data = self:Read()
 	if type(data) ~= "table" then
 		log.warning("[Serializer]: Invalid data type!")
 		return
 	end
 
 	local temp = {}
-
-	for key, value in pairs(self.default_config) do
-		if not exceptions[key] then
-			temp[key] = value
-
-			if _ENV.GVars then
-				_ENV.GVars[key] = value
-			end
-		else
-			temp[key] = data[key] or value
-		end
-	end
-
+	deep_reset(self.default_config, data, temp, exceptions, nil)
 	self:Parse(temp)
 end
 

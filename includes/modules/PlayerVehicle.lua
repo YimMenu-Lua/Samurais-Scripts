@@ -46,6 +46,7 @@ local MiscVehicle = require("includes.features.vehicle.misc_vehicle")
 ---@field public m_default_xenon_lights { enabled: boolean, index: integer }
 ---@field public m_default_tire_smoke { enabled: boolean, color: vec3 }
 ---@field public m_autopilot { eligible: boolean, state: eAutoPilotState, initial_nozzle_pos: integer }
+---@field public m_engine_swap_compatible boolean
 ---@field public m_is_shooting_flares boolean
 ---@field public m_is_flatbed boolean cache it so we don't have to call natives in UI threads
 ---@overload fun(handle: handle): PlayerVehicle
@@ -202,8 +203,9 @@ end
 
 -- Patches your current vehicle's memory once and automatically resets it on cleanup.
 ---@param data PatchData
-function PlayerVehicle:AddMemoryPatch(data)
-	Memory:AddPatch(self, data, false)
+---@param apply? boolean
+function PlayerVehicle:AddMemoryPatch(data, apply)
+	Memory:AddPatch(self, data, apply or false)
 end
 
 ---@param patchName string
@@ -231,7 +233,9 @@ function PlayerVehicle:AddGenericToggleable(name, onEnable, onDisable, args)
 
 	args = args or {}
 	if (type(onEnable) == "function") then
-		onEnable()
+		ThreadManager:Run(function()
+			onEnable()
+		end)
 	end
 
 	self.m_generic_toggleables[name] = {
@@ -247,8 +251,10 @@ function PlayerVehicle:ResetGenericToggleable(name)
 		return
 	end
 
-	generic.onDisable(table.unpack(generic.args))
-	self.m_generic_toggleables[name] = nil
+	ThreadManager:Run(function()
+		generic.onDisable(table.unpack(generic.args))
+		self.m_generic_toggleables[name] = nil
+	end)
 end
 
 function PlayerVehicle:ResetAllGenericToggleables()
@@ -566,6 +572,7 @@ function PlayerVehicle:Main()
 	end
 
 	self.m_is_flatbed = self:IsFlatbedTruck()
+	self.m_engine_swap_compatible = self:IsCar()
 	self.m_feat_mgr:Update()
 	self:UpdateESC()
 	self:AutolockDoors()
@@ -579,9 +586,10 @@ end
 --
 -- We can still ignore this and memorize patch names and directly use them to apply/restore.
 PlayerVehicle.MemoryPatches = {
-	DeformMult = "DeformMult",
-	Turbulence = "Turbulence",
-	WindMult   = "WindMult",
+	DeformMult   = "DeformMult",
+	Turbulence   = "Turbulence",
+	WindMult     = "WindMult",
+	Acceleration = "Acceleration",
 }
 
 return PlayerVehicle.new(0)

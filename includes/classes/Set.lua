@@ -49,6 +49,10 @@ function Set:Pop(element)
 	self.m_data[element] = nil
 end
 
+function Set:Clear()
+	self.m_data = {}
+end
+
 ---@return boolean
 function Set:Contains(element)
 	return self.m_data[element] == true

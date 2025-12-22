@@ -88,7 +88,7 @@ function CarCrash:Init()
 	})
 
 	self.m_thread = ThreadManager:RegisterLooped("SS_VEH_CRASH", function()
-		self:Mainthread()
+		self:OnTick()
 	end)
 end
 
@@ -193,7 +193,7 @@ function CarCrash:OnCollision(levelName, vehicle)
 	end
 end
 
-function CarCrash:Mainthread()
+function CarCrash:OnTick()
 	if (not self:ShouldRun()) then
 		sleep(1000)
 		return

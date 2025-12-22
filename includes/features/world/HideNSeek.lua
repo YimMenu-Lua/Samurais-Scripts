@@ -675,7 +675,7 @@ function HideNSeek:WhileHiding()
 	end
 end
 
-function HideNSeek:Main()
+function HideNSeek:OnTick()
 	self.m_is_wanted = PLAYER.GET_PLAYER_WANTED_LEVEL(Self:GetPlayerID()) > 0
 	self.m_was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(Self:GetPlayerID())
 	if (not self.m_is_active) then

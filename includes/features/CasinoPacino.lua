@@ -1,7 +1,9 @@
 ---@diagnostic disable: lowercase-global
 
+local SGSL = require("includes.structs.SGSL")
+
 ---@enum eCasinoPrize
-eCasinoPrize = {
+Enums.eCasinoPrize = {
 	VEHICLE  = 1,
 	MYSTERY  = 2,
 	CASH     = 3,
@@ -12,13 +14,13 @@ eCasinoPrize = {
 }
 
 local CasinoPrizes <const> = {
-	[eCasinoPrize.VEHICLE] = { v = 18 },
-	[eCasinoPrize.MYSTERY] = { v = 11 },
-	[eCasinoPrize.CASH] = { v = 19 },
-	[eCasinoPrize.CHIPS] = { v = 15 },
-	[eCasinoPrize.RP] = { v = 17 },
-	[eCasinoPrize.DISCOUNT] = { v = 4 },
-	[eCasinoPrize.CLOTHING] = { v = 8 },
+	[Enums.eCasinoPrize.VEHICLE] = { v = 18 },
+	[Enums.eCasinoPrize.MYSTERY] = { v = 11 },
+	[Enums.eCasinoPrize.CASH] = { v = 19 },
+	[Enums.eCasinoPrize.CHIPS] = { v = 15 },
+	[Enums.eCasinoPrize.RP] = { v = 17 },
+	[Enums.eCasinoPrize.DISCOUNT] = { v = 4 },
+	[Enums.eCasinoPrize.CLOTHING] = { v = 8 },
 }
 
 ---@class CasinoPacino
@@ -30,7 +32,7 @@ CasinoPacino.__index = CasinoPacino
 ---@return CasinoPacino
 function CasinoPacino:init()
 	local instance = setmetatable({
-		m_tab = GUI:RegisterNewTab(eTabID.TAB_ONLINE, "Casino Pacino")
+		m_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Casino Pacino")
 	}, self)
 
 	instance.m_thread = ThreadManager:RegisterLooped("SS_DUNK", function()
@@ -55,24 +57,21 @@ function CasinoPacino:GiveWheelPrize(prizeID)
 		return
 	end
 
-	local prize_wheel_win_state   = GetScriptGlobalOrLocal("prize_wheel_win_state") -- this function always returns a number even when it fails
-	local prize_wheel_prize       = GetScriptGlobalOrLocalOffset("prize_wheel_win_state", 1)
-	local prize_wheel_prize_state = GetScriptGlobalOrLocalOffset("prize_wheel_prize_state", 1)
-
-	-- avoid writing garbage data and exit early
-	if (not prize_wheel_win_state or not prize_wheel_prize or not prize_wheel_prize_state) then
-		Toast:ShowError("CasinoPacino", "Failed to give wheel prize! Unable to read script local.")
-		return
-	end
-
-	local obj = CasinoPrizes[prizeID]
+	local win_state_local         = SGSL:Get(SGSL.data.prize_wheel_win_state)
+	local prize_wheel_win_state   = win_state_local:AsLocal()
+	local prize_wheel_prize       = win_state_local:GetOffset(1)
+	local prize_wheel_prize_state = SGSL:Get(SGSL.data.prize_wheel_prize_state):GetOffset(1)
+	local obj                     = CasinoPrizes[prizeID]
 	if (not obj) then
 		log.fdebug("Unknown prize ID selected: %d", prizeID)
 		return
 	end
 
-	locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), obj.v)
-	locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
+
+	prize_wheel_win_state:At(prize_wheel_prize):WriteInt(obj.v)
+	prize_wheel_win_state:At(prize_wheel_prize_state):WriteInt(11)
+	-- locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), obj.v)
+	-- locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
 end
 
 ---@param card_index number
@@ -108,10 +107,12 @@ end
 function CasinoPacino:ForceDealerBust()
 	script.run_in_fiber(function(script)
 		local player_id                    = Self:GetPlayerID()
-		local blackjack_cards              = GetScriptGlobalOrLocal("blackjack_cards")
-		local blackjack_decks              = GetScriptGlobalOrLocalOffset("blackjack_cards", 1)
-		local blackjack_table_players      = GetScriptGlobalOrLocal("blackjack_table_players")
-		local blackjack_table_players_size = GetScriptGlobalOrLocalOffset("blackjack_table_players", 1)
+		local bjc_obj                      = SGSL:Get(SGSL.data.blackjack_cards)
+		local btp_obj                      = SGSL:Get(SGSL.data.blackjack_table_players)
+		local blackjack_cards              = bjc_obj:GetValue()
+		local blackjack_decks              = bjc_obj:GetOffset(1)
+		local blackjack_table_players      = btp_obj:GetValue()
+		local blackjack_table_players_size = btp_obj:GetOffset(1)
 		if (not player_id
 				or not blackjack_cards
 				or not blackjack_decks
@@ -165,22 +166,14 @@ end
 ---@param card_two integer
 ---@param card_three integer
 function CasinoPacino:SetPokerCards(player_id, players_current_table, card_one, card_two, card_three)
-	local three_card_poker_cards           = GetScriptGlobalOrLocal("three_card_poker_cards")
-	local three_card_poker_current_deck    = GetScriptGlobalOrLocalOffset("three_card_poker_cards", 1)
-	local three_card_poker_deck_size       = GetScriptGlobalOrLocal("three_card_poker_deck_size")
-	local three_card_poker_anti_cheat      = GetScriptGlobalOrLocal("three_card_poker_anti_cheat")
-	local three_card_poker_anti_cheat_deck = GetScriptGlobalOrLocalOffset("three_card_poker_anti_cheat", 1)
-
-	if (not three_card_poker_cards
-			or not three_card_poker_current_deck
-			or not three_card_poker_deck_size
-			or not three_card_poker_anti_cheat
-			or not three_card_poker_anti_cheat_deck
-		) then
-		return
-	end
-
-	local TCPCards = ScriptLocal(
+	local tcpc_obj                         = SGSL:Get(SGSL.data.three_card_poker_cards)
+	local tcp_ac_obj                       = SGSL:Get(SGSL.data.three_card_poker_anti_cheat)
+	local three_card_poker_cards           = tcpc_obj:GetValue()
+	local three_card_poker_current_deck    = tcpc_obj:GetOffset(1)
+	local three_card_poker_deck_size       = SGSL:Get(SGSL.data.three_card_poker_deck_size):GetValue()
+	local three_card_poker_anti_cheat      = tcp_ac_obj:GetValue()
+	local three_card_poker_anti_cheat_deck = tcp_ac_obj:GetOffset(1)
+	local TCPCards                         = ScriptLocal(
 			three_card_poker_cards,
 			"three_card_poker")
 		:At(three_card_poker_current_deck)
@@ -188,7 +181,7 @@ function CasinoPacino:SetPokerCards(player_id, players_current_table, card_one, 
 		:At(players_current_table * three_card_poker_deck_size)
 		:At(2)
 
-	local TCPAC = ScriptLocal(
+	local TCPAC                            = ScriptLocal(
 			three_card_poker_anti_cheat,
 			"three_card_poker")
 		:At(three_card_poker_anti_cheat_deck)
@@ -223,23 +216,15 @@ function CasinoPacino:ForcePokerCards()
 		sleep(500)
 	end
 
-	local three_card_poker_table        = GetScriptGlobalOrLocal("three_card_poker_table")
-	local three_card_poker_table_size   = GetScriptGlobalOrLocalOffset("three_card_poker_table", 1)
-	local three_card_poker_cards        = GetScriptGlobalOrLocal("three_card_poker_cards")
-	local three_card_poker_current_deck = GetScriptGlobalOrLocalOffset("three_card_poker_cards", 1)
-	local three_card_poker_deck_size    = GetScriptGlobalOrLocal("three_card_poker_deck_size")
-
-	if (not three_card_poker_table
-			or not three_card_poker_table_size
-			or not three_card_poker_cards
-			or not three_card_poker_current_deck
-			or not three_card_poker_deck_size
-		) then
-		return
-	end
-
-	local TCTable = ScriptLocal(three_card_poker_table, "three_card_poker"):At(1)
-	local players_current_table = TCTable:At(player_id * three_card_poker_table_size):At(2):ReadInt()
+	local tcpt_obj                      = SGSL:Get(SGSL.data.three_card_poker_table)
+	local tcpc_obj                      = SGSL:Get(SGSL.data.three_card_poker_cards)
+	local three_card_poker_table        = tcpt_obj:GetValue()
+	local three_card_poker_table_size   = tcpt_obj:GetOffset(1)
+	local three_card_poker_cards        = tcpc_obj:GetValue()
+	local three_card_poker_current_deck = tcpc_obj:GetOffset(1)
+	local three_card_poker_deck_size    = SGSL:Get(SGSL.data.three_card_poker_deck_size):GetValue()
+	local TCTable                       = ScriptLocal(three_card_poker_table, "three_card_poker"):At(1)
+	local players_current_table         = TCTable:At(player_id * three_card_poker_table_size):At(2):ReadInt()
 
 	if (players_current_table ~= -1) then -- If the player is sitting at a poker table
 		-- "three_card_poker", (three_card_poker_cards) + (three_card_poker_current_deck) + (1 + (players_current_table * three_card_poker_deck_size)) + (2) +
@@ -281,13 +266,11 @@ function CasinoPacino:ForceRouletteWheel()
 		return
 	end
 
-	local player_id = Self:GetPlayerID()
-	local roulette_master_table = GetScriptGlobalOrLocal("roulette_master_table")
-	local roulette_outcomes_table = GetScriptGlobalOrLocalOffset("roulette_master_table", 1)
-	local roulette_ball_table = GetScriptGlobalOrLocal("roulette_ball_table_offset")
-	if (not roulette_master_table or not roulette_outcomes_table or not roulette_ball_table) then
-		return -- GetScriptGlobalOrLocal failed and retured 0
-	end
+	local player_id               = Self:GetPlayerID()
+	local rmt_obj                 = SGSL:Get(SGSL.data.roulette_master_table)
+	local roulette_master_table   = rmt_obj:GetValue()
+	local roulette_outcomes_table = rmt_obj:GetOffset(1)
+	local roulette_ball_table     = SGSL:Get(SGSL.data.roulette_ball_table_offset):GetValue()
 
 	while (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", -1, 0) ~= player_id
 			and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 0, 0) ~= player_id
@@ -312,12 +295,8 @@ function CasinoPacino:RigSlotMachine()
 	end
 
 	local needs_run = false
-	local slots_random_results_table = GetScriptGlobalOrLocal("slots_random_result_table")
-	if (not slots_random_results_table) then
-		return
-	end
+	local SlotsResultLocal = SGSL:Get(SGSL.data.slots_random_result_table):AsLocal()
 
-	local SlotsResultLocal = ScriptLocal(slots_random_results_table, "casino_slots")
 	if (GVars.features.dunk.rig_slot_machine) then
 		for slots_iter = 3, 196, 1 do
 			if (slots_iter ~= 67 and slots_iter ~= 132) then
@@ -354,24 +333,29 @@ function CasinoPacino:RigSlotMachine()
 end
 
 function CasinoPacino:AutoPlaySlots()
-	local slots_slot_machine_state = GetScriptGlobalOrLocal("slots_slot_machine_state")
-	if (not slots_slot_machine_state) then
+	if (not GVars.features.dunk.autoplay_slots) then
 		return
 	end
 
-	local slotstate = locals.get_int("casino_slots", slots_slot_machine_state)
-	local autoplay_chips_cap = 0
-	local autoplay_cap = false
+	local slots_slot_machine_state = SGSL:Get(SGSL.data.slots_slot_machine_state):AsLocal()
+	local slotstate = slots_slot_machine_state:ReadInt()
+	local autoplay_cap = GVars.features.dunk.cap_slot_machine_chips
+	local delay = GVars.features.dunk.autoplay_slots_delay
+
+	if (GVars.features.dunk.autoplay_slots_delay_random) then
+		math.randomseed(os.time() * 60)
+		delay = math.random(500, 1e4)
+	end
 
 	if (Bit.is_set(slotstate, 0)) then --The user is sitting at a slot machine.
-		local chips = stats.get_int('MPX_CASINO_CHIPS')
-		local chip_cap = autoplay_chips_cap
+		local chips = stats.get_int("MPX_CASINO_CHIPS")
+		local chip_cap = GVars.features.dunk.slot_machine_cap
 		if ((autoplay_cap and chips < chip_cap) or not autoplay_cap) then
 			if (not Bit.is_set(slotstate, 24)) then --The slot machine is not currently spinning.
 				yield()                    -- Wait for the previous spin to clean up, if we just came from a spin.
 				slotstate = Bit.set(slotstate, 3) -- Bitwise set the 3rd bit (begin playing)
-				locals.set_int("casino_slots", slots_slot_machine_state, slotstate)
-				sleep(500)                 -- If we rewrite the begin playing bit again, the machine will get stuck.
+				slots_slot_machine_state:WriteInt(slotstate)
+				sleep(delay)               -- If we rewrite the begin playing bit again, the machine will get stuck.
 			end
 		end
 	end
@@ -397,24 +381,27 @@ function CasinoPacino:GetBJDealerCard()
 		return _T("CP_NOT_IN_CASINO")
 	end
 
-	local blackjack_cards              = GetScriptGlobalOrLocal("blackjack_cards")
-	local blackjack_decks              = GetScriptGlobalOrLocalOffset("blackjack_cards", 1)
-	local blackjack_table_players      = GetScriptGlobalOrLocal("blackjack_table_players")
-	local blackjack_table_players_size = GetScriptGlobalOrLocalOffset("blackjack_table_players", 1)
+	local bjc_obj                      = SGSL:Get(SGSL.data.blackjack_cards)
+	local bjtp_obj                     = SGSL:Get(SGSL.data.blackjack_table_players)
+	local blackjack_cards              = bjc_obj:GetValue()
+	local blackjack_decks              = bjc_obj:GetOffset(1)
+	local blackjack_table_players      = bjtp_obj:GetValue()
+	local blackjack_table_players_size = bjtp_obj:GetOffset(1)
 	local blackjack_table              = locals.get_int("blackjack",
-		blackjack_table_players + 1 + (Self:GetPlayerID() * blackjack_table_players_size) + 4)
-
-	if (not blackjack_cards
-			or not blackjack_decks
-			or not blackjack_table_players
-			or not blackjack_table_players_size
-		) then
-		return _T("GENERIC_SG_SL_READ_FAIL")
-	end
+		blackjack_table_players
+		+ 1
+		+ (Self:GetPlayerID() * blackjack_table_players_size)
+		+ 4
+	)
 
 	if (blackjack_table ~= -1) then
 		local dealers_card = locals.get_int("blackjack",
-			blackjack_cards + blackjack_decks + 1 + (blackjack_table * 13) + 1)
+			blackjack_cards
+			+ blackjack_decks
+			+ 1
+			+ (blackjack_table * 13)
+			+ 1
+		)
 		return self:GetCardNameFromIndex(dealers_card)
 	else
 		return _T("CP_NOT_PLAYING_BLACKJACK")
@@ -426,17 +413,14 @@ function CasinoPacino:SetCartAutoGrab()
 		return
 	end
 
-	local fmmc_cg = GetScriptGlobalOrLocal("fm_mission_controller_cart_grab")
-	local fmmc_cg_spd = GetScriptGlobalOrLocalOffset("fm_mission_controller_cart_grab", 1)
-	if (not fmmc_cg or not fmmc_cg_spd) then
-		return
-	end
+	local fmmc_obj    = SGSL:Get(SGSL.data.fm_mission_controller_cart_grab)
+	local fmmc_cg     = fmmc_obj:AsLocal()
+	local fmmc_cg_spd = fmmc_obj:GetOffset(1)
 
-	local FMMCCG = ScriptLocal(fmmc_cg, "fm_mission_controller")
-	if (FMMCCG:ReadInt() == 3) then
-		FMMCCG:WriteInt(4)
-	elseif (FMMCCG:ReadInt() == 4) then
-		FMMCCG:At(fmmc_cg_spd):WriteFloat(2.0)
+	if (fmmc_cg:ReadInt() == 3) then
+		fmmc_cg:WriteInt(4)
+	elseif (fmmc_cg:ReadInt() == 4) then
+		fmmc_cg:At(fmmc_cg_spd):WriteFloat(2.0)
 	end
 end
 
@@ -470,6 +454,7 @@ function CasinoPacino:Main()
 	self:ForceRouletteWheel()
 	self:RigSlotMachine()
 	self:SetCartAutoGrab()
+	self:AutoPlaySlots()
 end
 
 return CasinoPacino

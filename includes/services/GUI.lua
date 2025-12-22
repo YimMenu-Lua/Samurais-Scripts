@@ -16,7 +16,7 @@ local DrawClock = require("includes.frontend.clock")
 ---@field m_pos? vec2
 
 ---@enum eTabID
-eTabID = {
+Enums.eTabID = {
 	TAB_SELF     = 1,
 	TAB_VEHICLE  = 2,
 	TAB_WORLD    = 3,
@@ -25,15 +25,25 @@ eTabID = {
 	TAB_SETTINGS = 6,
 }
 
+local TABID_MIN <const> = 1
+local TABID_MAX <const> = table.getlen(Enums.eTabID)
+
 ---@type table<eTabID, table>
 local defaultTabs = {}
 
 ---@type table<eTabID, string>
-local tabIdToString = {}
+local tabIdToString <const> = {
+	[Enums.eTabID.TAB_SELF]     = "TAB_SELF",
+	[Enums.eTabID.TAB_VEHICLE]  = "TAB_VEHICLE",
+	[Enums.eTabID.TAB_WORLD]    = "TAB_WORLD",
+	[Enums.eTabID.TAB_ONLINE]   = "TAB_ONLINE",
+	[Enums.eTabID.TAB_EXTRA]    = "TAB_EXTRA",
+	[Enums.eTabID.TAB_SETTINGS] = "GENERIC_SETTINGS_LABEL",
+	default                     = "GENERIC_ERR_LABEL"
+}
 
-for name, enum in pairs(eTabID) do
+for _, enum in pairs(Enums.eTabID) do
 	defaultTabs[enum] = { first = "", second = {} }
-	tabIdToString[enum] = string.replace(name, "TAB_", ""):titlecase():trim()
 end
 
 --#region GUI
@@ -67,7 +77,7 @@ function GUI:init()
 		m_cb_window_pos = vec2:zero(),
 		m_screen_resolution = Game.GetScreenResolution(),
 		m_sidebar_width = 200,
-		m_selected_category = eTabID.TAB_SELF,
+		m_selected_category = Enums.eTabID.TAB_SELF,
 		m_tabs = defaultTabs,
 		m_independent_windows = {},
 		m_requested_windows = {},
@@ -105,7 +115,19 @@ function GUI:LateInit()
 		gui.add_always_draw_imgui(drawfunc)
 	end
 
-	self.m_selected_tab = self.m_tabs[eTabID.TAB_SELF][1].second
+	if (not math.inrange(GVars.ui.last_tab.tab_id, TABID_MIN, TABID_MAX)) then
+		GVars.ui.last_tab.tab_id = 1
+	end
+
+	local __t = self.m_tabs[GVars.ui.last_tab.tab_id][GVars.ui.last_tab.array_index]
+	if (not __t) then
+		GVars.ui.last_tab.array_index = 1
+	end
+
+	self.m_selected_category      = GVars.ui.last_tab.tab_id
+	self.m_selected_tab           = self.m_tabs[GVars.ui.last_tab.tab_id][GVars.ui.last_tab.array_index].second
+	self.m_selected_category_tabs = self.m_tabs[GVars.ui.last_tab.tab_id]
+	self.m_is_drawing_sidebar     = #self.m_selected_category_tabs > 1
 end
 
 function GUI:Toggle()
@@ -187,15 +209,16 @@ end
 ---@param name string
 ---@param drawable? function
 ---@param subtabs? Tab[]
+---@param isTranslatorLabel? boolean
 ---@return Tab
-function GUI:RegisterNewTab(id, name, drawable, subtabs)
+function GUI:RegisterNewTab(id, name, drawable, subtabs, isTranslatorLabel)
 	assert((not string.isnullorempty(name)), "Attempt to register a new tab with no name.")
 
 	if (self:DoesTabExist(id, name)) then
 		error(_F("Tab '%s' already exists.", name))
 	end
 
-	local newtab = Pair.new(name, Tab(name, drawable, subtabs))
+	local newtab = Pair.new(name, Tab(name, drawable, subtabs, isTranslatorLabel))
 	table.insert(self.m_tabs[id], newtab)
 
 	return newtab.second
@@ -364,7 +387,7 @@ function GUI:DrawTopBar()
 	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + startX)
 
 	for i = 1, tabCount do
-		local tabName = tabIdToString[i]
+		local tabName = _T(Match(i, tabIdToString))
 		local selected = (self.m_selected_category == i)
 
 		cursorPos = vec2:new(ImGui.GetCursorScreenPos())
@@ -427,6 +450,7 @@ function GUI:DrawTopBar()
 				self.m_selected_tab = nil
 			end
 
+			GVars.ui.last_tab.tab_id = i
 			self.m_selected_category = i
 			self.m_selected_category_tabs = self.m_tabs[i]
 			self:PlaySound(self.Sounds.Nav)
@@ -489,12 +513,14 @@ function GUI:DrawSideBar(yPos)
 				ImGuiWindowFlags.NoBringToFrontOnFocus |
 				ImGuiWindowFlags.AlwaysAutoResize)
 			) then
-			for _, pair in ipairs(self.m_selected_category_tabs or {}) do
+			for i, pair in ipairs(self.m_selected_category_tabs) do
 				if (pair and pair.second) then
 					local tab = pair.second
-					if (ImGui.Selectable2(pair.first, self.m_selected_tab == tab, selectableSize)) then
+					local label = tab:GetName()
+					if (ImGui.Selectable2(label, self.m_selected_tab == tab, selectableSize)) then
 						self:PlaySound(self.Sounds.Nav)
 						self.m_selected_tab = tab
+						GVars.ui.last_tab.array_index = i
 					end
 				end
 			end
@@ -643,29 +669,45 @@ end
 
 --#region Wrappers
 
--- Wrapper for `ImGui::TextColored`.
 ---@param text string
----@param color Color
----@param opts? { alpha: number, wrap_pos: number }
-function GUI:TextColored(text, color, opts)
+---@param opts? { scale: float, color: Color }
+function GUI:HeaderText(text, opts)
 	opts = opts or {}
-	local r, g, b, a -- fwd decl
-	local has_wrap_pos = type(opts.wrap_pos) == "number"
+	ImGui.SetWindowFontScale(opts.scale or 1.114)
+	self:Text(text, opts)
+	ImGui.SetWindowFontScale(1.0)
+end
 
-	if (not IsInstance(color, Color)) then
-		r, g, b, a = 1, 0.1, 0, 1
+-- Wrapper for `ImGui::Text` that supports optional colors and text formatting.
+--
+-- To use formatting, pass the label as the format string and pass a table of arguments in the optional parameters.
+--
+-- **Example:**
+--
+--```Lua
+-- GUI:Text("Found %s at 0x%X", { color = Color("green"), fmt = { "somePointer", 20015998343868 }})
+---@param text string
+---@param opts? { color: Color, alpha: number, wrap_pos: number, fmt: table } Optional parameters
+function GUI:Text(text, opts)
+	opts = opts or {}
+	if (type(opts.fmt) == "table") then
+		text = _F(text, table.unpack(opts.fmt))
 	end
 
-	r, g, b, a = color:AsFloat()
-	ImGui.PushStyleColor(ImGuiCol.Text, r, g, b, opts.alpha or a or 1)
+	if (not IsInstance(opts.color, Color)) then
+		ImGui.TextWrapped(text)
+		return
+	end
 
+	local has_wrap_pos = type(opts.wrap_pos) == "number"
+	local r, g, b, a   = opts.color:AsFloat()
+
+	ImGui.PushStyleColor(ImGuiCol.Text, r, g, b, opts.alpha or a or 1)
 	if (has_wrap_pos) then
 		ImGui.PushTextWrapPos(opts.wrap_pos)
 	end
-
 	ImGui.TextWrapped(text)
 	ImGui.PopStyleColor(1)
-
 	if (has_wrap_pos) then
 		ImGui.PopTextWrapPos()
 	end
@@ -673,7 +715,7 @@ end
 
 -- Displays a tooltip whenever the widget this function is called after is hovered.
 ---@param text string
----@param opts? { color: Color, alpha: number, wrap_pos: number }
+---@param opts? { color: Color, alpha: number, wrap_pos: number, fmt: table }
 function GUI:Tooltip(text, opts)
 	if (GVars.ui.disable_tooltips) then
 		return
@@ -686,7 +728,7 @@ function GUI:Tooltip(text, opts)
 		ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
 		ImGui.BeginTooltip()
 		if IsInstance(opts.color, Color) then
-			self:TextColored(text, opts.color, wrap_pos)
+			self:Text(text, opts)
 		else
 			ImGui.PushTextWrapPos(wrap_pos)
 			ImGui.TextWrapped(text)
@@ -700,7 +742,7 @@ end
 --
 -- When the symbol is hovered, it displays a tooltip.
 ---@param text string
----@param opts? { color: Color, alpha: number, wrap_pos: number }
+---@param opts? { color: Color, alpha: number, wrap_pos: number, fmt: table }
 function GUI:HelpMarker(text, opts)
 	if (GVars.ui.disable_tooltips) then
 		return
@@ -736,39 +778,63 @@ function GUI:TooltipMultiline(lines, wrap_pos)
 	end
 end
 
--- Draws a small confirmation popup window with Yes/No buttons.
+-- Draws a small confirmation popup window with Confirm/Cancel buttons.
 --
--- Can execute a callback function on confirmation.
+-- You must call `ImGui.OpenPopup` right before it and use the same label.
+--
+-- **Example:**
+--
+--```Lua
+-- local function scary_func()
+-- 	MyClass:DoTheThing()
+-- end
+--
+-- if ImGui.Button("Do The Thing") then
+--	ImGui.OpenPopup("myConfirmLabel")
+-- end
+--
+-- if GUI:ConfirmPopup("myConfirmLabel") then
+-- 	scary_func()
+-- end
+--```
 ---@param name string
----@param callback function
----@param ... any
-function GUI:ConfirmPopup(name, callback, ...)
+function GUI:ConfirmPopup(name)
+	local windowSize = vec2:new(420, 210)
+	local _, pos = self:GetNewWindowSizeAndCenterPos(0.5, 0.5, windowSize)
+	ImGui.SetNextWindowSize(windowSize.x, windowSize.y, ImGuiCond.Always)
+	ImGui.SetNextWindowPos(pos.x, pos.y, ImGuiCond.Always)
 	if ImGui.BeginPopupModal(
 			name,
 			ImGuiWindowFlags.NoTitleBar |
-			ImGuiWindowFlags.AlwaysAutoResize
+			ImGuiWindowFlags.NoMove |
+			ImGuiWindowFlags.NoResize
 		) then
-		local buttonSize = vec2:new(80, 30)
-		ImGui.PushTextWrapPos(ImGui.GetWindowWidth() - 10)
-		self:TextColored("Are you sure?", Color("yellow"), { alpha = 0.9 })
-		ImGui.Spacing()
+		local buttonSize     = vec2:new(windowSize.x / 4, 35)
+		local width          = windowSize.x
+		local spacing        = ImGui.GetStyle().ItemSpacing.x
+		local firstCursorPos = (width - ((buttonSize.x + spacing) * 3)) / 2
 
-		if (self:Button("Yes", { size = buttonSize })) then
-			callback(...)
+		self:HeaderText(_T("GENERIC_WARN_LABEL"), { color = Color("yellow") })
+		ImGui.Separator()
+		ImGui.Spacing()
+		self:Text(_T("GENERIC_CONFIRM_WARN"))
+		ImGui.Dummy(1, 10)
+		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + firstCursorPos)
+		if (self:Button(_T("GENERIC_CONFIRM"), { size = buttonSize })) then
 			ImGui.CloseCurrentPopup()
+			return true
 		end
 
 		ImGui.SameLine()
-		ImGui.Dummy(20, 1)
-		ImGui.SameLine()
+		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + buttonSize.x - spacing)
 
-		if (self:Button("No", { size = buttonSize })) then
+		if (self:Button(_T("GENERIC_CANCEL"), { size = buttonSize })) then
 			ImGui.CloseCurrentPopup()
+			return false
 		end
 
 		ImGui.PopTextWrapPos()
 		ImGui.EndPopup()
-		return true
 	end
 end
 

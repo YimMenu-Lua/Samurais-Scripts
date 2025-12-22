@@ -1,4 +1,17 @@
 return {
+	--#region Header Tab Names
+	["TAB_SELF"]                           = "Self",
+	["TAB_VEHICLE"]                        = "Vehicle",
+	["TAB_WORLD"]                          = "World",
+	["TAB_ONLINE"]                         = "Online",
+	["TAB_EXTRA"]                          = "Extra",
+	-- Settings already exists as a generic
+	["SUBTAB_CARS"]                        = "Cars & Bikes",
+	["SUBTAB_PAINTS"]                      = "Custom Paint Jobs",
+	["SUBTAB_AIRCRAFT"]                    = "Aircraft",
+	["SUBTAB_FLATBED"]                     = "Flatbed Script",
+	--#endregion
+
 	--#region generics
 	["WARN_PED_SPAWN_LIMIT"]               =
 	"Ped spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
@@ -49,6 +62,11 @@ return {
 	["GENERIC_SPAWN"]                      = "Spawn",
 	["GENERIC_INTERIOR_ACTION_ERR"]        = "This action is not allowed inside interiors.",
 	["GENERIC_ENTITY_CTRL_FAIL"]           = "Failed to take control of entity!",
+	["GENERIC_WARN_LABEL"]                 = "Warning!",
+	["GENERIC_ERR_LABEL"]                  = "Error!",
+	["GENERIC_CONFIRM_WARN"]               = "This action is irreversible. Are you sure you want to proceed?",
+	["GENERIC_NOT_IN_VEH"]                 = "You are not in a vehicle.",
+	["GENERIC_NOT_IN_PLANE"]               = "You are not in an aircraft.",
 	--#endregion
 
 	--#region CasinoPacino
@@ -87,6 +105,7 @@ return {
 	["CP_SLOT_MACHINES_RIG"]               = "Rig Slot Machines",
 	["CP_SLOT_MACHINES_AUTOPLAY"]          = "Autoplay Slot Machines",
 	["CP_SLOT_MACHINES_CAP_CHIPS"]         = "Cap Maximum Chips to:",
+	["CP_AUTOPLAY_SLOTS_TIME_DELAY"]       = "Delay Between Plays",
 	["CP_LUCKY_WHEEL_SETTINGS"]            = "Lucky Wheel",
 	["CP_LUCKY_WHEEL_GIVE_VEHICLE"]        = "Give Vehicle",
 	["CP_LUCKY_WHEEL_GIVE_MYSTERY"]        = "Give Mystery Prize",
@@ -333,6 +352,28 @@ return {
 	["VEH_FLARES_TT"]                      = "Allows you to deploy flares from any aircraft using the default countermeasures button.",
 	["VEH_SEAT_PREV"]                      = "Previous Seat",
 	["VEH_SEAT_NEXT"]                      = "Next Seat",
+	["VEH_ENGINE_SWAP"]                    = "Engine Swap",
+	["VEH_ENGINE_SWAP_SAME_ERR"]           = "Your vehicle already has this engine.",
+	["VEH_ENGINE_SWAP_INCOMPATIBE"]        = "This feature is only compatible with cars and trucks.",
+	["VEH_PAINT_NOTE"]                     = "Colors look different on game shaders.",
+	["VEH_PAINT_FILTER_TXT"]               = "Filter By: ",
+	["VEH_PAINT_FILTER_ALL"]               = "All",
+	["VEH_PAINT_FILTER_COL"]               = "Color",
+	["VEH_PAINT_FILTER_MFR"]               = "Manufacturer",
+	["VEH_PAINT_MATTE_CB"]                 = "Matte Color",
+	["VEH_PAINT_MATTE_TT"]                 = "Applies or removes a matte finish to or from the selected paint job.",
+	["VEH_PAINT_PRIMARY_CB"]               = "As Primary",
+	["VEH_PAINT_SECONDARY_CB"]             = "As Secondary",
+	["VEH_PAINT_NOT_SELECTED_ERR"]         = "Please select primary or secondary or both.",
+	["VEH_PAINT_SAVE_TT"]                  =
+	"To save this color on a personal vehicle, go to a modshop and buy something like window tint or plate style or anything.",
+	["VEH_COBRA_MANEUVER"]                 = "Cobra Maneuver",
+	["VEH_COBRA_MANEUVER_TT"]              = "Pres [X] on keyboard to perform a Cobra Maneuver. Only available for jets.",
+	["VEH_COBRA_MANEUVER_TOO_lOW"]         = "Your current altitude is too low to perform a Cobra Maneuver!",
+	["VEH_COBRA_MANEUVER_TOO_SlOW"]        = "Your current speed is too low to perform a Cobra Maneuver!",
+	["VEH_COBRA_MANEUVER_NOT_LEVEL"]       = "Please level your jet first.",
+	["VEH_COBRA_MANEUVER_INTERRUPT"]       = "Cobra Maneuver was interrupted! Giving control back to the player.",
+	["VEH_COBRA_MANEUVER_CANCEL"]          = "Performing cobra maneuver. Press [CTRL] to cancel and gain back control.",
 	--#endregion
 
 	--#region World
@@ -349,13 +390,13 @@ return {
 	--#endregion
 
 	--#region YimActions
-	["YAV3_SCN_STOP_SPINNER"]              = "Stopping scenario...",
+	["YAV3_SCN_STOP_SPINNER"]              = "Stopping current scenario...",
 	["YAV3_STOP_BTN_HINT"]                 =
 	"TIP: You can press %s to stop playing any action or hold it for one second to cleanup everything.",
 	--#endregion
 
 	--#region Flatbed
-	["FLTBD_MAIN_CB"]                      = "Enable Flatbed Script",
+	["FLTBD_MAIN_CB"]                      = "Enable Script",
 	["FLTBD_TOWING_TXT"]                   = "Towed Vehicle: ",
 	["FLTBD_SHOW_TOWPOS_CB"]               = "Show Towing Position",
 	["FLTBD_SHOW_TOWPOS_TT"]               = "Marks the position at which the script detects nearby vehicles.",
@@ -376,4 +417,12 @@ return {
 	["FTLBD_GET_IN_MSG"]                   =
 	"You are currently not in a flatbed truck. You can steal one from the street or use the button below to spawn a new one.",
 	--#region
+
+	--#region Settings
+	["SETTINGS_CFG_RESET"]                 = "Reset Saved Configuration",
+	["SETTINGS_RESET_PRESERVE_KEYS"]       = "Optional: Choose configuration items to keep.",
+	["SETTINGS_ENTITY_REPLACE"]            = "Auto-Replace Entities",
+	["SETTINGS_ENTITY_REPLACE_TT"]         =
+	"This project has a limit to how many entities you can spawn (peds, vehicles, objects). All features adhere to that limit to prevent entity spam or choking the game. This option allows the script to automatically replace old spawned entities once you reach the limit for a certain entity type and try to spawn a new one.",
+	--#endregion
 }

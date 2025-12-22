@@ -1,5 +1,6 @@
 ---@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
 
+local Refs        = require("includes.data.refs")
 local FeatureBase = require("includes.modules.FeatureBase")
 
 ---@class Flares : FeatureBase
@@ -8,8 +9,8 @@ local FeatureBase = require("includes.modules.FeatureBase")
 ---@field private m_shots table
 ---@field private m_next_shot_time seconds
 ---@field protected m_thread Thread
-local Flares = setmetatable({}, FeatureBase)
-Flares.__index = Flares
+local Flares      = setmetatable({}, FeatureBase)
+Flares.__index    = Flares
 
 ---@param pv PlayerVehicle
 ---@return Flares
@@ -23,7 +24,7 @@ function Flares:Init()
 	self.m_shots = {}
 	self.m_next_shot_time = 0
 	self.m_thread = ThreadManager:RegisterLooped("SS_FLARES", function()
-		self:Main()
+		self:OnTick()
 	end, not GVars.features.vehicle.flares)
 end
 
@@ -59,7 +60,7 @@ function Flares:Deploy()
 	self.m_shots = {}
 	self.m_next_shot_time = MISC.GET_GAME_TIMER() + firstDelay
 
-	for _, bone in pairs(t_PlaneBones) do
+	for _, bone in pairs(Refs.planeBones) do
 		local bone_idx = Game.GetEntityBoneIndexByName(handle, bone)
 		if (bone_idx ~= -1) then
 			for i = 1, 2 do
@@ -142,7 +143,7 @@ function Flares:Update()
 	end
 end
 
-function Flares:Main()
+function Flares:OnTick()
 	if (not self:ShouldRun()) then
 		yield()
 		return

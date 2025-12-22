@@ -9,7 +9,7 @@ local function DrawSalvageYardUI()
 		ImGui.BulletText(carname or _T("SY_EMPTY"))
 		ImGui.SameLine()
 		local value = stats.get_int(_F("MPX_SAL23_VALUE_VEH%d", i))
-		GUI:TextColored(string.formatmoney(value), Color("#00aa00"))
+		GUI:Text(string.formatmoney(value), Color("#00aa00"))
 	end
 
 	ImGui.SeparatorText(_T("SY_LIFTS"))
@@ -21,7 +21,7 @@ local function DrawSalvageYardUI()
 			ImGui.BulletText(SalvageYard:GetCarNameFromHash(hash))
 			ImGui.SameLine()
 			local value = stats.get_int(_F("MPX_MPSV_VALUE_SALVAGE_LIFT%d", i))
-			GUI:TextColored(string.formatmoney(value), Color("#00aa00"))
+			GUI:Text(string.formatmoney(value), Color("#00aa00"))
 
 			ImGui.SameLine()
 			if (ImGui.Button(_T("SY_INSTANT_SALVAGE"))) then
@@ -114,4 +114,4 @@ local function SalvageYardUI()
 	ImGui.EndTabBar()
 end
 
-GUI:RegisterNewTab(eTabID.TAB_ONLINE, "Salvage Yard", SalvageYardUI)
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Salvage Yard", SalvageYardUI)

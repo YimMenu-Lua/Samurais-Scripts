@@ -27,7 +27,7 @@ local CAttackers = GenericClass
 ---@field m_max_health pointer<float> // 0x0284
 ---@field m_max_attackers pointer<CAttackers> // 0x0288
 ---@overload fun(entity: handle): CEntity
-CEntity = Class("CEntity", nil, 0x290)
+local CEntity = Class("CEntity", nil, 0x290)
 
 ---@param entity handle
 ---@return CEntity
@@ -69,3 +69,5 @@ function CEntity:GetModelType()
 
 	return (self.m_model_type:get_word() & 0x1F)
 end
+
+return CEntity

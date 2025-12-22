@@ -168,7 +168,7 @@ end
 
 function SelfMisc:UpdateHandsUpAnim()
 	if (GVars.features.self.hands_up) then
-		Backend:RegisterDisabledControl(29)
+		PAD.DISABLE_CONTROL_ACTION(0, 29, true)
 
 		if (Self:CanPutHandsUp() and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29)) then
 			self:HandsUp()

@@ -1,3 +1,5 @@
+local SGSL = require("includes.structs.SGSL")
+
 ---@class WarehouseStruct
 ---@field wasChecked boolean
 ---@field isOwned boolean
@@ -351,7 +353,6 @@ function YRV3:GetCEOCratesValue(crates)
 		return 0
 	end
 
-	local FreeModeGlobal1 = ScriptGlobal(GetScriptGlobalOrLocal("tuneables_global") or 262145)
 	if (crates == 1) then
 		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1") -- EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1
 	end
@@ -391,14 +392,10 @@ function YRV3:FinishCEOCargoSourceMission()
 				return
 			end
 
-			local buyLocal = GetScriptGlobalOrLocal("gb_contraband_buy_local_1")
-			if (buyLocal == 0) then
-				Toast:ShowError("YRV3", "Auto-finish mission failed! Could not read local value.", true)
-				return
-			end
-			locals.set_int("gb_contraband_buy", buyLocal + 5, 1) -- 1.71 b3568.0 -- case -1: return "INVALID - UNSET";
-			locals.set_int("gb_contraband_buy", buyLocal + 191, 6) -- 1.71 b3568.0 -- Local_623.f_191 = iParam0;
-			locals.set_int("gb_contraband_buy", buyLocal + 192, 4) -- 1.71 b3568.0 -- Local_623.f_192 = iParam0;
+			local buyLocal = SGSL:Get(SGSL.data.gb_contraband_buy_local_1):AsLocal()
+			buyLocal:At(5):WriteInt(1) -- 1.71 b3568.0 -- case -1: return "INVALID - UNSET";
+			buyLocal:At(191):WriteInt(6) -- 1.71 b3568.0 -- Local_623.f_191 = iParam0;
+			buyLocal:At(192):WriteInt(4) -- 1.71 b3568.0 -- Local_623.f_192 = iParam0;
 		end)
 	elseif script.is_active("fm_content_cargo") then
 		script.execute_as_script("fm_content_cargo", function()
@@ -407,22 +404,18 @@ function YRV3:FinishCEOCargoSourceMission()
 				return
 			end
 
-			local fmccLocal2 = GetScriptGlobalOrLocal("gb_contraband_buy_local_2")
-			local fmccLocal3 = GetScriptGlobalOrLocal("gb_contraband_buy_local_3")
-			local fmccLocal3Offset = GetScriptGlobalOrLocalOffset("gb_contraband_buy_local_3", 1)
-			if (not fmccLocal2 or not fmccLocal3 or not fmccLocal3Offset) then
-				Toast:ShowError("YRV3", "Auto-finish mission failed! Could not read local value.", true)
-				return
+			local fmccLocal2       = SGSL:Get(SGSL.data.gb_contraband_buy_local_2):AsLocal():At(1):At(0) -- GENERIC_BITSET_I_WON -- 1.71 b3568.0: var uLocal_5973 = 4;
+			local gbcb_obj         = SGSL:Get(SGSL.data.gb_contraband_buy_local_3)
+			local fmccLocal3       = gbcb_obj:AsLocal()
+			local fmccLocal3Offset = gbcb_obj:GetOffset(1)
+			local bs               = fmccLocal2:ReadInt()
+
+			if (not Bit.is_set(bs, 11)) then
+				bs = Bit.set(bs, 11)
+				fmccLocal2:WriteInt(bs)
 			end
 
-			local FMMC1 = ScriptLocal(fmccLocal2, "fm_content_cargo"):At(1):At(0) -- GENERIC_BITSET_I_WON -- 1.71 b3568.0: var uLocal_5973 = 4;
-			local val = FMMC1:ReadInt()
-			if (not Bit.is_set(val, 11)) then
-				val = Bit.set(val, 11)
-				FMMC1:WriteInt(val)
-			end
-
-			locals.set_int("fm_content_cargo", fmccLocal3 + fmccLocal3Offset, 3) -- EndReason
+			fmccLocal3:At(fmccLocal3Offset):WriteInt(3) -- EndReason
 		end)
 	end
 end
@@ -597,19 +590,13 @@ function YRV3:FillAll()
 			end
 		end
 
-		local businessGlobal = GetScriptGlobalOrLocal("freemode_business_global")
-		if (not businessGlobal) then
-			Toast:ShowError("YRV3", "Auto-fill failed! Could not read global value")
-			return
-		end
-
-		local FMG = ScriptGlobal(businessGlobal)
-		if (stats.get_int("MPX_PROP_FAC_SLOT5") and stats.get_int("MPX_MATTOTALFORFACTORY5") < 100) then
+		local FMG = SGSL:Get(SGSL.data.freemode_business_global):AsGlobal()
+		if (stats.get_int("MPX_PROP_FAC_SLOT5") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY5") < 100) then
 			FMG:At(5):At(1):WriteInt(1)
 			sleep(math.random(100, 300))
 		end
 
-		if (stats.get_int("MPX_XM22_LAB_OWNED") ~= 0) and (stats.get_int("MPX_MATTOTALFORFACTORY6") < 100) then
+		if (stats.get_int("MPX_XM22_LAB_OWNED") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY6") < 100) then
 			FMG:At(6):At(1):WriteInt(1)
 			sleep(math.random(100, 300))
 		end
@@ -833,16 +820,8 @@ function YRV3:MCT()
 		return
 	end
 
-	local bhubG1 = GetScriptGlobalOrLocal("business_hub_global_1")
-	local bhubG2 = GetScriptGlobalOrLocal("business_hub_global_2")
-	if (not bhubG1 or not bhubG2) then
-		Toast:ShowError("YRV3", "Failed to open Master Control Terminal! Could not read global value.")
-		return
-	end
-
-	local BusinessHubGlobal1 = ScriptGlobal(bhubG1)
-	local BusinessHubGlobal2 = ScriptGlobal(bhubG2)
-
+	local BusinessHubGlobal1 = SGSL:Get(SGSL.data.business_hub_global_1):AsGlobal()
+	local BusinessHubGlobal2 = SGSL:Get(SGSL.data.business_hub_global_2):AsGlobal()
 	script.run_in_fiber(function()
 		if (BusinessHubGlobal1:ReadInt() ~= 0) then
 			BusinessHubGlobal1:WriteInt(0)
@@ -1048,46 +1027,46 @@ YRV3.t_CooldownData = {
 YRV3.t_SellScripts = {
 	["gb_smuggler"] = { -- air
 		{
-			l = (function() return GetScriptGlobalOrLocal("gb_smuggler_sell_air_local_1") end)(),
-			o = (function() return GetScriptGlobalOrLocalData("gb_smuggler_sell_air_local_1").offsets[1].value end)(),
+			l = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1):GetValue() end)(),
+			o = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1):GetOffset(1) end)(),
 			v = 0
 		},
 		{
-			l = (function() return GetScriptGlobalOrLocal("gb_smuggler_sell_air_local_2") end)(),
-			o = (function() return GetScriptGlobalOrLocalData("gb_smuggler_sell_air_local_2").offsets[1].value end)(),
+			l = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2):GetValue() end)(),
+			o = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2):GetOffset(1) end)(),
 			v = 1
 		},
 	},
 	["gb_gunrunning"] = {
 		{
-			l = (function() return GetScriptGlobalOrLocal("gb_gunrunning_sell_local_1") end)(),
-			o = (function() return GetScriptGlobalOrLocalData("gb_gunrunning_sell_local_1").offsets[1].value end)(),
+			l = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetValue() end)(),
+			o = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetOffset(1) end)(),
 			v = 0
 		},
 		{
-			l = (function() return GetScriptGlobalOrLocal("gb_gunrunning_sell_local_1") end)(),
-			o = (function() return GetScriptGlobalOrLocalData("gb_gunrunning_sell_local_2").offsets[1].value end)(),
+			l = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetValue() end)(),
+			o = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_2):GetOffset(1) end)(),
 			v = 1
 		},
 	},
 	["gb_contraband_sell"] = {
 		{
-			l = (function() return GetScriptGlobalOrLocal("gb_contraband_sell_local") end)(),
+			l = (function() return SGSL:Get(SGSL.data.gb_contraband_sell_local):GetValue() end)(),
 			o = 1,
 			v = 99999
 		},
 	},
 	["gb_biker_contraband_sell"] = {
 		{
-			l = (function() return GetScriptGlobalOrLocal("gb_biker_contraband_sell_local") end)(),
-			o = (function() return GetScriptGlobalOrLocalData("gb_biker_contraband_sell_local").offsets[1].value end)(),
+			l = (function() return SGSL:Get(SGSL.data.gb_biker_contraband_sell_local):GetValue() end)(),
+			o = (function() return SGSL:Get(SGSL.data.gb_biker_contraband_sell_local):GetOffset(1) end)(),
 			v = 15
 		},
 	},
 	["fm_content_acid_lab_sell"] = {
-		b = (function() return GetScriptGlobalOrLocal("acid_lab_sell_bitset") end)(),
-		l = (function() return GetScriptGlobalOrLocal("acid_lab_sell_local") end)(),
-		o = (function() return GetScriptGlobalOrLocalData("acid_lab_sell_local").offsets[1].value end)(),
+		b = (function() return SGSL:Get(SGSL.data.acid_lab_sell_bitset):GetValue() end)(),
+		l = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetValue() end)(),
+		o = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetOffset(1) end)(),
 	},
 }
 

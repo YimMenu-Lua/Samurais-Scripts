@@ -102,12 +102,11 @@ function Carpool:SetDrivingStyle(styleIndex)
 	end
 
 	self.m_current_drive_mode = styleIndex
-
 	ThreadManager:Run(function()
+		self:CancelAllTasks()
 		if (self.m_task == Enums.eVehicleTask.GOTO and self.m_last_task_coords) then
 			self:GoTo(self.m_last_task_coords)
-		elseif (self.m_task == Enums.eVehicleTask.WANDER) then
-			self:CancelAnyTasks()
+		else
 			self:Wander()
 		end
 	end)
@@ -189,7 +188,7 @@ function Carpool:OnExit()
 	end
 end
 
-function Carpool:CancelAnyTasks()
+function Carpool:CancelAllTasks()
 	if (not self.m_vehicle:IsValid() or not Game.IsScriptHandle(self.m_driver)) then
 		return
 	end
@@ -202,6 +201,7 @@ function Carpool:CancelAnyTasks()
 
 	self.m_task = Enums.eVehicleTask.NONE
 	self.m_last_task_coords = nil
+	sleep(1000)
 end
 
 ---@param coords vec3
@@ -210,9 +210,7 @@ function Carpool:GoTo(coords)
 		return
 	end
 
-	self:CancelAnyTasks()
-	sleep(10)
-
+	self:CancelAllTasks()
 	local drivingStyle = self:GetDrivingStyle()
 	self.m_vehicle:GoTo(coords, { speed = drivingStyle.speed, drivingFlags = drivingStyle.drivingFlags })
 	self.m_last_task_coords = coords
@@ -224,9 +222,7 @@ function Carpool:Wander()
 		return
 	end
 
-	self:CancelAnyTasks()
-	sleep(10)
-
+	self:CancelAllTasks()
 	local drivingStyle = self:GetDrivingStyle()
 	self.m_vehicle:Wander({ speed = drivingStyle.speed, drivingFlags = drivingStyle.drivingFlags })
 	self.m_task = Enums.eVehicleTask.WANDER
@@ -238,7 +234,7 @@ function Carpool:Stop()
 		return
 	end
 
-	self:CancelAnyTasks()
+	self:CancelAllTasks()
 	self.m_task = Enums.eVehicleTask.OVERRIDE
 end
 
@@ -247,7 +243,7 @@ function Carpool:EmergencyStop()
 		return
 	end
 
-	self:CancelAnyTasks()
+	self:CancelAllTasks()
 	self.m_task = Enums.eVehicleTask.OVERRIDE
 	VEHICLE.SET_VEHICLE_FORWARD_SPEED(self.m_vehicle, 0)
 end
@@ -293,7 +289,7 @@ function Carpool:Update()
 	end
 end
 
-function Carpool:Main()
+function Carpool:OnTick()
 	self:Update()
 
 	if (self.m_active) then
@@ -329,7 +325,7 @@ function Carpool:Main()
 	end
 
 	if (self.m_task ~= Enums.eVehicleTask.OVERRIDE) then
-		sleep(50)
+		sleep(60)
 	end
 end
 

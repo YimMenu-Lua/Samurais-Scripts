@@ -17,7 +17,7 @@
 ---@field m_weapon_damage_mult pointer<float>
 ---@field m_weapon_defence_mult pointer<float> // 0x0D70
 ---@overload fun(ptr: pointer): CPlayerInfo|nil
-CPlayerInfo = { m_size = 0x0D78 }
+local CPlayerInfo = { m_size = 0x0D78 }
 CPlayerInfo.__index = CPlayerInfo
 setmetatable(CPlayerInfo, {
 	__call = function(cls, ptr)
@@ -58,3 +58,5 @@ end
 function CPlayerInfo:GetGameState()
 	return self.m_game_state:get_int()
 end
+
+return CPlayerInfo

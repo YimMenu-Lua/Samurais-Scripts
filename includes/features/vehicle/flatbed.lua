@@ -136,14 +136,14 @@ function Flatbed:SetDisplayText()
 end
 
 function Flatbed:IsClosestVehicleTowable()
-	if (self.closestVehicle.handle == 0) or (self.closestVehicle.modelHash == 0) then
+	if (self.closestVehicle.handle == 0 or self.closestVehicle.modelHash == 0) then
 		return false
 	end
 
-	return GVars.features.flatbed.tow_everything or
-		self.closestVehicle.isCar or
-		self.closestVehicle.isBike or
-		(self.closestVehicle.modelHash == 745926877)
+	return GVars.features.flatbed.tow_everything
+		or (self.closestVehicle.modelHash == 745926877)
+		or not VEHICLE.IS_THIS_MODEL_A_PLANE(self.closestVehicle.handle)
+		or not VEHICLE.IS_THIS_MODEL_A_HELI(self.closestVehicle.handle)
 end
 
 function Flatbed:Attach()
@@ -152,7 +152,7 @@ function Flatbed:Attach()
 	end
 
 	if (not self.closestVehicle.isTowable) then
-		Toast:ShowWarning("Samurais Scripts", _T("FLTBD_CARS_ONLY_TXT_"))
+		Toast:ShowWarning("Samurais Scripts", _T("FLTBD_CARS_ONLY_TXT"))
 		return
 	end
 
@@ -404,10 +404,10 @@ function Flatbed:Detach()
 				false
 			)
 			VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(self.m_towed_vehicle.m_handle, 5.0)
-			self.m_towed_vehicle = nil
 		end
 
 		Decorator:RemoveEntity(self.m_towed_vehicle.m_handle, "Flatbed")
+		self.m_towed_vehicle = nil
 	end
 end
 
@@ -444,7 +444,30 @@ function Flatbed:OnKeyPress()
 	end
 end
 
-function Flatbed:Main()
+function Flatbed:Reset()
+	self.closestVehicle = {
+		isTowable = false,
+		modelHash = 0,
+		handle = 0,
+		name = "",
+	}
+
+	if self.m_towed_vehicle then
+		Decorator:RemoveEntity(self.m_towed_vehicle.m_handle, "Flatbed")
+	end
+
+	Decorator:RemoveEntity(self.m_handle, "Flatbed")
+	self.m_previous_handle = 0
+	self.m_search_pos = vec3:zero()
+	self.m_fwd_vec = vec3:zero()
+	self.m_towed_vehicle = nil
+	self.m_bone_index = -1
+	self.m_heading = 0
+	self.m_coords = vec3:zero()
+	self.m_handle = 0
+end
+
+function Flatbed:OnTick()
 	if (not Self:GetVehicle():IsFlatbedTruck()) then
 		if self.m_handle ~= 0 and not ENTITY.DOES_ENTITY_EXIST(self.m_handle) then
 			self:Reset()
@@ -501,29 +524,6 @@ function Flatbed:Main()
 	if KeyManager:IsKeybindJustPressed("flatbed") then
 		self:OnKeyPress()
 	end
-end
-
-function Flatbed:Reset()
-	self.closestVehicle = {
-		isTowable = false,
-		modelHash = 0,
-		handle = 0,
-		name = "",
-	}
-
-	if self.m_towed_vehicle then
-		Decorator:RemoveEntity(self.m_towed_vehicle.m_handle, "Flatbed")
-	end
-
-	Decorator:RemoveEntity(self.m_handle, "Flatbed")
-	self.m_previous_handle = 0
-	self.m_search_pos = vec3:zero()
-	self.m_fwd_vec = vec3:zero()
-	self.m_towed_vehicle = nil
-	self.m_bone_index = -1
-	self.m_heading = 0
-	self.m_coords = vec3:zero()
-	self.m_handle = 0
 end
 
 Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()

@@ -1,3 +1,5 @@
+local CEntity                    = require("includes.classes.CEntity")
+local CWheel                     = require("includes.classes.CWheel")
 local CBaseSubHandlingData       = require("includes.classes.CBaseSubHandlingData")
 local CCarHandlingData           = require("includes.classes.CCarHandlingData")
 local CBikeHandlingData          = require("includes.classes.CBikeHandlingData")
@@ -71,7 +73,7 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_num_wheels number // 0xC38
 ---@field private DumpFlags fun(self: CVehicle, enum_flags: Enum, get_func: fun(self: CVehicle, flag: integer): boolean): nil
 ---@overload fun(vehicle: integer): CVehicle|nil
-CVehicle                         = Class("CVehicle", CEntity, 0xC40)
+local CVehicle                   = Class("CVehicle", CEntity, 0xC40)
 
 ---@param vehicle handle
 ---@return CVehicle
@@ -411,3 +413,5 @@ function CVehicle:RotateBoneMatrix(boneIndex, axis, angle)
 
 	self:SetBoneMatrix(boneIndex, new_matrix)
 end
+
+return CVehicle
