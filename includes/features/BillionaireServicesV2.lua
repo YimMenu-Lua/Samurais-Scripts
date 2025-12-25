@@ -96,15 +96,7 @@ BillionaireServices.VehicleTaskToString = {
 }
 
 function BillionaireServices:init()
-	Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
-		self:ForceCleanup()
-	end)
-
-	Backend:RegisterEventCallback(eBackendEvent.PLAYER_SWITCH, function()
-		self:ForceCleanup()
-	end)
-
-	Backend:RegisterEventCallback(eBackendEvent.SESSION_SWITCH, function()
+	Backend:RegisterEventCallbackAll(function()
 		self:ForceCleanup()
 	end)
 

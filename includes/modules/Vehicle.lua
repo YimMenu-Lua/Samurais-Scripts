@@ -559,7 +559,7 @@ function Vehicle:MaxPerformance()
 	end
 
 	local function SetPlatformAppropriateMod(modType, modIndex)
-		if (Backend:GetAPIVersion() == eAPIVersion.V1) then
+		if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
 			while VEHICLE.IS_VEHICLE_MOD_GEN9_EXCLUSIVE(handle, modType, modIndex) do
 				modIndex = modIndex - 1
 				yield()
@@ -1048,7 +1048,7 @@ function Vehicle:Clone(opts)
 
 	opts = opts or {}
 	local pos = opts.spawn_pos or self:GetSpawnPosInFront()
-	local clone = Vehicle:Create(self:GetModelHash(), eEntityType.Vehicle, pos)
+	local clone = Vehicle:Create(self:GetModelHash(), Enums.eEntityType.Vehicle, pos)
 	local tModData = self:GetMods()
 
 	if clone:IsValid() then
@@ -1471,7 +1471,7 @@ function Vehicle.CreateFromJSON(filename, warp_into)
 
 	local entity   = Self:GetVehicle() ~= nil and Self:GetVehicle() or Self
 	local spawnpos = entity:GetSpawnPosInFront()
-	local new_veh  = Vehicle:Create(modelhash, eEntityType.Vehicle, spawnpos, Self:GetHeading())
+	local new_veh  = Vehicle:Create(modelhash, Enums.eEntityType.Vehicle, spawnpos, Self:GetHeading())
 	if (new_veh:IsValid() and type(data.mods) == "table") then
 		new_veh:ApplyMods(data.mods)
 	end

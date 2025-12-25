@@ -307,12 +307,20 @@ function KeyManager:EndFrame() end -- redundant
 ---@param code eVirtualKeyCodes
 ---@return Key|nil
 function KeyManager:GetKeyByCode(code)
+	if (not code) then
+		return
+	end
+
 	return self.m_keymap_by_code[code]
 end
 
 ---@param name string
 ---@return Key|nil
 function KeyManager:GetKeyByName(name)
+	if (not name) then
+		return
+	end
+
 	return self.m_keymap_by_name[name:upper()]
 end
 

@@ -43,7 +43,7 @@ function CasinoPacino:init()
 end
 
 function CasinoPacino:CanAccess()
-	return (Backend:GetAPIVersion() == eAPIVersion.V1)
+	return (Backend:GetAPIVersion() == Enums.eAPIVersion.V1)
 		and Backend:IsUpToDate()
 		and Game.IsOnline()
 		and not script.is_active("maintransition")

@@ -1,14 +1,23 @@
 ---@generic T
 ---@class Set<T> : { [T]: true }
----@field private m_data table<anyval, true>
----@field private m_data_type string
+---@field protected m_data table<anyval, true>
+---@field protected m_data_type string
+---@overload fun(...): Set<...>
 Set = {}
 Set.__index = Set
+Set.__type = "Set"
+---@diagnostic disable-next-line: param-type-mismatch
+setmetatable(Set, {
+	__call = function(_, ...)
+		return Set.new(...)
+	end
+})
 
 ---@generic T
 ---@param ... T
 ---@return Set<T>
 function Set.new(...)
+	---@diagnostic disable-next-line: param-type-mismatch
 	local instance = setmetatable({ m_data = {} }, Set)
 	local args = { ... }
 
@@ -22,6 +31,7 @@ function Set.new(...)
 	return instance
 end
 
+---@param element anyval
 function Set:Push(element)
 	if (element == nil) then
 		return
@@ -41,6 +51,7 @@ function Set:Push(element)
 	self.m_data[element] = true
 end
 
+---@param element anyval
 function Set:Pop(element)
 	if (type(element) ~= self.m_data_type) then
 		return
@@ -53,9 +64,20 @@ function Set:Clear()
 	self.m_data = {}
 end
 
+---@param element anyval
 ---@return boolean
 function Set:Contains(element)
 	return self.m_data[element] == true
+end
+
+---@return boolean
+function Set:IsEmpty()
+	return (next(self.m_data) == nil)
+end
+
+---@return number
+function Set:Size()
+	return table.getlen(self.m_data)
 end
 
 function Set:Iter()

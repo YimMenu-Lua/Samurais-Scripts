@@ -883,6 +883,38 @@ function table.set_nested_key(t, path, value)
 	current[parts[#parts]] = value
 end
 
+-- Snapshots a table into a string.
+---@generic K, V, P
+---@param t table
+---@param opts? { out?: table, path?: string, ignored_keys: Set<string> | Predicate<K, V, P?>}
+---@return string
+function table.snapshot(t, opts)
+	opts = opts or {}
+	out  = opts.out or {}
+	path = opts.path or ""
+
+	for k, v in pairs(t) do
+		if (opts.ignored_keys) then
+			if (IsInstance(opts.ignored_keys, Set) and opts.ignored_keys:Contains(k)) then
+				goto continue
+			elseif (type(opts.ignored_keys) == "function" and opts.ignored_keys(k, v, path)) then
+				goto continue
+			end
+		end
+
+		local p = path .. "." .. tostring(k)
+		out[#out + 1] = p .. ":" .. type(v)
+		if type(v) == "table" then
+			table.snapshot(v, { out = out, path = p, ignored_keys = opts.ignored_keys })
+		end
+
+		::continue::
+	end
+
+	table.sort(out)
+	return table.concat(out, "|")
+end
+
 -- Generates a random string.
 ---@param size? number
 ---@param isalnum? boolean Alphanumeric

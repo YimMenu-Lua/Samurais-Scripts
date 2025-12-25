@@ -174,7 +174,7 @@ def translate_text(iso: str, text: str) -> str:
 
 
 def write_hashmap():
-	print("Updating hashmap")
+	print("Updating hash map...")
 	with open(HASHMAP_PATH, "w", encoding="utf-8") as f:
 		json.dump(HASHMAP, f, indent=4)
 	print("Done.")
@@ -196,6 +196,8 @@ def generate_translations(dry_run: bool = False, diff_only: bool = False):
 
 	locales = read_lua_table(locales_path)
 	labels = read_lua_table(en_keys_path)
+	
+	print("Checking hash map...")
 	key_set = [k for k, v in labels.items() if HASHMAP.get(k) != joaat(v)]
 
 	for k, v in labels.items():

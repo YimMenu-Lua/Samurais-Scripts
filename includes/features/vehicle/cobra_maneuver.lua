@@ -17,6 +17,10 @@ end
 
 function CobraManeuver:Init()
 	self.m_is_active = false
+
+	KeyManager:RegisterKeybind(eVirtualKeyCodes.X, function()
+		self:Main()
+	end)
 end
 
 function CobraManeuver:ShouldRun()
@@ -29,33 +33,39 @@ function CobraManeuver:ShouldRun()
 end
 
 ---@return boolean
-function CobraManeuver:WasInterrupted()
-	return KeyManager:IsKeyJustPressed(eVirtualKeyCodes.CTRL)
-end
-
-function CobraManeuver:OnTick()
-	if (not self:ShouldRun()) then
-		sleep(1000)
-		return
+function CobraManeuver:CanExecute()
+	local PV = self.m_entity
+	if (PV:GetHeightAboveGround() < 500) then
+		Toast:ShowError("Samurai's Scripts", _T("VEH_COBRA_MANEUVER_TOO_lOW"))
+		return false
 	end
 
-	if (KeyManager:IsKeyJustPressed(eVirtualKeyCodes.X)) then
-		local PV = self.m_entity
-		if PV:GetHeightAboveGround() < 500 then
-			Toast:ShowError(
-				"Samurai's Scripts",
-				_T("VEH_COBRA_MANEUVER_TOO_lOW")
-			)
+	if (PV:GetSpeed() < 50) then
+		Toast:ShowError("Samurai's Scripts", _T("VEH_COBRA_MANEUVER_TOO_SlOW"))
+		return false
+	end
+
+	return true
+end
+
+---@return boolean
+function CobraManeuver:WasInterrupted()
+	if (KeyManager:IsKeyJustPressed(eVirtualKeyCodes.CTRL)) then
+		self.m_is_active = false
+		return true
+	end
+
+	return false
+end
+
+function CobraManeuver:Main()
+	ThreadManager:Run(function()
+		if (not self:ShouldRun() or not self:CanExecute()) then
 			return
 		end
 
-		if (PV:GetSpeed() < 50) then
-			Toast:ShowError("Samurai's Scripts", _T("VEH_COBRA_MANEUVER_TOO_SlOW"))
-			return
-		end
-
-		local handle = PV:GetHandle()
-		local startRot = Game.GetEntityRotation(handle, 2)
+		local handle       = self.m_entity:GetHandle()
+		local startRot     = Game.GetEntityRotation(handle, 2)
 		local currentPitch = startRot.x
 
 		if (startRot.x <= -6 or startRot.y <= -20 or startRot.y >= 20) then
@@ -63,10 +73,11 @@ function CobraManeuver:OnTick()
 			return
 		end
 
+		self.m_is_active = true
 		Toast:ShowMessage("Samurai's Scripts", _T("VEH_COBRA_MANEUVER_CANCEL"))
 		PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 51, 1.0)
 
-		local pitchDelta = 89.0
+		local pitchDelta  = 89.0
 		local targetPitch = currentPitch + pitchDelta
 
 		if (currentPitch < -10.0) then
@@ -78,7 +89,7 @@ function CobraManeuver:OnTick()
 		end
 
 		local targetRot = vec3:new(targetPitch, startRot.y, startRot.z)
-		local steps = 500
+		local steps     = 500
 
 		for i = 1, steps do
 			if (self:WasInterrupted()) then
@@ -151,9 +162,9 @@ function CobraManeuver:OnTick()
 			PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 110, -1.0)
 			yield()
 		end
-	end
 
-	yield()
+		self.m_is_active = false
+	end)
 end
 
 return CobraManeuver

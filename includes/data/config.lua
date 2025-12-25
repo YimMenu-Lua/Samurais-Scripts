@@ -1,7 +1,5 @@
 ---@class Config
 local Config <const> = {
-	__config_version = "0.2a",
-	__dev_reset = false,
 	backend = {
 		debug_mode = false,
 		auto_cleanup_entities = false,
@@ -37,18 +35,18 @@ local Config <const> = {
 	},
 	keyboard_keybinds = {
 		gui_toggle = "F5",
-		auto_kill = "F7",
-		cobra_maneuver = "M",
+		kill_all_enemies = "F7",
 		enemies_flee = "F8",
+		-- missile_defence = "F9",
+		cobra_maneuver = "X",
 		flatbed = "X",
 		laser_sights = "L",
-		missile_defence = "F9",
 		nos = "MOUSE5",
 		panik = "F12",
 		nos_purge = "X",
 		rod = "X",
 		drift_mode = "SHIFT",
-		trigger_bot = "SHIFT",
+		-- trigger_bot = "SHIFT",
 		veh_mine = "NUMPAD0",
 		stop_anim = "G"
 	},
@@ -77,10 +75,10 @@ local Config <const> = {
 			code = 288,
 			name = "A"
 		},
-		trigger_bot = {
-			code = 0,
-			name = "Unbound"
-		},
+		-- trigger_bot = {
+		-- 	code = 0,
+		-- 	name = "Unbound"
+		-- },
 		veh_mine = {
 			code = 0,
 			name = "Unbound"
@@ -178,6 +176,22 @@ local Config <const> = {
 				}
 			},
 			flares = false,
+			drift_minigame = {
+				enabled = false,
+				score_sound = false,
+				player_best = 0
+			},
+			no_engine_brake = false,
+			kers_boost = false,
+			offroad_abilities = false,
+			rallye_tyres = false,
+			no_traction_control = false,
+			low_speed_wheelies = false,
+			rocket_boost = false,
+			jump_capability = false,
+			parachute = false,
+			steer_rear_wheels = false,
+			steer_handbrake = false,
 		},
 		speedometer = {
 			enabled = false,
@@ -203,7 +217,26 @@ local Config <const> = {
 			show_towing_position = false,
 			show_esp = false,
 		},
-		weapon = {},
+		weapon = {
+			magic_bullet = false,
+			laser_sights = {
+				enabled = false,
+				keybind = "L",
+				ray_length = 500,
+				color = {
+					__type = "vec4",
+					x = 1,
+					y = 0,
+					z = 0,
+					w = 0.9
+				}
+			},
+			katana = {
+				enabled = false,
+				model = 0x958A4A8F,
+				name = "Baseball Bat"
+			},
+		},
 		world = {
 			hide_n_seek = false,
 			disable_ocean_waves = false,
@@ -211,6 +244,8 @@ local Config <const> = {
 			disable_flight_music = false,
 			disable_wanted_music = false,
 			carpool = false,
+			public_enemy = false,
+			kamikaze_drivers = false,
 		},
 		dunk = {
 			bypass_casino_bans = false,
@@ -350,7 +385,12 @@ local Config <const> = {
 				clipsets = {},
 			},
 		},
-		entity_forge = {},
+		entity_forge = {
+			---@type table<hash, {name: string, entityType: eEntityType}>
+			favorites = {},
+			---@type table<string, ForgeEntity>
+			forged_entities = {},
+		},
 	},
 }
 

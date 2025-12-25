@@ -84,11 +84,7 @@ function GUI:init()
 		m_snap_animator = WindowAnimator()
 	}, GUI)
 
-	if (not GVars.ui.style.theme or not GVars.ui.style.theme.Colors) then
-		GVars.ui.style.theme = ThemeManager:GetThemes().MidnightNeon
-	end
-
-	ThemeManager:SetCurrentTheme(GVars.ui.style.theme)
+	ThemeManager:Load()
 
 	gui.add_always_draw_imgui(function()
 		instance:Draw()
@@ -103,7 +99,7 @@ function GUI:init()
 		instance:Toggle()
 	end)
 
-	Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
+	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
 		instance:Close()
 	end)
 
@@ -209,7 +205,7 @@ end
 ---@param name string
 ---@param drawable? function
 ---@param subtabs? Tab[]
----@param isTranslatorLabel? boolean
+---@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@return Tab
 function GUI:RegisterNewTab(id, name, drawable, subtabs, isTranslatorLabel)
 	assert((not string.isnullorempty(name)), "Attempt to register a new tab with no name.")
@@ -377,7 +373,7 @@ function GUI:DrawTopBar()
 	local elemWidth = 90.0
 	local elemHeight = 40.0
 	local tabHeight = 55.0
-	local tabCount = table.getlen(tabIdToString)
+	local tabCount = table.getlen(tabIdToString) - 1
 	local totalWidth = tabCount * elemWidth + (tabCount - 1) * spacing
 	local startX = (availWidth - totalWidth) * 0.5
 	local cursorPos = vec2:new(ImGui.GetCursorScreenPos())

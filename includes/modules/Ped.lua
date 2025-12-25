@@ -34,8 +34,9 @@ function Ped:IsRagdoll()
 	return PED.IS_PED_RAGDOLL(self:GetHandle())
 end
 
+---@param radius? number
 ---@return boolean
-function Ped:IsInCombat()
+function Ped:IsInCombat(radius)
 	if not self:IsValid() or not self:IsAlive() then
 		return false
 	end
@@ -49,7 +50,7 @@ function Ped:IsInCombat()
 			pos.x,
 			pos.y,
 			pos.z,
-			100
+			radius or 100
 		) > 0
 end
 
@@ -123,7 +124,7 @@ function Ped:IsEnemy()
 end
 
 ---@return hash -- weapon hash or 0.
-function Ped:GetCurrentWeapon()
+function Ped:GetCurrentWeaponHash()
 	if not self:IsValid() then
 		return 0
 	end
@@ -131,6 +132,15 @@ function Ped:GetCurrentWeapon()
 	local armed, weapon = false, 0
 	armed, weapon = WEAPON.GET_CURRENT_PED_WEAPON(self:GetHandle(), weapon, false)
 	return armed and weapon or 0
+end
+
+---@return handle -- weapon entity index or 0.
+function Ped:GetCurrentWeaponIndex()
+	if not self:IsValid() then
+		return 0
+	end
+
+	return WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(self:GetHandle(), 0)
 end
 
 -- Bypasses `Vehicle` instance creation and directly returns the handle of the ped's vehicle or 0.
@@ -324,3 +334,32 @@ end
 function Ped:ClearDefaultPrimaryTask()
 	TASK.CLEAR_DEFAULT_PRIMARY_TASK(self:GetHandle())
 end
+
+-- ---@return array<handle>
+-- function Ped:GetNearbyPeds()
+-- 	local out    = {}
+-- 	local size   = 0x8
+-- 	local buffer = memory.allocate(0x4 * (size + 1))
+
+-- 	buffer:set_int(size)
+-- 	local count = PED.GET_PED_NEARBY_PEDS( -- stupid ass native
+-- 		self:GetHandle(),
+-- 		---@diagnostic disable-next-line
+-- 		buffer,
+-- 		-1
+-- 	)
+
+-- 	print(count)
+-- 	if buffer:is_valid() then
+-- 		print(buffer:add(0):get_int())
+-- 		print(buffer:add(1):get_int())
+-- 		for i = 1, count do
+-- 			local ped = buffer:add(i * 4):get_int()
+-- 			if (ped ~= 0) then
+-- 				table.insert(out, ped)
+-- 			end
+-- 		end
+-- 	end
+
+-- 	return out
+-- end

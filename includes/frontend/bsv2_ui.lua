@@ -443,7 +443,7 @@ local function DrawBodyguards()
 			end
 
 			if b_PedPreview and i_HoveredPedModelThisFrame ~= 0 then
-				PreviewService:OnTick(i_HoveredPedModelThisFrame, eEntityType.Ped)
+				PreviewService:OnTick(i_HoveredPedModelThisFrame, Enums.eEntityType.Ped)
 			end
 			ImGui.EndTabItem()
 		end
@@ -1603,7 +1603,16 @@ local function DrawMainSidebar()
 	ImGui.BeginChild("##main_sidebar", 160, GVars.ui.window_size.y * 0.6)
 	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 5, 20)
 	ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 40)
-	ImGui.Dummy(1, 80)
+	if BS:GetServiceCount() > 1 then
+		if GUI:ButtonColored(" Dismiss All ", Color("#FF0000"), Color("#EE4B2B"), Color("#880808")) then
+			BS:Dismiss(BS.SERVICE_TYPE.ALL)
+		end
+	else
+		ImGui.TextDisabled("Dismiss All")
+	end
+	GUI:Tooltip("Dismiss all services at once.")
+
+	ImGui.Dummy(1, 20)
 
 	for i, tab in ipairs(t_BillionareSidebarItems) do
 		local is_selected = (i_SelectedSidebarItem == i)
@@ -1629,18 +1638,6 @@ local function DrawMainSidebar()
 	end
 
 	ImGui.PopStyleVar(2)
-	local region = vec2:new(ImGui.GetContentRegionAvail())
-	ImGui.SetCursorPos(20.0, ImGui.GetCursorPosY() + region.y - 40)
-
-	if BS:GetServiceCount() > 1 then
-		if GUI:ButtonColored(" Dismiss All ", Color("#FF0000"), Color("#EE4B2B"), Color("#880808")) then
-			BS:Dismiss(BS.SERVICE_TYPE.ALL)
-		end
-	else
-		ImGui.TextDisabled("Dismiss All")
-	end
-	GUI:Tooltip("Dismiss all services at once.")
-
 	ImGui.EndChild()
 end
 

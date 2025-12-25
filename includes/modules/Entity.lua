@@ -94,9 +94,9 @@ function Entity:Resolve()
 	local hndl = self:GetHandle() -- This is overridden in `Self` to always invoke `PLAYER.PLAYER_PED_ID()`
 	local ent_type = Game.GetEntityType(hndl)
 
-	if (ent_type == eEntityType.Ped) then
+	if (ent_type == Enums.eEntityType.Ped) then
 		self.m_internal = CPed(hndl)
-	elseif (ent_type == eEntityType.Vehicle) then
+	elseif (ent_type == Enums.eEntityType.Vehicle) then
 		self.m_internal = CVehicle(hndl)
 	else
 		self.m_internal = CEntity(hndl)
@@ -127,10 +127,10 @@ function Entity:Create(modelHash, entityType, pos, heading, isNetwork, isScriptH
 
 	pos = pos or self:GetSpawnPosInFront()
 
-	if (entityType == eEntityType.Ped) then
+	if (entityType == Enums.eEntityType.Ped) then
 		local handle = Game.CreatePed(modelHash, pos, heading, isNetwork, isScriptHostPed)
 		return Ped(handle)
-	elseif (entityType == eEntityType.Vehicle) then
+	elseif (entityType == Enums.eEntityType.Vehicle) then
 		local handle = Game.CreateVehicle(modelHash, pos, heading, isNetwork, isScriptHostPed)
 		return Vehicle(handle)
 	else

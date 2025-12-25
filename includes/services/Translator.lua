@@ -45,12 +45,12 @@ function Translator:WasLogged(msg)
 	return table.find(self.m_log_history, msg)
 end
 
-function Translator:Notify(message)
+function Translator:Log(message)
 	if self:WasLogged(message) then
 		return
 	end
 
-	Toast:ShowWarning("Translator", message, true)
+	log.warning(message)
 	table.insert(self.m_log_history, message)
 end
 
@@ -94,15 +94,14 @@ function Translator:Translate(label)
 
 	local text = self.labels[label]
 	if (not text) then
-		self:Notify("Missing label!")
-		Backend:debug("Missing label: %s", label)
-		return _F("[!MISSING LABEL]: %s", label)
+		local msg = _F("Missing label! %s", label)
+		self:Log(msg)
+		return msg
 	end
 
 	if (string.isnullorempty(text)) then
-		self:Notify("Missing or unsupported language!")
-		Backend:debug("Missing translation for: %s in (%s)", label, self.lang_code)
-		return "[!MISSING TRANSLATION]"
+		self:Log(_F("Missing translation for: '%s' in '%s'", label, self.lang_code))
+		return _F("[!MISSING LABEL]: %s", label)
 	end
 
 	if (not cached) then
@@ -114,6 +113,7 @@ end
 
 -- Wrapper for `Translator:Translate`
 ---@param label string
+---@return string
 function _T(label)
 	return Translator:Translate(label)
 end

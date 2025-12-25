@@ -7,7 +7,7 @@
 Rect = {}
 Rect.__index = Rect
 setmetatable(Rect, {
-	__call = function(t, ...)
+	__call = function(_, ...)
 		return Rect.new(...)
 	end
 })
@@ -19,12 +19,12 @@ function Rect.new(min, max)
 	return setmetatable({ min = min, max = max }, Rect)
 end
 
----@return number
+---@return float
 function Rect:GetWidth()
 	return self.max.x - self.min.x
 end
 
----@return number
+---@return float
 function Rect:GetHeight()
 	return self.max.y - self.min.y
 end
@@ -37,11 +37,12 @@ function Rect:GetSize()
 	)
 end
 
----@return number
+---@return float
 function Rect:GetArea()
 	return (self.max.x - self.min.x) * (self.max.y - self.min.y)
 end
 
+---@return vec2
 function Rect:GetCenter()
 	return vec2:new(
 		(self.min.x + self.max.x) * 0.5,
@@ -60,6 +61,7 @@ function Rect:Contains(point)
 end
 
 ---@param point vec2
+---@return Rect
 function Rect:AddPoint(point)
 	local min = vec2:new(math.min(self.min.x, point.x), math.min(self.min.y, point.y))
 	local max = vec2:new(math.max(self.max.x, point.x), math.max(self.max.y, point.y))
@@ -67,12 +69,15 @@ function Rect:AddPoint(point)
 end
 
 ---@param other_rect Rect
+---@return Rect
 function Rect:Add(other_rect)
 	local min = vec2:new(math.min(self.min.x, other_rect.min.x), math.min(self.min.y, other_rect.min.y))
 	local max = vec2:new(math.max(self.max.x, other_rect.max.x), math.max(self.max.y, other_rect.max.y))
 	return Rect(min, max)
 end
 
+---@param other Rect
+---@return Rect
 function Rect:__add(other)
 	return self:Add(other)
 end

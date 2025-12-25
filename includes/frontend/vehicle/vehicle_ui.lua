@@ -1,10 +1,13 @@
 local selected_mine_name
 local Refs              = require("includes.data.refs")
 local default_cfg       = require("includes.data.config")
+local driftMG           = require("includes.features.vehicle.drift_minigame")
 local customPaintsUI    = require("includes.frontend.vehicle.custom_paints_ui")
 local engine_swap_index = 1
-
 local vehicleTab        = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
+local handlingEditorTab = vehicleTab:RegisterSubtab("SUBTAB_HANDLING_EDITOR", nil, nil, true)
+local optionWindowFlgs  = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove
+DriftMinigame           = Self:GetVehicle():AddFeature(driftMG)
 
 ---@type WindowRequest
 local speedometerOptionsWindow
@@ -14,6 +17,9 @@ local nosOptionsWindow
 
 ---@type WindowRequest
 local driftOptionsWindow
+
+---@type WindowRequest
+local driftMinigameOptionsWindow
 
 local function speedoOptions()
 	local resolution = Game.GetScreenResolution()
@@ -44,17 +50,28 @@ local function speedoOptions()
 	ImGui.Text(_T("GENERIC_COLORS_LABEL"))
 	ImGui.Separator()
 	GVars.features.speedometer.colors.circle, _ = ImGui.ColorEditU32(_T("VEH_SPEED_CIRCLE"),
-		GVars.features.speedometer.colors.circle)
+		GVars.features.speedometer.colors.circle
+	)
+
 	GVars.features.speedometer.colors.circle_bg, _ = ImGui.ColorEditU32(_T("VEH_SPEED_BG"),
-		GVars.features.speedometer.colors.circle_bg)
+		GVars.features.speedometer.colors.circle_bg
+	)
+
 	GVars.features.speedometer.colors.text, _ = ImGui.ColorEditU32(_T("VEH_SPEED_TEXT"),
-		GVars.features.speedometer.colors.text)
+		GVars.features.speedometer.colors.text
+	)
+
 	GVars.features.speedometer.colors.markings, _ = ImGui.ColorEditU32(_T("VEH_SPEED_MARK"),
-		GVars.features.speedometer.colors.markings)
+		GVars.features.speedometer.colors.markings
+	)
+
 	GVars.features.speedometer.colors.needle, _ = ImGui.ColorEditU32(_T("VEH_SPEED_NEEDLE"),
-		GVars.features.speedometer.colors.needle)
+		GVars.features.speedometer.colors.needle
+	)
+
 	GVars.features.speedometer.colors.needle_base, _ = ImGui.ColorEditU32(_T("VEH_SPEED_NEEDLE_BASE"),
-		GVars.features.speedometer.colors.needle_base)
+		GVars.features.speedometer.colors.needle_base
+	)
 
 	if GUI:Button(_T("GENERIC_RESET")) then
 		GVars.features.speedometer.colors = default_cfg.features.speedometer.colors
@@ -97,6 +114,18 @@ local function driftOptions()
 	)
 
 	ImGui.ColorEditVec3(_T("VEH_DRIFT_SMOKE_COL"), GVars.features.vehicle.drift.smoke_fx.color)
+end
+
+local function driftMinigameOptions()
+	GVars.features.vehicle.drift_minigame.score_sound, _ = GUI:Checkbox(_T("VEH_DRIFT_MINIGAME_SOUND_OPT"),
+		GVars.features.vehicle.drift_minigame.score_sound,
+		{ tooltip = _T("VEH_DRIFT_MINIGAME_SOUND_OPT_TT") }
+	)
+
+	ImGui.Spacing()
+	ImGui.BulletText(_F(_T("VEH_DRIFT_MINIGAME_PB_LABEL"),
+		string.formatint(GVars.features.vehicle.drift_minigame.player_best))
+	)
 end
 
 local function nosOptions()
@@ -145,7 +174,7 @@ vehicleTab:AddBoolCommand("VEH_SPEEDOMETER",
 	nil,                         -- onDisable callback
 	nil,                         -- CommandMeta
 	true,                        -- optional flag to decide whether to register a command with CommandExecutor or not
-	true
+	true                         -- Indicates that strings must be translated when drawing
 )
 
 vehicleTab:AddBoolCommand("VEH_ABS_LIGHTS",
@@ -338,6 +367,17 @@ vehicleTab:AddBoolCommand("VEH_MINES",
 	true
 )
 
+vehicleTab:AddLoopedCommand("VEH_DRIFT_MINIGAME",
+	"features.vehicle.drift_minigame.enabled",
+	function()
+		DriftMinigame:OnTick()
+	end,
+	nil,
+	{ description = "VEH_DRIFT_MINIGAME_TT" },
+	true,
+	true
+)
+
 speedometerOptionsWindow = {
 	m_label = "##speedometerOptionsWindow",
 	m_callback = function()
@@ -345,7 +385,7 @@ speedometerOptionsWindow = {
 			GUI:SetRequestedWindowDraw("##speedometerOptionsWindow", false)
 		end)
 	end,
-	m_flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize,
+	m_flags = optionWindowFlgs,
 	m_should_draw = false,
 }
 
@@ -356,7 +396,18 @@ driftOptionsWindow = {
 			GUI:SetRequestedWindowDraw("##driftOptionsWindow", false)
 		end)
 	end,
-	m_flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize,
+	m_flags = optionWindowFlgs,
+	m_should_draw = false,
+}
+
+driftMinigameOptionsWindow = {
+	m_label = "##driftMinigameOptionsWindow",
+	m_callback = function()
+		GUI:QuickConfigWindow("Drift Minigame Options", driftMinigameOptions, function()
+			GUI:SetRequestedWindowDraw("##driftMinigameOptionsWindow", false)
+		end)
+	end,
+	m_flags = optionWindowFlgs,
 	m_should_draw = false,
 }
 
@@ -367,12 +418,13 @@ nosOptionsWindow = {
 			GUI:SetRequestedWindowDraw("##nosOptionsWindow", false)
 		end)
 	end,
-	m_flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize,
+	m_flags = optionWindowFlgs,
 	m_should_draw = false,
 }
 
 GUI:RequestWindow(speedometerOptionsWindow)
 GUI:RequestWindow(driftOptionsWindow)
+GUI:RequestWindow(driftMinigameOptionsWindow)
 GUI:RequestWindow(nosOptionsWindow)
 
 vehicleTab:RegisterGUI(function()
@@ -386,20 +438,21 @@ vehicleTab:RegisterGUI(function()
 		{ tooltip = "Limits some features to performance cars only (Launch Control, Pops & Bangs, etc.)" }
 	)
 
-	GVars.features.vehicle.bangs_rpm_min, _ = ImGui.SliderFloat("Pops & Bangs RPM Min",
-		GVars.features.vehicle.bangs_rpm,
-		2000.0,
-		GVars.features.vehicle.bangs_rpm_max - 1000.0,
-		"%.0f RPM", GVars.features.vehicle.bangs_rpm_min
-	)
+	if (GVars.features.vehicle.burble_tune) then
+		GVars.features.vehicle.bangs_rpm_min, _ = ImGui.SliderFloat("Pops & Bangs RPM Min",
+			GVars.features.vehicle.bangs_rpm_min,
+			2000.0,
+			GVars.features.vehicle.bangs_rpm_max - 1000.0,
+			"%.0f RPM", GVars.features.vehicle.bangs_rpm_min
+		)
 
-	GVars.features.vehicle.bangs_rpm_max, _ = ImGui.SliderFloat("Pops & Bangs RPM Max",
-		GVars.features.vehicle.bangs_rpm_max,
-		GVars.features.vehicle.bangs_rpm_min + 1000.0,
-		9000.0,
-		"%.0f RPM", GVars.features.vehicle.bangs_rpm_max
-	)
-
+		GVars.features.vehicle.bangs_rpm_max, _ = ImGui.SliderFloat("Pops & Bangs RPM Max",
+			GVars.features.vehicle.bangs_rpm_max,
+			GVars.features.vehicle.bangs_rpm_min + 1000.0,
+			9000.0,
+			"%.0f RPM", GVars.features.vehicle.bangs_rpm_max
+		)
+	end
 	if (GVars.features.vehicle.rgb_lights.enabled) then
 		GVars.features.vehicle.rgb_lights.speed, _ = ImGui.SliderInt("RGB Lights Speed",
 			GVars.features.vehicle.rgb_lights.speed,
@@ -426,14 +479,18 @@ vehicleTab:RegisterGUI(function()
 		if (GUI:Button("Speedometer##settings")) then
 			speedometerOptionsWindow.m_should_draw = true
 		end
-		ImGui.SameLine()
 	end
 
 	if (GVars.features.vehicle.drift.enabled) then
 		if (GUI:Button("Drift Mode##settings")) then
 			driftOptionsWindow.m_should_draw = true
 		end
-		ImGui.SameLine()
+	end
+
+	if (GVars.features.vehicle.drift_minigame.enabled) then
+		if (GUI:Button(_F("%s##settings", _T("VEH_DRIFT_MINIGAME")))) then
+			driftMinigameOptionsWindow.m_should_draw = true
+		end
 	end
 
 	if (GVars.features.vehicle.nos.enabled) then
@@ -442,6 +499,32 @@ vehicleTab:RegisterGUI(function()
 		end
 	end
 end)
+
+--#region Handling Editor
+for key, data in pairs(Self:GetVehicle().m_flag_registry) do
+	handlingEditorTab:AddBoolCommand(
+		data.cb_label,
+		key,
+		function()
+			if (data.on_cb_enable) then
+				ThreadManager:Run(data.on_cb_enable)
+			end
+		end,
+		function()
+			if (data.on_cb_disable) then
+				ThreadManager:Run(data.on_cb_disable)
+			end
+		end,
+		{ description = data.cb_tt },
+		true,
+		true
+	)
+end
+
+handlingEditorTab:RegisterGUI(function()
+	handlingEditorTab:GetGridRenderer():Draw()
+end)
+--#endregion
 
 local swap_btn_size = vec2:new(140, 35)
 local swap_wnd_height = 260

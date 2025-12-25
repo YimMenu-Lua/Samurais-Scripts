@@ -1,7 +1,9 @@
-local World     = require("includes.modules.World")
-local HideNSeek = require("includes.features.world.HideNSeek").new()
-local Carpool   = require("includes.features.world.carpool").new()
-local world_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_WORLD, "World")
+local World       = require("includes.modules.World")
+local HideNSeek   = require("includes.features.world.HideNSeek").new()
+local Carpool     = require("includes.features.world.carpool").new()
+local EnemiesFlee = require("includes.features.EnemiesFlee")
+local KillAll     = require("includes.features.KillAllEnemies")
+local world_tab   = GUI:RegisterNewTab(Enums.eTabID.TAB_WORLD, "World")
 
 world_tab:AddBoolCommand("WRLD_DISABLE_WAVES",
 	"features.world.disable_ocean_waves",
@@ -12,7 +14,7 @@ world_tab:AddBoolCommand("WRLD_DISABLE_WAVES",
 		end)
 	end,
 	nil,
-	true,
+	false,
 	true
 )
 
@@ -38,7 +40,7 @@ world_tab:AddBoolCommand("WRLD_FLIGHT_MUSIC",
 		end)
 	end,
 	nil,
-	true,
+	false,
 	true
 )
 
@@ -51,7 +53,7 @@ world_tab:AddBoolCommand("WRLD_WANTED_MUSIC",
 		end)
 	end,
 	nil,
-	true,
+	false,
 	true
 )
 
@@ -163,7 +165,7 @@ local function ShowCarpoolControls()
 	ImGui.SameLine()
 
 	if GUI:Button("Drive To Objective") then
-		ThreadManager:Run(function(s)
+		ThreadManager:Run(function()
 			local objective_found, objective_coords = Game.GetObjectiveBlipCoords()
 			if (not objective_found) then
 				Toast:ShowError(
@@ -249,9 +251,37 @@ local function ShowCarpoolControls()
 	end
 end
 
+local public_enemy_clicked = false
 local function WorldUI()
 	world_tab:GetGridRenderer():Draw()
+
+	ImGui.Spacing()
+
+	World.m_public_enemy.m_enabled, public_enemy_clicked = GUI:Checkbox(_T("WRLD_PUBLIC_ENEMY"),
+		World.m_public_enemy.m_enabled,
+		{ tooltip = _T("WRLD_PUBLIC_ENEMY_TT") }
+	)
+
+	if (public_enemy_clicked and not World.m_public_enemy.m_enabled) then
+		ThreadManager:Run(function()
+			World.m_public_enemy:Cleanup()
+		end)
+	end
+
+	ImGui.SameLine()
+
+	if (GUI:Button(_T("WRLD_KILL_ALL"), { tooltip = _T("WRLD_KILL_ALL_TT") })) then
+		KillAll:OnClick()
+	end
+
+	ImGui.SameLine()
+
+	if (GUI:Button(_T("WRLD_FLEE_ALL"), { tooltip = _T("WRLD_FLEE_ALL_TT") })) then
+		EnemiesFlee:OnClick()
+	end
+
 	ShowCarpoolControls()
+
 	ImGui.Spacing()
 	ImGui.TextDisabled("The world is simple. For now.")
 end

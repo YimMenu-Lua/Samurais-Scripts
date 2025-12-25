@@ -7,6 +7,7 @@
 ---@field indent? number Number of indentations for pretty encoding.
 ---@field strict_parsing? boolean -- Refer to the Json package
 ---@field encryption_key? string -- Optional key for XOR encryption
+---@field force_reset? boolean
 
 --------------------------------------
 -- Class: Serializer
@@ -26,8 +27,7 @@
 ---@field private m_disabled boolean
 ---@field private xor_key string
 ---@field private m_last_write_time Time.TimePoint
----@field TickHandler fun(): nil
----@field ShutdownHandler fun(): nil
+---@field protected __schema_hash joaat_t
 ---@field class_types table<string, {serializer:fun(), constructor:fun()}>
 ---@overload fun(scrname?: string, default_config?: table, runtime_vars?: table, varargs?: SerializerOptionals): Serializer
 local Serializer = Class("Serializer")
@@ -75,7 +75,8 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 			parsing_options = {
 				pretty         = (varargs.pretty ~= nil) and varargs.pretty or true,
 				indent         = string.rep(" ", varargs.indent or 4),
-				strict_parsing = varargs.strict_parsing or false
+				strict_parsing = varargs.strict_parsing or false,
+				force_reset    = varargs.force_reset or false,
 			}
 		},
 		self
@@ -85,14 +86,14 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 		instance:Parse(instance.default_config)
 	end
 
-	if (instance.default_config.__dev_reset) then
+	if (instance.parsing_options.force_reset) then
 		self:notify("Your saved config has been force-reset due to a config mismatch.")
 		instance:Parse(instance.default_config)
 	end
 
 	local config_data = instance:Read()
 	if type(config_data) ~= "table" then
-		log.warning(_F("[Serializer]: Failed to read data. Persistent config will be disabled for %s.", script_name))
+		log.warning("[Serializer]: Failed to read data. Persistent config will be disabled for this session.")
 		instance.m_disabled = true
 		return instance
 	end
@@ -101,9 +102,6 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 		runtime_vars = _ENV.GVars or {}
 		_ENV.GVars = runtime_vars
 	end
-
-	instance.m_key_states.__version = config_data.__version or Backend and Backend.__version or Serializer.__version
-	config_data.__version = instance.m_key_states.__version
 
 	setmetatable(
 		runtime_vars,
@@ -156,7 +154,36 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 		runtime_vars[key] = saved_value
 	end
 
-	if (default_config and runtime_vars["__config_version"] ~= default_config.__config_version) then
+	local ignored_set = Set.new("__schema_hash", "__dev_reset", "__version")
+	instance.__schema_hash = joaat(table.snapshot(instance.default_config, { ignored_keys = ignored_set }))
+	instance:SyncKeys()
+	instance.m_last_write_time = TimePoint.new()
+
+	ThreadManager:RegisterLooped("SS_SERIALIZER", function()
+		instance:OnTick()
+	end)
+
+	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
+		instance:OnShutdown()
+	end)
+
+	return instance
+end
+
+-- Ensures that saved config matches the default schema.
+--
+-- Adds missing keys and removes deprecated ones.
+---@param runtime_vars? table Optional reference to GVars or other runtime config table.
+function Serializer:SyncKeys(runtime_vars)
+	if (not self:CanAccess()) then
+		return
+	end
+
+	local saved       = self:Read()
+	local default_cfg = self.default_config
+	runtime_vars      = runtime_vars or _ENV.GVars or {}
+
+	if (not saved["__schema_hash"] or saved["__schema_hash"] ~= self.__schema_hash) then
 		local function deep_merge(default, target, path, visited)
 			if (visited[default]) then
 				return
@@ -175,29 +202,11 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 			end
 		end
 
-		deep_merge(default_config, runtime_vars, nil, {})
-		runtime_vars["__config_version"] = default_config.__config_version
+		deep_merge(default_cfg, runtime_vars, nil, {})
+		saved["__schema_hash"] = self.__schema_hash
+		runtime_vars["__schema_hash"] = self.__schema_hash
+		self:Parse(saved)
 	end
-
-	-- inline
-	instance.TickHandler = function()
-		instance:OnTick()
-	end
-
-	instance.ShutdownHandler = function()
-		instance:OnShutdown()
-	end
-	--
-
-	instance.m_last_write_time = TimePoint.new()
-
-	if default_config then
-		instance:SyncKeys()
-	end
-
-	ThreadManager:RegisterLooped("SS_SERIALIZER", instance.TickHandler)
-	Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, instance.ShutdownHandler)
-	return instance
 end
 
 ---@param typename string
@@ -415,13 +424,17 @@ end
 ---@param out table
 ---@param exceptions Set<string>
 ---@param prefix? string
-local function deep_reset(defaults, current, out, exceptions, prefix)
+function Serializer:DeepReset(defaults, current, out, exceptions, prefix)
 	for key, def_val in pairs(defaults) do
 		local path = prefix and (prefix .. "." .. key) or key
+		out = out or {}
 
-		if (type(def_val) == "table") then
+		if (exceptions:Contains(path)) then
+			local preserved = table.get_nested_key(_ENV.GVars, path)
+			out[key] = preserved ~= nil and preserved or def_val
+		elseif (type(def_val) == "table") then
 			out[key] = {}
-			deep_reset(
+			self:DeepReset(
 				def_val,
 				type(current) == "table" and current[key] or nil,
 				out[key],
@@ -429,16 +442,7 @@ local function deep_reset(defaults, current, out, exceptions, prefix)
 				path
 			)
 		else
-			if exceptions[path] then
-				local preserved = table.get_nested_key(current or {}, path)
-				out[key] = preserved ~= nil and preserved or def_val
-			else
-				out[key] = def_val
-			end
-
-			if _ENV.GVars then
-				table.set_nested_key(_ENV.GVars, path, out[key])
-			end
+			out[key] = def_val
 		end
 	end
 end
@@ -450,68 +454,52 @@ function Serializer:Reset(exceptions)
 		return
 	end
 
-	exceptions = exceptions or {}
-
+	exceptions = exceptions or Set.new()
 	local data = self:Read()
 	if type(data) ~= "table" then
 		log.warning("[Serializer]: Invalid data type!")
 		return
 	end
 
+	-- local threads = ThreadManager:ListThreads()
+	-- local running_threads = Set.new()
+	-- for _, thread in pairs(threads) do
+	-- 	if (thread:IsRunning()) then
+	-- 		thread:Suspend()
+	-- 		running_threads:Push(thread)
+	-- 	end
+	-- end
+
+	GUI:Close()
 	local temp = {}
-	deep_reset(self.default_config, data, temp, exceptions, nil)
+	self:DeepReset(self.default_config, data, temp, exceptions, nil)
+	self:notify("Settings reset. Restarting user interface...")
 	self:Parse(temp)
-end
 
--- Ensures that saved config matches the default schema.
---
--- Adds missing keys and removes deprecated ones.
----@param runtime_vars? table Optional reference to GVars or other runtime config table.
-function Serializer:SyncKeys(runtime_vars)
-	if not self:CanAccess() then
-		return
+	for k, v in pairs(temp) do
+		self.m_key_states[k] = self:Reconstruct(v)
 	end
 
-	local saved = self:Read()
+	self:FlushObjectQueue()
+	ThreadManager:Run(function()
+		sleep(500)
 
-	if (saved.__version and saved.__version == Backend.__version) then
-		return
-	end
+		require("includes.services.ThemeManager"):Load()
 
-	local default = self.default_config
-	local dirty   = false
-	runtime_vars  = runtime_vars or (_ENV.GVars or {})
+		-- for _, thread in pairs(threads) do
+		-- 	if (running_threads:Contains(thread)) then
+		-- 		thread:Resume()
+		-- 		running_threads:Pop(thread)
+		-- 	end
+		-- end
 
-	for k, v in pairs(default) do
-		if saved[k] == nil then
-			saved[k] = v
-			runtime_vars[k] = v
-			Backend:debug(_F("[Serializer]: Added missing config key: '%s'", k))
-			dirty = true
+		if (exceptions) then
+			exceptions:Clear()
 		end
-	end
 
-	-- Defeats the purpose of a dynamic Serializer.
-	--[[
-	for k in pairs(saved) do
-	    if (k ~= "__version" and default[k] == nil) then
-	        saved[k] = nil
-	        runtime_vars[k] = nil
-	        Backend:debug(_F("[Serializer]: Removed deprecated config key: '%s'", k))
-	        dirty = true
-	    end
-	end
-	]]
-
-	if (not saved.__version or (saved.__version and saved.__version ~= Backend.__version)) then
-		dirty = true
-	end
-
-	if dirty then
-		saved.__version = Backend.__version
-		self.m_key_states.__version = Backend.__version
-		self:Parse(saved)
-	end
+		sleep(500)
+		GUI:Toggle()
+	end)
 end
 
 function Serializer:B64Encode(input)

@@ -1,7 +1,7 @@
 ---@diagnostic disable: lowercase-global
 
-require("includes.init")
 local commandRegistry = require("includes.lib.commands")
+require("includes.init")
 
 Serializer:FlushObjectQueue()
 Backend:RegisterHandlers()
@@ -14,15 +14,15 @@ script.run_in_fiber(function()
 		CommandExecutor:RegisterCommand(name, cmd.callback, cmd.opts)
 	end
 
-	t_MeleeWeapons = weapons.get_all_weapons_of_group_type("GROUP_MELEE")
-	t_Handguns = weapons.get_all_weapons_of_group_type("GROUP_PISTOL")
+	t_MeleeWeapons  = weapons.get_all_weapons_of_group_type("GROUP_MELEE")
+	t_Handguns      = weapons.get_all_weapons_of_group_type("GROUP_PISTOL")
 	t_AssaultRifles = weapons.get_all_weapons_of_group_type("GROUP_RIFLE")
-	t_Shotguns = weapons.get_all_weapons_of_group_type("GROUP_SHOTGUN")
-	t_SMG = weapons.get_all_weapons_of_group_type("GROUP_SMG")
-	t_MachineGuns = weapons.get_all_weapons_of_group_type("GROUP_MG")
-	t_SniperRifles = weapons.get_all_weapons_of_group_type("GROUP_SNIPER")
-	t_HeavyWeapons = weapons.get_all_weapons_of_group_type("GROUP_HEAVY")
-	t_Throwables = weapons.get_all_weapons_of_group_type("GROUP_THROWN")
+	t_Shotguns      = weapons.get_all_weapons_of_group_type("GROUP_SHOTGUN")
+	t_SMG           = weapons.get_all_weapons_of_group_type("GROUP_SMG")
+	t_MachineGuns   = weapons.get_all_weapons_of_group_type("GROUP_MG")
+	t_SniperRifles  = weapons.get_all_weapons_of_group_type("GROUP_SNIPER")
+	t_HeavyWeapons  = weapons.get_all_weapons_of_group_type("GROUP_HEAVY")
+	t_Throwables    = weapons.get_all_weapons_of_group_type("GROUP_THROWN")
 
 	for _, wpn in ipairs(weapons.get_all_weapons_of_group_type("GROUP_PETROLCAN")) do
 		table.insert(t_MiscWeapons, wpn)

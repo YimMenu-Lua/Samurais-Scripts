@@ -1,228 +1,3 @@
----@diagnostic disable: lowercase-global
-
-local ThemeManager = require("includes.services.ThemeManager")
-local selected_theme = ThemeManager:GetCurrentTheme()
-local draw_cfg_reset_window = false
-
----@type Set<string>
-local cfg_reset_exceptions = Set.new()
-local cfg_exc_keys = {
-	{ pair = Pair.new("YimActions Favorites", "features.yim_actions.favorites"), clicked = false, selected = false },
-	{ pair = Pair.new("YimResupplier", "features.yrv3"),                         clicked = false, selected = false },
-	{ pair = Pair.new("Casino Pacino", "features.dunk"),                         clicked = false, selected = false },
-	{ pair = Pair.new("Keyboard Keybinds", "keyboard_keybinds"),                 clicked = false, selected = false },
-	{ pair = Pair.new("Controller Keybinds", "gamepad_keybinds"),                clicked = false, selected = false },
-	-- { pair = Pair.new("EntityForge", "features.entity_forge"),                   selected = false },
-}
-
-local settings_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_SETTINGS, "General", function()
-	GVars.backend.auto_cleanup_entities = GUI:Checkbox("Auto Cleanup Entities", GVars.backend.auto_cleanup_entities)
-	ImGui.Spacing()
-	ImGui.BulletText(_F("Language: %s (%s)", GVars.backend.language_name, GVars.backend.language_code))
-	ImGui.Spacing()
-
-	if ImGui.BeginCombo("##langs", _F("%s (%s)",
-			Translator.locales[GVars.backend.language_index].name,
-			Translator.locales[GVars.backend.language_index].iso
-		)) then
-		for i, lang in ipairs(Translator.locales) do
-			local is_selected = (i == GVars.backend.language_index)
-			if ImGui.Selectable(_F("%s (%s)", lang.name, lang.iso), is_selected) then
-				GVars.backend.language_index = i
-				GVars.backend.language_name  = lang.name
-				GVars.backend.language_code  = lang.iso
-			end
-		end
-		ImGui.EndCombo()
-	end
-
-	ImGui.Spacing()
-
-	if ImGui.Button(_T("SETTINGS_CFG_RESET")) then
-		draw_cfg_reset_window = true
-	end
-
-	if (draw_cfg_reset_window) then
-		if (ImGui.Begin("##cfg_reset",
-				ImGuiWindowFlags.NoTitleBar
-				| ImGuiWindowFlags.NoMove
-				| ImGuiWindowFlags.NoResize
-				| ImGuiWindowFlags.AlwaysAutoResize
-			)) then
-			GUI:QuickConfigWindow(_T("SETTINGS_CFG_RESET"), function()
-				ImGui.Text(_T("SETTINGS_RESET_PRESERVE_KEYS"))
-				ImGui.Spacing()
-				for _, v in pairs(cfg_exc_keys) do
-					local label = v.pair.first
-					local gvar_key = v.pair.second
-					v.selected, v.clicked = ImGui.Checkbox(label, v.selected)
-					if (v.clicked) then
-						if (v.selected) then
-							cfg_reset_exceptions:Push(gvar_key)
-						else
-							cfg_reset_exceptions:Pop(gvar_key)
-						end
-					end
-				end
-				ImGui.Separator()
-				ImGui.Spacing()
-				if ImGui.Button(_T("GENERIC_RESET")) then
-					ImGui.OpenPopup("##confirm_cfg_reset")
-				end
-				if GUI:ConfirmPopup("##confirm_cfg_reset") then
-					Serializer:Reset(cfg_reset_exceptions)
-				end
-			end, function()
-				cfg_reset_exceptions:Clear()
-				for _, v in pairs(cfg_exc_keys) do
-					v.clicked = false
-					v.selected = false
-				end
-				draw_cfg_reset_window = false
-			end)
-			ImGui.End()
-		end
-	end
-	ImGui.Dummy(1, 10)
-end)
-
-local function DrawGuiSettings()
-	ImGui.SeparatorText("General")
-
-	GVars.ui.disable_tooltips = GUI:Checkbox("Disable Tooltips", GVars.ui.disable_tooltips)
-
-	ImGui.SameLine()
-	GVars.ui.disable_sound_feedback = GUI:Checkbox("Disable Sound Feedback", GVars.ui.disable_sound_feedback)
-
-	ImGui.SeparatorText("Geometry")
-	GVars.ui.moveable, _ = GUI:Checkbox("Moveable Window", GVars.ui.moveable,
-		{ tooltip = "Allows you to freely move the window" })
-
-	if (GVars.ui.moveable) then
-		ImGui.SameLine()
-		if (GUI:Button("Reset Position", { tooltip = "Resets the window to default screen position" })) then
-			GUI:Snap()
-		end
-
-		ImGui.SameLine()
-		if (GUI:Button("Snap To Position")) then
-			ImGui.OpenPopup("##snapMainWindow")
-		end
-	end
-
-	if (ImGui.BeginPopupModal("##snapMainWindow",
-			ImGuiWindowFlags.NoMove
-			| ImGuiWindowFlags.NoTitleBar
-			| ImGuiWindowFlags.NoResize
-			| ImGuiWindowFlags.AlwaysAutoResize)
-		) then
-		GUI:QuickConfigWindow("Snap",
-			function()
-				ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 35, 30)
-				ImGui.InvisibleButton("##dummy0", 30, 30)
-				ImGui.SameLine()
-				if (ImGui.ArrowButton("##top", 2)) then
-					GUI:Snap(0)
-				end
-				if (ImGui.ArrowButton("##left", 0)) then
-					GUI:Snap(2)
-				end
-				ImGui.SameLine()
-				if (ImGui.Button("O", 30, 30)) then
-					GUI:Snap(4)
-				end
-				ImGui.SameLine()
-				if (ImGui.ArrowButton("##right", 1)) then
-					GUI:Snap(3)
-				end
-				ImGui.InvisibleButton("##dummy1", 30, 30)
-				ImGui.SameLine()
-				if (ImGui.ArrowButton("##bottom", 3)) then
-					GUI:Snap(1)
-				end
-
-				ImGui.PopStyleVar()
-				GUI:ShowWindowHeightLimit()
-			end,
-			ImGui.CloseCurrentPopup
-		)
-		ImGui.EndPopup()
-	end
-
-	local resolution = Game.GetScreenResolution()
-
-	GVars.ui.window_size.x, _ = ImGui.SliderFloat("Window Width",
-		GVars.ui.window_size.x,
-		GUI:GetMaxTopBarHeight(),
-		resolution.x, "%.0f",
-		---@diagnostic disable-next-line
-		ImGuiSliderFlags.NoInput
-	)
-
-	ImGui.SameLine()
-	if GUI:Button("Reset##width") then
-		GUI:ResetWidth()
-	end
-
-	local top_bar_height = GUI:GetMaxTopBarHeight() + 10
-	GVars.ui.window_size.y, _ = ImGui.SliderFloat("Max Window Height",
-		GVars.ui.window_size.y,
-		top_bar_height, resolution.y - top_bar_height,
-		---@diagnostic disable-next-line
-		"%.0f", ImGuiSliderFlags.NoInput
-	)
-	if (ImGui.IsItemHovered()) then
-		GUI:ShowWindowHeightLimit()
-	end
-	GUI:HelpMarker(
-		"The window is dynamic, it resizes itself vertically based on content.\n\nThis option allows you to set the maximum allowed height.")
-
-	ImGui.SameLine()
-	if (GUI:Button("Reset##height")) then
-		GUI:ResetHeight()
-	end
-
-	ImGui.BeginDisabled()
-	GVars.ui.window_pos.x, _ = ImGui.SliderFloat("X Position", GVars.ui.window_pos.x, 0, resolution.x)
-	GUI:Tooltip("These are display only. Enable 'Moveable Window' then drag the top bar to freely move the window.")
-	GVars.ui.window_pos.y, _ = ImGui.SliderFloat("Y Position", GVars.ui.window_pos.y, 0, resolution.y)
-	GUI:Tooltip("These are display only. Enable 'Moveable Window' then drag the top bar to freely move the window.")
-	ImGui.EndDisabled()
-
-	ImGui.SeparatorText("Style")
-
-	if (ImGui.BeginCombo("##uitheme", selected_theme and selected_theme.Name or "Theme")) then
-		for name, theme in pairs(ThemeManager:GetThemes()) do
-			local is_selected = selected_theme and selected_theme.Name == name or false
-			if (ImGui.Selectable(name, is_selected)) then
-				selected_theme = theme
-				GVars.ui.style.theme = theme
-				ThemeManager:SetCurrentTheme(theme)
-			end
-		end
-		ImGui.EndCombo()
-	end
-
-	ImGui.Spacing()
-
-	GVars.ui.style.bg_alpha, _ = ImGui.SliderFloat("Window Transparency", GVars.ui.style.bg_alpha, 0.01, 1.0)
-
-	ImGui.SameLine()
-	ImGui.Text(_F("(%d%%)", math.floor(GVars.ui.style.bg_alpha * 100)))
-
-	ImGui.ColorEditVec4("Accent Color", GVars.ui.style.theme.TopBarFrameCol1)
-	ImGui.ColorEditVec4("Top Bar Button Gradient", GVars.ui.style.theme.TopBarFrameCol2)
-end
-
-settings_tab:RegisterSubtab("Gui", DrawGuiSettings)
-
---#region debug
-
-if (not GVars.backend.debug_mode) then
-	return
-end
-
-local debug_tab = settings_tab:RegisterSubtab("Debug")
 local RED <const> = Color("red")
 local GREEN <const> = Color("green")
 local BLUE <const> = Color("blue")
@@ -240,6 +15,10 @@ local selected_entity_type = 1
 local TVehList = {}
 local g_offsets = {}
 local l_offsets = {}
+local current_global
+local current_local
+local current_local_method
+local current_global_method
 local state_colors <const> = {
 	[eThreadState.UNK] = GREY,
 	[eThreadState.DEAD] = RED,
@@ -290,7 +69,7 @@ local function DrawEntities()
 	if ImGui.BeginChild("##entitytypes", 200, 200, true) then
 		for etype, entities in ipairs(Backend.SpawnedEntities) do
 			local count = table.getlen(entities)
-			local label = _F("%ss (%d/%d)", EnumTostring(eEntityType, etype), count,
+			local label = _F("%ss (%d/%d)", EnumTostring(Enums.eEntityType, etype), count,
 				Backend.MaxAllowedEntities[etype])
 
 			if ImGui.Selectable(label, selected_entity_type == etype) then
@@ -318,16 +97,16 @@ local function DrawEntities()
 				ImGui.TableSetColumnIndex(1)
 				ImGui.Text(tostring(Game.GetEntityModel(handle)))
 				ImGui.TableSetColumnIndex(2)
-				ImGui.Text(EnumTostring(eEntityType, selected_entity_type))
+				ImGui.Text(EnumTostring(Enums.eEntityType, selected_entity_type))
 				ImGui.TableSetColumnIndex(3)
 
-				if (selected_entity_type == eEntityType.Ped) then
+				if (selected_entity_type == Enums.eEntityType.Ped) then
 					if GUI:Button(_F(" K ##%d", handle)) then
 						ThreadManager:Run(function()
 							Ped(handle):Kill()
 						end)
 					end
-				elseif (selected_entity_type == eEntityType.Vehicle) then
+				elseif (selected_entity_type == Enums.eEntityType.Vehicle) then
 					if GUI:Button(_F(" C ##%d", handle)) then
 						ThreadManager:Run(function()
 							Vehicle(handle):Clone()
@@ -490,6 +269,8 @@ local function DrawGlobalsAndLocals()
 		g_offset_count = 0
 		g_offsets = {}
 		selected_g_type_idx = 1
+		current_global = nil
+		current_global_method = nil
 	end
 
 	ImGui.PushItemWidth(140)
@@ -512,17 +293,19 @@ local function DrawGlobalsAndLocals()
 	end
 
 	if GUI:Button(("Read %s##globals"):format(selected_G_type or "")) then
-		local method_name = selected_G_type == "Pointer" and "GetPointer" or "Read" .. selected_G_type
-		local g = ScriptGlobal(init_g_addr)
+		current_global_method = selected_G_type == "Pointer" and "GetPointer" or "Read" .. selected_G_type
+		current_global = ScriptGlobal(init_g_addr)
 		if (#g_offsets > 0) then
 			for i = 1, #g_offsets do
-				g = g:At(g_offsets[i])
+				current_global = current_global:At(g_offsets[i])
 			end
 		end
-
-		debug_tab:Notify("%s = %s", g, g[method_name](g))
 	end
 	ImGui.EndDisabled()
+
+	if (init_g_addr and current_global and current_global_method and selected_G_type) then
+		ImGui.Text(_F("%s = %s", current_global, current_global[current_global_method](current_global)))
+	end
 
 	ImGui.Spacing()
 	ImGui.SeparatorText("ScriptLocal")
@@ -585,17 +368,19 @@ local function DrawGlobalsAndLocals()
 	end
 
 	if GUI:Button(("Read %s##locals"):format(selected_L_type or "")) then
-		local method_name = selected_L_type == "Pointer" and "GetPointer" or "Read" .. selected_L_type
-		local l = ScriptLocal(init_l_addr, l_scr_name)
+		current_local_method = selected_L_type == "Pointer" and "GetPointer" or "Read" .. selected_L_type
+		current_local = ScriptLocal(init_l_addr, l_scr_name)
 		if (#l_offsets > 0) then
 			for i = 1, #l_offsets do
-				l = l:At(l_offsets[i])
+				current_local = current_local:At(l_offsets[i])
 			end
 		end
-
-		debug_tab:Notify("%s = %s", l, l[method_name](l))
 	end
 	ImGui.EndDisabled()
+
+	if (current_local and current_local_method) then
+		ImGui.Text(_F("%s = %s", current_local, current_local[current_local_method](current_local)))
+	end
 end
 
 local function DrawSerializerDebug()
@@ -745,12 +530,10 @@ local function DrawMiscTests()
 		end)
 	end
 
-	if (ImGui.Button("Test Confirm Popup")) then
-		ImGui.OpenPopup("testPopup")
-	end
-
-	if (GUI:ConfirmPopup("testPopup")) then
-		print("confirmed")
+	if (ImGui.Button("Reset Handling Flag")) then
+		local veh = self.get_veh()
+		if (veh) == 0 then return end
+		Vehicle(veh):SetHandlingFlag(Enums.eVehicleHandlingFlags.FREEWHEEL_NO_GAS, false)
 	end
 end
 
@@ -797,7 +580,7 @@ local function DrawPatches()
 	ImGui.EndChild()
 end
 
-debug_tab:RegisterGUI(function()
+return function()
 	ImGui.BeginTabBar("##debug")
 	ImGui.PushTextWrapPos(ImGui.GetFontSize() * 35)
 
@@ -848,6 +631,4 @@ debug_tab:RegisterGUI(function()
 
 	ImGui.PopTextWrapPos()
 	ImGui.EndTabBar()
-end)
-
---#endregion
+end

@@ -6,7 +6,7 @@ Compat.__index = Compat
 
 ---@param version integer eAPIVersion
 function Compat.SetupEnvironment(version)
-	if (version == eAPIVersion.V1) then
+	if (version == Enums.eAPIVersion.V1) then
 		print = function(...)
 			local out = {}
 
@@ -53,9 +53,9 @@ function Compat.SetupEnvironment(version)
 				end
 			end
 		end
-	elseif (version == eAPIVersion.V2) then
+	elseif (version == Enums.eAPIVersion.V2) then
 		error("YmMenu V2 is not supported. Please remove the script.")
-	elseif (version == eAPIVersion.L54) then
+	elseif (version == Enums.eAPIVersion.L54) then
 		require("includes.lib.mock_env")
 	end
 

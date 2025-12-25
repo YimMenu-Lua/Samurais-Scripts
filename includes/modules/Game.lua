@@ -43,9 +43,19 @@ function Game.GetLanguage()
 	return lang_iso, lang_name
 end
 
----@return integer
+---@return float
+function Game.GetFrameCount()
+	return MISC.GET_FRAME_COUNT()
+end
+
+---@return float
 function Game.GetFrameTime()
 	return MISC.GET_FRAME_TIME()
+end
+
+---@return float
+function Game.GetGameTimer()
+	return MISC.GET_GAME_TIMER()
 end
 
 ---@return integer | nil, string | nil
@@ -114,7 +124,7 @@ end
 ---@param is_networked? boolean
 ---@param is_sripthost_ped? boolean
 function Game.CreatePed(model_hash, spawn_pos, heading, is_networked, is_sripthost_ped)
-	if not Backend:CanCreateEntity(eEntityType.Ped) then
+	if not Backend:CanCreateEntity(Enums.eEntityType.Ped) then
 		if not GVars.backend.auto_cleanup_entities then
 			Toast:ShowError(
 				"Samurai's Scripts",
@@ -125,8 +135,8 @@ function Game.CreatePed(model_hash, spawn_pos, heading, is_networked, is_sriptho
 			return 0
 		end
 
-		local oldest = table.remove(Backend.SpawnedEntities[eEntityType.Ped], 1)
-		Game.DeleteEntity(oldest, eEntityType.Ped)
+		local oldest = table.remove(Backend.SpawnedEntities[Enums.eEntityType.Ped], 1)
+		Game.DeleteEntity(oldest, Enums.eEntityType.Ped)
 	end
 
 	Await(Game.RequestModel, model_hash)
@@ -141,7 +151,7 @@ function Game.CreatePed(model_hash, spawn_pos, heading, is_networked, is_sriptho
 		is_sripthost_ped or false
 	)
 
-	Backend:RegisterEntity(i_Handle, eEntityType.Ped)
+	Backend:RegisterEntity(i_Handle, Enums.eEntityType.Ped)
 	return i_Handle
 end
 
@@ -151,7 +161,7 @@ end
 ---@param is_networked? boolean
 ---@param is_scripthost_veh? boolean
 function Game.CreateVehicle(model_hash, spawn_pos, heading, is_networked, is_scripthost_veh)
-	if not Backend:CanCreateEntity(eEntityType.Vehicle) then
+	if not Backend:CanCreateEntity(Enums.eEntityType.Vehicle) then
 		if not GVars.backend.auto_cleanup_entities then
 			Toast:ShowError(
 				"Samurai's Scripts",
@@ -162,8 +172,8 @@ function Game.CreateVehicle(model_hash, spawn_pos, heading, is_networked, is_scr
 			return 0
 		end
 
-		local oldest = table.remove(Backend.SpawnedEntities[eEntityType.Vehicle], 1)
-		Game.DeleteEntity(oldest, eEntityType.Vehicle)
+		local oldest = table.remove(Backend.SpawnedEntities[Enums.eEntityType.Vehicle], 1)
+		Game.DeleteEntity(oldest, Enums.eEntityType.Vehicle)
 	end
 
 	Await(Game.RequestModel, model_hash)
@@ -184,7 +194,7 @@ function Game.CreateVehicle(model_hash, spawn_pos, heading, is_networked, is_scr
 	if Game.IsOnline() then
 		DECORATOR.DECOR_SET_INT(i_Handle, "MPBitset", 0)
 	end
-	Backend:RegisterEntity(i_Handle, eEntityType.Vehicle)
+	Backend:RegisterEntity(i_Handle, Enums.eEntityType.Vehicle)
 
 	return i_Handle
 end
@@ -198,7 +208,7 @@ end
 ---@param heading? integer
 function Game.CreateObject(model_hash, spawn_pos, is_networked, is_scripthost_obj, is_dynamic, should_place_on_ground,
 						   heading)
-	if not Backend:CanCreateEntity(eEntityType.Object) then
+	if not Backend:CanCreateEntity(Enums.eEntityType.Object) then
 		if not GVars.backend.auto_cleanup_entities then
 			Toast:ShowError(
 				"Samurai's Scripts",
@@ -209,8 +219,8 @@ function Game.CreateObject(model_hash, spawn_pos, is_networked, is_scripthost_ob
 			return 0
 		end
 
-		local oldest = table.remove(Backend.SpawnedEntities[eEntityType.Object], 1)
-		Game.DeleteEntity(oldest, eEntityType.Object)
+		local oldest = table.remove(Backend.SpawnedEntities[Enums.eEntityType.Object], 1)
+		Game.DeleteEntity(oldest, Enums.eEntityType.Object)
 	end
 
 	Await(Game.RequestModel, model_hash)
@@ -231,7 +241,7 @@ function Game.CreateObject(model_hash, spawn_pos, is_networked, is_scripthost_ob
 	if heading then
 		ENTITY.SET_ENTITY_HEADING(i_Handle, heading)
 	end
-	Backend:RegisterEntity(i_Handle, eEntityType.Object)
+	Backend:RegisterEntity(i_Handle, Enums.eEntityType.Object)
 
 	return i_Handle
 end
@@ -672,7 +682,7 @@ end
 ---@param entity handle
 ---@return string
 function Game.GetEntityTypeString(entity)
-	return EnumTostring(eEntityType, Game.GetEntityType(entity)) or "Unknown"
+	return EnumTostring(Enums.eEntityType, Game.GetEntityType(entity)) or "Unknown"
 end
 
 ---@param model joaat_t
@@ -1059,11 +1069,11 @@ function Game.GetModelType(modelHash)
 	end
 
 	if STREAMING.IS_MODEL_A_PED(modelHash) then
-		return eEntityType.Ped
+		return Enums.eEntityType.Ped
 	elseif STREAMING.IS_MODEL_A_VEHICLE(modelHash) then
-		return eEntityType.Vehicle
+		return Enums.eEntityType.Vehicle
 	else
-		return eEntityType.Object
+		return Enums.eEntityType.Object
 	end
 end
 

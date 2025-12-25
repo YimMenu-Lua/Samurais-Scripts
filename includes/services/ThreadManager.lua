@@ -265,7 +265,7 @@ function ThreadManager:init()
 	}, self)
 
 	instance.m_callback_handlers = {
-		[eAPIVersion.L54] = {
+		[Enums.eAPIVersion.L54] = {
 			dispatch = function(callback)
 				table.insert(
 					instance.m_mock_routines,
@@ -273,14 +273,14 @@ function ThreadManager:init()
 				)
 			end
 		},
-		[eAPIVersion.V1] = {
+		[Enums.eAPIVersion.V1] = {
 			dispatch = function(callback)
 				script.run_in_fiber(function(s)
 					callback(s)
 				end)
 			end
 		},
-		[eAPIVersion.V2] = {
+		[Enums.eAPIVersion.V2] = {
 			dispatch = function(callback)
 				---@diagnostic disable-next-line: undefined-field
 				script.run_in_callback(function(s)
@@ -290,7 +290,7 @@ function ThreadManager:init()
 		}
 	}
 
-	Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
+	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
 		instance:Shutdown()
 	end)
 
@@ -307,7 +307,7 @@ function ThreadManager:Run(func)
 
 	local handler = self.m_callback_handlers[API_VER]
 	if not (handler or handler.dispatch) then
-		Backend:debug("[ThreadManager] No handler for API version: %s", EnumTostring(eAPIVersion, API_VER))
+		Backend:debug("[ThreadManager] No handler for API version: %s", EnumTostring(Enums.eAPIVersion, API_VER))
 		return
 	end
 
@@ -320,11 +320,11 @@ end
 ---@param suspended? boolean
 ---@param is_debug_thread? boolean
 function ThreadManager:RegisterLooped(name, func, suspended, is_debug_thread)
-	if (API_VER == eAPIVersion.L54 and not is_debug_thread) then
+	if (API_VER == Enums.eAPIVersion.L54 and not is_debug_thread) then
 		return
 	end
 
-	if (is_debug_thread and API_VER ~= eAPIVersion.L54) then
+	if (is_debug_thread and API_VER ~= Enums.eAPIVersion.L54) then
 		return
 	end
 
@@ -481,7 +481,7 @@ function ThreadManager:UpdateMockRoutines()
 		return
 	end
 
-	while (API_VER == eAPIVersion.L54) do
+	while (API_VER == Enums.eAPIVersion.L54) do
 		for i = #self.m_mock_routines, 1, -1 do
 			local co = self.m_mock_routines[i]
 			if (coroutine.status(co) == "dead") then

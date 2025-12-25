@@ -49,7 +49,7 @@ function PrivateJet.spawn(model, airportData)
 
 	ENTITY.FREEZE_ENTITY_POSITION(copilot, true)
 
-	local vehicle = Vehicle:Create(model, eEntityType.Vehicle, vec3:zero(), airportData.hangar.heading)
+	local vehicle = Vehicle:Create(model, Enums.eEntityType.Vehicle, vec3:zero(), airportData.hangar.heading)
 	local handle = vehicle:GetHandle()
 	if (not Game.IsScriptHandle(handle)) then
 		Game.DeleteEntity(pilot)

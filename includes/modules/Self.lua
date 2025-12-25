@@ -4,6 +4,9 @@ local Refs         = require("includes.data.refs")
 local FeatureMgr   = require("includes.services.FeatureManager")
 local miscFeatures = require("includes.features.self.miscellaneous")
 local Ragdoll      = require("includes.features.self.ragdoll")
+local MagicBullet  = require("includes.features.self.magic_bullet")
+local LaserSights  = require("includes.features.self.laser_sights")
+local Katana       = require("includes.features.self.katana")
 
 --------------------------------------
 -- Class: Self
@@ -28,6 +31,9 @@ Self.m_feat_mgr    = FeatureMgr.new(Self)
 
 Self.m_feat_mgr:Add(miscFeatures.new(Self))
 Self.m_feat_mgr:Add(Ragdoll.new(Self))
+Self.m_feat_mgr:Add(MagicBullet.new(Self))
+Self.m_feat_mgr:Add(LaserSights.new(Self))
+Self.m_feat_mgr:Add(Katana.new(Self))
 
 ---@override
 Self.new = nil
@@ -442,15 +448,7 @@ function Self:Reset()
 	self:Destroy()
 end
 
-Backend:RegisterEventCallback(eBackendEvent.PLAYER_SWITCH, function()
-	Self:Reset()
-end)
-
-Backend:RegisterEventCallback(eBackendEvent.SESSION_SWITCH, function()
-	Self:Reset()
-end)
-
-Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
+Backend:RegisterEventCallbackAll(function()
 	Self:Reset()
 end)
 
@@ -458,7 +456,7 @@ ThreadManager:RegisterLooped("SS_PV_HANDLER", function()
 	if (Self.m_vehicle and Self.m_vehicle:IsValid()) then
 		if (Self:IsOnFoot()) then
 			Self:OnVehicleExit()
-		elseif (Self.m_vehicle:GetHandle() ~= Self:GetVehicleNative()) then
+		elseif (Self:IsDriving() and Self.m_vehicle:GetHandle() ~= Self:GetVehicleNative()) then
 			Self:OnVehicleSwitch()
 		end
 	elseif (Self:IsDriving()) then
@@ -473,10 +471,4 @@ end)
 
 ThreadManager:RegisterLooped("SS_SELF", function()
 	Self.m_feat_mgr:Update()
-
-	-- for i = 0, 360 do
-	-- 	if PAD.IS_CONTROL_PRESSED(0, i) then
-	-- 		print(i)
-	-- 	end
-	-- end
 end)

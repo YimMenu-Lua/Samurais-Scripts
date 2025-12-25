@@ -79,7 +79,7 @@ function PrivateLimo:CreateVehicle(t_Data, spawnPos)
 	end
 
 	-- local limo = Game.CreateVehicle(t_Data.model, spawnPos)
-	local vehicle = Vehicle:Create(t_Data.model, eEntityType.Vehicle, spawnPos)
+	local vehicle = Vehicle:Create(t_Data.model, Enums.eEntityType.Vehicle, spawnPos)
 	local handle = vehicle:GetHandle()
 	if (not Game.IsScriptHandle(handle)) then
 		return 0

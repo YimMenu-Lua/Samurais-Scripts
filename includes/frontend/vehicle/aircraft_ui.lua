@@ -1,13 +1,12 @@
-local Flares                  = require("includes.features.vehicle.flares").new(Self:GetVehicle())
-local CobraManeuver           = require("includes.features.vehicle.cobra_maneuver").new(Self:GetVehicle())
+local flrs                    = require("includes.features.vehicle.flares")
 local autopilot_state_idx     = 0
 local autopilot_index_changed = false
 local autopilot_labels
+local planes_tab              = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_AIRCRAFT", nil, nil, true)
+Flares                        = Self:GetVehicle():AddFeature(flrs)
 
-Flares:Init()
-
-local planes_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_AIRCRAFT", nil, nil, true)
-planes_tab:AddBoolCommand("VEH_FAST_JETS",
+planes_tab:AddBoolCommand(
+	"VEH_FAST_JETS",
 	"features.vehicle.fast_jets",
 	nil,
 	nil,
@@ -16,7 +15,8 @@ planes_tab:AddBoolCommand("VEH_FAST_JETS",
 	true
 )
 
-planes_tab:AddBoolCommand("VEH_NO_JET_STALL",
+planes_tab:AddBoolCommand(
+	"VEH_NO_JET_STALL",
 	"features.vehicle.no_jet_stall",
 	nil,
 	nil,
@@ -25,7 +25,8 @@ planes_tab:AddBoolCommand("VEH_NO_JET_STALL",
 	true
 )
 
-planes_tab:AddBoolCommand("VEH_NO_TURBULENCE",
+planes_tab:AddBoolCommand(
+	"VEH_NO_TURBULENCE",
 	"features.vehicle.no_turbulence",
 	nil,
 	function()
@@ -40,7 +41,8 @@ planes_tab:AddBoolCommand("VEH_NO_TURBULENCE",
 	true
 )
 
-planes_tab:AddBoolCommand("VEH_FLARES",
+planes_tab:AddBoolCommand(
+	"VEH_FLARES",
 	"features.vehicle.flares",
 	function()
 		Flares:OnEnable()
@@ -49,41 +51,73 @@ planes_tab:AddBoolCommand("VEH_FLARES",
 		Flares:OnDisable()
 	end,
 	{ description = "VEH_FLARES_TT" },
-	false,
+	true,
 	true
 )
 
-planes_tab:AddBoolCommand("VEH_MG_TRIGGERBOT",
+planes_tab:AddBoolCommand(
+	"VEH_MG_TRIGGERBOT",
 	"features.vehicle.aircraft_mg.triggerbot",
 	nil,
 	nil,
 	{ description = "VEH_MG_TRIGGERBOT_TT" },
-	false,
+	true,
 	true
 )
 
-planes_tab:AddBoolCommand("VEH_MG_MANUAL_AIM",
+planes_tab:AddBoolCommand(
+	"VEH_MG_MANUAL_AIM",
 	"features.vehicle.aircraft_mg.manual_aim",
 	nil,
 	nil,
 	{ description = "VEH_MG_MANUAL_AIM_TT" },
-	false,
+	true,
 	true
 )
 
-planes_tab:AddLoopedCommand("VEH_COBRA_MANEUVER",
+planes_tab:AddBoolCommand(
+	"VEH_COBRA_MANEUVER",
 	"features.vehicle.cobra_maneuver",
-	function()
-		CobraManeuver:OnTick()
-	end,
+	nil,
 	nil,
 	{ description = "VEH_COBRA_MANEUVER_TT" },
-	false,
+	true,
 	true
 )
 
 planes_tab:RegisterGUI(function()
 	planes_tab:GetGridRenderer():Draw()
+
+	ImGui.Spacing()
+	ImGui.SeparatorText(_T("VEH_AUTOPILOT"))
+	local eligible = Self:GetVehicle().m_autopilot.eligible
+	ImGui.BeginDisabled(not eligible)
+	if (not autopilot_labels) then
+		autopilot_labels = {
+			_T("GENERIC_NONE"),
+			_T("GENERIC_WAYPOINT"),
+			_T("GENERIC_OBJECTIVE"),
+			_T("GENERIC_RANDOM")
+		}
+	else
+		autopilot_state_idx, autopilot_index_changed = ImGui.Combo(
+			eligible and "##autopilotdest" or _T("GENERIC_NOT_IN_PLANE"),
+			autopilot_state_idx,
+			autopilot_labels,
+			4
+		)
+
+		if (autopilot_index_changed) then
+			ThreadManager:Run(function()
+				Self:GetVehicle():UpdateAutopilotState(autopilot_state_idx)
+			end)
+		end
+
+		if (Self:GetVehicle().m_autopilot.last_interrupted) then
+			autopilot_state_idx = 0
+		end
+	end
+	ImGui.EndDisabled()
 
 	ImGui.Spacing()
 	ImGui.SeparatorText(_T("GENERIC_SETTINGS_LABEL"))
@@ -110,32 +144,4 @@ planes_tab:RegisterGUI(function()
 
 		ImGui.ColorEditVec4(_T("VEH_MG_MARKER_COL"), GVars.features.vehicle.aircraft_mg.marker_color)
 	end
-
-	ImGui.Spacing()
-	ImGui.SeparatorText(_T("VEH_AUTOPILOT"))
-	ImGui.BeginDisabled(not Self:GetVehicle().m_autopilot.eligible)
-	if (not autopilot_labels) then
-		autopilot_labels = {
-			_T("GENERIC_NONE"),
-			_T("GENERIC_WAYPOINT"),
-			_T("GENERIC_OBJECTIVE"),
-			_T("GENERIC_RANDOM")
-		}
-	else
-		autopilot_state_idx, autopilot_index_changed = ImGui.Combo(
-			"##autopilotdest",
-			autopilot_state_idx,
-			autopilot_labels,
-			4
-		)
-
-		if (autopilot_index_changed) then
-			ThreadManager:Run(function()
-				Self:GetVehicle():UpdateAutopilotState(autopilot_state_idx)
-			end)
-		end
-
-		autopilot_state_idx = Self:GetVehicle().m_autopilot.state
-	end
-	ImGui.EndDisabled()
 end)

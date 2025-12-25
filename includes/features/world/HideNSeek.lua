@@ -449,15 +449,14 @@ function HideNSeek:WhileOnFoot()
 	end
 	self.m_last_check_time = currentTime
 	ThreadManager:Run(function(s)
-		s:sleep(1)
 		if (self.m_boot_vehicle.m_handle == 0) then
 			_, self.m_boot_vehicle.m_handle, self.m_boot_vehicle.m_is_rear_engined = self:IsNearCarTrunk()
+			s:sleep(250)
 		end
-
-		s:sleep(1)
 
 		if (self.m_trash_bin == 0) then
 			_, self.m_trash_bin = self:IsNearTrashBin()
+			s:sleep(250)
 		end
 	end)
 
@@ -676,6 +675,11 @@ function HideNSeek:WhileHiding()
 end
 
 function HideNSeek:OnTick()
+	if (not self:ShouldRun()) then
+		yield()
+		return
+	end
+
 	self.m_is_wanted = PLAYER.GET_PLAYER_WANTED_LEVEL(Self:GetPlayerID()) > 0
 	self.m_was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(Self:GetPlayerID())
 	if (not self.m_is_active) then

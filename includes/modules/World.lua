@@ -1,10 +1,13 @@
-local FeatureMgr = require("includes.services.FeatureManager")
-local MiscWorld = require("includes.features.world.misc_world")
+local FeatureMgr     = require("includes.services.FeatureManager")
+local MiscWorld      = require("includes.features.world.misc_world")
+local PublicEnemy    = require("includes.features.world.public_enemy")
 
 ---@class World
-local World = {}
-World.__index = World
-World.m_feat_mgr = FeatureMgr.new(World)
+---@field public m_public_enemy PublicEnemy
+local World          = {}
+World.__index        = World
+World.m_feat_mgr     = FeatureMgr.new(World)
+World.m_public_enemy = World.m_feat_mgr:Add(PublicEnemy.new())
 World.m_feat_mgr:Add(MiscWorld.new(World))
 
 function World:Cleanup()
@@ -108,11 +111,11 @@ function World:RayCast(src, dest, traceFlags, entityToExclude)
 	return hit, endCoords, entityHit
 end
 
-Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
+Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
 	World:Cleanup()
 end)
 
-Backend:RegisterEventCallback(eBackendEvent.SESSION_SWITCH, function()
+Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, function()
 	World:Cleanup()
 end)
 

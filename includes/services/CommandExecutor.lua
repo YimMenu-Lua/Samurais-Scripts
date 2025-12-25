@@ -7,7 +7,7 @@ local function get_default_commands(instance)
 			callback = function()
 				instance.gui.popup.should_draw = true
 			end,
-			alias = { "!l" },
+			alias = { "!ls", "!dump" },
 			args = {},
 			description = "Lists all available commands in a popup window."
 		},
@@ -186,7 +186,7 @@ function CommandExecutor.new()
 		instance:Close()
 	end)
 
-	Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
+	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
 		instance:Close()
 	end)
 

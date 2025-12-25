@@ -1,4 +1,10 @@
 local self_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_SELF, "Self")
+local katana_replace_weapons <const> = {
+	Pair.new(weapons.get_weapon_display_name(0x958A4A8F), 0x958A4A8F),
+	Pair.new(weapons.get_weapon_display_name(0x440E4788), 0x440E4788),
+	Pair.new(weapons.get_weapon_display_name(0xDD5DF8D9), 0xDD5DF8D9),
+	Pair.new(weapons.get_weapon_display_name(0x94117305), 0x94117305),
+}
 
 local function CheckIfRagdollBlocked()
 	ThreadManager:Run(function()
@@ -129,6 +135,33 @@ self_tab:AddBoolCommand("SELF_CLUMSY",
 	true
 )
 
+self_tab:AddBoolCommand("SELF_MAGIC_BULLET",
+	"features.weapon.magic_bullet",
+	nil,
+	nil,
+	{ description = "SELF_MAGIC_BULLET_TT" },
+	true,
+	true
+)
+
+self_tab:AddBoolCommand("SELF_LASER_SIGHTS",
+	"features.weapon.laser_sights.enabled",
+	nil,
+	nil,
+	{ description = "SELF_LASER_SIGHTS_TT" },
+	true,
+	true
+)
+
+self_tab:AddBoolCommand("SELF_KATANA",
+	"features.weapon.katana.enabled",
+	nil,
+	nil,
+	{ description = "SELF_KATANA_TT" },
+	true,
+	true
+)
+
 local function SelfUI()
 	self_tab:GetGridRenderer():Draw()
 
@@ -149,6 +182,44 @@ local function SelfUI()
 			GVars.features.self.ragdoll_sound,
 			{ tooltip = _T("SELF_RAGDOLL_SOUND_TT") }
 		)
+	end
+
+	if (GVars.features.weapon.laser_sights.enabled) then
+		ImGui.ColorEditVec4(_T("SELF_LASER_SIGHTS_COL"), GVars.features.weapon.laser_sights.color)
+
+		GVars.features.weapon.laser_sights.ray_length, _ = ImGui.SliderInt(_T("SELF_LASER_SIGHTS_LENGTH"),
+			GVars.features.weapon.laser_sights.ray_length,
+			100,
+			1000
+		)
+	end
+
+	if (GVars.features.weapon.katana.enabled) then
+		if (ImGui.BeginCombo(_T("SELF_KATANA_REPLACE_MODEL"), GVars.features.weapon.katana.name)) then
+			for _, pair in pairs(katana_replace_weapons) do
+				local is_selected = GVars.features.weapon.katana.name == pair.first
+				if (ImGui.Selectable(pair.first, is_selected)) then
+					GVars.features.weapon.katana.name = pair.first
+					GVars.features.weapon.katana.model = pair.second
+					ThreadManager:Run(function()
+						if (not Self:IsOnFoot() and Self:IsOutside()) then
+							return
+						end
+
+						local handle = Self:GetHandle()
+						if WEAPON.IS_PED_ARMED(handle, 7) then
+							WEAPON.SET_CURRENT_PED_WEAPON(handle, 0xA2719263, true)
+						end
+
+						if WEAPON.HAS_PED_GOT_WEAPON(handle, pair.second, false) then
+							sleep(300)
+							WEAPON.SET_CURRENT_PED_WEAPON(handle, pair.second, true)
+						end
+					end)
+				end
+			end
+			ImGui.EndCombo()
+		end
 	end
 end
 

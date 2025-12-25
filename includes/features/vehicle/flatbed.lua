@@ -469,9 +469,11 @@ end
 
 function Flatbed:OnTick()
 	if (not Self:GetVehicle():IsFlatbedTruck()) then
-		if self.m_handle ~= 0 and not ENTITY.DOES_ENTITY_EXIST(self.m_handle) then
+		if (self.m_handle ~= 0 and not ENTITY.DOES_ENTITY_EXIST(self.m_handle)) then
 			self:Reset()
 		end
+
+		sleep(1000)
 		return
 	end
 
@@ -526,15 +528,7 @@ function Flatbed:OnTick()
 	end
 end
 
-Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
-	Flatbed:ForceCleanup()
-end)
-
-Backend:RegisterEventCallback(eBackendEvent.PLAYER_SWITCH, function()
-	Flatbed:ForceCleanup()
-end)
-
-Backend:RegisterEventCallback(eBackendEvent.SESSION_SWITCH, function()
+Backend:RegisterEventCallbackAll(function()
 	Flatbed:ForceCleanup()
 end)
 

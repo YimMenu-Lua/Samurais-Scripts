@@ -1,7 +1,7 @@
 local t_AnimList                 = require("includes.data.actions.animations")
 local t_PedScenarios             = require("includes.data.actions.scenarios")
 local t_SyncedScenes             = require("includes.data.actions.synchronized_scenes")
-local t_MovementOptions          = require("includes.data.actions.movement_clipsets")
+local t_MovementClipsets         = require("includes.data.actions.movement_clipsets")
 local t_GamePeds                 = require("includes.data.peds")
 local Action                     = require("includes.structs.Action")
 local PreviewService             = require("includes.services.PreviewService")
@@ -11,18 +11,17 @@ local i_SelectedRecentIndex      = 1
 local i_SelectedAnimIndex        = 1
 local i_SelectedScenarioIndex    = 1
 local i_SelectedSceneIndex       = 1
-local i_MovementIndex            = 1
 local i_SelectedSidebarItem      = 1
 local i_CompanionIndex           = 1
 local i_CompanionActionCategory  = -1
 local s_SelectedPed              = ""
-local s_SearchQuery              = ""
-local s_MovementSearchQuery      = ""
-local s_PedSearchQuery           = ""
+local s_SearchBuffer             = ""
+local s_MovementSearchBuffer     = ""
+local s_PedSearchBuffer          = ""
 local s_SelectedFavoriteName     = ""
 local s_MovementClipsetsGitHub   = "https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json"
 local s_GitHubLinkColor          = "#0000EE"
-local b_AnimListCreated          = false
+local b_DataListsSorted          = false
 local b_MovementListCreated      = false
 local b_SearchBarUsed            = false
 local b_PreviewPeds              = false
@@ -32,15 +31,11 @@ local b_AutoCloseSpawnWindow     = false
 
 ---@type Action?
 local t_SelectedAction           = nil
+local t_SelectedMovementClipset  = nil
 local s_CurrentTab               = nil
 local s_PreviousTab              = nil
 local i_HoveredPedModelThisFrame = nil
 local unk_SelectedCompanion      = nil
-local t_FilteredScenarios        = t_PedScenarios
-local t_FilteredMovementClipsets = t_MovementOptions
-local t_FilteredPeds             = t_GamePeds
-local t_Anims                    = {}
-local t_FilteredAnims            = {}
 local t_MovementClipsetsJson     = {}
 local hwnd_PedSpawnWindow        = { should_draw = false }
 local CompanionMgr               = YimActions.CompanionManager
@@ -142,78 +137,47 @@ local t_AnimFlags <const>        = {
 local function OnTabItemSwitch()
 	if (s_CurrentTab ~= s_PreviousTab) then
 		GUI:PlaySound(GUI.Sounds.Nav)
-		s_PreviousTab       = s_CurrentTab
-		s_SearchQuery       = ""
-		i_AnimSortByIndex   = 0
-		t_SelectedAction    = nil
-		t_FilteredScenarios = t_PedScenarios
-		t_FilteredAnims     = t_Anims
+		s_PreviousTab     = s_CurrentTab
+		s_SearchBuffer    = ""
+		i_AnimSortByIndex = 0
+		t_SelectedAction  = nil
 	end
 end
 
-local function CreateAnimList()
+local function BuildDataLists()
 	script.run_in_fiber(function()
-		for _, action in ipairs(t_AnimList) do
-			table.insert(t_Anims, action)
-			table.sort(t_Anims, function(a, b)
-				return a.label < b.label
-			end)
+		table.sort(t_AnimList, function(a, b)
+			return a.label < b.label
+		end)
+		table.sort(t_PedScenarios, function(a, b)
+			return a.label < b.label
+		end)
+		table.sort(t_MovementClipsets, function(a, b)
+			return a.Name < b.Name
+		end)
+		table.sort(t_GamePeds, function(a, b)
+			return a < b
+		end)
 
-			yield()
-		end
-
-		t_FilteredAnims = t_Anims
-		b_AnimListCreated = true
+		b_DataListsSorted = true
 	end)
 end
 
-local function FilterAnimsByCategory()
-	if (not b_AnimListCreated) then
-		return
-	end
-
-	if i_AnimSortByIndex > 1 then
-		t_FilteredAnims = {}
-
-		for _, action in ipairs(t_Anims) do
-			if action.category == t_AnimSortbyList[i_AnimSortByIndex + 1] then
-				table.insert(t_FilteredAnims, action)
-			end
-		end
-	else
-		t_FilteredAnims = t_Anims
-	end
-end
-
-local function FilterAnimsBySearchQuery()
-	if (not b_AnimListCreated) then
-		return
-	end
-
-	if (#s_SearchQuery > 0) then
-		t_FilteredAnims = {}
-
-		for _, action in ipairs(t_Anims) do
-			if (string.find(action.label:lower(), s_SearchQuery:lower())) then
-				table.insert(t_FilteredAnims, action)
-			end
-		end
-	else
-		t_FilteredAnims = t_Anims
-	end
-end
-
 local function DrawAnims()
-	if #t_Anims == 0 then
-		CreateAnimList()
-	end
-
 	if ImGui.BeginListBox("##animlist", -1, -1) then
-		if not b_AnimListCreated then
+		if not b_DataListsSorted then
 			ImGui.Dummy(1, 60)
-			ImGui.TextSpinner("Loading Animations. Please wait", 7, ImGui.SpinnerStyle.SCAN)
+			ImGui.TextSpinner("Loading Data. Please wait", 7, ImGui.SpinnerStyle.SCAN)
 		else
-			for i, action in ipairs(t_FilteredAnims) do
+			for i, action in ipairs(t_AnimList) do
+				if (i_AnimSortByIndex > 0 and action.category ~= t_AnimSortbyList[i_AnimSortByIndex + 1]) then
+					goto continue
+				end
+
+				if (not s_SearchBuffer:isempty() and not action.label:lower():find(s_SearchBuffer:lower())) then
+					goto continue
+				end
+
 				local is_selected = (i == i_SelectedAnimIndex)
 				local is_favorite = YimActions:DoesFavoriteExist("anims", action.label)
 				local label = action.label
@@ -243,7 +207,7 @@ local function DrawAnims()
 				if (is_selected) then
 					ImGui.PopStyleColor(3)
 					t_SelectedAction = Action.new(
-						t_FilteredAnims[i_SelectedAnimIndex],
+						t_AnimList[i_SelectedAnimIndex],
 						Enums.eActionType.ANIM
 					)
 				end
@@ -274,29 +238,21 @@ local function DrawAnims()
 
 					ImGui.EndPopup()
 				end
+
+				::continue::
 			end
 		end
 		ImGui.EndListBox()
 	end
 end
 
-local function FilterScenariosBySearchQuery()
-	if (#s_SearchQuery > 0) then
-		t_FilteredScenarios = {}
-
-		for _, action in ipairs(t_PedScenarios) do
-			if string.find(action.label:lower(), s_SearchQuery:lower()) then
-				table.insert(t_FilteredScenarios, action)
-			end
-		end
-	else
-		t_FilteredScenarios = t_PedScenarios
-	end
-end
-
 local function DrawScenarios()
 	if ImGui.BeginListBox("##scenarios", -1, -1) then
-		for i, action in ipairs(t_FilteredScenarios) do
+		for i, action in ipairs(t_PedScenarios) do
+			if (not s_SearchBuffer:isempty() and not action.label:lower():find(s_SearchBuffer:lower())) then
+				goto continue
+			end
+
 			local is_selected = (i_SelectedScenarioIndex == i)
 			local is_favorite = YimActions:DoesFavoriteExist("scenarios", action.label)
 			local label = action.label
@@ -326,7 +282,7 @@ local function DrawScenarios()
 			if is_selected then
 				ImGui.PopStyleColor(3)
 				t_SelectedAction = Action.new(
-					t_FilteredScenarios[i_SelectedScenarioIndex],
+					t_PedScenarios[i_SelectedScenarioIndex],
 					Enums.eActionType.SCENARIO
 				)
 			end
@@ -356,6 +312,8 @@ local function DrawScenarios()
 
 				ImGui.EndPopup()
 			end
+
+			::continue::
 		end
 		ImGui.EndListBox()
 	end
@@ -511,12 +469,10 @@ local t_ActionsSidebarItems <const> = {
 	{
 		label = "Animations",
 		callback = DrawAnims,
-		OnSearchBarUsed = FilterAnimsBySearchQuery
 	},
 	{
 		label = "Scenarios",
 		callback = DrawScenarios,
-		OnSearchBarUsed = FilterScenariosBySearchQuery
 	},
 	-- {
 	--     label = "Scenes",
@@ -551,7 +507,7 @@ local function DrawActionsSidebar()
 		if ImGui.Button(tab.label, 120, 35) then
 			GUI:PlaySound("Nav")
 			if i_SelectedSidebarItem ~= i then
-				s_SearchQuery = ""
+				s_SearchBuffer = ""
 				t_SelectedAction = nil
 			end
 			i_SelectedSidebarItem = i
@@ -583,16 +539,10 @@ local function DrawSidebarItems()
 	end
 end
 
-local bSortUsed = false
 local function DrawAnimOptions()
 	ImGui.BeginDisabled(not t_SelectedAction)
 	ImGui.SetNextItemWidth(120)
-	i_AnimSortByIndex, bSortUsed = ImGui.Combo("Category", i_AnimSortByIndex, t_AnimSortbyList, #t_AnimSortbyList)
-
-	if bSortUsed then
-		GUI:PlaySound("Nav")
-		FilterAnimsByCategory()
-	end
+	i_AnimSortByIndex, _ = ImGui.Combo("Category", i_AnimSortByIndex, t_AnimSortbyList, #t_AnimSortbyList)
 
 	ImGui.SameLine()
 
@@ -643,10 +593,10 @@ local function DrawPlayerTabItem()
 
 	if (i_SelectedSidebarItem == 1) or (i_SelectedSidebarItem == 2) then
 		ImGui.SetNextItemWidth(-1)
-		s_SearchQuery, b_SearchBarUsed = ImGui.InputTextWithHint(
+		s_SearchBuffer, b_SearchBarUsed = ImGui.InputTextWithHint(
 			"##search",
 			_T("GENERIC_SEARCH_HINT"),
-			s_SearchQuery,
+			s_SearchBuffer,
 			128
 		)
 		Backend.disable_input = ImGui.IsItemActive()
@@ -727,51 +677,41 @@ local function GetMovementClipsetsFromJson()
 	end
 
 	local temp = Serializer:Decode(content)
+	if (not temp or type(temp)) ~= "table" then
+		Toast:ShowError("YimActions",
+			"Failed to read clipset data from Json. Are you use you have the correct file?",
+			true, 5
+		)
+		return
+	end
+
 	script.run_in_fiber(function()
 		for _, v in ipairs(temp) do
 			table.insert(t_MovementClipsetsJson, v)
-			table.sort(t_MovementClipsetsJson, function(a, b)
-				return a.Name < b.Name
-			end)
 			yield()
 		end
+
+		table.sort(t_MovementClipsetsJson, function(a, b)
+			return a.Name < b.Name
+		end)
 		b_MovementListCreated = (#t_MovementClipsetsJson > 0)
 		temp = nil
 	end)
 end
 
-local function FilterMovementsBySearchQuery(t)
-	if #s_MovementSearchQuery > 0 then
-		t_FilteredMovementClipsets = {}
-
-		for _, v in ipairs(t) do
-			if string.find(v.Name:lower(), s_MovementSearchQuery:lower()) then
-				table.insert(t_FilteredMovementClipsets, v)
-			end
-		end
-	else
-		t_FilteredMovementClipsets = t
-	end
-end
-
-local bIsSearchingMvmts
 local function DrawCustomMovementClipsets()
-	if bIsSearchingMvmts then
-		FilterMovementsBySearchQuery(t_MovementOptions)
-	end
-
 	ImGui.BeginListBox("##customMvmts", -1, -1)
-	if not t_FilteredMovementClipsets then
-		return
-	end
+	for i = 1, #t_MovementClipsets do
+		local label = t_MovementClipsets[i].Name
+		if (not s_MovementSearchBuffer:isempty() and not label:lower():find(s_MovementSearchBuffer:lower())) then
+			goto continue
+		end
 
-	for i = 1, #t_FilteredMovementClipsets do
-		local is_selected = (i_MovementIndex == i)
-		local is_favorite = YimActions:DoesFavoriteExist("clipsets", t_FilteredMovementClipsets[i].Name)
-		local label = t_FilteredMovementClipsets[i].Name
+		local is_selected = (t_SelectedMovementClipset == t_MovementClipsets[i])
+		local is_favorite = YimActions:DoesFavoriteExist("clipsets", t_MovementClipsets[i].Name)
 
 		if is_favorite then
-			label = _F("%s  [ * ]", t_FilteredMovementClipsets[i].Name)
+			label = _F("%s  [ * ]", t_MovementClipsets[i].Name)
 		end
 
 		if is_selected then
@@ -787,22 +727,18 @@ local function DrawCustomMovementClipsets()
 		end
 
 		if ImGui.Selectable(label, is_selected) then
-			i_MovementIndex = i
+			t_SelectedMovementClipset = t_MovementClipsets[i]
 		end
 
-		GUI:Tooltip("Left click to apply or right click to add to favorites.")
+		GUI:Tooltip("Right click to add to favorites.")
 
 		if is_selected then
 			ImGui.PopStyleColor(3)
 		end
 
-		if GUI:IsItemClicked(0) then
-			Self:SetMovementClipset(t_FilteredMovementClipsets[i], false)
-		end
-
 		if GUI:IsItemClicked(1) then
 			ImGui.OpenPopup("##custom_mvmt_" .. i)
-			i_MovementIndex = i
+			t_SelectedMovementClipset = t_MovementClipsets[i]
 		end
 
 		if ImGui.BeginPopup("##custom_mvmt_" .. i) then
@@ -811,7 +747,7 @@ local function DrawCustomMovementClipsets()
 					GUI:PlaySound("Click")
 					YimActions:RemoveFromFavorites(
 						"clipsets",
-						t_FilteredMovementClipsets[i].Name
+						t_MovementClipsets[i].Name
 					)
 				end
 			else
@@ -819,8 +755,8 @@ local function DrawCustomMovementClipsets()
 					GUI:PlaySound("Click")
 					YimActions:AddToFavorites(
 						"clipsets",
-						t_FilteredMovementClipsets[i].Name,
-						t_FilteredMovementClipsets[i],
+						t_MovementClipsets[i].Name,
+						t_MovementClipsets[i],
 						Enums.eActionType.UNK
 					)
 				end
@@ -828,6 +764,8 @@ local function DrawCustomMovementClipsets()
 
 			ImGui.EndPopup()
 		end
+
+		::continue::
 	end
 	ImGui.EndListBox()
 end
@@ -863,27 +801,27 @@ local function DrawJsonMovementClipsets()
 		end
 		ImGui.EndDisabled()
 	else
-		if bIsSearchingMvmts then
-			FilterMovementsBySearchQuery(t_MovementClipsetsJson)
-		end
-
-		ImGui.BeginDisabled(not b_MovementListCreated)
 		ImGui.BeginListBox("##jsonmvmts", -1, -1)
-		if not t_FilteredMovementClipsets then
+		if not b_MovementListCreated then
+			ImGui.TextSpinner("Loading data from Json", 7.5, ImGui.SpinnerStyle.SCAN)
+			ImGui.EndListBox()
 			return
 		end
 
-		for i = 1, #t_FilteredMovementClipsets do
-			local is_selected = (i_MovementIndex == i)
-			local is_favorite = YimActions:DoesFavoriteExist("clipsets", t_FilteredMovementClipsets[i].Name)
-			local label = t_FilteredMovementClipsets[i].Name
-
-			if is_favorite then
-				label = _F("%s  [ * ]", t_FilteredMovementClipsets[i].Name)
+		for i = 1, #t_MovementClipsetsJson do
+			local label = t_MovementClipsetsJson[i].Name
+			if (not s_MovementSearchBuffer:isempty() and not label:lower():find(s_MovementSearchBuffer:lower())) then
+				goto continue
 			end
 
-			if is_selected then
-				if is_favorite then
+			local is_selected = (t_SelectedMovementClipset == t_MovementClipsetsJson[i])
+			local is_favorite = YimActions:DoesFavoriteExist("clipsets", t_MovementClipsetsJson[i].Name)
+			if (is_favorite) then
+				label = _F("%s  [ * ]", t_MovementClipsetsJson[i].Name)
+			end
+
+			if (is_selected) then
+				if (is_favorite) then
 					ImGui.PushStyleColor(ImGuiCol.Header, 1.0, 0.843, 0.0, 0.65)
 					ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 1.0, 0.875, 0.2, 0.85)
 					ImGui.PushStyleColor(ImGuiCol.HeaderActive, 1.0, 0.9, 0.3, 1.0)
@@ -895,23 +833,19 @@ local function DrawJsonMovementClipsets()
 			end
 
 			if ImGui.Selectable(label, is_selected) then
-				i_MovementIndex = i
+				t_SelectedMovementClipset = t_MovementClipsetsJson[i]
 			end
 
-			GUI:Tooltip("Left click to apply or right click to add to favorites.")
+			GUI:Tooltip("Right click to add to favorites.")
 
 			if is_selected then
 				ImGui.PopStyleColor(3)
 			end
 
-			if GUI:IsItemClicked(0) then
-				Self:SetMovementClipset(t_FilteredMovementClipsets[i], true)
-			end
-
 			if GUI:IsItemClicked(1) then
 				GUI:PlaySound("Click")
 				ImGui.OpenPopup("##context_" .. i)
-				i_MovementIndex = i
+				t_SelectedMovementClipset = t_MovementClipsetsJson[i]
 			end
 
 			if ImGui.BeginPopup("##context_" .. i) then
@@ -920,7 +854,7 @@ local function DrawJsonMovementClipsets()
 						GUI:PlaySound("Click")
 						YimActions:RemoveFromFavorites(
 							"clipsets",
-							t_FilteredMovementClipsets[i].Name
+							t_MovementClipsetsJson[i].Name
 						)
 					end
 				else
@@ -928,8 +862,8 @@ local function DrawJsonMovementClipsets()
 						GUI:PlaySound("Click")
 						YimActions:AddToFavorites(
 							"clipsets",
-							t_FilteredMovementClipsets[i].Name,
-							t_FilteredMovementClipsets[i],
+							t_MovementClipsetsJson[i].Name,
+							t_MovementClipsetsJson[i],
 							Enums.eActionType.UNK
 						)
 					end
@@ -937,25 +871,27 @@ local function DrawJsonMovementClipsets()
 
 				ImGui.EndPopup()
 			end
+
+			::continue::
 		end
 		ImGui.EndListBox()
-		ImGui.EndDisabled()
 	end
 end
 
 local function DrawFavoriteMovementClipsets()
-	if not GVars.features.yim_actions.favorites or not GVars.features.yim_actions.favorites["clipsets"] then
+	if not GVars.features.yim_actions.favorites or not GVars.features.yim_actions.favorites.clipsets then
 		return
 	end
 
-	if next(GVars.features.yim_actions.favorites["clipsets"]) == nil then
+	local favs = GVars.features.yim_actions.favorites.clipsets
+	if next(favs) == nil then
 		ImGui.TextWrapped(("You don't have any saved clipsets."))
 		return
 	end
 
 	if ImGui.BeginListBox(("##favorite_clipsets"), -1, -1) then
-		for label, data in pairs(GVars.features.yim_actions.favorites["clipsets"]) do
-			local is_selected = (s_SelectedFavoriteName == label)
+		for label, data in pairs(favs) do
+			local is_selected = (t_SelectedMovementClipset == data)
 
 			if is_selected then
 				ImGui.PushStyleColor(ImGuiCol.Header, 0.3, 0.3, 0.7, 0.6)
@@ -964,23 +900,19 @@ local function DrawFavoriteMovementClipsets()
 			end
 
 			if ImGui.Selectable(data.Name, is_selected) then
-				s_SelectedFavoriteName = label
+				t_SelectedMovementClipset = data
 			end
 
 			GUI:Tooltip("Right click to remove from favorites.")
 
-			if is_selected then
+			if (is_selected) then
 				ImGui.PopStyleColor(3)
-			end
-
-			if GUI:IsItemClicked(0) then
-				Self:SetMovementClipset(data, (data.wmvmt ~= nil))
 			end
 
 			if GUI:IsItemClicked(1) then
 				GUI:PlaySound("Click")
 				ImGui.OpenPopup("##context_" .. label)
-				s_SelectedFavoriteName = label
+				t_SelectedMovementClipset = data
 			end
 
 			if ImGui.BeginPopup("##context_" .. label) then
@@ -1006,8 +938,7 @@ local function DrawMovemenOptions()
 
 	if b_CustomMvmmtClicked then
 		GUI:PlaySound("Nav")
-		s_MovementSearchQuery = ""
-		t_FilteredMovementClipsets = t_MovementOptions
+		s_MovementSearchBuffer = ""
 	end
 
 	ImGui.SameLine()
@@ -1018,8 +949,7 @@ local function DrawMovemenOptions()
 
 	if b_JsonMvmtClicked then
 		GUI:PlaySound("Nav")
-		s_MovementSearchQuery = ""
-		t_FilteredMovementClipsets = t_MovementClipsetsJson
+		s_MovementSearchBuffer = ""
 	end
 
 	ImGui.SameLine()
@@ -1030,70 +960,58 @@ local function DrawMovemenOptions()
 
 	if b_FavMvmtsClicked then
 		GUI:PlaySound("Nav")
-		s_MovementSearchQuery = ""
-		t_FilteredMovementClipsets = GVars.features.yim_actions.favorites["clipsets"]
+		s_MovementSearchBuffer = ""
 	end
 
 	ImGui.BeginChild("##movementClipsets", 0, GVars.ui.window_size.y * 0.6, true)
 	if i_MovementCategory < 2 then
 		ImGui.SetNextItemWidth(-1)
 		ImGui.BeginDisabled((i_MovementCategory == 1) and not b_MovementListCreated)
-		s_MovementSearchQuery, bIsSearchingMvmts = ImGui.InputTextWithHint("##mvmtsearch",
+		s_MovementSearchBuffer, _ = ImGui.InputTextWithHint("##mvmtsearch",
 			"Search",
-			s_MovementSearchQuery,
+			s_MovementSearchBuffer,
 			128
 		)
 		ImGui.EndDisabled()
 		Backend.disable_input = ImGui.IsItemActive()
 	end
 
-	if i_MovementCategory == 0 then
+	if (i_MovementCategory == 0) then
 		DrawCustomMovementClipsets()
-	elseif i_MovementCategory == 1 then
+	elseif (i_MovementCategory == 1) then
 		DrawJsonMovementClipsets()
-	elseif i_MovementCategory == 2 then
+	elseif (i_MovementCategory == 2) then
 		DrawFavoriteMovementClipsets()
 	end
 	ImGui.EndChild()
 
 	ImGui.BeginChild("##mvmts_footer", 0, 65, true)
-	if ImGui.Button("Reset", 80, 35) then
+	ImGui.BeginDisabled(not t_SelectedMovementClipset)
+	if ImGui.Button(_T("GENERIC_APPLY"), 80, 35) then
+		GUI:PlaySound("Select")
+		---@diagnostic disable-next-line
+		Self:SetMovementClipset(t_SelectedMovementClipset, i_MovementCategory == 1)
+	end
+	ImGui.EndDisabled()
+
+	ImGui.SameLine()
+
+	if ImGui.Button(_T("GENERIC_RESET"), 80, 35) then
 		GUI:PlaySound("Cancel")
 		Self:ResetMovementClipsets()
 	end
 	ImGui.EndChild()
 end
 
-local function FilterPedsBySearchQuery()
-	if #s_PedSearchQuery > 0 then
-		t_FilteredPeds = {}
-		for name, ped in pairs(t_GamePeds) do
-			if string.find(name:lower(), s_PedSearchQuery:lower()) then
-				t_FilteredPeds[name] = ped
-			end
-		end
-	else
-		t_FilteredPeds = t_GamePeds
-	end
-end
-
 local function DrawCompanionActionsSearchBar()
 	ImGui.SetNextItemWidth(-1)
-	s_SearchQuery, b_SearchBarUsed = ImGui.InputTextWithHint(
+	s_SearchBuffer, b_SearchBarUsed = ImGui.InputTextWithHint(
 		"##search_companion_anims",
 		_T("GENERIC_SEARCH_HINT"),
-		s_SearchQuery,
+		s_SearchBuffer,
 		128
 	)
 	Backend.disable_input = ImGui.IsItemActive()
-
-	if b_SearchBarUsed then
-		if i_CompanionActionCategory == 1 then
-			FilterAnimsBySearchQuery()
-		elseif i_CompanionActionCategory == 2 then
-			FilterScenariosBySearchQuery()
-		end
-	end
 end
 
 local function DrawCompanions()
@@ -1314,33 +1232,35 @@ local function DrawPedSpawnWindow()
 
 		ImGui.BeginChild("##ped_spawn_list", 440, 400, true)
 		ImGui.SetNextItemWidth(-1)
-		s_PedSearchQuery, b_PedSearch_used = ImGui.InputTextWithHint(
+		s_PedSearchBuffer, _ = ImGui.InputTextWithHint(
 			"##search",
 			"Search",
-			s_PedSearchQuery,
+			s_PedSearchBuffer,
 			128
 		)
 		Backend.disable_input = ImGui.IsItemActive()
 
-		if b_PedSearch_used then
-			FilterPedsBySearchQuery()
-		end
-
 		if ImGui.BeginListBox("##ped_list", -1, -1) then
-			for name, ped in pairs(t_FilteredPeds) do
-				if ImGui.Selectable(name, (s_SelectedPed == name)) then
-					s_SelectedPed = name
+			for model, data in pairs(t_GamePeds) do
+				if (not s_PedSearchBuffer:isempty() and not model:lower():find(s_PedSearchBuffer:lower())) then
+					goto continue
+				end
+
+				if ImGui.Selectable(model, (s_SelectedPed == model)) then
+					s_SelectedPed = model
 				end
 
 				if ImGui.IsItemHovered() and b_PreviewPeds then
-					i_HoveredPedModelThisFrame = ped.model_hash
+					i_HoveredPedModelThisFrame = data.model_hash
 				end
+
+				::continue::
 			end
 			ImGui.EndListBox()
 		end
 
 		if b_PreviewPeds and i_HoveredPedModelThisFrame ~= 0 then
-			PreviewService:OnTick(i_HoveredPedModelThisFrame, eEntityType.Ped)
+			PreviewService:OnTick(i_HoveredPedModelThisFrame, Enums.eEntityType.Ped)
 		end
 		ImGui.EndChild()
 
@@ -1358,12 +1278,12 @@ local function DrawPedSpawnWindow()
 
 		ImGui.Spacing()
 
-		ImGui.BeginDisabled(not t_FilteredPeds[s_SelectedPed])
+		ImGui.BeginDisabled(not t_GamePeds[s_SelectedPed])
 		if ImGui.Button("Spawn", 80, 35) then
 			GUI:PlaySound("Select")
 			script.run_in_fiber(function()
 				CompanionMgr:SpawnCompanion(
-					t_FilteredPeds[s_SelectedPed].model_hash,
+					t_GamePeds[s_SelectedPed].model_hash,
 					s_SelectedPed,
 					b_SpawnInvincible,
 					b_SpawnArmed,
@@ -1434,3 +1354,4 @@ local function YAV3UI()
 end
 
 GUI:RegisterNewTab(Enums.eTabID.TAB_EXTRA, "YimActions", YAV3UI)
+BuildDataLists()

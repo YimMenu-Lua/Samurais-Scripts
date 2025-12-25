@@ -11,21 +11,21 @@ end
 ---@field alpha integer
 
 ---@enum eAPIVersion
-eAPIVersion = {
+Enums.eAPIVersion = {
 	V1  = 1, -- YimMenu V1 (Lua54)
 	V2  = 2, -- YimMenu V2 (LuaJIT) // placeholder
 	L54 = 99, -- Mock environment (Lua54)
 }
 
 ---@enum eBackendEvent
-eBackendEvent = {
+Enums.eBackendEvent = {
 	RELOAD_UNLOAD  = 1,
 	SESSION_SWITCH = 2,
 	PLAYER_SWITCH  = 3,
 }
 
 ---@enum eEntityType
-eEntityType = {
+Enums.eEntityType = {
 	Ped     = 1,
 	Vehicle = 2,
 	Object  = 3
@@ -51,23 +51,23 @@ Backend = {
 
 	---@type table<eBackendEvent, array<function>>
 	EventCallbacks     = {
-		[eBackendEvent.RELOAD_UNLOAD]  = { ClearPreview },
-		[eBackendEvent.SESSION_SWITCH] = { ClearPreview },
-		[eBackendEvent.PLAYER_SWITCH]  = { ClearPreview }
+		[Enums.eBackendEvent.RELOAD_UNLOAD]  = { ClearPreview },
+		[Enums.eBackendEvent.SESSION_SWITCH] = { ClearPreview },
+		[Enums.eBackendEvent.PLAYER_SWITCH]  = { ClearPreview }
 	},
 
 	---@type table<eEntityType, table<handle, handle>>
 	SpawnedEntities    = {
-		[eEntityType.Ped]     = {},
-		[eEntityType.Vehicle] = {},
-		[eEntityType.Object]  = {},
+		[Enums.eEntityType.Ped]     = {},
+		[Enums.eEntityType.Vehicle] = {},
+		[Enums.eEntityType.Object]  = {},
 	},
 
 	---@type table<eEntityType, integer>
 	MaxAllowedEntities = {
-		[eEntityType.Ped]     = 50,
-		[eEntityType.Vehicle] = 25,
-		[eEntityType.Object]  = 75,
+		[Enums.eEntityType.Ped]     = 50,
+		[Enums.eEntityType.Vehicle] = 25,
+		[Enums.eEntityType.Object]  = 75,
 	},
 }
 Backend.__index = Backend
@@ -94,23 +94,23 @@ function Backend:GetAPIVersion()
 
 	if (script and (type(script) == "table")) then
 		if (menu_event and menu_event.Wndproc) then
-			return eAPIVersion.V1
+			return Enums.eAPIVersion.V1
 		end
 
 		if (type(script["run_in_callback"]) == "function") then
-			return eAPIVersion.V2
+			return Enums.eAPIVersion.V2
 		end
 		---@diagnostic disable-next-line: undefined-global
 	elseif (util or (menu and menu.root) or SCRIPT_SILENT_START or (_VERSION ~= "Lua 5.4")) then -- should probably place these in a lookup table
 		error("Failed to load: Unknown or unsupported environment.")
 	end
 
-	return eAPIVersion.L54
+	return Enums.eAPIVersion.L54
 end
 
 ---@return boolean
 function Backend:IsMockEnv()
-	return self:GetAPIVersion() == eAPIVersion.L54
+	return self:GetAPIVersion() == Enums.eAPIVersion.L54
 end
 
 ---@return boolean
@@ -248,9 +248,9 @@ end
 
 ---@param handle integer
 function Backend:CheckFeatureEntities(handle)
-	-- if Decorator:IsEntityRegistered(handle, "EntityForge") then
-	-- 	EntityForge:RemoveEntityByHandle(handle)
-	-- end
+	if Decorator:IsEntityRegistered(handle, "EntityForge") then
+		EntityForge:RemoveEntityByHandle(handle)
+	end
 
 	if Decorator:IsEntityRegistered(handle, "BillionaireServices") then
 		BillionaireServices:RemoveEntityByHandle(handle)
@@ -289,7 +289,7 @@ end
 function Backend:PoolMgr()
 	local timeout = self.debug_mode and 500 or 5e3
 
-	for index, category in ipairs({ self.SpawnedEntities[eEntityType.Object], self.SpawnedEntities[eEntityType.Ped], self.SpawnedEntities[eEntityType.Vehicle] }) do
+	for index, category in ipairs({ self.SpawnedEntities[Enums.eEntityType.Object], self.SpawnedEntities[Enums.eEntityType.Ped], self.SpawnedEntities[Enums.eEntityType.Vehicle] }) do
 		if (next(category) == nil) then
 			goto continue
 		end
@@ -327,21 +327,34 @@ function Backend:PoolMgr()
 	sleep(timeout)
 end
 
+-- Registers a callback to execute on backend event.
 ---@param event eBackendEvent
----@param func function
-function Backend:RegisterEventCallback(event, func)
+---@param callback function
+function Backend:RegisterEventCallback(event, callback)
 	local evnt = self.EventCallbacks[event]
 
-	if ((type(func) ~= "function") or not evnt) then
-		log.fdebug("Failed to register event: %s", EnumTostring(eBackendEvent, event))
+	if ((type(callback) ~= "function") or not evnt) then
+		log.fdebug("Failed to register event: %s", EnumTostring(Enums.eBackendEvent, event))
 		return
 	end
 
-	if table.find(evnt, func) then
+	if table.find(evnt, callback) then
 		return
 	end
 
-	table.insert(evnt, func)
+	table.insert(evnt, callback)
+end
+
+-- Registers a callback to execute on all backend events.
+---@param callback function
+function Backend:RegisterEventCallbackAll(callback)
+	if (type(callback) ~= "function") then
+		return
+	end
+
+	for i = Enums.eBackendEvent.RELOAD_UNLOAD, Enums.eBackendEvent.PLAYER_SWITCH do
+		self:RegisterEventCallback(i, callback)
+	end
 end
 
 ---@param key integer
@@ -368,7 +381,7 @@ function Backend:TriggerEventCallbacks(event)
 		if (type(fn) == "function") then
 			local ok, err = pcall(fn)
 			if (not ok) then
-				log.fwarning("[Backend]: Callback error for event %s: %s", EnumTostring(eBackendEvent, event), err)
+				log.fwarning("[Backend]: Callback error for event %s: %s", EnumTostring(Enums.eBackendEvent, event), err)
 			end
 		end
 	end
@@ -376,7 +389,7 @@ end
 
 function Backend:Cleanup()
 	self:EntitySweep()
-	self:TriggerEventCallbacks(eBackendEvent.RELOAD_UNLOAD)
+	self:TriggerEventCallbacks(Enums.eBackendEvent.RELOAD_UNLOAD)
 end
 
 function Backend:OnSessionSwitch()
@@ -384,7 +397,7 @@ function Backend:OnSessionSwitch()
 		return
 	end
 
-	self:TriggerEventCallbacks(eBackendEvent.SESSION_SWITCH)
+	self:TriggerEventCallbacks(Enums.eBackendEvent.SESSION_SWITCH)
 
 	repeat
 		sleep(100)
@@ -397,7 +410,7 @@ function Backend:OnPlayerSwitch()
 		return
 	end
 
-	self:TriggerEventCallbacks(eBackendEvent.PLAYER_SWITCH)
+	self:TriggerEventCallbacks(Enums.eBackendEvent.PLAYER_SWITCH)
 
 	repeat
 		sleep(100)
@@ -408,29 +421,14 @@ end
 function Backend:RegisterHandlers()
 	self.debug_mode = self:IsMockEnv() or GVars.backend.debug_mode or false
 
-	if (self:GetAPIVersion() ~= eAPIVersion.L54) then
+	if (self:GetAPIVersion() ~= Enums.eAPIVersion.L54) then
 		ThreadManager:RegisterLooped("SS_CTRLS", function()
 			if (self.disable_input) then
 				PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
 			end
 
 			if ((gui.is_open() or GUI:IsOpen()) and not self.disable_input) then
-				PAD.DISABLE_CONTROL_ACTION(0, 18, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 24, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 25, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 69, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 70, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 106, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 122, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 135, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 142, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 144, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 176, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 223, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 229, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 237, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 257, true)
-				PAD.DISABLE_CONTROL_ACTION(0, 294, true)
+				self:DisableAttackInput()
 			end
 
 			for _, control in pairs(self.ControlsToDisable) do
@@ -439,7 +437,7 @@ function Backend:RegisterHandlers()
 		end)
 	end
 
-	if (self:GetAPIVersion() == eAPIVersion.V1) then
+	if (self:GetAPIVersion() == Enums.eAPIVersion.V1) then
 		ThreadManager:RegisterLooped("SS_BACKEND", function()
 			self:OnPlayerSwitch()
 			self:OnSessionSwitch()
@@ -465,7 +463,7 @@ end
 function Backend:PANIQUE()
 	ThreadManager:Run(function()
 		self:Cleanup()
-		for i = eBackendEvent.SESSION_SWITCH, eBackendEvent.PLAYER_SWITCH do
+		for i = Enums.eBackendEvent.SESSION_SWITCH, Enums.eBackendEvent.PLAYER_SWITCH do
 			self:TriggerEventCallbacks(i)
 			sleep(100)
 		end
@@ -480,4 +478,23 @@ function Backend:PANIQUE()
 
 		gui.show_warning("PANIQUE!", "(Ó _ Ò )!!")
 	end)
+end
+
+function Backend:DisableAttackInput()
+	PAD.DISABLE_CONTROL_ACTION(0, 18, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 24, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 25, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 69, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 70, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 106, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 122, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 135, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 142, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 144, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 176, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 223, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 229, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 237, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 257, true)
+	PAD.DISABLE_CONTROL_ACTION(0, 294, true)
 end

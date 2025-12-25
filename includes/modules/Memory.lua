@@ -27,7 +27,7 @@ function Memory:init()
 	---@type Memory
 	local instance = setmetatable({ m_patches = {} }, Memory)
 
-	Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
+	Backend:RegisterEventCallbackAll(function()
 		instance:RestoreAllPatches()
 	end)
 

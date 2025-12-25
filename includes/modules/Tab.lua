@@ -21,7 +21,7 @@ local Tab = Class("Tab")
 ---@param name string
 ---@param drawable? GuiCallback
 ---@param subtabs? Tab[]
----@param isTranslatorLabel? boolean
+---@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@return Tab
 function Tab.new(name, drawable, subtabs, isTranslatorLabel)
 	return setmetatable(
@@ -39,7 +39,7 @@ end
 ---@param name string
 ---@param drawable? GuiCallback
 ---@param subtabs? Tab[]
----@param isTranslatorLabel? boolean
+---@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@return Tab
 function Tab:RegisterSubtab(name, drawable, subtabs, isTranslatorLabel)
 	assert((type(name) == "string" and #name > 0),

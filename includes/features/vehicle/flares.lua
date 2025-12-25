@@ -75,13 +75,16 @@ end
 
 function Flares:Update()
 	if (not self.m_is_active) then
-		yield()
 		return
 	end
 
 	local now = MISC.GET_GAME_TIMER()
 	local handle = Self:GetVehicle():GetHandle()
 	self.m_entity.m_is_shooting_flares = true
+
+	if (not Game.IsOnline()) then
+		STREAMING.REQUEST_MODEL(0x27AF51EC)
+	end
 
 	while now >= self.m_next_shot_time and #self.m_shots > 0 do
 		local shot = table.remove(self.m_shots, 1)
@@ -140,6 +143,9 @@ function Flares:Update()
 	if (#self.m_shots == 0) then
 		self.m_is_active = false
 		self.m_entity.m_is_shooting_flares = false
+		if (not Game.IsOnline()) then
+			STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(0x27AF51EC)
+		end
 	end
 end
 
@@ -154,6 +160,10 @@ function Flares:OnTick()
 	end
 
 	self:Update()
+
+	if (not self.m_active) then
+		yield()
+	end
 end
 
 return Flares

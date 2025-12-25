@@ -399,6 +399,15 @@ local ThemeLibrary <const> = {
 local ThemeManager = {
 	m_current_theme = ThemeLibrary.Tenebris,
 }
+ThemeManager.__index = ThemeManager
+
+function ThemeManager:Load()
+	if (not GVars.ui.style.theme or not GVars.ui.style.theme.Colors) then
+		GVars.ui.style.theme = self:GetThemes().MidnightNeon
+	end
+
+	self:SetCurrentTheme(GVars.ui.style.theme)
+end
 
 ---@param name string
 ---@return Theme

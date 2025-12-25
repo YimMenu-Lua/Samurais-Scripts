@@ -13,6 +13,7 @@ local drivingModes <const> = {
 ---@field private m_driver handle
 ---@field private m_last_task_coords vec3
 ---@field private m_current_drive_mode integer
+---@field private m_last_search_pos vec3
 ---@field private m_vehicle Vehicle
 ---@field protected m_thread Thread
 local Carpool = setmetatable({}, FeatureBase)
@@ -33,12 +34,29 @@ function Carpool:Init()
 	self.m_current_drive_mode = 1
 	self.m_driver             = 0
 	self.m_task               = Enums.eVehicleTask.NONE
+	self.m_last_search_pos    = vec3:zero()
 	self.cachedVehicleData    = {
 		isConvertible = false,
 		speed = 0,
 		roofState = Enums.eConvertibleRoofState.INVALID,
 		maxSeats = 0,
 		occupants = {},
+		pedConfigApplied = false,
+		radio = {
+			isOn = false,
+			station = "Off"
+		}
+	}
+end
+
+function Carpool:ResetCachedData()
+	self.cachedVehicleData = {
+		isConvertible = false,
+		speed = 0,
+		roofState = Enums.eConvertibleRoofState.INVALID,
+		maxSeats = 0,
+		occupants = {},
+		pedConfigApplied = false,
 		radio = {
 			isOn = false,
 			station = "Off"
@@ -47,10 +65,7 @@ function Carpool:Init()
 end
 
 function Carpool:ShouldRun()
-	return (GVars.features.world.carpool
-		and Self:IsOutside()
-		and Self:IsOnFoot()
-	)
+	return (GVars.features.world.carpool and Self:IsOutside())
 end
 
 function Carpool:OnDisable()
@@ -112,12 +127,21 @@ function Carpool:SetDrivingStyle(styleIndex)
 	end)
 end
 
+---@param toggle boolean
 function Carpool:TogglePedConfig(toggle)
-	if (not self.m_vehicle:IsValid()) then
+	if (not self.m_vehicle or not self.m_vehicle:IsValid()) then
 		return
 	end
 
-	for _, occupant in ipairs(self.m_vehicle:GetOccupants()) do
+	if (self.cachedVehicleData.pedConfigApplied == toggle) then
+		return
+	end
+
+	if (#self.cachedVehicleData.occupants == 0) then
+		self.cachedVehicleData.occupants = self.m_vehicle:GetOccupants()
+	end
+
+	for _, occupant in ipairs(self.cachedVehicleData.occupants) do
 		if (occupant
 				and entities.take_control_of(occupant, 200)
 				and ENTITY.IS_ENTITY_A_PED(occupant)
@@ -136,33 +160,57 @@ function Carpool:TogglePedConfig(toggle)
 			PED.SET_PED_CONFIG_FLAG(occupant, Enums.ePedConfigFlags.AIDriverAllowFriendlyPassengerSeatEntry, toggle)
 		end
 	end
+
+	self.cachedVehicleData.pedConfigApplied = toggle
 end
 
 function Carpool:FindVehicle()
-	if (PED.IS_PED_IN_ANY_VEHICLE(Self:GetHandle(), false)
-			or (self.m_vehicle and self.m_vehicle:IsValid())
-		) then
+	if (self.m_vehicle and self.m_vehicle:IsValid()) then
+		if (Self:GetPos():distance(self.m_vehicle:GetPos()) >= 20) then -- in case vehicle drove away
+			self:TogglePedConfig(false)
+			self:ResetCachedData()
+			self.m_vehicle = nil
+			return
+		end
 		return
 	end
 
+	if (Self:IsDriving()) then
+		self:ResetCachedData()
+		self.m_vehicle = nil
+		return
+	end
+
+	local now = Game.GetGameTimer()
+	if (now - self.m_last_check_time < 1000) then
+		return
+	end
+	self.m_last_check_time = now
+
 	local handle = Game.GetClosestVehicle(Self:GetHandle(), 15, Self:GetVehicleNative(), true, 3)
 	if (not ENTITY.IS_ENTITY_A_VEHICLE(handle)) then
+		self:ResetCachedData()
+		self.m_vehicle = nil
 		return
 	end
 
 	if (VEHICLE.GET_PED_IN_VEHICLE_SEAT(handle, -1, true) == 0) then
+		self:ResetCachedData()
+		self.m_vehicle = nil
 		return
 	end
 
 	if (Backend:IsScriptEntity(handle)) then
+		self:TogglePedConfig(false)
+		self:ResetCachedData()
+		self.m_vehicle = nil
 		return
 	end
 
-	if (Self:GetPos():distance(Game.GetEntityCoords(handle, false)) >= 20) then
-		return
-	end
-
-	if (VEHICLE.IS_VEHICLE_SEAT_FREE(handle, -1, false)) or not VEHICLE.ARE_ANY_VEHICLE_SEATS_FREE(handle) then
+	if (VEHICLE.IS_VEHICLE_SEAT_FREE(handle, -1, false) or not VEHICLE.ARE_ANY_VEHICLE_SEATS_FREE(handle)) then
+		self:TogglePedConfig(false)
+		self:ResetCachedData()
+		self.m_vehicle = nil
 		return
 	end
 
@@ -171,17 +219,19 @@ function Carpool:FindVehicle()
 end
 
 function Carpool:OnExit()
-	if (not self.m_vehicle or not self.m_vehicle:IsValid()) then
+	if (not self.m_active or not self.m_vehicle or not self.m_vehicle:IsValid()) then
+		self:TogglePedConfig(false)
+		self:ResetCachedData()
+		self.m_active = false
+		self.m_driver = 0
 		return
 	end
 
-	if (self.m_active
-			and (not self.m_vehicle:IsPedInVehicle(Self:GetHandle()) or not self.m_vehicle:IsPedInVehicle(self.m_driver))
-		) then
+	if (not self.m_vehicle:IsPedInVehicle(Self:GetHandle()) or not self.m_vehicle:IsPedInVehicle(self.m_driver)) then
 		self:EmergencyStop()
-
 		self:TogglePedConfig(false)
 
+		self:ResetCachedData()
 		self.m_active  = false
 		self.m_vehicle = nil
 		self.m_driver  = 0
@@ -201,7 +251,6 @@ function Carpool:CancelAllTasks()
 
 	self.m_task = Enums.eVehicleTask.NONE
 	self.m_last_task_coords = nil
-	sleep(1000)
 end
 
 ---@param coords vec3
@@ -265,17 +314,17 @@ function Carpool:Resume()
 end
 
 function Carpool:Update()
-	if (not Self:IsOutside()) then
-		return
-	end
-
 	if (Self:IsOnFoot()) then
 		if (not self.m_active or not self.m_vehicle or not self.m_vehicle:IsValid()) then
 			self:FindVehicle()
 		else
 			self:OnExit()
 		end
-	elseif (self.m_vehicle and self.m_vehicle:IsPedInVehicle(Self:GetHandle()) and not Self:IsDriving()) then
+
+		return
+	end
+
+	if (self.m_vehicle and self.m_vehicle:IsPedInVehicle(Self:GetHandle()) and not Self:IsDriving()) then
 		self.m_active = true
 		self.m_driver = self.m_vehicle:GetPedInSeat(-1, true)
 		self.cachedVehicleData.isConvertible = self.m_vehicle:IsConvertible()
@@ -287,17 +336,26 @@ function Carpool:Update()
 			self.cachedVehicleData.roofState = self.m_vehicle:GetConvertibleRoofState()
 		end
 	end
+
+	yield()
 end
 
 function Carpool:OnTick()
+	if (not self:ShouldRun()) then
+		yield()
+		return
+	end
+
 	self:Update()
 
 	if (self.m_active) then
 		if (not self.m_vehicle:IsValid()
 				or not ENTITY.DOES_ENTITY_EXIST(self.m_driver)
 				or (self.m_vehicle:GetPedInSeat(-1, true) ~= self.m_driver)
+				or not self.m_vehicle:IsPedInVehicle(Self:GetHandle())
 			) then
 			self:OnExit()
+			return
 		end
 
 		if (PAD.IS_CONTROL_PRESSED(0, 75)) then
@@ -318,14 +376,13 @@ function Carpool:OnTick()
 					break
 				end
 
-				TASK.TASK_VEHICLE_TEMP_ACTION(self.m_driver, self.m_vehicle:GetHandle(), 1, 1)
-				yield()
+				TASK.TASK_VEHICLE_TEMP_ACTION(self.m_driver, self.m_vehicle:GetHandle(), 1, 1) -- no yield, otherwise the NPC will resume driving
 			end
 		end
 	end
 
 	if (self.m_task ~= Enums.eVehicleTask.OVERRIDE) then
-		sleep(60)
+		yield()
 	end
 end
 

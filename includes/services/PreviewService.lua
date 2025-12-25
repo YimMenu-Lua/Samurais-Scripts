@@ -37,7 +37,7 @@ function PreviewService:Preview(modelHash, entityType)
 
 		coords = vec3:new(offset.x, offset.y, groundZ + 0.5)
 
-		if (entityType == eEntityType.Object) then
+		if (entityType == Enums.eEntityType.Object) then
 			handle = Game.CreateObject(
 				modelHash,
 				coords,
@@ -47,7 +47,7 @@ function PreviewService:Preview(modelHash, entityType)
 				false,
 				Self:GetHeading()
 			)
-		elseif entityType == eEntityType.Vehicle then
+		elseif entityType == Enums.eEntityType.Vehicle then
 			handle = Game.CreateVehicle(
 				modelHash,
 				coords,
@@ -55,7 +55,7 @@ function PreviewService:Preview(modelHash, entityType)
 				false,
 				false
 			)
-		elseif entityType == eEntityType.Ped then
+		elseif entityType == Enums.eEntityType.Ped then
 			handle = Game.CreatePed(
 				modelHash,
 				coords,

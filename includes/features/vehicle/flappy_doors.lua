@@ -21,7 +21,7 @@ function FlappyDoors:Init()
 	self.m_is_active = false
 	self.m_state_machine = StateMachine({
 		predicate = function(_, veh)
-			return Self:IsDriving() and veh:IsCar()
+			return veh:IsValid() and veh:IsCar()
 		end,
 		interval = 0.6,
 	})

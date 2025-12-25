@@ -25,6 +25,7 @@ end
 function IVStyleExit:ShouldRun()
 	return (self.m_entity
 			and self.m_entity:IsValid()
+			and self.m_entity:IsLandVehicle()
 			and Self:IsDriving()
 			and Self:IsOutside()
 			and (GVars.features.vehicle.iv_exit or GVars.features.vehicle.no_wheel_recenter))
@@ -43,7 +44,7 @@ function IVStyleExit:LeaveVehicle(keepEngineOn)
 	local vehHandle = self.m_entity:GetHandle()
 	local leftPressed = PAD.IS_CONTROL_PRESSED(0, 34)
 	local rightPressed = PAD.IS_CONTROL_PRESSED(0, 35)
-	local enabled = GVars.features.vehicle.no_wheel_recenter and (leftPressed or rightPressed)
+	local enabled = GVars.features.vehicle.no_wheel_recenter and self.m_entity:IsCar() and (leftPressed or rightPressed)
 	Self:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, keepEngineOn)
 	TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), vehHandle, enabled and 16 or 0) -- 16=tp outside. goofy because I don't feel like patching memory 🤷‍♂️
 	self:Cleanup()
@@ -80,7 +81,7 @@ function IVStyleExit:Update()
 	end
 
 	if (self.m_triggered and not Self:IsDriving()) then
-		PED.SET_PED_CONFIG_FLAG(Self:GetHandle(), Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
+		Self:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
 		self:Cleanup()
 		return
 	end

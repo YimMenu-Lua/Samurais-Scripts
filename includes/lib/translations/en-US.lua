@@ -10,6 +10,8 @@ return {
 	["SUBTAB_PAINTS"]                      = "Custom Paint Jobs",
 	["SUBTAB_AIRCRAFT"]                    = "Aircraft",
 	["SUBTAB_FLATBED"]                     = "Flatbed Script",
+	["SUBTAB_HANDLING_EDITOR"]             = "Handling Editor",
+	["SUBTAB_GUI"]                         = "User Interface",
 	--#endregion
 
 	--#region generics
@@ -24,6 +26,7 @@ return {
 	["GENERIC_UNAVAILABLE"]                = "Currently unavailable.",
 	["GENERIC_OFFLINE_OR_OUTDATED"]        =
 	"You need to be online and have the latest version of the script to access this feature!",
+	["GENERIC_GENERAL_LABEL"]              = "General",
 	["GENERIC_OPTIONS_LABEL"]              = "Options",
 	["GENERIC_POSITION_LABEL"]             = "Position",
 	["GENERIC_LEFT_RIGHT_LABEL"]           = "Left/Right",
@@ -31,7 +34,9 @@ return {
 	["GENERIC_COLORS_LABEL"]               = "Colors",
 	["GENERIC_CONFIRM"]                    = "Confirm",
 	["GENERIC_CANCEL"]                     = "Cancel",
+	["GENERIC_APPLY"]                      = "Apply",
 	["GENERIC_RESET"]                      = "Reset",
+	["GENERIC_CLEAR"]                      = "Clear",
 	["GENERIC_CONTACT_DEV"]                = "Something went wrong! Please contact a developer.",
 	["GENERIC_SG_SL_READ_FAIL"]            = "Failed to read script global/local. Please contact a developer.",
 	["GENERIC_TELEPORT"]                   = "Teleport",
@@ -52,8 +57,20 @@ return {
 	["GENERIC_PLAY"]                       = "Play",
 	["GENERIC_START"]                      = "Start",
 	["GENERIC_STOP"]                       = "Stop",
+	["GENERIC_USE"]                        = "Use",
 	["GENERIC_ATTACH"]                     = "Attach",
 	["GENERIC_DETACH"]                     = "Detach",
+	["GENERIC_DETACH_ALL"]                 = "Detach All",
+	["GENERIC_ADD"]                        = "Add",
+	["GENERIC_REMOVE"]                     = "Remove",
+	["GENERIC_REMOVE_ALL"]                 = "Remove All",
+	["GENERIC_DELETE"]                     = "Delete",
+	["GENERIC_DELETE_ALL"]                 = "Delete All",
+	["GENERIC_SAVE"]                       = "Save",
+	["GENERIC_LOAD"]                       = "Load",
+	["GENERIC_COPY"]                       = "Copy",
+	["GENERIC_SHARE"]                      = "Share",
+	["GENERIC_RENAME"]                     = "Rename",
 	["GENERIC_OBJECTIVE"]                  = "Objective",
 	["GENERIC_WAYPOINT"]                   = "Waypoint",
 	["GENERIC_RANDOM"]                     = "Random",
@@ -67,6 +84,7 @@ return {
 	["GENERIC_CONFIRM_WARN"]               = "This action is irreversible. Are you sure you want to proceed?",
 	["GENERIC_NOT_IN_VEH"]                 = "You are not in a vehicle.",
 	["GENERIC_NOT_IN_PLANE"]               = "You are not in an aircraft.",
+	["GENERIC_NOT_IN_COMBAT"]              = "You are not in combat with anyone.",
 	--#endregion
 
 	--#region CasinoPacino
@@ -267,6 +285,17 @@ return {
 	["SELF_RAGDOLL_SOUND"]                 = "Ragdoll Sound",
 	["SELF_RAGDOLL_SOUND_TT"]              = "Your online character will make a panic sound when ragdolling.",
 	["SELF_RAGDOLL_BLOCK_INFO"]            = "This feature will not work if you're blocking ragdoll.",
+	["SELF_MAGIC_BULLET"]                  = "Magic Bullet",
+	["SELF_MAGIC_BULLET_TT"]               =
+	"This feature does not auto-aim or auto-fire. It simply remembers the last ped you aimed at and redirects your shot to that ped when you fire, even if you shoot elsewhere. The target resets when you stop aiming.",
+	["SELF_LASER_SIGHTS"]                  = "Laser Sights",
+	["SELF_LASER_SIGHTS_LENGTH"]           = "Laser Ray Length",
+	["SELF_LASER_SIGHTS_TT"]               =
+	"Enables laser sights on your firearms. You can toggle the sights on and off by pressing [%s]", -- hopefully the keybind's name gets formatted across locales
+	["SELF_LASER_SIGHTS_COL"]              = "Laser Color",
+	["SELF_KATANA"]                        = "Katana",
+	["SELF_KATANA_TT"]                     = "Replaces one of four melee weapon models of your choosing with a Katana.",
+	["SELF_KATANA_REPLACE_MODEL"]          = "Model To Replace",
 	--#endregion
 
 	--#region Vehicle
@@ -287,7 +316,7 @@ return {
 	["VEH_HIGH_BEAMS"]                     = "High Beams on Horn",
 	["VEH_HIGH_BEAMS_TT"]                  = "Flashes your high beams whenever you honk your horn",
 	["VEH_AUTO_BRAKE_LIGHTS"]              = "Auto Brake Lights",
-	["VEH_AUTO_BRAKE_LIGHTS_TT"]           = "Turns your brake lights on whenever you're stopped. (Engine must be running).",
+	["VEH_AUTO_BRAKE_LIGHTS_TT"]           = "Turns on your brake lights on whenever you're stopped. (Engine must be running).",
 	["VEH_STRONG_WINDOWS"]                 = "Unbreakable Windows",
 	["VEH_STRONG_WINDOWS_TT"]              = "Your vehicle's windows will never break. Unless blown up, of course.",
 	["VEH_STRONG_CRASH"]                   = "Stronger Crashes",
@@ -337,7 +366,7 @@ return {
 	["VEH_NO_JET_STALL_TT"]                = "Aircraft engines will no longer stall when you hold the brake button.",
 	["VEH_FAST_JETS"]                      = "Fast Planes",
 	["VEH_FAST_JETS_TT"]                   =
-	"Makes most planes faster as long as they can reach 240Km/h by default, their max speed will be increased to 555Km/h.\n\nSlower planes like the duster do not benefit from this unless you forcibly make them reach the speed threshold by nose diving.",
+	"Makes most planes faster as long as they can reach 240Km/h by default, their max speed will be increased to 555Km/h.\n\nSlower planes like the duster do not benefit from this unless you forcibly make them reach the speed threshold by nose diving.\n\nNOTE: Your gear (plane wheels) must be up.",
 	["VEH_MG_TRIGGERBOT"]                  = "Machine Gun Triggerbot",
 	["VEH_MG_TRIGGERBOT_TT"]               = "Automatically fires your aircraft's machine gun.",
 	["VEH_MG_TRIGGERBOT_ENEMY"]            = "Enemies Only",
@@ -374,6 +403,46 @@ return {
 	["VEH_COBRA_MANEUVER_NOT_LEVEL"]       = "Please level your jet first.",
 	["VEH_COBRA_MANEUVER_INTERRUPT"]       = "Cobra Maneuver was interrupted! Giving control back to the player.",
 	["VEH_COBRA_MANEUVER_CANCEL"]          = "Performing cobra maneuver. Press [CTRL] to cancel and gain back control.",
+	["VEH_DRIFT_MINIGAME"]                 = "Drift Minigame",
+	["VEH_DRIFT_MINIGAME_TT"]              = "Earn points by drifting your car around Los Santos.",
+	["VEH_DRIFT_MINIGAME_PENALTY"]         = "Multiplier Penalty!",
+	["VEH_DRIFT_MINIGAME_STREAK_LOST"]     = "Streak Lost!",
+	["VEH_DRIFT_MINIGAME_DRIFT_LABEL"]     = "Drift",
+	["VEH_DRIFT_MINIGAME_BIG_ANGLE"]       = "Big Angle!",
+	["VEH_DRIFT_MINIGAME_SICK_ANGLE"]      = "Sick Angle!",
+	["VEH_DRIFT_MINIGAME_AIR"]             = "Air",
+	["VEH_DRIFT_MINIGAME_BIG_AIR"]         = "Big Air!",
+	["VEH_DRIFT_MINIGAME_BANKED_PTS"]      = "Banked Points: ",
+	["VEH_DRIFT_MINIGAME_NEW_PB"]          = "New personal best achieved!",
+	["VEH_DRIFT_MINIGAME_SOUND_OPT"]       = "Score Sound",
+	["VEH_DRIFT_MINIGAME_SOUND_OPT_TT"]    = "Play a sound when scoring points",
+	["VEH_DRIFT_MINIGAME_PB_LABEL"]        = "Player Best:\t%s Points",
+	["VEH_NO_ENGINE_BRAKE"]                = "Disable Engine Braking",
+	["VEH_NO_ENGINE_BRAKE_TT"]             = "Allows you to coast when not pressing the accelerator without losing so much speed.",
+	["VEH_KERS_BOOST"]                     = "KERS Boost",
+	["VEH_KERS_BOOST_TT"]                  = "Equips your vehicle with KERS (Kinetic Energy Recovery System) boost, similar to F1 cars.",
+	["VEH_OFFROAD_ABILITIES"]              = "Offroad Abilities",
+	["VEH_OFFROAD_ABILITIES_TT"]           = "Increases your vehicle's offroad capabilities.",
+	["VEH_RALLY_TYRES"]                    = "Rallye Tyres",
+	["VEH_RALLY_TYRES_TT"]                 = "Equips your vehicle with rallye tyres which further improves offroad handling.",
+	["VEH_FORCE_NO_TC"]                    = "No Traction Control",
+	["VEH_FORCE_NO_TC_TT"]                 =
+	"Bikes Only: Forces your vehicle to have no traction control which allows you to do drifts and skids with bikes.",
+	["VEH_LOW_SPEED_WHEELIE"]              = "Low Speed Wheelie",
+	["VEH_LOW_SPEED_WHEELIE_TT"]           = "Bikes Only: Allows you to pop wheelies at very low speeds, similar to the 'Manchez'.",
+	["VEH_ROCKET_BOOST"]                   = "Rocket Boost",
+	["VEH_ROCKET_BOOST_TT"]                = "Equips your vehicle with rocket boost, similar to the 'Vigilante'.",
+	["VEH_JUMP"]                           = "Jump Capability",
+	["VEH_JUMP_TT"]                        = "Equips your vehicle with jump capability, similar to the 'Ruiner 2000'.",
+	["VEH_PARACHUTE"]                      = "Parachute Capability",
+	["VEH_PARACHUTE_TT"]                   =
+	"Equips your vehicle with a parachute, similar to the 'Ruiner 2000'.\n\nImportant: Jump Capability must be enabled as well.",
+	--#endregion
+	["VEH_STEER_REAR_WHEELS"]              = "Rear Wheel Steering",
+	["VEH_STEER_ALL_WHEELS"]               = "All Wheel Steering",
+	["VEH_STEER_HANDBRAKE"]                = "Handbrake Steering",
+	["VEH_STEER_HANDBRAKE_TT"]             =
+	"Steers your vehicle's rear whels when you hold the handbrake, similar to monster cars.",
 	--#endregion
 
 	--#region World
@@ -387,6 +456,14 @@ return {
 	["WRLD_WANTED_MUSIC"]                  = "Disable Wanted Music",
 	["WRLD_CARPOOL"]                       = "Carpool",
 	["WRLD_CARPOOL_TT"]                    = "Allows you to get in NPC vehicles as passenger.",
+	["WRLD_KILL_ALL"]                      = "Kill All Enemies",
+	["WRLD_KILL_ALL_TT"]                   = "Kills all nearby enemies.",
+	["WRLD_KILL_ALL_NOTIF"]                = "Executed 'Kill All Enemies'",
+	["WRLD_FLEE_ALL"]                      = "Scare All Enemies",
+	["WRLD_FLEE_ALL_TT"]                   = "Runs in a 5 second loop: Forces all neabry enemies to drop their weapons and flee the area.",
+	["WRLD_FLEE_ALL_NOTIF"]                = "Forcing nearby enemies to flee. Please wait.",
+	["WRLD_PUBLIC_ENEMY"]                  = "Public Enemy #1",
+	["WRLD_PUBLIC_ENEMY_TT"]               = "All nearby NPCs will gang up on you and beat your ass. Including animals and cops.",
 	--#endregion
 
 	--#region YimActions
@@ -424,5 +501,53 @@ return {
 	["SETTINGS_ENTITY_REPLACE"]            = "Auto-Replace Entities",
 	["SETTINGS_ENTITY_REPLACE_TT"]         =
 	"This project has a limit to how many entities you can spawn (peds, vehicles, objects). All features adhere to that limit to prevent entity spam or choking the game. This option allows the script to automatically replace old spawned entities once you reach the limit for a certain entity type and try to spawn a new one.",
+	["SETTINGS_LANGUAGE"]                  = "Language",
+	["SETTINGS_TOOLTIPS"]                  = "Disable Tooltips",
+	["SETTINGS_UI_SOUND"]                  = "Disable Sound Feedback",
+	["SETTING_WINDOW_GEOMETRY"]            = "Window Geometry",
+	["SETTING_WINDOW_MOVEABLE"]            = "Moveable Window",
+	["SETTING_WINDOW_MOVEABLE_TT"]         = "Allows you to freely move the window",
+	["SETTING_WINDOW_POS_RESET"]           = "Reset Position",
+	["SETTING_WINDOW_POS_SNAP"]            = "Snap To Position",
+	["SETTING_WINDOW_POS_X"]               = "X Position",
+	["SETTING_WINDOW_POS_Y"]               = "Y Position",
+	["SETTING_WINDOW_POS_TT"]              =
+	"These are display only. Enable 'Moveable Window' then drag the top bar to freely move the window.",
+	["SETTING_WINDOW_WIDTH"]               = "Window Width",
+	["SETTING_WINDOW_HEIGHT"]              = "Max Window Height",
+	["SETTING_WINDOW_HEIGHT_TT"]           =
+	"The window is dynamic, it resizes itself vertically based on content.\n\nThis option allows you to set the maximum allowed height.",
+	["SETTING_WINDOW_STYLE"]               = "Window Style",
+	["SETTING_WINDOW_THEME"]               = "Theme",
+	["SETTING_WINDOW_ALPHA"]               = "Window Transparency",
+	["SETTING_WINDOW_ACCENT_COL"]          = "Accent Color",
+	["SETTING_WINDOW_TOP_FRAME_BG"]        = "Top Bar Button Gradient",
+	["SETTING_HOTKEY_WAIT"]                = "Press any key",
+	["SETTINGS_HOTKEY_RESERVED"]           = "This key is reserved. Please choose a different one.",
+	["SETTINGS_KEYBINDS"]                  = "Keybinds",
+	["SETTINGS_KEYBINDS_KEYBOARD"]         = "Keyboard",
+	["SETTINGS_KEYBINDS_CONTROLLER"]       = "Controller",
+	--#endregion
+
+	--#region EntityForge
+	["EF_NEW_NAME_HINT"]                   = "NOTE: Everything will be deleted once you save. You can spawn your creation later.",
+	["EF_NAME_EXISTS_ERR"]                 = "This name already exists. Please choose a different one.",
+	["EF_ROTATE_OBJECT"]                   = "Rotate Object:",
+	["EF_MOVE_OBJECT"]                     = "Move Object:",
+	["EF_MULTIPLIER_LABEL"]                = "Multiplier %.2f",
+	["EF_SAVED_NONE"]                      = "You don't have any saved creations.",
+	["EF_ENTITY_GUN"]                      = "Entity Gun",
+	["EF_IMPORT_DATA"]                     = "Import",
+	["EF_IMPORT_DATA_INSTR"]               = "Paste The Forge Data Here: ",
+	["EF_IMPORT_DATA_CLIPBOARD"]           = "Paste From Clipboard",
+	["EF_IMPORT_DATA_CLIPBOARD_ERR"]       = "Your clipboard is empty!",
+	["EF_IMPORT_DATA_NOTICE"]              =
+	"You have a creation with the same name. An [import] tag has been added to the name. You can still rename it later.",
+	["EF_ENTITY_GUN_TT"]                   =
+	"Aim your weapon at an entity in the game world and press [E] to add it to the forge pool. Once added, you'll be able to use your mouse to move and manipulate it.",
+	["EF_SHARE_SUCCESS"]                   =
+	"Your saved creation was copied to clipboard. If you share the copied data with other users of this script, they will be able import it into their saved creations.",
+	["EF_IMPORT_SUCCESS"]                  = "Data successfully imported.",
+	["EF_CHILD_ALPHA"]                     = "Child Item Transparency: %d",
 	--#endregion
 }

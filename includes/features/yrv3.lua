@@ -240,11 +240,11 @@ function YRV3:init()
 		instance:Main()
 	end)
 
-	Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
+	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
 		instance:Reset()
 	end)
 
-	Backend:RegisterEventCallback(eBackendEvent.SESSION_SWITCH, function()
+	Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, function()
 		instance:Reset()
 	end)
 
@@ -252,7 +252,7 @@ function YRV3:init()
 end
 
 function YRV3:CanAccess()
-	return (Backend:GetAPIVersion() == eAPIVersion.V1)
+	return (Backend:GetAPIVersion() == Enums.eAPIVersion.V1)
 		and Backend:IsUpToDate()
 		and Game.IsOnline()
 		and not script.is_active("maintransition")

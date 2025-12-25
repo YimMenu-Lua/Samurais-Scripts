@@ -1,5 +1,5 @@
 --------------------------------------
--- Struct: phFragInst
+-- phFragInst Struct
 --------------------------------------
 ---@class phFragInst
 ---@field private m_ptr pointer

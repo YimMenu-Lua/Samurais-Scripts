@@ -34,7 +34,7 @@ function PrivateHeli.spawn(model, spawnPos, godmode)
 
 	local vehicle = Vehicle:Create(
 		model,
-		eEntityType.Vehicle,
+		Enums.eEntityType.Vehicle,
 		vec3:zero(),
 		Self:GetHeading(-90),
 		Game.IsOnline(),

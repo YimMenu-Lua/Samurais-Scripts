@@ -27,15 +27,7 @@ YimActions.__index     = YimActions
 
 ---@return YimActions
 function YimActions:init()
-	Backend:RegisterEventCallback(eBackendEvent.RELOAD_UNLOAD, function()
-		self:ForceCleanup()
-	end)
-
-	Backend:RegisterEventCallback(eBackendEvent.PLAYER_SWITCH, function()
-		self:ForceCleanup()
-	end)
-
-	Backend:RegisterEventCallback(eBackendEvent.SESSION_SWITCH, function()
+	Backend:RegisterEventCallbackAll(function()
 		self:ForceCleanup()
 	end)
 
@@ -678,7 +670,7 @@ function YimActions.PropManager:Wipe()
 
 	for _, propTable in pairs(self.Props) do
 		for _, prop in pairs(propTable) do
-			Game.DeleteEntity(prop, eEntityType.Object)
+			Game.DeleteEntity(prop, Enums.eEntityType.Object)
 		end
 	end
 

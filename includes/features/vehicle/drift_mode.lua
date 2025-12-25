@@ -47,9 +47,9 @@ function DriftMode:UpdateFX()
 	local boneZoffset = height / 4
 	local handle      = PV:GetHandle()
 	local col         = GVars.features.vehicle.drift.smoke_fx.color
-	col.x             = math.min(col.x * 255, 255)
-	col.y             = math.min(col.y * 255, 255)
-	col.z             = math.min(col.z * 255, 255)
+	local r           = math.min(col.x * 255, 255)
+	local g           = math.min(col.y * 255, 255)
+	local b           = math.min(col.z * 255, 255)
 
 	if (PV:IsMoving()) then
 		local speed = PV:GetSpeed()
@@ -69,7 +69,7 @@ function DriftMode:UpdateFX()
 					fxScale,
 					vec3:new(1.2, 0.0, -boneZoffset),
 					vec3:zero(),
-					Color(col:unpack())
+					Color(r, g, b)
 				)
 			end
 		elseif self.m_smoke_fx then
@@ -91,7 +91,7 @@ function DriftMode:UpdateFX()
 					0.4,
 					vec3:new(1.2, 0.0, -boneZoffset),
 					vec3:zero(),
-					Color(col:unpack())
+					Color(r, g, b)
 				)
 			end
 		elseif self.m_smoke_fx then
