@@ -4,7 +4,7 @@
 
 #### A Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and [Tupoye-Menu](https://github.com/TupoyeMenu/TupoyeMenu), centered around roleplaying and having fun in a game full of ad bots and toxic cheaters
 
-[![sv](https://img.shields.io/badge/Script%20Version-v1.0.0-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
+[![sv](https://img.shields.io/badge/Script%20Version-v1.7.4-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
 [![gv](https://img.shields.io/badge/Game%20Version-Online%201.72%20|%20Build%203725.0-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
 
 ###  
