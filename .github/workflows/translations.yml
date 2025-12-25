@@ -21,11 +21,6 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v4
-
-    - name: Debug Fs
-      run: |
-       pwd
-       ls -R
        
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -34,7 +29,7 @@ jobs:
 
     - name: Run Translations Generator
       run: |
-        cd scripts
+        cd ./scripts/translations
         python generate_translations.py
 
     - name: Commit Changes
