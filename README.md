@@ -4,20 +4,15 @@
 
 #### A Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and [Tupoye-Menu](https://github.com/TupoyeMenu/TupoyeMenu), centered around roleplaying and having fun in a game full of ad bots and toxic cheaters
 
-[![sv](https://img.shields.io/badge/Script%20Version-v1.7.3-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
-[![gv](https://img.shields.io/badge/Game%20Version-Online%201.71%20|%20Build%203586-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
+[![sv](https://img.shields.io/badge/Script%20Version-v1.0.0-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
+[![gv](https://img.shields.io/badge/Game%20Version-Online%201.72%20|%20Build%203725.0-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
 
 ###  
 
 > [!Note]
 > **Legacy Only.**
->
 
-###  
-
-## Features
-
-- Full list of features is documented [here](FEATURES.md).  
+___
 
 ## Setup
 
@@ -35,29 +30,19 @@
 
 ## Commands
 
-> *Default command executor button: **[NUMPAD7]***
+- Use **[F4]** to toggle the command executor window.
+- Type `!ls` or `!dump` to dump all available commands.
+- Default commands are prefixed with an exclamation mark.
 
-- `autoheal` : Enables/Disables the script's auto-heal feature.
-- `rod` : Enables/Disables the **Ragdoll On Demand** feature.
-- `autofill.hangar` : Starts auto-filling your hangar cargo.
-- `autofill.whouse1` : Starts auto-filling your CEO Warehouse N°1 *(if you have more than one, use the same command with the corresponding number. Ex: `autofill.whouse4`)*.
-- `yrv2.fillall` : Fills all your owned businesses with supplies.
-- `finishsale` : Instantly finishes a sale mission (from a list of missions supported by the script). Will be skipped if you have the **Auto-Sell** option enabled.
-- `fastvehs` : Increases the top speed of any *land* vehicle you drive.
-- `spawnmeaperv` : No comment.
-- `kys` : Kills you.
-- `vehlock` : Locks/unlocks your vehicle.
-- `PANIK` : Resets all changes done by the script (same as the panic button).
-- `resetcfg` : Resets the script and restores your saved config to default.
+> [!Important]
+> The script now has its own UI toggleable through a customizable keybind (F5 by default). There's still a tab for it in YimMenu's UI that simply informs you about this change.
 
 ## Credits
 
 | Awesome Person                                    | Contribution                                                                   |
 |     :---:                                         | :---:                                                                          |
-| [Harmless](https://github.com/harmless05)         | Config system *(now YimConfig)* & Shift-Drift                                  |
+| [Harmless](https://github.com/harmless05)         | Shift-Drift                                                                    |
 | [NiiV3AU](https://github.com/NiiV3AU)             | German translations                                                            |
-| [xiaoxiao](https://github.com/xiaoxiao921)        | YimMenu's Lua API                                                              |
-| [YimMenu](https://github.com/YimMenu/YimMenu)     | I was never fond of any other project. It's just beautiful!                    |
 | [gir489returns](https://github.com/gir489returns) | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino)                  |
-| [tupoy-ya](https://github.com/tupoy-ya)           | Bugfixes, better date&time, helped me finally figure out handling flags in Lua |
-| [szalikdev](https://github.com/szalikdev)         | Revived the project |
+| [tupoy-ya](https://github.com/tupoy-ya)           | Several contributions and shared knowledge                                     |
+| [szalikdev](https://github.com/szalikdev)         | Revived the project                                                            |

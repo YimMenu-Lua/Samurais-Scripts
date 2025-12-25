@@ -1,70 +1,225 @@
-# Contributing
+# Commit Convention
+
+These are recommended, but not enforced yet. We follow slightly similar commit guidelines to [YimMenu](https://github.com/Mr-X-GTA/YimMenu/blob/master/CONTRIBUTING.md):
+
+## Commit Structure
+
+  ```text
+  <type>(scope): <description>
+
+  [optional body]
+
+  [optional footer]
+  ```
+
+- **Types (lowercase only):**
+  - feat: New features.
+  - fix: Bug fixes.
+  - style: Feature and updates related to styling.
+  - refactor: Refactoring a specific section of the codebase.
+  - test: Everything related to testing.
+  - docs: Everything related to documentation.
+  - chore: Regular code maintenance.
+
+- **Scope:**
+  - A scope is a phrase describing parts of the code affected by the changes. For example `(translations)`.
+
+- **Body (Optional):**
+  - The commit body can provide additional contextual information. For breaking changes, the body MUST start with "BREAKING CHANGE".
+
+- **Footer (Optional):**
+  - A commit footer is used to reference issues affected by the code changes. For example: "Fixes #13". It can also be used to indicate breaking changes by starting with "BREAKING CHANGE".
+
+- **Example:**
+
+  ```text
+  fix(SomeFeature): fix constructor returning an empty object.
+  docs(Readme): document coding conventions
+  ```
+
+## Coding Standards
+
+### Annotations
+
+Annotate all enums, classes, and class methods using [LuaLS](https://luals.github.io/wiki/annotations/)'s style.
+
+Annotations are critical for readability, code completion, error checking, and automatic generation of class documentations.
+
+For comments/summaries/descriptions, you can use either 2 or 3 dashes but please **leave a space** between the last dash and the text.
+
+- **Example:**
+
+    ```lua
+    -- Calculates the sum of two numbers.
+    ---@param a number The first number
+    ---@param b number The second number
+    ---@return number The sum of both numbers
+    function MyClass:Add(a, b)
+        return a + b
+    end
+    ```
+
+### Global Variables
+
+There are two ways to declare globals:
+
+1. Globals that should be serialized to JSON:
+Index the global `GVars` table. Even if the variable was never declared before:
+
+    ```lua
+    GVars.some_feature_enabled, _ = ImGui.Checkbox("My Checkbox", GVars.some_feature_enabled)
+    ```
+
+2. Regular globals:
+Use Lua's default global table `_G`:
+
+    ```lua
+    some_global_number = 123
+    ```
+
+### Style
+
+You are free to use any style you want, except in these cases:
+
+| Scope | Naming | Example |
+| ----------- | ----------- | ---------- |
+| Global Functions | PascalCase | `function DoSomething(...) end` |
+| Local Functions | any (consistent) | You are free to use any style as long as it stays consistent throughout the whole file |
+| Standard Lib Extensions | Use the lib's default style | `string.somefunc = function(...) end` |
+| Enums | PascalCase prefixed with a lowercase `e` | `eExampleEnum` |
+| Enum Members | Preferably UPPER_SNAKE_CASE but PascalCase is also allowed | `eExampleEnum.SOME_MEMBER`/`eExampleEnum.SomeMember` |
+| Classes | PascalCase | `MyNewClass = Class("MyNewClass")` |
+| Class Methods | PascalCase | `function MyNewClass:ExampleMethod(...) end` |
+| Class Members | snake_case prefixed with an `m` | `m_handle` |
+
+### Formatting
+
+- **Indentations:**
+  - Does not matter. If using tabs, make sure one tab equals **four** spaces.
+
+- **Line Wrapping:**
+  - Try to wrap wide lines using either your IDE's formatter or a Pythonic way.
+
+    - Example:
+
+        ```lua
+        SomeFunc(param1, param2, param3, param4, param5, param6, param7, param8, param9, ...)
+        ```
+
+    - Preferred (Pythonic) style:
+
+        ```lua
+        SomeFunc(
+            param1,
+            param2,
+            param3,
+            param4,
+            param5,
+            param6,
+            param7,
+            param8,
+            param9,
+            ...
+        )
+        ```
+
+- **Nested `if` Statements:**
+
+  - Always try to use guarded if statements when applicable.
+
+    - Example:
+
+        ```lua
+        local cond_1 = false
+        local cond_2 = nil
+        local cond_3 = true
+
+        if cond_1 then
+            if cond_2 then
+                if cond_3 then
+                    DoSomething()
+                end
+            end
+        end
+        ```
+
+    - Preferred approach:
+
+        ```lua
+        local cond_1 = false
+        local cond_2 = nil
+        local cond_3 = true
+
+        if not cond_1 then
+            return
+        end
+
+        if not cond_2 then
+            return
+        end
+
+        if not cond_3 then
+            return
+        end
+
+        DoSomething()
+        ```
+
+    - Shorter version:
+
+        ```lua
+        local cond_1 = false
+        local cond_2 = nil
+        local cond_3 = true
+
+        if not (cond_1 and cond_2 and cond_3) then
+            return
+        end
+
+        DoSomething()
+        ```
 
 ## Translations
 
-### Editing a pre-existing language
+- The primary language for all labels is English (US) (`includes/lib/translations/en-US.lua`).
+- To add a new language, add its name and ISO code to `includes/lib/translations/__locales.lua`.
+- To add a new label, update `/lib/translations/en-US.lua`.
+- All other language files will be automatically generated via GitHub Actions.
 
-1. Fork the repo then open `/lib/Translations.lua`
-2. Find each entry for the language you want to modify/correct and edit the `text =` field.
+### Examples
 
-   **Example:**
+#### Adding A New Label
 
-     ```lua
-     ["Self"] = {
-        {iso = "fr-FR", text = "Traduction du mot 'Self' en Français."},
-     },
-     ```
+Suppose you want to draw some text that gets automatically translated:
 
-3. Open a PR.
+1. Open `includes/lib/translations/en-US.lua`.
+2. Add a key-value pair for your new label:
 
-### Adding a new language
+    ```lua
+    return {
+      ...
+      ["MY_LABEL"] = "My label's text in English."
+    }
+    ```
 
-#### Manual (horrible)
+3. Use the `key` with the `_T` wrapper for the [`Translator:Translate(...)`](docs/services/Translator.md) method:
 
-1. Follow the same structure by adding a new table under each field containing your language's iso code and the translated text. So let's suppose you want to add Portuguese support:
+    ```lua
+    ImGui.Text(_T("MY_LABEL"))
+    ```
 
-   **Example:**
+#### Adding A New Language
 
-     ```lua
-     ["Self"] = {
-       {iso = "fr-FR", text = "Traduction du mot 'Self' en Français."},
-     -- leave the other tables as they are and add yours below the last one:
-       {iso = "pt-BR", text = "Tradução da palavra 'Self' em Português."},
-     },
-     ```
+1. Open `includes/lib/translations/__locales.lua`.
+2. Add a new language dictionary `{ name, iso }`:
 
-2. Open `samurais_scripts.lua` and check if your new language exists in the `lang_T` table. If it doesn't then simply add it by following the same structure.
-3. Open a PR.
+    ```lua
+    return {
+      ..., -- pre-existing tables
+      { name = "Türkçe", iso = "tr-TR" }, -- Your new language
+    }
+    ```
 
-#### Automatic (suggested)
+## What To Avoid
 
-1. Fork the repo.
-2. Locate `generate_translations.py`
-3. Install all requirements by either manually installing each module in the `modules` list at line 3 in the Python file or un-commenting lines 1 to 10 and running the script.
-4. Run the script if it's not already running and once prompted, choose the first option then enter your language code.
-
-> [!NOTE]
-> both `fr` and `fr-FR` are valid for French but just `zh` will throw an error because you have to specify which Chinese dialect you want: `zh-CN` for simplified and `zh-TW` for traditional. Same thing applies for all languages with multiple dialects.
-
-> [!NOTE]
-> **Important:** Do not enter a full language name like `french`. It will work but it will mess up the Lua file which in turn will prevent the main script from recognizing the language.
-
-5. Open `Translations.lua` and make sure your new language was correctly added and most importantly, double check the `iso` field. If it says `iso = ja-JA` then it will not work because that's not the correct iso code for Japanese, `ja-JP` is. This happens because the py script tries to set the iso country code if you don't provide one but it doesn't know that `JP` is the correct one so it simply adds a dash and an upper-case version of the iso code you provided.
-6. Open `samurais_scripts.lua` and check if your new language exists in the `lang_T` table. If it doesn't then simply add it by following the same structure.
-7. Open a PR.
-
-### Adding a new label
-
-1. Run `generate_translations.py` and choose the second option.
-2. Enter a global name in all uppercase and ending with an underscore (Example: `MY_NEW_LABEL_`). This will be used as both the Lua table key and the global variable that you can then pass to your new addition (text, button, tooltip, etc...)
-3. Enter the string that will be added and translated (Example: `This is a generic text.`).
-4. Wait for it to finish and then your new global can be used in the script. (Example: `ImGui.Text(MY_NEW_LABEL_)`).
-
-> Optional: If you have `pyperclip` installed, your new global variable's name will be automatically copied to clipboard.
-
-## Main Script
-
-- If you have any feature you want to add to the script, feel free to open a PR. If the feature code is not yours, make sure you have permission from the author before contributing it.
-
-> [!IMPORTANT]
-> Make sure to add a commit message and description to your PR. The release changelog depends on that.
+- Manually editing any language file except `en-US.lua`. They are auto-generated so any changes you add will be overwritten by GitHub Actions.
