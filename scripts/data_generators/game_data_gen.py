@@ -11,12 +11,13 @@
 
 import sys, subprocess, importlib.util
 
-if importlib.util.find_spec("alive_progress") is None:
-		try:
-			subprocess.check_call([sys.executable, "-m", "pip", "install", "alive_progress"])
-		except subprocess.CalledProcessError:
-			print(f"Failed to install {"alive_progress"}. Run as administrator.")
-			sys.exit(1)
+for module in {"requests", "alive_progress"}:
+	if importlib.util.find_spec(module) is None:
+			try:
+				subprocess.check_call([sys.executable, "-m", "pip", "install", module])
+			except subprocess.CalledProcessError:
+				print(f"Failed to install {module}. Run as administrator.")
+				sys.exit(1)
 
 
 import requests, datetime

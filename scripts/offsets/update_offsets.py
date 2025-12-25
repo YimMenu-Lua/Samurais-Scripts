@@ -14,12 +14,13 @@
 
 import sys, importlib.util, subprocess
 
-if importlib.util.find_spec("slpp") is None:
-	try:
-		subprocess.check_call([sys.executable, "-m", "pip", "install", "slpp"])
-	except subprocess.CalledProcessError:
-		print(f"Failed to install slpp! Try running as administrator.")
-		sys.exit(1)
+for module in {"requests", "slpp"}:
+	if importlib.util.find_spec(module) is None:
+		try:
+			subprocess.check_call([sys.executable, "-m", "pip", "install", module])
+		except subprocess.CalledProcessError:
+			print(f"Failed to install {module}! Try running as administrator.")
+			sys.exit(1)
 
 
 import os, re, requests
