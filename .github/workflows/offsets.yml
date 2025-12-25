@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Fetch Upstream Decomps Repo
+      - name: Fetch Upstream
         run: |
          git ls-remote https://github.com/calamity-inc/GTA-V-Decompiled-Scripts HEAD | cut -f1 > upstream_commit.txt
 
@@ -27,7 +27,7 @@ jobs:
         id: last
         run: |
           if [ -f scripts/offsets/.last_commit_hash ]; then
-            cat scripts/.last_commit_hash > last_commit.txt
+            cat ./scripts/.last_commit_hash > last_commit.txt
           else
             echo "none" > last_commit.txt
           fi
@@ -61,7 +61,7 @@ jobs:
       - name: Save New Commit Hash
         if: steps.compare_commit.outputs.run == 'true'
         run: |
-          cp upstream_commit.txt scripts/offsets/.last_commit_hash
+          cp upstream_commit.txt ./scripts/offsets/.last_commit_hash
 
       - name: Commit Changes
         if: steps.compare_commit.outputs.run == 'true'
