@@ -21,7 +21,7 @@ jobs:
 
       - name: Fetch Upstream Decomps Repo
         run: |
-		  git ls-remote https://github.com/calamity-inc/GTA-V-Decompiled-Scripts HEAD | cut -f1 > upstream_commit.txt
+         git ls-remote https://github.com/calamity-inc/GTA-V-Decompiled-Scripts HEAD | cut -f1 > upstream_commit.txt
 
       - name: Read Last Commit Hash
         id: last
