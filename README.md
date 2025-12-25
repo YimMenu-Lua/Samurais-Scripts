@@ -31,15 +31,18 @@ ___
 ## Commands
 
 - Use **[F4]** to toggle the command executor window.
-- Type `!ls` or `!dump` to display a window with all available commands.
+- Type `!ls` or `!dump` to dump all available commands.
 - Default commands are prefixed with an exclamation mark.
+
+> [!Important]
+> The script now has its own UI toggleable through a customizable keybind (F5 by default). There's still a tab for it in YimMenu's UI that simply informs you about this change.
 
 ## Credits
 
 | Awesome Person                                    | Contribution                                                                   |
 |     :---:                                         | :---:                                                                          |
-| [Harmless](https://github.com/harmless05)         | Config system *(now YimConfig)* & Shift-Drift                                  |
+| [Harmless](https://github.com/harmless05)         | Shift-Drift                                                                    |
 | [NiiV3AU](https://github.com/NiiV3AU)             | German translations                                                            |
 | [gir489returns](https://github.com/gir489returns) | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino)                  |
-| [tupoy-ya](https://github.com/tupoy-ya)           | Bugfixes, better date&time, helped me finally figure out handling flags in Lua |
+| [tupoy-ya](https://github.com/tupoy-ya)           | Several contributions and shared knowledge                                     |
 | [szalikdev](https://github.com/szalikdev)         | Revived the project                                                            |
