@@ -474,5 +474,8 @@ return {
 	["WRLD_KILL_ALL_TT"] = "Mata todos os inimigos próximos.",
 	["WRLD_KILL_ALL_NOTIF"] = "Executado 'Matar todos os inimigos'",
 	["WRLD_PUBLIC_ENEMY"] = "Inimigo Público nº 1",
-	["WRLD_PUBLIC_ENEMY_TT"] = "Todos os NPCs próximos irão se unir contra você e bater em você. Incluindo animais e policiais."
+	["WRLD_PUBLIC_ENEMY_TT"] = "Todos os NPCs próximos irão se unir contra você e bater em você. Incluindo animais e policiais.",
+	["GENERIC_IMPORTANT"] = "Importante",
+	["GUI_NEW_LAYOUT_NOTICE"] = "A UI do script agora é independente do menu. Pressione %s para alternar.",
+	["SETTING_HOTKEY_FOUND"] = "Nova chave:"
 }

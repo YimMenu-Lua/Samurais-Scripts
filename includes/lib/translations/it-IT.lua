@@ -474,5 +474,8 @@ return {
 	["WRLD_KILL_ALL_TT"] = "Uccide tutti i nemici vicini.",
 	["WRLD_FLEE_ALL_NOTIF"] = "Costringere i nemici vicini a fuggire. Attendere prego.",
 	["WRLD_PUBLIC_ENEMY"] = "Nemico pubblico n. 1",
-	["WRLD_PUBLIC_ENEMY_TT"] = "Tutti gli NPC vicini si alleeranno contro di te e ti faranno il culo. Compresi animali e poliziotti."
+	["WRLD_PUBLIC_ENEMY_TT"] = "Tutti gli NPC vicini si alleeranno contro di te e ti faranno il culo. Compresi animali e poliziotti.",
+	["GENERIC_IMPORTANT"] = "Importante",
+	["SETTING_HOTKEY_FOUND"] = "Nuova chiave:",
+	["GUI_NEW_LAYOUT_NOTICE"] = "L'interfaccia utente dello script è ora indipendente dal menu. Premi %s per attivarlo."
 }

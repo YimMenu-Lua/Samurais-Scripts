@@ -474,5 +474,8 @@ return {
 	["SELF_KATANA_REPLACE_MODEL"] = "교체할 모델",
 	["WRLD_KILL_ALL"] = "모든 적을 죽여라",
 	["WRLD_PUBLIC_ENEMY"] = "공공의 적 #1",
-	["WRLD_PUBLIC_ENEMY_TT"] = "근처의 모든 NPC가 당신에게 뭉쳐 당신을 때릴 것입니다. 동물과 경찰도 포함됩니다."
+	["WRLD_PUBLIC_ENEMY_TT"] = "근처의 모든 NPC가 당신에게 뭉쳐 당신을 때릴 것입니다. 동물과 경찰도 포함됩니다.",
+	["GENERIC_IMPORTANT"] = "중요한",
+	["GUI_NEW_LAYOUT_NOTICE"] = "이제 스크립트의 UI가 메뉴와 독립적입니다. 전환하려면 %s 키를 누르세요.",
+	["SETTING_HOTKEY_FOUND"] = "새 키:"
 }

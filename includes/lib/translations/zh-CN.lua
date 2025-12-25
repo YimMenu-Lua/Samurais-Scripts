@@ -474,5 +474,8 @@ return {
 	["WRLD_KILL_ALL_NOTIF"] = "执行“杀死所有敌人”",
 	["WRLD_FLEE_ALL_NOTIF"] = "迫使附近的敌人逃跑。请稍等。",
 	["WRLD_PUBLIC_ENEMY"] = "公众之敌#1",
-	["WRLD_PUBLIC_ENEMY_TT"] = "附近的所有 NPC 都会联合起来攻击你并殴打你。包括动物和警察。"
+	["WRLD_PUBLIC_ENEMY_TT"] = "附近的所有 NPC 都会联合起来攻击你并殴打你。包括动物和警察。",
+	["GUI_NEW_LAYOUT_NOTICE"] = "该脚本的 UI 现在独立于菜单。按 %s 进行切换。",
+	["GENERIC_IMPORTANT"] = "重要的",
+	["SETTING_HOTKEY_FOUND"] = "新钥匙："
 }

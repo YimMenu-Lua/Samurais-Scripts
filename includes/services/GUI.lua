@@ -332,15 +332,14 @@ function GUI:DrawDummyTab()
 	DrawClock()
 	ImGui.Dummy(1, 10)
 	ImGui.SetWindowFontScale(1.2)
-	ImGui.SeparatorText("Important")
+	ImGui.SeparatorText(_T("GENERIC_IMPORTANT"))
 	ImGui.SetWindowFontScale(1.0)
-	ImGui.Text(_F("The script's UI is now independent from the menu. Press %s to toggle it.",
-		GVars.keyboard_keybinds.gui_toggle or "F5"))
+	ImGui.Text(_F(_T("GUI_NEW_LAYOUT_NOTICE"), GVars.keyboard_keybinds.gui_toggle))
 	ImGui.Spacing()
 	ImGui.Separator()
 
 	ImGui.SetNextWindowBgAlpha(0)
-	if ImGui.BeginChild("footer", -1, 40, false) then
+	if ImGui.BeginChild("##footer", -1, 40, false) then
 		ImGui.Spacing()
 		ImGui.TextDisabled(("v%s"):format(Backend.__version))
 		if (self:IsItemClicked(self.MouseButtons.LEFT)) then

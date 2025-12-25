@@ -9,7 +9,10 @@ local _reserved = false
 
 local function GetCurrentKey()
 	local _, code, name = KeyManager:IsAnyKeyPressed()
-	if (code == eVirtualKeyCodes.VK_LBUTTON or code == eVirtualKeyCodes.VK_RBUTTON) then
+	if (code == eVirtualKeyCodes.VK_LBUTTON
+			or code == eVirtualKeyCodes.VK_RBUTTON
+			or code == eVirtualKeyCodes.ALT
+		) then
 		return
 	end
 
@@ -93,11 +96,11 @@ local function DrawKeybinds(gvarKey, isController)
 			_reserved = reserved_set:Contains(keyCode)
 
 			if not _reserved then
-				ImGui.Text("New Key: ")
+				ImGui.Text(_T("SETTING_HOTKEY_FOUND"))
 				ImGui.SameLine()
 				local name = _F("[%s]", keyName)
 				local nameWidth = ImGui.CalcTextSize(name)
-				ImGui.SetCursorPosX(ImGui.GetCursorPosX() + region.x - nameWidth - spacing)
+				ImGui.SetCursorPosX(region.x - nameWidth - spacing)
 				ImGui.Text(name)
 			else
 				GUI:Text(_T("SETTINGS_HOTKEY_RESERVED"), { color = Color("red"), alpha = 0.86 })

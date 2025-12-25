@@ -474,5 +474,8 @@ return {
 	["WRLD_KILL_ALL_TT"] = "Tötet alle Feinde in der Nähe.",
 	["WRLD_FLEE_ALL_NOTIF"] = "Zwingt Feinde in der Nähe zur Flucht. Bitte warten.",
 	["WRLD_PUBLIC_ENEMY"] = "Staatsfeind Nr. 1",
-	["WRLD_PUBLIC_ENEMY_TT"] = "Alle NPCs in der Nähe werden sich gegen dich verbünden und dir in den Arsch schlagen. Einschließlich Tiere und Polizisten."
+	["WRLD_PUBLIC_ENEMY_TT"] = "Alle NPCs in der Nähe werden sich gegen dich verbünden und dir in den Arsch schlagen. Einschließlich Tiere und Polizisten.",
+	["GENERIC_IMPORTANT"] = "Wichtig",
+	["GUI_NEW_LAYOUT_NOTICE"] = "Die Benutzeroberfläche des Skripts ist jetzt unabhängig vom Menü. Drücken Sie %s, um es umzuschalten.",
+	["SETTING_HOTKEY_FOUND"] = "Neuer Schlüssel:"
 }

@@ -474,5 +474,8 @@ return {
 	["SELF_KATANA_TT"] = "Remplace l'un des quatre modèles d'armes de mêlée de votre choix par un Katana.",
 	["WRLD_FLEE_ALL"] = "Effrayer tous les ennemis",
 	["WRLD_PUBLIC_ENEMY"] = "Ennemi public n°1",
-	["WRLD_PUBLIC_ENEMY_TT"] = "Tous les PNJ à proximité se ligueront contre vous et vous botteront le cul. Y compris les animaux et les flics."
+	["WRLD_PUBLIC_ENEMY_TT"] = "Tous les PNJ à proximité se ligueront contre vous et vous botteront le cul. Y compris les animaux et les flics.",
+	["GENERIC_IMPORTANT"] = "Important",
+	["SETTING_HOTKEY_FOUND"] = "Nouvelle clé :",
+	["GUI_NEW_LAYOUT_NOTICE"] = "L'interface utilisateur du script est désormais indépendante du menu. Appuyez sur %s pour l'activer."
 }

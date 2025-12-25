@@ -474,5 +474,8 @@ return {
 	["WRLD_FLEE_ALL_TT"] = "Działa w pętli trwającej 5 sekund: Zmusza wszystkich znajdujących się w pobliżu wrogów do opuszczenia broni i ucieczki z obszaru.",
 	["WRLD_KILL_ALL_NOTIF"] = "Wykonano „Zabij wszystkich wrogów”",
 	["WRLD_PUBLIC_ENEMY_TT"] = "Wszyscy pobliscy NPC złożą się na ciebie i skopią ci tyłek. Włącznie ze zwierzętami i policjantami.",
-	["WRLD_PUBLIC_ENEMY"] = "Wróg publiczny nr 1"
+	["WRLD_PUBLIC_ENEMY"] = "Wróg publiczny nr 1",
+	["GENERIC_IMPORTANT"] = "Ważny",
+	["SETTING_HOTKEY_FOUND"] = "Nowy klucz:",
+	["GUI_NEW_LAYOUT_NOTICE"] = "Interfejs użytkownika skryptu jest teraz niezależny od menu. Naciśnij %s, aby to przełączyć."
 }

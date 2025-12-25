@@ -474,5 +474,8 @@ return {
 	["WRLD_FLEE_ALL"] = "Asusta a todos los enemigos",
 	["WRLD_FLEE_ALL_NOTIF"] = "Obligando a los enemigos cercanos a huir. Espere por favor.",
 	["WRLD_PUBLIC_ENEMY"] = "Enemigo público n.° 1",
-	["WRLD_PUBLIC_ENEMY_TT"] = "Todos los NPC cercanos se unirán contra ti y te golpearán el trasero. Incluyendo animales y policías."
+	["WRLD_PUBLIC_ENEMY_TT"] = "Todos los NPC cercanos se unirán contra ti y te golpearán el trasero. Incluyendo animales y policías.",
+	["GENERIC_IMPORTANT"] = "Importante",
+	["GUI_NEW_LAYOUT_NOTICE"] = "La interfaz de usuario del script ahora es independiente del menú. Presione %s para alternarlo.",
+	["SETTING_HOTKEY_FOUND"] = "Nueva clave:"
 }

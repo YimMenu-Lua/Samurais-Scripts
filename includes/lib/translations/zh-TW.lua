@@ -474,5 +474,8 @@ return {
 	["WRLD_FLEE_ALL_TT"] = "5 秒循環運行：迫使所有附近的敵人放下武器並逃離該區域。",
 	["WRLD_FLEE_ALL_NOTIF"] = "迫使附近的敵人逃跑。請稍等。",
 	["WRLD_PUBLIC_ENEMY"] = "公眾之敵#1",
-	["WRLD_PUBLIC_ENEMY_TT"] = "附近的所有 NPC 都會聯合起來攻擊你並毆打你。包括動物和警察。"
+	["WRLD_PUBLIC_ENEMY_TT"] = "附近的所有 NPC 都會聯合起來攻擊你並毆打你。包括動物和警察。",
+	["GENERIC_IMPORTANT"] = "重要的",
+	["GUI_NEW_LAYOUT_NOTICE"] = "該腳本的 UI 現在獨立於菜單。按 %s 進行切換。",
+	["SETTING_HOTKEY_FOUND"] = "新鑰匙："
 }

@@ -474,5 +474,8 @@ return {
 	["WRLD_FLEE_ALL_TT"] = "5 秒のループで実行: すべての近くの敵に武器を捨ててエリアから逃げるように強制します。",
 	["WRLD_KILL_ALL_NOTIF"] = "「すべての敵を倒す」を実行しました",
 	["WRLD_PUBLIC_ENEMY"] = "パブリック・エネミー #1",
-	["WRLD_PUBLIC_ENEMY_TT"] = "近くのすべての NPC があなたに群がり、あなたのお尻を殴ります。動物や警官も含まれます。"
+	["WRLD_PUBLIC_ENEMY_TT"] = "近くのすべての NPC があなたに群がり、あなたのお尻を殴ります。動物や警官も含まれます。",
+	["GENERIC_IMPORTANT"] = "重要",
+	["GUI_NEW_LAYOUT_NOTICE"] = "スクリプトの UI はメニューから独立しました。 %s を押して切り替えます。",
+	["SETTING_HOTKEY_FOUND"] = "新しいキー:"
 }

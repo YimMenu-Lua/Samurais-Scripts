@@ -14,6 +14,8 @@ return {
 	["SUBTAB_GUI"]                         = "User Interface",
 	--#endregion
 
+	["GUI_NEW_LAYOUT_NOTICE"]              = "The script's UI is now independent from the menu. Press %s to toggle it.",
+
 	--#region generics
 	["WARN_PED_SPAWN_LIMIT"]               =
 	"Ped spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
@@ -26,6 +28,7 @@ return {
 	["GENERIC_UNAVAILABLE"]                = "Currently unavailable.",
 	["GENERIC_OFFLINE_OR_OUTDATED"]        =
 	"You need to be online and have the latest version of the script to access this feature!",
+	["GENERIC_IMPORTANT"]                  = "Important",
 	["GENERIC_GENERAL_LABEL"]              = "General",
 	["GENERIC_OPTIONS_LABEL"]              = "Options",
 	["GENERIC_POSITION_LABEL"]             = "Position",
@@ -523,6 +526,7 @@ return {
 	["SETTING_WINDOW_ACCENT_COL"]          = "Accent Color",
 	["SETTING_WINDOW_TOP_FRAME_BG"]        = "Top Bar Button Gradient",
 	["SETTING_HOTKEY_WAIT"]                = "Press any key",
+	["SETTING_HOTKEY_FOUND"]               = "New Key:",
 	["SETTINGS_HOTKEY_RESERVED"]           = "This key is reserved. Please choose a different one.",
 	["SETTINGS_KEYBINDS"]                  = "Keybinds",
 	["SETTINGS_KEYBINDS_KEYBOARD"]         = "Keyboard",
