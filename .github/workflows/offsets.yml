@@ -27,7 +27,7 @@ jobs:
         id: last
         run: |
           if [ -f scripts/offsets/.last_commit_hash ]; then
-            cat ./scripts/.last_commit_hash > last_commit.txt
+            cat scripts/offsets/.last_commit_hash > last_commit.txt
           else
             echo "none" > last_commit.txt
           fi
