@@ -112,8 +112,8 @@ jobs:
       run: |
         sed -i "s|return \".*\"|return \"${{steps.increment_tag.outputs.no_prefix}}\"|" includes/version.lua
         sed -i "s|https://img.shields.io/badge/Script%20Version-v[0-9]\+\.[0-9]\+\.[0-9]\+-blue|https://img.shields.io/badge/Script%20Version-${{steps.increment_tag.outputs.version_number}}-blue|g" README.md
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add includes/version.lua README.md
         git diff --cached --quiet || git commit -m "[noci] bump version"
         git push
@@ -121,7 +121,7 @@ jobs:
     - name: Create Archive
       uses: thedoctor0/zip-release@0.7.6
       with:
-        type: zip
+        type: 'zip'
         filename: "Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip"
         exclusions: /.git* /scripts* /docs* *.json *.md *.editorconfig *.py
 
@@ -132,6 +132,6 @@ jobs:
         tag_name: ${{steps.increment_tag.outputs.version_number}}
         body: |
           ### ${{steps.increment_tag.outputs.version_number}} Changelog
-          (changelog auto omitted for now)
+          ${{ env.changelog_body }}
         files: |
           Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip
