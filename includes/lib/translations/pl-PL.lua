@@ -477,5 +477,17 @@ return {
 	["WRLD_PUBLIC_ENEMY"] = "Wróg publiczny nr 1",
 	["GENERIC_IMPORTANT"] = "Ważny",
 	["SETTING_HOTKEY_FOUND"] = "Nowy klucz:",
-	["GUI_NEW_LAYOUT_NOTICE"] = "Interfejs użytkownika skryptu jest teraz niezależny od menu. Naciśnij %s, aby to przełączyć."
+	["GUI_NEW_LAYOUT_NOTICE"] = "Interfejs użytkownika skryptu jest teraz niezależny od menu. Naciśnij %s, aby to przełączyć.",
+	["YRV3_CWASH_LABEL"] = "Myjnia samochodowa",
+	["YRV3_CWASH_CASH_DIRTY"] = "Brudny:",
+	["YRV3_CWASH_NOT_OWNED"] = "Nie jesteś właścicielem myjni samochodowej.",
+	["YRV3_CWASH_CASH_CLEAN"] = "Czysty:",
+	["YRV3_CWASH_HEAT"] = "Poziom ciepła:",
+	["YRV3_HELITOURS_LABEL"] = "Higgins Helitours",
+	["SELF_MC_BIKE_ANIMS"] = "Włącz styl jazdy MC",
+	["YRV3_WEED_SHOP_LABEL"] = "Sklep z chwastami",
+	["YRV3_CWASH_WORK_EARNINGS"] = "Zarobki w pracy:",
+	["SELF_MC_BIKE_ANIMS_TT"] = "Przywraca alternatywne animacje jazdy na rowerze, które z jakiegoś powodu zostały wyłączone. Aby te animacje działały, musisz być zarejestrowany jako MC i mieć włączoną tę opcję.",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "Wyłącz czas odnowienia nielegalnej pracy",
+	["YRV3_CWASH_LEGAL_WORK_CD"] = "Wyłącz czas odnowienia legalnej pracy"
 }

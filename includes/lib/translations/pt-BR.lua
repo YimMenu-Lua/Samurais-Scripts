@@ -477,5 +477,17 @@ return {
 	["WRLD_PUBLIC_ENEMY_TT"] = "Todos os NPCs próximos irão se unir contra você e bater em você. Incluindo animais e policiais.",
 	["GENERIC_IMPORTANT"] = "Importante",
 	["GUI_NEW_LAYOUT_NOTICE"] = "A UI do script agora é independente do menu. Pressione %s para alternar.",
-	["SETTING_HOTKEY_FOUND"] = "Nova chave:"
+	["SETTING_HOTKEY_FOUND"] = "Nova chave:",
+	["YRV3_CWASH_LABEL"] = "Lavagem de carro",
+	["YRV3_HELITOURS_LABEL"] = "Higgins Helitours",
+	["YRV3_CWASH_CASH_CLEAN"] = "Limpar:",
+	["YRV3_CWASH_CASH_DIRTY"] = "Sujo:",
+	["YRV3_CWASH_NOT_OWNED"] = "Você não possui uma empresa de lavagem de carros.",
+	["YRV3_WEED_SHOP_LABEL"] = "Loja de ervas daninhas",
+	["YRV3_CWASH_WORK_EARNINGS"] = "Ganhos de trabalho:",
+	["YRV3_CWASH_HEAT"] = "Nível de calor:",
+	["YRV3_CWASH_LEGAL_WORK_CD"] = "Desativar tempo de espera para trabalho jurídico",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "Desativar tempo de espera para trabalho ilegal",
+	["SELF_MC_BIKE_ANIMS_TT"] = "Restaura as animações alternativas de andar de bicicleta que foram desativadas por algum motivo. Você deve estar registrado como MC e ter esta opção habilitada para que essas animações funcionem.",
+	["SELF_MC_BIKE_ANIMS"] = "Ativar estilo de pilotagem MC"
 }

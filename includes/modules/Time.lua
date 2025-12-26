@@ -97,6 +97,11 @@ function Time.elapsed_ms(since)
 	return Time.millis() - since
 end
 
+---@return integer
+function Time.epoch()
+	return os.time()
+end
+
 function Time.format_time_seconds(seconds)
 	local h = math.floor(seconds / 3600)
 	local m = math.floor((seconds % 3600) / 60)

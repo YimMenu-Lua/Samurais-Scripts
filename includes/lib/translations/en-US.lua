@@ -252,6 +252,16 @@ return {
 	["YRV3_MCT_UNAVAIL"]                   = "Master Control Terminal is unavailable at the moment.",
 	["YRV3_INCOME_APPROX_ALL"]             = "Approximate Income From All Businesses: ",
 	["YRV3_INCOME_APPROX_ALL_TT"]          = "Cycle through all tabs to update the total amount.",
+	["YRV3_CWASH_NOT_OWNED"]               = "You don't own a car wash business.",
+	["YRV3_CWASH_LABEL"]                   = "Car Wash",
+	["YRV3_CWASH_WORK_EARNINGS"]           = "Work Earnings:",
+	["YRV3_CWASH_CASH_CLEAN"]              = "Clean:",
+	["YRV3_CWASH_CASH_DIRTY"]              = "Dirty:",
+	["YRV3_WEED_SHOP_LABEL"]               = "Weed Shop",
+	["YRV3_HELITOURS_LABEL"]               = "Higgins Helitours",
+	["YRV3_CWASH_HEAT"]                    = "Heat Level:",
+	["YRV3_CWASH_LEGAL_WORK_CD"]           = "Disable Legal Work Cooldown",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"]         = "Disable Illegal Work Cooldown",
 	--#endregion
 
 	--#region Self
@@ -259,6 +269,9 @@ return {
 	["SELF_AUTOHEAL_TT"]                   = "Regenerates your health and armour.",
 	["SELF_PHONE_ANIMS"]                   = "Enable Phone Animations",
 	["SELF_PHONE_ANIMS_TT"]                = "Restores mobile phone animations in GTA Online.",
+	["SELF_MC_BIKE_ANIMS"]                 = "Enable MC Riding Style",
+	["SELF_MC_BIKE_ANIMS_TT"]              =
+	"Restores the alternate bike riding animations that were disabled for some reason. You must be registered as an MC and have this option enabled for these animations to work.",
 	["SELF_ACTION_MODE"]                   = "Disable Action Mode",
 	["SELF_ACTION_MODE_TT"]                = "Disables the player's janky movement during combat.",
 	["SELF_HEADPROPS"]                     = "Allow Head Props In Vehicles",

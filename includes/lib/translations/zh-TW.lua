@@ -477,5 +477,17 @@ return {
 	["WRLD_PUBLIC_ENEMY_TT"] = "附近的所有 NPC 都會聯合起來攻擊你並毆打你。包括動物和警察。",
 	["GENERIC_IMPORTANT"] = "重要的",
 	["GUI_NEW_LAYOUT_NOTICE"] = "該腳本的 UI 現在獨立於菜單。按 %s 進行切換。",
-	["SETTING_HOTKEY_FOUND"] = "新鑰匙："
+	["SETTING_HOTKEY_FOUND"] = "新鑰匙：",
+	["YRV3_CWASH_LABEL"] = "洗車",
+	["YRV3_CWASH_CASH_DIRTY"] = "骯髒的：",
+	["YRV3_CWASH_WORK_EARNINGS"] = "工作收入：",
+	["YRV3_CWASH_CASH_CLEAN"] = "乾淨的：",
+	["YRV3_CWASH_NOT_OWNED"] = "您沒有洗車業務。",
+	["YRV3_WEED_SHOP_LABEL"] = "雜草店",
+	["YRV3_CWASH_HEAT"] = "熱量等級：",
+	["YRV3_HELITOURS_LABEL"] = "希金斯直升機之旅",
+	["SELF_MC_BIKE_ANIMS"] = "啟用 MC 騎行風格",
+	["YRV3_CWASH_LEGAL_WORK_CD"] = "禁用法律工作冷卻",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "禁用非法工作冷卻",
+	["SELF_MC_BIKE_ANIMS_TT"] = "恢復由於某種原因禁用的備用自行車騎行動畫。您必須註冊為 MC 並啟用此選項才能使這些動畫正常工作。"
 }

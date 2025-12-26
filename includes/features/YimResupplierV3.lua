@@ -27,8 +27,23 @@ local SGSL = require("includes.structs.SGSL")
 ---@field cashValue fun(): integer
 ---@field max_cash integer
 ---@field blip integer
----@field popularity? fun(): integer
----@field maxPop? fun()
+---@field getSpecialVal? fun(): integer
+---@field setSpecialVal? fun()
+
+---@class MoneyFrontsStruct : BusinessSafeStruct
+---@field cashValue? fun(): integer
+---@field duffelTotal? fun(): integer
+---@field dirtyCash? fun(): integer
+---@field blip? integer
+---@field max_cash? integer
+---@field max_heat integer
+---@field gvar_key_1 string
+---@field gvar_key_2 string
+---@field cb1_clicked boolean
+---@field cb2_clicked boolean
+---@field on_cb1_click fun(this: YRV3, newVal: boolean)
+---@field on_cb2_click fun(this: YRV3, newVal: boolean)
+---@field coords vec3
 
 ---@type array<WarehouseStruct>
 local Wh_Default = {
@@ -94,10 +109,10 @@ local BS_Default = {
 		end,
 		max_cash = 25e4,
 		blip = 614,
-		popularity = function()
+		getSpecialVal = function()
 			return stats.get_int("MPX_CLUB_POPULARITY")
 		end,
-		maxPop = function()
+		setSpecialVal = function()
 			if stats.get_int("MPX_CLUB_POPULARITY") >= 1e3 then
 				return
 			end
@@ -164,15 +179,111 @@ local BS_Default = {
 		max_cash = 1e5,
 		blip = 900,
 	},
-	["Car Wash"] = {
+}
+
+---@type dict<MoneyFrontsStruct>
+local MF_Default = {
+	["YRV3_CWASH_LABEL"] = {
 		isOwned = function()
 			return stats.get_int("MPX_SB_CAR_WASH_OWNED") ~= 0
 		end,
 		cashValue = function()
 			return stats.get_int("MPX_CWASH_SAFE_CASH_VALUE")
 		end,
+		duffelTotal = function()
+			return stats.get_int("MPX_CAR_WASH_DUFFEL_VALUE")
+		end,
+		dirtyCash = function()
+			local posix = stats.get_int("MPX_CAR_WASH_DUFFEL_POSIX")
+			local pending_cash = stats.get_int("MPX_CAR_WASH_DUFFEL_PENDING") -- why is this always 35k even after it gets cleaned?
+			return Time.epoch() < posix and pending_cash or 0
+		end,
+		getSpecialVal = function()
+			return stats.get_packed_stat_int(24924)
+		end,
+		setSpecialVal = function()
+			if (stats.get_packed_stat_int(24924) == 0) then
+				return
+			end
+
+			stats.set_packed_stat_int(24924, 0)
+		end,
 		max_cash = 1e5,
+		max_heat = 100,
 		blip = 931,
+		gvar_key_1 = "features.yrv3.cwash_legal_work_cd",
+		gvar_key_2 = "features.yrv3.cwash_illegal_work_cd",
+		cb1_clicked = false,
+		cb2_clicked = false,
+		on_cb1_click = function(yrv3, newVal)
+			table.set_nested_key(GVars, "features.yrv3.cwash_legal_work_cd", newVal)
+			yrv3:SetCooldownStateDirty("cwash_legal_work_cd", true)
+		end,
+		on_cb2_click = function(yrv3, newVal)
+			table.set_nested_key(GVars, "features.yrv3.cwash_illegal_work_cd", newVal)
+			yrv3:SetCooldownStateDirty("cwash_illegal_work_cd", true)
+		end,
+		coords = vec3:new(25.645266, -1412.290649, 29.362230)
+	},
+	["YRV3_WEED_SHOP_LABEL"] = {
+		isOwned = function()
+			return stats.get_int("MPX_SB_WEED_SHOP_OWNED") ~= 0
+		end,
+		getSpecialVal = function()
+			return stats.get_packed_stat_int(24925)
+		end,
+		setSpecialVal = function()
+			if (stats.get_packed_stat_int(24925) == 0) then
+				return
+			end
+
+			stats.set_packed_stat_int(24925, 0)
+		end,
+		max_heat = 100,
+		gvar_key_1 = "features.yrv3.weedshop_legal_work_cd",
+		gvar_key_2 = "features.yrv3.weedshop_illegal_work_cd",
+		cb1_clicked = false,
+		cb2_clicked = false,
+		---@param yrv3 YRV3
+		on_cb1_click = function(yrv3, newVal)
+			table.set_nested_key(GVars, "features.yrv3.weedshop_legal_work_cd", newVal)
+			yrv3:SetCooldownStateDirty("weedshop_legal_work_cd", true)
+		end,
+		on_cb2_click = function(yrv3, newVal)
+			table.set_nested_key(GVars, "features.yrv3.weedshop_illegal_work_cd", newVal)
+			yrv3:SetCooldownStateDirty("weedshop_illegal_work_cd", true)
+		end,
+		coords = vec3:new(-1162.051147, -1564.757202, 4.410227)
+	},
+	["YRV3_HELITOURS_LABEL"] = {
+		isOwned = function()
+			return stats.get_int("MPX_SB_HELI_TOURS_OWNED") ~= 0
+		end,
+		getSpecialVal = function()
+			return stats.get_packed_stat_int(24926)
+		end,
+		setSpecialVal = function()
+			if (stats.get_packed_stat_int(24926) == 0) then
+				return
+			end
+
+			stats.set_packed_stat_int(24926, 0)
+		end,
+		max_heat = 100,
+		gvar_key_1 = "features.yrv3.helitours_legal_work_cd",
+		gvar_key_2 = "features.yrv3.helitours_illegal_work_cd",
+		cb1_clicked = false,
+		cb2_clicked = false,
+		---@param yrv3 YRV3
+		on_cb1_click = function(yrv3, newVal)
+			table.set_nested_key(GVars, "features.yrv3.helitours_legal_work_cd", newVal)
+			yrv3:SetCooldownStateDirty("helitours_legal_work_cd", true)
+		end,
+		on_cb2_click = function(yrv3, newVal)
+			table.set_nested_key(GVars, "features.yrv3.helitours_illegal_work_cd", newVal)
+			yrv3:SetCooldownStateDirty("helitours_illegal_work_cd", true)
+		end,
+		coords = vec3:new(-753.524841, -1511.244751, 5.015130)
 	},
 }
 
@@ -199,10 +310,12 @@ local eShouldTerminateScripts <const> = {
 ---@field m_ceo_value_sum number
 ---@field m_biker_value_sum number
 ---@field m_safe_cash_sum number
+---@field m_cwash_cash_sum number
 ---@field m_bhub_script_handle number
 ---@field m_warehouse_data array<WarehouseStruct>
 ---@field m_biker_data array<BikerBusinessStruct>
 ---@field m_safe_cash_data dict<BusinessSafeStruct>
+---@field m_money_fronts_data dict<MoneyFrontsStruct>
 ---@field m_hangar_loop boolean
 ---@field m_has_triggered_autosell boolean
 ---@field m_sell_script_running boolean
@@ -222,6 +335,7 @@ function YRV3:init()
 		m_ceo_value_sum = 0,
 		m_biker_value_sum = 0,
 		m_safe_cash_sum = 0,
+		m_cwash_cash_sum = 0,
 		m_bhub_script_handle = 0,
 		m_last_as_check_time = 0,
 		m_hangar_loop = false,
@@ -232,6 +346,7 @@ function YRV3:init()
 		m_warehouse_data = Wh_Default,
 		m_biker_data = BB_Default,
 		m_safe_cash_data = BS_Default,
+		m_money_fronts_data = MF_Default,
 		m_display_names = StructScriptDisplayNames,
 		m_cooldown_state_dirty = true,
 	}, self)
@@ -855,9 +970,11 @@ function YRV3:Reset()
 	self.m_ceo_value_sum        = 0
 	self.m_biker_value_sum      = 0
 	self.m_safe_cash_sum        = 0
+	self.m_cwash_cash_sum       = 0
 	self.m_warehouse_data       = Wh_Default
 	self.m_biker_data           = BB_Default
 	self.m_safe_cash_data       = BS_Default
+	self.m_money_fronts_data    = MF_Default
 	self.m_cooldown_state_dirty = true
 end
 
@@ -1019,6 +1136,72 @@ YRV3.t_CooldownData = {
 		onEnable = function()
 			if (stats.get_int("SALV23_CFR_COOLDOWN") > 0) then
 				stats.set_int("SALV23_CFR_COOLDOWN", 0)
+			end
+		end
+	},
+	["cwash_legal_work_cd"] = {
+		dirty = false,
+		gstate = function()
+			return GVars.features.yrv3.cwash_legal_work_cd
+		end,
+		onEnable = function()
+			if (stats.get_int("T25_CW_LEG_CD") > 0) then
+				stats.set_int("T25_CW_LEG_CD", 0)
+			end
+		end
+	},
+	["cwash_illegal_work_cd"] = {
+		dirty = false,
+		gstate = function()
+			return GVars.features.yrv3.cwash_illegal_work_cd
+		end,
+		onEnable = function()
+			if (stats.get_int("T25_CW_ILEG_CD") > 0) then
+				stats.set_int("T25_CW_ILEG_CD", 0)
+			end
+		end
+	},
+	["weedshop_legal_work_cd"] = {
+		dirty = false,
+		gstate = function()
+			return GVars.features.yrv3.weedshop_legal_work_cd
+		end,
+		onEnable = function()
+			if (stats.get_int("T25_WS_LEG_CD") > 0) then
+				stats.set_int("T25_WS_LEG_CD", 0)
+			end
+		end
+	},
+	["weedshop_illegal_work_cd"] = {
+		dirty = false,
+		gstate = function()
+			return GVars.features.yrv3.weedshop_illegal_work_cd
+		end,
+		onEnable = function()
+			if (stats.get_int("T25_WS_ILEG_CD") > 0) then
+				stats.set_int("T25_WS_ILEG_CD", 0)
+			end
+		end
+	},
+	["helitours_legal_work_cd"] = {
+		dirty = false,
+		gstate = function()
+			return GVars.features.yrv3.helitours_legal_work_cd
+		end,
+		onEnable = function()
+			if (stats.get_int("T25_WS_LEG_CD") > 0) then
+				stats.set_int("T25_WS_LEG_CD", 0)
+			end
+		end
+	},
+	["helitours_illegal_work_cd"] = {
+		dirty = false,
+		gstate = function()
+			return GVars.features.yrv3.helitours_illegal_work_cd
+		end,
+		onEnable = function()
+			if (stats.get_int("T25_HT_ILEG_CD") > 0) then
+				stats.set_int("T25_HT_ILEG_CD", 0)
 			end
 		end
 	},

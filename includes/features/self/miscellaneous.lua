@@ -47,6 +47,7 @@ end
 function SelfMisc:Cleanup()
 	self:ResetMpPhoneAnims()
 	self:Uncrouch()
+	self:HandsDown()
 end
 
 ---@param flag_id ePedConfigFlags
@@ -130,6 +131,10 @@ function SelfMisc:UpdateCrouchAnim()
 			self:Crouch()
 		end
 	end
+
+	if (self.m_is_crouching and not (Self:IsOnFoot() and Self:IsAlive())) then
+		self:Uncrouch()
+	end
 end
 
 function SelfMisc:HandsDown()
@@ -172,6 +177,10 @@ function SelfMisc:UpdateHandsUpAnim()
 
 		if (Self:CanPutHandsUp() and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29)) then
 			self:HandsUp()
+		end
+
+		if (self.m_is_playing_hands_up_anim and not (Self:IsOnFoot() and Self:IsAlive())) then
+			self.m_is_playing_hands_up_anim = false
 		end
 	end
 end
@@ -217,8 +226,8 @@ function SelfMisc:ResetMpPhoneAnims()
 		return
 	end
 
-	local playerHandle = Self:GetHandle()
 	Self:ToggleMpPhoneAnims(false)
+	local playerHandle = Self:GetHandle()
 	if (TASK.IS_PLAYING_PHONE_GESTURE_ANIM(playerHandle)) then
 		TASK.TASK_STOP_PHONE_GESTURE_ANIMATION(playerHandle, 0.25)
 	end
@@ -246,6 +255,7 @@ function SelfMisc:UpdateMpPhoneAnims()
 end
 
 function SelfMisc:UpdateFlagBasedFeatures()
+	-- TODO: refactor these into periodic checks since the game likes to reset them whenever
 	self:TogglePedConfigFlag(
 		Enums.ePedConfigFlags.DontAllowToBeDraggedOutOfVehicle,
 		GVars.features.self.no_carjacking
@@ -271,6 +281,11 @@ function SelfMisc:UpdateFlagBasedFeatures()
 		GVars.features.self.sprint_inside_interiors
 	)
 
+	self:TogglePedConfigFlag(
+		Enums.ePedConfigFlags.AllowBikeAlternateAnimations,
+		GVars.features.self.mc_alt_bike_anims
+	)
+
 	if (GVars.features.self.sprint_inside_interiors and not Self:IsOutside()) then
 		Self:SetPedResetFlag(Enums.ePedResetFlags.DisablePlayerJumping, false)
 		Self:SetPedResetFlag(Enums.ePedResetFlags.DisablePlayerVaulting, false)
@@ -290,8 +305,6 @@ function SelfMisc:UpdateFlagBasedFeatures()
 	if (GVars.features.self.stand_on_veh_roof) then
 		Self:SetPedResetFlag(Enums.ePedResetFlags.BlockRagdollFromVehicleFallOff, true)
 	end
-
-	-- Self:SetPedResetFlag(Enums.ePedResetFlags.DisablePlayerCombatRoll, true)
 end
 
 function SelfMisc:Update()

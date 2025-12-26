@@ -136,8 +136,8 @@ def scan_entry(entry: dict, file_content: str, file_name: str):
 	return None
 
 
-def serialize_lua(v, indent=0):
-	sp = " " * indent
+def serialize_lua(v, indent=1):
+	sp = "\t" * indent
 	if isinstance(v, dict):
 		if not v:
 			return "{}"
@@ -146,10 +146,10 @@ def serialize_lua(v, indent=0):
 		for k, vv in v.items():
 			if k == "pattern":
 				vv = f"[[{vv}]]"
-				parts.append(f"{sp}\t{k} = {vv}")
+				parts.append(f"{sp}{k} = {vv}")
 			else:
-				parts.append(f"{sp}\t{k} = {serialize_lua(vv, indent+4)}")
-		return "{\n" + ",\n".join(parts) + f"\n{sp}}}"
+				parts.append(f"{sp}{k} = {serialize_lua(vv, indent+1)}")
+		return "{\n" + ",\n".join(parts) + f"\n{"\t" * (indent - 1)}}}"
 
 	if isinstance(v, list):
 		if not v:
@@ -157,8 +157,8 @@ def serialize_lua(v, indent=0):
 
 		parts = []
 		for _, vv in enumerate(v):
-			parts.append(f"{sp}\t{serialize_lua(vv, indent+4)}")
-		return "{\n" + ",\n".join(parts) + f"\n{sp}}}"
+			parts.append(f"{sp}{serialize_lua(vv, indent+1)}")
+		return "{\n" + ",\n".join(parts) + f"\n{"\t" * (indent - 1)}}}"
 
 	if isinstance(v, bool):
 		return "true" if v else "false"

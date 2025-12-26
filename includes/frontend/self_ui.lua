@@ -35,6 +35,15 @@ self_tab:AddBoolCommand("SELF_PHONE_ANIMS",
 	true
 )
 
+self_tab:AddBoolCommand("SELF_MC_BIKE_ANIMS",
+	"features.self.mc_alt_bike_anims",
+	nil,
+	nil,
+	{ description = "SELF_MC_BIKE_ANIMS_TT" },
+	true,
+	true
+)
+
 self_tab:AddBoolCommand("SELF_ACTION_MODE",
 	"features.self.disable_action_mode",
 	nil,

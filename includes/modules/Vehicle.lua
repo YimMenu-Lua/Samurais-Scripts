@@ -140,7 +140,7 @@ end
 ---@return eLandingGearState
 function Vehicle:GetLandingGearState()
 	if not (self:IsAircraft() and self:HasLandingGear()) then
-		return 0
+		return Enums.eLandingGearState.RETRACTED
 	end
 
 	return VEHICLE.GET_LANDING_GEAR_STATE(self:GetHandle())
@@ -435,6 +435,7 @@ function Vehicle:IsSportsOrSuper()
 	)
 end
 
+-- ## TODO: fix this
 ---@return boolean
 function Vehicle:IsPerformanceCar()
 	if (not self:IsCar()) then

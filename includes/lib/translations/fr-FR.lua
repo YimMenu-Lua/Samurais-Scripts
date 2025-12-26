@@ -477,5 +477,17 @@ return {
 	["WRLD_PUBLIC_ENEMY_TT"] = "Tous les PNJ à proximité se ligueront contre vous et vous botteront le cul. Y compris les animaux et les flics.",
 	["GENERIC_IMPORTANT"] = "Important",
 	["SETTING_HOTKEY_FOUND"] = "Nouvelle clé :",
-	["GUI_NEW_LAYOUT_NOTICE"] = "L'interface utilisateur du script est désormais indépendante du menu. Appuyez sur %s pour l'activer."
+	["GUI_NEW_LAYOUT_NOTICE"] = "L'interface utilisateur du script est désormais indépendante du menu. Appuyez sur %s pour l'activer.",
+	["YRV3_CWASH_CASH_CLEAN"] = "Faire le ménage:",
+	["YRV3_CWASH_CASH_DIRTY"] = "Sale:",
+	["SELF_MC_BIKE_ANIMS"] = "Activer le style de conduite MC",
+	["YRV3_CWASH_LABEL"] = "Lavage de voiture",
+	["YRV3_CWASH_WORK_EARNINGS"] = "Gains de travail :",
+	["YRV3_CWASH_NOT_OWNED"] = "Vous ne possédez pas d'entreprise de lavage de voitures.",
+	["YRV3_CWASH_LEGAL_WORK_CD"] = "Désactiver le temps de recharge du travail légal",
+	["YRV3_CWASH_HEAT"] = "Niveau de chaleur :",
+	["YRV3_HELITOURS_LABEL"] = "Higgins Hélitours",
+	["YRV3_WEED_SHOP_LABEL"] = "Magasin de mauvaises herbes",
+	["SELF_MC_BIKE_ANIMS_TT"] = "Restaure les animations alternatives de conduite de vélo qui ont été désactivées pour une raison quelconque. Vous devez être enregistré en tant que MC et activer cette option pour que ces animations fonctionnent.",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "Désactiver le temps de recharge du travail illégal"
 }

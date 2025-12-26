@@ -477,5 +477,17 @@ return {
 	["WRLD_PUBLIC_ENEMY_TT"] = "Todos los NPC cercanos se unirán contra ti y te golpearán el trasero. Incluyendo animales y policías.",
 	["GENERIC_IMPORTANT"] = "Importante",
 	["GUI_NEW_LAYOUT_NOTICE"] = "La interfaz de usuario del script ahora es independiente del menú. Presione %s para alternarlo.",
-	["SETTING_HOTKEY_FOUND"] = "Nueva clave:"
+	["SETTING_HOTKEY_FOUND"] = "Nueva clave:",
+	["YRV3_CWASH_CASH_CLEAN"] = "Limpio:",
+	["YRV3_CWASH_LABEL"] = "Lavado de autos",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "Deshabilitar el tiempo de reutilización de trabajo ilegal",
+	["YRV3_CWASH_LEGAL_WORK_CD"] = "Deshabilitar el tiempo de reutilización de trabajo legal",
+	["YRV3_CWASH_NOT_OWNED"] = "No eres dueño de un negocio de lavado de autos.",
+	["YRV3_CWASH_CASH_DIRTY"] = "Sucio:",
+	["SELF_MC_BIKE_ANIMS"] = "Habilitar estilo de conducción MC",
+	["SELF_MC_BIKE_ANIMS_TT"] = "Restaura las animaciones alternativas de andar en bicicleta que se desactivaron por algún motivo. Debes estar registrado como MC y tener esta opción habilitada para que estas animaciones funcionen.",
+	["YRV3_CWASH_WORK_EARNINGS"] = "Ganancias laborales:",
+	["YRV3_WEED_SHOP_LABEL"] = "Tienda de marihuana",
+	["YRV3_HELITOURS_LABEL"] = "Helitours Higgins",
+	["YRV3_CWASH_HEAT"] = "Nivel de calor:"
 }

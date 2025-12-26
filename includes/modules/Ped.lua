@@ -339,20 +339,20 @@ end
 -- function Ped:GetNearbyPeds()
 -- 	local out    = {}
 -- 	local size   = 0x8
--- 	local buffer = memory.allocate(0x4 * (size + 1))
+-- 	local buffer = memory.allocate(size * 0x4)
 
 -- 	buffer:set_int(size)
--- 	local count = PED.GET_PED_NEARBY_PEDS( -- stupid ass native
+-- 	local count = PED.GET_PED_NEARBY_PEDS( -- stupid ass native (skill issue, I know)
 -- 		self:GetHandle(),
 -- 		---@diagnostic disable-next-line
 -- 		buffer,
 -- 		-1
 -- 	)
 
--- 	print(count)
+-- 	Backend:debug(count)
 -- 	if buffer:is_valid() then
--- 		print(buffer:add(0):get_int())
--- 		print(buffer:add(1):get_int())
+-- 		Backend:debug(buffer:add(0):get_int())
+-- 		Backend:debug(buffer:add(1):get_int())
 -- 		for i = 1, count do
 -- 			local ped = buffer:add(i * 4):get_int()
 -- 			if (ped ~= 0) then

@@ -46,6 +46,10 @@ function IVStyleExit:LeaveVehicle(keepEngineOn)
 	local rightPressed = PAD.IS_CONTROL_PRESSED(0, 35)
 	local enabled = GVars.features.vehicle.no_wheel_recenter and self.m_entity:IsCar() and (leftPressed or rightPressed)
 	Self:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, keepEngineOn)
+
+	if (enabled and not keepEngineOn) then
+		VEHICLE.SET_VEHICLE_ENGINE_ON(self.m_entity:GetHandle(), false, true, false)
+	end
 	TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), vehHandle, enabled and 16 or 0) -- 16=tp outside. goofy because I don't feel like patching memory 🤷‍♂️
 	self:Cleanup()
 end
@@ -73,11 +77,11 @@ function IVStyleExit:Update()
 	if (self.m_triggered) then
 		if (PAD.IS_DISABLED_CONTROL_RELEASED(0, 75) and not self.m_timer:is_done()) then
 			self:LeaveVehicle(true)
-			return
 		elseif (PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) and self.m_timer:is_done()) then
 			self:LeaveVehicle(false)
-			return
 		end
+
+		return
 	end
 
 	if (self.m_triggered and not Self:IsDriving()) then

@@ -476,6 +476,49 @@ local function DrawDummyVehSpawnMenu()
 	end
 end
 
+local selectedPatchTable
+local selectedPatchName = ""
+local function DrawPatches()
+	local patch_list <const> = Memory:ListPatches()
+	local thread_count = table.getlen(patch_list)
+	local child_width = selectedPatchTable and ImGui.GetContentRegionAvail() * 0.4 or 0
+
+	if (thread_count == 0) then
+		ImGui.Text("No registered memory patches.")
+		return
+	end
+
+	ImGui.BeginChild("##patchlist", child_width, 0)
+	ImGui.SetNextWindowBgAlpha(0)
+	if ImGui.BeginListBox("##patches", -1, 0) then
+		for owner, patchTable in pairs(patch_list) do
+			local count = table.getlen(patchTable)
+			local label = _F("%s [%d]",
+				(owner.__type or owner.__name or owner.m_name or tostring(patchTable)),
+				count
+			)
+			if (ImGui.Selectable(label, selectedPatchTable == patchTable)) then
+				selectedPatchTable = patchTable
+			end
+		end
+		ImGui.EndListBox()
+	end
+	ImGui.EndChild()
+	if (not selectedPatchTable) then
+		return
+	end
+
+	ImGui.SameLine()
+	ImGui.BeginChild("##patchesbyowner", 0, 0, true)
+	for name, patch in pairs(selectedPatchTable) do
+		local label = _F("%s (%s)", name, patch:IsEnabled() and "Applied" or "Not applied")
+		if (ImGui.Selectable(label, selectedPatchName == name)) then
+			selectedPatchName = name
+		end
+	end
+	ImGui.EndChild()
+end
+
 local function DrawMiscTests()
 	ImGui.SeparatorText("Vehicle Flag Dump")
 
@@ -529,55 +572,6 @@ local function DrawMiscTests()
 			print(PV:GetHandlingData())
 		end)
 	end
-
-	if (ImGui.Button("Reset Handling Flag")) then
-		local veh = self.get_veh()
-		if (veh) == 0 then return end
-		Vehicle(veh):SetHandlingFlag(Enums.eVehicleHandlingFlags.FREEWHEEL_NO_GAS, false)
-	end
-end
-
-local selectedPatchTable
-local selectedPatchName = ""
-local function DrawPatches()
-	local patch_list <const> = Memory:ListPatches()
-	local thread_count = table.getlen(patch_list)
-	local child_width = selectedPatchTable and ImGui.GetContentRegionAvail() * 0.4 or 0
-
-	if (thread_count == 0) then
-		ImGui.Text("No registered memory patches.")
-		return
-	end
-
-	ImGui.BeginChild("##patchlist", child_width, 0)
-	ImGui.SetNextWindowBgAlpha(0)
-	if ImGui.BeginListBox("##patches", -1, 0) then
-		for owner, patchTable in pairs(patch_list) do
-			local count = table.getlen(patchTable)
-			local label = _F("%s [%d]",
-				(owner.__type or owner.__name or owner.m_name or tostring(patchTable)),
-				count
-			)
-			if (ImGui.Selectable(label, selectedPatchTable == patchTable)) then
-				selectedPatchTable = patchTable
-			end
-		end
-		ImGui.EndListBox()
-	end
-	ImGui.EndChild()
-	if (not selectedPatchTable) then
-		return
-	end
-
-	ImGui.SameLine()
-	ImGui.BeginChild("##patchesbyowner", 0, 0, true)
-	for name, patch in pairs(selectedPatchTable) do
-		local label = _F("%s (%s)", name, patch:IsEnabled() and "Applied" or "Not applied")
-		if (ImGui.Selectable(label, selectedPatchName == name)) then
-			selectedPatchName = name
-		end
-	end
-	ImGui.EndChild()
 end
 
 return function()
