@@ -1,25 +1,78 @@
-name: Zip Release
-on: 
+name: CI
+
+on:
   push:
     branches:
       - main
     paths:
-      - '**.lua'
+      - "**/*.lua"
+      - "scripts/translations/**"
     paths-ignore:
-      - 'includes/version.lua'
-    tags:
-      - '*'
+      - "includes/version.lua"
   workflow_dispatch:
 
 concurrency:
   group: ss_ci-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  main:
+  orchestrator:
+    name: CI Main
     runs-on: ubuntu-latest
     if: "! contains(github.event.head_commit.message, '[noci]')"
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Check Translations
+      id: check_translations
+      run: |
+        if git diff --name-only HEAD^ HEAD | grep -E 'scripts/translations/|hashmap.json|includes/lib/translations/__locales.lua|includes/lib/translations/en-US.lua'; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Setup Python
+      if: steps.check_translations.outputs.changed == 'true'
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12.x"
+
+    - name: Generate Translations
+      if: steps.check_translations.outputs.changed == 'true'
+      run: |
+        cd ./scripts/translations
+        python generate_translations.py
+
+    - name: Add Translations
+      id: commit_translations
+      if: steps.check_translations.outputs.changed == 'true'
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add includes/lib/translations/
+        git add scripts/translations/hashmap.json || true
+
+    - name: Check Changes
+      id: check_changes
+      run: |
+        if git diff --name-only HEAD^ HEAD | grep '\.lua$' > /dev/null; then
+          echo "should_release=true" >> $GITHUB_OUTPUT
+        else
+          echo "should_release=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Skip If No Change
+      if: steps.check_changes.outputs.should_release == 'false'
+      run: |
+        echo "Nothing to release."
+        exit 0
 
     - name: Increment Tag
       id: increment_tag
@@ -28,73 +81,39 @@ jobs:
         script: |
           const owner = context.repo.owner;
           const repo  = context.repo.repo;
-          const tags  = await github.rest.repos.listTags(
-            {
-              owner: owner,
-              repo: repo,
-            }
-          );
+          const tags  = await github.rest.repos.listTags({ owner, repo });
 
           let no_prefix;
           let new_tag;
           let old_tag;
 
           if (tags.data.length === 0) {
-            console.log('No existing tags found. Starting with version 1.0.0');
             new_tag = 'v1.0.0';
             no_prefix = '1.0.0';
+          } else {
+            const latest = tags.data[0].name.substring(1).split('.').map(Number);
+            if (latest[1] === 9 && latest[2] === 9) {
+              latest[0] += 1; latest[1] = 0; latest[2] = 0;
+            } else if (latest[2] === 9) {
+              latest[1] += 1; latest[2] = 0;
+            } else {
+              latest[2] += 1;
+            }
+            no_prefix = latest.join('.');
+            new_tag   = `v${latest.join('.')}`;
+            old_tag   = tags.data[0].name;
           }
-          else {
-            const latest_tag = tags.data[0].name;
-            const tag_part   = latest_tag.substring(1).split('.').map(Number);
-            if (tag_part[1] === 9 && tag_part[2] === 9) {
-              tag_part[0] += 1;
-              tag_part[1] = 0;
-              tag_part[2] = 0;
-            } 
-            else if (tag_part[2] === 9) {
-              tag_part[1] += 1;
-              tag_part[2] = 0;
-            }
-            else {
-              tag_part[2] += 1;
-            }
 
-            no_prefix = `${tag_part.join('.')}`;
-            new_tag = `v${tag_part.join('.')}`;
-            old_tag = latest_tag;
-          }
           core.setOutput("version_number", new_tag);
           core.setOutput("no_prefix", no_prefix);
           core.setOutput("old_tag", old_tag);
-
-    - name: Write Changelog
-      id: write_changelog
-      run: |
-          commitMessage=$(git log -1 --pretty=format:"%s")
-          commitBody=$(git log -1 --pretty=format:"%b")
-          echo "Commit Message: $commitMessage"
-          echo "Commit Body: $commitBody"
-          {
-            echo "changelog_body<<EOF"
-            echo "$commitMessage"
-            echo ""
-            echo "$commitBody"
-            echo "EOF"
-          } >> "$GITHUB_ENV"
-      shell: bash
-
-    - name: Checkout Repo
-      uses: actions/checkout@master
-      with:
-        fetch-depth: 0
 
     - name: Bump Version
       run: |
         sed -i "s|return \".*\"|return \"${{steps.increment_tag.outputs.no_prefix}}\"|" includes/version.lua
         sed -i "s|https://img.shields.io/badge/Script%20Version-v[0-9]\+\.[0-9]\+\.[0-9]\+-blue|https://img.shields.io/badge/Script%20Version-${{steps.increment_tag.outputs.version_number}}-blue|g" README.md
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
         git add includes/version.lua README.md
         git diff --cached --quiet || git commit -m "[noci] bump version"
         git push
@@ -102,7 +121,7 @@ jobs:
     - name: Create Archive
       uses: thedoctor0/zip-release@0.7.6
       with:
-        type: 'zip'
+        type: zip
         filename: "Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip"
         exclusions: /.git* /scripts* /docs* *.json *.md *.editorconfig *.py
 
@@ -112,7 +131,7 @@ jobs:
         name: Samurai's Scripts ${{steps.increment_tag.outputs.version_number}}
         tag_name: ${{steps.increment_tag.outputs.version_number}}
         body: |
-            ### ${{steps.increment_tag.outputs.version_number}} Changelog
-            ${{ env.changelog_body }}
+          ### ${{steps.increment_tag.outputs.version_number}} Changelog
+          (changelog auto omitted for now)
         files: |
           Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip
