@@ -26,11 +26,7 @@ local HandlingEditor   = require("includes.structs.HandlingEditor")
 -----------------------------------------
 -- PlayerVehicle Module
 -----------------------------------------
--- Singleton controller for the player’s vehicle that manages features, state machines, threads, and ensures
---
--- all temporary modifications (handling flags, memory writes, toggles, visuals, audio, etc.) are safely restored
---
--- when the vehicle changes or resets.
+-- Singleton controller for our current vehicle.
 ---@class PlayerVehicle : Vehicle
 ---@field private m_handle handle
 ---@field private m_last_model hash

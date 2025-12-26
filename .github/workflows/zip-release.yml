@@ -87,7 +87,7 @@ jobs:
       with:
         type: 'zip'
         filename: "Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip"
-        exclusions: /.git* /scripts* *.json *.md *.editorconfig *.py
+        exclusions: /.git* /scripts* /docs* *.json *.md *.editorconfig *.py
 
     - name: Upload Release
       uses: softprops/action-gh-release@v2

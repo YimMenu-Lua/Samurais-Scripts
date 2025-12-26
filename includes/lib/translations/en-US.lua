@@ -252,6 +252,16 @@ return {
 	["YRV3_MCT_UNAVAIL"]                   = "Master Control Terminal is unavailable at the moment.",
 	["YRV3_INCOME_APPROX_ALL"]             = "Approximate Income From All Businesses: ",
 	["YRV3_INCOME_APPROX_ALL_TT"]          = "Cycle through all tabs to update the total amount.",
+	["YRV3_CWASH_NOT_OWNED"]               = "You don't own a car wash business.",
+	["YRV3_CWASH_LABEL"]                   = "Car Wash",
+	["YRV3_CWASH_WORK_EARNINGS"]           = "Work Earnings:",
+	["YRV3_CWASH_CASH_CLEAN"]              = "Clean:",
+	["YRV3_CWASH_CASH_DIRTY"]              = "Dirty:",
+	["YRV3_WEED_SHOP_LABEL"]               = "Weed Shop",
+	["YRV3_HELITOURS_LABEL"]               = "Higgins Helitours",
+	["YRV3_CWASH_HEAT"]                    = "Heat Level:",
+	["YRV3_CWASH_LEGAL_WORK_CD"]           = "Disable Legal Work Cooldown",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"]         = "Disable Illegal Work Cooldown",
 	--#endregion
 
 	--#region Self

@@ -21,6 +21,7 @@ local tabNames <const>         = {
 	"Acid Lab",
 	"Biker Business",
 	"Safes",
+	"Money Fronts",
 	"Misc",
 	"Settings"
 }
@@ -33,6 +34,7 @@ local function CalcTotalBusinessIncome()
 		YRV3.m_biker_value_sum,
 		YRV3.m_ceo_value_sum,
 		YRV3.m_safe_cash_sum,
+		YRV3.m_cwash_cash_sum,
 		hangarTotalValue,
 		bunkerTotalValue,
 		acidLabTotalValue
@@ -494,8 +496,8 @@ local function drawBusinessSafes()
 
 			ImGui.SeparatorText(name)
 
-			if (type(data.popularity) == "function") then
-				local popValue = data.popularity()
+			if (type(data.getSpecialVal) == "function") then
+				local popValue = data.getSpecialVal()
 				ImGui.BulletText(_F("%s: ", _T("YRV3_POPULARITY")))
 				ImGui.SameLine()
 				ImGui.Dummy(18, 1)
@@ -506,7 +508,7 @@ local function drawBusinessSafes()
 					ImGui.SameLine()
 
 					if GUI:Button(_F("%s %s##", _T("GENERIC_MAX"), _T("YRV3_POPULARITY"), name)) then
-						data.maxPop()
+						data.setSpecialVal()
 						Toast:ShowSuccess("Samurai's Scripts", _T("YRV3_POPULARITY_NOTIF"))
 					end
 				end
@@ -532,6 +534,96 @@ local function drawBusinessSafes()
 	ImGui.Separator()
 	ImGui.Spacing()
 	ImGui.BulletText(_F("%s: %s", _T("YRV3_SAFECASH_TOTAL"), string.formatmoney(YRV3.m_safe_cash_sum)))
+end
+
+local money_fronts_order <const> = {
+	"YRV3_CWASH_LABEL",
+	"YRV3_WEED_SHOP_LABEL",
+	"YRV3_HELITOURS_LABEL",
+}
+
+local function drawMoneyFronts()
+	if (not YRV3.m_money_fronts_data["YRV3_CWASH_LABEL"].isOwned()) then
+		ImGui.Text(_T("YRV3_CWASH_NOT_OWNED"))
+		return
+	end
+
+	YRV3.m_cwash_cash_sum = 0
+	for i = 1, #money_fronts_order do
+		local label = money_fronts_order[i]
+		local data = YRV3.m_money_fronts_data[label]
+
+		if (not data.isOwned()) then
+			goto continue
+		end
+
+		local region_width, _ = ImGui.GetContentRegionAvail()
+		ImGui.PushID(label)
+		ImGui.SeparatorText(_T(label))
+		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
+			Self:Teleport(data.coords, false)
+		end
+
+		if (data.cashValue) then
+			local cw_dirty_cash = data.dirtyCash()
+			local cw_clean_cash = data.duffelTotal() - cw_dirty_cash
+			local cw_safe_cash = data.cashValue()
+			local dirty_cash_text = string.formatmoney(cw_dirty_cash)
+			local clean_cash_text = string.formatmoney(cw_clean_cash)
+			local cw_cash_text = _F("%s %s | %s %s",
+				_T("YRV3_CWASH_CASH_DIRTY"),
+				dirty_cash_text,
+				_T("YRV3_CWASH_CASH_CLEAN"),
+				clean_cash_text
+			)
+			local duffel_cash_text_width = ImGui.CalcTextSize(cw_cash_text)
+			ImGui.BulletText(_T("YRV3_CWASH_WORK_EARNINGS"))
+			ImGui.SameLine()
+			ImGui.SetCursorPosX(region_width - duffel_cash_text_width)
+			ImGui.Text(cw_cash_text)
+			ImGui.Spacing()
+			ImGui.BulletText(_T("GENERIC_SAFE"))
+			ImGui.SameLine()
+			ImGui.SetCursorPosX(region_width - 240)
+			ImGui.ProgressBar(cw_safe_cash / (data.max_cash or 1), 240, 32, string.formatmoney(cw_safe_cash))
+			YRV3.m_cwash_cash_sum = YRV3.m_cwash_cash_sum + cw_clean_cash + cw_safe_cash
+		end
+
+		local heat = data.getSpecialVal()
+		local heatcol = math.max(0, heat / 100)
+		local clearButtonLabel = _T("GENERIC_CLEAR")
+		local clearButtonWidth, _ = ImGui.CalcTextSize(clearButtonLabel)
+		local style = ImGui.GetStyle()
+		ImGui.BulletText(_T("YRV3_CWASH_HEAT"))
+		ImGui.SameLine()
+		ImGui.SetCursorPosX(region_width - clearButtonWidth - 240 - (style.ItemSpacing.x * 2))
+		ImGui.BeginDisabled(heat == 0)
+		if (GUI:Button(_T("GENERIC_CLEAR"))) then
+			data.setSpecialVal()
+		end
+		ImGui.EndDisabled()
+		ImGui.SameLine()
+		ImGui.PushStyleColor(ImGuiCol.PlotHistogram, heatcol, 1 - heatcol, 0, 1)
+		ImGui.ProgressBar(heat / (data.max_heat or 100), 240, 32, _F("%d%%", heat))
+		ImGui.PopStyleColor()
+
+		local cb1_val = table.get_nested_key(GVars, data.gvar_key_1)
+		cb1_val, data.cb1_clicked = GUI:Checkbox(_T("YRV3_CWASH_LEGAL_WORK_CD"), cb1_val)
+		if (data.cb1_clicked) then
+			data.on_cb1_click(YRV3, cb1_val)
+		end
+
+		local cb2_val = table.get_nested_key(GVars, data.gvar_key_2)
+		cb2_val, data.cb2_clicked = GUI:Checkbox(_T("YRV3_CWASH_ILLEGAL_WORK_CD"), cb2_val)
+		if (data.cb2_clicked) then
+			data.on_cb2_click(YRV3, cb2_val)
+		end
+
+		ImGui.PopID()
+		ImGui.Spacing()
+
+		::continue::
+	end
 end
 
 local cooldownsGrid = GridRenderer.new(1)
@@ -750,8 +842,9 @@ local tabCallbacks <const> = {
 	[tabNames[4]] = drawAcidLab,
 	[tabNames[5]] = drawBikerBusiness,
 	[tabNames[6]] = drawBusinessSafes,
-	[tabNames[7]] = drawMisc,
-	[tabNames[8]] = drawSettings,
+	[tabNames[7]] = drawMoneyFronts,
+	[tabNames[8]] = drawMisc,
+	[tabNames[9]] = drawSettings,
 }
 
 local function YRV3UI()

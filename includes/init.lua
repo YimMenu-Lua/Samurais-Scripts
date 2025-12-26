@@ -67,7 +67,7 @@ CommandExecutor     = require("includes.services.CommandExecutor").new()
 BillionaireServices = require("includes.features.BillionaireServicesV2"):init()
 EntityForge         = require("includes.features.EntityForge"):init()
 YimActions          = require("includes.features.YimActionsV3"):init()
-YRV3                = require("includes.features.YRV3"):init()
+YRV3                = require("includes.features.YimResupplierV3"):init()
 ----------------------------------------------------------------------------------------------------
 
 local base_path     = "includes"
