@@ -7,8 +7,6 @@ on:
     paths:
       - "**/*.lua"
       - "scripts/translations/**"
-    paths-ignore:
-      - "includes/version.lua"
   workflow_dispatch:
 
 concurrency:
