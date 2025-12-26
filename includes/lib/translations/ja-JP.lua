@@ -477,5 +477,17 @@ return {
 	["WRLD_PUBLIC_ENEMY_TT"] = "近くのすべての NPC があなたに群がり、あなたのお尻を殴ります。動物や警官も含まれます。",
 	["GENERIC_IMPORTANT"] = "重要",
 	["GUI_NEW_LAYOUT_NOTICE"] = "スクリプトの UI はメニューから独立しました。 %s を押して切り替えます。",
-	["SETTING_HOTKEY_FOUND"] = "新しいキー:"
+	["SETTING_HOTKEY_FOUND"] = "新しいキー:",
+	["YRV3_CWASH_LABEL"] = "洗車",
+	["YRV3_CWASH_HEAT"] = "熱レベル:",
+	["SELF_MC_BIKE_ANIMS"] = "MCライディングスタイルを有効にする",
+	["YRV3_CWASH_NOT_OWNED"] = "あなたは洗車業を経営していません。",
+	["YRV3_CWASH_CASH_DIRTY"] = "汚い：",
+	["YRV3_CWASH_CASH_CLEAN"] = "クリーン：",
+	["SELF_MC_BIKE_ANIMS_TT"] = "何らかの理由で無効になった代替自転車乗車アニメーションを復元します。これらのアニメーションを機能させるには、MC として登録し、このオプションを有効にする必要があります。",
+	["YRV3_CWASH_WORK_EARNINGS"] = "仕事の収入:",
+	["YRV3_HELITOURS_LABEL"] = "ヒギンズ・ヘリツアーズ",
+	["YRV3_WEED_SHOP_LABEL"] = "雑草屋",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "違法な作業のクールダウンを無効にする",
+	["YRV3_CWASH_LEGAL_WORK_CD"] = "法務作業のクールダウンを無効にする"
 }

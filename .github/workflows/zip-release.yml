@@ -5,6 +5,8 @@ on:
       - main
     paths:
       - '**.lua'
+    paths-ignore:
+      - 'includes/version.lua'
     tags:
       - '*'
   workflow_dispatch:
@@ -16,12 +18,8 @@ concurrency:
 jobs:
   main:
     runs-on: ubuntu-latest
+    if: "! contains(github.event.head_commit.message, '[noci]')"
     steps:
-
-    - name: Checkout Repo
-      uses: actions/checkout@master
-      with:
-        fetch-depth: 0
 
     - name: Increment Tag
       id: increment_tag
@@ -37,12 +35,14 @@ jobs:
             }
           );
 
+          let no_prefix;
           let new_tag;
           let old_tag;
 
           if (tags.data.length === 0) {
             console.log('No existing tags found. Starting with version 1.0.0');
             new_tag = 'v1.0.0';
+            no_prefix = '1.0.0';
           }
           else {
             const latest_tag = tags.data[0].name;
@@ -60,10 +60,12 @@ jobs:
               tag_part[2] += 1;
             }
 
+            no_prefix = `${tag_part.join('.')}`;
             new_tag = `v${tag_part.join('.')}`;
             old_tag = latest_tag;
           }
           core.setOutput("version_number", new_tag);
+          core.setOutput("no_prefix", no_prefix);
           core.setOutput("old_tag", old_tag);
 
     - name: Write Changelog
@@ -82,6 +84,21 @@ jobs:
           } >> "$GITHUB_ENV"
       shell: bash
 
+    - name: Checkout Repo
+      uses: actions/checkout@master
+      with:
+        fetch-depth: 0
+
+    - name: Bump Version
+      run: |
+        sed -i "s|return \".*\"|return \"${{steps.increment_tag.outputs.no_prefix}}\"|" includes/version.lua
+        sed -i "s|https://img.shields.io/badge/Script%20Version-v[0-9]\+\.[0-9]\+\.[0-9]\+-blue|https://img.shields.io/badge/Script%20Version-${{steps.increment_tag.outputs.version_number}}-blue|g" README.md
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add includes/version.lua README.md
+        git diff --cached --quiet || git commit -m "[noci] bump version"
+        git push
+
     - name: Create Archive
       uses: thedoctor0/zip-release@0.7.6
       with:
@@ -99,12 +116,3 @@ jobs:
             ${{ env.changelog_body }}
         files: |
           Samurais_Scripts_${{steps.increment_tag.outputs.version_number}}.zip
-    
-    - name: Update README.md
-      run: |
-        sed -i "s|https://img.shields.io/badge/Script%20Version-v[0-9]\+\.[0-9]\+\.[0-9]\+-blue|https://img.shields.io/badge/Script%20Version-${{steps.increment_tag.outputs.version_number}}-blue|g" README.md
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add README.md
-        git diff --cached --quiet || git commit -m "Update README version badge to ${{steps.increment_tag.outputs.version_number}}"
-        git push

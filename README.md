@@ -5,7 +5,8 @@
 #### A Lua script written for [YimMenu](https://github.com/YimMenu/YimMenu) and [Tupoye-Menu](https://github.com/TupoyeMenu/TupoyeMenu), centered around roleplaying and having fun in a game full of ad bots and toxic cheaters
 
 [![sv](https://img.shields.io/badge/Script%20Version-v1.7.4-blue)](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest)
-[![gv](https://img.shields.io/badge/Game%20Version-Online%201.72%20|%20Build%203725.0-orange)](https://github.com/YimMenu-Lua/Samurais-Scripts)
+[![gv](https://img.shields.io/badge/Game%20Build-latest-green)](https://github.com/YimMenu-Lua/Samurais-Scripts)
+[![gv](https://img.shields.io/badge/Online%20Version-latest-green)](https://github.com/YimMenu-Lua/Samurais-Scripts)
 
 ###  
 
@@ -21,21 +22,13 @@ ___
 
        %AppData%\YimMenu\scripts
 
-## TODO
-
-- [x] Improve and merge [YimActions](https://github.com/xesdoog/YimActions). ✔️ Done.
-- [x] Improve and merge [TokyoDrift](https://github.com/YimMenu-Lua/TokyoDrift). ✔️ Done.
-- [x] Improve and merge [Object Spawner](https://github.com/xesdoog/object-spawner). ✔️ Done.
-- [x] Improve and merge [YimResupplier](https://github.com/YimMenu-Lua/YimResupplier). ✔️ Done.
+3. Once in-game, press **[F5]** to toggle the script's UI.
 
 ## Commands
 
 - Use **[F4]** to toggle the command executor window.
 - Type `!ls` or `!dump` to dump all available commands.
 - Default commands are prefixed with an exclamation mark.
-
-> [!Important]
-> The script now has its own UI toggleable through a customizable keybind (F5 by default). There's still a tab for it in YimMenu's UI that simply informs you about this change.
 
 ## Credits
 

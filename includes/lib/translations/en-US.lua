@@ -269,6 +269,9 @@ return {
 	["SELF_AUTOHEAL_TT"]                   = "Regenerates your health and armour.",
 	["SELF_PHONE_ANIMS"]                   = "Enable Phone Animations",
 	["SELF_PHONE_ANIMS_TT"]                = "Restores mobile phone animations in GTA Online.",
+	["SELF_MC_BIKE_ANIMS"]                 = "Enable MC Riding Style",
+	["SELF_MC_BIKE_ANIMS_TT"]              =
+	"Restores the alternate bike riding animations that were disabled for some reason. You must be registered as an MC and have this option enabled for these animations to work.",
 	["SELF_ACTION_MODE"]                   = "Disable Action Mode",
 	["SELF_ACTION_MODE_TT"]                = "Disables the player's janky movement during combat.",
 	["SELF_HEADPROPS"]                     = "Allow Head Props In Vehicles",

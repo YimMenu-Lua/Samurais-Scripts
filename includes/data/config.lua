@@ -91,6 +91,7 @@ local Config <const> = {
 	features = {
 		self = {
 			phone_anims = false,
+			mc_alt_bike_anims = false,
 			sprint_inside_interiors = false,
 			jacking_always_lockpick_anim = false,
 			disable_action_mode = false,

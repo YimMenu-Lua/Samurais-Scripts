@@ -477,5 +477,17 @@ return {
 	["WRLD_PUBLIC_ENEMY_TT"] = "근처의 모든 NPC가 당신에게 뭉쳐 당신을 때릴 것입니다. 동물과 경찰도 포함됩니다.",
 	["GENERIC_IMPORTANT"] = "중요한",
 	["GUI_NEW_LAYOUT_NOTICE"] = "이제 스크립트의 UI가 메뉴와 독립적입니다. 전환하려면 %s 키를 누르세요.",
-	["SETTING_HOTKEY_FOUND"] = "새 키:"
+	["SETTING_HOTKEY_FOUND"] = "새 키:",
+	["YRV3_CWASH_LABEL"] = "세차장",
+	["YRV3_CWASH_CASH_CLEAN"] = "깨끗한:",
+	["YRV3_CWASH_CASH_DIRTY"] = "더러운:",
+	["YRV3_CWASH_NOT_OWNED"] = "귀하는 세차장을 소유하고 있지 않습니다.",
+	["YRV3_CWASH_WORK_EARNINGS"] = "근로 소득:",
+	["YRV3_WEED_SHOP_LABEL"] = "위드샵",
+	["YRV3_CWASH_HEAT"] = "열 수준:",
+	["SELF_MC_BIKE_ANIMS"] = "MC 라이딩 스타일 활성화",
+	["YRV3_HELITOURS_LABEL"] = "히긴스 헬리투어",
+	["SELF_MC_BIKE_ANIMS_TT"] = "어떤 이유로 비활성화된 대체 자전거 타기 애니메이션을 복원합니다. 이러한 애니메이션이 작동하려면 MC로 등록하고 이 옵션을 활성화해야 합니다.",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "불법 작업 쿨다운 비활성화",
+	["YRV3_CWASH_LEGAL_WORK_CD"] = "법적 업무 쿨다운 비활성화"
 }

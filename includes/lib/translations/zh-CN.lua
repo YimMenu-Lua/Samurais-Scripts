@@ -477,5 +477,17 @@ return {
 	["WRLD_PUBLIC_ENEMY_TT"] = "附近的所有 NPC 都会联合起来攻击你并殴打你。包括动物和警察。",
 	["GUI_NEW_LAYOUT_NOTICE"] = "该脚本的 UI 现在独立于菜单。按 %s 进行切换。",
 	["GENERIC_IMPORTANT"] = "重要的",
-	["SETTING_HOTKEY_FOUND"] = "新钥匙："
+	["SETTING_HOTKEY_FOUND"] = "新钥匙：",
+	["YRV3_CWASH_NOT_OWNED"] = "您没有洗车业务。",
+	["YRV3_HELITOURS_LABEL"] = "希金斯直升机之旅",
+	["YRV3_CWASH_CASH_CLEAN"] = "干净的：",
+	["YRV3_CWASH_CASH_DIRTY"] = "肮脏的：",
+	["YRV3_CWASH_LABEL"] = "洗车",
+	["YRV3_CWASH_HEAT"] = "热量等级：",
+	["YRV3_CWASH_WORK_EARNINGS"] = "工作收入：",
+	["YRV3_WEED_SHOP_LABEL"] = "杂草店",
+	["YRV3_CWASH_LEGAL_WORK_CD"] = "禁用法律工作冷却",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "禁用非法工作冷却",
+	["SELF_MC_BIKE_ANIMS_TT"] = "恢复由于某种原因禁用的备用自行车骑行动画。您必须注册为 MC 并启用此选项才能使这些动画正常工作。",
+	["SELF_MC_BIKE_ANIMS"] = "启用 MC 骑行风格"
 }

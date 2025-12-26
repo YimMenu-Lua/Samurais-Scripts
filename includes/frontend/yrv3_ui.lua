@@ -887,18 +887,19 @@ local function YRV3UI()
 
 	ImGui.Spacing()
 	ImGui.SetNextWindowBgAlpha(0)
-	if ImGui.BeginChild("##yrv3_wrapped_tb", 0, 40, false, ImGuiWindowFlags.NoScrollbar) then
-		ImGui.BeginTabBar("##yrv3_tb")
-		for i = 1, #tabNames do
-			local name = tabNames[i]
-			if (ImGui.BeginTabItem(name)) then
-				selectedTabName = name
-				ImGui.EndTabItem()
+	if (ImGui.BeginChild("##yrv3_wrapped_tb", 0, 40, false, ImGuiWindowFlags.NoScrollbar)) then
+		if (ImGui.BeginTabBar("##yrv3_tb")) then
+			for i = 1, #tabNames do
+				local name = tabNames[i]
+				if (ImGui.BeginTabItem(name)) then
+					selectedTabName = name
+					ImGui.EndTabItem()
+				end
 			end
+			ImGui.EndTabBar()
 		end
 		ImGui.EndChild()
 	end
-	ImGui.EndTabBar()
 
 	ImGui.SetCursorPosY(ImGui.GetCursorPosY() - ImGui.GetStyle().ItemSpacing.y - 10)
 	ImGui.SetNextWindowBgAlpha(0.75)
@@ -912,4 +913,4 @@ local function YRV3UI()
 	end
 end
 
-GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YRV3", YRV3UI)
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimResupplierV3", YRV3UI)

@@ -477,5 +477,17 @@ return {
 	["WRLD_PUBLIC_ENEMY_TT"] = "Alle NPCs in der Nähe werden sich gegen dich verbünden und dir in den Arsch schlagen. Einschließlich Tiere und Polizisten.",
 	["GENERIC_IMPORTANT"] = "Wichtig",
 	["GUI_NEW_LAYOUT_NOTICE"] = "Die Benutzeroberfläche des Skripts ist jetzt unabhängig vom Menü. Drücken Sie %s, um es umzuschalten.",
-	["SETTING_HOTKEY_FOUND"] = "Neuer Schlüssel:"
+	["SETTING_HOTKEY_FOUND"] = "Neuer Schlüssel:",
+	["YRV3_CWASH_CASH_CLEAN"] = "Sauber:",
+	["YRV3_CWASH_LABEL"] = "Waschanlage",
+	["YRV3_CWASH_WORK_EARNINGS"] = "Arbeitsverdienst:",
+	["YRV3_CWASH_NOT_OWNED"] = "Sie besitzen kein Autowaschunternehmen.",
+	["YRV3_CWASH_CASH_DIRTY"] = "Schmutzig:",
+	["YRV3_WEED_SHOP_LABEL"] = "Unkrautladen",
+	["YRV3_HELITOURS_LABEL"] = "Higgins Helitours",
+	["YRV3_CWASH_HEAT"] = "Wärmestufe:",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "Deaktivieren Sie die Abklingzeit für illegale Arbeit",
+	["YRV3_CWASH_LEGAL_WORK_CD"] = "Deaktivieren Sie die Abklingzeit für legale Arbeit",
+	["SELF_MC_BIKE_ANIMS"] = "Aktivieren Sie den MC-Fahrstil",
+	["SELF_MC_BIKE_ANIMS_TT"] = "Stellt die alternativen Fahrradfahranimationen wieder her, die aus irgendeinem Grund deaktiviert waren. Damit diese Animationen funktionieren, müssen Sie als MC registriert sein und diese Option aktiviert haben."
 }

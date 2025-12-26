@@ -7,10 +7,10 @@
 
 
 local SCRIPT_NAME <const>    = "Samurai's Scripts"
-local SCRIPT_VERSION <const> = "1.7.4"
+local SCRIPT_VERSION <const> = require("includes.version")
+local DEFAULT_CONFIG <const> = require("includes.data.config")
 local TARGET_BUILD <const>   = "any"
 local TARGET_VERSION <const> = "any"
-local DEFAULT_CONFIG <const> = require("includes.data.config")
 
 -- ### Enums Namespace.
 --

@@ -477,5 +477,17 @@ return {
 	["WRLD_PUBLIC_ENEMY_TT"] = "Tutti gli NPC vicini si alleeranno contro di te e ti faranno il culo. Compresi animali e poliziotti.",
 	["GENERIC_IMPORTANT"] = "Importante",
 	["SETTING_HOTKEY_FOUND"] = "Nuova chiave:",
-	["GUI_NEW_LAYOUT_NOTICE"] = "L'interfaccia utente dello script è ora indipendente dal menu. Premi %s per attivarlo."
+	["GUI_NEW_LAYOUT_NOTICE"] = "L'interfaccia utente dello script è ora indipendente dal menu. Premi %s per attivarlo.",
+	["YRV3_CWASH_LABEL"] = "Autolavaggio",
+	["YRV3_CWASH_WORK_EARNINGS"] = "Guadagno lavorativo:",
+	["YRV3_CWASH_CASH_DIRTY"] = "Sporco:",
+	["YRV3_CWASH_CASH_CLEAN"] = "Pulito:",
+	["YRV3_CWASH_NOT_OWNED"] = "Non possiedi un'attività di autolavaggio.",
+	["YRV3_WEED_SHOP_LABEL"] = "Negozio di erba",
+	["YRV3_CWASH_HEAT"] = "Livello di calore:",
+	["SELF_MC_BIKE_ANIMS"] = "Abilita lo stile di guida MC",
+	["YRV3_HELITOURS_LABEL"] = "Higgins Helitour",
+	["YRV3_CWASH_LEGAL_WORK_CD"] = "Disabilita il tempo di recupero del lavoro legale",
+	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "Disabilita il tempo di recupero per lavoro illegale",
+	["SELF_MC_BIKE_ANIMS_TT"] = "Ripristina le animazioni alternative di guida in bicicletta che erano state disabilitate per qualche motivo. Devi essere registrato come MC e avere questa opzione abilitata affinché queste animazioni funzionino."
 }
