@@ -1,7 +1,7 @@
 ---@enum eHandlingEditorTypes
 Enums.eHandlingEditorTypes = {
-	TYPE_HF = 0, -- handling flag
-	TYPE_AF = 1, -- advanced flag
+	TYPE_HF  = 0, -- handling flag
+	TYPE_AF  = 1, -- advanced flag
 	TYPE_MIF = 2, -- model info flag
 }
 
@@ -75,7 +75,7 @@ end
 function HandlingEditor:GetFlagDefault(obj)
 	return Switch(obj.m_type) {
 		[Enums.eHandlingEditorTypes.TYPE_HF] = self.m_pv:GetHandlingFlag(obj.m_flag),
-		[Enums.eHandlingEditorTypes.TYPE_AF] = self.m_pv:GetHandlingFlag(obj.m_flag),
+		[Enums.eHandlingEditorTypes.TYPE_AF] = self.m_pv:GetAdvancedFlag(obj.m_flag),
 		[Enums.eHandlingEditorTypes.TYPE_MIF] = self.m_pv:GetModelInfoFlag(obj.m_flag),
 		default = false
 	}
@@ -89,7 +89,8 @@ end
 
 ---@param obj HandlingObject
 ---@param toggle boolean
-function HandlingEditor:SetFlag(obj, toggle)
+---@param reset? boolean
+function HandlingEditor:SetFlag(obj, toggle, reset)
 	if (not self.m_pv or not self.m_pv:IsValid()) then
 		return
 	end
@@ -123,7 +124,12 @@ function HandlingEditor:SetFlag(obj, toggle)
 		callback()
 	end
 
-	obj.m_was_edited = toggle
+	if (reset) then
+		obj.m_was_edited = false
+		return
+	end
+
+	obj.m_was_edited = true
 end
 
 ---@param obj HandlingObject
@@ -137,7 +143,7 @@ function HandlingEditor:ResetFlag(obj)
 	end
 
 	obj.m_was_edited = false
-	self:SetFlag(obj, obj.m_default)
+	self:SetFlag(obj, obj.m_default, true)
 	if (type(obj.m_on_disable) == "function") then
 		obj.m_on_disable()
 	end

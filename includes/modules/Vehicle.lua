@@ -1190,7 +1190,7 @@ end
 ---@param flag eVehicleAdvancedFlags
 ---@return boolean
 function Vehicle:GetAdvancedFlag(flag)
-	if not self:IsValid() then
+	if (not self:IsValid() or not self:IsCar()) then
 		return false
 	end
 
@@ -1201,7 +1201,7 @@ end
 ---@param flag eVehicleAdvancedFlags
 ---@param toggle boolean
 function Vehicle:SetAdvancedFlag(flag, toggle)
-	if not self:IsValid() then
+	if (not self:IsValid() or not self:IsCar()) then
 		return
 	end
 

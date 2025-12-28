@@ -37,7 +37,7 @@ function DriftMode:IsActive()
 end
 
 function DriftMode:UpdateFX()
-	if (not GVars.features.vehicle.drift.smoke_fx.enabled) then
+	if (not GVars.features.vehicle.drift.smoke_fx.enabled or not self.m_entity:IsCar()) then
 		return
 	end
 

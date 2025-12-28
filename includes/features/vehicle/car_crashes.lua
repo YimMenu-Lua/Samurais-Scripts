@@ -93,12 +93,12 @@ function CarCrash:Init()
 end
 
 function CarCrash:ShouldRun()
-	return (self.m_entity
+	return (GVars.features.vehicle.strong_crash
+		and self.m_entity
 		and self.m_entity:IsValid()
-		and self.m_entity:IsLandVehicle()
+		and self.m_entity:IsCar()
 		and Self:IsAlive()
 		and Self:IsDriving()
-		and GVars.features.vehicle.strong_crash
 		and not VEHICLE.IS_VEHICLE_STUCK_ON_ROOF(self.m_entity:GetHandle())
 	)
 end
