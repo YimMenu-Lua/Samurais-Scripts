@@ -92,6 +92,11 @@ function Backend:GetAPIVersion()
 		if (script and (type(script) == "table")) then
 			if (menu_event and menu_event.Wndproc) then
 				if (type(_G["get_game_branch"]) == "function") then
+					local branch = _G["get_game_branch"]()
+					if (type(branch) ~= "number" or branch > 1) then
+						error("Unknown or unsupported game branch.")
+					end
+
 					self.api_version = _G["get_game_branch"]() + 1
 				else
 					self.api_version = Enums.eAPIVersion.V1

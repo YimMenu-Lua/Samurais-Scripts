@@ -329,35 +329,35 @@ end
 
 function GUI:DrawDummyTab()
 	ImGui.SetNextWindowBgAlpha(0)
+	ImGui.BeginChild("##clock", 480, 400)
 	DrawClock()
 	ImGui.Dummy(1, 10)
 	ImGui.SetWindowFontScale(1.2)
 	ImGui.SeparatorText(_T("GENERIC_IMPORTANT"))
 	ImGui.SetWindowFontScale(1.0)
-	ImGui.Text(_F(_T("GUI_NEW_LAYOUT_NOTICE"), GVars.keyboard_keybinds.gui_toggle))
+	ImGui.TextWrapped(_F(_T("GUI_NEW_LAYOUT_NOTICE"), GVars.keyboard_keybinds.gui_toggle))
 	ImGui.Spacing()
-	ImGui.Separator()
+	ImGui.EndChild()
 
 	ImGui.SetNextWindowBgAlpha(0)
-	if ImGui.BeginChild("##footer", -1, 40, false) then
-		ImGui.Spacing()
-		ImGui.TextDisabled(("v%s"):format(Backend.__version))
-		if (self:IsItemClicked(self.MouseButtons.LEFT)) then
-			debug_counter = debug_counter + 1
+	ImGui.BeginChild("##footer", 480, 40)
+	ImGui.Separator()
+	ImGui.TextDisabled(("v%s"):format(Backend.__version))
+	if (self:IsItemClicked(self.MouseButtons.LEFT)) then
+		debug_counter = debug_counter + 1
 
-			if (debug_counter == 7) then
-				self:PlaySound(GUI.Sounds.Nav)
-				log.debug("Debug mode activated.")
-				GVars.backend.debug_mode = true
-			elseif (debug_counter > 7) then
-				self:PlaySound(GUI.Sounds.Cancel)
-				log.debug("Debug mode deactivated.")
-				GVars.backend.debug_mode = false
-				debug_counter = 0
-			end
+		if (debug_counter == 7) then
+			self:PlaySound(GUI.Sounds.Nav)
+			log.debug("Debug mode activated.")
+			GVars.backend.debug_mode = true
+		elseif (debug_counter > 7) then
+			self:PlaySound(GUI.Sounds.Cancel)
+			log.debug("Debug mode deactivated.")
+			GVars.backend.debug_mode = false
+			debug_counter = 0
 		end
-		ImGui.EndChild()
 	end
+	ImGui.EndChild()
 end
 
 local underlineX = 0.0
@@ -519,8 +519,8 @@ function GUI:DrawSideBar(yPos)
 					end
 				end
 			end
+			ImGui.End()
 		end
-		ImGui.End()
 		ThemeManager:PopTheme()
 		self.m_is_drawing_sidebar = true
 	elseif (ctabsCount == 1) then

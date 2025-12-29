@@ -38,4 +38,4 @@ ___
 | [NiiV3AU](https://github.com/NiiV3AU)             | German translations                                                            |
 | [gir489returns](https://github.com/gir489returns) | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino)                  |
 | [tupoy-ya](https://github.com/tupoy-ya)           | Several contributions and shared knowledge                                     |
-| [szalikdev](https://github.com/szalikdev)         | Revived the project                                                            |
+| [szalikdev](https://github.com/szalikdev)         | Revived the project and joined the dev team                                    |
