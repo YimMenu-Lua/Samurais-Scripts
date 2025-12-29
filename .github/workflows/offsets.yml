@@ -7,7 +7,7 @@ on:
 
 
 concurrency:
-  group: offsets-${{ github.ref }}
+  group: ss_offsets-${{ github.ref }}
   cancel-in-progress: true
 
 
@@ -21,54 +21,67 @@ jobs:
 
       - name: Fetch Upstream
         run: |
-         git ls-remote https://github.com/calamity-inc/GTA-V-Decompiled-Scripts HEAD | cut -f1 > upstream_commit.txt
+         git ls-remote https://github.com/acidlabsgg/gtav-legacy-scripts HEAD | cut -f1 > legacy_upstream.txt
+         git ls-remote https://github.com/acidlabsgg/gtav-enhanced-scripts HEAD | cut -f1 > enhanced_upstream.txt
 
-      - name: Read Last Commit Hash
-        id: last
+      - name: Read Saved Commit Hashes
+        id: saved_commits
         run: |
-          if [ -f scripts/offsets/.last_commit_hash ]; then
-            cat scripts/offsets/.last_commit_hash > last_commit.txt
+          if [ -f scripts/offsets/legacy.last_commit_hash ]; then
+            cat scripts/offsets/legacy.last_commit_hash > last_commit_legacy
           else
-            echo "none" > last_commit.txt
+            echo "none" > last_commit_legacy
           fi
 
-      - name: Compare Commit
-        id: compare_commit
+          if [ -f scripts/offsets/enhanced.last_commit_hash ]; then
+            cat scripts/offsets/enhanced.last_commit_hash > last_commit_enhanced
+          else
+            echo "none" > last_commit_enhanced
+          fi
+
+      - name: Compare Commits
+        id: compare_commits
         run: |
-          UPSTREAM=$(cat upstream_commit.txt)
-          LAST=$(cat last_commit.txt)
+          LEGACY_UPSTREAM=$(cat legacy_upstream.txt)
+          ENHANCED_UPSTREAM=$(cat enhanced_upstream.txt)
+          LEGACY_LAST=$(cat last_commit_legacy)
+          ENHANCED_LAST=$(cat last_commit_enhanced)
 
-          echo "Upstream: $UPSTREAM"
-          echo "Last run: $LAST"
+          echo "Legacy Upstream: $LEGACY_UPSTREAM"
+          echo "Legacy Last Run: $LEGACY_LAST"
+          echo "Enhanced Upstream: $ENHANCED_UPSTREAM"
+          echo "Enhanced Last Run: $ENHANCED_LAST"
 
-          if [ "$UPSTREAM" = "$LAST" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          if [ "$LEGACY_UPSTREAM" = "$LEGACY_LAST" ] && [ "$ENHANCED_UPSTREAM" = "$ENHANCED_LAST" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
             echo "run=false" >> $GITHUB_OUTPUT
           else
             echo "run=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Setup Python
-        if: steps.compare_commit.outputs.run == 'true'
+        if: steps.compare_commits.outputs.run == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12.x"
 
       - name: Run Offset Updater
-        if: steps.compare_commit.outputs.run == 'true'
+        if: steps.compare_commits.outputs.run == 'true'
         run: |
           python ./scripts/offsets/update_offsets.py
 
-      - name: Save New Commit Hash
-        if: steps.compare_commit.outputs.run == 'true'
+      - name: Save New Commit Hashes
+        if: steps.compare_commits.outputs.run == 'true'
         run: |
-          cp upstream_commit.txt ./scripts/offsets/.last_commit_hash
+          cp legacy_upstream.txt ./scripts/offsets/legacy.last_commit_hash
+          cp enhanced_upstream.txt ./scripts/offsets/enhanced.last_commit_hash
 
       - name: Commit Changes
-        if: steps.compare_commit.outputs.run == 'true'
+        if: steps.compare_commits.outputs.run == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add scripts/offsets/.last_commit_hash
+          git add scripts/offsets/legacy.last_commit_hash
+          git add scripts/offsets/enhanced.last_commit_hash
           git add includes/data/globals_locals.lua
-          git diff --cached --quiet || git commit -m "chore(offsets): update script globals & locals from upstream"
+          git diff --cached --quiet || git commit -m "chore(offsets): update script globals & locals"
           git push
