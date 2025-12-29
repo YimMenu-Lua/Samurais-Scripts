@@ -137,6 +137,7 @@ local Config <const> = {
 			performance_only = false,
 			burble_tune = false,
 			launch_control = false,
+			launch_control_mode = 0,
 			abs_lights = false,
 			subwoofer = false,
 			horn_beams = false,

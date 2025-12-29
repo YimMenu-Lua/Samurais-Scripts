@@ -3,6 +3,7 @@
 local commandRegistry = require("includes.lib.commands")
 require("includes.init")
 
+GPointers:Init()
 Serializer:FlushObjectQueue()
 Backend:RegisterHandlers()
 Translator:Load()

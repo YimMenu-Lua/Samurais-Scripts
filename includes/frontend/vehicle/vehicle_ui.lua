@@ -453,6 +453,7 @@ vehicleTab:RegisterGUI(function()
 			"%.0f RPM", GVars.features.vehicle.bangs_rpm_max
 		)
 	end
+
 	if (GVars.features.vehicle.rgb_lights.enabled) then
 		GVars.features.vehicle.rgb_lights.speed, _ = ImGui.SliderInt("RGB Lights Speed",
 			GVars.features.vehicle.rgb_lights.speed,
@@ -497,6 +498,13 @@ vehicleTab:RegisterGUI(function()
 		if (GUI:Button("NOS##settings")) then
 			nosOptionsWindow.m_should_draw = true
 		end
+	end
+
+	if (GVars.features.vehicle.launch_control) then
+		GVars.features.vehicle.launch_control_mode, _ = ImGui.Combo(_T("VEH_LAUNCH_CTRL_MODE"),
+			GVars.features.vehicle.launch_control_mode,
+			_F("%s\0%s\0", _T("VEH_LAUNCH_CTRL_REALISTIC"), _T("VEH_LAUNCH_CTRL_RIDICULOUS"))
+		)
 	end
 end)
 

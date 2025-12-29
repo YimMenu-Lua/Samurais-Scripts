@@ -348,6 +348,10 @@ return {
 	"Automatically locks your vehicle when you move away from it and unlocks it again when you try to re-enter or switch to a different vehicle.",
 	["VEH_LAUNCH_CTRL"]                    = "Launch Control",
 	["VEH_LAUNCH_CTRL_TT"]                 = "Simulates launch control. Only available for performance cars.",
+	["VEH_LAUNCH_CTRL_MODE"]               = "Launch Control Mode",
+	["VEH_LAUNCH_CTRL_REALISTIC"]          = "Realistic",
+	["VEH_LAUNCH_CTRL_RIDICULOUS"]         = "Ridiculous",
+	["VEH_LAUNCH_CTRL_ERR"]                = "Launch control is unavailable at the moment. Your engine is damaged.",
 	["VEH_IV_EXIT"]                        = "IV-Style Exit",
 	["VEH_IV_EXIT_TT"]                     =
 	"Imitates GTA IV's vehicle exit style: Hold [F] for one second to turn off the engine or normal press to leave it running.",

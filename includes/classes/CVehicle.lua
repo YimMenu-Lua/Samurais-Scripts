@@ -50,7 +50,7 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_is_targetable pointer<byte> `bool`
 ---@field public m_door_lock_status pointer<uint32_t>
 ---@field public m_model_info_flags pointer<uint32_t>
----@field public m_mass pointer<float> -- //0x000C
+---@field public m_mass pointer<float> -- 0x000C
 ---@field public m_initial_drag_coeff pointer<float>
 ---@field public m_drive_bias_rear pointer<float>
 ---@field public m_drive_bias_front pointer<float>
@@ -62,6 +62,8 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_steering_lock pointer<float>
 ---@field public m_steering_lock_ratio pointer<float>
 ---@field public m_traction_curve_max pointer<float>
+---@field public m_low_speed_traction_loss_mult pointer<float> -- 0x00A8
+---@field public m_traction_loss_mult pointer<float> -- 0x00B8
 ---@field public m_monetary_value pointer<uint32_t>
 ---@field public m_model_flags pointer<uint32_t>
 ---@field public m_handling_flags pointer<uint32_t>
@@ -69,8 +71,8 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_deform_mult pointer<float>
 ---@field public m_wheel_scale pointer<float>
 ---@field public m_wheel_scale_rear pointer<float>
----@field public m_wheels atArray<CWheel> // 0xC30
----@field public m_num_wheels number // 0xC38
+---@field public m_wheels atArray<CWheel> -- 0xC30
+---@field public m_num_wheels number -- 0xC38
 ---@field private DumpFlags fun(self: CVehicle, enum_flags: Enum, get_func: fun(self: CVehicle, flag: integer): boolean): nil
 ---@overload fun(vehicle: integer): CVehicle|nil
 local CVehicle                   = Class("CVehicle", CEntity, 0xC40)
@@ -90,44 +92,46 @@ function CVehicle:init(vehicle)
 	---@diagnostic disable-next-line: param-type-mismatch
 	instance:super().init(instance, vehicle)
 
-	instance.m_ptr                        = ptr
-	instance.m_model_info                 = ptr:add(0x20):deref()
-	instance.m_vehicle_damage             = ptr:add(0x0420)
-	instance.m_handling_data              = ptr:add(0x0960):deref()
-	instance.m_sub_handling_data          = atArray(instance.m_handling_data:add(0x158), CCarHandlingData)
-	instance.m_model_info_layout          = instance.m_model_info:add(0x00B0):deref()
-	instance.m_physics_fragments          = phFragInst(ptr:add(0x30):deref())
-	instance.m_can_boost_jump             = ptr:add(0x03A4)
-	instance.m_deform_god                 = ptr:add(0x096C)
-	instance.m_is_targetable              = ptr:add(0x0AEE)
-	instance.m_door_lock_status           = ptr:add(0x13D0)
-	instance.m_water_damage               = ptr:add(0xD8)
-	instance.m_next_gear                  = ptr:add(0x0880)
-	instance.m_current_gear               = ptr:add(0x0882)
-	instance.m_top_gear                   = ptr:add(0x0886)
-	instance.m_engine_health              = ptr:add(0x0910)
-	instance.m_model_info_flags           = instance.m_model_info:add(0x057C)
-	instance.m_mass                       = instance.m_handling_data:add(0x000C)
-	instance.m_initial_drag_coeff         = instance.m_handling_data:add(0x0010)
-	instance.m_drive_bias_rear            = instance.m_handling_data:add(0x0044)
-	instance.m_drive_bias_front           = instance.m_handling_data:add(0x0048)
-	instance.m_acceleration               = instance.m_handling_data:add(0x004C)
-	instance.m_initial_drive_gears        = instance.m_handling_data:add(0x0050)
-	instance.m_initial_drive_force        = instance.m_handling_data:add(0x0060)
-	instance.m_drive_max_flat_velocity    = instance.m_handling_data:add(0x0064)
-	instance.m_initial_drive_max_flat_vel = instance.m_handling_data:add(0x0068)
-	instance.m_steering_lock              = instance.m_handling_data:add(0x0080)
-	instance.m_steering_lock_ratio        = instance.m_handling_data:add(0x0084)
-	instance.m_traction_curve_max         = instance.m_handling_data:add(0x0088)
-	instance.m_monetary_value             = instance.m_handling_data:add(0x0118)
-	instance.m_model_flags                = instance.m_handling_data:add(0x0124)
-	instance.m_handling_flags             = instance.m_handling_data:add(0x0128)
-	instance.m_damage_flags               = instance.m_handling_data:add(0x012C)
-	instance.m_deform_mult                = instance.m_handling_data:add(0x00F8)
-	instance.m_wheel_scale                = instance.m_model_info:add(0x048C)
-	instance.m_wheel_scale_rear           = instance.m_model_info:add(0x0490)
-	instance.m_wheels                     = atArray(ptr:add(0xC30), CWheel)
-	instance.m_num_wheels                 = ptr:add(0xC38):get_int()
+	instance.m_ptr                          = ptr
+	instance.m_model_info                   = ptr:add(0x20):deref()
+	instance.m_vehicle_damage               = ptr:add(0x0420)
+	instance.m_handling_data                = ptr:add(0x0960):deref()
+	instance.m_sub_handling_data            = atArray(instance.m_handling_data:add(0x158), CCarHandlingData)
+	instance.m_model_info_layout            = instance.m_model_info:add(0x00B0):deref()
+	instance.m_physics_fragments            = phFragInst(ptr:add(0x30):deref())
+	instance.m_can_boost_jump               = ptr:add(0x03A4)
+	instance.m_deform_god                   = ptr:add(0x096C)
+	instance.m_is_targetable                = ptr:add(0x0AEE)
+	instance.m_door_lock_status             = ptr:add(0x13D0)
+	instance.m_water_damage                 = ptr:add(0xD8)
+	instance.m_next_gear                    = ptr:add(0x0880)
+	instance.m_current_gear                 = ptr:add(0x0882)
+	instance.m_top_gear                     = ptr:add(0x0886)
+	instance.m_engine_health                = ptr:add(0x0910)
+	instance.m_model_info_flags             = instance.m_model_info:add(0x057C)
+	instance.m_mass                         = instance.m_handling_data:add(0x000C)
+	instance.m_initial_drag_coeff           = instance.m_handling_data:add(0x0010)
+	instance.m_drive_bias_rear              = instance.m_handling_data:add(0x0044)
+	instance.m_drive_bias_front             = instance.m_handling_data:add(0x0048)
+	instance.m_acceleration                 = instance.m_handling_data:add(0x004C)
+	instance.m_initial_drive_gears          = instance.m_handling_data:add(0x0050)
+	instance.m_initial_drive_force          = instance.m_handling_data:add(0x0060)
+	instance.m_drive_max_flat_velocity      = instance.m_handling_data:add(0x0064)
+	instance.m_initial_drive_max_flat_vel   = instance.m_handling_data:add(0x0068)
+	instance.m_steering_lock                = instance.m_handling_data:add(0x0080)
+	instance.m_steering_lock_ratio          = instance.m_handling_data:add(0x0084)
+	instance.m_traction_curve_max           = instance.m_handling_data:add(0x0088)
+	instance.m_low_speed_traction_loss_mult = instance.m_handling_data:add(0x00A8)
+	instance.m_traction_loss_mult           = instance.m_handling_data:add(0x00B8)
+	instance.m_monetary_value               = instance.m_handling_data:add(0x0118)
+	instance.m_model_flags                  = instance.m_handling_data:add(0x0124)
+	instance.m_handling_flags               = instance.m_handling_data:add(0x0128)
+	instance.m_damage_flags                 = instance.m_handling_data:add(0x012C)
+	instance.m_deform_mult                  = instance.m_handling_data:add(0x00F8)
+	instance.m_wheel_scale                  = instance.m_model_info:add(0x048C)
+	instance.m_wheel_scale_rear             = instance.m_model_info:add(0x0490)
+	instance.m_wheels                       = atArray(ptr:add(0xC30), CWheel)
+	instance.m_num_wheels                   = ptr:add(0xC38):get_int()
 
 	return instance
 end

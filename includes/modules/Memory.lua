@@ -310,5 +310,6 @@ function Memory:SetWeaponEffectGroup(dword)
 end
 --]]
 
+require("includes.modules.Game")
 -- inline
 return Memory()

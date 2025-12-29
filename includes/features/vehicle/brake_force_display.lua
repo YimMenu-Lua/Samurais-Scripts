@@ -42,7 +42,8 @@ function BFD:Toggle()
 
 	if VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(PV:GetHandle())
 		and PAD.IS_CONTROL_PRESSED(0, 72)
-		and (PV:GetSpeed() >= 19.44) then
+		and (PV:GetSpeed() >= 19.44)
+		and (PV:GetCurrentGear() > 0) then
 		self.m_is_toggled = not self.m_is_toggled
 	else
 		self.m_is_toggled = false

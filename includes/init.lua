@@ -32,10 +32,6 @@ require("includes.classes.Set")
 require("includes.classes.fMatrix44")
 require("includes.classes.atArray")
 
-GPointers = require("includes.data.pointers")
-Memory = require("includes.modules.Memory")
-require("includes.modules.Game")
-
 
 -- ### Global Runtime Variables
 --
@@ -45,18 +41,18 @@ require("includes.modules.Game")
 --
 -- For temporary or internal state that should not be saved, use `_G` directly.
 ---@class GVars : Config
-GVars = {}
+GVars         = {}
 
 ----------------------------------------------------------------------------------------------------
 -- These services must be loaded before any class that registers with/uses them -------------------
 ThreadManager = require("includes.services.ThreadManager"):init()
-GPointers:Init() -- needs ThreadManager
-Serializer = require("includes.services.Serializer"):init("ssv2", DEFAULT_CONFIG, GVars)
-
+Serializer    = require("includes.services.Serializer"):init("ssv2", DEFAULT_CONFIG, GVars)
 require("includes.classes.Vector2")
 require("includes.classes.Vector3")
 require("includes.classes.Vector4")
 
+GPointers           = require("includes.data.pointers")
+Memory              = require("includes.modules.Memory")
 KeyManager          = require("includes.services.KeyManager"):init()
 GUI                 = require("includes.services.GUI"):init()
 Toast               = require("includes.services.ToastNotifier").new()

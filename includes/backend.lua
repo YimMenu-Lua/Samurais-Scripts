@@ -100,7 +100,7 @@ function Backend:GetAPIVersion()
 
 			if (type(script["run_in_callback"]) == "function") then
 				error(
-					"YmMenu V2 is not supported. If you want to run this script in GTA V Enhanced, download YimLuaAPI.") -- test error; add copyable link later
+					"YmMenu V2 is not supported. If you want to run this script in GTA V Enhanced, download YimLuaAPI.") -- test error; add Github link later
 			end
 			---@diagnostic disable-next-line: undefined-global
 		elseif (util or (menu and menu.root) or SCRIPT_SILENT_START or (_VERSION ~= "Lua 5.4")) then -- should probably place these in a lookup table

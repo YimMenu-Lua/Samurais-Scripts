@@ -30,7 +30,7 @@ local GPointers = {
 ---@field m_pattern string
 ---@field m_callback fun(ptr: pointer)
 local MemoryBatch <const> = {}
-MemoryBatch.__index = {}
+MemoryBatch.__index = MemoryBatch
 ---@param name string
 ---@param ida_sig string
 ---@param callback fun(ptr: pointer)
