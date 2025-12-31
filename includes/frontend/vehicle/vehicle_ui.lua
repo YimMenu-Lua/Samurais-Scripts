@@ -534,6 +534,10 @@ handlingEditorTab:RegisterGUI(function()
 end)
 --#endregion
 
+--#region stancer
+vehicleTab:RegisterSubtab("Stancer", require("includes.frontend.vehicle.stancer_ui"), nil, false)
+--#endregion
+
 local swap_btn_size = vec2:new(140, 35)
 local swap_wnd_height = 260
 vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()

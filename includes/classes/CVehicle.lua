@@ -5,6 +5,7 @@ local CCarHandlingData           = require("includes.classes.CCarHandlingData")
 local CBikeHandlingData          = require("includes.classes.CBikeHandlingData")
 local CFlyingHandlingData        = require("includes.classes.CFlyingHandlingData")
 local phFragInst                 = require("includes.structs.phFragInst")
+local CVehicleDrawData           = require("includes.classes.CVehicleDrawData")
 
 ---@class CAdvancedData : GenericClass
 local CAdvancedData              = GenericClass
@@ -34,6 +35,7 @@ local SubHandlingCtorMap <const> = {
 ---@class CVehicle : CEntity
 ---@field private m_ptr pointer
 ---@field public m_physics_fragments phFragInst //0x30 `struct rage::phFragInst`
+---@field public m_draw_data CVehicleDrawData
 ---@field public m_handling_data pointer<CHandlingData>
 ---@field public m_model_info pointer<CVehicleModelInfo>
 ---@field public m_vehicle_damage pointer<CVehicleDamage>
@@ -98,7 +100,8 @@ function CVehicle:init(vehicle)
 	instance.m_handling_data                = ptr:add(0x0960):deref()
 	instance.m_sub_handling_data            = atArray(instance.m_handling_data:add(0x158), CCarHandlingData)
 	instance.m_model_info_layout            = instance.m_model_info:add(0x00B0):deref()
-	instance.m_physics_fragments            = phFragInst(ptr:add(0x30):deref())
+	instance.m_physics_fragments            = phFragInst(ptr:add(0x0030):deref())
+	instance.m_draw_data                    = CVehicleDrawData:init(ptr:add(0x0048):deref())
 	instance.m_can_boost_jump               = ptr:add(0x03A4)
 	instance.m_deform_god                   = ptr:add(0x096C)
 	instance.m_is_targetable                = ptr:add(0x0AEE)
@@ -123,11 +126,11 @@ function CVehicle:init(vehicle)
 	instance.m_traction_curve_max           = instance.m_handling_data:add(0x0088)
 	instance.m_low_speed_traction_loss_mult = instance.m_handling_data:add(0x00A8)
 	instance.m_traction_loss_mult           = instance.m_handling_data:add(0x00B8)
+	instance.m_deform_mult                  = instance.m_handling_data:add(0x00F8)
 	instance.m_monetary_value               = instance.m_handling_data:add(0x0118)
 	instance.m_model_flags                  = instance.m_handling_data:add(0x0124)
 	instance.m_handling_flags               = instance.m_handling_data:add(0x0128)
 	instance.m_damage_flags                 = instance.m_handling_data:add(0x012C)
-	instance.m_deform_mult                  = instance.m_handling_data:add(0x00F8)
 	instance.m_wheel_scale                  = instance.m_model_info:add(0x048C)
 	instance.m_wheel_scale_rear             = instance.m_model_info:add(0x0490)
 	instance.m_wheels                       = atArray(ptr:add(0xC30), CWheel)

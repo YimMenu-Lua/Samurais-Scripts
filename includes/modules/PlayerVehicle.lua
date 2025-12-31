@@ -16,6 +16,7 @@ local VehMines         = require("includes.features.vehicle.mines")
 local MiscVehicle      = require("includes.features.vehicle.misc_vehicle")
 local CobraManeuver    = require("includes.features.vehicle.cobra_maneuver")
 local HandlingEditor   = require("includes.structs.HandlingEditor")
+local Stancer          = require("includes.features.vehicle.stancer")
 
 ---@class GenericToggleable
 ---@field is_toggled boolean
@@ -47,6 +48,7 @@ local HandlingEditor   = require("includes.structs.HandlingEditor")
 ---@field public m_engine_swap_compatible boolean
 ---@field public m_is_shooting_flares boolean
 ---@field public m_is_flatbed boolean cache it so we don't have to call natives in UI threads
+---@field public m_stance_mgr Stancer
 ---@overload fun(handle: handle): PlayerVehicle
 local PlayerVehicle = Class("PlayerVehicle", Vehicle)
 
@@ -90,10 +92,11 @@ function PlayerVehicle:AddFeature(feat)
 end
 
 function PlayerVehicle:InitFeatures()
-	self.m_feat_mgr  = FeatureMgr.new(self)
-	self.m_lctrl_mgr = self.m_feat_mgr:Add(LaunchControlMgr.new(self))
-	self.m_nos_mgr   = self.m_feat_mgr:Add(NosMgr.new(self))
-	self.m_abs_mgr   = self.m_feat_mgr:Add(BFD.new(self))
+	self.m_feat_mgr   = FeatureMgr.new(self)
+	self.m_lctrl_mgr  = self.m_feat_mgr:Add(LaunchControlMgr.new(self))
+	self.m_nos_mgr    = self.m_feat_mgr:Add(NosMgr.new(self))
+	self.m_abs_mgr    = self.m_feat_mgr:Add(BFD.new(self))
+	self.m_stance_mgr = self.m_feat_mgr:Add(Stancer.new(self))
 
 	self.m_feat_mgr:Add(FlappyDoors.new(self))
 	self.m_feat_mgr:Add(DriftMode.new(self))
@@ -184,6 +187,8 @@ function PlayerVehicle:Set(handle)
 	if (GVars.features.vehicle.no_turbulence and VEHICLE.IS_THIS_MODEL_A_PLANE(new_model)) then
 		VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(handle, 0.0)
 	end
+
+	self.m_stance_mgr:ReadDefaults()
 	-- self:ResumeThreads()
 	-- self.m_feat_mgr:OnEnable()
 end
@@ -191,9 +196,10 @@ end
 function PlayerVehicle:Reset()
 	-- self:SuspendThreads()
 	-- self.m_feat_mgr:Cleanup()
-	if (self:IsLocked()) then
+	if (self:IsValid() and self:IsLocked()) then
 		VEHICLE.SET_VEHICLE_DOORS_LOCKED(self:GetHandle(), 1)
 		self.m_generic_toggleables["autolockdoors"] = nil
+		self.m_last_model = self:GetModelHash()
 	end
 
 	self:RestoreHeadlights()
@@ -202,13 +208,14 @@ function PlayerVehicle:Reset()
 	self:RestoreAllPatches()
 	self:ResetAllGenericToggleables()
 	self.m_handling_editor:Reset()
+	self.m_stance_mgr:Cleanup()
 
 	self.m_autopilot = {
 		eligible = false,
 		state = self.eAutoPilotState.NONE,
 		initial_nozzle_pos = 1,
 	}
-	self.m_last_model = self:GetModelHash()
+
 	self:Destroy()
 	self.m_handle = 0
 end
@@ -288,7 +295,7 @@ function PlayerVehicle:ResetAllGenericToggleables()
 		local toggled = generic.is_toggled
 		local func = generic.onDisable
 		local args = generic.args
-		if (toggled and type(generic.onDisable) == "function") then
+		if (toggled and type(generic.onDisable) == "function" and self:IsValid()) then
 			func(table.unpack(args))
 		end
 	end

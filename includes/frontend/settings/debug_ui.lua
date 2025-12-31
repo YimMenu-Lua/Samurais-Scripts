@@ -551,6 +551,7 @@ local function DrawMiscTests()
 			PV:Resolve():DumpModelInfoFlags()
 		end)
 	end
+
 	ImGui.SameLine()
 	if (ImGui.Button("Advanced Flags")) then
 		script.run_in_fiber(function()
@@ -559,17 +560,6 @@ local function DrawMiscTests()
 				return
 			end
 			PV:Resolve():DumpAdvancedFlags()
-		end)
-	end
-
-	if (ImGui.Button("Get Subhandling Data")) then
-		script.run_in_fiber(function()
-			local PV = Self:GetVehicle()
-			if (not PV:IsValid()) then
-				return
-			end
-
-			print(PV:GetHandlingData())
 		end)
 	end
 end

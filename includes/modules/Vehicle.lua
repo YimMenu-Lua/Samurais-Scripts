@@ -32,6 +32,7 @@ local collisionInvalidModels = Set.new(
 ---@field private m_num_seats number
 ---@field private m_max_passengers number
 ---@field private m_has_loud_radio boolean
+---@field private m_last_ram_time seconds
 ---@field Resolve fun() : CVehicle
 ---@field Create fun(_, modelHash: joaat_t, entityType: eEntityType, pos?: vec3, heading?: number, isNetwork?: boolean, isScriptHostPed?: boolean): Vehicle
 ---@overload fun(handle: handle): Vehicle
@@ -1245,8 +1246,18 @@ function Vehicle:GetHandlingData()
 	return self:Resolve():GetSubHandlingData(handlingType)
 end
 
+---@return integer
 function Vehicle:GetMaxPassengers()
 	return VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(self:GetHandle())
+end
+
+---@return integer
+function Vehicle:GetNumberOfWheels()
+	if (not self:IsValid()) then
+		return 0
+	end
+
+	return self:Resolve().m_num_wheels
 end
 
 ---@param seatIndex integer
@@ -1415,6 +1426,86 @@ function Vehicle:Wander(opts)
 		opts.speed or 20,
 		opts.drivingFlags or 786603
 	)
+end
+
+function Vehicle:RamForward()
+	if (not self:IsValid() or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())) then
+		return
+	end
+
+	ThreadManager:Run(function()
+		self.m_last_ram_time = self.m_last_ram_time or 0
+		if (Time.now() - self.m_last_ram_time < 3) then
+			return
+		end
+
+		local last_speed = self:GetSpeed()
+		ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+			self:GetHandle(),
+			1,
+			0.0,
+			math.min(1e5, self:GetSpeed() * 3e3),
+			0.0,
+			false,
+			true,
+			false,
+			false
+		)
+
+		sleep(500)
+		VEHICLE.SET_VEHICLE_FORWARD_SPEED(self:GetHandle(), last_speed)
+		self.m_last_ram_time = Time.now()
+	end)
+end
+
+function Vehicle:RamLeft()
+	if (not self:IsValid() or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())) then
+		return
+	end
+
+	self.m_last_ram_time = self.m_last_ram_time or 0
+	if (Time.now() - self.m_last_ram_time < 3) then
+		return
+	end
+
+	ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+		self:GetHandle(),
+		1,
+		-math.min(1e5, self:GetSpeed() * 3e3),
+		0.0,
+		0.0,
+		false,
+		true,
+		false,
+		false
+	)
+
+	self.m_last_ram_time = Time.now()
+end
+
+function Vehicle:RamRight()
+	if (not self:IsValid() or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())) then
+		return
+	end
+
+	self.m_last_ram_time = self.m_last_ram_time or 0
+	if (Time.now() - self.m_last_ram_time < 3) then
+		return
+	end
+
+	ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+		self:GetHandle(),
+		1,
+		math.min(1e5, self:GetSpeed() * 3e3),
+		0.0,
+		0.0,
+		false,
+		true,
+		false,
+		false
+	)
+
+	self.m_last_ram_time = Time.now()
 end
 
 -- Serializes a vehicle to JSON.

@@ -53,6 +53,18 @@ script.run_in_fiber(function()
 		end
 	end
 
+	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD8, function()
+		Self:GetVehicle():RamForward()
+	end)
+
+	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD4, function()
+		Self:GetVehicle():RamLeft()
+	end)
+
+	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD6, function()
+		Self:GetVehicle():RamRight()
+	end)
+
 	while not PatternScanner:IsDone() do
 		yield()
 	end
