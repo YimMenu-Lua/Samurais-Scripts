@@ -28,7 +28,8 @@ return {
 	["VEH_NO_JET_STALL_TT"] = "當您按住制動按鈕時，飛機發動機將不再熄火。",
 	["VEH_MG_TRIGGERBOT_ENEMY"] = "僅限敵人",
 	["VEH_NO_JET_STALL"] = "禁用發動機熄火",
-	["VEH_FAST_JETS_TT"] = "使大多數飛機更快，只要它們默認可以達到 240 公里/小時，它們的最大速度將增加到 555 公里/小時。 \n\n像除塵器這樣較慢的飛機不會受益於此，除非你通過俯衝強制它們達到速度閾值。 \n\n注意：你的齒輪（飛機輪）必須向上。",
+	["VEH_FAST_JETS_TT"] =
+	"使大多數飛機更快，只要它們默認可以達到 240 公里/小時，它們的最大速度將增加到 555 公里/小時。 \n\n像除塵器這樣較慢的飛機不會受益於此，除非你通過俯衝強制它們達到速度閾值。 \n\n注意：你的齒輪（飛機輪）必須向上。",
 	["VEH_MG_TRIGGERBOT"] = "機槍扳機機器人",
 	["VEH_MG_TRIGGERBOT_ENEMY_TT"] = "機槍扳機機器人只射擊敵人。",
 	["VEH_MG_TRIGGERBOT_TT"] = "自動發射飛機的機槍。",
@@ -72,7 +73,8 @@ return {
 	["SETTINGS_RESET_PRESERVE_KEYS"] = "可選：選擇要保留的配置項。",
 	["FLTBD_EXIT_VEH_ERR"] = "首先退出當前車輛。",
 	["FTLBD_GET_IN_MSG"] = "您目前不在平闆卡車上。您可以從街上偷一個或使用下面的按鈕生成一個新的。",
-	["SETTINGS_ENTITY_REPLACE_TT"] = "該項目對可以​​生成的實體（行人、車輛、物體）數量有限制。所有功能都遵守該限制，以防止實體垃圾郵件或阻塞遊戲。一旦達到某種實體類型的限制並嘗試生成新實體，此選項允許腳本自動替換舊的生成實體。",
+	["SETTINGS_ENTITY_REPLACE_TT"] =
+	"該項目對可以​​生成的實體（行人、車輛、物體）數量有限制。所有功能都遵守該限制，以防止實體垃圾郵件或阻塞遊戲。一旦達到某種實體類型的限制並嘗試生成新實體，此選項允許腳本自動替換舊的生成實體。",
 	["SETTINGS_CFG_RESET"] = "重置保存的配置",
 	["GENERIC_UNAVAILABLE"] = "目前不可用。",
 	["INF_ATTACHMENT_DROP"] = "附件掉了。",
@@ -355,7 +357,7 @@ return {
 	["VEH_PAINT_NOT_SELECTED_ERR"] = "請選擇小學或中學或兩者兼而有之。",
 	["VEH_PAINT_SECONDARY_CB"] = "作為次要",
 	["VEH_PAINT_SAVE_TT"] = "要在個人車輛上保留這種顏色，請前往改裝店購買諸如車窗貼膜或板式或任何東西之類的東西。",
-	["VEH_ENGINE_SWAP_INCOMPATIBE"] = "此功能僅與汽車和卡車兼容。",
+	["GENERIC_CARS_ONLY"] = "此功能僅與汽車和卡車兼容。",
 	["VEH_COBRA_MANEUVER_TT"] = "按鍵盤上的 [X] 執行眼鏡蛇機動。僅適用於噴氣式飛機。",
 	["VEH_COBRA_MANEUVER"] = "眼鏡蛇機動",
 	["CP_AUTOPLAY_SLOTS_TIME_DELAY"] = "比賽之間的延遲",

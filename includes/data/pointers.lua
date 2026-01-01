@@ -1,5 +1,9 @@
 PatternScanner = require("includes.services.PatternScanner"):init()
 
+--- A place to store callable naems returned from `memory.dynamic_call`
+---@class DynamicFuncNames
+---@field dfn_IsVehicleWheelBrokenOff? string
+
 -- ### A place to store pointers globally.
 --
 -- You can add new indexes to this global table from any other file
@@ -15,15 +19,21 @@ PatternScanner = require("includes.services.PatternScanner"):init()
 ---@field GameTime pointer<uint32_t>
 ---@field GameVersion { _build: string, _online: string }
 ---@field ScreenResolution vec2
+---@field IsVehicleWheelBrokenOff pointer<function>
+---@field DynamicFuncNames DynamicFuncNames
 local GPointers = {
-	Init = function() PatternScanner:Scan() end,
-	Retry = function() PatternScanner:RetryScan() end,
-	ScriptGlobals = NULLPTR,
-	GameState = NULLPTR,
-	GameTime = NULLPTR,
-	GameVersion = { _build = "nil", _online = "nil" },
-	ScreenResolution = vec2:zero(),
+	Init                    = function() PatternScanner:Scan() end,
+	Retry                   = function() PatternScanner:RetryScan() end,
+	ScriptGlobals           = nullptr,
+	GameState               = nullptr,
+	GameTime                = nullptr,
+	IsVehicleWheelBrokenOff = nullptr,
+	GameVersion             = { _build = "nil", _online = "nil" },
+	ScreenResolution        = vec2:zero(),
 }
+
+GPointers.DynamicFuncNames = {}
+
 
 ---@class MemoryBatch
 ---@field m_name string
@@ -88,6 +98,19 @@ local mem_batches <const> = {
 				ptr:add(0x4):rip():get_word()
 			)
 		end),
+		-- MemoryBatch.new("IsVehicleWheelBrokenOff", "E8 ? ? ? ? 48 8B CD 41 88 84 1F", function(ptr)
+		-- 	if ptr:is_null() then
+		-- 		return
+		-- 	end
+
+		-- 	local func_ptr = ptr:add(0x1):rip()
+		-- 	GPointers.IsVehicleWheelBrokenOff = func_ptr -- not needed for this but we'll just go ahead and store it
+		-- 	GPointers.DynamicFuncNames.dfn_IsVehicleWheelBrokenOff = memory.dynamic_call(
+		-- 		"bool",
+		-- 		{ "void*", "int" },
+		-- 		func_ptr
+		-- 	)
+		-- end),
 	},
 	[Enums.eAPIVersion.V2] = {
 		MemoryBatch.new("ScriptGlobals", "48 8B 8E B8 00 00 00 48 8D 15 ? ? ? ? 49 89 D8", function(ptr)

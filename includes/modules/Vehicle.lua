@@ -374,6 +374,24 @@ function Vehicle:HasLandingGear()
 	return VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(self:GetHandle())
 end
 
+---@return boolean
+function Vehicle:HasCustomTyres()
+	if (not self:IsValid()) then
+		return false
+	end
+
+	return VEHICLE.GET_VEHICLE_MOD_VARIATION(self:GetHandle(), 23) ~= 0
+end
+
+---@return boolean
+function Vehicle:HasWheelDrawData()
+	if (not self:IsValid()) then
+		return false
+	end
+
+	return self:Resolve():HasWheelDrawData()
+end
+
 function Vehicle:HasCrashed()
 	if (not self:HasCollidedWithAnything()) then
 		return false, ""
@@ -498,19 +516,66 @@ function Vehicle:IsElectric()
 end
 
 -- Returns whether the vehicle is an F1 race car.
+---@return boolean
 function Vehicle:IsFormulaOne()
 	return self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.IS_FORMULA_VEHICLE)
 		or (self:GetClassID() == Enums.eVehicleClasses.OpenWheel)
 end
 
 -- Returns whether the vehicle is a lowrider equipped with hydraulic suspension.
+---@return boolean
 function Vehicle:IsLowrider()
 	return self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.HAS_LOWRIDER_HYDRAULICS)
 		or self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.HAS_LOWRIDER_DONK_HYDRAULICS)
 end
 
+---@return boolean
 function Vehicle:IsLocked()
 	return VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(self:GetHandle()) > 1
+end
+
+---@param wheelIndex integer
+---@return boolean
+function Vehicle:IsWheelBrokenOff(wheelIndex)
+	if (not self:IsValid()) then
+		return false
+	end
+
+	local numWheels = self:GetNumberOfWheels()
+	if (wheelIndex > numWheels) then
+		Backend:debug("Wheel index out of bounds.")
+		return false
+	end
+
+	return self:Resolve():IsWheelBrokenOff(wheelIndex)
+end
+
+---@return float -- Wheel width or 0.f if invalid
+function Vehicle:GetWheelWidth()
+	return self:Resolve():GetWheelWidth()
+end
+
+---@return float -- Wheel size or 0.f if invalid
+function Vehicle:GetWheelSize()
+	return self:Resolve():GetWheelSize()
+end
+
+---@param fValue float
+function Vehicle:SetVisualWheelWidth(fValue)
+	if (not self:HasWheelDrawData()) then
+		return
+	end
+
+	self:Resolve():SetWheelWidth(fValue)
+end
+
+---@param fValue float
+function Vehicle:SetVisualWheelSize(fValue)
+	if (not self:HasWheelDrawData()) then
+		return
+	end
+
+	self:Resolve():SetWheelSize(fValue)
 end
 
 function Vehicle:ClearPrimaryTask()
@@ -1429,7 +1494,10 @@ function Vehicle:Wander(opts)
 end
 
 function Vehicle:RamForward()
-	if (not self:IsValid() or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())) then
+	if not self:IsValid()
+		or not self:IsCar()
+		or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())
+	then
 		return
 	end
 
@@ -1459,7 +1527,10 @@ function Vehicle:RamForward()
 end
 
 function Vehicle:RamLeft()
-	if (not self:IsValid() or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())) then
+	if not self:IsValid()
+		or not self:IsCar()
+		or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())
+	then
 		return
 	end
 
@@ -1484,7 +1555,10 @@ function Vehicle:RamLeft()
 end
 
 function Vehicle:RamRight()
-	if (not self:IsValid() or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())) then
+	if not self:IsValid()
+		or not self:IsCar()
+		or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())
+	then
 		return
 	end
 

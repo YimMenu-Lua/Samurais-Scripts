@@ -355,8 +355,8 @@ end
 function PrivateHeli:Cleanup()
 	Game.DeleteEntity(self.pilot)
 	Game.DeleteEntity(self.m_handle)
-	Decorator:RemoveEntity(self.pilot, "BillionaireServices")
-	Decorator:RemoveEntity(self.m_handle, "BillionaireServices")
+	Decorator:RemoveEntity(self.pilot)
+	Decorator:RemoveEntity(self.m_handle)
 
 	self.pilot = nil
 	self.m_handle = nil

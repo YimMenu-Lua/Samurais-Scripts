@@ -421,4 +421,39 @@ function CVehicle:RotateBoneMatrix(boneIndex, axis, angle)
 	self:SetBoneMatrix(boneIndex, new_matrix)
 end
 
+---@param wheelIndex integer
+---@return boolean
+function CVehicle:IsWheelBrokenOff(wheelIndex)
+	if (not self:IsValid()) then
+		return false
+	end
+
+	-- Thanks tupoy-ya
+	return (self.m_ptr:add(0xA98):get_dword() >> (wheelIndex & 0x1F) & 1) ~= 0
+end
+
+---@return float -- Wheel width or 0.f if invalid
+function CVehicle:GetWheelWidth()
+	return self.m_draw_data:GetWheelWidth()
+end
+
+---@return float -- Wheel size or 0.f if invalid
+function CVehicle:GetWheelSize()
+	return self.m_draw_data:GetWheelSize()
+end
+
+---@param fValue float
+function CVehicle:SetWheelWidth(fValue)
+	self.m_draw_data:SetWheelWidth(fValue)
+end
+
+---@param fValue float
+function CVehicle:SetWheelSize(fValue)
+	self.m_draw_data:SetWheelSize(fValue)
+end
+
+function CVehicle:HasWheelDrawData()
+	return self.m_draw_data:GetWheelDrawData():IsValid()
+end
+
 return CVehicle

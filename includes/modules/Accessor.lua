@@ -170,7 +170,7 @@ function Accessor:GetPointer()
 		return locals.get_pointer(self.m_script, self:GetIndex())
 	end
 
-	return NULLPTR
+	return nullptr
 end
 
 ---------------------------

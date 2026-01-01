@@ -530,6 +530,11 @@ for key, data in pairs(Self:GetVehicle().m_flag_registry) do
 end
 
 handlingEditorTab:RegisterGUI(function()
+	if (self.get_veh() == 0) then
+		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
+		return
+	end
+
 	handlingEditorTab:GetGridRenderer():Draw()
 end)
 --#endregion
@@ -541,13 +546,13 @@ vehicleTab:RegisterSubtab("Stancer", require("includes.frontend.vehicle.stancer_
 local swap_btn_size = vec2:new(140, 35)
 local swap_wnd_height = 260
 vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
-	if (Self:GetVehicle():GetHandle() == 0) then
+	if (self.get_veh() == 0) then
 		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
 		return
 	end
 
 	if (not Self:GetVehicle().m_engine_swap_compatible) then
-		ImGui.Text(_T("VEH_ENGINE_SWAP_INCOMPATIBE"))
+		ImGui.Text(_T("GENERIC_CARS_ONLY"))
 		return
 	end
 

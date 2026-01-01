@@ -1,3 +1,4 @@
+local CWheel = require "includes.classes.CWheel"
 local RED <const> = Color("red")
 local GREEN <const> = Color("green")
 local BLUE <const> = Color("blue")

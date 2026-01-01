@@ -23,7 +23,8 @@ return {
 	["GENERIC_SPAWN"] = "Generare",
 	["VEH_NO_JET_STALL_TT"] = "I motori degli aerei non si fermeranno più quando si tiene premuto il pulsante del freno.",
 	["VEH_MG_TRIGGERBOT_RANGE"] = "Gamma Triggerbot",
-	["VEH_FAST_JETS_TT"] = "Rende la maggior parte degli aerei più veloci fintanto che possono raggiungere i 240 Km/h per impostazione predefinita, la loro velocità massima sarà aumentata a 555 Km/h.\n\nGli aerei più lenti come lo spolverino non ne beneficiano a meno che non li costringi a raggiungere con la forza la soglia di velocità tuffandosi dal muso.\n\nNOTA: il tuo equipaggiamento (ruote dell'aereo) deve essere alzato.",
+	["VEH_FAST_JETS_TT"] =
+	"Rende la maggior parte degli aerei più veloci fintanto che possono raggiungere i 240 Km/h per impostazione predefinita, la loro velocità massima sarà aumentata a 555 Km/h.\n\nGli aerei più lenti come lo spolverino non ne beneficiano a meno che non li costringi a raggiungere con la forza la soglia di velocità tuffandosi dal muso.\n\nNOTA: il tuo equipaggiamento (ruote dell'aereo) deve essere alzato.",
 	["VEH_AUTOPILOT"] = "Autopilota",
 	["VEH_NO_TURBULENCE"] = "Turbolenza dell'aria disabilitata",
 	["VEH_NO_JET_STALL"] = "Disabilita lo stallo del motore",
@@ -39,7 +40,8 @@ return {
 	["VEH_MG_TRIGGERBOT_ENEMY"] = "Solo nemici",
 	["VEH_MG_MANUAL_AIM"] = "Mira manuale della mitragliatrice",
 	["VEH_FLARES"] = "Contromisure per i fuochi d'artificio",
-	["VEH_FLARES_TT"] = "Ti consente di lanciare razzi da qualsiasi aereo utilizzando il pulsante di contromisure predefinito.",
+	["VEH_FLARES_TT"] =
+	"Ti consente di lanciare razzi da qualsiasi aereo utilizzando il pulsante di contromisure predefinito.",
 	["WRLD_HNS"] = "Nascondino",
 	["VEH_SEAT_NEXT"] = "Il prossimo posto",
 	["VEH_SEAT_PREV"] = "Posto precedente",
@@ -52,8 +54,10 @@ return {
 	["WRLD_CARPOOL"] = "Car pooling",
 	["FLTBD_TOWING_TXT"] = "Veicolo rimorchiato:",
 	["FLTBD_SHOW_TOWPOS_CB"] = "Mostra la posizione di traino",
-	["WRLD_HNS_TT"] = "Ti consente di nasconderti all'interno di veicoli, bagagliai o bidoni della spazzatura. Se hai un livello di ricercato, la polizia ti perderà fintanto che ti nascondi prima di essere individuato.",
-	["YAV3_STOP_BTN_HINT"] = "SUGGERIMENTO: puoi premere %s per interrompere l'esecuzione di qualsiasi azione o tenerlo premuto per un secondo per pulire tutto.",
+	["WRLD_HNS_TT"] =
+	"Ti consente di nasconderti all'interno di veicoli, bagagliai o bidoni della spazzatura. Se hai un livello di ricercato, la polizia ti perderà fintanto che ti nascondi prima di essere individuato.",
+	["YAV3_STOP_BTN_HINT"] =
+	"SUGGERIMENTO: puoi premere %s per interrompere l'esecuzione di qualsiasi azione o tenerlo premuto per un secondo per pulire tutto.",
 	["FLTBD_TOW_BTN"] = "Trainare",
 	["WRLD_CARPOOL_TT"] = "Ti permette di salire sui veicoli NPC come passeggero.",
 	["FLTBD_SHOW_TOWBOX_TT"] = "Disegna una casella ESP attorno al veicolo bersaglio.",
@@ -63,22 +67,29 @@ return {
 	["FLTBD_ADJUST_POS_TXT"] = "Regola la posizione del veicolo",
 	["FLTBD_NEARBY_VEH_TXT"] = "Veicolo più vicino:",
 	["SETTINGS_ENTITY_REPLACE"] = "Entità con sostituzione automatica",
-	["FLTBD_ADJUST_POS_TT"] = "Affinché le frecce abbiano un senso, sposta la telecamera del gioco verso destra. (Guarda a destra)",
+	["FLTBD_ADJUST_POS_TT"] =
+	"Affinché le frecce abbiano un senso, sposta la telecamera del gioco verso destra. (Guarda a destra)",
 	["FLTBD_CARS_ONLY_ERR"] = "Puoi trainare solo auto, camion e biciclette.",
-	["FTLBD_GET_IN_MSG"] = "Al momento non ti trovi su un camion con pianale. Puoi rubarne uno dalla strada o utilizzare il pulsante in basso per generarne uno nuovo.",
+	["FTLBD_GET_IN_MSG"] =
+	"Al momento non ti trovi su un camion con pianale. Puoi rubarne uno dalla strada o utilizzare il pulsante in basso per generarne uno nuovo.",
 	["SETTINGS_RESET_PRESERVE_KEYS"] = "Facoltativo: scegli gli elementi di configurazione da conservare.",
 	["FLTBD_EXIT_VEH_ERR"] = "Esci prima dal tuo veicolo attuale.",
 	["FLTBD_NO_VEH_TXT"] = "Nessun veicolo nelle vicinanze trovato.",
 	["FLTBD_SAME_NOT_ALLOWED_ERR"] = "Non è possibile trainare un altro camion con pianale.",
 	["SETTINGS_CFG_RESET"] = "Reimposta la configurazione salvata",
 	["FLTBD_FAST_ADJUST_TXT"] = "Tieni premuto [SHIFT] per muoverti più velocemente.",
-	["FLTBD_TOW_ALL_TT"] = "Per impostazione predefinita, il camion traina solo auto, camion e biciclette. Questa opzione rimuove tale limitazione.",
-	["SETTINGS_ENTITY_REPLACE_TT"] = "Questo progetto ha un limite al numero di entità che puoi generare (pedoni, veicoli, oggetti). Tutte le funzionalità rispettano tale limite per prevenire spam di entità o soffocare il gioco. Questa opzione consente allo script di sostituire automaticamente le vecchie entità generate una volta raggiunto il limite per un determinato tipo di entità e provare a generarne una nuova.",
+	["FLTBD_TOW_ALL_TT"] =
+	"Per impostazione predefinita, il camion traina solo auto, camion e biciclette. Questa opzione rimuove tale limitazione.",
+	["SETTINGS_ENTITY_REPLACE_TT"] =
+	"Questo progetto ha un limite al numero di entità che puoi generare (pedoni, veicoli, oggetti). Tutte le funzionalità rispettano tale limite per prevenire spam di entità o soffocare il gioco. Questa opzione consente allo script di sostituire automaticamente le vecchie entità generate una volta raggiunto il limite per un determinato tipo di entità e provare a generarne una nuova.",
 	["GENERIC_UNAVAILABLE"] = "Attualmente non disponibile.",
-	["WARN_PED_SPAWN_LIMIT"] = "Limite di spawn dei pedoni raggiunto! Valuta la possibilità di abilitare \"Sostituisci automaticamente entità\" nella scheda Impostazioni se desideri sostituire automaticamente le vecchie entità quando raggiungi il limite.",
+	["WARN_PED_SPAWN_LIMIT"] =
+	"Limite di spawn dei pedoni raggiunto! Valuta la possibilità di abilitare \"Sostituisci automaticamente entità\" nella scheda Impostazioni se desideri sostituire automaticamente le vecchie entità quando raggiungi il limite.",
 	["INF_ATTACHMENT_NONE"] = "Sembra che non ci sia nulla legato a noi.",
-	["WARN_OBJ_SPAWN_LIMIT"] = "Limite di generazione degli oggetti raggiunto! Valuta la possibilità di abilitare \"Sostituisci automaticamente entità\" nella scheda Impostazioni se desideri sostituire automaticamente le vecchie entità quando raggiungi il limite.",
-	["WARN_VEH_SPAWN_LIMIT"] = "Limite di spawn dei veicoli raggiunto! Valuta la possibilità di abilitare \"Sostituisci automaticamente entità\" nella scheda Impostazioni se desideri sostituire automaticamente le vecchie entità quando raggiungi il limite.",
+	["WARN_OBJ_SPAWN_LIMIT"] =
+	"Limite di generazione degli oggetti raggiunto! Valuta la possibilità di abilitare \"Sostituisci automaticamente entità\" nella scheda Impostazioni se desideri sostituire automaticamente le vecchie entità quando raggiungi il limite.",
+	["WARN_VEH_SPAWN_LIMIT"] =
+	"Limite di spawn dei veicoli raggiunto! Valuta la possibilità di abilitare \"Sostituisci automaticamente entità\" nella scheda Impostazioni se desideri sostituire automaticamente le vecchie entità quando raggiungi il limite.",
 	["GENERIC_OPTIONS_LABEL"] = "Opzioni",
 	["GENERIC_POSITION_LABEL"] = "Posizione",
 	["GENERIC_UP_DOWN_LABEL"] = "Su/Giù",
@@ -87,7 +98,8 @@ return {
 	["GENERIC_CANCEL"] = "Cancellare",
 	["GENERIC_RESET"] = "Reset",
 	["GENERIC_CONFIRM"] = "Confermare",
-	["GENERIC_OFFLINE_OR_OUTDATED"] = "Devi essere online e avere l'ultima versione dello script per accedere a questa funzionalità!",
+	["GENERIC_OFFLINE_OR_OUTDATED"] =
+	"Devi essere online e avere l'ultima versione dello script per accedere a questa funzionalità!",
 	["GENERIC_LEFT_RIGHT_LABEL"] = "Sinistra/destra",
 	["GENERIC_SG_SL_READ_FAIL"] = "Impossibile leggere lo script globale/locale. Contatta uno sviluppatore.",
 	["GENERIC_CONTACT_DEV"] = "Qualcosa è andato storto! Contatta uno sviluppatore.",
@@ -120,7 +132,8 @@ return {
 	["CP_CARD_DIAMONDS"] = "Diamanti",
 	["CP_COOLDOWN_BYPASS_STATUS"] = "Stato:",
 	["CP_COOLDOWN_BYPASS_ENABLE"] = "Abilita bypass",
-	["CP_COOLDOWN_BYPASS_TOOLTIP"] = "Disabilita il tempo di recupero del casinò, può comportare il ban. Utilizzare a proprio rischio.",
+	["CP_COOLDOWN_BYPASS_TOOLTIP"] =
+	"Disabilita il tempo di recupero del casinò, può comportare il ban. Utilizzare a proprio rischio.",
 	["CP_COOLDOWN_BYPASS_STATUS_FORMAT"] = "Recupero per %.2f minuto/i.",
 	["CP_COOLDOWN_BYPASS_STATUS_OFF"] = "Spento raffreddamento",
 	["CP_COOLDOWN_BYPASS"] = "Evita il tempo di recupero delle fiches del casinò",
@@ -214,7 +227,8 @@ return {
 	["YRV3_INCOME_APPROX_MC"] = "Reddito aziendale totale approssimativo di MC",
 	["YRV3_PRICE_NOTICE"] = "I prezzi potrebbero essere più alti a seconda degli aggiornamenti aziendali.",
 	["YRV3_HANGAR_STEAL_CB"] = "Ruba casse dell'hangar",
-	["YRV3_NC_CHANCE_ENCOUNTER_TT"] = "Genera sempre le missioni del nightclub piantagrane e disabilita le missioni VIP eliminate.",
+	["YRV3_NC_CHANCE_ENCOUNTER_TT"] =
+	"Genera sempre le missioni del nightclub piantagrane e disabilita le missioni VIP eliminate.",
 	["YRV3_POPULARITY_NOTIF"] = "La popolarità dei nightclub è aumentata.",
 	["YRV3_CEO_BUY_CB"] = "Acquista cassa CEO",
 	["YRV3_CFR_CD_CB"] = "Raid alla fabbrica di polli",
@@ -226,7 +240,8 @@ return {
 	["YRV3_NC_MANAGMENT_CB"] = "Gestione delle discoteche",
 	["YRV3_CLUB_WORK_CB"] = "Lavoro del club motociclistico",
 	["YRV3_SAFECASH_TOTAL"] = "Contanti totali in tutte le casseforti",
-	["YRV3_SEXY_SHINABI_NOTICE"] = "Utilizza invece lo script Payphone Hits di ShinyWasabi.\nPremi [TAB] per copiare il collegamento GitHub.",
+	["YRV3_SEXY_SHINABI_NOTICE"] =
+	"Utilizza invece lo script Payphone Hits di ShinyWasabi.\nPremi [TAB] per copiare il collegamento GitHub.",
 	["YRV3_IE_VEH_SELL_CB"] = "Vendita di veicoli I/E",
 	["YRV3_IE_VEH_STEAL_CB"] = "Approvvigionamento di veicoli I/E",
 	["YRV3_PAYHPONE_HITS_CB"] = "Hit del telefono pubblico",
@@ -239,15 +254,18 @@ return {
 	["YRV3_SELL_MISSIONS_LABEL"] = "Vendi missioni",
 	["YRV3_CB_UNCHECK_ALL"] = "Deseleziona tutto",
 	["YRV3_SELL_MISSIONS_NOTIF"] = "Disabilitate le missioni di vendita %s più fastidiose.",
-	["YRV3_SELL_MISSIONS_TT"] = "Queste opzioni non verranno salvate. Ciascun pulsante disabilita le missioni di vendita più noiose per quell'attività.",
+	["YRV3_SELL_MISSIONS_TT"] =
+	"Queste opzioni non verranno salvate. Ciascun pulsante disabilita le missioni di vendita più noiose per quell'attività.",
 	["YRV3_AUTO_SELL_SUPPORT_NOTICE"] = "Nota: sono supportate solo queste attività:",
 	["YRV3_AUTOSELL_BIKER_LABEL"] = "Imprese di motociclisti",
 	["YRV3_AUTOSELL_CEO_LABEL"] = "Magazzini CEO",
 	["YRV3_AUTOSELL_HANGAR_LABEL"] = "Hangar (solo aereo)",
-	["YRV3_SELL_MISSIONS_NOTE"] = "[NOTA]: Se prevedi di vendere più di una volta per la stessa attività, cambia sessione dopo aver terminato la prima vendita per ripristinare le missioni, altrimenti molto probabilmente la seconda non verrà avviata.",
+	["YRV3_SELL_MISSIONS_NOTE"] =
+	"[NOTA]: Se prevedi di vendere più di una volta per la stessa attività, cambia sessione dopo aver terminato la prima vendita per ripristinare le missioni, altrimenti molto probabilmente la seconda non verrà avviata.",
 	["YRV3_AUTOSELL_CURRENT"] = "Attualmente in vendita: %s",
 	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Laboratorio degli acidi",
-	["YRV3_AUTOSELL_TT"] = "Termina automaticamente una missione di vendita 20 secondi dopo il suo inizio. Non richiede che tu interagisca con nient'altro oltre all'avvio della missione.",
+	["YRV3_AUTOSELL_TT"] =
+	"Termina automaticamente una missione di vendita 20 secondi dopo il suo inizio. Non richiede che tu interagisca con nient'altro oltre all'avvio della missione.",
 	["YRV3_MCT_TITLE"] = "Terminale di controllo principale",
 	["YRV3_AUTO_SELL_MANUAL"] = "Termina manualmente la vendita",
 	["YRV3_HANGAR_LAND_ERR"] = "Hangar e vendite non sono attualmente supportati.",
@@ -261,20 +279,25 @@ return {
 	["YRV3_INCOME_APPROX_ALL"] = "Reddito approssimativo da tutte le imprese:",
 	["SELF_HEADPROPS"] = "Consenti oggetti di scena nei veicoli",
 	["YRV3_INCOME_APPROX_ALL_TT"] = "Scorri tutte le schede per aggiornare l'importo totale.",
-	["SELF_HEADPROPS_TT"] = "Impedisce al gioco di rimuovere l'equipaggiamento per la testa (cappelli, elmetti, cappelli lunghi, ecc.) quando si entra in un veicolo.",
+	["SELF_HEADPROPS_TT"] =
+	"Impedisce al gioco di rimuovere l'equipaggiamento per la testa (cappelli, elmetti, cappelli lunghi, ecc.) quando si entra in un veicolo.",
 	["SELF_ACTION_MODE_TT"] = "Disabilita il movimento stravagante del giocatore durante il combattimento.",
 	["SELF_CROUCH"] = "Accovacciati",
 	["SELF_STAND_ON_VEHS"] = "Salire sui veicoli",
 	["SELF_NO_CARJACKING"] = "Nessun furto d'auto",
-	["SELF_NO_CARJACKING_TT"] = "Impedisce agli NPC di rubarti l'auto. Dovrebbe prevenire anche i giocatori (non testato contro i giocatori).",
-	["SELF_STAND_ON_VEHS_TT"] = "Ti impedisce di rotolare quando sei sul tetto di un veicolo (cadrai comunque se colpisci qualcosa).",
+	["SELF_NO_CARJACKING_TT"] =
+	"Impedisce agli NPC di rubarti l'auto. Dovrebbe prevenire anche i giocatori (non testato contro i giocatori).",
+	["SELF_STAND_ON_VEHS_TT"] =
+	"Ti impedisce di rotolare quando sei sul tetto di un veicolo (cadrai comunque se colpisci qualcosa).",
 	["SELF_CROUCH_TT"] = "Ti fa accovacciare quando premi il pulsante invisibile, simile a GTA San Andreas.",
 	["SELF_HANDS_UP"] = "Mani in alto",
 	["SELF_SPRINT_INSIDE"] = "Sprint all'interno degli interni",
-	["SELF_HANDS_UP_TT"] = "Sostituisce l'azione \"Punta a\" in GTA Online (impostazione predefinita [B] sulla tastiera) con un'animazione di resa.",
+	["SELF_HANDS_UP_TT"] =
+	"Sostituisce l'azione \"Punta a\" in GTA Online (impostazione predefinita [B] sulla tastiera) con un'animazione di resa.",
 	["SELF_CLUMSY"] = "Goffo",
 	["SELF_ROD"] = "Ragdoll su richiesta",
-	["SELF_LOCKPICK_ANIM_TT"] = "Aumenta la possibilità di utilizzare l'animazione di scasso quando si rubano veicoli invece di rompere la finestra.",
+	["SELF_LOCKPICK_ANIM_TT"] =
+	"Aumenta la possibilità di utilizzare l'animazione di scasso quando si rubano veicoli invece di rompere la finestra.",
 	["SELF_SPRINT_INSIDE_TT"] = "Ti permette di correre a tutta velocità nella maggior parte degli interni (non tutti).",
 	["SELF_RAGDOLL_SOUND"] = "Suono Ragdoll",
 	["SELF_LOCKPICK_ANIM"] = "Animazione del grimaldello",
@@ -287,25 +310,32 @@ return {
 	["VEH_FAST_AF"] = "Veicoli veloci",
 	["SELF_REGEN_SPEED"] = "Velocità di rigenerazione della salute",
 	["VEH_FAST_AF_TT"] = "Aumenta la velocità massima di qualsiasi veicolo terrestre che guidi.",
-	["VEH_NOS_PURGE_TT"] = "Premere la combinazione di tasti assegnata (predefinita [X]) per eseguire un'eliminazione del NOS in stile 2Fast 2Furious.",
+	["VEH_NOS_PURGE_TT"] =
+	"Premere la combinazione di tasti assegnata (predefinita [X]) per eseguire un'eliminazione del NOS in stile 2Fast 2Furious.",
 	["VEH_ABS_LIGHTS"] = "Visualizzazione della forza frenante",
 	["VEH_POPS_N_BANGS"] = "Pop e scoppi",
 	["VEH_NOS_PURGE"] = "Spurgo NOS",
-	["VEH_ABS_LIGHTS_TT"] = "Fa lampeggiare le luci dei freni quando si frena ad alta velocità. Solo per veicoli dotati di ABS.",
-	["VEH_POPS_N_BANGS_TT"] = "Abilita forti schiocchi di scarico che si attivano ogni volta che si rilascia l'acceleratore da un regime elevato. PS: spaventa gli NPC vicini.",
+	["VEH_ABS_LIGHTS_TT"] =
+	"Fa lampeggiare le luci dei freni quando si frena ad alta velocità. Solo per veicoli dotati di ABS.",
+	["VEH_POPS_N_BANGS_TT"] =
+	"Abilita forti schiocchi di scarico che si attivano ogni volta che si rilascia l'acceleratore da un regime elevato. PS: spaventa gli NPC vicini.",
 	["VEH_SUBWOOFER"] = "Grande subwoofer",
 	["VEH_AUTO_BRAKE_LIGHTS"] = "Luci dei freni automatici",
 	["VEH_HIGH_BEAMS"] = "Abbaglianti sul clacson",
 	["VEH_STRONG_CRASH"] = "Crash più forti",
 	["VEH_STRONG_WINDOWS"] = "Finestre infrangibili",
-	["VEH_STRONG_WINDOWS_TT"] = "I finestrini del tuo veicolo non si romperanno mai. A meno che non venga fatto esplodere, ovviamente.",
+	["VEH_STRONG_WINDOWS_TT"] =
+	"I finestrini del tuo veicolo non si romperanno mai. A meno che non venga fatto esplodere, ovviamente.",
 	["VEH_HIGH_BEAMS_TT"] = "Fa lampeggiare gli abbaglianti ogni volta che suoni il clacson",
 	["VEH_AUTO_BRAKE_LIGHTS_TT"] = "Accende le luci dei freni ogni volta che ti fermi. (Il motore deve essere acceso).",
 	["VEH_RGB_LIGHTS"] = "Fari RGB",
 	["VEH_SUBWOOFER_TT"] = "Rende gli altoparlanti del tuo veicolo leggermente più forti e hanno bassi più profondi.",
-	["VEH_RGB_LIGHTS_TT"] = "Avvia un loop RGB sui fari del tuo veicolo. Puoi modificare la velocità nella parte inferiore di questa finestra.",
-	["VEH_STRONG_CRASH_TT"] = "Rende gli arresti anomali più spaventosi con vibrazioni della cam, effetti dello schermo, maggiore deformazione e danni. Le collisioni ad alta velocità possono essere fatali.",
-	["VEH_AUTO_LOCK_TT"] = "Blocca automaticamente il tuo veicolo quando ti allontani e lo sblocca nuovamente quando provi a rientrare o a passare a un veicolo diverso.",
+	["VEH_RGB_LIGHTS_TT"] =
+	"Avvia un loop RGB sui fari del tuo veicolo. Puoi modificare la velocità nella parte inferiore di questa finestra.",
+	["VEH_STRONG_CRASH_TT"] =
+	"Rende gli arresti anomali più spaventosi con vibrazioni della cam, effetti dello schermo, maggiore deformazione e danni. Le collisioni ad alta velocità possono essere fatali.",
+	["VEH_AUTO_LOCK_TT"] =
+	"Blocca automaticamente il tuo veicolo quando ti allontani e lo sblocca nuovamente quando provi a rientrare o a passare a un veicolo diverso.",
 	["VEH_AUTO_LOCK"] = "Blocco automatico",
 	["VEH_FLAPPY_DOORS_TT"] = "Non ho idea del motivo per cui l'ho fatto.",
 	["VEH_KEEP_WHEELS_TURNED"] = "Mantieni le ruote girate",
@@ -313,8 +343,10 @@ return {
 	["VEH_FLAPPY_DOORS"] = "Porte a soffietto",
 	["VEH_LAUNCH_CTRL_TT"] = "Simula il controllo del lancio. Disponibile solo per auto ad alte prestazioni.",
 	["VEH_SPEED_CIRCLE"] = "Cerchio",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "Impedisce al tuo personaggio giocante di centrare nuovamente le ruote quando esce da un veicolo teletrasportandoti all'esterno.",
-	["VEH_IV_EXIT_TT"] = "Imita lo stile di uscita del veicolo di GTA IV: tieni premuto [F] per un secondo per spegnere il motore o premi normalmente per lasciarlo acceso.",
+	["VEH_KEEP_WHEELS_TURNED_TT"] =
+	"Impedisce al tuo personaggio giocante di centrare nuovamente le ruote quando esce da un veicolo teletrasportandoti all'esterno.",
+	["VEH_IV_EXIT_TT"] =
+	"Imita lo stile di uscita del veicolo di GTA IV: tieni premuto [F] per un secondo per spegnere il motore o premi normalmente per lasciarlo acceso.",
 	["VEH_SPEED_BG"] = "Sfondo",
 	["VEH_SPEED_TEXT"] = "Testo",
 	["VEH_LAUNCH_CTRL"] = "Avvia Controllo",
@@ -354,8 +386,9 @@ return {
 	["VEH_PAINT_NOT_SELECTED_ERR"] = "Seleziona primario o secondario o entrambi.",
 	["VEH_PAINT_PRIMARY_CB"] = "Come Primario",
 	["VEH_PAINT_SECONDARY_CB"] = "Come secondario",
-	["VEH_PAINT_SAVE_TT"] = "Per salvare questo colore su un veicolo personale, vai in un negozio di moda e acquista qualcosa come una tinta per i finestrini, uno stile per la targa o altro.",
-	["VEH_ENGINE_SWAP_INCOMPATIBE"] = "Questa funzione è compatibile solo con auto e camion.",
+	["VEH_PAINT_SAVE_TT"] =
+	"Per salvare questo colore su un veicolo personale, vai in un negozio di moda e acquista qualcosa come una tinta per i finestrini, uno stile per la targa o altro.",
+	["GENERIC_CARS_ONLY"] = "Questa funzione è compatibile solo con auto e camion.",
 	["VEH_COBRA_MANEUVER_TOO_lOW"] = "La tua altitudine attuale è troppo bassa per eseguire una manovra Cobra!",
 	["VEH_COBRA_MANEUVER_TOO_SlOW"] = "La tua velocità attuale è troppo bassa per eseguire una manovra Cobra!",
 	["VEH_COBRA_MANEUVER"] = "Manovra del Cobra",
@@ -363,7 +396,8 @@ return {
 	["CP_AUTOPLAY_SLOTS_TIME_DELAY"] = "Ritardo tra le riproduzioni",
 	["VEH_COBRA_MANEUVER_NOT_LEVEL"] = "Per favore livella prima il tuo jet.",
 	["VEH_COBRA_MANEUVER_INTERRUPT"] = "La manovra Cobra è stata interrotta! Restituire il controllo al giocatore.",
-	["VEH_COBRA_MANEUVER_CANCEL"] = "Esecuzione della manovra del cobra. Premi [CTRL] per annullare e riprendere il controllo.",
+	["VEH_COBRA_MANEUVER_CANCEL"] =
+	"Esecuzione della manovra del cobra. Premi [CTRL] per annullare e riprendere il controllo.",
 	["GENERIC_ADD"] = "Aggiungere",
 	["GENERIC_DELETE"] = "Eliminare",
 	["GENERIC_LOAD"] = "Carico",
@@ -400,15 +434,19 @@ return {
 	["EF_IMPORT_DATA_CLIPBOARD_ERR"] = "I tuoi appunti sono vuoti!",
 	["EF_IMPORT_DATA_INSTR"] = "Incolla qui i dati della fucina:",
 	["EF_SAVED_NONE"] = "Non hai nessuna creazione salvata.",
-	["EF_IMPORT_DATA_NOTICE"] = "Hai una creazione con lo stesso nome. Al nome è stato aggiunto un tag [import]. Puoi comunque rinominarlo in seguito.",
+	["EF_IMPORT_DATA_NOTICE"] =
+	"Hai una creazione con lo stesso nome. Al nome è stato aggiunto un tag [import]. Puoi comunque rinominarlo in seguito.",
 	["EF_CHILD_ALPHA"] = "Trasparenza dell'elemento secondario: %d",
-	["EF_ENTITY_GUN_TT"] = "Punta la tua arma verso un'entità nel mondo di gioco e premi [E] per aggiungerla alla riserva della forgia. Una volta aggiunto, potrai utilizzare il mouse per spostarlo e manipolarlo.",
-	["EF_SHARE_SUCCESS"] = "La tua creazione salvata è stata copiata negli appunti. Se condividi i dati copiati con altri utenti di questo script, potranno importarli nelle loro creazioni salvate.",
+	["EF_ENTITY_GUN_TT"] =
+	"Punta la tua arma verso un'entità nel mondo di gioco e premi [E] per aggiungerla alla riserva della forgia. Una volta aggiunto, potrai utilizzare il mouse per spostarlo e manipolarlo.",
+	["EF_SHARE_SUCCESS"] =
+	"La tua creazione salvata è stata copiata negli appunti. Se condividi i dati copiati con altri utenti di questo script, potranno importarli nelle loro creazioni salvate.",
 	["EF_IMPORT_SUCCESS"] = "Dati importati con successo.",
 	["GENERIC_APPLY"] = "Fare domanda a",
 	["GENERIC_USE"] = "Utilizzo",
 	["SELF_MAGIC_BULLET"] = "Proiettile magico",
-	["SELF_MAGIC_BULLET_TT"] = "Questa funzione non mira né spara automaticamente. Ricorda semplicemente l'ultimo pedone a cui hai mirato e reindirizza il tuo tiro a quel pedone quando spari, anche se spari altrove. Il bersaglio si ripristina quando smetti di mirare.",
+	["SELF_MAGIC_BULLET_TT"] =
+	"Questa funzione non mira né spara automaticamente. Ricorda semplicemente l'ultimo pedone a cui hai mirato e reindirizza il tuo tiro a quel pedone quando spari, anche se spari altrove. Il bersaglio si ripristina quando smetti di mirare.",
 	["SUBTAB_GUI"] = "Interfaccia utente",
 	["GENERIC_GENERAL_LABEL"] = "Generale",
 	["GENERIC_CLEAR"] = "Chiaro",
@@ -418,22 +456,29 @@ return {
 	["SELF_LASER_SIGHTS"] = "Mirini laser",
 	["VEH_KERS_BOOST"] = "KERS potenziamento",
 	["VEH_OFFROAD_ABILITIES"] = "Abilità fuoristrada",
-	["VEH_RALLY_TYRES_TT"] = "Equipaggia il tuo veicolo con pneumatici da rally che migliorano ulteriormente la manovrabilità fuoristrada.",
-	["VEH_KERS_BOOST_TT"] = "Dota il tuo veicolo del potenziamento KERS (Kinetic Energy Recovery System), simile alle auto di F1.",
-	["VEH_FORCE_NO_TC_TT"] = "Solo biciclette: impone al tuo veicolo di non avere il controllo della trazione, il che ti consente di eseguire derapate e sbandate con le biciclette.",
-	["VEH_LOW_SPEED_WHEELIE_TT"] = "Solo bici: ti permette di fare impennate a velocità molto basse, simili al \"Manchez\".",
-	["VEH_NO_ENGINE_BRAKE_TT"] = "Ti permette di procedere per inerzia quando non premi l'acceleratore senza perdere troppa velocità.",
+	["VEH_RALLY_TYRES_TT"] =
+	"Equipaggia il tuo veicolo con pneumatici da rally che migliorano ulteriormente la manovrabilità fuoristrada.",
+	["VEH_KERS_BOOST_TT"] =
+	"Dota il tuo veicolo del potenziamento KERS (Kinetic Energy Recovery System), simile alle auto di F1.",
+	["VEH_FORCE_NO_TC_TT"] =
+	"Solo biciclette: impone al tuo veicolo di non avere il controllo della trazione, il che ti consente di eseguire derapate e sbandate con le biciclette.",
+	["VEH_LOW_SPEED_WHEELIE_TT"] =
+	"Solo bici: ti permette di fare impennate a velocità molto basse, simili al \"Manchez\".",
+	["VEH_NO_ENGINE_BRAKE_TT"] =
+	"Ti permette di procedere per inerzia quando non premi l'acceleratore senza perdere troppa velocità.",
 	["VEH_FORCE_NO_TC"] = "Nessun controllo della trazione",
 	["SELF_LASER_SIGHTS_LENGTH"] = "Lunghezza del raggio laser",
 	["VEH_LOW_SPEED_WHEELIE"] = "Impennata a bassa velocità",
 	["VEH_RALLY_TYRES"] = "Pneumatici Rally",
-	["SELF_LASER_SIGHTS_TT"] = "Abilita i mirini laser sulle tue armi da fuoco. Puoi attivare e disattivare la vista premendo [%s]",
+	["SELF_LASER_SIGHTS_TT"] =
+	"Abilita i mirini laser sulle tue armi da fuoco. Puoi attivare e disattivare la vista premendo [%s]",
 	["VEH_OFFROAD_ABILITIES_TT"] = "Aumenta le capacità fuoristrada del tuo veicolo.",
 	["VEH_ROCKET_BOOST"] = "Spinta del razzo",
 	["VEH_ROCKET_BOOST_TT"] = "Dota il tuo veicolo di un razzo potenziato, simile al \"Vigilante\".",
 	["VEH_PARACHUTE"] = "Capacità di paracadute",
 	["VEH_JUMP"] = "Capacità di salto",
-	["VEH_PARACHUTE_TT"] = "Equipaggia il tuo veicolo con un paracadute, simile al \"Ruiner 2000\".\n\nImportante: anche la capacità di salto deve essere abilitata.",
+	["VEH_PARACHUTE_TT"] =
+	"Equipaggia il tuo veicolo con un paracadute, simile al \"Ruiner 2000\".\n\nImportante: anche la capacità di salto deve essere abilitata.",
 	["SETTINGS_LANGUAGE"] = "Lingua",
 	["VEH_STEER_REAR_WHEELS"] = "Sterzo sulla ruota posteriore",
 	["VEH_STEER_HANDBRAKE"] = "Sterzo con freno a mano",
@@ -447,14 +492,17 @@ return {
 	["SETTING_WINDOW_POS_Y"] = "Posizione Y",
 	["SETTING_WINDOW_MOVEABLE"] = "Finestra mobile",
 	["SETTINGS_TOOLTIPS"] = "Disabilita descrizioni comandi",
-	["VEH_STEER_HANDBRAKE_TT"] = "Sterza le ruote posteriori del tuo veicolo quando tieni il freno a mano, in modo simile alle auto mostruose.",
-	["SETTING_WINDOW_POS_TT"] = "Questi sono solo di visualizzazione. Abilita \"Finestra mobile\", quindi trascina la barra superiore per spostare liberamente la finestra.",
+	["VEH_STEER_HANDBRAKE_TT"] =
+	"Sterza le ruote posteriori del tuo veicolo quando tieni il freno a mano, in modo simile alle auto mostruose.",
+	["SETTING_WINDOW_POS_TT"] =
+	"Questi sono solo di visualizzazione. Abilita \"Finestra mobile\", quindi trascina la barra superiore per spostare liberamente la finestra.",
 	["SETTING_WINDOW_POS_SNAP"] = "Aggancia alla posizione",
 	["SETTING_WINDOW_HEIGHT"] = "Altezza massima della finestra",
 	["SETTING_WINDOW_WIDTH"] = "Larghezza della finestra",
 	["SETTING_WINDOW_THEME"] = "Tema",
 	["SETTING_HOTKEY_WAIT"] = "Premere un tasto qualsiasi",
-	["SETTING_WINDOW_HEIGHT_TT"] = "La finestra è dinamica, si ridimensiona verticalmente in base al contenuto.\n\nQuesta opzione permette di impostare l'altezza massima consentita.",
+	["SETTING_WINDOW_HEIGHT_TT"] =
+	"La finestra è dinamica, si ridimensiona verticalmente in base al contenuto.\n\nQuesta opzione permette di impostare l'altezza massima consentita.",
 	["SETTING_WINDOW_STYLE"] = "Stile finestra",
 	["SETTING_WINDOW_TOP_FRAME_BG"] = "Gradiente del pulsante della barra superiore",
 	["SETTINGS_HOTKEY_RESERVED"] = "Questa chiave è riservata. Scegline uno diverso.",
@@ -470,11 +518,13 @@ return {
 	["SELF_KATANA_REPLACE_MODEL"] = "Modello da sostituire",
 	["WRLD_FLEE_ALL"] = "Spaventare tutti i nemici",
 	["WRLD_KILL_ALL_NOTIF"] = "Hai eseguito \"Uccidi tutti i nemici\"",
-	["WRLD_FLEE_ALL_TT"] = "Viene eseguito in un ciclo di 5 secondi: costringe tutti i nemici vicini a lasciare cadere le armi e a fuggire dall'area.",
+	["WRLD_FLEE_ALL_TT"] =
+	"Viene eseguito in un ciclo di 5 secondi: costringe tutti i nemici vicini a lasciare cadere le armi e a fuggire dall'area.",
 	["WRLD_KILL_ALL_TT"] = "Uccide tutti i nemici vicini.",
 	["WRLD_FLEE_ALL_NOTIF"] = "Costringere i nemici vicini a fuggire. Attendere prego.",
 	["WRLD_PUBLIC_ENEMY"] = "Nemico pubblico n. 1",
-	["WRLD_PUBLIC_ENEMY_TT"] = "Tutti gli NPC vicini si alleeranno contro di te e ti faranno il culo. Compresi animali e poliziotti.",
+	["WRLD_PUBLIC_ENEMY_TT"] =
+	"Tutti gli NPC vicini si alleeranno contro di te e ti faranno il culo. Compresi animali e poliziotti.",
 	["GENERIC_IMPORTANT"] = "Importante",
 	["SETTING_HOTKEY_FOUND"] = "Nuova chiave:",
 	["GUI_NEW_LAYOUT_NOTICE"] = "L'interfaccia utente dello script è ora indipendente dal menu. Premi %s per attivarlo.",
@@ -489,5 +539,6 @@ return {
 	["YRV3_HELITOURS_LABEL"] = "Higgins Helitour",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "Disabilita il tempo di recupero del lavoro legale",
 	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "Disabilita il tempo di recupero per lavoro illegale",
-	["SELF_MC_BIKE_ANIMS_TT"] = "Ripristina le animazioni alternative di guida in bicicletta che erano state disabilitate per qualche motivo. Devi essere registrato come MC e avere questa opzione abilitata affinché queste animazioni funzionino."
+	["SELF_MC_BIKE_ANIMS_TT"] =
+	"Ripristina le animazioni alternative di guida in bicicletta che erano state disabilitate per qualche motivo. Devi essere registrato come MC e avere questa opzione abilitata affinché queste animazioni funzionino."
 }

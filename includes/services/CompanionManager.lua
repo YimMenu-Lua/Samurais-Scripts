@@ -47,12 +47,12 @@ end
 
 ---@param entity integer
 function CompanionManager:RegisterEntity(entity)
-	Decorator:RegisterEntity(entity, "YimActions", true)
+	Decorator:Register(entity, "YimActions")
 end
 
 ---@param entity integer
 function CompanionManager:UnregisterEntity(entity)
-	Decorator:RemoveEntity(entity, "YimActions")
+	Decorator:RemoveEntity(entity)
 end
 
 ---@param pedModel hash|string

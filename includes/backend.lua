@@ -258,15 +258,15 @@ end
 
 ---@param handle integer
 function Backend:CheckFeatureEntities(handle)
-	if Decorator:IsEntityRegistered(handle, "EntityForge") then
+	if Decorator:ExistsOn(handle, "EntityForge") then
 		EntityForge:RemoveEntityByHandle(handle)
 	end
 
-	if Decorator:IsEntityRegistered(handle, "BillionaireServices") then
+	if Decorator:ExistsOn(handle, "BillionaireServices") then
 		BillionaireServices:RemoveEntityByHandle(handle)
 	end
 
-	if Decorator:IsEntityRegistered(handle, "YimActions") then
+	if Decorator:ExistsOn(handle, "YimActions") then
 		YimActions.CompanionManager:RemoveCompanionByHandle(handle)
 	end
 end
@@ -297,7 +297,7 @@ function Backend:EntitySweep()
 end
 
 function Backend:PoolMgr()
-	local timeout = self.debug_mode and 500 or 5e3
+	local timeout = self.debug_mode and 500 or 2e3
 
 	for index, category in ipairs({ self.SpawnedEntities[Enums.eEntityType.Object], self.SpawnedEntities[Enums.eEntityType.Ped], self.SpawnedEntities[Enums.eEntityType.Vehicle] }) do
 		if (next(category) == nil) then
@@ -452,7 +452,7 @@ function Backend:RegisterHandlers()
 			self:OnPlayerSwitch()
 			self:OnSessionSwitch()
 			PreviewService:Update()
-
+			Decorator:CollectGarbage()
 			yield()
 		end)
 
