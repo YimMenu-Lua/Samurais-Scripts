@@ -539,9 +539,9 @@ function PrivateJet:Cleanup()
 	Game.DeleteEntity(self.pilot)
 	Game.DeleteEntity(self.copilot)
 	Game.DeleteEntity(self.m_handle)
-	Decorator:RemoveEntity(self.pilot, "BillionaireServices")
-	Decorator:RemoveEntity(self.copilot, "BillionaireServices")
-	Decorator:RemoveEntity(self.m_handle, "BillionaireServices")
+	Decorator:RemoveEntity(self.pilot)
+	Decorator:RemoveEntity(self.copilot)
+	Decorator:RemoveEntity(self.m_handle)
 
 	self.pilot = nil
 	self.copilot = nil

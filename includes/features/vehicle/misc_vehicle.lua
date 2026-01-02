@@ -220,20 +220,38 @@ function MiscVehicle:Update()
 	local handle = PV:GetHandle()
 
 	if (GVars.features.vehicle.fast_jets and PV:IsPlane() and (VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(handle) ~= 1.0)) then
-		local speedIncrement = 0.21
-		local planeRotation = ENTITY.GET_ENTITY_ROTATION(handle, 2)
-		local speed = self.m_entity:GetSpeed()
+		local speed      = PV:GetSpeed()
+		local gearState  = PV:GetLandingGearState()
+		local rot        = PV:GetRotation(2)
+		local pitch      = rot.x
+		local baseThrust = 2e4
+		local minThrust  = 5e3
+		local maxSpeed   = 164.0
+		local thrustMult = 1.0
 
-		if (planeRotation.x >= 30) then
-			speedIncrement = 0.4
-		elseif (planeRotation.x >= 60) then
-			speedIncrement = 0.8
+		if (pitch >= 60) then
+			thrustMult = 2.0
+		elseif (pitch >= 30) then
+			thrustMult = 1.4
 		end
 
-		if (speed >= 73 and speed < 160) then
-			if (PAD.IS_CONTROL_PRESSED(0, 87) and PV:GetLandingGearState() == Enums.eLandingGearState.RETRACTED) then
-				VEHICLE.SET_VEHICLE_FORWARD_SPEED(handle, (speed + speedIncrement))
-			end
+		if speed >= 72 and speed < maxSpeed
+			and PAD.IS_CONTROL_PRESSED(0, 87)
+			and gearState == Enums.eLandingGearState.RETRACTED
+		then
+			local lerp   = math.min(1.0, (speed) / (maxSpeed))
+			local thrust = math.min(minThrust, baseThrust * thrustMult * (1.0 - lerp))
+			ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+				handle,
+				1,
+				0.0,
+				thrust,
+				0.0,
+				false,
+				true,
+				false,
+				false
+			)
 		end
 	end
 

@@ -1387,7 +1387,7 @@ end
 function EscortVehicle:Recover(lastCoords, passengers, lastHeading, groupName)
 	if self:Exists() then
 		Game.DeleteEntity(self.handle)
-		Decorator:RemoveEntity(self.handle, "BillionaireServices")
+		Decorator:RemoveEntity(self.handle)
 	end
 
 	if not lastCoords then
@@ -1400,7 +1400,7 @@ function EscortVehicle:Recover(lastCoords, passengers, lastHeading, groupName)
 	end
 
 	self.handle = Game.CreateVehicle(self.model, vec3:zero())
-	Decorator:RegisterEntity(self.handle, "BillionaireServices")
+	Decorator:Register(self.handle, "BillionaireServices")
 	ENTITY.FREEZE_ENTITY_POSITION(self.handle, true)
 
 	local r, g, b, _ = Color("#000100"):AsRGBA()

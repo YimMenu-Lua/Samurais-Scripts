@@ -5,48 +5,69 @@
 --
 -- Custom decorator to mark entities owned by this script.
 ---@class Decorator
-Decorator = {}
+---@field RegisteredEntities table<integer, table<string, any>>
+---@field private m_last_gc seconds
+Decorator = { m_last_gc = 0 }
 Decorator.RegisteredEntities = {}
 
 ---@param entity integer
----@param key string
-function Decorator:IsEntityRegistered(entity, key)
-	return self.RegisteredEntities[entity]
-		and self.RegisteredEntities[entity].key
-		and self.RegisteredEntities[entity].key == key
+function Decorator:IsEntityRegistered(entity)
+	return self.RegisteredEntities[entity] ~= nil
 end
 
 ---@param entity integer
 ---@param key string
----@param expectedValue any
-function Decorator:ExistsOn(entity, key, expectedValue)
-	if not self:IsEntityRegistered(entity, key) then
+---@return boolean
+function Decorator:ExistsOn(entity, key)
+	if (not self:IsEntityRegistered(entity)) then
 		return false
 	end
 
-	return self.RegisteredEntities[entity].value
-		and self.RegisteredEntities[entity].value == expectedValue
+	return self.RegisteredEntities[entity][key] and self.RegisteredEntities[entity][key] ~= nil
+end
+
+---@param entity handle
+---@param key string
+---@return any
+function Decorator:GetDecor(entity, key)
+	if (not self:ExistsOn(entity, key)) then
+		return
+	end
+
+	return self.RegisteredEntities[entity][key]
+end
+
+---@param entity handle
+---@param key string
+---@param new_value anyval
+---@return any
+function Decorator:UpdateDecor(entity, key, new_value)
+	if (not self:ExistsOn(entity, key)) then
+		return
+	end
+
+	self.RegisteredEntities[entity][key] = new_value
 end
 
 ---@param entity integer
 ---@param key string
 ---@param value any
-function Decorator:RegisterEntity(entity, key, value)
-	if self:IsEntityRegistered(entity, key) then
-		return
-	end
+function Decorator:Register(entity, key, value)
+	local existing = self.RegisteredEntities[entity]
+	if (existing) then
+		if (existing[key]) then
+			return
+		end
 
-	self.RegisteredEntities[entity] = {
-		handle = entity,
-		key = key,
-		value = value
-	}
+		existing[key] = value
+	else
+		self.RegisteredEntities[entity] = { [key] = value }
+	end
 end
 
 ---@param entity integer
----@param key string
-function Decorator:RemoveEntity(entity, key)
-	if not self:IsEntityRegistered(entity, key) then
+function Decorator:RemoveEntity(entity)
+	if not self:IsEntityRegistered(entity) then
 		return
 	end
 
@@ -54,9 +75,22 @@ function Decorator:RemoveEntity(entity, key)
 end
 
 ---@param entity integer
--- only bool decorators for now
 function Decorator:Validate(entity)
-	return ENTITY.DOES_ENTITY_EXIST(entity) and (self.RegisteredEntities[entity] ~= nil)
+	return self:IsEntityRegistered(entity) and ENTITY.DOES_ENTITY_EXIST(entity)
+end
+
+function Decorator:CollectGarbage()
+	if (Time.now() - self.m_last_gc < 5) then
+		return
+	end
+
+	for handle, _ in pairs(self.RegisteredEntities) do
+		if (not ENTITY.DOES_ENTITY_EXIST(handle)) then
+			self.RegisteredEntities[handle] = nil
+		end
+	end
+
+	self.m_last_gc = Time.now()
 end
 
 ---@param entity integer
@@ -72,10 +106,9 @@ function Decorator:DebugDump(entity)
 
 	Backend:debug(
 		_F(
-			"[%s] is registered to %s as %s",
+			"[%s] is registered with: %s",
 			entity,
-			self.RegisteredEntities[entity].key,
-			self.RegisteredEntities[entity].value
+			self.RegisteredEntities[entity]
 		)
 	)
 end

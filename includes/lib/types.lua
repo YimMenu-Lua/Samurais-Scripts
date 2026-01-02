@@ -68,5 +68,5 @@ GenericClass = setmetatable({}, {
 ---@alias Comparator<A, B> fun(a: A, b: B): boolean
 
 -- A poor man's `nullptr` 🥲
----@class NULLPTR : pointer
-NULLPTR = memory.pointer:new(0)
+---@class nullptr : pointer
+nullptr = memory.pointer:new(0)

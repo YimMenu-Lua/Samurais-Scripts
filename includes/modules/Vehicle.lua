@@ -32,6 +32,7 @@ local collisionInvalidModels = Set.new(
 ---@field private m_num_seats number
 ---@field private m_max_passengers number
 ---@field private m_has_loud_radio boolean
+---@field private m_last_ram_time seconds
 ---@field Resolve fun() : CVehicle
 ---@field Create fun(_, modelHash: joaat_t, entityType: eEntityType, pos?: vec3, heading?: number, isNetwork?: boolean, isScriptHostPed?: boolean): Vehicle
 ---@overload fun(handle: handle): Vehicle
@@ -373,6 +374,24 @@ function Vehicle:HasLandingGear()
 	return VEHICLE.GET_VEHICLE_HAS_LANDING_GEAR(self:GetHandle())
 end
 
+---@return boolean
+function Vehicle:HasCustomTyres()
+	if (not self:IsValid()) then
+		return false
+	end
+
+	return VEHICLE.GET_VEHICLE_MOD_VARIATION(self:GetHandle(), 23) ~= 0
+end
+
+---@return boolean
+function Vehicle:HasWheelDrawData()
+	if (not self:IsValid()) then
+		return false
+	end
+
+	return self:Resolve():HasWheelDrawData()
+end
+
 function Vehicle:HasCrashed()
 	if (not self:HasCollidedWithAnything()) then
 		return false, ""
@@ -497,19 +516,66 @@ function Vehicle:IsElectric()
 end
 
 -- Returns whether the vehicle is an F1 race car.
+---@return boolean
 function Vehicle:IsFormulaOne()
 	return self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.IS_FORMULA_VEHICLE)
 		or (self:GetClassID() == Enums.eVehicleClasses.OpenWheel)
 end
 
 -- Returns whether the vehicle is a lowrider equipped with hydraulic suspension.
+---@return boolean
 function Vehicle:IsLowrider()
 	return self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.HAS_LOWRIDER_HYDRAULICS)
 		or self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.HAS_LOWRIDER_DONK_HYDRAULICS)
 end
 
+---@return boolean
 function Vehicle:IsLocked()
 	return VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(self:GetHandle()) > 1
+end
+
+---@param wheelIndex integer
+---@return boolean
+function Vehicle:IsWheelBrokenOff(wheelIndex)
+	if (not self:IsValid()) then
+		return false
+	end
+
+	local numWheels = self:GetNumberOfWheels()
+	if (wheelIndex > numWheels) then
+		Backend:debug("Wheel index out of bounds.")
+		return false
+	end
+
+	return self:Resolve():IsWheelBrokenOff(wheelIndex)
+end
+
+---@return float -- Wheel width or 0.f if invalid
+function Vehicle:GetWheelWidth()
+	return self:Resolve():GetWheelWidth()
+end
+
+---@return float -- Wheel size or 0.f if invalid
+function Vehicle:GetWheelSize()
+	return self:Resolve():GetWheelSize()
+end
+
+---@param fValue float
+function Vehicle:SetVisualWheelWidth(fValue)
+	if (not self:HasWheelDrawData()) then
+		return
+	end
+
+	self:Resolve():SetWheelWidth(fValue)
+end
+
+---@param fValue float
+function Vehicle:SetVisualWheelSize(fValue)
+	if (not self:HasWheelDrawData()) then
+		return
+	end
+
+	self:Resolve():SetWheelSize(fValue)
 end
 
 function Vehicle:ClearPrimaryTask()
@@ -1190,7 +1256,7 @@ end
 ---@param flag eVehicleAdvancedFlags
 ---@return boolean
 function Vehicle:GetAdvancedFlag(flag)
-	if not self:IsValid() then
+	if (not self:IsValid() or not self:IsCar()) then
 		return false
 	end
 
@@ -1201,11 +1267,21 @@ end
 ---@param flag eVehicleAdvancedFlags
 ---@param toggle boolean
 function Vehicle:SetAdvancedFlag(flag, toggle)
-	if not self:IsValid() then
+	if (not self:IsValid() or not self:IsCar()) then
 		return
 	end
 
 	self:Resolve():SetAdvancedFlag(flag, toggle)
+end
+
+---@param fHeight float positive = lower, negative = higher. should use values between `-0.1` and `0.1`
+function Vehicle:SetRideHeight(fHeight)
+	if (not self:IsValid()) then
+		return
+	end
+
+	-- should probably start sanitizing values before writing to memory
+	self:Resolve():SetRideHeight(fHeight)
 end
 
 ---@param bone_index number
@@ -1245,8 +1321,18 @@ function Vehicle:GetHandlingData()
 	return self:Resolve():GetSubHandlingData(handlingType)
 end
 
+---@return integer
 function Vehicle:GetMaxPassengers()
 	return VEHICLE.GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(self:GetHandle())
+end
+
+---@return integer
+function Vehicle:GetNumberOfWheels()
+	if (not self:IsValid()) then
+		return 0
+	end
+
+	return self:Resolve().m_num_wheels
 end
 
 ---@param seatIndex integer
@@ -1415,6 +1501,95 @@ function Vehicle:Wander(opts)
 		opts.speed or 20,
 		opts.drivingFlags or 786603
 	)
+end
+
+function Vehicle:RamForward()
+	if not self:IsValid()
+		or not self:IsCar()
+		or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())
+	then
+		return
+	end
+
+	ThreadManager:Run(function()
+		self.m_last_ram_time = self.m_last_ram_time or 0
+		if (Time.now() - self.m_last_ram_time < 3) then
+			return
+		end
+
+		local last_speed = self:GetSpeed()
+		ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+			self:GetHandle(),
+			1,
+			0.0,
+			math.min(1e5, self:GetSpeed() * 3e3),
+			0.0,
+			false,
+			true,
+			false,
+			false
+		)
+
+		sleep(500)
+		VEHICLE.SET_VEHICLE_FORWARD_SPEED(self:GetHandle(), last_speed)
+		self.m_last_ram_time = Time.now()
+	end)
+end
+
+function Vehicle:RamLeft()
+	if not self:IsValid()
+		or not self:IsCar()
+		or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())
+	then
+		return
+	end
+
+	self.m_last_ram_time = self.m_last_ram_time or 0
+	if (Time.now() - self.m_last_ram_time < 3) then
+		return
+	end
+
+	ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+		self:GetHandle(),
+		1,
+		-math.min(1e5, self:GetSpeed() * 3e3),
+		0.0,
+		0.0,
+		false,
+		true,
+		false,
+		false
+	)
+
+	self.m_last_ram_time = Time.now()
+end
+
+function Vehicle:RamRight()
+	if not self:IsValid()
+		or not self:IsCar()
+		or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())
+	then
+		return
+	end
+
+	self.m_last_ram_time = self.m_last_ram_time or 0
+	if (Time.now() - self.m_last_ram_time < 3) then
+		return
+	end
+
+	ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+		self:GetHandle(),
+		1,
+		math.min(1e5, self:GetSpeed() * 3e3),
+		0.0,
+		0.0,
+		false,
+		true,
+		false,
+		false
+	)
+
+	self.m_last_ram_time = Time.now()
 end
 
 -- Serializes a vehicle to JSON.

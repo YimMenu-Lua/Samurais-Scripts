@@ -37,7 +37,7 @@ function DriftMode:IsActive()
 end
 
 function DriftMode:UpdateFX()
-	if (not GVars.features.vehicle.drift.smoke_fx.enabled) then
+	if (not GVars.features.vehicle.drift.smoke_fx.enabled or not self.m_entity:IsCar()) then
 		return
 	end
 
@@ -72,7 +72,7 @@ function DriftMode:UpdateFX()
 					Color(r, g, b)
 				)
 			end
-		elseif self.m_smoke_fx then
+		elseif (self.m_smoke_fx) then
 			Game.StopParticleEffects(self.m_smoke_fx, "scr_ba_bb")
 			self.m_smoke_fx = nil
 		end
@@ -102,7 +102,7 @@ function DriftMode:UpdateFX()
 
 	if (self.m_smoke_fx and #self.m_smoke_fx > 0) then
 		for _, fx in ipairs(self.m_smoke_fx) do
-			GRAPHICS.SET_PARTICLE_FX_LOOPED_COLOUR(fx, col.x, col.y, col.z, false)
+			GRAPHICS.SET_PARTICLE_FX_LOOPED_COLOUR(fx, r, g, b, false)
 		end
 	end
 end

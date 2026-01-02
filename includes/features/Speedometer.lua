@@ -523,6 +523,7 @@ function Speedometer:Draw(offset)
 	ImGui.SetNextWindowPos(GVars.features.speedometer.pos.x, GVars.features.speedometer.pos.y, ImGuiCond.Always)
 	if ImGui.Begin("##SpeedometerWindow", windowFlags | ImGuiWindowFlags.NoBackground) then
 		if (not self._state.should_draw) then
+			ImGui.End()
 			return
 		end
 

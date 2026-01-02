@@ -40,13 +40,19 @@ function LaserSights:Init()
 	KeyManager:RegisterKeybind(
 		GVars.features.weapon.laser_sights.keybind,
 		function()
-			GVars.features.weapon.laser_sights.enabled = not GVars.features.weapon.laser_sights.enabled
-			AUDIO.PLAY_SOUND_FRONTEND(
-				-1,
-				"TARGET_COUNTER_TICK",
-				"DLC_SM_GENERIC_MISSION_SOUNDS",
-				false
-			)
+			ThreadManager:Run(function()
+				if (not PLAYER.IS_PLAYER_FREE_AIMING(Self:GetPlayerID())) then
+					return
+				end
+
+				GVars.features.weapon.laser_sights.enabled = not GVars.features.weapon.laser_sights.enabled
+				AUDIO.PLAY_SOUND_FRONTEND(
+					-1,
+					"TARGET_COUNTER_TICK",
+					"DLC_SM_GENERIC_MISSION_SOUNDS",
+					false
+				)
+			end)
 		end,
 		false
 	)

@@ -206,7 +206,7 @@ local function SelfUI()
 	if (GVars.features.weapon.katana.enabled) then
 		if (ImGui.BeginCombo(_T("SELF_KATANA_REPLACE_MODEL"), GVars.features.weapon.katana.name)) then
 			for _, pair in pairs(katana_replace_weapons) do
-				local is_selected = GVars.features.weapon.katana.name == pair.first
+				local is_selected = GVars.features.weapon.katana.model == pair.second
 				if (ImGui.Selectable(pair.first, is_selected)) then
 					GVars.features.weapon.katana.name = pair.first
 					GVars.features.weapon.katana.model = pair.second
@@ -216,11 +216,11 @@ local function SelfUI()
 						end
 
 						local handle = Self:GetHandle()
-						if WEAPON.IS_PED_ARMED(handle, 7) then
+						if (WEAPON.IS_PED_ARMED(handle, 7)) then
 							WEAPON.SET_CURRENT_PED_WEAPON(handle, 0xA2719263, true)
 						end
 
-						if WEAPON.HAS_PED_GOT_WEAPON(handle, pair.second, false) then
+						if (WEAPON.HAS_PED_GOT_WEAPON(handle, pair.second, false)) then
 							sleep(300)
 							WEAPON.SET_CURRENT_PED_WEAPON(handle, pair.second, true)
 						end

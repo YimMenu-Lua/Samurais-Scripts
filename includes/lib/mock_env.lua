@@ -105,7 +105,7 @@ if (not memory) then
 		free = function(ptr) end,
 		handle_to_ptr = function(handle) return memory.pointer end,
 		ptr_to_handle = function(ptr) return 0x0 end,
-		dynamic_call = function(addr, ret_type, arg_types, ...) end
+		dynamic_call = function(ret_type, arg_types, ptr) end
 	}
 end
 

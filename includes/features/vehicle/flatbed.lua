@@ -96,7 +96,7 @@ function Flatbed:Spawn()
 			return
 		end
 
-		Decorator:RegisterEntity(self.m_handle, "Flatbed", true)
+		Decorator:Register(self.m_handle, "Flatbed", true)
 		PED.SET_PED_INTO_VEHICLE(Self:GetHandle(), self.m_handle, -1)
 		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(self.modelHash)
 		ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(self.m_handle)
@@ -265,7 +265,7 @@ function Flatbed:Attach()
 		tries = tries + 1
 		final_z = final_z + step
 	until success or tries > (maxLift / step)
-	Decorator:RegisterEntity(self.m_towed_vehicle.m_handle, "Flatbed", true)
+	Decorator:Register(self.m_towed_vehicle.m_handle, "Flatbed", true)
 end
 
 ---@param x float
@@ -406,7 +406,7 @@ function Flatbed:Detach()
 			VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(self.m_towed_vehicle.m_handle, 5.0)
 		end
 
-		Decorator:RemoveEntity(self.m_towed_vehicle.m_handle, "Flatbed")
+		Decorator:RemoveEntity(self.m_towed_vehicle.m_handle)
 		self.m_towed_vehicle = nil
 	end
 end
@@ -430,7 +430,7 @@ function Flatbed:ForceCleanup()
 				false
 			)
 			VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(attachedVehicle, 5.0)
-			Decorator:RemoveEntity(self.m_towed_vehicle.m_handle, "Flatbed")
+			Decorator:RemoveEntity(self.m_towed_vehicle.m_handle)
 			self.m_towed_vehicle = nil
 		end
 	end
@@ -453,10 +453,10 @@ function Flatbed:Reset()
 	}
 
 	if self.m_towed_vehicle then
-		Decorator:RemoveEntity(self.m_towed_vehicle.m_handle, "Flatbed")
+		Decorator:RemoveEntity(self.m_towed_vehicle.m_handle)
 	end
 
-	Decorator:RemoveEntity(self.m_handle, "Flatbed")
+	Decorator:RemoveEntity(self.m_handle)
 	self.m_previous_handle = 0
 	self.m_search_pos = vec3:zero()
 	self.m_fwd_vec = vec3:zero()

@@ -105,12 +105,12 @@ end
 
 ---@param entity integer
 function BillionaireServices:RegisterEntity(entity)
-	Decorator:RegisterEntity(entity, "BillionaireServices", true)
+	Decorator:Register(entity, "BillionaireServices", true)
 end
 
 ---@param entity integer
 function BillionaireServices:UnregisterEntity(entity)
-	Decorator:RemoveEntity(entity, "BillionaireServices")
+	Decorator:RemoveEntity(entity)
 end
 
 function BillionaireServices:GetServiceCount()

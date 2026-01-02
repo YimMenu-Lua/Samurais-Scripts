@@ -1,5 +1,6 @@
 local Flatbed     = require("includes.features.vehicle.flatbed")
 local flatbed_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_FLATBED", nil, nil, true)
+
 flatbed_tab:AddLoopedCommand("FLTBD_MAIN_CB",
 	"features.flatbed.enabled",
 	function()

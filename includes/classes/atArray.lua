@@ -30,8 +30,8 @@ setmetatable(atArray, {
 function atArray.new(address, data_type)
 	local instance = setmetatable(
 		{
-			m_address = NULLPTR,
-			m_data_ptr = NULLPTR,
+			m_address = nullptr,
+			m_data_ptr = nullptr,
 			m_size = 0x0,
 			m_count = 0x0,
 			m_data = {},
@@ -80,8 +80,8 @@ function atArray:IsEmpty()
 end
 
 function atArray:Clear()
-	self.m_address = NULLPTR
-	self.m_data_ptr = NULLPTR
+	self.m_address = nullptr
+	self.m_data_ptr = nullptr
 	self.m_data = {}
 	self.m_size = 0x0
 	self.m_count = 0x0

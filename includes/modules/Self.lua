@@ -238,7 +238,7 @@ end
 function Self:IsPedMyEnemy(pedHandle)
 	local ped = Ped(pedHandle)
 
-	if not ped:IsValid() then
+	if (not ped or not ped:IsValid()) then
 		return false
 	end
 
@@ -463,7 +463,7 @@ ThreadManager:RegisterLooped("SS_PV_HANDLER", function()
 		Self.m_vehicle:Set(Self:GetVehicleNative())
 	end
 
-	if (Self.m_vehicle:GetHandle() ~= 0 and Self.m_vehicle:IsAnyThreadRunning() and not Self.m_vehicle:IsValid()) then
+	if (Self.m_vehicle:GetHandle() ~= 0 and not Self.m_vehicle:IsValid()) then
 		Self.m_vehicle:Reset()
 		sleep(1000)
 	end

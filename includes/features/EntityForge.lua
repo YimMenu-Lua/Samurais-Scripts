@@ -65,12 +65,12 @@ end
 
 ---@param entity handle
 function EntityForge:RegisterEntity(entity)
-	Decorator:RegisterEntity(entity, "EntityForge", true)
+	Decorator:Register(entity, "EntityForge", true)
 end
 
 ---@param entity handle
 function EntityForge:UnregisterEntity(entity)
-	Decorator:RemoveEntity(entity, "EntityForge")
+	Decorator:RemoveEntity(entity)
 end
 
 ---@return ForgeEntity

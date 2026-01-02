@@ -88,24 +88,34 @@ end
 
 ---@return eAPIVersion
 function Backend:GetAPIVersion()
-	if self.api_version then
-		return self.api_version
+	if (not self.api_version) then
+		if (script and (type(script) == "table")) then
+			if (menu_event and menu_event.Wndproc) then
+				if (type(_G["get_game_branch"]) == "function") then
+					local branch = _G["get_game_branch"]()
+					if (type(branch) ~= "number" or branch > 1) then
+						error("Unknown or unsupported game branch.")
+					end
+
+					self.api_version = _G["get_game_branch"]() + 1
+				else
+					self.api_version = Enums.eAPIVersion.V1
+				end
+			end
+
+			if (type(script["run_in_callback"]) == "function") then
+				error(
+					"YmMenu V2 is not supported. If you want to run this script in GTA V Enhanced, download YimLuaAPI.") -- test error; add Github link later
+			end
+			---@diagnostic disable-next-line: undefined-global
+		elseif (util or (menu and menu.root) or SCRIPT_SILENT_START or (_VERSION ~= "Lua 5.4")) then -- should probably place these in a lookup table
+			error("Failed to load: Unknown or unsupported Lua environment.")
+		else
+			self.api_version = Enums.eAPIVersion.L54
+		end
 	end
 
-	if (script and (type(script) == "table")) then
-		if (menu_event and menu_event.Wndproc) then
-			return Enums.eAPIVersion.V1
-		end
-
-		if (type(script["run_in_callback"]) == "function") then
-			return Enums.eAPIVersion.V2
-		end
-		---@diagnostic disable-next-line: undefined-global
-	elseif (util or (menu and menu.root) or SCRIPT_SILENT_START or (_VERSION ~= "Lua 5.4")) then -- should probably place these in a lookup table
-		error("Failed to load: Unknown or unsupported environment.")
-	end
-
-	return Enums.eAPIVersion.L54
+	return self.api_version
 end
 
 ---@return boolean
@@ -248,15 +258,15 @@ end
 
 ---@param handle integer
 function Backend:CheckFeatureEntities(handle)
-	if Decorator:IsEntityRegistered(handle, "EntityForge") then
+	if Decorator:ExistsOn(handle, "EntityForge") then
 		EntityForge:RemoveEntityByHandle(handle)
 	end
 
-	if Decorator:IsEntityRegistered(handle, "BillionaireServices") then
+	if Decorator:ExistsOn(handle, "BillionaireServices") then
 		BillionaireServices:RemoveEntityByHandle(handle)
 	end
 
-	if Decorator:IsEntityRegistered(handle, "YimActions") then
+	if Decorator:ExistsOn(handle, "YimActions") then
 		YimActions.CompanionManager:RemoveCompanionByHandle(handle)
 	end
 end
@@ -287,7 +297,7 @@ function Backend:EntitySweep()
 end
 
 function Backend:PoolMgr()
-	local timeout = self.debug_mode and 500 or 5e3
+	local timeout = self.debug_mode and 500 or 2e3
 
 	for index, category in ipairs({ self.SpawnedEntities[Enums.eEntityType.Object], self.SpawnedEntities[Enums.eEntityType.Ped], self.SpawnedEntities[Enums.eEntityType.Vehicle] }) do
 		if (next(category) == nil) then
@@ -442,7 +452,7 @@ function Backend:RegisterHandlers()
 			self:OnPlayerSwitch()
 			self:OnSessionSwitch()
 			PreviewService:Update()
-
+			Decorator:CollectGarbage()
 			yield()
 		end)
 

@@ -281,10 +281,12 @@ function SelfMisc:UpdateFlagBasedFeatures()
 		GVars.features.self.sprint_inside_interiors
 	)
 
-	self:TogglePedConfigFlag(
-		Enums.ePedConfigFlags.AllowBikeAlternateAnimations,
-		GVars.features.self.mc_alt_bike_anims
-	)
+	if (Game.IsOnline()) then
+		self:TogglePedConfigFlag(
+			Enums.ePedConfigFlags.AllowBikeAlternateAnimations,
+			GVars.features.self.mc_alt_bike_anims
+		)
+	end
 
 	if (GVars.features.self.sprint_inside_interiors and not Self:IsOutside()) then
 		Self:SetPedResetFlag(Enums.ePedResetFlags.DisablePlayerJumping, false)

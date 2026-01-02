@@ -282,11 +282,16 @@ function ThreadManager:init()
 		},
 		[Enums.eAPIVersion.V2] = {
 			dispatch = function(callback)
-				---@diagnostic disable-next-line: undefined-field
-				script.run_in_callback(function(s)
+				script.run_in_fiber(function(s)
 					callback(s)
 				end)
 			end
+			-- dispatch = function(callback)
+			-- 	---@diagnostic disable-next-line: undefined-field
+			-- 	script.run_in_callback(function(s)
+			-- 		callback(s)
+			-- 	end)
+			-- end
 		}
 	}
 

@@ -162,15 +162,14 @@ function Entity:GetModelHash()
 	return self.m_modelhash
 end
 
----@return pointer|nil
+---@return pointer
 function Entity:GetPointer()
 	if not self.m_ptr then
 		local handle = self:GetHandle()
 		local ptr = memory.handle_to_ptr(handle)
 
-		if not ptr:is_valid() then
-			log.fwarning("Failed to get pointer for entity with handle %d", handle)
-			return
+		if (not ptr:is_valid()) then
+			error("Invalid entity.")
 		end
 
 		self.m_ptr = ptr

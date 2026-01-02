@@ -11,6 +11,7 @@ return {
 	["SUBTAB_AIRCRAFT"]                    = "Aircraft",
 	["SUBTAB_FLATBED"]                     = "Flatbed Script",
 	["SUBTAB_HANDLING_EDITOR"]             = "Handling Editor",
+	["SUBTAB_STANCER"]                     = "Stancer",
 	["SUBTAB_GUI"]                         = "User Interface",
 	--#endregion
 
@@ -88,6 +89,7 @@ return {
 	["GENERIC_NOT_IN_VEH"]                 = "You are not in a vehicle.",
 	["GENERIC_NOT_IN_PLANE"]               = "You are not in an aircraft.",
 	["GENERIC_NOT_IN_COMBAT"]              = "You are not in combat with anyone.",
+	["GENERIC_CARS_ONLY"]                  = "This feature is only compatible with cars and trucks.",
 	--#endregion
 
 	--#region CasinoPacino
@@ -348,6 +350,10 @@ return {
 	"Automatically locks your vehicle when you move away from it and unlocks it again when you try to re-enter or switch to a different vehicle.",
 	["VEH_LAUNCH_CTRL"]                    = "Launch Control",
 	["VEH_LAUNCH_CTRL_TT"]                 = "Simulates launch control. Only available for performance cars.",
+	["VEH_LAUNCH_CTRL_MODE"]               = "Launch Control Mode",
+	["VEH_LAUNCH_CTRL_REALISTIC"]          = "Realistic",
+	["VEH_LAUNCH_CTRL_RIDICULOUS"]         = "Ridiculous",
+	["VEH_LAUNCH_CTRL_ERR"]                = "Launch control is unavailable at the moment. Your engine is damaged.",
 	["VEH_IV_EXIT"]                        = "IV-Style Exit",
 	["VEH_IV_EXIT_TT"]                     =
 	"Imitates GTA IV's vehicle exit style: Hold [F] for one second to turn off the engine or normal press to leave it running.",
@@ -399,7 +405,6 @@ return {
 	["VEH_SEAT_NEXT"]                      = "Next Seat",
 	["VEH_ENGINE_SWAP"]                    = "Engine Swap",
 	["VEH_ENGINE_SWAP_SAME_ERR"]           = "Your vehicle already has this engine.",
-	["VEH_ENGINE_SWAP_INCOMPATIBE"]        = "This feature is only compatible with cars and trucks.",
 	["VEH_PAINT_NOTE"]                     = "Colors look different on game shaders.",
 	["VEH_PAINT_FILTER_TXT"]               = "Filter By: ",
 	["VEH_PAINT_FILTER_ALL"]               = "All",
@@ -459,6 +464,17 @@ return {
 	["VEH_STEER_HANDBRAKE"]                = "Handbrake Steering",
 	["VEH_STEER_HANDBRAKE_TT"]             =
 	"Steers your vehicle's rear whels when you hold the handbrake, similar to monster cars.",
+	["VEH_STANCE_CAMBER"]                  = "Camber",
+	["VEH_STANCE_TRACK_WIDTH"]             = "Track Width",
+	["VEH_STANCE_WHEEL_WIDTH"]             = "Wheel Width",
+	["VEH_STANCE_WHEEL_SIZE"]              = "Wheel Size",
+	["VEH_STANCE_NON_STOCK"]               = "This option requires non-stock wheels.",
+	["VEH_STANCE_INCOMPATIBLE"]            = "This option is incompatible with current vehicle.",
+	["VEH_STANCE_FRONT_AXLE"]              = "Front Axle",
+	["VEH_STANCE_REAR_AXLE"]               = "Rear Axle",
+	["VEH_STANCE_COPY_FB"]                 = "Copy Front To Back",
+	["VEH_STANCE_GEN_OPTIONS"]             = "General Options",
+	["VEH_STANCE_RIDE_HEIGHT"]             = "Ride Height",
 	--#endregion
 
 	--#region World

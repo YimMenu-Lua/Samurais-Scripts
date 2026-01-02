@@ -177,7 +177,6 @@ def write_hashmap():
 	print("Updating hash map...")
 	with open(HASHMAP_PATH, "w", encoding="utf-8") as f:
 		json.dump(HASHMAP, f, indent=4)
-	print("Done.")
 
 
 def generate_translations(dry_run: bool = False, diff_only: bool = False):

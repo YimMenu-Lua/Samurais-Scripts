@@ -2,12 +2,8 @@
 #
 # Usage:
 #	python update_offsets.py			: normal run (just hit F5 if in VS Code and have Python Debugger installed, reads raw files from a remote repository)
-#	python update_offsets.py --version	: 1: Legacy | 2: Enhanced; defaults to 1: Legacy
+#	python update_offsets.py --version	: 0: Legacy | 1: Enhanced; defaults to 0: Legacy
 #	python update_offsets.py --local	: Read from local files; this must be followed by the path to local decompiled scritps
-#	python update_offsets.py --owner	: Repository owner (if reading from remote repository)
-#	python update_offsets.py --repo		: Repository name (if reading from remote repository)
-#	python update_offsets.py --branch	: Repository branch (if reading from remote repository)
-#	python update_offsets.py --folder	: Repository folder (if reading from remote repository. Optional, must end with a forward slash if provided)
 #
 #	CI Run: Don't pass any arguments
 
@@ -31,6 +27,10 @@ from slpp import slpp as Lua
 
 PARENT_PATH = Path(__file__).resolve().parent
 SCRIPT_ROOT = PARENT_PATH.parent.parent
+REPO_URLS = [
+	"https://raw.githubusercontent.com/acidlabsgg/gtav-legacy-scripts/refs/heads/main/scripts",
+	"https://raw.githubusercontent.com/acidlabsgg/gtav-enhanced-scripts/refs/heads/main/scripts",
+]
 
 
 def has_c_file(path) -> bool:
@@ -41,8 +41,8 @@ def has_c_file(path) -> bool:
 	return False
 
 
-def read_raw_file(file_name: str, owner: str, repo: str, branch: str, folder: str) -> str:
-	url = f"https://raw.githubusercontent.com/{owner}/{repo}/refs/heads/{branch}/{folder}{file_name}"
+def read_raw_file(file_name: str, version: int=0) -> str:
+	url = f"{REPO_URLS[version]}/{file_name}"
 	try:
 		resp = requests.get(url)
 		resp.raise_for_status()
@@ -61,14 +61,14 @@ def read_local_file(file_path: str) -> str:
 		return f.read()
 
 
-def read_file(local: bool, file_name: str, decomps_path: str, owner: str, repo: str, branch: str, folder: str):
+def read_file(local: bool, file_name: str, decomps_path: str, version: int):
 	if local:
 		if not (os.path.isdir(decomps_path) and has_c_file(decomps_path)):
 			print("The path specified is invalid.")
 			sys.exit(1)
 		return read_local_file(script_file_path(decomps_path, file_name))
 	else:
-		return read_raw_file(file_name, owner, repo, branch, folder)
+		return read_raw_file(file_name, version)
 
 
 def read_lua_table(path: str):
@@ -171,35 +171,8 @@ def serialize_lua(v, indent=1):
 	return f'"{s}"'
 
 
-def main():
-	table_path = SCRIPT_ROOT / "includes/data/globals_locals.lua"
-	if not os.path.exists(table_path):
-		print("Lookup file not found: globals_locals.lua")
-		sys.exit(1)
-
-
-	parser = ArgParser(description="Update offsets from local path or GitHub repository.")
-	parser.add_argument("--version", type=int, help="Choose game version. (1: Legacy | 2: Enhanced)")
-	parser.add_argument("--local", action="store_true", help="Read from local decompiled scripts")
-	parser.add_argument("decomps_path", type=str, nargs="?", default="", help="Path to your local decompiled scripts")
-	parser.add_argument("--owner", type=str, default="calamity-inc", help="GitHub repo owner for remote files")
-	parser.add_argument("--repo", type=str, default="GTA-V-Decompiled-Scripts", help="GitHub repo name for remote files")
-	parser.add_argument("--branch", type=str, default="senpai", help="GitHub repo branch for remote files")
-	parser.add_argument("--folder", type=str, default="decompiled_scripts/", help="Optional GitHub repo folder. If provided, it must end with a forward slash.")
-	args = parser.parse_args()
-
-	version: int = args.version or 1
-	offsets_table = read_lua_table(table_path)
-	version = args.version or 1
-	local = args.local
-	path = args.decomps_path
-	owner = args.owner
-	repo = args.repo
-	branch = args.branch
-	folder = args.folder
-
-	offsets_table = read_lua_table(table_path)
-	version_key = "LEGACY" if version == 1 else "ENHANCED"
+def generate(offsets_table: list, version: int, local: bool, path: str):
+	version_key = "LEGACY" if version == 0 else "ENHANCED"
 
 	for name, data in offsets_table.items():
 		ver = data.get(version_key)
@@ -208,7 +181,7 @@ def main():
 
 		print(f"\n--- Scanning for: {name} ({version_key}) ---")
 		file_name = data["file"]
-		file_content = read_file(local, file_name, path, owner, repo, branch, folder)
+		file_content = read_file(local, file_name, path, version)
 		result = scan_entry(ver, file_content, file_name)
 		if not result:
 			print(f"[MISS] {name} (pattern not found in {file_name})")
@@ -225,6 +198,30 @@ def main():
 					print(f"\tFound offset for {name} ({version_key}): .f_{newv}")
 					ver["offsets"][i]["value"] = newv
 
+
+
+def main(auto: bool = True):
+	table_path = SCRIPT_ROOT / "includes/data/globals_locals.lua"
+	if not os.path.exists(table_path):
+		print("Lookup file not found: globals_locals.lua")
+		sys.exit(1)
+
+	offsets_table = read_lua_table(table_path)
+
+	if auto:
+		generate(offsets_table, 0, False, "")
+		generate(offsets_table, 1, False, "")	
+	else:
+		parser = ArgParser(description="Update offsets from local path or GitHub repository.")
+		parser.add_argument("--version", type=int, help="Choose game version. (0: Legacy | 1: Enhanced)")
+		parser.add_argument("--local", action="store_true", help="Read from local decompiled scripts")
+		parser.add_argument("decomps_path", type=str, nargs="?", default="", help="Path to your local decompiled scripts")
+		args = parser.parse_args()
+		version = args.version or 0
+		local = args.local
+		path = args.decomps_path
+		generate(offsets_table, version, local, path)
+	
 	data = serialize_lua(offsets_table)
 	with open(table_path, "w", encoding="utf-8") as f:
 		f.write("return ")
