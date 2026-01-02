@@ -2,4 +2,4 @@
 CI only. Do not edit.
 --]]
 
-return "1.7.5"
+return "1.7.6"

@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest">
-    <img alt="Script Version" src="https://img.shields.io/badge/Script%20Version-v1.7.5-blue?style=for-the-badge">
+    <img alt="Script Version" src="https://img.shields.io/badge/Script%20Version-v1.7.6-blue?style=for-the-badge">
   </a>
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/LICENSE">
     <img alt="License" src="https://img.shields.io/badge/Licence-GPL--3.0-white?style=for-the-badge">
