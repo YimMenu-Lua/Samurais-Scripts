@@ -11,6 +11,7 @@ return {
 	["SUBTAB_AIRCRAFT"]                    = "Aircraft",
 	["SUBTAB_FLATBED"]                     = "Flatbed Script",
 	["SUBTAB_HANDLING_EDITOR"]             = "Handling Editor",
+	["SUBTAB_STANCER"]                     = "Stancer",
 	["SUBTAB_GUI"]                         = "User Interface",
 	--#endregion
 
@@ -463,6 +464,17 @@ return {
 	["VEH_STEER_HANDBRAKE"]                = "Handbrake Steering",
 	["VEH_STEER_HANDBRAKE_TT"]             =
 	"Steers your vehicle's rear whels when you hold the handbrake, similar to monster cars.",
+	["VEH_STANCE_CAMBER"]                  = "Camber",
+	["VEH_STANCE_TRACK_WIDTH"]             = "Track Width",
+	["VEH_STANCE_WHEEL_WIDTH"]             = "Wheel Width",
+	["VEH_STANCE_WHEEL_SIZE"]              = "Wheel Size",
+	["VEH_STANCE_NON_STOCK"]               = "This option requires non-stock wheels.",
+	["VEH_STANCE_INCOMPATIBLE"]            = "This option is incompatible with current vehicle.",
+	["VEH_STANCE_FRONT_AXLE"]              = "Front Axle",
+	["VEH_STANCE_REAR_AXLE"]               = "Rear Axle",
+	["VEH_STANCE_COPY_FB"]                 = "Copy Front To Back",
+	["VEH_STANCE_GEN_OPTIONS"]             = "General Options",
+	["VEH_STANCE_RIDE_HEIGHT"]             = "Ride Height",
 	--#endregion
 
 	--#region World

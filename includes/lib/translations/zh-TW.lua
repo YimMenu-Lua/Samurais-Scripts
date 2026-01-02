@@ -28,8 +28,7 @@ return {
 	["VEH_NO_JET_STALL_TT"] = "當您按住制動按鈕時，飛機發動機將不再熄火。",
 	["VEH_MG_TRIGGERBOT_ENEMY"] = "僅限敵人",
 	["VEH_NO_JET_STALL"] = "禁用發動機熄火",
-	["VEH_FAST_JETS_TT"] =
-	"使大多數飛機更快，只要它們默認可以達到 240 公里/小時，它們的最大速度將增加到 555 公里/小時。 \n\n像除塵器這樣較慢的飛機不會受益於此，除非你通過俯衝強制它們達到速度閾值。 \n\n注意：你的齒輪（飛機輪）必須向上。",
+	["VEH_FAST_JETS_TT"] = "使大多數飛機更快，只要它們默認可以達到 240 公里/小時，它們的最大速度將增加到 555 公里/小時。 \n\n像除塵器這樣較慢的飛機不會受益於此，除非你通過俯衝強制它們達到速度閾值。 \n\n注意：你的齒輪（飛機輪）必須向上。",
 	["VEH_MG_TRIGGERBOT"] = "機槍扳機機器人",
 	["VEH_MG_TRIGGERBOT_ENEMY_TT"] = "機槍扳機機器人只射擊敵人。",
 	["VEH_MG_TRIGGERBOT_TT"] = "自動發射飛機的機槍。",
@@ -73,8 +72,7 @@ return {
 	["SETTINGS_RESET_PRESERVE_KEYS"] = "可選：選擇要保留的配置項。",
 	["FLTBD_EXIT_VEH_ERR"] = "首先退出當前車輛。",
 	["FTLBD_GET_IN_MSG"] = "您目前不在平闆卡車上。您可以從街上偷一個或使用下面的按鈕生成一個新的。",
-	["SETTINGS_ENTITY_REPLACE_TT"] =
-	"該項目對可以​​生成的實體（行人、車輛、物體）數量有限制。所有功能都遵守該限制，以防止實體垃圾郵件或阻塞遊戲。一旦達到某種實體類型的限制並嘗試生成新實體，此選項允許腳本自動替換舊的生成實體。",
+	["SETTINGS_ENTITY_REPLACE_TT"] = "該項目對可以​​生成的實體（行人、車輛、物體）數量有限制。所有功能都遵守該限制，以防止實體垃圾郵件或阻塞遊戲。一旦達到某種實體類型的限制並嘗試生成新實體，此選項允許腳本自動替換舊的生成實體。",
 	["SETTINGS_CFG_RESET"] = "重置保存的配置",
 	["GENERIC_UNAVAILABLE"] = "目前不可用。",
 	["INF_ATTACHMENT_DROP"] = "附件掉了。",
@@ -491,5 +489,21 @@ return {
 	["SELF_MC_BIKE_ANIMS"] = "啟用 MC 騎行風格",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "禁用法律工作冷卻",
 	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "禁用非法工作冷卻",
-	["SELF_MC_BIKE_ANIMS_TT"] = "恢復由於某種原因禁用的備用自行車騎行動畫。您必須註冊為 MC 並啟用此選項才能使這些動畫正常工作。"
+	["SELF_MC_BIKE_ANIMS_TT"] = "恢復由於某種原因禁用的備用自行車騎行動畫。您必須註冊為 MC 並啟用此選項才能使這些動畫正常工作。",
+	["VEH_LAUNCH_CTRL_MODE"] = "發射控制模式",
+	["SUBTAB_STANCER"] = "斯坦瑟",
+	["VEH_LAUNCH_CTRL_REALISTIC"] = "實際的",
+	["VEH_LAUNCH_CTRL_RIDICULOUS"] = "荒謬的",
+	["VEH_STANCE_CAMBER"] = "外傾角",
+	["VEH_STANCE_WHEEL_SIZE"] = "車輪尺寸",
+	["VEH_LAUNCH_CTRL_ERR"] = "目前無法使用啟動控制。你的發動機損壞了。",
+	["VEH_STANCE_TRACK_WIDTH"] = "軌道寬度",
+	["VEH_STANCE_FRONT_AXLE"] = "前軸",
+	["VEH_STANCE_WHEEL_WIDTH"] = "輪寬",
+	["VEH_STANCE_INCOMPATIBLE"] = "此選項與當前車輛不兼容。",
+	["VEH_STANCE_NON_STOCK"] = "此選項需要非庫存車輪。",
+	["VEH_STANCE_REAR_AXLE"] = "後橋",
+	["VEH_STANCE_RIDE_HEIGHT"] = "行駛高度",
+	["VEH_STANCE_COPY_FB"] = "從前到後復印",
+	["VEH_STANCE_GEN_OPTIONS"] = "一般選項"
 }

@@ -540,7 +540,7 @@ end)
 --#endregion
 
 --#region stancer
-vehicleTab:RegisterSubtab("Stancer", require("includes.frontend.vehicle.stancer_ui"), nil, false)
+vehicleTab:RegisterSubtab("SUBTAB_STANCER", require("includes.frontend.vehicle.stancer_ui"), nil, true)
 --#endregion
 
 local swap_btn_size = vec2:new(140, 35)

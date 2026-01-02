@@ -1274,6 +1274,16 @@ function Vehicle:SetAdvancedFlag(flag, toggle)
 	self:Resolve():SetAdvancedFlag(flag, toggle)
 end
 
+---@param fHeight float positive = lower, negative = higher. should use values between `-0.1` and `0.1`
+function Vehicle:SetRideHeight(fHeight)
+	if (not self:IsValid()) then
+		return
+	end
+
+	-- should probably start sanitizing values before writing to memory
+	self:Resolve():SetRideHeight(fHeight)
+end
+
 ---@param bone_index number
 ---@return fMatrix44
 function Vehicle:GetBoneMatrix(bone_index)

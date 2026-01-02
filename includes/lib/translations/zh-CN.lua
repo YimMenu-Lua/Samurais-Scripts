@@ -23,8 +23,7 @@ return {
 	["VEH_DRIFT_SMOKE"] = "轮胎冒烟",
 	["VEH_DRIFT_SMOKE_COL"] = "轮胎烟色",
 	["VEH_NO_JET_STALL"] = "禁用发动机熄火",
-	["VEH_FAST_JETS_TT"] =
-	"使大多数飞机更快，只要它们默认可以达到 240 公里/小时，它们的最大速度将增加到 555 公里/小时。\n\n像除尘器这样较慢的飞机不会受益于此，除非你通过俯冲强制它们达到速度阈值。\n\n注意：你的齿轮（飞机轮）必须向上。",
+	["VEH_FAST_JETS_TT"] = "使大多数飞机更快，只要它们默认可以达到 240 公里/小时，它们的最大速度将增加到 555 公里/小时。\n\n像除尘器这样较慢的飞机不会受益于此，除非你通过俯冲强制它们达到速度阈值。\n\n注意：你的齿轮（飞机轮）必须向上。",
 	["VEH_FAST_JETS"] = "快速飞机",
 	["VEH_NO_JET_STALL_TT"] = "当您按住刹车按钮时，飞机发动机将不再熄火。",
 	["VEH_NO_TURBULENCE"] = "禁用空气湍流",
@@ -74,8 +73,7 @@ return {
 	["FTLBD_GET_IN_MSG"] = "您目前不在平板卡车上。您可以从街上偷一个或使用下面的按钮生成一个新的。",
 	["SETTINGS_RESET_PRESERVE_KEYS"] = "可选：选择要保留的配置项。",
 	["SETTINGS_ENTITY_REPLACE"] = "自动替换实体",
-	["SETTINGS_ENTITY_REPLACE_TT"] =
-	"该项目对可以生成的实体（行人、车辆、物体）数量有限制。所有功能都遵守该限制，以防止实体垃圾邮件或阻塞游戏。一旦达到某种实体类型的限制并尝试生成新实体，此选项允许脚本自动替换旧的生成实体。",
+	["SETTINGS_ENTITY_REPLACE_TT"] = "该项目对可以生成的实体（行人、车辆、物体）数量有限制。所有功能都遵守该限制，以防止实体垃圾邮件或阻塞游戏。一旦达到某种实体类型的限制并尝试生成新实体，此选项允许脚本自动替换旧的生成实体。",
 	["WARN_PED_SPAWN_LIMIT"] = "Ped 生成上限已达到！如果您想在达到限制时自动替换旧实体，请考虑在“设置”选项卡中启用“自动替换实体”。",
 	["GENERIC_UNAVAILABLE"] = "目前不可用。",
 	["WARN_VEH_SPAWN_LIMIT"] = "车辆生成上限已达到！如果您想在达到限制时自动替换旧实体，请考虑在“设置”选项卡中启用“自动替换实体”。",
@@ -491,5 +489,21 @@ return {
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "禁用法律工作冷却",
 	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "禁用非法工作冷却",
 	["SELF_MC_BIKE_ANIMS_TT"] = "恢复由于某种原因禁用的备用自行车骑行动画。您必须注册为 MC 并启用此选项才能使这些动画正常工作。",
-	["SELF_MC_BIKE_ANIMS"] = "启用 MC 骑行风格"
+	["SELF_MC_BIKE_ANIMS"] = "启用 MC 骑行风格",
+	["SUBTAB_STANCER"] = "斯坦瑟",
+	["VEH_LAUNCH_CTRL_MODE"] = "发射控制模式",
+	["VEH_STANCE_CAMBER"] = "外倾角",
+	["VEH_LAUNCH_CTRL_REALISTIC"] = "实际的",
+	["VEH_LAUNCH_CTRL_RIDICULOUS"] = "荒谬的",
+	["VEH_LAUNCH_CTRL_ERR"] = "目前无法使用启动控制。你的发动机损坏了。",
+	["VEH_STANCE_TRACK_WIDTH"] = "轨道宽度",
+	["VEH_STANCE_NON_STOCK"] = "此选项需要非库存车轮。",
+	["VEH_STANCE_WHEEL_SIZE"] = "车轮尺寸",
+	["VEH_STANCE_WHEEL_WIDTH"] = "轮宽",
+	["VEH_STANCE_FRONT_AXLE"] = "前轴",
+	["VEH_STANCE_REAR_AXLE"] = "后桥",
+	["VEH_STANCE_COPY_FB"] = "从前到后复印",
+	["VEH_STANCE_GEN_OPTIONS"] = "一般选项",
+	["VEH_STANCE_INCOMPATIBLE"] = "此选项与当前车辆不兼容。",
+	["VEH_STANCE_RIDE_HEIGHT"] = "行驶高度"
 }

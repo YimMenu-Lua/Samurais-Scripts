@@ -75,6 +75,7 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_wheel_scale_rear pointer<float>
 ---@field public m_wheels atArray<CWheel> -- 0xC30
 ---@field public m_num_wheels number -- 0xC38
+---@field public m_ride_height pointer<float>
 ---@field private DumpFlags fun(self: CVehicle, enum_flags: Enum, get_func: fun(self: CVehicle, flag: integer): boolean): nil
 ---@overload fun(vehicle: integer): CVehicle|nil
 local CVehicle                   = Class("CVehicle", CEntity, 0xC40)
@@ -135,6 +136,7 @@ function CVehicle:init(vehicle)
 	instance.m_wheel_scale_rear             = instance.m_model_info:add(0x0490)
 	instance.m_wheels                       = atArray(ptr:add(0xC30), CWheel)
 	instance.m_num_wheels                   = ptr:add(0xC38):get_int()
+	instance.m_ride_height                  = ptr:add(0xC30):deref():add(0x07C)
 
 	return instance
 end
@@ -454,6 +456,16 @@ end
 
 function CVehicle:HasWheelDrawData()
 	return self.m_draw_data:GetWheelDrawData():IsValid()
+end
+
+---@param fHeight float positive = lower, negative = higher. should use values between `-0.1` and `0.1`
+function CVehicle:SetRideHeight(fHeight)
+	if (not self:IsValid()) then
+		return
+	end
+
+	-- should probably start sanitizing values before writing to memory
+	self.m_ride_height:set_float(fHeight)
 end
 
 return CVehicle
