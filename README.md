@@ -76,12 +76,12 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 
 ## Acknowledgments
 
-|                                                   |                                                                                |
-| :---:                                             | :---:                                                                          |
-| [Harmless](https://github.com/harmless05)         | Shift-Drift                                                                    |
-| [NiiV3AU](https://github.com/NiiV3AU)             | German translations                                                            |
-| [gir489returns](https://github.com/gir489returns) | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino)                  |
-| [tupoy-ya](https://github.com/tupoy-ya)           | Several contributions and shared knowledge                                     |
-| [szalikdev](https://github.com/szalikdev)         | Revived the project and joined the cause                                       |
-| [ShinyWasabi](https://github.com/shinywasabi)     | Foundational community tooling frequently used as reference                    |
-| [UnknownCheats.me](https://unknowncheats.me)      | A treasure trove of information                                                |
+| | |
+| :---: | :---: |
+| <a href="https://github.com/harmless05"><img height="40" width="40" src="https://avatars.githubusercontent.com/harmless05"><br/>Harmless</a> | Shift-Drift |
+| <a href="https://github.com/NiiV3AU"><img height="40" width="40" src="https://avatars.githubusercontent.com/NiiV3AU"><br/>NiiV3AU</a> | German translations |
+| <a href="https://github.com/gir489returns"><img height="40" width="40" src="https://avatars.githubusercontent.com/gir489returns"><br/>gir489returns</a> | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) |
+| <a href="https://github.com/tupoy-ya"><img height="40" width="40" src="https://avatars.githubusercontent.com/tupoy-ya"><br/>tupoy-ya</a> | Several contributions and shared knowledge |
+| <a href="https://github.com/szalikdev"><img height="40" width="40" src="https://avatars.githubusercontent.com/szalikdev"><br/>szalikdev</a> | Revived the project and joined the cause   |
+| <a href="https://github.com/shinywasabi"><img height="40" width="40" src="https://avatars.githubusercontent.com/shinywasabi"><br/>shinywasabi</a> | Foundational community tooling frequently used as reference |
+| <a href="https://unknowncheats.me"><img height="52" width="120" src="https://www.unknowncheats.me/forum/ambience/misc/forum_banner.png"><br/>UnknownCheats</a> | A treasure trove of information |
