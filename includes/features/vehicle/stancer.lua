@@ -25,6 +25,9 @@ end
 ---@field private m_entity PlayerVehicle
 ---@field private m_last_tick milliseconds
 ---@field private m_cached_model hash
+---@field private m_reloading boolean
+---@field private m_last_wheels_mod {type: integer, index: integer, var: integer}
+---@field private m_last_wheel_mod_check_time seconds
 ---@field public m_base_values table<eWheelSide, StanceObject>
 ---@field public m_deltas table<eWheelSide, StanceObject>
 ---@field public m_wheels table<eWheelSide, array<CWheel>>
@@ -153,6 +156,15 @@ end
 
 function Stancer:Init()
 	self.m_last_tick = 0
+	self.m_last_wheel_mod_check_time = 0
+	self.m_reloading = false
+
+	self.m_last_wheels_mod = {
+		index = -1,
+		type = -1,
+		var = -1
+	}
+
 	self.m_suspension_height = {
 		m_current = 0.0,
 		m_last_seen = 0.0
@@ -161,6 +173,7 @@ function Stancer:Init()
 	if (self.m_entity:IsValid()) then
 		self:ReadWheelArray()
 		self.m_cached_model = self.m_entity:GetModelHash()
+		self.m_last_wheels_mod = self.m_entity:GetCustomWheels()
 	end
 end
 
@@ -174,12 +187,12 @@ function Stancer:CanApplyDrawData()
 end
 
 function Stancer:Reset()
+	self.m_suspension_height.m_current   = 0.0
+	self.m_suspension_height.m_last_seen = 0.0
+
 	if (not self.m_wheels) then
 		return
 	end
-
-	self.m_suspension_height.m_current   = 0.0
-	self.m_suspension_height.m_last_seen = 0.0
 
 	for _, v in ipairs(self.decorators) do
 		self.m_deltas[v.wheel_side][v.key] = 0.0
@@ -207,10 +220,6 @@ function Stancer:Reset()
 end
 
 function Stancer:Cleanup()
-	if (not self.m_wheels) then
-		return
-	end
-
 	self:Reset()
 	Decorator:RemoveEntity(self.m_entity:GetHandle())
 	self.m_cached_model = nil
@@ -222,8 +231,10 @@ function Stancer:OnNewVehicle()
 		return
 	end
 
-	self.m_cached_model = self.m_entity:GetModelHash()
+	self.m_cached_model    = self.m_entity:GetModelHash()
+	self.m_last_wheels_mod = self.m_entity:GetCustomWheels()
 	self:ReadDefaults()
+
 	if (self:IsVehicleModelSaved() and GVars.features.vehicle.stancer.auto_apply_saved) then
 		self:LoadSavedDeltas()
 	end
@@ -338,6 +349,39 @@ function Stancer:GetNthWheelForSide(side, wheel_n)
 	end
 
 	return self.m_wheels[side][wheel_n]
+end
+
+function Stancer:OnWheelsChanged()
+	if (not self.m_entity or not self.m_entity:IsValid()) then
+		return
+	end
+
+	if (Time.now() - self.m_last_wheel_mod_check_time < 1) then
+		return
+	end
+
+	local current = self.m_entity:GetCustomWheels()
+	if (not table.is_equal(self.m_last_wheels_mod, current)) then
+		self.m_reloading = true
+		local prev_sup = self.m_suspension_height.m_current
+		local prev_deltas_f = table.copy(self.m_deltas[self.eWheelSide.FRONT])
+		local prev_deltas_r = table.copy(self.m_deltas[self.eWheelSide.BACK])
+		self:Cleanup()
+		self:OnNewVehicle()
+		self.m_last_wheels_mod = self.m_entity:GetCustomWheels()
+
+		for k, v in pairs(prev_deltas_f) do
+			self.m_deltas[self.eWheelSide.FRONT][k] = v
+		end
+		for k, v in pairs(prev_deltas_r) do
+			self.m_deltas[self.eWheelSide.BACK][k] = v
+		end
+
+		self.m_suspension_height.m_current = prev_sup
+		self.m_reloading = false
+	end
+
+	self.m_last_wheel_mod_check_time = Time.now()
 end
 
 ---@return boolean
@@ -481,6 +525,7 @@ function Stancer:ReadDefaults()
 		return
 	end
 
+	self.m_entity:GetWheelDrawData(true)
 	local queued_decors_loaded = self:RestoreQueueFromDecors()
 
 	if (self:AreDefaultsRegistered()) then
@@ -523,7 +568,7 @@ function Stancer:Update()
 	-- possible RAGE engine PTSD involved
 	self.m_is_model_saved = self:IsVehicleModelSaved()
 
-	if (not self.m_is_active or not self.m_wheels) then
+	if (not self.m_is_active or not self.m_wheels or self.m_reloading) then
 		return
 	end
 
@@ -532,6 +577,8 @@ function Stancer:Update()
 	if (not self:AreDefaultsRegistered()) then
 		return
 	end
+
+	self:OnWheelsChanged()
 
 	-- must have high frequency updates, otherwise wheels will flicker
 	-- when the game tries to force-reset them

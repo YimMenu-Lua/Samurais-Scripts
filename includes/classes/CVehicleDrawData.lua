@@ -35,7 +35,12 @@ function CVehicleDrawData:init(ptr)
 	return self
 end
 
-function CVehicleDrawData:GetWheelDrawData()
+---@param refresh? boolean
+function CVehicleDrawData:GetWheelDrawData(refresh)
+	if (refresh) then
+		self.m_wheel_draw_data = nil
+	end
+
 	if not (self.m_wheel_draw_data and self.m_wheel_draw_data:IsValid()) then
 		self.m_wheel_draw_data = CWheelDrawData.new(self.m_ptr:add(0x370):deref())
 	end

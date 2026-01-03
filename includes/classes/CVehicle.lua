@@ -433,6 +433,12 @@ function CVehicle:IsWheelBrokenOff(wheelIndex)
 	return (self.m_ptr:add(0xA98):get_dword() >> (wheelIndex & 0x1F) & 1) ~= 0
 end
 
+---@param refresh? boolean
+---@return CWheelDrawData
+function CVehicle:GetWheelDrawData(refresh)
+	return self.m_draw_data:GetWheelDrawData(refresh)
+end
+
 ---@return float -- Wheel width or 0.f if invalid
 function CVehicle:GetWheelWidth()
 	return self.m_draw_data:GetWheelWidth()

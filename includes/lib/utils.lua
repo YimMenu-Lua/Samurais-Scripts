@@ -818,28 +818,28 @@ function table.is_equal(a, b, seen)
 		return true
 	end
 
-	if type(a) ~= type(b) then
+	if (type(a) ~= type(b)) then
 		return false
 	end
 
-	if type(a) ~= "table" then
+	if (type(a) ~= "table") then
 		return false
 	end
 
 	seen = seen or {}
-	if seen[a] and seen[b] then
+	if (seen[a] and seen[b]) then
 		return true
 	end
 	seen[a], seen[b] = true, true
 
 	for k, v in pairs(a) do
-		if not table.is_equal(v, b[k], seen) then
+		if (not table.is_equal(v, b[k], seen)) then
 			return false
 		end
 	end
 
 	for k in pairs(b) do
-		if a[k] == nil then
+		if (a[k] == nil) then
 			return false
 		end
 	end
