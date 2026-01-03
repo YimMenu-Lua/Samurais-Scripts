@@ -550,13 +550,19 @@ function Vehicle:IsWheelBrokenOff(wheelIndex)
 	return self:Resolve():IsWheelBrokenOff(wheelIndex)
 end
 
+---@param refresh? boolean
+---@return CWheelDrawData
+function Vehicle:GetWheelDrawData(refresh)
+	return self:Resolve():GetWheelDrawData(refresh)
+end
+
 ---@return float -- Wheel width or 0.f if invalid
-function Vehicle:GetWheelWidth()
+function Vehicle:GetVisualWheelWidth()
 	return self:Resolve():GetWheelWidth()
 end
 
 ---@return float -- Wheel size or 0.f if invalid
-function Vehicle:GetWheelSize()
+function Vehicle:GetVisualWheelSize()
 	return self:Resolve():GetWheelSize()
 end
 
@@ -829,7 +835,7 @@ function Vehicle:GetColors()
 	return col1, col2
 end
 
----@return table
+---@return { type: integer, index: integer, var: integer }
 function Vehicle:GetCustomWheels()
 	if not self:IsValid() then
 		return {}

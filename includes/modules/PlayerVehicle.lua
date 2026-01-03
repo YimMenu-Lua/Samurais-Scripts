@@ -159,6 +159,11 @@ function PlayerVehicle.new(handle)
 		instance:Main()
 	end)
 
+	Backend:RegisterEventCallbackAll(function()
+		---@diagnostic disable-next-line: invisible
+		instance.m_feat_mgr:Cleanup()
+	end)
+
 	table.insert(instance.m_threads, main_thread)
 	return instance
 end
@@ -188,14 +193,13 @@ function PlayerVehicle:Set(handle)
 		VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(handle, 0.0)
 	end
 
-	self.m_stance_mgr:ReadDefaults()
+	self.m_stance_mgr:OnNewVehicle()
 	-- self:ResumeThreads()
 	-- self.m_feat_mgr:OnEnable()
 end
 
 function PlayerVehicle:Reset()
 	-- self:SuspendThreads()
-	-- self.m_feat_mgr:Cleanup()
 	if (self:IsValid() and self:IsLocked()) then
 		VEHICLE.SET_VEHICLE_DOORS_LOCKED(self:GetHandle(), 1)
 		self.m_generic_toggleables["autolockdoors"] = nil
@@ -208,7 +212,6 @@ function PlayerVehicle:Reset()
 	self:RestoreAllPatches()
 	self:ResetAllGenericToggleables()
 	self.m_handling_editor:Reset()
-	self.m_stance_mgr:Cleanup()
 
 	self.m_autopilot = {
 		eligible = false,
@@ -218,6 +221,9 @@ function PlayerVehicle:Reset()
 
 	self:Destroy()
 	self.m_handle = 0
+
+	-- called late so it only resets deltas and keeps the vehicle untouched.
+	self.m_stance_mgr:Reset()
 end
 
 ---@return hash

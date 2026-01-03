@@ -3,7 +3,7 @@
     <img alt="Script Version" src="https://img.shields.io/badge/Script%20Version-v1.7.6-blue?style=for-the-badge">
   </a>
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/LICENSE">
-    <img alt="License" src="https://img.shields.io/badge/Licence-GPL--3.0-white?style=for-the-badge">
+    <img alt="License" src="https://img.shields.io/badge/License-GPL--3.0-white?style=for-the-badge">
   </a>
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts">
     <img alt="Game Version" src="https://img.shields.io/badge/Game%20Build-latest-green?style=for-the-badge">
@@ -43,6 +43,9 @@ A modular GTA V Lua framework focused on enhancing the player's experience throu
 - Type `!ls` or `!dump` to dump all available commands.
 - All default commands are prefixed with an exclamation mark `<!>`.
 
+>[!Important]
+> **Do not use this in YimMenuV2. It will not work.**
+
 ## Contributing
 
 Contributions are what make the open source community a great place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -74,14 +77,33 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
   </a>
 </div>
 
+## FAQ
+
+- **Q:** Does this support Enhanced?
+- **A:** Prtially. You can use [YimLuaAPI](github.com/TupoyeMenu/YimLuaAPI) to test it but stability is not guaranteed as of now.
+
+- **Q:** What is YimLuaAPI and how do I use it?
+- **A:**
+  - **What is it:** [YimLuaAPI](github.com/TupoyeMenu/YimLuaAPI) is a universal Lua API that works for both Legacy and Enhanced.
+  - **How to use it:** Right now there is no release because it's still in development. If you want to try it, you have to compile it yourself. Once you have `YimLuaAPI.dll`, inject it into any GTA branch (Legacy/Enhanced), it will create a folder on first injection: `%AppData%\YimLuaAPI`. Simply place the script there and you're done. You can still use YimMenu/YimMenuV2 but the script has to only exist in YimLuaAPI.
+
+- **Q:** Why can't-I run this in YimMenuV2?
+- **A:** There are several reasons why:
+  - YimMenuV2 doesn't have a finished Lua API. `require` isn't even present, let alone custom bindings.
+  - There are several versions and flavors of the Lua programming language. This project is written in [Lua 5.4](https://www.lua.org/manual/5.4/) and YimMenuV2's API uses [LuaJIT](https://luajit.org/). Explaining the difference here is not ideal but it's not only the language difference, it's also how they are embedded in each menu.
+
+- **Q:** Can this be made compatible with YimMenuV2 once its API is finished?
+- **Short Answer:** No.
+- **Long Answer:** Yes, a compatibility layer can be added to accomodate for all language and API differences but is it worth the trouble and code bloat? Absolutely not. We would be better off rewriting this for V2's API.
+
 ## Acknowledgments
 
-|                                                   |                                                                                |
-| :---:                                             | :---:                                                                          |
-| [Harmless](https://github.com/harmless05)         | Shift-Drift                                                                    |
-| [NiiV3AU](https://github.com/NiiV3AU)             | German translations                                                            |
-| [gir489returns](https://github.com/gir489returns) | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino)                  |
-| [tupoy-ya](https://github.com/tupoy-ya)           | Several contributions and shared knowledge                                     |
-| [szalikdev](https://github.com/szalikdev)         | Revived the project and joined the cause                                       |
-| [ShinyWasabi](https://github.com/shinywasabi)     | Foundational community tooling frequently used as reference                    |
-| [UnknownCheats.me](https://unknowncheats.me)      | A treasure trove of information                                                |
+| Name | Contribution |
+| :---: | :---: |
+| <a href="https://github.com/harmless05"><img height="40" width="40" src="https://avatars.githubusercontent.com/harmless05"><br/>Harmless</a> | Shift-Drift |
+| <a href="https://github.com/NiiV3AU"><img height="40" width="40" src="https://avatars.githubusercontent.com/NiiV3AU"><br/>NiiV3AU</a> | German translations |
+| <a href="https://github.com/gir489returns"><img height="40" width="40" src="https://avatars.githubusercontent.com/gir489returns"><br/>gir489returns</a> | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) |
+| <a href="https://github.com/tupoy-ya"><img height="40" width="40" src="https://avatars.githubusercontent.com/tupoy-ya"><br/>tupoy-ya</a> | Several contributions and shared knowledge |
+| <a href="https://github.com/szalikdev"><img height="40" width="40" src="https://avatars.githubusercontent.com/szalikdev"><br/>szalikdev</a> | Revived the project and joined the cause   |
+| <a href="https://github.com/shinywasabi"><img height="40" width="40" src="https://avatars.githubusercontent.com/shinywasabi"><br/>ShinyWasabi</a> | Foundational community tooling frequently used as reference |
+| <a href="https://unknowncheats.me"><img height="52" width="120" src="https://www.unknowncheats.me/forum/ambience/misc/forum_banner.png"><br/>UnknownCheats</a> | A treasure trove of information |

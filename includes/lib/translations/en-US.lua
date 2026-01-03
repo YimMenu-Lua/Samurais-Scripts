@@ -466,6 +466,7 @@ return {
 	"Steers your vehicle's rear whels when you hold the handbrake, similar to monster cars.",
 	["VEH_STANCE_CAMBER"]                  = "Camber",
 	["VEH_STANCE_TRACK_WIDTH"]             = "Track Width",
+	["VEH_STANCE_SUSP_COMP"]               = "Suspension Compression",
 	["VEH_STANCE_WHEEL_WIDTH"]             = "Wheel Width",
 	["VEH_STANCE_WHEEL_SIZE"]              = "Wheel Size",
 	["VEH_STANCE_NON_STOCK"]               = "This option requires non-stock wheels.",
@@ -475,6 +476,11 @@ return {
 	["VEH_STANCE_COPY_FB"]                 = "Copy Front To Back",
 	["VEH_STANCE_GEN_OPTIONS"]             = "General Options",
 	["VEH_STANCE_RIDE_HEIGHT"]             = "Ride Height",
+	["VEH_STANCE_SAVE_MODEL"]              = "Save Current Model",
+	["VEH_STANCE_UPDATE_MODEL"]            = "Update Saved Model",
+	["VEH_STANCE_AUTOAPPLY"]               = "Auto-Apply",
+	["VEH_STANCE_AUTOAPPLY_TT"]            = "Automatically apply saved model stance when you enter a vehicle of that model.",
+	["VEH_STANCE_VIEW_SAVED"]              = "View Saved Vehicles",
 	--#endregion
 
 	--#region World

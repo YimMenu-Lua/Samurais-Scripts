@@ -505,5 +505,11 @@ return {
 	["VEH_STANCE_FRONT_AXLE"] = "Eixo dianteiro",
 	["VEH_STANCE_REAR_AXLE"] = "Eixo traseiro",
 	["VEH_STANCE_RIDE_HEIGHT"] = "Altura do passeio",
-	["VEH_STANCE_NON_STOCK"] = "Esta opção requer rodas sem estoque."
+	["VEH_STANCE_NON_STOCK"] = "Esta opção requer rodas sem estoque.",
+	["VEH_STANCE_AUTOAPPLY"] = "Aplicar automaticamente",
+	["VEH_STANCE_SUSP_COMP"] = "Compressão de Suspensão",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "Aplique automaticamente a postura salva do modelo ao entrar em um veículo desse modelo.",
+	["VEH_STANCE_VIEW_SAVED"] = "Ver veículos salvos",
+	["VEH_STANCE_UPDATE_MODEL"] = "Atualizar modelo salvo",
+	["VEH_STANCE_SAVE_MODEL"] = "Salvar modelo atual"
 }

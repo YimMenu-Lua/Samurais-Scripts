@@ -505,5 +505,11 @@ return {
 	["VEH_STANCE_REAR_AXLE"] = "Задний мост",
 	["VEH_STANCE_WHEEL_WIDTH"] = "Ширина колеса",
 	["VEH_STANCE_COPY_FB"] = "Копировать спереди назад",
-	["VEH_STANCE_RIDE_HEIGHT"] = "Высота посадки"
+	["VEH_STANCE_RIDE_HEIGHT"] = "Высота посадки",
+	["VEH_STANCE_UPDATE_MODEL"] = "Обновить сохраненную модель",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "Автоматически применять сохраненную позицию модели, когда вы садитесь в автомобиль этой модели.",
+	["VEH_STANCE_SAVE_MODEL"] = "Сохранить текущую модель",
+	["VEH_STANCE_AUTOAPPLY"] = "Автоматическое применение",
+	["VEH_STANCE_VIEW_SAVED"] = "Просмотр сохраненных автомобилей",
+	["VEH_STANCE_SUSP_COMP"] = "Компрессия подвески"
 }

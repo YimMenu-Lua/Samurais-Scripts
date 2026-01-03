@@ -505,5 +505,11 @@ return {
 	["VEH_LAUNCH_CTRL_ERR"] = "Il Launch Control non è al momento disponibile. Il tuo motore è danneggiato.",
 	["VEH_STANCE_NON_STOCK"] = "Questa opzione richiede ruote non di serie.",
 	["VEH_STANCE_COPY_FB"] = "Copia fronte-retro",
-	["VEH_STANCE_RIDE_HEIGHT"] = "Altezza di marcia"
+	["VEH_STANCE_RIDE_HEIGHT"] = "Altezza di marcia",
+	["VEH_STANCE_SUSP_COMP"] = "Compressione delle sospensioni",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "Applica automaticamente la posizione del modello salvata quando entri in un veicolo di quel modello.",
+	["VEH_STANCE_AUTOAPPLY"] = "Applicazione automatica",
+	["VEH_STANCE_VIEW_SAVED"] = "Visualizza i veicoli salvati",
+	["VEH_STANCE_SAVE_MODEL"] = "Save Current Model",
+	["VEH_STANCE_UPDATE_MODEL"] = "Update Saved Model"
 }

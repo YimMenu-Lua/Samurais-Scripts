@@ -505,5 +505,11 @@ return {
 	["VEH_STANCE_FRONT_AXLE"] = "Vorderachse",
 	["VEH_STANCE_COPY_FB"] = "Von vorne nach hinten kopieren",
 	["VEH_STANCE_RIDE_HEIGHT"] = "Fahrhöhe",
-	["VEH_STANCE_REAR_AXLE"] = "Hinterachse"
+	["VEH_STANCE_REAR_AXLE"] = "Hinterachse",
+	["VEH_STANCE_VIEW_SAVED"] = "Gespeicherte Fahrzeuge anzeigen",
+	["VEH_STANCE_SUSP_COMP"] = "Federungskompression",
+	["VEH_STANCE_AUTOAPPLY"] = "Automatisch anwenden",
+	["VEH_STANCE_SAVE_MODEL"] = "Aktuelles Modell speichern",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "Wenden Sie automatisch die gespeicherte Modellhaltung an, wenn Sie in ein Fahrzeug dieses Modells einsteigen.",
+	["VEH_STANCE_UPDATE_MODEL"] = "Gespeichertes Modell aktualisieren"
 }

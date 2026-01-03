@@ -1,6 +1,5 @@
 local CEntity                    = require("includes.classes.CEntity")
 local CWheel                     = require("includes.classes.CWheel")
-local CBaseSubHandlingData       = require("includes.classes.CBaseSubHandlingData")
 local CCarHandlingData           = require("includes.classes.CCarHandlingData")
 local CBikeHandlingData          = require("includes.classes.CBikeHandlingData")
 local CFlyingHandlingData        = require("includes.classes.CFlyingHandlingData")
@@ -432,6 +431,12 @@ function CVehicle:IsWheelBrokenOff(wheelIndex)
 
 	-- Thanks tupoy-ya
 	return (self.m_ptr:add(0xA98):get_dword() >> (wheelIndex & 0x1F) & 1) ~= 0
+end
+
+---@param refresh? boolean
+---@return CWheelDrawData
+function CVehicle:GetWheelDrawData(refresh)
+	return self.m_draw_data:GetWheelDrawData(refresh)
 end
 
 ---@return float -- Wheel width or 0.f if invalid

@@ -505,5 +505,11 @@ return {
 	["VEH_STANCE_FRONT_AXLE"] = "Oś przednia",
 	["VEH_STANCE_RIDE_HEIGHT"] = "Wysokość jazdy",
 	["VEH_STANCE_GEN_OPTIONS"] = "Opcje ogólne",
-	["VEH_STANCE_WHEEL_SIZE"] = "Rozmiar koła"
+	["VEH_STANCE_WHEEL_SIZE"] = "Rozmiar koła",
+	["VEH_STANCE_SUSP_COMP"] = "Kompresja zawieszenia",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "Automatycznie zastosuj zapisaną postawę modelu, gdy wejdziesz do pojazdu tego modelu.",
+	["VEH_STANCE_AUTOAPPLY"] = "Zastosuj automatycznie",
+	["VEH_STANCE_SAVE_MODEL"] = "Zapisz bieżący model",
+	["VEH_STANCE_UPDATE_MODEL"] = "Update Saved Model",
+	["VEH_STANCE_VIEW_SAVED"] = "View Saved Vehicles"
 }
