@@ -1276,4 +1276,18 @@ function math.lerp(a, b, t)
 	return a + (b - a) * t
 end
 
+-- This ignores floating point precision.
+--
+-- For normal numbers, use regular equality comparison.
+--
+-- https://www.lua.org/pil/2.3.html
+---@param a float
+---@param b float
+---@param e? float Optional epsilon (threshold)
+---@return boolean
+function math.is_equal(a, b, e)
+	e = e or 1e-6
+	return a == b or math.abs(a - b) < 1e-6
+end
+
 --#endregion

@@ -40,6 +40,7 @@ function CVehicleDrawData:GetWheelDrawData()
 		self.m_wheel_draw_data = CWheelDrawData.new(self.m_ptr:add(0x370):deref())
 	end
 
+	-- cached pointer gets invalidated when you change wheels?
 	return self.m_wheel_draw_data
 end
 

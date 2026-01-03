@@ -1,6 +1,5 @@
 local CEntity                    = require("includes.classes.CEntity")
 local CWheel                     = require("includes.classes.CWheel")
-local CBaseSubHandlingData       = require("includes.classes.CBaseSubHandlingData")
 local CCarHandlingData           = require("includes.classes.CCarHandlingData")
 local CBikeHandlingData          = require("includes.classes.CBikeHandlingData")
 local CFlyingHandlingData        = require("includes.classes.CFlyingHandlingData")

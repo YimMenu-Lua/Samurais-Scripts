@@ -551,12 +551,12 @@ function Vehicle:IsWheelBrokenOff(wheelIndex)
 end
 
 ---@return float -- Wheel width or 0.f if invalid
-function Vehicle:GetWheelWidth()
+function Vehicle:GetVisualWheelWidth()
 	return self:Resolve():GetWheelWidth()
 end
 
 ---@return float -- Wheel size or 0.f if invalid
-function Vehicle:GetWheelSize()
+function Vehicle:GetVisualWheelSize()
 	return self:Resolve():GetWheelSize()
 end
 

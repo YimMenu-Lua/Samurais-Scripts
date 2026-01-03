@@ -37,12 +37,15 @@ function Decorator:GetDecor(entity, key)
 	return self.RegisteredEntities[entity][key]
 end
 
+-- If a decor doesn't exist for the entity, this will register it nonetheless.
+--
+-- The only requirement is that the entity itself is registered.
 ---@param entity handle
 ---@param key string
 ---@param new_value anyval
 ---@return any
 function Decorator:UpdateDecor(entity, key, new_value)
-	if (not self:ExistsOn(entity, key)) then
+	if (not self:IsEntityRegistered(entity)) then
 		return
 	end
 

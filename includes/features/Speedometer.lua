@@ -494,7 +494,7 @@ function Speedometer:Draw(offset)
 		| ImGuiWindowFlags.NoMove
 
 	-- RIP Paul Walker
-	if (self._state.NOSDangerRatio >= 0.5) then
+	if (self._state.NOSDangerRatio >= 0.8) then
 		local window_width = radius * 1.3
 		local pulse = 0.5 + 0.5 * math.sin(Time.now() * 12)
 		ImGui.SetNextWindowSize(window_width, 100, ImGuiCond.Always)

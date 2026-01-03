@@ -149,7 +149,7 @@ function NosMgr:UpdateEngineDamage()
 	end
 
 	local current_speed = PV:GetSpeed()
-	local threshold = PV:GetMaxSpeed() * 2.1
+	local threshold = PV:GetMaxSpeed() * 1.7
 	self.m_engine_danger_ratio = math.min(1, math.max(0, current_speed / threshold))
 
 	if (current_speed > threshold) then
