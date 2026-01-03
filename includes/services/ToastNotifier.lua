@@ -53,24 +53,6 @@ local function logError(caller, message)
 	log.warning(("[ERROR] (%s): %s"):format(caller, message))
 end
 
-local function GetScreenResolution()
-	if PatternScanner:IsDone() then
-		return Game.GetScreenResolution()
-	end
-
-	local pScreenResolution = memory.scan_pattern("66 0F 6E 0D ? ? ? ? 0F B7 3D")
-	if pScreenResolution:is_null() then
-		return { x = 0, y = 0 }
-	end
-
-	return {
-		x = pScreenResolution:sub(0x4):rip():get_word(),
-		y = pScreenResolution:add(0x4):rip():get_word()
-	}
-end
-
-local SCREEN_RESOLUTION = GetScreenResolution()
-
 --#region Toast
 
 --------------------------------------
@@ -88,8 +70,7 @@ local SCREEN_RESOLUTION = GetScreenResolution()
 local Toast = {}
 Toast.__index = Toast
 Toast.ui_width = 320
-Toast.ui_pos_x = SCREEN_RESOLUTION.x - Toast.ui_width - 20
-Toast.ui_pos_y = -200.0
+
 
 ---@param caller string The notification title.
 ---@param message string The notification body.
@@ -105,7 +86,9 @@ function Toast.new(caller, message, level, duration, log)
 			duration    = duration or 3.0,
 			start_time  = Time.now(),
 			should_draw = false,
-			should_log  = log
+			should_log  = log,
+			ui_pos_x = GPointers.ScreenResolution.x - Toast.ui_width - 20,
+			ui_pos_y = -200.0
 		},
 		Toast
 	)
