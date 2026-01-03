@@ -505,5 +505,11 @@ return {
 	["VEH_STANCE_COPY_FB"] = "从前到后复印",
 	["VEH_STANCE_GEN_OPTIONS"] = "一般选项",
 	["VEH_STANCE_INCOMPATIBLE"] = "此选项与当前车辆不兼容。",
-	["VEH_STANCE_RIDE_HEIGHT"] = "行驶高度"
+	["VEH_STANCE_RIDE_HEIGHT"] = "行驶高度",
+	["VEH_STANCE_UPDATE_MODEL"] = "更新保存的模型",
+	["VEH_STANCE_SAVE_MODEL"] = "保存当前模型",
+	["VEH_STANCE_SUSP_COMP"] = "悬浮压缩",
+	["VEH_STANCE_VIEW_SAVED"] = "查看已保存的车辆",
+	["VEH_STANCE_AUTOAPPLY"] = "自动应用",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "当您进入该型号的车辆时，自动应用保存的模型姿态。"
 }

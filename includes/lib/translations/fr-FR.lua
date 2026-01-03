@@ -505,5 +505,11 @@ return {
 	["VEH_STANCE_INCOMPATIBLE"] = "Cette option est incompatible avec le véhicule actuel.",
 	["VEH_STANCE_NON_STOCK"] = "Cette option nécessite des roues non-stock.",
 	["VEH_STANCE_RIDE_HEIGHT"] = "Hauteur de caisse",
-	["VEH_LAUNCH_CTRL_ERR"] = "Le contrôle de lancement n'est pas disponible pour le moment. Votre moteur est endommagé."
+	["VEH_LAUNCH_CTRL_ERR"] = "Le contrôle de lancement n'est pas disponible pour le moment. Votre moteur est endommagé.",
+	["VEH_STANCE_SAVE_MODEL"] = "Enregistrer le modèle actuel",
+	["VEH_STANCE_VIEW_SAVED"] = "Afficher les véhicules enregistrés",
+	["VEH_STANCE_SUSP_COMP"] = "Compression des suspensions",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "Appliquez automatiquement la position du modèle enregistré lorsque vous entrez dans un véhicule de ce modèle.",
+	["VEH_STANCE_AUTOAPPLY"] = "Application automatique",
+	["VEH_STANCE_UPDATE_MODEL"] = "Mettre à jour le modèle enregistré"
 }

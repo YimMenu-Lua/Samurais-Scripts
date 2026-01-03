@@ -505,5 +505,11 @@ return {
 	["VEH_STANCE_REAR_AXLE"] = "Eje trasero",
 	["VEH_STANCE_GEN_OPTIONS"] = "Opciones generales",
 	["VEH_STANCE_COPY_FB"] = "Copiar de adelante hacia atrás",
-	["VEH_STANCE_RIDE_HEIGHT"] = "Altura de manejo"
+	["VEH_STANCE_RIDE_HEIGHT"] = "Altura de manejo",
+	["VEH_STANCE_SAVE_MODEL"] = "Guardar modelo actual",
+	["VEH_STANCE_UPDATE_MODEL"] = "Actualizar modelo guardado",
+	["VEH_STANCE_SUSP_COMP"] = "Compresión de suspensión",
+	["VEH_STANCE_AUTOAPPLY"] = "Aplicar automáticamente",
+	["VEH_STANCE_VIEW_SAVED"] = "Ver vehículos guardados",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "Aplique automáticamente la postura del modelo guardado cuando ingrese a un vehículo de ese modelo."
 }

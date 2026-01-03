@@ -505,5 +505,11 @@ return {
 	["VEH_STANCE_INCOMPATIBLE"] = "이 옵션은 현재 차량과 호환되지 않습니다.",
 	["VEH_STANCE_RIDE_HEIGHT"] = "탑승 높이",
 	["VEH_STANCE_GEN_OPTIONS"] = "일반 옵션",
-	["VEH_STANCE_COPY_FB"] = "앞에서 뒤로 복사"
+	["VEH_STANCE_COPY_FB"] = "앞에서 뒤로 복사",
+	["VEH_STANCE_SUSP_COMP"] = "서스펜션 압축",
+	["VEH_STANCE_SAVE_MODEL"] = "현재 모델 저장",
+	["VEH_STANCE_UPDATE_MODEL"] = "저장된 모델 업데이트",
+	["VEH_STANCE_AUTOAPPLY"] = "자동 적용",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "해당 모델의 차량에 탑승하면 저장된 모델 자세가 자동으로 적용됩니다.",
+	["VEH_STANCE_VIEW_SAVED"] = "저장된 차량 보기"
 }

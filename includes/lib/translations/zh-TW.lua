@@ -505,5 +505,11 @@ return {
 	["VEH_STANCE_REAR_AXLE"] = "後橋",
 	["VEH_STANCE_RIDE_HEIGHT"] = "行駛高度",
 	["VEH_STANCE_COPY_FB"] = "從前到後復印",
-	["VEH_STANCE_GEN_OPTIONS"] = "一般選項"
+	["VEH_STANCE_GEN_OPTIONS"] = "一般選項",
+	["VEH_STANCE_SUSP_COMP"] = "懸浮壓縮",
+	["VEH_STANCE_UPDATE_MODEL"] = "更新保存的模型",
+	["VEH_STANCE_SAVE_MODEL"] = "保存當前模型",
+	["VEH_STANCE_VIEW_SAVED"] = "查看已保存的車輛",
+	["VEH_STANCE_AUTOAPPLY"] = "自動應用",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "當您進入該型號的車輛時，自動應用保存的模型姿態。"
 }

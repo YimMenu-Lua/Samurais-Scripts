@@ -505,5 +505,11 @@ return {
 	["VEH_STANCE_REAR_AXLE"] = "リアアクスル",
 	["VEH_STANCE_COPY_FB"] = "前から後ろへコピー",
 	["VEH_STANCE_FRONT_AXLE"] = "フロントアクスル",
-	["VEH_STANCE_RIDE_HEIGHT"] = "車高"
+	["VEH_STANCE_RIDE_HEIGHT"] = "車高",
+	["VEH_STANCE_SUSP_COMP"] = "サスペンションの圧縮",
+	["VEH_STANCE_SAVE_MODEL"] = "現在のモデルを保存",
+	["VEH_STANCE_UPDATE_MODEL"] = "保存されたモデルを更新する",
+	["VEH_STANCE_VIEW_SAVED"] = "保存された車両を表示する",
+	["VEH_STANCE_AUTOAPPLY"] = "自動適用",
+	["VEH_STANCE_AUTOAPPLY_TT"] = "保存されているモデルの車両に乗り込むと、そのモデルのスタンスが自動的に適用されます。"
 }
