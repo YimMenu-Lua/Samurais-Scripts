@@ -3,7 +3,7 @@ name: Update Offsets
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 4 * * 0'
+    - cron: '0 2 * * 6'
 
 
 concurrency:
