@@ -106,4 +106,4 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 | <a href="https://github.com/tupoy-ya"><img height="40" width="40" src="https://avatars.githubusercontent.com/tupoy-ya"><br/>tupoy-ya</a> | Several contributions and shared knowledge |
 | <a href="https://github.com/szalikdev"><img height="40" width="40" src="https://avatars.githubusercontent.com/szalikdev"><br/>szalikdev</a> | Revived the project and joined the cause   |
 | <a href="https://github.com/shinywasabi"><img height="40" width="40" src="https://avatars.githubusercontent.com/shinywasabi"><br/>ShinyWasabi</a> | Foundational community tooling frequently used as reference |
-| <a href="https://unknowncheats.me"><img height="52" width="120" src="https://www.unknowncheats.me/forum/ambience/misc/forum_banner.png"><br/>UnknownCheats</a> | A treasure trove of information |
+| <a href="https://unknowncheats.me"><img height="40" width="40" src="https://avatars.githubusercontent.com/u/29552835"><br/>UnknownCheats</a> | A treasure trove of information |
