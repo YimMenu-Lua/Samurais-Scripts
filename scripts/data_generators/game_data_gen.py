@@ -28,7 +28,7 @@ from pathlib import Path
 
 PARENT_PATH = Path(__file__).resolve().parent
 SCRIPT_ROOT = PARENT_PATH.parent.parent
-LUA_DATA_PATH = SCRIPT_ROOT / "includes/data"
+LUA_DATA_PATH = SCRIPT_ROOT / "SSV2/includes/data"
 
 
 ePedType = {

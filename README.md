@@ -31,7 +31,7 @@ A modular GTA V Lua framework focused on enhancing the player's experience throu
 ### Setup
 
 - Download the latest zip archive from the [releases section](https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest).
-- Extract the archive to YimMenu's `scripts` folder:
+- Extract the archive and place the `SSV2` folder in YimMenu's `scripts` folder:
 
        %AppData%\YimMenu\scripts
 

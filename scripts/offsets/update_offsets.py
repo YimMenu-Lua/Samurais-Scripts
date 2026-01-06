@@ -201,7 +201,7 @@ def generate(offsets_table: list, version: int, local: bool, path: str):
 
 
 def main(auto: bool = True):
-	table_path = SCRIPT_ROOT / "includes/data/globals_locals.lua"
+	table_path = SCRIPT_ROOT / "SSV2/includes/data/globals_locals.lua"
 	if not os.path.exists(table_path):
 		print("Lookup file not found: globals_locals.lua")
 		sys.exit(1)
