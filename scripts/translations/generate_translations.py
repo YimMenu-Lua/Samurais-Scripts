@@ -180,7 +180,7 @@ def write_hashmap():
 
 
 def generate_translations(dry_run: bool = False, diff_only: bool = False):
-	base_path = PARENT_PATH.parent.parent / "includes/lib/translations"
+	base_path = PARENT_PATH.parent.parent / "SSV2/includes/lib/translations"
 	en_keys_path = base_path / "en-US.lua"
 	locales_path = base_path / "__locales.lua"
 
@@ -283,7 +283,7 @@ def generate_translations(dry_run: bool = False, diff_only: bool = False):
 
 
 def main():
-	parser = ArgParser(description="Generate translations from includes/lib/translations/en-US.lua")
+	parser = ArgParser(description="Generate translations from SSV2/includes/lib/translations/en-US.lua")
 	parser.add_argument("--dry-run", action="store_true", help="Don't write files; print diff summary")
 	parser.add_argument("--diff", action="store_true", help="Print diff summary only (no writes)")
 	args = parser.parse_args()
