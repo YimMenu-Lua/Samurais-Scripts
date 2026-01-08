@@ -1,4 +1,4 @@
-local SGSL = require("includes.structs.SGSL")
+local SGSL = require("includes.services.SGSL")
 
 ---@class WarehouseStruct
 ---@field wasChecked boolean

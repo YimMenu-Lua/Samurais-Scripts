@@ -32,7 +32,6 @@ end
 ---@field public m_deltas table<eWheelSide, StanceObject>
 ---@field public m_wheels table<eWheelSide, array<CWheel>>
 ---@field public m_suspension_height { m_current: float, m_last_seen: float }
----@field public m_is_model_saved boolean
 ---@field public m_is_active boolean
 local Stancer         = setmetatable({}, FeatureBase)
 Stancer.__index       = Stancer
@@ -263,12 +262,8 @@ function Stancer:ForEach(array, fn)
 end
 
 function Stancer:IsVehicleModelSaved()
-	if (not self.m_entity or not self.m_entity:IsValid()) then
-		return false
-	end
-
 	if (not self.m_cached_model) then
-		self.m_cached_model = self.m_entity:GetModelHash()
+		return false
 	end
 
 	return GVars.features.vehicle.stancer.saved_models[tostring(self.m_cached_model)] ~= nil
@@ -563,10 +558,6 @@ end
 
 function Stancer:Update()
 	self.m_is_active = self.m_entity:IsCar()
-
-	-- I'm paranoid about unnecessarily calling natives on tick
-	-- possible RAGE engine PTSD involved
-	self.m_is_model_saved = self:IsVehicleModelSaved()
 
 	if (not self.m_is_active or not self.m_wheels or self.m_reloading) then
 		return

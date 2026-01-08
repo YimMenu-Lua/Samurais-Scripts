@@ -1,5 +1,5 @@
 local sCooldownButtonLabel, bCooldownParam
-local SGSL                     = require("includes.structs.SGSL")
+local SGSL                     = require("includes.services.SGSL")
 local hangarSupplies           = 0
 local hangarTotalValue         = 0
 local bunkerTotalValue         = 0

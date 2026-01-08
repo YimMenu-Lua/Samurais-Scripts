@@ -1,6 +1,7 @@
 ---@diagnostic disable: param-type-mismatch
 
 local StateMachine     = require("includes.structs.StateMachine")
+local HandlingEditor   = require("includes.modules.HandlingEditor")
 local Speedometer      = require("includes.features.Speedometer")
 local FeatureMgr       = require("includes.services.FeatureManager")
 local NosMgr           = require("includes.features.vehicle.nos")
@@ -15,7 +16,6 @@ local CarCrash         = require("includes.features.vehicle.car_crashes")
 local VehMines         = require("includes.features.vehicle.mines")
 local MiscVehicle      = require("includes.features.vehicle.misc_vehicle")
 local CobraManeuver    = require("includes.features.vehicle.cobra_maneuver")
-local HandlingEditor   = require("includes.structs.HandlingEditor")
 local Stancer          = require("includes.features.vehicle.stancer")
 
 ---@class GenericToggleable
@@ -604,8 +604,6 @@ end
 -- Just for convenience so we don't have to remember patch names.
 --
 -- If we want auto-complete, we have to first define the patch name here.
---
--- We can still ignore this and memorize patch names and directly use them to apply/restore.
 PlayerVehicle.MemoryPatches = {
 	DeformMult   = "DeformMult",
 	Turbulence   = "Turbulence",

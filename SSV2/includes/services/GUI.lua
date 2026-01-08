@@ -2,7 +2,7 @@
 
 GVars.keyboard_keybinds.gui_toggle = GVars.keyboard_keybinds.gui_toggle or "F5"
 local Tab = require("includes.modules.Tab")
-local WindowAnimator = require("includes.structs.WindowAnimator")
+local WindowAnimator = require("includes.services.WindowAnimator")
 local ThemeManager = require("includes.services.ThemeManager")
 local debug_counter = GVars.backend.debug_mode and 7 or 0
 local DrawClock = require("includes.frontend.clock")
@@ -852,6 +852,8 @@ function GUI:ConfirmPopup(name)
 		ImGui.PopTextWrapPos()
 		ImGui.EndPopup()
 	end
+
+	return false
 end
 
 -- A simple window for features to draw further customizations (drift power, NOS effects, engine swap, etc.)

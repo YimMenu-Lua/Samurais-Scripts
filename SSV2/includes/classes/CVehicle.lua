@@ -3,7 +3,7 @@ local CWheel                     = require("includes.classes.CWheel")
 local CCarHandlingData           = require("includes.classes.CCarHandlingData")
 local CBikeHandlingData          = require("includes.classes.CBikeHandlingData")
 local CFlyingHandlingData        = require("includes.classes.CFlyingHandlingData")
-local phFragInst                 = require("includes.structs.phFragInst")
+local phFragInst                 = require("includes.classes.phFragInst")
 local CVehicleDrawData           = require("includes.classes.CVehicleDrawData")
 
 ---@class CAdvancedData : GenericClass

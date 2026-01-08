@@ -956,27 +956,35 @@ function table.erase_if(t, pred)
 		for _, k in ipairs(temp) do
 			t[k] = nil
 		end
+
+		temp = nil
 	end
 
 	return count > 0, count
 end
 
+---@param t table
+function table.clear(t)
+	for k in pairs(t) do
+		t[k] = nil
+	end
+end
+
 -- Generates a random string.
----@param size? number
+---@param length? number
 ---@param isalnum? boolean Alphanumeric
 ---@return string
-string.random = function(size, isalnum)
+string.random = function(length, isalnum)
 	local str_table = {}
-	local charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-	size = size or math.random(1, 10)
-	size = math.min(size, 128)
+	local charset   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	length          = length or math.random(1, 10)
+	length          = math.min(length or math.random(1, 10), 128)
 
 	if (isalnum) then
 		charset = charset .. "0123456789"
 	end
 
-	for _ = 1, size do
+	for _ = 1, length do
 		local index = math.random(1, #charset)
 		table.insert(str_table, charset:sub(index, index))
 	end
