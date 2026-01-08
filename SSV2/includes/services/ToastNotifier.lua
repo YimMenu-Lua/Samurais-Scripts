@@ -204,10 +204,10 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 		cardRounding
 	)
 
-	local titlePos = vec2:new(cardTL.x + padding, cardTL.y + padding)
-	local textCol = ImGui.GetAutoTextColor(Color(windowBG:unpack()))
-	local r, g, b, a = self.m_accent_color:AsFloat()
-	local headerCol = self.m_level == Enums.eNotificationLevel.MESSAGE and textCol or Color(r, g, b, 1.0 * alpha)
+	local titlePos   = vec2:new(cardTL.x + padding, cardTL.y + padding)
+	local textCol    = ImGui.GetAutoTextColor(Color(windowBG:unpack()))
+	local r, g, b, _ = self.m_accent_color:AsFloat()
+	local headerCol  = self.m_level == Enums.eNotificationLevel.MESSAGE and textCol or Color(r, g, b, 1.0 * alpha)
 	ImGui.ImDrawListAddText(
 		pImDrawList,
 		ImGui.GetFontSize() * titleScale,
@@ -261,7 +261,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 		content_width - (padding * 2.0)
 	)
 
-	if (context == Enums.eNotificationContext.TOAST and showProgress) then
+	if (context == Enums.eNotificationContext.TOAST and showProgress and progress) then
 		local barHeight = 4.0
 		local barW      = cardWidth * (1.0 - progress)
 

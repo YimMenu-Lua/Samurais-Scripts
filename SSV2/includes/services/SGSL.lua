@@ -1,5 +1,5 @@
 -----------------------------------------------------
--- SGSLObj Struct
+-- SGSLObj
 -----------------------------------------------------
 -- Represents each table in the globals_locals table.
 ---@class SGSLObj
@@ -9,7 +9,7 @@
 ---@field ENHANCED SGSLEntry
 
 -----------------------------------------------------
--- SGSLEntry Struct
+-- SGSLEntry
 -----------------------------------------------------
 -- Represents an entry in SGSLObj, in other words, the LEGACY/ENHANCED table
 -- that contains the actual data.

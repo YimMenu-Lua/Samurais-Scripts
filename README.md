@@ -1,3 +1,6 @@
+<!-- markdownlint-disable MD033 -->
+<!-- markdownlint-disable MD041 -->
+
 <div align="center">
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest">
     <img alt="Script Version" src="https://img.shields.io/badge/Script%20Version-v1.7.8-blue?style=for-the-badge">
@@ -69,14 +72,6 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 > Some parts of the API were refactored or extended but nothing has drastically changed.
 > All changes introduced in this project are documented in the source.
 
-## Contact
-
-<div>
-  <a href="https://discord.gg/RHBUxJ5Qhp">
-    <img height="96" width="192" src="https://substackcdn.com/image/fetch/$s_!nfCP!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F8a41e45e-aac9-44e5-8b69-55a81058ecbf_875x280.png">
-  </a>
-</div>
-
 ## FAQ
 
 - **Q:** Does this support Enhanced?
@@ -100,10 +95,18 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 
 | Name | Contribution |
 | :---: | :---: |
-| <a href="https://github.com/harmless05"><img height="40" width="40" src="https://avatars.githubusercontent.com/harmless05"><br/>Harmless</a> | Shift-Drift |
-| <a href="https://github.com/NiiV3AU"><img height="40" width="40" src="https://avatars.githubusercontent.com/NiiV3AU"><br/>NiiV3AU</a> | German translations |
-| <a href="https://github.com/gir489returns"><img height="40" width="40" src="https://avatars.githubusercontent.com/gir489returns"><br/>gir489returns</a> | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) |
-| <a href="https://github.com/tupoy-ya"><img height="40" width="40" src="https://avatars.githubusercontent.com/tupoy-ya"><br/>tupoy-ya</a> | Several contributions and shared knowledge |
-| <a href="https://github.com/szalikdev"><img height="40" width="40" src="https://avatars.githubusercontent.com/szalikdev"><br/>szalikdev</a> | Revived the project and joined the cause   |
-| <a href="https://github.com/shinywasabi"><img height="40" width="40" src="https://avatars.githubusercontent.com/shinywasabi"><br/>ShinyWasabi</a> | Foundational community tooling frequently used as reference |
-| <a href="https://unknowncheats.me"><img height="40" width="40" src="https://avatars.githubusercontent.com/u/29552835"><br/>UnknownCheats</a> | A treasure trove of information |
+| <a href="https://github.com/harmless05"><img height="40" width="40" alt="harmless05" src="https://avatars.githubusercontent.com/harmless05"><br/>Harmless</a> | Shift-Drift |
+| <a href="https://github.com/NiiV3AU"><img height="40" width="40" alt="NiiV3AU" src="https://avatars.githubusercontent.com/NiiV3AU"><br/>NiiV3AU</a> | German translations |
+| <a href="https://github.com/gir489returns"><img height="40" width="40" alt="gir489returns" src="https://avatars.githubusercontent.com/gir489returns"><br/>gir489returns</a> | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) |
+| <a href="https://github.com/tupoy-ya"><img height="40" width="40" alt="tupoy-ya" src="https://avatars.githubusercontent.com/tupoy-ya"><br/>tupoy-ya</a> | Several contributions and shared knowledge |
+| <a href="https://github.com/szalikdev"><img height="40" width="40" alt="szalikdev" src="https://avatars.githubusercontent.com/szalikdev"><br/>szalikdev</a> | Revived the project and joined the cause |
+| <a href="https://github.com/shinywasabi"><img height="40" width="40" alt="arthur" src="https://avatars.githubusercontent.com/shinywasabi"><br/>ShinyWasabi</a> | Foundational community tooling frequently used as reference |
+| <a href="https://unknowncheats.me"><img height="40" width="40" alt="uc" src="https://avatars.githubusercontent.com/u/29552835"><br/>UnknownCheats</a> | A treasure trove of information |
+
+## Contact
+
+<div>
+  <a href="https://discord.gg/RHBUxJ5Qhp">
+    <img height="96" width="192" alt="Discord" src="https://substackcdn.com/image/fetch/$s_!nfCP!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F8a41e45e-aac9-44e5-8b69-55a81058ecbf_875x280.png">
+  </a>
+</div>

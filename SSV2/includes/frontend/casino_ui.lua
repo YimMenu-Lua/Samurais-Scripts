@@ -1,5 +1,5 @@
 local CasinoPacino = require("includes.features.CasinoPacino"):init()
-local SGSL         = require("includes.structs.SGSL")
+local SGSL         = require("includes.services.SGSL")
 
 local function drawGamblingTab()
 	ImGui.SeparatorText(_T "CP_COOLDOWN_BYPASS")

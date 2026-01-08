@@ -1,6 +1,6 @@
 ---@diagnostic disable: lowercase-global
 
-local SGSL = require("includes.structs.SGSL")
+local SGSL = require("includes.services.SGSL")
 
 ---@enum eCasinoPrize
 Enums.eCasinoPrize = {

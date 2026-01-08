@@ -521,50 +521,7 @@ local function DrawPatches()
 end
 
 local function DrawMiscTests()
-	ImGui.SeparatorText("Vehicle Flag Dump")
-
-	if (ImGui.Button("Handling Flags")) then
-		script.run_in_fiber(function()
-			local PV = Self:GetVehicle()
-			if (not PV:IsValid()) then
-				return
-			end
-			PV:Resolve():DumpHandlingFlags()
-		end)
-	end
-	ImGui.SameLine()
-	if (ImGui.Button("Model Flags")) then
-		script.run_in_fiber(function()
-			local PV = Self:GetVehicle()
-			if (not PV:IsValid()) then
-				return
-			end
-			PV:Resolve():DumpModelFlags()
-		end)
-	end
-	ImGui.SameLine()
-	if (ImGui.Button("Model Info Flags")) then
-		script.run_in_fiber(function()
-			local PV = Self:GetVehicle()
-			if (not PV:IsValid()) then
-				return
-			end
-			PV:Resolve():DumpModelInfoFlags()
-		end)
-	end
-
-	ImGui.SameLine()
-	if (ImGui.Button("Advanced Flags")) then
-		script.run_in_fiber(function()
-			local PV = Self:GetVehicle()
-			if (not PV:IsValid()) then
-				return
-			end
-			PV:Resolve():DumpAdvancedFlags()
-		end)
-	end
-
-	if (ImGui.Button("≡")) then
+	if (ImGui.Button("Test Toasts")) then
 		for i = 1, 5 do
 			local label = _F("Test %d", i)
 			local level = math.random(0, 3)

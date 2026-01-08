@@ -114,7 +114,7 @@ return function()
 
 	ImGui.SameLine()
 
-	local save_label = Stancer.m_is_model_saved and "VEH_STANCE_UPDATE_MODEL" or "VEH_STANCE_SAVE_MODEL"
+	local save_label = Stancer:IsVehicleModelSaved() and "VEH_STANCE_UPDATE_MODEL" or "VEH_STANCE_SAVE_MODEL"
 	if (GUI:Button(_T(save_label))) then
 		Stancer:SaveCurrentVehicle()
 	end
@@ -171,11 +171,14 @@ return function()
 			end
 
 			if (GUI:ConfirmPopup("##confirm_remove_all")) then
-				GVars.features.vehicle.stancer.saved_models = {}
+				Serializer:WithLock(function()
+					GVars.features.vehicle.stancer.saved_models = {}
+				end)
 			end
 		end, function()
 			saved_vehs_window.should_draw = false
 		end)
+
 		ImGui.End()
 	end
 

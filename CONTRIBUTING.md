@@ -1,4 +1,8 @@
-# Commit Convention
+# Contributing
+
+Thank you for considering contributing to this project! It's people like you that make the open source community a great place to learn, inspire, and create.
+
+## Commit Convention
 
 These are recommended, but not enforced yet. We follow slightly similar commit guidelines to [YimMenu](https://github.com/Mr-X-GTA/YimMenu/blob/master/CONTRIBUTING.md):
 
@@ -82,7 +86,7 @@ Use Lua's default global table `_G`:
 You are free to use any style you want, except in these cases:
 
 | Scope | Naming | Example |
-| ----------- | ----------- | ---------- |
+| :---: | :---: | :---: |
 | Global Functions | PascalCase | `function DoSomething(...) end` |
 | Local Functions | any (consistent) | You are free to use any style as long as it stays consistent throughout the whole file |
 | Standard Lib Extensions | Use the lib's default style | `string.somefunc = function(...) end` |
@@ -220,6 +224,59 @@ Suppose you want to draw some text that gets automatically translated:
     }
     ```
 
+## Project Structure
+
+The project is organized by responsibility rather than feature size. Folders define architectural boundaries and expected usage patterns.
+
+```bash
+├─ includes/
+│  ├─ classes/          # Contains reverse-engineered game classes (mostly sourced from Yimura's archived classes repository) and a few Lua-defined classes.
+│  │
+│  ├─ data/             # A place where all raw data is stored.
+│  │  ├─ actions/       # Contains YimActions V3 data (animations, scenarios, synchronized scenes, and movement clipsets).
+│  │  └─ enums/         # Groups all game and custom enums in one place under one `Enums` global namespace.
+│  │
+│  ├─ features/         # Stores all script features.
+│  │  ├─ self/          # Player-specific features.
+│  │  ├─ vehicle/       # Vehicle-specific features.
+│  │  └─ world/         # World-specific features.
+│  │
+│  ├─ frontend/         # This is where UI tabs live.
+│  │
+│  ├─ lib/              # Contains project libraries and commands: API extensions, translations, Lua standard library extensions, global utilities, etc.
+│  │
+│  ├─ modules/          # Contains custom modules such as native wrappers, game entity abstractions, and higher-level gameplay utilities.
+│  │
+│  ├─ services/         # Contains runtime services (GUI, KeyManager, Serializer, CommandExecutor, etc.)
+│  │
+│  ├─ structs/          # Stores helper structs.
+│  │
+│  ├─ thirdparty/       # Thirdparty components and their license texts.
+│  │
+│  ├─ backend.lua       # Central backend module providing lifecycle coordination, entity management, and API/script version checks.
+│  ├─ version.lua       # This is purely for CI and should never be edited. It stores the latest script version.
+│  └─ init.lua          # Initializes the whole project.
+│
+└─ samurais_scripts.lua # Main entry point that calls `init.lua`, handles late initialization for a few modules/services, and lazily populates a few data sets in a fiber.
+```
+
+## Where Does My Code Go?
+
+| Addition | Home | Notes |
+| :---: | :---: | :---: |
+| A gameplay feature | `includes/features/` | Features are behavior, not UI. |
+| A UI tab or layout code | `includes/frontend/` | UI only. No game logic. |
+| A reusable system with lifecycle | `includes/services/` | Must be explicitly initialized. |
+| A reverse-engineered game structure or a custom Lua class | `includes/classes/` | - |
+| A lightweight data container or object | `includes/structs/` | No lifecycle, no side effects. |
+| Raw static data (tables, lists, maps) | `includes/data/` | Never execute logic here. |
+| A native wrapper or abstraction | `includes/modules/` | Bridges Lua `<->` game engine. |
+| Utility or extension code | `includes/lib/` | Generic helpers and API/stdlib extensions. |
+| Initialization or bootstrapping | `init.lua` / `backend.lua` | Do not add features here. |
+| A third party module from somewhere/someone else | `includes/thirdparty` | Place in a subfolder accompanied with the module's license *(when applicable)*. |
+
 ## What To Avoid
 
 - Manually editing any language file except `en-US.lua`. They are auto-generated so any changes you add will be overwritten by GitHub Actions.
+- Contributing licensed open source code from other developers without permission, credits, or original license *(when applicable)*.
+- Adding high-risk online options without clear and concise user warnings.

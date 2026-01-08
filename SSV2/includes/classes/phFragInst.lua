@@ -1,6 +1,3 @@
---------------------------------------
--- phFragInst Struct
---------------------------------------
 ---@class phFragInst
 ---@field private m_ptr pointer
 ---@field public m_cache_entry pointer

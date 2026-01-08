@@ -40,7 +40,7 @@ local settings_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_SETTINGS, "GENERIC_GENE
 		)) then
 		for i, lang in ipairs(Translator.locales) do
 			local is_selected = (i == GVars.backend.language_index)
-			if ImGui.Selectable(_F("%s (%s)", lang.name, lang.iso), is_selected) then
+			if (ImGui.Selectable(_F("%s (%s)", lang.name, lang.iso), is_selected)) then
 				GVars.backend.language_index = i
 				GVars.backend.language_name  = lang.name
 				GVars.backend.language_code  = lang.iso
