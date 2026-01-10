@@ -346,7 +346,7 @@ function Backend:RegisterEventCallback(event, callback)
 	local evnt = self.EventCallbacks[event]
 
 	if ((type(callback) ~= "function") or not evnt) then
-		log.fdebug("Failed to register event: %s", EnumTostring(Enums.eBackendEvent, event))
+		log.fdebug("Failed to register event: %s", EnumToString(Enums.eBackendEvent, event))
 		return
 	end
 
@@ -393,7 +393,7 @@ function Backend:TriggerEventCallbacks(event)
 		if (type(fn) == "function") then
 			local ok, err = pcall(fn)
 			if (not ok) then
-				log.fwarning("[Backend]: Callback error for event %s: %s", EnumTostring(Enums.eBackendEvent, event), err)
+				log.fwarning("[Backend]: Callback error for event %s: %s", EnumToString(Enums.eBackendEvent, event), err)
 			end
 		end
 	end

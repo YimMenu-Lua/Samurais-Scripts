@@ -70,7 +70,7 @@ local function DrawEntities()
 	if ImGui.BeginChild("##entitytypes", 200, 200, true) then
 		for etype, entities in ipairs(Backend.SpawnedEntities) do
 			local count = table.getlen(entities)
-			local label = _F("%ss (%d/%d)", EnumTostring(Enums.eEntityType, etype), count,
+			local label = _F("%ss (%d/%d)", EnumToString(Enums.eEntityType, etype), count,
 				Backend.MaxAllowedEntities[etype])
 
 			if ImGui.Selectable(label, selected_entity_type == etype) then
@@ -98,7 +98,7 @@ local function DrawEntities()
 				ImGui.TableSetColumnIndex(1)
 				ImGui.Text(tostring(Game.GetEntityModel(handle)))
 				ImGui.TableSetColumnIndex(2)
-				ImGui.Text(EnumTostring(Enums.eEntityType, selected_entity_type))
+				ImGui.Text(EnumToString(Enums.eEntityType, selected_entity_type))
 				ImGui.TableSetColumnIndex(3)
 
 				if (selected_entity_type == Enums.eEntityType.Ped) then
@@ -180,7 +180,7 @@ local function DrawThreads()
 		end
 		ImGui.EndChild()
 
-		ImGui.BulletText(_F("Internal State: %s", EnumTostring(eInternalThreadState, selected_thread:GetInternalState())))
+		ImGui.BulletText(_F("Internal State: %s", EnumToString(eInternalThreadState, selected_thread:GetInternalState())))
 		ImGui.BulletText(_F("Average Load: %.1fms", selected_thread:GetLoadAvg()))
 	end
 end
@@ -389,12 +389,12 @@ local function DrawSerializerDebug()
 
 	ImGui.BulletText("Thread State:")
 	ImGui.SameLine()
-	GUI:Text(EnumTostring(eThreadState, eState), state_colors[eState])
+	GUI:Text(EnumToString(eThreadState, eState), state_colors[eState])
 	ImGui.BulletText(_F("Is Disabled: %s", not Serializer:CanAccess()))
 	ImGui.BulletText(_F("Time Since Last Flush: %.0f seconds ago.", Serializer:GetTimeSinceLastFlush() / 1e3))
 
 	if GUI:Button("Dump Serializer") then
-		Serializer:DebugDump()
+		Serializer:Dump()
 	end
 end
 
@@ -527,6 +527,36 @@ local function DrawMiscTests()
 			local level = math.random(0, 3)
 			Notifier:Add(label, string.random(), level)
 		end
+	end
+
+	if (ImGui.Button("Fucking CWheel")) then
+		ThreadManager:Run(function()
+			local PV = Self:GetVehicle()
+			if (not PV:IsValid()) then
+				return
+			end
+
+			local wheel_array = PV:Resolve().m_wheels
+			if (wheel_array:IsNull()) then
+				return
+			end
+
+			local wheel_lf = CWheel(wheel_array:Get(1))
+			local wheel_lr = CWheel(wheel_array:Get(3))
+			if (not wheel_lf or not wheel_lr or not wheel_lf:IsValid()) then
+				return
+			end
+
+			local susp_comp_f = wheel_lf.m_suspension_forward_offset
+			local susp_comp_r = wheel_lr.m_suspension_forward_offset
+			local unk_minus4 = susp_comp_f:sub(0x4)
+			local unk_plus4 = susp_comp_f:add(0x4)
+			local m_tyre_radius = wheel_lf.m_tyre_radius
+			printf("susp_comp_f : %s\nsusp_comp_r : %s",
+				susp_comp_f:get_float(),
+				susp_comp_r:get_float()
+			)
+		end)
 	end
 end
 

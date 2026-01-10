@@ -82,7 +82,7 @@ function Vehicle:GetClassName()
 		return "Unknown"
 	end
 
-	return EnumTostring(Enums.eVehicleClasses, clsid)
+	return EnumToString(Enums.eVehicleClasses, clsid)
 end
 
 function Vehicle:GetEngineHealth()
