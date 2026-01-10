@@ -266,7 +266,7 @@ end
 
 ---@param e Enum
 ---@param index integer
-function EnumTostring(e, index)
+function EnumToString(e, index)
 	if (type(e) ~= "table") then
 		return ""
 	end

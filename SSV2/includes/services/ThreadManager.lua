@@ -312,7 +312,7 @@ function ThreadManager:Run(func)
 
 	local handler = self.m_callback_handlers[API_VER]
 	if not (handler or handler.dispatch) then
-		Backend:debug("[ThreadManager] No handler for API version: %s", EnumTostring(Enums.eAPIVersion, API_VER))
+		Backend:debug("[ThreadManager] No handler for API version: %s", EnumToString(Enums.eAPIVersion, API_VER))
 		return
 	end
 

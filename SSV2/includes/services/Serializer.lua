@@ -5,7 +5,6 @@ local eSerializerState <const> = {
 	IDLE      = 0,
 	FLUSHING  = 1,
 	SUSPENDED = 2,
-	DISABLED  = 3,
 }
 
 -- Optional parameters
@@ -30,6 +29,7 @@ local eSerializerState <const> = {
 ---@field protected __schema_hash joaat_t
 ---@field protected m_lock_queue array<function>
 ---@field private m_locked boolean
+---@field private m_disabled boolean
 ---@field private m_file_name string
 ---@field private m_default_config table
 ---@field private m_key_states table
@@ -82,6 +82,7 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 	self.m_state           = eSerializerState.IDLE
 	self.m_dirty           = false
 	self.m_locked          = false
+	self.m_disabled        = false
 	self.m_lock_queue      = {}
 	self.m_key_states      = {}
 	self.m_parsing_options = {
@@ -97,7 +98,7 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 	local config_data = self:Read()
 	if (type(config_data) ~= "table") then
 		log.warning("[Serializer]: Failed to read data. Persistent config will be disabled for this session.")
-		self.m_state = eSerializerState.DISABLED
+		self.m_disabled = true
 		return self
 	end
 
@@ -213,9 +214,39 @@ function Serializer:SyncKeys(runtime_vars)
 	end
 end
 
+-- Registers a new object type for automatic serialization/deserialization
+--
+-- **Example:**
+--
+-- - Suppose `MyClass` is a simple class that stores two numbers:
+--[[
+```Lua
+---@class MyClass
+---@field a number
+---@field b number
+local MyClass = Class("MyClass")
+
+---@return MyClass
+function MyClass.new(a, b)
+	return setmetatable({ a = a, b = b }, MyClass)
+end
+
+---@return table
+function MyClass:ToJson()
+	return { __type = self.__type, a = self.a, b = self.b }
+end
+
+---@return MyClass
+function MyClass.FromJson(jsonTable)
+	return MyClass.new(jsonTable.a, jsonTable.b)
+end
+
+Serializer:RegisterNewType("MyClass", MyClass.ToJson, MyClass.FromJson)
+```
+]]
 ---@param typename string
----@param serializer function
----@param deserializer function
+---@param serializer function Object to JSON
+---@param deserializer function JSON to object
 function Serializer:RegisterNewType(typename, serializer, deserializer)
 	assert(type(typename) == "string", "Attempt to register an invalid type. Type name should be string.")
 	typename = typename:lower():trim()
@@ -232,7 +263,7 @@ end
 
 ---@return boolean
 function Serializer:IsDisabled()
-	return self.m_state == eSerializerState.DISABLED
+	return self.m_disabled
 end
 
 ---@param data string
@@ -248,7 +279,7 @@ end
 
 ---@return string
 function Serializer:GetStateStr()
-	return EnumTostring(eSerializerState, self.m_state)
+	return EnumToString(eSerializerState, self.m_state)
 end
 
 ---@return milliseconds
@@ -282,17 +313,15 @@ function Serializer:WithLock(fun)
 	ThreadManager:Run(function()
 		while (#self.m_lock_queue > 0) do
 			local f = table.remove(self.m_lock_queue, 1)
-			if (type(f) ~= "function") then
-				return
-			end
+			if (type(f) == "function") then
+				while (not self:CanAccess()) do
+					yield()
+				end
 
-			while (self.m_state == eSerializerState.FLUSHING) do
-				yield()
+				self.m_state = eSerializerState.SUSPENDED
+				f()
+				self.m_state = eSerializerState.IDLE
 			end
-
-			self.m_state = eSerializerState.SUSPENDED
-			f()
-			self.m_state = eSerializerState.IDLE
 		end
 
 		self.m_locked = false
@@ -408,11 +437,10 @@ function Serializer:Parse(data)
 		return
 	end
 
-
 	local file, _ = io.open(self.m_file_name, "w")
 	if (not file) then
 		log.warning("[Serializer]: Failed to write config file!")
-		self.m_state = eSerializerState.DISABLED
+		self.m_disabled = true
 		return
 	end
 
@@ -432,7 +460,7 @@ function Serializer:Read()
 	local file, _ = io.open(self.m_file_name, "r")
 	if not file then
 		log.warning("[Serializer]: Failed to read config file!")
-		self.m_state = eSerializerState.DISABLED
+		self.m_disabled = true
 		return table.copy(self.m_default_config)
 	end
 
@@ -546,6 +574,8 @@ function Serializer:Reset(exceptions)
 	end)
 end
 
+---@param input string
+---@return string Base64
 function Serializer:B64Encode(input)
 	local output = {}
 	local n = #input
@@ -566,27 +596,29 @@ function Serializer:B64Encode(input)
 	return table.concat(output)
 end
 
-function Serializer:B64Decode(input)
+---@param base64 string
+---@return string
+function Serializer:B64Decode(base64)
 	local b64lookup = {}
 
 	for i = 1, #self.b64_chars do
 		b64lookup[self.b64_chars:sub(i, i)] = i - 1
 	end
 
-	input = input:gsub("%s", ""):gsub("=", "")
+	base64 = base64:gsub("%s", ""):gsub("=", "")
 	local output = {}
 
-	for i = 1, #input, 4 do
-		local a = b64lookup[input:sub(i, i)] or 0
-		local b = b64lookup[input:sub(i + 1, i + 1)] or 0
-		local c = b64lookup[input:sub(i + 2, i + 2)] or 0
-		local d = b64lookup[input:sub(i + 3, i + 3)] or 0
+	for i = 1, #base64, 4 do
+		local a = b64lookup[base64:sub(i, i)] or 0
+		local b = b64lookup[base64:sub(i + 1, i + 1)] or 0
+		local c = b64lookup[base64:sub(i + 2, i + 2)] or 0
+		local d = b64lookup[base64:sub(i + 3, i + 3)] or 0
 		local triple = (a << 18) | (b << 12) | (c << 6) | d
 		output[#output + 1] = string.char((triple >> 16) & 255)
-		if i + 2 <= #input then
+		if i + 2 <= #base64 then
 			output[#output + 1] = string.char((triple >> 8) & 255)
 		end
-		if i + 3 <= #input then
+		if i + 3 <= #base64 then
 			output[#output + 1] = string.char(triple & 255)
 		end
 	end
@@ -594,6 +626,8 @@ function Serializer:B64Decode(input)
 	return table.concat(output)
 end
 
+---@param input string
+---@return string
 function Serializer:XOR(input)
 	local output = {}
 	local key_len = #self.m_xor_key
@@ -607,24 +641,24 @@ end
 
 function Serializer:Encrypt()
 	local file, _ = io.open(self.m_file_name, "r")
-	if not file then
+	if (not file) then
 		log.warning("[Serializer]: Failed to encrypt data! Unable to read config file.")
 		return
 	end
 
 	local data = file:read("a")
 	file:close()
-	if not data or #data == 0 then
+
+	if (not data or #data == 0) then
 		log.warning("[Serializer]: Failed to encrypt config! Data is unreadable.")
 		return
 	end
 
 	local xor = self:XOR(data)
 	local b64 = self:B64Encode(xor)
-
 	file, _ = io.open(self.m_file_name, "w")
 
-	if file then
+	if (file) then
 		file:write(b64)
 		file:flush()
 		file:close()
@@ -687,7 +721,9 @@ function Serializer:WriteToFile(data, filename)
 	f:close()
 end
 
--- A separate read function that doesn't rely on any setup or state flags.
+-- A separate read function.
+--
+-- This can not be used with the main config file.
 ---@param filename string
 function Serializer:ReadFromFile(filename)
 	if (type(filename) ~= "string" or not filename:endswith(".json")) then
@@ -700,17 +736,13 @@ function Serializer:ReadFromFile(filename)
 		return
 	end
 
-	local f, err = io.open(filename, "r")
-	if not f then
+	local f <close>, err = io.open(filename, "r")
+	if (not f) then
 		log.fwarning("[Serializer]: Failed to open file: %s", err)
 		return
 	end
 
-	local data = f:read("a")
-	f:flush()
-	f:close()
-
-	return self:Decode(data)
+	return self:Decode(f:read("a"))
 end
 
 ---@param object table
@@ -798,10 +830,11 @@ function Serializer:OnShutdown()
 	self:Flush()
 end
 
-function Serializer:DebugDump()
+function Serializer:Dump()
 	local out = {
 		script_name    = Backend and Backend.script_name or "Samurai's Scripts",
 		file_name      = self.m_file_name,
+		disabled       = self.m_disabled,
 		state          = self:GetStateStr(),
 		key_states     = self.m_key_states,
 		default_config = self.m_default_config,

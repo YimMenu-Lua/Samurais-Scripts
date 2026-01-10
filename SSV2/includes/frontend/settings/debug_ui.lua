@@ -70,7 +70,7 @@ local function DrawEntities()
 	if ImGui.BeginChild("##entitytypes", 200, 200, true) then
 		for etype, entities in ipairs(Backend.SpawnedEntities) do
 			local count = table.getlen(entities)
-			local label = _F("%ss (%d/%d)", EnumTostring(Enums.eEntityType, etype), count,
+			local label = _F("%ss (%d/%d)", EnumToString(Enums.eEntityType, etype), count,
 				Backend.MaxAllowedEntities[etype])
 
 			if ImGui.Selectable(label, selected_entity_type == etype) then
@@ -98,7 +98,7 @@ local function DrawEntities()
 				ImGui.TableSetColumnIndex(1)
 				ImGui.Text(tostring(Game.GetEntityModel(handle)))
 				ImGui.TableSetColumnIndex(2)
-				ImGui.Text(EnumTostring(Enums.eEntityType, selected_entity_type))
+				ImGui.Text(EnumToString(Enums.eEntityType, selected_entity_type))
 				ImGui.TableSetColumnIndex(3)
 
 				if (selected_entity_type == Enums.eEntityType.Ped) then
@@ -180,7 +180,7 @@ local function DrawThreads()
 		end
 		ImGui.EndChild()
 
-		ImGui.BulletText(_F("Internal State: %s", EnumTostring(eInternalThreadState, selected_thread:GetInternalState())))
+		ImGui.BulletText(_F("Internal State: %s", EnumToString(eInternalThreadState, selected_thread:GetInternalState())))
 		ImGui.BulletText(_F("Average Load: %.1fms", selected_thread:GetLoadAvg()))
 	end
 end
@@ -389,12 +389,12 @@ local function DrawSerializerDebug()
 
 	ImGui.BulletText("Thread State:")
 	ImGui.SameLine()
-	GUI:Text(EnumTostring(eThreadState, eState), state_colors[eState])
+	GUI:Text(EnumToString(eThreadState, eState), state_colors[eState])
 	ImGui.BulletText(_F("Is Disabled: %s", not Serializer:CanAccess()))
 	ImGui.BulletText(_F("Time Since Last Flush: %.0f seconds ago.", Serializer:GetTimeSinceLastFlush() / 1e3))
 
 	if GUI:Button("Dump Serializer") then
-		Serializer:DebugDump()
+		Serializer:Dump()
 	end
 end
 

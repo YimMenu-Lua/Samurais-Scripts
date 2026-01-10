@@ -682,7 +682,7 @@ end
 ---@param entity handle
 ---@return string
 function Game.GetEntityTypeString(entity)
-	return EnumTostring(Enums.eEntityType, Game.GetEntityType(entity)) or "Unknown"
+	return EnumToString(Enums.eEntityType, Game.GetEntityType(entity)) or "Unknown"
 end
 
 ---@param model joaat_t

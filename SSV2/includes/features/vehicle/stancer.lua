@@ -81,10 +81,10 @@ Stancer.decorators    = {
 		wheel_side = Stancer.eWheelSide.FRONT,
 		side_dont_care = true,
 		read_func = function(w)
-			return w.m_suspension_compression:get_float()
+			return w.m_suspension_forward_offset:get_float()
 		end,
 		write_func = function(w, v)
-			w.m_suspension_compression:set_float(v)
+			w.m_suspension_forward_offset:set_float(v)
 		end
 	},
 	{
@@ -92,10 +92,10 @@ Stancer.decorators    = {
 		wheel_side = Stancer.eWheelSide.FRONT, -- doesn't matter
 		side_dont_care = true,
 		read_func = function(w)
-			return w.m_tire_width:get_float()
+			return w.m_tyre_width:get_float()
 		end,
 		write_func = function(w, v, veh)
-			w.m_tire_width:set_float(v)
+			w.m_tyre_width:set_float(v)
 			veh:SetVisualWheelWidth(v * 2)
 		end
 	},
@@ -104,10 +104,10 @@ Stancer.decorators    = {
 		wheel_side = Stancer.eWheelSide.FRONT, -- doesn't matter
 		side_dont_care = true,
 		read_func = function(w)
-			return w.m_tire_radius:get_float()
+			return w.m_tyre_radius:get_float()
 		end,
 		write_func = function(w, v, veh)
-			w.m_tire_radius:set_float(v)
+			w.m_tyre_radius:set_float(v)
 			veh:SetVisualWheelSize(v * 2)
 		end
 	},
@@ -137,10 +137,10 @@ Stancer.decorators    = {
 		wheel_side = Stancer.eWheelSide.BACK,
 		side_dont_care = true,
 		read_func = function(w)
-			return w.m_suspension_compression:get_float()
+			return w.m_suspension_forward_offset:get_float()
 		end,
 		write_func = function(w, v)
-			w.m_suspension_compression:set_float(v)
+			w.m_suspension_forward_offset:set_float(v)
 		end
 	},
 }
@@ -197,7 +197,7 @@ function Stancer:Reset()
 		self.m_deltas[v.wheel_side][v.key] = 0.0
 		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
 		self:ForEach(wheel_array, function(i, cwheel)
-			local decor_key = _F("%s_%d", v.key, i)
+			local decor_key = _F("%s_%d_%d", v.key, v.wheel_side, i)
 			local default = Decorator:GetDecor(self.m_entity:GetHandle(), decor_key)
 			if (type(default) == "number") then
 				v.write_func(cwheel, default, self.m_entity)
@@ -224,19 +224,25 @@ function Stancer:Cleanup()
 	self.m_cached_model = nil
 end
 
+function Stancer:ResetDeltas()
+	for _, k in pairs(self.decorators) do
+		self.m_deltas[self.eWheelSide.FRONT][k.key] = 0.0
+		self.m_deltas[self.eWheelSide.BACK][k.key] = 0.0
+	end
+end
+
 -- Main entry
 function Stancer:OnNewVehicle()
+	self:ResetDeltas()
+
 	if (not self.m_entity or not self.m_entity:IsValid()) then
 		return
 	end
 
 	self.m_cached_model    = self.m_entity:GetModelHash()
 	self.m_last_wheels_mod = self.m_entity:GetCustomWheels()
+	self:ReadWheelArray()
 	self:ReadDefaults()
-
-	if (self:IsVehicleModelSaved() and GVars.features.vehicle.stancer.auto_apply_saved) then
-		self:LoadSavedDeltas()
-	end
 end
 
 ---@param wheelIndex integer
@@ -270,10 +276,6 @@ function Stancer:IsVehicleModelSaved()
 end
 
 function Stancer:ReadWheelArray()
-	if (self.m_wheels) then
-		return
-	end
-
 	self.m_wheels = {
 		[self.eWheelSide.FRONT] = {},
 		[self.eWheelSide.BACK]  = {}
@@ -351,14 +353,14 @@ function Stancer:OnWheelsChanged()
 		return
 	end
 
-	if (Time.now() - self.m_last_wheel_mod_check_time < 1) then
+	if (Time.now() - self.m_last_wheel_mod_check_time < 2) then
 		return
 	end
 
 	local current = self.m_entity:GetCustomWheels()
 	if (not table.is_equal(self.m_last_wheels_mod, current)) then
-		self.m_reloading = true
-		local prev_sup = self.m_suspension_height.m_current
+		self.m_reloading    = true
+		local prev_sup      = self.m_suspension_height.m_current
 		local prev_deltas_f = table.copy(self.m_deltas[self.eWheelSide.FRONT])
 		local prev_deltas_r = table.copy(self.m_deltas[self.eWheelSide.BACK])
 		self:Cleanup()
@@ -427,7 +429,7 @@ function Stancer:AreDefaultsRegistered()
 	for _, v in ipairs(self.decorators) do
 		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
 		for i = 1, #wheel_array do
-			local decor = _F("%s_%d", v.key, i)
+			local decor = _F("%s_%d_%d", v.key, v.wheel_side, i)
 			if (not Decorator:ExistsOn(handle, decor)) then
 				return false
 			end
@@ -490,6 +492,11 @@ end
 
 ---@return boolean
 function Stancer:RestoreQueueFromDecors()
+	if (self:IsVehicleModelSaved() and GVars.features.vehicle.stancer.auto_apply_saved) then
+		self:LoadSavedDeltas()
+		return true
+	end
+
 	local handle = self.m_entity:GetHandle()
 	if (not Decorator:IsEntityRegistered(handle)) then
 		return false
@@ -527,26 +534,28 @@ function Stancer:ReadDefaults()
 		return
 	end
 
+	local handle = self.m_entity:GetHandle()
 	for _, v in ipairs(self.decorators) do
 		local read_func = v.read_func
 		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
 		local visual_size = self.m_entity:GetVisualWheelSize()
 		local visual_width = self.m_entity:GetVisualWheelWidth()
-		Decorator:Register(self.m_entity:GetHandle(), "m_visual_size", visual_size)
-		Decorator:Register(self.m_entity:GetHandle(), "m_visual_width", visual_width)
+		Decorator:Register(handle, "m_visual_size", visual_size)
+		Decorator:Register(handle, "m_visual_width", visual_width)
 
 		self:ForEach(wheel_array, function(i, cwheel)
 			local default_val = read_func(cwheel)
-			local wheel_key = _F("%s_%d", v.key, i)
-			Decorator:Register(self.m_entity:GetHandle(), wheel_key, default_val)
+			local wheel_key = _F("%s_%d_%d", v.key, v.wheel_side, i)
+
+			Decorator:Register(handle, wheel_key, default_val)
 
 			-- our values are based on the first wheel per axle
-			if (i == 1) then
+			if (i % 2 == 1) then
 				self.m_base_values[v.wheel_side][v.key] = default_val
 				if (not queued_decors_loaded) then
 					local pending_key = _F("%s_%d_queue", v.key, v.wheel_side)
-					if (not Decorator:ExistsOn(self.m_entity:GetHandle(), pending_key)) then
-						Decorator:Register(self.m_entity:GetHandle(), pending_key, default_val)
+					if (not Decorator:ExistsOn(handle, pending_key)) then
+						Decorator:Register(handle, pending_key, default_val)
 					end
 
 					self.m_deltas[v.wheel_side][v.key] = 0.0

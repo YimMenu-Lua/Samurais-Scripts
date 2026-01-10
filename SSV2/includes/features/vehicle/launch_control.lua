@@ -37,7 +37,7 @@ end
 
 function LaunchControl:Init()
 	self.m_state = eLaunchControlState.NONE
-	self.m_timer = Timer.new(3000)
+	self.m_timer = Timer.new(2000)
 	self.m_timer:pause()
 	self.m_last_pop_time = 0
 	self.m_thread = ThreadManager:RegisterLooped("SS_LAUNCH_CTRL", function()
@@ -192,7 +192,7 @@ function LaunchControl:OnTick()
 	local r, g, b, a = 255, 255, 255, 255
 
 	if (not self.m_timer) then
-		self.m_timer = Timer.new(3000)
+		self.m_timer = Timer.new(2000)
 		self.m_timer:pause()
 	end
 
@@ -226,7 +226,7 @@ function LaunchControl:OnTick()
 				0.01,
 				Color(r, g, b, a),
 				Color(0, 0, 0, 150),
-				math.min(1, math.max(0, self.m_timer:elapsed() / 3000))
+				math.min(1, math.max(0, self.m_timer:elapsed() / 2000))
 			)
 
 			if (self.m_timer:is_done() and self.m_state == eLaunchControlState.LOADING) then
