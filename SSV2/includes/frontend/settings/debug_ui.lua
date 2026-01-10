@@ -528,36 +528,6 @@ local function DrawMiscTests()
 			Notifier:Add(label, string.random(), level)
 		end
 	end
-
-	if (ImGui.Button("Fucking CWheel")) then
-		ThreadManager:Run(function()
-			local PV = Self:GetVehicle()
-			if (not PV:IsValid()) then
-				return
-			end
-
-			local wheel_array = PV:Resolve().m_wheels
-			if (wheel_array:IsNull()) then
-				return
-			end
-
-			local wheel_lf = CWheel(wheel_array:Get(1))
-			local wheel_lr = CWheel(wheel_array:Get(3))
-			if (not wheel_lf or not wheel_lr or not wheel_lf:IsValid()) then
-				return
-			end
-
-			local susp_comp_f = wheel_lf.m_suspension_forward_offset
-			local susp_comp_r = wheel_lr.m_suspension_forward_offset
-			local unk_minus4 = susp_comp_f:sub(0x4)
-			local unk_plus4 = susp_comp_f:add(0x4)
-			local m_tyre_radius = wheel_lf.m_tyre_radius
-			printf("susp_comp_f : %s\nsusp_comp_r : %s",
-				susp_comp_f:get_float(),
-				susp_comp_r:get_float()
-			)
-		end)
-	end
 end
 
 return function()

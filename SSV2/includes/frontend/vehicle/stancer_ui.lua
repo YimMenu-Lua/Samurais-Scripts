@@ -10,8 +10,8 @@ local ref <const>          = {
 	m_camber      = { label = "VEH_STANCE_CAMBER", fmt = "%.2f°", min = -1.0, max = 1.0 },
 	m_track_width = { label = "VEH_STANCE_TRACK_WIDTH", fmt = "%.2f", min = -0.5, max = 0.5 },
 	m_susp_comp   = { label = "VEH_STANCE_SUSP_COMP", fmt = "%.2f", min = -0.6, max = 0.6 },
-	m_wheel_width = { label = "VEH_STANCE_WHEEL_WIDTH", fmt = "%.2f", min = -0.5, max = 0.5, drawdata_only = true, tooltip = "VEH_STANCE_NON_STOCK" },
-	m_wheel_size  = { label = "VEH_STANCE_WHEEL_SIZE", fmt = "%.2f", min = -0.5, max = 0.5, drawdata_only = true, tooltip = "VEH_STANCE_NON_STOCK" },
+	m_wheel_width = { label = "VEH_STANCE_WHEEL_WIDTH", fmt = "%.2f", min = 0.0, max = 1.5, drawdata_only = true, tooltip = "VEH_STANCE_NON_STOCK" },
+	m_wheel_size  = { label = "VEH_STANCE_WHEEL_SIZE", fmt = "%.2f", min = 0.0, max = 1.5, drawdata_only = true, tooltip = "VEH_STANCE_NON_STOCK" },
 }
 
 ---@param key string
