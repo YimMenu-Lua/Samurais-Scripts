@@ -414,7 +414,7 @@ return {
 	["SUBTAB_GUI"] = "Interfejs użytkownika",
 	["SUBTAB_HANDLING_EDITOR"] = "Edytor obsługi",
 	["SELF_LASER_SIGHTS"] = "Celowniki laserowe",
-	["SELF_LASER_SIGHTS_TT"] = "Włącza celowniki laserowe w broni palnej. Możesz włączać i wyłączać celowniki, naciskając [%s]",
+	["SELF_LASER_SIGHTS_TT"] = "Włącza celowniki laserowe w broni palnej.",
 	["VEH_FORCE_NO_TC_TT"] = "Tylko rowery: powoduje, że pojazd nie ma kontroli trakcji, co pozwala na pokonywanie driftów i poślizgów z rowerami.",
 	["VEH_RALLY_TYRES_TT"] = "Wyposaża Twój pojazd w opony rajdowe, które dodatkowo poprawiają prowadzenie w terenie.",
 	["VEH_NO_ENGINE_BRAKE_TT"] = "Umożliwia jazdę bez naciskania pedału przyspieszenia bez utraty dużej prędkości.",

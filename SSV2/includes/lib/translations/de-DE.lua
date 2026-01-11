@@ -425,7 +425,7 @@ return {
 	["VEH_RALLY_TYRES"] = "Rallye-Reifen",
 	["VEH_OFFROAD_ABILITIES_TT"] = "Erhöht die Offroad-Fähigkeiten Ihres Fahrzeugs.",
 	["VEH_RALLY_TYRES_TT"] = "Rüstet Ihr Fahrzeug mit Rallye-Reifen aus, die das Handling im Gelände weiter verbessern.",
-	["SELF_LASER_SIGHTS_TT"] = "Ermöglicht Laservisiere für Ihre Schusswaffen. Sie können die Visiere ein- und ausschalten, indem Sie [%s] drücken.",
+	["SELF_LASER_SIGHTS_TT"] = "Ermöglicht Laservisiere für Ihre Schusswaffen.",
 	["VEH_FORCE_NO_TC_TT"] = "Nur Fahrräder: Zwingt Ihr Fahrzeug dazu, keine Traktionskontrolle zu haben, sodass Sie mit Fahrrädern driften und ins Schleudern geraten können.",
 	["VEH_LOW_SPEED_WHEELIE_TT"] = "Nur Fahrräder: Ermöglicht Ihnen, Wheelies bei sehr niedrigen Geschwindigkeiten zu machen, ähnlich wie beim „Manchez“.",
 	["VEH_LOW_SPEED_WHEELIE"] = "Low-Speed-Wheelie",

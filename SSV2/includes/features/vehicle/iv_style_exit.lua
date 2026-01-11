@@ -6,6 +6,9 @@ local FeatureBase = require("includes.modules.FeatureBase")
 ---@field private m_entity PlayerVehicle
 ---@field private m_triggered boolean
 ---@field private m_timer Time.Timer
+---@field private m_steering_timer Time.Timer
+---@field private m_pending_steering boolean
+---@field private m_last_steer_angle float
 local IVStyleExit = setmetatable({}, FeatureBase)
 IVStyleExit.__index = IVStyleExit
 
@@ -17,9 +20,13 @@ function IVStyleExit.new(pv)
 end
 
 function IVStyleExit:Init()
-	self.m_triggered = false
-	self.m_timer = Timer.new(1000)
+	self.m_triggered        = false
+	self.m_pending_steering = false
+	self.m_last_steer_angle = 0.0
+	self.m_steering_timer   = Timer.new(200)
+	self.m_timer            = Timer.new(1000)
 	self.m_timer:pause()
+	self.m_steering_timer:pause()
 end
 
 function IVStyleExit:ShouldRun()
@@ -39,39 +46,51 @@ function IVStyleExit:Cleanup()
 	self.m_timer:pause()
 end
 
+function IVStyleExit:ShouldReapplySteering()
+	local fVal = math.abs(self.m_last_steer_angle)
+	return fVal ~= 0 and fVal < 1 and fVal > 0.001
+end
+
 ---@param keepEngineOn boolean
 function IVStyleExit:LeaveVehicle(keepEngineOn)
 	local vehHandle = self.m_entity:GetHandle()
-	local leftPressed = PAD.IS_CONTROL_PRESSED(0, 34)
-	local rightPressed = PAD.IS_CONTROL_PRESSED(0, 35)
-	local enabled = GVars.features.vehicle.no_wheel_recenter and self.m_entity:IsCar() and (leftPressed or rightPressed)
+	local enabled   = GVars.features.vehicle.no_wheel_recenter and self.m_entity:IsCar()
 	Self:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, keepEngineOn)
 
-	if (enabled and not keepEngineOn) then
-		VEHICLE.SET_VEHICLE_ENGINE_ON(self.m_entity:GetHandle(), false, true, false)
+	if (enabled) then
+		self.m_last_steer_angle = self.m_entity:Resolve().m_current_steering:get_float()
+		if (not keepEngineOn) then
+			VEHICLE.SET_VEHICLE_ENGINE_ON(self.m_entity:GetHandle(), false, true, false)
+		end
 	end
-	TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), vehHandle, enabled and 16 or 0) -- 16=tp outside. goofy because I don't feel like patching memory 🤷‍♂️
+
+	TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), vehHandle, 0)
+
+	if (self:ShouldReapplySteering()) then
+		self.m_pending_steering = true
+		self.m_steering_timer:reset()
+		self.m_steering_timer:resume()
+	end
+
 	self:Cleanup()
 end
 
 function IVStyleExit:Update()
 	PAD.DISABLE_CONTROL_ACTION(0, 75, true)
 
-	local exitPressed = PAD.IS_DISABLED_CONTROL_PRESSED(0, 75)
-	if (exitPressed) then
+	if (PAD.IS_DISABLED_CONTROL_PRESSED(0, 75)) then
 		if (self.m_entity:GetSpeed() > 15) then
 			TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), self.m_entity:GetHandle(), 4160)
 			self:Cleanup()
 			return
 		end
 
-		if (not GVars.features.vehicle.iv_exit) then
+		if (not GVars.features.vehicle.iv_exit and not self.m_triggered) then
 			self:LeaveVehicle(false)
-			return
 		end
 
-		self.m_timer:resume()
 		self.m_triggered = true
+		self.m_timer:resume()
 	end
 
 	if (self.m_triggered) then
@@ -80,8 +99,19 @@ function IVStyleExit:Update()
 		elseif (PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) and self.m_timer:is_done()) then
 			self:LeaveVehicle(false)
 		end
+	end
 
-		return
+	if (self.m_pending_steering) then
+		local veh = self.m_entity
+		if (veh and veh:IsValid()) then
+			local pSteering = veh:Resolve().m_current_steering
+			pSteering:set_float(self.m_last_steer_angle)
+		end
+
+		if (self.m_steering_timer:is_done()) then
+			self.m_pending_steering = false
+			self.m_last_steer_angle = 0.0
+		end
 	end
 
 	if (self.m_triggered and not Self:IsDriving()) then

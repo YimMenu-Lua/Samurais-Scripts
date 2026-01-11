@@ -110,9 +110,9 @@ Enums.eWheelConfigFlags = {
 ---@field m_unk_u8 pointer<uint8_t> // 0x20A
 ---@field m_tyre_is_burst pointer<bool> // 0x20B
 ---@field m_unk_byte pointer<byte> // 0x20C
----@field m_has_hydraulics pointer<bool> // 0x20D // true for cars with DUNK mod
+---@field m_has_hydraulics pointer<bool> // 0x20D // true for cars with DONK mod
 ---@overload fun(addr: pointer): CWheel|nil
-local CWheel = { m_size = 0x1FC }
+local CWheel = { m_size = 0x20E }
 CWheel.__index = CWheel
 CWheel.__type = "CWheel"
 setmetatable(CWheel, {

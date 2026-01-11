@@ -427,7 +427,7 @@ return {
 	["SELF_LASER_SIGHTS_LENGTH"] = "Lunghezza del raggio laser",
 	["VEH_LOW_SPEED_WHEELIE"] = "Impennata a bassa velocità",
 	["VEH_RALLY_TYRES"] = "Pneumatici Rally",
-	["SELF_LASER_SIGHTS_TT"] = "Abilita i mirini laser sulle tue armi da fuoco. Puoi attivare e disattivare la vista premendo [%s]",
+	["SELF_LASER_SIGHTS_TT"] = "Abilita i mirini laser sulle tue armi da fuoco.",
 	["VEH_OFFROAD_ABILITIES_TT"] = "Aumenta le capacità fuoristrada del tuo veicolo.",
 	["VEH_ROCKET_BOOST"] = "Spinta del razzo",
 	["VEH_ROCKET_BOOST_TT"] = "Dota il tuo veicolo di un razzo potenziato, simile al \"Vigilante\".",

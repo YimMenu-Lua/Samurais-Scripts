@@ -414,7 +414,7 @@ return {
 	["SUBTAB_GUI"] = "사용자 인터페이스",
 	["SELF_LASER_SIGHTS"] = "레이저 조준경",
 	["SUBTAB_HANDLING_EDITOR"] = "핸들링 에디터",
-	["SELF_LASER_SIGHTS_TT"] = "총기의 레이저 조준경을 활성화합니다. [%s]를 눌러 조준경을 켜거나 끌 수 있습니다.",
+	["SELF_LASER_SIGHTS_TT"] = "총기의 레이저 조준경을 활성화합니다.",
 	["VEH_KERS_BOOST_TT"] = "F1 차량과 마찬가지로 차량에 KERS(운동 에너지 회수 시스템) 부스트를 장착합니다.",
 	["VEH_NO_ENGINE_BRAKE"] = "엔진 제동 비활성화",
 	["SELF_LASER_SIGHTS_COL"] = "레이저 컬러",

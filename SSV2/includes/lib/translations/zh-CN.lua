@@ -414,7 +414,7 @@ return {
 	["GENERIC_GENERAL_LABEL"] = "一般的",
 	["SUBTAB_GUI"] = "用户界面",
 	["SELF_LASER_SIGHTS"] = "激光瞄准器",
-	["SELF_LASER_SIGHTS_TT"] = "为您的枪支启用激光瞄准器。您可以通过按[%s]来打开和关闭瞄准器",
+	["SELF_LASER_SIGHTS_TT"] = "为您的枪支启用激光瞄准器。",
 	["VEH_KERS_BOOST"] = "KERS 提升",
 	["VEH_OFFROAD_ABILITIES"] = "越野能力",
 	["VEH_NO_ENGINE_BRAKE_TT"] = "让您在不踩油门时滑行而不会损失太多速度。",

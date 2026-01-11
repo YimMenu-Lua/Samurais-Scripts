@@ -412,7 +412,7 @@ return {
 	["SUBTAB_GUI"] = "Interface do usuário",
 	["GENERIC_CLEAR"] = "Claro",
 	["SELF_LASER_SIGHTS"] = "Miras Laser",
-	["SELF_LASER_SIGHTS_TT"] = "Permite mira a laser em suas armas de fogo. Você pode ativar e desativar a mira pressionando [%s]",
+	["SELF_LASER_SIGHTS_TT"] = "Permite mira a laser em suas armas de fogo.",
 	["VEH_KERS_BOOST"] = "Impulso KERS",
 	["VEH_KERS_BOOST_TT"] = "Equipa seu veículo com impulso KERS (Sistema de Recuperação de Energia Cinética), semelhante aos carros de F1.",
 	["GENERIC_GENERAL_LABEL"] = "Em geral",

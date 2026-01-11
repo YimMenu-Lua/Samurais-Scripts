@@ -422,7 +422,7 @@ return {
 	["VEH_OFFROAD_ABILITIES"] = "Capacités tout-terrain",
 	["VEH_OFFROAD_ABILITIES_TT"] = "Augmente les capacités tout-terrain de votre véhicule.",
 	["VEH_KERS_BOOST_TT"] = "Équipe votre véhicule du boost KERS (Kinetic Energy Recovery System), similaire aux voitures de F1.",
-	["SELF_LASER_SIGHTS_TT"] = "Permet des vues laser sur vos armes à feu. Vous pouvez activer et désactiver les viseurs en appuyant sur [%s]",
+	["SELF_LASER_SIGHTS_TT"] = "Permet des vues laser sur vos armes à feu.",
 	["SUBTAB_HANDLING_EDITOR"] = "Éditeur de manipulation",
 	["SELF_LASER_SIGHTS_COL"] = "Couleur laser",
 	["VEH_FORCE_NO_TC_TT"] = "Vélos uniquement : oblige votre véhicule à ne pas avoir de contrôle de traction, ce qui vous permet de faire des dérives et des dérapages avec des vélos.",

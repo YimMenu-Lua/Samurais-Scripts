@@ -423,7 +423,7 @@ return {
 	["VEH_RALLY_TYRES"] = "ラリータイヤ",
 	["VEH_OFFROAD_ABILITIES"] = "オフロード能力",
 	["VEH_FORCE_NO_TC_TT"] = "バイクのみ: 車両にトラクション コントロールを強制的に無効にし、バイクでドリフトやスキッドを行うことができます。",
-	["SELF_LASER_SIGHTS_TT"] = "銃器のレーザー照準器を有効にします。 [%s] を押すと照準器のオンとオフを切り替えることができます。",
+	["SELF_LASER_SIGHTS_TT"] = "銃器のレーザー照準器を有効にします。",
 	["VEH_RALLY_TYRES_TT"] = "車両にラリータイヤを装備すると、オフロードでのハンドリングがさらに向上します。",
 	["VEH_NO_ENGINE_BRAKE"] = "エンジンブレーキを無効にする",
 	["VEH_KERS_BOOST"] = "KERSブースト",

@@ -414,7 +414,7 @@ return {
 	["GENERIC_CLEAR"] = "Claro",
 	["SUBTAB_HANDLING_EDITOR"] = "Editor de manejo",
 	["SELF_LASER_SIGHTS"] = "Miras láser",
-	["SELF_LASER_SIGHTS_TT"] = "Habilita miras láser en sus armas de fuego. Puedes activar y desactivar las miras presionando [%s]",
+	["SELF_LASER_SIGHTS_TT"] = "Habilita miras láser en sus armas de fuego.",
 	["SELF_LASER_SIGHTS_LENGTH"] = "Longitud del rayo láser",
 	["SELF_LASER_SIGHTS_COL"] = "Color láser",
 	["VEH_NO_ENGINE_BRAKE_TT"] = "Te permite deslizarte cuando no pisas el acelerador sin perder tanta velocidad.",

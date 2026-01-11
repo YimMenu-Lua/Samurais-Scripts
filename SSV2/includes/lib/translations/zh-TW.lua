@@ -412,7 +412,7 @@ return {
 	["SUBTAB_HANDLING_EDITOR"] = "處理編輯器",
 	["SELF_LASER_SIGHTS"] = "激光瞄準器",
 	["SELF_LASER_SIGHTS_COL"] = "激光彩色",
-	["SELF_LASER_SIGHTS_TT"] = "為您的槍支啟用激光瞄準器。您可以通過按[%s]來打開和關閉瞄準器",
+	["SELF_LASER_SIGHTS_TT"] = "為您的槍支啟用激光瞄準器。",
 	["VEH_NO_ENGINE_BRAKE"] = "禁用發動機制動",
 	["SUBTAB_GUI"] = "使用者介面",
 	["GENERIC_CLEAR"] = "清除",

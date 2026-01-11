@@ -312,8 +312,7 @@ return {
 	"This feature does not auto-aim or auto-fire. It simply remembers the last ped you aimed at and redirects your shot to that ped when you fire, even if you shoot elsewhere. The target resets when you stop aiming.",
 	["SELF_LASER_SIGHTS"]                  = "Laser Sights",
 	["SELF_LASER_SIGHTS_LENGTH"]           = "Laser Ray Length",
-	["SELF_LASER_SIGHTS_TT"]               =
-	"Enables laser sights on your firearms. You can toggle the sights on and off by pressing [%s]", -- hopefully the keybind's name gets formatted across locales
+	["SELF_LASER_SIGHTS_TT"]               = "Enables laser sights on your firearms.",
 	["SELF_LASER_SIGHTS_COL"]              = "Laser Color",
 	["SELF_KATANA"]                        = "Katana",
 	["SELF_KATANA_TT"]                     = "Replaces one of four melee weapon models of your choosing with a Katana.",
