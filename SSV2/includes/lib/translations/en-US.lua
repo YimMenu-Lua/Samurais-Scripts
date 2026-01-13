@@ -469,7 +469,7 @@ return {
 	"Steers your vehicle's rear whels when you hold the handbrake, similar to monster cars.",
 	["VEH_STANCE_CAMBER"]                  = "Camber",
 	["VEH_STANCE_TRACK_WIDTH"]             = "Track Width",
-	["VEH_STANCE_SUSP_COMP"]               = "Suspension Compression",
+	["VEH_STANCE_SUSP_COMP"]               = "Suspension Height",
 	["VEH_STANCE_WHEEL_WIDTH"]             = "Wheel Width",
 	["VEH_STANCE_WHEEL_SIZE"]              = "Wheel Size",
 	["VEH_STANCE_NON_STOCK"]               = "This option requires non-stock wheels.",
@@ -477,13 +477,22 @@ return {
 	["VEH_STANCE_FRONT_AXLE"]              = "Front Axle",
 	["VEH_STANCE_REAR_AXLE"]               = "Rear Axle",
 	["VEH_STANCE_COPY_FB"]                 = "Copy Front To Back",
-	["VEH_STANCE_GEN_OPTIONS"]             = "General Options",
+	["VEH_STANCE_GEN_OPTIONS"]             = "General Options (Visual Only)",
 	["VEH_STANCE_RIDE_HEIGHT"]             = "Ride Height",
+	["VEH_STANCE_AIR_SUSPENSION"]          = "Air Suspension",
+	["VEH_STANCE_AIR_SUSPENSION_RAISE"]    = "Raise",
+	["VEH_STANCE_AIR_SUSPENSION_LOWER"]    = "Lower",
+	["VEH_STANCE_BOUNCE_MODE"]             = "Bounce Mode",
+	["VEH_STANCE_BOUNCE_MODE_TT"]          =
+	"SUVs Only.\n\nMakes your vehicle bounce up and down, similar to the 'E-Active Body Control' feature in the Mercedes-Benz GLE.",
+	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"]     = "Bounce Mode is only available for SUVs.",
 	["VEH_STANCE_SAVE_MODEL"]              = "Save Current Model",
 	["VEH_STANCE_UPDATE_MODEL"]            = "Update Saved Model",
 	["VEH_STANCE_AUTOAPPLY"]               = "Auto-Apply",
 	["VEH_STANCE_AUTOAPPLY_TT"]            = "Automatically apply saved model stance when you enter a vehicle of that model.",
 	["VEH_STANCE_VIEW_SAVED"]              = "View Saved Vehicles",
+	["VEH_LOCKED"]                         = "Vehicle locked.",
+	["VEH_UNLOCKED"]                       = "Vehicle unlocked.",
 	--#endregion
 
 	--#region World

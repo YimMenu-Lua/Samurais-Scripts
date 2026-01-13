@@ -6,6 +6,7 @@ local CWheel       = require("includes.classes.CWheel")
 ---@class StanceObject
 ---@field m_track_width float
 ---@field m_camber float
+---@field m_susp_comp float
 ---@field m_wheel_width float
 ---@field m_wheel_size float
 local StanceObject = {}
@@ -33,6 +34,7 @@ end
 ---@field public m_wheels table<eWheelSide, array<CWheel>>
 ---@field public m_suspension_height { m_current: float, m_last_seen: float }
 ---@field public m_is_active boolean
+---@field public m_bounce_mode { enabled: boolean, margin: float, speed: float, last_height_f: float, last_height_r: float, t: milliseconds }
 local Stancer         = setmetatable({}, FeatureBase)
 Stancer.__index       = Stancer
 
@@ -96,7 +98,10 @@ Stancer.decorators    = {
 		end,
 		write_func = function(w, v, veh)
 			w.m_tyre_width:set_float(v)
-			veh:SetVisualWheelWidth(v * 2)
+			local cached = Decorator:GetDecor(veh:GetHandle(), "m_visual_width")
+			if (cached and cached > 0 and veh:GetVisualWheelWidth() ~= cached + v) then
+				veh:SetVisualWheelWidth(cached + v)
+			end
 		end
 	},
 	{
@@ -108,7 +113,10 @@ Stancer.decorators    = {
 		end,
 		write_func = function(w, v, veh)
 			w.m_tyre_radius:set_float(v)
-			veh:SetVisualWheelSize(v * 2)
+			local cached = Decorator:GetDecor(veh:GetHandle(), "m_visual_size")
+			if (cached and cached > 0 and veh:GetVisualWheelSize() ~= cached + v) then
+				veh:SetVisualWheelSize(cached + v)
+			end
 		end
 	},
 	{
@@ -157,6 +165,12 @@ function Stancer:Init()
 	self.m_last_tick = 0
 	self.m_last_wheel_mod_check_time = 0
 	self.m_reloading = false
+	self.m_bounce_mode = {
+		enabled = false,
+		margin = 0.09,
+		speed = 0.988,
+		t = 0.0
+	}
 
 	self.m_last_wheels_mod = {
 		index = -1,
@@ -233,16 +247,19 @@ end
 
 -- Main entry
 function Stancer:OnNewVehicle()
+	self.m_reloading = true
 	self:ResetDeltas()
 
 	if (not self.m_entity or not self.m_entity:IsValid()) then
 		return
 	end
 
-	self.m_cached_model    = self.m_entity:GetModelHash()
+	self.m_cached_model = self.m_entity:GetModelHash()
 	self.m_last_wheels_mod = self.m_entity:GetCustomWheels()
+
 	self:ReadWheelArray()
 	self:ReadDefaults()
+	self.m_reloading = false
 end
 
 ---@param wheelIndex integer
@@ -318,7 +335,7 @@ end
 function Stancer:GetAllWheelsForSide(side)
 	self.m_wheels = self:GetWheels()
 	if (#self.m_wheels[side] == 0) then
-		return
+		return {}
 	end
 
 	return self.m_wheels[side]
@@ -553,15 +570,66 @@ function Stancer:ReadDefaults()
 			if (i % 2 == 1) then
 				self.m_base_values[v.wheel_side][v.key] = default_val
 				if (not queued_decors_loaded) then
-					local pending_key = _F("%s_%d_queue", v.key, v.wheel_side)
-					if (not Decorator:ExistsOn(handle, pending_key)) then
-						Decorator:Register(handle, pending_key, default_val)
-					end
-
 					self.m_deltas[v.wheel_side][v.key] = 0.0
 				end
 			end
 		end)
+	end
+end
+
+function Stancer:OnBounceModeDisable()
+	self.m_reloading = true
+
+	local last_f = self.m_bounce_mode.last_height_f
+	local last_r = self.m_bounce_mode.last_height_r
+
+	if (last_f) then
+		self.m_deltas[self.eWheelSide.FRONT].m_susp_comp = last_f
+		self.m_bounce_mode.last_height_f = nil
+	end
+
+	if (last_r) then
+		self.m_deltas[self.eWheelSide.BACK].m_susp_comp = last_r
+		self.m_bounce_mode.last_height_r = nil
+	end
+
+	self.m_reloading = false
+end
+
+function Stancer:UpdateBounceMode()
+	if (not self.m_bounce_mode.enabled) then
+		return
+	end
+
+	if (self.m_entity:GetClassID() ~= Enums.eVehicleClasses.SUVs) then
+		Notifier:ShowError("Stancer", _T("VEH_STANCE_BOUNCE_MODE_UNAVAIL")) -- it works for all cars but nah.. **REALISM**
+		self.m_bounce_mode.enabled = false
+		return
+	end
+
+	if (not self.m_bounce_mode.last_height_f) then
+		self.m_bounce_mode.last_height_f = self.m_deltas[self.eWheelSide.FRONT].m_susp_comp
+	end
+
+	if (not self.m_bounce_mode.last_height_r) then
+		self.m_bounce_mode.last_height_r = self.m_deltas[self.eWheelSide.BACK].m_susp_comp
+	end
+
+	local bm = self.m_bounce_mode
+	bm.t = bm.t + Game.GetFrameTime() * bm.speed
+
+	local tri = math.tent(bm.t)
+	local n = (tri + 1) * 0.5
+	n = math.smooth_step(n)
+
+	local sweep = (n * 2 - 1) * bm.margin
+
+
+	self.m_deltas[self.eWheelSide.FRONT].m_susp_comp = sweep
+	self.m_deltas[self.eWheelSide.BACK].m_susp_comp  = sweep
+
+	if (self.m_entity:IsStopped()) then
+		PHYSICS.ACTIVATE_PHYSICS(self.m_entity:GetHandle())
 	end
 end
 
@@ -579,6 +647,7 @@ function Stancer:Update()
 	end
 
 	self:OnWheelsChanged()
+	self:UpdateBounceMode()
 
 	-- must have high frequency updates, otherwise wheels will flicker
 	-- when the game tries to force-reset them
@@ -595,18 +664,14 @@ function Stancer:Update()
 
 	for _, v in ipairs(self.decorators) do
 		local delta_val = self.m_deltas[v.wheel_side][v.key]
-		if (delta_val == 0) then
-			goto continue
+		local pending_key = _F("%s_%d_queue", v.key, v.wheel_side)
+		local pending_val = Decorator:GetDecor(handle, pending_key)
+		if (pending_val and not math.is_equal(pending_val, delta_val)) then
+			Decorator:UpdateDecor(handle, pending_key, delta_val)
 		end
 
 		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
 		local base_val    = self.m_base_values[v.wheel_side][v.key]
-		local pending_key = _F("%s_%d_queue", v.key, v.wheel_side)
-
-		if (not math.is_equal(Decorator:GetDecor(handle, pending_key), base_val)) then
-			Decorator:UpdateDecor(handle, pending_key, base_val)
-		end
-
 		self:ForEach(wheel_array, function(i, cwheel)
 			local desired = v.side_dont_care and base_val + delta_val or
 				self:GetValueByWheelIndex(i, base_val + delta_val)
@@ -615,8 +680,6 @@ function Stancer:Update()
 				v.write_func(cwheel, desired, self.m_entity)
 			end
 		end)
-
-		::continue::
 	end
 
 	self.m_last_tick = Game.GetGameTimer()

@@ -505,8 +505,8 @@ return {
 	["VEH_STANCE_REAR_AXLE"] = "後橋",
 	["VEH_STANCE_RIDE_HEIGHT"] = "行駛高度",
 	["VEH_STANCE_COPY_FB"] = "從前到後復印",
-	["VEH_STANCE_GEN_OPTIONS"] = "一般選項",
-	["VEH_STANCE_SUSP_COMP"] = "懸浮壓縮",
+	["VEH_STANCE_GEN_OPTIONS"] = "常規選項（僅限視覺）",
+	["VEH_STANCE_SUSP_COMP"] = "懸掛高度",
 	["VEH_STANCE_UPDATE_MODEL"] = "更新保存的模型",
 	["VEH_STANCE_SAVE_MODEL"] = "保存當前模型",
 	["VEH_STANCE_VIEW_SAVED"] = "查看已保存的車輛",
@@ -515,5 +515,13 @@ return {
 	["GUI_NOTIFICATIONS_UNREAD"] = "未讀通知",
 	["GUI_NOTIFICATIONS"] = "通知",
 	["GUI_NOTIFICATIONS_NONE"] = "您沒有任何通知。",
-	["GENERIC_DISMISS"] = "解僱"
+	["GENERIC_DISMISS"] = "解僱",
+	["VEH_STANCE_AIR_SUSPENSION_LOWER"] = "降低",
+	["VEH_STANCE_AIR_SUSPENSION_RAISE"] = "增加",
+	["VEH_LOCKED"] = "車輛被鎖。",
+	["VEH_UNLOCKED"] = "車輛已解鎖。",
+	["VEH_STANCE_AIR_SUSPENSION"] = "空氣懸架",
+	["VEH_STANCE_BOUNCE_MODE_TT"] = "僅限 SUV。 \n\n使您的車輛上下彈跳，類似於梅賽德斯-奔馳 GLE 中的“電子主動車身控制”功能。",
+	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "彈跳模式僅適用於 SUV。",
+	["VEH_STANCE_BOUNCE_MODE"] = "彈跳模式"
 }

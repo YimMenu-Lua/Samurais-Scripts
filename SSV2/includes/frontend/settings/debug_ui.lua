@@ -528,6 +528,25 @@ local function DrawMiscTests()
 			Notifier:Add(label, string.random(), level)
 		end
 	end
+
+	--[[
+		if (ImGui.Button("BreakOffVehicleWheel")) then
+			ThreadManager:Run(function()
+				if self.get_veh() == 0 then return end
+				if (type(GPointers.DynamicFuncs.BreakOffVehicleWheel) ~= "function") then
+					print("BreakOffVehicleWheel dynamic call failed")
+					return
+				end
+
+				local cvehicledamage = Self:GetVehicle():Resolve().m_vehicle_damage
+				if (cvehicledamage:is_null()) then
+					return
+				end
+
+				GPointers.DynamicFuncs.BreakOffVehicleWheel(cvehicledamage:get_address(), 0, 1.0, 0.0, 0.0, false, true) -- lea rcx,[rdi+00000420] // rdi=CVehicle, rdi+420h=CVehicle+0x420=CVehicleDamage
+			end)
+		end
+	--]]
 end
 
 return function()

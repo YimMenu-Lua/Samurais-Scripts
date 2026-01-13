@@ -1,13 +1,14 @@
 ---@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
 
 local FeatureBase = require("includes.modules.FeatureBase")
+local CWheel      = require("includes.classes.CWheel")
 
 ---@class DriftMode : FeatureBase
 ---@field private m_entity PlayerVehicle -- Reference to PlayerVehicle
 ---@field private m_smoke_fx array<handle>|nil
 ---@field private m_is_active boolean
 ---@overload fun(pv: PlayerVehicle): DriftMode
-local DriftMode = setmetatable({}, FeatureBase)
+local DriftMode   = setmetatable({}, FeatureBase)
 DriftMode.__index = DriftMode
 DriftMode.fxBones = { "suspension_lr", "suspension_rr" }
 
@@ -107,7 +108,90 @@ function DriftMode:UpdateFX()
 	end
 end
 
-function DriftMode:Update()
+-- local debug_txt_scale = vec2:new(0.3, 0.3)
+-- local debug_white = Color(225, 225, 225, 255)
+-- function DriftMode:DrawDebugHUD()
+-- 	local PV = self.m_entity
+-- 	if (not PV:IsValid()) then
+-- 		return
+-- 	end
+
+-- 	local speed_vec   = PV:GetSpeedVector()
+-- 	local lateral_vel = speed_vec.x
+-- 	local forward_vel = speed_vec.y
+-- 	local absolute_x  = math.abs(lateral_vel)
+-- 	local absolute_y  = math.abs(speed_vec.y)
+-- 	local delta_x     = 0 + absolute_x
+-- 	local delta_y     = 0 + absolute_y
+-- 	local angle_rad   = math.atan(delta_y, delta_x)
+-- 	local angle_deg   = math.deg(angle_rad)
+-- 	local wheels      = PV:Resolve().m_wheels
+
+-- 	Game.DrawText(
+-- 		vec2:new(0.8, 0.35),
+-- 		_F("Raw Lateral Velocity: %.3f", lateral_vel),
+-- 		debug_white,
+-- 		debug_txt_scale,
+-- 		4
+-- 	)
+-- 	Game.DrawText(
+-- 		vec2:new(0.8, 0.37),
+-- 		_F("Angle: %.0f°", angle_deg),
+-- 		debug_white,
+-- 		debug_txt_scale,
+-- 		4
+-- 	)
+
+-- 	Game.DrawText(
+-- 		vec2:new(0.8, 0.39),
+-- 		_F("Forward Velocity: %.3f", forward_vel),
+-- 		debug_white,
+-- 		debug_txt_scale,
+-- 		4
+-- 	)
+
+-- 	for i, wheel in wheels:Iter() do
+-- 		local cwheel = CWheel(wheel)
+-- 		if (not cwheel) then
+-- 			goto continue
+-- 		end
+
+-- 		local wheel_pwr       = cwheel.m_drive_force:get_float()
+-- 		local brk_pwr         = cwheel.m_brake_force:get_float()
+-- 		local drag_co         = cwheel.m_tire_drag_coeff:get_float()
+-- 		local rot_spd         = cwheel.m_rotation_speed:get_float()
+-- 		local top_spd_mult    = cwheel.m_top_speed_mult:get_float()
+-- 		local is_full_thottle = cwheel:GetWheelFlag(Enums.eWheelFlags.FULL_THROTTLE)
+-- 		local is_cheat_tc     = cwheel:GetWheelFlag(Enums.eWheelFlags.CHEAT_TC)
+-- 		local is_cheat_sc     = cwheel:GetWheelFlag(Enums.eWheelFlags.CHEAT_SC)
+-- 		local is_driven       = cwheel:GetConfigFlag(Enums.eWheelConfigFlags.POWERED)
+-- 		local wheel_txt       = _F(
+-- 			"- %d: Power: %.3f | Brake: %.3f | Drag: %.3f | Rotation: %.3f | Speed Mult: %.3f",
+-- 			i,
+-- 			wheel_pwr,
+-- 			brk_pwr,
+-- 			drag_co,
+-- 			rot_spd,
+-- 			top_spd_mult
+-- 		)
+
+-- 		Game.DrawText(
+-- 			vec2:new(0.7, 0.4 + (i * 0.02)),
+-- 			wheel_txt,
+-- 			debug_white,
+-- 			debug_txt_scale,
+-- 			4
+-- 		)
+
+-- 		::continue::
+-- 	end
+
+-- 	if (angle_deg <= 88 and PAD.IS_CONTROL_PRESSED(0, 71)) then
+-- 		VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(PV:GetHandle(), 10.0)
+-- 	end
+-- end
+
+function DriftMode:UpdateArcadeStyle()
 	local PV = self.m_entity
 	local handle = PV:GetHandle()
 
@@ -135,8 +219,18 @@ function DriftMode:Update()
 		VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(handle, 1.0)
 		self.m_is_active = false
 	end
+end
+
+function DriftMode:Update()
+	if (GVars.features.vehicle.drift.mode < 3) then
+		self:UpdateArcadeStyle()
+	end
 
 	self:UpdateFX()
+
+	-- if (Backend.debug_mode) then
+	-- 	self:DrawDebugHUD()
+	-- end
 end
 
 return DriftMode

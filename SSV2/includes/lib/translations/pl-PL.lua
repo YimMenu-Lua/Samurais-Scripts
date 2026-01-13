@@ -504,9 +504,9 @@ return {
 	["VEH_STANCE_INCOMPATIBLE"] = "Ta opcja jest niekompatybilna z obecnym pojazdem.",
 	["VEH_STANCE_FRONT_AXLE"] = "Oś przednia",
 	["VEH_STANCE_RIDE_HEIGHT"] = "Wysokość jazdy",
-	["VEH_STANCE_GEN_OPTIONS"] = "Opcje ogólne",
+	["VEH_STANCE_GEN_OPTIONS"] = "Opcje ogólne (tylko wizualne)",
 	["VEH_STANCE_WHEEL_SIZE"] = "Rozmiar koła",
-	["VEH_STANCE_SUSP_COMP"] = "Kompresja zawieszenia",
+	["VEH_STANCE_SUSP_COMP"] = "Wysokość zawieszenia",
 	["VEH_STANCE_AUTOAPPLY_TT"] = "Automatycznie zastosuj zapisaną postawę modelu, gdy wejdziesz do pojazdu tego modelu.",
 	["VEH_STANCE_AUTOAPPLY"] = "Zastosuj automatycznie",
 	["VEH_STANCE_SAVE_MODEL"] = "Zapisz bieżący model",
@@ -515,5 +515,13 @@ return {
 	["GUI_NOTIFICATIONS"] = "Powiadomienia",
 	["GUI_NOTIFICATIONS_NONE"] = "Nie masz żadnych powiadomień.",
 	["GENERIC_DISMISS"] = "Odrzucać",
-	["GUI_NOTIFICATIONS_UNREAD"] = "Nieprzeczytane powiadomienia"
+	["GUI_NOTIFICATIONS_UNREAD"] = "Nieprzeczytane powiadomienia",
+	["VEH_STANCE_AIR_SUSPENSION_RAISE"] = "Wznosić",
+	["VEH_STANCE_AIR_SUSPENSION_LOWER"] = "Niżej",
+	["VEH_UNLOCKED"] = "Pojazd odblokowany.",
+	["VEH_STANCE_AIR_SUSPENSION"] = "Zawieszenie pneumatyczne",
+	["VEH_LOCKED"] = "Pojazd zablokowany.",
+	["VEH_STANCE_BOUNCE_MODE"] = "Tryb odbijania",
+	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "Tryb Bounce jest dostępny tylko dla SUV-ów.",
+	["VEH_STANCE_BOUNCE_MODE_TT"] = "Tylko SUV-y.\n\nSprawia, że ​​Twój pojazd podskakuje w górę i w dół, podobnie jak funkcja „E-Active Body Control” w Mercedes-Benz GLE."
 }

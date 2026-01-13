@@ -504,9 +504,9 @@ return {
 	["VEH_STANCE_NON_STOCK"] = "이 옵션에는 재고가 없는 바퀴가 필요합니다.",
 	["VEH_STANCE_INCOMPATIBLE"] = "이 옵션은 현재 차량과 호환되지 않습니다.",
 	["VEH_STANCE_RIDE_HEIGHT"] = "탑승 높이",
-	["VEH_STANCE_GEN_OPTIONS"] = "일반 옵션",
+	["VEH_STANCE_GEN_OPTIONS"] = "일반 옵션(시각적 전용)",
 	["VEH_STANCE_COPY_FB"] = "앞에서 뒤로 복사",
-	["VEH_STANCE_SUSP_COMP"] = "서스펜션 압축",
+	["VEH_STANCE_SUSP_COMP"] = "서스펜션 높이",
 	["VEH_STANCE_SAVE_MODEL"] = "현재 모델 저장",
 	["VEH_STANCE_UPDATE_MODEL"] = "저장된 모델 업데이트",
 	["VEH_STANCE_AUTOAPPLY"] = "자동 적용",
@@ -515,5 +515,13 @@ return {
 	["GUI_NOTIFICATIONS"] = "알림",
 	["GENERIC_DISMISS"] = "해고하다",
 	["GUI_NOTIFICATIONS_UNREAD"] = "읽지 않은 알림",
-	["GUI_NOTIFICATIONS_NONE"] = "알림이 없습니다."
+	["GUI_NOTIFICATIONS_NONE"] = "알림이 없습니다.",
+	["VEH_STANCE_AIR_SUSPENSION_RAISE"] = "들어올리다",
+	["VEH_STANCE_AIR_SUSPENSION_LOWER"] = "낮추다",
+	["VEH_LOCKED"] = "차량이 잠겨 있습니다.",
+	["VEH_UNLOCKED"] = "차량이 잠금 해제되었습니다.",
+	["VEH_STANCE_AIR_SUSPENSION"] = "에어 서스펜션",
+	["VEH_STANCE_BOUNCE_MODE_TT"] = "SUV 전용.\n\n메르세데스-벤츠 GLE의 'E-액티브 바디 컨트롤' 기능과 유사하게 차량이 위 아래로 튕겨 나옵니다.",
+	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "바운스 모드는 SUV에서만 사용할 수 있습니다.",
+	["VEH_STANCE_BOUNCE_MODE"] = "바운스 모드"
 }

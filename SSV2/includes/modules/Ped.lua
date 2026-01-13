@@ -25,6 +25,11 @@ function Ped:IsAlive()
 end
 
 ---@return boolean
+function Ped:IsDead()
+	return ENTITY.IS_ENTITY_DEAD(self:GetHandle(), false)
+end
+
+---@return boolean
 function Ped:IsOnFoot()
 	return self:IsValid() and PED.IS_PED_ON_FOOT(self:GetHandle())
 end
@@ -156,6 +161,11 @@ function Ped:GetVehicle()
 	end
 
 	return Vehicle(self:GetVehicleNative())
+end
+
+---@return handle -- vehicle handle or 0
+function Ped:GetVehicleTryingToEnter()
+	return PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(self:GetHandle())
 end
 
 ---@return hash -- weapon hash or 0.

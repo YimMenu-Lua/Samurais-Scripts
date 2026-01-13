@@ -499,7 +499,7 @@ return {
 	["VEH_STANCE_CAMBER"] = "Камбер",
 	["VEH_STANCE_FRONT_AXLE"] = "Передний мост",
 	["VEH_STANCE_INCOMPATIBLE"] = "Эта опция несовместима с текущим автомобилем.",
-	["VEH_STANCE_GEN_OPTIONS"] = "Общие параметры",
+	["VEH_STANCE_GEN_OPTIONS"] = "Общие параметры (только визуально)",
 	["VEH_STANCE_WHEEL_SIZE"] = "Размер колеса",
 	["VEH_STANCE_NON_STOCK"] = "Для этого варианта требуются нестандартные колеса.",
 	["VEH_STANCE_REAR_AXLE"] = "Задний мост",
@@ -511,9 +511,17 @@ return {
 	["VEH_STANCE_SAVE_MODEL"] = "Сохранить текущую модель",
 	["VEH_STANCE_AUTOAPPLY"] = "Автоматическое применение",
 	["VEH_STANCE_VIEW_SAVED"] = "Просмотр сохраненных автомобилей",
-	["VEH_STANCE_SUSP_COMP"] = "Компрессия подвески",
+	["VEH_STANCE_SUSP_COMP"] = "Высота подвески",
 	["GUI_NOTIFICATIONS_UNREAD"] = "Непрочитанные уведомления",
 	["GUI_NOTIFICATIONS_NONE"] = "У вас нет уведомлений.",
 	["GUI_NOTIFICATIONS"] = "Уведомления",
-	["GENERIC_DISMISS"] = "Увольнять"
+	["GENERIC_DISMISS"] = "Увольнять",
+	["VEH_STANCE_AIR_SUSPENSION_RAISE"] = "Поднимать",
+	["VEH_STANCE_AIR_SUSPENSION_LOWER"] = "Ниже",
+	["VEH_STANCE_AIR_SUSPENSION"] = "Пневматическая подвеска",
+	["VEH_LOCKED"] = "Транспортное средство заблокировано.",
+	["VEH_UNLOCKED"] = "Автомобиль разблокирован.",
+	["VEH_STANCE_BOUNCE_MODE_TT"] = "Только для внедорожников.\n\nЗаставляет ваш автомобиль подпрыгивать вверх и вниз, аналогично функции «E-Active Body Control» в Mercedes-Benz GLE.",
+	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "Режим Bounce доступен только для внедорожников.",
+	["VEH_STANCE_BOUNCE_MODE"] = "Режим отказов"
 }

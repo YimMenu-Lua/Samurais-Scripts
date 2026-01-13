@@ -69,7 +69,7 @@ Memory              = require("includes.modules.Memory")
 KeyManager          = require("includes.services.KeyManager"):init()
 GUI                 = require("includes.services.GUI"):init()
 Notifier            = require("includes.services.ToastNotifier").new()
-CommandExecutor     = require("includes.services.CommandExecutor").new()
+CommandExecutor     = require("includes.services.CommandExecutor"):init()
 ----------------------------------------------------------------------------------------------------
 
 ----------------- Big Features (for smaller features, refer to includes/features) ------------------

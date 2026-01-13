@@ -348,12 +348,12 @@ function PlayerVehicle:IsDrifting()
 	end
 
 	local handle = self:GetHandle()
-	local speed_vector = ENTITY.GET_ENTITY_SPEED_VECTOR(handle, true)
-	if (speed_vector.x == 0) then
+	local lateral = math.abs(self:GetSpeedVector().x)
+	if (lateral == 0) then
 		return false
 	end
 
-	return VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(handle) and (speed_vector.x <= -6 or speed_vector.x >= 6)
+	return VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(handle) and lateral >= 6
 end
 
 ---@return boolean
@@ -432,27 +432,29 @@ function PlayerVehicle:UpdateESC()
 	self.m_esc_sm:Update(self)
 end
 
-function PlayerVehicle:AutolockDoors()
-	if (not GVars.features.vehicle.auto_lock_doors) then
-		return
+function PlayerVehicle:AutoLock()
+	if (GVars.features.vehicle.auto_lock_doors) then
+		local playerPos = Self:GetPos()
+		local vehPos    = self:GetPos()
+		local distance  = playerPos:distance(vehPos)
+
+		if (not self:IsLocked()
+				and distance > 18
+				and Self:IsOutside()
+				and Self:GetVehicleTryingToEnter() ~= self:GetHandle()
+			) then
+			self:AddGenericToggleable("autolockdoors", function()
+				self:LockDoors(true)
+			end, self.LockDoors, { self, false })
+		end
 	end
 
-	local handle   = self:GetHandle()
-	local vehPos   = self:GetPos()
-	local distance = vehPos:distance(Self:GetPos())
-	local isLocked = VEHICLE.GET_VEHICLE_DOOR_LOCK_STATUS(handle) > 1
+	if (self:IsLocked() and Self:GetVehicleTryingToEnter() == self:GetHandle()) then
+		if (not self.m_generic_toggleables["autolockdoors"]) then
+			self:LockDoors(false)
+			return
+		end
 
-	if (not isLocked
-			and distance > 20
-			and Self:IsOutside()
-			and PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Self:GetHandle()) ~= handle
-		) then
-		self:AddGenericToggleable("autolockdoors", function()
-			self:LockDoors(true)
-		end, self.LockDoors, { self, false })
-	end
-
-	if (isLocked and PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Self:GetHandle()) == handle) then
 		self:ResetGenericToggleable("autolockdoors")
 	end
 end
@@ -596,7 +598,7 @@ function PlayerVehicle:Main()
 	self.m_engine_swap_compatible = self:IsCar()
 	self.m_feat_mgr:Update()
 	self:UpdateESC()
-	self:AutolockDoors()
+	self:AutoLock()
 	self:HandleAutopilot()
 	Speedometer:UpdateState()
 end

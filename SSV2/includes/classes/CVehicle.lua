@@ -74,6 +74,7 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_deform_mult pointer<float>
 ---@field public m_wheel_scale pointer<float>
 ---@field public m_wheel_scale_rear pointer<float>
+---@field public m_throttle pointer<float> // 0x8D8
 ---@field public m_wheels atArray<CWheel> -- 0xC30
 ---@field public m_num_wheels number -- 0xC38
 ---@field public m_ride_height pointer<float>
@@ -137,6 +138,7 @@ function CVehicle:init(vehicle)
 	instance.m_damage_flags                 = instance.m_handling_data:add(0x012C)
 	instance.m_wheel_scale                  = instance.m_model_info:add(0x048C)
 	instance.m_wheel_scale_rear             = instance.m_model_info:add(0x0490)
+	instance.m_throttle                     = instance.m_model_info:add(0x08D8)
 	instance.m_wheels                       = atArray(ptr:add(0x0C30), CWheel)
 	instance.m_num_wheels                   = ptr:add(0x0C38):get_int()
 	instance.m_ride_height                  = ptr:add(0x0C30):deref():add(0x07C)
@@ -433,8 +435,28 @@ function CVehicle:IsWheelBrokenOff(wheelIndex)
 		return false
 	end
 
-	-- Thanks tupoy-ya
-	return (self.m_ptr:add(0xA98):get_dword() >> (wheelIndex & 0x1F) & 1) ~= 0
+	-- -- Thanks tupoy-ya
+	-- return (self.m_ptr:add(0xA98):get_dword() >> (wheelIndex & 0x1F) & 1) ~= 0
+
+	local cwheel = self:GetWheel(wheelIndex)
+	if (not cwheel) then
+		return false
+	end
+
+	return cwheel:GetDynamicFlag(Enums.eWheelDynamicFlags.BROKEN_OFF)
+end
+
+---@return CWheel?
+function CVehicle:GetWheel(index)
+	if (not self:IsValid()) then
+		return
+	end
+
+	if (index > self.m_wheels:Size()) then
+		return
+	end
+
+	return CWheel(self.m_wheels:Get(index))
 end
 
 ---@param refresh? boolean
