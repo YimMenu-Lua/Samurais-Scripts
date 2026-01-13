@@ -75,7 +75,7 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 ## FAQ
 
 - **Q:** Does this support Enhanced?
-- **A:** Prtially. You can use [YimLuaAPI](https://github.com/TupoyeMenu/YimLuaAPI) to test it but stability is not guaranteed as of now.
+- **A:** Partially. You can use [YimLuaAPI](https://github.com/TupoyeMenu/YimLuaAPI) to test it but stability is not guaranteed as of now.
 
 - **Q:** What is YimLuaAPI and how do I use it?
 - **A:**
