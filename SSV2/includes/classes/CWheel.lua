@@ -1,7 +1,7 @@
 ---@diagnostic disable: param-type-mismatch
 
----@enum eWheelFlags
-Enums.eWheelFlags = {
+---@enum eWheelDynamicFlags
+Enums.eWheelDynamicFlags = {
 	HIT                       = 0,
 	HIT_PREV                  = 1,
 	ON_GAS                    = 2,
@@ -89,30 +89,30 @@ Enums.eWheelConfigFlags = {
 ---@field m_suspension_length pointer<float> //0x110
 ---@field m_max_suspension_travel pointer<float> //0x114
 ---@field m_suspension_forward_offset pointer<float> //0x13C // prefer this to raise/lower individual wheels
----@field m_suspension_compression pointer<float> // 0x164 `radians`
----@field m_suspension_compression_2 pointer<float> // 0x168 `radians`
+---@field m_suspension_compression pointer<float> // 0x164
+---@field m_suspension_compression_2 pointer<float> // 0x168
 ---@field m_wheel_compression pointer<float> // 0x16C
 ---@field m_rotation_speed pointer // 0x170
 ---@field m_unk0190 pointer // ?? 0x190
 ---@field m_unk0194 pointer // ?? 0x194
 ---@field m_tire_drag_coeff pointer<float> // 0x198
 ---@field m_top_speed_mult pointer<float> // 0x19C
----@field m_steering_angle pointer<float> // 0x1CC `radians`
+---@field m_steering_angle pointer<float> // 0x1CC
 ---@field m_brake_force pointer<float> // 0x1D0
 ---@field m_drive_force pointer<float> // 0x1D4
 ---@field m_suspension_health pointer<float> // 0x1E8 // 100.0f: car gets slammed (old method of shooting your suspension to stance your car) // 0.0f: wheel should fall off but doesn't. Something else must be set to trigger wheel detachment
 ---@field m_tyre_health pointer<float> // 0x1EC // <= 500.0f: flat tyre // 0.0f: no tyre
 ---@field m_tyre_wear_mult pointer<float> // 0x1F0 // 0.0f: tyres won't burst from long burnout
 ---@field m_tyre_wear_unk pointer<float> // 0x1F8 // similar?
----@field m_wheel_flags pointer<eWheelFlags> // 0x200
+---@field m_wheel_flags pointer<eWheelDynamicFlags> // 0x200
 ---@field m_wheel_config_flags pointer<eWheelConfigFlags> // 0x204
 ---@field m_unk_u16 pointer<uint16_t> // 0x208
 ---@field m_unk_u8 pointer<uint8_t> // 0x20A
 ---@field m_tyre_is_burst pointer<bool> // 0x20B
 ---@field m_unk_byte pointer<byte> // 0x20C
----@field m_has_hydraulics pointer<bool> // 0x20D // true for cars with DUNK mod
+---@field m_has_hydraulics pointer<bool> // 0x20D // true for cars with DONK mod
 ---@overload fun(addr: pointer): CWheel|nil
-local CWheel = { m_size = 0x1FC }
+local CWheel = { m_size = 0x20E }
 CWheel.__index = CWheel
 CWheel.__type = "CWheel"
 setmetatable(CWheel, {
@@ -233,9 +233,9 @@ function CWheel:GetTiltAngle()
 	return math.deg(math.acos(dot / mag))
 end
 
----@param flag eWheelFlags
+---@param flag eWheelDynamicFlags
 ---@return boolean
-function CWheel:GetWheelFlag(flag)
+function CWheel:GetDynamicFlag(flag)
 	if (not self:IsValid()) then
 		return false
 	end
@@ -253,9 +253,9 @@ function CWheel:GetConfigFlag(flag)
 	return Bit.is_set(self.m_wheel_config_flags:get_dword(), flag)
 end
 
----@param flag eWheelFlags
+---@param flag eWheelDynamicFlags
 ---@param toggle boolean
-function CWheel:SetWheelFlag(flag, toggle)
+function CWheel:SetDynamicFlag(flag, toggle)
 	if (not self:IsValid()) then
 		return
 	end

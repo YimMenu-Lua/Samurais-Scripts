@@ -52,14 +52,12 @@ local commandRegistry <const> = {
 			"Auto fills businesses based on argument passed. For hangar or all businesses, you can simply pass 'hangar' and 'all' respectively. For warehouses, you have to also specify which one, ex: 'autofill warehouse 1'"
 		}
 	},
-
 	["finishsale"] = {
 		callback = function()
 			YRV3:FinishSaleOnCommand()
 		end,
 		opts = { description = "Automatically finishes any sale mission you have at the moment (limited to missions supported by YRV3)." }
 	},
-
 	["clonepv"] = {
 		callback = function(args)
 			ThreadManager:Run(function()
@@ -79,7 +77,24 @@ local commandRegistry <const> = {
 			"Spawns an exact replica of the vehicle you're currently sitting in. Does nothing if you're on foot."
 		}
 	},
+	["lockpv"] = {
+		callback = function(_)
+			ThreadManager:Run(function()
+				local PV = Self:GetVehicle()
+				if (not PV:IsValid()) then
+					return
+				end
 
+				local is_locked = PV:IsLocked()
+				Self:PlayKeyfobAnim()
+				PV:LockDoors(not PV:IsLocked())
+				CommandExecutor:notify(_T(is_locked and "VEH_UNLOCKED" or "VEH_LOCKED"))
+			end)
+		end,
+		opts = {
+			description = "Locks or unlocks your vehicle."
+		}
+	},
 	["savepv"] = {
 		callback = function(args)
 			ThreadManager:Run(function()
@@ -98,7 +113,6 @@ local commandRegistry <const> = {
 			description = "Saves the vehicle you're currently sitting in to JSON."
 		}
 	},
-
 	["spawnjsonveh"] = {
 		callback = function(args)
 			ThreadManager:Run(function()

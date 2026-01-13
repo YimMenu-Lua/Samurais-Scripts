@@ -1323,11 +1323,7 @@ end
 ---@param b number
 ---@param t number delta
 function math.lerp(a, b, t)
-	if (t > 1) then
-		t = 1
-	end
-
-	return a + (b - a) * t
+	return a + (b - a) * math.clamp(t, 0, 1)
 end
 
 ---@param v number
@@ -1350,6 +1346,20 @@ end
 function math.is_equal(a, b, e)
 	e = e or 1e-6
 	return a == b or math.abs(a - b) < 1e-6
+end
+
+-- Generates a trianguar wave oscillating between 1 and -1
+---@param t number
+---@return number
+function math.tent(t)
+	return 2 * math.abs(2 * (t - math.floor(t + 0.5))) - 1
+end
+
+-- 3x²-2x²
+---@param x number
+---@return number
+function math.smooth_step(x)
+	return x * x * (3 - 2 * x)
 end
 
 --#endregion

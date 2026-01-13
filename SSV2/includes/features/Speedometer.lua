@@ -298,7 +298,7 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 			local textWidth = ImGui.CalcTextSize(self._state.Manufacturer)
 			ImGui.ImDrawListAddText(
 				ImDrawList,
-				21,
+				19.5,
 				center.x - 5 - (textWidth / 2),
 				center.y - 15 - (radius / 2),
 				GVars.features.speedometer.colors.text - (math.pi * 10),

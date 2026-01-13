@@ -48,6 +48,8 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_current_gear pointer<int16_t>
 ---@field public m_top_gear pointer<int8_t>
 ---@field public m_engine_health pointer<float>
+---@field public m_steering_input pointer<float> // 0xD4 name might not correctly reflect what this actually is but this seems to store controller input (value is between 0.99 (left) .. -0.99 (right))
+---@field public m_current_steering pointer<float> 0xDC // actual wheel steer. Wr'll use it to rewrite last known wheel steer after exiting a vehicle in IV-Style Exit so we'll no longer need to teleport outside or patch CTaskVehicleExit
 ---@field public m_is_targetable pointer<byte> `bool`
 ---@field public m_door_lock_status pointer<uint32_t>
 ---@field public m_model_info_flags pointer<uint32_t>
@@ -72,6 +74,7 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_deform_mult pointer<float>
 ---@field public m_wheel_scale pointer<float>
 ---@field public m_wheel_scale_rear pointer<float>
+---@field public m_throttle pointer<float> // 0x8D8
 ---@field public m_wheels atArray<CWheel> -- 0xC30
 ---@field public m_num_wheels number -- 0xC38
 ---@field public m_ride_height pointer<float>
@@ -106,11 +109,13 @@ function CVehicle:init(vehicle)
 	instance.m_deform_god                   = ptr:add(0x096C)
 	instance.m_is_targetable                = ptr:add(0x0AEE)
 	instance.m_door_lock_status             = ptr:add(0x13D0)
-	instance.m_water_damage                 = ptr:add(0xD8)
+	instance.m_water_damage                 = ptr:add(0x00D8)
 	instance.m_next_gear                    = ptr:add(0x0880)
 	instance.m_current_gear                 = ptr:add(0x0882)
 	instance.m_top_gear                     = ptr:add(0x0886)
 	instance.m_engine_health                = ptr:add(0x0910)
+	instance.m_steering_input               = ptr:add(0x09D4)
+	instance.m_current_steering             = ptr:add(0x09DC)
 	instance.m_model_info_flags             = instance.m_model_info:add(0x057C)
 	instance.m_mass                         = instance.m_handling_data:add(0x000C)
 	instance.m_initial_drag_coeff           = instance.m_handling_data:add(0x0010)
@@ -133,9 +138,10 @@ function CVehicle:init(vehicle)
 	instance.m_damage_flags                 = instance.m_handling_data:add(0x012C)
 	instance.m_wheel_scale                  = instance.m_model_info:add(0x048C)
 	instance.m_wheel_scale_rear             = instance.m_model_info:add(0x0490)
-	instance.m_wheels                       = atArray(ptr:add(0xC30), CWheel)
-	instance.m_num_wheels                   = ptr:add(0xC38):get_int()
-	instance.m_ride_height                  = ptr:add(0xC30):deref():add(0x07C)
+	instance.m_throttle                     = instance.m_model_info:add(0x08D8)
+	instance.m_wheels                       = atArray(ptr:add(0x0C30), CWheel)
+	instance.m_num_wheels                   = ptr:add(0x0C38):get_int()
+	instance.m_ride_height                  = ptr:add(0x0C30):deref():add(0x07C)
 
 	return instance
 end
@@ -429,8 +435,28 @@ function CVehicle:IsWheelBrokenOff(wheelIndex)
 		return false
 	end
 
-	-- Thanks tupoy-ya
-	return (self.m_ptr:add(0xA98):get_dword() >> (wheelIndex & 0x1F) & 1) ~= 0
+	-- -- Thanks tupoy-ya
+	-- return (self.m_ptr:add(0xA98):get_dword() >> (wheelIndex & 0x1F) & 1) ~= 0
+
+	local cwheel = self:GetWheel(wheelIndex)
+	if (not cwheel) then
+		return false
+	end
+
+	return cwheel:GetDynamicFlag(Enums.eWheelDynamicFlags.BROKEN_OFF)
+end
+
+---@return CWheel?
+function CVehicle:GetWheel(index)
+	if (not self:IsValid()) then
+		return
+	end
+
+	if (index > self.m_wheels:Size()) then
+		return
+	end
+
+	return CWheel(self.m_wheels:Get(index))
 end
 
 ---@param refresh? boolean

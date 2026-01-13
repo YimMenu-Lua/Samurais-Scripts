@@ -58,21 +58,16 @@ function Vehicle:GetManufacturerName()
 		return ""
 	end
 
-	local mfr = VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(self:GetModelHash())
-	return mfr:capitalize()
+	return HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(self:GetModelHash()))
 end
 
----@return number|nil
+---@return number
 function Vehicle:GetClassID()
 	if not self:IsValid() then
-		return
+		return -1
 	end
 
-	if not self.m_class_id then
-		self.m_class_id = VEHICLE.GET_VEHICLE_CLASS(self:GetHandle())
-	end
-
-	return self.m_class_id
+	return VEHICLE.GET_VEHICLE_CLASS(self:GetHandle())
 end
 
 ---@return string
@@ -221,12 +216,7 @@ end
 
 ---@return boolean
 function Vehicle:IsLocalPlayerInVehicle()
-	local PV = Self:GetVehicle()
-	if not (PV and PV:IsValid() and self:IsValid()) then
-		return false
-	end
-
-	return self:GetHandle() == PV:GetHandle()
+	return PED.IS_PED_SITTING_IN_VEHICLE(Self:GetHandle(), self:GetHandle())
 end
 
 ---@return boolean
@@ -537,13 +527,7 @@ end
 ---@param wheelIndex integer
 ---@return boolean
 function Vehicle:IsWheelBrokenOff(wheelIndex)
-	if (not self:IsValid()) then
-		return false
-	end
-
-	local numWheels = self:GetNumberOfWheels()
-	if (wheelIndex > numWheels) then
-		Backend:debug("Wheel index out of bounds.")
+	if (not self:IsValid() or type(wheelIndex) ~= "number") then
 		return false
 	end
 
@@ -669,41 +653,49 @@ function Vehicle:LockDoors(toggle)
 	end
 
 	local handle = self:GetHandle()
-	if (self:IsCar() and entities.take_control_of(handle, 300)) then
-		if (toggle) then
-			for i = 0, (VEHICLE.GET_NUMBER_OF_VEHICLE_DOORS(handle) + 1) do
-				if VEHICLE.GET_VEHICLE_DOOR_ANGLE_RATIO(handle, i) > 0.0 then
-					VEHICLE.SET_VEHICLE_DOORS_SHUT(handle, false)
-					break
-				end
-			end
-
-			if (self:IsConvertible() and self:GetConvertibleRoofState() ~= 0) then
-				VEHICLE.RAISE_CONVERTIBLE_ROOF(handle, false)
-			else
-				for i = 0, 7 do
-					VEHICLE.ROLL_UP_WINDOW(handle, i)
-				end
-			end
-		end
-
-		local engineWasRunning = VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(handle)
-		VEHICLE.SET_VEHICLE_ENGINE_ON(handle, true, true, false)
-		VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(handle, 0, true)
-		VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(handle, 1, true)
-		sleep(150)
-		if (not engineWasRunning) then
-			VEHICLE.SET_VEHICLE_ENGINE_ON(handle, false, true, false)
-		end
-
-		AUDIO.SET_HORN_PERMANENTLY_ON_TIME(handle, 1000)
-		AUDIO.SET_HORN_PERMANENTLY_ON(handle)
-		VEHICLE.SET_VEHICLE_DOORS_LOCKED(handle, toggle and 2 or 1)
-		VEHICLE.SET_VEHICLE_ALARM(handle, toggle)
-		sleep(696)
-		VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(handle, 0, false)
-		VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(handle, 1, false)
+	if (not self:IsCar() or not entities.take_control_of(handle, 300)) then
+		return
 	end
+
+	if (toggle) then
+		for i = 0, (VEHICLE.GET_NUMBER_OF_VEHICLE_DOORS(handle) + 1) do
+			if VEHICLE.GET_VEHICLE_DOOR_ANGLE_RATIO(handle, i) > 0.0 then
+				VEHICLE.SET_VEHICLE_DOORS_SHUT(handle, false)
+				break
+			end
+		end
+
+		if (self:IsConvertible() and self:GetConvertibleRoofState() ~= 0) then
+			VEHICLE.RAISE_CONVERTIBLE_ROOF(handle, false)
+		else
+			for i = 0, 7 do
+				VEHICLE.ROLL_UP_WINDOW(handle, i)
+			end
+		end
+	end
+
+	VEHICLE.SET_VEHICLE_DOORS_LOCKED(handle, toggle and 2 or 1)
+	if (self:IsLocalPlayerInVehicle()) then
+		return
+	end
+
+	local engineWasRunning = VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(handle)
+	if (not engineWasRunning) then
+		VEHICLE.SET_VEHICLE_ENGINE_ON(handle, true, true, false)
+	end
+	VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(handle, 0, true)
+	VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(handle, 1, true)
+	sleep(150)
+	if (not engineWasRunning) then
+		VEHICLE.SET_VEHICLE_ENGINE_ON(handle, false, true, false)
+	end
+
+	AUDIO.SET_HORN_PERMANENTLY_ON_TIME(handle, 1000)
+	AUDIO.SET_HORN_PERMANENTLY_ON(handle)
+	VEHICLE.SET_VEHICLE_ALARM(handle, toggle)
+	sleep(696)
+	VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(handle, 0, false)
+	VEHICLE.SET_VEHICLE_INDICATOR_LIGHTS(handle, 1, false)
 end
 
 function Vehicle:CloseDoors()
@@ -1339,6 +1331,16 @@ function Vehicle:GetNumberOfWheels()
 	end
 
 	return self:Resolve().m_num_wheels
+end
+
+---@param atIndex integer
+---@return CWheel?
+function Vehicle:GetWheel(atIndex)
+	if (not self:IsValid()) then
+		return
+	end
+
+	return self:Resolve():GetWheel(atIndex)
 end
 
 ---@param seatIndex integer

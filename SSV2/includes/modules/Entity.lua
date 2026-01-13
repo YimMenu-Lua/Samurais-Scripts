@@ -234,6 +234,11 @@ function Entity:GetSpeed()
 end
 
 ---@return vec3
+function Entity:GetSpeedVector()
+	return self:Exists() and ENTITY.GET_ENTITY_SPEED_VECTOR(self:GetHandle(), true) or vec3:zero()
+end
+
+---@return vec3
 function Entity:GetVelocity()
 	return self:Exists() and ENTITY.GET_ENTITY_VELOCITY(self:GetHandle()) or vec3:zero()
 end

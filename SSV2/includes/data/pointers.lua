@@ -1,8 +1,8 @@
 PatternScanner = require("includes.services.PatternScanner"):init()
 
---- A place to store callable naems returned from `memory.dynamic_call`
----@class DynamicFuncNames
----@field dfn_IsVehicleWheelBrokenOff? string
+--- A place to store functions returned from `memory.dynamic_call`
+---@class DynamicFuncs
+---@field BreakOffVehicleWheel? fun(pVehicleDamage: pointer<CVehicleDamage>, wheelIdx: integer, ptfxChance: float, deleteChance: float, burstChance: float, setOnFire: bool, isNetwork: bool)
 
 -- ### A place to store pointers globally.
 --
@@ -19,20 +19,18 @@ PatternScanner = require("includes.services.PatternScanner"):init()
 ---@field GameTime pointer<uint32_t>
 ---@field GameVersion { _build: string, _online: string }
 ---@field ScreenResolution vec2
----@field IsVehicleWheelBrokenOff pointer<function>
----@field DynamicFuncNames DynamicFuncNames
+---@field DynamicFuncs DynamicFuncs
 local GPointers = {
-	Init                    = function() PatternScanner:Scan() end,
-	Retry                   = function() PatternScanner:RetryScan() end,
-	ScriptGlobals           = nullptr,
-	GameState               = nullptr,
-	GameTime                = nullptr,
-	IsVehicleWheelBrokenOff = nullptr,
-	GameVersion             = { _build = "nil", _online = "nil" },
-	ScreenResolution        = vec2:zero(),
+	Init             = function() PatternScanner:Scan() end,
+	Retry            = function() PatternScanner:RetryScan() end,
+	ScriptGlobals    = nullptr,
+	GameState        = nullptr,
+	GameTime         = nullptr,
+	GameVersion      = { _build = "nil", _online = "nil" },
+	ScreenResolution = vec2:zero(),
 }
 
-GPointers.DynamicFuncNames = {}
+GPointers.DynamicFuncs = {}
 
 
 ---@class MemoryBatch
@@ -98,18 +96,21 @@ local mem_batches <const> = {
 				ptr:add(0x4):rip():get_word()
 			)
 		end),
-		-- MemoryBatch.new("IsVehicleWheelBrokenOff", "E8 ? ? ? ? 48 8B CD 41 88 84 1F", function(ptr)
+
+		-- fuck my life man fuck it
+		-- MemoryBatch.new("BreakOffVehicleWheel", "F3 44 0F 11 4C 24 ? E8 ? ? ? ? EB 7A", function(ptr)
 		-- 	if ptr:is_null() then
 		-- 		return
 		-- 	end
 
-		-- 	local func_ptr = ptr:add(0x1):rip()
-		-- 	GPointers.IsVehicleWheelBrokenOff = func_ptr -- not needed for this but we'll just go ahead and store it
-		-- 	GPointers.DynamicFuncNames.dfn_IsVehicleWheelBrokenOff = memory.dynamic_call(
-		-- 		"bool",
-		-- 		{ "void*", "int" },
+		-- 	local func_ptr = ptr:add(0x7)
+		-- 	local func_name = memory.dynamic_call(
+		-- 		"void",
+		-- 		{ "void*", "uint32_t", "float", "float", "float", "bool", "bool" },
 		-- 		func_ptr
 		-- 	)
+
+		-- 	GPointers.DynamicFuncs.BreakOffVehicleWheel = _G[func_name]
 		-- end),
 	},
 	[Enums.eAPIVersion.V2] = {
@@ -148,9 +149,7 @@ local mem_batches <const> = {
 			)
 		end),
 	},
-	[Enums.eAPIVersion.L54] = {
-		-- dummy
-	},
+	[Enums.eAPIVersion.L54] = { --[[dummy]] },
 }
 
 local API_VERSON <const> = Backend:GetAPIVersion()

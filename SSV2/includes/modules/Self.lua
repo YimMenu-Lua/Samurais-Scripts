@@ -308,14 +308,14 @@ function Self:ToggleMpPhoneAnims(value)
 end
 
 function Self:PlayKeyfobAnim()
-	if (Self:IsSwimming()
-			or not Self:IsAlive()
+	if (Self:IsDead()
+			or Self:IsSwimming()
+			or not Self:IsOnFoot()
 			or YimActions:IsPedPlaying()
 			or YimActions:IsPlayerBusy()
 		) then
 		return
 	end
-
 
 	Await(Game.RequestAnimDict, "anim@mp_player_intmenu@key_fob@")
 	TASK.TASK_PLAY_ANIM(
@@ -323,8 +323,8 @@ function Self:PlayKeyfobAnim()
 		"anim@mp_player_intmenu@key_fob@",
 		"fob_click",
 		4.0,
-		-4.0,
-		-1,
+		-8.0,
+		800.0,
 		48,
 		0.0,
 		false,

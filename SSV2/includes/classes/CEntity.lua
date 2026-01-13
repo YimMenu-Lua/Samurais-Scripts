@@ -63,6 +63,11 @@ function CEntity:IsValid()
 	return self.m_ptr and self.m_ptr:is_valid()
 end
 
+---@return uint64_t
+function CEntity:GetAddress()
+	return self.m_ptr:get_address()
+end
+
 ---@return eModelType
 function CEntity:GetModelType()
 	if not self:IsValid() then
