@@ -75,11 +75,11 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 ## FAQ
 
 - **Q:** Does this support Enhanced?
-- **A:** Prtially. You can use [YimLuaAPI](github.com/TupoyeMenu/YimLuaAPI) to test it but stability is not guaranteed as of now.
+- **A:** Prtially. You can use [YimLuaAPI](https://github.com/TupoyeMenu/YimLuaAPI) to test it but stability is not guaranteed as of now.
 
 - **Q:** What is YimLuaAPI and how do I use it?
 - **A:**
-  - **What is it:** [YimLuaAPI](github.com/TupoyeMenu/YimLuaAPI) is a universal Lua API that works for both Legacy and Enhanced.
+  - **What is it:** [YimLuaAPI](https://github.com/TupoyeMenu/YimLuaAPI) is a universal Lua API that works for both Legacy and Enhanced.
   - **How to use it:** Right now there is no release because it's still in development. If you want to try it, you have to compile it yourself. Once you have `YimLuaAPI.dll`, inject it into any GTA branch (Legacy/Enhanced), it will create a folder on first injection: `%AppData%\YimLuaAPI`. Simply place the script there and you're done. You can still use YimMenu/YimMenuV2 but the script has to only exist in YimLuaAPI.
 
 - **Q:** Why can't-I run this in YimMenuV2?
@@ -98,7 +98,7 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 | <a href="https://github.com/harmless05"><img height="40" width="40" alt="Harmless" src="https://avatars.githubusercontent.com/harmless05"><br/>Harmless</a> | Shift-Drift |
 | <a href="https://github.com/NiiV3AU"><img height="40" width="40" alt="NiiV3AU" src="https://avatars.githubusercontent.com/NiiV3AU"><br/>NiiV3AU</a> | German translations |
 | <a href="https://github.com/gir489returns"><img height="40" width="40" alt="gir489returns" src="https://avatars.githubusercontent.com/gir489returns"><br/>gir489returns</a> | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) |
-| <a href="https://github.com/tupoy-ya"><img height="40" width="40" alt="tupoy-ya" src="https://avatars.githubusercontent.com/tupoy-ya"><br/>tupoy-ya</a> | Several contributions and shared knowledge. Owner of [YimLuaAPI](github.com/TupoyeMenu/YimLuaAPI) |
+| <a href="https://github.com/tupoy-ya"><img height="40" width="40" alt="tupoy-ya" src="https://avatars.githubusercontent.com/tupoy-ya"><br/>tupoy-ya</a> | Several contributions and shared knowledge. Owner of [YimLuaAPI](https://github.com/TupoyeMenu/YimLuaAPI) |
 | <a href="https://github.com/szalikdev"><img height="40" width="40" alt="szalikdev" src="https://avatars.githubusercontent.com/szalikdev"><br/>szalikdev</a> | Revived the project and joined the cause. Owner of [Acid Labs](https://github.com/acidlabsdev) |
 | <a href="https://github.com/shinywasabi"><img height="40" width="40" alt="Arthur" src="https://avatars.githubusercontent.com/shinywasabi"><br/>ShinyWasabi</a> | [scrDbg](https://github.com/ShinyWasabi/scrDbg) and other foundational community contributions frequently used as reference |
 | <a href="https://github.com/durtyfree"><img height="40" width="40" alt="DurtyFree" src="https://avatars.githubusercontent.com/durtyfree"><br/>Alexander Schmid</a> | [GTA V data dumps](https://github.com/DurtyFree/gta-v-data-dumps) |
