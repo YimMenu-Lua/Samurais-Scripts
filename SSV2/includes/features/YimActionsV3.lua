@@ -170,12 +170,12 @@ function YimActions:InitInVehicleAnim(animData, targetPed)
 		return false
 	end
 
-	local veh = Self:GetVehicleNative()
+	local veh = PED.GET_VEHICLE_PED_IS_IN(targetPed, true)
 	if (veh == 0) then -- should never happen
 		return false
 	end
 
-	local seat = Self:GetVehicleSeat()
+	local seat = Game.GetPedVehicleSeat(targetPed)
 	if (not seat or seat > 2) then
 		return true
 	end
@@ -456,7 +456,7 @@ function YimActions:RegisterCommands()
 					self:Play(action)
 				end)
 			end,
-			{ description = _F("YimActions Command: Plays the '%s' %s", label, action:TypeAsString()) }
+			{ description = _F("YimActions Command: Plays the '%s' %s.", label, action:TypeAsString():lower()) }
 		)
 
 		::continue::
@@ -487,7 +487,7 @@ function YimActions:AddCommandAction(cmd_name, data)
 	end
 
 	if (GVars.features.yim_actions.action_commands[data.label] or CommandExecutor:DoesCommandExist(cmd_name)) then
-		Notifier:ShowError("YimActions", _F("Command '%s' already exists", data))
+		Notifier:ShowError("YimActions", _F("Command '%s' already exists.", data))
 		return
 	end
 
