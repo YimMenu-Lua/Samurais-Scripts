@@ -28,8 +28,8 @@ function CPedWeaponManager.new(ptr)
 		m_ptr                  = ptr,
 		m_owner                = ptr:add(0x0010):deref(), -- CPed
 		m_selected_weapon_hash = ptr:add(0x0018),
-		m_weapon_info          = CWeaponInfo(ptr:add(0x0020):deref()),
-		m_vehicle_weapon_info  = CWeaponInfo(ptr:add(0x0070):deref()),
+		m_weapon_info          = CWeaponInfo(ptr:add(0x0020)),
+		m_vehicle_weapon_info  = CWeaponInfo(ptr:add(0x0070)),
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, CPedWeaponManager)
 end

@@ -120,44 +120,45 @@ function CWeaponInfo.new(ptr)
 		return
 	end
 
-	---@diagnostic disable-next-line: param-type-mismatch
-	local instance                     = setmetatable({ m_ptr = ptr }, CWeaponInfo)
-	instance.m_name_hash               = ptr:add(0x0010)
-	instance.m_model_hash              = ptr:add(0x0014)
-	instance.m_audio_hash              = ptr:add(0x0018)
-	instance.m_slot_hash               = ptr:add(0x001C)
-	instance.m_damage_type             = ptr:add(0x0020)
-	instance.m_fire_type               = ptr:add(0x0054)
-	instance.m_wheel_slot              = ptr:add(0x0058)
-	instance.m_group_hash              = ptr:add(0x005C)
-	instance.m_clip_size               = ptr:add(0x0070)
-	instance.m_damage                  = ptr:add(0x00B0)
-	instance.m_vehicle_damage_modifier = ptr:add(0x00D4)
-	instance.m_force                   = ptr:add(0x00D8)
-	instance.m_force_on_ped            = ptr:add(0x00DC)
-	instance.m_force_on_vehicle        = ptr:add(0x00E0)
-	instance.m_force_on_heli           = ptr:add(0x00E4)
-	instance.m_force_max_strength_mult = ptr:add(0x00F8)
-	instance.m_projectile_force        = ptr:add(0x0108)
-	instance.m_frag_impulse            = ptr:add(0x010C)
-	instance.m_penetration             = ptr:add(0x0110)
-	instance.m_speed                   = ptr:add(0x011C)
-	instance.m_bullets_in_batch        = ptr:add(0x0120)
-	instance.m_bullets_per_anime_loop  = ptr:add(0x0138)
-	instance.m_time_between_shots      = ptr:add(0x013C)
-	instance.m_should_fire_time_left   = ptr:add(0x0140)
-	instance.m_alt_wait_time           = ptr:add(0x0150)
-	instance.m_effect_group            = ptr:add(0x0170)
-	instance.m_vehicle_weapon_hash     = ptr:add(0x02B4)
-	instance.m_default_camera_hash     = ptr:add(0x02B8)
-	instance.m_aim_camera_hash         = ptr:add(0x02BC)
-	instance.m_fire_camera_hash        = ptr:add(0x02C0)
-	instance.m_camera_fov              = ptr:add(0x02FC)
-	instance.m_reticule_scale          = ptr:add(0x05A8)
-	instance.m_reticule_style_hash     = ptr:add(0x05AC)
-	instance.m_firing_pattern_aliases  = CWeaponFiringPatternAliases(ptr:add(0x0920):deref())
-
-	return instance
+	ptr = ptr:deref()
+	return setmetatable({
+		m_ptr                     = ptr,
+		m_name_hash               = ptr:add(0x0010),
+		m_model_hash              = ptr:add(0x0014),
+		m_audio_hash              = ptr:add(0x0018),
+		m_slot_hash               = ptr:add(0x001C),
+		m_damage_type             = ptr:add(0x0020),
+		m_fire_type               = ptr:add(0x0054),
+		m_wheel_slot              = ptr:add(0x0058),
+		m_group_hash              = ptr:add(0x005C),
+		m_clip_size               = ptr:add(0x0070),
+		m_damage                  = ptr:add(0x00B0),
+		m_vehicle_damage_modifier = ptr:add(0x00D4),
+		m_force                   = ptr:add(0x00D8),
+		m_force_on_ped            = ptr:add(0x00DC),
+		m_force_on_vehicle        = ptr:add(0x00E0),
+		m_force_on_heli           = ptr:add(0x00E4),
+		m_force_max_strength_mult = ptr:add(0x00F8),
+		m_projectile_force        = ptr:add(0x0108),
+		m_frag_impulse            = ptr:add(0x010C),
+		m_penetration             = ptr:add(0x0110),
+		m_speed                   = ptr:add(0x011C),
+		m_bullets_in_batch        = ptr:add(0x0120),
+		m_bullets_per_anime_loop  = ptr:add(0x0138),
+		m_time_between_shots      = ptr:add(0x013C),
+		m_should_fire_time_left   = ptr:add(0x0140),
+		m_alt_wait_time           = ptr:add(0x0150),
+		m_effect_group            = ptr:add(0x0170),
+		m_vehicle_weapon_hash     = ptr:add(0x02B4),
+		m_default_camera_hash     = ptr:add(0x02B8),
+		m_aim_camera_hash         = ptr:add(0x02BC),
+		m_fire_camera_hash        = ptr:add(0x02C0),
+		m_camera_fov              = ptr:add(0x02FC),
+		m_reticule_scale          = ptr:add(0x05A8),
+		m_reticule_style_hash     = ptr:add(0x05AC),
+		m_firing_pattern_aliases  = CWeaponFiringPatternAliases(ptr:add(0x0920):deref())
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, CWeaponInfo)
 end
 
 ---@return boolean
