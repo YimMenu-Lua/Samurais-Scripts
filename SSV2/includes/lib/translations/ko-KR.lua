@@ -523,5 +523,12 @@ return {
 	["VEH_STANCE_AIR_SUSPENSION"] = "에어 서스펜션",
 	["VEH_STANCE_BOUNCE_MODE_TT"] = "SUV 전용.\n\n메르세데스-벤츠 GLE의 'E-액티브 바디 컨트롤' 기능과 유사하게 차량이 위 아래로 튕겨 나옵니다.",
 	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "바운스 모드는 SUV에서만 사용할 수 있습니다.",
-	["VEH_STANCE_BOUNCE_MODE"] = "바운스 모드"
+	["VEH_STANCE_BOUNCE_MODE"] = "바운스 모드",
+	["GENERIC_LIST_SORT"] = "정렬 기준",
+	["YAV3_DISABLE_PROPS"] = "소품 비활성화",
+	["YAV3_DISABLE_SFX"] = "음향 효과 비활성화",
+	["YAV3_ANIM_FLAGS"] = "행동 플래그",
+	["GENERIC_LIST_FILTER"] = "필터링 기준",
+	["GENERIC_LIST_GROUP"] = "그룹화 기준",
+	["YAV3_DISABLE_PTFX"] = "입자 효과 비활성화"
 }

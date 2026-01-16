@@ -523,5 +523,12 @@ return {
 	["VEH_STANCE_AIR_SUSPENSION"] = "Luftfederung",
 	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "Der Bounce-Modus ist nur für SUVs verfügbar.",
 	["VEH_STANCE_BOUNCE_MODE"] = "Bounce-Modus",
-	["VEH_STANCE_BOUNCE_MODE_TT"] = "Nur für SUVs.\n\nLässt Ihr Fahrzeug auf und ab springen, ähnlich der Funktion „E-Active Body Control“ im Mercedes-Benz GLE."
+	["VEH_STANCE_BOUNCE_MODE_TT"] = "Nur für SUVs.\n\nLässt Ihr Fahrzeug auf und ab springen, ähnlich der Funktion „E-Active Body Control“ im Mercedes-Benz GLE.",
+	["YAV3_DISABLE_PROPS"] = "Requisiten deaktivieren",
+	["YAV3_DISABLE_PTFX"] = "Partikeleffekte deaktivieren",
+	["GENERIC_LIST_GROUP"] = "Gruppieren nach",
+	["YAV3_DISABLE_SFX"] = "Deaktivieren Sie Soundeffekte",
+	["GENERIC_LIST_SORT"] = "Sortieren nach",
+	["GENERIC_LIST_FILTER"] = "Filtern nach",
+	["YAV3_ANIM_FLAGS"] = "Verhaltensflags"
 }

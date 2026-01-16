@@ -523,5 +523,12 @@ return {
 	["VEH_UNLOCKED"] = "Автомобиль разблокирован.",
 	["VEH_STANCE_BOUNCE_MODE_TT"] = "Только для внедорожников.\n\nЗаставляет ваш автомобиль подпрыгивать вверх и вниз, аналогично функции «E-Active Body Control» в Mercedes-Benz GLE.",
 	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "Режим Bounce доступен только для внедорожников.",
-	["VEH_STANCE_BOUNCE_MODE"] = "Режим отказов"
+	["VEH_STANCE_BOUNCE_MODE"] = "Режим отказов",
+	["GENERIC_LIST_FILTER"] = "Фильтровать по",
+	["GENERIC_LIST_GROUP"] = "Группировать по",
+	["GENERIC_LIST_SORT"] = "Сортировать по",
+	["YAV3_DISABLE_SFX"] = "Отключить звуковые эффекты",
+	["YAV3_DISABLE_PTFX"] = "Отключить эффекты частиц",
+	["YAV3_ANIM_FLAGS"] = "Behavior Flags",
+	["YAV3_DISABLE_PROPS"] = "Disable Props"
 }

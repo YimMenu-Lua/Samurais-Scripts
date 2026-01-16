@@ -10,7 +10,7 @@ planes_tab:AddBoolCommand(
 	"features.vehicle.fast_jets",
 	nil,
 	nil,
-	{ description = "VEH_FAST_JETS_TT" },
+	{ description = "VEH_FAST_JETS_TT", isTranslatorLabel = true },
 	false,
 	true
 )
@@ -20,7 +20,7 @@ planes_tab:AddBoolCommand(
 	"features.vehicle.no_jet_stall",
 	nil,
 	nil,
-	{ description = "VEH_NO_JET_STALL_TT" },
+	{ description = "VEH_NO_JET_STALL_TT", isTranslatorLabel = true },
 	false,
 	true
 )

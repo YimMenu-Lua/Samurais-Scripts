@@ -15,6 +15,8 @@ script.run_in_fiber(function()
 		CommandExecutor:RegisterCommand(name, cmd.callback, cmd.opts)
 	end
 
+	YimActions:RegisterCommands()
+
 	t_MeleeWeapons  = weapons.get_all_weapons_of_group_type("GROUP_MELEE")
 	t_Handguns      = weapons.get_all_weapons_of_group_type("GROUP_PISTOL")
 	t_AssaultRifles = weapons.get_all_weapons_of_group_type("GROUP_RIFLE")

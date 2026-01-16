@@ -849,7 +849,6 @@ function GUI:ConfirmPopup(name)
 			return false
 		end
 
-		ImGui.PopTextWrapPos()
 		ImGui.EndPopup()
 	end
 

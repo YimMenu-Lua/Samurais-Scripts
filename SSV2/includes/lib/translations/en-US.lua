@@ -94,6 +94,9 @@ return {
 	["GENERIC_NOT_IN_COMBAT"]              = "You are not in combat with anyone.",
 	["GENERIC_CARS_ONLY"]                  = "This feature is only compatible with cars and trucks.",
 	["GENERIC_DISMISS"]                    = "Dismiss",
+	["GENERIC_LIST_SORT"]                  = "Sort By",
+	["GENERIC_LIST_FILTER"]                = "Filter By",
+	["GENERIC_LIST_GROUP"]                 = "Group By",
 	--#endregion
 
 	--#region CasinoPacino
@@ -520,6 +523,10 @@ return {
 	["YAV3_SCN_STOP_SPINNER"]              = "Stopping current scenario...",
 	["YAV3_STOP_BTN_HINT"]                 =
 	"TIP: You can press %s to stop playing any action or hold it for one second to cleanup everything.",
+	["YAV3_ANIM_FLAGS"]                    = "Behavior Flags", -- labelling it 'Animation Flags' breaks translations even further
+	["YAV3_DISABLE_PROPS"]                 = "Disable Props",
+	["YAV3_DISABLE_PTFX"]                  = "Disable Particle Effects",
+	["YAV3_DISABLE_SFX"]                   = "Disable Sound Effects",
 	--#endregion
 
 	--#region Flatbed

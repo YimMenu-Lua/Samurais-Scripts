@@ -19,6 +19,7 @@ local s_SearchBuffer             = ""
 local s_MovementSearchBuffer     = ""
 local s_PedSearchBuffer          = ""
 local s_SelectedFavoriteName     = ""
+local s_NewCommandBuffer         = ""
 local s_MovementClipsetsGitHub   = "https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json"
 local s_GitHubLinkColor          = "#0000EE"
 local b_DataListsSorted          = false
@@ -38,8 +39,8 @@ local i_HoveredPedModelThisFrame = nil
 local unk_SelectedCompanion      = nil
 local t_MovementClipsetsJson     = {}
 local hwnd_PedSpawnWindow        = { should_draw = false }
+local hwnd_NewCommandWindow      = { should_draw = false }
 local CompanionMgr               = YimActions.CompanionManager
-local s_SidebarTip               = _F(_T("YAV3_STOP_BTN_HINT"), GVars.keyboard_keybinds.stop_anim)
 local t_AnimSortbyList <const>   = {
 	"All",
 	"Actions",
@@ -163,6 +164,65 @@ local function BuildDataLists()
 	end)
 end
 
+local function DrawNewCommandWindow()
+	if (not t_SelectedAction) then
+		return
+	end
+
+	if (hwnd_NewCommandWindow.should_draw) then
+		local windowSize = vec2:new(400, 200)
+		local _, pos = GUI:GetNewWindowSizeAndCenterPos(0.5, 0.5, windowSize)
+		ImGui.SetNextWindowSize(420, 200)
+		ImGui.SetNextWindowPos(pos.x, pos.y, ImGuiCond.Always)
+		if (ImGui.Begin("#yav3_new_command",
+				ImGuiWindowFlags.NoMove
+				| ImGuiWindowFlags.NoResize
+				| ImGuiWindowFlags.NoTitleBar
+				| ImGuiWindowFlags.NoSavedSettings
+				| ImGuiWindowFlags.AlwaysAutoResize)
+			) then
+			ImGui.Dummy(0, 20)
+			ImGui.SetNextItemWidth(-1)
+			s_NewCommandBuffer, _ = ImGui.InputTextWithHint("##cmd",
+				"command name (ex: /sitdown)",
+				s_NewCommandBuffer,
+				64
+			)
+			Backend.disable_input = ImGui.IsItemActive()
+
+			if (not s_NewCommandBuffer:isempty()) then
+				s_NewCommandBuffer = s_NewCommandBuffer:lower():replace(" ", "_")
+			end
+
+			ImGui.Dummy(0, 40)
+
+			ImGui.BeginDisabled(s_NewCommandBuffer:isempty())
+			if (ImGui.Button(_T("GENERIC_CONFIRM"))) then
+				ThreadManager:Run(function()
+					YimActions:AddCommandAction(
+						s_NewCommandBuffer,
+						---@diagnostic disable-next-line
+						{ label = t_SelectedAction.data.label, type = t_SelectedAction.action_type }
+					)
+					s_NewCommandBuffer = ""
+				end)
+
+				hwnd_NewCommandWindow.should_draw = false
+			end
+			ImGui.EndDisabled()
+
+			ImGui.SameLine()
+
+			if (ImGui.Button(_T("GENERIC_CANCEL"))) then
+				s_NewCommandBuffer = ""
+				hwnd_NewCommandWindow.should_draw = false
+			end
+
+			ImGui.End()
+		end
+	end
+end
+
 local function DrawAnims()
 	if ImGui.BeginListBox("##animlist", -1, -1) then
 		if not b_DataListsSorted then
@@ -180,7 +240,8 @@ local function DrawAnims()
 
 				local is_selected = (i == i_SelectedAnimIndex)
 				local is_favorite = YimActions:DoesFavoriteExist("anims", action.label)
-				local label = action.label
+				local has_command = GVars.features.yim_actions.action_commands[action.label] ~= nil
+				local label       = action.label
 
 				if is_favorite then
 					label = _F("%s  [ * ]", action.label)
@@ -202,7 +263,9 @@ local function DrawAnims()
 					i_SelectedAnimIndex = i
 				end
 
-				GUI:Tooltip(_F("Right click to %s favorites.", is_favorite and "remove from" or "add to"))
+				if (not hwnd_NewCommandWindow.should_draw) then
+					GUI:Tooltip(_F("Right click for more options."))
+				end
 
 				if (is_selected) then
 					ImGui.PopStyleColor(3)
@@ -236,6 +299,18 @@ local function DrawAnims()
 						end
 					end
 
+					if (has_command) then
+						if ImGui.MenuItem("Remove Command") then
+							GUI:PlaySound("Click")
+							YimActions:RemoveCommandAction(action.label)
+						end
+					else
+						if ImGui.MenuItem("Create Command") then
+							GUI:PlaySound("Click")
+							hwnd_NewCommandWindow.should_draw = true
+						end
+					end
+
 					ImGui.EndPopup()
 				end
 
@@ -255,7 +330,8 @@ local function DrawScenarios()
 
 			local is_selected = (i_SelectedScenarioIndex == i)
 			local is_favorite = YimActions:DoesFavoriteExist("scenarios", action.label)
-			local label = action.label
+			local has_command = GVars.features.yim_actions.action_commands[action.label] ~= nil
+			local label       = action.label
 
 			if is_favorite then
 				label = _F("%s  [ * ]", action.label)
@@ -277,7 +353,9 @@ local function DrawScenarios()
 				i_SelectedScenarioIndex = i
 			end
 
-			GUI:Tooltip(_F("Right click to %s favorites.", is_favorite and "remove from" or "add to"))
+			if (not hwnd_NewCommandWindow.should_draw) then
+				GUI:Tooltip(_F("Right click for more options."))
+			end
 
 			if is_selected then
 				ImGui.PopStyleColor(3)
@@ -307,6 +385,18 @@ local function DrawScenarios()
 							action,
 							Enums.eActionType.SCENARIO
 						)
+					end
+				end
+
+				if (has_command) then
+					if ImGui.MenuItem("Remove Command") then
+						GUI:PlaySound("Click")
+						YimActions:RemoveCommandAction(action.label)
+					end
+				else
+					if ImGui.MenuItem("Create Command") then
+						GUI:PlaySound("Click")
+						hwnd_NewCommandWindow.should_draw = true
 					end
 				end
 
@@ -519,8 +609,9 @@ local function DrawActionsSidebar()
 	end
 
 	ImGui.PopStyleVar(2)
-	ImGui.SetWindowFontScale(0.7)
-	local region = vec2:new(ImGui.GetContentRegionAvail())
+	ImGui.SetWindowFontScale(0.75)
+	local region        = vec2:new(ImGui.GetContentRegionAvail())
+	local s_SidebarTip  = _F(_T("YAV3_STOP_BTN_HINT"), GVars.keyboard_keybinds.stop_anim)
 	local _, textHeight = ImGui.CalcTextSize(s_SidebarTip, false, region.x)
 	ImGui.SetCursorPos(0.0, ImGui.GetCursorPosY() + region.y - textHeight - 10)
 	ImGui.TextWrapped(s_SidebarTip)
@@ -542,46 +633,70 @@ end
 local function DrawAnimOptions()
 	ImGui.BeginDisabled(not t_SelectedAction)
 	ImGui.SetNextItemWidth(120)
-	i_AnimSortByIndex, _ = ImGui.Combo("Category", i_AnimSortByIndex, t_AnimSortbyList, #t_AnimSortbyList)
-
-	ImGui.SameLine()
+	i_AnimSortByIndex, _ = ImGui.Combo(_T("GENERIC_LIST_FILTER"), i_AnimSortByIndex, t_AnimSortbyList, #t_AnimSortbyList)
 
 	if (s_CurrentTab ~= "companion_anims") then
-		if (GUI:Button("Edit Flags")) then
+		local opts_lbl = _T("GENERIC_OPTIONS_LABEL")
+		local opts_lbl_width = ImGui.CalcTextSize(opts_lbl)
+		local style = ImGui.GetStyle()
+		local padding = style.FramePadding.x * 2
+		local opts_button_width = opts_lbl_width + padding + style.WindowPadding.x
+		ImGui.SameLine()
+		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - opts_button_width)
+
+		if (GUI:Button(_T("GENERIC_OPTIONS_LABEL"))) then
 			ImGui.OpenPopup("##animflags")
 		end
-	end
 
-	ImGui.EndDisabled()
+		ImGui.EndDisabled()
 
-	if (t_SelectedAction and ImGui.BeginPopupModal("##animflags", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize)) then
-		GUI:QuickConfigWindow("Animation Flags", function()
-			ImGui.SetNextWindowBgAlpha(0)
-			ImGui.BeginChild("##flagsChild", 500, 300)
-			ImGui.Columns(2)
-			ImGui.SetColumnWidth(0, 250)
-			for name, flag in pairs(t_AnimFlags) do
-				ImGui.PushID(_F("##flag_%s", name))
-				flag.enabled, flag.wasClicked = ImGui.Checkbox(flag.label,
-					Bit.is_set(t_SelectedAction.data.flags, flag.bit))
-				ImGui.PopID()
+		if (t_SelectedAction and ImGui.BeginPopupModal("##animflags",
+				ImGuiWindowFlags.NoTitleBar
+				| ImGuiWindowFlags.AlwaysAutoResize)
+			) then
+			GUI:QuickConfigWindow(opts_lbl, function()
+				ImGui.SetNextWindowBgAlpha(0)
+				ImGui.BeginChild("##flagsChild", 500, 400)
+				ImGui.SeparatorText(_T("GENERIC_GENERAL_LABEL"))
+				GVars.features.yim_actions.disable_props, _ = GUI:Checkbox(_T("YAV3_DISABLE_PROPS"),
+					GVars.features.yim_actions.disable_props
+				)
 
-				if (flag.bit == Enums.eAnimFlags.ENDS_IN_DEAD_POSE) then
-					GUI:Tooltip("This will not do anything if the animation is looped.")
+				GVars.features.yim_actions.disable_ptfx, _ = GUI:Checkbox(_T("YAV3_DISABLE_PTFX"),
+					GVars.features.yim_actions.disable_ptfx
+				)
+
+				GVars.features.yim_actions.disable_sfx, _ = GUI:Checkbox(_T("YAV3_DISABLE_SFX"),
+					GVars.features.yim_actions.disable_sfx
+				)
+
+				ImGui.Spacing()
+				ImGui.SeparatorText(_T("YAV3_ANIM_FLAGS"))
+				ImGui.Columns(2)
+				ImGui.SetColumnWidth(0, 250)
+				for name, flag in pairs(t_AnimFlags) do
+					ImGui.PushID(_F("##flag_%s", name))
+					flag.enabled, flag.wasClicked = ImGui.Checkbox(flag.label,
+						Bit.is_set(t_SelectedAction.data.flags, flag.bit))
+					ImGui.PopID()
+
+					if (flag.bit == Enums.eAnimFlags.ENDS_IN_DEAD_POSE) then
+						GUI:Tooltip("This will not do anything if the animation is looped.")
+					end
+
+					ImGui.NextColumn()
+
+					if flag.wasClicked then
+						GUI:PlaySound("Nav")
+						local bitwiseOp = flag.enabled and Bit.set or Bit.clear
+						t_SelectedAction.data.flags = bitwiseOp(t_SelectedAction.data.flags, flag.bit)
+					end
 				end
-
-				ImGui.NextColumn()
-
-				if flag.wasClicked then
-					GUI:PlaySound("Nav")
-					local bitwiseOp = flag.enabled and Bit.set or Bit.clear
-					t_SelectedAction.data.flags = bitwiseOp(t_SelectedAction.data.flags, flag.bit)
-				end
-			end
-			ImGui.Columns(0)
-			ImGui.EndChild()
-		end, ImGui.CloseCurrentPopup)
-		ImGui.EndPopup()
+				ImGui.Columns(0)
+				ImGui.EndChild()
+			end, ImGui.CloseCurrentPopup)
+			ImGui.EndPopup()
+		end
 	end
 end
 
@@ -599,7 +714,7 @@ local function DrawPlayerTabItem()
 			s_SearchBuffer,
 			128
 		)
-		Backend.disable_input = ImGui.IsItemActive()
+		Backend.disable_input = ImGui.IsItemActive() and not hwnd_NewCommandWindow.should_draw
 	end
 
 	DrawSidebarItems()
@@ -757,7 +872,7 @@ local function DrawCustomMovementClipsets()
 						"clipsets",
 						t_MovementClipsets[i].Name,
 						t_MovementClipsets[i],
-						Enums.eActionType.UNK
+						Enums.eActionType.CLIPSET
 					)
 				end
 			end
@@ -864,7 +979,7 @@ local function DrawJsonMovementClipsets()
 							"clipsets",
 							t_MovementClipsetsJson[i].Name,
 							t_MovementClipsetsJson[i],
-							Enums.eActionType.UNK
+							Enums.eActionType.CLIPSET
 						)
 					end
 				end
@@ -1210,7 +1325,6 @@ local function DrawCompanions()
 	ImGui.EndChild()
 end
 
-local b_PedSearch_used = false
 local function DrawPedSpawnWindow()
 	if hwnd_PedSpawnWindow.should_draw then
 		ImGui.Begin(
@@ -1317,6 +1431,7 @@ local function DrawPedSpawnWindow()
 end
 
 local function YAV3UI()
+	ImGui.BeginDisabled(hwnd_NewCommandWindow.should_draw)
 	if ImGui.BeginTabBar("yimactionsv3") then
 		if ImGui.BeginTabItem("Actions") then
 			s_CurrentTab = "main_actions"
@@ -1351,6 +1466,9 @@ local function YAV3UI()
 		OnTabItemSwitch()
 		ImGui.EndTabBar()
 	end
+	ImGui.EndDisabled()
+
+	DrawNewCommandWindow()
 end
 
 GUI:RegisterNewTab(Enums.eTabID.TAB_EXTRA, "YimActions", YAV3UI)

@@ -14,15 +14,17 @@ INT_SIZES = {
 	uint64_t = 0x8,
 }
 
-Bit = require("includes.modules.Bit")
-Cast = require("includes.modules.Cast")
-Time = require("includes.modules.Time")
 
+Bit   = require("includes.modules.Bit")
+Cast  = require("includes.modules.Cast")
+Time  = require("includes.modules.Time")
 Timer = Time.Timer
+
+
 TimePoint = Time.TimePoint
-yield = coroutine.yield
-sleep = Time.sleep
-_F = string.format
+yield     = coroutine.yield
+sleep     = Time.sleep
+_F        = string.format
 
 
 --#region Global functions
@@ -367,6 +369,8 @@ end
 
 --#region extensions
 
+--#region YimMenu
+
 -- Equality comparator for pointer objects.
 ---@type Comparator<pointer, pointer>
 function memory.pointer:__eq(right)
@@ -504,7 +508,11 @@ function memory.pointer:create_pattern(size)
 	return table.concat(out, " ")
 end
 
+--#endregion
+
 -- stdlib --
+
+--#region tablib
 
 ---@param t table
 ---@param key string|number
@@ -970,6 +978,10 @@ function table.clear(t)
 	end
 end
 
+--#endregion
+
+--#region stringlib
+
 -- Generates a random string.
 ---@param length? number
 ---@param isalnum? boolean Alphanumeric
@@ -1235,22 +1247,32 @@ string.formatmoney = function(value, currency)
 	return "$" .. string.formatint(value)
 end
 
-string.hex2string = function(hex)
-	return (hex:gsub("%x%x", function(digits)
+---@param str string
+string.hex2string = function(str)
+	return (str:gsub("%x%x", function(digits)
 		return string.char(tonumber(digits, 16))
 	end))
 end
 
+---@param str string
 string.hex = function(str)
 	return (str:gsub(".", function(char)
 		return string.format("%02x", char:byte())
 	end))
 end
 
+--#endregion
+
+--#region mathlib
+
+---@param n number
+---@param x number
+---@return number
 math.round = function(n, x)
-	return tonumber(string.format("%." .. (x or 0) .. "f", n))
+	return tonumber(string.format("%." .. (x or 0) .. "f", n)) or 0
 end
 
+---@param ... any
 ---@return number
 math.sum = function(...)
 	local result = 0
@@ -1361,5 +1383,7 @@ end
 function math.smooth_step(x)
 	return x * x * (3 - 2 * x)
 end
+
+--#endregion
 
 --#endregion

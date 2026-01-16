@@ -5,7 +5,7 @@ local FeatureBase                  = require("includes.modules.FeatureBase")
 ---@class PublicEnemy : FeatureBase
 ---@field private m_last_scan_time Time.TimePoint
 ---@field private m_last_task_time Time.TimePoint
----@field private m_hotile_peds Set<handle>
+---@field private m_hostile_peds Set<handle>
 ---@field private m_hostile_count number
 ---@field private m_last_hostile_count number
 ---@field private m_max_count number
@@ -25,7 +25,10 @@ local t_PEcombatAttributes <const> = {
 	{ flag = 58, val = true },
 	{ flag = 71, val = true },
 	{ flag = 17, val = false },
-	{ flag = 63, val = false },
+
+	-- BF_FleesFromInvincibleOpponents: for some reason touching this flag in any way
+	-- always makes the npcs run from you when you're in god mode
+	-- { flag = 63, val = false },
 }
 
 local t_PEconfigFlags <const>      = {
@@ -47,7 +50,7 @@ end
 
 function PublicEnemy:Init()
 	self.m_enabled            = false
-	self.m_hotile_peds        = Set.new()
+	self.m_hostile_peds       = Set.new()
 	self.m_last_scan_time     = TimePoint.new()
 	self.m_last_task_time     = TimePoint.new()
 	self.m_hostile_count      = 0
@@ -62,11 +65,11 @@ function PublicEnemy:ShouldRun()
 end
 
 function PublicEnemy:Cleanup()
-	if (self.m_hotile_peds:IsEmpty()) then
+	if (self.m_hostile_peds:IsEmpty()) then
 		return
 	end
 
-	for ped in self.m_hotile_peds:Iter() do
+	for ped in self.m_hostile_peds:Iter() do
 		self:TogglePedConfig(ped, false)
 	end
 end
@@ -105,17 +108,17 @@ function PublicEnemy:UpdateHostileSet()
 				and not PED.IS_PED_A_PLAYER(ped)
 				and not PED.IS_PED_GROUP_MEMBER(ped, Self:GetGroupIndex())
 				and not Backend:IsScriptEntity(ped)
-				and not self.m_hotile_peds:Contains(ped)
+				and not self.m_hostile_peds:Contains(ped)
 			) then
 			self:TogglePedConfig(ped, true)
-			self.m_hotile_peds:Push(ped)
+			self.m_hostile_peds:Push(ped)
 		end
 
 		yield()
 	end
 
 	self.m_last_scan_time:reset()
-	self.m_hostile_count = self.m_hotile_peds:Size()
+	self.m_hostile_count = self.m_hostile_peds:Size()
 end
 
 function PublicEnemy:TaskCombat()
@@ -123,7 +126,7 @@ function PublicEnemy:TaskCombat()
 		return
 	end
 
-	if (self.m_hotile_peds:IsEmpty()) then
+	if (self.m_hostile_peds:IsEmpty()) then
 		return
 	end
 
@@ -133,7 +136,7 @@ function PublicEnemy:TaskCombat()
 
 	local trash = {}
 	local playerHandle = Self:GetHandle()
-	for ped in self.m_hotile_peds:Iter() do
+	for ped in self.m_hostile_peds:Iter() do
 		local pedPos = Game.GetEntityCoords(ped, true)
 		if (not ENTITY.DOES_ENTITY_EXIST(ped) or ENTITY.IS_ENTITY_DEAD(ped, true) or Self:GetPos():distance(pedPos) > 200) then
 			table.insert(trash, ped)
@@ -149,12 +152,12 @@ function PublicEnemy:TaskCombat()
 	end
 
 	for _, ped in ipairs(trash) do
-		if self.m_hotile_peds:Contains(ped) then
-			self.m_hotile_peds:Pop(ped)
+		if self.m_hostile_peds:Contains(ped) then
+			self.m_hostile_peds:Pop(ped)
 		end
 	end
 
-	self.m_hostile_count      = self.m_hotile_peds:Size()
+	self.m_hostile_count      = self.m_hostile_peds:Size()
 	self.m_last_hostile_count = self.m_hostile_count
 	self.m_last_task_time:reset()
 end
@@ -163,11 +166,11 @@ function PublicEnemy:Update()
 	self:UpdateHostileSet()
 	self:TaskCombat()
 
-	if (self.m_hotile_peds:IsEmpty()) then
+	if (self.m_hostile_peds:IsEmpty()) then
 		return
 	end
 
-	for ped in self.m_hotile_peds:Iter() do
+	for ped in self.m_hostile_peds:Iter() do
 		PED.SET_PED_RESET_FLAG(ped, Enums.ePedResetFlags.IgnoreCombatManager, true) -- so they can all gang up on you and beat your ass without waiting for their turns
 	end
 end

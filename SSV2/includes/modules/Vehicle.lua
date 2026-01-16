@@ -1512,19 +1512,19 @@ function Vehicle:Wander(opts)
 end
 
 function Vehicle:RamForward()
-	if not self:IsValid()
-		or not self:IsCar()
-		or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())
-	then
+	if (not self:IsValid()
+			or not self:IsCar()
+			or not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self:GetHandle())
+		) then
+		return
+	end
+
+	self.m_last_ram_time = self.m_last_ram_time or 0
+	if (Time.now() - self.m_last_ram_time < 3) then
 		return
 	end
 
 	ThreadManager:Run(function()
-		self.m_last_ram_time = self.m_last_ram_time or 0
-		if (Time.now() - self.m_last_ram_time < 3) then
-			return
-		end
-
 		local last_speed = self:GetSpeed()
 		ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
 			self:GetHandle(),
@@ -1539,7 +1539,9 @@ function Vehicle:RamForward()
 		)
 
 		sleep(500)
-		VEHICLE.SET_VEHICLE_FORWARD_SPEED(self:GetHandle(), last_speed)
+		if (not ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(self:GetHandle())) then
+			VEHICLE.SET_VEHICLE_FORWARD_SPEED(self:GetHandle(), last_speed)
+		end
 		self.m_last_ram_time = Time.now()
 	end)
 end

@@ -1,5 +1,8 @@
 local SceneManager     = require("includes.services.SceneManager")
 local CompanionManager = require("includes.services.CompanionManager")
+local t_AnimList       = require("includes.data.actions.animations")
+local t_PedScenarios   = require("includes.data.actions.scenarios")
+local Action           = require("includes.structs.Action")
 
 ---@alias ActionCategory
 --- | "anims"
@@ -7,26 +10,31 @@ local CompanionManager = require("includes.services.CompanionManager")
 --- | "scenes"
 --- | "clipsets"
 
+
 -----------------------------------------------------
 -- YimActions V3
 -----------------------------------------------------
 -- Wompus Theater™
 ---@class YimActions
+---@field protected m_initialized boolean
 ---@field CurrentlyPlaying table<handle, Action>
 ---@field LastPlayed Action[]
 ---@field CompanionManager CompanionManager
 ---@field SceneManager SceneManager
-local YimActions       = {
-	CompanionManager = CompanionManager.new(),
-	SceneManager     = SceneManager,
-	CurrentlyPlaying = {},
-	LastPlayed       = {}
-}
-YimActions.__index     = YimActions
-
+local YimActions   = {}
+YimActions.__index = YimActions
 
 ---@return YimActions
 function YimActions:init()
+	if (self.m_initialized) then
+		return self
+	end
+
+	self.CompanionManager = CompanionManager.new()
+	self.SceneManager     = SceneManager
+	self.CurrentlyPlaying = {}
+	self.LastPlayed       = {}
+
 	Backend:RegisterEventCallbackAll(function()
 		self:ForceCleanup()
 	end)
@@ -35,6 +43,7 @@ function YimActions:init()
 		self:MainThread()
 	end)
 
+	self.m_initialized = true
 	return self
 end
 
@@ -137,7 +146,6 @@ end
 function YimActions:WasActionInterrupted(ped)
 	ped = self:GetPed(ped)
 	local current = self.CurrentlyPlaying[ped]
-
 	if (not current) then
 		return false
 	end
@@ -146,16 +154,48 @@ function YimActions:WasActionInterrupted(ped)
 		return not ENTITY.IS_ENTITY_PLAYING_ANIM(ped, current.data.dict, current.data.name, -1)
 	elseif (current.action_type == Enums.eActionType.SCENARIO) then
 		return not PED.IS_PED_USING_ANY_SCENARIO(ped)
-	else
+	elseif (current.action_type == Enums.eActionType.SCENE) then
 		return self.SceneManager:IsPlaying()
+	else
+		return false
 	end
+end
+
+---@param animData AnimData
+---@param targetPed handle
+---@return boolean
+function YimActions:InitInVehicleAnim(animData, targetPed)
+	if (PED.IS_PED_ON_FOOT(targetPed)) then
+		Notifier:ShowError("YimActions", "This action can not be played on foot. Ped must be in a vehicle.", false, 5)
+		return false
+	end
+
+	local veh = Self:GetVehicleNative()
+	if (veh == 0) then -- should never happen
+		return false
+	end
+
+	local seat = Self:GetVehicleSeat()
+	if (not seat or seat > 2) then
+		return true
+	end
+
+	if (animData.label:find("Race Taunt") and seat == -1) then
+		VEHICLE.ROLL_DOWN_WINDOW(veh, 0)
+	elseif (animData.label:match("Lean.+%(in%-car%)")) then
+		VEHICLE.ROLL_DOWN_WINDOW(veh, seat + 1)
+	end
+
+	return true
 end
 
 ---@param animData AnimData
 ---@param targetPed? handle
 function YimActions:PlayAnim(animData, targetPed)
-	if not targetPed then
-		targetPed = Self:GetHandle()
+	targetPed = self:GetPed(targetPed)
+
+	if (animData.category == "In-Vehicle" and not self:InitInVehicleAnim(animData, targetPed)) then
+		return
 	end
 
 	Await(Game.RequestAnimDict, animData.dict)
@@ -172,17 +212,20 @@ function YimActions:PlayAnim(animData, targetPed)
 		false,
 		false
 	)
+
 	self:AddActionToRecents(targetPed)
 
-	if (animData.props and #animData.props > 0) then
-		YimActions.PropManager:AttachProp(targetPed, animData.props)
+	if (not GVars.features.yim_actions.disable_props) then
+		if (animData.props and #animData.props > 0) then
+			YimActions.PropManager:AttachProp(targetPed, animData.props)
+		end
+
+		if (animData.propPeds and #animData.propPeds > 0) then
+			YimActions.PropManager:AttachProp(targetPed, animData.propPeds, true)
+		end
 	end
 
-	if (animData.propPeds and #animData.propPeds > 0) then
-		YimActions.PropManager:AttachProp(targetPed, animData.propPeds, true)
-	end
-
-	if animData.ptfx and animData.ptfx.name then
+	if (not GVars.features.yim_actions.disable_ptfx and animData.ptfx and animData.ptfx.name) then
 		YimActions.FXManager:StartPTFX(targetPed, animData.ptfx)
 	end
 
@@ -351,17 +394,12 @@ function YimActions:OnInterruptEvent()
 		return
 	end
 
-	local isLooped
-	local isFrozen
+	local isLooped, isFrozen = false, false
 	if (current.action_type == Enums.eActionType.ANIM) then
 		isLooped = Bit.is_set(current.data.flags, Enums.eAnimFlags.LOOPING)
 		isFrozen = Bit.is_set(current.data.flags, Enums.eAnimFlags.HOLD_LAST_FRAME)
 	elseif (current.action_type == Enums.eActionType.SCENARIO) then
-		isLooped = true
-		isFrozen = true
-	else
-		isLooped = false
-		isFrozen = false
+		isLooped, isFrozen = true, true
 	end
 
 	if (not isLooped and not isFrozen) then
@@ -399,6 +437,209 @@ function YimActions:OnInterruptEvent()
 	end
 end
 
+function YimActions:RegisterCommands()
+	if (next(GVars.features.yim_actions.action_commands) == nil) then
+		return
+	end
+
+	local failed = {}
+	for label, data in pairs(GVars.features.yim_actions.action_commands) do
+		local action = self:FindActionByStrID(data.type, label)
+		if (not action) then
+			table.insert(failed, data.command)
+			goto continue
+		end
+
+		CommandExecutor:RegisterCommand(data.command,
+			function(_)
+				ThreadManager:Run(function()
+					self:Play(action)
+				end)
+			end,
+			{ description = _F("YimActions Command: Plays the '%s' %s", label, action:TypeAsString()) }
+		)
+
+		::continue::
+	end
+
+	if (#failed > 0) then
+		Notifier:ShowError(
+			"YimActions",
+			"Some commands were not registered (no matching action). Dumping to console..."
+		)
+
+		log.fdebug("Failed commands:\n\t%s", table.concat(failed, "\n"))
+	end
+end
+
+---@param cmd_name string
+---@param data { type: eActionType, label: string, is_json?: boolean }
+function YimActions:AddCommandAction(cmd_name, data)
+	if ((type(cmd_name) ~= "string") or cmd_name:isnullorwhitespace() or cmd_name:isempty()) then
+		Notifier:ShowError("YimActions", "Invalid command name.")
+		return
+	end
+
+	if (not data or not data.type or data.type == Enums.eActionType.UNK or data.type > Enums.eActionType.SCENARIO) then
+		Notifier:ShowError("YimActions", "Invalid action data")
+		Backend:debug("command data: %s", table.serialize(data))
+		return
+	end
+
+	if (GVars.features.yim_actions.action_commands[data.label] or CommandExecutor:DoesCommandExist(cmd_name)) then
+		Notifier:ShowError("YimActions", _F("Command '%s' already exists", data))
+		return
+	end
+
+	local action = self:FindActionByStrID(data.type, data.label)
+	if (not action) then
+		Notifier:ShowError("YimActions", _F("Could not match an action to ID: '%s'", data.label))
+		return
+	end
+
+	GVars.features.yim_actions.action_commands[data.label] = {
+		type    = data.type,
+		command = cmd_name,
+		is_json = false, -- debug flag. unused
+	}
+
+	local typename = action:TypeAsString():lower()
+	CommandExecutor:RegisterCommand(cmd_name,
+		function(_)
+			ThreadManager:Run(function()
+				self:Play(action)
+			end)
+		end,
+		{ description = _F("YimActions Command: Plays the '%s' %s.", data.label, typename) }
+	)
+
+	Notifier:ShowSuccess("YimActions", _F("New %s command successfully registered: '%s'", typename, cmd_name))
+end
+
+---@param action_label string
+function YimActions:RemoveCommandAction(action_label)
+	if (not GVars.features.yim_actions.action_commands[action_label]) then
+		return
+	end
+
+	local cmd = GVars.features.yim_actions.action_commands[action_label].command
+	GVars.features.yim_actions.action_commands[action_label] = nil
+	CommandExecutor:RemoveCommand(cmd)
+	Notifier:ShowMessage("YimActions", _F("Action command '%s' removed.", cmd))
+end
+
+---@param action_type eActionType
+---@param id string
+---@return Action?
+function YimActions:FindActionByStrID(action_type, id)
+	---@type AnimData|ScenarioData?
+	local lookup_array = Switch(action_type) {
+		[Enums.eActionType.ANIM]     = t_AnimList,
+		[Enums.eActionType.SCENARIO] = t_PedScenarios,
+		default                      = nil
+	}
+
+	if (not lookup_array) then
+		return nil
+	end
+
+	for _, data in ipairs(lookup_array) do
+		if (data.label == id) then
+			return Action.new(data, action_type)
+		end
+	end
+
+	return nil
+end
+
+function YimActions:DrawPoliceTorchLight()
+	local playerProps = YimActions.PropManager.Props[Self:GetHandle()]
+	if (not playerProps) then
+		return
+	end
+
+	local torch = playerProps[1]
+	if not (torch and ENTITY.DOES_ENTITY_EXIST(torch) and (Game.GetEntityModel(torch) == 211760048)) then
+		return
+	end
+
+	local torchPos = Game.GetEntityCoords(torch, false)
+	local torchFwd = (Game.GetForwardVector(torch)):inverse(true)
+	GRAPHICS.DRAW_SPOT_LIGHT(
+		torchPos.x,
+		torchPos.y,
+		torchPos.z - 0.2,
+		torchFwd.x,
+		torchFwd.y,
+		torchFwd.z,
+		226,
+		130,
+		78,
+		50.0,
+		8.0,
+		1.0,
+		10.0,
+		1.0
+	)
+end
+
+function YimActions:GoofyUnaliveAnim()
+	local ped = Self:GetHandle()
+	if (not ENTITY.IS_ENTITY_PLAYING_ANIM(ped, "mp_suicide", "pistol", 3) or ENTITY.GET_ENTITY_ANIM_CURRENT_TIME(ped, "mp_suicide", "pistol") > 0.299) then
+		return
+	end
+
+	ThreadManager:Run(function()
+		local current  = Self:GetCurrentWeaponHash()
+		local is_armed = false
+		if (current ~= 0 and WEAPON.GET_WEAPONTYPE_GROUP(current) ~= joaat("GROUP_PISTOL")) then
+			is_armed = true
+		else
+			for _, w in ipairs(t_Handguns) do
+				local pistol = joaat(w)
+				if (WEAPON.HAS_PED_GOT_WEAPON(ped, pistol, false)) then
+					WEAPON.SET_CURRENT_PED_WEAPON(ped, pistol, true)
+					is_armed = true
+					break
+				end
+			end
+		end
+
+		PED.SET_PED_CAN_SWITCH_WEAPON(ped, false)
+
+		while (ENTITY.GET_ENTITY_ANIM_CURRENT_TIME(ped, "mp_suicide", "pistol") < 0.299) do
+			yield()
+		end
+
+		if (is_armed) then
+			PED.SET_PED_SHOOTS_AT_COORD(ped, 0.0, 0.0, 0.0, false)
+		end
+
+		PED.SET_PED_CAN_SWITCH_WEAPON(ped, true)
+	end)
+end
+
+function YimActions:HandleCleanupKeybind()
+	if (KeyManager:IsKeybindJustPressed("stop_anim")) then
+		ThreadManager:Run(function()
+			local timer = Timer.new(1000)
+			while (KeyManager:IsKeybindPressed("stop_anim")) do
+				if (timer:is_done()) then
+					GUI:PlaySound(GUI.Sounds.Cancel)
+					self:ForceCleanup()
+					self:ResetPlayer()
+					return
+				end
+
+				yield()
+			end
+
+			GUI:PlaySound(GUI.Sounds.Button)
+			self:Cleanup()
+		end)
+	end
+end
+
 function YimActions:MainThread()
 	if (next(self.CurrentlyPlaying) == nil)
 		and (next(self.PropManager.Props) == nil)
@@ -407,74 +648,32 @@ function YimActions:MainThread()
 		return
 	end
 
-	local ped = Self:GetHandle()
-	if (KeyManager:IsKeybindPressed("stop_anim")) then
-		local timer = Timer.new(1000)
-		while not (timer:is_done()) do
-			if (not KeyManager:IsKeybindPressed("stop_anim")) then
-				self:Cleanup(ped)
-				break
-			end
+	self:HandleCleanupKeybind()
 
-			yield()
-		end
-
-		GUI:PlaySound(GUI.Sounds.Cancel)
-		self:ForceCleanup()
-		self:ResetPlayer()
-	end
-
+	local ped     = Self:GetHandle()
 	local current = self.CurrentlyPlaying[ped]
 	if (not current) then
 		return
 	end
 
 	if (current.action_type == Enums.eActionType.ANIM) then
-		if (string.find(string.lower(current.data.label), "police torch")) then
-			local torch = YimActions.PropManager.Props[ped][1]
-			if (ENTITY.DOES_ENTITY_EXIST(torch) and (Game.GetEntityModel(torch) == 211760048)) then
-				local torchPos = Game.GetEntityCoords(torch, false)
-				local torchFwd = (Game.GetForwardVector(torch)):inverse()
-				GRAPHICS.DRAW_SPOT_LIGHT(
-					torchPos.x,
-					torchPos.y,
-					torchPos.z - 0.2,
-					torchFwd.x,
-					torchFwd.y,
-					torchFwd.z,
-					226,
-					130,
-					78,
-					50.0,
-					8.0,
-					1.0,
-					10.0,
-					1.0
-				)
+		if (current.data.category == "In-Vehicle" and (Self:IsOnFoot() or PAD.IS_CONTROL_PRESSED(0, 75) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 75))) then
+			self:Cleanup()
+			return
+		end
+
+		if (not GVars.features.yim_actions.disable_ptfx and not GVars.features.yim_actions.disable_props) then
+			if (current.data.label and current.data.label:lower():find("police torch")) then
+				self:DrawPoliceTorchLight()
 			end
 		end
 
 		-- this is very stupid but it works... kinda.
-		if (ENTITY.IS_ENTITY_PLAYING_ANIM(ped, "mp_suicide", "pistol", 3) and #t_Handguns > 0) then
-			for _, w in ipairs(weapons.get_all_weapons_of_group_type(416676503)) do
-				if (WEAPON.HAS_PED_GOT_WEAPON(ped, joaat(w), false)) then
-					WEAPON.SET_CURRENT_PED_WEAPON(ped, joaat(w), true)
-					break
-				end
-			end
-
-			local animTime = 0
-			repeat
-				animTime = ENTITY.GET_ENTITY_ANIM_CURRENT_TIME(ped, "mp_suicide", "pistol")
-				sleep(1)
-			until animTime >= 0.299
-			AUDIO.PLAY_SOUND_FRONTEND(-1, "SNIPER_FIRE", "DLC_BIKER_RESUPPLY_MEET_CONTACT_SOUNDS", true)
-			repeat
-				sleep(10)
-			until not ENTITY.IS_ENTITY_PLAYING_ANIM(ped, "mp_suicide", "pistol", 3)
+		if (ENTITY.IS_ENTITY_PLAYING_ANIM(ped, "mp_suicide", "pistol", 3) and t_Handguns and #t_Handguns > 0) then
+			self:GoofyUnaliveAnim()
 		end
 
-		if current.data.sfx then
+		if (current.data.sfx and not GVars.features.yim_actions.disable_sfx) then
 			self.FXManager:StartSFX()
 		end
 	end

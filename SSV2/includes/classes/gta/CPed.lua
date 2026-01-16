@@ -1,11 +1,11 @@
 ---@diagnostic disable: param-type-mismatch
 
-local CEntity     = require("includes.classes.CEntity")
-local CPlayerInfo = require("includes.classes.CPlayerInfo")
+local CEntity           = require("includes.classes.gta.CEntity")
+local CPlayerInfo       = require("includes.classes.gta.CPlayerInfo")
+local CPedWeaponManager = require("includes.classes.gta.CPedWeaponManager")
 
 ---@class CPedIntelligence
 ---@class CPedInventory
----@class CPedWeaponManager
 
 --------------------------------------
 -- Class: CPed
@@ -15,7 +15,7 @@ local CPlayerInfo = require("includes.classes.CPlayerInfo")
 ---@field private m_ptr pointer
 ---@field m_ped_intelligence pointer<CPedIntelligence>
 ---@field m_ped_inventory pointer<CPedInventory>
----@field m_ped_weapon_mgr pointer<CPedWeaponManager>
+---@field m_ped_weapon_mgr CPedWeaponManager
 ---@field m_player_info? CPlayerInfo
 ---@field m_velocity pointer<vec3>
 ---@field m_ped_type pointer<uint8_t>
@@ -23,13 +23,13 @@ local CPlayerInfo = require("includes.classes.CPlayerInfo")
 ---@field m_seatbelt pointer<uint8_t>
 ---@field m_armor pointer<float>
 ---@field m_cash pointer<uint16_t> // 0x1614
----@overload fun(ped: handle): CPed|nil
-local CPed        = Class("CPed", CEntity, 0x161C)
+---@overload fun(ped: handle): CPed
+local CPed              = Class("CPed", CEntity, 0x161C)
 
 ---@param ped handle
 ---@return CPed
 function CPed:init(ped)
-	if not ENTITY.DOES_ENTITY_EXIST(ped) or not ENTITY.IS_ENTITY_A_PED(ped) then
+	if (not ENTITY.DOES_ENTITY_EXIST(ped) or not ENTITY.IS_ENTITY_A_PED(ped)) then
 		error("Invalid entity!")
 	end
 
@@ -41,7 +41,7 @@ function CPed:init(ped)
 	instance.m_ptr = ptr
 	instance.m_ped_intelligence = ptr:add(0x10A0)
 	instance.m_ped_inventory = ptr:add(0x10B0)
-	instance.m_ped_weapon_mgr = ptr:add(0x10B8)
+	instance.m_ped_weapon_mgr = CPedWeaponManager(ptr:add(0x10B8))
 	instance.m_velocity = ptr:add(0x0300)
 	instance.m_ped_type = ptr:add(0x1098)
 	instance.m_ped_task_flag = ptr:add(0x144B)

@@ -523,5 +523,12 @@ return {
 	["VEH_LOCKED"] = "Pojazd zablokowany.",
 	["VEH_STANCE_BOUNCE_MODE"] = "Tryb odbijania",
 	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "Tryb Bounce jest dostępny tylko dla SUV-ów.",
-	["VEH_STANCE_BOUNCE_MODE_TT"] = "Tylko SUV-y.\n\nSprawia, że ​​Twój pojazd podskakuje w górę i w dół, podobnie jak funkcja „E-Active Body Control” w Mercedes-Benz GLE."
+	["VEH_STANCE_BOUNCE_MODE_TT"] = "Tylko SUV-y.\n\nSprawia, że ​​Twój pojazd podskakuje w górę i w dół, podobnie jak funkcja „E-Active Body Control” w Mercedes-Benz GLE.",
+	["GENERIC_LIST_FILTER"] = "Filtruj według",
+	["GENERIC_LIST_SORT"] = "Sortuj według",
+	["YAV3_DISABLE_SFX"] = "Wyłącz efekty dźwiękowe",
+	["YAV3_ANIM_FLAGS"] = "Flagi zachowań",
+	["YAV3_DISABLE_PROPS"] = "Wyłącz rekwizyty",
+	["YAV3_DISABLE_PTFX"] = "Wyłącz efekty cząsteczkowe",
+	["GENERIC_LIST_GROUP"] = "Grupuj według"
 }

@@ -1,6 +1,6 @@
 ---@diagnostic disable: param-type-mismatch
 
-local fwDrawData = require("includes.classes.fwDrawData")
+local fwDrawData = require("includes.classes.gta.fwDrawData")
 
 ---@ignore
 ---@class CBaseModelInfo : GenericClass
@@ -28,7 +28,7 @@ local CAttackers = GenericClass
 ---@field m_hostility pointer<uint8_t> -- 0x018C
 ---@field m_health pointer<float> -- 0x0280
 ---@field m_max_health pointer<float> -- 0x0284
----@field m_max_attackers pointer<CAttackers> -- 0x0288
+---@field m_attackers pointer<CAttackers> -- 0x0288
 ---@overload fun(entity: handle): CEntity
 local CEntity = Class("CEntity", nil, 0x290)
 
@@ -53,7 +53,7 @@ function CEntity:init(entity)
 	instance.m_hostility             = ptr:add(0x018C)
 	instance.m_health                = ptr:add(0x0280)
 	instance.m_max_health            = ptr:add(0x0284)
-	instance.m_max_attackers         = ptr:add(0x0288)
+	instance.m_attackers             = ptr:add(0x0288):deref()
 
 	return instance
 end

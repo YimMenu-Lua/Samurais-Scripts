@@ -244,7 +244,7 @@ function DriftMinigame:OnTick()
 		self.m_streak_text = _T("VEH_DRIFT_MINIGAME_BANKED_PTS")
 
 		if (not Game.IsOnline() and self.m_points > 100) then
-			self:BankDriftPoints_SP(math.round(self.m_points / 10))
+			self:BankDriftPoints_SP(math.floor(self.m_points / 10))
 		end
 
 		if (self.m_points > self.m_player_best) then

@@ -523,5 +523,12 @@ return {
 	["VEH_UNLOCKED"] = "Veicolo sbloccato.",
 	["VEH_STANCE_BOUNCE_MODE_TT"] = "Solo SUV.\n\nFa rimbalzare il tuo veicolo su e giù, in modo simile alla funzione \"E-Active Body Control\" della Mercedes-Benz GLE.",
 	["VEH_STANCE_BOUNCE_MODE"] = "Modalità rimbalzo",
-	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "La modalità rimbalzo è disponibile solo per i SUV."
+	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "La modalità rimbalzo è disponibile solo per i SUV.",
+	["GENERIC_LIST_SORT"] = "Ordina per",
+	["YAV3_ANIM_FLAGS"] = "Flag di comportamento",
+	["YAV3_DISABLE_PROPS"] = "Disabilita oggetti di scena",
+	["YAV3_DISABLE_PTFX"] = "Disabilita gli effetti particellari",
+	["YAV3_DISABLE_SFX"] = "Disattiva gli effetti sonori",
+	["GENERIC_LIST_FILTER"] = "Filtra per",
+	["GENERIC_LIST_GROUP"] = "Raggruppa per"
 }

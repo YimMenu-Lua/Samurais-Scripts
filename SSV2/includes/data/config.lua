@@ -399,6 +399,9 @@ local Config <const> = {
 		},
 		yim_actions = {
 			auto_close_ped_window = false,
+			disable_props = false,
+			disable_ptfx = false,
+			disable_sfx = false,
 			favorites = {
 				---@type table<string, AnimData>
 				anims = {},
@@ -408,6 +411,8 @@ local Config <const> = {
 				scenes = {},
 				clipsets = {},
 			},
+			---@type table<string, ActionCommandData>
+			action_commands = {},
 		},
 		entity_forge = {
 			---@type table<hash, {name: string, entityType: eEntityType}>
