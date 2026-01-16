@@ -519,7 +519,6 @@ local function DrawPatches()
 	ImGui.EndChild()
 end
 
-local soundid = -1
 local function DrawMiscTests()
 	if (ImGui.Button("Test Toasts")) then
 		for i = 1, 5 do

@@ -53,7 +53,7 @@ function CEntity:init(entity)
 	instance.m_hostility             = ptr:add(0x018C)
 	instance.m_health                = ptr:add(0x0280)
 	instance.m_max_health            = ptr:add(0x0284)
-	instance.m_attackers             = ptr:add(0x0288):deref()
+	instance.m_attackers             = ptr:add(0x0288) -- CAttackers*
 
 	return instance
 end
