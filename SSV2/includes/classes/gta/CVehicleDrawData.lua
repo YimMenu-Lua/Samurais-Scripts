@@ -1,4 +1,4 @@
-local fwDrawData = require("includes.classes.fwDrawData")
+local fwDrawData = require("includes.classes.gta.fwDrawData")
 
 ---@class CWheelDrawData
 ---@field m_ptr pointer

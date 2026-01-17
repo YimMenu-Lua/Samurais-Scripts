@@ -523,5 +523,12 @@ return {
 	["VEH_STANCE_AIR_SUSPENSION"] = "Suspensão a Ar",
 	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "O modo Bounce está disponível apenas para SUVs.",
 	["VEH_STANCE_BOUNCE_MODE_TT"] = "Somente SUVs.\n\nFaz seu veículo saltar para cima e para baixo, semelhante ao recurso \"E-Active Body Control\" do Mercedes-Benz GLE.",
-	["VEH_STANCE_BOUNCE_MODE"] = "Modo de salto"
+	["VEH_STANCE_BOUNCE_MODE"] = "Modo de salto",
+	["YAV3_DISABLE_SFX"] = "Desativar efeitos sonoros",
+	["GENERIC_LIST_GROUP"] = "Agrupar por",
+	["YAV3_DISABLE_PTFX"] = "Desativar efeitos de partículas",
+	["GENERIC_LIST_FILTER"] = "Filtrar por",
+	["YAV3_DISABLE_PROPS"] = "Desativar acessórios",
+	["YAV3_ANIM_FLAGS"] = "Sinalizadores de comportamento",
+	["GENERIC_LIST_SORT"] = "Ordenar por"
 }

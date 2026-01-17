@@ -118,23 +118,32 @@ function HideNSeek:OnDisable()
 	self:Cleanup()
 end
 
+---@return boolean
+function HideNSeek:IsActive()
+	return self.m_is_active
+end
+
 function HideNSeek:HideInVehicle()
 	if (Self:IsOnFoot() or not self.m_is_wanted) then
 		return
 	end
 
-	local cond = not Self:IsDriving() or VEHICLE.IS_VEHICLE_STOPPED(Self:GetVehicleNative())
+	local veh = Self:GetVehicleNative()
+	if (not VEHICLE.IS_THIS_MODEL_A_CAR(Game.GetEntityModel(veh))) then
+		return
+	end
+
+	local cond = not Self:IsDriving() or VEHICLE.IS_VEHICLE_STOPPED(veh)
 	if (cond
 			and not PAD.IS_CONTROL_PRESSED(0, 71)
 			and not PAD.IS_CONTROL_PRESSED(0, 72)
-			and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(Self:GetVehicleNative())
+			and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(veh)
 		) then
 		Game.ShowButtonPrompt("Press ~INPUT_FRONTEND_ACCEPT~ to hide inside the vehicle.")
 		if (PAD.IS_CONTROL_JUST_PRESSED(0, 201) and not HUD.IS_MP_TEXT_CHAT_TYPING()) then
 			YimActions:ResetPlayer()
 			Await(Game.RequestAnimDict, vehAnim.dict)
 
-			VEHICLE.SET_VEHICLE_IS_WANTED(Self:GetVehicleNative(), false)
 			TASK.TASK_PLAY_ANIM(
 				Self:GetHandle(),
 				vehAnim.dict,
@@ -149,8 +158,9 @@ function HideNSeek:HideInVehicle()
 				false
 			)
 
+			VEHICLE.SET_VEHICLE_IS_WANTED(veh, false)
 			if (Self:IsDriving()) then
-				VEHICLE.SET_VEHICLE_ENGINE_ON(Self:GetVehicleNative(), false, false, true)
+				VEHICLE.SET_VEHICLE_ENGINE_ON(veh, false, false, true)
 			end
 
 			self.m_is_active = true
@@ -265,7 +275,7 @@ function HideNSeek:HideInTrunk()
 			TASK.TASK_TURN_PED_TO_FACE_ENTITY(pedHandle, veh, 0)
 			repeat
 				yield()
-			until not TASK.GET_IS_TASK_ACTIVE(pedHandle, 225) -- CTaskTurnToFaceEntityOrCoord
+			until not TASK.GET_IS_TASK_ACTIVE(pedHandle, Enums.ePedTaskIndex.TurnToFaceEntityOrCoord)
 		end
 
 		TASK.TASK_PLAY_ANIM(
@@ -352,7 +362,7 @@ function HideNSeek:HideInTrunk()
 		sleep(500)
 		VEHICLE.SET_VEHICLE_DOOR_SHUT(veh, 5, false)
 		ENTITY.SET_ENTITY_COLLISION(pedHandle, true, true)
-
+		VEHICLE.SET_VEHICLE_IS_WANTED(veh, false)
 		self.m_is_active = true
 		self.m_context = eHNSContext.CAR_BOOT
 		sleep(1000)
@@ -399,7 +409,6 @@ function HideNSeek:IsNearCarTrunk()
 				end
 			end
 		end
-		yield()
 	end
 
 	return false, 0, false
@@ -443,10 +452,11 @@ function HideNSeek:WhileOnFoot()
 		return
 	end
 
-	local currentTime = MISC.GET_GAME_TIMER()
+	local currentTime = Game.GetGameTimer()
 	if (currentTime - self.m_last_check_time < 1000) then
 		return
 	end
+
 	self.m_last_check_time = currentTime
 	ThreadManager:Run(function(s)
 		if (self.m_boot_vehicle.m_handle == 0) then
@@ -518,14 +528,14 @@ function HideNSeek:WhileHiding()
 		if (not v_WantedCentrePos) then
 			v_WantedCentrePos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
 				Self:GetHandle(),
-				math.random(-35, 35),
-				math.random(-35, 35),
-				math.random(0, 5)
+				math.random(-200, 200),
+				math.random(-200, 200),
+				math.random(0, 20)
 			)
 		end
 
 		if (self.m_is_wanted and not self.m_was_spotted) then
-			PED.SET_COP_PERCEPTION_OVERRIDES(40.0, 40.0, 40.0, 100.0, 100.0, 100.0, 0.0)
+			PED.SET_COP_PERCEPTION_OVERRIDES(0.1, 0.1, 0.1, 1.0, 1.0, 1.0, 0.0)
 			---@diagnostic disable-next-line
 			PLAYER.SET_PLAYER_WANTED_CENTRE_POSITION(Self:GetPlayerID(), v_WantedCentrePos, true)
 		end

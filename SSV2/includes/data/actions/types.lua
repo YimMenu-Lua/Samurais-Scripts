@@ -81,3 +81,8 @@
 ---@field type? eActionType
 
 ---@alias ActionData AnimData | ScenarioData | SyncedSceneData?
+
+---@class ActionCommandData
+---@field type eActionType
+---@field command string
+---@field is_json boolean

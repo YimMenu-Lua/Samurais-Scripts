@@ -4,6 +4,7 @@ local ThemeManager = require("includes.services.ThemeManager")
 ---@field args? string[]
 ---@field description? string
 ---@field alias? string[]
+---@field isTranslatorLabel? boolean
 
 ---@class CommandsWindow
 ---@field size vec2
@@ -25,7 +26,7 @@ local ThemeManager = require("includes.services.ThemeManager")
 ---@field private m_hint_text string
 ---@field private m_history array<string>
 ---@field private m_suggestions array<{name: string, def: string}>
----@field private m_commands dict<{ callback: fun(...), args: string[], description: string, alias?: string[], is_alias?: boolean }>
+---@field private m_commands table<string, { callback: fun(...), args: string[], description: string, alias?: string[], is_alias?: boolean, isTranslatorLabel?: boolean }>
 ---@field private m_screen_size vec2
 ---@field private m_window CommandsWindow
 ---@field private m_mutation_request? string
@@ -113,6 +114,11 @@ function CommandExecutor:IsBuiltinCommand(command_name)
 	return command_name:startswith("!")
 end
 
+---@param cmd_name string
+function CommandExecutor:DoesCommandExist(cmd_name)
+	return self.m_commands[cmd_name] ~= nil
+end
+
 -- Registers a command with a callback that receives arguments.
 ---@param name string
 ---@param callback fun(args: table)
@@ -123,6 +129,7 @@ function CommandExecutor:RegisterCommand(name, callback, meta)
 		args = meta and meta.args or {},
 		description = meta and meta.description or "No description.",
 		alias = meta and meta.alias or nil,
+		isTranslatorLabel = meta and meta.isTranslatorLabel or false,
 		is_alias = false,
 	}
 
@@ -148,6 +155,20 @@ function CommandExecutor:RegisterAlias(alias, of)
 	self.m_commands[alias:lower()] = cmd
 end
 
+---@param name string
+function CommandExecutor:RemoveCommand(name)
+	if (self:IsBuiltinCommand(name)) then
+		Notifier:ShowError("Command Executor", "Removing built-in commands is not allowed.")
+		return
+	end
+
+	if (not self.m_commands[name]) then
+		return
+	end
+
+	self.m_commands[name] = nil
+end
+
 ---@return string
 function CommandExecutor:ListCommands()
 	local out = { "\n" }
@@ -159,7 +180,8 @@ function CommandExecutor:ListCommands()
 				sig = sig .. " " .. table.concat(def.args, ", ")
 			end
 
-			local line = _F("* %s - %s", sig, def.description)
+			local desc = def.isTranslatorLabel and _T(def.description) or def.description
+			local line = _F("* %s - %s", sig, desc)
 			if (def.alias and #def.alias > 0) then
 				line = line .. " - Aliases: " .. table.concat(def.alias, " | ")
 			end
@@ -319,10 +341,18 @@ function CommandExecutor:DrawCommandDump()
 					ImGui.BulletText(name)
 					ImGui.Indent()
 					ImGui.SetWindowFontScale(0.9)
-					ImGui.Text(_F("- Description: %s", data.description or "No description."))
+					data.description = data.description or "No description."
+					local desc = data.isTranslatorLabel and _T(data.description) or data.description
+					ImGui.Text(_F("- Description: %s", desc))
+
 					if data.args then
-						ImGui.Text(_F("- Arguments (%d): %s", #data.args, table.concat(data.args, ", ")))
+						local args_txt = (#data.args == 0
+							and "- Arguments: None."
+							or _F("- Arguments (%d): %s", #data.args, table.concat(data.args, ", "))
+						)
+						ImGui.Text(args_txt)
 					end
+
 					if data.alias then
 						ImGui.Text(_F("- Alias: %s", table.concat(data.alias, " | ")))
 					end
@@ -427,7 +457,6 @@ function CommandExecutor:Draw()
 				128,
 				ImGuiInputTextFlags.EnterReturnsTrue
 			)
-			Backend.disable_input = ImGui.IsItemActive()
 
 			if (not self:ShouldFocusInput()) then
 				ImGui.SetKeyboardFocusHere()
@@ -443,17 +472,17 @@ function CommandExecutor:Draw()
 
 			for name, data in pairs(self.m_commands) do
 				if (typed_cmd ~= "" and name:find(typed_cmd:lower(), 1, true)) then
-					local s = _F(
-						"%s\nArguments (%d): %s",
-						data.description or "No description",
-						#data.args,
-						table.concat(data.args, ", ")
+					local args_txt = (#data.args == 0
+						and "Arguments: None."
+						or _F("Arguments (%d): %s", #data.args, table.concat(data.args, ", "))
 					)
+
+					local s = _F("%s\n- %s", data.description or "No description", args_txt)
 					if (data.alias and #data.alias > 0 and not data.is_alias) then
-						s = s .. "\nAliases: " .. table.concat(data.alias, " | ")
+						s = s .. "\n- Aliases: " .. table.concat(data.alias, " | ")
 					end
-					table.insert(self.m_suggestions, { name = name, def = s }
-					)
+
+					table.insert(self.m_suggestions, { name = name, def = s })
 				end
 			end
 

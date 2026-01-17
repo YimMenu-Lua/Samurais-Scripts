@@ -523,5 +523,12 @@ return {
 	["VEH_UNLOCKED"] = "車両のロックが解除されました。",
 	["VEH_STANCE_BOUNCE_MODE"] = "バウンスモード",
 	["VEH_STANCE_BOUNCE_MODE_TT"] = "SUV のみ。\n\nメルセデス ベンツ GLE の「E-アクティブ ボディ コントロール」機能と同様に、車両を上下に跳ねさせます。",
-	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "バウンス モードは SUV でのみ使用できます。"
+	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "バウンス モードは SUV でのみ使用できます。",
+	["GENERIC_LIST_SORT"] = "並べ替え",
+	["GENERIC_LIST_FILTER"] = "フィルター条件",
+	["GENERIC_LIST_GROUP"] = "グループ化",
+	["YAV3_ANIM_FLAGS"] = "動作フラグ",
+	["YAV3_DISABLE_PTFX"] = "パーティクルエフェクトを無効にする",
+	["YAV3_DISABLE_SFX"] = "効果音を無効にする",
+	["YAV3_DISABLE_PROPS"] = "小道具を無効にする"
 }

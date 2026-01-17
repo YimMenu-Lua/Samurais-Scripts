@@ -38,7 +38,8 @@ import threading
 
 
 PARENT_PATH = Path(__file__).resolve().parent
-HASHMAP_PATH = PARENT_PATH / "hashmap.json"
+LUA_PATH = PARENT_PATH.parent.parent / "SSV2/includes/lib/translations"
+HASHMAP_PATH = LUA_PATH / "__hashmap.json"
 MAX_WORKERS = min(16, (os.cpu_count() or 2) * 4)
 TRANSLATOR_LOCK = threading.Lock()
 TRANSLATORS: Dict[str, GoogleTranslator] = {}
@@ -180,11 +181,10 @@ def write_hashmap():
 
 
 def generate_translations(dry_run: bool = False, diff_only: bool = False):
-	base_path = PARENT_PATH.parent.parent / "SSV2/includes/lib/translations"
-	en_keys_path = base_path / "en-US.lua"
-	locales_path = base_path / "__locales.lua"
+	en_keys_path = LUA_PATH / "en-US.lua"
+	locales_path = LUA_PATH / "__locales.lua"
 
-	if not os.path.exists(base_path):
+	if not os.path.exists(LUA_PATH):
 		raise RuntimeError("Base translations directory not found!")
 
 	if not os.path.exists(en_keys_path):
@@ -274,7 +274,7 @@ def generate_translations(dry_run: bool = False, diff_only: bool = False):
 
 	with alive_bar(len(translations), title="Writing locale files", force_tty=True) as bar2:
 		for fname, content in translations.items():
-			write_lua_table(os.path.join(base_path, fname), content)
+			write_lua_table(os.path.join(LUA_PATH, fname), content)
 			bar2()
 
 	write_hashmap()

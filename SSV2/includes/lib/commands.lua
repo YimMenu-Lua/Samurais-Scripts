@@ -87,7 +87,7 @@ local commandRegistry <const> = {
 
 				local is_locked = PV:IsLocked()
 				Self:PlayKeyfobAnim()
-				PV:LockDoors(not PV:IsLocked())
+				PV:LockDoors(not is_locked)
 				CommandExecutor:notify(_T(is_locked and "VEH_UNLOCKED" or "VEH_LOCKED"))
 			end)
 		end,

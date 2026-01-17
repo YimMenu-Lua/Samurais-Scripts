@@ -1224,12 +1224,12 @@ YRV3.t_SellScripts = {
 		{
 			l = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetValue() end)(),
 			o = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetOffset(1) end)(),
-			v = 0
+			v = 1
 		},
 		{
 			l = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetValue() end)(),
 			o = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_2):GetOffset(1) end)(),
-			v = 1
+			v = 0
 		},
 	},
 	["gb_contraband_sell"] = {

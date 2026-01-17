@@ -1,7 +1,7 @@
 ---@diagnostic disable: param-type-mismatch
 
-local CPed        = require("includes.classes.CPed")
-local CVehicle    = require("includes.classes.CVehicle")
+local CPed        = require("includes.classes.gta.CPed")
+local CVehicle    = require("includes.classes.gta.CVehicle")
 local MemoryPatch = require("includes.structs.MemoryPatch")
 
 

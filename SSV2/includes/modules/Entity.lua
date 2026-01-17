@@ -1,8 +1,8 @@
 ---@diagnostic disable: param-type-mismatch
 
-local CEntity = require("includes.classes.CEntity")
-local CPed = require("includes.classes.CPed")
-local CVehicle = require("includes.classes.CVehicle")
+local CEntity = require("includes.classes.gta.CEntity")
+local CPed = require("includes.classes.gta.CPed")
+local CVehicle = require("includes.classes.gta.CVehicle")
 
 --------------------------------------
 -- Class: Entity

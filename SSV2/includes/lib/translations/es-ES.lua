@@ -523,5 +523,12 @@ return {
 	["VEH_UNLOCKED"] = "Vehículo desbloqueado.",
 	["VEH_STANCE_BOUNCE_MODE"] = "Modo de rebote",
 	["VEH_STANCE_BOUNCE_MODE_TT"] = "Solo SUV.\n\nHace que su vehículo rebote hacia arriba y hacia abajo, similar a la función 'E-Active Body Control' en el Mercedes-Benz GLE.",
-	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "El modo rebote solo está disponible para SUV."
+	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "El modo rebote solo está disponible para SUV.",
+	["GENERIC_LIST_SORT"] = "Ordenar por",
+	["GENERIC_LIST_FILTER"] = "Filtrar por",
+	["YAV3_DISABLE_PROPS"] = "Deshabilitar accesorios",
+	["YAV3_ANIM_FLAGS"] = "Banderas de comportamiento",
+	["YAV3_DISABLE_SFX"] = "Desactivar efectos de sonido",
+	["YAV3_DISABLE_PTFX"] = "Desactivar efectos de partículas",
+	["GENERIC_LIST_GROUP"] = "Agrupar por"
 }

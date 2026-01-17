@@ -523,5 +523,12 @@ return {
 	["VEH_LOCKED"] = "Véhicule verrouillé.",
 	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "Le mode rebond n’est disponible que pour les SUV.",
 	["VEH_STANCE_BOUNCE_MODE_TT"] = "SUV uniquement.\n\nFait rebondir votre véhicule de haut en bas, similaire à la fonction « E-Active Body Control » du Mercedes-Benz GLE.",
-	["VEH_STANCE_BOUNCE_MODE"] = "Mode rebond"
+	["VEH_STANCE_BOUNCE_MODE"] = "Mode rebond",
+	["GENERIC_LIST_SORT"] = "Trier par",
+	["GENERIC_LIST_FILTER"] = "Filtrer par",
+	["YAV3_DISABLE_PTFX"] = "Désactiver les effets de particules",
+	["YAV3_DISABLE_SFX"] = "Désactiver les effets sonores",
+	["YAV3_ANIM_FLAGS"] = "Indicateurs de comportement",
+	["GENERIC_LIST_GROUP"] = "Regrouper par",
+	["YAV3_DISABLE_PROPS"] = "Désactiver les accessoires"
 }

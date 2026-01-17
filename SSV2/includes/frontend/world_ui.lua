@@ -26,7 +26,7 @@ world_tab:AddBoolCommand("WRLD_EXTEND_BOUNDS",
 			World:ResetBounds()
 		end)
 	end,
-	{ description = "WRLD_EXTEND_BOUNDS_TT" },
+	{ description = "WRLD_EXTEND_BOUNDS_TT", isTranslatorLabel = true },
 	false,
 	true
 )

@@ -1,7 +1,7 @@
 -- Unfinished, WIP
 
 local FeatureBase  = require("includes.modules.FeatureBase")
-local CWheel       = require("includes.classes.CWheel")
+local CWheel       = require("includes.classes.gta.CWheel")
 
 ---@class StanceObject
 ---@field m_track_width float
@@ -344,8 +344,8 @@ end
 ---@param side eWheelSide
 ---@return CWheel?
 function Stancer:GetFirstWheelForSide(side)
-	local wheelsbyside = self.m_wheels[side]
-	if (#wheelsbyside == 0) then
+	local wheelsbyside = self:GetAllWheelsForSide(side)
+	if (not wheelsbyside or #wheelsbyside == 0) then
 		return
 	end
 
@@ -356,7 +356,11 @@ end
 ---@param wheel_n integer
 ---@return CWheel?
 function Stancer:GetNthWheelForSide(side, wheel_n)
-	local wheelsbyside = self.m_wheels[side]
+	local wheelsbyside = self:GetAllWheelsForSide(side)
+	if (not wheelsbyside) then
+		return
+	end
+
 	local count = #wheelsbyside
 	if (count == 0 or wheel_n > count) then
 		return
@@ -377,9 +381,10 @@ function Stancer:OnWheelsChanged()
 	local current = self.m_entity:GetCustomWheels()
 	if (not table.is_equal(self.m_last_wheels_mod, current)) then
 		self.m_reloading    = true
-		local prev_sup      = self.m_suspension_height.m_current
+		local prev_height   = self.m_suspension_height.m_current
 		local prev_deltas_f = table.copy(self.m_deltas[self.eWheelSide.FRONT])
 		local prev_deltas_r = table.copy(self.m_deltas[self.eWheelSide.BACK])
+
 		self:Cleanup()
 		self:OnNewVehicle()
 		self.m_last_wheels_mod = self.m_entity:GetCustomWheels()
@@ -391,7 +396,7 @@ function Stancer:OnWheelsChanged()
 			self.m_deltas[self.eWheelSide.BACK][k] = v
 		end
 
-		self.m_suspension_height.m_current = prev_sup
+		self.m_suspension_height.m_current = prev_height
 		self.m_reloading = false
 	end
 

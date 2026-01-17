@@ -1,7 +1,7 @@
 ---@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
 
 local FeatureBase = require("includes.modules.FeatureBase")
-local CWheel      = require("includes.classes.CWheel")
+local CWheel      = require("includes.classes.gta.CWheel")
 
 ---@class DriftMode : FeatureBase
 ---@field private m_entity PlayerVehicle -- Reference to PlayerVehicle

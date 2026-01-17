@@ -7,6 +7,7 @@ local Ragdoll      = require("includes.features.self.ragdoll")
 local MagicBullet  = require("includes.features.self.magic_bullet")
 local LaserSights  = require("includes.features.self.laser_sights")
 local Katana       = require("includes.features.self.katana")
+local CPed         = require("includes.classes.gta.CPed")
 
 --------------------------------------
 -- Class: Self
@@ -16,14 +17,12 @@ local Katana       = require("includes.features.self.katana")
 --
 -- A global singleton that always resolves to the current local player.
 ---@class Self: Player
----@field private m_internal CPed
 ---@field private m_vehicle PlayerVehicle
 ---@field private m_last_vehicle? Vehicle
 ---@field private m_feat_mgr FeatureManager
 ---@field public CurrentMovementClipset? string
 ---@field public CurrentStrafeClipset? string
 ---@field public CurrentWeaponMovementClipset? string
----@field Resolve fun(self: Self) : CPed
 ---@overload fun(): Self
 Self               = Class("Self", Player)
 Self.m_vehicle     = require("includes.modules.PlayerVehicle")
@@ -37,6 +36,11 @@ Self.m_feat_mgr:Add(Katana.new(Self))
 
 ---@override
 Self.new = nil
+
+---@return CPed
+function Self:Resolve()
+	return CPed(Self:GetHandle())
+end
 
 -- Returns the current local player's script handle.
 ---@override
@@ -127,15 +131,13 @@ function Self:GetEntityInCrosshairs(skip_players)
 	return is_aiming and entity or 0
 end
 
--- This is a leftover from [Samurai's Scripts](https://github.com/YimMenu-Lua/Samurais-Scripts).
+-- Returns whether local player is using any vehicle's machine gun.
 --
--- Returns whether local player is using an aircraft's machine gun.
---
--- If true, returns `true` and the `weapon hash` resolved and cast to unsigned 32bit integer, else returns `false` and `0`.
+-- If true, returns `true` and the `weapon hash`; else returns `false` and `0`.
 ---@return boolean, hash
-function Self:IsUsingAirctaftMG()
-	local veh = self:GetVehicle()
-	if (not veh) then
+function Self:IsUsingVehicleMG()
+	local veh = self:GetVehiclePlayerIsIn()
+	if (not veh or not veh:IsValid()) then
 		return false, 0
 	end
 
@@ -143,23 +145,33 @@ function Self:IsUsingAirctaftMG()
 		return false, 0
 	end
 
-	if not (veh:IsPlane() or veh:IsHeli()) then
+	local pWeaponInfo = Self:Resolve().m_ped_weapon_mgr.m_vehicle_weapon_info
+	if (not pWeaponInfo or not pWeaponInfo:IsValid()) then
 		return false, 0
 	end
 
-	local weapon = self:GetVehicleWeapon()
-	if (weapon == 0) then
+	local effectGroup = pWeaponInfo.m_effect_group:get_int()
+	local weaponHash  = pWeaponInfo.m_name_hash:get_dword()
+
+	-- we specifically want to return zero for the weapon hash if false
+	if (effectGroup ~= Enums.eWeaponEffectGroup.VehicleMG or weaponHash == 0) then
 		return false, 0
 	end
 
-	weapon = Cast(weapon):AsUint32_t()
-	for _, v in ipairs(Refs.aircraftMGs) do
-		if weapon == joaat(v) then
-			return true, weapon
-		end
+	return true, weaponHash
+end
+
+-- Returns whether local player is using an aircraft's machine gun.
+--
+-- If true, returns `true` and the `weapon hash`; else returns `false` and `0`.
+---@return boolean, hash
+function Self:IsUsingAirctaftMG()
+	local veh = self:GetVehiclePlayerIsIn()
+	if (not veh or not veh:IsPlane() or not veh:IsHeli()) then
+		return false, 0
 	end
 
-	return false, 0
+	return self:IsUsingVehicleMG()
 end
 
 function Self:IsBeingArrested()
@@ -233,18 +245,6 @@ function Self:IsInCarModShop()
 	return false
 end
 
----@param pedHandle handle
----@return boolean
-function Self:IsPedMyEnemy(pedHandle)
-	local ped = Ped(pedHandle)
-
-	if (not ped or not ped:IsValid()) then
-		return false
-	end
-
-	return ped:IsEnemy()
-end
-
 function Self:IsUsingPhone()
 	return script.is_active("CELLPHONE_FLASHHAND")
 end
@@ -262,7 +262,6 @@ function Self:CanUsePhoneAnims()
 	return
 		not ENTITY.IS_ENTITY_DEAD(self:GetHandle(), false)
 		and not YimActions:IsPedPlaying()
-		and not YimActions:IsPlayerBusy()
 		and (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self:GetHandle()) == 0)
 end
 

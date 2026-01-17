@@ -99,30 +99,32 @@ function Ped:IsDriving()
 	return (VEHICLE.GET_PED_IN_VEHICLE_SEAT(veh, -1, false) == self:GetHandle())
 end
 
+---@param pedHandle handle
 ---@return boolean
-function Ped:IsEnemy()
+function Ped:IsPedMyEnemy(pedHandle)
 	if (not self:IsValid()) then
 		return false
 	end
 
-	local pedHandle = self:GetHandle()
-	local localPlayer = Self:GetHandle()
-
-	if (pedHandle == localPlayer) then
+	local this = self:GetHandle()
+	if (this == pedHandle) then
 		return false
 	end
 
-	local relationship = PED.GET_RELATIONSHIP_BETWEEN_PEDS(pedHandle, localPlayer)
-	local pedCoords = self:GetPos(true)
+	local rel1 = PED.GET_RELATIONSHIP_BETWEEN_PEDS(this, pedHandle)
+	local rel2 = PED.GET_RELATIONSHIP_BETWEEN_PEDS(pedHandle, this)
+	local pos  = self:GetPos(true)
 
 	return (
-		PED.IS_PED_IN_COMBAT(pedHandle, localPlayer)
-		or (relationship > 2 and relationship <= 5)
+		PED.IS_PED_IN_COMBAT(pedHandle, this)
+		or PED.IS_PED_IN_COMBAT(this, pedHandle)
+		or math.isinrange(rel1, 3, 5)
+		or math.isinrange(rel2, 3, 5)
 		or PED.IS_ANY_HOSTILE_PED_NEAR_POINT(
 			pedHandle,
-			pedCoords.x,
-			pedCoords.y,
-			pedCoords.z,
+			pos.x,
+			pos.y,
+			pos.z,
 			1
 		)
 	)

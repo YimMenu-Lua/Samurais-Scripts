@@ -523,5 +523,12 @@ return {
 	["VEH_UNLOCKED"] = "车辆已解锁。",
 	["VEH_STANCE_BOUNCE_MODE"] = "弹跳模式",
 	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "弹跳模式仅适用于 SUV。",
-	["VEH_STANCE_BOUNCE_MODE_TT"] = "仅限 SUV。\n\n使您的车辆上下弹跳，类似于梅赛德斯-奔驰 GLE 中的“电子主动车身控制”功能。"
+	["VEH_STANCE_BOUNCE_MODE_TT"] = "仅限 SUV。\n\n使您的车辆上下弹跳，类似于梅赛德斯-奔驰 GLE 中的“电子主动车身控制”功能。",
+	["GENERIC_LIST_SORT"] = "排序方式",
+	["YAV3_ANIM_FLAGS"] = "行为标志",
+	["GENERIC_LIST_FILTER"] = "过滤依据",
+	["YAV3_DISABLE_PTFX"] = "禁用粒子效果",
+	["YAV3_DISABLE_PROPS"] = "禁用道具",
+	["GENERIC_LIST_GROUP"] = "分组依据",
+	["YAV3_DISABLE_SFX"] = "禁用音效"
 }

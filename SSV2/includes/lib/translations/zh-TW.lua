@@ -523,5 +523,12 @@ return {
 	["VEH_STANCE_AIR_SUSPENSION"] = "空氣懸架",
 	["VEH_STANCE_BOUNCE_MODE_TT"] = "僅限 SUV。 \n\n使您的車輛上下彈跳，類似於梅賽德斯-奔馳 GLE 中的“電子主動車身控制”功能。",
 	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"] = "彈跳模式僅適用於 SUV。",
-	["VEH_STANCE_BOUNCE_MODE"] = "彈跳模式"
+	["VEH_STANCE_BOUNCE_MODE"] = "彈跳模式",
+	["GENERIC_LIST_SORT"] = "排序方式",
+	["GENERIC_LIST_FILTER"] = "過濾依據",
+	["YAV3_ANIM_FLAGS"] = "行為標誌",
+	["YAV3_DISABLE_PTFX"] = "禁用粒子效果",
+	["YAV3_DISABLE_SFX"] = "禁用音效",
+	["YAV3_DISABLE_PROPS"] = "禁用道具",
+	["GENERIC_LIST_GROUP"] = "分組依據"
 }

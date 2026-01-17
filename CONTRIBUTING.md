@@ -230,7 +230,8 @@ The project is organized by responsibility rather than feature size. Folders def
 
 ```bash
 ├─ includes/
-│  ├─ classes/          # Contains reverse-engineered game classes (mostly sourced from Yimura's archived classes repository) and a few Lua-defined classes.
+│  ├─ classes/
+│  │  └─ gta/           # Contains reverse-engineered game classes mostly sourced from Yimura's archived repository and others I reversed myself using a mix of debuggers, public research, and personal suffering.
 │  │
 │  ├─ data/             # A place where all raw data is stored.
 │  │  ├─ actions/       # Contains YimActions V3 data (animations, scenarios, synchronized scenes, and movement clipsets).

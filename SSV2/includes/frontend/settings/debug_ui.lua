@@ -1,4 +1,3 @@
-local CWheel = require "includes.classes.CWheel"
 local RED <const> = Color("red")
 local GREEN <const> = Color("green")
 local BLUE <const> = Color("blue")
@@ -529,24 +528,28 @@ local function DrawMiscTests()
 		end
 	end
 
-	--[[
-		if (ImGui.Button("BreakOffVehicleWheel")) then
-			ThreadManager:Run(function()
-				if self.get_veh() == 0 then return end
-				if (type(GPointers.DynamicFuncs.BreakOffVehicleWheel) ~= "function") then
-					print("BreakOffVehicleWheel dynamic call failed")
-					return
-				end
-
-				local cvehicledamage = Self:GetVehicle():Resolve().m_vehicle_damage
-				if (cvehicledamage:is_null()) then
-					return
-				end
-
-				GPointers.DynamicFuncs.BreakOffVehicleWheel(cvehicledamage:get_address(), 0, 1.0, 0.0, 0.0, false, true) -- lea rcx,[rdi+00000420] // rdi=CVehicle, rdi+420h=CVehicle+0x420=CVehicleDamage
-			end)
+	if (ImGui.Button("Dump CWeaponInfo")) then
+		local out           = {}
+		local cpedweaponmgr = Self:Resolve().m_ped_weapon_mgr
+		if (not cpedweaponmgr:IsValid()) then
+			print("CPedWeaponManager: invalid pointer.")
+			return
 		end
-	--]]
+
+		local cweaponinfo = cpedweaponmgr.m_weapon_info
+		if (not cweaponinfo) then
+			print("CWeaponInfo: invalid pointer.")
+			return
+		end
+
+		for k, v in pairs(cweaponinfo) do
+			if (IsInstance(v, "pointer")) then
+				table.insert(out, _F("%s = 0x%X", k, v:get_address()))
+			end
+		end
+
+		printf("\n--------- CWeaponInfo ---------\n\n%s", table.concat(out, ",\n"))
+	end
 end
 
 return function()

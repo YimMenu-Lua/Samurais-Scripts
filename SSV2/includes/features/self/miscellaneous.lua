@@ -103,6 +103,9 @@ function SelfMisc:Crouch()
 	self:HandsDown()
 	PED.SET_PED_MOVEMENT_CLIPSET(playerHandle, "move_ped_crouched", 0.3)
 	PED.SET_PED_STRAFE_CLIPSET(playerHandle, "move_aim_strafe_crouch_2h")
+	PED.SET_PED_CAN_PLAY_AMBIENT_ANIMS(playerHandle, false)
+	PED.SET_PED_CAN_PLAY_AMBIENT_BASE_ANIMS(playerHandle, false)
+	TASK.SET_PED_CAN_PLAY_AMBIENT_IDLES(playerHandle, true, true)
 	self.m_is_crouching = true
 end
 
@@ -114,6 +117,9 @@ function SelfMisc:Uncrouch() -- is this even English?
 	local playerHandle = Self:GetHandle()
 	PED.RESET_PED_MOVEMENT_CLIPSET(playerHandle, 0.35)
 	PED.RESET_PED_STRAFE_CLIPSET(playerHandle)
+	PED.SET_PED_CAN_PLAY_AMBIENT_ANIMS(playerHandle, true)
+	PED.SET_PED_CAN_PLAY_AMBIENT_BASE_ANIMS(playerHandle, true)
+	TASK.SET_PED_CAN_PLAY_AMBIENT_IDLES(playerHandle, false, true)
 	self.m_is_crouching = false
 end
 

@@ -237,7 +237,7 @@ return function()
 	ImGui.EndDisabled()
 
 	ImGui.SameLine()
-	ImGui.BeginDisabled((current_susp_f <= min_susp - 0.01) and (current_susp_r <= min_susp - 0.01))
+	ImGui.BeginDisabled((current_susp_f <= min_susp + 0.01) and (current_susp_r <= min_susp + 0.01))
 	if (ImGui.Button(_T("VEH_STANCE_AIR_SUSPENSION_LOWER"))) then
 		FakeAirSuspension(current_susp_f, min_susp, -0.01, current_susp_r, min_susp, -0.01)
 	end

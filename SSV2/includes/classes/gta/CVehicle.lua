@@ -1,10 +1,10 @@
-local CEntity                    = require("includes.classes.CEntity")
-local CWheel                     = require("includes.classes.CWheel")
-local CCarHandlingData           = require("includes.classes.CCarHandlingData")
-local CBikeHandlingData          = require("includes.classes.CBikeHandlingData")
-local CFlyingHandlingData        = require("includes.classes.CFlyingHandlingData")
-local phFragInst                 = require("includes.classes.phFragInst")
-local CVehicleDrawData           = require("includes.classes.CVehicleDrawData")
+local CEntity                    = require("includes.classes.gta.CEntity")
+local CWheel                     = require("includes.classes.gta.CWheel")
+local CCarHandlingData           = require("includes.classes.gta.CCarHandlingData")
+local CBikeHandlingData          = require("includes.classes.gta.CBikeHandlingData")
+local CFlyingHandlingData        = require("includes.classes.gta.CFlyingHandlingData")
+local phFragInst                 = require("includes.classes.gta.phFragInst")
+local CVehicleDrawData           = require("includes.classes.gta.CVehicleDrawData")
 
 ---@class CAdvancedData : GenericClass
 local CAdvancedData              = GenericClass
