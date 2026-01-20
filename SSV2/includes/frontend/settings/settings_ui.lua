@@ -7,13 +7,12 @@ local draw_cfg_reset_window = false
 ---@type Set<string>
 local cfg_reset_exceptions = Set.new("backend.debug_mode")
 local cfg_exc_keys = {
-	{ pair = Pair.new("YimActions Favorites", "features.yim_actions.favorites"),         clicked = false, selected = false },
-	{ pair = Pair.new("YimResupplier", "features.yrv3"),                                 clicked = false, selected = false },
-	{ pair = Pair.new("Casino Pacino", "features.dunk"),                                 clicked = false, selected = false },
-	{ pair = Pair.new("Keyboard Keybinds", "keyboard_keybinds"),                         clicked = false, selected = false },
-	{ pair = Pair.new("Controller Keybinds", "gamepad_keybinds"),                        clicked = false, selected = false },
-	{ pair = Pair.new("EntityForge Favorites", "features.entity_forge.favorites"),       clicked = false, selected = false },
-	{ pair = Pair.new("EntityForge Creations", "features.entity_forge.forged_entities"), clicked = false, selected = false },
+	{ pair = Pair.new("Casino Pacino", "features.dunk"),          clicked = false, selected = false },
+	{ pair = Pair.new("EntityForge", "features.entity_forge"),    clicked = false, selected = false },
+	{ pair = Pair.new("YimActions", "features.yim_actions"),      clicked = false, selected = false },
+	{ pair = Pair.new("YimResupplier", "features.yrv3"),          clicked = false, selected = false },
+	{ pair = Pair.new("Controller Keybinds", "gamepad_keybinds"), clicked = false, selected = false },
+	{ pair = Pair.new("Keyboard Keybinds", "keyboard_keybinds"),  clicked = false, selected = false },
 }
 
 local function OnConfigReset()

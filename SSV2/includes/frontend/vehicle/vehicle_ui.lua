@@ -113,7 +113,9 @@ local function driftOptions()
 		}
 	)
 
-	ImGui.ColorEditVec3(_T("VEH_DRIFT_SMOKE_COL"), GVars.features.vehicle.drift.smoke_fx.color)
+	if (GVars.features.vehicle.drift.smoke_fx.enabled) then
+		ImGui.ColorEditVec3(_T("VEH_DRIFT_SMOKE_COL"), GVars.features.vehicle.drift.smoke_fx.color)
+	end
 end
 
 local function driftMinigameOptions()

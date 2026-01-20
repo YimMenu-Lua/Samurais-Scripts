@@ -273,20 +273,22 @@ return function()
 
 	local saved_models = GVars.features.vehicle.stancer.saved_models
 	if (next(saved_models) ~= nil) then
+		ImGui.SameLine()
+		if (GUI:Button(_T("VEH_STANCE_VIEW_SAVED"))) then
+			saved_vehs_window.should_draw = true
+		end
+
+		ImGui.SameLine()
 		GVars.features.vehicle.stancer.auto_apply_saved, auto_apply_clicked = GUI:Checkbox(
 			_T("VEH_STANCE_AUTOAPPLY"),
 			GVars.features.vehicle.stancer.auto_apply_saved,
 			{ tooltip = _T("VEH_STANCE_AUTOAPPLY_TT") }
 		)
 
-		if (GVars.features.vehicle.stancer.auto_apply_saved and auto_apply_clicked) then
+		if (auto_apply_clicked and GVars.features.vehicle.stancer.auto_apply_saved) then
 			ThreadManager:Run(function()
 				Stancer:LoadSavedDeltas()
 			end)
-		end
-
-		if (GUI:Button(_T("VEH_STANCE_VIEW_SAVED"))) then
-			saved_vehs_window.should_draw = true
 		end
 	end
 
@@ -323,9 +325,8 @@ return function()
 			end
 
 			if (GUI:ConfirmPopup("##confirm_remove_all")) then
-				Serializer:WithLock(function()
-					GVars.features.vehicle.stancer.saved_models = {}
-				end)
+				GVars.features.vehicle.stancer.saved_models = {}
+				saved_vehs_window.should_draw = false
 			end
 		end, function()
 			saved_vehs_window.should_draw = false

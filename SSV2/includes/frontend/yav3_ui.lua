@@ -28,7 +28,6 @@ local b_SearchBarUsed            = false
 local b_PreviewPeds              = false
 local b_SpawnInvincible          = false
 local b_SpawnArmed               = false
-local b_AutoCloseSpawnWindow     = false
 
 ---@type Action?
 local t_SelectedAction           = nil
@@ -243,24 +242,17 @@ local function DrawAnims()
 				local has_command = GVars.features.yim_actions.action_commands[action.label] ~= nil
 				local label       = action.label
 
-				if is_favorite then
-					label = _F("%s  [ * ]", action.label)
-				end
-
-				if is_selected then
-					if is_favorite then
-						ImGui.PushStyleColor(ImGuiCol.Header, 1.0, 0.843, 0.0, 0.65)
-						ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 1.0, 0.875, 0.2, 0.85)
-						ImGui.PushStyleColor(ImGuiCol.HeaderActive, 1.0, 0.9, 0.3, 1.0)
-					else
-						ImGui.PushStyleColor(ImGuiCol.Header, 0.3, 0.3, 0.7, 0.6)
-						ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 0.4, 0.4, 0.8, 0.8)
-						ImGui.PushStyleColor(ImGuiCol.HeaderActive, 0.5, 0.5, 0.9, 1.0)
-					end
+				if (is_favorite) then
+					label = _F("* %s", action.label)
+					ImGui.PushStyleColor(ImGuiCol.Text, 0.8, 0.8, 0.4, 0.8)
 				end
 
 				if ImGui.Selectable(label, is_selected) then
 					i_SelectedAnimIndex = i
+				end
+
+				if (is_favorite) then
+					ImGui.PopStyleColor()
 				end
 
 				if (not hwnd_NewCommandWindow.should_draw) then
@@ -268,7 +260,6 @@ local function DrawAnims()
 				end
 
 				if (is_selected) then
-					ImGui.PopStyleColor(3)
 					t_SelectedAction = Action.new(
 						t_AnimList[i_SelectedAnimIndex],
 						Enums.eActionType.ANIM
@@ -333,32 +324,24 @@ local function DrawScenarios()
 			local has_command = GVars.features.yim_actions.action_commands[action.label] ~= nil
 			local label       = action.label
 
-			if is_favorite then
-				label = _F("%s  [ * ]", action.label)
-			end
-
-			if is_selected then
-				if is_favorite then
-					ImGui.PushStyleColor(ImGuiCol.Header, 1.0, 0.843, 0.0, 0.65)
-					ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 1.0, 0.875, 0.2, 0.85)
-					ImGui.PushStyleColor(ImGuiCol.HeaderActive, 1.0, 0.9, 0.3, 1.0)
-				else
-					ImGui.PushStyleColor(ImGuiCol.Header, 0.3, 0.3, 0.7, 0.6)
-					ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 0.4, 0.4, 0.8, 0.8)
-					ImGui.PushStyleColor(ImGuiCol.HeaderActive, 0.5, 0.5, 0.9, 1.0)
-				end
+			if (is_favorite) then
+				label = _F("* %s", action.label)
+				ImGui.PushStyleColor(ImGuiCol.Text, 0.8, 0.8, 0.4, 0.8)
 			end
 
 			if ImGui.Selectable(label, is_selected) then
 				i_SelectedScenarioIndex = i
 			end
 
+			if (is_favorite) then
+				ImGui.PopStyleColor()
+			end
+
 			if (not hwnd_NewCommandWindow.should_draw) then
 				GUI:Tooltip(_F("Right click for more options."))
 			end
 
-			if is_selected then
-				ImGui.PopStyleColor(3)
+			if (is_selected) then
 				t_SelectedAction = Action.new(
 					t_PedScenarios[i_SelectedScenarioIndex],
 					Enums.eActionType.SCENARIO
@@ -451,12 +434,6 @@ local function ListFavoritesByCategory(category)
 		for label, data in pairs(GVars.features.yim_actions.favorites[category]) do
 			local is_selected = (s_SelectedFavoriteName == label)
 
-			if is_selected then
-				ImGui.PushStyleColor(ImGuiCol.Header, 0.3, 0.3, 0.7, 0.6)
-				ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 0.4, 0.4, 0.8, 0.8)
-				ImGui.PushStyleColor(ImGuiCol.HeaderActive, 0.5, 0.5, 0.9, 1.0)
-			end
-
 			if ImGui.Selectable(data.label, is_selected) then
 				s_SelectedFavoriteName = label
 			end
@@ -464,7 +441,6 @@ local function ListFavoritesByCategory(category)
 			GUI:Tooltip("Right click to remove from favorites.")
 
 			if is_selected then
-				ImGui.PopStyleColor(3)
 				t_SelectedAction = Action.new(
 					data,
 					data.type
@@ -825,31 +801,20 @@ local function DrawCustomMovementClipsets()
 		local is_selected = (t_SelectedMovementClipset == t_MovementClipsets[i])
 		local is_favorite = YimActions:DoesFavoriteExist("clipsets", t_MovementClipsets[i].Name)
 
-		if is_favorite then
-			label = _F("%s  [ * ]", t_MovementClipsets[i].Name)
-		end
-
-		if is_selected then
-			if is_favorite then
-				ImGui.PushStyleColor(ImGuiCol.Header, 1.0, 0.843, 0.0, 0.65)
-				ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 1.0, 0.875, 0.2, 0.85)
-				ImGui.PushStyleColor(ImGuiCol.HeaderActive, 1.0, 0.9, 0.3, 1.0)
-			else
-				ImGui.PushStyleColor(ImGuiCol.Header, 0.3, 0.3, 0.7, 0.6)
-				ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 0.4, 0.4, 0.8, 0.8)
-				ImGui.PushStyleColor(ImGuiCol.HeaderActive, 0.5, 0.5, 0.9, 1.0)
-			end
+		if (is_favorite) then
+			label = _F("* %s", t_MovementClipsets[i].Name)
+			ImGui.PushStyleColor(ImGuiCol.Text, 0.8, 0.8, 0.4, 0.8)
 		end
 
 		if ImGui.Selectable(label, is_selected) then
 			t_SelectedMovementClipset = t_MovementClipsets[i]
 		end
 
-		GUI:Tooltip("Right click to add to favorites.")
-
-		if is_selected then
-			ImGui.PopStyleColor(3)
+		if (is_favorite) then
+			ImGui.PopStyleColor()
 		end
+
+		GUI:Tooltip(_F("Right click to %s favorites.", is_favorite and "remove from" or "add to"))
 
 		if GUI:IsItemClicked(1) then
 			ImGui.OpenPopup("##custom_mvmt_" .. i)
@@ -931,31 +896,21 @@ local function DrawJsonMovementClipsets()
 
 			local is_selected = (t_SelectedMovementClipset == t_MovementClipsetsJson[i])
 			local is_favorite = YimActions:DoesFavoriteExist("clipsets", t_MovementClipsetsJson[i].Name)
-			if (is_favorite) then
-				label = _F("%s  [ * ]", t_MovementClipsetsJson[i].Name)
-			end
 
-			if (is_selected) then
-				if (is_favorite) then
-					ImGui.PushStyleColor(ImGuiCol.Header, 1.0, 0.843, 0.0, 0.65)
-					ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 1.0, 0.875, 0.2, 0.85)
-					ImGui.PushStyleColor(ImGuiCol.HeaderActive, 1.0, 0.9, 0.3, 1.0)
-				else
-					ImGui.PushStyleColor(ImGuiCol.Header, 0.3, 0.3, 0.7, 0.6)
-					ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 0.4, 0.4, 0.8, 0.8)
-					ImGui.PushStyleColor(ImGuiCol.HeaderActive, 0.5, 0.5, 0.9, 1.0)
-				end
+			if (is_favorite) then
+				label = _F("* %s", t_MovementClipsetsJson[i].Name)
+				ImGui.PushStyleColor(ImGuiCol.Text, 0.8, 0.8, 0.4, 0.8)
 			end
 
 			if ImGui.Selectable(label, is_selected) then
 				t_SelectedMovementClipset = t_MovementClipsetsJson[i]
 			end
 
-			GUI:Tooltip("Right click to add to favorites.")
-
-			if is_selected then
-				ImGui.PopStyleColor(3)
+			if (is_favorite) then
+				ImGui.PopStyleColor()
 			end
+
+			GUI:Tooltip(_F("Right click to %s favorites.", is_favorite and "remove from" or "add to"))
 
 			if GUI:IsItemClicked(1) then
 				GUI:PlaySound("Click")
@@ -1008,21 +963,11 @@ local function DrawFavoriteMovementClipsets()
 		for label, data in pairs(favs) do
 			local is_selected = (t_SelectedMovementClipset == data)
 
-			if is_selected then
-				ImGui.PushStyleColor(ImGuiCol.Header, 0.3, 0.3, 0.7, 0.6)
-				ImGui.PushStyleColor(ImGuiCol.HeaderHovered, 0.4, 0.4, 0.8, 0.8)
-				ImGui.PushStyleColor(ImGuiCol.HeaderActive, 0.5, 0.5, 0.9, 1.0)
-			end
-
 			if ImGui.Selectable(data.Name, is_selected) then
 				t_SelectedMovementClipset = data
 			end
 
 			GUI:Tooltip("Right click to remove from favorites.")
-
-			if (is_selected) then
-				ImGui.PopStyleColor(3)
-			end
 
 			if GUI:IsItemClicked(1) then
 				GUI:PlaySound("Click")
@@ -1404,21 +1349,22 @@ local function DrawPedSpawnWindow()
 					false
 				)
 
-				if b_AutoCloseSpawnWindow then
+				if (GVars.features.yim_actions.auto_close_ped_window) then
 					hwnd_PedSpawnWindow.should_draw = false
 				end
 			end)
 		end
+		ImGui.EndDisabled()
 
 		ImGui.SameLine()
 		ImGui.Spacing()
 		ImGui.SameLine()
+
 		GVars.features.yim_actions.auto_close_ped_window, _ = GUI:Checkbox(
 			"Auto-Close Window",
 			GVars.features.yim_actions.auto_close_ped_window
 		)
 
-		ImGui.EndDisabled()
 		ImGui.PopStyleVar()
 
 		if (PreviewService.m_current and (not ImGui.IsAnyItemHovered() or not b_PreviewPeds)) then

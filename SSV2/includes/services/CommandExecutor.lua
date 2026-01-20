@@ -449,7 +449,7 @@ function CommandExecutor:Draw()
 			if (self:ShouldFocusInput()) then
 				ImGui.SetKeyboardFocusHere()
 			end
-			-- end
+
 			self.m_user_cmd, self.m_cmd_entered = ImGui.InputTextWithHint(
 				"##cmd",
 				self.m_hint_text,
@@ -497,7 +497,7 @@ function CommandExecutor:Draw()
 			ImGui.PopTextWrapPos()
 			ImGui.SetWindowFontScale(1)
 
-			if self.m_window.popup.should_draw then
+			if (self.m_window.popup.should_draw) then
 				ImGui.OpenPopup(self.m_window.popup.name)
 				self.m_window.popup.should_draw = false
 			end
