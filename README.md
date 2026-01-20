@@ -94,7 +94,7 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 
 ## Features
 
-A full list of available features and their usage [can be found here](docs/FEATURES.md).
+A full list of available features and their usage [can be found here](docs/Features.md).
 
 ## FAQ
 
