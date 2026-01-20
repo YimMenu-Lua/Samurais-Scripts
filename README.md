@@ -23,15 +23,10 @@
   </a>
 </div>
 
-# About
-
-![ss](./docs/ss.png)
-
-A modular GTA V Lua framework focused on enhancing the player's experience through fun features, online business options, and unpopular opinions.
-
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#about">About</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
@@ -47,6 +42,12 @@ A modular GTA V Lua framework focused on enhancing the player's experience throu
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
+
+# About
+
+![ss](./docs/ss.png)
+
+A modular GTA V Lua framework focused on enhancing the player's experience through fun features, online business options, and unpopular opinions.
 
 ## Getting Started
 
