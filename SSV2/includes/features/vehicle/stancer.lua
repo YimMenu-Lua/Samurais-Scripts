@@ -285,11 +285,11 @@ function Stancer:ForEach(array, fn)
 end
 
 function Stancer:IsVehicleModelSaved()
-	if (not self.m_cached_model) then
+	if (not self.m_entity or not self.m_entity:IsValid()) then
 		return false
 	end
 
-	return GVars.features.vehicle.stancer.saved_models[tostring(self.m_cached_model)] ~= nil
+	return GVars.features.vehicle.stancer.saved_models[tostring(self.m_entity:GetModelHash())] ~= nil
 end
 
 function Stancer:ReadWheelArray()
@@ -413,7 +413,7 @@ function Stancer:AreSavedDeltasLoaded()
 		return false
 	end
 
-	local model     = tostring(self.m_cached_model or self.m_entity:GetModelHash())
+	local model     = tostring(self.m_entity:GetModelHash())
 	local saved     = GVars.features.vehicle.stancer.saved_models
 	local front_obj = saved[model][tostring(self.eWheelSide.FRONT)]
 	local rear_obj  = saved[model][tostring(self.eWheelSide.BACK)]
@@ -471,45 +471,36 @@ function Stancer:LoadSavedDeltas()
 		return false
 	end
 
-	local model     = tostring(self.m_cached_model or self.m_entity:GetModelHash())
+	local model     = tostring(self.m_entity:GetModelHash())
 	local saved     = GVars.features.vehicle.stancer.saved_models
-	local front_obj = saved[model][tostring(self.eWheelSide.FRONT)]
-	local rear_obj  = saved[model][tostring(self.eWheelSide.BACK)]
+	local front_obj = saved[model][self.eWheelSide.FRONT]
+	local rear_obj  = saved[model][self.eWheelSide.BACK]
 
-	if (not front_obj or not rear_obj or next(front_obj) == nil or next(rear_obj) == nil) then
+	if (not front_obj or not rear_obj) then
 		return false
 	end
 
 	for k, v in pairs(front_obj) do
-		self.m_deltas[self.eWheelSide.FRONT][k] = v
+		if (k == "m_suspension_height") then
+			self.m_suspension_height.m_current = v
+		else
+			self.m_deltas[self.eWheelSide.FRONT][k] = v
+		end
 	end
 
 	for k, v in pairs(rear_obj) do
 		self.m_deltas[self.eWheelSide.BACK][k] = v
 	end
 
-	self.m_suspension_height.m_current = saved[model]["m_suspension_height"] or 0.0
-
+	PHYSICS.ACTIVATE_PHYSICS(self.m_entity:GetHandle())
 	return true
 end
 
 function Stancer:SaveCurrentVehicle()
-	local model = self.m_cached_model or self.m_entity:GetModelHash()
-	local __t = {
-		[self.eWheelSide.FRONT] = StanceObject.new(),
-		[self.eWheelSide.BACK] = StanceObject.new(),
-		m_suspension_height = self.m_suspension_height.m_current
-	}
-
-	for k, v in pairs(self.m_deltas[self.eWheelSide.FRONT]) do
-		__t[self.eWheelSide.FRONT][k] = v
-	end
-
-	for k, v in pairs(self.m_deltas[self.eWheelSide.BACK]) do
-		__t[self.eWheelSide.BACK][k] = v
-	end
-
-	GVars.features.vehicle.stancer.saved_models[tostring(model)] = table.copy(__t)
+	local strModel = tostring(self.m_entity:GetModelHash())
+	local saved = GVars.features.vehicle.stancer.saved_models
+	saved[strModel] = table.copy(self.m_deltas)
+	saved[strModel][self.eWheelSide.FRONT]["m_suspension_height"] = self.m_suspension_height.m_current
 end
 
 ---@return boolean

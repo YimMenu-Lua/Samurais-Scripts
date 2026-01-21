@@ -123,10 +123,10 @@ jobs:
               changelog += `## PR #${pr.number}: ${pr.title}\n`;
               const body = pr.body
               if (body) {
-                const lines = body.split('\n').map(line => line.trim().replace(/^-\s*/, ''));
+                const lines = body.split('\n').map(line => line.trim());
                 for (const line of lines) {
                   if (line)
-                    changelog += `- ${line}\n`;
+                    changelog += `${line}\n`;
                 }
                 changelog += "\n";
               }

@@ -838,6 +838,7 @@ function GUI:ConfirmPopup(name)
 		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + firstCursorPos)
 		if (self:Button(_T("GENERIC_CONFIRM"), { size = buttonSize })) then
 			ImGui.CloseCurrentPopup()
+			ImGui.EndPopup()
 			return true
 		end
 
@@ -846,6 +847,7 @@ function GUI:ConfirmPopup(name)
 
 		if (self:Button(_T("GENERIC_CANCEL"), { size = buttonSize })) then
 			ImGui.CloseCurrentPopup()
+			ImGui.EndPopup()
 			return false
 		end
 

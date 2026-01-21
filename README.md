@@ -23,6 +23,26 @@
   </a>
 </div>
 
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#about">About</a></li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#setup">setup</a></li>
+        <li><a href="#commands-console">Commands Console</a></li>
+      </ul>
+    </li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#documentation">Documentation</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
+
 # About
 
 ![ss](./docs/ss.png)
@@ -72,6 +92,10 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 > Some parts of the API were refactored or extended but nothing has drastically changed.
 > All changes introduced in this project are documented in the source.
 
+## Features
+
+A full list of available features and their usage [can be found here](docs/Features.md).
+
 ## FAQ
 
 - **Q:** Does this support Enhanced?
@@ -91,6 +115,14 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 - **Short Answer:** No.
 - **Long Answer:** Yes, a compatibility layer can be added to accomodate for all language and API differences but is it worth the trouble and code bloat? Absolutely not. We would be better off rewriting this for V2's API.
 
+## Contact
+
+<div>
+  <a href="https://discord.gg/RHBUxJ5Qhp">
+    <img height="96" width="192" alt="Discord" src="https://substackcdn.com/image/fetch/$s_!nfCP!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F8a41e45e-aac9-44e5-8b69-55a81058ecbf_875x280.png">
+  </a>
+</div>
+
 ## Acknowledgments
 
 | Name | Contribution |
@@ -104,11 +136,3 @@ This project was rewritten from scratch using [SmallBase](https://github.com/xes
 | <a href="https://github.com/durtyfree"><img height="40" width="40" alt="DurtyFree" src="https://avatars.githubusercontent.com/durtyfree"><br/>Alexander Schmid</a> | [GTA V data dumps](https://github.com/DurtyFree/gta-v-data-dumps) |
 | <a href="https://github.com/yimura"><img height="40" width="40" alt="Yimura" src="https://avatars.githubusercontent.com/yimura"><br/>Andreas Maerten</a> | GTA V classes (archived/removed) |
 | <a href="https://unknowncheats.me"><img height="40" width="40" alt="UC" src="https://avatars.githubusercontent.com/u/29552835"><br/>UnknownCheats</a> | A treasure trove of information |
-
-## Contact
-
-<div>
-  <a href="https://discord.gg/RHBUxJ5Qhp">
-    <img height="96" width="192" alt="Discord" src="https://substackcdn.com/image/fetch/$s_!nfCP!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F8a41e45e-aac9-44e5-8b69-55a81058ecbf_875x280.png">
-  </a>
-</div>
