@@ -382,13 +382,13 @@ return {
 		description = "Acid Lab Sell Generic Bitset",
 		file = "fm_content_acid_lab_sell.c",
 		LEGACY = {
-			value = 301,
-			pattern = [[func_\w{3}\(&.?Local_5\d+, \w+\)]],
+			value = 5597,
+			pattern = [[func_\w{3}\(&.?(Local_5\d+), \w+\)]],
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 301,
-			pattern = [[func_\w{3}\(&.?Local_5\d+, \w+\)]],
+			value = 5599,
+			pattern = [[func_\w{3}\(&.?(Local_5\d+), \w+\)]],
 			capture_group = 1
 		}
 	},
