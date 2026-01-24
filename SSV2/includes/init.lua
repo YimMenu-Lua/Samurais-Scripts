@@ -5,12 +5,21 @@
 -- pointers available globally through the `GPointers` table.
 ---@module "init"
 
+---@class VersionInfo
+---@field build string
+---@field online string
+
+---@alias GAME_VERSION table<eAPIVersion, VersionInfo>
 
 local SCRIPT_NAME <const>    = "Samurai's Scripts"
 local SCRIPT_VERSION <const> = require("includes.version")
 local DEFAULT_CONFIG <const> = require("includes.data.config")
-local TARGET_BUILD <const>   = "any"
-local TARGET_VERSION <const> = "any"
+
+---@type GAME_VERSION
+local GAME_VERSION <const>   = {
+	{ build = "3725.0",  online = "1.72" },
+	{ build = "1013.20", online = "1.72" },
+}
 
 -- ### Enums Namespace.
 --
@@ -24,7 +33,7 @@ Enums                        = require("includes.data.enums.__init")
 -- It handles API/environment detection, cleanup logic, entity and blip tracking, etc.
 --
 -- This is the core system that ensures safe, predictable behavior when switching sessions, reloading scripts, or shutting down.
-Backend                      = require("includes.backend"):init(SCRIPT_NAME, SCRIPT_VERSION, TARGET_BUILD, TARGET_VERSION)
+Backend                      = require("includes.backend"):init(SCRIPT_NAME, SCRIPT_VERSION, GAME_VERSION)
 
 require("includes.lib.types")
 require("includes.lib.utils")

@@ -36,20 +36,20 @@ end
 
 -- Since PatternScanner runs in a fiber, we can't get pointer values on file load.
 local function SafeGetVersion()
-	if (not GPointers.GameVersion) then
+	if (GPointers.GameVersion.build:isempty()) then
 		local ptr = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
 		local b = ptr:add(0x24):rip()
 		local o = b:add(0x20)
 		GPointers.GameVersion = {
-			_build  = b:get_string(),
-			_online = o:get_string()
+			build  = b:get_string(),
+			online = o:get_string()
 		}
 	end
 
 	return GPointers.GameVersion
 end
 
----@return { _build: string, _online: string }
+---@return VersionInfo
 function Memory:GetGameVersion()
 	return SafeGetVersion()
 end

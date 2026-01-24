@@ -12,7 +12,7 @@ local Refs = require("includes.data.refs")
 Game = {}
 Game.__index = Game
 
----@return { _build: string, _online: string }
+---@return VersionInfo
 function Game.GetVersion()
 	return Memory:GetGameVersion()
 end

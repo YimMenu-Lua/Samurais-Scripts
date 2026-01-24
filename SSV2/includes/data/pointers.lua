@@ -17,7 +17,7 @@ PatternScanner = require("includes.services.PatternScanner"):init()
 ---@field ScriptGlobals pointer
 ---@field GameState pointer<byte>
 ---@field GameTime pointer<uint32_t>
----@field GameVersion { _build: string, _online: string }
+---@field GameVersion VersionInfo
 ---@field ScreenResolution vec2
 ---@field DynamicFuncs DynamicFuncs
 local GPointers = {
@@ -26,7 +26,7 @@ local GPointers = {
 	ScriptGlobals    = nullptr,
 	GameState        = nullptr,
 	GameTime         = nullptr,
-	GameVersion      = { _build = "nil", _online = "nil" },
+	GameVersion      = { build = "", online = "" },
 	ScreenResolution = vec2:zero(),
 }
 
@@ -68,8 +68,8 @@ local mem_batches <const> = {
 			local pGameBuild = ptr:add(0x24):rip()
 			local pOnlineVersion = pGameBuild:add(0x20)
 			GPointers.GameVersion = {
-				_build  = pGameBuild:get_string(),
-				_online = pOnlineVersion:get_string()
+				build  = pGameBuild:get_string(),
+				online = pOnlineVersion:get_string()
 			}
 		end),
 		MemoryBatch.new("GameState", "83 3D ? ? ? ? ? 75 17 8B 43 20 25", function(ptr)
@@ -127,8 +127,8 @@ local mem_batches <const> = {
 			end
 
 			GPointers.GameVersion = {
-				_build  = ptr:add(0x3):rip():get_string(),
-				_online = ptr:add(0x47):add(0x3):rip():get_string()
+				build  = ptr:add(0x3):rip():get_string(),
+				online = ptr:add(0x47):add(0x3):rip():get_string()
 			}
 		end),
 		MemoryBatch.new("GameState", "83 3D ? ? ? ? ? 0F 85 ? ? ? ? BA ? 00", function(ptr)
