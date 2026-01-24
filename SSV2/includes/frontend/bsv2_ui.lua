@@ -5,6 +5,7 @@ local PrivateJet                 = require("includes.modules.PrivateJet")
 local PrivateLimo                = require("includes.modules.PrivateLimo")
 local t_GamePeds                 = require("includes.data.peds")
 local PreviewService             = require("includes.services.PreviewService")
+local Weapons                    = require("includes.data.weapons")
 local i_SelectedSidebarItem      = 1
 local i_WeaponCategoryIndex      = 1
 local i_WeaponIndex              = 1
@@ -45,18 +46,20 @@ local t_SelectedLimo             = {}
 local t_WeaponList               = {}
 local t_MainUIfooter             = {}
 local t_SelectedEscortGroup      = {}
+
+---@type array<{name: string, list?: array<hash>}>
 local t_WeaponCategories         = {
 	{ name = "None" },
-	{ name = "Melee",          groupHash = 2685387236 },
-	{ name = "Pistols",        groupHash = 416676503 },
-	{ name = "SMGs",           groupHash = 3337201093 },
-	{ name = "Shotguns",       groupHash = 860033945 },
-	{ name = "Assault Rifles", groupHash = 970310034 },
-	{ name = "Machine Guns",   groupHash = 1159398588 },
-	{ name = "Sniper Rifles",  groupHash = 3082541095 },
-	{ name = "Heavy Weapons",  groupHash = 2725924767 },
-	{ name = "Throwables",     groupHash = 1548507267 },
-	{ name = "Miscellaneous",  groupHash = 4257178988 },
+	{ name = "Melee",          list = Weapons.Melee },
+	{ name = "Pistols",        list = Weapons.Pistols },
+	{ name = "SMGs",           list = Weapons.SMG },
+	{ name = "Shotguns",       list = Weapons.Shotguns },
+	{ name = "Assault Rifles", list = Weapons.AssaultRifles },
+	{ name = "Machine Guns",   list = Weapons.MachineGuns },
+	{ name = "Sniper Rifles",  list = Weapons.SniperRifles },
+	{ name = "Heavy Weapons",  list = Weapons.Heavy },
+	{ name = "Throwables",     list = Weapons.Throwables },
+	{ name = "Miscellaneous",  list = Weapons.Misc },
 }
 -- local t_NewEscortGroup           = {
 -- 	name = "N/A",
@@ -215,41 +218,43 @@ local function BodyguardSpawnFooter()
 		ImGui.PushItemWidth(200)
 		if ImGui.BeginCombo("Category", t_WeaponCategories[i_WeaponCategoryIndex].name) then
 			for i, cat in ipairs(t_WeaponCategories) do
-				if cat.groupHash then
-					local is_selected = (i_WeaponCategoryIndex == i)
-
-					if ImGui.Selectable(cat.name, is_selected) then
-						i_WeaponCategoryIndex = i
-					end
-
-					if GUI:IsItemClicked(0) then
-						GUI:PlaySound("Nav")
-						t_WeaponList = weapons.get_all_weapons_of_group_type(cat.groupHash)
-					end
-
-					if is_selected then
-						ImGui.SetItemDefaultFocus()
-					end
+				if (not cat.list) then
+					goto continue
 				end
+
+				local is_selected = (i_WeaponCategoryIndex == i)
+				if ImGui.Selectable(cat.name, is_selected) then
+					i_WeaponCategoryIndex = i
+				end
+
+				if GUI:IsItemClicked(0) then
+					GUI:PlaySound("Nav")
+					t_WeaponList = cat.list
+				end
+
+				if is_selected then
+					ImGui.SetItemDefaultFocus()
+				end
+
+				::continue::
 			end
 			ImGui.EndCombo()
 		end
 
-		if #t_WeaponList > 0 then
+		if t_WeaponList and #t_WeaponList > 0 then
 			ImGui.SameLine()
 
-			if ImGui.BeginCombo("Weapon", weapons.get_weapon_display_name(t_WeaponList[i_WeaponIndex])) then
+			local wpn_name = weapons.get_weapon_display_name(t_WeaponList[i_WeaponIndex])
+			if ImGui.BeginCombo("Weapon", wpn_name) then
 				for i, wpn in ipairs(t_WeaponList) do
 					local is_selected = (i_WeaponIndex == i)
-					local wpn_name = weapons.get_weapon_display_name(wpn)
-
 					if ImGui.Selectable(wpn_name, is_selected) then
 						i_WeaponIndex = i
 					end
 
 					if GUI:IsItemClicked(0) then
 						GUI:PlaySound("Nav")
-						i_SelectedBodyguardWeapon = joaat(t_WeaponList[i_WeaponIndex])
+						i_SelectedBodyguardWeapon = wpn
 					end
 
 					if is_selected then

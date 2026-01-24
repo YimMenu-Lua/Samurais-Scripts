@@ -533,5 +533,6 @@ return {
 	["GENERIC_LIST_GROUP"] = "分組依據",
 	["YRV3_TRIGGER_PROD"] = "觸發製作",
 	["YRV3_TRIGGER_PROD_TT"] = "只要有貨源，立即觸發生產。您可以按住按鈕繼續觸發它或啟用下一個複選框以完全自動化該過程。",
-	["YRV3_AUTO_PROD"] = "自動製作"
+	["YRV3_AUTO_PROD"] = "自動製作",
+	["GENERIC_WAIT_LABEL"] = "請稍等"
 }

@@ -533,5 +533,6 @@ return {
 	["GENERIC_LIST_SORT"] = "Ordenar por",
 	["YRV3_TRIGGER_PROD_TT"] = "Aciona instantaneamente a produção uma vez, desde que você tenha suprimentos. Você pode segurar o botão para continuar a acioná-lo ou ativar a próxima caixa de seleção para automatizar totalmente o processo.",
 	["YRV3_TRIGGER_PROD"] = "Produção de gatilho",
-	["YRV3_AUTO_PROD"] = "Produção automática"
+	["YRV3_AUTO_PROD"] = "Produção automática",
+	["GENERIC_WAIT_LABEL"] = "Por favor, aguarde"
 }

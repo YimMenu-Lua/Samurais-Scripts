@@ -533,5 +533,6 @@ return {
 	["YAV3_DISABLE_SFX"] = "禁用音效",
 	["YRV3_TRIGGER_PROD"] = "触发制作",
 	["YRV3_TRIGGER_PROD_TT"] = "只要有货源，立即触发生产。您可以按住按钮继续触发它或启用下一个复选框以完全自动化该过程。",
-	["YRV3_AUTO_PROD"] = "自动制作"
+	["YRV3_AUTO_PROD"] = "自动制作",
+	["GENERIC_WAIT_LABEL"] = "请稍等"
 }

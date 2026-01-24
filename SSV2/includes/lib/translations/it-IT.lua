@@ -533,5 +533,6 @@ return {
 	["GENERIC_LIST_GROUP"] = "Raggruppa per",
 	["YRV3_TRIGGER_PROD_TT"] = "Attiva istantaneamente la produzione una volta che hai scorte. Puoi tenere premuto il pulsante per continuare ad attivarlo o abilitare la casella di controllo successiva per automatizzare completamente il processo.",
 	["YRV3_TRIGGER_PROD"] = "Attivare la produzione",
-	["YRV3_AUTO_PROD"] = "Produzione automatica"
+	["YRV3_AUTO_PROD"] = "Produzione automatica",
+	["GENERIC_WAIT_LABEL"] = "attendere prego"
 }

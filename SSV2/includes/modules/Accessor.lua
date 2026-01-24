@@ -1,7 +1,7 @@
 ---@diagnostic disable: param-type-mismatch, return-type-mismatch, lowercase-global
 
 ---@enum eAccessorType
-eAccessorType = {
+Enums.eAccessorType = {
 	GLOBAL = 0,
 	LOCAL = 1
 }
@@ -18,7 +18,7 @@ local Accessor = Class("Accessor")
 --#region Internal
 
 local AccessorDispatch = {
-	[eAccessorType.GLOBAL] = function(self, method, args)
+	[Enums.eAccessorType.GLOBAL] = function(self, method, args)
 		local callback = globals[method]
 		if not callback then
 			log.warning(("Attempt to call an unsupported function: globals.%s"):format(method))
@@ -28,7 +28,7 @@ local AccessorDispatch = {
 		table.insert(args, 1, self:GetIndex())
 		return callback(table.unpack(args))
 	end,
-	[eAccessorType.LOCAL] = function(self, method, args)
+	[Enums.eAccessorType.LOCAL] = function(self, method, args)
 		local callback = locals[method]
 		if not callback then
 			log.warning(("Attempt to call an unsupported function: locals.%s"):format(method))
@@ -84,16 +84,17 @@ function Accessor:CanAccess()
 	return self:GetPointer():is_valid()
 end
 
+---@return eAccessorType
 function Accessor:GetType()
 	return self.m_type
 end
 
----@return number
+---@return uint64_t
 function Accessor:GetAddress()
 	return self:GetPointer():get_address()
 end
 
----@return number
+---@return integer
 function Accessor:GetIndex()
 	local addr = self.m_index
 
@@ -118,14 +119,14 @@ function Accessor:At(offset, size)
 end
 
 function Accessor:__tostring()
-	local prefix = self.m_type == eAccessorType.GLOBAL and "Global" or "Local"
+	local prefix = self.m_type == Enums.eAccessorType.GLOBAL and "Global" or "Local"
 	local chain, suffix = "", ""
 
 	for _, offset in ipairs(self.m_path or {}) do
 		chain = chain .. ".f_" .. offset
 	end
 
-	if (self.m_type == eAccessorType.LOCAL) and (self.m_script and #self.m_script > 0) then
+	if (self.m_type == Enums.eAccessorType.LOCAL) and (self.m_script and #self.m_script > 0) then
 		suffix = ":" .. self.m_script
 	end
 
@@ -170,9 +171,9 @@ end
 
 ---@return pointer
 function Accessor:GetPointer()
-	if self.m_type == eAccessorType.GLOBAL then
+	if self.m_type == Enums.eAccessorType.GLOBAL then
 		return globals.get_pointer(self:GetIndex())
-	elseif self.m_type == eAccessorType.LOCAL then
+	elseif self.m_type == Enums.eAccessorType.LOCAL then
 		return locals.get_pointer(self.m_script, self:GetIndex())
 	end
 
@@ -180,7 +181,7 @@ function Accessor:GetPointer()
 end
 
 ---------------------------
-------- Write
+---------- Write ----------
 ---------------------------
 
 ---@param value number
@@ -222,7 +223,7 @@ ScriptGlobal = Class("ScriptGlobal", Accessor)
 ---@param address integer Global address
 ---@return ScriptGlobal
 function ScriptGlobal.new(address)
-	local instance = Accessor.new(address, eAccessorType.GLOBAL)
+	local instance = Accessor.new(address, Enums.eAccessorType.GLOBAL)
 	---@diagnostic disable: undefined-field
 	instance.__index.__type = ScriptGlobal.__type
 	return setmetatable(instance, ScriptGlobal)
@@ -247,7 +248,7 @@ setmetatable(ScriptLocal,
 function ScriptLocal.new(address, script_name)
 	assert(not string.isnullorempty(script_name) and not string.iswhitespace(script_name),
 		"Invalid script name for ScriptLocal!")
-	local instance               = Accessor.new(address, eAccessorType.LOCAL, script_name)
+	local instance               = Accessor.new(address, Enums.eAccessorType.LOCAL, script_name)
 	---@diagnostic disable: undefined-field
 	instance.__index.ReadString  = nil
 	instance.__index.WriteString = nil

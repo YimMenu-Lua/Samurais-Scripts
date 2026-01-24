@@ -226,7 +226,7 @@ local function DrawAnims()
 	if ImGui.BeginListBox("##animlist", -1, -1) then
 		if not b_DataListsSorted then
 			ImGui.Dummy(1, 60)
-			ImGui.TextSpinner("Loading Data. Please wait", 7, ImGui.SpinnerStyle.SCAN)
+			ImGui.TextSpinner(_T("GENERIC_WAIT_LABEL"), 7, ImGui.SpinnerStyle.SCAN)
 		else
 			for i, action in ipairs(t_AnimList) do
 				if (i_AnimSortByIndex > 0 and action.category ~= t_AnimSortbyList[i_AnimSortByIndex + 1]) then
@@ -883,9 +883,8 @@ local function DrawJsonMovementClipsets()
 	else
 		ImGui.BeginListBox("##jsonmvmts", -1, -1)
 		if not b_MovementListCreated then
-			ImGui.TextSpinner("Loading data from Json", 7.5, ImGui.SpinnerStyle.SCAN)
-			ImGui.EndListBox()
-			return
+			ImGui.TextSpinner(_T("GENERIC_WAIT_LABEL"), 7.5, ImGui.SpinnerStyle.SCAN)
+			ImGui.Spacing()
 		end
 
 		for i = 1, #t_MovementClipsetsJson do
@@ -902,15 +901,19 @@ local function DrawJsonMovementClipsets()
 				ImGui.PushStyleColor(ImGuiCol.Text, 0.8, 0.8, 0.4, 0.8)
 			end
 
+			ImGui.BeginDisabled(not b_MovementListCreated)
 			if ImGui.Selectable(label, is_selected) then
 				t_SelectedMovementClipset = t_MovementClipsetsJson[i]
 			end
+			ImGui.EndDisabled()
 
 			if (is_favorite) then
 				ImGui.PopStyleColor()
 			end
 
-			GUI:Tooltip(_F("Right click to %s favorites.", is_favorite and "remove from" or "add to"))
+			if (b_MovementListCreated) then
+				GUI:Tooltip(_F("Right click to %s favorites.", is_favorite and "remove from" or "add to"))
+			end
 
 			if GUI:IsItemClicked(1) then
 				GUI:PlaySound("Click")

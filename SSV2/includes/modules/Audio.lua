@@ -34,6 +34,11 @@ function Audio:ToggleEmitter(data, toggle, entity, station)
 	end)
 end
 
+---@return table<string, StaticEmitter>
+function Audio:GetActiveEmitters()
+	return self.m_active_emitters
+end
+
 ---@param toggle boolean
 ---@param station? string
 function Audio:BlastRadio(toggle, station)

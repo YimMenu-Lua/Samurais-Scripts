@@ -533,5 +533,6 @@ return {
 	["GENERIC_LIST_GROUP"] = "Grupuj według",
 	["YRV3_TRIGGER_PROD"] = "Produkcja wyzwalacza",
 	["YRV3_TRIGGER_PROD_TT"] = "Natychmiastowo jednokrotnie uruchamia produkcję, o ile masz zapasy. Możesz przytrzymać przycisk, aby go uruchomić lub zaznaczyć kolejne pole wyboru, aby w pełni zautomatyzować proces.",
-	["YRV3_AUTO_PROD"] = "Produkcja automatyczna"
+	["YRV3_AUTO_PROD"] = "Produkcja automatyczna",
+	["GENERIC_WAIT_LABEL"] = "Proszę czekać"
 }

@@ -533,5 +533,6 @@ return {
 	["YAV3_DISABLE_PROPS"] = "小道具を無効にする",
 	["YRV3_TRIGGER_PROD"] = "トリガープロダクション",
 	["YRV3_TRIGGER_PROD_TT"] = "供給がある限り、即座に生産を 1 回トリガーします。ボタンを押したままにしてトリガーを継続することも、次のチェックボックスを有効にしてプロセスを完全に自動化することもできます。",
-	["YRV3_AUTO_PROD"] = "自動生成"
+	["YRV3_AUTO_PROD"] = "自動生成",
+	["GENERIC_WAIT_LABEL"] = "お待ちください"
 }

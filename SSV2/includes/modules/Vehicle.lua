@@ -1525,7 +1525,6 @@ function Vehicle:RamForward()
 	end
 
 	ThreadManager:Run(function()
-		local last_speed = self:GetSpeed()
 		ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
 			self:GetHandle(),
 			1,
@@ -1538,10 +1537,6 @@ function Vehicle:RamForward()
 			false
 		)
 
-		sleep(500)
-		if (not ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(self:GetHandle())) then
-			VEHICLE.SET_VEHICLE_FORWARD_SPEED(self:GetHandle(), last_speed)
-		end
 		self.m_last_ram_time = Time.now()
 	end)
 end

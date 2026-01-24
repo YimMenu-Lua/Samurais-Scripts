@@ -3,6 +3,7 @@ local CompanionManager = require("includes.services.CompanionManager")
 local t_AnimList       = require("includes.data.actions.animations")
 local t_PedScenarios   = require("includes.data.actions.scenarios")
 local Action           = require("includes.structs.Action")
+local Weapons          = require("includes.data.weapons")
 
 ---@alias ActionCategory
 --- | "anims"
@@ -151,7 +152,7 @@ function YimActions:WasActionInterrupted(ped)
 	end
 
 	if (current.action_type == Enums.eActionType.ANIM) then
-		return not ENTITY.IS_ENTITY_PLAYING_ANIM(ped, current.data.dict, current.data.name, -1)
+		return not ENTITY.IS_ENTITY_PLAYING_ANIM(ped, current.data.dict, current.data.name, 3)
 	elseif (current.action_type == Enums.eActionType.SCENARIO) then
 		return not PED.IS_PED_USING_ANY_SCENARIO(ped)
 	elseif (current.action_type == Enums.eActionType.SCENE) then
@@ -330,11 +331,13 @@ end
 function YimActions:ResetPlayer()
 	Self:Cleanup()
 
-	if (next(Audio.m_active_emitters) ~= nil) then
-		for _, emitter in pairs(Audio.m_active_emitters) do
-			if (emitter.source == Self:GetHandle()) then
-				Audio:ToggleEmitter(emitter, false)
-			end
+	if (not Audio:AreAnyEmittersEnabled()) then
+		return
+	end
+
+	for _, emitter in pairs(Audio:GetActiveEmitters()) do
+		if (emitter:GetOwner() == Self:GetHandle()) then
+			Audio:ToggleEmitter(emitter, false)
 		end
 	end
 end
@@ -391,6 +394,7 @@ function YimActions:OnInterruptEvent()
 	local localPlayer = Self:GetHandle()
 	local current = self.CurrentlyPlaying[localPlayer]
 	if (not current) then
+		yield()
 		return
 	end
 
@@ -595,10 +599,9 @@ function YimActions:GoofyUnaliveAnim()
 		if (current ~= 0 and WEAPON.GET_WEAPONTYPE_GROUP(current) ~= joaat("GROUP_PISTOL")) then
 			is_armed = true
 		else
-			for _, w in ipairs(t_Handguns) do
-				local pistol = joaat(w)
-				if (WEAPON.HAS_PED_GOT_WEAPON(ped, pistol, false)) then
-					WEAPON.SET_CURRENT_PED_WEAPON(ped, pistol, true)
+			for _, hash in ipairs(Weapons.Pistols) do
+				if (WEAPON.HAS_PED_GOT_WEAPON(ped, hash, false)) then
+					WEAPON.SET_CURRENT_PED_WEAPON(ped, hash, true)
 					is_armed = true
 					break
 				end
@@ -669,7 +672,7 @@ function YimActions:MainThread()
 		end
 
 		-- this is very stupid but it works... kinda.
-		if (ENTITY.IS_ENTITY_PLAYING_ANIM(ped, "mp_suicide", "pistol", 3) and t_Handguns and #t_Handguns > 0) then
+		if (ENTITY.IS_ENTITY_PLAYING_ANIM(ped, "mp_suicide", "pistol", 3) and Weapons.Pistols and #Weapons.Pistols > 0) then
 			self:GoofyUnaliveAnim()
 		end
 
@@ -705,7 +708,7 @@ function YimActions.PropManager:SpawnProp(owner, propData, isPed, coords, faceOw
 		coords = vec3:zero()
 	end
 
-	if (propData.model == 2767137151) or (propData.model == 976772591) then
+	if (propData.model == 2767137151 or propData.model == 976772591) then
 		Audio:PartyMode(true, owner)
 	end
 

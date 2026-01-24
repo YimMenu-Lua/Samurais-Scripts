@@ -1,3 +1,4 @@
+local Weapons = require("includes.data.weapons")
 require("includes.modules.Ped")
 
 local ReservedTargetVehicles = {}
@@ -172,6 +173,7 @@ function Bodyguard.new(modelHash, name, spawnPos, weapon, godmode, noRagdoll, be
 		taskQueue            = {},
 	}, Bodyguard)
 
+	guard:GiveWeapon(weapon)
 	return guard
 end
 
@@ -187,18 +189,20 @@ function Bodyguard:GiveWeapon(weapon)
 	end
 
 	weapon = (type(weapon) == "string") and joaat(weapon) or weapon
+	if (weapon == 0) then
+		weapon = joaat("WEAPON_TECPISTOL")
+	end
+
+	if (weapon == joaat("WEAPON_UNARMED")) then
+		self.isArmed = self:IsArmed()
+		return
+	end
 
 	if (type(weapon) == "number") then
-		if (weapon == 0) then
-			weapon = 350597077
-		elseif weapon == joaat("WEAPON_UNARMED") then
-			return
-		end
-
 		if (not WEAPON.HAS_PED_GOT_WEAPON(self.m_handle, weapon, false)) then
 			WEAPON.GIVE_WEAPON_TO_PED(self.m_handle, weapon, 9999, false, false)
 			WEAPON.SET_PED_INFINITE_AMMO(self.m_handle, true, weapon)
-			self.isArmed = (weapon ~= joaat("WEAPON_UNARMED"))
+			self.isArmed = true
 		end
 	end
 end
@@ -213,11 +217,12 @@ function Bodyguard:RemoveWeapon(weapon)
 end
 
 function Bodyguard:GiveAllWeapons()
-	for _, wpn in ipairs(t_AllWeapons) do
+	for _, wpn in ipairs(Weapons.All) do
 		if not WEAPON.HAS_PED_GOT_WEAPON(self.m_handle, wpn, false) then
 			WEAPON.GIVE_DELAYED_WEAPON_TO_PED(self.m_handle, wpn, 9999, false)
 		end
 	end
+
 	self.isArmed = true
 end
 
@@ -227,7 +232,7 @@ function Bodyguard:RemoveAllWeapons()
 end
 
 function Bodyguard:IsArmed()
-	for _, weaponHash in ipairs(t_AllWeapons) do
+	for _, weaponHash in ipairs(Weapons.All) do
 		if WEAPON.HAS_PED_GOT_WEAPON(self.m_handle, weaponHash, false) then
 			return true
 		end

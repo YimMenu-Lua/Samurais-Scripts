@@ -533,5 +533,6 @@ return {
 	["YAV3_DISABLE_PROPS"] = "Désactiver les accessoires",
 	["YRV3_TRIGGER_PROD"] = "Production de déclencheurs",
 	["YRV3_TRIGGER_PROD_TT"] = "Déclenche instantanément la production une fois tant que vous disposez de fournitures. Vous pouvez maintenir le bouton enfoncé pour continuer à le déclencher ou cocher la case suivante pour automatiser entièrement le processus.",
-	["YRV3_AUTO_PROD"] = "Production automatique"
+	["YRV3_AUTO_PROD"] = "Production automatique",
+	["GENERIC_WAIT_LABEL"] = "S'il vous plaît, attendez"
 }
