@@ -278,7 +278,7 @@ function YRV3:InitializeData()
 	self.m_data_initialized = true
 end
 
----@param index integer
+---@param index integer 0 .. 6
 ---@return integer
 function YRV3:GetBBProdTime(index)
 	local g_obj      = SGSL:Get(SGSL.data.biker_trigger_production_global)
@@ -295,7 +295,7 @@ function YRV3:GetBBProdTime(index)
 		:ReadInt()
 end
 
----@param index integer
+---@param index integer 0 .. 6
 function YRV3:TriggerBBProduction(index)
 	local g_obj      = SGSL:Get(SGSL.data.biker_trigger_production_global)
 	local pid_size   = g_obj:GetOffset(1)
@@ -311,6 +311,7 @@ function YRV3:TriggerBBProduction(index)
 		:WriteInt(100)
 end
 
+---@param slot integer 0 .. 6
 function YRV3:BBAutoProduce(slot)
 	---@type BikerBusiness|BikerBusinessExt
 	local data = Switch(slot) {
@@ -320,7 +321,6 @@ function YRV3:BBAutoProduce(slot)
 	}
 
 	if (not data) then
-		error("no data!")
 		return
 	end
 
@@ -864,7 +864,7 @@ end
 function YRV3:BBAutoProduceHandler()
 	for i, v in ipairs(self.m_biker_data) do
 		if (v.fast_prod_enabled and not v.fast_prod_running) then
-			self:BBAutoProduce(i)
+			self:BBAutoProduce(i - 1)
 		end
 	end
 
