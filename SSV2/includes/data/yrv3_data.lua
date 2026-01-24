@@ -609,11 +609,9 @@ local RawBusinessData <const> = {
 			},
 		},
 		["fm_content_acid_lab_sell"] = {
-			{
-				b = (function() return SGSL:Get(SGSL.data.acid_lab_sell_bitset):GetValue() end)(),
-				l = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetValue() end)(),
-				o = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetOffset(1) end)(),
-			}
+			b = (function() return SGSL:Get(SGSL.data.acid_lab_sell_bitset):GetValue() end)(),
+			l = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetValue() end)(),
+			o = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetOffset(1) end)(),
 		},
 	},
 	CEOWarehouses = {
