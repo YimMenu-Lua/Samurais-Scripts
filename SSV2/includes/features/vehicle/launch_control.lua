@@ -95,20 +95,20 @@ function LaunchControl:Update()
 		)
 
 		self.m_last_pop_time = Time.millis() + math.random(60, 120)
-		Audio.PlayExhaustPop(handle, false)
+		Audio:PlayExhaustPop(handle, false)
 	else
 		if (not GVars.features.vehicle.burble_tune) then
-			return
-		end
-
-		local gear = PV:GetCurrentGear()
-		if (gear == 0) then
 			return
 		end
 
 		if (not self.m_default_pops_off) then
 			AUDIO.ENABLE_VEHICLE_EXHAUST_POPS(handle, false)
 			self.m_default_pops_off = true
+		end
+
+		local gear = PV:GetCurrentGear()
+		if (gear == 0) then
+			return
 		end
 
 		if (not PV:IsMoving()) then
@@ -137,7 +137,7 @@ function LaunchControl:Update()
 				1.4
 			)
 
-			Audio.PlayExhaustPop(handle, true)
+			Audio:PlayExhaustPop(handle, true)
 
 			if (not self.m_shocking_event_handle and not EVENT.IS_SHOCKING_EVENT_IN_SPHERE(79, pos.x, pos.y, pos.z, 50)) then
 				self.m_shocking_event_handle = EVENT.ADD_SHOCKING_EVENT_FOR_ENTITY(79, handle, 10)

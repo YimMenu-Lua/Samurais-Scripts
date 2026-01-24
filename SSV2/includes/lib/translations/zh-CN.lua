@@ -339,7 +339,7 @@ return {
 	["SUBTAB_PAINTS"] = "定制油漆工作",
 	["SUBTAB_AIRCRAFT"] = "飞机",
 	["SUBTAB_FLATBED"] = "平板脚本",
-	["SUBTAB_CARS"] = "汽车和自行车",
+	["SUBTAB_CARS"] = "一般的",
 	["VEH_ENGINE_SWAP_SAME_ERR"] = "您的车辆已经配备了该发动机。",
 	["VEH_PAINT_NOTE"] = "颜色在游戏着色器上看起来不同。",
 	["GENERIC_NOT_IN_VEH"] = "您不在车内。",
@@ -530,5 +530,8 @@ return {
 	["YAV3_DISABLE_PTFX"] = "禁用粒子效果",
 	["YAV3_DISABLE_PROPS"] = "禁用道具",
 	["GENERIC_LIST_GROUP"] = "分组依据",
-	["YAV3_DISABLE_SFX"] = "禁用音效"
+	["YAV3_DISABLE_SFX"] = "禁用音效",
+	["YRV3_TRIGGER_PROD"] = "触发制作",
+	["YRV3_TRIGGER_PROD_TT"] = "只要有货源，立即触发生产。您可以按住按钮继续触发它或启用下一个复选框以完全自动化该过程。",
+	["YRV3_AUTO_PROD"] = "自动制作"
 }

@@ -67,7 +67,7 @@ function Flatbed:Spawn()
 	end
 
 	ThreadManager:Run(function()
-		Await(Game.RequestModel, self.modelHash)
+		TaskWait(Game.RequestModel, self.modelHash)
 		local spawnPos = Self:GetSpawnPosInFront()
 		self.m_handle = Game.CreateVehicle(
 			self.modelHash,

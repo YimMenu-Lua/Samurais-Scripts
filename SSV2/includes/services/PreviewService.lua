@@ -20,7 +20,7 @@ function PreviewService:Preview(modelHash, entityType)
 			self.m_current_pos = nil
 		end
 
-		Await(Game.RequestModel, modelHash)
+		TaskWait(Game.RequestModel, modelHash)
 		local handle
 		local coords = vec3:zero()
 		local groundZ = 0.0

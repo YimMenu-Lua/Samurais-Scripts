@@ -1,294 +1,6 @@
 local SGSL = require("includes.services.SGSL")
 
----@class WarehouseStruct
----@field wasChecked boolean
----@field isOwned boolean
----@field autoFill boolean
----@field name? string
----@field max? integer
----@field size? integer
----@field pos? vec3
----@field totalSupplies? integer
----@field totalValue? integer
-
----@class BikerBusinessStruct
----@field wasChecked boolean
----@field isOwned boolean
----@field unit_max? integer
----@field name? string
----@field value_tunable? string
----@field totalSupplies? integer
----@field totalStock? integer
----@field totalValue? integer
----@field blip? integer
-
----@class BusinessSafeStruct
----@field isOwned fun(): bool
----@field cashValue fun(): integer
----@field max_cash integer
----@field blip integer
----@field getSpecialVal? fun(): integer
----@field setSpecialVal? fun()
-
----@class MoneyFrontsStruct : BusinessSafeStruct
----@field cashValue? fun(): integer
----@field duffelTotal? fun(): integer
----@field dirtyCash? fun(): integer
----@field blip? integer
----@field max_cash? integer
----@field max_heat integer
----@field gvar_key_1 string
----@field gvar_key_2 string
----@field cb1_clicked boolean
----@field cb2_clicked boolean
----@field on_cb1_click fun(this: YRV3, newVal: boolean)
----@field on_cb2_click fun(this: YRV3, newVal: boolean)
----@field coords vec3
-
----@type array<WarehouseStruct>
-local Wh_Default = {
-	[1] = {
-		wasChecked = false,
-		isOwned = false,
-		autoFill = false
-	},
-	[2] = {
-		wasChecked = false,
-		isOwned = false,
-		autoFill = false
-	},
-	[3] = {
-		wasChecked = false,
-		isOwned = false,
-		autoFill = false
-	},
-	[4] = {
-		wasChecked = false,
-		isOwned = false,
-		autoFill = false
-	},
-	[5] = {
-		wasChecked = false,
-		isOwned = false,
-		autoFill = false
-	},
-}
-
----@type array<BikerBusinessStruct>
-local BB_Default = {
-	[1] = {
-		wasChecked = false,
-		isOwned = false,
-	},
-	[2] = {
-		wasChecked = false,
-		isOwned = false,
-	},
-	[3] = {
-		wasChecked = false,
-		isOwned = false,
-	},
-	[4] = {
-		wasChecked = false,
-		isOwned = false,
-	},
-	[5] = {
-		wasChecked = false,
-		isOwned = false,
-	},
-}
-
----@type dict<BusinessSafeStruct>
-local BS_Default = {
-	["Nightclub"] = {
-		isOwned = function()
-			return stats.get_int("MPX_NIGHTCLUB_OWNED") ~= 0
-		end,
-		cashValue = function()
-			return stats.get_int("MPX_CLUB_SAFE_CASH_VALUE")
-		end,
-		max_cash = 25e4,
-		blip = 614,
-		getSpecialVal = function()
-			return stats.get_int("MPX_CLUB_POPULARITY")
-		end,
-		setSpecialVal = function()
-			if stats.get_int("MPX_CLUB_POPULARITY") >= 1e3 then
-				return
-			end
-			stats.set_int("MPX_CLUB_POPULARITY", 1e3)
-		end
-	},
-	["Arcade"] = {
-		isOwned = function()
-			return stats.get_int("MPX_ARCADE_OWNED") ~= 0
-		end,
-		cashValue = function()
-			return stats.get_int("MPX_ARCADE_SAFE_CASH_VALUE")
-		end,
-		max_cash = 1e5,
-		blip = 740,
-	},
-	["Agency"] = {
-		isOwned = function()
-			return stats.get_int("MPX_FIXER_HQ_OWNED") ~= 0
-		end,
-		cashValue = function()
-			return stats.get_int("MPX_FIXER_SAFE_CASH_VALUE")
-		end,
-		max_cash = 25e4,
-		blip = 826,
-	},
-	["MC Clubhouse"] = {
-		isOwned = function()
-			return stats.get_int("MPX_PROP_CLUBHOUSE") ~= 0
-		end,
-		cashValue = function()
-			return stats.get_int("MPX_BIKER_BAR_RESUPPLY_CASH")
-		end,
-		max_cash = 1e5,
-		blip = 492,
-	},
-	["Bail Office"] = {
-		isOwned = function()
-			return stats.get_int("MPX_BAIL_OFFICE_OWNED") ~= 0
-		end,
-		cashValue = function()
-			return stats.get_int("MPX_BAIL_SAFE_CASH_VALUE")
-		end,
-		max_cash = 1e5,
-		blip = 893,
-	},
-	["Salvage Yard"] = {
-		isOwned = function()
-			return stats.get_int("MPX_SALVAGE_YARD_OWNED") ~= 0
-		end,
-		cashValue = function()
-			return stats.get_int("MPX_SALVAGE_SAFE_CASH_VALUE")
-		end,
-		max_cash = 25e4,
-		blip = 867,
-	},
-	["Garment Factory"] = {
-		isOwned = function()
-			return stats.get_int("MPX_HACKER_DEN_OWNED") ~= 0
-		end,
-		cashValue = function()
-			return stats.get_int("MPX_HDEN24_SAFE_CASH_VALUE")
-		end,
-		max_cash = 1e5,
-		blip = 900,
-	},
-}
-
----@type dict<MoneyFrontsStruct>
-local MF_Default = {
-	["YRV3_CWASH_LABEL"] = {
-		isOwned = function()
-			return stats.get_int("MPX_SB_CAR_WASH_OWNED") ~= 0
-		end,
-		cashValue = function()
-			return stats.get_int("MPX_CWASH_SAFE_CASH_VALUE")
-		end,
-		duffelTotal = function()
-			return stats.get_int("MPX_CAR_WASH_DUFFEL_VALUE")
-		end,
-		dirtyCash = function()
-			local posix = stats.get_int("MPX_CAR_WASH_DUFFEL_POSIX")
-			local pending_cash = stats.get_int("MPX_CAR_WASH_DUFFEL_PENDING") -- why is this always 35k even after it gets cleaned?
-			return Time.epoch() < posix and pending_cash or 0
-		end,
-		getSpecialVal = function()
-			return stats.get_packed_stat_int(24924)
-		end,
-		setSpecialVal = function()
-			if (stats.get_packed_stat_int(24924) == 0) then
-				return
-			end
-
-			stats.set_packed_stat_int(24924, 0)
-		end,
-		max_cash = 1e5,
-		max_heat = 100,
-		blip = 931,
-		gvar_key_1 = "features.yrv3.cwash_legal_work_cd",
-		gvar_key_2 = "features.yrv3.cwash_illegal_work_cd",
-		cb1_clicked = false,
-		cb2_clicked = false,
-		on_cb1_click = function(yrv3, newVal)
-			table.set_nested_key(GVars, "features.yrv3.cwash_legal_work_cd", newVal)
-			yrv3:SetCooldownStateDirty("cwash_legal_work_cd", true)
-		end,
-		on_cb2_click = function(yrv3, newVal)
-			table.set_nested_key(GVars, "features.yrv3.cwash_illegal_work_cd", newVal)
-			yrv3:SetCooldownStateDirty("cwash_illegal_work_cd", true)
-		end,
-		coords = vec3:new(25.645266, -1412.290649, 29.362230)
-	},
-	["YRV3_WEED_SHOP_LABEL"] = {
-		isOwned = function()
-			return stats.get_int("MPX_SB_WEED_SHOP_OWNED") ~= 0
-		end,
-		getSpecialVal = function()
-			return stats.get_packed_stat_int(24925)
-		end,
-		setSpecialVal = function()
-			if (stats.get_packed_stat_int(24925) == 0) then
-				return
-			end
-
-			stats.set_packed_stat_int(24925, 0)
-		end,
-		max_heat = 100,
-		gvar_key_1 = "features.yrv3.weedshop_legal_work_cd",
-		gvar_key_2 = "features.yrv3.weedshop_illegal_work_cd",
-		cb1_clicked = false,
-		cb2_clicked = false,
-		---@param yrv3 YRV3
-		on_cb1_click = function(yrv3, newVal)
-			table.set_nested_key(GVars, "features.yrv3.weedshop_legal_work_cd", newVal)
-			yrv3:SetCooldownStateDirty("weedshop_legal_work_cd", true)
-		end,
-		on_cb2_click = function(yrv3, newVal)
-			table.set_nested_key(GVars, "features.yrv3.weedshop_illegal_work_cd", newVal)
-			yrv3:SetCooldownStateDirty("weedshop_illegal_work_cd", true)
-		end,
-		coords = vec3:new(-1162.051147, -1564.757202, 4.410227)
-	},
-	["YRV3_HELITOURS_LABEL"] = {
-		isOwned = function()
-			return stats.get_int("MPX_SB_HELI_TOURS_OWNED") ~= 0
-		end,
-		getSpecialVal = function()
-			return stats.get_packed_stat_int(24926)
-		end,
-		setSpecialVal = function()
-			if (stats.get_packed_stat_int(24926) == 0) then
-				return
-			end
-
-			stats.set_packed_stat_int(24926, 0)
-		end,
-		max_heat = 100,
-		gvar_key_1 = "features.yrv3.helitours_legal_work_cd",
-		gvar_key_2 = "features.yrv3.helitours_illegal_work_cd",
-		cb1_clicked = false,
-		cb2_clicked = false,
-		---@param yrv3 YRV3
-		on_cb1_click = function(yrv3, newVal)
-			table.set_nested_key(GVars, "features.yrv3.helitours_legal_work_cd", newVal)
-			yrv3:SetCooldownStateDirty("helitours_legal_work_cd", true)
-		end,
-		on_cb2_click = function(yrv3, newVal)
-			table.set_nested_key(GVars, "features.yrv3.helitours_illegal_work_cd", newVal)
-			yrv3:SetCooldownStateDirty("helitours_illegal_work_cd", true)
-		end,
-		coords = vec3:new(-753.524841, -1511.244751, 5.015130)
-	},
-}
-
----@class StructScriptDisplayNames
-local StructScriptDisplayNames <const> = {
+local ScriptDisplayNames <const> = {
 	["fm_content_smuggler_sell"] = "Hangar (Land. Not supported.)",
 	["gb_smuggler"]              = "Hangar (Air)",
 	["gb_contraband_sell"]       = "CEO",
@@ -297,7 +9,7 @@ local StructScriptDisplayNames <const> = {
 	["fm_content_acid_lab_sell"] = "Acid Lab",
 }
 
-local eShouldTerminateScripts <const> = {
+local ScriptsToTerminate <const> = {
 	"appArcadeBusinessHub",
 	"appsmuggler",
 	"appbikerbusiness",
@@ -312,64 +24,90 @@ local eShouldTerminateScripts <const> = {
 ---@field m_safe_cash_sum number
 ---@field m_cwash_cash_sum number
 ---@field m_bhub_script_handle number
----@field m_warehouse_data array<WarehouseStruct>
----@field m_biker_data array<BikerBusinessStruct>
----@field m_safe_cash_data dict<BusinessSafeStruct>
----@field m_money_fronts_data dict<MoneyFrontsStruct>
 ---@field m_hangar_loop boolean
 ---@field m_has_triggered_autosell boolean
 ---@field m_sell_script_running boolean
 ---@field m_sell_script_name string?
 ---@field m_sell_script_disp_name string
----@field m_display_names StructScriptDisplayNames
+---@field m_script_display_names table<string, string>
+---@field m_raw_data RawBusinessData
+---@field m_warehouse_data array<SCWarehouse>
+---@field m_biker_data array<BikerBusiness>
+---@field m_biker_ext_data { bunker: BikerBusinessExt, acid_lab: BikerBusinessExt }
+---@field m_safe_cash_data dict<BusinessSafe>
+---@field m_money_fronts_data dict<MoneyFrontsBusiness>
+---@field m_prod_trigger_global ScriptGlobal
+---@field m_freemode_business_global ScriptGlobal
 ---@field private m_last_as_check_time number
 ---@field private m_cooldown_state_dirty boolean
+---@field private m_data_initialized boolean
 ---@field protected m_thread Thread?
-local YRV3 = {}
+---@field protected m_initialized boolean
+local YRV3 = { m_raw_data = require("includes.data.yrv3_data") }
 YRV3.__index = YRV3
 
 ---@return YRV3
 function YRV3:init()
-	local instance = setmetatable({
-		m_total_sum = 0,
-		m_ceo_value_sum = 0,
-		m_biker_value_sum = 0,
-		m_safe_cash_sum = 0,
-		m_cwash_cash_sum = 0,
-		m_bhub_script_handle = 0,
-		m_last_as_check_time = 0,
-		m_hangar_loop = false,
-		m_has_triggered_autosell = false,
-		m_sell_script_running = false,
-		m_sell_script_name = nil,
-		m_sell_script_disp_name = "None",
-		m_warehouse_data = Wh_Default,
-		m_biker_data = BB_Default,
-		m_safe_cash_data = BS_Default,
-		m_money_fronts_data = MF_Default,
-		m_display_names = StructScriptDisplayNames,
-		m_cooldown_state_dirty = true,
-	}, self)
+	if (self.m_initialized) then
+		return self
+	end
 
-	self.m_thread = ThreadManager:RegisterLooped("SS_YRV3", function()
-		instance:Main()
+	self.m_total_sum                = 0
+	self.m_ceo_value_sum            = 0
+	self.m_biker_value_sum          = 0
+	self.m_safe_cash_sum            = 0
+	self.m_cwash_cash_sum           = 0
+	self.m_bhub_script_handle       = 0
+	self.m_last_as_check_time       = 0
+	self.m_hangar_loop              = false
+	self.m_has_triggered_autosell   = false
+	self.m_sell_script_running      = false
+	self.m_data_initialized         = false
+	self.m_cooldown_state_dirty     = true
+	self.m_sell_script_name         = nil
+	self.m_sell_script_disp_name    = "None"
+	self.m_warehouse_data           = self.m_raw_data.SC_Default
+	self.m_biker_data               = self.m_raw_data.BB_Default
+	self.m_biker_ext_data           = self.m_raw_data.BBEXT_Default
+	self.m_safe_cash_data           = self.m_raw_data.BS_Default
+	self.m_money_fronts_data        = self.m_raw_data.MF_Default
+	self.m_script_display_names     = ScriptDisplayNames
+	self.m_prod_trigger_global      = SGSL:Get(SGSL.data.biker_trigger_production_global):AsGlobal()
+	self.m_freemode_business_global = SGSL:Get(SGSL.data.freemode_business_global):AsGlobal()
+
+	self.m_thread                   = ThreadManager:RegisterLooped("SS_YRV3", function()
+		self:Main()
 	end)
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
-		instance:Reset()
+		self:Reset()
 	end)
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, function()
-		instance:Reset()
+		self:Reset()
 	end)
 
-	return instance
+	return self
+end
+
+function YRV3:Reset()
+	self.m_ceo_value_sum        = 0
+	self.m_biker_value_sum      = 0
+	self.m_safe_cash_sum        = 0
+	self.m_cwash_cash_sum       = 0
+	self.m_warehouse_data       = self.m_raw_data.SC_Default
+	self.m_biker_data           = self.m_raw_data.BB_Default
+	self.m_biker_ext_data       = self.m_raw_data.BBEXT_Default
+	self.m_safe_cash_data       = self.m_raw_data.BS_Default
+	self.m_money_fronts_data    = self.m_raw_data.MF_Default
+	self.m_data_initialized     = false
+	self.m_cooldown_state_dirty = true
 end
 
 function YRV3:CanAccess()
-	return (Backend:GetAPIVersion() == Enums.eAPIVersion.V1)
-		and Backend:IsUpToDate()
+	return Backend:IsUpToDate()
 		and Game.IsOnline()
+		and not Backend:IsMockEnv()
 		and not script.is_active("maintransition")
 		and not NETWORK.NETWORK_IS_ACTIVITY_SESSION()
 end
@@ -416,49 +154,219 @@ end
 
 ---@param index integer
 function YRV3:PopulateBikerBusinessSlot(index)
-	script.run_in_fiber(function()
-		if (self.m_biker_data[index].wasChecked) then
+	ThreadManager:Run(function()
+		if (self.m_biker_data[index].was_checked) then
 			return
 		end
 
-		for _, v in ipairs(self.t_BikerBusinessIDs) do
-			local propertyIndex = stats.get_int(_F("MPX_FACTORYSLOT%d", index - 1))
+		local property_index = (stats.get_int(_F("MPX_FACTORYSLOT%d", index - 1)))
+		local ref            = self.m_raw_data.BikerBusinesses[property_index]
+		if (not ref) then
+			return
+		end
 
-			if table.find(v.possible_ids, propertyIndex) then
-				self.m_biker_data[index] = {
-					wasChecked = true,
-					isOwned = true,
-					name = v.name,
-					id = v.id,
-					unit_max = v.unit_max,
-					value_tunable = v.val_tunable,
-					blip = v.blip,
-				}
+		self.m_biker_data[index] = {
+			was_checked       = true,
+			is_owned          = true,
+			fast_prod_enabled = false,
+			fast_prod_running = false,
+			name              = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(ref.gxt),
+			id                = ref.id,
+			unit_max          = ref.unit_max,
+			value_tunable     = ref.val_tunable,
+			coords            = ref.coords,
+		}
+	end)
+end
+
+function YRV3:PopulateBikerExtData()
+	ThreadManager:Run(function()
+		if (not self.m_biker_ext_data.bunker.was_checked) then
+			local idx                             = stats.get_int("MPX_PROP_FAC_SLOT5")
+			local ref                             = self.m_raw_data.Bunkers[idx]
+			local gxt_idx                         = (idx < 28) and idx - 20 or idx - 19
+			local has_eq_upgrade                  = stats.get_int("MPX_BUNKER_EQUIPMENT") == 1
+			local has_staff_upgrade               = stats.get_int("MPX_BUNKER_STAFF") == 1
+
+			self.m_biker_ext_data.bunker.is_owned = idx ~= 0
+			self.m_biker_ext_data.bunker.name     = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_BUNKER_%d",
+				gxt_idx))
+			self.m_biker_ext_data.bunker.coords   = ref and ref.coords or vec3:zero()
+
+			if (has_eq_upgrade) then
+				self.m_biker_ext_data.bunker.equipment_upgrade = true
+				self.m_biker_ext_data.bunker.value_offset_1 = tunables.get_int("GR_MANU_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
+			end
+
+			if (has_staff_upgrade) then
+				self.m_biker_ext_data.bunker.staff_upgrade  = true
+				self.m_biker_ext_data.bunker.value_offset_2 = tunables.get_int("GR_MANU_PRODUCT_VALUE_STAFF_UPGRADE")
+			end
+
+			self.m_biker_ext_data.bunker.was_checked = true
+		end
+
+		if (not self.m_biker_ext_data.acid_lab.was_checked) then
+			self.m_biker_ext_data.acid_lab.name        = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION("MP_BWH_ACID")
+			self.m_biker_ext_data.acid_lab.is_owned    = stats.get_int("MPX_XM22_LAB_OWNED") ~= 0
+			self.m_biker_ext_data.acid_lab.was_checked = true
+			local has_eq_upgrade                       = (stats.get_int("MPX_AWD_CALLME") >= 10)
+				and (stats.get_int("MPX_XM22_LAB_EQUIP_UPGRADED") == 1)
+
+			if (has_eq_upgrade) then
+				self.m_biker_ext_data.acid_lab.equipment_upgrade = true
+				self.m_biker_ext_data.acid_lab.value_offset_1 = tunables.get_int(
+					"BIKER_ACID_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
 			end
 		end
 	end)
 end
 
 function YRV3:PopulateCEOwarehouseSlot(index)
-	if self.m_warehouse_data[index].wasChecked then
+	if self.m_warehouse_data[index].was_checked then
 		return
 	end
 
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		local property_index = (stats.get_int(_F("MPX_PROP_WHOUSE_SLOT%d", index - 1)))
-		local warehouseName = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_WHOUSE_%d", property_index - 1))
-
-		if self.t_CEOwarehouses[property_index] then
-			self.m_warehouse_data[index] = {
-				wasChecked = true,
-				isOwned = true,
-				autoFill = false,
-				name = warehouseName,
-				size = self.t_CEOwarehouses[property_index].size,
-				max = self.t_CEOwarehouses[property_index].max,
-				pos = self.t_CEOwarehouses[property_index].coords,
-			}
+		local ref            = self.m_raw_data.CEOWarehouses[property_index]
+		if (not ref) then
+			return
 		end
+
+		self.m_warehouse_data[index] = {
+			was_checked       = true,
+			is_owned          = true,
+			auto_fill_enabled = false,
+			name              = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_WHOUSE_%d", property_index - 1)),
+			size              = ref.size,
+			max               = ref.max,
+			coords            = ref.coords,
+		}
+	end)
+end
+
+function YRV3:InitializeData()
+	if (self.m_data_initialized or not Game.IsOnline()) then
+		return
+	end
+
+	for i, v in ipairs(self.m_warehouse_data) do
+		if (not v.was_checked or not v.max) then
+			self:PopulateCEOwarehouseSlot(i)
+			sleep(100)
+		end
+	end
+
+	for i, v in ipairs(self.m_biker_data) do
+		if (not v.was_checked or not v.unit_max) then
+			self:PopulateBikerBusinessSlot(i)
+			sleep(100)
+		end
+	end
+
+	for i, v in ipairs(self.m_raw_data.Hangars) do
+		v.name = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_HANGAR_%d", i))
+	end
+
+	-- for i, v in ipairs(self.m_raw_data.Nightclubs) do
+	-- 	v.name = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_NCLU_%d", i))
+	-- end
+
+
+	self:PopulateBikerExtData()
+	self.m_data_initialized = true
+end
+
+---@param index integer
+---@return integer
+function YRV3:GetBBProdTime(index)
+	local g_obj      = SGSL:Get(SGSL.data.biker_trigger_production_global)
+	local pid_size   = g_obj:GetOffset(1)
+	local offset_2   = g_obj:GetOffset(2)
+	local offset_3   = g_obj:GetOffset(3)
+	local index_size = g_obj:GetOffset(4)
+	return self.m_prod_trigger_global
+		:At(Self:GetPlayerID(), pid_size)
+		:At(offset_2)
+		:At(offset_3)
+		:At(index, index_size)
+		:At(9)
+		:ReadInt()
+end
+
+---@param index integer
+function YRV3:TriggerBBProduction(index)
+	local g_obj      = SGSL:Get(SGSL.data.biker_trigger_production_global)
+	local pid_size   = g_obj:GetOffset(1)
+	local offset_2   = g_obj:GetOffset(2)
+	local offset_3   = g_obj:GetOffset(3)
+	local index_size = g_obj:GetOffset(4)
+	self.m_prod_trigger_global
+		:At(Self:GetPlayerID(), pid_size)
+		:At(offset_2)
+		:At(offset_3)
+		:At(index, index_size)
+		:At(9)
+		:WriteInt(100)
+end
+
+function YRV3:BBAutoProduce(slot)
+	---@type BikerBusiness|BikerBusinessExt
+	local data = Switch(slot) {
+		[5]     = self.m_biker_ext_data.bunker,
+		[6]     = self.m_biker_ext_data.acid_lab,
+		default = self.m_biker_data[slot + 1]
+	}
+
+	if (not data) then
+		error("no data!")
+		return
+	end
+
+	if (data.fast_prod_running) then
+		return
+	end
+
+	local function getSupplies()
+		return stats.get_int(_F("MPX_MATTOTALFORFACTORY%d", slot))
+	end
+
+	local function getStock()
+		return stats.get_int(_F("MPX_PRODTOTALFORFACTORY%d", slot))
+	end
+
+	ThreadManager:Run(function()
+		data.fast_prod_running = true
+
+		if (not data.was_checked) then
+			if (slot < 5) then
+				self:PopulateBikerBusinessSlot(slot)
+			else
+				self:PopulateBikerExtData()
+			end
+
+			sleep(500)
+		end
+
+		if (not data.is_owned) then
+			data.fast_prod_enabled = false
+			data.fast_prod_running = false
+			return
+		end
+
+		while (data.fast_prod_enabled and getStock() < data.unit_max) do
+			if (getSupplies() <= 25) then
+				self:FillBikerBusiness(slot)
+				sleep(250)
+			end
+
+			self:TriggerBBProduction(slot)
+			yield()
+		end
+
+		data.fast_prod_enabled = false
+		data.fast_prod_running = false
 	end)
 end
 
@@ -541,11 +449,11 @@ function YRV3:WarehouseAutofill()
 	end
 
 	for i, v in ipairs(self.m_warehouse_data) do
-		if (not v.autoFill) then
+		if (not v.auto_fill_enabled) then
 			goto continue
 		end
 
-		if (not v.wasChecked or not v.name or not v.max) then
+		if (not v.was_checked or not v.name or not v.max) then
 			self:PopulateCEOwarehouseSlot(i)
 			sleep(500)
 		end
@@ -553,13 +461,13 @@ function YRV3:WarehouseAutofill()
 		if (stats.get_int(_F("MPX_CONTOTALFORWHOUSE%d", i - 1))) == v.max then
 			GUI:PlaySound(GUI.Sounds.Error)
 			Notifier:ShowWarning("YRV3", _F("Warehouse N°%d is already full! Option has been disabled.", i))
-			v.autoFill = false
+			v.auto_fill_enabled = false
 			goto continue
 		end
 
 		ThreadManager:Run(function()
 			while ((stats.get_int(_F("MPX_CONTOTALFORWHOUSE%d", i - 1))) < v.max) do
-				if (not v.autoFill) then
+				if (not v.auto_fill_enabled) then
 					break
 				end
 
@@ -567,7 +475,7 @@ function YRV3:WarehouseAutofill()
 				sleep(GVars.features.yrv3.autofill_delay or 100)
 			end
 
-			v.autoFill = false
+			v.auto_fill_enabled = false
 		end)
 
 		::continue::
@@ -651,13 +559,13 @@ function YRV3:WarehouseAutofillOnCommand(index)
 		return
 	end
 
-	script.run_in_fiber(function(s)
-		if (not self.m_warehouse_data[index].wasChecked) then
+	ThreadManager:Run(function(s)
+		if (not self.m_warehouse_data[index].was_checked) then
 			self:PopulateCEOwarehouseSlot(index)
 			s:sleep(250)
 		end
 
-		if (not self.m_warehouse_data[index].isOwned) then
+		if (not self.m_warehouse_data[index].is_owned) then
 			Notifier:ShowError(
 				"YRV3",
 				_F("No warehouse found in slot %d!", index),
@@ -666,12 +574,12 @@ function YRV3:WarehouseAutofillOnCommand(index)
 			return
 		end
 
-		self.m_warehouse_data[index].autoFill = not self.m_warehouse_data[index].autoFill
+		self.m_warehouse_data[index].auto_fill_enabled = not self.m_warehouse_data[index].auto_fill_enabled
 		Notifier:ShowMessage(
 			"YRV3",
 			_F("CEO Warehouse %d auto-fill %s.",
 				index,
-				self.m_warehouse_data[index].autoFill
+				self.m_warehouse_data[index].auto_fill_enabled
 				and "Enabled"
 				or "Disabled"
 			),
@@ -679,6 +587,10 @@ function YRV3:WarehouseAutofillOnCommand(index)
 			2
 		)
 	end)
+end
+
+function YRV3:FillBikerBusiness(index)
+	self.m_freemode_business_global:At(index):At(1):WriteInt(1)
 end
 
 function YRV3:FillAll()
@@ -693,31 +605,30 @@ function YRV3:FillAll()
 		end
 
 		for i, v in ipairs(self.m_warehouse_data) do
-			if (not v.wasChecked or not v.max) then
+			if (not v.was_checked or not v.max) then
 				self:PopulateCEOwarehouseSlot(i)
 				sleep(100)
 			end
 		end
 
 		for _, v in ipairs(self.m_warehouse_data) do
-			if (v.isOwned) then
-				v.autoFill = true
+			if (v.is_owned) then
+				v.auto_fill_enabled = true
 			end
 		end
 
-		local FMG = SGSL:Get(SGSL.data.freemode_business_global):AsGlobal()
 		if (stats.get_int("MPX_PROP_FAC_SLOT5") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY5") < 100) then
-			FMG:At(5):At(1):WriteInt(1)
+			self:FillBikerBusiness(5)
 			sleep(math.random(100, 300))
 		end
 
 		if (stats.get_int("MPX_XM22_LAB_OWNED") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY6") < 100) then
-			FMG:At(6):At(1):WriteInt(1)
+			self:FillBikerBusiness(6)
 			sleep(math.random(100, 300))
 		end
 
 		for i, v in ipairs(self.m_biker_data) do
-			if (not v.wasChecked or not v.unit_max) then
+			if (not v.was_checked or not v.unit_max) then
 				self:PopulateBikerBusinessSlot(i)
 				sleep(100)
 			end
@@ -726,8 +637,8 @@ function YRV3:FillAll()
 		for i, v in ipairs(self.m_biker_data) do
 			local slot = i - 1
 			local supplies = stats.get_int(_F("MPX_MATTOTALFORFACTORY%d", slot))
-			if (v.isOwned and v.unit_max and supplies < 100) then
-				FMG:At(slot):At(1):WriteInt(1)
+			if (v.is_owned and v.unit_max and supplies < 100) then
+				self:FillBikerBusiness(slot)
 				sleep(math.random(200, 666))
 			end
 		end
@@ -736,14 +647,14 @@ end
 
 function YRV3:FinishSale()
 	local sn = self.m_sell_script_name
-	if (not sn or not self.t_SellScripts[sn]) then
+	if (not sn or not self.m_raw_data.SellScripts[sn]) then
 		return
 	end
 
 	self.m_has_triggered_autosell = true
 	script.execute_as_script(sn, function()
-		if not self.t_SellScripts[sn].b then -- gb_*
-			for _, data in pairs(self.t_SellScripts[sn]) do
+		if not self.m_raw_data.SellScripts[sn].b then -- gb_*
+			for _, data in pairs(self.m_raw_data.SellScripts[sn]) do
 				locals.set_int(sn, data.l + data.o, data.v)
 			end
 		else -- fm_content_*
@@ -755,13 +666,13 @@ function YRV3:FinishSale()
 				return
 			end
 
-			local val = locals.get_int(sn, self.t_SellScripts[sn].b + 1 + 0)
+			local val = locals.get_int(sn, self.m_raw_data.SellScripts[sn].b + 1 + 0)
 			if not Bit.is_set(val, 11) then
 				val = Bit.set(val, 11)
-				locals.set_int(sn, self.t_SellScripts[sn].b + 1 + 0, val)
+				locals.set_int(sn, self.m_raw_data.SellScripts[sn].b + 1 + 0, val)
 			end
 
-			locals.set_int(sn, self.t_SellScripts[sn].l + self.t_SellScripts[sn].o, 3) -- 3=End reason.
+			locals.set_int(sn, self.m_raw_data.SellScripts[sn].l + self.m_raw_data.SellScripts[sn].o, 3) -- 3=End reason.
 		end
 	end)
 end
@@ -771,13 +682,13 @@ function YRV3:GetRunningSellScriptDisplayName()
 		return "None"
 	end
 
-	return self.m_display_names[self.m_sell_script_name] or "None"
+	return self.m_script_display_names[self.m_sell_script_name] or "None"
 end
 
 ---@param key string
 ---@param state boolean
 function YRV3:SetCooldownStateDirty(key, state)
-	local data = self.t_CooldownData[key]
+	local data = self.m_raw_data.Cooldowns[key]
 	if (not data) then
 		return
 	end
@@ -795,7 +706,7 @@ function YRV3:CheckAllCooldowns()
 		return
 	end
 
-	for _, data in pairs(self.t_CooldownData) do
+	for _, data in pairs(self.m_raw_data.Cooldowns) do
 		local gvar = data.gstate()
 		if (gvar and data.onEnable) then
 			data.onEnable()
@@ -814,7 +725,7 @@ function YRV3:CooldownHandler()
 		return
 	end
 
-	for _, data in pairs(self.t_CooldownData) do
+	for _, data in pairs(self.m_raw_data.Cooldowns) do
 		if (not data.dirty) then
 			goto continue
 		end
@@ -837,7 +748,7 @@ function YRV3:SetupAutosell()
 		return
 	end
 
-	for sn in pairs(self.t_SellScripts) do
+	for sn in pairs(self.m_raw_data.SellScripts) do
 		if script.is_active(sn) then
 			self.m_sell_script_name = sn
 			self.m_sell_script_running = true
@@ -851,7 +762,7 @@ function YRV3:SetupAutosell()
 	end
 
 	if (self.m_sell_script_running and self.m_bhub_script_handle ~= 0) then -- was triggered from the mct
-		for _, scr in pairs(eShouldTerminateScripts) do
+		for _, scr in pairs(ScriptsToTerminate) do
 			if (script.is_active(scr)) then
 				PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 202, 1.0)
 				sleep(200)
@@ -912,22 +823,6 @@ function YRV3:AutoSellHandler()
 	self.m_has_triggered_autosell = false
 end
 
-function YRV3:Main()
-	if (not Backend:IsUpToDate() and self.m_thread and self.m_thread:IsRunning()) then
-		self.m_thread:Stop()
-	end
-
-	if (not self:CanAccess()) then
-		sleep(500)
-		return
-	end
-
-	self:AutoSellHandler()
-	self:CooldownHandler()
-	self:HangarAutofill()
-	self:WarehouseAutofill()
-end
-
 -- Master Control Terminal
 function YRV3:MCT()
 	if Self:IsBrowsingApps() then
@@ -937,12 +832,12 @@ function YRV3:MCT()
 
 	local BusinessHubGlobal1 = SGSL:Get(SGSL.data.business_hub_global_1):AsGlobal()
 	local BusinessHubGlobal2 = SGSL:Get(SGSL.data.business_hub_global_2):AsGlobal()
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		if (BusinessHubGlobal1:ReadInt() ~= 0) then
 			BusinessHubGlobal1:WriteInt(0)
 		end
 
-		Await(Game.RequestScript, "appArcadeBusinessHub")
+		TaskWait(Game.RequestScript, "appArcadeBusinessHub")
 		GUI:PlaySound(GUI.Sounds.Button)
 		self.m_bhub_script_handle = SYSTEM.START_NEW_SCRIPT("appArcadeBusinessHub", 1424) -- STACK_SIZE_DEFAULT
 		SCRIPT.SET_SCRIPT_AS_NO_LONGER_NEEDED("appArcadeBusinessHub")
@@ -966,409 +861,41 @@ function YRV3:MCT()
 	end)
 end
 
-function YRV3:Reset()
-	self.m_ceo_value_sum        = 0
-	self.m_biker_value_sum      = 0
-	self.m_safe_cash_sum        = 0
-	self.m_cwash_cash_sum       = 0
-	self.m_warehouse_data       = Wh_Default
-	self.m_biker_data           = BB_Default
-	self.m_safe_cash_data       = BS_Default
-	self.m_money_fronts_data    = MF_Default
-	self.m_cooldown_state_dirty = true
+function YRV3:BBAutoProduceHandler()
+	for i, v in ipairs(self.m_biker_data) do
+		if (v.fast_prod_enabled and not v.fast_prod_running) then
+			self:BBAutoProduce(i)
+		end
+	end
+
+	for _, ext in pairs(self.m_biker_ext_data) do
+		if (ext.fast_prod_enabled and not ext.fast_prod_running) then
+			self:BBAutoProduce(ext.index)
+		end
+	end
 end
 
-------------------------------------------------------------------------
---- Data
-------------------------------------------------------------------------
+function YRV3:AutoFillHandler()
+	self:HangarAutofill()
+	self:WarehouseAutofill()
+end
 
-YRV3.t_CooldownData = {
-	["mc_work_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.mc_work_cd
-		end,
-		onEnable = function()
-			if (tunables.get_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL") > 0) then
-				tunables.set_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL", 0)
-			end
-		end
-	},
-	["hangar_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.hangar_cd
-		end,
-		onEnable = function()
-			local t = {
-				"SMUG_STEAL_EASY_COOLDOWN_TIMER",
-				"SMUG_STEAL_MED_COOLDOWN_TIMER",
-				"SMUG_STEAL_HARD_COOLDOWN_TIMER",
-			}
-			for _, str in ipairs(t) do
-				if (tunables.get_int(str) > 0) then
-					tunables.set_int(str, 0)
-				end
-			end
-		end
-	},
-	["nc_management_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.nc_management_cd
-		end,
-		onEnable = function()
-			if (tunables.get_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN") > 0) then
-				tunables.set_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN", 0)
-			end
-		end
-	},
-	["nc_vip_mission_chance"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.nc_vip_mission_chance
-		end,
-		onEnable = function()
-			if (tunables.get_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT") > 0) then
-				tunables.set_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT", 0)
-			end
-		end,
-		onDisable = function()
-			if (tunables.get_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT") == 0) then
-				tunables.set_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT", 50)
-			end
-		end
-	},
-	["security_missions_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.security_missions_cd
-		end,
-		onEnable = function()
-			if (tunables.get_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME") > 0) then
-				tunables.set_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME", 0)
-			end
-		end
-	},
-	["ie_vehicle_steal_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.ie_vehicle_steal_cd
-		end,
-		onEnable = function()
-			if (tunables.get_int("IMPEXP_STEAL_COOLDOWN") > 0) then
-				tunables.set_int("IMPEXP_STEAL_COOLDOWN", 0)
-			end
-		end
-	},
-	["ie_vehicle_sell_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.ie_vehicle_sell_cd
-		end,
-		onEnable = function()
-			if (tunables.get_int("IMPEXP_SELL_COOLDOWN") > 0) then
-				tunables.set_int("IMPEXP_SELL_COOLDOWN", 0)
-			end
-			for i = 1, 4, 1 do
-				local __t = _F("IMPEXP_SELL_%d_CAR_COOLDOWN", i)
-				if (tunables.get_int(__t) > 0) then
-					tunables.set_int(__t, 0)
-				end
-			end
-		end
-	},
-	["ceo_crate_buy_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.ceo_crate_buy_cd
-		end,
-		onEnable = function()
-			if (tunables.get_int("EXEC_BUY_COOLDOWN") > 0) then
-				tunables.set_int("EXEC_BUY_COOLDOWN", 0)
-			end
-			if (tunables.get_int("EXEC_BUY_FAIL_COOLDOWN") > 0) then
-				tunables.set_int("EXEC_BUY_FAIL_COOLDOWN", 0)
-			end
-		end
-	},
-	["ceo_crate_sell_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.ceo_crate_sell_cd
-		end,
-		onEnable = function()
-			if (tunables.get_int("EXEC_SELL_COOLDOWN") > 0) then
-				tunables.set_int("EXEC_SELL_COOLDOWN", 0)
-			end
-			if tunables.get_int("EXEC_SELL_FAIL_COOLDOWN") > 0 then
-				tunables.set_int("EXEC_SELL_FAIL_COOLDOWN", 0)
-			end
-		end
-	},
-	["dax_work_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.dax_work_cd
-		end,
-		onEnable = function()
-			if (stats.get_int("MPX_XM22JUGGALOWORKCDTIMER") > 0) then
-				stats.set_int("MPX_XM22JUGGALOWORKCDTIMER", 0)
-			end
-		end
-	},
-	["garment_rob_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.garment_rob_cd
-		end,
-		onEnable = function()
-			if (stats.get_int("MPX_HACKER24_ROBBERY_CD") > 0) then
-				stats.set_int("MPX_HACKER24_ROBBERY_CD", 0)
-			end
-		end
-	},
-	["cfr_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.cfr_cd
-		end,
-		onEnable = function()
-			if (stats.get_int("SALV23_CFR_COOLDOWN") > 0) then
-				stats.set_int("SALV23_CFR_COOLDOWN", 0)
-			end
-		end
-	},
-	["cwash_legal_work_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.cwash_legal_work_cd
-		end,
-		onEnable = function()
-			if (stats.get_int("T25_CW_LEG_CD") > 0) then
-				stats.set_int("T25_CW_LEG_CD", 0)
-			end
-		end
-	},
-	["cwash_illegal_work_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.cwash_illegal_work_cd
-		end,
-		onEnable = function()
-			if (stats.get_int("T25_CW_ILEG_CD") > 0) then
-				stats.set_int("T25_CW_ILEG_CD", 0)
-			end
-		end
-	},
-	["weedshop_legal_work_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.weedshop_legal_work_cd
-		end,
-		onEnable = function()
-			if (stats.get_int("T25_WS_LEG_CD") > 0) then
-				stats.set_int("T25_WS_LEG_CD", 0)
-			end
-		end
-	},
-	["weedshop_illegal_work_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.weedshop_illegal_work_cd
-		end,
-		onEnable = function()
-			if (stats.get_int("T25_WS_ILEG_CD") > 0) then
-				stats.set_int("T25_WS_ILEG_CD", 0)
-			end
-		end
-	},
-	["helitours_legal_work_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.helitours_legal_work_cd
-		end,
-		onEnable = function()
-			if (stats.get_int("T25_WS_LEG_CD") > 0) then
-				stats.set_int("T25_WS_LEG_CD", 0)
-			end
-		end
-	},
-	["helitours_illegal_work_cd"] = {
-		dirty = false,
-		gstate = function()
-			return GVars.features.yrv3.helitours_illegal_work_cd
-		end,
-		onEnable = function()
-			if (stats.get_int("T25_HT_ILEG_CD") > 0) then
-				stats.set_int("T25_HT_ILEG_CD", 0)
-			end
-		end
-	},
-}
+function YRV3:Main()
+	if (not Backend:IsUpToDate() and self.m_thread and self.m_thread:IsRunning()) then
+		self.m_thread:Stop()
+		return
+	end
 
-YRV3.t_SellScripts = {
-	["gb_smuggler"] = { -- air
-		{
-			l = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1):GetValue() end)(),
-			o = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1):GetOffset(1) end)(),
-			v = 0
-		},
-		{
-			l = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2):GetValue() end)(),
-			o = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2):GetOffset(1) end)(),
-			v = 1
-		},
-	},
-	["gb_gunrunning"] = {
-		{
-			l = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetValue() end)(),
-			o = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetOffset(1) end)(),
-			v = 1
-		},
-		{
-			l = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetValue() end)(),
-			o = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_2):GetOffset(1) end)(),
-			v = 0
-		},
-	},
-	["gb_contraband_sell"] = {
-		{
-			l = (function() return SGSL:Get(SGSL.data.gb_contraband_sell_local):GetValue() end)(),
-			o = 1,
-			v = 99999
-		},
-	},
-	["gb_biker_contraband_sell"] = {
-		{
-			l = (function() return SGSL:Get(SGSL.data.gb_biker_contraband_sell_local):GetValue() end)(),
-			o = (function() return SGSL:Get(SGSL.data.gb_biker_contraband_sell_local):GetOffset(1) end)(),
-			v = 15
-		},
-	},
-	["fm_content_acid_lab_sell"] = {
-		b = (function() return SGSL:Get(SGSL.data.acid_lab_sell_bitset):GetValue() end)(),
-		l = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetValue() end)(),
-		o = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetOffset(1) end)(),
-	},
-}
+	if (not self:CanAccess()) then
+		yield()
+		return
+	end
 
-YRV3.t_CEOwarehouses = {
-	{ size = 0, max = 16,  coords = vec3:new(51.311188, -2568.470947, 6.004591) },
-	{ size = 0, max = 16,  coords = vec3:new(-1081.083740, -1261.013184, 5.648909) },
-	{ size = 0, max = 16,  coords = vec3:new(898.484314, -1031.882446, 34.966454) },
-	{ size = 0, max = 16,  coords = vec3:new(249.246918, -1955.651978, 23.161957) },
-	{ size = 0, max = 16,  coords = vec3:new(-424.773499, 184.146530, 80.752899) },
-	{ size = 2, max = 111, coords = vec3:new(-1045.004395, -2023.150146, 13.161570) },
-	{ size = 1, max = 42,  coords = vec3:new(-1269.286133, -813.215820, 17.107399) },
-	{ size = 2, max = 111, coords = vec3:new(-876.108032, -2734.502930, 13.844264) },
-	{ size = 0, max = 16,  coords = vec3:new(272.409424, -3015.267090, 5.707359) },
-	{ size = 1, max = 42,  coords = vec3:new(1563.832031, -2135.110840, 77.616447) },
-	{ size = 1, max = 42,  coords = vec3:new(-308.772247, -2698.393799, 6.000292) },
-	{ size = 1, max = 42,  coords = vec3:new(503.738037, -653.082642, 24.751144) },
-	{ size = 1, max = 42,  coords = vec3:new(-528.074585, -1782.701904, 21.483055) },
-	{ size = 1, max = 42,  coords = vec3:new(-328.013458, -1354.755371, 31.296524) },
-	{ size = 1, max = 42,  coords = vec3:new(349.901184, 327.976440, 104.303856) },
-	{ size = 2, max = 111, coords = vec3:new(922.555481, -1560.048950, 30.756647) },
-	{ size = 2, max = 111, coords = vec3:new(762.672363, -909.193054, 25.250854) },
-	{ size = 2, max = 111, coords = vec3:new(1041.059814, -2172.653076, 31.488876) },
-	{ size = 2, max = 111, coords = vec3:new(1015.361633, -2510.986572, 28.302608) },
-	{ size = 2, max = 111, coords = vec3:new(-245.651718, 202.504669, 83.792648) },
-	{ size = 1, max = 42,  coords = vec3:new(541.587646, -1944.362793, 24.985096) },
-	{ size = 2, max = 111, coords = vec3:new(93.278641, -2216.144775, 6.033320) },
-}
-
-YRV3.t_BikerBusinessIDs = {
-	{ name = "Fake Documents",  id = 0, unit_max = 60, val_tunable = "BIKER_FAKEIDS_PRODUCT_VALUE",     blip = 498, possible_ids = { 5, 10, 15, 20 } },
-	{ name = "Weed",            id = 1, unit_max = 80, val_tunable = "BIKER_WEED_PRODUCT_VALUE",        blip = 496, possible_ids = { 2, 7, 12, 17 } },
-	{ name = "Fake Cash",       id = 2, unit_max = 40, val_tunable = "BIKER_COUNTERCASH_PRODUCT_VALUE", blip = 500, possible_ids = { 4, 9, 14, 19 } },
-	{ name = "Methamphetamine", id = 3, unit_max = 20, val_tunable = "BIKER_METH_PRODUCT_VALUE",        blip = 499, possible_ids = { 1, 6, 11, 16 } },
-	{ name = "Cocaine",         id = 4, unit_max = 10, val_tunable = "BIKER_CRACK_PRODUCT_VALUE",       blip = 497, possible_ids = { 3, 8, 13, 18 } },
-}
-
-YRV3.t_Hangars = {
-	{ name = "LSIA Hangar 1",            coords = vec3:new(-1148.908447, -3406.064697, 13.945053) },
-	{ name = "LSIA Hangar A17",          coords = vec3:new(-1393.322021, -3262.968262, 13.944828) },
-	{ name = "Fort Zancudo Hangar A2",   coords = vec3:new(-2022.336304, 3154.936768, 32.810272) },
-	{ name = "Fort Zancudo Hangar 3497", coords = vec3:new(-1879.105957, 3106.792969, 32.810234) },
-	{ name = "Fort Zancudo Hangar 3499", coords = vec3:new(-2470.278076, 3274.427734, 32.835461) },
-}
-
-YRV3.t_Bunkers = {
-	[21] = { name = "Grand Senora Oilfields Bunker", coords = vec3:new(494.680878, 3015.895996, 41.041725) },
-	[22] = { name = "Grand Senora Desert Bunker", coords = vec3:new(849.619812, 3024.425781, 41.266800) },
-	[23] = { name = "Route 68 Bunker", coords = vec3:new(40.422565, 2929.004395, 55.746357) },
-	[24] = { name = "Farmhouse Bunker", coords = vec3:new(1571.949341, 2224.597168, 78.350952) },
-	[25] = { name = "Smoke Tree Road Bunker", coords = vec3:new(2107.135254, 3324.630615, 45.371754) },
-	[26] = { name = "Thomson Scrapyard Bunker", coords = vec3:new(2488.706055, 3164.616699, 49.080124) },
-	[27] = { name = "Grapeseed Bunker", coords = vec3:new(1798.502930, 4704.956543, 39.995476) },
-	[28] = { name = "Paleto Forest Bunker", coords = vec3:new(-754.225769, 5944.171875, 19.836382) },
-	[29] = { name = "Raton Canyon Bunker", coords = vec3:new(-388.333160, 4338.322754, 56.103130) },
-	[30] = { name = "Lago Zancudo Bunker", coords = vec3:new(-3030.341797, 3334.570068, 10.105902) },
-	[31] = { name = "Chumash Bunker", coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
-}
-
-YRV3.t_ShittyMissions = {
-	["CEO"] = {
-		type = "bool",
-		tuneable = {
-			"EXEC_DISABLE_SELL_AIRATTACKED",
-			"EXEC_DISABLE_SELL_AIRDROP",
-			"EXEC_DISABLE_SELL_AIRFLYLOW",
-			"EXEC_DISABLE_SELL_AIRRESTRICTED",
-			"EXEC_DISABLE_SELL_ATTACKED",
-			"EXEC_DISABLE_SELL_DEFEND",
-			"EXEC_DISABLE_SELL_NODAMAGE",
-			"EXEC_DISABLE_SELL_SEAATTACKED",
-			"EXEC_DISABLE_SELL_SEADEFEND",
-			"EXEC_DISABLE_SELL_STING",
-			"EXEC_DISABLE_SELL_STING_1",
-			"EXEC_DISABLE_SELL_STING_2",
-			"EXEC_DISABLE_SELL_STING_3",
-			"EXEC_DISABLE_SELL_STING_4",
-			"EXEC_DISABLE_SELL_STING_5",
-			"EXEC_DISABLE_SELL_TRACKIFY"
-		}
-	},
-	["Biker"] = {
-		type = "bool",
-		tuneable = {
-			"BIKER_DISABLE_SELL_CONVOY",
-			"BIKER_DISABLE_SELL_PROVEN",
-			"BIKER_DISABLE_SELL_FRIENDS_IN_NEED",
-			"BIKER_DISABLE_SELL_BORDER_PATROL",
-			"BIKER_DISABLE_SELL_HELICOPTER_DROP",
-			"BIKER_DISABLE_SELL_POSTMAN",
-			"BIKER_DISABLE_SELL_AIR_DROP_AT_SEA",
-			"BIKER_DISABLE_SELL_STING_OP",
-		}
-	},
-	["Nightclub"] = {
-		type = "float",
-		tuneable = {
-			"BB_SELL_MISSIONS_WEIGHTING_MULTI_DROP",
-			"BB_SELL_MISSIONS_WEIGHTING_HACK_DROP",
-			"BB_SELL_MISSIONS_WEIGHTING_ROADBLOCK",
-			"BB_SELL_MISSIONS_WEIGHTING_PROTECT_BUYER",
-			"BB_SELL_MISSIONS_WEIGHTING_UNDERCOVER_COPS",
-			"BB_SELL_MISSIONS_WEIGHTING_OFFSHORE_TRANSFER",
-			"BB_SELL_MISSIONS_WEIGHTING_NOT_A_SCRATCH",
-			"BB_SELL_MISSIONS_WEIGHTING_FOLLOW_HELI",
-			"BB_SELL_MISSIONS_WEIGHTING_FIND_BUYER"
-		},
-	},
-	["Hangar"] = {
-		type = "float",
-		tuneable = {
-			"SMUG_SELL_HEAVY_LIFTING_WEIGHTING",
-			"SMUG_SELL_CONTESTED_WEIGHTING",
-			"SMUG_SELL_AGILE_DELIVERY_WEIGHTING",
-			"SMUG_SELL_FLYING_FORTRESS_WEIGHTING",
-			"SMUG_SELL_AIR_DELIVERY_WEIGHTING",
-			"SMUG_SELL_AIR_POLICE_WEIGHTING",
-			"SMUG_SELL_UNDER_THE_RADAR_WEIGHTING"
-		},
-	},
-}
+	self:InitializeData()
+	self:AutoSellHandler()
+	self:AutoFillHandler()
+	self:BBAutoProduceHandler()
+	self:CooldownHandler()
+end
 
 return YRV3

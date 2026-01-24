@@ -142,7 +142,7 @@ function HideNSeek:HideInVehicle()
 		Game.ShowButtonPrompt("Press ~INPUT_FRONTEND_ACCEPT~ to hide inside the vehicle.")
 		if (PAD.IS_CONTROL_JUST_PRESSED(0, 201) and not HUD.IS_MP_TEXT_CHAT_TYPING()) then
 			YimActions:ResetPlayer()
-			Await(Game.RequestAnimDict, vehAnim.dict)
+			TaskWait(Game.RequestAnimDict, vehAnim.dict)
 
 			TASK.TASK_PLAY_ANIM(
 				Self:GetHandle(),
@@ -210,7 +210,7 @@ function HideNSeek:HideInTrash()
 			1
 		)
 
-		Await(Game.RequestAnimDict, trashAnim.dict)
+		TaskWait(Game.RequestAnimDict, trashAnim.dict)
 		TASK.TASK_PLAY_ANIM(
 			pedHandle,
 			trashAnim.dict,
@@ -267,7 +267,7 @@ function HideNSeek:HideInTrunk()
 			z_offset = 1.2
 		end
 
-		Await(Game.RequestAnimDict, "rcmnigel3_trunk")
+		TaskWait(Game.RequestAnimDict, "rcmnigel3_trunk")
 		YimActions:ResetPlayer()
 
 		local pedHandle = Self:GetHandle()
@@ -324,7 +324,7 @@ function HideNSeek:HideInTrunk()
 			or (-self.m_boot_vehicle.m_length / 3)
 		-- local attachPosZ = self.bootVehicle.height * 0.42
 
-		Await(Game.RequestAnimDict, bootAnim.dict)
+		TaskWait(Game.RequestAnimDict, bootAnim.dict)
 
 		TASK.TASK_PLAY_ANIM(
 			pedHandle,
@@ -660,7 +660,7 @@ function HideNSeek:WhileHiding()
 				CAM.DO_SCREEN_FADE_IN(500)
 				AUDIO.PLAY_SOUND_FRONTEND(-1, "TRASH_BAG_LAND", "DLC_HEIST_SERIES_A_SOUNDS", true)
 
-				Await(Game.RequestAnimDict, "move_m@_idles@shake_off")
+				TaskWait(Game.RequestAnimDict, "move_m@_idles@shake_off")
 				TASK.TASK_PLAY_ANIM(
 					Self:GetHandle(),
 					"move_m@_idles@shake_off",

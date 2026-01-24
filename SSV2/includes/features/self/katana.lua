@@ -58,7 +58,7 @@ function Katana:Update()
 	end
 
 	if (self.m_katana_handle == 0) then
-		Await(Game.RequestModel, self.m_katana_model)
+		TaskWait(Game.RequestModel, self.m_katana_model)
 		self.m_katana_handle = Game.CreateObject(self.m_katana_model, vec3:zero(), true, false, true)
 		if (not ENTITY.DOES_ENTITY_EXIST(self.m_katana_handle)) then
 			self:Cleanup()

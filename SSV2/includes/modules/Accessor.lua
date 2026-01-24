@@ -104,8 +104,14 @@ function Accessor:GetIndex()
 	return addr
 end
 
-function Accessor:At(offset)
+---@param offset integer
+---@param size? integer
+function Accessor:At(offset, size)
 	local newPath = { table.unpack(self.m_path or {}) }
+	if (size) then
+		offset = 1 + (offset * size)
+	end
+
 	table.insert(newPath, offset)
 
 	return Accessor.new(self.m_index, self.m_type, self.m_script, newPath)
@@ -209,7 +215,7 @@ end
 
 
 ---@class ScriptGlobal : Accessor
----@field At fun(self: ScriptGlobal, offset: integer): ScriptGlobal
+---@field At fun(self: ScriptGlobal, offset: integer, size?: integer): ScriptGlobal
 ---@overload fun(address: integer): ScriptGlobal
 ScriptGlobal = Class("ScriptGlobal", Accessor)
 
@@ -223,7 +229,7 @@ function ScriptGlobal.new(address)
 end
 
 ---@class ScriptLocal : Accessor
----@field At fun(self: ScriptLocal, offset: integer): ScriptLocal
+---@field At fun(self: ScriptLocal, offset: integer, size?: integer): ScriptLocal
 ---@overload fun(address: integer, scr: string): ScriptLocal
 ScriptLocal = Class("ScriptLocal", Accessor)
 setmetatable(ScriptLocal,

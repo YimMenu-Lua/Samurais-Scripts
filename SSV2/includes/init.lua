@@ -37,6 +37,7 @@ require("includes.classes.Rect")
 require("includes.classes.Set")
 require("includes.classes.gta.fMatrix44")
 require("includes.classes.gta.atArray")
+require("includes.modules.Accessor")
 
 
 -- ### Global Runtime Variables
@@ -86,7 +87,6 @@ local packages      = {
 
 	"structs.StateMachine",
 
-	"modules.Accessor",
 	"modules.Audio",
 	"modules.Decorator",
 	"modules.Entity",

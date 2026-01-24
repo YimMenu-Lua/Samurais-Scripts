@@ -205,7 +205,7 @@ return {
 	["YRV3_CEO_NONE_OWNED"] = "No posee ningún almacén de CEO.",
 	["YRV3_GENERIC_NOT_OWNED"] = "No eres dueño de este negocio.",
 	["YRV3_CARGO_AMT"] = "Carga retenida",
-	["YRV3_AUTO_SELL"] = "Autoventa",
+	["YRV3_AUTO_SELL"] = "Venta automática",
 	["YRV3_FILL_SUPPLIES"] = "Llenar suministros",
 	["YRV3_AMT_TOTAL"] = "Monto total",
 	["YRV3_FINISH_SOURCE_MISSION"] = "Finalizar la misión de origen de carga",
@@ -342,7 +342,7 @@ return {
 	["VEH_ENGINE_SWAP_SAME_ERR"] = "Su vehículo ya tiene este motor.",
 	["SUBTAB_FLATBED"] = "Guión plano",
 	["VEH_PAINT_FILTER_TXT"] = "Filtrar por:",
-	["SUBTAB_CARS"] = "Coches y bicicletas",
+	["SUBTAB_CARS"] = "General",
 	["VEH_ENGINE_SWAP"] = "Cambio de motor",
 	["GENERIC_NOT_IN_PLANE"] = "No estás en un avión.",
 	["VEH_PAINT_NOTE"] = "Los colores se ven diferentes en los sombreadores de juegos.",
@@ -530,5 +530,8 @@ return {
 	["YAV3_ANIM_FLAGS"] = "Banderas de comportamiento",
 	["YAV3_DISABLE_SFX"] = "Desactivar efectos de sonido",
 	["YAV3_DISABLE_PTFX"] = "Desactivar efectos de partículas",
-	["GENERIC_LIST_GROUP"] = "Agrupar por"
+	["GENERIC_LIST_GROUP"] = "Agrupar por",
+	["YRV3_TRIGGER_PROD"] = "Activar producción",
+	["YRV3_TRIGGER_PROD_TT"] = "Activa instantáneamente la producción una vez mientras tengas suministros. Puede mantener presionado el botón para seguir activándolo o habilitar la siguiente casilla de verificación para automatizar completamente el proceso.",
+	["YRV3_AUTO_PROD"] = "Autoproducción"
 }

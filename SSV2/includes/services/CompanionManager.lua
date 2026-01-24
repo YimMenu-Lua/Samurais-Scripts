@@ -69,7 +69,7 @@ function CompanionManager:SpawnCompanion(pedModel, name, is_invincible, is_armed
 		pedModel = Game.GetPedHash(pedModel)
 	end
 
-	Await(Game.RequestModel, pedModel)
+	TaskWait(Game.RequestModel, pedModel)
 
 	local playerGroup = Self:GetGroupIndex()
 	local offsetPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
@@ -429,7 +429,7 @@ function Companion:AD_MORTEM_INIMICUS()
 	CAM.RENDER_SCRIPT_CAMS(true, true, 500, true, false)
 	MISC.SET_OVERRIDE_WEATHER("THUNDER")
 	GRAPHICS.ANIMPOSTFX_PLAY("PPGREEN", 25000, false)
-	Await(Game.RequestWeaponAsset, joaat("WEAPON_RPG"))
+	TaskWait(Game.RequestWeaponAsset, joaat("WEAPON_RPG"))
 
 	local highPos = Game.GetEntityCoords(self.handle, false)
 	sleep(2500)
@@ -470,7 +470,7 @@ function Companion:AD_MORTEM_INIMICUS()
 	end
 
 	CAM.SHAKE_CAM(cam, "LARGE_EXPLOSION_SHAKE", 0.5)
-	Await(Game.RequestNamedPtfxAsset, "scr_family5")
+	TaskWait(Game.RequestNamedPtfxAsset, "scr_family5")
 	Game.StartSyncedPtfxNonLoopedOnEntityBone(
 		self.handle,
 		"scr_xs_dr",

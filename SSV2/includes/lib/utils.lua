@@ -306,18 +306,25 @@ function Joaat(key)
 	return hash
 end
 
--- `Await` is not a true asynchronous function. Instead, it is designed to be called within a coroutine to pause execution until a condition is met.
+-- Pauses execution until a condition is met.
 --
--- All logic after the `Await` call will only execute once the provided function returns a truthy value.
+-- All logic after this call will only execute once the provided function returns a truthy value.
 --
--- If the condition isn't met before the optional timeout is reached, `Await` throws an error to prevent further execution.
+-- If the condition isn't met before the optional timeout is reached, `TaskWait` throws an error to prevent further execution.
 ---@param func fun(args: any): boolean
 ---@param args any
 ---@param timeout? milliseconds  -- Optional timeout in milliseconds. Defaults to 1200ms.
-function Await(func, args, timeout)
+function TaskWait(func, args, timeout)
 	local ftype = type(func)
 	if (ftype ~= "function") then
 		error(_F("Invalid argument #1! Function expected, got %s instead", ftype), 2)
+	end
+
+	args    = args or {}
+	timeout = timeout or 1200
+
+	if (timeout <= 0) then
+		error("Optional timeout must be greater than zero.", 2)
 	end
 
 	-- It is essential to use IsInstance here instead of type(args) == "table"
@@ -326,9 +333,8 @@ function Await(func, args, timeout)
 		args = { args }
 	end
 
-	timeout = timeout or 1200
 	local start_time = Time.millis()
-	while not func(table.unpack(args)) do
+	while (not func(table.unpack(args))) do
 		if ((Time.millis() - start_time) > timeout) then
 			error("Timeout reached!")
 		end

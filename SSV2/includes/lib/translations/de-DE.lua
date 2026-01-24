@@ -206,7 +206,7 @@ return {
 	["YRV3_FILL_SUPPLIES"] = "Vorräte auffüllen",
 	["YRV3_LSD_LAB_NOT_OWNED"] = "Sie besitzen kein Säurelabor.",
 	["YRV3_AUTO_FILL"] = "Automatisch ausfüllen",
-	["YRV3_AUTO_SELL"] = "Autosell",
+	["YRV3_AUTO_SELL"] = "Automatischer Verkauf",
 	["YRV3_FINISH_SOURCE_MISSION_TT"] = "Starten Sie eine Quellmission und drücken Sie dann diese Taste, um sie zu beenden.",
 	["YRV3_FINISH_SOURCE_MISSION"] = "Schließe die Mission „Frachtquelle“ ab",
 	["YRV3_AMT_TOTAL"] = "Gesamtbetrag",
@@ -348,7 +348,7 @@ return {
 	["VEH_PAINT_NOTE"] = "Farben sehen auf Game-Shadern anders aus.",
 	["VEH_ENGINE_SWAP_SAME_ERR"] = "Ihr Fahrzeug verfügt bereits über diesen Motor.",
 	["VEH_PAINT_FILTER_TXT"] = "Filtern nach:",
-	["SUBTAB_CARS"] = "Autos und Fahrräder",
+	["SUBTAB_CARS"] = "Allgemein",
 	["VEH_PAINT_NOT_SELECTED_ERR"] = "Bitte wählen Sie primär oder sekundär oder beides aus.",
 	["VEH_PAINT_MATTE_CB"] = "Matte Farbe",
 	["VEH_PAINT_MATTE_TT"] = "Wendet eine matte Oberfläche auf die ausgewählte Lackierung an oder entfernt sie.",
@@ -530,5 +530,8 @@ return {
 	["YAV3_DISABLE_SFX"] = "Deaktivieren Sie Soundeffekte",
 	["GENERIC_LIST_SORT"] = "Sortieren nach",
 	["GENERIC_LIST_FILTER"] = "Filtern nach",
-	["YAV3_ANIM_FLAGS"] = "Verhaltensflags"
+	["YAV3_ANIM_FLAGS"] = "Verhaltensflags",
+	["YRV3_TRIGGER_PROD"] = "Produktion auslösen",
+	["YRV3_TRIGGER_PROD_TT"] = "Löst die Produktion sofort einmal aus, solange Vorräte vorhanden sind. Sie können die Taste gedrückt halten, um sie weiterhin auszulösen, oder das nächste Kontrollkästchen aktivieren, um den Vorgang vollständig zu automatisieren.",
+	["YRV3_AUTO_PROD"] = "Automatisch produzieren"
 }

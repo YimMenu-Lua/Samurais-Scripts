@@ -231,7 +231,7 @@ function Logger:logf(level, fmt, ...)
 		return
 	end
 
-	local ok, msg = pcall(_F, fmt, ...)
+	local ok, msg = pcall(string.format, fmt, ...)
 
 	if not ok then
 		msg = "<formatting error!> " .. tostring(msg)

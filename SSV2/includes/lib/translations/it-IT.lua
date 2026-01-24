@@ -336,7 +336,7 @@ return {
 	["VEH_NOS_DAMAGE_CB"] = "Può danneggiare il motore",
 	["VEH_NOS_SOUND_FX"] = "Effetto sonoro",
 	["YAV3_SCN_STOP_SPINNER"] = "Arresto dello scenario attuale...",
-	["SUBTAB_CARS"] = "Auto e moto",
+	["SUBTAB_CARS"] = "Generale",
 	["SUBTAB_AIRCRAFT"] = "Aereo",
 	["SUBTAB_FLATBED"] = "Copione a superficie piana",
 	["VEH_PAINT_FILTER_ALL"] = "Tutto",
@@ -530,5 +530,8 @@ return {
 	["YAV3_DISABLE_PTFX"] = "Disabilita gli effetti particellari",
 	["YAV3_DISABLE_SFX"] = "Disattiva gli effetti sonori",
 	["GENERIC_LIST_FILTER"] = "Filtra per",
-	["GENERIC_LIST_GROUP"] = "Raggruppa per"
+	["GENERIC_LIST_GROUP"] = "Raggruppa per",
+	["YRV3_TRIGGER_PROD_TT"] = "Attiva istantaneamente la produzione una volta che hai scorte. Puoi tenere premuto il pulsante per continuare ad attivarlo o abilitare la casella di controllo successiva per automatizzare completamente il processo.",
+	["YRV3_TRIGGER_PROD"] = "Attivare la produzione",
+	["YRV3_AUTO_PROD"] = "Produzione automatica"
 }
