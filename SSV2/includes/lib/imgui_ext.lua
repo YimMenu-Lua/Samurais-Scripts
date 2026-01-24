@@ -96,30 +96,42 @@ function ImGui.ColorEditVec4(label, outVector)
 end
 
 ---@param label string
----@param inColor uint32_t
+---@param outU32 uint32_t
 ---@return uint32_t, boolean
-function ImGui.ColorEditU32(label, inColor)
-	local temp, changed = { Color(inColor):AsFloat() }, false
+function ImGui.ColorEditU32(label, outU32)
+	local temp, changed = { Color(outU32):AsFloat() }, false
 	temp, changed = ImGui.ColorEdit4(label, temp)
 	if (changed) then
 		return Color(temp):AsU32(), changed
 	end
 
-	return inColor, changed
+	return outU32, changed
 end
 
 ---@param label string
 ---@param stringBuffer string
----@param maxWidth? number
 ---@param flags? integer ImGuiInputTextFlags
+---@param maxWidth? float
+---@param bufferSize? integer
 ---@return string, boolean
-function ImGui.SearchBar(label, stringBuffer, maxWidth, flags)
-	if (maxWidth) then
-		ImGui.SetNextItemWidth(maxWidth)
-	end
+function ImGui.SearchBar(label, stringBuffer, flags, maxWidth, bufferSize)
+	maxWidth      = maxWidth or -1
+	bufferSize    = bufferSize or math.max(#stringBuffer + 32, 256)
+	flags         = flags or ImGuiInputTextFlags.None
+	local changed = false
 
-	local out, changed = ImGui.InputTextWithHint(label, "Search", stringBuffer, SizeOf(stringBuffer), flags or 0)
-	return out, changed
+	ImGui.SetNextItemWidth(maxWidth)
+	ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 6)
+	ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, 6, 4)
+	stringBuffer, changed = ImGui.InputTextWithHint(
+		label,
+		_T("GENERIC_SEARCH_HINT"),
+		stringBuffer,
+		bufferSize,
+		flags
+	)
+	ImGui.PopStyleVar(2)
+	return stringBuffer, changed
 end
 
 ---@param label string

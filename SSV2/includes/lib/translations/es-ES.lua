@@ -533,5 +533,6 @@ return {
 	["GENERIC_LIST_GROUP"] = "Agrupar por",
 	["YRV3_TRIGGER_PROD"] = "Activar producción",
 	["YRV3_TRIGGER_PROD_TT"] = "Activa instantáneamente la producción una vez mientras tengas suministros. Puede mantener presionado el botón para seguir activándolo o habilitar la siguiente casilla de verificación para automatizar completamente el proceso.",
-	["YRV3_AUTO_PROD"] = "Autoproducción"
+	["YRV3_AUTO_PROD"] = "Autoproducción",
+	["GENERIC_WAIT_LABEL"] = "Espere por favor"
 }

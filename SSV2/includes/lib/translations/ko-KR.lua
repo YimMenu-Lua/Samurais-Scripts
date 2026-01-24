@@ -533,5 +533,6 @@ return {
 	["YAV3_DISABLE_PTFX"] = "입자 효과 비활성화",
 	["YRV3_TRIGGER_PROD_TT"] = "소모품이 있는 한 즉시 생산이 시작됩니다. 버튼을 길게 눌러 계속 트리거하거나 다음 확인란을 활성화하여 프로세스를 완전히 자동화할 수 있습니다.",
 	["YRV3_TRIGGER_PROD"] = "트리거 생산",
-	["YRV3_AUTO_PROD"] = "자동 제작"
+	["YRV3_AUTO_PROD"] = "자동 제작",
+	["GENERIC_WAIT_LABEL"] = "기다리세요"
 }

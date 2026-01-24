@@ -1,6 +1,33 @@
 ---@diagnostic disable: lowercase-global
 
 local commandRegistry = require("includes.lib.commands")
+local Weapons         = require("includes.data.weapons")
+
+---@param t table
+---@param group_type string
+local function populate_weapon_list(t, group_type)
+	for _, v in ipairs(weapons.get_all_weapons_of_group_type(group_type)) do
+		local hash = joaat(v)
+		table.insert(t, hash)
+		table.insert(Weapons.All, hash)
+	end
+end
+
+local weapons_map = {
+	["GROUP_MELEE"]       = Weapons.Melee,
+	["GROUP_PISTOL"]      = Weapons.Pistols,
+	["GROUP_RIFLE"]       = Weapons.AssaultRifles,
+	["GROUP_SHOTGUN"]     = Weapons.Shotguns,
+	["GROUP_SMG"]         = Weapons.SMG,
+	["GROUP_MG"]          = Weapons.MachineGuns,
+	["GROUP_SNIPER"]      = Weapons.SniperRifles,
+	["GROUP_HEAVY"]       = Weapons.Heavy,
+	["GROUP_THROWN"]      = Weapons.Throwables,
+	["GROUP_PETROLCAN"]   = Weapons.Misc,
+	["GROUP_STUNGUN"]     = Weapons.Misc,
+	["GROUP_TRANQILIZER"] = Weapons.Misc,
+}
+
 require("includes.init")
 
 GPointers:Init()
@@ -9,7 +36,7 @@ Backend:RegisterHandlers()
 Translator:Load()
 GUI:LateInit()
 
-script.run_in_fiber(function()
+ThreadManager:Run(function()
 	local start_time = os.clock()
 	for name, cmd in pairs(commandRegistry) do
 		CommandExecutor:RegisterCommand(name, cmd.callback, cmd.opts)
@@ -17,42 +44,8 @@ script.run_in_fiber(function()
 
 	YimActions:RegisterCommands()
 
-	t_MeleeWeapons  = weapons.get_all_weapons_of_group_type("GROUP_MELEE")
-	t_Handguns      = weapons.get_all_weapons_of_group_type("GROUP_PISTOL")
-	t_AssaultRifles = weapons.get_all_weapons_of_group_type("GROUP_RIFLE")
-	t_Shotguns      = weapons.get_all_weapons_of_group_type("GROUP_SHOTGUN")
-	t_SMG           = weapons.get_all_weapons_of_group_type("GROUP_SMG")
-	t_MachineGuns   = weapons.get_all_weapons_of_group_type("GROUP_MG")
-	t_SniperRifles  = weapons.get_all_weapons_of_group_type("GROUP_SNIPER")
-	t_HeavyWeapons  = weapons.get_all_weapons_of_group_type("GROUP_HEAVY")
-	t_Throwables    = weapons.get_all_weapons_of_group_type("GROUP_THROWN")
-
-	for _, wpn in ipairs(weapons.get_all_weapons_of_group_type("GROUP_PETROLCAN")) do
-		table.insert(t_MiscWeapons, wpn)
-	end
-
-	for _, wpn in ipairs(weapons.get_all_weapons_of_group_type("GROUP_STUNGUN")) do
-		table.insert(t_MiscWeapons, wpn)
-	end
-
-	for _, wpn in ipairs(weapons.get_all_weapons_of_group_type("GROUP_TRANQILIZER")) do
-		table.insert(t_MiscWeapons, wpn)
-	end
-
-	for _, t in ipairs({
-		t_MeleeWeapons,
-		t_Handguns,
-		t_AssaultRifles,
-		t_Shotguns,
-		t_SMG,
-		t_MachineGuns,
-		t_SniperRifles,
-		t_HeavyWeapons,
-		t_Throwables
-	}) do
-		for _, wpn in ipairs(t) do
-			table.insert(t_AllWeapons, wpn)
-		end
+	for group_name, list in pairs(weapons_map) do
+		populate_weapon_list(list, group_name)
 	end
 
 	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD8, function()

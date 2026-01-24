@@ -1,13 +1,13 @@
 ---@diagnostic disable: lowercase-global
 
-local GroupManager = require("includes.services.GroupManager")
+local GroupManager     = require("includes.services.GroupManager")
 local t_RandomPedNames = require("includes.data.ped_names")
-local PrivateHeli = require("includes.modules.PrivateHeli")
-local PrivateJet = require("includes.modules.PrivateJet")
-local PrivateLimo = require("includes.modules.PrivateLimo")
-local __t = require("includes.modules.Bodyguard")
-local Bodyguard = __t.bg
-local EscortGroup = __t.eg
+local PrivateHeli      = require("includes.modules.PrivateHeli")
+local PrivateJet       = require("includes.modules.PrivateJet")
+local PrivateLimo      = require("includes.modules.PrivateLimo")
+local __t              = require("includes.modules.Bodyguard")
+local Bodyguard        = __t.bg
+local EscortGroup      = __t.eg
 
 ---@alias ServiceType integer
 ---| -1 # ALL

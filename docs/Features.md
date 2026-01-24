@@ -216,6 +216,12 @@ _Vehicle-centric features extending the capabilities of vanilla vehicles._
 
   Score points by drifting around Los Santos. You can bank your points for cash in Single Player.
 
+- **Ram _(AKA Shunt)_**
+
+  Gives you the ability to ram other vehicles, peds, or objects in 3 directions.
+
+  _Usage:_ Triggered via keybinds while moving forward in a vehicle. **[Numpad4]**: Left | **[Numpad8]**: Forward | **[Numpad6]**: Right.
+
 ### Aircraft
 
 - **Fast Planes**

@@ -533,5 +533,6 @@ return {
 	["YAV3_ANIM_FLAGS"] = "Verhaltensflags",
 	["YRV3_TRIGGER_PROD"] = "Produktion auslösen",
 	["YRV3_TRIGGER_PROD_TT"] = "Löst die Produktion sofort einmal aus, solange Vorräte vorhanden sind. Sie können die Taste gedrückt halten, um sie weiterhin auszulösen, oder das nächste Kontrollkästchen aktivieren, um den Vorgang vollständig zu automatisieren.",
-	["YRV3_AUTO_PROD"] = "Automatisch produzieren"
+	["YRV3_AUTO_PROD"] = "Automatisch produzieren",
+	["GENERIC_WAIT_LABEL"] = "Bitte warten"
 }

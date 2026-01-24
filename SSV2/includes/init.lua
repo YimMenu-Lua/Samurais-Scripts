@@ -24,7 +24,7 @@ local GAME_VERSION <const>   = {
 -- ### Enums Namespace.
 --
 -- All enums are stored here to avoid polluting the global namespace.
-Enums                        = require("includes.data.enums.__init")
+Enums                        = require("includes.data.enums.__init__")
 
 -- ### Backend Module
 --
