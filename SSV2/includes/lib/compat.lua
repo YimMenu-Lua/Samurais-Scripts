@@ -5,7 +5,7 @@ local Compat = {}
 Compat.__index = Compat
 
 ---@param version eAPIVersion
-function Compat.SetupEnvironment(version)
+function Compat.SetupEnv(version)
 	if (version == Enums.eAPIVersion.V1 or version == Enums.eAPIVersion.V2) then
 		print = function(...)
 			local out = {}

@@ -203,7 +203,7 @@ return {
 	["YRV3_SUPPLIES_LABEL"] = "Zaopatrzenie",
 	["YRV3_CRATES_LABEL"] = "Skrzynie",
 	["YRV3_VALUE_TOTAL"] = "Całkowita wartość",
-	["YRV3_AUTO_FILL"] = "Automatyczne uzupełnianie",
+	["YRV3_AUTO_FILL"] = "Automatyczne wypełnianie",
 	["YRV3_AMT_TOTAL"] = "Całkowita kwota",
 	["YRV3_CARGO_AMT"] = "Ładunek zatrzymany",
 	["YRV3_STOCK_LABEL"] = "Magazyn",
@@ -341,7 +341,7 @@ return {
 	["VEH_PAINT_FILTER_COL"] = "Kolor",
 	["VEH_ENGINE_SWAP_SAME_ERR"] = "Twój pojazd ma już ten silnik.",
 	["SUBTAB_PAINTS"] = "Niestandardowe prace malarskie",
-	["SUBTAB_CARS"] = "Samochody i rowery",
+	["SUBTAB_CARS"] = "Ogólny",
 	["VEH_PAINT_FILTER_TXT"] = "Filtruj według:",
 	["GENERIC_NOT_IN_PLANE"] = "Nie jesteś w samolocie.",
 	["VEH_ENGINE_SWAP"] = "Wymiana silnika",
@@ -530,5 +530,8 @@ return {
 	["YAV3_ANIM_FLAGS"] = "Flagi zachowań",
 	["YAV3_DISABLE_PROPS"] = "Wyłącz rekwizyty",
 	["YAV3_DISABLE_PTFX"] = "Wyłącz efekty cząsteczkowe",
-	["GENERIC_LIST_GROUP"] = "Grupuj według"
+	["GENERIC_LIST_GROUP"] = "Grupuj według",
+	["YRV3_TRIGGER_PROD"] = "Produkcja wyzwalacza",
+	["YRV3_TRIGGER_PROD_TT"] = "Natychmiastowo jednokrotnie uruchamia produkcję, o ile masz zapasy. Możesz przytrzymać przycisk, aby go uruchomić lub zaznaczyć kolejne pole wyboru, aby w pełni zautomatyzować proces.",
+	["YRV3_AUTO_PROD"] = "Produkcja automatyczna"
 }

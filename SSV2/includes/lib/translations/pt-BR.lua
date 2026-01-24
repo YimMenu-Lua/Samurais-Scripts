@@ -336,7 +336,7 @@ return {
 	["VEH_NOS_DAMAGE_CB"] = "Pode danificar o motor",
 	["VEH_NOS_DAMAGE_TT"] = "Danifica seu motor se você pressioná-lo com muita força.",
 	["YAV3_SCN_STOP_SPINNER"] = "Parando o cenário atual...",
-	["SUBTAB_CARS"] = "Carros e motos",
+	["SUBTAB_CARS"] = "Em geral",
 	["SUBTAB_PAINTS"] = "Trabalhos de pintura personalizados",
 	["SUBTAB_AIRCRAFT"] = "Aeronave",
 	["VEH_PAINT_FILTER_ALL"] = "Todos",
@@ -530,5 +530,8 @@ return {
 	["GENERIC_LIST_FILTER"] = "Filtrar por",
 	["YAV3_DISABLE_PROPS"] = "Desativar acessórios",
 	["YAV3_ANIM_FLAGS"] = "Sinalizadores de comportamento",
-	["GENERIC_LIST_SORT"] = "Ordenar por"
+	["GENERIC_LIST_SORT"] = "Ordenar por",
+	["YRV3_TRIGGER_PROD_TT"] = "Aciona instantaneamente a produção uma vez, desde que você tenha suprimentos. Você pode segurar o botão para continuar a acioná-lo ou ativar a próxima caixa de seleção para automatizar totalmente o processo.",
+	["YRV3_TRIGGER_PROD"] = "Produção de gatilho",
+	["YRV3_AUTO_PROD"] = "Produção automática"
 }

@@ -51,7 +51,7 @@ function VehMines:Update()
 		local y_offset   = veh_fwd.y * (veh_len / 1.6)
 		local mine_hash  = GVars.features.vehicle.mines.selected_type_hash
 
-		Await(Game.RequestWeaponAsset, mine_hash)
+		TaskWait(Game.RequestWeaponAsset, mine_hash)
 		_, groundZ = MISC.GET_GROUND_Z_FOR_3D_COORD(
 			veh_pos.x,
 			veh_pos.y,

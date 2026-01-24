@@ -70,6 +70,60 @@ return {
 			capture_group = 1
 		}
 	},
+	biker_trigger_production_global = {
+		description = "Trigger production for all biker businesses.",
+		file = "freemode.c",
+		LEGACY = {
+			value = 1845250,
+			pattern = [[(Global_\d{7})\[.*?(.*?)\]\.(f_\d{3}).(f_\d{3})\[.*?/(.*?)\].f_9 = .*?;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 880,
+					capture_group = 2,
+					description = "playerID read size."
+				},
+				{
+					value = 260,
+					capture_group = 3
+				},
+				{
+					value = 205,
+					capture_group = 4
+				},
+				{
+					value = 13,
+					capture_group = 5,
+					description = "business index read size."
+				},
+			},
+		},
+		ENHANCED = {
+			value = 1845299,
+			pattern = [[(Global_\d{7})\[.*?(.*?)\]\.(f_\d{3}).(f_\d{3})\[.*?/(.*?)\].f_9 = .*?;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 883,
+					capture_group = 2,
+					description = "playerID read size."
+				},
+				{
+					value = 260,
+					capture_group = 3
+				},
+				{
+					value = 205,
+					capture_group = 4
+				},
+				{
+					value = 13,
+					capture_group = 5,
+					description = "business index read size."
+				},
+			},
+		}
+	},
 	gb_contraband_buy_local_1 = {
 		description = "Contraband Buy Local 1",
 		file = "gb_contraband_buy.c",
@@ -245,7 +299,7 @@ return {
 		}
 	},
 	gb_gunrunning_sell_local_2 = {
-		description = "Bunker Sell Local 2",
+		description = "Amount delivered.",
 		file = "gb_gunrunning.c",
 		LEGACY = {
 			value = 1266,
@@ -265,6 +319,34 @@ return {
 			offsets = {
 				{
 					value = 816,
+					capture_group = 2
+				}
+			}
+		}
+	},
+	gb_gunrunning_sell_local_3 = {
+		description = "Remaining delivery vehicles.",
+		file = "gb_gunrunning.c",
+		LEGACY = {
+			value = 1266,
+			pattern =
+			[[for \(i = 0; i < func_\w+\(func_\w+\(\), func_\w+\(\),.*?(Local_\d{4})(\.f_\d{3}),.*?Local_\d{4}\.f_\d{3}\); i = i \+ 1\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 774,
+					capture_group = 2
+				}
+			}
+		},
+		ENHANCED = {
+			value = 1268,
+			pattern =
+			[[for \(i = 0; i < func_\w+\(func_\w+\(\), func_\w+\(\),.*?(Local_\d{4})(\.f_\d{3}),.*?Local_\d{4}\.f_\d{3}\); i = i \+ 1\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 774,
 					capture_group = 2
 				}
 			}

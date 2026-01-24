@@ -198,7 +198,7 @@ function YimActions:PlayAnim(animData, targetPed)
 		return
 	end
 
-	Await(Game.RequestAnimDict, animData.dict)
+	TaskWait(Game.RequestAnimDict, animData.dict)
 	TASK.TASK_PLAY_ANIM(
 		targetPed,
 		animData.dict,
@@ -305,7 +305,7 @@ function YimActions:Play(action, ped)
 	end
 
 	self:Cleanup(ped)
-	Await(function() return self.CurrentlyPlaying[ped] == nil end)
+	TaskWait(function() return self.CurrentlyPlaying[ped] == nil end)
 
 	self.CurrentlyPlaying[ped] = action
 
@@ -709,7 +709,7 @@ function YimActions.PropManager:SpawnProp(owner, propData, isPed, coords, faceOw
 		Audio:PartyMode(true, owner)
 	end
 
-	Await(Game.RequestModel, propData.model)
+	TaskWait(Game.RequestModel, propData.model)
 	local prop
 
 	if not isPed then
@@ -814,7 +814,7 @@ function YimActions.PropManager:AttachProp(ped, propData, isPed)
 				end
 
 				if ENTITY.IS_ENTITY_A_PED(handle) and prop.dict then
-					Await(Game.RequestAnimDict, prop.dict)
+					TaskWait(Game.RequestAnimDict, prop.dict)
 					sleep(1000)
 					TASK.TASK_PLAY_ANIM(
 						handle,
@@ -895,7 +895,7 @@ function YimActions.FXManager:StartPTFX(parent, ptfxData)
 		return
 	end
 
-	Await(Game.RequestNamedPtfxAsset, ptfxData.dict)
+	TaskWait(Game.RequestNamedPtfxAsset, ptfxData.dict)
 
 	local handle
 	if (Game.IsOnline() and parent ~= Self:GetHandle()) then

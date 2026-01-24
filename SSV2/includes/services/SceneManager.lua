@@ -141,7 +141,7 @@ function SceneManager:PlayNetworkedScene(sceneData)
 		Game.SetEntityCoords(scene.origin.handle, originPos)
 	end
 
-	Await(Game.RequestAnimDict, scene.animDict)
+	TaskWait(Game.RequestAnimDict, scene.animDict)
 	local originRot = Game.GetEntityRotation(scene.origin.handle, 2)
 	local sceneHandle = NETWORK.NETWORK_CREATE_SYNCHRONISED_SCENE(
 		originPos.x,
@@ -246,7 +246,7 @@ function SceneManager:PlayLocalScene(sceneData)
 		Game.SetEntityCoords(scene.origin.handle, originPos)
 	end
 
-	Await(Game.RequestAnimDict, scene.animDict)
+	TaskWait(Game.RequestAnimDict, scene.animDict)
 	local originRot = Game.GetEntityRotation(scene.origin.handle, 2)
 	local sceneHandle = PED.CREATE_SYNCHRONIZED_SCENE(
 		originPos.x,

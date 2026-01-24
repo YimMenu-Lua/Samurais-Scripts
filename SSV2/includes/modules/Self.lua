@@ -212,7 +212,7 @@ function Self:Teleport(where, keep_vehicle)
 			return
 		end
 
-		Await(Game.LoadGroundAtCoord, coords, 500)
+		TaskWait(Game.LoadGroundAtCoord, { coords }, 500)
 		PED.SET_PED_COORDS_KEEP_VEHICLE(self:GetHandle(), coords.x, coords.y, coords.z)
 	end)
 end
@@ -316,7 +316,7 @@ function Self:PlayKeyfobAnim()
 		return
 	end
 
-	Await(Game.RequestAnimDict, "anim@mp_player_intmenu@key_fob@")
+	TaskWait(Game.RequestAnimDict, "anim@mp_player_intmenu@key_fob@")
 	TASK.TASK_PLAY_ANIM(
 		Self:GetHandle(),
 		"anim@mp_player_intmenu@key_fob@",
@@ -394,7 +394,7 @@ function Self:SetMovementClipset(data, isJson)
 
 		local handle = Self:GetHandle()
 		if mvmtclipset then
-			Await(Game.RequestClipSet, mvmtclipset)
+			TaskWait(Game.RequestClipSet, mvmtclipset)
 			PED.SET_PED_MOVEMENT_CLIPSET(handle, mvmtclipset, 1.0)
 			PED.SET_PED_ALTERNATE_MOVEMENT_ANIM(handle, 0, "move_clown@generic", "idle", 1090519040, true)
 			TASK.SET_PED_CAN_PLAY_AMBIENT_IDLES(handle, true, true)

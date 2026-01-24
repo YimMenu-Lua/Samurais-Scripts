@@ -12,7 +12,7 @@ local Refs = require("includes.data.refs")
 Game = {}
 Game.__index = Game
 
----@return { _build: string, _online: string }
+---@return VersionInfo
 function Game.GetVersion()
 	return Memory:GetGameVersion()
 end
@@ -139,7 +139,7 @@ function Game.CreatePed(model_hash, spawn_pos, heading, is_networked, is_sriptho
 		Game.DeleteEntity(oldest, Enums.eEntityType.Ped)
 	end
 
-	Await(Game.RequestModel, model_hash)
+	TaskWait(Game.RequestModel, model_hash)
 	local i_Handle = PED.CREATE_PED(
 		Game.GetPedTypeFromModel(model_hash),
 		model_hash,
@@ -176,7 +176,7 @@ function Game.CreateVehicle(model_hash, spawn_pos, heading, is_networked, is_scr
 		Game.DeleteEntity(oldest, Enums.eEntityType.Vehicle)
 	end
 
-	Await(Game.RequestModel, model_hash)
+	TaskWait(Game.RequestModel, model_hash)
 	local i_Handle = VEHICLE.CREATE_VEHICLE(
 		model_hash,
 		spawn_pos.x,
@@ -223,7 +223,7 @@ function Game.CreateObject(model_hash, spawn_pos, is_networked, is_scripthost_ob
 		Game.DeleteEntity(oldest, Enums.eEntityType.Object)
 	end
 
-	Await(Game.RequestModel, model_hash)
+	TaskWait(Game.RequestModel, model_hash)
 	local i_Handle = OBJECT.CREATE_OBJECT(
 		model_hash,
 		spawn_pos.x,
@@ -280,7 +280,7 @@ function Game.DeleteEntity(entity, entity_type)
 			sleep(50)
 
 			if (ENTITY.DOES_ENTITY_EXIST(entity) and Game.IsOnline()) then
-				Await(entities.take_control_of, { entity, 300 }, 500)
+				TaskWait(entities.take_control_of, { entity, 300 }, 500)
 				ENTITY.DELETE_ENTITY(entity)
 			end
 			sleep(50)
@@ -773,7 +773,7 @@ function Game.StartSyncedPtfxLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s_Pt
 
 	local effects = {}
 
-	Await(Game.RequestNamedPtfxAsset, s_PtfxDict)
+	TaskWait(Game.RequestNamedPtfxAsset, s_PtfxDict)
 	local r, g, b, a = color and color:AsRGBA() or 0, 0, 0, 255
 	local boneList = {}
 	local isRightBone = false
@@ -836,7 +836,7 @@ function Game.StartSyncedPtfxNonLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s
 		return
 	end
 
-	Await(Game.RequestNamedPtfxAsset, s_PtfxDict)
+	TaskWait(Game.RequestNamedPtfxAsset, s_PtfxDict)
 
 	local boneList = {}
 
@@ -1251,7 +1251,7 @@ end
 ---@param owner integer
 ---@param speed integer
 function Game.ShootBulletBetweenCoords(weaponHash, startPos, endPos, damage, owner, speed)
-	Await(Game.RequestWeaponAsset, weaponHash)
+	TaskWait(Game.RequestWeaponAsset, weaponHash)
 	MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(
 		startPos.x,
 		startPos.y,

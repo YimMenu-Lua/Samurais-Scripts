@@ -959,7 +959,7 @@ function GUI:Button(label, opts)
 		self:Tooltip(opts.tooltip)
 	end
 
-	if (pressed) then
+	if (pressed and not opts.repeatable) then
 		self:PlaySound(self.Sounds.Button)
 	end
 

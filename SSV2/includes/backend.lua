@@ -73,50 +73,56 @@ local Backend = {
 Backend.__index = Backend
 
 ---@param name string
----@param version string
----@param game_build? string
----@param target_version? string
-function Backend:init(name, version, game_build, target_version)
-	self.api_version    = self:GetAPIVersion()
+---@param script_version string
+---@param game_version? GAME_VERSION
+function Backend:init(name, script_version, game_version)
+	local api_ver       = self:GetAPIVersion()
+	self.api_version    = api_ver
 	self.script_name    = name
-	self.__version      = version
-	self.target_build   = game_build or "any"
-	self.target_version = target_version or "any"
+	self.__version      = script_version
+	self.target_build   = game_version and game_version[api_ver].build or "any"
+	self.target_version = game_version and game_version[api_ver].online or "any"
 
-	require("includes.lib.compat").SetupEnvironment(self.api_version)
-
+	require("includes.lib.compat").SetupEnv(self.api_version)
 	return self
 end
 
 ---@return eAPIVersion
 function Backend:GetAPIVersion()
-	if (not self.api_version) then
-		if (script and (type(script) == "table")) then
-			if (menu_event and menu_event.Wndproc) then
-				if (type(_G["get_game_branch"]) == "function") then
-					local branch = _G["get_game_branch"]()
-					if (type(branch) ~= "number" or branch > 1) then
-						error("Unknown or unsupported game branch.")
-					end
-
-					self.api_version = _G["get_game_branch"]() + 1
-				else
-					self.api_version = Enums.eAPIVersion.V1
-				end
-			end
-
-			if (type(script["run_in_callback"]) == "function") then
-				error(
-					"YmMenu V2 is not supported. If you want to run this script in GTA V Enhanced, download YimLuaAPI.") -- test error; add Github link later
-			end
-			---@diagnostic disable-next-line: undefined-global
-		elseif (util or (menu and menu.root) or SCRIPT_SILENT_START or (_VERSION ~= "Lua 5.4")) then -- should probably place these in a lookup table
-			error("Failed to load: Unknown or unsupported Lua environment.")
-		else
-			self.api_version = Enums.eAPIVersion.L54
-		end
+	if (self.api_version) then
+		return self.api_version
 	end
 
+	if (not script or (type(script) ~= "table")) then
+		---@diagnostic disable-next-line: undefined-global
+		if (util or (menu and menu.root) or SCRIPT_SILENT_START or (_VERSION ~= "Lua 5.4")) then
+			error("Failed to load: Unknown or unsupported Lua environment.")
+		end
+
+		self.api_version = Enums.eAPIVersion.L54
+		return self.api_version
+	end
+
+	if (type(script["run_in_callback"]) == "function") then
+		error("YmMenu V2 is not supported. If you want to run this script in GTA V Enhanced, download YimLuaAPI.")
+	end
+
+	if (not menu_event or not menu_event.Wndproc) then
+		error("Unknown or unsupported game branch.")
+	end
+
+	local ylapi_func = _G["get_game_branch"]
+	if (type(ylapi_func) ~= "function") then
+		self.api_version = Enums.eAPIVersion.V1
+		return self.api_version
+	end
+
+	local branch = ylapi_func()
+	if (type(branch) ~= "number" or branch > 1) then
+		error("Unknown or unsupported game branch.")
+	end
+
+	self.api_version = branch + 1
 	return self.api_version
 end
 
@@ -139,18 +145,18 @@ function Backend:debug(data, ...)
 	log.fdebug(data, ...)
 end
 
-function Backend:MatchVersion()
+function Backend:MatchGameVersion()
 	local gv = Game.GetVersion()
-	return (gv and gv._build
-		and gv._online
-		and (self.target_build == gv._build)
-		and (self.target_version == gv._online)
+	return (gv and gv.build
+		and gv.online
+		and (self.target_build == gv.build)
+		and (self.target_version == gv.online)
 	)
 end
 
 ---@return boolean
 function Backend:IsUpToDate()
-	return (self.target_build == "any") or self:MatchVersion()
+	return (self.target_build == "any") or self:MatchGameVersion()
 end
 
 ---@param handle integer

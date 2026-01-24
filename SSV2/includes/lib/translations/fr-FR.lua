@@ -337,7 +337,7 @@ return {
 	["VEH_NOS_SOUND_FX"] = "Effet sonore",
 	["YAV3_SCN_STOP_SPINNER"] = "Arrêt du scénario actuel...",
 	["VEH_PAINT_FILTER_TXT"] = "Filtrer par :",
-	["SUBTAB_CARS"] = "Voitures et vélos",
+	["SUBTAB_CARS"] = "Général",
 	["VEH_PAINT_PRIMARY_CB"] = "En tant que primaire",
 	["VEH_PAINT_FILTER_MFR"] = "Fabricant",
 	["GENERIC_NOT_IN_VEH"] = "Vous n'êtes pas dans un véhicule.",
@@ -530,5 +530,8 @@ return {
 	["YAV3_DISABLE_SFX"] = "Désactiver les effets sonores",
 	["YAV3_ANIM_FLAGS"] = "Indicateurs de comportement",
 	["GENERIC_LIST_GROUP"] = "Regrouper par",
-	["YAV3_DISABLE_PROPS"] = "Désactiver les accessoires"
+	["YAV3_DISABLE_PROPS"] = "Désactiver les accessoires",
+	["YRV3_TRIGGER_PROD"] = "Production de déclencheurs",
+	["YRV3_TRIGGER_PROD_TT"] = "Déclenche instantanément la production une fois tant que vous disposez de fournitures. Vous pouvez maintenir le bouton enfoncé pour continuer à le déclencher ou cocher la case suivante pour automatiser entièrement le processus.",
+	["YRV3_AUTO_PROD"] = "Production automatique"
 }

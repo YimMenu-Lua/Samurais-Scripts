@@ -98,7 +98,7 @@ function SelfMisc:Crouch()
 	end
 
 	local playerHandle = Self:GetHandle()
-	Await(Game.RequestClipSet, "move_ped_crouched")
+	TaskWait(Game.RequestClipSet, "move_ped_crouched")
 
 	self:HandsDown()
 	PED.SET_PED_MOVEMENT_CLIPSET(playerHandle, "move_ped_crouched", 0.3)
@@ -160,7 +160,7 @@ function SelfMisc:HandsUp()
 	end
 
 	self:Uncrouch()
-	Await(Game.RequestAnimDict, "mp_missheist_countrybank@lift_hands")
+	TaskWait(Game.RequestAnimDict, "mp_missheist_countrybank@lift_hands")
 	TASK.TASK_PLAY_ANIM(
 		Self:GetHandle(),
 		"mp_missheist_countrybank@lift_hands",
@@ -202,7 +202,7 @@ function SelfMisc:UpdatePhoneGestures()
 	local playerHandle = Self:GetHandle()
 	local is_browsing_email = script.is_active("APPMPEMAIL")
 	if (AUDIO.IS_MOBILE_PHONE_CALL_ONGOING()) then
-		Await(Game.RequestAnimDict, phone_anim_dict)
+		TaskWait(Game.RequestAnimDict, phone_anim_dict)
 		TASK.TASK_PLAY_PHONE_GESTURE_ANIMATION(
 			playerHandle,
 			phone_anim_dict,

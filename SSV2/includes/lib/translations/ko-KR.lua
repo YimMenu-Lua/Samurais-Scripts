@@ -204,7 +204,7 @@ return {
 	["YRV3_CARGO_AMT"] = "화물 보관",
 	["YRV3_STOCK_LABEL"] = "재고",
 	["YRV3_CRATES_LABEL"] = "상자",
-	["YRV3_AUTO_FILL"] = "자동완성",
+	["YRV3_AUTO_FILL"] = "자동 채우기",
 	["YRV3_AUTO_SELL"] = "자동판매",
 	["YRV3_VALUE_TOTAL"] = "총 가치",
 	["YRV3_FINISH_SOURCE_MISSION_TT"] = "소스 미션을 시작한 다음 이 버튼을 눌러 완료하세요.",
@@ -344,7 +344,7 @@ return {
 	["VEH_ENGINE_SWAP_SAME_ERR"] = "귀하의 차량에는 이미 이 엔진이 있습니다.",
 	["VEH_PAINT_FILTER_COL"] = "색상",
 	["VEH_ENGINE_SWAP"] = "엔진 교환",
-	["SUBTAB_CARS"] = "자동차 및 자전거",
+	["SUBTAB_CARS"] = "일반적인",
 	["SUBTAB_AIRCRAFT"] = "항공기",
 	["VEH_PAINT_FILTER_TXT"] = "필터링 기준:",
 	["SUBTAB_FLATBED"] = "평판 스크립트",
@@ -530,5 +530,8 @@ return {
 	["YAV3_ANIM_FLAGS"] = "행동 플래그",
 	["GENERIC_LIST_FILTER"] = "필터링 기준",
 	["GENERIC_LIST_GROUP"] = "그룹화 기준",
-	["YAV3_DISABLE_PTFX"] = "입자 효과 비활성화"
+	["YAV3_DISABLE_PTFX"] = "입자 효과 비활성화",
+	["YRV3_TRIGGER_PROD_TT"] = "소모품이 있는 한 즉시 생산이 시작됩니다. 버튼을 길게 눌러 계속 트리거하거나 다음 확인란을 활성화하여 프로세스를 완전히 자동화할 수 있습니다.",
+	["YRV3_TRIGGER_PROD"] = "트리거 생산",
+	["YRV3_AUTO_PROD"] = "자동 제작"
 }

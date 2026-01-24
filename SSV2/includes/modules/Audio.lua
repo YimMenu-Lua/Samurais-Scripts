@@ -1,27 +1,22 @@
----@class ActiveEmitter
----@field name string
----@field default_station string
----@field current_station string
----@field source handle
----@field coords vec3
+local StaticEmitter = require("includes.structs.StaticEmitter")
 
 ---@class Audio
 ---@field StaticEmitters table<string, { name: string, default_station: string }>
 ---@field private m_frontend_sound_id integer
----@field private m_active_emitters table<string, ActiveEmitter> A list of enabled emitters and the entities they are linked to.
+---@field private m_active_emitters table<string, StaticEmitter>
 Audio = { m_active_emitters = {} }
 Audio.__index = Audio
 
----@param emitter table
+---@param data { name: string, default_station: string }
 ---@param toggle boolean
----@param entity? integer
+---@param entity? handle
 ---@param station? string
-function Audio:ToggleEmitter(emitter, toggle, entity, station)
-	script.run_in_fiber(function(s)
-		if (emitter and self.m_active_emitters[emitter.name]) then
-			AUDIO.SET_EMITTER_RADIO_STATION(emitter.name, self.m_active_emitters[emitter.name].default_station)
-			AUDIO.SET_STATIC_EMITTER_ENABLED(emitter.name, false)
-			self.m_active_emitters[emitter.name] = nil
+function Audio:ToggleEmitter(data, toggle, entity, station)
+	ThreadManager:Run(function(s)
+		local existing = self.m_active_emitters[data.name]
+		if (existing and existing:IsEnabled()) then
+			existing:Disable()
+			self.m_active_emitters[data.name] = nil
 			s:sleep(250)
 		end
 
@@ -33,32 +28,16 @@ function Audio:ToggleEmitter(emitter, toggle, entity, station)
 			AUDIO.SET_AUDIO_FLAG("LoadMPData", true)
 		end
 
-		if (type(emitter) == "string") then
-			emitter = self.StaticEmitters[emitter] or { name = emitter, default_station = station }
-		end
-
-		entity  = entity or Self:GetHandle()
-		emitter = emitter or self.StaticEmitters.rave_1
-		station = station or emitter.default_station
-
-		AUDIO.SET_STATIC_EMITTER_ENABLED(emitter.name, true)
-		AUDIO.SET_EMITTER_RADIO_STATION(emitter.name, station)
-		AUDIO.LINK_STATIC_EMITTER_TO_ENTITY(emitter.name, entity)
-
-		self.m_active_emitters[emitter.name] = {
-			name = emitter.name,
-			default_station = emitter.default_station,
-			current_station = station,
-			source = entity,
-			coords = Game.GetEntityCoords(entity, false)
-		}
+		local newEmitter = StaticEmitter.new(data.name, data.default_station)
+		newEmitter:Enable(station, entity or Self:GetHandle())
+		self.m_active_emitters[data.name] = newEmitter
 	end)
 end
 
 ---@param toggle boolean
 ---@param station? string
 function Audio:BlastRadio(toggle, station)
-	Audio:ToggleEmitter(
+	self:ToggleEmitter(
 		self.StaticEmitters.radio_high,
 		toggle,
 		Self:GetHandle(),
@@ -70,7 +49,7 @@ end
 ---@param entity? integer
 function Audio:PartyMode(toggle, entity)
 	for i = 1, 4 do
-		Audio:ToggleEmitter(
+		self:ToggleEmitter(
 			self.StaticEmitters["rave_" .. i],
 			toggle,
 			entity,
@@ -85,19 +64,20 @@ function Audio:AreAnyEmittersEnabled()
 end
 
 function Audio:StopAllEmitters()
-	if self:AreAnyEmittersEnabled() then
-		for _, emitter in pairs(self.m_active_emitters) do
-			AUDIO.SET_EMITTER_RADIO_STATION(emitter.name, emitter.default_station)
-			AUDIO.SET_STATIC_EMITTER_ENABLED(emitter.name, false)
-		end
-
-		self.m_active_emitters = {}
+	if (not self:AreAnyEmittersEnabled()) then
+		return
 	end
+
+	for _, emitter in pairs(self.m_active_emitters) do
+		emitter:Disable()
+	end
+
+	self.m_active_emitters = {}
 end
 
----@param vehicle integer
+---@param vehicle handle
 ---@param isLoud? boolean
-function Audio.PlayExhaustPop(vehicle, isLoud)
+function Audio:PlayExhaustPop(vehicle, isLoud)
 	if (not vehicle or not ENTITY.DOES_ENTITY_EXIST(vehicle)) then
 		return
 	end
@@ -180,7 +160,7 @@ Audio.StaticEmitters = {
 		default_station = "HIDDEN_RADIO_07_DANCE_01"
 	},
 	test_2 = {
-		name = "se_dlc_hei4_island_beach_party_music_new_03_reverb",
+		name = "SE_DLC_HEI4_ISLAND_BEACH_PARTY_MUSIC_NEW_03_REVERB",
 		default_station = "RADIO_30_DLC_HEI4_MIX1_REVERB"
 	},
 }

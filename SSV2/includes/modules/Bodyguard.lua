@@ -1285,10 +1285,10 @@ EscortVehicle.blip = nil
 ---@param groupName string
 ---@param godMode? boolean
 function EscortVehicle.new(modelHash, groupName, godMode)
-	Await(Game.RequestModel, modelHash)
+	TaskWait(Game.RequestModel, modelHash)
 
 	local handle = Game.CreateVehicle(modelHash, vec3:zero())
-	if not Await(Game.IsScriptHandle, handle) then
+	if not TaskWait(Game.IsScriptHandle, handle) then
 		return
 	end
 
@@ -1539,7 +1539,7 @@ function EscortGroup:Spawn(t_Data, godMode, noRagdoll, spawnPos)
 	local createdMembers = {}
 	local escortVehicle = EscortVehicle.new(t_Data.vehicleModel, t_Data.name, godMode)
 
-	if not escortVehicle or not Await(Game.IsScriptHandle, escortVehicle.handle) then
+	if not escortVehicle or not TaskWait(Game.IsScriptHandle, escortVehicle.handle) then
 		Notifier:ShowError(
 			"Samurai's Scripts",
 			"Failed to summon an escort group."
@@ -1570,7 +1570,7 @@ function EscortGroup:Spawn(t_Data, godMode, noRagdoll, spawnPos)
 			1
 		)
 
-		if not guard or not Await(Game.IsScriptHandle, guard:GetHandle()) then
+		if not guard or not TaskWait(Game.IsScriptHandle, guard:GetHandle()) then
 			return
 		end
 

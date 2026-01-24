@@ -337,7 +337,7 @@ return {
 	["VEH_NOS_DAMAGE_TT"] = "如果用力過猛，會損壞發動機。",
 	["YAV3_SCN_STOP_SPINNER"] = "停止當前場景...",
 	["SUBTAB_AIRCRAFT"] = "飛機",
-	["SUBTAB_CARS"] = "汽車和自行車",
+	["SUBTAB_CARS"] = "一般的",
 	["SUBTAB_PAINTS"] = "定製油漆工作",
 	["VEH_ENGINE_SWAP"] = "發動機更換",
 	["VEH_PAINT_FILTER_COL"] = "顏色",
@@ -530,5 +530,8 @@ return {
 	["YAV3_DISABLE_PTFX"] = "禁用粒子效果",
 	["YAV3_DISABLE_SFX"] = "禁用音效",
 	["YAV3_DISABLE_PROPS"] = "禁用道具",
-	["GENERIC_LIST_GROUP"] = "分組依據"
+	["GENERIC_LIST_GROUP"] = "分組依據",
+	["YRV3_TRIGGER_PROD"] = "觸發製作",
+	["YRV3_TRIGGER_PROD_TT"] = "只要有貨源，立即觸發生產。您可以按住按鈕繼續觸發它或啟用下一個複選框以完全自動化該過程。",
+	["YRV3_AUTO_PROD"] = "自動製作"
 }
