@@ -345,7 +345,7 @@ _Usage:_ Sit in the driver's seat of a flatbed truck then approach any vehicle a
 
 ### YimResupplierV3
 
-A business manager that supports auto-fill and auto-sell for several businesses, offsers instant production triggers for biker businesses, bunker, and acid lab, controls some job cooldowns, and integrates with CommandExecutor.
+A business manager that supports auto-fill and auto-sell for several businesses, offers instant production triggers for biker businesses, bunker, and acid lab, controls some job cooldowns, and integrates with CommandExecutor.
 
 ### CasinoPacino
 
