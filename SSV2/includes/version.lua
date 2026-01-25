@@ -2,4 +2,4 @@
 CI only. Do not edit.
 --]]
 
-return "1.8.0"
+return "1.8.1"
