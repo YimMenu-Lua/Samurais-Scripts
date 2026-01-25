@@ -180,7 +180,7 @@ jobs:
         name: Samurai's Scripts ${{ steps.increment_tag.outputs.version_number }}
         tag_name: ${{ steps.increment_tag.outputs.version_number }}
         body: |
-          ### ${{steps.increment_tag.outputs.version_number}} Changelog
+          ## Changelog
           ${{ steps.changelog.outputs.changelog }}
         files: |
           Samurais_Scripts_${{ steps.increment_tag.outputs.version_number }}.zip
