@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch, lowercase-global
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 GVars.keyboard_keybinds.gui_toggle = GVars.keyboard_keybinds.gui_toggle or "F5"
 local Tab = require("includes.modules.Tab")
@@ -133,9 +140,14 @@ function GUI:Toggle()
 	gui.override_mouse(self.m_should_draw)
 end
 
-function GUI:Close()
+---@param closeParent? boolean Closes YimMenu's UI as well
+function GUI:Close(closeParent)
 	self.m_should_draw = false
 	gui.override_mouse(false)
+
+	if (closeParent) then
+		gui.toggle(false)
+	end
 end
 
 ---@return float
@@ -686,7 +698,7 @@ end
 --#region Wrappers
 
 ---@param text string
----@param opts? { scale: float, color: Color }
+---@param opts? { scale: float, color?: Color }
 function GUI:HeaderText(text, opts)
 	opts = opts or {}
 	ImGui.SetWindowFontScale(opts.scale or 1.114)
@@ -703,7 +715,7 @@ end
 --```Lua
 -- GUI:Text("Found %s at 0x%X", { color = Color("green"), fmt = { "somePointer", 20015998343868 }})
 ---@param text string
----@param opts? { color: Color, alpha: number, wrap_pos: number, fmt: table } Optional parameters
+---@param opts? { color?: Color, alpha?: number, wrap_pos?: number, fmt?: table } Optional parameters
 function GUI:Text(text, opts)
 	opts = opts or {}
 	if (type(opts.fmt) == "table") then
@@ -738,7 +750,7 @@ function GUI:Tooltip(text, opts)
 	end
 
 	opts = opts or {}
-	wrap_pos = opts.wrap_pos or ImGui.GetFontSize() * 25
+	local wrap_pos = opts.wrap_pos or ImGui.GetFontSize() * 25
 
 	if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) then
 		ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
@@ -1000,6 +1012,7 @@ function GUI:ConditionalItem(ImGuiItem, condition, ...)
 end
 
 local radioStationIdx = 1
+local selectedStation
 ---@param vehicle integer
 ---@param comboName string
 ---@param stationName? string

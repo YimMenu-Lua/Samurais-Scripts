@@ -1,4 +1,13 @@
----@diagnostic disable: param-type-mismatch, lowercase-global
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
+---@diagnostic disable: lowercase-global
 
 local API_VER <const> = Backend:GetAPIVersion()
 
@@ -63,6 +72,7 @@ function Thread.new(name, callback)
 			m_avg_work_ms   = 0,
 			m_avg_cycle_ms  = 0,
 		},
+		---@diagnostic disable-next-line
 		Thread
 	)
 end

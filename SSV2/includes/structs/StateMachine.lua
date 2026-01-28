@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 ---@class StateMachineParams
 ---@field predicate? Predicate<StateMachine, table|metatable|userdata|lightuserdata>
@@ -16,6 +23,7 @@ local StateMachineParams = {}
 ---@overload fun(opts?: StateMachineParams) : StateMachine
 local StateMachine = {}
 StateMachine.__index = StateMachine
+---@diagnostic disable-next-line
 setmetatable(StateMachine, {
 	__call = function(_, ...)
 		return StateMachine:new(...)
@@ -31,6 +39,7 @@ function StateMachine:new(opts)
 		m_is_active = false,
 		m_is_toggled = false,
 		m_next_update = 0
+		---@diagnostic disable-next-line
 	}, StateMachine)
 end
 

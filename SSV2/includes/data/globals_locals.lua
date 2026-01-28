@@ -1,3 +1,12 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 return {
 	tuneables_global = {
 		description = "Tuneables (never changed)",
@@ -42,8 +51,8 @@ return {
 			capture_group = 1
 		}
 	},
-	business_hub_global_1 = {
-		description = "Business Hub Global 1",
+	arcade_bhub_global_1 = {
+		description = "Arcade Business Hub Global 1",
 		file = "apparcadebusinesshub.c",
 		LEGACY = {
 			value = 1950053,
@@ -56,8 +65,8 @@ return {
 			capture_group = 1
 		}
 	},
-	business_hub_global_2 = {
-		description = "Business Hub Global 2",
+	arcade_bhub_global_2 = {
+		description = "Arcade Business Hub Global 2",
 		file = "apparcadebusinesshub.c",
 		LEGACY = {
 			value = 1970093,
@@ -70,7 +79,7 @@ return {
 			capture_group = 1
 		}
 	},
-	biker_trigger_production_global = {
+	biker_prod_time_global = {
 		description = "Trigger production for all biker businesses.",
 		file = "freemode.c",
 		LEGACY = {
@@ -124,6 +133,48 @@ return {
 			},
 		}
 	},
+	bhub_prod_time_global = {
+		description = "Business Hub time left to produce.",
+		file = "freemode.c",
+		LEGACY = {
+			value = 2708951,
+			pattern = [[Global_(\d{7})\[.*?\] = Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 2709086,
+			pattern = [[Global_(\d{7})\[.*?\] = Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
+			capture_group = 1
+		}
+	},
+	bhub_prod_bool_global = {
+		description = "Business Hub some production bool. Flips back after production is triggered.",
+		file = "freemode.c",
+		LEGACY = {
+			value = 2708962,
+			pattern = [[Global_(\d{7})\[.*?\] = Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
+			capture_group = 2,
+			offsets = {
+				{
+					1,
+					capture_group = 3,
+					description = "some int value indexed by hub slot. can't be bothered -_-"
+				}
+			}
+		},
+		ENHANCED = {
+			value = 2709097,
+			pattern = [[Global_(\d{7})\[.*?\] = Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
+			capture_group = 2,
+			offsets = {
+				{
+					1,
+					capture_group = 3,
+					description = "some int value indexed by hub slot. can't be bothered -_-"
+				}
+			}
+		}
+	},
 	gb_contraband_buy_local_1 = {
 		description = "Contraband Buy Local 1",
 		file = "gb_contraband_buy.c",
@@ -143,12 +194,12 @@ return {
 		file = "fm_content_cargo.c",
 		LEGACY = {
 			value = 5991,
-			pattern = [[func_303\(&u(Local_59..?), \w+\);]],
+			pattern = [[func_\w+\(&.*?Local_(59..?), \w+\);]],
 			capture_group = 1
 		},
 		ENHANCED = {
 			value = 5993,
-			pattern = [[func_303\(&u(Local_59..?), \w+\);]],
+			pattern = [[func_\w+\(&.*?Local_(59..?), \w+\);]],
 			capture_group = 1
 		}
 	},

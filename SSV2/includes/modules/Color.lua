@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 ---@enum eColorType
 local eColorType <const> = {
@@ -65,6 +72,8 @@ end
 -- Constructor
 --
 -- Returns a new `Color` instance.
+--
+-- Hex strings are **ALWAYS** `RRGGBBAA`
 ---@param ... any
 ---@return Color
 function Color.new(...)
@@ -73,6 +82,7 @@ function Color.new(...)
 		args = { args[1]:unpack() }
 	end
 
+	---@diagnostic disable-next-line
 	local self = setmetatable({}, Color)
 	self.m_type = eColorType.UNK
 	self.m_source = args
@@ -174,12 +184,17 @@ function Color:AsU32()
 end
 
 -- Returns the color as a hexadecimal string.
+--
+-- Hex strings are **ALWAYS** `RRGGBBAA`.
 ---@return string
 function Color:AsHex()
 	local r, g, b, a = self:AsRGBA()
 	return string.format("#%02X%02X%02X%02X", r, g, b, a)
 end
 
+-- Returns the luminance of the color *(brightness)*.
+--
+-- https://www.w3.org/TR/AERT/#color-contrast
 ---@return float
 function Color:GetBrightness()
 	return (0.299 * self.r) + (0.587 * self.g) + (0.114 * self.b)
@@ -199,6 +214,8 @@ end
 -- Static Method.
 --
 -- Calculates the brightness of any given color in normalized RGBA format
+--
+-- https://www.w3.org/TR/AERT/#color-contrast
 ---@param r float
 ---@param g float
 ---@param b float

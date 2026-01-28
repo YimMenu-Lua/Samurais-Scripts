@@ -1,3 +1,12 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 local reservedKeys <const> = {
 	kb   = Set.new(0x01, 0x07, 0x0A, 0x0B, 0x1B, 0x24, 0x2C, 0x2D, 0x46, 0x5B, 0x5C, 0x5E),
 	gpad = Set.new(23, 24, 25, 71, 75)
@@ -85,7 +94,7 @@ local function DrawKeybinds(gvarKey, isController)
 		ImGui.Dummy(1, 10)
 
 		if not keyName then
-			ImGui.TextSpinner(_T("SETTING_HOTKEY_WAIT"), 10, ImGui.SpinnerStyle.BOUNCE_DOTS)
+			ImGui.Text(ImGui.TextSpinner(_T("SETTING_HOTKEY_WAIT"), 10, ImGuiSpinnerStyle.BOUNCE_DOTS))
 
 			if isController then
 				keyCode, keyName = Game.GetKeyPressed()

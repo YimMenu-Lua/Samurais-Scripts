@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local FeatureBase = require("includes.modules.FeatureBase")
 
@@ -19,19 +26,21 @@ local eLaunchControlState <const> = {
 ---@class LaunchControlMgr
 ---@field private m_entity PlayerVehicle
 ---@field private m_is_active boolean
----@field private m_thread Thread
+---@field private m_thread? Thread
 ---@field private m_state eLaunchControlState
 ---@field private m_timer Time.Timer
 ---@field private m_last_pop_time milliseconds
 ---@field private m_default_pops_off boolean
 ---@field private m_shocking_event_handle? handle
 ---@overload fun(pv: PlayerVehicle): LaunchControlMgr
+---@diagnostic disable-next-line
 local LaunchControl = setmetatable({}, FeatureBase)
 LaunchControl.__index = LaunchControl
 
 ---@param pv PlayerVehicle
 function LaunchControl.new(pv)
 	local self = FeatureBase.new(pv)
+	---@diagnostic disable-next-line
 	return setmetatable(self, LaunchControl)
 end
 

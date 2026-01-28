@@ -1,3 +1,12 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 ---@class Config
 local Config <const> = {
 	backend = {
@@ -268,8 +277,8 @@ local Config <const> = {
 			autoplay_slots_delay = 500,
 		},
 		yrv3 = {
-			auto_sell = false,
 			autofill_delay = 500,
+			auto_sell = false,
 			hangar_cd = false,
 			nc_management_cd = false,
 			nc_vip_mission_chance = false,
@@ -287,6 +296,7 @@ local Config <const> = {
 			weedshop_illegal_work_cd = false,
 			helitours_legal_work_cd = false,
 			helitours_illegal_work_cd = false,
+			nc_always_popular = false,
 		},
 		bsv2 = {
 			escort_groups = {

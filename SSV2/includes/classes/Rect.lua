@@ -1,11 +1,22 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
+
+--------------------------------------
+-- Class: Rect
+--------------------------------------
 ---@class Rect
 ---@field min vec2
 ---@field max vec2
 ---@overload fun(min: vec2, max: vec2) : Rect
 Rect = {}
 Rect.__index = Rect
+---@diagnostic disable-next-line
 setmetatable(Rect, {
 	__call = function(_, ...)
 		return Rect.new(...)
@@ -16,6 +27,7 @@ setmetatable(Rect, {
 ---@param max vec2
 ---@return Rect
 function Rect.new(min, max)
+	---@diagnostic disable-next-line
 	return setmetatable({ min = min, max = max }, Rect)
 end
 

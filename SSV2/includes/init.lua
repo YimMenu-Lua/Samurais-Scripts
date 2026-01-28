@@ -1,3 +1,12 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 -- Entry point for the entire Lua project.
 --
 -- Sets up global services, initializes pointer scanning, and makes
@@ -17,8 +26,8 @@ local DEFAULT_CONFIG <const> = require("includes.data.config")
 
 ---@type GAME_VERSION
 local GAME_VERSION <const>   = {
-	{ build = "3725.0",  online = "1.72" },
-	{ build = "1013.20", online = "1.72" },
+	{ build = "3751.0",  online = "1.72" },
+	{ build = "1013.29", online = "1.72" },
 }
 
 -- ### Enums Namespace.

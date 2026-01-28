@@ -1,4 +1,11 @@
----@diagnostic disable: lowercase-global
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local PrivateHeli                = require("includes.modules.PrivateHeli")
 local PrivateJet                 = require("includes.modules.PrivateJet")
@@ -139,20 +146,6 @@ local function FilterEscortsBySearchQuery()
 		end
 	else
 		t_FilteredEscortGroups = GVars.features.bsv2.escort_groups
-	end
-end
-
-local function FilterPedsByGender()
-	t_FilteredPedList = {}
-
-	if i_PedSortByIndex and i_PedSortByIndex < 3 then
-		for _, ped in ipairs(t_CustomPedList) do
-			if ped.gender == i_PedSortByIndex then
-				table.insert(t_FilteredPedList, ped)
-			end
-		end
-	else
-		t_FilteredPedList = t_CustomPedList
 	end
 end
 
@@ -386,7 +379,7 @@ local function SpawnedEscortGroupsFooter()
 end
 
 local function DrawBodyguards()
-	b_IsTyping = b_BodyguardInputText1 or b_BodyguardInputText2
+	Backend.disable_input = b_BodyguardInputText1 or b_BodyguardInputText2
 
 	if ImGui.BeginTabBar("bodyguards UI") then
 		if ImGui.BeginTabItem("Spawn") then
@@ -409,24 +402,23 @@ local function DrawBodyguards()
 
 			ImGui.BulletText("Gender: ")
 			ImGui.SameLine()
-			i_PedSortByIndex, bAll = ImGui.RadioButton("All", i_PedSortByIndex, 3)
+			i_PedSortByIndex, _ = ImGui.RadioButton("All", i_PedSortByIndex, 3)
 			ImGui.SameLine()
-			i_PedSortByIndex, bMale = ImGui.RadioButton("Male", i_PedSortByIndex, 0)
+			i_PedSortByIndex, _ = ImGui.RadioButton("Male", i_PedSortByIndex, 0)
 			ImGui.SameLine()
-			i_PedSortByIndex, bFemale = ImGui.RadioButton("Female", i_PedSortByIndex, 1)
+			i_PedSortByIndex, _ = ImGui.RadioButton("Female", i_PedSortByIndex, 1)
 
 			b_PedPreview, _ = ImGui.Checkbox("Preview", b_PedPreview)
 			if GUI:IsItemClicked(0) then
 				GUI:PlaySound("Nav")
 			end
 
-			if bAll or bMale or bFemale then
-				GUI:PlaySound("Nav")
-				FilterPedsByGender()
-			end
-
 			if ImGui.BeginListBox("##pedlist", -1, -1) then
 				for i, ped in ipairs(t_FilteredPedList) do
+					if (i_PedSortByIndex < 3 and ped.gender ~= i_PedSortByIndex) then
+						goto continue
+					end
+
 					local is_selected = (i_PedListIndex == i)
 					if ImGui.Selectable(ped.modelName, is_selected) then
 						i_PedListIndex = i
@@ -443,6 +435,8 @@ local function DrawBodyguards()
 					if is_selected then
 						t_SelectedPed = ped
 					end
+
+					::continue::
 				end
 				ImGui.EndListBox()
 			end
@@ -521,6 +515,8 @@ local function DrawBodyguards()
 	end
 end
 
+local b_DSnormal     = false
+local b_DSaggressive = false
 local function DrawEscorts()
 	if ImGui.BeginTabBar("escorts UI") then
 		if ImGui.BeginTabItem("Spawn##escorts") then
@@ -534,7 +530,7 @@ local function DrawEscorts()
 				s_SearchBuffer,
 				128
 			)
-			b_IsTyping = ImGui.IsItemActive()
+			Backend.disable_input = ImGui.IsItemActive()
 
 			if ImGui.BeginListBox("##escortGroupList", -1, -1) then
 				for i, group in ipairs(t_FilteredEscortGroups) do

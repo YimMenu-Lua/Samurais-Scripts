@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 --------------------------------------
 -- Class: CPlayerInfo
@@ -19,6 +26,7 @@
 ---@overload fun(ptr: pointer): CPlayerInfo|nil
 local CPlayerInfo = { m_size = 0x0D78 }
 CPlayerInfo.__index = CPlayerInfo
+---@diagnostic disable-next-line
 setmetatable(CPlayerInfo, {
 	__call = function(cls, ptr)
 		return cls.new(ptr)
@@ -32,6 +40,7 @@ function CPlayerInfo.new(ptr)
 		error("Invalid ped pointer!")
 	end
 
+	---@diagnostic disable-next-line
 	local instance = setmetatable({}, CPlayerInfo)
 
 	instance.m_ptr = ptr

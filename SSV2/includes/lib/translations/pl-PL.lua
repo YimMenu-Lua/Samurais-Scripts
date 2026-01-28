@@ -484,10 +484,10 @@ return {
 	["YRV3_CWASH_CASH_CLEAN"] = "Czysty:",
 	["YRV3_CWASH_HEAT"] = "Poziom ciepła:",
 	["YRV3_HELITOURS_LABEL"] = "Higgins Helitours",
-	["SELF_MC_BIKE_ANIMS"] = "Włącz styl jazdy MC",
+	["SELF_MC_BIKE_ANIMS"] = "Styl jazdy MC",
 	["YRV3_WEED_SHOP_LABEL"] = "Sklep z chwastami",
 	["YRV3_CWASH_WORK_EARNINGS"] = "Zarobki w pracy:",
-	["SELF_MC_BIKE_ANIMS_TT"] = "Przywraca alternatywne animacje jazdy na rowerze, które z jakiegoś powodu zostały wyłączone. Aby te animacje działały, musisz być zarejestrowany jako MC i mieć włączoną tę opcję.",
+	["SELF_MC_BIKE_ANIMS_TT"] = "Włączono alternatywne animacje jazdy na rowerze.",
 	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "Wyłącz czas odnowienia nielegalnej pracy",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "Wyłącz czas odnowienia legalnej pracy",
 	["VEH_LAUNCH_CTRL_REALISTIC"] = "Realistyczny",
@@ -534,5 +534,14 @@ return {
 	["YRV3_TRIGGER_PROD"] = "Produkcja wyzwalacza",
 	["YRV3_TRIGGER_PROD_TT"] = "Natychmiastowo jednokrotnie uruchamia produkcję, o ile masz zapasy. Możesz przytrzymać przycisk, aby go uruchomić lub zaznaczyć kolejne pole wyboru, aby w pełni zautomatyzować proces.",
 	["YRV3_AUTO_PROD"] = "Produkcja automatyczna",
-	["GENERIC_WAIT_LABEL"] = "Proszę czekać"
+	["GENERIC_WAIT_LABEL"] = "Proszę czekać",
+	["YRV3_NC_ALWAYS_POPULAR"] = "Zawsze popularne",
+	["GENERIC_UNAVAILABLE_SP"] = "Niedostępne w trybie dla jednego gracza.",
+	["YRV3_CLUB_NOT_OWNED"] = "Nie masz klubu nocnego.",
+	["YRV3_MILLION_DOLLAR_TIPS"] = "Napiwki za milion dolarów",
+	["GENERIC_OUTDATED"] = "Wymagana aktualizacja!",
+	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[Nietrwały]: Umożliwia dawanie napiwku pracownikowi toalety w klubie nocnym o wartości 1 miliona dolarów. Osoba obsługująca będzie wdzięczna. Twoje konto bankowe prawdopodobnie nie.\n\nUwaga: aby dać mu napiwek, musisz mieć pieniądze w gotówce.",
+	["YRV3_TRIGGER_PROD_HUB"] = "Kleszcz",
+	["YRV3_BUSINESS_HUB"] = "Centrum biznesowe",
+	["YRV3_TRIGGER_PROD_HUB_TT"] = "Z biegiem czasu uruchamia produkcję. Nie jest to natychmiastowe jak w przypadku firm motocyklowych. Pomiędzy każdym uruchomieniem występuje opóźnienie (około 20 sekund).\n\n[WAŻNE]: Przed włączeniem tej funkcji musisz upewnić się, że połączona firma jest skonfigurowana i działa oraz że w klubie nocnym jest przydzielony technik."
 }

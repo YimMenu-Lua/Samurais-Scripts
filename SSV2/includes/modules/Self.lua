@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local Refs         = require("includes.data.refs")
 local FeatureMgr   = require("includes.services.FeatureManager")
@@ -28,10 +35,15 @@ Self               = Class("Self", Player)
 Self.m_vehicle     = require("includes.modules.PlayerVehicle")
 Self.m_feat_mgr    = FeatureMgr.new(Self)
 
+---@diagnostic disable-next-line
 Self.m_feat_mgr:Add(miscFeatures.new(Self))
+---@diagnostic disable-next-line
 Self.m_feat_mgr:Add(Ragdoll.new(Self))
+---@diagnostic disable-next-line
 Self.m_feat_mgr:Add(MagicBullet.new(Self))
+---@diagnostic disable-next-line
 Self.m_feat_mgr:Add(LaserSights.new(Self))
+---@diagnostic disable-next-line
 Self.m_feat_mgr:Add(Katana.new(Self))
 
 ---@override
@@ -190,7 +202,7 @@ function Self:Teleport(where, keep_vehicle)
 			sleep(50)
 		end
 
-		if (IsInstance(where, "number")) then
+		if (type(where) == "number") then
 			local blip = HUD.GET_FIRST_BLIP_INFO_ID(where)
 
 			if not HUD.DOES_BLIP_EXIST(blip) then

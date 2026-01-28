@@ -1,48 +1,16 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 local SGSL = require("includes.services.SGSL")
 
----@class SCWarehouse
----@field was_checked boolean
----@field is_owned boolean
----@field auto_fill_enabled boolean
----@field name? string
----@field max? integer
----@field size? integer
----@field coords? vec3
----@field total_supplies? integer
----@field total_value? integer
-
----@class BikerBusiness
----@field was_checked boolean
----@field is_owned boolean
----@field fast_prod_enabled boolean
----@field fast_prod_running boolean
----@field unit_max? integer
----@field name? string
----@field value_tunable? string
----@field total_supplies? integer
----@field total_stock? integer
----@field total_value? integer
----@field coords? vec3
-
----@class BikerBusinessExt : BikerBusiness
----@field was_checked boolean
----@field is_owned boolean
----@field fast_prod_enabled boolean
----@field fast_prod_running boolean
----@field unit_max integer
----@field name? string
----@field staff_upgrade? boolean
----@field equipment_upgrade? boolean
----@field total_supplies? integer
----@field total_stock? integer
----@field total_value? integer
----@field coords? vec3
----@field blip? integer
----@field value_offset_1 integer
----@field value_offset_2 integer
----@field index integer
-
----@class BusinessSafe
+-- A table pretending to be an object
+---@class CashSafe
 ---@field is_owned fun(): bool
 ---@field cash_value fun(): integer
 ---@field max_cash integer
@@ -50,7 +18,8 @@ local SGSL = require("includes.services.SGSL")
 ---@field get_special_val? fun(): integer
 ---@field set_special_val? fun()
 
----@class MoneyFrontsBusiness : BusinessSafe
+-- A table pretending to be an object
+---@class MoneyFrontsBusiness : CashSafe
 ---@field cash_value? fun(): integer
 ---@field duffel_total? fun(): integer
 ---@field dirty_cash? fun(): integer
@@ -67,112 +36,8 @@ local SGSL = require("includes.services.SGSL")
 
 ---@class RawBusinessData
 local RawBusinessData <const> = {
-	---@type array<SCWarehouse>
-	SC_Default = {
-		[1] = {
-			was_checked       = false,
-			is_owned          = false,
-			auto_fill_enabled = false
-		},
-		[2] = {
-			was_checked       = false,
-			is_owned          = false,
-			auto_fill_enabled = false
-		},
-		[3] = {
-			was_checked       = false,
-			is_owned          = false,
-			auto_fill_enabled = false
-		},
-		[4] = {
-			was_checked       = false,
-			is_owned          = false,
-			auto_fill_enabled = false
-		},
-		[5] = {
-			was_checked       = false,
-			is_owned          = false,
-			auto_fill_enabled = false
-		},
-	},
-	---@type array<BikerBusiness>
-	BB_Default = {
-		[1] = {
-			was_checked       = false,
-			is_owned          = false,
-			fast_prod_enabled = false,
-			fast_prod_running = false,
-		},
-		[2] = {
-			was_checked       = false,
-			is_owned          = false,
-			fast_prod_enabled = false,
-			fast_prod_running = false,
-		},
-		[3] = {
-			was_checked       = false,
-			is_owned          = false,
-			fast_prod_enabled = false,
-			fast_prod_running = false,
-		},
-		[4] = {
-			was_checked       = false,
-			is_owned          = false,
-			fast_prod_enabled = false,
-			fast_prod_running = false,
-		},
-		[5] = {
-			was_checked       = false,
-			is_owned          = false,
-			fast_prod_enabled = false,
-			fast_prod_running = false,
-		},
-	},
-	---@type { bunker: BikerBusinessExt, acid_lab: BikerBusinessExt }
-	BBEXT_Default = {
-		bunker = {
-			was_checked       = false,
-			is_owned          = false,
-			fast_prod_enabled = false,
-			fast_prod_running = false,
-			unit_max          = 100,
-			value_offset_1    = 0,
-			value_offset_2    = 0,
-			index             = 5
-		},
-		acid_lab = {
-			was_checked       = false,
-			is_owned          = false,
-			fast_prod_enabled = false,
-			fast_prod_running = false,
-			unit_max          = 160,
-			value_offset_1    = 0,
-			value_offset_2    = 0,
-			blip              = 848,
-			index             = 6
-		}
-	},
-	---@type dict<BusinessSafe>
+	---@type dict<CashSafe>
 	BS_Default = {
-		["Nightclub"] = {
-			is_owned = function()
-				return stats.get_int("MPX_NIGHTCLUB_OWNED") ~= 0
-			end,
-			cash_value = function()
-				return stats.get_int("MPX_CLUB_SAFE_CASH_VALUE")
-			end,
-			max_cash = 25e4,
-			blip = 614,
-			get_special_val = function()
-				return stats.get_int("MPX_CLUB_POPULARITY")
-			end,
-			set_special_val = function()
-				if stats.get_int("MPX_CLUB_POPULARITY") >= 1e3 then
-					return
-				end
-				stats.set_int("MPX_CLUB_POPULARITY", 1e3)
-			end
-		},
 		["Arcade"] = {
 			is_owned = function()
 				return stats.get_int("MPX_ARCADE_OWNED") ~= 0
@@ -614,84 +479,6 @@ local RawBusinessData <const> = {
 			o = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetOffset(1) end)(),
 		},
 	},
-	CEOWarehouses = {
-		{ size = 0, max = 16,  coords = vec3:new(51.311188, -2568.470947, 6.004591) },
-		{ size = 0, max = 16,  coords = vec3:new(-1081.083740, -1261.013184, 5.648909) },
-		{ size = 0, max = 16,  coords = vec3:new(898.484314, -1031.882446, 34.966454) },
-		{ size = 0, max = 16,  coords = vec3:new(249.246918, -1955.651978, 23.161957) },
-		{ size = 0, max = 16,  coords = vec3:new(-424.773499, 184.146530, 80.752899) },
-		{ size = 2, max = 111, coords = vec3:new(-1045.004395, -2023.150146, 13.161570) },
-		{ size = 1, max = 42,  coords = vec3:new(-1269.286133, -813.215820, 17.107399) },
-		{ size = 2, max = 111, coords = vec3:new(-876.108032, -2734.502930, 13.844264) },
-		{ size = 0, max = 16,  coords = vec3:new(272.409424, -3015.267090, 5.707359) },
-		{ size = 1, max = 42,  coords = vec3:new(1563.832031, -2135.110840, 77.616447) },
-		{ size = 1, max = 42,  coords = vec3:new(-308.772247, -2698.393799, 6.000292) },
-		{ size = 1, max = 42,  coords = vec3:new(503.738037, -653.082642, 24.751144) },
-		{ size = 1, max = 42,  coords = vec3:new(-528.074585, -1782.701904, 21.483055) },
-		{ size = 1, max = 42,  coords = vec3:new(-328.013458, -1354.755371, 31.296524) },
-		{ size = 1, max = 42,  coords = vec3:new(349.901184, 327.976440, 104.303856) },
-		{ size = 2, max = 111, coords = vec3:new(922.555481, -1560.048950, 30.756647) },
-		{ size = 2, max = 111, coords = vec3:new(762.672363, -909.193054, 25.250854) },
-		{ size = 2, max = 111, coords = vec3:new(1041.059814, -2172.653076, 31.488876) },
-		{ size = 2, max = 111, coords = vec3:new(1015.361633, -2510.986572, 28.302608) },
-		{ size = 2, max = 111, coords = vec3:new(-245.651718, 202.504669, 83.792648) },
-		{ size = 1, max = 42,  coords = vec3:new(541.587646, -1944.362793, 24.985096) },
-		{ size = 2, max = 111, coords = vec3:new(93.278641, -2216.144775, 6.033320) },
-	},
-	BikerBusinesses = {
-		{ gxt = "MP_BWH_METH_1",   unit_max = 20, id = 3, val_tunable = "BIKER_METH_PRODUCT_VALUE",        coords = vec3:new(52.903, 6338.585, 31.35), },
-		{ gxt = "MP_BWH_WEED_1",   unit_max = 80, id = 1, val_tunable = "BIKER_WEED_PRODUCT_VALUE",        coords = vec3:new(416.7524, 6520.753, 27.7121), },
-		{ gxt = "MP_BWH_CRACK_1",  unit_max = 10, id = 4, val_tunable = "BIKER_CRACK_PRODUCT_VALUE",       coords = vec3:new(51.7653, 6486.163, 31.428), },
-		{ gxt = "MP_BWH_CASH_1",   unit_max = 40, id = 2, val_tunable = "BIKER_COUNTERCASH_PRODUCT_VALUE", coords = vec3:new(-413.6606, 6171.938, 31.4782), },
-		{ gxt = "MP_BWH_FAKEID_1", unit_max = 60, id = 0, val_tunable = "BIKER_FAKEIDS_PRODUCT_VALUE",     coords = vec3:new(-163.6828, 6334.845, 31.5808), },
-		{ gxt = "MP_BWH_METH_2",   unit_max = 20, id = 3, val_tunable = "BIKER_METH_PRODUCT_VALUE",        coords = vec3:new(1454.671, -1651.986, 67), },
-		{ gxt = "MP_BWH_WEED_2",   unit_max = 80, id = 1, val_tunable = "BIKER_WEED_PRODUCT_VALUE",        coords = vec3:new(102.14, 175.26, 104.56), },
-		{ gxt = "MP_BWH_CRACK_2",  unit_max = 10, id = 4, val_tunable = "BIKER_CRACK_PRODUCT_VALUE",       coords = vec3:new(-1462.622, -381.826, 38.802), },
-		{ gxt = "MP_BWH_CASH_2",   unit_max = 40, id = 2, val_tunable = "BIKER_COUNTERCASH_PRODUCT_VALUE", coords = vec3:new(-1171.005, -1380.922, 4.937), },
-		{ gxt = "MP_BWH_FAKEID_2", unit_max = 60, id = 0, val_tunable = "BIKER_FAKEIDS_PRODUCT_VALUE",     coords = vec3:new(299.071, -759.072, 29.333), },
-		{ gxt = "MP_BWH_METH_3",   unit_max = 20, id = 3, val_tunable = "BIKER_METH_PRODUCT_VALUE",        coords = vec3:new(201.8909, 2461.782, 55.6885), },
-		{ gxt = "MP_BWH_WEED_3",   unit_max = 80, id = 1, val_tunable = "BIKER_WEED_PRODUCT_VALUE",        coords = vec3:new(2848.369, 4450.147, 48.5139), },
-		{ gxt = "MP_BWH_CRACK_3",  unit_max = 10, id = 4, val_tunable = "BIKER_CRACK_PRODUCT_VALUE",       coords = vec3:new(387.5332, 3585.042, 33.2922), },
-		{ gxt = "MP_BWH_CASH_3",   unit_max = 40, id = 2, val_tunable = "BIKER_COUNTERCASH_PRODUCT_VALUE", coords = vec3:new(636.6344, 2785.126, 42.0111), },
-		{ gxt = "MP_BWH_FAKEID_3", unit_max = 60, id = 0, val_tunable = "BIKER_FAKEIDS_PRODUCT_VALUE",     coords = vec3:new(1657.066, 4851.732, 41.9882), },
-		{ gxt = "MP_BWH_METH_4",   unit_max = 20, id = 3, val_tunable = "BIKER_METH_PRODUCT_VALUE",        coords = vec3:new(1181.44, -3113.82, 6.03), },
-		{ gxt = "MP_BWH_WEED_4",   unit_max = 80, id = 1, val_tunable = "BIKER_WEED_PRODUCT_VALUE",        coords = vec3:new(136.973, -2472.795, 5.98), },
-		{ gxt = "MP_BWH_CRACK_4",  unit_max = 10, id = 4, val_tunable = "BIKER_CRACK_PRODUCT_VALUE",       coords = vec3:new(-253.31, -2591.15, 5.97), },
-		{ gxt = "MP_BWH_CASH_4",   unit_max = 40, id = 2, val_tunable = "BIKER_COUNTERCASH_PRODUCT_VALUE", coords = vec3:new(671.451, -2667.502, 6.0812), },
-		{ gxt = "MP_BWH_FAKEID_4", unit_max = 60, id = 0, val_tunable = "BIKER_FAKEIDS_PRODUCT_VALUE",     coords = vec3:new(-331.52, -2778.97, 5.12), },
-	},
-	Hangars = {
-		{ name = "", coords = vec3:new(-1148.908447, -3406.064697, 13.945053) },
-		{ name = "", coords = vec3:new(-1393.322021, -3262.968262, 13.944828) },
-		{ name = "", coords = vec3:new(-2022.336304, 3154.936768, 32.810272) },
-		{ name = "", coords = vec3:new(-1879.105957, 3106.792969, 32.810234) },
-		{ name = "", coords = vec3:new(-2470.278076, 3274.427734, 32.835461) },
-	},
-	Bunkers = {
-		[21] = { name = "", coords = vec3:new(494.680878, 3015.895996, 41.041725) },
-		[22] = { name = "", coords = vec3:new(849.619812, 3024.425781, 41.266800) },
-		[23] = { name = "", coords = vec3:new(40.422565, 2929.004395, 55.746357) },
-		[24] = { name = "", coords = vec3:new(1571.949341, 2224.597168, 78.350952) },
-		[25] = { name = "", coords = vec3:new(2107.135254, 3324.630615, 45.371754) },
-		[26] = { name = "", coords = vec3:new(2488.706055, 3164.616699, 49.080124) },
-		[27] = { name = "", coords = vec3:new(1798.502930, 4704.956543, 39.995476) },
-		[28] = { name = "", coords = vec3:new(-754.225769, 5944.171875, 19.836382) },
-		[29] = { name = "", coords = vec3:new(-388.333160, 4338.322754, 56.103130) },
-		[30] = { name = "", coords = vec3:new(-3030.341797, 3334.570068, 10.105902) },
-		[31] = { name = "", coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
-	},
-	Nightclubs = {
-		{ name = "", coords = vec3:new(757.009, -1332.32, 26.1802) }, -- am_mp_nightclub.c func_5118 // case 102: *uParam5 is main entrance corona coords
-		{ name = "", coords = vec3:new(345.7519, -978.8848, 28.2681) },
-		{ name = "", coords = vec3:new(-120.906, -1260.49, 28.2088) },
-		{ name = "", coords = vec3:new(5.53709, 221.35, 106.6566) },
-		{ name = "", coords = vec3:new(871.47, -2099.57, 29.3768) },
-		{ name = "", coords = vec3:new(-675.225, -2459.15, 12.8444) },
-		{ name = "", coords = vec3:new(195.534, -3168.88, 4.7903) },
-		{ name = "", coords = vec3:new(373.05, 252.13, 101.9097) },
-		{ name = "", coords = vec3:new(-1283.38, -649.916, 25.5198) },
-		{ name = "", coords = vec3:new(-1174.85, -1152.3, 4.56128) },
-	},
 	SellMissionTunables = {
 		["CEO"] = {
 			type = "bool",
@@ -753,7 +540,103 @@ local RawBusinessData <const> = {
 				"SMUG_SELL_UNDER_THE_RADAR_WEIGHTING"
 			},
 		},
-	}
+	},
+	CEOWarehouses = {
+		{ size = 0, max = 16,  coords = vec3:new(51.311188, -2568.470947, 6.004591) },
+		{ size = 0, max = 16,  coords = vec3:new(-1081.083740, -1261.013184, 5.648909) },
+		{ size = 0, max = 16,  coords = vec3:new(898.484314, -1031.882446, 34.966454) },
+		{ size = 0, max = 16,  coords = vec3:new(249.246918, -1955.651978, 23.161957) },
+		{ size = 0, max = 16,  coords = vec3:new(-424.773499, 184.146530, 80.752899) },
+		{ size = 2, max = 111, coords = vec3:new(-1045.004395, -2023.150146, 13.161570) },
+		{ size = 1, max = 42,  coords = vec3:new(-1269.286133, -813.215820, 17.107399) },
+		{ size = 2, max = 111, coords = vec3:new(-876.108032, -2734.502930, 13.844264) },
+		{ size = 0, max = 16,  coords = vec3:new(272.409424, -3015.267090, 5.707359) },
+		{ size = 1, max = 42,  coords = vec3:new(1563.832031, -2135.110840, 77.616447) },
+		{ size = 1, max = 42,  coords = vec3:new(-308.772247, -2698.393799, 6.000292) },
+		{ size = 1, max = 42,  coords = vec3:new(503.738037, -653.082642, 24.751144) },
+		{ size = 1, max = 42,  coords = vec3:new(-528.074585, -1782.701904, 21.483055) },
+		{ size = 1, max = 42,  coords = vec3:new(-328.013458, -1354.755371, 31.296524) },
+		{ size = 1, max = 42,  coords = vec3:new(349.901184, 327.976440, 104.303856) },
+		{ size = 2, max = 111, coords = vec3:new(922.555481, -1560.048950, 30.756647) },
+		{ size = 2, max = 111, coords = vec3:new(762.672363, -909.193054, 25.250854) },
+		{ size = 2, max = 111, coords = vec3:new(1041.059814, -2172.653076, 31.488876) },
+		{ size = 2, max = 111, coords = vec3:new(1015.361633, -2510.986572, 28.302608) },
+		{ size = 2, max = 111, coords = vec3:new(-245.651718, 202.504669, 83.792648) },
+		{ size = 1, max = 42,  coords = vec3:new(541.587646, -1944.362793, 24.985096) },
+		{ size = 2, max = 111, coords = vec3:new(93.278641, -2216.144775, 6.033320) },
+	},
+	BikerBusinesses = {
+		{ gxt = "MP_BWH_METH_1",   coords = vec3:new(52.903, 6338.585, 31.35), },
+		{ gxt = "MP_BWH_WEED_1",   coords = vec3:new(416.7524, 6520.753, 27.7121), },
+		{ gxt = "MP_BWH_CRACK_1",  coords = vec3:new(51.7653, 6486.163, 31.428), },
+		{ gxt = "MP_BWH_CASH_1",   coords = vec3:new(-413.6606, 6171.938, 31.4782), },
+		{ gxt = "MP_BWH_FAKEID_1", coords = vec3:new(-163.6828, 6334.845, 31.5808), },
+		{ gxt = "MP_BWH_METH_2",   coords = vec3:new(1454.671, -1651.986, 67), },
+		{ gxt = "MP_BWH_WEED_2",   coords = vec3:new(102.14, 175.26, 104.56), },
+		{ gxt = "MP_BWH_CRACK_2",  coords = vec3:new(-1462.622, -381.826, 38.802), },
+		{ gxt = "MP_BWH_CASH_2",   coords = vec3:new(-1171.005, -1380.922, 4.937), },
+		{ gxt = "MP_BWH_FAKEID_2", coords = vec3:new(299.071, -759.072, 29.333), },
+		{ gxt = "MP_BWH_METH_3",   coords = vec3:new(201.8909, 2461.782, 55.6885), },
+		{ gxt = "MP_BWH_WEED_3",   coords = vec3:new(2848.369, 4450.147, 48.5139), },
+		{ gxt = "MP_BWH_CRACK_3",  coords = vec3:new(387.5332, 3585.042, 33.2922), },
+		{ gxt = "MP_BWH_CASH_3",   coords = vec3:new(636.6344, 2785.126, 42.0111), },
+		{ gxt = "MP_BWH_FAKEID_3", coords = vec3:new(1657.066, 4851.732, 41.9882), },
+		{ gxt = "MP_BWH_METH_4",   coords = vec3:new(1181.44, -3113.82, 6.03), },
+		{ gxt = "MP_BWH_WEED_4",   coords = vec3:new(136.973, -2472.795, 5.98), },
+		{ gxt = "MP_BWH_CRACK_4",  coords = vec3:new(-253.31, -2591.15, 5.97), },
+		{ gxt = "MP_BWH_CASH_4",   coords = vec3:new(671.451, -2667.502, 6.0812), },
+		{ gxt = "MP_BWH_FAKEID_4", coords = vec3:new(-331.52, -2778.97, 5.12), },
+	},
+	BikerTunables = {
+		[0] = { max_units = 60, vpu = "BIKER_FAKEIDS_PRODUCT_VALUE", mult_1 = "BIKER_FAKEIDS_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_FAKEIDS_PRODUCT_VALUE_STAFF_UPGRADE" },
+		[1] = { max_units = 80, vpu = "BIKER_WEED_PRODUCT_VALUE", mult_1 = "BIKER_WEED_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_WEED_PRODUCT_VALUE_STAFF_UPGRADE" },
+		[2] = { max_units = 40, vpu = "BIKER_COUNTERCASH_PRODUCT_VALUE", mult_1 = "BIKER_COUNTERCASH_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_COUNTERCASH_PRODUCT_VALUE_STAFF_UPGRADE" },
+		[3] = { max_units = 20, vpu = "BIKER_METH_PRODUCT_VALUE", mult_1 = "BIKER_METH_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_METH_PRODUCT_VALUE_STAFF_UPGRADE" },
+		[4] = { max_units = 10, vpu = "BIKER_CRACK_PRODUCT_VALUE", mult_1 = "BIKER_CRACK_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_CRACK_PRODUCT_VALUE_STAFF_UPGRADE" },
+	},
+	Hangars = {
+		{ name = "", coords = vec3:new(-1148.908447, -3406.064697, 13.945053) },
+		{ name = "", coords = vec3:new(-1393.322021, -3262.968262, 13.944828) },
+		{ name = "", coords = vec3:new(-2022.336304, 3154.936768, 32.810272) },
+		{ name = "", coords = vec3:new(-1879.105957, 3106.792969, 32.810234) },
+		{ name = "", coords = vec3:new(-2470.278076, 3274.427734, 32.835461) },
+	},
+	Bunkers = {
+		[21] = { name = "", coords = vec3:new(494.680878, 3015.895996, 41.041725) },
+		[22] = { name = "", coords = vec3:new(849.619812, 3024.425781, 41.266800) },
+		[23] = { name = "", coords = vec3:new(40.422565, 2929.004395, 55.746357) },
+		[24] = { name = "", coords = vec3:new(1571.949341, 2224.597168, 78.350952) },
+		[25] = { name = "", coords = vec3:new(2107.135254, 3324.630615, 45.371754) },
+		[26] = { name = "", coords = vec3:new(2488.706055, 3164.616699, 49.080124) },
+		[27] = { name = "", coords = vec3:new(1798.502930, 4704.956543, 39.995476) },
+		[28] = { name = "", coords = vec3:new(-754.225769, 5944.171875, 19.836382) },
+		[29] = { name = "", coords = vec3:new(-388.333160, 4338.322754, 56.103130) },
+		[30] = { name = "", coords = vec3:new(-3030.341797, 3334.570068, 10.105902) },
+		[31] = { name = "", coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
+	},
+	Nightclubs = {
+		{ name = "", coords = vec3:new(757.009, -1332.32, 26.1802) }, -- am_mp_nightclub.c func_5118 // case 102: *uParam5 is main entrance corona coords
+		{ name = "", coords = vec3:new(345.7519, -978.8848, 28.2681) },
+		{ name = "", coords = vec3:new(-120.906, -1260.49, 28.2088) },
+		{ name = "", coords = vec3:new(5.53709, 221.35, 106.6566) },
+		{ name = "", coords = vec3:new(871.47, -2099.57, 29.3768) },
+		{ name = "", coords = vec3:new(-675.225, -2459.15, 12.8444) },
+		{ name = "", coords = vec3:new(195.534, -3168.88, 4.7903) },
+		{ name = "", coords = vec3:new(373.05, 252.13, 101.9097) },
+		{ name = "", coords = vec3:new(-1283.38, -649.916, 25.5198) },
+		{ name = "", coords = vec3:new(-1174.85, -1152.3, 4.56128) },
+	},
+	---@alias BusinessHubs array<{ name: string, vpu_tunable: string, max_units_tunable: string, prod_time_tunable: string }>
+	BusinessHubs = {
+		-- names are shortened and not localized because GXTs are too wide for our current UI
+		{ name = "Cargo",   vpu_tunable = "BB_BUSINESS_VALUE_CARGO",            max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_CARGO",            prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_CARGO" },
+		{ name = "Weapons", vpu_tunable = "BB_BUSINESS_VALUE_WEAPONS",          max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEAPONS",          prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEAPONS" },
+		{ name = "Cocaine", vpu_tunable = "BB_BUSINESS_VALUE_COKE",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COKE",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COKE" },
+		{ name = "Meth",    vpu_tunable = "BB_BUSINESS_VALUE_METH",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_METH",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_METH" },
+		{ name = "Weed",    vpu_tunable = "BB_BUSINESS_VALUE_WEED",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEED",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEED" },
+		{ name = "Fake ID", vpu_tunable = "BB_BUSINESS_VALUE_FORGED_DOCUMENTS", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_FORGED_DOCUMENTS", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_FORGED_DOCUMENTS" },
+		{ name = "Cash",    vpu_tunable = "BB_BUSINESS_VALUE_COUNTERFEIT_CASH", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COUNTERFEIT_CASH", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COUNTERFEIT_CASH" },
+	},
 }
 
 return RawBusinessData

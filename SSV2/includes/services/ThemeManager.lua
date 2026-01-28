@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 ---@class ThemeColors
 ---@field WindowBg vec4
@@ -43,6 +50,7 @@
 ---@overload fun(name: string, colors: ThemeColors, styles: ThemeStyles, topBarGradient1: vec4, topBarGradient2: vec4): Theme
 local Theme = {}
 Theme.__index = Theme
+---@diagnostic disable-next-line
 setmetatable(Theme, {
 	__call = function(_, ...)
 		return Theme.new(...)
@@ -95,6 +103,7 @@ function Theme.new(name, colors, styles, topBarGradient1, topBarGradient2)
 		TopBarFrameCol2 = topBarGradient2 or vec4:zero()
 	}
 
+	---@diagnostic disable-next-line
 	return setmetatable(t, Theme)
 end
 

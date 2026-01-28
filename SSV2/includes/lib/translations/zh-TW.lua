@@ -486,10 +486,10 @@ return {
 	["YRV3_WEED_SHOP_LABEL"] = "雜草店",
 	["YRV3_CWASH_HEAT"] = "熱量等級：",
 	["YRV3_HELITOURS_LABEL"] = "希金斯直升機之旅",
-	["SELF_MC_BIKE_ANIMS"] = "啟用 MC 騎行風格",
+	["SELF_MC_BIKE_ANIMS"] = "MC騎行風格",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "禁用法律工作冷卻",
 	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "禁用非法工作冷卻",
-	["SELF_MC_BIKE_ANIMS_TT"] = "恢復由於某種原因禁用的備用自行車騎行動畫。您必須註冊為 MC 並啟用此選項才能使這些動畫正常工作。",
+	["SELF_MC_BIKE_ANIMS_TT"] = "啟用交替騎自行車動畫。",
 	["VEH_LAUNCH_CTRL_MODE"] = "發射控制模式",
 	["SUBTAB_STANCER"] = "斯坦瑟",
 	["VEH_LAUNCH_CTRL_REALISTIC"] = "實際的",
@@ -534,5 +534,14 @@ return {
 	["YRV3_TRIGGER_PROD"] = "觸發製作",
 	["YRV3_TRIGGER_PROD_TT"] = "只要有貨源，立即觸發生產。您可以按住按鈕繼續觸發它或啟用下一個複選框以完全自動化該過程。",
 	["YRV3_AUTO_PROD"] = "自動製作",
-	["GENERIC_WAIT_LABEL"] = "請稍等"
+	["GENERIC_WAIT_LABEL"] = "請稍等",
+	["YRV3_TRIGGER_PROD_HUB"] = "打鉤",
+	["YRV3_BUSINESS_HUB"] = "商業中心",
+	["YRV3_MILLION_DOLLAR_TIPS"] = "百萬美元小費",
+	["YRV3_NC_ALWAYS_POPULAR"] = "永遠受歡迎",
+	["GENERIC_OUTDATED"] = "需要更新！",
+	["GENERIC_UNAVAILABLE_SP"] = "在單人遊戲中不可用。",
+	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[非持久]：允許您給夜總會廁所服務員小費 100 萬美元。服務員將不勝感激。您的銀行帳戶可能不會。 \n\n注意：您必須有現金才能給他小費。",
+	["YRV3_CLUB_NOT_OWNED"] = "你沒有夜總會。",
+	["YRV3_TRIGGER_PROD_HUB_TT"] = "隨著時間的推移不斷觸發生產。這不像騎自行車的企業那樣是即時的，每次觸發之間有一個延遲（大約 20 秒）。 \n\n[重要]：在啟用此功能之前，您必須確保連接的企業已設置並正在運行，並且您的夜總會中已分配了一名技術人員。"
 }

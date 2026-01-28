@@ -1,3 +1,12 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 local self_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_SELF, "Self")
 local katana_replace_weapons <const> = {
 	Pair.new(weapons.get_weapon_display_name(0x958A4A8F), 0x958A4A8F),

@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local FeatureBase = require("includes.modules.FeatureBase")
 local drivingModes <const> = {
@@ -25,6 +32,7 @@ function Carpool.new(owner)
 	local self     = FeatureBase.new(owner)
 	local instance = setmetatable(self, Carpool)
 	instance:Init()
+	---@diagnostic disable-next-line
 	return instance
 end
 
@@ -90,6 +98,7 @@ function Carpool:GetCurrentTask()
 	return self.m_task
 end
 
+---@return { speed: integer, drivingFlags: eDrivingFlags }
 function Carpool:GetDrivingStyle()
 	return {
 		speed = drivingModes[self.m_current_drive_mode].speed or 20,
@@ -246,8 +255,8 @@ function Carpool:CancelAllTasks()
 	entities.take_control_of(self.m_driver, 250)
 	TASK.CLEAR_PED_TASKS(self.m_driver)
 	TASK.CLEAR_PED_SECONDARY_TASK(self.m_driver)
-	TASK.CLEAR_PRIMARY_VEHICLE_TASK(self.m_vehicle)
-	TASK.TASK_VEHICLE_TEMP_ACTION(self.m_driver, self.m_vehicle, 1, 2000)
+	TASK.CLEAR_PRIMARY_VEHICLE_TASK(self.m_vehicle:GetHandle())
+	TASK.TASK_VEHICLE_TEMP_ACTION(self.m_driver, self.m_vehicle:GetHandle(), 1, 2000)
 
 	self.m_task = Enums.eVehicleTask.NONE
 	self.m_last_task_coords = nil
@@ -294,7 +303,7 @@ function Carpool:EmergencyStop()
 
 	self:CancelAllTasks()
 	self.m_task = Enums.eVehicleTask.OVERRIDE
-	VEHICLE.SET_VEHICLE_FORWARD_SPEED(self.m_vehicle, 0)
+	VEHICLE.SET_VEHICLE_FORWARD_SPEED(self.m_vehicle:GetHandle(), 0)
 end
 
 function Carpool:Resume()

@@ -488,8 +488,8 @@ return {
 	["YRV3_WEED_SHOP_LABEL"] = "杂草店",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "禁用法律工作冷却",
 	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "禁用非法工作冷却",
-	["SELF_MC_BIKE_ANIMS_TT"] = "恢复由于某种原因禁用的备用自行车骑行动画。您必须注册为 MC 并启用此选项才能使这些动画正常工作。",
-	["SELF_MC_BIKE_ANIMS"] = "启用 MC 骑行风格",
+	["SELF_MC_BIKE_ANIMS_TT"] = "启用交替骑自行车动画。",
+	["SELF_MC_BIKE_ANIMS"] = "MC骑行风格",
 	["SUBTAB_STANCER"] = "斯坦瑟",
 	["VEH_LAUNCH_CTRL_MODE"] = "发射控制模式",
 	["VEH_STANCE_CAMBER"] = "外倾角",
@@ -534,5 +534,14 @@ return {
 	["YRV3_TRIGGER_PROD"] = "触发制作",
 	["YRV3_TRIGGER_PROD_TT"] = "只要有货源，立即触发生产。您可以按住按钮继续触发它或启用下一个复选框以完全自动化该过程。",
 	["YRV3_AUTO_PROD"] = "自动制作",
-	["GENERIC_WAIT_LABEL"] = "请稍等"
+	["GENERIC_WAIT_LABEL"] = "请稍等",
+	["YRV3_MILLION_DOLLAR_TIPS"] = "百万美元小费",
+	["YRV3_CLUB_NOT_OWNED"] = "你没有夜总会。",
+	["GENERIC_UNAVAILABLE_SP"] = "在单人游戏中不可用。",
+	["YRV3_TRIGGER_PROD_HUB"] = "打钩",
+	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[非持久]：允许您给夜总会厕所服务员小费 100 万美元。服务员将不胜感激。您的银行帐户可能不会。\n\n注意：您必须有现金才能给他小费。",
+	["GENERIC_OUTDATED"] = "需要更新！",
+	["YRV3_NC_ALWAYS_POPULAR"] = "永远受欢迎",
+	["YRV3_BUSINESS_HUB"] = "商业中心",
+	["YRV3_TRIGGER_PROD_HUB_TT"] = "随着时间的推移不断触发生产。这不像骑自行车的企业那样是即时的，每次触发之间有一个延迟（大约 20 秒）。\n\n[重要]：在启用此功能之前，您必须确保连接的企业已设置并正在运行，并且您的夜总会中已分配了一名技术人员。"
 }
