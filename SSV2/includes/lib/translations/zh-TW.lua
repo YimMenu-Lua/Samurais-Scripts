@@ -484,7 +484,7 @@ return {
 	["YRV3_CWASH_CASH_CLEAN"] = "乾淨的：",
 	["YRV3_CWASH_NOT_OWNED"] = "您沒有洗車業務。",
 	["YRV3_WEED_SHOP_LABEL"] = "雜草店",
-	["YRV3_CWASH_HEAT"] = "熱量等級：",
+	["YRV3_CWASH_HEAT"] = "熱度",
 	["YRV3_HELITOURS_LABEL"] = "希金斯直升機之旅",
 	["SELF_MC_BIKE_ANIMS"] = "MC騎行風格",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "禁用法律工作冷卻",
@@ -543,5 +543,7 @@ return {
 	["GENERIC_UNAVAILABLE_SP"] = "在單人遊戲中不可用。",
 	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[非持久]：允許您給夜總會廁所服務員小費 100 萬美元。服務員將不勝感激。您的銀行帳戶可能不會。 \n\n注意：您必須有現金才能給他小費。",
 	["YRV3_CLUB_NOT_OWNED"] = "你沒有夜總會。",
-	["YRV3_TRIGGER_PROD_HUB_TT"] = "隨著時間的推移不斷觸發生產。這不像騎自行車的企業那樣是即時的，每次觸發之間有一個延遲（大約 20 秒）。 \n\n[重要]：在啟用此功能之前，您必須確保連接的企業已設置並正在運行，並且您的夜總會中已分配了一名技術人員。"
+	["YRV3_TRIGGER_PROD_HUB_TT"] = "隨著時間的推移不斷觸發生產。這不像騎自行車的企業那樣是即時的，每次觸發之間有一個延遲（大約 20 秒）。 \n\n[重要]：在啟用此功能之前，您必須確保連接的企業已設置並正在運行，並且您的夜總會中已分配了一名技術人員。",
+	["YRV3_STATE_ERR_WRONG_SESSION"] = "不兼容的會話。請加入免費模式。",
+	["YRV3_STATE_WAIT_TRANSITION"] = "等待自由模式轉換。"
 }

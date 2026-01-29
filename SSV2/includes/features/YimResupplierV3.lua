@@ -41,6 +41,15 @@ local ScriptsToTerminate <const> = {
 	"appbusinesshub"
 }
 
+---@enum eYRState
+Enums.eYRState                   = {
+	OFFLINE = 0x0,
+	WAITING = 0x1,
+	LOADING = 0x2,
+	RUNNING = 0x3,
+	ERROR   = 0x4
+}
+
 ---@class YRV3Businesses
 ---@field warehouses Warehouse[]
 ---@field biker_businesses BikerBusiness[]
@@ -66,6 +75,7 @@ local ScriptsToTerminate <const> = {
 ---@field private m_cooldown_state_dirty boolean
 ---@field private m_initial_data_done boolean
 ---@field private m_data_initialized boolean
+---@field protected m_state eYRState
 ---@field protected m_thread Thread?
 ---@field protected m_initialized boolean
 local YRV3                       = { m_raw_data = require("includes.data.yrv3_data") }
@@ -81,6 +91,7 @@ function YRV3:init()
 	self.m_bhub_script_handle     = 0
 	self.m_last_as_check_time     = 0
 	self.m_last_income_check_time = 0
+	self.m_state                  = Enums.eYRState.OFFLINE
 	self.m_has_triggered_autosell = false
 	self.m_sell_script_running    = false
 	self.m_initial_data_done      = false
@@ -88,6 +99,7 @@ function YRV3:init()
 	self.m_cooldown_state_dirty   = true
 	self.m_sell_script_name       = nil
 	self.m_sell_script_disp_name  = "None"
+	self.m_last_error             = ""
 	self.m_businesses             = {
 		warehouses       = {},
 		biker_businesses = {},
@@ -101,30 +113,61 @@ function YRV3:init()
 	end)
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
-		self:Reset()
+		if (self.m_data_initialized) then
+			self:Reset()
+		end
 	end)
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, function()
-		self:Reset()
+		if (self.m_data_initialized) then
+			self:Reset()
+		end
 	end)
 
 	return self
 end
 
 function YRV3:Reset()
-	self.m_cooldown_state_dirty = true
-
-	-- we no longer reset business data here and end up with dangling pointers in ImGui.
-	-- if the player changes something (swaps properties, buys a new one, etc.)
-	-- they can simply reload the script. It's not rocket science
+	self.m_total_sum              = 0
+	self.m_last_as_check_time     = 0
+	self.m_last_income_check_time = 0
+	self.m_businesses             = {
+		warehouses       = {},
+		biker_businesses = {},
+		safes            = self.m_raw_data.BS_Default,
+		money_fronts     = self.m_raw_data.MF_Default,
+	}
+	self.m_has_triggered_autosell = false
+	self.m_sell_script_running    = false
+	self.m_initial_data_done      = false
+	self.m_data_initialized       = false
+	self.m_cooldown_state_dirty   = true
 end
 
+function YRV3:Reload()
+	if (self.m_thread and self.m_thread:IsRunning()) then
+		self.m_thread:Suspend()
+	end
+
+	self:Reset()
+
+	if (self.m_thread and self.m_thread:IsSuspended()) then
+		self.m_thread:Resume()
+	end
+end
+
+---@return boolean
 function YRV3:CanAccess()
 	return Backend:IsUpToDate()
 		and Game.IsOnline()
 		and not Backend:IsMockEnv()
-		and not script.is_active("maintransition")
 		and not NETWORK.NETWORK_IS_ACTIVITY_SESSION()
+		and self.m_state ~= Enums.eYRState.ERROR
+end
+
+---@return boolean
+function YRV3:IsDataInitialized()
+	return self.m_data_initialized
 end
 
 ---@param where integer|vec3
@@ -138,8 +181,9 @@ function YRV3:Teleport(where, keepVehicle)
 	Self:Teleport(where, keepVehicle)
 end
 
-function YRV3:IsDataInitialized()
-	return self.m_data_initialized
+---@return eYRState
+function YRV3:GetState()
+	return self.m_state
 end
 
 ---@return string
@@ -149,6 +193,15 @@ function YRV3:GetLastError()
 	end
 
 	return self.m_last_error
+end
+
+---@param msg string
+function YRV3:SetLastError(msg)
+	if (msg == self.m_last_error) then
+		return
+	end
+
+	self.m_last_error = msg
 end
 
 ---@return array<Warehouse>
@@ -243,14 +296,18 @@ end
 function YRV3:PopulateBikerBusinesses()
 	for i = 0, 4 do
 		local property_index = (stats.get_int(_F("MPX_FACTORYSLOT%d", i)))
-		local ref            = self.m_raw_data.BikerBusinesses[property_index]
-		local ref2           = self.m_raw_data.BikerTunables[ref.id]
-		if (not ref or not ref2) then
+		local ref = self.m_raw_data.BikerBusinesses[property_index]
+		if (not ref) then
 			goto continue
 		end
 
-		local has_eq_upgrade    = stats.get_int(_F("MPX_FACTORYUPGRADES%d", ref.id)) == 1
-		local has_staff_upgrade = stats.get_int(_F("MPX_FACTORYUPGRADES%d_1", ref.id)) == 1
+		local ref2 = self.m_raw_data.BikerTunables[ref.id]
+		if (not ref2) then
+			goto continue
+		end
+
+		local has_eq_upgrade    = stats.get_int(_F("MPX_FACTORYUPGRADES%d", i)) == 1
+		local has_staff_upgrade = stats.get_int(_F("MPX_FACTORYUPGRADES%d_1", i)) == 1
 		local eq_upg_mult       = tunables.get_int(ref2.mult_1)
 		local stf_upg_mult      = tunables.get_int(ref2.mult_2)
 		table.insert(self.m_businesses.biker_businesses, BikerBusiness.new({
@@ -301,6 +358,7 @@ function YRV3:PopulateBikerBusinesses()
 			vpu_mult_2 = 0,
 			vpu        = tunables.get_int("BIKER_ACID_PRODUCT_VALUE"),
 			max_units  = 160,
+			blip       = 847,
 		})
 	end
 end
@@ -416,10 +474,12 @@ function YRV3:PreInit()
 end
 
 function YRV3:InitializeData()
-	if (self.m_data_initialized or not Game.IsOnline()) then
+	if (self.m_data_initialized or not Game.IsOnline() or self.m_state == Enums.eYRState.LOADING) then
 		return
 	end
 
+	self.m_state      = Enums.eYRState.LOADING
+	self.m_last_error = "GENERIC_WAIT_LABEL"
 	self:PreInit()
 	self:PopulateNightclub()
 end
@@ -891,11 +951,27 @@ end
 
 function YRV3:OnTick()
 	if (not Backend:IsUpToDate() and (self.m_thread and self.m_thread:IsRunning())) then
+		self.m_state = Enums.eYRState.ERROR
+		self:SetLastError("GENERIC_OUTDATED")
 		self.m_thread:Stop()
 		return
 	end
 
 	if (not self:CanAccess()) then
+		self.m_state = Enums.eYRState.OFFLINE
+
+		if (not network.is_session_started()) then
+			self:SetLastError("GENERIC_UNAVAILABLE_SP")
+		else
+			if (script.is_active("maintransition")) then
+				self.m_state = Enums.eYRState.WAITING
+				self:SetLastError("YRV3_STATE_WAIT_TRANSITION")
+			elseif (NETWORK.NETWORK_IS_ACTIVITY_SESSION()) then
+				self.m_state = Enums.eYRState.ERROR
+				self:SetLastError("YRV3_STATE_ERR_WRONG_SESSION")
+			end
+		end
+
 		yield()
 		return
 	end
@@ -906,6 +982,9 @@ function YRV3:OnTick()
 		yield()
 		return
 	end
+
+	self.m_state = Enums.eYRState.RUNNING
+	self:SetLastError("")
 
 	self:AutoSellHandler()
 	self:AutoFillHandler()

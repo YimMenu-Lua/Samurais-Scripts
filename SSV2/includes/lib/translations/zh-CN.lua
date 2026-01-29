@@ -483,7 +483,7 @@ return {
 	["YRV3_CWASH_CASH_CLEAN"] = "干净的：",
 	["YRV3_CWASH_CASH_DIRTY"] = "肮脏的：",
 	["YRV3_CWASH_LABEL"] = "洗车",
-	["YRV3_CWASH_HEAT"] = "热量等级：",
+	["YRV3_CWASH_HEAT"] = "热度",
 	["YRV3_CWASH_WORK_EARNINGS"] = "工作收入：",
 	["YRV3_WEED_SHOP_LABEL"] = "杂草店",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "禁用法律工作冷却",
@@ -543,5 +543,7 @@ return {
 	["GENERIC_OUTDATED"] = "需要更新！",
 	["YRV3_NC_ALWAYS_POPULAR"] = "永远受欢迎",
 	["YRV3_BUSINESS_HUB"] = "商业中心",
-	["YRV3_TRIGGER_PROD_HUB_TT"] = "随着时间的推移不断触发生产。这不像骑自行车的企业那样是即时的，每次触发之间有一个延迟（大约 20 秒）。\n\n[重要]：在启用此功能之前，您必须确保连接的企业已设置并正在运行，并且您的夜总会中已分配了一名技术人员。"
+	["YRV3_TRIGGER_PROD_HUB_TT"] = "随着时间的推移不断触发生产。这不像骑自行车的企业那样是即时的，每次触发之间有一个延迟（大约 20 秒）。\n\n[重要]：在启用此功能之前，您必须确保连接的企业已设置并正在运行，并且您的夜总会中已分配了一名技术人员。",
+	["YRV3_STATE_WAIT_TRANSITION"] = "等待自由模式转换。",
+	["YRV3_STATE_ERR_WRONG_SESSION"] = "不兼容的会话。请加入免费模式。"
 }

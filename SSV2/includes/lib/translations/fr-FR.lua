@@ -485,7 +485,7 @@ return {
 	["YRV3_CWASH_WORK_EARNINGS"] = "Gains de travail :",
 	["YRV3_CWASH_NOT_OWNED"] = "Vous ne possédez pas d'entreprise de lavage de voitures.",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "Désactiver le temps de recharge du travail légal",
-	["YRV3_CWASH_HEAT"] = "Niveau de chaleur :",
+	["YRV3_CWASH_HEAT"] = "Niveau de chaleur",
 	["YRV3_HELITOURS_LABEL"] = "Higgins Hélitours",
 	["YRV3_WEED_SHOP_LABEL"] = "Magasin de mauvaises herbes",
 	["SELF_MC_BIKE_ANIMS_TT"] = "Activation d'animations alternatives de conduite de vélo.",
@@ -543,5 +543,7 @@ return {
 	["YRV3_NC_ALWAYS_POPULAR"] = "Toujours populaire",
 	["GENERIC_OUTDATED"] = "Mise à jour requise !",
 	["YRV3_MILLION_DOLLAR_TIPS"] = "Conseils pour un million de dollars",
-	["YRV3_TRIGGER_PROD_HUB_TT"] = "Continue de déclencher la production au fil du temps. Ce n'est pas instantané comme dans les entreprises de motards, il y a un délai entre chaque déclenchement (environ 20 secondes).\n\n[IMPROTANT] : Vous devez vous assurer que l'entreprise connectée est configurée et opérationnelle et qu'un technicien est affecté dans votre discothèque avant de l'activer."
+	["YRV3_TRIGGER_PROD_HUB_TT"] = "Continue de déclencher la production au fil du temps. Ce n'est pas instantané comme dans les entreprises de motards, il y a un délai entre chaque déclenchement (environ 20 secondes).\n\n[IMPROTANT] : Vous devez vous assurer que l'entreprise connectée est configurée et opérationnelle et qu'un technicien est affecté dans votre discothèque avant de l'activer.",
+	["YRV3_STATE_WAIT_TRANSITION"] = "En attente de la transition en mode libre.",
+	["YRV3_STATE_ERR_WRONG_SESSION"] = "Séance incompatible. Veuillez rejoindre le mode gratuit."
 }

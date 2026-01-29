@@ -49,8 +49,8 @@ function BikerBusiness.new(opts)
 	local mult_1                 = opts.vpu_mult_1 or 0
 	local mult_2                 = opts.vpu_mult_2 or 0
 	instance.m_vpu               = base_vpu + mult_1 + mult_2
-	instance.m_equipment_upgrade = mult_1 > 1
-	instance.m_staff_upgrade     = mult_2 > 1
+	instance.m_equipment_upgrade = mult_1 > 0
+	instance.m_staff_upgrade     = mult_2 > 0
 	---@diagnostic disable-next-line
 	return instance
 end

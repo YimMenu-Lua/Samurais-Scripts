@@ -283,9 +283,11 @@ return {
 	["YRV3_CWASH_CASH_DIRTY"]              = "Dirty:",
 	["YRV3_WEED_SHOP_LABEL"]               = "Weed Shop",
 	["YRV3_HELITOURS_LABEL"]               = "Higgins Helitours",
-	["YRV3_CWASH_HEAT"]                    = "Heat Level:",
+	["YRV3_CWASH_HEAT"]                    = "Heat Level",
 	["YRV3_CWASH_LEGAL_WORK_CD"]           = "Disable Legal Work Cooldown",
 	["YRV3_CWASH_ILLEGAL_WORK_CD"]         = "Disable Illegal Work Cooldown",
+	["YRV3_STATE_WAIT_TRANSITION"]         = "Waiting for freemode transition.",
+	["YRV3_STATE_ERR_WRONG_SESSION"]       = "Incompatible session. Please join free mode.",
 	--#endregion
 
 	--#region Self

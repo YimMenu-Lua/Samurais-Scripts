@@ -485,7 +485,7 @@ return {
 	["YRV3_CWASH_CASH_DIRTY"] = "Schmutzig:",
 	["YRV3_WEED_SHOP_LABEL"] = "Unkrautladen",
 	["YRV3_HELITOURS_LABEL"] = "Higgins Helitours",
-	["YRV3_CWASH_HEAT"] = "Wärmestufe:",
+	["YRV3_CWASH_HEAT"] = "Wärmestufe",
 	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "Deaktivieren Sie die Abklingzeit für illegale Arbeit",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "Deaktivieren Sie die Abklingzeit für legale Arbeit",
 	["SELF_MC_BIKE_ANIMS"] = "MC-Fahrstil",
@@ -543,5 +543,7 @@ return {
 	["YRV3_CLUB_NOT_OWNED"] = "Du besitzt keinen Nachtclub.",
 	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[Nicht dauerhaft]: Ermöglicht Ihnen, dem Toilettenwärter in Ihrem Nachtclub 1 Million US-Dollar Trinkgeld zu geben. Der Begleiter wird Ihnen dankbar sein. Auf Ihrem Bankkonto ist das wahrscheinlich nicht der Fall.\n\nHinweis: Sie müssen das Geld in bar haben, um ihm ein Trinkgeld zu geben.",
 	["YRV3_TRIGGER_PROD_HUB_TT"] = "Löst im Laufe der Zeit immer wieder Produktion aus. Dies geschieht nicht sofort wie bei Biker-Unternehmen, es gibt eine Verzögerung zwischen den einzelnen Auslösern (ungefähr 20 Sekunden).\n\n[WICHTIG]: Sie müssen sicherstellen, dass das verbundene Unternehmen eingerichtet und in Betrieb ist und Ihnen ein Techniker in Ihrem Nachtclub zugewiesen ist, bevor Sie dies aktivieren.",
-	["YRV3_BUSINESS_HUB"] = "Geschäftszentrum"
+	["YRV3_BUSINESS_HUB"] = "Geschäftszentrum",
+	["YRV3_STATE_ERR_WRONG_SESSION"] = "Inkompatible Sitzung. Bitte nehmen Sie am kostenlosen Modus teil.",
+	["YRV3_STATE_WAIT_TRANSITION"] = "Warten auf den Freemode-Übergang."
 }

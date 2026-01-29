@@ -942,7 +942,7 @@ end
 ---@return boolean, boolean
 function GUI:Checkbox(label, bool, opts)
 	local clicked = false
-	bool, clicked = ImGui.Checkbox(label, bool)
+	bool, clicked = ImGui.Toggle(label, bool)
 
 	if (clicked) then
 		self:PlaySound(self.Sounds.Checkbox)

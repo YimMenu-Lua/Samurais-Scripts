@@ -485,7 +485,7 @@ return {
 	["YRV3_CWASH_NOT_OWNED"] = "Você não possui uma empresa de lavagem de carros.",
 	["YRV3_WEED_SHOP_LABEL"] = "Loja de ervas daninhas",
 	["YRV3_CWASH_WORK_EARNINGS"] = "Ganhos de trabalho:",
-	["YRV3_CWASH_HEAT"] = "Nível de calor:",
+	["YRV3_CWASH_HEAT"] = "Nível de calor",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "Desativar tempo de espera para trabalho jurídico",
 	["YRV3_CWASH_ILLEGAL_WORK_CD"] = "Desativar tempo de espera para trabalho ilegal",
 	["SELF_MC_BIKE_ANIMS_TT"] = "Habilitadas animações alternativas de andar de bicicleta.",
@@ -543,5 +543,7 @@ return {
 	["YRV3_MILLION_DOLLAR_TIPS"] = "Dicas de milhões de dólares",
 	["YRV3_BUSINESS_HUB"] = "Centro de Negócios",
 	["YRV3_TRIGGER_PROD_HUB_TT"] = "Continua acionando a produção ao longo do tempo. Isso não é instantâneo como as empresas de motociclistas. Há um atraso entre cada acionamento (aproximadamente 20 segundos).\n\n[IMPROTANTE]: você deve verificar se a empresa conectada está configurada e funcionando e se há um técnico designado para sua boate antes de ativar isso.",
-	["YRV3_NC_ALWAYS_POPULAR"] = "Sempre Popular"
+	["YRV3_NC_ALWAYS_POPULAR"] = "Sempre Popular",
+	["YRV3_STATE_WAIT_TRANSITION"] = "Aguardando a transição do modo livre.",
+	["YRV3_STATE_ERR_WRONG_SESSION"] = "Sessão incompatível. Por favor, entre no modo gratuito."
 }

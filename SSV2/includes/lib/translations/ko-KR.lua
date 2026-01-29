@@ -484,7 +484,7 @@ return {
 	["YRV3_CWASH_NOT_OWNED"] = "귀하는 세차장을 소유하고 있지 않습니다.",
 	["YRV3_CWASH_WORK_EARNINGS"] = "근로 소득:",
 	["YRV3_WEED_SHOP_LABEL"] = "위드샵",
-	["YRV3_CWASH_HEAT"] = "열 수준:",
+	["YRV3_CWASH_HEAT"] = "열 수준",
 	["SELF_MC_BIKE_ANIMS"] = "MC 라이딩 스타일",
 	["YRV3_HELITOURS_LABEL"] = "히긴스 헬리투어",
 	["SELF_MC_BIKE_ANIMS_TT"] = "대체 자전거 타기 애니메이션을 활성화했습니다.",
@@ -543,5 +543,7 @@ return {
 	["YRV3_MILLION_DOLLAR_TIPS"] = "백만 달러 팁",
 	["YRV3_NC_ALWAYS_POPULAR"] = "항상 인기 있는",
 	["YRV3_TRIGGER_PROD_HUB_TT"] = "시간이 지남에 따라 계속 생산을 시작합니다. 이는 바이커 비즈니스처럼 즉시 발생하지 않으며 각 트리거 사이에 지연(약 20초)이 있습니다.\n\n[중요]: 이를 활성화하기 전에 연결된 비즈니스가 설정 및 실행되고 나이트클럽에 기술자가 할당되어 있는지 확인해야 합니다.",
-	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[비지속적]: 나이트클럽 화장실 직원에게 100만 달러의 팁을 줄 수 있습니다. 수행원은 감사할 것입니다. 귀하의 은행 계좌는 그렇지 않을 것입니다.\n\n참고: 그에게 팁을 주려면 현금이 있어야 합니다."
+	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[비지속적]: 나이트클럽 화장실 직원에게 100만 달러의 팁을 줄 수 있습니다. 수행원은 감사할 것입니다. 귀하의 은행 계좌는 그렇지 않을 것입니다.\n\n참고: 그에게 팁을 주려면 현금이 있어야 합니다.",
+	["YRV3_STATE_ERR_WRONG_SESSION"] = "호환되지 않는 세션입니다. 무료 모드에 참여해 보세요.",
+	["YRV3_STATE_WAIT_TRANSITION"] = "자유 모드 전환을 기다리고 있습니다."
 }

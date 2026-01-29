@@ -484,7 +484,7 @@ return {
 	["YRV3_CWASH_CASH_CLEAN"] = "Pulito:",
 	["YRV3_CWASH_NOT_OWNED"] = "Non possiedi un'attività di autolavaggio.",
 	["YRV3_WEED_SHOP_LABEL"] = "Negozio di erba",
-	["YRV3_CWASH_HEAT"] = "Livello di calore:",
+	["YRV3_CWASH_HEAT"] = "Livello di calore",
 	["SELF_MC_BIKE_ANIMS"] = "Stile di guida MC",
 	["YRV3_HELITOURS_LABEL"] = "Higgins Helitour",
 	["YRV3_CWASH_LEGAL_WORK_CD"] = "Disabilita il tempo di recupero del lavoro legale",
@@ -543,5 +543,7 @@ return {
 	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[Non persistente]: ti consente di lasciare una mancia di 1 milione di dollari all'addetto al bagno del tuo nightclub. L'addetto te ne sarà grato. Il tuo conto bancario probabilmente no.\n\nNota: devi avere i soldi in contanti per potergli dare la mancia.",
 	["YRV3_MILLION_DOLLAR_TIPS"] = "Consigli da un milione di dollari",
 	["YRV3_BUSINESS_HUB"] = "Polo aziendale",
-	["YRV3_TRIGGER_PROD_HUB_TT"] = "Continua ad attivare la produzione nel tempo. Non è istantaneo come le attività di motociclisti, c'è un ritardo tra ogni attivazione (circa 20 secondi).\n\n[IMPROTANTE]: devi assicurarti che l'attività connessa sia configurata e funzionante e che sia stato assegnato un tecnico nel tuo nightclub prima di abilitarla."
+	["YRV3_TRIGGER_PROD_HUB_TT"] = "Continua ad attivare la produzione nel tempo. Non è istantaneo come le attività di motociclisti, c'è un ritardo tra ogni attivazione (circa 20 secondi).\n\n[IMPROTANTE]: devi assicurarti che l'attività connessa sia configurata e funzionante e che sia stato assegnato un tecnico nel tuo nightclub prima di abilitarla.",
+	["YRV3_STATE_WAIT_TRANSITION"] = "In attesa della transizione alla modalità libera.",
+	["YRV3_STATE_ERR_WRONG_SESSION"] = "Sessione incompatibile. Iscriviti alla modalità gratuita."
 }

@@ -192,6 +192,20 @@ function Color:AsHex()
 	return string.format("#%02X%02X%02X%02X", r, g, b, a)
 end
 
+-- Mixes two colors by factor `f`.
+--
+-- Note: This does not mutate. It returns a new `Color` instanec.
+---@param c Color color to mix with
+---@param f float factor
+function Color:Mix(c, f)
+	return Color(
+		self.r + (c.r - self.r) * f,
+		self.g + (c.g - self.g) * f,
+		self.b + (c.b - self.b) * f,
+		self.a
+	)
+end
+
 -- Returns the luminance of the color *(brightness)*.
 --
 -- https://www.w3.org/TR/AERT/#color-contrast
@@ -211,8 +225,10 @@ function Color:IsDark()
 	return not self:IsBright()
 end
 
--- Static Method.
---
+---------------------------------------------------------------------------------
+-- Static Methods/Helpers
+---------------------------------------------------------------------------------
+
 -- Calculates the brightness of any given color in normalized RGBA format
 --
 -- https://www.w3.org/TR/AERT/#color-contrast
@@ -220,8 +236,47 @@ end
 ---@param g float
 ---@param b float
 ---@return float
-function Color:CalculateBrightness(r, g, b, _)
+function Color.CalculateBrightness(r, g, b, _)
 	return (0.299 * r) + (0.587 * g) + (0.114 * b)
+end
+
+-- Returns a `Color` instance from HSV
+---@param h number
+---@param s number
+---@param v number
+---@param a? number
+---@return Color
+function Color.FromHSV(h, s, v, a)
+	a = a or 1
+	if (a > 1) then
+		a = math.clamp(a / 255, 0, 1)
+	end
+
+	if (s <= 0) then
+		return Color(v, v, v, a)
+	end
+
+	h = h * 6
+	local c = v * s
+	local x = (1 - math.abs((h % 2) - 1)) * c
+	local m = v - c
+	local r, g, b = 0, 0, 0
+
+	if (h < 1) then
+		r, g, b = c, x, 0
+	elseif h < 2 then
+		r, g, b = x, c, 0
+	elseif h < 3 then
+		r, g, b = 0, c, x
+	elseif h < 4 then
+		r, g, b = 0, x, c
+	elseif h < 5 then
+		r, g, b = x, 0, c
+	else
+		r, g, b = c, 0, x
+	end
+
+	return Color(r + m, g + m, b + m, a)
 end
 
 ---------------------------------------------------------------------------------

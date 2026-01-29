@@ -38,21 +38,32 @@ ImGuiSpinnerStyle = {
 	JUMP        = 11,
 }
 
+local toggleStates = {}
+
 -- Returns a basic animated string
 ---@param label? string
 ---@param speed? float
 ---@param style? ImGuiSpinnerStyle
 ---@return string
 function ImGui.TextSpinner(label, speed, style)
-	speed          = speed or 7.0
-	style          = style or 1
+	speed = speed or 7.0
+	style = style or 1
 
 	local charlist = spinner_chars[style]
-	local time     = ImGui.GetTime()
-	local index    = math.floor(math.fmod(time * speed, #charlist)) + 1
-	local current  = charlist[index]
+	if (type(charlist) ~= "table" or #charlist == 0) then
+		return label or ""
+	end
 
-	if (label) then
+	local time    = ImGui.GetTime()
+	local count   = #charlist
+	local index   = math.floor((time * speed) % count) + 1
+	local current = charlist[index]
+
+	if (type(current) ~= "string") then
+		current = ""
+	end
+
+	if (label ~= nil) then
 		return _F("%s %s", label, current)
 	end
 
@@ -150,10 +161,12 @@ end
 ---@param label string
 ---@param selected boolean
 ---@param size vec2
+---@param align? "center"|"left"
+---@param ellipsis? boolean
 ---@param shouldHighlight? boolean
 ---@param highlightColor? Color
 ---@return boolean
-function ImGui.Selectable2(label, selected, size, shouldHighlight, highlightColor)
+function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlight, highlightColor)
 	local drawList = ImGui.GetWindowDrawList()
 	local pos = vec2:new(ImGui.GetCursorScreenPos())
 	local max = pos + size
@@ -210,19 +223,39 @@ function ImGui.Selectable2(label, selected, size, shouldHighlight, highlightColo
 		)
 	end
 
-	local textSizeX, textSizeY = ImGui.CalcTextSize(label)
-	local textPos = pos + vec2:new((size.x - textSizeX) * 0.5, (size.y - textSizeY) * 0.5)
-	local indicatorPos = pos + vec2:new(max.x - 40.0, (size.y - textSizeY) * 0.5)
-	local windowBg = Color(GVars.ui.style.theme.Colors.WindowBg:unpack())
-	local textCol = selected and Color(GVars.ui.style.theme.TopBarFrameCol1:unpack()) or ImGui.GetAutoTextColor(windowBg)
+	local textW, textH = ImGui.CalcTextSize(label)
+	local padding = 8
+	local textX
 
-	ImGui.ImDrawListAddText(
-		drawList,
-		textPos.x,
-		textPos.y,
-		textCol:AsU32(),
-		label
-	)
+	if (align == "left") then
+		textX = pos.x + padding
+	else
+		textX = pos.x + (size.x - textW) * 0.5
+	end
+
+	local textPos      = pos + vec2:new((size.x - textX) * 0.5, (size.y - textH) * 0.5)
+	local indicatorPos = pos + vec2:new(max.x - 40.0, (size.y - textH) * 0.5)
+	local windowBg     = Color(GVars.ui.style.theme.Colors.WindowBg:unpack())
+	local textCol      = selected
+		and Color(GVars.ui.style.theme.TopBarFrameCol1:unpack())
+		or ImGui.GetAutoTextColor(windowBg)
+
+	local clipped      = textW > (size.x - padding * 2)
+	if (clipped and ellipsis) then
+		ImGui.PushClipRect(pos.x + padding, pos.y, pos.x + size.x - padding, pos.y + size.y, true)
+	end
+
+	ImGui.ImDrawListAddText(drawList, textX, textPos.y, textCol:AsU32(), label)
+
+	if (clipped) then
+		if (ellipsis) then
+			ImGui.PopClipRect()
+		end
+
+		if (hovered) then
+			ImGui.SetTooltip(label)
+		end
+	end
 
 	if (shouldHighlight) then
 		ImGui.ImDrawListAddText(
@@ -334,4 +367,101 @@ function ImGui.ValueBar(label, value, size, min_value, max_value, flags)
 
 	local total_height = rect_size.y + (has_label and label_size.y or 0)
 	ImGui.Dummy(rect_size.x, total_height)
+end
+
+---@param thickness? float
+---@param color? uint32_t
+function ImGui.VerticalSeparator(thickness, color)
+	thickness        = thickness or 1
+	color            = color or ImGui.GetStyleColorU32(ImGuiCol.Separator)
+	local drawList   = ImGui.GetWindowDrawList()
+	local cursorX    = ImGui.GetCursorScreenPos()
+	local _, winPosY = ImGui.GetWindowPos()
+	local winHeight  = ImGui.GetWindowHeight()
+
+	ImGui.ImDrawListAddRectFilled(
+		drawList,
+		cursorX,
+		winPosY,
+		cursorX + thickness,
+		winPosY + winHeight,
+		color
+	)
+
+	ImGui.Dummy(thickness, 0)
+end
+
+---@param label string
+---@param v boolean
+---@param height? float
+---@return boolean, boolean
+function ImGui.Toggle(label, v, height)
+	local textHeight  = ImGui.GetTextLineHeight() + 0.4
+	local frameHeight = ImGui.GetFrameHeight()
+	height            = height or textHeight
+	local width       = height * 1.8
+	local cursorPos   = vec2:new(ImGui.GetCursorScreenPos())
+	local drawList    = ImGui.GetWindowDrawList()
+	local toggleRect  = Rect(
+		cursorPos,
+		vec2:new(cursorPos.x + width, cursorPos.y + height)
+	)
+
+	if (height < frameHeight) then
+		local diff = frameHeight - height
+		toggleRect.min.y = toggleRect.min.y + (diff * 0.5)
+		toggleRect.max.y = toggleRect.max.y + (diff * 0.5)
+	end
+
+	ImGui.BeginGroup()
+	ImGui.InvisibleButton(label, width, height)
+	local hovered = ImGui.IsItemHovered()
+	local clicked = ImGui.IsItemClicked(0)
+
+	if (clicked) then
+		GUI:PlaySound(GUI.Sounds.Nav)
+		v = not v
+	end
+
+	local disabled = ImGui.GetStyle().Alpha < 1.0
+	local bgOff    = ImGui.GetStyleColorU32(ImGuiCol.FrameBg)
+	local bgOn     = ImGui.GetStyleColorU32(ImGuiCol.HeaderActive)
+	local bgHover  = ImGui.GetStyleColorU32(ImGuiCol.FrameBgHovered)
+	local knob     = ImGui.GetStyleColorU32(disabled and ImGuiCol.TextDisabled or ImGuiCol.Text)
+	local bg       = v and bgOn or bgOff
+	local radius   = height * 0.5
+
+	ImGui.ImDrawListAddRectFilled(
+		drawList,
+		toggleRect.min.x,
+		toggleRect.min.y,
+		toggleRect.max.x,
+		toggleRect.max.y,
+		hovered and bgHover or bg,
+		radius
+	)
+
+	local uniqueKey         = _F("%s%s%s", label, cursorPos.x, cursorPos.y)
+	local anim              = toggleStates[uniqueKey] or (v and 1.0 or 0.0)
+	local target            = v and 1.0 or 0.0
+	anim                    = math.lerp(anim, target, 0.17)
+	toggleStates[uniqueKey] = anim
+	local knobX             = cursorPos.x + radius + anim * (width - height)
+	ImGui.ImDrawListAddCircleFilled(
+		drawList,
+		knobX,
+		cursorPos.y + radius,
+		radius * 0.85,
+		knob
+	)
+
+	if (label and not label:startswith("##")) then
+		local textY = cursorPos.y + (height - textHeight) * 0.5
+		ImGui.SetCursorScreenPos(cursorPos.x + width + 10, textY)
+		ImGui.TextUnformatted(label)
+	end
+
+	ImGui.EndGroup()
+
+	return v, clicked
 end

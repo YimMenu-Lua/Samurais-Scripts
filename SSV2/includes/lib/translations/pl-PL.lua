@@ -482,7 +482,7 @@ return {
 	["YRV3_CWASH_CASH_DIRTY"] = "Brudny:",
 	["YRV3_CWASH_NOT_OWNED"] = "Nie jesteś właścicielem myjni samochodowej.",
 	["YRV3_CWASH_CASH_CLEAN"] = "Czysty:",
-	["YRV3_CWASH_HEAT"] = "Poziom ciepła:",
+	["YRV3_CWASH_HEAT"] = "Poziom ciepła",
 	["YRV3_HELITOURS_LABEL"] = "Higgins Helitours",
 	["SELF_MC_BIKE_ANIMS"] = "Styl jazdy MC",
 	["YRV3_WEED_SHOP_LABEL"] = "Sklep z chwastami",
@@ -543,5 +543,7 @@ return {
 	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[Nietrwały]: Umożliwia dawanie napiwku pracownikowi toalety w klubie nocnym o wartości 1 miliona dolarów. Osoba obsługująca będzie wdzięczna. Twoje konto bankowe prawdopodobnie nie.\n\nUwaga: aby dać mu napiwek, musisz mieć pieniądze w gotówce.",
 	["YRV3_TRIGGER_PROD_HUB"] = "Kleszcz",
 	["YRV3_BUSINESS_HUB"] = "Centrum biznesowe",
-	["YRV3_TRIGGER_PROD_HUB_TT"] = "Z biegiem czasu uruchamia produkcję. Nie jest to natychmiastowe jak w przypadku firm motocyklowych. Pomiędzy każdym uruchomieniem występuje opóźnienie (około 20 sekund).\n\n[WAŻNE]: Przed włączeniem tej funkcji musisz upewnić się, że połączona firma jest skonfigurowana i działa oraz że w klubie nocnym jest przydzielony technik."
+	["YRV3_TRIGGER_PROD_HUB_TT"] = "Z biegiem czasu uruchamia produkcję. Nie jest to natychmiastowe jak w przypadku firm motocyklowych. Pomiędzy każdym uruchomieniem występuje opóźnienie (około 20 sekund).\n\n[WAŻNE]: Przed włączeniem tej funkcji musisz upewnić się, że połączona firma jest skonfigurowana i działa oraz że w klubie nocnym jest przydzielony technik.",
+	["YRV3_STATE_ERR_WRONG_SESSION"] = "Niezgodna sesja. Dołącz do trybu bezpłatnego.",
+	["YRV3_STATE_WAIT_TRANSITION"] = "Czekam na przejście w tryb swobodny."
 }

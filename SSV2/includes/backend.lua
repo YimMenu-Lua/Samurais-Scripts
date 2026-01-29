@@ -42,36 +42,38 @@ Enums.eEntityType = {
 ---@class Backend
 ---@field private api_version eAPIVersion
 local Backend = {
-	__version          = "",
-	target_build       = "",
-	target_version     = "",
-	disable_input      = false, -- Never serialize this runtime variable!
+	__version                = "",
+	target_build             = "",
+	target_version           = "",
+	disable_input            = false, -- Never serialize this runtime variable!
+	is_in_session_transition = false,
+	is_in_player_transition  = false,
 
 	---@type table<integer, integer>
-	ControlsToDisable  = {},
+	ControlsToDisable        = {},
 
 	---@type table<integer, BlipData>
-	CreatedBlips       = {},
+	CreatedBlips             = {},
 
 	---@type array<handle>
-	AttachedEntities   = {},
+	AttachedEntities         = {},
 
 	---@type table<eBackendEvent, array<function>>
-	EventCallbacks     = {
+	EventCallbacks           = {
 		[Enums.eBackendEvent.RELOAD_UNLOAD]  = { ClearPreview },
 		[Enums.eBackendEvent.SESSION_SWITCH] = { ClearPreview },
 		[Enums.eBackendEvent.PLAYER_SWITCH]  = { ClearPreview }
 	},
 
 	---@type table<eEntityType, table<handle, handle>>
-	SpawnedEntities    = {
+	SpawnedEntities          = {
 		[Enums.eEntityType.Ped]     = {},
 		[Enums.eEntityType.Vehicle] = {},
 		[Enums.eEntityType.Object]  = {},
 	},
 
 	---@type table<eEntityType, integer>
-	MaxAllowedEntities = {
+	MaxAllowedEntities       = {
 		[Enums.eEntityType.Ped]     = 50,
 		[Enums.eEntityType.Vehicle] = 25,
 		[Enums.eEntityType.Object]  = 75,
@@ -418,29 +420,47 @@ function Backend:Cleanup()
 end
 
 function Backend:OnSessionSwitch()
+	if (self.is_in_session_transition) then
+		return
+	end
+
 	if (not script.is_active("maintransition")) then
 		return
 	end
 
-	self:TriggerEventCallbacks(Enums.eBackendEvent.SESSION_SWITCH)
+	self.is_in_session_transition = true
+	ThreadManager:Run(function()
+		self:TriggerEventCallbacks(Enums.eBackendEvent.SESSION_SWITCH)
 
-	repeat
-		sleep(100)
-	until not script.is_active("maintransition")
-	sleep(1000)
+		while (script.is_active("maintransition")) do
+			yield()
+		end
+
+		sleep(1000)
+		self.is_in_session_transition = false
+	end)
 end
 
 function Backend:OnPlayerSwitch()
+	if (self.is_in_player_transition) then
+		return
+	end
+
 	if (not self:IsPlayerSwitchInProgress()) then
 		return
 	end
 
-	self:TriggerEventCallbacks(Enums.eBackendEvent.PLAYER_SWITCH)
+	self.is_in_player_transition = true
 
-	repeat
-		sleep(100)
-	until not self:IsPlayerSwitchInProgress()
-	sleep(1000)
+	ThreadManager:Run(function()
+		self:TriggerEventCallbacks(Enums.eBackendEvent.PLAYER_SWITCH)
+
+		while (self:IsPlayerSwitchInProgress()) do
+			yield()
+		end
+
+		self.is_in_player_transition = false
+	end)
 end
 
 function Backend:RegisterHandlers()

@@ -4,6 +4,7 @@
 #	python update_offsets.py			: normal run (just hit F5 if in VS Code and have Python Debugger installed, reads raw files from a remote repository)
 #	python update_offsets.py --version	: 0: Legacy | 1: Enhanced; defaults to 0: Legacy
 #	python update_offsets.py --local	: Read from local files; this must be followed by the path to local decompiled scritps
+#	python update_offsets.py --diff 	: Show diff only, do not overwrite Lua table
 #
 #	CI Run: Don't pass any arguments
 
@@ -28,8 +29,7 @@ from slpp import slpp as Lua
 PARENT_PATH = Path(__file__).resolve().parent
 SCRIPT_ROOT = PARENT_PATH.parent.parent
 REPO_URLS = [
-	"https://raw.githubusercontent.com/calamity-inc/GTA-V-Decompiled-Scripts/refs/heads/senpai/decompiled_scripts/",
-	# "https://raw.githubusercontent.com/acidlabsgg/gtav-legacy-scripts/refs/heads/main/scripts",
+	"https://raw.githubusercontent.com/acidlabsgg/gtav-legacy-scripts/refs/heads/main/scripts",
 	"https://raw.githubusercontent.com/acidlabsgg/gtav-enhanced-scripts/refs/heads/main/scripts",
 ]
 SS_NOTICE = """-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.

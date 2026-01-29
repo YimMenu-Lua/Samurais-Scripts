@@ -489,7 +489,7 @@ return {
 	["YRV3_CWASH_WORK_EARNINGS"] = "Ganancias laborales:",
 	["YRV3_WEED_SHOP_LABEL"] = "Tienda de marihuana",
 	["YRV3_HELITOURS_LABEL"] = "Helitours Higgins",
-	["YRV3_CWASH_HEAT"] = "Nivel de calor:",
+	["YRV3_CWASH_HEAT"] = "Nivel de calor",
 	["VEH_LAUNCH_CTRL_REALISTIC"] = "Realista",
 	["VEH_LAUNCH_CTRL_RIDICULOUS"] = "Ridículo",
 	["VEH_STANCE_CAMBER"] = "Comba",
@@ -543,5 +543,7 @@ return {
 	["YRV3_MILLION_DOLLAR_TIPS"] = "Consejos de millones de dólares",
 	["YRV3_BUSINESS_HUB"] = "Centro de negocios",
 	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[No persistente]: Le permite darle una propina de 1 millón de dólares al encargado del baño de su club nocturno. El asistente se lo agradecerá. Su cuenta bancaria probablemente no.\n\nNota: Debe tener el dinero en efectivo para poder darle propina.",
-	["YRV3_TRIGGER_PROD_HUB_TT"] = "Sigue activando la producción con el tiempo. Esto no es instantáneo como en los negocios de motociclistas, hay un retraso entre cada activación (aproximadamente 20 segundos).\n\n[IMPROTANTE]: Debes asegurarte de que el negocio conectado esté configurado y funcionando y que tengas un técnico asignado en tu club nocturno antes de habilitar esto."
+	["YRV3_TRIGGER_PROD_HUB_TT"] = "Sigue activando la producción con el tiempo. Esto no es instantáneo como en los negocios de motociclistas, hay un retraso entre cada activación (aproximadamente 20 segundos).\n\n[IMPROTANTE]: Debes asegurarte de que el negocio conectado esté configurado y funcionando y que tengas un técnico asignado en tu club nocturno antes de habilitar esto.",
+	["YRV3_STATE_WAIT_TRANSITION"] = "Esperando la transición al modo libre.",
+	["YRV3_STATE_ERR_WRONG_SESSION"] = "Sesión incompatible. Únase al modo gratuito."
 }

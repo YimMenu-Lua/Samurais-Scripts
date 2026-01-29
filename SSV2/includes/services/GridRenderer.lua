@@ -228,7 +228,7 @@ function GridRenderer:Draw()
 
 		if (item.item_type:lower() == "checkbox") then
 			item_size   = vec2:new(ImGui.CalcTextSize(label))
-			item_size.x = item_size.x + self.padding_x + 30
+			item_size.x = item_size.x + self.padding_x + 40
 		elseif (item.item_type == "button") then
 			item_size = vec2:new(ImGui.GetItemRectSize())
 		elseif (item.item_type:lower() == "radio") then
