@@ -30,6 +30,8 @@ return {
 	["INF_ATTACHMENT_NONE"]                = "There doesn't seem to be anything attached to us.",
 	["INF_ATTACHMENT_DROP"]                = "Attachments dropped.",
 	["GENERIC_UNAVAILABLE"]                = "Currently unavailable.",
+	["GENERIC_UNAVAILABLE_SP"]             = "Unavailable in Single Player.",
+	["GENERIC_OUTDATED"]                   = "Update required!",
 	["GENERIC_OFFLINE_OR_OUTDATED"]        =
 	"You need to be online and have the latest version of the script to access this feature!",
 	["GENERIC_IMPORTANT"]                  = "Important",
@@ -201,6 +203,7 @@ return {
 	["YRV3_HANGAR_NOT_OWNED"]              = "You don't own a hangar.",
 	["YRV3_BUNKER_NOT_OWNED"]              = "You don't own a bunker.",
 	["YRV3_LSD_LAB_NOT_OWNED"]             = "You don't own an acid lab.",
+	["YRV3_CLUB_NOT_OWNED"]                = "You don't own a nightclub.",
 	["YRV3_GENERIC_NOT_OWNED"]             = "You don't own this business.",
 	["YRV3_CARGO_AMT"]                     = "Cargo Held",
 	["YRV3_CRATES_LABEL"]                  = "Crates",
@@ -209,10 +212,17 @@ return {
 	["YRV3_AUTO_FILL"]                     = "Auto-Fill",
 	["YRV3_AUTO_PROD"]                     = "Auto-Produce",
 	["YRV3_AUTO_SELL"]                     = "Auto-Sell",
+	["YRV3_NC_ALWAYS_POPULAR"]             = "Always Popular",
+	["YRV3_MILLION_DOLLAR_TIPS"]           = "Million Dollar Tips",
+	["YRV3_MILLION_DOLLAR_TIPS_TT"]        =
+	"[Non-persistent]: Allows you to tip the toilet attendant at your nightclub $1M. The attendant will be grateful. Your bank account probably will not.\n\nNote: You must have the money in cash in order to tip him.",
 	["YRV3_FILL_SUPPLIES"]                 = "Fill Supplies",
 	["YRV3_TRIGGER_PROD"]                  = "Trigger Production",
 	["YRV3_TRIGGER_PROD_TT"]               =
 	"Instantly triggers production once as long as you have supplies. You can hold the button to keep triggering it or enable the next checkbox to fully automate the process.",
+	["YRV3_TRIGGER_PROD_HUB"]              = "Tick", -- I don't know what label to use. We need something short that fits into an 80px wide frame across all supported languages
+	["YRV3_TRIGGER_PROD_HUB_TT"]           =
+	"Keeps triggering production over time. This is not instant like biker businesses, there's a delay between each trigger (approximately 20 seconds).\n\n[IMPROTANT]: You must make sure the connected business is setup and running and you have a technician assigned in your nightclub before enabling this.",
 	["YRV3_FINISH_SOURCE_MISSION"]         = "Finish Cargo Source Mission",
 	["YRV3_FINISH_SOURCE_MISSION_TT"]      = "Start a source mission then press this button to finish it.",
 	["YRV3_VALUE_TOTAL"]                   = "Total Value",
@@ -223,6 +233,7 @@ return {
 	["YRV3_PRICE_NOTICE"]                  = "Prices may be higher depending on business upgrades.",
 	["YRV3_POPULARITY"]                    = "Popularity",
 	["YRV3_POPULARITY_NOTIF"]              = "Nightclub popularity has been increased.",
+	["YRV3_BUSINESS_HUB"]                  = "Business Hub",
 	["YRV3_SAFECASH_TOTAL"]                = "Total Cash In All Safes",
 	["YRV3_CLUB_WORK_CB"]                  = "Motorcycle Club Work",
 	["YRV3_HANGAR_STEAL_CB"]               = "Hangar Crate Steal",
@@ -265,7 +276,6 @@ return {
 	["YRV3_MCT_TITLE"]                     = "Master Control Terminal",
 	["YRV3_MCT_UNAVAIL"]                   = "Master Control Terminal is unavailable at the moment.",
 	["YRV3_INCOME_APPROX_ALL"]             = "Approximate Income From All Businesses: ",
-	["YRV3_INCOME_APPROX_ALL_TT"]          = "Cycle through all tabs to update the total amount.",
 	["YRV3_CWASH_NOT_OWNED"]               = "You don't own a car wash business.",
 	["YRV3_CWASH_LABEL"]                   = "Car Wash",
 	["YRV3_CWASH_WORK_EARNINGS"]           = "Work Earnings:",
@@ -273,9 +283,11 @@ return {
 	["YRV3_CWASH_CASH_DIRTY"]              = "Dirty:",
 	["YRV3_WEED_SHOP_LABEL"]               = "Weed Shop",
 	["YRV3_HELITOURS_LABEL"]               = "Higgins Helitours",
-	["YRV3_CWASH_HEAT"]                    = "Heat Level:",
+	["YRV3_CWASH_HEAT"]                    = "Heat Level",
 	["YRV3_CWASH_LEGAL_WORK_CD"]           = "Disable Legal Work Cooldown",
 	["YRV3_CWASH_ILLEGAL_WORK_CD"]         = "Disable Illegal Work Cooldown",
+	["YRV3_STATE_WAIT_TRANSITION"]         = "Waiting for freemode transition.",
+	["YRV3_STATE_ERR_WRONG_SESSION"]       = "Incompatible session. Please join free mode.",
 	--#endregion
 
 	--#region Self
@@ -283,9 +295,8 @@ return {
 	["SELF_AUTOHEAL_TT"]                   = "Regenerates your health and armour.",
 	["SELF_PHONE_ANIMS"]                   = "Enable Phone Animations",
 	["SELF_PHONE_ANIMS_TT"]                = "Restores mobile phone animations in GTA Online.",
-	["SELF_MC_BIKE_ANIMS"]                 = "Enable MC Riding Style",
-	["SELF_MC_BIKE_ANIMS_TT"]              =
-	"Restores the alternate bike riding animations that were disabled for some reason. You must be registered as an MC and have this option enabled for these animations to work.",
+	["SELF_MC_BIKE_ANIMS"]                 = "MC Riding Style",
+	["SELF_MC_BIKE_ANIMS_TT"]              = "Enabled alternate bike riding animations.",
 	["SELF_ACTION_MODE"]                   = "Disable Action Mode",
 	["SELF_ACTION_MODE_TT"]                = "Disables the player's janky movement during combat.",
 	["SELF_HEADPROPS"]                     = "Allow Head Props In Vehicles",

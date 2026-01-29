@@ -1,3 +1,12 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 local t_AnimList                 = require("includes.data.actions.animations")
 local t_PedScenarios             = require("includes.data.actions.scenarios")
 local t_SyncedScenes             = require("includes.data.actions.synchronized_scenes")
@@ -226,7 +235,7 @@ local function DrawAnims()
 	if ImGui.BeginListBox("##animlist", -1, -1) then
 		if not b_DataListsSorted then
 			ImGui.Dummy(1, 60)
-			ImGui.TextSpinner(_T("GENERIC_WAIT_LABEL"), 7, ImGui.SpinnerStyle.SCAN)
+			ImGui.Text(ImGui.TextSpinner(_T("GENERIC_WAIT_LABEL"), 7, ImGuiSpinnerStyle.SCAN))
 		else
 			for i, action in ipairs(t_AnimList) do
 				if (i_AnimSortByIndex > 0 and action.category ~= t_AnimSortbyList[i_AnimSortByIndex + 1]) then
@@ -883,7 +892,7 @@ local function DrawJsonMovementClipsets()
 	else
 		ImGui.BeginListBox("##jsonmvmts", -1, -1)
 		if not b_MovementListCreated then
-			ImGui.TextSpinner(_T("GENERIC_WAIT_LABEL"), 7.5, ImGui.SpinnerStyle.SCAN)
+			ImGui.Text(ImGui.TextSpinner(_T("GENERIC_WAIT_LABEL"), 7.5, ImGuiSpinnerStyle.SCAN))
 			ImGui.Spacing()
 		end
 

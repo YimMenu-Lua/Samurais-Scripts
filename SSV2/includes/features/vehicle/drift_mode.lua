@@ -1,13 +1,20 @@
----@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local FeatureBase = require("includes.modules.FeatureBase")
-local CWheel      = require("includes.classes.gta.CWheel")
 
 ---@class DriftMode : FeatureBase
 ---@field private m_entity PlayerVehicle -- Reference to PlayerVehicle
 ---@field private m_smoke_fx array<handle>|nil
 ---@field private m_is_active boolean
 ---@overload fun(pv: PlayerVehicle): DriftMode
+---@diagnostic disable-next-line
 local DriftMode   = setmetatable({}, FeatureBase)
 DriftMode.__index = DriftMode
 DriftMode.fxBones = { "suspension_lr", "suspension_rr" }
@@ -16,6 +23,7 @@ DriftMode.fxBones = { "suspension_lr", "suspension_rr" }
 ---@return DriftMode
 function DriftMode.new(pv)
 	local self = FeatureBase.new(pv)
+	---@diagnostic disable-next-line
 	return setmetatable(self, DriftMode)
 end
 

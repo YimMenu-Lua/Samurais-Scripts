@@ -1,4 +1,16 @@
-local SGSL = require("includes.services.SGSL")
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
+local SGSL                       = require("includes.services.SGSL")
+local Warehouse                  = require("includes.modules.businesses.Warehouse")
+local BikerBusiness              = require("includes.modules.businesses.BikerBusiness")
+local Nightclub                  = require("includes.modules.businesses.Nightclub")
 
 local ScriptDisplayNames <const> = {
 	["fm_content_smuggler_sell"] = "Hangar (Land. Not supported.)",
@@ -9,6 +21,18 @@ local ScriptDisplayNames <const> = {
 	["fm_content_acid_lab_sell"] = "Acid Lab",
 }
 
+local NightclubNames <const>     = {
+	"Maisonette Los Santos",
+	"Studio Los Santos",
+	"GALAXY",
+	"Gefangnis",
+	"Omega",
+	"Technologie",
+	"Paradise",
+	"The Palace",
+	"Tony's Fun House",
+}
+
 local ScriptsToTerminate <const> = {
 	"appArcadeBusinessHub",
 	"appsmuggler",
@@ -17,34 +41,45 @@ local ScriptsToTerminate <const> = {
 	"appbusinesshub"
 }
 
+---@enum eYRState
+Enums.eYRState                   = {
+	OFFLINE = 0x0,
+	WAITING = 0x1,
+	LOADING = 0x2,
+	RUNNING = 0x3,
+	ERROR   = 0x4
+}
+
+---@class YRV3Businesses
+---@field warehouses Warehouse[]
+---@field biker_businesses BikerBusiness[]
+---@field safes dict<CashSafe>
+---@field hangar? Warehouse
+---@field bunker? BikerBusiness
+---@field acid_lab? BikerBusiness
+---@field nightclub? Nightclub
+---@field money_fronts? dict<MoneyFrontsBusiness>
+
 ---@class YRV3
----@field m_total_sum number
----@field m_ceo_value_sum number
----@field m_biker_value_sum number
----@field m_safe_cash_sum number
----@field m_cwash_cash_sum number
----@field m_bhub_script_handle number
----@field m_hangar_loop boolean
----@field m_has_triggered_autosell boolean
----@field m_sell_script_running boolean
----@field m_sell_script_name string?
----@field m_sell_script_disp_name string
----@field m_script_display_names table<string, string>
----@field m_raw_data RawBusinessData
----@field m_warehouse_data array<SCWarehouse>
----@field m_biker_data array<BikerBusiness>
----@field m_biker_ext_data { bunker: BikerBusinessExt, acid_lab: BikerBusinessExt }
----@field m_safe_cash_data dict<BusinessSafe>
----@field m_money_fronts_data dict<MoneyFrontsBusiness>
----@field m_prod_trigger_global ScriptGlobal
----@field m_freemode_business_global ScriptGlobal
----@field private m_last_as_check_time number
+---@field private m_last_error string
+---@field private m_total_sum number
+---@field private m_bhub_script_handle number
+---@field private m_has_triggered_autosell boolean
+---@field private m_sell_script_running boolean
+---@field private m_sell_script_name string?
+---@field private m_sell_script_disp_name string
+---@field private m_raw_data RawBusinessData
+---@field private m_businesses YRV3Businesses
+---@field private m_last_as_check_time milliseconds
+---@field private m_last_income_check_time milliseconds
 ---@field private m_cooldown_state_dirty boolean
+---@field private m_initial_data_done boolean
 ---@field private m_data_initialized boolean
+---@field protected m_state eYRState
 ---@field protected m_thread Thread?
 ---@field protected m_initialized boolean
-local YRV3 = { m_raw_data = require("includes.data.yrv3_data") }
-YRV3.__index = YRV3
+local YRV3                       = { m_raw_data = require("includes.data.yrv3_data") }
+YRV3.__index                     = YRV3
 
 ---@return YRV3
 function YRV3:init()
@@ -52,64 +87,87 @@ function YRV3:init()
 		return self
 	end
 
-	self.m_total_sum                = 0
-	self.m_ceo_value_sum            = 0
-	self.m_biker_value_sum          = 0
-	self.m_safe_cash_sum            = 0
-	self.m_cwash_cash_sum           = 0
-	self.m_bhub_script_handle       = 0
-	self.m_last_as_check_time       = 0
-	self.m_hangar_loop              = false
-	self.m_has_triggered_autosell   = false
-	self.m_sell_script_running      = false
-	self.m_data_initialized         = false
-	self.m_cooldown_state_dirty     = true
-	self.m_sell_script_name         = nil
-	self.m_sell_script_disp_name    = "None"
-	self.m_warehouse_data           = self.m_raw_data.SC_Default
-	self.m_biker_data               = self.m_raw_data.BB_Default
-	self.m_biker_ext_data           = self.m_raw_data.BBEXT_Default
-	self.m_safe_cash_data           = self.m_raw_data.BS_Default
-	self.m_money_fronts_data        = self.m_raw_data.MF_Default
-	self.m_script_display_names     = ScriptDisplayNames
-	self.m_prod_trigger_global      = SGSL:Get(SGSL.data.biker_trigger_production_global):AsGlobal()
-	self.m_freemode_business_global = SGSL:Get(SGSL.data.freemode_business_global):AsGlobal()
+	self.m_total_sum              = 0
+	self.m_bhub_script_handle     = 0
+	self.m_last_as_check_time     = 0
+	self.m_last_income_check_time = 0
+	self.m_state                  = Enums.eYRState.OFFLINE
+	self.m_has_triggered_autosell = false
+	self.m_sell_script_running    = false
+	self.m_initial_data_done      = false
+	self.m_data_initialized       = false
+	self.m_cooldown_state_dirty   = true
+	self.m_sell_script_name       = nil
+	self.m_sell_script_disp_name  = "None"
+	self.m_last_error             = ""
+	self.m_businesses             = {
+		warehouses       = {},
+		biker_businesses = {},
+		safes            = self.m_raw_data.BS_Default,
+		money_fronts     = self.m_raw_data.MF_Default,
+	}
 
-	self.m_thread                   = ThreadManager:RegisterLooped("SS_YRV3", function()
-		self:Main()
+
+	self.m_thread = ThreadManager:RegisterLooped("SS_YRV3", function()
+		self:OnTick()
 	end)
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
-		self:Reset()
+		if (self.m_data_initialized) then
+			self:Reset()
+		end
 	end)
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, function()
-		self:Reset()
+		if (self.m_data_initialized) then
+			self:Reset()
+		end
 	end)
 
 	return self
 end
 
 function YRV3:Reset()
-	self.m_ceo_value_sum        = 0
-	self.m_biker_value_sum      = 0
-	self.m_safe_cash_sum        = 0
-	self.m_cwash_cash_sum       = 0
-	self.m_warehouse_data       = self.m_raw_data.SC_Default
-	self.m_biker_data           = self.m_raw_data.BB_Default
-	self.m_biker_ext_data       = self.m_raw_data.BBEXT_Default
-	self.m_safe_cash_data       = self.m_raw_data.BS_Default
-	self.m_money_fronts_data    = self.m_raw_data.MF_Default
-	self.m_data_initialized     = false
-	self.m_cooldown_state_dirty = true
+	self.m_total_sum              = 0
+	self.m_last_as_check_time     = 0
+	self.m_last_income_check_time = 0
+	self.m_businesses             = {
+		warehouses       = {},
+		biker_businesses = {},
+		safes            = self.m_raw_data.BS_Default,
+		money_fronts     = self.m_raw_data.MF_Default,
+	}
+	self.m_has_triggered_autosell = false
+	self.m_sell_script_running    = false
+	self.m_initial_data_done      = false
+	self.m_data_initialized       = false
+	self.m_cooldown_state_dirty   = true
 end
 
+function YRV3:Reload()
+	if (self.m_thread and self.m_thread:IsRunning()) then
+		self.m_thread:Suspend()
+	end
+
+	self:Reset()
+
+	if (self.m_thread and self.m_thread:IsSuspended()) then
+		self.m_thread:Resume()
+	end
+end
+
+---@return boolean
 function YRV3:CanAccess()
 	return Backend:IsUpToDate()
 		and Game.IsOnline()
 		and not Backend:IsMockEnv()
-		and not script.is_active("maintransition")
 		and not NETWORK.NETWORK_IS_ACTIVITY_SESSION()
+		and self.m_state ~= Enums.eYRState.ERROR
+end
+
+---@return boolean
+function YRV3:IsDataInitialized()
+	return self.m_data_initialized
 end
 
 ---@param where integer|vec3
@@ -121,6 +179,89 @@ function YRV3:Teleport(where, keepVehicle)
 	end
 
 	Self:Teleport(where, keepVehicle)
+end
+
+---@return eYRState
+function YRV3:GetState()
+	return self.m_state
+end
+
+---@return string
+function YRV3:GetLastError()
+	if (not self.m_last_error:isempty() and self.m_last_error:gsub("_", ""):find("%l") == nil) then
+		return _T(self.m_last_error)
+	end
+
+	return self.m_last_error
+end
+
+---@param msg string
+function YRV3:SetLastError(msg)
+	if (msg == self.m_last_error) then
+		return
+	end
+
+	self.m_last_error = msg
+end
+
+---@return array<Warehouse>
+function YRV3:GetSCWarehouses()
+	return self.m_businesses.warehouses
+end
+
+---@return Warehouse?
+function YRV3:GetHangar()
+	return self.m_businesses.hangar
+end
+
+---@return array<BikerBusiness>
+function YRV3:GetBikerBusinesses()
+	return self.m_businesses.biker_businesses
+end
+
+---@return Nightclub
+function YRV3:GetNightclub()
+	return self.m_businesses.nightclub
+end
+
+---@return dict<CashSafe>
+function YRV3:GetBusinessSafes()
+	return self.m_businesses.safes
+end
+
+---@return dict<MoneyFrontsBusiness>
+function YRV3:GetMoneyFrontsBusiness()
+	return self.m_businesses.money_fronts
+end
+
+---@return BikerBusiness?
+function YRV3:GetBunker()
+	return self.m_businesses.bunker
+end
+
+---@return BikerBusiness?
+function YRV3:GetAcidLab()
+	return self.m_businesses.acid_lab
+end
+
+---@return table
+function YRV3:GetSaleMissionTunables()
+	return self.m_raw_data.SellMissionTunables
+end
+
+---@return integer
+function YRV3:GetEstimatedIncome()
+	return self.m_total_sum
+end
+
+---@return boolean
+function YRV3:IsAnySaleInProgress()
+	return self.m_sell_script_running
+end
+
+---@return boolean
+function YRV3:HasTriggeredAutoSell()
+	return self.m_has_triggered_autosell
 end
 
 ---@param stat string
@@ -152,295 +293,195 @@ function YRV3:DoesPlayerOwnAnyBikerBusiness()
 	return false
 end
 
----@param index integer
-function YRV3:PopulateBikerBusinessSlot(index)
-	ThreadManager:Run(function()
-		if (self.m_biker_data[index].was_checked) then
-			return
-		end
-
-		local property_index = (stats.get_int(_F("MPX_FACTORYSLOT%d", index - 1)))
-		local ref            = self.m_raw_data.BikerBusinesses[property_index]
+function YRV3:PopulateBikerBusinesses()
+	for i = 0, 4 do
+		local property_index = (stats.get_int(_F("MPX_FACTORYSLOT%d", i)))
+		local ref = self.m_raw_data.BikerBusinesses[property_index]
 		if (not ref) then
-			return
+			goto continue
 		end
 
-		self.m_biker_data[index] = {
-			was_checked       = true,
-			is_owned          = true,
-			fast_prod_enabled = false,
-			fast_prod_running = false,
-			name              = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(ref.gxt),
-			id                = ref.id,
-			unit_max          = ref.unit_max,
-			value_tunable     = ref.val_tunable,
-			coords            = ref.coords,
-		}
-	end)
+		local ref2 = self.m_raw_data.BikerTunables[ref.id]
+		if (not ref2) then
+			goto continue
+		end
+
+		local has_eq_upgrade    = stats.get_int(_F("MPX_FACTORYUPGRADES%d", i)) == 1
+		local has_staff_upgrade = stats.get_int(_F("MPX_FACTORYUPGRADES%d_1", i)) == 1
+		local eq_upg_mult       = tunables.get_int(ref2.mult_1)
+		local stf_upg_mult      = tunables.get_int(ref2.mult_2)
+		table.insert(self.m_businesses.biker_businesses, BikerBusiness.new({
+			id         = i,
+			name       = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(ref.gxt),
+			max_units  = ref2.max_units,
+			vpu        = tunables.get_int(ref2.vpu),
+			vpu_mult_1 = has_eq_upgrade and eq_upg_mult or 0,
+			vpu_mult_2 = has_staff_upgrade and stf_upg_mult or 0,
+			coords     = ref.coords,
+		}))
+
+		::continue::
+	end
+
+	if (not self.m_businesses.bunker) then
+		local idx = stats.get_int("MPX_PROP_FAC_SLOT5")
+		local ref = self.m_raw_data.Bunkers[idx]
+
+		if (ref) then
+			local gxt_idx            = (idx < 28) and idx - 20 or idx - 19
+			local has_eq_upgrade     = stats.get_int("MPX_BUNKER_EQUIPMENT") == 1
+			local has_staff_upgrade  = stats.get_int("MPX_BUNKER_STAFF") == 1
+			local eq_upg_mult        = tunables.get_int("GR_MANU_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
+			local stf_upg_mult       = tunables.get_int("GR_MANU_PRODUCT_VALUE_STAFF_UPGRADE")
+
+			self.m_businesses.bunker = BikerBusiness.new({
+				id         = 5,
+				name       = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_BUNKER_%d", gxt_idx)),
+				coords     = ref and ref.coords or vec3:zero(),
+				vpu_mult_1 = has_eq_upgrade and eq_upg_mult or 0,
+				vpu_mult_2 = has_staff_upgrade and stf_upg_mult or 0,
+				vpu        = tunables.get_int("GR_MANU_PRODUCT_VALUE"),
+				max_units  = 100,
+			})
+		end
+	end
+
+	if (not self.m_businesses.acid_lab and stats.get_int("MPX_XM22_LAB_OWNED") ~= 0) then
+		local has_eq_upgrade       = (stats.get_int("MPX_AWD_CALLME") >= 10)
+			and (stats.get_int("MPX_XM22_LAB_EQUIP_UPGRADED") == 1)
+		local eq_upg_mult          = tunables.get_int("BIKER_ACID_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
+
+		self.m_businesses.acid_lab = BikerBusiness.new({
+			id         = 6,
+			name       = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION("MP_BWH_ACID"),
+			vpu_mult_1 = has_eq_upgrade and eq_upg_mult or 0,
+			vpu_mult_2 = 0,
+			vpu        = tunables.get_int("BIKER_ACID_PRODUCT_VALUE"),
+			max_units  = 160,
+			blip       = 847,
+		})
+	end
 end
 
-function YRV3:PopulateBikerExtData()
-	ThreadManager:Run(function()
-		if (not self.m_biker_ext_data.bunker.was_checked) then
-			local idx                             = stats.get_int("MPX_PROP_FAC_SLOT5")
-			local ref                             = self.m_raw_data.Bunkers[idx]
-			local gxt_idx                         = (idx < 28) and idx - 20 or idx - 19
-			local has_eq_upgrade                  = stats.get_int("MPX_BUNKER_EQUIPMENT") == 1
-			local has_staff_upgrade               = stats.get_int("MPX_BUNKER_STAFF") == 1
-
-			self.m_biker_ext_data.bunker.is_owned = idx ~= 0
-			self.m_biker_ext_data.bunker.name     = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_BUNKER_%d",
-				gxt_idx))
-			self.m_biker_ext_data.bunker.coords   = ref and ref.coords or vec3:zero()
-
-			if (has_eq_upgrade) then
-				self.m_biker_ext_data.bunker.equipment_upgrade = true
-				self.m_biker_ext_data.bunker.value_offset_1 = tunables.get_int("GR_MANU_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
-			end
-
-			if (has_staff_upgrade) then
-				self.m_biker_ext_data.bunker.staff_upgrade  = true
-				self.m_biker_ext_data.bunker.value_offset_2 = tunables.get_int("GR_MANU_PRODUCT_VALUE_STAFF_UPGRADE")
-			end
-
-			self.m_biker_ext_data.bunker.was_checked = true
+function YRV3:PopulateWarehouses()
+	for i = 0, 4 do
+		local property_index = (stats.get_int(_F("MPX_PROP_WHOUSE_SLOT%d", i)))
+		local ref            = self.m_raw_data.CEOWarehouses[property_index]
+		if (not ref) then
+			goto continue
 		end
 
-		if (not self.m_biker_ext_data.acid_lab.was_checked) then
-			self.m_biker_ext_data.acid_lab.name        = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION("MP_BWH_ACID")
-			self.m_biker_ext_data.acid_lab.is_owned    = stats.get_int("MPX_XM22_LAB_OWNED") ~= 0
-			self.m_biker_ext_data.acid_lab.was_checked = true
-			local has_eq_upgrade                       = (stats.get_int("MPX_AWD_CALLME") >= 10)
-				and (stats.get_int("MPX_XM22_LAB_EQUIP_UPGRADED") == 1)
+		table.insert(self.m_businesses.warehouses, Warehouse.new({
+			id        = i,
+			size      = ref.size,
+			max_units = ref.max,
+			name      = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_WHOUSE_%d", property_index - 1)),
+			coords    = ref.coords,
+		}, Enums.eWarehouseType.SPECIAL_CARGO))
 
-			if (has_eq_upgrade) then
-				self.m_biker_ext_data.acid_lab.equipment_upgrade = true
-				self.m_biker_ext_data.acid_lab.value_offset_1 = tunables.get_int(
-					"BIKER_ACID_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
-			end
-		end
-	end)
+		::continue::
+	end
+
+	if (self.m_businesses.hangar) then
+		return
+	end
+
+	local property_index = stats.get_int("MPX_HANGAR_OWNED")
+	local ref            = self.m_raw_data.Hangars[property_index]
+	if (not ref) then
+		return
+	end
+
+	self.m_businesses.hangar = Warehouse.new({
+		id        = -1,
+		name      = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_HANGAR_%d", property_index)),
+		coords    = ref.coords,
+		max_units = 50,
+	}, Enums.eWarehouseType.HANGAR)
 end
 
-function YRV3:PopulateCEOwarehouseSlot(index)
-	if self.m_warehouse_data[index].was_checked then
+function YRV3:PopulateNightclub()
+	if (self.m_businesses.nightclub) then
 		return
 	end
 
 	ThreadManager:Run(function()
-		local property_index = (stats.get_int(_F("MPX_PROP_WHOUSE_SLOT%d", index - 1)))
-		local ref            = self.m_raw_data.CEOWarehouses[property_index]
-		if (not ref) then
+		local nc_index = stats.get_int("MPX_NIGHTCLUB_OWNED")
+		local ref = self.m_raw_data.Nightclubs[nc_index]
+		if (nc_index == 0 or not ref) then
 			return
 		end
 
-		self.m_warehouse_data[index] = {
-			was_checked       = true,
-			is_owned          = true,
-			auto_fill_enabled = false,
-			name              = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_WHOUSE_%d", property_index - 1)),
-			size              = ref.size,
-			max               = ref.max,
-			coords            = ref.coords,
-		}
+		self.m_businesses.nightclub = Nightclub.new({
+			id          = nc_index,
+			name        = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_NCLU_%d", nc_index)),
+			custom_name = NightclubNames[stats.get_int("MPX_PROP_NIGHTCLUB_NAME_ID") + 1],
+			max_cash    = 25e4,
+			coords      = ref.coords
+		})
+
+		while (not self.m_initial_data_done) do
+			yield()
+		end
+
+		local owns_cargo = false
+
+		if (self.m_businesses.hangar) then
+			owns_cargo = true
+		else
+			for _, wh in ipairs(self.m_businesses.warehouses) do
+				if (wh:IsValid()) then
+					owns_cargo = true
+					break
+				end
+			end
+		end
+
+		if (owns_cargo) then
+			self.m_businesses.nightclub:SetupBusinessHub(0, self.m_raw_data.BusinessHubs)
+		end
+
+		if (self.m_businesses.bunker) then
+			self.m_businesses.nightclub:SetupBusinessHub(1, self.m_raw_data.BusinessHubs)
+		end
+
+		for _, bb in ipairs(self.m_businesses.biker_businesses) do
+			if (bb:IsValid()) then
+				local index = bb:GetIndex()
+				self.m_businesses.nightclub:SetupBusinessHub(index + 2, self.m_raw_data.BusinessHubs)
+			end
+		end
+
+		self.m_data_initialized = true
+		sleep(3000)
+
+		if (GVars.features.yrv3.nc_always_popular) then
+			self.m_businesses.nightclub:LockPopularityDecay()
+		end
+	end)
+end
+
+function YRV3:PreInit()
+	if (self.m_initial_data_done or self.m_data_initialized) then
+		return
+	end
+
+	ThreadManager:Run(function()
+		self:PopulateBikerBusinesses()
+		self:PopulateWarehouses()
+		self.m_initial_data_done = true
 	end)
 end
 
 function YRV3:InitializeData()
-	if (self.m_data_initialized or not Game.IsOnline()) then
+	if (self.m_data_initialized or not Game.IsOnline() or self.m_state == Enums.eYRState.LOADING) then
 		return
 	end
 
-	for i, v in ipairs(self.m_warehouse_data) do
-		if (not v.was_checked or not v.max) then
-			self:PopulateCEOwarehouseSlot(i)
-			sleep(100)
-		end
-	end
-
-	for i, v in ipairs(self.m_biker_data) do
-		if (not v.was_checked or not v.unit_max) then
-			self:PopulateBikerBusinessSlot(i)
-			sleep(100)
-		end
-	end
-
-	for i, v in ipairs(self.m_raw_data.Hangars) do
-		v.name = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_HANGAR_%d", i))
-	end
-
-	-- for i, v in ipairs(self.m_raw_data.Nightclubs) do
-	-- 	v.name = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_NCLU_%d", i))
-	-- end
-
-
-	self:PopulateBikerExtData()
-	self.m_data_initialized = true
-end
-
----@param index integer 0 .. 6
----@return integer
-function YRV3:GetBBProdTime(index)
-	local g_obj      = SGSL:Get(SGSL.data.biker_trigger_production_global)
-	local pid_size   = g_obj:GetOffset(1)
-	local offset_2   = g_obj:GetOffset(2)
-	local offset_3   = g_obj:GetOffset(3)
-	local index_size = g_obj:GetOffset(4)
-	return self.m_prod_trigger_global
-		:At(Self:GetPlayerID(), pid_size)
-		:At(offset_2)
-		:At(offset_3)
-		:At(index, index_size)
-		:At(9)
-		:ReadInt()
-end
-
----@param index integer 0 .. 6
-function YRV3:TriggerBBProduction(index)
-	local g_obj      = SGSL:Get(SGSL.data.biker_trigger_production_global)
-	local pid_size   = g_obj:GetOffset(1)
-	local offset_2   = g_obj:GetOffset(2)
-	local offset_3   = g_obj:GetOffset(3)
-	local index_size = g_obj:GetOffset(4)
-	self.m_prod_trigger_global
-		:At(Self:GetPlayerID(), pid_size)
-		:At(offset_2)
-		:At(offset_3)
-		:At(index, index_size)
-		:At(9)
-		:WriteInt(100)
-end
-
----@param slot integer 0 .. 6
-function YRV3:BBAutoProduce(slot)
-	---@type BikerBusiness|BikerBusinessExt
-	local data = Switch(slot) {
-		[5]     = self.m_biker_ext_data.bunker,
-		[6]     = self.m_biker_ext_data.acid_lab,
-		default = self.m_biker_data[slot + 1]
-	}
-
-	if (not data) then
-		return
-	end
-
-	if (data.fast_prod_running) then
-		return
-	end
-
-	local function getSupplies()
-		return stats.get_int(_F("MPX_MATTOTALFORFACTORY%d", slot))
-	end
-
-	local function getStock()
-		return stats.get_int(_F("MPX_PRODTOTALFORFACTORY%d", slot))
-	end
-
-	ThreadManager:Run(function()
-		data.fast_prod_running = true
-
-		if (not data.was_checked) then
-			if (slot < 5) then
-				self:PopulateBikerBusinessSlot(slot)
-			else
-				self:PopulateBikerExtData()
-			end
-
-			sleep(500)
-		end
-
-		if (not data.is_owned) then
-			data.fast_prod_enabled = false
-			data.fast_prod_running = false
-			return
-		end
-
-		while (data.fast_prod_enabled and getStock() < data.unit_max) do
-			if (getSupplies() <= 25) then
-				self:FillBikerBusiness(slot)
-				sleep(250)
-			end
-
-			self:TriggerBBProduction(slot)
-			yield()
-		end
-
-		data.fast_prod_enabled = false
-		data.fast_prod_running = false
-	end)
-end
-
----@param crates number
-function YRV3:GetCEOCratesValue(crates)
-	if (not crates or crates <= 0) then
-		return 0
-	end
-
-	if (crates == 1) then
-		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1") -- EXEC_CONTRABAND_SALE_VALUE_THRESHOLD1
-	end
-
-	if (crates == 2) then
-		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD2") * 2 -- +1
-	end
-
-	if (crates == 3) then
-		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD3") * 3 -- +1
-	end
-
-	if (crates == 4 or crates == 5) then
-		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD4") * crates -- +1
-	end
-
-	if (crates >= 6 and crates <= 9) then
-		return (tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD4") + math.floor((crates - 4) / 2)) * crates -- +0
-	end
-
-	if (crates >= 10 and crates <= 110) then
-		return (tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD7") + math.floor((crates - 10) / 5)) * crates -- +3
-	end
-
-	if (crates == 111) then
-		return tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD21") * 111 -- + 14
-	end
-
-	return 0
-end
-
-function YRV3:FinishCEOCargoSourceMission()
-	if script.is_active("gb_contraband_buy") then
-		script.execute_as_script("gb_contraband_buy", function()
-			if (not NETWORK.NETWORK_IS_HOST_OF_THIS_SCRIPT()) then
-				Notifier:ShowError("YRV3", "You are not host of this script.")
-				return
-			end
-
-			local buyLocal = SGSL:Get(SGSL.data.gb_contraband_buy_local_1):AsLocal()
-			buyLocal:At(5):WriteInt(1) -- 1.71 b3568.0 -- case -1: return "INVALID - UNSET";
-			buyLocal:At(191):WriteInt(6) -- 1.71 b3568.0 -- Local_623.f_191 = iParam0;
-			buyLocal:At(192):WriteInt(4) -- 1.71 b3568.0 -- Local_623.f_192 = iParam0;
-		end)
-	elseif script.is_active("fm_content_cargo") then
-		script.execute_as_script("fm_content_cargo", function()
-			if not NETWORK.NETWORK_IS_HOST_OF_THIS_SCRIPT() then
-				Notifier:ShowError("YRV3", "You are not host of this script.")
-				return
-			end
-
-			local fmccLocal2       = SGSL:Get(SGSL.data.gb_contraband_buy_local_2):AsLocal():At(1):At(0) -- GENERIC_BITSET_I_WON -- 1.71 b3568.0: var uLocal_5973 = 4;
-			local gbcb_obj         = SGSL:Get(SGSL.data.gb_contraband_buy_local_3)
-			local fmccLocal3       = gbcb_obj:AsLocal()
-			local fmccLocal3Offset = gbcb_obj:GetOffset(1)
-			local bs               = fmccLocal2:ReadInt()
-
-			if (not Bit.is_set(bs, 11)) then
-				bs = Bit.set(bs, 11)
-				fmccLocal2:WriteInt(bs)
-			end
-
-			fmccLocal3:At(fmccLocal3Offset):WriteInt(3) -- EndReason
-		end)
-	end
+	self.m_state      = Enums.eYRState.LOADING
+	self.m_last_error = "GENERIC_WAIT_LABEL"
+	self:PreInit()
+	self:PopulateNightclub()
 end
 
 function YRV3:WarehouseAutofill()
@@ -448,40 +489,9 @@ function YRV3:WarehouseAutofill()
 		return
 	end
 
-	for i, v in ipairs(self.m_warehouse_data) do
-		if (not v.auto_fill_enabled) then
-			goto continue
-		end
-
-		if (not v.was_checked or not v.name or not v.max) then
-			self:PopulateCEOwarehouseSlot(i)
-			sleep(500)
-		end
-
-		if (stats.get_int(_F("MPX_CONTOTALFORWHOUSE%d", i - 1))) == v.max then
-			GUI:PlaySound(GUI.Sounds.Error)
-			Notifier:ShowWarning("YRV3", _F("Warehouse N°%d is already full! Option has been disabled.", i))
-			v.auto_fill_enabled = false
-			goto continue
-		end
-
-		ThreadManager:Run(function()
-			while ((stats.get_int(_F("MPX_CONTOTALFORWHOUSE%d", i - 1))) < v.max) do
-				if (not v.auto_fill_enabled) then
-					break
-				end
-
-				stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, i + 11)
-				sleep(GVars.features.yrv3.autofill_delay or 100)
-			end
-
-			v.auto_fill_enabled = false
-		end)
-
-		::continue::
+	for _, wh in ipairs(self.m_businesses.warehouses) do
+		wh:AutoFill()
 	end
-
-	sleep(1000)
 end
 
 function YRV3:HangarAutofill()
@@ -489,40 +499,10 @@ function YRV3:HangarAutofill()
 		return
 	end
 
-	if (not self.m_hangar_loop) then
-		return
+	local hangar = self.m_businesses.hangar
+	if (hangar and hangar:IsValid()) then
+		self.m_businesses.hangar:AutoFill()
 	end
-
-	if (stats.get_int("MPX_HANGAR_OWNED") == 0) then
-		Notifier:ShowWarning(
-			"YRV3",
-			"You don't seem to own a hangar. Option has been disabled.",
-			false,
-			3
-		)
-
-		self.m_hangar_loop = false
-		return
-	end
-
-	if stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL") == 50 then
-		Notifier:ShowWarning("YRV3", "Your Hangar is already full! Option has been disabled.")
-		self.m_hangar_loop = false
-		return
-	end
-
-	ThreadManager:Run(function()
-		while stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL") < 50 do
-			if (not self.m_hangar_loop) then
-				break
-			end
-
-			stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
-			sleep(GVars.features.yrv3.autofill_delay or 100)
-		end
-
-		self.m_hangar_loop = false
-	end)
 end
 
 function YRV3:FinishSaleOnCommand()
@@ -559,38 +539,33 @@ function YRV3:WarehouseAutofillOnCommand(index)
 		return
 	end
 
-	ThreadManager:Run(function(s)
-		if (not self.m_warehouse_data[index].was_checked) then
-			self:PopulateCEOwarehouseSlot(index)
-			s:sleep(250)
-		end
+	local warehouse = self.m_businesses.warehouses[index]
 
-		if (not self.m_warehouse_data[index].is_owned) then
-			Notifier:ShowError(
-				"YRV3",
-				_F("No warehouse found in slot %d!", index),
-				false
-			)
-			return
-		end
-
-		self.m_warehouse_data[index].auto_fill_enabled = not self.m_warehouse_data[index].auto_fill_enabled
-		Notifier:ShowMessage(
+	if (not warehouse or not warehouse:IsValid()) then
+		Notifier:ShowError(
 			"YRV3",
-			_F("CEO Warehouse %d auto-fill %s.",
-				index,
-				self.m_warehouse_data[index].auto_fill_enabled
-				and "Enabled"
-				or "Disabled"
-			),
-			false,
-			2
+			_F("No warehouse found in slot %d!", index),
+			false
 		)
-	end)
-end
+		return
+	end
 
-function YRV3:FillBikerBusiness(index)
-	self.m_freemode_business_global:At(index):At(1):WriteInt(1)
+	if (warehouse:IsFull()) then
+		return
+	end
+
+	warehouse.auto_fill = not warehouse.auto_fill
+	Notifier:ShowMessage(
+		"YRV3",
+		_F("CEO Warehouse %d auto-fill %s.",
+			index,
+			warehouse.auto_fill
+			and "Enabled"
+			or "Disabled"
+		),
+		false,
+		2
+	)
 end
 
 function YRV3:FillAll()
@@ -598,51 +573,42 @@ function YRV3:FillAll()
 		return
 	end
 
-	ThreadManager:Run(function()
-		if (stats.get_int("MPX_HANGAR_OWNED") ~= 0 and not self.m_hangar_loop) then
-			self.m_hangar_loop = true
-			sleep(math.random(100, 300))
+	for _, wh in ipairs(self.m_businesses.warehouses) do
+		if (wh:IsValid()) then
+			wh.auto_fill = true
 		end
+	end
 
-		for i, v in ipairs(self.m_warehouse_data) do
-			if (not v.was_checked or not v.max) then
-				self:PopulateCEOwarehouseSlot(i)
-				sleep(100)
-			end
-		end
+	if (self.m_businesses.hangar and self.m_businesses.hangar:IsValid()) then
+		self.m_businesses.hangar.auto_fill = true
+		sleep(math.random(100, 300))
+	end
 
-		for _, v in ipairs(self.m_warehouse_data) do
-			if (v.is_owned) then
-				v.auto_fill_enabled = true
-			end
-		end
+	if (self.m_businesses.bunker and self.m_businesses.bunker:IsValid()) then
+		self.m_businesses.bunker:ReStock()
+		sleep(math.random(100, 300))
+	end
 
-		if (stats.get_int("MPX_PROP_FAC_SLOT5") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY5") < 100) then
-			self:FillBikerBusiness(5)
-			sleep(math.random(100, 300))
-		end
+	if (self.m_businesses.acid_lab and self.m_businesses.acid_lab:IsValid()) then
+		self.m_businesses.acid_lab:ReStock()
+		sleep(math.random(100, 300))
+	end
 
-		if (stats.get_int("MPX_XM22_LAB_OWNED") ~= 0 and stats.get_int("MPX_MATTOTALFORFACTORY6") < 100) then
-			self:FillBikerBusiness(6)
-			sleep(math.random(100, 300))
+	for _, bb in ipairs(self.m_businesses.biker_businesses) do
+		if (bb:IsValid()) then
+			bb:ReStock()
 		end
+		sleep(math.random(200, 666))
+	end
+end
 
-		for i, v in ipairs(self.m_biker_data) do
-			if (not v.was_checked or not v.unit_max) then
-				self:PopulateBikerBusinessSlot(i)
-				sleep(100)
-			end
-		end
+---@return string
+function YRV3:GetRunningSellScriptDisplayName()
+	if (not self.m_sell_script_running or not self.m_sell_script_name) then
+		return "None"
+	end
 
-		for i, v in ipairs(self.m_biker_data) do
-			local slot = i - 1
-			local supplies = stats.get_int(_F("MPX_MATTOTALFORFACTORY%d", slot))
-			if (v.is_owned and v.unit_max and supplies < 100) then
-				self:FillBikerBusiness(slot)
-				sleep(math.random(200, 666))
-			end
-		end
-	end)
+	return ScriptDisplayNames[self.m_sell_script_name] or "None"
 end
 
 function YRV3:FinishSale()
@@ -658,7 +624,7 @@ function YRV3:FinishSale()
 				locals.set_int(sn, data.l + data.o, data.v)
 			end
 		else -- fm_content_*
-			if not (NETWORK.NETWORK_GET_HOST_OF_THIS_SCRIPT() == Self:GetPlayerID()) then
+			if (NETWORK.NETWORK_GET_HOST_OF_THIS_SCRIPT() ~= Self:GetPlayerID()) then
 				Notifier:ShowWarning(
 					"YRV3",
 					"Unable to finish sale mission. You are not host of this script."
@@ -677,12 +643,40 @@ function YRV3:FinishSale()
 	end)
 end
 
-function YRV3:GetRunningSellScriptDisplayName()
-	if (not self.m_sell_script_running or not self.m_sell_script_name) then
-		return "None"
-	end
+function YRV3:FinishCEOCargoSourceMission()
+	if script.is_active("gb_contraband_buy") then
+		script.execute_as_script("gb_contraband_buy", function()
+			if (not NETWORK.NETWORK_IS_HOST_OF_THIS_SCRIPT()) then
+				Notifier:ShowError("YRV3", "You are not host of this script.")
+				return
+			end
 
-	return self.m_script_display_names[self.m_sell_script_name] or "None"
+			local buyLocal = SGSL:Get(SGSL.data.gb_contraband_buy_local_1):AsLocal()
+			buyLocal:At(5):WriteInt(1) -- 1.71 b3568.0 -- case -1: return "INVALID - UNSET";
+			buyLocal:At(191):WriteInt(6) -- 1.71 b3568.0 -- Local_623.f_191 = iParam0;
+			buyLocal:At(192):WriteInt(4) -- 1.71 b3568.0 -- Local_623.f_192 = iParam0;
+		end)
+	elseif script.is_active("fm_content_cargo") then
+		script.execute_as_script("fm_content_cargo", function()
+			if not NETWORK.NETWORK_IS_HOST_OF_THIS_SCRIPT() then
+				Notifier:ShowError("YRV3", "You are not host of this script.")
+				return
+			end
+
+			local fmccLocal2       = SGSL:Get(SGSL.data.gb_contraband_buy_local_2):AsLocal():At(1):At(0) -- GENERIC_BITSET_I_WON -- 1.71 b3568.0: var uLocal_5973 = 4;
+			local gbcb_obj         = SGSL:Get(SGSL.data.gb_contraband_buy_local_3)
+			local fmccLocal3       = gbcb_obj:AsLocal()
+			local fmccLocal3Offset = gbcb_obj:GetOffset(1)
+			local bs               = fmccLocal2:ReadInt()
+
+			if (not Bit.is_set(bs, 11)) then
+				bs = Bit.set(bs, 11)
+				fmccLocal2:WriteInt(bs)
+			end
+
+			fmccLocal3:At(fmccLocal3Offset):WriteInt(3) -- EndReason
+		end)
+	end
 end
 
 ---@param key string
@@ -743,8 +737,9 @@ function YRV3:CooldownHandler()
 end
 
 local fadedOutTimer = Timer.new(1e4)
+fadedOutTimer:pause()
 function YRV3:SetupAutosell()
-	if (Time.now() < self.m_last_as_check_time) then
+	if (Time.millis() - self.m_last_as_check_time < 1200) then
 		return
 	end
 
@@ -774,6 +769,7 @@ function YRV3:SetupAutosell()
 		sleep(1000)
 
 		if (CAM.IS_SCREEN_FADING_OUT() or CAM.IS_SCREEN_FADED_OUT()) then
+			fadedOutTimer:resume()
 			while (not fadedOutTimer:is_done()) do
 				if (not CAM.IS_SCREEN_FADED_OUT() or CAM.IS_SCREEN_FADING_IN()) then
 					break
@@ -789,9 +785,10 @@ function YRV3:SetupAutosell()
 		end
 
 		fadedOutTimer:reset()
+		fadedOutTimer:pause()
 	end
 
-	self.m_last_as_check_time = Time.now() + 1
+	self.m_last_as_check_time = Time.millis()
 end
 
 function YRV3:AutoSellHandler()
@@ -830,8 +827,8 @@ function YRV3:MCT()
 		return
 	end
 
-	local BusinessHubGlobal1 = SGSL:Get(SGSL.data.business_hub_global_1):AsGlobal()
-	local BusinessHubGlobal2 = SGSL:Get(SGSL.data.business_hub_global_2):AsGlobal()
+	local BusinessHubGlobal1 = SGSL:Get(SGSL.data.arcade_bhub_global_1):AsGlobal()
+	local BusinessHubGlobal2 = SGSL:Get(SGSL.data.arcade_bhub_global_2):AsGlobal()
 	ThreadManager:Run(function()
 		if (BusinessHubGlobal1:ReadInt() ~= 0) then
 			BusinessHubGlobal1:WriteInt(0)
@@ -842,7 +839,6 @@ function YRV3:MCT()
 		self.m_bhub_script_handle = SYSTEM.START_NEW_SCRIPT("appArcadeBusinessHub", 1424) -- STACK_SIZE_DEFAULT
 		SCRIPT.SET_SCRIPT_AS_NO_LONGER_NEEDED("appArcadeBusinessHub")
 		sleep(100)
-		gui.toggle(false)
 
 		while (script.is_active("appArcadeBusinessHub")) do
 			if (BusinessHubGlobal2:ReadInt() == -1) then
@@ -861,16 +857,39 @@ function YRV3:MCT()
 	end)
 end
 
-function YRV3:BBAutoProduceHandler()
-	for i, v in ipairs(self.m_biker_data) do
-		if (v.fast_prod_enabled and not v.fast_prod_running) then
-			self:BBAutoProduce(i - 1)
+function YRV3:AutoProduceHandler()
+	for _, bb in ipairs(self.m_businesses.biker_businesses) do
+		if (bb.fast_prod_enabled and not bb.fast_prod_running) then
+			bb:LoopProduction()
 		end
 	end
 
-	for _, ext in pairs(self.m_biker_ext_data) do
-		if (ext.fast_prod_enabled and not ext.fast_prod_running) then
-			self:BBAutoProduce(ext.index)
+	local bunker = self.m_businesses.bunker
+	if (bunker and bunker:IsValid()) then
+		if (bunker.fast_prod_enabled and not bunker.fast_prod_running) then
+			bunker:LoopProduction()
+		end
+	end
+
+	local acidlab = self.m_businesses.acid_lab
+	if (acidlab and acidlab:IsValid()) then
+		if (acidlab.fast_prod_enabled and not acidlab.fast_prod_running) then
+			acidlab:LoopProduction()
+		end
+	end
+
+	if (not self.m_businesses.nightclub) then
+		return
+	end
+
+	local hubs = self.m_businesses.nightclub:GetBusinessHubs()
+	if (not hubs) then
+		return
+	end
+
+	for _, hub in ipairs(hubs) do
+		if (hub.fast_prod_enabled and not hub.fast_prod_running) then
+			hub:LoopProduction()
 		end
 	end
 end
@@ -880,22 +899,98 @@ function YRV3:AutoFillHandler()
 	self:WarehouseAutofill()
 end
 
-function YRV3:Main()
-	if (not Backend:IsUpToDate() and self.m_thread and self.m_thread:IsRunning()) then
+---@param business BusinessBase
+local function getBusinessVal(business)
+	if (not business or not business:IsValid()) then
+		return 0
+	end
+
+	return business:GetEstimatedValue()
+end
+
+function YRV3:CalculateEstimatedIncome()
+	if (not self.m_data_initialized or not GUI:IsOpen()) then -- has no purpose outside of UI
+		return
+	end
+
+	if (Time.millis() - self.m_last_income_check_time < 500) then
+		return
+	end
+
+	local businesses = self.m_businesses
+	local warehouses = businesses.warehouses
+	local biker      = businesses.biker_businesses
+
+	self.m_total_sum = getBusinessVal(businesses.hangar)
+		+ getBusinessVal(businesses.bunker)
+		+ getBusinessVal(businesses.acid_lab)
+		+ getBusinessVal(businesses.nightclub)
+
+	for _, wh in ipairs(warehouses) do
+		self.m_total_sum = self.m_total_sum + getBusinessVal(wh)
+	end
+
+	for _, bb in ipairs(biker) do
+		self.m_total_sum = self.m_total_sum + getBusinessVal(bb)
+	end
+
+	for _, safe in pairs(businesses.safes) do
+		if (safe.cash_value) then
+			self.m_total_sum = self.m_total_sum + safe.cash_value()
+		end
+	end
+
+	for _, mf in pairs(businesses.money_fronts) do
+		if (mf.cash_value) then
+			self.m_total_sum = self.m_total_sum + mf.cash_value()
+		end
+	end
+
+	self.m_last_income_check_time = Time.millis()
+end
+
+function YRV3:OnTick()
+	if (not Backend:IsUpToDate() and (self.m_thread and self.m_thread:IsRunning())) then
+		self.m_state = Enums.eYRState.ERROR
+		self:SetLastError("GENERIC_OUTDATED")
 		self.m_thread:Stop()
 		return
 	end
 
 	if (not self:CanAccess()) then
+		self.m_state = Enums.eYRState.OFFLINE
+
+		if (not network.is_session_started()) then
+			self:SetLastError("GENERIC_UNAVAILABLE_SP")
+		else
+			if (script.is_active("maintransition")) then
+				self.m_state = Enums.eYRState.WAITING
+				self:SetLastError("YRV3_STATE_WAIT_TRANSITION")
+			elseif (NETWORK.NETWORK_IS_ACTIVITY_SESSION()) then
+				self.m_state = Enums.eYRState.ERROR
+				self:SetLastError("YRV3_STATE_ERR_WRONG_SESSION")
+			end
+		end
+
 		yield()
 		return
 	end
 
 	self:InitializeData()
+
+	if (not self.m_data_initialized) then
+		yield()
+		return
+	end
+
+	self.m_state = Enums.eYRState.RUNNING
+	self:SetLastError("")
+
 	self:AutoSellHandler()
 	self:AutoFillHandler()
-	self:BBAutoProduceHandler()
+	self:AutoProduceHandler()
 	self:CooldownHandler()
+	self:CalculateEstimatedIncome()
 end
 
 return YRV3

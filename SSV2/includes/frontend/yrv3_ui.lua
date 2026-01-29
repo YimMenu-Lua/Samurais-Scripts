@@ -1,51 +1,41 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 local sCooldownButtonLabel, bCooldownParam
-local SGSL                       = require("includes.services.SGSL")
-local hangarSupplies             = 0
-local hangarTotalValue           = 0
-local bunkerTotalValue           = 0
-local acidLabTotalValue          = 0
 local ownsWarehouse              = false
-local ownsBikerBusiness          = false
+local alwaysPopularClicked       = false
+local bigTips                    = false
+local bigTipsClicked             = false
 local maxSellMissionButtonSize   = vec2:new(80, 30)
 local progressBarSize            = vec2:new(300, 25)
 local moneyGreen                 = Color("#85BB65")
 
-local yrv3_state                 = {
-	disabled = false,
-	reason   = _T("GENERIC_CONTACT_DEV")
-}
-
 local tabNames <const>           = {
 	"CEO",
 	"Hangar",
+	"Biker",
 	"Bunker",
 	"Acid Lab",
-	"Biker Business",
+	"Nightclub",
 	"Safes",
-	"Money Fronts",
+	"Car Wash",
 	"Misc",
 	"Settings"
 }
+
+local selectedTabName            = tabNames[1]
 
 local money_fronts_order <const> = {
 	"YRV3_CWASH_LABEL",
 	"YRV3_WEED_SHOP_LABEL",
 	"YRV3_HELITOURS_LABEL",
 }
-
-local selectedTabName            = tabNames[1]
-
-local function CalcTotalBusinessIncome()
-	return math.sum(
-		YRV3.m_biker_value_sum,
-		YRV3.m_ceo_value_sum,
-		YRV3.m_safe_cash_sum,
-		YRV3.m_cwash_cash_sum,
-		hangarTotalValue,
-		bunkerTotalValue,
-		acidLabTotalValue
-	)
-end
 
 local function GetAllCDCheckboxes()
 	return GVars.features.yrv3.mc_work_cd
@@ -64,20 +54,204 @@ end
 
 ---@param value boolean
 local function SetAllCDCheckboxes(value)
-	GVars.features.yrv3.mc_work_cd = value
-	GVars.features.yrv3.hangar_cd = value
-	GVars.features.yrv3.nc_management_cd = value
+	GVars.features.yrv3.mc_work_cd            = value
+	GVars.features.yrv3.hangar_cd             = value
+	GVars.features.yrv3.nc_management_cd      = value
 	GVars.features.yrv3.nc_vip_mission_chance = value
-	GVars.features.yrv3.security_missions_cd = value
-	GVars.features.yrv3.ie_vehicle_steal_cd = value
-	GVars.features.yrv3.ie_vehicle_sell_cd = value
-	GVars.features.yrv3.ceo_crate_buy_cd = value
-	GVars.features.yrv3.ceo_crate_sell_cd = value
-	GVars.features.yrv3.dax_work_cd = value
-	GVars.features.yrv3.garment_rob_cd = value
-	GVars.features.yrv3.cfr_cd = value
+	GVars.features.yrv3.security_missions_cd  = value
+	GVars.features.yrv3.ie_vehicle_steal_cd   = value
+	GVars.features.yrv3.ie_vehicle_sell_cd    = value
+	GVars.features.yrv3.ceo_crate_buy_cd      = value
+	GVars.features.yrv3.ceo_crate_sell_cd     = value
+	GVars.features.yrv3.dax_work_cd           = value
+	GVars.features.yrv3.garment_rob_cd        = value
+	GVars.features.yrv3.cfr_cd                = value
 
 	YRV3:SetAllCooldownStatesDirty(true)
+end
+
+local function measureBulletWidths(labels)
+	local max = 0
+	for i = 1, #labels do
+		local w = ImGui.CalcTextSize(labels[i])
+		if w > max then
+			max = w
+		end
+	end
+
+	return max + 60 + ImGui.GetStyle().ItemSpacing.x
+end
+
+---@param warehouse? Warehouse
+---@param notOwnedLabel? string Optional label to display if the business isn't owned
+local function drawWarehouse(warehouse, notOwnedLabel)
+	if (not warehouse or not warehouse:IsValid()) then
+		if (notOwnedLabel) then
+			ImGui.Text(notOwnedLabel)
+		end
+
+		return
+	end
+
+	local bulletWidth = measureBulletWidths({
+		_T("YRV3_CARGO_AMT"),
+		_T("YRV3_VALUE_TOTAL"),
+	})
+
+	local name        = warehouse:GetName()
+	local max         = warehouse:GetMaxUnits()
+	local prod        = warehouse:GetProductCount()
+	local value       = warehouse:GetProductValue()
+	local coords      = warehouse:GetCoords()
+
+	ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 8)
+	ImGui.BeginChild(_F("wh##%s", name),
+		0,
+		240,
+		false,
+		ImGuiWindowFlags.NoScrollbar
+		| ImGuiWindowFlags.AlwaysUseWindowPadding
+	)
+
+	ImGui.SeparatorText(name)
+	if (coords) then
+		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
+			YRV3:Teleport(coords, false)
+		end
+	end
+	ImGui.Separator()
+	ImGui.Spacing()
+
+	ImGui.BulletText(_T("YRV3_CARGO_AMT"))
+	ImGui.SameLine(bulletWidth)
+	ImGui.ProgressBar(
+		prod / max,
+		-1,
+		progressBarSize.y,
+		_F(
+			"%d %s (%d%%)",
+			prod,
+			_T("YRV3_CRATES_LABEL"),
+			(math.floor(prod / max) * 100)
+		)
+	)
+
+	ImGui.BulletText(_T("YRV3_VALUE_TOTAL"))
+	ImGui.SameLine(bulletWidth)
+	GUI:Text(string.formatmoney(value), { color = moneyGreen })
+	ImGui.Spacing()
+
+	ImGui.BeginDisabled(prod >= max)
+	ImGui.BeginDisabled(warehouse.auto_fill)
+	if GUI:Button(_T("YRV3_RANDOM_CRATES")) then
+		warehouse:ReStock()
+	end
+	ImGui.EndDisabled()
+	ImGui.SameLine()
+	warehouse.auto_fill, _ = GUI:Checkbox(_T("YRV3_AUTO_FILL"), warehouse.auto_fill)
+	ImGui.EndDisabled()
+	ImGui.EndChild()
+	ImGui.PopStyleVar()
+end
+
+---@param bb? BikerBusiness
+---@param notOwnedLabel? string Optional label to display if the business isn't owned
+local function drawBikerBusiness(bb, notOwnedLabel)
+	if (not bb or not bb:IsValid()) then
+		if (notOwnedLabel) then
+			ImGui.Text(notOwnedLabel)
+		end
+
+		return
+	end
+
+	local bulletWidth   = measureBulletWidths({
+		_T("YRV3_EQUIP_UPGDRADE"),
+		_T("YRV3_STAFF_UPGDRADE"),
+		_T("YRV3_SUPPLIES_LABEL"),
+		_T("YRV3_STOCK_LABEL"),
+		_T("YRV3_VALUE_TOTAL"),
+	})
+
+	local name          = bb:GetName()
+	local updgrade1     = bb:HasEquipmentUpgrade()
+	local updgrade2     = bb:HasStaffUpgrade()
+	local supplies      = bb:GetSuppliesCount()
+	local stock         = bb:GetProductCount()
+	local totalValue    = bb:GetProductValue()
+	local eqLabelCol    = updgrade1 and "green" or "red"
+	local staffLabelCol = updgrade2 and "green" or "red"
+	local maxUnits      = bb:GetMaxUnits()
+
+	ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 8)
+	ImGui.BeginChild(_F("bb##%s", name),
+		0,
+		bb:GetIndex() < 6 and 330 or 300,
+		false,
+		ImGuiWindowFlags.NoScrollbar
+		| ImGuiWindowFlags.AlwaysUseWindowPadding
+	)
+
+	ImGui.SeparatorText(name or "NULL")
+
+	local coords = bb:GetCoords()
+	if (coords) then
+		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
+			YRV3:Teleport(coords, false)
+		end
+
+		ImGui.Separator()
+	end
+
+	ImGui.BulletText(_T("YRV3_EQUIP_UPGDRADE"))
+	ImGui.SameLine(bulletWidth)
+	GUI:Text(updgrade1 and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), { color = Color(eqLabelCol) })
+
+	if (bb:GetIndex() < 6) then
+		ImGui.BulletText(_T("YRV3_STAFF_UPGDRADE"))
+		ImGui.SameLine(bulletWidth)
+		GUI:Text(updgrade2 and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), { color = Color(staffLabelCol) })
+	end
+
+	ImGui.BulletText(_T("YRV3_SUPPLIES_LABEL"))
+	ImGui.SameLine(bulletWidth)
+	ImGui.ProgressBar(supplies / 100, -1, progressBarSize.y)
+
+	ImGui.BulletText(_T("YRV3_STOCK_LABEL"))
+	ImGui.SameLine(bulletWidth)
+	ImGui.ProgressBar(
+		stock / maxUnits,
+		-1,
+		progressBarSize.y,
+		_F("%d %s (%d%%)", stock, _T("YRV3_CRATES_LABEL"), stock)
+	)
+
+	ImGui.BulletText(_T("YRV3_VALUE_TOTAL"))
+	ImGui.SameLine(bulletWidth)
+	GUI:Text(string.formatmoney(totalValue), { color = moneyGreen })
+	ImGui.Spacing()
+
+	ImGui.BeginDisabled(supplies == 100)
+	if (GUI:Button(_T("YRV3_FILL_SUPPLIES"))) then
+		bb:ReStock()
+	end
+	ImGui.EndDisabled()
+
+	ImGui.SameLine()
+	ImGui.BeginDisabled(stock == maxUnits or supplies < 5 or bb.fast_prod_enabled)
+	if (GUI:Button(_T("YRV3_TRIGGER_PROD"), { repeatable = true })) then
+		bb:TriggerProduction()
+	end
+	ImGui.EndDisabled()
+	GUI:HelpMarker(_T("YRV3_TRIGGER_PROD_TT"))
+
+	ImGui.SameLine()
+	ImGui.BeginDisabled(stock == maxUnits)
+	bb.fast_prod_enabled, _ = GUI:Checkbox(_T("YRV3_AUTO_PROD"), bb.fast_prod_enabled)
+	ImGui.EndDisabled()
+
+	ImGui.EndChild()
+	ImGui.PopStyleVar()
 end
 
 local function drawCEOwarehouses()
@@ -86,88 +260,17 @@ local function drawCEOwarehouses()
 		return
 	end
 
-	YRV3.m_ceo_value_sum = 0
-	for i, wh in ipairs(YRV3.m_warehouse_data) do
-		local slot = i - 1
-		wh.is_owned = stats.get_int(("MPX_PROP_WHOUSE_SLOT%d"):format(slot)) > 0
+	local warehouses = YRV3:GetSCWarehouses()
+	ownsWarehouse    = warehouses and #warehouses > 0
 
-		if (not wh.is_owned) then
-			goto continue
-		end
-
-		ownsWarehouse = true
-
-		if (not YRV3.m_warehouse_data[i].was_checked) then
-			YRV3:PopulateCEOwarehouseSlot(i)
-		else
-			wh.total_supplies    = stats.get_int(("MPX_CONTOTALFORWHOUSE%d"):format(slot))
-			wh.total_value       = YRV3:GetCEOCratesValue(wh.total_supplies or 0)
-			YRV3.m_ceo_value_sum = YRV3.m_ceo_value_sum + wh.total_value
-
-			if (wh.name and wh.size and wh.max) then
-				ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 8)
-				ImGui.BeginChild(_F("wh##%d", i),
-					0,
-					180,
-					false,
-					ImGuiWindowFlags.NoScrollbar
-					| ImGuiWindowFlags.AlwaysUseWindowPadding
-				)
-				ImGui.PushID(i)
-				ImGui.SeparatorText(tostring(wh.name))
-				ImGui.BulletText(_T("YRV3_CARGO_AMT"))
-				ImGui.SameLine()
-				ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-				ImGui.ProgressBar(
-					(wh.total_supplies / wh.max),
-					progressBarSize.x,
-					progressBarSize.y,
-					_F(
-						"%d %s (%d%%)",
-						wh.total_supplies,
-						_T("YRV3_CRATES_LABEL"),
-						(math.floor(wh.total_supplies / wh.max) * 100)
-					)
-				)
-				ImGui.BulletText(_T("YRV3_VALUE_TOTAL"))
-				ImGui.SameLine()
-				ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-				GUI:Text(string.formatmoney(wh.total_value), { color = moneyGreen })
-				ImGui.Spacing()
-
-				if (wh.coords) then
-					if GUI:Button(_F("%s##%d", _T("GENERIC_TELEPORT"), i)) then
-						YRV3:Teleport(wh.coords)
-					end
-				end
-
-				ImGui.SameLine()
-				ImGui.BeginDisabled(wh.total_supplies >= wh.max)
-				ImGui.BeginDisabled(wh.auto_fill_enabled)
-				if GUI:Button(_F("%s##wh%d", _T("YRV3_RANDOM_CRATES"), i)) then
-					stats.set_bool_masked(
-						"MPX_FIXERPSTAT_BOOL1",
-						true,
-						i + 11
-					)
-				end
-				ImGui.EndDisabled()
-				ImGui.SameLine()
-				YRV3.m_warehouse_data[i].auto_fill_enabled, _ = GUI:Checkbox(_F("%s##wh%d", _T("YRV3_AUTO_FILL"), i),
-					YRV3.m_warehouse_data[i].auto_fill_enabled)
-				ImGui.EndDisabled()
-				ImGui.PopID()
-				ImGui.EndChild()
-				ImGui.PopStyleVar()
-			end
-		end
-		::continue::
+	for i, wh in ipairs(warehouses) do
+		ImGui.PushID(i)
+		drawWarehouse(wh)
+		ImGui.PopID()
 	end
 
 	if (ownsWarehouse) then
 		ImGui.Spacing()
-		ImGui.BulletText(_F("%s: %s", _T("YRV3_VALUE_TOTAL"), string.formatmoney(YRV3.m_ceo_value_sum)))
-		ImGui.Dummy(1, 5)
 		ImGui.SeparatorText(_T("GENERIC_MISC"))
 		ImGui.Spacing()
 		local bCond = (not script.is_active("gb_contraband_buy") and not script.is_active("fm_content_cargo"))
@@ -184,378 +287,270 @@ local function drawCEOwarehouses()
 end
 
 local function drawHangar()
-	local hangar_index = stats.get_int("MPX_HANGAR_OWNED")
-	local hangarOwned = hangar_index ~= 0
-
-	if (not hangarOwned) then
-		ImGui.Text(_T("YRV3_HANGAR_NOT_OWNED"))
-		return
-	end
-
-	local hangar_name = YRV3.m_raw_data.Hangars[hangar_index].name
-	local hangar_pos = YRV3.m_raw_data.Hangars[hangar_index].coords
-
-	ImGui.SeparatorText(hangar_name)
-	hangarSupplies = stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
-	hangarTotalValue = hangarSupplies * 30000
-
-	ImGui.BulletText(_T("YRV3_SUPPLIES_LABEL"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	ImGui.ProgressBar(
-		(hangarSupplies / 50),
-		progressBarSize.x,
-		progressBarSize.y
-	)
-
-	ImGui.BulletText(_T("YRV3_STOCK_LABEL"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	ImGui.ProgressBar(
-		(hangarSupplies / 50),
-		progressBarSize.x,
-		progressBarSize.y,
-		_F("%d %s (%d%%)", hangarSupplies, _T("YRV3_CRATES_LABEL"), math.floor(hangarSupplies / 0.5))
-	)
-
-	ImGui.BulletText(_T("YRV3_VALUE_TOTAL"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	GUI:Text(string.formatmoney(hangarTotalValue), { color = moneyGreen })
-	ImGui.Spacing()
-
-	if GUI:Button(_T("GENERIC_TELEPORT")) then
-		YRV3:Teleport(hangar_pos, true)
-	end
-
-	ImGui.SameLine()
-	local is_maxed = hangarSupplies == 50
-	ImGui.BeginDisabled(YRV3.m_hangar_loop or is_maxed)
-	if GUI:Button(_F("%s##hangar", _T("YRV3_RANDOM_CRATES"))) then
-		script.run_in_fiber(function()
-			stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
-		end)
-	end
-	ImGui.EndDisabled()
-
-	ImGui.SameLine()
-	ImGui.BeginDisabled(is_maxed)
-	YRV3.m_hangar_loop, _ = GUI:Checkbox(_F("%s##hangar", _T("YRV3_AUTO_FILL")), YRV3.m_hangar_loop)
-	ImGui.EndDisabled()
+	drawWarehouse(YRV3:GetHangar(), _T("YRV3_HANGAR_NOT_OWNED"))
 end
 
 local function drawBunker()
-	local bunker = YRV3.m_biker_ext_data.bunker
-	if (not bunker.is_owned) then
-		ImGui.Text(_T("YRV3_BUNKER_NOT_OWNED"))
-		return
-	end
-
-	ImGui.SeparatorText(bunker.name)
-
-	local bunkerUpdgrade1  = bunker.equipment_upgrade
-	local bunkerUpdgrade2  = bunker.staff_upgrade
-	local bunkerOffset1    = bunker.value_offset_1
-	local bunkerOffset2    = bunker.value_offset_2
-	local bunkerEqLabelCol = bunkerUpdgrade1 and "green" or "red"
-	local bunkerStLabelCol = bunkerUpdgrade2 and "green" or "red"
-	local bunkerSupplies   = stats.get_int("MPX_MATTOTALFORFACTORY5")
-	local bunkerStock      = stats.get_int("MPX_PRODTOTALFORFACTORY5")
-	bunkerTotalValue       = (tunables.get_int("GR_MANU_PRODUCT_VALUE") + bunkerOffset1 + bunkerOffset2) * bunkerStock
-
-	ImGui.BulletText(_T("YRV3_EQUIP_UPGDRADE"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	GUI:Text(bunkerUpdgrade1 and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), { color = Color(bunkerEqLabelCol) })
-
-	ImGui.BulletText(_T("YRV3_STAFF_UPGDRADE"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	GUI:Text(bunkerUpdgrade2 and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), { color = Color(bunkerStLabelCol) })
-
-	ImGui.BulletText(_T("YRV3_SUPPLIES_LABEL"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	ImGui.ProgressBar((bunkerSupplies / 100), progressBarSize.x, progressBarSize.y)
-
-	ImGui.BulletText(_T("YRV3_STOCK_LABEL"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	ImGui.ProgressBar(
-		(bunkerStock / bunker.unit_max),
-		progressBarSize.x,
-		progressBarSize.y,
-		_F("%d %s (%d%%)", bunkerStock, _T("YRV3_CRATES_LABEL"), bunkerStock)
-	)
-
-	ImGui.BulletText(_F(
-		"%s\tBlaine County: %s | Los Santos: %s",
-		_T("YRV3_VALUE_TOTAL"),
-		string.formatmoney(bunkerTotalValue),
-		string.formatmoney(math.floor(bunkerTotalValue * 1.5))
-	))
-	ImGui.Spacing()
-
-	if (GUI:Button(_T("GENERIC_TELEPORT"))) then
-		YRV3:Teleport(bunker.coords, true)
-	end
-
-	ImGui.SameLine()
-	ImGui.BeginDisabled(bunkerSupplies >= 100)
-	if (GUI:Button(_F(" %s ##bunker", _T("YRV3_FILL_SUPPLIES")))) then
-		YRV3:FillBikerBusiness(5)
-	end
-	ImGui.EndDisabled()
-
-	ImGui.SameLine()
-	ImGui.BeginDisabled(bunkerStock == bunker.unit_max or bunkerSupplies < 5 or bunker.fast_prod_enabled)
-	if (GUI:Button(_F(" %s ##bunker", _T("YRV3_TRIGGER_PROD")), { repeatable = true })) then
-		YRV3:TriggerBBProduction(5)
-	end
-	ImGui.EndDisabled()
-	GUI:HelpMarker(_T("YRV3_TRIGGER_PROD_TT"))
-
-	ImGui.SameLine()
-	ImGui.BeginDisabled(bunkerStock == bunker.unit_max)
-	bunker.fast_prod_enabled, _ = GUI:Checkbox(_T("YRV3_AUTO_PROD"), bunker.fast_prod_enabled)
-	ImGui.EndDisabled()
+	drawBikerBusiness(YRV3:GetBunker(), _T("YRV3_BUNKER_NOT_OWNED"))
 end
 
 local function drawAcidLab()
-	local acidLab = YRV3.m_biker_ext_data.acid_lab
-	if (not acidLab.is_owned) then
-		ImGui.Text(_T("YRV3_LSD_LAB_NOT_OWNED"))
-		return
-	end
-
-	local acidUpdgrade        = acidLab.equipment_upgrade
-	local acidOffset          = acidLab.value_offset_1
-	local acidUpgradeLabelCol = acidUpdgrade and "green" or "red"
-	local acidSupplies        = stats.get_int("MPX_MATTOTALFORFACTORY6")
-	local acidStock           = stats.get_int("MPX_PRODTOTALFORFACTORY6")
-	acidLabTotalValue         = tunables.get_int("BIKER_ACID_PRODUCT_VALUE") + acidOffset * acidStock
-
-	ImGui.BulletText(_T("YRV3_EQUIP_UPGDRADE"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	GUI:Text(acidUpdgrade and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), { color = Color(acidUpgradeLabelCol) })
-	ImGui.BulletText(_T("YRV3_SUPPLIES_LABEL"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	ImGui.ProgressBar((acidSupplies / 100), progressBarSize.x, progressBarSize.y)
-
-	ImGui.BulletText(_T("YRV3_STOCK_LABEL"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	ImGui.ProgressBar(
-		(acidStock / acidLab.unit_max),
-		progressBarSize.x,
-		progressBarSize.y,
-		_F(
-			"%d %s (%d%%)",
-			acidStock,
-			_T("YRV3_CRATES_LABEL"),
-			math.floor(acidStock / acidLab.unit_max)
-		)
-	)
-
-	ImGui.Text(_T("YRV3_VALUE_TOTAL"))
-	ImGui.SameLine()
-	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-	GUI:Text(string.formatmoney(acidLabTotalValue), { color = moneyGreen })
-
-	ImGui.Spacing()
-	if (GUI:Button(_T("GENERIC_TELEPORT"))) then
-		YRV3:Teleport(acidLab.blip)
-	end
-
-	ImGui.SameLine()
-	ImGui.BeginDisabled(acidSupplies >= 100)
-	if (GUI:Button(_F(" %s ##acid", _T("YRV3_FILL_SUPPLIES")))) then
-		YRV3:FillBikerBusiness(6)
-	end
-	ImGui.EndDisabled()
-
-	ImGui.SameLine()
-	ImGui.BeginDisabled(acidStock == acidLab.unit_max or acidSupplies < 20)
-	if (GUI:Button(_F(" %s ##bunker", _T("YRV3_TRIGGER_PROD")), { repeatable = true })) then
-		YRV3:TriggerBBProduction(6)
-	end
-	ImGui.EndDisabled()
-	GUI:HelpMarker(_T("YRV3_TRIGGER_PROD_TT"))
-
-	ImGui.SameLine()
-	ImGui.BeginDisabled(acidStock == acidLab.unit_max)
-	acidLab.fast_prod_enabled, _ = GUI:Checkbox(_T("YRV3_AUTO_PROD"), acidLab.fast_prod_enabled)
-	ImGui.EndDisabled()
+	drawBikerBusiness(YRV3:GetAcidLab(), _T("YRV3_LSD_LAB_NOT_OWNED"))
 end
 
-local function drawBikerBusiness()
+local function drawBikerBusinesses()
 	if (not YRV3:DoesPlayerOwnAnyBikerBusiness()) then
 		ImGui.Text(_T("YRV3_MC_NONE_OWNED"))
 		return
 	end
 
-	YRV3.m_biker_value_sum = 0
-
-	for i, data in ipairs(YRV3.m_biker_data) do
-		local slot = i - 1
-		local business = YRV3.m_biker_data[i]
-		data.is_owned = stats.get_int(_F("MPX_PROP_FAC_SLOT%d", slot)) ~= 0
-
-		if (not data.is_owned) then
-			goto continue
-		end
-
-		ownsBikerBusiness = true
-
-		if (not business.was_checked) then
-			YRV3:PopulateBikerBusinessSlot(i)
-		elseif (business.name and business.value_tunable) then
-			data.total_supplies    = stats.get_int(_F("MPX_MATTOTALFORFACTORY%d", slot))
-			data.total_stock       = stats.get_int(_F("MPX_PRODTOTALFORFACTORY%d", slot))
-			data.total_value       = tunables.get_int(business.value_tunable) * data.total_stock
-			YRV3.m_biker_value_sum = YRV3.m_biker_value_sum + data.total_value
-
-			ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 8)
-			ImGui.BeginChild(_F("mc##%d", i),
-				0,
-				220,
-				false,
-				ImGuiWindowFlags.NoScrollbar
-				| ImGuiWindowFlags.AlwaysUseWindowPadding
-			)
-			ImGui.PushID(i)
-			ImGui.SeparatorText(business.name)
-			ImGui.Spacing()
-
-			ImGui.BulletText(_T("YRV3_SUPPLIES_LABEL"))
-			ImGui.SameLine()
-			ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-			ImGui.ProgressBar(data.total_supplies / 100, progressBarSize.x, progressBarSize.y)
-
-			ImGui.BulletText(_T("YRV3_STOCK_LABEL"))
-			ImGui.SameLine()
-			ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-			ImGui.ProgressBar(
-				(data.total_stock / business.unit_max),
-				progressBarSize.x,
-				progressBarSize.y,
-				_F("%d%%", math.floor(data.total_stock * (100 / business.unit_max)))
-			)
-
-			ImGui.BulletText(_F("%s:\tBlaine County: %s | Los Santos: %s",
-				_T("YRV3_VALUE_TOTAL"),
-				string.formatmoney(data.total_value),
-				string.formatmoney(math.floor(data.total_value * 1.5))
-			))
-
-			ImGui.Spacing()
-			if (GUI:Button(_F("%s##%d", _T("GENERIC_TELEPORT"), i))) then
-				if (not business.coords) then
-					return
-				end
-
-				YRV3:Teleport(business.coords)
-			end
-
-			ImGui.SameLine()
-			ImGui.BeginDisabled(data.total_supplies >= 100)
-			if (GUI:Button(_F(" %s ##%d", _T("YRV3_SUPPLIES_FILL"), i))) then
-				YRV3:FillBikerBusiness(slot)
-			end
-			ImGui.EndDisabled()
-
-			ImGui.SameLine()
-			ImGui.BeginDisabled(data.total_stock == data.unit_max or data.total_supplies < 20 or data.fast_prod_enabled)
-			if (GUI:Button(_F(" %s ##bunker", _T("YRV3_TRIGGER_PROD")), { repeatable = true })) then
-				YRV3:TriggerBBProduction(slot)
-			end
-			ImGui.EndDisabled()
-			GUI:HelpMarker(_T("YRV3_TRIGGER_PROD_TT"))
-
-			ImGui.SameLine()
-			ImGui.BeginDisabled(data.total_stock == data.unit_max)
-			data.fast_prod_enabled, _ = GUI:Checkbox(_T("YRV3_AUTO_PROD"), data.fast_prod_enabled)
-			ImGui.EndDisabled()
-
-			ImGui.PopID()
-			ImGui.EndChild()
-			ImGui.PopStyleVar()
-		end
-		::continue::
-	end
-
-	if (ownsBikerBusiness) then
-		ImGui.Separator()
-		ImGui.Spacing()
-		ImGui.BulletText(_T("YRV3_INCOME_APPROX_MC"))
-		ImGui.SameLine()
-		GUI:Text(string.formatmoney(YRV3.m_biker_value_sum), { color = moneyGreen })
-		GUI:Tooltip(_T("YRV3_PRICE_NOTICE"))
+	for i, bb in ipairs(YRV3:GetBikerBusinesses()) do
+		ImGui.PushID(i)
+		drawBikerBusiness(bb)
+		ImGui.PopID()
 	end
 end
 
-local function drawBusinessSafes()
-	YRV3.m_safe_cash_sum = 0
+local tempHubVal = 0
+local function drawNightclub()
+	local businessHubTotalValue = 0
+	local club = YRV3:GetNightclub()
+	if (not club) then
+		ImGui.Text(_T("YRV3_CLUB_NOT_OWNED"))
+		return
+	end
 
-	for name, data in pairs(YRV3.m_safe_cash_data) do
+	-- synthwave and pain
+	local t      = os.clock()
+	local beat   = (math.sin(t * 1.8) + 1) * 0.5
+	local accent = ((math.sin(t * 6.0) + 1) * 0.5) ^ 1.5
+	local hue    = (t * 0.05) % 1.0
+	local base   = Color(12, 12, 18, 220)
+	local glow   = Color.FromHSV(hue, 0.7, 0.8, 1)
+	local flash  = Color.FromHSV((hue + 0.2) % 1.0, 0.9, 1.0, 1)
+	local bg     = base:Mix(glow, beat * 0.6)
+	bg           = bg:Mix(flash, accent * 0.8)
+
+	ImGui.PushStyleColor(ImGuiCol.Border, bg:AsU32())
+	ImGui.BeginChild("##nightclub",
+		0,
+		130,
+		true,
+		ImGuiWindowFlags.NoScrollbar
+		| ImGuiWindowFlags.AlwaysUseWindowPadding
+	)
+
+	ImGui.SetWindowFontScale(1.18)
+	local custom_name       = club:GetCustomName()
+	local custom_name_width = ImGui.CalcTextSize(custom_name)
+	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - custom_name_width - 10) * 0.5)
+	ImGui.TextColored(bg.r, bg.g, bg.b, bg.a, custom_name)
+
+	ImGui.Spacing()
+	ImGui.SetWindowFontScale(0.8)
+	local prop_name = club:GetName() or "Nightclub"
+	local prop_name_width = ImGui.CalcTextSize(prop_name)
+	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - prop_name_width - 10) * 0.5)
+	ImGui.Text(prop_name)
+	ImGui.SetWindowFontScale(1)
+
+	local tp_label = _T("GENERIC_TELEPORT")
+	local tp_label_width = ImGui.CalcTextSize(tp_label) + (ImGui.GetStyle().FramePadding.x * 2)
+	local coords = club:GetCoords()
+	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - tp_label_width) * 0.5)
+	if (coords) then
+		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
+			YRV3:Teleport(coords)
+		end
+	end
+	ImGui.EndChild()
+	ImGui.PopStyleColor()
+	ImGui.Spacing()
+
+	local cashValue   = club:GetCashValue()
+	local popValue    = club:GetPopularity()
+	local maxCash     = club:GetMaxCash()
+	local bulletWidth = measureBulletWidths({
+		_T("YRV3_POPULARITY"),
+		_T("GENERIC_SAFE"),
+	})
+
+	ImGui.BulletText(_T("YRV3_POPULARITY"))
+	ImGui.SameLine(bulletWidth)
+	ImGui.ProgressBar(popValue / 1e3,
+		-1,
+		progressBarSize.y,
+		_F("%d%%", math.floor(popValue / 10))
+	)
+
+	ImGui.BulletText(_T("GENERIC_SAFE"))
+	ImGui.SameLine(bulletWidth)
+	ImGui.ProgressBar(
+		cashValue / maxCash,
+		-1,
+		progressBarSize.y,
+		string.formatmoney(cashValue)
+	)
+
+	ImGui.Spacing()
+
+	ImGui.BeginDisabled(popValue >= 999)
+	if (GUI:Button(_F("%s %s", _T("GENERIC_MAX"), _T("YRV3_POPULARITY")))) then
+		club:MaxPopularity()
+	end
+	ImGui.EndDisabled()
+
+	GVars.features.yrv3.nc_always_popular, alwaysPopularClicked = GUI:Checkbox(
+		_T("YRV3_NC_ALWAYS_POPULAR"),
+		GVars.features.yrv3.nc_always_popular
+	)
+
+	if (alwaysPopularClicked) then
+		if (GVars.features.yrv3.nc_always_popular) then
+			club:LockPopularityDecay()
+		else
+			club:RestorePopularityDecay()
+		end
+	end
+
+	bigTips, bigTipsClicked = GUI:Checkbox(_T("YRV3_MILLION_DOLLAR_TIPS"), bigTips)
+
+	if (bigTipsClicked) then
+		club:ToggleBigTips(bigTips)
+	end
+
+	GUI:HelpMarker(_T("YRV3_MILLION_DOLLAR_TIPS_TT"))
+
+	local hubs = club:GetBusinessHubs()
+	if (not hubs) then
+		return
+	end
+
+	local hubsize = #hubs
+	if (hubsize == 0) then
+		return
+	end
+
+	ImGui.Spacing()
+	ImGui.SeparatorText(_T("YRV3_BUSINESS_HUB"))
+	ImGui.Spacing()
+	ImGui.BulletText(_T("YRV3_VALUE_TOTAL"))
+	ImGui.SameLine()
+	GUI:Text(string.formatmoney(tempHubVal), { color = moneyGreen })
+
+	for i = 1, hubsize do
+		ImGui.SetNextWindowBgAlpha(0)
+		ImGui.PushID(i)
+		ImGui.BeginChild("##hub_child",
+			90,
+			300,
+			false,
+			ImGuiWindowFlags.NoScrollbar
+			| ImGuiWindowFlags.AlwaysUseWindowPadding
+		)
+		local this            = hubs[i]
+		local prod            = this:GetProductCount()
+		local hub_value       = this:GetProductValue()
+		businessHubTotalValue = businessHubTotalValue + hub_value
+
+
+		local hub_name   = this:GetName() or _F("Hub %d", i)
+		local text_width = ImGui.CalcTextSize(hub_name)
+		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetContentRegionAvail() - text_width) * 0.5)
+		ImGui.Text(hub_name)
+
+		ImGui.SetWindowFontScale(0.68)
+		local max_units   = this:GetMaxUnits()
+		local prod_txt    = _F("%s/%s", prod, max_units)
+		local text_width2 = ImGui.CalcTextSize(prod_txt)
+		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetContentRegionAvail() - text_width2) * 0.5)
+		ImGui.Text(prod_txt)
+		ImGui.SetWindowFontScale(1)
+
+		ImGui.Spacing()
+
+		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + 35) * 0.5)
+		ImGui.ValueBar(
+			_F("##bb_hub_%d", i),
+			prod / max_units,
+			vec2:new(35, 140),
+			0,
+			1,
+			ImGuiValueBarFlags.VERTICAL
+		)
+
+		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + 40) * 0.5)
+		ImGui.BeginDisabled(prod >= max_units)
+		this.fast_prod_enabled, _ = GUI:Checkbox("##fast_prod", this.fast_prod_enabled)
+		ImGui.EndDisabled()
+		GUI:Tooltip(_T("YRV3_TRIGGER_PROD_HUB_TT"))
+
+		local prod_time       = this:GetTimeLeftBeforeProd()
+		local safe_to_trigger = this:CanTriggerProduction() and not this.fast_prod_running
+		local btn_label       = (safe_to_trigger or prod_time <= -1)
+			and _T("YRV3_TRIGGER_PROD_HUB")
+			or ImGui.TextSpinner()
+		local btn_size        = vec2:new(65, 30)
+
+		ImGui.BeginDisabled(not safe_to_trigger or prod >= max_units)
+		if (GUI:Button(btn_label, { size = btn_size })) then
+			this:TriggerProduction()
+		end
+		ImGui.EndDisabled()
+
+		ImGui.EndChild()
+		ImGui.PopID()
+
+		ImGui.SameLine()
+		if (ImGui.GetContentRegionAvail() < 90) then
+			ImGui.NewLine()
+		end
+	end
+
+	tempHubVal = businessHubTotalValue
+end
+
+local function drawBusinessSafes()
+	local safes = YRV3:GetBusinessSafes()
+	if (not safes) then
+		return
+	end
+
+	local bulletWidth = measureBulletWidths({
+		_T("YRV3_POPULARITY"),
+		_T("GENERIC_SAFE"),
+	})
+
+	for name, data in pairs(safes) do
 		if (not data.is_owned()) then
 			goto continue
 		end
 
-		local hasSpecial = type(data.get_special_val) == "function"
 		ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 8)
 		ImGui.BeginChild(name,
 			0,
-			hasSpecial and 200 or 160,
+			160,
 			false,
 			ImGuiWindowFlags.NoScrollbar
 			| ImGuiWindowFlags.AlwaysUseWindowPadding
 		)
 		ImGui.PushID(name)
-		local cashValue      = data.cash_value()
-		local popValue       = hasSpecial and data.get_special_val() or 0
-		YRV3.m_safe_cash_sum = YRV3.m_safe_cash_sum + cashValue
+		local cashValue = data.cash_value()
 
 		ImGui.SeparatorText(name)
-		ImGui.Spacing()
-
-		if (hasSpecial) then
-			ImGui.BulletText(_F("%s: ", _T("YRV3_POPULARITY")))
-			ImGui.SameLine()
-			ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-			ImGui.ProgressBar(popValue / 1e3,
-				progressBarSize.x,
-				progressBarSize.y,
-				_F("%d%%", math.floor(popValue / 10))
-			)
-		end
-
-		ImGui.BulletText(_F("%s: ", _T("GENERIC_SAFE")))
-		ImGui.SameLine()
-		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - progressBarSize.x)
-		ImGui.ProgressBar(cashValue / data.max_cash,
-			progressBarSize.x,
-			progressBarSize.y,
-			string.formatmoney(cashValue)
-		)
-
-		ImGui.Spacing()
-
 		if (GUI:Button(_F("%s##%s", _T("GENERIC_TELEPORT"), name))) then
 			YRV3:Teleport(data.blip)
 		end
+		ImGui.Separator()
+		ImGui.Spacing()
 
-		if (hasSpecial) then
-			ImGui.SameLine()
-			ImGui.BeginDisabled(popValue >= 1e3)
-			if GUI:Button(_F("%s %s##", _T("GENERIC_MAX"), _T("YRV3_POPULARITY"), name)) then
-				data.set_special_val()
-				Notifier:ShowSuccess("Samurai's Scripts", _T("YRV3_POPULARITY_NOTIF"))
-			end
-			ImGui.EndDisabled()
-		end
+		ImGui.BulletText(_F("%s: ", _T("GENERIC_SAFE")))
+		ImGui.SameLine(bulletWidth)
+		ImGui.ProgressBar(cashValue / data.max_cash,
+			-1,
+			progressBarSize.y,
+			string.formatmoney(cashValue)
+		)
 
 		ImGui.PopID()
 		ImGui.EndChild()
@@ -563,78 +558,95 @@ local function drawBusinessSafes()
 
 		::continue::
 	end
-
-	ImGui.Separator()
-	ImGui.Spacing()
-	ImGui.BulletText(_T("YRV3_SAFECASH_TOTAL"))
-	ImGui.SameLine()
-	GUI:Text(string.formatmoney(YRV3.m_safe_cash_sum), { color = moneyGreen })
 end
 
 local function drawMoneyFronts()
-	if (not YRV3.m_money_fronts_data["YRV3_CWASH_LABEL"].is_owned()) then
+	local mf_data = YRV3:GetMoneyFrontsBusiness()
+	if (not mf_data or not mf_data["YRV3_CWASH_LABEL"] or not mf_data["YRV3_CWASH_LABEL"].is_owned()) then
 		ImGui.Text(_T("YRV3_CWASH_NOT_OWNED"))
 		return
 	end
 
-	YRV3.m_cwash_cash_sum = 0
+	local clearHeatLabel = _F("%s %s", _T("GENERIC_CLEAR"), _T("YRV3_CWASH_HEAT"))
+	local bulletWidth = measureBulletWidths({
+		_T("YRV3_CWASH_WORK_EARNINGS"),
+		_T("GENERIC_SAFE"),
+		_T("YRV3_CWASH_HEAT"),
+		clearHeatLabel
+	})
+
 	for i = 1, #money_fronts_order do
 		local label = money_fronts_order[i]
-		local data = YRV3.m_money_fronts_data[label]
+		local data  = mf_data[label]
 
 		if (not data.is_owned()) then
 			goto continue
 		end
 
-		local region_width, _ = ImGui.GetContentRegionAvail()
-		ImGui.PushID(label)
+		ImGui.PushID(i)
+		ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 8)
+		ImGui.BeginChild("##money_fronts",
+			0,
+			i == 1 and 355 or 280,
+			false,
+			ImGuiWindowFlags.AlwaysUseWindowPadding
+			| ImGuiWindowFlags.NoScrollbar
+		)
+
 		ImGui.SeparatorText(_T(label))
 		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
-			Self:Teleport(data.coords, false)
+			YRV3:Teleport(data.coords, false)
 		end
+		ImGui.Separator()
+		ImGui.Spacing()
 
 		if (data.cash_value) then
-			local cw_dirty_cash = data.dirty_cash()
-			local cw_clean_cash = data.duffel_total() - cw_dirty_cash
-			local cw_safe_cash = data.cash_value()
+			local cw_dirty_cash   = data.dirty_cash()
+			local cw_clean_cash   = data.duffel_total() - cw_dirty_cash
+			local cw_safe_cash    = data.cash_value()
 			local dirty_cash_text = string.formatmoney(cw_dirty_cash)
 			local clean_cash_text = string.formatmoney(cw_clean_cash)
-			local cw_cash_text = _F("%s %s | %s %s",
+			local cw_cash_text    = _F("%s %s | %s %s",
 				_T("YRV3_CWASH_CASH_DIRTY"),
 				dirty_cash_text,
 				_T("YRV3_CWASH_CASH_CLEAN"),
 				clean_cash_text
 			)
-			local duffel_cash_text_width = ImGui.CalcTextSize(cw_cash_text)
+
 			ImGui.BulletText(_T("YRV3_CWASH_WORK_EARNINGS"))
-			ImGui.SameLine()
-			ImGui.SetCursorPosX(region_width - duffel_cash_text_width)
+			ImGui.SameLine(bulletWidth)
 			ImGui.Text(cw_cash_text)
 			ImGui.Spacing()
 			ImGui.BulletText(_T("GENERIC_SAFE"))
-			ImGui.SameLine()
-			ImGui.SetCursorPosX(region_width - 240)
-			ImGui.ProgressBar(cw_safe_cash / (data.max_cash or 1), 240, 32, string.formatmoney(cw_safe_cash))
-			YRV3.m_cwash_cash_sum = YRV3.m_cwash_cash_sum + cw_clean_cash + cw_safe_cash
+			ImGui.SameLine(bulletWidth)
+			ImGui.ProgressBar(
+				cw_safe_cash / (data.max_cash or 1),
+				-1,
+				progressBarSize.y,
+				string.formatmoney(cw_safe_cash)
+			)
 		end
 
-		local heat = data.get_special_val()
-		local heatcol = math.max(0, heat / 100)
-		local clearButtonLabel = _T("GENERIC_CLEAR")
-		local clearButtonWidth, _ = ImGui.CalcTextSize(clearButtonLabel)
-		local style = ImGui.GetStyle()
+		local heat    = data.get_special_val()
+		local heatcol = math.clamp(heat / 100, 0, 1)
+
 		ImGui.BulletText(_T("YRV3_CWASH_HEAT"))
-		ImGui.SameLine()
-		ImGui.SetCursorPosX(region_width - clearButtonWidth - 240 - (style.ItemSpacing.x * 2))
+		ImGui.SameLine(bulletWidth)
+		ImGui.PushStyleColor(ImGuiCol.PlotHistogram, heatcol, 1 - heatcol, 0, 1)
+		ImGui.ProgressBar(
+			heat / (data.max_heat or 100),
+			-1,
+			progressBarSize.y,
+			_F("%d%%", heat)
+		)
+		ImGui.PopStyleColor()
+
 		ImGui.BeginDisabled(heat == 0)
-		if (GUI:Button(_T("GENERIC_CLEAR"))) then
+		if (GUI:Button(clearHeatLabel)) then
 			data.set_special_val()
 		end
 		ImGui.EndDisabled()
-		ImGui.SameLine()
-		ImGui.PushStyleColor(ImGuiCol.PlotHistogram, heatcol, 1 - heatcol, 0, 1)
-		ImGui.ProgressBar(heat / (data.max_heat or 100), 240, 32, _F("%d%%", heat))
-		ImGui.PopStyleColor()
+		ImGui.Spacing()
 
 		local cb1_val = table.get_nested_key(GVars, data.gvar_key_1)
 		cb1_val, data.cb1_clicked = GUI:Checkbox(_T("YRV3_CWASH_LEGAL_WORK_CD"), cb1_val)
@@ -648,6 +660,8 @@ local function drawMoneyFronts()
 			data.on_cb2_click(YRV3, cb2_val)
 		end
 
+		ImGui.EndChild()
+		ImGui.PopStyleVar()
 		ImGui.PopID()
 		ImGui.Spacing()
 
@@ -758,8 +772,9 @@ local function drawMisc()
 
 	cooldownsGrid:Draw()
 
+	ImGui.Spacing()
 	ImGui.BeginDisabled()
-	ImGui.Checkbox(_F("%s [x]", _T("YRV3_PAYHPONE_HITS_CB")), false)
+	ImGui.Toggle(_F("%s [x]", _T("YRV3_PAYHPONE_HITS_CB")), false)
 	ImGui.EndDisabled()
 	if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and KeyManager:IsKeyJustPressed(eVirtualKeyCodes.TAB)) then
 		local url = "https://github.com/YimMenu-Lua/PayphoneHits"
@@ -788,7 +803,7 @@ local function drawMisc()
 	ImGui.Spacing()
 	GUI:Text(_T("YRV3_SELL_MISSIONS_NOTE"), Color("yellow"))
 
-	for name, data in pairs(YRV3.m_raw_data.SellMissionTunables) do
+	for name, data in pairs(YRV3:GetSaleMissionTunables()) do
 		local isFloat      = (data.type == "float")
 		local get_func     = isFloat and tunables.get_float or tunables.get_int
 		local set_func     = isFloat and tunables.set_float or tunables.set_int
@@ -807,7 +822,7 @@ local function drawMisc()
 				end
 			end
 
-			Notifier:ShowSuccess("Samurai's Scripts", _F(_T("YRV3_SELL_MISSIONS_NOTIF"), name:lower()))
+			Notifier:ShowSuccess("YRV3", _F(_T("YRV3_SELL_MISSIONS_NOTIF"), name:lower()))
 		end
 
 		ImGui.SameLine()
@@ -826,7 +841,8 @@ local function drawSettings()
 	ImGui.BulletText(_T("YRV3_AUTOSELL_BIKER_LABEL"))
 	ImGui.BulletText(_T("YRV3_AUTOSELL_LSD_LAB_LABEL"))
 	ImGui.Spacing()
-	ImGui.BeginDisabled(YRV3.m_has_triggered_autosell)
+	local autoSellTriggered = YRV3:HasTriggeredAutoSell()
+	ImGui.BeginDisabled(autoSellTriggered)
 	GVars.features.yrv3.autosell, _ = GUI:Checkbox(_T("YRV3_AUTO_SELL"), GVars.features.yrv3.autosell)
 	ImGui.EndDisabled()
 	GUI:Tooltip(_T("YRV3_AUTOSELL_TT"))
@@ -834,22 +850,24 @@ local function drawSettings()
 	if (script.is_active("fm_content_smuggler_sell")) then
 		GUI:Text(_T("YRV3_HANGAR_LAND_ERR"), Color("red"))
 	else
-		ImGui.BeginDisabled(GVars.features.yrv3.autosell or YRV3.m_has_triggered_autosell or
-			not YRV3.m_sell_script_running)
+		ImGui.BeginDisabled(GVars.features.yrv3.autosell
+			or autoSellTriggered
+			or not YRV3:IsAnySaleInProgress()
+		)
 		if (GUI:Button(_T("YRV3_AUTO_SELL_MANUAL"))) then
-			YRV3.m_has_triggered_autosell = true
+			autoSellTriggered = true
 			YRV3:FinishSale()
 			ThreadManager:Run(function()
 				repeat
 					yield()
-				until not YRV3.m_sell_script_running
-				YRV3.m_has_triggered_autosell = false
+				until not YRV3:IsAnySaleInProgress()
+				autoSellTriggered = false
 			end)
 		end
 		ImGui.EndDisabled()
 	end
 
-	ImGui.Text(_F(_T("YRV3_AUTOSELL_CURRENT"), YRV3.m_sell_script_disp_name))
+	ImGui.Text(_F(_T("YRV3_AUTOSELL_CURRENT"), YRV3:GetRunningSellScriptDisplayName()))
 
 	ImGui.SeparatorText(_T("YRV3_AUTO_FILL"))
 	ImGui.Text(_T("YRV3_AUTO_FILL_DELAY"))
@@ -865,83 +883,106 @@ local function drawSettings()
 end
 
 local tabCallbacks <const> = {
-	[tabNames[1]] = drawCEOwarehouses,
-	[tabNames[2]] = drawHangar,
-	[tabNames[3]] = drawBunker,
-	[tabNames[4]] = drawAcidLab,
-	[tabNames[5]] = drawBikerBusiness,
-	[tabNames[6]] = drawBusinessSafes,
-	[tabNames[7]] = drawMoneyFronts,
-	[tabNames[8]] = drawMisc,
-	[tabNames[9]] = drawSettings,
+	[tabNames[1]]  = drawCEOwarehouses,
+	[tabNames[2]]  = drawHangar,
+	[tabNames[3]]  = drawBikerBusinesses,
+	[tabNames[4]]  = drawBunker,
+	[tabNames[5]]  = drawAcidLab,
+	[tabNames[6]]  = drawNightclub,
+	[tabNames[7]]  = drawBusinessSafes,
+	[tabNames[8]]  = drawMoneyFronts,
+	[tabNames[9]]  = drawMisc,
+	[tabNames[10]] = drawSettings,
 }
 
+---@return boolean
+local function handleYRV3State()
+	local __state = YRV3:GetState()
+	local message = YRV3:GetLastError()
+
+	if (__state == Enums.eYRState.RUNNING) then
+		return true
+	end
+
+	if (__state == Enums.eYRState.LOADING) then
+		message = ImGui.TextSpinner(message)
+	end
+
+	if (__state == Enums.eYRState.ERROR) then
+		ImGui.TextColored(0.9, 0.1, 0.1, 1.0, message)
+	else
+		ImGui.Text(message)
+	end
+
+	return false
+end
+
 local function YRV3UI()
-	if (yrv3_state.disabled) then
-		ImGui.Text(yrv3_state.reason)
+	if (not handleYRV3State()) then
 		return
 	end
 
-	if (not YRV3:CanAccess()) then
-		ImGui.Text(_T("GENERIC_OFFLINE_OR_OUTDATED"))
-		return
-	end
+	local headerHeight   = 100.0
+	local windowHeight   = math.max(400, GVars.ui.window_size.y - headerHeight - 100.0)
+	local sidebarWidth   = 86.0
+	local separatorWidth = 3.0
 
-	progressBarSize.x = math.max(progressBarSize.x, GVars.ui.window_size.x * 0.4)
-
-	if ImGui.BeginChild("##yrv3_header", 0, 100, true, ImGuiWindowFlags.AlwaysUseWindowPadding) then
-		local title = _T("YRV3_MCT_TITLE")
-		local textWidth = ImGui.CalcTextSize(title) + ImGui.GetStyle().FramePadding.x + 10
-		local regionWidth = ImGui.GetWindowWidth()
-		ImGui.SetCursorPosX((regionWidth - textWidth) / 2)
+	if (ImGui.BeginChild("##yrv3_header", 0, headerHeight, true, ImGuiWindowFlags.AlwaysUseWindowPadding)) then
+		local title     = _T("YRV3_MCT_TITLE")
+		local textWidth = ImGui.CalcTextSize(title) + (ImGui.GetStyle().FramePadding.x * 2)
+		ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - textWidth) * 0.5)
 
 		if (GUI:Button(title)) then
-			if (YRV3.m_sell_script_running) then
+			if (YRV3:IsAnySaleInProgress()) then
 				Notifier:ShowMessage("YRV3", _T("YRV3_MCT_UNAVAIL"))
 			else
 				YRV3:MCT()
-				GUI:Close()
+				GUI:Close(true)
 			end
 		end
 
 		ImGui.Spacing()
 		ImGui.SetWindowFontScale(0.9)
-		local tooltip = _T("YRV3_INCOME_APPROX_ALL_TT")
 		ImGui.BulletText(_T("YRV3_INCOME_APPROX_ALL"))
-		GUI:Tooltip(tooltip)
 		ImGui.SameLine()
-		GUI:Text(string.formatmoney(CalcTotalBusinessIncome()), { color = moneyGreen })
-		GUI:Tooltip(tooltip)
+		GUI:Text(string.formatmoney(YRV3:GetEstimatedIncome() or 0), { color = moneyGreen })
 		ImGui.SetWindowFontScale(1)
 		ImGui.EndChild()
 	end
 
 	ImGui.Spacing()
 	ImGui.SetNextWindowBgAlpha(0)
-	if (ImGui.BeginChild("##yrv3_wrapped_tb", 0, 40, false, ImGuiWindowFlags.NoScrollbar)) then
-		if (ImGui.BeginTabBar("##yrv3_tb")) then
-			for i = 1, #tabNames do
-				local name = tabNames[i]
-				if (ImGui.BeginTabItem(name)) then
-					selectedTabName = name
-					ImGui.EndTabItem()
-				end
-			end
-			ImGui.EndTabBar()
-		end
-		ImGui.EndChild()
-	end
+	ImGui.BeginChild("##yrv3_2", 0, windowHeight, false)
 
-	ImGui.SetCursorPosY(ImGui.GetCursorPosY() - ImGui.GetStyle().ItemSpacing.y - 10)
-	ImGui.SetNextWindowBgAlpha(0.75)
-	if (ImGui.BeginChild("##yrv3_main", 0, GVars.ui.window_size.y - GUI:GetMaxTopBarHeight() - 100, false, ImGuiWindowFlags.AlwaysUseWindowPadding)) then
-		for name, callback in pairs(tabCallbacks) do
-			if (name == selectedTabName and type(callback) == "function") then
-				callback()
-			end
+	ImGui.SetNextWindowBgAlpha(0)
+	ImGui.BeginChild("##yrv3_3", sidebarWidth, 0, false)
+	for i = 1, #tabNames do
+		local name = tabNames[i]
+		if (ImGui.Selectable2(
+				name,
+				name == selectedTabName,
+				vec2:new(sidebarWidth, 27),
+				"center",
+				true
+			)) then
+			selectedTabName = name
 		end
-		ImGui.EndChild()
 	end
+	ImGui.EndChild()
+
+	ImGui.SameLine()
+	ImGui.VerticalSeparator(separatorWidth)
+	ImGui.SameLine()
+
+	ImGui.SetNextWindowBgAlpha(0)
+	ImGui.BeginChild("##yrv3_4")
+	local callback = tabCallbacks[selectedTabName]
+	if (type(callback) == "function") then
+		callback()
+	end
+	ImGui.EndChild()
+
+	ImGui.EndChild()
 end
 
 GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimResupplierV3", YRV3UI)

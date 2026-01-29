@@ -1,3 +1,12 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 ---@diagnostic disable: lowercase-global
 math.randomseed(os.time())
 
@@ -385,6 +394,45 @@ function memory.pointer:__eq(right)
 	end
 
 	return self:get_address() == right:get_address()
+end
+
+---Casts the pointer to an object.
+---
+---**IMPORTANT:** You must only cast to objects that take a pointer parameter in their constructors.
+---
+---**Example Usage:**
+---```lua
+---local cvehicle = memory.handle_to_ptr(self.get_veh()):as(CVehicle)
+---```
+---@generic T
+---@param obj T
+---@return T
+function memory.pointer:as(obj)
+	local obj_type = type(obj)
+	if (obj_type ~= "table") then
+		error(_F("Invalid parameter #1: Table expected, got %s instead.", obj_type))
+	end
+
+	if (type(obj.__from_ptr) == "boolean" and not obj.__from_ptr) then
+		error(_F("Class '%s' does not take a pointer.", obj.__type or tostring(obj)))
+	end
+
+	local mt = getmetatable(obj)
+	if (mt and type(mt.__call) == "function") then
+		return obj(self)
+	end
+
+	if (type(obj.new) == "function") then
+		return obj.new(self)
+	end
+
+	if (type(obj.init) == "function") then
+		local instance = setmetatable({}, obj)
+		instance.init(obj, self)
+		return obj
+	end
+
+	error(_F("Class '%s' has no valid pointer constructor", obj.__type or tostring(obj)))
 end
 
 -- Retrieves a 32-bit displacement value from the memory address, optionally adding an offset and adjustment.

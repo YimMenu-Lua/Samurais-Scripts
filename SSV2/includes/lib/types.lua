@@ -1,6 +1,16 @@
----@diagnostic disable: undefined-doc-name, param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
--- Generic Containers
+
+---@diagnostic disable: undefined-doc-name, param-type-mismatch
+---@meta
+
+--#region Generic Containers
 
 ---@class array<T> : { [integer]: T }
 ---@class dict<T> : { [string]: T }
@@ -33,8 +43,9 @@ GenericClass = setmetatable({}, {
 ---@field private __enum boolean Used internally to flag this as an enum. I know, leave me alone 🥲
 ---@field private __data_type? string Optional: "int8_t" | "int16_t" | "int32_t" | "int64_t" | "uint8_t" | "uint16_t" | "uint32_t"| "uint64_t" | "joaat_t" | "float" | "byte" Used internally to define the data type so that SizeOf or the internal __sizeof can immediately lookup the size without invoking integer inference.
 
+--#endregion
 
--- Primitives
+--#region Primitives
 
 -- Time in seconds.
 ---@class seconds: number
@@ -60,8 +71,9 @@ GenericClass = setmetatable({}, {
 ---@alias anyval<T> table|metatable|userdata|lightuserdata|function|string|number|boolean Any Lua value except nil.
 ---@alias optional<T> T?
 
+--#endregion
 
--- Functional Types
+--#region Functional Types
 
 ---@alias Callback fun()
 ---@alias Predicate<P1, P2, P3, P4, P5> fun(p1: P1, p2?: P2, p3?: P3, p4?: P4, p5?: P5): boolean
@@ -70,3 +82,5 @@ GenericClass = setmetatable({}, {
 -- A poor man's `nullptr` 🥲
 ---@class nullptr : pointer
 nullptr = memory.pointer:new(0)
+
+--#endregion

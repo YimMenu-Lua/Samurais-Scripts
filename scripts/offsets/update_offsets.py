@@ -4,6 +4,7 @@
 #	python update_offsets.py			: normal run (just hit F5 if in VS Code and have Python Debugger installed, reads raw files from a remote repository)
 #	python update_offsets.py --version	: 0: Legacy | 1: Enhanced; defaults to 0: Legacy
 #	python update_offsets.py --local	: Read from local files; this must be followed by the path to local decompiled scritps
+#	python update_offsets.py --diff 	: Show diff only, do not overwrite Lua table
 #
 #	CI Run: Don't pass any arguments
 
@@ -31,6 +32,16 @@ REPO_URLS = [
 	"https://raw.githubusercontent.com/acidlabsgg/gtav-legacy-scripts/refs/heads/main/scripts",
 	"https://raw.githubusercontent.com/acidlabsgg/gtav-enhanced-scripts/refs/heads/main/scripts",
 ]
+SS_NOTICE = """-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
+"""
 
 
 def has_c_file(path) -> bool:
@@ -199,7 +210,6 @@ def generate(offsets_table: list, version: int, local: bool, path: str):
 					ver["offsets"][i]["value"] = newv
 
 
-
 def main(auto: bool = True):
 	table_path = SCRIPT_ROOT / "SSV2/includes/data/globals_locals.lua"
 	if not os.path.exists(table_path):
@@ -215,6 +225,7 @@ def main(auto: bool = True):
 		parser = ArgParser(description="Update offsets from local path or GitHub repository.")
 		parser.add_argument("--version", type=int, help="Choose game version. (0: Legacy | 1: Enhanced)")
 		parser.add_argument("--local", action="store_true", help="Read from local decompiled scripts")
+		parser.add_argument("--diff", action="store_true", help="Show diff only. Do not write Lua table.")
 		parser.add_argument("decomps_path", type=str, nargs="?", default="", help="Path to your local decompiled scripts")
 		args = parser.parse_args()
 		version = args.version or 0
@@ -222,12 +233,16 @@ def main(auto: bool = True):
 		path = args.decomps_path
 		generate(offsets_table, version, local, path)
 	
+	if (args.diff):
+		return
+	
 	data = serialize_lua(offsets_table)
 	with open(table_path, "w", encoding="utf-8") as f:
+		f.write(SS_NOTICE)
 		f.write("return ")
 		f.write(data)
 		f.write("\n")
 
 
 if __name__ == "__main__":
-	main()
+	main(len(sys.argv) == 0)

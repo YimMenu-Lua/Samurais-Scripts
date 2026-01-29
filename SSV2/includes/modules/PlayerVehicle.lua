@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local StateMachine     = require("includes.structs.StateMachine")
 local HandlingEditor   = require("includes.modules.HandlingEditor")
@@ -93,6 +100,7 @@ end
 
 function PlayerVehicle:InitFeatures()
 	self.m_feat_mgr   = FeatureMgr.new(self)
+	---@diagnostic disable-next-line
 	self.m_lctrl_mgr  = self.m_feat_mgr:Add(LaunchControlMgr.new(self))
 	self.m_nos_mgr    = self.m_feat_mgr:Add(NosMgr.new(self))
 	self.m_abs_mgr    = self.m_feat_mgr:Add(BFD.new(self))
@@ -140,6 +148,7 @@ function PlayerVehicle.new(handle)
 			initial_nozzle_pos = 1,
 		},
 		m_default_max_speed = 0,
+		---@diagnostic disable-next-line
 	}, PlayerVehicle)
 
 	instance.m_esc_sm = StateMachine({
@@ -302,6 +311,7 @@ function PlayerVehicle:ResetAllGenericToggleables()
 		local func = generic.onDisable
 		local args = generic.args
 		if (toggled and type(generic.onDisable) == "function" and self:IsValid()) then
+			---@diagnostic disable-next-line
 			func(table.unpack(args))
 		end
 	end
@@ -506,7 +516,7 @@ function PlayerVehicle:UpdateAutopilotState(newState)
 	elseif (newState == self.eAutoPilotState.WAYPOINT) then
 		destination = Game.GetWaypointCoords()
 	elseif (newState == self.eAutoPilotState.OBJECTIVE) then
-		destination = Game.GetObjectiveBlipCoords()
+		_, destination = Game.GetObjectiveBlipCoords()
 	end
 
 	if (not destination or destination:is_zero()) then

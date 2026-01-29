@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local CEntity           = require("includes.classes.gta.CEntity")
 local CPlayerInfo       = require("includes.classes.gta.CPlayerInfo")
@@ -34,20 +41,21 @@ function CPed:init(ped)
 	end
 
 	self:super().init(self, ped)
-	local ptr = memory.handle_to_ptr(ped)
+	local ptr                   = memory.handle_to_ptr(ped)
 
 	---@type CPed
-	local instance = setmetatable({}, CPed)
-	instance.m_ptr = ptr
+	---@diagnostic disable-next-line
+	local instance              = setmetatable({}, CPed)
+	instance.m_ptr              = ptr
 	instance.m_ped_intelligence = ptr:add(0x10A0)
-	instance.m_ped_inventory = ptr:add(0x10B0)
-	instance.m_ped_weapon_mgr = CPedWeaponManager(ptr:add(0x10B8))
-	instance.m_velocity = ptr:add(0x0300)
-	instance.m_ped_type = ptr:add(0x1098)
-	instance.m_ped_task_flag = ptr:add(0x144B)
-	instance.m_seatbelt = ptr:add(0x143C)
-	instance.m_armor = ptr:add(0x150C)
-	instance.m_cash = ptr:add(0x1614)
+	instance.m_ped_inventory    = ptr:add(0x10B0)
+	instance.m_ped_weapon_mgr   = CPedWeaponManager(ptr:add(0x10B8))
+	instance.m_velocity         = ptr:add(0x0300)
+	instance.m_ped_type         = ptr:add(0x1098)
+	instance.m_ped_task_flag    = ptr:add(0x144B)
+	instance.m_seatbelt         = ptr:add(0x143C)
+	instance.m_armor            = ptr:add(0x150C)
+	instance.m_cash             = ptr:add(0x1614)
 
 	if (PED.IS_PED_A_PLAYER(ped)) then
 		instance.m_player_info = CPlayerInfo(ptr:add(0x10A8):deref())

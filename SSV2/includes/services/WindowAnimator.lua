@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 --------------------------------------
 -- WindowAnimator Struct
@@ -15,6 +22,7 @@
 ---@overload fun() : WindowAnimator
 local WindowAnimator = {}
 WindowAnimator.__index = WindowAnimator
+---@diagnostic disable-next-line
 setmetatable(WindowAnimator, {
 	__call = function(...)
 		return setmetatable({
@@ -23,6 +31,7 @@ setmetatable(WindowAnimator, {
 			m_start_pos  = vec2:zero(),
 			m_end_pos    = vec2:zero(),
 			m_duration   = 0.18
+			---@diagnostic disable-next-line
 		}, WindowAnimator)
 	end
 })

@@ -1,3 +1,12 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 local World                      = require("includes.modules.World")
 local t_GameObjects              = require("includes.data.objects")
 local t_GamePeds                 = require("includes.data.ped_reverse_lookup")
@@ -1466,7 +1475,7 @@ local function EntityForgeUI()
 			DrawSpanwerItems()
 			ImGui.Spacing()
 			if selectedSidebarItem == Enums.eEntityType.Vehicle and not vehicleListCreated then
-				ImGui.TextSpinner("Loading vehicle list", 8.0, ImGui.SpinnerStyle.FILL)
+				ImGui.Text(ImGui.TextSpinner("Loading vehicle list", 8.0, ImGuiSpinnerStyle.FILL))
 			else
 				ImGui.BeginDisabled(not unk_SelectedEntity)
 				if GUI:Button(_T("GENERIC_SPAWN"), { size = vec2:new(120, 35) }) then

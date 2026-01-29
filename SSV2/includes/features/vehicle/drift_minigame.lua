@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local FeatureBase = require("includes.modules.FeatureBase")
 
@@ -29,6 +36,7 @@ DriftMinigame.__index = DriftMinigame
 ---@return DriftMinigame
 function DriftMinigame.new(pv)
 	local self = FeatureBase.new(pv)
+	---@diagnostic disable-next-line
 	return setmetatable(self, DriftMinigame)
 end
 

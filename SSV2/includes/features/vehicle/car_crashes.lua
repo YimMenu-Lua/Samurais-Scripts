@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local FeatureBase = require("includes.modules.FeatureBase")
 
@@ -10,11 +17,12 @@ local FeatureBase = require("includes.modules.FeatureBase")
 
 ---@class CarCrash : FeatureBase
 ---@field private m_entity PlayerVehicle
----@field private m_thread Thread
+---@field private m_thread? Thread
 ---@field private m_last_update_time seconds
 ---@field private m_is_active boolean
 ---@field private m_crash_levels { minor: CrashLevel, major: CrashLevel, fatal: CrashLevel }
 ---@overload fun(pv: PlayerVehicle): CarCrash
+---@diagnostic disable-next-line
 local CarCrash = setmetatable({}, FeatureBase)
 CarCrash.__index = CarCrash
 
@@ -22,6 +30,7 @@ CarCrash.__index = CarCrash
 ---@return CarCrash
 function CarCrash.new(pv)
 	local self = FeatureBase.new(pv)
+	---@diagnostic disable-next-line
 	return setmetatable(self, CarCrash)
 end
 

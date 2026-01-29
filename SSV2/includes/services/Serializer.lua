@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 ---@enum eSerializerState
 local eSerializerState <const> = {
@@ -11,7 +18,7 @@ local eSerializerState <const> = {
 ---@ignore
 ---@class SerializerOptionals
 ---@field pretty? boolean Pretty Encoding
----@field indent? string Number of indentations for pretty encoding.
+---@field indent? integer Number of indentations for pretty encoding.
 ---@field strict_parsing? boolean -- Refer to the Json package
 ---@field encryption_key? string -- Optional key for XOR encryption
 
@@ -34,7 +41,7 @@ local eSerializerState <const> = {
 ---@field private m_default_config table
 ---@field private m_key_states table
 ---@field private m_dirty boolean
----@field private m_parsing_options SerializerOptionals
+---@field private m_parsing_options { pretty: boolean, indent: string, strict_parsing: boolean }
 ---@field private m_state eSerializerState
 ---@field private m_xor_key string
 ---@field private m_last_write_time Time.TimePoint
@@ -510,7 +517,7 @@ function Serializer:SaveItem(item_name, value)
 end
 
 ---@param defaults table
----@param current table
+---@param current? table
 ---@param out table
 ---@param exceptions Set<string>
 ---@param prefix? string

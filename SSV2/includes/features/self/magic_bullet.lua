@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local FeatureBase = require("includes.modules.FeatureBase")
 
@@ -14,6 +21,7 @@ MagicBullet.__index = MagicBullet
 ---@return MagicBullet
 function MagicBullet.new(entity)
 	local self = FeatureBase.new(entity)
+	---@diagnostic disable-next-line
 	return setmetatable(self, MagicBullet)
 end
 
@@ -36,7 +44,7 @@ function MagicBullet:Update()
 
 	if PLAYER.IS_PLAYER_FREE_AIMING(Self:GetPlayerID()) then
 		local entity = Self:GetEntityInCrosshairs(false)
-		if (ENTITY.IS_ENTITY_A_PED(entity) and PED.IS_PED_HUMAN(entity)) then
+		if (entity and ENTITY.IS_ENTITY_A_PED(entity) and PED.IS_PED_HUMAN(entity)) then
 			if (entity ~= 0) then
 				self.m_last_aim_target = entity
 			end

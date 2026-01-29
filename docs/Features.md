@@ -52,11 +52,11 @@ _Player-centric features affecting movement, combat, and animations._
 
   Restores mobile phone animations in Online mode.
 
-- **Enable MC Riding Style**
+- **MC Riding Style**
 
-  Restores the alternate bike riding style in GTA Online for MCs.
+  Enables alternate bike riding animations.
 
-  _Usage:_ Automatically applies when riding a motorcycle at low speed while registered as an MC.
+  _Usage:_ Automatically applies when riding a motorcycle at low speed.
 
 - **Disable Action Mode**
 

@@ -29,7 +29,16 @@ from pathlib import Path
 PARENT_PATH = Path(__file__).resolve().parent
 SCRIPT_ROOT = PARENT_PATH.parent.parent
 LUA_DATA_PATH = SCRIPT_ROOT / "SSV2/includes/data"
+SS_NOTICE = """-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
+
+"""
 
 ePedType = {
 	"PLAYER_0": 0,
@@ -63,6 +72,15 @@ ePedType = {
 	"ANIMAL": 28,
 	"ARMY": 29,
 }
+
+
+def gen_file_header():
+	today = datetime.date.today()
+	date_str = today.strftime("%d-%m-%Y")
+	buff = SS_NOTICE
+	buff += f"-- Auto-generated on <{date_str}>\n\n"
+	buff += "---@diagnostic disable\n\n"
+	return buff
 
 
 def serialize_lua(v, indent=0):
@@ -119,15 +137,6 @@ def read_raw_file(file_name: str, as_json: bool = True):
 
 	out = resp.json() if as_json else resp.text
 	return out
-
-
-def gen_file_header():
-	today = datetime.date.today()
-	date_str = today.strftime("%d-%m-%Y")
-	buff = f"---@diagnostic disable\n\n"
-	buff += f"-- This file is part of Samurai's Scripts\n"
-	buff += f"-- Auto-generated on {date_str}\n\n\n"
-	return buff
 
 
 def gen_vehicles():

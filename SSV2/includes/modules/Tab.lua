@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 ---@class GuiCallback : function
 
@@ -32,6 +39,7 @@ function Tab.new(name, drawable, subtabs, isTranslatorLabel)
 			m_has_error            = false,
 			m_has_translator_label = isTranslatorLabel or false
 		},
+		---@diagnostic disable-next-line
 		Tab
 	)
 end
@@ -245,7 +253,7 @@ function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta, noCom
 
 	local command_callback = function()
 		local v = table.get_nested_key(GVars, gvar_key)
-		table.get_nested_key(GVars, not v)
+		table.set_nested_key(GVars, gvar_key, not v)
 		toggle()
 	end
 

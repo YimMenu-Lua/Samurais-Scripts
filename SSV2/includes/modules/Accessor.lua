@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch, return-type-mismatch, lowercase-global
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 ---@enum eAccessorType
 Enums.eAccessorType = {
@@ -75,6 +82,7 @@ function Accessor.new(m_base, m_type, script, path)
 			m_script = script,
 			m_path = path or {}
 		},
+		---@diagnostic disable-next-line
 		Accessor
 	)
 end
@@ -226,6 +234,7 @@ function ScriptGlobal.new(address)
 	local instance = Accessor.new(address, Enums.eAccessorType.GLOBAL)
 	---@diagnostic disable: undefined-field
 	instance.__index.__type = ScriptGlobal.__type
+	---@diagnostic disable-next-line
 	return setmetatable(instance, ScriptGlobal)
 end
 
@@ -233,6 +242,7 @@ end
 ---@field At fun(self: ScriptLocal, offset: integer, size?: integer): ScriptLocal
 ---@overload fun(address: integer, scr: string): ScriptLocal
 ScriptLocal = Class("ScriptLocal", Accessor)
+---@diagnostic disable-next-line
 setmetatable(ScriptLocal,
 	{
 		__call = function(_, scr, addr)
@@ -255,5 +265,6 @@ function ScriptLocal.new(address, script_name)
 	instance.__index.WriteUint   = nil
 	instance.__index.__type      = ScriptLocal.__type
 
+	---@diagnostic disable-next-line
 	return setmetatable(instance, ScriptLocal)
 end

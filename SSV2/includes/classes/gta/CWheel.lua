@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 ---@enum eWheelDynamicFlags
 Enums.eWheelDynamicFlags = {
@@ -115,6 +122,7 @@ Enums.eWheelConfigFlags = {
 local CWheel = { m_size = 0x20E }
 CWheel.__index = CWheel
 CWheel.__type = "CWheel"
+---@diagnostic disable-next-line
 setmetatable(CWheel, {
 	__call = function(cls, addr)
 		return cls.new(addr)
@@ -127,6 +135,7 @@ function CWheel.new(addr)
 		return nil
 	end
 
+	---@diagnostic disable-next-line
 	local instance                       = setmetatable({}, CWheel)
 	instance.m_ptr                       = addr
 	instance.m_y_rotation                = addr:add(0x008)

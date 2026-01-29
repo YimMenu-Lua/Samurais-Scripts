@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch, undefined-field
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 --------------------------------------
 -- Class: atArray
@@ -17,6 +24,7 @@
 atArray = {}
 atArray.__index = atArray
 atArray.__type = "atArray"
+---@diagnostic disable-next-line
 setmetatable(atArray, {
 	__call = function(cls, ...)
 		return cls.new(...)
@@ -28,17 +36,15 @@ setmetatable(atArray, {
 ---@param data_type optional<T>
 ---@return atArray<T>
 function atArray.new(address, data_type)
-	local instance = setmetatable(
-		{
-			m_address = nullptr,
-			m_data_ptr = nullptr,
-			m_size = 0x0,
-			m_count = 0x0,
-			m_data = {},
-			m_data_type = nil
-		},
-		atArray
-	)
+	local instance = setmetatable({
+		m_address = nullptr,
+		m_data_ptr = nullptr,
+		m_size = 0x0,
+		m_count = 0x0,
+		m_data = {},
+		m_data_type = nil
+		---@diagnostic disable-next-line
+	}, atArray)
 
 	if not (IsInstance(address, "pointer") and address:is_valid()) then
 		return instance

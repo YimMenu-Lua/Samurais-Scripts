@@ -1,5 +1,12 @@
----@diagnostic disable: param-type-mismatch, unknown-operator
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
+---@diagnostic disable: unknown-operator
 local EPSILON <const> = 1e-6
 
 --------------------------------------
@@ -30,6 +37,7 @@ fMatrix44 = {}
 
 fMatrix44.__index = fMatrix44
 fMatrix44.__type = "fMatrix44"
+---@diagnostic disable-next-line
 setmetatable(fMatrix44, {
 	__call = function(cls, ...)
 		return cls:new(...)
@@ -58,6 +66,7 @@ function fMatrix44:new(
 	m31, m32, m33, m34,
 	m41, m42, m43, m44
 )
+	---@diagnostic disable-next-line
 	local instance = setmetatable({}, fMatrix44)
 	instance.M11 = m11 or 1
 	instance.M12 = m12 or 0

@@ -1,4 +1,11 @@
----@diagnostic disable: param-type-mismatch, return-type-mismatch, assign-type-mismatch
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
 
 local Refs        = require("includes.data.refs")
 local FeatureBase = require("includes.modules.FeatureBase")
@@ -8,7 +15,7 @@ local FeatureBase = require("includes.modules.FeatureBase")
 ---@field private m_is_active boolean
 ---@field private m_shots table
 ---@field private m_next_shot_time seconds
----@field protected m_thread Thread
+---@field protected m_thread? Thread
 local Flares      = setmetatable({}, FeatureBase)
 Flares.__index    = Flares
 
@@ -16,6 +23,7 @@ Flares.__index    = Flares
 ---@return Flares
 function Flares.new(pv)
 	local self = FeatureBase.new(pv)
+	---@diagnostic disable-next-line
 	return setmetatable(self, Flares)
 end
 

@@ -1,31 +1,40 @@
-local RED <const> = Color("red")
-local GREEN <const> = Color("green")
-local BLUE <const> = Color("blue")
-local GREY <const> = Color("#636363")
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
-local side_button_size = vec2:new(140, 35)
-local init_g_addr = 0
-local init_l_addr = 0
-local g_offset_count = 0
-local l_offset_count = 0
-local l_scr_name = ""
-local selected_g_type_idx = 1
-local selected_l_type_idx = 1
-local selected_entity_type = 1
-local TVehList = {}
-local g_offsets = {}
-local l_offsets = {}
+
+local RED <const>               = Color("red")
+local GREEN <const>             = Color("green")
+local BLUE <const>              = Color("blue")
+local GREY <const>              = Color("#636363")
+
+local side_button_size          = vec2:new(140, 35)
+local init_g_addr               = 0
+local init_l_addr               = 0
+local g_offset_count            = 0
+local l_offset_count            = 0
+local l_scr_name                = ""
+local selected_g_type_idx       = 1
+local selected_l_type_idx       = 1
+local selected_entity_type      = 1
+local TVehList                  = {}
+local g_offsets                 = {}
+local l_offsets                 = {}
 local current_global
 local current_local
 local current_local_method
 local current_global_method
-local state_colors <const> = {
+local state_colors <const>      = {
 	[eThreadState.UNK] = GREY,
 	[eThreadState.DEAD] = RED,
 	[eThreadState.RUNNING] = GREEN,
 	[eThreadState.SUSPENDED] = BLUE,
 }
-local accessor_read_types = {
+local accessor_read_types       = {
 	"Int",
 	"Uint",
 	"Float",
@@ -548,7 +557,7 @@ local function DrawMiscTests()
 			end
 		end
 
-		printf("\n--------- CWeaponInfo ---------\n\n%s", table.concat(out, ",\n"))
+		printf("\n--------- CWeaponInfo Dump ---------\n\n%s", table.concat(out, ",\n"))
 	end
 end
 
