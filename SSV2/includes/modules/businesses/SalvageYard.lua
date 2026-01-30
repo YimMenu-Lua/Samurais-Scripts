@@ -176,20 +176,20 @@ function SalvageYard:MaximizeIncome()
 end
 
 function SalvageYard:LockIncomeDecay()
-	if (tunables.get_float(797544186) <= 0.0) then
+	if (tunables.get_int(797544186) <= 0) then
 		return
 	end
 
-	tunables.set_float(797544186, -1e-8)
+	tunables.set_int(797544186, 0)
 	self:MaximizeIncome()
 end
 
 function SalvageYard:RestoreIncomeDecay()
-	if (tunables.get_float(797544186) == 5.0) then
+	if (tunables.get_int(797544186) == 5) then
 		return
 	end
 
-	tunables.set_float(797544186, 5.0)
+	tunables.set_int(797544186, 5)
 end
 
 ---@param slot integer
