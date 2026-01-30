@@ -767,8 +767,8 @@ local function drawSalvageYard()
 		_T("SY_ALWAYS_MAX_INCOME"),
 		GVars.features.yrv3.sy_always_max_income,
 		{
-			onClick = function()
-				if (GVars.features.yrv3.sy_always_max_income) then
+			onClick = function(v)
+				if (v) then
 					salvage_yard:LockIncomeDecay()
 				else
 					salvage_yard:RestoreIncomeDecay()

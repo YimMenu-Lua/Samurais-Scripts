@@ -949,7 +949,7 @@ function GUI:CustomToggle(label, v, opts)
 	end
 
 	if (clicked and opts and type(opts.onClick) == "function") then
-		opts.onClick()
+		opts.onClick(v)
 	end
 
 	return v, clicked
@@ -970,7 +970,7 @@ function GUI:Checkbox(label, v, opts)
 	if (clicked) then
 		self:PlaySound(self.Sounds.Checkbox)
 		if (opts and type(opts.onClick) == "function") then
-			opts.onClick()
+			opts.onClick(v)
 		end
 	end
 
