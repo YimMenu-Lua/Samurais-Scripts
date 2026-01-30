@@ -11,6 +11,7 @@ local sCooldownButtonLabel, bCooldownParam
 local alwaysPopularClicked     = false
 local bigTips                  = false
 local bigTipsClicked           = false
+local coloredNameplate         = false
 local maxSellMissionButtonSize = vec2:new(80, 30)
 local progressBarSize          = vec2:new(300, 25)
 local moneyGreen               = Color("#85BB65")
@@ -79,7 +80,8 @@ end
 ---@param business BusinessFront
 ---@param custom_name string
 ---@param bg Color
-local function drawNamePlate(business, custom_name, bg)
+---@param tpKeepVeh? boolean
+local function drawNamePlate(business, custom_name, bg, tpKeepVeh)
 	ImGui.BeginChild("##nightclub",
 		0,
 		130,
@@ -111,7 +113,7 @@ local function drawNamePlate(business, custom_name, bg)
 	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - tp_label_width) * 0.5)
 	if (coords) then
 		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
-			YRV3:Teleport(coords)
+			YRV3:Teleport(coords, tpKeepVeh)
 		end
 	end
 	ImGui.EndChild()
@@ -370,13 +372,9 @@ local function drawBikerBusinesses()
 	ImGui.EndTabBar()
 end
 
-local tempHubVal = 0
-local function drawNightclub()
-	local businessHubTotalValue = 0
-	local club = YRV3:GetNightclub()
-	if (not club) then
-		ImGui.Text(_T("YRV3_CLUB_NOT_OWNED"))
-		return
+local function getClubNameColor()
+	if (not coloredNameplate) then
+		return Color(ImGui.GetStyleColorVec4(ImGuiCol.Text))
 	end
 
 	-- synthwave and pain
@@ -388,11 +386,23 @@ local function drawNightclub()
 	local glow   = Color.FromHSV(hue, 0.7, 0.8, 1)
 	local flash  = Color.FromHSV((hue + 0.2) % 1.0, 0.9, 1.0, 1)
 	local bg     = base:Mix(glow, beat * 0.6)
-	bg           = bg:Mix(flash, accent * 0.8)
+	return bg:Mix(flash, accent * 0.8)
+end
 
+local tempHubVal = 0
+local function drawNightclub()
+	local businessHubTotalValue = 0
+	local club = YRV3:GetNightclub()
+	if (not club) then
+		ImGui.Text(_T("YRV3_CLUB_NOT_OWNED"))
+		return
+	end
+
+	local bg = getClubNameColor()
 	ImGui.PushStyleColor(ImGuiCol.Border, bg:AsU32())
 	drawNamePlate(club, club:GetCustomName(), bg)
 	ImGui.PopStyleColor()
+	coloredNameplate, _ = GUI:CustomToggle("Synthwave & Pain", coloredNameplate)
 	ImGui.Spacing()
 
 	local popValue    = club:GetPopularity()
@@ -726,7 +736,8 @@ local function drawSalvageYard()
 	drawNamePlate(
 		salvage_yard,
 		salvage_yard:GetName(),
-		Color(ImGui.GetStyleColorVec4(ImGuiCol.Text))
+		Color(ImGui.GetStyleColorVec4(ImGuiCol.Text)),
+		true
 	)
 
 	ImGui.Spacing()
