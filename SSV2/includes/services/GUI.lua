@@ -937,25 +937,44 @@ function GUI:PlaySound(sound)
 end
 
 ---@param label string
----@param bool boolean
+---@param v boolean
 ---@param opts? { tooltip?: string, color?: Color, onClick?: function }
 ---@return boolean, boolean
-function GUI:Checkbox(label, bool, opts)
+function GUI:CustomToggle(label, v, opts)
 	local clicked = false
-	bool, clicked = ImGui.Toggle(label, bool)
+	v, clicked = ImGui.Toggle(label, v)
+
+	if (opts and opts.tooltip) then
+		self:Tooltip(opts.tooltip, { color = opts.color })
+	end
+
+	if (clicked and opts and type(opts.onClick) == "function") then
+		opts.onClick(v)
+	end
+
+	return v, clicked
+end
+
+---@param label string
+---@param v boolean
+---@param opts? { tooltip?: string, color?: Color, onClick?: function }
+---@return boolean, boolean
+function GUI:Checkbox(label, v, opts)
+	local clicked = false
+	v, clicked = ImGui.Checkbox(label, v)
+
+	if (opts and opts.tooltip) then
+		self:Tooltip(opts.tooltip, { color = opts.color })
+	end
 
 	if (clicked) then
 		self:PlaySound(self.Sounds.Checkbox)
 		if (opts and type(opts.onClick) == "function") then
-			opts.onClick()
+			opts.onClick(v)
 		end
 	end
 
-	if (opts and opts.tooltip) then
-		self:Tooltip(opts.tooltip, opts.color)
-	end
-
-	return bool, clicked
+	return v, clicked
 end
 
 ---@param label string

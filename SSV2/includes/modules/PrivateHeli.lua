@@ -119,7 +119,7 @@ function PrivateHeli.spawn(model, spawnPos, godmode)
 			},
 			radio = {
 				isOn = true,
-				stationName = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+				stationName = Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 			},
 			lastCheckTime = Time.now() + 3
 		},
@@ -497,7 +497,7 @@ function PrivateHeli:StateEval()
 	if self:IsPlayerInHeli() then
 		self.radio.isOn = AUDIO.IS_VEHICLE_RADIO_ON(self.m_handle)
 		self.radio.stationName = self.radio.isOn
-			and HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+			and Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 			or "Off"
 	end
 

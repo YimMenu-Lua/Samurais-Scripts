@@ -262,7 +262,7 @@ local function BodyguardSpawnFooter()
 	end
 
 	ImGui.SameLine()
-	b_BodyguardAllWeapons, _ = GUI:Checkbox("Give All Weapons", b_BodyguardAllWeapons)
+	b_BodyguardAllWeapons, _ = GUI:CustomToggle("Give All Weapons", b_BodyguardAllWeapons)
 
 	ImGui.Separator()
 
@@ -1092,7 +1092,7 @@ local function DrawHeliService()
 		ImGui.Separator()
 		ImGui.Dummy(1, 5)
 
-		b_HeliGodMode, _ = GUI:Checkbox("God Mode", b_HeliGodMode)
+		b_HeliGodMode, _ = GUI:CustomToggle("God Mode", b_HeliGodMode)
 
 		ImGui.SameLine()
 
@@ -1285,7 +1285,7 @@ local function DrawHeliService()
 						or "RADIO_22_DLC_BATTLE_MIX1_RADIO"
 					)
 					heli.radio.isOn = AUDIO.IS_VEHICLE_RADIO_ON(heli:GetHandle())
-					heli.radio.stationName = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+					heli.radio.stationName = Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 				end)
 			end
 
@@ -1550,7 +1550,7 @@ local function DrawJetService()
 						or "RADIO_22_DLC_BATTLE_MIX1_RADIO"
 					)
 					jet.radio.isOn = AUDIO.IS_VEHICLE_RADIO_ON(jet:GetHandle())
-					jet.radio.stationName = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+					jet.radio.stationName = Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 				end)
 			end
 

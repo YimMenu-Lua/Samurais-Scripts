@@ -190,8 +190,11 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 		)
 	end
 
-	local accent = Color(0, 0, 0, 60):AsU32()
-	local bg = selected and Color(95, 95, 95, 255):AsU32() or Color(100, 100, 100, 255):AsU32()
+	local accent       = Color(0, 0, 0, 60):AsU32()
+	local bg           = selected and Color(95, 95, 95, 255):AsU32() or Color(100, 100, 100, 255):AsU32()
+	local textW, textH = ImGui.CalcTextSize(label)
+	local padding      = 8
+	local textX
 
 	if (hovered) then
 		bg = Color(105, 105, 105, 255):AsU32()
@@ -221,11 +224,21 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 			bg,
 			8.0
 		)
-	end
+	else
+		local diff = (size.x - textW) * 0.5
+		if (diff < 0) then
+			diff = 0
+		end
 
-	local textW, textH = ImGui.CalcTextSize(label)
-	local padding = 8
-	local textX
+		ImGui.ImDrawListAddLine(
+			drawList,
+			pos.x + diff,
+			max.y,
+			pos.x + size.x - diff,
+			max.y,
+			bg
+		)
+	end
 
 	if (align == "left") then
 		textX = pos.x + padding

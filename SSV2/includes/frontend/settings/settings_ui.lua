@@ -31,7 +31,7 @@ local function OnConfigReset()
 end
 
 local settings_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_SETTINGS, "GENERIC_GENERAL_LABEL", function()
-	GVars.backend.auto_cleanup_entities = GUI:Checkbox(_T("SETTINGS_ENTITY_REPLACE"),
+	GVars.backend.auto_cleanup_entities = GUI:CustomToggle(_T("SETTINGS_ENTITY_REPLACE"),
 		GVars.backend.auto_cleanup_entities
 	)
 	GUI:Tooltip(_T("SETTINGS_ENTITY_REPLACE_TT"))
@@ -105,13 +105,13 @@ end, nil, true)
 local function DrawGuiSettings()
 	ImGui.SeparatorText(_T("GENERIC_GENERAL_LABEL"))
 
-	GVars.ui.disable_tooltips = GUI:Checkbox(_T("SETTINGS_TOOLTIPS"), GVars.ui.disable_tooltips)
+	GVars.ui.disable_tooltips = GUI:CustomToggle(_T("SETTINGS_TOOLTIPS"), GVars.ui.disable_tooltips)
 
 	ImGui.SameLine()
-	GVars.ui.disable_sound_feedback = GUI:Checkbox(_T("SETTINGS_UI_SOUND"), GVars.ui.disable_sound_feedback)
+	GVars.ui.disable_sound_feedback = GUI:CustomToggle(_T("SETTINGS_UI_SOUND"), GVars.ui.disable_sound_feedback)
 
 	ImGui.SeparatorText(_T("SETTING_WINDOW_GEOMETRY"))
-	GVars.ui.moveable, _ = GUI:Checkbox(_T("SETTING_WINDOW_MOVEABLE"), GVars.ui.moveable,
+	GVars.ui.moveable, _ = GUI:CustomToggle(_T("SETTING_WINDOW_MOVEABLE"), GVars.ui.moveable,
 		{ tooltip = _T("SETTING_WINDOW_MOVEABLE_TT") })
 
 	if (GVars.ui.moveable) then

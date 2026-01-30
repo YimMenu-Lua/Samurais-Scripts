@@ -108,7 +108,7 @@ local function driftOptions()
 	ImGui.EndDisabled()
 	GUI:HelpMarker(_T("VEH_DRIFT_MODE_INTENSITY_TT"))
 
-	GVars.features.vehicle.drift.smoke_fx.enabled = GUI:Checkbox(_T("VEH_DRIFT_SMOKE"),
+	GVars.features.vehicle.drift.smoke_fx.enabled = GUI:CustomToggle(_T("VEH_DRIFT_SMOKE"),
 		GVars.features.vehicle.drift.smoke_fx.enabled,
 		{
 			tooltip = _T("VEH_DRIFT_SMOKE_TT"),
@@ -128,7 +128,7 @@ local function driftOptions()
 end
 
 local function driftMinigameOptions()
-	GVars.features.vehicle.drift_minigame.score_sound, _ = GUI:Checkbox(_T("VEH_DRIFT_MINIGAME_SOUND_OPT"),
+	GVars.features.vehicle.drift_minigame.score_sound, _ = GUI:CustomToggle(_T("VEH_DRIFT_MINIGAME_SOUND_OPT"),
 		GVars.features.vehicle.drift_minigame.score_sound,
 		{ tooltip = _T("VEH_DRIFT_MINIGAME_SOUND_OPT_TT") }
 	)
@@ -142,15 +142,15 @@ end
 local function nosOptions()
 	GVars.features.vehicle.nos.power, _ = ImGui.SliderInt(_T("VEH_POWER_GAIN"), GVars.features.vehicle.nos.power, 10, 100)
 
-	GVars.features.vehicle.nos.screen_effect, _ = GUI:Checkbox(_T("VEH_NOS_SCREEN_FX"),
+	GVars.features.vehicle.nos.screen_effect, _ = GUI:CustomToggle(_T("VEH_NOS_SCREEN_FX"),
 		GVars.features.vehicle.nos.screen_effect
 	)
 
-	GVars.features.vehicle.nos.sound_effect, _ = GUI:Checkbox(_T("VEH_NOS_SOUND_FX"),
+	GVars.features.vehicle.nos.sound_effect, _ = GUI:CustomToggle(_T("VEH_NOS_SOUND_FX"),
 		GVars.features.vehicle.nos.sound_effect
 	)
 
-	GVars.features.vehicle.nos.can_damage_engine, _ = GUI:Checkbox(_T("VEH_NOS_DAMAGE_CB"),
+	GVars.features.vehicle.nos.can_damage_engine, _ = GUI:CustomToggle(_T("VEH_NOS_DAMAGE_CB"),
 		GVars.features.vehicle.nos.can_damage_engine,
 		{ tooltip = _T("VEH_NOS_DAMAGE_TT") }
 	)
@@ -444,7 +444,7 @@ vehicleTab:RegisterGUI(function()
 	ImGui.Spacing()
 	ImGui.SeparatorText("Settings")
 
-	GVars.features.vehicle.performance_only, _ = GUI:Checkbox("Performance Cars Only",
+	GVars.features.vehicle.performance_only, _ = GUI:CustomToggle("Performance Cars Only",
 		GVars.features.vehicle.performance_only,
 		{ tooltip = "Limits some features to performance cars only (Launch Control, Pops & Bangs, etc.)" }
 	)

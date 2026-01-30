@@ -643,15 +643,15 @@ local function DrawAnimOptions()
 				ImGui.SetNextWindowBgAlpha(0)
 				ImGui.BeginChild("##flagsChild", 500, 400)
 				ImGui.SeparatorText(_T("GENERIC_GENERAL_LABEL"))
-				GVars.features.yim_actions.disable_props, _ = GUI:Checkbox(_T("YAV3_DISABLE_PROPS"),
+				GVars.features.yim_actions.disable_props, _ = GUI:CustomToggle(_T("YAV3_DISABLE_PROPS"),
 					GVars.features.yim_actions.disable_props
 				)
 
-				GVars.features.yim_actions.disable_ptfx, _ = GUI:Checkbox(_T("YAV3_DISABLE_PTFX"),
+				GVars.features.yim_actions.disable_ptfx, _ = GUI:CustomToggle(_T("YAV3_DISABLE_PTFX"),
 					GVars.features.yim_actions.disable_ptfx
 				)
 
-				GVars.features.yim_actions.disable_sfx, _ = GUI:Checkbox(_T("YAV3_DISABLE_SFX"),
+				GVars.features.yim_actions.disable_sfx, _ = GUI:CustomToggle(_T("YAV3_DISABLE_SFX"),
 					GVars.features.yim_actions.disable_sfx
 				)
 
@@ -1337,15 +1337,15 @@ local function DrawPedSpawnWindow()
 
 		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
 
-		b_SpawnInvincible, _ = GUI:Checkbox("Spawn Invincible", b_SpawnInvincible)
+		b_SpawnInvincible, _ = GUI:CustomToggle("Spawn Invincible", b_SpawnInvincible)
 
 		ImGui.SameLine()
 
-		b_SpawnArmed, _ = GUI:Checkbox("Spawn Armed", b_SpawnArmed)
+		b_SpawnArmed, _ = GUI:CustomToggle("Spawn Armed", b_SpawnArmed)
 
 		ImGui.SameLine()
 
-		b_PreviewPeds, _ = GUI:Checkbox("Preview", b_PreviewPeds)
+		b_PreviewPeds, _ = GUI:CustomToggle("Preview", b_PreviewPeds)
 
 		ImGui.Spacing()
 
@@ -1372,7 +1372,7 @@ local function DrawPedSpawnWindow()
 		ImGui.Spacing()
 		ImGui.SameLine()
 
-		GVars.features.yim_actions.auto_close_ped_window, _ = GUI:Checkbox(
+		GVars.features.yim_actions.auto_close_ped_window, _ = GUI:CustomToggle(
 			"Auto-Close Window",
 			GVars.features.yim_actions.auto_close_ped_window
 		)

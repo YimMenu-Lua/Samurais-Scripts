@@ -16,6 +16,7 @@ local SGSL            = require("includes.services.SGSL")
 ---@field vpu integer Base Value Per Unit
 ---@field vpu_mult_1 integer Value Per Unit with equipment upgrade
 ---@field vpu_mult_2 integer Value Per Unit with staff upgrade
+---@field normalized_name? string
 ---@field coords? vec3
 
 -- Class representing a business that turns materials into product.
@@ -24,6 +25,7 @@ local SGSL            = require("includes.services.SGSL")
 ---@class BikerBusiness : BusinessBase
 ---@field private m_id integer
 ---@field private m_name string
+---@field private m_normalized_name? string
 ---@field private m_coords vec3
 ---@field private m_max_units integer
 ---@field private m_vpu integer
@@ -41,6 +43,7 @@ function BikerBusiness.new(opts)
 
 	local base                 = BusinessBase.new(opts)
 	local instance             = setmetatable(base, BikerBusiness)
+	instance.m_normalized_name = opts.normalized_name
 	instance.fast_prod_enabled = false
 	instance.fast_prod_running = false
 
@@ -59,6 +62,11 @@ function BikerBusiness:Reset()
 	self.fast_prod_enabled = false
 	self.fast_prod_running = false
 	self:ResetImpl()
+end
+
+---@return string?
+function BikerBusiness:GetNormalizedName()
+	return self.m_normalized_name
 end
 
 ---@return integer

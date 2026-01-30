@@ -67,7 +67,7 @@ function Vehicle:GetManufacturerName()
 		return ""
 	end
 
-	return HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(self:GetModelHash()))
+	return Game.GetGXTLabel(VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(self:GetModelHash()))
 end
 
 ---@return number
@@ -166,7 +166,7 @@ function Vehicle:GetRadioStationName()
 		return "OFF"
 	end
 
-	return HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+	return Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 end
 
 ---@return boolean

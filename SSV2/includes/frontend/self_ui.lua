@@ -196,7 +196,7 @@ local function SelfUI()
 	end
 
 	if (GVars.features.self.rod or GVars.features.self.clumsy) then
-		GVars.features.self.ragdoll_sound, _ = GUI:Checkbox(_T("SELF_RAGDOLL_SOUND"),
+		GVars.features.self.ragdoll_sound, _ = GUI:CustomToggle(_T("SELF_RAGDOLL_SOUND"),
 			GVars.features.self.ragdoll_sound,
 			{ tooltip = _T("SELF_RAGDOLL_SOUND_TT") }
 		)

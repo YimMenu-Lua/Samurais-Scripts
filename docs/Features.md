@@ -26,7 +26,6 @@ SSV2 includes polished versions of your favorite features from previous versions
       <ul>
         <li><a href="#yimresupplierv3">YimResupplierV3</a></li>
         <li><a href="#casinopacino">CasinoPacino</a></li>
-        <li><a href="#salvageyard">SalvageYard</a></li>
       </ul>
     </li>
     <li>
@@ -351,15 +350,11 @@ _Usage:_ Sit in the driver's seat of a flatbed truck then approach any vehicle a
 
 ### YimResupplierV3
 
-A business manager that supports auto-fill and auto-sell for several businesses, offers instant production triggers for biker businesses, bunker, and acid lab, controls some job cooldowns, and integrates with CommandExecutor.
+A business manager that supports auto-fill and auto-sell for several businesses, offers instant production triggers for biker businesses, bunker, acid lab, nightclub controls some job cooldowns, and integrates with CommandExecutor.
 
 ### CasinoPacino
 
 An updated and slightly refactored version of [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino).
-
-### SalvageYard
-
-A script focused on the Chop Shop business. Added by [szalikdev](https://github.com/szalikdev).
 
 ## Extra
 

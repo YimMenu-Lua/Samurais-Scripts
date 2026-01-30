@@ -11,6 +11,10 @@ local SGSL                       = require("includes.services.SGSL")
 local Warehouse                  = require("includes.modules.businesses.Warehouse")
 local BikerBusiness              = require("includes.modules.businesses.BikerBusiness")
 local Nightclub                  = require("includes.modules.businesses.Nightclub")
+local Clubhouse                  = require("includes.modules.businesses.Clubhouse")
+local CashSafe                   = require("includes.modules.businesses.CashSafe")
+local CarWash                    = require("includes.modules.businesses.CarWash")
+local SalvageYard                = require("includes.modules.businesses.SalvageYard")
 
 local ScriptDisplayNames <const> = {
 	["fm_content_smuggler_sell"] = "Hangar (Land. Not supported.)",
@@ -52,13 +56,14 @@ Enums.eYRState                   = {
 
 ---@class YRV3Businesses
 ---@field warehouses Warehouse[]
----@field biker_businesses BikerBusiness[]
----@field safes dict<CashSafe>
+---@field safes array<CashSafe>
+---@field clubhouse? Clubhouse
 ---@field hangar? Warehouse
 ---@field bunker? BikerBusiness
 ---@field acid_lab? BikerBusiness
 ---@field nightclub? Nightclub
----@field money_fronts? dict<MoneyFrontsBusiness>
+---@field car_wash? CarWash
+---@field salvage_yard? SalvageYard
 
 ---@class YRV3
 ---@field private m_last_error string
@@ -101,10 +106,8 @@ function YRV3:init()
 	self.m_sell_script_disp_name  = "None"
 	self.m_last_error             = ""
 	self.m_businesses             = {
-		warehouses       = {},
-		biker_businesses = {},
-		safes            = self.m_raw_data.BS_Default,
-		money_fronts     = self.m_raw_data.MF_Default,
+		warehouses = {},
+		safes      = {},
 	}
 
 
@@ -132,10 +135,8 @@ function YRV3:Reset()
 	self.m_last_as_check_time     = 0
 	self.m_last_income_check_time = 0
 	self.m_businesses             = {
-		warehouses       = {},
-		biker_businesses = {},
-		safes            = self.m_raw_data.BS_Default,
-		money_fronts     = self.m_raw_data.MF_Default,
+		warehouses = {},
+		safes      = {},
 	}
 	self.m_has_triggered_autosell = false
 	self.m_sell_script_running    = false
@@ -214,9 +215,9 @@ function YRV3:GetHangar()
 	return self.m_businesses.hangar
 end
 
----@return array<BikerBusiness>
-function YRV3:GetBikerBusinesses()
-	return self.m_businesses.biker_businesses
+---@return Clubhouse
+function YRV3:GetClubhouse()
+	return self.m_businesses.clubhouse
 end
 
 ---@return Nightclub
@@ -224,14 +225,14 @@ function YRV3:GetNightclub()
 	return self.m_businesses.nightclub
 end
 
----@return dict<CashSafe>
+---@return array<CashSafe>
 function YRV3:GetBusinessSafes()
 	return self.m_businesses.safes
 end
 
----@return dict<MoneyFrontsBusiness>
-function YRV3:GetMoneyFrontsBusiness()
-	return self.m_businesses.money_fronts
+---@return CarWash
+function YRV3:GetCarWash()
+	return self.m_businesses.car_wash
 end
 
 ---@return BikerBusiness?
@@ -242,6 +243,11 @@ end
 ---@return BikerBusiness?
 function YRV3:GetAcidLab()
 	return self.m_businesses.acid_lab
+end
+
+---@return SalvageYard
+function YRV3:GetSalvageYard()
+	return self.m_businesses.salvage_yard
 end
 
 ---@return table
@@ -293,35 +299,38 @@ function YRV3:DoesPlayerOwnAnyBikerBusiness()
 	return false
 end
 
-function YRV3:PopulateBikerBusinesses()
-	for i = 0, 4 do
-		local property_index = (stats.get_int(_F("MPX_FACTORYSLOT%d", i)))
-		local ref = self.m_raw_data.BikerBusinesses[property_index]
-		if (not ref) then
-			goto continue
-		end
-
-		local ref2 = self.m_raw_data.BikerTunables[ref.id]
-		if (not ref2) then
-			goto continue
-		end
-
-		local has_eq_upgrade    = stats.get_int(_F("MPX_FACTORYUPGRADES%d", i)) == 1
-		local has_staff_upgrade = stats.get_int(_F("MPX_FACTORYUPGRADES%d_1", i)) == 1
-		local eq_upg_mult       = tunables.get_int(ref2.mult_1)
-		local stf_upg_mult      = tunables.get_int(ref2.mult_2)
-		table.insert(self.m_businesses.biker_businesses, BikerBusiness.new({
-			id         = i,
-			name       = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(ref.gxt),
-			max_units  = ref2.max_units,
-			vpu        = tunables.get_int(ref2.vpu),
-			vpu_mult_1 = has_eq_upgrade and eq_upg_mult or 0,
-			vpu_mult_2 = has_staff_upgrade and stf_upg_mult or 0,
-			coords     = ref.coords,
-		}))
-
-		::continue::
+function YRV3:PopulateClubhouse()
+	local club_prop = stats.get_int("MPX_PROP_CLUBHOUSE")
+	if (club_prop == 0) then
+		return
 	end
+
+	local idx = club_prop - 90
+	local club_ref = self.m_raw_data.Clubhouses[idx]
+	if (not club_ref) then
+		return
+	end
+
+	local safe_data = self.m_raw_data.CashSafes.fronts.clubhouse
+	safe_data.name = "Clubhouse Duffle Bag"
+	self.m_businesses.clubhouse = Clubhouse.new({
+		id        = idx,
+		name      = Game.GetGXTLabel(club_ref.gxt),
+		coords    = club_ref.coords,
+		safe_data = safe_data
+	})
+
+	if (not self.m_businesses.clubhouse) then
+		return
+	end
+
+	for i = 0, 4 do
+		self.m_businesses.clubhouse:AddSubBusiness(i)
+	end
+end
+
+function YRV3:PopulateBikerBusinesses()
+	self:PopulateClubhouse()
 
 	if (not self.m_businesses.bunker) then
 		local idx = stats.get_int("MPX_PROP_FAC_SLOT5")
@@ -336,7 +345,7 @@ function YRV3:PopulateBikerBusinesses()
 
 			self.m_businesses.bunker = BikerBusiness.new({
 				id         = 5,
-				name       = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_BUNKER_%d", gxt_idx)),
+				name       = Game.GetGXTLabel(_F("MP_BUNKER_%d", gxt_idx)),
 				coords     = ref and ref.coords or vec3:zero(),
 				vpu_mult_1 = has_eq_upgrade and eq_upg_mult or 0,
 				vpu_mult_2 = has_staff_upgrade and stf_upg_mult or 0,
@@ -347,13 +356,13 @@ function YRV3:PopulateBikerBusinesses()
 	end
 
 	if (not self.m_businesses.acid_lab and stats.get_int("MPX_XM22_LAB_OWNED") ~= 0) then
-		local has_eq_upgrade       = (stats.get_int("MPX_AWD_CALLME") >= 10)
+		local has_eq_upgrade       = (stats.get_int("MPX_AWD_CALLME") >= tunables.get_int("ACID_LAB_UPGRADE_EQUIPMENT_NUM_MISSIONS_UNLOCK"))
 			and (stats.get_int("MPX_XM22_LAB_EQUIP_UPGRADED") == 1)
 		local eq_upg_mult          = tunables.get_int("BIKER_ACID_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
 
 		self.m_businesses.acid_lab = BikerBusiness.new({
 			id         = 6,
-			name       = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION("MP_BWH_ACID"),
+			name       = Game.GetGXTLabel("MP_BWH_ACID"),
 			vpu_mult_1 = has_eq_upgrade and eq_upg_mult or 0,
 			vpu_mult_2 = 0,
 			vpu        = tunables.get_int("BIKER_ACID_PRODUCT_VALUE"),
@@ -375,7 +384,7 @@ function YRV3:PopulateWarehouses()
 			id        = i,
 			size      = ref.size,
 			max_units = ref.max,
-			name      = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_WHOUSE_%d", property_index - 1)),
+			name      = Game.GetGXTLabel(_F("MP_WHOUSE_%d", property_index - 1)),
 			coords    = ref.coords,
 		}, Enums.eWarehouseType.SPECIAL_CARGO))
 
@@ -394,7 +403,7 @@ function YRV3:PopulateWarehouses()
 
 	self.m_businesses.hangar = Warehouse.new({
 		id        = -1,
-		name      = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_HANGAR_%d", property_index)),
+		name      = Game.GetGXTLabel(_F("MP_HANGAR_%d", property_index)),
 		coords    = ref.coords,
 		max_units = 50,
 	}, Enums.eWarehouseType.HANGAR)
@@ -412,12 +421,14 @@ function YRV3:PopulateNightclub()
 			return
 		end
 
+		local safedata = self.m_raw_data.CashSafes.fronts.nightclub
+		safedata.name = "Nightclub Safe"
 		self.m_businesses.nightclub = Nightclub.new({
 			id          = nc_index,
-			name        = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(_F("MP_NCLU_%d", nc_index)),
+			name        = Game.GetGXTLabel(_F("MP_NCLU_%d", nc_index)),
 			custom_name = NightclubNames[stats.get_int("MPX_PROP_NIGHTCLUB_NAME_ID") + 1],
-			max_cash    = 25e4,
-			coords      = ref.coords
+			coords      = ref.coords,
+			safe_data   = safedata
 		})
 
 		while (not self.m_initial_data_done) do
@@ -438,17 +449,19 @@ function YRV3:PopulateNightclub()
 		end
 
 		if (owns_cargo) then
-			self.m_businesses.nightclub:SetupBusinessHub(0, self.m_raw_data.BusinessHubs)
+			self.m_businesses.nightclub:AddSubBusiness(0)
 		end
 
 		if (self.m_businesses.bunker) then
-			self.m_businesses.nightclub:SetupBusinessHub(1, self.m_raw_data.BusinessHubs)
+			self.m_businesses.nightclub:AddSubBusiness(1)
 		end
 
-		for _, bb in ipairs(self.m_businesses.biker_businesses) do
-			if (bb:IsValid()) then
-				local index = bb:GetIndex()
-				self.m_businesses.nightclub:SetupBusinessHub(index + 2, self.m_raw_data.BusinessHubs)
+		if (self.m_businesses.clubhouse) then
+			for _, bb in ipairs(self.m_businesses.clubhouse:GetSubBusinesses()) do
+				if (bb:IsValid()) then
+					local index = bb:GetIndex()
+					self.m_businesses.nightclub:AddSubBusiness(index + 2)
+				end
 			end
 		end
 
@@ -461,6 +474,60 @@ function YRV3:PopulateNightclub()
 	end)
 end
 
+function YRV3:PopulateCarWash()
+	if (stats.get_int("MPX_SB_CAR_WASH_OWNED") == 0) then
+		return
+	end
+
+	self.m_businesses.car_wash = CarWash.new({
+		name   = Game.GetGXTLabel("CELL_CWAS"),
+		coords = vec3:new(25.645266, -1412.290649, 29.362230)
+	})
+end
+
+function YRV3:PopulateCashSafes()
+	for i, data in ipairs(self.m_raw_data.CashSafes.regular) do
+		local property_index = stats.get_int(data.property_stat)
+		if (property_index == 0) then
+			goto continue
+		end
+
+		local entry                = self.m_raw_data[data.raw_data_entry][property_index]
+		local name                 = entry and Game.GetGXTLabel(entry.gxt) or "NULL"
+		local coords               = entry and entry.coords or nil
+		self.m_businesses.safes[i] = CashSafe.new({
+			name            = name,
+			coords          = coords,
+			cash_value_stat = data.cash_value_stat,
+			get_max_cash    = data.get_max_cash,
+		})
+
+		::continue::
+	end
+end
+
+function YRV3:PopulateSalvageYard()
+	local property_index = stats.get_int("MPX_SALVAGE_YARD_OWNED")
+	if (property_index == 0) then
+		return
+	end
+
+	local ref                      = self.m_raw_data.SalvageYards[property_index]
+	local name                     = ref and Game.GetGXTLabel(ref.gxt) or _T("SY_SALVAGE_YARD")
+	local safe_data                = self.m_raw_data.CashSafes.fronts.salvage_yard
+	safe_data.name                 = name
+	self.m_businesses.salvage_yard = SalvageYard.new({
+		id        = property_index,
+		name      = name,
+		coords    = ref and ref.coords or nil,
+		safe_data = safe_data
+	})
+
+	if (self.m_businesses.salvage_yard and GVars.features.yrv3.sy_always_max_income) then
+		self.m_businesses.salvage_yard:LockIncomeDecay()
+	end
+end
+
 function YRV3:PreInit()
 	if (self.m_initial_data_done or self.m_data_initialized) then
 		return
@@ -469,6 +536,9 @@ function YRV3:PreInit()
 	ThreadManager:Run(function()
 		self:PopulateBikerBusinesses()
 		self:PopulateWarehouses()
+		self:PopulateCarWash()
+		self:PopulateCashSafes()
+		self:PopulateSalvageYard()
 		self.m_initial_data_done = true
 	end)
 end
@@ -594,7 +664,7 @@ function YRV3:FillAll()
 		sleep(math.random(100, 300))
 	end
 
-	for _, bb in ipairs(self.m_businesses.biker_businesses) do
+	for _, bb in ipairs(self.m_businesses.clubhouse:GetSubBusinesses()) do
 		if (bb:IsValid()) then
 			bb:ReStock()
 		end
@@ -858,7 +928,7 @@ function YRV3:MCT()
 end
 
 function YRV3:AutoProduceHandler()
-	for _, bb in ipairs(self.m_businesses.biker_businesses) do
+	for _, bb in ipairs(self.m_businesses.clubhouse:GetSubBusinesses()) do
 		if (bb.fast_prod_enabled and not bb.fast_prod_running) then
 			bb:LoopProduction()
 		end
@@ -882,7 +952,7 @@ function YRV3:AutoProduceHandler()
 		return
 	end
 
-	local hubs = self.m_businesses.nightclub:GetBusinessHubs()
+	local hubs = self.m_businesses.nightclub:GetSubBusinesses()
 	if (not hubs) then
 		return
 	end
@@ -899,13 +969,13 @@ function YRV3:AutoFillHandler()
 	self:WarehouseAutofill()
 end
 
----@param business BusinessBase
-local function getBusinessVal(business)
+---@param business BusinessBase|BasicBusiness
+local function getBusinessIncome(business)
 	if (not business or not business:IsValid()) then
 		return 0
 	end
 
-	return business:GetEstimatedValue()
+	return business:GetEstimatedIncome()
 end
 
 function YRV3:CalculateEstimatedIncome()
@@ -913,37 +983,27 @@ function YRV3:CalculateEstimatedIncome()
 		return
 	end
 
-	if (Time.millis() - self.m_last_income_check_time < 500) then
+	if (Time.millis() - self.m_last_income_check_time < 1200) then
 		return
 	end
 
 	local businesses = self.m_businesses
 	local warehouses = businesses.warehouses
-	local biker      = businesses.biker_businesses
 
-	self.m_total_sum = getBusinessVal(businesses.hangar)
-		+ getBusinessVal(businesses.bunker)
-		+ getBusinessVal(businesses.acid_lab)
-		+ getBusinessVal(businesses.nightclub)
+	self.m_total_sum = getBusinessIncome(businesses.hangar)
+		+ getBusinessIncome(businesses.bunker)
+		+ getBusinessIncome(businesses.acid_lab)
+		+ getBusinessIncome(businesses.nightclub)
+		+ getBusinessIncome(businesses.clubhouse)
+		+ getBusinessIncome(businesses.car_wash)
+		+ getBusinessIncome(businesses.salvage_yard)
 
 	for _, wh in ipairs(warehouses) do
-		self.m_total_sum = self.m_total_sum + getBusinessVal(wh)
+		self.m_total_sum = self.m_total_sum + getBusinessIncome(wh)
 	end
 
-	for _, bb in ipairs(biker) do
-		self.m_total_sum = self.m_total_sum + getBusinessVal(bb)
-	end
-
-	for _, safe in pairs(businesses.safes) do
-		if (safe.cash_value) then
-			self.m_total_sum = self.m_total_sum + safe.cash_value()
-		end
-	end
-
-	for _, mf in pairs(businesses.money_fronts) do
-		if (mf.cash_value) then
-			self.m_total_sum = self.m_total_sum + mf.cash_value()
-		end
+	for _, safe in ipairs(businesses.safes) do
+		self.m_total_sum = self.m_total_sum + safe:GetCashValue()
 	end
 
 	self.m_last_income_check_time = Time.millis()
