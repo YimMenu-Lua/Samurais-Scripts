@@ -1253,6 +1253,11 @@ function Game.LoadGroundAtCoord(coords)
 	return true
 end
 
+---@param label string
+function Game.GetGXTLabel(label)
+	return HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(label or "")
+end
+
 ---@param weaponHash hash
 ---@param startPos vec3
 ---@param endPos vec3

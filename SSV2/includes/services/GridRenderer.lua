@@ -262,7 +262,7 @@ function GridRenderer:Draw()
 		local config_value = table.get_nested_key(global_table, item.gvar)
 		if (item.item_type:lower() == "checkbox") then
 			config_value = config_value or false
-			config_value, result = GUI:Checkbox(label, config_value, { tooltip = tooltip })
+			config_value, result = GUI:CustomToggle(label, config_value, { tooltip = tooltip })
 			if (result) then
 				table.set_nested_key(global_table, item.gvar, config_value)
 			end

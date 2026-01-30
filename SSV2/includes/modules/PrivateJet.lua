@@ -158,7 +158,7 @@ function PrivateJet.spawn(model, airportData)
 			},
 			radio = {
 				isOn = true,
-				stationName = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+				stationName = Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 			},
 			wasDismissed = false,
 			task = Enums.eVehicleTask.NONE,
@@ -647,7 +647,7 @@ function PrivateJet:StateEval()
 	if self:IsPlayerInJet() then
 		self.radio.isOn = AUDIO.IS_VEHICLE_RADIO_ON(self.m_handle)
 		self.radio.stationName = self.radio.isOn
-			and HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+			and Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 			or "Off"
 	end
 

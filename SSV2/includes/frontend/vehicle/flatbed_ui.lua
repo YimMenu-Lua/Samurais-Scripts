@@ -43,15 +43,15 @@ flatbed_tab:RegisterGUI(function()
 	ImGui.BulletText(Flatbed.displayText)
 	ImGui.Dummy(1, 10)
 
-	GVars.features.flatbed.show_towing_position, _ = GUI:Checkbox(_T("FLTBD_SHOW_TOWPOS_CB"),
+	GVars.features.flatbed.show_towing_position, _ = GUI:CustomToggle(_T("FLTBD_SHOW_TOWPOS_CB"),
 		GVars.features.flatbed.show_towing_position
 	)
 	GUI:HelpMarker(_T("FLTBD_SHOW_TOWPOS_TT"))
 
-	GVars.features.flatbed.show_esp, _ = GUI:Checkbox(_T("FLTBD_SHOW_TOWBOX_CB"), GVars.features.flatbed.show_esp)
+	GVars.features.flatbed.show_esp, _ = GUI:CustomToggle(_T("FLTBD_SHOW_TOWBOX_CB"), GVars.features.flatbed.show_esp)
 	GUI:HelpMarker(_T("FLTBD_SHOW_TOWBOX_TT"))
 
-	GVars.features.flatbed.tow_everything, _ = GUI:Checkbox(_T("FLTBD_TOW_ALL_CB"),
+	GVars.features.flatbed.tow_everything, _ = GUI:CustomToggle(_T("FLTBD_TOW_ALL_CB"),
 		GVars.features.flatbed.tow_everything
 	)
 	GUI:HelpMarker(_T("FLTBD_TOW_ALL_TT"))

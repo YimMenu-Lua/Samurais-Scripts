@@ -266,7 +266,7 @@ local function WorldUI()
 
 	ImGui.Spacing()
 
-	World.m_public_enemy.m_enabled, public_enemy_clicked = GUI:Checkbox(_T("WRLD_PUBLIC_ENEMY"),
+	World.m_public_enemy.m_enabled, public_enemy_clicked = GUI:CustomToggle(_T("WRLD_PUBLIC_ENEMY"),
 		World.m_public_enemy.m_enabled,
 		{ tooltip = _T("WRLD_PUBLIC_ENEMY_TT") }
 	)

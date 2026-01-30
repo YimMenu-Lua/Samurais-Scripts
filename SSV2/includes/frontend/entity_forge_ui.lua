@@ -657,7 +657,7 @@ local function DrawCreatorUI()
 		ImGui.TextWrapped("Movement is relative to the attachment bone.")
 		ImGui.Dummy(1, 10)
 		ImGui.BeginDisabled(not t_SelectedCanvasChild)
-		attachmentAxisWindow.should_draw, b_AxisWindow = GUI:Checkbox(
+		attachmentAxisWindow.should_draw, b_AxisWindow = GUI:CustomToggle(
 			"Axis Window",
 			attachmentAxisWindow.should_draw
 		)
@@ -1586,7 +1586,7 @@ local function EntityForgeUI()
 			ImGui.Dummy(1, 10)
 			ImGui.SeparatorText("Preferences")
 
-			previewSelectedEntity, _ = GUI:Checkbox("Preview", previewSelectedEntity)
+			previewSelectedEntity, _ = GUI:CustomToggle("Preview", previewSelectedEntity)
 
 			ImGui.SameLine()
 			ImGui.Spacing()

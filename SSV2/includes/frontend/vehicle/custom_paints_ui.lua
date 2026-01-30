@@ -195,7 +195,7 @@ local function CustomPaintsUI()
 	DisplayCustomPaints()
 	ImGui.Spacing()
 	ImGui.BeginDisabled(selected_paint == nil)
-	_, matteClicked = GUI:Checkbox(_T("VEH_PAINT_MATTE_CB"), selected_paint and selected_paint.m or false)
+	_, matteClicked = GUI:CustomToggle(_T("VEH_PAINT_MATTE_CB"), selected_paint and selected_paint.m or false)
 	GUI:Tooltip(_T("VEH_PAINT_MATTE_TT"))
 
 	if (matteClicked) then
@@ -203,10 +203,10 @@ local function CustomPaintsUI()
 	end
 	ImGui.Separator()
 
-	isPrimary, _ = GUI:Checkbox(_T("VEH_PAINT_PRIMARY_CB"), isPrimary)
+	isPrimary, _ = GUI:CustomToggle(_T("VEH_PAINT_PRIMARY_CB"), isPrimary)
 
 	ImGui.SameLine()
-	isSecondary, _ = GUI:Checkbox(_T("VEH_PAINT_SECONDARY_CB"), isSecondary)
+	isSecondary, _ = GUI:CustomToggle(_T("VEH_PAINT_SECONDARY_CB"), isSecondary)
 
 	local text_x = ImGui.CalcTextSize(_T("GENERIC_CONFIRM"))
 	if (GUI:Button(_T("GENERIC_CONFIRM"), { size = vec2:new(text_x + 20, 40) }) and selected_paint ~= nil) then

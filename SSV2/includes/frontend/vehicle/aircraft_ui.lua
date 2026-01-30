@@ -131,7 +131,7 @@ planes_tab:RegisterGUI(function()
 	ImGui.Spacing()
 	ImGui.SeparatorText(_T("GENERIC_SETTINGS_LABEL"))
 	if (GVars.features.vehicle.aircraft_mg.triggerbot) then
-		GVars.features.vehicle.aircraft_mg.enemies_only, _ = GUI:Checkbox(_T("VEH_MG_TRIGGERBOT_ENEMY"),
+		GVars.features.vehicle.aircraft_mg.enemies_only, _ = GUI:CustomToggle(_T("VEH_MG_TRIGGERBOT_ENEMY"),
 			GVars.features.vehicle.aircraft_mg.enemies_only,
 			{ tooltip = _T("VEH_MG_TRIGGERBOT_ENEMY_TT") }
 		)

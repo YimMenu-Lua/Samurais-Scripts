@@ -254,7 +254,7 @@ return function()
 	ImGui.EndDisabled()
 
 	ImGui.SameLine()
-	Stancer.m_bounce_mode.enabled, bounce_mode_clicked = GUI:Checkbox(_T("VEH_STANCE_BOUNCE_MODE"),
+	Stancer.m_bounce_mode.enabled, bounce_mode_clicked = GUI:CustomToggle(_T("VEH_STANCE_BOUNCE_MODE"),
 		Stancer.m_bounce_mode.enabled,
 		{ tooltip = _T("VEH_STANCE_BOUNCE_MODE_TT") }
 	)
@@ -288,7 +288,7 @@ return function()
 		end
 
 		ImGui.SameLine()
-		GVars.features.vehicle.stancer.auto_apply_saved, auto_apply_clicked = GUI:Checkbox(
+		GVars.features.vehicle.stancer.auto_apply_saved, auto_apply_clicked = GUI:CustomToggle(
 			_T("VEH_STANCE_AUTOAPPLY"),
 			GVars.features.vehicle.stancer.auto_apply_saved,
 			{ tooltip = _T("VEH_STANCE_AUTOAPPLY_TT") }

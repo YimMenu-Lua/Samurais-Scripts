@@ -12,7 +12,7 @@ local SGSL         = require("includes.services.SGSL")
 
 local function drawGamblingTab()
 	ImGui.SeparatorText(_T "CP_COOLDOWN_BYPASS")
-	GVars.features.dunk.bypass_casino_bans, _ = GUI:Checkbox(_T "CP_COOLDOWN_BYPASS_ENABLE",
+	GVars.features.dunk.bypass_casino_bans, _ = GUI:CustomToggle(_T "CP_COOLDOWN_BYPASS_ENABLE",
 		GVars.features.dunk.bypass_casino_bans, {
 			tooltip = _T "CP_COOLDOWN_BYPASS_TOOLTIP",
 			color = Color("#AA0000")
@@ -24,9 +24,9 @@ local function drawGamblingTab()
 	ImGui.Text(CasinoPacino:GetCooldownString())
 
 	ImGui.SeparatorText(_T "CP_POKER_SETTINGS")
-	GVars.features.dunk.force_poker_cards, _ = GUI:Checkbox(_T "CP_POKER_FORCE_ROYAL_FLUSH",
+	GVars.features.dunk.force_poker_cards, _ = GUI:CustomToggle(_T "CP_POKER_FORCE_ROYAL_FLUSH",
 		GVars.features.dunk.force_poker_cards)
-	GVars.features.dunk.set_dealers_poker_cards, _ = GUI:Checkbox(_T "CP_POKER_FORCE_BAD_BEAT",
+	GVars.features.dunk.set_dealers_poker_cards, _ = GUI:CustomToggle(_T "CP_POKER_FORCE_BAD_BEAT",
 		GVars.features.dunk.set_dealers_poker_cards)
 
 	ImGui.SeparatorText(_T "CP_BLACKJACK_SETTINGS")
@@ -38,21 +38,21 @@ local function drawGamblingTab()
 	end
 
 	ImGui.SeparatorText(_T "CP_ROULETTE_SETTINGS")
-	GVars.features.dunk.force_roulette_wheel, _ = GUI:Checkbox(_T("CP_ROULETTE_FORCE_RED_18"),
+	GVars.features.dunk.force_roulette_wheel, _ = GUI:CustomToggle(_T("CP_ROULETTE_FORCE_RED_18"),
 		GVars.features.dunk.force_roulette_wheel
 	)
 
 	ImGui.SeparatorText(_T "CP_SLOT_MACHINES_SETTINGS")
-	GVars.features.dunk.rig_slot_machine, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_RIG"),
+	GVars.features.dunk.rig_slot_machine, _ = GUI:CustomToggle(_T("CP_SLOT_MACHINES_RIG"),
 		GVars.features.dunk.rig_slot_machine
 	)
 
-	GVars.features.dunk.autoplay_slots, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_AUTOPLAY"),
+	GVars.features.dunk.autoplay_slots, _ = GUI:CustomToggle(_T("CP_SLOT_MACHINES_AUTOPLAY"),
 		GVars.features.dunk.autoplay_slots
 	)
 
 	if (GVars.features.dunk.autoplay_slots) then
-		GVars.features.dunk.cap_slot_machine_chips, _ = GUI:Checkbox(_T("CP_SLOT_MACHINES_CAP_CHIPS"),
+		GVars.features.dunk.cap_slot_machine_chips, _ = GUI:CustomToggle(_T("CP_SLOT_MACHINES_CAP_CHIPS"),
 			GVars.features.dunk.cap_slot_machine_chips
 		)
 
@@ -80,7 +80,7 @@ local function drawGamblingTab()
 			ImGui.SameLine()
 		end
 
-		GVars.features.dunk.autoplay_slots_delay_random, _ = GUI:Checkbox(_T("GENERIC_RANDOM"),
+		GVars.features.dunk.autoplay_slots_delay_random, _ = GUI:CustomToggle(_T("GENERIC_RANDOM"),
 			GVars.features.dunk.autoplay_slots_delay_random
 		)
 	end

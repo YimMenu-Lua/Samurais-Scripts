@@ -297,6 +297,9 @@ local Config <const> = {
 			helitours_legal_work_cd = false,
 			helitours_illegal_work_cd = false,
 			nc_always_popular = false,
+			sy_always_max_income = false,
+			sy_disable_rob_cd = false,
+			sy_disable_rob_weekly_cd = false,
 		},
 		bsv2 = {
 			escort_groups = {

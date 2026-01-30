@@ -9,201 +9,8 @@
 
 local SGSL = require("includes.services.SGSL")
 
--- A table pretending to be an object
----@class CashSafe
----@field is_owned fun(): bool
----@field cash_value fun(): integer
----@field max_cash integer
----@field blip integer
----@field get_special_val? fun(): integer
----@field set_special_val? fun()
-
--- A table pretending to be an object
----@class MoneyFrontsBusiness : CashSafe
----@field cash_value? fun(): integer
----@field duffel_total? fun(): integer
----@field dirty_cash? fun(): integer
----@field blip? integer
----@field max_cash? integer
----@field max_heat integer
----@field gvar_key_1 string
----@field gvar_key_2 string
----@field cb1_clicked boolean
----@field cb2_clicked boolean
----@field on_cb1_click fun(this: YRV3, newVal: boolean)
----@field on_cb2_click fun(this: YRV3, newVal: boolean)
----@field coords vec3
-
 ---@class RawBusinessData
 local RawBusinessData <const> = {
-	---@type dict<CashSafe>
-	BS_Default = {
-		["Arcade"] = {
-			is_owned = function()
-				return stats.get_int("MPX_ARCADE_OWNED") ~= 0
-			end,
-			cash_value = function()
-				return stats.get_int("MPX_ARCADE_SAFE_CASH_VALUE")
-			end,
-			max_cash = 1e5,
-			blip = 740,
-		},
-		["Agency"] = {
-			is_owned = function()
-				return stats.get_int("MPX_FIXER_HQ_OWNED") ~= 0
-			end,
-			cash_value = function()
-				return stats.get_int("MPX_FIXER_SAFE_CASH_VALUE")
-			end,
-			max_cash = 25e4,
-			blip = 826,
-		},
-		["MC Clubhouse"] = {
-			is_owned = function()
-				return stats.get_int("MPX_PROP_CLUBHOUSE") ~= 0
-			end,
-			cash_value = function()
-				return stats.get_int("MPX_BIKER_BAR_RESUPPLY_CASH")
-			end,
-			max_cash = 1e5,
-			blip = 492,
-		},
-		["Bail Office"] = {
-			is_owned = function()
-				return stats.get_int("MPX_BAIL_OFFICE_OWNED") ~= 0
-			end,
-			cash_value = function()
-				return stats.get_int("MPX_BAIL_SAFE_CASH_VALUE")
-			end,
-			max_cash = 1e5,
-			blip = 893,
-		},
-		["Salvage Yard"] = {
-			is_owned = function()
-				return stats.get_int("MPX_SALVAGE_YARD_OWNED") ~= 0
-			end,
-			cash_value = function()
-				return stats.get_int("MPX_SALVAGE_SAFE_CASH_VALUE")
-			end,
-			max_cash = 25e4,
-			blip = 867,
-		},
-		["Garment Factory"] = {
-			is_owned = function()
-				return stats.get_int("MPX_HACKER_DEN_OWNED") ~= 0
-			end,
-			cash_value = function()
-				return stats.get_int("MPX_HDEN24_SAFE_CASH_VALUE")
-			end,
-			max_cash = 1e5,
-			blip = 900,
-		},
-	},
-	---@type dict<MoneyFrontsBusiness>
-	MF_Default = {
-		["YRV3_CWASH_LABEL"] = {
-			is_owned = function()
-				return stats.get_int("MPX_SB_CAR_WASH_OWNED") ~= 0
-			end,
-			cash_value = function()
-				return stats.get_int("MPX_CWASH_SAFE_CASH_VALUE")
-			end,
-			duffel_total = function()
-				return stats.get_int("MPX_CAR_WASH_DUFFEL_VALUE")
-			end,
-			dirty_cash = function()
-				local posix = stats.get_int("MPX_CAR_WASH_DUFFEL_POSIX")
-				local pending_cash = stats.get_int("MPX_CAR_WASH_DUFFEL_PENDING") -- why is this always 35k even after it gets cleaned?
-				return Time.epoch() < posix and pending_cash or 0
-			end,
-			get_special_val = function()
-				return stats.get_packed_stat_int(24924)
-			end,
-			set_special_val = function()
-				if (stats.get_packed_stat_int(24924) == 0) then
-					return
-				end
-
-				stats.set_packed_stat_int(24924, 0)
-			end,
-			max_cash = 1e5,
-			max_heat = 100,
-			blip = 931,
-			gvar_key_1 = "features.yrv3.cwash_legal_work_cd",
-			gvar_key_2 = "features.yrv3.cwash_illegal_work_cd",
-			cb1_clicked = false,
-			cb2_clicked = false,
-			on_cb1_click = function(yrv3, newVal)
-				table.set_nested_key(GVars, "features.yrv3.cwash_legal_work_cd", newVal)
-				yrv3:SetCooldownStateDirty("cwash_legal_work_cd", true)
-			end,
-			on_cb2_click = function(yrv3, newVal)
-				table.set_nested_key(GVars, "features.yrv3.cwash_illegal_work_cd", newVal)
-				yrv3:SetCooldownStateDirty("cwash_illegal_work_cd", true)
-			end,
-			coords = vec3:new(25.645266, -1412.290649, 29.362230)
-		},
-		["YRV3_WEED_SHOP_LABEL"] = {
-			is_owned = function()
-				return stats.get_int("MPX_SB_WEED_SHOP_OWNED") ~= 0
-			end,
-			get_special_val = function()
-				return stats.get_packed_stat_int(24925)
-			end,
-			set_special_val = function()
-				if (stats.get_packed_stat_int(24925) == 0) then
-					return
-				end
-
-				stats.set_packed_stat_int(24925, 0)
-			end,
-			max_heat = 100,
-			gvar_key_1 = "features.yrv3.weedshop_legal_work_cd",
-			gvar_key_2 = "features.yrv3.weedshop_illegal_work_cd",
-			cb1_clicked = false,
-			cb2_clicked = false,
-			---@param yrv3 YRV3
-			on_cb1_click = function(yrv3, newVal)
-				table.set_nested_key(GVars, "features.yrv3.weedshop_legal_work_cd", newVal)
-				yrv3:SetCooldownStateDirty("weedshop_legal_work_cd", true)
-			end,
-			on_cb2_click = function(yrv3, newVal)
-				table.set_nested_key(GVars, "features.yrv3.weedshop_illegal_work_cd", newVal)
-				yrv3:SetCooldownStateDirty("weedshop_illegal_work_cd", true)
-			end,
-			coords = vec3:new(-1162.051147, -1564.757202, 4.410227)
-		},
-		["YRV3_HELITOURS_LABEL"] = {
-			is_owned = function()
-				return stats.get_int("MPX_SB_HELI_TOURS_OWNED") ~= 0
-			end,
-			get_special_val = function()
-				return stats.get_packed_stat_int(24926)
-			end,
-			set_special_val = function()
-				if (stats.get_packed_stat_int(24926) == 0) then
-					return
-				end
-
-				stats.set_packed_stat_int(24926, 0)
-			end,
-			max_heat = 100,
-			gvar_key_1 = "features.yrv3.helitours_legal_work_cd",
-			gvar_key_2 = "features.yrv3.helitours_illegal_work_cd",
-			cb1_clicked = false,
-			cb2_clicked = false,
-			---@param yrv3 YRV3
-			on_cb1_click = function(yrv3, newVal)
-				table.set_nested_key(GVars, "features.yrv3.helitours_legal_work_cd", newVal)
-				yrv3:SetCooldownStateDirty("helitours_legal_work_cd", true)
-			end,
-			on_cb2_click = function(yrv3, newVal)
-				table.set_nested_key(GVars, "features.yrv3.helitours_illegal_work_cd", newVal)
-				yrv3:SetCooldownStateDirty("helitours_illegal_work_cd", true)
-			end,
-			coords = vec3:new(-753.524841, -1511.244751, 5.015130)
-		},
-	},
 	Cooldowns = {
 		["mc_work_cd"] = {
 			dirty = false,
@@ -427,6 +234,29 @@ local RawBusinessData <const> = {
 				end
 			end
 		},
+		["sy_disable_rob_cd"] = {
+			dirty = false,
+			gstate = function()
+				return GVars.features.yrv3.sy_disable_rob_cd
+			end,
+			onEnable = function()
+				if (stats.get_int("MPX_SALV23_VEHROB_CD") > 0) then
+					stats.set_int("MPX_SALV23_VEHROB_CD", 0)
+				end
+			end
+		},
+		["sy_disable_rob_weekly_cd"] = {
+			dirty = false,
+			gstate = function()
+				return GVars.features.yrv3.sy_disable_rob_weekly_cd
+			end,
+			onEnable = function()
+				local week_sync = stats.get_int("MPX_SALV23_WEEK_SYNC")
+				if (tunables.get_int("SALV23_VEH_ROBBERY_WEEK_ID") == stats.get_int("MPX_SALV23_WEEK_SYNC")) then
+					tunables.set_int("SALV23_VEH_ROBBERY_WEEK_ID", week_sync + 1)
+				end
+			end
+		},
 	},
 	SellScripts = {
 		["gb_smuggler"] = { -- air
@@ -595,24 +425,24 @@ local RawBusinessData <const> = {
 		[4] = { max_units = 10, vpu = "BIKER_CRACK_PRODUCT_VALUE", mult_1 = "BIKER_CRACK_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_CRACK_PRODUCT_VALUE_STAFF_UPGRADE" },
 	},
 	Hangars = {
-		{ name = "", coords = vec3:new(-1148.908447, -3406.064697, 13.945053) },
-		{ name = "", coords = vec3:new(-1393.322021, -3262.968262, 13.944828) },
-		{ name = "", coords = vec3:new(-2022.336304, 3154.936768, 32.810272) },
-		{ name = "", coords = vec3:new(-1879.105957, 3106.792969, 32.810234) },
-		{ name = "", coords = vec3:new(-2470.278076, 3274.427734, 32.835461) },
+		{ coords = vec3:new(-1148.908447, -3406.064697, 13.945053) },
+		{ coords = vec3:new(-1393.322021, -3262.968262, 13.944828) },
+		{ coords = vec3:new(-2022.336304, 3154.936768, 32.810272) },
+		{ coords = vec3:new(-1879.105957, 3106.792969, 32.810234) },
+		{ coords = vec3:new(-2470.278076, 3274.427734, 32.835461) },
 	},
 	Bunkers = {
-		[21] = { name = "", coords = vec3:new(494.680878, 3015.895996, 41.041725) },
-		[22] = { name = "", coords = vec3:new(849.619812, 3024.425781, 41.266800) },
-		[23] = { name = "", coords = vec3:new(40.422565, 2929.004395, 55.746357) },
-		[24] = { name = "", coords = vec3:new(1571.949341, 2224.597168, 78.350952) },
-		[25] = { name = "", coords = vec3:new(2107.135254, 3324.630615, 45.371754) },
-		[26] = { name = "", coords = vec3:new(2488.706055, 3164.616699, 49.080124) },
-		[27] = { name = "", coords = vec3:new(1798.502930, 4704.956543, 39.995476) },
-		[28] = { name = "", coords = vec3:new(-754.225769, 5944.171875, 19.836382) },
-		[29] = { name = "", coords = vec3:new(-388.333160, 4338.322754, 56.103130) },
-		[30] = { name = "", coords = vec3:new(-3030.341797, 3334.570068, 10.105902) },
-		[31] = { name = "", coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
+		[21] = { coords = vec3:new(494.680878, 3015.895996, 41.041725) },
+		[22] = { coords = vec3:new(849.619812, 3024.425781, 41.266800) },
+		[23] = { coords = vec3:new(40.422565, 2929.004395, 55.746357) },
+		[24] = { coords = vec3:new(1571.949341, 2224.597168, 78.350952) },
+		[25] = { coords = vec3:new(2107.135254, 3324.630615, 45.371754) },
+		[26] = { coords = vec3:new(2488.706055, 3164.616699, 49.080124) },
+		[27] = { coords = vec3:new(1798.502930, 4704.956543, 39.995476) },
+		[28] = { coords = vec3:new(-754.225769, 5944.171875, 19.836382) },
+		[29] = { coords = vec3:new(-388.333160, 4338.322754, 56.103130) },
+		[30] = { coords = vec3:new(-3030.341797, 3334.570068, 10.105902) },
+		[31] = { coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
 	},
 	Nightclubs = {
 		{ name = "", coords = vec3:new(757.009, -1332.32, 26.1802) }, -- am_mp_nightclub.c func_5118 // case 102: *uParam5 is main entrance corona coords
@@ -637,6 +467,114 @@ local RawBusinessData <const> = {
 		{ name = "Fake ID", vpu_tunable = "BB_BUSINESS_VALUE_FORGED_DOCUMENTS", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_FORGED_DOCUMENTS", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_FORGED_DOCUMENTS" },
 		{ name = "Cash",    vpu_tunable = "BB_BUSINESS_VALUE_COUNTERFEIT_CASH", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COUNTERFEIT_CASH", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COUNTERFEIT_CASH" },
 	},
+	-- index + 90
+	Clubhouses = {
+		{ gxt = "MP_PROP_CLUBH1",  coords = vec3:new(246.5035, -1798.7494, 26.1131) }, -- case 91:
+		{ gxt = "MP_PROP_CLUBH2",  coords = vec3:new(-1464.5, -927.9, 9.0) },
+		{ gxt = "MP_PROP_CLUBH3",  coords = vec3:new(30.0784, -1024.1604, 28.4469) },
+		{ gxt = "MP_PROP_CLUBH4",  coords = vec3:new(45.0033, 2784.3918, 56.8782) },
+		{ gxt = "MP_PROP_CLUBH5",  coords = vec3:new(-332.5679, 6069.1445, 30.2175) },
+		{ gxt = "MP_PROP_CLUBH6",  coords = vec3:new(1738.4215, 3716.7786, 33.0787) },
+		{ gxt = "MP_PROP_CLUBH7",  coords = vec3:new(947.9371, -1452.7367, 30.143) },
+		{ gxt = "MP_PROP_CLUBH8",  coords = vec3:new(186.6051, 306.8702, 104.389) },
+		{ gxt = "MP_PROP_CLUBH9",  coords = vec3:new(-31.2801, -200.3394, 51.3551) },
+		{ gxt = "MP_PROP_CLUBH10", coords = vec3:new(2478.5203, 4082.1372, 36.8208) },
+		{ gxt = "MP_PROP_CLUBH11", coords = vec3:new(-32.1085, 6407.398, 30.4903) },
+		{ gxt = "MP_PROP_CLUBH12", coords = vec3:new(-1138.0574, -1572.1804, 3.4157) },
+	},
+	SalvageYards = {
+		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(-195.6784, 6266.2856, 31.4892) }, -- func_3737 // case 162:
+		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(2508.7229, 4110.6401, 38.3481) },
+		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(-509.6919, -1735.85, 19.1262) },
+		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(-12.9673, -1309.9194, 29.2606) },
+		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(1194.7052, -1263.8588, 35.2128) },
+	},
+	-- index + 127
+	Arcades = {
+		{ gxt = "CELL_ARCADE", coords = vec3:new(-238.9248, 6230.4282, 31.5033) }, -- func_5639 // case 128:
+		{ gxt = "CELL_ARCADE", coords = vec3:new(1710.6895, 4758.3442, 41.9292) },
+		{ gxt = "CELL_ARCADE", coords = vec3:new(-103.9111, -1776.6021, 29.5181) },
+		{ gxt = "CELL_ARCADE", coords = vec3:new(-618.2486, 283.322, 81.6805) },
+		{ gxt = "CELL_ARCADE", coords = vec3:new(-1287.7996, -275.9392, 38.7089) },
+		{ gxt = "CELL_ARCADE", coords = vec3:new(723.8805, -822.3783, 24.7562) },
+	},
+	-- index + 154
+	Agencies = {
+		{ gxt = "FHQ_E_O_3", coords = vec3:new(390.7725, -78.3233, 68.1805) }, -- func_4471 // case 155: uParam1->f_3
+		{ gxt = "FHQ_E_O_3", coords = vec3:new(-1018.2380, -411.9423, 39.6161) },
+		{ gxt = "FHQ_E_O_3", coords = vec3:new(-590.1196, -705.2702, 36.2811) },
+		{ gxt = "FHQ_E_O_3", coords = vec3:new(-1040.2611, -760.1538, 19.8387) },
+	},
+	-- index + 166
+	BailOffices = {
+		{ gxt = "PIM_S_BAOF", coords = vec3:new(485.114, -943.441, 26.161) }, -- func_3540 // case 167: case 0: *uParam2
+		{ gxt = "PIM_S_BAOF", coords = vec3:new(123.352, 13.748, 67.315) },
+		{ gxt = "PIM_S_BAOF", coords = vec3:new(-1412.704, -654.563, 27.673) },
+		{ gxt = "PIM_S_BAOF", coords = vec3:new(127.30589, -1709.8208, 28.28193) },
+		{ gxt = "PIM_S_BAOF", coords = vec3:new(-66.372, 6506.075, 30.536) },
+	},
+	HackerDen = {
+		{ gxt = "HD_GARNAME", coords = vec3:new(719.3386, -983.1850, 24.1402) },
+	},
+	CashSafes = {
+		regular = {
+			{
+				property_stat   = "MPX_ARCADE_OWNED",
+				cash_value_stat = "MPX_ARCADE_SAFE_CASH_VALUE",
+				raw_data_entry  = "Arcades",
+				get_max_cash    = function()
+					return tunables.get_int("MAXARCADESAFESTORAGE")
+				end,
+			},
+			{
+				property_stat   = "MPX_FIXER_HQ_OWNED",
+				cash_value_stat = "MPX_FIXER_SAFE_CASH_VALUE",
+				raw_data_entry  = "Agencies",
+				get_max_cash    = function()
+					return tunables.get_int("MAXFIXERHQSAFESTORAGE")
+				end,
+			},
+			{
+				property_stat   = "MPX_BAIL_OFFICE_OWNED",
+				cash_value_stat = "MPX_ARCADE_SAFE_CASH_VALUE",
+				raw_data_entry  = "BailOffices",
+				get_max_cash    = function()
+					return tunables.get_int(-1736487760)
+				end,
+			},
+			{
+				property_stat   = "MPX_HACKER_DEN_OWNED",
+				cash_value_stat = "MPX_HDEN24_SAFE_CASH_VALUE",
+				raw_data_entry  = "HackerDen",
+				get_max_cash    = function()
+					return tunables.get_int(-792265290)
+				end,
+			},
+		},
+		fronts = {
+			salvage_yard = {
+				cash_value_stat = "MPX_SALVAGE_SAFE_CASH_VALUE",
+				get_max_cash    = function()
+					if (stats.get_int("MPX_SALVAGE_YARD_WALL_SAFE") == 1) then
+						return tunables.get_int(594814186)
+					end
+					return tunables.get_int(1839510301)
+				end,
+			},
+			clubhouse = {
+				cash_value_stat = "MPX_BIKER_BAR_RESUPPLY_CASH",
+				get_max_cash    = function()
+					return tunables.get_int("BIKER_PASSIVE_INCOME_BAG_LIMIT")
+				end,
+			},
+			nightclub = {
+				cash_value_stat = "MPX_CLUB_SAFE_CASH_VALUE",
+				get_max_cash    = function()
+					return tunables.get_int("NIGHTCLUBMAXSAFEVALUE")
+				end,
+			},
+		},
+	}
 }
 
 return RawBusinessData

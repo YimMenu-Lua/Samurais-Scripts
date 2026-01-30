@@ -7,39 +7,30 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BusinessBase = require("includes.modules.businesses.BusinessBase")
-local BusinessHub  = require("includes.modules.businesses.BusinessHub")
+local BusinessFront   = require("includes.modules.businesses.BusinessFront")
+local BusinessHub     = require("includes.modules.businesses.BusinessHub")
+local RawBusinessData = require("includes.data.yrv3_data")
 
----@class ClubOpts : BusinessOpts
----@field name string
+---@class ClubOpts : BusinessFrontOpts
 ---@field custom_name string
----@field max_cash integer
----@field coords vec3
 
 -- Class representing the Nightclub business.
----@class Nightclub : BusinessBase
+---@class Nightclub : BusinessFront
 ---@field private m_id integer
 ---@field private m_name string
 ---@field private m_custom_name string
----@field private m_max_cash integer
----@field private m_fast_prod_running boolean
+---@field private m_safe CashSafe
 ---@field private m_hubs BusinessHub[]
----@field public fast_prod_enabled boolean
-local Nightclub    = setmetatable({}, BusinessBase)
-Nightclub.__index  = Nightclub
+local Nightclub       = setmetatable({}, BusinessFront)
+Nightclub.__index     = Nightclub
 
 ---@param opts ClubOpts
 ---@return Nightclub
 function Nightclub.new(opts)
-	assert(type(opts.max_cash) == "number", "Missing argument: max_units<integer>")
-
-	local base                 = BusinessBase.new(opts)
-	local instance             = setmetatable(base, Nightclub)
-	instance.m_custom_name     = opts.custom_name
-	instance.m_max_cash        = opts.max_cash
-	instance.fast_prod_enabled = false
-	instance.fast_prod_running = false
-	instance.m_hubs            = {}
+	local base             = BusinessFront.new(opts)
+	local instance         = setmetatable(base, Nightclub)
+	instance.m_custom_name = opts.custom_name
+	instance.m_hubs        = {}
 	---@diagnostic disable-next-line
 	return instance
 end
@@ -49,40 +40,14 @@ function Nightclub:Reset()
 	self.fast_prod_running = false
 end
 
----@return integer
-function Nightclub:GetCashValue()
-	return stats.get_int("MPX_CLUB_SAFE_CASH_VALUE")
-end
-
 ---@return string
 function Nightclub:GetCustomName()
 	return self.m_custom_name or "The Palace"
 end
 
----@return boolean
-function Nightclub:IsFull()
-	return self.m_max_cash <= self:GetCashValue()
-end
-
----@return integer
-function Nightclub:GetMaxCash()
-	return self.m_max_cash or 25e4
-end
-
 ---@return integer
 function Nightclub:GetPopularity()
 	return stats.get_int("MPX_CLUB_POPULARITY")
-end
-
----@return integer
-function Nightclub:GetEstimatedValue()
-	local moola = self:GetCashValue()
-	for _, hub in ipairs(self.m_hubs) do
-		if (hub and hub:IsValid()) then
-			moola = moola + hub:GetEstimatedValue()
-		end
-	end
-	return moola
 end
 
 function Nightclub:MaxPopularity()
@@ -111,13 +76,12 @@ function Nightclub:ToggleBigTips(toggle)
 end
 
 ---@param index integer
----@param reference_table BusinessHubs
-function Nightclub:SetupBusinessHub(index, reference_table)
+function Nightclub:AddSubBusiness(index)
 	if (not self:IsValid()) then
 		return
 	end
 
-	local ref = reference_table[index + 1]
+	local ref = RawBusinessData.BusinessHubs[index + 1]
 	if (not ref) then
 		return
 	end
@@ -131,7 +95,7 @@ function Nightclub:SetupBusinessHub(index, reference_table)
 end
 
 ---@return array<BusinessHub>
-function Nightclub:GetBusinessHubs()
+function Nightclub:GetSubBusinesses()
 	return self.m_hubs
 end
 
