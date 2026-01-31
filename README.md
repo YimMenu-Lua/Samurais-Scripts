@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD028 -->
 <!-- markdownlint-disable MD033 -->
 <!-- markdownlint-disable MD041 -->
 
@@ -65,6 +66,11 @@ A modular GTA V Lua framework focused on enhancing the player's experience throu
 - Use **[F4]** to toggle the console window.
 - Type `!ls` or `!dump` to dump all available commands.
 - All default commands are prefixed with an exclamation mark `<!>`.
+
+>[!Note]
+> Releases are scheduled for Sundays at 8AM.
+> If the game gets updated during the week and we push an update, you can manually update your local copy if you don't want to wait until the end of the week.
+> All you need is the [SSV2](./SSV2) folder.
 
 >[!Important]
 > **Do not use this in YimMenuV2. It will not work.**

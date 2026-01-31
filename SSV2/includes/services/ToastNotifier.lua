@@ -82,7 +82,7 @@ Notification.__index = Notification
 ---@param callback? Callback
 ---@return Notification
 function Notification.new(title, message, level, id, callback)
-	assert(math.isinrange(level, 0, (Enums.eNotificationLevel.__MAX - 1)), "Invalid notification level.")
+	assert(math.is_inrange(level, 0, (Enums.eNotificationLevel.__MAX - 1)), "Invalid notification level.")
 
 	return setmetatable({
 		m_title        = title,

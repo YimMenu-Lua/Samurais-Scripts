@@ -178,7 +178,7 @@ end
 ---@return pointer
 function atArray:Get(i)
 	self:Update()
-	assert(math.isinrange(i, 1, self.m_size), "[atArray]: Index out of bounds!")
+	assert(math.is_inrange(i, 1, self.m_size), "[atArray]: Index out of bounds!")
 	return self.m_data[i]
 end
 
@@ -186,7 +186,7 @@ end
 ---@param v pointer
 function atArray:Set(i, v)
 	self:Update()
-	assert(math.isinrange(i, 1, self.m_size), "[atArray]: Index out of bounds!")
+	assert(math.is_inrange(i, 1, self.m_size), "[atArray]: Index out of bounds!")
 	assert(IsInstance(v, "pointer"), "[atArray]: Attempt to set array value to non-pointer value!")
 
 	self.m_data[i] = v

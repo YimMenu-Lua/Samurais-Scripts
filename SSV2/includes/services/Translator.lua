@@ -106,7 +106,7 @@ function Translator:Translate(label)
 		return msg
 	end
 
-	if (string.isnullorempty(text)) then
+	if (not string.isvalid(text)) then
 		self:Log(_F("Missing translation for: '%s' in '%s'", label, self.lang_code))
 		return _F("[!MISSING LABEL]: %s", label)
 	end

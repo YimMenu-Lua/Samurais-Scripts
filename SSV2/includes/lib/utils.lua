@@ -1092,11 +1092,17 @@ string.isnull = function(str)
 end
 
 string.isempty = function(str)
-	return str == ""
+	return #str == 0
 end
 
+---@param str string?
+---@return boolean
 string.isnullorempty = function(str)
-	return string.isnull(str) or str:isempty()
+	if str == nil then
+		return true
+	end
+
+	return str:isempty()
 end
 
 ---@param str string?
@@ -1105,7 +1111,20 @@ string.isnullorwhitespace = function(str)
 	if str == nil then
 		return true
 	end
-	return string.isnull(str) or str:iswhitespace()
+
+	return str:iswhitespace()
+end
+
+-- A string is considered invalid if any of these conditions are true:
+-- - `nil`
+-- - `empty`
+-- - `white space`
+---@param str? string
+---@return boolean
+string.isvalid = function(str)
+	return type(str) == "string"
+		and not str:isempty()
+		and not str:iswhitespace()
 end
 
 -- Returns whether a string starts with the provided prefix.
@@ -1257,8 +1276,7 @@ end
 ---@param char string
 ---@return string
 string.padleft = function(str, len, char)
-	char = char or " "
-	return string.rep(char, math.max(0, len - #str)) .. str
+	return _F("%s%s", string.rep(char or " ", math.max(0, len - #str)), str)
 end
 
 ---@param str string
@@ -1266,8 +1284,7 @@ end
 ---@param char string
 ---@return string
 string.padright = function(str, len, char)
-	char = char or " "
-	return str .. string.rep(char, math.max(0, len - #str))
+	return _F("%s%s", str, string.rep(char or " ", math.max(0, len - #str)))
 end
 
 -- Capitalizes the first letter in a string.
@@ -1297,8 +1314,7 @@ end
 ---@param currency? string
 ---@return string
 string.formatmoney = function(value, currency)
-	currency = currency or "$"
-	return "$" .. string.formatint(value)
+	return _F("%s%s", currency or "$", string.formatint(value))
 end
 
 ---@param str string
@@ -1308,11 +1324,19 @@ string.hex2string = function(str)
 	end))
 end
 
----@param str string
-string.hex = function(str)
-	return (str:gsub(".", function(char)
-		return string.format("%02x", char:byte())
-	end))
+---@param v string|number
+---@return string
+string.hex = function(v)
+	local _type = type(v)
+	if (_type == "string") then
+		return (string.gsub(v, ".", function(char)
+			return _F("%02x", string.byte(char))
+		end))
+	elseif (_type == "number") then
+		return _F("0x%X", v)
+	end
+
+	return ""
 end
 
 --#endregion
@@ -1345,8 +1369,22 @@ end
 ---@param min number
 ---@param max number
 ---@return boolean
-math.isinrange = function(n, min, max)
+math.is_inrange = function(n, min, max)
 	return n >= min and n <= max
+end
+
+-- This ignores floating point precision.
+--
+-- For normal numbers, use regular equality comparison.
+--
+-- https://www.lua.org/pil/2.3.html
+---@param a float
+---@param b float
+---@param e? float Optional epsilon (threshold)
+---@return boolean
+function math.is_equal(a, b, e)
+	e = e or 1e-6
+	return a == b or math.abs(a - b) < 1e-6
 end
 
 ---@param n integer
@@ -1375,10 +1413,6 @@ math.sizeof = function(n)
 		}
 	}
 
-	local function num_equal(a, b) -- ignore lost floating point precision
-		return math.abs(a - b) < 1e-9
-	end
-
 	local c = Cast(n)
 	local key = n < 0 and "signed" or "unsigned"
 	local _t = int_infer[key]
@@ -1387,19 +1421,12 @@ math.sizeof = function(n)
 		local method, size_key = _t[i][1], _t[i][2]
 		local value = method(c)
 
-		if num_equal(n, value) then
+		if math.is_equal(n, value, 1e-9) then
 			return INT_SIZES[size_key]
 		end
 	end
 
 	return 0x4
-end
-
----@param a number
----@param b number
----@param t number delta
-function math.lerp(a, b, t)
-	return a + (b - a) * math.clamp(t, 0, 1)
 end
 
 ---@param v number
@@ -1410,18 +1437,11 @@ function math.clamp(v, min, max)
 	return math.max(min, math.min(max, v))
 end
 
--- This ignores floating point precision.
---
--- For normal numbers, use regular equality comparison.
---
--- https://www.lua.org/pil/2.3.html
----@param a float
----@param b float
----@param e? float Optional epsilon (threshold)
----@return boolean
-function math.is_equal(a, b, e)
-	e = e or 1e-6
-	return a == b or math.abs(a - b) < 1e-6
+---@param a number
+---@param b number
+---@param t number delta
+function math.lerp(a, b, t)
+	return a + (b - a) * math.clamp(t, 0, 1)
 end
 
 -- Generates a trianguar wave oscillating between 1 and -1

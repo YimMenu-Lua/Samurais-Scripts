@@ -29,7 +29,7 @@ Player.SetAsNoLongerNeeded = nil
 ---@param player_id integer
 ---@return Player
 function Player.new(player_id)
-	assert(math.isinrange(player_id, 0, 32), "Invalid player ID")
+	assert(math.is_inrange(player_id, 0, 32), "Invalid player ID")
 
 	local ped_handle = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
 	---@type Player

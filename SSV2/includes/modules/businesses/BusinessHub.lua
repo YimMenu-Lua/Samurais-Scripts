@@ -48,7 +48,7 @@ end
 
 ---@return integer
 function BusinessHub:GetProductCount()
-	assert(type(self.m_id) == "number" and math.isinrange(self.m_id, 0, 6), "Invalid Business Hub id.")
+	assert(type(self.m_id) == "number" and math.is_inrange(self.m_id, 0, 6), "Invalid Business Hub id.")
 	return stats.get_int(_F("MPX_HUB_PROD_TOTAL_%d", self.m_id))
 end
 

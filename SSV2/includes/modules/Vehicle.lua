@@ -1615,7 +1615,7 @@ function Vehicle:SaveToJSON(name)
 		return
 	end
 
-	if (not name or string.isnullorwhitespace(name)) then
+	if (not name or name:isempty() or name:iswhitespace()) then
 		name = self:GetName()
 	end
 
