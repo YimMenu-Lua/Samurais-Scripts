@@ -563,5 +563,6 @@ return {
 	["SY_CD_ROB_TYPE_ERR"] = "Aktueller Raubüberfall konnte nicht abgerufen werden! Sind Sie sicher, dass Sie eines gestartet haben?",
 	["YRV3_CLUBHOUSE_NOT_OWNED"] = "Sie besitzen keinen Motorradclub.",
 	["SY_ALWAYS_MAX_INCOME_TT"] = "Verhindert, dass Ihre Einkommensgrenze mit der Zeit sinkt.",
-	["SY_ALWAYS_MAX_INCOME"] = "Sperrschwelle"
+	["SY_ALWAYS_MAX_INCOME"] = "Sperrschwelle",
+	["YRV3_GENERIC_NOT_SETUP"] = "Dieses Unternehmen wurde noch nicht eingerichtet. Bitte kehren Sie nach Abschluss der Setup-Mission zurück."
 }

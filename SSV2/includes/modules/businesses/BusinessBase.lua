@@ -62,7 +62,13 @@ function BusinessBase:GetMaxUnits() return self.m_max_units end
 function BusinessBase:GetCoords() return self.m_coords or self.m_blip end
 
 ---@return integer
-function BusinessBase:GetEstimatedIncome() return self:GetProductValue() end
+function BusinessBase:GetEstimatedIncome()
+	if (not self:IsValid()) then
+		return 0
+	end
+
+	return self:GetProductValue()
+end
 
 ---@return integer
 function BusinessBase:GetProductCount() end
@@ -78,5 +84,7 @@ function BusinessBase:ReStock() end
 function BusinessBase:TriggerProduction() end
 
 function BusinessBase:LoopProduction() end
+
+function BusinessBase:Update() end
 
 return BusinessBase

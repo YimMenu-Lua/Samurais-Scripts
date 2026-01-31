@@ -563,5 +563,6 @@ return {
 	["SY_CD_ROB_TYPE_ERR"] = "현재 강도 획득에 실패했습니다! 정말 시작하셨나요?",
 	["YRV3_CASH_SAFE"] = "안전한 현금",
 	["SY_ALWAYS_MAX_INCOME"] = "잠금 임계값",
-	["SY_ALWAYS_MAX_INCOME_TT"] = "시간이 지남에 따라 소득 기준이 감소하는 것을 방지합니다."
+	["SY_ALWAYS_MAX_INCOME_TT"] = "시간이 지남에 따라 소득 기준이 감소하는 것을 방지합니다.",
+	["YRV3_GENERIC_NOT_SETUP"] = "이 비즈니스는 설정되지 않았습니다. 설정 미션을 완료한 후 돌아와주세요."
 }

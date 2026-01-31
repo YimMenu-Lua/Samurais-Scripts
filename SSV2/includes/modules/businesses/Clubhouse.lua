@@ -8,7 +8,7 @@
 
 
 local BusinessFront   = require("includes.modules.businesses.BusinessFront")
-local BikerBusiness   = require("includes.modules.businesses.BikerBusiness")
+local Factory         = require("SSV2.includes.modules.businesses.Factory")
 local RawBusinessData = require("includes.data.yrv3_data")
 
 -- Class representing a MC Clubhouse business.
@@ -17,7 +17,8 @@ local RawBusinessData = require("includes.data.yrv3_data")
 ---@field private m_name string
 ---@field private m_custom_name string
 ---@field private m_safe CashSafe
----@field private m_subs BikerBusiness[]
+---@field private m_subs Factory[]
+---@field public GetSubBusinesses fun(self: Clubhouse): Factory[]
 local Clubhouse       = setmetatable({}, BusinessFront)
 Clubhouse.__index     = Clubhouse
 
@@ -69,7 +70,7 @@ function Clubhouse:AddSubBusiness(index)
 		default = ""
 	}
 
-	table.insert(self.m_subs, BikerBusiness.new({
+	table.insert(self.m_subs, Factory.new({
 		id              = index,
 		name            = Game.GetGXTLabel(ref.gxt),
 		normalized_name = not normalized_name:isempty() and Game.GetGXTLabel(normalized_name) or nil,

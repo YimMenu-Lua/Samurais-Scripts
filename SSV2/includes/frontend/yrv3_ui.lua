@@ -191,7 +191,7 @@ local function drawWarehouse(warehouse, notOwnedLabel)
 	ImGui.PopStyleVar()
 end
 
----@param bb? BikerBusiness
+---@param bb? Factory
 ---@param notOwnedLabel? string Optional label to display if the business isn't owned
 local function drawBikerBusiness(bb, notOwnedLabel)
 	if (not bb or not bb:IsValid()) then
@@ -199,6 +199,11 @@ local function drawBikerBusiness(bb, notOwnedLabel)
 			ImGui.Text(notOwnedLabel)
 		end
 
+		return
+	end
+
+	if (not bb:IsSetup()) then
+		ImGui.Text(_T("YRV3_GENERIC_NOT_SETUP"))
 		return
 	end
 

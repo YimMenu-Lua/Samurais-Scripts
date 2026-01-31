@@ -62,6 +62,8 @@ function CarWashDuffle:CleanNow()
 		return
 	end
 
+	-- this stat is useless. Posix used in freemode is stored at Global_1882572[PLAYER::PLAYER_ID() /*315*/].f_158.f_27.f_5 (as of 1.72-3751.0)
+	-- not even gonna bother with this shit I hate maintaining globals and locals
 	stats.set_int("MPX_CAR_WASH_DUFFEL_POSIX", Time.epoch() + 1000)
 end
 

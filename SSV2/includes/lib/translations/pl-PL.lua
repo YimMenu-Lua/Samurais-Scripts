@@ -563,5 +563,6 @@ return {
 	["SY_MAX_THRESHOLD"] = "Maksymalizuj dochód",
 	["YRV3_CASH_SAFE"] = "Bezpieczna gotówka",
 	["SY_ALWAYS_MAX_INCOME_TT"] = "Zapobiega spadkowi progu dochodu w miarę upływu czasu.",
-	["SY_ALWAYS_MAX_INCOME"] = "Zablokuj próg"
+	["SY_ALWAYS_MAX_INCOME"] = "Zablokuj próg",
+	["YRV3_GENERIC_NOT_SETUP"] = "Ta firma nie została skonfigurowana. Wróć po zakończeniu misji konfiguracyjnej."
 }

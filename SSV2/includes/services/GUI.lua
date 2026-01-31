@@ -62,6 +62,7 @@ end
 ---@field private m_selected_tab Tab
 ---@field private m_selected_category eTabID
 ---@field private m_selected_category_tabs array<Pair<string, Tab>>
+---@field private m_prev_category_tabs table<eTabID, Tab>
 ---@field private m_dummy_tab tab -- default YimMenu API tab object
 ---@field private m_tabs table<eTabID, array<Pair<string, Tab>>>
 ---@field private m_independent_windows array<GuiCallback>
@@ -79,18 +80,19 @@ local GUI = Class("GUI")
 function GUI:init()
 	---@type GUI
 	local instance = setmetatable({
-		m_main_window_label = "##ss_main_window",
-		m_should_draw = false,
-		m_is_drawing_sidebar = false,
-		m_cb_window_pos = vec2:zero(),
-		m_notifier_pos = vec2:zero(),
-		m_screen_resolution = Game.GetScreenResolution(),
-		m_sidebar_width = 200,
-		m_selected_category = Enums.eTabID.TAB_SELF,
-		m_tabs = defaultTabs,
+		m_main_window_label   = "##ss_main_window",
+		m_should_draw         = false,
+		m_is_drawing_sidebar  = false,
+		m_cb_window_pos       = vec2:zero(),
+		m_notifier_pos        = vec2:zero(),
+		m_screen_resolution   = Game.GetScreenResolution(),
+		m_sidebar_width       = 200,
+		m_selected_category   = Enums.eTabID.TAB_SELF,
+		m_tabs                = defaultTabs,
 		m_independent_windows = {},
-		m_requested_windows = {},
-		m_snap_animator = WindowAnimator()
+		m_requested_windows   = {},
+		m_prev_category_tabs  = {},
+		m_snap_animator       = WindowAnimator()
 	}, GUI)
 
 	ThemeManager:Load()
@@ -381,36 +383,36 @@ local underlineTargetX = 0.0
 local underlineTargetW = 0.0
 local underlineSet = false
 function GUI:DrawTopBar()
-	local drawList = ImGui.GetWindowDrawList()
-	local spacing = 10
+	local drawList      = ImGui.GetWindowDrawList()
+	local spacing       = 10
 	local availWidth, _ = ImGui.GetContentRegionAvail()
-	local elemWidth = 90.0
-	local elemHeight = 40.0
-	local tabHeight = 55.0
-	local tabCount = table.getlen(tabIdToString) - 1
-	local totalWidth = tabCount * elemWidth + (tabCount - 1) * spacing
-	local startX = (availWidth - totalWidth) * 0.5
-	local cursorPos = vec2:new(ImGui.GetCursorScreenPos())
-	local _col1 = GVars.ui.style.theme.TopBarFrameCol1
-	local _col2 = GVars.ui.style.theme.TopBarFrameCol2
+	local elemWidth     = 90.0
+	local elemHeight    = 40.0
+	local tabHeight     = 55.0
+	local tabCount      = table.getlen(tabIdToString) - 1
+	local totalWidth    = tabCount * elemWidth + (tabCount - 1) * spacing
+	local startX        = (availWidth - totalWidth) * 0.5
+	local cursorPos     = vec2:new(ImGui.GetCursorScreenPos())
+	local _col1         = GVars.ui.style.theme.TopBarFrameCol1
+	local _col2         = GVars.ui.style.theme.TopBarFrameCol2
 
 	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + startX)
 
 	for i = 1, tabCount do
-		local tabName = _T(Match(i, tabIdToString))
+		local tabName  = _T(Match(i, tabIdToString))
 		local selected = (self.m_selected_category == i)
 
-		cursorPos = vec2:new(ImGui.GetCursorScreenPos())
-		local yCenter = cursorPos.y + tabHeight * 0.5 - elemHeight * 0.5
-		local elemPos = vec2:new(cursorPos.x, yCenter)
-		local rect = Rect(elemPos, vec2:new(elemPos.x + elemWidth, elemPos.y + elemHeight))
+		cursorPos      = vec2:new(ImGui.GetCursorScreenPos())
+		local yCenter  = cursorPos.y + tabHeight * 0.5 - elemHeight * 0.5
+		local elemPos  = vec2:new(cursorPos.x, yCenter)
+		local rect     = Rect(elemPos, vec2:new(elemPos.x + elemWidth, elemPos.y + elemHeight))
 		local rectSize = rect:GetSize()
 
 		ImGui.PushID(i)
 		ImGui.InvisibleButton(tabName, rectSize.x, rectSize.y)
 		local hovered = ImGui.IsItemHovered()
 		local clicked = ImGui.IsItemClicked()
-		local held = (hovered and KeyManager:IsKeyPressed(eVirtualKeyCodes.VK_LBUTTON))
+		local held    = (hovered and KeyManager:IsKeyPressed(eVirtualKeyCodes.VK_LBUTTON))
 		local rectMod = vec2:new((held or clicked) and 1 or 0, (held or clicked) and 1 or 0)
 
 		if (not underlineSet) then
@@ -457,6 +459,7 @@ function GUI:DrawTopBar()
 
 		if (clicked) then
 			if (self.m_selected_category ~= i and self.m_selected_tab) then
+				self.m_prev_category_tabs[self.m_selected_category] = self.m_selected_tab
 				self.m_selected_tab = nil
 			end
 
@@ -510,6 +513,16 @@ function GUI:DrawSideBar(yPos)
 
 	self.m_selected_category_tabs = self.m_selected_category_tabs or {}
 	local ctabsCount = #self.m_selected_category_tabs
+	self.m_is_drawing_sidebar = ctabsCount > 1
+
+	if (not self.m_selected_tab) then
+		if (self.m_prev_category_tabs[self.m_selected_category]) then
+			self.m_selected_tab = self.m_prev_category_tabs[self.m_selected_category]
+		else
+			self.m_selected_tab = self.m_selected_category_tabs[1].second
+		end
+	end
+
 	if (ctabsCount > 1) then
 		local selectableSize = vec2:new(self.m_sidebar_width - 30, 32)
 		ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
@@ -537,10 +550,6 @@ function GUI:DrawSideBar(yPos)
 			ImGui.End()
 		end
 		ThemeManager:PopTheme()
-		self.m_is_drawing_sidebar = true
-	elseif (ctabsCount == 1) then
-		self.m_selected_tab = self.m_selected_category_tabs[1].second
-		self.m_is_drawing_sidebar = false
 	end
 end
 
@@ -735,7 +744,7 @@ function GUI:Text(text, opts)
 	if (has_wrap_pos) then
 		ImGui.PushTextWrapPos(opts.wrap_pos)
 	end
-	ImGui.TextWrapped(text)
+	ImGui.Text(text)
 	ImGui.PopStyleColor(1)
 	if (has_wrap_pos) then
 		ImGui.PopTextWrapPos()

@@ -23,7 +23,7 @@ local CashSafe        = require("includes.modules.businesses.CashSafe")
 ---@field private m_id integer
 ---@field private m_name string
 ---@field private m_safe CashSafe
----@field private m_subs BikerBusiness[]|BusinessHub[]
+---@field private m_subs Factory[]|BusinessHub[]
 local BusinessFront   = setmetatable({}, BusinessBase)
 BusinessFront.__index = BusinessFront
 
@@ -52,18 +52,35 @@ function BusinessFront:AddSubBusiness(index) end
 ---@return CashSafe
 function BusinessFront:GetCashSafe() return self.m_safe end
 
----@return array<BikerBusiness>
+---@return array<Factory>|array<BusinessHub>
 function BusinessFront:GetSubBusinesses() return self.m_subs end
+
+---@return boolean
+function BusinessFront:HasSubBusinesses()
+	return self.m_subs and #self.m_subs > 0
+end
 
 ---@return integer
 function BusinessFront:GetEstimatedIncome()
-	local moola = self.m_safe:GetCashValue()
+	local moola = self.m_safe and self.m_safe:GetCashValue() or 0
 	for _, sub in ipairs(self.m_subs) do
-		if (sub and sub:IsValid()) then
-			moola = moola + sub:GetEstimatedIncome()
-		end
+		moola = moola + sub:GetEstimatedIncome()
 	end
 	return moola
+end
+
+function BusinessFront:Update()
+	if (not self:IsValid()) then
+		return
+	end
+
+	if (not self:HasSubBusinesses()) then
+		return
+	end
+
+	for _, sub in ipairs(self.m_subs) do
+		sub:Update()
+	end
 end
 
 return BusinessFront

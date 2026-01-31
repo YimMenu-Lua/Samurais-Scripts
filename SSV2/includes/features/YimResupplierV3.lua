@@ -9,7 +9,7 @@
 
 local SGSL                       = require("includes.services.SGSL")
 local Warehouse                  = require("includes.modules.businesses.Warehouse")
-local BikerBusiness              = require("includes.modules.businesses.BikerBusiness")
+local Factory                    = require("SSV2.includes.modules.businesses.Factory")
 local Nightclub                  = require("includes.modules.businesses.Nightclub")
 local Clubhouse                  = require("includes.modules.businesses.Clubhouse")
 local CashSafe                   = require("includes.modules.businesses.CashSafe")
@@ -59,8 +59,8 @@ Enums.eYRState                   = {
 ---@field safes array<CashSafe>
 ---@field clubhouse? Clubhouse
 ---@field hangar? Warehouse
----@field bunker? BikerBusiness
----@field acid_lab? BikerBusiness
+---@field bunker? Factory
+---@field acid_lab? Factory
 ---@field nightclub? Nightclub
 ---@field car_wash? CarWash
 ---@field salvage_yard? SalvageYard
@@ -75,8 +75,9 @@ Enums.eYRState                   = {
 ---@field private m_sell_script_disp_name string
 ---@field private m_raw_data RawBusinessData
 ---@field private m_businesses YRV3Businesses
----@field private m_last_as_check_time milliseconds
+---@field private m_last_autosell_check_time milliseconds
 ---@field private m_last_income_check_time milliseconds
+---@field private m_last_business_update_time milliseconds
 ---@field private m_cooldown_state_dirty boolean
 ---@field private m_initial_data_done boolean
 ---@field private m_data_initialized boolean
@@ -92,20 +93,21 @@ function YRV3:init()
 		return self
 	end
 
-	self.m_total_sum              = 0
-	self.m_bhub_script_handle     = 0
-	self.m_last_as_check_time     = 0
-	self.m_last_income_check_time = 0
-	self.m_state                  = Enums.eYRState.OFFLINE
-	self.m_has_triggered_autosell = false
-	self.m_sell_script_running    = false
-	self.m_initial_data_done      = false
-	self.m_data_initialized       = false
-	self.m_cooldown_state_dirty   = true
-	self.m_sell_script_name       = nil
-	self.m_sell_script_disp_name  = "None"
-	self.m_last_error             = ""
-	self.m_businesses             = {
+	self.m_total_sum                 = 0
+	self.m_bhub_script_handle        = 0
+	self.m_last_autosell_check_time  = 0
+	self.m_last_income_check_time    = 0
+	self.m_last_business_update_time = 0
+	self.m_state                     = Enums.eYRState.OFFLINE
+	self.m_has_triggered_autosell    = false
+	self.m_sell_script_running       = false
+	self.m_initial_data_done         = false
+	self.m_data_initialized          = false
+	self.m_cooldown_state_dirty      = true
+	self.m_sell_script_name          = nil
+	self.m_sell_script_disp_name     = "None"
+	self.m_last_error                = ""
+	self.m_businesses                = {
 		warehouses = {},
 		safes      = {},
 	}
@@ -131,18 +133,19 @@ function YRV3:init()
 end
 
 function YRV3:Reset()
-	self.m_total_sum              = 0
-	self.m_last_as_check_time     = 0
-	self.m_last_income_check_time = 0
-	self.m_businesses             = {
+	self.m_total_sum                 = 0
+	self.m_last_autosell_check_time  = 0
+	self.m_last_income_check_time    = 0
+	self.m_last_business_update_time = 0
+	self.m_businesses                = {
 		warehouses = {},
 		safes      = {},
 	}
-	self.m_has_triggered_autosell = false
-	self.m_sell_script_running    = false
-	self.m_initial_data_done      = false
-	self.m_data_initialized       = false
-	self.m_cooldown_state_dirty   = true
+	self.m_has_triggered_autosell    = false
+	self.m_sell_script_running       = false
+	self.m_initial_data_done         = false
+	self.m_data_initialized          = false
+	self.m_cooldown_state_dirty      = true
 end
 
 function YRV3:Reload()
@@ -235,12 +238,12 @@ function YRV3:GetCarWash()
 	return self.m_businesses.car_wash
 end
 
----@return BikerBusiness?
+---@return Factory?
 function YRV3:GetBunker()
 	return self.m_businesses.bunker
 end
 
----@return BikerBusiness?
+---@return Factory?
 function YRV3:GetAcidLab()
 	return self.m_businesses.acid_lab
 end
@@ -343,7 +346,7 @@ function YRV3:PopulateBikerBusinesses()
 			local eq_upg_mult        = tunables.get_int("GR_MANU_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
 			local stf_upg_mult       = tunables.get_int("GR_MANU_PRODUCT_VALUE_STAFF_UPGRADE")
 
-			self.m_businesses.bunker = BikerBusiness.new({
+			self.m_businesses.bunker = Factory.new({
 				id         = 5,
 				name       = Game.GetGXTLabel(_F("MP_BUNKER_%d", gxt_idx)),
 				coords     = ref and ref.coords or vec3:zero(),
@@ -360,7 +363,7 @@ function YRV3:PopulateBikerBusinesses()
 			and (stats.get_int("MPX_XM22_LAB_EQUIP_UPGRADED") == 1)
 		local eq_upg_mult          = tunables.get_int("BIKER_ACID_PRODUCT_VALUE_EQUIPMENT_UPGRADE")
 
-		self.m_businesses.acid_lab = BikerBusiness.new({
+		self.m_businesses.acid_lab = Factory.new({
 			id         = 6,
 			name       = Game.GetGXTLabel("MP_BWH_ACID"),
 			vpu_mult_1 = has_eq_upgrade and eq_upg_mult or 0,
@@ -552,27 +555,6 @@ function YRV3:InitializeData()
 	self.m_last_error = "GENERIC_WAIT_LABEL"
 	self:PreInit()
 	self:PopulateNightclub()
-end
-
-function YRV3:WarehouseAutofill()
-	if (not self:CanAccess()) then
-		return
-	end
-
-	for _, wh in ipairs(self.m_businesses.warehouses) do
-		wh:AutoFill()
-	end
-end
-
-function YRV3:HangarAutofill()
-	if (not self:CanAccess()) then
-		return
-	end
-
-	local hangar = self.m_businesses.hangar
-	if (hangar and hangar:IsValid()) then
-		self.m_businesses.hangar:AutoFill()
-	end
 end
 
 function YRV3:FinishSaleOnCommand()
@@ -809,7 +791,7 @@ end
 local fadedOutTimer = Timer.new(1e4)
 fadedOutTimer:pause()
 function YRV3:SetupAutosell()
-	if (Time.millis() - self.m_last_as_check_time < 1200) then
+	if (Time.millis() - self.m_last_autosell_check_time < 1200) then
 		return
 	end
 
@@ -858,7 +840,7 @@ function YRV3:SetupAutosell()
 		fadedOutTimer:pause()
 	end
 
-	self.m_last_as_check_time = Time.millis()
+	self.m_last_autosell_check_time = Time.millis()
 end
 
 function YRV3:AutoSellHandler()
@@ -927,46 +909,33 @@ function YRV3:MCT()
 	end)
 end
 
-function YRV3:AutoProduceHandler()
-	for _, bb in ipairs(self.m_businesses.clubhouse:GetSubBusinesses()) do
-		if (bb.fast_prod_enabled and not bb.fast_prod_running) then
-			bb:LoopProduction()
-		end
-	end
-
-	local bunker = self.m_businesses.bunker
-	if (bunker and bunker:IsValid()) then
-		if (bunker.fast_prod_enabled and not bunker.fast_prod_running) then
-			bunker:LoopProduction()
-		end
-	end
-
-	local acidlab = self.m_businesses.acid_lab
-	if (acidlab and acidlab:IsValid()) then
-		if (acidlab.fast_prod_enabled and not acidlab.fast_prod_running) then
-			acidlab:LoopProduction()
-		end
-	end
-
-	if (not self.m_businesses.nightclub) then
+function YRV3:UpdateBusinesses()
+	if (not self:CanAccess()) then
 		return
 	end
 
-	local hubs = self.m_businesses.nightclub:GetSubBusinesses()
-	if (not hubs) then
+	if (Time.millis() - self.m_last_business_update_time < 500) then
 		return
 	end
 
-	for _, hub in ipairs(hubs) do
-		if (hub.fast_prod_enabled and not hub.fast_prod_running) then
-			hub:LoopProduction()
+	for key, business in pairs(self.m_businesses) do
+		if (key == "safes" or key == "salvage_yard" or key == "car_wash") then
+			goto continue
 		end
-	end
-end
 
-function YRV3:AutoFillHandler()
-	self:HangarAutofill()
-	self:WarehouseAutofill()
+		if (key == "warehouses") then
+			for _, wh in ipairs(business) do
+				if (type(wh.Update) == "function") then
+					wh:Update()
+				end
+			end
+		elseif (type(business.Update) == "function") then
+			business:Update()
+		end
+		::continue::
+	end
+
+	self.m_last_business_update_time = Time.millis()
 end
 
 ---@param business BusinessBase|BasicBusiness
@@ -1046,11 +1015,11 @@ function YRV3:OnTick()
 	self.m_state = Enums.eYRState.RUNNING
 	self:SetLastError("")
 
-	self:AutoSellHandler()
-	self:AutoFillHandler()
-	self:AutoProduceHandler()
-	self:CooldownHandler()
+	self:UpdateBusinesses()
 	self:CalculateEstimatedIncome()
+
+	self:AutoSellHandler()
+	self:CooldownHandler()
 end
 
 return YRV3

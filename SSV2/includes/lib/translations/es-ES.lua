@@ -563,5 +563,6 @@ return {
 	["SY_MAX_THRESHOLD"] = "Maximizar los ingresos",
 	["YRV3_CASH_SAFE"] = "Efectivo seguro",
 	["SY_ALWAYS_MAX_INCOME"] = "Umbral de bloqueo",
-	["SY_ALWAYS_MAX_INCOME_TT"] = "Evita que su umbral de ingresos disminuya con el tiempo."
+	["SY_ALWAYS_MAX_INCOME_TT"] = "Evita que su umbral de ingresos disminuya con el tiempo.",
+	["YRV3_GENERIC_NOT_SETUP"] = "Este negocio no ha sido creado. Regrese después de finalizar la misión de configuración."
 }
