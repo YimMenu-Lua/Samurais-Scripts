@@ -488,7 +488,7 @@ end
 ---@param cmd_name string
 ---@param data { type: eActionType, label: string, is_json?: boolean }
 function YimActions:AddCommandAction(cmd_name, data)
-	if ((type(cmd_name) ~= "string") or cmd_name:isnullorwhitespace() or cmd_name:isempty()) then
+	if (not string.isvalid(cmd_name)) then
 		Notifier:ShowError("YimActions", "Invalid command name.")
 		return
 	end

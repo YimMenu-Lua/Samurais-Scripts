@@ -41,7 +41,7 @@ end
 
 ---@param index integer
 function Clubhouse:AddSubBusiness(index)
-	if (not math.isinrange(index, 0, 4)) then
+	if (not math.is_inrange(index, 0, 4)) then
 		return
 	end
 

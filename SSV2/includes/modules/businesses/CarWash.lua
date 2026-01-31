@@ -62,7 +62,7 @@ function CarWashDuffle:CleanNow()
 		return
 	end
 
-	stats.set_int("MPX_CAR_WASH_DUFFEL_POSIX", self:GetDirtyCashPosix() - 1000)
+	stats.set_int("MPX_CAR_WASH_DUFFEL_POSIX", Time.epoch() + 1000)
 end
 
 ---@class CarWashSubBusinessOpts : BasicBusinessOpts

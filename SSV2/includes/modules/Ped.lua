@@ -127,8 +127,8 @@ function Ped:IsPedMyEnemy(pedHandle)
 	return (
 		PED.IS_PED_IN_COMBAT(pedHandle, this)
 		or PED.IS_PED_IN_COMBAT(this, pedHandle)
-		or math.isinrange(rel1, 3, 5)
-		or math.isinrange(rel2, 3, 5)
+		or math.is_inrange(rel1, 3, 5)
+		or math.is_inrange(rel2, 3, 5)
 		or PED.IS_ANY_HOSTILE_PED_NEAR_POINT(
 			pedHandle,
 			pos.x,

@@ -120,7 +120,7 @@ end
 ---@param command_name string
 ---@return boolean
 function CommandExecutor:IsBuiltinCommand(command_name)
-	return command_name:startswith("!")
+	return string.isvalid(command_name) and command_name:startswith("!")
 end
 
 ---@param cmd_name string
@@ -233,7 +233,7 @@ function CommandExecutor:HandleCallbacks()
 		return
 	end
 
-	if (self.m_cmd_entered and not string.isnullorwhitespace(self.m_user_cmd)) then
+	if (self.m_cmd_entered and string.isvalid(self.m_user_cmd)) then
 		GUI:PlaySound(GUI.Sounds.Click)
 
 		local cmd, args = self:ParseCommand(self.m_user_cmd)

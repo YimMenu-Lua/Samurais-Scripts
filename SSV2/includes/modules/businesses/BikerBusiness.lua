@@ -71,13 +71,13 @@ end
 
 ---@return integer
 function BikerBusiness:GetSuppliesCount()
-	assert(type(self.m_id) == "number" and math.isinrange(self.m_id, 0, 6), "Invalid Biker Business id.")
+	assert(type(self.m_id) == "number" and math.is_inrange(self.m_id, 0, 6), "Invalid Biker Business id.")
 	return stats.get_int(_F("MPX_MATTOTALFORFACTORY%d", self.m_id))
 end
 
 ---@return integer
 function BikerBusiness:GetProductCount()
-	assert(type(self.m_id) == "number" and math.isinrange(self.m_id, 0, 6), "Invalid Biker Business id.")
+	assert(type(self.m_id) == "number" and math.is_inrange(self.m_id, 0, 6), "Invalid Biker Business id.")
 	return stats.get_int(_F("MPX_PRODTOTALFORFACTORY%d", self.m_id))
 end
 

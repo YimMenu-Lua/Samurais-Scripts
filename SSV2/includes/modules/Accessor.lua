@@ -256,8 +256,7 @@ setmetatable(ScriptLocal,
 ---@param script_name string Script name
 ---@return ScriptLocal
 function ScriptLocal.new(address, script_name)
-	assert(not string.isnullorempty(script_name) and not string.iswhitespace(script_name),
-		"Invalid script name for ScriptLocal!")
+	assert(string.isvalid(script_name), "Invalid script name for ScriptLocal!")
 	local instance               = Accessor.new(address, Enums.eAccessorType.LOCAL, script_name)
 	---@diagnostic disable: undefined-field
 	instance.__index.ReadString  = nil

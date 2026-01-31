@@ -120,7 +120,7 @@ function GUI:LateInit()
 		gui.add_always_draw_imgui(drawfunc)
 	end
 
-	if (not math.isinrange(GVars.ui.last_tab.tab_id, TABID_MIN, TABID_MAX)) then
+	if (not math.is_inrange(GVars.ui.last_tab.tab_id, TABID_MIN, TABID_MAX)) then
 		GVars.ui.last_tab.tab_id = 1
 	end
 
@@ -222,7 +222,7 @@ end
 ---@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@return Tab
 function GUI:RegisterNewTab(id, name, drawable, subtabs, isTranslatorLabel)
-	assert((not string.isnullorempty(name)), "Attempt to register a new tab with no name.")
+	assert((string.isvalid(name)), "Attempt to register a new tab with no name.")
 
 	if (self:DoesTabExist(id, name)) then
 		error(_F("Tab '%s' already exists.", name))
@@ -268,14 +268,15 @@ end
 -- Registers an independent window that can only be drawn when the menu is open.
 ---@param windowData WindowRequest
 function GUI:RequestWindow(windowData)
-	if (type(windowData.m_label) ~= "string" or windowData.m_label:isnullorempty()) then
+	if (not string.isvalid(windowData.m_label)) then
 		log.warning("[GUI]: Failed to register window request. Invalid window name")
 		return
 	end
 
 	if (self.m_requested_windows[windowData.m_label]) then
 		log.fwarning("[GUI]: Failed to register window request. A window with the name %s already exists!",
-			windowData.m_label)
+			windowData.m_label
+		)
 		return
 	end
 

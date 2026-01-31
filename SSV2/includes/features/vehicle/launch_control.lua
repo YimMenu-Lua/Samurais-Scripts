@@ -128,7 +128,7 @@ function LaunchControl:Update()
 
 		local rpm = PV:GetRPM()
 
-		if (PAD.IS_CONTROL_RELEASED(0, 71) and (rpm < 1.0) and math.isinrange(rpm, rpmThreshold.min, rpmThreshold.max) and (gear ~= 0)) then
+		if (PAD.IS_CONTROL_RELEASED(0, 71) and (rpm < 1.0) and math.is_inrange(rpm, rpmThreshold.min, rpmThreshold.max) and (gear ~= 0)) then
 			if (Time.millis() < self.m_last_pop_time) then
 				return
 			end

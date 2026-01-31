@@ -168,13 +168,13 @@ end
 ---@return boolean
 function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlight, highlightColor)
 	local drawList = ImGui.GetWindowDrawList()
-	local pos = vec2:new(ImGui.GetCursorScreenPos())
-	local max = pos + size
-	local rect = Rect(pos, vec2:new(pos.x + size.x, pos.y + size.y))
+	local pos      = vec2:new(ImGui.GetCursorScreenPos())
+	local max      = pos + size
+	local rect     = Rect(pos, vec2:new(pos.x + size.x, pos.y + size.y))
 	local rectSize = rect:GetSize()
+
 	ImGui.InvisibleButton(label, rectSize.x, rectSize.y)
 	local hovered = ImGui.IsItemHovered()
-	-- local hovered = ImGui.IsMouseHoveringRect(pos.x, pos.y, max.x, max.y)
 	local clicked = hovered and ImGui.IsItemClicked(0)
 	local pressed = hovered and KeyManager:IsKeyPressed(eVirtualKeyCodes.VK_LBUTTON)
 

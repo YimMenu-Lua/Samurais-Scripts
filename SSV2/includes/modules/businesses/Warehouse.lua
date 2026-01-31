@@ -111,7 +111,7 @@ function Warehouse:GetProductCount()
 	if (self.m_type == Enums.eWarehouseType.HANGAR) then
 		return stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
 	elseif (self.m_type == Enums.eWarehouseType.SPECIAL_CARGO) then
-		assert(type(self.m_id) == "number" and math.isinrange(self.m_id, 0, 4), "Invalid special cargo warehouse id.")
+		assert(type(self.m_id) == "number" and math.is_inrange(self.m_id, 0, 4), "Invalid special cargo warehouse id.")
 		return stats.get_int(_F("MPX_CONTOTALFORWHOUSE%d", self.m_id))
 	end
 
@@ -139,7 +139,7 @@ function Warehouse:ReStock()
 	if (self.m_type == Enums.eWarehouseType.HANGAR) then
 		stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
 	elseif (self.m_type == Enums.eWarehouseType.SPECIAL_CARGO) then
-		assert(type(self.m_id) == "number" and math.isinrange(self.m_id, 0, 4), "Invalid special cargo warehouse id.")
+		assert(type(self.m_id) == "number" and math.is_inrange(self.m_id, 0, 4), "Invalid special cargo warehouse id.")
 		stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, self.m_id + 11)
 	end
 end

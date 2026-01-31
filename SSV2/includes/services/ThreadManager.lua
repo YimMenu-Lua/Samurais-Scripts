@@ -53,7 +53,7 @@ eInternalThreadState = {
 ---@overload fun(name: string, callback: function): Thread
 local Thread = Class("Thread")
 function Thread.new(name, callback)
-	if string.isnullorwhitespace(name) then
+	if not string.isvalid(name) then
 		name = string.random(5, true):upper()
 	end
 
