@@ -563,5 +563,6 @@ return {
 	["YRV3_CLUBHOUSE_NOT_OWNED"] = "您沒有摩托車俱樂部。",
 	["YRV3_CASH_SAFE"] = "安全現金",
 	["SY_ALWAYS_MAX_INCOME_TT"] = "防止您的收入門檻隨著時間的推移而下降。",
-	["SY_ALWAYS_MAX_INCOME"] = "鎖定閾值"
+	["SY_ALWAYS_MAX_INCOME"] = "鎖定閾值",
+	["YRV3_GENERIC_NOT_SETUP"] = "該業務尚未設立。請完成設置任務後返回。"
 }

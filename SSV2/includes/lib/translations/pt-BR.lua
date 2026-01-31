@@ -563,5 +563,6 @@ return {
 	["SY_INCOME_THRESHOLD"] = "Limite de renda",
 	["SY_CHOP_SHOP"] = "Loja de costeletas",
 	["SY_ALWAYS_MAX_INCOME_TT"] = "Impede que seu limite de renda diminua com o tempo.",
-	["SY_ALWAYS_MAX_INCOME"] = "Limite de bloqueio"
+	["SY_ALWAYS_MAX_INCOME"] = "Limite de bloqueio",
+	["YRV3_GENERIC_NOT_SETUP"] = "Este negócio não foi configurado. Por favor, retorne após terminar a missão de preparação."
 }

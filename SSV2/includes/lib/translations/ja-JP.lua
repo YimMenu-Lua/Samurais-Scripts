@@ -563,5 +563,6 @@ return {
 	["YRV3_CASH_SAFE"] = "安全な現金",
 	["YRV3_CLUBHOUSE_NOT_OWNED"] = "あなたはオートバイクラブを所有していません。",
 	["SY_ALWAYS_MAX_INCOME"] = "ロックしきい値",
-	["SY_ALWAYS_MAX_INCOME_TT"] = "収入の基準値が時間の経過とともに低下するのを防ぎます。"
+	["SY_ALWAYS_MAX_INCOME_TT"] = "収入の基準値が時間の経過とともに低下するのを防ぎます。",
+	["YRV3_GENERIC_NOT_SETUP"] = "このビジネスは確立されていません。セットアップミッション終了後、お戻りください。"
 }

@@ -220,6 +220,7 @@ return {
 	["YRV3_LSD_LAB_NOT_OWNED"]             = "You don't own an acid lab.",
 	["YRV3_CLUB_NOT_OWNED"]                = "You don't own a nightclub.",
 	["YRV3_GENERIC_NOT_OWNED"]             = "You don't own this business.",
+	["YRV3_GENERIC_NOT_SETUP"]             = "This business has not been setup. Please return after finishing the setup mission.",
 	["YRV3_CASH_SAFE"]                     = "Safe Cash",
 	["YRV3_CARGO_AMT"]                     = "Cargo Held",
 	["YRV3_CRATES_LABEL"]                  = "Crates",

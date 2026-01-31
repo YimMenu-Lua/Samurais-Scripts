@@ -20,7 +20,8 @@ local RawBusinessData = require("includes.data.yrv3_data")
 ---@field private m_name string
 ---@field private m_custom_name string
 ---@field private m_safe CashSafe
----@field private m_hubs BusinessHub[]
+---@field private m_subs BusinessHub[]
+---@field public GetSubBusinesses fun(self: Nightclub): BusinessHub[]
 local Nightclub       = setmetatable({}, BusinessFront)
 Nightclub.__index     = Nightclub
 
@@ -30,14 +31,22 @@ function Nightclub.new(opts)
 	local base             = BusinessFront.new(opts)
 	local instance         = setmetatable(base, Nightclub)
 	instance.m_custom_name = opts.custom_name
-	instance.m_hubs        = {}
 	---@diagnostic disable-next-line
 	return instance
 end
 
 function Nightclub:Reset()
-	self.fast_prod_enabled = false
-	self.fast_prod_running = false
+	self:ResetImpl()
+end
+
+---@return boolean
+function Nightclub:HasBusinessHub()
+	return stats.get_int("MPX_BUSINESSHUB_OWNED") == self.m_id
+end
+
+---@return integer
+function Nightclub:GetHubStorageLevels()
+	return stats.get_int("MPX_BUSINESSHUB_MOD_3")
 end
 
 ---@return string
@@ -77,7 +86,7 @@ end
 
 ---@param index integer
 function Nightclub:AddSubBusiness(index)
-	if (not self:IsValid()) then
+	if (not self:IsValid() or not self:HasBusinessHub()) then
 		return
 	end
 
@@ -86,17 +95,12 @@ function Nightclub:AddSubBusiness(index)
 		return
 	end
 
-	table.insert(self.m_hubs, BusinessHub.new({
+	table.insert(self.m_subs, BusinessHub.new({
 		id        = index,
 		name      = ref.name,
 		max_units = tunables.get_int(ref.max_units_tunable),
 		vpu       = tunables.get_int(ref.vpu_tunable)
 	}))
-end
-
----@return array<BusinessHub>
-function Nightclub:GetSubBusinesses()
-	return self.m_hubs
 end
 
 return Nightclub

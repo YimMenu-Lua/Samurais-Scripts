@@ -563,5 +563,6 @@ return {
 	["YRV3_CASH_SAFE"] = "安全现金",
 	["SY_INCOME_THRESHOLD"] = "收入门槛",
 	["SY_ALWAYS_MAX_INCOME"] = "锁定阈值",
-	["SY_ALWAYS_MAX_INCOME_TT"] = "防止您的收入门槛随着时间的推移而下降。"
+	["SY_ALWAYS_MAX_INCOME_TT"] = "防止您的收入门槛随着时间的推移而下降。",
+	["YRV3_GENERIC_NOT_SETUP"] = "该业务尚未设立。请完成设置任务后返回。"
 }

@@ -111,7 +111,9 @@ function Warehouse:GetProductCount()
 	if (self.m_type == Enums.eWarehouseType.HANGAR) then
 		return stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
 	elseif (self.m_type == Enums.eWarehouseType.SPECIAL_CARGO) then
-		assert(type(self.m_id) == "number" and math.is_inrange(self.m_id, 0, 4), "Invalid special cargo warehouse id.")
+		if (not self.m_id or not math.is_inrange(self.m_id, 0, 4)) then
+			return 0
+		end
 		return stats.get_int(_F("MPX_CONTOTALFORWHOUSE%d", self.m_id))
 	end
 
@@ -139,18 +141,15 @@ function Warehouse:ReStock()
 	if (self.m_type == Enums.eWarehouseType.HANGAR) then
 		stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
 	elseif (self.m_type == Enums.eWarehouseType.SPECIAL_CARGO) then
-		assert(type(self.m_id) == "number" and math.is_inrange(self.m_id, 0, 4), "Invalid special cargo warehouse id.")
-		stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, self.m_id + 11)
+		if (not self.m_id or not math.is_inrange(self.m_id, 0, 4)) then
+			return 0
+		end
+		stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, self.m_id + 12)
 	end
 end
 
 function Warehouse:AutoFill()
-	if (not self.auto_fill or self.m_auto_fill_running) then
-		return
-	end
-
 	ThreadManager:Run(function()
-		self.m_auto_fill_running = true
 		while (self:IsValid() and self.auto_fill and not self:IsFull()) do
 			self:ReStock()
 			sleep(GVars.features.yrv3.autofill_delay or 300)
@@ -159,6 +158,17 @@ function Warehouse:AutoFill()
 		self.auto_fill = false
 		self.m_auto_fill_running = false
 	end)
+end
+
+function Warehouse:Update()
+	if (not self:IsValid()) then
+		return
+	end
+
+	if (self.auto_fill and not self.m_auto_fill_running and not self:IsFull()) then
+		self.m_auto_fill_running = true
+		self:AutoFill()
+	end
 end
 
 return Warehouse

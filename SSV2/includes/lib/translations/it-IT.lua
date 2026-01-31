@@ -563,5 +563,6 @@ return {
 	["SY_CD_ROB_TYPE_ERR"] = "Impossibile ottenere la rapina in corso! Sei sicuro di averne iniziato uno?",
 	["SY_INCOME_THRESHOLD"] = "Soglia di reddito",
 	["SY_ALWAYS_MAX_INCOME"] = "Soglia di blocco",
-	["SY_ALWAYS_MAX_INCOME_TT"] = "Evita che la tua soglia di reddito diminuisca nel tempo."
+	["SY_ALWAYS_MAX_INCOME_TT"] = "Evita che la tua soglia di reddito diminuisca nel tempo.",
+	["YRV3_GENERIC_NOT_SETUP"] = "Questa attività non è stata configurata. Si prega di tornare dopo aver terminato la missione di configurazione."
 }

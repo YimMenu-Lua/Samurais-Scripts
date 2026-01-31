@@ -563,5 +563,6 @@ return {
 	["YRV3_CASH_SAFE"] = "Argent sécurisé",
 	["SY_ROB_IN_PROGRESS"] = "En cours.",
 	["SY_ALWAYS_MAX_INCOME_TT"] = "Empêche votre seuil de revenu de diminuer avec le temps.",
-	["SY_ALWAYS_MAX_INCOME"] = "Seuil de verrouillage"
+	["SY_ALWAYS_MAX_INCOME"] = "Seuil de verrouillage",
+	["YRV3_GENERIC_NOT_SETUP"] = "Cette entreprise n'a pas été créée. Veuillez revenir après avoir terminé la mission de configuration."
 }

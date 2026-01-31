@@ -14,8 +14,8 @@ local function drawGamblingTab()
 	ImGui.SeparatorText(_T "CP_COOLDOWN_BYPASS")
 	GVars.features.dunk.bypass_casino_bans, _ = GUI:CustomToggle(_T "CP_COOLDOWN_BYPASS_ENABLE",
 		GVars.features.dunk.bypass_casino_bans, {
-			tooltip = _T "CP_COOLDOWN_BYPASS_TOOLTIP",
-			color = Color("#AA0000")
+			tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"),
+			color   = Color("#AA0000")
 		})
 
 	ImGui.SameLine()
@@ -25,9 +25,12 @@ local function drawGamblingTab()
 
 	ImGui.SeparatorText(_T "CP_POKER_SETTINGS")
 	GVars.features.dunk.force_poker_cards, _ = GUI:CustomToggle(_T "CP_POKER_FORCE_ROYAL_FLUSH",
-		GVars.features.dunk.force_poker_cards)
+		GVars.features.dunk.force_poker_cards
+	)
+
 	GVars.features.dunk.set_dealers_poker_cards, _ = GUI:CustomToggle(_T "CP_POKER_FORCE_BAD_BEAT",
-		GVars.features.dunk.set_dealers_poker_cards)
+		GVars.features.dunk.set_dealers_poker_cards
+	)
 
 	ImGui.SeparatorText(_T "CP_BLACKJACK_SETTINGS")
 	ImGui.BulletText(_T "CP_BLACKJACK_DEALER_FACE_DOWN_CARD")

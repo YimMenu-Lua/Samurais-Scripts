@@ -89,13 +89,7 @@ function BusinessHub:CanTriggerProduction()
 end
 
 function BusinessHub:LoopProduction()
-	if (not self.fast_prod_enabled or self.m_fast_prod_running) then
-		return
-	end
-
 	ThreadManager:Run(function()
-		self.m_fast_prod_running = true
-
 		while (self:IsValid() and self.fast_prod_enabled and not self:IsFull()) do
 			self:TriggerProduction()
 			yield()
@@ -104,6 +98,17 @@ function BusinessHub:LoopProduction()
 		self.fast_prod_enabled = false
 		self.m_fast_prod_running = false
 	end)
+end
+
+function BusinessHub:Update()
+	if (not self:IsValid()) then
+		return
+	end
+
+	if (self.fast_prod_enabled and not self.m_fast_prod_running and not self:IsFull()) then
+		self.m_fast_prod_running = true
+		self:LoopProduction()
+	end
 end
 
 return BusinessHub
