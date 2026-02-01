@@ -8,7 +8,7 @@
 
 
 local BusinessFront   = require("includes.modules.businesses.BusinessFront")
-local Factory         = require("SSV2.includes.modules.businesses.Factory")
+local Factory         = require("includes.modules.businesses.Factory")
 local RawBusinessData = require("includes.data.yrv3_data")
 
 -- Class representing a MC Clubhouse business.

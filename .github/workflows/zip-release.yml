@@ -107,6 +107,12 @@ jobs:
           });
 
           let changelog = "";
+          let breaking = false;
+          let breakingMsg = ">[!Important]\n>**This is a breaking change**\n>To install this update, please remove the previous version completely and then install the new version.\n\n";
+
+          function isBreakingChange(str) {
+            return str.toLowerCase().includes("breaking change");
+          }
 
           const mergedPRs = pulls.filter(pr => pr.merged_at && new Date(pr.merged_at) > lastTagDate);
           const extractField = (body, fieldName) => {
@@ -120,15 +126,11 @@ jobs:
 
           if (mergedPRs.length > 0) {
             for (const pr of mergedPRs) {
-              changelog += `## PR #${pr.number}: ${pr.title}\n`;
-              const body = pr.body
+              changelog += `### PR #${pr.number}: ${pr.title}\n`;
+              const body = pr.body;
               if (body) {
-                const lines = body.split('\n').map(line => line.trim());
-                for (const line of lines) {
-                  if (line)
-                    changelog += `${line}\n`;
-                }
-                changelog += "\n";
+                breaking = breaking || isBreakingChange(body);
+                changelog += `${body.trim()}\n\n`;
               }
             }
           } else {
@@ -141,17 +143,25 @@ jobs:
 
             const commits = compared.data.commits;
             for (const commit of commits) {
-              const msg = commit.commit.message;
+              const msg = commit.commit.message || "";
               const body = commit.commit.body;
+
               if (msg.toLowerCase().startsWith("merge pull"))
                 continue;
 
+              breaking = breaking || isBreakingChange(msg);
               changelog += `## ${msg}\n\n`;
-              if (body)
-                changelog += `${body}\n\n`;
+
+              if (body) {
+                breaking = breaking || isBreakingChange(body);
+                changelog += `${body.trim()}\n\n`;
+              }
             }
           }
 
+          if (breaking) {
+            changelog = `${breakingMsg}${changelog}`
+          }
           core.setOutput("changelog", changelog);
 
     - name: Bump Version
