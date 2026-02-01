@@ -9,7 +9,7 @@
 
 local SGSL                       = require("includes.services.SGSL")
 local Warehouse                  = require("includes.modules.businesses.Warehouse")
-local Factory                    = require("SSV2.includes.modules.businesses.Factory")
+local Factory                    = require("includes.modules.businesses.Factory")
 local Nightclub                  = require("includes.modules.businesses.Nightclub")
 local Clubhouse                  = require("includes.modules.businesses.Clubhouse")
 local CashSafe                   = require("includes.modules.businesses.CashSafe")
@@ -414,6 +414,7 @@ end
 
 function YRV3:PopulateNightclub()
 	if (self.m_businesses.nightclub) then
+		self.m_data_initialized = true
 		return
 	end
 
@@ -421,6 +422,7 @@ function YRV3:PopulateNightclub()
 		local nc_index = stats.get_int("MPX_NIGHTCLUB_OWNED")
 		local ref = self.m_raw_data.Nightclubs[nc_index]
 		if (nc_index == 0 or not ref) then
+			self.m_data_initialized = true
 			return
 		end
 
