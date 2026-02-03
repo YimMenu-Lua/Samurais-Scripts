@@ -451,12 +451,13 @@ function GUI:DrawTopBar()
 		)
 
 		local bg = (hovered or selected) and col1 or Color(GVars.ui.style.theme.Colors.WindowBg:unpack())
-		local textColor = ImGui.GetAutoTextColor(bg)
+		local autoTextColor = ImGui.GetAutoTextColor(bg)
+		local textColor = ImGui.GetColorU32(autoTextColor.r, autoTextColor.g, autoTextColor.b, 0.80)
 		ImGui.ImDrawListAddText(
 			drawList,
 			textPos.x,
 			textPos.y,
-			textColor:AsU32(),
+			textColor,
 			tabName
 		)
 

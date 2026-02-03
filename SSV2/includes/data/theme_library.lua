@@ -159,7 +159,7 @@ local ThemeLibrary <const> = {
 			SliderGrab           = vec4:new(0.10, 0.30, 0.80, 0.90),
 			SliderGrabActive     = vec4:new(0.15, 0.40, 1.00, 1.00),
 
-			Text                 = vec4:new(0.15, 0.17, 0.19, 1.00),
+			Text                 = vec4:new(0.15, 0.17, 0.19, 0.85),
 			TextDisabled         = vec4:new(0.50, 0.50, 0.52, 1.00),
 
 			PlotHistogram        = vec4:new(0.10, 0.35, 0.80, 0.90),
