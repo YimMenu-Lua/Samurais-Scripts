@@ -7,12 +7,15 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+require("includes.lib.imgui_ext")
+
 GVars.keyboard_keybinds.gui_toggle = GVars.keyboard_keybinds.gui_toggle or "F5"
-local Tab = require("includes.modules.Tab")
-local WindowAnimator = require("includes.services.WindowAnimator")
-local ThemeManager = require("includes.services.ThemeManager")
-local debug_counter = GVars.backend.debug_mode and 7 or 0
-local DrawClock = require("includes.frontend.clock")
+local Tab                          = require("includes.modules.Tab")
+local WindowAnimator               = require("includes.services.WindowAnimator")
+local ThemeManager                 = require("includes.services.ThemeManager")
+local debug_counter                = GVars.backend.debug_mode and 7 or 0
+local DrawClock                    = require("includes.frontend.clock")
+
 
 ---@class WindowRequest
 ---@field m_should_draw boolean
@@ -23,7 +26,7 @@ local DrawClock = require("includes.frontend.clock")
 ---@field m_pos? vec2
 
 ---@enum eTabID
-Enums.eTabID = {
+Enums.eTabID                = {
 	TAB_SELF     = 1,
 	TAB_VEHICLE  = 2,
 	TAB_WORLD    = 3,
@@ -32,11 +35,11 @@ Enums.eTabID = {
 	TAB_SETTINGS = 6,
 }
 
-local TABID_MIN <const> = 1
-local TABID_MAX <const> = table.getlen(Enums.eTabID)
+local TABID_MIN <const>     = 1
+local TABID_MAX <const>     = table.getlen(Enums.eTabID)
 
 ---@type table<eTabID, table>
-local defaultTabs = {}
+local defaultTabs           = {}
 
 ---@type table<eTabID, string>
 local tabIdToString <const> = {
@@ -483,21 +486,24 @@ function GUI:DrawTopBar()
 		end
 	end
 
-	underlineX = underlineX + (underlineTargetX - underlineX - 0.5) * 0.15
+	underlineX = underlineX + (underlineTargetX - underlineX) * 0.15
 	underlineW = underlineW + (underlineTargetW - underlineW) * 0.15
 
 	local underlineHeight = 4.0
 	local underlinePos = vec2:new(underlineX, cursorPos.y + tabHeight - underlineHeight)
 	local underlineEnd = vec2:new(underlineX + underlineW, underlinePos.y + underlineHeight)
-	local underlineCol = Color(_col1.x, _col1.y, _col1.z, 255):AsU32()
-	ImGui.ImDrawListAddRectFilled(
+	local underlineCol1 = Color(_col1.x, _col1.y, _col1.z, _col1.w):AsU32()
+	local underlineCol2 = Color(_col2.x, _col2.y, _col2.z, _col2.w):AsU32()
+	ImGui.ImDrawListAddRectFilledMultiColor(
 		drawList,
 		underlineX,
 		underlinePos.y,
 		underlineEnd.x,
 		underlineEnd.y,
-		underlineCol,
-		1.5
+		underlineCol1,
+		underlineCol2,
+		underlineCol2,
+		underlineCol1
 	)
 
 	ImGui.Separator()
@@ -561,9 +567,9 @@ function GUI:ShowWindowHeightLimit()
 		| ImGuiWindowFlags.AlwaysAutoResize
 		| ImGuiWindowFlags.NoBackground
 
-	local color = Color(GVars.ui.style.theme.TopBarFrameCol1:unpack())
-	local top_height = self:GetMaxTopBarHeight()
-	local pos = vec2:new(GVars.ui.window_pos.x, GVars.ui.window_pos.y + GVars.ui.window_size.y + top_height - 10)
+	local color       = Color(GVars.ui.style.theme.TopBarFrameCol1:unpack())
+	local topHeight   = self:GetMaxTopBarHeight()
+	local pos         = vec2:new(GVars.ui.window_pos.x, GVars.ui.window_pos.y + GVars.ui.window_size.y + topHeight - 10)
 	ImGui.SetNextWindowSize(GVars.ui.window_size.x + 10, 0)
 	ImGui.SetNextWindowPos(pos.x - 10, pos.y)
 	if (ImGui.Begin("##indicator", windowFlags)) then
@@ -630,16 +636,19 @@ function GUI:Draw()
 		local nextPosX = ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - 40
 		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - 40)
 		if (Notifier) then
-			local count = Notifier:GetNotifCount()
-			local label = Notifier:HasUnread() and "!" or ". . ."
-			local tt = count > 0 and _F("%d %s", count, _T("GUI_NOTIFICATIONS_UNREAD")) or _T("GUI_NOTIFICATIONS")
+			local count      = Notifier:GetNotifCount()
+			local countLabel = _F("(%d)", count)
+			if (count > 99) then
+				countLabel = _F("(+%d)", 99)
+			end
+			local label = Notifier:HasUnread() and countLabel or ". . ."
 			ImGui.SetWindowFontScale(0.8)
 			if (self:Button(label, { size = vec2:new(35, 30) })) then
 				Notifier:Toggle()
 			end
 			ImGui.SetWindowFontScale(1)
 			self.m_notifier_pos = vec2:new(nextPosX, ImGui.GetCursorPosY())
-			self:Tooltip(tt)
+			self:Tooltip(_T("GUI_NOTIFICATIONS"))
 		end
 		ImGui.Spacing()
 		self:DrawTopBar()
@@ -948,17 +957,18 @@ end
 
 ---@param label string
 ---@param v boolean
----@param opts? { tooltip?: string, color?: Color, onClick?: function }
+---@param opts? { tooltip?: string, color?: Color, onClick?: fun(v?: boolean) }
 ---@return boolean, boolean
 function GUI:CustomToggle(label, v, opts)
 	local clicked = false
-	v, clicked = ImGui.Toggle(label, v)
+	opts          = opts or {}
+	v, clicked    = ImGui.Toggle(label, v)
 
-	if (opts and opts.tooltip) then
+	if (opts.tooltip) then
 		self:Tooltip(opts.tooltip, { color = opts.color })
 	end
 
-	if (clicked and opts and type(opts.onClick) == "function") then
+	if (clicked and type(opts.onClick) == "function") then
 		opts.onClick(v)
 	end
 
@@ -967,19 +977,20 @@ end
 
 ---@param label string
 ---@param v boolean
----@param opts? { tooltip?: string, color?: Color, onClick?: function }
+---@param opts? { tooltip?: string, color?: Color, onClick?: fun(v?: boolean) }
 ---@return boolean, boolean
 function GUI:Checkbox(label, v, opts)
 	local clicked = false
-	v, clicked = ImGui.Checkbox(label, v)
+	opts          = opts or {}
+	v, clicked    = ImGui.Checkbox(label, v)
 
-	if (opts and opts.tooltip) then
+	if (opts.tooltip) then
 		self:Tooltip(opts.tooltip, { color = opts.color })
 	end
 
 	if (clicked) then
 		self:PlaySound(self.Sounds.Checkbox)
-		if (opts and type(opts.onClick) == "function") then
+		if (type(opts.onClick) == "function") then
 			opts.onClick(v)
 		end
 	end

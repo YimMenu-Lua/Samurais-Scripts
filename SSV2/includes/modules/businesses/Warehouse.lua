@@ -133,11 +133,16 @@ function Warehouse:GetProductValue()
 end
 
 ---@return boolean
-function Warehouse:IsFull()
+function Warehouse:HasFullProduction()
 	return self:GetProductCount() == self.m_max_units
 end
 
 function Warehouse:ReStock()
+	if (self:HasFullProduction()) then
+		Notifier:ShowError(self:GetName(), _T("YRV3_FAST_PROD_ERR"))
+		return
+	end
+
 	if (self.m_type == Enums.eWarehouseType.HANGAR) then
 		stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
 	elseif (self.m_type == Enums.eWarehouseType.SPECIAL_CARGO) then
@@ -150,7 +155,7 @@ end
 
 function Warehouse:AutoFill()
 	ThreadManager:Run(function()
-		while (self:IsValid() and self.auto_fill and not self:IsFull()) do
+		while (self:IsValid() and self.auto_fill and not self:HasFullProduction()) do
 			self:ReStock()
 			sleep(GVars.features.yrv3.autofill_delay or 300)
 		end
@@ -165,7 +170,7 @@ function Warehouse:Update()
 		return
 	end
 
-	if (self.auto_fill and not self.m_auto_fill_running and not self:IsFull()) then
+	if (self.auto_fill and not self.m_auto_fill_running and not self:HasFullProduction()) then
 		self.m_auto_fill_running = true
 		self:AutoFill()
 	end

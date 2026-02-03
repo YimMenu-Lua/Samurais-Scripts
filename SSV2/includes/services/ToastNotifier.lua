@@ -1,3 +1,4 @@
+local ThemeManager = require "includes.services.ThemeManager"
 -- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
 -- This file is part of Samurai's Scripts.
 --
@@ -188,7 +189,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 			counterPos.x,
 			counterPos.y,
 			radius,
-			Color(windowBG.x, windowBG.y, windowBG.z, windowAlpha):AsU32()
+			ImGui.GetStyleColorU32(ImGuiCol.WindowBg)
 		)
 
 		ImGui.ImDrawListAddText(
@@ -196,7 +197,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 			countFontSize,
 			textPos.x,
 			textPos.y,
-			Color(255, 255, 255, 255):AsU32(),
+			ImGui.GetStyleColorU32(ImGuiCol.Text),
 			countText
 		)
 	end
@@ -227,14 +228,14 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 	if (context == Enums.eNotificationContext.CENTER) then
 		local btnPos = vec2:new(cardBR.x - padding - rightButtonW + 6.0, cardTL.y + padding - 2.0)
 		local btnBR = vec2:new(btnPos.x + 20.0, btnPos.y + 20.0)
-		local btnBg = Color(255, 255, 255, 8.0 * alpha)
+		local btnBg = ImGui.GetStyleColorU32(ImGuiCol.Button)
 		ImGui.ImDrawListAddRectFilled(
 			pImDrawList,
 			btnPos.x,
 			btnPos.y,
 			btnBR.x,
 			btnBR.y,
-			btnBg:AsU32(),
+			btnBg,
 			6.0
 		)
 
@@ -618,6 +619,7 @@ function Notifier:DrawToasts()
 
 	ImGui.SetNextWindowPos(toast.m_pos.x, toast.m_pos.y)
 	ImGui.SetNextWindowSizeConstraints(toast.m_size.x + padding, 200, toast.m_size.x + padding, 420)
+	ThemeManager:PushTheme()
 	if (ImGui.Begin(toast.m_notification.m_id,
 			ImGuiWindowFlags.NoMove
 			| ImGuiWindowFlags.NoResize
@@ -641,6 +643,7 @@ function Notifier:DrawToasts()
 		)
 		ImGui.End()
 	end
+	ThemeManager:PopTheme()
 end
 
 ---@param start_pos vec2
@@ -674,20 +677,28 @@ function Notifier:DrawNotifications(start_pos)
 			| ImGuiWindowFlags.NoSavedSettings
 		)) then
 		local drawList = ImGui.GetWindowDrawList()
-		local bgCol = Color(0.1, 0.1, 0.1, 0.85):AsU32()
+		local windowBG = vec4:new(ImGui.GetStyleColorVec4(ImGuiCol.WindowBg))
+		local frame    = vec4:new(ImGui.GetStyleColorVec4(ImGuiCol.FrameBg))
+		local contrast = math.abs(frame.x - windowBG.x)
+		if (contrast >= 0.1) then
+			frame.x = frame.x * 0.85
+			frame.y = frame.y * 0.85
+			frame.z = frame.z * 0.85
+			frame.w = frame.w * 0.85
+		end
 		ImGui.ImDrawListAddRectFilled(
 			drawList,
 			window_pos.x + 10,
 			window_pos.y + 10,
 			window_pos.x + self.m_window_width - 10,
 			window_pos.y + height - 10,
-			bgCol,
+			ImGui.GetColorU32(frame.x, frame.y, frame.z, frame.w),
 			10.0
 		)
 		ImGui.Spacing()
 		ImGui.Spacing()
 		ImGui.SameLine()
-		GUI:Text(_T("GUI_NOTIFICATIONS"), { color = Color("white") })
+		ImGui.Text(_T("GUI_NOTIFICATIONS"))
 
 		if (count > 0) then
 			ImGui.SameLine()

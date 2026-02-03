@@ -762,10 +762,10 @@ local function JSON()
 
 	local chars_to_be_escaped_in_JSON_string
 	= '['
-		.. '"'                  -- class sub-pattern to match a double quote
-		.. '%\\'                -- class sub-pattern to match a backslash
-		.. '/'                  -- class sub-pattern to match a forwardslash
-		.. '%z'                 -- class sub-pattern to match a null
+		.. '"'               -- class sub-pattern to match a double quote
+		.. '%\\'             -- class sub-pattern to match a backslash
+		.. '/'               -- class sub-pattern to match a forwardslash
+		.. '%z'              -- class sub-pattern to match a null
 		.. '\001' .. '-' .. '\031' -- class sub-pattern to match control characters
 		.. ']'
 

@@ -732,6 +732,7 @@ end
 --
 -- This can not be used with the main config file.
 ---@param filename string
+---@return any
 function Serializer:ReadFromFile(filename)
 	if (type(filename) ~= "string" or not filename:endswith(".json")) then
 		log.warning("[Serializer]: Invalid file name.")

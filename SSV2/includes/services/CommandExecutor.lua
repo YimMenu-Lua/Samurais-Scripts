@@ -36,6 +36,7 @@ local ThemeManager = require("includes.services.ThemeManager")
 ---@field private m_history array<string>
 ---@field private m_suggestions array<{name: string, def: string}>
 ---@field private m_commands table<string, { callback: fun(...), args: string[], description: string, alias?: string[], is_alias?: boolean, isTranslatorLabel?: boolean }>
+---@field private m_sorted_command_names array<string>
 ---@field private m_screen_size vec2
 ---@field private m_window CommandsWindow
 ---@field private m_mutation_request? string
@@ -240,10 +241,12 @@ function CommandExecutor:HandleCallbacks()
 		local command   = self.m_commands[cmd]
 		local callback  = command and command.callback or nil
 
-		if (callback) then
-			callback(args)
-			table.insert(self.m_history, self.m_user_cmd)
+		if (type(callback) == "function") then
+			ThreadManager:Run(function()
+				callback(args)
+			end)
 
+			table.insert(self.m_history, self.m_user_cmd)
 			if (GVars.commands_console.auto_close and not self:IsBuiltinCommand(cmd)) then
 				self:Close()
 			end
@@ -345,29 +348,34 @@ function CommandExecutor:DrawCommandDump()
 		ImGui.SetNextWindowBgAlpha(0)
 		if ImGui.BeginChild("##cmd_dump_lower", (size.x * 0.965), (size.y * 0.7)) then
 			ImGui.PushTextWrapPos(size.x * 0.94)
-			for name, data in pairs(self.m_commands) do
-				if not data.is_alias then
-					ImGui.BulletText(name)
-					ImGui.Indent()
-					ImGui.SetWindowFontScale(0.9)
-					data.description = data.description or "No description."
-					local desc = data.isTranslatorLabel and _T(data.description) or data.description
-					ImGui.Text(_F("- Description: %s", desc))
-
-					if data.args then
-						local args_txt = (#data.args == 0
-							and "- Arguments: None."
-							or _F("- Arguments (%d): %s", #data.args, table.concat(data.args, ", "))
-						)
-						ImGui.Text(args_txt)
-					end
-
-					if data.alias then
-						ImGui.Text(_F("- Alias: %s", table.concat(data.alias, " | ")))
-					end
-					ImGui.SetWindowFontScale(1)
-					ImGui.Unindent()
+			for _, name in ipairs(self.m_sorted_command_names or {}) do
+				local data = self.m_commands[name]
+				if (data.is_alias) then
+					goto continue
 				end
+
+				ImGui.BulletText(name)
+				ImGui.Indent()
+				ImGui.SetWindowFontScale(0.9)
+				data.description = data.description or "No description."
+				local desc = data.isTranslatorLabel and _T(data.description) or data.description
+				ImGui.Text(desc)
+
+				if data.args then
+					local args_txt = (#data.args == 0
+						and "- Arguments: None."
+						or _F("- Arguments (%d): %s", #data.args, table.concat(data.args, ", "))
+					)
+					ImGui.Text(args_txt)
+				end
+
+				if data.alias then
+					ImGui.Text(_F("- Alias: %s", table.concat(data.alias, " | ")))
+				end
+				ImGui.SetWindowFontScale(1)
+				ImGui.Unindent()
+
+				::continue::
 			end
 			ImGui.PopTextWrapPos()
 			ImGui.EndChild()
@@ -550,6 +558,16 @@ function CommandExecutor:GetDefaultCommands()
 	return {
 		["!list"] = {
 			callback = function()
+				if (not self.m_sorted_command_names) then
+					self.m_sorted_command_names = {}
+					for name in pairs(self.m_commands) do
+						table.insert(self.m_sorted_command_names, name)
+					end
+
+					table.sort(self.m_sorted_command_names, function(a, b)
+						return a:lower() < b:lower()
+					end)
+				end
 				self.m_window.popup.should_draw = true
 			end,
 			alias = { "!ls", "!dump" },

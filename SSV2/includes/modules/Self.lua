@@ -15,6 +15,7 @@ local MagicBullet  = require("includes.features.self.magic_bullet")
 local LaserSights  = require("includes.features.self.laser_sights")
 local Katana       = require("includes.features.self.katana")
 local CPed         = require("includes.classes.gta.CPed")
+local YimActions   = require("includes.features.YimActionsV3")
 
 --------------------------------------
 -- Class: Self
