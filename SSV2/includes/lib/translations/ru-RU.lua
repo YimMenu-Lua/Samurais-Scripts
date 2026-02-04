@@ -598,5 +598,8 @@ return {
 	["SETTINGS_JSON_THEME_DELETE"] = "Щелкните правой кнопкой мыши, чтобы удалить",
 	["SETTINGS_HOTKEY_WAIT"] = "Нажмите любую клавишу",
 	["SETTINGS_NEW_THEME_NAME_ERR"] = "Тема с именем %s уже существует. Пожалуйста, выберите другой.",
-	["SETTINGS_HOTKEY_FOUND"] = "Новый ключ:"
+	["SETTINGS_HOTKEY_FOUND"] = "Новый ключ:",
+	["GENERIC_CLEAR_ALL"] = "Очистить все",
+	["GENERIC_UNMUTE"] = "Включить звук",
+	["GENERIC_MUTE"] = "Немой"
 }

@@ -598,5 +598,8 @@ return {
 	["SETTINGS_NEW_THEME_CONTRAST_ERR"] = "您的新主題未通過可見性測試。 \n請檢查以下錯誤，並在編輯相應顏色後重試。",
 	["SETTINGS_NEW_THEME_NAME_ERR"] = "名為 %s 的主題已存在。請選擇一個不同的。",
 	["SETTINGS_HOTKEY_FOUND"] = "新鑰匙：",
-	["SETTINGS_HOTKEY_WAIT"] = "按任意鍵"
+	["SETTINGS_HOTKEY_WAIT"] = "按任意鍵",
+	["GENERIC_MUTE"] = "沉默的",
+	["GENERIC_CLEAR_ALL"] = "全部清除",
+	["GENERIC_UNMUTE"] = "取消靜音"
 }

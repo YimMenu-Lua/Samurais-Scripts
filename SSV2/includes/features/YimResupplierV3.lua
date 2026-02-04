@@ -981,7 +981,6 @@ end
 -- Master Control Terminal
 function YRV3:MCT()
 	if Self:IsBrowsingApps() then
-		GUI:PlaySound(GUI.Sounds.Error)
 		return
 	end
 
@@ -993,7 +992,6 @@ function YRV3:MCT()
 		end
 
 		TaskWait(Game.RequestScript, "appArcadeBusinessHub")
-		GUI:PlaySound(GUI.Sounds.Button)
 		self.m_bhub_script_handle = SYSTEM.START_NEW_SCRIPT("appArcadeBusinessHub", 1424) -- STACK_SIZE_DEFAULT
 		SCRIPT.SET_SCRIPT_AS_NO_LONGER_NEEDED("appArcadeBusinessHub")
 		sleep(100)

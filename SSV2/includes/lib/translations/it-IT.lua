@@ -598,5 +598,8 @@ return {
 	["SETTINGS_WINDOW_ACCENT_COL"] = "Colore accento",
 	["SETTINGS_WINDOW_TOP_FRAME_BG"] = "Gradiente del pulsante della barra superiore",
 	["SETTINGS_JSON_THEME_DELETE"] = "Fare clic con il tasto destro per eliminare",
-	["SETTINGS_HOTKEY_FOUND"] = "Nuova chiave:"
+	["SETTINGS_HOTKEY_FOUND"] = "Nuova chiave:",
+	["GENERIC_CLEAR_ALL"] = "Cancella tutto",
+	["GENERIC_UNMUTE"] = "Riattiva",
+	["GENERIC_MUTE"] = "Muto"
 }

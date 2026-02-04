@@ -598,5 +598,8 @@ return {
 	["SETTINGS_WINDOW_TOP_FRAME_BG"] = "顶部栏按钮渐变",
 	["SETTINGS_HOTKEY_WAIT"] = "按任意键",
 	["SETTINGS_WINDOW_ACCENT_COL"] = "强调色",
-	["SETTINGS_HOTKEY_FOUND"] = "新钥匙："
+	["SETTINGS_HOTKEY_FOUND"] = "新钥匙：",
+	["GENERIC_CLEAR_ALL"] = "全部清除",
+	["GENERIC_MUTE"] = "沉默的",
+	["GENERIC_UNMUTE"] = "取消静音"
 }

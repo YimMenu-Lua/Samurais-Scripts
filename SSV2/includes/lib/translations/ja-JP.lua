@@ -598,5 +598,8 @@ return {
 	["SETTINGS_WINDOW_ACCENT_COL"] = "アクセントカラー",
 	["SETTINGS_NEW_THEME_NAME_ERR"] = "%s という名前のテーマはすでに存在します。別のものを選択してください。",
 	["SETTINGS_NEW_THEME_CONTRAST_ERR"] = "新しいテーマは可視性テストに失敗しました。\n以下のエラーを確認し、対応する色を編集した後、再試行してください。",
-	["SETTINGS_HOTKEY_FOUND"] = "新しいキー:"
+	["SETTINGS_HOTKEY_FOUND"] = "新しいキー:",
+	["GENERIC_MUTE"] = "ミュート",
+	["GENERIC_UNMUTE"] = "ミュートを解除する",
+	["GENERIC_CLEAR_ALL"] = "すべてクリア"
 }

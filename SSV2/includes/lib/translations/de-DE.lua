@@ -598,5 +598,8 @@ return {
 	["SETTINGS_WINDOW_TOP_FRAME_BG"] = "Farbverlauf der oberen Leistenschaltfläche",
 	["SETTINGS_HOTKEY_FOUND"] = "Neuer Schlüssel:",
 	["SETTINGS_HOTKEY_WAIT"] = "Drücken Sie eine beliebige Taste",
-	["SETTINGS_NEW_THEME_STYLE"] = "Fensterstil"
+	["SETTINGS_NEW_THEME_STYLE"] = "Fensterstil",
+	["GENERIC_MUTE"] = "Stumm",
+	["GENERIC_CLEAR_ALL"] = "Alles löschen",
+	["GENERIC_UNMUTE"] = "Stummschaltung aufheben"
 }

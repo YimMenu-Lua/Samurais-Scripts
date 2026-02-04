@@ -38,6 +38,12 @@ ImGuiSpinnerStyle = {
 	JUMP        = 11,
 }
 
+---@class NotifBellState
+---@field unreadCount number
+---@field muted boolean
+---@field unread boolean
+---@field open boolean
+
 local toggleStates = {}
 
 -- Returns a basic animated string
@@ -253,22 +259,21 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 		)
 	end
 
+	local accent       = GVars.ui.style.theme.SSAccent
+	local gradient     = GVars.ui.style.theme.SSGradient
+	local selectedCol  = ImGui.GetColorU32(
+		accent.x,
+		accent.y,
+		accent.z,
+		pressed and accent.w - 0.25 or (hovered and 1.0 or accent.w)
+	)
+	local defaultCol   = ImGui.GetColorU32(0.31, 0.31, 0.43, pressed and 0.50 or 1.00)
+	local background   = selected and selectedCol or defaultCol
 	local shadow       = Color(0.01, 0.01, 0.01, 55):AsU32()
-	local tab          = ImGui.GetStyleColorU32(ImGuiCol.Tab)
-	local tabHovered   = ImGui.GetStyleColorU32(ImGuiCol.TabHovered)
-	local tabActive    = ImGui.GetStyleColorU32(ImGuiCol.TabActive)
-	local bg           = tabActive
 	local textW, textH = ImGui.CalcTextSize(label)
 	local padding      = 8
+	local rounding     = ImGui.GetStyle().FrameRounding
 	local textX
-
-	if (hovered) then
-		bg = tabHovered
-	end
-
-	if (pressed or clicked) then
-		bg = tab
-	end
 
 	if (hovered or pressed or selected) then
 		ImGui.ImDrawListAddRectFilled(
@@ -287,14 +292,12 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 			pos.y,
 			max.x,
 			max.y,
-			bg,
-			8.0
+			background,
+			rounding or 0.0
 		)
 	end
 
 	local indicatorPos = pos + vec2:new(max.x - 40.0, (size.y - textH) * 0.5)
-	local windowBg     = Color(GVars.ui.style.theme.Colors.WindowBg:unpack())
-	local textCol      = ImGui.GetAutoTextColor(windowBg)
 	local frameRegion  = size.x - padding * 2
 	local clipped      = textW > frameRegion
 	local finalLabel   = ImGui.TrimTextToWidth(label, frameRegion)
@@ -317,8 +320,11 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 		textX = pos.x + (size.x - textW) * 0.5
 	end
 
-	local textY = pos.y + (size.y - textH) * 0.5
-	ImGui.ImDrawListAddText(drawList, textX, textY, textCol:AsU32(), finalLabel)
+	local textY            = pos.y + (size.y - textH) * 0.5
+	local defaultTextColor = ImGui.GetStyleColorU32(ImGuiCol.Text)
+	local autoTextColor    = ImGui.GetAutoTextColor(Color(background)):AsU32()
+	local textColor        = (hovered or selected) and autoTextColor or defaultTextColor
+	ImGui.ImDrawListAddText(drawList, textX, textY, textColor, finalLabel)
 
 	if (clipped) then
 		if (ellipsis) then
@@ -342,19 +348,25 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 
 	if (not hovered and not clicked and not selected) then
 		local finalLabelW = ImGui.CalcTextSize(finalLabel)
-		local diff = (size.x - finalLabelW) * 0.5
+		local diff = ((size.x - finalLabelW) * 0.5)
+		local mod = clipped and 4 or 0
 		if (diff < 0) then
 			diff = 0
 		end
 
 		ImGui.ImDrawListAddLine(
 			drawList,
-			pos.x + diff,
+			pos.x + diff - mod,
 			max.y,
-			pos.x + size.x - diff,
+			pos.x + size.x - diff - mod,
 			max.y,
-			tabActive,
-			1.4
+			ImGui.GetColorU32(
+				gradient.x,
+				gradient.y,
+				gradient.z,
+				gradient.w
+			),
+			1.3
 		)
 	end
 
@@ -495,7 +507,7 @@ function ImGui.Toggle(label, v, height)
 	height            = height or textHeight
 	local width       = height * 1.8
 	local cursorPos   = vec2:new(ImGui.GetCursorScreenPos())
-	local drawList    = ImGui.GetWindowDrawList()
+	local pDrawList   = ImGui.GetWindowDrawList()
 	local toggleRect  = Rect(
 		cursorPos,
 		vec2:new(cursorPos.x + width, cursorPos.y + height)
@@ -519,7 +531,7 @@ function ImGui.Toggle(label, v, height)
 
 	local disabled = ImGui.GetStyle().Alpha < 1.0
 	local windowBG = vec4:new(ImGui.GetStyleColorVec4(ImGuiCol.WindowBg))
-	local frame    = vec4:new(ImGui.GetStyleColorVec4(ImGuiCol.FrameBg))
+	local frame    = vec4:new(ImGui.GetStyleColorVec4(ImGuiCol.Button))
 	local contrast = math.abs(frame.x - windowBG.x)
 	if (contrast < 0.05) then
 		frame.x = frame.x * 0.85
@@ -528,7 +540,7 @@ function ImGui.Toggle(label, v, height)
 	end
 
 	local checkmark    = vec4:new(ImGui.GetStyleColorVec4(ImGuiCol.CheckMark))
-	local frameHovered = vec4:new(ImGui.GetStyleColorVec4(ImGuiCol.FrameBgHovered))
+	local frameHovered = vec4:new(ImGui.GetStyleColorVec4(ImGuiCol.ButtonHovered))
 	local bgOff        = ImGui.GetColorU32(
 		frame.x * 0.9,
 		frame.y * 0.9,
@@ -552,7 +564,7 @@ function ImGui.Toggle(label, v, height)
 	local radius       = height * 0.5
 
 	ImGui.ImDrawListAddRectFilled(
-		drawList,
+		pDrawList,
 		toggleRect.min.x,
 		toggleRect.min.y,
 		toggleRect.max.x,
@@ -568,7 +580,7 @@ function ImGui.Toggle(label, v, height)
 	toggleStates[uniqueKey] = anim
 	local knobX             = cursorPos.x + radius + anim * (width - height)
 	ImGui.ImDrawListAddCircleFilled(
-		drawList,
+		pDrawList,
 		knobX,
 		cursorPos.y + radius,
 		radius * 0.85,
@@ -584,4 +596,135 @@ function ImGui.Toggle(label, v, height)
 	ImGui.EndGroup()
 
 	return v, clicked
+end
+
+---@param state NotifBellState
+---@param size vec2
+---@return boolean clicked
+function ImGui.NotifBell(state, size)
+	ImGui.BeginGroup()
+
+	local clicked    = ImGui.InvisibleButton("##ss_bell_widget", size.x, size.y)
+	local pDrawList  = ImGui.GetWindowDrawList()
+	local pmin       = vec2:new(ImGui.GetItemRectMin())
+	local pmax       = vec2:new(ImGui.GetItemRectMax())
+	local cx         = (pmin.x + pmax.x) * 0.5
+	local cy         = (pmin.y + pmax.y) * 0.5
+	local w          = pmax.x - pmin.x
+	local h          = pmax.y - pmin.y
+	local radius     = w * 0.25
+	local accent     = GVars.ui.style.theme.SSAccent
+	local colHovered = GVars.ui.style.theme.Colors.ButtonHovered
+	local colActive  = GVars.ui.style.theme.Colors.ButtonActive
+	local colMuted   = ImGui.GetStyleColorU32(ImGuiCol.TextDisabled)
+	local bellFill   = state.muted and colMuted or Color(state.unread and accent or colHovered):AsU32()
+
+	if (state.open) then
+		bellFill = Color(colActive):AsU32()
+	end
+
+	ImGui.ImDrawListAddCircle(
+		pDrawList,
+		cx,
+		cy - h * 0.12,
+		radius,
+		bellFill,
+		16
+	)
+
+	local topY    = cy - h * 0.05
+	local bottomY = cy + h * 0.22
+	local spread  = w * 0.22
+
+	ImGui.ImDrawListAddLine(
+		pDrawList,
+		cx - spread,
+		topY,
+		cx - spread * 0.75,
+		bottomY,
+		bellFill,
+		1.5
+	)
+
+	ImGui.ImDrawListAddLine(
+		pDrawList,
+		cx + spread,
+		topY,
+		cx + spread * 0.75,
+		bottomY,
+		bellFill,
+		1.5
+	)
+
+	ImGui.ImDrawListAddLine(
+		pDrawList,
+		cx - spread * 0.6,
+		bottomY,
+		cx + spread * 0.6,
+		bottomY,
+		bellFill,
+		1.5
+	)
+
+	ImGui.ImDrawListAddCircleFilled(
+		pDrawList,
+		cx,
+		bottomY + h * 0.06,
+		w * 0.05,
+		bellFill,
+		8
+	)
+
+	ImGui.ImDrawListAddLine(
+		pDrawList,
+		cx,
+		cy - h * 0.28,
+		cx,
+		cy - h * 0.22,
+		bellFill,
+		1.5
+	)
+
+	if (state.muted) then
+		ImGui.ImDrawListAddLine(
+			pDrawList,
+			pmin.x + 4,
+			pmin.y + 4,
+			pmax.x - 4,
+			pmax.y - 4,
+			bellFill,
+			2.0
+		)
+	elseif (state.unread and state.unreadCount > 0) then
+		local c  = state.unreadCount
+		local r  = w * 0.18
+		local bx = pmax.x
+		local by = pmin.y + r + 2.7
+
+		-- ImGui.ImDrawListAddCircleFilled(
+		-- 	pDrawList,
+		-- 	bx,
+		-- 	by,
+		-- 	r,
+		-- 	bellFill,
+		-- 	12
+		-- )
+
+		if (c > 99) then
+			c = 99
+		end
+
+		ImGui.ImDrawListAddText(
+			pDrawList,
+			16,
+			bx - r * 0.5,
+			by - r,
+			ImGui.GetColorU32(GVars.ui.style.theme.Colors.Text:unpack()),
+			_F("%s%d", c >= 99 and "+" or "", c)
+		)
+	end
+
+	ImGui.EndGroup()
+
+	return clicked
 end

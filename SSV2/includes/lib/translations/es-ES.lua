@@ -598,5 +598,8 @@ return {
 	["SETTINGS_NEW_THEME_CONTRAST_ERR"] = "Su nuevo tema no pasó la prueba de visibilidad.\nCompruebe los siguientes errores y vuelva a intentarlo después de editar los colores correspondientes.",
 	["SETTINGS_HOTKEY_FOUND"] = "Nueva clave:",
 	["SETTINGS_WINDOW_ACCENT_COL"] = "Color de acento",
-	["SETTINGS_HOTKEY_WAIT"] = "Presione cualquier tecla"
+	["SETTINGS_HOTKEY_WAIT"] = "Presione cualquier tecla",
+	["GENERIC_MUTE"] = "Silenciar",
+	["GENERIC_CLEAR_ALL"] = "Borrar todo",
+	["GENERIC_UNMUTE"] = "Dejar de silenciar"
 }

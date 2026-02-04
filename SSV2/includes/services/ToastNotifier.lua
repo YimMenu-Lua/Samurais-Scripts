@@ -64,6 +64,7 @@ local logLevels <const> = {
 
 --#region Notification
 
+---@private
 ---@class Notification
 ---@field m_title string
 ---@field m_message string
@@ -159,7 +160,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 
 	if (context == Enums.eNotificationContext.TOAST and pendingCount > 0) then
 		local stackSpacing = 6.0
-		local maxOffset = 24.0
+		local maxOffset    = 24.0
 		for i = 1, pendingCount do
 			local ghostOffset = math.min((i - 1) * stackSpacing, maxOffset)
 			ImGui.ImDrawListAddRectFilled(
@@ -211,6 +212,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 		notifBG,
 		cardRounding
 	)
+	local hovered    = ImGui.IsMouseHoveringRect(cardTL.x, cardTL.y, cardBR.x, cardBR.y)
 
 	local titlePos   = vec2:new(cardTL.x + padding, cardTL.y + padding)
 	local textCol    = ImGui.GetAutoTextColor(Color(windowBG:unpack()))
@@ -225,10 +227,10 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 		self.m_title
 	)
 
-	if (context == Enums.eNotificationContext.CENTER) then
+	if (context == Enums.eNotificationContext.CENTER and hovered) then
 		local btnPos = vec2:new(cardBR.x - padding - rightButtonW + 6.0, cardTL.y + padding - 2.0)
-		local btnBR = vec2:new(btnPos.x + 20.0, btnPos.y + 20.0)
-		local btnBg = ImGui.GetStyleColorU32(ImGuiCol.Button)
+		local btnBR  = vec2:new(btnPos.x + 20.0, btnPos.y + 20.0)
+		local btnBg  = ImGui.GetStyleColorU32(ImGuiCol.Button)
 		ImGui.ImDrawListAddRectFilled(
 			pImDrawList,
 			btnPos.x,
@@ -298,7 +300,7 @@ end
 --------------------------------------
 -- Private Subclass: Toast
 --------------------------------------
----@ignore
+---@private
 ---@class Toast
 ---@field m_pos vec2
 ---@field m_size vec2
@@ -310,7 +312,7 @@ end
 ---@field m_notification Notification
 ---@field m_expired boolean
 local Toast = {
-	m_size = vec2:new(360, 20),
+	m_size      = vec2:new(360, 20),
 	m_safe_area = vec2:new(20, 20)
 }
 Toast.__index = Toast
@@ -359,6 +361,15 @@ end
 ---@return boolean
 function Toast:HasExpired()
 	return self.m_notification.m_seen or (self.m_lifetime and Time.now() - self.m_lifetime >= self.m_duration)
+end
+
+function Toast:SetAsExpired()
+	if (self:HasExpired()) then
+		return
+	end
+
+	self.m_appeared = true
+	self.m_lifetime = Time.now() + self.m_duration
 end
 
 function Toast:Dismiss()
@@ -449,6 +460,7 @@ end
 ---@field private m_should_draw boolean
 ---@field private m_window_width float
 ---@field private m_viewed boolean
+---@field private m_muted boolean
 local Notifier = { m_window_width = 400.0 }
 Notifier.__index = Notifier
 
@@ -459,6 +471,7 @@ function Notifier.new()
 		m_notifs      = {},
 		m_should_draw = false,
 		m_viewed      = true,
+		m_muted       = false,
 		m_last_time   = 0,
 		m_rate_limit  = 3,
 	}, Notifier)
@@ -468,6 +481,15 @@ function Notifier.new()
 	end)
 
 	return instance
+end
+
+---@return boolean
+function Notifier:IsMuted()
+	return self.m_muted
+end
+
+function Notifier:ToggleMute()
+	self.m_muted = not self.m_muted
 end
 
 ---@return integer
@@ -484,12 +506,20 @@ function Notifier:IsOpen()
 	return self.m_should_draw
 end
 
-function Notifier:Toggle()
-	self.m_should_draw = not self.m_should_draw
+function Notifier:Open()
+	if (self.m_should_draw) then
+		return
+	end
+
+	self.m_should_draw = true
 end
 
 function Notifier:Close()
 	self.m_should_draw = false
+end
+
+function Notifier:Toggle()
+	self.m_should_draw = not self.m_should_draw
 end
 
 function Notifier:Clear()
@@ -506,6 +536,10 @@ function Notifier:ClearSeen()
 	table.erase_if(self.m_notifs, function(_, notif)
 		return notif.m_seen == true
 	end)
+end
+
+function Notifier:ClearToasts()
+	self.m_toasts = {}
 end
 
 ---@return boolean
@@ -548,7 +582,10 @@ function Notifier:Add(title, message, level, opts)
 	local toast         = Toast.new(opts.duration or 3.0, opts.log or false)
 
 	table.insert(self.m_notifs, notif)
-	table.insert(self.m_toasts, toast:Bind(notif))
+
+	if (not self:IsMuted()) then
+		table.insert(self.m_toasts, toast:Bind(notif))
+	end
 end
 
 ---@param caller string The notification title.
@@ -611,7 +648,8 @@ function Notifier:DrawToasts()
 		toast.m_lifetime = Time.now()
 	end
 
-	if (self.m_should_draw) then
+	if (self.m_should_draw or self:IsMuted()) then
+		self:ClearToasts()
 		return
 	end
 
@@ -660,6 +698,7 @@ function Notifier:DrawNotifications(start_pos)
 	local max_screen  = GPointers.ScreenResolution.x
 	local window_pos  = vec2:new(start_pos.x + self.m_window_width, start_pos.y)
 	local window_size = vec2:new(self.m_window_width, height)
+	local style       = ImGui.GetStyle()
 	if (window_pos.x >= max_screen) then
 		window_pos.x = max_screen - self.m_window_width - 10
 	end
@@ -667,7 +706,6 @@ function Notifier:DrawNotifications(start_pos)
 	ImGui.SetNextWindowBgAlpha(0)
 	ImGui.SetNextWindowPos(window_pos.x, window_pos.y)
 	ImGui.SetNextWindowSize(window_size.x, window_size.y)
-	ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 8)
 	ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0)
 	if (ImGui.Begin("##notif_center",
 			ImGuiWindowFlags.NoMove
@@ -693,26 +731,35 @@ function Notifier:DrawNotifications(start_pos)
 			window_pos.x + self.m_window_width - 10,
 			window_pos.y + height - 10,
 			ImGui.GetColorU32(frame.x, frame.y, frame.z, frame.w),
-			10.0
+			GVars.ui.style.theme.Styles.WindowRounding or 2
 		)
 		ImGui.Spacing()
 		ImGui.Spacing()
 		ImGui.SameLine()
 		ImGui.Text(_T("GUI_NOTIFICATIONS"))
 
+		ImGui.SameLine()
+		ImGui.SetWindowFontScale(0.81)
+		local muteText      = _T(self:IsMuted() and "GENERIC_UNMUTE" or "GENERIC_MUTE")
+		local muteTextWidth = ImGui.CalcTextSize(muteText)
+		local totalWidth    = muteTextWidth + (style.FramePadding.x * (count > 0 and 4 or 2)) +
+			(style.ItemSpacing.x * (count > 0 and 2 or 1))
+		if (count > 0) then
+			totalWidth = totalWidth + ImGui.CalcTextSize(_T("GENERIC_CLEAR_ALL"))
+		end
+
+		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - totalWidth))
+		if (GUI:Button(muteText)) then
+			self:ToggleMute()
+		end
+
 		if (count > 0) then
 			ImGui.SameLine()
-			local clearText = _T("GENERIC_CLEAR")
-			local clearTextWidth = ImGui.CalcTextSize(clearText)
-			ImGui.SetCursorPosX(
-				(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - clearTextWidth - (ImGui.GetStyle().FramePadding.x * 4))
-			)
-			if (GUI:Button(clearText)) then
+			if (GUI:Button(_T("GENERIC_CLEAR_ALL"))) then
 				self:Clear()
-				self:Close()
-				return
 			end
 		end
+		ImGui.SetWindowFontScale(1.0)
 
 		ImGui.Separator()
 		ImGui.Spacing()
@@ -746,8 +793,8 @@ function Notifier:DrawNotifications(start_pos)
 		end
 
 		ImGui.End()
-		ImGui.PopStyleVar(2)
 	end
+	ImGui.PopStyleVar()
 
 	if (self.m_should_draw and not GUI:IsOpen()) then
 		self:Close()

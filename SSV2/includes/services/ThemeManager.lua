@@ -19,7 +19,7 @@ local ThemeLibrary <const> = require("includes.data.theme_library")
 ---@field private m_theme_library ThemeLibrary
 ---@field m_themes_file string
 local ThemeManager   = {
-	m_current_theme = Theme.new(ThemeLibrary.Cyberpunk),
+	m_current_theme = Theme.new(ThemeLibrary.Tenebris),
 	m_themes_file   = "ss_themes.json",
 	m_theme_library = {},
 }
@@ -42,7 +42,7 @@ function ThemeManager:Load()
 		GVars.ui.style.theme = current
 	end
 
-	if (not current.__type or not IsInstance(current.TopBarFrameCol1, vec4)) then
+	if (not current.__type or not IsInstance(current.SSAccent, vec4)) then
 		current = Theme.deserialize(current)
 		GVars.ui.style.theme = current
 	end
@@ -63,7 +63,7 @@ end
 
 ---@return Theme
 function ThemeManager:GetDefaultTheme()
-	return self.m_theme_library.Cyberpunk or Theme.new(ThemeLibrary.Cyberpunk)
+	return self.m_theme_library.Tenebris or Theme.new(ThemeLibrary.Tenebris)
 end
 
 ---@return Theme

@@ -598,5 +598,8 @@ return {
 	["SETTINGS_NEW_THEME_NAME"] = "Nazwa motywu",
 	["SETTINGS_NEW_THEME_NAME_ERR"] = "Motyw o nazwie %s już istnieje. Proszę wybrać inny.",
 	["SETTINGS_HOTKEY_WAIT"] = "Naciśnij dowolny klawisz",
-	["SETTINGS_HOTKEY_FOUND"] = "Nowy klucz:"
+	["SETTINGS_HOTKEY_FOUND"] = "Nowy klucz:",
+	["GENERIC_CLEAR_ALL"] = "Wyczyść wszystko",
+	["GENERIC_MUTE"] = "Niemy",
+	["GENERIC_UNMUTE"] = "Wyłącz wyciszenie"
 }

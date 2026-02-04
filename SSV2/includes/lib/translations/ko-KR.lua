@@ -598,5 +598,8 @@ return {
 	["SETTINGS_NEW_THEME_STYLE"] = "창 스타일",
 	["SETTINGS_HOTKEY_FOUND"] = "새 키:",
 	["SETTINGS_NEW_THEME_CONTRAST_ERR"] = "새 테마가 가시성 테스트에 실패했습니다.\n아래 오류를 확인하고 해당 색상을 편집한 후 다시 시도하십시오.",
-	["SETTINGS_NEW_THEME_NAME_ERR"] = "이름이 %s인 테마가 이미 존재합니다. 다른 것을 선택하세요."
+	["SETTINGS_NEW_THEME_NAME_ERR"] = "이름이 %s인 테마가 이미 존재합니다. 다른 것을 선택하세요.",
+	["GENERIC_CLEAR_ALL"] = "모두 지우기",
+	["GENERIC_MUTE"] = "무음",
+	["GENERIC_UNMUTE"] = "음소거 해제"
 }

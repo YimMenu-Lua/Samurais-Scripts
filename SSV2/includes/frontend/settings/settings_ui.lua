@@ -24,7 +24,7 @@ local cfgReset      = {
 	open = false,
 }
 local themeEditor   = {
-	open            = false,
+	shouldDraw      = false,
 	liveEdit        = false,
 	shouldFocusName = false,
 	valid           = true,
@@ -113,7 +113,7 @@ local function drawGeneralSettings()
 end
 
 local function drawThemeSettings()
-	if (not themeEditor.open or not newThemeBuff) then
+	if (not themeEditor.shouldDraw or not newThemeBuff) then
 		return
 	end
 
@@ -160,8 +160,10 @@ local function drawThemeSettings()
 				true,
 				ImGuiWindowFlags.AlwaysUseWindowPadding
 			)
-			ImGui.ColorEditVec4("Top Bar Frame", newThemeBuff.TopBarFrameCol1)
-			ImGui.ColorEditVec4("Top Bar Frame Gradient", newThemeBuff.TopBarFrameCol2)
+
+			ImGui.ColorEditVec4("Custom Accent", newThemeBuff.SSAccent)
+			ImGui.ColorEditVec4("Accent Gradient", newThemeBuff.SSGradient)
+
 			for k, v in pairs(newThemeBuff.Colors) do
 				ImGui.ColorEditVec4(k, v)
 			end
@@ -207,9 +209,9 @@ local function drawThemeSettings()
 					themeEditor.valid, themeEditor.errors = newThemeBuff:ValidateVisibility()
 					if (themeEditor.valid) then
 						ThemeManager:AddNewTheme(newThemeBuff:Copy())
-						selectedTheme = newThemeBuff:Copy()
+						selectedTheme          = newThemeBuff:Copy()
+						themeEditor.shouldDraw = false
 						newThemeBuff:Clear()
-						themeEditor.open = false
 					else
 						ImGui.OpenPopup("##newColorBadContrast")
 					end
@@ -242,7 +244,7 @@ local function drawThemeSettings()
 			if (themeEditor.liveEdit) then
 				ThemeManager:SetCurrentTheme(selectedTheme)
 			end
-			themeEditor.open = false
+			themeEditor.shouldDraw = false
 		end)
 		ImGui.End()
 	end
@@ -251,9 +253,7 @@ end
 local function drawGuiSettings()
 	ImGui.SeparatorText(_T("GENERIC_GENERAL_LABEL"))
 
-	GVars.ui.disable_tooltips = GUI:CustomToggle(_T("SETTINGS_TOOLTIPS"), GVars.ui.disable_tooltips)
-
-	ImGui.SameLine()
+	GVars.ui.disable_tooltips       = GUI:CustomToggle(_T("SETTINGS_TOOLTIPS"), GVars.ui.disable_tooltips)
 	GVars.ui.disable_sound_feedback = GUI:CustomToggle(_T("SETTINGS_UI_SOUND"), GVars.ui.disable_sound_feedback)
 
 	ImGui.SeparatorText(_T("SETTINGS_WINDOW_GEOMETRY"))
@@ -312,9 +312,10 @@ local function drawGuiSettings()
 	end
 
 	local resolution = Game.GetScreenResolution()
-	GVars.ui.window_size.x, _ = ImGui.SliderFloat(_T("SETTINGS_WINDOW_WIDTH"),
+	GVars.ui.window_size.x, _ = ImGui.SliderFloat(
+		_T("SETTINGS_WINDOW_WIDTH"),
 		GVars.ui.window_size.x,
-		GUI:GetMaxTopBarHeight(),
+		620,
 		resolution.x, "%.0f",
 		---@diagnostic disable-next-line
 		ImGuiSliderFlags.NoInput
@@ -325,10 +326,12 @@ local function drawGuiSettings()
 		GUI:ResetWidth()
 	end
 
-	local top_bar_height = GUI:GetMaxTopBarHeight() + 10
-	GVars.ui.window_size.y, _ = ImGui.SliderFloat(_T("SETTINGS_WINDOW_HEIGHT"),
+	local topBarHeight = GUI:GetMaxTopBarHeight()
+	GVars.ui.window_size.y, _ = ImGui.SliderFloat(
+		_T("SETTINGS_WINDOW_HEIGHT"),
 		GVars.ui.window_size.y,
-		top_bar_height, resolution.y - top_bar_height,
+		topBarHeight + 240,
+		resolution.y - (topBarHeight + 10),
 		---@diagnostic disable-next-line
 		"%.0f", ImGuiSliderFlags.NoInput
 	)
@@ -390,12 +393,16 @@ local function drawGuiSettings()
 
 	ImGui.Spacing()
 	if (GUI:Button(_T("SETTINGS_WINDOW_NEW_THEME"))) then
-		newThemeBuff      = ThemeManager:GetCurrentTheme():Copy()
-		newThemeBuff.Name = ""
-		themeEditor.open  = true
+		newThemeBuff           = ThemeManager:GetCurrentTheme():Copy()
+		newThemeBuff.Name      = ""
+		themeEditor.shouldDraw = true
+
+		if (themeEditor.liveEdit) then
+			ThemeManager:SetCurrentTheme(newThemeBuff)
+		end
 	end
 
-	if (themeEditor.open) then
+	if (themeEditor.shouldDraw) then
 		drawThemeSettings()
 	end
 end

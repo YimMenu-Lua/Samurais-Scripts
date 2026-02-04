@@ -598,5 +598,8 @@ return {
 	["SETTINGS_HOTKEY_WAIT"] = "Appuyez sur n'importe quelle touche",
 	["SETTINGS_NEW_THEME_NAME_ERR"] = "Un thème portant le nom %s existe déjà. Veuillez en choisir un autre.",
 	["SETTINGS_HOTKEY_FOUND"] = "Nouvelle clé :",
-	["SETTINGS_WINDOW_TOP_FRAME_BG"] = "Dégradé des boutons de la barre supérieure"
+	["SETTINGS_WINDOW_TOP_FRAME_BG"] = "Dégradé des boutons de la barre supérieure",
+	["GENERIC_UNMUTE"] = "Activer le son",
+	["GENERIC_MUTE"] = "Muet",
+	["GENERIC_CLEAR_ALL"] = "Tout effacer"
 }

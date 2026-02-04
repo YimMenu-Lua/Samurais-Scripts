@@ -1,3 +1,12 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 ---@class ThemeColors
 ---@field WindowBg vec4
 ---@field ChildBg vec4
@@ -28,14 +37,15 @@
 ---@field PlotHistogramHovered vec4
 
 ---@class ThemeStyles
----@field WindowRounding integer
----@field FrameRounding integer
----@field GrabRounding integer
----@field ScrollbarRounding integer
----@field TabRounding integer
----@field WindowBorderSize integer
----@field FrameBorderSize integer
----@field PopupBorderSize integer
+---@field WindowRounding float
+---@field ChildRounding float
+---@field FrameRounding float
+---@field GrabRounding float
+---@field ScrollbarRounding float
+---@field TabRounding float
+---@field WindowBorderSize float
+---@field FrameBorderSize float
+---@field PopupBorderSize float
 ---@field ItemSpacing vec2
 ---@field FramePadding vec2
 
@@ -43,8 +53,8 @@
 ---@field Name string
 ---@field Colors ThemeColors
 ---@field Styles ThemeStyles
----@field TopBarFrameCol1 vec4
----@field TopBarFrameCol2 vec4
+---@field SSAccent vec4
+---@field SSGradient vec4
 ---@field JSON? boolean
 ---@overload fun(themeTable?: table): Theme
 local Theme = { __type = "Theme" }
@@ -56,18 +66,18 @@ setmetatable(Theme, {
 	end
 })
 
----@param themeTable? table
+---@param themeTable? Theme
 ---@return Theme
 function Theme.new(themeTable)
-	local name   = themeTable and themeTable.Name or ""
-	local colors = themeTable and themeTable.Colors or nil
-	local styles = themeTable and themeTable.Styles or nil
-	local tbg1   = themeTable and themeTable.TopBarFrameCol1 or nil
-	local tbg2   = themeTable and themeTable.TopBarFrameCol2 or nil
+	local name     = themeTable and themeTable.Name or ""
+	local colors   = themeTable and themeTable.Colors or nil
+	local styles   = themeTable and themeTable.Styles or nil
+	local accent   = themeTable and themeTable.SSAccent or nil
+	local gradient = themeTable and themeTable.SSGradient or nil
 
-	local __t    = {
-		Name = name,
-		Colors = {
+	local __t      = {
+		Name       = name,
+		Colors     = {
 			WindowBg             = colors and colors.WindowBg or vec4:new(0, 0, 0, 1),
 			ChildBg              = colors and colors.ChildBg or vec4:new(0, 0, 0, 1),
 			PopupBg              = colors and colors.PopupBg or vec4:new(0, 0, 0, 1),
@@ -96,8 +106,9 @@ function Theme.new(themeTable)
 			PlotHistogram        = colors and colors.PlotHistogram or vec4:new(0, 0, 0, 1),
 			PlotHistogramHovered = colors and colors.PlotHistogramHovered or vec4:new(0, 0, 0, 1),
 		},
-		Styles = {
+		Styles     = {
 			WindowRounding    = styles and styles.WindowRounding or 0,
+			ChildRounding     = styles and styles.ChildRounding or 0,
 			FrameRounding     = styles and styles.FrameRounding or 0,
 			GrabRounding      = styles and styles.GrabRounding or 0,
 			ScrollbarRounding = styles and styles.ScrollbarRounding or 0,
@@ -108,8 +119,8 @@ function Theme.new(themeTable)
 			ItemSpacing       = styles and styles.ItemSpacing or vec2:new(1, 1),
 			FramePadding      = styles and styles.FramePadding or vec2:new(1, 1),
 		},
-		TopBarFrameCol1 = tbg1 or vec4:new(0, 0, 0, 1),
-		TopBarFrameCol2 = tbg2 or vec4:new(0, 0, 0, 1)
+		SSAccent   = accent or vec4:new(0, 0, 0, 1),
+		SSGradient = gradient or vec4:new(0, 0, 0, 1)
 	}
 
 	---@diagnostic disable-next-line
@@ -174,9 +185,9 @@ function Theme:Normalize()
 end
 
 function Theme:Clear()
-	self.Name = ""
-	self.TopBarFrameCol1 = vec4:new(0, 0, 0, 1)
-	self.TopBarFrameCol2 = vec4:new(0, 0, 0, 1)
+	self.Name       = ""
+	self.SSAccent   = vec4:new(0, 0, 0, 1)
+	self.SSGradient = vec4:new(0, 0, 0, 1)
 
 	for k, _ in pairs(self.Colors) do
 		self.Colors[k] = vec4:new(0, 0, 0, 1)
@@ -192,9 +203,9 @@ function Theme:Clear()
 end
 
 function Theme:Copy()
-	local out = Theme.new(self)
-	out.TopBarFrameCol1 = self.TopBarFrameCol1:copy()
-	out.TopBarFrameCol2 = self.TopBarFrameCol2:copy()
+	local out      = Theme.new(self)
+	out.SSAccent   = self.SSAccent:copy()
+	out.SSGradient = self.SSGradient:copy()
 
 	for k, v in pairs(self.Colors) do
 		out.Colors[k] = v:copy()
@@ -214,13 +225,13 @@ end
 ---@return table
 function Theme:serialize()
 	local __t = {
-		Name            = self.Name,
-		Colors          = {},
-		Styles          = {},
-		TopBarFrameCol1 = self.TopBarFrameCol1:serialize(),
-		TopBarFrameCol2 = self.TopBarFrameCol2:serialize(),
-		__type          = self.__type,
-		JSON            = true
+		Name       = self.Name,
+		Colors     = {},
+		Styles     = {},
+		SSAccent   = self.SSAccent:serialize(),
+		SSGradient = self.SSGradient:serialize(),
+		__type     = self.__type,
+		JSON       = true
 	}
 
 	for k, v in pairs(self.Colors) do
@@ -258,8 +269,8 @@ function Theme.deserialize(t)
 		end
 	end
 
-	newTheme.TopBarFrameCol1 = vec4.deserialize(t.TopBarFrameCol1)
-	newTheme.TopBarFrameCol2 = vec4.deserialize(t.TopBarFrameCol2)
+	newTheme.SSAccent = vec4.deserialize(t.SSAccent)
+	newTheme.SSGradient = vec4.deserialize(t.SSGradient)
 
 	newTheme:Normalize()
 	return newTheme

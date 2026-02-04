@@ -598,5 +598,8 @@ return {
 	["SETTINGS_NEW_THEME_NAME_EMPTY"] = "Por favor, escolha um nome de tema!",
 	["SETTINGS_WINDOW_TOP_FRAME_BG"] = "Gradiente do botão da barra superior",
 	["SETTINGS_HOTKEY_WAIT"] = "Pressione qualquer tecla",
-	["SETTINGS_HOTKEY_FOUND"] = "Nova chave:"
+	["SETTINGS_HOTKEY_FOUND"] = "Nova chave:",
+	["GENERIC_CLEAR_ALL"] = "Limpar tudo",
+	["GENERIC_MUTE"] = "Mudo",
+	["GENERIC_UNMUTE"] = "Ativar som"
 }

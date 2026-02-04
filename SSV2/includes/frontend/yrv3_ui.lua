@@ -79,7 +79,7 @@ end
 
 ---@param business BusinessFront
 ---@param custom_name string
----@param bg Color
+---@param bg? Color
 ---@param tpKeepVeh? boolean
 local function drawNamePlate(business, custom_name, bg, tpKeepVeh)
 	ImGui.BeginChild("##nameplate",
@@ -93,7 +93,11 @@ local function drawNamePlate(business, custom_name, bg, tpKeepVeh)
 	ImGui.SetWindowFontScale(1.18)
 	local custom_name_width = ImGui.CalcTextSize(custom_name)
 	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - custom_name_width - 10) * 0.5)
-	ImGui.TextColored(bg.r, bg.g, bg.b, bg.a, custom_name)
+	if (bg) then
+		ImGui.TextColored(bg.r, bg.g, bg.b, bg.a, custom_name)
+	else
+		ImGui.Text(custom_name)
+	end
 
 	ImGui.Spacing()
 	ImGui.SetWindowFontScale(0.8)
@@ -151,7 +155,6 @@ local function drawWarehouse(warehouse, notOwnedLabel)
 		_T("YRV3_VALUE_TOTAL"),
 	})
 
-	ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 8)
 	ImGui.BeginChild(name,
 		0,
 		240,
@@ -204,7 +207,6 @@ local function drawWarehouse(warehouse, notOwnedLabel)
 	warehouse.auto_fill, _ = GUI:CustomToggle(_T("YRV3_AUTO_FILL"), warehouse.auto_fill)
 	ImGui.EndDisabled()
 	ImGui.EndChild()
-	ImGui.PopStyleVar()
 end
 
 ---@param bb? Factory
@@ -241,7 +243,6 @@ local function drawBikerBusiness(bb, notOwnedLabel)
 		_T("YRV3_VALUE_TOTAL"),
 	})
 
-	ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 8)
 	ImGui.BeginChild(_F("bb##%s", name),
 		0,
 		index < 6 and 330 or 300,
@@ -308,7 +309,6 @@ local function drawBikerBusiness(bb, notOwnedLabel)
 	ImGui.EndDisabled()
 
 	ImGui.EndChild()
-	ImGui.PopStyleVar()
 end
 
 local function drawCEOwarehouses()
@@ -410,10 +410,6 @@ local function drawClubhouse()
 end
 
 local function getClubNameColor()
-	if (not coloredNameplate) then
-		return Color(ImGui.GetStyleColorVec4(ImGuiCol.Text))
-	end
-
 	-- synthwave and pain
 	local t      = os.clock()
 	local beat   = (math.sin(t * 1.8) + 1) * 0.5
@@ -435,10 +431,18 @@ local function drawNightclub()
 		return
 	end
 
-	local bg = getClubNameColor()
-	ImGui.PushStyleColor(ImGuiCol.Border, bg:AsU32())
+	local bg
+	if (coloredNameplate) then
+		bg = getClubNameColor()
+		ImGui.PushStyleColor(ImGuiCol.Border, bg:AsU32())
+	end
+
 	drawNamePlate(club, club:GetCustomName(), bg)
-	ImGui.PopStyleColor()
+
+	if (coloredNameplate) then
+		ImGui.PopStyleColor()
+	end
+
 	coloredNameplate, _ = GUI:CustomToggle("Synthwave & Pain", coloredNameplate)
 	ImGui.Spacing()
 
@@ -599,7 +603,6 @@ local function drawBusinessSafes()
 	for i, cashSafe in ipairs(safes) do
 		local name = cashSafe:GetName() or _F("Cash Safe %d", i)
 		ImGui.PushID(i)
-		ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 8)
 		ImGui.BeginChild(name,
 			0,
 			160,
@@ -634,7 +637,6 @@ local function drawBusinessSafes()
 		)
 
 		ImGui.EndChild()
-		ImGui.PopStyleVar()
 		ImGui.PopID()
 	end
 end
@@ -653,7 +655,6 @@ local function drawBasicBusiness(business, isParent, kvSpacing, clearHeatLabel)
 	local heat    = business:GetHeat()
 	local maxHeat = 100
 
-	ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 8)
 	ImGui.BeginChild(name,
 		0,
 		isParent and 360 or 280,
@@ -750,7 +751,6 @@ local function drawBasicBusiness(business, isParent, kvSpacing, clearHeatLabel)
 	)
 
 	ImGui.EndChild()
-	ImGui.PopStyleVar()
 end
 
 local function drawMoneyFronts()
@@ -1271,7 +1271,7 @@ local function YRV3UI()
 
 	local headerHeight   = 100.0
 	local windowHeight   = math.max(400, GVars.ui.window_size.y - headerHeight - 100.0)
-	local sidebarWidth   = 100.0
+	local sidebarWidth   = math.max(100.0, ImGui.GetWindowWidth() * 0.2)
 	local separatorWidth = 3.0
 
 	if (ImGui.BeginChild("##yrv3_header", 0, headerHeight, true, ImGuiWindowFlags.AlwaysUseWindowPadding)) then
