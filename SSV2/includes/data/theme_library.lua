@@ -258,8 +258,8 @@ local ThemeLibrary <const> = {
 			Border               = vec4:new(1.00, 0.38, 0.33, 1.00),
 
 			ScrollbarBg          = vec4:new(0.23, 0.07, 0.09, 1.00),
-			ScrollbarGrab        = vec4:new(0.95, 0.30, 0.28, 1.00),
-			ScrollbarGrabHovered = vec4:new(0.95, 0.30, 0.28, 1.00),
+			ScrollbarGrab        = vec4:new(0.95, 0.30, 0.28, 0.80),
+			ScrollbarGrabHovered = vec4:new(0.95, 0.30, 0.28, 0.90),
 			ScrollbarGrabActive  = vec4:new(0.95, 0.30, 0.28, 1.00),
 
 			Header               = vec4:new(0.08, 0.08, 0.15, 1.00),
@@ -283,7 +283,7 @@ local ThemeLibrary <const> = {
 			SliderGrabActive     = vec4:new(0.99, 0.96, 0.00, 1.00),
 
 			Text                 = vec4:new(0.00, 0.87, 1.00, 1.00),
-			TextDisabled         = vec4:new(0.00, 0.87, 1.00, 0.90),
+			TextDisabled         = vec4:new(0.00, 0.80, 0.90, 0.50),
 
 			PlotHistogram        = vec4:new(0.00, 0.94, 0.94, 0.40),
 			PlotHistogramHovered = vec4:new(0.00, 0.94, 0.94, 0.60),
