@@ -796,7 +796,7 @@ local function drawSalvageYard()
 
 	ImGui.Spacing()
 
-	local childWidth  = 260
+	local childWidth  = 240
 	local cash_safe   = salvage_yard:GetCashSafe()
 	local cashValue   = cash_safe:GetCashValue()
 	local maxCash     = cash_safe:GetMaxCash()
