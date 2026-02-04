@@ -314,7 +314,7 @@ return {
 	["VEH_LAUNCH_CTRL_TT"] = "Simuliert die Startsteuerung. Nur für Performance-Fahrzeuge verfügbar.",
 	["VEH_AUTO_LOCK_TT"] = "Verriegelt Ihr Fahrzeug automatisch, wenn Sie sich von ihm entfernen, und entriegelt es wieder, wenn Sie versuchen, wieder einzusteigen oder zu einem anderen Fahrzeug zu wechseln.",
 	["VEH_IV_EXIT_TT"] = "Imitiert den Fahrzeugausstiegsstil von GTA IV: Halten Sie [F] eine Sekunde lang gedrückt, um den Motor auszuschalten, oder drücken Sie normal, um ihn laufen zu lassen.",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "Verhindert, dass Ihr Spielercharakter beim Verlassen eines Fahrzeugs die Räder neu zentriert, indem er Sie nach draußen teleportiert.",
+	["VEH_KEEP_WHEELS_TURNED_TT"] = "Hält die Räder Ihres Fahrzeugs in jedem Winkel, in dem Sie sie vor dem Verlassen des Fahrzeugs gelassen haben.",
 	["VEH_SPEED_UNIT"] = "Geschwindigkeitseinheit",
 	["VEH_MINES"] = "Fahrzeugminen",
 	["VEH_SPEED_BG"] = "Hintergrund",

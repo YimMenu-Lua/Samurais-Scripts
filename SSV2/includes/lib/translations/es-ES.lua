@@ -316,7 +316,7 @@ return {
 	["VEH_MINES"] = "Minas de vehículos",
 	["VEH_KEEP_WHEELS_TURNED"] = "Mantenga las ruedas en marcha",
 	["VEH_SPEED_UNIT"] = "Unidad de velocidad",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "Evita que tu personaje jugador vuelva a centrar las ruedas al salir de un vehículo al teletransportarte afuera.",
+	["VEH_KEEP_WHEELS_TURNED_TT"] = "Mantiene las ruedas de su vehículo en cualquier ángulo en el que las dejó antes de salir del vehículo.",
 	["VEH_SPEED_CIRCLE"] = "Círculo",
 	["VEH_MINES_TT"] = "Te permite lanzar una mina desde cualquier vehículo terrestre.",
 	["VEH_SPEED_BG"] = "Fondo",

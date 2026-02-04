@@ -320,7 +320,7 @@ return {
 	["VEH_SPEED_MARK"] = "標記",
 	["VEH_LAUNCH_CTRL_TT"] = "模擬發射控制。僅適用於高性能汽車。",
 	["VEH_LAUNCH_CTRL"] = "發射控制",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "通過將您傳送到外面來防止您的玩家角色在退出車輛時重新居中車輪。",
+	["VEH_KEEP_WHEELS_TURNED_TT"] = "在離開車輛之前，使車輪保持在您離開的任何角度。",
 	["VEH_KEEP_WHEELS_TURNED"] = "保持車輪轉動",
 	["VEH_SPEED_NEEDLE"] = "針",
 	["VEH_DRIFT_MODE_MIXED"] = "混合",

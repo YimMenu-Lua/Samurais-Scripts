@@ -309,7 +309,7 @@ return {
 	["VEH_FLAPPY_DOORS_TT"] = "Je n'ai aucune idée de pourquoi j'ai fait ça.",
 	["VEH_LAUNCH_CTRL"] = "Contrôle de lancement",
 	["VEH_AUTO_LOCK"] = "Verrouillage automatique",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "Empêche votre personnage joueur de recentrer les roues en sortant d'un véhicule en vous téléportant à l'extérieur.",
+	["VEH_KEEP_WHEELS_TURNED_TT"] = "Maintient les roues de votre véhicule dans n'importe quel angle dans lequel vous les avez laissées avant de quitter le véhicule.",
 	["VEH_KEEP_WHEELS_TURNED"] = "Gardez les roues tournées",
 	["VEH_IV_EXIT"] = "Sortie de style IV",
 	["VEH_SPEED_BG"] = "Arrière-plan",

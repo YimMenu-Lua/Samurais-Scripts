@@ -313,7 +313,7 @@ return {
 	["VEH_FLAPPY_DOORS"] = "Porte a soffietto",
 	["VEH_LAUNCH_CTRL_TT"] = "Simula il controllo del lancio. Disponibile solo per auto ad alte prestazioni.",
 	["VEH_SPEED_CIRCLE"] = "Cerchio",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "Impedisce al tuo personaggio giocante di centrare nuovamente le ruote quando esce da un veicolo teletrasportandoti all'esterno.",
+	["VEH_KEEP_WHEELS_TURNED_TT"] = "Mantiene le ruote del tuo veicolo nell'angolazione che hai lasciato prima di scendere dal veicolo.",
 	["VEH_IV_EXIT_TT"] = "Imita lo stile di uscita del veicolo di GTA IV: tieni premuto [F] per un secondo per spegnere il motore o premi normalmente per lasciarlo acceso.",
 	["VEH_SPEED_BG"] = "Sfondo",
 	["VEH_SPEED_TEXT"] = "Testo",

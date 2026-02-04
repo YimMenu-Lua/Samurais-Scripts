@@ -321,7 +321,7 @@ return {
 	["VEH_KEEP_WHEELS_TURNED"] = "계속해서 바퀴를 돌리세요",
 	["VEH_IV_EXIT"] = "IV 스타일 출구",
 	["VEH_MINES_TT"] = "모든 육상 차량에서 지뢰를 떨어뜨릴 수 있습니다.",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "플레이어 캐릭터가 차량에서 내릴 때 외부로 순간 이동하여 바퀴가 다시 중앙에 위치하는 것을 방지합니다.",
+	["VEH_KEEP_WHEELS_TURNED_TT"] = "차량에서 내리기 전에 차량의 바퀴를 어떤 각도에서든 유지합니다.",
 	["VEH_DRIFT_MODE_STRONG"] = "강한",
 	["VEH_SPEED_NEEDLE_BASE"] = "바늘대",
 	["VEH_DRIFT_MODE_SLIPPERY"] = "미끄러운",

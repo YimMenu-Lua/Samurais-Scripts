@@ -313,7 +313,7 @@ return {
 	["VEH_LAUNCH_CTRL"] = "发射控制",
 	["VEH_AUTO_LOCK"] = "自动锁",
 	["VEH_STRONG_CRASH_TT"] = "凸轮抖动、屏幕效果、更多变形和损坏使碰撞变得更加可怕。高速碰撞可能是致命的。",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "通过将您传送到外面来防止您的玩家角色在退出车辆时重新居中车轮。",
+	["VEH_KEEP_WHEELS_TURNED_TT"] = "在离开车辆之前，使车轮保持在您离开的任何角度。",
 	["VEH_SPEED_UNIT"] = "速度单位",
 	["VEH_SPEED_BG"] = "背景",
 	["VEH_SPEED_CIRCLE"] = "圆圈",

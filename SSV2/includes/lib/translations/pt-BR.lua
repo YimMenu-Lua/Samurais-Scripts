@@ -319,7 +319,7 @@ return {
 	["VEH_MINES_TT"] = "Permite que você solte uma mina de qualquer veículo terrestre.",
 	["VEH_SPEED_UNIT"] = "Unidade de velocidade",
 	["VEH_SPEED_BG"] = "Fundo",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "Impede que seu personagem centralize novamente as rodas ao sair de um veículo, teletransportando você para fora.",
+	["VEH_KEEP_WHEELS_TURNED_TT"] = "Mantém as rodas do seu veículo em qualquer ângulo em que você as deixou antes de sair do veículo.",
 	["VEH_SPEED_NEEDLE"] = "Agulha",
 	["VEH_MINES"] = "Minas de veículos",
 	["VEH_IV_EXIT_TT"] = "Imita o estilo de saída do veículo do GTA IV: Segure [F] por um segundo para desligar o motor ou pressione normalmente para deixá-lo funcionando.",

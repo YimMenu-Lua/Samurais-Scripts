@@ -314,7 +314,7 @@ return {
 	["VEH_MINES"] = "Kopalnie pojazdów",
 	["VEH_AUTO_LOCK"] = "Automatyczna blokada",
 	["VEH_AUTO_LOCK_TT"] = "Automatycznie blokuje pojazd, gdy się od niego oddalisz i odblokowuje go ponownie, gdy spróbujesz ponownie wejść lub przełączyć się na inny pojazd.",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "Uniemożliwia Twojej postaci gracza ponowne wycentrowanie kół podczas wychodzenia z pojazdu, teleportując Cię na zewnątrz.",
+	["VEH_KEEP_WHEELS_TURNED_TT"] = "Utrzymuje koła pojazdu pod dowolnym kątem, jaki pozostawiłeś przed opuszczeniem pojazdu.",
 	["VEH_SPEED_BG"] = "Tło",
 	["VEH_SPEED_CIRCLE"] = "Koło",
 	["VEH_MINES_TT"] = "Umożliwia zrzucenie miny z dowolnego pojazdu lądowego.",

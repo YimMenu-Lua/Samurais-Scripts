@@ -317,7 +317,7 @@ return {
 	["VEH_RGB_LIGHTS_TT"] = "車のヘッドライトで RGB ループを開始します。このウィンドウの下部で速度を調整できます。",
 	["VEH_MINES"] = "車両鉱山",
 	["VEH_SPEED_TEXT"] = "文章",
-	["VEH_KEEP_WHEELS_TURNED_TT"] = "車から降りるときにプレイヤー キャラクターが車外にテレポートして車輪を再中心に置くのを防ぎます。",
+	["VEH_KEEP_WHEELS_TURNED_TT"] = "車から降りる前に、車の車輪を任意の角度に保ちます。",
 	["VEH_SPEED_NEEDLE"] = "針",
 	["VEH_KEEP_WHEELS_TURNED"] = "車輪を回し続ける",
 	["VEH_SPEED_UNIT"] = "速度単位",

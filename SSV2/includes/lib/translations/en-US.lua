@@ -406,8 +406,7 @@ return {
 	["VEH_IV_EXIT_TT"]                     =
 	"Imitates GTA IV's vehicle exit style: Hold [F] for one second to turn off the engine or normal press to leave it running.",
 	["VEH_KEEP_WHEELS_TURNED"]             = "Keep Wheels Turned",
-	["VEH_KEEP_WHEELS_TURNED_TT"]          =
-	"Prevents your player character from re-centering the wheels when exiting a vehicle by teleporting you outside.",
+	["VEH_KEEP_WHEELS_TURNED_TT"]          = "Keeps your vehicle's wheels at any angle you left them before exiting the vehicle.",
 	["VEH_MINES"]                          = "Vehicle Mines",
 	["VEH_MINES_TT"]                       = "Allows you to drop a mine from any land vehicle.",
 	["VEH_SPEED_UNIT"]                     = "Speed Unit",
