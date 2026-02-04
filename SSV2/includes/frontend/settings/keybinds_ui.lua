@@ -94,7 +94,7 @@ local function DrawKeybinds(gvarKey, isController)
 		ImGui.Dummy(1, 10)
 
 		if not keyName then
-			ImGui.Text(ImGui.TextSpinner(_T("SETTING_HOTKEY_WAIT"), 10, ImGuiSpinnerStyle.BOUNCE_DOTS))
+			ImGui.Text(ImGui.TextSpinner(_T("SETTINGS_HOTKEY_WAIT"), 10, ImGuiSpinnerStyle.BOUNCE_DOTS))
 
 			if isController then
 				keyCode, keyName = Game.GetKeyPressed()
@@ -105,7 +105,7 @@ local function DrawKeybinds(gvarKey, isController)
 			_reserved = reserved_set:Contains(keyCode)
 
 			if not _reserved then
-				ImGui.Text(_T("SETTING_HOTKEY_FOUND"))
+				ImGui.Text(_T("SETTINGS_HOTKEY_FOUND"))
 				ImGui.SameLine()
 				local name = _F("[%s]", keyName)
 				local nameWidth = ImGui.CalcTextSize(name)

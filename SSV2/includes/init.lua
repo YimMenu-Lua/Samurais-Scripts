@@ -46,7 +46,6 @@ Backend                      = require("includes.backend"):init(SCRIPT_NAME, SCR
 
 require("includes.lib.types")
 require("includes.lib.utils")
-require("includes.lib.imgui_ext")
 require("includes.lib.class")
 require("includes.lib.enum")
 require("includes.classes.Pair")

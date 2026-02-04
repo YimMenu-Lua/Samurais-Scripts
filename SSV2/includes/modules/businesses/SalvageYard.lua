@@ -206,6 +206,11 @@ end
 ---@return integer
 function SalvageYard:GetEstimatedIncome()
 	local sum = 0
+
+	for i = 1, 2 do
+		sum = sum + self:GetCarValueOnLift(i)
+	end
+
 	for i = 1, 4 do
 		sum = sum + self:GetRobberyCarValue(i)
 	end

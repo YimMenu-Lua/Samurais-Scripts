@@ -43,11 +43,11 @@ function Factory.new(opts)
 	assert(type(opts.max_units) == "number", "Missing argument: max_units<integer>")
 	assert(type(opts.id) == "number" and math.is_inrange(opts.id, 0, 6), "Invalid Biker Business id.")
 
-	local base                 = BusinessBase.new(opts)
-	local instance             = setmetatable(base, Factory)
-	instance.m_normalized_name = opts.normalized_name
-	instance.fast_prod_enabled = false
-	instance.fast_prod_running = false
+	local base                   = BusinessBase.new(opts)
+	local instance               = setmetatable(base, Factory)
+	instance.m_normalized_name   = opts.normalized_name
+	instance.fast_prod_enabled   = false
+	instance.m_fast_prod_running = false
 
 
 	local base_vpu               = opts.vpu
@@ -62,7 +62,7 @@ end
 
 function Factory:Reset()
 	self.fast_prod_enabled = false
-	self.fast_prod_running = false
+	self.m_fast_prod_running = false
 	self:ResetImpl()
 end
 
@@ -95,6 +95,12 @@ function Factory:ReStock()
 		return
 	end
 
+	if (self:HasFullSupplies()) then
+		local name = self:GetNormalizedName() or self:GetName()
+		Notifier:ShowError(name, _T("YRV3_RESTOCK_ERR"))
+		return
+	end
+
 	SGSL:Get(SGSL.data.freemode_business_global)
 		:AsGlobal()
 		:At(1, self.m_id)
@@ -122,6 +128,12 @@ function Factory:TriggerProduction()
 		return
 	end
 
+	if (self:HasFullProduction()) then
+		local name = self:GetNormalizedName() or self:GetName()
+		Notifier:ShowError(name, _T("YRV3_FAST_PROD_ERR"))
+		return
+	end
+
 	local g_obj      = SGSL:Get(SGSL.data.biker_prod_time_global)
 	local pid_size   = g_obj:GetOffset(1)
 	local offset_2   = g_obj:GetOffset(2)
@@ -135,6 +147,8 @@ function Factory:TriggerProduction()
 		:At(9)
 
 	if (global:ReadInt() < 1000) then
+		local name = self:GetNormalizedName() or self:GetName()
+		Notifier:ShowError(name, _T("YRV3_RESTOCK_ERR"))
 		return
 	end
 
@@ -142,7 +156,12 @@ function Factory:TriggerProduction()
 end
 
 ---@return boolean
-function Factory:IsFull()
+function Factory:HasFullSupplies()
+	return self:GetSuppliesCount() == 100
+end
+
+---@return boolean
+function Factory:HasFullProduction()
 	return self:GetProductCount() == self.m_max_units
 end
 
@@ -161,15 +180,10 @@ function Factory:CanTriggerProduction()
 	return self:GetTimeLeftBeforeProd() > 1000
 end
 
+---@private
 function Factory:LoopProduction()
-	if (not self.fast_prod_enabled or self.m_fast_prod_running) then
-		return
-	end
-
-	self.m_fast_prod_running = true
-
 	ThreadManager:Run(function()
-		while (self:IsValid() and self.fast_prod_enabled and not self:IsFull()) do
+		while (self:IsValid() and self.fast_prod_enabled and not self:HasFullProduction()) do
 			if (self:GetSuppliesCount() <= 25) then
 				self:ReStock()
 				sleep(250)
@@ -189,7 +203,8 @@ function Factory:Update()
 		return
 	end
 
-	if (self.fast_prod_enabled and not self.m_fast_prod_running) then
+	if (self.fast_prod_enabled and not self.m_fast_prod_running and not self:HasFullProduction()) then
+		self.m_fast_prod_running = true
 		self:LoopProduction()
 	end
 

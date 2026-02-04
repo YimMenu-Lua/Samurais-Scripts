@@ -40,6 +40,21 @@ function Clubhouse:GetCustomName()
 	return self.m_custom_name
 end
 
+---@return joaat_t
+function Clubhouse:GetClientBikeModel()
+	return stats.get_int("MPX_MPSV_MODEL_BIKER_CLT")
+end
+
+---@return string
+function Clubhouse:GetClientBikeName()
+	local model = self:GetClientBikeModel()
+	if (not model or model == 0) then
+		return _T("GENERIC_NONE")
+	end
+
+	return vehicles.get_vehicle_display_name(model)
+end
+
 ---@param index integer
 function Clubhouse:AddSubBusiness(index)
 	if (not math.is_inrange(index, 0, 4)) then

@@ -214,6 +214,30 @@ function Color:GetBrightness()
 	return (0.299 * self.r) + (0.587 * self.g) + (0.114 * self.b)
 end
 
+-- https://stackoverflow.com/a/56678483
+---@return float
+function Color:GetRelativeLuminance()
+	local r = self.GetChannel(self.r)
+	local g = self.GetChannel(self.g)
+	local b = self.GetChannel(self.b)
+
+	return (0.2126 * r) + (0.7152 * g) + (0.0722 * b)
+end
+
+-- Returns the contrast ratio between two colors
+---@param c Color
+---@return float
+function Color:GetContrastRatio(c)
+	local L1 = self:GetRelativeLuminance()
+	local L2 = c:GetRelativeLuminance()
+
+	if (L1 < L2) then
+		L1, L2 = L2, L1
+	end
+
+	return (L1 + 0.05) / (L2 + 0.05)
+end
+
 ---@return boolean
 function Color:IsBright()
 	local brightness = self:GetBrightness()
@@ -238,6 +262,17 @@ end
 ---@return float
 function Color.CalculateBrightness(r, g, b, _)
 	return (0.299 * r) + (0.587 * g) + (0.114 * b)
+end
+
+-- https://stackoverflow.com/a/56678483
+---@param v float
+---@return float
+function Color.GetChannel(v)
+	if (v <= 0.03928) then
+		return v / 12.92
+	end
+
+	return ((v + 0.055) / 1.055) ^ 2.4
 end
 
 -- Returns a `Color` instance from HSV

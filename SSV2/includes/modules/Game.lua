@@ -1033,8 +1033,9 @@ end
 ---@return boolean, vec3
 function Game.GetObjectiveBlipCoords()
 	for _, v in ipairs(Refs.objectiveBlips) do
-		if HUD.DOES_BLIP_EXIST(HUD.GET_FIRST_BLIP_INFO_ID(v)) then
-			return true, HUD.GET_BLIP_INFO_ID_COORD(HUD.GET_FIRST_BLIP_INFO_ID(v))
+		local blipID = HUD.GET_FIRST_BLIP_INFO_ID(v)
+		if HUD.DOES_BLIP_EXIST(blipID) then
+			return true, HUD.GET_BLIP_INFO_ID_COORD(blipID)
 		else
 			local i_stdBlip = HUD.GET_FIRST_BLIP_INFO_ID(HUD.GET_STANDARD_BLIP_ENUM_ID())
 			local vec_blipCoords = HUD.GET_BLIP_INFO_ID_COORD(i_stdBlip)
@@ -1055,6 +1056,30 @@ function Game.GetWaypointCoords()
 	if (HUD.DOES_BLIP_EXIST(waypoint)) then
 		return HUD.GET_BLIP_COORDS(waypoint)
 	end
+end
+
+---@param target vec2|vec3|integer BlipID | Entity handle | Vector2 | Vector3
+function Game.SetWaypointCoords(target)
+	ThreadManager:Run(function()
+		local x, y
+		if (IsInstance(target, vec3) or IsInstance(target, vec2)) then
+			x, y = target.x, target.y
+		elseif (type(target) == "number") then
+			local testBlip = HUD.GET_FIRST_BLIP_INFO_ID(target)
+			if (HUD.DOES_BLIP_EXIST(testBlip)) then
+				x, y, _ = HUD.GET_BLIP_INFO_ID_COORD(testBlip):unpack()
+			elseif (Game.IsScriptHandle(target)) then
+				x, y, _ = Game.GetEntityCoords(target, false):unpack()
+			end
+		end
+
+		if (not x or not y) then
+			return
+		end
+
+		HUD.DELETE_WAYPOINTS_FROM_THIS_PLAYER()
+		HUD.SET_NEW_WAYPOINT(x, y)
+	end)
 end
 
 ---@param vecMin vec3

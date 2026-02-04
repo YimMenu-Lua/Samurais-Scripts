@@ -7,12 +7,15 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+require("includes.lib.imgui_ext")
+
 GVars.keyboard_keybinds.gui_toggle = GVars.keyboard_keybinds.gui_toggle or "F5"
-local Tab = require("includes.modules.Tab")
-local WindowAnimator = require("includes.services.WindowAnimator")
-local ThemeManager = require("includes.services.ThemeManager")
-local debug_counter = GVars.backend.debug_mode and 7 or 0
-local DrawClock = require("includes.frontend.clock")
+local Tab                          = require("includes.modules.Tab")
+local WindowAnimator               = require("includes.services.WindowAnimator")
+local ThemeManager                 = require("includes.services.ThemeManager")
+local debug_counter                = GVars.backend.debug_mode and 7 or 0
+local DrawClock                    = require("includes.frontend.clock")
+
 
 ---@class WindowRequest
 ---@field m_should_draw boolean
@@ -23,7 +26,7 @@ local DrawClock = require("includes.frontend.clock")
 ---@field m_pos? vec2
 
 ---@enum eTabID
-Enums.eTabID = {
+Enums.eTabID                = {
 	TAB_SELF     = 1,
 	TAB_VEHICLE  = 2,
 	TAB_WORLD    = 3,
@@ -32,11 +35,11 @@ Enums.eTabID = {
 	TAB_SETTINGS = 6,
 }
 
-local TABID_MIN <const> = 1
-local TABID_MAX <const> = table.getlen(Enums.eTabID)
+local TABID_MIN <const>     = 1
+local TABID_MAX <const>     = table.getlen(Enums.eTabID)
 
 ---@type table<eTabID, table>
-local defaultTabs = {}
+local defaultTabs           = {}
 
 ---@type table<eTabID, string>
 local tabIdToString <const> = {
@@ -74,47 +77,50 @@ end
 ---@field private m_sidebar_width number
 ---@field private m_snap_animator WindowAnimator
 ---@field private m_notifier_pos vec2
+---@field protected m_initialized boolean
 local GUI = Class("GUI")
 
 ---@return GUI
 function GUI:init()
-	---@type GUI
-	local instance = setmetatable({
-		m_main_window_label   = "##ss_main_window",
-		m_should_draw         = false,
-		m_is_drawing_sidebar  = false,
-		m_cb_window_pos       = vec2:zero(),
-		m_notifier_pos        = vec2:zero(),
-		m_screen_resolution   = Game.GetScreenResolution(),
-		m_sidebar_width       = 200,
-		m_selected_category   = Enums.eTabID.TAB_SELF,
-		m_tabs                = defaultTabs,
-		m_independent_windows = {},
-		m_requested_windows   = {},
-		m_prev_category_tabs  = {},
-		m_snap_animator       = WindowAnimator()
-	}, GUI)
+	if (self.m_initialized) then
+		return self
+	end
+
+	self.m_main_window_label   = "##ss_main_window"
+	self.m_should_draw         = false
+	self.m_is_drawing_sidebar  = false
+	self.m_cb_window_pos       = vec2:zero()
+	self.m_notifier_pos        = vec2:zero()
+	self.m_screen_resolution   = Game.GetScreenResolution()
+	self.m_sidebar_width       = 200
+	self.m_selected_category   = Enums.eTabID.TAB_SELF
+	self.m_tabs                = defaultTabs
+	self.m_independent_windows = {}
+	self.m_requested_windows   = {}
+	self.m_prev_category_tabs  = {}
+	self.m_snap_animator       = WindowAnimator()
 
 	ThemeManager:Load()
 
 	gui.add_always_draw_imgui(function()
-		instance:Draw()
+		self:Draw()
 	end)
 
-	instance.m_dummy_tab = gui.add_tab(Backend.script_name or "Samurai's Scripts")
-	instance.m_dummy_tab:add_imgui(function()
-		instance:DrawDummyTab()
+	self.m_dummy_tab = gui.add_tab(Backend.script_name or "Samurai's Scripts")
+	self.m_dummy_tab:add_imgui(function()
+		self:DrawDummyTab()
 	end)
 
 	KeyManager:RegisterKeybind(GVars.keyboard_keybinds.gui_toggle, function()
-		instance:Toggle()
+		self:Toggle()
 	end)
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
-		instance:Close()
+		self:Close()
 	end)
 
-	return instance
+	self.m_initialized = true
+	return self
 end
 
 function GUI:LateInit()
@@ -245,6 +251,8 @@ function GUI:GetTab(id, name)
 			return pair.second
 		end
 	end
+
+	return nil
 end
 
 ---@param id eTabID Category
@@ -344,6 +352,7 @@ function GUI:GetMaxSizeForWindow(desired)
 	return vec2:new(maxwidth, maxheight)
 end
 
+---@private
 function GUI:DrawDummyTab()
 	ImGui.SetNextWindowBgAlpha(0)
 	ImGui.BeginChild("##clock", 480, 400)
@@ -377,11 +386,13 @@ function GUI:DrawDummyTab()
 	ImGui.EndChild()
 end
 
-local underlineX = 0.0
-local underlineW = 0.0
+local underlineX       = 0.0
+local underlineW       = 0.0
 local underlineTargetX = 0.0
 local underlineTargetW = 0.0
-local underlineSet = false
+local underlineSet     = false
+
+---@private
 function GUI:DrawTopBar()
 	local drawList      = ImGui.GetWindowDrawList()
 	local spacing       = 10
@@ -393,8 +404,8 @@ function GUI:DrawTopBar()
 	local totalWidth    = tabCount * elemWidth + (tabCount - 1) * spacing
 	local startX        = (availWidth - totalWidth) * 0.5
 	local cursorPos     = vec2:new(ImGui.GetCursorScreenPos())
-	local _col1         = GVars.ui.style.theme.TopBarFrameCol1
-	local _col2         = GVars.ui.style.theme.TopBarFrameCol2
+	local accent        = GVars.ui.style.theme.SSAccent
+	local gradient      = GVars.ui.style.theme.SSGradient
 
 	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + startX)
 
@@ -421,12 +432,24 @@ function GUI:DrawTopBar()
 			underlineSet = true
 		end
 
-		local selectedColor1 = Color(_col1.x, _col1.y, _col1.z, held and _col1.w or 230)
-		local selectedColor2 = Color(_col2.x, _col2.y, _col2.z, held and _col2.w or 255)
-		local defaultColor1  = Color(60, 60, 80, held and 100 or 150)
-		local defaultColor2  = Color(80, 80, 110, held and 130 or 180)
-		local col1           = selected and selectedColor1 or defaultColor1
-		local col2           = selected and selectedColor2 or defaultColor2
+		local selectedAccent   = ImGui.GetColorU32(
+			accent.x,
+			accent.y,
+			accent.z,
+			held and accent.w - 0.25 or accent.w
+		)
+		local selectedGradient = ImGui.GetColorU32(
+			gradient.x,
+			gradient.y,
+			gradient.z,
+			held and gradient.w - 0.25 or 1.00
+		)
+
+		local defaultColor1    = ImGui.GetColorU32(0.31, 0.31, 0.43, held and 0.50 or 0.70)
+		local defaultColor2    = ImGui.GetColorU32(0.23, 0.23, 0.31, held and 0.39 or 0.58)
+		local col1             = selected and selectedAccent or defaultColor1
+		local col2             = selected and selectedGradient or defaultColor2
+
 		if (hovered or selected) then
 			ImGui.ImDrawListAddRectFilledMultiColor(
 				drawList,
@@ -434,26 +457,28 @@ function GUI:DrawTopBar()
 				rect.min.y + rectMod.y,
 				rect.max.x - rectMod.x,
 				rect.max.y - rectMod.y,
-				col1:AsU32(),
-				col2:AsU32(),
-				col2:AsU32(),
-				col1:AsU32()
+				col1,
+				col1,
+				col2,
+				col2
 			)
 		end
 
-		local textSize = vec2:new(ImGui.CalcTextSize(tabName))
-		local textPos = vec2:new(
+		local textSize         = vec2:new(ImGui.CalcTextSize(tabName))
+		local textPos          = vec2:new(
 			rect.min.x + (elemWidth - textSize.x) * 0.5,
 			rect.min.y + (elemHeight - textSize.y) * 0.5
 		)
 
-		local bg = (hovered or selected) and col1 or Color(GVars.ui.style.theme.Colors.WindowBg:unpack())
-		local textColor = ImGui.GetAutoTextColor(bg)
+		local bg               = (hovered or selected) and col1 or ImGui.GetStyleColorU32(ImGuiCol.WindowBg)
+		local defaultTextColor = ImGui.GetStyleColorU32(ImGuiCol.Text)
+		local autoTextColor    = ImGui.GetAutoTextColor(Color(bg)):AsU32()
+		local textColor        = (hovered or selected) and autoTextColor or defaultTextColor
 		ImGui.ImDrawListAddText(
 			drawList,
 			textPos.x,
 			textPos.y,
-			textColor:AsU32(),
+			textColor,
 			tabName
 		)
 
@@ -483,27 +508,27 @@ function GUI:DrawTopBar()
 		end
 	end
 
-	underlineX = underlineX + (underlineTargetX - underlineX - 0.5) * 0.15
+	underlineX = underlineX + (underlineTargetX - underlineX) * 0.15
 	underlineW = underlineW + (underlineTargetW - underlineW) * 0.15
 
 	local underlineHeight = 4.0
 	local underlinePos = vec2:new(underlineX, cursorPos.y + tabHeight - underlineHeight)
 	local underlineEnd = vec2:new(underlineX + underlineW, underlinePos.y + underlineHeight)
-	local underlineCol = Color(_col1.x, _col1.y, _col1.z, 255):AsU32()
 	ImGui.ImDrawListAddRectFilled(
 		drawList,
 		underlineX,
 		underlinePos.y,
 		underlineEnd.x,
 		underlineEnd.y,
-		underlineCol,
-		1.5
+		ImGui.GetColorU32(gradient.x, gradient.y, gradient.z, gradient.w),
+		GVars.ui.style.theme.Styles.WindowRounding
 	)
 
 	ImGui.Separator()
 	self.m_cursor_pos = vec2:new(ImGui.GetCursorScreenPos())
 end
 
+---@private
 ---@param yPos float
 function GUI:DrawSideBar(yPos)
 	if (not self.m_selected_category or not tabIdToString[self.m_selected_category]) then
@@ -561,9 +586,9 @@ function GUI:ShowWindowHeightLimit()
 		| ImGuiWindowFlags.AlwaysAutoResize
 		| ImGuiWindowFlags.NoBackground
 
-	local color = Color(GVars.ui.style.theme.TopBarFrameCol1:unpack())
-	local top_height = self:GetMaxTopBarHeight()
-	local pos = vec2:new(GVars.ui.window_pos.x, GVars.ui.window_pos.y + GVars.ui.window_size.y + top_height - 10)
+	local color       = Color(GVars.ui.style.theme.SSAccent:unpack())
+	local topHeight   = self:GetMaxTopBarHeight()
+	local pos         = vec2:new(GVars.ui.window_pos.x, GVars.ui.window_pos.y + GVars.ui.window_size.y + topHeight - 10)
 	ImGui.SetNextWindowSize(GVars.ui.window_size.x + 10, 0)
 	ImGui.SetNextWindowPos(pos.x - 10, pos.y)
 	if (ImGui.Begin("##indicator", windowFlags)) then
@@ -619,27 +644,37 @@ function GUI:Draw()
 	ThemeManager:PushTheme()
 	ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
 	if (ImGui.Begin(self.m_main_window_label, windowFlags)) then
-		local fontScale = 1.5
+		local fontScale  = 1.5
 		local titleWidth = ImGui.CalcTextSize("Samurai's Scripts") * fontScale
-		local winWidth = ImGui.GetWindowWidth()
+		local winWidth   = ImGui.GetWindowWidth()
+
 		ImGui.SetCursorPosX((winWidth - titleWidth) / 2)
 		ImGui.SetWindowFontScale(fontScale)
 		ImGui.Text("Samurai's Scripts")
 		ImGui.SetWindowFontScale(1)
-		ImGui.SameLine()
-		local nextPosX = ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - 40
-		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - 40)
+
 		if (Notifier) then
-			local count = Notifier:GetNotifCount()
-			local label = Notifier:HasUnread() and "!" or ". . ."
-			local tt = count > 0 and _F("%d %s", count, _T("GUI_NOTIFICATIONS_UNREAD")) or _T("GUI_NOTIFICATIONS")
-			ImGui.SetWindowFontScale(0.8)
-			if (self:Button(label, { size = vec2:new(35, 30) })) then
-				Notifier:Toggle()
+			ImGui.SameLine()
+			local bellSize = vec2:new(40, 35)
+			local region = vec2:new(ImGui.GetContentRegionAvail())
+			local nextPosX = ImGui.GetCursorPosX() + region.x - bellSize.x
+			local nextPosY = ImGui.GetCursorPosY() - (bellSize.y * 0.11)
+			ImGui.SetCursorPos(nextPosX, nextPosY)
+			local isOpen = Notifier:IsOpen()
+			if (ImGui.NotifBell({
+					muted       = Notifier:IsMuted(),
+					open        = isOpen,
+					unread      = Notifier:HasUnread(),
+					unreadCount = Notifier:GetNotifCount(),
+				}, bellSize)
+				) then
+				Notifier:Open()
 			end
-			ImGui.SetWindowFontScale(1)
 			self.m_notifier_pos = vec2:new(nextPosX, ImGui.GetCursorPosY())
-			self:Tooltip(tt)
+
+			if (not isOpen) then
+				self:Tooltip(_T("GUI_NOTIFICATIONS"))
+			end
 		end
 		ImGui.Spacing()
 		self:DrawTopBar()
@@ -948,17 +983,18 @@ end
 
 ---@param label string
 ---@param v boolean
----@param opts? { tooltip?: string, color?: Color, onClick?: function }
+---@param opts? { tooltip?: string, color?: Color, onClick?: fun(v?: boolean) }
 ---@return boolean, boolean
 function GUI:CustomToggle(label, v, opts)
 	local clicked = false
-	v, clicked = ImGui.Toggle(label, v)
+	opts          = opts or {}
+	v, clicked    = ImGui.Toggle(label, v)
 
-	if (opts and opts.tooltip) then
+	if (opts.tooltip) then
 		self:Tooltip(opts.tooltip, { color = opts.color })
 	end
 
-	if (clicked and opts and type(opts.onClick) == "function") then
+	if (clicked and type(opts.onClick) == "function") then
 		opts.onClick(v)
 	end
 
@@ -967,19 +1003,20 @@ end
 
 ---@param label string
 ---@param v boolean
----@param opts? { tooltip?: string, color?: Color, onClick?: function }
+---@param opts? { tooltip?: string, color?: Color, onClick?: fun(v?: boolean) }
 ---@return boolean, boolean
 function GUI:Checkbox(label, v, opts)
 	local clicked = false
-	v, clicked = ImGui.Checkbox(label, v)
+	opts          = opts or {}
+	v, clicked    = ImGui.Checkbox(label, v)
 
-	if (opts and opts.tooltip) then
+	if (opts.tooltip) then
 		self:Tooltip(opts.tooltip, { color = opts.color })
 	end
 
 	if (clicked) then
 		self:PlaySound(self.Sounds.Checkbox)
-		if (opts and type(opts.onClick) == "function") then
+		if (type(opts.onClick) == "function") then
 			opts.onClick(v)
 		end
 	end
@@ -988,14 +1025,37 @@ function GUI:Checkbox(label, v, opts)
 end
 
 ---@param label string
----@param opts? { size?: vec2, repeatable?: boolean, tooltip?: string }
+---@param opts? { size?: vec2, repeatable?: boolean, tooltip?: string, colors?: { button?: Color, buttonHovered?: Color, buttonActive?: Color } }
 function GUI:Button(label, opts)
-	opts = opts or {}
-	opts.size = opts.size or vec2:zero()
+	opts             = opts or {}
+	opts.size        = opts.size or vec2:zero()
+	local colorStack = 0
+
+	if (opts.colors) then
+		if (opts.colors.button) then
+			ImGui.PushStyleColor(ImGuiCol.Button, opts.colors.button:AsFloat())
+			colorStack = colorStack + 1
+		end
+
+		if (opts.colors.buttonHovered) then
+			ImGui.PushStyleColor(ImGuiCol.ButtonHovered, opts.colors.buttonHovered:AsFloat())
+			colorStack = colorStack + 1
+		end
+
+		if (opts.colors.buttonActive) then
+			ImGui.PushStyleColor(ImGuiCol.ButtonActive, opts.colors.buttonActive:AsFloat())
+			colorStack = colorStack + 1
+		end
+	end
 
 	ImGui.PushButtonRepeat(opts.repeatable or false)
 	local pressed = ImGui.Button(label, opts.size.x, opts.size.y)
 	ImGui.PopButtonRepeat()
+
+	if (colorStack > 0) then
+		ImGui.PopStyleColor(colorStack)
+	end
+
 	if (opts.tooltip) then
 		self:Tooltip(opts.tooltip)
 	end
@@ -1013,9 +1073,9 @@ end
 ---@param active_color Color
 ---@param opts? { size?: vec2, repeatable?: boolean }
 function GUI:ButtonColored(label, color, hover_color, active_color, opts)
-	ImGui.PushStyleColor(ImGuiCol.Button, color:AsRGBA())
-	ImGui.PushStyleColor(ImGuiCol.ButtonHovered, hover_color:AsRGBA())
-	ImGui.PushStyleColor(ImGuiCol.ButtonActive, active_color:AsRGBA())
+	ImGui.PushStyleColor(ImGuiCol.Button, color:AsFloat())
+	ImGui.PushStyleColor(ImGuiCol.ButtonHovered, hover_color:AsFloat())
+	ImGui.PushStyleColor(ImGuiCol.ButtonActive, active_color:AsFloat())
 	local pressed = self:Button(label, opts)
 	ImGui.PopStyleColor(3)
 

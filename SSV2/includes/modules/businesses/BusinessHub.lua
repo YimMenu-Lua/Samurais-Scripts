@@ -79,7 +79,7 @@ function BusinessHub:TriggerProduction()
 end
 
 ---@return boolean
-function BusinessHub:IsFull()
+function BusinessHub:HasFullProduction()
 	return self:GetProductCount() == self.m_max_units
 end
 
@@ -88,9 +88,10 @@ function BusinessHub:CanTriggerProduction()
 	return self:GetTimeLeftBeforeProd() > 1000
 end
 
+---@private
 function BusinessHub:LoopProduction()
 	ThreadManager:Run(function()
-		while (self:IsValid() and self.fast_prod_enabled and not self:IsFull()) do
+		while (self:IsValid() and self.fast_prod_enabled and not self:HasFullProduction()) do
 			self:TriggerProduction()
 			yield()
 		end
@@ -105,7 +106,7 @@ function BusinessHub:Update()
 		return
 	end
 
-	if (self.fast_prod_enabled and not self.m_fast_prod_running and not self:IsFull()) then
+	if (self.fast_prod_enabled and not self.m_fast_prod_running and not self:HasFullProduction()) then
 		self.m_fast_prod_running = true
 		self:LoopProduction()
 	end

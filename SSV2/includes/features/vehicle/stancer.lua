@@ -517,29 +517,30 @@ function Stancer:RestoreQueueFromDecors()
 		return true
 	end
 
-	local handle = self.m_entity:GetHandle()
-	if (not Decorator:IsEntityRegistered(handle)) then
-		return false
-	end
+	return false
+	-- local handle = self.m_entity:GetHandle()
+	-- if (not Decorator:IsEntityRegistered(handle)) then
+	-- 	return false
+	-- end
 
-	local success = true
-	for _, v in ipairs(self.decorators) do
-		local queued_key = _F("%s_%d_queue", v.key, v.wheel_side)
-		local val = Decorator:GetDecor(handle, queued_key)
-		if (type(val) ~= "number") then
-			success = false
-		else
-			self.m_deltas[v.wheel_side][v.key] = val
-		end
-	end
+	-- local success = true
+	-- for _, v in ipairs(self.decorators) do
+	-- 	local queued_key = _F("%s_%d_queue", v.key, v.wheel_side)
+	-- 	local val = Decorator:GetDecor(handle, queued_key)
+	-- 	if (type(val) ~= "number") then
+	-- 		success = false
+	-- 	else
+	-- 		self.m_deltas[v.wheel_side][v.key] = val
+	-- 	end
+	-- end
 
-	local suspension = Decorator:GetDecor(handle, "m_suspension_height_q")
-	if (type(suspension) ~= "number") then
-		return false
-	end
+	-- local suspension = Decorator:GetDecor(handle, "m_suspension_height_q")
+	-- if (type(suspension) ~= "number") then
+	-- 	return false
+	-- end
 
-	self.m_suspension_height.m_current = suspension
-	return success
+	-- self.m_suspension_height.m_current = suspension
+	-- return success
 end
 
 function Stancer:ReadDefaults()
@@ -666,12 +667,12 @@ function Stancer:Update()
 	end
 
 	for _, v in ipairs(self.decorators) do
-		local delta_val = self.m_deltas[v.wheel_side][v.key]
-		local pending_key = _F("%s_%d_queue", v.key, v.wheel_side)
-		local pending_val = Decorator:GetDecor(handle, pending_key)
-		if (pending_val and not math.is_equal(pending_val, delta_val)) then
-			Decorator:UpdateDecor(handle, pending_key, delta_val)
-		end
+		local delta_val   = self.m_deltas[v.wheel_side][v.key]
+		-- local pending_key = _F("%s_%d_queue", v.key, v.wheel_side)
+		-- local pending_val = Decorator:GetDecor(handle, pending_key)
+		-- if (pending_val and not math.is_equal(pending_val, delta_val)) then
+		-- 	Decorator:UpdateDecor(handle, pending_key, delta_val)
+		-- end
 
 		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
 		local base_val    = self.m_base_values[v.wheel_side][v.key]

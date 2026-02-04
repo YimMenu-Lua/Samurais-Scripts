@@ -47,11 +47,13 @@ local ScriptsToTerminate <const> = {
 
 ---@enum eYRState
 Enums.eYRState                   = {
-	OFFLINE = 0x0,
-	WAITING = 0x1,
-	LOADING = 0x2,
-	RUNNING = 0x3,
-	ERROR   = 0x4
+	IDLE      = 0x0,
+	OFFLINE   = 0x1,
+	WAITING   = 0x2,
+	LOADING   = 0x3,
+	RUNNING   = 0x4,
+	RELOADING = 0x5,
+	ERROR     = 0x6,
 }
 
 ---@class YRV3Businesses
@@ -98,7 +100,7 @@ function YRV3:init()
 	self.m_last_autosell_check_time  = 0
 	self.m_last_income_check_time    = 0
 	self.m_last_business_update_time = 0
-	self.m_state                     = Enums.eYRState.OFFLINE
+	self.m_state                     = Enums.eYRState.IDLE
 	self.m_has_triggered_autosell    = false
 	self.m_sell_script_running       = false
 	self.m_initial_data_done         = false
@@ -146,18 +148,16 @@ function YRV3:Reset()
 	self.m_initial_data_done         = false
 	self.m_data_initialized          = false
 	self.m_cooldown_state_dirty      = true
+	self.m_state                     = Enums.eYRState.IDLE
 end
 
 function YRV3:Reload()
-	if (self.m_thread and self.m_thread:IsRunning()) then
-		self.m_thread:Suspend()
-	end
-
-	self:Reset()
-
-	if (self.m_thread and self.m_thread:IsSuspended()) then
-		self.m_thread:Resume()
-	end
+	ThreadManager:Run(function()
+		self.m_state = Enums.eYRState.RELOADING
+		self.m_total_sum = 0
+		sleep(1500) -- dummy busy wait to give the UI time to refresh
+		self:Reset()
+	end)
 end
 
 ---@return boolean
@@ -370,7 +370,7 @@ function YRV3:PopulateBikerBusinesses()
 			vpu_mult_2 = 0,
 			vpu        = tunables.get_int("BIKER_ACID_PRODUCT_VALUE"),
 			max_units  = 160,
-			blip       = 847,
+			coords     = vec3:new(597.7751, -405.7288, 26.0292),
 		})
 	end
 end
@@ -549,7 +549,11 @@ function YRV3:PreInit()
 end
 
 function YRV3:InitializeData()
-	if (self.m_data_initialized or not Game.IsOnline() or self.m_state == Enums.eYRState.LOADING) then
+	if (self.m_data_initialized
+			or not Game.IsOnline()
+			or self.m_state == Enums.eYRState.LOADING
+			or self.m_state == Enums.eYRState.RELOADING
+		) then
 		return
 	end
 
@@ -559,7 +563,7 @@ function YRV3:InitializeData()
 	self:PopulateNightclub()
 end
 
-function YRV3:FinishSaleOnCommand()
+function YRV3:CommandFinishSale()
 	if (not self:CanAccess()) then
 		return
 	end
@@ -569,7 +573,7 @@ function YRV3:FinishSaleOnCommand()
 			"YRV3",
 			"You aleady have 'Auto-Sell' enabled. No need to manually trigger it.",
 			false,
-			1.5
+			5
 		)
 		return
 	end
@@ -579,7 +583,7 @@ function YRV3:FinishSaleOnCommand()
 			"YRV3",
 			"No supported sale script is currently running.",
 			false,
-			1.5
+			5
 		)
 		return
 	end
@@ -588,12 +592,20 @@ function YRV3:FinishSaleOnCommand()
 end
 
 ---@param index number
-function YRV3:WarehouseAutofillOnCommand(index)
+function YRV3:CommandWarehouseAutoFill(index)
 	if (not self:CanAccess()) then
 		return
 	end
 
-	local warehouse = self.m_businesses.warehouses[index]
+	---@type Warehouse?
+	local warehouse
+
+	for _, wh in ipairs(self.m_businesses.warehouses) do
+		if (wh:GetIndex() == index - 1) then
+			warehouse = wh
+			break
+		end
+	end
 
 	if (not warehouse or not warehouse:IsValid()) then
 		Notifier:ShowError(
@@ -604,22 +616,124 @@ function YRV3:WarehouseAutofillOnCommand(index)
 		return
 	end
 
-	if (warehouse:IsFull()) then
+	warehouse.auto_fill = not warehouse.auto_fill
+	Notifier:ShowMessage(warehouse:GetName(), _F("Autofill %s.", warehouse.auto_fill and "enabled" or "disabled"))
+end
+
+function YRV3:CommandHangarAutoFill()
+	if (not self:CanAccess()) then
 		return
 	end
 
-	warehouse.auto_fill = not warehouse.auto_fill
-	Notifier:ShowMessage(
-		"YRV3",
-		_F("CEO Warehouse %d auto-fill %s.",
-			index,
-			warehouse.auto_fill
-			and "Enabled"
-			or "Disabled"
-		),
-		false,
-		2
-	)
+	local hangar = self.m_businesses.hangar
+	if (not hangar or not hangar:IsValid()) then
+		Notifier:ShowError(
+			"YRV3",
+			_T("YRV3_HANGAR_NOT_OWNED"),
+			false,
+			5
+		)
+		return
+	end
+
+	if (hangar:HasFullProduction()) then
+		return
+	end
+
+	hangar.auto_fill = not hangar.auto_fill
+	Notifier:ShowMessage(hangar:GetName(), _F("Autofill %s.", hangar.auto_fill and "enabled" or "disabled"))
+end
+
+---@param index integer -- `1 .. 7`
+---@return Factory?
+function YRV3:GetFactoryByIndex(index)
+	if (not self:CanAccess()) then
+		return
+	end
+
+	if (type(index) ~= "number" or not math.is_inrange(index, 1, 7)) then
+		Notifier:ShowError("YRV3", "Invalid factory index! Please make sure to use a number between 1 and 7.")
+		return
+	end
+
+	local factory -- fwd decl
+	if (index < 6) then
+		local clubhouse = self.m_businesses.clubhouse
+		if (not clubhouse) then
+			return
+		end
+
+		local factories = self.m_businesses.clubhouse:GetSubBusinesses()
+		if (type(factories) == "table") then
+			for _, f in ipairs(factories) do
+				if (f:GetIndex() == index - 1) then
+					factory = f
+					break
+				end
+			end
+		end
+	elseif (index == 6) then
+		factory = self.m_businesses.bunker
+	elseif (index == 7) then
+		factory = self.m_businesses.acid_lab
+	end
+
+	return factory
+end
+
+---@param index integer -- `1 .. 7`
+function YRV3:CommandFactoryRestock(index)
+	local factory = self:GetFactoryByIndex(index)
+	if (not factory) then
+		Notifier:ShowError("YRV3", _T("YRV3_MC_NONE_OWNED"), false, 5)
+		return
+	end
+
+	factory:ReStock()
+end
+
+---@param index integer -- `1 .. 7`
+---@param isNightclubHub? boolean
+function YRV3:CommandToggleProduction(index, isNightclubHub)
+	local factory
+	if (not isNightclubHub) then
+		factory = self:GetFactoryByIndex(index)
+	else
+		local nc = self.m_businesses.nightclub
+		if (not nc) then
+			Notifier:ShowError("YRV3", _T("YRV3_CLUB_NOT_OWNED"), false, 5)
+			return
+		end
+
+		local hubs = nc:GetSubBusinesses()
+		if (type(hubs) == "table") then
+			for _, hub in ipairs(hubs) do
+				if (hub:GetIndex() == index - 1) then
+					factory = hub
+					break
+				end
+			end
+		end
+	end
+
+	if (not factory) then
+		Notifier:ShowError("YRV3", _T("YRV3_GENERIC_NOT_OWNED"), false, 5)
+		return
+	end
+
+	factory.fast_prod_enabled = not factory.fast_prod_enabled
+	local bool = factory.fast_prod_enabled
+	local name = isNightclubHub and self:GetNightclub():GetCustomName() or
+		(factory:GetNormalizedName() or factory:GetName())
+
+	if (factory:HasFullProduction()) then
+		Notifier:ShowError(name, _T("YRV3_FAST_PROD_ERR"))
+	else
+		local prefix = "Fast production"
+		local state  = bool and "enabled" or "disabled"
+		local msg    = isNightclubHub and _F("%s for the %s hub", state, factory:GetName()) or state
+		Notifier:ShowMessage(name, _F("%s %s.", prefix, msg))
+	end
 end
 
 function YRV3:FillAll()
@@ -635,24 +749,14 @@ function YRV3:FillAll()
 
 	if (self.m_businesses.hangar and self.m_businesses.hangar:IsValid()) then
 		self.m_businesses.hangar.auto_fill = true
-		sleep(math.random(100, 300))
 	end
 
-	if (self.m_businesses.bunker and self.m_businesses.bunker:IsValid()) then
-		self.m_businesses.bunker:ReStock()
-		sleep(math.random(100, 300))
-	end
-
-	if (self.m_businesses.acid_lab and self.m_businesses.acid_lab:IsValid()) then
-		self.m_businesses.acid_lab:ReStock()
-		sleep(math.random(100, 300))
-	end
-
-	for _, bb in ipairs(self.m_businesses.clubhouse:GetSubBusinesses()) do
-		if (bb:IsValid()) then
-			bb:ReStock()
+	for i = 1, 7 do
+		local factory = self:GetFactoryByIndex(i)
+		if (factory) then
+			factory:ReStock()
+			sleep(math.random(600, 1200))
 		end
-		sleep(math.random(200, 666))
 	end
 end
 
@@ -877,7 +981,6 @@ end
 -- Master Control Terminal
 function YRV3:MCT()
 	if Self:IsBrowsingApps() then
-		GUI:PlaySound(GUI.Sounds.Error)
 		return
 	end
 
@@ -889,7 +992,6 @@ function YRV3:MCT()
 		end
 
 		TaskWait(Game.RequestScript, "appArcadeBusinessHub")
-		GUI:PlaySound(GUI.Sounds.Button)
 		self.m_bhub_script_handle = SYSTEM.START_NEW_SCRIPT("appArcadeBusinessHub", 1424) -- STACK_SIZE_DEFAULT
 		SCRIPT.SET_SCRIPT_AS_NO_LONGER_NEEDED("appArcadeBusinessHub")
 		sleep(100)
@@ -988,6 +1090,10 @@ function YRV3:OnTick()
 		return
 	end
 
+	if (self.m_state == Enums.eYRState.RELOADING) then
+		return
+	end
+
 	if (not self:CanAccess()) then
 		self.m_state = Enums.eYRState.OFFLINE
 
@@ -1007,11 +1113,12 @@ function YRV3:OnTick()
 		return
 	end
 
-	self:InitializeData()
+	if (not self.m_data_initialized and not self.m_initial_data_done and self.m_state ~= Enums.eYRState.LOADING) then
+		self:InitializeData()
+	end
 
-	if (not self.m_data_initialized) then
+	while (not self.m_data_initialized) do
 		yield()
-		return
 	end
 
 	self.m_state = Enums.eYRState.RUNNING

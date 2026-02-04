@@ -311,6 +311,7 @@ function vec2:serialize()
 end
 
 -- Deserializes a table into a vec3 **(static method)**.
+---@param t { x: float, y: float }
 function vec2.deserialize(t)
 	if (type(t) ~= "table" or not (t.x and t.y)) then
 		return vec2:zero()

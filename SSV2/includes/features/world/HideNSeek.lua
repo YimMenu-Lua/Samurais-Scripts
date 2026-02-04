@@ -7,9 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local FeatureBase = require("includes.modules.FeatureBase")
-
-local trashBins <const> = {
+local FeatureBase         = require("includes.modules.FeatureBase")
+local YimActions          = require("includes.features.YimActionsV3")
+local trashBins <const>   = {
 	"m23_2_prop_m32_dumpster_01a",
 	"prop_cs_dumpster_01a",
 	"prop_dumpster_01a",
@@ -21,17 +21,17 @@ local trashBins <const> = {
 	"p_dumpster_t",
 }
 
-local vehAnim <const> = {
+local vehAnim <const>     = {
 	dict = "missmic3leadinout_mcs1",
 	anim = "cockpit_pilot"
 }
 
-local trashAnim <const> = {
+local trashAnim <const>   = {
 	dict = "anim@amb@inspect@crouch@male_a@base",
 	anim = "base"
 }
 
-local bootAnim <const> = {
+local bootAnim <const>    = {
 	dict = "timetable@tracy@sleep@",
 	anim = "base"
 }
@@ -50,8 +50,8 @@ local eHNSContext <const> = {
 ---@field m_length float
 ---@field m_height float
 ---@overload fun(handle?: handle, m_is_rear_engined?: boolean, length?: float, height?: float): BootVehicle
-local BootVehicle = {}
-BootVehicle.__index = BootVehicle
+local BootVehicle         = {}
+BootVehicle.__index       = BootVehicle
 ---@diagnostic disable-next-line
 setmetatable(BootVehicle, {
 	__call = function(_, handle, m_is_rear_engined, length, height)

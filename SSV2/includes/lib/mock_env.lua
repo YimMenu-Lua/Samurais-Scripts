@@ -119,8 +119,11 @@ if (not memory) then
 end
 
 if (not vec3) then
-	---@class vec3
 	vec3 = {}
+	---@param x float
+	---@param y float
+	---@param z float
+	---@return vec3
 	function vec3:new(x, y, z)
 		return setmetatable(
 			{

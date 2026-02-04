@@ -350,6 +350,10 @@ end
 ---@param key eVirtualKeyCodes|string
 ---@return boolean
 function KeyManager:IsKeyPressed(key)
+	if (Backend.disable_input) then
+		return false
+	end
+
 	local _key = self:GetKey(key)
 	return _key and _key.m_pressed or false
 end
