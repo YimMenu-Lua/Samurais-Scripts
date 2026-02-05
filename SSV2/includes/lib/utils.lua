@@ -1458,6 +1458,26 @@ function math.smooth_step(x)
 	return x * x * (3 - 2 * x)
 end
 
+---@return int32_t
+function math.int32_min()
+	return -2 ^ 31
+end
+
+---@return int32_t
+function math.int32_max()
+	return 2 ^ 31
+end
+
+---@return uint32_t
+function math.uint32_min()
+	return 0
+end
+
+---@return uint32_t
+function math.uint32_max()
+	return 2 ^ 32
+end
+
 --#endregion
 
 --#endregion

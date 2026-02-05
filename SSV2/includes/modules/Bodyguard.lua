@@ -111,7 +111,8 @@ function Bodyguard.new(modelHash, name, spawnPos, weapon, godmode, noRagdoll, be
 
 	behavior = behavior or 1
 
-	local ped = Ped:Create(modelHash, Enums.eEntityType.Ped, spawnPos, Self:GetHeading(-180), Game.IsOnline(), false)
+	local ped = Ped:Create(modelHash, Enums.eEntityType.Ped, spawnPos, Self:GetHeading(-180), Game.IsOnline(),
+		false)
 	local handle = ped:GetHandle()
 	if (not Game.IsScriptHandle(handle)) then
 		Backend:debug("failed to create ped.")

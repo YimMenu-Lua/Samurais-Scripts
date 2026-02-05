@@ -7,9 +7,10 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local ped_list <const> = require("includes.data.peds")
-local ped_lookup_table <const> = require("includes.data.ped_reverse_lookup")
-local Refs = require("includes.data.refs")
+local ped_list <const>    = require("includes.data.peds")
+local ped_hashmap <const> = require("includes.data.ped_hashmap")
+local Refs                = require("includes.data.refs")
+
 
 --------------------------------------
 -- Class: Game
@@ -18,7 +19,7 @@ local Refs = require("includes.data.refs")
 --
 -- Native wrappers.
 ---@class Game
-Game = {}
+Game         = {}
 Game.__index = Game
 
 ---@return VersionInfo
@@ -1119,13 +1120,13 @@ end
 ---@param modelHash integer
 ---@return string
 function Game.GetPedName(modelHash)
-	return ped_lookup_table[modelHash] or _F("0x%X", modelHash)
+	return ped_hashmap[modelHash] or _F("0x%X", modelHash)
 end
 
 ---@param model integer|string
 function Game.GetPedTypeFromModel(model)
 	if (type(model) == "number") then
-		model = ped_lookup_table[model]
+		model = ped_hashmap[model]
 	end
 
 	return ped_list[model].ped_type or Enums.ePedType.CIVMALE
@@ -1135,7 +1136,7 @@ end
 ---@return ePedGender
 function Game.GetPedGenderFromModel(model)
 	if (type(model) == "number") then
-		model = ped_lookup_table[model]
+		model = ped_hashmap[model]
 	end
 
 	local found = ped_list[model]
@@ -1146,7 +1147,7 @@ end
 ---@param model integer|string
 function Game.IsPedModelHuman(model)
 	if (type(model) == "number") then
-		model = ped_lookup_table[model]
+		model = ped_hashmap[model]
 	end
 
 	local found = ped_list[model]

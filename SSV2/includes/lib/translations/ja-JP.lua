@@ -601,5 +601,8 @@ return {
 	["SETTINGS_HOTKEY_FOUND"] = "新しいキー:",
 	["GENERIC_MUTE"] = "ミュート",
 	["GENERIC_UNMUTE"] = "ミュートを解除する",
-	["GENERIC_CLEAR_ALL"] = "すべてクリア"
+	["GENERIC_CLEAR_ALL"] = "すべてクリア",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "この機能は安全ではなく、悪用されるとアカウントが停止される可能性があります。\n\nご自身の責任で有効にするには [確認] を押し、元に戻すには [キャンセル] を押してください。 [SHIFT] キーを押しながらトグルをクリックすると、後でいつでもこの承認を取り消すことができます。",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "[SHIFT] を押したままトグルをクリックすると、確認を取り消し、この機能をロックできます。",
+	["YRV3_CASH_LOOP"] = "キャッシュループ"
 }

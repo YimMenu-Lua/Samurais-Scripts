@@ -74,12 +74,14 @@ function BusinessFront:Update()
 		return
 	end
 
-	if (not self:HasSubBusinesses()) then
-		return
+	if (self:HasSubBusinesses()) then
+		for _, sub in ipairs(self.m_subs) do
+			sub:Update()
+		end
 	end
 
-	for _, sub in ipairs(self.m_subs) do
-		sub:Update()
+	if (self.m_safe and self.m_safe:CanLoop()) then
+		self.m_safe:Update()
 	end
 end
 

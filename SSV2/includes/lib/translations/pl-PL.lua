@@ -601,5 +601,8 @@ return {
 	["SETTINGS_HOTKEY_FOUND"] = "Nowy klucz:",
 	["GENERIC_CLEAR_ALL"] = "Wyczyść wszystko",
 	["GENERIC_MUTE"] = "Niemy",
-	["GENERIC_UNMUTE"] = "Wyłącz wyciszenie"
+	["GENERIC_UNMUTE"] = "Wyłącz wyciszenie",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Możesz przytrzymać [SHIFT] podczas klikania przełącznika, aby odwołać potwierdzenie i zablokować tę funkcję.",
+	["YRV3_CASH_LOOP"] = "Pętla gotówkowa",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Ta funkcja jest niebezpieczna i może skutkować zawieszeniem konta w przypadku nadużycia.\n\nNaciśnij „Potwierdź”, aby włączyć ją na własne ryzyko, lub „Anuluj”, aby wrócić. Możesz później odwołać to potwierdzenie, przytrzymując [SHIFT] podczas klikania przełącznika."
 }

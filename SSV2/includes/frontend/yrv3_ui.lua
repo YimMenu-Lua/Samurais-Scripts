@@ -13,7 +13,6 @@ local coloredNameplate         = false
 local maxSellMissionButtonSize = vec2:new(80, 30)
 local progressBarSize          = vec2:new(300, 25)
 local colMoneyGreen            = Color("#85BB65")
-local colTextDefault           = Color(ImGui.GetStyleColorVec4(ImGuiCol.Text))
 local selectedTabID            = 1
 
 local tabNames <const>         = {
@@ -65,16 +64,60 @@ local function SetAllCDCheckboxes(value)
 	YRV3:SetAllCooldownStatesDirty(true)
 end
 
+---@param labels array<string>
 local function measureBulletWidths(labels)
 	local max = 0
 	for i = 1, #labels do
 		local w = ImGui.CalcTextSize(labels[i])
-		if w > max then
+		if (w > max) then
 			max = w
 		end
 	end
 
 	return max + 60 + ImGui.GetStyle().ItemSpacing.x
+end
+
+---@param cashSafe CashSafe
+local function onCashLoopEnable(cashSafe)
+	if (GVars.features.yrv3.safe_loop_warn_ack) then
+		return
+	end
+
+	if (GUI:ConfirmPopup("##warn_safe_loop", _T("YRV3_CASH_LOOP_WARN_ACK"))) then
+		GVars.features.yrv3.safe_loop_warn_ack = true
+		cashSafe.cash_loop_enabled = true
+	end
+end
+
+---@param cashSafe CashSafe
+local function drawCashSafeLoopToggle(cashSafe)
+	if (not cashSafe:CanLoop()) then
+		return
+	end
+
+	local isOpen = ImGui.IsPopupOpen("##warn_safe_loop")
+	ImGui.BeginDisabled(isOpen or (not cashSafe.cash_loop_enabled and cashSafe:IsFull()))
+	cashSafe.cash_loop_enabled, _ = GUI:CustomToggle(
+		_F("%s##%s", _T("YRV3_CASH_LOOP"), cashSafe:GetName()),
+		cashSafe.cash_loop_enabled,
+		{
+			onClick = function(v)
+				if (KeyManager:IsKeyPressed(eVirtualKeyCodes.SHIFT) and GVars.features.yrv3.safe_loop_warn_ack) then
+					GVars.features.yrv3.safe_loop_warn_ack = false
+					return
+				end
+				if (v and not isOpen and not GVars.features.yrv3.safe_loop_warn_ack) then
+					ImGui.OpenPopup("##warn_safe_loop")
+				end
+			end
+		}
+	)
+	ImGui.EndDisabled()
+	if (GVars.features.yrv3.safe_loop_warn_ack) then
+		GUI:HelpMarker(_T("YRV3_CASH_LOOP_ACK_DISABLE_TT"))
+	end
+
+	onCashLoopEnable(cashSafe)
 end
 
 ---@param business BusinessFront
@@ -367,7 +410,7 @@ local function drawClubhouse()
 
 	local cashSafe    = clubhouse:GetCashSafe()
 	local cashValue   = cashSafe:GetCashValue()
-	local maxCash     = cashSafe:GetMaxCash()
+	local maxCash     = cashSafe:GetCapacity()
 	local bulletWidth = measureBulletWidths({
 		_T("YRV3_CASH_SAFE"),
 		_T("YRV3_MC_CLIENT_BIKE_LABEL"),
@@ -449,7 +492,7 @@ local function drawNightclub()
 	local popValue    = club:GetPopularity()
 	local cashSafe    = club:GetCashSafe()
 	local cashValue   = cashSafe:GetCashValue()
-	local maxCash     = cashSafe:GetMaxCash()
+	local maxCash     = cashSafe:GetCapacity()
 	local bulletWidth = measureBulletWidths({
 		_T("YRV3_POPULARITY"),
 		_T("YRV3_CASH_SAFE"),
@@ -493,6 +536,8 @@ local function drawNightclub()
 			end
 		}
 	)
+
+	drawCashSafeLoopToggle(cashSafe)
 
 	bigTips, _ = GUI:CustomToggle(
 		_T("YRV3_MILLION_DOLLAR_TIPS"),
@@ -605,13 +650,13 @@ local function drawBusinessSafes()
 		ImGui.PushID(i)
 		ImGui.BeginChild(name,
 			0,
-			160,
+			cashSafe:CanLoop() and 195 or 160,
 			false,
 			ImGuiWindowFlags.NoScrollbar
 			| ImGuiWindowFlags.AlwaysUseWindowPadding
 		)
 		local cashValue = cashSafe:GetCashValue()
-		local maxCash   = cashSafe:GetMaxCash()
+		local maxCash   = cashSafe:GetCapacity()
 		local coords    = cashSafe:GetCoords()
 
 		ImGui.SeparatorText(name)
@@ -636,6 +681,8 @@ local function drawBusinessSafes()
 			string.formatmoney(cashValue)
 		)
 
+		drawCashSafeLoopToggle(cashSafe)
+
 		ImGui.EndChild()
 		ImGui.PopID()
 	end
@@ -657,7 +704,7 @@ local function drawBasicBusiness(business, isParent, kvSpacing, clearHeatLabel)
 
 	ImGui.BeginChild(name,
 		0,
-		isParent and 360 or 280,
+		isParent and 385 or 280,
 		false,
 		ImGuiWindowFlags.AlwaysUseWindowPadding
 		| ImGuiWindowFlags.NoScrollbar
@@ -682,7 +729,7 @@ local function drawBasicBusiness(business, isParent, kvSpacing, clearHeatLabel)
 		local duffle          = business:GetDuffleBag()
 		---@diagnostic disable-next-line
 		local cashSafe        = business:GetCashSafe()
-		local maxCash         = cashSafe:GetMaxCash()
+		local maxCash         = cashSafe:GetCapacity()
 		local cw_dirty_cash   = duffle:GetDirtyCash()
 		local cw_clean_cash   = duffle:GetDuffleValue()
 		local cw_safe_cash    = cashSafe:GetCashValue()
@@ -730,6 +777,11 @@ local function drawBasicBusiness(business, isParent, kvSpacing, clearHeatLabel)
 		end
 		ImGui.EndDisabled()
 		ImGui.Spacing()
+	end
+
+	if (isParent) then
+		---@diagnostic disable-next-line
+		drawCashSafeLoopToggle(business:GetCashSafe())
 	end
 
 	GUI:CustomToggle(_T("YRV3_CWASH_LEGAL_WORK_CD"),
@@ -797,9 +849,9 @@ local function drawSalvageYard()
 	ImGui.Spacing()
 
 	local childWidth  = 240
-	local cash_safe   = salvage_yard:GetCashSafe()
-	local cashValue   = cash_safe:GetCashValue()
-	local maxCash     = cash_safe:GetMaxCash()
+	local cashSafe    = salvage_yard:GetCashSafe()
+	local cashValue   = cashSafe:GetCashValue()
+	local maxCash     = cashSafe:GetCapacity()
 	local bulletWidth = measureBulletWidths({
 		_T("YRV3_CASH_SAFE"),
 		_T("SY_INCOME_THRESHOLD"),
@@ -825,9 +877,6 @@ local function drawSalvageYard()
 	end
 	ImGui.EndDisabled()
 
-	ImGui.SameLine()
-	ImGui.Spacing()
-	ImGui.SameLine()
 	GVars.features.yrv3.sy_always_max_income, _ = GUI:CustomToggle(
 		_T("SY_ALWAYS_MAX_INCOME"),
 		GVars.features.yrv3.sy_always_max_income,
@@ -842,6 +891,8 @@ local function drawSalvageYard()
 		}
 	)
 	GUI:HelpMarker(_T("SY_ALWAYS_MAX_INCOME_TT"))
+
+	drawCashSafeLoopToggle(cashSafe)
 
 	ImGui.Spacing()
 	ImGui.BeginTabBar("##salvage_yard_tb")

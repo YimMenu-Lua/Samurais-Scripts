@@ -601,5 +601,8 @@ return {
 	["SETTINGS_WINDOW_TOP_FRAME_BG"] = "Dégradé des boutons de la barre supérieure",
 	["GENERIC_UNMUTE"] = "Activer le son",
 	["GENERIC_MUTE"] = "Muet",
-	["GENERIC_CLEAR_ALL"] = "Tout effacer"
+	["GENERIC_CLEAR_ALL"] = "Tout effacer",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Cette fonctionnalité n'est pas sécurisée et peut entraîner la suspension du compte en cas d'abus.\n\nAppuyez sur « Confirmer » pour l'activer à vos propres risques, ou sur « Annuler » pour revenir en arrière. Vous pouvez révoquer cet accusé de réception à tout moment ultérieurement en maintenant [SHIFT] tout en cliquant sur la bascule.",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Vous pouvez maintenir [SHIFT] enfoncé tout en cliquant sur la bascule pour révoquer l'accusé de réception et verrouiller cette fonctionnalité.",
+	["YRV3_CASH_LOOP"] = "Boucle de trésorerie"
 }

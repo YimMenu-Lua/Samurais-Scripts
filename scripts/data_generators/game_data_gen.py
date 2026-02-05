@@ -74,17 +74,18 @@ ePedType = {
 }
 
 
-def gen_file_header():
+def gen_file_header() -> str:
     today = datetime.date.today()
     date_str = today.strftime("%d-%m-%Y")
     buff = SS_NOTICE
-    buff += f"-- Auto-generated on <{date_str}>\n\n"
-    buff += "---@diagnostic disable\n\n"
+    buff += f"\n-- Auto-generated on <{date_str}>\n\n"
+    buff += "\n---@diagnostic disable\n\n"
     return buff
 
 
-def serialize_lua(v, indent=0):
+def serialize_lua(v, indent=0) -> str:
     sp = "\t" * indent
+
     if isinstance(v, dict):
         if not v:
             return "{}"
@@ -142,19 +143,26 @@ def read_raw_file(file_name: str, as_json: bool = True):
 def gen_vehicles():
     jsondata = read_raw_file("vehicles.json")
     out = {}
+    hash_lookup = {}
 
     with alive_bar(len(jsondata), title="Generating Vehicles", force_tty=True) as bar:
         for veh in jsondata:
-            out[str(veh["Name"]).lower()] = {
-                "model_hash": veh["Hash"],
+            str_name = str(veh["Name"]).lower()
+            joaat_hash = veh["Hash"]
+
+            out[str_name] = {
+                "model_hash": joaat_hash,
                 "display_name": veh["DisplayName"]["English"],
                 "manufacturer": veh["ManufacturerDisplayName"]["English"],
                 "class_id": veh["ClassId"],
                 "class_name": veh["Class"],
             }
+
+            hash_lookup[joaat_hash] = str_name
             bar()
 
     write_lua_table(LUA_DATA_PATH / "vehicles.lua", out)
+    write_lua_table(LUA_DATA_PATH / "vehicle_hashmap.lua", hash_lookup)
 
 
 def gen_peds():
@@ -172,22 +180,24 @@ def gen_peds():
             else:
                 gender = 2
 
-            ped_type = ePedType[str_pedtype.upper()]
-            model_hash = ped["Hash"]
+            ped_type = ePedType.get(str_pedtype.upper(), 4) # not sure if it's a good idea to default to civmale
+            joaat_hash = ped["Hash"]
+
             out[str_name] = {
-                "model_hash": model_hash,
+                "model_hash": joaat_hash,
                 "ped_type": ped_type,
                 "ped_gender": gender,
                 "is_human": is_human,
             }
-            hash_lookup[model_hash] = str_name
+
+            hash_lookup[joaat_hash] = str_name
             bar()
 
     write_lua_table(LUA_DATA_PATH / "peds.lua", out)
-    write_lua_table(LUA_DATA_PATH / "ped_reverse_lookup.lua", hash_lookup)
+    write_lua_table(LUA_DATA_PATH / "ped_hashmap.lua", hash_lookup)
 
 
-def gen_onjects():
+def gen_objects():
     resp_text = read_raw_file("ObjectList.ini", as_json=False)
     data = resp_text.splitlines()
     out = []
@@ -206,11 +216,11 @@ def generate_lists(vehicles: bool = True, peds: bool = True, objects: bool = Tru
     if peds:
         gen_peds()
     if objects:
-        gen_onjects()
+        gen_objects()
 
 
 if __name__ == "__main__":
-    parser = ArgParser(description="Generate vehicle list from json (durtyfree's repository) If no arguments passed, all lists will be generated.")
+    parser = ArgParser(description="Generate raw game entity data from durtyfree's repository. If no arguments passed, all lists will be generated (peds, vehicles, objects).")
     parser.add_argument("--vehicles", action="store_true", help="Generate vehicle list.")
     parser.add_argument("--peds", action="store_true", help="Generate ped list.")
     parser.add_argument("--objects", action="store_true", help="Generate object list.")
