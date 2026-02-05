@@ -521,6 +521,9 @@ local RawBusinessData <const> = {
 			{
 				property_stat   = "MPX_ARCADE_OWNED",
 				cash_value_stat = "MPX_ARCADE_SAFE_CASH_VALUE",
+				paytime_stat    = "MPX_ARCADE_PAY_TIME_LEFT",
+				interior_id     = 278273,
+				room_hash       = 3710124102, -- MAINW_RM
 				raw_data_entry  = "Arcades",
 				get_max_cash    = function()
 					return tunables.get_int("MAXARCADESAFESTORAGE")
@@ -529,6 +532,9 @@ local RawBusinessData <const> = {
 			{
 				property_stat   = "MPX_FIXER_HQ_OWNED",
 				cash_value_stat = "MPX_FIXER_SAFE_CASH_VALUE",
+				paytime_stat    = "MPX_FIXER_PASSIVE_PAY_TIME_LEFT",
+				interior_id     = 288257,
+				room_hash       = 767622941, -- ROOM_MAIN
 				raw_data_entry  = "Agencies",
 				get_max_cash    = function()
 					return tunables.get_int("MAXFIXERHQSAFESTORAGE")
@@ -536,16 +542,22 @@ local RawBusinessData <const> = {
 			},
 			{
 				property_stat   = "MPX_BAIL_OFFICE_OWNED",
-				cash_value_stat = "MPX_ARCADE_SAFE_CASH_VALUE",
+				cash_value_stat = "MPX_BAIL_SAFE_CASH_VALUE",
 				raw_data_entry  = "BailOffices",
+				interior_id     = 295425,
+				room_hash       = 2990789022, -- ROOM_OFFICE
 				get_max_cash    = function()
 					return tunables.get_int(-1736487760)
 				end,
+				-- no paytime_stat; this functions somewhat similar to the clubhouse duffle
 			},
 			{
 				property_stat   = "MPX_HACKER_DEN_OWNED",
 				cash_value_stat = "MPX_HDEN24_SAFE_CASH_VALUE",
+				paytime_stat    = "MPX_HDEN24_PAY_TIME_LEFT",
 				raw_data_entry  = "HackerDen",
+				interior_id     = 297729,
+				room_hash       = 1055494658, -- ROOM_WORKSHOP
 				get_max_cash    = function()
 					return tunables.get_int(-792265290)
 				end,
@@ -554,6 +566,9 @@ local RawBusinessData <const> = {
 		fronts = {
 			salvage_yard = {
 				cash_value_stat = "MPX_SALVAGE_SAFE_CASH_VALUE",
+				paytime_stat    = "MPX_SALVAGE_PAY_TIME_LEFT",
+				interior_id     = 293377,
+				room_hash       = 1287104603, -- SHOP_OFFICE
 				get_max_cash    = function()
 					if (stats.get_int("MPX_SALVAGE_YARD_WALL_SAFE") == 1) then
 						return tunables.get_int(594814186)
@@ -563,12 +578,21 @@ local RawBusinessData <const> = {
 			},
 			clubhouse = {
 				cash_value_stat = "MPX_BIKER_BAR_RESUPPLY_CASH",
+				interior_id     = 246273,
+				room_hash       = 405984664, -- BIKERDLC_INT01_OFFRM
 				get_max_cash    = function()
 					return tunables.get_int("BIKER_PASSIVE_INCOME_BAG_LIMIT")
 				end,
+				-- there's no paytime stat; naturally there's still a timer
+				-- but this uses a packed stat int and a bool global as well.
+				-- Im not even gonna bother.
+				-- hint: 36620
 			},
 			nightclub = {
 				cash_value_stat = "MPX_CLUB_SAFE_CASH_VALUE",
+				paytime_stat    = "MPX_CLUB_PAY_TIME_LEFT",
+				interior_id     = 271617,
+				room_hash       = 3920029441, -- "INT_01_ORIFICE"
 				get_max_cash    = function()
 					return tunables.get_int("NIGHTCLUBMAXSAFEVALUE")
 				end,

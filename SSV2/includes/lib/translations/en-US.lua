@@ -314,6 +314,11 @@ return {
 	["YRV3_MC_CLIENT_BIKE_LABEL"]          = "Client Bike",
 	["YRV3_BUSINESSES_LABEL"]              = "Businesses",
 	["YRV3_CASH_SAFES_LABEL"]              = "Cash Safes",
+	["YRV3_CASH_LOOP"]                     = "Cash Loop",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"]      =
+	"You can hold [SHIFT] while clicking the toggle to revoke the acknowledgment and lock this feature.",
+	["YRV3_CASH_LOOP_WARN_ACK"]            =
+	"This feature is unsafe and may result in account suspension if abused.\n\nPress 'Confirm' to enable it at your own risk, or 'Cancel' to go back. You can revoke this acknowledgment at any time later by holding [SHIFT] while clicking the toggle.",
 	--#endregion
 
 	--#region Self

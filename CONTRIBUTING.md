@@ -99,7 +99,7 @@ You are free to use any style you want, except in these cases:
 ### Formatting
 
 - **Indentations:**
-  - Does not matter. If using tabs, make sure one tab equals **four** spaces.
+  - Indentation and empty spaces are handled by [.editorconfig](.editorconfig). Please make sure you have it in your workspace.
 
 - **Line Wrapping:**
   - Try to wrap wide lines using either your IDE's formatter or a Pythonic way.

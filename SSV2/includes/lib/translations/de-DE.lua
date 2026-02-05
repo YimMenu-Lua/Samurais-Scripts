@@ -601,5 +601,8 @@ return {
 	["SETTINGS_NEW_THEME_STYLE"] = "Fensterstil",
 	["GENERIC_MUTE"] = "Stumm",
 	["GENERIC_CLEAR_ALL"] = "Alles löschen",
-	["GENERIC_UNMUTE"] = "Stummschaltung aufheben"
+	["GENERIC_UNMUTE"] = "Stummschaltung aufheben",
+	["YRV3_CASH_LOOP"] = "Cash-Loop",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Diese Funktion ist unsicher und kann bei Missbrauch zur Kontosperrung führen.\n\nKlicken Sie auf „Bestätigen“, um sie auf eigenes Risiko zu aktivieren, oder auf „Abbrechen“, um zurückzukehren. Sie können diese Bestätigung später jederzeit widerrufen, indem Sie die Umschalttaste gedrückt halten und gleichzeitig auf den Schalter klicken.",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Sie können [UMSCHALT] gedrückt halten, während Sie auf den Schalter klicken, um die Bestätigung zu widerrufen und diese Funktion zu sperren."
 }

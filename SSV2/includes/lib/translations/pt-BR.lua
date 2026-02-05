@@ -601,5 +601,8 @@ return {
 	["SETTINGS_HOTKEY_FOUND"] = "Nova chave:",
 	["GENERIC_CLEAR_ALL"] = "Limpar tudo",
 	["GENERIC_MUTE"] = "Mudo",
-	["GENERIC_UNMUTE"] = "Ativar som"
+	["GENERIC_UNMUTE"] = "Ativar som",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Você pode segurar [SHIFT] enquanto clica no botão de alternância para revogar o reconhecimento e bloquear este recurso.",
+	["YRV3_CASH_LOOP"] = "Loop de dinheiro",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Este recurso não é seguro e pode resultar na suspensão da conta se for abusado.\n\nPressione 'Confirmar' para ativá-lo por sua conta e risco ou 'Cancelar' para voltar atrás. Você pode revogar esse reconhecimento a qualquer momento pressionando [SHIFT] enquanto clica no botão de alternância."
 }

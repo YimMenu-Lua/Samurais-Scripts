@@ -601,5 +601,8 @@ return {
 	["SETTINGS_HOTKEY_WAIT"] = "按任意鍵",
 	["GENERIC_MUTE"] = "沉默的",
 	["GENERIC_CLEAR_ALL"] = "全部清除",
-	["GENERIC_UNMUTE"] = "取消靜音"
+	["GENERIC_UNMUTE"] = "取消靜音",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "此功能不安全，如果濫用，可能會導致帳戶被暫停。 \n\n按“確認”啟用該功能，風險由您自行承擔，或按“取消”返回。您可以在以後隨時通過按住 [SHIFT] 並單擊切換按鈕來撤銷此確認。",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "您可以在按住 [SHIFT] 的同時單擊切換按鈕來撤銷確認並鎖定此功能。",
+	["YRV3_CASH_LOOP"] = "現金循環"
 }

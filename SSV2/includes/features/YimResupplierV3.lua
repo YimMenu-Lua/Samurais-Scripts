@@ -302,13 +302,23 @@ function YRV3:DoesPlayerOwnAnyBikerBusiness()
 	return false
 end
 
+---@param idx integer
+---@return boolean
+function YRV3:IsPropertyIndexValid(idx)
+	if (type(idx) ~= "number") then
+		return false
+	end
+
+	return idx > 0 and idx < math.int32_max()
+end
+
 function YRV3:PopulateClubhouse()
 	local club_prop = stats.get_int("MPX_PROP_CLUBHOUSE")
-	if (club_prop == 0) then
+	if (not self:IsPropertyIndexValid(club_prop)) then
 		return
 	end
 
-	local idx = club_prop - 90
+	local idx      = club_prop - 90
 	local club_ref = self.m_raw_data.Clubhouses[idx]
 	if (not club_ref) then
 		return
@@ -420,18 +430,22 @@ function YRV3:PopulateNightclub()
 
 	ThreadManager:Run(function()
 		local nc_index = stats.get_int("MPX_NIGHTCLUB_OWNED")
-		local ref = self.m_raw_data.Nightclubs[nc_index]
-		if (nc_index == 0 or not ref) then
+		local ref      = self.m_raw_data.Nightclubs[nc_index]
+		if (not self:IsPropertyIndexValid(nc_index) or not ref) then
 			self.m_data_initialized = true
 			return
 		end
 
+		local nameid   = stats.get_int("MPX_PROP_NIGHTCLUB_NAME_ID")
 		local safedata = self.m_raw_data.CashSafes.fronts.nightclub
-		safedata.name = "Nightclub Safe"
+		local clubname = NightclubNames[nameid + 1]
+		safedata.name  = clubname
+
+
 		self.m_businesses.nightclub = Nightclub.new({
 			id          = nc_index,
 			name        = Game.GetGXTLabel(_F("MP_NCLU_%d", nc_index)),
-			custom_name = NightclubNames[stats.get_int("MPX_PROP_NIGHTCLUB_NAME_ID") + 1],
+			custom_name = clubname,
 			coords      = ref.coords,
 			safe_data   = safedata
 		})
@@ -471,7 +485,6 @@ function YRV3:PopulateNightclub()
 		end
 
 		self.m_data_initialized = true
-		sleep(3000)
 
 		if (GVars.features.yrv3.nc_always_popular) then
 			self.m_businesses.nightclub:LockPopularityDecay()
@@ -480,7 +493,8 @@ function YRV3:PopulateNightclub()
 end
 
 function YRV3:PopulateCarWash()
-	if (stats.get_int("MPX_SB_CAR_WASH_OWNED") == 0) then
+	local idx = stats.get_int("MPX_SB_CAR_WASH_OWNED")
+	if (not self:IsPropertyIndexValid(idx)) then
 		return
 	end
 
@@ -493,7 +507,7 @@ end
 function YRV3:PopulateCashSafes()
 	for i, data in ipairs(self.m_raw_data.CashSafes.regular) do
 		local property_index = stats.get_int(data.property_stat)
-		if (property_index == 0) then
+		if (not self:IsPropertyIndexValid(property_index)) then
 			goto continue
 		end
 
@@ -504,6 +518,9 @@ function YRV3:PopulateCashSafes()
 			name            = name,
 			coords          = coords,
 			cash_value_stat = data.cash_value_stat,
+			paytime_stat    = data.paytime_stat,
+			interior_id     = data.interior_id,
+			room_hash       = data.room_hash,
 			get_max_cash    = data.get_max_cash,
 		})
 
@@ -513,14 +530,16 @@ end
 
 function YRV3:PopulateSalvageYard()
 	local property_index = stats.get_int("MPX_SALVAGE_YARD_OWNED")
-	if (property_index == 0) then
+	if (not self:IsPropertyIndexValid(property_index)) then
 		return
 	end
 
-	local ref                      = self.m_raw_data.SalvageYards[property_index]
-	local name                     = ref and Game.GetGXTLabel(ref.gxt) or _T("SY_SALVAGE_YARD")
-	local safe_data                = self.m_raw_data.CashSafes.fronts.salvage_yard
-	safe_data.name                 = name
+	local ref       = self.m_raw_data.SalvageYards[property_index]
+	local name      = ref and Game.GetGXTLabel(ref.gxt) or _T("SY_SALVAGE_YARD")
+	local safe_data = self.m_raw_data.CashSafes.fronts.salvage_yard
+	safe_data.name  = name
+
+
 	self.m_businesses.salvage_yard = SalvageYard.new({
 		id        = property_index,
 		name      = name,
@@ -1023,20 +1042,19 @@ function YRV3:UpdateBusinesses()
 	end
 
 	for key, business in pairs(self.m_businesses) do
-		if (key == "safes" or key == "salvage_yard" or key == "car_wash") then
-			goto continue
-		end
-
 		if (key == "warehouses") then
 			for _, wh in ipairs(business) do
 				if (type(wh.Update) == "function") then
 					wh:Update()
 				end
 			end
+		elseif (key == "safes") then
+			for _, safe in ipairs(self.m_businesses.safes) do
+				safe:Update()
+			end
 		elseif (type(business.Update) == "function") then
 			business:Update()
 		end
-		::continue::
 	end
 
 	self.m_last_business_update_time = Time.millis()

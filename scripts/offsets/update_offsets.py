@@ -245,4 +245,4 @@ def main(auto: bool = True):
 
 
 if __name__ == "__main__":
-    main(len(sys.argv) == 0)
+    main(len(sys.argv) == 1)

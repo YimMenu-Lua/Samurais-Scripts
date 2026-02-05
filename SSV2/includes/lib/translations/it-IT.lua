@@ -601,5 +601,8 @@ return {
 	["SETTINGS_HOTKEY_FOUND"] = "Nuova chiave:",
 	["GENERIC_CLEAR_ALL"] = "Cancella tutto",
 	["GENERIC_UNMUTE"] = "Riattiva",
-	["GENERIC_MUTE"] = "Muto"
+	["GENERIC_MUTE"] = "Muto",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "È possibile tenere premuto [MAIUSC] mentre si fa clic sull'interruttore per revocare il riconoscimento e bloccare questa funzione.",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Questa funzionalità non è sicura e potrebbe comportare la sospensione dell'account in caso di abuso.\n\nPremi \"Conferma\" per attivarla a tuo rischio o pericolo oppure \"Annulla\" per tornare indietro. È possibile revocare questo riconoscimento in qualsiasi momento tenendo premuto [SHIFT] mentre si fa clic sull'interruttore.",
+	["YRV3_CASH_LOOP"] = "Ciclo di contanti"
 }

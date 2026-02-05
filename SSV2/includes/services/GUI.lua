@@ -655,18 +655,18 @@ function GUI:Draw()
 
 		if (Notifier) then
 			ImGui.SameLine()
-			local bellSize = vec2:new(40, 35)
-			local region = vec2:new(ImGui.GetContentRegionAvail())
-			local nextPosX = ImGui.GetCursorPosX() + region.x - bellSize.x
-			local nextPosY = ImGui.GetCursorPosY() - (bellSize.y * 0.11)
+			local isOpen     = Notifier:IsOpen()
+			local widgetSize = vec2:new(27, 22)
+			local region     = vec2:new(ImGui.GetContentRegionAvail())
+			local nextPosX   = ImGui.GetCursorPosX() + region.x - widgetSize.x - 20
+			local nextPosY   = ImGui.GetCursorPosY() + (widgetSize.y * 0.25)
 			ImGui.SetCursorPos(nextPosX, nextPosY)
-			local isOpen = Notifier:IsOpen()
-			if (ImGui.NotifBell({
+			if (ImGui.NotifWidget({
 					muted       = Notifier:IsMuted(),
 					open        = isOpen,
 					unread      = Notifier:HasUnread(),
 					unreadCount = Notifier:GetNotifCount(),
-				}, bellSize)
+				}, widgetSize)
 				) then
 				Notifier:Open()
 			end
@@ -676,7 +676,8 @@ function GUI:Draw()
 				self:Tooltip(_T("GUI_NOTIFICATIONS"))
 			end
 		end
-		ImGui.Spacing()
+
+		ImGui.Dummy(0, 1)
 		self:DrawTopBar()
 
 		local current_pos = vec2:new(ImGui.GetWindowPos())
@@ -871,26 +872,34 @@ end
 -- end
 --```
 ---@param name string
-function GUI:ConfirmPopup(name)
-	local windowSize = vec2:new(420, 210)
-	local _, pos = self:GetNewWindowSizeAndCenterPos(0.5, 0.5, windowSize)
-	ImGui.SetNextWindowSize(windowSize.x, windowSize.y, ImGuiCond.Always)
-	ImGui.SetNextWindowPos(pos.x, pos.y, ImGuiCond.Always)
+---@param message? string
+function GUI:ConfirmPopup(name, message)
+	ImGui.SetNextWindowSizeConstraints(420, 200, 420, 600)
 	if ImGui.BeginPopupModal(
 			name,
 			ImGuiWindowFlags.NoTitleBar |
 			ImGuiWindowFlags.NoMove |
-			ImGuiWindowFlags.NoResize
+			ImGuiWindowFlags.NoResize |
+			ImGuiWindowFlags.AlwaysAutoResize |
+			ImGuiWindowFlags.NoSavedSettings
 		) then
+		local windowSize = vec2:new(ImGui.GetWindowSize())
+		local _, pos     = self:GetNewWindowSizeAndCenterPos(0.5, 0.5, windowSize)
+		ImGui.SetWindowPos(pos.x, pos.y, ImGuiCond.Always)
+
 		local buttonSize     = vec2:new(windowSize.x / 4, 35)
-		local width          = windowSize.x
 		local spacing        = ImGui.GetStyle().ItemSpacing.x
-		local firstCursorPos = (width - ((buttonSize.x + spacing) * 3)) / 2
+		local firstCursorPos = (windowSize.x - ((buttonSize.x + spacing) * 3)) / 2
 
 		self:HeaderText(_T("GENERIC_WARN_LABEL"), { color = Color("yellow") })
 		ImGui.Separator()
+
 		ImGui.Spacing()
-		self:Text(_T("GENERIC_CONFIRM_WARN"))
+		ImGui.TextWrapped(message or _T("GENERIC_CONFIRM_WARN"))
+
+		ImGui.Spacing()
+		ImGui.Separator()
+
 		ImGui.Dummy(1, 10)
 		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + firstCursorPos)
 		if (self:Button(_T("GENERIC_CONFIRM"), { size = buttonSize })) then
@@ -908,6 +917,7 @@ function GUI:ConfirmPopup(name)
 			return false
 		end
 
+		ImGui.Spacing()
 		ImGui.EndPopup()
 	end
 

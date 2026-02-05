@@ -601,5 +601,8 @@ return {
 	["SETTINGS_HOTKEY_FOUND"] = "新钥匙：",
 	["GENERIC_CLEAR_ALL"] = "全部清除",
 	["GENERIC_MUTE"] = "沉默的",
-	["GENERIC_UNMUTE"] = "取消静音"
+	["GENERIC_UNMUTE"] = "取消静音",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "您可以在按住 [SHIFT] 的同时单击切换按钮来撤销确认并锁定此功能。",
+	["YRV3_CASH_LOOP"] = "现金循环",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "此功能不安全，如果滥用，可能会导致帐户被暂停。\n\n按“确认”启用该功能，风险由您自行承担，或按“取消”返回。您可以在以后随时通过按住 [SHIFT] 并单击切换按钮来撤销此确认。"
 }

@@ -300,6 +300,7 @@ local Config <const> = {
 			sy_always_max_income = false,
 			sy_disable_rob_cd = false,
 			sy_disable_rob_weekly_cd = false,
+			safe_loop_warn_ack = false,
 		},
 		bsv2 = {
 			escort_groups = {

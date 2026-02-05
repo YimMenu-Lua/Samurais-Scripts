@@ -143,6 +143,9 @@ function CarWash.new(opts)
 	instance.m_safe   = CashSafe.new({
 		name            = opts.name,
 		cash_value_stat = "MPX_CWASH_SAFE_CASH_VALUE",
+		paytime_stat    = "MPX_CWASH_PAY_TIME_LEFT",
+		interior_id     = 298497,
+		room_hash       = 4269274169,
 		get_max_cash    = function()
 			return tunables.get_int("TYCOON_CAR_WASH_SAFE_MAX_STORAGE_AMOUNT")
 		end,
@@ -230,6 +233,21 @@ end
 ---@return integer
 function CarWash:GetEstimatedIncome()
 	return self.m_safe:GetCashValue() + self.m_duffle:GetDuffleValue()
+end
+
+function CarWash:Update()
+	if (not self:IsValid()) then
+		return
+	end
+
+	if (self.m_safe and self.m_safe:CanLoop()) then
+		if (self.m_safe.cash_loop_enabled and self:GetHeat() >= 90) then
+			self.m_safe.cash_loop_enabled = false
+			return
+		end
+
+		self.m_safe:Update()
+	end
 end
 
 return CarWash

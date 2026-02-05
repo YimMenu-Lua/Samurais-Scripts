@@ -256,6 +256,25 @@ function Entity:GetHeightAboveGround()
 	return self:Exists() and ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(self:GetHandle()) or 0
 end
 
+---@return integer
+function Entity:GetInterior()
+	return self:Exists() and INTERIOR.GET_INTERIOR_FROM_ENTITY(self:GetHandle()) or 0
+end
+
+---@return boolean
+function Entity:IsOutside()
+	return self:GetInterior() == 0
+end
+
+---@return joaat_t
+function Entity:GetRoomHash()
+	if (not self:Exists() or self:IsOutside()) then
+		return 0
+	end
+
+	return INTERIOR.GET_ROOM_KEY_FROM_ENTITY(self:GetHandle())
+end
+
 ---@param offset_x number
 ---@param offset_y number
 ---@param offset_z number

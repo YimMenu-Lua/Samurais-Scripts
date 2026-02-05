@@ -84,11 +84,6 @@ function Ped:IsSwimming()
 end
 
 ---@return boolean
-function Ped:IsOutside()
-	return INTERIOR.GET_INTERIOR_FROM_ENTITY(self:GetHandle()) == 0
-end
-
----@return boolean
 function Ped:IsMoving()
 	return self:IsValid() and not PED.IS_PED_STOPPED(self:GetHandle())
 end

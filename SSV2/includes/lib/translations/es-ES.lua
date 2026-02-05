@@ -601,5 +601,8 @@ return {
 	["SETTINGS_HOTKEY_WAIT"] = "Presione cualquier tecla",
 	["GENERIC_MUTE"] = "Silenciar",
 	["GENERIC_CLEAR_ALL"] = "Borrar todo",
-	["GENERIC_UNMUTE"] = "Dejar de silenciar"
+	["GENERIC_UNMUTE"] = "Dejar de silenciar",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Puede mantener presionado [SHIFT] mientras hace clic en el interruptor para revocar el reconocimiento y bloquear esta función.",
+	["YRV3_CASH_LOOP"] = "Bucle de efectivo",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Esta función no es segura y puede provocar la suspensión de la cuenta si se abusa de ella.\n\nPresiona 'Confirmar' para habilitarla bajo tu propio riesgo o 'Cancelar' para regresar. Puede revocar este reconocimiento en cualquier momento posterior manteniendo presionado [SHIFT] mientras hace clic en el botón de alternar."
 }

@@ -9,7 +9,7 @@
 
 local World                      = require("includes.modules.World")
 local t_GameObjects              = require("includes.data.objects")
-local t_GamePeds                 = require("includes.data.ped_reverse_lookup")
+local t_GamePeds                 = require("includes.data.ped_hashmap")
 local t_GameVehicles             = require("includes.data.vehicles")
 local t_PedScenarios             = require("includes.data.actions.scenarios")
 local Refs                       = require("includes.data.refs")

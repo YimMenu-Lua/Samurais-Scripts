@@ -601,5 +601,8 @@ return {
 	["SETTINGS_NEW_THEME_NAME_ERR"] = "이름이 %s인 테마가 이미 존재합니다. 다른 것을 선택하세요.",
 	["GENERIC_CLEAR_ALL"] = "모두 지우기",
 	["GENERIC_MUTE"] = "무음",
-	["GENERIC_UNMUTE"] = "음소거 해제"
+	["GENERIC_UNMUTE"] = "음소거 해제",
+	["YRV3_CASH_LOOP"] = "현금 루프",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "승인을 취소하고 이 기능을 잠그려면 토글을 클릭하는 동안 [SHIFT]를 누르고 있을 수 있습니다.",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "이 기능은 안전하지 않으며 남용할 경우 계정이 정지될 수 있습니다.\n\n이 기능을 활성화하려면 사용자 책임하에 '확인'을 누르고, 돌아가려면 '취소'를 누르세요. 토글을 클릭하는 동안 [SHIFT]를 눌러 나중에 언제든지 이 승인을 취소할 수 있습니다."
 }

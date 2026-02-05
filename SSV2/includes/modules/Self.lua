@@ -96,6 +96,21 @@ function Self:GetLastVehicle()
 	return self.m_last_vehicle
 end
 
+---@return integer
+function Self:GetWalletBalance()
+	return MONEY.NETWORK_GET_VC_WALLET_BALANCE(stats.get_character_index())
+end
+
+---@return integer
+function Self:GetBankBalance()
+	return MONEY.NETWORK_GET_VC_BANK_BALANCE()
+end
+
+---@return integer
+function Self:GetTotalBalance()
+	return Self:GetWalletBalance() + Self:GetBankBalance()
+end
+
 function Self:OnVehicleSwitch()
 	if (self.m_vehicle:IsValid()) then
 		self.m_vehicle:RestoreHeadlights()
