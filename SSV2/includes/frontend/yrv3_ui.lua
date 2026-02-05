@@ -523,8 +523,6 @@ local function drawNightclub()
 	end
 	ImGui.EndDisabled()
 
-	drawCashSafeLoopToggle(cashSafe)
-
 	GVars.features.yrv3.nc_always_popular, _ = GUI:CustomToggle(
 		_T("YRV3_NC_ALWAYS_POPULAR"),
 		GVars.features.yrv3.nc_always_popular,
@@ -538,6 +536,8 @@ local function drawNightclub()
 			end
 		}
 	)
+
+	drawCashSafeLoopToggle(cashSafe)
 
 	bigTips, _ = GUI:CustomToggle(
 		_T("YRV3_MILLION_DOLLAR_TIPS"),
