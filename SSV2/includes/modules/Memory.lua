@@ -46,9 +46,17 @@ end
 -- Since PatternScanner runs in a fiber, we can't get pointer values on file load.
 local function SafeGetVersion()
 	if (GPointers.GameVersion.build:isempty()) then
-		local ptr = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
-		local b = ptr:add(0x24):rip()
-		local o = b:add(0x20)
+		local ptr, b, o
+		if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
+			ptr = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
+			b = ptr:add(0x24):rip()
+			o = b:add(0x20)
+		else
+			ptr = memory.scan_pattern("4C 8D 0D ? ? ? ? 48 8D 5C 24 ? 48 89 D9 48 89 FA")
+			b = ptr:add(0x3):rip()
+			o = ptr:add(0x47):add(0x3):rip()
+		end
+
 		GPointers.GameVersion = {
 			build  = b:get_string(),
 			online = o:get_string()
