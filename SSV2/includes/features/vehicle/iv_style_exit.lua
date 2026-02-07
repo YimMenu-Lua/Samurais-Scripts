@@ -12,8 +12,8 @@ local FeatureBase = require("includes.modules.FeatureBase")
 ---@class IVStyleExit : FeatureBase
 ---@field private m_entity PlayerVehicle
 ---@field private m_triggered boolean
----@field private m_timer Time.Timer
----@field private m_steering_timer Time.Timer
+---@field private m_timer Timer
+---@field private m_steering_timer Timer
 ---@field private m_pending_steering boolean
 ---@field private m_last_steer_angle float
 local IVStyleExit = setmetatable({}, FeatureBase)

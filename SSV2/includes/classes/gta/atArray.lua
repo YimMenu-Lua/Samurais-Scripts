@@ -19,7 +19,7 @@
 ---@field private m_count uint16_t
 ---@field private m_data array<pointer>
 ---@field private m_data_type any
----@field private m_last_update_time Time.TimePoint
+---@field private m_last_update_time TimePoint
 ---@overload fun(address: pointer, data_type?: any): atArray
 atArray = {}
 atArray.__index = atArray

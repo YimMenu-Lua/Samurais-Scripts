@@ -19,7 +19,7 @@ local locales_loaded, t = pcall(require, "lib.translations.__locales")
 ---@field lang_code string
 ---@field private m_log_history table
 ---@field private m_cache table<string, table<string, string>>
----@field private m_last_load_time Time.TimePoint
+---@field private m_last_load_time TimePoint
 Translator = {}
 Translator.__index = Translator
 Translator.default_labels = en_loaded and en or {}

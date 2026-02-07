@@ -31,6 +31,13 @@ local collisionInvalidModels = Set.new(
 	1067874014
 )
 
+local towTruckModels <const> = Set.new(
+	joaat("towtruck"),
+	joaat("towtruck2"),
+	joaat("towtruck3"),
+	joaat("towtruck4")
+)
+
 --------------------------------------
 -- Class: Vehicle
 --------------------------------------
@@ -504,8 +511,14 @@ function Vehicle:IsPerformanceCar()
 	return false
 end
 
+---@return boolean
 function Vehicle:IsFlatbedTruck()
 	return self:GetModelHash() == 1353720154
+end
+
+---@return boolean
+function Vehicle:IsTowTruck()
+	return towTruckModels:Contains(self:GetModelHash())
 end
 
 -- Returns whether the vehicle is a pubic hair shaver.

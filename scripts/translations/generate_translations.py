@@ -94,7 +94,7 @@ def write_lua_table(path: str, table: dict):
                     existing[k] = v
             newdata = existing
 
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write("return ")
         f.write(Lua.encode(newdata))
         f.write("\n")
@@ -176,7 +176,7 @@ def translate_text(iso: str, text: str) -> str:
 
 def write_hashmap():
     print("Updating hash map...")
-    with open(HASHMAP_PATH, "w", encoding="utf-8") as f:
+    with open(HASHMAP_PATH, "w", encoding="utf-8", newline="\n") as f:
         json.dump(HASHMAP, f, indent=4)
 
 

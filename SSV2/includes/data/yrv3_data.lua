@@ -257,6 +257,17 @@ local RawBusinessData <const> = {
 				end
 			end
 		},
+		["sy_disable_tow_cd"] = {
+			dirty = false,
+			gstate = function()
+				return GVars.features.yrv3.sy_disable_tow_cd
+			end,
+			onEnable = function()
+				if (tunables.get_int(1521767918) > 0) then -- 120000ms
+					tunables.set_int(1521767918, 0)
+				end
+			end
+		},
 	},
 	SellScripts = {
 		["gb_smuggler"] = { -- air
@@ -483,10 +494,10 @@ local RawBusinessData <const> = {
 		{ gxt = "MP_PROP_CLUBH12", coords = vec3:new(-1138.0574, -1572.1804, 3.4157) },
 	},
 	SalvageYards = {
-		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(-195.6784, 6266.2856, 31.4892) }, -- func_3737 // case 162:
+		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(-195.0317, 6269.1601, 31.4892) }, -- func_3737 // case 162:
 		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(2508.7229, 4110.6401, 38.3481) },
 		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(-509.6919, -1735.85, 19.1262) },
-		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(-12.9673, -1309.9194, 29.2606) },
+		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(-15.3909, -1307.951, 29.2440) },
 		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(1194.7052, -1263.8588, 35.2128) },
 	},
 	-- index + 127

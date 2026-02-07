@@ -96,6 +96,7 @@ return {
 	["GENERIC_SPAWN"]                      = "Spawn",
 	["GENERIC_INTERIOR_ACTION_ERR"]        = "This action is not allowed inside interiors.",
 	["GENERIC_ENTITY_CTRL_FAIL"]           = "Failed to take control of entity!",
+	["GENERIC_SCRIPT_CTRL_FAIL"]           = "Failed to take control of script thread!",
 	["GENERIC_CONFIRM_WARN"]               = "This action is irreversible. Are you sure you want to proceed?",
 	["GENERIC_NOT_IN_VEH"]                 = "You are not in a vehicle.",
 	["GENERIC_NOT_IN_PLANE"]               = "You are not in an aircraft.",
@@ -108,6 +109,8 @@ return {
 	["GENERIC_UNKOWN"]                     = "Unknown",
 	["GENERIC_VEHICLE"]                    = "Vehicle",
 	["GENERIC_VALUE"]                      = "Value",
+	["GENERIC_TIME"]                       = "Time",
+	["GENERIC_TIME_LEFT"]                  = "Time Left",
 	--#endregion
 
 	--#region CasinoPacino
@@ -185,6 +188,7 @@ return {
 	["SY_ROBBERY_COOLDOWN"]                = "Robbery Cooldown",
 	["SY_DISABLE_COOLDOWN"]                = "Disable Cooldown",
 	["SY_DISABLE_WEEKLY_COOLDOWN"]         = "Disable Weekly Cooldown",
+	["SY_DISABLE_TOWING_COOLDOWN"]         = "Disable Towing Service Cooldown",
 	["SY_WEEKLY_ROBBERIES"]                = "Weekly Robberies",
 	["SY_WEEKLY_CAR_STATUS"]               = "Car %d: %s",
 	["SY_ROBBERY_ACTIVE_CAR"]              = "Robbery Active for: %s",
@@ -212,6 +216,12 @@ return {
 	["SY_MAX_THRESHOLD"]                   = "Maximize Income",
 	["SY_ALWAYS_MAX_INCOME"]               = "Lock Threshold",
 	["SY_ALWAYS_MAX_INCOME_TT"]            = "Prevents your income threshold from decaying over time.",
+	["SY_TOW_MISSION_BRING_VEH"]           = "Bring Mission Target",
+	["SY_TOW_MISSION_BRING_VEH_TT"]        =
+	"Teleports the towing mission target vehicle to you and attempts to attach it to the towing hook",
+	["SY_NOT_IN_TOWTRUCK_ERR"]             = "You are not sitting in the tow truck.",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"]     = "Failed to find the mission objective.",
+	["SY_TOW_VEH_NOT_FOUND_ERR"]           = "Failed to find the target vehicle.",
 	--#endregion
 
 	--#region YRV3
@@ -292,6 +302,7 @@ return {
 	["YRV3_AUTOSELL_CURRENT"]              = "Currently Selling: %s",
 	["YRV3_AUTOSELL_TT"]                   =
 	"Automatically finishes a sale mission 20 seconds after it starts. Doesn't require you to interact with anything other than starting the mission.",
+	["YRV3_SCRIPT_HOST_ERR"]               = "Unable to finish sale mission! You are not host of this script.",
 	["YRV3_HANGAR_LAND_ERR"]               = "Hangar and sales are currently not supported.",
 	["YRV3_AUTO_SELL_MANUAL"]              = "Manually Finish Sale",
 	["YRV3_AUTO_FILL_DELAY"]               = "Global Auto-Fill delay:",
@@ -318,7 +329,7 @@ return {
 	["YRV3_CASH_LOOP_ACK_DISABLE_TT"]      =
 	"You can hold [SHIFT] while clicking the toggle to revoke the acknowledgment and lock this feature.",
 	["YRV3_CASH_LOOP_WARN_ACK"]            =
-	"This feature is unsafe and may result in account suspension if abused.\n\nPress 'Confirm' to enable it at your own risk, or 'Cancel' to go back. You can revoke this acknowledgment at any time later by holding [SHIFT] while clicking the toggle.",
+	"This feature is unsafe and may result in account suspension if abused.\n\nPress 'Confirm' to acknowledge this warning and accept the risk, or 'Cancel' to go back. You can revoke this acknowledgment at any time later by holding [SHIFT] while clicking the toggle.",
 	--#endregion
 
 	--#region Self

@@ -69,4 +69,14 @@ function Player:IsMale()
 	return self:GetModelHash() == 0x705E61F2
 end
 
+---@param scriptName string
+---@return boolean
+function Player:IsHostOfScript(scriptName)
+	return (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, -1, 0) == self.m_pid)
+		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 0, 0) == self.m_pid)
+		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 1, 0) == self.m_pid)
+		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 2, 0) == self.m_pid)
+		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 3, 0) == self.m_pid)
+end
+
 -- [WIP]

@@ -603,6 +603,16 @@ return {
 	["GENERIC_CLEAR_ALL"] = "Alles löschen",
 	["GENERIC_UNMUTE"] = "Stummschaltung aufheben",
 	["YRV3_CASH_LOOP"] = "Cash-Loop",
-	["YRV3_CASH_LOOP_WARN_ACK"] = "Diese Funktion ist unsicher und kann bei Missbrauch zur Kontosperrung führen.\n\nKlicken Sie auf „Bestätigen“, um sie auf eigenes Risiko zu aktivieren, oder auf „Abbrechen“, um zurückzukehren. Sie können diese Bestätigung später jederzeit widerrufen, indem Sie die Umschalttaste gedrückt halten und gleichzeitig auf den Schalter klicken.",
-	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Sie können [UMSCHALT] gedrückt halten, während Sie auf den Schalter klicken, um die Bestätigung zu widerrufen und diese Funktion zu sperren."
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Diese Funktion ist unsicher und kann bei Missbrauch zur Kontosperrung führen.\n\nKlicken Sie auf „Bestätigen“, um diese Warnung zu bestätigen und das Risiko zu akzeptieren, oder auf „Abbrechen“, um zurückzukehren. Sie können diese Bestätigung später jederzeit widerrufen, indem Sie die Umschalttaste gedrückt halten und gleichzeitig auf den Schalter klicken.",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Sie können [UMSCHALT] gedrückt halten, während Sie auf den Schalter klicken, um die Bestätigung zu widerrufen und diese Funktion zu sperren.",
+	["GENERIC_TIME"] = "Zeit",
+	["SY_NOT_IN_TOWTRUCK_ERR"] = "Sie sitzen nicht im Abschleppwagen.",
+	["GENERIC_TIME_LEFT"] = "Übrige Zeit",
+	["SY_TOW_MISSION_BRING_VEH_TT"] = "Teleportiert das Zielfahrzeug der Abschleppmission zu Ihnen und versucht, es am Abschlepphaken zu befestigen",
+	["SY_TOW_MISSION_BRING_VEH"] = "Bringen Sie das Missionsziel mit",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "Das Missionsziel konnte nicht gefunden werden.",
+	["SY_DISABLE_TOWING_COOLDOWN"] = "Deaktivieren Sie die Abklingzeit des Abschleppdienstes",
+	["SY_TOW_VEH_NOT_FOUND_ERR"] = "Das Zielfahrzeug konnte nicht gefunden werden.",
+	["YRV3_SCRIPT_HOST_ERR"] = "Verkaufsmission konnte nicht abgeschlossen werden! Sie sind nicht der Host dieses Skripts.",
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Die Kontrolle über den Skript-Thread konnte nicht übernommen werden!"
 }

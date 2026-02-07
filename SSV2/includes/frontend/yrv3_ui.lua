@@ -14,7 +14,7 @@ local maxSellMissionButtonSize = vec2:new(80, 30)
 local progressBarSize          = vec2:new(300, 25)
 local colMoneyGreen            = Color("#85BB65")
 local selectedTabID            = 1
-
+local selfTranslateLabels      = Set.new("YRV3_CASH_SAFES_LABEL", "GENERIC_MISC")
 local tabNames <const>         = {
 	"GB_BOSSC",
 	"CELL_HANGAR",
@@ -29,9 +29,7 @@ local tabNames <const>         = {
 	"CELL_16"
 }
 
-local selfTranslateLabels      = Set.new("YRV3_CASH_SAFES_LABEL", "GENERIC_MISC")
-
-local function GetAllCDCheckboxes()
+local function getAllCDCheckboxes()
 	return GVars.features.yrv3.mc_work_cd
 		and GVars.features.yrv3.hangar_cd
 		and GVars.features.yrv3.nc_management_cd
@@ -47,7 +45,7 @@ local function GetAllCDCheckboxes()
 end
 
 ---@param value boolean
-local function SetAllCDCheckboxes(value)
+local function setAllCDCheckboxes(value)
 	GVars.features.yrv3.mc_work_cd            = value
 	GVars.features.yrv3.hangar_cd             = value
 	GVars.features.yrv3.nc_management_cd      = value
@@ -83,7 +81,7 @@ local function onCashLoopEnable(cashSafe)
 		return
 	end
 
-	if (GUI:ConfirmPopup("##warn_safe_loop", _T("YRV3_CASH_LOOP_WARN_ACK"))) then
+	if (ImGui.DialogBox(_T("GENERIC_WARN_LABEL"), _T("YRV3_CASH_LOOP_WARN_ACK"), ImGuiDialogBoxStyle.WARN)) then
 		GVars.features.yrv3.safe_loop_warn_ack = true
 		cashSafe.cash_loop_enabled = true
 	end
@@ -95,7 +93,7 @@ local function drawCashSafeLoopToggle(cashSafe)
 		return
 	end
 
-	local isOpen = ImGui.IsPopupOpen("##warn_safe_loop")
+	local isOpen = ImGui.IsPopupOpen(_T("GENERIC_WARN_LABEL"))
 	ImGui.BeginDisabled(isOpen or (not cashSafe.cash_loop_enabled and cashSafe:IsFull()))
 	cashSafe.cash_loop_enabled, _ = GUI:CustomToggle(
 		_F("%s##%s", _T("YRV3_CASH_LOOP"), cashSafe:GetName()),
@@ -107,12 +105,13 @@ local function drawCashSafeLoopToggle(cashSafe)
 					return
 				end
 				if (v and not isOpen and not GVars.features.yrv3.safe_loop_warn_ack) then
-					ImGui.OpenPopup("##warn_safe_loop")
+					ImGui.OpenPopup(_T("GENERIC_WARN_LABEL"))
 				end
 			end
 		}
 	)
 	ImGui.EndDisabled()
+
 	if (GVars.features.yrv3.safe_loop_warn_ack) then
 		GUI:HelpMarker(_T("YRV3_CASH_LOOP_ACK_DISABLE_TT"))
 	end
@@ -604,8 +603,6 @@ local function drawNightclub()
 			_F("##bb_hub_%d", i),
 			prod / max_units,
 			vec2:new(40, 140),
-			0,
-			1,
 			ImGuiValueBarFlags.VERTICAL
 		)
 
@@ -726,33 +723,44 @@ local function drawBasicBusiness(business, isParent, kvSpacing, clearHeatLabel)
 
 	if (isParent) then
 		---@diagnostic disable-next-line
-		local duffle          = business:GetDuffleBag()
+		local duffle        = business:GetDuffleBag()
 		---@diagnostic disable-next-line
-		local cashSafe        = business:GetCashSafe()
-		local maxCash         = cashSafe:GetCapacity()
-		local cw_dirty_cash   = duffle:GetDirtyCash()
-		local cw_clean_cash   = duffle:GetDuffleValue()
-		local cw_safe_cash    = cashSafe:GetCashValue()
-		local dirty_cash_text = string.formatmoney(cw_dirty_cash)
-		local clean_cash_text = string.formatmoney(cw_clean_cash)
-		local cw_cash_text    = _F("%s %s | %s %s",
-			_T("YRV3_CWASH_CASH_DIRTY"),
-			dirty_cash_text,
+		local cashSafe      = business:GetCashSafe()
+		local maxCash       = cashSafe:GetCapacity()
+		local maxDuffle     = duffle:GetCapacity()
+		local duffDirtyCash = duffle:GetDirtyCash()
+		local duffCleanCash = duffle:GetDuffleValue()
+		local safeCash      = cashSafe:GetCashValue()
+		local dirtyCashTxt  = string.formatmoney(duffDirtyCash)
+		local cleanCashTxt  = string.formatmoney(duffCleanCash)
+		local duffCashTxt   = _F("(%s %s | %s %s) / $1M",
 			_T("YRV3_CWASH_CASH_CLEAN"),
-			clean_cash_text
+			cleanCashTxt,
+			_T("YRV3_CWASH_CASH_DIRTY"),
+			dirtyCashTxt
 		)
 
 		ImGui.BulletText(_T("YRV3_CWASH_WORK_EARNINGS"))
 		ImGui.SameLine(kvSpacing)
-		ImGui.Text(cw_cash_text)
-		ImGui.Spacing()
+		ImGui.ValueBar("##carWashDuffle",
+			duffCleanCash / maxDuffle,
+			vec2:new(-1, progressBarSize.y),
+			ImGuiValueBarFlags.MULTI_VAL,
+			{
+				value2 = duffDirtyCash / maxDuffle,
+				v1Col  = colMoneyGreen:Darken(0.12):AsU32(),
+				v2Col  = Color("red"):AsU32(),
+				fmt    = duffCashTxt
+			}
+		)
+
 		ImGui.BulletText(_T("YRV3_CASH_SAFE"))
 		ImGui.SameLine(kvSpacing)
 		ImGui.ProgressBar(
-			cw_safe_cash / maxCash,
+			safeCash / maxCash,
 			-1,
 			progressBarSize.y,
-			string.formatmoney(cw_safe_cash)
+			string.formatmoney(safeCash)
 		)
 	end
 
@@ -897,6 +905,26 @@ local function drawSalvageYard()
 	ImGui.Spacing()
 	ImGui.BeginTabBar("##salvage_yard_tb")
 	if (ImGui.BeginTabItem(_T("SY_CHOP_SHOP"))) then
+		ImGui.Spacing()
+		GVars.features.yrv3.sy_disable_tow_cd = GUI:CustomToggle(
+			_T("SY_DISABLE_TOWING_COOLDOWN"),
+			GVars.features.yrv3.sy_disable_tow_cd,
+			{
+				onClick = function()
+					YRV3:SetCooldownStateDirty("sy_disable_tow_cd", true)
+				end
+			}
+		)
+		ImGui.BeginDisabled(not salvage_yard:IsTowMissionActive())
+		if (GUI:Button(_T("SY_TOW_MISSION_BRING_VEH"))) then
+			salvage_yard:BringTowMissionTarget()
+		end
+		ImGui.EndDisabled()
+		GUI:HelpMarker(_T("SY_TOW_MISSION_BRING_VEH_TT"))
+
+		ImGui.Spacing()
+		ImGui.Separator()
+
 		for i = 1, 2 do
 			local isTaken = salvage_yard:IsLiftTaken(i)
 			ImGui.SetNextWindowBgAlpha(0.64)
@@ -904,7 +932,7 @@ local function drawSalvageYard()
 			ImGui.BeginChild(
 				_F("##lift%d", i),
 				childWidth,
-				isTaken and 180 or 100,
+				isTaken and 210 or 100,
 				false,
 				ImGuiWindowFlags.NoScrollbar
 				| ImGuiWindowFlags.AlwaysUseWindowPadding
@@ -917,8 +945,11 @@ local function drawSalvageYard()
 			else
 				local vehName   = vehicles.get_vehicle_display_name(salvage_yard:GetCarModelOnLift(i))
 				local value     = string.formatmoney(salvage_yard:GetCarValueOnLift(i))
+				local timeleft  = salvage_yard:GetSalvagePosixForLift(i)
+				local timeStr   = Time.format_time_seconds(timeleft - Time.epoch())
 				local nameWidth = ImGui.CalcTextSize(vehName)
 				local valWidth  = ImGui.CalcTextSize(value)
+				local timeWidth = ImGui.CalcTextSize(timeStr)
 
 				ImGui.BulletText(_T("GENERIC_VEHICLE"))
 				ImGui.SameLine()
@@ -930,11 +961,18 @@ local function drawSalvageYard()
 				ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - valWidth - 10)
 				GUI:Text(value, Color("#00AA00"))
 
-				ImGui.Spacing()
+				ImGui.BulletText(_T("GENERIC_TIME_LEFT"))
+				ImGui.SameLine()
+				ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - timeWidth - 10)
+				ImGui.Text(timeStr)
 
+				ImGui.Separator()
+
+				ImGui.BeginDisabled(timeleft <= 1e3)
 				if (GUI:Button(_T("SY_INSTANT_SALVAGE"))) then
 					salvage_yard:SalvageNow(i)
 				end
+				ImGui.EndDisabled()
 			end
 			ImGui.EndChild()
 			ImGui.EndDisabled()
@@ -947,7 +985,7 @@ local function drawSalvageYard()
 	end
 
 	if (ImGui.BeginTabItem(_T("SY_CAR_ROBBERIES"))) then
-		GUI:CustomToggle(
+		GVars.features.yrv3.sy_disable_rob_cd = GUI:CustomToggle(
 			_T("SY_DISABLE_COOLDOWN"),
 			GVars.features.yrv3.sy_disable_rob_cd,
 			{
@@ -958,7 +996,7 @@ local function drawSalvageYard()
 		)
 
 		ImGui.SameLine()
-		GUI:CustomToggle(
+		GVars.features.yrv3.sy_disable_rob_weekly_cd = GUI:CustomToggle(
 			_T("SY_DISABLE_WEEKLY_COOLDOWN"),
 			GVars.features.yrv3.sy_disable_rob_weekly_cd,
 			{
@@ -1160,14 +1198,14 @@ local function drawMisc()
 	GUI:Tooltip(_T("YRV3_SEXY_SHINABI_NOTICE"))
 
 	ImGui.Dummy(1, 5)
-	if (GetAllCDCheckboxes()) then
+	if (getAllCDCheckboxes()) then
 		sCooldownButtonLabel, bCooldownParam = "YRV3_CB_UNCHECK_ALL", false
 	else
 		sCooldownButtonLabel, bCooldownParam = "YRV3_CB_CHECK_ALL", true
 	end
 
 	if (GUI:Button(_T(sCooldownButtonLabel), { size = vec2:new(120, 40) })) then
-		SetAllCDCheckboxes(bCooldownParam)
+		setAllCDCheckboxes(bCooldownParam)
 	end
 
 	ImGui.Spacing()

@@ -796,16 +796,13 @@ function YRV3:FinishSale()
 
 	self.m_has_triggered_autosell = true
 	script.execute_as_script(sn, function()
-		if not self.m_raw_data.SellScripts[sn].b then -- gb_*
+		if (not self.m_raw_data.SellScripts[sn].b) then
 			for _, data in pairs(self.m_raw_data.SellScripts[sn]) do
 				locals.set_int(sn, data.l + data.o, data.v)
 			end
-		else -- fm_content_*
-			if (NETWORK.NETWORK_GET_HOST_OF_THIS_SCRIPT() ~= Self:GetPlayerID()) then
-				Notifier:ShowWarning(
-					"YRV3",
-					"Unable to finish sale mission. You are not host of this script."
-				)
+		else
+			if (not Self:IsHostOfScript(sn)) then
+				Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
 				return
 			end
 
@@ -821,38 +818,34 @@ function YRV3:FinishSale()
 end
 
 function YRV3:FinishCEOCargoSourceMission()
-	if script.is_active("gb_contraband_buy") then
-		script.execute_as_script("gb_contraband_buy", function()
-			if (not NETWORK.NETWORK_IS_HOST_OF_THIS_SCRIPT()) then
-				Notifier:ShowError("YRV3", "You are not host of this script.")
-				return
-			end
+	if (script.is_active("gb_contraband_buy")) then
+		if (not Self:IsHostOfScript("gb_contraband_buy")) then
+			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
+			return
+		end
 
-			local buyLocal = SGSL:Get(SGSL.data.gb_contraband_buy_local_1):AsLocal()
-			buyLocal:At(5):WriteInt(1) -- 1.71 b3568.0 -- case -1: return "INVALID - UNSET";
-			buyLocal:At(191):WriteInt(6) -- 1.71 b3568.0 -- Local_623.f_191 = iParam0;
-			buyLocal:At(192):WriteInt(4) -- 1.71 b3568.0 -- Local_623.f_192 = iParam0;
-		end)
-	elseif script.is_active("fm_content_cargo") then
-		script.execute_as_script("fm_content_cargo", function()
-			if not NETWORK.NETWORK_IS_HOST_OF_THIS_SCRIPT() then
-				Notifier:ShowError("YRV3", "You are not host of this script.")
-				return
-			end
+		local buyLocal = SGSL:Get(SGSL.data.gb_contraband_buy_local_1):AsLocal()
+		buyLocal:At(5):WriteInt(1)
+		buyLocal:At(191):WriteInt(6)
+		buyLocal:At(192):WriteInt(4)
+	elseif (script.is_active("fm_content_cargo")) then
+		if (not Self:IsHostOfScript("fm_content_cargo")) then
+			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
+			return
+		end
 
-			local fmccLocal2       = SGSL:Get(SGSL.data.gb_contraband_buy_local_2):AsLocal():At(1):At(0) -- GENERIC_BITSET_I_WON -- 1.71 b3568.0: var uLocal_5973 = 4;
-			local gbcb_obj         = SGSL:Get(SGSL.data.gb_contraband_buy_local_3)
-			local fmccLocal3       = gbcb_obj:AsLocal()
-			local fmccLocal3Offset = gbcb_obj:GetOffset(1)
-			local bs               = fmccLocal2:ReadInt()
+		local fmccLocal2       = SGSL:Get(SGSL.data.gb_contraband_buy_local_2):AsLocal():At(1):At(0)
+		local gbcb_obj         = SGSL:Get(SGSL.data.gb_contraband_buy_local_3)
+		local fmccLocal3       = gbcb_obj:AsLocal()
+		local fmccLocal3Offset = gbcb_obj:GetOffset(1)
+		local bs               = fmccLocal2:ReadInt()
 
-			if (not Bit.is_set(bs, 11)) then
-				bs = Bit.set(bs, 11)
-				fmccLocal2:WriteInt(bs)
-			end
+		if (not Bit.is_set(bs, 11)) then
+			bs = Bit.set(bs, 11)
+			fmccLocal2:WriteInt(bs)
+		end
 
-			fmccLocal3:At(fmccLocal3Offset):WriteInt(3) -- EndReason
-		end)
+		fmccLocal3:At(fmccLocal3Offset):WriteInt(3)
 	end
 end
 

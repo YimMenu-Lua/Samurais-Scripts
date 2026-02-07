@@ -893,7 +893,7 @@ end
 -----------------------------------------------------
 -- Handles sound and visual effects.
 ---@class YimActions.FXManager
----@field SFXTimers table<handle, Time.Timer>
+---@field SFXTimers table<handle, Timer>
 YimActions.FXManager = { Fx = {} }
 YimActions.FXManager.__index = YimActions.FXManager
 YimActions.FXManager.SFXTimers = {}

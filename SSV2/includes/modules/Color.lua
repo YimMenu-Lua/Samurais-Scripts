@@ -206,6 +206,36 @@ function Color:Mix(c, f)
 	)
 end
 
+---@param f float -- factor
+---@param includeAlpha? boolean
+---@return Color
+function Color:Darken(f, includeAlpha)
+	local r = math.clamp(self.r - f, 0, 1)
+	local g = math.clamp(self.g - f, 0, 1)
+	local b = math.clamp(self.b - f, 0, 1)
+	local a = self.a
+	if (includeAlpha) then
+		a = math.clamp(a - f, 0, 1)
+	end
+
+	return Color(r, g, b, a)
+end
+
+---@param f float -- factor
+---@param includeAlpha? boolean
+---@return Color
+function Color:Brighten(f, includeAlpha)
+	local r = math.clamp(self.r + f, 0, 1)
+	local g = math.clamp(self.g + f, 0, 1)
+	local b = math.clamp(self.b + f, 0, 1)
+	local a = self.a
+	if (includeAlpha) then
+		a = math.clamp(a + f, 0, 1)
+	end
+
+	return Color(r, g, b, a)
+end
+
 -- Returns the luminance of the color *(brightness)*.
 --
 -- https://www.w3.org/TR/AERT/#color-contrast

@@ -604,5 +604,15 @@ return {
 	["GENERIC_UNMUTE"] = "Ativar som",
 	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Você pode segurar [SHIFT] enquanto clica no botão de alternância para revogar o reconhecimento e bloquear este recurso.",
 	["YRV3_CASH_LOOP"] = "Loop de dinheiro",
-	["YRV3_CASH_LOOP_WARN_ACK"] = "Este recurso não é seguro e pode resultar na suspensão da conta se for abusado.\n\nPressione 'Confirmar' para ativá-lo por sua conta e risco ou 'Cancelar' para voltar atrás. Você pode revogar esse reconhecimento a qualquer momento pressionando [SHIFT] enquanto clica no botão de alternância."
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Este recurso não é seguro e pode resultar na suspensão da conta se for abusado.\n\nPressione 'Confirmar' para reconhecer este aviso e aceitar o risco ou 'Cancelar' para voltar atrás. Você pode revogar esse reconhecimento a qualquer momento pressionando [SHIFT] enquanto clica no botão de alternância.",
+	["GENERIC_TIME_LEFT"] = "Tempo restante",
+	["GENERIC_TIME"] = "Tempo",
+	["SY_TOW_MISSION_BRING_VEH"] = "Traga o alvo da missão",
+	["SY_NOT_IN_TOWTRUCK_ERR"] = "Você não está sentado no caminhão de reboque.",
+	["SY_DISABLE_TOWING_COOLDOWN"] = "Desativar resfriamento do serviço de reboque",
+	["SY_TOW_VEH_NOT_FOUND_ERR"] = "Falha ao encontrar o veículo alvo.",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "Falha ao encontrar o objetivo da missão.",
+	["SY_TOW_MISSION_BRING_VEH_TT"] = "Teletransporta o veículo alvo da missão de reboque para você e tenta prendê-lo ao gancho de reboque",
+	["YRV3_SCRIPT_HOST_ERR"] = "Não foi possível terminar a missão de venda! Você não é o anfitrião deste script.",
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Falha ao assumir o controle do thread do script!"
 }

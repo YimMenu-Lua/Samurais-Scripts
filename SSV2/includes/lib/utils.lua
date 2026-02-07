@@ -8,9 +8,11 @@
 
 
 ---@diagnostic disable: lowercase-global
+
 math.randomseed(os.time())
 
 local LUA_TABLE_OVERHEAD <const> = 3 * 0x8 -- 0x18
+local Clock <const> = require("includes.modules.Time")
 
 INT_SIZES = {
 	int8_t   = 0x1,
@@ -24,13 +26,13 @@ INT_SIZES = {
 }
 
 
-Bit   = require("includes.modules.Bit")
-Cast  = require("includes.modules.Cast")
-Time  = require("includes.modules.Time")
-Timer = Time.Timer
+Bit       = require("includes.modules.Bit")
+Cast      = require("includes.modules.Cast")
 
-
-TimePoint = Time.TimePoint
+Time      = Clock.Time
+Timer     = Clock.Timer
+TimePoint = Clock.TimePoint
+DateTime  = Clock.DateTime
 yield     = coroutine.yield
 sleep     = Time.sleep
 _F        = string.format

@@ -330,10 +330,10 @@ return function()
 
 			ImGui.SameLine()
 			if (GUI:Button(_T("GENERIC_REMOVE_ALL"))) then
-				ImGui.OpenPopup("##confirm_remove_all")
+				ImGui.OpenPopup(_T("GENERIC_REMOVE_ALL"))
 			end
 
-			if (GUI:ConfirmPopup("##confirm_remove_all")) then
+			if (ImGui.DialogBox(_T("GENERIC_REMOVE_ALL"))) then
 				GVars.features.vehicle.stancer.saved_models = {}
 				saved_vehs_window.should_draw = false
 			end

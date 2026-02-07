@@ -733,10 +733,13 @@ function Notifier:DrawNotifications(start_pos)
 			ImGui.GetColorU32(frame.x, frame.y, frame.z, frame.w),
 			GVars.ui.style.theme.Styles.WindowRounding or 2
 		)
+
 		ImGui.Spacing()
 		ImGui.Spacing()
 		ImGui.SameLine()
+		ImGui.SetWindowFontScale(1.05)
 		ImGui.Text(_T("GUI_NOTIFICATIONS"))
+		ImGui.SetWindowFontScale(1.0)
 
 		ImGui.SameLine()
 		ImGui.SetWindowFontScale(0.81)

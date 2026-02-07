@@ -796,10 +796,10 @@ local function DrawCreatorUI()
 			ImGui.BeginDisabled(not EntityForge.currentParent)
 			if EntityForge.currentParent and EntityForge.currentParent.m_is_forged then
 				if GUI:Button("Overwrite", { size = vec2:new(100, 35) }) then
-					ImGui.OpenPopup("confirm overwrite")
+					ImGui.OpenPopup("Overwrite Data?")
 				end
 
-				if GUI:ConfirmPopup("confirm overwrite") then
+				if ImGui.DialogBox("Overwrite Data?") then
 					EntityForge:OverwriteSavedAbomination()
 				end
 			else
@@ -1201,11 +1201,11 @@ local function DrawFavoriteEntities()
 	end
 
 	if GUI:Button(_T("GENERIC_REMOVE")) then
-		ImGui.OpenPopup("confirm remove from favorites")
+		ImGui.OpenPopup(_T("GENERIC_REMOVE"))
 	end
 	ImGui.EndDisabled()
 
-	if GUI:ConfirmPopup("confirm remove from favorites") then
+	if ImGui.DialogBox(_T("GENERIC_REMOVE")) then
 		EntityForge:RemoveFromFavorites(t_SelectedFavoriteEntity)
 	end
 
@@ -1213,11 +1213,11 @@ local function DrawFavoriteEntities()
 
 	ImGui.BeginDisabled(no_favs)
 	if GUI:Button(_T("GENERIC_REMOVE_ALL")) then
-		ImGui.OpenPopup("confirm remove all favorites")
+		ImGui.OpenPopup(_T("GENERIC_REMOVE_ALL"))
 	end
 	ImGui.EndDisabled()
 
-	if GUI:ConfirmPopup("confirm remove all favorites") then
+	if ImGui.DialogBox(_T("GENERIC_REMOVE_ALL")) then
 		EntityForge:RemoveAllFavorites()
 	end
 end
@@ -1446,22 +1446,22 @@ local function DrawSavedEntities()
 
 	ImGui.BeginDisabled(not t_SelectedSavedEntity)
 	if GUI:Button(_T("GENERIC_REMOVE")) then
-		ImGui.OpenPopup("confirm remove saved creation")
+		ImGui.OpenPopup(_T("GENERIC_REMOVE"))
 	end
 	ImGui.EndDisabled()
 
-	if GUI:ConfirmPopup("confirm remove saved creation") then
+	if ImGui.DialogBox(_T("GENERIC_REMOVE")) then
 		EntityForge:RemoveSavedAbomination(t_SelectedSavedEntity)
 	end
 	ImGui.SameLine()
 
 	ImGui.BeginDisabled(no_saved_forges)
 	if GUI:Button(_T("GENERIC_REMOVE_ALL")) then
-		ImGui.OpenPopup("confirm remove all saved")
+		ImGui.OpenPopup(_T("GENERIC_REMOVE_ALL"))
 	end
 	ImGui.EndDisabled()
 
-	if GUI:ConfirmPopup("confirm remove all saved") then
+	if ImGui.DialogBox(_T("GENERIC_REMOVE_ALL")) then
 		EntityForge:RemoveAllSavedAbominations()
 	end
 end

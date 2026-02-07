@@ -602,7 +602,17 @@ return {
 	["GENERIC_UNMUTE"] = "Activer le son",
 	["GENERIC_MUTE"] = "Muet",
 	["GENERIC_CLEAR_ALL"] = "Tout effacer",
-	["YRV3_CASH_LOOP_WARN_ACK"] = "Cette fonctionnalité n'est pas sécurisée et peut entraîner la suspension du compte en cas d'abus.\n\nAppuyez sur « Confirmer » pour l'activer à vos propres risques, ou sur « Annuler » pour revenir en arrière. Vous pouvez révoquer cet accusé de réception à tout moment ultérieurement en maintenant [SHIFT] tout en cliquant sur la bascule.",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Cette fonctionnalité n'est pas sécurisée et peut entraîner la suspension du compte en cas d'abus.\n\nAppuyez sur « Confirmer » pour accuser réception de cet avertissement et accepter le risque, ou sur « Annuler » pour revenir en arrière. Vous pouvez révoquer cet accusé de réception à tout moment ultérieurement en maintenant [SHIFT] tout en cliquant sur la bascule.",
 	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Vous pouvez maintenir [SHIFT] enfoncé tout en cliquant sur la bascule pour révoquer l'accusé de réception et verrouiller cette fonctionnalité.",
-	["YRV3_CASH_LOOP"] = "Boucle de trésorerie"
+	["YRV3_CASH_LOOP"] = "Boucle de trésorerie",
+	["SY_TOW_MISSION_BRING_VEH_TT"] = "Téléporte le véhicule cible de la mission de remorquage vers vous et tente de l'attacher au crochet de remorquage.",
+	["GENERIC_TIME_LEFT"] = "Temps restant",
+	["SY_TOW_MISSION_BRING_VEH"] = "Apportez la cible de la mission",
+	["GENERIC_TIME"] = "Temps",
+	["SY_TOW_VEH_NOT_FOUND_ERR"] = "Impossible de trouver le véhicule cible.",
+	["SY_DISABLE_TOWING_COOLDOWN"] = "Désactiver le temps de recharge du service de remorquage",
+	["YRV3_SCRIPT_HOST_ERR"] = "Impossible de terminer la mission de vente ! Vous n'êtes pas l'hôte de ce script.",
+	["SY_NOT_IN_TOWTRUCK_ERR"] = "Vous n'êtes pas assis dans la dépanneuse.",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "Impossible de trouver l'objectif de la mission.",
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Échec de la prise de contrôle du fil de script !"
 }

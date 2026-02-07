@@ -604,5 +604,15 @@ return {
 	["GENERIC_UNMUTE"] = "Dejar de silenciar",
 	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Puede mantener presionado [SHIFT] mientras hace clic en el interruptor para revocar el reconocimiento y bloquear esta función.",
 	["YRV3_CASH_LOOP"] = "Bucle de efectivo",
-	["YRV3_CASH_LOOP_WARN_ACK"] = "Esta función no es segura y puede provocar la suspensión de la cuenta si se abusa de ella.\n\nPresiona 'Confirmar' para habilitarla bajo tu propio riesgo o 'Cancelar' para regresar. Puede revocar este reconocimiento en cualquier momento posterior manteniendo presionado [SHIFT] mientras hace clic en el botón de alternar."
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Esta función no es segura y puede provocar la suspensión de la cuenta si se abusa de ella.\n\nPresione 'Confirmar' para reconocer esta advertencia y aceptar el riesgo, o 'Cancelar' para regresar. Puede revocar este reconocimiento en cualquier momento posterior manteniendo presionado [SHIFT] mientras hace clic en el botón de alternar.",
+	["GENERIC_TIME"] = "Tiempo",
+	["SY_DISABLE_TOWING_COOLDOWN"] = "Desactivar el enfriamiento del servicio de remolque",
+	["GENERIC_TIME_LEFT"] = "Tiempo restante",
+	["SY_TOW_MISSION_BRING_VEH"] = "Traer objetivo de misión",
+	["SY_TOW_MISSION_BRING_VEH_TT"] = "Teletransporta el vehículo objetivo de la misión de remolque hacia usted e intenta sujetarlo al gancho de remolque.",
+	["SY_NOT_IN_TOWTRUCK_ERR"] = "No estás sentado en la grúa.",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "No se pudo encontrar el objetivo de la misión.",
+	["YRV3_SCRIPT_HOST_ERR"] = "¡No se puede finalizar la misión de venta! No eres el anfitrión de este script.",
+	["SY_TOW_VEH_NOT_FOUND_ERR"] = "No se pudo encontrar el vehículo objetivo.",
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "¡No se pudo tomar el control del hilo del script!"
 }

@@ -46,6 +46,10 @@ function SalvageYard:IsLiftTaken(slot)
 	return self:GetCarModelOnLift(slot) ~= 0
 end
 
+function SalvageYard:IsTowMissionActive()
+	return script.is_active("fm_content_tow_truck_work")
+end
+
 ---@return boolean
 function SalvageYard:IsRobberyActive()
 	return self:GetRobberyType() >= 0
@@ -190,6 +194,104 @@ function SalvageYard:RestoreIncomeDecay()
 	end
 
 	tunables.set_int(797544186, 5)
+end
+
+---@return seconds
+function SalvageYard:GetSalvagePosixForLift(slot)
+	if (not self:IsLiftTaken(slot)) then
+		return 0
+	end
+
+	return stats.get_int(_F("MPX_SALVAGING_POSIX_LIFT%d", slot))
+end
+
+function SalvageYard:BringTowMissionTarget()
+	ThreadManager:Run(function()
+		-- This is low quality but works... kinda.
+		-- The proper way to do it it so check the mission flow bitset in fm_content_tow_truck_work
+		-- then get the target vehicle. But I'm lazy and don't want to maintain any more script globals and locals.
+		-- 		- Target vehicle: ScriptLocal(1850, "fm_content_tow_truck_work"):At(48):At(0, 9) -- (netID)
+		-- 		- Tow truck: ScriptLocal(1850, "fm_content_tow_truck_work"):At(48):At(1, 9) -- (netID)
+		--
+
+		if (not self:IsTowMissionActive()) then
+			return
+		end
+
+		if (not Self:IsHostOfScript("fm_content_tow_truck_work")) then
+			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
+			return
+		end
+
+		local PV = Self:GetVehicle()
+		if (Self:IsOnFoot() or not PV:IsTowTruck()) then
+			Notifier:ShowError(_T("SY_SALVAGE_YARD"), _T("SY_NOT_IN_TOWTRUCK_ERR"))
+			return
+		end
+
+		local found, objective = Game.GetObjectiveBlipCoords()
+		if (not found or not objective or objective:is_zero()) then
+			Notifier:ShowError(_T("SY_SALVAGE_YARD"), _T("SY_TOW_OBJECTIVE_NOT_FOUND_ERR"))
+			return
+		end
+
+		local veh = Game.GetClosestVehicle(objective, 1, nil, true, 0)
+		if (veh == 0 or not ENTITY.IS_ENTITY_A_VEHICLE(veh)) then
+			Notifier:ShowError(_T("SY_SALVAGE_YARD"), _T("SY_TOW_VEH_NOT_FOUND_ERR"))
+			return
+		end
+
+		local myPos     = Self:GetPos()
+		local heading   = Self:GetHeading()
+		local bonePos   = PV:GetBonePosition("tow_mount_a")
+		local forward   = PV:GetForwardVector()
+		local offsetPos = vec3:new(
+			bonePos.x - forward.x * 3.5,
+			bonePos.y - forward.y * 3.5,
+			bonePos.z
+		)
+
+		if (myPos:distance(objective) >= 100) then
+			PED.SET_PED_COORDS_KEEP_VEHICLE(Self:GetHandle(), objective.x, objective.y, objective.z)
+			yield()
+			PED.SET_PED_COORDS_KEEP_VEHICLE(Self:GetHandle(), myPos.x, myPos.y, myPos.z)
+			VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(PV:GetHandle(), 5.0)
+		end
+
+		VEHICLE.SET_VEHICLE_TOW_TRUCK_ARM_POSITION(PV:GetHandle(), 0.0)
+		sleep(2000)
+		ENTITY.SET_ENTITY_HEADING(veh, heading)
+		ENTITY.SET_ENTITY_PROOFS(
+			veh,
+			false,
+			false,
+			false,
+			true,
+			false,
+			false,
+			false,
+			false
+		)
+		Game.SetEntityCoords(veh, offsetPos)
+		while (Game.GetEntityCoords(veh, false):distance(offsetPos) > 50) do
+			yield()
+		end
+
+		VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(veh, 5.0)
+		if (not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(veh, PV:GetHandle())) then
+			VEHICLE.ATTACH_VEHICLE_TO_TOW_TRUCK(PV:GetHandle(), veh, false, 0, 0, 0)
+			sleep(500)
+		end
+
+		VEHICLE.SET_VEHICLE_TOW_TRUCK_ARM_POSITION(PV:GetHandle(), 1.0)
+
+		---@diagnostic disable
+		local syPos = self:GetCoords()
+		if (Self:GetPos():distance(syPos) > 10 and ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(veh, PV:GetHandle())) then
+			Self:Teleport(syPos, true)
+		end
+		---@diagnostic enable
+	end)
 end
 
 ---@param slot integer

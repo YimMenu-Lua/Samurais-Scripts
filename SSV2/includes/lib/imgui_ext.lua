@@ -9,22 +9,14 @@
 
 -- Global ImGui extensions
 
-local spinner_chars <const> = {
-	{ "_   ",  " _  ",  "  _  ", "   _" },
-	{ "_   ",  "__  ",  "___ ",  "____", " ___", "  __", "   _", "    " },
-	{ "_   ",  " _  ",  "  _ ",  "   _", "  _ ", " _  " },
-	{ ".   ",  " .  ",  "  . ",  "   .", "    " },
-	{ ".   ",  "..  ",  "... ",  "....", "    " },
-	{ ".   ",  "..  ",  "... ",  "....", " ...", "  ..", "   .", "    " },
-	{ "|",     "/",     "-",     "\\" },
-	{ "  _  ", "  -  ", "  =  ", "  -  " },
-	{ "=   ",  "==  ",  "=== ",  "====", " ===", "  ==", "   =", "    " },
-	{ "*   ",  "**  ",  "*** ",  "****", " ***", "  **", "   *", "    " },
-	{ "  _  ", "  -  ", "  _  ", "  -  " },
-}
+---@class NotifBellState
+---@field unreadCount number
+---@field muted boolean
+---@field unread boolean
+---@field open boolean
 
 ---@enum ImGuiSpinnerStyle
-ImGuiSpinnerStyle = {
+ImGuiSpinnerStyle             = {
 	SCAN        = 1,
 	FILL        = 2,
 	BOUNCE      = 3,
@@ -38,13 +30,41 @@ ImGuiSpinnerStyle = {
 	JUMP        = 11,
 }
 
----@class NotifBellState
----@field unreadCount number
----@field muted boolean
----@field unread boolean
----@field open boolean
+---@enum ImGuiValueBarFlags
+ImGuiValueBarFlags            = {
+	NONE      = 0,
+	VERTICAL  = 1 << 0,
+	MULTI_VAL = 1 << 1,
+}
 
-local toggleStates = {}
+---@enum ImGuiDialogBoxStyle
+ImGuiDialogBoxStyle           = {
+	INFO   = 0,
+	WARN   = 1,
+	SEVERE = 2,
+}
+
+local toggleStates            = {}
+
+local spinner_chars <const>   = {
+	{ "_   ",  " _  ",  "  _  ", "   _" },
+	{ "_   ",  "__  ",  "___ ",  "____", " ___", "  __", "   _", "    " },
+	{ "_   ",  " _  ",  "  _ ",  "   _", "  _ ", " _  " },
+	{ ".   ",  " .  ",  "  . ",  "   .", "    " },
+	{ ".   ",  "..  ",  "... ",  "....", "    " },
+	{ ".   ",  "..  ",  "... ",  "....", " ...", "  ..", "   .", "    " },
+	{ "|",     "/",     "-",     "\\" },
+	{ "  _  ", "  -  ", "  =  ", "  -  " },
+	{ "=   ",  "==  ",  "=== ",  "====", " ===", "  ==", "   =", "    " },
+	{ "*   ",  "**  ",  "*** ",  "****", " ***", "  **", "   *", "    " },
+	{ "  _  ", "  -  ", "  _  ", "  -  " },
+}
+
+local DialogBoxColors <const> = {
+	-- info is just derived from default theme
+	[ImGuiDialogBoxStyle.WARN]   = Color(240, 190, 2, 255), -- safety yellow; we should probably define this in the Color class as a named color
+	[ImGuiDialogBoxStyle.SEVERE] = Color("red"),
+}
 
 -- Returns a basic animated string
 ---@param label? string
@@ -375,95 +395,147 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 end
 
 ---@param idx ImGuiCol
----@return uint32_t
-function ImGui.GetStyleColorU32(idx)
-	return Color(ImGui.GetStyleColorVec4(idx)):AsU32()
+---@return Color
+function ImGui.GetStyleColor(idx)
+	return Color(ImGui.GetStyleColorVec4(idx))
 end
 
----@enum ImGuiValueBarFlags
-ImGuiValueBarFlags = {
-	NONE     = 0,
-	VERTICAL = 1 << 0,
-}
+---@param idx ImGuiCol
+---@return uint32_t
+function ImGui.GetStyleColorU32(idx)
+	return ImGui.GetStyleColor(idx):AsU32()
+end
 
-local ValueBarFontScale = 1
 -- https://github.com/ocornut/imgui/issues/5263
 ---@param label string
 ---@param value float
----@param size vec2
----@param min_value float
----@param max_value float
----@param flags ImGuiValueBarFlags
-function ImGui.ValueBar(label, value, size, min_value, max_value, flags)
-	min_value           = min_value or 0
-	max_value           = max_value or 1
-	flags               = flags or ImGuiValueBarFlags.NONE
+---@param size? vec2
+---@param flags? ImGuiValueBarFlags
+---@param opts? { value2?: float, v1Col?: uint32_t, v2Col?: uint32_t, fmt?: string }
+function ImGui.ValueBar(label, value, size, flags, opts)
+	flags              = flags or ImGuiValueBarFlags.NONE
+	size               = size or vec2:zero()
+	opts               = opts or {}
 
-	local has_label     = #label > 0 and not label:startswith("##")
-	local is_horizontal = not (flags & ImGuiValueBarFlags.VERTICAL)
-	local style         = ImGui.GetStyle()
-	local draw_list     = ImGui.GetWindowDrawList()
-	local cursor_pos    = vec2:new(ImGui.GetCursorScreenPos())
-	local fraction      = math.clamp((value - min_value) / (max_value - min_value), 0, 1)
-	local frame_height  = ImGui.GetFrameHeight()
-	local text_size     = vec2:new(ImGui.CalcTextSize(label))
-	local label_size    = has_label and vec2:new(text_size.x, frame_height) or vec2:zero()
-	local width         = (size and size.x > 0) and size.x or ImGui.CalcItemWidth()
-	local rect_size     = is_horizontal
-		and vec2:new(width, frame_height)
-		or vec2:new(ImGui.GetFontSize() * 2, size.y - label_size.y)
-	local rect_start    = cursor_pos + vec2:new(
-		is_horizontal and 0 or math.max(0.0, (label_size.x - rect_size.x) / 2), 0
+	---@type boolean
+	local isMultiVal   = flags & ImGuiValueBarFlags.MULTI_VAL ~= 0
+	local isHotizontal = flags & ImGuiValueBarFlags.VERTICAL == 0
+	local region       = vec2:new(ImGui.GetContentRegionAvail())
+
+	if (size.x <= 0) then
+		if (isHotizontal) then
+			size.x = region.x
+		else
+			size.y = region.y
+		end
+	end
+
+	if (size.y <= 0) then
+		if (isHotizontal) then
+			size.y = 32
+		else
+			size.y = region.y
+		end
+	end
+
+	local pDrawList = ImGui.GetWindowDrawList()
+	local style     = ImGui.GetStyle()
+	local cursorPos = vec2:new(ImGui.GetCursorScreenPos())
+	local hasLabel  = #label > 0 and not label:startswith("##")
+	local minV      = 0
+	local maxV      = 1
+	local fraction  = math.clamp((value - minV) / (maxV - minV), 0, 1)
+	local frameH    = ImGui.GetFrameHeight() - style.FramePadding.y
+	local textSize  = vec2:new(ImGui.CalcTextSize(label))
+	local labelSize = hasLabel and vec2:new(textSize.x, frameH) or vec2:zero()
+	local width     = (size and size.x > 0) and size.x or ImGui.CalcItemWidth()
+	local rectSize  = isHotizontal
+		and vec2:new(width, frameH)
+		or vec2:new(ImGui.GetFontSize() * 2, size.y - labelSize.y)
+	local rectStart = cursorPos + vec2:new(
+		isHotizontal and 0 or math.max(0.0, (labelSize.x - rectSize.x) / 2), 0
 	)
+	local v1Col     = opts.v1Col or ImGui.GetStyleColorU32(ImGuiCol.PlotHistogram)
 
-	ImGui.ImDrawListAddRect(
-		draw_list,
-		rect_start.x,
-		rect_start.y,
-		rect_start.x + rect_size.x,
-		rect_start.y + rect_size.y,
+	ImGui.ImDrawListAddRectFilled(
+		pDrawList,
+		rectStart.x,
+		rectStart.y,
+		rectStart.x + rectSize.x,
+		rectStart.y + rectSize.y,
 		ImGui.GetStyleColorU32(ImGuiCol.FrameBg),
 		style.FrameRounding
 	)
 
-	local rect_start_2 = rect_start + vec2:new(0, is_horizontal and 0 or (1 - fraction) * rect_size.y)
-	local rect_end_2 = rect_start + rect_size * vec2:new(is_horizontal and fraction or 1, 1)
-	ImGui.ImDrawListAddRectFilled(
-		draw_list,
-		rect_start_2.x,
-		rect_start_2.y,
-		rect_end_2.x,
-		rect_end_2.y,
-		ImGui.GetStyleColorU32(ImGuiCol.PlotHistogram),
-		style.FrameRounding
-	)
+	local value2     = opts.value2 or 0
+	local rect2Start = rectStart + vec2:new(0, isHotizontal and 0 or (1 - fraction) * rectSize.y)
+	local rect2End   = rectStart + rectSize * vec2:new(isHotizontal and fraction or 1, 1)
+	if (value > 0) then
+		ImGui.ImDrawListAddRectFilled(
+			pDrawList,
+			rect2Start.x,
+			rect2Start.y,
+			rect2End.x,
+			rect2End.y,
+			v1Col,
+			style.FrameRounding,
+			isHotizontal and (value < 1 and 80 or 240) or 240 -- ImDrawFlags_RoundCorners*
+		)
+	end
 
-	local value_text   = _F("%d%%", math.floor(value * 100))
-	local maxTextWidth = rect_size.x - style.FramePadding.x * 2
+	if (isMultiVal and value2 > 0) then
+		local v2Col      = opts.v2Col or ImGui.GetStyleColor(ImGuiCol.PlotHistogram):Brighten(0.2):AsU32()
+		local fraction2  = math.clamp((value2 - minV) / (maxV - minV), 0, 1)
+		local rect3Start = vec2:new(rect2End.x, rect2Start.y) +
+			vec2:new(0, isHotizontal and 0 or (1 - fraction2) * rectSize.y)
+		local rect3End   = rect3Start + rectSize * vec2:new(isHotizontal and fraction2 or 1, 1)
+		local rounding   = 0
+		local dlFlags    = 0
+		if (value == 0) then
+			rounding = style.FrameRounding
+			dlFlags = 80
+		elseif (value + value2 >= 1) then
+			rounding = style.FrameRounding
+			dlFlags = 160
+		end
+		ImGui.ImDrawListAddRectFilled(
+			pDrawList,
+			rect3Start.x,
+			rect3Start.y,
+			rect3End.x,
+			rect3End.y,
+			v2Col,
+			rounding,
+			dlFlags
+		)
+	end
+
+	local valueText    = opts.fmt or _F("%d%%", math.floor(value * 100))
+	local maxTextWidth = rectSize.x - style.FramePadding.x * 2
 	local fontScale    = ImGui.CalcFontScaleToFitWidth(
-		value_text,
+		valueText,
 		maxTextWidth,
 		0.6,
 		1.0
 	)
 
 	ImGui.SetWindowFontScale(fontScale)
-	local value_text_size = vec2:new(ImGui.CalcTextSize(value_text))
-	local value_text_pos  = rect_start + (rect_size - value_text_size) / 2
+	local valTextSize = vec2:new(ImGui.CalcTextSize(valueText))
+	local valTextPos  = rectStart + (rectSize - valTextSize) / 2
 	ImGui.ImDrawListAddText(
-		draw_list,
-		value_text_pos.x,
-		value_text_pos.y,
+		pDrawList,
+		valTextPos.x,
+		valTextPos.y,
 		ImGui.GetStyleColorU32(ImGuiCol.Text),
-		value_text
+		valueText
 	)
 	ImGui.SetWindowFontScale(1)
 
-	if (has_label) then
-		local posX = is_horizontal and rect_size.x + style.ItemInnerSpacing.x or (rect_size.x - label_size.x) / 2
-		local posY = style.FramePadding.y + (is_horizontal and 0 or rect_size.y)
+	if (hasLabel) then
+		local posX = isHotizontal and rectSize.x + style.ItemInnerSpacing.x or (rectSize.x - labelSize.x) / 2
+		local posY = style.FramePadding.y + (isHotizontal and 0 or rectSize.y)
 		ImGui.ImDrawListAddText(
-			draw_list,
+			pDrawList,
 			posX,
 			posY,
 			ImGui.GetStyleColorU32(ImGuiCol.Text),
@@ -471,8 +543,8 @@ function ImGui.ValueBar(label, value, size, min_value, max_value, flags)
 		)
 	end
 
-	local total_height = rect_size.y + (has_label and label_size.y or 0)
-	ImGui.Dummy(rect_size.x, total_height)
+	local totalH = rectSize.y + (hasLabel and labelSize.y or 0)
+	ImGui.Dummy(rectSize.x, totalH)
 end
 
 ---@param thickness? float
@@ -686,12 +758,12 @@ function ImGui.NotifWidget(state, size)
 				12
 			)
 
-			if (c > 99) then
-				c = 99
+			if (c > 9) then
+				c = 9
 			end
 
 			ImGui.SetWindowFontScale(0.5)
-			local countTxt = _F("%s%d", c >= 99 and "+" or "", c)
+			local countTxt = _F("%s%d", state.unreadCount > 9 and "+" or "", c)
 			local txtSize = vec2:new(ImGui.CalcTextSize(countTxt))
 			ImGui.ImDrawListAddText(
 				pDrawList,
@@ -699,7 +771,7 @@ function ImGui.NotifWidget(state, size)
 				bx - txtSize.x * 0.5,
 				by - txtSize.y * 0.75,
 				ImGui.GetAutoTextColor(accent):AsU32(),
-				_F("%s%d", c >= 99 and "+" or "", c)
+				countTxt
 			)
 			ImGui.SetWindowFontScale(1.0)
 		end
@@ -718,4 +790,99 @@ function ImGui.NotifWidget(state, size)
 	ImGui.EndGroup()
 
 	return clicked
+end
+
+-- Draws a dialog box with Confirm/Cancel buttons.
+--
+-- You must call `ImGui.OpenPopup` right before it and use the same label.
+--
+-- **Example:**
+--
+--```Lua
+-- local function scary_func()
+-- 	MyClass:DoTheThing()
+-- end
+--
+-- if ImGui.Button("Do The Thing") then
+--	ImGui.OpenPopup("Delete File")
+-- end
+--
+-- if ImGui.DialogBox(
+-- 	"Delete File",
+-- 	"Are you sure you want to delete this file?",
+-- 	ImGuiDialogBoxStyle.WARN
+-- ) then
+-- 	scary_func()
+-- end
+--```
+---@param label string
+---@param message? string -- Optional: Defaults to: "This action is irreversible. Are you sure you want to proceed?"
+---@param boxStyle? ImGuiDialogBoxStyle
+---@return boolean
+function ImGui.DialogBox(label, message, boxStyle)
+	boxStyle      = boxStyle or ImGuiDialogBoxStyle.INFO
+	message       = message or _T("GENERIC_CONFIRM_WARN")
+	local col     = DialogBoxColors[boxStyle] or Color(ImGui.GetStyleColorVec4(ImGuiCol.PopupBg))
+	local textCol = ImGui.GetAutoTextColor(col)
+	local v       = false
+
+	ImGui.SetNextWindowBgAlpha(0.97)
+	ImGui.SetNextWindowSizeConstraints(440, 200, 440, 600)
+	ImGui.PushStyleColor(ImGuiCol.TitleBg, col.r, col.g, col.b, col.a)
+	ImGui.PushStyleColor(ImGuiCol.TitleBgActive, col.r, col.g, col.b, col.a)
+	ImGui.PushStyleColor(ImGuiCol.TitleBgCollapsed, col.r, col.g, col.b, col.a) -- is this even necessary?
+	ImGui.PushStyleColor(ImGuiCol.Text, textCol.r, textCol.g, textCol.b, textCol.a)
+	local open = ImGui.BeginPopupModal(
+		label,
+		true,
+		ImGuiWindowFlags.NoMove
+		| ImGuiWindowFlags.NoResize
+		| ImGuiWindowFlags.NoCollapse
+		| ImGuiWindowFlags.AlwaysAutoResize
+		| ImGuiWindowFlags.NoSavedSettings
+	)
+	ImGui.PopStyleColor(4)
+
+	if (open) then
+		local windowSize = vec2:new(ImGui.GetWindowSize())
+		local _, pos     = GUI:GetNewWindowSizeAndCenterPos(0.5, 0.5, windowSize)
+		ImGui.SetWindowPos(pos.x, pos.y, ImGuiCond.Always)
+		ImGui.Spacing()
+
+		local buttonSize     = vec2:new(windowSize.x * 0.3, 35)
+		local spacing        = ImGui.GetStyle().ItemSpacing.x
+		local firstCursorPos = (windowSize.x - ((buttonSize.x + spacing) * 3)) / 2
+		ImGui.TextWrapped(message)
+
+		ImGui.Dummy(0, 40)
+		if (boxStyle > ImGuiDialogBoxStyle.INFO) then
+			ImGui.PushStyleColor(ImGuiCol.Button, col.r, col.g, col.b, math.max(col.a * 0.8, 0.8))
+			ImGui.PushStyleColor(ImGuiCol.ButtonHovered, col.r, col.g, col.b, col.a)
+			ImGui.PushStyleColor(ImGuiCol.ButtonActive, col.r, col.g, col.b, math.max(col.a * 0.7, 0.7))
+			ImGui.PushStyleColor(ImGuiCol.Text, textCol.r, textCol.g, textCol.b, textCol.a)
+		end
+
+		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + firstCursorPos)
+		if (ImGui.Button(_T("GENERIC_CONFIRM"), buttonSize.x, buttonSize.y)) then
+			v = true
+			ImGui.CloseCurrentPopup()
+		end
+
+		if (boxStyle > 0) then
+			ImGui.PopStyleColor(4)
+		end
+
+		ImGui.SameLine()
+		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + buttonSize.x - spacing)
+
+		if (ImGui.Button(_T("GENERIC_CANCEL"), buttonSize.x, buttonSize.y)) then
+			v = false
+			ImGui.CloseCurrentPopup()
+		end
+
+		ImGui.Spacing()
+		ImGui.EndPopup()
+	end
+
+	return v
 end

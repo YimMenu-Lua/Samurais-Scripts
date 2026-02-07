@@ -28,7 +28,7 @@ local eLaunchControlState <const> = {
 ---@field private m_is_active boolean
 ---@field private m_thread? Thread
 ---@field private m_state eLaunchControlState
----@field private m_timer Time.Timer
+---@field private m_timer Timer
 ---@field private m_last_pop_time milliseconds
 ---@field private m_default_pops_off boolean
 ---@field private m_shocking_event_handle? handle
