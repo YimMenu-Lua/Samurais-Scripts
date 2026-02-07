@@ -91,7 +91,6 @@ local function DrawKeybinds(gvarKey, isController)
 			ImGui.CloseCurrentPopup()
 		end
 		ImGui.Separator()
-		ImGui.Dummy(1, 10)
 
 		if not keyName then
 			ImGui.Text(ImGui.TextSpinner(_T("SETTINGS_HOTKEY_WAIT"), 10, ImGuiSpinnerStyle.BOUNCE_DOTS))
@@ -117,6 +116,7 @@ local function DrawKeybinds(gvarKey, isController)
 		end
 
 		ImGui.SetCursorPosY(region.y - 35)
+		ImGui.Dummy(1, 10)
 
 		if (keyCode and keyName and not _reserved) then
 			if GUI:Button(_F("%s##keybinds", _T("GENERIC_CONFIRM"))) then
@@ -145,16 +145,23 @@ end
 
 return function()
 	if (ImGui.BeginTabBar("##ss_keybinds")) then
+		local id = 1
 		if (ImGui.BeginTabItem(_T("SETTINGS_KEYBINDS_KEYBOARD"))) then
 			for key in pairs(GVars.keyboard_keybinds) do
+				ImGui.PushID(id)
 				DrawKeybinds(key, false)
+				ImGui.PopID()
+				id = id + 1
 			end
 			ImGui.EndTabItem()
 		end
 
 		if (ImGui.BeginTabItem(_T("SETTINGS_KEYBINDS_CONTROLLER"))) then
 			for key in pairs(GVars.gamepad_keybinds) do
+				ImGui.PushID(id)
 				DrawKeybinds(key, true)
+				ImGui.PopID()
+				id = id + 1
 			end
 			ImGui.EndTabItem()
 		end
