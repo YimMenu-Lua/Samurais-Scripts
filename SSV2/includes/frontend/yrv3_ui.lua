@@ -29,6 +29,8 @@ local tabNames <const>         = {
 	"CELL_16"
 }
 
+local compatFlag = (Backend:GetAPIVersion() == Enums.eAPIVersion.V2) and ImGuiChildFlags.AlwaysUseWindowPadding or false
+
 local function getAllCDCheckboxes()
 	return GVars.features.yrv3.mc_work_cd
 		and GVars.features.yrv3.hangar_cd
@@ -201,7 +203,7 @@ local function drawWarehouse(warehouse, notOwnedLabel)
 	ImGui.BeginChild(name,
 		0,
 		240,
-		false or ImGuiChildFlags.AlwaysUseWindowPadding,
+		compatFlag,
 		ImGuiWindowFlags.NoScrollbar
 		| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 	)
@@ -289,7 +291,7 @@ local function drawBikerBusiness(bb, notOwnedLabel)
 	ImGui.BeginChild(_F("bb##%s", name),
 		0,
 		index < 6 and 330 or 300,
-		false or ImGuiChildFlags.AlwaysUseWindowPadding,
+		compatFlag,
 		ImGuiWindowFlags.NoScrollbar
 		| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 	)
@@ -575,7 +577,7 @@ local function drawNightclub()
 		ImGui.BeginChild("##hub_child",
 			90,
 			300,
-			false or ImGuiChildFlags.AlwaysUseWindowPadding,
+			compatFlag,
 			ImGuiWindowFlags.NoScrollbar
 			| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 		)
@@ -652,7 +654,7 @@ local function drawBusinessSafes()
 		ImGui.BeginChild(name,
 			0,
 			cashSafe:CanLoop() and 195 or 160,
-			false or ImGuiChildFlags.AlwaysUseWindowPadding,
+			compatFlag,
 			ImGuiWindowFlags.NoScrollbar
 			| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 		)
@@ -706,7 +708,7 @@ local function drawBasicBusiness(business, isParent, kvSpacing, clearHeatLabel)
 	ImGui.BeginChild(name,
 		0,
 		isParent and 385 or 280,
-		false or ImGuiChildFlags.AlwaysUseWindowPadding,
+		compatFlag,
 		(ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 		| ImGuiWindowFlags.NoScrollbar
 	)
@@ -937,7 +939,7 @@ local function drawSalvageYard()
 				_F("##lift%d", i),
 				childWidth,
 				isTaken and 210 or 100,
-				false or ImGuiChildFlags.AlwaysUseWindowPadding,
+				compatFlag,
 				ImGuiWindowFlags.NoScrollbar
 				| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 			)
@@ -1052,7 +1054,7 @@ local function drawSalvageYard()
 				_F("##robbery%d", i),
 				childWidth,
 				isAvailable and 180 or 100,
-				false or ImGuiChildFlags.AlwaysUseWindowPadding,
+				compatFlag,
 				ImGuiWindowFlags.NoScrollbar
 				| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 			)
