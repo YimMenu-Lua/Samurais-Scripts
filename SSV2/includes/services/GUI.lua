@@ -744,12 +744,22 @@ end
 --#region Wrappers
 
 ---@param text string
----@param opts? { scale: float, color?: Color }
+---@param opts? { scale: float, color?: Color, separator?: boolean }
 function GUI:HeaderText(text, opts)
 	opts = opts or {}
+	if (opts.color) then
+		ImGui.PushStyleColor(ImGuiCol.Text, opts.color:AsFloat())
+	end
 	ImGui.SetWindowFontScale(opts.scale or 1.114)
-	self:Text(text, opts)
+	if (opts.separator) then
+		ImGui.SeparatorText(text)
+	else
+		ImGui.Text(text)
+	end
 	ImGui.SetWindowFontScale(1.0)
+	if (opts.color) then
+		ImGui.PopStyleColor()
+	end
 end
 
 -- Wrapper for `ImGui::Text` that supports optional colors and text formatting.
@@ -850,78 +860,6 @@ function GUI:TooltipMultiline(lines, wrap_pos)
 		ImGui.PopTextWrapPos()
 		ImGui.EndTooltip()
 	end
-end
-
--- Draws a small confirmation popup window with Confirm/Cancel buttons.
---
--- You must call `ImGui.OpenPopup` right before it and use the same label.
---
--- **Example:**
---
---```Lua
--- local function scary_func()
--- 	MyClass:DoTheThing()
--- end
---
--- if ImGui.Button("Do The Thing") then
---	ImGui.OpenPopup("myConfirmLabel")
--- end
---
--- if GUI:ConfirmPopup("myConfirmLabel") then
--- 	scary_func()
--- end
---```
----@param name string
----@param message? string
-function GUI:ConfirmPopup(name, message)
-	ImGui.SetNextWindowSizeConstraints(420, 200, 420, 600)
-	if ImGui.BeginPopupModal(
-			name,
-			ImGuiWindowFlags.NoTitleBar |
-			ImGuiWindowFlags.NoMove |
-			ImGuiWindowFlags.NoResize |
-			ImGuiWindowFlags.AlwaysAutoResize |
-			ImGuiWindowFlags.NoSavedSettings
-		) then
-		local windowSize = vec2:new(ImGui.GetWindowSize())
-		local _, pos     = self:GetNewWindowSizeAndCenterPos(0.5, 0.5, windowSize)
-		ImGui.SetWindowPos(pos.x, pos.y, ImGuiCond.Always)
-
-		local buttonSize     = vec2:new(windowSize.x / 4, 35)
-		local spacing        = ImGui.GetStyle().ItemSpacing.x
-		local firstCursorPos = (windowSize.x - ((buttonSize.x + spacing) * 3)) / 2
-
-		self:HeaderText(_T("GENERIC_WARN_LABEL"), { color = Color("yellow") })
-		ImGui.Separator()
-
-		ImGui.Spacing()
-		ImGui.TextWrapped(message or _T("GENERIC_CONFIRM_WARN"))
-
-		ImGui.Spacing()
-		ImGui.Separator()
-
-		ImGui.Dummy(1, 10)
-		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + firstCursorPos)
-		if (self:Button(_T("GENERIC_CONFIRM"), { size = buttonSize })) then
-			ImGui.CloseCurrentPopup()
-			ImGui.EndPopup()
-			return true
-		end
-
-		ImGui.SameLine()
-		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + buttonSize.x - spacing)
-
-		if (self:Button(_T("GENERIC_CANCEL"), { size = buttonSize })) then
-			ImGui.CloseCurrentPopup()
-			ImGui.EndPopup()
-			return false
-		end
-
-		ImGui.Spacing()
-		ImGui.EndPopup()
-	end
-
-	return false
 end
 
 -- A simple window for features to draw further customizations (drift power, NOS effects, engine swap, etc.)

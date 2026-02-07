@@ -49,12 +49,16 @@ function Set:Push(element)
 		return
 	end
 
+	if (self.m_data[element] == true) then
+		return
+	end
+
 	local __type = type(element)
 	if (not self.m_data_type) then
 		self.m_data_type = __type
 	elseif (__type ~= self.m_data_type) then
 		error(_F(
-			"[Set]: Data type mismatch! A set can only be created with same-type objects. %s expected, got %s instead.",
+			"[Set]: Data type mismatch! A set can only contain unique same-type objects. %s expected, got %s instead.",
 			self.m_data_type,
 			__type
 		))

@@ -602,7 +602,17 @@ return {
 	["GENERIC_MUTE"] = "沉默的",
 	["GENERIC_CLEAR_ALL"] = "全部清除",
 	["GENERIC_UNMUTE"] = "取消靜音",
-	["YRV3_CASH_LOOP_WARN_ACK"] = "此功能不安全，如果濫用，可能會導致帳戶被暫停。 \n\n按“確認”啟用該功能，風險由您自行承擔，或按“取消”返回。您可以在以後隨時通過按住 [SHIFT] 並單擊切換按鈕來撤銷此確認。",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "此功能不安全，如果濫用，可能會導致帳戶被暫停。 \n\n按“確認”確認此警告並接受風險，或按“取消”返回。您可以在以後隨時通過按住 [SHIFT] 並單擊切換按鈕來撤銷此確認。",
 	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "您可以在按住 [SHIFT] 的同時單擊切換按鈕來撤銷確認並鎖定此功能。",
-	["YRV3_CASH_LOOP"] = "現金循環"
+	["YRV3_CASH_LOOP"] = "現金循環",
+	["GENERIC_TIME_LEFT"] = "剩餘時間",
+	["SY_DISABLE_TOWING_COOLDOWN"] = "禁用拖車服務冷卻",
+	["SY_TOW_MISSION_BRING_VEH"] = "帶上任務目標",
+	["GENERIC_TIME"] = "時間",
+	["SY_TOW_MISSION_BRING_VEH_TT"] = "將牽引任務目標車輛傳送到您身邊並嘗試將其連接到牽引鉤上",
+	["SY_TOW_VEH_NOT_FOUND_ERR"] = "未能找到目標車輛。",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "未能找到任務目標。",
+	["SY_NOT_IN_TOWTRUCK_ERR"] = "你不是坐在拖車裡。",
+	["YRV3_SCRIPT_HOST_ERR"] = "無法完成銷售任務！您不是該腳本的主持人。",
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "無法控制腳本線程！"
 }

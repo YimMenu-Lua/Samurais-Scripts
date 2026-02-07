@@ -604,5 +604,15 @@ return {
 	["GENERIC_UNMUTE"] = "음소거 해제",
 	["YRV3_CASH_LOOP"] = "현금 루프",
 	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "승인을 취소하고 이 기능을 잠그려면 토글을 클릭하는 동안 [SHIFT]를 누르고 있을 수 있습니다.",
-	["YRV3_CASH_LOOP_WARN_ACK"] = "이 기능은 안전하지 않으며 남용할 경우 계정이 정지될 수 있습니다.\n\n이 기능을 활성화하려면 사용자 책임하에 '확인'을 누르고, 돌아가려면 '취소'를 누르세요. 토글을 클릭하는 동안 [SHIFT]를 눌러 나중에 언제든지 이 승인을 취소할 수 있습니다."
+	["YRV3_CASH_LOOP_WARN_ACK"] = "이 기능은 안전하지 않으며 남용할 경우 계정이 정지될 수 있습니다.\n\n이 경고를 확인하고 위험을 감수하려면 '확인'을 누르고, 돌아가려면 '취소'를 누르세요. 토글을 클릭하는 동안 [SHIFT]를 눌러 나중에 언제든지 이 승인을 취소할 수 있습니다.",
+	["GENERIC_TIME"] = "시간",
+	["SY_DISABLE_TOWING_COOLDOWN"] = "견인 서비스 쿨다운 비활성화",
+	["SY_NOT_IN_TOWTRUCK_ERR"] = "당신은 견인 트럭에 앉아 있지 않습니다.",
+	["SY_TOW_MISSION_BRING_VEH_TT"] = "견인 임무 대상 차량을 자신에게 순간이동시켜 견인 고리에 부착하려고 시도합니다.",
+	["SY_TOW_MISSION_BRING_VEH"] = "미션 타겟 가져오기",
+	["GENERIC_TIME_LEFT"] = "남은 시간",
+	["YRV3_SCRIPT_HOST_ERR"] = "판매 임무를 완료할 수 없습니다! 귀하는 이 스크립트의 호스트가 아닙니다.",
+	["SY_TOW_VEH_NOT_FOUND_ERR"] = "대상 차량을 찾지 못했습니다.",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "미션 목표를 찾지 못했습니다.",
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "스크립트 스레드를 제어하지 못했습니다!"
 }

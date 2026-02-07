@@ -43,7 +43,7 @@ eInternalThreadState = {
 ---@field private m_can_run boolean
 ---@field private m_should_pause boolean
 ---@field private m_state eThreadState
----@field private m_time_created Time.TimePoint
+---@field private m_time_created TimePoint
 ---@field private m_time_started seconds
 ---@field private m_last_entry_at seconds
 ---@field private m_last_exit_at seconds
@@ -94,7 +94,7 @@ end
 
 ---@return milliseconds
 function Thread:GetTimeCreated()
-	return self.m_time_created.value
+	return self.m_time_created:value()
 end
 
 ---@return seconds

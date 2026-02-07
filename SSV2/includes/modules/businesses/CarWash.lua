@@ -26,6 +26,7 @@ end
 
 ---@class CarWashDuffleOpts
 ---@class CarWashDuffle : CashSafe
+---@field private m_max_cash integer
 local CarWashDuffle   = setmetatable({}, CashSafe)
 CarWashDuffle.__index = CarWashDuffle
 
@@ -35,6 +36,10 @@ function CarWashDuffle.new(opts)
 	local base = CashSafe.new(opts)
 	---@diagnostic disable-next-line
 	return setmetatable(base, CarWashDuffle)
+end
+
+function CarWashDuffle:IsFull()
+	return self:GetDuffleValue() >= self:GetCapacity()
 end
 
 ---@return integer
@@ -155,7 +160,7 @@ function CarWash.new(opts)
 		name            = opts.name,
 		cash_value_stat = "MPX_CAR_WASH_DUFFEL_VALUE",
 		get_max_cash    = function()
-			return tunables.get_int("TYCOON_CAR_WASH_SAFE_MAX_STORAGE_AMOUNT")
+			return tunables.get_int(564305888) -- 1M
 		end,
 	})
 

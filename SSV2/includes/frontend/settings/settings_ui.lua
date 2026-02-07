@@ -96,9 +96,9 @@ local function drawGeneralSettings()
 				ImGui.Separator()
 				ImGui.Spacing()
 				if ImGui.Button(_T("GENERIC_RESET")) then
-					ImGui.OpenPopup("##confirm_cfg_reset")
+					ImGui.OpenPopup(_T("GENERIC_RESET"))
 				end
-				if GUI:ConfirmPopup("##confirm_cfg_reset") then
+				if ImGui.DialogBox(_T("GENERIC_RESET")) then
 					Serializer:Reset(cfgReset.exceptions)
 					onConfigReset()
 				end
@@ -128,7 +128,7 @@ local function drawThemeSettings()
 			ImGui.BeginChild(
 				"##new_theme_scroll_region",
 				GVars.ui.window_size.x * 0.65,
-				GVars.ui.window_size.x * 0.8
+				GPointers.ScreenResolution.y * 0.75
 			)
 
 			themeEditor.liveEdit, _ = GUI:CustomToggle(
@@ -152,7 +152,7 @@ local function drawThemeSettings()
 			Backend.disable_input = ImGui.IsItemActive()
 
 			ImGui.Spacing()
-			ImGui.SeparatorText(_T("SETTINGS_NEW_THEME_COLORS"))
+			GUI:HeaderText(_T("SETTINGS_NEW_THEME_COLORS"), { separator = true })
 			ImGui.BeginChild(
 				"##colors",
 				0,
@@ -169,7 +169,8 @@ local function drawThemeSettings()
 			end
 			ImGui.EndChild()
 
-			ImGui.SeparatorText(_T("SETTINGS_NEW_THEME_STYLE"))
+			ImGui.Spacing()
+			GUI:HeaderText(_T("SETTINGS_NEW_THEME_STYLE"), { separator = true })
 			ImGui.BeginChild(
 				"##style",
 				0,
@@ -192,8 +193,8 @@ local function drawThemeSettings()
 			ImGui.EndChild()
 
 			ImGui.Spacing()
-			local btnLabel = _T("GENERIC_SAVE")
-			local btnWidth = ImGui.CalcTextSize(btnLabel) + 10 + (ImGui.GetStyle().FramePadding.x * 2)
+			local btnLabel    = _T("GENERIC_SAVE")
+			local btnWidth    = ImGui.CalcTextSize(btnLabel) + 10 + (ImGui.GetStyle().FramePadding.x * 2)
 			local disableCond = not string.isvalid(newThemeBuff.Name)
 			ImGui.BeginDisabled(disableCond)
 			if (GUI:Button(_T("GENERIC_SAVE"), { size = vec2:new(btnWidth, 35) })) then
@@ -251,12 +252,15 @@ local function drawThemeSettings()
 end
 
 local function drawGuiSettings()
-	ImGui.SeparatorText(_T("GENERIC_GENERAL_LABEL"))
+	ImGui.Spacing()
+	GUI:HeaderText(_T("GENERIC_GENERAL_LABEL"), { separator = true })
 
 	GVars.ui.disable_tooltips       = GUI:CustomToggle(_T("SETTINGS_TOOLTIPS"), GVars.ui.disable_tooltips)
 	GVars.ui.disable_sound_feedback = GUI:CustomToggle(_T("SETTINGS_UI_SOUND"), GVars.ui.disable_sound_feedback)
 
-	ImGui.SeparatorText(_T("SETTINGS_WINDOW_GEOMETRY"))
+	ImGui.Spacing()
+	GUI:HeaderText(_T("SETTINGS_WINDOW_GEOMETRY"), { separator = true })
+
 	GVars.ui.moveable, _ = GUI:CustomToggle(_T("SETTINGS_WINDOW_MOVEABLE"), GVars.ui.moveable,
 		{ tooltip = _T("SETTINGS_WINDOW_MOVEABLE_TT") })
 
@@ -352,7 +356,8 @@ local function drawGuiSettings()
 	GUI:Tooltip(_T("SETTINGS_WINDOW_POS_TT"))
 	ImGui.EndDisabled()
 
-	ImGui.SeparatorText(_T("SETTINGS_WINDOW_STYLE"))
+	ImGui.Spacing()
+	GUI:HeaderText(_T("SETTINGS_WINDOW_STYLE"), { separator = true })
 
 	GVars.ui.style.bg_alpha, _ = ImGui.SliderFloat(_T("SETTINGS_WINDOW_ALPHA"), GVars.ui.style.bg_alpha, 0.01, 1.0)
 	ImGui.SameLine()

@@ -9,6 +9,7 @@
 
 ---@enum eSerializerState
 local eSerializerState <const> = {
+	INIT      = -1,
 	IDLE      = 0,
 	FLUSHING  = 1,
 	SUSPENDED = 2,
@@ -44,7 +45,7 @@ local eSerializerState <const> = {
 ---@field private m_parsing_options { pretty: boolean, indent: string, strict_parsing: boolean }
 ---@field private m_state eSerializerState
 ---@field private m_xor_key string
----@field private m_last_write_time Time.TimePoint
+---@field private m_last_write_time TimePoint
 ---@field public class_types table<string, { serializer:fun(), constructor:fun() }>
 ---@overload fun(scrname?: string, default_config?: table, runtime_vars?: table, varargs?: SerializerOptionals): Serializer
 local Serializer = Class("Serializer")
@@ -86,7 +87,7 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 	self.m_default_config  = default_config or { __version = Backend and Backend.__version or self.__version }
 	self.m_file_name       = _F("%s.json", script_name:lower():gsub("%s+", "_"))
 	self.m_xor_key         = varargs.encryption_key or self.default_xor_key
-	self.m_state           = eSerializerState.IDLE
+	self.m_state           = eSerializerState.INIT
 	self.m_dirty           = false
 	self.m_locked          = false
 	self.m_disabled        = false
@@ -165,7 +166,7 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 		runtime_vars[key] = saved_value
 	end
 
-	local ignored_set = Set.new("__schema_hash", "__dev_reset", "__version")
+	local ignored_set  = Set.new("__schema_hash", "__dev_reset", "__version")
 	self.__schema_hash = joaat(table.snapshot(self.m_default_config, { ignored_keys = ignored_set }))
 	self:SyncKeys()
 	self.m_last_write_time = TimePoint.new()
@@ -179,6 +180,7 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 	end)
 
 	self.m_initialized = true
+	self.m_state       = eSerializerState.IDLE
 	return self
 end
 
@@ -291,7 +293,7 @@ end
 
 ---@return milliseconds
 function Serializer:GetLastWriteTime()
-	return self.m_last_write_time and self.m_last_write_time.value or 0
+	return self.m_last_write_time and self.m_last_write_time:value() or 0
 end
 
 ---@return milliseconds
@@ -805,6 +807,17 @@ function Serializer:FlushObjectQueue()
 end
 
 function Serializer:Flush()
+	-- Welp. We need atomic writes. My config got corrupted because of a power outage.
+	-- Since th os library doesn't have rename, we can write to a secondary file and check if the write was
+	-- successful and the file is readable then write the actual config file. If main gets corrupted, read temp and overwrite
+	-- but that's a horrible way to do it: double read/write calls and an unnecessary file just sitting in the config folder.
+	--
+	-- TODO: contribute a refactored os lib sandbox to YimMenu
+	-- that has os.rename. Must group config files in a subfolder tied to the module
+	-- otherwise Lua devs would be able to rename other devs' config files (we already can read/write them which is bad enough)
+	-- and if the dev is a troll, that's a problem.
+	-- Once that's done, regactor this to write to a temp file then swap.
+
 	if (self:IsDisabled()) then
 		return
 	end

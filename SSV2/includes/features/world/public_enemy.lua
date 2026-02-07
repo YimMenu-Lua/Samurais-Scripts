@@ -10,8 +10,8 @@
 local FeatureBase                  = require("includes.modules.FeatureBase")
 
 ---@class PublicEnemy : FeatureBase
----@field private m_last_scan_time Time.TimePoint
----@field private m_last_task_time Time.TimePoint
+---@field private m_last_scan_time TimePoint
+---@field private m_last_task_time TimePoint
 ---@field private m_hostile_peds Set<handle>
 ---@field private m_hostile_count number
 ---@field private m_last_hostile_count number

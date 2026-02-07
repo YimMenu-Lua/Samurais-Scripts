@@ -17,6 +17,7 @@ local Katana       = require("includes.features.self.katana")
 local CPed         = require("includes.classes.gta.CPed")
 local YimActions   = require("includes.features.YimActionsV3")
 
+
 --------------------------------------
 -- Class: Self
 --------------------------------------
@@ -32,20 +33,17 @@ local YimActions   = require("includes.features.YimActionsV3")
 ---@field public CurrentStrafeClipset? string
 ---@field public CurrentWeaponMovementClipset? string
 ---@overload fun(): Self
-Self               = Class("Self", Player)
-Self.m_vehicle     = require("includes.modules.PlayerVehicle")
-Self.m_feat_mgr    = FeatureMgr.new(Self)
+Self            = Class("Self", Player)
+Self.m_vehicle  = require("includes.modules.PlayerVehicle")
+Self.m_feat_mgr = FeatureMgr.new(Self)
 
----@diagnostic disable-next-line
+---@diagnostic disable
 Self.m_feat_mgr:Add(miscFeatures.new(Self))
----@diagnostic disable-next-line
 Self.m_feat_mgr:Add(Ragdoll.new(Self))
----@diagnostic disable-next-line
 Self.m_feat_mgr:Add(MagicBullet.new(Self))
----@diagnostic disable-next-line
 Self.m_feat_mgr:Add(LaserSights.new(Self))
----@diagnostic disable-next-line
 Self.m_feat_mgr:Add(Katana.new(Self))
+---@diagnostic enable
 
 ---@override
 Self.new = nil
@@ -243,6 +241,17 @@ function Self:Teleport(where, keep_vehicle)
 		TaskWait(Game.LoadGroundAtCoord, { coords }, 500)
 		PED.SET_PED_COORDS_KEEP_VEHICLE(self:GetHandle(), coords.x, coords.y, coords.z)
 	end)
+end
+
+---@param scriptName string
+---@return boolean
+function Self:IsHostOfScript(scriptName)
+	local pid = self:GetPlayerID()
+	return (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, -1, 0) == pid)
+		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 0, 0) == pid)
+		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 1, 0) == pid)
+		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 2, 0) == pid)
+		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 3, 0) == pid)
 end
 
 -- Returns whether the player is currently using any mobile or computer app.

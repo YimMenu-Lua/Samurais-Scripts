@@ -603,6 +603,16 @@ return {
 	["GENERIC_UNMUTE"] = "Riattiva",
 	["GENERIC_MUTE"] = "Muto",
 	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "È possibile tenere premuto [MAIUSC] mentre si fa clic sull'interruttore per revocare il riconoscimento e bloccare questa funzione.",
-	["YRV3_CASH_LOOP_WARN_ACK"] = "Questa funzionalità non è sicura e potrebbe comportare la sospensione dell'account in caso di abuso.\n\nPremi \"Conferma\" per attivarla a tuo rischio o pericolo oppure \"Annulla\" per tornare indietro. È possibile revocare questo riconoscimento in qualsiasi momento tenendo premuto [SHIFT] mentre si fa clic sull'interruttore.",
-	["YRV3_CASH_LOOP"] = "Ciclo di contanti"
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Questa funzionalità non è sicura e potrebbe comportare la sospensione dell'account in caso di abuso.\n\nPremi \"Conferma\" per riconoscere questo avviso e accettare il rischio oppure \"Annulla\" per tornare indietro. È possibile revocare questo riconoscimento in qualsiasi momento tenendo premuto [SHIFT] mentre si fa clic sull'interruttore.",
+	["YRV3_CASH_LOOP"] = "Ciclo di contanti",
+	["GENERIC_TIME"] = "Tempo",
+	["SY_TOW_MISSION_BRING_VEH_TT"] = "Teletrasporta verso di te il veicolo bersaglio della missione di traino e tenta di agganciarlo al gancio di traino",
+	["SY_TOW_MISSION_BRING_VEH"] = "Porta l'obiettivo della missione",
+	["GENERIC_TIME_LEFT"] = "Tempo rimasto",
+	["SY_NOT_IN_TOWTRUCK_ERR"] = "Non sei seduto nel carro attrezzi.",
+	["SY_DISABLE_TOWING_COOLDOWN"] = "Disabilita il tempo di recupero del servizio di traino",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "Impossibile trovare l'obiettivo della missione.",
+	["YRV3_SCRIPT_HOST_ERR"] = "Impossibile completare la missione di vendita! Non sei l'host di questo script.",
+	["SY_TOW_VEH_NOT_FOUND_ERR"] = "Impossibile trovare il veicolo di destinazione.",
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Impossibile assumere il controllo del thread dello script!"
 }

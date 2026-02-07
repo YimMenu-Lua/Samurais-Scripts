@@ -604,5 +604,15 @@ return {
 	["GENERIC_UNMUTE"] = "Wyłącz wyciszenie",
 	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "Możesz przytrzymać [SHIFT] podczas klikania przełącznika, aby odwołać potwierdzenie i zablokować tę funkcję.",
 	["YRV3_CASH_LOOP"] = "Pętla gotówkowa",
-	["YRV3_CASH_LOOP_WARN_ACK"] = "Ta funkcja jest niebezpieczna i może skutkować zawieszeniem konta w przypadku nadużycia.\n\nNaciśnij „Potwierdź”, aby włączyć ją na własne ryzyko, lub „Anuluj”, aby wrócić. Możesz później odwołać to potwierdzenie, przytrzymując [SHIFT] podczas klikania przełącznika."
+	["YRV3_CASH_LOOP_WARN_ACK"] = "Ta funkcja jest niebezpieczna i może skutkować zawieszeniem konta w przypadku nadużycia.\n\nNaciśnij „Potwierdź”, aby potwierdzić to ostrzeżenie i zaakceptować ryzyko, lub „Anuluj”, aby wrócić. Możesz później odwołać to potwierdzenie, przytrzymując [SHIFT] podczas klikania przełącznika.",
+	["GENERIC_TIME"] = "Czas",
+	["SY_DISABLE_TOWING_COOLDOWN"] = "Wyłącz czas odnowienia usługi holowania",
+	["SY_TOW_MISSION_BRING_VEH_TT"] = "Teleportuje do ciebie docelowy pojazd misji holowniczej i próbuje przymocować go do haka holowniczego",
+	["GENERIC_TIME_LEFT"] = "Pozostał czas",
+	["SY_TOW_MISSION_BRING_VEH"] = "Przynieś cel misji",
+	["SY_NOT_IN_TOWTRUCK_ERR"] = "Nie siedzisz w lawecie.",
+	["SY_TOW_VEH_NOT_FOUND_ERR"] = "Nie udało się znaleźć pojazdu docelowego.",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "Nie udało się znaleźć celu misji.",
+	["YRV3_SCRIPT_HOST_ERR"] = "Nie można ukończyć misji sprzedaży! Nie jesteś gospodarzem tego skryptu.",
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Nie udało się przejąć kontroli nad wątkiem skryptu!"
 }

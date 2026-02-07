@@ -112,7 +112,7 @@ function CasinoPacino:GetCardNameFromIndex(card_index)
 end
 
 function CasinoPacino:ForceDealerBust()
-	script.run_in_fiber(function(script)
+	ThreadManager:Run(function(s)
 		local player_id                    = Self:GetPlayerID()
 		local bjc_obj                      = SGSL:Get(SGSL.data.blackjack_cards)
 		local btp_obj                      = SGSL:Get(SGSL.data.blackjack_table_players)
@@ -130,16 +130,22 @@ function CasinoPacino:ForceDealerBust()
 			return
 		end
 
-		while (
-				(NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", -1, 0) ~= player_id)
-				and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 0, 0) ~= player_id)
-				and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 1, 0) ~= player_id)
-				and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 2, 0) ~= player_id)
-				and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("blackjack", 3, 0) ~= player_id)
-			) do
+		local giveupTimer = Timer.new(3e4)
+		local success     = true
+		Notifier:ShowMessage("Casino Pacino", _T("CP_BLACKJACK_SCRIPT_CONTROL"))
+		while (not Self:IsHostOfScript("blackjack")) do
+			if (giveupTimer:is_done()) then
+				success = false
+				break
+			end
+
 			network.force_script_host("blackjack")
-			Notifier:ShowMessage("CasinoPacino", _T("CP_BLACKJACK_SCRIPT_CONTROL")) --If you see this spammed, someone is fighting you for control.
-			script:yield()
+			s:yield()
+		end
+
+		if (not success) then
+			Notifier:ShowError("Casino Pacino", _T("GENERIC_SCRIPT_CTRL_FAIL"))
+			return
 		end
 
 		local blackjack_table = locals.get_int("blackjack",

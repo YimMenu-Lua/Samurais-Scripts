@@ -604,5 +604,15 @@ return {
 	["GENERIC_UNMUTE"] = "取消静音",
 	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "您可以在按住 [SHIFT] 的同时单击切换按钮来撤销确认并锁定此功能。",
 	["YRV3_CASH_LOOP"] = "现金循环",
-	["YRV3_CASH_LOOP_WARN_ACK"] = "此功能不安全，如果滥用，可能会导致帐户被暂停。\n\n按“确认”启用该功能，风险由您自行承担，或按“取消”返回。您可以在以后随时通过按住 [SHIFT] 并单击切换按钮来撤销此确认。"
+	["YRV3_CASH_LOOP_WARN_ACK"] = "此功能不安全，如果滥用，可能会导致帐户被暂停。\n\n按“确认”确认此警告并接受风险，或按“取消”返回。您可以在以后随时通过按住 [SHIFT] 并单击切换按钮来撤销此确认。",
+	["GENERIC_TIME"] = "时间",
+	["GENERIC_TIME_LEFT"] = "剩余时间",
+	["SY_DISABLE_TOWING_COOLDOWN"] = "禁用拖车服务冷却",
+	["SY_TOW_MISSION_BRING_VEH"] = "带上任务目标",
+	["SY_TOW_MISSION_BRING_VEH_TT"] = "将牵引任务目标车辆传送到您身边并尝试将其连接到牵引钩上",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "未能找到任务目标。",
+	["SY_NOT_IN_TOWTRUCK_ERR"] = "你不是坐在拖车里。",
+	["SY_TOW_VEH_NOT_FOUND_ERR"] = "未能找到目标车辆。",
+	["YRV3_SCRIPT_HOST_ERR"] = "无法完成销售任务！您不是该脚本的主持人。",
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "无法控制脚本线程！"
 }

@@ -602,7 +602,17 @@ return {
 	["GENERIC_MUTE"] = "ミュート",
 	["GENERIC_UNMUTE"] = "ミュートを解除する",
 	["GENERIC_CLEAR_ALL"] = "すべてクリア",
-	["YRV3_CASH_LOOP_WARN_ACK"] = "この機能は安全ではなく、悪用されるとアカウントが停止される可能性があります。\n\nご自身の責任で有効にするには [確認] を押し、元に戻すには [キャンセル] を押してください。 [SHIFT] キーを押しながらトグルをクリックすると、後でいつでもこの承認を取り消すことができます。",
+	["YRV3_CASH_LOOP_WARN_ACK"] = "この機能は安全ではなく、悪用されるとアカウントが停止される可能性があります。\n\nこの警告を承認してリスクを受け入れるには [確認] を押し、元に戻るには [キャンセル] を押してください。 [SHIFT] キーを押しながらトグルをクリックすると、後でいつでもこの承認を取り消すことができます。",
 	["YRV3_CASH_LOOP_ACK_DISABLE_TT"] = "[SHIFT] を押したままトグルをクリックすると、確認を取り消し、この機能をロックできます。",
-	["YRV3_CASH_LOOP"] = "キャッシュループ"
+	["YRV3_CASH_LOOP"] = "キャッシュループ",
+	["GENERIC_TIME"] = "時間",
+	["GENERIC_TIME_LEFT"] = "残り時間",
+	["SY_DISABLE_TOWING_COOLDOWN"] = "牽引サービスのクールダウンを無効にする",
+	["SY_TOW_MISSION_BRING_VEH_TT"] = "牽引ミッションのターゲット車両をテレポートし、牽引フックに取り付けようとします",
+	["SY_TOW_MISSION_BRING_VEH"] = "ミッションターゲットを連れてくる",
+	["SY_TOW_VEH_NOT_FOUND_ERR"] = "目的の車両が見つかりませんでした。",
+	["SY_NOT_IN_TOWTRUCK_ERR"] = "あなたはレッカー車に座っていません。",
+	["YRV3_SCRIPT_HOST_ERR"] = "セールミッションを完了できません!あなたはこのスクリプトのホストではありません。",
+	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "ミッション目標を見つけることができませんでした。",
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "スクリプト スレッドの制御を取得できませんでした。"
 }

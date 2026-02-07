@@ -237,7 +237,7 @@ def main(auto: bool = True):
         return
     
     data = serialize_lua(offsets_table)
-    with open(table_path, "w", encoding="utf-8") as f:
+    with open(table_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(SS_NOTICE)
         f.write("return ")
         f.write(data)

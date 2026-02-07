@@ -120,7 +120,7 @@ def serialize_lua(v, indent=0) -> str:
 
 
 def write_lua_table(lua_path, data):
-    with open(lua_path, "w", encoding="utf-8") as f:
+    with open(lua_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(gen_file_header())
         f.write("return ")
         f.write(serialize_lua(data))
