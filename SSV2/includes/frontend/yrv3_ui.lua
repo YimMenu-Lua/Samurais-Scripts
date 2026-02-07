@@ -608,6 +608,8 @@ local function drawNightclub()
 		)
 
 		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + 40) * 0.5)
+		-- TODO: Fix glitchy behavior + session disconnect on Enhanced/YLAPI(?)
+		ImGui.BeginDisabled(Backend:GetAPIVersion() == Enums.eAPIVersion.V2)
 		ImGui.BeginDisabled(prod >= max_units)
 		this.fast_prod_enabled, _ = GUI:CustomToggle("##fast_prod", this.fast_prod_enabled)
 		ImGui.EndDisabled()
@@ -623,6 +625,7 @@ local function drawNightclub()
 		if (GUI:Button(btn_label, { size = vec2:new(65, 30) })) then
 			this:TriggerProduction()
 		end
+		ImGui.EndDisabled()
 		ImGui.EndDisabled()
 
 		ImGui.EndChild()
@@ -934,7 +937,7 @@ local function drawSalvageYard()
 				_F("##lift%d", i),
 				childWidth,
 				isTaken and 210 or 100,
-				false or ImGuiWindowFlags.NoScrollbar,
+				false or ImGuiChildFlags.AlwaysUseWindowPadding,
 				ImGuiWindowFlags.NoScrollbar
 				| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 			)
@@ -1049,7 +1052,7 @@ local function drawSalvageYard()
 				_F("##robbery%d", i),
 				childWidth,
 				isAvailable and 180 or 100,
-				false or ImGuiWindowFlags.NoScrollbar,
+				false or ImGuiChildFlags.AlwaysUseWindowPadding,
 				ImGuiWindowFlags.NoScrollbar
 				| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 			)
