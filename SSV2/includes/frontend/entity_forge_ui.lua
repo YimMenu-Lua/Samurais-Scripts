@@ -53,6 +53,7 @@ local spawnerSidebarItems        = {
 	[Enums.eEntityType.Object]  = "Objects",
 }
 
+local compatFlag = (Backend:GetAPIVersion() == Enums.eAPIVersion.V2) and ImGuiChildFlags.AlwaysUseWindowPadding or true
 
 local hoveredThisFrame
 local s_SelectedVehBone
@@ -374,7 +375,7 @@ local function DrawSpawnerSideBar()
 	ImGui.EndChild()
 end
 
-local function DrawSpanwerItems()
+local function DrawSpawnerItems()
 	if selectedSidebarItem == Enums.eEntityType.Object then
 		DrawObjects()
 	elseif selectedSidebarItem == Enums.eEntityType.Vehicle then
@@ -1471,8 +1472,8 @@ local function EntityForgeUI()
 		if ImGui.BeginTabItem("Spawner") then
 			DrawSpawnerSideBar()
 			ImGui.SameLine()
-			ImGui.BeginChild("##items", 0, GVars.ui.window_size.y * 0.7, true)
-			DrawSpanwerItems()
+			ImGui.BeginChild("##items", 0, GVars.ui.window_size.y * 0.7, compatFlag)
+			DrawSpawnerItems()
 			ImGui.Spacing()
 			if selectedSidebarItem == Enums.eEntityType.Vehicle and not vehicleListCreated then
 				ImGui.Text(ImGui.TextSpinner("Loading vehicle list", 8.0, ImGuiSpinnerStyle.FILL))
