@@ -451,12 +451,15 @@ local function DrawBodyguards()
 			s_CurrentTab = "Spawned Bodyguards"
 			t_MainUIfooter[s_CurrentTab] = SpawnedBodyguardsFooter
 
-			if next(BS.Bodyguards) == nil then
-				ImGui.Text("You haven't spawned any bodyguards.")
-				return
-			end
-
 			if ImGui.BeginListBox("##guardlist", -1, -1) then
+				if next(BS.Bodyguards) == nil then
+					ImGui.Text("You haven't spawned any bodyguards.")
+					ImGui.EndListBox()
+					ImGui.EndTabItem()
+					ImGui.EndTabBar()
+					return
+				end
+
 				for i, guard in pairs(BS.Bodyguards) do
 					local is_selected = (i_SpawnedBodyguardIndex == i)
 
@@ -560,6 +563,8 @@ local function DrawEscorts()
 
 			if next(BS.EscortGroups) == nil then
 				ImGui.Text("You haven't spawned any escort groups.")
+				ImGui.EndTabItem()
+				ImGui.EndTabBar()
 				return
 			end
 

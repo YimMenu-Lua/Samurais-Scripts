@@ -205,7 +205,7 @@ return {
 	["SY_CD_NONE"]                         = "No Cooldown",
 	["SY_CD_ACTIVE"]                       = "Cooldown Active",
 	["SY_CD_DISABLED"]                     = "Cooldown Disabled",
-	["SY_PREP_SKIP"]                       = "Skiping Preparations...",
+	["SY_PREP_SKIP"]                       = "Skipping Preparations...",
 	["SY_INSTANT_SALVAGE"]                 = "Salvage Now",
 	["SY_ROB_AVAILABLE"]                   = "Available.",
 	["SY_ROB_IN_PROGRESS"]                 = "In-Progress.",

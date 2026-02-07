@@ -158,7 +158,7 @@ local function drawThemeSettings()
 				0,
 				ImGui.GetWindowHeight() * 0.34,
 				true,
-				ImGuiWindowFlags.AlwaysUseWindowPadding
+				(ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 			)
 
 			ImGui.ColorEditVec4("Custom Accent", newThemeBuff.SSAccent)
@@ -176,7 +176,7 @@ local function drawThemeSettings()
 				0,
 				ImGui.GetWindowHeight() * 0.34,
 				true,
-				ImGuiWindowFlags.AlwaysUseWindowPadding
+				(ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 			)
 			for k, v in pairs(newThemeBuff.Styles) do
 				if (type(v) == "number") then

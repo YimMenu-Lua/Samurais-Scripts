@@ -1403,14 +1403,17 @@ local function YAV3UI()
 			ImGui.EndTabItem()
 		end
 
-		if ImGui.BeginTabItem("Companions") then
-			s_CurrentTab = "main_companions"
-			DrawCompanions()
+		-- TODO: Fix this from completely breaking everything on Enhanced
+		if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
+			if ImGui.BeginTabItem("Companions") then
+				s_CurrentTab = "main_companions"
+				DrawCompanions()
 
-			if hwnd_PedSpawnWindow.should_draw then
-				DrawPedSpawnWindow()
+				if hwnd_PedSpawnWindow.should_draw then
+					DrawPedSpawnWindow()
+				end
+				ImGui.EndTabItem()
 			end
-			ImGui.EndTabItem()
 		end
 
 		if Backend.debug_mode then
