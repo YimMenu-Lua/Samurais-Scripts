@@ -30,12 +30,12 @@ local weapons_map = {
 local function populate_weapons()
 	for hash, data in pairs(weaponData) do
 		data.display_name = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(data.gxt)
-		local group = data.group
-		if (not weapons_map[group]) then
+		local group       = data.group
+		local cat         = weapons_map[group]
+		if (not cat) then
 			goto continue
 		end
 
-		local cat = weapons_map[group]
 		table.insert(cat, hash)
 		table.insert(Weapons.All, hash)
 
