@@ -373,6 +373,11 @@ function Entity:SetCoordsNoOffset(coords, xAxis, yAxis, zAxis)
 	Game.SetEntityCoordsNoOffset(self:GetHandle(), coords, xAxis, yAxis, zAxis)
 end
 
+---@param heading number
+function Entity:SetHeading(heading)
+	Game.SetEntityHeading(self:GetHandle(), heading)
+end
+
 function Entity:Kill()
 	if not self:Exists() then
 		return

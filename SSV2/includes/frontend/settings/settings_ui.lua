@@ -153,12 +153,10 @@ local function drawThemeSettings()
 
 			ImGui.Spacing()
 			GUI:HeaderText(_T("SETTINGS_NEW_THEME_COLORS"), { separator = true })
-			ImGui.BeginChild(
+			ImGui.BeginChildEx(
 				"##colors",
-				0,
-				ImGui.GetWindowHeight() * 0.34,
-				true,
-				(ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
+				vec2:new(0, ImGui.GetWindowHeight() * 0.34),
+				ImGuiChildFlags.AlwaysUseWindowPadding
 			)
 
 			ImGui.ColorEditVec4("Custom Accent", newThemeBuff.SSAccent)
@@ -171,12 +169,10 @@ local function drawThemeSettings()
 
 			ImGui.Spacing()
 			GUI:HeaderText(_T("SETTINGS_NEW_THEME_STYLE"), { separator = true })
-			ImGui.BeginChild(
+			ImGui.BeginChildEx(
 				"##style",
-				0,
-				ImGui.GetWindowHeight() * 0.34,
-				true,
-				(ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
+				vec2:new(0, ImGui.GetWindowHeight() * 0.34),
+				ImGuiChildFlags.AlwaysUseWindowPadding
 			)
 			for k, v in pairs(newThemeBuff.Styles) do
 				if (type(v) == "number") then

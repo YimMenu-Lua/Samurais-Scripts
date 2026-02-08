@@ -99,7 +99,12 @@ local t_SelectedHeliPresetDest   = PrivateHeli.PresetDestinations[i_HeliPresetDe
 local unk_SelectedBodyguard
 
 local function CreatePedList()
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
+		-- this whole function is retarded
+		if (#t_CustomPedList > 0) then
+			return
+		end
+
 		for name, ped in pairs(t_GamePeds) do
 			local gender = ped.ped_gender
 			if (gender < 2) then
@@ -237,9 +242,9 @@ local function BodyguardSpawnFooter()
 		if t_WeaponList and #t_WeaponList > 0 then
 			ImGui.SameLine()
 
-			local wpn_name = weapons.get_weapon_display_name(t_WeaponList[i_WeaponIndex])
-			if ImGui.BeginCombo("Weapon", wpn_name) then
-				for i, wpn in ipairs(t_WeaponList) do
+			if ImGui.BeginCombo("Weapon", Game.GetWeaponDisplayName(t_WeaponList[i_WeaponIndex])) then
+				for i, wpn_hash in ipairs(t_WeaponList) do
+					local wpn_name = Game.GetWeaponDisplayName(wpn_hash)
 					local is_selected = (i_WeaponIndex == i)
 					if ImGui.Selectable(wpn_name, is_selected) then
 						i_WeaponIndex = i
@@ -247,7 +252,7 @@ local function BodyguardSpawnFooter()
 
 					if GUI:IsItemClicked(0) then
 						GUI:PlaySound("Nav")
-						i_SelectedBodyguardWeapon = wpn
+						i_SelectedBodyguardWeapon = wpn_hash
 					end
 
 					if is_selected then
@@ -383,12 +388,14 @@ local function DrawBodyguards()
 
 	if ImGui.BeginTabBar("bodyguards UI") then
 		if ImGui.BeginTabItem("Spawn") then
-			if #t_CustomPedList == 0 then
+			if (#t_CustomPedList == 0) then
 				CreatePedList()
+				ImGui.EndTabItem()
+				ImGui.EndTabBar()
 				return
 			end
 
-			s_CurrentTab = "Spawn Bodyguards"
+			s_CurrentTab                 = "Spawn Bodyguards"
 			t_MainUIfooter[s_CurrentTab] = BodyguardSpawnFooter
 
 			ImGui.SetNextItemWidth(-1)
@@ -485,20 +492,20 @@ local function DrawBodyguards()
 					if ImGui.BeginPopup(_F("bodyguard_options##%d", i)) then
 						if ImGui.MenuItem("Bring") then
 							GUI:PlaySound("Select")
-							script.run_in_fiber(function()
+							ThreadManager:Run(function()
 								guard:Bring(nil, true)
 							end)
 						end
 
 						if ImGui.MenuItem("Warp Into Vehicle") then
-							script.run_in_fiber(function()
+							ThreadManager:Run(function()
 								guard:WarpIntoPlayerVeh()
 							end)
 						end
 
 						if ImGui.MenuItem("Kill") then
 							GUI:PlaySound("Select")
-							script.run_in_fiber(function()
+							ThreadManager:Run(function()
 								ENTITY.SET_ENTITY_HEALTH(guard.m_handle, 0, 0, 0)
 							end)
 						end
@@ -523,7 +530,7 @@ local b_DSaggressive = false
 local function DrawEscorts()
 	if ImGui.BeginTabBar("escorts UI") then
 		if ImGui.BeginTabItem("Spawn##escorts") then
-			s_CurrentTab = "Spawn Escorts"
+			s_CurrentTab                 = "Spawn Escorts"
 			t_MainUIfooter[s_CurrentTab] = EscortGroupSpawnFooter
 
 			ImGui.SetNextItemWidth(-1)
@@ -573,8 +580,7 @@ local function DrawEscorts()
 					local isOpen = (unk_EscortGroupHeaderName == group.name)
 
 					if ImGui.Selectable(
-							_F(
-								"[%s] %s",
+							_F("[%s] %s",
 								isOpen and "-" or "+",
 								group.name
 							),
@@ -611,7 +617,7 @@ local function DrawEscorts()
 
 						if ImGui.Button(_F("Repair Vehicle##%s", group.name)) then
 							GUI:PlaySound("Select")
-							script.run_in_fiber(function()
+							ThreadManager:Run(function()
 								group:RepairGroupVehicle()
 							end)
 						end
@@ -651,14 +657,14 @@ local function DrawEscorts()
 
 							if ImGui.BeginPopup(_F("escort driving options##%s", group.name)) then
 								if ImGui.MenuItem(_F("Wander##%s", group.name)) then
-									script.run_in_fiber(function()
+									ThreadManager:Run(function()
 										group:Wander()
 									end)
 									ImGui.CloseCurrentPopup()
 								end
 
 								if ImGui.MenuItem(_F("To Waypoint##%s", group.name)) then
-									script.run_in_fiber(function()
+									ThreadManager:Run(function()
 										local v_Pos = Game.GetWaypointCoords()
 										if not v_Pos then
 											GUI:PlaySound("Error")
@@ -675,7 +681,7 @@ local function DrawEscorts()
 								end
 
 								if ImGui.MenuItem(_F("To Objective##%s", group.name)) then
-									script.run_in_fiber(function()
+									ThreadManager:Run(function()
 										local b_Found, v_Pos = Game.GetObjectiveBlipCoords()
 										if not b_Found then
 											GUI:PlaySound("Error")
@@ -693,7 +699,7 @@ local function DrawEscorts()
 
 								ImGui.BeginDisabled(group:IsIdle())
 								if ImGui.MenuItem(_F("Stop##%s", group.name)) then
-									script.run_in_fiber(function()
+									ThreadManager:Run(function()
 										group:StopTheVehicle()
 									end)
 									ImGui.CloseCurrentPopup()
@@ -800,7 +806,7 @@ local function SpawnedLimoFooter()
 
 	if Backend.debug_mode then
 		if ImGui.Button("Parse Vehicle Mods") then
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				local t = limo:GetMods()
 				local toPrint = {}
 
@@ -823,7 +829,7 @@ local function SpawnedLimoFooter()
 
 	if ImGui.Button("Repair", 100, 35) then
 		GUI:PlaySound("Select")
-		script.run_in_fiber(function()
+		ThreadManager:Run(function()
 			limo:Repair()
 		end)
 	end
@@ -915,7 +921,7 @@ local function DrawLimousineService()
 			ImGui.BeginDisabled(Self:GetVehicle():GetSpeed() <= 0.1 and limo:IsIdle())
 			if ImGui.Button("Stop The Limo", v_ButtonSize.x, v_ButtonSize.y) then
 				GUI:PlaySound("Select")
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					limo:Stop()
 				end)
 			end
@@ -924,7 +930,7 @@ local function DrawLimousineService()
 
 			if ImGui.Button("Emergency Stop", v_ButtonSize.x, v_ButtonSize.y) then
 				GUI:PlaySound("Select")
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					limo:EmergencyStop()
 				end)
 			end
@@ -932,7 +938,7 @@ local function DrawLimousineService()
 
 			if ImGui.Button("Drive To Waypoint", v_ButtonSize.x, v_ButtonSize.y) then
 				GUI:PlaySound("Select")
-				script.run_in_fiber(function(s)
+				ThreadManager:Run(function(s)
 					local v_Pos = Game.GetWaypointCoords()
 
 					if not v_Pos then
@@ -953,7 +959,7 @@ local function DrawLimousineService()
 
 			if ImGui.Button("Drive To Objective", v_ButtonSize.x, v_ButtonSize.y) then
 				GUI:PlaySound("Select")
-				script.run_in_fiber(function(s)
+				ThreadManager:Run(function(s)
 					local b_Found, v_Pos = Game.GetObjectiveBlipCoords()
 
 					if not b_Found then
@@ -972,7 +978,7 @@ local function DrawLimousineService()
 
 			if ImGui.Button("Wander", v_ButtonSize.x, v_ButtonSize.y) then
 				GUI:PlaySound("Select")
-				script.run_in_fiber(function(s)
+				ThreadManager:Run(function(s)
 					limo:Wander(s)
 				end)
 			end
@@ -1015,7 +1021,7 @@ local function DrawLimousineService()
 
 			if ImGui.Button(limo.radio.isOn and "Turn Off" or "Turn On") then
 				GUI:PlaySound("Click")
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					AUDIO.SET_VEH_RADIO_STATION(
 						limo:GetHandle(),
 						limo.radio.isOn
@@ -1123,7 +1129,7 @@ local function DrawHeliService()
 			ImGui.BeginDisabled(not heli.isFarAway)
 			if ImGui.Button("Bring", v_ButtonSize.x, v_ButtonSize.y) then
 				GUI:PlaySound("Select")
-				script.run_in_fiber(function(s)
+				ThreadManager:Run(function(s)
 					heli:Bring(s)
 				end)
 			end
@@ -1144,7 +1150,7 @@ local function DrawHeliService()
 			ImGui.BeginDisabled((heli.task == Enums.eVehicleTask.HOVER_IN_PLACE) or heli.altitude <= 3)
 			if ImGui.Button("Hover Here", v_ButtonSize.x, v_ButtonSize.y) then
 				GUI:PlaySound("Select")
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					heli:HoverInPlace()
 				end)
 			end
@@ -1154,14 +1160,14 @@ local function DrawHeliService()
 
 			ImGui.BeginDisabled(heli.altitude <= 3)
 			if ImGui.Button("Land Here", v_ButtonSize.x, v_ButtonSize.y) then
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					heli:LandHere()
 				end)
 			end
 			ImGui.EndDisabled()
 
 			if ImGui.Button("Fly To Waypoint", v_ButtonSize.x, v_ButtonSize.y) then
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					local v_Pos = Game.GetWaypointCoords()
 
 					if not v_Pos then
@@ -1181,7 +1187,7 @@ local function DrawHeliService()
 			ImGui.SameLine()
 
 			if ImGui.Button("Fly To Objective", v_ButtonSize.x, v_ButtonSize.y) then
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					local b_Found, v_Pos = Game.GetObjectiveBlipCoords()
 
 					if not b_Found then
@@ -1200,7 +1206,7 @@ local function DrawHeliService()
 
 			ImGui.BeginDisabled(heli.task ~= Enums.eVehicleTask.GOTO)
 			if ImGui.Button("Skip Trip", v_ButtonSize.x, v_ButtonSize.y) then
-				script.run_in_fiber(function(s)
+				ThreadManager:Run(function(s)
 					heli:SkipTrip(s)
 				end)
 			end
@@ -1213,7 +1219,7 @@ local function DrawHeliService()
 				ImGui.BeginDisabled((heli.task ~= Enums.eVehicleTask.HOVER_IN_PLACE) or (heli.altitude < 5) or
 					heli.isPlayerRappelling)
 				if ImGui.Button("Rappell Down", v_ButtonSize.x, v_ButtonSize.y) then
-					script.run_in_fiber(function()
+					ThreadManager:Run(function()
 						if Self:GetVehicleSeat() < 1 then
 							GUI:PlaySound("Error")
 							Notifier:ShowError(
@@ -1255,7 +1261,7 @@ local function DrawHeliService()
 			ImGui.BeginDisabled(not t_SelectedHeliPresetDest.second)
 			if ImGui.Button("Fly To") then
 				GUI:PlaySound("Select")
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					heli:FlyTo(t_SelectedHeliPresetDest.second, true)
 				end)
 			end
@@ -1282,7 +1288,7 @@ local function DrawHeliService()
 			ImGui.Spacing()
 
 			if ImGui.Button(heli.radio.isOn and "Turn Off" or "Turn On") then
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					AUDIO.SET_VEH_RADIO_STATION(
 						heli:GetHandle(),
 						heli.radio.isOn
@@ -1425,7 +1431,7 @@ local function DrawJetService()
 
 			ImGui.BeginDisabled(jet.task == Enums.eVehicleTask.TAKE_OFF)
 			if ImGui.Button("Fly To Waypoint", v_ButtonSize.x, v_ButtonSize.y) then
-				script.run_in_fiber(function(s)
+				ThreadManager:Run(function(s)
 					local v_Pos = Game.GetWaypointCoords()
 
 					if not v_Pos then
@@ -1445,7 +1451,7 @@ local function DrawJetService()
 			ImGui.SameLine()
 
 			if ImGui.Button("Fly To Objective", v_ButtonSize.x, v_ButtonSize.y) then
-				script.run_in_fiber(function(s)
+				ThreadManager:Run(function(s)
 					local b_Found, v_Pos = Game.GetObjectiveBlipCoords()
 
 					if not b_Found then
@@ -1458,7 +1464,7 @@ local function DrawJetService()
 					end
 
 					GUI:PlaySound("Select")
-					script.run_in_fiber(function()
+					ThreadManager:Run(function()
 						jet:FlyTo(v_Pos, s)
 					end)
 				end)
@@ -1468,7 +1474,7 @@ local function DrawJetService()
 			ImGui.BeginDisabled(jet.task ~= Enums.eVehicleTask.GOTO)
 			if ImGui.Button("Skip Trip", v_ButtonSize.x, v_ButtonSize.y) then
 				GUI:PlaySound("Select")
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					jet:SkipTrip()
 				end)
 			end
@@ -1479,7 +1485,7 @@ local function DrawJetService()
 			ImGui.BeginDisabled(jet.task ~= Enums.eVehicleTask.LAND)
 			if ImGui.Button("Skip Landing", v_ButtonSize.x, v_ButtonSize.y) then
 				GUI:PlaySound("Select")
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					jet:FinishLanding()
 				end)
 			end
@@ -1495,7 +1501,7 @@ local function DrawJetService()
 
 			ImGui.BeginDisabled(not unk_JetAirportData or not unk_JetAirportData.landingApproach)
 			if ImGui.Button(" Go ") then
-				script.run_in_fiber(function(s)
+				ThreadManager:Run(function(s)
 					if not unk_JetAirportData then
 						return
 					end
@@ -1547,7 +1553,7 @@ local function DrawJetService()
 			ImGui.Spacing()
 
 			if ImGui.Button(jet.radio.isOn and "Turn Off" or "Turn On") then
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					AUDIO.SET_VEH_RADIO_STATION(
 						jet:GetHandle(),
 						jet.radio.isOn
@@ -1595,10 +1601,10 @@ local t_BillionareSidebarItems <const> = {
 local function DrawSidebarItems()
 	local t_SelectedTab = t_BillionareSidebarItems[i_SelectedSidebarItem]
 
-	if t_SelectedTab and t_SelectedTab.callback then
+	if (t_SelectedTab and type(t_SelectedTab.callback) == "function") then
 		t_SelectedTab.callback()
 
-		if b_SearchBarUsed and t_SelectedTab.OnSearchBarUsed then
+		if (b_SearchBarUsed and t_SelectedTab.OnSearchBarUsed) then
 			t_SelectedTab.OnSearchBarUsed()
 		end
 	end
@@ -1651,7 +1657,10 @@ local function BSV2UI()
 	ImGui.BeginGroup()
 	DrawMainSidebar()
 	ImGui.SameLine()
-	ImGui.BeginChild("##main", 0, GVars.ui.window_size.y * 0.6, (Backend:GetAPIVersion() == Enums.eAPIVersion.V2) and ImGuiChildFlags.AlwaysUseWindowPadding or true)
+	ImGui.BeginChildEx("##main",
+		vec2:new(0, GVars.ui.window_size.y * 0.6),
+		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+	)
 	DrawSidebarItems()
 	ImGui.EndChild()
 	ImGui.EndGroup()

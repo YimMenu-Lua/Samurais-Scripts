@@ -18,8 +18,6 @@
 ---@field private m_coords vec3
 ---@field private m_generic_val_get_func fun(): anyval
 ---@field private m_generic_val_set_func function
----@field private m_legal_work_cooldown_stat string
----@field private m_illegal_work_cooldown_stat string
 ---@field protected m_is_stale boolean
 local BasicBusiness = {}
 BasicBusiness.__index = BasicBusiness
@@ -29,8 +27,8 @@ function BasicBusiness.new(opts)
 	return setmetatable({
 		m_name                 = opts.name,
 		m_coords               = opts.coords,
-		m_generic_val_get_func = opts.generic_val_get_func,
-		generic_val_set_func   = opts.generic_val_set_func,
+		m_generic_val_get_func = opts.generic_val_get_func or NOP,
+		generic_val_set_func   = opts.generic_val_set_func or NOP,
 		m_is_stale             = false,
 	}, BasicBusiness)
 end

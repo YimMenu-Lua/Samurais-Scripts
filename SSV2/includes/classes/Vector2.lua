@@ -247,7 +247,7 @@ function vec2:perpendicular()
 	return vec2:new(-self.y, self.x)
 end
 
--- Returns the angle between the x and y components of the vector.
+-- Returns the arc tangent of y/x in radians.
 ---@return number
 function vec2:angle()
 	return math.atan(self.y, self.x)

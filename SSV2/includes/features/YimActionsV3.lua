@@ -1168,7 +1168,10 @@ function YimActions.Debugger:Draw()
 		end
 
 		ImGui.BeginGroup()
-		ImGui.BeginChild("##debugProplist", 200, 200, true)
+		ImGui.BeginChildEx("##debugProplist",
+			vec2:new(200, 200),
+			ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+		)
 		ImGui.SeparatorText("Props")
 		for i = 1, #actor.props do
 			local is_selected = (self.i_PropIndex == i - 1)

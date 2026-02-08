@@ -29,7 +29,6 @@ local tabNames <const>         = {
 	"CELL_16"
 }
 
-local compatFlag = (Backend:GetAPIVersion() == Enums.eAPIVersion.V2) and ImGuiChildFlags.AlwaysUseWindowPadding or false
 
 local function getAllCDCheckboxes()
 	return GVars.features.yrv3.mc_work_cd
@@ -126,15 +125,12 @@ end
 ---@param bg? Color
 ---@param tpKeepVeh? boolean
 local function drawNamePlate(business, custom_name, bg, tpKeepVeh)
-	ImGui.BeginChild("##nameplate",
-		0,
-		130,
-		true,
+	ImGui.BeginChildEx("##nameplate",
+		vec2:new(0, 130),
+		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding,
 		ImGuiWindowFlags.NoScrollbar
-		| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 	)
 
-	ImGui.Spacing()
 	ImGui.SetWindowFontScale(1.18)
 	local custom_name_width = ImGui.CalcTextSize(custom_name)
 	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - custom_name_width - 10) * 0.5)
@@ -200,12 +196,10 @@ local function drawWarehouse(warehouse, notOwnedLabel)
 		_T("YRV3_VALUE_TOTAL"),
 	})
 
-	ImGui.BeginChild(name,
-		0,
-		240,
-		compatFlag,
+	ImGui.BeginChildEx(name,
+		vec2:new(0, 240),
+		ImGuiChildFlags.AlwaysUseWindowPadding,
 		ImGuiWindowFlags.NoScrollbar
-		| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 	)
 
 	ImGui.SeparatorText(name)
@@ -288,12 +282,10 @@ local function drawBikerBusiness(bb, notOwnedLabel)
 		_T("YRV3_VALUE_TOTAL"),
 	})
 
-	ImGui.BeginChild(_F("bb##%s", name),
-		0,
-		index < 6 and 330 or 300,
-		compatFlag,
+	ImGui.BeginChildEx(_F("bb##%s", name),
+		vec2:new(0, index < 6 and 330 or 300),
+		ImGuiChildFlags.AlwaysUseWindowPadding,
 		ImGuiWindowFlags.NoScrollbar
-		| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 	)
 
 	ImGui.SeparatorText(name or "NULL")
@@ -565,21 +557,18 @@ local function drawNightclub()
 	ImGui.Spacing()
 	ImGui.SeparatorText(_T("YRV3_BUSINESS_HUB"))
 
-	ImGui.Spacing()
 	ImGui.BulletText(_T("YRV3_VALUE_TOTAL"))
-
 	ImGui.SameLine()
 	GUI:Text(string.formatmoney(tempHubVal), { color = colMoneyGreen })
+	ImGui.Spacing()
 
 	for i = 1, hubsize do
 		ImGui.PushID(i)
 		ImGui.SetNextWindowBgAlpha(0.64)
-		ImGui.BeginChild("##hub_child",
-			90,
-			300,
-			compatFlag,
+		ImGui.BeginChildEx("##hub_child",
+			vec2:new(90, 300),
+			ImGuiChildFlags.AlwaysUseWindowPadding,
 			ImGuiWindowFlags.NoScrollbar
-			| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 		)
 
 		local this       = hubs[i]
@@ -611,7 +600,7 @@ local function drawNightclub()
 
 		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + 40) * 0.5)
 		-- TODO: Fix glitchy behavior + session disconnect on Enhanced/YLAPI(?)
-		ImGui.BeginDisabled(Backend:GetAPIVersion() == Enums.eAPIVersion.V2)
+		ImGui.BeginDisabled(Game.IsEnhanced())
 		ImGui.BeginDisabled(prod >= max_units)
 		this.fast_prod_enabled, _ = GUI:CustomToggle("##fast_prod", this.fast_prod_enabled)
 		ImGui.EndDisabled()
@@ -651,13 +640,12 @@ local function drawBusinessSafes()
 	for i, cashSafe in ipairs(safes) do
 		local name = cashSafe:GetName() or _F("Cash Safe %d", i)
 		ImGui.PushID(i)
-		ImGui.BeginChild(name,
-			0,
-			cashSafe:CanLoop() and 195 or 160,
-			compatFlag,
+		ImGui.BeginChildEx(name,
+			vec2:new(0, cashSafe:CanLoop() and 195 or 160),
+			ImGuiChildFlags.AlwaysUseWindowPadding,
 			ImGuiWindowFlags.NoScrollbar
-			| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 		)
+
 		local cashValue = cashSafe:GetCashValue()
 		local maxCash   = cashSafe:GetCapacity()
 		local coords    = cashSafe:GetCoords()
@@ -705,12 +693,10 @@ local function drawBasicBusiness(business, isParent, kvSpacing, clearHeatLabel)
 	local heat    = business:GetHeat()
 	local maxHeat = 100
 
-	ImGui.BeginChild(name,
-		0,
-		isParent and 385 or 280,
-		compatFlag,
-		(ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
-		| ImGuiWindowFlags.NoScrollbar
+	ImGui.BeginChildEx(name,
+		vec2:new(0, isParent and 385 or 280),
+		ImGuiChildFlags.AlwaysUseWindowPadding,
+		ImGuiWindowFlags.NoScrollbar
 	)
 
 	ImGui.SeparatorText(name)
@@ -935,13 +921,11 @@ local function drawSalvageYard()
 			local isTaken = salvage_yard:IsLiftTaken(i)
 			ImGui.SetNextWindowBgAlpha(0.64)
 			ImGui.BeginDisabled(not isTaken)
-			ImGui.BeginChild(
+			ImGui.BeginChildEx(
 				_F("##lift%d", i),
-				childWidth,
-				isTaken and 210 or 100,
-				compatFlag,
+				vec2:new(childWidth, isTaken and 210 or 100),
+				ImGuiChildFlags.AlwaysUseWindowPadding,
 				ImGuiWindowFlags.NoScrollbar
-				| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 			)
 			ImGui.SeparatorText(_F(_T("SY_LIFT"), i))
 			ImGui.Spacing()
@@ -1050,13 +1034,11 @@ local function drawSalvageYard()
 			local isAvailable = carName and not carName:isempty()
 			ImGui.SetNextWindowBgAlpha(0.64)
 			ImGui.BeginDisabled(not isAvailable)
-			ImGui.BeginChild(
+			ImGui.BeginChildEx(
 				_F("##robbery%d", i),
-				childWidth,
-				isAvailable and 180 or 100,
-				compatFlag,
+				vec2:new(childWidth, isAvailable and 180 or 100),
+				ImGuiChildFlags.AlwaysUseWindowPadding,
 				ImGuiWindowFlags.NoScrollbar
-				| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 			)
 
 			ImGui.SeparatorText(_F(_T("SY_VEH_SLOT"), i))
@@ -1369,7 +1351,7 @@ local function YRV3UI()
 	local sidebarWidth   = math.max(100.0, ImGui.GetWindowWidth() * 0.2)
 	local separatorWidth = 3.0
 
-	if (ImGui.BeginChild("##yrv3_header", 0, headerHeight, true, ImGuiWindowFlags.AlwaysUseWindowPadding or 0)) then
+	if (ImGui.BeginChildEx("##yrv3_header", vec2:new(0, headerHeight), ImGuiChildFlags.Borders)) then
 		local title     = _T("YRV3_MCT_TITLE")
 		local textWidth = ImGui.CalcTextSize(title) + (ImGui.GetStyle().FramePadding.x * 2)
 		ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - textWidth) * 0.5)
@@ -1394,10 +1376,10 @@ local function YRV3UI()
 
 	ImGui.Spacing()
 	ImGui.SetNextWindowBgAlpha(0)
-	ImGui.BeginChild("##yrv3_2", 0, windowHeight, false)
+	ImGui.BeginChild("##yrv3_2", 0, windowHeight)
 
 	ImGui.SetNextWindowBgAlpha(0)
-	ImGui.BeginChild("##yrv3_3", sidebarWidth, 0, false)
+	ImGui.BeginChild("##yrv3_3", sidebarWidth, 0)
 	for i = 1, #tabNames do
 		local name = tabNames[i]
 		if (ImGui.Selectable2(

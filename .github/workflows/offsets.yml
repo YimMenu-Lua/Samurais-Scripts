@@ -27,14 +27,14 @@ jobs:
       - name: Read Saved Commit Hashes
         id: saved_commits
         run: |
-          if [ -f scripts/offsets/legacy.last_commit_hash ]; then
-            cat scripts/offsets/legacy.last_commit_hash > last_commit_legacy
+          if [ -f dev/scripts/offsets/legacy.last_commit_hash ]; then
+            cat dev/scripts/offsets/legacy.last_commit_hash > last_commit_legacy
           else
             echo "none" > last_commit_legacy
           fi
 
-          if [ -f scripts/offsets/enhanced.last_commit_hash ]; then
-            cat scripts/offsets/enhanced.last_commit_hash > last_commit_enhanced
+          if [ -f dev/scripts/offsets/enhanced.last_commit_hash ]; then
+            cat dev/scripts/offsets/enhanced.last_commit_hash > last_commit_enhanced
           else
             echo "none" > last_commit_enhanced
           fi
@@ -67,21 +67,21 @@ jobs:
       - name: Run Offset Updater
         if: steps.compare_commits.outputs.run == 'true'
         run: |
-          python ./scripts/offsets/update_offsets.py
+          python ./dev/scripts/offsets/update_offsets.py
 
       - name: Save New Commit Hashes
         if: steps.compare_commits.outputs.run == 'true'
         run: |
-          cp legacy_upstream.txt ./scripts/offsets/legacy.last_commit_hash
-          cp enhanced_upstream.txt ./scripts/offsets/enhanced.last_commit_hash
+          cp legacy_upstream.txt ./dev/scripts/offsets/legacy.last_commit_hash
+          cp enhanced_upstream.txt ./dev/scripts/offsets/enhanced.last_commit_hash
 
       - name: Commit Changes
         if: steps.compare_commits.outputs.run == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add scripts/offsets/legacy.last_commit_hash
-          git add scripts/offsets/enhanced.last_commit_hash
+          git add dev/scripts/offsets/legacy.last_commit_hash
+          git add dev/scripts/offsets/enhanced.last_commit_hash
           git add SSV2/includes/data/globals_locals.lua
           git diff --cached --quiet || git commit -m "chore(offsets): update script globals & locals"
           git push

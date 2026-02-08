@@ -3,7 +3,7 @@ name: Generate Translations
 on:
   push:
     paths:
-      - "scripts/translations/**"
+      - "dev/scripts/translations/**"
       - "SSV2/includes/lib/translations/en-US.lua"
       - "SSV2/includes/lib/translations/__locales.lua"
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
 
     - name: Run Generator
       run: |
-        cd ./scripts/translations
+        cd ./dev/scripts/translations
         python generate_translations.py
 
     - name: Commit Changes

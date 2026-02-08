@@ -9,15 +9,15 @@
 
 local self_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_SELF, "Self")
 local katana_replace_weapons <const> = {
-	Pair.new(weapons.get_weapon_display_name(0x958A4A8F), 0x958A4A8F),
-	Pair.new(weapons.get_weapon_display_name(0x440E4788), 0x440E4788),
-	Pair.new(weapons.get_weapon_display_name(0xDD5DF8D9), 0xDD5DF8D9),
-	Pair.new(weapons.get_weapon_display_name(0x94117305), 0x94117305),
+	2508868239,
+	1141786504,
+	3713923289,
+	2484171525,
 }
 
 local function CheckIfRagdollBlocked()
 	ThreadManager:Run(function()
-		if (not PED.CAN_PED_RAGDOLL(Self:GetHandle())) then
+		if (Self:IsOnFoot() and not PED.CAN_PED_RAGDOLL(Self:GetHandle())) then
 			Notifier:ShowWarning(
 				"Samurais Scripts",
 				_T("SELF_RAGDOLL_BLOCK_INFO")
@@ -214,13 +214,17 @@ local function SelfUI()
 
 	if (GVars.features.weapon.katana.enabled) then
 		if (ImGui.BeginCombo(_T("SELF_KATANA_REPLACE_MODEL"), GVars.features.weapon.katana.name)) then
-			for _, pair in pairs(katana_replace_weapons) do
-				local is_selected = GVars.features.weapon.katana.model == pair.second
-				if (ImGui.Selectable(pair.first, is_selected)) then
-					GVars.features.weapon.katana.name = pair.first
-					GVars.features.weapon.katana.model = pair.second
+			for _, hash in ipairs(katana_replace_weapons) do
+				local is_selected = GVars.features.weapon.katana.model == hash
+				local name = Game.GetWeaponDisplayName(hash)
+				if (ImGui.Selectable(name, is_selected)) then
+					GVars.features.weapon.katana.name = name
+					GVars.features.weapon.katana.model = hash
+				end
+
+				if (ImGui.IsItemClicked(0)) then
 					ThreadManager:Run(function()
-						if (not Self:IsOnFoot() and Self:IsOutside()) then
+						if not (Self:IsOnFoot() and Self:IsOutside()) then
 							return
 						end
 
@@ -229,9 +233,9 @@ local function SelfUI()
 							WEAPON.SET_CURRENT_PED_WEAPON(handle, 0xA2719263, true)
 						end
 
-						if (WEAPON.HAS_PED_GOT_WEAPON(handle, pair.second, false)) then
+						if (WEAPON.HAS_PED_GOT_WEAPON(handle, hash, false)) then
 							sleep(300)
-							WEAPON.SET_CURRENT_PED_WEAPON(handle, pair.second, true)
+							WEAPON.SET_CURRENT_PED_WEAPON(handle, hash, true)
 						end
 					end)
 				end

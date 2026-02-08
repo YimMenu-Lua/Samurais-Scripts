@@ -149,7 +149,7 @@ function PreviewService:OnTick(hoveredModel, entityType)
 end
 
 function PreviewService:Clear()
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		if (self.m_current and ENTITY.DOES_ENTITY_EXIST(self.m_current)) then
 			Game.DeleteEntity(self.m_current)
 		end

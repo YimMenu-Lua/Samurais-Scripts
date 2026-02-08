@@ -143,7 +143,8 @@ local t_AnimFlags <const>        = {
 	},
 }
 
-local compatFlag = (Backend:GetAPIVersion() == Enums.eAPIVersion.V2) and ImGuiChildFlags.AlwaysUseWindowPadding or true
+local compatFlag                 = (Backend:GetAPIVersion() == Enums.eAPIVersion.V2) and
+	ImGuiChildFlags.AlwaysUseWindowPadding or true
 
 local function OnTabItemSwitch()
 	if (s_CurrentTab ~= s_PreviousTab) then
@@ -156,7 +157,7 @@ local function OnTabItemSwitch()
 end
 
 local function BuildDataLists()
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		table.sort(t_AnimList, function(a, b)
 			return a.label < b.label
 		end)
@@ -621,20 +622,22 @@ local function DrawAnimOptions()
 	ImGui.BeginDisabled(not t_SelectedAction)
 	ImGui.SetNextItemWidth(120)
 	i_AnimSortByIndex, _ = ImGui.Combo(_T("GENERIC_LIST_FILTER"), i_AnimSortByIndex, t_AnimSortbyList, #t_AnimSortbyList)
+	ImGui.EndDisabled()
 
 	if (s_CurrentTab ~= "companion_anims") then
-		local opts_lbl = _T("GENERIC_OPTIONS_LABEL")
-		local opts_lbl_width = ImGui.CalcTextSize(opts_lbl)
-		local style = ImGui.GetStyle()
-		local padding = style.FramePadding.x * 2
+		local opts_lbl          = _T("GENERIC_OPTIONS_LABEL")
+		local opts_lbl_width    = ImGui.CalcTextSize(opts_lbl)
+		local style             = ImGui.GetStyle()
+		local padding           = style.FramePadding.x * 2
 		local opts_button_width = opts_lbl_width + padding + style.WindowPadding.x
+
 		ImGui.SameLine()
 		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - opts_button_width)
 
+		ImGui.BeginDisabled(not t_SelectedAction)
 		if (GUI:Button(_T("GENERIC_OPTIONS_LABEL"))) then
 			ImGui.OpenPopup("##animflags")
 		end
-
 		ImGui.EndDisabled()
 
 		if (t_SelectedAction and ImGui.BeginPopupModal("##animflags",
@@ -659,8 +662,13 @@ local function DrawAnimOptions()
 
 				ImGui.Spacing()
 				ImGui.SeparatorText(_T("YAV3_ANIM_FLAGS"))
-				ImGui.Columns(2)
-				ImGui.SetColumnWidth(0, 250)
+				-- ImGui.Columns was causing a resoure deadlock in YimLuaAPI.
+				-- The Columns API is deprecated anyway so if we want to draw nicely alined chechboxes
+				-- then we'll have to either use GridRenderer or do it manually.
+
+				-- ImGui.Columns(2)
+				-- ImGui.SetColumnWidth(0, 250)
+
 				for name, flag in pairs(t_AnimFlags) do
 					ImGui.PushID(_F("##flag_%s", name))
 					flag.enabled, flag.wasClicked = ImGui.Checkbox(flag.label,
@@ -671,7 +679,7 @@ local function DrawAnimOptions()
 						GUI:Tooltip("This will not do anything if the animation is looped.")
 					end
 
-					ImGui.NextColumn()
+					-- ImGui.NextColumn()
 
 					if flag.wasClicked then
 						GUI:PlaySound("Nav")
@@ -679,7 +687,7 @@ local function DrawAnimOptions()
 						t_SelectedAction.data.flags = bitwiseOp(t_SelectedAction.data.flags, flag.bit)
 					end
 				end
-				ImGui.Columns(0)
+				-- ImGui.Columns(0)
 				ImGui.EndChild()
 			end, ImGui.CloseCurrentPopup)
 			ImGui.EndPopup()
@@ -691,7 +699,10 @@ local function DrawPlayerTabItem()
 	ImGui.BeginGroup()
 	DrawActionsSidebar()
 	ImGui.SameLine()
-	ImGui.BeginChild("##main_player", 0, GVars.ui.window_size.y * 0.7, compatFlag)
+	ImGui.BeginChildEx("##main_player",
+		vec2:new(0, GVars.ui.window_size.y * 0.7),
+		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+	)
 
 	if (i_SelectedSidebarItem == 1) or (i_SelectedSidebarItem == 2) then
 		ImGui.SetNextItemWidth(-1)
@@ -711,13 +722,17 @@ local function DrawPlayerTabItem()
 	ImGui.Separator()
 
 	ImGui.SetNextWindowBgAlpha(0.69)
-	ImGui.BeginChild("##player_footer", 0, 65, true, ImGuiWindowFlags.NoScrollbar)
+	ImGui.BeginChildEx("##player_footer",
+		vec2:new(0, 65),
+		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding,
+		ImGuiWindowFlags.NoScrollbar
+	)
 
 	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
 	ImGui.BeginDisabled(not t_SelectedAction or YimActions:IsPlayerBusy())
 	if ImGui.Button("Play", 80, 35) then
 		GUI:PlaySound("Select")
-		script.run_in_fiber(function()
+		ThreadManager:Run(function()
 			---@diagnostic disable-next-line
 			YimActions:Play(t_SelectedAction, self.get_ped())
 		end)
@@ -729,7 +744,7 @@ local function DrawPlayerTabItem()
 	ImGui.BeginDisabled(not YimActions:IsPedPlaying())
 	if ImGui.Button("Stop", 80, 35) then
 		GUI:PlaySound("Cancel")
-		script.run_in_fiber(function()
+		ThreadManager:Run(function()
 			YimActions:Cleanup(self.get_ped())
 		end)
 	end
@@ -787,7 +802,7 @@ local function GetMovementClipsetsFromJson()
 		return
 	end
 
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		for _, v in ipairs(temp) do
 			table.insert(t_MovementClipsetsJson, v)
 			yield()
@@ -1037,7 +1052,7 @@ local function DrawMovementOptions()
 		s_MovementSearchBuffer = ""
 	end
 
-	ImGui.BeginChild("##movementClipsets", 0, GVars.ui.window_size.y * 0.6, compatFlag)
+	ImGui.BeginChildEx("##movementClipsets", vec2:new(0, GVars.ui.window_size.y * 0.6), ImGuiChildFlags.Borders)
 	if i_MovementCategory < 2 then
 		ImGui.SetNextItemWidth(-1)
 		ImGui.BeginDisabled((i_MovementCategory == 1) and not b_MovementListCreated)
@@ -1059,7 +1074,7 @@ local function DrawMovementOptions()
 	end
 	ImGui.EndChild()
 
-	ImGui.BeginChild("##mvmts_footer", 0, 65, true)
+	ImGui.BeginChildEx("##mvmts_footer", vec2:new(0, 65), ImGuiChildFlags.Borders)
 	ImGui.BeginDisabled(not t_SelectedMovementClipset)
 	if ImGui.Button(_T("GENERIC_APPLY"), 80, 35) then
 		GUI:PlaySound("Select")
@@ -1089,12 +1104,16 @@ local function DrawCompanionActionsSearchBar()
 end
 
 local function DrawCompanions()
-	local region = vec2:new(ImGui.GetContentRegionAvail())
+	local region            = vec2:new(ImGui.GetContentRegionAvail())
 	local controlButtonSize = vec2:new(160, 32)
-	local style = ImGui.GetStyle()
-	local height = region.y * 0.4
-	local width = region.x - controlButtonSize.x - (style.ItemSpacing.x * 3)
-	ImGui.BeginChild("##spawned_companions", width, height, compatFlag)
+	local style             = ImGui.GetStyle()
+	local height            = region.y * 0.4
+	local width             = region.x - controlButtonSize.x - (style.ItemSpacing.x * 3)
+
+	ImGui.BeginChildEx("##spawned_companions",
+		vec2:new(width, height),
+		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+	)
 	if next(CompanionMgr.Companions) == nil then
 		ImGui.Text("No companions spawned.")
 	else
@@ -1113,7 +1132,7 @@ local function DrawCompanions()
 
 				if ImGui.BeginPopup("##companion_controls_" .. i) then
 					if ImGui.MenuItem("Warp Into Vehicle") then
-						script.run_in_fiber(function()
+						ThreadManager:Run(function()
 							local veh = self.get_veh()
 							if (veh == 0) then
 								Notifier:ShowWarning("Samurai's Scripts", "No vehicle to warp into.")
@@ -1144,7 +1163,7 @@ local function DrawCompanions()
 	if unk_SelectedCompanion and (next(CompanionMgr.Companions) ~= nil) then
 		if ImGui.Button("Remove", 160, 32) then -- AD PROFUNDIS
 			GUI:PlaySound("Delete")
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				CompanionMgr:RemoveCompanion(unk_SelectedCompanion)
 			end)
 		end
@@ -1182,7 +1201,7 @@ local function DrawCompanions()
 		ImGui.BeginDisabled(not t_SelectedAction)
 		if ImGui.Button("Play", 160, 32) then -- AVE IMPERATOR, MORITURI TE SALUTANT
 			GUI:PlaySound("Select")
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				YimActions:Play(t_SelectedAction, unk_SelectedCompanion.handle)
 			end)
 		end
@@ -1190,16 +1209,16 @@ local function DrawCompanions()
 		ImGui.BeginDisabled(not YimActions:IsPedPlaying(unk_SelectedCompanion.handle))
 		if ImGui.Button("Stop", 160, 32) then
 			GUI:PlaySound("Cancel")
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				YimActions:Cleanup(unk_SelectedCompanion.handle)
 			end)
 		end
 		ImGui.EndDisabled()
 
 		ImGui.BeginDisabled(#CompanionMgr.Companions <= 1)
-		if ImGui.Button("All Play", 160, 32) then -- I hate how *All Play* sounds 😒
+		if ImGui.Button("All Play", 160, 32) then
 			GUI:PlaySound("Select")
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				CompanionMgr:AllCompanionsPlay(t_SelectedAction)
 			end)
 		end
@@ -1209,7 +1228,7 @@ local function DrawCompanions()
 		ImGui.BeginDisabled(#CompanionMgr.Companions <= 1 or not CompanionMgr:AreAnyCompanionsPlaying())
 		if ImGui.Button("Stop All", 160, 32) then
 			GUI:PlaySound("Cancel")
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				CompanionMgr:StopAllCompanions()
 			end)
 		end
@@ -1218,7 +1237,7 @@ local function DrawCompanions()
 		ImGui.BeginDisabled(#CompanionMgr.Companions == 0)
 		if ImGui.Button("Bring All", 160, 32) then
 			GUI:PlaySound("Cancel")
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				CompanionMgr:BringAllCompanions()
 			end)
 		end
@@ -1228,7 +1247,11 @@ local function DrawCompanions()
 
 	ImGui.Spacing()
 	ImGui.SeparatorText("Companion Actions")
-	ImGui.BeginChild("##companion_actions_child", 0, 335, true)
+	ImGui.BeginChildEx("##companion_actions_child",
+		vec2:new(0, 335),
+		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+	)
+
 	ImGui.BeginTabBar("##companion_actions_tabbar")
 	if ImGui.BeginTabItem("Animations##companions") then
 		s_CurrentTab = "companion_anims"
@@ -1249,13 +1272,19 @@ local function DrawCompanions()
 	OnTabItemSwitch()
 	ImGui.EndTabBar()
 	ImGui.EndChild()
-	ImGui.BeginChild("##player_footer_2", 0, 65, true, ImGuiWindowFlags.NoScrollbar)
-	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
+
+	ImGui.BeginChildEx("##player_footer_2",
+		vec2:new(0, 65),
+		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding,
+		ImGuiWindowFlags.NoScrollbar
+	)
+
 	if i_CompanionActionCategory > 0 and i_CompanionActionCategory <= 2 then
-		ImGui.BeginDisabled(not t_SelectedAction or YimActions:IsPlayerBusy())
+		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
+		ImGui.BeginDisabled(not t_SelectedAction)
 		if ImGui.Button("Play", 80, 35) then
 			GUI:PlaySound("Select")
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				YimActions:Play(t_SelectedAction)
 			end)
 		end
@@ -1267,7 +1296,7 @@ local function DrawCompanions()
 		ImGui.BeginDisabled(not YimActions:IsPedPlaying())
 		if ImGui.Button("Stop", 80, 35) then
 			GUI:PlaySound("Cancel")
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				YimActions:Cleanup()
 			end)
 		end
@@ -1278,8 +1307,8 @@ local function DrawCompanions()
 		if i_CompanionActionCategory == 1 then
 			DrawAnimOptions()
 		end
+		ImGui.PopStyleVar()
 	end
-	ImGui.PopStyleVar()
 
 	ImGui.EndChild()
 end
@@ -1303,7 +1332,7 @@ local function DrawPedSpawnWindow()
 		ImGui.Separator()
 		ImGui.Dummy(1, 10)
 
-		ImGui.BeginChild("##ped_spawn_list", 440, 400, compatFlag)
+		ImGui.BeginChildEx("##ped_spawn_list", vec2:new(440, 400), ImGuiChildFlags.Borders)
 		ImGui.SetNextItemWidth(-1)
 		s_PedSearchBuffer, _ = ImGui.InputTextWithHint(
 			"##search",
@@ -1354,7 +1383,7 @@ local function DrawPedSpawnWindow()
 		ImGui.BeginDisabled(not t_GamePeds[s_SelectedPed])
 		if ImGui.Button("Spawn", 80, 35) then
 			GUI:PlaySound("Select")
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				CompanionMgr:SpawnCompanion(
 					t_GamePeds[s_SelectedPed].model_hash,
 					s_SelectedPed,
@@ -1405,18 +1434,14 @@ local function YAV3UI()
 			ImGui.EndTabItem()
 		end
 
-		-- TODO: Fix this from completely breaking everything on YLAPI
-		local ylapi_func = _G["get_game_branch"]
-		if (type(ylapi_func) ~= "function") then
-			if ImGui.BeginTabItem("Companions") then
-				s_CurrentTab = "main_companions"
-				DrawCompanions()
+		if ImGui.BeginTabItem("Companions") then
+			s_CurrentTab = "main_companions"
+			DrawCompanions()
 
-				if hwnd_PedSpawnWindow.should_draw then
-					DrawPedSpawnWindow()
-				end
-				ImGui.EndTabItem()
+			if hwnd_PedSpawnWindow.should_draw then
+				DrawPedSpawnWindow()
 			end
+			ImGui.EndTabItem()
 		end
 
 		if Backend.debug_mode then
