@@ -691,7 +691,7 @@ local function DrawPlayerTabItem()
 	ImGui.BeginGroup()
 	DrawActionsSidebar()
 	ImGui.SameLine()
-	ImGui.BeginChild("##main_player", 0, GVars.ui.window_size.y * 0.7, true)
+	ImGui.BeginChild("##main_player", 0, GVars.ui.window_size.y * 0.7, compatFlag)
 
 	if (i_SelectedSidebarItem == 1) or (i_SelectedSidebarItem == 2) then
 		ImGui.SetNextItemWidth(-1)
@@ -1094,7 +1094,7 @@ local function DrawCompanions()
 	local style = ImGui.GetStyle()
 	local height = region.y * 0.4
 	local width = region.x - controlButtonSize.x - (style.ItemSpacing.x * 3)
-	ImGui.BeginChild("##spawned_companions", width, height, true)
+	ImGui.BeginChild("##spawned_companions", width, height, compatFlag)
 	if next(CompanionMgr.Companions) == nil then
 		ImGui.Text("No companions spawned.")
 	else
@@ -1303,7 +1303,7 @@ local function DrawPedSpawnWindow()
 		ImGui.Separator()
 		ImGui.Dummy(1, 10)
 
-		ImGui.BeginChild("##ped_spawn_list", 440, 400, true)
+		ImGui.BeginChild("##ped_spawn_list", 440, 400, compatFlag)
 		ImGui.SetNextItemWidth(-1)
 		s_PedSearchBuffer, _ = ImGui.InputTextWithHint(
 			"##search",
@@ -1405,8 +1405,9 @@ local function YAV3UI()
 			ImGui.EndTabItem()
 		end
 
-		-- TODO: Fix this from completely breaking everything on Enhanced
-		if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
+		-- TODO: Fix this from completely breaking everything on YLAPI
+		local ylapi_func = _G["get_game_branch"]
+		if (type(ylapi_func) ~= "function") then
 			if ImGui.BeginTabItem("Companions") then
 				s_CurrentTab = "main_companions"
 				DrawCompanions()

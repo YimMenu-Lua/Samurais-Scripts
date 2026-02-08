@@ -200,81 +200,45 @@ local function drawHeistTab()
 		stats.set_int("MPX_H3OPT_CREWWEAP", new_gunman)
 	end
 
-	if (new_gunman == 1) then --Karl Abolaji
-		ImGui.SameLine()
-		local karl_gun_list = {
-			{ '##1", "##2' },
-			{ "Micro SMG Loadout", "Machine Pistol Loadout" },
-			{ "Micro SMG Loadout", "Shotgun Loadout" },
-			{ "Shotgun Loadout",   "Revolver Loadout" }
-		}
+	if (new_gunman > 0) then
+		local gunList = {
+			[1] = { --Karl Abolaji
+				{ '##1", "##2' },
+				{ "Micro SMG Loadout", "Machine Pistol Loadout" },
+				{ "Micro SMG Loadout", "Shotgun Loadout" },
+				{ "Shotgun Loadout",   "Revolver Loadout" }
+			},
+			[2] = { --Gustavo Fring
+				{ '##1", "##2' },
+				{ "Rifle Loadout", "Shotgun Loadout" },
+				{ "Rifle Loadout", "Shotgun Loadout" },
+				{ "Rifle Loadout", "Shotgun Loadout" },
+			},
+			[3] = { --Charlie Reed
+				{ '##1", "##2' },
+				{ "SMG Loadout",            "Shotgun Loadout" },
+				{ "Machine Pistol Loadout", "Shotgun Loadout" },
+				{ "SMG Loadout",            "Shotgun Loadout" }
+			},
+			[4] = { --Chester McCoy
+				{ '##1", "##2' },
+				{ "MK II Shotgun Loadout", "MK II Rifle Loadout" },
+				{ "MK II SMG Loadout",     "MK II Rifle Loadout" },
+				{ "MK II Shotgun Loadout", "MK II Rifle Loadout" }
+			},
+			[5] = { --Laddie Paddie Sadie Enweird
+				{ '##1", "##2' },
+				{ "Combat PDW Loadout", "Rifle Loadout" },
+				{ "Shotgun Loadout",    "Rifle Loadout" },
+				{ "Shotgun Loadout",    "Combat MG Loadout" }
+			}
+
+	}
 
 		local new_weapons, weapons_clicked = ImGui.Combo(
 			_T "CP_HEIST_WEAPONS",
 			casino_heist_weapons,
-			karl_gun_list[casino_heist_approach + 1],
-			2
-		)
-		if weapons_clicked then
-			stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
-		end
-	elseif casino_heist_gunman == 2 then --Gustavo Fring
-		ImGui.SameLine()
-		local new_weapons, weapons_clicked = ImGui.Combo(
-			_T "CP_HEIST_WEAPONS",
-			casino_heist_weapons,
-			{ "Rifle Loadout", "Shotgun Loadout" },
-			2
-		)
-		if weapons_clicked then
-			stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
-		end
-	elseif casino_heist_gunman == 3 then --Charlie Reed
-		ImGui.SameLine()
-		local charlie_gun_list = {
-			{ '##1", "##2' },
-			{ "SMG Loadout",            "Shotgun Loadout" },
-			{ "Machine Pistol Loadout", "Shotgun Loadout" },
-			{ "SMG Loadout",            "Shotgun Loadout" }
-		}
-		local new_weapons, weapons_clicked = ImGui.Combo(
-			_T "CP_HEIST_WEAPONS",
-			casino_heist_weapons,
-			charlie_gun_list[casino_heist_approach + 1],
-			2
-		)
-		if (weapons_clicked) then
-			stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
-		end
-	elseif casino_heist_gunman == 4 then --Chester McCoy
-		ImGui.SameLine()
-		local chester_gun_list = {
-			{ '##1", "##2' },
-			{ "MK II Shotgun Loadout", "MK II Rifle Loadout" },
-			{ "MK II SMG Loadout",     "MK II Rifle Loadout" },
-			{ "MK II Shotgun Loadout", "MK II Rifle Loadout" }
-		}
-		local new_weapons, weapons_clicked = ImGui.Combo(
-			_T "CP_HEIST_WEAPONS",
-			casino_heist_weapons,
-			chester_gun_list[casino_heist_approach + 1],
-			2
-		)
-		if (weapons_clicked) then
-			stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
-		end
-	elseif casino_heist_gunman == 5 then --Laddie Paddie Sadie Enweird
-		ImGui.SameLine()
-		local laddie_paddie_gun_list = {
-			{ '##1", "##2' },
-			{ "Combat PDW Loadout", "Rifle Loadout" },
-			{ "Shotgun Loadout",    "Rifle Loadout" },
-			{ "Shotgun Loadout",    "Combat MG Loadout" }
-		}
-		local new_weapons, weapons_clicked = ImGui.Combo(
-			_T "CP_HEIST_WEAPONS",
-			casino_heist_weapons,
-			laddie_paddie_gun_list[casino_heist_approach + 1],
+			gunList[new_gunman][casino_heist_approach + 1],
 			2
 		)
 		if (weapons_clicked) then
@@ -299,76 +263,28 @@ local function drawHeistTab()
 		stats.set_int("MPX_H3OPT_CREWDRIVER", new_driver)
 	end
 
-	if (casino_heist_driver == 1) then --Karim Deniz
-		ImGui.SameLine()
-		local new_car, car_clicked = ImGui.Combo(
-			_T "CP_HEIST_GETAWAY_VEHS",
-			casino_heist_cars,
-			{ "Issi Classic", "Asbo", "Kanjo", "Sentinel Classic" },
-			4
-		)
-		if (car_clicked) then
-			stats.set_int("MPX_H3OPT_VEHS", new_car)
-		end
-	elseif (casino_heist_driver == 2) then --Taliana Martinez
-		ImGui.SameLine()
-		local new_car, car_clicked = ImGui.Combo(
-			_T "CP_HEIST_GETAWAY_VEHS",
-			casino_heist_cars,
-			{
-				"Retinue MK II",
-				"Drift Yosemite",
-				"Sugoi",
-				"Jugular"
+	if (new_driver > 0) then
+		local carList = {
+			[1] = {  --Karim Deniz
+				"Issi Classic", "Asbo", "Kanjo", "Sentinel Classic"
 			},
-			4
-		)
-		if (car_clicked) then
-			stats.set_int("MPX_H3OPT_VEHS", new_car)
-		end
-	elseif (casino_heist_driver == 3) then --Eddie Toh
-		ImGui.SameLine()
+			[2] = { --Taliana Martinez
+				"Retinue MK II", "Drift Yosemite", "Sugoi", "Jugular"
+			},
+			[3] = { --Eddie Toh
+				"Sultan Classic", "Guantlet Classic", "Ellie", "Komoda"
+			},
+			[4] = { --Zach Nelson
+				"Manchez", "Stryder", "Defiler", "Lectro"
+			},
+			[5] = { --Chester McCoy
+				"Zhaba", "Vagrant", "Outlaw", "Everon"
+			},
+		}
 		local new_car, car_clicked = ImGui.Combo(
 			_T "CP_HEIST_GETAWAY_VEHS",
 			casino_heist_cars,
-			{
-				"Sultan Classic",
-				"Guantlet Classic",
-				"Ellie",
-				"Komoda"
-			},
-			4
-		)
-		if (car_clicked) then
-			stats.set_int("MPX_H3OPT_VEHS", new_car)
-		end
-	elseif (casino_heist_driver == 4) then --Zach Nelson
-		ImGui.SameLine()
-		local new_car, car_clicked = ImGui.Combo(
-			_T "CP_HEIST_GETAWAY_VEHS",
-			casino_heist_cars,
-			{
-				"Manchez",
-				"Stryder",
-				"Defiler",
-				"Lectro"
-			},
-			4
-		)
-		if (car_clicked) then
-			stats.set_int("MPX_H3OPT_VEHS", new_car)
-		end
-	elseif (casino_heist_driver == 5) then --Chester McCoy
-		ImGui.SameLine()
-		local new_car, car_clicked = ImGui.Combo(
-			_T "CP_HEIST_GETAWAY_VEHS",
-			casino_heist_cars,
-			{
-				"Zhaba",
-				"Vagrant",
-				"Outlaw",
-				"Everon"
-			},
+			carList[new_driver],
 			4
 		)
 		if (car_clicked) then
