@@ -188,7 +188,7 @@ return {
 	["SY_CD_ACTIVE"] = "冷却激活",
 	["SY_ROBBERY_CAN_KEEP_CAR"] = "可以保留汽车：%s",
 	["SY_ROBBERY_TYPE"] = "抢劫类型：%s",
-	["SY_PREP_SKIP"] = "跳过准备...",
+	["SY_PREP_SKIP"] = "跳过准备工作...",
 	["SY_INSTANT_SALVAGE"] = "立即打捞",
 	["SY_CD_DISABLED"] = "冷却时间已禁用",
 	["SY_CD_NONE"] = "无冷却时间",

@@ -191,7 +191,7 @@ return {
 	["SY_CD_ACTIVE"] = "Enfriamiento activo",
 	["SY_CAR_ROBBERIES"] = "Robos de autos",
 	["SY_INSTANT_SALVAGE"] = "Salvar ahora",
-	["SY_PREP_SKIP"] = "Saltarse los preparativos...",
+	["SY_PREP_SKIP"] = "Saltándose los preparativos...",
 	["YRV3_RANDOM_CRATES"] = "Consigue cajas aleatorias",
 	["YRV3_MC_NONE_OWNED"] = "No eres dueño de ningún negocio de motociclistas.",
 	["YRV3_BUNKER_NOT_OWNED"] = "No eres dueño de un búnker.",

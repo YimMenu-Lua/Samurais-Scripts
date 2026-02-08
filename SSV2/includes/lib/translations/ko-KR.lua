@@ -187,7 +187,7 @@ return {
 	["SY_DO_NOT_OWN_SALVAGE_YARD"] = "귀하는 폐차장을 소유하고 있지 않습니다.",
 	["SY_CAR_ROBBERIES"] = "자동차 강도",
 	["SY_SALVAGE_YARD"] = "회수장",
-	["SY_PREP_SKIP"] = "준비 건너뛰기...",
+	["SY_PREP_SKIP"] = "준비를 건너뛰는 중...",
 	["YRV3_MC_NONE_OWNED"] = "귀하는 자전거 타는 사람 사업체를 소유하고 있지 않습니다.",
 	["YRV3_BUNKER_NOT_OWNED"] = "당신은 벙커를 소유하고 있지 않습니다.",
 	["SY_INSTANT_SALVAGE"] = "지금 회수하세요",

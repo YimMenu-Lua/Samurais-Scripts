@@ -189,7 +189,7 @@ return {
 	["SY_DO_NOT_OWN_SALVAGE_YARD"] = "あなたはサルベージヤードを所有していません。",
 	["SY_CD_DISABLED"] = "クールダウン無効",
 	["SY_CD_NONE"] = "クールダウンなし",
-	["SY_PREP_SKIP"] = "準備を省略しています...",
+	["SY_PREP_SKIP"] = "準備をすっ飛ばして…",
 	["SY_CD_ACTIVE"] = "クールダウン有効",
 	["SY_INSTANT_SALVAGE"] = "今すぐサルベージ",
 	["YRV3_CRATES_LABEL"] = "木箱",

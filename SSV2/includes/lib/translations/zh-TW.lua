@@ -188,7 +188,7 @@ return {
 	["SY_COMPLETE_PREPARATIONS"] = "準備工作齊全",
 	["SY_ROBBERY_CAR_VALUE"] = "汽車價值：$%s",
 	["SY_DO_NOT_OWN_SALVAGE_YARD"] = "您沒有廢品回收場。",
-	["SY_PREP_SKIP"] = "跳過準備...",
+	["SY_PREP_SKIP"] = "跳過準備工作...",
 	["SY_CAR_ROBBERIES"] = "汽車搶劫",
 	["SY_INSTANT_SALVAGE"] = "立即打撈",
 	["YRV3_RANDOM_CRATES"] = "獲取隨機箱子",
