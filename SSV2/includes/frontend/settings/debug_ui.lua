@@ -443,7 +443,9 @@ local function DrawDummyVehSpawnMenu()
 	PopulateVehlistOnce()
 
 	if ImGui.BeginListBox("##dummyvehlist", -1, 0) then
+		local ii = 1
 		for _, veh in ipairs(TVehList) do
+			ImGui.PushID(ii)
 			ImGui.Selectable(veh.displayname, false)
 			if ImGui.IsItemHovered() then
 				local item_min = vec2:new(ImGui.GetItemRectMin())
@@ -452,6 +454,8 @@ local function DrawDummyVehSpawnMenu()
 			elseif not ImGui.IsAnyItemHovered() then
 				hovered_y = nil
 			end
+			ImGui.PopID()
+			ii = ii + 1
 		end
 		ImGui.EndListBox()
 	end
