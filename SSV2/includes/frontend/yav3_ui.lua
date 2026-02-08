@@ -143,6 +143,8 @@ local t_AnimFlags <const>        = {
 	},
 }
 
+local compatFlag = (Backend:GetAPIVersion() == Enums.eAPIVersion.V2) and ImGuiChildFlags.AlwaysUseWindowPadding or true
+
 local function OnTabItemSwitch()
 	if (s_CurrentTab ~= s_PreviousTab) then
 		GUI:PlaySound(GUI.Sounds.Nav)
@@ -1003,7 +1005,7 @@ end
 local b_CustomMvmmtClicked = false
 local b_JsonMvmtClicked = false
 local b_FavMvmtsClicked = false
-local function DrawMovemenOptions()
+local function DrawMovementOptions()
 	ImGui.Spacing()
 	ImGui.Spacing()
 	i_MovementCategory, b_CustomMvmmtClicked = ImGui.RadioButton("Custom Movements", i_MovementCategory, 0)
@@ -1035,7 +1037,7 @@ local function DrawMovemenOptions()
 		s_MovementSearchBuffer = ""
 	end
 
-	ImGui.BeginChild("##movementClipsets", 0, GVars.ui.window_size.y * 0.6, true)
+	ImGui.BeginChild("##movementClipsets", 0, GVars.ui.window_size.y * 0.6, compatFlag)
 	if i_MovementCategory < 2 then
 		ImGui.SetNextItemWidth(-1)
 		ImGui.BeginDisabled((i_MovementCategory == 1) and not b_MovementListCreated)
@@ -1399,18 +1401,21 @@ local function YAV3UI()
 
 		if ImGui.BeginTabItem("Movement Styles") then
 			s_CurrentTab = "main_movements"
-			DrawMovemenOptions()
+			DrawMovementOptions()
 			ImGui.EndTabItem()
 		end
 
-		if ImGui.BeginTabItem("Companions") then
-			s_CurrentTab = "main_companions"
-			DrawCompanions()
+		-- TODO: Fix this from completely breaking everything on Enhanced
+		if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
+			if ImGui.BeginTabItem("Companions") then
+				s_CurrentTab = "main_companions"
+				DrawCompanions()
 
-			if hwnd_PedSpawnWindow.should_draw then
-				DrawPedSpawnWindow()
+				if hwnd_PedSpawnWindow.should_draw then
+					DrawPedSpawnWindow()
+				end
+				ImGui.EndTabItem()
 			end
-			ImGui.EndTabItem()
 		end
 
 		if Backend.debug_mode then

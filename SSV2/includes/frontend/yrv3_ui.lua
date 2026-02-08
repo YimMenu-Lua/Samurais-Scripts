@@ -29,6 +29,8 @@ local tabNames <const>         = {
 	"CELL_16"
 }
 
+local compatFlag = (Backend:GetAPIVersion() == Enums.eAPIVersion.V2) and ImGuiChildFlags.AlwaysUseWindowPadding or false
+
 local function getAllCDCheckboxes()
 	return GVars.features.yrv3.mc_work_cd
 		and GVars.features.yrv3.hangar_cd
@@ -129,9 +131,10 @@ local function drawNamePlate(business, custom_name, bg, tpKeepVeh)
 		130,
 		true,
 		ImGuiWindowFlags.NoScrollbar
-		| ImGuiWindowFlags.AlwaysUseWindowPadding
+		| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 	)
 
+	ImGui.Spacing()
 	ImGui.SetWindowFontScale(1.18)
 	local custom_name_width = ImGui.CalcTextSize(custom_name)
 	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - custom_name_width - 10) * 0.5)
@@ -200,9 +203,9 @@ local function drawWarehouse(warehouse, notOwnedLabel)
 	ImGui.BeginChild(name,
 		0,
 		240,
-		false,
+		compatFlag,
 		ImGuiWindowFlags.NoScrollbar
-		| ImGuiWindowFlags.AlwaysUseWindowPadding
+		| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 	)
 
 	ImGui.SeparatorText(name)
@@ -229,7 +232,7 @@ local function drawWarehouse(warehouse, notOwnedLabel)
 			"%d %s (%d%%)",
 			prod,
 			_T("YRV3_CRATES_LABEL"),
-			(math.floor(prod / max) * 100)
+			(math.floor((prod / max) * 100))
 		)
 	)
 
@@ -288,9 +291,9 @@ local function drawBikerBusiness(bb, notOwnedLabel)
 	ImGui.BeginChild(_F("bb##%s", name),
 		0,
 		index < 6 and 330 or 300,
-		false,
+		compatFlag,
 		ImGuiWindowFlags.NoScrollbar
-		| ImGuiWindowFlags.AlwaysUseWindowPadding
+		| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 	)
 
 	ImGui.SeparatorText(name or "NULL")
@@ -570,13 +573,13 @@ local function drawNightclub()
 
 	for i = 1, hubsize do
 		ImGui.PushID(i)
-		ImGui.SetNextWindowBgAlpha(0)
+		ImGui.SetNextWindowBgAlpha(0.64)
 		ImGui.BeginChild("##hub_child",
 			90,
 			300,
-			false,
+			compatFlag,
 			ImGuiWindowFlags.NoScrollbar
-			| ImGuiWindowFlags.AlwaysUseWindowPadding
+			| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 		)
 
 		local this       = hubs[i]
@@ -607,6 +610,8 @@ local function drawNightclub()
 		)
 
 		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + 40) * 0.5)
+		-- TODO: Fix glitchy behavior + session disconnect on Enhanced/YLAPI(?)
+		ImGui.BeginDisabled(Backend:GetAPIVersion() == Enums.eAPIVersion.V2)
 		ImGui.BeginDisabled(prod >= max_units)
 		this.fast_prod_enabled, _ = GUI:CustomToggle("##fast_prod", this.fast_prod_enabled)
 		ImGui.EndDisabled()
@@ -622,6 +627,7 @@ local function drawNightclub()
 		if (GUI:Button(btn_label, { size = vec2:new(65, 30) })) then
 			this:TriggerProduction()
 		end
+		ImGui.EndDisabled()
 		ImGui.EndDisabled()
 
 		ImGui.EndChild()
@@ -648,9 +654,9 @@ local function drawBusinessSafes()
 		ImGui.BeginChild(name,
 			0,
 			cashSafe:CanLoop() and 195 or 160,
-			false,
+			compatFlag,
 			ImGuiWindowFlags.NoScrollbar
-			| ImGuiWindowFlags.AlwaysUseWindowPadding
+			| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 		)
 		local cashValue = cashSafe:GetCashValue()
 		local maxCash   = cashSafe:GetCapacity()
@@ -702,8 +708,8 @@ local function drawBasicBusiness(business, isParent, kvSpacing, clearHeatLabel)
 	ImGui.BeginChild(name,
 		0,
 		isParent and 385 or 280,
-		false,
-		ImGuiWindowFlags.AlwaysUseWindowPadding
+		compatFlag,
+		(ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 		| ImGuiWindowFlags.NoScrollbar
 	)
 
@@ -933,9 +939,9 @@ local function drawSalvageYard()
 				_F("##lift%d", i),
 				childWidth,
 				isTaken and 210 or 100,
-				false,
+				compatFlag,
 				ImGuiWindowFlags.NoScrollbar
-				| ImGuiWindowFlags.AlwaysUseWindowPadding
+				| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 			)
 			ImGui.SeparatorText(_F(_T("SY_LIFT"), i))
 			ImGui.Spacing()
@@ -1048,9 +1054,9 @@ local function drawSalvageYard()
 				_F("##robbery%d", i),
 				childWidth,
 				isAvailable and 180 or 100,
-				false,
+				compatFlag,
 				ImGuiWindowFlags.NoScrollbar
-				| ImGuiWindowFlags.AlwaysUseWindowPadding
+				| (ImGuiWindowFlags.AlwaysUseWindowPadding or 0)
 			)
 
 			ImGui.SeparatorText(_F(_T("SY_VEH_SLOT"), i))
@@ -1363,7 +1369,7 @@ local function YRV3UI()
 	local sidebarWidth   = math.max(100.0, ImGui.GetWindowWidth() * 0.2)
 	local separatorWidth = 3.0
 
-	if (ImGui.BeginChild("##yrv3_header", 0, headerHeight, true, ImGuiWindowFlags.AlwaysUseWindowPadding)) then
+	if (ImGui.BeginChild("##yrv3_header", 0, headerHeight, true, ImGuiWindowFlags.AlwaysUseWindowPadding or 0)) then
 		local title     = _T("YRV3_MCT_TITLE")
 		local textWidth = ImGui.CalcTextSize(title) + (ImGui.GetStyle().FramePadding.x * 2)
 		ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - textWidth) * 0.5)
