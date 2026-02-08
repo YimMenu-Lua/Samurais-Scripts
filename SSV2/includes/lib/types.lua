@@ -83,4 +83,21 @@ GenericClass = setmetatable({}, {
 ---@class nullptr : pointer
 nullptr = memory.pointer:new(0)
 
+---@type boolean?
+_G.FAKE_YIMAPI = _G.FAKE_YIMAPI
+
+---@enum ImGuiChildFlags
+ImGuiChildFlags = {
+	None                   = 0,
+	Borders                = 1 << 0, -- this does not work in YimLuaAPI for some reason. No borders are drawn around child windows
+	AlwaysUseWindowPadding = 1 << 1,
+	ResizeX                = 1 << 2,
+	ResizeY                = 1 << 3,
+	AutoResizeX            = 1 << 4,
+	AutoResizeY            = 1 << 5,
+	AlwaysAutoResize       = 1 << 6,
+	FrameStyle             = 1 << 7,
+	NavFlattened           = 1 << 8,
+}
+
 --#endregion

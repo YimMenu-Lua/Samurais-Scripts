@@ -1004,6 +1004,7 @@ function YRV3:MCT()
 		end
 
 		TaskWait(Game.RequestScript, "appArcadeBusinessHub")
+		---@diagnostic disable-next-line: undefined-global
 		self.m_bhub_script_handle = (SYSTEM or BUILTIN).START_NEW_SCRIPT("appArcadeBusinessHub", 1424) -- STACK_SIZE_DEFAULT
 		SCRIPT.SET_SCRIPT_AS_NO_LONGER_NEEDED("appArcadeBusinessHub")
 		sleep(100)

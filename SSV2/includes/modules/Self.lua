@@ -229,6 +229,7 @@ function Self:Teleport(where, keep_vehicle)
 
 			coords = HUD.GET_BLIP_COORDS(blip)
 		elseif (IsInstance(where, vec3)) then
+			---@type vec3
 			coords = where
 		else
 			Notifier:ShowError(
@@ -239,7 +240,12 @@ function Self:Teleport(where, keep_vehicle)
 		end
 
 		TaskWait(Game.LoadGroundAtCoord, { coords }, 500)
-		PED.SET_PED_COORDS_KEEP_VEHICLE(self:GetHandle(), coords.x, coords.y, coords.z)
+
+		local handle  = self:GetHandle()
+		-- local dir = Self:GetPos() - coords -- it's so stupid that passing the coords works better than the correct params. I'm so dumb bruh
+		local heading = MISC.GET_HEADING_FROM_VECTOR_2D(coords.x, coords.y)
+		Self:SetHeading(heading)
+		PED.SET_PED_COORDS_KEEP_VEHICLE(handle, coords.x, coords.y, coords.z)
 	end)
 end
 

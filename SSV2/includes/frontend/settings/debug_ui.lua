@@ -75,7 +75,7 @@ end
 local function DrawEntities()
 	ImGui.BulletText(_F("Maximum Allowed Entities: [%d]", GetMaxAllowedEntities()))
 	ImGui.BulletText(_F("Total Spawned Entities: [%d]", GetSpawnedEntities()))
-	if ImGui.BeginChild("##entitytypes", 200, 200, true) then
+	if ImGui.BeginChildEx("##entitytypes", vec2:new(200, 200), ImGuiChildFlags.Borders) then
 		for etype, entities in ipairs(Backend.SpawnedEntities) do
 			local count = table.getlen(entities)
 			local label = _F("%ss (%d/%d)", EnumToString(Enums.eEntityType, etype), count,
@@ -90,7 +90,7 @@ local function DrawEntities()
 
 	if (selected_entity_type and Backend.SpawnedEntities[selected_entity_type]) then
 		ImGui.SameLine()
-		ImGui.BeginChild("##entitydetails", 0, 0, true)
+		ImGui.BeginChildEx("##entitydetails", vec2:zero(), ImGuiChildFlags.Borders)
 		---@diagnostic disable-next-line: undefined-global
 		if ImGui.BeginTable("entity_table", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.BordersInner) then
 			ImGui.TableSetupColumn("Handle")
@@ -162,7 +162,7 @@ local function DrawThreads()
 
 	if selected_thread then
 		ImGui.SameLine()
-		ImGui.BeginChild("##threadctrls", 170, 155, true)
+		ImGui.BeginChildEx("##threadctrls", vec2:new(170, 155), ImGuiChildFlags.Borders)
 		if GUI:Button("Remove", { size = side_button_size }) then
 			ThreadManager:RemoveThread(thread_name)
 		end
@@ -199,7 +199,7 @@ local function DrawPointers()
 	local child_height = math.min(total_count * 65, GVars.ui.window_size.y - 30)
 
 	ImGui.BulletText(_F("Total Count: [%d]", total_count))
-	ImGui.BeginChild("##ptr_list", 0, child_height, true)
+	ImGui.BeginChildEx("##ptr_list", vec2:new(0, child_height), ImGuiChildFlags.Borders)
 	ImGui.SetNextWindowBgAlpha(0)
 	if ImGui.BeginListBox("##ptr_listbox", -1, -1) then
 		for name, ptr in pairs(ptr_list) do
@@ -518,7 +518,7 @@ local function DrawPatches()
 	end
 
 	ImGui.SameLine()
-	ImGui.BeginChild("##patchesbyowner", 0, 0, true)
+	ImGui.BeginChildEx("##patchesbyowner", vec2:zero(), ImGuiChildFlags.Borders)
 	for name, patch in pairs(selectedPatchTable) do
 		local label = _F("%s (%s)", name, patch:IsEnabled() and "Applied" or "Not applied")
 		if (ImGui.Selectable(label, selectedPatchName == name)) then

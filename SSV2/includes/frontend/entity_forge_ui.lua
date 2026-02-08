@@ -53,7 +53,6 @@ local spawnerSidebarItems        = {
 	[Enums.eEntityType.Object]  = "Objects",
 }
 
-local compatFlag = (Backend:GetAPIVersion() == Enums.eAPIVersion.V2) and ImGuiChildFlags.AlwaysUseWindowPadding or true
 
 local hoveredThisFrame
 local s_SelectedVehBone
@@ -397,7 +396,10 @@ local function DrawCreatorUI()
 
 	local regionWidth = ImGui.GetContentRegionAvail()
 	local child_width = (regionWidth / 2) - (ImGui.GetStyle().ItemSpacing.x * 2) - 60
-	ImGui.BeginChild("ChildList", child_width, GVars.ui.window_size.y * 0.4, true)
+	ImGui.BeginChildEx("ChildList",
+		vec2:new(child_width, GVars.ui.window_size.y * 0.4),
+		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+	)
 	ImGui.SeparatorText("Child Candidates")
 
 	if ImGui.BeginListBox("##children", -1, -1) then
@@ -518,7 +520,10 @@ local function DrawCreatorUI()
 	ImGui.EndChild()
 	ImGui.SameLine()
 
-	ImGui.BeginChild("ParentList", child_width, GVars.ui.window_size.y * 0.4, true)
+	ImGui.BeginChildEx("ParentList",
+		vec2:new(child_width, GVars.ui.window_size.y * 0.4),
+		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+	)
 	ImGui.SeparatorText("Parent Candidates")
 
 	ImGui.SetNextItemWidth(-1)
@@ -673,7 +678,10 @@ local function DrawCreatorUI()
 		ImGui.EndChild()
 
 		ImGui.SameLine()
-		ImGui.BeginChild("current parent", regionWidth * 0.45, 0, true)
+		ImGui.BeginChildEx("current parent",
+			vec2:new(regionWidth * 0.45, 0),
+			ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+		)
 		ImGui.SetWindowFontScale(1.05)
 		ImGui.SeparatorText(
 			_F(
@@ -1471,8 +1479,12 @@ local function EntityForgeUI()
 	if ImGui.BeginTabBar("##entityforge_tb") then
 		if ImGui.BeginTabItem("Spawner") then
 			DrawSpawnerSideBar()
+
 			ImGui.SameLine()
-			ImGui.BeginChild("##items", 0, GVars.ui.window_size.y * 0.7, compatFlag)
+			ImGui.BeginChildEx("##items",
+				vec2:new(0, GVars.ui.window_size.y * 0.7),
+				ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+			)
 			DrawSpawnerItems()
 			ImGui.Spacing()
 			if selectedSidebarItem == Enums.eEntityType.Vehicle and not vehicleListCreated then
@@ -1812,7 +1824,10 @@ local function ForgeAxisWindow()
 
 		ImGui.Dummy(1, 20)
 		ImGui.SetNextWindowBgAlpha(0.0)
-		if ImGui.BeginChild("axis movement", 220, 340, true) then
+		if ImGui.BeginChildEx("axis movement",
+				vec2:new(220, 340),
+				ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+			) then
 			ImGui.SeparatorText(_T("EF_MOVE_OBJECT"))
 			ImGui.Dummy(1, 10)
 			ImGui.SetNextItemWidth(-1)
@@ -1908,7 +1923,10 @@ local function ForgeAxisWindow()
 		ImGui.SameLine()
 
 		ImGui.SetNextWindowBgAlpha(0.0)
-		if ImGui.BeginChild("axis rotation", 220, 340, true) then
+		if ImGui.BeginChildEx("axis rotation",
+				vec2:new(220, 340),
+				ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
+			) then
 			ImGui.SeparatorText(_T("EF_ROTATE_OBJECT"))
 			ImGui.Dummy(1, 10)
 			ImGui.SetNextItemWidth(-1)

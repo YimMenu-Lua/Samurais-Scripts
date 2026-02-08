@@ -9,6 +9,7 @@
 
 local ped_list <const>    = require("includes.data.peds")
 local ped_hashmap <const> = require("includes.data.ped_hashmap")
+local weaponData <const>  = require("includes.data.weapon_data")
 local Refs                = require("includes.data.refs")
 
 
@@ -79,6 +80,16 @@ function Game.GetKeyPressed()
 			return v.ctrl, v.gpad
 		end
 	end
+end
+
+---@return boolean
+function Game.IsLegacy()
+	return Backend:GetAPIVersion() == Enums.eAPIVersion.V1
+end
+
+---@return boolean
+function Game.IsEnhanced()
+	return Backend:GetAPIVersion() == Enums.eAPIVersion.V2
 end
 
 ---@return boolean
@@ -460,14 +471,14 @@ function Game.SetBlipName(blip, name)
 	HUD.END_TEXT_COMMAND_SET_BLIP_NAME(blip)
 end
 
----@param i_entity integer
----@param i_heading integer
-function Game.SetEntityHeading(i_entity, i_heading)
-	if not Game.IsScriptHandle(i_entity) then
+---@param entity handle
+---@param heading float
+function Game.SetEntityHeading(entity, heading)
+	if not Game.IsScriptHandle(entity) then
 		return
 	end
 
-	ENTITY.SET_ENTITY_HEADING(i_entity, i_heading)
+	ENTITY.SET_ENTITY_HEADING(entity, heading)
 end
 
 ---@param handle integer
@@ -1152,6 +1163,23 @@ function Game.IsPedModelHuman(model)
 
 	local found = ped_list[model]
 	return found and found.is_human or false
+end
+
+---@param weapon string|joaat_t
+---@return string
+function Game.GetWeaponDisplayName(weapon)
+	local hash
+	if (type(weapon) == "string") then
+		hash = joaat(weapon)
+	elseif (type(weapon) == "number") then
+		hash = weapon
+	end
+
+	if (not hash or not weaponData[hash]) then
+		return _T("GENERIC_UNKOWN")
+	end
+
+	return weaponData[hash].display_name
 end
 
 ---@param coords vec3

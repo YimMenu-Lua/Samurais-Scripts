@@ -241,10 +241,16 @@ end
 -- Conversions
 --------------------------------------
 
--- Returns the heading angle (XY plane).
----@return number
+-- Returns the compass heading (0 - 360).
+--
+-- Heading is measured from +Y (forward) around the Z axis.
+--
+-- This differs from vec2:angle(), which measures from +X using
+--
+-- the standard math convention.
+---@return float
 function vec3:heading()
-	return math.atan(self.y, self.x)
+	return (math.deg(math.atan(self.x, self.y)) + 360) % 360
 end
 
 -- Returns a new vec3 with the z component replaced.

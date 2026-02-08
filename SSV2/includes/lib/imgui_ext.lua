@@ -886,3 +886,40 @@ function ImGui.DialogBox(label, message, boxStyle)
 
 	return v
 end
+
+---@param name string
+---@param size vec2
+---@param childFlags? integer
+---@param windowFlags? integer
+---@return boolean
+function ImGui.BeginChildEx(name, size, childFlags, windowFlags)
+	childFlags  = childFlags or 0
+	windowFlags = windowFlags or 0
+
+
+	---@diagnostic disable
+	local bChildBorder = Bit.is_set(childFlags, 0)
+	if (_G.FAKE_YIMAPI) then
+		-- if we used ImGuiWindowFlags.AlwaysUseWindowPadding or we set ImGuiChildFlags.Borders then
+		-- always enable window padding
+		local paddingFlag = ImGuiWindowFlags.AlwaysUseWindowPadding -- this is 1 << 30 in YimMenu's ImGuiWindowFlags
+		if ((type(paddingFlag) == "number" and Bit.is_set(windowFlags, paddingFlag)) or bChildBorder) then
+			childFlags = Bit.set(childFlags, 1)
+		end
+	else
+		-- We can use either ImGuiChildFlags.AlwaysUseWindowPadding or ImGuiWindowFlags.AlwaysUseWindowPadding
+		-- both will work as long as they are in the correct parameter position
+		if (Bit.is_set(childFlags, 1)) then
+			windowFlags = windowFlags | ImGuiWindowFlags.AlwaysUseWindowPadding
+		end
+	end
+
+	return ImGui.BeginChild(
+		name,
+		size.x,
+		size.y,
+		_G.FAKE_YIMAPI and childFlags or bChildBorder,
+		windowFlags
+	)
+	---@diagnostic enable
+end

@@ -33,11 +33,10 @@ from alive_progress import alive_bar
 from deep_translator import GoogleTranslator
 from langcodes import Language as Lang
 from argparse import ArgumentParser as ArgParser
-import deep_translator.exceptions
 import threading
 
 
-PARENT_PATH = Path(__file__).resolve().parent
+PARENT_PATH = Path(__file__).resolve().parent.parent
 LUA_PATH = PARENT_PATH.parent.parent / "SSV2/includes/lib/translations"
 HASHMAP_PATH = LUA_PATH / "__hashmap.json"
 MAX_WORKERS = min(16, (os.cpu_count() or 2) * 4)

@@ -7,9 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
--- Auto-generated on 14-12-2025
----@diagnostic disable
 
+-- Auto-generated on <08-02-2026>
+
+
+---@diagnostic disable
 
 return {
 	adder = {

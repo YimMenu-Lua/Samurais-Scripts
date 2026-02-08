@@ -241,6 +241,8 @@ function SalvageYard:BringTowMissionTarget()
 			return
 		end
 
+		local towTruck  = PV:GetHandle()
+		local myHandle  = Self:GetHandle()
 		local myPos     = Self:GetPos()
 		local heading   = Self:GetHeading()
 		local bonePos   = PV:GetBonePosition("tow_mount_a")
@@ -252,13 +254,14 @@ function SalvageYard:BringTowMissionTarget()
 		)
 
 		if (myPos:distance(objective) >= 100) then
-			PED.SET_PED_COORDS_KEEP_VEHICLE(Self:GetHandle(), objective.x, objective.y, objective.z)
+			-- update the objective without touching any script locals then jump back to our previous position
+			PED.SET_PED_COORDS_KEEP_VEHICLE(myHandle, objective.x, objective.y, objective.z)
 			yield()
-			PED.SET_PED_COORDS_KEEP_VEHICLE(Self:GetHandle(), myPos.x, myPos.y, myPos.z)
-			VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(PV:GetHandle(), 5.0)
+			PED.SET_PED_COORDS_KEEP_VEHICLE(myHandle, myPos.x, myPos.y, myPos.z)
+			VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(towTruck, 5.0)
 		end
 
-		VEHICLE.SET_VEHICLE_TOW_TRUCK_ARM_POSITION(PV:GetHandle(), 0.0)
+		VEHICLE.SET_VEHICLE_TOW_TRUCK_ARM_POSITION(towTruck, 0.0)
 		sleep(2000)
 		ENTITY.SET_ENTITY_HEADING(veh, heading)
 		ENTITY.SET_ENTITY_PROOFS(
@@ -266,7 +269,7 @@ function SalvageYard:BringTowMissionTarget()
 			false,
 			false,
 			false,
-			true,
+			true, -- collision proof so it doesn't yeet itself when we bring it
 			false,
 			false,
 			false,
@@ -278,19 +281,28 @@ function SalvageYard:BringTowMissionTarget()
 		end
 
 		VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(veh, 5.0)
-		if (not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(veh, PV:GetHandle())) then
-			VEHICLE.ATTACH_VEHICLE_TO_TOW_TRUCK(PV:GetHandle(), veh, false, 0, 0, 0)
+		if (not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(veh, towTruck)) then
+			VEHICLE.ATTACH_VEHICLE_TO_TOW_TRUCK(towTruck, veh, false, 0, 0, 0)
 			sleep(500)
 		end
 
-		VEHICLE.SET_VEHICLE_TOW_TRUCK_ARM_POSITION(PV:GetHandle(), 1.0)
+		VEHICLE.SET_VEHICLE_TOW_TRUCK_ARM_POSITION(towTruck, 1.0)
 
+		-- teleport to the salvage yard to complete the mission
 		---@diagnostic disable
 		local syPos = self:GetCoords()
-		if (Self:GetPos():distance(syPos) > 10 and ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(veh, PV:GetHandle())) then
+		if (Self:GetPos():distance(syPos) > 10) then
 			Self:Teleport(syPos, true)
+			---@diagnostic enable
+
+			sleep(2000)
+			if (Self:IsOutside() and not CAM.IS_SCREEN_FADING_OUT() and not CAM.IS_SCREEN_FADED_OUT() and not CAM.IS_SCREEN_FADING_IN()) then
+				if (not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(veh, towTruck)) then
+					VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(veh, 5.0)
+					VEHICLE.SET_ATTACHED_VEHICLE_TO_TOW_TRUCK_ARM_(towTruck, veh)
+				end
+			end
 		end
-		---@diagnostic enable
 	end)
 end
 

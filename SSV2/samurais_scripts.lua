@@ -9,16 +9,8 @@
 
 local commandRegistry = require("includes.lib.commands")
 local Weapons         = require("includes.data.weapons")
+local weaponData      = require("includes.data.weapon_data")
 
----@param t table
----@param group_type string
-local function populate_weapon_list(t, group_type)
-	for _, v in ipairs(weapons.get_all_weapons_of_group_type(group_type)) do
-		local hash = joaat(v)
-		table.insert(t, hash)
-		table.insert(Weapons.All, hash)
-	end
-end
 
 local weapons_map = {
 	["GROUP_MELEE"]       = Weapons.Melee,
@@ -34,6 +26,22 @@ local weapons_map = {
 	["GROUP_STUNGUN"]     = Weapons.Misc,
 	["GROUP_TRANQILIZER"] = Weapons.Misc,
 }
+
+local function populate_weapons()
+	for hash, data in pairs(weaponData) do
+		data.display_name = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(data.gxt)
+		local group       = data.group
+		local cat         = weapons_map[group]
+		if (not cat) then
+			goto continue
+		end
+
+		table.insert(cat, hash)
+		table.insert(Weapons.All, hash)
+
+		::continue::
+	end
+end
 
 require("includes.init")
 
@@ -51,9 +59,7 @@ ThreadManager:Run(function()
 
 	YimActions:RegisterCommands()
 
-	for group_name, list in pairs(weapons_map) do
-		populate_weapon_list(list, group_name)
-	end
+	populate_weapons()
 
 	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD8, function()
 		Self:GetVehicle():RamForward()

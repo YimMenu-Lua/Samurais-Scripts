@@ -5,6 +5,7 @@
 #	python game_data_gen.py --vehicles	: generates vehicle list only.
 #	python game_data_gen.py --peds		: generates ped list only.
 #	python game_data_gen.py --objects	: generates object list only.
+#	python game_data_gen.py --weapons	: generates weapon list only.
 #
 #	CI Run: None. Only local.
 
@@ -26,7 +27,7 @@ from argparse import ArgumentParser as ArgParser
 from pathlib import Path
 
 
-PARENT_PATH = Path(__file__).resolve().parent
+PARENT_PATH = Path(__file__).resolve().parent.parent
 SCRIPT_ROOT = PARENT_PATH.parent.parent
 LUA_DATA_PATH = SCRIPT_ROOT / "SSV2/includes/data"
 SS_NOTICE = """-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
@@ -197,6 +198,38 @@ def gen_peds():
     write_lua_table(LUA_DATA_PATH / "ped_hashmap.lua", hash_lookup)
 
 
+def gen_weapons():
+    jsondata = read_raw_file("weapons.json")
+    out = {}
+
+    with alive_bar(len(jsondata), title="Generating Weapons", force_tty=True) as bar:
+        for wpn in jsondata:
+            if wpn["IsVehicleWeapon"] == True:
+                continue
+
+            if not wpn["TranslatedLabel"]:
+                continue
+
+            gxt = wpn["TranslatedLabel"]["Name"]
+            if not gxt or gxt == "WT_INVALID":
+                continue
+
+            str_name = wpn["Name"]
+            joaat_hash = wpn["Hash"]
+            group = wpn["Category"]
+
+            out[joaat_hash] = {
+                "model_name": str_name,
+                "group": group,
+                "gxt": gxt,
+                "display_name": "" # we'll get this from the game on script load
+            }
+
+            bar()
+
+    write_lua_table(LUA_DATA_PATH / "weapon_data.lua", out)
+
+
 def gen_objects():
     resp_text = read_raw_file("ObjectList.ini", as_json=False)
     data = resp_text.splitlines()
@@ -210,13 +243,15 @@ def gen_objects():
     write_lua_table(LUA_DATA_PATH / "objects.lua", out)
 
 
-def generate_lists(vehicles: bool = True, peds: bool = True, objects: bool = True):
+def generate_lists(vehicles: bool = True, peds: bool = True, objects: bool = True, weapons: bool = True):
     if vehicles:
         gen_vehicles()
     if peds:
         gen_peds()
     if objects:
         gen_objects()
+    if weapons:
+        gen_weapons()
 
 
 if __name__ == "__main__":
@@ -224,14 +259,16 @@ if __name__ == "__main__":
     parser.add_argument("--vehicles", action="store_true", help="Generate vehicle list.")
     parser.add_argument("--peds", action="store_true", help="Generate ped list.")
     parser.add_argument("--objects", action="store_true", help="Generate object list.")
+    parser.add_argument("--weapons", action="store_true", help="Generate weapon list.")
     args = parser.parse_args()
 
     genvehs = args.vehicles
     genpeds = args.peds
     genobj  = args.objects
+    genwpns = args.weapons
 
     if (len(sys.argv) == 1):
         print("No arguments passed. Generating all lists...")
-        genvehs, genpeds, genobj = True, True, True
+        genvehs, genpeds, genobj, genwpns = True, True, True, True
 
-    generate_lists(genvehs, genpeds, genobj)
+    generate_lists(genvehs, genpeds, genobj, genwpns)

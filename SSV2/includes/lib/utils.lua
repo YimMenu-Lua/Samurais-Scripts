@@ -40,13 +40,8 @@ _F        = string.format
 
 --#region Global functions
 
--- A dummy function that returns its parameter or nil.
----@generic T
----@param arg? T
----@return T
-function DummyFunc(arg)
-	return arg
-end
+-- A dummy function (no-operation).
+function NOP() end
 
 -- Returns whether `obj` is an instance of `T`. Can be used instead of Lua's default `type` function.
 --
