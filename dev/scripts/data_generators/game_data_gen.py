@@ -27,7 +27,7 @@ from argparse import ArgumentParser as ArgParser
 from pathlib import Path
 
 
-PARENT_PATH = Path(__file__).resolve().parent
+PARENT_PATH = Path(__file__).resolve().parent.parent
 SCRIPT_ROOT = PARENT_PATH.parent.parent
 LUA_DATA_PATH = SCRIPT_ROOT / "SSV2/includes/data"
 SS_NOTICE = """-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.

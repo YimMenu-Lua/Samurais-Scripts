@@ -26,7 +26,7 @@ from pathlib import Path
 from slpp import slpp as Lua
 
 
-PARENT_PATH = Path(__file__).resolve().parent
+PARENT_PATH = Path(__file__).resolve().parent.parent
 SCRIPT_ROOT = PARENT_PATH.parent.parent
 REPO_URLS = [
     "https://raw.githubusercontent.com/acidlabsgg/gtav-legacy-scripts/refs/heads/main/scripts",
