@@ -232,9 +232,8 @@ def main(auto: bool = True):
         local = args.local
         path = args.decomps_path
         generate(offsets_table, version, local, path)
-    
-    if (args.diff):
-        return
+        if (args.diff):
+            return
     
     data = serialize_lua(offsets_table)
     with open(table_path, "w", encoding="utf-8", newline="\n") as f:
