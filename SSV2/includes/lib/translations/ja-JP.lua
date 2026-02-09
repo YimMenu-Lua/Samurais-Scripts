@@ -614,5 +614,17 @@ return {
 	["SY_NOT_IN_TOWTRUCK_ERR"] = "あなたはレッカー車に座っていません。",
 	["YRV3_SCRIPT_HOST_ERR"] = "セールミッションを完了できません!あなたはこのスクリプトのホストではありません。",
 	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "ミッション目標を見つけることができませんでした。",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "スクリプト スレッドの制御を取得できませんでした。"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "スクリプト スレッドの制御を取得できませんでした。",
+	["SELF_ABILITY_STAM"] = "スタミナ",
+	["SELF_ABILITY_SHOOTING"] = "射撃",
+	["SELF_ABILITY_EDITOR"] = "選手の能力",
+	["SELF_ABILITY_STRENGTH"] = "強さ",
+	["SELF_ABILITY_FLYING"] = "フライング",
+	["SELF_ABILITY_STEALTH"] = "ステルス",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "肺活量",
+	["SELF_ABILITY_DRIVING"] = "運転",
+	["SELF_ABILITY_MENTAL_STATE"] = "精神状態",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "あなたは CEO オフィスを所有していません。",
+	["YRV3_WAREHOUSE_SLOT"] = "倉庫 %d",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "特殊貨物倉庫"
 }

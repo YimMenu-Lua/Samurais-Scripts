@@ -16,7 +16,7 @@
 ---@field open boolean
 
 ---@enum ImGuiSpinnerStyle
-ImGuiSpinnerStyle             = {
+ImGuiSpinnerStyle   = {
 	SCAN        = 1,
 	FILL        = 2,
 	BOUNCE      = 3,
@@ -31,18 +31,34 @@ ImGuiSpinnerStyle             = {
 }
 
 ---@enum ImGuiValueBarFlags
-ImGuiValueBarFlags            = {
+ImGuiValueBarFlags  = {
 	NONE      = 0,
 	VERTICAL  = 1 << 0,
 	MULTI_VAL = 1 << 1,
 }
 
 ---@enum ImGuiDialogBoxStyle
-ImGuiDialogBoxStyle           = {
+ImGuiDialogBoxStyle = {
 	INFO   = 0,
 	WARN   = 1,
 	SEVERE = 2,
 }
+
+if (not _G.FAKE_YIMAPI) then
+	---@enum ImGuiChildFlags
+	ImGuiChildFlags = {
+		None                   = 0,
+		Borders                = 1 << 0, -- this does not work in YimLuaAPI for some reason. No borders are drawn around child windows
+		AlwaysUseWindowPadding = 1 << 1,
+		ResizeX                = 1 << 2,
+		ResizeY                = 1 << 3,
+		AutoResizeX            = 1 << 4,
+		AutoResizeY            = 1 << 5,
+		AlwaysAutoResize       = 1 << 6,
+		FrameStyle             = 1 << 7,
+		NavFlattened           = 1 << 8,
+	}
+end
 
 local toggleStates            = {}
 
@@ -887,39 +903,57 @@ function ImGui.DialogBox(label, message, boxStyle)
 	return v
 end
 
+--#region BeginChildEx
+
+local CHILD_BORDERS_BIT <const> = 0
+local CHILD_PADDING_BIT <const> = 1
+
+---@param childFlags integer
+---@return boolean
+local function wants_border(childFlags)
+	return Bit.is_set(childFlags, CHILD_BORDERS_BIT)
+end
+
+---@param childFlags integer
+---@param windowFlags integer
+---@return boolean
+local function wants_padding(childFlags, windowFlags)
+	if (Bit.is_set(childFlags, CHILD_PADDING_BIT)) then
+		return true
+	end
+
+	local pad = ImGuiWindowFlags.AlwaysUseWindowPadding
+	return type(pad) == "number" and Bit.is_set(windowFlags, pad) or false
+end
+
+-- This is a wrapper around `ImGui.BeginChild` that's compatible with both YimMenu and YimLuaAPI.
+--
+-- It's strongly recommended to use `ImGuiChildFlags` in YimMenu even though they don't exist
+--
+-- in the API *(we define them ourselves, see the top of this file)*.
 ---@param name string
 ---@param size vec2
 ---@param childFlags? integer
 ---@param windowFlags? integer
 ---@return boolean
 function ImGui.BeginChildEx(name, size, childFlags, windowFlags)
-	childFlags  = childFlags or 0
-	windowFlags = windowFlags or 0
+	childFlags    = childFlags or 0
+	windowFlags   = windowFlags or 0
+	local border  = wants_border(childFlags)
+	local padding = wants_padding(childFlags, windowFlags)
 
-
-	---@diagnostic disable
-	local bChildBorder = Bit.is_set(childFlags, 0)
 	if (_G.FAKE_YIMAPI) then
-		-- if we used ImGuiWindowFlags.AlwaysUseWindowPadding or we set ImGuiChildFlags.Borders then
-		-- always enable window padding
-		local paddingFlag = ImGuiWindowFlags.AlwaysUseWindowPadding -- this is 1 << 30 in YimMenu's ImGuiWindowFlags
-		if ((type(paddingFlag) == "number" and Bit.is_set(windowFlags, paddingFlag)) or bChildBorder) then
-			childFlags = Bit.set(childFlags, 1)
+		if (padding) then
+			childFlags = Bit.set(childFlags, CHILD_PADDING_BIT)
 		end
+		---@diagnostic disable-next-line: param-type-mismatch
+		return ImGui.BeginChild(name, size.x, size.y, childFlags, windowFlags)
 	else
-		-- We can use either ImGuiChildFlags.AlwaysUseWindowPadding or ImGuiWindowFlags.AlwaysUseWindowPadding
-		-- both will work as long as they are in the correct parameter position
-		if (Bit.is_set(childFlags, 1)) then
+		if (padding) then
 			windowFlags = windowFlags | ImGuiWindowFlags.AlwaysUseWindowPadding
 		end
+		return ImGui.BeginChild(name, size.x, size.y, border, windowFlags)
 	end
-
-	return ImGui.BeginChild(
-		name,
-		size.x,
-		size.y,
-		_G.FAKE_YIMAPI and childFlags or bChildBorder,
-		windowFlags
-	)
-	---@diagnostic enable
 end
+
+--#endregion

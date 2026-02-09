@@ -109,6 +109,10 @@ function Self:GetTotalBalance()
 	return Self:GetWalletBalance() + Self:GetBankBalance()
 end
 
+function Self:GetName()
+	return Game.GetCharacterName()
+end
+
 function Self:OnVehicleSwitch()
 	if (self.m_vehicle:IsValid()) then
 		self.m_vehicle:RestoreHeadlights()
@@ -207,7 +211,8 @@ end
 -- Teleports local player to the provided coordinates.
 ---@param where integer|vec3 -- [blip ID](https://wiki.rage.mp/wiki/Blips) or vector3 coordinates
 ---@param keep_vehicle? boolean
-function Self:Teleport(where, keep_vehicle)
+---@param loadGround? boolean
+function Self:Teleport(where, keep_vehicle, loadGround)
 	ThreadManager:Run(function()
 		local coords -- fwd decl
 
@@ -239,7 +244,9 @@ function Self:Teleport(where, keep_vehicle)
 			return
 		end
 
-		TaskWait(Game.LoadGroundAtCoord, { coords }, 500)
+		if (loadGround) then
+			TaskWait(Game.LoadGroundAtCoord, { coords }, 500)
+		end
 
 		local handle  = self:GetHandle()
 		-- local dir = Self:GetPos() - coords -- it's so stupid that passing the coords works better than the correct params. I'm so dumb bruh

@@ -614,5 +614,17 @@ return {
 	["YRV3_SCRIPT_HOST_ERR"] = "판매 임무를 완료할 수 없습니다! 귀하는 이 스크립트의 호스트가 아닙니다.",
 	["SY_TOW_VEH_NOT_FOUND_ERR"] = "대상 차량을 찾지 못했습니다.",
 	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "미션 목표를 찾지 못했습니다.",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "스크립트 스레드를 제어하지 못했습니다!"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "스크립트 스레드를 제어하지 못했습니다!",
+	["SELF_ABILITY_STAM"] = "내구력",
+	["SELF_ABILITY_SHOOTING"] = "촬영",
+	["SELF_ABILITY_STRENGTH"] = "힘",
+	["SELF_ABILITY_EDITOR"] = "플레이어 능력",
+	["SELF_ABILITY_STEALTH"] = "몰래 하기",
+	["SELF_ABILITY_FLYING"] = "나는",
+	["SELF_ABILITY_DRIVING"] = "운전",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "폐활량",
+	["SELF_ABILITY_MENTAL_STATE"] = "정신상태",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "귀하는 CEO 사무실을 소유하고 있지 않습니다.",
+	["YRV3_WAREHOUSE_SLOT"] = "창고 %d",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "특수 화물 창고"
 }

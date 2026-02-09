@@ -7,7 +7,6 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
----@diagnostic disable: undefined-doc-name, param-type-mismatch
 ---@meta
 
 --#region Generic Containers
@@ -39,8 +38,8 @@ GenericClass = setmetatable({}, {
 ---@field public Values fun(self: Enum): integer[] Returns an array of all enum values.
 ---@field public NameOf fun(self: Enum, value: integer): string Returns the key name of `value`.
 ---@field public Has fun(self: Enum, value: integer): boolean Returns whether the enum has `value`
----@field private __sizeof fun(self: Enum): integer Used internally to get the size of the enum. If it's an enum of joaa_t -> Size = 0x4.
----@field private __enum boolean Used internally to flag this as an enum. I know, leave me alone 🥲
+---@field private __sizeof fun(self: Enum): integer Used internally to get the symbolic size of the enum. If it's an enum of joaa_t -> Size = 0x4.
+---@field private __enum boolean Used internally to flag this as an enum.
 ---@field private __data_type? string Optional: "int8_t" | "int16_t" | "int32_t" | "int64_t" | "uint8_t" | "uint16_t" | "uint32_t"| "uint64_t" | "joaat_t" | "float" | "byte" Used internally to define the data type so that SizeOf or the internal __sizeof can immediately lookup the size without invoking integer inference.
 
 --#endregion
@@ -60,8 +59,8 @@ GenericClass = setmetatable({}, {
 ---@class uint32_t: integer
 ---@class uint64_t: integer
 ---@class joaat_t: uint32_t
+---@class byte: int8_t
 ---@class float: number
----@class byte: number
 ---@class bool: boolean
 ---@class ID: integer
 -- RAGE entity script handle
@@ -79,25 +78,11 @@ GenericClass = setmetatable({}, {
 ---@alias Predicate<P1, P2, P3, P4, P5> fun(p1: P1, p2?: P2, p3?: P3, p4?: P4, p5?: P5): boolean
 ---@alias Comparator<A, B> fun(a: A, b: B): boolean
 
--- A poor man's `nullptr` 🥲
+-- A poor man's `nullptr`
 ---@class nullptr : pointer
 nullptr = memory.pointer:new(0)
 
 ---@type boolean?
-_G.FAKE_YIMAPI = _G.FAKE_YIMAPI
-
----@enum ImGuiChildFlags
-ImGuiChildFlags = {
-	None                   = 0,
-	Borders                = 1 << 0, -- this does not work in YimLuaAPI for some reason. No borders are drawn around child windows
-	AlwaysUseWindowPadding = 1 << 1,
-	ResizeX                = 1 << 2,
-	ResizeY                = 1 << 3,
-	AutoResizeX            = 1 << 4,
-	AutoResizeY            = 1 << 5,
-	AlwaysAutoResize       = 1 << 6,
-	FrameStyle             = 1 << 7,
-	NavFlattened           = 1 << 8,
-}
+_G.FAKE_YIMAPI = _G.FAKE_YIMAPI or false
 
 --#endregion

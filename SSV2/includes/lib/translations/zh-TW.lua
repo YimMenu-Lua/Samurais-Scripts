@@ -614,5 +614,17 @@ return {
 	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "未能找到任務目標。",
 	["SY_NOT_IN_TOWTRUCK_ERR"] = "你不是坐在拖車裡。",
 	["YRV3_SCRIPT_HOST_ERR"] = "無法完成銷售任務！您不是該腳本的主持人。",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "無法控制腳本線程！"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "無法控制腳本線程！",
+	["SELF_ABILITY_SHOOTING"] = "射擊",
+	["SELF_ABILITY_EDITOR"] = "玩家能力",
+	["SELF_ABILITY_STRENGTH"] = "力量",
+	["SELF_ABILITY_STAM"] = "耐力",
+	["SELF_ABILITY_FLYING"] = "飛行",
+	["SELF_ABILITY_DRIVING"] = "駕駛",
+	["SELF_ABILITY_STEALTH"] = "隱身",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "肺活量",
+	["SELF_ABILITY_MENTAL_STATE"] = "精神狀態",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "您沒有首席執行官辦公室。",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "特殊貨物倉庫",
+	["YRV3_WAREHOUSE_SLOT"] = "倉庫 %d"
 }

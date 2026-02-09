@@ -381,7 +381,34 @@ end
 
 --#region extensions
 
---#region YimMenu
+--#region Lua API
+
+---@param stat_name string
+---@param v number
+---@param min? number
+---@param max? number
+function stats.increment_stat(stat_name, v, min, max)
+	min = min or 0
+	max = max or 100
+
+	local stat_get, stat_set
+	if (math.type(v) == "integer") then
+		stat_get, stat_set = stats.get_int, stats.set_int
+	elseif (math.type(v) == "float") then
+		stat_get, stat_set = stats.get_float, stats.set_float
+	end
+
+	if (not stat_get or not stat_set) then
+		return
+	end
+
+	local sum = stat_get(stat_name) + v
+	if (sum < min or sum > max) then
+		return
+	end
+
+	stat_set(stat_name, sum)
+end
 
 -- Equality comparator for pointer objects.
 ---@type Comparator<pointer, pointer>

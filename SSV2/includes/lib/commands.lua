@@ -27,11 +27,17 @@ local commandRegistry <const> = {
 	},
 	["yrv3.restock_warehouse"] = {
 		callback = function(args)
+			local office = YRV3:GetOffice()
+			if (not office) then
+				Notifier:ShowError("CommandExecutor", _T("YRV3_CEO_OFFICE_NOT_OWNED"))
+				return
+			end
+
 			local arg = args and args[1] or nil
 			if (type(arg) == "string" and arg == "all") then
-				for _, wh in ipairs(YRV3:GetSCWarehouses()) do
+				for _, wh in ipairs(office:GetCargoWarehouses()) do
 					if (wh:IsValid() and not wh:HasFullProduction()) then
-						wh:AutoFill()
+						wh.auto_fill = true
 					end
 				end
 			elseif (type(arg) == "number") then

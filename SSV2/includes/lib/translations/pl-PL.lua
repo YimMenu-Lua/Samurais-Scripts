@@ -614,5 +614,17 @@ return {
 	["SY_TOW_VEH_NOT_FOUND_ERR"] = "Nie udało się znaleźć pojazdu docelowego.",
 	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "Nie udało się znaleźć celu misji.",
 	["YRV3_SCRIPT_HOST_ERR"] = "Nie można ukończyć misji sprzedaży! Nie jesteś gospodarzem tego skryptu.",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "Nie udało się przejąć kontroli nad wątkiem skryptu!"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Nie udało się przejąć kontroli nad wątkiem skryptu!",
+	["SELF_ABILITY_STEALTH"] = "Podstęp",
+	["SELF_ABILITY_EDITOR"] = "Zdolności Gracza",
+	["SELF_ABILITY_DRIVING"] = "Napędowy",
+	["SELF_ABILITY_FLYING"] = "Latający",
+	["SELF_ABILITY_STAM"] = "Wytrwałość",
+	["SELF_ABILITY_SHOOTING"] = "Strzelanie",
+	["SELF_ABILITY_STRENGTH"] = "Wytrzymałość",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "Pojemność płuc",
+	["SELF_ABILITY_MENTAL_STATE"] = "Stan psychiczny",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Nie masz biura dyrektora generalnego.",
+	["YRV3_WAREHOUSE_SLOT"] = "Magazyn %d",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Magazyny ładunków specjalnych"
 }

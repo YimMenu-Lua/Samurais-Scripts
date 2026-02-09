@@ -22,7 +22,7 @@ local function GetCurrentKey()
 	local _, code, name = KeyManager:IsAnyKeyPressed()
 	if (code == eVirtualKeyCodes.VK_LBUTTON
 			or code == eVirtualKeyCodes.VK_RBUTTON
-			or code == eVirtualKeyCodes.ALT
+		-- or code == eVirtualKeyCodes.ALT
 		) then
 		return
 	end
@@ -61,7 +61,7 @@ local function DrawKeybinds(gvarKey, isController)
 	ImGui.SetNextItemWidth(key_container_width)
 	currentKeyName, _ = ImGui.InputText(_F("##%s", label), currentKeyName, 16, ImGuiInputTextFlags.ReadOnly)
 
-	if GUI:IsItemClicked(0) then
+	if ImGui.IsItemClicked(0) then
 		ImGui.OpenPopup(label)
 		Backend.disable_input = true
 	end
@@ -82,25 +82,24 @@ local function DrawKeybinds(gvarKey, isController)
 			| ImGuiWindowFlags.NoTitleBar
 			| ImGuiWindowFlags.NoMove
 		) then
-		local size   = vec2:new(ImGui.GetWindowSize())
-		local _, pos = GUI:GetNewWindowSizeAndCenterPos(0.5, 0.5, size)
-		local region = vec2:new(ImGui.GetContentRegionAvail())
+		local winSize = vec2:new(ImGui.GetWindowSize())
+		local _, pos  = GUI:GetNewWindowSizeAndCenterPos(0.5, 0.5, winSize)
 		ImGui.SetWindowPos(label, pos.x, pos.y, ImGuiCond.Always)
 
-		local reserved_set = isController and reservedKeys.gpad or reservedKeys.kb
 		if ImGui.SmallButton("X") then
-			keyCode, keyName = nil, nil
-			Backend.disable_input = false
 			ImGui.CloseCurrentPopup()
+			Backend.disable_input = false
+			keyCode, keyName = nil, nil
 		end
 
 		ImGui.Separator()
 		ImGui.Dummy(1, 10)
 
-		if not keyName then
+		local reserved_set = isController and reservedKeys.gpad or reservedKeys.kb
+		if (not keyName) then
 			ImGui.Text(ImGui.TextSpinner(_T("SETTINGS_HOTKEY_WAIT"), 10, ImGuiSpinnerStyle.BOUNCE_DOTS))
 
-			if isController then
+			if (isController) then
 				keyCode, keyName = Game.GetKeyPressed()
 			else
 				keyCode, keyName = GetCurrentKey()
@@ -108,11 +107,13 @@ local function DrawKeybinds(gvarKey, isController)
 		else
 			_reserved = reserved_set:Contains(keyCode)
 
-			if not _reserved then
+			if (_reserved) then
+				GUI:Text(_T("SETTINGS_HOTKEY_RESERVED"), { color = Color("red"), alpha = 0.86, wrap_pos = winSize.x })
+			else
 				local valueBarSize = vec2:new(button_size.x, ImGui.GetTextLineHeightWithSpacing())
 				ImGui.Text(_T("SETTINGS_HOTKEY_FOUND"))
 				ImGui.SameLine()
-				ImGui.SetCursorPosX(size.x - valueBarSize.x - style.WindowPadding.x)
+				ImGui.SetCursorPosX(winSize.x - valueBarSize.x - style.WindowPadding.x)
 				ImGui.ValueBar(
 					"##keyName",
 					0,
@@ -120,33 +121,37 @@ local function DrawKeybinds(gvarKey, isController)
 					ImGuiValueBarFlags.NONE,
 					{ fmt = keyName }
 				)
-			else
-				GUI:Text(_T("SETTINGS_HOTKEY_RESERVED"), { color = Color("red"), alpha = 0.86, wrap_pos = size.x })
 			end
 		end
-		ImGui.SetCursorPosY(region.y - button_size.y + style.WindowPadding.y)
+
+		local _, availY = ImGui.GetContentRegionAvail()
+		-- ImGui.SetCursorPosY crashes in YimLuaAPI for no reason that I can make sense of.
+		-- I give up. here's a dummy instead.
+		ImGui.Dummy(0, math.max(0, availY - button_size.y - style.WindowPadding.y))
 
 		if (keyCode and keyName and not _reserved) then
-			if GUI:Button(_T("GENERIC_CONFIRM"), { size = button_size }) then
-				if not isController then
+			if (GUI:Button(_T("GENERIC_CONFIRM"), { size = button_size })) then
+				if (not isController) then
 					KeyManager:UpdateKeybind(current_key, { id = keyName })
 				end
 
 				local newKey = isController and { name = keyName, code = keyCode } or keyName
 				table.set_nested_key(GVars, current_path, newKey)
-				keyCode, keyName = nil, nil
-				Backend.disable_input = false
 				ImGui.CloseCurrentPopup()
+				Backend.disable_input = false
+				keyCode, keyName = nil, nil
 			end
+
 			ImGui.SameLine()
-			ImGui.SetCursorPosX(size.x - button_size.x - style.WindowPadding.x)
+			ImGui.SetCursorPosX(winSize.x - button_size.x - style.WindowPadding.x)
 		end
 
 		if (keyName) then
-			if GUI:Button(_T("GENERIC_CLEAR"), { size = button_size }) then
+			if (GUI:Button(_T("GENERIC_CLEAR"), { size = button_size })) then
 				keyCode, keyName = nil, nil
 			end
 		end
+
 		ImGui.EndPopup()
 	end
 end

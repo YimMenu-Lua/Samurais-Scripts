@@ -614,5 +614,17 @@ return {
 	["SY_TOW_VEH_NOT_FOUND_ERR"] = "Не удалось найти целевой автомобиль.",
 	["YRV3_SCRIPT_HOST_ERR"] = "Невозможно завершить миссию по продаже! Вы не являетесь хозяином этого скрипта.",
 	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "Не удалось найти цель миссии.",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "Не удалось получить контроль над потоком сценария!"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Не удалось получить контроль над потоком сценария!",
+	["SELF_ABILITY_STAM"] = "Выносливость",
+	["SELF_ABILITY_EDITOR"] = "Способности игрока",
+	["SELF_ABILITY_FLYING"] = "Летающий",
+	["SELF_ABILITY_DRIVING"] = "Вождение",
+	["SELF_ABILITY_STRENGTH"] = "Сила",
+	["SELF_ABILITY_SHOOTING"] = "Стрельба",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "Объем легких",
+	["SELF_ABILITY_STEALTH"] = "Скрытность",
+	["SELF_ABILITY_MENTAL_STATE"] = "Психическое состояние",
+	["YRV3_WAREHOUSE_SLOT"] = "Склад %d",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "У вас нет офиса генерального директора.",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Склады специальных грузов"
 }

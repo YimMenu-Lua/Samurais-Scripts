@@ -23,7 +23,7 @@ local CashSafe        = require("includes.modules.businesses.CashSafe")
 ---@field private m_id integer
 ---@field private m_name string
 ---@field private m_safe CashSafe
----@field private m_subs Factory[]|BusinessHub[]
+---@field private m_subs Factory[]|BusinessHub[]|Warehouse
 local BusinessFront   = setmetatable({}, BusinessBase)
 BusinessFront.__index = BusinessFront
 
@@ -32,13 +32,15 @@ BusinessFront.__index = BusinessFront
 function BusinessFront.new(opts)
 	assert(type(opts.id) == "number", "Missing argument: id<integer>")
 	assert(type(opts.name) == "string", "Missing argument: name<string>")
-	assert(type(opts.safe_data) == "table", "Missing argument: safe_data<CashSafeOpts>")
 	-- assert(IsInstance(opts.coords, vec3), "Missing argument: coords<vec3>") -- not necessary. UI does not render a tp button if this is missing and LuaLS will warn as well
 
 	local base      = BusinessBase.new(opts)
 	local instance  = setmetatable(base, BusinessFront)
 	instance.m_subs = {}
-	instance.m_safe = CashSafe.new(opts.safe_data)
+
+	if (opts.safe_data) then
+		instance.m_safe = CashSafe.new(opts.safe_data)
+	end
 
 	---@diagnostic disable-next-line
 	return instance

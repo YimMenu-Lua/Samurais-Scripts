@@ -614,5 +614,17 @@ return {
 	["YRV3_SCRIPT_HOST_ERR"] = "Impossible de terminer la mission de vente ! Vous n'êtes pas l'hôte de ce script.",
 	["SY_NOT_IN_TOWTRUCK_ERR"] = "Vous n'êtes pas assis dans la dépanneuse.",
 	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "Impossible de trouver l'objectif de la mission.",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "Échec de la prise de contrôle du fil de script !"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Échec de la prise de contrôle du fil de script !",
+	["SELF_ABILITY_STRENGTH"] = "Force",
+	["SELF_ABILITY_STEALTH"] = "Furtivité",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "Capacité pulmonaire",
+	["SELF_ABILITY_STAM"] = "Endurance",
+	["SELF_ABILITY_SHOOTING"] = "Tournage",
+	["SELF_ABILITY_MENTAL_STATE"] = "État mental",
+	["SELF_ABILITY_DRIVING"] = "Conduite",
+	["SELF_ABILITY_FLYING"] = "Vol",
+	["SELF_ABILITY_EDITOR"] = "Capacités du joueur",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Vous ne possédez pas de bureau de PDG.",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Entrepôts de marchandises spéciales",
+	["YRV3_WAREHOUSE_SLOT"] = "Entrepôt %d"
 }

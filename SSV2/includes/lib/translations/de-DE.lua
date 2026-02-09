@@ -614,5 +614,17 @@ return {
 	["SY_DISABLE_TOWING_COOLDOWN"] = "Deaktivieren Sie die Abklingzeit des Abschleppdienstes",
 	["SY_TOW_VEH_NOT_FOUND_ERR"] = "Das Zielfahrzeug konnte nicht gefunden werden.",
 	["YRV3_SCRIPT_HOST_ERR"] = "Verkaufsmission konnte nicht abgeschlossen werden! Sie sind nicht der Host dieses Skripts.",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "Die Kontrolle über den Skript-Thread konnte nicht übernommen werden!"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Die Kontrolle über den Skript-Thread konnte nicht übernommen werden!",
+	["SELF_ABILITY_DRIVING"] = "Fahren",
+	["SELF_ABILITY_STAM"] = "Ausdauer",
+	["SELF_ABILITY_STEALTH"] = "Heimlichkeit",
+	["SELF_ABILITY_EDITOR"] = "Spielerfähigkeiten",
+	["SELF_ABILITY_STRENGTH"] = "Stärke",
+	["SELF_ABILITY_SHOOTING"] = "Schießen",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "Lungenkapazität",
+	["SELF_ABILITY_MENTAL_STATE"] = "Geisteszustand",
+	["SELF_ABILITY_FLYING"] = "Fliegen",
+	["YRV3_WAREHOUSE_SLOT"] = "Lager %d",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Sie besitzen kein CEO-Büro.",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Spezielle Frachtlager"
 }

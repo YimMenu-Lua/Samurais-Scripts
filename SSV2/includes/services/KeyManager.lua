@@ -32,7 +32,13 @@ eVirtualKeyCodes = { -- https://learn.microsoft.com/en-us/windows/win32/inputdev
 	DIGIT_9                = 0x39,
 	A                      = 0x41,
 	ADD                    = 0x6B,
-	ALT                    = 0x12,
+
+	-- This is disabled because KeyManager never sees the KEYUP event after alt-tabbing so this key gets stuck on KEYDOWN until you press and release it again.
+	-- Since this is a feature keybinding system not a raw input debugger, having it in the first place is counter-intuitive because it's a modifier key
+	-- often used for window focus switching and it's reserved by the game as the default character switch key. Imagine assigning it to a "suicide" command then alt-tabbing
+	-- during a heist or mission. Now that is simply stupid.
+	-- ALT                    = 0x12,
+
 	APPS                   = 0x5D,
 	B                      = 0x42,
 	BACKSPACE              = 0x8,

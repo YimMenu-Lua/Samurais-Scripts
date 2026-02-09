@@ -7,10 +7,20 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local ped_list <const>    = require("includes.data.peds")
-local ped_hashmap <const> = require("includes.data.ped_hashmap")
-local weaponData <const>  = require("includes.data.weapon_data")
-local Refs                = require("includes.data.refs")
+local ped_list <const>     = require("includes.data.peds")
+local ped_hashmap <const>  = require("includes.data.ped_hashmap")
+local weaponData <const>   = require("includes.data.weapon_data")
+local Refs                 = require("includes.data.refs")
+local SP_CharIDs <const>   = {
+	[225514697]  = 0,
+	[2602752943] = 1,
+	[2608926626] = 2,
+}
+local SP_CharNames <const> = {
+	"Michael",
+	"Franklin",
+	"Trevor",
+}
 
 
 --------------------------------------
@@ -18,7 +28,7 @@ local Refs                = require("includes.data.refs")
 --------------------------------------
 -- **Global Singleton.**
 --
--- Native wrappers.
+-- Native wrappers and generic helpers.
 ---@class Game
 Game         = {}
 Game.__index = Game
@@ -1180,6 +1190,32 @@ function Game.GetWeaponDisplayName(weapon)
 	end
 
 	return weaponData[hash].display_name
+end
+
+---@return integer
+function Game.GetCharacterIndex()
+	if (Game.IsOnline()) then
+		return stats.get_character_index()
+	else
+		if (self.get_ped() == 0) then
+			return 0
+		end
+
+		return SP_CharIDs[Self:GetModelHash()]
+	end
+end
+
+function Game.GetCharacterName()
+	local char_idx = Game.GetCharacterIndex()
+	if (Game.IsOnline()) then
+		return STATS.STAT_GET_STRING(joaat(_F("MP%d_CHAR_NAME", char_idx)), -1)
+	end
+
+	if (self.get_ped() == 0) then
+		return "Unknown"
+	end
+
+	return SP_CharNames[char_idx + 1]
 end
 
 ---@param coords vec3
