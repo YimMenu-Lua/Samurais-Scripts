@@ -614,5 +614,17 @@ return {
 	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "Impossibile trovare l'obiettivo della missione.",
 	["YRV3_SCRIPT_HOST_ERR"] = "Impossibile completare la missione di vendita! Non sei l'host di questo script.",
 	["SY_TOW_VEH_NOT_FOUND_ERR"] = "Impossibile trovare il veicolo di destinazione.",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "Impossibile assumere il controllo del thread dello script!"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Impossibile assumere il controllo del thread dello script!",
+	["SELF_ABILITY_STRENGTH"] = "Forza",
+	["SELF_ABILITY_STEALTH"] = "Furtivo",
+	["SELF_ABILITY_DRIVING"] = "Guida",
+	["SELF_ABILITY_FLYING"] = "Volare",
+	["SELF_ABILITY_STAM"] = "Resistenza",
+	["SELF_ABILITY_SHOOTING"] = "Tiro",
+	["SELF_ABILITY_EDITOR"] = "Abilità del giocatore",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "Capacità polmonare",
+	["SELF_ABILITY_MENTAL_STATE"] = "Stato mentale",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Non possiedi un ufficio amministratore delegato.",
+	["YRV3_WAREHOUSE_SLOT"] = "Magazzino %d",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Magazzini per carichi speciali"
 }

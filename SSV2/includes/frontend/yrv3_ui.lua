@@ -133,7 +133,7 @@ local function drawNamePlate(business, custom_name, bg, tpKeepVeh)
 
 	ImGui.SetWindowFontScale(1.18)
 	local custom_name_width = ImGui.CalcTextSize(custom_name)
-	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - custom_name_width - 10) * 0.5)
+	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - custom_name_width) * 0.5)
 	if (bg) then
 		ImGui.TextColored(bg.r, bg.g, bg.b, bg.a, custom_name)
 	else
@@ -147,7 +147,7 @@ local function drawNamePlate(business, custom_name, bg, tpKeepVeh)
 		ImGui.Text("")
 	else
 		local prop_name_width = ImGui.CalcTextSize(prop_name)
-		ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - prop_name_width - 10) * 0.5)
+		ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - prop_name_width) * 0.5)
 		ImGui.Text(prop_name)
 	end
 	ImGui.SetWindowFontScale(1)
@@ -348,21 +348,18 @@ local function drawBikerBusiness(bb, notOwnedLabel)
 	ImGui.EndChild()
 end
 
-local function drawCEOwarehouses()
-	local warehouses = YRV3:GetSCWarehouses()
-	if (not warehouses or #warehouses == 0) then
-		ImGui.Text(_T("YRV3_CEO_NONE_OWNED"))
+local function drawOffice()
+	local office = YRV3:GetOffice()
+	if (not office) then
+		ImGui.Text(_T("YRV3_CEO_OFFICE_NOT_OWNED"))
 		return
 	end
 
-	for i, wh in ipairs(warehouses) do
-		ImGui.PushID(i)
-		drawWarehouse(wh)
-		ImGui.PopID()
-	end
+	drawNamePlate(
+		office,
+		office:GetCustomName()
+	)
 
-	ImGui.Spacing()
-	ImGui.SeparatorText(_T("GENERIC_MISC"))
 	ImGui.Spacing()
 	local bCond = (not script.is_active("gb_contraband_buy") and not script.is_active("fm_content_cargo"))
 	ImGui.BeginDisabled(bCond)
@@ -374,6 +371,26 @@ local function drawCEOwarehouses()
 	if (bCond) then
 		GUI:Tooltip(_T("YRV3_FINISH_SOURCE_MISSION_TT"))
 	end
+
+	ImGui.Spacing()
+	ImGui.SeparatorText(_T("YRV3_CARGO_WAREHOUSES_LABEL"))
+
+	local warehouses = office:GetCargoWarehouses()
+	if (not warehouses or #warehouses == 0) then
+		ImGui.Text(_T("YRV3_CEO_NONE_OWNED"))
+		return
+	end
+
+	ImGui.BeginTabBar("##mc_businesses")
+	for i, wh in ipairs(warehouses) do
+		ImGui.PushID(i)
+		if (ImGui.BeginTabItem(_F(_T("YRV3_WAREHOUSE_SLOT"), i))) then
+			drawWarehouse(wh)
+			ImGui.EndTabItem()
+		end
+		ImGui.PopID()
+	end
+	ImGui.EndTabBar()
 end
 
 local function drawHangar()
@@ -1286,7 +1303,6 @@ local function drawSettings()
 	end
 
 	ImGui.Text(_F(_T("YRV3_AUTOSELL_CURRENT"), YRV3:GetRunningSellScriptDisplayName()))
-
 	ImGui.SeparatorText(_T("YRV3_AUTO_FILL"))
 	ImGui.Text(_T("YRV3_AUTO_FILL_DELAY"))
 	ImGui.SetNextItemWidth(280)
@@ -1301,7 +1317,7 @@ local function drawSettings()
 end
 
 local tabCallbacks <const> = {
-	drawCEOwarehouses,
+	drawOffice,
 	drawHangar,
 	drawClubhouse,
 	drawBunker,

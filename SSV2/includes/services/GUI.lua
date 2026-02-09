@@ -874,7 +874,7 @@ end
 function GUI:QuickConfigWindow(label, callback, onClose)
 	local size = vec2:new(ImGui.GetWindowSize())
 	local _, center = self:GetNewWindowSizeAndCenterPos(0.5, 0.5, size)
-	ImGui.SetWindowPos(center.x, center.y)
+	ImGui.SetWindowPos(center.x, center.y, ImGuiCond.Once)
 
 	ImGui.SeparatorText(label)
 	if (self:Button("Close")) then

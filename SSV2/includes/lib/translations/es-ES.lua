@@ -614,5 +614,17 @@ return {
 	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "No se pudo encontrar el objetivo de la misión.",
 	["YRV3_SCRIPT_HOST_ERR"] = "¡No se puede finalizar la misión de venta! No eres el anfitrión de este script.",
 	["SY_TOW_VEH_NOT_FOUND_ERR"] = "No se pudo encontrar el vehículo objetivo.",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "¡No se pudo tomar el control del hilo del script!"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "¡No se pudo tomar el control del hilo del script!",
+	["SELF_ABILITY_STAM"] = "Aguante",
+	["SELF_ABILITY_SHOOTING"] = "Tiroteo",
+	["SELF_ABILITY_STEALTH"] = "Sigilo",
+	["SELF_ABILITY_FLYING"] = "Vuelo",
+	["SELF_ABILITY_STRENGTH"] = "Fortaleza",
+	["SELF_ABILITY_DRIVING"] = "Conduciendo",
+	["SELF_ABILITY_EDITOR"] = "Habilidades del jugador",
+	["SELF_ABILITY_MENTAL_STATE"] = "Estado mental",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "Capacidad pulmonar",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "No eres dueño de una oficina de director ejecutivo.",
+	["YRV3_WAREHOUSE_SLOT"] = "Almacén %d",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Bodegas de Carga Especial"
 }

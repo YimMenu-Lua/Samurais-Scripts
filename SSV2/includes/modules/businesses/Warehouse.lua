@@ -170,7 +170,12 @@ function Warehouse:Update()
 		return
 	end
 
-	if (self.auto_fill and not self.m_auto_fill_running and not self:HasFullProduction()) then
+	if (self.auto_fill and not self.m_auto_fill_running) then
+		if (self:HasFullProduction()) then
+			self.auto_fill = false
+			return
+		end
+
 		self.m_auto_fill_running = true
 		self:AutoFill()
 	end

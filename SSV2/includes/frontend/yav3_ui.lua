@@ -143,9 +143,6 @@ local t_AnimFlags <const>        = {
 	},
 }
 
-local compatFlag                 = (Backend:GetAPIVersion() == Enums.eAPIVersion.V2) and
-	ImGuiChildFlags.AlwaysUseWindowPadding or true
-
 local function OnTabItemSwitch()
 	if (s_CurrentTab ~= s_PreviousTab) then
 		GUI:PlaySound(GUI.Sounds.Nav)

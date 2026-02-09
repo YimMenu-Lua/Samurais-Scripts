@@ -8,11 +8,24 @@
 
 
 local self_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_SELF, "Self")
+local player_abilities = require("includes.frontend.self.player_abilities")
 local katana_replace_weapons <const> = {
 	2508868239,
 	1141786504,
 	3713923289,
 	2484171525,
+}
+
+---@type WindowRequest
+local playerAbilitiesWindow = {
+	m_label = "##playerAbilitiesWindow",
+	m_callback = function()
+		GUI:QuickConfigWindow(_T("SELF_ABILITY_EDITOR"), player_abilities, function()
+			GUI:SetRequestedWindowDraw("##playerAbilitiesWindow", false)
+		end)
+	end,
+	m_flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize,
+	m_should_draw = false,
 }
 
 local function CheckIfRagdollBlocked()
@@ -186,6 +199,16 @@ local function SelfUI()
 	ImGui.Spacing()
 	ImGui.SeparatorText(_T("GENERIC_SETTINGS_LABEL"))
 
+	local isOnline = Game.IsOnline()
+	ImGui.BeginDisabled(not isOnline)
+	if (GUI:Button(_T("SELF_ABILITY_EDITOR"))) then
+		playerAbilitiesWindow.m_should_draw = true
+	end
+	ImGui.EndDisabled()
+	if (not isOnline) then
+		GUI:Tooltip(_T("GENERIC_UNAVAILABLE_SP"))
+	end
+
 	if (GVars.features.self.autoheal.enabled) then
 		ImGui.SetNextItemWidth(240)
 		GVars.features.self.autoheal.regen_speed, _ = ImGui.SliderInt(
@@ -246,3 +269,4 @@ local function SelfUI()
 end
 
 self_tab:RegisterGUI(SelfUI)
+GUI:RequestWindow(playerAbilitiesWindow)

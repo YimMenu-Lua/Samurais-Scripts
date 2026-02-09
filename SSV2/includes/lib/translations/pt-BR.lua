@@ -614,5 +614,17 @@ return {
 	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"] = "Falha ao encontrar o objetivo da missão.",
 	["SY_TOW_MISSION_BRING_VEH_TT"] = "Teletransporta o veículo alvo da missão de reboque para você e tenta prendê-lo ao gancho de reboque",
 	["YRV3_SCRIPT_HOST_ERR"] = "Não foi possível terminar a missão de venda! Você não é o anfitrião deste script.",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "Falha ao assumir o controle do thread do script!"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "Falha ao assumir o controle do thread do script!",
+	["SELF_ABILITY_SHOOTING"] = "Tiroteio",
+	["SELF_ABILITY_STAM"] = "Vigor",
+	["SELF_ABILITY_STRENGTH"] = "Força",
+	["SELF_ABILITY_STEALTH"] = "Furtivo",
+	["SELF_ABILITY_FLYING"] = "Vôo",
+	["SELF_ABILITY_EDITOR"] = "Habilidades do jogador",
+	["SELF_ABILITY_DRIVING"] = "Condução",
+	["SELF_ABILITY_MENTAL_STATE"] = "Estado Mental",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "Capacidade pulmonar",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Você não possui um escritório de CEO.",
+	["YRV3_WAREHOUSE_SLOT"] = "Armazém %d",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Armazéns de Carga Especiais"
 }

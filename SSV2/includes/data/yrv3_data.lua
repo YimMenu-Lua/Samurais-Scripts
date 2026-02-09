@@ -478,6 +478,13 @@ local RawBusinessData <const> = {
 		{ name = "Fake ID", vpu_tunable = "BB_BUSINESS_VALUE_FORGED_DOCUMENTS", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_FORGED_DOCUMENTS", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_FORGED_DOCUMENTS" },
 		{ name = "Cash",    vpu_tunable = "BB_BUSINESS_VALUE_COUNTERFEIT_CASH", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COUNTERFEIT_CASH", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COUNTERFEIT_CASH" },
 	},
+	-- index + 86
+	Offices = {
+		{ gxt = "MP_PROP_OFF1", coords = vec3:new(-1582.7917, -556.7172, 34.9540) }, -- case 87:
+		{ gxt = "MP_PROP_OFF2", coords = vec3:new(-1371.9658, -505.6313, 33.1574) },
+		{ gxt = "MP_PROP_OFF3", coords = vec3:new(-114.8752, -607.7647, 36.2807) },
+		{ gxt = "MP_PROP_OFF4", coords = vec3:new(-82.6223, -794.0724, 44.2273) },
+	},
 	-- index + 90
 	Clubhouses = {
 		{ gxt = "MP_PROP_CLUBH1",  coords = vec3:new(246.5035, -1798.7494, 26.1131) }, -- case 91:

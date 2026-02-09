@@ -227,6 +227,7 @@ return {
 	--#region YRV3
 	["YRV3_RANDOM_CRATES"]                 = "Get Random Crates",
 	["YRV3_SUPPLIES_FILL"]                 = "Fill Supplies",
+	["YRV3_CEO_OFFICE_NOT_OWNED"]          = "You don't own a CEO office.",
 	["YRV3_CLUBHOUSE_NOT_OWNED"]           = "You don't own a motorcycle club.",
 	["YRV3_MC_NONE_OWNED"]                 = "You don't own any biker businesses.",
 	["YRV3_CEO_NONE_OWNED"]                = "You don't own any CEO warehouses.",
@@ -236,6 +237,8 @@ return {
 	["YRV3_CLUB_NOT_OWNED"]                = "You don't own a nightclub.",
 	["YRV3_GENERIC_NOT_OWNED"]             = "You don't own this business.",
 	["YRV3_GENERIC_NOT_SETUP"]             = "This business has not been setup. Please return after finishing the setup mission.",
+	["YRV3_WAREHOUSE_SLOT"]                = "Warehouse %d",
+	["YRV3_CARGO_WAREHOUSES_LABEL"]        = "Specal Cargo Warehouses",
 	["YRV3_CASH_SAFE"]                     = "Safe Cash",
 	["YRV3_CARGO_AMT"]                     = "Cargo Held",
 	["YRV3_CRATES_LABEL"]                  = "Crates",
@@ -378,6 +381,15 @@ return {
 	["SELF_KATANA"]                        = "Katana",
 	["SELF_KATANA_TT"]                     = "Replaces one of four melee weapon models of your choosing with a Katana.",
 	["SELF_KATANA_REPLACE_MODEL"]          = "Model To Replace",
+	["SELF_ABILITY_EDITOR"]                = "Player Abilities",
+	["SELF_ABILITY_STAM"]                  = "Stamina",
+	["SELF_ABILITY_SHOOTING"]              = "Shooting",
+	["SELF_ABILITY_STRENGTH"]              = "Strength",
+	["SELF_ABILITY_STEALTH"]               = "Stealth",
+	["SELF_ABILITY_FLYING"]                = "Flying",
+	["SELF_ABILITY_DRIVING"]               = "Driving",
+	["SELF_ABILITY_LUNG_CAPACITY"]         = "Lung Capacity",
+	["SELF_ABILITY_MENTAL_STATE"]          = "Mental State",
 	--#endregion
 
 	--#region Vehicle

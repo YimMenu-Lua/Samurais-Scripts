@@ -119,7 +119,7 @@ local packages      = {
 	"frontend.entity_forge_ui",
 	"frontend.bsv2_ui",
 	"frontend.casino_ui",
-	"frontend.self_ui",
+	"frontend.self.self_ui",
 	"frontend.settings.settings_ui",
 	"frontend.vehicle.vehicle_ui",
 	"frontend.world_ui",

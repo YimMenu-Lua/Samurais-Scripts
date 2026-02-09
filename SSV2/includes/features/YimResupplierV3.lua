@@ -8,8 +8,9 @@
 
 
 local SGSL                       = require("includes.services.SGSL")
-local Warehouse                  = require("includes.modules.businesses.Warehouse")
 local Factory                    = require("includes.modules.businesses.Factory")
+local Warehouse                  = require("includes.modules.businesses.Warehouse")
+local Office                     = require("includes.modules.businesses.Office")
 local Nightclub                  = require("includes.modules.businesses.Nightclub")
 local Clubhouse                  = require("includes.modules.businesses.Clubhouse")
 local CashSafe                   = require("includes.modules.businesses.CashSafe")
@@ -57,8 +58,8 @@ Enums.eYRState                   = {
 }
 
 ---@class YRV3Businesses
----@field warehouses Warehouse[]
 ---@field safes array<CashSafe>
+---@field office? Office
 ---@field clubhouse? Clubhouse
 ---@field hangar? Warehouse
 ---@field bunker? Factory
@@ -109,10 +110,7 @@ function YRV3:init()
 	self.m_sell_script_name          = nil
 	self.m_sell_script_disp_name     = "None"
 	self.m_last_error                = ""
-	self.m_businesses                = {
-		warehouses = {},
-		safes      = {},
-	}
+	self.m_businesses                = { safes = {} }
 
 
 	self.m_thread = ThreadManager:RegisterLooped("SS_YRV3", function()
@@ -139,10 +137,7 @@ function YRV3:Reset()
 	self.m_last_autosell_check_time  = 0
 	self.m_last_income_check_time    = 0
 	self.m_last_business_update_time = 0
-	self.m_businesses                = {
-		warehouses = {},
-		safes      = {},
-	}
+	self.m_businesses                = { safes = {} }
 	self.m_has_triggered_autosell    = false
 	self.m_sell_script_running       = false
 	self.m_initial_data_done         = false
@@ -208,9 +203,9 @@ function YRV3:SetLastError(msg)
 	self.m_last_error = msg
 end
 
----@return array<Warehouse>
-function YRV3:GetSCWarehouses()
-	return self.m_businesses.warehouses
+---@return Office?
+function YRV3:GetOffice()
+	return self.m_businesses.office
 end
 
 ---@return Warehouse?
@@ -312,6 +307,56 @@ function YRV3:IsPropertyIndexValid(idx)
 	return idx > 0 and idx < math.int32_max()
 end
 
+function YRV3:PopulateHangar()
+	if (self.m_businesses.hangar) then
+		return
+	end
+
+	local property_index = stats.get_int("MPX_HANGAR_OWNED")
+	local ref            = self.m_raw_data.Hangars[property_index]
+	if (not ref) then
+		return
+	end
+
+	self.m_businesses.hangar = Warehouse.new({
+		id        = -1,
+		name      = Game.GetGXTLabel(_F("MP_HANGAR_%d", property_index)),
+		coords    = ref.coords,
+		max_units = 50,
+	}, Enums.eWarehouseType.HANGAR)
+end
+
+function YRV3:PopulateOffice()
+	local office_prop = stats.get_int("MPX_PROP_OFFICE")
+	if (not self:IsPropertyIndexValid(office_prop)) then
+		return
+	end
+
+	local idx = office_prop - 86
+	local ref = self.m_raw_data.Offices[idx]
+	if (not ref) then
+		return
+	end
+
+	local charIdx = stats.get_character_index()
+	local name1 = STATS.STAT_GET_STRING(joaat(_F("MP%d_GB_OFFICE_NAME", charIdx)), -1)
+	local name2 = STATS.STAT_GET_STRING(joaat(_F("MP%d_GB_OFFICE_NAME2", charIdx)), -1)
+	self.m_businesses.office = Office.new({
+		id          = idx,
+		name        = Game.GetGXTLabel(ref.gxt),
+		coords      = ref.coords,
+		custom_name = _F("%s%s", name1, name2)
+	})
+
+	if (not self.m_businesses.office) then
+		return
+	end
+
+	for i = 0, 4 do
+		self.m_businesses.office:AddSubBusiness(i)
+	end
+end
+
 function YRV3:PopulateClubhouse()
 	local club_prop = stats.get_int("MPX_PROP_CLUBHOUSE")
 	if (not self:IsPropertyIndexValid(club_prop)) then
@@ -385,43 +430,6 @@ function YRV3:PopulateBikerBusinesses()
 	end
 end
 
-function YRV3:PopulateWarehouses()
-	for i = 0, 4 do
-		local property_index = (stats.get_int(_F("MPX_PROP_WHOUSE_SLOT%d", i)))
-		local ref            = self.m_raw_data.CEOWarehouses[property_index]
-		if (not ref) then
-			goto continue
-		end
-
-		table.insert(self.m_businesses.warehouses, Warehouse.new({
-			id        = i,
-			size      = ref.size,
-			max_units = ref.max,
-			name      = Game.GetGXTLabel(_F("MP_WHOUSE_%d", property_index - 1)),
-			coords    = ref.coords,
-		}, Enums.eWarehouseType.SPECIAL_CARGO))
-
-		::continue::
-	end
-
-	if (self.m_businesses.hangar) then
-		return
-	end
-
-	local property_index = stats.get_int("MPX_HANGAR_OWNED")
-	local ref            = self.m_raw_data.Hangars[property_index]
-	if (not ref) then
-		return
-	end
-
-	self.m_businesses.hangar = Warehouse.new({
-		id        = -1,
-		name      = Game.GetGXTLabel(_F("MP_HANGAR_%d", property_index)),
-		coords    = ref.coords,
-		max_units = 50,
-	}, Enums.eWarehouseType.HANGAR)
-end
-
 function YRV3:PopulateNightclub()
 	if (self.m_businesses.nightclub) then
 		self.m_data_initialized = true
@@ -455,15 +463,11 @@ function YRV3:PopulateNightclub()
 		end
 
 		local owns_cargo = false
-
 		if (self.m_businesses.hangar) then
 			owns_cargo = true
-		else
-			for _, wh in ipairs(self.m_businesses.warehouses) do
-				if (wh:IsValid()) then
-					owns_cargo = true
-					break
-				end
+		elseif (self.m_businesses.office) then
+			if (self.m_businesses.office:HasCargoWarehouse()) then
+				owns_cargo = true
 			end
 		end
 
@@ -558,8 +562,9 @@ function YRV3:PreInit()
 	end
 
 	ThreadManager:Run(function()
+		self:PopulateHangar()
+		self:PopulateOffice()
 		self:PopulateBikerBusinesses()
-		self:PopulateWarehouses()
 		self:PopulateCarWash()
 		self:PopulateCashSafes()
 		self:PopulateSalvageYard()
@@ -616,16 +621,12 @@ function YRV3:CommandWarehouseAutoFill(index)
 		return
 	end
 
-	---@type Warehouse?
-	local warehouse
-
-	for _, wh in ipairs(self.m_businesses.warehouses) do
-		if (wh:GetIndex() == index - 1) then
-			warehouse = wh
-			break
-		end
+	local office = self:GetOffice()
+	if (not office) then
+		return
 	end
 
+	local warehouse = office:GetCargoWarehouseByIndex(index)
 	if (not warehouse or not warehouse:IsValid()) then
 		Notifier:ShowError(
 			"YRV3",
@@ -760,9 +761,11 @@ function YRV3:FillAll()
 		return
 	end
 
-	for _, wh in ipairs(self.m_businesses.warehouses) do
-		if (wh:IsValid()) then
-			wh.auto_fill = true
+	if (self.m_businesses.office) then
+		for _, wh in ipairs(self.m_businesses.office:GetCargoWarehouses()) do
+			if (wh:IsValid()) then
+				wh.auto_fill = true
+			end
 		end
 	end
 
@@ -1073,19 +1076,15 @@ function YRV3:CalculateEstimatedIncome()
 	end
 
 	local businesses = self.m_businesses
-	local warehouses = businesses.warehouses
 
-	self.m_total_sum = getBusinessIncome(businesses.hangar)
+	self.m_total_sum = getBusinessIncome(businesses.office)
+		+ getBusinessIncome(businesses.hangar)
 		+ getBusinessIncome(businesses.bunker)
 		+ getBusinessIncome(businesses.acid_lab)
 		+ getBusinessIncome(businesses.nightclub)
 		+ getBusinessIncome(businesses.clubhouse)
 		+ getBusinessIncome(businesses.car_wash)
 		+ getBusinessIncome(businesses.salvage_yard)
-
-	for _, wh in ipairs(warehouses) do
-		self.m_total_sum = self.m_total_sum + getBusinessIncome(wh)
-	end
 
 	for _, safe in ipairs(businesses.safes) do
 		self.m_total_sum = self.m_total_sum + safe:GetCashValue()

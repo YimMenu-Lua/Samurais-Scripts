@@ -614,5 +614,17 @@ return {
 	["SY_NOT_IN_TOWTRUCK_ERR"] = "你不是坐在拖车里。",
 	["SY_TOW_VEH_NOT_FOUND_ERR"] = "未能找到目标车辆。",
 	["YRV3_SCRIPT_HOST_ERR"] = "无法完成销售任务！您不是该脚本的主持人。",
-	["GENERIC_SCRIPT_CTRL_FAIL"] = "无法控制脚本线程！"
+	["GENERIC_SCRIPT_CTRL_FAIL"] = "无法控制脚本线程！",
+	["SELF_ABILITY_STEALTH"] = "隐身",
+	["SELF_ABILITY_FLYING"] = "飞行",
+	["SELF_ABILITY_SHOOTING"] = "射击",
+	["SELF_ABILITY_DRIVING"] = "驾驶",
+	["SELF_ABILITY_EDITOR"] = "玩家能力",
+	["SELF_ABILITY_STAM"] = "耐力",
+	["SELF_ABILITY_STRENGTH"] = "力量",
+	["SELF_ABILITY_LUNG_CAPACITY"] = "肺活量",
+	["SELF_ABILITY_MENTAL_STATE"] = "精神状态",
+	["YRV3_CEO_OFFICE_NOT_OWNED"] = "您没有首席执行官办公室。",
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "特殊货物仓库",
+	["YRV3_WAREHOUSE_SLOT"] = "仓库 %d"
 }
