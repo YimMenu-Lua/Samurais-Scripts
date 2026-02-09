@@ -75,7 +75,7 @@ function CompanionManager:SpawnCompanion(pedModel, name, is_invincible, is_armed
 	end
 
 	if (type(pedModel) == "string") then
-		pedModel = Game.GetPedHash(pedModel)
+		pedModel = joaat(pedModel)
 	end
 
 	TaskWait(Game.RequestModel, pedModel)

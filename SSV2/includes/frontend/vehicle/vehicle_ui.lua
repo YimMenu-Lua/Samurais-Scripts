@@ -637,7 +637,7 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 				local PV = LocalPlayer:GetVehicle()
 				PV:RestorePatch(PV.MemoryPatches.Acceleration)
 				AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(PV:GetHandle(),
-					vehicles.get_vehicle_display_name(PV:GetModelHash())
+					Game.GetVehicleDisplayName(PV:GetModelHash())
 				)
 			end)
 		end)

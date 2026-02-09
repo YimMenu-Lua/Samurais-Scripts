@@ -1158,8 +1158,8 @@ function Game.GetModelType(modelHash)
 end
 
 ---@param modelName string
-function Game.GetPedHash(modelName)
-	return joaat(modelName)
+function Game.GetModelHash(modelName)
+	return Game.EnsureModelHash(modelName)
 end
 
 ---@param modelHash integer

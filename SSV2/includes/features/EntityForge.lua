@@ -466,7 +466,7 @@ function EntityForge:EntityGun()
 			end
 
 			if (entityType == Enums.eEntityType.Vehicle) then
-				entityName = _F("World Vehicle (%s)", vehicles.get_vehicle_display_name(modelHash))
+				entityName = _F("World Vehicle (%s)", Game.GetVehicleDisplayName(modelHash))
 				local t_Occupants = Vehicle(aimedAtEntity):GetOccupants()
 				if (#t_Occupants > 0) then
 					for _, ped in ipairs(t_Occupants) do

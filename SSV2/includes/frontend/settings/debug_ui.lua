@@ -425,7 +425,7 @@ local function PopulateVehlistOnce()
 				TVehList,
 				{
 					name = name,
-					displayname = vehicles.get_vehicle_display_name(joaat(name))
+					displayname = Game.GetVehicleDisplayName(name)
 				}
 			)
 		end

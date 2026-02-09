@@ -65,7 +65,7 @@ function Vehicle:GetName()
 		return ""
 	end
 
-	return vehicles.get_vehicle_display_name(self:GetModelHash())
+	return Game.GetVehicleDisplayName(self:GetModelHash())
 end
 
 ---@return string
