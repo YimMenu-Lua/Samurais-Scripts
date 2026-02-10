@@ -9,45 +9,43 @@
 
 local YHV1 = require("includes.features.YimHeistsV1"):init()
 
----@class HeistInfo
----@field name string
----@field location vec3|nil
----@field blip integer BlipID
----@field stat string
----@field val integer
----@field optInfo? string
-
----@alias HEIST_TYPES table<integer, HeistInfo>
-
 ---@type HEIST_TYPES
 local HEIST_TYPES = {
 	{
 		name = "Cluckin Bell",
-		location = vec3:new(-1093.15, -807.14, 19.28),
+		coords = vec3:new(-1093.15, -807.14, 19.28),
 		blip = 871,
-		stat = "MPX_SALV23_INST_PROG",
-		val = 31
+		stat = {
+			name = "MPX_SALV23_INST_PROG",
+			val = 31,
+		}
 	},
 	{
 		name = "KnoWay",
-		location = vec3:new(42.82, -1599.19, 29.60),
+		coords = vec3:new(42.82, -1599.19, 29.60),
 		blip = 76,
-		stat = "MPX_M25_AVI_MISSION_CURRENT",
-		val = 4
+		stat = {
+			name = "MPX_M25_AVI_MISSION_CURRENT",
+			val = 4,
+		},
 	},
 	{
 		name = "Dr. Dre",
-		location = YHV1:GetAgencyLocation(),
+		coords = YHV1:GetAgencyLocation(),
 		blip = 826,
-		stat = "MPX_FIXER_STORY_BS",
-		val = 4095
+		stat = {
+			name = "MPX_FIXER_STORY_BS",
+			val = 4095,
+		}
 	},
 	{
 		name = "Oscar Guzman",
-		location = vec3:new(2150.65, 4796.60, 41.17),
+		coords = vec3:new(2150.65, 4796.60, 41.17),
 		blip = 903,
-		stat = "MPX_HACKER24_INST_BS",
-		val = 31,
+		stat = {
+			name = "MPX_HACKER24_INST_BS",
+			val = 31,
+		},
 		optInfo = "Complete first mission on Hard first!"
 	},
 }
@@ -67,12 +65,12 @@ end
 -- TODO: Make this better
 local function drawBasicTab()
 	for i, heist in ipairs(HEIST_TYPES) do
-		ImGui.BeginDisabled(not heist.location or not Game.IsValidCoords(heist.blip))
+		ImGui.BeginDisabled(not heist.coords or not Game.IsValidCoords(heist.blip))
 		ImGui.PushID(i)
 		ImGui.BulletText(heist.name)
 
 		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
-			YHV1:Teleport(heist.location, false)
+			YHV1:Teleport(heist.coords, false)
 		end
 
 		ImGui.SameLine()
@@ -82,16 +80,16 @@ local function drawBasicTab()
 
 		ImGui.SameLine()
 
-		ImGui.BeginDisabled(stats.get_int(heist.stat) == heist.val)
+		ImGui.BeginDisabled(stats.get_int(heist.stat.name) == heist.stat.val)
 		if GUI:Button(_T "SY_COMPLETE_PREPARATIONS") then
-			YHV1:SkipPrep(heist.stat, heist.val, heist.name)
+			YHV1:SkipPrep(heist.stat.name, heist.stat.val, heist.name)
 		end
 		if (heist.optInfo) then
 			GUI:Tooltip(heist.optInfo)
 		end
 		ImGui.EndDisabled()
-		ImGui.EndDisabled()
 		ImGui.PopID()
+		ImGui.EndDisabled()
 	end
 end
 
@@ -151,13 +149,19 @@ local function drawCayoTab()
 		targets_c[new_secondary_target_c + 1] = -1
 
 		stats.set_int("MPX_H4LOOT_CASH_I", targets_i[0])
+		stats.set_int("MPX_H4LOOT_CASH_I_SCOPED", targets_i[0])
 		stats.set_int("MPX_H4LOOT_WEED_I", targets_i[1])
+		stats.set_int("MPX_H4LOOT_WEED_I_SCOPED", targets_i[1])
 		stats.set_int("MPX_H4LOOT_COKE_I", targets_i[2])
+		stats.set_int("MPX_H4LOOT_COKE_I_SCOPED", targets_i[2])
 		stats.set_int("MPX_H4LOOT_GOLD_I", targets_i[3])
+		stats.set_int("MPX_H4LOOT_GOLD_I_SCOPED", targets_i[3])
 		stats.set_int("MPX_H4LOOT_CASH_C", targets_c[0])
 		stats.set_int("MPX_H4LOOT_WEED_C", targets_c[1])
 		stats.set_int("MPX_H4LOOT_COKE_C", targets_c[2])
 		stats.set_int("MPX_H4LOOT_GOLD_C", targets_c[3])
+		stats.set_int("MPX_H4LOOT_PAINT", -1) -- Not really any reason to have an option for paintings
+		stats.set_int("MPX_H4LOOT_PAINT_SCOPED", -1)
 	end
 
 	ImGui.SeparatorText(_T "GENERIC_SETTINGS_LABEL")
@@ -185,11 +189,18 @@ local function drawCayoTab()
 		stats.set_int("MPX_H4CNF_WEAPONS", new_weapons)
 	end
 
+	-- https://www.unknowncheats.me/forum/3058973-post602.html
 	if GUI:Button(_T "CP_HEIST_UNLOCK_ALL") then
+		stats.set_int("MPX_H4CNF_BS_GEN", 131071)
+		stats.set_int("MPX_H4CNF_BS_ENTR", 63)
+		stats.set_int("MPX_H4CNF_BS_ABIL", 63)
 		stats.set_int("MPX_H4CNF_WEP_DISRP", 3)
 		stats.set_int("MPX_H4CNF_ARM_DISRP", 3)
 		stats.set_int("MPX_H4CNF_HEL_DISRP", 3)
 		stats.set_int("MPX_H4_MISSIONS", 65535)
+		if (stats.get_int("MPX_H4_PLAYTHROUGH_STATUS") == 0) then
+			stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 40000)
+		end
 		Notifier:ShowSuccess("YHV1", "Heist ready")
 	end
 
@@ -200,7 +211,8 @@ local function drawCayoTab()
 		stats.set_int("MPX_H4CNF_APPROACH", 0)
 		stats.set_int("MPX_H4CNF_BS_ENTR", 0)
 		stats.set_int("MPX_H4CNF_BS_GEN", 0)
-		Notifier:ShowSuccess("YHV1", "Cayo Perico has been reset!")
+		stats.set_int("MPX_H4CNF_BS_ABIL", 0)
+		Notifier:ShowSuccess("YHV1", "All progress has been reset!")
 	end
 end
 

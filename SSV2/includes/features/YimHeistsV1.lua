@@ -7,6 +7,15 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+---@class HeistInfo
+---@field name string
+---@field coords vec3|nil
+---@field blip integer BlipID
+---@field stat { name: string, val: integer}
+---@field optInfo? string
+
+---@alias HEIST_TYPES table<integer, HeistInfo>
+
 ---@class YimHeists
 ---@field private m_raw_data RawBusinessData
 ---@field m_tab Tab
@@ -22,15 +31,15 @@ function YimHeists:init()
 	return instance
 end
 
---@param statName string
---@param statVal integer
---@param notifTitle string
+---@param statName string
+---@param statVal integer
+---@param notifTitle string
 function YimHeists:SkipPrep(statName, statVal, notifTitle)
 	stats.set_int(statName, statVal)
 	Notifier:ShowSuccess(notifTitle, _T("YH_PREP_SKIP_NOTIF"))
 end
 
---@return vec3
+---@return vec3
 function YimHeists:GetAgencyLocation()
 	local property_index = stats.get_int("MPX_FIXER_HQ_OWNED")
 	if (not YRV3:IsPropertyIndexValid(property_index)) then
