@@ -626,5 +626,16 @@ return {
 	["SELF_ABILITY_MENTAL_STATE"] = "정신상태",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "귀하는 CEO 사무실을 소유하고 있지 않습니다.",
 	["YRV3_WAREHOUSE_SLOT"] = "창고 %d",
-	["YRV3_CARGO_WAREHOUSES_LABEL"] = "특수 화물 창고"
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "특수 화물 창고",
+	["YH_BASIC_TAB"] = "기초적인",
+	["YH_CAYO_RESET_ALL"] = "모든 진행 상황 재설정",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "2차 표적(화합물)",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "모든 보조 대상 설정",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "2차 타겟(섬)",
+	["YH_PREP_SKIP_NOTIF"] = "모든 준비 임무를 건너뛰었습니다. 이제 마지막 미션을 시작할 수 있습니다.",
+	["YH_PREP_SKIP"] = "준비 임무 건너뛰기",
+	["YH_CAYO_TAB"] = "카요 페리코",
+	["YH_CAYO_WEAPONS"] = "무기 로드아웃",
+	["YH_CAYO_DIFFICULTY"] = "하드 모드",
+	["YH_CAYO_TARGET_PRIMARY"] = "주요 타겟"
 }

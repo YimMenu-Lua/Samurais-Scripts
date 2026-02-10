@@ -626,5 +626,16 @@ return {
 	["SELF_ABILITY_MENTAL_STATE"] = "精神狀態",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "您沒有首席執行官辦公室。",
 	["YRV3_CARGO_WAREHOUSES_LABEL"] = "特殊貨物倉庫",
-	["YRV3_WAREHOUSE_SLOT"] = "倉庫 %d"
+	["YRV3_WAREHOUSE_SLOT"] = "倉庫 %d",
+	["YH_BASIC_TAB"] = "基本的",
+	["YH_CAYO_TARGET_PRIMARY"] = "主要目標",
+	["YH_CAYO_TAB"] = "佩里科島",
+	["YH_PREP_SKIP_NOTIF"] = "所有準備任務都已被跳過。現在你可以開始最後的任務了。",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "次要目標（島嶼）",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "次要目標（化合物）",
+	["YH_PREP_SKIP"] = "跳過準備任務",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "設定所有次要目標",
+	["YH_CAYO_RESET_ALL"] = "重置所有進度",
+	["YH_CAYO_WEAPONS"] = "武器裝載",
+	["YH_CAYO_DIFFICULTY"] = "困難模式"
 }

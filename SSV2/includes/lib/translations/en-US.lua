@@ -687,4 +687,17 @@ return {
 	["EF_IMPORT_SUCCESS"]                  = "Data successfully imported.",
 	["EF_CHILD_ALPHA"]                     = "Child Item Transparency: %d",
 	--#endregion
+
+	--#region YimHeists
+	["YH_BASIC_TAB"]                       = "Basic",
+	["YH_CAYO_TAB"]                        = "Cayo Perico",
+	["YH_PREP_SKIP_NOTIF"]                 = "All preparation missions have been skipped. You can now start the final mission.",
+	["YH_CAYO_TARGET_PRIMARY"]             = "Primary Target",
+	["YH_CAYO_TARGET_SECONDARY_I"]         = "Secondary Target (Island)",
+	["YH_CAYO_TARGET_SECONDARY_C"]         = "Secondary Target (Compound)",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"]    = "Set All Secondary Targets",
+	["YH_CAYO_DIFFICULTY"]                 = "Hard Mode",
+	["YH_CAYO_WEAPONS"]                    = "Weapon Loadout",
+	["YH_CAYO_RESET_ALL"]                  = "Reset ALL Progress",
+	--#endregion
 }

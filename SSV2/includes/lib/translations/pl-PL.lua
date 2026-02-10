@@ -626,5 +626,16 @@ return {
 	["SELF_ABILITY_MENTAL_STATE"] = "Stan psychiczny",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Nie masz biura dyrektora generalnego.",
 	["YRV3_WAREHOUSE_SLOT"] = "Magazyn %d",
-	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Magazyny ładunków specjalnych"
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Magazyny ładunków specjalnych",
+	["YH_BASIC_TAB"] = "Podstawowy",
+	["YH_CAYO_TAB"] = "Cayo Perico",
+	["YH_CAYO_TARGET_PRIMARY"] = "Główny cel",
+	["YH_PREP_SKIP"] = "Pomiń misje przygotowawcze",
+	["YH_PREP_SKIP_NOTIF"] = "Wszystkie misje przygotowawcze zostały pominięte. Możesz już rozpocząć ostatnią misję.",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Cel drugorzędny (wyspa)",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Ustaw wszystkie cele drugorzędne",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Cel dodatkowy (złożony)",
+	["YH_CAYO_DIFFICULTY"] = "Tryb trudny",
+	["YH_CAYO_RESET_ALL"] = "Zresetuj WSZYSTKIE postępy",
+	["YH_CAYO_WEAPONS"] = "Załadunek broni"
 }

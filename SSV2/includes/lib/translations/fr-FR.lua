@@ -626,5 +626,16 @@ return {
 	["SELF_ABILITY_EDITOR"] = "Capacités du joueur",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Vous ne possédez pas de bureau de PDG.",
 	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Entrepôts de marchandises spéciales",
-	["YRV3_WAREHOUSE_SLOT"] = "Entrepôt %d"
+	["YRV3_WAREHOUSE_SLOT"] = "Entrepôt %d",
+	["YH_BASIC_TAB"] = "Basique",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Définir toutes les cibles secondaires",
+	["YH_CAYO_TAB"] = "Cayo Perico",
+	["YH_CAYO_RESET_ALL"] = "Réinitialiser TOUS les progrès",
+	["YH_CAYO_DIFFICULTY"] = "Mode difficile",
+	["YH_CAYO_WEAPONS"] = "Chargement d'armes",
+	["YH_CAYO_TARGET_PRIMARY"] = "Cible principale",
+	["YH_PREP_SKIP"] = "Passer les missions de préparation",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Cible secondaire (île)",
+	["YH_PREP_SKIP_NOTIF"] = "Toutes les missions de préparation ont été ignorées. Vous pouvez maintenant commencer la mission finale.",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Cible secondaire (composé)"
 }

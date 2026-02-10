@@ -626,5 +626,16 @@ return {
 	["SELF_ABILITY_LUNG_CAPACITY"] = "Capacidade pulmonar",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Você não possui um escritório de CEO.",
 	["YRV3_WAREHOUSE_SLOT"] = "Armazém %d",
-	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Armazéns de Carga Especiais"
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Armazéns de Carga Especiais",
+	["YH_CAYO_TAB"] = "Cayo Perico",
+	["YH_BASIC_TAB"] = "Básico",
+	["YH_PREP_SKIP"] = "Pular missões de preparação",
+	["YH_CAYO_TARGET_PRIMARY"] = "Alvo Primário",
+	["YH_PREP_SKIP_NOTIF"] = "Todas as missões de preparação foram ignoradas. Agora você pode iniciar a missão final.",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Alvo Secundário (Composto)",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Alvo Secundário (Ilha)",
+	["YH_CAYO_DIFFICULTY"] = "Modo Difícil",
+	["YH_CAYO_RESET_ALL"] = "Redefinir TODO o progresso",
+	["YH_CAYO_WEAPONS"] = "Carregamento de armas",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Defina todas as metas secundárias"
 }

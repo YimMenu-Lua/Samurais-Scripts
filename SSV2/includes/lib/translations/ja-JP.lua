@@ -626,5 +626,16 @@ return {
 	["SELF_ABILITY_MENTAL_STATE"] = "精神状態",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "あなたは CEO オフィスを所有していません。",
 	["YRV3_WAREHOUSE_SLOT"] = "倉庫 %d",
-	["YRV3_CARGO_WAREHOUSES_LABEL"] = "特殊貨物倉庫"
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "特殊貨物倉庫",
+	["YH_CAYO_TARGET_PRIMARY"] = "主なターゲット",
+	["YH_CAYO_TAB"] = "カヨ ペリコ",
+	["YH_CAYO_DIFFICULTY"] = "ハードモード",
+	["YH_CAYO_WEAPONS"] = "武器の装備",
+	["YH_BASIC_TAB"] = "基本",
+	["YH_CAYO_RESET_ALL"] = "すべての進行状況をリセット",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "二次ターゲット（島）",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "すべてのセカンダリ ターゲットを設定する",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "二次ターゲット (化合物)",
+	["YH_PREP_SKIP_NOTIF"] = "準備ミッションはすべてスキップされました。これで最後のミッションを開始できます。",
+	["YH_PREP_SKIP"] = "準備ミッションをスキップする"
 }
