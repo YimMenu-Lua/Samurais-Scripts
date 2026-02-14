@@ -50,17 +50,6 @@ local HEIST_TYPES = {
 	},
 }
 
----@param where integer|vec3
----@param keepVehicle? boolean
-function YHV1:Teleport(where, keepVehicle)
-	if not Self:IsOutside() then
-		Notifier:ShowError("YHV1", "Please go outside first!")
-		return
-	end
-
-	Self:Teleport(where, keepVehicle)
-end
-
 -- This is all a pretty asinine way of handling this and has some UI/UX inconsistencies but it's quick and it works good enuff for now
 -- TODO: Make this better
 local function drawBasicTab()
@@ -81,7 +70,7 @@ local function drawBasicTab()
 		ImGui.SameLine()
 
 		ImGui.BeginDisabled(stats.get_int(heist.stat.name) == heist.stat.val)
-		if GUI:Button(_T "SY_COMPLETE_PREPARATIONS") then
+		if GUI:Button(_T("SY_COMPLETE_PREPARATIONS")) then
 			YHV1:SkipPrep(heist.stat.name, heist.stat.val, heist.name)
 		end
 		if (heist.optInfo) then

@@ -50,4 +50,15 @@ function YimHeists:GetAgencyLocation()
 	return ref.coords
 end
 
+---@param where integer|vec3
+---@param keepVehicle? boolean
+function YimHeists:Teleport(where, keepVehicle)
+	if not Self:IsOutside() then
+		Notifier:ShowError("YHV1", "Please go outside first!")
+		return
+	end
+
+	Self:Teleport(where, keepVehicle)
+end
+
 return YimHeists
