@@ -626,5 +626,16 @@ return {
 	["SELF_ABILITY_MENTAL_STATE"] = "Психическое состояние",
 	["YRV3_WAREHOUSE_SLOT"] = "Склад %d",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "У вас нет офиса генерального директора.",
-	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Склады специальных грузов"
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Склады специальных грузов",
+	["YH_BASIC_TAB"] = "Базовый",
+	["YH_CAYO_DIFFICULTY"] = "Сложный режим",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Установите все вторичные цели",
+	["YH_PREP_SKIP_NOTIF"] = "Все подготовительные миссии пропущены. Теперь вы можете начать последнюю миссию.",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Вторичная цель (остров)",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Вторичная цель (соединение)",
+	["YH_CAYO_WEAPONS"] = "Комплектация оружия",
+	["YH_PREP_SKIP"] = "Пропустить подготовительные миссии",
+	["YH_CAYO_TAB"] = "Кайо Перико",
+	["YH_CAYO_RESET_ALL"] = "Сбросить ВЕСЬ прогресс",
+	["YH_CAYO_TARGET_PRIMARY"] = "Основная цель"
 }

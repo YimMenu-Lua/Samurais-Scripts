@@ -124,6 +124,7 @@ local packages      = {
 	"frontend.vehicle.vehicle_ui",
 	"frontend.world_ui",
 	"frontend.yav3_ui",
+	"frontend.yhv1_ui",
 	"frontend.yrv3_ui",
 }
 

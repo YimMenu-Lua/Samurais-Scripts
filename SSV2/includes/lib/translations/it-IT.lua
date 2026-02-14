@@ -626,5 +626,16 @@ return {
 	["SELF_ABILITY_MENTAL_STATE"] = "Stato mentale",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Non possiedi un ufficio amministratore delegato.",
 	["YRV3_WAREHOUSE_SLOT"] = "Magazzino %d",
-	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Magazzini per carichi speciali"
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Magazzini per carichi speciali",
+	["YH_BASIC_TAB"] = "Di base",
+	["YH_PREP_SKIP"] = "Salta le missioni di preparazione",
+	["YH_CAYO_TAB"] = "Cayo Perico",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Imposta tutti gli obiettivi secondari",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Obiettivo secondario (composto)",
+	["YH_PREP_SKIP_NOTIF"] = "Tutte le missioni di preparazione sono state saltate. Ora puoi iniziare la missione finale.",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Obiettivo secondario (isola)",
+	["YH_CAYO_WEAPONS"] = "Carico di armi",
+	["YH_CAYO_TARGET_PRIMARY"] = "Obiettivo primario",
+	["YH_CAYO_DIFFICULTY"] = "Modalità difficile",
+	["YH_CAYO_RESET_ALL"] = "Ripristina TUTTI i progressi"
 }

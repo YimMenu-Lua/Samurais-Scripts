@@ -626,5 +626,16 @@ return {
 	["SELF_ABILITY_MENTAL_STATE"] = "精神状态",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "您没有首席执行官办公室。",
 	["YRV3_CARGO_WAREHOUSES_LABEL"] = "特殊货物仓库",
-	["YRV3_WAREHOUSE_SLOT"] = "仓库 %d"
+	["YRV3_WAREHOUSE_SLOT"] = "仓库 %d",
+	["YH_BASIC_TAB"] = "基本的",
+	["YH_CAYO_TARGET_PRIMARY"] = "主要目标",
+	["YH_PREP_SKIP"] = "跳过准备任务",
+	["YH_PREP_SKIP_NOTIF"] = "所有准备任务都已被跳过。现在你可以开始最后的任务了。",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "次要目标（岛屿）",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "设定所有次要目标",
+	["YH_CAYO_TAB"] = "佩里科岛",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "次要目标（化合物）",
+	["YH_CAYO_RESET_ALL"] = "重置所有进度",
+	["YH_CAYO_WEAPONS"] = "武器装载",
+	["YH_CAYO_DIFFICULTY"] = "困难模式"
 }

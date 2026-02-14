@@ -1104,6 +1104,28 @@ function Game.SetWaypointCoords(target)
 	end)
 end
 
+---@param target vec2|vec3|integer BlipID | Entity handle | Vector2 | Vector3
+---@return boolean
+function Game.IsValidCoords(target)
+	local x, y
+	if (IsInstance(target, vec3) or IsInstance(target, vec2)) then
+		x, y = target.x, target.y
+	elseif (type(target) == "number") then
+		local testBlip = HUD.GET_FIRST_BLIP_INFO_ID(target)
+		if (HUD.DOES_BLIP_EXIST(testBlip)) then
+			x, y, _ = HUD.GET_BLIP_INFO_ID_COORD(testBlip):unpack()
+		elseif (Game.IsScriptHandle(target)) then
+			x, y, _ = vec3:zero():unpack()
+		end
+	end
+
+	if (not x or not y) then
+		return false
+	end
+	
+	return true
+end
+
 ---@param vecMin vec3
 ---@param vecMax vec3
 ---@return vec3

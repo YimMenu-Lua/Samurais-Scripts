@@ -626,5 +626,16 @@ return {
 	["SELF_ABILITY_FLYING"] = "Fliegen",
 	["YRV3_WAREHOUSE_SLOT"] = "Lager %d",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Sie besitzen kein CEO-Büro.",
-	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Spezielle Frachtlager"
+	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Spezielle Frachtlager",
+	["YH_BASIC_TAB"] = "Basic",
+	["YH_CAYO_TAB"] = "Cayo Perico",
+	["YH_PREP_SKIP_NOTIF"] = "Alle Vorbereitungsmissionen wurden übersprungen. Sie können nun mit der letzten Mission beginnen.",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Sekundäres Ziel (Insel)",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Sekundäres Ziel (Verbindung)",
+	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Legen Sie alle sekundären Ziele fest",
+	["YH_CAYO_RESET_ALL"] = "Setzen Sie ALLE Fortschritte zurück",
+	["YH_CAYO_TARGET_PRIMARY"] = "Primäres Ziel",
+	["YH_CAYO_DIFFICULTY"] = "Harter Modus",
+	["YH_PREP_SKIP"] = "Überspringen Sie Vorbereitungsmissionen",
+	["YH_CAYO_WEAPONS"] = "Waffenausstattung"
 }
