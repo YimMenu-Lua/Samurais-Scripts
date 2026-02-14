@@ -52,7 +52,7 @@ function Clubhouse:GetClientBikeName()
 		return _T("GENERIC_NONE")
 	end
 
-	return Game.GetVehicleDisplayName(modelName)
+	return Game.GetVehicleDisplayName(model)
 end
 
 ---@param index integer
