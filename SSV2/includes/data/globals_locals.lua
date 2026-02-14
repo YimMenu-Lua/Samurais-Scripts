@@ -31,7 +31,8 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 1673830,
+			-- value = 1673830,
+			value = 1673814,
 			pattern =
 			[[if \(Global_\d{7}\[PLAYER::PLAYER_ID\(\) /\*883\*/\]\.f_\d{3}\.f_\d{3}\[.*?/\*13\*/\] != HUD_COLOUR_PURE_WHITE && (Global_\d{7})\[.*?\] != 0\)]],
 			capture_group = 1

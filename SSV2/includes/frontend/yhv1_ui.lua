@@ -12,11 +12,11 @@ local setTranslations    = require("SSV2.includes.frontend.helpers.set_translati
 local heistNames <const> = {
 	"AWT_1026",    -- The Cluckin' Bell Farm Raid
 	"AWT_1109",    -- No Way KnoWay
-	"USBMIXHELPDRE", -- DR. DRE
+	"AWT_973",     -- Don't Fuck With Dre
 	"HACK24_MFM_STR", -- Oscar Guzman Flies Again
 }
 local tabNames <const>   = {
-	"YH_BASIC_TAB",
+	"YH_BASIC_TAB", -- Basic
 	"ISLAND_TRAVEL_T", -- Cayo Perico
 }
 
