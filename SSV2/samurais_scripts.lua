@@ -76,5 +76,3 @@ ThreadManager:Run(function()
 
 	Backend:debug("Script loaded in %.0fms", (os.clock() - start_time) * 1000)
 end)
-
-print(Game.GetGXTLabel("AWT_521"))

@@ -272,12 +272,12 @@ local RawBusinessData <const> = {
 	SellScripts = {
 		["gb_smuggler"] = { -- air
 			autofinish = function()
-				local GBSMUG_OBJ1 = SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1)
-				local GBSMUG_OBJ2 = SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2)
-				local offset1     = GBSMUG_OBJ1:GetOffset(1)
-				local offset2     = GBSMUG_OBJ2:GetOffset(1)
-				GBSMUG_OBJ1:AsLocal():At(offset1):WriteInt(0)
-				GBSMUG_OBJ2:AsLocal():At(offset2):WriteInt(1)
+				local GBSMUG_OBJ   = SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1)
+				local GBSMUG_LOCAL = GBSMUG_OBJ:AsLocal()
+				local offset1      = GBSMUG_OBJ:GetOffset(1)
+				local offset2      = SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2):GetOffset(1)
+				GBSMUG_LOCAL:At(offset1):WriteInt(0)
+				GBSMUG_LOCAL:At(offset2):WriteInt(1)
 			end
 		},
 		["gb_gunrunning"] = {
