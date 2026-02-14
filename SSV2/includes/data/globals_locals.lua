@@ -31,10 +31,8 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			-- value = 1673830,
 			value = 1673814,
-			pattern =
-			[[if \(Global_\d{7}\[PLAYER::PLAYER_ID\(\) /\*883\*/\]\.f_\d{3}\.f_\d{3}\[.*?/\*13\*/\] != HUD_COLOUR_PURE_WHITE && (Global_\d{7})\[.*?\] != 0\)]],
+			pattern = [[if \(Global_\d{7}\[.*?\] != 0 && func_\w+\(.*?\) && \w+\)]],
 			capture_group = 1
 		}
 	},
@@ -105,8 +103,8 @@ return {
 					value = 13,
 					capture_group = 5,
 					description = "business index read size."
-				},
-			},
+				}
+			}
 		},
 		ENHANCED = {
 			value = 1845299,
@@ -130,8 +128,8 @@ return {
 					value = 13,
 					capture_group = 5,
 					description = "business index read size."
-				},
-			},
+				}
+			}
 		}
 	},
 	bhub_prod_time_global = {
@@ -256,7 +254,7 @@ return {
 					value = 174,
 					capture_group = 2,
 					description = "expected deliveries."
-				},
+				}
 			}
 		},
 		ENHANCED = {
@@ -284,7 +282,7 @@ return {
 					value = 122,
 					capture_group = 2,
 					description = "number of deliveries made"
-				},
+				}
 			}
 		},
 		ENHANCED = {
@@ -305,8 +303,7 @@ return {
 		file = "gb_smuggler.c",
 		LEGACY = {
 			value = 1989,
-			pattern =
-			[[for \(i = 0; i < func_\w{2}\(func_\w{4}\(\), func_\w{2}\(\), .*?(Local_\d{4})\.(f_\d{4}), -1\); i = i \+ 1\)]],
+			pattern = [[for \(i = 0; i < func_\w{2}\(func_\w{4}\(\), func_\w{2}\(\), .*?(Local_\d{4})\.(f_\d{4}), -1\); i = i \+ 1\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -317,8 +314,7 @@ return {
 		},
 		ENHANCED = {
 			value = 1991,
-			pattern =
-			[[for \(i = 0; i < func_\w{2}\(func_\w{4}\(\), func_\w{2}\(\), .*?(Local_\d{4})\.(f_\d{4}), -1\); i = i \+ 1\)]],
+			pattern = [[for \(i = 0; i < func_\w{2}\(func_\w{4}\(\), func_\w{2}\(\), .*?(Local_\d{4})\.(f_\d{4}), -1\); i = i \+ 1\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -360,12 +356,12 @@ return {
 		LEGACY = {
 			value = 1266,
 			pattern = [[Local_1\d{3}\.f_\d{3} = func_\w+\(func_\w+\(\),.*?(Local_1\d{3})\.(f_\d{3}), \w+, -1\);]],
-			capture_group = 1,
+			capture_group = 1
 		},
 		ENHANCED = {
 			value = 1268,
 			pattern = [[Local_1\d{3}\.f_\d{3} = func_\w+\(func_\w+\(\),.*?(Local_1\d{3})\.(f_\d{3}), \w+, -1\);]],
-			capture_group = 1,
+			capture_group = 1
 		}
 	},
 	bunker_sell_amt_delivered = {
@@ -399,8 +395,7 @@ return {
 		file = "gb_gunrunning.c",
 		LEGACY = {
 			value = 1266,
-			pattern =
-			[[for \(i = 0; i < func_\w+\(func_\w+\(\), func_\w+\(\),.*?(Local_\d{4})(\.f_\d{3}),.*?Local_\d{4}\.f_\d{3}\); i = i \+ 1\)]],
+			pattern = [[for \(i = 0; i < func_\w+\(func_\w+\(\), func_\w+\(\),.*?(Local_\d{4})(\.f_\d{3}),.*?Local_\d{4}\.f_\d{3}\); i = i \+ 1\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -411,8 +406,7 @@ return {
 		},
 		ENHANCED = {
 			value = 1268,
-			pattern =
-			[[for \(i = 0; i < func_\w+\(func_\w+\(\), func_\w+\(\),.*?(Local_\d{4})(\.f_\d{3}),.*?Local_\d{4}\.f_\d{3}\); i = i \+ 1\)]],
+			pattern = [[for \(i = 0; i < func_\w+\(func_\w+\(\), func_\w+\(\),.*?(Local_\d{4})(\.f_\d{3}),.*?Local_\d{4}\.f_\d{3}\); i = i \+ 1\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -467,8 +461,7 @@ return {
 		file = "three_card_poker.c",
 		LEGACY = {
 			value = 771,
-			pattern =
-			[[if \((.*?Local_\d{3})\[.*? /\*(\d+)\*/\]\.f_\d+ ==.*?&&.*?Local_\d{3}\[.*?\]\.f_\d+ > 0 \|\| .*?Local_\d{3}\[.*?\]\.f_\d+ > 0\)]],
+			pattern = [[if \((.*?Local_\d{3})\[.*? /\*(\d+)\*/\]\.f_\d+ ==.*?&&.*?Local_\d{3}\[.*?\]\.f_\d+ > 0 \|\| .*?Local_\d{3}\[.*?\]\.f_\d+ > 0\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -479,8 +472,7 @@ return {
 		},
 		ENHANCED = {
 			value = 773,
-			pattern =
-			[[if \((.*?Local_\d{3})\[.*? /\*(\d+)\*/\]\.f_\d+ ==.*?&&.*?Local_\d{3}\[.*?\]\.f_\d+ > 0 \|\| .*?Local_\d{3}\[.*?\]\.f_\d+ > 0\)]],
+			pattern = [[if \((.*?Local_\d{3})\[.*? /\*(\d+)\*/\]\.f_\d+ ==.*?&&.*?Local_\d{3}\[.*?\]\.f_\d+ > 0 \|\| .*?Local_\d{3}\[.*?\]\.f_\d+ > 0\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -495,8 +487,7 @@ return {
 		file = "three_card_poker.c",
 		LEGACY = {
 			value = 138,
-			pattern =
-			[[STREAMING::REQUEST_MODEL\(func_\d+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\.f_\d+\[.*?\], .*?Local_\d{4}\.f_\d+\)\);]],
+			pattern = [[STREAMING::REQUEST_MODEL\(func_\d+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\.f_\d+\[.*?\], .*?Local_\d{4}\.f_\d+\)\);]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -508,8 +499,7 @@ return {
 		},
 		ENHANCED = {
 			value = 140,
-			pattern =
-			[[STREAMING::REQUEST_MODEL\(func_\d+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\.f_\d+\[.*?\], .*?Local_\d{4}\.f_\d+\)\);]],
+			pattern = [[STREAMING::REQUEST_MODEL\(func_\d+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\.f_\d+\[.*?\], .*?Local_\d{4}\.f_\d+\)\);]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -525,14 +515,12 @@ return {
 		file = "three_card_poker.c",
 		LEGACY = {
 			value = 55,
-			pattern =
-			[[if \(!NETWORK::NETWORK_HAS_CONTROL_OF_NETWORK_ID\(.*?Local_\d{3}(\.f_\d{2})\[\w+\(\w+, 0\)\]\)\)]],
+			pattern = [[if \(!NETWORK::NETWORK_HAS_CONTROL_OF_NETWORK_ID\(.*?Local_\d{3}(\.f_\d{2})\[\w+\(\w+, 0\)\]\)\)]],
 			capture_group = 1
 		},
 		ENHANCED = {
 			value = 55,
-			pattern =
-			[[if \(!NETWORK::NETWORK_HAS_CONTROL_OF_NETWORK_ID\(.*?Local_\d{3}(\.f_\d{2})\[\w+\(\w+, 0\)\]\)\)]],
+			pattern = [[if \(!NETWORK::NETWORK_HAS_CONTROL_OF_NETWORK_ID\(.*?Local_\d{3}(\.f_\d{2})\[\w+\(\w+, 0\)\]\)\)]],
 			capture_group = 1
 		}
 	},
@@ -541,8 +529,7 @@ return {
 		file = "three_card_poker.c",
 		LEGACY = {
 			value = 1060,
-			pattern =
-			[[if \(.*?(Local_\d{4})(\.f_\d{3})\.f_\d+\[.*?\] !=.*?Local_\d{3}\.f_\d+\[PLAYER::PLAYER_ID\(\) .*?\]\.f_1\[.*?\]\)]],
+			pattern = [[if \(.*?(Local_\d{4})(\.f_\d{3})\.f_\d+\[.*?\] !=.*?Local_\d{3}\.f_\d+\[PLAYER::PLAYER_ID\(\) .*?\]\.f_1\[.*?\]\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -554,8 +541,7 @@ return {
 		},
 		ENHANCED = {
 			value = 1062,
-			pattern =
-			[[if \(.*?(Local_\d{4})(\.f_\d{3})\.f_\d+\[.*?\] !=.*?Local_\d{3}\.f_\d+\[PLAYER::PLAYER_ID\(\) .*?\]\.f_1\[.*?\]\)]],
+			pattern = [[if \(.*?(Local_\d{4})(\.f_\d{3})\.f_\d+\[.*?\] !=.*?Local_\d{3}\.f_\d+\[PLAYER::PLAYER_ID\(\) .*?\]\.f_1\[.*?\]\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -597,8 +583,7 @@ return {
 		file = "blackjack.c",
 		LEGACY = {
 			value = 138,
-			pattern =
-			[[if \(func_\w+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\) == 10 \|\| func_\d+\(.*?Local_\d{3}\.f_\d{3}\[.*?\]\) == 11\)]],
+			pattern = [[if \(func_\w+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\) == 10 \|\| func_\d+\(.*?Local_\d{3}\.f_\d{3}\[.*?\]\) == 11\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -609,8 +594,7 @@ return {
 		},
 		ENHANCED = {
 			value = 140,
-			pattern =
-			[[if \(func_\w+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\) == 10 \|\| func_\d+\(.*?Local_\d{3}\.f_\d{3}\[.*?\]\) == 11\)]],
+			pattern = [[if \(func_\w+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\) == 10 \|\| func_\d+\(.*?Local_\d{3}\.f_\d{3}\[.*?\]\) == 11\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -667,14 +651,12 @@ return {
 		file = "casino_slots.c",
 		LEGACY = {
 			value = 1372,
-			pattern =
-			[[\w+ = func_\d+\(.*?(Local_\d{4})\.f_1\[.*?\]\[.*?Local_\d+\[0\]\], .*?Local_\d+?\.f_1\[.*?\]\[.*?Local_\d+\[1\]\], .*?Local_\d{4}\.f_1\[.*?\]\[.*?Local_\d+\[2\]\]\);]],
+			pattern = [[\w+ = func_\d+\(.*?(Local_\d{4})\.f_1\[.*?\]\[.*?Local_\d+\[0\]\], .*?Local_\d+?\.f_1\[.*?\]\[.*?Local_\d+\[1\]\], .*?Local_\d{4}\.f_1\[.*?\]\[.*?Local_\d+\[2\]\]\);]],
 			capture_group = 1
 		},
 		ENHANCED = {
 			value = 1374,
-			pattern =
-			[[\w+ = func_\d+\(.*?(Local_\d{4})\.f_1\[.*?\]\[.*?Local_\d+\[0\]\], .*?Local_\d+?\.f_1\[.*?\]\[.*?Local_\d+\[1\]\], .*?Local_\d{4}\.f_1\[.*?\]\[.*?Local_\d+\[2\]\]\);]],
+			pattern = [[\w+ = func_\d+\(.*?(Local_\d{4})\.f_1\[.*?\]\[.*?Local_\d+\[0\]\], .*?Local_\d+?\.f_1\[.*?\]\[.*?Local_\d+\[1\]\], .*?Local_\d{4}\.f_1\[.*?\]\[.*?Local_\d+\[2\]\]\);]],
 			capture_group = 1
 		}
 	},
@@ -797,8 +779,7 @@ return {
 		file = "fm_mission_controller.c",
 		LEGACY = {
 			value = 10295,
-			pattern =
-			[[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d{5}\.f_\d+\), .?(Local_\d{5})(\.f_\d+\))]],
+			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d{5}\.f_\d+\), .?(Local_\d{5})(\.f_\d+\))]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -810,8 +791,7 @@ return {
 		},
 		ENHANCED = {
 			value = 10697,
-			pattern =
-			[[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d{5}\.f_\d+\), .?(Local_\d{5})(\.f_\d+\))]],
+			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d{5}\.f_\d+\), .?(Local_\d{5})(\.f_\d+\))]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -833,9 +813,8 @@ return {
 				{
 					value = 459,
 					capture_group = 2,
-					description =
-					"Current objective. This hasn't changed in years, hence the reason it's hardcoded in the regex pattern."
-				},
+					description = "Current objective. This hasn't changed in years, hence the reason it's hardcoded in the regex pattern."
+				}
 			}
 		},
 		ENHANCED = {
@@ -845,8 +824,8 @@ return {
 			offsets = {
 				{
 					value = 459,
-					capture_group = 2,
-				},
+					capture_group = 2
+				}
 			}
 		}
 	},
@@ -856,12 +835,12 @@ return {
 		LEGACY = {
 			value = 453,
 			pattern = [[.*?Local_\d{3}\.f_(453)\.*?]],
-			capture_group = 1,
+			capture_group = 1
 		},
 		ENHANCED = {
 			value = 453,
 			pattern = [[.*?Local_\d{3}\.f_(453)\.*?]],
-			capture_group = 1,
+			capture_group = 1
 		}
 	},
 	ie_num_vehs = {
@@ -869,15 +848,13 @@ return {
 		file = "gb_vehicle_export.c",
 		LEGACY = {
 			value = 650,
-			pattern =
-			[[Local_\d{3}\.(f_\d{3})\s+=\s+func_\w+\(func_\w+\(\),.*?Local_\d{3}\.f_\d{3},\s+func_\w+\(func_\d{3}\(\)\)\);]],
-			capture_group = 1,
+			pattern = [[Local_\d{3}\.(f_\d{3})\s+=\s+func_\w+\(func_\w+\(\),.*?Local_\d{3}\.f_\d{3},\s+func_\w+\(func_\d{3}\(\)\)\);]],
+			capture_group = 1
 		},
 		ENHANCED = {
 			value = 650,
-			pattern =
-			[[Local_\d{3}\.(f_\d{3})\s+=\s+func_\w+\(func_\w+\(\),.*?Local_\d{3}\.f_\d{3},\s+func_\w+\(func_\d{3}\(\)\)\);]],
-			capture_group = 1,
+			pattern = [[Local_\d{3}\.(f_\d{3})\s+=\s+func_\w+\(func_\w+\(\),.*?Local_\d{3}\.f_\d{3},\s+func_\w+\(func_\d{3}\(\)\)\);]],
+			capture_group = 1
 		}
 	},
 	ie_steal_bitset = {
@@ -900,7 +877,7 @@ return {
 					value = 2,
 					capture_group = 2,
 					description = "read size."
-				},
+				}
 			}
 		},
 		ENHANCED = {
@@ -912,7 +889,7 @@ return {
 					value = 2,
 					capture_group = 2,
 					description = "read size."
-				},
+				}
 			}
 		}
 	}
