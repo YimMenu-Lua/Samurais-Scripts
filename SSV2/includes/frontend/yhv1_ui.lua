@@ -7,58 +7,64 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YHV1 = require("includes.features.YimHeistsV1"):init()
+local YHV1               = require("includes.features.YimHeistsV1"):init()
+local setTranslations    = require("SSV2.includes.frontend.helpers.set_translations")
+local heistNames <const> = {
+	"AWT_1026",    -- The Cluckin' Bell Farm Raid
+	"AWT_1109",    -- No Way KnoWay
+	"USBMIXHELPDRE", -- DR. DRE
+	"HACK24_MFM_STR", -- Oscar Guzman Flies Again
+}
+local tabNames <const>   = {
+	"YH_BASIC_TAB",
+	"ISLAND_TRAVEL_T", -- Cayo Perico
+}
 
 ---@type HEIST_TYPES
-local HEIST_TYPES = {
-	-- You can find all mission GXTs in freemode.c func_22395 and call Game.GetGXTLabel
-	-- to get the label for the currently selected game language.
-	--
-	-- To expand the UI further, we can grab all needed GXTs
-	-- then run a one time fiber at the bottom of this file to
-	-- get the text for all of them. This ensures all heist/setup mission names
-	-- are exactly how they appear in the game.
-	--
-	-- See bottom of yrv3_ui.lua for an example.
-	{
-		name = "Cluckin Bell", -- AWT_1026
+local HEIST_TYPES        = {
+	{ -- Cluckin Bell
+		get_name = function()
+			return heistNames[1]
+		end,
 		get_coords = function()
 			return vec3:new(-1093.15, -807.14, 19.28)
 		end,
-		blip = 871,
 		stat = {
 			name = "MPX_SALV23_INST_PROG",
 			val = 31,
 		}
 	},
-	{
-		name = "KnoWay", -- AWT_1109
+	{ -- KnoWay
+		get_name = function()
+			return heistNames[2]
+		end,
 		get_coords = function()
 			return vec3:new(42.82, -1599.19, 29.60)
 		end,
-		blip = 76,
 		stat = {
 			name = "MPX_M25_AVI_MISSION_CURRENT",
 			val = 4,
 		},
 	},
-	{
-		name = "Dr. Dre",
+	{ -- Dr Dre
+		get_name = function()
+			return heistNames[3]
+		end,
 		get_coords = function()
 			return YHV1:GetAgencyLocation()
 		end,
-		blip = 826,
 		stat = {
 			name = "MPX_FIXER_STORY_BS",
 			val = 4095,
 		}
 	},
-	{
-		name = "Oscar Guzman",
-		get_coords = function()
-			return vec3:new(2150.65, 4796.60, 41.17)
+	{ -- Oscar Guzman
+		get_name = function()
+			return heistNames[4]
 		end,
-		blip = 903,
+		get_coords = function()
+			return YHV1:GetFieldHangarLocation()
+		end,
 		stat = {
 			name = "MPX_HACKER24_INST_BS",
 			val = 31,
@@ -67,14 +73,13 @@ local HEIST_TYPES = {
 	},
 }
 
--- This is all a pretty asinine way of handling this and has some UI/UX inconsistencies but it's quick and it works good enuff for now
--- TODO: Make this better
 local function drawBasicTab()
 	for i, heist in ipairs(HEIST_TYPES) do
 		ImGui.PushID(i)
-		ImGui.BulletText(heist.name)
+		local heist_name = heist.get_name()
+		ImGui.BulletText(heist_name)
 
-		local location = heist.get_coords() or heist.blip
+		local location = heist.get_coords()
 		ImGui.BeginDisabled(not location)
 		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
 			LocalPlayer:Teleport(location, false)
@@ -88,11 +93,12 @@ local function drawBasicTab()
 
 		ImGui.SameLine()
 
-		ImGui.BeginDisabled(stats.get_int(heist.stat.name) == heist.stat.val)
+		local isDone = stats.get_int(heist.stat.name) == heist.stat.val
+		ImGui.BeginDisabled(isDone)
 		if GUI:Button(_T("SY_COMPLETE_PREPARATIONS")) then
-			YHV1:SkipPrep(heist.stat.name, heist.stat.val, heist.name)
+			YHV1:SkipPrep(heist.stat.name, heist.stat.val, heist_name)
 		end
-		if (heist.optInfo) then
+		if (heist.optInfo and not isDone) then
 			GUI:Tooltip(heist.optInfo)
 		end
 		ImGui.EndDisabled()
@@ -104,6 +110,24 @@ local cayo_secondary_target_i = 2
 local cayo_secondary_target_c = 3
 
 local function drawCayoTab()
+	local sub = YHV1:HasSubmarine()
+	if (not sub) then
+		ImGui.Text(_T("YH_SUBMARINE_NOT_OWNED"))
+		return
+	end
+
+	ImGui.BeginDisabled(sub.coords:is_zero())
+	if (GUI:Button(_T("GENERIC_TELEPORT"))) then
+		LocalPlayer:Teleport(sub.coords)
+	end
+
+	ImGui.SameLine()
+
+	if (GUI:Button(_T("GENERIC_SET_WAYPOINT"))) then
+		Game.SetWaypointCoords(sub.coords)
+	end
+	ImGui.EndDisabled()
+
 	-- https://www.unknowncheats.me/forum/grand-theft-auto-v/695454-edit-cayo-perico-primary-target-stat-yimmenu-v2.html
 	-- https://www.unknowncheats.me/forum/grand-theft-auto-v/431801-cayo-perico-heist-click.html
 	local cayo_heist_primary    = stats.get_int("MPX_H4CNF_TARGET")
@@ -223,29 +247,27 @@ local function drawCayoTab()
 	end
 end
 
+local tabCallbacks <const> = {
+	drawBasicTab,
+	drawCayoTab,
+}
+
 local function HeistUI()
 	if (not Game.IsOnline() or not Backend:IsUpToDate()) then
 		ImGui.Text(_T("GENERIC_UNAVAILABLE_SP"))
 		return
 	end
 
-	if (ImGui.BeginTabBar("##dunkBar")) then
+	if (ImGui.BeginTabBar("##funkBar")) then
 		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
 
-		if ImGui.BeginTabItem(_T("GENERIC_GENERAL_LABEL")) then
-			drawBasicTab()
-			ImGui.EndTabItem()
+		for i = 1, #tabNames do
+			local name = tabNames[i]
+			if ImGui.BeginTabItem(name) then
+				tabCallbacks[i]()
+				ImGui.EndTabItem()
+			end
 		end
-
-		if ImGui.BeginTabItem(_T("YH_CAYO_TAB")) then
-			drawCayoTab()
-			ImGui.EndTabItem()
-		end
-
-		-- if ImGui.BeginTabItem(_T("YH_DDAY_TAB")) then
-		-- 	drawDDayTab()
-		-- 	ImGui.EndTabItem()
-		-- end
 
 		ImGui.PopStyleVar()
 		ImGui.EndTabBar()
@@ -253,3 +275,8 @@ local function HeistUI()
 end
 
 GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimHeists", HeistUI)
+
+ThreadManager:Run(function()
+	setTranslations(tabNames)
+	setTranslations(heistNames)
+end)

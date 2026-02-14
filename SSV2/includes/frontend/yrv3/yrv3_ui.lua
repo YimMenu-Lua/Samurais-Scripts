@@ -9,7 +9,7 @@
 
 local selectedTabID        = 1
 local colMoneyGreen        = Color("#85BB65")
-local selfTranslateLabels  = Set.new("YRV3_CASH_SAFES_LABEL", "GENERIC_MISC")
+local setTranslations      = require("SSV2.includes.frontend.helpers.set_translations")
 local tabNames <const>     = {
 	"GB_BOSSC",
 	"CELL_HANGAR",
@@ -136,12 +136,5 @@ end
 GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimResupplierV3", YRV3UI)
 
 ThreadManager:Run(function()
-	for i = 1, #tabNames do
-		local label = tabNames[i]
-		if (selfTranslateLabels:Contains(label)) then -- no GXT; use our own translations
-			tabNames[i] = _T(label)
-		else
-			tabNames[i] = Game.GetGXTLabel(label) -- get label from the game.
-		end
-	end
+	setTranslations(tabNames)
 end)
