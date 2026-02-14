@@ -20,7 +20,7 @@ function Terrifier:OnClick()
 	end
 
 	ThreadManager:Run(function(s)
-		if (not Self:IsInCombat()) then
+		if (not LocalPlayer:IsInCombat()) then
 			Notifier:ShowMessage("Samurai's Scripts", _T("GENERIC_NOT_IN_COMBAT"), false, 3)
 			return
 		end
@@ -34,7 +34,7 @@ function Terrifier:OnClick()
 
 		while (not timer:is_done()) do
 			for _, p in ipairs(entities.get_all_peds_as_handles()) do
-				if (not PED.IS_PED_A_PLAYER(p) and Self:IsPedMyEnemy(p) and not task_set:Contains(p)) then
+				if (not PED.IS_PED_A_PLAYER(p) and LocalPlayer:IsPedMyEnemy(p) and not task_set:Contains(p)) then
 					TASK.CLEAR_PED_TASKS(p)
 					TASK.CLEAR_PED_SECONDARY_TASK(p)
 					PED.SET_PED_COMBAT_ATTRIBUTES(p, 5, false)
@@ -54,7 +54,7 @@ function Terrifier:OnClick()
 					end
 
 					PED.SET_PED_KEEP_TASK(p, true)
-					TASK.TASK_SMART_FLEE_PED(p, Self:GetHandle(), 300, 10000, false, true)
+					TASK.TASK_SMART_FLEE_PED(p, LocalPlayer:GetHandle(), 300, 10000, false, true)
 					task_set:Push(p)
 				end
 
@@ -66,7 +66,7 @@ function Terrifier:OnClick()
 			-- This is for scripted attackers (cops, mission enemies, etc.) they refuse to back down so we remind them who's the boss
 			for ped in task_set:Iter() do
 				if (not TASK.GET_IS_TASK_ACTIVE(ped, Enums.ePedTaskIndex.SmartFlee)) then
-					TASK.TASK_SMART_FLEE_PED(ped, Self:GetHandle(), 300, -1, false, true)
+					TASK.TASK_SMART_FLEE_PED(ped, LocalPlayer:GetHandle(), 300, -1, false, true)
 				else
 					table.insert(trash, ped)
 				end

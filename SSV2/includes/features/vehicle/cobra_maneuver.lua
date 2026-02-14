@@ -33,7 +33,7 @@ end
 
 function CobraManeuver:ShouldRun()
 	return (GVars.features.vehicle.cobra_maneuver
-		and Self:IsDriving()
+		and LocalPlayer:IsDriving()
 		and self.m_entity
 		and self.m_entity:IsValid()
 		and self.m_entity:IsPlane()

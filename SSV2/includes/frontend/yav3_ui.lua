@@ -1076,7 +1076,7 @@ local function DrawMovementOptions()
 	if ImGui.Button(_T("GENERIC_APPLY"), 80, 35) then
 		GUI:PlaySound("Select")
 		---@diagnostic disable-next-line
-		Self:SetMovementClipset(t_SelectedMovementClipset, i_MovementCategory == 1)
+		LocalPlayer:SetMovementClipset(t_SelectedMovementClipset, i_MovementCategory == 1)
 	end
 	ImGui.EndDisabled()
 
@@ -1084,7 +1084,7 @@ local function DrawMovementOptions()
 
 	if ImGui.Button(_T("GENERIC_RESET"), 80, 35) then
 		GUI:PlaySound("Cancel")
-		Self:ResetMovementClipsets()
+		LocalPlayer:ResetMovementClipsets()
 	end
 	ImGui.EndChild()
 end

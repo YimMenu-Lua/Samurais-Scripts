@@ -40,7 +40,7 @@ function Flares:ShouldRun()
 	return (self.m_entity
 		and self.m_entity:IsValid()
 		and self.m_entity:IsAircraft()
-		and Self:IsDriving()
+		and LocalPlayer:IsDriving()
 		and GVars.features.vehicle.flares
 	)
 end
@@ -61,7 +61,7 @@ function Flares:Deploy()
 		return
 	end
 
-	local handle = Self:GetVehicle():GetHandle()
+	local handle = LocalPlayer:GetVehicle():GetHandle()
 	local firstDelay = 200
 
 	self.m_is_active = true
@@ -87,7 +87,7 @@ function Flares:Update()
 	end
 
 	local now = MISC.GET_GAME_TIMER()
-	local handle = Self:GetVehicle():GetHandle()
+	local handle = LocalPlayer:GetVehicle():GetHandle()
 	self.m_entity.m_is_shooting_flares = true
 
 	if (not Game.IsOnline()) then
@@ -140,7 +140,7 @@ function Flares:Update()
 			bone_pos + shot.offset,
 			end_pos,
 			1.0,
-			Self:GetHandle(),
+			LocalPlayer:GetHandle(),
 			100.0
 		)
 

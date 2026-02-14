@@ -30,7 +30,7 @@ local playerAbilitiesWindow = {
 
 local function CheckIfRagdollBlocked()
 	ThreadManager:Run(function()
-		if (Self:IsOnFoot() and not PED.CAN_PED_RAGDOLL(Self:GetHandle())) then
+		if (LocalPlayer:IsOnFoot() and not PED.CAN_PED_RAGDOLL(LocalPlayer:GetHandle())) then
 			Notifier:ShowWarning(
 				"Samurais Scripts",
 				_T("SELF_RAGDOLL_BLOCK_INFO")
@@ -247,11 +247,11 @@ local function SelfUI()
 
 				if (ImGui.IsItemClicked(0)) then
 					ThreadManager:Run(function()
-						if not (Self:IsOnFoot() and Self:IsOutside()) then
+						if not (LocalPlayer:IsOnFoot() and LocalPlayer:IsOutside()) then
 							return
 						end
 
-						local handle = Self:GetHandle()
+						local handle = LocalPlayer:GetHandle()
 						if (WEAPON.IS_PED_ARMED(handle, 7)) then
 							WEAPON.SET_CURRENT_PED_WEAPON(handle, 0xA2719263, true)
 						end

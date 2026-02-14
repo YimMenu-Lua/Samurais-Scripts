@@ -24,8 +24,8 @@ function GroupManager:Init()
 			_, self.relationshipGroup = PED.ADD_RELATIONSHIP_GROUP("WOMPUS_SPECIAL", joaat("WOMPUS_SPECIAL"))
 		end
 
-		PED.SET_RELATIONSHIP_BETWEEN_GROUPS(0, self.relationshipGroup, Self:GetRelationshipGroupHash())
-		PED.SET_RELATIONSHIP_BETWEEN_GROUPS(0, Self:GetRelationshipGroupHash(), self.relationshipGroup)
+		PED.SET_RELATIONSHIP_BETWEEN_GROUPS(0, self.relationshipGroup, LocalPlayer:GetRelationshipGroupHash())
+		PED.SET_RELATIONSHIP_BETWEEN_GROUPS(0, LocalPlayer:GetRelationshipGroupHash(), self.relationshipGroup)
 		PED.SET_RELATIONSHIP_BETWEEN_GROUPS(0, self.relationshipGroup, self.relationshipGroup)
 	end
 end
@@ -102,7 +102,7 @@ function GroupManager:HandleBodyuards(s)
 		return
 	end
 
-	local playerCoords = Self:GetPos()
+	local playerCoords = LocalPlayer:GetPos()
 	for ped, data in pairs(self.Bodyguards) do
 		if data and ped and Backend:IsScriptEntity(ped) then
 			---@type Bodyguard
@@ -113,7 +113,7 @@ function GroupManager:HandleBodyuards(s)
 					local guardPos = guard:GetPos()
 					local distance = guardPos:distance(playerCoords)
 
-					if guard:IsOnFoot() and Self:IsOnFoot() and distance > 5 then
+					if guard:IsOnFoot() and LocalPlayer:IsOnFoot() and distance > 5 then
 						guard:QueueTask(guard.TASKS.FOLLOW, guard:TaskGoToEntity())
 					end
 

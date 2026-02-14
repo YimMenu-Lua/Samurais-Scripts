@@ -19,6 +19,7 @@ require "includes.modules.Entity"
 -- Class representing a GTA V Ped.
 ---@class Ped : Entity
 ---@field private m_internal CPed
+---@field Resolve fun() : CPed
 ---@field Create fun(_, modelHash: hash, entityType: eEntityType, pos?: vec3, heading?: number, isNetwork?: boolean, isScriptHostPed?: boolean): Ped
 ---@overload fun(handle: handle): Ped
 Ped = Class("Ped", Entity)
@@ -26,6 +27,17 @@ Ped = Class("Ped", Entity)
 ---@return boolean
 function Ped:IsValid()
 	return self:Exists() and ENTITY.IS_ENTITY_A_PED(self:GetHandle())
+end
+
+---@return boolean
+function Ped:IsPlayer()
+	local cplayerinfo = self:Resolve().m_player_info
+	return cplayerinfo and cplayerinfo:IsValid() or false
+end
+
+---@return boolean
+function Ped:IsLocalPlayer()
+	return self == LocalPlayer
 end
 
 ---@return boolean
@@ -203,6 +215,7 @@ end
 ---@param isNetwork? boolean
 ---@param isScriptHost? boolean
 ---@param copyHeadBlend? boolean
+---@return Ped?
 function Ped:Clone(cloneSpawnPos, isNetwork, isScriptHost, copyHeadBlend)
 	if not self:IsValid() then
 		return
@@ -314,7 +327,7 @@ end
 ---@param pBoolParam? boolean
 ---@return boolean
 function Ped:GetConfigFlag(flag_id, pBoolParam)
-	return PED.GET_PED_CONFIG_FLAG(Self:GetHandle(), flag_id, pBoolParam or true)
+	return PED.GET_PED_CONFIG_FLAG(self:GetHandle(), flag_id, pBoolParam or true)
 end
 
 ---@param flag_id ePedConfigFlags
@@ -349,6 +362,46 @@ end
 
 function Ped:ClearDefaultPrimaryTask()
 	TASK.CLEAR_DEFAULT_PRIMARY_TASK(self:GetHandle())
+end
+
+---@param coords vec3
+function Ped:SetCoordsKeepVehicle(coords)
+	PED.SET_PED_COORDS_KEEP_VEHICLE(self:GetHandle(), coords.x, coords.y, coords.z)
+end
+
+-- Teleports the ped to the provided coordinates.
+--
+-- You can pass an entity handle, a blip sprite number, or a vec3 as the coordinates param.
+---@param where integer|vec3 -- [blip ID](https://wiki.rage.mp/wiki/Blips), entity handle, or vector3 coordinates.
+---@param keep_vehicle? boolean
+---@param loadGround? boolean
+function Ped:Teleport(where, keep_vehicle, loadGround)
+	ThreadManager:Run(function()
+		if (self:IsLocalPlayer() and not self:IsOutside()) then
+			Notifier:ShowError(_T("GENERIC_TELEPORT"), _T("GENERIC_TP_INTERIOR_ERR"))
+			return
+		end
+
+		local coords = Game.Ensure3DCoords(where)
+		if (not coords or coords:is_zero()) then
+			Notifier:ShowError(_T("GENERIC_TELEPORT"), _T("GENERIC_TP_INVALID_COORDS_ERR"))
+			return
+		end
+
+		if (loadGround) then
+			TaskWait(Game.LoadGroundAtCoord, { coords }, 500)
+		end
+
+		if (not keep_vehicle and not self:IsOnFoot()) then
+			self:ClearTasksImmediately()
+			sleep(50)
+		end
+
+		local dir     = self:GetPos() - coords
+		local heading = MISC.GET_HEADING_FROM_VECTOR_2D(dir.x, dir.y)
+		self:SetHeading(heading)
+		self:SetCoordsKeepVehicle(coords)
+	end)
 end
 
 -- ---@return array<handle>

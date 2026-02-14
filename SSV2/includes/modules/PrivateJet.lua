@@ -203,13 +203,13 @@ function PrivateJet:IsPlayerInJet()
 		return false
 	end
 
-	local playerVeh = Self:GetVehicleNative()
+	local playerVeh = LocalPlayer:GetVehicleNative()
 	return (playerVeh ~= 0 and self.m_handle == playerVeh)
 end
 
 function PrivateJet:IsFarAwayFromBoss()
 	return not self:IsPlayerInJet()
-		and Self:GetPos():distance(self:GetPos()) > 500
+		and LocalPlayer:GetPos():distance(self:GetPos()) > 500
 end
 
 function PrivateJet:GetTaskAsString()
@@ -255,8 +255,8 @@ function PrivateJet:WarpPlayer()
 
 		STREAMING.REQUEST_COLLISION_AT_COORD(jetCoords.x, jetCoords.y, jetCoords.z)
 		STREAMING.REQUEST_ADDITIONAL_COLLISION_AT_COORD(jetCoords.x, jetCoords.y, jetCoords.z)
-		Self:ClearTasksImmediately()
-		self:WarpPed(Self:GetHandle(), seatIndex)
+		LocalPlayer:ClearTasksImmediately()
+		self:WarpPed(LocalPlayer:GetHandle(), seatIndex)
 		ENTITY.SET_ENTITY_VISIBLE(self.m_handle, true, true)
 		ENTITY.SET_ENTITY_ALPHA(self.m_handle, 255, false)
 	end)
@@ -607,10 +607,10 @@ function PrivateJet:StateEval()
 
 	if not self:IsIdle() then
 		if self:IsCruising() then
-			local parachuteState = PED.GET_PED_PARACHUTE_STATE(Self:GetHandle())
-			if PED.IS_PED_IN_PARACHUTE_FREE_FALL(Self:GetHandle())
+			local parachuteState = PED.GET_PED_PARACHUTE_STATE(LocalPlayer:GetHandle())
+			if PED.IS_PED_IN_PARACHUTE_FREE_FALL(LocalPlayer:GetHandle())
 				or parachuteState > 0
-				or Self:IsFalling() then
+				or LocalPlayer:IsFalling() then
 				self:PilotSpeak("GENERIC_SHOCKED_HIGH", "SPEECH_PARAMS_FORCE_HELI")
 				Notifier:ShowMessage(
 					"Private Jet",

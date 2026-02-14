@@ -16,7 +16,7 @@ local FeatureBase = require("includes.modules.FeatureBase")
 local AutoHeal = setmetatable({}, FeatureBase)
 AutoHeal.__index = AutoHeal
 
----@param ent Self
+---@param ent LocalPlayer
 ---@return AutoHeal
 function AutoHeal.new(ent)
 	local self = FeatureBase.new(ent)
@@ -31,7 +31,7 @@ end
 
 function AutoHeal:ShouldRun()
 	return (GVars.features.self.autoheal.enabled
-		and Self:IsAlive()
+		and LocalPlayer:IsAlive()
 		and not Backend:IsPlayerSwitchInProgress()
 		and not script.is_active("maintransition")
 	)
@@ -42,11 +42,11 @@ function AutoHeal:Update()
 		return
 	end
 
-	local maxHp = Self:GetMaxHealth()
-	local hp = Self:GetHealth()
-	local maxArmr = Self:GetMaxArmour()
-	local armor = Self:GetArmour()
-	local handle = Self:GetHandle()
+	local maxHp = LocalPlayer:GetMaxHealth()
+	local hp = LocalPlayer:GetHealth()
+	local maxArmr = LocalPlayer:GetMaxArmour()
+	local armor = LocalPlayer:GetArmour()
+	local handle = LocalPlayer:GetHandle()
 
 	if (hp < maxHp and hp > 0) then
 		if (PED.IS_PED_IN_COVER(handle, false)) then

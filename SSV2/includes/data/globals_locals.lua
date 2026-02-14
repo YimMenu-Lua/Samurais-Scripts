@@ -84,7 +84,7 @@ return {
 		file = "freemode.c",
 		LEGACY = {
 			value = 1845250,
-			pattern = [[(Global_\d{7})\[.*?(.*?)\]\.(f_\d{3}).(f_\d{3})\[.*?/(.*?)\].f_9 = .*?;]],
+			pattern = [[Global_(\d{7})\[.*? /\*(\d+)\*/\]\.(f_\d{3}).(f_\d{3})\[.*? /\*(\d+)\*/\].f_9 = .*?;]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -109,7 +109,7 @@ return {
 		},
 		ENHANCED = {
 			value = 1845299,
-			pattern = [[(Global_\d{7})\[.*?(.*?)\]\.(f_\d{3}).(f_\d{3})\[.*?/(.*?)\].f_9 = .*?;]],
+			pattern = [[Global_(\d{7})\[.*? /\*(\d+)\*/\]\.(f_\d{3}).(f_\d{3})\[.*? /\*(\d+)\*/\].f_9 = .*?;]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -156,7 +156,7 @@ return {
 			capture_group = 2,
 			offsets = {
 				{
-					1,
+					value = 1,
 					capture_group = 3,
 					description = "some int value indexed by hub slot. can't be bothered -_-"
 				}
@@ -168,7 +168,7 @@ return {
 			capture_group = 2,
 			offsets = {
 				{
-					1,
+					value = 1,
 					capture_group = 3,
 					description = "some int value indexed by hub slot. can't be bothered -_-"
 				}
@@ -243,7 +243,33 @@ return {
 			capture_group = 1
 		}
 	},
-	gb_biker_contraband_sell_local = {
+	biker_required_deliveries_local = {
+		description = "Biker Contraband Sell Local",
+		file = "gb_biker_contraband_sell.c",
+		LEGACY = {
+			value = 729,
+			pattern = [[.*?Local_(\d{3})\.f_(\d{3}) = func_\w+\(-1\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 174,
+					capture_group = 2
+				},
+			}
+		},
+		ENHANCED = {
+			value = 731,
+			pattern = [[.*?Local_(\d{3})\.f_(\d{3}) = func_\w+\(-1\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 174,
+					capture_group = 2
+				}
+			}
+		}
+	},
+	biker_deliveries_local = {
 		description = "Biker Contraband Sell Local",
 		file = "gb_biker_contraband_sell.c",
 		LEGACY = {
@@ -254,6 +280,10 @@ return {
 				{
 					value = 122,
 					capture_group = 2
+				},
+				{
+					value = 174,
+					description = "number of deliveries"
 				}
 			}
 		},
@@ -323,33 +353,21 @@ return {
 			}
 		}
 	},
-	gb_gunrunning_sell_local_1 = {
+	gb_gunrunning_sell_local = {
 		description = "Bunker Sell Local 1",
 		file = "gb_gunrunning.c",
 		LEGACY = {
 			value = 1266,
 			pattern = [[Local_1\d{3}\.f_\d{3} = func_\w+\(func_\w+\(\),.*?(Local_1\d{3})\.(f_\d{3}), \w+, -1\);]],
 			capture_group = 1,
-			offsets = {
-				{
-					value = 762,
-					capture_group = 2
-				}
-			}
 		},
 		ENHANCED = {
 			value = 1268,
 			pattern = [[Local_1\d{3}\.f_\d{3} = func_\w+\(func_\w+\(\),.*?(Local_1\d{3})\.(f_\d{3}), \w+, -1\);]],
 			capture_group = 1,
-			offsets = {
-				{
-					value = 762,
-					capture_group = 2
-				}
-			}
 		}
 	},
-	gb_gunrunning_sell_local_2 = {
+	bunker_sell_amt_delivered = {
 		description = "Amount delivered.",
 		file = "gb_gunrunning.c",
 		LEGACY = {
@@ -375,8 +393,8 @@ return {
 			}
 		}
 	},
-	gb_gunrunning_sell_local_3 = {
-		description = "Remaining delivery vehicles.",
+	bunker_sell_num_vehs = {
+		description = "Number of delivery vehicles.",
 		file = "gb_gunrunning.c",
 		LEGACY = {
 			value = 1266,
@@ -800,6 +818,100 @@ return {
 					capture_group = 2,
 					description = "grab speed"
 				}
+			}
+		}
+	},
+	ie_objective_local = {
+		description = "Import/Export steal auto complete mission.",
+		file = "gb_vehicle_export.c",
+		LEGACY = {
+			value = 880,
+			pattern = [[.*?Local_(\d{3})\.f_(459)\s+=\s+\w+;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 459,
+					capture_group = 2,
+					description =
+					"Current objective. This hasn't changed in years, hence the reason it's hardcoded in the regex pattern."
+				},
+			}
+		},
+		ENHANCED = {
+			value = 882,
+			pattern = [[.*?Local_(\d{3})\.f_(459)\s+=\s+\w+;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 459,
+					capture_group = 2,
+				},
+			}
+		}
+	},
+	ie_bitset_1 = {
+		description = "Import/Export some other array of bits. Hardcoded as well because it hasn't changed either.",
+		file = "gb_vehicle_export.c",
+		LEGACY = {
+			value = 453,
+			pattern = [[.*?Local_\d{3}\.f_(453)\.*?]],
+			capture_group = 1,
+		},
+		ENHANCED = {
+			value = 453,
+			pattern = [[.*?Local_\d{3}\.f_(453)\.*?]],
+			capture_group = 1,
+		}
+	},
+	ie_num_vehs = {
+		description = "Import/Export steal number of vehicles.",
+		file = "gb_vehicle_export.c",
+		LEGACY = {
+			value = 650,
+			pattern =
+			[[Local_\d{3}\.(f_\d{3})\s+=\s+func_\w+\(func_\w+\(\),.*?Local_\d{3}\.f_\d{3},\s+func_\w+\(func_\d{3}\(\)\)\);]],
+			capture_group = 1,
+		},
+		ENHANCED = {
+			value = 650,
+			pattern =
+			[[Local_\d{3}\.(f_\d{3})\s+=\s+func_\w+\(func_\w+\(\),.*?Local_\d{3}\.f_\d{3},\s+func_\w+\(func_\d{3}\(\)\)\);]],
+			capture_group = 1,
+		}
+	},
+	ie_steal_bitset = {
+		description = [[This stores indices of bitsets??
+		It's indexed by the number of targets (size 2, idx from 1 to 4) which is stored in Local_880.f_650.
+		Still haven't figured out which bits we need to set.
+		Attempts made:
+		- Use Arthur's scrDbg to log calls to func_9 and func_140
+			- Result: 1.7GB log file that broke my text editor (skill issue on my part).
+		- Log the final value after finishing the mission normally and try to directly set it. Feels wrong, bad, and weird but does (kida) work.
+			- Result: Mission passes but vehicle won't be stored in our garage.
+		]],
+		file = "gb_vehicle_export.c",
+		LEGACY = {
+			value = 48,
+			pattern = [[.*?Local_\d{3}\.f_(\d{2})\[.*?/\*(\d+)\*/\]\[\w+\], \w+\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 2,
+					capture_group = 2,
+					description = "read size."
+				},
+			}
+		},
+		ENHANCED = {
+			value = 48,
+			pattern = [[.*?Local_\d{3}\.f_(\d{2})\[.*?/\*(\d+)\*/\]\[\w+\], \w+\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 2,
+					capture_group = 2,
+					description = "read size."
+				},
 			}
 		}
 	}

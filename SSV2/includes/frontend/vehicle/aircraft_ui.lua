@@ -12,7 +12,7 @@ local autopilot_state_idx     = 0
 local autopilot_index_changed = false
 local autopilot_labels
 local planes_tab              = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_AIRCRAFT", nil, nil, true)
-Flares                        = Self:GetVehicle():AddFeature(flrs)
+Flares                        = LocalPlayer:GetVehicle():AddFeature(flrs)
 
 planes_tab:AddBoolCommand(
 	"VEH_FAST_JETS",
@@ -40,7 +40,7 @@ planes_tab:AddBoolCommand(
 	nil,
 	function()
 		ThreadManager:Run(function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			PV:RestorePatch(PV.MemoryPatches.Turbulence)
 			PV:RestorePatch(PV.MemoryPatches.WindMult)
 		end)
@@ -99,7 +99,7 @@ planes_tab:RegisterGUI(function()
 
 	ImGui.Spacing()
 	ImGui.SeparatorText(_T("VEH_AUTOPILOT"))
-	local eligible = Self:GetVehicle().m_autopilot.eligible
+	local eligible = LocalPlayer:GetVehicle().m_autopilot.eligible
 	ImGui.BeginDisabled(not eligible)
 	if (not autopilot_labels) then
 		autopilot_labels = {
@@ -118,11 +118,11 @@ planes_tab:RegisterGUI(function()
 
 		if (autopilot_index_changed) then
 			ThreadManager:Run(function()
-				Self:GetVehicle():UpdateAutopilotState(autopilot_state_idx)
+				LocalPlayer:GetVehicle():UpdateAutopilotState(autopilot_state_idx)
 			end)
 		end
 
-		if (Self:GetVehicle().m_autopilot.last_interrupted) then
+		if (LocalPlayer:GetVehicle().m_autopilot.last_interrupted) then
 			autopilot_state_idx = 0
 		end
 	end

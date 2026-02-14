@@ -68,7 +68,7 @@ end
 
 function PublicEnemy:ShouldRun()
 	return self.m_enabled
-		and Self:IsOutside()
+		and LocalPlayer:IsOutside()
 		and not NETWORK.NETWORK_IS_ACTIVITY_SESSION()
 end
 
@@ -110,11 +110,11 @@ function PublicEnemy:UpdateHostileSet()
 		return
 	end
 
-	local playerHandle = Self:GetHandle()
+	local playerHandle = LocalPlayer:GetHandle()
 	for _, ped in pairs(entities.get_all_peds_as_handles()) do
 		if (ped ~= playerHandle
 				and not PED.IS_PED_A_PLAYER(ped)
-				and not PED.IS_PED_GROUP_MEMBER(ped, Self:GetGroupIndex())
+				and not PED.IS_PED_GROUP_MEMBER(ped, LocalPlayer:GetGroupIndex())
 				and not Backend:IsScriptEntity(ped)
 				and not self.m_hostile_peds:Contains(ped)
 			) then
@@ -143,10 +143,10 @@ function PublicEnemy:TaskCombat()
 	end
 
 	local trash = {}
-	local playerHandle = Self:GetHandle()
+	local playerHandle = LocalPlayer:GetHandle()
 	for ped in self.m_hostile_peds:Iter() do
 		local pedPos = Game.GetEntityCoords(ped, true)
-		if (not ENTITY.DOES_ENTITY_EXIST(ped) or ENTITY.IS_ENTITY_DEAD(ped, true) or Self:GetPos():distance(pedPos) > 200) then
+		if (not ENTITY.DOES_ENTITY_EXIST(ped) or ENTITY.IS_ENTITY_DEAD(ped, true) or LocalPlayer:GetPos():distance(pedPos) > 200) then
 			table.insert(trash, ped)
 		end
 

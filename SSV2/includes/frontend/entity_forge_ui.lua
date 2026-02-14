@@ -1509,7 +1509,7 @@ local function EntityForgeUI()
 						if previewSelectedEntity and PreviewService.m_current_pos then
 							vec_Position = PreviewService.m_current_pos
 						else
-							vec_Position = Self:GetOffsetInWorldCoords(1, 5, 0)
+							vec_Position = LocalPlayer:GetOffsetInWorldCoords(1, 5, 0)
 						end
 
 						EntityForge:CreateEntity(

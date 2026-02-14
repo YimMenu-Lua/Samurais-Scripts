@@ -153,7 +153,7 @@ function PlayerVehicle.new(handle)
 
 	instance.m_esc_sm = StateMachine({
 		predicate = function(_, veh)
-			return Self:IsDriving()
+			return LocalPlayer:IsDriving()
 				and veh:IsCar()
 				and veh:IsDrifting()
 				and VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(veh:GetHandle())
@@ -444,14 +444,14 @@ end
 
 function PlayerVehicle:AutoLock()
 	if (GVars.features.vehicle.auto_lock_doors) then
-		local playerPos = Self:GetPos()
+		local playerPos = LocalPlayer:GetPos()
 		local vehPos    = self:GetPos()
 		local distance  = playerPos:distance(vehPos)
 
 		if (not self:IsLocked()
 				and distance > 18
-				and Self:IsOutside()
-				and Self:GetVehicleTryingToEnter() ~= self:GetHandle()
+				and LocalPlayer:IsOutside()
+				and LocalPlayer:GetVehicleTryingToEnter() ~= self:GetHandle()
 			) then
 			self:AddGenericToggleable("autolockdoors", function()
 				self:LockDoors(true)
@@ -459,7 +459,7 @@ function PlayerVehicle:AutoLock()
 		end
 	end
 
-	if (self:IsLocked() and Self:GetVehicleTryingToEnter() == self:GetHandle()) then
+	if (self:IsLocked() and LocalPlayer:GetVehicleTryingToEnter() == self:GetHandle()) then
 		if (not self.m_generic_toggleables["autolockdoors"]) then
 			self:LockDoors(false)
 			return
@@ -489,8 +489,8 @@ end
 function PlayerVehicle:ResetAutopilot()
 	self.m_autopilot.state = self.eAutoPilotState.NONE
 	self:ClearPrimaryTask()
-	Self:ClearTasks()
-	Self:ClearSecondaryTask()
+	LocalPlayer:ClearTasks()
+	LocalPlayer:ClearSecondaryTask()
 end
 
 ---@param newState eAutoPilotState
@@ -499,7 +499,7 @@ function PlayerVehicle:UpdateAutopilotState(newState)
 		return
 	end
 
-	if (not Self:IsDriving()) then
+	if (not LocalPlayer:IsDriving()) then
 		Notifier:ShowError("Autopilot", "You are not in an aircraft.")
 		return
 	end
@@ -534,7 +534,7 @@ function PlayerVehicle:HandleAutopilot()
 		return
 	end
 
-	if (not Self:IsDriving() or not Self:IsAlive()) then
+	if (not LocalPlayer:IsDriving() or not LocalPlayer:IsAlive()) then
 		self:ResetAutopilot()
 		return
 	end
@@ -598,7 +598,7 @@ function PlayerVehicle:Main()
 		end, native, { handle, false })
 	end
 
-	if (GVars.features.vehicle.auto_brake_lights and Self:IsDriving()) then
+	if (GVars.features.vehicle.auto_brake_lights and LocalPlayer:IsDriving()) then
 		if (self:IsDriveable() and self:IsEngineOn() and not self:IsMoving() and not PAD.IS_CONTROL_PRESSED(0, 72)) then
 			VEHICLE.SET_VEHICLE_BRAKE_LIGHTS(handle, true)
 		end
@@ -634,10 +634,10 @@ PlayerVehicle.m_flag_registry = {
 		cb_label = "VEH_NO_ENGINE_BRAKE",
 		cb_tt = "VEH_NO_ENGINE_BRAKE_TT",
 		on_cb_enable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.no_engine_brake", true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.no_engine_brake", true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.no_engine_brake", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.no_engine_brake", false, true)
 		end,
 	},
 	["features.vehicle.kers_boost"]          = {
@@ -647,14 +647,14 @@ PlayerVehicle.m_flag_registry = {
 			return pv:IsLandVehicle()
 		end,
 		on_enable = function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			if (not PV:IsValid()) then
 				return
 			end
 			VEHICLE.SET_VEHICLE_KERS_ALLOWED(PV:GetHandle(), true)
 		end,
 		on_disable = function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			if (not PV:IsValid()) then
 				return
 			end
@@ -663,10 +663,10 @@ PlayerVehicle.m_flag_registry = {
 		cb_label = "VEH_KERS_BOOST",
 		cb_tt = "VEH_KERS_BOOST_TT",
 		on_cb_enable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.kers_boost", true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.kers_boost", true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.kers_boost", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.kers_boost", false, true)
 		end,
 	},
 	["features.vehicle.offroad_abilities"]   = {
@@ -678,10 +678,10 @@ PlayerVehicle.m_flag_registry = {
 			return pv:IsLandVehicle()
 		end,
 		on_cb_enable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.offroad_abilities", true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.offroad_abilities", true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.offroad_abilities", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.offroad_abilities", false, true)
 		end,
 	},
 	["features.vehicle.rallye_tyres"]        = {
@@ -693,10 +693,10 @@ PlayerVehicle.m_flag_registry = {
 			return pv:IsLandVehicle()
 		end,
 		on_cb_enable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.rallye_tyres", true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.rallye_tyres", true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.rallye_tyres", false)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.rallye_tyres", false)
 		end,
 	},
 	["features.vehicle.no_traction_control"] = {
@@ -708,10 +708,10 @@ PlayerVehicle.m_flag_registry = {
 		cb_label = "VEH_FORCE_NO_TC",
 		cb_tt = "VEH_FORCE_NO_TC_TT",
 		on_cb_enable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.no_traction_control", true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.no_traction_control", true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.no_traction_control", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.no_traction_control", false, true)
 		end,
 	},
 	["features.vehicle.low_speed_wheelies"]  = {
@@ -723,10 +723,10 @@ PlayerVehicle.m_flag_registry = {
 		cb_label = "VEH_LOW_SPEED_WHEELIE",
 		cb_tt = "VEH_LOW_SPEED_WHEELIE_TT",
 		on_cb_enable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.low_speed_wheelies", true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.low_speed_wheelies", true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.low_speed_wheelies", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.low_speed_wheelies", false, true)
 		end,
 	},
 	["features.vehicle.rocket_boost"]        = {
@@ -742,10 +742,10 @@ PlayerVehicle.m_flag_registry = {
 			STREAMING.REMOVE_NAMED_PTFX_ASSET("VEH_IMPEXP_ROCKET")
 		end,
 		on_cb_enable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.rocket_boost", true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.rocket_boost", true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.rocket_boost", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.rocket_boost", false, true)
 		end,
 		cb_label = "VEH_ROCKET_BOOST",
 		cb_tt = "VEH_ROCKET_BOOST_TT",
@@ -757,24 +757,24 @@ PlayerVehicle.m_flag_registry = {
 			return pv:IsLandVehicle()
 		end,
 		on_enable = function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			if (not PV:IsValid()) then
 				return
 			end
 			VEHICLE.SET_USE_HIGHER_CAR_JUMP(PV:GetHandle(), true)
 		end,
 		on_disable = function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			if (not PV:IsValid()) then
 				return
 			end
 			VEHICLE.SET_USE_HIGHER_CAR_JUMP(PV:GetHandle(), false)
 		end,
 		on_cb_enable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.jump_capability", true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.jump_capability", true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.jump_capability", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.jump_capability", false, true)
 		end,
 		cb_label = "VEH_JUMP",
 		cb_tt = "VEH_JUMP_TT",
@@ -786,10 +786,10 @@ PlayerVehicle.m_flag_registry = {
 			return pv:IsCar() and GVars.features.vehicle.jump_capability
 		end,
 		on_cb_enable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.parachute", true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.parachute", true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.parachute", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.parachute", false, true)
 		end,
 		cb_label = "VEH_PARACHUTE",
 		cb_tt = "VEH_PARACHUTE_TT",
@@ -801,13 +801,13 @@ PlayerVehicle.m_flag_registry = {
 			return pv:IsCar()
 		end,
 		on_cb_enable = function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			PV:SetVehicleFlag("features.vehicle.steer_rear_wheels", true)
 			PV:SetVehicleFlag("features.vehicle.steer_all_wheels", false, true)
 			PV:SetVehicleFlag("features.vehicle.steer_handbrake", false, true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.steer_rear_wheels", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.steer_rear_wheels", false, true)
 		end,
 		cb_label = "VEH_STEER_REAR_WHEELS",
 	},
@@ -818,13 +818,13 @@ PlayerVehicle.m_flag_registry = {
 			return pv:IsCar()
 		end,
 		on_cb_enable = function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			PV:SetVehicleFlag("features.vehicle.steer_all_wheels", true)
 			PV:SetVehicleFlag("features.vehicle.steer_rear_wheels", false, true)
 			PV:SetVehicleFlag("features.vehicle.steer_handbrake", false, true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.steer_all_wheels", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.steer_all_wheels", false, true)
 		end,
 		cb_label = "VEH_STEER_ALL_WHEELS",
 	},
@@ -835,13 +835,13 @@ PlayerVehicle.m_flag_registry = {
 			return pv:IsCar()
 		end,
 		on_cb_enable = function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			PV:SetVehicleFlag("features.vehicle.steer_handbrake", true)
 			PV:SetVehicleFlag("features.vehicle.steer_rear_wheels", false, true)
 			PV:SetVehicleFlag("features.vehicle.steer_all_wheels", false, true)
 		end,
 		on_cb_disable = function()
-			Self:GetVehicle():SetVehicleFlag("features.vehicle.steer_handbrake", false, true)
+			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.steer_handbrake", false, true)
 		end,
 		cb_label = "VEH_STEER_HANDBRAKE",
 		cb_tt = "VEH_STEER_HANDBRAKE_TT",

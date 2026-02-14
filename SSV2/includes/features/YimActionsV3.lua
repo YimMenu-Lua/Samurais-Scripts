@@ -59,7 +59,7 @@ end
 
 ---@param ped? integer
 function YimActions:GetPed(ped)
-	return ped or Self:GetHandle()
+	return ped or LocalPlayer:GetHandle()
 end
 
 ---@param ped? integer
@@ -124,9 +124,9 @@ function YimActions:IsPlayerBusy()
 		or CUTSCENE.IS_CUTSCENE_PLAYING()
 		or NETWORK.NETWORK_IS_IN_MP_CUTSCENE()
 		or HUD.IS_MP_TEXT_CHAT_TYPING()
-		or Self:IsBrowsingApps()
-		or Self:IsInWater()
-		or Self:IsRagdoll()
+		or LocalPlayer:IsBrowsingApps()
+		or LocalPlayer:IsInWater()
+		or LocalPlayer:IsRagdoll()
 		or script.is_active("maintransition")
 		or Backend:IsPlayerSwitchInProgress()
 		or Backend:AreControlsDisabled()
@@ -306,7 +306,7 @@ function YimActions:Play(action, ped)
 
 	ped = self:GetPed(ped)
 
-	if (ped == Self:GetHandle() and self:IsPlayerBusy()) then
+	if (ped == LocalPlayer:GetHandle() and self:IsPlayerBusy()) then
 		Notifier:ShowMessage(
 			"Samurai's Scripts",
 			"Player is unavailable at this moment. Clear any other tasks then try again."
@@ -338,14 +338,14 @@ function YimActions:Play(action, ped)
 end
 
 function YimActions:ResetPlayer()
-	Self:Cleanup()
+	LocalPlayer:Cleanup()
 
 	if (not Audio:AreAnyEmittersEnabled()) then
 		return
 	end
 
 	for _, emitter in pairs(Audio:GetActiveEmitters()) do
-		if (emitter:GetOwner() == Self:GetHandle()) then
+		if (emitter:GetOwner() == LocalPlayer:GetHandle()) then
 			Audio:ToggleEmitter(emitter, false)
 		end
 	end
@@ -370,7 +370,7 @@ function YimActions:Cleanup(ped)
 	sleep(200)
 	TASK.CLEAR_PED_TASKS(ped)
 
-	if (ped == Self:GetHandle()) then
+	if (ped == LocalPlayer:GetHandle()) then
 		if (PED.IS_PED_USING_ANY_SCENARIO(ped)) then
 			Game.BusySpinnerOn(_T("YAV3_SCN_STOP_SPINNER"), 3)
 			repeat
@@ -396,11 +396,11 @@ function YimActions:ForceCleanup()
 	self.CurrentlyPlaying = {}
 	self:ResetPlayer()
 	Audio:StopAllEmitters()
-	Self:ClearTasks()
+	LocalPlayer:ClearTasks()
 end
 
 function YimActions:OnInterruptEvent()
-	local localPlayer = Self:GetHandle()
+	local localPlayer = LocalPlayer:GetHandle()
 	local current = self.CurrentlyPlaying[localPlayer]
 	if (not current) then
 		yield()
@@ -419,28 +419,28 @@ function YimActions:OnInterruptEvent()
 		return
 	end
 
-	if (not Self:IsAlive() or Self:IsBeingArrested() or Backend:IsPlayerSwitchInProgress() or script.is_active("maintransition")) then
+	if (not LocalPlayer:IsAlive() or LocalPlayer:IsBeingArrested() or Backend:IsPlayerSwitchInProgress() or script.is_active("maintransition")) then
 		self:ForceCleanup()
 		sleep(1000)
 		return
 	end
 
 	if (current and self:WasActionInterrupted(localPlayer)) then
-		if (Self:IsFalling()) then
+		if (LocalPlayer:IsFalling()) then
 			repeat
 				sleep(1000)
-			until not Self:IsFalling()
+			until not LocalPlayer:IsFalling()
 			sleep(1000)
 		end
 
-		if Self:IsRagdoll() then
+		if LocalPlayer:IsRagdoll() then
 			repeat
 				sleep(1000)
-			until not Self:IsRagdoll()
+			until not LocalPlayer:IsRagdoll()
 			sleep(1000)
 		end
 
-		if Self:IsSwimming() then
+		if LocalPlayer:IsSwimming() then
 			self:Cleanup(localPlayer)
 			sleep(1000)
 			return
@@ -566,7 +566,7 @@ function YimActions:FindActionByStrID(action_type, id)
 end
 
 function YimActions:DrawPoliceTorchLight()
-	local playerProps = YimActions.PropManager.Props[Self:GetHandle()]
+	local playerProps = YimActions.PropManager.Props[LocalPlayer:GetHandle()]
 	if (not playerProps) then
 		return
 	end
@@ -597,13 +597,13 @@ function YimActions:DrawPoliceTorchLight()
 end
 
 function YimActions:GoofyUnaliveAnim()
-	local ped = Self:GetHandle()
+	local ped = LocalPlayer:GetHandle()
 	if (not ENTITY.IS_ENTITY_PLAYING_ANIM(ped, "mp_suicide", "pistol", 3) or ENTITY.GET_ENTITY_ANIM_CURRENT_TIME(ped, "mp_suicide", "pistol") > 0.299) then
 		return
 	end
 
 	ThreadManager:Run(function()
-		local current  = Self:GetCurrentWeaponHash()
+		local current  = LocalPlayer:GetCurrentWeaponHash()
 		local is_armed = false
 		if (current ~= 0 and WEAPON.GET_WEAPONTYPE_GROUP(current) ~= joaat("GROUP_PISTOL")) then
 			is_armed = true
@@ -662,14 +662,14 @@ function YimActions:MainThread()
 
 	self:HandleCleanupKeybind()
 
-	local ped     = Self:GetHandle()
+	local ped     = LocalPlayer:GetHandle()
 	local current = self.CurrentlyPlaying[ped]
 	if (not current) then
 		return
 	end
 
 	if (current.action_type == Enums.eActionType.ANIM) then
-		if (current.data.category == "In-Vehicle" and (Self:IsOnFoot() or PAD.IS_CONTROL_PRESSED(0, 75) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 75))) then
+		if (current.data.category == "In-Vehicle" and (LocalPlayer:IsOnFoot() or PAD.IS_CONTROL_PRESSED(0, 75) or PAD.IS_DISABLED_CONTROL_PRESSED(0, 75))) then
 			self:Cleanup()
 			return
 		end
@@ -910,7 +910,7 @@ function YimActions.FXManager:StartPTFX(parent, ptfxData)
 	TaskWait(Game.RequestNamedPtfxAsset, ptfxData.dict)
 
 	local handle
-	if (Game.IsOnline() and parent ~= Self:GetHandle()) then
+	if (Game.IsOnline() and parent ~= LocalPlayer:GetHandle()) then
 		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(parent))
 	end
 
@@ -1059,7 +1059,7 @@ function YimActions.Debugger:Update(ped)
 		props = YimActions.PropManager.Props[ped],
 		ptfx = YimActions.FXManager.Fx[ped],
 		sfx = {},
-		isLocalPlayer = (ped == Self:GetHandle())
+		isLocalPlayer = (ped == LocalPlayer:GetHandle())
 	}
 
 	local actor_exists = false
@@ -1142,7 +1142,7 @@ function YimActions.Debugger:Draw()
 		ImGui.BulletText(
 			string.format(
 				"Current Actor: [ %s ]",
-				actor.handle == Self:GetHandle() and
+				actor.handle == LocalPlayer:GetHandle() and
 				"You" or
 				YimActions.CompanionManager:GetCompanionNameFromHandle(actor.handle)
 			)

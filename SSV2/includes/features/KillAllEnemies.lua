@@ -19,17 +19,17 @@ function EnemyKiller:OnClick()
 	end
 
 	ThreadManager:Run(function()
-		if (not Self:IsInCombat()) then
+		if (not LocalPlayer:IsInCombat()) then
 			Notifier:ShowMessage("Samurai's Scripts", _T("GENERIC_NOT_IN_COMBAT"), false, 3)
 			return
 		end
 
 		Notifier:ShowSuccess("Samurai's Scripts", _T("WRLD_KILL_ALL_NOTIF"))
 		for _, p in ipairs(entities.get_all_peds_as_handles()) do
-			if (not PED.IS_PED_A_PLAYER(p) and Self:IsPedMyEnemy(p)) then
+			if (not PED.IS_PED_A_PLAYER(p) and LocalPlayer:IsPedMyEnemy(p)) then
 				if (PED.IS_PED_IN_ANY_VEHICLE(p, false)) then
 					local enemy_vehicle = PED.GET_VEHICLE_PED_IS_IN(p, false)
-					local distance      = Self:GetPos():distance(Game.GetEntityCoords(enemy_vehicle, true))
+					local distance      = LocalPlayer:GetPos():distance(Game.GetEntityCoords(enemy_vehicle, true))
 
 					if (distance <= 100) then
 						VEHICLE.SET_VEHICLE_ENGINE_HEALTH(enemy_vehicle, -4000)

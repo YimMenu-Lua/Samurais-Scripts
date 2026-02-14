@@ -169,17 +169,6 @@ function YRV3:IsDataInitialized()
 	return self.m_data_initialized
 end
 
----@param where integer|vec3
----@param keepVehicle? boolean
-function YRV3:Teleport(where, keepVehicle)
-	if not Self:IsOutside() then
-		Notifier:ShowError("YRV3", "Please go outdside first!")
-		return
-	end
-
-	Self:Teleport(where, keepVehicle)
-end
-
 ---@return eYRState
 function YRV3:GetState()
 	return self.m_state
@@ -793,36 +782,29 @@ end
 
 function YRV3:FinishSale()
 	local sn = self.m_sell_script_name
-	if (not sn or not self.m_raw_data.SellScripts[sn]) then
+	if (not sn) then
+		return
+	end
+
+	local entry = self.m_raw_data.SellScripts[sn]
+	if (not entry) then
 		return
 	end
 
 	self.m_has_triggered_autosell = true
 	script.execute_as_script(sn, function()
-		if (not self.m_raw_data.SellScripts[sn].b) then
-			for _, data in pairs(self.m_raw_data.SellScripts[sn]) do
-				locals.set_int(sn, data.l + data.o, data.v)
-			end
-		else
-			if (not Self:IsHostOfScript(sn)) then
-				Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
-				return
-			end
-
-			local val = locals.get_int(sn, self.m_raw_data.SellScripts[sn].b + 1 + 0)
-			if not Bit.is_set(val, 11) then
-				val = Bit.set(val, 11)
-				locals.set_int(sn, self.m_raw_data.SellScripts[sn].b + 1 + 0, val)
-			end
-
-			locals.set_int(sn, self.m_raw_data.SellScripts[sn].l + self.m_raw_data.SellScripts[sn].o, 3) -- 3=End reason.
+		if (not LocalPlayer:IsHostOfScript(sn)) then
+			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
+			return
 		end
+
+		entry.autofinish()
 	end)
 end
 
 function YRV3:FinishCEOCargoSourceMission()
 	if (script.is_active("gb_contraband_buy")) then
-		if (not Self:IsHostOfScript("gb_contraband_buy")) then
+		if (not LocalPlayer:IsHostOfScript("gb_contraband_buy")) then
 			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
 			return
 		end
@@ -832,7 +814,7 @@ function YRV3:FinishCEOCargoSourceMission()
 		buyLocal:At(191):WriteInt(6)
 		buyLocal:At(192):WriteInt(4)
 	elseif (script.is_active("fm_content_cargo")) then
-		if (not Self:IsHostOfScript("fm_content_cargo")) then
+		if (not LocalPlayer:IsHostOfScript("fm_content_cargo")) then
 			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
 			return
 		end
@@ -995,7 +977,7 @@ end
 
 -- Master Control Terminal
 function YRV3:MCT()
-	if Self:IsBrowsingApps() then
+	if LocalPlayer:IsBrowsingApps() then
 		return
 	end
 
@@ -1020,7 +1002,7 @@ function YRV3:MCT()
 			yield()
 		end
 
-		while (Self:IsBrowsingApps()) do
+		while (LocalPlayer:IsBrowsingApps()) do
 			yield()
 		end
 

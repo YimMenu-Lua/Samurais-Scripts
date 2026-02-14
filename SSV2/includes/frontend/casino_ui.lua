@@ -9,21 +9,31 @@
 
 local CasinoPacino = require("includes.features.CasinoPacino"):init()
 local SGSL         = require("includes.services.SGSL")
+local casino_pos   = vec3:new(924.6380, 46.6918, 81.1063)
 
 local function drawGamblingTab()
-	ImGui.SeparatorText(_T "CP_COOLDOWN_BYPASS")
+	if (GUI:Button(_T("CP_TP_CASINO"))) then
+		LocalPlayer:Teleport(casino_pos)
+	end
+
+	ImGui.SameLine()
+
+	if (GUI:Button(_T("GENERIC_SET_WAYPOINT"))) then
+		Game.SetWaypointCoords(casino_pos)
+	end
+
+	GUI:HeaderText(_T("CP_COOLDOWN_BYPASS"), { separator = true, spacing = true })
 	GVars.features.dunk.bypass_casino_bans, _ = GUI:CustomToggle(_T "CP_COOLDOWN_BYPASS_ENABLE",
 		GVars.features.dunk.bypass_casino_bans, {
 			tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"),
 			color   = Color("#AA0000")
 		})
 
-	ImGui.SameLine()
 	ImGui.BulletText(_T "CP_COOLDOWN_BYPASS_STATUS")
 	ImGui.SameLine()
 	ImGui.Text(CasinoPacino:GetCooldownString())
 
-	ImGui.SeparatorText(_T "CP_POKER_SETTINGS")
+	GUI:HeaderText(_T("CP_POKER_SETTINGS"), { separator = true, spacing = true })
 	GVars.features.dunk.force_poker_cards, _ = GUI:CustomToggle(_T "CP_POKER_FORCE_ROYAL_FLUSH",
 		GVars.features.dunk.force_poker_cards
 	)
@@ -34,7 +44,7 @@ local function drawGamblingTab()
 
 	-- TODO: Fix crashing on Enhanced
 	if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
-		ImGui.SeparatorText(_T "CP_BLACKJACK_SETTINGS")
+		GUI:HeaderText(_T("CP_BLACKJACK_SETTINGS"), { separator = true, spacing = true })
 		ImGui.BulletText(_T "CP_BLACKJACK_DEALER_FACE_DOWN_CARD")
 		ImGui.SameLine()
 		ImGui.Text(CasinoPacino:GetBJDealerCard())
@@ -43,12 +53,12 @@ local function drawGamblingTab()
 		end
 	end
 
-	ImGui.SeparatorText(_T "CP_ROULETTE_SETTINGS")
+	GUI:HeaderText(_T("CP_ROULETTE_SETTINGS"), { separator = true, spacing = true })
 	GVars.features.dunk.force_roulette_wheel, _ = GUI:CustomToggle(_T("CP_ROULETTE_FORCE_RED_18"),
 		GVars.features.dunk.force_roulette_wheel
 	)
 
-	ImGui.SeparatorText(_T "CP_SLOT_MACHINES_SETTINGS")
+	GUI:HeaderText(_T("CP_SLOT_MACHINES_SETTINGS"), { separator = true, spacing = true })
 	GVars.features.dunk.rig_slot_machine, _ = GUI:CustomToggle(_T("CP_SLOT_MACHINES_RIG"),
 		GVars.features.dunk.rig_slot_machine
 	)
@@ -91,47 +101,58 @@ local function drawGamblingTab()
 		)
 	end
 
-	ImGui.SeparatorText(_T "CP_LUCKY_WHEEL_SETTINGS")
-	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_VEHICLE") then
-		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.VEHICLE)
+	GUI:HeaderText(_T("CP_LUCKY_WHEEL_SETTINGS"), { separator = true, spacing = true })
+
+	---@type dict<eCasinoPrize>
+	local labels = {
+		[_T("CP_LUCKY_WHEEL_GIVE_VEHICLE")]  = Enums.eCasinoPrize.VEHICLE,
+		[_T("CP_LUCKY_WHEEL_GIVE_MYSTERY")]  = Enums.eCasinoPrize.MYSTERY,
+		[_T("CP_LUCKY_WHEEL_GIVE_CASH")]     = Enums.eCasinoPrize.CASH,
+		[_T("CP_LUCKY_WHEEL_GIVE_CHIPS")]    = Enums.eCasinoPrize.CHIPS,
+		[_T("CP_LUCKY_WHEEL_GIVE_RP")]       = Enums.eCasinoPrize.RP,
+		[_T("CP_LUCKY_WHEEL_GIVE_DISCOUNT")] = Enums.eCasinoPrize.DISCOUNT,
+		[_T("CP_LUCKY_WHEEL_GIVE_CLOTHING")] = Enums.eCasinoPrize.CLOTHING,
+		[_T("CP_LUCKY_WHEEL_GIVE_SURPRISE")] = Enums.eCasinoPrize.RANDOM,
+	}
+
+	local maxwidth = 0
+	local padding = ImGui.GetStyle().FramePadding.x * 4 -- double padding
+	for label in pairs(labels) do
+		local width = ImGui.CalcTextSize(label) + padding
+		if (width > maxwidth) then
+			maxwidth = width
+		end
 	end
 
-	ImGui.SameLine()
-	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_MYSTERY") then
-		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.MYSTERY)
-	end
-
-	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_CASH") then
-		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.CASH)
-	end
-	ImGui.SameLine()
-	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_CHIPS") then
-		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.CHIPS)
-	end
-
-	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_RP") then
-		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.RP)
-	end
-
-	ImGui.SameLine()
-	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_DISCOUNT") then
-		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.DISCOUNT)
-	end
-
-	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_CLOTHING") then
-		CasinoPacino:GiveWheelPrize(Enums.eCasinoPrize.CLOTHING)
-	end
-	ImGui.SameLine()
-	if GUI:Button(_T "CP_LUCKY_WHEEL_GIVE_SURPRISE") then
-		ThreadManager:Run(function()
-			math.randomseed(os.time() * 60)
-			local id = math.random(Enums.eCasinoPrize.VEHICLE, Enums.eCasinoPrize.CLOTHING)
-			CasinoPacino:GiveWheelPrize(id)
-		end)
+	local btnIdx = 1
+	for label, prizeID in pairs(labels) do
+		if (GUI:Button(label, { size = vec2:new(maxwidth, 32) })) then
+			CasinoPacino:GiveWheelPrize(prizeID)
+		end
+		if (btnIdx % 2 ~= 0) then
+			ImGui.SameLine()
+		end
+		btnIdx = btnIdx + 1
 	end
 end
 
 local function drawHeistTab()
+	local arcade = CasinoPacino:GetOwnedArcade()
+	if (not arcade) then
+		ImGui.Text(_T("CP_ARCADE_NOT_OWNED"))
+		return
+	end
+
+	if (GUI:Button(_T("CP_TP_ARCADE"))) then
+		LocalPlayer:Teleport(arcade.coords)
+	end
+
+	ImGui.SameLine()
+
+	if (GUI:Button(_T("GENERIC_SET_WAYPOINT"))) then
+		Game.SetWaypointCoords(arcade.coords)
+	end
+
 	local casino_heist_approach      = stats.get_int("MPX_H3OPT_APPROACH")
 	local casino_heist_target        = stats.get_int("MPX_H3OPT_TARGET")
 	local casino_heist_last_approach = stats.get_int("MPX_H3_LAST_APPROACH")
@@ -143,7 +164,7 @@ local function drawHeistTab()
 	local casino_heist_cars          = stats.get_int("MPX_H3OPT_VEHS")
 	local casino_heist_masks         = stats.get_int("MPX_H3OPT_MASKS")
 
-	ImGui.SeparatorText(_T "CP_HEIST_SETUP")
+	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
 	ImGui.PushItemWidth(200)
 
 	local new_approach, approach_clicked = ImGui.Combo(_T "CP_HEIST_APPROACH",
@@ -233,7 +254,7 @@ local function drawHeistTab()
 				{ "Shotgun Loadout",    "Combat MG Loadout" }
 			}
 
-	}
+		}
 
 		local new_weapons, weapons_clicked = ImGui.Combo(
 			_T "CP_HEIST_WEAPONS",
@@ -265,7 +286,7 @@ local function drawHeistTab()
 
 	if (new_driver > 0) then
 		local carList = {
-			[1] = {  --Karim Deniz
+			[1] = { --Karim Deniz
 				"Issi Classic", "Asbo", "Kanjo", "Sentinel Classic"
 			},
 			[2] = { --Taliana Martinez
@@ -327,12 +348,15 @@ local function drawHeistTab()
 	end
 
 	ImGui.PopItemWidth()
-	ImGui.SeparatorText(_T "GENERIC_OPTIONS_LABEL")
-	-- GVars.features.dunk.ch_cart_autograb, _ = GUI:Checkbox(_T"CP_HEIST_AUTOGRAB", GVars.features.dunk.ch_cart_autograb)
+	GUI:HeaderText(_T("GENERIC_OPTIONS_LABEL"), { separator = true, spacing = true })
+	GVars.features.dunk.ch_cart_autograb, _ = GUI:CustomToggle(
+		_T("CP_HEIST_AUTOGRAB"),
+		GVars.features.dunk.ch_cart_autograb
+	) -- this was disabled for no reason
 
 	-- this serves as a "cooldown disabler" as well because you need to reset it anyway to be able to replay
 	-- so we don't need a separate cooldown button or checkbox
-	if (GUI:Button(_T "CP_HEIST_UNLOCK_ALL")) then
+	if (GUI:Button(_T("CP_HEIST_UNLOCK_ALL"))) then
 		stats.set_int("MPX_H3OPT_ACCESSPOINTS", -1)
 		stats.set_int("MPX_H3OPT_POI", -1)
 		stats.set_int("MPX_H3OPT_BITSET0", -1)
@@ -383,8 +407,6 @@ local function DrawDunk()
 	end
 
 	if (ImGui.BeginTabBar("##dunkBar")) then
-		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
-
 		if ImGui.BeginTabItem(_T("CASINO_GAMBLING_TAB")) then
 			if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
 				drawGamblingTab()
@@ -398,10 +420,8 @@ local function DrawDunk()
 			drawHeistTab()
 			ImGui.EndTabItem()
 		end
-
-		ImGui.PopStyleVar()
 		ImGui.EndTabBar()
 	end
 end
 
-CasinoPacino.m_tab:RegisterGUI(DrawDunk)
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Casino Pacino", DrawDunk)

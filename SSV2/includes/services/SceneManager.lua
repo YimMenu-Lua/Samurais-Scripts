@@ -18,7 +18,7 @@ SceneManager.CurrentlyPlaying = {}
 ---@param model string|hash
 function SceneManager:CreateParticipant(model)
 	local v_SpawnPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		0.0,
 		0.0,
 		-50.0
@@ -29,20 +29,20 @@ function SceneManager:CreateParticipant(model)
 	end
 
 	if (STREAMING.IS_MODEL_A_PED(model)) then
-		if model == Self:GetModelHash() then
-			return Self:GetHandle()
+		if model == LocalPlayer:GetModelHash() then
+			return LocalPlayer:GetHandle()
 		end
 
 		return Game.CreatePed(
 			model,
 			v_SpawnPos,
-			Self:GetHeading()
+			LocalPlayer:GetHeading()
 		)
 	elseif STREAMING.IS_MODEL_A_VEHICLE(model) then
 		return Game.CreateVehicle(
 			model,
 			v_SpawnPos,
-			Self:GetHeading()
+			LocalPlayer:GetHeading()
 		)
 	else
 		return Game.CreateObject(
@@ -52,7 +52,7 @@ function SceneManager:CreateParticipant(model)
 			false,
 			true,
 			false,
-			Self:GetHeading()
+			LocalPlayer:GetHeading()
 		)
 	end
 end
@@ -63,13 +63,13 @@ function SceneManager:PrepareScene(t_Data)
 	local sceneParticipants = {}
 
 	if (t_Data.origin.isPlayer) then
-		originEntity = Self:GetHandle()
+		originEntity = LocalPlayer:GetHandle()
 	else
 		originEntity = self:CreateParticipant(t_Data.origin.model)
 	end
 
 	for _, participant in ipairs(t_Data.participants) do
-		local handle = participant.isPlayer and Self:GetHandle() or self:CreateParticipant(participant.model)
+		local handle = participant.isPlayer and LocalPlayer:GetHandle() or self:CreateParticipant(participant.model)
 		table.insert(
 			sceneParticipants,
 			{
@@ -136,7 +136,7 @@ function SceneManager:PlayNetworkedScene(sceneData)
 	end
 
 	local originPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		scene.origin.pos_offset.x,
 		scene.origin.pos_offset.y,
 		scene.origin.pos_offset.z
@@ -146,7 +146,7 @@ function SceneManager:PlayNetworkedScene(sceneData)
 		originPos = self:GetSceneGroundPos(originPos)
 	end
 
-	if scene.origin.handle ~= Self:GetHandle() then
+	if scene.origin.handle ~= LocalPlayer:GetHandle() then
 		Game.SetEntityCoords(scene.origin.handle, originPos)
 	end
 
@@ -170,7 +170,7 @@ function SceneManager:PlayNetworkedScene(sceneData)
 	for _, participant in ipairs(scene.participants) do
 		if ENTITY.DOES_ENTITY_EXIST(participant.handle) then
 			if (ENTITY.IS_ENTITY_A_PED(participant.handle)) then
-				if (participant.handle ~= Self:GetHandle()) then
+				if (participant.handle ~= LocalPlayer:GetHandle()) then
 					local offset = 1
 					entities.take_control_of(participant.handle, 300)
 					Game.SetEntityCoords(participant.handle, originPos + offset)
@@ -241,7 +241,7 @@ function SceneManager:PlayLocalScene(sceneData)
 	end
 
 	local originPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		scene.origin.pos_offset.x,
 		scene.origin.pos_offset.y,
 		scene.origin.pos_offset.z
@@ -251,7 +251,7 @@ function SceneManager:PlayLocalScene(sceneData)
 		originPos = self:GetSceneGroundPos(originPos)
 	end
 
-	if (scene.origin.handle ~= Self:GetHandle()) then
+	if (scene.origin.handle ~= LocalPlayer:GetHandle()) then
 		Game.SetEntityCoords(scene.origin.handle, originPos)
 	end
 
@@ -281,7 +281,7 @@ function SceneManager:PlayLocalScene(sceneData)
 					5
 				)
 			else
-				if (participant.handle ~= Self:GetHandle()) then
+				if (participant.handle ~= LocalPlayer:GetHandle()) then
 					local tries = 0
 					while (not ENTITY.DOES_ENTITY_EXIST(participant.handle) and tries < 20) do
 						yield()
@@ -363,7 +363,7 @@ function SceneManager:Wipe()
 		end
 	end
 
-	Self:ClearTasks()
+	LocalPlayer:ClearTasks()
 	self.CurrentlyPlaying = {}
 end
 

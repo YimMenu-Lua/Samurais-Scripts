@@ -232,7 +232,7 @@ end
 
 ---@return boolean
 function Vehicle:IsLocalPlayerInVehicle()
-	return PED.IS_PED_SITTING_IN_VEHICLE(Self:GetHandle(), self:GetHandle())
+	return PED.IS_PED_SITTING_IN_VEHICLE(LocalPlayer:GetHandle(), self:GetHandle())
 end
 
 ---@return boolean
@@ -243,7 +243,7 @@ function Vehicle:IsEnemyVehicle()
 
 	local occupants = self:GetOccupants()
 	for _, passenger in ipairs(occupants) do
-		if not ENTITY.IS_ENTITY_DEAD(passenger, false) and Self:IsPedMyEnemy(passenger) then
+		if not ENTITY.IS_ENTITY_DEAD(passenger, false) and LocalPlayer:IsPedMyEnemy(passenger) then
 			return true
 		end
 	end
@@ -1145,7 +1145,7 @@ function Vehicle:Clone(opts)
 
 		clone:SetAsNoLongerNeeded()
 		if (opts.warp_into == true) then -- Some idiot passed a vector3 and kept wondering why they were being teleported into the vehicle. Don't ask who the idiot is.
-			clone:WarpPed(Self:GetHandle(), -1)
+			clone:WarpPed(LocalPlayer:GetHandle(), -1)
 		end
 	end
 
@@ -1179,7 +1179,7 @@ function Vehicle:ShuffleSeats(step)
 		end
 
 		local maxSeats = self:GetNumberOfPassengers()
-		local currentSeat = Self:GetVehicleSeat()
+		local currentSeat = LocalPlayer:GetVehicleSeat()
 
 		if (not currentSeat or maxSeats == 0) then
 			return
@@ -1198,7 +1198,7 @@ function Vehicle:ShuffleSeats(step)
 			end
 
 			if self:IsSeatFree(seatIndex) then
-				PED.SET_PED_INTO_VEHICLE(Self:GetHandle(), self:GetHandle(), seatIndex)
+				PED.SET_PED_INTO_VEHICLE(LocalPlayer:GetHandle(), self:GetHandle(), seatIndex)
 				return
 			end
 
@@ -1211,7 +1211,7 @@ end
 -- Must be called on tick. If you want a one-shot thing, use `Vehicle:SetAcceleration` instead.
 ---@param value number speed modifier
 function Vehicle:ModifyTopSpeed(value)
-	if not Self:IsValid() then
+	if not LocalPlayer:IsValid() then
 		return
 	end
 
@@ -1421,8 +1421,8 @@ function Vehicle:ShootAtTarget(targetEntity, enemiesOnly)
 	end
 
 	local targetCoords = ENTITY.GET_ENTITY_COORDS(targetEntity, true)
-	local playerHandle = Self:GetHandle()
-	local isEnemy = (ENTITY.IS_ENTITY_A_PED(targetEntity) and Self:IsPedMyEnemy(targetEntity))
+	local playerHandle = LocalPlayer:GetHandle()
+	local isEnemy = (ENTITY.IS_ENTITY_A_PED(targetEntity) and LocalPlayer:IsPedMyEnemy(targetEntity))
 		or (ENTITY.IS_ENTITY_A_VEHICLE(targetEntity) and Vehicle(targetEntity):IsEnemyVehicle())
 
 	if (enemiesOnly and not isEnemy) then
@@ -1672,15 +1672,15 @@ function Vehicle.CreateFromJSON(filename, warp_into)
 		return
 	end
 
-	local entity   = Self:GetVehicle() ~= nil and Self:GetVehicle() or Self
+	local entity   = LocalPlayer:GetVehicle() ~= nil and LocalPlayer:GetVehicle() or LocalPlayer
 	local spawnpos = entity:GetSpawnPosInFront()
-	local new_veh  = Vehicle:Create(modelhash, Enums.eEntityType.Vehicle, spawnpos, Self:GetHeading())
+	local new_veh  = Vehicle:Create(modelhash, Enums.eEntityType.Vehicle, spawnpos, LocalPlayer:GetHeading())
 	if (new_veh:IsValid() and type(data.mods) == "table") then
 		new_veh:ApplyMods(data.mods)
 	end
 
 	if (warp_into == true) then
-		new_veh:WarpPed(Self:GetHandle())
+		new_veh:WarpPed(LocalPlayer:GetHandle())
 	end
 
 	return new_veh

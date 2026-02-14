@@ -57,7 +57,7 @@ function NOP() end
 --```
 -- - Classes:
 --```Lua
--- local myveh = Self:GetVehicle()
+-- local myveh = LocalPlayer:GetVehicle()
 -- print(IsInstance(myveh, Vehicle)) -- -> true
 -- print(IsInstance(myveh, Object)) -- -> false
 -- print(IsInstance(myveh, Entity)) -- -> true
@@ -426,7 +426,7 @@ end
 ---
 ---**Example Usage:**
 ---```lua
----local cvehicle = memory.handle_to_ptr(self.get_veh()):as(CVehicle)
+---print(memory.handle_to_ptr(self.get_ped()):add(0x10B8):as(CPedWeaponManager))
 ---```
 ---@generic T
 ---@param obj T
@@ -434,7 +434,7 @@ end
 function memory.pointer:as(obj)
 	local obj_type = type(obj)
 	if (obj_type ~= "table") then
-		error(_F("Invalid parameter #1: Table expected, got %s instead.", obj_type))
+		error(_F("Invalid parameter #1: Table/class expected, got %s instead.", obj_type))
 	end
 
 	if (type(obj.__from_ptr) == "boolean" and not obj.__from_ptr) then
@@ -451,9 +451,7 @@ function memory.pointer:as(obj)
 	end
 
 	if (type(obj.init) == "function") then
-		local instance = setmetatable({}, obj)
-		instance.init(obj, self)
-		return obj
+		return obj:init(self)
 	end
 
 	error(_F("Class '%s' has no valid pointer constructor", obj.__type or tostring(obj)))
@@ -893,6 +891,47 @@ table.copy = function(t, seen)
 	end
 
 	return out
+end
+
+---@param inTable table
+---@param outTable table
+function table.swap(inTable, outTable)
+	local temp = {}
+
+	for k, v in pairs(inTable) do
+		temp[k]    = v
+		inTable[k] = nil
+	end
+
+	for k, v in pairs(outTable) do
+		inTable[k]  = v
+		outTable[k] = temp[k]
+		temp[k]     = nil
+	end
+end
+
+---@param t table
+---@param src table
+---@param seen? table
+function table.overwrite(t, src, seen)
+	seen = seen or {}
+	if (seen[src]) then
+		return
+	end
+
+	seen[src] = true
+
+	for k in pairs(t) do
+		t[k] = nil
+	end
+
+	for k, v in pairs(src) do
+		if (type(v) == "table" and type(t[k]) == "table") then
+			table.overwrite(t[k], v, seen)
+		else
+			t[k] = v
+		end
+	end
 end
 
 ---@param a table

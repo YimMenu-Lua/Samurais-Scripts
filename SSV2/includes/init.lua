@@ -111,7 +111,7 @@ local packages      = {
 	"modules.Ped",
 	"modules.Player",
 	"modules.Vehicle",
-	"modules.Self",
+	"modules.LocalPlayer",
 
 	"services.GridRenderer",
 	"services.Translator",
@@ -125,7 +125,7 @@ local packages      = {
 	"frontend.world_ui",
 	"frontend.yav3_ui",
 	"frontend.yhv1_ui",
-	"frontend.yrv3_ui",
+	"frontend.yrv3.yrv3_ui",
 }
 
 for _, package in ipairs(packages) do

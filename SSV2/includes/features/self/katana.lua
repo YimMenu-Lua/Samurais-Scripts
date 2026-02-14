@@ -10,14 +10,14 @@
 local FeatureBase = require("includes.modules.FeatureBase")
 
 ---@class Katana : FeatureBase
----@field private m_entity Self
+---@field private m_entity LocalPlayer
 ---@field private m_is_active boolean
 ---@field private m_katana_handle handle
 ---@field private m_katana_model hash
 local Katana      = setmetatable({}, FeatureBase)
 Katana.__index    = Katana
 
----@param entity Self
+---@param entity LocalPlayer
 ---@return Katana
 function Katana.new(entity)
 	local self = FeatureBase.new(entity)
@@ -46,20 +46,20 @@ function Katana:Cleanup()
 end
 
 function Katana:Update()
-	local playerHandle = Self:GetHandle()
+	local playerHandle = LocalPlayer:GetHandle()
 	local model_to_replace <const> = GVars.features.weapon.katana.model
 	if (not WEAPON.IS_PED_ARMED(playerHandle, 1)) then
 		self:Cleanup()
 		return
 	end
 
-	local wpn_hash = Self:GetCurrentWeaponHash()
+	local wpn_hash = LocalPlayer:GetCurrentWeaponHash()
 	if (wpn_hash ~= model_to_replace) then
 		self:Cleanup()
 		return
 	end
 
-	local wpn_idx = Self:GetCurrentWeaponIndex()
+	local wpn_idx = LocalPlayer:GetCurrentWeaponIndex()
 	if (not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(wpn_idx, playerHandle)) then
 		self:Cleanup()
 		return

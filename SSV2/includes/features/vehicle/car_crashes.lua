@@ -106,8 +106,8 @@ function CarCrash:ShouldRun()
 		and self.m_entity
 		and self.m_entity:IsValid()
 		and self.m_entity:IsCar()
-		and Self:IsAlive()
-		and Self:IsDriving()
+		and LocalPlayer:IsAlive()
+		and LocalPlayer:IsDriving()
 		and not VEHICLE.IS_VEHICLE_STUCK_ON_ROOF(self.m_entity:GetHandle())
 	)
 end
@@ -143,11 +143,11 @@ function CarCrash:PlaySpeech(levelName)
 	end
 
 	local speech_name = (levelName == "major") and "DEATH_HIGH_MEDIUM" or "DYING_MOAN"
-	local voice_name = Self:IsMale() and "WAVELOAD_PAIN_MALE" or "WAVELOAD_PAIN_FEMALE"
+	local voice_name = LocalPlayer:IsMale() and "WAVELOAD_PAIN_MALE" or "WAVELOAD_PAIN_FEMALE"
 	Audio:PlaySpeechFromPosition(
 		speech_name,
 		voice_name,
-		Self:GetPos(),
+		LocalPlayer:GetPos(),
 		"SPEECH_PARAMS_FORCE_SHOUTED"
 	)
 end
@@ -171,7 +171,7 @@ function CarCrash:OnCollision(levelName, vehicle)
 	local occupants = self.m_entity:GetOccupants()
 	if (#occupants > 0) then
 		for _, ped in ipairs(occupants) do
-			-- if (PED.IS_PED_A_PLAYER(ped) and ped ~= Self:GetHandle()) then -- nah, kill players too.
+			-- if (PED.IS_PED_A_PLAYER(ped) and ped ~= LocalPlayer:GetHandle()) then -- nah, kill players too.
 			-- 	goto continue
 			-- end
 

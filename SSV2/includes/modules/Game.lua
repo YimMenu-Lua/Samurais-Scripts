@@ -9,7 +9,9 @@
 
 local ped_list <const>     = require("includes.data.peds")
 local ped_hashmap <const>  = require("includes.data.ped_hashmap")
-local weaponData <const>   = require("includes.data.weapon_data")
+local veh_hashmap <const>  = require("includes.data.vehicle_hashmap")
+local weapon_data <const>  = require("includes.data.weapon_data")
+local vehicle_data <const> = require("includes.data.vehicles")
 local Refs                 = require("includes.data.refs")
 local SP_CharIDs <const>   = {
 	[225514697]  = 0,
@@ -149,6 +151,28 @@ function Game.EnsureModelHash(input)
 	return 0
 end
 
+---@param arg (integer|vec3)?
+---@return vec3?
+function Game.Ensure3DCoords(arg)
+	if (IsInstance(arg, vec3)) then
+		---@type vec3
+		return arg
+	end
+
+	if (type(arg) == "number") then
+		if (Game.IsScriptHandle(arg)) then
+			return Game.GetEntityCoords(arg, false)
+		end
+
+		local blip = HUD.GET_FIRST_BLIP_INFO_ID(arg)
+		if (HUD.DOES_BLIP_EXIST(blip)) then
+			return HUD.GET_BLIP_COORDS(blip)
+		end
+	end
+
+	return nil
+end
+
 ---@param model_hash integer
 ---@param spawn_pos vec3
 ---@param heading? integer
@@ -278,7 +302,7 @@ function Game.CreateObject(model_hash, spawn_pos, is_networked, is_scripthost_ob
 end
 
 function Game.RemovePedFromGroup(ped)
-	local groupID = PED.GET_PED_GROUP_INDEX(Self:GetHandle())
+	local groupID = PED.GET_PED_GROUP_INDEX(LocalPlayer:GetHandle())
 	if PED.DOES_GROUP_EXIST(groupID) and PED.IS_PED_GROUP_MEMBER(ped, groupID) then
 		PED.REMOVE_PED_FROM_GROUP(ped)
 	end
@@ -289,7 +313,7 @@ end
 function Game.DeleteEntity(entity, entity_type)
 	ThreadManager:Run(function()
 		entity_type = entity_type or Game.GetEntityType(entity)
-		if (not Game.IsScriptHandle(entity) or entity == Self:GetHandle()) then
+		if (not Game.IsScriptHandle(entity) or entity == LocalPlayer:GetHandle()) then
 			return
 		end
 
@@ -809,7 +833,7 @@ function Game.StartSyncedPtfxLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s_Pt
 	local boneList = {}
 	local isRightBone = false
 
-	if Game.IsOnline() and (i_EntityHandle ~= Self:GetHandle()) and entities.take_control_of(i_EntityHandle, 300) then
+	if Game.IsOnline() and (i_EntityHandle ~= LocalPlayer:GetHandle()) and entities.take_control_of(i_EntityHandle, 300) then
 		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(i_EntityHandle))
 	end
 
@@ -871,7 +895,7 @@ function Game.StartSyncedPtfxNonLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s
 
 	local boneList = {}
 
-	if Game.IsOnline() and (i_EntityHandle ~= Self:GetHandle()) and entities.take_control_of(i_EntityHandle, 500) then
+	if Game.IsOnline() and (i_EntityHandle ~= LocalPlayer:GetHandle()) and entities.take_control_of(i_EntityHandle, 500) then
 		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(i_EntityHandle))
 	end
 
@@ -1030,7 +1054,7 @@ function Game.GetClosestPed(closeTo, range, aliveOnly)
 
 	if PED.IS_ANY_PED_NEAR_POINT(this.x, this.y, this.z, range) then
 		for _, ped in ipairs(entities.get_all_peds_as_handles()) do
-			if PED.IS_PED_HUMAN(ped) and (ped ~= Self:GetHandle()) then
+			if PED.IS_PED_HUMAN(ped) and (ped ~= LocalPlayer:GetHandle()) then
 				local pedPos = Game.GetEntityCoords(ped, true)
 				---@diagnostic disable-next-line
 				local distance = this:distance(pedPos)
@@ -1104,28 +1128,6 @@ function Game.SetWaypointCoords(target)
 	end)
 end
 
----@param target vec2|vec3|integer BlipID | Entity handle | Vector2 | Vector3
----@return boolean
-function Game.IsValidCoords(target)
-	local x, y
-	if (IsInstance(target, vec3) or IsInstance(target, vec2)) then
-		x, y = target.x, target.y
-	elseif (type(target) == "number") then
-		local testBlip = HUD.GET_FIRST_BLIP_INFO_ID(target)
-		if (HUD.DOES_BLIP_EXIST(testBlip)) then
-			x, y, _ = HUD.GET_BLIP_INFO_ID_COORD(testBlip):unpack()
-		elseif (Game.IsScriptHandle(target)) then
-			x, y, _ = vec3:zero():unpack()
-		end
-	end
-
-	if (not x or not y) then
-		return false
-	end
-	
-	return true
-end
-
 ---@param vecMin vec3
 ---@param vecMax vec3
 ---@return vec3
@@ -1197,9 +1199,36 @@ function Game.IsPedModelHuman(model)
 	return found and found.is_human or false
 end
 
+---@param vehModel string|joaat_t
+---@return string
+function Game.GetVehicleDisplayName(vehModel)
+	if (not _G.FAKE_YIMAPI) then
+		return vehicles.get_vehicle_display_name(vehModel)
+	end
+
+	local modelName = ""
+	if (type(vehModel) == "string") then
+		modelName = vehModel
+	elseif (type(vehModel) == "integer") then
+		modelName = veh_hashmap[vehModel]
+	end
+
+	local data = vehicle_data[modelName]
+	if (not data) then
+		return "NULL"
+	end
+
+	-- display_name can be nil as well
+	return data.display_name or "NULL"
+end
+
 ---@param weapon string|joaat_t
 ---@return string
 function Game.GetWeaponDisplayName(weapon)
+	if (not _G.FAKE_YIMAPI) then
+		return weapons.get_weapon_display_name(weapon)
+	end
+
 	local hash
 	if (type(weapon) == "string") then
 		hash = joaat(weapon)
@@ -1207,11 +1236,16 @@ function Game.GetWeaponDisplayName(weapon)
 		hash = weapon
 	end
 
-	if (not hash or not weaponData[hash]) then
-		return _T("GENERIC_UNKOWN")
+	if (not hash) then
+		return "NULL"
 	end
 
-	return weaponData[hash].display_name
+	local data = weapon_data[hash]
+	if (not data) then
+		return "NULL"
+	end
+
+	return weapon_data[hash].display_name or "NULL"
 end
 
 ---@return integer
@@ -1223,7 +1257,7 @@ function Game.GetCharacterIndex()
 			return 0
 		end
 
-		return SP_CharIDs[Self:GetModelHash()]
+		return SP_CharIDs[LocalPlayer:GetModelHash()]
 	end
 end
 
@@ -1264,8 +1298,8 @@ end
 ---@param distance integer
 function Game.FindSpawnPointNearPlayer(distance)
 	return Game.FindSpawnPointInDirection(
-		Self:GetPos(),
-		Self:GetForwardVector(),
+		LocalPlayer:GetPos(),
+		LocalPlayer:GetForwardVector(),
 		distance
 	)
 end

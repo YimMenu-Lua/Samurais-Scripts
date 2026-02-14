@@ -80,9 +80,9 @@ function CompanionManager:SpawnCompanion(pedModel, name, is_invincible, is_armed
 
 	TaskWait(Game.RequestModel, pedModel)
 
-	local playerGroup = Self:GetGroupIndex()
+	local playerGroup = LocalPlayer:GetGroupIndex()
 	local offsetPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		math.random(-5, 5),
 		math.random(2, 5),
 		0.0
@@ -91,7 +91,7 @@ function CompanionManager:SpawnCompanion(pedModel, name, is_invincible, is_armed
 	local handle = Game.CreatePed(
 		pedModel,
 		offsetPos,
-		Self:GetHeading(-180),
+		LocalPlayer:GetHeading(-180),
 		Game.IsOnline(),
 		false
 	)
@@ -206,11 +206,11 @@ function CompanionManager:BringAllCompanions()
 	end
 
 	local x_offset = 1
-	local y_offset = Self:IsOnFoot() and 1 or 6.9 -- I'm a child
+	local y_offset = LocalPlayer:IsOnFoot() and 1 or 6.9 -- I'm a child
 
 	for _, companion in ipairs(self.Companions) do
 		local offsetCoords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-			Self:GetHandle(),
+			LocalPlayer:GetHandle(),
 			x_offset,
 			y_offset,
 			0.0
@@ -231,7 +231,7 @@ function CompanionManager:RemoveCompanion(companion)
 	YimActions:Cleanup(companion.handle)
 
 	if Game.IsScriptHandle(companion.handle) then
-		if PED.IS_PED_GROUP_MEMBER(companion.handle, Self:GetGroupIndex()) then
+		if PED.IS_PED_GROUP_MEMBER(companion.handle, LocalPlayer:GetGroupIndex()) then
 			PED.REMOVE_PED_FROM_GROUP(companion.handle)
 		end
 
@@ -364,13 +364,13 @@ end
 function CompanionManager:FulfillTheProphecy()
 	script.run_in_fiber(function()
 		local spawnPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-			Self:GetHandle(),
+			LocalPlayer:GetHandle(),
 			0.0,
 			10.0,
 			20.0
 		)
 
-		local handle = Game.CreatePed(joaat("A_C_Boar_02"), spawnPos, Self:GetHeading(-180))
+		local handle = Game.CreatePed(joaat("A_C_Boar_02"), spawnPos, LocalPlayer:GetHeading(-180))
 		local MinimusWompusMeridius = Companion.new(
 			"Minimus Wompus Meridius",
 			handle,
@@ -384,7 +384,7 @@ end
 
 -- PERII
 function Companion:AD_MORTEM_INIMICUS()
-	if NETWORK.NETWORK_IS_ACTIVITY_SESSION() or not Self:IsOutside() then
+	if NETWORK.NETWORK_IS_ACTIVITY_SESSION() or not LocalPlayer:IsOutside() then
 		return
 	end
 
@@ -403,9 +403,9 @@ function Companion:AD_MORTEM_INIMICUS()
 	end
 
 	local cam = CAM.CREATE_CAM("DEFAULT_SCRIPTED_CAMERA", true)
-	local rot = Self:GetRotation()
+	local rot = LocalPlayer:GetRotation()
 	local camPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		0,
 		1,
 		1
@@ -460,7 +460,7 @@ function Companion:AD_MORTEM_INIMICUS()
 		0,
 		false,
 		joaat("WEAPON_RPG"),
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		true,
 		false,
 		-1
@@ -509,21 +509,21 @@ function Companion:AD_MORTEM_INIMICUS()
 	)
 
 	local wompus_group = PED.GET_PED_RELATIONSHIP_GROUP_HASH(self.handle)
-	local my_group = Self:GetRelationshipGroupHash()
+	local my_group = LocalPlayer:GetRelationshipGroupHash()
 	PED.SET_RELATIONSHIP_BETWEEN_GROUPS(5, wompus_group, my_group)
 	PED.SET_RELATIONSHIP_BETWEEN_GROUPS(5, my_group, wompus_group)
 	PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(self.handle, true)
 	TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(self.handle, true)
 	TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.handle)
 	PED.SET_PED_KEEP_TASK(self.handle, true)
-	TASK.TASK_COMBAT_PED(self.handle, Self:GetHandle(), 0, 16)
+	TASK.TASK_COMBAT_PED(self.handle, LocalPlayer:GetHandle(), 0, 16)
 	ENTITY.FREEZE_ENTITY_POSITION(self.handle, false)
 	CAM.RENDER_SCRIPT_CAMS(false, true, 500, true, false)
 	CAM.DESTROY_CAM(cam, false)
 
 	local timer_2 = Timer.new(10000)
 	while (not timer_2:is_done()) do
-		if (not Self:IsAlive()) then
+		if (not LocalPlayer:IsAlive()) then
 			break
 		end
 
@@ -560,7 +560,7 @@ function Companion:AD_MORTEM_INIMICUS()
 		999,
 		false,
 		joaat("WEAPON_RPG"),
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		true,
 		false,
 		-1

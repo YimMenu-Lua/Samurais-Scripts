@@ -33,7 +33,7 @@ function PreviewService:Preview(modelHash, entityType)
 		local handle
 		local coords = vec3:zero()
 		local groundZ = 0.0
-		local offset = Self:GetOffsetInWorldCoords(1, 5, 0)
+		local offset = LocalPlayer:GetOffsetInWorldCoords(1, 5, 0)
 
 		_, groundZ = MISC.GET_GROUND_Z_EXCLUDING_OBJECTS_FOR_3D_COORD(
 			offset.x,
@@ -54,13 +54,13 @@ function PreviewService:Preview(modelHash, entityType)
 				false,
 				false,
 				false,
-				Self:GetHeading()
+				LocalPlayer:GetHeading()
 			)
 		elseif entityType == Enums.eEntityType.Vehicle then
 			handle = Game.CreateVehicle(
 				modelHash,
 				coords,
-				Self:GetHeading(),
+				LocalPlayer:GetHeading(),
 				false,
 				false
 			)
@@ -68,7 +68,7 @@ function PreviewService:Preview(modelHash, entityType)
 			handle = Game.CreatePed(
 				modelHash,
 				coords,
-				Self:GetHeading(),
+				LocalPlayer:GetHeading(),
 				false,
 				false
 			)
@@ -101,9 +101,9 @@ function PreviewService:Rotate()
 		local heading = ENTITY.GET_ENTITY_HEADING(self.m_current)
 		ENTITY.SET_ENTITY_HEADING(self.m_current, (heading - 0.3) % 360)
 
-		if Self:IsMoving() then
+		if LocalPlayer:IsMoving() then
 			local groundZ = 0
-			local vec_Offset = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Self:GetHandle(), 1, 5, 0)
+			local vec_Offset = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(LocalPlayer:GetHandle(), 1, 5, 0)
 			_, groundZ = MISC.GET_GROUND_Z_EXCLUDING_OBJECTS_FOR_3D_COORD(
 				vec_Offset.x,
 				vec_Offset.y,

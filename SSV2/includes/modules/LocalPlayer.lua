@@ -19,101 +19,101 @@ local YimActions   = require("includes.features.YimActionsV3")
 
 
 --------------------------------------
--- Class: Self
+-- Class: LocalPlayer
 --------------------------------------
 --
 -- **Parent:** `Player`.
 --
 -- A global singleton that always resolves to the current local player.
----@class Self: Player
+---@class LocalPlayer: Player
 ---@field private m_vehicle PlayerVehicle
 ---@field private m_last_vehicle? Vehicle
 ---@field private m_feat_mgr FeatureManager
 ---@field public CurrentMovementClipset? string
 ---@field public CurrentStrafeClipset? string
 ---@field public CurrentWeaponMovementClipset? string
----@overload fun(): Self
-Self            = Class("Self", Player)
-Self.m_vehicle  = require("includes.modules.PlayerVehicle")
-Self.m_feat_mgr = FeatureMgr.new(Self)
+LocalPlayer = Class("LocalPlayer", Player)
 
----@diagnostic disable
-Self.m_feat_mgr:Add(miscFeatures.new(Self))
-Self.m_feat_mgr:Add(Ragdoll.new(Self))
-Self.m_feat_mgr:Add(MagicBullet.new(Self))
-Self.m_feat_mgr:Add(LaserSights.new(Self))
-Self.m_feat_mgr:Add(Katana.new(Self))
----@diagnostic enable
 
 ---@override
-Self.new = nil
+LocalPlayer.new        = nil
+LocalPlayer.m_vehicle  = require("includes.modules.PlayerVehicle")
+LocalPlayer.m_feat_mgr = FeatureMgr.new(LocalPlayer)
+
+---@diagnostic disable
+LocalPlayer.m_feat_mgr:Add(miscFeatures.new(LocalPlayer))
+LocalPlayer.m_feat_mgr:Add(Ragdoll.new(LocalPlayer))
+LocalPlayer.m_feat_mgr:Add(MagicBullet.new(LocalPlayer))
+LocalPlayer.m_feat_mgr:Add(LaserSights.new(LocalPlayer))
+LocalPlayer.m_feat_mgr:Add(Katana.new(LocalPlayer))
+---@diagnostic enable
 
 ---@return CPed
-function Self:Resolve()
-	return CPed(Self:GetHandle())
+function LocalPlayer:Resolve()
+	return CPed(LocalPlayer:GetHandle())
 end
 
 -- Returns the current local player's script handle.
 ---@override
 ---@return handle
-function Self:GetHandle()
+function LocalPlayer:GetHandle()
 	return PLAYER.PLAYER_PED_ID()
 end
 
 -- Returns the current local player's ID.
 ---@return number
-function Self:GetPlayerID()
+function LocalPlayer:GetPlayerID()
 	return PLAYER.PLAYER_ID()
 end
 
 -- Returns the current local player's model hash.
 ---@return hash
-function Self:GetModelHash()
+function LocalPlayer:GetModelHash()
 	return ENTITY.GET_ENTITY_MODEL(self:GetHandle())
 end
 
 -- Returns the vehicle you're driving, not just sitting in.
 ---@override
 ---@return PlayerVehicle
-function Self:GetVehicle()
+function LocalPlayer:GetVehicle()
 	return self.m_vehicle
 end
 
 -- Returns the vehicle you're currently sitting in whether you're driving or not.
 ---@return Vehicle
-function Self:GetVehiclePlayerIsIn()
+function LocalPlayer:GetVehiclePlayerIsIn()
 	return Vehicle(self:GetVehicleNative())
 end
 
-function Self:GetMaxArmour()
+function LocalPlayer:GetMaxArmour()
 	return PLAYER.GET_PLAYER_MAX_ARMOUR(PLAYER.PLAYER_ID())
 end
 
 ---@return Vehicle|nil
-function Self:GetLastVehicle()
+function LocalPlayer:GetLastVehicle()
 	return self.m_last_vehicle
 end
 
 ---@return integer
-function Self:GetWalletBalance()
+function LocalPlayer:GetWalletBalance()
 	return MONEY.NETWORK_GET_VC_WALLET_BALANCE(stats.get_character_index())
 end
 
 ---@return integer
-function Self:GetBankBalance()
+function LocalPlayer:GetBankBalance()
 	return MONEY.NETWORK_GET_VC_BANK_BALANCE()
 end
 
 ---@return integer
-function Self:GetTotalBalance()
-	return Self:GetWalletBalance() + Self:GetBankBalance()
+function LocalPlayer:GetTotalBalance()
+	return LocalPlayer:GetWalletBalance() + LocalPlayer:GetBankBalance()
 end
 
-function Self:GetName()
+function LocalPlayer:GetName()
 	return Game.GetCharacterName()
 end
 
-function Self:OnVehicleSwitch()
+function LocalPlayer:OnVehicleSwitch()
 	if (self.m_vehicle:IsValid()) then
 		self.m_vehicle:RestoreHeadlights()
 
@@ -125,7 +125,7 @@ function Self:OnVehicleSwitch()
 	self.m_vehicle:Set(self:GetVehicleNative())
 end
 
-function Self:OnVehicleExit()
+function LocalPlayer:OnVehicleExit()
 	if (not self.m_last_vehicle or self.m_last_vehicle:GetHandle() ~= self.m_vehicle:GetHandle()) then
 		self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
 	end
@@ -138,7 +138,7 @@ end
 -- Returns the entity local player is aiming at.
 ---@param skip_players? boolean -- Ignore network players.
 ---@return handle | nil
-function Self:GetEntityInCrosshairs(skip_players)
+function LocalPlayer:GetEntityInCrosshairs(skip_players)
 	local is_aiming, entity, pid = false, 0, self:GetPlayerID()
 
 	if not PLAYER.IS_PLAYER_FREE_AIMING(pid) then
@@ -165,7 +165,7 @@ end
 --
 -- If true, returns `true` and the `weapon hash`; else returns `false` and `0`.
 ---@return boolean, hash
-function Self:IsUsingVehicleMG()
+function LocalPlayer:IsUsingVehicleMG()
 	local veh = self:GetVehiclePlayerIsIn()
 	if (not veh or not veh:IsValid()) then
 		return false, 0
@@ -175,7 +175,7 @@ function Self:IsUsingVehicleMG()
 		return false, 0
 	end
 
-	local pWeaponInfo = Self:Resolve().m_ped_weapon_mgr.m_vehicle_weapon_info
+	local pWeaponInfo = LocalPlayer:Resolve().m_ped_weapon_mgr.m_vehicle_weapon_info
 	if (not pWeaponInfo or not pWeaponInfo:IsValid()) then
 		return false, 0
 	end
@@ -195,7 +195,7 @@ end
 --
 -- If true, returns `true` and the `weapon hash`; else returns `false` and `0`.
 ---@return boolean, hash
-function Self:IsUsingAirctaftMG()
+function LocalPlayer:IsUsingAirctaftMG()
 	local veh = self:GetVehiclePlayerIsIn()
 	if (not veh or not veh:IsPlane() or not veh:IsHeli()) then
 		return false, 0
@@ -204,7 +204,7 @@ function Self:IsUsingAirctaftMG()
 	return self:IsUsingVehicleMG()
 end
 
-function Self:IsBeingArrested()
+function LocalPlayer:IsBeingArrested()
 	return PLAYER.IS_PLAYER_BEING_ARRESTED(self:GetPlayerID(), true)
 end
 
@@ -212,53 +212,38 @@ end
 ---@param where integer|vec3 -- [blip ID](https://wiki.rage.mp/wiki/Blips) or vector3 coordinates
 ---@param keep_vehicle? boolean
 ---@param loadGround? boolean
-function Self:Teleport(where, keep_vehicle, loadGround)
+function LocalPlayer:Teleport(where, keep_vehicle, loadGround)
 	ThreadManager:Run(function()
-		local coords -- fwd decl
-
-		if (not keep_vehicle and not Self:IsOnFoot()) then
-			TASK.CLEAR_PED_TASKS_IMMEDIATELY(Self:GetHandle())
-			sleep(50)
+		if (not self:IsOutside()) then
+			Notifier:ShowError(_T("GENERIC_TELEPORT"), _T("GENERIC_TP_INTERIOR_ERR"))
+			return
 		end
 
-		if (type(where) == "number") then
-			local blip = HUD.GET_FIRST_BLIP_INFO_ID(where)
-
-			if not HUD.DOES_BLIP_EXIST(blip) then
-				Notifier:ShowError(
-					Backend.script_name,
-					"Invalid teleport coordinates!"
-				)
-				return
-			end
-
-			coords = HUD.GET_BLIP_COORDS(blip)
-		elseif (IsInstance(where, vec3)) then
-			---@type vec3
-			coords = where
-		else
-			Notifier:ShowError(
-				Backend.script_name,
-				"Invalid teleport coordinates!"
-			)
+		local coords = Game.Ensure3DCoords(where)
+		if (not coords or coords:is_zero()) then
+			Notifier:ShowError(_T("GENERIC_TELEPORT"), _T("GENERIC_TP_INVALID_COORDS_ERR"))
 			return
+		end
+
+		if (not keep_vehicle and not LocalPlayer:IsOnFoot()) then
+			TASK.CLEAR_PED_TASKS_IMMEDIATELY(LocalPlayer:GetHandle())
+			sleep(50)
 		end
 
 		if (loadGround) then
 			TaskWait(Game.LoadGroundAtCoord, { coords }, 500)
 		end
 
-		local handle  = self:GetHandle()
-		-- local dir = Self:GetPos() - coords -- it's so stupid that passing the coords works better than the correct params. I'm so dumb bruh
-		local heading = MISC.GET_HEADING_FROM_VECTOR_2D(coords.x, coords.y)
-		Self:SetHeading(heading)
-		PED.SET_PED_COORDS_KEEP_VEHICLE(handle, coords.x, coords.y, coords.z)
+		local dir     = LocalPlayer:GetPos() - coords
+		local heading = MISC.GET_HEADING_FROM_VECTOR_2D(dir.x, dir.y)
+		LocalPlayer:SetHeading(heading)
+		LocalPlayer:SetCoordsKeepVehicle(coords)
 	end)
 end
 
 ---@param scriptName string
 ---@return boolean
-function Self:IsHostOfScript(scriptName)
+function LocalPlayer:IsHostOfScript(scriptName)
 	local pid = self:GetPlayerID()
 	return (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, -1, 0) == pid)
 		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 0, 0) == pid)
@@ -269,7 +254,7 @@ end
 
 -- Returns whether the player is currently using any mobile or computer app.
 ---@return boolean
-function Self:IsBrowsingApps()
+function LocalPlayer:IsBrowsingApps()
 	for _, v in ipairs(Refs.appScriptNames) do
 		if script.is_active(v) then
 			return true
@@ -281,7 +266,7 @@ end
 
 -- Returns whether the player is inside a modshop.
 ---@return boolean
-function Self:IsInCarModShop()
+function LocalPlayer:IsInCarModShop()
 	if (self:IsOnFoot() or self:IsOutside()) then
 		return false
 	end
@@ -295,11 +280,11 @@ function Self:IsInCarModShop()
 	return false
 end
 
-function Self:IsUsingPhone()
+function LocalPlayer:IsUsingPhone()
 	return script.is_active("CELLPHONE_FLASHHAND")
 end
 
-function Self:IsPlayingHandsUpAnim()
+function LocalPlayer:IsPlayingHandsUpAnim()
 	return ENTITY.IS_ENTITY_PLAYING_ANIM(
 		self:GetHandle(),
 		"mp_missheist_countrybank@lift_hands",
@@ -308,16 +293,16 @@ function Self:IsPlayingHandsUpAnim()
 	)
 end
 
-function Self:CanUsePhoneAnims()
+function LocalPlayer:CanUsePhoneAnims()
 	return
 		not ENTITY.IS_ENTITY_DEAD(self:GetHandle(), false)
 		and not YimActions:IsPedPlaying()
 		and (PED.COUNT_PEDS_IN_COMBAT_WITH_TARGET(self:GetHandle()) == 0)
 end
 
-function Self:CanCrouch()
+function LocalPlayer:CanCrouch()
 	return
-		Self:IsOnFoot()
+		LocalPlayer:IsOnFoot()
 		and not gui.is_open()
 		and not GUI:IsOpen()
 		and not HUD.IS_PAUSE_MENU_ACTIVE()
@@ -326,9 +311,9 @@ function Self:CanCrouch()
 		and not Backend:AreControlsDisabled()
 end
 
-function Self:CanPutHandsUp()
+function LocalPlayer:CanPutHandsUp()
 	return
-		(Self:IsOnFoot() or Self:GetVehicle():IsCar())
+		(LocalPlayer:IsOnFoot() or LocalPlayer:GetVehicle():IsCar())
 		and not gui.is_open()
 		and not GUI:IsOpen()
 		and not YimActions:IsPedPlaying()
@@ -344,7 +329,7 @@ end
 --
 -- so we invert the value to preserve sane semantics at the API level.
 ---@param value boolean
-function Self:ToggleMpPhoneAnims(value)
+function LocalPlayer:ToggleMpPhoneAnims(value)
 	-- ePedConfigFlags (see includes/data/enums.lua)
 	-- 242 = PhoneDisableTextingAnimations
 	-- 243 = PhoneDisableTalkingAnimations
@@ -356,10 +341,10 @@ function Self:ToggleMpPhoneAnims(value)
 	end
 end
 
-function Self:PlayKeyfobAnim()
-	if (Self:IsDead()
-			or Self:IsSwimming()
-			or not Self:IsOnFoot()
+function LocalPlayer:PlayKeyfobAnim()
+	if (LocalPlayer:IsDead()
+			or LocalPlayer:IsSwimming()
+			or not LocalPlayer:IsOnFoot()
 			or YimActions:IsPedPlaying()
 			or YimActions:IsPlayerBusy()
 		) then
@@ -368,7 +353,7 @@ function Self:PlayKeyfobAnim()
 
 	TaskWait(Game.RequestAnimDict, "anim@mp_player_intmenu@key_fob@")
 	TASK.TASK_PLAY_ANIM(
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		"anim@mp_player_intmenu@key_fob@",
 		"fob_click",
 		4.0,
@@ -384,12 +369,12 @@ end
 
 -- A helper method to quickly remove player attachments
 ---@param lookup_table? table
-function Self:RemoveAttachments(lookup_table)
+function LocalPlayer:RemoveAttachments(lookup_table)
 	ThreadManager:Run(function()
 		local had_attachments = false
 
 		local function _detach(entity)
-			if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(entity, Self:GetHandle()) then
+			if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(entity, LocalPlayer:GetHandle()) then
 				had_attachments = true
 				ENTITY.DETACH_ENTITY(entity, true, true)
 				ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(entity)
@@ -435,14 +420,14 @@ end
 
 ---@param data table
 ---@param isJson boolean
-function Self:SetMovementClipset(data, isJson)
+function LocalPlayer:SetMovementClipset(data, isJson)
 	local mvmtclipset = isJson and data.Name or data.mvmt
 
 	script.run_in_fiber(function(s)
-		Self:ResetMovementClipsets()
+		LocalPlayer:ResetMovementClipsets()
 		s:sleep(100)
 
-		local handle = Self:GetHandle()
+		local handle = LocalPlayer:GetHandle()
 		if mvmtclipset then
 			TaskWait(Game.RequestClipSet, mvmtclipset)
 			PED.SET_PED_MOVEMENT_CLIPSET(handle, mvmtclipset, 1.0)
@@ -471,8 +456,8 @@ function Self:SetMovementClipset(data, isJson)
 	end)
 end
 
-function Self:ResetMovementClipsets()
-	local handle = Self:GetHandle()
+function LocalPlayer:ResetMovementClipsets()
+	local handle = LocalPlayer:GetHandle()
 
 	PED.RESET_PED_MOVEMENT_CLIPSET(handle, 0.3)
 	PED.RESET_PED_STRAFE_CLIPSET(handle)
@@ -485,12 +470,12 @@ function Self:ResetMovementClipsets()
 	self.CurrentWeaponMovementClipset = nil
 end
 
-function Self:Cleanup()
-	Self:ResetMovementClipsets()
-	Self.m_feat_mgr:Cleanup()
+function LocalPlayer:Cleanup()
+	LocalPlayer:ResetMovementClipsets()
+	LocalPlayer.m_feat_mgr:Cleanup()
 end
 
-function Self:Reset()
+function LocalPlayer:Reset()
 	self:Cleanup()
 	self.m_vehicle:Reset()
 	self.m_last_vehicle = nil
@@ -498,26 +483,26 @@ function Self:Reset()
 end
 
 Backend:RegisterEventCallbackAll(function()
-	Self:Reset()
+	LocalPlayer:Reset()
 end)
 
 ThreadManager:RegisterLooped("SS_PV_HANDLER", function()
-	if (Self.m_vehicle and Self.m_vehicle:IsValid()) then
-		if (Self:IsOnFoot()) then
-			Self:OnVehicleExit()
-		elseif (Self:IsDriving() and Self.m_vehicle:GetHandle() ~= Self:GetVehicleNative()) then
-			Self:OnVehicleSwitch()
+	if (LocalPlayer.m_vehicle and LocalPlayer.m_vehicle:IsValid()) then
+		if (LocalPlayer:IsOnFoot()) then
+			LocalPlayer:OnVehicleExit()
+		elseif (LocalPlayer:IsDriving() and LocalPlayer.m_vehicle:GetHandle() ~= LocalPlayer:GetVehicleNative()) then
+			LocalPlayer:OnVehicleSwitch()
 		end
-	elseif (Self:IsDriving()) then
-		Self.m_vehicle:Set(Self:GetVehicleNative())
+	elseif (LocalPlayer:IsDriving()) then
+		LocalPlayer.m_vehicle:Set(LocalPlayer:GetVehicleNative())
 	end
 
-	if (Self.m_vehicle:GetHandle() ~= 0 and not Self.m_vehicle:IsValid()) then
-		Self.m_vehicle:Reset()
+	if (LocalPlayer.m_vehicle:GetHandle() ~= 0 and not LocalPlayer.m_vehicle:IsValid()) then
+		LocalPlayer.m_vehicle:Reset()
 		sleep(1000)
 	end
 end)
 
 ThreadManager:RegisterLooped("SS_SELF", function()
-	Self.m_feat_mgr:Update()
+	LocalPlayer.m_feat_mgr:Update()
 end)

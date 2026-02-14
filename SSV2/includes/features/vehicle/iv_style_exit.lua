@@ -41,8 +41,8 @@ function IVStyleExit:ShouldRun()
 	return (self.m_entity
 			and self.m_entity:IsValid()
 			and self.m_entity:IsLandVehicle()
-			and Self:IsDriving()
-			and Self:IsOutside()
+			and LocalPlayer:IsDriving()
+			and LocalPlayer:IsOutside()
 			and (GVars.features.vehicle.iv_exit or GVars.features.vehicle.no_wheel_recenter))
 		and not Backend:AreControlsDisabled()
 		and not HUD.IS_MP_TEXT_CHAT_TYPING()
@@ -63,7 +63,7 @@ end
 function IVStyleExit:LeaveVehicle(keepEngineOn)
 	local vehHandle = self.m_entity:GetHandle()
 	local enabled   = GVars.features.vehicle.no_wheel_recenter and self.m_entity:IsCar()
-	Self:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, keepEngineOn)
+	LocalPlayer:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, keepEngineOn)
 
 	if (enabled) then
 		self.m_last_steer_angle = self.m_entity:Resolve().m_current_steering:get_float()
@@ -72,7 +72,7 @@ function IVStyleExit:LeaveVehicle(keepEngineOn)
 		end
 	end
 
-	TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), vehHandle, 0)
+	TASK.TASK_LEAVE_VEHICLE(LocalPlayer:GetHandle(), vehHandle, 0)
 
 	if (self:ShouldReapplySteering()) then
 		self.m_pending_steering = true
@@ -88,7 +88,7 @@ function IVStyleExit:Update()
 
 	if (PAD.IS_DISABLED_CONTROL_PRESSED(0, 75)) then
 		if (self.m_entity:GetSpeed() > 15) then
-			TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), self.m_entity:GetHandle(), 4160)
+			TASK.TASK_LEAVE_VEHICLE(LocalPlayer:GetHandle(), self.m_entity:GetHandle(), 4160)
 			self:Cleanup()
 			return
 		end
@@ -122,8 +122,8 @@ function IVStyleExit:Update()
 		end
 	end
 
-	if (self.m_triggered and not Self:IsDriving()) then
-		Self:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
+	if (self.m_triggered and not LocalPlayer:IsDriving()) then
+		LocalPlayer:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
 		self:Cleanup()
 		return
 	end

@@ -91,7 +91,6 @@ local function DrawEntities()
 	if (selected_entity_type and Backend.SpawnedEntities[selected_entity_type]) then
 		ImGui.SameLine()
 		ImGui.BeginChildEx("##entitydetails", vec2:zero(), ImGuiChildFlags.Borders)
-		---@diagnostic disable-next-line: undefined-global
 		if ImGui.BeginTable("entity_table", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.BordersInner) then
 			ImGui.TableSetupColumn("Handle")
 			ImGui.TableSetupColumn("Model Hash")
@@ -539,7 +538,7 @@ local function DrawMiscTests()
 
 	if (ImGui.Button("Dump CWeaponInfo")) then
 		local out           = {}
-		local cpedweaponmgr = Self:Resolve().m_ped_weapon_mgr
+		local cpedweaponmgr = LocalPlayer:Resolve().m_ped_weapon_mgr
 		if (not cpedweaponmgr:IsValid()) then
 			print("CPedWeaponManager: invalid pointer.")
 			return

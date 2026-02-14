@@ -59,7 +59,7 @@ Flatbed.closestVehicle = {
 }
 
 function Flatbed:Spawn()
-	if (not Self:IsOutside()) then
+	if (not LocalPlayer:IsOutside()) then
 		Notifier:ShowError(
 			"Samurais Scripts",
 			_T("GENERIC_INTERIOR_ACTION_ERR")
@@ -67,7 +67,7 @@ function Flatbed:Spawn()
 		return
 	end
 
-	if (not Self:IsOnFoot()) then
+	if (not LocalPlayer:IsOnFoot()) then
 		Notifier:ShowError(
 			"Samurais Scripts",
 			_T("FLTBD_EXIT_VEH_ERR")
@@ -77,11 +77,11 @@ function Flatbed:Spawn()
 
 	ThreadManager:Run(function()
 		TaskWait(Game.RequestModel, self.modelHash)
-		local spawnPos = Self:GetSpawnPosInFront()
+		local spawnPos = LocalPlayer:GetSpawnPosInFront()
 		self.m_handle = Game.CreateVehicle(
 			self.modelHash,
 			spawnPos,
-			Self:GetHeading(),
+			LocalPlayer:GetHeading(),
 			Game.IsOnline(),
 			false
 		)
@@ -106,7 +106,7 @@ function Flatbed:Spawn()
 		end
 
 		Decorator:Register(self.m_handle, "Flatbed", true)
-		PED.SET_PED_INTO_VEHICLE(Self:GetHandle(), self.m_handle, -1)
+		PED.SET_PED_INTO_VEHICLE(LocalPlayer:GetHandle(), self.m_handle, -1)
 		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(self.modelHash)
 		ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(self.m_handle)
 	end)
@@ -394,7 +394,7 @@ function Flatbed:AttachPhysically()
 end
 
 function Flatbed:Detach()
-	if (Self:GetVehicle():IsFlatbedTruck()
+	if (LocalPlayer:GetVehicle():IsFlatbedTruck()
 			and self.m_towed_vehicle
 			and (self.m_towed_vehicle.m_handle ~= 0)
 			and ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(self.m_towed_vehicle.m_handle, self.m_previous_handle)
@@ -477,7 +477,7 @@ function Flatbed:Reset()
 end
 
 function Flatbed:OnTick()
-	if (not Self:GetVehicle():IsFlatbedTruck()) then
+	if (not LocalPlayer:GetVehicle():IsFlatbedTruck()) then
 		if (self.m_handle ~= 0 and not ENTITY.DOES_ENTITY_EXIST(self.m_handle)) then
 			self:Reset()
 		end
@@ -494,7 +494,7 @@ function Flatbed:OnTick()
 		self:Reset()
 	end
 
-	self.m_handle = Self:GetVehicleNative()
+	self.m_handle = LocalPlayer:GetVehicleNative()
 	self.m_heading = Game.GetHeading(self.m_handle)
 	self.m_coords = Game.GetEntityCoords(self.m_handle, false)
 	self.m_fwd_vec = Game.GetForwardVector(self.m_previous_handle or self.m_handle)
@@ -513,7 +513,7 @@ function Flatbed:OnTick()
 
 	self:SetDisplayText()
 
-	if (not self.m_towed_vehicle and Self:IsDriving()) then
+	if (not self.m_towed_vehicle and LocalPlayer:IsDriving()) then
 		if (GVars.features.flatbed.show_towing_position) then
 			GRAPHICS.DRAW_MARKER_SPHERE(
 				self.m_search_pos.x,

@@ -513,7 +513,7 @@ function Backend:PANIQUE()
 			sleep(100)
 		end
 
-		local pos = Self:GetPos()
+		local pos = LocalPlayer:GetPos()
 		AUDIO.PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(
 			"ELECTROCUTION",
 			"MISTERK",

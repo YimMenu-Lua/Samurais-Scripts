@@ -217,6 +217,48 @@ function Accessor:WriteString(value)
 	Call(self, "set_string", value)
 end
 
+---------------------------
+--------- Bitwise ---------
+---------------------------
+
+---@param pos integer
+function Accessor:SetBit(pos)
+	if (math.type(pos) ~= "integer") then
+		return
+	end
+
+	local v = self:ReadInt()
+	self:WriteInt(Bit.set(v, pos))
+end
+
+---@param pos integer
+function Accessor:ClearBit(pos)
+	if (math.type(pos) ~= "integer") then
+		return
+	end
+
+	local v = self:ReadInt()
+	self:WriteInt(Bit.clear(v, pos))
+end
+
+---@param bits array<integer> -- bit positions to set
+function Accessor:SetBits(bits)
+	local v = self:ReadInt()
+	for _, pos in ipairs(bits) do
+		v = Bit.set(v, pos)
+	end
+	self:WriteInt(v)
+end
+
+---@param bits array<integer> -- bit positions to clear
+function Accessor:ClearBits(bits)
+	local v = self:ReadInt()
+	for _, pos in ipairs(bits) do
+		v = Bit.clear(v, pos)
+	end
+	self:WriteInt(v)
+end
+
 --------------------------------------------------------
 --------------------------------------------------------
 --------------------------------------------------------

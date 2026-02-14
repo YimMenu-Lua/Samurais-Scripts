@@ -80,7 +80,7 @@ function PrivateLimo:CreateVehicle(t_Data, spawnPos)
 		local spawnPoint = Game.FindSpawnPointNearPlayer(10)
 		spawnPos = spawnPoint and spawnPoint
 			or ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-				Self:GetHandle(),
+				LocalPlayer:GetHandle(),
 				0,
 				15,
 				0.1
@@ -429,12 +429,12 @@ function PrivateLimo:TakeControl()
 	script.run_in_fiber(function(s)
 		if not Game.IsScriptHandle(self.m_handle)
 			or not Game.IsScriptHandle(self.driver)
-			or (Self:GetVehicle():GetHandle() ~= self.m_handle) then
+			or (LocalPlayer:GetVehicle():GetHandle() ~= self.m_handle) then
 			return
 		end
 
 		local limoClone = self:CreateVehicle(self.limoData, vec3:zero())
-		local playerClone = Game.CreatePed(Self:GetModelHash(), vec3:zero())
+		local playerClone = Game.CreatePed(LocalPlayer:GetModelHash(), vec3:zero())
 		if (not Game.IsScriptHandle(limoClone) or not Game.IsScriptHandle(playerClone)) then
 			Notifier:ShowError(
 				"Private Limo",
@@ -445,7 +445,7 @@ function PrivateLimo:TakeControl()
 
 		self.limoClone = limoClone
 		self.playerClone = playerClone
-		self.playerSeat = Game.GetPedVehicleSeat(Self:GetHandle())
+		self.playerSeat = Game.GetPedVehicleSeat(LocalPlayer:GetHandle())
 		self:CancelAnyTasks()
 
 		ENTITY.SET_ENTITY_COLLISION(self.limoClone, false, false)
@@ -456,13 +456,13 @@ function PrivateLimo:TakeControl()
 		ENTITY.SET_ENTITY_INVINCIBLE(self.playerClone, true)
 		PED.SET_PED_CAN_BE_DRAGGED_OUT(self.playerClone, false)
 		PED.SET_PED_CAN_BE_TARGETTED(self.playerClone, false)
-		PED.CLONE_PED_TO_TARGET(Self:GetHandle(), self.playerClone)
+		PED.CLONE_PED_TO_TARGET(LocalPlayer:GetHandle(), self.playerClone)
 		PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(self.playerClone, true)
 		TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(self.playerClone, true)
 
 		Game.SetEntityCoordsNoOffset(self.limoClone, Game.GetEntityCoords(self.m_handle, false))
 		ENTITY.SET_ENTITY_HEADING(self.limoClone, Game.GetHeading(self.m_handle))
-		TASK.TASK_WARP_PED_INTO_VEHICLE(Self:GetHandle(), self.limoClone, -1)
+		TASK.TASK_WARP_PED_INTO_VEHICLE(LocalPlayer:GetHandle(), self.limoClone, -1)
 		VEHICLE.SET_VEHICLE_ENGINE_ON(self.limoClone, true, true, false)
 		VEHICLE.SET_VEHICLE_DOORS_LOCKED(self.limoClone, 2)
 		VEHICLE.SET_VEHICLE_DIRT_LEVEL(self.limoClone, VEHICLE.GET_VEHICLE_DIRT_LEVEL(self.m_handle))
@@ -473,8 +473,8 @@ function PrivateLimo:TakeControl()
 		TASK.TASK_WARP_PED_INTO_VEHICLE(self.playerClone, self.m_handle, self.playerSeat or -2)
 		ENTITY.SET_ENTITY_VISIBLE(self.m_handle, false, false)
 		ENTITY.SET_ENTITY_ALPHA(self.m_handle, 10.0, false)
-		ENTITY.SET_ENTITY_VISIBLE(Self:GetHandle(), false, false)
-		ENTITY.SET_ENTITY_ALPHA(Self:GetHandle(), 0.0, false)
+		ENTITY.SET_ENTITY_VISIBLE(LocalPlayer:GetHandle(), false, false)
+		ENTITY.SET_ENTITY_ALPHA(LocalPlayer:GetHandle(), 0.0, false)
 
 		local prevSpeed = ENTITY.GET_ENTITY_SPEED(self.m_handle)
 		ENTITY.ATTACH_ENTITY_TO_ENTITY(
@@ -536,7 +536,7 @@ function PrivateLimo:ReleaseControl()
 			yield()
 		end
 
-		local speed = ENTITY.GET_ENTITY_SPEED(Self:GetHandle())
+		local speed = ENTITY.GET_ENTITY_SPEED(LocalPlayer:GetHandle())
 		ENTITY.DETACH_ENTITY(self.m_handle, false, false)
 		ENTITY.SET_ENTITY_COLLISION(self.m_handle, false, false)
 		ENTITY.SET_ENTITY_COLLISION(self.limoClone, false, false)
@@ -545,11 +545,11 @@ function PrivateLimo:ReleaseControl()
 		s:sleep(10)
 
 		ENTITY.SET_ENTITY_COLLISION(self.m_handle, true, true)
-		TASK.TASK_WARP_PED_INTO_VEHICLE(Self:GetHandle(), self.m_handle, self.playerSeat or -2)
+		TASK.TASK_WARP_PED_INTO_VEHICLE(LocalPlayer:GetHandle(), self.m_handle, self.playerSeat or -2)
 		ENTITY.SET_ENTITY_VISIBLE(self.m_handle, true, true)
 		ENTITY.SET_ENTITY_ALPHA(self.m_handle, 255, false)
-		ENTITY.SET_ENTITY_VISIBLE(Self:GetHandle(), true, true)
-		ENTITY.SET_ENTITY_ALPHA(Self:GetHandle(), 255, false)
+		ENTITY.SET_ENTITY_VISIBLE(LocalPlayer:GetHandle(), true, true)
+		ENTITY.SET_ENTITY_ALPHA(LocalPlayer:GetHandle(), 255, false)
 
 		for _, ped in ipairs(self:GetOccupants()) do
 			if ped and Game.IsScriptHandle(ped) then
@@ -571,7 +571,7 @@ function PrivateLimo:IsPlayerInLimo()
 		return false
 	end
 
-	local playerVeh = Self:GetVehicleNative()
+	local playerVeh = LocalPlayer:GetVehicleNative()
 	return (playerVeh ~= 0 and self.m_handle == playerVeh)
 end
 
@@ -582,8 +582,8 @@ function PrivateLimo:WarpPlayer()
 
 	script.run_in_fiber(function()
 		local seatIndex = VEHICLE.IS_VEHICLE_SEAT_FREE(self.m_handle, 2, true) and 2 or -2
-		Self:ClearTasksImmediately()
-		self:WarpPed(Self:GetHandle(), seatIndex)
+		LocalPlayer:ClearTasksImmediately()
+		self:WarpPed(LocalPlayer:GetHandle(), seatIndex)
 	end)
 end
 
@@ -615,7 +615,7 @@ function PrivateLimo:Dismiss()
 			s:sleep(500)
 		end
 
-		if self:GetPos():distance(Self:GetPos()) <= 10 then
+		if self:GetPos():distance(LocalPlayer:GetPos()) <= 10 then
 			AUDIO.PLAY_PED_AMBIENT_SPEECH_NATIVE(
 				self.driver,
 				"GENERIC_BYE",
@@ -654,8 +654,8 @@ function PrivateLimo:Cleanup()
 		Game.DeleteEntity(self.playerClone)
 	end
 
-	ENTITY.SET_ENTITY_VISIBLE(Self:GetHandle(), true, true)
-	ENTITY.SET_ENTITY_ALPHA(Self:GetHandle(), 255, false)
+	ENTITY.SET_ENTITY_VISIBLE(LocalPlayer:GetHandle(), true, true)
+	ENTITY.SET_ENTITY_ALPHA(LocalPlayer:GetHandle(), 255, false)
 
 	self.driver = nil
 	self.m_handle = nil
@@ -674,8 +674,8 @@ function PrivateLimo:ForceCleanup()
 	end
 
 	if self.isRemoteControlled then
-		ENTITY.SET_ENTITY_VISIBLE(Self:GetHandle(), true, true)
-		ENTITY.SET_ENTITY_ALPHA(Self:GetHandle(), 255, false)
+		ENTITY.SET_ENTITY_VISIBLE(LocalPlayer:GetHandle(), true, true)
+		ENTITY.SET_ENTITY_ALPHA(LocalPlayer:GetHandle(), 255, false)
 	end
 end
 
@@ -701,14 +701,14 @@ function PrivateLimo:StateEval()
 		self.isRemoteControlled = false
 		self:Cleanup()
 		BillionaireServices.ActiveServices.limo = nil
-		ENTITY.SET_ENTITY_VISIBLE(Self:GetHandle(), true, true)
-		ENTITY.SET_ENTITY_ALPHA(Self:GetHandle(), 255, false)
+		ENTITY.SET_ENTITY_VISIBLE(LocalPlayer:GetHandle(), true, true)
+		ENTITY.SET_ENTITY_ALPHA(LocalPlayer:GetHandle(), 255, false)
 	end
 
 	if not VEHICLE.IS_VEHICLE_DRIVEABLE(self.m_handle, false) and not ENTITY.IS_ENTITY_IN_WATER(self.m_handle) then
 		if ENTITY.IS_ENTITY_IN_WATER(self.m_handle) then
 			local roadNode, roadHeading = Game.GetClosestVehicleNodeWithHeading(
-				Self:GetPos(),
+				LocalPlayer:GetPos(),
 				0
 			)
 
@@ -721,34 +721,34 @@ function PrivateLimo:StateEval()
 		self:Repair(true)
 	end
 
-	if (PED.IS_PED_SITTING_IN_ANY_VEHICLE(Self:GetHandle())
+	if (PED.IS_PED_SITTING_IN_ANY_VEHICLE(LocalPlayer:GetHandle())
 			and self:IsPlayerInLimo()
-			and PED.IS_PED_STOPPED(Self:GetHandle())
+			and PED.IS_PED_STOPPED(LocalPlayer:GetHandle())
 		) then
-		local playerDoor = Game.GetPedVehicleSeat(Self:GetHandle()) + 1
+		local playerDoor = Game.GetPedVehicleSeat(LocalPlayer:GetHandle()) + 1
 		if VEHICLE.GET_IS_DOOR_VALID(self.m_handle, playerDoor)
 			and not VEHICLE.IS_VEHICLE_DOOR_DAMAGED(self.m_handle, playerDoor)
 			and VEHICLE.GET_VEHICLE_DOOR_ANGLE_RATIO(self.m_handle, playerDoor) > 0 then
 			VEHICLE.SET_VEHICLE_DOOR_SHUT(self.m_handle, playerDoor, false)
 		end
 	else
-		if (PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(Self:GetHandle()) == self.m_handle)
-			and PED.IS_PED_TRYING_TO_ENTER_A_LOCKED_VEHICLE(Self:GetHandle()) then
+		if (PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(LocalPlayer:GetHandle()) == self.m_handle)
+			and PED.IS_PED_TRYING_TO_ENTER_A_LOCKED_VEHICLE(LocalPlayer:GetHandle()) then
 			VEHICLE.SET_VEHICLE_DOORS_SHUT(self.m_handle, false)
 			VEHICLE.SET_VEHICLE_DOOR_OPEN(self.m_handle, 3, false, false)
-			TASK.CLEAR_PED_TASKS_IMMEDIATELY(Self:GetHandle())
-			PED.SET_PED_INTO_VEHICLE(Self:GetHandle(), self.m_handle, 2)
+			TASK.CLEAR_PED_TASKS_IMMEDIATELY(LocalPlayer:GetHandle())
+			PED.SET_PED_INTO_VEHICLE(LocalPlayer:GetHandle(), self.m_handle, 2)
 		end
 	end
 
 	if self.isRemoteControlled
 		and self.limoClone
-		and not PED.IS_PED_IN_VEHICLE(Self:GetHandle(), self.limoClone, true) then
+		and not PED.IS_PED_IN_VEHICLE(LocalPlayer:GetHandle(), self.limoClone, true) then
 		if ENTITY.DOES_ENTITY_EXIST(self.limoClone)
-			and (self:GetPos():distance(Self:GetPos()) <= 5) then
+			and (self:GetPos():distance(LocalPlayer:GetPos()) <= 5) then
 			VEHICLE.BRING_VEHICLE_TO_HALT(self.limoClone, 1.0, 1, false)
-			TASK.CLEAR_PED_TASKS_IMMEDIATELY(Self:GetHandle())
-			PED.SET_PED_INTO_VEHICLE(Self:GetHandle(), self.limoClone, -1)
+			TASK.CLEAR_PED_TASKS_IMMEDIATELY(LocalPlayer:GetHandle())
+			PED.SET_PED_INTO_VEHICLE(LocalPlayer:GetHandle(), self.limoClone, -1)
 			VEHICLE.SET_VEHICLE_DOORS_SHUT(self.limoClone, true)
 		end
 
@@ -762,7 +762,7 @@ function PrivateLimo:StateEval()
 			yield()
 		end
 
-		TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), self.m_handle, 0)
+		TASK.TASK_LEAVE_VEHICLE(LocalPlayer:GetHandle(), self.m_handle, 0)
 	end
 
 	if (not self:IsIdle()) then

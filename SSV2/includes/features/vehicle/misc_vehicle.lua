@@ -111,7 +111,7 @@ function MiscVehicle:ShouldRun()
 	return (self.m_entity
 		and self.m_entity:IsValid()
 		and self.m_entity:IsAircraft()
-		and Self:IsDriving()
+		and LocalPlayer:IsDriving()
 	)
 end
 
@@ -123,7 +123,7 @@ end
 function MiscVehicle:ShootExplosiveMG(enemiesOnly, targetEntity, startPos, endPos, damage)
 	damage = damage or 1000.0
 	self.m_entity:ShootAtTarget(targetEntity, enemiesOnly)
-	Game.ShootBulletBetweenCoords(3800181289, startPos, endPos, damage, Self:GetHandle(), 300)
+	Game.ShootBulletBetweenCoords(3800181289, startPos, endPos, damage, LocalPlayer:GetHandle(), 300)
 end
 
 function MiscVehicle:UpdateMachineGuns()
@@ -132,7 +132,7 @@ function MiscVehicle:UpdateMachineGuns()
 		return
 	end
 
-	if (not Self:IsUsingAirctaftMG()) then
+	if (not LocalPlayer:IsUsingAirctaftMG()) then
 		return
 	end
 
@@ -140,7 +140,7 @@ function MiscVehicle:UpdateMachineGuns()
 	local handle                    = PV:GetHandle()
 	local manualAim                 = GVars.features.vehicle.aircraft_mg.manual_aim
 	local triggerbotRange           = GVars.features.vehicle.aircraft_mg.tiggerbot_range
-	local playerPos                 = Self:GetPos()
+	local playerPos                 = LocalPlayer:GetPos()
 	local rotation                  = manualAim and CAM.GET_GAMEPLAY_CAM_ROT(2) or PV:GetRotation(2)
 	local direction                 = rotation:to_direction()
 	local multiplier                = manualAim and 200 or triggerbotRange

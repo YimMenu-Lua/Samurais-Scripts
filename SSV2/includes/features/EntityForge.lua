@@ -61,11 +61,11 @@ function EntityForge:init()
 	end)
 
 	ThreadManager:RegisterLooped("SS_ENTITY_FORGE", function()
-		if (not instance.EntityGunEnabled or not WEAPON.IS_PED_ARMED(Self:GetHandle(), 4)) then
+		if (not instance.EntityGunEnabled or not WEAPON.IS_PED_ARMED(LocalPlayer:GetHandle(), 4)) then
 			return
 		end
 
-		PLAYER.DISABLE_PLAYER_FIRING(Self:GetPlayerID(), true)
+		PLAYER.DISABLE_PLAYER_FIRING(LocalPlayer:GetPlayerID(), true)
 		instance:EntityGun()
 	end)
 
@@ -85,12 +85,12 @@ end
 ---@return ForgeEntity
 function EntityForge:GetPlayerInstance()
 	local p = ForgeEntity.new(
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		"You",
 		-1, Enums.eEntityType.Ped,
 		255,
-		Self:GetPos(),
-		Self:GetRotation()
+		LocalPlayer:GetPos(),
+		LocalPlayer:GetRotation()
 	)
 	p.m_is_player = true
 	return p
@@ -130,7 +130,7 @@ function EntityForge:AddEntity(entity, isWorldEntity)
 	if (not self:FindEntity(entity.m_handle)) then
 		if (not entity.m_is_forged
 				and not entity.m_is_player
-				and entity.m_handle ~= Self:GetHandle()
+				and entity.m_handle ~= LocalPlayer:GetHandle()
 			) then
 			if (entity.m_type == Enums.eEntityType.Object) then
 				table.insert(self.SpawnedObjects, entity)
@@ -169,7 +169,7 @@ function EntityForge:RemoveEntityByHandle(handle)
 		end
 	end
 
-	if (handle == Self:GetHandle()) then
+	if (handle == LocalPlayer:GetHandle()) then
 		self.PlayerEntity = nil
 	end
 
@@ -184,7 +184,7 @@ function EntityForge:MoveEntityWithGun(entity, deltaTime)
 	local camRot        = CAM.GET_GAMEPLAY_CAM_ROT(2)
 	local camPos        = CAM.GET_GAMEPLAY_CAM_COORD()
 	local direction     = camRot:to_direction()
-	local selfPos       = Self:GetPos()
+	local selfPos       = LocalPlayer:GetPos()
 	local camHeading    = CAM.GET_GAMEPLAY_CAM_ROT(2).z
 	local entityHeading = ENTITY.GET_ENTITY_HEADING(entity.m_handle)
 	local headingDiff   = math.abs(camHeading - entityHeading)
@@ -293,14 +293,14 @@ end
 
 -- Grabs and manipulates world entities.
 function EntityForge:EntityGun()
-	if (not PLAYER.IS_PLAYER_FREE_AIMING(Self:GetPlayerID())) then
+	if (not PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetPlayerID())) then
 		if (self.GrabbedEntity) then
 			ENTITY.SET_ENTITY_COLLISION(self.GrabbedEntity.m_handle, true, true)
 		end
 		return
 	end
 
-	local aimedAtEntity = Self:GetEntityInCrosshairs(true)
+	local aimedAtEntity = LocalPlayer:GetEntityInCrosshairs(true)
 	local existing_entity
 
 	if (aimedAtEntity and (ENTITY.IS_ENTITY_DEAD(aimedAtEntity, false) or Backend:IsScriptEntity(aimedAtEntity))) then
@@ -431,7 +431,7 @@ function EntityForge:EntityGun()
 
 			if (PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 24)) then
 				self.GrabbedEntity     = existing_entity
-				local v_SelfPos        = Self:GetPos()
+				local v_SelfPos        = LocalPlayer:GetPos()
 				local v_EntityPos      = Game.GetEntityCoords(self.GrabbedEntity.m_handle, false)
 				self.EntityGunDistance = v_SelfPos:distance(v_EntityPos)
 
@@ -492,7 +492,7 @@ function EntityForge:EntityGun()
 			self:ResetEntityPosition(
 				world_entity,
 				ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-					Self:GetHandle(),
+					LocalPlayer:GetHandle(),
 					0,
 					5,
 					0
@@ -565,13 +565,13 @@ function EntityForge:CreateEntity(modelHash, name, entityType, coords, pedType, 
 			false,
 			true,
 			true,
-			Self:GetHeading()
+			LocalPlayer:GetHeading()
 		)
 	elseif (entityType == Enums.eEntityType.Vehicle) then
 		handle = Game.CreateVehicle(
 			modelHash,
 			spawnPos,
-			Self:GetHeading(-90),
+			LocalPlayer:GetHeading(-90),
 			true,
 			false
 		)
@@ -579,7 +579,7 @@ function EntityForge:CreateEntity(modelHash, name, entityType, coords, pedType, 
 		handle = Game.CreatePed(
 			modelHash,
 			spawnPos,
-			Self:GetHeading(-90),
+			LocalPlayer:GetHeading(-90),
 			true,
 			false
 		)
@@ -664,7 +664,7 @@ function EntityForge:SpawnSavedAbomination(abomination)
 					entityData.modelHash,
 					entityData.name,
 					entityData.type,
-					Self:GetOffsetInWorldCoords(
+					LocalPlayer:GetOffsetInWorldCoords(
 						math.random(1, 30),
 						math.random(1, 30),
 						-50
@@ -745,7 +745,7 @@ function EntityForge:SpawnSavedAbomination(abomination)
 		if (not rootEntity.m_is_player) then
 			Game.SetEntityCoords(
 				rootEntity.m_handle,
-				Self:GetOffsetInWorldCoords(1, 5, 0)
+				LocalPlayer:GetOffsetInWorldCoords(1, 5, 0)
 			)
 		end
 
@@ -839,7 +839,7 @@ function EntityForge:AttachEntity(child, parent, unk_bone, attachPos, attachRot)
 	local parent_handle
 
 	if (parent.m_is_player) then
-		parent_handle = Self:GetHandle()
+		parent_handle = LocalPlayer:GetHandle()
 	else
 		parent_handle = parent.m_handle
 	end
@@ -915,7 +915,7 @@ function EntityForge:MoveAttachment(attachment, x, y, z)
 	local boneIndex = 0
 
 	if (attachment.m_parent.m_is_player) then
-		parent_handle = Self:GetHandle()
+		parent_handle = LocalPlayer:GetHandle()
 	else
 		parent_handle = attachment.m_parent.m_handle
 	end
@@ -975,7 +975,7 @@ function EntityForge:RotateAttachment(attachment, x, y, z)
 	local boneIndex = 0
 
 	if (attachment.m_parent.m_is_player) then
-		parent_handle = Self:GetHandle()
+		parent_handle = LocalPlayer:GetHandle()
 	else
 		parent_handle = attachment.m_parent.m_handle
 	end
@@ -1119,7 +1119,7 @@ function EntityForge:DetachEntity(parent, child)
 		child.m_is_forged = false
 		self:AddEntity(child)
 
-		if (parent.m_handle ~= Self:GetHandle() and not parent.m_is_player) then
+		if (parent.m_handle ~= LocalPlayer:GetHandle() and not parent.m_is_player) then
 			if (self.currentParent ~= parent) then
 				parent.m_is_forged = false
 				self:AddEntity(parent)
@@ -1188,7 +1188,7 @@ function EntityForge:DetachAllEntities(parent)
 			end
 		end
 
-		if (parent.m_handle ~= Self:GetHandle() and not parent.m_is_player) then
+		if (parent.m_handle ~= LocalPlayer:GetHandle() and not parent.m_is_player) then
 			if (self.currentParent ~= parent) then
 				parent.m_is_forged = false
 				self:AddEntity(parent)
@@ -1255,7 +1255,7 @@ function EntityForge:ForceCleanup(reference)
 	end
 
 	for _, entity in pairs(reference) do
-		if (entity.m_handle and (entity.m_handle ~= Self:GetHandle()) and not entity.m_is_player) then
+		if (entity.m_handle and (entity.m_handle ~= LocalPlayer:GetHandle()) and not entity.m_is_player) then
 			self:UnregisterEntity(entity.m_handle)
 			ENTITY.DELETE_ENTITY(entity.m_handle)
 		end

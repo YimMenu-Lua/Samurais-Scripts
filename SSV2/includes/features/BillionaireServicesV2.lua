@@ -248,7 +248,7 @@ function BillionaireServices:GetClosestBodyguard()
 				allGuardDist,
 				{
 					guard = guard,
-					distance = guardPos:distance(Self:GetPos())
+					distance = guardPos:distance(LocalPlayer:GetPos())
 				}
 			)
 		end
@@ -267,7 +267,7 @@ end
 ---@param spawnPos? vec3
 function BillionaireServices:SpawnEscortGroup(t_Data, godMode, noRagdoll, spawnPos)
 	script.run_in_fiber(function()
-		if not Self:IsOutside() then
+		if not LocalPlayer:IsOutside() then
 			Notifier:ShowError(
 				"Samurai's Scripts",
 				"You can not summon an escort group indoors. Please go outside!"
@@ -275,7 +275,7 @@ function BillionaireServices:SpawnEscortGroup(t_Data, godMode, noRagdoll, spawnP
 			return
 		end
 
-		if Self:IsInWater() then
+		if LocalPlayer:IsInWater() then
 			Notifier:ShowError(
 				"Samurai's Scripts",
 				"You can not summon an escort group while swimming. Please go to a suitable location first!"
@@ -326,7 +326,7 @@ function BillionaireServices:RespawnEscortGroup(group, godMode, noRagdoll)
 		return
 	end
 
-	if not Self:IsOutside() then
+	if not LocalPlayer:IsOutside() then
 		Notifier:ShowError(
 			"Samurai's Scripts",
 			"Please go outside!"
@@ -337,7 +337,7 @@ function BillionaireServices:RespawnEscortGroup(group, godMode, noRagdoll)
 	script.run_in_fiber(function(s)
 		local t_Data = group:ToTable()
 		local spawnPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-			Self:GetHandle(),
+			LocalPlayer:GetHandle(),
 			math.random(-2, 2),
 			-10,
 			0.1
@@ -360,7 +360,7 @@ function BillionaireServices:GetEscortVehicleByHandle(vehicleHandle)
 end
 
 function BillionaireServices:IsPlayerInEscortVehicle()
-	local PV = Self:GetVehicle()
+	local PV = LocalPlayer:GetVehicle()
 	return (PV:IsValid() and self:GetEscortVehicleByHandle(PV:GetHandle()))
 end
 
@@ -406,7 +406,7 @@ end
 ---@param spawnPos? vec3
 function BillionaireServices:CallPrivateLimo(t_Data, spawnPos)
 	script.run_in_fiber(function()
-		if not Self:IsOutside() then
+		if not LocalPlayer:IsOutside() then
 			Notifier:ShowError(
 				"Samurai's Scripts",
 				"You can not call a limousine while staying indoors. Please go outside first!"
@@ -414,7 +414,7 @@ function BillionaireServices:CallPrivateLimo(t_Data, spawnPos)
 			return
 		end
 
-		if Self:IsInWater() then
+		if LocalPlayer:IsInWater() then
 			Notifier:ShowError(
 				"Samurai's Scripts",
 				"You can not call a limousine while swimming. Please go to a suitable location first!"
@@ -473,7 +473,7 @@ end
 ---@param godmode? boolean
 function BillionaireServices:CallPrivateHeli(model, godmode)
 	script.run_in_fiber(function(s)
-		if not Self:IsOutside() then
+		if not LocalPlayer:IsOutside() then
 			Notifier:ShowError(
 				"Samurai's Scripts",
 				"You can not call a helicopter while staying indoors. Please go outside first!"
@@ -481,8 +481,8 @@ function BillionaireServices:CallPrivateHeli(model, godmode)
 			return
 		end
 
-		local isInWater = Self:IsOnFoot() and Self:IsInWater() or Self:GetVehicle():IsBoat()
-		local spawnPos  = Self:GetOffsetInWorldCoords(0.0, 30.0, 50.0)
+		local isInWater = LocalPlayer:IsOnFoot() and LocalPlayer:IsInWater() or LocalPlayer:GetVehicle():IsBoat()
+		local spawnPos  = LocalPlayer:GetOffsetInWorldCoords(0.0, 30.0, 50.0)
 		local heli      = PrivateHeli.spawn(model, spawnPos, godmode)
 
 		if (not heli) then

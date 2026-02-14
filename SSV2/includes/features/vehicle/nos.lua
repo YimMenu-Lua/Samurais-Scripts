@@ -53,7 +53,7 @@ function NosMgr:ShouldRun()
 	return (self.m_entity
 		and self.m_entity:IsValid()
 		and self.m_entity:IsLandVehicle()
-		and Self:IsDriving()
+		and LocalPlayer:IsDriving()
 		and not self.m_entity:IsElectric())
 end
 
