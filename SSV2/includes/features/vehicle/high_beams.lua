@@ -32,7 +32,7 @@ function HighBeams:ShouldRun()
 		and self.m_entity:IsValid()
 		and self.m_entity:IsLandVehicle()
 		and self.m_entity:IsEngineOn()
-		and Self:IsDriving()
+		and LocalPlayer:IsDriving()
 		and GVars.features.vehicle.horn_beams
 		and not VEHICLE.GET_BOTH_VEHICLE_HEADLIGHTS_DAMAGED(self.m_entity:GetHandle()))
 end

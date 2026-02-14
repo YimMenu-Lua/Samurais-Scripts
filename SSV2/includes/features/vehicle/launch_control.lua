@@ -58,8 +58,8 @@ function LaunchControl:ShouldRun()
 	return self.m_entity
 		and self.m_entity:IsValid()
 		and self.m_entity:IsCar()
-		and Self:IsAlive()
-		and Self:IsDriving()
+		and LocalPlayer:IsAlive()
+		and LocalPlayer:IsDriving()
 		and (not GVars.features.vehicle.performance_only or self.m_entity:IsPerformanceCar())
 		and (GVars.features.vehicle.launch_control or GVars.features.vehicle.burble_tune)
 end
@@ -183,7 +183,7 @@ function LaunchControl:OnTick()
 		return
 	end
 
-	if (not Self:IsDriving()) then
+	if (not LocalPlayer:IsDriving()) then
 		sleep(250)
 		return
 	end

@@ -749,12 +749,17 @@ end
 --#region Wrappers
 
 ---@param text string
----@param opts? { scale: float, color?: Color, separator?: boolean }
+---@param opts? { scale: float, color?: Color, separator?: boolean, spacing?: boolean }
 function GUI:HeaderText(text, opts)
 	opts = opts or {}
+	if (opts.spacing) then
+		ImGui.Spacing()
+	end
+
 	if (opts.color) then
 		ImGui.PushStyleColor(ImGuiCol.Text, opts.color:AsFloat())
 	end
+
 	ImGui.SetWindowFontScale(opts.scale or 1.114)
 	if (opts.separator) then
 		ImGui.SeparatorText(text)
@@ -762,6 +767,7 @@ function GUI:HeaderText(text, opts)
 		ImGui.Text(text)
 	end
 	ImGui.SetWindowFontScale(1.0)
+
 	if (opts.color) then
 		ImGui.PopStyleColor()
 	end

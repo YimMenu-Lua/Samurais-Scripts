@@ -271,53 +271,66 @@ local RawBusinessData <const> = {
 	},
 	SellScripts = {
 		["gb_smuggler"] = { -- air
-			{
-				l = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1):GetValue() end)(),
-				o = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1):GetOffset(1) end)(),
-				v = 0
-			},
-			{
-				l = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2):GetValue() end)(),
-				o = (function() return SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2):GetOffset(1) end)(),
-				v = 1
-			},
+			autofinish = function()
+				local GBSMUG_OBJ1 = SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1)
+				local GBSMUG_OBJ2 = SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2)
+				local offset1     = GBSMUG_OBJ1:GetOffset(1)
+				local offset2     = GBSMUG_OBJ2:GetOffset(1)
+				GBSMUG_OBJ1:AsLocal():At(offset1):WriteInt(0)
+				GBSMUG_OBJ2:AsLocal():At(offset2):WriteInt(1)
+			end
 		},
 		["gb_gunrunning"] = {
-			{
-				l = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetValue() end)(),
-				o = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetOffset(1) end)(),
-				v = 1 -- this is always 1 anyway // observed using Arthur's scrDbg
-			},
-			{
-				l = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetValue() end)(),
-				o = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_2):GetOffset(1) end)(),
-				v = 1 -- amount delivered
-			},
-			{
-				l = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_1):GetValue() end)(),
-				o = (function() return SGSL:Get(SGSL.data.gb_gunrunning_sell_local_3):GetOffset(1) end)(),
-				v = 0 -- number of delivery vehicles
-			},
-			-- Local_1266.f_573 cancels the mission if set to 3
+			autofinish = function()
+				-- TODO: fix this. this is bad. seccess depends on mission type (iLocal_1266.f_1)
+				-- this just forces mission failure by setting the number of delivery vehicles to 0 (it only succeeds on type 16)
+				-- but since we set the amount delivered to non-zero, you get paid nonetheless.
+				-- there's also a side effect that could be used as an exploit but will be almost 100% bannable:
+				-- 		we can force mission subtype to 16 and always set delivered amount to num_vehs * 5. This would
+				-- 		guarantee a mission success everytime but the payment would end up being something nonsensical
+				-- 		like $10.5M on subtype 18 (the two semi-trucks mission) you get paid x10 what you should lol
+				--
+				-- Local_1266.f_573 cancels the mission if set to 3
+				local GBGR_LOCAL = SGSL:Get(SGSL.data.gb_gunrunning_sell_local):AsLocal()
+				local offset2    = SGSL:Get(SGSL.data.bunker_sell_amt_delivered):GetOffset(1)
+				local offset3    = SGSL:Get(SGSL.data.bunker_sell_num_vehs):GetOffset(1)
+				local vehicles   = GBGR_LOCAL:At(offset3):ReadInt()
+				local mission    = GBGR_LOCAL:At(1):ReadInt()
+				local num        = (mission == 16 or mission == 14) and 5 or 1 -- func_148()
+				GBGR_LOCAL:At(offset2):WriteInt(vehicles * num)
+				GBGR_LOCAL:At(offset3):WriteInt(0)
+			end
 		},
 		["gb_contraband_sell"] = {
-			{
-				l = (function() return SGSL:Get(SGSL.data.gb_contraband_sell_local):GetValue() end)(),
-				o = 1,
-				v = 99999
-			},
+			autofinish = function()
+				SGSL:Get(SGSL.data.gb_contraband_sell_local)
+					:AsLocal()
+					:At(1)
+					:WriteInt(99999)
+			end,
 		},
 		["gb_biker_contraband_sell"] = {
-			{
-				l = (function() return SGSL:Get(SGSL.data.gb_biker_contraband_sell_local):GetValue() end)(),
-				o = (function() return SGSL:Get(SGSL.data.gb_biker_contraband_sell_local):GetOffset(1) end)(),
-				v = 15
-			},
+			autofinish = function()
+				local GBBKR_OBJ   = SGSL:Get(SGSL.data.biker_deliveries_local)
+				local GBBKR_LOCAL = GBBKR_OBJ:AsLocal()
+				local deliveries  = GBBKR_OBJ:GetOffset(1)
+				local target      = SGSL:Get(SGSL.data.biker_required_deliveries_local):GetOffset(1)
+				local value       = GBBKR_LOCAL:At(target):ReadInt()
+				GBBKR_LOCAL:At(deliveries):WriteInt(value)
+			end,
 		},
 		["fm_content_acid_lab_sell"] = {
-			b = (function() return SGSL:Get(SGSL.data.acid_lab_sell_bitset):GetValue() end)(),
-			l = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetValue() end)(),
-			o = (function() return SGSL:Get(SGSL.data.acid_lab_sell_local):GetOffset(1) end)(),
+			autofinish = function()
+				local FMCAL_OBJ   = SGSL:Get(SGSL.data.acid_lab_sell_local)
+				local FMCAL_LOCAL = FMCAL_OBJ:AsLocal()
+				local offset      = FMCAL_OBJ:GetOffset(1)
+				SGSL:Get(SGSL.data.acid_lab_sell_bitset)
+					:AsLocal()
+					:At(1)
+					:At(0)
+					:SetBit(11)
+				FMCAL_LOCAL:At(offset):WriteInt(3) -- end reason
+			end
 		},
 	},
 	SellMissionTunables = {
@@ -477,6 +490,19 @@ local RawBusinessData <const> = {
 		{ name = "Weed",    vpu_tunable = "BB_BUSINESS_VALUE_WEED",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEED",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEED" },
 		{ name = "Fake ID", vpu_tunable = "BB_BUSINESS_VALUE_FORGED_DOCUMENTS", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_FORGED_DOCUMENTS", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_FORGED_DOCUMENTS" },
 		{ name = "Cash",    vpu_tunable = "BB_BUSINESS_VALUE_COUNTERFEIT_CASH", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COUNTERFEIT_CASH", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COUNTERFEIT_CASH" },
+	},
+	-- index + 59
+	VehicleWarehouses = {
+		{ gxt = "MP_WAREHOUSE_1",  coords = vec3:new(-631.693, -1778.812, 22.98) }, -- func_7938 case 60:
+		{ gxt = "MP_WAREHOUSE_2",  coords = vec3:new(1007.344, -1854.104, 30.055) },
+		{ gxt = "MP_WAREHOUSE_3",  coords = vec3:new(-72.690, -1820.721, 25.96) },
+		{ gxt = "MP_WAREHOUSE_4",  coords = vec3:new(36.290, -1283.851, 28.3) },
+		{ gxt = "MP_WAREHOUSE_5",  coords = vec3:new(1213.935, -1251.067, 35.34) },
+		{ gxt = "MP_WAREHOUSE_6",  coords = vec3:new(808.9337, -2226.6355, 30.5702) },
+		{ gxt = "MP_WAREHOUSE_7",  coords = vec3:new(1755.0826, -1652.7717, 113.9896) },
+		{ gxt = "MP_WAREHOUSE_8",  coords = vec3:new(144.163, -3006.28, 6.025) },
+		{ gxt = "MP_WAREHOUSE_9",  coords = vec3:new(-514.9109, -2200.7783, 8.504) },
+		{ gxt = "MP_WAREHOUSE_10", coords = vec3:new(-1157.2069, -2167.5227, 14.6173) },
 	},
 	-- index + 86
 	Offices = {

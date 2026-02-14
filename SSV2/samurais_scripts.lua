@@ -10,9 +10,7 @@
 local commandRegistry = require("includes.lib.commands")
 local Weapons         = require("includes.data.weapons")
 local weaponData      = require("includes.data.weapon_data")
-
-
-local weapons_map = {
+local weapons_map     = {
 	["GROUP_MELEE"]       = Weapons.Melee,
 	["GROUP_PISTOL"]      = Weapons.Pistols,
 	["GROUP_RIFLE"]       = Weapons.AssaultRifles,
@@ -29,14 +27,13 @@ local weapons_map = {
 
 local function populate_weapons()
 	for hash, data in pairs(weaponData) do
-		data.display_name = HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(data.gxt)
-		local group       = data.group
-		local cat         = weapons_map[group]
-		if (not cat) then
+		data.display_name  = Game.GetGXTLabel(data.gxt)
+		local weapon_group = weapons_map[data.group]
+		if (not weapon_group) then
 			goto continue
 		end
 
-		table.insert(cat, hash)
+		table.insert(weapon_group, hash)
 		table.insert(Weapons.All, hash)
 
 		::continue::
@@ -62,15 +59,15 @@ ThreadManager:Run(function()
 	populate_weapons()
 
 	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD8, function()
-		Self:GetVehicle():RamForward()
+		LocalPlayer:GetVehicle():RamForward()
 	end)
 
 	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD4, function()
-		Self:GetVehicle():RamLeft()
+		LocalPlayer:GetVehicle():RamLeft()
 	end)
 
 	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD6, function()
-		Self:GetVehicle():RamRight()
+		LocalPlayer:GetVehicle():RamRight()
 	end)
 
 	while not PatternScanner:IsDone() do
@@ -79,3 +76,5 @@ ThreadManager:Run(function()
 
 	Backend:debug("Script loaded in %.0fms", (os.clock() - start_time) * 1000)
 end)
+
+print(Game.GetGXTLabel("AWT_521"))

@@ -1,3 +1,5 @@
+# TODO: Improve diffs to look like actual diffs (colorama, ignore unchaged stuff, etc.)
+
 # Samurai's Scripts Script Global/Local Offset Updater
 #
 # Usage:
@@ -11,7 +13,7 @@
 
 import sys, importlib.util, subprocess
 
-for module in {"requests", "slpp"}:
+for module in { "requests", "slpp" }:
     if importlib.util.find_spec(module) is None:
         try:
             subprocess.check_call([sys.executable, "-m", "pip", "install", module])
@@ -20,7 +22,7 @@ for module in {"requests", "slpp"}:
             sys.exit(1)
 
 
-import os, re, requests
+import os, re, requests, difflib
 from argparse import ArgumentParser as ArgParser
 from pathlib import Path
 from slpp import slpp as Lua
@@ -210,38 +212,53 @@ def generate(offsets_table: list, version: int, local: bool, path: str):
                     ver["offsets"][i]["value"] = newv
 
 
-def main(auto: bool = True):
+def main():
     table_path = SCRIPT_ROOT / "SSV2/includes/data/globals_locals.lua"
     if not os.path.exists(table_path):
         print("Lookup file not found: globals_locals.lua")
         sys.exit(1)
 
     offsets_table = read_lua_table(table_path)
+    original_content = Path(table_path).read_text(encoding="utf-8")
+    diff_only = False
+
+    parser = ArgParser(description="Update offsets from local path or GitHub repository.")
+    parser.add_argument("--version", type=int, help="Choose game version. (0: Legacy | 1: Enhanced)")
+    parser.add_argument("--local", action="store_true", help="Read from local decompiled scripts")
+    parser.add_argument("--diff", action="store_true", help="Show diff only. Do not write Lua table.")
+    parser.add_argument("decomps_path", type=str, nargs="?", default="", help="Path to your local decompiled scripts")
+
+    args = parser.parse_args()
+    auto = args.version is None
+    diff_only = args.diff
 
     if auto:
         generate(offsets_table, 0, False, "")
         generate(offsets_table, 1, False, "")	
     else:
-        parser = ArgParser(description="Update offsets from local path or GitHub repository.")
-        parser.add_argument("--version", type=int, help="Choose game version. (0: Legacy | 1: Enhanced)")
-        parser.add_argument("--local", action="store_true", help="Read from local decompiled scripts")
-        parser.add_argument("--diff", action="store_true", help="Show diff only. Do not write Lua table.")
-        parser.add_argument("decomps_path", type=str, nargs="?", default="", help="Path to your local decompiled scripts")
-        args = parser.parse_args()
-        version = args.version or 0
-        local = args.local
-        path = args.decomps_path
-        generate(offsets_table, version, local, path)
-        if (args.diff):
-            return
+        generate(offsets_table, args.version, args.local, args.decomps_path)
     
-    data = serialize_lua(offsets_table)
+    new_data = serialize_lua(offsets_table)
+    new_content = SS_NOTICE + "return " + new_data + "\n"
+
+    if diff_only:
+        diff = difflib.unified_diff(
+            original_content.splitlines(),
+            new_content.splitlines(),
+            fromfile="before",
+            tofile="after",
+            lineterm=""
+        )
+        print("\n".join(diff))
+        return
+
+    if original_content == new_content:
+        print("No changes detected.")
+        return
+
     with open(table_path, "w", encoding="utf-8", newline="\n") as f:
-        f.write(SS_NOTICE)
-        f.write("return ")
-        f.write(data)
-        f.write("\n")
+        f.write(new_content)
 
 
 if __name__ == "__main__":
-    main(len(sys.argv) == 1)
+    main()

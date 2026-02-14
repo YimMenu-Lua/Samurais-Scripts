@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local PV                   = Self:GetVehicle()
+local PV                   = LocalPlayer:GetVehicle()
 local Stancer              = PV.m_stance_mgr
 local frontStanceDeltas    = Stancer.m_deltas[Stancer.eWheelSide.FRONT]
 local backStanceDeltas     = Stancer.m_deltas[Stancer.eWheelSide.BACK]

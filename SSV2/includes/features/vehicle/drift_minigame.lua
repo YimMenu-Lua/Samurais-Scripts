@@ -102,7 +102,7 @@ end
 
 ---@param points number
 function DriftMinigame:BankDriftPoints_SP(points)
-	local idx = sp_chars[Self:GetModelHash()]
+	local idx = sp_chars[LocalPlayer:GetModelHash()]
 	if (not idx) then
 		return
 	end
@@ -153,7 +153,7 @@ function DriftMinigame:OnTick()
 		return
 	end
 
-	if (self.m_is_active and not Self:IsDriving()) then
+	if (self.m_is_active and not LocalPlayer:IsDriving()) then
 		self:ResetStreak(true)
 		self.m_drift_time = 0
 		return
@@ -234,7 +234,7 @@ function DriftMinigame:OnTick()
 		local timer = Timer.new(5000)
 
 		while (not timer:is_done()) do
-			if not Self:IsDriving() then
+			if not LocalPlayer:IsDriving() then
 				self:ResetStreak(true)
 				return
 			end

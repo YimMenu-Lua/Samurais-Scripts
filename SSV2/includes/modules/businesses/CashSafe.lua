@@ -65,12 +65,12 @@ function CashSafe:IsPlayerNearby()
 		return false
 	end
 
-	local interior = Self:GetInterior()
+	local interior = LocalPlayer:GetInterior()
 	if (interior == 0) then
 		return false
 	end
 
-	return interior == self.m_interior_id and Self:GetRoomHash() == self.m_room_hash
+	return interior == self.m_interior_id and LocalPlayer:GetRoomHash() == self.m_room_hash
 end
 
 ---@return boolean
@@ -143,7 +143,7 @@ function CashSafe:Update()
 	ThreadManager:Run(function()
 		local currentSafeCash = self:GetCashValue()
 		local capacity        = self:GetCapacity()
-		local lastBalance     = Self:GetTotalBalance()
+		local lastBalance     = LocalPlayer:GetTotalBalance()
 		local collected       = false
 
 		while (self.cash_loop_enabled) do
@@ -174,10 +174,10 @@ function CashSafe:Update()
 				break
 			end
 
-			if (Self:GetTotalBalance() - lastBalance >= capacity) then
+			if (LocalPlayer:GetTotalBalance() - lastBalance >= capacity) then
 				collected = true
 				sleep(5000)
-				lastBalance = Self:GetTotalBalance()
+				lastBalance = LocalPlayer:GetTotalBalance()
 				collected   = false
 			end
 

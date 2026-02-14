@@ -111,7 +111,7 @@ local commandRegistry <const> = {
 	},
 	["clonepv"] = {
 		callback = function(args)
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			if not PV then
 				Notifier:ShowError("CommandExecutor", _T("GENERIC_NOT_IN_VEH"))
 				return
@@ -129,13 +129,13 @@ local commandRegistry <const> = {
 	},
 	["lockpv"] = {
 		callback = function(_)
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			if (not PV:IsValid()) then
 				return
 			end
 
 			local is_locked = PV:IsLocked()
-			Self:PlayKeyfobAnim()
+			LocalPlayer:PlayKeyfobAnim()
 			PV:LockDoors(not is_locked)
 			CommandExecutor:notify(_T(is_locked and "VEH_UNLOCKED" or "VEH_LOCKED"))
 		end,
@@ -145,7 +145,7 @@ local commandRegistry <const> = {
 	},
 	["savepv"] = {
 		callback = function(args)
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			if (not PV) then
 				Notifier:ShowError("CommandExecutor", _T("GENERIC_NOT_IN_VEH"))
 				return

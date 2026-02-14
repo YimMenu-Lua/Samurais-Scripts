@@ -115,7 +115,7 @@ function Factory:GetTimeLeftBeforeProd()
 	local offset_3   = g_obj:GetOffset(3)
 	local index_size = g_obj:GetOffset(4)
 	return g_obj:AsGlobal()
-		:At(Self:GetPlayerID(), pid_size)
+		:At(LocalPlayer:GetPlayerID(), pid_size)
 		:At(offset_2)
 		:At(offset_3)
 		:At(self.m_id, index_size)
@@ -140,15 +140,13 @@ function Factory:TriggerProduction()
 	local offset_3   = g_obj:GetOffset(3)
 	local index_size = g_obj:GetOffset(4)
 	local global     = g_obj:AsGlobal()
-		:At(Self:GetPlayerID(), pid_size)
+		:At(LocalPlayer:GetPlayerID(), pid_size)
 		:At(offset_2)
 		:At(offset_3)
 		:At(self.m_id, index_size)
 		:At(9)
 
 	if (global:ReadInt() < 1000) then
-		local name = self:GetNormalizedName() or self:GetName()
-		Notifier:ShowError(name, _T("YRV3_RESTOCK_ERR"))
 		return
 	end
 

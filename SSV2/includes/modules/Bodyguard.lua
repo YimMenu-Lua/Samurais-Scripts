@@ -106,12 +106,12 @@ Bodyguard.CombatAttributes = {
 ---@return Bodyguard?
 function Bodyguard.new(modelHash, name, spawnPos, weapon, godmode, noRagdoll, behavior)
 	if (not spawnPos) then
-		spawnPos = Self:GetOffsetInWorldCoords(0, 2, 0.1)
+		spawnPos = LocalPlayer:GetOffsetInWorldCoords(0, 2, 0.1)
 	end
 
 	behavior = behavior or 1
 
-	local ped = Ped:Create(modelHash, Enums.eEntityType.Ped, spawnPos, Self:GetHeading(-180), Game.IsOnline(),
+	local ped = Ped:Create(modelHash, Enums.eEntityType.Ped, spawnPos, LocalPlayer:GetHeading(-180), Game.IsOnline(),
 		false)
 	local handle = ped:GetHandle()
 	if (not Game.IsScriptHandle(handle)) then
@@ -282,7 +282,7 @@ function Bodyguard:IsInCombat()
 end
 
 function Bodyguard:IsFarAwayFromBoss()
-	local bossPos = Self:GetPos()
+	local bossPos = LocalPlayer:GetPos()
 	local guardPos = self:GetPos()
 
 	return guardPos:distance(bossPos) > 200
@@ -307,7 +307,7 @@ end
 
 ---@param ped integer
 function Bodyguard:IsPedFriendly(ped)
-	return ped == Self:GetHandle()
+	return ped == LocalPlayer:GetHandle()
 		or (PED.GET_RELATIONSHIP_BETWEEN_PEDS(self.m_handle, ped) <= 2
 			and PED.GET_RELATIONSHIP_BETWEEN_PEDS(ped, self.m_handle) <= 2
 		)
@@ -327,23 +327,23 @@ end
 ---@param pos? vec3
 ---@param allowInside? boolean
 function Bodyguard:Bring(pos, allowInside)
-	if (not Self:IsOutside() and not allowInside) then
+	if (not LocalPlayer:IsOutside() and not allowInside) then
 		return
 	end
 
-	if (PED.IS_PED_SITTING_IN_VEHICLE(self.m_handle, Self:GetVehicleNative())) then
+	if (PED.IS_PED_SITTING_IN_VEHICLE(self.m_handle, LocalPlayer:GetVehicleNative())) then
 		return
 	end
 
 	if (not pos) then
-		local yOffset = Self:IsOnFoot() and math.random(2, 4) or math.random(6, 8)
+		local yOffset = LocalPlayer:IsOnFoot() and math.random(2, 4) or math.random(6, 8)
 
 		if (self:GetVehicle()) then
 			yOffset = -yOffset
 		end
 
 		pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-			Self:GetHandle(),
+			LocalPlayer:GetHandle(),
 			0,
 			yOffset,
 			0.1
@@ -354,7 +354,7 @@ function Bodyguard:Bring(pos, allowInside)
 end
 
 function Bodyguard:WarpIntoPlayerVeh()
-	local PV = Self:GetVehicleNative()
+	local PV = LocalPlayer:GetVehicleNative()
 	if (PV == 0 or PED.IS_PED_SITTING_IN_VEHICLE(self.m_handle, PV)) then
 		return
 	end
@@ -376,7 +376,7 @@ function Bodyguard:UpdatePosition(allowInside)
 		return
 	end
 
-	if (PLAYER.IS_PLAYER_TELEPORT_ACTIVE() and not PLAYER.UPDATE_PLAYER_TELEPORT(Self:GetPlayerID())) then
+	if (PLAYER.IS_PLAYER_TELEPORT_ACTIVE() and not PLAYER.UPDATE_PLAYER_TELEPORT(LocalPlayer:GetPlayerID())) then
 		sleep(10)
 		return
 	end
@@ -386,7 +386,7 @@ function Bodyguard:UpdatePosition(allowInside)
 		return
 	end
 
-	local PV = Self:GetVehiclePlayerIsIn()
+	local PV = LocalPlayer:GetVehiclePlayerIsIn()
 	if (self:IsBodyguard() and self:IsOnFoot() and PV and PV:IsValid()) then
 		if (PV:IsAnySeatFree()) then
 			PV:WarpPed(self.m_handle, -2)
@@ -395,7 +395,7 @@ function Bodyguard:UpdatePosition(allowInside)
 		end
 	end
 
-	local playerElevation = Self:GetHeightAboveGround()
+	local playerElevation = LocalPlayer:GetHeightAboveGround()
 	if (PV:IsValid()) then
 		if (playerElevation >= 5 or playerElevation < 0) then
 			if (not PV:IsLandVehicle() and not PV:IsPedInVehicle(self.m_handle)) then
@@ -416,7 +416,7 @@ function Bodyguard:UpdatePosition(allowInside)
 			return
 		end
 
-		if (Self:IsInWater()) then
+		if (LocalPlayer:IsInWater()) then
 			self.task = eGuardTask.NONE
 
 			if self:IsBodyguard() then
@@ -433,7 +433,7 @@ function Bodyguard:UpdatePosition(allowInside)
 		end
 	end
 
-	if (not Self:IsOutside()) then
+	if (not LocalPlayer:IsOutside()) then
 		if (not allowInside or not self:IsOnFoot()) then
 			return
 		end
@@ -450,7 +450,7 @@ function Bodyguard:UpdatePosition(allowInside)
 	local vehicle = self:GetVehicle()
 	local handle = vehicle and vehicle:GetHandle() or 0
 	local pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		(handle == 0) and math.random(-3, 3) or -math.random(-6, 6),
 		(handle == 0) and -math.random(3, 6) or -math.random(6, 12),
 		0.1
@@ -463,7 +463,7 @@ function Bodyguard:UpdatePosition(allowInside)
 		entity = handle
 	end
 
-	ENTITY.SET_ENTITY_HEADING(entity, Self:GetHeading())
+	ENTITY.SET_ENTITY_HEADING(entity, LocalPlayer:GetHeading())
 	PED.SET_PED_COORDS_KEEP_VEHICLE(self.m_handle, pos.x, pos.y, pos.z)
 
 	if (self.task == eGuardTask.VEH_FOLLOW and vehicle and vehicle:IsValid() and PV:IsValid()) then
@@ -472,8 +472,8 @@ function Bodyguard:UpdatePosition(allowInside)
 end
 
 function Bodyguard:ShouldJackVehicle()
-	local PV = Self:GetVehiclePlayerIsIn()
-	return self:IsOnFoot() and not Self:IsOnFoot()
+	local PV = LocalPlayer:GetVehiclePlayerIsIn()
+	return self:IsOnFoot() and not LocalPlayer:IsOnFoot()
 		and (PV and not PV:IsAnySeatFree())
 		and (self.task ~= eGuardTask.JACK_VEHICLE)
 end
@@ -483,8 +483,8 @@ function Bodyguard:GrabNearestVehicle()
 		return
 	end
 
-	local PV = Self:GetVehiclePlayerIsIn()
-	if (PV and PV:IsValid() and Self:GetHeightAboveGround() >= 5) then
+	local PV = LocalPlayer:GetVehiclePlayerIsIn()
+	if (PV and PV:IsValid() and LocalPlayer:GetHeightAboveGround() >= 5) then
 		Notifier:ShowMessage(
 			"Samurai's Scripts",
 			"Some of your bodyguards have been dismissed because you're flying."
@@ -529,7 +529,7 @@ function Bodyguard:GrabNearestVehicle()
 
 		::search::
 		local guardPos = self:GetPos()
-		local potentialVehicle = Game.GetClosestVehicle(guardPos, 75, Self:GetVehicleNative(), true, 20.0)
+		local potentialVehicle = Game.GetClosestVehicle(guardPos, 75, LocalPlayer:GetVehicleNative(), true, 20.0)
 		local closestVehicle = 0
 
 		if IsSuitableVehicle(potentialVehicle) then
@@ -558,7 +558,7 @@ function Bodyguard:GrabNearestVehicle()
 				until roadNode:distance(self:GetPos()) <= 2.0
 
 				while (retries < maxRetries) and (closestVehicle == 0) do
-					closestVehicle = Game.GetClosestVehicle(self:GetPos(), 75, Self:GetVehicleNative(), true, 20.0)
+					closestVehicle = Game.GetClosestVehicle(self:GetPos(), 75, LocalPlayer:GetVehicleNative(), true, 20.0)
 
 					if (closestVehicle ~= 0) and IsSuitableVehicle(closestVehicle) then
 						break
@@ -621,7 +621,7 @@ function Bodyguard:GrabNearestVehicle()
 			end
 
 			self.task = eGuardTask.NONE
-			self:QueueTask(eGuardTask.VEH_FOLLOW, self:TaskVehicleEscort(Self:GetVehicleNative()))
+			self:QueueTask(eGuardTask.VEH_FOLLOW, self:TaskVehicleEscort(LocalPlayer:GetVehicleNative()))
 		end
 	end)
 end
@@ -760,7 +760,7 @@ function Bodyguard:UpdateTasks()
 	end
 
 	if (self.task == eGuardTask.COMBAT) then
-		if (not self:IsInCombat() or PED.IS_PED_IN_COMBAT(self.m_handle, Self:GetHandle())) then
+		if (not self:IsInCombat() or PED.IS_PED_IN_COMBAT(self.m_handle, LocalPlayer:GetHandle())) then
 			self:ClearCombatTask()
 
 			if (self:IsEscort() and self.escortGroup) then
@@ -784,7 +784,7 @@ function Bodyguard:UpdateTasks()
 			self.task = eGuardTask.NONE
 		end
 	elseif (self.task == eGuardTask.VEH_FOLLOW) then
-		if (self:IsOnFoot() or Self:IsOnFoot()) then
+		if (self:IsOnFoot() or LocalPlayer:IsOnFoot()) then
 			self.task = eGuardTask.NONE
 		end
 	elseif (self.task ~= eGuardTask.PRACHUTE) or (self.task ~= eGuardTask.RAPPELL_DOWN) then
@@ -905,8 +905,8 @@ function Bodyguard:StateEval()
 
 				if (veh and VEHICLE.GET_PED_IN_VEHICLE_SEAT(veh:GetHandle(), -1, true) == self.m_handle) then
 					self:ClearTasks()
-					if Self:IsDriving() then
-						self.escortTarget = Self:GetVehicleNative()
+					if LocalPlayer:IsDriving() then
+						self.escortTarget = LocalPlayer:GetVehicleNative()
 						self.task = eGuardTask.VEH_FOLLOW
 					end
 				end
@@ -914,14 +914,14 @@ function Bodyguard:StateEval()
 
 			if (self.task == eGuardTask.VEH_FOLLOW) then
 				local bgVeh = self:GetVehicle()
-				local PV = Self:GetVehiclePlayerIsIn()
+				local PV = LocalPlayer:GetVehiclePlayerIsIn()
 				if (not bgVeh or not bgVeh:IsValid()) then
 					self:Reset()
 				end
 
 				if (bgVeh and bgVeh:IsValid())
 					and (PV and PV:GetSpeed() >= 10)
-					and self:GetPos():distance(Self:GetPos()) >= 69
+					and self:GetPos():distance(LocalPlayer:GetPos()) >= 69
 					and ENTITY.GET_ENTITY_SPEED(bgVeh:GetHandle()) <= 3 then
 					Backend:debug(_F(
 						"%s's vehicle appears to be stuck. Attempting to reset...",
@@ -929,17 +929,17 @@ function Bodyguard:StateEval()
 					))
 
 					local pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-						Self:GetHandle(),
+						LocalPlayer:GetHandle(),
 						0,
 						-10,
 						0
 					)
 
-					ENTITY.SET_ENTITY_HEADING(bgVeh:GetHandle(), Self:GetHeading())
+					ENTITY.SET_ENTITY_HEADING(bgVeh:GetHandle(), LocalPlayer:GetHeading())
 					PED.SET_PED_COORDS_KEEP_VEHICLE(self.m_handle, pos.x, pos.y, pos.z)
 
 					local pvSpeed = PV:GetSpeed()
-					if (Self:IsDriving() and pvSpeed > 5) then
+					if (LocalPlayer:IsDriving() and pvSpeed > 5) then
 						VEHICLE.SET_VEHICLE_FORWARD_SPEED(bgVeh:GetHandle(), (pvSpeed - 5))
 					end
 				end
@@ -947,7 +947,7 @@ function Bodyguard:StateEval()
 
 			if self:IsEscort()
 				and ((self:GetVehicle():GetHandle() == 0) or self:IsOnFoot())
-				and not Self:IsOnFoot() then
+				and not LocalPlayer:IsOnFoot() then
 				Backend:debug("Escorts were glitching out of their vehicle. Attempting to reset...")
 				self:Reset()
 				TASK.TASK_WARP_PED_INTO_VEHICLE(self.m_handle, self.vehicle.handle, self.seatIndex)
@@ -976,7 +976,7 @@ function Bodyguard:TaskGoToEntity(entity)
 			return
 		end
 
-		entity = entity or Self:GetHandle()
+		entity = entity or LocalPlayer:GetHandle()
 
 		if not Game.IsScriptHandle(entity) then
 			self:ClearTasks()
@@ -1164,7 +1164,7 @@ function Bodyguard:TaskCombatEngage(target)
 		return
 	end
 
-	local playerPos = Self:GetPos()
+	local playerPos = LocalPlayer:GetPos()
 	TASK.TASK_SET_SPHERE_DEFENSIVE_AREA(self.m_handle, playerPos.x, playerPos.y, playerPos.z, 10)
 	TASK.OPEN_SEQUENCE_TASK(self.combatSequenceTaskID)
 	TASK.TASK_COMBAT_PED(self.m_handle, target, 0, 16)
@@ -1174,13 +1174,13 @@ function Bodyguard:TaskCombatEngage(target)
 end
 
 function Bodyguard:TickCombat()
-	if not Self:IsInCombat() then
+	if not LocalPlayer:IsInCombat() then
 		return
 	end
 
-	local target = PED.GET_MELEE_TARGET_FOR_PED(Self:GetHandle())
+	local target = PED.GET_MELEE_TARGET_FOR_PED(LocalPlayer:GetHandle())
 	if not target or not ENTITY.DOES_ENTITY_EXIST(target) then
-		target = PED.GET_PED_TARGET_FROM_COMBAT_PED(Self:GetHandle())
+		target = PED.GET_PED_TARGET_FROM_COMBAT_PED(LocalPlayer:GetHandle())
 	end
 
 	self:TaskCombatEngage(target)
@@ -1190,16 +1190,16 @@ end
 ---@param targetVehicle? integer
 function Bodyguard:TaskVehicleEscort(targetVehicle)
 	return function()
-		self.escortTarget = targetVehicle or Self:GetVehicleNative()
+		self.escortTarget = targetVehicle or LocalPlayer:GetVehicleNative()
 		self:SetTask(eGuardTask.VEH_FOLLOW)
 	end
 end
 
 ---@param s script_util
 function Bodyguard:TickVehicleEscort(s)
-	local PV = Self:GetVehiclePlayerIsIn()
+	local PV = LocalPlayer:GetVehiclePlayerIsIn()
 	if (self.task == eGuardTask.VEH_FOLLOW) then
-		if (Self:IsOnFoot()) then
+		if (LocalPlayer:IsOnFoot()) then
 			self.escortGroup:StopTheVehicle()
 			return
 		end
@@ -1255,8 +1255,8 @@ function Bodyguard:HandleVehicleTransitions()
 	end
 
 	local guardInVehicle = PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.m_handle)
-	local playerInVehicle = not Self:IsOnFoot()
-	local PV = Self:GetVehicle()
+	local playerInVehicle = not LocalPlayer:IsOnFoot()
+	local PV = LocalPlayer:GetVehicle()
 	if (not guardInVehicle) then
 		if (playerInVehicle and PV and PV:IsValid() and self.task ~= eGuardTask.ENTER_VEHICLE) then
 			if (PV:IsAnySeatFree()) then
@@ -1267,7 +1267,7 @@ function Bodyguard:HandleVehicleTransitions()
 		end
 	else
 		local gv = self:GetVehicle()
-		if (gv and gv:GetHandle() ~= Self:GetVehicleNative()) then
+		if (gv and gv:GetHandle() ~= LocalPlayer:GetVehicleNative()) then
 			if (playerInVehicle) then
 				if (not PV:IsLandVehicle()) then
 					return
@@ -1362,7 +1362,7 @@ function EscortVehicle:IsStuck()
 end
 
 function EscortVehicle:IsPlayerInEscortVehicle()
-	local playerVeh = Self:GetVehicleNative()
+	local playerVeh = LocalPlayer:GetVehicleNative()
 	return (playerVeh ~= 0 and self.handle == playerVeh)
 end
 
@@ -1407,7 +1407,7 @@ function EscortVehicle:Recover(lastCoords, passengers, lastHeading, groupName)
 
 	if not lastCoords then
 		lastCoords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-			Self:GetHandle(),
+			LocalPlayer:GetHandle(),
 			0,
 			-10,
 			1.0
@@ -1435,7 +1435,7 @@ function EscortVehicle:Recover(lastCoords, passengers, lastHeading, groupName)
 	for i = 1, #passengers do
 		local guard = passengers[i]
 
-		if (guard:GetHandle() ~= Self:GetHandle()) and not PED.IS_PED_A_PLAYER(guard:GetHandle()) then
+		if (guard:GetHandle() ~= LocalPlayer:GetHandle()) and not PED.IS_PED_A_PLAYER(guard:GetHandle()) then
 			PED.CLEAR_ALL_PED_VEHICLE_FORCED_SEAT_USAGE(guard:GetHandle())
 			PED.SET_PED_VEHICLE_FORCED_SEAT_USAGE(
 				guard:GetHandle(),
@@ -1463,7 +1463,7 @@ function EscortVehicle:Recover(lastCoords, passengers, lastHeading, groupName)
 	Game.SetBlipName(blip, blipName)
 	Game.SetEntityCoordsNoOffset(self.handle, lastCoords)
 
-	ENTITY.SET_ENTITY_HEADING(self.handle, lastHeading or Self:GetHeading())
+	ENTITY.SET_ENTITY_HEADING(self.handle, lastHeading or LocalPlayer:GetHeading())
 	ENTITY.FREEZE_ENTITY_POSITION(self.handle, false)
 	VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(self.handle, 5.0)
 	VEHICLE.SET_VEHICLE_ENGINE_ON(self.handle, true, true, false)
@@ -1544,7 +1544,7 @@ function EscortGroup:Spawn(t_Data, godMode, noRagdoll, spawnPos)
 
 	if not spawnPos then
 		spawnPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-			Self:GetHandle(),
+			LocalPlayer:GetHandle(),
 			0,
 			-10,
 			1.0
@@ -1615,7 +1615,7 @@ function EscortGroup:Spawn(t_Data, godMode, noRagdoll, spawnPos)
 	end
 
 	ENTITY.FREEZE_ENTITY_POSITION(escortVehicle.handle, false)
-	ENTITY.SET_ENTITY_HEADING(escortVehicle.handle, Self:GetHeading())
+	ENTITY.SET_ENTITY_HEADING(escortVehicle.handle, LocalPlayer:GetHeading())
 	Game.SetEntityCoordsNoOffset(escortVehicle.handle, spawnPos)
 	VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(escortVehicle.handle, 5.0)
 	VEHICLE.SET_VEHICLE_ENGINE_ON(escortVehicle.handle, true, true, false)
@@ -1712,7 +1712,7 @@ function EscortGroup:GetDriver()
 end
 
 function EscortGroup:Bring()
-	if not Self:IsOutside() then
+	if not LocalPlayer:IsOutside() then
 		Notifier:ShowError(
 			"Samurai's Scripts",
 			"You can not bring escort groups inside interiors."
@@ -1729,7 +1729,7 @@ function EscortGroup:Bring()
 			return
 		end
 
-		local pos = Self:GetOffsetInWorldCoords(
+		local pos = LocalPlayer:GetOffsetInWorldCoords(
 			math.random(-2, 2),
 			math.random(-12, -8),
 			0.1
@@ -1741,7 +1741,7 @@ end
 
 function EscortGroup:BringPlayer()
 	script.run_in_fiber(function()
-		if not Self:IsOutside() or not Self:IsOnFoot() then
+		if not LocalPlayer:IsOutside() or not LocalPlayer:IsOnFoot() then
 			Notifier:ShowError(
 				"Samurai's Scripts",
 				"You must be outside and standing on foot to teleport to your escort group."
@@ -1767,7 +1767,7 @@ function EscortGroup:BringPlayer()
 			height + 0.1
 		)
 
-		Game.SetEntityCoordsNoOffset(Self:GetHandle(), pos)
+		Game.SetEntityCoordsNoOffset(LocalPlayer:GetHandle(), pos)
 	end)
 end
 
@@ -2107,10 +2107,10 @@ function EscortGroup:Dismiss(s)
 				yield()
 			end
 
-			TASK.TASK_LEAVE_VEHICLE(Self:GetHandle(), self.vehicle.handle, 0)
+			TASK.TASK_LEAVE_VEHICLE(LocalPlayer:GetHandle(), self.vehicle.handle, 0)
 			repeat
 				s:sleep(100)
-			until not PED.IS_PED_IN_VEHICLE(Self:GetHandle(), self.vehicle.handle, false)
+			until not PED.IS_PED_IN_VEHICLE(LocalPlayer:GetHandle(), self.vehicle.handle, false)
 			s:sleep(2000)
 		end
 
@@ -2155,7 +2155,7 @@ function EscortGroup:BackgroundWorker(s, globalTick)
 		return
 	end
 
-	local playerInVehicle = PED.IS_PED_SITTING_IN_ANY_VEHICLE(Self:GetHandle())
+	local playerInVehicle = PED.IS_PED_SITTING_IN_ANY_VEHICLE(LocalPlayer:GetHandle())
 
 	if (not self:IsIdle()) then
 		if (self.task == Enums.eVehicleTask.GOTO and self.lastTaskCoords) then
@@ -2202,7 +2202,7 @@ function EscortGroup:BackgroundWorker(s, globalTick)
 						)
 					end
 				elseif (playerInVehicle) then
-					local veh = Self:GetVehicleNative()
+					local veh = LocalPlayer:GetVehicleNative()
 					if (escort:IsEscortDriver() and veh ~= self.vehicle.handle) then
 						escort:QueueTask(
 							escort.TASKS.VEH_FOLLOW,

@@ -10,7 +10,7 @@
 local FeatureBase = require("includes.modules.FeatureBase")
 
 ---@class SelfMisc : FeatureBase
----@field private m_entity Self
+---@field private m_entity LocalPlayer
 ---@field private m_active boolean
 ---@field private m_last_autoheal_update_time milliseconds
 ---@field public m_phone_anims_enabled boolean
@@ -31,7 +31,7 @@ SelfMisc.m_cell_input = {
 	Pair.new(181, 2),
 }
 
----@param ent Self
+---@param ent LocalPlayer
 ---@return SelfMisc
 function SelfMisc.new(ent)
 	local self = FeatureBase.new(ent)
@@ -46,7 +46,7 @@ function SelfMisc:Init()
 end
 
 function SelfMisc:ShouldRun()
-	return (Self:IsAlive()
+	return (LocalPlayer:IsAlive()
 		and not Backend:IsPlayerSwitchInProgress()
 		and not script.is_active("maintransition")
 	)
@@ -61,8 +61,8 @@ end
 ---@param flag_id ePedConfigFlags
 ---@param value boolean
 function SelfMisc:TogglePedConfigFlag(flag_id, value)
-	if (not Self:GetConfigFlag(flag_id, value)) then
-		Self:SetConfigFlag(flag_id, value)
+	if (not LocalPlayer:GetConfigFlag(flag_id, value)) then
+		LocalPlayer:SetConfigFlag(flag_id, value)
 	end
 end
 
@@ -75,11 +75,11 @@ function SelfMisc:AutoHeal()
 		return
 	end
 
-	local maxHp = Self:GetMaxHealth()
-	local hp = Self:GetHealth()
-	local maxArmr = Self:GetMaxArmour()
-	local armor = Self:GetArmour()
-	local handle = Self:GetHandle()
+	local maxHp = LocalPlayer:GetMaxHealth()
+	local hp = LocalPlayer:GetHealth()
+	local maxArmr = LocalPlayer:GetMaxArmour()
+	local armor = LocalPlayer:GetArmour()
+	local handle = LocalPlayer:GetHandle()
 
 	if (hp < maxHp and hp > 0) then
 		if (PED.IS_PED_IN_COVER(handle, false)) then
@@ -105,7 +105,7 @@ function SelfMisc:Crouch()
 		return
 	end
 
-	local playerHandle = Self:GetHandle()
+	local playerHandle = LocalPlayer:GetHandle()
 	TaskWait(Game.RequestClipSet, "move_ped_crouched")
 
 	self:HandsDown()
@@ -122,7 +122,7 @@ function SelfMisc:Uncrouch() -- is this even English?
 		return
 	end
 
-	local playerHandle = Self:GetHandle()
+	local playerHandle = LocalPlayer:GetHandle()
 	PED.RESET_PED_MOVEMENT_CLIPSET(playerHandle, 0.35)
 	PED.RESET_PED_STRAFE_CLIPSET(playerHandle)
 	PED.SET_PED_CAN_PLAY_AMBIENT_ANIMS(playerHandle, true)
@@ -138,7 +138,7 @@ function SelfMisc:UpdateCrouchAnim()
 
 	Backend:RegisterDisabledControl(36)
 
-	if (Self:IsOnFoot() and Self:CanCrouch() and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 36)) then
+	if (LocalPlayer:IsOnFoot() and LocalPlayer:CanCrouch() and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 36)) then
 		if (self.m_is_crouching) then
 			self:Uncrouch()
 		else
@@ -146,7 +146,7 @@ function SelfMisc:UpdateCrouchAnim()
 		end
 	end
 
-	if (self.m_is_crouching and not (Self:IsOnFoot() and Self:IsAlive())) then
+	if (self.m_is_crouching and not (LocalPlayer:IsOnFoot() and LocalPlayer:IsAlive())) then
 		self:Uncrouch()
 	end
 end
@@ -156,13 +156,13 @@ function SelfMisc:HandsDown()
 		return
 	end
 
-	Self:ClearTasks()
+	LocalPlayer:ClearTasks()
 	self.m_is_playing_hands_up_anim = false
 end
 
 function SelfMisc:HandsUp()
 	if (self.m_is_playing_hands_up_anim) then
-		Self:ClearTasks()
+		LocalPlayer:ClearTasks()
 		self.m_is_playing_hands_up_anim = false
 		return
 	end
@@ -170,7 +170,7 @@ function SelfMisc:HandsUp()
 	self:Uncrouch()
 	TaskWait(Game.RequestAnimDict, "mp_missheist_countrybank@lift_hands")
 	TASK.TASK_PLAY_ANIM(
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		"mp_missheist_countrybank@lift_hands",
 		"lift_hands_in_air_outro",
 		4.0,
@@ -189,11 +189,11 @@ function SelfMisc:UpdateHandsUpAnim()
 	if (GVars.features.self.hands_up) then
 		PAD.DISABLE_CONTROL_ACTION(0, 29, true)
 
-		if (Self:CanPutHandsUp() and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29)) then
+		if (LocalPlayer:CanPutHandsUp() and PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, 29)) then
 			self:HandsUp()
 		end
 
-		if (self.m_is_playing_hands_up_anim and not (Self:IsOnFoot() and Self:IsAlive())) then
+		if (self.m_is_playing_hands_up_anim and not (LocalPlayer:IsOnFoot() and LocalPlayer:IsAlive())) then
 			self.m_is_playing_hands_up_anim = false
 		end
 	end
@@ -207,7 +207,7 @@ function SelfMisc:UpdatePhoneGestures()
 		return
 	end
 
-	local playerHandle = Self:GetHandle()
+	local playerHandle = LocalPlayer:GetHandle()
 	local is_browsing_email = script.is_active("APPMPEMAIL")
 	if (AUDIO.IS_MOBILE_PHONE_CALL_ONGOING()) then
 		TaskWait(Game.RequestAnimDict, phone_anim_dict)
@@ -225,7 +225,7 @@ function SelfMisc:UpdatePhoneGestures()
 		TASK.TASK_STOP_PHONE_GESTURE_ANIMATION(playerHandle, 0.25)
 	end
 
-	if (Self:IsUsingPhone()) then
+	if (LocalPlayer:IsUsingPhone()) then
 		MOBILE.CELL_HORIZONTAL_MODE_TOGGLE(is_browsing_email)
 		for _, p in ipairs(self.m_cell_input) do
 			if PAD.IS_CONTROL_JUST_PRESSED(0, p.first) then
@@ -240,8 +240,8 @@ function SelfMisc:ResetMpPhoneAnims()
 		return
 	end
 
-	Self:ToggleMpPhoneAnims(false)
-	local playerHandle = Self:GetHandle()
+	LocalPlayer:ToggleMpPhoneAnims(false)
+	local playerHandle = LocalPlayer:GetHandle()
 	if (TASK.IS_PLAYING_PHONE_GESTURE_ANIM(playerHandle)) then
 		TASK.TASK_STOP_PHONE_GESTURE_ANIMATION(playerHandle, 0.25)
 	end
@@ -253,14 +253,14 @@ function SelfMisc:UpdateMpPhoneAnims()
 		return
 	end
 
-	if (not GVars.features.self.phone_anims or not Self:CanUsePhoneAnims()) then
+	if (not GVars.features.self.phone_anims or not LocalPlayer:CanUsePhoneAnims()) then
 		self:ResetMpPhoneAnims()
 		return
 	end
 
 	-- This looks like it should be inside the if statement below but it not really.
 	--The game resets the config flags back on certain conditions.
-	Self:ToggleMpPhoneAnims(true)
+	LocalPlayer:ToggleMpPhoneAnims(true)
 	if (not self.m_phone_anims_enabled) then
 		self.m_phone_anims_enabled = true
 	end
@@ -302,29 +302,29 @@ function SelfMisc:UpdateFlagBasedFeatures()
 		)
 	end
 
-	if (GVars.features.self.sprint_inside_interiors and not Self:IsOutside()) then
-		Self:SetPedResetFlag(Enums.ePedResetFlags.DisablePlayerJumping, false)
-		Self:SetPedResetFlag(Enums.ePedResetFlags.DisablePlayerVaulting, false)
-		Self:SetPedResetFlag(Enums.ePedResetFlags.DisablePlayerAutoVaulting, false)
-		Self:SetPedResetFlag(Enums.ePedResetFlags.UseInteriorCapsuleSettings, false)
-		PED.SET_PED_MAX_MOVE_BLEND_RATIO(Self:GetHandle(), 3)
+	if (GVars.features.self.sprint_inside_interiors and not LocalPlayer:IsOutside()) then
+		LocalPlayer:SetPedResetFlag(Enums.ePedResetFlags.DisablePlayerJumping, false)
+		LocalPlayer:SetPedResetFlag(Enums.ePedResetFlags.DisablePlayerVaulting, false)
+		LocalPlayer:SetPedResetFlag(Enums.ePedResetFlags.DisablePlayerAutoVaulting, false)
+		LocalPlayer:SetPedResetFlag(Enums.ePedResetFlags.UseInteriorCapsuleSettings, false)
+		PED.SET_PED_MAX_MOVE_BLEND_RATIO(LocalPlayer:GetHandle(), 3)
 	end
 
 	if (GVars.features.self.disable_action_mode) then
-		Self:SetPedResetFlag(Enums.ePedResetFlags.DisableActionMode, true)
+		LocalPlayer:SetPedResetFlag(Enums.ePedResetFlags.DisableActionMode, true)
 	end
 
 	if (GVars.features.self.allow_headprops_in_vehicles) then
-		Self:SetPedResetFlag(Enums.ePedResetFlags.AllowHeadPropInVehicle, true)
+		LocalPlayer:SetPedResetFlag(Enums.ePedResetFlags.AllowHeadPropInVehicle, true)
 	end
 
 	if (GVars.features.self.stand_on_veh_roof) then
-		Self:SetPedResetFlag(Enums.ePedResetFlags.BlockRagdollFromVehicleFallOff, true)
+		LocalPlayer:SetPedResetFlag(Enums.ePedResetFlags.BlockRagdollFromVehicleFallOff, true)
 	end
 end
 
 function SelfMisc:Update()
-	if (Self:IsRagdoll()) then
+	if (LocalPlayer:IsRagdoll()) then
 		self:Cleanup()
 		return
 	end

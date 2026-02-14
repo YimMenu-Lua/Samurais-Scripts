@@ -60,7 +60,7 @@ function ForgeEntity.new(handle, name, modelHash, entityType, alpha, coords, rot
 	instance.m_properties = {}
 	instance.m_alpha = alpha or 255
 	instance.m_is_attached = false
-	instance.m_is_player = handle == Self:GetHandle()
+	instance.m_is_player = handle == LocalPlayer:GetHandle()
 	instance.m_parent = {}
 	instance.m_children = {}
 	instance.m_position = coords

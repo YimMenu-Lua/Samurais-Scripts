@@ -73,7 +73,7 @@ function Carpool:ResetCachedData()
 end
 
 function Carpool:ShouldRun()
-	return (GVars.features.world.carpool and Self:IsOutside())
+	return (GVars.features.world.carpool and LocalPlayer:IsOutside())
 end
 
 function Carpool:OnDisable()
@@ -155,7 +155,7 @@ function Carpool:TogglePedConfig(toggle)
 				and entities.take_control_of(occupant, 200)
 				and ENTITY.IS_ENTITY_A_PED(occupant)
 				and not PED.IS_PED_A_PLAYER(occupant)
-				and not PED.IS_PED_GROUP_MEMBER(occupant, Self:GetGroupIndex())
+				and not PED.IS_PED_GROUP_MEMBER(occupant, LocalPlayer:GetGroupIndex())
 				and not Backend:IsScriptEntity(occupant)
 			) then
 			if (toggle) then
@@ -175,7 +175,7 @@ end
 
 function Carpool:FindVehicle()
 	if (self.m_vehicle and self.m_vehicle:IsValid()) then
-		if (Self:GetPos():distance(self.m_vehicle:GetPos()) >= 20) then -- in case vehicle drove away
+		if (LocalPlayer:GetPos():distance(self.m_vehicle:GetPos()) >= 20) then -- in case vehicle drove away
 			self:TogglePedConfig(false)
 			self:ResetCachedData()
 			self.m_vehicle = nil
@@ -184,7 +184,7 @@ function Carpool:FindVehicle()
 		return
 	end
 
-	if (Self:IsDriving()) then
+	if (LocalPlayer:IsDriving()) then
 		self:ResetCachedData()
 		self.m_vehicle = nil
 		return
@@ -196,7 +196,7 @@ function Carpool:FindVehicle()
 	end
 	self.m_last_check_time = now
 
-	local handle = Game.GetClosestVehicle(Self:GetHandle(), 15, Self:GetVehicleNative(), true, 3)
+	local handle = Game.GetClosestVehicle(LocalPlayer:GetHandle(), 15, LocalPlayer:GetVehicleNative(), true, 3)
 	if (not ENTITY.IS_ENTITY_A_VEHICLE(handle)) then
 		self:ResetCachedData()
 		self.m_vehicle = nil
@@ -236,7 +236,7 @@ function Carpool:OnExit()
 		return
 	end
 
-	if (not self.m_vehicle:IsPedInVehicle(Self:GetHandle()) or not self.m_vehicle:IsPedInVehicle(self.m_driver)) then
+	if (not self.m_vehicle:IsPedInVehicle(LocalPlayer:GetHandle()) or not self.m_vehicle:IsPedInVehicle(self.m_driver)) then
 		self:EmergencyStop()
 		self:TogglePedConfig(false)
 
@@ -323,7 +323,7 @@ function Carpool:Resume()
 end
 
 function Carpool:Update()
-	if (Self:IsOnFoot()) then
+	if (LocalPlayer:IsOnFoot()) then
 		if (not self.m_active or not self.m_vehicle or not self.m_vehicle:IsValid()) then
 			self:FindVehicle()
 		else
@@ -333,7 +333,7 @@ function Carpool:Update()
 		return
 	end
 
-	if (self.m_vehicle and self.m_vehicle:IsPedInVehicle(Self:GetHandle()) and not Self:IsDriving()) then
+	if (self.m_vehicle and self.m_vehicle:IsPedInVehicle(LocalPlayer:GetHandle()) and not LocalPlayer:IsDriving()) then
 		self.m_active = true
 		self.m_driver = self.m_vehicle:GetPedInSeat(-1, true)
 		self.cachedVehicleData.isConvertible = self.m_vehicle:IsConvertible()
@@ -361,7 +361,7 @@ function Carpool:OnTick()
 		if (not self.m_vehicle:IsValid()
 				or not ENTITY.DOES_ENTITY_EXIST(self.m_driver)
 				or (self.m_vehicle:GetPedInSeat(-1, true) ~= self.m_driver)
-				or not self.m_vehicle:IsPedInVehicle(Self:GetHandle())
+				or not self.m_vehicle:IsPedInVehicle(LocalPlayer:GetHandle())
 			) then
 			self:OnExit()
 			return
@@ -381,7 +381,7 @@ function Carpool:OnTick()
 					break
 				end
 
-				if (not self.m_vehicle:IsPedInVehicle(Self:GetHandle())) then
+				if (not self.m_vehicle:IsPedInVehicle(LocalPlayer:GetHandle())) then
 					break
 				end
 

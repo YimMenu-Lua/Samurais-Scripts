@@ -8,16 +8,21 @@
 
 
 ---@class HeistInfo
----@field name string
----@field coords vec3|nil
----@field blip integer BlipID
----@field stat { name: string, val: integer}
----@field optInfo? string
+---@field public name string
+---@field public get_coords fun(): vec3?
+---@field public blip integer BlipID
+---@field public stat { name: string, val: integer}
+---@field public optInfo? string
+
+---@class AgencyProperty
+---@field public name string
+---@field public coords vec3
 
 ---@alias HEIST_TYPES table<integer, HeistInfo>
 
 ---@class YimHeists
 ---@field private m_raw_data RawBusinessData
+---@field private m_properties { agency: AgencyProperty }
 ---@field m_tab Tab
 local YimHeists = { m_raw_data = require("includes.data.yrv3_data") }
 YimHeists.__index = YimHeists
@@ -25,8 +30,18 @@ YimHeists.__index = YimHeists
 ---@return YimHeists
 function YimHeists:init()
 	local instance = setmetatable({
-		m_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimHeists")
+		m_properties = {}
 	}, self)
+
+	if (Game.IsOnline()) then
+		ThreadManager:Run(function()
+			instance:ReadPropertyData()
+		end)
+	end
+
+	Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, function()
+		instance:ReadPropertyData()
+	end)
 
 	return instance
 end
@@ -39,26 +54,33 @@ function YimHeists:SkipPrep(statName, statVal, notifTitle)
 	Notifier:ShowSuccess(notifTitle, _T("YH_PREP_SKIP_NOTIF"))
 end
 
----@return vec3
-function YimHeists:GetAgencyLocation()
-	local property_index = stats.get_int("MPX_FIXER_HQ_OWNED")
-	if (not YRV3:IsPropertyIndexValid(property_index)) then
-		return
-	end
+function YimHeists:ReadPropertyData()
+	-- We can extend this with other required properties
+	-- like high-end apartments, etc.
 
-	local ref = self.m_raw_data.Agencies[property_index]
-	return ref.coords
+	local agency_idx = stats.get_int("MPX_FIXER_HQ_OWNED")
+	if (YRV3:IsPropertyIndexValid(agency_idx)) then
+		local ref = self.m_raw_data.Agencies[agency_idx]
+		self.m_properties.agency = {
+			name   = Game.GetGXTLabel(ref.gxt),
+			coords = ref.coords
+		}
+	end
 end
 
----@param where integer|vec3
----@param keepVehicle? boolean
-function YimHeists:Teleport(where, keepVehicle)
-	if not Self:IsOutside() then
-		Notifier:ShowError("YHV1", "Please go outside first!")
+---@return AgencyProperty?
+function YimHeists:GetAgencyProperty()
+	return self.m_properties.agency
+end
+
+---@return vec3?
+function YimHeists:GetAgencyLocation()
+	local agency = self:GetAgencyProperty()
+	if (not agency) then
 		return
 	end
 
-	Self:Teleport(where, keepVehicle)
+	return agency.coords
 end
 
 return YimHeists

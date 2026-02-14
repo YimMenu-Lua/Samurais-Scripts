@@ -32,7 +32,7 @@ flatbed_tab:RegisterGUI(function()
 	end
 
 	ImGui.Spacing()
-	if (not Self:GetVehicle().m_is_flatbed) then
+	if (not LocalPlayer:GetVehicle().m_is_flatbed) then
 		ImGui.TextWrapped(_T("FTLBD_GET_IN_MSG"))
 		if (GUI:Button(_T("GENERIC_SPAWN"))) then
 			Flatbed:Spawn()

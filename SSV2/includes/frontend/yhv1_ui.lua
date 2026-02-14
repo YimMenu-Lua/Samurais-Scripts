@@ -11,9 +11,20 @@ local YHV1 = require("includes.features.YimHeistsV1"):init()
 
 ---@type HEIST_TYPES
 local HEIST_TYPES = {
+	-- You can find all mission GXTs in freemode.c func_22395 and call Game.GetGXTLabel
+	-- to get the label for the currently selected game language.
+	--
+	-- To expand the UI further, we can grab all needed GXTs
+	-- then run a one time fiber at the bottom of this file to
+	-- get the text for all of them. This ensures all heist/setup mission names
+	-- are exactly how they appear in the game.
+	--
+	-- See bottom of yrv3_ui.lua for an example.
 	{
-		name = "Cluckin Bell",
-		coords = vec3:new(-1093.15, -807.14, 19.28),
+		name = "Cluckin Bell", -- AWT_1026
+		get_coords = function()
+			return vec3:new(-1093.15, -807.14, 19.28)
+		end,
 		blip = 871,
 		stat = {
 			name = "MPX_SALV23_INST_PROG",
@@ -21,8 +32,10 @@ local HEIST_TYPES = {
 		}
 	},
 	{
-		name = "KnoWay",
-		coords = vec3:new(42.82, -1599.19, 29.60),
+		name = "KnoWay", -- AWT_1109
+		get_coords = function()
+			return vec3:new(42.82, -1599.19, 29.60)
+		end,
 		blip = 76,
 		stat = {
 			name = "MPX_M25_AVI_MISSION_CURRENT",
@@ -31,7 +44,9 @@ local HEIST_TYPES = {
 	},
 	{
 		name = "Dr. Dre",
-		coords = YHV1:GetAgencyLocation(),
+		get_coords = function()
+			return YHV1:GetAgencyLocation()
+		end,
 		blip = 826,
 		stat = {
 			name = "MPX_FIXER_STORY_BS",
@@ -40,7 +55,9 @@ local HEIST_TYPES = {
 	},
 	{
 		name = "Oscar Guzman",
-		coords = vec3:new(2150.65, 4796.60, 41.17),
+		get_coords = function()
+			return vec3:new(2150.65, 4796.60, 41.17)
+		end,
 		blip = 903,
 		stat = {
 			name = "MPX_HACKER24_INST_BS",
@@ -54,18 +71,20 @@ local HEIST_TYPES = {
 -- TODO: Make this better
 local function drawBasicTab()
 	for i, heist in ipairs(HEIST_TYPES) do
-		ImGui.BeginDisabled(not heist.coords or not Game.IsValidCoords(heist.blip))
 		ImGui.PushID(i)
 		ImGui.BulletText(heist.name)
 
+		local location = heist.get_coords() or heist.blip
+		ImGui.BeginDisabled(not location)
 		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
-			YHV1:Teleport(heist.coords, false)
+			LocalPlayer:Teleport(location, false)
 		end
 
 		ImGui.SameLine()
 		if (GUI:Button(_T("GENERIC_SET_WAYPOINT"))) then
-			Game.SetWaypointCoords(heist.blip)
+			Game.SetWaypointCoords(location)
 		end
+		ImGui.EndDisabled()
 
 		ImGui.SameLine()
 
@@ -78,7 +97,6 @@ local function drawBasicTab()
 		end
 		ImGui.EndDisabled()
 		ImGui.PopID()
-		ImGui.EndDisabled()
 	end
 end
 
@@ -234,4 +252,4 @@ local function HeistUI()
 	end
 end
 
-YHV1.m_tab:RegisterGUI(HeistUI)
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimHeists", HeistUI)

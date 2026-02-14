@@ -36,7 +36,7 @@ function DriftMode:ShouldRun()
 		and self.m_entity:IsValid()
 		and self.m_entity:IsLandVehicle()
 		and self.m_entity:IsEngineOn()
-		and Self:IsDriving()
+		and LocalPlayer:IsDriving()
 		and GVars.features.vehicle.drift.enabled)
 end
 

@@ -7,10 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local SGSL = require("includes.services.SGSL")
+local SGSL                 = require("includes.services.SGSL")
+local RawBusinessData      = require("includes.data.yrv3_data")
 
 ---@enum eCasinoPrize
-Enums.eCasinoPrize = {
+Enums.eCasinoPrize         = {
 	VEHICLE  = 1,
 	MYSTERY  = 2,
 	CASH     = 3,
@@ -18,6 +19,7 @@ Enums.eCasinoPrize = {
 	RP       = 5,
 	DISCOUNT = 6,
 	CLOTHING = 7,
+	RANDOM   = 8,
 }
 
 local CasinoPrizes <const> = {
@@ -31,17 +33,20 @@ local CasinoPrizes <const> = {
 }
 
 ---@class CasinoPacino
----@field m_tab Tab
+---@field private m_arcade_prop { coords: vec3, gxt: string }
 ---@field protected m_thread Thread?
-local CasinoPacino = {}
-CasinoPacino.__index = CasinoPacino
+---@field protected m_initialized boolean
+local CasinoPacino         = {}
+CasinoPacino.__index       = CasinoPacino
 
 ---@return CasinoPacino
 function CasinoPacino:init()
-	local instance = setmetatable({
-		m_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Casino Pacino")
-	}, self)
+	if (self.m_initialized) then
+		return self
+	end
 
+	local instance = setmetatable({}, self)
+	instance.m_initialized = true
 	instance.m_thread = ThreadManager:RegisterLooped("SS_DUNK", function()
 		instance:Main()
 	end)
@@ -49,12 +54,27 @@ function CasinoPacino:init()
 	return instance
 end
 
+---@return boolean
 function CasinoPacino:CanAccess()
 	return (Backend:GetAPIVersion() == Enums.eAPIVersion.V1)
 		and Backend:IsUpToDate()
 		and Game.IsOnline()
 		and not script.is_active("maintransition")
 		and not NETWORK.NETWORK_IS_ACTIVITY_SESSION()
+end
+
+---@return { coords: vec3, gxt: string }?
+function CasinoPacino:GetOwnedArcade()
+	if (not self.m_arcade_prop) then
+		local arcade_idx = stats.get_int("MPX_ARCADE_OWNED")
+		local property = RawBusinessData.Arcades[arcade_idx]
+		if (not property) then
+			return
+		end
+		self.m_arcade_prop = property
+	end
+
+	return self.m_arcade_prop
 end
 
 ---@param prizeID eCasinoPrize
@@ -68,17 +88,22 @@ function CasinoPacino:GiveWheelPrize(prizeID)
 	local prize_wheel_win_state   = win_state_local:AsLocal()
 	local prize_wheel_prize       = win_state_local:GetOffset(1)
 	local prize_wheel_prize_state = SGSL:Get(SGSL.data.prize_wheel_prize_state):GetOffset(1)
-	local obj                     = CasinoPrizes[prizeID]
+	local idx                     = prizeID
+
+	if (prizeID == Enums.eCasinoPrize.RANDOM) then
+		math.randomseed(os.time() * 60)
+		idx = math.random(Enums.eCasinoPrize.VEHICLE, Enums.eCasinoPrize.CLOTHING)
+	end
+
+	local obj = CasinoPrizes[idx]
 	if (not obj) then
-		log.fdebug("Unknown prize ID selected: %d", prizeID)
+		log.fdebug("Unknown prize ID: %d", prizeID)
 		return
 	end
 
 
 	prize_wheel_win_state:At(prize_wheel_prize):WriteInt(obj.v)
 	prize_wheel_win_state:At(prize_wheel_prize_state):WriteInt(11)
-	-- locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize), obj.v)
-	-- locals.set_int("casino_lucky_wheel", (prize_wheel_win_state) + (prize_wheel_prize_state), 11)
 end
 
 ---@param card_index number
@@ -113,7 +138,7 @@ end
 
 function CasinoPacino:ForceDealerBust()
 	ThreadManager:Run(function(s)
-		local player_id                    = Self:GetPlayerID()
+		local player_id                    = LocalPlayer:GetPlayerID()
 		local bjc_obj                      = SGSL:Get(SGSL.data.blackjack_cards)
 		local btp_obj                      = SGSL:Get(SGSL.data.blackjack_table_players)
 		local blackjack_cards              = bjc_obj:GetValue()
@@ -133,7 +158,7 @@ function CasinoPacino:ForceDealerBust()
 		local giveupTimer = Timer.new(3e4)
 		local success     = true
 		Notifier:ShowMessage("Casino Pacino", _T("CP_BLACKJACK_SCRIPT_CONTROL"))
-		while (not Self:IsHostOfScript("blackjack")) do
+		while (not LocalPlayer:IsHostOfScript("blackjack")) do
 			if (giveupTimer:is_done()) then
 				success = false
 				break
@@ -217,7 +242,7 @@ function CasinoPacino:ForcePokerCards()
 		return
 	end
 
-	local player_id = Self:GetPlayerID()
+	local player_id = LocalPlayer:GetPlayerID()
 	while ((NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", -1, 0) ~= player_id)
 			and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 0, 0) ~= player_id)
 			and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 1, 0) ~= player_id)
@@ -279,7 +304,7 @@ function CasinoPacino:ForceRouletteWheel()
 		return
 	end
 
-	local player_id               = Self:GetPlayerID()
+	local player_id               = LocalPlayer:GetPlayerID()
 	local rmt_obj                 = SGSL:Get(SGSL.data.roulette_master_table)
 	local roulette_master_table   = rmt_obj:GetValue()
 	local roulette_outcomes_table = rmt_obj:GetOffset(1)
@@ -403,7 +428,7 @@ function CasinoPacino:GetBJDealerCard()
 	local blackjack_table              = locals.get_int("blackjack",
 		blackjack_table_players
 		+ 1
-		+ (Self:GetPlayerID() * blackjack_table_players_size)
+		+ (LocalPlayer:GetPlayerID() * blackjack_table_players_size)
 		+ 4
 	)
 
@@ -433,7 +458,9 @@ function CasinoPacino:SetCartAutoGrab()
 	if (fmmc_cg:ReadInt() == 3) then
 		fmmc_cg:WriteInt(4)
 	elseif (fmmc_cg:ReadInt() == 4) then
-		fmmc_cg:At(fmmc_cg_spd):WriteFloat(2.0)
+		if (fmmc_cg:At(fmmc_cg_spd):ReadFloat() < 2.0) then
+			fmmc_cg:At(fmmc_cg_spd):WriteFloat(2.0)
+		end
 	end
 end
 
@@ -466,8 +493,11 @@ function CasinoPacino:Main()
 	self:ForcePokerCards()
 	self:ForceRouletteWheel()
 	self:RigSlotMachine()
-	self:SetCartAutoGrab()
 	self:AutoPlaySlots()
+
+	if (script.is_active("fm_mission_controller")) then
+		self:SetCartAutoGrab()
+	end
 end
 
 return CasinoPacino

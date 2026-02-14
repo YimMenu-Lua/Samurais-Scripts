@@ -16,7 +16,7 @@ local engine_swap_index = 1
 local vehicleTab        = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
 local handlingEditorTab = vehicleTab:RegisterSubtab("SUBTAB_HANDLING_EDITOR", nil, nil, true)
 local optionWindowFlgs  = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove
-DriftMinigame           = Self:GetVehicle():AddFeature(driftMG)
+DriftMinigame           = LocalPlayer:GetVehicle():AddFeature(driftMG)
 
 ---@type WindowRequest
 local speedometerOptionsWindow
@@ -115,7 +115,7 @@ local function driftOptions()
 			onClick = function()
 				if (not GVars.features.vehicle.drift.smoke_fx.enabled) then
 					ThreadManager:Run(function()
-						Self:GetVehicle():RestoreTireSmoke()
+						LocalPlayer:GetVehicle():RestoreTireSmoke()
 					end)
 				end
 			end
@@ -158,24 +158,24 @@ end
 
 local function ToggleSubwoofer(toggle)
 	ThreadManager:Run(function()
-		if (not Self:IsDriving()) then
+		if (not LocalPlayer:IsDriving()) then
 			return
 		end
 
-		Self:GetVehicle():ToggleSubwoofer(toggle)
+		LocalPlayer:GetVehicle():ToggleSubwoofer(toggle)
 	end)
 end
 
 local function CloseDoors()
 	ThreadManager:Run(function(s)
 		s:sleep(100)
-		Self:GetVehicle():CloseDoors()
+		LocalPlayer:GetVehicle():CloseDoors()
 	end)
 end
 
 local function RestoreExhaustPops()
 	ThreadManager:Run(function()
-		Self:GetVehicle():RestoreExhaustPops()
+		LocalPlayer:GetVehicle():RestoreExhaustPops()
 	end)
 end
 
@@ -277,7 +277,7 @@ vehicleTab:AddBoolCommand("VEH_STRONG_WINDOWS",
 	nil,
 	function()
 		ThreadManager:Run(function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			if (not PV:IsValid()) then
 				return
 			end
@@ -294,7 +294,7 @@ vehicleTab:AddBoolCommand("VEH_STRONG_CRASH",
 	"features.vehicle.strong_crash",
 	nil,
 	function()
-		local PV = Self:GetVehicle()
+		local PV = LocalPlayer:GetVehicle()
 		PV:RestorePatch(PV.MemoryPatches.DeformMult)
 	end,
 	{ description = "VEH_STRONG_CRASH_TT" },
@@ -307,7 +307,7 @@ vehicleTab:AddBoolCommand("VEH_RGB_LIGHTS",
 	nil,
 	function()
 		ThreadManager:Run(function()
-			Self:GetVehicle():RestoreHeadlights()
+			LocalPlayer:GetVehicle():RestoreHeadlights()
 		end)
 	end,
 	{ description = "VEH_RGB_LIGHTS_TT" },
@@ -328,7 +328,7 @@ vehicleTab:AddBoolCommand("VEH_AUTO_LOCK",
 	"features.vehicle.auto_lock_doors",
 	nil,
 	function()
-		Self:GetVehicle():ResetGenericToggleable("autolockdoors")
+		LocalPlayer:GetVehicle():ResetGenericToggleable("autolockdoors")
 	end,
 	{ description = "VEH_AUTO_LOCK_TT" },
 	true,
@@ -349,7 +349,7 @@ vehicleTab:AddBoolCommand("VEH_IV_EXIT",
 	nil,
 	function()
 		ThreadManager:Run(function()
-			Self:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
+			LocalPlayer:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
 			if (not GVars.features.vehicle.no_wheel_recenter) then
 				Backend:RemoveDisabledControl(75)
 			end
@@ -475,7 +475,7 @@ vehicleTab:RegisterGUI(function()
 
 	if (GVars.features.vehicle.mines.enabled) then
 		if (ImGui.BeginCombo("Vehicle Mine Type", selected_mine_name or "Unselected")) then
-			for _, pair in pairs(Self:GetVehicle().mines) do
+			for _, pair in pairs(LocalPlayer:GetVehicle().mines) do
 				local selected = GVars.features.vehicle.mines.selected_type_hash == pair.second
 				if (ImGui.Selectable(pair.first, selected)) then
 					GVars.features.vehicle.mines.selected_type_hash = pair.second
@@ -520,7 +520,7 @@ vehicleTab:RegisterGUI(function()
 end)
 
 --#region Handling Editor
-for key, data in pairs(Self:GetVehicle().m_flag_registry) do
+for key, data in pairs(LocalPlayer:GetVehicle().m_flag_registry) do
 	handlingEditorTab:AddBoolCommand(
 		data.cb_label,
 		key,
@@ -562,7 +562,7 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 		return
 	end
 
-	if (not Self:GetVehicle().m_engine_swap_compatible) then
+	if (not LocalPlayer:GetVehicle().m_engine_swap_compatible) then
 		ImGui.Text(_T("GENERIC_CARS_ONLY"))
 		return
 	end
@@ -585,7 +585,7 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 	ImGui.BeginChild("##engine_s_btns", 0, swap_wnd_height)
 	if (GUI:Button(_T("GENERIC_CONFIRM"), { size = swap_btn_size })) then
 		ThreadManager:Run(function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			if (PV:GetModelHash() == joaat(Refs.engineSwaps[engine_swap_index].audioname)) then
 				Notifier:ShowError(_T("VEH_ENGINE_SWAP"), _T("VEH_ENGINE_SWAP_SAME_ERR"), false, 5)
 				return
@@ -634,7 +634,7 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 					AUDIO.SET_VEH_RADIO_STATION(PV:GetHandle(), "OFF")
 				end
 			end, function()
-				local PV = Self:GetVehicle()
+				local PV = LocalPlayer:GetVehicle()
 				PV:RestorePatch(PV.MemoryPatches.Acceleration)
 				AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(PV:GetHandle(),
 					vehicles.get_vehicle_display_name(PV:GetModelHash())
@@ -645,7 +645,7 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 
 	if (GUI:Button(_T("GENERIC_RESET"), { size = swap_btn_size })) then
 		ThreadManager:Run(function()
-			local PV = Self:GetVehicle()
+			local PV = LocalPlayer:GetVehicle()
 			PV:ResetGenericToggleable("engine_swap")
 		end)
 	end
@@ -658,7 +658,7 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 end, nil, true)
 
 vehicleTab:RegisterSubtab("SUBTAB_PAINTS", function()
-	if (Self:GetVehicle():GetHandle() == 0) then
+	if (LocalPlayer:GetVehicle():GetHandle() == 0) then
 		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
 		return
 	end

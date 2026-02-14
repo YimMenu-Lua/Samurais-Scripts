@@ -17,6 +17,7 @@ local data          = require("includes.data.sv23_data")
 ---@field private m_id integer
 ---@field private m_name string
 ---@field private m_safe CashSafe
+---@field private m_bring_veh_triggered boolean
 local SalvageYard   = setmetatable({}, BusinessFront)
 SalvageYard.__index = SalvageYard
 
@@ -205,7 +206,17 @@ function SalvageYard:GetSalvagePosixForLift(slot)
 	return stats.get_int(_F("MPX_SALVAGING_POSIX_LIFT%d", slot))
 end
 
+---@return boolean
+function SalvageYard:IsBringingTowMissionTarget()
+	return self.m_bring_veh_triggered == true
+end
+
 function SalvageYard:BringTowMissionTarget()
+	if (self.m_bring_veh_triggered) then
+		return
+	end
+
+	self.m_bring_veh_triggered = true
 	ThreadManager:Run(function()
 		-- This is low quality but works... kinda.
 		-- The proper way to do it it so check the mission flow bitset in fm_content_tow_truck_work
@@ -215,36 +226,41 @@ function SalvageYard:BringTowMissionTarget()
 		--
 
 		if (not self:IsTowMissionActive()) then
+			self.m_bring_veh_triggered = false
 			return
 		end
 
-		if (not Self:IsHostOfScript("fm_content_tow_truck_work")) then
+		if (not LocalPlayer:IsHostOfScript("fm_content_tow_truck_work")) then
 			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
+			self.m_bring_veh_triggered = false
 			return
 		end
 
-		local PV = Self:GetVehicle()
-		if (Self:IsOnFoot() or not PV:IsTowTruck()) then
+		local PV = LocalPlayer:GetVehicle()
+		if (LocalPlayer:IsOnFoot() or not PV:IsTowTruck()) then
 			Notifier:ShowError(_T("SY_SALVAGE_YARD"), _T("SY_NOT_IN_TOWTRUCK_ERR"))
+			self.m_bring_veh_triggered = false
 			return
 		end
 
 		local found, objective = Game.GetObjectiveBlipCoords()
 		if (not found or not objective or objective:is_zero()) then
 			Notifier:ShowError(_T("SY_SALVAGE_YARD"), _T("SY_TOW_OBJECTIVE_NOT_FOUND_ERR"))
+			self.m_bring_veh_triggered = false
 			return
 		end
 
 		local veh = Game.GetClosestVehicle(objective, 1, nil, true, 0)
 		if (veh == 0 or not ENTITY.IS_ENTITY_A_VEHICLE(veh)) then
 			Notifier:ShowError(_T("SY_SALVAGE_YARD"), _T("SY_TOW_VEH_NOT_FOUND_ERR"))
+			self.m_bring_veh_triggered = false
 			return
 		end
 
 		local towTruck  = PV:GetHandle()
-		local myHandle  = Self:GetHandle()
-		local myPos     = Self:GetPos()
-		local heading   = Self:GetHeading()
+		local myHandle  = LocalPlayer:GetHandle()
+		local myPos     = LocalPlayer:GetPos()
+		local heading   = LocalPlayer:GetHeading()
 		local bonePos   = PV:GetBonePosition("tow_mount_a")
 		local forward   = PV:GetForwardVector()
 		local offsetPos = vec3:new(
@@ -291,18 +307,21 @@ function SalvageYard:BringTowMissionTarget()
 		-- teleport to the salvage yard to complete the mission
 		---@diagnostic disable
 		local syPos = self:GetCoords()
-		if (Self:GetPos():distance(syPos) > 10) then
-			Self:Teleport(syPos, true)
+		if (LocalPlayer:GetPos():distance(syPos) > 10) then
+			LocalPlayer:Teleport(syPos, true)
 			---@diagnostic enable
 
 			sleep(2000)
-			if (Self:IsOutside() and not CAM.IS_SCREEN_FADING_OUT() and not CAM.IS_SCREEN_FADED_OUT() and not CAM.IS_SCREEN_FADING_IN()) then
+
+			if (LocalPlayer:IsOutside() and not CAM.IS_SCREEN_FADING_OUT() and not CAM.IS_SCREEN_FADED_OUT() and not CAM.IS_SCREEN_FADING_IN()) then
 				if (not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(veh, towTruck)) then
 					VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(veh, 5.0)
 					VEHICLE.SET_ATTACHED_VEHICLE_TO_TOW_TRUCK_ARM_(towTruck, veh)
 				end
 			end
 		end
+
+		self.m_bring_veh_triggered = false
 	end)
 end
 

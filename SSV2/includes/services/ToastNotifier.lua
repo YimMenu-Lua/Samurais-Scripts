@@ -703,10 +703,18 @@ function Notifier:DrawNotifications(start_pos)
 		window_pos.x = max_screen - self.m_window_width - 10
 	end
 
-	ImGui.SetNextWindowBgAlpha(0)
+	ImGui.SetNextWindowBgAlpha(0.55)
 	ImGui.SetNextWindowPos(window_pos.x, window_pos.y)
-	ImGui.SetNextWindowSize(window_size.x, window_size.y)
+
+	if (count <= 4) then
+		ImGui.SetNextWindowSize(window_size.x, window_size.y)
+	else
+		ImGui.SetNextWindowSize(window_size.x, math.min(700, GPointers.ScreenResolution.y * 0.65))
+	end
+
 	ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0)
+	ImGui.PushStyleVar(ImGuiStyleVar.ScrollbarSize, 9.0)
+	ImGui.PushStyleColor(ImGuiCol.ScrollbarBg, 0)
 	if (ImGui.Begin("##notif_center",
 			ImGuiWindowFlags.NoMove
 			| ImGuiWindowFlags.NoResize
@@ -797,7 +805,8 @@ function Notifier:DrawNotifications(start_pos)
 
 		ImGui.End()
 	end
-	ImGui.PopStyleVar()
+	ImGui.PopStyleVar(2)
+	ImGui.PopStyleColor()
 
 	if (self.m_should_draw and not GUI:IsOpen()) then
 		self:Close()

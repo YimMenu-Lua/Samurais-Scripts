@@ -66,7 +66,7 @@ setmetatable(BootVehicle, {
 })
 
 ---@class HideNSeek : FeatureBase
----@field private m_entity Self
+---@field private m_entity LocalPlayer
 ---@field private m_is_active boolean
 ---@field private m_was_spotted boolean
 ---@field private m_is_wanted boolean
@@ -99,7 +99,7 @@ end
 
 function HideNSeek:ShouldRun()
 	return GVars.features.world.hide_n_seek
-		and not Self:IsSwimming()
+		and not LocalPlayer:IsSwimming()
 		and not HUD.IS_PAUSE_MENU_ACTIVE()
 		and not NETWORK.NETWORK_IS_IN_MP_CUTSCENE()
 end
@@ -109,9 +109,9 @@ function HideNSeek:Cleanup()
 		return
 	end
 
-	local pedHandle = Self:GetHandle()
+	local pedHandle = LocalPlayer:GetHandle()
 	TASK.CLEAR_PED_TASKS(pedHandle)
-	PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(Self:GetPlayerID())
+	PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetPlayerID())
 	if (ENTITY.IS_ENTITY_ATTACHED(pedHandle)) then
 		ENTITY.DETACH_ENTITY(pedHandle, true, false)
 	end
@@ -133,16 +133,16 @@ function HideNSeek:IsActive()
 end
 
 function HideNSeek:HideInVehicle()
-	if (Self:IsOnFoot() or not self.m_is_wanted) then
+	if (LocalPlayer:IsOnFoot() or not self.m_is_wanted) then
 		return
 	end
 
-	local veh = Self:GetVehicleNative()
+	local veh = LocalPlayer:GetVehicleNative()
 	if (not VEHICLE.IS_THIS_MODEL_A_CAR(Game.GetEntityModel(veh))) then
 		return
 	end
 
-	local cond = not Self:IsDriving() or VEHICLE.IS_VEHICLE_STOPPED(veh)
+	local cond = not LocalPlayer:IsDriving() or VEHICLE.IS_VEHICLE_STOPPED(veh)
 	if (cond
 			and not PAD.IS_CONTROL_PRESSED(0, 71)
 			and not PAD.IS_CONTROL_PRESSED(0, 72)
@@ -154,7 +154,7 @@ function HideNSeek:HideInVehicle()
 			TaskWait(Game.RequestAnimDict, vehAnim.dict)
 
 			TASK.TASK_PLAY_ANIM(
-				Self:GetHandle(),
+				LocalPlayer:GetHandle(),
 				vehAnim.dict,
 				vehAnim.anim,
 				6.0,
@@ -168,7 +168,7 @@ function HideNSeek:HideInVehicle()
 			)
 
 			VEHICLE.SET_VEHICLE_IS_WANTED(veh, false)
-			if (Self:IsDriving()) then
+			if (LocalPlayer:IsDriving()) then
 				VEHICLE.SET_VEHICLE_ENGINE_ON(veh, false, false, true)
 			end
 
@@ -195,7 +195,7 @@ function HideNSeek:HideInTrash()
 			return
 		end
 
-		local pedHandle = Self:GetHandle()
+		local pedHandle = LocalPlayer:GetHandle()
 		YimActions:ResetPlayer()
 		TASK.TASK_TURN_PED_TO_FACE_ENTITY(pedHandle, self.m_trash_bin, 10)
 		CAM.DO_SCREEN_FADE_OUT(500)
@@ -279,7 +279,7 @@ function HideNSeek:HideInTrunk()
 		TaskWait(Game.RequestAnimDict, "rcmnigel3_trunk")
 		YimActions:ResetPlayer()
 
-		local pedHandle = Self:GetHandle()
+		local pedHandle = LocalPlayer:GetHandle()
 		if not ENTITY.HAS_ENTITY_CLEAR_LOS_TO_ENTITY_IN_FRONT(pedHandle, veh) then
 			TASK.TASK_TURN_PED_TO_FACE_ENTITY(pedHandle, veh, 0)
 			repeat
@@ -379,9 +379,9 @@ function HideNSeek:HideInTrunk()
 end
 
 function HideNSeek:IsNearCarTrunk()
-	if Self:IsOnFoot() and not YimActions:IsPedPlaying() then
-		local selfPos = Self:GetPos()
-		local selfFwd = Game.GetForwardVector(Self:GetHandle())
+	if LocalPlayer:IsOnFoot() and not YimActions:IsPedPlaying() then
+		local selfPos = LocalPlayer:GetPos()
+		local selfFwd = Game.GetForwardVector(LocalPlayer:GetHandle())
 		local fwdPos = vec3:new(selfPos.x + (selfFwd.x * 1.3), selfPos.y + (selfFwd.y * 1.3), selfPos.z)
 		local veh = Game.GetClosestVehicle(fwdPos, 20, nil, false, 2)
 
@@ -413,7 +413,7 @@ function HideNSeek:IsNearCarTrunk()
 					)
 
 				local search_area       = vec3:new(tempPos.x, tempPos.y, vehCoords.z)
-				if (search_area:distance(Self:GetPos()) <= 1.5) then
+				if (search_area:distance(LocalPlayer:GetPos()) <= 1.5) then
 					return true, veh, m_is_rear_engined
 				end
 			end
@@ -425,8 +425,8 @@ end
 
 function HideNSeek:IsNearTrashBin()
 	local binPos = vec3:zero()
-	local myCoords = Self:GetPos()
-	local myFwdVec = Self:GetForwardVector()
+	local myCoords = LocalPlayer:GetPos()
+	local myFwdVec = LocalPlayer:GetForwardVector()
 	local searchPos = vec3:new(
 		myCoords.x + myFwdVec.x * 1.2,
 		myCoords.y + myFwdVec.y * 1.2,
@@ -457,7 +457,7 @@ function HideNSeek:IsNearTrashBin()
 end
 
 function HideNSeek:WhileOnFoot()
-	if (self.m_is_active or not Self:IsOutside() or not Self:IsOnFoot()) then
+	if (self.m_is_active or not LocalPlayer:IsOutside() or not LocalPlayer:IsOnFoot()) then
 		return
 	end
 
@@ -480,14 +480,14 @@ function HideNSeek:WhileOnFoot()
 	end)
 
 	if (self.m_boot_vehicle.m_handle ~= 0) then
-		if (Self:GetPos():distance(Game.GetEntityCoords(self.m_boot_vehicle.m_handle, false)) >= 3.5) then
+		if (LocalPlayer:GetPos():distance(Game.GetEntityCoords(self.m_boot_vehicle.m_handle, false)) >= 3.5) then
 			self.m_boot_vehicle = BootVehicle()
 			return
 		end
 	end
 
 	if (self.m_trash_bin ~= 0) then
-		if Self:GetPos():distance(Game.GetEntityCoords(self.m_trash_bin, false)) > 2 then
+		if LocalPlayer:GetPos():distance(Game.GetEntityCoords(self.m_trash_bin, false)) > 2 then
 			self.m_trash_bin = 0
 			return
 		end
@@ -495,7 +495,7 @@ function HideNSeek:WhileOnFoot()
 end
 
 function HideNSeek:GetHidingContext()
-	if (Self:IsOnFoot()) then
+	if (LocalPlayer:IsOnFoot()) then
 		self:WhileOnFoot()
 
 		if (self.m_trash_bin ~= 0) then
@@ -512,31 +512,31 @@ function HideNSeek:WhileHiding()
 	local v_WantedCentrePos
 
 	if (self.m_is_active) then
-		if (not Self:IsAlive()) then
+		if (not LocalPlayer:IsAlive()) then
 			self:Cleanup()
 		end
 
-		if (self.m_context == eHNSContext.IN_VEHICLE and not ENTITY.DOES_ENTITY_EXIST(Self:GetVehicleNative())) then
+		if (self.m_context == eHNSContext.IN_VEHICLE and not ENTITY.DOES_ENTITY_EXIST(LocalPlayer:GetVehicleNative())) then
 			self:Cleanup()
-			Self:ClearTasks()
-			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(Self:GetPlayerID())
+			LocalPlayer:ClearTasks()
+			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetPlayerID())
 		end
 
 		if (self.m_context == eHNSContext.CAR_BOOT and not ENTITY.DOES_ENTITY_EXIST(self.m_boot_vehicle.m_handle)) then
 			self:Cleanup()
-			Self:ClearTasks()
-			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(Self:GetPlayerID())
+			LocalPlayer:ClearTasks()
+			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetPlayerID())
 		end
 
 		if (self.m_context == eHNSContext.TRASH and not ENTITY.DOES_ENTITY_EXIST(self.m_trash_bin)) then
 			self:Cleanup()
-			Self:ClearTasks()
-			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(Self:GetPlayerID())
+			LocalPlayer:ClearTasks()
+			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetPlayerID())
 		end
 
 		if (not v_WantedCentrePos) then
 			v_WantedCentrePos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-				Self:GetHandle(),
+				LocalPlayer:GetHandle(),
 				math.random(-200, 200),
 				math.random(-200, 200),
 				math.random(0, 20)
@@ -546,7 +546,7 @@ function HideNSeek:WhileHiding()
 		if (self.m_is_wanted and not self.m_was_spotted) then
 			PED.SET_COP_PERCEPTION_OVERRIDES(0.1, 0.1, 0.1, 1.0, 1.0, 1.0, 0.0)
 			---@diagnostic disable-next-line
-			PLAYER.SET_PLAYER_WANTED_CENTRE_POSITION(Self:GetPlayerID(), v_WantedCentrePos, true)
+			PLAYER.SET_PLAYER_WANTED_CENTRE_POSITION(LocalPlayer:GetPlayerID(), v_WantedCentrePos, true)
 		end
 
 		if (self.m_context == eHNSContext.IN_VEHICLE) then
@@ -557,7 +557,7 @@ function HideNSeek:WhileHiding()
 				)
 
 				self:Cleanup()
-				Self:ClearTasks()
+				LocalPlayer:ClearTasks()
 				return
 			end
 
@@ -570,9 +570,9 @@ function HideNSeek:WhileHiding()
 						or PAD.IS_CONTROL_PRESSED(0, 72))
 					and not HUD.IS_MP_TEXT_CHAT_TYPING()
 				) then
-				Self:ClearTasks()
-				if (Self:IsDriving()) then
-					VEHICLE.SET_VEHICLE_ENGINE_ON(Self:GetVehicleNative(), true, false, false)
+				LocalPlayer:ClearTasks()
+				if (LocalPlayer:IsDriving()) then
+					VEHICLE.SET_VEHICLE_ENGINE_ON(LocalPlayer:GetVehicleNative(), true, false, false)
 				end
 
 				self:Cleanup()
@@ -584,10 +584,10 @@ function HideNSeek:WhileHiding()
 			Game.ShowButtonPrompt("Press ~INPUT_PICKUP~ to get out.")
 
 			if (PAD.IS_CONTROL_JUST_PRESSED(0, 38)) then
-				local my_pos = Self:GetPos()
+				local my_pos = LocalPlayer:GetPos()
 				local groundZ = 0
 				local outPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-					Self:GetHandle(),
+					LocalPlayer:GetHandle(),
 					0,
 					self.m_boot_vehicle.m_is_rear_engined and 2 or -2,
 					0
@@ -608,10 +608,10 @@ function HideNSeek:WhileHiding()
 
 				VEHICLE.SET_VEHICLE_DOOR_OPEN(self.m_boot_vehicle.m_handle, 5, false, false)
 				sleep(500)
-				Self:ClearTasks()
-				ENTITY.DETACH_ENTITY(Self:GetHandle(), true, false)
+				LocalPlayer:ClearTasks()
+				ENTITY.DETACH_ENTITY(LocalPlayer:GetHandle(), true, false)
 				ENTITY.SET_ENTITY_COORDS(
-					Self:GetHandle(),
+					LocalPlayer:GetHandle(),
 					outPos.x,
 					outPos.y,
 					groundZ,
@@ -621,12 +621,12 @@ function HideNSeek:WhileHiding()
 					false
 				)
 
-				ENTITY.SET_ENTITY_HEADING(Self:GetHandle(), outHeading)
+				ENTITY.SET_ENTITY_HEADING(LocalPlayer:GetHandle(), outHeading)
 				VEHICLE.SET_VEHICLE_DOOR_SHUT(self.m_boot_vehicle.m_handle, 5, false)
 				sleep(200)
 
 				if ENTITY.GET_ENTITY_SPEED(self.m_boot_vehicle.m_handle) > 4.0 then
-					PED.SET_PED_TO_RAGDOLL(Self:GetHandle(), 1500, 0, 0, false, false, false)
+					PED.SET_PED_TO_RAGDOLL(LocalPlayer:GetHandle(), 1500, 0, 0, false, false, false)
 				end
 
 				self:Cleanup()
@@ -639,7 +639,7 @@ function HideNSeek:WhileHiding()
 			if PAD.IS_CONTROL_JUST_PRESSED(0, 38) then
 				CAM.DO_SCREEN_FADE_OUT(500)
 				sleep(1000)
-				local my_pos = Self:GetPos()
+				local my_pos = LocalPlayer:GetPos()
 				local groundZ = 0
 
 				_, groundZ = MISC.GET_GROUND_Z_FOR_3D_COORD(
@@ -651,13 +651,13 @@ function HideNSeek:WhileHiding()
 					false
 				)
 
-				ENTITY.DETACH_ENTITY(Self:GetHandle(), true, false)
-				ENTITY.SET_ENTITY_HEADING(Self:GetHandle(), Self:GetHeading(90))
-				Self:ClearTasks()
+				ENTITY.DETACH_ENTITY(LocalPlayer:GetHandle(), true, false)
+				ENTITY.SET_ENTITY_HEADING(LocalPlayer:GetHandle(), LocalPlayer:GetHeading(90))
+				LocalPlayer:ClearTasks()
 
-				local my_fwd = Self:GetForwardVector()
+				local my_fwd = LocalPlayer:GetForwardVector()
 				ENTITY.SET_ENTITY_COORDS(
-					Self:GetHandle(),
+					LocalPlayer:GetHandle(),
 					my_pos.x + (my_fwd.x * 1.3),
 					my_pos.y + (my_fwd.y * 1.3),
 					groundZ,
@@ -671,7 +671,7 @@ function HideNSeek:WhileHiding()
 
 				TaskWait(Game.RequestAnimDict, "move_m@_idles@shake_off")
 				TASK.TASK_PLAY_ANIM(
-					Self:GetHandle(),
+					LocalPlayer:GetHandle(),
 					"move_m@_idles@shake_off",
 					"shakeoff_1",
 					4.0,
@@ -699,8 +699,8 @@ function HideNSeek:OnTick()
 		return
 	end
 
-	self.m_is_wanted = PLAYER.GET_PLAYER_WANTED_LEVEL(Self:GetPlayerID()) > 0
-	self.m_was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(Self:GetPlayerID())
+	self.m_is_wanted = PLAYER.GET_PLAYER_WANTED_LEVEL(LocalPlayer:GetPlayerID()) > 0
+	self.m_was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(LocalPlayer:GetPlayerID())
 	if (not self.m_is_active) then
 		self:GetHidingContext()
 	else

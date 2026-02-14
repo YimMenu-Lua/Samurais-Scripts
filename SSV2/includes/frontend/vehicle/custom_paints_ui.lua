@@ -213,7 +213,7 @@ local function CustomPaintsUI()
 		if (not isPrimary and not isSecondary) then
 			Notifier:ShowError("Samurai's Scripts", _T("VEH_PAINT_NOT_SELECTED_ERR"))
 		else
-			Self:GetVehicle():SetCustomPaint(
+			LocalPlayer:GetVehicle():SetCustomPaint(
 				selected_paint.hex,
 				selected_paint.p,
 				selected_paint.m,

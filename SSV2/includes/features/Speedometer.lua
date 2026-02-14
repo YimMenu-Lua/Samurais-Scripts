@@ -48,7 +48,7 @@ Speedometer._state = {
 }
 
 function Speedometer:UpdateState()
-	self._state.PV = Self:GetVehicle()
+	self._state.PV = LocalPlayer:GetVehicle()
 	if (not self._state.PV) then
 		self._state.should_draw = false
 		return
@@ -79,9 +79,9 @@ function Speedometer:UpdateState()
 	self._state.LandingGearState = self._state.PV:GetLandingGearState()
 	self._state.should_draw      = (self._state.PV and self._state.PV:IsValid()
 		and self._state.IsEngineOn
-		and Self:IsDriving()
-		and not Self:IsUsingPhone()
-		and not Self:IsBrowsingApps()
+		and LocalPlayer:IsDriving()
+		and not LocalPlayer:IsUsingPhone()
+		and not LocalPlayer:IsBrowsingApps()
 		and not HUD.IS_PAUSE_MENU_ACTIVE()
 		and not CAM.IS_SCREEN_FADING_OUT()
 		and not CAM.IS_SCREEN_FADED_OUT()
@@ -484,7 +484,7 @@ end
 
 ---@param offset? float
 function Speedometer:Draw(offset)
-	if (not Self:IsDriving() or not GVars.features.speedometer.enabled) then
+	if (not LocalPlayer:IsDriving() or not GVars.features.speedometer.enabled) then
 		return
 	end
 

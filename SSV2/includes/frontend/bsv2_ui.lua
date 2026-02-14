@@ -918,7 +918,7 @@ local function DrawLimousineService()
 			ImGui.SeparatorText("Commands")
 			ImGui.Spacing()
 
-			ImGui.BeginDisabled(Self:GetVehicle():GetSpeed() <= 0.1 and limo:IsIdle())
+			ImGui.BeginDisabled(LocalPlayer:GetVehicle():GetSpeed() <= 0.1 and limo:IsIdle())
 			if ImGui.Button("Stop The Limo", v_ButtonSize.x, v_ButtonSize.y) then
 				GUI:PlaySound("Select")
 				ThreadManager:Run(function()
@@ -1220,7 +1220,7 @@ local function DrawHeliService()
 					heli.isPlayerRappelling)
 				if ImGui.Button("Rappell Down", v_ButtonSize.x, v_ButtonSize.y) then
 					ThreadManager:Run(function()
-						if Self:GetVehicleSeat() < 1 then
+						if LocalPlayer:GetVehicleSeat() < 1 then
 							GUI:PlaySound("Error")
 							Notifier:ShowError(
 								"Private Heli",
@@ -1232,7 +1232,7 @@ local function DrawHeliService()
 						end
 
 						GUI:PlaySound("Select")
-						TASK.TASK_RAPPEL_FROM_HELI(Self:GetHandle(), 5.0)
+						TASK.TASK_RAPPEL_FROM_HELI(LocalPlayer:GetHandle(), 5.0)
 					end)
 				end
 				ImGui.EndDisabled()

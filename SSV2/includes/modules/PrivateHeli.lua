@@ -45,7 +45,7 @@ function PrivateHeli.spawn(model, spawnPos, godmode)
 		model,
 		Enums.eEntityType.Vehicle,
 		vec3:zero(),
-		Self:GetHeading(-90),
+		LocalPlayer:GetHeading(-90),
 		Game.IsOnline(),
 		false
 	)
@@ -150,13 +150,13 @@ function PrivateHeli:IsPlayerInHeli()
 		return false
 	end
 
-	local PV = Self:GetVehicleNative()
+	local PV = LocalPlayer:GetVehicleNative()
 	return (PV ~= 0 and self.m_handle == PV)
 end
 
 function PrivateHeli:IsFarAwayFromBoss()
 	return not self:IsPlayerInHeli()
-		and Self:GetPos():distance(self:GetPos()) > 50
+		and LocalPlayer:GetPos():distance(self:GetPos()) > 50
 end
 
 function PrivateHeli:GetTaskAsString()
@@ -197,14 +197,14 @@ function PrivateHeli:WarpPlayer()
 			return
 		end
 		local seatIndex = VEHICLE.IS_VEHICLE_SEAT_FREE(self.m_handle, 2, true) and 2 or -2
-		Self:ClearTasksImmediately()
-		self:WarpPed(Self:GetHandle(), seatIndex)
+		LocalPlayer:ClearTasksImmediately()
+		self:WarpPed(LocalPlayer:GetHandle(), seatIndex)
 	end)
 end
 
 ---@param s script_util
 function PrivateHeli:Bring(s)
-	if not Self:IsOutside() then
+	if not LocalPlayer:IsOutside() then
 		Notifier:ShowError(
 			"Private Heli",
 			"You can not bring your private helicopter indoors."
@@ -212,7 +212,7 @@ function PrivateHeli:Bring(s)
 		return
 	end
 
-	local playerPos = Self:GetPos()
+	local playerPos = LocalPlayer:GetPos()
 	if (self.altitude < 3) then
 		if playerPos:distance(self:GetPos()) < 10 then
 			Notifier:ShowWarning(
@@ -224,13 +224,13 @@ function PrivateHeli:Bring(s)
 	end
 
 	local tpPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		0.0,
 		10.0,
 		20.0
 	)
 
-	Game.SetEntityHeading(self.m_handle, Self:GetHeading(-90))
+	Game.SetEntityHeading(self.m_handle, LocalPlayer:GetHeading(-90))
 	Game.SetEntityCoords(self.m_handle, tpPos, true, true, true, true)
 	s:sleep(100)
 	self:LandHere()
@@ -449,7 +449,7 @@ function PrivateHeli:StateEval()
 
 	if ENTITY.IS_ENTITY_IN_WATER(self.m_handle) then
 		local roadNode, roadHeading = Game.GetClosestVehicleNodeWithHeading(
-			Self:GetPos(),
+			LocalPlayer:GetPos(),
 			0
 		)
 
@@ -461,10 +461,10 @@ function PrivateHeli:StateEval()
 
 	if not self:IsIdle() then
 		if self.altitude >= 5 then
-			local parachuteState = PED.GET_PED_PARACHUTE_STATE(Self:GetHandle())
-			if PED.IS_PED_IN_PARACHUTE_FREE_FALL(Self:GetHandle())
+			local parachuteState = PED.GET_PED_PARACHUTE_STATE(LocalPlayer:GetHandle())
+			if PED.IS_PED_IN_PARACHUTE_FREE_FALL(LocalPlayer:GetHandle())
 				or parachuteState > 0
-				or Self:IsFalling() then
+				or LocalPlayer:IsFalling() then
 				self:PilotSpeak("GENERIC_SHOCKED_HIGH", "SPEECH_PARAMS_FORCE_HELI")
 				Notifier:ShowMessage(
 					"Private Heli",

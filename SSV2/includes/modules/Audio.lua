@@ -38,7 +38,7 @@ function Audio:ToggleEmitter(data, toggle, entity, station)
 		end
 
 		local newEmitter = StaticEmitter.new(data.name, data.default_station)
-		newEmitter:Enable(station, entity or Self:GetHandle())
+		newEmitter:Enable(station, entity or LocalPlayer:GetHandle())
 		self.m_active_emitters[data.name] = newEmitter
 	end)
 end
@@ -54,7 +54,7 @@ function Audio:BlastRadio(toggle, station)
 	self:ToggleEmitter(
 		self.StaticEmitters.radio_high,
 		toggle,
-		Self:GetHandle(),
+		LocalPlayer:GetHandle(),
 		station
 	)
 end

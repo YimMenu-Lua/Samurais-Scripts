@@ -59,7 +59,7 @@ end
 
 return function()
 	ImGui.SetWindowFontScale(1.17)
-	local charName      = Self:GetName()
+	local charName      = LocalPlayer:GetName()
 	local charNameWidth = ImGui.CalcTextSize(charName)
 	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetContentRegionAvail() - charNameWidth) * 0.5)
 	ImGui.Text(charName)

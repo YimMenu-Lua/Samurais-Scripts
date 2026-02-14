@@ -33,7 +33,7 @@ function VehMines:ShouldRun()
 	return (self.m_entity
 		and self.m_entity:IsValid()
 		and self.m_entity:IsLandVehicle()
-		and Self:IsDriving()
+		and LocalPlayer:IsDriving()
 		and GVars.features.vehicle.mines.enabled
 	)
 end
@@ -78,7 +78,7 @@ function VehMines:Update()
 			0.0,
 			false,
 			mine_hash,
-			Self:GetHandle(),
+			LocalPlayer:GetHandle(),
 			true,
 			false,
 			0.01

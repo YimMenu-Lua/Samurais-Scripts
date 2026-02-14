@@ -11,7 +11,7 @@ local FeatureBase            = require("includes.modules.FeatureBase")
 local World                  = require("includes.modules.World")
 
 ---@class LaserSights : FeatureBase
----@field private m_entity Self
+---@field private m_entity LocalPlayer
 ---@field private m_is_active boolean
 ---@field private m_color Color
 local LaserSights            = setmetatable({}, FeatureBase)
@@ -35,7 +35,7 @@ LaserSights.WeaponBoneNames  = {
 	"gun_muzzle"
 }
 
----@param entity Self
+---@param entity LocalPlayer
 ---@return LaserSights
 function LaserSights.new(entity)
 	local self = FeatureBase.new(entity)
@@ -49,7 +49,7 @@ function LaserSights:Init()
 		GVars.features.weapon.laser_sights.keybind,
 		function()
 			ThreadManager:Run(function()
-				if (not PLAYER.IS_PLAYER_FREE_AIMING(Self:GetPlayerID())) then
+				if (not PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetPlayerID())) then
 					return
 				end
 
@@ -68,10 +68,10 @@ end
 
 function LaserSights:ShouldRun()
 	return GVars.features.weapon.laser_sights.enabled
-		and Self:IsAlive()
-		and Self:IsOnFoot()
-		and WEAPON.IS_PED_ARMED(Self:GetHandle(), 4)
-		and PLAYER.IS_PLAYER_FREE_AIMING(Self:GetPlayerID())
+		and LocalPlayer:IsAlive()
+		and LocalPlayer:IsOnFoot()
+		and WEAPON.IS_PED_ARMED(LocalPlayer:GetHandle(), 4)
+		and PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetPlayerID())
 end
 
 ---@param startPos vec3
@@ -107,12 +107,12 @@ function LaserSights:DrawLaserBeam(startPos, endPos, r, g, b, a)
 end
 
 function LaserSights:Update()
-	local wpn_hash = Self:GetCurrentWeaponHash()
+	local wpn_hash = LocalPlayer:GetCurrentWeaponHash()
 	if (self.WeaponExclusions:Contains(wpn_hash)) then
 		return
 	end
 
-	local wpn_idx = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Self:GetHandle(), 0)
+	local wpn_idx = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(LocalPlayer:GetHandle(), 0)
 	local wpn_bone = 0
 	for _, bone in ipairs(self.WeaponBoneNames) do
 		local boneIndex = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(wpn_idx, bone)
@@ -132,7 +132,7 @@ function LaserSights:Update()
 		bone_pos.z + direction.z * GVars.features.weapon.laser_sights.ray_length
 	)
 
-	local hit, endCoords, _ = World:RayCast(bone_pos, destination, -1, Self:GetHandle())
+	local hit, endCoords, _ = World:RayCast(bone_pos, destination, -1, LocalPlayer:GetHandle())
 	local r, g, b, a = math.min(255, color.x * 255),
 		math.min(255, color.y * 255),
 		math.min(255, color.z * 255),

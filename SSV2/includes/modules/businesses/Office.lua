@@ -7,9 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BusinessFront   = require("includes.modules.businesses.BusinessFront")
-local Warehouse       = require("includes.modules.businesses.Warehouse")
-local RawBusinessData = require("includes.data.yrv3_data")
+local BusinessFront    = require("includes.modules.businesses.BusinessFront")
+local VehicleWarehouse = require("includes.modules.businesses.VehicleWarehouse")
+local Warehouse        = require("includes.modules.businesses.Warehouse")
+local RawBusinessData  = require("includes.data.yrv3_data")
+
 
 ---@class OfficeOpts : BusinessFrontOpts
 ---@field custom_name string
@@ -21,22 +23,49 @@ local RawBusinessData = require("includes.data.yrv3_data")
 ---@field private m_name string
 ---@field private m_custom_name string
 ---@field private m_subs array<Warehouse>
----@field public GetSubBusinesses fun(self: Office): array<Warehouse>
-local Office          = setmetatable({}, BusinessFront)
-Office.__index        = Office
+---@field private m_vehicle_warehouse? VehicleWarehouse
+local Office   = setmetatable({}, BusinessFront)
+Office.__index = Office
 
 ---@param opts OfficeOpts
 ---@return Office
 function Office.new(opts)
 	local base             = BusinessFront.new(opts)
+
+	---@type Office
+	---@diagnostic disable-next-line
 	local instance         = setmetatable(base, Office)
 	instance.m_custom_name = opts.custom_name
-	---@diagnostic disable-next-line
+	instance:CheckVehicleWarehouse()
 	return instance
 end
 
 function Office:Reset()
 	self:ResetImpl()
+end
+
+---@private
+function Office:CheckVehicleWarehouse()
+	local ie_wh_prop = stats.get_int("MPX_PROP_IE_WAREHOUSE")
+	if (ie_wh_prop == 0 or ie_wh_prop >= math.int32_max()) then
+		return
+	end
+
+	local idx = ie_wh_prop - 114
+	local ref = RawBusinessData.VehicleWarehouses[idx]
+	if (not ref) then
+		return
+	end
+
+	self.m_vehicle_warehouse = VehicleWarehouse.new(
+		Game.GetGXTLabel(ref.gxt),
+		ref.coords
+	)
+end
+
+---@return VehicleWarehouse?
+function Office:GetVehicleWarehouse()
+	return self.m_vehicle_warehouse
 end
 
 ---@return string
@@ -75,6 +104,10 @@ end
 ---@return integer
 function Office:GetEstimatedIncome()
 	local count = 0
+	if (self.m_vehicle_warehouse) then
+		count = count + self.m_vehicle_warehouse:GetEstimatedIncome()
+	end
+
 	for _, wh in ipairs(self.m_subs) do
 		count = count + wh:GetEstimatedIncome()
 	end
@@ -107,6 +140,10 @@ function Office:AddSubBusiness(index)
 end
 
 function Office:Update()
+	if (self.m_vehicle_warehouse) then
+		self.m_vehicle_warehouse:Update()
+	end
+
 	for _, wh in ipairs(self.m_subs) do
 		if (wh:IsValid() and type(wh.Update) == "function") then
 			wh:Update()

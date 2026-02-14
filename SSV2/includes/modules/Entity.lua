@@ -79,9 +79,9 @@ end
 -- Usage Example:
 --
 --```Lua
--- print(Self:Resolve().m_max_health:get_float()) -- -> 200.0 (Single Player Michael)
+-- print(LocalPlayer:Resolve().m_max_health:get_float()) -- -> 200.0 (Single Player Michael)
 --
--- local veh = Self:GetVehicle()
+-- local veh = LocalPlayer:GetVehicle()
 -- if (veh:IsValid()) then
 --      local cvehicle = veh:Resolve()
 --      print(cvehicle.m_max_health:get_float()) -- -> 1000.0
@@ -405,7 +405,7 @@ end
 -- Will be improved later.
 function Entity:GetSpawnPosInFront()
 	if not self:Exists() then
-		return Self and Self:GetOffsetInWorldCoords(0, 5, 0.1) or vec3:zero()
+		return LocalPlayer and LocalPlayer:GetOffsetInWorldCoords(0, 5, 0.1) or vec3:zero()
 	end
 
 	local min, max = self:GetModelDimensions()
