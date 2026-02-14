@@ -253,7 +253,8 @@ return {
 			offsets = {
 				{
 					value = 174,
-					capture_group = 2
+					capture_group = 2,
+					description = "expected deliveries."
 				},
 			}
 		},
@@ -264,7 +265,8 @@ return {
 			offsets = {
 				{
 					value = 174,
-					capture_group = 2
+					capture_group = 2,
+					description = "expected deliveries."
 				}
 			}
 		}
@@ -279,12 +281,9 @@ return {
 			offsets = {
 				{
 					value = 122,
-					capture_group = 2
+					capture_group = 2,
+					description = "number of deliveries made"
 				},
-				{
-					value = 174,
-					description = "number of deliveries"
-				}
 			}
 		},
 		ENHANCED = {
@@ -294,7 +293,8 @@ return {
 			offsets = {
 				{
 					value = 122,
-					capture_group = 2
+					capture_group = 2,
+					description = "number of deliveries made"
 				}
 			}
 		}
