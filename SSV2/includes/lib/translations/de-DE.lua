@@ -660,5 +660,8 @@ return {
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Legen Sie alle sekundären Ziele fest",
 	["YH_CAYO_TARGET_SECONDARY_C"] = "Sekundäres Ziel (Verbindung)",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "Ungültige Koordinaten!",
-	["YH_SUBMARINE_NOT_OWNED"] = "Kaufen Sie einen Kosatka, um Zugang zum Cayo Perico-Raub zu erhalten."
+	["YH_SUBMARINE_NOT_OWNED"] = "Kaufen Sie einen Kosatka, um Zugang zum Cayo Perico-Raub zu erhalten.",
+	["GENERIC_MINUTES_LABEL"] = "Minuten",
+	["GENERIC_HOURS_LABEL"] = "Std",
+	["GENERIC_MILLIS_LABEL"] = "Millisekunden"
 }

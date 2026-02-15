@@ -660,5 +660,8 @@ return {
 	["YH_CAYO_TARGET_SECONDARY_C"] = "Bersaglio secondario (composto)",
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Imposta tutti gli obiettivi secondari",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "Coordinate non valide!",
-	["YH_SUBMARINE_NOT_OWNED"] = "Acquista un Kosatka per accedere al colpo a Cayo Perico."
+	["YH_SUBMARINE_NOT_OWNED"] = "Acquista un Kosatka per accedere al colpo a Cayo Perico.",
+	["GENERIC_MINUTES_LABEL"] = "Minuti",
+	["GENERIC_HOURS_LABEL"] = "Ore",
+	["GENERIC_MILLIS_LABEL"] = "Millisecondi"
 }

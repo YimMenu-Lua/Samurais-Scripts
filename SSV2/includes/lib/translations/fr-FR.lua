@@ -660,5 +660,8 @@ return {
 	["YH_CAYO_WEAPONS"] = "Chargement d'armes",
 	["YH_CAYO_TARGET_PRIMARY"] = "Cible principale",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "Coordonnées invalides !",
-	["YH_SUBMARINE_NOT_OWNED"] = "Achetez un Kosatka pour accéder au Cayo Perico Heist."
+	["YH_SUBMARINE_NOT_OWNED"] = "Achetez un Kosatka pour accéder au Cayo Perico Heist.",
+	["GENERIC_HOURS_LABEL"] = "Heures",
+	["GENERIC_MILLIS_LABEL"] = "Millisecondes",
+	["GENERIC_MINUTES_LABEL"] = "Minutes"
 }

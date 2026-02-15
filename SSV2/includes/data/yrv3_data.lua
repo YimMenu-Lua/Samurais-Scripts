@@ -294,10 +294,10 @@ local RawBusinessData <const> = {
 				local GBGR_LOCAL = SGSL:Get(SGSL.data.gb_gunrunning_sell_local):AsLocal()
 				local offset2    = SGSL:Get(SGSL.data.bunker_sell_amt_delivered):GetOffset(1)
 				local offset3    = SGSL:Get(SGSL.data.bunker_sell_num_vehs):GetOffset(1)
-				local vehicles   = GBGR_LOCAL:At(offset3):ReadInt()
-				local mission    = GBGR_LOCAL:At(1):ReadInt()
-				local num        = (mission == 16 or mission == 14) and 5 or 1 -- func_148()
-				GBGR_LOCAL:At(offset2):WriteInt(vehicles * num)
+				-- local vehicles   = GBGR_LOCAL:At(offset3):ReadInt()
+				-- local mission    = GBGR_LOCAL:At(1):ReadInt()
+				-- local num        = (mission == 16 or mission == 14) and 5 or 1 -- func_148()
+				GBGR_LOCAL:At(offset2):WriteInt(1)
 				GBGR_LOCAL:At(offset3):WriteInt(0)
 			end
 		},
@@ -319,19 +319,19 @@ local RawBusinessData <const> = {
 				GBBKR_LOCAL:At(deliveries):WriteInt(value)
 			end,
 		},
-		["fm_content_acid_lab_sell"] = {
-			autofinish = function()
-				local FMCAL_OBJ   = SGSL:Get(SGSL.data.acid_lab_sell_local)
-				local FMCAL_LOCAL = FMCAL_OBJ:AsLocal()
-				local offset      = FMCAL_OBJ:GetOffset(1)
-				SGSL:Get(SGSL.data.acid_lab_sell_bitset)
-					:AsLocal()
-					:At(1)
-					:At(0)
-					:SetBit(11)
-				FMCAL_LOCAL:At(offset):WriteInt(3) -- end reason
-			end
-		},
+		-- ["fm_content_acid_lab_sell"] = {
+		-- 	autofinish = function()
+		-- 		local FMCAL_OBJ   = SGSL:Get(SGSL.data.acid_lab_sell_local)
+		-- 		local FMCAL_LOCAL = FMCAL_OBJ:AsLocal()
+		-- 		local offset      = FMCAL_OBJ:GetOffset(1)
+		-- 		SGSL:Get(SGSL.data.acid_lab_sell_bitset)
+		-- 			:AsLocal()
+		-- 			:At(1)
+		-- 			:At(0)
+		-- 			:SetBit(11)
+		-- 		FMCAL_LOCAL:At(offset):WriteInt(3) -- end reason
+		-- 	end
+		-- },
 	},
 	SellMissionTunables = {
 		["CEO"] = {

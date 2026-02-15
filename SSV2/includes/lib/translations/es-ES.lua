@@ -660,5 +660,8 @@ return {
 	["YH_CAYO_RESET_ALL"] = "Restablecer TODO el progreso",
 	["YH_CAYO_DIFFICULTY"] = "Modo difícil",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "¡Coordenadas no válidas!",
-	["YH_SUBMARINE_NOT_OWNED"] = "Compra un Kosatka para acceder al atraco a Cayo Perico."
+	["YH_SUBMARINE_NOT_OWNED"] = "Compra un Kosatka para acceder al atraco a Cayo Perico.",
+	["GENERIC_MINUTES_LABEL"] = "Minutos",
+	["GENERIC_MILLIS_LABEL"] = "Milisegundos",
+	["GENERIC_HOURS_LABEL"] = "Horas"
 }

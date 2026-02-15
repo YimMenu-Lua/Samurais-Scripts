@@ -58,35 +58,48 @@ function YimHeists:SkipPrep(statName, statVal, notifTitle)
 end
 
 function YimHeists:ReadPropertyData()
-	-- We can extend this with other required properties
-	-- like high-end apartments, etc.
+	ThreadManager:Run(function()
+		-- a better approach to this would be to read transition state.
+		-- I forgot how to do that so this will do.
+		while (script.is_active("maintransition")) do
+			yield()
+		end
 
-	local agency_idx = stats.get_int("MPX_FIXER_HQ_OWNED")
-	if (YRV3:IsPropertyIndexValid(agency_idx)) then
-		local ref = self.m_raw_data.Agencies[agency_idx]
-		self.m_properties.agency = {
-			name   = Game.GetGXTLabel(ref.gxt),
-			coords = ref.coords
-		}
-	end
+		if (not network.is_session_started()) then
+			-- player left online; bail out
+			return
+		end
 
-	local hangar_own = stats.get_int("MPX_MCKENZIE_HANGAR_OWNED")
-	if (hangar_own) then
-		local ref = self.m_raw_data.FieldHangar[1]
-		self.m_properties.hangar = {
-			name   = Game.GetGXTLabel(ref.gxt),
-			coords = ref.coords
-		}
-	end
+		local agency_idx = stats.get_int("MPX_FIXER_HQ_OWNED")
+		local agency_ref = self.m_raw_data.Agencies[agency_idx]
+		if (agency_ref) then
+			self.m_properties.agency = {
+				name   = Game.GetGXTLabel(agency_ref.gxt),
+				coords = agency_ref.coords
+			}
+		end
 
-	local sub_own = stats.get_int("MPX_IH_SUB_OWNED")
-	if (sub_own == joaat("kosatka")) then
-		self.m_properties.submarine = {
-			name   = Game.GetGXTLabel("CELL_SUBMARINE"),
-			-- TODO: I have no idea how to properly get the location of player Kosatka
-			coords = Game.Ensure3DCoords(760) or vec3:zero()
-		}
-	end
+		local hangar_idx = stats.get_int("MPX_MCKENZIE_HANGAR_OWNED")
+		if (YRV3:IsPropertyIndexValid(hangar_idx)) then
+			local hangar_ref = self.m_raw_data.FieldHangar[1]
+			self.m_properties.hangar = {
+				name   = Game.GetGXTLabel(hangar_ref.gxt),
+				coords = hangar_ref.coords
+			}
+		end
+
+		local sub_hash = stats.get_int("MPX_IH_SUB_OWNED")
+		if (sub_hash == joaat("kosatka")) then
+			self.m_properties.submarine = {
+				name   = Game.GetGXTLabel("CELL_SUBMARINE"),
+				-- TODO: I have no idea how to properly get the location of player Kosatka
+				--
+				-- It's an index in some global which also has offsets to show if its currently requested or not
+				-- I attempted to do the same for the acid lab truck but quickly got irritated
+				coords = Game.Ensure3DCoords(760) or vec3:zero()
+			}
+		end
+	end)
 end
 
 ---@return AgencyProperty?
