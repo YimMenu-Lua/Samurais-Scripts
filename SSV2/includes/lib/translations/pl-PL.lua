@@ -660,5 +660,8 @@ return {
 	["YH_CAYO_DIFFICULTY"] = "Tryb trudny",
 	["YH_CAYO_RESET_ALL"] = "Zresetuj WSZYSTKIE postępy",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "Nieprawidłowe współrzędne!",
-	["YH_SUBMARINE_NOT_OWNED"] = "Kup Kosatkę, aby uzyskać dostęp do napadu Cayo Perico."
+	["YH_SUBMARINE_NOT_OWNED"] = "Kup Kosatkę, aby uzyskać dostęp do napadu Cayo Perico.",
+	["GENERIC_MILLIS_LABEL"] = "milisekundy",
+	["GENERIC_MINUTES_LABEL"] = "Protokół",
+	["GENERIC_HOURS_LABEL"] = "Godziny"
 }

@@ -157,6 +157,10 @@ function Warehouse:AutoFill()
 	ThreadManager:Run(function()
 		while (self:IsValid() and self.auto_fill and not self:HasFullProduction()) do
 			self:ReStock()
+			if (not Game.IsOnline()) then
+				break
+			end
+
 			sleep(GVars.features.yrv3.autofill_delay or 300)
 		end
 

@@ -7,6 +7,56 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local timer_data <const> = {
+	{ label = "GENERIC_MILLIS_LABEL",  mult = 1 },
+	{ label = "GENERIC_SECONDS_LABEL", mult = 1e3 },
+	{ label = "GENERIC_MINUTES_LABEL", mult = 6e4 },
+}
+
+---@param v integer
+local function getTimeThreshold(v)
+	if (v < 1e3) then
+		return 1
+	elseif (v < 6e4) then
+		return 2
+	else
+		return 3
+	end
+end
+
+local function getStepForDelay(ms)
+	if (ms < 1e3) then
+		return 100
+	elseif (ms < 1e4) then
+		return 500
+	elseif (ms < 6e4) then
+		return 1000
+	else
+		return 10000
+	end
+end
+
+local function drawAutofillTimeSelector()
+	local delay        = GVars.features.yrv3.autofill_delay
+	local mode         = getTimeThreshold(delay)
+	local data         = timer_data[mode]
+	local v            = delay / data.mult
+	local step_ms      = getStepForDelay(delay)
+	local step         = step_ms / data.mult
+	local step_fast    = (step_ms * 5) / data.mult
+	local new_value, c = ImGui.InputFloat(
+		"##autofill_delay",
+		v,
+		step,
+		step_fast,
+		_F("%.1f %s", v, _T(data.label))
+	)
+
+	if (c) then
+		GVars.features.yrv3.autofill_delay = math.clamp(new_value * data.mult, 100, 6e5)
+	end
+end
+
 return function()
 	local __state        = YRV3:GetState()
 	local isReloading    = __state == Enums.eYRState.RELOADING
@@ -24,13 +74,14 @@ return function()
 		return
 	end
 
-	ImGui.SeparatorText(_T("YRV3_AUTO_SELL"))
+	GUI:HeaderText(_T("YRV3_AUTO_SELL"), { separator = true, spacing = true })
 	ImGui.TextWrapped(_T("YRV3_AUTO_SELL_SUPPORT_NOTICE"))
 	ImGui.BulletText(_T("YRV3_AUTOSELL_BUNKER_LABEL"))
 	ImGui.BulletText(_T("YRV3_AUTOSELL_HANGAR_LABEL"))
 	ImGui.BulletText(_T("YRV3_AUTOSELL_CEO_LABEL"))
 	ImGui.BulletText(_T("YRV3_AUTOSELL_BIKER_LABEL"))
 	ImGui.BulletText(_T("YRV3_AUTOSELL_LSD_LAB_LABEL"))
+
 	ImGui.Spacing()
 	local autoSellTriggered = YRV3:HasTriggeredAutoSell()
 	ImGui.BeginDisabled(autoSellTriggered)
@@ -59,15 +110,8 @@ return function()
 	end
 
 	ImGui.Text(_F(_T("YRV3_AUTOSELL_CURRENT"), YRV3:GetRunningSellScriptDisplayName()))
-	ImGui.SeparatorText(_T("YRV3_AUTO_FILL"))
+
+	GUI:HeaderText(_T("YRV3_AUTO_FILL"), { separator = true, spacing = true })
 	ImGui.Text(_T("YRV3_AUTO_FILL_DELAY"))
-	ImGui.SetNextItemWidth(280)
-	GVars.features.yrv3.autofill_delay, _ = ImGui.SliderFloat("##autofilldelay",
-		GVars.features.yrv3.autofill_delay,
-		100,
-		5000,
-		"%.0f ms"
-	)
-	ImGui.SameLine()
-	ImGui.Text(_F("%.1f %s", GVars.features.yrv3.autofill_delay / 1000, _T("GENERIC_SECONDS_LABEL")))
+	drawAutofillTimeSelector()
 end

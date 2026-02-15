@@ -660,5 +660,8 @@ return {
 	["YH_CAYO_RESET_ALL"] = "重置所有進度",
 	["YH_CAYO_WEAPONS"] = "武器裝載",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "座標無效！",
-	["YH_SUBMARINE_NOT_OWNED"] = "購買科薩特卡即可進入佩里科島搶劫。"
+	["YH_SUBMARINE_NOT_OWNED"] = "購買科薩特卡即可進入佩里科島搶劫。",
+	["GENERIC_MINUTES_LABEL"] = "分分鐘",
+	["GENERIC_HOURS_LABEL"] = "時間",
+	["GENERIC_MILLIS_LABEL"] = "毫秒"
 }

@@ -660,5 +660,8 @@ return {
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "すべてのセカンダリ ターゲットを設定する",
 	["YH_PREP_SKIP_NOTIF"] = "準備ミッションはすべてスキップされました。これで最後のミッションを開始できます。",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "無効な座標です!",
-	["YH_SUBMARINE_NOT_OWNED"] = "カヨ ペリコ強盗にアクセスするには、コサトカを購入してください。"
+	["YH_SUBMARINE_NOT_OWNED"] = "カヨ ペリコ強盗にアクセスするには、コサトカを購入してください。",
+	["GENERIC_MINUTES_LABEL"] = "分",
+	["GENERIC_HOURS_LABEL"] = "営業時間",
+	["GENERIC_MILLIS_LABEL"] = "ミリ秒"
 }

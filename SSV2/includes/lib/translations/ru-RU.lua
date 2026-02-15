@@ -660,5 +660,8 @@ return {
 	["YRV3_IE_VEH_COMMISSION"] = "Базовая комиссия",
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Установите все вторичные цели",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "Неверные координаты!",
-	["YH_SUBMARINE_NOT_OWNED"] = "Купите Косатку, чтобы получить доступ к ограблению Кайо Перико."
+	["YH_SUBMARINE_NOT_OWNED"] = "Купите Косатку, чтобы получить доступ к ограблению Кайо Перико.",
+	["GENERIC_MILLIS_LABEL"] = "Миллисекунды",
+	["GENERIC_MINUTES_LABEL"] = "Минуты",
+	["GENERIC_HOURS_LABEL"] = "Часы"
 }

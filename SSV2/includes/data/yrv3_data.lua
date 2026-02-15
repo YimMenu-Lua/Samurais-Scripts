@@ -294,10 +294,10 @@ local RawBusinessData <const> = {
 				local GBGR_LOCAL = SGSL:Get(SGSL.data.gb_gunrunning_sell_local):AsLocal()
 				local offset2    = SGSL:Get(SGSL.data.bunker_sell_amt_delivered):GetOffset(1)
 				local offset3    = SGSL:Get(SGSL.data.bunker_sell_num_vehs):GetOffset(1)
-				local vehicles   = GBGR_LOCAL:At(offset3):ReadInt()
-				local mission    = GBGR_LOCAL:At(1):ReadInt()
-				local num        = (mission == 16 or mission == 14) and 5 or 1 -- func_148()
-				GBGR_LOCAL:At(offset2):WriteInt(vehicles * num)
+				-- local vehicles   = GBGR_LOCAL:At(offset3):ReadInt()
+				-- local mission    = GBGR_LOCAL:At(1):ReadInt()
+				-- local num        = (mission == 16 or mission == 14) and 5 or 1 -- func_148()
+				GBGR_LOCAL:At(offset2):WriteInt(1)
 				GBGR_LOCAL:At(offset3):WriteInt(0)
 			end
 		},
