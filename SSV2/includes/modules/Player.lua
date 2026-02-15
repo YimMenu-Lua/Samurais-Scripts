@@ -33,10 +33,10 @@ function Player.new(player_id)
 
 	local ped_handle = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
 	---@type Player
+	---@diagnostic disable-next-line: assign-type-mismatch
 	local instance = setmetatable({
 		m_pid = player_id,
 		m_handle = ped_handle,
-		---@diagnostic disable-next-line: param-type-mismatch
 	}, Player)
 
 	instance.m_internal = instance:Resolve()

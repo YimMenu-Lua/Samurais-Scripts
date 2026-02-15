@@ -480,9 +480,7 @@ function Backend:RegisterHandlers()
 				PAD.DISABLE_CONTROL_ACTION(0, control, true)
 			end
 		end)
-	end
 
-	if (self:GetAPIVersion() == Enums.eAPIVersion.V1) then
 		ThreadManager:RegisterLooped("SS_BACKEND", function()
 			self:OnPlayerSwitch()
 			self:OnSessionSwitch()

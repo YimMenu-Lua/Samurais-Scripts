@@ -42,15 +42,12 @@ local function drawGamblingTab()
 		GVars.features.dunk.set_dealers_poker_cards
 	)
 
-	-- TODO: Fix crashing on Enhanced
-	if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
-		GUI:HeaderText(_T("CP_BLACKJACK_SETTINGS"), { separator = true, spacing = true })
-		ImGui.BulletText(_T "CP_BLACKJACK_DEALER_FACE_DOWN_CARD")
-		ImGui.SameLine()
-		ImGui.Text(CasinoPacino:GetBJDealerCard())
-		if GUI:Button(_T "CP_BLACKJACK_FORCE_DEALER_BUST") then
-			CasinoPacino:ForceDealerBust()
-		end
+	GUI:HeaderText(_T("CP_BLACKJACK_SETTINGS"), { separator = true, spacing = true })
+	ImGui.BulletText(_T "CP_BLACKJACK_DEALER_FACE_DOWN_CARD")
+	ImGui.SameLine()
+	ImGui.Text(CasinoPacino:GetBJDealerCard())
+	if GUI:Button(_T "CP_BLACKJACK_FORCE_DEALER_BUST") then
+		CasinoPacino:ForceDealerBust()
 	end
 
 	GUI:HeaderText(_T("CP_ROULETTE_SETTINGS"), { separator = true, spacing = true })
@@ -408,11 +405,11 @@ local function DrawDunk()
 
 	if (ImGui.BeginTabBar("##dunkBar")) then
 		if ImGui.BeginTabItem(_T("CASINO_GAMBLING_TAB")) then
-			if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
+			-- if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
 				drawGamblingTab()
-			else
-				ImGui.Text(_T("CP_FEATURE_DISABLED"))
-			end
+			-- else
+			-- 	ImGui.Text(_T("CP_FEATURE_DISABLED"))
+			-- end
 			ImGui.EndTabItem()
 		end
 

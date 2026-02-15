@@ -56,9 +56,9 @@ end
 
 ---@return boolean
 function CasinoPacino:CanAccess()
-	return (Backend:GetAPIVersion() == Enums.eAPIVersion.V1)
-		and Backend:IsUpToDate()
+	return Backend:IsUpToDate()
 		and Game.IsOnline()
+		and not Backend:IsMockEnv()
 		and not script.is_active("maintransition")
 		and not NETWORK.NETWORK_IS_ACTIVITY_SESSION()
 end
