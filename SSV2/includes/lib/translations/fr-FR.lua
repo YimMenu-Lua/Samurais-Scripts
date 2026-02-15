@@ -659,5 +659,6 @@ return {
 	["YH_CAYO_RESET_ALL"] = "Réinitialiser TOUS les progrès",
 	["YH_CAYO_WEAPONS"] = "Chargement d'armes",
 	["YH_CAYO_TARGET_PRIMARY"] = "Cible principale",
-	["GENERIC_TP_INVALID_COORDS_ERR"] = "Coordonnées invalides !"
+	["GENERIC_TP_INVALID_COORDS_ERR"] = "Coordonnées invalides !",
+	["YH_SUBMARINE_NOT_OWNED"] = "Achetez un Kosatka pour accéder au Cayo Perico Heist."
 }

@@ -659,5 +659,6 @@ return {
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "設定所有次要目標",
 	["YH_CAYO_RESET_ALL"] = "重置所有進度",
 	["YH_CAYO_WEAPONS"] = "武器裝載",
-	["GENERIC_TP_INVALID_COORDS_ERR"] = "座標無效！"
+	["GENERIC_TP_INVALID_COORDS_ERR"] = "座標無效！",
+	["YH_SUBMARINE_NOT_OWNED"] = "購買科薩特卡即可進入佩里科島搶劫。"
 }

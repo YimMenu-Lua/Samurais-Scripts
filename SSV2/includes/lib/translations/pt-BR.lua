@@ -659,5 +659,6 @@ return {
 	["YH_CAYO_TARGET_SECONDARY_C"] = "Alvo Secundário (Composto)",
 	["YH_CAYO_TARGET_SECONDARY_I"] = "Alvo Secundário (Ilha)",
 	["YH_PREP_SKIP_NOTIF"] = "Todas as missões de preparação foram ignoradas. Agora você pode iniciar a missão final.",
-	["GENERIC_TP_INVALID_COORDS_ERR"] = "Coordenadas inválidas!"
+	["GENERIC_TP_INVALID_COORDS_ERR"] = "Coordenadas inválidas!",
+	["YH_SUBMARINE_NOT_OWNED"] = "Compre um Kosatka para acessar o Golpe de Cayo Perico."
 }

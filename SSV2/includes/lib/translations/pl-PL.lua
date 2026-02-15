@@ -659,5 +659,6 @@ return {
 	["YH_CAYO_WEAPONS"] = "Załadunek broni",
 	["YH_CAYO_DIFFICULTY"] = "Tryb trudny",
 	["YH_CAYO_RESET_ALL"] = "Zresetuj WSZYSTKIE postępy",
-	["GENERIC_TP_INVALID_COORDS_ERR"] = "Nieprawidłowe współrzędne!"
+	["GENERIC_TP_INVALID_COORDS_ERR"] = "Nieprawidłowe współrzędne!",
+	["YH_SUBMARINE_NOT_OWNED"] = "Kup Kosatkę, aby uzyskać dostęp do napadu Cayo Perico."
 }

@@ -659,5 +659,6 @@ return {
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "모든 보조 대상 설정",
 	["YH_CAYO_TARGET_SECONDARY_C"] = "2차 표적(화합물)",
 	["YH_PREP_SKIP_NOTIF"] = "모든 준비 임무를 건너뛰었습니다. 이제 마지막 미션을 시작할 수 있습니다.",
-	["GENERIC_TP_INVALID_COORDS_ERR"] = "좌표가 잘못되었습니다!"
+	["GENERIC_TP_INVALID_COORDS_ERR"] = "좌표가 잘못되었습니다!",
+	["YH_SUBMARINE_NOT_OWNED"] = "Cayo Perico 습격에 액세스하려면 Kosatka를 구입하세요."
 }

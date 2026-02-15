@@ -659,5 +659,6 @@ return {
 	["YH_PREP_SKIP_NOTIF"] = "Tutte le missioni di preparazione sono state saltate. Ora puoi iniziare la missione finale.",
 	["YH_CAYO_TARGET_SECONDARY_C"] = "Bersaglio secondario (composto)",
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Imposta tutti gli obiettivi secondari",
-	["GENERIC_TP_INVALID_COORDS_ERR"] = "Coordinate non valide!"
+	["GENERIC_TP_INVALID_COORDS_ERR"] = "Coordinate non valide!",
+	["YH_SUBMARINE_NOT_OWNED"] = "Acquista un Kosatka per accedere al colpo a Cayo Perico."
 }

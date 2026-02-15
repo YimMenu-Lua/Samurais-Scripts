@@ -659,5 +659,6 @@ return {
 	["YH_CAYO_WEAPONS"] = "Equipamiento de armas",
 	["YH_CAYO_RESET_ALL"] = "Restablecer TODO el progreso",
 	["YH_CAYO_DIFFICULTY"] = "Modo difícil",
-	["GENERIC_TP_INVALID_COORDS_ERR"] = "¡Coordenadas no válidas!"
+	["GENERIC_TP_INVALID_COORDS_ERR"] = "¡Coordenadas no válidas!",
+	["YH_SUBMARINE_NOT_OWNED"] = "Compra un Kosatka para acceder al atraco a Cayo Perico."
 }

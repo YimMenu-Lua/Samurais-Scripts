@@ -627,7 +627,7 @@ return {
 	["YRV3_WAREHOUSE_SLOT"] = "Lager %d",
 	["YRV3_CEO_OFFICE_NOT_OWNED"] = "Sie besitzen kein CEO-Büro.",
 	["YRV3_CARGO_WAREHOUSES_LABEL"] = "Spezialfracht",
-	["CP_ARCADE_NOT_OWNED"] = "Kaufen Sie eine Spielhalle, um Zugang zum Diamond Casino Heist zu erhalten.",
+	["CP_ARCADE_NOT_OWNED"] = "Kaufen Sie eine Spielhalle, um auf den Diamond Casino Heist zuzugreifen.",
 	["YRV3_IE_WH_NOT_OWNED"] = "Sie besitzen kein Fahrzeuglager.",
 	["CP_TP_CASINO"] = "Zum Casino teleportieren",
 	["CP_TP_ARCADE"] = "Zur Spielhalle teleportieren",
@@ -659,5 +659,6 @@ return {
 	["YH_CAYO_TARGET_SECONDARY_I"] = "Sekundäres Ziel (Insel)",
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Legen Sie alle sekundären Ziele fest",
 	["YH_CAYO_TARGET_SECONDARY_C"] = "Sekundäres Ziel (Verbindung)",
-	["GENERIC_TP_INVALID_COORDS_ERR"] = "Ungültige Koordinaten!"
+	["GENERIC_TP_INVALID_COORDS_ERR"] = "Ungültige Koordinaten!",
+	["YH_SUBMARINE_NOT_OWNED"] = "Kaufen Sie einen Kosatka, um Zugang zum Cayo Perico-Raub zu erhalten."
 }

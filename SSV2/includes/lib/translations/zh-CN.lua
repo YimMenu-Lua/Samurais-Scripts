@@ -659,5 +659,6 @@ return {
 	["YH_CAYO_WEAPONS"] = "武器装载",
 	["YH_CAYO_DIFFICULTY"] = "困难模式",
 	["YH_CAYO_RESET_ALL"] = "重置所有进度",
-	["GENERIC_TP_INVALID_COORDS_ERR"] = "坐标无效！"
+	["GENERIC_TP_INVALID_COORDS_ERR"] = "坐标无效！",
+	["YH_SUBMARINE_NOT_OWNED"] = "购买科萨特卡即可进入佩里科岛抢劫。"
 }
