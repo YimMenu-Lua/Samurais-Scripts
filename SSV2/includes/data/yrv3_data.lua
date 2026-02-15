@@ -319,19 +319,19 @@ local RawBusinessData <const> = {
 				GBBKR_LOCAL:At(deliveries):WriteInt(value)
 			end,
 		},
-		["fm_content_acid_lab_sell"] = {
-			autofinish = function()
-				local FMCAL_OBJ   = SGSL:Get(SGSL.data.acid_lab_sell_local)
-				local FMCAL_LOCAL = FMCAL_OBJ:AsLocal()
-				local offset      = FMCAL_OBJ:GetOffset(1)
-				SGSL:Get(SGSL.data.acid_lab_sell_bitset)
-					:AsLocal()
-					:At(1)
-					:At(0)
-					:SetBit(11)
-				FMCAL_LOCAL:At(offset):WriteInt(3) -- end reason
-			end
-		},
+		-- ["fm_content_acid_lab_sell"] = {
+		-- 	autofinish = function()
+		-- 		local FMCAL_OBJ   = SGSL:Get(SGSL.data.acid_lab_sell_local)
+		-- 		local FMCAL_LOCAL = FMCAL_OBJ:AsLocal()
+		-- 		local offset      = FMCAL_OBJ:GetOffset(1)
+		-- 		SGSL:Get(SGSL.data.acid_lab_sell_bitset)
+		-- 			:AsLocal()
+		-- 			:At(1)
+		-- 			:At(0)
+		-- 			:SetBit(11)
+		-- 		FMCAL_LOCAL:At(offset):WriteInt(3) -- end reason
+		-- 	end
+		-- },
 	},
 	SellMissionTunables = {
 		["CEO"] = {
