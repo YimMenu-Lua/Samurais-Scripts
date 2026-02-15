@@ -118,7 +118,7 @@ return {
 	--#region CasinoPacino
 	["CASINO_GAMBLING_TAB"]                = "Gambling",
 	["CP_CASINO_HEIST_TAB"]                = "Casino Heist",
-	["CP_ARCADE_NOT_OWNED"]                = "Purshase an Arcade to access the Diamond Casino Heist.",
+	["CP_ARCADE_NOT_OWNED"]                = "Purchase an Arcade to access the Diamond Casino Heist.", -- CH_HLP_2
 	["CP_TP_ARCADE"]                       = "Teleport To Arcade",
 	["CP_TP_CASINO"]                       = "Teleport To Casino",
 	["CP_MUST_BE_AT_WHEEL"]                = "You must be at the Lucky Wheel to receive this prize!",
@@ -715,6 +715,7 @@ return {
 	--#region YimHeists
 	["YH_BASIC_TAB"]                       = "Basic",
 	["YH_CAYO_TAB"]                        = "Cayo Perico",
+	["YH_SUBMARINE_NOT_OWNED"]             = "Purchase a Kosatka to access the Cayo Perico Heist.", -- HIF_SUB_HELP
 	["YH_PREP_SKIP_NOTIF"]                 = "All preparation missions have been skipped. You can now start the final mission.",
 	["YH_CAYO_TARGET_PRIMARY"]             = "Primary Target",
 	["YH_CAYO_TARGET_SECONDARY_I"]         = "Secondary Target (Island)",

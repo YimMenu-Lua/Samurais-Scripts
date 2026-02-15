@@ -311,7 +311,7 @@ return function()
 			if (ImGui.BeginListBox("##savedVehList", -1, 360)) then
 				for model_str in pairs(saved_models) do
 					local model = tonumber(model_str) or 0
-					local name = vehicles.get_vehicle_display_name(model)
+					local name = Game.GetVehicleDisplayName(model)
 					local is_selected = selected_saved_model == model
 					if (ImGui.Selectable(name, is_selected)) then
 						selected_saved_model = model

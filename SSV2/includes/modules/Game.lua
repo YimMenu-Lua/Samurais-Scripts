@@ -1109,7 +1109,10 @@ function Game.SetWaypointCoords(target)
 	ThreadManager:Run(function()
 		local x, y
 		if (IsInstance(target, vec3) or IsInstance(target, vec2)) then
-			x, y = target.x, target.y
+			---@diagnostic disable-next-line
+			if (not target:is_zero()) then
+				x, y = target.x, target.y
+			end
 		elseif (type(target) == "number") then
 			local testBlip = HUD.GET_FIRST_BLIP_INFO_ID(target)
 			if (HUD.DOES_BLIP_EXIST(testBlip)) then
@@ -1158,8 +1161,8 @@ function Game.GetModelType(modelHash)
 end
 
 ---@param modelName string
-function Game.GetPedHash(modelName)
-	return joaat(modelName)
+function Game.GetModelHash(modelName)
+	return Game.EnsureModelHash(modelName)
 end
 
 ---@param modelHash integer

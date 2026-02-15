@@ -122,8 +122,8 @@ local function BuildVehicleList()
 		local s_VehicleName
 		for model, data in pairs(t_GameVehicles) do
 			sidebarLowerText = "Loading Vehicles"
-			s_VehicleName = vehicles.get_vehicle_display_name(model)
-			if (s_VehicleName:isempty()) then
+			s_VehicleName = data.display_name
+			if (not string.isvalid(s_VehicleName)) then
 				goto continue
 			end
 
@@ -259,7 +259,7 @@ local function DrawVehicles()
 		for i = 1, #filteredVehicles do
 			local is_selected = (vehicleIndex == i)
 
-			if ImGui.Selectable(filteredVehicles[i].name, is_selected) then
+			if ImGui.Selectable(_F("%s##%d", filteredVehicles[i].name, i), is_selected) then
 				vehicleIndex = i
 			end
 

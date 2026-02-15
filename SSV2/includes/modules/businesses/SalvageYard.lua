@@ -119,7 +119,7 @@ end
 
 ---@return string
 function SalvageYard:GetRobberyVehicleName()
-	return vehicles.get_vehicle_display_name(self:GetRobberyVehicleModel())
+	return Game.GetVehicleDisplayName(self:GetRobberyVehicleModel())
 end
 
 ---@return integer
@@ -141,7 +141,7 @@ function SalvageYard:GetRobberyCarInSlot(slot)
 		return ""
 	end
 
-	return vehicles.get_vehicle_display_name(modelName)
+	return Game.GetVehicleDisplayName(modelName)
 end
 
 function SalvageYard:DisableRobberyCooldown()

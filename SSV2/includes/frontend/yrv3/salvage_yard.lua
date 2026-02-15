@@ -122,7 +122,7 @@ return function()
 			if (not isTaken) then
 				ImGui.Text(_T("SY_LIFT_EMPTY"))
 			else
-				local vehName   = vehicles.get_vehicle_display_name(salvage_yard:GetCarModelOnLift(i))
+				local vehName   = Game.GetVehicleDisplayName(salvage_yard:GetCarModelOnLift(i))
 				local value     = string.formatmoney(salvage_yard:GetCarValueOnLift(i))
 				local timeleft  = salvage_yard:GetSalvagePosixForLift(i)
 				local timeStr   = Time.format_time_seconds(timeleft - Time.epoch())
