@@ -137,4 +137,15 @@ function YimHeists:HasSubmarine()
 	return self.m_properties.submarine
 end
 
+-- ---@return vec3?
+-- function YimHeists:GetSubmarineLocation()
+-- 	local sub = self:HasSubmarine()
+-- 	if (not sub) then
+-- 		return
+-- 	end
+
+-- 	sub.coords = Game.Ensure3DCoords(760)
+-- 	return sub.coords
+-- end
+
 return YimHeists

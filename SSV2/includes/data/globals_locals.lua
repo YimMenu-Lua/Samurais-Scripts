@@ -892,5 +892,19 @@ return {
 				}
 			}
 		}
+	},
+	request_services_global = {
+		description = "Request Services Global.",
+		file = "am_prostitute.c", -- definitely the right file to use I'm sure of it
+		LEGACY = {
+			value = 2733002,
+			pattern = [[Global_(\d{7})\.f_4 = 0;]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 2733138,
+			pattern = [[Global_(\d{7})\.f_4 = 0;]],
+			capture_group = 1
+		}
 	}
 }

@@ -8,6 +8,7 @@
 
 
 local YHV1               = require("includes.features.YimHeistsV1"):init()
+local SGSL               = require("includes.services.SGSL")
 local setTranslations    = require("SSV2.includes.frontend.helpers.set_translations")
 local heistNames <const> = {
 	"AWT_1026",    -- The Cluckin' Bell Farm Raid
@@ -116,15 +117,40 @@ local function drawCayoTab()
 		return
 	end
 
-	ImGui.BeginDisabled(sub.coords:is_zero())
+	-- This is shitty, and only properly works when not near the sub. No idea what happens if multiple subs in session
+	-- TODO: Find and use the correct globals/offsets
+	local subBlip = Game.Ensure3DCoords(760)
+	local requestKosatka = SGSL:Get(SGSL.data.request_services_global):AsGlobal():At(613)
+	local subRequested = requestKosatka:ReadInt() == 1
+	local subSpawned = not sub.coords:is_zero() and subBlip ~= nil
+
+	if (subBlip or not subRequested) then
+		sub.coords = subBlip or vec3:zero()
+	end
+
+	ImGui.BeginDisabled(not subSpawned)
 	if (GUI:Button(_T("GENERIC_TELEPORT"))) then
-		LocalPlayer:Teleport(sub.coords)
+		LocalPlayer:Teleport(sub.coords + vec3:new(0, 0, -9.8)) -- Teleport under Kosatka
 	end
 
 	ImGui.SameLine()
-
 	if (GUI:Button(_T("GENERIC_SET_WAYPOINT"))) then
 		Game.SetWaypointCoords(sub.coords)
+	end
+	ImGui.EndDisabled()
+
+	local btn_label = (subRequested)
+		and ImGui.TextSpinner()
+		or _T("YH_CAYO_REQUEST_SUB")
+
+	ImGui.SameLine()
+	ImGui.BeginDisabled(subRequested or subSpawned)
+	if (GUI:Button(btn_label)) then
+		if (not LocalPlayer:IsOutside()) then
+			Notifier:ShowError("YHV1", _T("GENERIC_TP_INTERIOR_ERR"))
+		else
+			requestKosatka:WriteInt(1)
+		end
 	end
 	ImGui.EndDisabled()
 

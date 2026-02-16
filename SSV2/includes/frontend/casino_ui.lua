@@ -405,11 +405,7 @@ local function DrawDunk()
 
 	if (ImGui.BeginTabBar("##dunkBar")) then
 		if ImGui.BeginTabItem(_T("CASINO_GAMBLING_TAB")) then
-			-- if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
-				drawGamblingTab()
-			-- else
-			-- 	ImGui.Text(_T("CP_FEATURE_DISABLED"))
-			-- end
+			drawGamblingTab()
 			ImGui.EndTabItem()
 		end
 

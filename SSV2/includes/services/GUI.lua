@@ -160,7 +160,8 @@ end
 
 ---@return float
 function GUI:GetMaxTopBarHeight()
-	return Game.GetScreenResolution().y * 0.115
+	-- return Game.GetScreenResolution().y * 0.115 -- Incorrect sizing on anything not 1080p
+	return 124.2 -- 1080 * 0.115
 end
 
 ---@param align? number -- 0: top center | 1: bottom center | 2: left center | 3: right center | 4: center

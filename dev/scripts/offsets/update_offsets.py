@@ -157,7 +157,7 @@ def serialize_lua(v, indent=1):
 
         parts = []
         for k, vv in v.items():
-            if k == "pattern":
+            if (k == "pattern") or ((k == "description") and ("\n" in vv)):
                 vv = f"[[{vv}]]"
                 parts.append(f"{sp}{k} = {vv}")
             else:
