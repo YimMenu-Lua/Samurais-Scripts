@@ -20,7 +20,7 @@ end
 ---@enum eAPIVersion
 Enums.eAPIVersion = {
 	V1  = 1, -- YimMenu V1 (Lua54)
-	V2  = 2, -- YimMenu V2 (LuaJIT) // placeholder
+	V2  = 2, -- YimLuaAPI (Lua 54)
 	L54 = 99, -- Mock environment (Lua54)
 }
 
@@ -113,7 +113,7 @@ function Backend:GetAPIVersion()
 	end
 
 	if (type(script["run_in_callback"]) == "function") then
-		error("YmMenu V2 is not supported. If you want to run this script in GTA V Enhanced, download YimLuaAPI.")
+		error("YimMenuV2 is not supported. If you want to run this script in GTA V Enhanced, download YimLuaAPI.")
 	end
 
 	if (not menu_event or not menu_event.Wndproc) then
