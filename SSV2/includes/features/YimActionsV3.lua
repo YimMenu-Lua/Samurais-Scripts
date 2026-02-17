@@ -426,7 +426,6 @@ function YimActions:OnInterruptEvent()
 	end
 
 	if (current and self:WasActionInterrupted(localPlayer)) then
-		print("interrupted")
 		if (LocalPlayer:IsFalling()) then
 			repeat
 				sleep(1000)
