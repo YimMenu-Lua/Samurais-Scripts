@@ -42,11 +42,11 @@ end
 
 function Ragdoll:Update()
 	if (GVars.features.self.clumsy) then
-		if (LocalPlayer:IsRagdoll() and Time.now() > self.m_last_ragdoll_check_time) then
-			self.m_last_ragdoll_check_time = Time.now() + 3.5
+		if (LocalPlayer:IsRagdoll() and Time.Now() > self.m_last_ragdoll_check_time) then
+			self.m_last_ragdoll_check_time = Time.Now() + 3.5
 		end
 
-		if (Time.now() > self.m_last_ragdoll_check_time) then
+		if (Time.Now() > self.m_last_ragdoll_check_time) then
 			PED.SET_PED_RAGDOLL_ON_COLLISION(LocalPlayer:GetHandle(), true)
 		end
 	elseif (GVars.features.self.rod and KeyManager:IsKeybindPressed("rod")) then
@@ -58,13 +58,13 @@ function Ragdoll:Update()
 	end
 
 	if (GVars.features.self.ragdoll_sound and Game.IsOnline() and LocalPlayer:IsRagdoll()) then
-		if (Time.now() < self.m_last_audio_queue_time) then
+		if (Time.Now() < self.m_last_audio_queue_time) then
 			return
 		end
 
 		local voiceName = LocalPlayer:IsMale() and "WAVELOAD_PAIN_MALE" or "WAVELOAD_PAIN_FEMALE"
 		Audio:PlaySpeechFromPosition("SCREAM_PANIC_SHORT", voiceName, LocalPlayer:GetPos(), "SPEECH_PARAMS_FORCE_SHOUTED")
-		self.m_last_audio_queue_time = Time.now() + 3
+		self.m_last_audio_queue_time = Time.Now() + 3
 	end
 end
 

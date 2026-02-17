@@ -439,7 +439,7 @@ function HideNSeek:IsNearTrashBin()
 			searchPos.y,
 			searchPos.z,
 			1.5,
-			joaat(trash),
+			_J(trash),
 			false,
 			false,
 			false

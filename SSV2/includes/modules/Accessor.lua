@@ -228,7 +228,7 @@ function Accessor:SetBit(pos)
 	end
 
 	local v = self:ReadInt()
-	self:WriteInt(Bit.set(v, pos))
+	self:WriteInt(Bit.Set(v, pos))
 end
 
 ---@param pos integer
@@ -238,14 +238,14 @@ function Accessor:ClearBit(pos)
 	end
 
 	local v = self:ReadInt()
-	self:WriteInt(Bit.clear(v, pos))
+	self:WriteInt(Bit.Clear(v, pos))
 end
 
 ---@param bits array<integer> -- bit positions to set
 function Accessor:SetBits(bits)
 	local v = self:ReadInt()
 	for _, pos in ipairs(bits) do
-		v = Bit.set(v, pos)
+		v = Bit.Set(v, pos)
 	end
 	self:WriteInt(v)
 end
@@ -254,7 +254,7 @@ end
 function Accessor:ClearBits(bits)
 	local v = self:ReadInt()
 	for _, pos in ipairs(bits) do
-		v = Bit.clear(v, pos)
+		v = Bit.Clear(v, pos)
 	end
 	self:WriteInt(v)
 end

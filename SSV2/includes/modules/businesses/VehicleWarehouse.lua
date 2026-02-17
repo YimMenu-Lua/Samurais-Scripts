@@ -144,7 +144,7 @@ function VehicleWarehouse:IsMissionBitSet(index, pos)
 	local bit_offset   = math.floor(pos / 32)
 	local bit          = pos % 32
 	local v            = ImportExport:At(local_offset):At(index, bs_read_size):At(bit_offset):ReadInt()
-	return Bit.is_set(v, bit)
+	return Bit.IsBitSet(v, bit)
 end
 
 ---@private
@@ -231,7 +231,7 @@ function VehicleWarehouse:FinishStealMission()
 end
 
 function VehicleWarehouse:Update()
-	if (Time.millis() - self.m_last_storage_update_time < 1200 or not GUI:IsOpen()) then
+	if (Time.Millis() - self.m_last_storage_update_time < 1200 or not GUI:IsOpen()) then
 		return
 	end
 
@@ -267,7 +267,7 @@ function VehicleWarehouse:Update()
 
 	-- table.overwrite(self.m_cached_veh_storage, temp) -- unnecessary as we currently don't hold refs to this table anywhere
 	self.m_cached_veh_storage       = temp
-	self.m_last_storage_update_time = Time.millis()
+	self.m_last_storage_update_time = Time.Millis()
 end
 
 return VehicleWarehouse

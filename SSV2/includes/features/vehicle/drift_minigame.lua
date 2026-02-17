@@ -102,13 +102,7 @@ end
 
 ---@param points number
 function DriftMinigame:BankDriftPoints_SP(points)
-	local idx = sp_chars[LocalPlayer:GetModelHash()]
-	if (not idx) then
-		return
-	end
-
-	local statName = _F("SP%d_TOTAL_CASH", idx)
-	stats.set_int(statName, stats.get_int(statName) + points)
+	stats.increment_stat(stats.get_prefixed_stat("SPX_TOTAL_CASH"), points)
 	AUDIO.PLAY_SOUND_FRONTEND(
 		-1,
 		"LOCAL_PLYR_CASH_COUNTER_INCREASE",
@@ -233,14 +227,14 @@ function DriftMinigame:OnTick()
 	elseif (self.m_straight_counter > 100 or PV:IsStopped()) then
 		local timer = Timer.new(5000)
 
-		while (not timer:is_done()) do
+		while (not timer:IsDone()) do
 			if not LocalPlayer:IsDriving() then
 				self:ResetStreak(true)
 				return
 			end
 
 			if (PV:IsDrifting() or ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(handle)) then
-				timer:reset(3000)
+				timer:Reset(3000)
 				return
 			end
 

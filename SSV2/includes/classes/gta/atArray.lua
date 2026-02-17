@@ -92,7 +92,7 @@ function atArray:Clear()
 	self.m_size = 0x0
 	self.m_count = 0x0
 	self.m_data_type = nil
-	self.m_last_update_time:reset()
+	self.m_last_update_time:Reset()
 end
 
 function atArray:Update()
@@ -100,7 +100,7 @@ function atArray:Update()
 		return
 	end
 
-	if not self.m_last_update_time:has_elapsed(250) then
+	if not self.m_last_update_time:HasElapsed(250) then
 		return
 	end
 
@@ -108,7 +108,7 @@ function atArray:Update()
 	self.m_count = self.m_address:add(0xA):get_word()
 	if (self.m_size == 0) then
 		self.m_data = {}
-		self.m_last_update_time:reset()
+		self.m_last_update_time:Reset()
 		return
 	end
 
@@ -116,7 +116,7 @@ function atArray:Update()
 		self.m_data[i + 1] = self.m_data_ptr:add(i * 0x8):deref()
 	end
 
-	self.m_last_update_time:reset()
+	self.m_last_update_time:Reset()
 end
 
 ---@return pointer|nil

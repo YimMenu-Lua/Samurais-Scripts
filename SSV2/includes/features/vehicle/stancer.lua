@@ -381,7 +381,7 @@ function Stancer:OnWheelsChanged()
 		return
 	end
 
-	if (Time.now() - self.m_last_wheel_mod_check_time < 2) then
+	if (Time.Now() - self.m_last_wheel_mod_check_time < 2) then
 		return
 	end
 
@@ -407,7 +407,7 @@ function Stancer:OnWheelsChanged()
 		self.m_reloading = false
 	end
 
-	self.m_last_wheel_mod_check_time = Time.now()
+	self.m_last_wheel_mod_check_time = Time.Now()
 end
 
 ---@return boolean

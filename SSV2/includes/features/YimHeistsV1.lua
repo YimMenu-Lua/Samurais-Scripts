@@ -89,7 +89,7 @@ function YimHeists:ReadPropertyData()
 		end
 
 		local sub_hash = stats.get_int("MPX_IH_SUB_OWNED")
-		if (sub_hash == joaat("kosatka")) then
+		if (sub_hash == _J("kosatka")) then
 			self.m_properties.submarine = {
 				name   = Game.GetGXTLabel("CELL_SUBMARINE"),
 				-- TODO: I have no idea how to properly get the location of player Kosatka

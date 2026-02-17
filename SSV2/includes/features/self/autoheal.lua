@@ -38,7 +38,7 @@ function AutoHeal:ShouldRun()
 end
 
 function AutoHeal:Update()
-	if (Time.millis() < self.m_last_update_time) then
+	if (Time.Millis() < self.m_last_update_time) then
 		return
 	end
 
@@ -64,7 +64,7 @@ function AutoHeal:Update()
 		PED.ADD_ARMOUR_TO_PED(handle, 0.5)
 	end
 
-	self.m_last_update_time = Time.millis() + (1000 / GVars.features.self.autoheal.regen_speed)
+	self.m_last_update_time = Time.Millis() + (1000 / GVars.features.self.autoheal.regen_speed)
 end
 
 return AutoHeal

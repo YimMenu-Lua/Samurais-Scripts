@@ -249,7 +249,7 @@ function CWheel:GetDynamicFlag(flag)
 		return false
 	end
 
-	return Bit.is_set(self.m_wheel_flags:get_dword(), flag)
+	return Bit.IsBitSet(self.m_wheel_flags:get_dword(), flag)
 end
 
 ---@param flag eWheelConfigFlags
@@ -259,7 +259,7 @@ function CWheel:GetConfigFlag(flag)
 		return false
 	end
 
-	return Bit.is_set(self.m_wheel_config_flags:get_dword(), flag)
+	return Bit.IsBitSet(self.m_wheel_config_flags:get_dword(), flag)
 end
 
 ---@param flag eWheelDynamicFlags
@@ -270,7 +270,7 @@ function CWheel:SetDynamicFlag(flag, toggle)
 	end
 
 	local dwFlags = self.m_wheel_flags:get_dword()
-	local bitFunc = toggle and Bit.set or Bit.clear
+	local bitFunc = toggle and Bit.Set or Bit.Clear
 	self.m_wheel_flags:set_dword(bitFunc(dwFlags, flag))
 end
 
@@ -282,7 +282,7 @@ function CWheel:SetConfigFlag(flag, toggle)
 	end
 
 	local dwFlags = self.m_wheel_config_flags:get_dword()
-	local bitFunc = toggle and Bit.set or Bit.clear
+	local bitFunc = toggle and Bit.Set or Bit.Clear
 	self.m_wheel_config_flags:set_dword(bitFunc(dwFlags, flag))
 end
 

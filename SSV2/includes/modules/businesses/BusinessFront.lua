@@ -16,6 +16,14 @@ local CashSafe        = require("includes.modules.businesses.CashSafe")
 ---@field safe_data CashSafeOpts
 ---@field coords vec3
 
+---@class BusinessEarningsReport
+---@field lifetime_buy_undertaken? integer
+---@field lifetime_buy_completed? integer
+---@field lifetime_sell_undertaken? integer
+---@field lifetime_sell_completed? integer
+---@field lifetime_earnings? integer
+---@field lifetime_earnings_fmt? string
+
 -- Class representing a Business Front.
 --
 -- Can be: Nightclub or MC clubhouse
@@ -24,6 +32,8 @@ local CashSafe        = require("includes.modules.businesses.CashSafe")
 ---@field private m_name string
 ---@field private m_safe CashSafe
 ---@field private m_subs Factory[]|BusinessHub[]|Warehouse
+---@field private m_earnings_report? BusinessEarningsReport
+---@field private m_last_report_check_time milliseconds
 local BusinessFront   = setmetatable({}, BusinessBase)
 BusinessFront.__index = BusinessFront
 
@@ -34,9 +44,10 @@ function BusinessFront.new(opts)
 	assert(type(opts.name) == "string", "Missing argument: name<string>")
 	-- assert(IsInstance(opts.coords, vec3), "Missing argument: coords<vec3>") -- not necessary. UI does not render a tp button if this is missing and LuaLS will warn as well
 
-	local base      = BusinessBase.new(opts)
-	local instance  = setmetatable(base, BusinessFront)
-	instance.m_subs = {}
+	local base                        = BusinessBase.new(opts)
+	local instance                    = setmetatable(base, BusinessFront)
+	instance.m_subs                   = {}
+	instance.m_last_report_check_time = 0
 
 	if (opts.safe_data) then
 		instance.m_safe = CashSafe.new(opts.safe_data)

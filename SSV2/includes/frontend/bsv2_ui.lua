@@ -172,15 +172,16 @@ end
 
 local function BodyguardSpawnFooter()
 	ImGui.SetNextWindowBgAlpha(0)
-	ImGui.BeginChild("##bgFooter", 0, 260)
-	ImGui.SetWindowFontScale(1.12)
-	ImGui.SeparatorText("Bodyguard Preferences")
-	ImGui.SetWindowFontScale(1.0)
+	ImGui.BeginChild("##bgFooter", 0, 280)
 
-	ImGui.Dummy(1, 5)
+	ImGui.SeparatorText("Bodyguard Preferences")
+
 	ImGui.BeginDisabled(not t_SelectedPed)
-	ImGui.BulletText("Name: ")
+
+	b_BodyguardGodmode, _ = GUI:CustomToggle("God Mode", b_BodyguardGodmode)
+
 	ImGui.SameLine()
+	b_BodyguardNoRagdoll, _ = GUI:CustomToggle("No Ragdoll", b_BodyguardNoRagdoll)
 
 	ImGui.SetNextItemWidth(280)
 	s_BodyguardNameBuffer, _ = ImGui.InputTextWithHint(
@@ -193,24 +194,13 @@ local function BodyguardSpawnFooter()
 
 	ImGui.SameLine()
 
-	if ImGui.Button("Random") then
-		GUI:PlaySound("Select")
+	if GUI:Button("Random") then
 		s_BodyguardNameBuffer = BS:GetRandomPedName(t_SelectedPed.gender)
 	end
 
-	b_BodyguardGodmode, _ = ImGui.Checkbox("God Mode", b_BodyguardGodmode)
-	if GUI:IsItemClicked(0) then
-		GUI:PlaySound("Nav")
-	end
-
-	ImGui.SameLine()
-
-	b_BodyguardNoRagdoll, _ = ImGui.Checkbox("No Ragdoll", b_BodyguardNoRagdoll)
-	if GUI:IsItemClicked(0) then
-		GUI:PlaySound("Nav")
-	end
-
 	ImGui.SeparatorText("Weapons")
+
+	b_BodyguardAllWeapons, _ = GUI:CustomToggle("Give All Weapons", b_BodyguardAllWeapons)
 
 	if not b_BodyguardAllWeapons then
 		ImGui.PushItemWidth(200)
@@ -266,13 +256,9 @@ local function BodyguardSpawnFooter()
 		ImGui.PopItemWidth()
 	end
 
-	ImGui.SameLine()
-	b_BodyguardAllWeapons, _ = GUI:CustomToggle("Give All Weapons", b_BodyguardAllWeapons)
-
 	ImGui.Separator()
 
-	if ImGui.Button("Call", 80, 35) then
-		GUI:PlaySound("Select")
+	if GUI:Button("Call", { size = vec2:new(80, 35) }) then
 		BS:SpawnBodyguard(
 			t_SelectedPed.modelHash,
 			#s_BodyguardNameBuffer > 0
@@ -309,8 +295,7 @@ local function SpawnedBodyguardsFooter()
 		ImGui.Spacing()
 
 		ImGui.BeginDisabled(unk_SelectedBodyguard.wasDismissed)
-		if ImGui.Button("Dismiss", 80, 35) then
-			GUI:PlaySound("Cancel")
+		if GUI:Button("Dismiss", { size = vec2:new(80, 35) }) then
 			BS:DismissBodyguard(unk_SelectedBodyguard)
 		end
 		ImGui.EndDisabled()
@@ -318,8 +303,7 @@ local function SpawnedBodyguardsFooter()
 		ImGui.SameLine()
 
 		ImGui.BeginDisabled(table.getlen(BS.Bodyguards) <= 1)
-		if ImGui.Button("Dismiss All", 100, 35) then
-			GUI:PlaySound("Cancel")
+		if GUI:Button("Dismiss All", { size = vec2:new(100, 35) }) then
 			BS:Dismiss(BS.SERVICE_TYPE.BODYGUARD)
 		end
 		ImGui.EndDisabled()
@@ -337,24 +321,16 @@ local function EscortGroupSpawnFooter()
 
 	ImGui.Dummy(1, 5)
 	ImGui.BeginDisabled(next(t_SelectedEscortGroup) == nil)
-	b_BodyguardGodmode, _ = ImGui.Checkbox("God Mode##escorts", b_BodyguardGodmode)
-	if GUI:IsItemClicked(0) then
-		GUI:PlaySound("Nav")
-	end
+	b_BodyguardGodmode, _ = GUI:CustomToggle("God Mode##escorts", b_BodyguardGodmode)
 
 	ImGui.SameLine()
-
-	b_BodyguardNoRagdoll, _ = ImGui.Checkbox("No Ragdoll##escorts", b_BodyguardNoRagdoll)
-	if GUI:IsItemClicked(0) then
-		GUI:PlaySound("Nav")
-	end
+	b_BodyguardNoRagdoll, _ = GUI:CustomToggle("No Ragdoll##escorts", b_BodyguardNoRagdoll)
 
 	ImGui.Spacing()
 
 	ImGui.Separator()
 
-	if ImGui.Button("Summon##escorts", 90, 40) then
-		GUI:PlaySound("Select")
+	if GUI:Button("Summon##escorts", { size = vec2:new(90, 40) }) then
 		BS:SpawnEscortGroup(
 			t_SelectedEscortGroup,
 			b_BodyguardGodmode,
@@ -374,8 +350,7 @@ local function SpawnedEscortGroupsFooter()
 		ImGui.Separator()
 		ImGui.Spacing()
 		ImGui.BeginDisabled(table.getlen(BS.EscortGroups) <= 1)
-		if ImGui.Button("Dismiss All", 100, 35) then
-			GUI:PlaySound("Cancel")
+		if GUI:Button("Dismiss All", { size = vec2:new(100, 35) }) then
 			BS:Dismiss(BS.SERVICE_TYPE.ESCORT)
 		end
 		ImGui.EndDisabled()
@@ -615,8 +590,7 @@ local function DrawEscorts()
 
 						ImGui.Spacing()
 
-						if ImGui.Button(_F("Repair Vehicle##%s", group.name)) then
-							GUI:PlaySound("Select")
+						if GUI:Button(_F("Repair Vehicle##%s", group.name)) then
 							ThreadManager:Run(function()
 								group:RepairGroupVehicle()
 							end)
@@ -625,22 +599,19 @@ local function DrawEscorts()
 						ImGui.SameLine()
 
 						ImGui.BeginDisabled(group.vehicle:IsPlayerInEscortVehicle())
-						if ImGui.Button(_F("Go To##%s", group.name)) then
-							GUI:PlaySound("Select")
+						if GUI:Button(_F("Go To##%s", group.name)) then
 							group:BringPlayer()
 						end
 
 						ImGui.SameLine()
 
-						if ImGui.Button(_F("Bring##%s", group.name)) then
-							GUI:PlaySound("Select")
+						if GUI:Button(_F("Bring##%s", group.name)) then
 							group:Bring()
 						end
 
 						ImGui.SameLine()
 
-						if ImGui.Button(_F("Respawn##%s", group.name)) then
-							GUI:PlaySound("Select")
+						if GUI:Button(_F("Respawn##%s", group.name)) then
 							BS:RespawnEscortGroup(
 								group,
 								b_BodyguardGodmode,
@@ -650,8 +621,7 @@ local function DrawEscorts()
 						ImGui.EndDisabled()
 
 						if group.vehicle:IsPlayerInEscortVehicle() then
-							if ImGui.Button(_F("Driving Options >##%s", group.name)) then
-								GUI:PlaySound("Click")
+							if GUI:Button(_F("Driving Options >##%s", group.name)) then
 								ImGui.OpenPopup(_F("escort driving options##%s", group.name))
 							end
 
@@ -727,8 +697,7 @@ local function DrawEscorts()
 						end
 
 						ImGui.BeginDisabled(group.wasDismissed)
-						if ImGui.Button(_F("Dismiss##%s", group.name)) then
-							GUI:PlaySound("Cancel")
+						if GUI:Button(_F("Dismiss##%s", group.name)) then
 							BS:DismissEscortGroup(group.name)
 						end
 						ImGui.EndDisabled()
@@ -746,7 +715,6 @@ local function DrawEscorts()
 		--     t_MainUIfooter[s_CurrentTab] = nil
 
 		--     if ImGui.Button("[ ! ] Tutorial") then
-		--         GUI:PlaySound("Select")
 		--         ImGui.OpenPopup("HowToCreateEscorts")
 		--         ImGui.SetNextWindowSizeConstraints(600, 600, 600, 800)
 		--         ImGui.SetNextWindowPos(Game.ScreenResolution.x / 2 - 300, Game.ScreenResolution.y / 2 - 200)
@@ -760,7 +728,6 @@ local function DrawEscorts()
 		--         | ImGuiWindowFlags.AlwaysAutoResize
 		--     ) then
 		--         if ImGui.Button("Close") then
-		--             GUI:PlaySound("Cancel")
 		--             ImGui.CloseCurrentPopup()
 		--         end
 
@@ -827,8 +794,7 @@ local function SpawnedLimoFooter()
 		end
 	end
 
-	if ImGui.Button("Repair", 100, 35) then
-		GUI:PlaySound("Select")
+	if GUI:Button("Repair", { size = vec2:new(100, 35) }) then
 		ThreadManager:Run(function()
 			limo:Repair()
 		end)
@@ -836,8 +802,7 @@ local function SpawnedLimoFooter()
 
 	ImGui.SameLine()
 
-	if ImGui.Button("Dismiss", 100, 35) then
-		GUI:PlaySound("Cancel")
+	if GUI:Button("Dismiss", { size = vec2:new(100, 35) }) then
 		BS:Dismiss(BS.SERVICE_TYPE.LIMO)
 		b_LimoWasCalled = false
 	end
@@ -878,8 +843,7 @@ local function DrawLimousineService()
 		ImGui.Dummy(1, 5)
 
 		ImGui.BeginDisabled((next(t_SelectedLimo) == nil) or b_LimoWasCalled)
-		if ImGui.Button("Dispatch", 100, 40) then
-			GUI:PlaySound("Select")
+		if GUI:Button("Dispatch", { size = vec2:new(100, 35) }) then
 			BS:CallPrivateLimo(t_SelectedLimo)
 			b_LimoWasCalled = true
 		end
@@ -889,8 +853,7 @@ local function DrawLimousineService()
 		ImGui.Dummy(1, 5)
 
 		if not limo:IsPlayerInLimo() and not limo.isRemoteControlled then
-			if ImGui.Button("Warp Into The Limo", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Warp Into The Limo", { size = v_ButtonSize }) then
 				limo:WarpPlayer()
 			end
 
@@ -919,8 +882,7 @@ local function DrawLimousineService()
 			ImGui.Spacing()
 
 			ImGui.BeginDisabled(LocalPlayer:GetVehicle():GetSpeed() <= 0.1 and limo:IsIdle())
-			if ImGui.Button("Stop The Limo", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Stop The Limo", { size = v_ButtonSize }) then
 				ThreadManager:Run(function()
 					limo:Stop()
 				end)
@@ -928,56 +890,44 @@ local function DrawLimousineService()
 
 			ImGui.SameLine()
 
-			if ImGui.Button("Emergency Stop", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Emergency Stop", { size = v_ButtonSize }) then
 				ThreadManager:Run(function()
 					limo:EmergencyStop()
 				end)
 			end
 			ImGui.EndDisabled()
 
-			if ImGui.Button("Drive To Waypoint", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Drive To Waypoint", { size = v_ButtonSize }) then
 				ThreadManager:Run(function(s)
 					local v_Pos = Game.GetWaypointCoords()
-
 					if not v_Pos then
-						GUI:PlaySound("Error")
 						Notifier:ShowError(
 							"Samurai's Scripts",
 							"[Limousine Service]: No waypoint found!"
 						)
 						return
 					end
-
-					GUI:PlaySound("Select")
 					limo:GoTo(v_Pos, s)
 				end)
 			end
 
 			ImGui.SameLine()
 
-			if ImGui.Button("Drive To Objective", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Drive To Objective", { size = v_ButtonSize }) then
 				ThreadManager:Run(function(s)
 					local b_Found, v_Pos = Game.GetObjectiveBlipCoords()
-
 					if not b_Found then
-						GUI:PlaySound("Error")
 						Notifier:ShowError(
 							"Samurai's Scripts",
 							"[Limousine Service]: No objective found!"
 						)
 						return
 					end
-
-					GUI:PlaySound("Select")
 					limo:GoTo(v_Pos, s)
 				end)
 			end
 
-			if ImGui.Button("Wander", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Wander", { size = v_ButtonSize }) then
 				ThreadManager:Run(function(s)
 					limo:Wander(s)
 				end)
@@ -987,13 +937,11 @@ local function DrawLimousineService()
 			local isControlled = limo.isRemoteControlled
 			local verb         = isControlled and "Give" or "Take"
 			local callback     = isControlled and limo.ReleaseControl or limo.TakeControl
-			local clickSound   = isControlled and "Cancel" or "Select"
 			local tt           = isControlled and "Give control of the limousine back to the chauffeur."
 				or "Allows you to remotely control the limousine from the comfort of your backseat."
 
 			ImGui.SameLine()
-			if ImGui.Button(_F("%s Control", verb), v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound(clickSound)
+			if GUI:Button(_F("%s Control", verb), { size = v_ButtonSize }) then
 				callback(limo)
 			end
 			GUI:Tooltip(tt)
@@ -1003,15 +951,13 @@ local function DrawLimousineService()
 			ImGui.SeparatorText("Seat Controls")
 			ImGui.Spacing()
 
-			if ImGui.Button("< Previous Seat", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("< Previous Seat", { size = v_ButtonSize }) then
 				limo:ShuffleSeats(-1)
 			end
 
 			ImGui.SameLine()
 
-			if ImGui.Button("Next Seat >", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Next Seat >", { size = v_ButtonSize }) then
 				limo:ShuffleSeats(1)
 			end
 
@@ -1019,8 +965,7 @@ local function DrawLimousineService()
 			ImGui.SeparatorText("Radio Controls")
 			ImGui.Spacing()
 
-			if ImGui.Button(limo.radio.isOn and "Turn Off" or "Turn On") then
-				GUI:PlaySound("Click")
+			if GUI:Button(limo.radio.isOn and "Turn Off" or "Turn On") then
 				ThreadManager:Run(function()
 					AUDIO.SET_VEH_RADIO_STATION(
 						limo:GetHandle(),
@@ -1057,15 +1002,13 @@ local function SpawnedHeliFooter()
 	ImGui.Dummy(1, 5)
 
 	ImGui.BeginDisabled(not heli.isReady)
-	if ImGui.Button("Repair", 100, 35) then
-		GUI:PlaySound("Select")
+	if GUI:Button("Repair", { size = vec2:new(100, 35) }) then
 		heli:Repair()
 	end
 
 	ImGui.SameLine()
 
-	if ImGui.Button("Dismiss", 100, 35) then
-		GUI:PlaySound("Cancel")
+	if GUI:Button("Dismiss", { size = vec2:new(100, 35) }) then
 		BS:Dismiss(BS.SERVICE_TYPE.HELI)
 	end
 	ImGui.EndDisabled()
@@ -1108,8 +1051,7 @@ local function DrawHeliService()
 		ImGui.SameLine()
 
 		ImGui.BeginDisabled(i_SelectedHeliModel == 0)
-		if ImGui.Button("Dispatch", 100, 40) then
-			GUI:PlaySound("Select")
+		if GUI:Button("Dispatch", { size = vec2:new(100, 40) }) then
 			BS:CallPrivateHeli(i_SelectedHeliModel, b_HeliGodMode)
 		end
 		ImGui.EndDisabled()
@@ -1119,16 +1061,14 @@ local function DrawHeliService()
 
 		if not heli:IsPlayerInHeli() then
 			ImGui.BeginDisabled(heli.isPlayerRappelling or not heli.isReady)
-			if ImGui.Button("Warp Into The Heli", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Warp Into The Heli", { size = v_ButtonSize }) then
 				heli:WarpPlayer()
 			end
 
 			ImGui.SameLine()
 
 			ImGui.BeginDisabled(not heli.isFarAway)
-			if ImGui.Button("Bring", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Bring", { size = v_ButtonSize }) then
 				ThreadManager:Run(function(s)
 					heli:Bring(s)
 				end)
@@ -1148,8 +1088,7 @@ local function DrawHeliService()
 			ImGui.Spacing()
 
 			ImGui.BeginDisabled((heli.task == Enums.eVehicleTask.HOVER_IN_PLACE) or heli.altitude <= 3)
-			if ImGui.Button("Hover Here", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Hover Here", { size = v_ButtonSize }) then
 				ThreadManager:Run(function()
 					heli:HoverInPlace()
 				end)
@@ -1159,53 +1098,45 @@ local function DrawHeliService()
 			ImGui.SameLine()
 
 			ImGui.BeginDisabled(heli.altitude <= 3)
-			if ImGui.Button("Land Here", v_ButtonSize.x, v_ButtonSize.y) then
+			if GUI:Button("Land Here", { size = v_ButtonSize }) then
 				ThreadManager:Run(function()
 					heli:LandHere()
 				end)
 			end
 			ImGui.EndDisabled()
 
-			if ImGui.Button("Fly To Waypoint", v_ButtonSize.x, v_ButtonSize.y) then
+			if GUI:Button("Fly To Waypoint", { size = v_ButtonSize }) then
 				ThreadManager:Run(function()
 					local v_Pos = Game.GetWaypointCoords()
-
 					if not v_Pos then
-						GUI:PlaySound("Error")
 						Notifier:ShowError(
 							"Samurai's Scripts",
 							"[Heli Service]: No waypoint found!"
 						)
 						return
 					end
-
-					GUI:PlaySound("Select")
 					heli:FlyTo(v_Pos)
 				end)
 			end
 
 			ImGui.SameLine()
 
-			if ImGui.Button("Fly To Objective", v_ButtonSize.x, v_ButtonSize.y) then
+			if GUI:Button("Fly To Objective", { size = v_ButtonSize }) then
 				ThreadManager:Run(function()
 					local b_Found, v_Pos = Game.GetObjectiveBlipCoords()
-
 					if not b_Found then
-						GUI:PlaySound("Error")
 						Notifier:ShowError(
 							"Samurai's Scripts",
 							"[Heli Service]: No objective found!"
 						)
 						return
 					end
-
-					GUI:PlaySound("Select")
 					heli:FlyTo(v_Pos)
 				end)
 			end
 
 			ImGui.BeginDisabled(heli.task ~= Enums.eVehicleTask.GOTO)
-			if ImGui.Button("Skip Trip", v_ButtonSize.x, v_ButtonSize.y) then
+			if GUI:Button("Skip Trip", { size = v_ButtonSize }) then
 				ThreadManager:Run(function(s)
 					heli:SkipTrip(s)
 				end)
@@ -1216,12 +1147,13 @@ local function DrawHeliService()
 
 			if heli.allowsRappelling then
 				ImGui.SameLine()
-				ImGui.BeginDisabled((heli.task ~= Enums.eVehicleTask.HOVER_IN_PLACE) or (heli.altitude < 5) or
-					heli.isPlayerRappelling)
-				if ImGui.Button("Rappell Down", v_ButtonSize.x, v_ButtonSize.y) then
+				ImGui.BeginDisabled((heli.task ~= Enums.eVehicleTask.HOVER_IN_PLACE)
+					or (heli.altitude < 5)
+					or heli.isPlayerRappelling
+				)
+				if GUI:Button("Rappell Down", { size = v_ButtonSize }) then
 					ThreadManager:Run(function()
 						if LocalPlayer:GetVehicleSeat() < 1 then
-							GUI:PlaySound("Error")
 							Notifier:ShowError(
 								"Private Heli",
 								"You can not rappell down from this seat. Please switch to one of the back seats!",
@@ -1230,8 +1162,6 @@ local function DrawHeliService()
 							)
 							return
 						end
-
-						GUI:PlaySound("Select")
 						TASK.TASK_RAPPEL_FROM_HELI(LocalPlayer:GetHandle(), 5.0)
 					end)
 				end
@@ -1259,8 +1189,7 @@ local function DrawHeliService()
 			ImGui.SameLine()
 
 			ImGui.BeginDisabled(not t_SelectedHeliPresetDest.second)
-			if ImGui.Button("Fly To") then
-				GUI:PlaySound("Select")
+			if GUI:Button("Fly To") then
 				ThreadManager:Run(function()
 					heli:FlyTo(t_SelectedHeliPresetDest.second, true)
 				end)
@@ -1271,15 +1200,13 @@ local function DrawHeliService()
 			ImGui.SeparatorText("Seat Controls")
 			ImGui.Spacing()
 
-			if ImGui.Button("< Previous Seat", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("< Previous Seat", { size = v_ButtonSize }) then
 				heli:ShuffleSeats(-1)
 			end
 
 			ImGui.SameLine()
 
-			if ImGui.Button("Next Seat >", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Next Seat >", { size = v_ButtonSize }) then
 				heli:ShuffleSeats(1)
 			end
 
@@ -1344,15 +1271,13 @@ local function SpawnedJetFooter()
 	ImGui.BulletText(_F("Status: %s", jet:GetTaskAsString()))
 	ImGui.Dummy(1, 5)
 
-	if ImGui.Button("Repair", 100, 35) then
-		GUI:PlaySound("Select")
+	if GUI:Button("Repair", { size = vec2:new(100, 35) }) then
 		jet:Repair()
 	end
 
 	ImGui.SameLine()
 
-	if ImGui.Button("Dismiss", 100, 35) then
-		GUI:PlaySound("Cancel")
+	if GUI:Button("Dismiss", { size = vec2:new(100, 35) }) then
 		BS:Dismiss(BS.SERVICE_TYPE.JET)
 	end
 end
@@ -1398,8 +1323,7 @@ local function DrawJetService()
 
 		local JetSpawnDataNotSelected = (i_SelectedJetModel == 0) or not unk_JetAirportData
 		ImGui.BeginDisabled(JetSpawnDataNotSelected)
-		if ImGui.Button("Dispatch", 100, 40) and unk_JetAirportData then
-			GUI:PlaySound("Select")
+		if GUI:Button("Dispatch", { size = vec2:new(100, 40) }) and unk_JetAirportData then
 			BS:CallPrivateJet(i_SelectedJetModel, unk_JetAirportData)
 		end
 		ImGui.EndDisabled()
@@ -1416,8 +1340,7 @@ local function DrawJetService()
 
 		if not jet:IsPlayerInJet() then
 			ImGui.BeginDisabled(not jet.canWarpPlayer)
-			if ImGui.Button("Warp Into The Jet", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Warp Into The Jet", { size = v_ButtonSize }) then
 				jet:WarpPlayer()
 			end
 			ImGui.EndDisabled()
@@ -1430,40 +1353,32 @@ local function DrawJetService()
 			ImGui.Spacing()
 
 			ImGui.BeginDisabled(jet.task == Enums.eVehicleTask.TAKE_OFF)
-			if ImGui.Button("Fly To Waypoint", v_ButtonSize.x, v_ButtonSize.y) then
+			if GUI:Button("Fly To Waypoint", { size = v_ButtonSize }) then
 				ThreadManager:Run(function(s)
 					local v_Pos = Game.GetWaypointCoords()
-
 					if not v_Pos then
-						GUI:PlaySound("Error")
 						Notifier:ShowError(
 							"Samurai's Scripts",
 							"[Heli Service]: No waypoint found!"
 						)
 						return
 					end
-
-					GUI:PlaySound("Select")
 					jet:FlyTo(v_Pos, s)
 				end)
 			end
 
 			ImGui.SameLine()
 
-			if ImGui.Button("Fly To Objective", v_ButtonSize.x, v_ButtonSize.y) then
+			if GUI:Button("Fly To Objective", { size = v_ButtonSize }) then
 				ThreadManager:Run(function(s)
 					local b_Found, v_Pos = Game.GetObjectiveBlipCoords()
-
 					if not b_Found then
-						GUI:PlaySound("Error")
 						Notifier:ShowError(
 							"Samurai's Scripts",
 							"[Heli Service]: No objective found!"
 						)
 						return
 					end
-
-					GUI:PlaySound("Select")
 					ThreadManager:Run(function()
 						jet:FlyTo(v_Pos, s)
 					end)
@@ -1472,8 +1387,7 @@ local function DrawJetService()
 			ImGui.EndDisabled()
 
 			ImGui.BeginDisabled(jet.task ~= Enums.eVehicleTask.GOTO)
-			if ImGui.Button("Skip Trip", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Skip Trip", { size = v_ButtonSize }) then
 				ThreadManager:Run(function()
 					jet:SkipTrip()
 				end)
@@ -1483,8 +1397,7 @@ local function DrawJetService()
 			ImGui.SameLine()
 
 			ImGui.BeginDisabled(jet.task ~= Enums.eVehicleTask.LAND)
-			if ImGui.Button("Skip Landing", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Skip Landing", { size = v_ButtonSize }) then
 				ThreadManager:Run(function()
 					jet:FinishLanding()
 				end)
@@ -1500,14 +1413,13 @@ local function DrawJetService()
 			ImGui.SameLine()
 
 			ImGui.BeginDisabled(not unk_JetAirportData or not unk_JetAirportData.landingApproach)
-			if ImGui.Button(" Go ") then
+			if GUI:Button(" Go ") then
 				ThreadManager:Run(function(s)
 					if not unk_JetAirportData then
 						return
 					end
 
 					if jet.departureAirport and (jet.departureAirport.name == unk_JetAirportData.name) then
-						GUI:PlaySound("Error")
 						Notifier:ShowError(
 							"Private Jet",
 							_F(
@@ -1517,8 +1429,6 @@ local function DrawJetService()
 						)
 						return
 					end
-
-					GUI:PlaySound("Select")
 					jet.arrivalAirport = unk_JetAirportData
 					Notifier:ShowMessage(
 						"Private Jet",
@@ -1536,15 +1446,13 @@ local function DrawJetService()
 			ImGui.SeparatorText("Seat Controls")
 			ImGui.Spacing()
 
-			if ImGui.Button("< Previous Seat", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("< Previous Seat", { size = v_ButtonSize }) then
 				jet:ShuffleSeats(-1)
 			end
 
 			ImGui.SameLine()
 
-			if ImGui.Button("Next Seat >", v_ButtonSize.x, v_ButtonSize.y) then
-				GUI:PlaySound("Select")
+			if GUI:Button("Next Seat >", { size = v_ButtonSize }) then
 				jet:ShuffleSeats(1)
 			end
 
@@ -1552,7 +1460,7 @@ local function DrawJetService()
 			ImGui.SeparatorText("Radio Controls")
 			ImGui.Spacing()
 
-			if ImGui.Button(jet.radio.isOn and "Turn Off" or "Turn On") then
+			if GUI:Button(jet.radio.isOn and "Turn Off" or "Turn On") then
 				ThreadManager:Run(function()
 					AUDIO.SET_VEH_RADIO_STATION(
 						jet:GetHandle(),
@@ -1635,8 +1543,7 @@ local function DrawMainSidebar()
 			ImGui.PushStyleColor(ImGuiCol.Button, r, g, b, a)
 		end
 
-		if ImGui.Button(tab.label, 120, 35) then
-			GUI:PlaySound("Nav")
+		if GUI:Button(tab.label, { size = vec2:new(120, 35) }) then
 			if i_SelectedSidebarItem ~= i then
 				s_SearchBuffer = ""
 				t_SelectedPed = nil

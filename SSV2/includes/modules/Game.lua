@@ -123,7 +123,7 @@ end
 ---@return boolean
 function Game.IsModelHash(value)
 	if type(value) == "string" then
-		value = joaat(value)
+		value = _J(value)
 	end
 
 	return type(value) == "number" and value >= 0xFFFF and STREAMING.IS_MODEL_VALID(value)
@@ -138,7 +138,7 @@ function Game.EnsureModelHash(input)
 
 	if Game.IsModelHash(input) then
 		if type(input) == "string" then
-			return joaat(input)
+			return _J(input)
 		else
 			return input
 		end
@@ -781,7 +781,7 @@ function Game.SyncNetworkID(netID)
 
 	local timer = Timer.new(250)
 	NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
-	while not NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) and not timer:is_done() do
+	while not NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) and not timer:IsDone() do
 		NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
 		yield()
 	end
@@ -799,7 +799,7 @@ function Game.DesyncNetworkID(netID)
 
 	local timer = Timer.new(250)
 	NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
-	while not NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) and timer:is_done() do
+	while not NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) and timer:IsDone() do
 		NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
 		yield()
 	end
@@ -1104,13 +1104,16 @@ function Game.GetWaypointCoords()
 	end
 end
 
----@param target vec2|vec3|integer BlipID | Entity handle | Vector2 | Vector3
+---@param target (vec2|vec3|integer)? BlipID | Entity handle | Vector2 | Vector3
 function Game.SetWaypointCoords(target)
 	ThreadManager:Run(function()
 		local x, y
 		if (IsInstance(target, vec3) or IsInstance(target, vec2)) then
+			-- the target check here seems redundant but it's just there to silence LuaLS
+			-- because IsInstance already inferred that the object is not nil and is of the correct type
+			-- but the language server has no way to know that.
 			---@diagnostic disable-next-line
-			if (not target:is_zero()) then
+			if (target and not target:is_zero()) then
 				x, y = target.x, target.y
 			end
 		elseif (type(target) == "number") then
@@ -1167,7 +1170,7 @@ end
 
 ---@param modelHash integer
 ---@return string
-function Game.GetPedName(modelHash)
+function Game.GetPedModelName(modelHash)
 	return ped_hashmap[modelHash] or _F("0x%X", modelHash)
 end
 
@@ -1225,6 +1228,12 @@ function Game.GetVehicleDisplayName(vehModel)
 	return data.display_name or "NULL"
 end
 
+-- Returns the vehicle's model name, not display name (ex: `youga2`)
+---@param modelHash joaat_t
+function Game.GetVehicleModelName(modelHash)
+	return veh_hashmap[modelHash] or "NULL"
+end
+
 ---@param weapon string|joaat_t
 ---@return string
 function Game.GetWeaponDisplayName(weapon)
@@ -1234,7 +1243,7 @@ function Game.GetWeaponDisplayName(weapon)
 
 	local hash
 	if (type(weapon) == "string") then
-		hash = joaat(weapon)
+		hash = _J(weapon)
 	elseif (type(weapon) == "number") then
 		hash = weapon
 	end
@@ -1255,26 +1264,26 @@ end
 function Game.GetCharacterIndex()
 	if (Game.IsOnline()) then
 		return stats.get_character_index()
-	else
-		if (self.get_ped() == 0) then
-			return 0
-		end
-
-		return SP_CharIDs[LocalPlayer:GetModelHash()]
-	end
-end
-
-function Game.GetCharacterName()
-	local char_idx = Game.GetCharacterIndex()
-	if (Game.IsOnline()) then
-		return STATS.STAT_GET_STRING(joaat(_F("MP%d_CHAR_NAME", char_idx)), -1)
 	end
 
 	if (self.get_ped() == 0) then
-		return "Unknown"
+		return 0
 	end
 
-	return SP_CharNames[char_idx + 1]
+	return SP_CharIDs[LocalPlayer:GetModelHash()]
+end
+
+---@return string
+function Game.GetCharacterName()
+	if (Game.IsOnline()) then
+		return stats.get_string("MPX_CHAR_NAME")
+	end
+
+	if (self.get_ped() == 0) then
+		return "NULL"
+	end
+
+	return SP_CharNames[Game.GetCharacterIndex() + 1]
 end
 
 ---@param coords vec3
@@ -1283,7 +1292,6 @@ end
 ---@return vec3|nil
 function Game.FindSpawnPointInDirection(coords, forwardVector, distance)
 	local bFound, vOutPos = false, vec3:zero()
-
 	bFound, vOutPos = MISC.FIND_SPAWN_POINT_IN_DIRECTION(
 		coords.x,
 		coords.y,
@@ -1336,12 +1344,12 @@ function Game.FadeOutEntity(entity)
 
 	if type(entity) == "number" then
 		if ENTITY.DOES_ENTITY_EXIST(entity) then
-			NETWORK.NETWORK_FADE_OUT_ENTITY(entity, false, true)
+			NETWORK.NETWORK_FADE_OUT_ENTITY(entity, true, true)
 		end
 	elseif type(entity) == "table" then
 		for i = 1, #entity do
 			if ENTITY.DOES_ENTITY_EXIST(entity[i]) then
-				NETWORK.NETWORK_FADE_OUT_ENTITY(entity[i], false, true)
+				NETWORK.NETWORK_FADE_OUT_ENTITY(entity[i], true, true)
 			end
 		end
 	end
@@ -1355,12 +1363,12 @@ function Game.FadeInEntity(entity)
 
 	if type(entity) == "number" then
 		if ENTITY.DOES_ENTITY_EXIST(entity) then
-			NETWORK.NETWORK_FADE_IN_ENTITY(entity, false, true)
+			NETWORK.NETWORK_FADE_IN_ENTITY(entity, true, true)
 		end
 	elseif type(entity) == "table" then
 		for i = 1, #entity do
 			if ENTITY.DOES_ENTITY_EXIST(entity[i]) then
-				NETWORK.NETWORK_FADE_IN_ENTITY(entity[i], false, true)
+				NETWORK.NETWORK_FADE_IN_ENTITY(entity[i], true, true)
 			end
 		end
 	end

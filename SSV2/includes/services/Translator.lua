@@ -39,7 +39,7 @@ function Translator:Load()
 	self.labels = (ok and (type(res) == "table")) and res or self.default_labels
 	self.lang_code = iso
 	self.m_log_history = {}
-	self.m_last_load_time:reset()
+	self.m_last_load_time:Reset()
 end
 
 ---@param msg string
@@ -62,7 +62,7 @@ function Translator:Log(message)
 end
 
 function Translator:Reload()
-	if (not self.m_last_load_time:has_elapsed(3e3)) then
+	if (not self.m_last_load_time:HasElapsed(3e3)) then
 		return
 	end
 

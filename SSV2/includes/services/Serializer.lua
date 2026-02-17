@@ -167,7 +167,7 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 	end
 
 	local ignored_set  = Set.new("__schema_hash", "__dev_reset", "__version")
-	self.__schema_hash = joaat(table.snapshot(self.m_default_config, { ignored_keys = ignored_set }))
+	self.__schema_hash = _J(table.snapshot(self.m_default_config, { ignored_keys = ignored_set }))
 	self:SyncKeys()
 	self.m_last_write_time = TimePoint.new()
 
@@ -293,12 +293,12 @@ end
 
 ---@return milliseconds
 function Serializer:GetLastWriteTime()
-	return self.m_last_write_time and self.m_last_write_time:value() or 0
+	return self.m_last_write_time and self.m_last_write_time:Value() or 0
 end
 
 ---@return milliseconds
 function Serializer:GetTimeSinceLastFlush()
-	return self.m_last_write_time and self.m_last_write_time:elapsed() or 0
+	return self.m_last_write_time and self.m_last_write_time:Elapsed() or 0
 end
 
 -- Waits for idle state before mutating the config table.
@@ -825,7 +825,7 @@ function Serializer:Flush()
 	self:WithLock(function()
 		self:Parse(self.m_key_states)
 		self.m_dirty = false
-		self.m_last_write_time:reset()
+		self.m_last_write_time:Reset()
 	end)
 end
 
@@ -834,7 +834,7 @@ function Serializer:OnTick()
 		return
 	end
 
-	if (not self.m_dirty and not self.m_last_write_time:has_elapsed(5e3)) then
+	if (not self.m_dirty and not self.m_last_write_time:HasElapsed(5e3)) then
 		yield()
 		return
 	end
@@ -844,7 +844,7 @@ function Serializer:OnTick()
 end
 
 function Serializer:OnShutdown()
-	if (not self:CanAccess() or not self.m_last_write_time:has_elapsed(2e3)) then
+	if (not self:CanAccess() or not self.m_last_write_time:HasElapsed(2e3)) then
 		return
 	end
 

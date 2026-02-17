@@ -586,7 +586,7 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 	if (GUI:Button(_T("GENERIC_CONFIRM"), { size = swap_btn_size })) then
 		ThreadManager:Run(function()
 			local PV = LocalPlayer:GetVehicle()
-			if (PV:GetModelHash() == joaat(Refs.engineSwaps[engine_swap_index].audioname)) then
+			if (PV:GetModelHash() == _J(Refs.engineSwaps[engine_swap_index].audioname)) then
 				Notifier:ShowError(_T("VEH_ENGINE_SWAP"), _T("VEH_ENGINE_SWAP_SAME_ERR"), false, 5)
 				return
 			end

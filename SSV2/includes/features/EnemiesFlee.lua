@@ -15,7 +15,7 @@ local Terrifier = { m_active = false, m_last_triggered = 0 }
 Terrifier.__index = Terrifier
 
 function Terrifier:OnClick()
-	if (self.m_active or Time.millis() - self.m_last_triggered < 500) then
+	if (self.m_active or Time.Millis() - self.m_last_triggered < 500) then
 		return
 	end
 
@@ -32,7 +32,7 @@ function Terrifier:OnClick()
 		local trash = {}
 		local timer = Timer.new(1e4)
 
-		while (not timer:is_done()) do
+		while (not timer:IsDone()) do
 			for _, p in ipairs(entities.get_all_peds_as_handles()) do
 				if (not PED.IS_PED_A_PLAYER(p) and LocalPlayer:IsPedMyEnemy(p) and not task_set:Contains(p)) then
 					TASK.CLEAR_PED_TASKS(p)
@@ -78,7 +78,7 @@ function Terrifier:OnClick()
 		end
 
 		self.m_active         = false
-		self.m_last_triggered = Time.millis()
+		self.m_last_triggered = Time.Millis()
 	end)
 end
 

@@ -911,19 +911,19 @@ local CHILD_PADDING_BIT <const> = 1
 ---@param childFlags integer
 ---@return boolean
 local function wants_border(childFlags)
-	return Bit.is_set(childFlags, CHILD_BORDERS_BIT)
+	return Bit.IsBitSet(childFlags, CHILD_BORDERS_BIT)
 end
 
 ---@param childFlags integer
 ---@param windowFlags integer
 ---@return boolean
 local function wants_padding(childFlags, windowFlags)
-	if (Bit.is_set(childFlags, CHILD_PADDING_BIT)) then
+	if (Bit.IsBitSet(childFlags, CHILD_PADDING_BIT)) then
 		return true
 	end
 
 	local pad = ImGuiWindowFlags.AlwaysUseWindowPadding
-	return type(pad) == "number" and Bit.is_set(windowFlags, pad) or false
+	return type(pad) == "number" and Bit.IsBitSet(windowFlags, pad) or false
 end
 
 -- This is a wrapper around `ImGui.BeginChild` that's compatible with both YimMenu and YimLuaAPI.
@@ -944,7 +944,7 @@ function ImGui.BeginChildEx(name, size, childFlags, windowFlags)
 
 	if (_G.FAKE_YIMAPI) then
 		if (padding) then
-			childFlags = Bit.set(childFlags, CHILD_PADDING_BIT)
+			childFlags = Bit.Set(childFlags, CHILD_PADDING_BIT)
 		end
 		---@diagnostic disable-next-line: param-type-mismatch
 		return ImGui.BeginChild(name, size.x, size.y, childFlags, windowFlags)

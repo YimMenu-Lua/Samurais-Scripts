@@ -56,12 +56,12 @@ function StateMachine:Update(context)
 	if (not self.m_is_active) then
 		self.m_is_active = true
 		self.m_is_toggled = false
-		self.m_next_update = Time.now() + self.m_interval
+		self.m_next_update = Time.Now() + self.m_interval
 	end
 
-	if (Time.now() >= self.m_next_update) then
+	if (Time.Now() >= self.m_next_update) then
 		self.m_is_toggled = not self.m_is_toggled
-		self.m_next_update = Time.now() + self.m_interval
+		self.m_next_update = Time.Now() + self.m_interval
 	end
 
 	if (self.m_is_toggled and self.m_callback) then
@@ -73,7 +73,7 @@ end
 
 function StateMachine:Activate()
 	self.m_is_active = true
-	self.m_next_update = Time.now()
+	self.m_next_update = Time.Now()
 end
 
 function StateMachine:Reset()

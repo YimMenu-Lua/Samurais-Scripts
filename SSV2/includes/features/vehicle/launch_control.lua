@@ -47,7 +47,7 @@ end
 function LaunchControl:Init()
 	self.m_state = eLaunchControlState.NONE
 	self.m_timer = Timer.new(2000)
-	self.m_timer:pause()
+	self.m_timer:Pause()
 	self.m_last_pop_time = 0
 	self.m_thread = ThreadManager:RegisterLooped("SS_LAUNCH_CTRL", function()
 		self:OnTick()
@@ -90,7 +90,7 @@ function LaunchControl:Update()
 
 	if (self.m_state == eLaunchControlState.LOADING or self.m_state == eLaunchControlState.READY) then
 		local bones = PV:GetExhaustBones()
-		if (Time.millis() < self.m_last_pop_time) then
+		if (Time.Millis() < self.m_last_pop_time) then
 			return
 		end
 		Game.StartSyncedPtfxNonLoopedOnEntityBone(
@@ -103,7 +103,7 @@ function LaunchControl:Update()
 			0.69420
 		)
 
-		self.m_last_pop_time = Time.millis() + math.random(60, 120)
+		self.m_last_pop_time = Time.Millis() + math.random(60, 120)
 		Audio:PlayExhaustPop(handle, false)
 	else
 		if (not GVars.features.vehicle.burble_tune) then
@@ -129,7 +129,7 @@ function LaunchControl:Update()
 		local rpm = PV:GetRPM()
 
 		if (PAD.IS_CONTROL_RELEASED(0, 71) and (rpm < 1.0) and math.is_inrange(rpm, rpmThreshold.min, rpmThreshold.max) and (gear ~= 0)) then
-			if (Time.millis() < self.m_last_pop_time) then
+			if (Time.Millis() < self.m_last_pop_time) then
 				return
 			end
 			local bones = PV:GetExhaustBones()
@@ -152,7 +152,7 @@ function LaunchControl:Update()
 				self.m_shocking_event_handle = EVENT.ADD_SHOCKING_EVENT_FOR_ENTITY(79, handle, 10)
 			end
 
-			self.m_last_pop_time = Time.millis() + math.random(60, 180)
+			self.m_last_pop_time = Time.Millis() + math.random(60, 180)
 		else
 			if (self.m_shocking_event_handle) then
 				EVENT.REMOVE_SHOCKING_EVENT(self.m_shocking_event_handle)
@@ -202,7 +202,7 @@ function LaunchControl:OnTick()
 
 	if (not self.m_timer) then
 		self.m_timer = Timer.new(2000)
-		self.m_timer:pause()
+		self.m_timer:Pause()
 	end
 
 	if (not PV:IsMoving() and PV:IsEngineOn()) then
@@ -213,11 +213,11 @@ function LaunchControl:OnTick()
 				return
 			end
 
-			self.m_timer:resume()
+			self.m_timer:Resume()
 			self.m_state = eLaunchControlState.LOADING
 			PV:Freeze()
 
-			if (self.m_timer:is_done()) then
+			if (self.m_timer:IsDone()) then
 				r, g, b, a = 111, 194, 118, 255
 			end
 
@@ -235,19 +235,19 @@ function LaunchControl:OnTick()
 				0.01,
 				Color(r, g, b, a),
 				Color(0, 0, 0, 150),
-				math.min(1, math.max(0, self.m_timer:elapsed() / 2000))
+				math.min(1, math.max(0, self.m_timer:Elapsed() / 2000))
 			)
 
-			if (self.m_timer:is_done() and self.m_state == eLaunchControlState.LOADING) then
+			if (self.m_timer:IsDone() and self.m_state == eLaunchControlState.LOADING) then
 				self.m_state = eLaunchControlState.READY
-				self.m_timer:pause()
+				self.m_timer:Pause()
 			end
 		elseif (self.m_state ~= eLaunchControlState.NONE and self.m_state ~= eLaunchControlState.READY) then
 			if (PAD.IS_CONTROL_RELEASED(0, 71) or PAD.IS_CONTROL_RELEASED(0, 72) or not self:ShouldRun()) then
 				r, g, b, a = 255, 255, 255, 255
 				PV:Unfreeze()
-				self.m_timer:reset()
-				self.m_timer:pause()
+				self.m_timer:Reset()
+				self.m_timer:Pause()
 				self.m_state = eLaunchControlState.CANCELED
 			end
 		end
@@ -289,8 +289,8 @@ function LaunchControl:OnTick()
 			VEHICLE.SET_VEHICLE_MAX_LAUNCH_ENGINE_REVS_(handle, 1.0)
 			PHYSICS.SET_IN_ARENA_MODE(false)
 			self.m_state = eLaunchControlState.NONE
-			self.m_timer:reset()
-			self.m_timer:pause()
+			self.m_timer:Reset()
+			self.m_timer:Pause()
 		end
 	end
 end

@@ -131,7 +131,7 @@ end
 ---@param hoveredModel integer
 ---@param entityType eEntityType
 function PreviewService:OnTick(hoveredModel, entityType)
-	local now = Time.millis()
+	local now = Time.Millis()
 	if (hoveredModel ~= self.lastHovered) then
 		self.lastHovered = hoveredModel
 		self.hoverStartTime = now

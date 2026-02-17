@@ -221,7 +221,7 @@ local function DrawObjects()
 			end
 
 			if (ImGui.IsItemHovered() and previewSelectedEntity) then
-				hoveredThisFrame = joaat(filteredObjects[i])
+				hoveredThisFrame = _J(filteredObjects[i])
 			end
 
 			if is_selected then
@@ -1496,7 +1496,7 @@ local function EntityForgeUI()
 						local vec_Position
 						local i_ModelHash = (
 							type(unk_SelectedEntity) == "string" and
-							joaat(unk_SelectedEntity) or
+							_J(unk_SelectedEntity) or
 							unk_SelectedEntity.hash
 						)
 
@@ -1548,7 +1548,7 @@ local function EntityForgeUI()
 					if GUI:Button(_T("GENERIC_CONFIRM")) then
 						local i_ModelHash = (
 							type(unk_SelectedEntity) == "string" and
-							joaat(unk_SelectedEntity) or
+							_J(unk_SelectedEntity) or
 							unk_SelectedEntity.hash
 						)
 

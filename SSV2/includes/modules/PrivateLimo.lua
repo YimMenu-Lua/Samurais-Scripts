@@ -54,7 +54,7 @@ function PrivateLimo.new(t_Data, vehicleHandle, driverHandle)
 			name = Vehicle(vehicleHandle):GetName() or "Private Limousine",
 			driver = driverHandle,
 			driverName = BillionaireServices:GetRandomPedName(Enums.ePedGender.MALE),
-			lastCheckTime = Time.now() + 3,
+			lastCheckTime = Time.Now() + 3,
 			currentDrivingMode = 1,
 			wasDismissed = false,
 			isRemoteControlled = false,
@@ -211,7 +211,7 @@ function PrivateLimo:Spawn(t_Data, spawnPos)
 
 	local timer1 = Timer.new(1000)
 	while not VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(limo) do
-		if timer1:is_done() then
+		if timer1:IsDone() then
 			break
 		end
 		yield()
@@ -263,7 +263,7 @@ function PrivateLimo:SetDrivingStyle(i_DrivingStyle)
 
 	self.currentDrivingMode = i_DrivingStyle
 
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		if (self.task == Enums.eVehicleTask.GOTO) and self.lastTaskCoords then
 			self:GoTo(self.lastTaskCoords, s)
 		elseif (self.task == Enums.eVehicleTask.WANDER) then
@@ -426,14 +426,14 @@ function PrivateLimo:CancelAnyTasks()
 end
 
 function PrivateLimo:TakeControl()
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		if not Game.IsScriptHandle(self.m_handle)
 			or not Game.IsScriptHandle(self.driver)
-			or (LocalPlayer:GetVehicle():GetHandle() ~= self.m_handle) then
+			or not self:IsPlayerInLimo() then
 			return
 		end
 
-		local limoClone = self:CreateVehicle(self.limoData, vec3:zero())
+		local limoClone   = self:CreateVehicle(self.limoData, vec3:zero())
 		local playerClone = Game.CreatePed(LocalPlayer:GetModelHash(), vec3:zero())
 		if (not Game.IsScriptHandle(limoClone) or not Game.IsScriptHandle(playerClone)) then
 			Notifier:ShowError(
@@ -443,9 +443,9 @@ function PrivateLimo:TakeControl()
 			return
 		end
 
-		self.limoClone = limoClone
+		self.limoClone   = limoClone
 		self.playerClone = playerClone
-		self.playerSeat = Game.GetPedVehicleSeat(LocalPlayer:GetHandle())
+		self.playerSeat  = Game.GetPedVehicleSeat(LocalPlayer:GetHandle())
 		self:CancelAnyTasks()
 
 		ENTITY.SET_ENTITY_COLLISION(self.limoClone, false, false)
@@ -513,7 +513,7 @@ function PrivateLimo:ReleaseControl()
 		return
 	end
 
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		local abyss = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
 			self.limoClone,
 			0,
@@ -529,7 +529,7 @@ function PrivateLimo:ReleaseControl()
 
 		local timer = Timer.new(2000)
 		while Game.IsScriptHandle(self.playerClone) do
-			if timer:is_done()
+			if timer:IsDone()
 				or (self.playerSeat and VEHICLE.IS_VEHICLE_SEAT_FREE(self.m_handle, self.playerSeat, true)) then
 				break
 			end
@@ -580,7 +580,7 @@ function PrivateLimo:WarpPlayer()
 		return
 	end
 
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		local seatIndex = VEHICLE.IS_VEHICLE_SEAT_FREE(self.m_handle, 2, true) and 2 or -2
 		LocalPlayer:ClearTasksImmediately()
 		self:WarpPed(LocalPlayer:GetHandle(), seatIndex)
@@ -588,7 +588,7 @@ function PrivateLimo:WarpPlayer()
 end
 
 function PrivateLimo:Dismiss()
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		self:ReleaseControl()
 		self:CancelAnyTasks()
 		self.task = Enums.eVehicleTask.GO_HOME
@@ -680,7 +680,7 @@ function PrivateLimo:ForceCleanup()
 end
 
 function PrivateLimo:StateEval()
-	if self.lastCheckTime and self.lastCheckTime > Time.now() then
+	if self.lastCheckTime and self.lastCheckTime > Time.Now() then
 		return
 	end
 
@@ -755,7 +755,7 @@ function PrivateLimo:StateEval()
 		self:ReleaseControl()
 
 		local timer = Timer.new(2000)
-		while not timer:is_done() do
+		while not timer:IsDone() do
 			if self:IsPlayerInLimo() then
 				break
 			end
@@ -794,7 +794,7 @@ function PrivateLimo:StateEval()
 	end
 
 	self:ToggleBlip(not self:IsPlayerInLimo() and not self.isRemoteControlled)
-	self.lastCheckTime = Time.now() + 1
+	self.lastCheckTime = Time.Now() + 1
 end
 
 PrivateLimo.Limos = {

@@ -209,7 +209,7 @@ function LocalPlayer:IsBeingArrested()
 end
 
 -- Teleports local player to the provided coordinates.
----@param where integer|vec3 -- [blip ID](https://wiki.rage.mp/wiki/Blips) or vector3 coordinates
+---@param where (integer|vec3)? -- [blip ID](https://wiki.rage.mp/wiki/Blips) or vector3 coordinates
 ---@param keep_vehicle? boolean
 ---@param loadGround? boolean
 function LocalPlayer:Teleport(where, keep_vehicle, loadGround)
@@ -451,7 +451,7 @@ function LocalPlayer:SetMovementClipset(data, isJson)
 		end
 
 		if data.wanim then
-			WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(handle, joaat(data.wanim))
+			WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(handle, _J(data.wanim))
 		end
 	end)
 end

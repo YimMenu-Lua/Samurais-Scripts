@@ -54,7 +54,7 @@ end
 
 function CarWashDuffle:GetDirtyCash()
 	local posix = self:GetDirtyCashPosix()
-	return Time.epoch() >= posix and 0 or self:GetPendingCash()
+	return Time.Epoch() >= posix and 0 or self:GetPendingCash()
 end
 
 ---@return integer
@@ -69,7 +69,7 @@ function CarWashDuffle:CleanNow()
 
 	-- this stat is useless. Posix used in freemode is stored at Global_1882572[PLAYER::PLAYER_ID() /*315*/].f_158.f_27.f_5 (as of 1.72-3751.0)
 	-- not even gonna bother with this shit I hate maintaining globals and locals
-	stats.set_int("MPX_CAR_WASH_DUFFEL_POSIX", Time.epoch() + 1000)
+	stats.set_int("MPX_CAR_WASH_DUFFEL_POSIX", Time.Epoch() + 1000)
 end
 
 ---@class CarWashSubBusinessOpts : BasicBusinessOpts

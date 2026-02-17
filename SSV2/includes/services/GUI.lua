@@ -623,9 +623,9 @@ function GUI:Draw()
 		| ImGuiWindowFlags.NoScrollbar
 
 	if (GVars.ui.moveable) then
-		windowFlags = Bit.clear(windowFlags, ImGuiWindowFlags.NoMove)
+		windowFlags = Bit.Clear(windowFlags, ImGuiWindowFlags.NoMove)
 	else
-		windowFlags = Bit.set(windowFlags, ImGuiWindowFlags.NoMove)
+		windowFlags = Bit.Set(windowFlags, ImGuiWindowFlags.NoMove)
 	end
 
 	if (GVars.ui.window_pos:is_zero()) then

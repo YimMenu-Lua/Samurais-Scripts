@@ -38,7 +38,7 @@ function MagicBullet:ShouldRun()
 end
 
 function MagicBullet:Update()
-	if (Time.millis() - self.m_last_fired < 150) then
+	if (Time.Millis() - self.m_last_fired < 150) then
 		return
 	end
 
@@ -78,7 +78,7 @@ function MagicBullet:Update()
 				-1082130432
 			)
 
-			self.m_last_fired = Time.millis() + 150
+			self.m_last_fired = Time.Millis() + 150
 		end
 	end
 end

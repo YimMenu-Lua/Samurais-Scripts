@@ -44,7 +44,7 @@ setmetatable(WindowAnimator, {
 function WindowAnimator:Init(windowLabel, startPos, endPos, duration, easeOut)
 	self.m_window_label = windowLabel
 	self.m_active       = true
-	self.m_start_time   = Time.now()
+	self.m_start_time   = Time.Now()
 	self.m_start_pos    = startPos
 	self.m_end_pos      = endPos
 	self.m_duration     = duration or 0.18
@@ -69,7 +69,7 @@ function WindowAnimator:Apply()
 		return
 	end
 
-	local t = (Time.now() - self.m_start_time) / self.m_duration
+	local t = (Time.Now() - self.m_start_time) / self.m_duration
 	if (t >= 1) then
 		self.m_active = false
 		ImGui.SetWindowPos(self.m_window_label, self.m_end_pos.x, self.m_end_pos.y, ImGuiCond.Always)

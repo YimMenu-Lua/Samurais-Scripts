@@ -159,7 +159,7 @@ function CasinoPacino:ForceDealerBust()
 		local success     = true
 		Notifier:ShowMessage("Casino Pacino", _T("CP_BLACKJACK_SCRIPT_CONTROL"))
 		while (not LocalPlayer:IsHostOfScript("blackjack")) do
-			if (giveupTimer:is_done()) then
+			if (giveupTimer:IsDone()) then
 				success = false
 				break
 			end
@@ -385,15 +385,15 @@ function CasinoPacino:AutoPlaySlots()
 		delay = math.random(500, 1e4)
 	end
 
-	if (Bit.is_set(slotstate, 0)) then --The user is sitting at a slot machine.
+	if (Bit.IsBitSet(slotstate, 0)) then --The user is sitting at a slot machine.
 		local chips = stats.get_int("MPX_CASINO_CHIPS")
 		local chip_cap = GVars.features.dunk.slot_machine_cap
 		if ((autoplay_cap and chips < chip_cap) or not autoplay_cap) then
-			if (not Bit.is_set(slotstate, 24)) then --The slot machine is not currently spinning.
-				yield()                    -- Wait for the previous spin to clean up, if we just came from a spin.
-				slotstate = Bit.set(slotstate, 3) -- Bitwise set the 3rd bit (begin playing)
+			if (not Bit.IsBitSet(slotstate, 24)) then --The slot machine is not currently spinning.
+				yield()                      -- Wait for the previous spin to clean up, if we just came from a spin.
+				slotstate = Bit.Set(slotstate, 3) -- Bitwise set the 3rd bit (begin playing)
 				slots_slot_machine_state:WriteInt(slotstate)
-				sleep(delay)               -- If we rewrite the begin playing bit again, the machine will get stuck.
+				sleep(delay)                 -- If we rewrite the begin playing bit again, the machine will get stuck.
 			end
 		end
 	end

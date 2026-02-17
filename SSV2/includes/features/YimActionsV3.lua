@@ -239,8 +239,8 @@ function YimActions:PlayAnim(animData, targetPed)
 		YimActions.FXManager:StartPTFX(targetPed, animData.ptfx)
 	end
 
-	local isLooped = Bit.is_set(animData.flags, Enums.eAnimFlags.LOOPING)
-	local isFrozen = Bit.is_set(animData.flags, Enums.eAnimFlags.HOLD_LAST_FRAME)
+	local isLooped = Bit.IsBitSet(animData.flags, Enums.eAnimFlags.LOOPING)
+	local isFrozen = Bit.IsBitSet(animData.flags, Enums.eAnimFlags.HOLD_LAST_FRAME)
 
 	if (not isLooped and not isFrozen) then
 		repeat
@@ -368,6 +368,7 @@ function YimActions:Cleanup(ped)
 	end
 
 	sleep(200)
+	self.CurrentlyPlaying[ped] = nil
 	TASK.CLEAR_PED_TASKS(ped)
 
 	if (ped == LocalPlayer:GetHandle()) then
@@ -382,7 +383,6 @@ function YimActions:Cleanup(ped)
 		self:ResetPlayer()
 	end
 
-	self.CurrentlyPlaying[ped] = nil
 	if (Backend.debug_mode) then
 		YimActions.Debugger:Remove(ped)
 	end
@@ -409,8 +409,8 @@ function YimActions:OnInterruptEvent()
 
 	local isLooped, isFrozen = false, false
 	if (current.action_type == Enums.eActionType.ANIM) then
-		isLooped = Bit.is_set(current.data.flags, Enums.eAnimFlags.LOOPING)
-		isFrozen = Bit.is_set(current.data.flags, Enums.eAnimFlags.HOLD_LAST_FRAME)
+		isLooped = Bit.IsBitSet(current.data.flags, Enums.eAnimFlags.LOOPING)
+		isFrozen = Bit.IsBitSet(current.data.flags, Enums.eAnimFlags.HOLD_LAST_FRAME)
 	elseif (current.action_type == Enums.eActionType.SCENARIO) then
 		isLooped, isFrozen = true, true
 	end
@@ -426,6 +426,7 @@ function YimActions:OnInterruptEvent()
 	end
 
 	if (current and self:WasActionInterrupted(localPlayer)) then
+		print("interrupted")
 		if (LocalPlayer:IsFalling()) then
 			repeat
 				sleep(1000)
@@ -605,7 +606,7 @@ function YimActions:GoofyUnaliveAnim()
 	ThreadManager:Run(function()
 		local current  = LocalPlayer:GetCurrentWeaponHash()
 		local is_armed = false
-		if (current ~= 0 and WEAPON.GET_WEAPONTYPE_GROUP(current) ~= joaat("GROUP_PISTOL")) then
+		if (current ~= 0 and WEAPON.GET_WEAPONTYPE_GROUP(current) ~= _J("GROUP_PISTOL")) then
 			is_armed = true
 		else
 			for _, hash in ipairs(Weapons.Pistols) do
@@ -636,7 +637,7 @@ function YimActions:HandleCleanupKeybind()
 		ThreadManager:Run(function()
 			local timer = Timer.new(1000)
 			while (KeyManager:IsKeybindPressed("stop_anim")) do
-				if (timer:is_done()) then
+				if (timer:IsDone()) then
 					GUI:PlaySound(GUI.Sounds.Cancel)
 					self:ForceCleanup()
 					self:ResetPlayer()
@@ -994,7 +995,7 @@ function YimActions.FXManager:StartSFX(ped)
 	self.SFXTimers[ped] = self.SFXTimers[ped] or Timer.new(0)
 	local timer = self.SFXTimers[ped]
 
-	if (not timer:is_done()) then
+	if (not timer:IsDone()) then
 		return
 	end
 
@@ -1011,7 +1012,7 @@ function YimActions.FXManager:StartSFX(ped)
 		end
 	end
 
-	timer:reset(2500)
+	timer:Reset(2500)
 end
 
 function YimActions.FXManager:Wipe()

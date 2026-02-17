@@ -541,7 +541,7 @@ function PlayerVehicle:HandleAutopilot()
 
 	for _, ctrl in ipairs(self.FlightControls) do
 		if (PAD.IS_CONTROL_PRESSED(0, ctrl)) then
-			self.m_autopilot.last_interrupted = Time.now() + 5
+			self.m_autopilot.last_interrupted = Time.Now() + 5
 			Notifier:ShowMessage(
 				"Samurai's Scripts",
 				"Autopilot interrupted! Giving back control to the player.",
@@ -564,7 +564,7 @@ function PlayerVehicle:HandleAutopilot()
 		end
 	end
 
-	if (self.m_autopilot.last_interrupted and Time.now() > self.m_autopilot.last_interrupted) then
+	if (self.m_autopilot.last_interrupted and Time.Now() > self.m_autopilot.last_interrupted) then
 		self.m_autopilot.last_interrupted = nil
 	end
 end

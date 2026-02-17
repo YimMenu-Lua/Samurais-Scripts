@@ -669,7 +669,7 @@ local function DrawAnimOptions()
 				for name, flag in pairs(t_AnimFlags) do
 					ImGui.PushID(_F("##flag_%s", name))
 					flag.enabled, flag.wasClicked = ImGui.Checkbox(flag.label,
-						Bit.is_set(t_SelectedAction.data.flags, flag.bit))
+						Bit.IsBitSet(t_SelectedAction.data.flags, flag.bit))
 					ImGui.PopID()
 
 					if (flag.bit == Enums.eAnimFlags.ENDS_IN_DEAD_POSE) then
@@ -680,7 +680,7 @@ local function DrawAnimOptions()
 
 					if flag.wasClicked then
 						GUI:PlaySound("Nav")
-						local bitwiseOp = flag.enabled and Bit.set or Bit.clear
+						local bitwiseOp = flag.enabled and Bit.Set or Bit.Clear
 						t_SelectedAction.data.flags = bitwiseOp(t_SelectedAction.data.flags, flag.bit)
 					end
 				end

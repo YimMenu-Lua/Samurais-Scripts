@@ -327,9 +327,8 @@ function YRV3:PopulateOffice()
 		return
 	end
 
-	local charIdx = stats.get_character_index()
-	local name1 = STATS.STAT_GET_STRING(joaat(_F("MP%d_GB_OFFICE_NAME", charIdx)), -1)
-	local name2 = STATS.STAT_GET_STRING(joaat(_F("MP%d_GB_OFFICE_NAME2", charIdx)), -1)
+	local name1 = stats.get_string("MPX_GB_OFFICE_NAME")
+	local name2 = stats.get_string("MPX_GB_OFFICE_NAME2")
 	self.m_businesses.office = Office.new({
 		id          = idx,
 		name        = Game.GetGXTLabel(ref.gxt),
@@ -825,8 +824,8 @@ function YRV3:FinishCEOCargoSourceMission()
 		local fmccLocal3Offset = gbcb_obj:GetOffset(1)
 		local bs               = fmccLocal2:ReadInt()
 
-		if (not Bit.is_set(bs, 11)) then
-			bs = Bit.set(bs, 11)
+		if (not Bit.IsBitSet(bs, 11)) then
+			bs = Bit.Set(bs, 11)
 			fmccLocal2:WriteInt(bs)
 		end
 
@@ -892,9 +891,9 @@ function YRV3:CooldownHandler()
 end
 
 local fadedOutTimer = Timer.new(1e4)
-fadedOutTimer:pause()
+fadedOutTimer:Pause()
 function YRV3:SetupAutosell()
-	if (Time.millis() - self.m_last_autosell_check_time < 1200) then
+	if (Time.Millis() - self.m_last_autosell_check_time < 1200) then
 		return
 	end
 
@@ -924,8 +923,8 @@ function YRV3:SetupAutosell()
 		sleep(1000)
 
 		if (CAM.IS_SCREEN_FADING_OUT() or CAM.IS_SCREEN_FADED_OUT()) then
-			fadedOutTimer:resume()
-			while (not fadedOutTimer:is_done()) do
+			fadedOutTimer:Resume()
+			while (not fadedOutTimer:IsDone()) do
 				if (not CAM.IS_SCREEN_FADED_OUT() or CAM.IS_SCREEN_FADING_IN()) then
 					break
 				end
@@ -939,11 +938,11 @@ function YRV3:SetupAutosell()
 			end
 		end
 
-		fadedOutTimer:reset()
-		fadedOutTimer:pause()
+		fadedOutTimer:Reset()
+		fadedOutTimer:Pause()
 	end
 
-	self.m_last_autosell_check_time = Time.millis()
+	self.m_last_autosell_check_time = Time.Millis()
 end
 
 function YRV3:AutoSellHandler()
@@ -1016,7 +1015,7 @@ function YRV3:UpdateBusinesses()
 		return
 	end
 
-	if (Time.millis() - self.m_last_business_update_time < 500) then
+	if (Time.Millis() - self.m_last_business_update_time < 500) then
 		return
 	end
 
@@ -1036,7 +1035,7 @@ function YRV3:UpdateBusinesses()
 		end
 	end
 
-	self.m_last_business_update_time = Time.millis()
+	self.m_last_business_update_time = Time.Millis()
 end
 
 ---@param business BusinessBase|BasicBusiness
@@ -1053,7 +1052,7 @@ function YRV3:CalculateEstimatedIncome()
 		return
 	end
 
-	if (Time.millis() - self.m_last_income_check_time < 1200) then
+	if (Time.Millis() - self.m_last_income_check_time < 1200) then
 		return
 	end
 
@@ -1072,7 +1071,7 @@ function YRV3:CalculateEstimatedIncome()
 		self.m_total_sum = self.m_total_sum + safe:GetCashValue()
 	end
 
-	self.m_last_income_check_time = Time.millis()
+	self.m_last_income_check_time = Time.Millis()
 end
 
 function YRV3:OnTick()
