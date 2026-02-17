@@ -663,5 +663,13 @@ return {
 	["YH_SUBMARINE_NOT_OWNED"] = "Acquista un Kosatka per accedere al colpo a Cayo Perico.",
 	["GENERIC_MINUTES_LABEL"] = "Minuti",
 	["GENERIC_HOURS_LABEL"] = "Ore",
-	["GENERIC_MILLIS_LABEL"] = "Millisecondi"
+	["GENERIC_MILLIS_LABEL"] = "Millisecondi",
+	["GENERIC_EDIT"] = "Modificare",
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Vendi missioni intraprese:",
+	["YRV3_SHOW_EARNINGS_DATA"] = "Mostra dati sui guadagni",
+	["YRV3_LIFETIME_EARNINGS"] = "Guadagni nel corso della vita:",
+	["YRV3_LIFETIME_BUY_COMPLETE"] = "Acquista missioni completate:",
+	["YRV3_LIFETIME_SELL_COMPLETE"] = "Vendi missioni completate:",
+	["YRV3_EDIT_EARNINGS_DATA"] = "Modifica i dati sui guadagni",
+	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "Acquista le missioni intraprese:"
 }

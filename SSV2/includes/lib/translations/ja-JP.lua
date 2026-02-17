@@ -663,5 +663,13 @@ return {
 	["YH_SUBMARINE_NOT_OWNED"] = "カヨ ペリコ強盗にアクセスするには、コサトカを購入してください。",
 	["GENERIC_MINUTES_LABEL"] = "分",
 	["GENERIC_HOURS_LABEL"] = "営業時間",
-	["GENERIC_MILLIS_LABEL"] = "ミリ秒"
+	["GENERIC_MILLIS_LABEL"] = "ミリ秒",
+	["GENERIC_EDIT"] = "編集",
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "実施された販売ミッション:",
+	["YRV3_LIFETIME_EARNINGS"] = "生涯収入:",
+	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "引き受けたミッションを購入:",
+	["YRV3_LIFETIME_SELL_COMPLETE"] = "完了した販売ミッション:",
+	["YRV3_SHOW_EARNINGS_DATA"] = "収益データを表示する",
+	["YRV3_EDIT_EARNINGS_DATA"] = "収益データの編集",
+	["YRV3_LIFETIME_BUY_COMPLETE"] = "完了したミッションを購入:"
 }

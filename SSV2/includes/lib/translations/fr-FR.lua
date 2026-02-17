@@ -663,5 +663,13 @@ return {
 	["YH_SUBMARINE_NOT_OWNED"] = "Achetez un Kosatka pour accéder au Cayo Perico Heist.",
 	["GENERIC_HOURS_LABEL"] = "Heures",
 	["GENERIC_MILLIS_LABEL"] = "Millisecondes",
-	["GENERIC_MINUTES_LABEL"] = "Minutes"
+	["GENERIC_MINUTES_LABEL"] = "Minutes",
+	["GENERIC_EDIT"] = "Modifier",
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Missions de vente réalisées :",
+	["YRV3_SHOW_EARNINGS_DATA"] = "Afficher les données sur les revenus",
+	["YRV3_EDIT_EARNINGS_DATA"] = "Modifier les données sur les revenus",
+	["YRV3_LIFETIME_SELL_COMPLETE"] = "Missions de vente terminées :",
+	["YRV3_LIFETIME_EARNINGS"] = "Gains à vie :",
+	["YRV3_LIFETIME_BUY_COMPLETE"] = "Acheter des missions terminées :",
+	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "Acheter Missions entreprises :"
 }

@@ -663,5 +663,13 @@ return {
 	["YH_SUBMARINE_NOT_OWNED"] = "Kup Kosatkę, aby uzyskać dostęp do napadu Cayo Perico.",
 	["GENERIC_MILLIS_LABEL"] = "milisekundy",
 	["GENERIC_MINUTES_LABEL"] = "Protokół",
-	["GENERIC_HOURS_LABEL"] = "Godziny"
+	["GENERIC_HOURS_LABEL"] = "Godziny",
+	["GENERIC_EDIT"] = "Redagować",
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Podjęte misje sprzedażowe:",
+	["YRV3_SHOW_EARNINGS_DATA"] = "Pokaż dane o zarobkach",
+	["YRV3_LIFETIME_SELL_COMPLETE"] = "Ukończone misje sprzedaży:",
+	["YRV3_LIFETIME_BUY_COMPLETE"] = "Kup ukończone misje:",
+	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "Kup Podjęte misje:",
+	["YRV3_EDIT_EARNINGS_DATA"] = "Edytuj dane o zarobkach",
+	["YRV3_LIFETIME_EARNINGS"] = "Zarobki w ciągu całego życia:"
 }

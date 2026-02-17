@@ -663,5 +663,13 @@ return {
 	["YH_SUBMARINE_NOT_OWNED"] = "Купите Косатку, чтобы получить доступ к ограблению Кайо Перико.",
 	["GENERIC_MILLIS_LABEL"] = "Миллисекунды",
 	["GENERIC_MINUTES_LABEL"] = "Минуты",
-	["GENERIC_HOURS_LABEL"] = "Часы"
+	["GENERIC_HOURS_LABEL"] = "Часы",
+	["GENERIC_EDIT"] = "Редактировать",
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Продать выполненные миссии:",
+	["YRV3_EDIT_EARNINGS_DATA"] = "Редактировать данные о доходах",
+	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "Купить выполненные миссии:",
+	["YRV3_SHOW_EARNINGS_DATA"] = "Показать данные о доходах",
+	["YRV3_LIFETIME_EARNINGS"] = "Заработок за всю жизнь:",
+	["YRV3_LIFETIME_SELL_COMPLETE"] = "Продать выполненные миссии:",
+	["YRV3_LIFETIME_BUY_COMPLETE"] = "Купить выполненные миссии:"
 }
