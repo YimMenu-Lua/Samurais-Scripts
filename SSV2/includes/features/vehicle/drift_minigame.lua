@@ -9,12 +9,6 @@
 
 local FeatureBase = require("includes.modules.FeatureBase")
 
-local sp_chars <const> = {
-	[225514697]  = 0,
-	[2602752943] = 1,
-	[2608926626] = 2,
-}
-
 ---@class DriftMinigame : FeatureBase
 ---@field private m_entity PlayerVehicle
 ---@field private m_is_active boolean
