@@ -78,7 +78,7 @@ function MagicBullet:Update()
 				-1082130432
 			)
 
-			self.m_last_fired = Time.Millis() + 150
+			self.m_last_fired = Time.Millis()
 		end
 	end
 end
