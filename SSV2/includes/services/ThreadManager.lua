@@ -94,7 +94,7 @@ end
 
 ---@return milliseconds
 function Thread:GetTimeCreated()
-	return self.m_time_created:value()
+	return self.m_time_created:Value()
 end
 
 ---@return seconds
@@ -104,12 +104,12 @@ end
 
 ---@return string
 function Thread:GetLifetime()
-	return Time.format_time_since_ms(self:GetTimeCreated())
+	return Time.FormatSinceMillis(self:GetTimeCreated())
 end
 
 ---@return string
 function Thread:GetRunningTime()
-	return Time.format_time_since(self:GetTimeStarted())
+	return Time.FormatSince(self:GetTimeStarted())
 end
 
 ---@return boolean
@@ -136,8 +136,8 @@ function Thread:OnTick(s)
 		return
 	end
 
-	self.m_time_started  = Time.now()
-	self.m_last_entry_at = Time.now()
+	self.m_time_started  = Time.Now()
+	self.m_last_entry_at = Time.Now()
 	Backend:debug("Started thread %s", self.m_name)
 
 	while (self.m_can_run) do
@@ -145,21 +145,21 @@ function Thread:OnTick(s)
 			self.m_state = eThreadState.SUSPENDED
 			self.m_last_entry_at = 0
 			repeat
-				self.m_last_yield_at = Time.now()
+				self.m_last_yield_at = Time.Now()
 				yield()
 			until not self.m_should_pause
-			self.m_time_started = Time.now()
-			self.m_last_entry_at = Time.now()
+			self.m_time_started = Time.Now()
+			self.m_last_entry_at = Time.Now()
 		end
 
 		self.m_state = eThreadState.RUNNING
 
-		local cycle_start = Time.now()
+		local cycle_start = Time.Now()
 		self.m_last_entry_at = cycle_start
 
 		local work_start = cycle_start
 		local ok, err = pcall(self.m_callback, s)
-		local work_end = Time.now()
+		local work_end = Time.Now()
 		local work_ms = (work_end - work_start) * 1000
 		self.m_avg_work_ms = self.m_avg_work_ms * 0.9 + work_ms * 0.1
 
@@ -169,7 +169,7 @@ function Thread:OnTick(s)
 			return
 		end
 
-		self.m_last_exit_at = Time.now()
+		self.m_last_exit_at = Time.Now()
 		self.m_last_yield_at = self.m_last_exit_at
 		local cycle_ms = (self.m_last_exit_at - cycle_start) * 1000
 		self.m_avg_cycle_ms = self.m_avg_cycle_ms * 0.9 + cycle_ms * 0.1
@@ -192,7 +192,7 @@ function Thread:Start()
 	end
 
 	self.m_state = eThreadState.RUNNING
-	self.m_time_started = Time.now()
+	self.m_time_started = Time.Now()
 	Backend:debug("Started thread %s", self.m_name)
 	return true
 end
@@ -215,12 +215,12 @@ end
 
 function Thread:Resume()
 	self.m_should_pause = false
-	self.m_time_started = Time.now()
+	self.m_time_started = Time.Now()
 end
 
 ---@return eInternalThreadState
 function Thread:GetInternalState()
-	local now = Time.now()
+	local now = Time.Now()
 
 	if (now - self.m_last_entry_at > 5.0) then
 		return eInternalThreadState.STALLED

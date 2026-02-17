@@ -38,15 +38,16 @@ function AutoHeal:ShouldRun()
 end
 
 function AutoHeal:Update()
-	if (Time.millis() < self.m_last_update_time) then
+	local delay = math.floor(1000 / (GVars.features.self.autoheal.regen_speed or 1))
+	if (Time.Millis() - self.m_last_update_time < delay) then
 		return
 	end
 
-	local maxHp = LocalPlayer:GetMaxHealth()
-	local hp = LocalPlayer:GetHealth()
+	local maxHp   = LocalPlayer:GetMaxHealth()
+	local hp      = LocalPlayer:GetHealth()
 	local maxArmr = LocalPlayer:GetMaxArmour()
-	local armor = LocalPlayer:GetArmour()
-	local handle = LocalPlayer:GetHandle()
+	local armor   = LocalPlayer:GetArmour()
+	local handle  = LocalPlayer:GetHandle()
 
 	if (hp < maxHp and hp > 0) then
 		if (PED.IS_PED_IN_COVER(handle, false)) then
@@ -64,7 +65,7 @@ function AutoHeal:Update()
 		PED.ADD_ARMOUR_TO_PED(handle, 0.5)
 	end
 
-	self.m_last_update_time = Time.millis() + (1000 / GVars.features.self.autoheal.regen_speed)
+	self.m_last_update_time = Time.Millis()
 end
 
 return AutoHeal

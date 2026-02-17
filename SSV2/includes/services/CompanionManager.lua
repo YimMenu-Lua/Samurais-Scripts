@@ -75,7 +75,7 @@ function CompanionManager:SpawnCompanion(pedModel, name, is_invincible, is_armed
 	end
 
 	if (type(pedModel) == "string") then
-		pedModel = joaat(pedModel)
+		pedModel = _J(pedModel)
 	end
 
 	TaskWait(Game.RequestModel, pedModel)
@@ -333,7 +333,7 @@ function Companion.new(name, handle, model, is_invincible, is_armed, blip, is_sa
 	instance.armed = is_armed or false
 	instance.blip = { handle = blip or 0, alpha = 255 }
 	instance.is_saved = is_saved or false
-	instance.time_created = Time.now()
+	instance.time_created = Time.Now()
 
 	return instance
 end
@@ -370,11 +370,11 @@ function CompanionManager:FulfillTheProphecy()
 			20.0
 		)
 
-		local handle = Game.CreatePed(joaat("A_C_Boar_02"), spawnPos, LocalPlayer:GetHeading(-180))
+		local handle = Game.CreatePed(_J("A_C_Boar_02"), spawnPos, LocalPlayer:GetHeading(-180))
 		local MinimusWompusMeridius = Companion.new(
 			"Minimus Wompus Meridius",
 			handle,
-			joaat("A_C_Boar_02")
+			_J("A_C_Boar_02")
 		)
 
 		-- TODO: RNG to decide whether to spawn wholesome or evil Wompus. For now it's just evil Wompus blowing the player and himself up
@@ -393,7 +393,7 @@ function Companion:AD_MORTEM_INIMICUS()
 	PED.SET_PED_KEEP_TASK(self.handle, false)
 	TASK.CLEAR_PED_TASKS_IMMEDIATELY(self.handle)
 	TASK.TASK_STAND_STILL(self.handle, -1)
-	WEAPON.GIVE_WEAPON_TO_PED(self.handle, joaat("WEAPON_MACHETE"), 1, false, true)
+	WEAPON.GIVE_WEAPON_TO_PED(self.handle, _J("WEAPON_MACHETE"), 1, false, true)
 	PED.SET_PED_CONFIG_FLAG(self.handle, 118, false)
 	PED.SET_PED_CONFIG_FLAG(self.handle, 294, true)
 	PED.SET_PED_COMBAT_ATTRIBUTES(self.handle, 63, false)
@@ -438,7 +438,7 @@ function Companion:AD_MORTEM_INIMICUS()
 	CAM.RENDER_SCRIPT_CAMS(true, true, 500, true, false)
 	MISC.SET_OVERRIDE_WEATHER("THUNDER")
 	GRAPHICS.ANIMPOSTFX_PLAY("PPGREEN", 25000, false)
-	TaskWait(Game.RequestWeaponAsset, joaat("WEAPON_RPG"))
+	TaskWait(Game.RequestWeaponAsset, _J("WEAPON_RPG"))
 
 	local highPos = Game.GetEntityCoords(self.handle, false)
 	sleep(2500)
@@ -459,7 +459,7 @@ function Companion:AD_MORTEM_INIMICUS()
 		highPos.z - 0.1,
 		0,
 		false,
-		joaat("WEAPON_RPG"),
+		_J("WEAPON_RPG"),
 		LocalPlayer:GetHandle(),
 		true,
 		false,
@@ -468,7 +468,7 @@ function Companion:AD_MORTEM_INIMICUS()
 	sleep(2500)
 
 	local timer = Timer.new(5000)
-	while (ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(self.handle) > 1 and not timer:is_done()) do
+	while (ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(self.handle) > 1 and not timer:IsDone()) do
 		local tDelta = math.min(1, Game.GetFrameTime() * 10)
 		local lastPos = Game.GetEntityCoords(self.handle, false)
 		local targetPos = vec3:new(lastPos.x, lastPos.y, lastPos.z - 1)
@@ -522,7 +522,7 @@ function Companion:AD_MORTEM_INIMICUS()
 	CAM.DESTROY_CAM(cam, false)
 
 	local timer_2 = Timer.new(10000)
-	while (not timer_2:is_done()) do
+	while (not timer_2:IsDone()) do
 		if (not LocalPlayer:IsAlive()) then
 			break
 		end
@@ -559,7 +559,7 @@ function Companion:AD_MORTEM_INIMICUS()
 		most_recent_pos.z,
 		999,
 		false,
-		joaat("WEAPON_RPG"),
+		_J("WEAPON_RPG"),
 		LocalPlayer:GetHandle(),
 		true,
 		false,

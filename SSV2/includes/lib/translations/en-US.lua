@@ -109,6 +109,7 @@ return {
 	["GENERIC_LIST_SORT"]                  = "Sort By",
 	["GENERIC_LIST_FILTER"]                = "Filter By",
 	["GENERIC_LIST_GROUP"]                 = "Group By",
+	["GENERIC_EDIT"]                       = "Edit",
 	["GENERIC_UNKOWN"]                     = "Unknown",
 	["GENERIC_VEHICLE"]                    = "Vehicle",
 	["GENERIC_VALUE"]                      = "Value",
@@ -360,6 +361,13 @@ return {
 	"You can hold [SHIFT] while clicking the toggle to revoke the acknowledgment and lock this feature.",
 	["YRV3_CASH_LOOP_WARN_ACK"]            =
 	"This feature is unsafe and may result in account suspension if abused.\n\nPress 'Confirm' to acknowledge this warning and accept the risk, or 'Cancel' to go back. You can revoke this acknowledgment at any time later by holding [SHIFT] while clicking the toggle.",
+	["YRV3_LIFETIME_BUY_UNDERTAKEN"]       = "Buy Missions Undertaken:",
+	["YRV3_LIFETIME_BUY_COMPLETE"]         = "Buy Missions Completed:",
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"]      = "Sell Missions Undertaken:",
+	["YRV3_LIFETIME_SELL_COMPLETE"]        = "Sell Missions Completed:",
+	["YRV3_LIFETIME_EARNINGS"]             = "Lifetime Earnings:",
+	["YRV3_SHOW_EARNINGS_DATA"]            = "Show Earnings Data",
+	["YRV3_EDIT_EARNINGS_DATA"]            = "Edit Earnings Data",
 	--#endregion
 
 	--#region Self

@@ -259,7 +259,7 @@ function Memory:GetVehicleHandlingFlag(vehicle, flag)
 		return false
 	end
 
-	return Bit.is_set(m_handling_flags:get_dword(), flag)
+	return Bit.IsBitSet(m_handling_flags:get_dword(), flag)
 end
 
 -- Checks if a vehicle's model info flag is set. It is recommended to use the `Vehicle` module instead since it caches the CVehicle instance.
@@ -284,7 +284,7 @@ function Memory:GetVehicleModelInfoFlag(vehicle, flag)
 	local flag_ptr = base_ptr:add(index * 4)
 	local dword    = flag_ptr:get_dword()
 
-	return Bit.is_set(dword, bitPos)
+	return Bit.IsBitSet(dword, bitPos)
 end
 
 -- Unsafe for non-scripted entities.

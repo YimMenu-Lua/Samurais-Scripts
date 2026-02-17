@@ -25,7 +25,7 @@ function SceneManager:CreateParticipant(model)
 	)
 
 	if (type(model) == "string") then
-		model = joaat(model)
+		model = _J(model)
 	end
 
 	if (STREAMING.IS_MODEL_A_PED(model)) then

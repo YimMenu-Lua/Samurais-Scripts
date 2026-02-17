@@ -27,8 +27,8 @@ Clubhouse.__index     = Clubhouse
 function Clubhouse.new(opts)
 	local base             = BusinessFront.new(opts)
 	local instance         = setmetatable(base, Clubhouse)
-	local custom_name1     = STATS.STAT_GET_STRING(joaat(_F("MP%d_MC_GANG_NAME", stats.get_character_index())), -1)
-	local custom_name2     = STATS.STAT_GET_STRING(joaat(_F("MP%d_MC_GANG_NAME2", stats.get_character_index())), -1)
+	local custom_name1     = stats.get_string("MPX_MC_GANG_NAME")
+	local custom_name2     = stats.get_string("MPX_MC_GANG_NAME2")
 	instance.m_custom_name = _F("%s%s", custom_name1, custom_name2)
 
 	---@diagnostic disable-next-line

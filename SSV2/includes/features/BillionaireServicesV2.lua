@@ -155,7 +155,7 @@ end
 ---@param disableRagdoll? boolean
 ---@param behavior? integer
 function BillionaireServices:SpawnBodyguard(modelHash, name, spawnPos, weapon, godmode, disableRagdoll, behavior)
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		local count = table.getlen(self.Bodyguards)
 		if count > 1 and (count % 10 == 0) then
 			Notifier:ShowWarning(
@@ -197,7 +197,7 @@ end
 
 ---@param bodyguard Bodyguard
 function BillionaireServices:DismissBodyguard(bodyguard)
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		self.GroupManager:RemoveBodyguard(bodyguard.m_handle)
 
 		if table.getlen(self.Bodyguards) == 1 then
@@ -266,7 +266,7 @@ end
 ---@param noRagdoll? boolean
 ---@param spawnPos? vec3
 function BillionaireServices:SpawnEscortGroup(t_Data, godMode, noRagdoll, spawnPos)
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		if not LocalPlayer:IsOutside() then
 			Notifier:ShowError(
 				"Samurai's Scripts",
@@ -334,7 +334,7 @@ function BillionaireServices:RespawnEscortGroup(group, godMode, noRagdoll)
 		return
 	end
 
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		local t_Data = group:ToTable()
 		local spawnPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
 			LocalPlayer:GetHandle(),
@@ -366,7 +366,7 @@ end
 
 ---@param groupName string
 function BillionaireServices:DismissEscortGroup(groupName)
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		local group = self.EscortGroups[groupName]
 
 		if group then
@@ -405,7 +405,7 @@ end
 ---@param t_Data table
 ---@param spawnPos? vec3
 function BillionaireServices:CallPrivateLimo(t_Data, spawnPos)
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		if not LocalPlayer:IsOutside() then
 			Notifier:ShowError(
 				"Samurai's Scripts",
@@ -472,7 +472,7 @@ end
 ---@param model integer
 ---@param godmode? boolean
 function BillionaireServices:CallPrivateHeli(model, godmode)
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		if not LocalPlayer:IsOutside() then
 			Notifier:ShowError(
 				"Samurai's Scripts",
@@ -521,7 +521,7 @@ function BillionaireServices:CallPrivateHeli(model, godmode)
 
 			repeat
 				s:sleep(1000)
-			until ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(heli.m_handle) <= 3 or timer:is_done()
+			until ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(heli.m_handle) <= 3 or timer:IsDone()
 		else
 			Notifier:ShowMessage(
 				"Private Heli",
@@ -572,7 +572,7 @@ end
 ---@param model integer
 ---@param airportData table
 function BillionaireServices:CallPrivateJet(model, airportData)
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		if not airportData or not airportData.hangar then
 			Notifier:ShowError(
 				"Samurai's Scripts",

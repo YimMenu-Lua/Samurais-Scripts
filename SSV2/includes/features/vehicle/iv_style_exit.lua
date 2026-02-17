@@ -33,8 +33,8 @@ function IVStyleExit:Init()
 	self.m_last_steer_angle = 0.0
 	self.m_steering_timer   = Timer.new(200)
 	self.m_timer            = Timer.new(1000)
-	self.m_timer:pause()
-	self.m_steering_timer:pause()
+	self.m_timer:Pause()
+	self.m_steering_timer:Pause()
 end
 
 function IVStyleExit:ShouldRun()
@@ -50,8 +50,8 @@ end
 
 function IVStyleExit:Cleanup()
 	self.m_triggered = false
-	self.m_timer:reset()
-	self.m_timer:pause()
+	self.m_timer:Reset()
+	self.m_timer:Pause()
 end
 
 function IVStyleExit:ShouldReapplySteering()
@@ -76,8 +76,8 @@ function IVStyleExit:LeaveVehicle(keepEngineOn)
 
 	if (self:ShouldReapplySteering()) then
 		self.m_pending_steering = true
-		self.m_steering_timer:reset()
-		self.m_steering_timer:resume()
+		self.m_steering_timer:Reset()
+		self.m_steering_timer:Resume()
 	end
 
 	self:Cleanup()
@@ -98,13 +98,13 @@ function IVStyleExit:Update()
 		end
 
 		self.m_triggered = true
-		self.m_timer:resume()
+		self.m_timer:Resume()
 	end
 
 	if (self.m_triggered) then
-		if (PAD.IS_DISABLED_CONTROL_RELEASED(0, 75) and not self.m_timer:is_done()) then
+		if (PAD.IS_DISABLED_CONTROL_RELEASED(0, 75) and not self.m_timer:IsDone()) then
 			self:LeaveVehicle(true)
-		elseif (PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) and self.m_timer:is_done()) then
+		elseif (PAD.IS_DISABLED_CONTROL_PRESSED(0, 75) and self.m_timer:IsDone()) then
 			self:LeaveVehicle(false)
 		end
 	end
@@ -116,7 +116,7 @@ function IVStyleExit:Update()
 			pSteering:set_float(self.m_last_steer_angle)
 		end
 
-		if (self.m_steering_timer:is_done()) then
+		if (self.m_steering_timer:IsDone()) then
 			self.m_pending_steering = false
 			self.m_last_steer_angle = 0.0
 		end

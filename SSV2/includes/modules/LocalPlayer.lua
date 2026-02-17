@@ -9,11 +9,12 @@
 
 local Refs         = require("includes.data.refs")
 local FeatureMgr   = require("includes.services.FeatureManager")
-local miscFeatures = require("includes.features.self.miscellaneous")
+local Autoheal     = require("includes.features.self.autoheal")
 local Ragdoll      = require("includes.features.self.ragdoll")
 local MagicBullet  = require("includes.features.self.magic_bullet")
 local LaserSights  = require("includes.features.self.laser_sights")
 local Katana       = require("includes.features.self.katana")
+local miscFeatures = require("includes.features.self.miscellaneous")
 local CPed         = require("includes.classes.gta.CPed")
 local YimActions   = require("includes.features.YimActionsV3")
 
@@ -41,16 +42,17 @@ LocalPlayer.m_vehicle  = require("includes.modules.PlayerVehicle")
 LocalPlayer.m_feat_mgr = FeatureMgr.new(LocalPlayer)
 
 ---@diagnostic disable
-LocalPlayer.m_feat_mgr:Add(miscFeatures.new(LocalPlayer))
+LocalPlayer.m_feat_mgr:Add(Autoheal.new(LocalPlayer))
 LocalPlayer.m_feat_mgr:Add(Ragdoll.new(LocalPlayer))
 LocalPlayer.m_feat_mgr:Add(MagicBullet.new(LocalPlayer))
 LocalPlayer.m_feat_mgr:Add(LaserSights.new(LocalPlayer))
 LocalPlayer.m_feat_mgr:Add(Katana.new(LocalPlayer))
+LocalPlayer.m_feat_mgr:Add(miscFeatures.new(LocalPlayer))
 ---@diagnostic enable
 
 ---@return CPed
 function LocalPlayer:Resolve()
-	return CPed(LocalPlayer:GetHandle())
+	return CPed(self:GetHandle())
 end
 
 -- Returns the current local player's script handle.
@@ -106,7 +108,7 @@ end
 
 ---@return integer
 function LocalPlayer:GetTotalBalance()
-	return LocalPlayer:GetWalletBalance() + LocalPlayer:GetBankBalance()
+	return self:GetWalletBalance() + self:GetBankBalance()
 end
 
 function LocalPlayer:GetName()
@@ -175,13 +177,18 @@ function LocalPlayer:IsUsingVehicleMG()
 		return false, 0
 	end
 
-	local pWeaponInfo = LocalPlayer:Resolve().m_ped_weapon_mgr.m_vehicle_weapon_info
-	if (not pWeaponInfo or not pWeaponInfo:IsValid()) then
+	local cpedweaponmgr = self:Resolve().m_ped_weapon_mgr
+	if (not cpedweaponmgr or not cpedweaponmgr:IsValid()) then
 		return false, 0
 	end
 
-	local effectGroup = pWeaponInfo.m_effect_group:get_int()
-	local weaponHash  = pWeaponInfo.m_name_hash:get_dword()
+	local cvehicleweaponinfo = cpedweaponmgr.m_vehicle_weapon_info
+	if (not cvehicleweaponinfo or not cvehicleweaponinfo:IsValid()) then
+		return false, 0
+	end
+
+	local effectGroup = cvehicleweaponinfo.m_effect_group:get_int()
+	local weaponHash  = cvehicleweaponinfo.m_name_hash:get_dword()
 
 	-- we specifically want to return zero for the weapon hash if false
 	if (effectGroup ~= Enums.eWeaponEffectGroup.VehicleMG or weaponHash == 0) then
@@ -209,7 +216,7 @@ function LocalPlayer:IsBeingArrested()
 end
 
 -- Teleports local player to the provided coordinates.
----@param where integer|vec3 -- [blip ID](https://wiki.rage.mp/wiki/Blips) or vector3 coordinates
+---@param where (integer|vec3)? -- [blip ID](https://wiki.rage.mp/wiki/Blips) or vector3 coordinates
 ---@param keep_vehicle? boolean
 ---@param loadGround? boolean
 function LocalPlayer:Teleport(where, keep_vehicle, loadGround)
@@ -302,7 +309,7 @@ end
 
 function LocalPlayer:CanCrouch()
 	return
-		LocalPlayer:IsOnFoot()
+		self:IsOnFoot()
 		and not gui.is_open()
 		and not GUI:IsOpen()
 		and not HUD.IS_PAUSE_MENU_ACTIVE()
@@ -313,7 +320,7 @@ end
 
 function LocalPlayer:CanPutHandsUp()
 	return
-		(LocalPlayer:IsOnFoot() or LocalPlayer:GetVehicle():IsCar())
+		(self:IsOnFoot() or self:GetVehicle():IsCar())
 		and not gui.is_open()
 		and not GUI:IsOpen()
 		and not YimActions:IsPedPlaying()
@@ -342,9 +349,9 @@ function LocalPlayer:ToggleMpPhoneAnims(value)
 end
 
 function LocalPlayer:PlayKeyfobAnim()
-	if (LocalPlayer:IsDead()
-			or LocalPlayer:IsSwimming()
-			or not LocalPlayer:IsOnFoot()
+	if (self:IsDead()
+			or self:IsSwimming()
+			or not self:IsOnFoot()
 			or YimActions:IsPedPlaying()
 			or YimActions:IsPlayerBusy()
 		) then
@@ -353,7 +360,7 @@ function LocalPlayer:PlayKeyfobAnim()
 
 	TaskWait(Game.RequestAnimDict, "anim@mp_player_intmenu@key_fob@")
 	TASK.TASK_PLAY_ANIM(
-		LocalPlayer:GetHandle(),
+		self:GetHandle(),
 		"anim@mp_player_intmenu@key_fob@",
 		"fob_click",
 		4.0,
@@ -374,7 +381,7 @@ function LocalPlayer:RemoveAttachments(lookup_table)
 		local had_attachments = false
 
 		local function _detach(entity)
-			if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(entity, LocalPlayer:GetHandle()) then
+			if ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(entity, self:GetHandle()) then
 				had_attachments = true
 				ENTITY.DETACH_ENTITY(entity, true, true)
 				ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(entity)
@@ -424,10 +431,10 @@ function LocalPlayer:SetMovementClipset(data, isJson)
 	local mvmtclipset = isJson and data.Name or data.mvmt
 
 	script.run_in_fiber(function(s)
-		LocalPlayer:ResetMovementClipsets()
+		self:ResetMovementClipsets()
 		s:sleep(100)
 
-		local handle = LocalPlayer:GetHandle()
+		local handle = self:GetHandle()
 		if mvmtclipset then
 			TaskWait(Game.RequestClipSet, mvmtclipset)
 			PED.SET_PED_MOVEMENT_CLIPSET(handle, mvmtclipset, 1.0)
@@ -451,13 +458,13 @@ function LocalPlayer:SetMovementClipset(data, isJson)
 		end
 
 		if data.wanim then
-			WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(handle, joaat(data.wanim))
+			WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(handle, _J(data.wanim))
 		end
 	end)
 end
 
 function LocalPlayer:ResetMovementClipsets()
-	local handle = LocalPlayer:GetHandle()
+	local handle = self:GetHandle()
 
 	PED.RESET_PED_MOVEMENT_CLIPSET(handle, 0.3)
 	PED.RESET_PED_STRAFE_CLIPSET(handle)
@@ -471,8 +478,8 @@ function LocalPlayer:ResetMovementClipsets()
 end
 
 function LocalPlayer:Cleanup()
-	LocalPlayer:ResetMovementClipsets()
-	LocalPlayer.m_feat_mgr:Cleanup()
+	self:ResetMovementClipsets()
+	self.m_feat_mgr:Cleanup()
 end
 
 function LocalPlayer:Reset()

@@ -17,6 +17,14 @@ local RawBusinessData  = require("includes.data.yrv3_data")
 ---@field custom_name string
 ---@field safe_data nil
 
+---@class OfficeEarningsReport : BusinessEarningsReport
+---@field lifetime_buy_undertaken integer
+---@field lifetime_buy_completed integer
+---@field lifetime_sell_undertaken integer
+---@field lifetime_sell_completed integer
+---@field lifetime_earnings integer
+---@field lifetime_earnings_fmt string
+
 -- Class representing the CEO Office.
 ---@class Office : BusinessFront
 ---@field private m_id integer
@@ -24,18 +32,28 @@ local RawBusinessData  = require("includes.data.yrv3_data")
 ---@field private m_custom_name string
 ---@field private m_subs array<Warehouse>
 ---@field private m_vehicle_warehouse? VehicleWarehouse
+---@field private m_earnings_report OfficeEarningsReport
+---@field private m_last_report_check_time milliseconds
 local Office   = setmetatable({}, BusinessFront)
 Office.__index = Office
 
 ---@param opts OfficeOpts
 ---@return Office
 function Office.new(opts)
-	local base             = BusinessFront.new(opts)
+	local base                 = BusinessFront.new(opts)
 
 	---@type Office
 	---@diagnostic disable-next-line
-	local instance         = setmetatable(base, Office)
-	instance.m_custom_name = opts.custom_name
+	local instance             = setmetatable(base, Office)
+	instance.m_custom_name     = opts.custom_name
+	instance.m_earnings_report = {
+		lifetime_buy_undertaken  = 0,
+		lifetime_buy_completed   = 0,
+		lifetime_sell_undertaken = 0,
+		lifetime_sell_completed  = 0,
+		lifetime_earnings        = 0,
+		lifetime_earnings_fmt    = "$0",
+	}
 	instance:CheckVehicleWarehouse()
 	return instance
 end
@@ -114,6 +132,23 @@ function Office:GetEstimatedIncome()
 	return count
 end
 
+---@return OfficeEarningsReport
+function Office:GetEarningsReport()
+	return self.m_earnings_report
+end
+
+function Office:UpdateEarningsReport()
+	self.m_earnings_report                          = self.m_earnings_report or {}
+
+	local lifetime_earnings                         = stats.get_int("MPX_LIFETIME_CONTRA_EARNINGS")
+	self.m_earnings_report.lifetime_earnings        = lifetime_earnings
+	self.m_earnings_report.lifetime_earnings_fmt    = string.formatmoney(lifetime_earnings)
+	self.m_earnings_report.lifetime_buy_undertaken  = stats.get_int("MPX_LIFETIME_BUY_UNDERTAKEN")
+	self.m_earnings_report.lifetime_buy_completed   = stats.get_int("MPX_LIFETIME_BUY_COMPLETE")
+	self.m_earnings_report.lifetime_sell_undertaken = stats.get_int("MPX_LIFETIME_SELL_UNDERTAKEN")
+	self.m_earnings_report.lifetime_sell_completed  = stats.get_int("MPX_LIFETIME_SELL_COMPLETE")
+end
+
 ---@param index integer
 function Office:AddSubBusiness(index)
 	if (not self:IsValid()) then
@@ -148,6 +183,11 @@ function Office:Update()
 		if (wh:IsValid() and type(wh.Update) == "function") then
 			wh:Update()
 		end
+	end
+
+	if (Time.Millis() - self.m_last_report_check_time > 5000 and GUI:IsOpen()) then
+		self:UpdateEarningsReport()
+		self.m_last_report_check_time = Time.Millis()
 	end
 end
 

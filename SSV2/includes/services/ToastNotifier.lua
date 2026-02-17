@@ -90,7 +90,7 @@ function Notification.new(title, message, level, id, callback)
 		m_title        = title,
 		m_message      = message,
 		m_id           = id,
-		m_time_created = Time.now(),
+		m_time_created = Time.Now(),
 		m_level        = level,
 		m_seen         = false,
 		m_accent_color = bgColors[level],
@@ -116,7 +116,7 @@ end
 
 ---@return number
 function Notification:GetEaseIn()
-	local now   = Time.now()
+	local now   = Time.Now()
 	local age   = now - self.m_time_created
 	local animT = 0.22
 	return math.clamp(age / animT, 0, 1)
@@ -360,7 +360,7 @@ end
 
 ---@return boolean
 function Toast:HasExpired()
-	return self.m_notification.m_seen or (self.m_lifetime and Time.now() - self.m_lifetime >= self.m_duration)
+	return self.m_notification.m_seen or (self.m_lifetime and Time.Now() - self.m_lifetime >= self.m_duration)
 end
 
 function Toast:SetAsExpired()
@@ -369,7 +369,7 @@ function Toast:SetAsExpired()
 	end
 
 	self.m_appeared = true
-	self.m_lifetime = Time.now() + self.m_duration
+	self.m_lifetime = Time.Now() + self.m_duration
 end
 
 function Toast:Dismiss()
@@ -401,7 +401,7 @@ function Toast:GetEase()
 		return 0.0
 	end
 
-	local now     = Time.now()
+	local now     = Time.Now()
 	local age     = now - self.m_lifetime
 	local easeIn  = 0.22
 	local easeOut = 0.22
@@ -424,7 +424,7 @@ function Toast:GetDelta()
 		return 0.0
 	end
 
-	local age = Time.now() - self.m_lifetime
+	local age = Time.Now() - self.m_lifetime
 	return math.clamp(age / self.m_duration, 0, 1)
 end
 
@@ -567,7 +567,7 @@ end
 function Notifier:Add(title, message, level, opts)
 	opts = opts or {}
 
-	local now = Time.now()
+	local now = Time.Now()
 	if (self.m_last_title == title and self.m_last_message == message) and (now - self.m_last_time) < self.m_rate_limit then
 		return
 	end
@@ -645,7 +645,7 @@ function Notifier:DrawToasts()
 	end
 
 	if (not toast.m_lifetime) then
-		toast.m_lifetime = Time.now()
+		toast.m_lifetime = Time.Now()
 	end
 
 	if (self.m_should_draw or self:IsMuted()) then

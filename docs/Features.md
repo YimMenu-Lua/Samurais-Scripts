@@ -26,6 +26,7 @@ SSV2 includes polished versions of your favorite features from previous versions
       <ul>
         <li><a href="#yimresupplierv3">YimResupplierV3</a></li>
         <li><a href="#casinopacino">CasinoPacino</a></li>
+        <li><a href="#yimheistsv1">YimHeistsV1</a></li>
       </ul>
     </li>
     <li>
@@ -350,17 +351,21 @@ _Usage:_ Sit in the driver's seat of a flatbed truck then approach any vehicle a
 
 ### YimResupplierV3
 
-A business manager that supports auto-fill and auto-sell for several businesses, offers instant production triggers for biker businesses, bunker, acid lab, nightclub controls some job cooldowns, and integrates with CommandExecutor.
+A business manager that supports auto-fill and auto-sell for several businesses, offers instant production triggers for biker businesses, bunker, acid lab, nightclub controls some job cooldowns, and integrates with CommandExecutor. Includes a SalvageYard script by [@szalikdev](https://github.com/szalikdev).
 
 ### CasinoPacino
 
 An updated and slightly refactored version of [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino).
 
+### YimHeistsV1
+
+A heist editor added by [@How-Bout-No](https://github.com/How-Bout-No) [WIP].
+
 ## Extra
 
 ### YimActionsV3
 
-A greatly improved version of my all-in-one animations script.
+All-in-one animations script.
 
 ### EntityForge
 

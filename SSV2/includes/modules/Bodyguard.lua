@@ -198,12 +198,12 @@ function Bodyguard:GiveWeapon(weapon)
 		return
 	end
 
-	weapon = (type(weapon) == "string") and joaat(weapon) or weapon
+	weapon = (type(weapon) == "string") and _J(weapon) or weapon
 	if (weapon == 0) then
-		weapon = joaat("WEAPON_TECPISTOL")
+		weapon = _J("WEAPON_TECPISTOL")
 	end
 
-	if (weapon == joaat("WEAPON_UNARMED")) then
+	if (weapon == _J("WEAPON_UNARMED")) then
 		self.isArmed = self:IsArmed()
 		return
 	end
@@ -604,7 +604,7 @@ function Bodyguard:GrabNearestVehicle()
 			local timer = Timer.new(10000)
 			repeat
 				yield()
-			until not self:IsOnFoot() or timer:is_done()
+			until not self:IsOnFoot() or timer:IsDone()
 
 			if (PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(self.m_handle) == 0) or (self:IsOnFoot() and PED.IS_PED_STOPPED(self.m_handle)) then
 				retries = retries + 1
@@ -660,7 +660,7 @@ function Bodyguard:SetOverrideTask(OnCall, duration, description)
 
 	self.overrideTaskData = {
 		func = OnCall,
-		duration = (duration and duration ~= -1) and (Time.now() + duration) or -1,
+		duration = (duration and duration ~= -1) and (Time.Now() + duration) or -1,
 		task = eGuardTask.OVERRIDE,
 		desc = description,
 		hasRun = false
@@ -746,7 +746,7 @@ function Bodyguard:UpdateTasks()
 	local override = self.overrideTaskData
 
 	if (override) then
-		if (override.duration == -1 or Time.now() < override.duration) then
+		if (override.duration == -1 or Time.Now() < override.duration) then
 			if (not override.hasRun) then
 				if (override.func and type(override.func) == "function") then
 					override.func(self)
@@ -850,7 +850,7 @@ function Bodyguard:Dismiss(s)
 	local dismissTimer = Timer.new(9000)
 	repeat
 		s:sleep(500)
-	until dismissTimer:is_done()
+	until dismissTimer:IsDone()
 	Game.FadeOutEntity(self.m_handle)
 	s:sleep(1000)
 	return true
@@ -878,7 +878,7 @@ function Bodyguard:StateEval()
 			return
 		end
 
-		if self.evalTimer:is_done() then
+		if self.evalTimer:IsDone() then
 			local distMoved = self:GetPos():distance(self.evalStartPos or vec3:zero())
 
 			if distMoved < 0.2
@@ -1059,7 +1059,7 @@ function Bodyguard:TaskEnterVehicle(vehicle, timeout, seatIndex)
 			)
 
 			local timer = Timer.new(5000)
-			while not timer:is_done() do
+			while not timer:IsDone() do
 				if not seatIndex or PED.IS_PED_SITTING_IN_VEHICLE(self.m_handle, vehicle) then
 					break
 				end
@@ -1226,7 +1226,7 @@ function Bodyguard:TickVehicleEscort(s)
 							local timer = Timer.new(5000)
 							repeat
 								s:sleep(100)
-							until PED.IS_PED_SITTING_IN_VEHICLE(member.m_handle, self.vehicle.handle) or timer:is_done()
+							until PED.IS_PED_SITTING_IN_VEHICLE(member.m_handle, self.vehicle.handle) or timer:IsDone()
 						end
 					end
 				end
@@ -2033,9 +2033,9 @@ function EscortGroup:SanityCheck()
 end
 
 function EscortGroup:CheckDriver()
-	if Time.millis() >= self.lastDriverCheckTime then
+	if Time.Millis() >= self.lastDriverCheckTime then
 		EscortGroup:GetDriver()
-		self.lastDriverCheckTime = Time.millis() + 1e4
+		self.lastDriverCheckTime = Time.Millis() + 1e4
 	end
 end
 
@@ -2122,7 +2122,7 @@ function EscortGroup:Dismiss(s)
 		local dismissTimer = Timer.new(9000)
 		repeat
 			s:sleep(500)
-		until dismissTimer:is_done()
+		until dismissTimer:IsDone()
 		Game.FadeOutEntity(self.vehicle.handle)
 	else
 		for _, escort in ipairs(self.members) do

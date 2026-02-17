@@ -244,7 +244,7 @@ end
 ---@param radius number
 function Speedometer:DrawEngineWarning(ImDrawList, center, radius)
 	if (self._state.EngineHealth < 800) then
-		local pulse = 0.5 + 0.5 * math.sin(Time.now() * 5)
+		local pulse = 0.5 + 0.5 * math.sin(Time.Now() * 5)
 		local color = Color(1, self._state.EngineHealth < 400 and pulse or 0.9, 0, 1):AsU32()
 		local offset = vec2:new(-radius + 72, 15)
 		local p1 = center + offset + vec2:new(0, -7)
@@ -505,7 +505,7 @@ function Speedometer:Draw(offset)
 	-- RIP Paul Walker
 	if (self._state.NOSDangerRatio >= 0.8) then
 		local window_width = radius * 1.3
-		local pulse = 0.5 + 0.5 * math.sin(Time.now() * 12)
+		local pulse = 0.5 + 0.5 * math.sin(Time.Now() * 12)
 		ImGui.SetNextWindowSize(window_width, 100, ImGuiCond.Always)
 		ImGui.SetNextWindowPos(
 			GVars.features.speedometer.pos.x + radius * 0.7,

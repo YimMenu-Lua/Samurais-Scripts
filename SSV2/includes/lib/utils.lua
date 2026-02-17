@@ -12,7 +12,10 @@
 math.randomseed(os.time())
 
 local LUA_TABLE_OVERHEAD <const> = 3 * 0x8 -- 0x18
-local Clock <const> = require("includes.modules.Time")
+local Chrono <const>             = require("includes.modules.Chrono")
+local Cast                       = require("includes.modules.Cast")
+Bit                              = require("includes.modules.Bit")
+
 
 INT_SIZES = {
 	int8_t   = 0x1,
@@ -25,18 +28,39 @@ INT_SIZES = {
 	uint64_t = 0x8,
 }
 
-
-Bit       = require("includes.modules.Bit")
-Cast      = require("includes.modules.Cast")
-
-Time      = Clock.Time
-Timer     = Clock.Timer
-TimePoint = Clock.TimePoint
-DateTime  = Clock.DateTime
+Time      = Chrono.Time
+Timer     = Chrono.Timer
+TimePoint = Chrono.TimePoint
+DateTime  = Chrono.DateTime
 yield     = coroutine.yield
-sleep     = Time.sleep
+sleep     = Time.Sleep
 _F        = string.format
 
+-- Lua version of Bob Jenskins' "Jenkins One At A Time" hash function
+--
+-- https://en.wikipedia.org/wiki/Jenkins_hash_function
+---@param key string
+---@return joaat_t
+local function Joaat(key)
+	local hash = 0
+	key = key:lower()
+
+	for i = 1, #key do
+		hash = hash + string.byte(key, i)
+		hash = hash + (hash << 10)
+		hash = hash & 0xFFFFFFFF
+		hash = hash ~ (hash >> 6)
+	end
+
+	hash = hash + (hash << 3)
+	hash = hash & 0xFFFFFFFF
+	hash = hash ~ (hash >> 11)
+	hash = hash + (hash << 15)
+	hash = hash & 0xFFFFFFFF
+	return hash
+end
+
+_J = _G.joaat or Joaat
 
 --#region Global functions
 
@@ -288,30 +312,6 @@ function EnumToString(e, index)
 	return "Unknown"
 end
 
--- Lua version of Bob Jenskins' "Jenkins One At A Time" hash function
---
--- https://en.wikipedia.org/wiki/Jenkins_hash_function
----@param key string
----@return joaat_t
-function Joaat(key)
-	local hash = 0
-	key = key:lower()
-
-	for i = 1, #key do
-		hash = hash + string.byte(key, i)
-		hash = hash + (hash << 10)
-		hash = hash & 0xFFFFFFFF
-		hash = hash ~ (hash >> 6)
-	end
-
-	hash = hash + (hash << 3)
-	hash = hash & 0xFFFFFFFF
-	hash = hash ~ (hash >> 11)
-	hash = hash + (hash << 15)
-	hash = hash & 0xFFFFFFFF
-	return hash
-end
-
 -- Pauses execution until a condition is met.
 --
 -- All logic after this call will only execute once the provided function returns a truthy value.
@@ -339,9 +339,9 @@ function TaskWait(func, args, timeout)
 		args = { args }
 	end
 
-	local start_time = Time.millis()
+	local start_time = Time.Millis()
 	while (not func(table.unpack(args))) do
-		if ((Time.millis() - start_time) > timeout) then
+		if ((Time.Millis() - start_time) > timeout) then
 			error("Timeout reached!")
 		end
 		yield()
@@ -382,6 +382,44 @@ end
 --#region extensions
 
 --#region Lua API
+
+-- Returns the stat with the appropriate character prefix.
+--
+-- For online stats, you can pass a stat starting with `MPX`, `MP0`, `MP1`, or `MP_STAT`
+--
+-- For single player, you can pass a stat starting with `SPX`, `SP0`, `SP1`, or `SP2`
+---@param stat_name string
+---@return string
+function stats.get_prefixed_stat(stat_name)
+	local char_idx = Game.GetCharacterIndex()
+	if (stat_name:startswith("MPX") or stat_name:startswith("SPX")) then
+		return stat_name:replace_char(3, tostring(char_idx))
+	end
+
+	if (stat_name:startswith("MP_STAT")) then
+		local ret, _ = stat_name:replace("MP_STAT", _F("MP%d", char_idx))
+		return ret
+	end
+
+	return stat_name
+end
+
+---@param stat_name string
+---@return string
+function stats.get_string(stat_name)
+	stat_name = stats.get_prefixed_stat(stat_name)
+	return STATS.STAT_GET_STRING(_J(stat_name), -1)
+end
+
+---@param stat_name string
+function stats.set_string(stat_name, v)
+	stat_name = stats.get_prefixed_stat(stat_name)
+	if (not stat_name:startswith("MP") or not stat_name:startswith("SP")) then
+		return
+	end
+
+	STATS.STAT_SET_STRING(_J(stat_name), v, true)
+end
 
 ---@param stat_name string
 ---@param v number
@@ -1236,6 +1274,17 @@ string.replace = function(str, old, new)
 	end
 
 	return str:gsub(old:gsub("([^%w])", "%%%1"), new)
+end
+
+---@param str string
+---@param pos integer
+---@param new_cahr string
+string.replace_char = function(str, pos, new_cahr)
+	pos = math.max(1, math.min(pos, #str + 1))
+	local prefix = str:sub(1, pos - 1)
+	local suffix = str:sub(pos + 1)
+
+	return _F("%s%s%s", prefix, new_cahr, suffix)
 end
 
 -- Joins a table of strings using a separator.

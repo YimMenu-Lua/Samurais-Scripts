@@ -121,7 +121,7 @@ function PrivateHeli.spawn(model, spawnPos, godmode)
 				isOn = true,
 				stationName = Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 			},
-			lastCheckTime = Time.now() + 3
+			lastCheckTime = Time.Now() + 3
 		},
 		PrivateHeli
 	)
@@ -428,7 +428,7 @@ function PrivateHeli:Dismiss()
 end
 
 function PrivateHeli:StateEval()
-	if self.lastCheckTime and self.lastCheckTime > Time.now() then
+	if self.lastCheckTime and self.lastCheckTime > Time.Now() then
 		return
 	end
 
@@ -506,7 +506,7 @@ function PrivateHeli:StateEval()
 	self.isFarAway = self:IsFarAwayFromBoss()
 	self.isPlayerRappelling = self.allowsRappelling and (self.altitude > 3) and
 		VEHICLE.IS_ANY_PED_RAPPELLING_FROM_HELI(self.m_handle)
-	self.lastCheckTime = Time.now() + 2
+	self.lastCheckTime = Time.Now() + 2
 end
 
 ------------------------------------------------------------------------

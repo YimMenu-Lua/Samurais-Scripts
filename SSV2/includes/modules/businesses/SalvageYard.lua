@@ -62,7 +62,7 @@ end
 
 ---@return boolean
 function SalvageYard:ArePrepsCompleted()
-	return Bit.is_set(stats.get_int("MPX_SALV23_GEN_BS"), 0)
+	return Bit.IsBitSet(stats.get_int("MPX_SALV23_GEN_BS"), 0)
 end
 
 -- Similar to nightclub popularity.

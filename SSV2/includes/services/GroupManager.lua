@@ -18,10 +18,10 @@ GroupManager.Escorts = {}
 
 function GroupManager:Init()
 	if not self.relationshipGroup then
-		if (PED.DOES_RELATIONSHIP_GROUP_EXIST(joaat("WOMPUS_SPECIAL"))) then
-			self.relationshipGroup = joaat("WOMPUS_SPECIAL")
+		if (PED.DOES_RELATIONSHIP_GROUP_EXIST(_J("WOMPUS_SPECIAL"))) then
+			self.relationshipGroup = _J("WOMPUS_SPECIAL")
 		else
-			_, self.relationshipGroup = PED.ADD_RELATIONSHIP_GROUP("WOMPUS_SPECIAL", joaat("WOMPUS_SPECIAL"))
+			_, self.relationshipGroup = PED.ADD_RELATIONSHIP_GROUP("WOMPUS_SPECIAL", _J("WOMPUS_SPECIAL"))
 		end
 
 		PED.SET_RELATIONSHIP_BETWEEN_GROUPS(0, self.relationshipGroup, LocalPlayer:GetRelationshipGroupHash())
@@ -55,7 +55,7 @@ function GroupManager:AddBodyguard(bodyguard)
 		bodyguard.tickOffset = (#self.Bodyguards % 4)
 		self.Bodyguards[bodyguard.m_handle] = {
 			member = bodyguard,
-			lastTaskTime = Time.now()
+			lastTaskTime = Time.Now()
 		}
 	end
 end
@@ -77,7 +77,7 @@ function GroupManager:AddEscortGroup(group)
 
 	self.Escorts[group.name] = {
 		group = group,
-		lastTaskTime = Time.now()
+		lastTaskTime = Time.Now()
 	}
 end
 
@@ -109,7 +109,7 @@ function GroupManager:HandleBodyuards(s)
 			local guard = data.member
 
 			if guard and guard.tickOffset and (self.globalTick % 4 == guard.tickOffset) then
-				if (data.lastTaskTime < Time.now()) then
+				if (data.lastTaskTime < Time.Now()) then
 					local guardPos = guard:GetPos()
 					local distance = guardPos:distance(playerCoords)
 
@@ -124,7 +124,7 @@ function GroupManager:HandleBodyuards(s)
 					guard:TickVehicleEscort(s)
 					guard:StateEval()
 
-					data.lastTaskTime = Time.now() + 1
+					data.lastTaskTime = Time.Now() + 1
 				end
 			end
 		else
@@ -140,13 +140,13 @@ function GroupManager:HandleEscorts(s)
 	end
 
 	for _, data in pairs(self.Escorts) do
-		if data and (data.lastTaskTime < Time.now()) then
+		if data and (data.lastTaskTime < Time.Now()) then
 			---@type EscortGroup
 			local group = data.group
 			if group then
 				group:BackgroundWorker(s, self.globalTick)
 			end
-			data.lastTaskTime = Time.now() + 1
+			data.lastTaskTime = Time.Now() + 1
 		end
 	end
 	s:sleep(1)

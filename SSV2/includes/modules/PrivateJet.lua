@@ -162,7 +162,7 @@ function PrivateJet.spawn(model, airportData)
 			},
 			wasDismissed = false,
 			task = Enums.eVehicleTask.NONE,
-			lastCheckTime = Time.now() + 3
+			lastCheckTime = Time.Now() + 3
 		},
 		PrivateJet
 	)
@@ -585,7 +585,7 @@ function PrivateJet:Dismiss()
 end
 
 function PrivateJet:StateEval()
-	if self.lastCheckTime and self.lastCheckTime > Time.now() then
+	if self.lastCheckTime and self.lastCheckTime > Time.Now() then
 		return
 	end
 
@@ -652,7 +652,7 @@ function PrivateJet:StateEval()
 	end
 
 	self:ToggleBlip(not self:IsPlayerInJet())
-	self.lastCheckTime = Time.now() + 2
+	self.lastCheckTime = Time.Now() + 2
 	self.canWarpPlayer = self:IsFarAwayFromBoss()
 end
 

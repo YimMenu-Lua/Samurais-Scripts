@@ -102,7 +102,7 @@ function PublicEnemy:TogglePedConfig(ped, toggle)
 end
 
 function PublicEnemy:UpdateHostileSet()
-	if (not self.m_last_scan_time:has_elapsed(3000)) then
+	if (not self.m_last_scan_time:HasElapsed(3000)) then
 		return
 	end
 
@@ -125,12 +125,12 @@ function PublicEnemy:UpdateHostileSet()
 		yield()
 	end
 
-	self.m_last_scan_time:reset()
+	self.m_last_scan_time:Reset()
 	self.m_hostile_count = self.m_hostile_peds:Size()
 end
 
 function PublicEnemy:TaskCombat()
-	if (not self.m_last_task_time:has_elapsed(1000)) then
+	if (not self.m_last_task_time:HasElapsed(1000)) then
 		return
 	end
 
@@ -167,7 +167,7 @@ function PublicEnemy:TaskCombat()
 
 	self.m_hostile_count      = self.m_hostile_peds:Size()
 	self.m_last_hostile_count = self.m_hostile_count
-	self.m_last_task_time:reset()
+	self.m_last_task_time:Reset()
 end
 
 function PublicEnemy:Update()

@@ -61,7 +61,7 @@ function RGBLights:Update()
 		VEHICLE.TOGGLE_VEHICLE_MOD(handle, 22, true)
 	end
 
-	if (Time.millis() < self.m_last_update_time) then
+	if (Time.Millis() < self.m_last_update_time) then
 		return
 	end
 
@@ -75,7 +75,7 @@ function RGBLights:Update()
 		self.m_light_direction = -self.m_light_direction
 	end
 
-	self.m_last_update_time = Time.millis() + (100 / speed)
+	self.m_last_update_time = Time.Millis() + (100 / speed)
 end
 
 return RGBLights

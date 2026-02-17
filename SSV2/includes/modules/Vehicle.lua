@@ -32,10 +32,10 @@ local collisionInvalidModels = Set.new(
 )
 
 local towTruckModels <const> = Set.new(
-	joaat("towtruck"),
-	joaat("towtruck2"),
-	joaat("towtruck3"),
-	joaat("towtruck4")
+	_J("towtruck"),
+	_J("towtruck2"),
+	_J("towtruck3"),
+	_J("towtruck4")
 )
 
 --------------------------------------
@@ -623,7 +623,7 @@ function Vehicle:Repair(reset_dirt)
 
 	local damage_bits = pWaterDamage:get_int()
 	if (type(damage_bits) == "number") then
-		pWaterDamage:set_int(Bit.clear(damage_bits, 0))
+		pWaterDamage:set_int(Bit.Clear(damage_bits, 0))
 	end
 end
 
@@ -1542,7 +1542,7 @@ function Vehicle:RamForward()
 	end
 
 	self.m_last_ram_time = self.m_last_ram_time or 0
-	if (Time.now() - self.m_last_ram_time < 3) then
+	if (Time.Now() - self.m_last_ram_time < 3) then
 		return
 	end
 
@@ -1559,7 +1559,7 @@ function Vehicle:RamForward()
 			false
 		)
 
-		self.m_last_ram_time = Time.now()
+		self.m_last_ram_time = Time.Now()
 	end)
 end
 
@@ -1572,7 +1572,7 @@ function Vehicle:RamLeft()
 	end
 
 	self.m_last_ram_time = self.m_last_ram_time or 0
-	if (Time.now() - self.m_last_ram_time < 3) then
+	if (Time.Now() - self.m_last_ram_time < 3) then
 		return
 	end
 
@@ -1588,7 +1588,7 @@ function Vehicle:RamLeft()
 		false
 	)
 
-	self.m_last_ram_time = Time.now()
+	self.m_last_ram_time = Time.Now()
 end
 
 function Vehicle:RamRight()
@@ -1600,7 +1600,7 @@ function Vehicle:RamRight()
 	end
 
 	self.m_last_ram_time = self.m_last_ram_time or 0
-	if (Time.now() - self.m_last_ram_time < 3) then
+	if (Time.Now() - self.m_last_ram_time < 3) then
 		return
 	end
 
@@ -1616,7 +1616,7 @@ function Vehicle:RamRight()
 		false
 	)
 
-	self.m_last_ram_time = Time.now()
+	self.m_last_ram_time = Time.Now()
 end
 
 -- Serializes a vehicle to JSON.

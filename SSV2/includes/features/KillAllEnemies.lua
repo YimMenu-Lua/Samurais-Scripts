@@ -14,7 +14,7 @@ local EnemyKiller = { m_last_trigger_time = 0 }
 EnemyKiller.__index = EnemyKiller
 
 function EnemyKiller:OnClick()
-	if (Time.millis() - self.m_last_trigger_time < 500) then
+	if (Time.Millis() - self.m_last_trigger_time < 500) then
 		return
 	end
 
@@ -45,7 +45,7 @@ function EnemyKiller:OnClick()
 			yield()
 		end
 
-		self.m_last_trigger_time = Time.millis()
+		self.m_last_trigger_time = Time.Millis()
 	end)
 end
 

@@ -44,7 +44,7 @@ end
 
 function BFD:Toggle()
 	local PV = self.m_entity
-	if (Time.millis() < self.m_last_update_time) then
+	if (Time.Millis() < self.m_last_update_time) then
 		return
 	end
 
@@ -57,7 +57,7 @@ function BFD:Toggle()
 		self.m_is_toggled = false
 	end
 
-	self.m_last_update_time = Time.millis() + 100
+	self.m_last_update_time = Time.Millis() + 100
 end
 
 function BFD:Update()

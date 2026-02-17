@@ -39,7 +39,7 @@ function VehMines:ShouldRun()
 end
 
 function VehMines:Update()
-	if (Time.now() < self.m_last_deployed) then
+	if (Time.Now() < self.m_last_deployed) then
 		return
 	end
 
@@ -84,7 +84,7 @@ function VehMines:Update()
 			0.01
 		)
 
-		self.m_last_deployed = Time.now() + 5
+		self.m_last_deployed = Time.Now() + 5
 	end
 end
 

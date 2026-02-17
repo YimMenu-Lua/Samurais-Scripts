@@ -92,7 +92,7 @@ function Decorator:Validate(entity)
 end
 
 function Decorator:CollectGarbage()
-	if (Time.now() - self.m_last_gc < 5) then
+	if (Time.Now() - self.m_last_gc < 5) then
 		return
 	end
 
@@ -102,7 +102,7 @@ function Decorator:CollectGarbage()
 		end
 	end
 
-	self.m_last_gc = Time.now()
+	self.m_last_gc = Time.Now()
 end
 
 ---@param entity integer

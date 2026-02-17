@@ -222,7 +222,7 @@ function CVehicle:GetHandlingFlag(flag)
 	end
 
 	local dword_flags = self.m_handling_flags:get_dword()
-	return Bit.is_set(dword_flags, flag)
+	return Bit.IsBitSet(dword_flags, flag)
 end
 
 ---@param flag eVehicleHandlingFlags
@@ -237,7 +237,7 @@ function CVehicle:SetHandlingFlag(flag, toggle)
 	end
 
 	local dword_flags = self.m_handling_flags:get_dword()
-	local Bitwise     = toggle and Bit.set or Bit.clear
+	local Bitwise     = toggle and Bit.Set or Bit.Clear
 	local new_flags   = Bitwise(dword_flags, flag)
 
 	self.m_handling_flags:set_dword(new_flags)
@@ -254,7 +254,7 @@ function CVehicle:GetModelFlag(flag)
 	end
 
 	local dword_flags = self.m_model_flags:get_dword()
-	return Bit.is_set(dword_flags, flag)
+	return Bit.IsBitSet(dword_flags, flag)
 end
 
 ---@param flag eVehicleModelInfoFlags
@@ -273,7 +273,7 @@ function CVehicle:GetModelInfoFlag(flag)
 	local flag_ptr  = self.m_model_info_flags:add(index * 4)
 	local flag_bits = flag_ptr:get_dword()
 
-	return Bit.is_set(flag_bits, bit_pos)
+	return Bit.IsBitSet(flag_bits, bit_pos)
 end
 
 ---@param flag eVehicleModelInfoFlags
@@ -291,7 +291,7 @@ function CVehicle:SetModelInfoFlag(flag, toggle)
 	end
 
 	local flag_bits = flag_ptr:get_dword()
-	local Bitwise   = toggle and Bit.set or Bit.clear
+	local Bitwise   = toggle and Bit.Set or Bit.Clear
 	local new_bits  = Bitwise(flag_bits, bit_pos)
 	flag_ptr:set_dword(new_bits)
 end
@@ -313,7 +313,7 @@ function CVehicle:GetAdvancedFlag(flag)
 	end
 
 	local dword_flags = ccarhandlingdata.m_advanced_flags:get_dword()
-	return Bit.is_set(dword_flags, flag)
+	return Bit.IsBitSet(dword_flags, flag)
 end
 
 ---@param flag eVehicleAdvancedFlags
@@ -334,7 +334,7 @@ function CVehicle:SetAdvancedFlag(flag, toggle)
 
 	local ptr         = ccarhandlingdata.m_advanced_flags
 	local dword_flags = ptr:get_dword()
-	local Bitwise     = toggle and Bit.set or Bit.clear
+	local Bitwise     = toggle and Bit.Set or Bit.Clear
 	local new_flags   = Bitwise(dword_flags, flag)
 
 	ptr:set_dword(new_flags)
