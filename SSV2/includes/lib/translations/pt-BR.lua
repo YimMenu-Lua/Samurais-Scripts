@@ -665,11 +665,11 @@ return {
 	["GENERIC_HOURS_LABEL"] = "Horas",
 	["GENERIC_MILLIS_LABEL"] = "Milissegundos",
 	["GENERIC_EDIT"] = "Editar",
-	["YRV3_SHOW_EARNINGS_DATA"] = "Mostrar dados de ganhos",
+	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "Buy Missions Undertaken:",
+	["YRV3_SHOW_EARNINGS_DATA"] = "Show Earnings Data",
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Vender Missões Realizadas:",
+	["YRV3_EDIT_EARNINGS_DATA"] = "Edit Earnings Data",
 	["YRV3_LIFETIME_BUY_COMPLETE"] = "Compre missões concluídas:",
-	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "Comprar Missões Realizadas:",
 	["YRV3_LIFETIME_SELL_COMPLETE"] = "Missões de venda concluídas:",
-	["YRV3_LIFETIME_EARNINGS"] = "Ganhos vitalícios:",
-	["YRV3_EDIT_EARNINGS_DATA"] = "Editar dados de ganhos",
-	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Vender Missões Realizadas:"
+	["YRV3_LIFETIME_EARNINGS"] = "Ganhos vitalícios:"
 }

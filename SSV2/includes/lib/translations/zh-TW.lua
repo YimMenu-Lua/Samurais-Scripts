@@ -665,11 +665,11 @@ return {
 	["GENERIC_HOURS_LABEL"] = "時間",
 	["GENERIC_MILLIS_LABEL"] = "毫秒",
 	["GENERIC_EDIT"] = "編輯",
+	["YRV3_LIFETIME_BUY_COMPLETE"] = "購買任務已完成：",
 	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "執行的銷售任務：",
-	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "已執行的購買任務：",
-	["YRV3_EDIT_EARNINGS_DATA"] = "編輯獲利數據",
-	["YRV3_LIFETIME_EARNINGS"] = "終生收入：",
-	["YRV3_LIFETIME_SELL_COMPLETE"] = "銷售任務已完成：",
 	["YRV3_SHOW_EARNINGS_DATA"] = "顯示獲利數據",
-	["YRV3_LIFETIME_BUY_COMPLETE"] = "購買任務已完成："
+	["YRV3_LIFETIME_EARNINGS"] = "終生收入：",
+	["YRV3_EDIT_EARNINGS_DATA"] = "編輯獲利數據",
+	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "已執行的購買任務：",
+	["YRV3_LIFETIME_SELL_COMPLETE"] = "銷售任務已完成："
 }

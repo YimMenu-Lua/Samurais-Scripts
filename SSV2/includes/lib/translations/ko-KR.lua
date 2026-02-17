@@ -665,11 +665,11 @@ return {
 	["GENERIC_MINUTES_LABEL"] = "분",
 	["GENERIC_HOURS_LABEL"] = "시간",
 	["GENERIC_EDIT"] = "편집하다",
+	["YRV3_SHOW_EARNINGS_DATA"] = "수익 데이터 표시",
+	["YRV3_LIFETIME_SELL_COMPLETE"] = "판매 임무 완료:",
 	["YRV3_LIFETIME_BUY_COMPLETE"] = "구매 임무 완료:",
 	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "수행된 임무 구매:",
-	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "수행되는 판매 임무:",
-	["YRV3_SHOW_EARNINGS_DATA"] = "수익 데이터 표시",
 	["YRV3_LIFETIME_EARNINGS"] = "평생 수입:",
-	["YRV3_LIFETIME_SELL_COMPLETE"] = "판매 임무 완료:",
-	["YRV3_EDIT_EARNINGS_DATA"] = "수입 데이터 편집"
+	["YRV3_EDIT_EARNINGS_DATA"] = "수입 데이터 편집",
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "수행되는 판매 임무:"
 }

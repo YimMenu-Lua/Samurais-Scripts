@@ -664,12 +664,12 @@ return {
 	["GENERIC_MINUTES_LABEL"] = "分钟",
 	["GENERIC_HOURS_LABEL"] = "时间",
 	["GENERIC_MILLIS_LABEL"] = "毫秒",
-	["GENERIC_EDIT"] = "编辑",
 	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "已执行的购买任务：",
 	["YRV3_LIFETIME_BUY_COMPLETE"] = "购买任务已完成：",
+	["YRV3_LIFETIME_EARNINGS"] = "终生收入：",
 	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "执行的销售任务：",
-	["YRV3_LIFETIME_SELL_COMPLETE"] = "销售任务已完成：",
 	["YRV3_SHOW_EARNINGS_DATA"] = "显示盈利数据",
+	["YRV3_LIFETIME_SELL_COMPLETE"] = "销售任务已完成：",
 	["YRV3_EDIT_EARNINGS_DATA"] = "编辑盈利数据",
-	["YRV3_LIFETIME_EARNINGS"] = "终生收入："
+	["GENERIC_EDIT"] = "编辑"
 }

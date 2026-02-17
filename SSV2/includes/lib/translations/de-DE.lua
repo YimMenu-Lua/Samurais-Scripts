@@ -665,11 +665,11 @@ return {
 	["GENERIC_HOURS_LABEL"] = "Std",
 	["GENERIC_MILLIS_LABEL"] = "Millisekunden",
 	["GENERIC_EDIT"] = "Bearbeiten",
-	["YRV3_LIFETIME_SELL_COMPLETE"] = "Abgeschlossene Verkaufsmissionen:",
-	["YRV3_EDIT_EARNINGS_DATA"] = "Verdienstdaten bearbeiten",
 	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "Kaufen Sie durchgeführte Missionen:",
-	["YRV3_LIFETIME_EARNINGS"] = "Lebenseinkommen:",
 	["YRV3_LIFETIME_BUY_COMPLETE"] = "Abgeschlossene Kaufmissionen:",
+	["YRV3_EDIT_EARNINGS_DATA"] = "Verdienstdaten bearbeiten",
+	["YRV3_LIFETIME_EARNINGS"] = "Lebenseinkommen:",
 	["YRV3_SHOW_EARNINGS_DATA"] = "Verdienstdaten anzeigen",
+	["YRV3_LIFETIME_SELL_COMPLETE"] = "Abgeschlossene Verkaufsmissionen:",
 	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Durchgeführte Verkaufsmissionen:"
 }

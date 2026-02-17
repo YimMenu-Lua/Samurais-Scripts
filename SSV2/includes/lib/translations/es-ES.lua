@@ -668,8 +668,8 @@ return {
 	["YRV3_LIFETIME_BUY_COMPLETE"] = "Comprar misiones completadas:",
 	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "Comprar misiones realizadas:",
 	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Vender misiones realizadas:",
-	["YRV3_LIFETIME_EARNINGS"] = "Ganancias de por vida:",
 	["YRV3_LIFETIME_SELL_COMPLETE"] = "Vender misiones completadas:",
-	["YRV3_SHOW_EARNINGS_DATA"] = "Mostrar datos de ganancias",
-	["YRV3_EDIT_EARNINGS_DATA"] = "Editar datos de ganancias"
+	["YRV3_LIFETIME_EARNINGS"] = "Ganancias de por vida:",
+	["YRV3_EDIT_EARNINGS_DATA"] = "Editar datos de ganancias",
+	["YRV3_SHOW_EARNINGS_DATA"] = "Mostrar datos de ganancias"
 }
