@@ -26,7 +26,7 @@ SSV2 includes polished versions of your favorite features from previous versions
       <ul>
         <li><a href="#yimresupplierv3">YimResupplierV3</a></li>
         <li><a href="#casinopacino">CasinoPacino</a></li>
-        <li><a href="#yimheistsv1">CasinoPacino</a></li>
+        <li><a href="#yimheistsv1">YimHeistsV1</a></li>
       </ul>
     </li>
     <li>
