@@ -365,7 +365,7 @@ A heist editor added by [@How-Bout-No](https://github.com/How-Bout-No) [WIP].
 
 ### YimActionsV3
 
-A greatly improved version of my all-in-one animations script.
+All-in-one animations script.
 
 ### EntityForge
 
