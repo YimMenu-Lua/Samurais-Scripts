@@ -11,6 +11,7 @@
 ---@field public name string
 ---@field public val integer
 ---@field public cooldown_name string
+---@field public cooldown_gvar string
 
 ---@class HeistInfo
 ---@field public get_name fun(): string
@@ -89,10 +90,10 @@ function YimHeists:GetSecondaryTargets()
 	for st = 1, #secondary_targets do
 		local stat_name = _F("MPX_H4LOOT_%s", secondary_targets[st])
 		if (stats.get_int(stat_name .. "_I") == -1) then
-			return_i = st
+			return_i = st - 1 -- ImGui indexes by 0
 		end
 		if (stats.get_int(stat_name .. "_C") == -1) then
-			return_c = st
+			return_c = st - 1
 		end
 	end
 

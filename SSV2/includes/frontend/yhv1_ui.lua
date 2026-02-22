@@ -34,6 +34,7 @@ local HEIST_TYPES        = {
 			name = "MPX_SALV23_INST_PROG",
 			val = 31,
 			cooldown_name = "MPX_SALV23_CFR_COOLDOWN",
+			cooldown_gvar = "cfr_cd",
 		}
 	},
 	{ -- KnoWay
@@ -46,7 +47,8 @@ local HEIST_TYPES        = {
 		stat = {
 			name = "MPX_M25_AVI_MISSION_CURRENT",
 			val = 4,
-			cooldown_name = "MPX_M25_AVI_MISSION_CD"
+			cooldown_name = "MPX_M25_AVI_MISSION_CD",
+			cooldown_gvar = "knoway_cd",
 		},
 	},
 	{ -- Dr Dre
@@ -60,6 +62,7 @@ local HEIST_TYPES        = {
 			name = "MPX_FIXER_STORY_BS",
 			val = 4095,
 			cooldown_name = "MPX_FIXER_STORY_COOLDOWN",
+			cooldown_gvar = "dre_cd",
 		}
 	},
 	{ -- Oscar Guzman
@@ -73,6 +76,7 @@ local HEIST_TYPES        = {
 			name = "MPX_HACKER24_INST_BS",
 			val = 31,
 			cooldown_name = "MPX_HACKER24_MFM_COOLDOWN",
+			cooldown_gvar = "ogfa_cd",
 		},
 		opt_info = "Complete first mission on Hard first!"
 	},
@@ -90,7 +94,7 @@ local function drawBasicTab()
 		local is_done = stats.get_int(heist.stat.name) == heist.stat.val
 
 		ImGui.PushID(i)
-		ImGui.BulletText(heist_name)
+		GUI:HeaderText(heist_name, { separator = true, spacing = true })
 
 		local location = heist.get_coords() or vec3:zero()
 		ImGui.BeginDisabled(location:is_zero() or on_cooldown)
@@ -115,8 +119,22 @@ local function drawBasicTab()
 		elseif (on_cooldown) then
 			GUI:Tooltip(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), seconds_left / 60))
 		end
+
+		-- Trying to add a normal toggle would not work so copied this from yrv3/misc.lua, hopefully didn't miss anything else
+		local cooldownsGrid = GridRenderer.new(1)
+		cooldownsGrid:AddCheckbox("CP_HEIST_COOLDOWN_DISABLE", "features.yim_heists." .. heist.stat.cooldown_gvar, {
+			persistent = true,
+			isTranslatorLabel = true,
+			onClick = function()
+				YRV3:SetCooldownStateDirty(heist.stat.cooldown_gvar, true)
+			end
+		})
+
+		cooldownsGrid:Draw()
 		ImGui.EndDisabled()
 		ImGui.PopID()
+
+		ImGui.Spacing()
 	end
 end
 
@@ -266,6 +284,17 @@ local function drawCayoTab()
 		stats.set_int("MPX_H4_MISSIONS", 65535)
 		stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 40000)
 	end
+
+	local cooldownsGrid = GridRenderer.new(1)
+	cooldownsGrid:AddCheckbox("CP_HEIST_COOLDOWN_DISABLE", "features.yim_heists.cayo_cd", {
+		persistent = true,
+		isTranslatorLabel = true,
+		onClick = function()
+			YRV3:SetCooldownStateDirty("cayo_cd", true)
+		end
+	})
+
+	cooldownsGrid:Draw()
 
 	if (GVars.backend.debug_mode) then
 		-- This button should only be used if something is severely wrong

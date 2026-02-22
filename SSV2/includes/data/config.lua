@@ -276,6 +276,13 @@ local Config <const> = {
 			slot_machine_cap = 0,
 			autoplay_slots_delay = 500,
 		},
+		yim_heists = {
+			cfr_cd = false,
+			knoway_cd = false,
+			dre_cd = false,
+			ogfa_cd = false,
+			cayo_cd = false,
+		},
 		yrv3 = {
 			autofill_delay = 500,
 			auto_sell = false,
@@ -289,7 +296,6 @@ local Config <const> = {
 			ceo_crate_sell_cd = false,
 			dax_work_cd = false,
 			garment_rob_cd = false,
-			cfr_cd = false,
 			cwash_legal_work_cd = false,
 			cwash_illegal_work_cd = false,
 			weedshop_legal_work_cd = false,
