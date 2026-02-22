@@ -93,7 +93,7 @@ local function drawBasicTab()
 		ImGui.BulletText(heist_name)
 
 		local location = heist.get_coords() or vec3:zero()
-		ImGui.BeginDisabled(not location:is_zero() or on_cooldown)
+		ImGui.BeginDisabled(location:is_zero() or on_cooldown)
 		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
 			LocalPlayer:Teleport(location, false)
 		end
