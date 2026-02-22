@@ -12,7 +12,6 @@
 ---@field public val integer
 ---@field public cooldown_name string
 ---@field public cooldown_gvar string GVar path name
----@field public gvar fun(set_val?: boolean): boolean? Getter/setter for cooldown GVar
 
 ---@class HeistInfo
 ---@field public get_name fun(): string

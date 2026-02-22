@@ -728,6 +728,7 @@ return {
 	["YH_CAYO_TAB"]                        = "Cayo Perico",
 	["YH_SUBMARINE_NOT_OWNED"]             = "Purchase a Kosatka to access the Cayo Perico Heist.", -- HIF_SUB_HELP
 	["YH_PREP_SKIP_NOTIF"]                 = "All preparation missions have been skipped. You can now start the final mission.",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"]         = "Disables cooldown, may result in ban. Use at your own risk!",
 	["YH_CAYO_REQUEST_SUB"]                = "Request Submarine",
 	["YH_CAYO_TARGET_PRIMARY"]             = "Primary Target",
 	["YH_CAYO_TARGET_SECONDARY_I"]         = "Secondary Target (Island)",

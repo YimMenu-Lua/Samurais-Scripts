@@ -35,12 +35,6 @@ local HEIST_TYPES        = {
 			val = 31,
 			cooldown_name = "MPX_SALV23_CFR_COOLDOWN",
 			cooldown_gvar = "cfr_cd",
-			gvar = function(set)
-				if (type(set) ~= "boolean") then
-					return GVars.features.yim_heists.cfr_cd
-				end
-				GVars.features.yim_heists.cfr_cd = set
-			end,
 		},
 	},
 	{ -- KnoWay
@@ -55,12 +49,6 @@ local HEIST_TYPES        = {
 			val = 4,
 			cooldown_name = "MPX_M25_AVI_MISSION_CD",
 			cooldown_gvar = "knoway_cd",
-			gvar = function(set)
-				if (type(set) ~= "boolean") then
-					return GVars.features.yim_heists.knoway_cd
-				end
-				GVars.features.yim_heists.knoway_cd = set
-			end,
 		},
 	},
 	{ -- Dr Dre
@@ -75,12 +63,6 @@ local HEIST_TYPES        = {
 			val = 4095,
 			cooldown_name = "MPX_FIXER_STORY_COOLDOWN",
 			cooldown_gvar = "dre_cd",
-			gvar = function(set)
-				if (type(set) ~= "boolean") then
-					return GVars.features.yim_heists.dre_cd
-				end
-				GVars.features.yim_heists.dre_cd = set
-			end,
 		}
 	},
 	{ -- Oscar Guzman
@@ -95,12 +77,6 @@ local HEIST_TYPES        = {
 			val = 31,
 			cooldown_name = "MPX_HACKER24_MFM_COOLDOWN",
 			cooldown_gvar = "ogfa_cd",
-			gvar = function(set)
-				if (type(set) ~= "boolean") then
-					return GVars.features.yim_heists.ogfa_cd
-				end
-				GVars.features.yim_heists.ogfa_cd = set
-			end,
 		},
 		opt_info = "Complete first mission on Hard first!"
 	},
@@ -142,15 +118,15 @@ local function drawBasicTab()
 		ImGui.EndDisabled()
 		ImGui.SameLine()
 
-		local new_cd_state, cd_state_changed = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"), heist.stat.gvar(), {
-			onClick = function()
-				YRV3:SetCooldownStateDirty(heist.stat.cooldown_gvar, true)
-			end
-		})
-
-		if (cd_state_changed) then
-			heist.stat.gvar(new_cd_state)
-		end
+		local key = heist.stat.cooldown_gvar
+		GVars.features.yim_heists[key], _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
+			GVars.features.yim_heists[key], {
+				tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
+				color   = Color("#AA0000"),
+				onClick = function()
+					YRV3:SetCooldownStateDirty(key, true)
+				end
+			})
 
 		ImGui.PopID()
 
@@ -307,6 +283,8 @@ local function drawCayoTab()
 
 	GVars.features.yim_heists.cayo_cd, _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
 		GVars.features.yim_heists.cayo_cd, {
+			tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
+			color   = Color("#AA0000"),
 			onClick = function()
 				YRV3:SetCooldownStateDirty("cayo_cd", true)
 			end
