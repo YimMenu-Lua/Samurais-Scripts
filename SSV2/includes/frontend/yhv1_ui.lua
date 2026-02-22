@@ -33,6 +33,7 @@ local HEIST_TYPES        = {
 		stat = {
 			name = "MPX_SALV23_INST_PROG",
 			val = 31,
+			cooldown_name = "MPX_SALV23_CFR_COOLDOWN",
 		}
 	},
 	{ -- KnoWay
@@ -45,6 +46,7 @@ local HEIST_TYPES        = {
 		stat = {
 			name = "MPX_M25_AVI_MISSION_CURRENT",
 			val = 4,
+			cooldown_name = "MPX_M25_AVI_MISSION_CD"
 		},
 	},
 	{ -- Dr Dre
@@ -57,6 +59,7 @@ local HEIST_TYPES        = {
 		stat = {
 			name = "MPX_FIXER_STORY_BS",
 			val = 4095,
+			cooldown_name = "MPX_FIXER_STORY_COOLDOWN",
 		}
 	},
 	{ -- Oscar Guzman
@@ -69,19 +72,28 @@ local HEIST_TYPES        = {
 		stat = {
 			name = "MPX_HACKER24_INST_BS",
 			val = 31,
+			cooldown_name = "MPX_HACKER24_MFM_COOLDOWN",
 		},
-		optInfo = "Complete first mission on Hard first!"
+		opt_info = "Complete first mission on Hard first!"
 	},
 }
 
 local function drawBasicTab()
 	for i, heist in ipairs(HEIST_TYPES) do
-		ImGui.PushID(i)
 		local heist_name = heist.get_name()
+		-- It is risky to skip these cooldowns since replaying heists too quickly may get you flagged, so probably best to just check if cooldown is active and disable skipping
+		-- If a heist is on cooldown, just do a different one while you wait
+		-- TODO: User should have option to skip cooldown anyways, as long as they acknowledge the risk
+		local cooldown_time = stats.get_int(heist.stat.cooldown_name) -- POSIX
+		local seconds_left = cooldown_time - Time.Epoch()
+		local on_cooldown = cooldown_time > Time.Epoch()
+		local is_done = stats.get_int(heist.stat.name) == heist.stat.val
+
+		ImGui.PushID(i)
 		ImGui.BulletText(heist_name)
 
 		local location = heist.get_coords() or vec3:zero()
-		ImGui.BeginDisabled(not location)
+		ImGui.BeginDisabled(not location:is_zero() or on_cooldown)
 		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
 			LocalPlayer:Teleport(location, false)
 		end
@@ -94,13 +106,14 @@ local function drawBasicTab()
 
 		ImGui.SameLine()
 
-		local isDone = stats.get_int(heist.stat.name) == heist.stat.val
-		ImGui.BeginDisabled(isDone)
+		ImGui.BeginDisabled(is_done or on_cooldown)
 		if GUI:Button(_T("SY_COMPLETE_PREPARATIONS")) then
 			YHV1:SkipPrep(heist.stat.name, heist.stat.val, heist_name)
 		end
-		if (heist.optInfo and not isDone) then
-			GUI:Tooltip(heist.optInfo)
+		if (heist.opt_info and not is_done) then
+			GUI:Tooltip(heist.opt_info)
+		elseif (on_cooldown) then
+			GUI:Tooltip(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), seconds_left / 60))
 		end
 		ImGui.EndDisabled()
 		ImGui.PopID()
@@ -159,6 +172,18 @@ local function drawCayoTab()
 	local cayo_heist_primary    = stats.get_int("MPX_H4CNF_TARGET")
 	local cayo_heist_difficulty = stats.get_int("MPX_H4_PROGRESS")
 	local cayo_heist_weapons    = stats.get_int("MPX_H4CNF_WEAPONS")
+	local cayo_cooldown         = stats.get_int("MPX_H4_COOLDOWN")
+	local cayo_cooldown_hard    = stats.get_int("MPX_H4_COOLDOWN_HARD")
+
+	local posix_now = Time.Epoch()
+	local cooldown_seconds_left = cayo_cooldown - posix_now
+	local cooldown_hard_seconds_left = cayo_cooldown_hard - posix_now
+	local on_cooldown = (cooldown_seconds_left > 0) or (cooldown_hard_seconds_left > 0)
+	ImGui.BeginDisabled(on_cooldown)
+
+	if (on_cooldown) then
+		ImGui.Separator()ImGui.Text(_F(_T("YH_COOLDOWN_STATUS_FORMAT"), (cooldown_seconds_left > 0 and cooldown_seconds_left or cooldown_hard_seconds_left) / 60))
+	end
 
 	ImGui.SeparatorText("Targets")
 
@@ -271,6 +296,8 @@ local function drawCayoTab()
 		stats.set_int("MPX_H4CNF_BS_ABIL", 0)
 		Notifier:ShowSuccess("YHV1", "All progress has been reset!")
 	end
+
+	ImGui.EndDisabled() -- on_cooldown
 end
 
 local tabCallbacks <const> = {

@@ -7,11 +7,16 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+---@class HeistStat
+---@field public name string
+---@field public val integer
+---@field public cooldown_name string
+
 ---@class HeistInfo
 ---@field public get_name fun(): string
 ---@field public get_coords fun(): vec3?
----@field public stat { name: string, val: integer}
----@field public optInfo? string
+---@field public stat HeistStat
+---@field public opt_info? string Optional info to provide to a tooltip, typically a starting requirement that needs to be done manually
 
 ---@class GenericProperty
 ---@field public name string

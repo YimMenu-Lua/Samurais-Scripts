@@ -183,23 +183,11 @@ local commandRegistry <const> = {
 	},
 	["teleport"] = {
 		callback = function(args)
-			local notifE = function()
-				Notifier:ShowError(
-					"CommandExecutor",
-					"Missing or incorrect parameter. Usage: teleport [X] [Y] [Z]",
-					true,
-					5
-				)
-			end
-
-			if (type(args) ~= "table") then
-				notifE()
-				return
-			end
+			args = args or {}
 
 			local x = args[1]
 			local y = args[2]
-			local z = args[3]
+			local z = args[3] or 0
 
 			if (#args < 2) then
 				local wpc = Game.GetWaypointCoords()
@@ -216,13 +204,18 @@ local commandRegistry <const> = {
 				x, y, _ = wpc:unpack()
 			end
 
-			if (type(x) ~= "number" or type(y) ~= "number") then
-				notifE()
+			if ((type(x) ~= "number") or (type(y) ~= "number")) then
+				Notifier:ShowError(
+					"CommandExecutor",
+					"Missing or incorrect parameter. Usage: teleport <X> <Y> [Z]",
+					true,
+					5
+				)
 				return
 			end
 
-			local coords = vec3:new(x, y, z or 0)
-			LocalPlayer:Teleport(coords, false, z == nil)
+			local coords = vec3:new(x, y, z)
+			LocalPlayer:Teleport(coords, false, z == 0)
 		end,
 		opts = {
 			description =
