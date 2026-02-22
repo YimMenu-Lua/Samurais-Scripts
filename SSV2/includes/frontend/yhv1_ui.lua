@@ -120,8 +120,7 @@ local function drawBasicTab()
 	end
 end
 
-local cayo_secondary_target_i = 2
-local cayo_secondary_target_c = 3
+local cayo_secondary_target_i, cayo_secondary_target_c = YHV1:GetSecondaryTargets()
 
 local function drawCayoTab()
 	local sub = YHV1:HasSubmarine()
@@ -132,16 +131,16 @@ local function drawCayoTab()
 
 	-- This is shitty, and only properly works when not near the sub. No idea what happens if multiple subs in session
 	-- TODO: Find and use the correct globals/offsets
-	local subBlip = Game.Ensure3DCoords(760)
-	local requestKosatka = SGSL:Get(SGSL.data.request_services_global):AsGlobal():At(613)
-	local subRequested = requestKosatka:ReadInt() == 1
-	local subSpawned = not sub.coords:is_zero() and subBlip ~= nil
+	local sub_blip = Game.Ensure3DCoords(760)
+	local request_kosatka = SGSL:Get(SGSL.data.request_services_global):AsGlobal():At(613)
+	local sub_requested = request_kosatka:ReadInt() == 1
+	local sub_spawned = not sub.coords:is_zero() and sub_blip ~= nil
 
-	if (subBlip or not subRequested) then
-		sub.coords = subBlip or vec3:zero()
+	if (sub_blip or not sub_requested) then
+		sub.coords = sub_blip or vec3:zero()
 	end
 
-	ImGui.BeginDisabled(not subSpawned)
+	ImGui.BeginDisabled(not sub_spawned)
 	if (GUI:Button(_T("GENERIC_TELEPORT"))) then
 		LocalPlayer:Teleport(sub.coords + vec3:new(0, 0, -9.8)) -- Teleport under Kosatka
 	end
@@ -152,40 +151,42 @@ local function drawCayoTab()
 	end
 	ImGui.EndDisabled()
 
-	local btn_label = (subRequested)
+	local btn_label = (sub_requested)
 		and ImGui.TextSpinner()
 		or _T("YH_CAYO_REQUEST_SUB")
 
 	ImGui.SameLine()
-	ImGui.BeginDisabled(subRequested or subSpawned)
+	ImGui.BeginDisabled(sub_requested or sub_spawned)
 	if (GUI:Button(btn_label)) then
 		if (not LocalPlayer:IsOutside()) then
 			Notifier:ShowError("YHV1", _T("GENERIC_TP_INTERIOR_ERR"))
 		else
-			requestKosatka:WriteInt(1)
+			request_kosatka:WriteInt(1)
 		end
 	end
 	ImGui.EndDisabled()
 
 	-- https://www.unknowncheats.me/forum/grand-theft-auto-v/695454-edit-cayo-perico-primary-target-stat-yimmenu-v2.html
 	-- https://www.unknowncheats.me/forum/grand-theft-auto-v/431801-cayo-perico-heist-click.html
-	local cayo_heist_primary    = stats.get_int("MPX_H4CNF_TARGET")
-	local cayo_heist_difficulty = stats.get_int("MPX_H4_PROGRESS")
-	local cayo_heist_weapons    = stats.get_int("MPX_H4CNF_WEAPONS")
-	local cayo_cooldown         = stats.get_int("MPX_H4_COOLDOWN")
-	local cayo_cooldown_hard    = stats.get_int("MPX_H4_COOLDOWN_HARD")
+	local cayo_heist_primary         = stats.get_int("MPX_H4CNF_TARGET")
+	local cayo_heist_difficulty      = stats.get_int("MPX_H4_PROGRESS")
+	local cayo_heist_weapons         = stats.get_int("MPX_H4CNF_WEAPONS")
+	local cayo_cooldown              = stats.get_int("MPX_H4_COOLDOWN")
+	local cayo_cooldown_hard         = stats.get_int("MPX_H4_COOLDOWN_HARD")
 
-	local posix_now = Time.Epoch()
-	local cooldown_seconds_left = cayo_cooldown - posix_now
+	local posix_now                  = Time.Epoch()
+	local cooldown_seconds_left      = cayo_cooldown - posix_now
 	local cooldown_hard_seconds_left = cayo_cooldown_hard - posix_now
-	local on_cooldown = (cooldown_seconds_left > 0) or (cooldown_hard_seconds_left > 0)
-	ImGui.BeginDisabled(on_cooldown)
+	local on_cooldown                = (cooldown_seconds_left > 0) or (cooldown_hard_seconds_left > 0)
 
 	if (on_cooldown) then
-		ImGui.Separator()ImGui.Text(_F(_T("YH_COOLDOWN_STATUS_FORMAT"), (cooldown_seconds_left > 0 and cooldown_seconds_left or cooldown_hard_seconds_left) / 60))
+		local minutes_left = (cooldown_seconds_left > 0 and cooldown_seconds_left or cooldown_hard_seconds_left) / 60
+		GUI:HeaderText(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left),
+			{ separator = false, spacing = true, color = Color("#AA0000") })
 	end
+	ImGui.BeginDisabled(on_cooldown)
 
-	ImGui.SeparatorText("Targets")
+	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
 
 	local new_primary_target, primary_target_clicked = ImGui.Combo(
 		_T "YH_CAYO_TARGET_PRIMARY",
@@ -209,6 +210,7 @@ local function drawCayoTab()
 	)
 
 	if (secondary_target_i_click) then
+		YHV1:SetSecondaryTargets("I", new_secondary_target_i + 1)
 		cayo_secondary_target_i = new_secondary_target_i
 	end
 
@@ -220,45 +222,11 @@ local function drawCayoTab()
 	)
 
 	if (secondary_target_c_click) then
+		YHV1:SetSecondaryTargets("C", new_secondary_target_c + 1)
 		cayo_secondary_target_c = new_secondary_target_c
 	end
 
-	-- https://www.unknowncheats.me/forum/4489469-post16.html
-	if GUI:Button("Set All Secondary Targets") then
-		local targets_i = { 0, 0, 0, 0 }
-		local targets_c = { 0, 0, 0, 0 }
-		targets_i[new_secondary_target_i + 1] = -1
-		targets_c[new_secondary_target_c + 1] = -1
-
-		stats.set_int("MPX_H4LOOT_CASH_I", targets_i[0])
-		stats.set_int("MPX_H4LOOT_CASH_I_SCOPED", targets_i[0])
-		stats.set_int("MPX_H4LOOT_WEED_I", targets_i[1])
-		stats.set_int("MPX_H4LOOT_WEED_I_SCOPED", targets_i[1])
-		stats.set_int("MPX_H4LOOT_COKE_I", targets_i[2])
-		stats.set_int("MPX_H4LOOT_COKE_I_SCOPED", targets_i[2])
-		stats.set_int("MPX_H4LOOT_GOLD_I", targets_i[3])
-		stats.set_int("MPX_H4LOOT_GOLD_I_SCOPED", targets_i[3])
-		stats.set_int("MPX_H4LOOT_CASH_C", targets_c[0])
-		stats.set_int("MPX_H4LOOT_WEED_C", targets_c[1])
-		stats.set_int("MPX_H4LOOT_COKE_C", targets_c[2])
-		stats.set_int("MPX_H4LOOT_GOLD_C", targets_c[3])
-		stats.set_int("MPX_H4LOOT_PAINT", -1) -- Not really any reason to have an option for paintings
-		stats.set_int("MPX_H4LOOT_PAINT_SCOPED", -1)
-	end
-
-	ImGui.SeparatorText(_T "GENERIC_SETTINGS_LABEL")
-
-	local new_difficulty, difficulty_toggled = GUI:CustomToggle(_T("YH_CAYO_DIFFICULTY"),
-		cayo_heist_difficulty > 130000
-	)
-
-	if (difficulty_toggled) then
-		if (new_difficulty) then
-			stats.set_int("MPX_H4_PROGRESS", 131055)
-		else
-			stats.set_int("MPX_H4_PROGRESS", 126823)
-		end
-	end
+	ImGui.Spacing()
 
 	local new_weapons, weapons_clicked = ImGui.Combo(
 		_T "YH_CAYO_WEAPONS",
@@ -271,8 +239,24 @@ local function drawCayoTab()
 		stats.set_int("MPX_H4CNF_WEAPONS", new_weapons)
 	end
 
+	GUI:HeaderText(_T "GENERIC_OPTIONS_LABEL", { separator = true, spacing = true })
+
+	-- I'll also need to find which bits actually correspond to hard mode instead of just hard coding values and this stupid check; Bits 4, 8, 13 is the difference
+	local new_difficulty, difficulty_toggled = GUI:CustomToggle(_T("YH_CAYO_DIFFICULTY"),
+		cayo_heist_difficulty > 130000
+	)
+
+	if (difficulty_toggled) then
+		if (new_difficulty) then
+			stats.set_int("MPX_H4_PROGRESS", 131055)
+		else
+			stats.set_int("MPX_H4_PROGRESS", 126823)
+		end
+	end
+
 	-- https://www.unknowncheats.me/forum/3058973-post602.html
 	if GUI:Button(_T "CP_HEIST_UNLOCK_ALL") then
+		-- Also gotta figure out wtf these actually do, currently they're just here to hopefully prevent bugs
 		stats.set_int("MPX_H4CNF_BS_GEN", 131071)
 		stats.set_int("MPX_H4CNF_BS_ENTR", 63)
 		stats.set_int("MPX_H4CNF_BS_ABIL", 63)
@@ -280,21 +264,21 @@ local function drawCayoTab()
 		stats.set_int("MPX_H4CNF_ARM_DISRP", 3)
 		stats.set_int("MPX_H4CNF_HEL_DISRP", 3)
 		stats.set_int("MPX_H4_MISSIONS", 65535)
-		if (stats.get_int("MPX_H4_PLAYTHROUGH_STATUS") == 0) then
-			stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 40000)
-		end
-		Notifier:ShowSuccess("YHV1", "Heist ready")
+		stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 40000)
 	end
 
-	if GUI:Button(_T "YH_CAYO_RESET_ALL") then
-		stats.set_int("MPX_H4_MISSIONS", 0)
-		stats.set_int("MPX_H4_PROGRESS", 0)
-		stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 0)
-		stats.set_int("MPX_H4CNF_APPROACH", 0)
-		stats.set_int("MPX_H4CNF_BS_ENTR", 0)
-		stats.set_int("MPX_H4CNF_BS_GEN", 0)
-		stats.set_int("MPX_H4CNF_BS_ABIL", 0)
-		Notifier:ShowSuccess("YHV1", "All progress has been reset!")
+	if (GVars.backend.debug_mode) then
+		-- This button should only be used if something is severely wrong
+		if GUI:Button(_T "YH_CAYO_RESET_ALL") then
+			stats.set_int("MPX_H4_MISSIONS", 0)
+			stats.set_int("MPX_H4_PROGRESS", 0)
+			stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 0)
+			stats.set_int("MPX_H4CNF_APPROACH", 0)
+			stats.set_int("MPX_H4CNF_BS_ENTR", 0)
+			stats.set_int("MPX_H4CNF_BS_GEN", 0)
+			stats.set_int("MPX_H4CNF_BS_ABIL", 0)
+			Notifier:ShowSuccess("YHV1", "All progress has been reset!")
+		end
 	end
 
 	ImGui.EndDisabled() -- on_cooldown
