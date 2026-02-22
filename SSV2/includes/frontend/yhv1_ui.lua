@@ -35,7 +35,13 @@ local HEIST_TYPES        = {
 			val = 31,
 			cooldown_name = "MPX_SALV23_CFR_COOLDOWN",
 			cooldown_gvar = "cfr_cd",
-		}
+			gvar = function(set)
+				if (type(set) ~= "boolean") then
+					return GVars.features.yim_heists.cfr_cd
+				end
+				GVars.features.yim_heists.cfr_cd = set
+			end,
+		},
 	},
 	{ -- KnoWay
 		get_name = function()
@@ -49,6 +55,12 @@ local HEIST_TYPES        = {
 			val = 4,
 			cooldown_name = "MPX_M25_AVI_MISSION_CD",
 			cooldown_gvar = "knoway_cd",
+			gvar = function(set)
+				if (type(set) ~= "boolean") then
+					return GVars.features.yim_heists.knoway_cd
+				end
+				GVars.features.yim_heists.knoway_cd = set
+			end,
 		},
 	},
 	{ -- Dr Dre
@@ -63,6 +75,12 @@ local HEIST_TYPES        = {
 			val = 4095,
 			cooldown_name = "MPX_FIXER_STORY_COOLDOWN",
 			cooldown_gvar = "dre_cd",
+			gvar = function(set)
+				if (type(set) ~= "boolean") then
+					return GVars.features.yim_heists.dre_cd
+				end
+				GVars.features.yim_heists.dre_cd = set
+			end,
 		}
 	},
 	{ -- Oscar Guzman
@@ -77,6 +95,12 @@ local HEIST_TYPES        = {
 			val = 31,
 			cooldown_name = "MPX_HACKER24_MFM_COOLDOWN",
 			cooldown_gvar = "ogfa_cd",
+			gvar = function(set)
+				if (type(set) ~= "boolean") then
+					return GVars.features.yim_heists.ogfa_cd
+				end
+				GVars.features.yim_heists.ogfa_cd = set
+			end,
 		},
 		opt_info = "Complete first mission on Hard first!"
 	},
@@ -85,9 +109,6 @@ local HEIST_TYPES        = {
 local function drawBasicTab()
 	for i, heist in ipairs(HEIST_TYPES) do
 		local heist_name = heist.get_name()
-		-- It is risky to skip these cooldowns since replaying heists too quickly may get you flagged, so probably best to just check if cooldown is active and disable skipping
-		-- If a heist is on cooldown, just do a different one while you wait
-		-- TODO: User should have option to skip cooldown anyways, as long as they acknowledge the risk
 		local cooldown_time = stats.get_int(heist.stat.cooldown_name) -- POSIX
 		local seconds_left = cooldown_time - Time.Epoch()
 		local on_cooldown = cooldown_time > Time.Epoch()
@@ -108,8 +129,6 @@ local function drawBasicTab()
 		end
 		ImGui.EndDisabled()
 
-		ImGui.SameLine()
-
 		ImGui.BeginDisabled(is_done or on_cooldown)
 		if GUI:Button(_T("SY_COMPLETE_PREPARATIONS")) then
 			YHV1:SkipPrep(heist.stat.name, heist.stat.val, heist_name)
@@ -120,18 +139,19 @@ local function drawBasicTab()
 			GUI:Tooltip(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), seconds_left / 60))
 		end
 
-		-- Trying to add a normal toggle would not work so copied this from yrv3/misc.lua, hopefully didn't miss anything else
-		local cooldownsGrid = GridRenderer.new(1)
-		cooldownsGrid:AddCheckbox("CP_HEIST_COOLDOWN_DISABLE", "features.yim_heists." .. heist.stat.cooldown_gvar, {
-			persistent = true,
-			isTranslatorLabel = true,
+		ImGui.EndDisabled()
+		ImGui.SameLine()
+
+		local new_cd_state, cd_state_changed = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"), heist.stat.gvar(), {
 			onClick = function()
 				YRV3:SetCooldownStateDirty(heist.stat.cooldown_gvar, true)
 			end
 		})
 
-		cooldownsGrid:Draw()
-		ImGui.EndDisabled()
+		if (cd_state_changed) then
+			heist.stat.gvar(new_cd_state)
+		end
+
 		ImGui.PopID()
 
 		ImGui.Spacing()
@@ -274,27 +294,23 @@ local function drawCayoTab()
 
 	-- https://www.unknowncheats.me/forum/3058973-post602.html
 	if GUI:Button(_T "CP_HEIST_UNLOCK_ALL") then
-		-- Also gotta figure out wtf these actually do, currently they're just here to hopefully prevent bugs
-		stats.set_int("MPX_H4CNF_BS_GEN", 131071)
-		stats.set_int("MPX_H4CNF_BS_ENTR", 63)
-		stats.set_int("MPX_H4CNF_BS_ABIL", 63)
 		stats.set_int("MPX_H4CNF_WEP_DISRP", 3)
 		stats.set_int("MPX_H4CNF_ARM_DISRP", 3)
 		stats.set_int("MPX_H4CNF_HEL_DISRP", 3)
+		-- Also gotta figure out wtf these below actually do, currently they're just here to hopefully prevent bugs
+		stats.set_int("MPX_H4CNF_BS_GEN", 131071)
+		stats.set_int("MPX_H4CNF_BS_ENTR", 63)
+		stats.set_int("MPX_H4CNF_BS_ABIL", 63)
 		stats.set_int("MPX_H4_MISSIONS", 65535)
 		stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 40000)
 	end
 
-	local cooldownsGrid = GridRenderer.new(1)
-	cooldownsGrid:AddCheckbox("CP_HEIST_COOLDOWN_DISABLE", "features.yim_heists.cayo_cd", {
-		persistent = true,
-		isTranslatorLabel = true,
-		onClick = function()
-			YRV3:SetCooldownStateDirty("cayo_cd", true)
-		end
-	})
-
-	cooldownsGrid:Draw()
+	GVars.features.yim_heists.cayo_cd, _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
+		GVars.features.yim_heists.cayo_cd, {
+			onClick = function()
+				YRV3:SetCooldownStateDirty("cayo_cd", true)
+			end
+		})
 
 	if (GVars.backend.debug_mode) then
 		-- This button should only be used if something is severely wrong
