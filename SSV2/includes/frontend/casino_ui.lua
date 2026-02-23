@@ -23,30 +23,30 @@ local function drawGamblingTab()
 	end
 
 	GUI:HeaderText(_T("CP_COOLDOWN_BYPASS"), { separator = true, spacing = true })
-	GVars.features.dunk.bypass_casino_bans, _ = GUI:CustomToggle(_T "CP_COOLDOWN_BYPASS_ENABLE",
+	GVars.features.dunk.bypass_casino_bans, _ = GUI:CustomToggle(_T("CP_COOLDOWN_BYPASS_ENABLE"),
 		GVars.features.dunk.bypass_casino_bans, {
 			tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"),
 			color   = Color("#AA0000")
 		})
 
-	ImGui.BulletText(_T "CP_COOLDOWN_BYPASS_STATUS")
+	ImGui.BulletText(_T("CP_COOLDOWN_BYPASS_STATUS"))
 	ImGui.SameLine()
 	ImGui.Text(CasinoPacino:GetCooldownString())
 
 	GUI:HeaderText(_T("CP_POKER_SETTINGS"), { separator = true, spacing = true })
-	GVars.features.dunk.force_poker_cards, _ = GUI:CustomToggle(_T "CP_POKER_FORCE_ROYAL_FLUSH",
+	GVars.features.dunk.force_poker_cards, _ = GUI:CustomToggle(_T("CP_POKER_FORCE_ROYAL_FLUSH"),
 		GVars.features.dunk.force_poker_cards
 	)
 
-	GVars.features.dunk.set_dealers_poker_cards, _ = GUI:CustomToggle(_T "CP_POKER_FORCE_BAD_BEAT",
+	GVars.features.dunk.set_dealers_poker_cards, _ = GUI:CustomToggle(_T("CP_POKER_FORCE_BAD_BEAT"),
 		GVars.features.dunk.set_dealers_poker_cards
 	)
 
 	GUI:HeaderText(_T("CP_BLACKJACK_SETTINGS"), { separator = true, spacing = true })
-	ImGui.BulletText(_T "CP_BLACKJACK_DEALER_FACE_DOWN_CARD")
+	ImGui.BulletText(_T("CP_BLACKJACK_DEALER_FACE_DOWN_CARD"))
 	ImGui.SameLine()
 	ImGui.Text(CasinoPacino:GetBJDealerCard())
-	if GUI:Button(_T "CP_BLACKJACK_FORCE_DEALER_BUST") then
+	if GUI:Button(_T("CP_BLACKJACK_FORCE_DEALER_BUST")) then
 		CasinoPacino:ForceDealerBust()
 	end
 
@@ -164,7 +164,7 @@ local function drawHeistTab()
 	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
 	ImGui.PushItemWidth(200)
 
-	local new_approach, approach_clicked = ImGui.Combo(_T "CP_HEIST_APPROACH",
+	local new_approach, approach_clicked = ImGui.Combo(_T("CP_HEIST_APPROACH"),
 		casino_heist_approach,
 		{ "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" },
 		4
@@ -175,7 +175,7 @@ local function drawHeistTab()
 	end
 
 	local new_last_approach, last_approach_clicked = ImGui.Combo(
-		_T "CP_HEIST_LAST_APPROACH",
+		_T("CP_HEIST_LAST_APPROACH"),
 		casino_heist_last_approach,
 		{ "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" },
 		4
@@ -186,7 +186,7 @@ local function drawHeistTab()
 	end
 
 	local new_hard_approach, hard_approach_clicked = ImGui.Combo(
-		_T "CP_HEIST_HARD_APPROACH",
+		_T("CP_HEIST_HARD_APPROACH"),
 		casino_heist_hard,
 		{ "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" },
 		4
@@ -197,7 +197,7 @@ local function drawHeistTab()
 	end
 
 	local new_target, target_clicked = ImGui.Combo(
-		_T "CP_HEIST_TARGET",
+		_T("CP_HEIST_TARGET"),
 		casino_heist_target,
 		{ "Money", "Gold", "Art", "Diamonds" },
 		4
@@ -208,7 +208,7 @@ local function drawHeistTab()
 	end
 
 	local new_gunman, gunman_clicked = ImGui.Combo(
-		_T "CP_HEIST_GUNMAN",
+		_T("CP_HEIST_GUNMAN"),
 		casino_heist_gunman,
 		{ "Unselected", "Karl Abolaji", "Gustavo Mota", "Charlie Reed", "Chester McCoy", "Patrick McReary" },
 		6
@@ -254,7 +254,7 @@ local function drawHeistTab()
 		}
 
 		local new_weapons, weapons_clicked = ImGui.Combo(
-			_T "CP_HEIST_WEAPONS",
+			_T("CP_HEIST_WEAPONS"),
 			casino_heist_weapons,
 			gunList[new_gunman][casino_heist_approach + 1],
 			2
@@ -265,7 +265,7 @@ local function drawHeistTab()
 	end
 
 	local new_driver, driver_clicked = ImGui.Combo(
-		_T "CP_HEIST_DRIVER",
+		_T("CP_HEIST_DRIVER"),
 		casino_heist_driver,
 		{
 			"Unselected",
@@ -300,7 +300,7 @@ local function drawHeistTab()
 			},
 		}
 		local new_car, car_clicked = ImGui.Combo(
-			_T "CP_HEIST_GETAWAY_VEHS",
+			_T("CP_HEIST_GETAWAY_VEHS"),
 			casino_heist_cars,
 			carList[new_driver],
 			4
@@ -311,7 +311,7 @@ local function drawHeistTab()
 	end
 
 	local new_hacker, hacker_clicked = ImGui.Combo(
-		_T "CP_HEIST_HACKER",
+		_T("CP_HEIST_HACKER"),
 		casino_heist_hacker,
 		{ "Unselected", "Rickie Lukens", "Christian Feltz", "Yohan Blair", "Avi Schwartzman", "Page Harris" },
 		6
@@ -321,7 +321,7 @@ local function drawHeistTab()
 	end
 
 	local new_masks, masks_clicked = ImGui.Combo(
-		_T "CP_HEIST_MASKS",
+		_T("CP_HEIST_MASKS"),
 		casino_heist_masks,
 		{
 			"Unselected",
@@ -367,7 +367,7 @@ local function drawHeistTab()
 		stats.set_packed_stat_bool(26969, true) --Unlock High Roller
 	end
 
-	if (GUI:Button(_T "CP_HEIST_ZERO_AI_CUTS")) then
+	if (GUI:Button(_T("CP_HEIST_ZERO_AI_CUTS"))) then
 		tunables.set_int("CH_LESTER_CUT", 0)
 		tunables.set_int("HEIST3_PREPBOARD_GUNMEN_KARL_CUT", 0)
 		tunables.set_int("HEIST3_PREPBOARD_GUNMEN_GUSTAVO_CUT", 0)

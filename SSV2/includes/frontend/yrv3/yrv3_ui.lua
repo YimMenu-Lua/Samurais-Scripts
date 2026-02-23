@@ -9,7 +9,7 @@
 
 local selectedTabID        = 1
 local colMoneyGreen        = Color("#85BB65")
-local setTranslations      = require("SSV2.includes.frontend.helpers.set_translations")
+local setTranslations      = require("includes.frontend.helpers.set_translations")
 local tabNames <const>     = {
 	"GB_BOSSC",
 	"CELL_HANGAR",
