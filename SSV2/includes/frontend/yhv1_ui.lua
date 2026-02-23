@@ -9,7 +9,10 @@
 
 local YHV1               = require("includes.features.YimHeistsV1"):init()
 local SGSL               = require("includes.services.SGSL")
-local setTranslations    = require("includes.frontend.helpers.set_translations")
+local setTranslations    = require("SSV2.includes.frontend.helpers.set_translations")
+local secondary_targets  = { "Cash", "Weed", "Coke", "Gold" }
+local cayo_secondary_target_i, cayo_secondary_target_c
+
 local heistNames <const> = {
 	"AWT_1026",    -- The Cluckin' Bell Farm Raid
 	"AWT_1109",    -- No Way KnoWay
@@ -106,6 +109,7 @@ local function drawBasicTab()
 		ImGui.EndDisabled()
 
 		ImGui.BeginDisabled(is_done or on_cooldown)
+		ImGui.SameLine()
 		if GUI:Button(_T("SY_COMPLETE_PREPARATIONS")) then
 			YHV1:SkipPrep(heist.stat.name, heist.stat.val, heist_name)
 		end
@@ -116,7 +120,6 @@ local function drawBasicTab()
 		end
 
 		ImGui.EndDisabled()
-		ImGui.SameLine()
 
 		local key = heist.stat.cooldown_gvar
 		GVars.features.yim_heists[key], _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
@@ -133,8 +136,6 @@ local function drawBasicTab()
 		ImGui.Spacing()
 	end
 end
-
-local cayo_secondary_target_i, cayo_secondary_target_c = YHV1:GetSecondaryTargets()
 
 local function drawCayoTab()
 	local sub = YHV1:HasSubmarine()
@@ -218,29 +219,27 @@ local function drawCayoTab()
 
 	ImGui.Spacing()
 
-	local secondary_targets = { "Cash", "Weed", "Coke", "Gold" }
-	local new_secondary_target_i, secondary_target_i_click = ImGui.Combo(
-		_T("YH_CAYO_TARGET_SECONDARY_I"),
+	local secondary_target_click
+	cayo_secondary_target_i, secondary_target_click = ImGui.Combo(
+		_T "YH_CAYO_TARGET_SECONDARY_I",
 		cayo_secondary_target_i,
 		secondary_targets,
 		4
 	)
 
-	if (secondary_target_i_click) then
-		YHV1:SetSecondaryTargets("I", new_secondary_target_i + 1)
-		cayo_secondary_target_i = new_secondary_target_i
+	if (secondary_target_click) then
+		YHV1:SetSecondaryTargets("I", cayo_secondary_target_i + 1)
 	end
 
-	local new_secondary_target_c, secondary_target_c_click = ImGui.Combo(
-		_T("YH_CAYO_TARGET_SECONDARY_C"),
+	cayo_secondary_target_c, secondary_target_click = ImGui.Combo(
+		_T "YH_CAYO_TARGET_SECONDARY_C",
 		cayo_secondary_target_c,
 		secondary_targets,
 		4
 	)
 
-	if (secondary_target_c_click) then
-		YHV1:SetSecondaryTargets("C", new_secondary_target_c + 1)
-		cayo_secondary_target_c = new_secondary_target_c
+	if (secondary_target_click) then
+		YHV1:SetSecondaryTargets("C", cayo_secondary_target_c + 1)
 	end
 
 	ImGui.Spacing()
@@ -320,6 +319,8 @@ local function HeistUI()
 		ImGui.Text(_T("GENERIC_UNAVAILABLE_SP"))
 		return
 	end
+
+	cayo_secondary_target_i, cayo_secondary_target_c = YHV1:GetSecondaryTargets()
 
 	if (ImGui.BeginTabBar("##funkBar")) then
 		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
