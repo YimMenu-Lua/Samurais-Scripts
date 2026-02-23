@@ -671,5 +671,7 @@ return {
 	["YRV3_EDIT_EARNINGS_DATA"] = "Редактировать данные о доходах",
 	["YRV3_LIFETIME_BUY_COMPLETE"] = "Купить выполненные миссии:",
 	["YRV3_SHOW_EARNINGS_DATA"] = "Показать данные о доходах",
-	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Продать выполненные миссии:"
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Продать выполненные миссии:",
+	["YH_CAYO_REQUEST_SUB"] = "Запросить подводную лодку",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Отключает время восстановления, может привести к бану. Используйте на свой страх и риск!"
 }

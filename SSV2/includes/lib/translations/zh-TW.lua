@@ -671,5 +671,7 @@ return {
 	["YRV3_LIFETIME_EARNINGS"] = "終生收入：",
 	["YRV3_EDIT_EARNINGS_DATA"] = "編輯獲利數據",
 	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "已執行的購買任務：",
-	["YRV3_LIFETIME_SELL_COMPLETE"] = "銷售任務已完成："
+	["YRV3_LIFETIME_SELL_COMPLETE"] = "銷售任務已完成：",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "禁用冷却时间，可能会导致禁止。使用風險自負！",
+	["YH_CAYO_REQUEST_SUB"] = "請求潛水艇"
 }

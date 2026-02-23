@@ -671,5 +671,7 @@ return {
 	["YRV3_EDIT_EARNINGS_DATA"] = "Edit Earnings Data",
 	["YRV3_LIFETIME_BUY_COMPLETE"] = "Compre missões concluídas:",
 	["YRV3_LIFETIME_SELL_COMPLETE"] = "Missões de venda concluídas:",
-	["YRV3_LIFETIME_EARNINGS"] = "Ganhos vitalícios:"
+	["YRV3_LIFETIME_EARNINGS"] = "Ganhos vitalícios:",
+	["YH_CAYO_REQUEST_SUB"] = "Solicitar Submarino",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Desativa o tempo de espera, pode resultar em banimento. Use por sua conta e risco!"
 }

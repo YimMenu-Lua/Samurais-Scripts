@@ -671,5 +671,7 @@ return {
 	["YRV3_LIFETIME_BUY_COMPLETE"] = "Acheter des missions terminées :",
 	["YRV3_EDIT_EARNINGS_DATA"] = "Modifier les données sur les revenus",
 	["YRV3_SHOW_EARNINGS_DATA"] = "Afficher les données sur les revenus",
-	["YRV3_LIFETIME_EARNINGS"] = "Gains à vie :"
+	["YRV3_LIFETIME_EARNINGS"] = "Gains à vie :",
+	["YH_CAYO_REQUEST_SUB"] = "Demander un sous-marin",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Désactive le temps de recharge, peut entraîner un bannissement. Utilisez à vos propres risques !"
 }

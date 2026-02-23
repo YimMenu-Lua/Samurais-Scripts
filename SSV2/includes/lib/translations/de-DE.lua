@@ -671,5 +671,7 @@ return {
 	["YRV3_LIFETIME_EARNINGS"] = "Lebenseinkommen:",
 	["YRV3_SHOW_EARNINGS_DATA"] = "Verdienstdaten anzeigen",
 	["YRV3_LIFETIME_SELL_COMPLETE"] = "Abgeschlossene Verkaufsmissionen:",
-	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Durchgeführte Verkaufsmissionen:"
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Durchgeführte Verkaufsmissionen:",
+	["YH_CAYO_REQUEST_SUB"] = "U-Boot anfordern",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Deaktiviert die Abklingzeit und kann zu einem Bann führen. Nutzung auf eigene Gefahr!"
 }

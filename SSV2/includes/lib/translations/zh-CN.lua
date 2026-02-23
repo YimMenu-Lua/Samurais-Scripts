@@ -671,5 +671,7 @@ return {
 	["YRV3_SHOW_EARNINGS_DATA"] = "显示盈利数据",
 	["YRV3_LIFETIME_SELL_COMPLETE"] = "销售任务已完成：",
 	["YRV3_EDIT_EARNINGS_DATA"] = "编辑盈利数据",
-	["GENERIC_EDIT"] = "编辑"
+	["GENERIC_EDIT"] = "编辑",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "禁用冷却时间，可能会导致禁止。使用风险自负！",
+	["YH_CAYO_REQUEST_SUB"] = "请求潜艇"
 }

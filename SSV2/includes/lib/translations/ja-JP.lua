@@ -671,5 +671,7 @@ return {
 	["YRV3_EDIT_EARNINGS_DATA"] = "収益データの編集",
 	["YRV3_LIFETIME_EARNINGS"] = "生涯収入:",
 	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "引き受けたミッションを購入:",
-	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "実施された販売ミッション:"
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "実施された販売ミッション:",
+	["YH_CAYO_REQUEST_SUB"] = "潜水艦のリクエスト",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "クールダウンを無効にし、BANされる可能性があります。ご自身の責任でご使用ください。"
 }

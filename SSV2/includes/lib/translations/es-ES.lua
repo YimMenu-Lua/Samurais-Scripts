@@ -671,5 +671,7 @@ return {
 	["YRV3_LIFETIME_SELL_COMPLETE"] = "Vender misiones completadas:",
 	["YRV3_LIFETIME_EARNINGS"] = "Ganancias de por vida:",
 	["YRV3_EDIT_EARNINGS_DATA"] = "Editar datos de ganancias",
-	["YRV3_SHOW_EARNINGS_DATA"] = "Mostrar datos de ganancias"
+	["YRV3_SHOW_EARNINGS_DATA"] = "Mostrar datos de ganancias",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Desactiva el tiempo de reutilización, puede resultar en una prohibición. ¡Úselo bajo su propio riesgo!",
+	["YH_CAYO_REQUEST_SUB"] = "Solicitar Submarino"
 }

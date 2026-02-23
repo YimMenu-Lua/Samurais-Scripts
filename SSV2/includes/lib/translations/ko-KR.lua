@@ -671,5 +671,7 @@ return {
 	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "수행된 임무 구매:",
 	["YRV3_LIFETIME_EARNINGS"] = "평생 수입:",
 	["YRV3_EDIT_EARNINGS_DATA"] = "수입 데이터 편집",
-	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "수행되는 판매 임무:"
+	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "수행되는 판매 임무:",
+	["YH_CAYO_REQUEST_SUB"] = "잠수함 요청",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "재사용 대기시간을 비활성화합니다. 차단될 수 있습니다. 자신의 책임하에 사용하십시오!"
 }

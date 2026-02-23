@@ -671,5 +671,7 @@ return {
 	["YRV3_LIFETIME_EARNINGS"] = "Guadagni nel corso della vita:",
 	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Vendi missioni intraprese:",
 	["YRV3_EDIT_EARNINGS_DATA"] = "Modifica i dati sui guadagni",
-	["YRV3_SHOW_EARNINGS_DATA"] = "Mostra dati sui guadagni"
+	["YRV3_SHOW_EARNINGS_DATA"] = "Mostra dati sui guadagni",
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Disabilita il tempo di recupero, può comportare il ban. Utilizzare a proprio rischio!",
+	["YH_CAYO_REQUEST_SUB"] = "Richiedi sottomarino"
 }
