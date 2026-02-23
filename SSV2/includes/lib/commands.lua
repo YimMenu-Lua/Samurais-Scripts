@@ -181,6 +181,49 @@ local commandRegistry <const> = {
 			description = "Spawns a vehicle from JSON."
 		}
 	},
+	["teleport"] = {
+		callback = function(args)
+			args = args or {}
+
+			local x = args[1]
+			local y = args[2]
+			local z = args[3] or 0
+
+			if (#args < 2) then
+				local wpc = Game.GetWaypointCoords()
+				if (not wpc) then
+					Notifier:ShowError(
+						"CommandExecutor",
+						"No waypoint active!",
+						true,
+						3
+					)
+					return
+				end
+
+				x, y, _ = wpc:unpack()
+			end
+
+			if ((type(x) ~= "number") or (type(y) ~= "number")) then
+				Notifier:ShowError(
+					"CommandExecutor",
+					"Missing or incorrect parameter. Usage: teleport <X> <Y> [Z]",
+					true,
+					5
+				)
+				return
+			end
+
+			local coords = vec3:new(x, y, z)
+			LocalPlayer:Teleport(coords, false, z == 0)
+		end,
+		opts = {
+			description =
+			"Teleports to given coordinates or waypoint if none given. Will try to teleport to top level if no Z argument given.\nUsage Example:\n  - teleport 69 420 69\n  - tp 123.456 789.1011",
+			args = { "X<number>", "Y<number>", "Optional: Z<number>" },
+			alias = { "tp" }
+		}
+	},
 }
 
 return commandRegistry

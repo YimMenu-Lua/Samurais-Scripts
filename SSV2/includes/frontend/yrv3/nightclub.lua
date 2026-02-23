@@ -183,7 +183,7 @@ return function()
 		)
 
 		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + 40) * 0.5)
-		-- TODO: Fix glitchy behavior + session disconnect on Enhanced/YLAPI(?)
+		-- TODO: Fix glitchy behavior + session disconnect on Enhanced
 		ImGui.BeginDisabled(Game.IsEnhanced())
 		ImGui.BeginDisabled(prod >= max_units)
 		this.fast_prod_enabled, _ = GUI:CustomToggle("##fast_prod", this.fast_prod_enabled)

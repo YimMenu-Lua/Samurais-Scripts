@@ -157,17 +157,6 @@ local RawBusinessData <const> = {
 				end
 			end
 		},
-		["cfr_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.cfr_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("SALV23_CFR_COOLDOWN") > 0) then
-					stats.set_int("SALV23_CFR_COOLDOWN", 0)
-				end
-			end
-		},
 		["cwash_legal_work_cd"] = {
 			dirty = false,
 			gstate = function()
@@ -265,6 +254,64 @@ local RawBusinessData <const> = {
 			onEnable = function()
 				if (tunables.get_int(1521767918) > 0) then -- 120000ms
 					tunables.set_int(1521767918, 0)
+				end
+			end
+		},
+		["cfr_cd"] = {
+			dirty = false,
+			gstate = function()
+				return GVars.features.yim_heists.cfr_cd
+			end,
+			onEnable = function()
+				if (stats.get_int("SALV23_CFR_COOLDOWN") > 0) then
+					stats.set_int("SALV23_CFR_COOLDOWN", 0)
+				end
+			end
+		},
+		["knoway_cd"] = {
+			dirty = false,
+			gstate = function()
+				return GVars.features.yim_heists.knoway_cd
+			end,
+			onEnable = function()
+				if (stats.get_int("MPX_M25_AVI_MISSION_CD") > 0) then
+					stats.set_int("MPX_M25_AVI_MISSION_CD", 0)
+				end
+			end
+		},
+		["dre_cd"] = {
+			dirty = false,
+			gstate = function()
+				return GVars.features.yim_heists.dre_cd
+			end,
+			onEnable = function()
+				if (stats.get_int("MPX_FIXER_STORY_COOLDOWN") > 0) then
+					stats.set_int("MPX_FIXER_STORY_COOLDOWN", 0)
+				end
+			end
+		},
+		["ogfa_cd"] = {
+			dirty = false,
+			gstate = function()
+				return GVars.features.yim_heists.ogfa_cd
+			end,
+			onEnable = function()
+				if (stats.get_int("MPX_HACKER24_MFM_COOLDOWN") > 0) then
+					stats.set_int("MPX_HACKER24_MFM_COOLDOWN", 0)
+				end
+			end
+		},
+		["cayo_cd"] = {
+			dirty = false,
+			gstate = function()
+				return GVars.features.yim_heists.cayo_cd
+			end,
+			onEnable = function()
+				if (stats.get_int("MPX_H4_COOLDOWN") > 0) then
+					stats.set_int("MPX_H4_COOLDOWN", 0)
+				end
+				if (stats.get_int("MPX_H4_COOLDOWN_HARD") > 0) then
+					stats.set_int("MPX_H4_COOLDOWN_HARD", 0)
 				end
 			end
 		},

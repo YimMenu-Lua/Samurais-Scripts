@@ -7,11 +7,17 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+---@class HeistStat
+---@field public name string
+---@field public val integer
+---@field public cooldown_name string
+---@field public cooldown_gvar string GVar path name
+
 ---@class HeistInfo
 ---@field public get_name fun(): string
 ---@field public get_coords fun(): vec3?
----@field public stat { name: string, val: integer}
----@field public optInfo? string
+---@field public stat HeistStat
+---@field public opt_info? string Optional info to provide to a tooltip, typically a starting requirement that needs to be done manually
 
 ---@class GenericProperty
 ---@field public name string
@@ -55,6 +61,43 @@ end
 function YimHeists:SkipPrep(statName, statVal, notifTitle)
 	stats.set_int(statName, statVal)
 	Notifier:ShowSuccess(notifTitle, _T("YH_PREP_SKIP_NOTIF"))
+end
+
+-- https://www.unknowncheats.me/forum/4489469-post16.html EXCEPT setting values as that's greater risk
+---@param type string I or C
+---@param index integer
+function YimHeists:SetSecondaryTargets(type, index)
+	local secondary_targets = { "CASH", "WEED", "COKE", "GOLD" }
+	local targets = { 0, 0, 0, 0 }
+	targets[index] = -1
+
+	for st = 1, #secondary_targets do
+		local stat_name = _F("MPX_H4LOOT_%s_%s", secondary_targets[st], type)
+		stats.set_int(stat_name, targets[st])
+		stats.set_int(stat_name .. "_SCOPED", targets[st])
+	end
+
+	stats.set_int("MPX_H4LOOT_PAINT", -1) -- Not really any reason to have an option for paintings
+	stats.set_int("MPX_H4LOOT_PAINT_SCOPED", -1)
+end
+
+---@return integer, integer
+function YimHeists:GetSecondaryTargets()
+	local secondary_targets = { "CASH", "WEED", "COKE", "GOLD" }
+	local return_i
+	local return_c
+
+	for st = 1, #secondary_targets do
+		local stat_name = _F("MPX_H4LOOT_%s", secondary_targets[st])
+		if (stats.get_int(stat_name .. "_I") == -1) then
+			return_i = st - 1 -- ImGui indexes by 0
+		end
+		if (stats.get_int(stat_name .. "_C") == -1) then
+			return_c = st - 1
+		end
+	end
+
+	return return_i or -1, return_c or -1
 end
 
 function YimHeists:ReadPropertyData()
@@ -136,5 +179,16 @@ end
 function YimHeists:HasSubmarine()
 	return self.m_properties.submarine
 end
+
+-- ---@return vec3?
+-- function YimHeists:GetSubmarineLocation()
+-- 	local sub = self:HasSubmarine()
+-- 	if (not sub) then
+-- 		return
+-- 	end
+
+-- 	sub.coords = Game.Ensure3DCoords(760)
+-- 	return sub.coords
+-- end
 
 return YimHeists
