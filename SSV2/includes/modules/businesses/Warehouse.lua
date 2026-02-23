@@ -15,48 +15,48 @@ local function GetCEOCratesValue(crates)
 		return 0
 	end
 
-	local val
+	local v = 1
 	if crates <= 3 then
-		val = tostring(crates)
+		v = crates
 	elseif crates <= 5 then
-		val = "4"
+		v = 4
 	elseif crates <= 7 then
-		val = "5"
+		v = 5
 	elseif crates <= 9 then
-		val = "6"
+		v = 6
 	elseif crates <= 14 then
-		val = "7"
+		v = 7
 	elseif crates <= 19 then
-		val = "8"
+		v = 8
 	elseif crates <= 24 then
-		val = "9"
+		v = 9
 	elseif crates <= 29 then
-		val = "10"
+		v = 10
 	elseif crates <= 34 then
-		val = "11"
+		v = 11
 	elseif crates <= 39 then
-		val = "12"
+		v = 12
 	elseif crates <= 44 then
-		val = "13"
+		v = 13
 	elseif crates <= 49 then
-		val = "14"
+		v = 14
 	elseif crates <= 59 then
-		val = "15"
+		v = 15
 	elseif crates <= 69 then
-		val = "16"
+		v = 16
 	elseif crates <= 79 then
-		val = "17"
+		v = 17
 	elseif crates <= 89 then
-		val = "18"
+		v = 18
 	elseif crates <= 99 then
-		val = "19"
+		v = 19
 	elseif crates <= 110 then
-		val = "20"
+		v = 20
 	elseif crates == 111 then
-		val = "21"
+		v = 21
 	end
 
-	return val and (tunables.get_int("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD" .. val) * crates) or 0
+	return tunables.get_int(_F("EXEC_CONTRABAND_SALE_VALUE_THRESHOLD%d", v)) * crates
 end
 
 ---@enum eWarehouseType

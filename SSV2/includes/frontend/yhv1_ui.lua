@@ -9,7 +9,7 @@
 
 local YHV1               = require("includes.features.YimHeistsV1"):init()
 local SGSL               = require("includes.services.SGSL")
-local setTranslations    = require("SSV2.includes.frontend.helpers.set_translations")
+local setTranslations    = require("includes.frontend.helpers.set_translations")
 local heistNames <const> = {
 	"AWT_1026",    -- The Cluckin' Bell Farm Raid
 	"AWT_1109",    -- No Way KnoWay
@@ -172,11 +172,14 @@ local function drawCayoTab()
 	ImGui.SameLine()
 	ImGui.BeginDisabled(sub_requested or sub_spawned)
 	if (GUI:Button(btn_label)) then
-		if (not LocalPlayer:IsOutside()) then
-			Notifier:ShowError("YHV1", _T("GENERIC_TP_INTERIOR_ERR"))
-		else
+		ThreadManager:Run(function()
+			if (not LocalPlayer:IsOutside()) then
+				Notifier:ShowError("YHV1", _T("GENERIC_TP_INTERIOR_ERR"))
+				return
+			end
+
 			request_kosatka:WriteInt(1)
-		end
+		end)
 	end
 	ImGui.EndDisabled()
 
@@ -198,12 +201,12 @@ local function drawCayoTab()
 		GUI:HeaderText(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left),
 			{ separator = false, spacing = true, color = Color("#AA0000") })
 	end
-	ImGui.BeginDisabled(on_cooldown)
 
+	ImGui.BeginDisabled(on_cooldown)
 	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
 
 	local new_primary_target, primary_target_clicked = ImGui.Combo(
-		_T "YH_CAYO_TARGET_PRIMARY",
+		_T("YH_CAYO_TARGET_PRIMARY"),
 		cayo_heist_primary,
 		{ "Tequila", "Ruby", "Bearer Bonds", "Pink Diamond", "Madrazo Files", "Panther Statue" },
 		6
@@ -217,7 +220,7 @@ local function drawCayoTab()
 
 	local secondary_targets = { "Cash", "Weed", "Coke", "Gold" }
 	local new_secondary_target_i, secondary_target_i_click = ImGui.Combo(
-		_T "YH_CAYO_TARGET_SECONDARY_I",
+		_T("YH_CAYO_TARGET_SECONDARY_I"),
 		cayo_secondary_target_i,
 		secondary_targets,
 		4
@@ -229,7 +232,7 @@ local function drawCayoTab()
 	end
 
 	local new_secondary_target_c, secondary_target_c_click = ImGui.Combo(
-		_T "YH_CAYO_TARGET_SECONDARY_C",
+		_T("YH_CAYO_TARGET_SECONDARY_C"),
 		cayo_secondary_target_c,
 		secondary_targets,
 		4
@@ -243,7 +246,7 @@ local function drawCayoTab()
 	ImGui.Spacing()
 
 	local new_weapons, weapons_clicked = ImGui.Combo(
-		_T "YH_CAYO_WEAPONS",
+		_T("YH_CAYO_WEAPONS"),
 		cayo_heist_weapons,
 		{ "Unselected", "Aggressor", "Conspirator", "Crackshot", "Saboteur", "Marksman" },
 		6
@@ -253,7 +256,7 @@ local function drawCayoTab()
 		stats.set_int("MPX_H4CNF_WEAPONS", new_weapons)
 	end
 
-	GUI:HeaderText(_T "GENERIC_OPTIONS_LABEL", { separator = true, spacing = true })
+	GUI:HeaderText(_T("GENERIC_OPTIONS_LABEL"), { separator = true, spacing = true })
 
 	-- I'll also need to find which bits actually correspond to hard mode instead of just hard coding values and this stupid check; Bits 4, 8, 13 is the difference
 	local new_difficulty, difficulty_toggled = GUI:CustomToggle(_T("YH_CAYO_DIFFICULTY"),
@@ -269,7 +272,7 @@ local function drawCayoTab()
 	end
 
 	-- https://www.unknowncheats.me/forum/3058973-post602.html
-	if GUI:Button(_T "CP_HEIST_UNLOCK_ALL") then
+	if GUI:Button(_T("CP_HEIST_UNLOCK_ALL")) then
 		stats.set_int("MPX_H4CNF_WEP_DISRP", 3)
 		stats.set_int("MPX_H4CNF_ARM_DISRP", 3)
 		stats.set_int("MPX_H4CNF_HEL_DISRP", 3)
@@ -292,7 +295,7 @@ local function drawCayoTab()
 
 	if (GVars.backend.debug_mode) then
 		-- This button should only be used if something is severely wrong
-		if GUI:Button(_T "YH_CAYO_RESET_ALL") then
+		if GUI:Button(_T("YH_CAYO_RESET_ALL")) then
 			stats.set_int("MPX_H4_MISSIONS", 0)
 			stats.set_int("MPX_H4_PROGRESS", 0)
 			stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 0)
