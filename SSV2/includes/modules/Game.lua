@@ -105,8 +105,13 @@ function Game.IsEnhanced()
 end
 
 ---@return boolean
+function Game.IsInTransition()
+	return NETWORK.NETWORK_IS_IN_TRANSITION() or Backend:IsPlayerSwitchInProgress()
+end
+
+---@return boolean
 function Game.IsOnline()
-	return network.is_session_started() and not script.is_active("maintransition")
+	return network.is_session_started() and not Game.IsInTransition()
 end
 
 ---@param handle integer

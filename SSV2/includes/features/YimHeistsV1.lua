@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local SGSL              = require("includes.services.SGSL")
 local secondary_targets = { "CASH", "WEED", "COKE", "GOLD" }
 
 ---@class HeistStat
@@ -28,6 +29,7 @@ local secondary_targets = { "CASH", "WEED", "COKE", "GOLD" }
 ---@class AgencyProperty : GenericProperty
 ---@class FieldHangarProperty : GenericProperty
 ---@class SubmarineProperty : GenericProperty
+---@field public heading float
 
 ---@alias HEIST_TYPES table<integer, HeistInfo>
 
@@ -35,8 +37,9 @@ local secondary_targets = { "CASH", "WEED", "COKE", "GOLD" }
 ---@field private m_raw_data RawBusinessData
 ---@field private m_properties { agency: AgencyProperty, hangar: FieldHangarProperty, submarine: SubmarineProperty }
 ---@field m_tab Tab
-local YimHeists = { m_raw_data = require("includes.data.yrv3_data") }
-YimHeists.__index = YimHeists
+local YimHeists         = { m_raw_data = require("includes.data.yrv3_data") }
+YimHeists.__index       = YimHeists
+YimHeists.__label       = "YimHeists"
 
 ---@return YimHeists
 function YimHeists:init()
@@ -45,9 +48,7 @@ function YimHeists:init()
 	}, self)
 
 	if (Game.IsOnline()) then
-		ThreadManager:Run(function()
-			instance:ReadPropertyData()
-		end)
+		instance:ReadPropertyData()
 	end
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, function()
@@ -99,11 +100,22 @@ function YimHeists:GetSecondaryTargets()
 	return loot_i or -1, loot_c or -1
 end
 
+---@return ScriptGlobal
+local function GetSubCoordsGlobal()
+	local coords_global = SGSL:Get(SGSL.data.submarine_global)
+	local pid_size = coords_global:GetOffset(1)
+	local offset2 = coords_global:GetOffset(2)
+	local vec_offset = 286 -- magic
+
+	return coords_global:AsGlobal()
+		:At(LocalPlayer:GetPlayerID(), pid_size)
+		:At(offset2)
+		:At(vec_offset)
+end
+
 function YimHeists:ReadPropertyData()
 	ThreadManager:Run(function()
-		-- a better approach to this would be to read transition state.
-		-- I forgot how to do that so this will do.
-		while (script.is_active("maintransition")) do
+		while (Game.IsInTransition()) do
 			yield()
 		end
 
@@ -132,13 +144,11 @@ function YimHeists:ReadPropertyData()
 
 		local sub_hash = stats.get_int("MPX_IH_SUB_OWNED")
 		if (sub_hash == _J("kosatka")) then
+			local global = GetSubCoordsGlobal()
 			self.m_properties.submarine = {
-				name   = Game.GetGXTLabel("CELL_SUBMARINE"),
-				-- TODO: I have no idea how to properly get the location of player Kosatka
-				--
-				-- It's an index in some global which also has offsets to show if its currently requested or not
-				-- I attempted to do the same for the acid lab truck but quickly got irritated
-				coords = Game.Ensure3DCoords(760) or vec3:zero()
+				name    = Game.GetGXTLabel("CELL_SUBMARINE"),
+				coords  = global:ReadVec3(),
+				heading = global:At(3):ReadFloat()
 			}
 		end
 	end)
@@ -175,19 +185,16 @@ function YimHeists:GetFieldHangarLocation()
 end
 
 ---@return SubmarineProperty?
-function YimHeists:HasSubmarine()
-	return self.m_properties.submarine
+function YimHeists:GetSubmarine()
+	local sub = self.m_properties.submarine
+	if (not sub) then
+		return
+	end
+
+	local sub_global = GetSubCoordsGlobal()
+	sub.coords = sub_global:ReadVec3()
+	sub.heading = sub_global:At(3):ReadFloat()
+	return sub
 end
-
--- ---@return vec3?
--- function YimHeists:GetSubmarineLocation()
--- 	local sub = self:HasSubmarine()
--- 	if (not sub) then
--- 		return
--- 	end
-
--- 	sub.coords = Game.Ensure3DCoords(760)
--- 	return sub.coords
--- end
 
 return YimHeists

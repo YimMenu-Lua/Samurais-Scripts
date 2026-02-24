@@ -96,8 +96,8 @@ local function drawBasicTab()
 		ImGui.PushID(i)
 		GUI:HeaderText(heist_name, { separator = true, spacing = true })
 
-		local location = heist.get_coords() or vec3:zero()
-		ImGui.BeginDisabled(location:is_zero() or on_cooldown)
+		local location = heist.get_coords()
+		ImGui.BeginDisabled(not location or on_cooldown)
 		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
 			LocalPlayer:Teleport(location, false)
 		end
@@ -118,7 +118,6 @@ local function drawBasicTab()
 		elseif (on_cooldown) then
 			GUI:Tooltip(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), seconds_left / 60))
 		end
-
 		ImGui.EndDisabled()
 
 		local key = heist.stat.cooldown_gvar
@@ -138,26 +137,21 @@ local function drawBasicTab()
 end
 
 local function drawCayoTab()
-	local sub = YHV1:HasSubmarine()
+	local sub = YHV1:GetSubmarine()
 	if (not sub) then
 		ImGui.Text(_T("YH_SUBMARINE_NOT_OWNED"))
 		return
 	end
 
-	-- This is shitty, and only properly works when not near the sub. No idea what happens if multiple subs in session
-	-- TODO: Find and use the correct globals/offsets
-	local sub_blip = Game.Ensure3DCoords(760)
 	local request_kosatka = SGSL:Get(SGSL.data.request_services_global):AsGlobal():At(613)
 	local sub_requested = request_kosatka:ReadInt() == 1
-	local sub_spawned = not sub.coords:is_zero() and sub_blip ~= nil
-
-	if (sub_blip or not sub_requested) then
-		sub.coords = sub_blip or vec3:zero()
-	end
+	local sub_spawned = not sub.coords:is_zero()
 
 	ImGui.BeginDisabled(not sub_spawned)
 	if (GUI:Button(_T("GENERIC_TELEPORT"))) then
-		LocalPlayer:Teleport(sub.coords + vec3:new(0, 0, -9.8)) -- Teleport under Kosatka
+		local forward_angle = math.rad(sub.heading + 90)
+		local offset = vec3:new(math.cos(forward_angle), math.sin(forward_angle), 4) -- front of door
+		LocalPlayer:Teleport(sub.coords + offset)
 	end
 
 	ImGui.SameLine()
@@ -166,16 +160,14 @@ local function drawCayoTab()
 	end
 	ImGui.EndDisabled()
 
-	local btn_label = (sub_requested)
-		and ImGui.TextSpinner()
-		or _T("YH_CAYO_REQUEST_SUB")
+	local btn_label = (sub_requested) and ImGui.TextSpinner() or _T("YH_CAYO_REQUEST_SUB")
 
-	ImGui.SameLine()
 	ImGui.BeginDisabled(sub_requested or sub_spawned)
+	ImGui.SameLine()
 	if (GUI:Button(btn_label)) then
 		ThreadManager:Run(function()
 			if (not LocalPlayer:IsOutside()) then
-				Notifier:ShowError("YHV1", _T("GENERIC_TP_INTERIOR_ERR"))
+				Notifier:ShowError(YHV1.__label, _T("GENERIC_TP_INTERIOR_ERR"))
 				return
 			end
 
@@ -302,7 +294,7 @@ local function drawCayoTab()
 			stats.set_int("MPX_H4CNF_BS_ENTR", 0)
 			stats.set_int("MPX_H4CNF_BS_GEN", 0)
 			stats.set_int("MPX_H4CNF_BS_ABIL", 0)
-			Notifier:ShowSuccess("YHV1", "All progress has been reset!")
+			Notifier:ShowSuccess(YHV1.__label, "All Cayo progress has been reset!")
 		end
 	end
 
@@ -338,7 +330,7 @@ local function HeistUI()
 	end
 end
 
-GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimHeists", HeistUI)
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, YHV1.__label, HeistUI)
 
 ThreadManager:Run(function()
 	setTranslations(tabNames)

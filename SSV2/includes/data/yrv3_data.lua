@@ -608,7 +608,7 @@ local RawBusinessData <const> = {
 		{ gxt = "HD_GARNAME", coords = vec3:new(719.3386, -983.1850, 24.1402) },
 	},
 	FieldHangar = {
-		{ gxt = "FHAN_NME_1", coords = vec3:new(2150.65, 4796.60, 41.17) },
+		{ gxt = "FHAN_NME_1", coords = vec3:new(2152.74, 4791.05, 41.17) },
 	},
 	CashSafes = {
 		regular = {
