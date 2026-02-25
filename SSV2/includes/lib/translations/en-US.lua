@@ -738,7 +738,7 @@ return {
 	["YH_CAYO_RESET_ALL"]                  = "Reset ALL Progress",
 	["YH_FACILITY_NOT_OWNED"]              = "Purchase a Facility to access The Doomsday Heist.", -- GOPS_BASE_HELP
 	["YH_TP_FACILITY"]                     = "Teleport to Facility",
-	["YH_DDAY_FORCE"]                      = "FORCE ENABLE",
+	["YH_DDAY_FORCE"]                      = "FORCE RESET",
 	["YH_DDAY_HELP1"]                      =
 	"This method is necessary if you have never played Doomsday as a host. If you have already played and completed some heists as host, skip this step.",
 	["YH_DDAY_HELP2_FMT"]                  =

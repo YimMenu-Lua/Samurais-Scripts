@@ -164,6 +164,20 @@ function YimHeists:ReadPropertyData()
 	end)
 end
 
+---@return vec3
+function YimHeists:GetAviLocation()
+	local stat = stats.get_int("MPX_M25_AVI_MISSION_CURRENT")
+	local blip = HUD.GET_FIRST_BLIP_INFO_ID(76)
+	if (blip and stat ~= 4) then
+		local blip_coords = HUD.GET_BLIP_INFO_ID_COORD(blip)
+		local forward_angle = math.rad(HUD.GET_BLIP_ROTATION(blip) + 90)
+		local offset = vec3:new(math.cos(forward_angle), math.sin(forward_angle), 0) -- front of payphone
+		return blip_coords + offset
+	end
+
+	return vec3:new(42.82, -1599.19, 29.60) -- final payphone
+end
+
 ---@return AgencyProperty?
 function YimHeists:GetAgencyProperty()
 	return self.m_properties.agency

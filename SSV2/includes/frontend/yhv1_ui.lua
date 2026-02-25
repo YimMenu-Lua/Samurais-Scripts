@@ -12,11 +12,17 @@ local SGSL               = require("includes.services.SGSL")
 local secondary_targets  = { "Cash", "Weed", "Coke", "Gold" }
 local cayo_secondary_target_i, cayo_secondary_target_c
 
+-- https://github.com/root-cause/v-labels/blob/master/labels.json
 local heistNames <const> = {
 	"AWT_1026",    -- The Cluckin' Bell Farm Raid
-	"AWT_1109",    -- No Way KnoWay
+	"DLCC_AVIM",   -- KnoWay Out
 	"AWT_973",     -- Don't Fuck With Dre
 	"HACK24_MFM_STR", -- Oscar Guzman Flies Again
+	"HTITLE_TUT",  -- The Fleeca Job
+	"HTITLE_PRISON", -- The Prison Break
+	"HTITLE_HUMANE", -- The Humane Labs Raid
+	"HTITLE_NARC", -- Series A Funding
+	"HTITLE_ORNATE", -- The Pacific Standard Job
 }
 local tabNames <const>   = {
 	"YH_BASIC_TAB", -- Basic
@@ -45,7 +51,7 @@ local HEIST_TYPES        = {
 			return heistNames[2]
 		end,
 		get_coords = function()
-			return vec3:new(42.82, -1599.19, 29.60)
+			return YHV1:GetAviLocation()
 		end,
 		stat = {
 			name = "MPX_M25_AVI_MISSION_CURRENT",
@@ -130,7 +136,6 @@ local function drawBasicTab()
 					YRV3:SetCooldownStateDirty(key, true)
 				end
 			})
-
 		ImGui.PopID()
 
 		ImGui.Spacing()
@@ -379,6 +384,12 @@ local function drawDDayTab()
 				YRV3:SetCooldownStateDirty("dday_cd", true)
 			end
 		})
+end
+
+-- Maybe port https://github.com/YimMenu/YimMenuV2/blob/enhanced/src/game/features/recovery/Heist/ApartmentHeist.cpp ?
+-- Apartment heists actually seem complicated in that (I assume) since they're old they use a different method of storing progress as there isn't just 1 stat to check like all the others
+-- Or if there is, there only *was* because no stats I've found seem to do anything today, like the stat from that link right there. Doesn't do anything, am I missing something?
+local function drawAptTab()
 end
 
 local tabCallbacks <const> = {
