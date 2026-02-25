@@ -133,7 +133,7 @@ function Translator:TranslateGXT(label)
 	if (string.isvalid(GXT) and GXT ~= "NULL") then
 		return GXT -- get label from the game.
 	else
-		return _T(label)  -- no GXT; use our own translations
+		return self:Translate(label)  -- no GXT; use our own translations
 	end
 end
 

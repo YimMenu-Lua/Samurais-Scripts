@@ -321,8 +321,8 @@ local RawBusinessData <const> = {
 				return GVars.features.yim_heists.dday_cd
 			end,
 			onEnable = function()
-				if (stats.get_int("MPX_GANGOPS_FLOW_MISSION_PROG") > 0) then
-					stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 0)
+				if (stats.get_int("MPX_GANGOPS_LAUNCH_TIME") > 0) then
+					stats.set_int("MPX_GANGOPS_LAUNCH_TIME", 0)
 				end
 			end
 		},
