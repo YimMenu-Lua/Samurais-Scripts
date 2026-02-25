@@ -361,6 +361,31 @@ An updated and slightly refactored version of [Casino Pacino](https://github.com
 
 A heist editor added by [@How-Bout-No](https://github.com/How-Bout-No) [WIP].
 
+Contains the following modules:
+
+- **Basic**
+
+  Options for Teleport, Set Waypoint, Skip Preps, and Disable Cooldowns on:
+  - Cluckin Bell
+  - KnoWay
+  - Dr Dre Contract
+  - Oscar Guzman
+
+- **Cayo Perico**
+
+  Options for Teleport, Set Waypoint, and Request Submarine.
+
+  Ability to change Primary Target, all Secondary Targets on the island and inside the compound, Weapon Loadout, Hard Mode, Unlock All Heist Options *(Approach Vehicles, Disruptions, etc)*, Disable Cooldown
+
+- **Doomsday**
+
+  Options for Teleport and Set Waypoint to Facility.
+
+  Skip all Preps/Setups and Disable Cooldowns on all 3 Acts (your choice):
+  1. The Data Breaches
+  2. The Bogdan Problem
+  3. The Doomsday Scenario
+
 ## Extra
 
 ### YimActionsV3
