@@ -315,6 +315,17 @@ local RawBusinessData <const> = {
 				end
 			end
 		},
+		["dday_cd"] = {
+			dirty = false,
+			gstate = function()
+				return GVars.features.yim_heists.dday_cd
+			end,
+			onEnable = function()
+				if (stats.get_int("MPX_GANGOPS_FLOW_MISSION_PROG") > 0) then
+					stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 0)
+				end
+			end
+		},
 	},
 	SellScripts = {
 		["gb_smuggler"] = { -- air
@@ -515,17 +526,28 @@ local RawBusinessData <const> = {
 		[30] = { coords = vec3:new(-3030.341797, 3334.570068, 10.105902) },
 		[31] = { coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
 	},
+	Facilities = {
+		{ gxt = "MP_DBASE_1",  coords = vec3:new(1273.1376, 2835.0068, 48.0734) }, -- freemode.c func_7238
+		{ gxt = "MP_DBASE_2",  coords = vec3:new(34.4699, 2620.9768, 84.6202) },
+		{ gxt = "MP_DBASE_3",  coords = vec3:new(2755.9807, 3907.2722, 44.3148) },
+		{ gxt = "MP_DBASE_4",  coords = vec3:new(3389.6028, 5508.971, 24.875) },
+		{ gxt = "MP_DBASE_6",  coords = vec3:new(19.4492, 6825.3613, 14.4952) },
+		{ gxt = "MP_DBASE_7",  coords = vec3:new(-2229.408, 2395.4102, 12.0106) },
+		{ gxt = "MP_DBASE_8",  coords = vec3:new(-3.0095, 3344.4888, 40.2769) },
+		{ gxt = "MP_DBASE_9",  coords = vec3:new(2086.0674, 1761.3461, 103.043) },
+		{ gxt = "MP_DBASE_10", coords = vec3:new(1864.8027, 269.0474, 163.0169) },
+	},
 	Nightclubs = {
-		{ name = "", coords = vec3:new(757.009, -1332.32, 26.1802) }, -- am_mp_nightclub.c func_5118 // case 102: *uParam5 is main entrance corona coords
-		{ name = "", coords = vec3:new(345.7519, -978.8848, 28.2681) },
-		{ name = "", coords = vec3:new(-120.906, -1260.49, 28.2088) },
-		{ name = "", coords = vec3:new(5.53709, 221.35, 106.6566) },
-		{ name = "", coords = vec3:new(871.47, -2099.57, 29.3768) },
-		{ name = "", coords = vec3:new(-675.225, -2459.15, 12.8444) },
-		{ name = "", coords = vec3:new(195.534, -3168.88, 4.7903) },
-		{ name = "", coords = vec3:new(373.05, 252.13, 101.9097) },
-		{ name = "", coords = vec3:new(-1283.38, -649.916, 25.5198) },
-		{ name = "", coords = vec3:new(-1174.85, -1152.3, 4.56128) },
+		{ coords = vec3:new(757.009, -1332.32, 26.1802) }, -- am_mp_nightclub.c func_5118 // case 102: *uParam5 is main entrance corona coords
+		{ coords = vec3:new(345.7519, -978.8848, 28.2681) },
+		{ coords = vec3:new(-120.906, -1260.49, 28.2088) },
+		{ coords = vec3:new(5.53709, 221.35, 106.6566) },
+		{ coords = vec3:new(871.47, -2099.57, 29.3768) },
+		{ coords = vec3:new(-675.225, -2459.15, 12.8444) },
+		{ coords = vec3:new(195.534, -3168.88, 4.7903) },
+		{ coords = vec3:new(373.05, 252.13, 101.9097) },
+		{ coords = vec3:new(-1283.38, -649.916, 25.5198) },
+		{ coords = vec3:new(-1174.85, -1152.3, 4.56128) },
 	},
 	---@alias BusinessHubs array<{ name: string, vpu_tunable: string, max_units_tunable: string, prod_time_tunable: string }>
 	BusinessHubs = {

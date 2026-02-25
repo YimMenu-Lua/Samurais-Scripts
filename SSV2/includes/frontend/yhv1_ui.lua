@@ -9,7 +9,6 @@
 
 local YHV1               = require("includes.features.YimHeistsV1"):init()
 local SGSL               = require("includes.services.SGSL")
-local setTranslations    = require("SSV2.includes.frontend.helpers.set_translations")
 local secondary_targets  = { "Cash", "Weed", "Coke", "Gold" }
 local cayo_secondary_target_i, cayo_secondary_target_c
 
@@ -22,6 +21,7 @@ local heistNames <const> = {
 local tabNames <const>   = {
 	"YH_BASIC_TAB", -- Basic
 	"ISLAND_TRAVEL_T", -- Cayo Perico
+	"FMMC_RSTAR_MHS2", -- The Doomsday Heist
 }
 
 ---@type HEIST_TYPES
@@ -121,7 +121,8 @@ local function drawBasicTab()
 		ImGui.EndDisabled()
 
 		local key = heist.stat.cooldown_gvar
-		GVars.features.yim_heists[key], _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
+		GVars.features.yim_heists[key], _ = GUI:CustomToggle(
+			_T("CP_HEIST_COOLDOWN_DISABLE"),
 			GVars.features.yim_heists[key], {
 				tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
 				color   = Color("#AA0000"),
@@ -249,14 +250,15 @@ local function drawCayoTab()
 
 	GUI:HeaderText(_T("GENERIC_OPTIONS_LABEL"), { separator = true, spacing = true })
 
-	-- I'll also need to find which bits actually correspond to hard mode instead of just hard coding values and this stupid check; Bits 4, 8, 13 is the difference
-	local new_difficulty, difficulty_toggled = GUI:CustomToggle(_T("YH_CAYO_DIFFICULTY"),
-		cayo_heist_difficulty > 130000
+	local new_difficulty, difficulty_toggled = GUI:CustomToggle(
+		_T("YH_CAYO_DIFFICULTY"),
+		Bit.IsBitSet(cayo_heist_difficulty, 12)
 	)
 
 	if (difficulty_toggled) then
+		-- Idk what bits 3 and 7 do
 		if (new_difficulty) then
-			stats.set_int("MPX_H4_PROGRESS", 131055)
+			stats.set_int("MPX_H4_PROGRESS", 131055) -- 126823 | 3 7 12
 		else
 			stats.set_int("MPX_H4_PROGRESS", 126823)
 		end
@@ -275,7 +277,10 @@ local function drawCayoTab()
 		stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 40000)
 	end
 
-	GVars.features.yim_heists.cayo_cd, _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
+	ImGui.EndDisabled() -- on_cooldown
+
+	GVars.features.yim_heists.cayo_cd, _ = GUI:CustomToggle(
+		_T("CP_HEIST_COOLDOWN_DISABLE"),
 		GVars.features.yim_heists.cayo_cd, {
 			tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
 			color   = Color("#AA0000"),
@@ -297,13 +302,89 @@ local function drawCayoTab()
 			Notifier:ShowSuccess(YHV1.__label, "All Cayo progress has been reset!")
 		end
 	end
+end
 
+-- Help text and values copied from: https://www.unknowncheats.me/forum/grand-theft-auto-v/431801-cayo-perico-heist-click.html
+local function drawDDayTab()
+	local facility = YHV1:GetFacilityProperty()
+	if (not facility) then
+		ImGui.Text(_T("YH_FACILITY_NOT_OWNED"))
+		return
+	end
+
+	if (GUI:Button(_T("YH_TP_FACILITY"))) then
+		LocalPlayer:Teleport(facility.coords)
+	end
+
+	ImGui.SameLine()
+	if (GUI:Button(_T("GENERIC_SET_WAYPOINT"))) then
+		Game.SetWaypointCoords(facility.coords)
+	end
+
+	local dday_status           = stats.get_int("MPX_GANGOPS_HEIST_STATUS")
+	local dday_cooldown         = stats.get_int("MPX_GANGOPS_LAUNCH_TIME")
+
+	local posix_now             = Time.Epoch()
+	local cooldown_seconds_left = dday_cooldown - posix_now
+	local on_cooldown           = cooldown_seconds_left > 0
+
+	if (on_cooldown) then
+		local minutes_left = cooldown_seconds_left / 60
+		GUI:HeaderText(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left),
+			{ separator = false, spacing = true, color = Color("#AA0000") })
+	end
+
+	ImGui.BeginDisabled(on_cooldown)
+	GUI:HeaderText(_T("GENERIC_IMPORTANT"), { separator = true, spacing = true })
+	ImGui.Text(_T("YH_DDAY_HELP1"))
+	local button_label = _T("YH_DDAY_FORCE")
+	if (GUI:Button(button_label)) then
+		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 9999)
+	end
+	ImGui.Text(_F(_T("YH_DDAY_HELP2_FMT"), button_label))
+
+	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
+	-- Final ACT 1
+	ImGui.BeginDisabled(dday_status == 229383)
+	if (GUI:Button(Game.GetGXTLabel("HPSTRAND_IAAb"))) then -- The Data Breaches
+		stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 503)
+		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 229383)
+		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)
+	end
+	ImGui.EndDisabled()
+	-- Final ACT 2
+	ImGui.SameLine()
+	ImGui.BeginDisabled(dday_status == 229378)
+	if (GUI:Button(Game.GetGXTLabel("HPSTRAND_SUBb"))) then -- The Bogdan Problem
+		stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 240)
+		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 229378)
+		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)
+	end
+	ImGui.EndDisabled()
+	-- Final ACT 3
+	ImGui.BeginDisabled(dday_status == 229380)
+	if (GUI:Button(Game.GetGXTLabel("HPSTRAND_MSILb"))) then -- The Doomsday Scenario
+		stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 16368)
+		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 229380)
+		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)
+	end
+	ImGui.EndDisabled()
 	ImGui.EndDisabled() -- on_cooldown
+
+	GVars.features.yim_heists.dday_cd, _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
+		GVars.features.yim_heists.dday_cd, {
+			tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
+			color   = Color("#AA0000"),
+			onClick = function()
+				YRV3:SetCooldownStateDirty("dday_cd", true)
+			end
+		})
 end
 
 local tabCallbacks <const> = {
 	drawBasicTab,
 	drawCayoTab,
+	drawDDayTab,
 }
 
 local function HeistUI()
@@ -333,6 +414,6 @@ end
 GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, YHV1.__label, HeistUI)
 
 ThreadManager:Run(function()
-	setTranslations(tabNames)
-	setTranslations(heistNames)
+	Translator:TranslateGXTList(tabNames)
+	Translator:TranslateGXTList(heistNames)
 end)

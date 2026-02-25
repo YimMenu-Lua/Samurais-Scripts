@@ -725,10 +725,9 @@ return {
 
 	--#region YimHeists
 	["YH_BASIC_TAB"]                       = "Basic",
-	["YH_CAYO_TAB"]                        = "Cayo Perico",
-	["YH_SUBMARINE_NOT_OWNED"]             = "Purchase a Kosatka to access the Cayo Perico Heist.", -- HIF_SUB_HELP
 	["YH_PREP_SKIP_NOTIF"]                 = "All preparation missions have been skipped. You can now start the final mission.",
 	["YH_COOLDOWN_BYPASS_TOOLTIP"]         = "Disables cooldown, may result in ban. Use at your own risk!",
+	["YH_SUBMARINE_NOT_OWNED"]             = "Purchase a Kosatka to access the Cayo Perico Heist.", -- HIF_SUB_HELP
 	["YH_CAYO_REQUEST_SUB"]                = "Request Submarine",
 	["YH_CAYO_TARGET_PRIMARY"]             = "Primary Target",
 	["YH_CAYO_TARGET_SECONDARY_I"]         = "Secondary Targets (Island)",
@@ -737,5 +736,12 @@ return {
 	["YH_CAYO_DIFFICULTY"]                 = "Hard Mode",
 	["YH_CAYO_WEAPONS"]                    = "Weapon Loadout",
 	["YH_CAYO_RESET_ALL"]                  = "Reset ALL Progress",
+	["YH_FACILITY_NOT_OWNED"]              = "Purchase a Facility to access The Doomsday Heist.", -- GOPS_BASE_HELP
+	["YH_TP_FACILITY"]                     = "Teleport to Facility",
+	["YH_DDAY_FORCE"]                      = "FORCE ENABLE",
+	["YH_DDAY_HELP1"]                      =
+	"This method is necessary if you have never played Doomsday as a host. If you have already played and completed some heists as host, skip this step.",
+	["YH_DDAY_HELP2_FMT"]                  =
+	"Press the '%s' button, then call Lester to cancel all 3 heists for Doomsday.",
 	--#endregion
 }

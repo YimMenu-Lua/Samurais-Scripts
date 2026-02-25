@@ -27,6 +27,7 @@ local secondary_targets = { "CASH", "WEED", "COKE", "GOLD" }
 ---@field public coords vec3
 
 ---@class AgencyProperty : GenericProperty
+---@class FacilityProperty : GenericProperty
 ---@class FieldHangarProperty : GenericProperty
 ---@class SubmarineProperty : GenericProperty
 ---@field public heading float
@@ -35,7 +36,7 @@ local secondary_targets = { "CASH", "WEED", "COKE", "GOLD" }
 
 ---@class YimHeists
 ---@field private m_raw_data RawBusinessData
----@field private m_properties { agency: AgencyProperty, hangar: FieldHangarProperty, submarine: SubmarineProperty }
+---@field private m_properties { agency: AgencyProperty, hangar: FieldHangarProperty, facility: FacilityProperty, submarine: SubmarineProperty }
 ---@field m_tab Tab
 local YimHeists         = { m_raw_data = require("includes.data.yrv3_data") }
 YimHeists.__index       = YimHeists
@@ -134,11 +135,20 @@ function YimHeists:ReadPropertyData()
 		end
 
 		local hangar_idx = stats.get_int("MPX_MCKENZIE_HANGAR_OWNED")
-		if (YRV3:IsPropertyIndexValid(hangar_idx)) then
+		if (hangar_idx > 0) then
 			local hangar_ref = self.m_raw_data.FieldHangar[1]
 			self.m_properties.hangar = {
 				name   = Game.GetGXTLabel(hangar_ref.gxt),
 				coords = hangar_ref.coords
+			}
+		end
+
+		local facility_idx = stats.get_int("MPX_DBASE_OWNED")
+		if (facility_idx > 0) then
+			local facility_ref = self.m_raw_data.Facilities[facility_idx]
+			self.m_properties.facility = {
+				name   = Game.GetGXTLabel(facility_ref.gxt),
+				coords = facility_ref.coords
 			}
 		end
 
@@ -182,6 +192,21 @@ function YimHeists:GetFieldHangarLocation()
 	end
 
 	return hangar.coords
+end
+
+---@return FacilityProperty?
+function YimHeists:GetFacilityProperty()
+	return self.m_properties.facility
+end
+
+---@return vec3?
+function YimHeists:GetFacilityLocation()
+	local facility = self:GetFacilityProperty()
+	if (not facility) then
+		return
+	end
+
+	return facility.coords
 end
 
 ---@return SubmarineProperty?

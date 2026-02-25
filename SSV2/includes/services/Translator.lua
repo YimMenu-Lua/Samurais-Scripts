@@ -124,3 +124,23 @@ end
 function _T(label)
 	return Translator:Translate(label)
 end
+
+-- Translates text using GXTs if expected and available.
+---@param label string
+---@return string
+function Translator:TranslateGXT(label)
+	local GXT = Game.GetGXTLabel(label)
+	if (string.isvalid(GXT) and GXT ~= "NULL") then
+		return GXT -- get label from the game.
+	else
+		return _T(label)  -- no GXT; use our own translations
+	end
+end
+
+---@param labels array<string>
+function Translator:TranslateGXTList(labels)
+	for i = 1, #labels do
+		local label = labels[i]
+        labels[i] = self:TranslateGXT(label)
+	end
+end

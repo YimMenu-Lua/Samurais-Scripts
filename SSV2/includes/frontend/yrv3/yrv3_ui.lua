@@ -9,7 +9,6 @@
 
 local selectedTabID        = 1
 local colMoneyGreen        = Color("#85BB65")
-local setTranslations      = require("includes.frontend.helpers.set_translations")
 local tabNames <const>     = {
 	"GB_BOSSC",
 	"CELL_HANGAR",
@@ -136,5 +135,5 @@ end
 GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimResupplierV3", YRV3UI)
 
 ThreadManager:Run(function()
-	setTranslations(tabNames)
+	Translator:TranslateGXTList(tabNames)
 end)
