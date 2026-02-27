@@ -12,17 +12,19 @@ local SGSL               = require("includes.services.SGSL")
 local secondary_targets  = { "Cash", "Weed", "Coke", "Gold" }
 local cayo_secondary_target_i, cayo_secondary_target_c
 
--- https://github.com/root-cause/v-labels/blob/master/labels.json
-local heistNames <const> = {
-	"AWT_1026",    -- The Cluckin' Bell Farm Raid
-	"DLCC_AVIM",   -- KnoWay Out
-	"AWT_973",     -- Don't Fuck With Dre
-	"HACK24_MFM_STR", -- Oscar Guzman Flies Again
-	"HTITLE_TUT",  -- The Fleeca Job
-	"HTITLE_PRISON", -- The Prison Break
-	"HTITLE_HUMANE", -- The Humane Labs Raid
-	"HTITLE_NARC", -- Series A Funding
-	"HTITLE_ORNATE", -- The Pacific Standard Job
+local heistNames <const> = { -- https://github.com/root-cause/v-labels/blob/master/labels.json
+	CluckinBellFarmRaid = "AWT_1026",
+	KnoWayOut = "DLCC_AVIM",
+	DontFuckWithDre = "AWT_973",
+	OscarGuzmanFliesAgain = "HACK24_MFM_STR",
+	FleecaJob = "HTITLE_TUT",
+	PrisonBreak = "HTITLE_PRISON",
+	HumaneLabsRaid = "HTITLE_HUMANE",
+	SeriesAFunding = "HTITLE_NARC",
+	PacificStandardJob = "HTITLE_ORNATE",
+	DataBreaches = "HPSTRAND_IAAb",
+	BogdanProblem = "HPSTRAND_SUBb",
+	DoomsdayScenario = "HPSTRAND_MSILb",
 }
 local tabNames <const>   = {
 	"YH_BASIC_TAB", -- Basic
@@ -32,9 +34,9 @@ local tabNames <const>   = {
 
 ---@type HEIST_TYPES
 local HEIST_TYPES        = {
-	{ -- Cluckin Bell
+	{
 		get_name = function()
-			return heistNames[1]
+			return heistNames.CluckinBellFarmRaid
 		end,
 		get_coords = function()
 			return vec3:new(-1093.15, -807.14, 19.28)
@@ -46,9 +48,9 @@ local HEIST_TYPES        = {
 			cooldown_gvar = "cfr_cd",
 		},
 	},
-	{ -- KnoWay
+	{
 		get_name = function()
-			return heistNames[2]
+			return heistNames.KnoWayOut
 		end,
 		get_coords = function()
 			return YHV1:GetAviLocation()
@@ -60,9 +62,9 @@ local HEIST_TYPES        = {
 			cooldown_gvar = "knoway_cd",
 		},
 	},
-	{ -- Dr Dre
+	{
 		get_name = function()
-			return heistNames[3]
+			return heistNames.DontFuckWithDre
 		end,
 		get_coords = function()
 			return YHV1:GetAgencyLocation()
@@ -74,9 +76,9 @@ local HEIST_TYPES        = {
 			cooldown_gvar = "dre_cd",
 		}
 	},
-	{ -- Oscar Guzman
+	{
 		get_name = function()
-			return heistNames[4]
+			return heistNames.OscarGuzmanFliesAgain
 		end,
 		get_coords = function()
 			return YHV1:GetFieldHangarLocation()
@@ -351,7 +353,7 @@ local function drawDDayTab()
 	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
 	-- Final ACT 1
 	ImGui.BeginDisabled(dday_status == 229383)
-	if (GUI:Button(Game.GetGXTLabel("HPSTRAND_IAAb"))) then -- The Data Breaches
+	if (GUI:Button(heistNames.DataBreaches)) then
 		stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 503)
 		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 229383)
 		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)
@@ -360,7 +362,7 @@ local function drawDDayTab()
 	-- Final ACT 2
 	ImGui.SameLine()
 	ImGui.BeginDisabled(dday_status == 229378)
-	if (GUI:Button(Game.GetGXTLabel("HPSTRAND_SUBb"))) then -- The Bogdan Problem
+	if (GUI:Button(heistNames.BogdanProblem)) then
 		stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 240)
 		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 229378)
 		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)
@@ -368,7 +370,7 @@ local function drawDDayTab()
 	ImGui.EndDisabled()
 	-- Final ACT 3
 	ImGui.BeginDisabled(dday_status == 229380)
-	if (GUI:Button(Game.GetGXTLabel("HPSTRAND_MSILb"))) then -- The Doomsday Scenario
+	if (GUI:Button(heistNames.DoomsdayScenario)) then
 		stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 16368)
 		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 229380)
 		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)

@@ -139,8 +139,7 @@ end
 
 ---@param labels array<string>
 function Translator:TranslateGXTList(labels)
-	for i = 1, #labels do
-		local label = labels[i]
-        labels[i] = self:TranslateGXT(label)
+	for k, v in pairs(labels) do
+		labels[k] = self:TranslateGXT(v)
 	end
 end
