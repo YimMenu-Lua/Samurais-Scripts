@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YHV1               = require("includes.features.YimHeistsV1"):init()
+local Mastermind         = require("SSV2.includes.features.Mastermind"):init()
 local SGSL               = require("includes.services.SGSL")
 local secondary_targets  = { "Cash", "Weed", "Coke", "Gold" }
 local cayo_secondary_target_i, cayo_secondary_target_c
@@ -26,10 +26,10 @@ local heistNames <const> = { -- https://github.com/root-cause/v-labels/blob/mast
 	BogdanProblem = "HPSTRAND_SUBb",
 	DoomsdayScenario = "HPSTRAND_MSILb",
 }
-local tabNames <const>   = {
-	"YH_BASIC_TAB", -- Basic
-	"ISLAND_TRAVEL_T", -- Cayo Perico
-	"FMMC_RSTAR_MHS2", -- The Doomsday Heist
+local tabNames <const>   = { --
+	"YH_BASIC_TAB",          -- Basic
+	"ISLAND_TRAVEL_T",       -- Cayo Perico
+	"FMMC_RSTAR_MHS2",       -- The Doomsday Heist
 }
 
 ---@type HEIST_TYPES
@@ -53,7 +53,7 @@ local HEIST_TYPES        = {
 			return heistNames.KnoWayOut
 		end,
 		get_coords = function()
-			return YHV1:GetAviLocation()
+			return Mastermind:GetAviLocation()
 		end,
 		stat = {
 			name = "MPX_M25_AVI_MISSION_CURRENT",
@@ -67,7 +67,7 @@ local HEIST_TYPES        = {
 			return heistNames.DontFuckWithDre
 		end,
 		get_coords = function()
-			return YHV1:GetAgencyLocation()
+			return Mastermind:GetAgencyLocation()
 		end,
 		stat = {
 			name = "MPX_FIXER_STORY_BS",
@@ -81,7 +81,7 @@ local HEIST_TYPES        = {
 			return heistNames.OscarGuzmanFliesAgain
 		end,
 		get_coords = function()
-			return YHV1:GetFieldHangarLocation()
+			return Mastermind:GetFieldHangarLocation()
 		end,
 		stat = {
 			name = "MPX_HACKER24_INST_BS",
@@ -119,7 +119,7 @@ local function drawBasicTab()
 		ImGui.BeginDisabled(is_done or on_cooldown)
 		ImGui.SameLine()
 		if GUI:Button(_T("SY_COMPLETE_PREPARATIONS")) then
-			YHV1:SkipPrep(heist.stat.name, heist.stat.val, heist_name)
+			Mastermind:SkipPrep(heist.stat.name, heist.stat.val, heist_name)
 		end
 		if (heist.opt_info and not is_done) then
 			GUI:Tooltip(heist.opt_info)
@@ -145,7 +145,7 @@ local function drawBasicTab()
 end
 
 local function drawCayoTab()
-	local sub = YHV1:GetSubmarine()
+	local sub = Mastermind:GetSubmarine()
 	if (not sub) then
 		ImGui.Text(_T("YH_SUBMARINE_NOT_OWNED"))
 		return
@@ -175,7 +175,7 @@ local function drawCayoTab()
 	if (GUI:Button(btn_label)) then
 		ThreadManager:Run(function()
 			if (not LocalPlayer:IsOutside()) then
-				Notifier:ShowError(YHV1.__label, _T("GENERIC_TP_INTERIOR_ERR"))
+				Notifier:ShowError(Mastermind.__label, _T("GENERIC_TP_INTERIOR_ERR"))
 				return
 			end
 
@@ -228,7 +228,7 @@ local function drawCayoTab()
 	)
 
 	if (secondary_target_click) then
-		YHV1:SetSecondaryTargets("I", cayo_secondary_target_i + 1)
+		Mastermind:SetCayoSecTargets("I", cayo_secondary_target_i + 1)
 	end
 
 	cayo_secondary_target_c, secondary_target_click = ImGui.Combo(
@@ -239,7 +239,7 @@ local function drawCayoTab()
 	)
 
 	if (secondary_target_click) then
-		YHV1:SetSecondaryTargets("C", cayo_secondary_target_c + 1)
+		Mastermind:SetCayoSecTargets("C", cayo_secondary_target_c + 1)
 	end
 
 	ImGui.Spacing()
@@ -306,14 +306,14 @@ local function drawCayoTab()
 			stats.set_int("MPX_H4CNF_BS_ENTR", 0)
 			stats.set_int("MPX_H4CNF_BS_GEN", 0)
 			stats.set_int("MPX_H4CNF_BS_ABIL", 0)
-			Notifier:ShowSuccess(YHV1.__label, "All Cayo progress has been reset!")
+			Notifier:ShowSuccess(Mastermind.__label, "All Cayo progress has been reset!")
 		end
 	end
 end
 
 -- Help text and values copied from: https://www.unknowncheats.me/forum/grand-theft-auto-v/431801-cayo-perico-heist-click.html
 local function drawDDayTab()
-	local facility = YHV1:GetFacilityProperty()
+	local facility = Mastermind:GetFacilityProperty()
 	if (not facility) then
 		ImGui.Text(_T("YH_FACILITY_NOT_OWNED"))
 		return
@@ -406,7 +406,7 @@ local function HeistUI()
 		return
 	end
 
-	cayo_secondary_target_i, cayo_secondary_target_c = YHV1:GetSecondaryTargets()
+	cayo_secondary_target_i, cayo_secondary_target_c = Mastermind:GetCayoSecTargets()
 
 	if (ImGui.BeginTabBar("##funkBar")) then
 		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
@@ -424,7 +424,7 @@ local function HeistUI()
 	end
 end
 
-GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, YHV1.__label, HeistUI)
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, Mastermind.__label, HeistUI)
 
 ThreadManager:Run(function()
 	Translator:TranslateGXTList(tabNames)

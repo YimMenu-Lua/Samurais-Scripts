@@ -34,16 +34,16 @@ local secondary_targets = { "CASH", "WEED", "COKE", "GOLD" }
 
 ---@alias HEIST_TYPES table<integer, HeistInfo>
 
----@class YimHeists
+---@class Mastermind
 ---@field private m_raw_data RawBusinessData
 ---@field private m_properties { agency: AgencyProperty, hangar: FieldHangarProperty, facility: FacilityProperty, submarine: SubmarineProperty }
 ---@field m_tab Tab
-local YimHeists         = { m_raw_data = require("includes.data.yrv3_data") }
-YimHeists.__index       = YimHeists
-YimHeists.__label       = "YimHeists"
+local Mastermind        = { m_raw_data = require("includes.data.yrv3_data") }
+Mastermind.__index      = Mastermind
+Mastermind.__label      = "Mastermind"
 
----@return YimHeists
-function YimHeists:init()
+---@return Mastermind
+function Mastermind:init()
 	local instance = setmetatable({
 		m_properties = {}
 	}, self)
@@ -62,7 +62,7 @@ end
 ---@param statName string
 ---@param statVal integer
 ---@param notifTitle string
-function YimHeists:SkipPrep(statName, statVal, notifTitle)
+function Mastermind:SkipPrep(statName, statVal, notifTitle)
 	stats.set_int(statName, statVal)
 	Notifier:ShowSuccess(notifTitle, _T("YH_PREP_SKIP_NOTIF"))
 end
@@ -70,14 +70,14 @@ end
 -- https://www.unknowncheats.me/forum/4489469-post16.html
 ---@param type string
 ---@param index integer
-function YimHeists:SetSecondaryTargets(type, index)
+function Mastermind:SetCayoSecTargets(type, index)
 	local targets = { 0, 0, 0, 0 }
 	targets[index] = -1
 
 	for st = 1, 4 do
 		local stat_name = _F("MPX_H4LOOT_%s_%s", secondary_targets[st], type)
 		stats.set_int(stat_name, targets[st])
-		stats.set_int(stat_name .. "_SCOPED", targets[st])
+		stats.set_int(_F("%s_SCOPED", stat_name), targets[st])
 	end
 
 	stats.set_int("MPX_H4LOOT_PAINT", -1) -- Not really any reason to have an option for paintings
@@ -85,15 +85,15 @@ function YimHeists:SetSecondaryTargets(type, index)
 end
 
 ---@return integer, integer
-function YimHeists:GetSecondaryTargets()
+function Mastermind:GetCayoSecTargets()
 	local loot_i, loot_c
 
 	for st = 1, 4 do
 		local stat_name = _F("MPX_H4LOOT_%s", secondary_targets[st])
-		if (stats.get_int(stat_name .. "_I") == -1) then
+		if (stats.get_int(_F("%s_I", stat_name)) == -1) then
 			loot_i = st - 1 -- ImGui indexes by 0
 		end
-		if (stats.get_int(stat_name .. "_C") == -1) then
+		if (stats.get_int(_F("%s_C", stat_name)) == -1) then
 			loot_c = st - 1
 		end
 	end
@@ -114,7 +114,7 @@ local function GetSubCoordsGlobal()
 		:At(vec_offset)
 end
 
-function YimHeists:ReadPropertyData()
+function Mastermind:ReadPropertyData()
 	ThreadManager:Run(function()
 		while (Game.IsInTransition()) do
 			yield()
@@ -165,7 +165,7 @@ function YimHeists:ReadPropertyData()
 end
 
 ---@return vec3
-function YimHeists:GetAviLocation()
+function Mastermind:GetAviLocation()
 	local stat = stats.get_int("MPX_M25_AVI_MISSION_CURRENT")
 	local blip = HUD.GET_FIRST_BLIP_INFO_ID(76)
 	if (blip and stat ~= 4) then
@@ -179,12 +179,12 @@ function YimHeists:GetAviLocation()
 end
 
 ---@return AgencyProperty?
-function YimHeists:GetAgencyProperty()
+function Mastermind:GetAgencyProperty()
 	return self.m_properties.agency
 end
 
 ---@return vec3?
-function YimHeists:GetAgencyLocation()
+function Mastermind:GetAgencyLocation()
 	local agency = self:GetAgencyProperty()
 	if (not agency) then
 		return
@@ -194,12 +194,12 @@ function YimHeists:GetAgencyLocation()
 end
 
 ---@return FieldHangarProperty?
-function YimHeists:GetFieldHangarProperty()
+function Mastermind:GetFieldHangarProperty()
 	return self.m_properties.hangar
 end
 
 ---@return vec3?
-function YimHeists:GetFieldHangarLocation()
+function Mastermind:GetFieldHangarLocation()
 	local hangar = self:GetFieldHangarProperty()
 	if (not hangar) then
 		return
@@ -209,12 +209,12 @@ function YimHeists:GetFieldHangarLocation()
 end
 
 ---@return FacilityProperty?
-function YimHeists:GetFacilityProperty()
+function Mastermind:GetFacilityProperty()
 	return self.m_properties.facility
 end
 
 ---@return vec3?
-function YimHeists:GetFacilityLocation()
+function Mastermind:GetFacilityLocation()
 	local facility = self:GetFacilityProperty()
 	if (not facility) then
 		return
@@ -224,7 +224,7 @@ function YimHeists:GetFacilityLocation()
 end
 
 ---@return SubmarineProperty?
-function YimHeists:GetSubmarine()
+function Mastermind:GetSubmarine()
 	local sub = self.m_properties.submarine
 	if (not sub) then
 		return
@@ -236,4 +236,4 @@ function YimHeists:GetSubmarine()
 	return sub
 end
 
-return YimHeists
+return Mastermind
