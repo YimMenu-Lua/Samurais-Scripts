@@ -135,8 +135,8 @@ function Mastermind:ReadPropertyData()
 		end
 
 		local hangar_idx = stats.get_int("MPX_MCKENZIE_HANGAR_OWNED")
-		if (hangar_idx > 0) then
-			local hangar_ref = self.m_raw_data.FieldHangar[1]
+		local hangar_ref = self.m_raw_data.FieldHangar[hangar_idx]
+		if (hangar_ref) then
 			self.m_properties.hangar = {
 				name   = Game.GetGXTLabel(hangar_ref.gxt),
 				coords = hangar_ref.coords
@@ -144,8 +144,8 @@ function Mastermind:ReadPropertyData()
 		end
 
 		local facility_idx = stats.get_int("MPX_DBASE_OWNED")
-		if (facility_idx > 0) then
-			local facility_ref = self.m_raw_data.Facilities[facility_idx]
+		local facility_ref = self.m_raw_data.Facilities[facility_idx]
+		if (facility_ref) then
 			self.m_properties.facility = {
 				name   = Game.GetGXTLabel(facility_ref.gxt),
 				coords = facility_ref.coords

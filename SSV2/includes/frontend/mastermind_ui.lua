@@ -388,7 +388,7 @@ end
 
 -- Maybe port https://github.com/YimMenu/YimMenuV2/blob/enhanced/src/game/features/recovery/Heist/ApartmentHeist.cpp ?
 -- Apartment heists actually seem complicated in that (I assume) since they're old they use a different method of storing progress as there isn't just 1 stat to check like all the others
--- Or if there is, there only *was* because no stats I've found seem to do anything today, like the stat from that link right there. Doesn't do anything, am I missing something?
+-- Or if there is, there only *was* because no stats I've found seem to do anything today, like the stat from that link right there. Doesn't do anything here or in YimMenuV2, am I missing something?
 local function drawAptTab()
 end
 
