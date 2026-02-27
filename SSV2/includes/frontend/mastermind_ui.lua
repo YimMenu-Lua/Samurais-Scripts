@@ -7,25 +7,36 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YHV1               = require("includes.features.YimHeistsV1"):init()
+local Mastermind         = require("SSV2.includes.features.Mastermind"):init()
 local SGSL               = require("includes.services.SGSL")
-local setTranslations    = require("includes.frontend.helpers.set_translations")
-local heistNames <const> = {
-	"AWT_1026",    -- The Cluckin' Bell Farm Raid
-	"AWT_1109",    -- No Way KnoWay
-	"AWT_973",     -- Don't Fuck With Dre
-	"HACK24_MFM_STR", -- Oscar Guzman Flies Again
+local secondary_targets  = { "Cash", "Weed", "Coke", "Gold" }
+local cayo_secondary_target_i, cayo_secondary_target_c
+
+local heistNames <const> = { -- https://github.com/root-cause/v-labels/blob/master/labels.json
+	CluckinBellFarmRaid = "AWT_1026",
+	KnoWayOut = "DLCC_AVIM",
+	DontFuckWithDre = "AWT_973",
+	OscarGuzmanFliesAgain = "HACK24_MFM_STR",
+	FleecaJob = "HTITLE_TUT",
+	PrisonBreak = "HTITLE_PRISON",
+	HumaneLabsRaid = "HTITLE_HUMANE",
+	SeriesAFunding = "HTITLE_NARC",
+	PacificStandardJob = "HTITLE_ORNATE",
+	DataBreaches = "HPSTRAND_IAAb",
+	BogdanProblem = "HPSTRAND_SUBb",
+	DoomsdayScenario = "HPSTRAND_MSILb",
 }
-local tabNames <const>   = {
-	"YH_BASIC_TAB", -- Basic
-	"ISLAND_TRAVEL_T", -- Cayo Perico
+local tabNames <const>   = { --
+	"YH_BASIC_TAB",          -- Basic
+	"ISLAND_TRAVEL_T",       -- Cayo Perico
+	"FMMC_RSTAR_MHS2",       -- The Doomsday Heist
 }
 
 ---@type HEIST_TYPES
 local HEIST_TYPES        = {
-	{ -- Cluckin Bell
+	{
 		get_name = function()
-			return heistNames[1]
+			return heistNames.CluckinBellFarmRaid
 		end,
 		get_coords = function()
 			return vec3:new(-1093.15, -807.14, 19.28)
@@ -37,12 +48,12 @@ local HEIST_TYPES        = {
 			cooldown_gvar = "cfr_cd",
 		},
 	},
-	{ -- KnoWay
+	{
 		get_name = function()
-			return heistNames[2]
+			return heistNames.KnoWayOut
 		end,
 		get_coords = function()
-			return vec3:new(42.82, -1599.19, 29.60)
+			return Mastermind:GetAviLocation()
 		end,
 		stat = {
 			name = "MPX_M25_AVI_MISSION_CURRENT",
@@ -51,12 +62,12 @@ local HEIST_TYPES        = {
 			cooldown_gvar = "knoway_cd",
 		},
 	},
-	{ -- Dr Dre
+	{
 		get_name = function()
-			return heistNames[3]
+			return heistNames.DontFuckWithDre
 		end,
 		get_coords = function()
-			return YHV1:GetAgencyLocation()
+			return Mastermind:GetAgencyLocation()
 		end,
 		stat = {
 			name = "MPX_FIXER_STORY_BS",
@@ -65,12 +76,12 @@ local HEIST_TYPES        = {
 			cooldown_gvar = "dre_cd",
 		}
 	},
-	{ -- Oscar Guzman
+	{
 		get_name = function()
-			return heistNames[4]
+			return heistNames.OscarGuzmanFliesAgain
 		end,
 		get_coords = function()
-			return YHV1:GetFieldHangarLocation()
+			return Mastermind:GetFieldHangarLocation()
 		end,
 		stat = {
 			name = "MPX_HACKER24_INST_BS",
@@ -93,8 +104,8 @@ local function drawBasicTab()
 		ImGui.PushID(i)
 		GUI:HeaderText(heist_name, { separator = true, spacing = true })
 
-		local location = heist.get_coords() or vec3:zero()
-		ImGui.BeginDisabled(location:is_zero() or on_cooldown)
+		local location = heist.get_coords()
+		ImGui.BeginDisabled(not location or on_cooldown)
 		if (GUI:Button(_T("GENERIC_TELEPORT"))) then
 			LocalPlayer:Teleport(location, false)
 		end
@@ -106,20 +117,20 @@ local function drawBasicTab()
 		ImGui.EndDisabled()
 
 		ImGui.BeginDisabled(is_done or on_cooldown)
+		ImGui.SameLine()
 		if GUI:Button(_T("SY_COMPLETE_PREPARATIONS")) then
-			YHV1:SkipPrep(heist.stat.name, heist.stat.val, heist_name)
+			Mastermind:SkipPrep(heist.stat.name, heist.stat.val, heist_name)
 		end
 		if (heist.opt_info and not is_done) then
 			GUI:Tooltip(heist.opt_info)
 		elseif (on_cooldown) then
 			GUI:Tooltip(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), seconds_left / 60))
 		end
-
 		ImGui.EndDisabled()
-		ImGui.SameLine()
 
 		local key = heist.stat.cooldown_gvar
-		GVars.features.yim_heists[key], _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
+		GVars.features.yim_heists[key], _ = GUI:CustomToggle(
+			_T("CP_HEIST_COOLDOWN_DISABLE"),
 			GVars.features.yim_heists[key], {
 				tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
 				color   = Color("#AA0000"),
@@ -127,36 +138,28 @@ local function drawBasicTab()
 					YRV3:SetCooldownStateDirty(key, true)
 				end
 			})
-
 		ImGui.PopID()
 
 		ImGui.Spacing()
 	end
 end
 
-local cayo_secondary_target_i, cayo_secondary_target_c = YHV1:GetSecondaryTargets()
-
 local function drawCayoTab()
-	local sub = YHV1:HasSubmarine()
+	local sub = Mastermind:GetSubmarine()
 	if (not sub) then
 		ImGui.Text(_T("YH_SUBMARINE_NOT_OWNED"))
 		return
 	end
 
-	-- This is shitty, and only properly works when not near the sub. No idea what happens if multiple subs in session
-	-- TODO: Find and use the correct globals/offsets
-	local sub_blip = Game.Ensure3DCoords(760)
 	local request_kosatka = SGSL:Get(SGSL.data.request_services_global):AsGlobal():At(613)
 	local sub_requested = request_kosatka:ReadInt() == 1
-	local sub_spawned = not sub.coords:is_zero() and sub_blip ~= nil
-
-	if (sub_blip or not sub_requested) then
-		sub.coords = sub_blip or vec3:zero()
-	end
+	local sub_spawned = not sub.coords:is_zero()
 
 	ImGui.BeginDisabled(not sub_spawned)
 	if (GUI:Button(_T("GENERIC_TELEPORT"))) then
-		LocalPlayer:Teleport(sub.coords + vec3:new(0, 0, -9.8)) -- Teleport under Kosatka
+		local forward_angle = math.rad(sub.heading + 90)
+		local offset = vec3:new(math.cos(forward_angle), math.sin(forward_angle), 4) -- front of door
+		LocalPlayer:Teleport(sub.coords + offset)
 	end
 
 	ImGui.SameLine()
@@ -165,16 +168,14 @@ local function drawCayoTab()
 	end
 	ImGui.EndDisabled()
 
-	local btn_label = (sub_requested)
-		and ImGui.TextSpinner()
-		or _T("YH_CAYO_REQUEST_SUB")
+	local btn_label = (sub_requested) and ImGui.TextSpinner() or _T("YH_CAYO_REQUEST_SUB")
 
-	ImGui.SameLine()
 	ImGui.BeginDisabled(sub_requested or sub_spawned)
+	ImGui.SameLine()
 	if (GUI:Button(btn_label)) then
 		ThreadManager:Run(function()
 			if (not LocalPlayer:IsOutside()) then
-				Notifier:ShowError("YHV1", _T("GENERIC_TP_INTERIOR_ERR"))
+				Notifier:ShowError(Mastermind.__label, _T("GENERIC_TP_INTERIOR_ERR"))
 				return
 			end
 
@@ -218,29 +219,27 @@ local function drawCayoTab()
 
 	ImGui.Spacing()
 
-	local secondary_targets = { "Cash", "Weed", "Coke", "Gold" }
-	local new_secondary_target_i, secondary_target_i_click = ImGui.Combo(
-		_T("YH_CAYO_TARGET_SECONDARY_I"),
+	local secondary_target_click
+	cayo_secondary_target_i, secondary_target_click = ImGui.Combo(
+		_T "YH_CAYO_TARGET_SECONDARY_I",
 		cayo_secondary_target_i,
 		secondary_targets,
 		4
 	)
 
-	if (secondary_target_i_click) then
-		YHV1:SetSecondaryTargets("I", new_secondary_target_i + 1)
-		cayo_secondary_target_i = new_secondary_target_i
+	if (secondary_target_click) then
+		Mastermind:SetCayoSecTargets("I", cayo_secondary_target_i + 1)
 	end
 
-	local new_secondary_target_c, secondary_target_c_click = ImGui.Combo(
-		_T("YH_CAYO_TARGET_SECONDARY_C"),
+	cayo_secondary_target_c, secondary_target_click = ImGui.Combo(
+		_T "YH_CAYO_TARGET_SECONDARY_C",
 		cayo_secondary_target_c,
 		secondary_targets,
 		4
 	)
 
-	if (secondary_target_c_click) then
-		YHV1:SetSecondaryTargets("C", new_secondary_target_c + 1)
-		cayo_secondary_target_c = new_secondary_target_c
+	if (secondary_target_click) then
+		Mastermind:SetCayoSecTargets("C", cayo_secondary_target_c + 1)
 	end
 
 	ImGui.Spacing()
@@ -258,14 +257,15 @@ local function drawCayoTab()
 
 	GUI:HeaderText(_T("GENERIC_OPTIONS_LABEL"), { separator = true, spacing = true })
 
-	-- I'll also need to find which bits actually correspond to hard mode instead of just hard coding values and this stupid check; Bits 4, 8, 13 is the difference
-	local new_difficulty, difficulty_toggled = GUI:CustomToggle(_T("YH_CAYO_DIFFICULTY"),
-		cayo_heist_difficulty > 130000
+	local new_difficulty, difficulty_toggled = GUI:CustomToggle(
+		_T("YH_CAYO_DIFFICULTY"),
+		Bit.IsBitSet(cayo_heist_difficulty, 12)
 	)
 
 	if (difficulty_toggled) then
+		-- Idk what bits 3 and 7 do
 		if (new_difficulty) then
-			stats.set_int("MPX_H4_PROGRESS", 131055)
+			stats.set_int("MPX_H4_PROGRESS", 131055) -- 126823 | 3 7 12
 		else
 			stats.set_int("MPX_H4_PROGRESS", 126823)
 		end
@@ -284,7 +284,10 @@ local function drawCayoTab()
 		stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 40000)
 	end
 
-	GVars.features.yim_heists.cayo_cd, _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
+	ImGui.EndDisabled() -- on_cooldown
+
+	GVars.features.yim_heists.cayo_cd, _ = GUI:CustomToggle(
+		_T("CP_HEIST_COOLDOWN_DISABLE"),
 		GVars.features.yim_heists.cayo_cd, {
 			tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
 			color   = Color("#AA0000"),
@@ -303,16 +306,98 @@ local function drawCayoTab()
 			stats.set_int("MPX_H4CNF_BS_ENTR", 0)
 			stats.set_int("MPX_H4CNF_BS_GEN", 0)
 			stats.set_int("MPX_H4CNF_BS_ABIL", 0)
-			Notifier:ShowSuccess("YHV1", "All progress has been reset!")
+			Notifier:ShowSuccess(Mastermind.__label, "All Cayo progress has been reset!")
 		end
 	end
+end
 
+-- Help text and values copied from: https://www.unknowncheats.me/forum/grand-theft-auto-v/431801-cayo-perico-heist-click.html
+local function drawDDayTab()
+	local facility = Mastermind:GetFacilityProperty()
+	if (not facility) then
+		ImGui.Text(_T("YH_FACILITY_NOT_OWNED"))
+		return
+	end
+
+	if (GUI:Button(_T("YH_TP_FACILITY"))) then
+		LocalPlayer:Teleport(facility.coords)
+	end
+
+	ImGui.SameLine()
+	if (GUI:Button(_T("GENERIC_SET_WAYPOINT"))) then
+		Game.SetWaypointCoords(facility.coords)
+	end
+
+	local dday_status           = stats.get_int("MPX_GANGOPS_HEIST_STATUS")
+	local dday_cooldown         = stats.get_int("MPX_GANGOPS_LAUNCH_TIME")
+
+	local posix_now             = Time.Epoch()
+	local cooldown_seconds_left = dday_cooldown - posix_now
+	local on_cooldown           = cooldown_seconds_left > 0
+
+	if (on_cooldown) then
+		local minutes_left = cooldown_seconds_left / 60
+		GUI:HeaderText(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left),
+			{ separator = false, spacing = true, color = Color("#AA0000") })
+	end
+
+	ImGui.BeginDisabled(on_cooldown)
+	GUI:HeaderText(_T("GENERIC_IMPORTANT"), { separator = true, spacing = true })
+	ImGui.Text(_T("YH_DDAY_HELP1"))
+	local button_label = _T("YH_DDAY_FORCE")
+	if (GUI:Button(button_label)) then
+		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 9999)
+	end
+	ImGui.Text(_F(_T("YH_DDAY_HELP2_FMT"), button_label))
+
+	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
+	-- Final ACT 1
+	ImGui.BeginDisabled(dday_status == 229383)
+	if (GUI:Button(heistNames.DataBreaches)) then
+		stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 503)
+		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 229383)
+		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)
+	end
+	ImGui.EndDisabled()
+	-- Final ACT 2
+	ImGui.SameLine()
+	ImGui.BeginDisabled(dday_status == 229378)
+	if (GUI:Button(heistNames.BogdanProblem)) then
+		stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 240)
+		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 229378)
+		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)
+	end
+	ImGui.EndDisabled()
+	-- Final ACT 3
+	ImGui.BeginDisabled(dday_status == 229380)
+	if (GUI:Button(heistNames.DoomsdayScenario)) then
+		stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 16368)
+		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 229380)
+		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)
+	end
+	ImGui.EndDisabled()
 	ImGui.EndDisabled() -- on_cooldown
+
+	GVars.features.yim_heists.dday_cd, _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
+		GVars.features.yim_heists.dday_cd, {
+			tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
+			color   = Color("#AA0000"),
+			onClick = function()
+				YRV3:SetCooldownStateDirty("dday_cd", true)
+			end
+		})
+end
+
+-- Maybe port https://github.com/YimMenu/YimMenuV2/blob/enhanced/src/game/features/recovery/Heist/ApartmentHeist.cpp ?
+-- Apartment heists actually seem complicated in that (I assume) since they're old they use a different method of storing progress as there isn't just 1 stat to check like all the others
+-- Or if there is, there only *was* because no stats I've found seem to do anything today, like the stat from that link right there. Doesn't do anything, am I missing something?
+local function drawAptTab()
 end
 
 local tabCallbacks <const> = {
 	drawBasicTab,
 	drawCayoTab,
+	drawDDayTab,
 }
 
 local function HeistUI()
@@ -320,6 +405,8 @@ local function HeistUI()
 		ImGui.Text(_T("GENERIC_UNAVAILABLE_SP"))
 		return
 	end
+
+	cayo_secondary_target_i, cayo_secondary_target_c = Mastermind:GetCayoSecTargets()
 
 	if (ImGui.BeginTabBar("##funkBar")) then
 		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
@@ -337,9 +424,9 @@ local function HeistUI()
 	end
 end
 
-GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimHeists", HeistUI)
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, Mastermind.__label, HeistUI)
 
 ThreadManager:Run(function()
-	setTranslations(tabNames)
-	setTranslations(heistNames)
+	Translator:TranslateGXTList(tabNames)
+	Translator:TranslateGXTList(heistNames)
 end)

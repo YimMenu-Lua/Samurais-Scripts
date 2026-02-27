@@ -489,6 +489,10 @@ function LocalPlayer:Reset()
 	self:Destroy()
 end
 
+function LocalPlayer.ForceCloudSave()
+	STATS.STAT_SAVE(0, 0, 3, 0)
+end
+
 Backend:RegisterEventCallbackAll(function()
 	LocalPlayer:Reset()
 end)

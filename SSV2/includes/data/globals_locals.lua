@@ -894,17 +894,53 @@ return {
 		}
 	},
 	request_services_global = {
-		description = "Request Services Global.",
-		file = "am_prostitute.c", -- definitely the right file to use I'm sure of it
+		description = "Request Services Global. Only used for Kosatka atm, same global for all services.",
+		file = "am_mp_submarine.c",
 		LEGACY = {
 			value = 2733002,
-			pattern = [[Global_(\d{7})\.f_4 = 0;]],
+			pattern = [[return Global_(\d{7})\.f_371;]],
 			capture_group = 1
 		},
 		ENHANCED = {
 			value = 2733138,
-			pattern = [[Global_(\d{7})\.f_4 = 0;]],
+			pattern = [[return Global_(\d{7})\.f_371;]],
 			capture_group = 1
+		}
+	},
+	submarine_global = {
+		description = "Submarine Global",
+		file = "am_mp_submarine.c",
+		LEGACY = {
+			value = 2658291,
+			pattern = [[if \(NETWORK::NETWORK_DOES_NETWORK_ID_EXIST\(Global_(\d{7})\[.*?Param0 /\*(\d+)\*/\]\.(f_\d{2})\)\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 468,
+					capture_group = 2,
+					description = "playerID read size."
+				},
+				{
+					value = 52,
+					capture_group = 3
+				}
+			}
+		},
+		ENHANCED = {
+			value = 2658294,
+			pattern = [[if \(NETWORK::NETWORK_DOES_NETWORK_ID_EXIST\(Global_(\d{7})\[.*?Param0 /\*(\d+)\*/\]\.(f_\d{2})\)\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 468,
+					capture_group = 2,
+					description = "playerID read size."
+				},
+				{
+					value = 52,
+					capture_group = 3
+				}
+			}
 		}
 	}
 }

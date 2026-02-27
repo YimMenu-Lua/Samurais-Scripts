@@ -282,6 +282,7 @@ local Config <const> = {
 			dre_cd = false,
 			ogfa_cd = false,
 			cayo_cd = false,
+			dday_cd = false,
 		},
 		yrv3 = {
 			autofill_delay = 500,
