@@ -673,5 +673,10 @@ return {
 	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "已執行的購買任務：",
 	["YRV3_LIFETIME_SELL_COMPLETE"] = "銷售任務已完成：",
 	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "禁用冷却时间，可能会导致禁止。使用風險自負！",
-	["YH_CAYO_REQUEST_SUB"] = "請求潛水艇"
+	["YH_CAYO_REQUEST_SUB"] = "請求潛水艇",
+	["YH_DDAY_HELP1"] = "如果你沒有玩過末日主機，這個方法很有必要。如果您已經作為主持人玩過並完成了一些搶劫，請跳過此步驟。",
+	["YH_DDAY_HELP2_FMT"] = "按下“%s”按鈕，然後呼叫萊斯特取消世界末日的所有 3 次搶劫。",
+	["YH_FACILITY_NOT_OWNED"] = "購買設施造訪末日搶劫。",
+	["YH_TP_FACILITY"] = "傳送到設施",
+	["YH_DDAY_FORCE"] = "強制重置"
 }

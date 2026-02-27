@@ -651,8 +651,8 @@ return {
 	["YH_BASIC_TAB"] = "Basique",
 	["YH_CAYO_DIFFICULTY"] = "Mode difficile",
 	["YRV3_IE_STEAL_THRESHOLD_TT"] = "Astuce : les missions de vol sont aléatoires, mais vous pouvez garantir un véhicule haut de gamme en stockant 10 véhicules dans chaque niveau. (La plage supérieure peut être de 10 ou plus, mais les deux autres doivent être exactement de 10.)",
-	["YH_CAYO_TARGET_SECONDARY_I"] = "Cible secondaire (île)",
-	["YH_CAYO_TARGET_SECONDARY_C"] = "Cible secondaire (composé)",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Cibles secondaires (île)",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Cibles secondaires (composées)",
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Définir toutes les cibles secondaires",
 	["YH_PREP_SKIP_NOTIF"] = "Toutes les missions de préparation ont été ignorées. Vous pouvez maintenant commencer la mission finale.",
 	["YH_CAYO_TAB"] = "Cayo Perico",
@@ -673,5 +673,10 @@ return {
 	["YRV3_SHOW_EARNINGS_DATA"] = "Afficher les données sur les revenus",
 	["YRV3_LIFETIME_EARNINGS"] = "Gains à vie :",
 	["YH_CAYO_REQUEST_SUB"] = "Demander un sous-marin",
-	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Désactive le temps de recharge, peut entraîner un bannissement. Utilisez à vos propres risques !"
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Désactive le temps de recharge, peut entraîner un bannissement. Utilisez à vos propres risques !",
+	["YH_DDAY_HELP1"] = "Cette méthode est nécessaire si vous n'avez jamais joué à Doomsday en tant qu'hôte. Si vous avez déjà joué et réalisé quelques braquages ​​en tant qu'hôte, ignorez cette étape.",
+	["YH_DDAY_HELP2_FMT"] = "Appuyez sur le bouton '%s', puis appelez Lester pour annuler les 3 braquages ​​de Doomsday.",
+	["YH_FACILITY_NOT_OWNED"] = "Achetez une installation pour accéder à The Doomsday Heist.",
+	["YH_TP_FACILITY"] = "Téléportation vers l'installation",
+	["YH_DDAY_FORCE"] = "FORCER LA RÉINITIALISATION"
 }

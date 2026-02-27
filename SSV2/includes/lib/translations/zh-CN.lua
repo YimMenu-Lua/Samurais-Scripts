@@ -673,5 +673,10 @@ return {
 	["YRV3_EDIT_EARNINGS_DATA"] = "编辑盈利数据",
 	["GENERIC_EDIT"] = "编辑",
 	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "禁用冷却时间，可能会导致禁止。使用风险自负！",
-	["YH_CAYO_REQUEST_SUB"] = "请求潜艇"
+	["YH_CAYO_REQUEST_SUB"] = "请求潜艇",
+	["YH_DDAY_FORCE"] = "强制重置",
+	["YH_TP_FACILITY"] = "传送到设施",
+	["YH_DDAY_HELP2_FMT"] = "按“%s”按钮，然后呼叫莱斯特取消世界末日的所有 3 次抢劫。",
+	["YH_DDAY_HELP1"] = "如果你没有玩过末日主机，这个方法很有必要。如果您已经作为主持人玩过并完成了一些抢劫，请跳过此步骤。",
+	["YH_FACILITY_NOT_OWNED"] = "购买设施来访问末日抢劫。"
 }

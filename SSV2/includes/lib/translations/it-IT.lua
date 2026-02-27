@@ -655,9 +655,9 @@ return {
 	["YH_CAYO_RESET_ALL"] = "Ripristina TUTTI i progressi",
 	["YH_CAYO_WEAPONS"] = "Carico di armi",
 	["YH_CAYO_DIFFICULTY"] = "Modalità difficile",
-	["YH_CAYO_TARGET_SECONDARY_I"] = "Obiettivo secondario (isola)",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Bersagli secondari (isola)",
 	["YH_PREP_SKIP_NOTIF"] = "Tutte le missioni di preparazione sono state saltate. Ora puoi iniziare la missione finale.",
-	["YH_CAYO_TARGET_SECONDARY_C"] = "Bersaglio secondario (composto)",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Bersagli secondari (composti)",
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Imposta tutti gli obiettivi secondari",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "Coordinate non valide!",
 	["YH_SUBMARINE_NOT_OWNED"] = "Acquista un Kosatka per accedere al colpo a Cayo Perico.",
@@ -673,5 +673,10 @@ return {
 	["YRV3_EDIT_EARNINGS_DATA"] = "Modifica i dati sui guadagni",
 	["YRV3_SHOW_EARNINGS_DATA"] = "Mostra dati sui guadagni",
 	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Disabilita il tempo di recupero, può comportare il ban. Utilizzare a proprio rischio!",
-	["YH_CAYO_REQUEST_SUB"] = "Richiedi sottomarino"
+	["YH_CAYO_REQUEST_SUB"] = "Richiedi sottomarino",
+	["YH_DDAY_HELP1"] = "Questo metodo è necessario se non hai mai giocato a Doomsday come host. Se hai già giocato e completato alcune rapine come host, salta questo passaggio.",
+	["YH_FACILITY_NOT_OWNED"] = "Acquista una struttura per accedere al colpo dell'apocalisse.",
+	["YH_DDAY_HELP2_FMT"] = "Premi il pulsante '%s', quindi chiama Lester per annullare tutti e 3 i colpi per Doomsday.",
+	["YH_TP_FACILITY"] = "Teletrasportarsi alla struttura",
+	["YH_DDAY_FORCE"] = "RESET FORZATO"
 }

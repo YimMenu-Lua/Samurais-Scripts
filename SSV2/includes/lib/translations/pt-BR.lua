@@ -656,8 +656,8 @@ return {
 	["YH_CAYO_TAB"] = "Cayo Perico",
 	["YH_CAYO_RESET_ALL"] = "Redefinir TODO o progresso",
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Defina todas as metas secundárias",
-	["YH_CAYO_TARGET_SECONDARY_C"] = "Alvo Secundário (Composto)",
-	["YH_CAYO_TARGET_SECONDARY_I"] = "Alvo Secundário (Ilha)",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Alvos Secundários (Composto)",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Alvos Secundários (Ilha)",
 	["YH_PREP_SKIP_NOTIF"] = "Todas as missões de preparação foram ignoradas. Agora você pode iniciar a missão final.",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "Coordenadas inválidas!",
 	["YH_SUBMARINE_NOT_OWNED"] = "Compre um Kosatka para acessar o Golpe de Cayo Perico.",
@@ -673,5 +673,10 @@ return {
 	["YRV3_LIFETIME_SELL_COMPLETE"] = "Missões de venda concluídas:",
 	["YRV3_LIFETIME_EARNINGS"] = "Ganhos vitalícios:",
 	["YH_CAYO_REQUEST_SUB"] = "Solicitar Submarino",
-	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Desativa o tempo de espera, pode resultar em banimento. Use por sua conta e risco!"
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Desativa o tempo de espera, pode resultar em banimento. Use por sua conta e risco!",
+	["YH_DDAY_FORCE"] = "FORÇAR REINICIALIZAÇÃO",
+	["YH_TP_FACILITY"] = "Teleporte para a instalação",
+	["YH_FACILITY_NOT_OWNED"] = "Compre uma instalação para acessar The Doomsday Heist.",
+	["YH_DDAY_HELP1"] = "Este método é necessário se você nunca jogou Doomsday como anfitrião. Se você já jogou e completou alguns assaltos como anfitrião, pule esta etapa.",
+	["YH_DDAY_HELP2_FMT"] = "Pressione o botão '%s' e ligue para Lester para cancelar todos os 3 assaltos do Doomsday."
 }

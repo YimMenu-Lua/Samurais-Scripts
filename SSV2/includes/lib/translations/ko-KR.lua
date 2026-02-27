@@ -673,5 +673,10 @@ return {
 	["YRV3_EDIT_EARNINGS_DATA"] = "수입 데이터 편집",
 	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "수행되는 판매 임무:",
 	["YH_CAYO_REQUEST_SUB"] = "잠수함 요청",
-	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "재사용 대기시간을 비활성화합니다. 차단될 수 있습니다. 자신의 책임하에 사용하십시오!"
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "재사용 대기시간을 비활성화합니다. 차단될 수 있습니다. 자신의 책임하에 사용하십시오!",
+	["YH_FACILITY_NOT_OWNED"] = "심판의 날 습격에 접근하려면 시설을 구매하세요.",
+	["YH_DDAY_HELP1"] = "Doomsday를 호스트로 플레이한 적이 없는 경우 이 방법이 필요합니다. 이미 호스트로서 일부 습격을 플레이하고 완료했다면 이 단계를 건너뛰세요.",
+	["YH_DDAY_FORCE"] = "강제 재설정",
+	["YH_TP_FACILITY"] = "시설로 순간이동",
+	["YH_DDAY_HELP2_FMT"] = "'%s' 버튼을 누른 다음 Lester에게 전화하여 Doomsday의 3가지 습격을 모두 취소하세요."
 }

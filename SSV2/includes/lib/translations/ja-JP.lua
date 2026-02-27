@@ -673,5 +673,10 @@ return {
 	["YRV3_LIFETIME_BUY_UNDERTAKEN"] = "引き受けたミッションを購入:",
 	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "実施された販売ミッション:",
 	["YH_CAYO_REQUEST_SUB"] = "潜水艦のリクエスト",
-	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "クールダウンを無効にし、BANされる可能性があります。ご自身の責任でご使用ください。"
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "クールダウンを無効にし、BANされる可能性があります。ご自身の責任でご使用ください。",
+	["YH_TP_FACILITY"] = "施設へテレポート",
+	["YH_DDAY_FORCE"] = "強制リセット",
+	["YH_DDAY_HELP1"] = "この方法は、ホストとして Doomsday をプレイしたことがない場合に必要です。すでにホストとしてプレイし、いくつかの強盗を完了している場合は、このステップをスキップしてください。",
+	["YH_FACILITY_NOT_OWNED"] = "施設を購入してThe Doomsday Heistにアクセスしてください。",
+	["YH_DDAY_HELP2_FMT"] = "「%s」ボタンを押してから、レスターに電話して、ドゥームズデイの 3 つの強盗をすべてキャンセルしてください。"
 }

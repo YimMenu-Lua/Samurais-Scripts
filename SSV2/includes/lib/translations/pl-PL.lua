@@ -651,8 +651,8 @@ return {
 	["YH_PREP_SKIP_NOTIF"] = "Wszystkie misje przygotowawcze zostały pominięte. Możesz już rozpocząć ostatnią misję.",
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Ustaw wszystkie cele drugorzędne",
 	["YRV3_IE_STEAL_THRESHOLD_TT"] = "Wskazówka: Misje kradzieży są losowe, ale możesz zagwarantować pojazd najwyższej klasy, przechowując 10 pojazdów na każdym poziomie. (Górny zakres może wynosić 10 lub więcej, ale pozostałe dwa muszą wynosić dokładnie 10.)",
-	["YH_CAYO_TARGET_SECONDARY_I"] = "Cel drugorzędny (wyspa)",
-	["YH_CAYO_TARGET_SECONDARY_C"] = "Cel dodatkowy (złożony)",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Cele drugorzędne (wyspa)",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Cele drugorzędne (złożone)",
 	["YRV3_IE_VEH_COMMISSION"] = "Komisja podstawowa",
 	["YH_CAYO_TARGET_PRIMARY"] = "Główny cel",
 	["YH_CAYO_TAB"] = "Cayo Perico",
@@ -673,5 +673,10 @@ return {
 	["YRV3_LIFETIME_EARNINGS"] = "Zarobki w ciągu całego życia:",
 	["YRV3_LIFETIME_BUY_COMPLETE"] = "Kup ukończone misje:",
 	["YH_CAYO_REQUEST_SUB"] = "Poproś o łódź podwodną",
-	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Wyłącza czas odnowienia, może skutkować banem. Używaj na własne ryzyko!"
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Wyłącza czas odnowienia, może skutkować banem. Używaj na własne ryzyko!",
+	["YH_FACILITY_NOT_OWNED"] = "Kup obiekt, aby uzyskać dostęp do Skoku na koniec świata.",
+	["YH_DDAY_FORCE"] = "WYMUŚ RESET",
+	["YH_DDAY_HELP2_FMT"] = "Naciśnij przycisk „%s”, a następnie zadzwoń do Lestera, aby anulował wszystkie 3 napady na Dzień Sądu.",
+	["YH_DDAY_HELP1"] = "Ta metoda jest konieczna, jeśli nigdy nie grałeś w Doomsday jako gospodarz. Jeśli grałeś już i ukończyłeś kilka napadów jako gospodarz, pomiń ten krok.",
+	["YH_TP_FACILITY"] = "Teleportuj się do obiektu"
 }

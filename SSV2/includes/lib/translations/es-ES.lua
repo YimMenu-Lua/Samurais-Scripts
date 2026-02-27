@@ -654,8 +654,8 @@ return {
 	["YH_CAYO_TAB"] = "Cayo Perico",
 	["YH_CAYO_TARGET_PRIMARY"] = "Objetivo principal",
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Establecer todos los objetivos secundarios",
-	["YH_CAYO_TARGET_SECONDARY_C"] = "Objetivo secundario (compuesto)",
-	["YH_CAYO_TARGET_SECONDARY_I"] = "Objetivo secundario (isla)",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Objetivos secundarios (compuestos)",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Objetivos secundarios (isla)",
 	["YH_CAYO_WEAPONS"] = "Equipamiento de armas",
 	["YH_CAYO_RESET_ALL"] = "Restablecer TODO el progreso",
 	["YH_CAYO_DIFFICULTY"] = "Modo difícil",
@@ -673,5 +673,10 @@ return {
 	["YRV3_EDIT_EARNINGS_DATA"] = "Editar datos de ganancias",
 	["YRV3_SHOW_EARNINGS_DATA"] = "Mostrar datos de ganancias",
 	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Desactiva el tiempo de reutilización, puede resultar en una prohibición. ¡Úselo bajo su propio riesgo!",
-	["YH_CAYO_REQUEST_SUB"] = "Solicitar Submarino"
+	["YH_CAYO_REQUEST_SUB"] = "Solicitar Submarino",
+	["YH_DDAY_HELP1"] = "Este método es necesario si nunca has jugado a Doomsday como anfitrión. Si ya jugaste y completaste algunos atracos como anfitrión, omite este paso.",
+	["YH_FACILITY_NOT_OWNED"] = "Compra una instalación para acceder a The Doomsday Heist.",
+	["YH_DDAY_FORCE"] = "FORZAR RESET",
+	["YH_TP_FACILITY"] = "Teletransportarse a la instalación",
+	["YH_DDAY_HELP2_FMT"] = "Presiona el botón '%s', luego llama a Lester para cancelar los 3 atracos de Doomsday."
 }

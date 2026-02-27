@@ -656,9 +656,9 @@ return {
 	["YH_CAYO_TAB"] = "Cayo Perico",
 	["YH_CAYO_DIFFICULTY"] = "Harter Modus",
 	["YH_PREP_SKIP_NOTIF"] = "Alle Vorbereitungsmissionen wurden übersprungen. Sie können nun mit der letzten Mission beginnen.",
-	["YH_CAYO_TARGET_SECONDARY_I"] = "Sekundäres Ziel (Insel)",
+	["YH_CAYO_TARGET_SECONDARY_I"] = "Sekundärziele (Insel)",
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"] = "Legen Sie alle sekundären Ziele fest",
-	["YH_CAYO_TARGET_SECONDARY_C"] = "Sekundäres Ziel (Verbindung)",
+	["YH_CAYO_TARGET_SECONDARY_C"] = "Sekundäre Ziele (Compound)",
 	["GENERIC_TP_INVALID_COORDS_ERR"] = "Ungültige Koordinaten!",
 	["YH_SUBMARINE_NOT_OWNED"] = "Kaufen Sie einen Kosatka, um Zugang zum Cayo Perico-Raub zu erhalten.",
 	["GENERIC_MINUTES_LABEL"] = "Minuten",
@@ -673,5 +673,10 @@ return {
 	["YRV3_LIFETIME_SELL_COMPLETE"] = "Abgeschlossene Verkaufsmissionen:",
 	["YRV3_LIFETIME_SELL_UNDERTAKEN"] = "Durchgeführte Verkaufsmissionen:",
 	["YH_CAYO_REQUEST_SUB"] = "U-Boot anfordern",
-	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Deaktiviert die Abklingzeit und kann zu einem Bann führen. Nutzung auf eigene Gefahr!"
+	["YH_COOLDOWN_BYPASS_TOOLTIP"] = "Deaktiviert die Abklingzeit und kann zu einem Bann führen. Nutzung auf eigene Gefahr!",
+	["YH_TP_FACILITY"] = "Zur Einrichtung teleportieren",
+	["YH_DDAY_FORCE"] = "Zurücksetzen erzwingen",
+	["YH_DDAY_HELP1"] = "Diese Methode ist notwendig, wenn Sie Doomsday noch nie als Moderator gespielt haben. Wenn Sie als Gastgeber bereits einige Raubüberfälle gespielt und abgeschlossen haben, überspringen Sie diesen Schritt.",
+	["YH_FACILITY_NOT_OWNED"] = "Kaufen Sie eine Einrichtung, um auf The Doomsday Heist zuzugreifen.",
+	["YH_DDAY_HELP2_FMT"] = "Drücken Sie die Schaltfläche „%s“ und rufen Sie dann Lester an, um alle drei Raubüberfälle für Doomsday abzubrechen."
 }
