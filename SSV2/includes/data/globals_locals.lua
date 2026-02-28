@@ -907,12 +907,22 @@ return {
 			capture_group = 1
 		}
 	},
-	submarine_global = {
-		description = "Submarine Global",
-		file = "am_mp_submarine.c",
+	service_vehicles_global = {
+		description = [[Stores status of Service Vehicles.
+		To find bitsets:
+		> freemode.c func_15166
+		> 	Global_2733138.f_XXX ;; i.e. 613 for Kosatka, 592 for Acid Lab
+		> 		func_15202(blah, blah, blah, THIS_NUMBER_IS_YOUR_BITSET_OFFSET);
+
+		Scrolling through offsets for Vectors has revealed that this has the coords of:
+		- Super Yacht @ offset -48
+		- Kosatka/Terrorbyte/MOC @ offset +13
+		- Acid Lab @ offset +75	
+		]],
+		file = "freemode.c",
 		LEGACY = {
 			value = 2658291,
-			pattern = [[if \(NETWORK::NETWORK_DOES_NETWORK_ID_EXIST\(Global_(\d{7})\[.*?Param0 /\*(\d+)\*/\]\.(f_\d{2})\)\)]],
+			pattern = [[MISC::SET_BIT\(&\(Global_(\d{7})\[PLAYER::PLAYER_ID\(\) /\*(\d{3})\*/\]\.(f_\d{3})\.f_\d{1}\), 31\);]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -921,14 +931,14 @@ return {
 					description = "playerID read size."
 				},
 				{
-					value = 52,
+					value = 325,
 					capture_group = 3
 				}
 			}
 		},
 		ENHANCED = {
 			value = 2658294,
-			pattern = [[if \(NETWORK::NETWORK_DOES_NETWORK_ID_EXIST\(Global_(\d{7})\[.*?Param0 /\*(\d+)\*/\]\.(f_\d{2})\)\)]],
+			pattern = [[MISC::SET_BIT\(&\(Global_(\d{7})\[PLAYER::PLAYER_ID\(\) /\*(\d{3})\*/\]\.(f_\d{3})\.f_\d{1}\), 31\);]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -937,7 +947,7 @@ return {
 					description = "playerID read size."
 				},
 				{
-					value = 52,
+					value = 325,
 					capture_group = 3
 				}
 			}

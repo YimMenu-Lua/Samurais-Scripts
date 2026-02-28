@@ -31,6 +31,7 @@ local secondary_targets = { "CASH", "WEED", "COKE", "GOLD" }
 ---@class FieldHangarProperty : GenericProperty
 ---@class SubmarineProperty : GenericProperty
 ---@field public heading float
+---@field public is_spawned boolean
 
 ---@alias HEIST_TYPES table<integer, HeistInfo>
 
@@ -101,17 +102,34 @@ function Mastermind:GetCayoSecTargets()
 	return loot_i or -1, loot_c or -1
 end
 
----@return ScriptGlobal
-local function GetSubCoordsGlobal()
-	local coords_global = SGSL:Get(SGSL.data.submarine_global)
-	local pid_size = coords_global:GetOffset(1)
-	local offset2 = coords_global:GetOffset(2)
-	local vec_offset = 286 -- magic
+--- Returns the coords and heading to either the Kosatka/Terrorbyte/MOC, whichever is called in.
+---@return vec3, float
+local function getServiceVehicleCoords()
+	local ser_veh_global = SGSL:Get(SGSL.data.service_vehicles_global)
+	local pid_size = ser_veh_global:GetOffset(1)
+	local offset2 = ser_veh_global:GetOffset(2)
+	local vec_offset = 13
 
-	return coords_global:AsGlobal()
+	local final = ser_veh_global:AsGlobal()
 		:At(LocalPlayer:GetPlayerID(), pid_size)
 		:At(offset2)
 		:At(vec_offset)
+
+	return final:ReadVec3(), final:At(3):ReadFloat()
+end
+
+---@return boolean
+local function isSubmarineSpawned()
+	local sub_global = SGSL:Get(SGSL.data.service_vehicles_global)
+	local pid_size = sub_global:GetOffset(1)
+	local offset2 = sub_global:GetOffset(2)
+	local sub_offset = 4
+	local sub_status = sub_global:AsGlobal()
+		:At(LocalPlayer:GetPlayerID(), pid_size)
+		:At(offset2)
+		:At(sub_offset)
+		:ReadInt()
+	return Bit.IsBitSet(sub_status, 31)
 end
 
 function Mastermind:ReadPropertyData()
@@ -154,11 +172,11 @@ function Mastermind:ReadPropertyData()
 
 		local sub_hash = stats.get_int("MPX_IH_SUB_OWNED")
 		if (sub_hash == _J("kosatka")) then
-			local global = GetSubCoordsGlobal()
 			self.m_properties.submarine = {
 				name    = Game.GetGXTLabel("CELL_SUBMARINE"),
-				coords  = global:ReadVec3(),
-				heading = global:At(3):ReadFloat()
+				coords  = vec3:zero(),
+				heading = 0.0,
+				is_spawned = isSubmarineSpawned()
 			}
 		end
 	end)
@@ -230,9 +248,10 @@ function Mastermind:GetSubmarine()
 		return
 	end
 
-	local sub_global = GetSubCoordsGlobal()
-	sub.coords = sub_global:ReadVec3()
-	sub.heading = sub_global:At(3):ReadFloat()
+	sub.is_spawned = isSubmarineSpawned()
+	if (sub.is_spawned) then
+		sub.coords, sub.heading = getServiceVehicleCoords()
+	end
 	return sub
 end
 
