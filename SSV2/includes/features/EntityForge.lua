@@ -1322,7 +1322,7 @@ end
 
 ---@param data any Base64 XOR-encrypted json
 function EntityForge:ImportCreation(data)
-	if (not data or not Serializer:IsBase64(data)) then
+	if (not data or not Serializer:IsEncrypted(data)) then
 		Notifier:ShowError(
 			"EntityForge",
 			"Import Error: Incorrect data type!",

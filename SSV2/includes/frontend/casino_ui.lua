@@ -398,8 +398,13 @@ local function drawHeistTab()
 end
 
 local function DrawDunk()
-	if (not Game.IsOnline() or not Backend:IsUpToDate()) then
-		ImGui.Text(_T("GENERIC_OFFLINE_OR_OUTDATED"))
+	if (not Game.IsOnline()) then
+		ImGui.Text(_T("GENERIC_UNAVAILABLE_SP"))
+		return
+	end
+
+	if (not Backend:IsUpToDate()) then
+		ImGui.Text(_T("GENERIC_OUTDATED"))
 		return
 	end
 

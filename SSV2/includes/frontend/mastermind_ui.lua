@@ -7,24 +7,24 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local Mastermind         = require("SSV2.includes.features.Mastermind"):init()
+local Mastermind         = require("includes.features.Mastermind"):init()
 local SGSL               = require("includes.services.SGSL")
 local secondary_targets  = { "Cash", "Weed", "Coke", "Gold" }
 local cayo_secondary_target_i, cayo_secondary_target_c
 
 local heistNames <const> = { -- https://github.com/root-cause/v-labels/blob/master/labels.json
-	CluckinBellFarmRaid = "AWT_1026",
-	KnoWayOut = "DLCC_AVIM",
-	DontFuckWithDre = "AWT_973",
+	CluckinBellFarmRaid   = "AWT_1026",
+	KnoWayOut             = "DLCC_AVIM",
+	DontFuckWithDre       = "AWT_973",
 	OscarGuzmanFliesAgain = "HACK24_MFM_STR",
-	FleecaJob = "HTITLE_TUT",
-	PrisonBreak = "HTITLE_PRISON",
-	HumaneLabsRaid = "HTITLE_HUMANE",
-	SeriesAFunding = "HTITLE_NARC",
-	PacificStandardJob = "HTITLE_ORNATE",
-	DataBreaches = "HPSTRAND_IAAb",
-	BogdanProblem = "HPSTRAND_SUBb",
-	DoomsdayScenario = "HPSTRAND_MSILb",
+	FleecaJob             = "HTITLE_TUT",
+	PrisonBreak           = "HTITLE_PRISON",
+	HumaneLabsRaid        = "HTITLE_HUMANE",
+	SeriesAFunding        = "HTITLE_NARC",
+	PacificStandardJob    = "HTITLE_ORNATE",
+	DataBreaches          = "HPSTRAND_IAAb",
+	BogdanProblem         = "HPSTRAND_SUBb",
+	DoomsdayScenario      = "HPSTRAND_MSILb",
 }
 local tabNames <const>   = { --
 	"YH_BASIC_TAB",          -- Basic
@@ -152,8 +152,8 @@ local function drawCayoTab()
 	end
 
 	local request_kosatka = SGSL:Get(SGSL.data.request_services_global):AsGlobal():At(613)
-	local sub_requested = request_kosatka:ReadInt() == 1
-	local sub_spawned = not sub.coords:is_zero()
+	local sub_requested   = request_kosatka:ReadInt() == 1
+	local sub_spawned     = not sub.coords:is_zero()
 
 	ImGui.BeginDisabled(not sub_spawned)
 	if (GUI:Button(_T("GENERIC_TELEPORT"))) then
@@ -191,7 +191,6 @@ local function drawCayoTab()
 	local cayo_heist_weapons         = stats.get_int("MPX_H4CNF_WEAPONS")
 	local cayo_cooldown              = stats.get_int("MPX_H4_COOLDOWN")
 	local cayo_cooldown_hard         = stats.get_int("MPX_H4_COOLDOWN_HARD")
-
 	local posix_now                  = Time.Epoch()
 	local cooldown_seconds_left      = cayo_cooldown - posix_now
 	local cooldown_hard_seconds_left = cayo_cooldown_hard - posix_now
@@ -330,7 +329,6 @@ local function drawDDayTab()
 
 	local dday_status           = stats.get_int("MPX_GANGOPS_HEIST_STATUS")
 	local dday_cooldown         = stats.get_int("MPX_GANGOPS_LAUNCH_TIME")
-
 	local posix_now             = Time.Epoch()
 	local cooldown_seconds_left = dday_cooldown - posix_now
 	local on_cooldown           = cooldown_seconds_left > 0
@@ -401,16 +399,19 @@ local tabCallbacks <const> = {
 }
 
 local function HeistUI()
-	if (not Game.IsOnline() or not Backend:IsUpToDate()) then
+	if (not Game.IsOnline()) then
 		ImGui.Text(_T("GENERIC_UNAVAILABLE_SP"))
+		return
+	end
+
+	if (not Backend:IsUpToDate()) then
+		ImGui.Text(_T("GENERIC_OUTDATED"))
 		return
 	end
 
 	cayo_secondary_target_i, cayo_secondary_target_c = Mastermind:GetCayoSecTargets()
 
-	if (ImGui.BeginTabBar("##funkBar")) then
-		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
-
+	if (ImGui.BeginTabBar("##mastermind")) then
 		for i = 1, #tabNames do
 			local name = tabNames[i]
 			if ImGui.BeginTabItem(name) then
@@ -418,8 +419,6 @@ local function HeistUI()
 				ImGui.EndTabItem()
 			end
 		end
-
-		ImGui.PopStyleVar()
 		ImGui.EndTabBar()
 	end
 end

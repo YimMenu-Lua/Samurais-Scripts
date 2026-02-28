@@ -931,9 +931,34 @@ table.copy = function(t, seen)
 	return out
 end
 
+---@param src table
+---@param dest table
+---@param path string?
+---@param seen table?
+function table.merge(src, dest, path, seen)
+	seen = seen or {}
+	if (seen[src]) then
+		return
+	end
+	seen[src] = true
+
+	for k, v in pairs(src) do
+		if (dest[k] == nil) then
+			dest[k] = v
+		elseif (type(v) == "table" and type(dest[k]) == "table") then
+			local current_path = path and (path .. "." .. tostring(k)) or tostring(k)
+			table.merge(v, dest[k], current_path, seen)
+		end
+	end
+end
+
 ---@param inTable table
 ---@param outTable table
 function table.swap(inTable, outTable)
+	if (inTable == outTable) then
+		return
+	end
+
 	local temp = {}
 
 	for k, v in pairs(inTable) do
@@ -960,11 +985,16 @@ function table.overwrite(t, src, seen)
 	seen[src] = true
 
 	for k in pairs(t) do
-		t[k] = nil
+		if (src[k] == nil) then
+			t[k] = nil
+		end
 	end
 
 	for k, v in pairs(src) do
-		if (type(v) == "table" and type(t[k]) == "table") then
+		if (type(v) == "table") then
+			if (type(t[k]) ~= "table") then
+				t[k] = {}
+			end
 			table.overwrite(t[k], v, seen)
 		else
 			t[k] = v
@@ -1226,6 +1256,16 @@ string.isvalid = function(str)
 	return type(str) == "string"
 		and not str:isempty()
 		and not str:iswhitespace()
+end
+
+---@param str string
+---@return boolean
+function string.is_base64(str)
+	if (not string.isvalid(str)) then
+		return false
+	end
+
+	return (#str % 4 == 0) and (str:match("^[A-Za-z0-9+/]+=?=?$") ~= nil)
 end
 
 -- Returns whether a string starts with the provided prefix.

@@ -116,7 +116,7 @@ end
 
 function Mastermind:ReadPropertyData()
 	ThreadManager:Run(function()
-		while (Game.IsInTransition()) do
+		while (Game.IsInNetworkTransition()) do
 			yield()
 		end
 

@@ -39,6 +39,7 @@ local eSerializerState <const> = {
 ---@field private m_locked boolean
 ---@field private m_disabled boolean
 ---@field private m_file_name string
+---@field private m_backup_file string
 ---@field private m_default_config table
 ---@field private m_key_states table
 ---@field private m_dirty boolean
@@ -84,8 +85,11 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 	local timestamp        = tostring(os.date("%H_%M_%S"))
 	script_name            = script_name or (Backend and Backend.script_name or ("unk_cfg_%s"):format(timestamp))
 	varargs                = varargs or {}
+	local filename         = script_name:lower():gsub("%s+", "_")
+
 	self.m_default_config  = default_config or { __version = Backend and Backend.__version or self.__version }
-	self.m_file_name       = _F("%s.json", script_name:lower():gsub("%s+", "_"))
+	self.m_file_name       = _F("%s.json", filename)
+	self.m_backup_file     = _F("%s.bak", filename)
 	self.m_xor_key         = varargs.encryption_key or self.default_xor_key
 	self.m_state           = eSerializerState.INIT
 	self.m_dirty           = false
@@ -105,14 +109,16 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 
 	local config_data = self:Read()
 	if (type(config_data) ~= "table") then
-		log.warning("[Serializer]: Failed to read data. Persistent config will be disabled for this session.")
-		self.m_disabled = true
+		log.warning("[Serializer]: Failed to read data! Persistent config will be disabled for this session.")
+		self.m_disabled    = true
+		self.m_state       = eSerializerState.SUSPENDED
+		self.m_initialized = true
 		return self
 	end
 
 	if (not runtime_vars) then
 		runtime_vars = _ENV.GVars or {}
-		_ENV.GVars = runtime_vars
+		_ENV.GVars   = runtime_vars
 	end
 
 	setmetatable(
@@ -166,10 +172,12 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 		runtime_vars[key] = saved_value
 	end
 
-	local ignored_set  = Set.new("__schema_hash", "__dev_reset", "__version")
-	self.__schema_hash = _J(table.snapshot(self.m_default_config, { ignored_keys = ignored_set }))
-	self:SyncKeys()
+	local ignored_set      = Set.new("__schema_hash", "__dev_reset", "__version")
+	self.__schema_hash     = _J(table.snapshot(self.m_default_config, { ignored_keys = ignored_set }))
+	self.m_state           = eSerializerState.IDLE
 	self.m_last_write_time = TimePoint.new()
+	self:SyncKeys()
+	self:SaveBackup()
 
 	ThreadManager:RegisterLooped("SS_SERIALIZER", function()
 		self:OnTick()
@@ -180,7 +188,6 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 	end)
 
 	self.m_initialized = true
-	self.m_state       = eSerializerState.IDLE
 	return self
 end
 
@@ -198,25 +205,7 @@ function Serializer:SyncKeys(runtime_vars)
 	runtime_vars      = runtime_vars or _ENV.GVars or {}
 
 	if (not saved["__schema_hash"] or saved["__schema_hash"] ~= self.__schema_hash) then
-		local function deep_merge(default, target, path, visited)
-			if (visited[default]) then
-				return
-			end
-			visited[default] = true
-
-			for k, v in pairs(default) do
-				local current_path = path and (path .. "." .. tostring(k)) or tostring(k)
-
-				if (target[k] == nil) then
-					Backend:debug("[Serializer]: Added missing config key %s", current_path)
-					target[k] = v
-				elseif (type(v) == "table" and type(target[k]) == "table") then
-					deep_merge(v, target[k], current_path, visited)
-				end
-			end
-		end
-
-		deep_merge(default_cfg, runtime_vars, nil, {})
+		table.merge(default_cfg, runtime_vars)
 		saved["__schema_hash"] = self.__schema_hash
 		runtime_vars["__schema_hash"] = self.__schema_hash
 		self:Parse(saved)
@@ -277,8 +266,8 @@ end
 
 ---@param data string
 ---@return boolean
-function Serializer:IsBase64(data)
-	return (#data % 4 == 0 and data:match("^[A-Za-z0-9+/]+=?=?$") ~= nil)
+function Serializer:IsEncrypted(data)
+	return string.is_base64(data)
 end
 
 ---@return eSerializerState
@@ -299,6 +288,48 @@ end
 ---@return milliseconds
 function Serializer:GetTimeSinceLastFlush()
 	return self.m_last_write_time and self.m_last_write_time:Elapsed() or 0
+end
+
+function Serializer:SaveBackup()
+	if (not io.exists(self.m_file_name)) then
+		return
+	end
+
+	local f1 <close> = io.open(self.m_file_name, "r")
+	local f2 <close> = io.open(self.m_backup_file, "w")
+	if (not f1 or not f2) then
+		return
+	end
+
+	local data = f1:read("a")
+	if (not data) then
+		return
+	end
+
+	f2:write(data)
+	f2:flush()
+end
+
+---@return boolean, any
+function Serializer:RecoverBackup()
+	if (not io.exists(self.m_backup_file)) then
+		return false, nil
+	end
+
+	local f1 <close> = io.open(self.m_backup_file, "r")
+	local f2 <close> = io.open(self.m_file_name, "w")
+	if (not f1 or not f2) then
+		return false, nil
+	end
+
+	local data = f1:read("a")
+	if (not data) then
+		return false, nil
+	end
+
+	f2:write(data)
+	f2:flush()
+	return true, data
 end
 
 -- Waits for idle state before mutating the config table.
@@ -341,84 +372,85 @@ end
 ---@return any
 function Serializer:Preprocess(value, seen)
 	seen = seen or {}
-	if seen[value] then
+	if (seen[value]) then
 		return seen[value]
 	end
 
-	local t = type(value)
-	if (t == "table" or t == "userdata") then
-		seen[value] = {}
-
-		local type_name = value.__type
-		if type_name then
-			local name = tostring(type_name):lower():trim()
-			local fallback = self.class_types[name] and self.class_types[name].serializer
-
-			if (type(fallback) == "function") then
-				local ok, result = pcall(fallback, value)
-				if (ok and type(result) == "table") then
-					seen[value] = result
-					return result
-				end
-			end
-		end
-
-		if (type(value.serialize) == "function") then
-			local ok, result = pcall(value.serialize, value)
-			if ok and (type(result) == "table") then
-				seen[value] = result
-				return result
-			end
-		end
-
-		local out = {}
-		seen[value] = out
-		for k, v in pairs(value) do
-			out[k] = self:Preprocess(v, seen)
-		end
-
-		return out
+	local __type = type(value)
+	if (__type ~= "table" and __type ~= "userdata") then
+		return value
 	end
 
-	return value
+	seen[value] = {}
+	local type_name = value.__type
+	if (type_name) then
+		local name     = tostring(type_name):lower():trim()
+		local fallback = self.class_types[name] and self.class_types[name].serializer
+		if (type(fallback) == "function") then
+			local ok, res = pcall(fallback, value)
+			if (ok and type(res) == "table") then
+				seen[value] = res
+				return res
+			end
+		end
+	end
+
+	if (type(value.serialize) == "function") then
+		local ok, res = pcall(value.serialize, value)
+		if (ok and (type(res) == "table")) then
+			seen[value] = res
+			return res
+		end
+	end
+
+	local out = {}
+	seen[value] = out
+	for k, v in pairs(value) do
+		out[k] = self:Preprocess(v, seen)
+	end
+
+	return out
 end
 
 ---@param value any
 ---@return any
 function Serializer:Postprocess(value)
-	if (type(value) == "table") then
-		local type_name = rawget(value, "__type")
-		if type_name then
-			local name = tostring(type_name):lower():trim()
-			local ctor = self.class_types[name] and self.class_types[name].constructor
-
-			if (type(ctor) == "function") then
-				local ok, result = pcall(ctor, value)
-				if ok then
-					return result
-				end
-			else
-				table.insert(self.m_deferred_objects, value)
-				return value
-			end
-		end
-
-		local out = {}
-		for k, v in pairs(value) do
-			out[self:Postprocess(k)] = self:Postprocess(v)
-		end
-
-		return out
+	if (type(value) ~= "table") then
+		return value
 	end
 
-	return value
+	local type_name = rawget(value, "__type")
+	if (type_name) then
+		local name = tostring(type_name):lower():trim()
+		local ctor = self.class_types[name] and self.class_types[name].constructor
+
+		if (type(ctor) == "function") then
+			local ok, result = pcall(ctor, value)
+			if (ok) then
+				return result
+			end
+		else
+			table.insert(self.m_deferred_objects, value)
+			return value
+		end
+	end
+
+	local out = {}
+	for k, v in pairs(value) do
+		out[self:Postprocess(k)] = self:Postprocess(v)
+	end
+
+	return out
 end
 
+---@private
 ---@param data any
----@param etc? any
-function Serializer:Encode(data, etc)
-	return self.json:encode(
-		self:Preprocess(data),
+---@param etc any
+---@return boolean success, string? result
+function Serializer:EncodeImpl(data, etc)
+	return pcall(self.json.encode,
+		self.json,
+		data,
 		etc,
 		{
 			pretty = self.m_parsing_options.pretty,
@@ -427,17 +459,64 @@ function Serializer:Encode(data, etc)
 	)
 end
 
+---@private
 ---@param data any
----@param etc? any
----@return any
-function Serializer:Decode(data, etc)
-	local parsed = self.json:decode(
+---@param etc any
+---@return boolean success, any result
+function Serializer:DecodeImpl(data, etc)
+	return pcall(self.json.decode,
+		self.json,
 		data,
 		etc,
 		{ strictParsing = self.m_parsing_options.strict_parsing or false }
 	)
+end
 
-	return self:Postprocess(parsed)
+---@param data any
+---@param etc? any
+---@return string?
+function Serializer:Encode(data, etc)
+	local pre     = self:Preprocess(data)
+	local ok, res = self:EncodeImpl(pre, etc)
+	if (not ok) then
+		log.warning("[Serializer]: Failed to encode data!")
+		return
+	end
+
+	return res
+end
+
+---@param data any
+---@param etc? any
+---@return any
+function Serializer:Decode(data, etc)
+	local ok, res = self:DecodeImpl(data, etc)
+	if (not ok) then
+		local function onDecodeError()
+			log.warning("[Serializer]: No suitable config backup. Resetting to default.")
+			self:Parse(self.m_default_config)
+			return table.copy(self.m_default_config)
+		end
+
+		log.warning("[Serializer]: Your config file is corrupted! Attempting to recover...")
+		local success, recov = self:RecoverBackup()
+		if (not success) then
+			return onDecodeError()
+		end
+
+		if (self:IsEncrypted(recov)) then
+			recov = self:Decrypt(recov)
+		end
+
+		ok, res = self:DecodeImpl(recov, etc)
+		if (not ok) then
+			return onDecodeError()
+		end
+
+		log.info("[Serializer]: Config backup successfullly recovered.")
+	end
+
+	return self:Postprocess(res)
 end
 
 ---@param data any
@@ -446,17 +525,21 @@ function Serializer:Parse(data)
 		return
 	end
 
-	local file, _ = io.open(self.m_file_name, "w")
-	if (not file) then
+	local f <close> = io.open(self.m_file_name, "w")
+	if (not f) then
 		log.warning("[Serializer]: Failed to write config file!")
 		self.m_disabled = true
 		return
 	end
 
 	self.m_state = eSerializerState.FLUSHING
-	file:write(self:Encode(data))
-	file:flush()
-	file:close()
+	local json   = self:Encode(data)
+	if (not json) then
+		return
+	end
+
+	f:write(json)
+	f:flush()
 	self.m_state = eSerializerState.IDLE
 end
 
@@ -466,56 +549,47 @@ function Serializer:Read()
 		return table.copy(self.m_default_config)
 	end
 
-	local file, _ = io.open(self.m_file_name, "r")
-	if not file then
+	local f <close> = io.open(self.m_file_name, "r")
+	if (not f) then
 		log.warning("[Serializer]: Failed to read config file!")
 		self.m_disabled = true
 		return table.copy(self.m_default_config)
 	end
 
-	local data = file:read("a")
-	file:close()
-
+	local data = f:read("a")
 	if (not data or #data == 0) then
 		log.warning("[Serializer]: Config data is empty or unreadable.")
+		self.m_disabled = true
 		return table.copy(self.m_default_config)
 	end
 
-	if self:IsBase64(data) then
-		self:Decrypt()
-		local decrypted_data = self:Read()
-		self:Encrypt()
-		return decrypted_data
+	if (self:IsEncrypted(data)) then
+		data = self:Decrypt(data)
 	end
 
 	return self:Decode(data)
 end
 
----@param item_name string
+---@param item_path string
 ---@return any
-function Serializer:ReadItem(item_name)
-	local data = self:Read()
-
-	if (type(data) ~= "table") then
-		log.warning("[Serializer]: Invalid data type! Returning default value.")
-		return self.m_default_config[item_name]
+function Serializer:ReadItem(item_path)
+	if (type(GVars) ~= "table") then
+		log.warning("[Serializer]: No runtime variables table! Returning default value.")
+		return table.get_nested_key(self.m_default_config, item_path)
 	end
 
-	return data[item_name]
+	return table.get_nested_key(GVars, item_path)
 end
 
----@param item_name string
+---@param item_path string
 ---@param value any
-function Serializer:SaveItem(item_name, value)
-	local data = self:Read()
-
-	if (type(data) ~= "table") then
-		log.warning("[Serializer]: Invalid data type!")
+function Serializer:SaveItem(item_path, value)
+	if (type(GVars) ~= "table") then
+		log.warning("[Serializer]: No runtime variables table!")
 		return
 	end
 
-	data[item_name] = value
-	self:Parse(data)
+	table.set_nested_key(GVars, item_path, value)
 end
 
 ---@param defaults table
@@ -648,54 +722,46 @@ function Serializer:XOR(input)
 	return table.concat(output)
 end
 
-function Serializer:Encrypt()
-	local file, _ = io.open(self.m_file_name, "r")
-	if (not file) then
-		log.warning("[Serializer]: Failed to encrypt data! Unable to read config file.")
-		return
-	end
-
-	local data = file:read("a")
-	file:close()
-
+---@param data anyval json data
+---@return string?
+function Serializer:Encrypt(data)
 	if (not data or #data == 0) then
-		log.warning("[Serializer]: Failed to encrypt config! Data is unreadable.")
+		log.warning("[Serializer]: Encryption failed! Data is unreadable.")
 		return
 	end
 
-	local xor = self:XOR(data)
-	local b64 = self:B64Encode(xor)
-	file, _ = io.open(self.m_file_name, "w")
-
-	if (file) then
-		file:write(b64)
-		file:flush()
-		file:close()
-	end
+	return self:B64Encode(self:XOR(data))
 end
 
-function Serializer:Decrypt()
-	local file, _ = io.open(self.m_file_name, "r")
-	if not file then
-		log.warning("[Serializer]: Failed to decrypt data! Unable to read config file.")
+---@param data anyval Json data encrypted in base64 + xor
+---@return any -- json data or nil
+function Serializer:Decrypt(data)
+	if (not data or #data == 0) then
+		log.warning("[Serializer]: Decryption failed! Data is unreadable.")
 		return
 	end
 
-	local data = file:read("a")
-	file:close()
-	if not data or #data == 0 then
-		log.warning("[Serializer]: Failed to decrypt config! Data is unreadable.")
-		return
-	end
-
-	if (not self:IsBase64(data)) then
+	if (not self:IsEncrypted(data)) then
 		log.warning("[Serializer]: Data is not encrypted!")
 		return
 	end
 
-	local decoded = self:B64Decode(data)
-	local decrypted = self:XOR(decoded)
-	self:Parse(self:Decode(decrypted))
+	return self:XOR(self:B64Decode(data))
+end
+
+---@private
+---@param data any
+---@param filename string
+function Serializer:WriteInternal(data, filename)
+	local f, err = io.open(filename, "w")
+	if (not f) then
+		log.fwarning("[Serializer]: Failed to open file: %s", err)
+		return
+	end
+
+	f:write(data)
+	f:flush()
+	f:close()
 end
 
 -- A separate write function that doesn't rely on any setup or state flags.
@@ -720,7 +786,7 @@ function Serializer:WriteToFile(data, filename)
 	end
 
 	local f, err = io.open(filename, "w")
-	if not f then
+	if (not f) then
 		log.fwarning("[Serializer]: Failed to open file: %s", err)
 		return
 	end
@@ -830,7 +896,7 @@ function Serializer:Flush()
 end
 
 function Serializer:OnTick()
-	if (not self:CanAccess()) then
+	if (not self.m_initialized or not self:CanAccess()) then
 		return
 	end
 
@@ -849,6 +915,38 @@ function Serializer:OnShutdown()
 	end
 
 	self:Flush()
+end
+
+---@private
+---@param mode number 0 | 1
+function Serializer:DebugBreak(mode)
+	if (not Backend.debug_mode) then
+		return
+	end
+
+	mode            = mode or 0
+	self.m_dirty    = false
+	self.m_disabled = true
+
+	if (mode == 0) then
+		self:WriteInternal("{ royallyfuckedjson", self.m_file_name)
+	elseif (mode == 1) then
+		local f = io.open(self.m_file_name, "r")
+		if (not f) then
+			return
+		end
+
+		---@type string?
+		local data = f:read("a")
+		f:close()
+
+		local f2 <close> = io.open(self.m_file_name, "w")
+		if (not f2 or type(data) ~= "string") then
+			return
+		end
+
+		f2:write(data:sub(1, #data // 2))
+	end
 end
 
 function Serializer:Dump()
