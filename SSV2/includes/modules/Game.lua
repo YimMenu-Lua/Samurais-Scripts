@@ -105,13 +105,14 @@ function Game.IsEnhanced()
 end
 
 ---@return boolean
-function Game.IsInTransition()
-	return NETWORK.NETWORK_IS_IN_TRANSITION() or Backend:IsPlayerSwitchInProgress()
+function Game.IsInNetworkTransition()
+	-- PlayerSwitch is invalid here as it will return true in Single Player
+	return script.is_active("maintransition")
 end
 
 ---@return boolean
 function Game.IsOnline()
-	return network.is_session_started() and not Game.IsInTransition()
+	return network.is_session_started() and not Game.IsInNetworkTransition()
 end
 
 ---@param handle integer
