@@ -152,10 +152,9 @@ local function drawCayoTab()
 	end
 
 	local request_kosatka = SGSL:Get(SGSL.data.request_services_global):AsGlobal():At(613)
-	local sub_requested   = request_kosatka:ReadInt() == 1
-	local sub_spawned     = not sub.coords:is_zero()
+	local sub_requested = request_kosatka:ReadInt() == 1
 
-	ImGui.BeginDisabled(not sub_spawned)
+	ImGui.BeginDisabled(not sub.is_spawned)
 	if (GUI:Button(_T("GENERIC_TELEPORT"))) then
 		local forward_angle = math.rad(sub.heading + 90)
 		local offset = vec3:new(math.cos(forward_angle), math.sin(forward_angle), 4) -- front of door
@@ -170,7 +169,7 @@ local function drawCayoTab()
 
 	local btn_label = (sub_requested) and ImGui.TextSpinner() or _T("YH_CAYO_REQUEST_SUB")
 
-	ImGui.BeginDisabled(sub_requested or sub_spawned)
+	ImGui.BeginDisabled(sub_requested or sub.is_spawned)
 	ImGui.SameLine()
 	if (GUI:Button(btn_label)) then
 		ThreadManager:Run(function()
@@ -388,7 +387,7 @@ end
 
 -- Maybe port https://github.com/YimMenu/YimMenuV2/blob/enhanced/src/game/features/recovery/Heist/ApartmentHeist.cpp ?
 -- Apartment heists actually seem complicated in that (I assume) since they're old they use a different method of storing progress as there isn't just 1 stat to check like all the others
--- Or if there is, there only *was* because no stats I've found seem to do anything today, like the stat from that link right there. Doesn't do anything, am I missing something?
+-- Or if there is, there only *was* because no stats I've found seem to do anything today, like the stat from that link right there. Doesn't do anything here or in YimMenuV2, am I missing something?
 local function drawAptTab()
 end
 

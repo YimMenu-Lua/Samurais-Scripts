@@ -531,7 +531,7 @@ local RawBusinessData <const> = {
 		{ gxt = "MP_DBASE_2",  coords = vec3:new(34.4699, 2620.9768, 84.6202) },
 		{ gxt = "MP_DBASE_3",  coords = vec3:new(2755.9807, 3907.2722, 44.3148) },
 		{ gxt = "MP_DBASE_4",  coords = vec3:new(3389.6028, 5508.971, 24.875) },
-		{ gxt = "MP_DBASE_6",  coords = vec3:new(19.4492, 6825.3613, 14.4952) },
+		{ gxt = "MP_DBASE_6",  coords = vec3:new(19.4492, 6825.3613, 14.4952) }, -- skips DBASE_5
 		{ gxt = "MP_DBASE_7",  coords = vec3:new(-2229.408, 2395.4102, 12.0106) },
 		{ gxt = "MP_DBASE_8",  coords = vec3:new(-3.0095, 3344.4888, 40.2769) },
 		{ gxt = "MP_DBASE_9",  coords = vec3:new(2086.0674, 1761.3461, 103.043) },
