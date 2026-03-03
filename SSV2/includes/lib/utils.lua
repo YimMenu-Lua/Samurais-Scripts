@@ -383,8 +383,8 @@ end
 
 --#region Lua API
 
----@param src string Filename with extenstion
----@param dest string Filename with extenstion
+---@param src string Filename with extension
+---@param dest string Filename with extension
 ---@return boolean, any
 function io.copy(src, dest)
 	if (not io.exists(src)) then
