@@ -290,6 +290,11 @@ end
 
 ---@return boolean, any
 function Serializer:RecoverBackup()
+	-- prevent triggering the FileNotFound warning in io.copy
+	if (not io.exists(self.m_backup_file)) then
+		return false, nil
+	end
+
 	return io.copy(self.m_backup_file, self.m_file_name)
 end
 
