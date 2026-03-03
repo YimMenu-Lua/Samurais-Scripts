@@ -16,7 +16,7 @@
 ---@class CStructLayout
 ---@field [1] string
 ---@field [2] ptrchain
----@field [3] Obj|any?
+---@field [3] (Obj|any)?
 
 -- A helper function that allows us to quickly define game classes while eliminating repetitive code.
 --
@@ -100,7 +100,7 @@ local function CStructView(name, layout, size, is_ref_ptr)
 
 	---@return boolean
 	function cls:IsValid()
-		return self.m_ptr and self.m_ptr:is_valid()
+		return self.m_ptr and self.m_ptr:is_valid() or false
 	end
 
 	---@return pointer
