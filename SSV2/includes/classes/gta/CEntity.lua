@@ -22,7 +22,7 @@ local CAttackers = GenericClass
 --------------------------------------
 ---@ignore
 ---@class CEntity: ClassMeta<CEntity>
----@field private m_ptr pointer
+---@field protected m_ptr pointer
 ---@field m_model_info pointer<CBaseModelInfo> -- 0x0020
 ---@field m_entity_type uint8_t -- 0x0028
 ---@field m_model_type pointer<uint8_t> -- CBaseModelInfo + 0x009D
@@ -42,15 +42,14 @@ local CEntity = Class("CEntity", nil, 0x290)
 ---@param entity handle
 ---@return CEntity
 function CEntity:init(entity)
-	if not ENTITY.DOES_ENTITY_EXIST(entity) then
+	if (not Game.IsScriptHandle(entity)) then
 		error("Invalid entity!")
 	end
 
 	local ptr                        = memory.handle_to_ptr(entity)
 	---@type CEntity
-	---@diagnostic disable-next-line
-	local instance                   = setmetatable({}, CEntity)
-	instance.m_ptr                   = ptr
+	---@diagnostic disable-next-line: param-type-mismatch
+	local instance                   = setmetatable({ m_ptr = ptr }, CEntity)
 	instance.m_model_info            = ptr:add(0x0020):deref()
 	instance.m_model_type            = instance.m_model_info:add(0x009D)
 	instance.m_flags                 = ptr:add(0x002D)

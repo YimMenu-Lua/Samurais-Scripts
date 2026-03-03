@@ -7,34 +7,27 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CEntity                    = require("includes.classes.gta.CEntity")
-local CWheel                     = require("includes.classes.gta.CWheel")
-local CCarHandlingData           = require("includes.classes.gta.CCarHandlingData")
-local CBikeHandlingData          = require("includes.classes.gta.CBikeHandlingData")
-local CFlyingHandlingData        = require("includes.classes.gta.CFlyingHandlingData")
-local phFragInst                 = require("includes.classes.gta.phFragInst")
-local CVehicleDrawData           = require("includes.classes.gta.CVehicleDrawData")
+local CEntity             = require("includes.classes.gta.CEntity")
+local CWheel              = require("includes.classes.gta.CWheel")
+local CCarHandlingData    = require("includes.classes.gta.CCarHandlingData")
+local CBikeHandlingData   = require("includes.classes.gta.CBikeHandlingData")
+local CFlyingHandlingData = require("includes.classes.gta.CFlyingHandlingData")
+local phFragInst          = require("includes.classes.gta.phFragInst")
+local CVehicleDrawData    = require("includes.classes.gta.CVehicleDrawData")
 
----@class CAdvancedData : GenericClass
-local CAdvancedData              = GenericClass
+---@class CAdvancedData
+---@class CVehicleModelInfo
+---@class CVehicleDamage
+---@class CHandlingData
+---@class CVehicleModelInfoLayout
 
----@class CVehicleModelInfo : GenericClass
-local CVehicleModelInfo          = GenericClass
-
----@class CVehicleDamage : GenericClass
-local CVehicleDamage             = GenericClass
-
----@class CHandlingData : GenericClass
-local CHandlingData              = GenericClass
-
----@class CVehicleModelInfoLayout : GenericClass
-local CVehicleModelInfoLayout    = GenericClass
 
 local SubHandlingCtorMap <const> = {
 	[Enums.eHandlingType.CAR]    = function(ptr) return CCarHandlingData.new(ptr) end,
 	[Enums.eHandlingType.BIKE]   = function(ptr) return CBikeHandlingData.new(ptr) end,
 	[Enums.eHandlingType.FLYING] = function(ptr) return CFlyingHandlingData.new(ptr) end,
 }
+
 
 --------------------------------------
 -- Class: CVehicle
@@ -89,23 +82,21 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_ride_height pointer<float>
 ---@field private DumpFlags fun(self: CVehicle, enum_flags: Enum, get_func: fun(self: CVehicle, flag: integer): boolean): nil
 ---@overload fun(vehicle: integer): CVehicle|nil
-local CVehicle                   = Class("CVehicle", CEntity, 0xC40)
+local CVehicle = Class("CVehicle", CEntity, 0xC40)
 
 ---@param vehicle handle
 ---@return CVehicle
 function CVehicle:init(vehicle)
-	if (not ENTITY.DOES_ENTITY_EXIST(vehicle) or not ENTITY.IS_ENTITY_A_VEHICLE(vehicle)) then
+	if (not Game.IsScriptHandle(vehicle) or not ENTITY.IS_ENTITY_A_VEHICLE(vehicle)) then
 		error("Invalid entity!")
 	end
-
-	local ptr = memory.handle_to_ptr(vehicle)
 
 	---@type CVehicle
 	---@diagnostic disable-next-line: param-type-mismatch
 	local instance = setmetatable({}, CVehicle)
-	---@diagnostic disable-next-line: param-type-mismatch
 	instance:super().init(instance, vehicle)
 
+	local ptr                               = memory.handle_to_ptr(vehicle)
 	instance.m_ptr                          = ptr
 	instance.m_model_info                   = ptr:add(0x20):deref()
 	instance.m_vehicle_damage               = ptr:add(0x0420)

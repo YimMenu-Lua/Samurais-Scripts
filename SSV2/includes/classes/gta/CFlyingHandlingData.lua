@@ -7,6 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local CStructView = require("includes.classes.gta.CStructView")
+
 ---@class CFlyingHandlingData : CBaseSubHandlingData
 ---@field m_thrust pointer<float> -- 0x0008
 ---@field m_thrust_falloff pointer<float> -- 0x000C
@@ -51,67 +53,47 @@
 ---@field m_submerge_level pointer<float> -- 0x00C0
 ---@field m_unk_lift_00C4 pointer<float> -- 0x00C4
 ---@overload fun(addr: pointer): CFlyingHandlingData
-local CFlyingHandlingData = { m_size = 0x00C8 }
-CFlyingHandlingData.__index = CFlyingHandlingData
----@diagnostic disable-next-line: param-type-mismatch
-setmetatable(CFlyingHandlingData, {
-	__call = function(cls, ...)
-		return cls.new(...)
-	end,
-})
-
----@param ptr pointer
----@return CFlyingHandlingData|nil
-function CFlyingHandlingData.new(ptr)
-	if not ptr or ptr:is_null() then return end
-
-	---@diagnostic disable-next-line: param-type-mismatch
-	local instance                             = setmetatable({}, CFlyingHandlingData)
-	instance.m_ptr                             = ptr
-	instance.m_thrust                          = ptr:add(0x0008)
-	instance.m_thrust_falloff                  = ptr:add(0x000C)
-	instance.m_thrust_vectoring                = ptr:add(0x0010)
-	instance.m_initial_thrust                  = ptr:add(0x0014)
-	instance.m_initial_thrust_falloff          = ptr:add(0x0018)
-	instance.m_yaw_mult                        = ptr:add(0x001C)
-	instance.m_yaw_stability_mult              = ptr:add(0x0020)
-	instance.m_side_slip_mult                  = ptr:add(0x0024)
-	instance.m_initial_yaw_mult                = ptr:add(0x0028)
-	instance.m_roll_mult                       = ptr:add(0x002C)
-	instance.m_roll_stability_mult             = ptr:add(0x0030)
-	instance.m_initial_roll_mult               = ptr:add(0x0034)
-	instance.m_pitch_mult                      = ptr:add(0x0038)
-	instance.m_pitch_stability_mult            = ptr:add(0x003C)
-	instance.m_initial_pitch_mult              = ptr:add(0x0040)
-	instance.m_lift_mult                       = ptr:add(0x0044)
-	instance.m_unk_0048                        = ptr:add(0x0048)
-	instance.m_dive_mult                       = ptr:add(0x004C)
-	instance.m_gear_down_drag_mult             = ptr:add(0x0050)
-	instance.m_gear_down_lift_mult             = ptr:add(0x0054)
-	instance.m_wind_force_mult                 = ptr:add(0x0058)
-	instance.m_move_resistance                 = ptr:add(0x005C)
-	instance.m_turn_resistance                 = ptr:add(0x0060)
-	instance.m_speed_resistance                = ptr:add(0x0070)
-	instance.m_gear_door_front_state           = ptr:add(0x0080)
-	instance.m_gear_door_rl_state              = ptr:add(0x0084)
-	instance.m_gear_door_rr_state              = ptr:add(0x0088)
-	instance.m_gear_door_rm_state              = ptr:add(0x008C)
-	instance.m_turbulence_mag_max              = ptr:add(0x0090)
-	instance.m_turbulence_force_mult           = ptr:add(0x0094)
-	instance.m_turbulence_roll_torque_mult     = ptr:add(0x0098)
-	instance.m_turbulence_pitch_torque_mult    = ptr:add(0x009C)
-	instance.m_body_damage_control_effect_mult = ptr:add(0x00A0)
-	instance.m_unk_00A4                        = ptr:add(0x00A4)
-	instance.m_ground_yaw_speed_max            = ptr:add(0x00A8)
-	instance.m_ground_yaw_speed_cap            = ptr:add(0x00AC)
-	instance.m_glide_mult                      = ptr:add(0x00B0)
-	instance.m_afterburner_effect_radius       = ptr:add(0x00B4)
-	instance.m_afterburner_effect_dist         = ptr:add(0x00B8)
-	instance.m_afterburner_effect_force_mult   = ptr:add(0x00BC)
-	instance.m_submerge_level                  = ptr:add(0x00C0)
-	instance.m_unk_lift_00C4                   = ptr:add(0x00C4)
-
-	return instance
-end
+local CFlyingHandlingData = CStructView("CFlyingHandlingData", {
+	{ "m_thrust",                          0x0008 },
+	{ "m_thrust_falloff",                  0x000C },
+	{ "m_thrust_vectoring",                0x0010 },
+	{ "m_initial_thrust",                  0x0014 },
+	{ "m_initial_thrust_falloff",          0x0018 },
+	{ "m_yaw_mult",                        0x001C },
+	{ "m_yaw_stability_mult",              0x0020 },
+	{ "m_side_slip_mult",                  0x0024 },
+	{ "m_roll_mult",                       0x002C },
+	{ "m_roll_stability_mult",             0x0030 },
+	{ "m_initial_roll_mult",               0x0034 },
+	{ "m_pitch_mult",                      0x0038 },
+	{ "m_pitch_stability_mult",            0x003C },
+	{ "m_initial_pitch_mult",              0x0040 },
+	{ "m_lift_mult",                       0x0044 },
+	{ "m_unk_0048",                        0x0048 },
+	{ "m_dive_mult",                       0x004C },
+	{ "m_gear_down_drag_mult",             0x0050 },
+	{ "m_gear_down_lift_mult",             0x0054 },
+	{ "m_wind_force_mult",                 0x0058 },
+	{ "m_move_resistance",                 0x005C },
+	{ "m_turn_resistance",                 0x0060 },
+	{ "m_speed_resistance",                0x0070 },
+	{ "m_gear_door_front_state",           0x0080 },
+	{ "m_gear_door_rl_state",              0x0084 },
+	{ "m_gear_door_rr_state",              0x0088 },
+	{ "m_gear_door_rm_state",              0x008C },
+	{ "m_turbulence_mag_max",              0x0090 },
+	{ "m_turbulence_force_mult",           0x0094 },
+	{ "m_turbulence_roll_torque_mult",     0x0098 },
+	{ "m_body_damage_control_effect_mult", 0x00A0 },
+	{ "m_unk_00A4",                        0x00A4 },
+	{ "m_ground_yaw_speed_max",            0x00A8 },
+	{ "m_ground_yaw_speed_cap",            0x00AC },
+	{ "m_glide_mult",                      0x00B0 },
+	{ "m_afterburner_effect_radius",       0x00B4 },
+	{ "m_afterburner_effect_dist",         0x00B8 },
+	{ "m_afterburner_effect_force_mult",   0x00BC },
+	{ "m_submerge_level",                  0x00C0 },
+	{ "m_unk_lift_00C4",                   0x00C4 },
+}, 0x00C8)
 
 return CFlyingHandlingData

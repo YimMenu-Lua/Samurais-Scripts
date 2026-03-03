@@ -28,41 +28,48 @@ setmetatable(phFragInst, {
 ---@param ptr pointer
 ---@return phFragInst|nil
 function phFragInst.new(ptr)
-	if not ptr or ptr:is_null() then return end
+	if (not ptr or ptr:is_null()) then
+		return
+	end
 
 	local cache = ptr:add(0x68):deref()
-	if not cache or cache:is_null() then return end
+	if (not cache or cache:is_null()) then
+		return
+	end
 
 	local skel = cache:add(0x178):deref() -- CSkeleton*
-	if not skel or skel:is_null() then return end
+	if (not skel or skel:is_null()) then
+		return
+	end
 
-	local numBones = skel:add(0x20):get_int() or 0
-	local matricesPtr = skel:add(0x10):deref()
+	local numBones      = skel:add(0x20):get_int() or 0
+	local matricesPtr   = skel:add(0x10):deref()
 	local g_matricesPtr = skel:add(0x18):deref()
-	---@diagnostic disable-next-line: param-type-mismatch
-	local instance = setmetatable({}, phFragInst)
 
-	instance.m_ptr = ptr
-	instance.m_cache_entry = cache
-	instance.m_skeleton = skel
-	instance.m_num_bones = numBones or 0
-	instance.m_obj_matrices = matricesPtr
-	instance.m_global_matrices = g_matricesPtr
-
-	return instance
+	return setmetatable({
+		m_ptr             = ptr,
+		m_cache_entry     = cache,
+		m_skeleton        = skel,
+		m_num_bones       = numBones or 0,
+		m_obj_matrices    = matricesPtr,
+		m_global_matrices = g_matricesPtr,
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, phFragInst)
 end
 
+---@return pointer
 function phFragInst:GetMatrixPtr(bone_index)
-	if not self.m_obj_matrices or self.m_num_bones == 0 or bone_index < 0 then
-		return nil
+	if (not self.m_obj_matrices or self.m_num_bones == 0 or bone_index < 0) then
+		return nullptr
 	end
 
 	return self.m_obj_matrices:add(bone_index * SizeOf(fMatrix44))
 end
 
+---@return pointer
 function phFragInst:GetGlobalMatrixPtr(bone_index)
-	if not self.m_global_matrices or self.m_num_bones == 0 or bone_index < 0 then
-		return nil
+	if (not self.m_global_matrices or self.m_num_bones == 0 or bone_index < 0) then
+		return nullptr
 	end
 
 	return self.m_global_matrices:add(bone_index * SizeOf(fMatrix44))

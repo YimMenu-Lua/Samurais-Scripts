@@ -36,16 +36,15 @@ local CPed              = Class("CPed", CEntity, 0x161C)
 ---@param ped handle
 ---@return CPed
 function CPed:init(ped)
-	if (not ENTITY.DOES_ENTITY_EXIST(ped) or not ENTITY.IS_ENTITY_A_PED(ped)) then
+	if (not Game.IsScriptHandle(ped) or not ENTITY.IS_ENTITY_A_PED(ped)) then
 		error("Invalid entity!")
 	end
 
-	self:super().init(self, ped)
-	local ptr                   = memory.handle_to_ptr(ped)
+	---@diagnostic disable-next-line: param-type-mismatch
+	local instance = setmetatable({}, CPed)
+	instance:super().init(instance, ped)
 
-	---@type CPed
-	---@diagnostic disable-next-line
-	local instance              = setmetatable({}, CPed)
+	local ptr                   = memory.handle_to_ptr(ped)
 	instance.m_ptr              = ptr
 	instance.m_ped_intelligence = ptr:add(0x10A0)
 	instance.m_ped_inventory    = ptr:add(0x10B0)
