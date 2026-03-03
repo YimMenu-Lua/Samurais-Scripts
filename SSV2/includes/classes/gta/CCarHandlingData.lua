@@ -7,8 +7,10 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local CStructView = require("includes.classes.gta.CStructView")
+
 ---@class CCarHandlingData : CBaseSubHandlingData
----@field private m_ptr pointer
+---@field protected m_ptr pointer
 ---@field private m_size uint16_t
 ---@field public m_back_end_popup_car_impulse_mult pointer<float> -- 0x0008
 ---@field public m_back_end_popup_building_impulse_mult pointer<float> -- 0x000C
@@ -23,42 +25,21 @@
 ---@field public m_jumpforce_scale pointer<float> -- 0x0030
 ---@field public m_advanced_flags pointer<uint32_t> -- 0x003C
 ---@field public m_advanced_data atArray<CAdvancedData>   -- 0x0040
----@overload fun(addr: pointer): CCarHandlingData
-local CCarHandlingData = { m_size = 0x0048 }
-CCarHandlingData.__index = CCarHandlingData
-CCarHandlingData.__type = "CCarHandlingData"
----@diagnostic disable-next-line: param-type-mismatch
-setmetatable(CCarHandlingData, {
-	__call = function(cls, ...)
-		return cls.new(...)
-	end,
-})
-
----@param ptr pointer
----@return CCarHandlingData|nil
-function CCarHandlingData.new(ptr)
-	if (not ptr or ptr:is_null()) then
-		return
-	end
-
-	---@diagnostic disable-next-line: param-type-mismatch
-	local instance                                  = setmetatable({}, CCarHandlingData)
-	instance.m_ptr                                  = ptr
-	instance.m_back_end_popup_car_impulse_mult      = ptr:add(0x0008)
-	instance.m_back_end_popup_building_impulse_mult = ptr:add(0x000C)
-	instance.m_back_end_popup_max_delta_speed       = ptr:add(0x0010)
-	instance.m_toe_front                            = ptr:add(0x0014)
-	instance.m_toe_rear                             = ptr:add(0x0018)
-	instance.m_camber_front                         = ptr:add(0x001C)
-	instance.m_camber_rear                          = ptr:add(0x0020)
-	instance.m_castor                               = ptr:add(0x0024)
-	instance.m_engine_resistance                    = ptr:add(0x0028)
-	instance.m_max_drive_bias_transfer              = ptr:add(0x002C)
-	instance.m_jumpforce_scale                      = ptr:add(0x0030)
-	instance.m_advanced_flags                       = ptr:add(0x003C)
-	instance.m_advanced_data                        = atArray(ptr:add(0x0040))
-
-	return instance
-end
+---@overload fun(ptr: pointer): CCarHandlingData
+local CCarHandlingData = CStructView("CCarHandlingData", {
+	{ "m_back_end_popup_car_impulse_mult",      0x0008 },
+	{ "m_back_end_popup_building_impulse_mult", 0x000C },
+	{ "m_back_end_popup_max_delta_speed",       0x0010 },
+	{ "m_toe_front",                            0x0014 },
+	{ "m_toe_rear",                             0x0018 },
+	{ "m_camber_front",                         0x001C },
+	{ "m_camber_rear",                          0x0020 },
+	{ "m_castor",                               0x0024 },
+	{ "m_engine_resistance",                    0x0028 },
+	{ "m_max_drive_bias_transfer",              0x002C },
+	{ "m_jumpforce_scale",                      0x0030 },
+	{ "m_advanced_flags",                       0x003C },
+	{ "m_advanced_data",                        0x0040, atArray },
+}, 0x0048)
 
 return CCarHandlingData

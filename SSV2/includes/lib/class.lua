@@ -30,12 +30,13 @@
 ---@param size? integer Optional: sizeof class
 ---@return ClassMeta<T>
 function Class(name, base, size)
-	size = size or SizeOf(GenericClass)
+	local cls = {
+		m_size = size or GenericClass.m_size,
+		__name = name,
+		__type = name,
+	}
 
-	local cls = { m_size = size }
 	cls.__index = cls
-	cls.__name = name
-	cls.__type = name
 
 	-- optional inheritance
 	if (base) then
@@ -83,14 +84,37 @@ function Class(name, base, size)
 		}
 	)
 
+	---@generic T
+	---@param default any Defaul value to return on failure
+	---@param func fun(self: ClassMeta<T>, ...): ...
+	---@param ... any
+	---@return ...
+	function cls:__safecall(default, func, ...)
+		if (not self:IsValid()) then
+			return default
+		end
+
+		local results = { pcall(func, ...) }
+		local ok      = results[1]
+		local err     = results[2]
+
+		if (not ok) then
+			log.fwarning("Safecall failed in %s: %s", self.__type, err)
+			return default
+		end
+
+		table.remove(results, 1)
+		return table.unpack(results)
+	end
+
 	function cls:super()
 		return self.__base or self
 	end
 
-	---@param sub_ame string
+	---@param sub_name string
 	---@param sub_size? integer
-	function cls:extend(sub_ame, sub_size)
-		return Class(sub_ame, self, sub_size)
+	function cls:extend(sub_name, sub_size)
+		return Class(sub_name, self, sub_size)
 	end
 
 	---@param of any
@@ -105,7 +129,7 @@ function Class(name, base, size)
 		end
 	end
 
-	-- If ToastNotifier is available, calls `ToastNotifier:ShowMessage`. Otherwise logs to console.
+	-- If ToastNotifier is available, calls `Notifier:ShowMessage`. Otherwise logs to console.
 	function cls:notify(fmt, ...)
 		local msg = (... ~= nil) and string.format(fmt, ...) or fmt
 		local caller = name:gsub("_", " "):titlecase()
