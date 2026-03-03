@@ -383,6 +383,32 @@ end
 
 --#region Lua API
 
+---@param src string Filename with extenstion
+---@param dest string Filename with extenstion
+---@return boolean, any
+function io.copy(src, dest)
+	if (not io.exists(src)) then
+		log.warning("[File I/O]: Copy operation failed. Source file does not exist.")
+		return false, nil
+	end
+
+	local f1 <close> = io.open(src, "r")
+	local f2 <close> = io.open(dest, "w")
+	if (not f1 or not f2) then
+		return false, nil
+	end
+
+	local data = f1:read("a")
+	if (not data) then
+		return false, nil
+	end
+
+	f2:write(data)
+	f2:flush()
+
+	return true, data
+end
+
 -- Returns the stat with the appropriate character prefix.
 --
 -- For online stats, you can pass a stat starting with `MPX`, `MP0`, `MP1`, or `MP_STAT`
@@ -458,14 +484,14 @@ function memory.pointer:__eq(right)
 	return self:get_address() == right:get_address()
 end
 
----Casts the pointer to an object.
----
----**IMPORTANT:** You must only cast to objects that take a pointer parameter in their constructors.
----
----**Example Usage:**
----```lua
----print(memory.handle_to_ptr(self.get_ped()):add(0x10B8):as(CPedWeaponManager))
----```
+-- Casts the pointer to an object.
+--
+-- **IMPORTANT:** You must only cast to objects that take a pointer parameter in their constructors.
+--
+-- **Example Usage:**
+--```lua
+--print(memory.handle_to_ptr(self.get_ped()):add(0x10B8):as(CPedWeaponManager))
+--```
 ---@generic T
 ---@param obj T
 ---@return T

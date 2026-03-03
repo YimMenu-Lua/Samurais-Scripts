@@ -26,12 +26,6 @@ local eSerializerState <const> = {
 --------------------------------------
 -- Class: Serializer
 --------------------------------------
---[[**¤ Universal Config System For YimMenu-Lua ¤**
-
-  - Author: [SAMURAI (xesdoog)](https://github.com/xesdoog).
-
-  - Uses [JSON.lua package by Jeffrey Friedl](http://regex.info/blog/lua/json).
-]]
 ---@class Serializer : ClassMeta<Serializer>
 ---@field protected m_initialized boolean
 ---@field protected __schema_hash joaat_t
@@ -56,7 +50,7 @@ Serializer.json = require("includes.thirdparty.json.json")()
 Serializer.default_xor_key =
 "\xA3\x4F\xD2\x9B\x7E\xC1\xE8\x36\x5D\x0A\xF7\xB4\x6C\x2D\x89\x50\x1E\x73\xC9\xAF\x3B\x92\x58\xE0\x14\x7D\xA6\xCB\x81\x3F\xD5\x67"
 Serializer.b64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-Serializer.__version = "1.0.0"
+Serializer.__version = "1.0.5"
 Serializer.__credits = [[
 	  +----------------------------------------------------------------------------------------+
 	  |                                                                                        |
@@ -291,45 +285,12 @@ function Serializer:GetTimeSinceLastFlush()
 end
 
 function Serializer:SaveBackup()
-	if (not io.exists(self.m_file_name)) then
-		return
-	end
-
-	local f1 <close> = io.open(self.m_file_name, "r")
-	local f2 <close> = io.open(self.m_backup_file, "w")
-	if (not f1 or not f2) then
-		return
-	end
-
-	local data = f1:read("a")
-	if (not data) then
-		return
-	end
-
-	f2:write(data)
-	f2:flush()
+	io.copy(self.m_file_name, self.m_backup_file)
 end
 
 ---@return boolean, any
 function Serializer:RecoverBackup()
-	if (not io.exists(self.m_backup_file)) then
-		return false, nil
-	end
-
-	local f1 <close> = io.open(self.m_backup_file, "r")
-	local f2 <close> = io.open(self.m_file_name, "w")
-	if (not f1 or not f2) then
-		return false, nil
-	end
-
-	local data = f1:read("a")
-	if (not data) then
-		return false, nil
-	end
-
-	f2:write(data)
-	f2:flush()
-	return true, data
+	return io.copy(self.m_backup_file, self.m_file_name)
 end
 
 -- Waits for idle state before mutating the config table.
