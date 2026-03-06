@@ -186,16 +186,23 @@ setmetatable(Timer, {
 
 -- Creates a new timer that runs for `duration` milliseconds.
 ---@param duration milliseconds
+---@param startPaused? boolean
 ---@return Timer
-function Timer.new(duration)
+function Timer.new(duration, startPaused)
 	assert(type(duration) == "number" and duration > 0, "Timer duration must be a number >= 0 (milliseconds).")
-	return setmetatable({
+	local instance = setmetatable({
 		m_duration   = math.max(0, duration or 0),
 		m_start_time = Time.Millis(),
 		m_pause_time = nil,
 		m_is_paused  = false,
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, Timer)
+
+	if (startPaused) then
+		instance:Pause()
+	end
+
+	return instance
 end
 
 ---@return boolean
@@ -225,14 +232,16 @@ function Timer:Remaining()
 end
 
 function Timer:Pause()
-	if not self.m_is_paused then
-		self.m_is_paused  = true
-		self.m_pause_time = Time.Millis()
+	if (self.m_is_paused) then
+		return
 	end
+
+	self.m_is_paused  = true
+	self.m_pause_time = Time.Millis()
 end
 
 function Timer:Resume()
-	if not self.m_is_paused then
+	if (not self.m_is_paused) then
 		return
 	end
 
@@ -249,6 +258,12 @@ function Timer:Reset(new_duration)
 	self.m_start_time = Time.Millis()
 	self.m_is_paused  = false
 	self.m_pause_time = nil
+end
+
+-- Resets and pauses the timer
+function Timer:Freeze()
+	self:Reset()
+	self:Pause()
 end
 
 --------------------------------------

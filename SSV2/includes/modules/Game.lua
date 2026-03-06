@@ -1039,8 +1039,9 @@ function Game.GetClosestVehicle(closeTo, range, excludeEntity, nonPlayerVehicle,
 		return 0
 	end
 
-	local dist = range * range
-	local out  = 0
+	local dist        = range * range
+	local closestVeh  = 0
+	local closestDist = dist
 	for _, veh in ipairs(entities.get_all_vehicles_as_handles()) do
 		if (excludeEntity and veh == excludeEntity) then
 			goto continue
@@ -1051,11 +1052,7 @@ function Game.GetClosestVehicle(closeTo, range, excludeEntity, nonPlayerVehicle,
 			goto continue
 		end
 
-		local vehPos = Game.GetEntityCoords(veh, true)
-		---@diagnostic disable-next-line
-		local distance = area:distance(vehPos)
-
-		if (distance > dist or math.floor(VEHICLE.GET_VEHICLE_BODY_HEALTH(veh)) <= 0) then
+		if (VEHICLE.GET_VEHICLE_BODY_HEALTH(veh) <= 0) then
 			goto continue
 		end
 
@@ -1063,12 +1060,22 @@ function Game.GetClosestVehicle(closeTo, range, excludeEntity, nonPlayerVehicle,
 			goto continue
 		end
 
-		out = veh
+		local vehPos = Game.GetEntityCoords(veh, true)
+		---@diagnostic disable-next-line
+		local distance = area:distance(vehPos)
+		if (distance <= closestDist) then
+			closestVeh  = veh
+			closestDist = distance
+
+			if (distance < 2.0) then
+				return veh
+			end
+		end
 
 		::continue::
 	end
 
-	return out
+	return closestVeh
 end
 
 -- Returns a handle for the closest human ped to a provided entity or coordinates.
@@ -1082,18 +1089,11 @@ function Game.GetClosestPed(closeTo, range, aliveOnly)
 		return 0
 	end
 
-	local dist = range * range
-	local out  = 0
+	local dist        = range * range
+	local closestPed  = 0
+	local closestDist = dist
 	for _, ped in ipairs(entities.get_all_peds_as_handles()) do
 		if (not PED.IS_PED_HUMAN(ped) or ped == LocalPlayer:GetHandle()) then
-			goto continue
-		end
-
-		local pedPos = Game.GetEntityCoords(ped, true)
-		---@diagnostic disable-next-line
-		local distance = area:distance(pedPos)
-
-		if (distance > dist) then
 			goto continue
 		end
 
@@ -1101,12 +1101,22 @@ function Game.GetClosestPed(closeTo, range, aliveOnly)
 			goto continue
 		end
 
-		out = ped
+		local pedPos = Game.GetEntityCoords(ped, true)
+		---@diagnostic disable-next-line
+		local distance = area:distance(pedPos)
+		if (distance <= closestDist) then
+			closestPed  = ped
+			closestDist = distance
+
+			if (distance < 2.0) then
+				return ped
+			end
+		end
 
 		::continue::
 	end
 
-	return out
+	return closestPed
 end
 
 -- Temporary workaround to fix auto-pilot's "fly to objective" option.
