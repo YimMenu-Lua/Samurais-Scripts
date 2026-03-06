@@ -37,7 +37,7 @@ local CAttackers = GenericClass
 ---@field m_max_health pointer<float> -- 0x0284
 ---@field m_attackers pointer<CAttackers> -- 0x0288
 ---@overload fun(entity: handle): CEntity
-local CEntity = Class("CEntity", nil, 0x290)
+local CEntity = Class("CEntity", { symbolic_size = 0x28C, pointer_ctor = true })
 
 ---@param entity handle
 ---@return CEntity

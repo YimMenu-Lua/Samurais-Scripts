@@ -10,6 +10,10 @@
 local CStructView = require("includes.classes.gta.CStructView")
 local CWeaponInfo = require("includes.classes.gta.CWeaponInfo")
 
+
+--------------------------------------
+-- Class: CPedWeaponManager
+--------------------------------------
 ---@class CPedWeaponManager : CStructBase<CPedWeaponManager>
 ---@field protected m_ptr pointer
 ---@field public m_owner pointer<CPed>
@@ -22,6 +26,6 @@ local CPedWeaponManager = CStructView("CPedWeaponManager", {
 	{ "m_selected_weapon_hash", 0x0018 },
 	{ "m_weapon_info",          0x0020,             CWeaponInfo },
 	{ "m_vehicle_weapon_info",  0x0070,             CWeaponInfo },
-})
+}, 0x0078)
 
 return CPedWeaponManager

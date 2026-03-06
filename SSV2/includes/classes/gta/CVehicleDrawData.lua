@@ -11,6 +11,9 @@ local CStructView = require("includes.classes.gta.CStructView")
 local fwDrawData  = require("includes.classes.gta.fwDrawData")
 
 
+--------------------------------------
+-- Class: CWheelDrawData
+--------------------------------------
 ---@class CWheelDrawData : CStructBase<CWheelDrawData>
 ---@field m_ptr pointer
 ---@field m_wheel_size pointer<float> // 0x008 -- this seems to hold a float value equal to `CWheel.m_tire_radius * 2` and affects all 4 wheels
@@ -18,12 +21,16 @@ local fwDrawData  = require("includes.classes.gta.fwDrawData")
 local CWheelDrawData = CStructView("CWheelDrawData", {
 	{ "m_wheel_size",  0x008 },
 	{ "m_wheel_width", 0xBA0 },
-})
+}, 0xBA4)
 
+
+--------------------------------------
+-- Class: CVehicleDrawData
+--------------------------------------
 ---@class CVehicleDrawData : fwDrawData
 ---@field m_wheel_draw_data CWheelDrawData
 ---@overload fun(ptr: pointer): CVehicleDrawData
-local CVehicleDrawData = Class("CVehicleDrawData", fwDrawData)
+local CVehicleDrawData = Class("CVehicleDrawData", { parent = fwDrawData, pointer_ctor = true })
 
 ---@param ptr pointer
 ---@return CVehicleDrawData

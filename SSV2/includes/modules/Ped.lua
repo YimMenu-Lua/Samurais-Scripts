@@ -22,7 +22,7 @@ require "includes.modules.Entity"
 ---@field Resolve fun() : CPed
 ---@field Create fun(_, modelHash: hash, entityType: eEntityType, pos?: vec3, heading?: number, isNetwork?: boolean, isScriptHostPed?: boolean): Ped
 ---@overload fun(handle: handle): Ped
-Ped = Class("Ped", Entity)
+Ped = Class("Ped", { parent = Entity })
 
 ---@return boolean
 function Ped:IsValid()

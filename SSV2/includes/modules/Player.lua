@@ -20,7 +20,7 @@
 ---@field private m_pid integer PlayerID
 ---@field Resolve fun() : CPed
 ---@overload fun(pid: integer): Player
-Player = Class("Player", Ped)
+Player = Class("Player", { parent = Ped })
 Player.Create = nil
 Player.Delete = nil
 Player.SetAsNoLongerNeeded = nil
@@ -32,11 +32,10 @@ function Player.new(player_id)
 	assert(math.is_inrange(player_id, 0, 32), "Invalid player ID")
 
 	local ped_handle = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-	---@type Player
-	---@diagnostic disable-next-line: assign-type-mismatch
 	local instance = setmetatable({
-		m_pid = player_id,
+		m_pid    = player_id,
 		m_handle = ped_handle,
+		---@diagnostic disable-next-line: param-type-mismatch
 	}, Player)
 
 	instance.m_internal = instance:Resolve()

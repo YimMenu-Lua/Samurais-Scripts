@@ -18,7 +18,7 @@ local CVehicle = require("includes.classes.gta.CVehicle")
 ---@class Entity : ClassMeta<Entity>
 ---@field private m_handle handle
 ---@field private m_modelhash joaat_t
----@field private m_ptr pointer
+---@field protected m_ptr pointer
 ---@field private m_internal? CEntity
 ---@overload fun(handle: integer): Entity?
 Entity = Class("Entity")

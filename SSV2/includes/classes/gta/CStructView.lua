@@ -1,13 +1,24 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
 ---@generic T
+---@generic R1, R2, R3, R4, R5
 ---@class CStructBase<T>
 ---@field protected m_ptr pointer
 ---@field private m_size integer
 ---@field private __type string
----@field private __safecall fun(self: T, default: any, func: fun(...): ...): ...
----@field new fun(...): T
----@field IsValid fun(self: T): boolean
----@field GetPointer fun(self: T): pointer
----@field GetAddress fun(self: T): uint64_t
+---@field private __ptr_ctor true
+---@field public new fun(...): T
+---@field public IsValid fun(self: T): boolean
+---@field public GetPointer fun(self: T): pointer
+---@field public GetAddress fun(self: T): uint64_t
+---@field __safecall fun(self: T, default: any, func: fun(...): R1, R2?, R3?, R4?, R5?, ...?): R1, R2?, R3?, R4?, R5?, ...?
 
 ---@alias ptrstep integer|"deref"
 ---@alias ptrfunc fun(base: pointer): anyval
@@ -45,8 +56,9 @@
 ---@return CStructBase<T>
 local function CStructView(name, layout, size, is_ref_ptr)
 	local cls = {
-		m_size = size or GenericClass.m_size,
-		__type = name
+		m_size     = size or GenericClass.m_size,
+		__type     = name,
+		__ptr_ctor = true
 	}
 
 	cls.__index = cls
@@ -83,10 +95,10 @@ local function CStructView(name, layout, size, is_ref_ptr)
 			end
 
 			if (wrapper) then
-				instance[fieldname] = wrapper(current)
-			else
-				instance[fieldname] = current
+				current = current:as(wrapper)
 			end
+
+			instance[fieldname] = current
 		end
 
 		return instance
@@ -113,10 +125,12 @@ local function CStructView(name, layout, size, is_ref_ptr)
 		return self.m_ptr and self.m_ptr:get_address() or 0x0
 	end
 
+	---@private
+	---@generic R1, R2, R3, R4, R5
 	---@param default any Defaul value to return on failure
-	---@param func fun(...): ...
+	---@param func fun(...): R1, R2?, R3?, R4?, R5?, ... ?
 	---@param ... any
-	---@return ...
+	---@return R1, R2?, R3?, R4?, R5?, ... ?
 	function cls:__safecall(default, func, ...)
 		if (not self:IsValid()) then
 			return default

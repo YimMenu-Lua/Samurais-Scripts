@@ -9,6 +9,10 @@
 
 local CStructView = require("includes.classes.gta.CStructView")
 
+
+--------------------------------------
+-- Class: CFiringPatternAlias
+--------------------------------------
 ---@class CFiringPatternAlias
 ---@field protected m_ptr pointer
 ---@field m_firing_pattern_hash pointer<joaat_t> // 0x0
@@ -17,6 +21,6 @@ local CStructView = require("includes.classes.gta.CStructView")
 local CFiringPatternAlias = CStructView("CFiringPatternAlias", {
 	{ "m_firing_pattern_hash", 0x0 },
 	{ "m_alias_hash",          0x4 },
-})
+}, 0x8)
 
 return CFiringPatternAlias

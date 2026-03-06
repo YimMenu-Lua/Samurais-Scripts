@@ -34,7 +34,7 @@ newThemeBuff.Name   = ""
 
 local function onConfigReset()
 	for _, v in pairs(cfgReset.excToggles) do
-		v.clicked = false
+		v.clicked  = false
 		v.selected = false
 	end
 	cfgReset.open = false

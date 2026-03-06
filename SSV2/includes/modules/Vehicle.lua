@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local fMatrix44 = require("includes.classes.gta.fMatrix44")
 require("includes.modules.Entity")
 
 ---@enum eConvertibleRoofState
@@ -52,7 +53,7 @@ local towTruckModels <const> = Set.new(
 ---@field Resolve fun() : CVehicle
 ---@field Create fun(_, modelHash: joaat_t, entityType: eEntityType, pos?: vec3, heading?: number, isNetwork?: boolean, isScriptHostPed?: boolean): Vehicle
 ---@overload fun(handle: handle): Vehicle
-Vehicle = Class("Vehicle", Entity)
+Vehicle = Class("Vehicle", { parent = Entity })
 
 ---@return boolean
 function Vehicle:IsValid()

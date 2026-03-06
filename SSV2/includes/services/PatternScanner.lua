@@ -8,73 +8,79 @@
 
 
 --------------------------------------
--- Class: Pointer
+-- Class: Pattern
 --------------------------------------
--- Represents a single memory pattern pointer. Used internally by `PatternScanner` to hold the scan pattern, result address, and name.
+-- Represents a scannable memory pattern.
+--
+-- Used internally by `PatternScanner` to hold the scan pattern, result address, callback, and name.
+--
 -- > [!Note]
+--
 -- > This is just an intermediate object. There is no use for it outside of `PatternScanner`.
 ---@generic T
----@class Pointer<T> @internal
+---@class Pattern<T>
 ---@field private m_name string
----@field private m_address integer
----@field private m_ptr pointer YimMenu API usertype
----@field private m_pattern string
+---@field private m_address uint64_t
+---@field protected m_ptr pointer
+---@field private m_sig string
 ---@field private m_func fun(ptr: pointer): any
----@overload fun(name: string, pattern: string, func: fun(ptr: pointer): any): Pointer
-local Pointer = {}
-Pointer.__index = Pointer
+---@overload fun(name: string, ida_sig: string, func: fun(ptr: pointer): any): Pattern
+local Pattern = { __type = "Pattern" }
+Pattern.__index = Pattern
 ---@diagnostic disable-next-line
-setmetatable(Pointer, {
+setmetatable(Pattern, {
 	__call = function(cls, ...)
-		return cls:new(...)
+		return cls.new(...)
 	end,
 })
 
-function Pointer:__tostring()
-	return _F("Pointer<%s @ 0x%X>", self.m_name, self.m_address)
+function Pattern:__tostring()
+	return _F("Pattern<%s> @ 0x%X", self.m_name, self.m_address)
 end
 
--- Creates a new unresolved `Pointer`.
 ---@param name string
----@param pattern string
+---@param ida_sig string
 ---@param func fun(ptr: pointer)
----@return Pointer
-function Pointer:new(name, pattern, func)
-	---@diagnostic disable-next-line
-	local instance = setmetatable({}, Pointer)
-
-	instance.m_name = name
-	instance.m_pattern = pattern
-	instance.m_func = func
-	instance.m_address = 0x0
-
-	return instance
+---@return Pattern
+function Pattern.new(name, ida_sig, func)
+	return setmetatable({
+		m_name    = name,
+		m_sig     = ida_sig,
+		m_ptr     = nullptr,
+		m_address = 0x0,
+		m_func    = func
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, Pattern)
 end
 
 -- Scans memory for this pointer's pattern and resolves its address.
 --
 -- Logs a debug message if successful.
 ---@return boolean
-function Pointer:Scan()
-	self.m_ptr = memory.scan_pattern(self.m_pattern)
+function Pattern:Scan()
+	self.m_ptr     = memory.scan_pattern(self.m_sig)
 	self.m_address = self.m_ptr:get_address()
 
 	if (self.m_ptr:is_null()) then
 		log.fwarning("[PatternScanner]: Failed to find pattern: %s", self.m_name)
+		return false
 	end
 
 	log.fdebug("[PatternScanner]: Found %s at 0x%X", self.m_name, self.m_address)
 
-	local ok, result = pcall(self.m_func, self.m_ptr)
-	if (not ok) then
-		log.fwarning("[PatternScanner]: Resolver failed for %s: %s", self.m_name, result)
-		return false
+	if (type(self.m_func) == "function") then
+		local ok, result = pcall(self.m_func, self.m_ptr)
+		if (not ok) then
+			log.fwarning("[PatternScanner]: Resolver failed for %s: %s", self.m_name, result)
+			return false
+		end
 	end
 
 	return self.m_ptr:is_valid()
 end
 
-function Pointer:GetAddress()
+---@return uint64_t
+function Pattern:GetAddress()
 	return self.m_address
 end
 
@@ -88,52 +94,50 @@ local eScannerState = {
 --------------------------------------
 -- Class: PatternScanner
 --------------------------------------
--- A simple manager for storing and lazy scanning multiple memory patterns.
+-- A singleton manager for storing and lazy scanning multiple memory patterns.
 ---@class PatternScanner : ClassMeta<PatternScanner>
----@field private m_pointers dict<Pointer>
----@field private m_failed_pointers array<Pointer>
+---@field private m_patterns dict<Pattern>
+---@field private m_failed_patterns array<Pattern>
 ---@field private m_state eScannerState
----@overload fun(_: any): PatternScanner
+---@field protected m_initialized boolean
+---@overload fun(): PatternScanner
 local PatternScanner = Class("PatternScanner")
 
--- Initializes a new `PatternScanner` instance.
 ---@return PatternScanner
 function PatternScanner:init()
-	return setmetatable(
-		{
-			m_pointers = {},
-			m_failed_pointers = {},
-			m_state = eScannerState.NONE
-		},
-		---@diagnostic disable-next-line
-		PatternScanner
-	)
-end
-
--- Registers a new pointer to be scanned later. If a pointer with the same name already exists, the new name will be concatenated with four random characters.
----@generic T -- Type inference.
----@param name string -- Unique name for the pointer
----@param pattern string -- AOB pattern string to scan for (IDA-style)
----@param func fun(ptr: pointer) -- Resolver called with the found pointer.
-function PatternScanner:Add(name, pattern, func)
-	if self.m_pointers[name] then
-		name = name .. string.random(4)
-		log.fwarning("[PatternScanner]: A pointer with the same name already exists. Renamed this one to %s", name)
+	if (self.m_initialized) then
+		log.warning("Attempt to create a second instance of a singleton (PatternScanner)")
+		return self
 	end
 
-	local ptr = Pointer(name, pattern, func)
-	self.m_pointers[name] = ptr
+	self.m_patterns        = {}
+	self.m_failed_patterns = {}
+	self.m_state           = eScannerState.NONE
+	self.m_initialized     = true
+	return self
 end
 
--- Retrieves a previously registered `Pointer` by name.
----@return Pointer -- Our custom `Pointer` object, not the default API usertype.
-function PatternScanner:Get(name)
-	return self.m_pointers[name]
-end
-
--- Scans for all registered pointers asynchronously in a fiber.
+-- Registers a new pattern to be scanned later.
 --
--- Each pointer's pattern is scanned and resolved individually.
+-- If a pattern with the same name already exists, the new name will be concatenated with four random characters.
+---@param name string -- Unique name
+---@param sig string -- IDA signature
+---@param func fun(ptr: pointer) -- Resolver called with the found pointer.
+function PatternScanner:Add(name, sig, func)
+	if (self.m_patterns[name]) then
+		name = name .. string.random(4)
+		log.fwarning("[PatternScanner]: A pattern with the same name already exists. Renamed current to '%s'", name)
+	end
+
+	self.m_patterns[name] = Pattern(name, sig, func)
+end
+
+---@return Pattern?
+function PatternScanner:Get(name)
+	return self.m_patterns[name]
+end
+
+-- Scans all registered patterns asynchronously in a fiber.
 --
 -- Should be called on script init.
 function PatternScanner:Scan()
@@ -142,22 +146,28 @@ function PatternScanner:Scan()
 		return
 	end
 
-	ThreadManager:Run(function()
-		self.m_state = eScannerState.BUSY
+	-- Scanning in a fiber improves perceived load time
+	-- but delays pointer availability during script initialization.
+	-- Since we only scan a small number of patterns,
+	-- we currently run synchronously to guarantee immediate access.
+	-- The fiber call can be reintroduced if scan count grows.
 
-		for _, ptr in pairs(self.m_pointers) do
-			if not ptr:Scan() then
-				table.insert(self.m_failed_pointers, ptr)
-			end
+	-- ThreadManager:Run(function()
+	self.m_state = eScannerState.BUSY
 
-			yield()
+	for _, ptr in pairs(self.m_patterns) do
+		if (not ptr:Scan()) then
+			table.insert(self.m_failed_patterns, ptr)
 		end
 
-		self.m_state = eScannerState.DONE
-	end)
+		-- yield()
+	end
+
+	self.m_state = eScannerState.DONE
+	-- end)
 end
 
--- Retries failed pointer scans (if any) asynchronously in a fiber.
+-- Retries failed pattern scans (if any) asynchronously in a fiber.
 --
 -- Manually called.
 function PatternScanner:RetryScan()
@@ -166,7 +176,7 @@ function PatternScanner:RetryScan()
 		return
 	end
 
-	local sizeof_failed = #self.m_failed_pointers
+	local sizeof_failed = #self.m_failed_patterns
 	if (sizeof_failed == 0) then
 		log.debug("[PatternScanner] No failed pointers to rescan.")
 		return
@@ -177,36 +187,39 @@ function PatternScanner:RetryScan()
 		self.m_state = eScannerState.BUSY
 
 		for i = sizeof_failed, 1, -1 do
-			local ptr = self.m_failed_pointers[i]
+			local ptr = self.m_failed_patterns[i]
 
-			if ptr:Scan() then
-				table.remove(self.m_failed_pointers, i)
+			if (ptr:Scan()) then
+				table.remove(self.m_failed_patterns, i)
 				success = success + 1
 			end
 
 			yield()
 		end
 
-		log.fdebug("[PatternScanner] Recovered %d/%d failed pointer(s)", success, sizeof_failed)
+		log.fdebug("[PatternScanner] Recovered %d/%d failed pattern(s)", success, sizeof_failed)
 		self.m_state = eScannerState.DONE
 	end)
 end
 
--- Returns whether all deferred scans are complete.
+---@return eScannerState
+function PatternScanner:GetState()
+	return self.m_state
+end
+
 ---@return boolean
 function PatternScanner:IsDone()
 	return self.m_state == eScannerState.DONE
 end
 
--- Returns whether a pattern scan is in-progress.
 ---@return boolean
 function PatternScanner:IsBusy()
 	return self.m_state == eScannerState.BUSY
 end
 
----@return dict<Pointer>, array<Pointer>
+---@return dict<Pattern>, array<Pattern>
 function PatternScanner:ListPointers()
-	return self.m_pointers, self.m_failed_pointers
+	return self.m_patterns, self.m_failed_patterns
 end
 
-return PatternScanner
+return PatternScanner()

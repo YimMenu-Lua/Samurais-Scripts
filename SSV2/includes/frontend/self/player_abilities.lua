@@ -6,7 +6,7 @@
 --	* Credit the owner and contributors.
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
-
+local charName       = ""
 local PStats <const> = {
 	{ label = "SELF_ABILITY_STAM",          stat_1 = "MPX_STAMINA",             stat_2 = "MPX_SCRIPT_INCREASE_STAM", incr_val = 1,   func = stats.get_int },
 	{ label = "SELF_ABILITY_SHOOTING",      stat_1 = "MPX_SHOOTING_ABILITY",    stat_2 = "MPX_SCRIPT_INCREASE_SHO",  incr_val = 1,   func = stats.get_int },
@@ -58,8 +58,11 @@ local function DrawAblityControls(label, read_func, read_stat, incr_stat, incr_v
 end
 
 return function()
+	ThreadManager:Run(function()
+		charName = LocalPlayer:GetName()
+	end)
+
 	ImGui.SetWindowFontScale(1.17)
-	local charName      = LocalPlayer:GetName()
 	local charNameWidth = ImGui.CalcTextSize(charName)
 	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetContentRegionAvail() - charNameWidth) * 0.5)
 	ImGui.Text(charName)

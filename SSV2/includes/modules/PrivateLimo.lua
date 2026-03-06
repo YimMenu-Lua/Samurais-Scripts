@@ -10,6 +10,7 @@
 require("includes.modules.Vehicle")
 local t_CustomPaints = require("includes.data.custom_paints")
 
+
 -----------------------------------------------------
 -- Private Limo Struct
 -----------------------------------------------------
@@ -26,18 +27,18 @@ local t_CustomPaints = require("includes.data.custom_paints")
 ---@field limoClone integer
 ---@field lastTaskCoords vec3
 ---@field lastCheckTime integer
-local PrivateLimo = Class("PrivateLimo", Vehicle)
+local PrivateLimo              = Class("PrivateLimo", { parent = Vehicle })
 PrivateLimo.isRemoteControlled = false
-PrivateLimo.wasDismissed = false
-PrivateLimo.playerSeat = nil
-PrivateLimo.driverModel = 0xE75B4B1C
+PrivateLimo.wasDismissed       = false
+PrivateLimo.playerSeat         = nil
+PrivateLimo.driverModel        = 0xE75B4B1C
 PrivateLimo.currentDrivingMode = 1
-PrivateLimo.task = Enums.eVehicleTask.NONE or -1
-PrivateLimo.radio = {
+PrivateLimo.task               = Enums.eVehicleTask.NONE or -1
+PrivateLimo.radio              = {
 	isOn = false,
 	stationName = "OFF"
 }
-PrivateLimo.drivingModes = {
+PrivateLimo.drivingModes       = {
 	{ drivingFlags = 786603,  speed = 19 }, -- chill
 	{ drivingFlags = 2886204, speed = 60 } -- aggressive
 }
@@ -48,19 +49,19 @@ PrivateLimo.drivingModes = {
 function PrivateLimo.new(t_Data, vehicleHandle, driverHandle)
 	return setmetatable(
 		{
-			limoData = t_Data,
-			m_handle = vehicleHandle,
-			m_modelhash = t_Data.model,
-			name = Vehicle(vehicleHandle):GetName() or "Private Limousine",
-			driver = driverHandle,
-			driverName = BillionaireServices:GetRandomPedName(Enums.ePedGender.MALE),
-			lastCheckTime = Time.Now() + 3,
+			limoData           = t_Data,
+			m_handle           = vehicleHandle,
+			m_modelhash        = t_Data.model,
+			name               = Vehicle(vehicleHandle):GetName() or "Private Limousine",
+			driver             = driverHandle,
+			driverName         = BillionaireServices:GetRandomPedName(Enums.ePedGender.MALE),
+			lastCheckTime      = Time.Now() + 3,
 			currentDrivingMode = 1,
-			wasDismissed = false,
+			wasDismissed       = false,
 			isRemoteControlled = false,
-			task = Enums.eVehicleTask.NONE,
-			isReady = false,
-			radio = {
+			task               = Enums.eVehicleTask.NONE,
+			isReady            = false,
+			radio              = {
 				isOn = false,
 				stationName = "OFF"
 			}

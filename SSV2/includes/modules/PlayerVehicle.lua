@@ -57,7 +57,7 @@ local Stancer          = require("includes.features.vehicle.stancer")
 ---@field public m_is_flatbed boolean cache it so we don't have to call natives in UI threads
 ---@field public m_stance_mgr Stancer
 ---@overload fun(handle: handle): PlayerVehicle
-local PlayerVehicle = Class("PlayerVehicle", Vehicle)
+local PlayerVehicle = Class("PlayerVehicle", { parent = Vehicle })
 
 PlayerVehicle.mines = {
 	Pair.new("Spikes", -647126932),
@@ -184,7 +184,6 @@ function PlayerVehicle:Set(handle)
 	end
 
 	local new_model                     = ENTITY.GET_ENTITY_MODEL(handle)
-
 	self.m_default_max_speed            = VEHICLE.GET_VEHICLE_MODEL_ESTIMATED_MAX_SPEED(new_model)
 	self.m_last_model                   = new_model
 	self.m_handle                       = handle
@@ -277,15 +276,17 @@ function PlayerVehicle:AddGenericToggleable(name, onEnable, onDisable, args)
 	args = args or {}
 	if (type(onEnable) == "function") then
 		ThreadManager:Run(function()
-			onEnable()
+			local toggled = xpcall(onEnable, function(err)
+				log.fwarning("Failed to enable generic toggleable '%s': %s", name, err)
+			end)
+
+			self.m_generic_toggleables[name] = {
+				is_toggled = toggled,
+				onDisable  = onDisable,
+				args       = args
+			}
 		end)
 	end
-
-	self.m_generic_toggleables[name] = {
-		is_toggled = true,
-		onDisable = onDisable,
-		args = args
-	}
 end
 
 ---@param name string
@@ -308,10 +309,10 @@ function PlayerVehicle:ResetAllGenericToggleables()
 
 	for _, generic in pairs(self.m_generic_toggleables) do
 		local toggled = generic.is_toggled
-		local func = generic.onDisable
-		local args = generic.args
-		if (toggled and type(generic.onDisable) == "function" and self:IsValid()) then
-			---@diagnostic disable-next-line
+		local func    = generic.onDisable or NOP
+		local args    = generic.args or {}
+
+		if (toggled and self:IsValid()) then
 			func(table.unpack(args))
 		end
 	end
@@ -357,7 +358,7 @@ function PlayerVehicle:IsDrifting()
 		return false
 	end
 
-	local handle = self:GetHandle()
+	local handle  = self:GetHandle()
 	local lateral = math.abs(self:GetSpeedVector().x)
 	if (lateral == 0) then
 		return false

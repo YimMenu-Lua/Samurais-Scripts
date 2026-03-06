@@ -7,6 +7,17 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local INT_SIZES <const> = {
+	int8_t   = 0x1,
+	int16_t  = 0x2,
+	int32_t  = 0x4,
+	int64_t  = 0x8,
+	uint8_t  = 0x1,
+	uint16_t = 0x2,
+	uint32_t = 0x4,
+	uint64_t = 0x8,
+}
+
 -- Minimal JS-like enum class with metamethods.
 --
 -- **[NOTE]**: If you care about performance, or don't care about constants, consider using a simple table instead
@@ -156,9 +167,7 @@ function Enum(t, data_type)
 
 	function meta:__sizeof()
 		local ext_sizes = { byte = 0x1, float = 0x4, joaat_t = 0x4 }
-		return ext_sizes[data_type]
-			or (INT_SIZES and INT_SIZES[data_type])
-			or math.sizeof(proxy:First())
+		return ext_sizes[data_type] or INT_SIZES[data_type]
 	end
 
 	return proxy

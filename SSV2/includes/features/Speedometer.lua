@@ -8,42 +8,43 @@
 
 
 local UnitCases = {
-	[0] = 1,
-	[1] = 3.6,
+	[0]     = 1,
+	[1]     = 3.6,
 	default = 2.236936
 }
 
+
 ---@class Speedometer
-local Speedometer = {}
-Speedometer.__index = Speedometer
-Speedometer.cached_ticks = nil
-Speedometer.cached_unit_sizes = {}
+local Speedometer              = {}
+Speedometer.__index            = Speedometer
+Speedometer.cached_ticks       = nil
+Speedometer.cached_unit_sizes  = {}
 Speedometer.last_max_fractions = nil
-Speedometer.last_max_value = nil
-Speedometer.tick_marks = 10
-Speedometer.line_thickness = 3.0
-Speedometer.font_scale = 1.0
-Speedometer._state = {
-	should_draw = false,
-	speed_modifier = 1,
-	PV = nil,
-	IsEngineOn = false,
-	HasABS = false,
-	IsABSEngaged = false,
-	IsESCEngaged = false,
-	IsNOSActive = false,
-	IsAircraft = false,
-	IsSports = false,
+Speedometer.last_max_value     = nil
+Speedometer.tick_marks         = 10
+Speedometer.line_thickness     = 3.0
+Speedometer.font_scale         = 1.0
+Speedometer._state             = {
+	should_draw      = false,
+	speed_modifier   = 1,
+	PV               = nil,
+	IsEngineOn       = false,
+	HasABS           = false,
+	IsABSEngaged     = false,
+	IsESCEngaged     = false,
+	IsNOSActive      = false,
+	IsAircraft       = false,
+	IsSports         = false,
 	IsShootingFlares = false,
-	Manufacturer = "",
-	NOSDangerRatio = 0.0,
-	CurrentSpeed = 0,
-	CurrentAltitude = 0,
-	MaxSpeed = 0,
-	Throttle = 0,
-	RPM = 0,
-	Gear = 0,
-	EngineHealth = 0,
+	Manufacturer     = "",
+	NOSDangerRatio   = 0.0,
+	CurrentSpeed     = 0,
+	CurrentAltitude  = 0,
+	MaxSpeed         = 0,
+	Throttle         = 0,
+	RPM              = 0,
+	Gear             = 0,
+	EngineHealth     = 0,
 	LandingGearState = Enums.eLandingGearState.UNK
 }
 
@@ -71,7 +72,7 @@ function Speedometer:UpdateState()
 	self._state.IsAircraft       = self._state.PV:IsPlane() or self._state.PV:IsHeli()
 	self._state.IsSports         = self._state.PV:IsSportsOrSuper()
 	self._state.IsShootingFlares = self._state.PV.m_is_shooting_flares
-	self._state.Throttle         = self._state.PV:GetThrottle()
+	self._state.Throttle         = math.max(0.1, self._state.PV:GetThrottle())
 	self._state.RPM              = self._state.PV:GetRPM()
 	self._state.Gear             = self._state.PV:GetCurrentGear()
 	self._state.EngineHealth     = self._state.PV:GetEngineHealth()

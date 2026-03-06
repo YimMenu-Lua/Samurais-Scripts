@@ -33,7 +33,7 @@ local YimActions   = require("includes.features.YimActionsV3")
 ---@field public CurrentMovementClipset? string
 ---@field public CurrentStrafeClipset? string
 ---@field public CurrentWeaponMovementClipset? string
-LocalPlayer = Class("LocalPlayer", Player)
+LocalPlayer = Class("LocalPlayer", { parent = Player })
 
 
 ---@override
@@ -98,16 +98,28 @@ end
 
 ---@return integer
 function LocalPlayer:GetWalletBalance()
+	if (not Game.IsOnline()) then
+		return 0
+	end
+
 	return MONEY.NETWORK_GET_VC_WALLET_BALANCE(stats.get_character_index())
 end
 
 ---@return integer
 function LocalPlayer:GetBankBalance()
+	if (not Game.IsOnline()) then
+		return 0
+	end
+
 	return MONEY.NETWORK_GET_VC_BANK_BALANCE()
 end
 
 ---@return integer
 function LocalPlayer:GetTotalBalance()
+	if (not Game.IsOnline()) then
+		return stats.get_int(stats.get_prefixed_stat("SPX_TOTAL_CASH"))
+	end
+
 	return self:GetWalletBalance() + self:GetBankBalance()
 end
 
@@ -490,7 +502,7 @@ function LocalPlayer:Reset()
 end
 
 function LocalPlayer.ForceCloudSave()
-	STATS.STAT_SAVE(0, 0, 3, 0)
+	STATS.STAT_SAVE(0, false, 3, false)
 end
 
 Backend:RegisterEventCallbackAll(function()

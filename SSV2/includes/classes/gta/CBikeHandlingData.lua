@@ -9,6 +9,10 @@
 
 local CStructView = require("includes.classes.gta.CStructView")
 
+
+--------------------------------------
+-- Class: CBikeHandlingData
+--------------------------------------
 ---@class CBikeHandlingData : CBaseSubHandlingData
 ---@field protected m_ptr pointer
 ---@field m_lean_fwd_com_mult pointer<float> -- 0x0008

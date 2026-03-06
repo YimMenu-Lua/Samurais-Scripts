@@ -466,7 +466,7 @@ local function DrawDummyVehSpawnMenu()
 		local draw_pos     = abs_pos / resolution
 
 		ThreadManager:Run(function()
-			if Game.RequestTextureDict(texture_dict) then
+			if (Game.RequestTextureDict(texture_dict)) then
 				local sprite_w = 256
 				local sprite_h = 128
 				local norm_w   = sprite_w / resolution.x

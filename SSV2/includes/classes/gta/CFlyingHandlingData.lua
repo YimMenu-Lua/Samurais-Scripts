@@ -9,6 +9,10 @@
 
 local CStructView = require("includes.classes.gta.CStructView")
 
+
+--------------------------------------
+-- Class: CFlyingHandlingData
+--------------------------------------
 ---@class CFlyingHandlingData : CBaseSubHandlingData
 ---@field m_thrust pointer<float> -- 0x0008
 ---@field m_thrust_falloff pointer<float> -- 0x000C

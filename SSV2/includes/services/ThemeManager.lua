@@ -42,7 +42,7 @@ function ThemeManager:Load()
 		GVars.ui.style.theme = current
 	end
 
-	if (not current.__type or not IsInstance(current.SSAccent, vec4)) then
+	if (current.JSON or not current.__type or not IsInstance(current.SSAccent, vec4)) then
 		current = Theme.deserialize(current)
 		GVars.ui.style.theme = current
 	end

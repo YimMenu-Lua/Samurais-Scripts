@@ -8,14 +8,15 @@
 
 
 -- Basic compatibility layers/API stubs
----@diagnostic disable: lowercase-global
 
-local Compat = {}
+local Compat <const> = {}
 Compat.__index = Compat
 
 ---@param version eAPIVersion
 function Compat.SetupEnv(version)
-	if (version == Enums.eAPIVersion.V1 or version == Enums.eAPIVersion.V2) then
+	if (version == Enums.eAPIVersion.L54) then
+		require("includes.lib.mock_env")
+	else
 		print = function(...)
 			local out = {}
 
@@ -30,7 +31,7 @@ function Compat.SetupEnv(version)
 						local ok, result = pcall(table.serialize, v)
 						str = ok and result or "<serialization error!>"
 					end
-				elseif IsInstance(v, "pointer") then
+				elseif (IsInstance(v, "pointer")) then
 					str = string.format("Pointer @ 0x%X", v:get_address())
 				else
 					local ok, result = pcall(tostring, v)
@@ -54,7 +55,7 @@ function Compat.SetupEnv(version)
 				local fname = "f" .. level
 				log[fname] = function(fmt, ...)
 					local ok, msg = pcall(string.format, fmt, ...)
-					if not ok then
+					if (not ok) then
 						msg = string.format("<format error: %s> %s", tostring(msg), tostring(fmt))
 					end
 
@@ -62,10 +63,11 @@ function Compat.SetupEnv(version)
 				end
 			end
 		end
-	elseif (version == Enums.eAPIVersion.L54) then
-		require("includes.lib.mock_env")
 	end
 
+	---@param fmt string
+	---@param ... any
+	---@diagnostic disable-next-line: lowercase-global
 	printf = function(fmt, ...)
 		log.finfo(fmt, ...)
 	end

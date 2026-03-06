@@ -82,7 +82,7 @@ local eGuardTaskToString = {
 ---@field ConfigFlags table<integer, table<integer, integer>>
 ---@field CombatAttributes table<integer, table<integer, integer>>
 ---@field Create fun(_, modelHash: hash, entityType: eEntityType, pos?: vec3, heading?: number, isNetwork?: boolean, isScriptHostPed?: boolean): Bodyguard
-local Bodyguard = Class("Bodyguard", Ped)
+local Bodyguard = Class("Bodyguard", { parent = Ped })
 Bodyguard.TASKS = eGuardTask
 Bodyguard.ROLES = {
 	BODYGUARD = 0,
@@ -110,9 +110,19 @@ function Bodyguard.new(modelHash, name, spawnPos, weapon, godmode, noRagdoll, be
 	end
 
 	behavior = behavior or 1
+	if (weapon == nil or weapon == 0) then
+		weapon = _J("WEAPON_TECPISTOL")
+	end
 
-	local ped = Ped:Create(modelHash, Enums.eEntityType.Ped, spawnPos, LocalPlayer:GetHeading(-180), Game.IsOnline(),
-		false)
+	local ped = Ped:Create(
+		modelHash,
+		Enums.eEntityType.Ped,
+		spawnPos,
+		LocalPlayer:GetHeading(-180),
+		Game.IsOnline(),
+		false
+	)
+
 	local handle = ped:GetHandle()
 	if (not Game.IsScriptHandle(handle)) then
 		Backend:debug("failed to create ped.")
@@ -141,8 +151,8 @@ function Bodyguard.new(modelHash, name, spawnPos, weapon, godmode, noRagdoll, be
 	PED.SET_CAN_ATTACK_FRIENDLY(handle, false, false)
 
 	if (noRagdoll) then
-		for _, enum in pairs(Enums.eRagdollBlockingFlags) do
-			PED.SET_RAGDOLL_BLOCKING_FLAGS(handle, enum)
+		for _, flag in pairs(Enums.eRagdollBlockingFlags) do
+			PED.SET_RAGDOLL_BLOCKING_FLAGS(handle, flag)
 		end
 	end
 
@@ -209,7 +219,7 @@ function Bodyguard:GiveWeapon(weapon)
 	end
 
 	if (type(weapon) == "number") then
-		if (not WEAPON.HAS_PED_GOT_WEAPON(self.m_handle, weapon, false)) then
+		if (WEAPON.IS_WEAPON_VALID(weapon) and not WEAPON.HAS_PED_GOT_WEAPON(self.m_handle, weapon, false)) then
 			WEAPON.GIVE_WEAPON_TO_PED(self.m_handle, weapon, 9999, false, false)
 			WEAPON.SET_PED_INFINITE_AMMO(self.m_handle, true, weapon)
 			self.isArmed = true

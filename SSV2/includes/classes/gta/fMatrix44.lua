@@ -33,10 +33,9 @@ local EPSILON <const> = 1e-6
 ---@operator mul(fMatrix44|number): fMatrix44
 ---@operator eq(fMatrix44): boolean
 ---@overload fun(...): fMatrix44
-fMatrix44 = {}
-
+local fMatrix44 = { __type = "fMatrix44" }
 fMatrix44.__index = fMatrix44
-fMatrix44.__type = "fMatrix44"
+
 ---@diagnostic disable-next-line
 setmetatable(fMatrix44, {
 	__call = function(cls, ...)
@@ -350,3 +349,5 @@ function fMatrix44:multiply(b)
 		r4:dot_product(c1), r4:dot_product(c2), r4:dot_product(c3), r4:dot_product(c4)
 	)
 end
+
+return fMatrix44

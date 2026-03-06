@@ -14,12 +14,13 @@ local CPedWeaponManager = require("includes.classes.gta.CPedWeaponManager")
 ---@class CPedIntelligence
 ---@class CPedInventory
 
+
 --------------------------------------
 -- Class: CPed
 --------------------------------------
 ---@ignore
 ---@class CPed : CEntity
----@field private m_ptr pointer
+---@field protected m_ptr pointer
 ---@field m_ped_intelligence pointer<CPedIntelligence>
 ---@field m_ped_inventory pointer<CPedInventory>
 ---@field m_ped_weapon_mgr CPedWeaponManager
@@ -31,7 +32,7 @@ local CPedWeaponManager = require("includes.classes.gta.CPedWeaponManager")
 ---@field m_armor pointer<float>
 ---@field m_cash pointer<uint16_t> // 0x1614
 ---@overload fun(ped: handle): CPed
-local CPed              = Class("CPed", CEntity, 0x161C)
+local CPed = Class("CPed", { parent = CEntity, symbolic_size = 0x161C, pointer_ctor = true })
 
 ---@param ped handle
 ---@return CPed

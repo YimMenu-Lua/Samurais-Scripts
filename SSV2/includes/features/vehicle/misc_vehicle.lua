@@ -219,7 +219,7 @@ function MiscVehicle:DisableAirTurbulence()
 		return
 	end
 
-	PV:ApplyPatch(PV.MemoryPatches.DeformMult)
+	PV:ApplyPatch(PV.MemoryPatches.Turbulence)
 	PV:ApplyPatch(PV.MemoryPatches.WindMult)
 end
 
