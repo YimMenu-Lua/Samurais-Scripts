@@ -19,7 +19,7 @@
 ---@field private m_internal CEntity
 ---@field Resolve fun(self: Object) : CEntity
 ---@overload fun(handle: integer): Entity
-Object = Class("Object", Entity)
+Object = Class("Object", { parent = Entity })
 
 ---@return boolean
 function Object:IsValid()

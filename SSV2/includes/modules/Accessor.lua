@@ -268,7 +268,7 @@ end
 ---@class ScriptGlobal : Accessor
 ---@field At fun(self: ScriptGlobal, offset: integer, size?: integer): ScriptGlobal
 ---@overload fun(address: integer): ScriptGlobal
-ScriptGlobal = Class("ScriptGlobal", Accessor)
+ScriptGlobal = Class("ScriptGlobal", { parent = Accessor })
 
 ---@param address integer Global address
 ---@return ScriptGlobal
@@ -283,7 +283,7 @@ end
 ---@class ScriptLocal : Accessor
 ---@field At fun(self: ScriptLocal, offset: integer, size?: integer): ScriptLocal
 ---@overload fun(address: integer, scr: string): ScriptLocal
-ScriptLocal = Class("ScriptLocal", Accessor)
+ScriptLocal = Class("ScriptLocal", { parent = Accessor })
 ---@diagnostic disable-next-line
 setmetatable(ScriptLocal,
 	{

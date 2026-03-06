@@ -26,19 +26,19 @@
 -- This avoids clashing with PascalCase global utils and class methods and ensures style consistency.
 ---@generic T
 ---@param name string Class name
----@param base T? Optional: Parent class (inheritance)
----@param size? integer Optional: sizeof class
+---@param opts? { parent?: T, symbolic_size?: integer, pointer_ctor?: boolean }
 ---@return ClassMeta<T>
-function Class(name, base, size)
-	local cls = {
-		m_size = size or GenericClass.m_size,
-		__name = name,
-		__type = name,
+function Class(name, opts)
+	opts        = opts or {}
+	local cls   = {
+		m_size     = opts.symbolic_size or GenericClass.m_size,
+		__name     = name,
+		__type     = name,
+		__ptr_ctor = opts.pointer_ctor or false
 	}
 
 	cls.__index = cls
-
-	-- optional inheritance
+	local base  = opts.parent
 	if (base) then
 		-- so I have to manually copy base metamethods? https://www.youtube.com/watch?v=AxkZJmi-5xc
 		for k, v in pairs(base) do
@@ -114,7 +114,7 @@ function Class(name, base, size)
 	---@param sub_name string
 	---@param sub_size? integer
 	function cls:extend(sub_name, sub_size)
-		return Class(sub_name, self, sub_size)
+		return Class(sub_name, { parent = self, symbolic_size = sub_size })
 	end
 
 	---@param of any

@@ -543,8 +543,12 @@ function GUI:DrawSideBar(yPos)
 	end
 
 	self.m_selected_category_tabs = self.m_selected_category_tabs or {}
-	local ctabsCount = #self.m_selected_category_tabs
-	self.m_is_drawing_sidebar = ctabsCount > 1
+	local ctabsCount              = #self.m_selected_category_tabs
+	self.m_is_drawing_sidebar     = ctabsCount > 1
+
+	if (ctabsCount == 0) then -- should never happen unless a ui file fails to load
+		return
+	end
 
 	if (not self.m_selected_tab) then
 		if (self.m_prev_category_tabs[self.m_selected_category]) then

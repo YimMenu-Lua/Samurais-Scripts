@@ -7,13 +7,15 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CEntity             = require("includes.classes.gta.CEntity")
-local CWheel              = require("includes.classes.gta.CWheel")
+local atArray             = require("includes.classes.gta.atArray")
 local CCarHandlingData    = require("includes.classes.gta.CCarHandlingData")
 local CBikeHandlingData   = require("includes.classes.gta.CBikeHandlingData")
+local CEntity             = require("includes.classes.gta.CEntity")
 local CFlyingHandlingData = require("includes.classes.gta.CFlyingHandlingData")
-local phFragInst          = require("includes.classes.gta.phFragInst")
 local CVehicleDrawData    = require("includes.classes.gta.CVehicleDrawData")
+local CWheel              = require("includes.classes.gta.CWheel")
+local fMatrix44           = require("includes.classes.gta.fMatrix44")
+local phFragInst          = require("includes.classes.gta.phFragInst")
 
 ---@class CAdvancedData
 ---@class CVehicleModelInfo
@@ -34,7 +36,7 @@ local SubHandlingCtorMap <const> = {
 --------------------------------------
 ---@ignore
 ---@class CVehicle : CEntity
----@field private m_ptr pointer
+---@field protected m_ptr pointer
 ---@field public m_physics_fragments phFragInst //0x30 `struct rage::phFragInst`
 ---@field public m_draw_data CVehicleDrawData
 ---@field public m_handling_data pointer<CHandlingData>
@@ -82,7 +84,7 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_ride_height pointer<float>
 ---@field private DumpFlags fun(self: CVehicle, enum_flags: Enum, get_func: fun(self: CVehicle, flag: integer): boolean): nil
 ---@overload fun(vehicle: integer): CVehicle|nil
-local CVehicle = Class("CVehicle", CEntity, 0xC40)
+local CVehicle = Class("CVehicle", { parent = CEntity, symbolic_size = 0xC40, pointer_ctor = true })
 
 ---@param vehicle handle
 ---@return CVehicle

@@ -564,52 +564,74 @@ end
 ---@param model integer
 ---@return boolean
 function Game.RequestModel(model)
-	if STREAMING.IS_MODEL_VALID(model) and STREAMING.IS_MODEL_IN_CDIMAGE(model) then
-		STREAMING.REQUEST_MODEL(model)
-		return STREAMING.HAS_MODEL_LOADED(model)
+	if not (STREAMING.IS_MODEL_VALID(model) and STREAMING.IS_MODEL_IN_CDIMAGE(model)) then
+		return false
 	end
-	return false
+
+	if (not STREAMING.HAS_MODEL_LOADED(model)) then
+		STREAMING.REQUEST_MODEL(model)
+	end
+
+	return STREAMING.HAS_MODEL_LOADED(model)
 end
 
 ---@param dict string
 ---@return boolean
 function Game.RequestNamedPtfxAsset(dict)
-	STREAMING.REQUEST_NAMED_PTFX_ASSET(dict)
+	if (not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(dict)) then
+		STREAMING.REQUEST_NAMED_PTFX_ASSET(dict)
+	end
+
 	return STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(dict)
 end
 
 ---@param clipset string
 ---@return boolean
 function Game.RequestClipSet(clipset)
-	STREAMING.REQUEST_CLIP_SET(clipset)
+	if (not STREAMING.HAS_CLIP_SET_LOADED(clipset)) then
+		STREAMING.REQUEST_CLIP_SET(clipset)
+	end
+
 	return STREAMING.HAS_CLIP_SET_LOADED(clipset)
 end
 
 ---@param dict string
 ---@return boolean
 function Game.RequestAnimDict(dict)
-	STREAMING.REQUEST_ANIM_DICT(dict)
+	if (not STREAMING.HAS_ANIM_DICT_LOADED(dict)) then
+		STREAMING.REQUEST_ANIM_DICT(dict)
+	end
+
 	return STREAMING.HAS_ANIM_DICT_LOADED(dict)
 end
 
 ---@param dict string
 ---@return boolean
 function Game.RequestTextureDict(dict)
-	GRAPHICS.REQUEST_STREAMED_TEXTURE_DICT(dict, false)
+	if (not GRAPHICS.HAS_STREAMED_TEXTURE_DICT_LOADED(dict)) then
+		GRAPHICS.REQUEST_STREAMED_TEXTURE_DICT(dict, false)
+	end
+
 	return GRAPHICS.HAS_STREAMED_TEXTURE_DICT_LOADED(dict)
 end
 
----@param weapon integer
+---@param weapon joaat_t
 ---@return boolean
 function Game.RequestWeaponAsset(weapon)
-	WEAPON.REQUEST_WEAPON_ASSET(weapon, 31, 0)
+	if (not WEAPON.HAS_WEAPON_ASSET_LOADED(weapon)) then
+		WEAPON.REQUEST_WEAPON_ASSET(weapon, 31, 0)
+	end
+
 	return WEAPON.HAS_WEAPON_ASSET_LOADED(weapon)
 end
 
 ---@param scr string
 ---@return boolean
 function Game.RequestScript(scr)
-	SCRIPT.REQUEST_SCRIPT(scr)
+	if (not SCRIPT.HAS_SCRIPT_LOADED(scr)) then
+		SCRIPT.REQUEST_SCRIPT(scr)
+	end
+
 	return SCRIPT.HAS_SCRIPT_LOADED(scr)
 end
 
@@ -817,57 +839,56 @@ function Game.DesyncNetworkID(netID)
 	return NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID)
 end
 
----@param i_EntityHandle integer
----@param s_PtfxDict string
----@param s_PtfxName string
+---@param handle handle
+---@param dict string
+---@param name string
 ---@param bone string | integer | table
----@param f_Scale integer
----@param v_Pos vec3
----@param v_Rot vec3
+---@param scale integer
+---@param pos vec3
+---@param rot vec3
 ---@param color? Color
 ---@return table | nil
-function Game.StartSyncedPtfxLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s_PtfxName, bone, f_Scale, v_Pos, v_Rot,
-												color)
-	if not i_EntityHandle or not ENTITY.DOES_ENTITY_EXIST(i_EntityHandle) then
+function Game.StartSyncedPtfxLoopedOnEntityBone(handle, dict, name, bone, scale, pos, rot, color)
+	if (not Game.IsScriptHandle(handle)) then
 		return
 	end
 
 	local effects = {}
 
-	TaskWait(Game.RequestNamedPtfxAsset, s_PtfxDict)
-	local r, g, b, a = color and color:AsRGBA() or 0, 0, 0, 255
-	local boneList = {}
+	TaskWait(Game.RequestNamedPtfxAsset, dict)
+	local r, g, b, a  = color and color:AsRGBA() or 0, 0, 0, 255
+	local boneList    = {}
 	local isRightBone = false
 
-	if Game.IsOnline() and (i_EntityHandle ~= LocalPlayer:GetHandle()) and entities.take_control_of(i_EntityHandle, 300) then
-		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(i_EntityHandle))
+	if (Game.IsOnline() and (handle ~= LocalPlayer:GetHandle()) and entities.take_control_of(handle, 300)) then
+		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(handle))
 	end
 
-	if type(bone) == "table" then
+	if (type(bone) == "table") then
 		boneList = bone
 	else
 		boneList = { bone }
 	end
 
 	for _, boneIndex in ipairs(boneList) do
-		if type(boneIndex) == "string" then
+		if (type(boneIndex) == "string") then
 			isRightBone = (string.find(boneIndex, "_rf") ~= nil) or (string.find(boneIndex, "_rr") ~= nil)
-			boneIndex = Game.GetEntityBoneIndexByName(i_EntityHandle, boneIndex)
+			boneIndex   = Game.GetEntityBoneIndexByName(handle, boneIndex)
 		end
 
-		if boneIndex ~= -1 then
-			GRAPHICS.USE_PARTICLE_FX_ASSET(s_PtfxDict)
+		if (boneIndex ~= -1) then
+			GRAPHICS.USE_PARTICLE_FX_ASSET(dict)
 			local fxHandle = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(
-				s_PtfxName,
-				i_EntityHandle,
-				isRightBone and -v_Pos.x or v_Pos.x,
-				v_Pos.y,
-				v_Pos.z,
-				v_Rot.x,
-				v_Rot.y,
-				v_Rot.z,
+				name,
+				handle,
+				isRightBone and -pos.x or pos.x,
+				pos.y,
+				pos.z,
+				rot.x,
+				rot.y,
+				rot.z,
 				boneIndex,
-				f_Scale,
+				scale,
 				false,
 				false,
 				false,
@@ -885,49 +906,49 @@ function Game.StartSyncedPtfxLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s_Pt
 	return effects
 end
 
----@param i_EntityHandle integer
----@param s_PtfxDict string
----@param s_PtfxName string
+---@param handle integer
+---@param dict string
+---@param name string
 ---@param bone string | integer | table
----@param v_Pos vec3
----@param v_Rot vec3
----@param f_Scale integer
-function Game.StartSyncedPtfxNonLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s_PtfxName, bone, v_Pos, v_Rot, f_Scale)
-	if not i_EntityHandle or not ENTITY.DOES_ENTITY_EXIST(i_EntityHandle) then
+---@param pos vec3
+---@param rot vec3
+---@param scale integer
+function Game.StartSyncedPtfxNonLoopedOnEntityBone(handle, dict, name, bone, pos, rot, scale)
+	if (not Game.IsScriptHandle(handle)) then
 		return
 	end
 
-	TaskWait(Game.RequestNamedPtfxAsset, s_PtfxDict)
+	TaskWait(Game.RequestNamedPtfxAsset, dict)
 
 	local boneList = {}
 
-	if Game.IsOnline() and (i_EntityHandle ~= LocalPlayer:GetHandle()) and entities.take_control_of(i_EntityHandle, 500) then
-		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(i_EntityHandle))
+	if (Game.IsOnline() and (handle ~= LocalPlayer:GetHandle()) and entities.take_control_of(handle, 500)) then
+		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(handle))
 	end
 
-	if type(bone) == "table" then
+	if (type(bone) == "table") then
 		boneList = bone
 	else
 		boneList = { bone }
 	end
 
 	for _, boneIndex in ipairs(boneList) do
-		if type(boneIndex) == "string" then
-			boneIndex = Game.GetEntityBoneIndexByName(i_EntityHandle, boneIndex)
+		if (type(boneIndex) == "string") then
+			boneIndex = Game.GetEntityBoneIndexByName(handle, boneIndex)
 		end
 
-		GRAPHICS.USE_PARTICLE_FX_ASSET(s_PtfxDict)
+		GRAPHICS.USE_PARTICLE_FX_ASSET(dict)
 		GRAPHICS.START_PARTICLE_FX_NON_LOOPED_ON_ENTITY_BONE(
-			s_PtfxName,
-			i_EntityHandle,
-			v_Pos.x,
-			v_Pos.y,
-			v_Pos.z,
-			v_Rot.x,
-			v_Rot.y,
-			v_Rot.z,
+			name,
+			handle,
+			pos.x,
+			pos.y,
+			pos.z,
+			rot.x,
+			rot.y,
+			rot.z,
 			boneIndex or 0,
-			f_Scale,
+			scale,
 			false,
 			false,
 			false
@@ -935,7 +956,7 @@ function Game.StartSyncedPtfxNonLoopedOnEntityBone(i_EntityHandle, s_PtfxDict, s
 	end
 end
 
----@param fxHandles table
+---@param fxHandles array<handle>
 ---@param dict? string
 function Game.StopParticleEffects(fxHandles, dict)
 	for _, fx in ipairs(fxHandles) do
@@ -943,7 +964,7 @@ function Game.StopParticleEffects(fxHandles, dict)
 		GRAPHICS.REMOVE_PARTICLE_FX(fx, false)
 	end
 
-	if dict then
+	if (dict) then
 		STREAMING.REMOVE_NAMED_PTFX_ASSET(dict)
 	end
 end
@@ -1013,40 +1034,41 @@ end
 ---@param maxSpeed? number  -- **Optional**: if set, skips vehicles faster than this speed (m/s)
 ---@return integer -- vehicle handle or 0
 function Game.GetClosestVehicle(closeTo, range, excludeEntity, nonPlayerVehicle, maxSpeed)
-	local this = type(closeTo) == "number" and Game.GetEntityCoords(closeTo, false) or closeTo
-	local closestVeh = 0
-	local closestDist = range * range
-
-	if VEHICLE.IS_ANY_VEHICLE_NEAR_POINT(this.x, this.y, this.z, range) then
-		local veh_handles = entities.get_all_vehicles_as_handles()
-
-		for _, veh in ipairs(veh_handles) do
-			if veh ~= excludeEntity then
-				local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(veh, -1, true)
-
-				if not (nonPlayerVehicle and PED.IS_PED_A_PLAYER(driver)) then
-					local vehPos = Game.GetEntityCoords(veh, true)
-					---@diagnostic disable-next-line -- it's literally evaluated at the top 😡
-					local distance = this:distance(vehPos)
-
-					if distance <= closestDist and math.floor(VEHICLE.GET_VEHICLE_BODY_HEALTH(veh)) > 0 then
-						if maxSpeed then
-							local vehSpeed = ENTITY.GET_ENTITY_SPEED(veh)
-							if vehSpeed <= maxSpeed then
-								closestVeh = veh
-								closestDist = distance
-							end
-						else
-							closestVeh = veh
-							closestDist = distance
-						end
-					end
-				end
-			end
-		end
+	local area = (type(closeTo) == "number") and Game.GetEntityCoords(closeTo, false) or closeTo
+	if (not VEHICLE.IS_ANY_VEHICLE_NEAR_POINT(area.x, area.y, area.z, range)) then
+		return 0
 	end
 
-	return closestVeh
+	local dist = range * range
+	local out  = 0
+	for _, veh in ipairs(entities.get_all_vehicles_as_handles()) do
+		if (excludeEntity and veh == excludeEntity) then
+			goto continue
+		end
+
+		local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(veh, -1, true)
+		if (nonPlayerVehicle and PED.IS_PED_A_PLAYER(driver)) then
+			goto continue
+		end
+
+		local vehPos = Game.GetEntityCoords(veh, true)
+		---@diagnostic disable-next-line
+		local distance = area:distance(vehPos)
+
+		if (distance > dist or math.floor(VEHICLE.GET_VEHICLE_BODY_HEALTH(veh)) <= 0) then
+			goto continue
+		end
+
+		if (maxSpeed and ENTITY.GET_ENTITY_SPEED(veh) > maxSpeed) then
+			goto continue
+		end
+
+		out = veh
+
+		::continue::
+	end
+
+	return out
 end
 
 -- Returns a handle for the closest human ped to a provided entity or coordinates.
@@ -1055,30 +1077,36 @@ end
 ---@param aliveOnly boolean **Optional**: if true, ignores dead peds.
 ---@return integer
 function Game.GetClosestPed(closeTo, range, aliveOnly)
-	local this = type(closeTo) == 'number' and Game.GetEntityCoords(closeTo, false) or closeTo
-	local closestDist = range * range
-
-	if PED.IS_ANY_PED_NEAR_POINT(this.x, this.y, this.z, range) then
-		for _, ped in ipairs(entities.get_all_peds_as_handles()) do
-			if PED.IS_PED_HUMAN(ped) and (ped ~= LocalPlayer:GetHandle()) then
-				local pedPos = Game.GetEntityCoords(ped, true)
-				---@diagnostic disable-next-line
-				local distance = this:distance(pedPos)
-
-				if distance <= closestDist then
-					if aliveOnly then
-						if not ENTITY.IS_ENTITY_DEAD(ped, false) then
-							return ped
-						end
-					else
-						return ped
-					end
-				end
-			end
-		end
+	local area = (type(closeTo) == "number") and Game.GetEntityCoords(closeTo, false) or closeTo
+	if (not PED.IS_ANY_PED_NEAR_POINT(area.x, area.y, area.z, range)) then
+		return 0
 	end
 
-	return 0
+	local dist = range * range
+	local out  = 0
+	for _, ped in ipairs(entities.get_all_peds_as_handles()) do
+		if (not PED.IS_PED_HUMAN(ped) or ped == LocalPlayer:GetHandle()) then
+			goto continue
+		end
+
+		local pedPos = Game.GetEntityCoords(ped, true)
+		---@diagnostic disable-next-line
+		local distance = area:distance(pedPos)
+
+		if (distance > dist) then
+			goto continue
+		end
+
+		if (aliveOnly and ENTITY.IS_ENTITY_DEAD(ped, false)) then
+			goto continue
+		end
+
+		out = ped
+
+		::continue::
+	end
+
+	return out
 end
 
 -- Temporary workaround to fix auto-pilot's "fly to objective" option.

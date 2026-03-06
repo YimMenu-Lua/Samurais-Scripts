@@ -9,6 +9,10 @@
 
 local CStructView = require("includes.classes.gta.CStructView")
 
+
+--------------------------------------
+-- Class: CBaseSubHandlingData
+--------------------------------------
 ---@class CBaseSubHandlingData : CStructBase<CBaseSubHandlingData>
 ---@field protected m_ptr pointer
 ---@field protected m_handling_type pointer<int32_t> -- 0x00C8

@@ -52,8 +52,6 @@ require("includes.classes.Pair")
 require("includes.classes.Range")
 require("includes.classes.Rect")
 require("includes.classes.Set")
-require("includes.classes.gta.fMatrix44")
-require("includes.classes.gta.atArray")
 require("includes.modules.Accessor")
 
 

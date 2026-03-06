@@ -14,19 +14,9 @@ math.randomseed(os.time())
 local LUA_TABLE_OVERHEAD <const> = 3 * 0x8 -- 0x18
 local Chrono <const>             = require("includes.modules.Chrono")
 local Cast                       = require("includes.modules.Cast")
+local fMatrix44                  = require("includes.classes.gta.fMatrix44")
 Bit                              = require("includes.modules.Bit")
 
-
-INT_SIZES = {
-	int8_t   = 0x1,
-	int16_t  = 0x2,
-	int32_t  = 0x4,
-	int64_t  = 0x8,
-	uint8_t  = 0x1,
-	uint16_t = 0x2,
-	uint32_t = 0x4,
-	uint64_t = 0x8,
-}
 
 Time      = Chrono.Time
 Timer     = Chrono.Timer
@@ -67,6 +57,20 @@ _J = _G.joaat or Joaat
 -- A dummy function (no-operation).
 function NOP() end
 
+-------
+
+local ISINSTANCE_STD_TYPES <const>  = {
+	["table"]    = true,
+	["string"]   = true,
+	["number"]   = true,
+	["boolean"]  = true,
+	["function"] = true,
+	["userdata"] = true
+}
+local ISINSTANCE_MATH_TYPES <const> = {
+	["integer"] = true,
+	["float"]   = true
+}
 -- Returns whether `obj` is an instance of `T`. Can be used instead of Lua's default `type` function.
 --
 -- **Usage Example**:
@@ -96,33 +100,16 @@ function IsInstance(obj, T)
 		return T == "nil"
 	end
 
-	local std_types <const>  = {
-		["table"]    = true,
-		["string"]   = true,
-		["number"]   = true,
-		["boolean"]  = true,
-		["function"] = true,
-		["userdata"] = true
-	}
-
-	local math_types <const> = {
-		["integer"] = true,
-		["float"]   = true
-	}
-
-	local obj_type <const>   = type(obj)
-	local T_type <const>     = type(T)
+	local obj_type <const> = type(obj)
+	local T_type <const>   = type(T)
 	if (T_type == "string" and T == "pointer" and obj_type == "userdata") then
 		return (type(obj.rip) == "function")
 	end
+
 	local obj_mt = getmetatable(obj)
-	local T_mt = getmetatable(T)
+	local T_mt   = getmetatable(T)
 
 	if (T_type == "table") then
-		-- special case for vec3 since it's defined as a usertype in C++ but we extended it
-		-- so it became a hybrid: An instance of vec3 (from vec3:new, vec3:zero, or a return from a native function)
-		-- is of type "userdata" but vec3 itself is of type "table". Since we guard against returning true on classes vs regular tables,
-		-- IsInstance(vec3:new(1, 2, 3), vec3) returns false. This check fixes the issue and correctly returns true.
 		if (obj_type == "userdata" and T.__type == "vec3") then
 			return obj_mt and obj_mt.__type == T.__type
 		end
@@ -134,6 +121,10 @@ function IsInstance(obj, T)
 			or (type(T_mt) == "table" and rawget(T_mt, "__call") ~= nil)
 
 		if (is_obj) then
+			if (obj_type == "table" and obj.__type and obj.__type == T.__type) then
+				return true
+			end
+
 			while obj_mt do
 				if (obj_mt == T) then
 					return true
@@ -149,11 +140,11 @@ function IsInstance(obj, T)
 	end
 
 	if (T_type == "string") then
-		if ((obj_type) == "number" and math_types[T]) then
+		if ((obj_type) == "number" and ISINSTANCE_MATH_TYPES[T]) then
 			return math.type(obj) == T
 		end
 
-		if (std_types[T]) then
+		if (ISINSTANCE_STD_TYPES[T]) then
 			if (obj_type == "table") then
 				return (obj_type == T and obj_mt == nil)
 			else
@@ -165,22 +156,24 @@ function IsInstance(obj, T)
 	return false
 end
 
--- A poor man's `sizeof` 🥲
+local SIZEOF_TYPES <const> = {
+	["boolean"]   = 0x1,
+	-- ["DataBuffer"] = function(t) return t:Size() end,
+	["fMatrix44"] = 0x40,
+	["function"]  = 0x8,
+	["nil"]       = 0x0,
+	["number"]    = function(t) return math.sizeof(t) end,
+	["pointer"]   = 0x8,
+	["string"]    = function(t) return string.isempty(t) and 0 or (#t + 1) end,
+	["vec2"]      = 0x8,
+	["vec3"]      = 0xC,
+	["vec4"]      = 0x10,
+}
+-- Returns a symbolic size, not actual memory usage.
 ---@param T any
 ---@param seen? table Circular reference
 ---@return number
 function SizeOf(T, seen)
-	local types <const> = {
-		["boolean"]   = 0x1,
-		["vec2"]      = 0x8,
-		["vec3"]      = 0xC,
-		["vec4"]      = 0x10,
-		["fMatrix44"] = 0x40,
-		["function"]  = 0x8,
-		["pointer"]   = 0x8,
-		["nil"]       = 0x0,
-	}
-
 	local T_type <const> = type(T)
 	local resolved_type -- fwd decl
 
@@ -194,42 +187,41 @@ function SizeOf(T, seen)
 		resolved_type = T_type
 	end
 
-	local known = types[resolved_type]
+	local known = SIZEOF_TYPES[resolved_type]
 	if (known) then
+		if (type(known) == "function") then
+			return known(T)
+		end
 		return known
 	end
 
-	if (T_type == "string") then
-		return #T + 1
-	end
-
-	if (T_type == "number") then
-		return math.sizeof(T)
-	end
-
 	if (T_type == "table") then
-		seen = seen or {}
-		if seen[T] then
-			return 0
+		local size_method = T.Size
+		if (type(size_method) == "function") then
+			return size_method(T)
 		end
-		seen[T] = true
 
 		if (IsInstance(T.m_size, "number")) then
 			return T.m_size
 		end
 
 		if (T.__enum or IsInstance(T.__sizeof, "function")) then
-			return T:__sizeof()
+			return T.__sizeof(T)
 		end
 
 		if (IsInstance(T.__len, "function")) then
-			return T:__len()
+			return T.__len(T)
 		end
 
 		if (IsInstance(T.__type, "string")) then
 			return GenericClass.m_size -- 0x40
 		end
 
+		seen = seen or {}
+		if (seen[T]) then
+			return 0
+		end
+		seen[T] = true
 		return table.sizeof(T, seen)
 	end
 
@@ -486,7 +478,7 @@ end
 
 -- Casts the pointer to an object.
 --
--- **IMPORTANT:** You must only cast to objects that take a pointer parameter in their constructors.
+-- **IMPORTANT:** You must only cast to objects that take a pointer parameter in their constructors otherwise this method will throw.
 --
 -- **Example Usage:**
 --```lua
@@ -501,13 +493,8 @@ function memory.pointer:as(obj)
 		error(_F("Invalid parameter #1: Table/class expected, got %s instead.", obj_type))
 	end
 
-	if (type(obj.__from_ptr) == "boolean" and not obj.__from_ptr) then
-		error(_F("Class '%s' does not take a pointer.", obj.__type or tostring(obj)))
-	end
-
-	local mt = getmetatable(obj)
-	if (mt and type(mt.__call) == "function") then
-		return obj(self)
+	if (not obj.__ptr_ctor) then
+		error(_F("Class '%s' constructor does not expect a pointer.", obj.__type or tostring(obj)))
 	end
 
 	if (type(obj.new) == "function") then
@@ -516,6 +503,11 @@ function memory.pointer:as(obj)
 
 	if (type(obj.init) == "function") then
 		return obj:init(self)
+	end
+
+	local mt = getmetatable(obj)
+	if (mt and type(mt.__call) == "function") then
+		return obj(self)
 	end
 
 	error(_F("Class '%s' has no valid pointer constructor", obj.__type or tostring(obj)))
@@ -656,14 +648,13 @@ end
 
 ---@param t table
 ---@param key string|number
----@param value any
-table.matchbykey = function(t, key, value)
-	if not t or (table.getlen(t) == 0) then
+function table.matchbykey(t, key)
+	if (not t or (table.getlen(t) == 0)) then
 		return
 	end
 
 	for k, v in pairs(t) do
-		if k == key then
+		if (k == key) then
 			return v
 		end
 	end
@@ -672,7 +663,7 @@ end
 ---@param t table
 ---@param value any
 ---@return string|number|nil -- the table key where the value was found or nil
-table.matchbyvalue = function(t, value)
+function table.matchbyvalue(t, value)
 	if not t or (table.getlen(t) == 0) then
 		return nil
 	end
@@ -688,7 +679,7 @@ end
 
 ---@param t table
 ---@param value any
-table.find = function(t, value)
+function table.find(t, value)
 	if (#t == 0) then
 		return false
 	end
@@ -743,7 +734,7 @@ end
 ---@param indent? number
 ---@param key_order? table
 ---@param seen? table
-table.serialize = function(tbl, indent, key_order, seen)
+function table.serialize(tbl, indent, key_order, seen)
 	indent = indent or 2
 	seen = seen or {}
 
@@ -842,14 +833,14 @@ table.serialize = function(tbl, indent, key_order, seen)
 	return table.concat(pieces)
 end
 
-table.print = function(t)
+function table.print(t)
 	print(table.serialize(t))
 end
 
 -- Returns the number of values in a table. Doesn't count nil fields.
 ---@param t table
 ---@return number
-table.getlen = function(t)
+function table.getlen(t)
 	if not t then
 		return 0
 	end
@@ -864,7 +855,7 @@ table.getlen = function(t)
 end
 
 ---@return boolean
-table.is_array = function(t)
+function table.is_array(t)
 	return #t > 0
 end
 
@@ -874,7 +865,7 @@ end
 ---@param t table
 ---@param seen? table
 ---@return number
-table.sizeof = function(t, seen)
+function table.sizeof(t, seen)
 	if (type(t) ~= "table") then
 		return 0
 	end
@@ -896,7 +887,7 @@ end
 -- Returns the number of duplicate items in a table.
 ---@param t table
 ---@param value string | number | integer | table
-table.getduplicates = function(t, value)
+function table.getduplicates(t, value)
 	local count = 0
 
 	for _, v in ipairs(t) do
@@ -913,7 +904,7 @@ end
 -- If `debug` is set to `true`, it adds a table with duplicate items to the return as well.
 ---@param t table
 ---@param debug? boolean
-table.removeduplicates = function(t, debug)
+function table.removeduplicates(t, debug)
 	local t_exists, t_clean, t_dupes, t_result = {}, {}, {}, {}
 
 	for _, v in ipairs(t) do
@@ -937,7 +928,7 @@ end
 
 ---@param t table
 ---@param seen? table
-table.copy = function(t, seen)
+function table.copy(t, seen)
 	seen = seen or {}
 	if seen[t] then
 		return seen[t]
@@ -1135,8 +1126,8 @@ function table.snapshot(t, opts)
 end
 
 ---@generic K, V
----@param t table
----@param pred Predicate<K, V>
+---@param t table<K, V>
+---@param pred fun(k: K, v: V): boolean
 ---@return boolean -- success/failure
 function table.erase_first_if(t, pred)
 	for k, v in pairs(t) do
@@ -1150,8 +1141,8 @@ function table.erase_first_if(t, pred)
 end
 
 ---@generic K, V
----@param t table
----@param pred Predicate<K, V>
+---@param t table<K, V>
+---@param pred fun(k: K, v: V): boolean
 ---@return boolean, integer -- success/failure and count of removed items
 function table.erase_if(t, pred)
 	local count = 0
@@ -1197,7 +1188,7 @@ end
 ---@param length? number
 ---@param isalnum? boolean Alphanumeric
 ---@return string
-string.random = function(length, isalnum)
+function string.random(length, isalnum)
 	local str_table = {}
 	local charset   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	length          = length or math.random(1, 10)
@@ -1218,43 +1209,44 @@ end
 -- Returns whether a string is alphabetic.
 ---@param str string
 ---@return boolean
-string.isalpha = function(str)
+function string.isalpha(str)
 	return str:match("^%a+$") ~= nil
 end
 
 -- Returns whether a string is numeric.
 ---@param str string
 ---@return boolean
-string.isdigit = function(str)
+function string.isdigit(str)
 	return str:match("^%d+$") ~= nil
 end
 
 -- Returns whether a string is alpha-numeric.
 ---@param str string
 ---@return boolean
-string.isalnum = function(str)
+function string.isalnum(str)
 	return str:match("^%w+$") ~= nil
 end
 
 ---@param str string
 ---@return boolean
-string.iswhitespace = function(str)
+function string.iswhitespace(str)
 	return str:match("^%s*$") ~= nil
 end
 
 ---@param str? string
 ---@return boolean
-string.isnull = function(str)
+function string.isnull(str)
 	return str == nil
 end
 
-string.isempty = function(str)
+---@param str string
+function string.isempty(str)
 	return #str == 0
 end
 
 ---@param str string?
 ---@return boolean
-string.isnullorempty = function(str)
+function string.isnullorempty(str)
 	if str == nil then
 		return true
 	end
@@ -1264,7 +1256,7 @@ end
 
 ---@param str string?
 ---@return boolean
-string.isnullorwhitespace = function(str)
+function string.isnullorwhitespace(str)
 	if str == nil then
 		return true
 	end
@@ -1278,7 +1270,7 @@ end
 -- - `white space`
 ---@param str? string
 ---@return boolean
-string.isvalid = function(str)
+function string.isvalid(str)
 	return type(str) == "string"
 		and not str:isempty()
 		and not str:iswhitespace()
@@ -1298,7 +1290,7 @@ end
 ---@param str string
 ---@param prefix string
 ---@return boolean
-string.startswith = function(str, prefix)
+function string.startswith(str, prefix)
 	return str:sub(1, #prefix) == prefix
 end
 
@@ -1306,7 +1298,7 @@ end
 ---@param str string
 ---@param sub string
 ---@return boolean
-string.contains = function(str, sub)
+function string.contains(str, sub)
 	return str:find(sub, 1, true) ~= nil
 end
 
@@ -1314,7 +1306,7 @@ end
 ---@param str string
 ---@param suffix string
 ---@return boolean
-string.endswith = function(str, suffix)
+function string.endswith(str, suffix)
 	return str:sub(- #suffix) == suffix
 end
 
@@ -1322,7 +1314,7 @@ end
 ---@param str string
 ---@param pos integer
 ---@param text string
-string.insert = function(str, pos, text)
+function string.insert(str, pos, text)
 	pos = math.max(1, math.min(pos, #str + 1))
 	return str:sub(1, pos) .. text .. str:sub(pos)
 end
@@ -1334,7 +1326,7 @@ end
 ---@param old string
 ---@param new string
 ---@return string, number
-string.replace = function(str, old, new)
+function string.replace(str, old, new)
 	if old == "" then
 		return str, 0
 	end
@@ -1345,7 +1337,7 @@ end
 ---@param str string
 ---@param pos integer
 ---@param new_cahr string
-string.replace_char = function(str, pos, new_cahr)
+function string.replace_char(str, pos, new_cahr)
 	pos = math.max(1, math.min(pos, #str + 1))
 	local prefix = str:sub(1, pos - 1)
 	local suffix = str:sub(pos + 1)
@@ -1357,14 +1349,14 @@ end
 ---@param sep string
 ---@param tbl string[]
 ---@return string
-string.join = function(sep, tbl)
+function string.join(sep, tbl)
 	return table.concat(tbl, sep)
 end
 
 -- Removes leading and trailing white space from a string.
 ---@param str string
 ---@return string
-string.trim = function(str)
+function string.trim(str)
 	return str:match("^%s*(.-)%s*$")
 end
 
@@ -1373,7 +1365,7 @@ end
 ---@param sep string
 ---@param maxsplit? integer Optional: limit the number of splits.
 ---@return string[]
-string.split = function(str, sep, maxsplit)
+function string.split(str, sep, maxsplit)
 	local result, count = {}, 0
 	local pattern = "([^" .. sep .. "]+)"
 
@@ -1398,7 +1390,7 @@ end
 ---@param sep string
 ---@param maxsplit? integer Optional: limit the number of splits.
 ---@return string[]
-string.rsplit = function(str, sep, maxsplit)
+function string.rsplit(str, sep, maxsplit)
 	local splits = {}
 
 	for part in string.gmatch(str, "([^" .. sep .. "]+)") do
@@ -1424,7 +1416,7 @@ end
 ---@param str string
 ---@param sep string
 ---@return string, string, string
-string.partition = function(str, sep)
+function string.partition(str, sep)
 	local start_pos, end_pos = str:find(sep, 1, true)
 
 	if not start_pos then
@@ -1438,7 +1430,7 @@ end
 ---@param str string
 ---@param sep string
 ---@return string, string, string
-string.rpartition = function(str, sep)
+function string.rpartition(str, sep)
 	local start_pos, end_pos = str:reverse():find(sep:reverse(), 1, true)
 
 	if not start_pos then
@@ -1453,7 +1445,7 @@ end
 ---@param len number
 ---@param char string
 ---@return string
-string.padleft = function(str, len, char)
+function string.padleft(str, len, char)
 	return _F("%s%s", string.rep(char or " ", math.max(0, len - #str)), str)
 end
 
@@ -1461,21 +1453,21 @@ end
 ---@param len number
 ---@param char string
 ---@return string
-string.padright = function(str, len, char)
+function string.padright(str, len, char)
 	return _F("%s%s", str, string.rep(char or " ", math.max(0, len - #str)))
 end
 
 -- Capitalizes the first letter in a string.
 ---@param str string
 ---@return string
-string.capitalize = function(str)
+function string.capitalize(str)
 	return (str:lower():gsub("^%l", string.upper))
 end
 
 -- Capitalizes the first letter of each word in a string.
 ---@param str string
 ---@return string
-string.titlecase = function(str)
+function string.titlecase(str)
 	return (str:gsub("(%a)([%w_']*)", function(a, b)
 		return a:upper() .. b:lower()
 	end))
@@ -1483,7 +1475,7 @@ end
 
 ---@param value number|string
 ---@return string
-string.formatint = function(value)
+function string.formatint(value)
 	local s, _ = tostring(value):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
 	return s
 end
@@ -1491,12 +1483,12 @@ end
 ---@param value number|string
 ---@param currency? string
 ---@return string
-string.formatmoney = function(value, currency)
+function string.formatmoney(value, currency)
 	return _F("%s%s", currency or "$", string.formatint(value))
 end
 
 ---@param str string
-string.hex2string = function(str)
+function string.hex2string(str)
 	return (str:gsub("%x%x", function(digits)
 		return string.char(tonumber(digits, 16))
 	end))
@@ -1504,7 +1496,7 @@ end
 
 ---@param v string|number
 ---@return string
-string.hex = function(v)
+function string.hex(v)
 	local _type = type(v)
 	if (_type == "string") then
 		return (string.gsub(v, ".", function(char)
@@ -1524,13 +1516,13 @@ end
 ---@param n number
 ---@param x number
 ---@return number
-math.round = function(n, x)
+function math.round(n, x)
 	return tonumber(string.format("%." .. (x or 0) .. "f", n)) or 0
 end
 
 ---@param ... any
 ---@return number
-math.sum = function(...)
+function math.sum(...)
 	local result = 0
 	local args = type(...) == "table" and ... or { ... }
 
@@ -1547,7 +1539,7 @@ end
 ---@param min number
 ---@param max number
 ---@return boolean
-math.is_inrange = function(n, min, max)
+function math.is_inrange(n, min, max)
 	return n >= min and n <= max
 end
 
@@ -1565,41 +1557,49 @@ function math.is_equal(a, b, e)
 	return a == b or math.abs(a - b) < 1e-6
 end
 
+local INT_SIZES <const>     = {
+	int8_t   = 0x1,
+	int16_t  = 0x2,
+	int32_t  = 0x4,
+	int64_t  = 0x8,
+	uint8_t  = 0x1,
+	uint16_t = 0x2,
+	uint32_t = 0x4,
+	uint64_t = 0x8,
+}
+local INT_INFERENCE <const> = {
+	["unsigned"] = {
+		{ Cast.AsUint8_t,  "uint8_t" },
+		{ Cast.AsUint16_t, "uint16_t" },
+		{ Cast.AsUint32_t, "uint32_t" },
+		{ Cast.AsUint64_t, "uint64_t" },
+	},
+	["signed"] = {
+		{ Cast.AsInt8_t,  "int8_t" },
+		{ Cast.AsInt16_t, "int16_t" },
+		{ Cast.AsInt32_t, "int32_t" },
+		{ Cast.AsInt64_t, "int64_t" },
+	}
+}
 ---@param n integer
-math.sizeof = function(n)
+function math.sizeof(n)
 	local t_n = type(n)
 	assert(t_n == "number",
-		_F("Attempt to call math.sizeof on a non-integer value. Number expected, got %s instead!", t_n)
+		_F("Attempt to call math.sizeof on an invalid value. Number expected, got %s instead!", t_n)
 	)
 
 	if (n == 0 or IsInstance(n, "float")) then
 		return 0x4
 	end
 
-	local int_infer <const> = {
-		["unsigned"] = {
-			{ Cast.AsUint8_t,  "uint8_t" },
-			{ Cast.AsUint16_t, "uint16_t" },
-			{ Cast.AsUint32_t, "uint32_t" },
-			{ Cast.AsUint64_t, "uint64_t" },
-		},
-		["signed"] = {
-			{ Cast.AsInt8_t,  "int8_t" },
-			{ Cast.AsInt16_t, "int16_t" },
-			{ Cast.AsInt32_t, "int32_t" },
-			{ Cast.AsInt64_t, "int64_t" },
-		}
-	}
-
-	local c = Cast(n)
+	local c   = Cast(n)
 	local key = n < 0 and "signed" or "unsigned"
-	local _t = int_infer[key]
+	local _t  = INT_INFERENCE[key]
 
 	for i = 1, #_t do
 		local method, size_key = _t[i][1], _t[i][2]
 		local value = method(c)
-
-		if math.is_equal(n, value, 1e-9) then
+		if (math.is_equal(n, value, 1e-9)) then
 			return INT_SIZES[size_key]
 		end
 	end

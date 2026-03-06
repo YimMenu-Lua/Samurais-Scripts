@@ -21,9 +21,12 @@
 ---@field private m_data_type any
 ---@field private m_last_update_time TimePoint
 ---@overload fun(address: pointer, data_type?: any): atArray
-atArray = {}
+local atArray = {
+	__type     = "atArray",
+	__ptr_ctor = true
+}
 atArray.__index = atArray
-atArray.__type = "atArray"
+
 ---@diagnostic disable-next-line
 setmetatable(atArray, {
 	__call = function(cls, ...)
@@ -229,3 +232,5 @@ function atArray:__tostring()
 
 	return buffer
 end
+
+return atArray

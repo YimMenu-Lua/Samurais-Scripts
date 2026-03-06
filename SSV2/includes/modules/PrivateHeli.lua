@@ -25,7 +25,7 @@ require("includes.modules.Vehicle")
 ---@field isFarAway boolean
 ---@field radio { isOn: boolean, stationName: string }
 ---@field isReady boolean
-local PrivateHeli = Class("PrivateHeli", Vehicle)
+local PrivateHeli = Class("PrivateHeli", { parent = Vehicle })
 PrivateHeli.pilotModel = 0xE75B4B1C -- S_M_M_Pilot_01
 
 ---@param model integer

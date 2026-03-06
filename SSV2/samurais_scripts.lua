@@ -27,6 +27,10 @@ local weapons_map     = {
 
 local function populate_weapons()
 	for hash, data in pairs(weaponData) do
+		if (not WEAPON.IS_WEAPON_VALID(hash)) then
+			goto continue
+		end
+
 		data.display_name  = Game.GetGXTLabel(data.gxt)
 		local weapon_group = weapons_map[data.group]
 		if (not weapon_group) then

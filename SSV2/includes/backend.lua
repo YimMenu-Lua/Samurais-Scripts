@@ -128,7 +128,7 @@ function Backend:GetAPIVersion()
 
 	local branch = ylapi_func()
 	if (type(branch) ~= "number" or branch > 1) then
-		error("Unknown or unsupported game branch.")
+		error("Failed to load: Unknown or unsupported game branch.")
 	end
 
 	self.api_version = branch + 1
@@ -291,21 +291,25 @@ end
 -- TODO: Refactor this
 function Backend:EntitySweep()
 	for _, category in pairs(self.SpawnedEntities) do
-		if next(category) ~= nil then
-			for handle in pairs(category) do
-				if ENTITY.DOES_ENTITY_EXIST(category[handle]) then
-					ENTITY.SET_ENTITY_AS_MISSION_ENTITY(category[handle], true, true)
-					ENTITY.DELETE_ENTITY(category[handle])
-					Game.RemoveBlipFromEntity(category[handle])
-					category[handle] = nil
-				end
+		if (next(category) == nil) then
+			goto continue
+		end
+
+		for handle in pairs(category) do
+			if (ENTITY.DOES_ENTITY_EXIST(handle)) then
+				ENTITY.SET_ENTITY_AS_MISSION_ENTITY(handle, true, true)
+				ENTITY.DELETE_ENTITY(handle)
+				Game.RemoveBlipFromEntity(handle)
+				category[handle] = nil
 			end
 		end
+
+		::continue::
 	end
 
-	if next(self.CreatedBlips) ~= nil then
+	if (next(self.CreatedBlips) ~= nil) then
 		for _, blip in pairs(self.CreatedBlips) do
-			if HUD.DOES_BLIP_EXIST(blip.handle) then
+			if (HUD.DOES_BLIP_EXIST(blip.handle)) then
 				HUD.REMOVE_BLIP(blip.handle)
 			end
 			self:RemoveBlip(blip.owner)
@@ -316,15 +320,17 @@ end
 function Backend:PoolMgr()
 	local timeout = self.debug_mode and 500 or 2e3
 
-	for index, category in ipairs({ self.SpawnedEntities[Enums.eEntityType.Object], self.SpawnedEntities[Enums.eEntityType.Ped], self.SpawnedEntities[Enums.eEntityType.Vehicle] }) do
+	for index, category in ipairs({
+		self.SpawnedEntities[Enums.eEntityType.Object],
+		self.SpawnedEntities[Enums.eEntityType.Ped],
+		self.SpawnedEntities[Enums.eEntityType.Vehicle]
+	}) do
 		if (next(category) == nil) then
 			goto continue
 		end
 
 		for handle in pairs(category) do
-			local bExists = ENTITY.DOES_ENTITY_EXIST(handle)
-
-			if (not bExists) then
+			if (not ENTITY.DOES_ENTITY_EXIST(handle)) then
 				self:CheckFeatureEntities(handle)
 				Game.DeleteEntity(handle, index)
 			end
@@ -365,7 +371,7 @@ function Backend:RegisterEventCallback(event, callback)
 		return
 	end
 
-	if table.find(evnt, callback) then
+	if (table.find(evnt, callback)) then
 		return
 	end
 
@@ -406,10 +412,9 @@ end
 function Backend:TriggerEventCallbacks(event)
 	for _, fn in ipairs(self.EventCallbacks[event] or {}) do
 		if (type(fn) == "function") then
-			local ok, err = pcall(fn)
-			if (not ok) then
+			xpcall(fn, function(err)
 				log.fwarning("[Backend]: Callback error for event %s: %s", EnumToString(Enums.eBackendEvent, event), err)
-			end
+			end)
 		end
 	end
 end
@@ -424,7 +429,7 @@ function Backend:OnSessionSwitch()
 		return
 	end
 
-	if (not script.is_active("maintransition")) then
+	if (not Game.IsInNetworkTransition()) then
 		return
 	end
 
@@ -432,7 +437,7 @@ function Backend:OnSessionSwitch()
 	ThreadManager:Run(function()
 		self:TriggerEventCallbacks(Enums.eBackendEvent.SESSION_SWITCH)
 
-		while (script.is_active("maintransition")) do
+		while (Game.IsInNetworkTransition()) do
 			yield()
 		end
 
@@ -466,36 +471,38 @@ end
 function Backend:RegisterHandlers()
 	self.debug_mode = self:IsMockEnv() or GVars.backend.debug_mode or false
 
-	if (self:GetAPIVersion() ~= Enums.eAPIVersion.L54) then
-		ThreadManager:RegisterLooped("SS_CTRLS", function()
-			if (self.disable_input) then
-				PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
-			end
-
-			if ((gui.is_open() or GUI:IsOpen()) and not self.disable_input) then
-				self:DisableAttackInput()
-			end
-
-			for _, control in pairs(self.ControlsToDisable) do
-				PAD.DISABLE_CONTROL_ACTION(0, control, true)
-			end
-		end)
-
-		ThreadManager:RegisterLooped("SS_BACKEND", function()
-			self:OnPlayerSwitch()
-			self:OnSessionSwitch()
-			PreviewService:Update()
-			Decorator:CollectGarbage()
-			yield()
-		end)
-
-		ThreadManager:RegisterLooped("SS_POOLMGR", function()
-			self:PoolMgr()
-		end)
-
-		event.register_handler(menu_event.MenuUnloaded, function() self:Cleanup() end)
-		event.register_handler(menu_event.ScriptsReloaded, function() self:Cleanup() end)
+	if (self:IsMockEnv()) then
+		return
 	end
+
+	ThreadManager:RegisterLooped("SS_CTRLS", function()
+		if (self.disable_input) then
+			PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
+		end
+
+		if ((gui.is_open() or GUI:IsOpen()) and not self.disable_input) then
+			self:DisableAttackInput()
+		end
+
+		for _, control in pairs(self.ControlsToDisable) do
+			PAD.DISABLE_CONTROL_ACTION(0, control, true)
+		end
+	end)
+
+	ThreadManager:RegisterLooped("SS_BACKEND", function()
+		self:OnPlayerSwitch()
+		self:OnSessionSwitch()
+		PreviewService:Update()
+		Decorator:CollectGarbage()
+		yield()
+	end)
+
+	ThreadManager:RegisterLooped("SS_POOLMGR", function()
+		self:PoolMgr()
+	end)
+
+	event.register_handler(menu_event.MenuUnloaded, function() self:Cleanup() end)
+	event.register_handler(menu_event.ScriptsReloaded, function() self:Cleanup() end)
 end
 
 -- ### Baguette

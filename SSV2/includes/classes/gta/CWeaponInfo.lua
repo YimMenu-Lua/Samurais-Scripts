@@ -80,6 +80,9 @@ Enums.eWeaponEffectGroup = {
 }
 
 
+--------------------------------------
+-- Class: CWeaponInfo
+--------------------------------------
 ---@class CWeaponInfo : CStructBase<CWeaponInfo>
 ---@field protected m_ptr pointer
 ---@field m_name_hash pointer<joaat_t>  //0x0010

@@ -8,7 +8,12 @@
 
 
 local CStructView = require("includes.classes.gta.CStructView")
+local atArray     = require("includes.classes.gta.atArray")
 
+
+--------------------------------------
+-- Class: CWeaponFiringPatternAliases
+--------------------------------------
 ---@class CWeaponFiringPatternAliases : CStructBase<CWeaponFiringPatternAliases>
 ---@field protected m_ptr pointer
 ---@field m_name_hash pointer<joaat_t> // 0x0
@@ -16,7 +21,7 @@ local CStructView = require("includes.classes.gta.CStructView")
 ---@overload fun(ptr: pointer): CWeaponFiringPatternAliases
 local CWeaponFiringPatternAliases = CStructView("CWeaponFiringPatternAliases", {
 	{ "m_name_hash", 0x0 },
-	{ "m_aliases",   0x8 },
-})
+	{ "m_aliases",   0x8, atArray },
+}, 0x10)
 
 return CWeaponFiringPatternAliases

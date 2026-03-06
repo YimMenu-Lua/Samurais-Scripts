@@ -28,12 +28,12 @@ require("includes.modules.Vehicle")
 ---@field lastTaskCoords vec3
 ---@field lastCheckTime integer
 ---@field canWarpPlayer boolean
-local PrivateJet = Class("PrivateJet", Vehicle)
+local PrivateJet        = Class("PrivateJet", { parent = Vehicle })
 PrivateJet.wasDismissed = false
-PrivateJet.pilotModel = 0xE75B4B1C   -- S_M_M_Pilot_01
+PrivateJet.pilotModel   = 0xE75B4B1C -- S_M_M_Pilot_01
 PrivateJet.copilotModel = 0x864ED68E -- IG_Pilot
-PrivateJet.task = Enums.eVehicleTask.NONE or -1
-PrivateJet.radio = { isOn = false, stationName = "OFF" }
+PrivateJet.task         = Enums.eVehicleTask.NONE or -1
+PrivateJet.radio        = { isOn = false, stationName = "OFF" }
 
 
 ---@param model integer

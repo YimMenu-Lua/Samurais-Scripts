@@ -8,6 +8,21 @@
 
 
 local FeatureBase = require("includes.modules.FeatureBase")
+-- if (self.m_drift_time >= 10 and self.m_drift_time < 30) then
+-- 	self.m_multiplier = 1
+-- elseif (self.m_drift_time >= 30 and self.m_drift_time < 60) then
+-- 	self.m_multiplier = 2
+-- elseif (self.m_drift_time >= 60 and self.m_drift_time < 120) then
+-- 	self.m_multiplier = 5
+-- elseif (self.m_drift_time >= 120) then
+-- 	self.m_multiplier = 10
+-- end
+local MultiplierStages <const> = {
+	{ mult = 1,  threshold = { min = 1500, max = 2900 } },
+	{ mult = 2,  threshold = { min = 3000, max = 5900 } },
+	{ mult = 5,  threshold = { min = 6000, max = 11900 } },
+	{ mult = 10, threshold = { min = 12000, max = math.int32_max() } },
+}
 
 ---@class DriftMinigame : FeatureBase
 ---@field private m_entity PlayerVehicle
@@ -60,32 +75,36 @@ function DriftMinigame:ShouldRun()
 		and self.m_entity:IsCar())
 end
 
----@param forceReset? boolean
-function DriftMinigame:ResetStreak(forceReset)
-	self.m_extra_points = 0
-	self.m_extra_text   = ""
-
-	if (self.m_multiplier > 1 and not forceReset) then
-		self.m_multiplier = math.max(1, self.m_multiplier - 1)
-		self.m_extra_text = _T("VEH_DRIFT_MINIGAME_PENALTY")
-		sleep(2000)
-		return
-	end
-
-	self.m_text_height = 0.7
-	self.m_streak_text = _T("VEH_DRIFT_MINIGAME_STREAK_LOST")
-
-	sleep(3000)
-	self.m_points       = 0
-	self.m_extra_points = 0
-	self.m_multiplier   = 1
-	self.m_streak_text  = ""
-	self.m_is_active    = false
-end
-
 ---@return boolean
 function DriftMinigame:IsActive()
 	return self.m_is_active
+end
+
+---@return number
+function DriftMinigame:GetMultiplier()
+	for _, v in ipairs(MultiplierStages) do
+		if (self.m_drift_time >= v.threshold.min and self.m_drift_time < v.threshold.max) then
+			return v.mult
+		end
+	end
+
+	return 1
+end
+
+function DriftMinigame:SetMultiplierPlenalty()
+	if (self.m_multiplier == 1) then
+		return
+	end
+
+	for i = #MultiplierStages, 2, -1 do
+		local curr_stage = MultiplierStages[i]
+		local prev_stage = MultiplierStages[i - 1]
+		if (self.m_multiplier == curr_stage.mult) then
+			self.m_drift_time = prev_stage.threshold.min
+			self.m_multiplier = prev_stage.mult
+			break
+		end
+	end
 end
 
 function DriftMinigame:PlayIncrementSound()
@@ -96,7 +115,12 @@ end
 
 ---@param points number
 function DriftMinigame:BankDriftPoints_SP(points)
-	stats.increment_stat(stats.get_prefixed_stat("SPX_TOTAL_CASH"), points)
+	stats.increment_stat(
+		stats.get_prefixed_stat("SPX_TOTAL_CASH"),
+		points,
+		0,
+		math.int32_max()
+	)
 	AUDIO.PLAY_SOUND_FRONTEND(
 		-1,
 		"LOCAL_PLYR_CASH_COUNTER_INCREASE",
@@ -105,15 +129,42 @@ function DriftMinigame:BankDriftPoints_SP(points)
 	)
 end
 
+---@param forceReset? boolean
+function DriftMinigame:ResetStreak(forceReset)
+	self.m_extra_points = 0
+
+	if (self.m_multiplier > 1 and not forceReset) then
+		self.m_extra_text      = _T("VEH_DRIFT_MINIGAME_PENALTY")
+		self.m_extra_text_time = Game.GetGameTimer() + 3000
+		self:SetMultiplierPlenalty()
+		sleep(250)
+		return
+	end
+
+	self.m_extra_text  = ""
+	self.m_text_height = 0.7
+	self.m_streak_text = _T("VEH_DRIFT_MINIGAME_STREAK_LOST")
+
+	sleep(3000)
+	self.m_points           = 0
+	self.m_drift_time       = 0
+	self.m_straight_counter = 0
+	self.m_extra_points     = 0
+	self.m_multiplier       = 1
+	self.m_streak_text      = ""
+	self.m_is_active        = false
+end
+
 function DriftMinigame:Update()
 	if (self.m_points == 0) then
 		return
 	end
 
 	local col = Color(255, 192, 0, 200)
-	local driftText = not self.m_has_crashed
-		and _F("%s\n+%s pts", self.m_streak_text, string.formatint(self.m_points))
-		or self.m_streak_text
+	local driftText = _F("%s\n+%s pts", self.m_streak_text, string.formatint(self.m_points))
+	if (self.m_has_crashed and self.m_multiplier == 1) then
+		driftText = self.m_streak_text
+	end
 
 	Game.DrawText(
 		vec2:new(0.5, 0.03),
@@ -124,7 +175,7 @@ function DriftMinigame:Update()
 		true
 	)
 
-	if (self.m_extra_text ~= "" and MISC.GET_GAME_TIMER() < self.m_extra_text_time) then
+	if (self.m_extra_text ~= "" and Game.GetGameTimer() < self.m_extra_text_time) then
 		Game.DrawText(
 			vec2:new(0.5, 0.12),
 			self.m_extra_text,
@@ -141,17 +192,16 @@ function DriftMinigame:OnTick()
 		return
 	end
 
-	if (self.m_is_active and not LocalPlayer:IsDriving()) then
+	local PV = self.m_entity
+	if (self.m_is_active and (not LocalPlayer:IsDriving() or PV:GetCurrentGear() < 1)) then
 		self:ResetStreak(true)
-		self.m_drift_time = 0
 		return
 	end
 
-	local PV                           = self.m_entity
 	local handle                       = PV:GetHandle()
-	local speedVec                     = ENTITY.GET_ENTITY_SPEED_VECTOR(handle, true)
-	local speed                        = ENTITY.GET_ENTITY_SPEED(handle)
-	local height                       = ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(handle)
+	local speedVec                     = PV:GetSpeedVector()
+	local speed                        = PV:GetSpeed()
+	local height                       = PV:GetHeightAboveGround()
 	local localCrashText               = ""
 	local angle                        = math.abs(speedVec.x)
 	self.m_has_crashed, localCrashText = PV:HasCrashed()
@@ -181,42 +231,33 @@ function DriftMinigame:OnTick()
 	end
 
 	if (self.m_straight_counter == 0 and self.m_is_active) then
-		self.m_drift_time = self.m_drift_time + 1
-	else
-		self.m_drift_time = 0
+		self.m_drift_time = self.m_drift_time + (1 * (speed // 10))
 	end
 
-	if (self.m_drift_time >= 10 and self.m_drift_time < 30) then
-		self.m_multiplier = 1
-	elseif (self.m_drift_time >= 30 and self.m_drift_time < 60) then
-		self.m_multiplier = 2
-	elseif (self.m_drift_time >= 60 and self.m_drift_time < 120) then
-		self.m_multiplier = 5
-	elseif (self.m_drift_time >= 120) then
-		self.m_multiplier = 10
-	end
+	self.m_multiplier = self:GetMultiplier()
 
 	if (speed > 5 and not self.m_has_crashed) then
 		if (height > 1 and height < 5) then
 			self.m_extra_points = self.m_extra_points + 1
-			self.m_points = self.m_points + self.m_extra_points
-			self.m_extra_text = _F("%s  +%d pts", _T("VEH_DRIFT_MINIGAME_AIR"), self.m_extra_points)
+			self.m_points       = self.m_points + self.m_extra_points
+			self.m_extra_text   = _F("%s  +%d pts", _T("VEH_DRIFT_MINIGAME_AIR"), self.m_extra_points)
 		elseif (height >= 5) then
 			self.m_extra_points = self.m_extra_points + 5
-			self.m_points = self.m_points + self.m_extra_points
-			self.m_extra_text = _F("%s  +%d pts", _T("VEH_DRIFT_MINIGAME_BIG_AIR"), self.m_extra_points)
+			self.m_points       = self.m_points + self.m_extra_points
+			self.m_extra_text   = _F("%s  +%d pts", _T("VEH_DRIFT_MINIGAME_BIG_AIR"), self.m_extra_points)
 		end
 
 		if (not localCrashText:isempty()) then
-			self.m_extra_points = self.m_extra_points + 1
-			self.m_extra_text = _F("%s  +%d", localCrashText, self.m_extra_points)
-			self.m_extra_text_time = MISC.GET_GAME_TIMER() + 3000
+			self.m_extra_points    = self.m_extra_points + 1
+			self.m_extra_text      = _F("%s  +%d", localCrashText, self.m_extra_points)
+			self.m_extra_text_time = Game.GetGameTimer() + 3000
 		end
 	end
 
 	if (self.m_has_crashed) then
-		self.m_text_height = 0.7
-		self.m_streak_text = localCrashText
+		if (self.m_multiplier < 2) then
+			self.m_streak_text = localCrashText
+		end
 		self:ResetStreak()
 	elseif (self.m_straight_counter > 100 or PV:IsStopped()) then
 		local timer = Timer.new(5000)
@@ -232,7 +273,7 @@ function DriftMinigame:OnTick()
 				return
 			end
 
-			local pulse = 0.67 + 0.03 * math.sin(MISC.GET_GAME_TIMER() / 120)
+			local pulse = 0.67 + 0.03 * math.sin(Game.GetGameTimer() / 120)
 			self.m_text_height = pulse
 			sleep(16)
 		end

@@ -22,25 +22,27 @@ local MemoryPatch = require("includes.structs.MemoryPatch")
 --------------------------------------
 -- Class: Memory
 --------------------------------------
----
---**Global Singleton.**
---
--- Handles most interactions with the game's memory.
 ---@class Memory : ClassMeta<Memory>
 ---@field private m_patches table<Obj, table<string, MemoryPatch>>
----@overload fun(_: any): Memory
+---@field protected m_initialized boolean
+---@overload fun(): Memory
 local Memory = Class("Memory")
 
 ---@return Memory
 function Memory:init()
-	---@type Memory
-	local instance = setmetatable({ m_patches = {} }, Memory)
+	if (self.m_initialized) then
+		log.warning("Attempt to create a second instance of a singleton (Memory)")
+		return self
+	end
+
+	self.m_patches = {}
 
 	Backend:RegisterEventCallbackAll(function()
-		instance:RestoreAllPatches()
+		self:RestoreAllPatches()
 	end)
 
-	return instance
+	self.m_initialized = true
+	return self
 end
 
 -- Since PatternScanner runs in a fiber, we can't get pointer values on file load.
@@ -94,30 +96,30 @@ function Memory:GetScreenResolution()
 	return GPointers.ScreenResolution
 end
 
----@param obj Obj
+---@param owner Obj
 ---@param data PatchData
 ---@param apply? boolean
-function Memory:AddPatch(obj, data, apply)
+function Memory:AddPatch(owner, data, apply)
+	if (not self.m_patches[owner]) then
+		self.m_patches[owner] = {}
+	end
+
+	if (self.m_patches[owner][data.name]) then
+		return
+	end
+
 	local patch = MemoryPatch.new(data.name, data.onEnable, data.onDisable)
-	if (not self.m_patches[obj]) then
-		self.m_patches[obj] = {}
-	end
-
-	if (self.m_patches[obj][data.name]) then
-		self:RestorePatch(obj, data.name, true)
-	end
-
-	self.m_patches[obj][data.name] = patch
+	self.m_patches[owner][data.name] = patch
 
 	if (apply) then
 		patch:Apply()
 	end
 end
 
----@param obj Obj
+---@param owner Obj
 ---@param patchName string
-function Memory:RemovePatch(obj, patchName)
-	local _t = self.m_patches[obj]
+function Memory:RemovePatch(owner, patchName)
+	local _t = self.m_patches[owner]
 	if (_t and _t[patchName]) then
 		_t[patchName]:Restore()
 		_t[patchName] = nil
@@ -125,73 +127,78 @@ function Memory:RemovePatch(obj, patchName)
 end
 
 ---@generic T
----@param obj Obj The object that owns the patch
+---@param owner Obj
 ---@param patchName string
 ---@return T
-function Memory:ApplyPatch(obj, patchName)
-	local _t = self.m_patches[obj]
-	local res = nil
-
-	if (_t and _t[patchName]) then
-		res = _t[patchName]:Apply()
+function Memory:ApplyPatch(owner, patchName)
+	local _t = self.m_patches[owner]
+	if (not _t) then
+		return nil
 	end
 
-	return res
+	local patch = _t[patchName]
+	if (not patch or patch:IsEnabled()) then
+		return nil
+	end
+
+	return patch:Apply()
 end
 
 ---@generic T
----@param obj Obj The object that owns the patch
+---@param owner Obj
 ---@param patchName string
----@param remove? boolean Optional: remove after restoring
+---@param clear? boolean Optional: remove after restoring
 ---@return T
-function Memory:RestorePatch(obj, patchName, remove)
-	local _t = self.m_patches[obj]
-	local res = nil
+function Memory:RestorePatch(owner, patchName, clear)
+	local _t = self.m_patches[owner]
+	if (not _t) then
+		return nil
+	end
 
-	if (_t and _t[patchName]) then
-		res = _t[patchName]:Restore()
+	local patch = _t[patchName]
+	if (not patch) then
+		return nil
+	end
 
-		if (remove) then
-			_t[patchName] = nil
-		end
+	local res = patch:Restore()
+
+	if (clear) then
+		_t[patchName] = nil
 	end
 
 	return res
 end
 
----@param obj Obj
----@param remove? boolean
-function Memory:RestoreAllPatchesByRef(obj, remove)
-	local batch = self.m_patches[obj]
+---@param owner Obj
+---@param clear? boolean
+function Memory:RestoreAllPatchesByRef(owner, clear)
+	local batch = self.m_patches[owner]
 	if (not batch) then
 		return
 	end
 
-	if (remove) then
-		local names = {}
-		for name, patch in pairs(batch) do
-			patch:Restore()
-			names[#names + 1] = name
-		end
+	for _, patch in pairs(batch) do
+		patch:Restore()
+	end
 
-		for _, name in ipairs(names) do
-			batch[name] = nil
-		end
-	else
-		for _, patch in pairs(batch) do
-			patch:Restore()
-		end
+	if (clear) then
+		table.erase_if(batch, function(_, v)
+			return v:IsDisabled()
+		end)
 	end
 end
 
-function Memory:RestoreAllPatches()
+---@param clear? boolean
+function Memory:RestoreAllPatches(clear)
 	for _, batch in pairs(self.m_patches) do
 		for _, patch in pairs(batch) do
 			patch:Restore()
 		end
 	end
 
-	self.m_patches = {}
+	if (clear) then
+		self.m_patches = {}
+	end
 end
 
 ---@return table<Obj, table<string, MemoryPatch>>
@@ -228,13 +235,13 @@ end
 
 ---@param vehicle integer vehicle handle
 ---@return CVehicle|nil
-function Memory:GetVehicleInfo(vehicle)
+function Memory:GetVehicleInternal(vehicle)
 	return CVehicle(vehicle)
 end
 
 ---@param ped handle A Ped ID, not a Player ID.
 ---@return CPed|nil
-function Memory:GetPedInfo(ped)
+function Memory:GetPedInternal(ped)
 	return CPed(ped)
 end
 
@@ -249,12 +256,12 @@ function Memory:GetVehicleHandlingFlag(vehicle, flag)
 		return false
 	end
 
-	local CVehicle = self:GetVehicleInfo(vehicle)
-	if not CVehicle then
+	local cvehicle = self:GetVehicleInternal(vehicle)
+	if (not cvehicle) then
 		return false
 	end
 
-	local m_handling_flags = CVehicle.m_handling_flags
+	local m_handling_flags = cvehicle.m_handling_flags
 	if m_handling_flags:is_null() then
 		return false
 	end
@@ -269,12 +276,12 @@ end
 ---@param flag eVehicleModelFlags
 ---@return boolean
 function Memory:GetVehicleModelInfoFlag(vehicle, flag)
-	local CVehicle = self:GetVehicleInfo(vehicle)
-	if not CVehicle then
+	local cvehicle = self:GetVehicleInternal(vehicle)
+	if (not cvehicle) then
 		return false
 	end
 
-	local base_ptr = CVehicle.m_model_info_flags
+	local base_ptr = cvehicle.m_model_info_flags
 	if base_ptr:is_null() then
 		return false
 	end
@@ -305,7 +312,7 @@ function Memory:GetEntityModelType(entity)
 
 		local m_model_info = pEntity:add(0x0020):deref()
 		local m_model_type = m_model_info:add(0x009D)
-		return m_model_type:get_word()
+		return m_model_type:get_word() & 0x1F
 	end)
 
 	return isMemSafe and entityType or Enums.eModelType.Invalid
@@ -328,5 +335,4 @@ end
 --]]
 
 require("includes.modules.Game")
--- inline
 return Memory()

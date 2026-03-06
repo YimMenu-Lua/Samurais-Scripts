@@ -14,17 +14,17 @@ local CStructView = require("includes.classes.gta.CStructView")
 --------------------------------------
 ---@ignore
 ---@class CPlayerInfo : CStructBase<CPlayerInfo>
----@field private m_ptr pointer
----@field m_swim_speed pointer<float>
----@field m_game_state pointer<eGameState>
----@field m_is_wanted pointer<byte> bool
----@field m_wanted_level pointer<uint32_t>
----@field m_wanted_level_display pointer<uint32_t>
----@field m_run_speed pointer<float>
----@field m_stamina pointer<float>
----@field m_stamina_regen pointer<float>
----@field m_weapon_damage_mult pointer<float>
----@field m_weapon_defence_mult pointer<float> // 0x0D70
+---@field protected m_ptr pointer
+---@field public m_swim_speed pointer<float>
+---@field public m_game_state pointer<eGameState>
+---@field public m_is_wanted pointer<bool>
+---@field public m_wanted_level pointer<uint32_t>
+---@field public m_wanted_level_display pointer<uint32_t>
+---@field public m_run_speed pointer<float>
+---@field public m_stamina pointer<float>
+---@field public m_stamina_regen pointer<float>
+---@field public m_weapon_damage_mult pointer<float>
+---@field public m_weapon_defence_mult pointer<float> // 0x0D70
 ---@overload fun(ptr: pointer): CPlayerInfo|nil
 local CPlayerInfo = CStructView("CPlayerInfo", {
 	{ "m_swim_speed",           0x01C8 },
@@ -37,7 +37,7 @@ local CPlayerInfo = CStructView("CPlayerInfo", {
 	{ "m_stamina_regen",        0x0D58 },
 	{ "m_weapon_damage_mult",   0x0D6C },
 	{ "m_weapon_defence_mult",  0x0D70 },
-}, 0x0D78)
+}, 0x0D74)
 
 ---@return eGameState
 function CPlayerInfo:GetGameState()

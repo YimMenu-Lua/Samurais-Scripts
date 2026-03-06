@@ -8,7 +8,6 @@
 
 
 ---@diagnostic disable: lowercase-global
-
 local API_VER <const> = Backend:GetAPIVersion()
 
 ---@enum eThreadState
@@ -72,7 +71,7 @@ function Thread.new(name, callback)
 			m_avg_work_ms   = 0,
 			m_avg_cycle_ms  = 0,
 		},
-		---@diagnostic disable-next-line
+		---@diagnostic disable-next-line: param-type-mismatch
 		Thread
 	)
 end
@@ -142,26 +141,24 @@ function Thread:OnTick(s)
 
 	while (self.m_can_run) do
 		if (self.m_should_pause) then
-			self.m_state = eThreadState.SUSPENDED
+			self.m_state         = eThreadState.SUSPENDED
 			self.m_last_entry_at = 0
 			repeat
 				self.m_last_yield_at = Time.Now()
 				yield()
 			until not self.m_should_pause
-			self.m_time_started = Time.Now()
+			self.m_time_started  = Time.Now()
 			self.m_last_entry_at = Time.Now()
 		end
 
-		self.m_state = eThreadState.RUNNING
-
-		local cycle_start = Time.Now()
+		self.m_state         = eThreadState.RUNNING
+		local cycle_start    = Time.Now()
 		self.m_last_entry_at = cycle_start
-
-		local work_start = cycle_start
-		local ok, err = pcall(self.m_callback, s)
-		local work_end = Time.Now()
-		local work_ms = (work_end - work_start) * 1000
-		self.m_avg_work_ms = self.m_avg_work_ms * 0.9 + work_ms * 0.1
+		local work_start     = cycle_start
+		local ok, err        = pcall(self.m_callback, s)
+		local work_end       = Time.Now()
+		local work_ms        = (work_end - work_start) * 1000
+		self.m_avg_work_ms   = self.m_avg_work_ms * 0.9 + work_ms * 0.1
 
 		if (not ok) then
 			log.fwarning("Thread %s was terminated due to an unhandled exception: %s", self.m_name, err)
@@ -169,10 +166,10 @@ function Thread:OnTick(s)
 			return
 		end
 
-		self.m_last_exit_at = Time.Now()
+		self.m_last_exit_at  = Time.Now()
 		self.m_last_yield_at = self.m_last_exit_at
-		local cycle_ms = (self.m_last_exit_at - cycle_start) * 1000
-		self.m_avg_cycle_ms = self.m_avg_cycle_ms * 0.9 + cycle_ms * 0.1
+		local cycle_ms       = (self.m_last_exit_at - cycle_start) * 1000
+		self.m_avg_cycle_ms  = self.m_avg_cycle_ms * 0.9 + cycle_ms * 0.1
 
 		yield()
 	end
@@ -185,13 +182,13 @@ function Thread:Start()
 	end
 
 	self.m_can_run = (type(self.m_callback) == "function")
-	if not self.m_can_run then
-		log.fwarning("Thread %s was terminated because it had no callback", self.m_name)
+	if (not self.m_can_run) then
+		log.fwarning("Thread %s was terminated. Nothing to execute.", self.m_name)
 		self.m_state = eThreadState.DEAD
 		return false
 	end
 
-	self.m_state = eThreadState.RUNNING
+	self.m_state        = eThreadState.RUNNING
 	self.m_time_started = Time.Now()
 	Backend:debug("Started thread %s", self.m_name)
 	return true
@@ -203,8 +200,8 @@ function Thread:Stop()
 	end
 
 	self.m_time_started = 0
-	self.m_can_run = false
-	self.m_state = eThreadState.DEAD
+	self.m_can_run      = false
+	self.m_state        = eThreadState.DEAD
 	Backend:debug("Terminated thread %s", self.m_name)
 end
 
@@ -264,21 +261,24 @@ end
 ---@class ThreadManager : ClassMeta<ThreadManager>
 ---@field private m_threads table<string, Thread>
 ---@field private m_mock_routines table<integer, thread>
----@field private m_callback_handlers table<integer, { dispatch: function}>
+---@field private m_callback_handlers table<integer, { dispatch: function }>
+---@field protected m_initialized boolean
 local ThreadManager = Class("ThreadManager")
 
 ---@return ThreadManager
 function ThreadManager:init()
-	local instance = setmetatable({
-		m_threads = {},
-		m_mock_routines = {}
-	}, self)
+	if (self.m_initialized) then
+		log.warning("Attempt to create a second instance of a singleton (ThreadManager)")
+		return self
+	end
 
-	instance.m_callback_handlers = {
+	self.m_threads           = {}
+	self.m_mock_routines     = {}
+	self.m_callback_handlers = {
 		[Enums.eAPIVersion.L54] = {
 			dispatch = function(callback)
 				table.insert(
-					instance.m_mock_routines,
+					self.m_mock_routines,
 					coroutine.create(callback)
 				)
 			end
@@ -306,10 +306,11 @@ function ThreadManager:init()
 	}
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
-		instance:Shutdown()
+		self:Shutdown()
 	end)
 
-	return instance
+	self.m_initialized = true
+	return self
 end
 
 -- Runs a callback once in a fiber.
@@ -328,6 +329,70 @@ function ThreadManager:Run(func)
 
 	handler.dispatch(func)
 end
+
+--[[
+-- Fiber-safe variant of `ThreadManager:Run` that captures return values and writes them into the provided buffer (DataBuffer or table).
+--
+-- For single values, you can always just store a local somewhere outside the UI function then call `Run` and manually asign the value.
+--
+-- However with multiple values, this function is cleaner.
+--
+-- - **Run Example:**
+--
+--```Lua
+-- local some_val_1 = false
+-- local some_val_2 = ""
+-- local function MyImGuiFunction()
+-- 	ThreadManager:Run(function()
+-- 		some_val_1, some_val_2 = NAMESPACE.SOME_GTA_NATIVE()
+-- 	end)
+--
+-- 	if (some_val_1) then
+-- 		ImGui.Text(some_val_2)
+-- 	end
+-- end
+--```
+--
+-- - **WithBuffer Example:**
+--
+--```Lua
+-- local myBuff = { false, "" }
+-- local function MyImGuiFunction()
+-- 	ThreadManager:WithBuffer(myBuff, function()
+-- 		return NAMESPACE.SOME_GTA_NATIVE()
+-- 	end)
+--
+-- 	if (myBuff[1]) then
+-- 		ImGui.Text(myBuff[2])
+-- 	end
+-- end
+--```
+---@generic R1, R2, R3, R4, R5, R6, R7, R8, R9
+---@param outBuff array<any>|DataBuffer|DataBuffer[] A buffer that will contain the function output. Can be a single `DataBuffer` object, an empty array, an array of arbitrary data, or an array of `DataBuffer` objects.
+---@param func fun(): R1, R2?, R3?, R4?, R5?, R6?, R7?, R8?, R9?, ...?
+function ThreadManager:WithBuffer(outBuff, func)
+	if (not outBuff) then
+		return
+	end
+
+	self:Run(function()
+		if (IsInstance(outBuff, DataBuffer)) then
+			outBuff:Set(func())
+			return
+		end
+
+		local res = { func() }
+		for i = 1, #res do
+			local buff = outBuff[i]
+			if (IsInstance(buff, DataBuffer)) then
+				buff:Set(res[i])
+			else
+				outBuff[i] = res[i]
+			end
+		end
+	end)
+end
+]]
 
 -- Creates a thread that runs in a loop.
 ---@param name string

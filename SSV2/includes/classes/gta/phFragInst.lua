@@ -7,8 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+--------------------------------------
+-- Class: phFragInst
+--------------------------------------
 ---@class phFragInst
----@field private m_ptr pointer
+---@field protected m_ptr pointer
 ---@field public m_cache_entry pointer
 ---@field public m_num_bones number
 ---@field public m_skeleton pointer
@@ -63,7 +66,7 @@ function phFragInst:GetMatrixPtr(bone_index)
 		return nullptr
 	end
 
-	return self.m_obj_matrices:add(bone_index * SizeOf(fMatrix44))
+	return self.m_obj_matrices:add(bone_index * 0x40)
 end
 
 ---@return pointer
@@ -72,7 +75,7 @@ function phFragInst:GetGlobalMatrixPtr(bone_index)
 		return nullptr
 	end
 
-	return self.m_global_matrices:add(bone_index * SizeOf(fMatrix44))
+	return self.m_global_matrices:add(bone_index * 0x40)
 end
 
 return phFragInst

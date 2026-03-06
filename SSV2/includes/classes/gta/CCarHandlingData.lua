@@ -8,7 +8,12 @@
 
 
 local CStructView = require("includes.classes.gta.CStructView")
+local atArray     = require("includes.classes.gta.atArray")
 
+
+--------------------------------------
+-- Class: CCarHandlingData
+--------------------------------------
 ---@class CCarHandlingData : CBaseSubHandlingData
 ---@field protected m_ptr pointer
 ---@field private m_size uint16_t
