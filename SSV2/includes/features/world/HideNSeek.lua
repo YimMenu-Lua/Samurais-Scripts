@@ -379,48 +379,54 @@ function HideNSeek:HideInTrunk()
 end
 
 function HideNSeek:IsNearCarTrunk()
-	if LocalPlayer:IsOnFoot() and not YimActions:IsPedPlaying() then
-		local selfPos = LocalPlayer:GetPos()
-		local selfFwd = Game.GetForwardVector(LocalPlayer:GetHandle())
-		local fwdPos = vec3:new(selfPos.x + (selfFwd.x * 1.3), selfPos.y + (selfFwd.y * 1.3), selfPos.z)
-		local veh = Game.GetClosestVehicle(fwdPos, 20, nil, false, 2)
-
-		if (veh ~= nil and veh > 0) then
-			if (not VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(veh))) then
-				return false, 0, false
-			end
-
-			local bootBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "boot")
-			if (bootBone ~= -1) then
-				local vehCoords         = ENTITY.GET_ENTITY_COORDS(veh, false)
-				local vehFwdVec         = ENTITY.GET_ENTITY_FORWARD_VECTOR(veh)
-				local engineBone        = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "engine")
-				local lfwheelBone       = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "wheel_lf")
-				local engBoneCoords     = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, engineBone)
-				local lfwBoneCoords     = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, lfwheelBone)
-				local bonedistance      = lfwBoneCoords:distance(engBoneCoords)
-				local m_is_rear_engined = bonedistance > 2 -- Can also read vehicle model flag FRONT_BOOT
-				local vmin, vmax        = Game.GetModelDimensions(ENTITY.GET_ENTITY_MODEL(veh))
-				local veh_length        = vmax.y - vmin.y
-				local tempPos           = m_is_rear_engined
-					and vec2:new(
-						vehCoords.x + (vehFwdVec.x * (veh_length / 1.6)),
-						vehCoords.y + (vehFwdVec.y * (veh_length / 1.6))
-					)
-					or vec2:new(
-						vehCoords.x - (vehFwdVec.x * (veh_length / 1.6)),
-						vehCoords.y - (vehFwdVec.y * (veh_length / 1.6))
-					)
-
-				local search_area       = vec3:new(tempPos.x, tempPos.y, vehCoords.z)
-				if (search_area:distance(LocalPlayer:GetPos()) <= 1.5) then
-					return true, veh, m_is_rear_engined
-				end
-			end
-		end
+	if (not LocalPlayer:IsOnFoot() or YimActions:IsPedPlaying()) then
+		return false, 0, false
 	end
 
-	return false, 0, false
+	local selfPos = LocalPlayer:GetPos()
+	local selfFwd = Game.GetForwardVector(LocalPlayer:GetHandle())
+	local fwdPos  = vec3:new(selfPos.x + (selfFwd.x * 1.3), selfPos.y + (selfFwd.y * 1.3), selfPos.z)
+	local veh     = Game.GetClosestVehicle(fwdPos, 20, nil, false, 2)
+
+	if (veh == 0) then
+		return false, 0, false
+	end
+
+	if (not VEHICLE.IS_THIS_MODEL_A_CAR(ENTITY.GET_ENTITY_MODEL(veh))) then
+		return false, 0, false
+	end
+
+	local bootBone = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "boot")
+	if (bootBone == -1) then
+		return false, 0, false
+	end
+
+	local vehCoords         = ENTITY.GET_ENTITY_COORDS(veh, false)
+	local vehFwdVec         = ENTITY.GET_ENTITY_FORWARD_VECTOR(veh)
+	local engineBone        = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "engine")
+	local lfwheelBone       = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(veh, "wheel_lf")
+	local engBoneCoords     = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, engineBone)
+	local lfwBoneCoords     = ENTITY.GET_WORLD_POSITION_OF_ENTITY_BONE(veh, lfwheelBone)
+	local bonedistance      = lfwBoneCoords:distance(engBoneCoords)
+	local m_is_rear_engined = bonedistance > 2 -- Can also read vehicle model flag FRONT_BOOT
+	local vmin, vmax        = Game.GetModelDimensions(ENTITY.GET_ENTITY_MODEL(veh))
+	local veh_length        = vmax.y - vmin.y
+	local tempPos           = m_is_rear_engined
+		and vec2:new(
+			vehCoords.x + (vehFwdVec.x * (veh_length / 1.6)),
+			vehCoords.y + (vehFwdVec.y * (veh_length / 1.6))
+		)
+		or vec2:new(
+			vehCoords.x - (vehFwdVec.x * (veh_length / 1.6)),
+			vehCoords.y - (vehFwdVec.y * (veh_length / 1.6))
+		)
+
+	local search_area       = vec3:new(tempPos.x, tempPos.y, vehCoords.z)
+	if (search_area:distance(LocalPlayer:GetPos()) > 1.5) then
+		return false, 0, false
+	end
+
+	return true, veh, m_is_rear_engined
 end
 
 function HideNSeek:IsNearTrashBin()

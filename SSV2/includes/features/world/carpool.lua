@@ -196,8 +196,8 @@ function Carpool:FindVehicle()
 	end
 	self.m_last_check_time = now
 
-	local handle = Game.GetClosestVehicle(LocalPlayer:GetHandle(), 15, LocalPlayer:GetVehicleNative(), true, 3)
-	if (not ENTITY.IS_ENTITY_A_VEHICLE(handle)) then
+	local handle = Game.GetClosestVehicle(LocalPlayer:GetPos(), 15, LocalPlayer:GetVehicleNative(), true, 3)
+	if (handle == 0) then
 		self:ResetCachedData()
 		self.m_vehicle = nil
 		return
