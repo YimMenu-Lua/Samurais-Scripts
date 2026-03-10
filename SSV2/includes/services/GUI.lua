@@ -166,18 +166,17 @@ end
 
 ---@param align? number -- 0: top center | 1: bottom center | 2: left center | 3: right center | 4: center
 function GUI:Snap(align)
-	align = align or 0
-	local resolution = Game.GetScreenResolution()
+	local resolution     = Game.GetScreenResolution()
 	local top_bar_height = resolution.y * 0.12
-	local size = vec2:new(GVars.ui.window_size.x, GVars.ui.window_size.y + top_bar_height + 10)
-	local _, center = self:GetNewWindowSizeAndCenterPos(0.5, 0.8, size)
-	local top_center = vec2:new(center.x, 1)
-	local endPos = Switch(align) {
-		[0] = top_center,
-		[1] = vec2:new(center.x, resolution.y - size.y),
-		[2] = vec2:new(1, center.y),
-		[3] = vec2:new(resolution.x - size.x - 1, center.y),
-		[4] = center,
+	local size           = vec2:new(GVars.ui.window_size.x, GVars.ui.window_size.y + top_bar_height + 10)
+	local _, center      = self:GetNewWindowSizeAndCenterPos(0.5, 0.8, size)
+	local top_center     = vec2:new(center.x, 1)
+	local endPos         = Switch(align or 0) {
+		[0]     = top_center,
+		[1]     = vec2:new(center.x, resolution.y - size.y),
+		[2]     = vec2:new(1, center.y),
+		[3]     = vec2:new(resolution.x - size.x - 1, center.y),
+		[4]     = center,
 		default = top_center
 	}
 
@@ -213,15 +212,22 @@ end
 
 ---@param id eTabID Category
 ---@param name string
----@return boolean
-function GUI:DoesTabExist(id, name)
+---@return Tab?
+function GUI:GetTab(id, name)
 	for _, pair in ipairs(self.m_tabs[id]) do
 		if (pair.first == name) then
-			return true
+			return pair.second
 		end
 	end
 
-	return false
+	return nil
+end
+
+---@param id eTabID Category
+---@param name string
+---@return boolean
+function GUI:DoesTabExist(id, name)
+	return self:GetTab(id, name) ~= nil
 end
 
 ---@param id eTabID Category
@@ -239,21 +245,7 @@ function GUI:RegisterNewTab(id, name, drawable, subtabs, isTranslatorLabel)
 
 	local newtab = Pair.new(name, Tab(name, drawable, subtabs, isTranslatorLabel))
 	table.insert(self.m_tabs[id], newtab)
-
 	return newtab.second
-end
-
----@param id eTabID Category
----@param name string
----@return Tab?
-function GUI:GetTab(id, name)
-	for _, pair in ipairs(self.m_tabs[id]) do
-		if (pair.first == name) then
-			return pair.second
-		end
-	end
-
-	return nil
 end
 
 ---@param id eTabID Category
@@ -309,7 +301,6 @@ end
 ---@param drawfunc function
 function GUI:RegisterIndependentGUI(drawfunc)
 	if (type(drawfunc) ~= "function") then
-		log.debug("not a function")
 		return
 	end
 
@@ -319,7 +310,7 @@ end
 ---@param fmt string
 ---@param ... any
 function GUI:Notify(fmt, ...)
-	local msg = (... ~= nil) and _F(fmt, ...) or fmt
+	local msg  = (... ~= nil) and _F(fmt, ...) or fmt
 	local name = Backend.script_name:replace("_", " "):titlecase()
 	Notifier:ShowMessage(name, msg)
 end
@@ -375,11 +366,11 @@ function GUI:DrawDummyTab()
 
 		if (debug_counter == 7) then
 			self:PlaySound(GUI.Sounds.Nav)
-			log.debug("Debug mode activated.")
+			log.debug("Debug mode activated. Please reload the script to load debug tools & UIs.")
 			GVars.backend.debug_mode = true
 		elseif (debug_counter > 7) then
 			self:PlaySound(GUI.Sounds.Cancel)
-			log.debug("Debug mode deactivated.")
+			log.debug("Debug mode deactivated. Please reload the script to hide debug tools & UIs.")
 			GVars.backend.debug_mode = false
 			debug_counter = 0
 		end
@@ -700,17 +691,14 @@ function GUI:Draw()
 	end
 	ThemeManager:PopTheme()
 
-	local next_y_pos = GVars.ui.window_pos.y + fixed_height + 10
+	local next_y_pos      = GVars.ui.window_pos.y + fixed_height + 10
 	local cb_window_pos_x = GVars.ui.window_pos.x
 	if (self.m_is_drawing_sidebar) then
 		cb_window_pos_x = cb_window_pos_x + self.m_sidebar_width + 10
 	end
 
 	if (self.m_selected_tab) then
-		local fixedWidth = self.m_is_drawing_sidebar
-			and (GVars.ui.window_size.x - self.m_sidebar_width - 10)
-			or GVars.ui.window_size.x
-
+		local fixedWidth = self.m_is_drawing_sidebar and (GVars.ui.window_size.x - self.m_sidebar_width - 10) or GVars.ui.window_size.x
 		ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
 		ImGui.SetNextWindowPos(cb_window_pos_x, next_y_pos, ImGuiCond.Always)
 		ImGui.SetNextWindowSizeConstraints(fixedWidth, 20, fixedWidth, GVars.ui.window_size.y - 10)
@@ -854,7 +842,7 @@ function GUI:HelpMarker(text, opts)
 end
 
 -- Displays a multiline tooltip when the ImGui widget this function is called after is hovered.
----@param lines string[]
+---@param lines array<string>
 ---@param wrap_pos? number
 function GUI:TooltipMultiline(lines, wrap_pos)
 	if (GVars.ui.disable_tooltips) then
@@ -1031,34 +1019,15 @@ function GUI:Button(label, opts)
 	return pressed
 end
 
----@param label string
----@param color Color
----@param hover_color Color
----@param active_color Color
----@param opts? { size?: vec2, repeatable?: boolean }
-function GUI:ButtonColored(label, color, hover_color, active_color, opts)
-	ImGui.PushStyleColor(ImGuiCol.Button, color:AsFloat())
-	ImGui.PushStyleColor(ImGuiCol.ButtonHovered, hover_color:AsFloat())
-	ImGui.PushStyleColor(ImGuiCol.ButtonActive, active_color:AsFloat())
-	local pressed = self:Button(label, opts)
-	ImGui.PopStyleColor(3)
-
-	if (pressed) then
-		self:PlaySound(self.Sounds.Button)
-	end
-
-	return pressed
-end
-
 --- Draws an ImGui item and handles enabling/disabling it on `condition`.
 ---@generic T1, T2, T3, T4, T5
----@param ImGuiItem fun(...: any): T1, T2, T3, T4, T5
 ---@param condition boolean Disables the item when true.
+---@param ImGuiItem fun(...: any): T1, T2?, T3?, T4?, T5?
 ---@param ... any
----@return T1, T2, T3, T4, T5, ...
-function GUI:ConditionalItem(ImGuiItem, condition, ...)
+---@return T1, T2?, T3?, T4?, T5?, ...?
+function GUI:ConditionalItem(condition, ImGuiItem, ...)
 	ImGui.BeginDisabled(condition)
-	local ret = table.pack(ImGuiItem(...))
+	local ret = { ImGuiItem(...) }
 	ImGui.EndDisabled()
 
 	return table.unpack(ret)

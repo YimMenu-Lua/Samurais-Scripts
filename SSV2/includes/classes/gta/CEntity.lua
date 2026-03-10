@@ -9,13 +9,10 @@
 
 local fwDrawData = require("includes.classes.gta.fwDrawData")
 
----@ignore
----@class CBaseModelInfo : GenericClass
-local CBaseModelInfo = GenericClass
 
----@ignore
----@class CAttackers : GenericClass
-local CAttackers = GenericClass
+---@class CBaseModelInfo
+---@class CAttackers
+
 
 --------------------------------------
 -- Class: CEntity

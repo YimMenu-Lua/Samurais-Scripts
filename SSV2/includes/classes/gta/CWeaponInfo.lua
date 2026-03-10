@@ -7,8 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CWeaponFiringPatternAliases = require("includes.classes.gta.CWeaponFiringPatternAliases")
 local CStructView                 = require("includes.classes.gta.CStructView")
+local CWeaponFiringPatternAliases = require("includes.classes.gta.CWeaponFiringPatternAliases")
 
 
 ---@enum eWeaponDamageType
@@ -120,40 +120,49 @@ Enums.eWeaponEffectGroup = {
 ---@field m_reticule_style_hash pointer<joaat_t> //0x05AC
 ---@field m_firing_pattern_aliases CWeaponFiringPatternAliases //0x0920
 ---@overload fun(ptr: pointer): CWeaponInfo
-local CWeaponInfo = CStructView("CWeaponInfo", {
-	{ "m_name_hash",               0x0010 },
-	{ "m_model_hash",              0x0014 },
-	{ "m_audio_hash",              0x0018 },
-	{ "m_slot_hash",               0x001C },
-	{ "m_damage_type",             0x0020 },
-	{ "m_fire_type",               0x0054 },
-	{ "m_wheel_slot",              0x0058 },
-	{ "m_group_hash",              0x005C },
-	{ "m_clip_size",               0x0070 },
-	{ "m_damage",                  0x00B0 },
-	{ "m_vehicle_damage_modifier", 0x00D4 },
-	{ "m_force",                   0x00D8 },
-	{ "m_force_on_ped",            0x00DC },
-	{ "m_force_on_vehicle",        0x00E0 },
-	{ "m_force_on_heli",           0x00E4 },
-	{ "m_force_max_strength_mult", 0x00F8 },
-	{ "m_projectile_force",        0x0108 },
-	{ "m_frag_impulse",            0x010C },
-	{ "m_speed",                   0x011C },
-	{ "m_bullets_in_batch",        0x0120 },
-	{ "m_bullets_per_anim_loop",   0x0138 },
-	{ "m_time_between_shots",      0x013C },
-	{ "m_should_fire_time_left",   0x0140 },
-	{ "m_alt_wait_time",           0x0150 },
-	{ "m_effect_group",            0x0170 },
-	{ "m_vehicle_weapon_hash",     0x02B4 },
-	{ "m_default_camera_hash",     0x02B8 },
-	{ "m_aim_camera_hash",         0x02BC },
-	{ "m_fire_camera_hash",        0x02C0 },
-	{ "m_camera_fov",              0x02FC },
-	{ "m_reticule_scale",          0x05A8 },
-	{ "m_reticule_style_hash",     0x05AC },
-	{ "m_firing_pattern_aliases",  { 0x0920, "deref" }, CWeaponFiringPatternAliases },
-}, 0x0928, true)
+local CWeaponInfo = CStructView("CWeaponInfo", 0x0928)
+
+---@param ptr pointer
+---@return CWeaponInfo
+function CWeaponInfo.new(ptr)
+	return setmetatable({
+		m_ptr                     = ptr,
+		m_name_hash               = ptr:add(0x0010),
+		m_model_hash              = ptr:add(0x0014),
+		m_audio_hash              = ptr:add(0x0018),
+		m_slot_hash               = ptr:add(0x001C),
+		m_damage_type             = ptr:add(0x0020),
+		m_fire_type               = ptr:add(0x0054),
+		m_wheel_slot              = ptr:add(0x0058),
+		m_group_hash              = ptr:add(0x005C),
+		m_clip_size               = ptr:add(0x0070),
+		m_damage                  = ptr:add(0x00B0),
+		m_vehicle_damage_modifier = ptr:add(0x00D4),
+		m_force                   = ptr:add(0x00D8),
+		m_force_on_ped            = ptr:add(0x00DC),
+		m_force_on_vehicle        = ptr:add(0x00E0),
+		m_force_on_heli           = ptr:add(0x00E4),
+		m_force_max_strength_mult = ptr:add(0x00F8),
+		m_projectile_force        = ptr:add(0x0108),
+		m_frag_impulse            = ptr:add(0x010C),
+		m_penetration             = ptr:add(0x0110),
+		m_speed                   = ptr:add(0x011C),
+		m_bullets_in_batch        = ptr:add(0x0120),
+		m_bullets_per_anim_loop   = ptr:add(0x0138),
+		m_time_between_shots      = ptr:add(0x013C),
+		m_should_fire_time_left   = ptr:add(0x0140),
+		m_alt_wait_time           = ptr:add(0x0150),
+		m_effect_group            = ptr:add(0x0170),
+		m_vehicle_weapon_hash     = ptr:add(0x02B4),
+		m_default_camera_hash     = ptr:add(0x02B8),
+		m_aim_camera_hash         = ptr:add(0x02BC),
+		m_fire_camera_hash        = ptr:add(0x02C0),
+		m_camera_fov              = ptr:add(0x02FC),
+		m_reticule_scale          = ptr:add(0x05A8),
+		m_reticule_style_hash     = ptr:add(0x05AC),
+		m_firing_pattern_aliases  = CWeaponFiringPatternAliases(ptr:add(0x0920):deref())
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, CWeaponInfo)
+end
 
 return CWeaponInfo

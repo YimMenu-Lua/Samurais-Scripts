@@ -67,6 +67,9 @@ GenericClass = setmetatable({}, {
 ---@class handle: integer
 -- RAGE JOAAT hash
 ---@class hash: joaat_t
+---@class pointer_ref
+---@field deref fun(self: pointer): pointer|nullptr
+
 ---@alias anyval<T> table|metatable|userdata|lightuserdata|function|string|number|boolean Any Lua value except nil.
 ---@alias optional<T> T?
 
@@ -74,15 +77,60 @@ GenericClass = setmetatable({}, {
 
 --#region Functional Types
 
----@alias Callback fun()
+---@alias Callback function
 ---@alias Predicate<P1, P2, P3, P4, P5> fun(p1: P1, p2?: P2, p3?: P3, p4?: P4, p5?: P5): boolean
 ---@alias Comparator<A, B> fun(a: A, b: B): boolean
 
--- A poor man's `nullptr`
----@class nullptr : pointer
-nullptr = memory.pointer:new(0)
-
----@type boolean?
+---@type boolean
 _G.FAKE_YIMAPI = _G.FAKE_YIMAPI or false
 
 --#endregion
+
+do
+	---@class nullptr : pointer
+	local nullptr <const>     = {}
+	local NOP <const>         = function() end -- there's also a global no-op function but it gets defined after we load this file.
+	local RET_ZERO <const>    = function() return 0 end
+	local RET_NULL <const>    = function() return "" end
+	local RET_NULLPTR <const> = function() return nullptr end
+	local RET_TRUE <const>    = function() return true end
+	local RET_FALSE <const>   = function() return false end
+	local THROW <const>       = function() error("Attempt to dereference a null pointer.", 2) end
+	local CONST_THROW <const> = function() error("Attempt to modify nullptr", 2) end
+	local TOSTRING <const>    = function() return "nullptr" end
+	local __null_idx <const>  = {
+		is_valid    = RET_FALSE,
+		is_null     = RET_TRUE,
+		get_address = RET_ZERO,
+		set_address = NOP,
+		deref       = THROW,
+		rip         = RET_NULLPTR,
+		add         = RET_NULLPTR,
+		sub         = RET_NULLPTR,
+		new         = RET_NULLPTR,
+	}
+
+	for k, v in pairs(getmetatable(memory.pointer)) do
+		if (type(k) ~= "string" or __null_idx[k] or type(v) ~= "function") then
+			goto continue
+		end
+
+		local sub = k:sub(1, 3)
+		if (sub == "set") then
+			__null_idx[k] = NOP
+		elseif (sub == "get") then
+			__null_idx[k] = (k == "get_string") and RET_NULL or RET_ZERO
+		else
+			__null_idx[k] = v
+		end
+
+		::continue::
+	end
+
+	local __null_mt <const> = {
+		__index     = __null_idx,
+		__newindex  = CONST_THROW,
+		__tostring  = TOSTRING,
+		__metatable = false
+	}; setmetatable(nullptr, __null_mt); _G.nullptr = nullptr
+end

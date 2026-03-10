@@ -17,6 +17,7 @@ local CWheel              = require("includes.classes.gta.CWheel")
 local fMatrix44           = require("includes.classes.gta.fMatrix44")
 local phFragInst          = require("includes.classes.gta.phFragInst")
 
+
 ---@class CAdvancedData
 ---@class CVehicleModelInfo
 ---@class CVehicleDamage
@@ -461,10 +462,9 @@ function CVehicle:GetWheel(index)
 	return CWheel(self.m_wheels:Get(index))
 end
 
----@param refresh? boolean
 ---@return CWheelDrawData
-function CVehicle:GetWheelDrawData(refresh)
-	return self.m_draw_data:GetWheelDrawData(refresh)
+function CVehicle:GetWheelDrawData()
+	return self.m_draw_data:GetWheelDrawData()
 end
 
 ---@return float -- Wheel width or 0.f if invalid

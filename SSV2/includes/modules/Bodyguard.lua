@@ -786,7 +786,6 @@ function Bodyguard:UpdateTasks()
 		end
 	elseif (self.task == eGuardTask.LEAVE_VEHICLE) then
 		if (not PED.IS_PED_IN_ANY_VEHICLE(self.m_handle, false)) then
-			print("not in a vehicle")
 			self.task = eGuardTask.NONE
 		end
 	elseif (self.task == eGuardTask.FOLLOW) then

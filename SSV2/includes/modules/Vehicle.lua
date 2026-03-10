@@ -557,10 +557,9 @@ function Vehicle:IsWheelBrokenOff(wheelIndex)
 	return self:Resolve():IsWheelBrokenOff(wheelIndex)
 end
 
----@param refresh? boolean
 ---@return CWheelDrawData
-function Vehicle:GetWheelDrawData(refresh)
-	return self:Resolve():GetWheelDrawData(refresh)
+function Vehicle:GetWheelDrawData()
+	return self:Resolve():GetWheelDrawData()
 end
 
 ---@return float -- Wheel width or 0.f if invalid

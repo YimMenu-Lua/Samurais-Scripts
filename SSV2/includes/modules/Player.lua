@@ -17,43 +17,62 @@
 -- Class representing a GTA V player (Unfinished).
 ---@class Player : Ped
 ---@field private m_internal CPed
----@field private m_pid integer PlayerID
----@field Resolve fun() : CPed
----@overload fun(pid: integer): Player
+---@field private m_handle handle
+---@field private m_pid ID PlayerID
+---@field public Resolve fun(self: Player) : CPed
+---@field public super fun(self: Player): Ped
+---@overload fun(p0: ID | handle): Player
 Player = Class("Player", { parent = Ped })
-Player.Create = nil
-Player.Delete = nil
+
+
+---@override
+Player.Create              = nil
+---@override
+Player.Delete              = nil
+---@override
 Player.SetAsNoLongerNeeded = nil
 
--- Constructor
----@param player_id integer
----@return Player
-function Player.new(player_id)
-	assert(math.is_inrange(player_id, 0, 32), "Invalid player ID")
 
-	local ped_handle = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+---@param p0 ID|handle A player ID [0 .. 32] or a ped handle.
+---@return Player
+function Player.new(p0)
+	local ped, pid = 0, 0
+	if (math.is_inrange(p0, 0, 32)) then
+		pid = p0
+		ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+	elseif (Game.IsScriptHandle(p0)) then
+		ped = p0
+		pid = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(p0)
+	else
+		error("Invalid parameter. Function expects a player ID or a ped handle.")
+	end
+
+	if (not PED.IS_PED_A_PLAYER(ped)) then
+		error("Attempt to create a Player instance from a non-player ped.")
+	end
+
+	---@type Player
 	local instance = setmetatable({
-		m_pid    = player_id,
-		m_handle = ped_handle,
+		m_pid    = pid,
+		m_handle = ped,
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, Player)
 
-	instance.m_internal = instance:Resolve()
 	return instance
+end
+
+---@return boolean
+function Player:IsValid()
+	if (self == LocalPlayer) then
+		return true
+	end
+
+	return self:Exists() and PED.IS_PED_A_PLAYER(self:GetHandle())
 end
 
 ---@return eGameState
 function Player:GetGameState()
-	if (not self:IsValid()) then
-		return Enums.eGameState.Invalid
-	end
-
-	local cplayerinfo = self:Resolve().m_player_info
-	if (not cplayerinfo or not cplayerinfo:IsValid()) then
-		return Enums.eGameState.Invalid
-	end
-
-	return cplayerinfo:GetGameState()
+	return self:Resolve().m_player_info:GetGameState()
 end
 
 -- Returns whether the player is currently playing.

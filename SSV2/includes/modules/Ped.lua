@@ -31,8 +31,7 @@ end
 
 ---@return boolean
 function Ped:IsPlayer()
-	local cplayerinfo = self:Resolve().m_player_info
-	return cplayerinfo and cplayerinfo:IsValid() or false
+	return self:Resolve().m_player_info:IsValid()
 end
 
 ---@return boolean

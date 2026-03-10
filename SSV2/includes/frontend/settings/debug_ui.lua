@@ -540,8 +540,8 @@ local function DrawMiscTests()
 
 	if (ImGui.Button("Dump CWeaponInfo")) then
 		local out           = {}
-		local cpedweaponmgr = LocalPlayer:Resolve().m_ped_weapon_mgr
-		if (not cpedweaponmgr:IsValid()) then
+		local cpedweaponmgr = LocalPlayer:Resolve():GetWeaponManager()
+		if (not cpedweaponmgr or not cpedweaponmgr:IsValid()) then
 			print("CPedWeaponManager: invalid pointer.")
 			return
 		end

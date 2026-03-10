@@ -7,9 +7,33 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CEntity = require("includes.classes.gta.CEntity")
-local CPed = require("includes.classes.gta.CPed")
-local CVehicle = require("includes.classes.gta.CVehicle")
+local CEntity          = require("includes.classes.gta.CEntity")
+local CPed             = require("includes.classes.gta.CPed")
+local CVehicle         = require("includes.classes.gta.CVehicle")
+local cast_map <const> = {
+	["Entity"]      = {
+		["Object"]      = true,
+		["Vehicle"]     = true,
+		["Ped"]         = true,
+		["Player"]      = true,
+		["LocalPlayer"] = true,
+	},
+	["Object"]      = {
+		["Entity"] = true
+	},
+	["Vehicle"]     = {
+		["Entity"] = true
+	},
+	["Ped"]         = {
+		["Entity"] = true,
+		["Player"] = true,
+	},
+	["LocalPlayer"] = {
+		["Entity"] = true,
+		["Ped"]    = true,
+		["Player"] = true,
+	}
+}
 
 --------------------------------------
 -- Class: Entity
@@ -21,7 +45,7 @@ local CVehicle = require("includes.classes.gta.CVehicle")
 ---@field protected m_ptr pointer
 ---@field private m_internal? CEntity
 ---@overload fun(handle: integer): Entity?
-Entity = Class("Entity")
+Entity                 = Class("Entity")
 
 function Entity:__eq(right)
 	local hndl = self:GetHandle()
@@ -36,36 +60,72 @@ function Entity:__eq(right)
 end
 
 ---@param handle number
----@return Entity|nil
-function Entity.new(handle)
+---@param expectedType? eEntityType
+---@return Entity
+function Entity.new(handle, expectedType)
 	if (not Game.IsScriptHandle(handle)) then
-		return
+		error("Attempt to create an Entity instance from an invalid entity script handle", 2)
+	end
+
+	if (expectedType and ENTITY.GET_ENTITY_TYPE(handle) ~= expectedType) then
+		local type_str = EnumToString(Enums.eEntityType, expectedType)
+		error(_F("The handle provided does not match the expected entity type (%s).", type_str))
 	end
 
 	---@type Entity
 	---@diagnostic disable-next-line
-	local instance = setmetatable({}, Entity)
-	instance.m_handle = handle
+	local instance       = setmetatable({}, Entity)
+	instance.m_handle    = handle
 	instance.m_modelhash = Game.GetEntityModel(handle)
-	instance.m_ptr = memory.handle_to_ptr(handle)
-	instance.m_internal = instance:Resolve()
+	instance.m_ptr       = memory.handle_to_ptr(handle)
+	instance.m_internal  = instance:Resolve()
 
 	return instance
 end
 
----@generic T
----@param obj ClassMeta<T>
----@return T?
+---@return boolean
+function Entity:IsValid()
+	return ENTITY.DOES_ENTITY_EXIST(self:GetHandle())
+end
+
+---@generic T : ClassMeta<Entity>
+---@param obj T
+---@return T
 function Entity:As(obj)
-	if (IsInstance(obj, self)) then
-		log.fwarning("Ignored illegal casting of class %s as %s", self.__type, obj.__type or "Unknown type")
-		return
+	---@diagnostic disable-next-line: undefined-field
+	if (not obj.__type) then
+		error(
+			"Invalid argument. Function expects a game entity class (Entity | Object | Vehicle | Ped | Player | LocalPlayer)."
+		)
 	end
 
-	setmetatable(self, obj)
-	self.__type = obj.__type
+	---@type string
+	local obj_type = obj.__type or "Unknown type"
+	if (obj_type == "LocalPlayer") then
+		error("Can not construct a LocalPlayer instance.")
+	end
 
-	return self
+	local self_type = self.__type
+	if (obj_type == self_type) then
+		error("Can not cast an entity type to the same type.")
+	end
+
+	if (type(obj.new) ~= "function") then
+		error(_F("%s has no valid constructor.", obj_type))
+	end
+
+	local map = cast_map[self_type]
+	if (not map or not map[obj_type]) then
+		error(_F("Can not cast %s to %s.", self_type, obj_type))
+	end
+
+	---@type Entity
+	local instance = obj(self:GetHandle())
+	if (not instance:IsValid()) then
+		error(_F("Failed to cast '%s' to '%s': Invalid entity.", self_type, obj_type))
+	end
+
+	return instance
 end
 
 -- Resolves this entity to its corresponding internal game class (`CEntity`, `CPed`, or `CVehicle`).
@@ -99,9 +159,8 @@ function Entity:Resolve()
 	-- We have to do this because `Self` is static, it inherits from `Entity` but doesn't have a constructor
 	-- and doesn't store handles or hashes as members (because they can change on player switch).
 
-	local hndl = self:GetHandle() -- This is overridden in `Self` to always invoke `PLAYER.PLAYER_PED_ID()`
+	local hndl     = self:GetHandle() -- This is overridden in `Self` to always invoke `PLAYER.PLAYER_PED_ID()`
 	local ent_type = Game.GetEntityType(hndl)
-
 	if (ent_type == Enums.eEntityType.Ped) then
 		self.m_internal = CPed(hndl)
 	elseif (ent_type == Enums.eEntityType.Vehicle) then
@@ -157,7 +216,7 @@ end
 
 ---@return boolean
 function Entity:Exists()
-	return (self:GetHandle() and Game.IsScriptHandle(self:GetHandle()))
+	return Game.IsScriptHandle(self:GetHandle())
 end
 
 ---@return handle

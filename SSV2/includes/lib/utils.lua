@@ -466,14 +466,38 @@ function stats.increment_stat(stat_name, v, min, max)
 	stat_set(stat_name, sum)
 end
 
+local newptr <const> = memory.pointer.new
+---@return pointer
+function memory.pointer:new(addr)
+	if (addr == 0) then return nullptr end
+	return newptr(self, addr)
+end
+
 -- Equality comparator for pointer objects.
 ---@type Comparator<pointer, pointer>
 function memory.pointer:__eq(right)
-	if not IsInstance(right, "pointer") then
+	return self:get_address() == right:get_address()
+end
+
+-- Allows you to compare pointers to numbers, pointers, or nullptr.
+--
+-- **Note:** When comparing with a number, the return will indicate whether the pointer's address equals `v`.
+---@param v pointer|nullptr|number
+---@return boolean
+function memory.pointer:is_equal(v)
+	if (v == self) then
+		return true
+	end
+
+	if (type(v) == "number") then
+		return self:get_address() == v
+	end
+
+	if (not IsInstance(v, "pointer")) then
 		return false
 	end
 
-	return self:get_address() == right:get_address()
+	return self:get_address() == v:get_address()
 end
 
 -- Casts the pointer to an object.
@@ -488,6 +512,10 @@ end
 ---@param obj T
 ---@return T
 function memory.pointer:as(obj)
+	if (self:is_null()) then
+		error("Attempt to cast a null pointer")
+	end
+
 	local obj_type = type(obj)
 	if (obj_type ~= "table") then
 		error(_F("Invalid parameter #1: Table/class expected, got %s instead.", obj_type))
@@ -523,19 +551,22 @@ end
 ---@param adjust? integer
 ---@return number -- imm32 displacement
 function memory.pointer:get_disp32(offset, adjust)
-	if self:is_null() then
-		log.warning("Failed to get imm32 displacement!")
+	if (self:is_null()) then
+		log.warning("Attempt to get imm32 displacement from a null pointer!")
 		return 0
 	end
 
 	offset = offset or 0
 	adjust = adjust or 0
-	local val = self:add(offset):get_int()
-	return val + adjust
+	return self:add(offset):get_int() + adjust
 end
 
 ---@return vec3
 function memory.pointer:get_vec3()
+	if (self:is_null()) then
+		return vec3:zero()
+	end
+
 	local x = self:add(0x4):get_float()
 	local y = self:add(0x8):get_float()
 	local z = self:add(0xC):get_float()
@@ -544,6 +575,10 @@ end
 
 ---@param vector3 vec3
 function memory.pointer:set_vec3(vector3)
+	if (self:is_null()) then
+		return
+	end
+
 	self:add(0x4):set_float(vector3.x)
 	self:add(0x8):set_float(vector3.y)
 	self:add(0xC):set_float(vector3.z)
@@ -551,6 +586,10 @@ end
 
 ---@return vec4
 function memory.pointer:get_vec4()
+	if (self:is_null()) then
+		return vec4:zero()
+	end
+
 	local x = self:add(0x4):get_float()
 	local y = self:add(0x8):get_float()
 	local z = self:add(0xC):get_float()
@@ -561,6 +600,10 @@ end
 
 ---@param vector4 vec4
 function memory.pointer:set_vec4(vector4)
+	if (self:is_null()) then
+		return
+	end
+
 	self:add(0x4):set_float(vector4.x)
 	self:add(0x8):set_float(vector4.y)
 	self:add(0xC):set_float(vector4.z)
@@ -569,6 +612,10 @@ end
 
 ---@return fMatrix44
 function memory.pointer:get_matrix44()
+	if (self:is_null()) then
+		return fMatrix44:zero()
+	end
+
 	return fMatrix44:new(
 		self:add(0x00):get_float(), self:add(0x04):get_float(), self:add(0x08):get_float(), self:add(0x0C):get_float(),
 		self:add(0x10):get_float(), self:add(0x14):get_float(), self:add(0x18):get_float(), self:add(0x1C):get_float(),
@@ -579,6 +626,10 @@ end
 
 ---@param matrix fMatrix44
 function memory.pointer:set_matrix44(matrix)
+	if (self:is_null()) then
+		return
+	end
+
 	local m1 = matrix:R1()
 	local m2 = matrix:R2()
 	local m3 = matrix:R3()
@@ -599,14 +650,13 @@ end
 
 ---@param size? number bytes
 function memory.pointer:dump(size)
-	size = size or 0x10
-	if self:is_null() then
+	if (self:is_null()) then
 		log.debug("Memory Dump<nullptr>")
 		return
 	end
 
 	local result = {}
-
+	size = size or 0x10
 	for i = 0, size - 1 do
 		local byte = self:add(i):get_byte()
 		table.insert(result, string.format("%02X", byte))
@@ -626,9 +676,9 @@ function memory.pointer:create_pattern(size)
 		return ""
 	end
 
-	size = size or 0x10
-	local out = {}
+	local out                      = {}
 	local REG_DIRECT_RANGE <const> = Range(0xC0, 0x100)
+	size                           = size or 0x10
 
 	for i = 0, size - 1 do
 		local byte = self:add(i):get_byte()
