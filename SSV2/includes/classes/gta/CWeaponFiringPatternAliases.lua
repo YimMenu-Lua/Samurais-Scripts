@@ -19,9 +19,16 @@ local atArray     = require("includes.classes.gta.atArray")
 ---@field m_name_hash pointer<joaat_t> // 0x0
 ---@field m_aliases atArray<CFiringPatternAlias> // 0x8
 ---@overload fun(ptr: pointer): CWeaponFiringPatternAliases
-local CWeaponFiringPatternAliases = CStructView("CWeaponFiringPatternAliases", {
-	{ "m_name_hash", 0x0 },
-	{ "m_aliases",   0x8, atArray },
-}, 0x10)
+local CWeaponFiringPatternAliases = CStructView("CWeaponFiringPatternAliases")
+
+---@param ptr pointer
+---@return CWeaponFiringPatternAliases
+function CWeaponFiringPatternAliases.new(ptr)
+	return setmetatable({
+		m_name_hash = ptr:add(0x0),
+		m_aliases   = atArray(ptr:add(0x8))
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, CWeaponFiringPatternAliases)
+end
 
 return CWeaponFiringPatternAliases

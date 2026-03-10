@@ -135,19 +135,19 @@ end
 function PlayerVehicle.new(handle)
 	---@type PlayerVehicle
 	local instance = setmetatable({
-		m_is_nos_active = false,
-		m_handle = handle,
-		m_threads = {},
+		m_is_nos_active          = false,
+		m_handle                 = handle,
+		m_threads                = {},
 		m_default_handling_flags = {},
-		m_generic_toggleables = {},
-		m_default_xenon_lights = { enabled = false, index = 0 },
-		m_default_tire_smoke = { enabled = false, color = vec3:zero() },
-		m_autopilot = {
+		m_generic_toggleables    = {},
+		m_default_xenon_lights   = { enabled = false, index = 0 },
+		m_default_tire_smoke     = { enabled = false, color = vec3:zero() },
+		m_autopilot              = {
 			eligible = false,
 			state = PlayerVehicle.eAutoPilotState.NONE,
 			initial_nozzle_pos = 1,
 		},
-		m_default_max_speed = 0,
+		m_default_max_speed      = 0,
 		---@diagnostic disable-next-line
 	}, PlayerVehicle)
 
@@ -222,8 +222,8 @@ function PlayerVehicle:Reset()
 	self.m_handling_editor:Reset()
 
 	self.m_autopilot = {
-		eligible = false,
-		state = self.eAutoPilotState.NONE,
+		eligible           = false,
+		state              = self.eAutoPilotState.NONE,
 		initial_nozzle_pos = 1,
 	}
 

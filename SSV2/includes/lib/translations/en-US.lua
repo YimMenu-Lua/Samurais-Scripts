@@ -21,19 +21,15 @@ return {
 	["GUI_NOTIFICATIONS_NONE"]             = "You have no notifications.",
 
 	--#region generics
-	["WARN_PED_SPAWN_LIMIT"]               =
-	"Ped spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
-	["WARN_VEH_SPAWN_LIMIT"]               =
-	"Vehicle spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
-	["WARN_OBJ_SPAWN_LIMIT"]               =
-	"Object spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
+	["WARN_PED_SPAWN_LIMIT"]               = "Ped spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
+	["WARN_VEH_SPAWN_LIMIT"]               = "Vehicle spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
+	["WARN_OBJ_SPAWN_LIMIT"]               = "Object spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",
 	["INF_ATTACHMENT_NONE"]                = "There doesn't seem to be anything attached to us.",
 	["INF_ATTACHMENT_DROP"]                = "Attachments dropped.",
 	["GENERIC_UNAVAILABLE"]                = "Currently unavailable.",
 	["GENERIC_UNAVAILABLE_SP"]             = "Unavailable in Single Player.",
 	["GENERIC_OUTDATED"]                   = "Update required!",
-	["GENERIC_OFFLINE_OR_OUTDATED"]        =
-	"You need to be online and have the latest version of the script to access this feature!",
+	["GENERIC_OFFLINE_OR_OUTDATED"]        = "You need to be online and have the latest version of the script to access this feature!",
 	["GENERIC_IMPORTANT"]                  = "Important",
 	["GENERIC_GENERAL_LABEL"]              = "General",
 	["GENERIC_OPTIONS_LABEL"]              = "Options",
@@ -226,8 +222,7 @@ return {
 	["SY_ALWAYS_MAX_INCOME"]               = "Lock Threshold",
 	["SY_ALWAYS_MAX_INCOME_TT"]            = "Prevents your income threshold from decaying over time.",
 	["SY_TOW_MISSION_BRING_VEH"]           = "Bring Mission Target",
-	["SY_TOW_MISSION_BRING_VEH_TT"]        =
-	"Teleports the towing mission target vehicle to you and attempts to attach it to the towing hook",
+	["SY_TOW_MISSION_BRING_VEH_TT"]        = "Teleports the towing mission target vehicle to you and attempts to attach it to the towing hook",
 	["SY_NOT_IN_TOWTRUCK_ERR"]             = "You are not sitting in the tow truck.",
 	["SY_TOW_OBJECTIVE_NOT_FOUND_ERR"]     = "Failed to find the mission objective.",
 	["SY_TOW_VEH_NOT_FOUND_ERR"]           = "Failed to find the target vehicle.",
@@ -266,8 +261,7 @@ return {
 	["YRV3_IE_VEH_PLATE"]                  = "License Plate",
 	["YRV3_IE_VEH_RANGE"]                  = "Range",
 	["YRV3_IE_VEH_COMMISSION"]             = "Base Commission",
-	["YRV3_IE_STEAL_THRESHOLD_TT"]         =
-	"Hint: Steal missions are random but you can guarantee a Top Range vehicle by storing 10 vehicles in each tier. (Top Range can be 10 or more but the other two must be exactly 10.)",
+	["YRV3_IE_STEAL_THRESHOLD_TT"]         = "Hint: Steal missions are random but you can guarantee a Top Range vehicle by storing 10 vehicles in each tier. (Top Range can be 10 or more but the other two must be exactly 10.)",
 	["YRV3_CARGO_AMT"]                     = "Cargo Held",
 	["YRV3_CRATES_LABEL"]                  = "Crates",
 	["YRV3_SUPPLIES_LABEL"]                = "Supplies",
@@ -277,15 +271,12 @@ return {
 	["YRV3_AUTO_SELL"]                     = "Auto-Sell",
 	["YRV3_NC_ALWAYS_POPULAR"]             = "Always Popular",
 	["YRV3_MILLION_DOLLAR_TIPS"]           = "Million Dollar Tips",
-	["YRV3_MILLION_DOLLAR_TIPS_TT"]        =
-	"[Non-persistent]: Allows you to tip the toilet attendant at your nightclub $1M. The attendant will be grateful. Your bank account probably will not.\n\nNote: You must have the money in cash in order to tip him.",
+	["YRV3_MILLION_DOLLAR_TIPS_TT"]        = "[Non-persistent]: Allows you to tip the toilet attendant at your nightclub $1M. The attendant will be grateful. Your bank account probably will not.\n\nNote: You must have the money in cash in order to tip him.",
 	["YRV3_FILL_SUPPLIES"]                 = "Fill Supplies",
 	["YRV3_TRIGGER_PROD"]                  = "Trigger Production",
-	["YRV3_TRIGGER_PROD_TT"]               =
-	"Instantly triggers production once as long as you have supplies. You can hold the button to keep triggering it or enable 'Auto-Produce' to fully automate the process.",
+	["YRV3_TRIGGER_PROD_TT"]               = "Instantly triggers production once as long as you have supplies. You can hold the button to keep triggering it or enable 'Auto-Produce' to fully automate the process.",
 	["YRV3_TRIGGER_PROD_HUB"]              = "Tick", -- I don't know what label to use. We need something short that fits into an 80px wide frame across all supported languages
-	["YRV3_TRIGGER_PROD_HUB_TT"]           =
-	"Keeps triggering production over time. This is not instant like biker businesses, there's a delay between each trigger (approximately 20 seconds).\n\n[IMPROTANT]: You must make sure the connected business is setup and running and you have a technician assigned in your nightclub before enabling this.",
+	["YRV3_TRIGGER_PROD_HUB_TT"]           = "Keeps triggering production over time. This is not instant like biker businesses, there's a delay between each trigger (approximately 20 seconds).\n\n[IMPROTANT]: You must make sure the connected business is setup and running and you have a technician assigned in your nightclub before enabling this.",
 	["YRV3_FINISH_SOURCE_MISSION"]         = "Finish Cargo Source Mission",
 	["YRV3_FINISH_SOURCE_MISSION_TT"]      = "Start a source mission then press this button to finish it.",
 	["YRV3_VALUE_TOTAL"]                   = "Total Value",
@@ -302,8 +293,7 @@ return {
 	["YRV3_HANGAR_STEAL_CB"]               = "Hangar Crate Steal",
 	["YRV3_NC_MANAGMENT_CB"]               = "Nightclub Management",
 	["YRV3_NC_CHANCE_ENCOUNTER_CB"]        = "Always Troublemaker",
-	["YRV3_NC_CHANCE_ENCOUNTER_TT"]        =
-	"Always spawns the troublemaker nightclub missions and disables the knocked out VIP missions.",
+	["YRV3_NC_CHANCE_ENCOUNTER_TT"]        = "Always spawns the troublemaker nightclub missions and disables the knocked out VIP missions.",
 	["YRV3_CEO_BUY_CB"]                    = "CEO Crate Buy",
 	["YRV3_CEO_SELL_CB"]                   = "CEO Crate Sell",
 	["YRV3_SECURITY_WORK_CB"]              = "Security Missions",
@@ -314,15 +304,12 @@ return {
 	["YRV3_IE_VEH_SELL_CB"]                = "I/E Vehicle Selling",
 	["YRV3_PAYHPONE_HITS_CB"]              = "Payphone Hits",
 	["YRV3_COOLDOWNS_LABEL"]               = "Cooldowns",
-	["YRV3_SEXY_SHINABI_NOTICE"]           =
-	"Use ShinyWasabi's Payphone Hits script instead.\nPress [TAB] to copy the GitHub link.",
+	["YRV3_SEXY_SHINABI_NOTICE"]           = "Use ShinyWasabi's Payphone Hits script instead.\nPress [TAB] to copy the GitHub link.",
 	["YRV3_CB_CHECK_ALL"]                  = "Check All",
 	["YRV3_CB_UNCHECK_ALL"]                = "Uncheck All",
 	["YRV3_SELL_MISSIONS_LABEL"]           = "Sell Missions",
-	["YRV3_SELL_MISSIONS_TT"]              =
-	"These options will not be saved. Each button disables the most tedious sell missions for that business.",
-	["YRV3_SELL_MISSIONS_NOTE"]            =
-	"[NOTE]: If you plan on selling more than once for the same business, please switch sessions after finishing the first sale to reset the missions, otherwise a second one will more than likely fail to start.",
+	["YRV3_SELL_MISSIONS_TT"]              = "These options will not be saved. Each button disables the most tedious sell missions for that business.",
+	["YRV3_SELL_MISSIONS_NOTE"]            = "[NOTE]: If you plan on selling more than once for the same business, please switch sessions after finishing the first sale to reset the missions, otherwise a second one will more than likely fail to start.",
 	["YRV3_SELL_MISSIONS_NOTIF"]           = "Disabled the most annoying %s sell missions.",
 	["YRV3_AUTO_SELL_SUPPORT_NOTICE"]      = "Note: Only these businesses are supported:",
 	["YRV3_AUTOSELL_BUNKER_LABEL"]         = "Bunker",
@@ -331,8 +318,7 @@ return {
 	["YRV3_AUTOSELL_BIKER_LABEL"]          = "Biker Businesses",
 	["YRV3_AUTOSELL_LSD_LAB_LABEL"]        = "Acid Lab",
 	["YRV3_AUTOSELL_CURRENT"]              = "Currently Selling: %s",
-	["YRV3_AUTOSELL_TT"]                   =
-	"Automatically finishes a sale mission 20 seconds after it starts. Doesn't require you to interact with anything other than starting the mission.",
+	["YRV3_AUTOSELL_TT"]                   = "Automatically finishes a sale mission 20 seconds after it starts. Doesn't require you to interact with anything other than starting the mission.",
 	["YRV3_SCRIPT_HOST_ERR"]               = "Unable to finish sale mission! You are not host of this script.",
 	["YRV3_HANGAR_LAND_ERR"]               = "Hangar and sales are currently not supported.",
 	["YRV3_AUTO_SELL_MANUAL"]              = "Manually Finish Sale",
@@ -357,10 +343,8 @@ return {
 	["YRV3_BUSINESSES_LABEL"]              = "Businesses",
 	["YRV3_CASH_SAFES_LABEL"]              = "Cash Safes",
 	["YRV3_CASH_LOOP"]                     = "Cash Loop",
-	["YRV3_CASH_LOOP_ACK_DISABLE_TT"]      =
-	"You can hold [SHIFT] while clicking the toggle to revoke the acknowledgment and lock this feature.",
-	["YRV3_CASH_LOOP_WARN_ACK"]            =
-	"This feature is unsafe and may result in account suspension if abused.\n\nPress 'Confirm' to acknowledge this warning and accept the risk, or 'Cancel' to go back. You can revoke this acknowledgment at any time later by holding [SHIFT] while clicking the toggle.",
+	["YRV3_CASH_LOOP_ACK_DISABLE_TT"]      = "You can hold [SHIFT] while clicking the toggle to revoke the acknowledgment and lock this feature.",
+	["YRV3_CASH_LOOP_WARN_ACK"]            = "This feature is unsafe and may result in account suspension if abused.\n\nPress 'Confirm' to acknowledge this warning and accept the risk, or 'Cancel' to go back. You can revoke this acknowledgment at any time later by holding [SHIFT] while clicking the toggle.",
 	["YRV3_LIFETIME_BUY_UNDERTAKEN"]       = "Buy Missions Undertaken:",
 	["YRV3_LIFETIME_BUY_COMPLETE"]         = "Buy Missions Completed:",
 	["YRV3_LIFETIME_SELL_UNDERTAKEN"]      = "Sell Missions Undertaken:",
@@ -380,24 +364,19 @@ return {
 	["SELF_ACTION_MODE"]                   = "Disable Action Mode",
 	["SELF_ACTION_MODE_TT"]                = "Disables the player's janky movement during combat.",
 	["SELF_HEADPROPS"]                     = "Allow Head Props In Vehicles",
-	["SELF_HEADPROPS_TT"]                  =
-	"Prevents the game from removing your head gear (hats, helmets, long harcuts, etc.) when entering a vehicle.",
+	["SELF_HEADPROPS_TT"]                  = "Prevents the game from removing your head gear (hats, helmets, long harcuts, etc.) when entering a vehicle.",
 	["SELF_STAND_ON_VEHS"]                 = "Stand On Vehicles",
-	["SELF_STAND_ON_VEHS_TT"]              =
-	"Prevents you from ragdolling when standing on top of a vehicle (you'll still fall if you hit something).",
+	["SELF_STAND_ON_VEHS_TT"]              = "Prevents you from ragdolling when standing on top of a vehicle (you'll still fall if you hit something).",
 	["SELF_NO_CARJACKING"]                 = "No Carjacking",
-	["SELF_NO_CARJACKING_TT"]              =
-	"Prevents NPCs from carjacking you. It should prevent players too (not tested against players).",
+	["SELF_NO_CARJACKING_TT"]              = "Prevents NPCs from carjacking you. It should prevent players too (not tested against players).",
 	["SELF_CROUCH"]                        = "Crouch",
 	["SELF_CROUCH_TT"]                     = "Makes you crouch when you press the stealth button, similar to GTA San Andreas.",
 	["SELF_HANDS_UP"]                      = "Hands Up",
-	["SELF_HANDS_UP_TT"]                   =
-	"Replaces the 'Point At' action in GTA Online (default [B] on keyboard) with a surrender animation.",
+	["SELF_HANDS_UP_TT"]                   = "Replaces the 'Point At' action in GTA Online (default [B] on keyboard) with a surrender animation.",
 	["SELF_SPRINT_INSIDE"]                 = "Sprint Inside Interiors",
 	["SELF_SPRINT_INSIDE_TT"]              = "Allows you to run at full speed inside most interiors (not all of them).",
 	["SELF_LOCKPICK_ANIM"]                 = "Lockpick Animation",
-	["SELF_LOCKPICK_ANIM_TT"]              =
-	"Increases the chance of using the lockpicking animation when stealing vehicles instead of breaking the window.",
+	["SELF_LOCKPICK_ANIM_TT"]              = "Increases the chance of using the lockpicking animation when stealing vehicles instead of breaking the window.",
 	["SELF_REGEN_SPEED"]                   = "Health Regeneration Speed",
 	["SELF_ROD"]                           = "Ragdoll On Demand",
 	["SELF_ROD_TT"]                        = "Allows you to ragdoll at any time you want while on foot.",
@@ -407,8 +386,7 @@ return {
 	["SELF_RAGDOLL_SOUND_TT"]              = "Your online character will make a panic sound when ragdolling.",
 	["SELF_RAGDOLL_BLOCK_INFO"]            = "This feature will not work if you're blocking ragdoll.",
 	["SELF_MAGIC_BULLET"]                  = "Magic Bullet",
-	["SELF_MAGIC_BULLET_TT"]               =
-	"This feature does not auto-aim or auto-fire. It simply remembers the last ped you aimed at and redirects your shot to that ped when you fire, even if you shoot elsewhere. The target resets when you stop aiming.",
+	["SELF_MAGIC_BULLET_TT"]               = "This feature does not auto-aim or auto-fire. It simply remembers the last ped you aimed at and redirects your shot to that ped when you fire, even if you shoot elsewhere. The target resets when you stop aiming.",
 	["SELF_LASER_SIGHTS"]                  = "Laser Sights",
 	["SELF_LASER_SIGHTS_LENGTH"]           = "Laser Ray Length",
 	["SELF_LASER_SIGHTS_TT"]               = "Enables laser sights on your firearms.",
@@ -435,11 +413,9 @@ return {
 	["VEH_NOS_PURGE"]                      = "NOS Purge",
 	["VEH_NOS_PURGE_TT"]                   = "Press the assigned keybind (default [X]) to do a 2Fast 2Furious style NOS purge.",
 	["VEH_ABS_LIGHTS"]                     = "Brake Force Display",
-	["VEH_ABS_LIGHTS_TT"]                  =
-	"Flashes your brake lights when braking from high speed. Only for vehicles equipped with ABS.",
+	["VEH_ABS_LIGHTS_TT"]                  = "Flashes your brake lights when braking from high speed. Only for vehicles equipped with ABS.",
 	["VEH_POPS_N_BANGS"]                   = "Pops & Bangs",
-	["VEH_POPS_N_BANGS_TT"]                =
-	"Enables loud exhaust pops that trigger each time you let go of the accelerator from high RPM. PS: It scares nearby NPCs.",
+	["VEH_POPS_N_BANGS_TT"]                = "Enables loud exhaust pops that trigger each time you let go of the accelerator from high RPM. PS: It scares nearby NPCs.",
 	["VEH_SUBWOOFER"]                      = "Big Subwoofer",
 	["VEH_SUBWOOFER_TT"]                   = "Makes your vehicle's speakers sound slightly louder and have deeper bass.",
 	["VEH_HIGH_BEAMS"]                     = "High Beams on Horn",
@@ -449,16 +425,13 @@ return {
 	["VEH_STRONG_WINDOWS"]                 = "Unbreakable Windows",
 	["VEH_STRONG_WINDOWS_TT"]              = "Your vehicle's windows will never break. Unless blown up, of course.",
 	["VEH_STRONG_CRASH"]                   = "Stronger Crashes",
-	["VEH_STRONG_CRASH_TT"]                =
-	"Makes crashes scarier with cam shakes, screen effects, more deformation, and damage. High-speed collisions can be fatal.",
+	["VEH_STRONG_CRASH_TT"]                = "Makes crashes scarier with cam shakes, screen effects, more deformation, and damage. High-speed collisions can be fatal.",
 	["VEH_RGB_LIGHTS"]                     = "RGB Headlights",
-	["VEH_RGB_LIGHTS_TT"]                  =
-	"Starts an RGB loop on your vehicle's headlights. You can tweak the speed at the bottom of this window.",
+	["VEH_RGB_LIGHTS_TT"]                  = "Starts an RGB loop on your vehicle's headlights. You can tweak the speed at the bottom of this window.",
 	["VEH_FLAPPY_DOORS"]                   = "Flappy Doors",
 	["VEH_FLAPPY_DOORS_TT"]                = "I have no idea why I made this.",
 	["VEH_AUTO_LOCK"]                      = "Auto Lock",
-	["VEH_AUTO_LOCK_TT"]                   =
-	"Automatically locks your vehicle when you move away from it and unlocks it again when you try to re-enter or switch to a different vehicle.",
+	["VEH_AUTO_LOCK_TT"]                   = "Automatically locks your vehicle when you move away from it and unlocks it again when you try to re-enter or switch to a different vehicle.",
 	["VEH_LAUNCH_CTRL"]                    = "Launch Control",
 	["VEH_LAUNCH_CTRL_TT"]                 = "Simulates launch control. Only available for performance cars.",
 	["VEH_LAUNCH_CTRL_MODE"]               = "Launch Control Mode",
@@ -466,8 +439,7 @@ return {
 	["VEH_LAUNCH_CTRL_RIDICULOUS"]         = "Ridiculous",
 	["VEH_LAUNCH_CTRL_ERR"]                = "Launch control is unavailable at the moment. Your engine is damaged.",
 	["VEH_IV_EXIT"]                        = "IV-Style Exit",
-	["VEH_IV_EXIT_TT"]                     =
-	"Imitates GTA IV's vehicle exit style: Hold [F] for one second to turn off the engine or normal press to leave it running.",
+	["VEH_IV_EXIT_TT"]                     = "Imitates GTA IV's vehicle exit style: Hold [F] for one second to turn off the engine or normal press to leave it running.",
 	["VEH_KEEP_WHEELS_TURNED"]             = "Keep Wheels Turned",
 	["VEH_KEEP_WHEELS_TURNED_TT"]          = "Keeps your vehicle's wheels at any angle you left them before exiting the vehicle.",
 	["VEH_MINES"]                          = "Vehicle Mines",
@@ -497,8 +469,7 @@ return {
 	["VEH_NO_TURBULENCE"]                  = "Disabled Air Turbulence",
 	["VEH_NO_JET_STALL_TT"]                = "Aircraft engines will no longer stall when you hold the brake button.",
 	["VEH_FAST_JETS"]                      = "Fast Planes",
-	["VEH_FAST_JETS_TT"]                   =
-	"Makes most planes faster as long as they can reach 240Km/h by default, their max speed will be increased to 555Km/h.\n\nSlower planes like the duster do not benefit from this unless you forcibly make them reach the speed threshold by nose diving.\n\nNOTE: Your gear (plane wheels) must be up.",
+	["VEH_FAST_JETS_TT"]                   = "Makes most planes faster as long as they can reach 240Km/h by default, their max speed will be increased to 555Km/h.\n\nSlower planes like the duster do not benefit from this unless you forcibly make them reach the speed threshold by nose diving.\n\nNOTE: Your gear (plane wheels) must be up.",
 	["VEH_MG_TRIGGERBOT"]                  = "Machine Gun Triggerbot",
 	["VEH_MG_TRIGGERBOT_TT"]               = "Automatically fires your aircraft's machine gun.",
 	["VEH_MG_TRIGGERBOT_ENEMY"]            = "Enemies Only",
@@ -525,8 +496,7 @@ return {
 	["VEH_PAINT_PRIMARY_CB"]               = "As Primary",
 	["VEH_PAINT_SECONDARY_CB"]             = "As Secondary",
 	["VEH_PAINT_NOT_SELECTED_ERR"]         = "Please select primary or secondary or both.",
-	["VEH_PAINT_SAVE_TT"]                  =
-	"To save this color on a personal vehicle, go to a modshop and buy something like window tint or plate style or anything.",
+	["VEH_PAINT_SAVE_TT"]                  = "To save this color on a personal vehicle, go to a modshop and buy something like window tint or plate style or anything.",
 	["VEH_COBRA_MANEUVER"]                 = "Cobra Maneuver",
 	["VEH_COBRA_MANEUVER_TT"]              = "Pres [X] on keyboard to perform a Cobra Maneuver. Only available for jets.",
 	["VEH_COBRA_MANEUVER_TOO_lOW"]         = "Your current altitude is too low to perform a Cobra Maneuver!",
@@ -557,8 +527,7 @@ return {
 	["VEH_RALLY_TYRES"]                    = "Rallye Tyres",
 	["VEH_RALLY_TYRES_TT"]                 = "Equips your vehicle with rallye tyres which further improves offroad handling.",
 	["VEH_FORCE_NO_TC"]                    = "No Traction Control",
-	["VEH_FORCE_NO_TC_TT"]                 =
-	"Bikes Only: Forces your vehicle to have no traction control which allows you to do drifts and skids with bikes.",
+	["VEH_FORCE_NO_TC_TT"]                 = "Bikes Only: Forces your vehicle to have no traction control which allows you to do drifts and skids with bikes.",
 	["VEH_LOW_SPEED_WHEELIE"]              = "Low Speed Wheelie",
 	["VEH_LOW_SPEED_WHEELIE_TT"]           = "Bikes Only: Allows you to pop wheelies at very low speeds, similar to the 'Manchez'.",
 	["VEH_ROCKET_BOOST"]                   = "Rocket Boost",
@@ -566,14 +535,12 @@ return {
 	["VEH_JUMP"]                           = "Jump Capability",
 	["VEH_JUMP_TT"]                        = "Equips your vehicle with jump capability, similar to the 'Ruiner 2000'.",
 	["VEH_PARACHUTE"]                      = "Parachute Capability",
-	["VEH_PARACHUTE_TT"]                   =
-	"Equips your vehicle with a parachute, similar to the 'Ruiner 2000'.\n\nImportant: Jump Capability must be enabled as well.",
+	["VEH_PARACHUTE_TT"]                   = "Equips your vehicle with a parachute, similar to the 'Ruiner 2000'.\n\nImportant: Jump Capability must be enabled as well.",
 	--#endregion
 	["VEH_STEER_REAR_WHEELS"]              = "Rear Wheel Steering",
 	["VEH_STEER_ALL_WHEELS"]               = "All Wheel Steering",
 	["VEH_STEER_HANDBRAKE"]                = "Handbrake Steering",
-	["VEH_STEER_HANDBRAKE_TT"]             =
-	"Steers your vehicle's rear whels when you hold the handbrake, similar to monster cars.",
+	["VEH_STEER_HANDBRAKE_TT"]             = "Steers your vehicle's rear whels when you hold the handbrake, similar to monster cars.",
 	["VEH_STANCE_CAMBER"]                  = "Camber",
 	["VEH_STANCE_TRACK_WIDTH"]             = "Track Width",
 	["VEH_STANCE_SUSP_COMP"]               = "Suspension Height",
@@ -590,8 +557,7 @@ return {
 	["VEH_STANCE_AIR_SUSPENSION_RAISE"]    = "Raise",
 	["VEH_STANCE_AIR_SUSPENSION_LOWER"]    = "Lower",
 	["VEH_STANCE_BOUNCE_MODE"]             = "Bounce Mode",
-	["VEH_STANCE_BOUNCE_MODE_TT"]          =
-	"SUVs Only.\n\nMakes your vehicle bounce up and down, similar to the 'E-Active Body Control' feature in the Mercedes-Benz GLE.",
+	["VEH_STANCE_BOUNCE_MODE_TT"]          = "SUVs Only.\n\nMakes your vehicle bounce up and down, similar to the 'E-Active Body Control' feature in the Mercedes-Benz GLE.",
 	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"]     = "Bounce Mode is only available for SUVs.",
 	["VEH_STANCE_SAVE_MODEL"]              = "Save Current Model",
 	["VEH_STANCE_UPDATE_MODEL"]            = "Update Saved Model",
@@ -604,8 +570,7 @@ return {
 
 	--#region World
 	["WRLD_HNS"]                           = "Hide And Seek",
-	["WRLD_HNS_TT"]                        =
-	"Allows you to hide inside vehicles, car trunks, or trash bins. If you have a wanted level, police will lose you as long as you hide before being spotted.",
+	["WRLD_HNS_TT"]                        = "Allows you to hide inside vehicles, car trunks, or trash bins. If you have a wanted level, police will lose you as long as you hide before being spotted.",
 	["WRLD_DISABLE_WAVES"]                 = "Disable Ocean Waves",
 	["WRLD_EXTEND_BOUNDS"]                 = "Extend World Boundaries",
 	["WRLD_EXTEND_BOUNDS_TT"]              = "Allows you to travel further into the world in any direction.",
@@ -625,8 +590,7 @@ return {
 
 	--#region YimActions
 	["YAV3_SCN_STOP_SPINNER"]              = "Stopping current scenario...",
-	["YAV3_STOP_BTN_HINT"]                 =
-	"TIP: You can press %s to stop playing any action or hold it for one second to cleanup everything.",
+	["YAV3_STOP_BTN_HINT"]                 = "TIP: You can press %s to stop playing any action or hold it for one second to cleanup everything.",
 	["YAV3_ANIM_FLAGS"]                    = "Behavior Flags", -- labelling it 'Animation Flags' breaks translations even further
 	["YAV3_DISABLE_PROPS"]                 = "Disable Props",
 	["YAV3_DISABLE_PTFX"]                  = "Disable Particle Effects",
@@ -650,18 +614,15 @@ return {
 	["FLTBD_SAME_NOT_ALLOWED_ERR"]         = "You can not tow another flatbed truck.",
 	["FLTBD_CARS_ONLY_ERR"]                = "You can only tow cars, trucks and bikes.",
 	["FLTBD_NEARBY_VEH_TXT"]               = "Closest Vehicle: ",
-	["FLTBD_TOW_ALL_TT"]                   =
-	"By default, the truck only tows cars, trucks, and bikes. This option removes that limitation.",
-	["FTLBD_GET_IN_MSG"]                   =
-	"You are currently not in a flatbed truck. You can steal one from the street or use the button below to spawn a new one.",
+	["FLTBD_TOW_ALL_TT"]                   = "By default, the truck only tows cars, trucks, and bikes. This option removes that limitation.",
+	["FTLBD_GET_IN_MSG"]                   = "You are currently not in a flatbed truck. You can steal one from the street or use the button below to spawn a new one.",
 	--#region
 
 	--#region Settings
 	["SETTINGS_CFG_RESET"]                 = "Reset Saved Configuration",
 	["SETTINGS_RESET_PRESERVE_KEYS"]       = "Optional: Choose configuration items to keep.",
 	["SETTINGS_ENTITY_REPLACE"]            = "Auto-Replace Entities",
-	["SETTINGS_ENTITY_REPLACE_TT"]         =
-	"This project has a limit to how many entities you can spawn (peds, vehicles, objects). All features adhere to that limit to prevent entity spam or choking the game. This option allows the script to automatically replace old spawned entities once you reach the limit for a certain entity type and try to spawn a new one.",
+	["SETTINGS_ENTITY_REPLACE_TT"]         = "This project has a limit to how many entities you can spawn (peds, vehicles, objects). All features adhere to that limit to prevent entity spam or choking the game. This option allows the script to automatically replace old spawned entities once you reach the limit for a certain entity type and try to spawn a new one.",
 	["SETTINGS_LANGUAGE"]                  = "Language",
 	["SETTINGS_TOOLTIPS"]                  = "Disable Tooltips",
 	["SETTINGS_UI_SOUND"]                  = "Disable Sound Feedback",
@@ -672,12 +633,10 @@ return {
 	["SETTINGS_WINDOW_POS_SNAP"]           = "Snap To Position",
 	["SETTINGS_WINDOW_POS_X"]              = "X Position",
 	["SETTINGS_WINDOW_POS_Y"]              = "Y Position",
-	["SETTINGS_WINDOW_POS_TT"]             =
-	"These are display only. Enable 'Moveable Window' then drag the top bar to freely move the window.",
+	["SETTINGS_WINDOW_POS_TT"]             = "These are display only. Enable 'Moveable Window' then drag the top bar to freely move the window.",
 	["SETTINGS_WINDOW_WIDTH"]              = "Window Width",
 	["SETTINGS_WINDOW_HEIGHT"]             = "Max Window Height",
-	["SETTINGS_WINDOW_HEIGHT_TT"]          =
-	"The window is dynamic, it resizes itself vertically based on content.\n\nThis option allows you to set the maximum allowed height.",
+	["SETTINGS_WINDOW_HEIGHT_TT"]          = "The window is dynamic, it resizes itself vertically based on content.\n\nThis option allows you to set the maximum allowed height.",
 	["SETTINGS_WINDOW_STYLE"]              = "Window Style",
 	["SETTINGS_WINDOW_THEME"]              = "Theme",
 	["SETTINGS_WINDOW_ALPHA"]              = "Window Transparency",
@@ -689,8 +648,7 @@ return {
 	["SETTINGS_NEW_THEME_COLORS"]          = "Colors",
 	["SETTINGS_NEW_THEME_STYLE"]           = "Window Style",
 	["SETTINGS_NEW_THEME_NAME_ERR"]        = "A theme with the name %s already exists. Please choose a different one.",
-	["SETTINGS_NEW_THEME_CONTRAST_ERR"]    =
-	"Your new theme failed the visibility test.\nPlease check the below errors and try again after editing the corresponding colors.",
+	["SETTINGS_NEW_THEME_CONTRAST_ERR"]    = "Your new theme failed the visibility test.\nPlease check the below errors and try again after editing the corresponding colors.",
 	["SETTINGS_WINDOW_ACCENT_COL"]         = "Accent Color",
 	["SETTINGS_WINDOW_TOP_FRAME_BG"]       = "Top Bar Button Gradient",
 	["SETTINGS_HOTKEY_WAIT"]               = "Press any key",
@@ -713,12 +671,9 @@ return {
 	["EF_IMPORT_DATA_INSTR"]               = "Paste The Forge Data Here: ",
 	["EF_IMPORT_DATA_CLIPBOARD"]           = "Paste From Clipboard",
 	["EF_IMPORT_DATA_CLIPBOARD_ERR"]       = "Your clipboard is empty!",
-	["EF_IMPORT_DATA_NOTICE"]              =
-	"You have a creation with the same name. An [import] tag has been added to the name. You can still rename it later.",
-	["EF_ENTITY_GUN_TT"]                   =
-	"Aim your weapon at an entity in the game world and press [E] to add it to the forge pool. Once added, you'll be able to use your mouse to move and manipulate it.",
-	["EF_SHARE_SUCCESS"]                   =
-	"Your saved creation was copied to clipboard. If you share the copied data with other users of this script, they will be able import it into their saved creations.",
+	["EF_IMPORT_DATA_NOTICE"]              = "You have a creation with the same name. An [import] tag has been added to the name. You can still rename it later.",
+	["EF_ENTITY_GUN_TT"]                   = "Aim your weapon at an entity in the game world and press [E] to add it to the forge pool. Once added, you'll be able to use your mouse to move and manipulate it.",
+	["EF_SHARE_SUCCESS"]                   = "Your saved creation was copied to clipboard. If you share the copied data with other users of this script, they will be able import it into their saved creations.",
 	["EF_IMPORT_SUCCESS"]                  = "Data successfully imported.",
 	["EF_CHILD_ALPHA"]                     = "Child Item Transparency: %d",
 	--#endregion
@@ -739,9 +694,7 @@ return {
 	["YH_FACILITY_NOT_OWNED"]              = "Purchase a Facility to access The Doomsday Heist.", -- GOPS_BASE_HELP
 	["YH_TP_FACILITY"]                     = "Teleport to Facility",
 	["YH_DDAY_FORCE"]                      = "FORCE RESET",
-	["YH_DDAY_HELP1"]                      =
-	"This method is necessary if you have never played Doomsday as a host. If you have already played and completed some heists as host, skip this step.",
-	["YH_DDAY_HELP2_FMT"]                  =
-	"Press the '%s' button, then call Lester to cancel all 3 heists for Doomsday.",
+	["YH_DDAY_HELP1"]                      = "This method is necessary if you have never played Doomsday as a host. If you have already played and completed some heists as host, skip this step.",
+	["YH_DDAY_HELP2_FMT"]                  = "Press the '%s' button, then call Lester to cancel all 3 heists for Doomsday.",
 	--#endregion
 }

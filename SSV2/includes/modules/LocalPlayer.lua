@@ -33,11 +33,21 @@ local YimActions   = require("includes.features.YimActionsV3")
 ---@field public CurrentMovementClipset? string
 ---@field public CurrentStrafeClipset? string
 ---@field public CurrentWeaponMovementClipset? string
+---@field protected m_internal CPed
+---@field SetAsNoLongerNeeded nil
 LocalPlayer = Class("LocalPlayer", { parent = Player })
 
 
 ---@override
-LocalPlayer.new        = nil
+LocalPlayer.new                 = nil
+---@override
+LocalPlayer.Create              = nil
+---@override
+LocalPlayer.Delete              = nil
+---@override
+LocalPlayer.SetAsNoLongerNeeded = nil
+
+
 LocalPlayer.m_vehicle  = require("includes.modules.PlayerVehicle")
 LocalPlayer.m_feat_mgr = FeatureMgr.new(LocalPlayer)
 
@@ -52,7 +62,11 @@ LocalPlayer.m_feat_mgr:Add(miscFeatures.new(LocalPlayer))
 
 ---@return CPed
 function LocalPlayer:Resolve()
-	return CPed(self:GetHandle())
+	if (not self.m_internal) then
+		self.m_internal = CPed(self:GetHandle())
+	end
+
+	return self.m_internal
 end
 
 -- Returns the current local player's script handle.
@@ -189,12 +203,12 @@ function LocalPlayer:IsUsingVehicleMG()
 		return false, 0
 	end
 
-	local cpedweaponmgr = self:Resolve().m_ped_weapon_mgr
+	local cpedweaponmgr = self:Resolve():GetWeaponManager()
 	if (not cpedweaponmgr or not cpedweaponmgr:IsValid()) then
 		return false, 0
 	end
 
-	local cvehicleweaponinfo = cpedweaponmgr.m_vehicle_weapon_info
+	local cvehicleweaponinfo = cpedweaponmgr:GetVehicleWeaponInfo()
 	if (not cvehicleweaponinfo or not cvehicleweaponinfo:IsValid()) then
 		return false, 0
 	end
@@ -216,7 +230,7 @@ end
 ---@return boolean, hash
 function LocalPlayer:IsUsingAirctaftMG()
 	local veh = self:GetVehiclePlayerIsIn()
-	if (not veh or not veh:IsPlane() or not veh:IsHeli()) then
+	if (not veh or not veh:IsAircraft()) then
 		return false, 0
 	end
 

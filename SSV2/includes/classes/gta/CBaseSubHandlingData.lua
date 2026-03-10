@@ -17,9 +17,17 @@ local CStructView = require("includes.classes.gta.CStructView")
 ---@field protected m_ptr pointer
 ---@field protected m_handling_type pointer<int32_t> -- 0x00C8
 ---@overload fun(ptr: pointer): CBaseSubHandlingData
-local CBaseSubHandlingData = CStructView("CBaseSubHandlingData", {
-	{ "m_handling_type", 0x00C8 }
-}, 0x00CC)
+local CBaseSubHandlingData = CStructView("CBaseSubHandlingData", 0x00CC)
+
+---@param ptr pointer
+---@return CBaseSubHandlingData
+function CBaseSubHandlingData.new(ptr)
+	return setmetatable({
+		m_ptr           = ptr,
+		m_handling_type = ptr:add(0x00C8)
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, CBaseSubHandlingData)
+end
 
 ---@return eHandlingType
 function CBaseSubHandlingData:GetHandlingType()

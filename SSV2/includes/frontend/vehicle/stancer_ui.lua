@@ -13,63 +13,40 @@ local frontStanceDeltas    = Stancer.m_deltas[Stancer.eWheelSide.FRONT]
 local backStanceDeltas     = Stancer.m_deltas[Stancer.eWheelSide.BACK]
 local selected_saved_model = 0
 local saved_vehs_window    = { should_draw = false }
-local auto_apply_clicked   = false
-local bounce_mode_clicked  = false
-
 local ref <const>          = {
 	m_camber      = {
 		label = "VEH_STANCE_CAMBER",
-		fmt = "%.2f°",
-		min = function()
-			return -1.0
-		end,
-		max = function()
-			return 1.0
-		end
+		fmt   = "%.2f°",
+		min   = function() return -1.0 end,
+		max   = function() return 1.0 end
 	},
 	m_track_width = {
 		label = "VEH_STANCE_TRACK_WIDTH",
-		fmt = "%.2f",
-		min = function()
-			return -0.5
-		end,
-		max = function()
-			return 0.5
-		end,
+		fmt   = "%.2f",
+		min   = function() return -0.5 end,
+		max   = function() return 0.5 end,
 	},
 	m_susp_comp   = {
 		label = "VEH_STANCE_SUSP_COMP",
-		fmt = "%.2f",
-		min = function()
-			return -Stancer.m_base_values[Stancer.eWheelSide.FRONT].m_susp_comp + 0.1
-		end,
-		max = function()
-			return Stancer.m_base_values[Stancer.eWheelSide.FRONT].m_susp_comp - 0.1
-		end,
+		fmt   = "%.2f",
+		min   = function() return -Stancer.m_base_values[Stancer.eWheelSide.FRONT].m_susp_comp + 0.1 end,
+		max   = function() return Stancer.m_base_values[Stancer.eWheelSide.FRONT].m_susp_comp - 0.1 end,
 	},
 	m_wheel_width = {
-		label = "VEH_STANCE_WHEEL_WIDTH",
-		fmt = "%.2f",
-		min = function()
-			return -0.5
-		end,
-		max = function()
-			return 0.5
-		end,
+		label         = "VEH_STANCE_WHEEL_WIDTH",
+		fmt           = "%.2f",
+		min           = function() return -0.5 end,
+		max           = function() return 0.5 end,
 		drawdata_only = true,
-		tooltip = "VEH_STANCE_NON_STOCK"
+		tooltip       = "VEH_STANCE_NON_STOCK"
 	},
 	m_wheel_size  = {
-		label = "VEH_STANCE_WHEEL_SIZE",
-		fmt = "%.2f",
-		min = function()
-			return -0.5
-		end,
-		max = function()
-			return 0.5
-		end,
+		label         = "VEH_STANCE_WHEEL_SIZE",
+		fmt           = "%.2f",
+		min           = function() return -0.5 end,
+		max           = function() return 0.5 end,
 		drawdata_only = true,
-		tooltip = "VEH_STANCE_NON_STOCK"
+		tooltip       = "VEH_STANCE_NON_STOCK"
 	},
 }
 
@@ -125,8 +102,8 @@ end
 ---@param needsPhysicsUpdate? boolean
 local function DrawSlider(key, deltaTable, side, needsPhysicsUpdate)
 	local meta     = ref[key]
-	local disabled = (meta.drawdata_only and not Stancer:CanApplyDrawData())
 	local label    = _F("%s##%d", _T(meta.label), side)
+	local disabled = (meta.drawdata_only and not Stancer:CanApplyDrawData())
 	if (disabled) then
 		ImGui.BeginDisabled()
 	end
@@ -137,6 +114,7 @@ local function DrawSlider(key, deltaTable, side, needsPhysicsUpdate)
 			UpdatePhysics()
 		end
 	end
+
 	ImGui.SameLine()
 	deltaTable[key], _ = ImGui.SliderFloat(
 		_F("##%s", label),
@@ -144,11 +122,10 @@ local function DrawSlider(key, deltaTable, side, needsPhysicsUpdate)
 		meta.min(),
 		meta.max(), meta.fmt
 	)
-	if (ImGui.IsItemDeactivatedAfterEdit()) then
-		if (needsPhysicsUpdate) then
-			UpdatePhysics()
-		end
+	if (ImGui.IsItemDeactivatedAfterEdit() and needsPhysicsUpdate) then
+		UpdatePhysics()
 	end
+
 	ImGui.SameLine()
 	if (ImGui.ArrowButton(_F("##%s_+", label), 1)) then
 		deltaTable[key] = math.min(meta.max(), deltaTable[key] + 0.01)
@@ -157,8 +134,10 @@ local function DrawSlider(key, deltaTable, side, needsPhysicsUpdate)
 		end
 	end
 	ImGui.PopButtonRepeat()
+
 	ImGui.SameLine()
 	ImGui.Text(_T(meta.label))
+
 	if (disabled) then
 		ImGui.EndDisabled()
 		GUI:HelpMarker(_T(meta.tooltip or "VEH_STANCE_INCOMPATIBLE"))
@@ -169,7 +148,9 @@ return function()
 	if (self.get_veh() == 0) then
 		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
 		return
-	elseif (not Stancer.m_is_active) then
+	end
+
+	if (not Stancer.m_is_active) then
 		ImGui.Text(_T("GENERIC_CARS_ONLY"))
 		return
 	end
@@ -196,12 +177,12 @@ return function()
 	end
 
 	ImGui.SeparatorText(_T("VEH_STANCE_GEN_OPTIONS"))
-
 	ImGui.BeginDisabled(Stancer.m_bounce_mode.enabled)
 	ImGui.PushButtonRepeat(true)
 	if (ImGui.ArrowButton("##rideHight-", 3)) then
 		Stancer.m_suspension_height.m_current = math.min(0.2, Stancer.m_suspension_height.m_current + 0.01)
 	end
+
 	ImGui.SameLine()
 	Stancer.m_suspension_height.m_current, _ = ImGui.SliderFloat(
 		"##rideHeight",
@@ -209,11 +190,13 @@ return function()
 		-0.2,
 		0.2
 	)
+
 	ImGui.SameLine()
 	if (ImGui.ArrowButton("##rideHight+", 2)) then
 		Stancer.m_suspension_height.m_current = math.max(-0.2, Stancer.m_suspension_height.m_current - 0.01)
 	end
 	ImGui.PopButtonRepeat()
+
 	ImGui.SameLine()
 	ImGui.Text(_T("VEH_STANCE_RIDE_HEIGHT"))
 	ImGui.EndDisabled()
@@ -222,12 +205,11 @@ return function()
 	DrawSlider("m_wheel_size", frontStanceDeltas, Stancer.eWheelSide.FRONT)
 
 	ImGui.Spacing()
-
 	ImGui.SeparatorText(_T("VEH_STANCE_AIR_SUSPENSION"))
 	local current_susp_f = frontStanceDeltas.m_susp_comp
 	local current_susp_r = backStanceDeltas.m_susp_comp
-	local min_susp = ref.m_susp_comp.min()
-	local max_susp = ref.m_susp_comp.max()
+	local min_susp       = ref.m_susp_comp.min()
+	local max_susp       = ref.m_susp_comp.max()
 
 	ImGui.BeginDisabled(Stancer.m_bounce_mode.enabled)
 	ImGui.BeginDisabled((current_susp_f >= max_susp - 0.01) and (current_susp_r >= max_susp - 0.01))
@@ -254,23 +236,22 @@ return function()
 	ImGui.EndDisabled()
 
 	ImGui.SameLine()
-	Stancer.m_bounce_mode.enabled, bounce_mode_clicked = GUI:CustomToggle(_T("VEH_STANCE_BOUNCE_MODE"),
+	Stancer.m_bounce_mode.enabled, _ = GUI:CustomToggle(_T("VEH_STANCE_BOUNCE_MODE"),
 		Stancer.m_bounce_mode.enabled,
-		{ tooltip = _T("VEH_STANCE_BOUNCE_MODE_TT") }
+		{
+			tooltip = _T("VEH_STANCE_BOUNCE_MODE_TT"),
+			onClick = function(v)
+				if (not v) then Stancer:OnBounceModeDisable() end
+			end
+		}
 	)
-
-	if (bounce_mode_clicked and not Stancer.m_bounce_mode.enabled) then
-		Stancer:OnBounceModeDisable()
-	end
 
 	ImGui.Separator()
 
 	if (GUI:Button(_T("GENERIC_RESET"))) then
 		ThreadManager:Run(function()
 			Stancer:Reset()
-			if (not PV:IsValid()) then
-				return
-			end
+			if (not PV:IsValid()) then return end
 			OnSuspensionReset()
 		end)
 	end
@@ -288,17 +269,17 @@ return function()
 		end
 
 		ImGui.SameLine()
-		GVars.features.vehicle.stancer.auto_apply_saved, auto_apply_clicked = GUI:CustomToggle(
+		GVars.features.vehicle.stancer.auto_apply_saved, _ = GUI:CustomToggle(
 			_T("VEH_STANCE_AUTOAPPLY"),
 			GVars.features.vehicle.stancer.auto_apply_saved,
-			{ tooltip = _T("VEH_STANCE_AUTOAPPLY_TT") }
+			{
+				tooltip = _T("VEH_STANCE_AUTOAPPLY_TT"),
+				onClick = function(v)
+					if (not v) then return end
+					ThreadManager:Run(function() Stancer:LoadSavedDeltas() end)
+				end
+			}
 		)
-
-		if (auto_apply_clicked and GVars.features.vehicle.stancer.auto_apply_saved) then
-			ThreadManager:Run(function()
-				Stancer:LoadSavedDeltas()
-			end)
-		end
 	end
 
 	if (saved_vehs_window.should_draw) then
@@ -310,8 +291,8 @@ return function()
 		GUI:QuickConfigWindow(_T("VEH_STANCE_VIEW_SAVED"), function()
 			if (ImGui.BeginListBox("##savedVehList", -1, 360)) then
 				for model_str in pairs(saved_models) do
-					local model = tonumber(model_str) or 0
-					local name = Game.GetVehicleDisplayName(model)
+					local model       = tonumber(model_str) or 0
+					local name        = Game.GetVehicleDisplayName(model)
 					local is_selected = selected_saved_model == model
 					if (ImGui.Selectable(name, is_selected)) then
 						selected_saved_model = model

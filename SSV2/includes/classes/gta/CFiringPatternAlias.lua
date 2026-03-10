@@ -13,14 +13,21 @@ local CStructView = require("includes.classes.gta.CStructView")
 --------------------------------------
 -- Class: CFiringPatternAlias
 --------------------------------------
----@class CFiringPatternAlias
+---@class CFiringPatternAlias : CStructBase<CFiringPatternAlias>
 ---@field protected m_ptr pointer
 ---@field m_firing_pattern_hash pointer<joaat_t> // 0x0
 ---@field m_alias_hash pointer<joaat_t> // 0x4
 ---@overload fun(ptr: pointer): CFiringPatternAlias
-local CFiringPatternAlias = CStructView("CFiringPatternAlias", {
-	{ "m_firing_pattern_hash", 0x0 },
-	{ "m_alias_hash",          0x4 },
-}, 0x8)
+local CFiringPatternAlias = CStructView("CFiringPatternAlias", 0x8)
+
+---@param ptr pointer
+---@return CFiringPatternAlias
+function CFiringPatternAlias.new(ptr)
+	return setmetatable({
+		m_firing_pattern_hash = ptr:add(0x0),
+		m_alias_hash          = ptr:add(0x4)
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, CFiringPatternAlias)
+end
 
 return CFiringPatternAlias

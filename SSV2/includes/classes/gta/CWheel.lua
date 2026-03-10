@@ -7,8 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CStructView = require("includes.classes.gta.CStructView")
-
+local CStructView        = require("includes.classes.gta.CStructView")
+local VEC3_ZERO <const>  = vec3:zero()
 
 ---@enum eWheelDynamicFlags
 Enums.eWheelDynamicFlags = {
@@ -122,50 +122,58 @@ Enums.eWheelConfigFlags  = {
 ---@field m_tyre_is_burst pointer<bool> // 0x20B
 ---@field m_unk_byte pointer<byte> // 0x20C
 ---@field m_has_hydraulics pointer<bool> // 0x20D // true for cars with DONK mod
----@overload fun(addr: pointer): CWheel
-local CWheel = CStructView("CWheel", {
-	{ "m_y_rotation",                0x008 },
-	{ "m_y_rotation_inv",            0x010 },
-	{ "m_offset_from_body",          0x020 },
-	{ "m_x_offset",                  0x030 },
-	{ "m_last_ground_pos",           0x03C },
-	{ "m_wheel_transform",           function(ptr) return { ptr:add(0x090), ptr:add(0x0A0), ptr:add(0x0B0), ptr:add(0x0C0) } end },
-	{ "m_unk_flags",                 0x0D0 },
-	{ "m_tyre_radius",               0x0F4 },
-	{ "m_rim_radius",                0x0F6 },
-	{ "m_old_rim_radius",            0x0FA },
-	{ "m_tyre_width",                0x0FE },
-	{ "m_handling_data",             0x102 },
-	{ "m_vehicle",                   0x106 },
-	{ "m_suspension_length",         0x110 },
-	{ "m_max_suspension_travel",     0x114 },
-	{ "m_suspension_forward_offset", 0x13C },
-	{ "m_suspension_compression_2",  0x168 },
-	{ "m_wheel_compression",         0x16C },
-	{ "m_rotation_speed",            0x170 },
-	{ "m_unk0190",                   0x190 },
-	{ "m_unk0194",                   0x194 },
-	{ "m_tire_drag_coeff",           0x198 },
-	{ "m_top_speed_mult",            0x19C },
-	{ "m_steering_angle",            0x1CC },
-	{ "m_brake_force",               0x1D0 },
-	{ "m_drive_force",               0x1D4 },
-	{ "m_suspension_health",         0x1E8 },
-	{ "m_tyre_health",               0x1EC },
-	{ "m_tyre_wear_mult",            0x1F0 },
-	{ "m_tyre_wear_unk",             0x1F8 },
-	{ "m_wheel_flags",               0x200 },
-	{ "m_wheel_config_flags",        0x204 },
-	{ "m_unk_u16",                   0x208 },
-	{ "m_unk_u8",                    0x20A },
-	{ "m_tyre_is_burst",             0x20B },
-	{ "m_unk_byte",                  0x20C },
-	{ "m_has_hydraulics",            0x20D },
-}, 0x020E)
+---@overload fun(addr: pointer): CWheel|nil
+local CWheel = CStructView("CWheel", 0x020E)
+
+---@param ptr pointer
+---@return CWheel
+function CWheel.new(ptr)
+	return setmetatable({
+		m_ptr                       = ptr,
+		m_y_rotation                = ptr:add(0x008),
+		m_y_rotation_inv            = ptr:add(0x010),
+		m_offset_from_body          = ptr:add(0x020),
+		m_x_offset                  = ptr:add(0x030),
+		m_last_ground_pos           = ptr:add(0x03C),
+		m_wheel_transform           = { ptr:add(0x090), ptr:add(0x0A0), ptr:add(0x0B0), ptr:add(0x0C0) },
+		m_unk_flags                 = ptr:add(0x0C8),
+		m_tyre_radius               = ptr:add(0x0F4),
+		m_rim_radius                = ptr:add(0x0F6),
+		m_old_rim_radius            = ptr:add(0x0FA),
+		m_tyre_width                = ptr:add(0x0FE),
+		m_handling_data             = ptr:add(0x102),
+		m_vehicle                   = ptr:add(0x106),
+		m_suspension_length         = ptr:add(0x110),
+		m_max_suspension_travel     = ptr:add(0x114),
+		m_suspension_forward_offset = ptr:add(0x13C),
+		m_suspension_compression_2  = ptr:add(0x168),
+		m_wheel_compression         = ptr:add(0x16C),
+		m_rotation_speed            = ptr:add(0x170),
+		m_unk0190                   = ptr:add(0x190),
+		m_unk0194                   = ptr:add(0x194),
+		m_tire_drag_coeff           = ptr:add(0x198),
+		m_top_speed_mult            = ptr:add(0x19C),
+		m_steering_angle            = ptr:add(0x1CC),
+		m_brake_force               = ptr:add(0x1D0),
+		m_drive_force               = ptr:add(0x1D4),
+		m_suspension_health         = ptr:add(0x1E8),
+		m_tyre_health               = ptr:add(0x1EC),
+		m_tyre_wear_mult            = ptr:add(0x1F0),
+		m_tyre_wear_unk             = ptr:add(0x1F8),
+		m_wheel_flags               = ptr:add(0x200),
+		m_wheel_config_flags        = ptr:add(0x204),
+		m_unk_u16                   = ptr:add(0x208),
+		m_unk_u8                    = ptr:add(0x20A),
+		m_tyre_is_burst             = ptr:add(0x20B),
+		m_unk_byte                  = ptr:add(0x20C),
+		m_has_hydraulics            = ptr:add(0x20D),
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, CWheel)
+end
 
 ---@return vec3 -- The world position of the wheel or a zero vector if the wheel is invalid.
 function CWheel:GetWorldPosition()
-	return self:__safecall(vec3:zero(), function()
+	return self:__safecall(VEC3_ZERO, function()
 		return self.m_last_ground_pos:get_vec3()
 	end)
 end
@@ -173,7 +181,7 @@ end
 -- test
 ---@return vec3
 function CWheel:GetTransformRight()
-	return self:__safecall(vec3:zero(), function()
+	return self:__safecall(VEC3_ZERO, function()
 		return self.m_wheel_transform[1]:get_vec3()
 	end)
 end
@@ -181,7 +189,7 @@ end
 -- test
 ---@return vec3
 function CWheel:GetTransformFwd()
-	return self:__safecall(vec3:zero(), function()
+	return self:__safecall(VEC3_ZERO, function()
 		return self.m_wheel_transform[2]:get_vec3()
 	end)
 end
@@ -189,7 +197,7 @@ end
 -- test
 ---@return vec3
 function CWheel:GetTransformUp()
-	return self:__safecall(vec3:zero(), function()
+	return self:__safecall(VEC3_ZERO, function()
 		return self.m_wheel_transform[3]:get_vec3()
 	end)
 end
@@ -197,7 +205,7 @@ end
 -- test
 ---@return vec3
 function CWheel:GetTransformPos()
-	return self:__safecall(vec3:zero(), function()
+	return self:__safecall(VEC3_ZERO, function()
 		return self.m_wheel_transform[4]:get_vec3()
 	end)
 end
@@ -205,7 +213,7 @@ end
 -- test
 ---@return float
 function CWheel:GetTiltAngle()
-	return self:__safecall(0, function()
+	return self:__safecall(0.0, function()
 		local up       = self:GetTransformUp()
 		local world_up = vec3:new(0, 0, 1)
 		local dot      = up:dot_product(world_up)
@@ -236,26 +244,26 @@ end
 
 ---@param flag eWheelDynamicFlags
 ---@param toggle boolean
+---@return boolean
 function CWheel:SetDynamicFlag(flag, toggle)
-	if (not self:IsValid()) then
-		return
-	end
-
-	local dwFlags = self.m_wheel_flags:get_dword()
-	local bitFunc = toggle and Bit.Set or Bit.Clear
-	self.m_wheel_flags:set_dword(bitFunc(dwFlags, flag))
+	return self:__safecall(false, function()
+		local dwFlags = self.m_wheel_flags:get_dword()
+		local bitFunc = toggle and Bit.Set or Bit.Clear
+		self.m_wheel_flags:set_dword(bitFunc(dwFlags, flag))
+		return true
+	end)
 end
 
 ---@param flag eWheelConfigFlags
 ---@param toggle boolean
+---@return boolean
 function CWheel:SetConfigFlag(flag, toggle)
-	if (not self:IsValid()) then
-		return
-	end
-
-	local dwFlags = self.m_wheel_config_flags:get_dword()
-	local bitFunc = toggle and Bit.Set or Bit.Clear
-	self.m_wheel_config_flags:set_dword(bitFunc(dwFlags, flag))
+	return self:__safecall(false, function()
+		local dwFlags = self.m_wheel_config_flags:get_dword()
+		local bitFunc = toggle and Bit.Set or Bit.Clear
+		self.m_wheel_config_flags:set_dword(bitFunc(dwFlags, flag))
+		return true
+	end)
 end
 
 return CWheel

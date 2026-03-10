@@ -1518,13 +1518,18 @@ local function DrawSidebarItems()
 	end
 end
 
+local dismissAllBtnCols = {
+	button        = Color("#FF0000"),
+	buttonHovered = Color("#EE4B2B"),
+	buttonActive  = Color("#880808")
+}
 local function DrawMainSidebar()
 	ImGui.SetNextWindowBgAlpha(0.0)
 	ImGui.BeginChild("##main_sidebar", 160, GVars.ui.window_size.y * 0.6)
 	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 5, 20)
 	ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 40)
 	if BS:GetServiceCount() > 1 then
-		if GUI:ButtonColored(" Dismiss All ", Color("#FF0000"), Color("#EE4B2B"), Color("#880808")) then
+		if GUI:Button(" Dismiss All ", { colors = dismissAllBtnCols }) then
 			BS:Dismiss(BS.SERVICE_TYPE.ALL)
 		end
 	else

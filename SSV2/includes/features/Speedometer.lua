@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local UnitCases = {
+local UnitCases <const> = {
 	[0]     = 1,
 	[1]     = 3.6,
 	default = 2.236936
@@ -15,38 +15,39 @@ local UnitCases = {
 
 
 ---@class Speedometer
-local Speedometer              = {}
-Speedometer.__index            = Speedometer
-Speedometer.cached_ticks       = nil
-Speedometer.cached_unit_sizes  = {}
-Speedometer.last_max_fractions = nil
-Speedometer.last_max_value     = nil
-Speedometer.tick_marks         = 10
-Speedometer.line_thickness     = 3.0
-Speedometer.font_scale         = 1.0
-Speedometer._state             = {
-	should_draw      = false,
-	speed_modifier   = 1,
-	PV               = nil,
-	IsEngineOn       = false,
-	HasABS           = false,
-	IsABSEngaged     = false,
-	IsESCEngaged     = false,
-	IsNOSActive      = false,
-	IsAircraft       = false,
-	IsSports         = false,
-	IsShootingFlares = false,
-	Manufacturer     = "",
-	NOSDangerRatio   = 0.0,
-	CurrentSpeed     = 0,
-	CurrentAltitude  = 0,
-	MaxSpeed         = 0,
-	Throttle         = 0,
-	RPM              = 0,
-	Gear             = 0,
-	EngineHealth     = 0,
-	LandingGearState = Enums.eLandingGearState.UNK
+local Speedometer   = {
+	cached_ticks       = nil,
+	cached_unit_sizes  = {},
+	last_max_fractions = nil,
+	last_max_value     = nil,
+	tick_marks         = 10,
+	line_thickness     = 3.0,
+	font_scale         = 1.0,
+	_state             = {
+		should_draw      = false,
+		speed_modifier   = 1,
+		PV               = nil,
+		IsEngineOn       = false,
+		HasABS           = false,
+		IsABSEngaged     = false,
+		IsESCEngaged     = false,
+		IsNOSActive      = false,
+		IsAircraft       = false,
+		IsSports         = false,
+		IsShootingFlares = false,
+		Manufacturer     = "",
+		NOSDangerRatio   = 0.0,
+		CurrentSpeed     = 0,
+		CurrentAltitude  = 0,
+		MaxSpeed         = 0,
+		Throttle         = 0,
+		RPM              = 0,
+		Gear             = 0,
+		EngineHealth     = 0,
+		LandingGearState = Enums.eLandingGearState.UNK
+	}
 }
+Speedometer.__index = Speedometer
 
 function Speedometer:UpdateState()
 	self._state.PV = LocalPlayer:GetVehicle()
@@ -89,6 +90,7 @@ function Speedometer:UpdateState()
 	)
 end
 
+---@private
 ---@param radius number
 ---@param start_angle number
 ---@param end_angle number
@@ -122,6 +124,7 @@ function Speedometer:GenerateTicks(radius, start_angle, end_angle, max_value, Is
 	end
 end
 
+---@private
 ---@param ImDrawlist userdata
 ---@param center vec2
 function Speedometer:DrawABSNOSESCIndicators(ImDrawlist, center)
@@ -164,6 +167,7 @@ function Speedometer:DrawABSNOSESCIndicators(ImDrawlist, center)
 	end
 end
 
+---@private
 ---@param ImDrawlist userdata
 ---@param center vec2
 function Speedometer:DrawAirplaneIndicators(ImDrawlist, center)
@@ -190,6 +194,7 @@ function Speedometer:DrawAirplaneIndicators(ImDrawlist, center)
 	)
 end
 
+---@private
 ---@param ImDrawList userdata
 ---@param center vec2
 ---@param radius number
@@ -225,6 +230,7 @@ function Speedometer:DrawSmoothArc(ImDrawList, center, radius, angle_start, angl
 	end
 end
 
+---@private
 ---@param ImDrawlist userdata
 ---@param center vec2
 function Speedometer:DrawLowerIndicators(ImDrawlist, center)
@@ -240,6 +246,7 @@ function Speedometer:DrawLowerIndicators(ImDrawlist, center)
 	end
 end
 
+---@private
 ---@param ImDrawList userdata
 ---@param center vec2
 ---@param radius number
@@ -257,6 +264,7 @@ function Speedometer:DrawEngineWarning(ImDrawList, center, radius)
 	end
 end
 
+---@private
 ---@param ImDrawList userdata
 ---@param center vec2
 ---@param radius number
@@ -265,9 +273,8 @@ end
 ---@param current_altitude number
 ---@param max_altitude number
 function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_speed, current_altitude, max_altitude)
-	local value = self._state.IsAircraft and current_altitude or current_speed
-	local max_value = self._state.IsAircraft and max_altitude or max_speed
-	local max_fractions = self.tick_marks or 10
+	local value                  = self._state.IsAircraft and current_altitude or current_speed
+	local max_value              = self._state.IsAircraft and max_altitude or max_speed
 	local start_angle, end_angle = -math.pi * 1.25, math.pi * 0.25
 
 	self:GenerateTicks(radius, start_angle, end_angle, max_value, self._state.IsAircraft)
@@ -489,11 +496,12 @@ function Speedometer:Draw(offset)
 		return
 	end
 
-	local radius = 150
+	local pos        = GVars.features.speedometer.pos
+	local radius     = 150
 	local resolution = Game.GetScreenResolution()
-	if (GVars.features.speedometer.pos:is_zero()) then
-		GVars.features.speedometer.pos.x = resolution.x - (radius * 2.5)
-		GVars.features.speedometer.pos.y = resolution.y - (radius * 3.5)
+	if (pos.x == 0 and pos.y == 0) then
+		pos.x = resolution.x - (radius * 2.5)
+		pos.y = resolution.y - (radius * 3.5)
 	end
 
 	local windowFlags = ImGuiWindowFlags.NoTitleBar
@@ -508,11 +516,7 @@ function Speedometer:Draw(offset)
 		local window_width = radius * 1.3
 		local pulse = 0.5 + 0.5 * math.sin(Time.Now() * 12)
 		ImGui.SetNextWindowSize(window_width, 100, ImGuiCond.Always)
-		ImGui.SetNextWindowPos(
-			GVars.features.speedometer.pos.x + radius * 0.7,
-			GVars.features.speedometer.pos.y - 120,
-			ImGuiCond.Always
-		)
+		ImGui.SetNextWindowPos(pos.x + radius * 0.7, pos.y - 120, ImGuiCond.Always)
 		ImGui.PushStyleColor(ImGuiCol.WindowBg, 1, pulse, 0.02, 0.9)
 		ImGui.PushStyleColor(ImGuiCol.Text, 0.1, 0.1, 0.1, 1.0)
 		if (ImGui.Begin("##dangertomanifold", windowFlags)) then
@@ -530,20 +534,20 @@ function Speedometer:Draw(offset)
 
 	ImGui.SetNextWindowBgAlpha(0.0)
 	ImGui.SetNextWindowSize(radius * 2.5, radius * 2)
-	ImGui.SetNextWindowPos(GVars.features.speedometer.pos.x, GVars.features.speedometer.pos.y, ImGuiCond.Always)
+	ImGui.SetNextWindowPos(pos.x, pos.y, ImGuiCond.Always)
 	if ImGui.Begin("##SpeedometerWindow", windowFlags | ImGuiWindowFlags.NoBackground) then
 		if (not self._state.should_draw) then
 			ImGui.End()
 			return
 		end
 
-		local pos_offset = offset or 0.0
-		local ImDrawList = ImGui.GetWindowDrawList()
-		local window_pos = vec2:new(ImGui.GetWindowPos())
-		local window_size = vec2:new(ImGui.GetWindowSize())
-		local center = window_pos + window_size * 0.5 + pos_offset
+		local pos_offset   = offset or 0.0
+		local ImDrawList   = ImGui.GetWindowDrawList()
+		local window_pos   = vec2:new(ImGui.GetWindowPos())
+		local window_size  = vec2:new(ImGui.GetWindowSize())
+		local center       = window_pos + window_size * 0.5 + pos_offset
 		local max_altitude = 2500
-		center.y = center.y + 11
+		center.y           = center.y + 11
 
 		self:DrawImpl(
 			ImDrawList,

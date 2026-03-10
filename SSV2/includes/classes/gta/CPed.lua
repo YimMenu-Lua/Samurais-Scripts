@@ -8,8 +8,9 @@
 
 
 local CEntity           = require("includes.classes.gta.CEntity")
-local CPlayerInfo       = require("includes.classes.gta.CPlayerInfo")
 local CPedWeaponManager = require("includes.classes.gta.CPedWeaponManager")
+local CPlayerInfo       = require("includes.classes.gta.CPlayerInfo")
+
 
 ---@class CPedIntelligence
 ---@class CPedInventory
@@ -23,14 +24,15 @@ local CPedWeaponManager = require("includes.classes.gta.CPedWeaponManager")
 ---@field protected m_ptr pointer
 ---@field m_ped_intelligence pointer<CPedIntelligence>
 ---@field m_ped_inventory pointer<CPedInventory>
----@field m_ped_weapon_mgr CPedWeaponManager
----@field m_player_info? CPlayerInfo
+---@field m_ped_weapon_mgr pointer_ref<CPedWeaponManager>
+---@field m_player_info CPlayerInfo
 ---@field m_velocity pointer<vec3>
 ---@field m_ped_type pointer<uint8_t>
 ---@field m_ped_task_flag pointer<uint8_t>
 ---@field m_seatbelt pointer<uint8_t>
 ---@field m_armor pointer<float>
 ---@field m_cash pointer<uint16_t> // 0x1614
+---@field private m_ped_weapon_mgr_inst CPedWeaponManager
 ---@overload fun(ped: handle): CPed
 local CPed = Class("CPed", { parent = CEntity, symbolic_size = 0x161C, pointer_ctor = true })
 
@@ -41,27 +43,25 @@ function CPed:init(ped)
 		error("Invalid entity!")
 	end
 
-	---@diagnostic disable-next-line: param-type-mismatch
-	local instance = setmetatable({}, CPed)
-	instance:super().init(instance, ped)
+	self:super().init(self, ped)
+	local ptr = memory.handle_to_ptr(ped)
 
-	local ptr                   = memory.handle_to_ptr(ped)
-	instance.m_ptr              = ptr
-	instance.m_ped_intelligence = ptr:add(0x10A0)
-	instance.m_ped_inventory    = ptr:add(0x10B0)
-	instance.m_ped_weapon_mgr   = CPedWeaponManager(ptr:add(0x10B8))
-	instance.m_velocity         = ptr:add(0x0300)
-	instance.m_ped_type         = ptr:add(0x1098)
-	instance.m_ped_task_flag    = ptr:add(0x144B)
-	instance.m_seatbelt         = ptr:add(0x143C)
-	instance.m_armor            = ptr:add(0x150C)
-	instance.m_cash             = ptr:add(0x1614)
+	---@type CPed
 
-	if (PED.IS_PED_A_PLAYER(ped)) then
-		instance.m_player_info = CPlayerInfo(ptr:add(0x10A8):deref())
-	end
-
-	return instance
+	return setmetatable({
+		m_ptr              = ptr,
+		m_ped_intelligence = ptr:add(0x10A0),
+		m_ped_inventory    = ptr:add(0x10B0),
+		m_ped_weapon_mgr   = ptr:add(0x10B8),
+		m_velocity         = ptr:add(0x0300),
+		m_ped_type         = ptr:add(0x1098),
+		m_ped_task_flag    = ptr:add(0x144B),
+		m_seatbelt         = ptr:add(0x143C),
+		m_armor            = ptr:add(0x150C),
+		m_cash             = ptr:add(0x1614),
+		m_player_info      = CPlayerInfo(ptr:add(0x10A8):deref()),
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, CPed)
 end
 
 ---@return boolean
@@ -95,6 +95,23 @@ end
 ---@return ePedType
 function CPed:GetPedType()
 	return (self.m_ped_type:get_word() << 11 >> 25)
+end
+
+---@return CPedWeaponManager?
+function CPed:GetWeaponManager()
+	local ptr = self.m_ped_weapon_mgr:deref()
+	if (ptr:is_null()) then
+		self.m_ped_weapon_mgr_inst = nil
+		return
+	end
+
+	local mgr = self.m_ped_weapon_mgr_inst
+	---@diagnostic disable-next-line: invisible
+	if (not mgr or not mgr:IsValid() or (mgr.m_ptr ~= ptr)) then
+		self.m_ped_weapon_mgr_inst = CPedWeaponManager(ptr)
+	end
+
+	return self.m_ped_weapon_mgr_inst
 end
 
 return CPed
