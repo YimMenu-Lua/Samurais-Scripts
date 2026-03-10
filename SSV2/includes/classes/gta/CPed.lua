@@ -45,9 +45,6 @@ function CPed:init(ped)
 
 	self:super().init(self, ped)
 	local ptr = memory.handle_to_ptr(ped)
-
-	---@type CPed
-
 	return setmetatable({
 		m_ptr              = ptr,
 		m_ped_intelligence = ptr:add(0x10A0),

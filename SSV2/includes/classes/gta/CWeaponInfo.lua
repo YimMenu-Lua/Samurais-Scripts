@@ -123,7 +123,7 @@ Enums.eWeaponEffectGroup = {
 local CWeaponInfo = CStructView("CWeaponInfo", 0x0928)
 
 ---@param ptr pointer
----@return CWeaponInfo?
+---@return CWeaponInfo
 function CWeaponInfo.new(ptr)
 	return setmetatable({
 		m_ptr                     = ptr,

@@ -25,7 +25,7 @@ local CStructView = require("includes.classes.gta.CStructView")
 ---@field m_lean_mult pointer<float> -- 0x0028
 ---@field m_brake_force_mult pointer<float> -- 0x002C
 ---@field m_air_steer_mult pointer<float> -- 0x0030
----@field m_wheelie_walance_point pointer<float> -- 0x0034
+---@field m_wheelie_balance_point pointer<float> -- 0x0034
 ---@field m_stoppie_balance_mult pointer<float> -- 0x0038
 ---@field m_wheelie_steer_mult pointer<float> -- 0x003C
 ---@field m_rear_balance_mult pointer<float> -- 0x0040
@@ -54,7 +54,7 @@ function CBikeHandlingData.new(ptr)
 		m_lean_mult                       = ptr:add(0x0028),
 		m_brake_force_mult                = ptr:add(0x002C),
 		m_air_steer_mult                  = ptr:add(0x0030),
-		m_wheelie_walance_point           = ptr:add(0x0034),
+		m_wheelie_balance_point           = ptr:add(0x0034),
 		m_stoppie_balance_mult            = ptr:add(0x0038),
 		m_wheelie_steer_mult              = ptr:add(0x003C),
 		m_rear_balance_mult               = ptr:add(0x0040),
