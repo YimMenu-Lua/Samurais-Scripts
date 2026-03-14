@@ -67,6 +67,24 @@ function CEntity:IsValid()
 	return self.m_ptr and self.m_ptr:is_valid()
 end
 
+---@generic R1, R2, R3, R4, R5
+---@param default any
+---@param func fun(...?): R1, R2?, R3?, R4?, R5?, ...?
+---@param ... any
+---@return R1, R2?, R3?, R4?, R5?, ...?
+function CEntity:__safecall(default, func, ...)
+	if (not self:IsValid()) then
+		return default
+	end
+
+	return func(...)
+end
+
+---@return pointer
+function CEntity:GetPointer()
+	return self.m_ptr
+end
+
 ---@return uint64_t
 function CEntity:GetAddress()
 	return self.m_ptr:get_address()
@@ -74,11 +92,9 @@ end
 
 ---@return eModelType
 function CEntity:GetModelType()
-	if not self:IsValid() then
-		return Enums.eModelType.Invalid
-	end
-
-	return (self.m_model_type:get_word() & 0x1F)
+	return self:__safecall(Enums.eModelType.Invalid, function()
+		return self.m_model_type:get_word() & 0x1F
+	end)
 end
 
 return CEntity

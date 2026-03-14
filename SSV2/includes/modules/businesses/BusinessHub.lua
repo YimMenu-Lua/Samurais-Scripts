@@ -22,6 +22,8 @@ local SGSL          = require("includes.services.SGSL")
 ---@field private m_name string
 ---@field private m_max_units integer
 ---@field private m_vpu integer
+---@field private m_prod_time_g ScriptGlobal
+---@field private m_prod_bool_g ScriptGlobal
 ---@field private m_fast_prod_running boolean
 ---@field public fast_prod_enabled boolean
 local BusinessHub   = setmetatable({}, BusinessBase)
@@ -37,6 +39,9 @@ function BusinessHub.new(opts)
 	instance.fast_prod_enabled = false
 	instance.fast_prod_running = false
 	instance.m_vpu             = opts.vpu
+	instance.m_prod_time_g     = SGSL:Get(SGSL.data.bhub_prod_time_global):AsGlobal():At(1, base:GetIndex())
+	instance.m_prod_bool_g     = SGSL:Get(SGSL.data.bhub_prod_bool_global):AsGlobal()
+
 	---@diagnostic disable-next-line
 	return instance
 end
@@ -59,23 +64,17 @@ end
 
 ---@return milliseconds
 function BusinessHub:GetTimeLeftBeforeProd()
-	return SGSL:Get(SGSL.data.bhub_prod_time_global)
-		:AsGlobal()
-		:At(1, self.m_id)
-		:ReadInt()
+	return self.m_prod_time_g:ReadInt()
 end
 
 function BusinessHub:TriggerProduction()
-	local g_ProdTime = SGSL:Get(SGSL.data.bhub_prod_time_global):AsGlobal():At(1, self.m_id)
-	local g_ProdBool = SGSL:Get(SGSL.data.bhub_prod_bool_global):AsGlobal()
-
-	if (g_ProdTime:ReadInt() < 1000) then
+	if (self.m_prod_time_g:ReadInt() < 1000) then
 		return
 	end
 
-	g_ProdTime:WriteInt(100)
-	g_ProdBool:At(1):At(self.m_id):WriteInt(0)
-	g_ProdBool:WriteInt(1)
+	self.m_prod_time_g:WriteInt(100)
+	self.m_prod_bool_g:At(1):At(self.m_id):WriteInt(0)
+	self.m_prod_bool_g:WriteInt(1)
 end
 
 ---@return boolean
@@ -96,7 +95,7 @@ function BusinessHub:LoopProduction()
 			yield()
 		end
 
-		self.fast_prod_enabled = false
+		self.fast_prod_enabled   = false
 		self.m_fast_prod_running = false
 	end)
 end

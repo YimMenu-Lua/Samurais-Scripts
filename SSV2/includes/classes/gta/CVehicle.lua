@@ -151,72 +151,65 @@ end
 
 ---@return float
 function CVehicle:GetAcceleration()
-	if (not self:IsValid()) then
-		return 0.0
-	end
-
-	return self.m_acceleration:get_float()
+	return self:__safecall(0, function()
+		return self.m_acceleration:get_float()
+	end)
 end
 
 ---@param value float
+---@return boolean
 function CVehicle:SetAcceleration(value)
-	if (not self:IsValid()) then
-		return
-	end
-
-	self.m_acceleration:set_float(value)
+	return self:__safecall(false, function()
+		self.m_acceleration:set_float(value)
+		return true
+	end)
 end
 
 ---@return float
 function CVehicle:GetDeformMultiplier()
-	if (not self:IsValid()) then
-		return 0.0
-	end
-
-	return self.m_deform_mult:get_float()
+	return self:__safecall(0, function()
+		return self.m_deform_mult:get_float()
+	end)
 end
 
 ---@param value float
+---@return boolean
 function CVehicle:SetDeformMultiplier(value)
-	if (not self:IsValid()) then
-		return
-	end
-
-	self.m_deform_mult:set_float(value)
+	return self:__safecall(false, function()
+		self.m_deform_mult:set_float(value)
+		return true
+	end)
 end
 
 ---@param handlingType eHandlingType
----@return any|nil
+---@return CCarHandlingData|CBikeHandlingData|CFlyingHandlingData|any
 function CVehicle:GetSubHandlingData(handlingType)
-	if (not self:IsValid()) then
-		return
-	end
-
-	for _, sub_ptr in self.m_sub_handling_data:Iter() do
-		if (sub_ptr:is_valid()) then
-			-- local base = CBaseSubHandlingData.new(sub_ptr)
-			-- if (base and base:GetHandlingType() == handlingType) then
-			local func = SubHandlingCtorMap[handlingType]
-			return func and func(sub_ptr) or nil
-			-- return func and func(sub_ptr) or base
-			-- end
+	return self:__safecall(nil, function()
+		for _, sub_ptr in self.m_sub_handling_data:Iter() do
+			if (sub_ptr:is_valid()) then
+				-- local base = CBaseSubHandlingData.new(sub_ptr)
+				-- if (base and base:GetHandlingType() == handlingType) then
+				local func = SubHandlingCtorMap[handlingType]
+				return func and func(sub_ptr) or nil
+				-- return func and func(sub_ptr) or base
+				-- end
+			end
 		end
-	end
+		return nil
+	end)
 end
 
 ---@param flag eVehicleHandlingFlags
 ---@return boolean
 function CVehicle:GetHandlingFlag(flag)
-	if (not self:IsValid() or type(flag) ~= "number") then
-		return false
-	end
+	return self:__safecall(false, function()
+		if (type(flag) ~= "number" or self.m_handling_flags:is_null()) then
+			return false
+		end
 
-	if (self.m_handling_flags:is_null()) then
-		return false
-	end
-
-	local dword_flags = self.m_handling_flags:get_dword()
-	return Bit.IsBitSet(dword_flags, flag)
+		local dword_flags = self.m_handling_flags:get_dword()
+		return Bit.IsBitSet(dword_flags, flag)
+	end)
 end
 
 ---@param flag eVehicleHandlingFlags
@@ -238,36 +231,36 @@ function CVehicle:SetHandlingFlag(flag, toggle)
 end
 
 ---@param flag eVehicleModelFlags
+---@return boolean
 function CVehicle:GetModelFlag(flag)
-	if (not self:IsValid()) then
-		return false
-	end
+	return self:__safecall(false, function()
+		if (type(flag) ~= "number" or self.m_model_flags:is_null()) then
+			return false
+		end
 
-	if self.m_model_flags:is_null() then
-		return false
-	end
-
-	local dword_flags = self.m_model_flags:get_dword()
-	return Bit.IsBitSet(dword_flags, flag)
+		local dword_flags = self.m_model_flags:get_dword()
+		return Bit.IsBitSet(dword_flags, flag)
+	end)
 end
 
 ---@param flag eVehicleModelInfoFlags
 ---@return boolean
 function CVehicle:GetModelInfoFlag(flag)
-	if (not self:IsValid()) then
-		return false
-	end
+	return self:__safecall(false, function()
+		if (not self.m_model_info_flags:is_valid()) then
+			return false
+		end
 
-	if not self.m_model_info_flags:is_valid() then
-		return false
-	end
+		local index    = math.floor(flag / 32)
+		local bit_pos  = flag % 32
+		local flag_ptr = self.m_model_info_flags:add(index * 4)
+		if (flag_ptr:is_null()) then
+			return false
+		end
 
-	local index     = math.floor(flag / 32)
-	local bit_pos   = flag % 32
-	local flag_ptr  = self.m_model_info_flags:add(index * 4)
-	local flag_bits = flag_ptr:get_dword()
-
-	return Bit.IsBitSet(flag_bits, bit_pos)
+		local flag_bits = flag_ptr:get_dword()
+		return Bit.IsBitSet(flag_bits, bit_pos)
+	end)
 end
 
 ---@param flag eVehicleModelInfoFlags
@@ -280,7 +273,7 @@ function CVehicle:SetModelInfoFlag(flag, toggle)
 	local index    = math.floor(flag / 32)
 	local bit_pos  = flag % 32
 	local flag_ptr = self.m_model_info_flags:add(index * 4)
-	if flag_ptr:is_null() then
+	if (flag_ptr:is_null()) then
 		return
 	end
 
@@ -293,40 +286,31 @@ end
 ---@param flag eVehicleAdvancedFlags
 ---@return boolean
 function CVehicle:GetAdvancedFlag(flag)
-	if (not self:IsValid()) then
-		return false
-	end
+	return self:__safecall(false, function()
+		local cchd = self:GetSubHandlingData(Enums.eHandlingType.CAR)
+		if (not cchd or not cchd.m_advanced_flags or cchd.m_advanced_flags:is_null()) then
+			return false
+		end
 
-	---@type CCarHandlingData?
-	local ccarhandlingdata = self:GetSubHandlingData(Enums.eHandlingType.CAR)
-	if (not ccarhandlingdata
-			or not ccarhandlingdata.m_advanced_flags
-			or ccarhandlingdata.m_advanced_flags:is_null()
-		) then
-		return false
-	end
-
-	local dword_flags = ccarhandlingdata.m_advanced_flags:get_dword()
-	return Bit.IsBitSet(dword_flags, flag)
+		local dword_flags = cchd.m_advanced_flags:get_dword()
+		return Bit.IsBitSet(dword_flags, flag)
+	end)
 end
 
 ---@param flag eVehicleAdvancedFlags
 ---@param toggle boolean
 function CVehicle:SetAdvancedFlag(flag, toggle)
 	if (not self:IsValid()) then
-		return false
+		return
 	end
 
 	---@type CCarHandlingData?
-	local ccarhandlingdata = self:GetSubHandlingData(Enums.eHandlingType.CAR)
-	if (not ccarhandlingdata
-			or not ccarhandlingdata.m_advanced_flags
-			or ccarhandlingdata.m_advanced_flags:is_null()
-		) then
-		return false
+	local cchd = self:GetSubHandlingData(Enums.eHandlingType.CAR)
+	if (not cchd or not cchd.m_advanced_flags or cchd.m_advanced_flags:is_null()) then
+		return
 	end
 
-	local ptr         = ccarhandlingdata.m_advanced_flags
+	local ptr         = cchd.m_advanced_flags
 	local dword_flags = ptr:get_dword()
 	local Bitwise     = toggle and Bit.Set or Bit.Clear
 	local new_flags   = Bitwise(dword_flags, flag)
@@ -434,32 +418,34 @@ end
 ---@param wheelIndex integer
 ---@return boolean
 function CVehicle:IsWheelBrokenOff(wheelIndex)
-	if (not self:IsValid()) then
-		return false
-	end
+	-- if (not self:IsValid()) then
+	-- 	return false
+	-- end
 
-	-- -- Thanks tupoy-ya
-	-- return (self.m_ptr:add(0xA98):get_dword() >> (wheelIndex & 0x1F) & 1) ~= 0
+	-- local cwheel = self:GetWheel(wheelIndex)
+	-- if (not cwheel) then
+	-- 	return false
+	-- end
 
-	local cwheel = self:GetWheel(wheelIndex)
-	if (not cwheel) then
-		return false
-	end
-
-	return cwheel:GetDynamicFlag(Enums.eWheelDynamicFlags.BROKEN_OFF)
+	-- return cwheel:GetDynamicFlag(Enums.eWheelDynamicFlags.BROKEN_OFF)
+	return self:__safecall(false, function()
+		-- Thanks tupoy-ya
+		return (self.m_ptr:add(0xA98):get_dword() >> (wheelIndex & 0x1F) & 1) ~= 0
+	end)
 end
 
 ---@return CWheel?
 function CVehicle:GetWheel(index)
-	if (not self:IsValid()) then
+	if (not self:IsValid() or index > self.m_num_wheels) then
 		return
 	end
 
-	if (index > self.m_wheels:Size()) then
+	local ptr = self.m_wheels:Get(index)
+	if (not ptr or ptr:is_null()) then
 		return
 	end
 
-	return CWheel(self.m_wheels:Get(index))
+	return CWheel(ptr)
 end
 
 ---@return CWheelDrawData
@@ -492,13 +478,16 @@ function CVehicle:HasWheelDrawData()
 end
 
 ---@param fHeight float positive = lower, negative = higher. should use values between `-0.1` and `0.1`
+---@return boolean
 function CVehicle:SetRideHeight(fHeight)
-	if (not self:IsValid()) then
-		return
-	end
+	return self:__safecall(false, function()
+		if (type(fHeight) ~= "number") then
+			return false
+		end
 
-	-- should probably start sanitizing values before writing to memory
-	self.m_ride_height:set_float(fHeight)
+		self.m_ride_height:set_float(fHeight)
+		return true
+	end)
 end
 
 return CVehicle

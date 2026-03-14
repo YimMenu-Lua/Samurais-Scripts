@@ -84,29 +84,6 @@ function Class(name, opts)
 		}
 	)
 
-	---@generic T
-	---@param default any Defaul value to return on failure
-	---@param func fun(self: ClassMeta<T>, ...): ...
-	---@param ... any
-	---@return ...
-	function cls:__safecall(default, func, ...)
-		if (not self:IsValid()) then
-			return default
-		end
-
-		local results = { pcall(func, ...) }
-		local ok      = results[1]
-		local err     = results[2]
-
-		if (not ok) then
-			log.fwarning("Safecall failed in %s: %s", self.__type, err)
-			return default
-		end
-
-		table.remove(results, 1)
-		return table.unpack(results)
-	end
-
 	function cls:super()
 		return self.__base or self
 	end
