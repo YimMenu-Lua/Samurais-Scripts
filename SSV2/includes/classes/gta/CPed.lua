@@ -63,52 +63,49 @@ end
 
 ---@return boolean
 function CPed:CanRagdoll()
-	if not self:IsValid() then
-		return false
-	end
-
-	return (self.m_ped_type & 0x20) ~= 0
+	return self:__safecall(false, function()
+		return (self.m_ped_type & 0x20) ~= 0
+	end)
 end
 
 ---@return boolean
 function CPed:HasSeatbelt()
-	if not self:IsValid() then
-		return false
-	end
-
-	return (self.m_seatbelt & 0x3) ~= 0
+	return self:__safecall(false, function()
+		return (self.m_seatbelt & 0x3) ~= 0
+	end)
 end
 
 ---@return float
 function CPed:GetSpeed()
-	if not self:IsValid() then
-		return 0.0
-	end
-
-	local speed_vec = self.m_velocity:get_vec3()
-	return speed_vec:mag()
+	return self:__safecall(0.0, function()
+		return self.m_velocity:get_vec3():mag()
+	end)
 end
 
 ---@return ePedType
 function CPed:GetPedType()
-	return (self.m_ped_type:get_word() << 11 >> 25)
+	return self:__safecall(-1, function()
+		return (self.m_ped_type:get_word() << 11 >> 25)
+	end)
 end
 
 ---@return CPedWeaponManager?
 function CPed:GetWeaponManager()
-	local ptr = self.m_ped_weapon_mgr:deref()
-	if (ptr:is_null()) then
-		self.m_ped_weapon_mgr_inst = nil
-		return
-	end
+	return self:__safecall(nil, function()
+		local ptr = self.m_ped_weapon_mgr:deref()
+		if (ptr:is_null()) then
+			self.m_ped_weapon_mgr_inst = nil
+			return nil
+		end
 
-	local mgr = self.m_ped_weapon_mgr_inst
-	---@diagnostic disable-next-line: invisible
-	if (not mgr or not mgr:IsValid() or (mgr.m_ptr ~= ptr)) then
-		self.m_ped_weapon_mgr_inst = CPedWeaponManager(ptr)
-	end
+		local mgr = self.m_ped_weapon_mgr_inst
+		---@diagnostic disable-next-line: invisible
+		if (not mgr or not mgr:IsValid() or (mgr.m_ptr ~= ptr)) then
+			self.m_ped_weapon_mgr_inst = CPedWeaponManager(ptr)
+		end
 
-	return self.m_ped_weapon_mgr_inst
+		return self.m_ped_weapon_mgr_inst
+	end)
 end
 
 return CPed

@@ -32,6 +32,7 @@ local SGSL         = require("includes.services.SGSL")
 ---@field private m_vpu integer
 ---@field private m_equipment_upgrade boolean
 ---@field private m_staff_upgrade boolean
+---@field private m_prod_time_g ScriptGlobal
 ---@field private m_fast_prod_running boolean
 ---@field public fast_prod_enabled boolean
 local Factory   = setmetatable({}, BusinessBase)
@@ -49,13 +50,25 @@ function Factory.new(opts)
 	instance.fast_prod_enabled   = false
 	instance.m_fast_prod_running = false
 
-
 	local base_vpu               = opts.vpu
 	local mult_1                 = opts.vpu_mult_1 or 0
 	local mult_2                 = opts.vpu_mult_2 or 0
 	instance.m_vpu               = base_vpu + mult_1 + mult_2
 	instance.m_equipment_upgrade = mult_1 > 0
 	instance.m_staff_upgrade     = mult_2 > 0
+
+	local g_obj                  = SGSL:Get(SGSL.data.biker_prod_time_global)
+	local pid_size               = g_obj:GetOffset(1)
+	local offset_2               = g_obj:GetOffset(2)
+	local offset_3               = g_obj:GetOffset(3)
+	local index_size             = g_obj:GetOffset(4)
+	instance.m_prod_time_g       = g_obj:AsGlobal()
+		:At(LocalPlayer:GetPlayerID(), pid_size)
+		:At(offset_2)
+		:At(offset_3)
+		:At(base:GetIndex(), index_size)
+		:At(9)
+
 	---@diagnostic disable-next-line
 	return instance
 end
@@ -71,8 +84,9 @@ function Factory:GetNormalizedName()
 	return self.m_normalized_name
 end
 
+---@return boolean
 function Factory:IsSetup()
-	return stats.get_int(_F("MPX_FACTORYSETUP%d", self.m_id))
+	return stats.get_int(_F("MPX_FACTORYSETUP%d", self.m_id)) == 1
 end
 
 ---@return integer
@@ -109,18 +123,11 @@ end
 
 ---@return milliseconds
 function Factory:GetTimeLeftBeforeProd()
-	local g_obj      = SGSL:Get(SGSL.data.biker_prod_time_global)
-	local pid_size   = g_obj:GetOffset(1)
-	local offset_2   = g_obj:GetOffset(2)
-	local offset_3   = g_obj:GetOffset(3)
-	local index_size = g_obj:GetOffset(4)
-	return g_obj:AsGlobal()
-		:At(LocalPlayer:GetPlayerID(), pid_size)
-		:At(offset_2)
-		:At(offset_3)
-		:At(self.m_id, index_size)
-		:At(9)
-		:ReadInt()
+	if (not self.m_prod_time_g) then
+		return -1
+	end
+
+	return self.m_prod_time_g:ReadInt()
 end
 
 function Factory:TriggerProduction()
@@ -134,23 +141,11 @@ function Factory:TriggerProduction()
 		return
 	end
 
-	local g_obj      = SGSL:Get(SGSL.data.biker_prod_time_global)
-	local pid_size   = g_obj:GetOffset(1)
-	local offset_2   = g_obj:GetOffset(2)
-	local offset_3   = g_obj:GetOffset(3)
-	local index_size = g_obj:GetOffset(4)
-	local global     = g_obj:AsGlobal()
-		:At(LocalPlayer:GetPlayerID(), pid_size)
-		:At(offset_2)
-		:At(offset_3)
-		:At(self.m_id, index_size)
-		:At(9)
-
-	if (global:ReadInt() < 1000) then
+	if (self.m_prod_time_g:ReadInt() < 1000) then
 		return
 	end
 
-	global:WriteInt(100)
+	self.m_prod_time_g:WriteInt(100)
 end
 
 ---@return boolean
@@ -191,7 +186,7 @@ function Factory:LoopProduction()
 			yield()
 		end
 
-		self.fast_prod_enabled = false
+		self.fast_prod_enabled   = false
 		self.m_fast_prod_running = false
 	end)
 end
