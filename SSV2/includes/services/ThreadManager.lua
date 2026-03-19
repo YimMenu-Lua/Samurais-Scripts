@@ -51,8 +51,11 @@ eInternalThreadState = {
 ---@field private m_avg_cycle_ms milliseconds
 ---@overload fun(name: string, callback: function): Thread
 local Thread = Class("Thread")
+
+---@param name string
+---@param callback function
 function Thread.new(name, callback)
-	if not string.isvalid(name) then
+	if (not string.isvalid(name)) then
 		name = string.random(5, true):upper()
 	end
 
@@ -502,7 +505,7 @@ function ThreadManager:ResumeThread(name)
 end
 
 ---@param name string
-function ThreadManager:StopThread(name)
+function ThreadManager:TerminateThread(name)
 	local thread = self:GetThread(name)
 	if not thread then
 		return
@@ -513,7 +516,7 @@ end
 
 ---@param name string
 function ThreadManager:RemoveThread(name)
-	self:StopThread(name)
+	self:TerminateThread(name)
 	self.m_threads[name] = nil
 end
 

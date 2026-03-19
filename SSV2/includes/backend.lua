@@ -155,7 +155,7 @@ function Backend:debug(data, ...)
 end
 
 function Backend:MatchGameVersion()
-	local gv = Game.GetVersion()
+	local gv = Memory:GetGameVersion()
 	return (gv and gv.build
 		and gv.online
 		and (self.target_build == gv.build)

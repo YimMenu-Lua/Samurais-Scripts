@@ -839,17 +839,6 @@ function Serializer:FlushObjectQueue()
 end
 
 function Serializer:Flush()
-	-- Welp. We need atomic writes. My config got corrupted because of a power outage.
-	-- Since th os library doesn't have rename, we can write to a secondary file and check if the write was
-	-- successful and the file is readable then write the actual config file. If main gets corrupted, read temp and overwrite
-	-- but that's a horrible way to do it: double read/write calls and an unnecessary file just sitting in the config folder.
-	--
-	-- TODO: contribute a refactored os lib sandbox to YimMenu
-	-- that has os.rename. Must group config files in a subfolder tied to the module
-	-- otherwise Lua devs would be able to rename other devs' config files (we already can read/write them which is bad enough)
-	-- and if the dev is a troll, that's a problem.
-	-- Once that's done, regactor this to write to a temp file then swap.
-
 	if (self:IsDisabled()) then
 		return
 	end

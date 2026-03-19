@@ -26,7 +26,7 @@ local DEFAULT_CONFIG <const> = require("includes.data.config")
 
 ---@type GAME_VERSION
 local GAME_VERSION <const>   = {
-	{ build = "3751.0",  online = "1.72" },
+	{ build = "3788.0",  online = "1.72" },
 	{ build = "1013.29", online = "1.72" },
 }
 
@@ -83,7 +83,7 @@ require("includes.modules.Color")
 GPointers           = require("includes.data.pointers")
 Memory              = require("includes.modules.Memory")
 KeyManager          = require("includes.services.KeyManager"):init()
-GUI                 = require("includes.services.GUI"):init()
+GUI                 = require("includes.services.GUI")
 Notifier            = require("includes.services.ToastNotifier").new()
 CommandExecutor     = require("includes.services.CommandExecutor"):init()
 ----------------------------------------------------------------------------------------------------

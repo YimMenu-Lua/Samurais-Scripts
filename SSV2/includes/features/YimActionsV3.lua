@@ -50,7 +50,7 @@ function YimActions:init()
 	end)
 
 	ThreadManager:RegisterLooped("SS_YIMACTIONS", function()
-		self:MainThread()
+		self:OnTick()
 	end)
 
 	self.m_initialized = true
@@ -127,7 +127,7 @@ function YimActions:IsPlayerBusy()
 		or LocalPlayer:IsBrowsingApps()
 		or LocalPlayer:IsInWater()
 		or LocalPlayer:IsRagdoll()
-		or script.is_active("maintransition")
+		or Game.IsInNetworkTransition()
 		or Backend:IsPlayerSwitchInProgress()
 		or Backend:AreControlsDisabled()
 end
@@ -227,16 +227,16 @@ function YimActions:PlayAnim(animData, targetPed)
 
 	if (not GVars.features.yim_actions.disable_props) then
 		if (animData.props and #animData.props > 0) then
-			YimActions.PropManager:AttachProp(targetPed, animData.props)
+			self.PropManager:AttachProp(targetPed, animData.props)
 		end
 
 		if (animData.propPeds and #animData.propPeds > 0) then
-			YimActions.PropManager:AttachProp(targetPed, animData.propPeds, true)
+			self.PropManager:AttachProp(targetPed, animData.propPeds, true)
 		end
 	end
 
 	if (not GVars.features.yim_actions.disable_ptfx and animData.ptfx and animData.ptfx.name) then
-		YimActions.FXManager:StartPTFX(targetPed, animData.ptfx)
+		self.FXManager:StartPTFX(targetPed, animData.ptfx)
 	end
 
 	local isLooped = Bit.IsBitSet(animData.flags, Enums.eAnimFlags.LOOPING)
@@ -264,7 +264,7 @@ function YimActions:PlayScenario(scenarioData, targetPed, playImmediately)
 			0.0
 		)
 
-		local bbq = YimActions.PropManager:SpawnProp(
+		local bbq = self.PropManager:SpawnProp(
 			targetPed,
 			{ model = 286252949 },
 			false,
@@ -307,8 +307,7 @@ function YimActions:Play(action, ped)
 	ped = self:GetPed(ped)
 
 	if (ped == LocalPlayer:GetHandle() and self:IsPlayerBusy()) then
-		Notifier:ShowMessage(
-			"Samurai's Scripts",
+		Notifier:ShowMessage("YimActions",
 			"Player is unavailable at this moment. Clear any other tasks then try again."
 		)
 		return
@@ -364,7 +363,7 @@ function YimActions:Cleanup(ped)
 	self.SceneManager:Wipe()
 
 	if (string.find(self.CurrentlyPlaying[ped].data.label, "DJ")) then
-		Audio:PartyMode(false)
+		Audio:PartyMode(false, ped)
 	end
 
 	sleep(200)
@@ -393,15 +392,15 @@ function YimActions:ForceCleanup()
 	self.PropManager:Wipe()
 	self.SceneManager:Wipe()
 	self.CompanionManager:Wipe()
-	self.CurrentlyPlaying = {}
 	self:ResetPlayer()
 	Audio:StopAllEmitters()
 	LocalPlayer:ClearTasks()
+	self.CurrentlyPlaying = {}
 end
 
 function YimActions:OnInterruptEvent()
-	local localPlayer = LocalPlayer:GetHandle()
-	local current = self.CurrentlyPlaying[localPlayer]
+	local playerHandle = LocalPlayer:GetHandle()
+	local current      = self.CurrentlyPlaying[playerHandle]
 	if (not current) then
 		yield()
 		return
@@ -419,34 +418,34 @@ function YimActions:OnInterruptEvent()
 		return
 	end
 
-	if (not LocalPlayer:IsAlive() or LocalPlayer:IsBeingArrested() or Backend:IsPlayerSwitchInProgress() or script.is_active("maintransition")) then
+	if (not LocalPlayer:IsAlive() or LocalPlayer:IsBeingArrested() or Backend:IsPlayerSwitchInProgress() or Game.IsInNetworkTransition()) then
 		self:ForceCleanup()
-		sleep(1000)
+		yield()
 		return
 	end
 
-	if (current and self:WasActionInterrupted(localPlayer)) then
+	if (current and self:WasActionInterrupted(playerHandle)) then
 		if (LocalPlayer:IsFalling()) then
 			repeat
-				sleep(1000)
+				yield()
 			until not LocalPlayer:IsFalling()
 			sleep(1000)
 		end
 
-		if LocalPlayer:IsRagdoll() then
+		if (LocalPlayer:IsRagdoll()) then
 			repeat
-				sleep(1000)
+				yield()
 			until not LocalPlayer:IsRagdoll()
 			sleep(1000)
 		end
 
-		if LocalPlayer:IsSwimming() then
-			self:Cleanup(localPlayer)
+		if (LocalPlayer:IsSwimming()) then
+			self:Cleanup(playerHandle)
 			sleep(1000)
 			return
 		end
 
-		self:Play(current, localPlayer)
+		self:Play(current, playerHandle)
 	end
 end
 
@@ -631,7 +630,7 @@ function YimActions:GoofyUnaliveAnim()
 	end)
 end
 
-function YimActions:HandleCleanupKeybind()
+function YimActions:OnKeyDown()
 	if (KeyManager:IsKeybindJustPressed("stop_anim")) then
 		ThreadManager:Run(function()
 			local timer = Timer.new(1000)
@@ -652,7 +651,7 @@ function YimActions:HandleCleanupKeybind()
 	end
 end
 
-function YimActions:MainThread()
+function YimActions:OnTick()
 	if (next(self.CurrentlyPlaying) == nil)
 		and (next(self.PropManager.Props) == nil)
 		and (#self.CompanionManager.Companions == 0) then
@@ -660,7 +659,7 @@ function YimActions:MainThread()
 		return
 	end
 
-	self:HandleCleanupKeybind()
+	self:OnKeyDown()
 
 	local ped     = LocalPlayer:GetHandle()
 	local current = self.CurrentlyPlaying[ped]

@@ -480,12 +480,9 @@ function CasinoPacino:BypassCooldown()
 end
 
 function CasinoPacino:Main()
-	if (not Backend:IsUpToDate() and self.m_thread and self.m_thread:IsRunning()) then
-		self.m_thread:Stop()
-	end
+	yield()
 
 	if (not self:CanAccess()) then
-		sleep(500)
 		return
 	end
 
