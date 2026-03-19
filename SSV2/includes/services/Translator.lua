@@ -7,8 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local en_loaded, en = pcall(require, "lib.translations.en-US")
+local en_loaded, en     = pcall(require, "lib.translations.en-US")
 local locales_loaded, t = pcall(require, "lib.translations.__locales")
+
 
 --------------------------------------
 -- Class: Translator
@@ -20,24 +21,26 @@ local locales_loaded, t = pcall(require, "lib.translations.__locales")
 ---@field private m_log_history table
 ---@field private m_cache table<string, table<string, string>>
 ---@field private m_last_load_time TimePoint
-Translator = {}
+Translator         = {
+	default_labels   = en_loaded and en or {},
+	m_last_load_time = TimePoint.new(),
+	m_cache          = {},
+	locales          = locales_loaded and t or { { name = "English", iso = "en-US" } },
+}
 Translator.__index = Translator
-Translator.default_labels = en_loaded and en or {}
-Translator.m_last_load_time = TimePoint.new()
-Translator.m_cache = {}
-Translator.locales = locales_loaded and t or { { name = "English", iso = "en-US" } }
 
 function Translator:Load()
-	local iso = GVars.backend.language_code or "en-US"
-	local ok, res         -- fwd decl
+	GVars.backend.language_code = GVars.backend.language_code or "en-US"
+	local iso = GVars.backend.language_code
+	local ok, res
 
-	if (iso ~= "en-US") then -- skip already loaded default
+	if (iso ~= "en-US") then
 		local path = _F("lib.translations.%s", iso)
 		ok, res = pcall(require, path)
 	end
 
-	self.labels = (ok and (type(res) == "table")) and res or self.default_labels
-	self.lang_code = iso
+	self.labels        = (ok and (type(res) == "table")) and res or self.default_labels
+	self.lang_code     = iso
 	self.m_log_history = {}
 	self.m_last_load_time:Reset()
 end
@@ -131,9 +134,9 @@ end
 function Translator:TranslateGXT(label)
 	local GXT = Game.GetGXTLabel(label)
 	if (string.isvalid(GXT) and GXT ~= "NULL") then
-		return GXT -- get label from the game.
+		return GXT             -- get label from the game.
 	else
-		return self:Translate(label)  -- no GXT; use our own translations
+		return self:Translate(label) -- no GXT; use our own translations
 	end
 end
 

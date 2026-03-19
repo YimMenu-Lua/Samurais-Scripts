@@ -73,8 +73,8 @@ local mem_batches <const> = {
 				online = pOnlineVersion:get_string()
 			}
 		end),
-		MemoryBatch.new("GameState", "83 3D ? ? ? ? ? 75 17 8B 43 20 25", function(ptr)
-			GPointers.GameState = ptr:add(0x2):rip():add(0x1)
+		MemoryBatch.new("GameState", "81 39 5D 6D FF AF 75 20", function(ptr)
+			GPointers.GameState = ptr:add(0xA):rip():add(0x1)
 		end),
 		MemoryBatch.new("GameTime", "8B 05 ? ? ? ? 89 ? 48 8D 4D C8", function(ptr)
 			GPointers.GameTime = ptr:add(0x2):rip()

@@ -172,7 +172,7 @@ local function DrawThreads()
 			end
 
 			if GUI:Button("Kill", { size = side_button_size }) then
-				ThreadManager:StopThread(thread_name)
+				ThreadManager:TerminateThread(thread_name)
 			end
 		else
 			if (thread_state == eThreadState.SUSPENDED) then

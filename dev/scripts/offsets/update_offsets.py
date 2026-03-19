@@ -5,6 +5,7 @@
 # Usage:
 #	python update_offsets.py			: normal run (just hit F5 if in VS Code and have Python Debugger installed, reads raw files from a remote repository)
 #	python update_offsets.py --version	: 0: Legacy | 1: Enhanced; defaults to 0: Legacy
+#	python update_offsets.py --url	    : Override repo URL
 #	python update_offsets.py --local	: Read from local files; this must be followed by the path to local decompiled scritps
 #	python update_offsets.py --diff 	: Show diff only, do not overwrite Lua table
 #
@@ -224,19 +225,25 @@ def main():
 
     parser = ArgParser(description="Update offsets from local path or GitHub repository.")
     parser.add_argument("--version", type=int, help="Choose game version. (0: Legacy | 1: Enhanced)")
+    parser.add_argument("--url", type=str, help="Override repo URL")
     parser.add_argument("--local", action="store_true", help="Read from local decompiled scripts")
     parser.add_argument("--diff", action="store_true", help="Show diff only. Do not write Lua table.")
     parser.add_argument("decomps_path", type=str, nargs="?", default="", help="Path to your local decompiled scripts")
 
     args = parser.parse_args()
-    auto = args.version is None
+    version = args.version
+    url = args.url
+    auto = version is None
     diff_only = args.diff
+
+    if isinstance(version, int) and isinstance(url, str):
+        REPO_URLS[version] = url
 
     if auto:
         generate(offsets_table, 0, False, "")
         generate(offsets_table, 1, False, "")	
     else:
-        generate(offsets_table, args.version, args.local, args.decomps_path)
+        generate(offsets_table, version, args.local, args.decomps_path)
     
     new_data = serialize_lua(offsets_table)
     new_content = SS_NOTICE + "return " + new_data + "\n"

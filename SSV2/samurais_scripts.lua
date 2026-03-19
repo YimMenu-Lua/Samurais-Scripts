@@ -7,6 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+require("includes.init")
+
 local commandRegistry = require("includes.lib.commands")
 local Weapons         = require("includes.data.weapons")
 local weaponData      = require("includes.data.weapon_data")
@@ -44,16 +46,15 @@ local function populate_weapons()
 	end
 end
 
-require("includes.init")
-
 GPointers:Init()
 Serializer:FlushObjectQueue()
 Backend:RegisterHandlers()
 Translator:Load()
-GUI:LateInit()
+GUI:init()
 
 ThreadManager:Run(function()
 	local start_time = os.clock()
+
 	for name, cmd in pairs(commandRegistry) do
 		CommandExecutor:RegisterCommand(name, cmd.callback, cmd.opts)
 	end

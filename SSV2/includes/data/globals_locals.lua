@@ -27,12 +27,12 @@ return {
 		file = "freemode.c",
 		LEGACY = {
 			value = 1673807,
-			pattern = [[if \(Global_\d{7}\[.*?\] != 0 && func_\w+\(.*?\) && \w+\)]],
+			pattern = [[if.*?Global_\d{7}\[.*?\] != 0 && func_\w+\(.*?\) && \w+\)]],
 			capture_group = 1
 		},
 		ENHANCED = {
 			value = 1673814,
-			pattern = [[if \(Global_\d{7}\[.*?\] != 0 && func_\w+\(.*?\) && \w+\)]],
+			pattern = [[if.*?Global_\d{7}\[.*?\] != 0 && func_\w+\(.*?\) && \w+\)]],
 			capture_group = 1
 		}
 	},
@@ -137,12 +137,12 @@ return {
 		file = "freemode.c",
 		LEGACY = {
 			value = 2708951,
-			pattern = [[Global_(\d{7})\[.*?\] = Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
+			pattern = [[Global_(\d{7})\[.*?\] =.*?Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
 			capture_group = 1
 		},
 		ENHANCED = {
 			value = 2709086,
-			pattern = [[Global_(\d{7})\[.*?\] = Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
+			pattern = [[Global_(\d{7})\[.*?\] =.*?Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
 			capture_group = 1
 		}
 	},
@@ -151,7 +151,7 @@ return {
 		file = "freemode.c",
 		LEGACY = {
 			value = 2708962,
-			pattern = [[Global_(\d{7})\[.*?\] = Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
+			pattern = [[Global_(\d{7})\[.*?\] =.*?Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
 			capture_group = 2,
 			offsets = {
 				{
@@ -785,7 +785,7 @@ return {
 				{
 					value = 14,
 					capture_group = 2,
-					description = "grab speed"
+					description = "scene rate"
 				}
 			}
 		},
@@ -797,7 +797,7 @@ return {
 				{
 					value = 14,
 					capture_group = 2,
-					description = "grab speed"
+					description = "scene rate"
 				}
 			}
 		}

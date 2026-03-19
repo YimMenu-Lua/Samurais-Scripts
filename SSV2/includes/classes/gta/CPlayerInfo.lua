@@ -17,6 +17,7 @@ local CStructView = require("includes.classes.gta.CStructView")
 ---@class CPlayerInfo : CStructBase<CPlayerInfo>
 ---@field protected m_ptr pointer
 ---@field m_swim_speed pointer<float>
+---@field m_walk_speed pointer<float>
 ---@field m_game_state pointer<eGameState>
 ---@field m_is_wanted pointer<bool>
 ---@field m_wanted_level pointer<uint32_t>
@@ -35,6 +36,7 @@ function CPlayerInfo.new(ptr)
 	return setmetatable({
 		m_ptr                  = ptr,
 		m_swim_speed           = ptr:add(0x01C8),
+		m_walk_speed           = ptr:add(0x01E4),
 		m_game_state           = ptr:add(0x0230),
 		m_is_wanted            = ptr:add(0x08E0),
 		m_wanted_level         = ptr:add(0x08E8),

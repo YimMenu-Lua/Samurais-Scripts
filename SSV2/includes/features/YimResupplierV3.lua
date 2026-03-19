@@ -117,17 +117,14 @@ function YRV3:init()
 		self:OnTick()
 	end)
 
-	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
+	local function __reset__()
 		if (self.m_data_initialized) then
 			self:Reset()
 		end
-	end)
+	end
 
-	Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, function()
-		if (self.m_data_initialized) then
-			self:Reset()
-		end
-	end)
+	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, __reset__)
+	Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, __reset__)
 
 	return self
 end
@@ -1074,10 +1071,11 @@ function YRV3:CalculateEstimatedIncome()
 end
 
 function YRV3:OnTick()
-	if (not Backend:IsUpToDate() and (self.m_thread and self.m_thread:IsRunning())) then
+	yield()
+
+	if (not Backend:IsUpToDate()) then
 		self.m_state = Enums.eYRState.ERROR
 		self:SetLastError("GENERIC_OUTDATED")
-		self.m_thread:Stop()
 		return
 	end
 
@@ -1100,7 +1098,6 @@ function YRV3:OnTick()
 			end
 		end
 
-		yield()
 		return
 	end
 

@@ -78,27 +78,25 @@ end
 ---@field private m_snap_animator WindowAnimator
 ---@field private m_notifier_pos vec2
 ---@field protected m_initialized boolean
-local GUI = Class("GUI")
+local GUI                 = Class("GUI")
+GUI.m_main_window_label   = "##ss_main_window"
+GUI.m_should_draw         = false
+GUI.m_is_drawing_sidebar  = false
+GUI.m_cb_window_pos       = vec2:zero()
+GUI.m_notifier_pos        = vec2:zero()
+GUI.m_screen_resolution   = Game.GetScreenResolution()
+GUI.m_sidebar_width       = 200
+GUI.m_selected_category   = Enums.eTabID.TAB_SELF
+GUI.m_tabs                = defaultTabs
+GUI.m_independent_windows = {}
+GUI.m_requested_windows   = {}
+GUI.m_prev_category_tabs  = {}
+GUI.m_snap_animator       = WindowAnimator()
 
----@return GUI
 function GUI:init()
 	if (self.m_initialized) then
-		return self
+		return
 	end
-
-	self.m_main_window_label   = "##ss_main_window"
-	self.m_should_draw         = false
-	self.m_is_drawing_sidebar  = false
-	self.m_cb_window_pos       = vec2:zero()
-	self.m_notifier_pos        = vec2:zero()
-	self.m_screen_resolution   = Game.GetScreenResolution()
-	self.m_sidebar_width       = 200
-	self.m_selected_category   = Enums.eTabID.TAB_SELF
-	self.m_tabs                = defaultTabs
-	self.m_independent_windows = {}
-	self.m_requested_windows   = {}
-	self.m_prev_category_tabs  = {}
-	self.m_snap_animator       = WindowAnimator()
 
 	ThemeManager:Load()
 
@@ -119,8 +117,8 @@ function GUI:init()
 		self:Close()
 	end)
 
+	self:LateInit()
 	self.m_initialized = true
-	return self
 end
 
 function GUI:LateInit()

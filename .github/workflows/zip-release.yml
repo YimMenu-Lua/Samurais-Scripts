@@ -13,7 +13,7 @@ jobs:
   release:
     name: CI Main
     runs-on: ubuntu-latest
-    if: "! contains(github.event.head_commit.message, '[noci]')"
+    if: "!contains(github.event.head_commit.message, '[noci]')"
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -115,14 +115,6 @@ jobs:
           }
 
           const mergedPRs = pulls.filter(pr => pr.merged_at && new Date(pr.merged_at) > lastTagDate);
-          const extractField = (body, fieldName) => {
-            const regex = new RegExp(`${fieldName}:\\s*([\\s\\S]*?)(?=\\n\\w+:|$)`, 'm');
-            const match = body.match(regex);
-            if (!match)
-              return "";
-
-            return match[1].trim();
-          };
 
           if (mergedPRs.length > 0) {
             for (const pr of mergedPRs) {
