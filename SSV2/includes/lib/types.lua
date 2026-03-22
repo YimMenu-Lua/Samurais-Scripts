@@ -110,21 +110,25 @@ do
 		new         = RET_NULLPTR,
 	}
 
-	for k, v in pairs(getmetatable(memory.pointer)) do
-		if (type(k) ~= "string" or __null_idx[k] or type(v) ~= "function") then
-			goto continue
-		end
 
-		local sub = k:sub(1, 3)
-		if (sub == "set") then
-			__null_idx[k] = NOP
-		elseif (sub == "get") then
-			__null_idx[k] = (k == "get_string") and RET_NULL or RET_ZERO
-		else
-			__null_idx[k] = v
-		end
+	local sol_ptr_mt = getmetatable(memory.pointer)
+	if (sol_ptr_mt) then
+		for k, v in pairs(sol_ptr_mt) do
+			if (type(k) ~= "string" or __null_idx[k] or type(v) ~= "function") then
+				goto continue
+			end
 
-		::continue::
+			local sub = k:sub(1, 3)
+			if (sub == "set") then
+				__null_idx[k] = NOP
+			elseif (sub == "get") then
+				__null_idx[k] = (k == "get_string") and RET_NULL or RET_ZERO
+			else
+				__null_idx[k] = v
+			end
+
+			::continue::
+		end
 	end
 
 	local __null_mt <const> = {

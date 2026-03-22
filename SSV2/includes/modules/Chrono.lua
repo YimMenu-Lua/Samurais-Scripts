@@ -14,9 +14,6 @@
 --------------------------------------
 --**Global Singleton.**
 ---@class Time
----@field TimePoint TimePoint
----@field Timer Timer
----@field DateTime DateTime
 local Time = { __type = "Time" }
 Time.__index = Time
 setmetatable(Time, Time)
@@ -320,6 +317,7 @@ end
 ---@class DateTime
 ---@field private m_epoch seconds
 ---@field private m_dt osdate
+---@field private m_fmt_warn boolean
 ---@overload fun(p1: (seconds|osdateparam)?): DateTime
 local DateTime <const> = { __type = "DateTime" }
 DateTime.__index = DateTime
@@ -359,15 +357,31 @@ function DateTime.Now()
 	return DateTime.new()
 end
 
+---@return DateTime
+function DateTime.Today()
+	return DateTime.new()
+end
+
 ---@param fmt? string
 ---@return string
 function DateTime:Format(fmt)
-	---@diagnostic disable
-	if (string.isvalid(fmt) and fmt == "*t") then
-		return os.date("%Y-%m-%d %H:%M:%S", self.m_epoch)
+	local epoch = self.m_epoch
+	if (epoch == nil) then
+		if (not self.m_fmt_warn) then
+			log.warning("[DateTime]: Calling 'Format' from the DateTime class itself. Please consider creating an instance first.")
+			self.m_fmt_warn = true
+		end
+
+		epoch = os.time()
 	end
 
-	return os.date(fmt or "%Y-%m-%d %H:%M:%S", self.m_epoch)
+	---@diagnostic disable
+	if (fmt == "*t") then
+		log.warning("[DateTime]: '*t' format is not supported. Format method only returns a string.")
+		return ""
+	end
+
+	return os.date(fmt or "%Y-%m-%d %H:%M:%S", epoch)
 	---@diagnostic enable
 end
 

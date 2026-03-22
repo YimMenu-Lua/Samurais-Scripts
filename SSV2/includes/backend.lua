@@ -456,7 +456,6 @@ function Backend:OnPlayerSwitch()
 	end
 
 	self.is_in_player_transition = true
-
 	ThreadManager:Run(function()
 		self:TriggerEventCallbacks(Enums.eBackendEvent.PLAYER_SWITCH)
 
@@ -469,36 +468,38 @@ function Backend:OnPlayerSwitch()
 end
 
 function Backend:RegisterHandlers()
-	self.debug_mode = self:IsMockEnv() or GVars.backend.debug_mode or false
+	local mockEnv = self:IsMockEnv()
+	self.debug_mode = mockEnv or GVars.backend.debug_mode or false
 
-	if (self:IsMockEnv()) then
-		return
-	end
+	if (mockEnv) then return end
 
 	ThreadManager:RegisterLooped("SS_CTRLS", function()
 		if (self.disable_input) then
 			PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
-		end
+		else
+			if ((gui.is_open() or GUI:IsOpen())) then
+				self:DisableAttackInput()
+			end
 
-		if ((gui.is_open() or GUI:IsOpen()) and not self.disable_input) then
-			self:DisableAttackInput()
-		end
-
-		for _, control in pairs(self.ControlsToDisable) do
-			PAD.DISABLE_CONTROL_ACTION(0, control, true)
+			for _, control in pairs(self.ControlsToDisable) do
+				PAD.DISABLE_CONTROL_ACTION(0, control, true)
+			end
 		end
 	end)
 
 	ThreadManager:RegisterLooped("SS_BACKEND", function()
 		self:OnPlayerSwitch()
 		self:OnSessionSwitch()
+
 		PreviewService:Update()
 		Decorator:CollectGarbage()
+
 		yield()
 	end)
 
 	ThreadManager:RegisterLooped("SS_POOLMGR", function()
 		self:PoolMgr()
+		yield()
 	end)
 
 	event.register_handler(menu_event.MenuUnloaded, function() self:Cleanup() end)

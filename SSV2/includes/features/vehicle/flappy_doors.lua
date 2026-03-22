@@ -7,14 +7,15 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local FeatureBase = require("includes.modules.FeatureBase")
+local FeatureBase  = require("includes.modules.FeatureBase")
 local StateMachine = require("includes.structs.StateMachine")
+
 
 ---@class FlappyDoors : FeatureBase
 ---@field private m_entity PlayerVehicle
 ---@field private m_is_active boolean
 ---@field private m_state_machine StateMachine
-local FlappyDoors = setmetatable({}, FeatureBase)
+local FlappyDoors   = setmetatable({}, FeatureBase)
 FlappyDoors.__index = FlappyDoors
 
 ---@param pv PlayerVehicle

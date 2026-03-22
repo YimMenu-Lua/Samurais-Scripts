@@ -10,7 +10,7 @@
 --------------------------------------
 -- Class: Mutex
 --------------------------------------
--- Simple mutual exclusion.
+-- Simple mutual exclusivity.
 ---@class Mutex
 ---@field protected m_locked boolean
 ---@overload fun(): Mutex
@@ -42,9 +42,10 @@ function Mutex:Release()
 end
 
 -- Scoped lock.
----@param func function
+---@generic R1, R2, R3, R4, R5
+---@param func fun(...?: any): R1?, R2?, R3?, R4?, R5?, ...?
 ---@param ... any
----@return ...
+---@return boolean success, R1?, R2?, R3?, R4?, R5?, ...?
 function Mutex:WithLock(func, ...)
 	self:Acquire()
 	local ret = { xpcall(func, function(msg)
