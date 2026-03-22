@@ -30,6 +30,13 @@ eInternalThreadState = {
 	DEADLOCKED = 5,
 }
 
+---@enum eThreadStage
+eThreadStage = {
+	IDLE          = 0,
+	PRE_CALLBACK  = 1,
+	POST_CALLBACK = 2,
+}
+
 --#region Thread
 
 --------------------------------------
@@ -41,7 +48,9 @@ eInternalThreadState = {
 ---@field private m_callback function
 ---@field private m_can_run boolean
 ---@field private m_should_pause boolean
+---@field private m_should_terminate boolean
 ---@field private m_state eThreadState
+---@field private m_stage eThreadStage
 ---@field private m_time_created TimePoint
 ---@field private m_time_started seconds
 ---@field private m_last_entry_at seconds
@@ -65,7 +74,9 @@ function Thread.new(name, callback)
 			m_callback      = callback,
 			m_can_run       = false,
 			m_should_pause  = false,
+			m_wants_exit    = false,
 			m_state         = eThreadState.UNK,
+			m_stage         = eThreadStage.IDLE,
 			m_time_created  = TimePoint.new(),
 			m_time_started  = 0,
 			m_last_entry_at = 0,
@@ -87,6 +98,12 @@ end
 ---@return eThreadState
 function Thread:GetState()
 	return self.m_state
+end
+
+---@private
+---@return eThreadStage
+function Thread:GetStage()
+	return self.m_stage
 end
 
 ---@return function
@@ -143,28 +160,40 @@ function Thread:OnTick(s)
 	Backend:debug("Started thread %s", self.m_name)
 
 	while (self.m_can_run) do
+		self.m_stage = eThreadStage.IDLE
+
 		if (self.m_should_pause) then
 			self.m_state         = eThreadState.SUSPENDED
 			self.m_last_entry_at = 0
 			repeat
 				self.m_last_yield_at = Time.Now()
 				yield()
-			until not self.m_should_pause
+			until not self.m_should_pause or self.m_should_terminate
 			self.m_time_started  = Time.Now()
 			self.m_last_entry_at = Time.Now()
+		end
+
+		if (self.m_should_terminate) then
+			self:Stop()
+			return
 		end
 
 		self.m_state         = eThreadState.RUNNING
 		local cycle_start    = Time.Now()
 		self.m_last_entry_at = cycle_start
 		local work_start     = cycle_start
+		self.m_stage         = eThreadStage.PRE_CALLBACK
 		local ok, err        = pcall(self.m_callback, s)
+		self.m_stage         = eThreadStage.POST_CALLBACK
 		local work_end       = Time.Now()
 		local work_ms        = (work_end - work_start) * 1000
 		self.m_avg_work_ms   = self.m_avg_work_ms * 0.9 + work_ms * 0.1
 
-		if (not ok) then
-			log.fwarning("Thread %s was terminated due to an unhandled exception: %s", self.m_name, err)
+		if (self.m_should_terminate or not ok) then
+			if (not ok and err) then
+				log.fwarning("Thread %s was terminated due to an unhandled exception: %s", self.m_name, err)
+			end
+
 			self:Stop()
 			return
 		end
@@ -173,7 +202,6 @@ function Thread:OnTick(s)
 		self.m_last_yield_at = self.m_last_exit_at
 		local cycle_ms       = (self.m_last_exit_at - cycle_start) * 1000
 		self.m_avg_cycle_ms  = self.m_avg_cycle_ms * 0.9 + cycle_ms * 0.1
-
 		yield()
 	end
 end
@@ -202,9 +230,17 @@ function Thread:Stop()
 		return
 	end
 
-	self.m_time_started = 0
-	self.m_can_run      = false
-	self.m_state        = eThreadState.DEAD
+	if (self.m_stage ~= eThreadStage.IDLE) then
+		Backend:debug("Thread %s tried to exit mid-callback.", self.m_name)
+		self.m_should_terminate = true
+		return
+	end
+
+	self.m_time_started     = 0
+	self.m_can_run          = false
+	self.m_should_terminate = false
+	self.m_state            = eThreadState.DEAD
+	self.m_stage            = eThreadStage.IDLE
 	Backend:debug("Terminated thread %s", self.m_name)
 end
 
@@ -325,7 +361,7 @@ function ThreadManager:Run(func)
 	end
 
 	local handler = self.m_callback_handlers[API_VER]
-	if not (handler or handler.dispatch) then
+	if not (handler and handler.dispatch) then
 		Backend:debug("[ThreadManager] No handler for API version: %s", EnumToString(Enums.eAPIVersion, API_VER))
 		return
 	end
@@ -403,25 +439,21 @@ end
 ---@param suspended? boolean
 ---@param is_debug_thread? boolean
 function ThreadManager:RegisterLooped(name, func, suspended, is_debug_thread)
-	if (API_VER == Enums.eAPIVersion.L54 and not is_debug_thread) then
-		return
-	end
+	local isMock = (API_VER == Enums.eAPIVersion.L54)
+	if (isMock and not is_debug_thread) then return end
+	if (is_debug_thread and not isMock) then return end
 
-	if (is_debug_thread and API_VER ~= Enums.eAPIVersion.L54) then
-		return
-	end
-
-	if (string.isempty(name) or string.iswhitespace(name)) then
+	if (not string.isvalid(name)) then
 		name = string.random(5, true):upper()
 	end
 
 	if (self:IsThreadRegistered(name)) then
-		log.fwarning("a thread with the name '%s' is already registered!", name)
+		log.fwarning("A thread with the name '%s' is already registered!", name)
 		return
 	end
 
 	local thread = Thread(name, func)
-	if suspended then
+	if (suspended) then
 		thread:Suspend()
 	end
 
@@ -438,14 +470,34 @@ function ThreadManager:GetThread(name)
 	return self.m_threads[name]
 end
 
----@return eThreadState
-function ThreadManager:GetThreadState(name)
+---@generic RET
+---@param name string
+---@param default RET
+---@param func fun(thread: Thread, ...?: any): RET
+---@param ... any
+---@return RET
+function ThreadManager:WithThreadName(name, default, func, ...)
 	local thread = self:GetThread(name)
-	if not thread then
-		return eThreadState.UNK
+	if (not thread) then
+		return default
 	end
 
-	return thread:GetState()
+	return func(thread, ...)
+end
+
+---@param func fun(name: string, thread: Thread): nil
+function ThreadManager:ForEach(func)
+	for name, thread in pairs(self.m_threads) do
+		func(name, thread)
+	end
+end
+
+---@param name string
+---@return eThreadState
+function ThreadManager:GetThreadState(name)
+	return self:WithThreadName(name, eThreadState.UNK, function(thread)
+		return thread:GetState()
+	end)
 end
 
 function ThreadManager:ListThreads()
@@ -461,57 +513,54 @@ end
 ---@param name string
 ---@return boolean
 function ThreadManager:IsThreadRunning(name)
-	local thread = self:GetThread(name)
-	return thread and thread:IsRunning() or false
+	return self:WithThreadName(name, false, function(thread)
+		return thread:IsRunning()
+	end)
 end
 
+-- ### This is dangerous outside of debug context. Do not call.
+--
+-- TODO: Refactor and properly document this.
+---@private
 ---@param name string
-function ThreadManager:StartThread(name)
-	local thread = self:GetThread(name)
-	if not thread then
-		return
-	end
+function ThreadManager:RestartThread(name)
+	self:WithThreadName(name, nil, function(thread)
+		if (thread:IsRunning()) then
+			return
+		end
 
-	local ok = thread:Start()
-	if not ok then
-		local func = thread:GetCallback()
-		local new_thread = Thread(name, func)
-
-		self.m_threads[name] = new_thread
-		self:Run(function(s)
-			new_thread:OnTick(s)
-		end)
-	end
+		-- This is horrible. Some of our modules hold references to their threads and doing this leaves them with dangling references.
+		-- Thankfully this does not end up actually happening since this branch is never reached.
+		-- I can't remember why I did this but I'm pretty sure it's supposed to be a duct tape fix to some obscure bug. I blame Beck's.
+		if (not thread:Start()) then
+			Backend:debug("Recreating thread %s", name)
+			local func           = thread:GetCallback()
+			local new_thread     = Thread(name, func)
+			self.m_threads[name] = new_thread
+			self:Run(function(s) new_thread:OnTick(s) end)
+		end
+	end)
 end
 
 ---@param name string
 function ThreadManager:SuspendThread(name)
-	local thread = self:GetThread(name)
-	if not thread then
-		return
-	end
-
-	thread:Suspend()
+	self:WithThreadName(name, nil, function(thread)
+		thread:Suspend()
+	end)
 end
 
 ---@param name string
 function ThreadManager:ResumeThread(name)
-	local thread = self:GetThread(name)
-	if not thread then
-		return
-	end
-
-	thread:Resume()
+	self:WithThreadName(name, nil, function(thread)
+		thread:Resume()
+	end)
 end
 
 ---@param name string
 function ThreadManager:TerminateThread(name)
-	local thread = self:GetThread(name)
-	if not thread then
-		return
-	end
-
-	thread:Stop()
+	self:WithThreadName(name, nil, function(thread)
+		thread:Stop()
+	end)
 end
 
 ---@param name string
@@ -521,22 +570,15 @@ function ThreadManager:RemoveThread(name)
 end
 
 function ThreadManager:SuspendAllThreads()
-	for _, thread in pairs(self.m_threads) do
-		thread:Suspend()
-	end
+	self:ForEach(function(_, thread) thread:Suspend() end)
 end
 
 function ThreadManager:ResumeAllThreads()
-	for _, thread in pairs(self.m_threads) do
-		thread:Resume()
-	end
+	self:ForEach(function(_, thread) thread:Resume() end)
 end
 
 function ThreadManager:RemoveAllThreads()
-	for name, _ in pairs(self.m_threads) do
-		self:RemoveThread(name)
-	end
-
+	self:ForEach(function(name, _) self:RemoveThread(name) end)
 	self.m_mock_routines = {}
 end
 

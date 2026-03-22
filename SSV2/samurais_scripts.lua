@@ -7,24 +7,30 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local start_time = os.clock()
 require("includes.init")
 
+if (Backend:IsMockEnv()) then
+	require("includes.tests")
+	return
+end
+
 local commandRegistry = require("includes.lib.commands")
-local Weapons         = require("includes.data.weapons")
+local weapons         = require("includes.data.weapons")
 local weaponData      = require("includes.data.weapon_data")
 local weapons_map     = {
-	["GROUP_MELEE"]       = Weapons.Melee,
-	["GROUP_PISTOL"]      = Weapons.Pistols,
-	["GROUP_RIFLE"]       = Weapons.AssaultRifles,
-	["GROUP_SHOTGUN"]     = Weapons.Shotguns,
-	["GROUP_SMG"]         = Weapons.SMG,
-	["GROUP_MG"]          = Weapons.MachineGuns,
-	["GROUP_SNIPER"]      = Weapons.SniperRifles,
-	["GROUP_HEAVY"]       = Weapons.Heavy,
-	["GROUP_THROWN"]      = Weapons.Throwables,
-	["GROUP_PETROLCAN"]   = Weapons.Misc,
-	["GROUP_STUNGUN"]     = Weapons.Misc,
-	["GROUP_TRANQILIZER"] = Weapons.Misc,
+	["GROUP_MELEE"]       = weapons.Melee,
+	["GROUP_PISTOL"]      = weapons.Pistols,
+	["GROUP_RIFLE"]       = weapons.AssaultRifles,
+	["GROUP_SHOTGUN"]     = weapons.Shotguns,
+	["GROUP_SMG"]         = weapons.SMG,
+	["GROUP_MG"]          = weapons.MachineGuns,
+	["GROUP_SNIPER"]      = weapons.SniperRifles,
+	["GROUP_HEAVY"]       = weapons.Heavy,
+	["GROUP_THROWN"]      = weapons.Throwables,
+	["GROUP_PETROLCAN"]   = weapons.Misc,
+	["GROUP_STUNGUN"]     = weapons.Misc,
+	["GROUP_TRANQILIZER"] = weapons.Misc,
 }
 
 local function populate_weapons()
@@ -40,7 +46,7 @@ local function populate_weapons()
 		end
 
 		table.insert(weapon_group, hash)
-		table.insert(Weapons.All, hash)
+		table.insert(weapons.All, hash)
 
 		::continue::
 	end
@@ -53,8 +59,6 @@ Translator:Load()
 GUI:init()
 
 ThreadManager:Run(function()
-	local start_time = os.clock()
-
 	for name, cmd in pairs(commandRegistry) do
 		CommandExecutor:RegisterCommand(name, cmd.callback, cmd.opts)
 	end

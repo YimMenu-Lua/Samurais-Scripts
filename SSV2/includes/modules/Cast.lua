@@ -44,12 +44,12 @@ function Cast.new(n)
 end
 
 ---@return uint8_t
-function Cast:AsUint8_t()
+function Cast:AsUint8()
 	return self.m_value & 0xFF
 end
 
 ---@return int8_t
-function Cast:AsInt8_t()
+function Cast:AsInt8()
 	local v = self.m_value & 0xFF
 
 	if (v >= 0x80) then
@@ -60,12 +60,12 @@ function Cast:AsInt8_t()
 end
 
 ---@return uint16_t
-function Cast:AsUint16_t()
+function Cast:AsUint16()
 	return self.m_value & 0xFFFF
 end
 
 ---@return int16_t
-function Cast:AsInt16_t()
+function Cast:AsInt16()
 	local v = self.m_value & 0xFFFF
 
 	if (v >= 0x8000) then
@@ -76,7 +76,7 @@ function Cast:AsInt16_t()
 end
 
 ---@return uint32_t
-function Cast:AsUint32_t()
+function Cast:AsUint32()
 	return self.m_value & 0xFFFFFFFF
 end
 
@@ -92,16 +92,16 @@ function Cast:AsInt32_t()
 end
 
 ---@return joaat_t
-function Cast:AsJoaat_t()
+function Cast:AsJoaat()
 	---@diagnostic disable-next-line: return-type-mismatch
-	return self:AsUint32_t()
+	return self:AsUint32()
 end
 
 -- **[NOTE]** Lua numbers are IEEE-754 doubles so this **will lose precision above 2^53**.
 --
 -- V1 does not have `bigint` or an `FFI` lib so this will have to do.
 ---@return uint64_t
-function Cast:AsUint64_t()
+function Cast:AsUint64()
 	local lo = self.m_value & 0xFFFFFFFF
 	local hi = math.floor(self.m_value / 0x100000000) & 0xFFFFFFFF
 
@@ -109,8 +109,8 @@ function Cast:AsUint64_t()
 end
 
 ---@return int64_t
-function Cast:AsInt64_t()
-	local u = self:AsUint64_t()
+function Cast:AsInt64()
+	local u = self:AsUint64()
 
 	if (u >= 0x8000000000000000) then
 		return u - 0x10000000000000000

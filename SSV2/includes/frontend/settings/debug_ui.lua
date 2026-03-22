@@ -181,7 +181,8 @@ local function DrawThreads()
 				end
 			elseif (thread_state == eThreadState.DEAD) then
 				if GUI:Button("Start", { size = side_button_size }) then
-					ThreadManager:StartThread(thread_name)
+					---@diagnostic disable-next-line: invisible
+					ThreadManager:RestartThread(thread_name)
 				end
 			end
 		end

@@ -15,7 +15,7 @@ Compat.__index = Compat
 ---@param version eAPIVersion
 function Compat.SetupEnv(version)
 	if (version == Enums.eAPIVersion.L54) then
-		require("includes.lib.mock_env")
+		require("includes.lib.mock_env").Setup(version)
 	else
 		print = function(...)
 			local out = {}

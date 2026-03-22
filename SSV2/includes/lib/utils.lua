@@ -1523,6 +1523,16 @@ function string.titlecase(str)
 	end))
 end
 
+---@return string
+function string.pascalcase(str)
+	return str:lower():gsub("%_+", " "):gsub("%-+", ""):titlecase():gsub("%s+", "")
+end
+
+---@return string
+function string.snakecase(str)
+	return str:lower():gsub("[%s%-]", "_")
+end
+
 ---@param value number|string
 ---@return string
 function string.formatint(value)
@@ -1570,14 +1580,18 @@ function math.round(n, x)
 	return tonumber(string.format("%." .. (x or 0) .. "f", n)) or 0
 end
 
----@param ... any
+---@param ... any Varargs or array of numbers.
 ---@return number
 function math.sum(...)
 	local result = 0
-	local args = type(...) == "table" and ... or { ... }
+	local args   = type(...) == "table" and ... or { ... }
+	local __len  = #args
+	if (__len == 0) then
+		return 0
+	end
 
-	for i = 1, table.getlen(args) do
-		if type(args[i]) == "number" then
+	for i = 1, __len do
+		if (type(args[i]) == "number") then
 			result = result + args[i]
 		end
 	end
@@ -1619,16 +1633,16 @@ local INT_SIZES <const>     = {
 }
 local INT_INFERENCE <const> = {
 	["unsigned"] = {
-		{ Cast.AsUint8_t,  "uint8_t" },
-		{ Cast.AsUint16_t, "uint16_t" },
-		{ Cast.AsUint32_t, "uint32_t" },
-		{ Cast.AsUint64_t, "uint64_t" },
+		{ Cast.AsUint8,  "uint8_t" },
+		{ Cast.AsUint16, "uint16_t" },
+		{ Cast.AsUint32, "uint32_t" },
+		{ Cast.AsUint64, "uint64_t" },
 	},
 	["signed"] = {
-		{ Cast.AsInt8_t,  "int8_t" },
-		{ Cast.AsInt16_t, "int16_t" },
+		{ Cast.AsInt8,    "int8_t" },
+		{ Cast.AsInt16,   "int16_t" },
 		{ Cast.AsInt32_t, "int32_t" },
-		{ Cast.AsInt64_t, "int64_t" },
+		{ Cast.AsInt64,   "int64_t" },
 	}
 }
 ---@param n integer
@@ -1672,14 +1686,14 @@ function math.lerp(a, b, t)
 	return a + (b - a) * math.clamp(t, 0, 1)
 end
 
--- Generates a trianguar wave oscillating between 1 and -1
+-- Generates a triangular wave oscillating between 1 and -1
 ---@param t number
 ---@return number
 function math.tent(t)
 	return 2 * math.abs(2 * (t - math.floor(t + 0.5))) - 1
 end
 
--- 3x²-2x²
+-- 3x² - 2x²
 ---@param x number
 ---@return number
 function math.smooth_step(x)
