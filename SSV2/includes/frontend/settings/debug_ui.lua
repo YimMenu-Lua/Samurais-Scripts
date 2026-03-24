@@ -547,8 +547,8 @@ local function DrawMiscTests()
 			return
 		end
 
-		local cweaponinfo = cpedweaponmgr.m_weapon_info
-		if (not cweaponinfo) then
+		local cweaponinfo = cpedweaponmgr:GetWeaponInfo()
+		if not (cweaponinfo and cweaponinfo:IsValid()) then
 			print("CWeaponInfo: invalid pointer.")
 			return
 		end

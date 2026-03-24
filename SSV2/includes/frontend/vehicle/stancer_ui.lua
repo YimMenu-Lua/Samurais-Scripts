@@ -320,7 +320,7 @@ return function()
 			end
 		end, function()
 			saved_vehs_window.should_draw = false
-		end)
+		end, true)
 
 		ImGui.End()
 	end

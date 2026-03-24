@@ -27,7 +27,7 @@ local CPlayerInfo       = require("includes.classes.gta.CPlayerInfo")
 ---@field m_ped_weapon_mgr pointer_ref<CPedWeaponManager>
 ---@field m_player_info CPlayerInfo
 ---@field m_velocity pointer<vec3>
----@field m_ped_type pointer<uint8_t>
+---@field m_ped_type pointer<uint32_t>
 ---@field m_ped_task_flag pointer<uint8_t>
 ---@field m_seatbelt pointer<uint8_t>
 ---@field m_armor pointer<float>
@@ -64,14 +64,14 @@ end
 ---@return boolean
 function CPed:CanRagdoll()
 	return self:__safecall(false, function()
-		return (self.m_ped_type & 0x20) ~= 0
+		return (self.m_ped_type:get_dword() & 0x20) ~= 0
 	end)
 end
 
 ---@return boolean
 function CPed:HasSeatbelt()
 	return self:__safecall(false, function()
-		return (self.m_seatbelt & 0x3) ~= 0
+		return (self.m_seatbelt:get_byte() & 0x3) ~= 0
 	end)
 end
 
@@ -85,7 +85,7 @@ end
 ---@return ePedType
 function CPed:GetPedType()
 	return self:__safecall(-1, function()
-		return (self.m_ped_type:get_word() << 11 >> 25)
+		return (self.m_ped_type:get_dword() << 11 >> 25)
 	end)
 end
 

@@ -127,7 +127,7 @@ function GUI:LateInit()
 	end
 
 	if (not math.is_inrange(GVars.ui.last_tab.tab_id, TABID_MIN, TABID_MAX)) then
-		GVars.ui.last_tab.tab_id = 1
+		GVars.ui.last_tab.tab_id = TABID_MIN
 	end
 
 	local __t = self.m_tabs[GVars.ui.last_tab.tab_id][GVars.ui.last_tab.array_index]
@@ -390,12 +390,12 @@ local underlineSet     = false
 ---@private
 function GUI:DrawTopBar()
 	local drawList      = ImGui.GetWindowDrawList()
-	local spacing       = 10
+	local tabCount      = table.getlen(tabIdToString) - 1
 	local availWidth, _ = ImGui.GetContentRegionAvail()
-	local elemWidth     = 90.0
+	local spacing       = 10
+	local elemWidth     = math.min(90.0, availWidth / tabCount)
 	local elemHeight    = 40.0
 	local tabHeight     = 55.0
-	local tabCount      = table.getlen(tabIdToString) - 1
 	local totalWidth    = tabCount * elemWidth + (tabCount - 1) * spacing
 	local startX        = (availWidth - totalWidth) * 0.5
 	local cursorPos     = vec2:new(ImGui.GetCursorScreenPos())
@@ -405,14 +405,15 @@ function GUI:DrawTopBar()
 	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + startX)
 
 	for i = 1, tabCount do
-		local tabName  = _T(Match(i, tabIdToString))
-		local selected = (self.m_selected_category == i)
+		local tabName_orig      = _T(Match(i, tabIdToString))
+		local selected          = (self.m_selected_category == i)
+		local tabName, clipping = ImGui.TrimTextToWidth(tabName_orig, elemWidth - 10)
 
-		cursorPos      = vec2:new(ImGui.GetCursorScreenPos())
-		local yCenter  = cursorPos.y + tabHeight * 0.5 - elemHeight * 0.5
-		local elemPos  = vec2:new(cursorPos.x, yCenter)
-		local rect     = Rect(elemPos, vec2:new(elemPos.x + elemWidth, elemPos.y + elemHeight))
-		local rectSize = rect:GetSize()
+		cursorPos               = vec2:new(ImGui.GetCursorScreenPos())
+		local yCenter           = cursorPos.y + tabHeight * 0.5 - elemHeight * 0.5
+		local elemPos           = vec2:new(cursorPos.x, yCenter)
+		local rect              = Rect(elemPos, vec2:new(elemPos.x + elemWidth, elemPos.y + elemHeight))
+		local rectSize          = rect:GetSize()
 
 		ImGui.PushID(i)
 		ImGui.InvisibleButton(tabName, rectSize.x, rectSize.y)
@@ -420,6 +421,9 @@ function GUI:DrawTopBar()
 		local clicked = ImGui.IsItemClicked()
 		local held    = (hovered and KeyManager:IsKeyPressed(eVirtualKeyCodes.VK_LBUTTON))
 		local rectMod = vec2:new((held or clicked) and 1 or 0, (held or clicked) and 1 or 0)
+		if (clipping) then
+			self:Tooltip(tabName_orig)
+		end
 
 		if (not underlineSet) then
 			underlineTargetX = rect.min.x
@@ -868,10 +872,11 @@ end
 ---@param label string
 ---@param callback GuiCallback
 ---@param onClose function -- Close button callback
-function GUI:QuickConfigWindow(label, callback, onClose)
+---@param alwaysCenter? boolean
+function GUI:QuickConfigWindow(label, callback, onClose, alwaysCenter)
 	local size = vec2:new(ImGui.GetWindowSize())
 	local _, center = self:GetNewWindowSizeAndCenterPos(0.5, 0.5, size)
-	ImGui.SetWindowPos(center.x, center.y, ImGuiCond.Once)
+	ImGui.SetWindowPos(center.x, center.y, alwaysCenter and ImGuiCond.Always or ImGuiCond.Once)
 
 	ImGui.SeparatorText(label)
 	if (self:Button("Close")) then

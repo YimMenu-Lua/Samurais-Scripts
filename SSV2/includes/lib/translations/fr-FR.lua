@@ -678,5 +678,9 @@ return {
 	["YH_DDAY_HELP2_FMT"] = "Appuyez sur le bouton '%s', puis appelez Lester pour annuler les 3 braquages ​​de Doomsday.",
 	["YH_FACILITY_NOT_OWNED"] = "Achetez une installation pour accéder à The Doomsday Heist.",
 	["YH_TP_FACILITY"] = "Téléportation vers l'installation",
-	["YH_DDAY_FORCE"] = "FORCER LA RÉINITIALISATION"
+	["YH_DDAY_FORCE"] = "FORCER LA RÉINITIALISATION",
+	["GENERIC_LOADED"] = "Chargé.",
+	["SETTINGS_GAME_LANGUAGE_TT"] = "Utilisez la langue de jeu actuellement sélectionnée.",
+	["SETTINGS_GAME_LANGUAGE"] = "Utiliser le langage du jeu",
+	["GENERIC_RELOADED"] = "Rechargé."
 }

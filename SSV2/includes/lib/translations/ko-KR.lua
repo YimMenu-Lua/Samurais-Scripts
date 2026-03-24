@@ -678,5 +678,9 @@ return {
 	["YH_DDAY_HELP1"] = "Doomsday를 호스트로 플레이한 적이 없는 경우 이 방법이 필요합니다. 이미 호스트로서 일부 습격을 플레이하고 완료했다면 이 단계를 건너뛰세요.",
 	["YH_DDAY_FORCE"] = "강제 재설정",
 	["YH_TP_FACILITY"] = "시설로 순간이동",
-	["YH_DDAY_HELP2_FMT"] = "'%s' 버튼을 누른 다음 Lester에게 전화하여 Doomsday의 3가지 습격을 모두 취소하세요."
+	["YH_DDAY_HELP2_FMT"] = "'%s' 버튼을 누른 다음 Lester에게 전화하여 Doomsday의 3가지 습격을 모두 취소하세요.",
+	["GENERIC_LOADED"] = "짐을 실은.",
+	["SETTINGS_GAME_LANGUAGE_TT"] = "현재 선택된 게임 언어를 사용합니다.",
+	["SETTINGS_GAME_LANGUAGE"] = "게임 언어 사용",
+	["GENERIC_RELOADED"] = "다시 로드되었습니다."
 }

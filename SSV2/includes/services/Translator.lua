@@ -7,8 +7,23 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local en_loaded, en     = pcall(require, "lib.translations.en-US")
-local locales_loaded, t = pcall(require, "lib.translations.__locales")
+local en_loaded, en             = pcall(require, "lib.translations.en-US")
+local locales_loaded, __locales = pcall(require, "lib.translations.__locales")
+local GameLangToCustom <const>  = {
+	[0]  = 1,
+	[1]  = 2,
+	[2]  = 3,
+	[3]  = 5,
+	[4]  = 4,
+	[5]  = 6,
+	[6]  = 11,
+	[7]  = 7,
+	[8]  = 12,
+	[9]  = 8,
+	[10] = 10,
+	[11] = 4,
+	[12] = 9,
+}
 
 
 --------------------------------------
@@ -21,28 +36,51 @@ local locales_loaded, t = pcall(require, "lib.translations.__locales")
 ---@field private m_log_history table
 ---@field private m_cache table<string, table<string, string>>
 ---@field private m_last_load_time TimePoint
+---@field protected m_initialized boolean
 Translator         = {
 	default_labels   = en_loaded and en or {},
 	m_last_load_time = TimePoint.new(),
 	m_cache          = {},
-	locales          = locales_loaded and t or { { name = "English", iso = "en-US" } },
+	locales          = locales_loaded and __locales or { { name = "English", iso = "en-US" } },
+	m_initialized    = false
 }
 Translator.__index = Translator
 
-function Translator:Load()
-	GVars.backend.language_code = GVars.backend.language_code or "en-US"
-	local iso = GVars.backend.language_code
-	local ok, res
-
-	if (iso ~= "en-US") then
-		local path = _F("lib.translations.%s", iso)
-		ok, res = pcall(require, path)
+function Translator:MatchGameLanguage()
+	self.m_last_game_lang_idx = LOCALIZATION.GET_CURRENT_LANGUAGE()
+	local idx                 = GameLangToCustom[self.m_last_game_lang_idx] or 1
+	local match               = self.locales[idx]
+	if (not match) then
+		return false
 	end
 
-	self.labels        = (ok and (type(res) == "table")) and res or self.default_labels
-	self.lang_code     = iso
-	self.m_log_history = {}
-	self.m_last_load_time:Reset()
+	GVars.backend.language_index = idx
+	GVars.backend.language_code  = match.iso
+	GVars.backend.language_name  = match.name
+	return true
+end
+
+function Translator:Load()
+	ThreadManager:Run(function()
+		if (GVars.backend.use_game_language) then
+			self:MatchGameLanguage()
+		end
+
+		GVars.backend.language_code = GVars.backend.language_code or "en-US"
+		local iso = GVars.backend.language_code
+		local ok, res
+
+		if (iso ~= "en-US") then
+			local path = _F("lib.translations.%s", iso)
+			ok, res = pcall(require, path)
+		end
+
+		self.labels        = (ok and (type(res) == "table")) and res or self.default_labels
+		self.lang_code     = iso
+		self.m_log_history = {}
+		self.m_initialized = true
+		self.m_last_load_time:Reset()
+	end)
 end
 
 ---@param msg string
@@ -65,13 +103,18 @@ function Translator:Log(message)
 end
 
 function Translator:Reload()
-	if (not self.m_last_load_time:HasElapsed(3e3)) then
+	if (not self.m_initialized or not self.m_last_load_time:HasElapsed(3e3)) then
 		return
 	end
 
 	-- We can't even unload files because package is fully disabled. loadfile? in your dreams... 🥲
+	self.m_initialized = false
 	self:Load()
 	Notifier:ShowMessage("Translator", "Reloaded.")
+end
+
+function Translator:IsReady()
+	return self.m_initialized
 end
 
 ---@param label string

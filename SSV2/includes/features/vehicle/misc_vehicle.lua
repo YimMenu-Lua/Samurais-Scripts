@@ -132,7 +132,7 @@ function MiscVehicle:UpdateMachineGuns()
 		return
 	end
 
-	if (not LocalPlayer:IsUsingAirctaftMG()) then
+	if (not LocalPlayer:IsUsingAircraftMG()) then
 		return
 	end
 

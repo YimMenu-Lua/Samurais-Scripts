@@ -62,28 +62,15 @@ function MockEnv.Setup(version)
 
 	if (not script) then
 		script = {
-			register_looped = function(name, fn)
-				print("[mock script looped]", name)
-				fn({ sleep = NOP, yield = NOP })
-			end,
-			run_in_fiber = function(fn)
-				fn({ sleep = NOP, yield = NOP })
-			end,
-
-			is_active = function(scr_name)
-				print("[mock script active check]", scr_name)
-				return false
-			end
+			register_looped   = NOP,
+			run_in_fiber      = NOP,
+			execute_as_script = NOP,
+			is_active         = function(_) return false end,
 		}
 	end
 
 	if (not event) then
-		event = {
-			register_handler = function(evt, fn)
-				print("[mock event]", evt)
-				return fn
-			end
-		}
+		event = { register_handler = NOP }
 	end
 
 	if (not menu_event) then
@@ -147,13 +134,14 @@ function MockEnv.Setup(version)
 	end
 
 	if (not gui) then
-		gui                       = {}
-		gui.add_tab               = function(_)
-			print("[mock gui.add_tab]")
-			return gui
-		end
-		gui.add_imgui             = NOP
-		gui.add_always_draw_imgui = NOP
+		gui         = {
+			add_imgui             = NOP,
+			add_always_draw_imgui = NOP,
+			override_mouse        = NOP,
+			is_open               = function() return false end,
+			mouse_override        = function() return false end,
+		}
+		gui.add_tab = function(_) return gui end
 	end
 
 	if (not STREAMING) then

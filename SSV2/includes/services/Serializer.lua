@@ -752,6 +752,11 @@ end
 ---@param data any
 ---@param filename string
 function Serializer:WriteToFile(data, filename)
+	if (data == nil) then
+		log.warning("[Serializer]: Invalid data.")
+		return
+	end
+
 	if (type(filename) ~= "string" or not filename:endswith(".json")) then
 		log.warning("[Serializer]: Invalid file name.")
 		return
@@ -759,11 +764,6 @@ function Serializer:WriteToFile(data, filename)
 
 	if (filename == self.m_file_name) then
 		log.warning("[Serializer]: Illegal operation: Attempt to overwrite the main config file.")
-		return
-	end
-
-	if (not data) then
-		log.warning("[Serializer]: Invalid data type.")
 		return
 	end
 

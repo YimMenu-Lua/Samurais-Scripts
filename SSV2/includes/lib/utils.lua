@@ -102,12 +102,12 @@ function IsInstance(obj, T)
 
 	local obj_type <const> = type(obj)
 	local T_type <const>   = type(T)
-	if (T_type == "string" and T == "pointer" and obj_type == "userdata") then
-		return (type(obj.rip) == "function")
-	end
+	local obj_mt           = getmetatable(obj)
+	local T_mt             = getmetatable(T)
 
-	local obj_mt = getmetatable(obj)
-	local T_mt   = getmetatable(T)
+	if (T_type == "string" and T == "pointer" and obj_type == "userdata") then
+		return (obj_mt and type(obj_mt.rip) == "function" or false)
+	end
 
 	if (T_type == "table") then
 		if (obj_type == "userdata" and T.__type == "vec3") then
@@ -1639,10 +1639,10 @@ local INT_INFERENCE <const> = {
 		{ Cast.AsUint64, "uint64_t" },
 	},
 	["signed"] = {
-		{ Cast.AsInt8,    "int8_t" },
-		{ Cast.AsInt16,   "int16_t" },
-		{ Cast.AsInt32_t, "int32_t" },
-		{ Cast.AsInt64,   "int64_t" },
+		{ Cast.AsInt8,  "int8_t" },
+		{ Cast.AsInt16, "int16_t" },
+		{ Cast.AsInt32, "int32_t" },
+		{ Cast.AsInt64, "int64_t" },
 	}
 }
 ---@param n integer

@@ -15,7 +15,7 @@ local customPaintsUI    = require("includes.frontend.vehicle.custom_paints_ui")
 local engine_swap_index = 1
 local vehicleTab        = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
 local handlingEditorTab = vehicleTab:RegisterSubtab("SUBTAB_HANDLING_EDITOR", nil, nil, true)
-local optionWindowFlgs  = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove
+local optionWindowFlgs  = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize
 DriftMinigame           = LocalPlayer:GetVehicle():AddFeature(driftMG)
 
 ---@type WindowRequest

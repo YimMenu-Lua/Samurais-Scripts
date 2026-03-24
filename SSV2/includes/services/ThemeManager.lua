@@ -39,14 +39,13 @@ function ThemeManager:Load()
 
 	if (not current or not current.Colors) then
 		current = self:GetDefaultTheme()
-		GVars.ui.style.theme = current
 	end
 
 	if (current.JSON or not current.__type or not IsInstance(current.SSAccent, vec4)) then
 		current = Theme.deserialize(current)
-		GVars.ui.style.theme = current
 	end
 
+	GVars.ui.style.theme = current
 	self.m_current_theme = current
 end
 

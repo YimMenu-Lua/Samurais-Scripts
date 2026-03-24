@@ -81,7 +81,7 @@ function Cast:AsUint32()
 end
 
 ---@return int32_t
-function Cast:AsInt32_t()
+function Cast:AsInt32()
 	local v = self.m_value & 0xFFFFFFFF
 
 	if (v >= 0x80000000) then

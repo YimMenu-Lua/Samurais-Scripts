@@ -113,6 +113,8 @@ return {
 	["GENERIC_TIME_LEFT"]                  = "Time Left",
 	["GENERIC_TP_INTERIOR_ERR"]            = "Please go outside first!",
 	["GENERIC_TP_INVALID_COORDS_ERR"]      = "Invalid coordinates!",
+	["GENERIC_LOADED"]                     = "Loaded.",
+	["GENERIC_RELOADED"]                   = "Reloaded.",
 	--#endregion
 
 	--#region CasinoPacino
@@ -624,6 +626,8 @@ return {
 	["SETTINGS_ENTITY_REPLACE"]            = "Auto-Replace Entities",
 	["SETTINGS_ENTITY_REPLACE_TT"]         = "This project has a limit to how many entities you can spawn (peds, vehicles, objects). All features adhere to that limit to prevent entity spam or choking the game. This option allows the script to automatically replace old spawned entities once you reach the limit for a certain entity type and try to spawn a new one.",
 	["SETTINGS_LANGUAGE"]                  = "Language",
+	["SETTINGS_GAME_LANGUAGE"]             = "Use Game Language",
+	["SETTINGS_GAME_LANGUAGE_TT"]          = "Use the currently selected game language.",
 	["SETTINGS_TOOLTIPS"]                  = "Disable Tooltips",
 	["SETTINGS_UI_SOUND"]                  = "Disable Sound Feedback",
 	["SETTINGS_WINDOW_GEOMETRY"]           = "Window Geometry",

@@ -59,6 +59,11 @@ function Ped:IsRagdoll()
 	return PED.IS_PED_RAGDOLL(self:GetHandle())
 end
 
+---@return boolean
+function Ped:CanRagdoll()
+	return PED.CAN_PED_RAGDOLL(self:GetHandle())
+end
+
 ---@param radius? number
 ---@return boolean
 function Ped:IsInCombat(radius)

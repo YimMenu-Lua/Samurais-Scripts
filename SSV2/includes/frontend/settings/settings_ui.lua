@@ -7,10 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local ThemeManager  = require("includes.services.ThemeManager")
-local selectedTheme = ThemeManager:GetCurrentTheme()
-local newThemeBuff  = selectedTheme:Copy()
-local cfgReset      = {
+local ThemeManager = require("includes.services.ThemeManager")
+local selectedTheme
+local newThemeBuff
+
+local cfgReset     = {
 	---@type Set<string>
 	exceptions = Set.new("backend.debug_mode"),
 	excToggles = {
@@ -23,14 +24,13 @@ local cfgReset      = {
 	},
 	open = false,
 }
-local themeEditor   = {
+local themeEditor  = {
 	shouldDraw      = false,
 	liveEdit        = false,
 	shouldFocusName = false,
 	valid           = true,
 	errors          = {}
 }
-newThemeBuff.Name   = ""
 
 local function onConfigReset()
 	for _, v in pairs(cfgReset.excToggles) do
@@ -44,29 +44,38 @@ local function drawGeneralSettings()
 	GVars.backend.auto_cleanup_entities = GUI:CustomToggle(_T("SETTINGS_ENTITY_REPLACE"),
 		GVars.backend.auto_cleanup_entities
 	)
-	GUI:Tooltip(_T("SETTINGS_ENTITY_REPLACE_TT"))
+	GUI:HelpMarker(_T("SETTINGS_ENTITY_REPLACE_TT"))
 
-	ImGui.Spacing()
-	ImGui.BulletText(_F("%s: %s (%s)", _T("SETTINGS_LANGUAGE"), GVars.backend.language_name, GVars.backend.language_code))
-	ImGui.Spacing()
+	if (Translator and Translator:IsReady()) then
+		GUI:HeaderText(_T("SETTINGS_LANGUAGE"), { separator = true, spacing = true })
 
-	if ImGui.BeginCombo("##langs", _F("%s (%s)",
-			Translator.locales[GVars.backend.language_index].name,
-			Translator.locales[GVars.backend.language_index].iso
-		)) then
-		for i, lang in ipairs(Translator.locales) do
-			local is_selected = (i == GVars.backend.language_index)
-			if (ImGui.Selectable(_F("%s (%s)", lang.name, lang.iso), is_selected)) then
-				GVars.backend.language_index = i
-				GVars.backend.language_name  = lang.name
-				GVars.backend.language_code  = lang.iso
+		GVars.backend.use_game_language = GUI:CustomToggle(_T("SETTINGS_GAME_LANGUAGE"),
+			GVars.backend.use_game_language,
+			{ onClick = function() Translator:Reload() end, }
+		)
+		GUI:HelpMarker(_T("SETTINGS_GAME_LANGUAGE_TT"))
+
+		ImGui.Spacing()
+		ImGui.BeginDisabled(GVars.backend.use_game_language)
+		if ImGui.BeginCombo("##langs", _F("%s (%s)",
+				Translator.locales[GVars.backend.language_index].name,
+				Translator.locales[GVars.backend.language_index].iso
+			)) then
+			for i, lang in ipairs(Translator.locales) do
+				local is_selected = (i == GVars.backend.language_index)
+				if (ImGui.Selectable(_F("%s (%s)", lang.name, lang.iso), is_selected)) then
+					GVars.backend.language_index = i
+					GVars.backend.language_name  = lang.name
+					GVars.backend.language_code  = lang.iso
+				end
 			end
+			ImGui.EndCombo()
 		end
-		ImGui.EndCombo()
+		ImGui.EndDisabled()
 	end
 
 	ImGui.Spacing()
-
+	ImGui.Separator()
 	if ImGui.Button(_T("SETTINGS_CFG_RESET")) then
 		cfgReset.open = true
 	end
@@ -105,11 +114,10 @@ local function drawGeneralSettings()
 			end, function()
 				cfgReset.exceptions:Clear()
 				onConfigReset()
-			end)
+			end, true)
 			ImGui.End()
 		end
 	end
-	ImGui.Dummy(1, 10)
 end
 
 local function drawThemeSettings()
@@ -119,7 +127,6 @@ local function drawThemeSettings()
 
 	if (ImGui.Begin("##new_theme",
 			ImGuiWindowFlags.NoTitleBar
-			| ImGuiWindowFlags.NoMove
 			| ImGuiWindowFlags.NoResize
 			| ImGuiWindowFlags.AlwaysAutoResize
 		)) then
@@ -306,7 +313,8 @@ local function drawGuiSettings()
 				ImGui.PopStyleVar()
 				GUI:ShowWindowHeightLimit()
 			end,
-			ImGui.CloseCurrentPopup
+			ImGui.CloseCurrentPopup,
+			true
 		)
 		ImGui.EndPopup()
 	end
@@ -346,14 +354,18 @@ local function drawGuiSettings()
 	end
 
 	ImGui.BeginDisabled()
-	GVars.ui.window_pos.x, _ = ImGui.SliderFloat(_T("SETTINGS_WINDOW_POS_X"), GVars.ui.window_pos.x, 0, resolution.x)
-	GUI:Tooltip(_T("SETTINGS_WINDOW_POS_TT"))
-	GVars.ui.window_pos.y, _ = ImGui.SliderFloat(_T("SETTINGS_WINDOW_POS_Y"), GVars.ui.window_pos.y, 0, resolution.y)
-	GUI:Tooltip(_T("SETTINGS_WINDOW_POS_TT"))
+	GVars.ui.window_pos.x = ImGui.SliderFloat(_T("SETTINGS_WINDOW_POS_X"), GVars.ui.window_pos.x, 0, resolution.x)
 	ImGui.EndDisabled()
+	GUI:Tooltip(_T("SETTINGS_WINDOW_POS_TT"))
+
+	ImGui.BeginDisabled()
+	GVars.ui.window_pos.y = ImGui.SliderFloat(_T("SETTINGS_WINDOW_POS_Y"), GVars.ui.window_pos.y, 0, resolution.y)
+	ImGui.EndDisabled()
+	GUI:Tooltip(_T("SETTINGS_WINDOW_POS_TT"))
 
 	ImGui.Spacing()
 	GUI:HeaderText(_T("SETTINGS_WINDOW_STYLE"), { separator = true })
+	selectedTheme = selectedTheme or ThemeManager:GetCurrentTheme()
 
 	GVars.ui.style.bg_alpha, _ = ImGui.SliderFloat(_T("SETTINGS_WINDOW_ALPHA"), GVars.ui.style.bg_alpha, 0.01, 1.0)
 	ImGui.SameLine()
