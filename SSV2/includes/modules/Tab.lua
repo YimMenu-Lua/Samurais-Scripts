@@ -15,6 +15,7 @@
 ---@ignore
 ---@class Tab : ClassMeta<Tab>
 ---@field private m_name string
+---@field private m_id joaat_t
 ---@field private m_selected_tab_name string
 ---@field private m_callback? GuiCallback
 ---@field private m_subtabs? table<string, Tab>
@@ -34,6 +35,7 @@ function Tab.new(name, drawable, subtabs, isTranslatorLabel)
 	return setmetatable(
 		{
 			m_name                 = name,
+			m_id                   = joaat(name),
 			m_callback             = drawable,
 			m_subtabs              = subtabs or {},
 			m_has_error            = false,
@@ -101,6 +103,15 @@ end
 ---@return string
 function Tab:GetName()
 	return self.m_has_translator_label and _T(self.m_name) or self.m_name
+end
+
+---@return joaat_t
+function Tab:GetID()
+	if (not self.m_id) then
+		self.m_id = joaat(self.m_name)
+	end
+
+	return self.m_id
 end
 
 ---@return GuiCallback
@@ -300,7 +311,7 @@ function Tab:Draw()
 		return
 	end
 
-	ImGui.BeginTabBar(_F("##sutab_selector%s", self.m_name))
+	ImGui.BeginTabBar(_F("##sutab_selector%d", self:GetID()))
 	if (ImGui.BeginTabItem(self:GetName())) then
 		self:DrawInternal()
 		ImGui.EndTabItem()

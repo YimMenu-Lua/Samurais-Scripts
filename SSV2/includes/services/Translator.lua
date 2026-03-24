@@ -66,8 +66,10 @@ function Translator:Load()
 			self:MatchGameLanguage()
 		end
 
-		GVars.backend.language_code = GVars.backend.language_code or "en-US"
-		local iso = GVars.backend.language_code
+		GVars.backend.language_index = GVars.backend.language_index or 1
+		GVars.backend.language_code  = GVars.backend.language_code or "en-US"
+		GVars.backend.language_name  = GVars.backend.language_name or "English"
+		local iso                    = GVars.backend.language_code
 		local ok, res
 
 		if (iso ~= "en-US") then
