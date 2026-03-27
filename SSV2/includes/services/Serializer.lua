@@ -76,10 +76,11 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 		return self
 	end
 
-	local timestamp        = tostring(os.date("%H_%M_%S"))
+	local timestamp        = DateTime:Now():Format("%H_%M_%S")
 	script_name            = script_name or (Backend and Backend.script_name or ("unk_cfg_%s"):format(timestamp))
+
+	local filename         = script_name:snakecase()
 	varargs                = varargs or {}
-	local filename         = script_name:lower():gsub("%s+", "_")
 
 	self.m_default_config  = default_config or { __version = Backend and Backend.__version or self.__version }
 	self.m_file_name       = _F("%s.json", filename)
@@ -452,22 +453,26 @@ function Serializer:Encode(data, etc)
 	return res
 end
 
+-- Just to avoid creating a closure later
+---@private
+---@return Config
+function Serializer:OnDecodeError()
+	log.warning("[Serializer]: No suitable config backup. Resetting to default.")
+	self:Parse(self.m_default_config)
+	self:SaveBackup()
+	return self:Postprocess(self.m_default_config)
+end
+
 ---@param data any
 ---@param etc? any
 ---@return any
 function Serializer:Decode(data, etc)
 	local ok, res = self:DecodeImpl(data, etc)
 	if (not ok) then
-		local function onDecodeError()
-			log.warning("[Serializer]: No suitable config backup. Resetting to default.")
-			self:Parse(self.m_default_config)
-			return table.copy(self.m_default_config)
-		end
-
 		log.warning("[Serializer]: Your config file is corrupted! Attempting to recover...")
 		local success, recov = self:RecoverBackup()
 		if (not success) then
-			return onDecodeError()
+			return self:OnDecodeError()
 		end
 
 		if (self:IsEncrypted(recov)) then
@@ -476,7 +481,7 @@ function Serializer:Decode(data, etc)
 
 		ok, res = self:DecodeImpl(recov, etc)
 		if (not ok) then
-			return onDecodeError()
+			return self:OnDecodeError()
 		end
 
 		log.info("[Serializer]: Config backup successfullly recovered.")
@@ -485,27 +490,39 @@ function Serializer:Decode(data, etc)
 	return self:Postprocess(res)
 end
 
+---@private
+---@param msg? string
+function Serializer:OnParseError(msg)
+	msg = msg or "Unknown error."
+	log.fwarning("[Serializer]: Failed to parse config data: %s", msg)
+	self.m_state    = eSerializerState.SUSPENDED
+	self.m_disabled = true
+end
+
 ---@param data any
 function Serializer:Parse(data)
 	if (self:IsDisabled()) then
 		return
 	end
 
-	local f <close> = io.open(self.m_file_name, "w")
-	if (not f) then
-		log.warning("[Serializer]: Failed to write config file!")
-		self.m_disabled = true
-		return
-	end
-
 	self.m_state = eSerializerState.FLUSHING
 	local json   = self:Encode(data)
 	if (not json) then
+		self:OnParseError("JSON encoding failed.")
 		return
 	end
 
-	f:write(json)
-	f:flush()
+	local fname = "ss_temp"
+	local temp  = io.open(fname, "w")
+	if (not temp) then
+		self:OnParseError("Failed to open file.")
+		return
+	end
+
+	temp:write(json)
+	temp:flush()
+	temp:close()
+	os.rename(fname, self.m_file_name) -- I came while writing this line. Thanks for accepting the PR MR-X
 	self.m_state = eSerializerState.IDLE
 end
 
@@ -540,7 +557,7 @@ end
 ---@return any
 function Serializer:ReadItem(item_path)
 	if (type(GVars) ~= "table") then
-		log.warning("[Serializer]: No runtime variables table! Returning default value.")
+		log.warning("[Serializer]: No global runtime variables table! Returning default value.")
 		return table.get_nested_key(self.m_default_config, item_path)
 	end
 
@@ -551,7 +568,7 @@ end
 ---@param value any
 function Serializer:SaveItem(item_path, value)
 	if (type(GVars) ~= "table") then
-		log.warning("[Serializer]: No runtime variables table!")
+		log.warning("[Serializer]: No global runtime variables table!")
 		return
 	end
 
@@ -630,15 +647,13 @@ function Serializer:B64Encode(input)
 	local n = #input
 
 	for i = 1, n, 3 do
-		local a = input:byte(i) or 0
-		local b = input:byte(i + 1) or 0
-		local c = input:byte(i + 2) or 0
-		local triple = (a << 16) | (b << 8) | c
-
+		local a             = input:byte(i) or 0
+		local b             = input:byte(i + 1) or 0
+		local c             = input:byte(i + 2) or 0
+		local triple        = (a << 16) | (b << 8) | c
 		output[#output + 1] = self.b64_chars:sub(((triple >> 18) & 63) + 1, ((triple >> 18) & 63) + 1)
 		output[#output + 1] = self.b64_chars:sub(((triple >> 12) & 63) + 1, ((triple >> 12) & 63) + 1)
-		output[#output + 1] = (i + 1 <= n) and self.b64_chars:sub(((triple >> 6) & 63) + 1, ((triple >> 6) & 63) + 1) or
-			"="
+		output[#output + 1] = (i + 1 <= n) and self.b64_chars:sub(((triple >> 6) & 63) + 1, ((triple >> 6) & 63) + 1) or "="
 		output[#output + 1] = (i + 2 <= n) and self.b64_chars:sub((triple & 63) + 1, (triple & 63) + 1) or "="
 	end
 
@@ -654,7 +669,7 @@ function Serializer:B64Decode(base64)
 		b64lookup[self.b64_chars:sub(i, i)] = i - 1
 	end
 
-	base64 = base64:gsub("%s", ""):gsub("=", "")
+	base64       = base64:gsub("%s", ""):gsub("=", "")
 	local output = {}
 
 	for i = 1, #base64, 4 do
@@ -678,13 +693,15 @@ end
 ---@param input string
 ---@return string
 function Serializer:XOR(input)
-	local output = {}
+	local output  = {}
 	local key_len = #self.m_xor_key
+
 	for i = 1, #input do
 		local input_byte = input:byte(i)
-		local key_byte = self.m_xor_key:byte((i - 1) % key_len + 1)
-		output[i] = string.char(input_byte ~ key_byte)
+		local key_byte   = self.m_xor_key:byte((i - 1) % key_len + 1)
+		output[i]        = string.char(input_byte ~ key_byte)
 	end
+
 	return table.concat(output)
 end
 
@@ -719,7 +736,7 @@ end
 ---@param data any
 ---@param filename string
 function Serializer:WriteInternal(data, filename)
-	local f, err = io.open(filename, "w")
+	local f <close>, err = io.open(filename, "w")
 	if (not f) then
 		log.fwarning("[Serializer]: Failed to open file: %s", err)
 		return
@@ -727,15 +744,19 @@ function Serializer:WriteInternal(data, filename)
 
 	f:write(data)
 	f:flush()
-	f:close()
 end
 
 -- A separate write function that doesn't rely on any setup or state flags.
 --
 -- Do not use it to write to the Serializer's config file.
----@param data any
 ---@param filename string
-function Serializer:WriteToFile(data, filename)
+---@param data any
+function Serializer:WriteToFile(filename, data)
+	if (data == nil) then
+		log.warning("[Serializer]: Invalid data.")
+		return
+	end
+
 	if (type(filename) ~= "string" or not filename:endswith(".json")) then
 		log.warning("[Serializer]: Invalid file name.")
 		return
@@ -746,12 +767,7 @@ function Serializer:WriteToFile(data, filename)
 		return
 	end
 
-	if (not data) then
-		log.warning("[Serializer]: Invalid data type.")
-		return
-	end
-
-	local f, err = io.open(filename, "w")
+	local f <close>, err = io.open(filename, "w")
 	if (not f) then
 		log.fwarning("[Serializer]: Failed to open file: %s", err)
 		return
@@ -759,7 +775,6 @@ function Serializer:WriteToFile(data, filename)
 
 	f:write(self:Encode(data))
 	f:flush()
-	f:close()
 end
 
 -- A separate read function.
@@ -774,7 +789,7 @@ function Serializer:ReadFromFile(filename)
 	end
 
 	if (filename == self.m_file_name) then
-		log.warning("[Serializer]: Use Serializer:Read() instead to read the Serializer's config file.")
+		log.warning("[Serializer]: Use Serializer:Read() instead to read the main config file.")
 		return
 	end
 
@@ -787,6 +802,7 @@ function Serializer:ReadFromFile(filename)
 	return self:Decode(f:read("a"))
 end
 
+-- Rebuilds objects from simple tables.
 ---@param object table
 function Serializer:Reconstruct(object)
 	if (type(object) ~= "table") then
@@ -809,19 +825,17 @@ function Serializer:Reconstruct(object)
 		end
 	end
 
+	local out = {}
 	if (table.is_array(object)) then
-		local out = {}
 		for i = 1, #object do
 			out[i] = self:Reconstruct(object[i])
 		end
-		return out
 	else
-		local out = {}
 		for k, v in pairs(object) do
 			out[k] = self:Reconstruct(v)
 		end
-		return out
 	end
+	return out
 end
 
 function Serializer:FlushObjectQueue()
@@ -851,12 +865,13 @@ function Serializer:Flush()
 end
 
 function Serializer:OnTick()
+	yield()
+
 	if (not self.m_initialized or not self:CanAccess()) then
 		return
 	end
 
 	if (not self.m_dirty and not self.m_last_write_time:HasElapsed(5e3)) then
-		yield()
 		return
 	end
 

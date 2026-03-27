@@ -15,6 +15,7 @@
 ---@ignore
 ---@class Tab : ClassMeta<Tab>
 ---@field private m_name string
+---@field private m_id joaat_t
 ---@field private m_selected_tab_name string
 ---@field private m_callback? GuiCallback
 ---@field private m_subtabs? table<string, Tab>
@@ -34,6 +35,7 @@ function Tab.new(name, drawable, subtabs, isTranslatorLabel)
 	return setmetatable(
 		{
 			m_name                 = name,
+			m_id                   = joaat(name),
 			m_callback             = drawable,
 			m_subtabs              = subtabs or {},
 			m_has_error            = false,
@@ -101,6 +103,15 @@ end
 ---@return string
 function Tab:GetName()
 	return self.m_has_translator_label and _T(self.m_name) or self.m_name
+end
+
+---@return joaat_t
+function Tab:GetID()
+	if (not self.m_id) then
+		self.m_id = joaat(self.m_name)
+	end
+
+	return self.m_id
 end
 
 ---@return GuiCallback
@@ -265,6 +276,7 @@ function Tab:Notify(fmt, ...)
 	Notifier:ShowMessage(self:GetName(), msg, false, 5)
 end
 
+---@parivate
 function Tab:DrawInternal()
 	if (not self.m_callback) then
 		return
@@ -276,9 +288,11 @@ function Tab:DrawInternal()
 			ImGui.Spacing()
 			ImGui.BulletText("Traceback most recent call:") -- not an actual trace because Lua's debug is disabled in this sandbox
 			ImGui.Indent()
+			ImGui.PushTextWrapPos()
 			ImGui.TextColored(1, 0, 0, 1, self.m_traceback)
+			ImGui.PopTextWrapPos()
 			ImGui.Unindent()
-			if (GUI:Button("Copy Trace")) then
+			if (ImGui.Button("Copy Trace")) then
 				ImGui.SetClipboardText(self.m_traceback)
 			end
 		end
@@ -300,27 +314,29 @@ function Tab:Draw()
 		return
 	end
 
-	ImGui.BeginTabBar(_F("##sutab_selector%s", self.m_name))
-	if (ImGui.BeginTabItem(self:GetName())) then
-		self:DrawInternal()
-		ImGui.EndTabItem()
-	end
-
-	for _, tab in pairs(self.m_subtabs) do
-		local label = tab:GetName()
-		if (ImGui.BeginTabItem(label)) then
-			if (tab:HasSubtabs()) then
-				ImGui.EndTabItem()
-				ImGui.EndTabBar()
-				tab:Draw()
-				return
-			end
-
-			tab:DrawInternal()
+	local __next = nil
+	if (ImGui.BeginTabBar("ss_tabs")) then
+		local __label = _F("%s##%d", self:GetName(), self:GetID())
+		if (ImGui.BeginTabItem(__label)) then
+			self:DrawInternal()
 			ImGui.EndTabItem()
 		end
+
+		for _, tab in pairs(self.m_subtabs) do
+			local label = _F("%s##%d", tab:GetName(), tab:GetID())
+			if (ImGui.BeginTabItem(label)) then
+				if (tab:HasSubtabs()) then
+					__next = tab
+				else
+					tab:DrawInternal()
+				end
+				ImGui.EndTabItem()
+			end
+		end
+		ImGui.EndTabBar()
 	end
-	ImGui.EndTabBar()
+
+	if (__next) then __next:Draw() end
 end
 
 return Tab

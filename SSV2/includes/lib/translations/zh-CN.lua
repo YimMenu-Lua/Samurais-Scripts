@@ -678,5 +678,9 @@ return {
 	["YH_TP_FACILITY"] = "传送到设施",
 	["YH_DDAY_HELP2_FMT"] = "按“%s”按钮，然后呼叫莱斯特取消世界末日的所有 3 次抢劫。",
 	["YH_DDAY_HELP1"] = "如果你没有玩过末日主机，这个方法很有必要。如果您已经作为主持人玩过并完成了一些抢劫，请跳过此步骤。",
-	["YH_FACILITY_NOT_OWNED"] = "购买设施来访问末日抢劫。"
+	["YH_FACILITY_NOT_OWNED"] = "购买设施来访问末日抢劫。",
+	["GENERIC_LOADED"] = "已加载。",
+	["SETTINGS_GAME_LANGUAGE"] = "使用游戏语言",
+	["GENERIC_RELOADED"] = "重新加载。",
+	["SETTINGS_GAME_LANGUAGE_TT"] = "使用当前选择的游戏语言。"
 }

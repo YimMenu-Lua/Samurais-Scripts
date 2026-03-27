@@ -11,7 +11,7 @@
 ---@field predicate? Predicate<StateMachine, table|metatable|userdata|lightuserdata>
 ---@field interval? seconds
 ---@field callback? fun(self: StateMachine, context: table|metatable|userdata|lightuserdata)
-local StateMachineParams = {}
+
 
 ---@class StateMachine
 ---@field private m_is_active boolean
@@ -33,11 +33,11 @@ setmetatable(StateMachine, {
 ---@param opts StateMachineParams
 function StateMachine:new(opts)
 	return setmetatable({
-		m_predicate = opts.predicate,
-		m_interval = opts.interval or 0,
-		m_callback = opts.callback,
-		m_is_active = false,
-		m_is_toggled = false,
+		m_predicate   = opts.predicate,
+		m_interval    = opts.interval or 0,
+		m_callback    = opts.callback,
+		m_is_active   = false,
+		m_is_toggled  = false,
 		m_next_update = 0
 		---@diagnostic disable-next-line
 	}, StateMachine)
@@ -48,20 +48,21 @@ function StateMachine:Update(context)
 	local should_be_active = not self.m_predicate or self:m_predicate(context)
 
 	if (not should_be_active) then
-		self.m_is_active = false
+		self.m_is_active  = false
 		self.m_is_toggled = false
 		return
 	end
 
+	local now = Time.Now()
 	if (not self.m_is_active) then
-		self.m_is_active = true
-		self.m_is_toggled = false
-		self.m_next_update = Time.Now() + self.m_interval
+		self.m_is_active   = true
+		self.m_is_toggled  = false
+		self.m_next_update = now + self.m_interval
 	end
 
-	if (Time.Now() >= self.m_next_update) then
-		self.m_is_toggled = not self.m_is_toggled
-		self.m_next_update = Time.Now() + self.m_interval
+	if (now >= self.m_next_update) then
+		self.m_is_toggled  = not self.m_is_toggled
+		self.m_next_update = now + self.m_interval
 	end
 
 	if (self.m_is_toggled and self.m_callback) then
@@ -72,7 +73,7 @@ end
 -- Manual
 
 function StateMachine:Activate()
-	self.m_is_active = true
+	self.m_is_active   = true
 	self.m_next_update = Time.Now()
 end
 

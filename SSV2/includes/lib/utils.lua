@@ -26,6 +26,17 @@ yield     = coroutine.yield
 sleep     = Time.Sleep
 _F        = string.format
 
+-- Wrapper for `Translator:Translate`
+---@param label string
+---@return string
+function _T(label)
+	if (not Translator) then
+		return label
+	end
+
+	return Translator:Translate(label)
+end
+
 -- Lua version of Bob Jenskins' "Jenkins One At A Time" hash function
 --
 -- https://en.wikipedia.org/wiki/Jenkins_hash_function
@@ -102,12 +113,12 @@ function IsInstance(obj, T)
 
 	local obj_type <const> = type(obj)
 	local T_type <const>   = type(T)
-	if (T_type == "string" and T == "pointer" and obj_type == "userdata") then
-		return (type(obj.rip) == "function")
-	end
+	local obj_mt           = getmetatable(obj)
+	local T_mt             = getmetatable(T)
 
-	local obj_mt = getmetatable(obj)
-	local T_mt   = getmetatable(T)
+	if (T_type == "string" and T == "pointer" and obj_type == "userdata") then
+		return (obj_mt and type(obj_mt.rip) == "function" or false)
+	end
 
 	if (T_type == "table") then
 		if (obj_type == "userdata" and T.__type == "vec3") then
@@ -1040,10 +1051,11 @@ function table.swap(inTable, outTable)
 	end
 end
 
----@param t table
+-- Overwrites `this` table with `src` table.
+---@param this table
 ---@param src table
 ---@param seen? table
-function table.overwrite(t, src, seen)
+function table.overwrite(this, src, seen)
 	seen = seen or {}
 	if (seen[src]) then
 		return
@@ -1051,20 +1063,20 @@ function table.overwrite(t, src, seen)
 
 	seen[src] = true
 
-	for k in pairs(t) do
+	for k in pairs(this) do
 		if (src[k] == nil) then
-			t[k] = nil
+			this[k] = nil
 		end
 	end
 
 	for k, v in pairs(src) do
 		if (type(v) == "table") then
-			if (type(t[k]) ~= "table") then
-				t[k] = {}
+			if (type(this[k]) ~= "table") then
+				this[k] = {}
 			end
-			table.overwrite(t[k], v, seen)
+			table.overwrite(this[k], v, seen)
 		else
-			t[k] = v
+			this[k] = v
 		end
 	end
 end
@@ -1523,6 +1535,16 @@ function string.titlecase(str)
 	end))
 end
 
+---@return string
+function string.pascalcase(str)
+	return str:lower():gsub("%_+", " "):gsub("%-+", ""):titlecase():gsub("%s+", "")
+end
+
+---@return string
+function string.snakecase(str)
+	return str:lower():gsub("[%s%-]", "_")
+end
+
 ---@param value number|string
 ---@return string
 function string.formatint(value)
@@ -1570,14 +1592,18 @@ function math.round(n, x)
 	return tonumber(string.format("%." .. (x or 0) .. "f", n)) or 0
 end
 
----@param ... any
+---@param ... any Varargs or array of numbers.
 ---@return number
 function math.sum(...)
 	local result = 0
-	local args = type(...) == "table" and ... or { ... }
+	local args   = type(...) == "table" and ... or { ... }
+	local __len  = #args
+	if (__len == 0) then
+		return 0
+	end
 
-	for i = 1, table.getlen(args) do
-		if type(args[i]) == "number" then
+	for i = 1, __len do
+		if (type(args[i]) == "number") then
 			result = result + args[i]
 		end
 	end
@@ -1619,16 +1645,16 @@ local INT_SIZES <const>     = {
 }
 local INT_INFERENCE <const> = {
 	["unsigned"] = {
-		{ Cast.AsUint8_t,  "uint8_t" },
-		{ Cast.AsUint16_t, "uint16_t" },
-		{ Cast.AsUint32_t, "uint32_t" },
-		{ Cast.AsUint64_t, "uint64_t" },
+		{ Cast.AsUint8,  "uint8_t" },
+		{ Cast.AsUint16, "uint16_t" },
+		{ Cast.AsUint32, "uint32_t" },
+		{ Cast.AsUint64, "uint64_t" },
 	},
 	["signed"] = {
-		{ Cast.AsInt8_t,  "int8_t" },
-		{ Cast.AsInt16_t, "int16_t" },
-		{ Cast.AsInt32_t, "int32_t" },
-		{ Cast.AsInt64_t, "int64_t" },
+		{ Cast.AsInt8,  "int8_t" },
+		{ Cast.AsInt16, "int16_t" },
+		{ Cast.AsInt32, "int32_t" },
+		{ Cast.AsInt64, "int64_t" },
 	}
 }
 ---@param n integer
@@ -1672,14 +1698,14 @@ function math.lerp(a, b, t)
 	return a + (b - a) * math.clamp(t, 0, 1)
 end
 
--- Generates a trianguar wave oscillating between 1 and -1
+-- Generates a triangular wave oscillating between 1 and -1
 ---@param t number
 ---@return number
 function math.tent(t)
 	return 2 * math.abs(2 * (t - math.floor(t + 0.5))) - 1
 end
 
--- 3x²-2x²
+-- 3x² - 2x²
 ---@param x number
 ---@return number
 function math.smooth_step(x)

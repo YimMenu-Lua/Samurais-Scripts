@@ -195,11 +195,7 @@ end
 ---@return boolean, hash
 function LocalPlayer:IsUsingVehicleMG()
 	local veh = self:GetVehiclePlayerIsIn()
-	if (not veh or not veh:IsValid()) then
-		return false, 0
-	end
-
-	if (not veh:IsWeaponized()) then
+	if (not veh or not veh:IsValid() or not veh:IsWeaponized()) then
 		return false, 0
 	end
 
@@ -213,11 +209,11 @@ function LocalPlayer:IsUsingVehicleMG()
 		return false, 0
 	end
 
-	local effectGroup = cvehicleweaponinfo.m_effect_group:get_int()
 	local weaponHash  = cvehicleweaponinfo.m_name_hash:get_dword()
+	local effectGroup = cvehicleweaponinfo.m_effect_group:get_int()
 
 	-- we specifically want to return zero for the weapon hash if false
-	if (effectGroup ~= Enums.eWeaponEffectGroup.VehicleMG or weaponHash == 0) then
+	if (weaponHash == 0 or effectGroup ~= Enums.eWeaponEffectGroup.VehicleMG) then
 		return false, 0
 	end
 
@@ -228,7 +224,7 @@ end
 --
 -- If true, returns `true` and the `weapon hash`; else returns `false` and `0`.
 ---@return boolean, hash
-function LocalPlayer:IsUsingAirctaftMG()
+function LocalPlayer:IsUsingAircraftMG()
 	local veh = self:GetVehiclePlayerIsIn()
 	if (not veh or not veh:IsAircraft()) then
 		return false, 0
@@ -237,15 +233,16 @@ function LocalPlayer:IsUsingAirctaftMG()
 	return self:IsUsingVehicleMG()
 end
 
+---@return boolean
 function LocalPlayer:IsBeingArrested()
 	return PLAYER.IS_PLAYER_BEING_ARRESTED(self:GetPlayerID(), true)
 end
 
 -- Teleports local player to the provided coordinates.
 ---@param where (integer|vec3)? -- [blip ID](https://wiki.rage.mp/wiki/Blips) or vector3 coordinates
----@param keep_vehicle? boolean
+---@param keepVehicle? boolean
 ---@param loadGround? boolean
-function LocalPlayer:Teleport(where, keep_vehicle, loadGround)
+function LocalPlayer:Teleport(where, keepVehicle, loadGround)
 	ThreadManager:Run(function()
 		if (not self:IsOutside()) then
 			Notifier:ShowError(_T("GENERIC_TELEPORT"), _T("GENERIC_TP_INTERIOR_ERR"))
@@ -258,7 +255,7 @@ function LocalPlayer:Teleport(where, keep_vehicle, loadGround)
 			return
 		end
 
-		if (not keep_vehicle and not LocalPlayer:IsOnFoot()) then
+		if (not keepVehicle and not LocalPlayer:IsOnFoot()) then
 			TASK.CLEAR_PED_TASKS_IMMEDIATELY(LocalPlayer:GetHandle())
 			sleep(50)
 		end
@@ -456,7 +453,7 @@ end
 function LocalPlayer:SetMovementClipset(data, isJson)
 	local mvmtclipset = isJson and data.Name or data.mvmt
 
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		self:ResetMovementClipsets()
 		s:sleep(100)
 
@@ -524,6 +521,8 @@ Backend:RegisterEventCallbackAll(function()
 end)
 
 ThreadManager:RegisterLooped("SS_PV_HANDLER", function()
+	yield()
+
 	if (LocalPlayer.m_vehicle and LocalPlayer.m_vehicle:IsValid()) then
 		if (LocalPlayer:IsOnFoot()) then
 			LocalPlayer:OnVehicleExit()

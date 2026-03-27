@@ -678,5 +678,9 @@ return {
 	["YH_DDAY_FORCE"] = "WYMUŚ RESET",
 	["YH_DDAY_HELP2_FMT"] = "Naciśnij przycisk „%s”, a następnie zadzwoń do Lestera, aby anulował wszystkie 3 napady na Dzień Sądu.",
 	["YH_DDAY_HELP1"] = "Ta metoda jest konieczna, jeśli nigdy nie grałeś w Doomsday jako gospodarz. Jeśli grałeś już i ukończyłeś kilka napadów jako gospodarz, pomiń ten krok.",
-	["YH_TP_FACILITY"] = "Teleportuj się do obiektu"
+	["YH_TP_FACILITY"] = "Teleportuj się do obiektu",
+	["GENERIC_LOADED"] = "Załadowany.",
+	["SETTINGS_GAME_LANGUAGE_TT"] = "Użyj aktualnie wybranego języka gry.",
+	["SETTINGS_GAME_LANGUAGE"] = "Użyj języka gry",
+	["GENERIC_RELOADED"] = "Załadowano ponownie."
 }

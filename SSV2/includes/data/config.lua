@@ -14,7 +14,8 @@ local Config <const> = {
 		auto_cleanup_entities = false,
 		language_index = 1,
 		language_code = "en-US",
-		language_name = "English"
+		language_name = "English",
+		use_game_language = false
 	},
 	ui = {
 		disable_tooltips = false,

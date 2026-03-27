@@ -7,10 +7,12 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local ThemeManager  = require("includes.services.ThemeManager")
-local selectedTheme = ThemeManager:GetCurrentTheme()
-local newThemeBuff  = selectedTheme:Copy()
-local cfgReset      = {
+local ThemeManager    = require("includes.services.ThemeManager")
+local LOCALES <const> = Translator.locales
+local selectedTheme
+local newThemeBuff
+
+local cfgReset        = {
 	---@type Set<string>
 	exceptions = Set.new("backend.debug_mode"),
 	excToggles = {
@@ -23,14 +25,13 @@ local cfgReset      = {
 	},
 	open = false,
 }
-local themeEditor   = {
+local themeEditor     = {
 	shouldDraw      = false,
 	liveEdit        = false,
 	shouldFocusName = false,
 	valid           = true,
 	errors          = {}
 }
-newThemeBuff.Name   = ""
 
 local function onConfigReset()
 	for _, v in pairs(cfgReset.excToggles) do
@@ -44,29 +45,38 @@ local function drawGeneralSettings()
 	GVars.backend.auto_cleanup_entities = GUI:CustomToggle(_T("SETTINGS_ENTITY_REPLACE"),
 		GVars.backend.auto_cleanup_entities
 	)
-	GUI:Tooltip(_T("SETTINGS_ENTITY_REPLACE_TT"))
+	GUI:HelpMarker(_T("SETTINGS_ENTITY_REPLACE_TT"))
 
-	ImGui.Spacing()
-	ImGui.BulletText(_F("%s: %s (%s)", _T("SETTINGS_LANGUAGE"), GVars.backend.language_name, GVars.backend.language_code))
-	ImGui.Spacing()
+	if (Translator and Translator:IsReady()) then
+		GUI:HeaderText(_T("SETTINGS_LANGUAGE"), { separator = true, spacing = true })
 
-	if ImGui.BeginCombo("##langs", _F("%s (%s)",
-			Translator.locales[GVars.backend.language_index].name,
-			Translator.locales[GVars.backend.language_index].iso
-		)) then
-		for i, lang in ipairs(Translator.locales) do
-			local is_selected = (i == GVars.backend.language_index)
-			if (ImGui.Selectable(_F("%s (%s)", lang.name, lang.iso), is_selected)) then
-				GVars.backend.language_index = i
-				GVars.backend.language_name  = lang.name
-				GVars.backend.language_code  = lang.iso
+		ImGui.BeginDisabled(not Translator:CanReload())
+		GVars.backend.use_game_language = GUI:CustomToggle(_T("SETTINGS_GAME_LANGUAGE"),
+			GVars.backend.use_game_language,
+			{ onClick = function() Translator.wants_reload = true end, }
+		)
+		ImGui.EndDisabled()
+		GUI:HelpMarker(_T("SETTINGS_GAME_LANGUAGE_TT"))
+
+		ImGui.Spacing()
+		ImGui.BeginDisabled(GVars.backend.use_game_language)
+		if (ImGui.BeginCombo("##langs", _F("%s (%s)", GVars.backend.language_name or "English", GVars.backend.language_code or "en-US"))) then
+			for i, lang in ipairs(LOCALES) do
+				local idx         = GVars.backend.language_index
+				local is_selected = (i == idx)
+				if (ImGui.Selectable(_F("%s (%s)", lang.name, lang.iso), is_selected)) then
+					GVars.backend.language_index = i
+					GVars.backend.language_name  = lang.name
+					GVars.backend.language_code  = lang.iso
+				end
 			end
+			ImGui.EndCombo()
 		end
-		ImGui.EndCombo()
+		ImGui.EndDisabled()
 	end
 
 	ImGui.Spacing()
-
+	ImGui.Separator()
 	if ImGui.Button(_T("SETTINGS_CFG_RESET")) then
 		cfgReset.open = true
 	end
@@ -105,11 +115,10 @@ local function drawGeneralSettings()
 			end, function()
 				cfgReset.exceptions:Clear()
 				onConfigReset()
-			end)
+			end, true)
 			ImGui.End()
 		end
 	end
-	ImGui.Dummy(1, 10)
 end
 
 local function drawThemeSettings()
@@ -119,7 +128,6 @@ local function drawThemeSettings()
 
 	if (ImGui.Begin("##new_theme",
 			ImGuiWindowFlags.NoTitleBar
-			| ImGuiWindowFlags.NoMove
 			| ImGuiWindowFlags.NoResize
 			| ImGuiWindowFlags.AlwaysAutoResize
 		)) then
@@ -148,7 +156,7 @@ local function drawThemeSettings()
 				newThemeBuff.Name = ""
 				themeEditor.shouldFocusName = false
 			end
-			newThemeBuff.Name, _ = ImGui.InputText(_T("SETTINGS_NEW_THEME_NAME"), newThemeBuff.Name, 128)
+			newThemeBuff.Name, _  = ImGui.InputText(_T("SETTINGS_NEW_THEME_NAME"), newThemeBuff.Name, 128)
 			Backend.disable_input = ImGui.IsItemActive()
 
 			ImGui.Spacing()
@@ -205,8 +213,9 @@ local function drawThemeSettings()
 				else
 					themeEditor.valid, themeEditor.errors = newThemeBuff:ValidateVisibility()
 					if (themeEditor.valid) then
-						ThemeManager:AddNewTheme(newThemeBuff:Copy())
-						selectedTheme          = newThemeBuff:Copy()
+						local themeCopy = newThemeBuff:Copy()
+						ThemeManager:AddNewTheme(themeCopy, themeEditor.liveEdit)
+						selectedTheme          = themeCopy
 						themeEditor.shouldDraw = false
 						newThemeBuff:Clear()
 					else
@@ -306,7 +315,8 @@ local function drawGuiSettings()
 				ImGui.PopStyleVar()
 				GUI:ShowWindowHeightLimit()
 			end,
-			ImGui.CloseCurrentPopup
+			ImGui.CloseCurrentPopup,
+			true
 		)
 		ImGui.EndPopup()
 	end
@@ -346,14 +356,18 @@ local function drawGuiSettings()
 	end
 
 	ImGui.BeginDisabled()
-	GVars.ui.window_pos.x, _ = ImGui.SliderFloat(_T("SETTINGS_WINDOW_POS_X"), GVars.ui.window_pos.x, 0, resolution.x)
-	GUI:Tooltip(_T("SETTINGS_WINDOW_POS_TT"))
-	GVars.ui.window_pos.y, _ = ImGui.SliderFloat(_T("SETTINGS_WINDOW_POS_Y"), GVars.ui.window_pos.y, 0, resolution.y)
-	GUI:Tooltip(_T("SETTINGS_WINDOW_POS_TT"))
+	GVars.ui.window_pos.x = ImGui.SliderFloat(_T("SETTINGS_WINDOW_POS_X"), GVars.ui.window_pos.x, 0, resolution.x)
 	ImGui.EndDisabled()
+	GUI:Tooltip(_T("SETTINGS_WINDOW_POS_TT"))
+
+	ImGui.BeginDisabled()
+	GVars.ui.window_pos.y = ImGui.SliderFloat(_T("SETTINGS_WINDOW_POS_Y"), GVars.ui.window_pos.y, 0, resolution.y)
+	ImGui.EndDisabled()
+	GUI:Tooltip(_T("SETTINGS_WINDOW_POS_TT"))
 
 	ImGui.Spacing()
 	GUI:HeaderText(_T("SETTINGS_WINDOW_STYLE"), { separator = true })
+	selectedTheme = selectedTheme or ThemeManager:GetCurrentTheme()
 
 	GVars.ui.style.bg_alpha, _ = ImGui.SliderFloat(_T("SETTINGS_WINDOW_ALPHA"), GVars.ui.style.bg_alpha, 0.01, 1.0)
 	ImGui.SameLine()
@@ -363,9 +377,9 @@ local function drawGuiSettings()
 		for _, theme in pairs(ThemeManager:GetAllThemes()) do
 			local name        = theme.Name or ""
 			local is_selected = selectedTheme and selectedTheme.Name == name or false
-			local is_json     = theme.JSON or false
+			local is_json     = theme.JSON == true
 			if (is_json) then
-				name = _F("[*] %s", name)
+				name = _F("{..} %s", name)
 			end
 
 			if (ImGui.Selectable(name, is_selected)) then
@@ -383,8 +397,13 @@ local function drawGuiSettings()
 
 			if (ImGui.BeginPopup(name)) then
 				if (ImGui.MenuItem(_T("GENERIC_DELETE"))) then
+					if (theme.Name == (ThemeManager:GetCurrentTheme()).Name) then
+						local default = ThemeManager:GetDefaultTheme()
+						ThemeManager:SetCurrentTheme(default)
+						selectedTheme = default
+					end
+
 					ThemeManager:RemoveTheme(theme)
-					selectedTheme = ThemeManager:GetCurrentTheme()
 				end
 				ImGui.EndPopup()
 			end

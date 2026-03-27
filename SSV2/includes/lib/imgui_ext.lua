@@ -120,10 +120,10 @@ end
 
 ---@param text string
 ---@param width float
----@return string
+---@return string, boolean
 function ImGui.TrimTextToWidth(text, width)
 	if (ImGui.CalcTextSize(text) < width) then
-		return text
+		return text, false
 	end
 
 	local ellipsis  = "."
@@ -143,7 +143,7 @@ function ImGui.TrimTextToWidth(text, width)
 		trimmed = trimmed:sub(1, -2)
 	end
 
-	return _F("%s%s", trimmed, ellipsis)
+	return _F("%s%s", trimmed, ellipsis), true
 end
 
 ---@param text string

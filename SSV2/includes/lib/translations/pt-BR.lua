@@ -678,5 +678,9 @@ return {
 	["YH_TP_FACILITY"] = "Teleporte para a instalação",
 	["YH_FACILITY_NOT_OWNED"] = "Compre uma instalação para acessar The Doomsday Heist.",
 	["YH_DDAY_HELP1"] = "Este método é necessário se você nunca jogou Doomsday como anfitrião. Se você já jogou e completou alguns assaltos como anfitrião, pule esta etapa.",
-	["YH_DDAY_HELP2_FMT"] = "Pressione o botão '%s' e ligue para Lester para cancelar todos os 3 assaltos do Doomsday."
+	["YH_DDAY_HELP2_FMT"] = "Pressione o botão '%s' e ligue para Lester para cancelar todos os 3 assaltos do Doomsday.",
+	["GENERIC_LOADED"] = "Carregado.",
+	["GENERIC_RELOADED"] = "Recarregado.",
+	["SETTINGS_GAME_LANGUAGE_TT"] = "Use o idioma do jogo atualmente selecionado.",
+	["SETTINGS_GAME_LANGUAGE"] = "Use a linguagem do jogo"
 }

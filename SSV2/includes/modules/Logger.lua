@@ -7,10 +7,6 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-if (not Backend or (Backend:GetAPIVersion() ~= Enums.eAPIVersion.L54)) then
-	return
-end
-
 ---@alias LogLevel string
 ---|"trace"
 ---|"debug"
@@ -130,13 +126,13 @@ function Logger.new(name, options)
 	options = options or {}
 
 	local instance = {
-		name = name or "Logger",
-		level = LEVELS[options.level or "debug"] or LEVELS.debug,
+		name          = name or "Logger",
+		level         = LEVELS[options.level or "debug"] or LEVELS.debug,
 		use_timestamp = options.use_timestamp ~= false,
-		use_caller = options.use_caller ~= false,
-		use_colors = options.use_colors or false,
-		file_path = options.file or nil,
-		max_size = options.max_size or nil
+		use_caller    = options.use_caller ~= false,
+		use_colors    = options.use_colors or false,
+		file_path     = options.file or nil,
+		max_size      = options.max_size or nil
 	}
 
 	return setmetatable(instance, Logger)

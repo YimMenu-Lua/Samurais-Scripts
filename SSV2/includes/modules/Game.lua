@@ -37,33 +37,22 @@ Game.__index = Game
 
 ---@return VersionInfo
 function Game.GetVersion()
-	return Memory:GetGameVersion()
+	return GPointers.GameVersion
 end
 
 ---@return vec2
 function Game.GetScreenResolution()
-	return Memory:GetScreenResolution() or vec2:zero()
+	return GPointers.ScreenResolution
 end
 
----@return string, string
+---@return integer, string, string
 function Game.GetLanguage()
-	local lang_iso = "en-US"
-	local lang_name = "English"
-	local i_LangID = LOCALIZATION.GET_CURRENT_LANGUAGE()
+	local idx  = LOCALIZATION.GET_CURRENT_LANGUAGE()
+	local _t   = Refs.locales[idx]
+	local iso  = _t.iso or "en-US"
+	local name = _t.name or "English"
 
-	for _, _lang in ipairs(Refs.locales) do
-		if i_LangID == _lang.id then
-			lang_iso = _lang.iso
-			lang_name = _lang.name
-			break
-		end
-	end
-
-	if lang_iso == "es-MX" then
-		lang_iso = "es-ES"
-	end
-
-	return lang_iso, lang_name
+	return idx, iso, name
 end
 
 ---@return float
@@ -106,7 +95,6 @@ end
 
 ---@return boolean
 function Game.IsInNetworkTransition()
-	-- PlayerSwitch is invalid here as it will return true in Single Player
 	return script.is_active("maintransition")
 end
 

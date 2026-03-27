@@ -678,5 +678,9 @@ return {
 	["YH_DDAY_FORCE"] = "強制リセット",
 	["YH_DDAY_HELP1"] = "この方法は、ホストとして Doomsday をプレイしたことがない場合に必要です。すでにホストとしてプレイし、いくつかの強盗を完了している場合は、このステップをスキップしてください。",
 	["YH_FACILITY_NOT_OWNED"] = "施設を購入してThe Doomsday Heistにアクセスしてください。",
-	["YH_DDAY_HELP2_FMT"] = "「%s」ボタンを押してから、レスターに電話して、ドゥームズデイの 3 つの強盗をすべてキャンセルしてください。"
+	["YH_DDAY_HELP2_FMT"] = "「%s」ボタンを押してから、レスターに電話して、ドゥームズデイの 3 つの強盗をすべてキャンセルしてください。",
+	["GENERIC_LOADED"] = "ロードされました。",
+	["SETTINGS_GAME_LANGUAGE"] = "ゲーム言語を使用する",
+	["GENERIC_RELOADED"] = "リロードされました。",
+	["SETTINGS_GAME_LANGUAGE_TT"] = "現在選択されているゲーム言語を使用します。"
 }

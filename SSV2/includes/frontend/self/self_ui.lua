@@ -30,11 +30,8 @@ local playerAbilitiesWindow = {
 
 local function CheckIfRagdollBlocked()
 	ThreadManager:Run(function()
-		if (LocalPlayer:IsOnFoot() and not PED.CAN_PED_RAGDOLL(LocalPlayer:GetHandle())) then
-			Notifier:ShowWarning(
-				"Samurais Scripts",
-				_T("SELF_RAGDOLL_BLOCK_INFO")
-			)
+		if (LocalPlayer:IsOnFoot() and not LocalPlayer:IsRagdoll() and not LocalPlayer:CanRagdoll()) then
+			Notifier:ShowWarning("Samurais Scripts", _T("SELF_RAGDOLL_BLOCK_INFO"))
 		end
 	end)
 end

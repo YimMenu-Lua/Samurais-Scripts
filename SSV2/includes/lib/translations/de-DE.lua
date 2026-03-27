@@ -678,5 +678,9 @@ return {
 	["YH_DDAY_FORCE"] = "Zurücksetzen erzwingen",
 	["YH_DDAY_HELP1"] = "Diese Methode ist notwendig, wenn Sie Doomsday noch nie als Moderator gespielt haben. Wenn Sie als Gastgeber bereits einige Raubüberfälle gespielt und abgeschlossen haben, überspringen Sie diesen Schritt.",
 	["YH_FACILITY_NOT_OWNED"] = "Kaufen Sie eine Einrichtung, um auf The Doomsday Heist zuzugreifen.",
-	["YH_DDAY_HELP2_FMT"] = "Drücken Sie die Schaltfläche „%s“ und rufen Sie dann Lester an, um alle drei Raubüberfälle für Doomsday abzubrechen."
+	["YH_DDAY_HELP2_FMT"] = "Drücken Sie die Schaltfläche „%s“ und rufen Sie dann Lester an, um alle drei Raubüberfälle für Doomsday abzubrechen.",
+	["GENERIC_LOADED"] = "Geladen.",
+	["GENERIC_RELOADED"] = "Neu geladen.",
+	["SETTINGS_GAME_LANGUAGE"] = "Verwenden Sie die Spielsprache",
+	["SETTINGS_GAME_LANGUAGE_TT"] = "Verwenden Sie die aktuell ausgewählte Spielsprache."
 }

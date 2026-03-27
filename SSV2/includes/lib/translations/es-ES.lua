@@ -678,5 +678,9 @@ return {
 	["YH_FACILITY_NOT_OWNED"] = "Compra una instalación para acceder a The Doomsday Heist.",
 	["YH_DDAY_FORCE"] = "FORZAR RESET",
 	["YH_TP_FACILITY"] = "Teletransportarse a la instalación",
-	["YH_DDAY_HELP2_FMT"] = "Presiona el botón '%s', luego llama a Lester para cancelar los 3 atracos de Doomsday."
+	["YH_DDAY_HELP2_FMT"] = "Presiona el botón '%s', luego llama a Lester para cancelar los 3 atracos de Doomsday.",
+	["GENERIC_LOADED"] = "Cargado.",
+	["GENERIC_RELOADED"] = "Recargado.",
+	["SETTINGS_GAME_LANGUAGE"] = "Usar lenguaje de juego",
+	["SETTINGS_GAME_LANGUAGE_TT"] = "Usa el idioma del juego seleccionado actualmente."
 }
