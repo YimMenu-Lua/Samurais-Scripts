@@ -56,7 +56,7 @@ GPointers:Init()
 Serializer:FlushObjectQueue()
 Backend:RegisterHandlers()
 Translator:Load()
-GUI:init()
+GUI:LateInit()
 
 ThreadManager:Run(function()
 	for name, cmd in pairs(commandRegistry) do

@@ -1641,7 +1641,7 @@ function Vehicle:SaveToJSON(name)
 		mods = mods
 	}
 
-	Serializer:WriteToFile(t, filename)
+	Serializer:WriteToFile(filename, t)
 	self:notify("Saved vehicle to '%s'", filename)
 end
 

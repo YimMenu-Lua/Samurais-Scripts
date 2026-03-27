@@ -29,60 +29,108 @@ local GameLangToCustom <const>  = {
 --------------------------------------
 -- Class: Translator
 --------------------------------------
---**Global Singleton.**
 ---@class Translator
----@field labels table<string, string>
+---@field labels dict<string>
+---@field default_labels dict<string>
 ---@field lang_code string
+---@field locales array<{ name: string, iso: string }>
+---@field wants_reload boolean
 ---@field private m_log_history table
 ---@field private m_cache table<string, table<string, string>>
 ---@field private m_last_load_time TimePoint
+---@field private m_reloading boolean
 ---@field protected m_initialized boolean
-Translator         = {
-	default_labels   = en_loaded and en or {},
-	m_last_load_time = TimePoint.new(),
-	m_cache          = {},
-	locales          = locales_loaded and __locales or { { name = "English", iso = "en-US" } },
-	m_initialized    = false
-}
+local Translator   = {}
 Translator.__index = Translator
 
+---@return Translator
+function Translator:init()
+	if (self.m_initialized) then return self end
+	if (_G.Translator) then return _G.Translator end
+
+	return setmetatable({
+		default_labels   = en_loaded and en or {},
+		locales          = locales_loaded and __locales or { { name = "English", iso = "en-US" } },
+		labels           = {},
+		m_cache          = {},
+		m_log_history    = {},
+		m_last_load_time = TimePoint.new(),
+		m_initialized    = false,
+		m_reloading      = false,
+	}, Translator)
+end
+
 function Translator:MatchGameLanguage()
-	self.m_last_game_lang_idx = LOCALIZATION.GET_CURRENT_LANGUAGE()
-	local idx                 = GameLangToCustom[self.m_last_game_lang_idx] or 1
-	local match               = self.locales[idx]
-	if (not match) then
-		return false
-	end
+	local current = LOCALIZATION.GET_CURRENT_LANGUAGE()
+	local idx     = GameLangToCustom[current] or 1
+	local match   = self.locales[idx]
+
+	if (not match) then return false end
 
 	GVars.backend.language_index = idx
 	GVars.backend.language_code  = match.iso
 	GVars.backend.language_name  = match.name
+
 	return true
 end
 
 function Translator:Load()
 	ThreadManager:Run(function()
 		if (GVars.backend.use_game_language) then
-			self:MatchGameLanguage()
+			if (not self:MatchGameLanguage() and self.m_reloading) then
+				Notifier:ShowError("Translator", "Failed to match game language.")
+				GVars.backend.use_game_language = false
+				return
+			end
 		end
 
 		GVars.backend.language_index = GVars.backend.language_index or 1
 		GVars.backend.language_code  = GVars.backend.language_code or "en-US"
 		GVars.backend.language_name  = GVars.backend.language_name or "English"
-		local iso                    = GVars.backend.language_code
-		local ok, res
 
-		if (iso ~= "en-US") then
-			local path = _F("lib.translations.%s", iso)
+		local ok, res
+		if (GVars.backend.language_code ~= "en-US") then
+			local path = "lib.translations." .. GVars.backend.language_code
 			ok, res = pcall(require, path)
 		end
 
-		self.labels        = (ok and (type(res) == "table")) and res or self.default_labels
-		self.lang_code     = iso
+		local newLabels = (ok and (type(res) == "table")) and res or self.default_labels
+		table.overwrite(self.labels, newLabels)
+
 		self.m_log_history = {}
+		self.m_cache       = {}
+		self.lang_code     = GVars.backend.language_code
 		self.m_initialized = true
+		self.m_reloading   = false
 		self.m_last_load_time:Reset()
 	end)
+end
+
+---@private
+function Translator:Reload()
+	if (not self.m_initialized or not self.m_last_load_time:HasElapsed(3e3)) then -- 3. we have this though so reload can not be called twice. I'm a bit confused
+		return
+	end
+
+	self.m_initialized = false
+	self.m_reloading   = true
+	self:Load()
+	Notifier:ShowMessage("Translator", "Reloaded.")
+end
+
+---@return boolean
+function Translator:IsReady()
+	return self.m_initialized and not self.m_reloading
+end
+
+---@return boolean
+function Translator:IsReloading()
+	return self.m_reloading
+end
+
+---@return boolean
+function Translator:CanReload()
+	return self:IsReady() and self.m_last_load_time:HasElapsed(3e3)
 end
 
 ---@param msg string
@@ -104,31 +152,21 @@ function Translator:Log(message)
 	table.insert(self.m_log_history, message)
 end
 
-function Translator:Reload()
-	if (not self.m_initialized or not self.m_last_load_time:HasElapsed(3e3)) then
-		return
-	end
-
-	-- We can't even unload files because package is fully disabled. loadfile? in your dreams... 🥲
-	self.m_initialized = false
-	self:Load()
-	Notifier:ShowMessage("Translator", "Reloaded.")
-end
-
-function Translator:IsReady()
-	return self.m_initialized
+---@return table<string, table<string, string>>
+function Translator:GetCache()
+	return self.m_cache
 end
 
 ---@param label string
 ---@return string
-function Translator:GetCache(label)
+function Translator:GetCachedLabel(label)
 	self.m_cache[self.lang_code] = self.m_cache[self.lang_code] or {}
 	return self.m_cache[self.lang_code][label]
 end
 
 ---@param label string
 ---@param text string
-function Translator:SetCache(label, text)
+function Translator:CacheLabel(label, text)
 	self.m_cache[self.lang_code] = self.m_cache[self.lang_code] or {}
 	self.m_cache[self.lang_code][label] = text
 end
@@ -137,15 +175,15 @@ end
 ---@param label string
 ---@return string
 function Translator:Translate(label)
+	if (not self:IsReady()) then return "" end
+
 	if (self.lang_code ~= GVars.backend.language_code) then
-		self:Reload()
+		self.wants_reload = true
 		return ""
 	end
 
-	local cached = self:GetCache(label)
-	if (cached) then
-		return cached
-	end
+	local cached = self:GetCachedLabel(label)
+	if (cached) then return cached end
 
 	local text = self.labels[label]
 	if (not text) then
@@ -159,18 +197,9 @@ function Translator:Translate(label)
 		return _F("[!MISSING LABEL]: %s", label)
 	end
 
-	if (not cached) then
-		self:SetCache(label, text)
-	end
+	if (not cached) then self:CacheLabel(label, text) end
 
 	return text
-end
-
--- Wrapper for `Translator:Translate`
----@param label string
----@return string
-function _T(label)
-	return Translator:Translate(label)
 end
 
 -- Translates text using GXTs if expected and available.
@@ -191,3 +220,15 @@ function Translator:TranslateGXTList(labels)
 		labels[k] = self:TranslateGXT(v)
 	end
 end
+
+-- This is called in `Backend`'s main thread.
+function Translator:OnTick()
+	-- currently only handles reload requests.
+
+	if (self.wants_reload and not self:IsReloading()) then
+		self.wants_reload = false
+		self:Reload()
+	end
+end
+
+return Translator:init()

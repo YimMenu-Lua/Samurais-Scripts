@@ -7,11 +7,12 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local ThemeManager = require("includes.services.ThemeManager")
+local ThemeManager    = require("includes.services.ThemeManager")
+local LOCALES <const> = Translator.locales
 local selectedTheme
 local newThemeBuff
 
-local cfgReset     = {
+local cfgReset        = {
 	---@type Set<string>
 	exceptions = Set.new("backend.debug_mode"),
 	excToggles = {
@@ -24,7 +25,7 @@ local cfgReset     = {
 	},
 	open = false,
 }
-local themeEditor  = {
+local themeEditor     = {
 	shouldDraw      = false,
 	liveEdit        = false,
 	shouldFocusName = false,
@@ -49,20 +50,20 @@ local function drawGeneralSettings()
 	if (Translator and Translator:IsReady()) then
 		GUI:HeaderText(_T("SETTINGS_LANGUAGE"), { separator = true, spacing = true })
 
+		ImGui.BeginDisabled(not Translator:CanReload())
 		GVars.backend.use_game_language = GUI:CustomToggle(_T("SETTINGS_GAME_LANGUAGE"),
 			GVars.backend.use_game_language,
-			{ onClick = function() Translator:Reload() end, }
+			{ onClick = function() Translator.wants_reload = true end, }
 		)
+		ImGui.EndDisabled()
 		GUI:HelpMarker(_T("SETTINGS_GAME_LANGUAGE_TT"))
 
 		ImGui.Spacing()
 		ImGui.BeginDisabled(GVars.backend.use_game_language)
-		if ImGui.BeginCombo("##langs", _F("%s (%s)",
-				Translator.locales[GVars.backend.language_index].name,
-				Translator.locales[GVars.backend.language_index].iso
-			)) then
-			for i, lang in ipairs(Translator.locales) do
-				local is_selected = (i == GVars.backend.language_index)
+		if (ImGui.BeginCombo("##langs", _F("%s (%s)", GVars.backend.language_name or "English", GVars.backend.language_code or "en-US"))) then
+			for i, lang in ipairs(LOCALES) do
+				local idx         = GVars.backend.language_index
+				local is_selected = (i == idx)
 				if (ImGui.Selectable(_F("%s (%s)", lang.name, lang.iso), is_selected)) then
 					GVars.backend.language_index = i
 					GVars.backend.language_name  = lang.name
@@ -155,7 +156,7 @@ local function drawThemeSettings()
 				newThemeBuff.Name = ""
 				themeEditor.shouldFocusName = false
 			end
-			newThemeBuff.Name, _ = ImGui.InputText(_T("SETTINGS_NEW_THEME_NAME"), newThemeBuff.Name, 128)
+			newThemeBuff.Name, _  = ImGui.InputText(_T("SETTINGS_NEW_THEME_NAME"), newThemeBuff.Name, 128)
 			Backend.disable_input = ImGui.IsItemActive()
 
 			ImGui.Spacing()
@@ -212,8 +213,9 @@ local function drawThemeSettings()
 				else
 					themeEditor.valid, themeEditor.errors = newThemeBuff:ValidateVisibility()
 					if (themeEditor.valid) then
-						ThemeManager:AddNewTheme(newThemeBuff:Copy())
-						selectedTheme          = newThemeBuff:Copy()
+						local themeCopy = newThemeBuff:Copy()
+						ThemeManager:AddNewTheme(themeCopy, themeEditor.liveEdit)
+						selectedTheme          = themeCopy
 						themeEditor.shouldDraw = false
 						newThemeBuff:Clear()
 					else
@@ -375,9 +377,9 @@ local function drawGuiSettings()
 		for _, theme in pairs(ThemeManager:GetAllThemes()) do
 			local name        = theme.Name or ""
 			local is_selected = selectedTheme and selectedTheme.Name == name or false
-			local is_json     = theme.JSON or false
+			local is_json     = theme.JSON == true
 			if (is_json) then
-				name = _F("[*] %s", name)
+				name = _F("{..} %s", name)
 			end
 
 			if (ImGui.Selectable(name, is_selected)) then
@@ -395,8 +397,13 @@ local function drawGuiSettings()
 
 			if (ImGui.BeginPopup(name)) then
 				if (ImGui.MenuItem(_T("GENERIC_DELETE"))) then
+					if (theme.Name == (ThemeManager:GetCurrentTheme()).Name) then
+						local default = ThemeManager:GetDefaultTheme()
+						ThemeManager:SetCurrentTheme(default)
+						selectedTheme = default
+					end
+
 					ThemeManager:RemoveTheme(theme)
-					selectedTheme = ThemeManager:GetCurrentTheme()
 				end
 				ImGui.EndPopup()
 			end

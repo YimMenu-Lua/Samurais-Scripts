@@ -410,8 +410,26 @@ local function DrawTranslatorDebug()
 	ImGui.TextDisabled("You can switch between available languages in Settings -> General.")
 	ImGui.Spacing()
 
-	if GUI:Button("Reload Translator") then
-		Translator:Reload()
+	ImGui.BulletText(_F("Language Name: %s", GVars.backend.language_name))
+	ImGui.BulletText(_F("ISO: %s", GVars.backend.language_code))
+	ImGui.BulletText(_F("Index: %d", GVars.backend.language_index))
+
+	ImGui.Spacing()
+
+	if (GUI:Button("Reload")) then
+		Translator.wants_reload = true
+	end
+
+	if (GUI:Button("Dump Labels")) then
+		print(Translator.labels)
+	end
+
+	if (GUI:Button("Dump Locales")) then
+		print(Translator.locales)
+	end
+
+	if (GUI:Button("Dump Cache")) then
+		print(Translator:GetCache())
 	end
 end
 
@@ -537,6 +555,8 @@ local function DrawMiscTests()
 			local level = math.random(0, 3)
 			Notifier:Add(label, string.random(), level)
 		end
+
+		Notifier:Add("Callable", string.random(), 0, { callback = function() print("notification callback") end })
 	end
 
 	if (ImGui.Button("Dump CWeaponInfo")) then

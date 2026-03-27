@@ -133,6 +133,9 @@ end
 function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pendingCount, showProgress, progress)
 	pendingCount       = pendingCount or 0
 	ease               = ease or self:GetEaseIn()
+	local isToast      = context == Enums.eNotificationContext.TOAST
+	local isNotif      = not isToast
+	local hasCallback  = isNotif and self.m_callback ~= nil
 	local cardRounding = context == Enums.eNotificationContext.TOAST and 3.0 or 8.0
 	local padding      = 12.0
 	local accentWidth  = 8.0
@@ -154,11 +157,15 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 	local alpha       = 0.0 + ease
 	local cardTL      = vec2:new(cursor.x, cursor.y + slideOffset)
 	local cardBR      = vec2:new(cursor.x + cardWidth, cursor.y + slideOffset + cardHeight)
-	local windowBG    = GVars.ui.style.theme.Colors.WindowBg
+	local frameBG     = GVars.ui.style.theme.Colors.FrameBg
 	local windowAlpha = GVars.ui.style.bg_alpha
-	local notifBG     = Color(windowBG.x, windowBG.y, windowBG.z, windowAlpha * alpha):AsU32()
+	local hovered     = ImGui.IsMouseHoveringRect(cardTL.x, cardTL.y, cardBR.x, cardBR.y)
+	local mainCol     = Color(frameBG.x, frameBG.y, frameBG.z, isNotif and 1 or (windowAlpha * alpha))
+	local method      = ThemeManager:IsBackgroundDark() and Color.Brighten or Color.Darken
+	local notifCol    = (hovered and hasCallback) and method(mainCol, 0.12) or mainCol
+	local notifBG     = notifCol:AsU32()
 
-	if (context == Enums.eNotificationContext.TOAST and pendingCount > 0) then
+	if (isToast and pendingCount > 0) then
 		local stackSpacing = 6.0
 		local maxOffset    = 24.0
 		for i = 1, pendingCount do
@@ -169,7 +176,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 				cardBR.y + ghostOffset - 1,
 				cardBR.x - i + 1,
 				cardBR.y + ghostOffset + 6,
-				ImGui.GetColorU32(windowBG.x, windowBG.y, windowBG.z, windowAlpha - (i * 0.1) * alpha),
+				ImGui.GetColorU32(frameBG.x, frameBG.y, frameBG.z, windowAlpha - (i * 0.1) * alpha),
 				cardRounding + i
 			)
 		end
@@ -212,10 +219,8 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 		notifBG,
 		cardRounding
 	)
-	local hovered    = ImGui.IsMouseHoveringRect(cardTL.x, cardTL.y, cardBR.x, cardBR.y)
-
 	local titlePos   = vec2:new(cardTL.x + padding, cardTL.y + padding)
-	local textCol    = ImGui.GetAutoTextColor(Color(windowBG:unpack()))
+	local textCol    = ImGui.GetAutoTextColor(Color(frameBG:unpack()))
 	local r, g, b, _ = self.m_accent_color:AsFloat()
 	local headerCol  = self.m_level == Enums.eNotificationLevel.MESSAGE and textCol or Color(r, g, b, 1.0 * alpha)
 	ImGui.ImDrawListAddText(
@@ -227,7 +232,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 		self.m_title
 	)
 
-	if (context == Enums.eNotificationContext.CENTER and hovered) then
+	if (isNotif and hovered) then
 		local btnPos = vec2:new(cardBR.x - padding - rightButtonW + 6.0, cardTL.y + padding - 2.0)
 		local btnBR  = vec2:new(btnPos.x + 20.0, btnPos.y + 20.0)
 		local btnBg  = ImGui.GetStyleColorU32(ImGuiCol.Button)
@@ -257,6 +262,14 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 
 			ImGui.SetTooltip(_T("GENERIC_DISMISS"))
 		end
+
+		if (hasCallback) then
+			ImGui.SetTooltip("Click to execute.")
+
+			if (KeyManager:IsKeyJustPressed(eVirtualKeyCodes.VK_LBUTTON)) then
+				self:Invoke()
+			end
+		end
 	end
 
 	local bodyPos = vec2:new(cardTL.x + padding, cardTL.y + padding + titleSize.y + titleSpacing)
@@ -271,7 +284,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 		content_width - (padding * 2.0)
 	)
 
-	if (context == Enums.eNotificationContext.TOAST and showProgress and progress) then
+	if (isToast and showProgress and progress) then
 		local barHeight = 4.0
 		local barW      = cardWidth * (1.0 - progress)
 
@@ -715,6 +728,7 @@ function Notifier:DrawNotifications(start_pos)
 	ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0)
 	ImGui.PushStyleVar(ImGuiStyleVar.ScrollbarSize, 9.0)
 	ImGui.PushStyleColor(ImGuiCol.ScrollbarBg, 0)
+	ImGui.SetNextWindowBgAlpha(0)
 	if (ImGui.Begin("##notif_center",
 			ImGuiWindowFlags.NoMove
 			| ImGuiWindowFlags.NoResize
@@ -724,21 +738,13 @@ function Notifier:DrawNotifications(start_pos)
 		)) then
 		local drawList = ImGui.GetWindowDrawList()
 		local windowBG = vec4:new(ImGui.GetStyleColorVec4(ImGuiCol.WindowBg))
-		local frame    = vec4:new(ImGui.GetStyleColorVec4(ImGuiCol.FrameBg))
-		local contrast = math.abs(frame.x - windowBG.x)
-		if (contrast >= 0.1) then
-			frame.x = frame.x * 0.85
-			frame.y = frame.y * 0.85
-			frame.z = frame.z * 0.85
-			frame.w = frame.w * 0.85
-		end
 		ImGui.ImDrawListAddRectFilled(
 			drawList,
 			window_pos.x + 10,
 			window_pos.y + 10,
 			window_pos.x + self.m_window_width - 10,
 			window_pos.y + height - 10,
-			ImGui.GetColorU32(frame.x, frame.y, frame.z, frame.w),
+			ImGui.GetColorU32(windowBG.x, windowBG.y, windowBG.z, windowBG.w),
 			GVars.ui.style.theme.Styles.WindowRounding or 2
 		)
 
@@ -753,8 +759,10 @@ function Notifier:DrawNotifications(start_pos)
 		ImGui.SetWindowFontScale(0.81)
 		local muteText      = _T(self:IsMuted() and "GENERIC_UNMUTE" or "GENERIC_MUTE")
 		local muteTextWidth = ImGui.CalcTextSize(muteText)
-		local totalWidth    = muteTextWidth + (style.FramePadding.x * (count > 0 and 4 or 2)) +
-			(style.ItemSpacing.x * (count > 0 and 2 or 1))
+		local totalWidth    = muteTextWidth
+			+ (style.FramePadding.x * (count > 0 and 4 or 2))
+			+ (style.ItemSpacing.x * (count > 0 and 2 or 1))
+
 		if (count > 0) then
 			totalWidth = totalWidth + ImGui.CalcTextSize(_T("GENERIC_CLEAR_ALL"))
 		end

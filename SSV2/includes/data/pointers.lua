@@ -21,7 +21,7 @@ PatternScanner = require("includes.services.PatternScanner")
 --
 -- **NOTE:** Please make sure no modules/files try to use a pointer before the scan is complete.
 --
--- You can call `PatternScanner:IsDone()` to double check.
+-- You can call `PatternScanner:IsDone()` to double check.-
 ---@class GPointers
 ---@field ScriptGlobals pointer
 ---@field GameState pointer<byte>
@@ -66,12 +66,10 @@ local mem_batches <const> = {
 			GPointers.ScriptGlobals = ptr:add(0x3):rip()
 		end),
 		MemoryBatch.new("GameVersion", "8B C3 33 D2 C6 44 24 20", function(ptr)
-			local pGameBuild = ptr:add(0x24):rip()
-			local pOnlineVersion = pGameBuild:add(0x20)
-			GPointers.GameVersion = {
-				build  = pGameBuild:get_string(),
-				online = pOnlineVersion:get_string()
-			}
+			local pGameBuild             = ptr:add(0x24):rip()
+			local pOnlineVersion         = pGameBuild:add(0x20)
+			GPointers.GameVersion.build  = pGameBuild:get_string()
+			GPointers.GameVersion.online = pOnlineVersion:get_string()
 		end),
 		MemoryBatch.new("GameState", "81 39 5D 6D FF AF 75 20", function(ptr)
 			GPointers.GameState = ptr:add(0xA):rip():add(0x1)
@@ -80,10 +78,8 @@ local mem_batches <const> = {
 			GPointers.GameTime = ptr:add(0x2):rip()
 		end),
 		MemoryBatch.new("ScreenResolution", "66 0F 6E 0D ? ? ? ? 0F B7 3D", function(ptr)
-			GPointers.ScreenResolution = vec2:new(
-				ptr:sub(0x4):rip():get_word(),
-				ptr:add(0x4):rip():get_word()
-			)
+			GPointers.ScreenResolution.x = ptr:sub(0x4):rip():get_word()
+			GPointers.ScreenResolution.y = ptr:add(0x4):rip():get_word()
 		end),
 
 		-- TODO: enable once dynamic calls become stable. For now either the JIT compiler is broken or I'm just outright stupid.
@@ -103,19 +99,15 @@ local mem_batches <const> = {
 			GPointers.ScriptGlobals = ptr:add(0x7):add(0x3):rip()
 		end),
 		MemoryBatch.new("GameVersion", "4C 8D 0D ? ? ? ? 48 8D 5C 24 ? 48 89 D9 48 89 FA", function(ptr)
-			GPointers.GameVersion = {
-				build  = ptr:add(0x3):rip():get_string(),
-				online = ptr:add(0x47):add(0x3):rip():get_string()
-			}
+			GPointers.GameVersion.build  = ptr:add(0x3):rip():get_string()
+			GPointers.GameVersion.online = ptr:add(0x47):add(0x3):rip():get_string()
 		end),
 		MemoryBatch.new("GameState", "83 3D ? ? ? ? ? 0F 85 ? ? ? ? BA ? 00", function(ptr)
 			GPointers.GameState = ptr:add(0x2):rip():add(0x1)
 		end),
 		MemoryBatch.new("ScreenResolution", "75 39 0F 57 C0 F3 0F 2A 05", function(ptr)
-			GPointers.ScreenResolution = vec2:new(
-				ptr:add(0x5):add(0x4):rip():get_word(),
-				ptr:add(0x1E):add(0x4):rip():get_word()
-			)
+			GPointers.ScreenResolution.x = ptr:add(0x5):add(0x4):rip():get_word()
+			GPointers.ScreenResolution.y = ptr:add(0x1E):add(0x4):rip():get_word()
 		end),
 	},
 	[Enums.eAPIVersion.L54] = { --[[dummy]] },

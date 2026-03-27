@@ -26,6 +26,17 @@ yield     = coroutine.yield
 sleep     = Time.Sleep
 _F        = string.format
 
+-- Wrapper for `Translator:Translate`
+---@param label string
+---@return string
+function _T(label)
+	if (not Translator) then
+		return label
+	end
+
+	return Translator:Translate(label)
+end
+
 -- Lua version of Bob Jenskins' "Jenkins One At A Time" hash function
 --
 -- https://en.wikipedia.org/wiki/Jenkins_hash_function
@@ -1040,10 +1051,11 @@ function table.swap(inTable, outTable)
 	end
 end
 
----@param t table
+-- Overwrites `this` table with `src` table.
+---@param this table
 ---@param src table
 ---@param seen? table
-function table.overwrite(t, src, seen)
+function table.overwrite(this, src, seen)
 	seen = seen or {}
 	if (seen[src]) then
 		return
@@ -1051,20 +1063,20 @@ function table.overwrite(t, src, seen)
 
 	seen[src] = true
 
-	for k in pairs(t) do
+	for k in pairs(this) do
 		if (src[k] == nil) then
-			t[k] = nil
+			this[k] = nil
 		end
 	end
 
 	for k, v in pairs(src) do
 		if (type(v) == "table") then
-			if (type(t[k]) ~= "table") then
-				t[k] = {}
+			if (type(this[k]) ~= "table") then
+				this[k] = {}
 			end
-			table.overwrite(t[k], v, seen)
+			table.overwrite(this[k], v, seen)
 		else
-			t[k] = v
+			this[k] = v
 		end
 	end
 end

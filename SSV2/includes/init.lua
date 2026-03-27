@@ -94,6 +94,7 @@ KeyManager      = require("includes.services.KeyManager"):init()
 GUI             = require("includes.services.GUI")
 Notifier        = require("includes.services.ToastNotifier").new()
 CommandExecutor = require("includes.services.CommandExecutor"):init()
+Translator      = require("includes.services.Translator")
 ----------------------------------------------------------------------------------------------------
 
 
@@ -119,7 +120,6 @@ local packages  = {
 	"modules.LocalPlayer",
 
 	"services.GridRenderer",
-	"services.Translator",
 
 	"frontend.entity_forge_ui",
 	"frontend.bsv2_ui",

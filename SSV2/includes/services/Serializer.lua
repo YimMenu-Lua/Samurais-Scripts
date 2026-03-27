@@ -749,9 +749,9 @@ end
 -- A separate write function that doesn't rely on any setup or state flags.
 --
 -- Do not use it to write to the Serializer's config file.
----@param data any
 ---@param filename string
-function Serializer:WriteToFile(data, filename)
+---@param data any
+function Serializer:WriteToFile(filename, data)
 	if (data == nil) then
 		log.warning("[Serializer]: Invalid data.")
 		return

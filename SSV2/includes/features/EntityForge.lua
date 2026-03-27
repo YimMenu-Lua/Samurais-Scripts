@@ -62,6 +62,7 @@ function EntityForge:init()
 
 	ThreadManager:RegisterLooped("SS_ENTITY_FORGE", function()
 		if (not instance.EntityGunEnabled or not WEAPON.IS_PED_ARMED(LocalPlayer:GetHandle(), 4)) then
+			yield()
 			return
 		end
 

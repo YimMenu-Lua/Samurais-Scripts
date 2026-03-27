@@ -74,9 +74,9 @@ local Backend = {
 
 	---@type table<eEntityType, integer>
 	MaxAllowedEntities       = {
-		[Enums.eEntityType.Ped]     = 50,
-		[Enums.eEntityType.Vehicle] = 25,
-		[Enums.eEntityType.Object]  = 75,
+		[Enums.eEntityType.Ped]     = 25,
+		[Enums.eEntityType.Vehicle] = 15,
+		[Enums.eEntityType.Object]  = 35,
 	},
 }
 Backend.__index = Backend
@@ -493,6 +493,7 @@ function Backend:RegisterHandlers()
 
 		PreviewService:Update()
 		Decorator:CollectGarbage()
+		Translator:OnTick()
 
 		yield()
 	end)

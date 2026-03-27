@@ -14,6 +14,7 @@ local ThemeLibrary <const> = require("includes.data.theme_library")
 
 ---@class ThemeManager
 ---@field private m_current_theme Theme
+---@field private m_stack_depth integer
 ---@field private m_col_stack integer
 ---@field private m_style_stack integer
 ---@field private m_theme_library ThemeLibrary
@@ -22,6 +23,7 @@ local ThemeManager   = {
 	m_current_theme = Theme.new(ThemeLibrary.Tenebris),
 	m_themes_file   = "ss_themes.json",
 	m_theme_library = {},
+	m_stack_depth   = 0,
 }
 ThemeManager.__index = ThemeManager
 
@@ -47,6 +49,10 @@ function ThemeManager:Load()
 
 	GVars.ui.style.theme = current
 	self.m_current_theme = current
+end
+
+function ThemeManager:GetStackDepth()
+	return self.m_stack_depth
 end
 
 ---@param name string
@@ -81,35 +87,45 @@ function ThemeManager:DoesThemeExist(name)
 	return self:GetTheme(name) ~= nil
 end
 
----@return table<string, table>
+---@return boolean
+function ThemeManager:IsBackgroundDark()
+	return ImGui.GetStyleColor(ImGuiCol.WindowBg):IsDark()
+end
+
+---@return table<string, Theme>
 function ThemeManager:ReadThemesJson()
 	if (not io.exists(self.m_themes_file)) then
-		Serializer:WriteToFile({}, self.m_themes_file)
+		Serializer:WriteToFile(self.m_themes_file, {})
 		return {}
 	end
 
+	---@type table<string, Theme>
 	local themes = Serializer:ReadFromFile(self.m_themes_file)
 	if (type(themes) ~= "table") then
 		log.warning("Theme data appears to be corrupted! Returning an empty table.")
-		themes = {}
+		Serializer:WriteToFile(self.m_themes_file, {})
+		return {}
 	end
 
 	return themes
 end
 
 ---@param theme Theme
-function ThemeManager:AddNewTheme(theme)
+---@param apply? boolean
+function ThemeManager:AddNewTheme(theme, apply)
 	if (self:DoesThemeExist(theme.Name)) then
 		return
 	end
 
-	local json_themes                = self:ReadThemesJson()
-	theme.JSON                       = true
-	json_themes[theme.Name]          = theme
-	self.m_theme_library[theme.Name] = theme
+	theme.JSON       = true
+	local lib        = self.m_theme_library
+	local json       = self:ReadThemesJson()
+	local serialized = theme:serialize()
+	json[theme.Name] = serialized
+	lib[theme.Name]  = theme
 
-	Serializer:WriteToFile(json_themes, self.m_themes_file)
-	self:SetCurrentTheme(theme)
+	if (apply) then self:SetCurrentTheme(theme) end
+	Serializer:WriteToFile(self.m_themes_file, json)
 end
 
 ---@param theme Theme
@@ -122,11 +138,12 @@ function ThemeManager:RemoveTheme(theme)
 		self:SetCurrentTheme(self:GetDefaultTheme())
 	end
 
-	local json_themes                = self:ReadThemesJson()
-	json_themes[theme.Name]          = nil
-	self.m_theme_library[theme.Name] = nil
+	local lib        = self.m_theme_library
+	local json       = self:ReadThemesJson()
+	json[theme.Name] = nil
+	lib[theme.Name]  = nil
 
-	Serializer:WriteToFile(json_themes, self.m_themes_file)
+	Serializer:WriteToFile(self.m_themes_file, json)
 end
 
 function ThemeManager:FetchSavedThemes()
@@ -165,16 +182,20 @@ function ThemeManager:PushTheme()
 			self.m_style_stack = self.m_style_stack + 1
 		end
 	end
+
+	self.m_stack_depth = self.m_stack_depth + 1
 end
 
 function ThemeManager:PopTheme()
-	if (self.m_col_stack ~= 0) then
+	if (self.m_col_stack > 0) then
 		ImGui.PopStyleColor(self.m_col_stack)
 	end
 
-	if (self.m_style_stack ~= 0) then
+	if (self.m_style_stack > 0) then
 		ImGui.PopStyleVar(self.m_style_stack)
 	end
+
+	self.m_stack_depth = self.m_stack_depth - 1
 end
 
 return ThemeManager

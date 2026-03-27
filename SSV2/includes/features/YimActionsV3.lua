@@ -129,7 +129,6 @@ function YimActions:IsPlayerBusy()
 		or LocalPlayer:IsRagdoll()
 		or Game.IsInNetworkTransition()
 		or Backend:IsPlayerSwitchInProgress()
-		or Backend:AreControlsDisabled()
 end
 
 ---@param ped? integer
@@ -631,6 +630,10 @@ function YimActions:GoofyUnaliveAnim()
 end
 
 function YimActions:OnKeyDown()
+	if (Backend:AreControlsDisabled()) then
+		return
+	end
+
 	if (KeyManager:IsKeybindJustPressed("stop_anim")) then
 		ThreadManager:Run(function()
 			local timer = Timer.new(1000)
