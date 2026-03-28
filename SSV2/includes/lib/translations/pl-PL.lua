@@ -682,5 +682,17 @@ return {
 	["GENERIC_LOADED"] = "Załadowany.",
 	["SETTINGS_GAME_LANGUAGE_TT"] = "Użyj aktualnie wybranego języka gry.",
 	["SETTINGS_GAME_LANGUAGE"] = "Użyj języka gry",
-	["GENERIC_RELOADED"] = "Załadowano ponownie."
+	["GENERIC_RELOADED"] = "Załadowano ponownie.",
+	["de-DE"] = "niemiecki",
+	["es-ES"] = "hiszpański",
+	["ru-RU"] = "rosyjski",
+	["it-IT"] = "włoski",
+	["en-US"] = "angielski (amerykański)",
+	["zh-TW"] = "chiński (tradycyjny)",
+	["ja-JP"] = "japoński",
+	["zh-CN"] = "Chiński (uproszczony)",
+	["ko-KR"] = "koreański",
+	["pl-PL"] = "Polski",
+	["fr-FR"] = "francuski",
+	["pt-BR"] = "portugalski"
 }

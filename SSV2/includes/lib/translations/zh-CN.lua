@@ -682,5 +682,17 @@ return {
 	["GENERIC_LOADED"] = "已加载。",
 	["SETTINGS_GAME_LANGUAGE"] = "使用游戏语言",
 	["GENERIC_RELOADED"] = "重新加载。",
-	["SETTINGS_GAME_LANGUAGE_TT"] = "使用当前选择的游戏语言。"
+	["SETTINGS_GAME_LANGUAGE_TT"] = "使用当前选择的游戏语言。",
+	["en-US"] = "英语（美国）",
+	["fr-FR"] = "法语",
+	["pt-BR"] = "葡萄牙语",
+	["de-DE"] = "德语",
+	["es-ES"] = "西班牙语",
+	["ru-RU"] = "俄语",
+	["it-IT"] = "意大利语",
+	["zh-TW"] = "中文（繁体）",
+	["zh-CN"] = "中文（简体）",
+	["ja-JP"] = "日本人",
+	["pl-PL"] = "抛光",
+	["ko-KR"] = "韩国人"
 }

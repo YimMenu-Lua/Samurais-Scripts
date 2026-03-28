@@ -60,14 +60,14 @@ local function drawGeneralSettings()
 
 		ImGui.Spacing()
 		ImGui.BeginDisabled(GVars.backend.use_game_language)
-		if (ImGui.BeginCombo("##langs", _F("%s (%s)", GVars.backend.language_name or "English", GVars.backend.language_code or "en-US"))) then
-			for i, lang in ipairs(LOCALES) do
+		local currentLang = LOCALES[GVars.backend.language_index]
+		if (ImGui.BeginCombo("##langs", currentLang and _T(currentLang) or "NULL")) then
+			for i, iso in ipairs(LOCALES) do
 				local idx         = GVars.backend.language_index
 				local is_selected = (i == idx)
-				if (ImGui.Selectable(_F("%s (%s)", lang.name, lang.iso), is_selected)) then
+				local langName    = _T(iso)
+				if (ImGui.Selectable(_F("%s (%s)", langName, iso), is_selected)) then
 					GVars.backend.language_index = i
-					GVars.backend.language_name  = lang.name
-					GVars.backend.language_code  = lang.iso
 				end
 			end
 			ImGui.EndCombo()

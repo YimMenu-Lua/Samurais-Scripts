@@ -682,5 +682,17 @@ return {
 	["GENERIC_LOADED"] = "짐을 실은.",
 	["SETTINGS_GAME_LANGUAGE_TT"] = "현재 선택된 게임 언어를 사용합니다.",
 	["SETTINGS_GAME_LANGUAGE"] = "게임 언어 사용",
-	["GENERIC_RELOADED"] = "다시 로드되었습니다."
+	["GENERIC_RELOADED"] = "다시 로드되었습니다.",
+	["fr-FR"] = "프랑스 국민",
+	["de-DE"] = "독일 사람",
+	["it-IT"] = "이탈리아 사람",
+	["en-US"] = "영어(미국)",
+	["ru-RU"] = "러시아인",
+	["zh-TW"] = "중국어(번체)",
+	["ja-JP"] = "일본어",
+	["ko-KR"] = "한국인",
+	["pl-PL"] = "광택",
+	["pt-BR"] = "포르투갈어",
+	["zh-CN"] = "중국어(간체)",
+	["es-ES"] = "스페인 사람"
 }

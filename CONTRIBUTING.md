@@ -186,7 +186,7 @@ You are free to use any style you want, except in these cases:
 ## Translations
 
 - The primary language for all labels is English (US) (`includes/lib/translations/en-US.lua`).
-- To add a new language, add its name and ISO code to `includes/lib/translations/__locales.lua`.
+- To add a new language, add its ISO code to `includes/lib/translations/__locales.lua`.
 - To add a new label, update `/lib/translations/en-US.lua`.
 - All other language files will be automatically generated via GitHub Actions.
 
@@ -215,12 +215,12 @@ Suppose you want to draw some text that gets automatically translated:
 #### Adding A New Language
 
 1. Open `includes/lib/translations/__locales.lua`.
-2. Add a new language dictionary `{ name, iso }`:
+2. Add a new language iso to the array:
 
     ```lua
     return {
-      ..., -- pre-existing tables
-      { name = "Türkçe", iso = "tr-TR" }, -- Your new language
+      ..., -- pre-existing strings
+      "tr-TR", -- Your new language
     }
     ```
 
