@@ -166,21 +166,28 @@ function ThemeManager:PushTheme()
 
 	self.m_col_stack = 0
 	for k, v in pairs(colors) do
-		if (ImGuiCol[k]) then
-			ImGui.PushStyleColor(ImGuiCol[k], v.x, v.y, v.z, v.w)
+		local idx = ImGuiCol[k]
+		if (idx) then
+			ImGui.PushStyleColor(idx, v.x, v.y, v.z, v.w)
 			self.m_col_stack = self.m_col_stack + 1
 		end
 	end
 
 	self.m_style_stack = 0
 	for k, v in pairs(styles) do
-		if (type(v) == "table") then
-			ImGui.PushStyleVar(ImGuiStyleVar[k], v.x, v.y)
-			self.m_style_stack = self.m_style_stack + 1
-		else
-			ImGui.PushStyleVar(ImGuiStyleVar[k], v)
-			self.m_style_stack = self.m_style_stack + 1
+		local idx = ImGuiStyleVar[k]
+		if (not idx) then
+			goto continue
 		end
+
+		if (type(v) == "table" and v.__type == "vec2") then
+			ImGui.PushStyleVar(idx, v.x, v.y)
+		else
+			ImGui.PushStyleVar(idx, v)
+		end
+		self.m_style_stack = self.m_style_stack + 1
+
+		::continue::
 	end
 
 	self.m_stack_depth = self.m_stack_depth + 1

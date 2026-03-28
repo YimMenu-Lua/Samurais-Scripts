@@ -11,6 +11,7 @@ local RED <const>               = Color("red")
 local GREEN <const>             = Color("green")
 local BLUE <const>              = Color("blue")
 local GREY <const>              = Color("#636363")
+local LOCALES <const>           = Translator.locales
 
 local side_button_size          = vec2:new(140, 35)
 local init_g_addr               = 0
@@ -401,7 +402,17 @@ local function DrawSerializerDebug()
 	ImGui.BulletText(_F("Is Disabled: %s", not Serializer:CanAccess()))
 	ImGui.BulletText(_F("Time Since Last Flush: %.0f seconds ago.", Serializer:GetTimeSinceLastFlush() / 1e3))
 
-	if GUI:Button("Dump Serializer") then
+	---@diagnostic disable
+	if GUI:Button("Break 0") then
+		Serializer:DebugBreak(0)
+	end
+	ImGui.SameLine()
+	if GUI:Button("Break 1") then
+		Serializer:DebugBreak(1)
+	end
+	---@diagnostic enable
+
+	if GUI:Button("Dump") then
 		Serializer:Dump()
 	end
 end
@@ -410,15 +421,24 @@ local function DrawTranslatorDebug()
 	ImGui.TextDisabled("You can switch between available languages in Settings -> General.")
 	ImGui.Spacing()
 
-	ImGui.BulletText(_F("Language Name: %s", GVars.backend.language_name))
-	ImGui.BulletText(_F("ISO: %s", GVars.backend.language_code))
-	ImGui.BulletText(_F("Index: %d", GVars.backend.language_index))
+	local idx = GVars.backend.language_index
+	local iso = LOCALES[idx]
+	ImGui.BulletText(_F("Index: %d", idx))
+	ImGui.BulletText(_F("ISO: %s", iso))
+	ImGui.BulletText(_F("Translated Name: %s", _T(iso)))
 
 	ImGui.Spacing()
 
 	if (GUI:Button("Reload")) then
 		Translator.wants_reload = true
 	end
+
+	ImGui.BeginDisabled(Translator:IsReloading())
+	if (GUI:Button("Break")) then
+		---@diagnostic disable-next-line
+		Translator:Reload(true)
+	end
+	ImGui.EndDisabled()
 
 	if (GUI:Button("Dump Labels")) then
 		print(Translator.labels)
@@ -443,7 +463,7 @@ local function PopulateVehlistOnce()
 			table.insert(
 				TVehList,
 				{
-					name = name,
+					name        = name,
 					displayname = Game.GetVehicleDisplayName(name)
 				}
 			)
@@ -584,7 +604,7 @@ local function DrawMiscTests()
 end
 
 return function()
-	ImGui.BeginTabBar("##debug")
+	ImGui.BeginTabBar("##ss_debug")
 	ImGui.PushTextWrapPos(ImGui.GetFontSize() * 35)
 
 	if ImGui.BeginTabItem("Entities") then

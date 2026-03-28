@@ -15,10 +15,27 @@ return {
 	["SUBTAB_GUI"]                         = "User Interface",
 	--#endregion
 
+	--#region language names
+	["en-US"]                              = "English (US)",
+	["fr-FR"]                              = "French",
+	["de-DE"]                              = "German",
+	["es-ES"]                              = "Spanish", -- Always defaults to ES-ES (no ES-MX)
+	["it-IT"]                              = "Italian",
+	["pt-BR"]                              = "Portugese",
+	["ru-RU"]                              = "Russian",
+	["zh-TW"]                              = "Chinese (Traditional)",
+	["zh-CN"]                              = "Chinese (Simplified)",
+	["ja-JP"]                              = "Japanese",
+	["pl-PL"]                              = "Polish",
+	["ko-KR"]                              = "Korean",
+	--#endregion
+
+	--#region GUI stuff
 	["GUI_NEW_LAYOUT_NOTICE"]              = "The script's UI is now independent from the menu. Press %s to toggle it.",
 	["GUI_NOTIFICATIONS"]                  = "Notifications",
 	["GUI_NOTIFICATIONS_UNREAD"]           = "Unread notifications",
 	["GUI_NOTIFICATIONS_NONE"]             = "You have no notifications.",
+	--#endregion
 
 	--#region generics
 	["WARN_PED_SPAWN_LIMIT"]               = "Ped spawn limit reached! Consider enabling 'Auto Replace Entities' in the Settings tab if you want to automatically replace old entities when you reach the limit.",

@@ -13,8 +13,6 @@ local Config <const> = {
 		debug_mode = false,
 		auto_cleanup_entities = false,
 		language_index = 1,
-		language_code = "en-US",
-		language_name = "English",
 		use_game_language = false
 	},
 	ui = {

@@ -115,52 +115,6 @@ def get_lang_name(iso: str) -> str:
             return f"({iso})"
 
 
-# def create_translator(iso: str):
-# 	iso_norm = iso.strip()
-# 	return GoogleTranslator(source="en", target=iso_norm)
-
-
-# def get_translator(iso: str):
-# 	iso = iso.strip()
-# 	if iso in FAILED_LANGS:
-# 		return None
-
-# 	with TRANSLATOR_LOCK:
-# 		if iso in TRANSLATORS:
-# 			return TRANSLATORS[iso]
-
-# 		try:
-# 			tr = create_translator(iso)
-# 			TRANSLATORS[iso] = tr
-# 			return tr
-# 		except deep_translator.exceptions.LanguageNotSupportedException:
-# 			FAILED_LANGS.add(iso)
-# 			return None
-# 		except Exception:
-# 			FAILED_LANGS.add(iso)
-# 			return None
-
-
-# def translate_text(iso: str, text: str) -> str:
-# 	tr = get_translator(iso)
-# 	if tr is not None:
-# 		try:
-# 			return tr.translate(text)
-# 		except deep_translator.exceptions.LanguageNotSupportedException:
-# 			FAILED_LANGS.add(iso)
-# 		except Exception:
-# 			pass
-
-# 	short = iso[:2]
-# 	tr2 = get_translator(short)
-# 	if tr2 is not None:
-# 		try:
-# 			return tr2.translate(text)
-# 		except Exception:
-# 			pass
-
-# 	return text
-
 def translate_text(iso: str, text: str) -> str:
     try:
         return GoogleTranslator(source="en", target=iso).translate(text)
@@ -209,7 +163,7 @@ def generate_translations(dry_run: bool = False, diff_only: bool = False):
         return {"new": [], "updated": [], "skipped": list(labels.keys())}
 
     translations = {}
-    target_locales = [d for d in locales if d.get("iso") != "en-US"]
+    target_locales = [d for d in locales if d != "en-US"]
     total_tasks = len(target_locales) * len(key_set)
     workers = min(MAX_WORKERS, max(1, int(total_tasks / 4)))
     workers = min(workers, MAX_WORKERS)
@@ -218,14 +172,13 @@ def generate_translations(dry_run: bool = False, diff_only: bool = False):
         futures = {}
         with alive_bar(total_tasks, title="Translating", force_tty=True) as bar:
             for locale in target_locales:
-                iso = locale["iso"]
-                fname = f"{iso}.lua"
+                fname = f"{locale}.lua"
                 translations.setdefault(fname, {})
 
                 for label in key_set:
                     text = labels[label]
-                    fut = exec.submit(translate_text, iso, text)
-                    futures[fut] = (iso, label, text, fname)
+                    fut = exec.submit(translate_text, locale, text)
+                    futures[fut] = (locale, label, text, fname)
 
             for fut in as_completed(futures):
                 iso, label, orig_text, fname = futures[fut]
@@ -251,7 +204,7 @@ def generate_translations(dry_run: bool = False, diff_only: bool = False):
         "new": new_labels,
         "updated": updated_labels,
         "skipped": [k for k in labels.keys() if k not in key_set],
-        "languages": [d["iso"] for d in target_locales],
+        "languages": [d for d in target_locales],
     }
 
     if diff_only or dry_run:
@@ -277,7 +230,7 @@ def generate_translations(dry_run: bool = False, diff_only: bool = False):
             bar2()
 
     write_hashmap()
-    print("\nDone. Files written for languages:", ", ".join([d["iso"] for d in target_locales]))
+    print("\nDone. Files written for languages:", ", ".join([d for d in target_locales]))
     return summary
 
 

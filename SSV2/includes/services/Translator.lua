@@ -32,13 +32,14 @@ local GameLangToCustom <const>  = {
 ---@class Translator
 ---@field labels dict<string>
 ---@field default_labels dict<string>
----@field lang_code string
----@field locales array<{ name: string, iso: string }>
+---@field lang_idx integer
+---@field locales array<string>
 ---@field wants_reload boolean
----@field private m_log_history table
+---@field private m_log_history set<string>
 ---@field private m_cache table<string, table<string, string>>
 ---@field private m_last_load_time TimePoint
 ---@field private m_reloading boolean
+---@field private m_disabled boolean
 ---@field protected m_initialized boolean
 local Translator   = {}
 Translator.__index = Translator
@@ -50,7 +51,7 @@ function Translator:init()
 
 	return setmetatable({
 		default_labels   = en_loaded and en or {},
-		locales          = locales_loaded and __locales or { { name = "English", iso = "en-US" } },
+		locales          = locales_loaded and __locales or { "en-US" },
 		labels           = {},
 		m_cache          = {},
 		m_log_history    = {},
@@ -60,46 +61,61 @@ function Translator:init()
 	}, Translator)
 end
 
+---@return boolean
 function Translator:MatchGameLanguage()
 	local current = LOCALIZATION.GET_CURRENT_LANGUAGE()
 	local idx     = GameLangToCustom[current] or 1
-	local match   = self.locales[idx]
+	if (self.locales[idx]) then
+		GVars.backend.language_index = idx
+		return true
+	end
 
-	if (not match) then return false end
-
-	GVars.backend.language_index = idx
-	GVars.backend.language_code  = match.iso
-	GVars.backend.language_name  = match.name
-
-	return true
+	return false
 end
 
-function Translator:Load()
+---@param debugBreak? boolean
+function Translator:Load(debugBreak)
 	ThreadManager:Run(function()
 		if (GVars.backend.use_game_language) then
 			if (not self:MatchGameLanguage() and self.m_reloading) then
-				Notifier:ShowError("Translator", "Failed to match game language.")
+				Notifier:ShowError("Translator", "Failed to match game language. Falling back to English (US).")
 				GVars.backend.use_game_language = false
-				return
+				GVars.backend.language_index    = 1
 			end
 		end
 
-		GVars.backend.language_index = GVars.backend.language_index or 1
-		GVars.backend.language_code  = GVars.backend.language_code or "en-US"
-		GVars.backend.language_name  = GVars.backend.language_name or "English"
-
-		local ok, res
-		if (GVars.backend.language_code ~= "en-US") then
-			local path = "lib.translations." .. GVars.backend.language_code
-			ok, res = pcall(require, path)
+		if (debugBreak and Backend.debug_mode) then
+			GVars.backend.language_index = 69
 		end
 
-		local newLabels = (ok and (type(res) == "table")) and res or self.default_labels
+		local idx = GVars.backend.language_index
+		local iso = self.locales[idx]
+		if (not iso) then
+			log.warning("[Translator]: Invalid language code!")
+		end
+
+		local ok, result
+		if (iso ~= "en-US") then
+			local path = "lib.translations." .. iso
+			ok, result = pcall(require, path)
+			if (not ok) then
+				log.warning("[Translator]: Failed to load translations file! Falling back to English (US).")
+				GVars.backend.language_index = 1
+			end
+		end
+
+		result = result or self.default_labels
+		if (next(result) == nil) then
+			log.warning("[Translator]: Failed to load! Translations will be disabled.")
+			self.m_disabled = true
+		end
+
+		local newLabels = result
 		table.overwrite(self.labels, newLabels)
 
 		self.m_log_history = {}
 		self.m_cache       = {}
-		self.lang_code     = GVars.backend.language_code
+		self.lang_idx      = GVars.backend.language_index
 		self.m_initialized = true
 		self.m_reloading   = false
 		self.m_last_load_time:Reset()
@@ -107,15 +123,16 @@ function Translator:Load()
 end
 
 ---@private
-function Translator:Reload()
+---@param debugBreak? boolean
+function Translator:Reload(debugBreak)
 	if (not self.m_initialized or not self.m_last_load_time:HasElapsed(3e3)) then -- 3. we have this though so reload can not be called twice. I'm a bit confused
 		return
 	end
 
+	self.m_disabled    = false
 	self.m_initialized = false
 	self.m_reloading   = true
-	self:Load()
-	Notifier:ShowMessage("Translator", "Reloaded.")
+	self:Load(debugBreak)
 end
 
 ---@return boolean
@@ -133,23 +150,14 @@ function Translator:CanReload()
 	return self:IsReady() and self.m_last_load_time:HasElapsed(3e3)
 end
 
----@param msg string
----@return boolean
-function Translator:WasLogged(msg)
-	if (#self.m_log_history == 0) then
-		return false
-	end
-
-	return table.find(self.m_log_history, msg)
-end
-
-function Translator:Log(message)
-	if self:WasLogged(message) then
+---@param message string
+function Translator:Warn(message)
+	if (self.m_log_history[message]) then
 		return
 	end
 
 	log.warning(message)
-	table.insert(self.m_log_history, message)
+	self.m_log_history[message] = true
 end
 
 ---@return table<string, table<string, string>>
@@ -160,41 +168,47 @@ end
 ---@param label string
 ---@return string
 function Translator:GetCachedLabel(label)
-	self.m_cache[self.lang_code] = self.m_cache[self.lang_code] or {}
-	return self.m_cache[self.lang_code][label]
+	if (self.m_disabled) then return "" end
+
+	self.m_cache[self.lang_idx] = self.m_cache[self.lang_idx] or {}
+	return self.m_cache[self.lang_idx][label]
 end
 
 ---@param label string
 ---@param text string
 function Translator:CacheLabel(label, text)
-	self.m_cache[self.lang_code] = self.m_cache[self.lang_code] or {}
-	self.m_cache[self.lang_code][label] = text
+	if (self.m_disabled) then return end
+
+	self.m_cache[self.lang_idx] = self.m_cache[self.lang_idx] or {}
+	self.m_cache[self.lang_idx][label] = text
 end
 
 -- Translates text to the user's language.
 ---@param label string
 ---@return string
 function Translator:Translate(label)
-	if (not self:IsReady()) then return "" end
+	if (self.m_disabled or not self:IsReady()) then
+		return label
+	end
 
-	if (self.lang_code ~= GVars.backend.language_code) then
+	if (self.lang_idx ~= GVars.backend.language_index) then
 		self.wants_reload = true
-		return ""
+		return label
+	end
+
+	if (not label) then
+		local msg = _F("Missing label! %s", label)
+		self:Warn(msg)
+		return msg
 	end
 
 	local cached = self:GetCachedLabel(label)
 	if (cached) then return cached end
 
 	local text = self.labels[label]
-	if (not text) then
-		local msg = _F("Missing label! %s", label)
-		self:Log(msg)
-		return msg
-	end
-
 	if (not string.isvalid(text)) then
-		self:Log(_F("Missing translation for: '%s' in '%s'", label, self.lang_code))
-		return _F("[!MISSING LABEL]: %s", label)
+		self:Warn(_F("Missing translation for label: '%s'", label))
+		return _F("[!MISSING TEXT] %s", label)
 	end
 
 	if (not cached) then self:CacheLabel(label, text) end
