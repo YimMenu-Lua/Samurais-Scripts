@@ -66,8 +66,8 @@ return function()
 	showEarningsData = GUI:CustomToggle(_T("YRV3_SHOW_EARNINGS_DATA"), showEarningsData)
 
 	if (showEarningsData) then
-		local iso         = GVars.backend.language_code
-		local bulletWidth = bulletWidths[iso]
+		local index       = GVars.backend.language_index
+		local bulletWidth = bulletWidths[index]
 		if (not bulletWidth) then
 			local labels = {}
 			for _, data in ipairs(earningData) do
@@ -75,7 +75,7 @@ return function()
 			end
 			bulletWidth = measureBulletWidths(labels, 60.0)
 
-			bulletWidths[iso] = bulletWidth
+			bulletWidths[index] = bulletWidth
 		end
 
 		ImGui.Separator()

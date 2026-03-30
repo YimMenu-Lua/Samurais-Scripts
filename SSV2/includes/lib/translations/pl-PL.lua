@@ -694,5 +694,10 @@ return {
 	["ko-KR"] = "koreański",
 	["pl-PL"] = "Polski",
 	["fr-FR"] = "francuski",
-	["pt-BR"] = "portugalski"
+	["pt-BR"] = "portugalski",
+	["SETTINGS_KEYBINDS_UNBIND"] = "Rozwiązać",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"] = "Czy na pewno chcesz zresetować ten klucz do ustawień domyślnych?",
+	["SETTINGS_KEYBINDS_NO_RESET"] = "To jest domyślne połączenie klawiszy. Nic do resetowania.",
+	["SETTINGS_KEYBINDS_NO_UNBIND"] = "Klucz ten nie może być rozwiązany.",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"] = "Wszystkie funkcje powiązane z tym kluczem nie będą już działać. Czy na pewno chcesz to rozłączyć?"
 }

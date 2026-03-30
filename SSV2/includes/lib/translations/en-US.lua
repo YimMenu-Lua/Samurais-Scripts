@@ -678,6 +678,11 @@ return {
 	["SETTINGS_KEYBINDS"]                  = "Keybinds",
 	["SETTINGS_KEYBINDS_KEYBOARD"]         = "Keyboard",
 	["SETTINGS_KEYBINDS_CONTROLLER"]       = "Controller",
+	["SETTINGS_KEYBINDS_UNBIND"]           = "Unbind",
+	["SETTINGS_KEYBINDS_NO_UNBIND"]        = "This key can not be unbound.",
+	["SETTINGS_KEYBINDS_NO_RESET"]         = "This is a default keybind. Nothing to reset.",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"]    = "Are you sure you want to reset this key to default?",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"]   = "All features associated with this key will no longer work. Are you sure you want to unbind it?",
 	--#endregion
 
 	--#region EntityForge

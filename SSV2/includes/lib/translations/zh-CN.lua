@@ -694,5 +694,10 @@ return {
 	["zh-CN"] = "中文（简体）",
 	["ja-JP"] = "日本人",
 	["pl-PL"] = "抛光",
-	["ko-KR"] = "韩国人"
+	["ko-KR"] = "韩国人",
+	["SETTINGS_KEYBINDS_UNBIND"] = "解绑",
+	["SETTINGS_KEYBINDS_NO_UNBIND"] = "该密钥无法解除绑定。",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"] = "您确定要将此键重置为默认值吗？",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"] = "与此键关联的所有功能将不再起作用。您确定要解除绑定吗？",
+	["SETTINGS_KEYBINDS_NO_RESET"] = "这是默认的按键绑定。没什么可重置的。"
 }

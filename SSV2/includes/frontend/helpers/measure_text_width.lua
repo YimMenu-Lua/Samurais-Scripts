@@ -8,11 +8,11 @@
 
 
 ---@param labels array<string>
----@param padding float
+---@param padding? float
 ---@return float
 return function(labels, padding)
 	local max = 0
-	padding = padding or 0
+	padding   = padding or 0
 
 	for i = 1, #labels do
 		local w = ImGui.CalcTextSize(labels[i])
