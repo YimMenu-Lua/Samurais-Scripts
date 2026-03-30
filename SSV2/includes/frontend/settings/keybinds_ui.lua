@@ -88,7 +88,7 @@ local function DrawKeybind(gvarKey, isController)
 	local resetPopup = _F("%s##%s%s", reset_label, label, currentKeyName)
 	ImGui.SameLine()
 	ImGui.BeginDisabled(is_default or default_key == nil)
-	if (GUI:Button(reset_label)) then
+	if (GUI:Button(_F("%s##%s", reset_label, label))) then
 		ImGui.OpenPopup(resetPopup)
 	end
 	ImGui.EndDisabled()
@@ -108,14 +108,20 @@ local function DrawKeybind(gvarKey, isController)
 		GUI:Tooltip(_T("SETTINGS_KEYBINDS_NO_UNBIND"))
 	end
 
-	if (default_key and ImGui.DialogBox(resetPopup, _T("SETTINGS_KEYBINDS_RESET_COFNIRM"), ImGuiDialogBoxStyle.WARN)) then
+	if (ImGui.DialogBox(resetPopup, _T("SETTINGS_KEYBINDS_RESET_COFNIRM"), ImGuiDialogBoxStyle.WARN)) then
 		local newKey = isController and table.copy(default_key) or default_key
 		table.set_nested_key(GVars, current_path, newKey)
+		if (not isController and type(newKey) ~= "table") then
+			KeyManager:UpdateKeybind(current_key, { id = newKey })
+		end
 	end
 
 	if (ImGui.DialogBox(unbindPopup, _T("SETTINGS_KEYBINDS_UNBIND_COFNIRM"), ImGuiDialogBoxStyle.WARN)) then
 		local newKey = isController and { name = "Unbound", code = 0 } or "Unbound"
 		table.set_nested_key(GVars, current_path, newKey)
+		if (not isController and type(newKey) ~= "table") then
+			KeyManager:UpdateKeybind(current_key, { id = newKey })
+		end
 	end
 
 	ImGui.SetNextWindowSize(400, 220)
