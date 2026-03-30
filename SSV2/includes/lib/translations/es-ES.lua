@@ -694,5 +694,10 @@ return {
 	["zh-CN"] = "Chino (simplificado)",
 	["ja-JP"] = "japonés",
 	["zh-TW"] = "Chino (tradicional)",
-	["pl-PL"] = "Polaco"
+	["pl-PL"] = "Polaco",
+	["SETTINGS_KEYBINDS_UNBIND"] = "Desatar",
+	["SETTINGS_KEYBINDS_NO_UNBIND"] = "Esta clave no se puede desatar.",
+	["SETTINGS_KEYBINDS_NO_RESET"] = "Esta es una combinación de teclas predeterminada. Nada que restablecer.",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"] = "¿Está seguro de que desea restablecer esta clave a sus valores predeterminados?",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"] = "Todas las funciones asociadas con esta clave ya no funcionarán. ¿Estás seguro de que quieres desvincularlo?"
 }

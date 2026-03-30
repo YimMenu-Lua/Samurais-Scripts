@@ -694,5 +694,10 @@ return {
 	["it-IT"] = "義大利語",
 	["pl-PL"] = "拋光",
 	["ko-KR"] = "韓國人",
-	["ja-JP"] = "日本人"
+	["ja-JP"] = "日本人",
+	["SETTINGS_KEYBINDS_UNBIND"] = "解綁",
+	["SETTINGS_KEYBINDS_NO_UNBIND"] = "該密鑰無法解除綁定。",
+	["SETTINGS_KEYBINDS_NO_RESET"] = "這是預設的按鍵綁定。沒什麼好重置的。",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"] = "您確定要將此鍵重設為預設值嗎？",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"] = "與此鍵關聯的所有功能將不再運作。您確定要解除綁定嗎？"
 }

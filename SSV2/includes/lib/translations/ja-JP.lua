@@ -694,5 +694,10 @@ return {
 	["pt-BR"] = "ポルトガル語",
 	["ko-KR"] = "韓国人",
 	["zh-TW"] = "中国語（繁体字）",
-	["ja-JP"] = "日本語"
+	["ja-JP"] = "日本語",
+	["SETTINGS_KEYBINDS_NO_UNBIND"] = "このキーのバインドを解除することはできません。",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"] = "このキーをデフォルトにリセットしてもよろしいですか?",
+	["SETTINGS_KEYBINDS_UNBIND"] = "バインドを解除する",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"] = "このキーに関連付けられているすべての機能は動作しなくなります。バインドを解除してもよろしいですか?",
+	["SETTINGS_KEYBINDS_NO_RESET"] = "これはデフォルトのキーバインドです。リセットするものは何もありません。"
 }

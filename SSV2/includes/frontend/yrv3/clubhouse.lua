@@ -28,15 +28,15 @@ return function()
 	)
 	ImGui.Spacing()
 
-	local iso         = GVars.backend.language_code
-	local bulletWidth = bulletWidths[iso]
+	local index       = GVars.backend.language_index
+	local bulletWidth = bulletWidths[index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_CASH_SAFE"),
 			_T("YRV3_MC_CLIENT_BIKE_LABEL"),
 		}, 60.0)
 
-		bulletWidths[iso] = bulletWidth
+		bulletWidths[index] = bulletWidth
 	end
 
 	local cashSafe  = clubhouse:GetCashSafe()

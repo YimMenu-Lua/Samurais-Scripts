@@ -7,16 +7,19 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local reservedKeys <const> = {
+local ReservedKeys <const>  = {
 	kb   = Set.new(0x01, 0x07, 0x0A, 0x0B, 0x1B, 0x24, 0x2C, 0x2D, 0x46, 0x5B, 0x5C, 0x5E),
 	gpad = Set.new(23, 24, 25, 71, 75)
 }
 
-
+local NoUnbindKeys <const>  = Set.new("gui_toggle")
+local DefaultConfig <const> = Serializer:GetDefaultConfig()
 local keyName, keyCode
-local currentKeyName = ""
-local _reserved      = false
-local button_size    = vec2:new(120, 32)
+local currentKeyName        = ""
+local _reserved             = false
+local key_container_size    = vec2:new(160, 32)
+local button_size           = vec2:new(120, 32)
+
 
 local function GetCurrentKey()
 	local _, code, name = KeyManager:IsAnyKeyPressed()
@@ -30,16 +33,32 @@ local function GetCurrentKey()
 	return code, name
 end
 
+local function IsDefault(current_key, default_key, isController)
+	if (type(current_key) ~= type(default_key)) then
+		return false
+	end
+
+	if (isController) then
+		return current_key.name == default_key.name
+	end
+
+	return current_key == default_key
+end
+
 ---@param gvarKey string
 ---@param isController? boolean
-local function DrawKeybinds(gvarKey, isController)
+local function DrawKeybind(gvarKey, isController)
 	local label               = gvarKey:replace("_", " "):titlecase()
 	local main_path           = isController and "gamepad_keybinds" or "keyboard_keybinds"
 	local current_path        = _F("%s.%s", main_path, gvarKey)
 	local current_key         = table.get_nested_key(GVars, current_path)
-	local key_container_width = 160
-	local reset_button_width  = 80
+	local default_key         = table.get_nested_key(DefaultConfig, current_path)
 	local style               = ImGui.GetStyle()
+	local framePaddingX       = style.FramePadding.x
+	local unbind_label        = _T("SETTINGS_KEYBINDS_UNBIND")
+	local reset_label         = _T("GENERIC_RESET")
+	local unbind_button_width = ImGui.CalcTextSize(unbind_label) + (framePaddingX * 2)
+	local reset_button_width  = ImGui.CalcTextSize(reset_label) + (framePaddingX * 2)
 
 	ImGui.BulletText(label)
 	local avail_x, _ = ImGui.GetContentRegionAvail()
@@ -53,27 +72,51 @@ local function DrawKeybinds(gvarKey, isController)
 	ImGui.SameLine()
 	ImGui.SetCursorPosX(
 		avail_x
-		- key_container_width
+		- key_container_size.x
+		- unbind_button_width
 		- reset_button_width
-		- style.ItemSpacing.x
+		- (style.ItemSpacing.x * 2)
 	)
 
-	ImGui.SetNextItemWidth(key_container_width)
-	currentKeyName, _ = ImGui.InputText(_F("##%s", label), currentKeyName, 16, ImGuiInputTextFlags.ReadOnly)
-
-	if ImGui.IsItemClicked(0) then
+	if (ImGui.Button(_F("%s##%s", currentKeyName, label), key_container_size.x, key_container_size.y)) then
+		GUI:PlaySound(GUI.Sounds.Click)
 		ImGui.OpenPopup(label)
 		Backend.disable_input = true
 	end
 
+	local is_default = IsDefault(current_key, default_key, isController)
+	local resetPopup = _F("%s##%s%s", reset_label, label, currentKeyName)
 	ImGui.SameLine()
-	ImGui.BeginDisabled(keyCode == 0)
-	if ImGui.Button(_F("%s##%s", _T("GENERIC_RESET"), label), reset_button_width, 32) then
-		GUI:PlaySound("Delete")
+	ImGui.BeginDisabled(is_default or default_key == nil)
+	if (GUI:Button(reset_label)) then
+		ImGui.OpenPopup(resetPopup)
+	end
+	ImGui.EndDisabled()
+	if (is_default) then
+		GUI:Tooltip(_T("SETTINGS_KEYBINDS_NO_RESET"))
+	end
+
+	local no_unbind   = NoUnbindKeys:Contains(gvarKey)
+	local unbindPopup = _F("%s##%s%s", unbind_label, label, currentKeyName)
+	ImGui.SameLine()
+	ImGui.BeginDisabled(keyCode == 0 or no_unbind)
+	if (GUI:Button(_F("%s##%s", unbind_label, label), { size = vec2:new(unbind_button_width, 32) })) then
+		ImGui.OpenPopup(unbindPopup)
+	end
+	ImGui.EndDisabled()
+	if (no_unbind) then
+		GUI:Tooltip(_T("SETTINGS_KEYBINDS_NO_UNBIND"))
+	end
+
+	if (default_key and ImGui.DialogBox(resetPopup, _T("SETTINGS_KEYBINDS_RESET_COFNIRM"), ImGuiDialogBoxStyle.WARN)) then
+		local newKey = isController and table.copy(default_key) or default_key
+		table.set_nested_key(GVars, current_path, newKey)
+	end
+
+	if (ImGui.DialogBox(unbindPopup, _T("SETTINGS_KEYBINDS_UNBIND_COFNIRM"), ImGuiDialogBoxStyle.WARN)) then
 		local newKey = isController and { name = "Unbound", code = 0 } or "Unbound"
 		table.set_nested_key(GVars, current_path, newKey)
 	end
-	ImGui.EndDisabled()
 
 	ImGui.SetNextWindowSize(400, 220)
 	if ImGui.BeginPopupModal(
@@ -89,13 +132,25 @@ local function DrawKeybinds(gvarKey, isController)
 		if ImGui.SmallButton("X") then
 			ImGui.CloseCurrentPopup()
 			Backend.disable_input = false
-			keyCode, keyName = nil, nil
+			keyCode, keyName      = nil, nil
 		end
 
 		ImGui.Separator()
 		ImGui.Dummy(1, 10)
 
-		local reserved_set = isController and reservedKeys.gpad or reservedKeys.kb
+		local confirm_label       = _T("GENERIC_CONFIRM")
+		local clear_label         = _T("GENERIC_CLEAR")
+		local confirm_label_width = ImGui.CalcTextSize(confirm_label) + (framePaddingX * 2)
+		local clear_label_width   = ImGui.CalcTextSize(clear_label) + (framePaddingX * 2)
+		if (confirm_label_width > button_size.x) then
+			button_size.x = confirm_label_width
+		end
+
+		if (clear_label_width > button_size.x) then
+			button_size.x = clear_label_width
+		end
+
+		local reserved_set = isController and ReservedKeys.gpad or ReservedKeys.kb
 		if (not keyName) then
 			ImGui.Text(ImGui.TextSpinner(_T("SETTINGS_HOTKEY_WAIT"), 10, ImGuiSpinnerStyle.BOUNCE_DOTS))
 
@@ -130,7 +185,7 @@ local function DrawKeybinds(gvarKey, isController)
 		ImGui.Dummy(0, math.max(0, availY - button_size.y - style.WindowPadding.y))
 
 		if (keyCode and keyName and not _reserved) then
-			if (GUI:Button(_T("GENERIC_CONFIRM"), { size = button_size })) then
+			if (GUI:Button(confirm_label, { size = button_size })) then
 				if (not isController) then
 					KeyManager:UpdateKeybind(current_key, { id = keyName })
 				end
@@ -139,7 +194,7 @@ local function DrawKeybinds(gvarKey, isController)
 				table.set_nested_key(GVars, current_path, newKey)
 				ImGui.CloseCurrentPopup()
 				Backend.disable_input = false
-				keyCode, keyName = nil, nil
+				keyCode, keyName      = nil, nil
 			end
 
 			ImGui.SameLine()
@@ -147,7 +202,7 @@ local function DrawKeybinds(gvarKey, isController)
 		end
 
 		if (keyName) then
-			if (GUI:Button(_T("GENERIC_CLEAR"), { size = button_size })) then
+			if (GUI:Button(clear_label, { size = button_size })) then
 				keyCode, keyName = nil, nil
 			end
 		end
@@ -160,14 +215,14 @@ return function()
 	if (ImGui.BeginTabBar("##ss_keybinds")) then
 		if (ImGui.BeginTabItem(_T("SETTINGS_KEYBINDS_KEYBOARD"))) then
 			for key in pairs(GVars.keyboard_keybinds) do
-				DrawKeybinds(key, false)
+				DrawKeybind(key, false)
 			end
 			ImGui.EndTabItem()
 		end
 
 		if (ImGui.BeginTabItem(_T("SETTINGS_KEYBINDS_CONTROLLER"))) then
 			for key in pairs(GVars.gamepad_keybinds) do
-				DrawKeybinds(key, true)
+				DrawKeybind(key, true)
 			end
 			ImGui.EndTabItem()
 		end

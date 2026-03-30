@@ -21,8 +21,8 @@ return function()
 	end
 
 	local clearHeatLabel = _F("%s %s", _T("GENERIC_CLEAR"), _T("YRV3_CWASH_HEAT"))
-	local iso            = GVars.backend.language_code
-	local bulletWidth    = bulletWidths[iso]
+	local index          = GVars.backend.language_index
+	local bulletWidth    = bulletWidths[index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_CWASH_WORK_EARNINGS"),
@@ -31,7 +31,7 @@ return function()
 			clearHeatLabel
 		}, 60.0)
 
-		bulletWidths[iso] = bulletWidth
+		bulletWidths[index] = bulletWidth
 	end
 
 	drawBasicBusiness(carWash, true, bulletWidth, clearHeatLabel)

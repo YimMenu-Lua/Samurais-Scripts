@@ -60,15 +60,15 @@ return function()
 	bools.coloredNameplate, _ = GUI:CustomToggle("Synthwave & Pain", bools.coloredNameplate)
 	ImGui.Spacing()
 
-	local iso         = GVars.backend.language_code
-	local bulletWidth = bulletWidths[iso]
+	local index       = GVars.backend.language_index
+	local bulletWidth = bulletWidths[index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_POPULARITY"),
 			_T("YRV3_CASH_SAFE"),
 		}, 60.0)
 
-		bulletWidths[iso] = bulletWidth
+		bulletWidths[index] = bulletWidth
 	end
 
 	local popValue  = club:GetPopularity()

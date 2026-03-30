@@ -34,7 +34,7 @@ local eSerializerState <const> = {
 ---@field private m_disabled boolean
 ---@field private m_file_name string
 ---@field private m_backup_file string
----@field private m_default_config table
+---@field private m_default_config Config
 ---@field private m_key_states table
 ---@field private m_dirty boolean
 ---@field private m_parsing_options { pretty: boolean, indent: string, strict_parsing: boolean }
@@ -283,6 +283,11 @@ end
 ---@return milliseconds
 function Serializer:GetTimeSinceLastFlush()
 	return self.m_last_write_time and self.m_last_write_time:Elapsed() or 0
+end
+
+---@return Config
+function Serializer:GetDefaultConfig()
+	return self.m_default_config
 end
 
 function Serializer:SaveBackup()

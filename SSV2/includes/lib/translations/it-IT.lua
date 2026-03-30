@@ -694,5 +694,10 @@ return {
 	["pl-PL"] = "Polacco",
 	["zh-TW"] = "Cinese (tradizionale)",
 	["ja-JP"] = "giapponese",
-	["ko-KR"] = "coreano"
+	["ko-KR"] = "coreano",
+	["SETTINGS_KEYBINDS_UNBIND"] = "Slegare",
+	["SETTINGS_KEYBINDS_NO_UNBIND"] = "Questa chiave non può essere sbloccata.",
+	["SETTINGS_KEYBINDS_NO_RESET"] = "Questa è una combinazione di tasti predefinita. Niente da resettare.",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"] = "Sei sicuro di voler reimpostare questa chiave sui valori predefiniti?",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"] = "Tutte le funzionalità associate a questa chiave non funzioneranno più. Sei sicuro di volerlo sciogliere?"
 }

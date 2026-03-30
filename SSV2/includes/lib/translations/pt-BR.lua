@@ -694,5 +694,10 @@ return {
 	["pt-BR"] = "Português",
 	["zh-CN"] = "Chinês (simplificado)",
 	["pl-PL"] = "polonês",
-	["ko-KR"] = "coreano"
+	["ko-KR"] = "coreano",
+	["SETTINGS_KEYBINDS_UNBIND"] = "Desvincular",
+	["SETTINGS_KEYBINDS_NO_UNBIND"] = "Esta chave não pode ser desvinculada.",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"] = "Todos os recursos associados a esta chave não funcionarão mais. Tem certeza de que deseja desvinculá-lo?",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"] = "Tem certeza de que deseja redefinir esta chave para o padrão?",
+	["SETTINGS_KEYBINDS_NO_RESET"] = "Este é um atalho de teclado padrão. Nada para redefinir."
 }

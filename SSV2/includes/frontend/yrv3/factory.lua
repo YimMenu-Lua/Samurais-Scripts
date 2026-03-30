@@ -29,8 +29,8 @@ return function(bb, notOwnedLabel)
 		return
 	end
 
-	local iso         = GVars.backend.language_code
-	local bulletWidth = bulletWidths[iso]
+	local index       = GVars.backend.language_index
+	local bulletWidth = bulletWidths[index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_EQUIP_UPGDRADE"),
@@ -40,7 +40,7 @@ return function(bb, notOwnedLabel)
 			_T("YRV3_VALUE_TOTAL"),
 		}, 60.0)
 
-		bulletWidths[iso] = bulletWidth
+		bulletWidths[index] = bulletWidth
 	end
 
 	local name          = bb:GetName()

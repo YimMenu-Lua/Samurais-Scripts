@@ -24,15 +24,15 @@ return function(warehouse, notOwnedLabel)
 		return
 	end
 
-	local iso         = GVars.backend.language_code
-	local bulletWidth = bulletWidths[iso]
+	local index       = GVars.backend.language_index
+	local bulletWidth = bulletWidths[index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_CARGO_AMT"),
 			_T("YRV3_VALUE_TOTAL"),
 		}, 60.0)
 
-		bulletWidths[iso] = bulletWidth
+		bulletWidths[index] = bulletWidth
 	end
 
 	local name   = warehouse:GetName()

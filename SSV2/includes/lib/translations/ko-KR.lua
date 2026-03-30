@@ -694,5 +694,10 @@ return {
 	["pl-PL"] = "광택",
 	["pt-BR"] = "포르투갈어",
 	["zh-CN"] = "중국어(간체)",
-	["es-ES"] = "스페인 사람"
+	["es-ES"] = "스페인 사람",
+	["SETTINGS_KEYBINDS_UNBIND"] = "바인딩 해제",
+	["SETTINGS_KEYBINDS_NO_UNBIND"] = "이 키는 바인딩을 해제할 수 없습니다.",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"] = "이 키를 기본값으로 재설정하시겠습니까?",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"] = "이 키와 관련된 모든 기능은 더 이상 작동하지 않습니다. 바인딩을 해제하시겠습니까?",
+	["SETTINGS_KEYBINDS_NO_RESET"] = "이는 기본 키 바인딩입니다. 재설정할 항목이 없습니다."
 }

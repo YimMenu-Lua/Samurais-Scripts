@@ -694,5 +694,10 @@ return {
 	["ko-KR"] = "coréen",
 	["pl-PL"] = "polonais",
 	["ja-JP"] = "japonais",
-	["pt-BR"] = "Portugais"
+	["pt-BR"] = "Portugais",
+	["SETTINGS_KEYBINDS_UNBIND"] = "Délier",
+	["SETTINGS_KEYBINDS_NO_UNBIND"] = "Cette clé ne peut pas être déliée.",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"] = "Toutes les fonctionnalités associées à cette clé ne fonctionneront plus. Êtes-vous sûr de vouloir le dissocier ?",
+	["SETTINGS_KEYBINDS_NO_RESET"] = "Il s'agit d'un raccourci clavier par défaut. Rien à réinitialiser.",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"] = "Êtes-vous sûr de vouloir réinitialiser cette clé par défaut ?"
 }

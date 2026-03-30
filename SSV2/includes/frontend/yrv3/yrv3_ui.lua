@@ -135,5 +135,9 @@ end
 GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimResupplierV3", YRV3UI)
 
 ThreadManager:Run(function()
+	while (not Translator:IsReady()) do
+		yield()
+	end
+
 	Translator:TranslateGXTList(tabNames)
 end)

@@ -9,7 +9,7 @@
 
 -- Global ImGui extensions
 
----@class NotifBellState
+---@class NotifWidgetState
 ---@field unreadCount number
 ---@field muted boolean
 ---@field unread boolean
@@ -691,7 +691,7 @@ function ImGui.Toggle(label, v, height)
 end
 
 -- idk what to call this
----@param state NotifBellState
+---@param state NotifWidgetState
 ---@param size vec2
 ---@return boolean clicked
 function ImGui.NotifWidget(state, size)

@@ -694,5 +694,10 @@ return {
 	["pl-PL"] = "Polieren",
 	["zh-CN"] = "Chinesisch (vereinfacht)",
 	["ja-JP"] = "japanisch",
-	["pt-BR"] = "Portugiesisch"
+	["pt-BR"] = "Portugiesisch",
+	["SETTINGS_KEYBINDS_UNBIND"] = "Lösen",
+	["SETTINGS_KEYBINDS_NO_UNBIND"] = "Dieser Schlüssel kann nicht entbunden werden.",
+	["SETTINGS_KEYBINDS_RESET_COFNIRM"] = "Sind Sie sicher, dass Sie diesen Schlüssel auf die Standardeinstellungen zurücksetzen möchten?",
+	["SETTINGS_KEYBINDS_UNBIND_COFNIRM"] = "Alle mit diesem Schlüssel verknüpften Funktionen funktionieren nicht mehr. Sind Sie sicher, dass Sie die Bindung aufheben möchten?",
+	["SETTINGS_KEYBINDS_NO_RESET"] = "Dies ist eine Standard-Tastenkombination. Nichts zum Zurücksetzen."
 }
