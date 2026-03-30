@@ -13,13 +13,13 @@
 
 
 ---@enum eControlType
-eControlType = {
+eControlType                 = {
 	KEYBOARD   = 0x0,
 	CONTROLLER = 0x1
 }
 
 ---@enum eVirtualKeyCodes
-eVirtualKeyCodes = { -- https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+eVirtualKeyCodes             = { -- https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 	DIGIT_0                = 0x30,
 	DIGIT_1                = 0x31,
 	DIGIT_2                = 0x32,
@@ -198,19 +198,19 @@ eVirtualKeyCodes = { -- https://learn.microsoft.com/en-us/windows/win32/inputdev
 	Z                      = 0x5A,
 }
 
-local WM_KEYDOWN <const> = 0x0100
-local WM_KEYUP <const> = 0x0101
+local WM_KEYDOWN <const>     = 0x0100
+local WM_KEYUP <const>       = 0x0101
 local WM_LBUTTONDOWN <const> = 0x0201
-local WM_LBUTTONUP <const> = 0x0202
+local WM_LBUTTONUP <const>   = 0x0202
 local WM_MBUTTONDOWN <const> = 0x0207
-local WM_MBUTTONUP <const> = 0x0208
-local WM_MOUSEWHEEL <const> = 0x020A
+local WM_MBUTTONUP <const>   = 0x0208
+local WM_MOUSEWHEEL <const>  = 0x020A
 local WM_RBUTTONDOWN <const> = 0x0204
-local WM_RBUTTONUP <const> = 0x0205
-local WM_SYSKEYDOWN <const> = 0x0104
-local WM_SYSKEYUP <const> = 0x0105
+local WM_RBUTTONUP <const>   = 0x0205
+local WM_SYSKEYDOWN <const>  = 0x0104
+local WM_SYSKEYUP <const>    = 0x0105
 local WM_XBUTTONDOWN <const> = 0x020B
-local WM_XBUTTONUP <const> = 0x020C
+local WM_XBUTTONUP <const>   = 0x020C
 
 --#endregion
 
@@ -383,40 +383,55 @@ function KeyManager:IsAnyKeyPressed()
 end
 
 ---@param keybindName string
-function KeyManager:IsKeybindPressed(keybindName)
+---@return eControlType, (integer|string)?
+function KeyManager:GetKeybind(keybindName)
 	local control = self:GetCurrentControlType()
+	local key     = nil
 	if (control == eControlType.KEYBOARD) then
-		local kbKeyStr = GVars.keyboard_keybinds[keybindName]
-		return kbKeyStr and KeyManager:IsKeyPressed(kbKeyStr) or false
+		key = GVars.keyboard_keybinds[keybindName]
 	end
 
 	if (control == eControlType.CONTROLLER) then
 		local gpad_t = GVars.gamepad_keybinds[keybindName]
-		if (type(gpad_t) ~= "table" or not gpad_t.code or gpad_t.code == 0) then
-			return false
+		if (type(gpad_t) ~= "table" or not gpad_t.code) then
+			key = 0
 		end
 
-		return PAD.IS_CONTROL_PRESSED(0, gpad_t.code)
+		key = gpad_t.code
+	end
+
+	return control, key
+end
+
+---@param keybindName string
+---@return boolean
+function KeyManager:IsKeybindPressed(keybindName)
+	local controlType, key = self:GetKeybind(keybindName)
+	if (not key) then return false end
+
+	if (controlType == eControlType.KEYBOARD) then
+		return self:IsKeyPressed(key)
+	end
+
+	if (controlType == eControlType.CONTROLLER and type(key) == "number") then
+		return key ~= 0 and PAD.IS_CONTROL_PRESSED(0, key)
 	end
 
 	return false
 end
 
 ---@param keybindName string
+---@return boolean
 function KeyManager:IsKeybindJustPressed(keybindName)
-	local control = self:GetCurrentControlType()
-	if (control == eControlType.KEYBOARD) then
-		local kbKeyStr = GVars.keyboard_keybinds[keybindName]
-		return kbKeyStr and KeyManager:IsKeyJustPressed(kbKeyStr) or false
+	local controlType, key = self:GetKeybind(keybindName)
+	if (not key) then return false end
+
+	if (controlType == eControlType.KEYBOARD) then
+		return self:IsKeyJustPressed(key)
 	end
 
-	if (control == eControlType.CONTROLLER) then
-		local gpad_t = GVars.gamepad_keybinds[keybindName]
-		if (type(gpad_t) ~= "table" or not gpad_t.code or gpad_t.code == 0) then
-			return false
-		end
-
-		return PAD.IS_CONTROL_JUST_PRESSED(0, gpad_t.code)
+	if (controlType == eControlType.CONTROLLER and type(key) == "number") then
+		return key ~= 0 and PAD.IS_CONTROL_JUST_PRESSED(0, key)
 	end
 
 	return false
@@ -489,9 +504,13 @@ function KeyManager:UpdateKeybind(oldKey, newKey)
 		return
 	end
 
-	local prev_func, on_key_down = registered.callback, registered.m_repeat_on_hold
+	local callback, on_key_down = registered.callback, registered.m_repeat_on_hold
+	if (type(newKey.newCallback) == "function") then
+		callback = newKey.newCallback
+	end
+
 	self:RemoveKeybind(oldKey)
-	self:RegisterKeybind(newKey.id, prev_func, on_key_down)
+	self:RegisterKeybind(newKey.id, callback, on_key_down)
 end
 
 ---@param key eVirtualKeyCodes | string
