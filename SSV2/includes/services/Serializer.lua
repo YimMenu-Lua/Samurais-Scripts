@@ -7,6 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local JSON <const>      = require("includes.thirdparty.json.json")()
+local B64_CHARS <const> = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+local XOR_KEY <const>   = "\xA3\x4F\xD2\x9B\x7E\xC1\xE8\x36\x5D\x0A\xF7\xB4\x6C\x2D\x89\x50\x1E\x73\xC9\xAF\x3B\x92\x58\xE0\x14\x7D\xA6\xCB\x81\x3F\xD5\x67"
+
+assert(JSON.VERSION == "20211016.28", "Bad Json package version.")
 ---@enum eSerializerState
 local eSerializerState <const> = {
 	INIT      = -1,
@@ -23,6 +28,7 @@ local eSerializerState <const> = {
 ---@field strict_parsing? boolean -- Refer to the Json package
 ---@field encryption_key? string -- Optional key for XOR encryption
 
+
 --------------------------------------
 -- Class: Serializer
 --------------------------------------
@@ -35,22 +41,19 @@ local eSerializerState <const> = {
 ---@field private m_file_name string
 ---@field private m_backup_file string
 ---@field private m_default_config Config
+---@field private m_deferred_objects array<anyval>
 ---@field private m_key_states table
 ---@field private m_dirty boolean
 ---@field private m_parsing_options { pretty: boolean, indent: string, strict_parsing: boolean }
 ---@field private m_state eSerializerState
 ---@field private m_xor_key string
 ---@field private m_last_write_time TimePoint
----@field public class_types table<string, { serializer:fun(), constructor:fun() }>
----@overload fun(scrname?: string, default_config?: table, runtime_vars?: table, varargs?: SerializerOptionals): Serializer
-local Serializer = Class("Serializer")
-Serializer.class_types = {}
-Serializer.m_deferred_objects = {}
-Serializer.json = require("includes.thirdparty.json.json")()
-Serializer.default_xor_key =
-"\xA3\x4F\xD2\x9B\x7E\xC1\xE8\x36\x5D\x0A\xF7\xB4\x6C\x2D\x89\x50\x1E\x73\xC9\xAF\x3B\x92\x58\xE0\x14\x7D\xA6\xCB\x81\x3F\xD5\x67"
-Serializer.b64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-Serializer.__version = "1.0.5"
+---@field private m_deprecated_keys array<string>
+---@field private m_moved_keys array<{ path: string, file_name: string }> -- Keys to be moved into a separate file and managed by the owner feature.
+---@field private m_registered_types table<string, { serializer:fun(), constructor:fun() }>
+---@overload fun(): Serializer
+local Serializer     = Class("Serializer")
+Serializer.__version = "1.0.6"
 Serializer.__credits = [[
 	  +----------------------------------------------------------------------------------------+
 	  |                                                                                        |
@@ -64,34 +67,58 @@ Serializer.__credits = [[
 	  +----------------------------------------------------------------------------------------+
 	]]
 
-assert(Serializer.json.VERSION == "20211016.28", "Bad Json package version.")
+
+---@return Serializer
+function Serializer:init()
+	if (self.m_initialized) then return self end
+	if (_G.Serializer) then return _G.Serializer end
+
+	local instance = setmetatable({
+		m_state            = eSerializerState.INIT,
+		m_initialized      = true,
+		m_dirty            = false,
+		m_locked           = false,
+		m_disabled         = false,
+		m_registered_types = {},
+		m_deferred_objects = {},
+		m_moved_keys       = {
+			{ path = "features.yim_actions.action_commands",  file_name = "action_commands.json" },
+			{ path = "features.entity_forge.favorites",       file_name = "forge_favorites.json" },
+			{ path = "features.entity_forge.forged_entities", file_name = "forged_entities.json" },
+		},
+		m_deprecated_keys  = {
+			"features.bsv2",
+			"features.entity_forge",
+		},
+		m_lock_queue       = {},
+		m_key_states       = {},
+		---@diagnostic disable-next-line
+	}, Serializer)
+
+	ThreadManager:RegisterLooped("SS_SERIALIZER", function()
+		instance:OnTick()
+	end)
+
+	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
+		instance:OnShutdown()
+	end)
+
+	return instance
+end
 
 ---@param script_name? string
 ---@param default_config? table
 ---@param runtime_vars? table Runtime variables that will be tracked for auto-save.
 ---@param varargs? SerializerOptionals
----@return Serializer
-function Serializer:init(script_name, default_config, runtime_vars, varargs)
-	if (self.m_initialized) then
-		return self
-	end
-
-	local timestamp        = DateTime:Now():Format("%H_%M_%S")
-	script_name            = script_name or (Backend and Backend.script_name or ("unk_cfg_%s"):format(timestamp))
-
-	local filename         = script_name:snakecase()
+function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 	varargs                = varargs or {}
+	script_name            = script_name or (Backend and Backend.script_name or ("unk_cfg_%s"):format(DateTime:Now():Format("%H_%M_%S")))
+	local filename         = script_name:snakecase()
 
 	self.m_default_config  = default_config or { __version = Backend and Backend.__version or self.__version }
 	self.m_file_name       = _F("%s.json", filename)
 	self.m_backup_file     = _F("%s.bak", filename)
-	self.m_xor_key         = varargs.encryption_key or self.default_xor_key
-	self.m_state           = eSerializerState.INIT
-	self.m_dirty           = false
-	self.m_locked          = false
-	self.m_disabled        = false
-	self.m_lock_queue      = {}
-	self.m_key_states      = {}
+	self.m_xor_key         = varargs.encryption_key or XOR_KEY
 	self.m_parsing_options = {
 		pretty         = (varargs.pretty ~= nil) and varargs.pretty or true,
 		indent         = string.rep(" ", varargs.indent or 4),
@@ -105,10 +132,9 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 	local config_data = self:Read()
 	if (type(config_data) ~= "table") then
 		log.warning("[Serializer]: Failed to read data! Persistent config will be disabled for this session.")
-		self.m_disabled    = true
-		self.m_state       = eSerializerState.SUSPENDED
-		self.m_initialized = true
-		return self
+		self.m_disabled = true
+		self.m_state    = eSerializerState.SUSPENDED
+		return
 	end
 
 	if (not runtime_vars) then
@@ -125,26 +151,20 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 					return value
 				end
 
-				value = config_data[k]
-				local saved = self.m_default_config[value]
+				local default = self.m_default_config[value]
+				value         = config_data[k]
 				if (value ~= nil) then
-					runtime_vars[k] = value
 					self.m_key_states[k] = value
-					self.m_dirty = true
+					self.m_dirty         = true
 					return value
-				elseif (saved ~= nil) then
-					runtime_vars[k] = saved
-					self.m_key_states[k] = saved
-					self.m_dirty = true
+				elseif (default ~= nil) then
+					self.m_key_states[k] = default
+					self.m_dirty         = true
 				end
 
-				return nil
+				return self.m_key_states[k]
 			end,
 			__newindex = function(_, k, v)
-				if (type(v) == "table" and getmetatable(v) == nil and type(v.serialize) ~= "function") then
-					v = table.copy(v)
-				end
-
 				if (self.m_default_config[k] == nil) then
 					local value = config_data[k] ~= nil and config_data[k] or v
 					self.m_key_states[k] = value
@@ -152,7 +172,7 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 
 				if (self.m_key_states[k] ~= v) then
 					self.m_key_states[k] = v
-					self.m_dirty = true
+					self.m_dirty         = true
 				end
 			end
 		}
@@ -173,17 +193,6 @@ function Serializer:init(script_name, default_config, runtime_vars, varargs)
 	self.m_last_write_time = TimePoint.new()
 	self:SyncKeys()
 	self:SaveBackup()
-
-	ThreadManager:RegisterLooped("SS_SERIALIZER", function()
-		self:OnTick()
-	end)
-
-	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
-		self:OnShutdown()
-	end)
-
-	self.m_initialized = true
-	return self
 end
 
 -- Ensures that saved config matches the default schema.
@@ -195,16 +204,33 @@ function Serializer:SyncKeys(runtime_vars)
 		return
 	end
 
-	local saved       = self:Read()
-	local default_cfg = self.m_default_config
-	runtime_vars      = runtime_vars or _ENV.GVars or {}
+	ThreadManager:Run(function()
+		local saved       = self:Read()
+		local default_cfg = self.m_default_config
+		runtime_vars      = runtime_vars or _ENV.GVars or {}
 
-	if (not saved["__schema_hash"] or saved["__schema_hash"] ~= self.__schema_hash) then
-		table.merge(default_cfg, runtime_vars)
-		saved["__schema_hash"] = self.__schema_hash
-		runtime_vars["__schema_hash"] = self.__schema_hash
-		self:Parse(saved)
-	end
+		for _, data in ipairs(self.m_moved_keys) do
+			---@type table?
+			local current = table.get_nested_key(saved, data.path)
+			if (type(current) == "table") then
+				self:WriteToFile(data.file_name, current)
+			end
+			table.set_nested_key(saved, data.path, nil)
+			table.set_nested_key(runtime_vars, data.path, nil)
+		end
+
+		for _, path in ipairs(self.m_deprecated_keys) do
+			table.set_nested_key(saved, path, nil)
+			table.set_nested_key(runtime_vars, path, nil)
+		end
+
+		if (not saved["__schema_hash"] or saved["__schema_hash"] ~= self.__schema_hash) then
+			table.merge(default_cfg, runtime_vars)
+			saved["__schema_hash"]        = self.__schema_hash
+			runtime_vars["__schema_hash"] = self.__schema_hash
+			self.m_dirty                  = true
+		end
+	end)
 end
 
 -- Registers a new object type for automatic serialization/deserialization
@@ -242,8 +268,13 @@ Serializer:RegisterNewType("MyClass", MyClass.ToJson, MyClass.FromJson)
 ---@param deserializer function JSON to object
 function Serializer:RegisterNewType(typename, serializer, deserializer)
 	assert(type(typename) == "string", "Attempt to register an invalid type. Type name should be string.")
+
 	typename = typename:lower():trim()
-	self.class_types[typename] = {
+	if (self.m_registered_types[typename] ~= nil) then
+		return
+	end
+
+	self.m_registered_types[typename] = {
 		serializer  = serializer,
 		constructor = deserializer
 	}
@@ -251,7 +282,7 @@ end
 
 ---@return boolean
 function Serializer:CanAccess()
-	return self.m_state == eSerializerState.IDLE
+	return self.m_state == eSerializerState.IDLE and not self.m_disabled
 end
 
 ---@return boolean
@@ -357,7 +388,7 @@ function Serializer:Preprocess(value, seen)
 	local type_name = value.__type
 	if (type_name) then
 		local name     = tostring(type_name):lower():trim()
-		local fallback = self.class_types[name] and self.class_types[name].serializer
+		local fallback = self.m_registered_types[name] and self.m_registered_types[name].serializer
 		if (type(fallback) == "function") then
 			local ok, res = pcall(fallback, value)
 			if (ok and type(res) == "table") then
@@ -394,7 +425,7 @@ function Serializer:Postprocess(value)
 	local type_name = rawget(value, "__type")
 	if (type_name) then
 		local name = tostring(type_name):lower():trim()
-		local ctor = self.class_types[name] and self.class_types[name].constructor
+		local ctor = self.m_registered_types[name] and self.m_registered_types[name].constructor
 
 		if (type(ctor) == "function") then
 			local ok, result = pcall(ctor, value)
@@ -420,15 +451,9 @@ end
 ---@param etc any
 ---@return boolean success, string? result
 function Serializer:EncodeImpl(data, etc)
-	return pcall(self.json.encode,
-		self.json,
-		data,
-		etc,
-		{
-			pretty = self.m_parsing_options.pretty,
-			indent = self.m_parsing_options.indent
-		}
-	)
+	local pretty = self.m_parsing_options.pretty
+	local indent = self.m_parsing_options.indent
+	return pcall(JSON.encode, JSON, data, etc, { pretty = pretty, indent = indent })
 end
 
 ---@private
@@ -436,12 +461,8 @@ end
 ---@param etc any
 ---@return boolean success, any result
 function Serializer:DecodeImpl(data, etc)
-	return pcall(self.json.decode,
-		self.json,
-		data,
-		etc,
-		{ strictParsing = self.m_parsing_options.strict_parsing or false }
-	)
+	local strictParsing = self.m_parsing_options.strict_parsing or false
+	return pcall(JSON.decode, JSON, data, etc, { strictParsing = strictParsing })
 end
 
 ---@param data any
@@ -610,7 +631,7 @@ end
 
 ---@param exceptions? Set<string>
 function Serializer:Reset(exceptions)
-	exceptions = exceptions or Set.new()
+	exceptions = exceptions or Set.new("backend.debug_mode", "__schema_hash")
 	local data = self:Read()
 	if (type(data) ~= "table") then
 		log.warning("[Serializer]: Invalid data type!")
@@ -656,10 +677,10 @@ function Serializer:B64Encode(input)
 		local b             = input:byte(i + 1) or 0
 		local c             = input:byte(i + 2) or 0
 		local triple        = (a << 16) | (b << 8) | c
-		output[#output + 1] = self.b64_chars:sub(((triple >> 18) & 63) + 1, ((triple >> 18) & 63) + 1)
-		output[#output + 1] = self.b64_chars:sub(((triple >> 12) & 63) + 1, ((triple >> 12) & 63) + 1)
-		output[#output + 1] = (i + 1 <= n) and self.b64_chars:sub(((triple >> 6) & 63) + 1, ((triple >> 6) & 63) + 1) or "="
-		output[#output + 1] = (i + 2 <= n) and self.b64_chars:sub((triple & 63) + 1, (triple & 63) + 1) or "="
+		output[#output + 1] = B64_CHARS:sub(((triple >> 18) & 63) + 1, ((triple >> 18) & 63) + 1)
+		output[#output + 1] = B64_CHARS:sub(((triple >> 12) & 63) + 1, ((triple >> 12) & 63) + 1)
+		output[#output + 1] = (i + 1 <= n) and B64_CHARS:sub(((triple >> 6) & 63) + 1, ((triple >> 6) & 63) + 1) or "="
+		output[#output + 1] = (i + 2 <= n) and B64_CHARS:sub((triple & 63) + 1, (triple & 63) + 1) or "="
 	end
 
 	return table.concat(output)
@@ -670,8 +691,8 @@ end
 function Serializer:B64Decode(base64)
 	local b64lookup = {}
 
-	for i = 1, #self.b64_chars do
-		b64lookup[self.b64_chars:sub(i, i)] = i - 1
+	for i = 1, #B64_CHARS do
+		b64lookup[B64_CHARS:sub(i, i)] = i - 1
 	end
 
 	base64       = base64:gsub("%s", ""):gsub("=", "")
@@ -786,8 +807,9 @@ end
 --
 -- This can not be used with the main config file.
 ---@param filename string
+---@param onFileNotFoundErr? fun(): any
 ---@return any
-function Serializer:ReadFromFile(filename)
+function Serializer:ReadFromFile(filename, onFileNotFoundErr)
 	if (type(filename) ~= "string" or not filename:endswith(".json")) then
 		log.warning("[Serializer]: Invalid file name.")
 		return
@@ -800,6 +822,10 @@ function Serializer:ReadFromFile(filename)
 
 	local f <close>, err = io.open(filename, "r")
 	if (not f) then
+		if (type(onFileNotFoundErr) == "function") then
+			return onFileNotFoundErr()
+		end
+
 		log.fwarning("[Serializer]: Failed to open file: %s", err)
 		return
 	end
@@ -816,7 +842,7 @@ function Serializer:Reconstruct(object)
 
 	if (object.__type) then
 		local name  = tostring(object.__type):lower()
-		local entry = self.class_types[name]
+		local entry = self.m_registered_types[name]
 
 		if (entry and type(entry.constructor) == "function") then
 			local ok, result = pcall(entry.constructor, object)
@@ -876,12 +902,11 @@ function Serializer:OnTick()
 		return
 	end
 
-	if (not self.m_dirty and not self.m_last_write_time:HasElapsed(5e3)) then
+	if (not self.m_dirty and not self.m_last_write_time:HasElapsed(5000)) then
 		return
 	end
 
 	self:Flush()
-	sleep(1e3)
 end
 
 function Serializer:OnShutdown()
@@ -939,4 +964,6 @@ function Serializer:Dump()
 	self:notify("Dumped to console.")
 end
 
-return Serializer
+local singleInstance = Serializer()
+_G.Serializer        = singleInstance
+return singleInstance

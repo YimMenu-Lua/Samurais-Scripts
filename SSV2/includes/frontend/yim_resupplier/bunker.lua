@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local drawFactory = require("includes.frontend.yrv3.factory")
+local drawFactory = require("includes.frontend.yim_resupplier.factory")
 
 return function()
 	drawFactory(YRV3:GetBunker(), _T("YRV3_BUNKER_NOT_OWNED"))

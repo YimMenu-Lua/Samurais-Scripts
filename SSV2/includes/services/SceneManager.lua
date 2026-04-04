@@ -121,15 +121,11 @@ function SceneManager:PlayNetworkedScene(sceneData)
 	end
 
 	if (self:IsPlaying()) then
-		Notifier:ShowMessage(
-			"Samurai's Scripts",
-			"A scene is already playing."
-		)
+		Notifier:ShowMessage("Samurai's Scripts", "A scene is already playing.")
 		return
 	end
 
 	local scene = self:PrepareScene(sceneData)
-
 	if (not ENTITY.DOES_ENTITY_EXIST(scene.origin.handle)) then
 		log.warning("origin entity not found")
 		return

@@ -142,7 +142,7 @@ end
 
 ---@return boolean
 function Backend:AreControlsDisabled()
-	return self.disable_input
+	return self.disable_input or GUI:WantsInput()
 end
 
 ---@param data string
@@ -474,7 +474,7 @@ function Backend:RegisterHandlers()
 	if (mockEnv) then return end
 
 	ThreadManager:RegisterLooped("SS_CTRLS", function()
-		if (self.disable_input) then
+		if (self.disable_input or GUI:WantsInput()) then
 			PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
 		else
 			if ((gui.is_open() or GUI:IsOpen())) then

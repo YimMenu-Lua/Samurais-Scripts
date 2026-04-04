@@ -6,7 +6,7 @@
 --	* Credit the owner and contributors.
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
-local drawCashSafeLoopToggle = require("includes.frontend.yrv3.cashloop_toggle")
+local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
 local colMoneyGreen = Color("#85BB65")
 
 ---@param business CarWash|CarWashSubBusiness

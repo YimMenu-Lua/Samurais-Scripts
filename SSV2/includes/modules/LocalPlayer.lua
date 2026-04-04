@@ -73,19 +73,24 @@ end
 ---@override
 ---@return handle
 function LocalPlayer:GetHandle()
-	return PLAYER.PLAYER_PED_ID()
+	return _G.self.get_ped()
 end
 
 -- Returns the current local player's ID.
 ---@return number
 function LocalPlayer:GetPlayerID()
-	return PLAYER.PLAYER_ID()
+	return _G.self.get_id()
 end
 
 -- Returns the current local player's model hash.
 ---@return hash
 function LocalPlayer:GetModelHash()
 	return ENTITY.GET_ENTITY_MODEL(self:GetHandle())
+end
+
+---@return vec3
+function LocalPlayer:GetPos(_)
+	return _G.self.get_pos()
 end
 
 -- Returns the vehicle you're driving, not just sitting in.
@@ -95,10 +100,17 @@ function LocalPlayer:GetVehicle()
 	return self.m_vehicle
 end
 
+---@return handle
+function LocalPlayer:GetVehicleNative()
+	return _G.self.get_veh()
+end
+
 -- Returns the vehicle you're currently sitting in whether you're driving or not.
----@return Vehicle
+---@return Vehicle?
 function LocalPlayer:GetVehiclePlayerIsIn()
-	return Vehicle(self:GetVehicleNative())
+	local handle = self:GetVehicleNative()
+	if (handle == 0) then return end
+	return Vehicle(handle)
 end
 
 function LocalPlayer:GetMaxArmour()
@@ -137,7 +149,7 @@ function LocalPlayer:GetTotalBalance()
 	return self:GetWalletBalance() + self:GetBankBalance()
 end
 
-function LocalPlayer:GetName()
+function LocalPlayer:GetCharacterName()
 	return Game.GetCharacterName()
 end
 
@@ -458,7 +470,7 @@ function LocalPlayer:SetMovementClipset(data, isJson)
 		s:sleep(100)
 
 		local handle = self:GetHandle()
-		if mvmtclipset then
+		if (mvmtclipset) then
 			TaskWait(Game.RequestClipSet, mvmtclipset)
 			PED.SET_PED_MOVEMENT_CLIPSET(handle, mvmtclipset, 1.0)
 			PED.SET_PED_ALTERNATE_MOVEMENT_ANIM(handle, 0, "move_clown@generic", "idle", 1090519040, true)
@@ -466,21 +478,18 @@ function LocalPlayer:SetMovementClipset(data, isJson)
 			self.CurrentMovementClipset = mvmtclipset
 		end
 
-		if data.wmvmt then
+		if (data.wmvmt) then
 			PED.SET_PED_WEAPON_MOVEMENT_CLIPSET(handle, data.wmvmt)
 			self.CurrentWeaponMovementClipset = data.wmvmt
 		end
 
-		if data.strf then
-			while not STREAMING.HAS_CLIP_SET_LOADED(data.strf) do
-				STREAMING.REQUEST_CLIP_SET(data.strf)
-				coroutine.yield()
-			end
+		if (data.strf) then
+			TaskWait(Game.RequestClipSet, data.strf)
 			PED.SET_PED_STRAFE_CLIPSET(handle, data.strf)
 			self.CurrentStrafeClipset = data.strf
 		end
 
-		if data.wanim then
+		if (data.wanim) then
 			WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(handle, _J(data.wanim))
 		end
 	end)

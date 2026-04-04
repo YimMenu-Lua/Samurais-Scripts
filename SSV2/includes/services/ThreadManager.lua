@@ -164,6 +164,7 @@ function Thread:OnTick(s)
 
 		if (self.m_should_pause) then
 			self.m_state         = eThreadState.SUSPENDED
+			self.m_time_started  = 0
 			self.m_last_entry_at = 0
 			repeat
 				self.m_last_yield_at = Time.Now()
@@ -231,7 +232,6 @@ function Thread:Stop()
 	end
 
 	if (self.m_stage ~= eThreadStage.IDLE) then
-		Backend:debug("Thread %s tried to exit mid-callback.", self.m_name)
 		self.m_should_terminate = true
 		return
 	end
@@ -302,54 +302,58 @@ end
 ---@field private m_mock_routines table<integer, thread>
 ---@field private m_callback_handlers table<integer, { dispatch: function }>
 ---@field protected m_initialized boolean
+---@overload fun() : ThreadManager
 local ThreadManager = Class("ThreadManager")
 
 ---@return ThreadManager
 function ThreadManager:init()
-	if (self.m_initialized) then
-		log.warning("Attempt to create a second instance of a singleton (ThreadManager)")
-		return self
-	end
+	if (self.m_initialized) then return self end
+	if (_G.ThreadManager) then return _G.ThreadManager end
 
-	self.m_threads           = {}
-	self.m_mock_routines     = {}
-	self.m_callback_handlers = {
-		[Enums.eAPIVersion.L54] = {
-			dispatch = function(callback)
-				table.insert(
-					self.m_mock_routines,
-					coroutine.create(callback)
-				)
-			end
-		},
-		[Enums.eAPIVersion.V1] = {
-			dispatch = function(callback)
-				script.run_in_fiber(function(s)
-					callback(s)
-				end)
-			end
-		},
-		[Enums.eAPIVersion.V2] = {
-			dispatch = function(callback)
-				script.run_in_fiber(function(s)
-					callback(s)
-				end)
-			end
-			-- dispatch = function(callback)
-			-- 	---@diagnostic disable-next-line: undefined-field
-			-- 	script.run_in_callback(function(s)
-			-- 		callback(s)
-			-- 	end)
-			-- end
+	local instance = setmetatable({
+		m_threads           = {},
+		m_mock_routines     = {},
+		m_callback_handlers = {
+			[Enums.eAPIVersion.L54] = {
+				dispatch = function(callback)
+					table.insert(
+						self.m_mock_routines,
+						coroutine.create(callback)
+					)
+				end
+			},
+			[Enums.eAPIVersion.V1] = {
+				dispatch = function(callback)
+					script.run_in_fiber(function(s)
+						callback(s)
+					end)
+				end
+			},
+			[Enums.eAPIVersion.V2] = {
+				dispatch = function(callback)
+					script.run_in_fiber(function(s)
+						callback(s)
+					end)
+				end
+
+				-- Support for YimMenuV2 is no longer considered
+				-- dispatch = function(callback)
+				-- 	---@diagnostic disable-next-line: undefined-field
+				-- 	script.run_in_callback(function(s)
+				-- 		callback(s)
+				-- 	end)
+				-- end
+			}
 		}
-	}
+		---@diagnostic disable-next-line
+	}, ThreadManager)
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
-		self:Shutdown()
+		instance:Shutdown()
 	end)
 
-	self.m_initialized = true
-	return self
+	instance.m_initialized = true
+	return instance
 end
 
 -- Runs a callback once in a fiber.
@@ -624,4 +628,6 @@ end
 
 --#endregion
 
-return ThreadManager
+local singleInstance = ThreadManager()
+_G.ThreadManager     = singleInstance
+return ThreadManager()

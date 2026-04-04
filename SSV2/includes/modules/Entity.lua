@@ -35,6 +35,7 @@ local cast_map <const> = {
 	}
 }
 
+
 --------------------------------------
 -- Class: Entity
 --------------------------------------
@@ -45,8 +46,9 @@ local cast_map <const> = {
 ---@field protected m_ptr pointer
 ---@field private m_internal? CEntity
 ---@overload fun(handle: integer): Entity?
-Entity                 = Class("Entity")
+Entity = Class("Entity")
 
+---@return boolean
 function Entity:__eq(right)
 	local hndl = self:GetHandle()
 
@@ -85,7 +87,8 @@ end
 
 ---@return boolean
 function Entity:IsValid()
-	return ENTITY.DOES_ENTITY_EXIST(self:GetHandle())
+	local handle = self:GetHandle()
+	return handle and handle > 0 and ENTITY.DOES_ENTITY_EXIST(handle)
 end
 
 ---@generic T : ClassMeta<Entity>
@@ -117,6 +120,11 @@ function Entity:As(obj)
 	local map = cast_map[self_type]
 	if (not map or not map[obj_type]) then
 		error(_F("Can not cast %s to %s.", self_type, obj_type))
+	end
+
+	local handle = self:GetHandle()
+	if (not Game.IsScriptHandle(handle)) then
+		error(_F("Failed to cast '%s' to '%s': Invalid entity.", self_type, obj_type))
 	end
 
 	---@type Entity

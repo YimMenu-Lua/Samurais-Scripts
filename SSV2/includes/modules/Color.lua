@@ -436,7 +436,7 @@ function Color.deserialize(t)
 	return Color.new(t.arg)
 end
 
-if (Serializer and not Serializer.class_types["color"]) then
+if (Serializer) then
 	Serializer:RegisterNewType("color", Color.serialize, Color.deserialize)
 end
 ------------------------------------------------------------------------------------------

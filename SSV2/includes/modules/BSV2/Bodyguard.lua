@@ -10,10 +10,9 @@
 local Weapons = require("includes.data.weapons")
 require("includes.modules.Ped")
 
-local ReservedTargetVehicles = {}
-local ReservedVehicleSeats = {}
-
-local eGuardTask <const> = {
+local ReservedTargetVehicles            = {}
+local ReservedVehicleSeats              = {}
+local eGuardTask <const>                = {
 	NONE          = -1,
 	FOLLOW        = 0,
 	VEH_FOLLOW    = 1,
@@ -39,7 +38,7 @@ local eGuardUninterruptibleTask <const> = {
 	[eGuardTask.OVERRIDE]     = true,
 }
 
-local eGuardTaskToString = {
+local eGuardTaskToString                = {
 	[eGuardTask.NONE]          = "Idle.",
 	[eGuardTask.FOLLOW]        = "Following player.",
 	[eGuardTask.VEH_FOLLOW]    = "Escorting player's vehicle.",
@@ -114,18 +113,15 @@ function Bodyguard.new(modelHash, name, spawnPos, weapon, godmode, noRagdoll, be
 		weapon = _J("WEAPON_TECPISTOL")
 	end
 
-	local ped = Ped:Create(
+	local ok, handle = pcall(Game.CreatePed,
 		modelHash,
-		Enums.eEntityType.Ped,
 		spawnPos,
 		LocalPlayer:GetHeading(-180),
 		Game.IsOnline(),
 		false
 	)
-
-	local handle = ped:GetHandle()
-	if (not Game.IsScriptHandle(handle)) then
-		Backend:debug("failed to create ped.")
+	if (not ok or not Game.IsScriptHandle(handle)) then
+		Notifier:ShowWarning("Billionaire Services", "Failed to create entity! Please try again later", true, 5)
 		return
 	end
 
@@ -406,7 +402,7 @@ function Bodyguard:UpdatePosition(allowInside)
 	end
 
 	local playerElevation = LocalPlayer:GetHeightAboveGround()
-	if (PV:IsValid()) then
+	if (PV and PV:IsValid()) then
 		if (playerElevation >= 5 or playerElevation < 0) then
 			if (not PV:IsLandVehicle() and not PV:IsPedInVehicle(self.m_handle)) then
 				self.task = eGuardTask.NONE
@@ -476,7 +472,7 @@ function Bodyguard:UpdatePosition(allowInside)
 	ENTITY.SET_ENTITY_HEADING(entity, LocalPlayer:GetHeading())
 	PED.SET_PED_COORDS_KEEP_VEHICLE(self.m_handle, pos.x, pos.y, pos.z)
 
-	if (self.task == eGuardTask.VEH_FOLLOW and vehicle and vehicle:IsValid() and PV:IsValid()) then
+	if (self.task == eGuardTask.VEH_FOLLOW and vehicle and vehicle:IsValid() and PV and PV:IsValid()) then
 		VEHICLE.SET_VEHICLE_FORWARD_SPEED(handle, PV:GetSpeed() + 0.5)
 	end
 end
@@ -517,7 +513,7 @@ function Bodyguard:GrabNearestVehicle()
 
 	self:SetTask(eGuardTask.JACK_VEHICLE)
 
-	script.run_in_fiber(function(s)
+	ThreadManager:Run(function(s)
 		if self.targetVehicleToJack then
 			if Game.IsScriptHandle(self.targetVehicleToJack) then
 				local pos = self:GetPos()
@@ -831,7 +827,7 @@ end
 ---@param speechName string
 ---@param speechParam? string
 function Bodyguard:Speak(speechName, speechParam)
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		if AUDIO.IS_AMBIENT_SPEECH_PLAYING(self.m_handle) then
 			return
 		end
@@ -1019,7 +1015,7 @@ function Bodyguard:TaskEnterVehicle(vehicle, timeout, seatIndex)
 		end
 
 		self.escortTarget = nil
-		script.run_in_fiber(function(s)
+		ThreadManager:Run(function(s)
 			if PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.m_handle) then
 				return
 			end
@@ -1206,14 +1202,14 @@ end
 
 ---@param s script_util
 function Bodyguard:TickVehicleEscort(s)
-	local PV = LocalPlayer:GetVehiclePlayerIsIn()
 	if (self.task == eGuardTask.VEH_FOLLOW) then
 		if (LocalPlayer:IsOnFoot()) then
 			self.escortGroup:StopTheVehicle()
 			return
 		end
 
-		if (self.escortTarget and PV and self.escortTarget == PV:GetHandle()) then
+		local PV = LocalPlayer:GetVehiclePlayerIsIn()
+		if (PV and self.escortTarget and self.escortTarget == PV:GetHandle()) then
 			if (not PV:IsLandVehicle()) then
 				self.escortTarget = nil
 				self.task = eGuardTask.NONE
@@ -1263,11 +1259,11 @@ function Bodyguard:HandleVehicleTransitions()
 		return
 	end
 
-	local guardInVehicle = PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.m_handle)
+	local guardInVehicle  = PED.IS_PED_SITTING_IN_ANY_VEHICLE(self.m_handle)
 	local playerInVehicle = not LocalPlayer:IsOnFoot()
-	local PV = LocalPlayer:GetVehicle()
+	local PV              = playerInVehicle and LocalPlayer:GetVehiclePlayerIsIn() or nil
 	if (not guardInVehicle) then
-		if (playerInVehicle and PV and PV:IsValid() and self.task ~= eGuardTask.ENTER_VEHICLE) then
+		if (PV and PV:IsValid() and self.task ~= eGuardTask.ENTER_VEHICLE) then
 			if (PV:IsAnySeatFree()) then
 				self:QueueTask(eGuardTask.ENTER_VEHICLE, self:TaskEnterVehicle(PV:GetHandle()), true)
 			else
@@ -1277,7 +1273,7 @@ function Bodyguard:HandleVehicleTransitions()
 	else
 		local gv = self:GetVehicle()
 		if (gv and gv:GetHandle() ~= LocalPlayer:GetVehicleNative()) then
-			if (playerInVehicle) then
+			if (playerInVehicle and PV) then
 				if (not PV:IsLandVehicle()) then
 					return
 				end
@@ -1294,944 +1290,4 @@ function Bodyguard:HandleVehicleTransitions()
 	end
 end
 
------------------------------------------------------
--- Escort Vehicle Struct
------------------------------------------------------
----@class EscortVehicle
-local EscortVehicle = {}
-EscortVehicle.__index = EscortVehicle
-EscortVehicle.model = 0
-EscortVehicle.handle = 0
-EscortVehicle.name = ""
-EscortVehicle.blip = nil
-
----@param modelHash integer
----@param groupName string
----@param godMode? boolean
-function EscortVehicle.new(modelHash, groupName, godMode)
-	TaskWait(Game.RequestModel, modelHash)
-
-	local handle = Game.CreateVehicle(modelHash, vec3:zero())
-	if not TaskWait(Game.IsScriptHandle, handle) then
-		return
-	end
-
-	local wrapper    = Vehicle(handle)
-	local vehName    = wrapper:GetName()
-	local blip       = Game.AddBlipForEntity(handle, 1.14, true)
-	local blipName   = groupName or string.format("Escort Vehicle (%s)", vehName)
-	local r, g, b, _ = Color("#000100"):AsRGBA() -- Vantablack
-
-	entities.take_control_of(handle, 300)
-	Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(handle))
-	Game.SetBlipSprite(blip, 229)
-	Game.SetBlipName(blip, blipName)
-
-	ENTITY.SET_ENTITY_INVINCIBLE(handle, godMode or false)
-	VEHICLE.SET_VEHICLE_MOD_KIT(handle, 0)
-	VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(handle, r, g, b)
-	VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(handle, r, g, b)
-	VEHICLE.SET_VEHICLE_EXTRA_COLOURS(handle, 0, 0)
-	VEHICLE.SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(handle, false, false)
-	VEHICLE.SET_VEHICLE_TYRES_CAN_BURST(handle, false)
-	VEHICLE.SET_VEHICLE_STRONG(handle, true)
-	VEHICLE.SET_VEHICLE_DIRT_LEVEL(handle, 0)
-	VEHICLE.SET_VEHICLE_WINDOW_TINT(handle, 1)
-	VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT(handle, "MRDR INC")
-	wrapper:MaxPerformance()
-
-	return setmetatable(
-		{
-			model = modelHash,
-			handle = handle,
-			name = vehName,
-			blip = {
-				handle = blip,
-				alpha = 255
-			}
-		},
-		EscortVehicle
-	)
-end
-
-function EscortVehicle:Exists()
-	return self.handle ~= 0 and Backend:IsScriptEntity(self.handle)
-end
-
-function EscortVehicle:IsDriveable()
-	return VEHICLE.IS_VEHICLE_DRIVEABLE(self.handle, true)
-end
-
-function EscortVehicle:IsStuck()
-	if not self:Exists() or not self:IsDriveable() then
-		return false
-	end
-
-	return VEHICLE.IS_VEHICLE_STUCK_ON_ROOF(self.handle)
-end
-
-function EscortVehicle:IsPlayerInEscortVehicle()
-	local playerVeh = LocalPlayer:GetVehicleNative()
-	return (playerVeh ~= 0 and self.handle == playerVeh)
-end
-
-function EscortVehicle:GetPos()
-	if self:Exists() then
-		return Game.GetEntityCoords(self.handle, false)
-	end
-
-	return vec3:zero()
-end
-
-function EscortVehicle:GetDriver()
-	return VEHICLE.GET_PED_IN_VEHICLE_SEAT(self.handle, -1, true)
-end
-
----@param toggle boolean
-function EscortVehicle:ToggleBlip(toggle)
-	if not self.blip or not self.blip.handle then
-		return
-	end
-
-	local targetAlpha = toggle and 255 or 0
-	local cond = toggle and self.blip.alpha < targetAlpha or self.blip.alpha > targetAlpha
-
-	if cond then
-		self.blip.alpha = targetAlpha
-		if HUD.DOES_BLIP_EXIST(self.blip.handle) then
-			HUD.SET_BLIP_ALPHA(self.blip.handle, targetAlpha)
-		end
-	end
-end
-
----@param lastCoords? vec3
----@param passengers Bodyguard[]
----@param lastHeading? integer
----@param groupName? string
-function EscortVehicle:Recover(lastCoords, passengers, lastHeading, groupName)
-	if self:Exists() then
-		Game.DeleteEntity(self.handle)
-		Decorator:RemoveEntity(self.handle)
-	end
-
-	if not lastCoords then
-		lastCoords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-			LocalPlayer:GetHandle(),
-			0,
-			-10,
-			1.0
-		)
-	end
-
-	self.handle = Game.CreateVehicle(self.model, vec3:zero())
-	Decorator:Register(self.handle, "BillionaireServices")
-	ENTITY.FREEZE_ENTITY_POSITION(self.handle, true)
-
-	local r, g, b, _ = Color("#000100"):AsRGBA()
-	local wrapper = Vehicle(self.handle)
-	VEHICLE.SET_VEHICLE_MOD_KIT(self.handle, 0)
-	VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(self.handle, r, g, b)
-	VEHICLE.SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(self.handle, r, g, b)
-	VEHICLE.SET_VEHICLE_EXTRA_COLOURS(self.handle, 0, 0)
-	VEHICLE.SET_VEHICLE_ALLOW_HOMING_MISSLE_LOCKON(self.handle, false, false)
-	VEHICLE.SET_VEHICLE_TYRES_CAN_BURST(self.handle, false)
-	VEHICLE.SET_VEHICLE_STRONG(self.handle, true)
-	VEHICLE.SET_VEHICLE_DIRT_LEVEL(self.handle, 0)
-	VEHICLE.SET_VEHICLE_WINDOW_TINT(self.handle, 1)
-	VEHICLE.SET_VEHICLE_NUMBER_PLATE_TEXT(self.handle, "MRDR INC")
-	wrapper:MaxPerformance()
-
-	for i = 1, #passengers do
-		local guard = passengers[i]
-
-		if (guard:GetHandle() ~= LocalPlayer:GetHandle()) and not PED.IS_PED_A_PLAYER(guard:GetHandle()) then
-			PED.CLEAR_ALL_PED_VEHICLE_FORCED_SEAT_USAGE(guard:GetHandle())
-			PED.SET_PED_VEHICLE_FORCED_SEAT_USAGE(
-				guard:GetHandle(),
-				self.handle,
-				guard:IsEscortDriver() and -1 or guard.seatIndex,
-				0,
-				0
-			)
-
-			if not guard:IsInCombat() then
-				TASK.TASK_WARP_PED_INTO_VEHICLE(
-					guard:GetHandle(),
-					self.handle,
-					guard:IsEscortDriver() and -1 or guard.seatIndex
-				)
-			end
-		end
-	end
-
-	local vehName = wrapper:GetName()
-	local blip = Game.AddBlipForEntity(self.handle, 1.14, true)
-	local blipName = groupName or string.format("Escort Vehicle (%s)", vehName)
-
-	Game.SetBlipSprite(blip, 229)
-	Game.SetBlipName(blip, blipName)
-	Game.SetEntityCoordsNoOffset(self.handle, lastCoords)
-
-	ENTITY.SET_ENTITY_HEADING(self.handle, lastHeading or LocalPlayer:GetHeading())
-	ENTITY.FREEZE_ENTITY_POSITION(self.handle, false)
-	VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(self.handle, 5.0)
-	VEHICLE.SET_VEHICLE_ENGINE_ON(self.handle, true, true, false)
-end
-
------------------------------------------------------
--- Escort Group Struct
------------------------------------------------------
----@class EscortGroup
----@field members Bodyguard[]
----@field vehicle EscortVehicle
----@field wasDismissed boolean
----@field lastDriverCheckTime integer
----@field task number
----@field lastTask number
----@field lastTaskCoords vec3
-local EscortGroup = {}
-EscortGroup.__index = EscortGroup
-EscortGroup.name = ""
-EscortGroup.members = {}
-EscortGroup.wasDismissed = false
-EscortGroup.lastDriverCheckTime = 0
-EscortGroup.currentDrivingMode = 1
-EscortGroup.task = Enums.eVehicleTask.NONE
-EscortGroup.drivingModes = {
-	{ drivingFlags = 786603, speed = 19 },
-	{ drivingFlags = 527164, speed = 60 }
-}
-
----@param groupName string
----@param members Bodyguard[]
----@param vehicle EscortVehicle
-function EscortGroup.new(groupName, members, vehicle)
-	return setmetatable(
-		{
-			name = string.format(
-				"%s [%d]",
-				string.gsub(groupName, " %[%d+%]", ""),
-				vehicle.handle
-			),
-			members = members,
-			vehicle = vehicle
-		},
-		EscortGroup
-	)
-end
-
-function EscortGroup:ToTable()
-	return {
-		name = self.name,
-		vehicleModel = self.vehicle.model,
-		members = (function()
-			local t = {}
-			for _, member in pairs(self.members) do
-				table.insert(
-					t,
-					{
-						modelHash = member.m_modelhash,
-						name = member.name,
-						weapon = member.weapon or 350597077
-					}
-				)
-			end
-			return t
-		end)()
-	}
-end
-
----@param t_Data table
----@param godMode? boolean
----@param noRagdoll? boolean
----@param spawnPos? vec3
-function EscortGroup:Spawn(t_Data, godMode, noRagdoll, spawnPos)
-	if not t_Data or not t_Data.members then
-		Backend:debug("Failed to summon an escort group! Invalid data.")
-		return
-	end
-
-	if not spawnPos then
-		spawnPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-			LocalPlayer:GetHandle(),
-			0,
-			-10,
-			1.0
-		)
-	end
-
-	local createdMembers = {}
-	local escortVehicle = EscortVehicle.new(t_Data.vehicleModel, t_Data.name, godMode)
-
-	if not escortVehicle or not TaskWait(Game.IsScriptHandle, escortVehicle.handle) then
-		Notifier:ShowError(
-			"Samurai's Scripts",
-			"Failed to summon an escort group."
-		)
-		return
-	end
-
-	ENTITY.FREEZE_ENTITY_POSITION(escortVehicle.handle, true)
-
-	for i = 1, 3 do
-		local member = t_Data.members[i]
-
-		if not member.modelHash then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"Failed to create an escort group! Wrong member list."
-			)
-			return
-		end
-
-		local guard = Bodyguard.new(
-			member.modelHash,
-			member.name,
-			vec3:zero(),
-			member.weapon or 0x1B06D571,
-			godMode or false,
-			noRagdoll or false,
-			1
-		)
-
-		if not guard or not TaskWait(Game.IsScriptHandle, guard:GetHandle()) then
-			return
-		end
-
-		guard.vehicle = escortVehicle
-		guard:GiveAllWeapons()
-
-		if (i == 1) then
-			guard.role = Bodyguard.ROLES.ESCORT_DRIVER
-			guard.seatIndex = -1
-			PED.SET_PED_VEHICLE_FORCED_SEAT_USAGE(guard:GetHandle(), escortVehicle.handle, -1, 0, 0)
-			TASK.TASK_WARP_PED_INTO_VEHICLE(guard:GetHandle(), escortVehicle.handle, -1)
-		else
-			guard.role = Bodyguard.ROLES.ESCORT_PASSENGER
-			guard.seatIndex = i - 2
-			PED.SET_PED_VEHICLE_FORCED_SEAT_USAGE(guard:GetHandle(), escortVehicle.handle, i - 2, 0, 0)
-			TASK.TASK_WARP_PED_INTO_VEHICLE(guard:GetHandle(), escortVehicle.handle, i - 2)
-		end
-
-		table.insert(createdMembers, guard)
-	end
-
-	if #t_Data.members > 3 then
-		Notifier:ShowWarning(
-			"Samurai's Scripts",
-			"Escort groups can only hold up to 3 members. Excess members in this list have been dismissed."
-		)
-	end
-
-	ENTITY.FREEZE_ENTITY_POSITION(escortVehicle.handle, false)
-	ENTITY.SET_ENTITY_HEADING(escortVehicle.handle, LocalPlayer:GetHeading())
-	Game.SetEntityCoordsNoOffset(escortVehicle.handle, spawnPos)
-	VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(escortVehicle.handle, 5.0)
-	VEHICLE.SET_VEHICLE_ENGINE_ON(escortVehicle.handle, true, true, false)
-	Game.FadeInEntity(escortVehicle.handle)
-
-	local group = self.new(
-		t_Data.name,
-		createdMembers,
-		escortVehicle
-	)
-
-	for _, escort in ipairs(group.members) do
-		escort.escortGroup = group
-	end
-
-	return group
-end
-
----@param member Bodyguard
-function EscortGroup:RemoveMember(member)
-	if not member then
-		return
-	end
-
-	Backend:debug(string.format("member [%s] was removed", member.name))
-
-	local newMembers = {}
-	for _, escort in ipairs(self.members) do
-		if escort and escort.m_handle ~= member.m_handle then
-			table.insert(newMembers, escort)
-		end
-	end
-
-	self.members = newMembers
-	self:SanityCheck()
-end
-
--- Returns the current escort group driver if they exist
--- otherwise, assigns a new driver and returns them.
-function EscortGroup:GetDriver()
-	for _, member in ipairs(self.members) do
-		if (member:Exists() and member:IsAlive() and member:IsEscortDriver()) then
-			return member
-		end
-	end
-
-	---@type Bodyguard[]
-	local eligibleMembers = {}
-
-	for _, member in ipairs(self.members) do
-		if (member:Exists() and member:IsAlive()) then
-			table.insert(eligibleMembers, member)
-		end
-	end
-
-	if (#eligibleMembers == 0) then
-		return
-	end
-
-	table.sort(eligibleMembers, function(a, b)
-		return a.seatIndex < b.seatIndex
-	end)
-
-	local seatOrder = { -1, 0, 1 }
-	local driver = nil
-
-	for i, member in ipairs(eligibleMembers) do
-		local newSeat = seatOrder[i]
-
-		if newSeat then
-			member.seatIndex = newSeat
-			PED.CLEAR_ALL_PED_VEHICLE_FORCED_SEAT_USAGE(member.m_handle)
-			PED.SET_PED_VEHICLE_FORCED_SEAT_USAGE(member.m_handle, self.vehicle.handle, newSeat, 0, 0)
-
-			if not member:IsInCombat() then
-				if PED.IS_PED_IN_ANY_VEHICLE(member.m_handle, true) then
-					TASK.CLEAR_PED_TASKS_IMMEDIATELY(member.m_handle)
-				end
-
-				TASK.TASK_WARP_PED_INTO_VEHICLE(member.m_handle, self.vehicle.handle, newSeat)
-			end
-
-			if (newSeat == -1) then
-				member.role = member.ROLES.ESCORT_DRIVER
-				Backend:debug("Escort driver reassigned to " .. member.name)
-				driver = member
-			else
-				member.role = member.ROLES.ESCORT_PASSENGER
-			end
-		end
-	end
-
-	return driver
-end
-
-function EscortGroup:Bring()
-	if not LocalPlayer:IsOutside() then
-		Notifier:ShowError(
-			"Samurai's Scripts",
-			"You can not bring escort groups inside interiors."
-		)
-		return
-	end
-
-	script.run_in_fiber(function()
-		if not self:GetInTheFuckingCar() then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"[Escort Group] Something went wrong!"
-			)
-			return
-		end
-
-		local pos = LocalPlayer:GetOffsetInWorldCoords(
-			math.random(-2, 2),
-			math.random(-12, -8),
-			0.1
-		)
-
-		Game.SetEntityCoordsNoOffset(self.vehicle.handle, pos)
-	end)
-end
-
-function EscortGroup:BringPlayer()
-	script.run_in_fiber(function()
-		if not LocalPlayer:IsOutside() or not LocalPlayer:IsOnFoot() then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"You must be outside and standing on foot to teleport to your escort group."
-			)
-			return
-		end
-		local veh = self.vehicle
-
-		if not veh:Exists() then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"The escort vehicle seems to no longer exist."
-			)
-			return
-		end
-
-		local vmin, vmax = Game.GetModelDimensions(Game.GetEntityModel(veh.handle))
-		local height = vmax.z - vmin.z
-		local pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-			veh.handle,
-			0.0,
-			0.0,
-			height + 0.1
-		)
-
-		Game.SetEntityCoordsNoOffset(LocalPlayer:GetHandle(), pos)
-	end)
-end
-
-function EscortGroup:RepairGroupVehicle()
-	if not self.vehicle:Exists() then
-		return
-	end
-
-	Vehicle(self.vehicle.handle):Repair(true)
-end
-
-function EscortGroup:AreAllMembersInTheVehicle()
-	for _, member in ipairs(self.members) do
-		if not member or member:IsOnFoot() then
-			return false
-		end
-	end
-
-	return true
-end
-
----@param i_DrivingStyle number
-function EscortGroup:SetDrivingStyle(i_DrivingStyle)
-	if type(i_DrivingStyle) ~= "number" or i_DrivingStyle > 2 then
-		return
-	end
-
-	self.currentDrivingMode = i_DrivingStyle
-
-	script.run_in_fiber(function(s)
-		if (self.task == Enums.eVehicleTask.GOTO and self.lastTaskCoords) then
-			local driver = self:GetDriver()
-			if (not driver) then
-				return
-			end
-
-			driver:Speak("GENERIC_YES")
-			TASK.CLEAR_PED_TASKS(driver.m_handle)
-			TASK.TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(
-				driver.m_handle,
-				self.vehicle.handle,
-				self.lastTaskCoords.x,
-				self.lastTaskCoords.y,
-				self.lastTaskCoords.z,
-				self:GetDrivingStyle().speed,
-				self:GetDrivingStyle().drivingFlags,
-				30
-			)
-		elseif (self.task == Enums.eVehicleTask.WANDER) then
-			self:CancelGroupTask()
-			s:sleep(500)
-			self:Wander()
-		end
-	end)
-end
-
-function EscortGroup:GetDrivingStyle()
-	return {
-		speed = self.drivingModes[self.currentDrivingMode].speed or 20,
-		drivingFlags = self.drivingModes[self.currentDrivingMode].drivingFlags or 786603
-	}
-end
-
-function EscortGroup:CanGroupAcceptTask()
-	for _, member in ipairs(self.members) do
-		if not (member or member:CanAcceptTask()) then
-			return false
-		end
-	end
-
-	return true
-end
-
-function EscortGroup:IsIdle()
-	return (self.task == Enums.eVehicleTask.NONE)
-end
-
-function EscortGroup:GetTaskAsString()
-	return BillionaireServices.VehicleTaskToString[self.task or -1]
-end
-
-function EscortGroup:PrepareForGroupTask()
-	if (not self:SanityCheck()) then
-		return
-	end
-
-	if (not self.vehicle:IsPlayerInEscortVehicle()) then
-		return
-	end
-
-	if not self:CanGroupAcceptTask() then
-		return
-	end
-
-	local driver = self:GetDriver()
-
-	if not driver then
-		return
-	end
-
-	if not driver:CanAcceptTask() then
-		return
-	end
-
-	if not self:AreAllMembersInTheVehicle() then
-		self:GetInVehicle()
-
-		repeat
-			yield()
-		until self:AreAllMembersInTheVehicle()
-	end
-
-	return driver
-end
-
----@param coords vec3
-function EscortGroup:GoTo(coords)
-	local driver = self:PrepareForGroupTask()
-
-	if not driver then
-		return
-	end
-
-	driver:Speak("GENERIC_YES")
-	driver:SetOverrideTask(nil, -1, "Driving to coordinates")
-
-	TASK.CLEAR_PED_TASKS(driver.m_handle)
-	TASK.TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(
-		driver.m_handle,
-		self.vehicle.handle,
-		coords.x,
-		coords.y,
-		coords.z,
-		self:GetDrivingStyle().speed,
-		self:GetDrivingStyle().drivingFlags,
-		30
-	)
-
-	self.lastTaskCoords = coords
-	self.task = Enums.eVehicleTask.GOTO
-end
-
-function EscortGroup:Wander()
-	local driver = self:PrepareForGroupTask()
-
-	if not driver then
-		return
-	end
-
-	driver:Speak("GENERIC_YES")
-	driver:SetOverrideTask(nil, -1, "Cuising around")
-
-	TASK.CLEAR_PED_TASKS(driver.m_handle)
-	TASK.TASK_VEHICLE_DRIVE_WANDER(
-		driver.m_handle,
-		self.vehicle.handle,
-		self:GetDrivingStyle().speed,
-		self:GetDrivingStyle().drivingFlags
-	)
-
-	self.lastTaskCoords = nil
-	self.task = Enums.eVehicleTask.WANDER
-end
-
-function EscortGroup:CancelGroupTask()
-	if not self:SanityCheck() then
-		return
-	end
-
-	local driver = self:GetDriver()
-
-	if not driver then
-		return
-	end
-
-	TASK.CLEAR_PED_TASKS(driver.m_handle)
-	TASK.CLEAR_PED_SECONDARY_TASK(driver.m_handle)
-	TASK.CLEAR_PRIMARY_VEHICLE_TASK(self.vehicle.handle)
-	TASK.TASK_VEHICLE_TEMP_ACTION(driver.m_handle, self.vehicle.handle, 1, 2000)
-
-	driver:ClearOverrideTask()
-	self.task = Enums.eVehicleTask.NONE
-	self.lastTaskCoords = nil
-end
-
-function EscortGroup:StopTheVehicle()
-	if not self:SanityCheck() then
-		return
-	end
-
-	local driver = self:GetDriver()
-
-	if not driver then
-		return
-	end
-
-	self:CancelGroupTask()
-	TASK.TASK_VEHICLE_TEMP_ACTION(driver.m_handle, self.vehicle.handle, 1, -1)
-end
-
-function EscortGroup:ParkTheVehicle()
-	if not self:SanityCheck() then
-		return
-	end
-
-	local driver = self:GetDriver()
-
-	if not driver then
-		return
-	end
-
-	local area = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
-		self.vehicle.handle,
-		2,
-		10,
-		0
-	)
-
-	self:CancelGroupTask()
-	TASK.TASK_VEHICLE_PARK(
-		driver.m_handle,
-		self.vehicle.handle,
-		area.x,
-		area.y,
-		area.z,
-		Game.GetHeading(self.vehicle.handle),
-		0,
-		100,
-		true
-	)
-end
-
-function EscortGroup:SanityCheck()
-	local driver = self:GetDriver()
-
-	if driver and driver:IsAlive() then
-		if self.vehicle:Exists() then
-			self.vehicle:ToggleBlip(not self.vehicle:IsPlayerInEscortVehicle())
-			return true
-		else
-			local lastCoords = Game.GetEntityCoords(driver.m_handle, true)
-
-			if ENTITY.IS_ENTITY_IN_WATER(driver.m_handle) then
-				lastCoords, _ = Game.GetClosestVehicleNodeWithHeading(lastCoords, 0)
-			end
-
-			self.vehicle:Recover(lastCoords, self.members, nil, self.name)
-			return true
-		end
-	end
-
-	if not self:GetDriver() or not self.vehicle:Exists() then
-		Backend:debug("Sanity check failed! Escort driver and/or vehicle no longer valid.")
-		BillionaireServices:RemoveEscortGroup(self.name)
-		return false
-	end
-
-	if not self.members or (table.getlen(self.members) == 0) then
-		Backend:debug("Sanity check failed! No group members found.")
-		BillionaireServices:RemoveEscortGroup(self.name)
-		return false
-	end
-end
-
-function EscortGroup:CheckDriver()
-	if Time.Millis() >= self.lastDriverCheckTime then
-		EscortGroup:GetDriver()
-		self.lastDriverCheckTime = Time.Millis() + 1e4
-	end
-end
-
-function EscortGroup:GetInVehicle()
-	if not self:SanityCheck() then
-		return
-	end
-
-	for _, member in ipairs(self.members) do
-		if member:IsAlive() and Game.IsScriptHandle(member.m_handle) then
-			if not PED.IS_PED_SITTING_IN_VEHICLE(member.m_handle, self.vehicle.handle) then
-				TASK.CLEAR_PED_TASKS(member.m_handle)
-				TASK.CLEAR_PED_SECONDARY_TASK(member.m_handle)
-				TASK.CLEAR_PRIMARY_VEHICLE_TASK(self.vehicle.handle)
-				member:TaskEnterVehicle(self.vehicle.handle, 1e4, member.seatIndex or -2)()
-			end
-		end
-	end
-end
-
-function EscortGroup:GetInTheFuckingCar()
-	if not self:SanityCheck() then
-		return false
-	end
-
-	for _, member in ipairs(self.members) do
-		if member:IsAlive() and Game.IsScriptHandle(member.m_handle) then
-			local seat = member.seatIndex or -2
-			local ped = member.m_handle
-
-			if not PED.IS_PED_SITTING_IN_VEHICLE(ped, self.vehicle.handle) then
-				Backend:debug(
-					string.format(
-						"Forcing %s into seat %d",
-						member.name,
-						seat
-					)
-				)
-				TASK.CLEAR_PED_TASKS_IMMEDIATELY(ped)
-				PED.SET_PED_INTO_VEHICLE(ped, self.vehicle.handle, seat)
-
-				if member:IsEscortPassenger() then
-					member.task = member.TASKS.SIT_IN_VEH
-				end
-			end
-		end
-	end
-
-	return true
-end
-
-function EscortGroup:Dismiss(s)
-	self.wasDismissed = true
-	self:GetInVehicle()
-	local driver = self:GetDriver()
-	local veh = driver and driver:GetVehicle()
-	if (driver
-			and driver:IsAlive()
-			and (self.vehicle and Game.IsScriptHandle(self.vehicle.handle))
-			and (veh and veh:GetHandle() == self.vehicle.handle)
-		) then
-		if (self.vehicle:IsPlayerInEscortVehicle()) then
-			driver:ClearTasks()
-			TASK.TASK_VEHICLE_TEMP_ACTION(driver.m_handle, self.vehicle.handle, 1, -1)
-			while not VEHICLE.IS_VEHICLE_STOPPED(self.vehicle.handle) do
-				if not self.vehicle:IsPlayerInEscortVehicle() then
-					break
-				end
-				yield()
-			end
-
-			TASK.TASK_LEAVE_VEHICLE(LocalPlayer:GetHandle(), self.vehicle.handle, 0)
-			repeat
-				s:sleep(100)
-			until not PED.IS_PED_IN_VEHICLE(LocalPlayer:GetHandle(), self.vehicle.handle, false)
-			s:sleep(2000)
-		end
-
-		driver.task = driver.TASKS.GO_HOME
-		self.task = Enums.eVehicleTask.GO_HOME
-		driver:Speak("GENERIC_BYE", "SPEECH_PARAMS_FORCE_SHOUTED")
-		TASK.TASK_VEHICLE_DRIVE_WANDER(driver.m_handle, self.vehicle.handle, 20, 803243)
-
-		local dismissTimer = Timer.new(9000)
-		repeat
-			s:sleep(500)
-		until dismissTimer:IsDone()
-		Game.FadeOutEntity(self.vehicle.handle)
-	else
-		for _, escort in ipairs(self.members) do
-			if escort and escort.m_handle then
-				if PED.IS_PED_IN_ANY_VEHICLE(escort.m_handle, false) then
-					TASK.TASK_LEAVE_ANY_VEHICLE(escort.m_handle, 0, 0)
-					s:sleep(250)
-				end
-
-				escort.task = escort.TASKS.GO_HOME
-				escort.wasDismissed = true
-				TASK.TASK_WANDER_STANDARD(escort.m_handle, 0, 0)
-			end
-		end
-	end
-
-	for _, escort in ipairs(self.members) do
-		if escort and escort.m_handle and (not driver or escort.m_handle ~= driver.m_handle) then
-			Game.FadeOutEntity(escort.m_handle)
-		end
-	end
-	s:sleep(1000)
-	return true
-end
-
----@param s script_util
----@param globalTick number
-function EscortGroup:BackgroundWorker(s, globalTick)
-	if not self:SanityCheck() then
-		return
-	end
-
-	local playerInVehicle = PED.IS_PED_SITTING_IN_ANY_VEHICLE(LocalPlayer:GetHandle())
-
-	if (not self:IsIdle()) then
-		if (self.task == Enums.eVehicleTask.GOTO and self.lastTaskCoords) then
-			if (not self.vehicle:IsPlayerInEscortVehicle()) then
-				self:StopTheVehicle()
-				return
-			end
-
-			local speed = ENTITY.GET_ENTITY_SPEED(self.vehicle.handle)
-			local threshold = math.max(40, speed * 2)
-			if (self.vehicle:GetPos():distance(self.lastTaskCoords) <= threshold) then
-				Notifier:ShowMessage(
-					"Samurai's Scripts",
-					"[Private Escort]: You have reached your destination."
-				)
-				self:StopTheVehicle()
-			end
-		end
-	end
-
-	for _, escort in ipairs(self.members) do
-		if not escort:Exists() or not escort:IsAlive() then
-			self:RemoveMember(escort)
-			s:sleep(5)
-			return
-		end
-
-		if (not escort or not escort.tickOffset or (globalTick % 4 ~= escort.tickOffset)) then
-			goto continue
-		end
-
-		if (escort:CanAcceptTask()) then
-			local escortInVehicle = PED.IS_PED_SITTING_IN_ANY_VEHICLE(escort.m_handle)
-			if (playerInVehicle and not escort:IsInCombat()) then
-				if (not escortInVehicle) then
-					if (not PED.IS_PED_IN_VEHICLE(escort.m_handle, self.vehicle.handle, true)) then
-						escort:QueueTask(
-							escort.TASKS.ENTER_VEHICLE,
-							escort:TaskEnterVehicle(
-								self.vehicle.handle,
-								2e4,
-								escort.seatIndex or -2
-							)
-						)
-					end
-				elseif (playerInVehicle) then
-					local veh = LocalPlayer:GetVehicleNative()
-					if (escort:IsEscortDriver() and veh ~= self.vehicle.handle) then
-						escort:QueueTask(
-							escort.TASKS.VEH_FOLLOW,
-							escort:TaskVehicleEscort(veh),
-							true
-						)
-					end
-				end
-			end
-		end
-
-		escort:TickCombat()
-		escort:TickVehicleEscort(s)
-		escort:UpdateTasks()
-		escort:UpdatePosition(false)
-		escort:StateEval()
-		s:sleep(1)
-
-		::continue::
-	end
-end
-
-return { bg = Bodyguard, eg = EscortGroup }
+return Bodyguard

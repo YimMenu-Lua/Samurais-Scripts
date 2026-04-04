@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+---@type array<MovementClipsetData>
 return {
 	{ Name = "Arrogant (Female)",  mvmt = "move_f@arrogant@a",                      wmvmt = nil,                         strf = nil,                                        wanim = "Female" },
 	{ Name = "Bodybuilder",        mvmt = "move_m@muscle@a",                        wmvmt = nil,                         strf = nil,                                        wanim = "Default" },

@@ -26,6 +26,15 @@ local GameLangToCustom <const>  = {
 }
 
 
+---@enum eTranslatorState
+Enums.eTranslatorState = {
+	NONE      = 0,
+	RUNNING   = 1,
+	RELOADING = 2,
+	DISABLED  = 3
+}
+
+
 --------------------------------------
 -- Class: Translator
 --------------------------------------
@@ -38,8 +47,7 @@ local GameLangToCustom <const>  = {
 ---@field private m_log_history set<string>
 ---@field private m_cache table<string, table<string, string>>
 ---@field private m_last_load_time TimePoint
----@field private m_reloading boolean
----@field private m_disabled boolean
+---@field private m_state eTranslatorState
 ---@field protected m_initialized boolean
 local Translator   = {}
 Translator.__index = Translator
@@ -56,8 +64,8 @@ function Translator:init()
 		m_cache          = {},
 		m_log_history    = {},
 		m_last_load_time = TimePoint.new(),
-		m_initialized    = false,
-		m_reloading      = false,
+		m_initialized    = true,
+		m_state          = Enums.eTranslatorState.NONE
 	}, Translator)
 end
 
@@ -76,26 +84,25 @@ end
 ---@param debugBreak? boolean
 function Translator:Load(debugBreak)
 	ThreadManager:Run(function()
+		self.m_log_history = {}
+		self.m_cache       = {}
+
 		if (GVars.backend.use_game_language) then
-			if (not self:MatchGameLanguage() and self.m_reloading) then
+			if (not self:MatchGameLanguage() and self:IsReloading()) then
 				Notifier:ShowError("Translator", "Failed to match game language. Falling back to English (US).")
 				GVars.backend.use_game_language = false
 				GVars.backend.language_index    = 1
 			end
 		end
 
-		if (debugBreak and Backend.debug_mode) then
-			GVars.backend.language_index = 69
-		end
-
 		local idx = GVars.backend.language_index
-		local iso = self.locales[idx]
-		if (not iso) then
-			log.warning("[Translator]: Invalid language code!")
+		if (debugBreak and Backend.debug_mode) then
+			idx = 69
 		end
 
+		local iso = self.locales[idx]
 		local ok, result
-		if (iso ~= "en-US") then
+		if (iso and iso ~= "en-US") then
 			local path = "lib.translations." .. iso
 			ok, result = pcall(require, path)
 			if (not ok) then
@@ -105,19 +112,15 @@ function Translator:Load(debugBreak)
 		end
 
 		result = result or self.default_labels
-		if (next(result) == nil) then
+		if (iso == nil or next(result) == nil) then
 			log.warning("[Translator]: Failed to load! Translations will be disabled.")
-			self.m_disabled = true
+			self.m_state = Enums.eTranslatorState.DISABLED
+		else
+			table.overwrite(self.labels, result)
+			self.m_state = Enums.eTranslatorState.RUNNING
 		end
 
-		local newLabels = result
-		table.overwrite(self.labels, newLabels)
-
-		self.m_log_history = {}
-		self.m_cache       = {}
-		self.lang_idx      = GVars.backend.language_index
-		self.m_initialized = true
-		self.m_reloading   = false
+		self.lang_idx = idx
 		self.m_last_load_time:Reset()
 	end)
 end
@@ -125,24 +128,27 @@ end
 ---@private
 ---@param debugBreak? boolean
 function Translator:Reload(debugBreak)
-	if (not self.m_initialized or not self.m_last_load_time:HasElapsed(3e3)) then -- 3. we have this though so reload can not be called twice. I'm a bit confused
+	if (not self.m_initialized or not self.m_last_load_time:HasElapsed(3e3)) then
 		return
 	end
 
-	self.m_disabled    = false
-	self.m_initialized = false
-	self.m_reloading   = true
+	self.m_state = Enums.eTranslatorState.RELOADING
 	self:Load(debugBreak)
 end
 
 ---@return boolean
 function Translator:IsReady()
-	return self.m_initialized and not self.m_reloading
+	return self.m_initialized and self.m_state == Enums.eTranslatorState.RUNNING
+end
+
+---@return boolean
+function Translator:IsDisabled()
+	return self.m_state == Enums.eTranslatorState.DISABLED
 end
 
 ---@return boolean
 function Translator:IsReloading()
-	return self.m_reloading
+	return self.m_state == Enums.eTranslatorState.RELOADING
 end
 
 ---@return boolean
@@ -160,6 +166,11 @@ function Translator:Warn(message)
 	self.m_log_history[message] = true
 end
 
+---@return eTranslatorState
+function Translator:GetState()
+	return self.m_state
+end
+
 ---@return table<string, table<string, string>>
 function Translator:GetCache()
 	return self.m_cache
@@ -168,7 +179,7 @@ end
 ---@param label string
 ---@return string
 function Translator:GetCachedLabel(label)
-	if (self.m_disabled) then return "" end
+	if (self:IsDisabled()) then return "" end
 
 	self.m_cache[self.lang_idx] = self.m_cache[self.lang_idx] or {}
 	return self.m_cache[self.lang_idx][label]
@@ -177,7 +188,7 @@ end
 ---@param label string
 ---@param text string
 function Translator:CacheLabel(label, text)
-	if (self.m_disabled) then return end
+	if (self:IsDisabled()) then return end
 
 	self.m_cache[self.lang_idx] = self.m_cache[self.lang_idx] or {}
 	self.m_cache[self.lang_idx][label] = text
@@ -187,7 +198,7 @@ end
 ---@param label string
 ---@return string
 function Translator:Translate(label)
-	if (self.m_disabled or not self:IsReady()) then
+	if (not self:IsReady()) then
 		return label
 	end
 
@@ -238,11 +249,12 @@ end
 -- This is called in `Backend`'s main thread.
 function Translator:OnTick()
 	-- currently only handles reload requests.
-
 	if (self.wants_reload and not self:IsReloading()) then
 		self.wants_reload = false
 		self:Reload()
 	end
 end
 
-return Translator:init()
+local singleInstance = Translator:init()
+_G.Translator        = singleInstance
+return singleInstance

@@ -7,11 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local drawNamePlate       = require("includes.frontend.yrv3.nameplate")
-local drawFactory         = require("includes.frontend.yrv3.factory")
+local drawNamePlate       = require("includes.frontend.yim_resupplier.nameplate")
+local drawFactory         = require("includes.frontend.yim_resupplier.factory")
 local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
 
----@type table<string, integer>
+---@type array<integer>
 local bulletWidths        = {}
 
 return function()
@@ -28,15 +28,15 @@ return function()
 	)
 	ImGui.Spacing()
 
-	local index       = GVars.backend.language_index
-	local bulletWidth = bulletWidths[index]
+	local lang_index  = GVars.backend.language_index
+	local bulletWidth = bulletWidths[lang_index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_CASH_SAFE"),
 			_T("YRV3_MC_CLIENT_BIKE_LABEL"),
 		}, 60.0)
 
-		bulletWidths[index] = bulletWidth
+		bulletWidths[lang_index] = bulletWidth
 	end
 
 	local cashSafe  = clubhouse:GetCashSafe()

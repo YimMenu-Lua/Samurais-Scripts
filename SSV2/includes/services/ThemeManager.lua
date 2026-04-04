@@ -14,16 +14,17 @@ local ThemeLibrary <const> = require("includes.data.theme_library")
 
 ---@class ThemeManager
 ---@field private m_current_theme Theme
----@field private m_stack_depth integer
----@field private m_col_stack integer
----@field private m_style_stack integer
+---@field private m_stack { depth: integer, colors: integer, style_vars: integer }
 ---@field private m_theme_library ThemeLibrary
 ---@field m_themes_file string
 local ThemeManager   = {
-	m_current_theme = Theme.new(ThemeLibrary.Tenebris),
 	m_themes_file   = "ss_themes.json",
 	m_theme_library = {},
-	m_stack_depth   = 0,
+	m_stack         = {
+		depth      = 0,
+		colors     = 0,
+		style_vars = 0
+	}
 }
 ThemeManager.__index = ThemeManager
 
@@ -32,27 +33,29 @@ function ThemeManager:LoadLibrary()
 	for k, t in pairs(ThemeLibrary) do
 		self.m_theme_library[k] = Theme.new(t)
 	end
+
+	self:MergeSavedThemes()
 end
 
 function ThemeManager:Load()
 	self:LoadLibrary()
-	self:FetchSavedThemes()
-	local current = GVars.ui.style.theme
 
+	local current = GVars.ui.style.theme
 	if (not current or not current.Colors) then
 		current = self:GetDefaultTheme()
 	end
 
-	if (current.JSON or not current.__type or not IsInstance(current.SSAccent, vec4)) then
-		current = Theme.deserialize(current)
+	if (getmetatable(current) == nil) then
+		current = Theme.new(current)
 	end
 
 	GVars.ui.style.theme = current
 	self.m_current_theme = current
 end
 
+---@return integer
 function ThemeManager:GetStackDepth()
-	return self.m_stack_depth
+	return self.m_stack.depth
 end
 
 ---@param name string
@@ -68,7 +71,7 @@ end
 
 ---@return Theme
 function ThemeManager:GetDefaultTheme()
-	return self.m_theme_library.Tenebris or Theme.new(ThemeLibrary.Tenebris)
+	return Theme.new(ThemeLibrary.Synthwave)
 end
 
 ---@return Theme
@@ -78,6 +81,10 @@ end
 
 ---@param theme Theme
 function ThemeManager:SetCurrentTheme(theme)
+	if (getmetatable(theme) == nil) then
+		theme = Theme.new(theme)
+	end
+
 	GVars.ui.style.theme = theme
 	self.m_current_theme = theme
 end
@@ -92,8 +99,9 @@ function ThemeManager:IsBackgroundDark()
 	return ImGui.GetStyleColor(ImGuiCol.WindowBg):IsDark()
 end
 
+---@private
 ---@return table<string, Theme>
-function ThemeManager:ReadThemesJson()
+function ThemeManager:ReadSavedThemes()
 	if (not io.exists(self.m_themes_file)) then
 		Serializer:WriteToFile(self.m_themes_file, {})
 		return {}
@@ -110,8 +118,8 @@ function ThemeManager:ReadThemesJson()
 	return themes
 end
 
----@param theme Theme
----@param apply? boolean
+---@param theme Theme A Theme instance not plain table.
+---@param apply? boolean Set as current theme.
 function ThemeManager:AddNewTheme(theme, apply)
 	if (self:DoesThemeExist(theme.Name)) then
 		return
@@ -119,10 +127,11 @@ function ThemeManager:AddNewTheme(theme, apply)
 
 	theme.JSON       = true
 	local lib        = self.m_theme_library
-	local json       = self:ReadThemesJson()
+	local json       = self:ReadSavedThemes()
 	local serialized = theme:serialize()
+
 	json[theme.Name] = serialized
-	lib[theme.Name]  = theme
+	lib[theme.Name]  = serialized
 
 	if (apply) then self:SetCurrentTheme(theme) end
 	Serializer:WriteToFile(self.m_themes_file, json)
@@ -131,6 +140,7 @@ end
 ---@param theme Theme
 function ThemeManager:RemoveTheme(theme)
 	if (not theme.JSON) then
+		log.warning("[ThemeManager]: Default themes can not be removed.")
 		return
 	end
 
@@ -139,42 +149,39 @@ function ThemeManager:RemoveTheme(theme)
 	end
 
 	local lib        = self.m_theme_library
-	local json       = self:ReadThemesJson()
+	local json       = self:ReadSavedThemes()
 	json[theme.Name] = nil
 	lib[theme.Name]  = nil
 
 	Serializer:WriteToFile(self.m_themes_file, json)
 end
 
-function ThemeManager:FetchSavedThemes()
-	local themes = self:ReadThemesJson()
+---@private
+function ThemeManager:MergeSavedThemes()
+	local themes = self:ReadSavedThemes()
 	for name, data in pairs(themes) do
 		if (not self:DoesThemeExist(name)) then
-			self.m_theme_library[name] = Theme.deserialize(data)
-			self.m_theme_library[name].JSON = true
+			local instance             = Theme.deserialize(data)
+			instance.JSON              = true
+			self.m_theme_library[name] = instance
 		end
 	end
 end
 
-function ThemeManager:PushTheme()
-	if (not self.m_current_theme) then
-		return
-	end
-
-	local colors = self.m_current_theme.Colors
-	local styles = self.m_current_theme.Styles
-
-	self.m_col_stack = 0
-	for k, v in pairs(colors) do
+---@private
+---@param theme Theme
+function ThemeManager:__push(theme)
+	self.m_stack.colors = 0
+	for k, v in pairs(theme.Colors) do
 		local idx = ImGuiCol[k]
 		if (idx) then
 			ImGui.PushStyleColor(idx, v.x, v.y, v.z, v.w)
-			self.m_col_stack = self.m_col_stack + 1
+			self.m_stack.colors = self.m_stack.colors + 1
 		end
 	end
 
-	self.m_style_stack = 0
-	for k, v in pairs(styles) do
+	self.m_stack.style_vars = 0
+	for k, v in pairs(theme.Styles) do
 		local idx = ImGuiStyleVar[k]
 		if (not idx) then
 			goto continue
@@ -185,24 +192,46 @@ function ThemeManager:PushTheme()
 		else
 			ImGui.PushStyleVar(idx, v)
 		end
-		self.m_style_stack = self.m_style_stack + 1
+		self.m_stack.style_vars = self.m_stack.style_vars + 1
 
 		::continue::
 	end
 
-	self.m_stack_depth = self.m_stack_depth + 1
+	self.m_stack.depth = self.m_stack.depth + 1
+end
+
+---@private
+function ThemeManager:__pop()
+	if (self.m_stack.colors > 0) then
+		ImGui.PopStyleColor(self.m_stack.colors)
+	end
+
+	if (self.m_stack.style_vars > 0) then
+		ImGui.PopStyleVar(self.m_stack.style_vars)
+	end
+
+	self.m_stack.depth = self.m_stack.depth - 1
+end
+
+function ThemeManager:PushTheme()
+	if (not self.m_current_theme) then
+		return
+	end
+
+	self:__push(self.m_current_theme)
 end
 
 function ThemeManager:PopTheme()
-	if (self.m_col_stack > 0) then
-		ImGui.PopStyleColor(self.m_col_stack)
-	end
+	self:__pop()
+end
 
-	if (self.m_style_stack > 0) then
-		ImGui.PopStyleVar(self.m_style_stack)
-	end
-
-	self.m_stack_depth = self.m_stack_depth - 1
+-- Wraps a gui callback in a theme push/pop
+---@param theme Theme Theme to use
+---@param func function ImGui callback
+function ThemeManager:WithTheme(theme, func)
+	self:__push(theme)
+	xpcall(func, function(err) log.warning(err) end)
+	self:__pop()
 end
 
 return ThemeManager

@@ -6,15 +6,14 @@
 --	* Credit the owner and contributors.
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
-
-local GroupManager     = require("includes.services.GroupManager")
-local t_RandomPedNames = require("includes.data.ped_names")
-local PrivateHeli      = require("includes.modules.PrivateHeli")
-local PrivateJet       = require("includes.modules.PrivateJet")
-local PrivateLimo      = require("includes.modules.PrivateLimo")
-local __t              = require("includes.modules.Bodyguard")
-local Bodyguard        = __t.bg
-local EscortGroup      = __t.eg
+local BSV2Data       = require("includes.data.bsv2_data")
+local GroupManager   = require("includes.services.GroupManager")
+local RandomPedNames = require("includes.data.ped_names")
+local Bodyguard      = require("includes.modules.BSV2.Bodyguard")
+local EscortGroup    = require("includes.modules.BSV2.EscortGroup")
+local PrivateHeli    = require("includes.modules.BSV2.PrivateHeli")
+local PrivateJet     = require("includes.modules.BSV2.PrivateJet")
+local PrivateLimo    = require("includes.modules.BSV2.PrivateLimo")
 
 ---@alias ServiceType integer
 ---| -1 # ALL
@@ -60,30 +59,29 @@ local EscortGroup      = __t.eg
 ---| 6  # GO_HOME
 ---| 99  # OVERRIDE
 
------------------------------------------------------
--- Billionaire Services Class
------------------------------------------------------
+
 ---@class BillionaireServices
 ---@field Bodyguards table<integer, Bodyguard>
 ---@field EscortGroups table<string, EscortGroup>
 ---@field EscortVehicles table<integer, EscortVehicle>
-local BillionaireServices = {}
-BillionaireServices.__index = BillionaireServices
-BillionaireServices.Bodyguards = {}
-BillionaireServices.EscortGroups = {}
-BillionaireServices.EscortVehicles = {}
-BillionaireServices.GroupManager = GroupManager
+local BillionaireServices                   = {}
+BillionaireServices.__index                 = BillionaireServices
+BillionaireServices.Bodyguards              = {}
+BillionaireServices.EscortGroups            = {}
+BillionaireServices.EscortVehicles          = {}
+BillionaireServices.groups_file_name        = "escort_groups.json"
+BillionaireServices.GroupManager            = GroupManager
 BillionaireServices.GroupManager.globalTick = GroupManager.globalTick or 0
-BillionaireServices.SERVICE_TYPE = {
-	ALL = -1,
+BillionaireServices.EscortGroupsData        = BSV2Data.DefaultEscortGroups
+BillionaireServices.SERVICE_TYPE            = {
+	ALL       = -1,
 	BODYGUARD = 0,
-	ESCORT = 1,
-	LIMO = 2,
-	HELI = 3,
-	JET = 4,
+	ESCORT    = 1,
+	LIMO      = 2,
+	HELI      = 3,
+	JET       = 4,
 }
-
-BillionaireServices.ActiveServices = {
+BillionaireServices.ActiveServices          = {
 	---@type PrivateLimo
 	limo = nil,
 	---@type PrivateHeli
@@ -92,7 +90,7 @@ BillionaireServices.ActiveServices = {
 	jet = nil,
 }
 
-BillionaireServices.VehicleTaskToString = {
+BillionaireServices.VehicleTaskToString     = {
 	[Enums.eVehicleTask.NONE]           = "Idle.",
 	[Enums.eVehicleTask.GOTO]           = "Going to destination.",
 	[Enums.eVehicleTask.WANDER]         = "Cruising around.",
@@ -103,10 +101,8 @@ BillionaireServices.VehicleTaskToString = {
 }
 
 function BillionaireServices:init()
-	Backend:RegisterEventCallbackAll(function()
-		self:ForceCleanup()
-	end)
-
+	self:ParseEscortGroups()
+	Backend:RegisterEventCallbackAll(function() self:ForceCleanup() end)
 	return self
 end
 
@@ -120,6 +116,93 @@ function BillionaireServices:UnregisterEntity(entity)
 	Decorator:RemoveEntity(entity)
 end
 
+function BillionaireServices:ParseEscortGroups()
+	if (not io.exists(self.groups_file_name)) then
+		Serializer:WriteToFile(self.groups_file_name, {})
+		return
+	end
+
+	---@type dict<RawEscortGroupData>?
+	local saved = Serializer:ReadFromFile(self.groups_file_name)
+	if (not saved or next(saved) == nil) then return end
+
+	local loaded = self.EscortGroupsData
+	for name, data in pairs(saved) do
+		if (not loaded[name]) then
+			data.JSON    = data.JSON or true
+			loaded[name] = data
+		end
+	end
+end
+
+---@return dict<RawEscortGroupData>
+function BillionaireServices:GetEscortGroupList()
+	return self.EscortGroupsData
+end
+
+---@param group RawEscortGroupData
+function BillionaireServices:AddNewEscortGroup(group)
+	if (type(group.vehicleModel) ~= "number") then
+		Notifier:ShowError("Billionaire Services", "Invalid group vehicle model!")
+		return
+	end
+
+	local name = group.name
+	if (not string.isvalid(name)) then
+		Notifier:ShowError("Billionaire Services", "Invalid group name!")
+		return
+	end
+
+	if (self.EscortGroupsData[name]) then
+		Notifier:ShowError("Billionaire Services", _F("An escort group with the name %s already exists.", name))
+		return
+	end
+
+	local members = group.members
+	if (type(members) ~= "table" or #members ~= 3) then
+		Notifier:ShowError("Billionaire Services", "A group must have exactly 3 members.")
+		return
+	end
+
+	local members_ok = true
+	for _, member in ipairs(members) do
+		if (not member.modelHash) then
+			members_ok = false
+			break
+		end
+
+		if (not string.isvalid(member.name)) then
+			member.name = self:GetRandomPedName(Game.GetPedGenderFromModel(member.modelHash))
+		end
+
+		if (math.is_null(member.weapon)) then
+			member.weapon = _J("WEAPON_TECPISTOL")
+		end
+	end
+
+	if (not members_ok) then
+		Notifier:ShowError("Billionaire Services", "Missing entity model hash for one or more group members.")
+		return
+	end
+
+	group.JSON                  = true
+	self.EscortGroupsData[name] = group
+	Serializer:WriteToFile(self.groups_file_name, self.EscortGroupsData)
+	Notifier:ShowSuccess("Billionaire Services", _T("BSV2_ES_NEW_GROUP_SUCCESS"))
+end
+
+---@param groupName string
+function BillionaireServices:RemoveSavedEscortGroup(groupName)
+	local group = self.EscortGroupsData[groupName]
+	if (not group or not group.JSON) then
+		return
+	end
+
+	self.EscortGroupsData[groupName] = nil
+	Serializer:WriteToFile(self.groups_file_name, self.EscortGroupsData)
+end
+
+---@return integer
 function BillionaireServices:GetServiceCount()
 	local count = 0
 
@@ -143,8 +226,9 @@ end
 ---@param gender ePedGender
 ---@return string
 function BillionaireServices:GetRandomPedName(gender)
-	local eRandomNames = t_RandomPedNames[gender]
-	return eRandomNames[math.random(1, #eRandomNames)] or "NULL"
+	math.randomseed(math.floor(os.clock() * 1e6))
+	local randomNames = RandomPedNames[gender]
+	return randomNames[math.random(1, #randomNames)] or "NULL"
 end
 
 ---@param modelHash integer
@@ -164,7 +248,7 @@ function BillionaireServices:SpawnBodyguard(modelHash, name, spawnPos, weapon, g
 			)
 		end
 
-		local guard = Bodyguard.new(
+		local ok, guard = pcall(Bodyguard.new,
 			modelHash,
 			name,
 			spawnPos,
@@ -174,16 +258,12 @@ function BillionaireServices:SpawnBodyguard(modelHash, name, spawnPos, weapon, g
 			behavior
 		)
 
-		if not guard then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"[ERROR] Failed to summon a bodyguard!"
-			)
+		if (not ok or not guard) then
+			Notifier:ShowWarning("Billionaire Services", "Failed to create entity! Please try again later", true, 5)
 			return
 		end
 
 		guard.role = guard.ROLES.BODYGUARD
-
 		self:RegisterEntity(guard.m_handle)
 		self.GroupManager:AddBodyguard(guard)
 		self.Bodyguards[guard.m_handle] = guard
@@ -267,43 +347,31 @@ end
 ---@param spawnPos? vec3
 function BillionaireServices:SpawnEscortGroup(t_Data, godMode, noRagdoll, spawnPos)
 	ThreadManager:Run(function()
-		if not LocalPlayer:IsOutside() then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"You can not summon an escort group indoors. Please go outside!"
-			)
+		if (not LocalPlayer:IsOutside()) then
+			Notifier:ShowError("Billionaire Services", _T("GENERIC_INTERIOR_ACTION_ERR"))
 			return
 		end
 
-		if LocalPlayer:IsInWater() then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"You can not summon an escort group while swimming. Please go to a suitable location first!"
-			)
+		if (LocalPlayer:IsInWater()) then
+			Notifier:ShowError("Billionaire Services", _T("GENERIC_LOCATION_ACTION_ERR"))
 			return
 		end
 
 		local count = table.getlen(self.EscortGroups)
-
-		if count > 1 and (count % 4 == 0) then
-			Notifier:ShowWarning(
-				"Samurai's Scripts",
-				"[Warning] You're spawning too many escort groups!"
-			)
+		if (count > 1 and (count % 4 == 0)) then
+			Notifier:ShowWarning("Billionaire Services", _T("BSV2_TOO_MANY_GROUPS_WARN"))
 		end
 
-		local group = EscortGroup:Spawn(
+		local ok, group = pcall(EscortGroup.Spawn,
+			EscortGroup,
 			t_Data,
 			godMode,
 			noRagdoll,
 			spawnPos
 		)
 
-		if not group then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"[ERROR] Failed to summon an escort group!"
-			)
+		if (not ok or not group) then
+			Notifier:ShowError("Billionaire Services", _T("GENERIC_ENTITY_SPAWN_FAIL"))
 			return
 		end
 
@@ -406,34 +474,24 @@ end
 ---@param spawnPos? vec3
 function BillionaireServices:CallPrivateLimo(t_Data, spawnPos)
 	ThreadManager:Run(function()
-		if not LocalPlayer:IsOutside() then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"You can not call a limousine while staying indoors. Please go outside first!"
-			)
+		if (not LocalPlayer:IsOutside()) then
+			Notifier:ShowError("Billionaire Services", _T("GENERIC_INTERIOR_ACTION_ERR"))
 			return
 		end
 
-		if LocalPlayer:IsInWater() then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"You can not call a limousine while swimming. Please go to a suitable location first!"
-			)
+		if (LocalPlayer:IsInWater()) then
+			Notifier:ShowError("Billionaire Services", _T("GENERIC_LOCATION_ACTION_ERR"))
 			return
 		end
 
-		local limo = PrivateLimo:Spawn(t_Data, spawnPos)
-		if not limo then
-			Notifier:ShowWarning(
-				"Samurai's Scripts",
-				"Unable to summon your private limousine at the moment."
-			)
+		local ok, limo = pcall(PrivateLimo.Spawn, PrivateLimo, t_Data, spawnPos)
+		if (not ok or not limo) then
+			Notifier:ShowWarning("Billionaire Services", _T("GENERIC_ENTITY_SPAWN_FAIL"))
 			return
 		end
 
 		self.ActiveServices.limo = limo
 		self.GroupManager:AddPedToGroup(limo.driver)
-
 		self:RegisterEntity(limo:GetHandle())
 		self:RegisterEntity(limo.driver)
 	end)
@@ -473,33 +531,26 @@ end
 ---@param godmode? boolean
 function BillionaireServices:CallPrivateHeli(model, godmode)
 	ThreadManager:Run(function(s)
-		if not LocalPlayer:IsOutside() then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"You can not call a helicopter while staying indoors. Please go outside first!"
-			)
+		if (not LocalPlayer:IsOutside()) then
+			Notifier:ShowError("Billionaire Services", _T("GENERIC_INTERIOR_ACTION_ERR"))
 			return
 		end
 
 		local isInWater = LocalPlayer:IsOnFoot() and LocalPlayer:IsInWater() or LocalPlayer:GetVehicle():IsBoat()
 		local spawnPos  = LocalPlayer:GetOffsetInWorldCoords(0.0, 30.0, 50.0)
-		local heli      = PrivateHeli.spawn(model, spawnPos, godmode)
+		local ok, heli  = pcall(PrivateHeli.spawn, model, spawnPos, godmode)
 
-		if (not heli) then
-			Notifier:ShowWarning(
-				"Samurai's Scripts",
-				"Unable to summon your private heli at the moment."
-			)
+		if (not ok or not heli) then
+			Notifier:ShowWarning("Billionaire Services", _T("GENERIC_ENTITY_SPAWN_FAIL"))
 			return
 		end
 
 		self.ActiveServices.heli = heli
 		self.GroupManager:AddPedToGroup(heli.pilot)
-
 		self:RegisterEntity(heli.m_handle)
 		self:RegisterEntity(heli.pilot)
 
-		if not isInWater then
+		if (not isInWater) then
 			local timer = Timer.new(3e4)
 			TASK.TASK_HELI_MISSION(
 				heli.pilot,
@@ -523,10 +574,7 @@ function BillionaireServices:CallPrivateHeli(model, godmode)
 				s:sleep(1000)
 			until ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(heli.m_handle) <= 3 or timer:IsDone()
 		else
-			Notifier:ShowMessage(
-				"Private Heli",
-				"Your helicopter will not land because you're in the water."
-			)
+			Notifier:ShowMessage("Billionaire Services", _T("BSV2_HELI_LAND_WATER_ERR"))
 		end
 
 		AUDIO.PLAY_PED_AMBIENT_SPEECH_NATIVE(
@@ -574,39 +622,26 @@ end
 function BillionaireServices:CallPrivateJet(model, airportData)
 	ThreadManager:Run(function()
 		if not airportData or not airportData.hangar then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"Failed to call a private jet! Invalid airport data."
-			)
+			Notifier:ShowError("Billionaire Services", _T("BSV2_JET_SPAWN_AIRPORT_ERR"))
 			return
 		end
 
-		local jet = PrivateJet.spawn(model, airportData)
-
-		if not jet then
-			Notifier:ShowWarning(
-				"Samurai's Scripts",
-				"Unable to summon your private jet at the moment."
-			)
+		local ok, jet = pcall(PrivateJet.spawn, model, airportData)
+		if (not ok or not jet) then
+			Notifier:ShowWarning("Billionaire Services", _T("GENERIC_ENTITY_SPAWN_FAIL"))
 			return
 		end
 
-		jet.departureAirport = airportData
+		jet.departureAirport    = airportData
 		self.ActiveServices.jet = jet
 		self.GroupManager:AddPedToGroup(jet.pilot)
 		self.GroupManager:AddPedToGroup(jet.copilot)
-
 		self:RegisterEntity(jet:GetHandle())
 		self:RegisterEntity(jet.pilot)
 		self:RegisterEntity(jet.copilot)
 
-		Notifier:ShowMessage(
-			"Private Jet",
-			string.format(
-				"Your %s is waiting for you at %s",
-				jet.name,
-				airportData.name
-			)
+		Notifier:ShowMessage("Billionaire Services",
+			_F(_T("BSV2_JET_SPAWN_SUCCESS"), jet.name, airportData.name)
 		)
 	end)
 end
@@ -629,10 +664,7 @@ function BillionaireServices:DismissJet()
 
 	if self.ActiveServices.jet:IsCruising() then
 		if self.ActiveServices.jet:IsPlayerInJet() then
-			Notifier:ShowError(
-				"Private Jet",
-				"You can not dismiss your jet mid-air! Jump out or ask your pilot to land at an airport first."
-			)
+			Notifier:ShowError("Billionaire Services", _T("BSV2_JET_DISMISS_ERR"))
 			return
 		end
 
@@ -753,8 +785,8 @@ function BillionaireServices:Cleanup()
 		end
 	end
 
-	self.Bodyguards = {}
-	self.EscortGroups = {}
+	self.Bodyguards     = {}
+	self.EscortGroups   = {}
 	self.EscortVehicles = {}
 end
 
@@ -791,21 +823,9 @@ function BillionaireServices:ForceCleanup()
 		end
 	end
 
-	self.Bodyguards = {}
-	self.EscortGroups = {}
+	self.Bodyguards     = {}
+	self.EscortGroups   = {}
 	self.EscortVehicles = {}
 end
-
-BillionaireServices.EscortCreatorTutorialText = [[
-[1] - Choose a group name.
-
-[2] - Select a vehicle model.
-
-[3] - Select 3 ped models (has to be exactly 3 in order to leave a free vehicle seat for yourself but also keep the original logic intact).
-
-[4] - Optional: Add names for each ped or leave empty to assign a random name.
-
-[5] - Optional: Choose a weapon for each ped or leave empty to automatically give them a Tactical SMG (you can always spawn escorts with all weapons later).
-]]
 
 return BillionaireServices

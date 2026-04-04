@@ -1270,7 +1270,8 @@ end
 ---@return string
 function Game.GetWeaponDisplayName(weapon)
 	if (not _G.FAKE_YIMAPI) then
-		return weapons.get_weapon_display_name(weapon)
+		local name = weapons.get_weapon_display_name(weapon)
+		return name ~= "" and name or "NULL"
 	end
 
 	local hash

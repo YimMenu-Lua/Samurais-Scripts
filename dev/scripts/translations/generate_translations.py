@@ -178,10 +178,10 @@ def generate_translations(dry_run: bool = False, diff_only: bool = False):
                 for label in key_set:
                     text = labels[label]
                     fut = exec.submit(translate_text, locale, text)
-                    futures[fut] = (locale, label, text, fname)
+                    futures[fut] = (label, text, fname)
 
             for fut in as_completed(futures):
-                iso, label, orig_text, fname = futures[fut]
+                label, orig_text, fname = futures[fut]
                 try:
                     translated = fut.result()
                 except Exception:

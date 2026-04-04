@@ -244,16 +244,15 @@ end
 local function DrawGlobalsAndLocals()
 	local selected_G_type = accessor_read_types[selected_g_type_idx]
 	local selected_L_type = accessor_read_types[selected_l_type_idx]
-	Backend.disable_input = input_1 or input_2 or input_3
 
 	ImGui.Spacing()
 	ImGui.SeparatorText("ScriptGlobal")
 	ImGui.Text("Global_")
 	ImGui.SameLine()
 	ImGui.SetNextItemWidth(200)
-	init_g_addr, _ = ImGui.InputInt("##test_global", init_g_addr)
-	input_1 = ImGui.IsItemActive()
+	init_g_addr = ImGui.InputInt("##test_global", init_g_addr)
 	init_g_addr = math.max(0, init_g_addr)
+	GUI:RequestInput(ImGui.IsItemActive())
 
 	ImGui.SameLine()
 	ImGui.BeginDisabled(init_g_addr == 0)
@@ -322,14 +321,13 @@ local function DrawGlobalsAndLocals()
 	ImGui.Text("Local_")
 	ImGui.SameLine()
 	ImGui.SetNextItemWidth(200)
-	init_l_addr, _ = ImGui.InputInt("##test_local", init_l_addr)
-	input_2 = ImGui.IsItemActive()
+	init_l_addr = ImGui.InputInt("##test_local", init_l_addr)
 	init_l_addr = math.max(0, init_l_addr)
+	GUI:RequestInput(ImGui.IsItemActive())
 
 	ImGui.SameLine()
 	ImGui.SetNextItemWidth(200)
-	l_scr_name, _ = ImGui.InputTextWithHint("##scr_name", "Script Name", l_scr_name, 64)
-	input_3 = ImGui.IsItemActive()
+	l_scr_name = ImGui.InputTextWithHint("##scr_name", "Script Name", l_scr_name, 64)
 
 	ImGui.BeginDisabled(string.isempty(l_scr_name) or init_l_addr == 0)
 	ImGui.SameLine()
@@ -421,22 +419,30 @@ local function DrawTranslatorDebug()
 	ImGui.TextDisabled("You can switch between available languages in Settings -> General.")
 	ImGui.Spacing()
 
-	local idx = GVars.backend.language_index
-	local iso = LOCALES[idx]
-	ImGui.BulletText(_F("Index: %d", idx))
-	ImGui.BulletText(_F("ISO: %s", iso))
-	ImGui.BulletText(_F("Translated Name: %s", _T(iso)))
+	local state = Translator:GetState()
+	local idx   = (GVars.backend.language_index)
+	local iso   = LOCALES[idx]
+
+	ImGui.BulletText(_F("State: %s", EnumToString(Enums.eTranslatorState, state)))
+	if (state == Enums.eTranslatorState.RUNNING) then
+		ImGui.BulletText(_F("Index: %d", idx))
+		ImGui.BulletText(_F("ISO: %s", iso))
+		ImGui.BulletText(_F("Translated Name: %s", _T(iso)))
+	end
 
 	ImGui.Spacing()
 
-	if (GUI:Button("Reload")) then
-		Translator.wants_reload = true
-	end
-
 	ImGui.BeginDisabled(Translator:IsReloading())
+	ImGui.BeginDisabled(state == Enums.eTranslatorState.DISABLED)
 	if (GUI:Button("Break")) then
 		---@diagnostic disable-next-line
 		Translator:Reload(true)
+	end
+	ImGui.EndDisabled()
+
+	ImGui.SameLine()
+	if (GUI:Button("Reload")) then
+		Translator.wants_reload = true
 	end
 	ImGui.EndDisabled()
 

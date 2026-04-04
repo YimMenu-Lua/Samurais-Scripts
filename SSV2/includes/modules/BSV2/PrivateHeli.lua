@@ -509,39 +509,4 @@ function PrivateHeli:StateEval()
 	self.lastCheckTime = Time.Now() + 2
 end
 
-------------------------------------------------------------------------
---- Data
-------------------------------------------------------------------------
-
-PrivateHeli.Models = {
-	Pair.new("Annihilator", 837858166),
-	Pair.new("Annihilator Stealth", 295054921),
-	Pair.new("Maverick", 2634305738),
-	Pair.new("Police Maverick", 353883353),
-	Pair.new("Savage", 4212341271),
-	Pair.new("SuperVolito", 710198397),
-	Pair.new("SuperVolito Carbon", 2623428164),
-	Pair.new("Swift Flying Bravo", 3955379698),
-	Pair.new("Swift Deluxe", 1075432268),
-	Pair.new("Valkyrie", 2694714877),
-	Pair.new("Volatus", 2449479409),
-}
-
-PrivateHeli.PresetDestinations = {
-	Pair.new("Sandy Shores Helipad", vec3:new(1770.17, 3239.85, 42.1217)),
-	Pair.new("Paleto Bay Sheriff's Office", vec3:new(-475.02, 5988.46, 31.3367)),
-	Pair.new("Fort Zancudo Helipad", vec3:new(-1859.4, 2795.65, 32.8066)),
-	Pair.new("The Diamond Casino Helipad", vec3:new(967.052, 42.1343, 123.127)),
-	Pair.new("Vinewood Police Station", vec3:new(579.992, 12.3636, 103.234)),
-	Pair.new("Hawick Agency Helipad", vec3:new(393.284, -66.3109, 124.376)),
-	Pair.new("Richard's Majestic Helipad", vec3:new(-913.493, -378.444, 137.906)),
-	Pair.new("Rockford Hills Agency Helipad", vec3:new(-1007.68, -415.99, 80.1686)),
-	Pair.new("Vespucci Canals Agency Helipad", vec3:new(-1010.76, -756.875, 81.7484)),
-	Pair.new("Little Seoul Agency Helipad", vec3:new(-597.602, -716.92, 131.04)),
-	Pair.new("Lombank Office Helipad", vec3:new(-1581.9, -569.51, 116.328)),
-	Pair.new("Mazebank West Office Helipad", vec3:new(-1391.7, -477.587, 91.2508)),
-	Pair.new("Mazebank Tower Helipad", vec3:new(-75.2834, -819.323, 326.175)),
-	Pair.new("Arcadius Office Helipad", vec3:new(-144.582, -593.811, 211.775)),
-}
-
 return PrivateHeli

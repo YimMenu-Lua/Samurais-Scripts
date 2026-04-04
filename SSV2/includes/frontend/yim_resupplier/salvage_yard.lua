@@ -8,10 +8,10 @@
 
 
 local measureBulletWidths    = require("includes.frontend.helpers.measure_text_width")
-local drawNamePlate          = require("includes.frontend.yrv3.nameplate")
-local drawCashSafeLoopToggle = require("includes.frontend.yrv3.cashloop_toggle")
+local drawNamePlate          = require("includes.frontend.yim_resupplier.nameplate")
+local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
 
----@type table<string, integer>
+---@type array<integer>
 local bulletWidths           = {}
 
 return function()
@@ -30,15 +30,15 @@ return function()
 
 	ImGui.Spacing()
 
-	local index       = GVars.backend.language_index
-	local bulletWidth = bulletWidths[index]
+	local lang_index  = GVars.backend.language_index
+	local bulletWidth = bulletWidths[lang_index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_CASH_SAFE"),
 			_T("SY_INCOME_THRESHOLD"),
 		}, 60.0)
 
-		bulletWidths[index] = bulletWidth
+		bulletWidths[lang_index] = bulletWidth
 	end
 
 	local childWidth = 240

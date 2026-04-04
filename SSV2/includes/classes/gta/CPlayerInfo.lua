@@ -8,7 +8,7 @@
 
 
 local CStructView = require("includes.classes.gta.CStructView")
-
+local rlGamerInfo = require("includes.classes.gta.rlGamerInfo")
 
 --------------------------------------
 -- Class: CPlayerInfo
@@ -16,6 +16,7 @@ local CStructView = require("includes.classes.gta.CStructView")
 ---@ignore
 ---@class CPlayerInfo : CStructBase<CPlayerInfo>
 ---@field protected m_ptr pointer
+---@field m_rl_gamer_info rlGamerInfo
 ---@field m_swim_speed pointer<float>
 ---@field m_walk_speed pointer<float>
 ---@field m_game_state pointer<eGameState>
@@ -35,6 +36,7 @@ local CPlayerInfo = CStructView("CPlayerInfo", 0x0D78)
 function CPlayerInfo.new(ptr)
 	return setmetatable({
 		m_ptr                  = ptr,
+		m_rl_gamer_info        = rlGamerInfo(ptr:add(0x0020)),
 		m_swim_speed           = ptr:add(0x01C8),
 		m_walk_speed           = ptr:add(0x01E4),
 		m_game_state           = ptr:add(0x0230),
@@ -48,6 +50,34 @@ function CPlayerInfo.new(ptr)
 		m_weapon_defence_mult  = ptr:add(0x0D70),
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, CPlayerInfo)
+end
+
+---@return int64_t
+function CPlayerInfo:GetRockstarID()
+	return self:__safecall(0, function()
+		return self.m_rl_gamer_info.m_rockstar_id:get_int()
+	end)
+end
+
+---@return IPAddress?
+function CPlayerInfo:GetExternalIP()
+	return self:__safecall(nil, function()
+		return self.m_rl_gamer_info:GetExternalIP()
+	end)
+end
+
+---@return IPAddress?
+function CPlayerInfo:GetInternalIP()
+	return self:__safecall(nil, function()
+		return self.m_rl_gamer_info:GetInternalIP()
+	end)
+end
+
+---@return string
+function CPlayerInfo:GetPlayerName()
+	return self:__safecall("", function()
+		return self.m_rl_gamer_info:GetPlayerName()
+	end)
 end
 
 ---@return eGameState

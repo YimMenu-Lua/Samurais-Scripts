@@ -7,7 +7,13 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
--- Global ImGui extensions
+---@diagnostic disable: duplicate-set-field
+
+-- Global ImGui extensions and overloads
+
+local __InputText         = ImGui.InputText
+local __InputTextWithHint = ImGui.InputTextWithHint
+
 
 ---@class NotifWidgetState
 ---@field unreadCount number
@@ -81,6 +87,55 @@ local DialogBoxColors <const> = {
 	[ImGuiDialogBoxStyle.WARN]   = Color(240, 190, 2, 255), -- safety yellow; we should probably define this in the Color class as a named color
 	[ImGuiDialogBoxStyle.SEVERE] = Color("red"),
 }
+
+---@param label string
+---@param text string
+---@param buf_size integer
+---@param flags? integer
+function ImGui.InputText(label, text, buf_size, flags)
+	flags = flags or 0
+	local out, clicked = __InputText(label, text, buf_size, flags)
+	GUI:RequestInput(ImGui.IsItemActive())
+	return out, clicked
+end
+
+---@param label string
+---@param hint string
+---@param text string
+---@param buf_size integer
+---@param flags? integer
+function ImGui.InputTextWithHint(label, hint, text, buf_size, flags)
+	flags = flags or 0
+	local out, clicked = __InputTextWithHint(label, hint, text, buf_size, flags)
+	GUI:RequestInput(ImGui.IsItemActive())
+	return out, clicked
+end
+
+---@param label string
+---@param stringBuffer string
+---@param flags? integer ImGuiInputTextFlags
+---@param maxWidth? float
+---@param bufferSize? integer
+---@return string, boolean
+function ImGui.SearchBar(label, stringBuffer, flags, maxWidth, bufferSize)
+	maxWidth      = maxWidth or -1
+	bufferSize    = bufferSize or math.max(#stringBuffer + 32, 256)
+	flags         = flags or ImGuiInputTextFlags.None
+	local changed = false
+
+	ImGui.SetNextItemWidth(maxWidth)
+	ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 6)
+	ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, 6, 4)
+	stringBuffer, changed = ImGui.InputTextWithHint(
+		label,
+		_T("GENERIC_SEARCH_HINT"),
+		stringBuffer,
+		bufferSize,
+		flags
+	)
+	ImGui.PopStyleVar(2)
+	return stringBuffer, changed
+end
 
 -- Returns a basic animated string
 ---@param label? string
@@ -237,30 +292,12 @@ function ImGui.ColorEditU32(label, outU32)
 	return outU32, changed
 end
 
----@param label string
----@param stringBuffer string
----@param flags? integer ImGuiInputTextFlags
----@param maxWidth? float
----@param bufferSize? integer
----@return string, boolean
-function ImGui.SearchBar(label, stringBuffer, flags, maxWidth, bufferSize)
-	maxWidth      = maxWidth or -1
-	bufferSize    = bufferSize or math.max(#stringBuffer + 32, 256)
-	flags         = flags or ImGuiInputTextFlags.None
-	local changed = false
-
-	ImGui.SetNextItemWidth(maxWidth)
-	ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 6)
-	ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, 6, 4)
-	stringBuffer, changed = ImGui.InputTextWithHint(
-		label,
-		_T("GENERIC_SEARCH_HINT"),
-		stringBuffer,
-		bufferSize,
-		flags
-	)
-	ImGui.PopStyleVar(2)
-	return stringBuffer, changed
+---@param avail float
+function ImGui.SameLineIfAvail(avail)
+	ImGui.SameLine()
+	if (ImGui.GetContentRegionAvail() < avail) then
+		ImGui.NewLine()
+	end
 end
 
 ---@param label string
@@ -446,12 +483,8 @@ function ImGui.ValueBar(label, value, size, flags, opts)
 		end
 	end
 
-	if (size.y <= 0) then
-		if (isHotizontal) then
-			size.y = 32
-		else
-			size.y = region.y
-		end
+	if (size.y <= 0 and not isHotizontal) then
+		size.y = region.y
 	end
 
 	local pDrawList = ImGui.GetWindowDrawList()
@@ -461,7 +494,7 @@ function ImGui.ValueBar(label, value, size, flags, opts)
 	local minV      = 0
 	local maxV      = 1
 	local fraction  = math.clamp((value - minV) / (maxV - minV), 0, 1)
-	local frameH    = ImGui.GetFrameHeight() - style.FramePadding.y
+	local frameH    = size.y == 0 and (ImGui.GetFrameHeight() - style.FramePadding.y) or size.y
 	local textSize  = vec2:new(ImGui.CalcTextSize(label))
 	local labelSize = hasLabel and vec2:new(textSize.x, frameH) or vec2:zero()
 	local width     = (size and size.x > 0) and size.x or ImGui.CalcItemWidth()

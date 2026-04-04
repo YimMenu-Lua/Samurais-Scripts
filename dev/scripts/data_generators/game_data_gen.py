@@ -177,7 +177,7 @@ def gen_peds():
             str_pedtype = str(ped["Pedtype"]).lower()
             is_human = str_pedtype != "animal"
             if is_human:
-                gender = 0 if ped["PedCapsuleName"] == "standard_male" else 1
+                gender = 1 if (str_name.startswith("_f_", 1) or str_name.startswith("_f_", 2) or str(ped["PedCapsuleName"]).lower() == "standard_female") else 0
             else:
                 gender = 2
 

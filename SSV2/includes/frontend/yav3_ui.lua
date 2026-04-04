@@ -7,6 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+--[[ TODO: Refactor this monstrocity ]]
+
 local t_AnimList                 = require("includes.data.actions.animations")
 local t_PedScenarios             = require("includes.data.actions.scenarios")
 local t_SyncedScenes             = require("includes.data.actions.synchronized_scenes")
@@ -62,84 +64,82 @@ local t_AnimSortbyList <const>   = {
 
 local t_AnimFlags <const>        = {
 	looped = {
-		label = "Looped",
-		enabled = false,
+		label      = "YAV3_FLAGS_LOOPING",
+		bit        = Enums.eAnimFlags.LOOPING,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.LOOPING
 	},
 	upperbody = {
-		label = "Upper Body Only",
-		enabled = false,
-		wasClicked =
-			false,
-		bit = Enums.eAnimFlags.UPPERBODY
+		label      = "YAV3_FLAGS_UPPERBODY",
+		bit        = Enums.eAnimFlags.UPPERBODY,
+		enabled    = false,
+		wasClicked = false,
 	},
 	secondary = {
-		label = "Secondary",
-		enabled = false,
-		wasClicked =
-			false,
-		bit = Enums.eAnimFlags.SECONDARY
+		label      = "YAV3_FLAGS_SECONDARY",
+		bit        = Enums.eAnimFlags.SECONDARY,
+		enabled    = false,
+		wasClicked = false,
 	},
 	hideWeapon = {
-		label = "Hide Weapon",
-		enabled = false,
+		label      = "YAV3_FLAGS_HIDE_WEAPON",
+		bit        = Enums.eAnimFlags.HIDE_WEAPON,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.HIDE_WEAPON
 	},
 	endsInDeath = {
-		label = "Ends In Death",
-		enabled = false,
+		label      = "YAV3_FLAGS_ENDS_IN_DEAD_POSE",
+		bit        = Enums.eAnimFlags.ENDS_IN_DEAD_POSE,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.ENDS_IN_DEAD_POSE
 	},
 	holdLastFrame = {
-		label = "Hold Last Frame",
-		enabled = false,
+		label      = "YAV3_FLAGS_HOLD_LAST_FRAME",
+		bit        = Enums.eAnimFlags.HOLD_LAST_FRAME,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.HOLD_LAST_FRAME
 	},
 	uninterruptable = {
-		label = "Uninterruptible",
-		enabled = false,
+		label      = "YAV3_FLAGS_NOT_INTERRUPTABLE",
+		bit        = Enums.eAnimFlags.NOT_INTERRUPTABLE,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.NOT_INTERRUPTABLE
 	},
 	additive = {
-		label = "Additive",
-		enabled = false,
+		label      = "YAV3_FLAGS_ADDITIVE",
+		bit        = Enums.eAnimFlags.ADDITIVE,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.ADDITIVE
 	},
 	nocollision = {
-		label = "No Collision",
-		enabled = false,
+		label      = "YAV3_FLAGS_TURN_OFF_COLLISION",
+		bit        = Enums.eAnimFlags.TURN_OFF_COLLISION,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.TURN_OFF_COLLISION
 	},
 	forceStart = {
-		label = "Force Start",
-		enabled = false,
+		label      = "YAV3_FLAGS_FORCE_START",
+		bit        = Enums.eAnimFlags.FORCE_START,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.FORCE_START
 	},
 	processAttachments = {
-		label = "Process Attachments",
-		enabled = false,
+		label      = "YAV3_FLAGS_PROCESS_ATTACHMENTS",
+		bit        = Enums.eAnimFlags.PROCESS_ATTACHMENTS_ON_START,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.PROCESS_ATTACHMENTS_ON_START
 	},
 	alternateFpAnim = {
-		label = "Alt First Person Anim",
-		enabled = false,
+		label      = "YAV3_FLAGS_ALTERNATIVE_FP_ANIM",
+		bit        = Enums.eAnimFlags.USE_ALTERNATIVE_FP_ANIM,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.USE_ALTERNATIVE_FP_ANIM
 	},
 	useFullBlending = {
-		label = "Use Full Blending",
-		enabled = false,
+		label      = "YAV3_FLAGS_USE_FULL_BLENDING",
+		bit        = Enums.eAnimFlags.USE_FULL_BLENDING,
+		enabled    = false,
 		wasClicked = false,
-		bit = Enums.eAnimFlags.USE_FULL_BLENDING
 	},
 }
 
@@ -153,7 +153,7 @@ local function OnTabItemSwitch()
 	end
 end
 
-local function BuildDataLists()
+local function SortDataLists()
 	ThreadManager:Run(function()
 		table.sort(t_AnimList, function(a, b)
 			return a.label < b.label
@@ -196,7 +196,6 @@ local function DrawNewCommandWindow()
 				s_NewCommandBuffer,
 				64
 			)
-			Backend.disable_input = ImGui.IsItemActive()
 
 			if (not s_NewCommandBuffer:isempty()) then
 				s_NewCommandBuffer = s_NewCommandBuffer:lower():replace(" ", "_")
@@ -248,7 +247,7 @@ local function DrawAnims()
 
 				local is_selected = (i == i_SelectedAnimIndex)
 				local is_favorite = YimActions:DoesFavoriteExist("anims", action.label)
-				local has_command = GVars.features.yim_actions.action_commands[action.label] ~= nil
+				local has_command = YimActions.Commands[action.label] ~= nil
 				local label       = action.label
 
 				if (is_favorite) then
@@ -330,7 +329,7 @@ local function DrawScenarios()
 
 			local is_selected = (i_SelectedScenarioIndex == i)
 			local is_favorite = YimActions:DoesFavoriteExist("scenarios", action.label)
-			local has_command = GVars.features.yim_actions.action_commands[action.label] ~= nil
+			local has_command = YimActions.Commands[action.label] ~= nil
 			local label       = action.label
 
 			if (is_favorite) then
@@ -430,20 +429,21 @@ local function DrawScenes()
 end
 
 local function ListFavoritesByCategory(category)
-	if not GVars.features.yim_actions.favorites or not GVars.features.yim_actions.favorites[category] then
+	local favorites = YimActions.Favorites
+	if (not favorites or not favorites[category]) then
 		return
 	end
 
-	if next(GVars.features.yim_actions.favorites[category]) == nil then
+	if (next(favorites[category]) == nil) then
 		ImGui.TextWrapped(_F("You don't have any saved %s.", category or "actions of this type"))
 		return
 	end
 
-	if ImGui.BeginListBox(_F("##favorite_", category), -1, -1) then
-		for label, data in pairs(GVars.features.yim_actions.favorites[category]) do
+	if (ImGui.BeginListBox(_F("##favorite_", category), -1, -1)) then
+		for label, data in pairs(favorites[category]) do
 			local is_selected = (s_SelectedFavoriteName == label)
 
-			if ImGui.Selectable(data.label, is_selected) then
+			if (ImGui.Selectable(data.label, is_selected)) then
 				s_SelectedFavoriteName = label
 			end
 
@@ -475,13 +475,14 @@ local function ListFavoritesByCategory(category)
 end
 
 local function DrawFavoriteActions()
-	if not GVars.features.yim_actions.favorites or next(GVars.features.yim_actions.favorites) == nil then
+	local favorites = YimActions.Favorites
+	if (not favorites or next(favorites) == nil) then
 		ImGui.Dummy(1, 80)
 		ImGui.TextWrapped("Nothig saved yet.")
 		return
 	end
 
-	if ImGui.BeginTabBar("##AnimationsTabBar") then
+	if (ImGui.BeginTabBar("##AnimationsTabBar")) then
 		if ImGui.BeginTabItem("Animations") then
 			s_CurrentTab = "anims"
 			ListFavoritesByCategory("anims")
@@ -644,39 +645,31 @@ local function DrawAnimOptions()
 			GUI:QuickConfigWindow(opts_lbl, function()
 				ImGui.SetNextWindowBgAlpha(0)
 				ImGui.BeginChild("##flagsChild", 500, 400)
+
 				ImGui.SeparatorText(_T("GENERIC_GENERAL_LABEL"))
-				GVars.features.yim_actions.disable_props, _ = GUI:CustomToggle(_T("YAV3_DISABLE_PROPS"),
+				GVars.features.yim_actions.disable_props = GUI:CustomToggle(_T("YAV3_DISABLE_PROPS"),
 					GVars.features.yim_actions.disable_props
 				)
 
-				GVars.features.yim_actions.disable_ptfx, _ = GUI:CustomToggle(_T("YAV3_DISABLE_PTFX"),
+				GVars.features.yim_actions.disable_ptfx = GUI:CustomToggle(_T("YAV3_DISABLE_PTFX"),
 					GVars.features.yim_actions.disable_ptfx
 				)
 
-				GVars.features.yim_actions.disable_sfx, _ = GUI:CustomToggle(_T("YAV3_DISABLE_SFX"),
+				GVars.features.yim_actions.disable_sfx = GUI:CustomToggle(_T("YAV3_DISABLE_SFX"),
 					GVars.features.yim_actions.disable_sfx
 				)
 
 				ImGui.Spacing()
 				ImGui.SeparatorText(_T("YAV3_ANIM_FLAGS"))
-				-- ImGui.Columns was causing a resoure deadlock in YimLuaAPI.
-				-- The Columns API is deprecated anyway so if we want to draw nicely alined chechboxes
-				-- then we'll have to either use GridRenderer or do it manually.
-
-				-- ImGui.Columns(2)
-				-- ImGui.SetColumnWidth(0, 250)
-
 				for name, flag in pairs(t_AnimFlags) do
 					ImGui.PushID(_F("##flag_%s", name))
-					flag.enabled, flag.wasClicked = ImGui.Checkbox(flag.label,
-						Bit.IsBitSet(t_SelectedAction.data.flags, flag.bit))
+					local isEnabled = Bit.IsBitSet(t_SelectedAction.data.flags, flag.bit)
+					flag.enabled, flag.wasClicked = ImGui.Checkbox(_T(flag.label), isEnabled)
 					ImGui.PopID()
 
 					if (flag.bit == Enums.eAnimFlags.ENDS_IN_DEAD_POSE) then
-						GUI:Tooltip("This will not do anything if the animation is looped.")
+						GUI:Tooltip(_T("YAV3_FLAGS_DEAD_POSE_LOOPED_TT"))
 					end
-
-					-- ImGui.NextColumn()
 
 					if flag.wasClicked then
 						GUI:PlaySound("Nav")
@@ -684,7 +677,6 @@ local function DrawAnimOptions()
 						t_SelectedAction.data.flags = bitwiseOp(t_SelectedAction.data.flags, flag.bit)
 					end
 				end
-				-- ImGui.Columns(0)
 				ImGui.EndChild()
 			end, ImGui.CloseCurrentPopup)
 			ImGui.EndPopup()
@@ -701,7 +693,7 @@ local function DrawPlayerTabItem()
 		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
 	)
 
-	if (i_SelectedSidebarItem == 1) or (i_SelectedSidebarItem == 2) then
+	if (i_SelectedSidebarItem == 1 or i_SelectedSidebarItem == 2) then
 		ImGui.SetNextItemWidth(-1)
 		s_SearchBuffer, b_SearchBarUsed = ImGui.InputTextWithHint(
 			"##search",
@@ -709,7 +701,6 @@ local function DrawPlayerTabItem()
 			s_SearchBuffer,
 			128
 		)
-		Backend.disable_input = ImGui.IsItemActive() and not hwnd_NewCommandWindow.should_draw
 	end
 
 	DrawSidebarItems()
@@ -975,18 +966,16 @@ local function DrawJsonMovementClipsets()
 end
 
 local function DrawFavoriteMovementClipsets()
-	if not GVars.features.yim_actions.favorites or not GVars.features.yim_actions.favorites.clipsets then
-		return
-	end
+	local favorites = YimActions.Favorites.clipsets
+	if (not favorites) then return end
 
-	local favs = GVars.features.yim_actions.favorites.clipsets
-	if next(favs) == nil then
+	if next(favorites) == nil then
 		ImGui.TextWrapped(("You don't have any saved clipsets."))
 		return
 	end
 
-	if ImGui.BeginListBox(("##favorite_clipsets"), -1, -1) then
-		for label, data in pairs(favs) do
+	if (ImGui.BeginListBox(("##favorite_clipsets"), -1, -1)) then
+		for label, data in pairs(favorites) do
 			local is_selected = (t_SelectedMovementClipset == data)
 
 			if ImGui.Selectable(data.Name, is_selected) then
@@ -1059,7 +1048,6 @@ local function DrawMovementOptions()
 			128
 		)
 		ImGui.EndDisabled()
-		Backend.disable_input = ImGui.IsItemActive()
 	end
 
 	if (i_MovementCategory == 0) then
@@ -1097,7 +1085,6 @@ local function DrawCompanionActionsSearchBar()
 		s_SearchBuffer,
 		128
 	)
-	Backend.disable_input = ImGui.IsItemActive()
 end
 
 local function DrawCompanions()
@@ -1337,7 +1324,6 @@ local function DrawPedSpawnWindow()
 			s_PedSearchBuffer,
 			128
 		)
-		Backend.disable_input = ImGui.IsItemActive()
 
 		if ImGui.BeginListBox("##ped_list", -1, -1) then
 			for model, data in pairs(t_GamePeds) do
@@ -1407,7 +1393,7 @@ local function DrawPedSpawnWindow()
 
 		ImGui.PopStyleVar()
 
-		if (PreviewService.m_current and (not ImGui.IsAnyItemHovered() or not b_PreviewPeds)) then
+		if (PreviewService:GetCurrentEntity() and (not ImGui.IsAnyItemHovered() or not b_PreviewPeds)) then
 			i_HoveredPedModelThisFrame = nil
 			PreviewService:Clear()
 		end
@@ -1458,4 +1444,4 @@ local function YAV3UI()
 end
 
 GUI:RegisterNewTab(Enums.eTabID.TAB_EXTRA, "YimActions", YAV3UI)
-BuildDataLists()
+SortDataLists()

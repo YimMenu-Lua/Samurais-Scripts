@@ -81,8 +81,8 @@ local function DrawKeybind(gvarKey, isController)
 	if (ImGui.Button(_F("%s##%s", currentKeyName, label), key_container_size.x, key_container_size.y)) then
 		GUI:PlaySound(GUI.Sounds.Click)
 		ImGui.OpenPopup(label)
-		Backend.disable_input = true
 	end
+	GUI:RequestInput(ImGui.IsPopupOpen(label))
 
 	local is_default = IsDefault(current_key, default_key, isController)
 	local resetPopup = _F("%s##%s%s", reset_label, label, currentKeyName)
@@ -137,8 +137,7 @@ local function DrawKeybind(gvarKey, isController)
 
 		if ImGui.SmallButton("X") then
 			ImGui.CloseCurrentPopup()
-			Backend.disable_input = false
-			keyCode, keyName      = nil, nil
+			keyCode, keyName = nil, nil
 		end
 
 		ImGui.Separator()
@@ -199,8 +198,7 @@ local function DrawKeybind(gvarKey, isController)
 				local newKey = isController and { name = keyName, code = keyCode } or keyName
 				table.set_nested_key(GVars, current_path, newKey)
 				ImGui.CloseCurrentPopup()
-				Backend.disable_input = false
-				keyCode, keyName      = nil, nil
+				keyCode, keyName = nil, nil
 			end
 
 			ImGui.SameLine()

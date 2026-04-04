@@ -7,8 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local drawFactory = require("includes.frontend.yrv3.factory")
+local drawWarehouse = require("includes.frontend.yim_resupplier.warehouse")
 
 return function()
-	drawFactory(YRV3:GetAcidLab(), _T("YRV3_LSD_LAB_NOT_OWNED"))
+	drawWarehouse(YRV3:GetHangar(), _T("YRV3_HANGAR_NOT_OWNED"))
 end

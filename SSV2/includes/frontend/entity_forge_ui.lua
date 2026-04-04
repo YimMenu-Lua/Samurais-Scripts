@@ -7,6 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+--[[ TODO: Refactor this monstrocity ]]
+
 local World                      = require("includes.modules.World")
 local t_GameObjects              = require("includes.data.objects")
 local t_GamePeds                 = require("includes.data.ped_hashmap")
@@ -32,7 +34,7 @@ local selectedVehBone            = 1
 local forgeScenarioIndex         = 1
 local attachmentMovementModifier = 1.0
 local attachmentRotationModifier = 1.0
-local savedEntityIndex           = ""
+local selectedSavedEntityName    = ""
 local sidebarLowerText           = ""
 local objectSearchBuffer         = ""
 local vehicleSearch              = ""
@@ -58,13 +60,16 @@ local hoveredThisFrame
 local s_SelectedVehBone
 local unk_AttachBone
 local unk_SelectedEntity
-local unk_ImportedCreation
 local t_SelectedPedBone
+
+---@type ForgeEntityPlainTable?
+local unk_ImportedCreation
 
 ---@type ForgeEntity?
 local t_SelectedSpawnedEntity
 
 local t_SelectedFavoriteEntity
+---@type ForgeEntityPlainTable
 local t_SelectedSavedEntity
 
 ---@type ForgeEntity?
@@ -80,16 +85,6 @@ local t_SelectedCanvasChild
 local t_ForgeCustomizationTarget
 
 local t_SelectedForgeScenario
-
-local function WrapB64String(b64, index)
-	local out = {}
-
-	for i = 1, #b64, index do
-		table.insert(out, b64:sub(i, i + index - 1))
-	end
-
-	return table.concat(out, "\n")
-end
 
 local function FilterObjects()
 	if (#objectSearchBuffer > 0) then
@@ -118,7 +113,7 @@ local function FilterPeds()
 end
 
 local function BuildVehicleList()
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		local s_VehicleName
 		for model, data in pairs(t_GameVehicles) do
 			sidebarLowerText = "Loading Vehicles"
@@ -203,7 +198,6 @@ local function DrawObjects()
 		objectSearchBuffer,
 		128
 	)
-	Backend.disable_input = ImGui.IsItemActive()
 
 	if (b_ObjectsSearch_used) then
 		FilterObjects()
@@ -247,7 +241,6 @@ local function DrawVehicles()
 		vehicleSearch,
 		128
 	)
-	Backend.disable_input = ImGui.IsItemActive()
 
 	if (b_VehicleSearch_used) then
 		FilterVehicles()
@@ -293,7 +286,6 @@ local function DrawPeds()
 		pedSearch,
 		128
 	)
-	Backend.disable_input = ImGui.IsItemActive()
 
 	if (b_PedSearch_used) then
 		FilterPeds()
@@ -463,7 +455,7 @@ local function DrawCreatorUI()
 		ImGui.BeginDisabled(childPedCustomization.should_draw)
 		if GUI:Button("Customize") then
 			t_ForgeCustomizationTarget = t_SelectedChild
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				t_ForgeCustomizationTarget.m_properties.components = Game.GetPedComponents(
 					t_ForgeCustomizationTarget.m_handle
 				)
@@ -484,7 +476,7 @@ local function DrawCreatorUI()
 	ImGui.BeginDisabled(not t_SelectedParent or not t_SelectedChild)
 	if GUI:Button(_F("%s ->", _T("GENERIC_ATTACH")), { size = vec2:new(100, 40) }) then
 		if t_SelectedParent and t_SelectedChild and (t_SelectedParent ~= t_SelectedChild) then
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				EntityForge:AttachEntity(
 					t_SelectedChild,
 					t_SelectedParent,
@@ -708,7 +700,7 @@ local function DrawCreatorUI()
 		end
 
 		if bParentVisUsed then
-			script.run_in_fiber(function()
+			ThreadManager:Run(function()
 				ENTITY.SET_ENTITY_ALPHA(
 					EntityForge.currentParent.m_handle,
 					EntityForge.currentParent.m_alpha,
@@ -744,7 +736,7 @@ local function DrawCreatorUI()
 				ImGui.BeginDisabled(childPedCustomization.should_draw)
 				if GUI:Button("Customize") then
 					t_ForgeCustomizationTarget = t_SelectedCanvasChild
-					script.run_in_fiber(function()
+					ThreadManager:Run(function()
 						t_ForgeCustomizationTarget.m_properties.components = Game.GetPedComponents(
 							t_ForgeCustomizationTarget.m_handle
 						)
@@ -793,7 +785,7 @@ local function DrawCreatorUI()
 			)
 
 			if bChildVisUsed then
-				script.run_in_fiber(function()
+				ThreadManager:Run(function()
 					ENTITY.SET_ENTITY_ALPHA(
 						t_SelectedCanvasChild.m_handle,
 						t_SelectedCanvasChild.m_alpha,
@@ -830,22 +822,21 @@ local function DrawCreatorUI()
 					newEntityNameBuffer,
 					128
 				)
-				Backend.disable_input = ImGui.IsItemActive()
 
 				ImGui.Spacing()
 				ImGui.Text(_T("EF_NEW_NAME_HINT"))
 				ImGui.Dummy(1, 10)
 
 				if ImGui.Button(_T("GENERIC_CONFIRM"), 80, 30) then
-					if GVars.features.entity_forge.forged_entities[newEntityNameBuffer] then
+					if (EntityForge.SavedForges[newEntityNameBuffer]) then
 						Notifier:ShowError("EntityForge", _T("EF_NAME_EXISTS_ERR"))
 						return
 					end
 
 					local new_creation = EntityForge.currentParent:serialize()
-					new_creation.name = newEntityNameBuffer
+					new_creation.name  = newEntityNameBuffer
 
-					script.run_in_fiber(function(save)
+					ThreadManager:Run(function(save)
 						local function GetVehicleProperties(vehicleEntity)
 							if vehicleEntity.type == Enums.eEntityType.Vehicle then
 								local col1 = {}
@@ -894,7 +885,7 @@ local function DrawCreatorUI()
 							yield()
 						end
 
-						GVars.features.entity_forge.forged_entities[new_creation.name] = new_creation
+						EntityForge.SavedForges[new_creation.name] = new_creation
 						Notifier:ShowSuccess(
 							"EntityForge",
 							_F("Added '%s' to Saved Creations",
@@ -1114,7 +1105,8 @@ local function DrawSpawnedEntities()
 end
 
 local function DrawFavoriteEntities()
-	local no_favs = next(GVars.features.entity_forge.favorites) == nil
+	local favorites = EntityForge.FavoriteModels
+	local no_favs = next(favorites) == nil
 	if (no_favs) then
 		ImGui.Dummy(1, 10)
 		ImGui.TextWrapped("You don't have any saved favorites.")
@@ -1122,14 +1114,14 @@ local function DrawFavoriteEntities()
 	end
 
 	ImGui.BeginListBox("##FavoriteEntities", 530, 280)
-	for hash, data in pairs(GVars.features.entity_forge.favorites) do
+	for hash, data in pairs(favorites) do
 		local is_selected = (favoriteEntityIndex == hash)
 		if ImGui.Selectable(data.name, is_selected) then
 			favoriteEntityIndex = hash
 		end
 
 		if is_selected then
-			t_SelectedFavoriteEntity = GVars.features.entity_forge.favorites[favoriteEntityIndex]
+			t_SelectedFavoriteEntity = favorites[favoriteEntityIndex]
 		end
 	end
 	ImGui.EndListBox()
@@ -1138,7 +1130,7 @@ local function DrawFavoriteEntities()
 
 	ImGui.BeginDisabled(not t_SelectedFavoriteEntity)
 	if GUI:Button(_T("GENERIC_SPAWN")) then
-		script.run_in_fiber(function()
+		ThreadManager:Run(function()
 			EntityForge:CreateEntity(
 				t_SelectedFavoriteEntity.modelHash,
 				t_SelectedFavoriteEntity.name,
@@ -1170,30 +1162,11 @@ local function DrawFavoriteEntities()
 			newEntityNameBuffer,
 			128
 		)
-		Backend.disable_input = ImGui.IsItemActive()
 
 		ImGui.Spacing()
 
 		if ImGui.Button(_T("GENERIC_CONFIRM"), 80, 30) then
-			for hash, data in pairs(GVars.features.entity_forge.favorites) do
-				if data.name == newEntityNameBuffer then
-					Notifier:ShowError("EntityForge", _T("EF_NAME_EXISTS_ERR"))
-					return
-				end
-
-				if data.name == t_SelectedFavoriteEntity.name then
-					Notifier:ShowSuccess(
-						"EntityForge",
-						_F(
-							"Renamed '%s' to '%s'",
-							data.name,
-							newEntityNameBuffer
-						)
-					)
-					GVars.features.entity_forge.favorites[hash].name = newEntityNameBuffer
-					break
-				end
-			end
+			EntityForge:RenameFavoriteModel(t_SelectedFavoriteEntity.modelHash, newEntityNameBuffer)
 			newEntityNameBuffer = ""
 			ImGui.CloseCurrentPopup()
 		end
@@ -1232,7 +1205,8 @@ local function DrawFavoriteEntities()
 end
 
 local function DrawSavedEntities()
-	local no_saved_forges = next(GVars.features.entity_forge.forged_entities) == nil
+	local savedForges = EntityForge.SavedForges
+	local no_saved_forges = next(savedForges) == nil
 	if (no_saved_forges) then
 		ImGui.Dummy(1, 10)
 		ImGui.TextWrapped(_T("EF_SAVED_NONE"))
@@ -1240,13 +1214,13 @@ local function DrawSavedEntities()
 	end
 
 	if ImGui.BeginListBox("##ForgedEntities", 530, 280) then
-		for name, forged in pairs(GVars.features.entity_forge.forged_entities) do
-			local is_selected = (savedEntityIndex == name)
-			if ImGui.Selectable(name, is_selected) then
-				savedEntityIndex = name
+		for name, forged in pairs(savedForges) do
+			local is_selected = (selectedSavedEntityName == name)
+			if (ImGui.Selectable(name, is_selected)) then
+				selectedSavedEntityName = name
 			end
 
-			if is_selected then
+			if (is_selected) then
 				t_SelectedSavedEntity = forged
 			end
 		end
@@ -1280,29 +1254,16 @@ local function DrawSavedEntities()
 			newEntityNameBuffer,
 			128
 		)
-		Backend.disable_input = ImGui.IsItemActive()
 
 		ImGui.Spacing()
 
 		if ImGui.Button(_T("GENERIC_CONFIRM"), 80, 30) then
-			if (GVars.features.entity_forge.forged_entities[newEntityNameBuffer]) then
+			if (savedForges[newEntityNameBuffer]) then
 				Notifier:ShowError("EntityForge", _T("EF_NAME_EXISTS_ERR"))
 				return
 			end
 
-			Notifier:ShowSuccess(
-				"EntityForge",
-				_F(
-					"Renamed '%s' to '%s'",
-					t_SelectedSavedEntity.name,
-					newEntityNameBuffer
-				)
-			)
-			local new = table.copy(GVars.features.entity_forge.forged_entities[t_SelectedSavedEntity.name])
-			GVars.features.entity_forge.forged_entities[t_SelectedSavedEntity.name] = nil
-			new.name = newEntityNameBuffer
-			t_SelectedSavedEntity = new
-			GVars.features.entity_forge.forged_entities[newEntityNameBuffer] = new
+			t_SelectedSavedEntity = EntityForge:RenameSavedForge(t_SelectedSavedEntity.name, newEntityNameBuffer)
 			newEntityNameBuffer = ""
 			ImGui.CloseCurrentPopup()
 		end
@@ -1321,8 +1282,19 @@ local function DrawSavedEntities()
 	ImGui.SameLine()
 
 	if GUI:Button(_T("GENERIC_SHARE")) then
-		encodedShareableCreation = Serializer:B64Encode(Serializer:XOR(Serializer:Encode(t_SelectedSavedEntity)))
-		wrappedBase64String, _ = WrapB64String(encodedShareableCreation, 40)
+		local encoded = Serializer:Encode(t_SelectedSavedEntity)
+		if (not encoded) then
+			log.warning("Encoding failed!")
+			return
+		end
+
+		encodedShareableCreation = Serializer:B64Encode(Serializer:XOR(encoded))
+		if (not string.isvalid(encodedShareableCreation)) then
+			log.warning("Encryption failed!")
+			return
+		end
+
+		wrappedBase64String = encodedShareableCreation:wrap(40)
 		ImGui.OpenPopup("share creation")
 	end
 	ImGui.EndDisabled()
@@ -1336,8 +1308,7 @@ local function DrawSavedEntities()
 		ImGui.Spacing()
 		ImGui.BulletText(_F("Name: %s", t_SelectedSavedEntity.name))
 		ImGui.BulletText(_F("N° Of Attachments: [ %d ]", #t_SelectedSavedEntity.children))
-		ImGui.BulletText(_F("Nested Child Attachments: [ %s ]",
-			t_SelectedSavedEntity.children.children and "Yes" or "No"))
+		ImGui.BulletText(_F("Nested Child Attachments: [ %s ]", (t_SelectedSavedEntity.children[1] ~= nil) and "Yes" or "No"))
 
 		ImGui.Separator()
 		ImGui.Spacing()
@@ -1351,7 +1322,7 @@ local function DrawSavedEntities()
 			440, 150,
 			ImGuiInputTextFlags.ReadOnly
 		)
-		Backend.disable_input = ImGui.IsItemActive()
+		GUI:RequestInput(ImGui.IsItemActive())
 
 		ImGui.Spacing()
 		ImGui.Spacing()
@@ -1389,8 +1360,7 @@ local function DrawSavedEntities()
 			ImGui.Spacing()
 			ImGui.BulletText(_F("Name: %s", unk_ImportedCreation.name))
 			ImGui.BulletText(_F("N° Of Attachments: [ %d ]", #unk_ImportedCreation.children))
-			ImGui.BulletText(_F("Nested Child Attachments: [ %s ]",
-				unk_ImportedCreation.children.children and "Yes" or "No"))
+			ImGui.BulletText(_F("Nested Child Attachments: [ %s ]", unk_ImportedCreation.children[1] ~= nil and "Yes" or "No"))
 
 			ImGui.Separator()
 			ImGui.Spacing()
@@ -1404,7 +1374,7 @@ local function DrawSavedEntities()
 			0xFFFF,
 			440, 150
 		)
-		Backend.disable_input = ImGui.IsItemActive()
+		GUI:RequestInput(ImGui.IsItemActive())
 
 		ImGui.Spacing()
 		ImGui.Spacing()
@@ -1412,29 +1382,30 @@ local function DrawSavedEntities()
 		if (encodedShareableCreation:isempty()) then
 			if GUI:Button(_T("EF_IMPORT_DATA_CLIPBOARD")) then
 				encodedShareableCreation = ImGui.GetClipboardText()
-				if type(encodedShareableCreation) ~= "string" then
-					Notifier:ShowError(
-						"EntityForge",
-						_T("EF_IMPORT_DATA_CLIPBOARD_ERR")
+				if (type(encodedShareableCreation) ~= "string") then
+					Notifier:ShowError("EntityForge", _T("EF_IMPORT_DATA_CLIPBOARD_ERR")
 					)
 					return
 				end
 
-				wrappedBase64String = WrapB64String(encodedShareableCreation, 40)
+				wrappedBase64String  = encodedShareableCreation:wrap(40)
 				unk_ImportedCreation = EntityForge:ImportCreation(encodedShareableCreation)
 			end
 		else
 			if GUI:Button(_T("GENERIC_ADD")) then
-				if (GVars.features.entity_forge.forged_entities[unk_ImportedCreation.m_name]) then
-					Notifier:ShowWarning("EntityForge", _T("EF_IMPORT_DATA_NOTICE"))
-					unk_ImportedCreation.m_name = unk_ImportedCreation.m_name .. " [import]"
+				if (not unk_ImportedCreation or not unk_ImportedCreation.name) then
+					return
 				end
 
-				GVars.features.entity_forge.forged_entities[unk_ImportedCreation.m_name] = unk_ImportedCreation
-				wrappedBase64String = ""
+				if (savedForges[unk_ImportedCreation.name]) then
+					Notifier:ShowWarning("EntityForge", _T("EF_IMPORT_DATA_NOTICE"))
+					unk_ImportedCreation.name = unk_ImportedCreation.name .. " [import]"
+				end
+
+				EntityForge:AddForgedEntity(unk_ImportedCreation)
+				wrappedBase64String      = ""
 				encodedShareableCreation = ""
-				unk_ImportedCreation = nil
-				Notifier:ShowSuccess("EntityForge", _T("EF_IMPORT_SUCCESS"))
+				unk_ImportedCreation     = nil
 				ImGui.CloseCurrentPopup()
 			end
 		end
@@ -1444,9 +1415,9 @@ local function DrawSavedEntities()
 		ImGui.SameLine()
 
 		if GUI:Button(_T("GENERIC_CANCEL")) then
-			wrappedBase64String = ""
+			wrappedBase64String      = ""
 			encodedShareableCreation = ""
-			unk_ImportedCreation = nil
+			unk_ImportedCreation     = nil
 			ImGui.CloseCurrentPopup()
 		end
 
@@ -1492,7 +1463,7 @@ local function EntityForgeUI()
 			else
 				ImGui.BeginDisabled(not unk_SelectedEntity)
 				if GUI:Button(_T("GENERIC_SPAWN"), { size = vec2:new(120, 35) }) then
-					script.run_in_fiber(function()
+					ThreadManager:Run(function()
 						local vec_Position
 						local i_ModelHash = (
 							type(unk_SelectedEntity) == "string" and
@@ -1506,8 +1477,9 @@ local function EntityForgeUI()
 							unk_SelectedEntity.name
 						)
 
-						if previewSelectedEntity and PreviewService.m_current_pos then
-							vec_Position = PreviewService.m_current_pos
+						local previewPos = PreviewService:GetCurrentPosition()
+						if (previewSelectedEntity and previewPos) then
+							vec_Position = previewPos
 						else
 							vec_Position = LocalPlayer:GetOffsetInWorldCoords(1, 5, 0)
 						end
@@ -1542,7 +1514,6 @@ local function EntityForgeUI()
 						newEntityNameBuffer,
 						128
 					)
-					Backend.disable_input = ImGui.IsItemActive()
 					ImGui.Dummy(1, 10)
 
 					if GUI:Button(_T("GENERIC_CONFIRM")) then
@@ -1642,7 +1613,7 @@ local function EntityForgeUI()
 		ImGui.EndTabBar()
 	end
 
-	if PreviewService.m_current and (not ImGui.IsAnyItemHovered() or not previewSelectedEntity) then
+	if PreviewService:GetCurrentEntity() and (not ImGui.IsAnyItemHovered() or not previewSelectedEntity) then
 		hoveredThisFrame = nil
 		PreviewService:Clear()
 	end
@@ -1707,7 +1678,7 @@ local function ForgeChildCustomizationWindow()
 					end
 
 					if GUI:Button("Apply") then
-						script.run_in_fiber(function()
+						ThreadManager:Run(function()
 							Game.ApplyPedComponents(
 								t_ForgeCustomizationTarget.m_handle,
 								t_ForgeCustomizationTarget.m_properties.components
@@ -1721,7 +1692,7 @@ local function ForgeChildCustomizationWindow()
 				end
 
 				if GUI:Button("Randomize") then
-					script.run_in_fiber(function()
+					ThreadManager:Run(function()
 						PED.SET_PED_RANDOM_COMPONENT_VARIATION(t_ForgeCustomizationTarget.m_handle, 0)
 						t_ForgeCustomizationTarget.m_properties.components = Game.GetPedComponents(
 							t_ForgeCustomizationTarget.m_handle)
@@ -1754,7 +1725,7 @@ local function ForgeChildCustomizationWindow()
 						scenario = t_SelectedForgeScenario.scenario
 					}
 
-					script.run_in_fiber(function()
+					ThreadManager:Run(function()
 						TASK.CLEAR_PED_TASKS_IMMEDIATELY(t_ForgeCustomizationTarget.m_handle)
 						TASK.TASK_START_SCENARIO_IN_PLACE(
 							t_ForgeCustomizationTarget.m_handle,
@@ -1771,7 +1742,7 @@ local function ForgeChildCustomizationWindow()
 
 				if ImGui.Button("Stop & Clear") then
 					t_ForgeCustomizationTarget.m_properties.action = nil
-					script.run_in_fiber(function(clear)
+					ThreadManager:Run(function(clear)
 						if PED.IS_PED_USING_ANY_SCENARIO(t_ForgeCustomizationTarget.m_handle) then
 							TASK.CLEAR_PED_TASKS_IMMEDIATELY(t_ForgeCustomizationTarget.m_handle)
 							if t_ForgeCustomizationTarget.m_is_attached then

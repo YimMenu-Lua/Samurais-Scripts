@@ -34,7 +34,7 @@ local CPlayerInfo       = require("includes.classes.gta.CPlayerInfo")
 ---@field m_cash pointer<uint16_t> // 0x1614
 ---@field private m_ped_weapon_mgr_inst CPedWeaponManager
 ---@overload fun(ped: handle): CPed
-local CPed = Class("CPed", { parent = CEntity, symbolic_size = 0x161C, pointer_ctor = true })
+local CPed = Class("CPed", { parent = CEntity, symbolic_size = 0x161C })
 
 ---@param ped handle
 ---@return CPed

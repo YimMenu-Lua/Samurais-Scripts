@@ -7,6 +7,24 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+---@class ForgeEntityPlainTable
+---@field name string
+---@field handle integer
+---@field modelHash integer
+---@field alpha integer
+---@field type ePedType
+---@field isAttached boolean
+---@field isPlayer boolean
+---@field properties table
+---@field parent_bone string|integer
+---@field attach_pos vec3
+---@field attach_rot vec3
+---@field isForged boolean
+---@field children ForgeEntityPlainTable[]
+---@field coordinates vec3?
+---@field rotation vec3?
+
+
 -----------------------------------------------------
 -- ForgeEntity Struct
 -----------------------------------------------------
@@ -22,7 +40,7 @@
 ---@field m_is_forged boolean
 ---@field m_is_player boolean
 ---@field m_is_world_entity boolean
----@field m_parent table
+---@field m_parent ForgeEntity?
 ---@field m_parent_bone number | string
 ---@field m_children ForgeEntity[]
 ---@field m_position vec3
@@ -52,19 +70,18 @@ setmetatable(ForgeEntity, {
 ---@return ForgeEntity
 function ForgeEntity.new(handle, name, modelHash, entityType, alpha, coords, rotation)
 	---@diagnostic disable-next-line: param-type-mismatch
-	local instance = setmetatable({}, ForgeEntity)
-	instance.m_handle = handle
-	instance.m_name = name
-	instance.m_model_hash = modelHash
-	instance.m_type = entityType
-	instance.m_properties = {}
-	instance.m_alpha = alpha or 255
+	local instance         = setmetatable({}, ForgeEntity)
+	instance.m_handle      = handle
+	instance.m_name        = name
+	instance.m_model_hash  = modelHash
+	instance.m_type        = entityType
+	instance.m_properties  = {}
+	instance.m_alpha       = alpha or 255
 	instance.m_is_attached = false
-	instance.m_is_player = handle == LocalPlayer:GetHandle()
-	instance.m_parent = {}
-	instance.m_children = {}
-	instance.m_position = coords
-	instance.m_rotation = rotation
+	instance.m_is_player   = handle == LocalPlayer:GetHandle()
+	instance.m_children    = {}
+	instance.m_position    = coords
+	instance.m_rotation    = rotation
 	return instance
 end
 
@@ -73,6 +90,7 @@ function ForgeEntity:IsParent()
 	return self.m_children and next(self.m_children) ~= nil
 end
 
+---@return ForgeEntityPlainTable
 function ForgeEntity:serialize()
 	local childTables = {}
 	for _, child in ipairs(self.m_children or {}) do
@@ -96,10 +114,10 @@ function ForgeEntity:serialize()
 	}
 end
 
----@param data table
+---@param data ForgeEntityPlainTable
 ---@return ForgeEntity
 function ForgeEntity.deserialize(data)
-	local instance         = ForgeEntity.new(
+	local instance = ForgeEntity.new(
 		0,
 		data.name,
 		data.modelHash,
@@ -108,6 +126,7 @@ function ForgeEntity.deserialize(data)
 		data.coordinates or vec3:zero(),
 		data.rotation or vec3:zero()
 	)
+
 
 	instance.m_properties  = data.properties or {}
 	instance.m_attach_pos  = data.attach_pos and vec3.deserialize(data.attach_pos) or vec3:zero()
@@ -120,9 +139,5 @@ function ForgeEntity.deserialize(data)
 
 	return instance
 end
-
--- if (Serializer and not Serializer.class_types["ForgeEntity"]) then
--- 	Serializer:RegisterNewType("ForgeEntity", ForgeEntity.serialize, ForgeEntity.deserialize)
--- end
 
 return ForgeEntity
