@@ -1321,4 +1321,4 @@ function YimActions.Debugger:Draw()
 	end
 end
 
-return YimActions:init()
+return YimActions
