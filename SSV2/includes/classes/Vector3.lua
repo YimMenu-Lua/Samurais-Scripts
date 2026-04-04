@@ -297,11 +297,11 @@ end
 -- Conversion Helpers (Optional)
 --------------------------------------
 
-if Serializer and not Serializer.class_types["vec3"] then
+if (Serializer) then
 	Serializer:RegisterNewType("vec3", vec3.serialize, vec3.deserialize)
 end
 
-if vec2 then
+if (vec2) then
 	---@return vec2
 	function vec3:as_vec2()
 		return vec2:new(self.x, self.y)
@@ -309,4 +309,4 @@ if vec2 then
 end
 
 vec3.magnitude = vec3.length
-vec3.mag = vec3.length
+vec3.mag       = vec3.length

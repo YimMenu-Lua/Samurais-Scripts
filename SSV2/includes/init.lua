@@ -24,9 +24,8 @@ local SCRIPT_NAME <const>    = "Samurai's Scripts"
 local SCRIPT_VERSION <const> = require("includes.version")
 local DEFAULT_CONFIG <const> = require("includes.data.config")
 
-
 ---@type GAME_VERSION
-local GAME_VERSION <const> = {
+local GAME_VERSION <const>   = {
 	[1]  = { build = "3788.0", online = "1.72" },
 	[2]  = { build = "1013.29", online = "1.72" },
 	[99] = { build = "any", online = "any" },
@@ -74,7 +73,8 @@ GVars = {}
 ----------------------------------------------------------------------------------------------------
 -- These services must be loaded before any class that registers with/uses them -------------------
 ThreadManager = require("includes.services.ThreadManager"):init()
-Serializer    = require("includes.services.Serializer"):init("ssv2", DEFAULT_CONFIG, GVars)
+Serializer    = require("includes.services.Serializer")
+Serializer:Setup("ssv2", DEFAULT_CONFIG, GVars)
 
 
 -- These may look out of place, but they register themselves with Serializer for seamless
@@ -108,8 +108,6 @@ YRV3                = require("includes.features.YimResupplierV3"):init()
 
 local base_path = "includes"
 local packages  = {
-	"data.refs",
-
 	"modules.Audio",
 	"modules.Decorator",
 	"modules.Entity",
@@ -121,16 +119,16 @@ local packages  = {
 
 	"services.GridRenderer",
 
-	"frontend.entity_forge_ui",
-	"frontend.bsv2_ui",
+	"frontend.billionaire_services.bsv2_ui",
 	"frontend.casino_ui",
+	"frontend.entity_forge_ui",
 	"frontend.mastermind_ui",
 	"frontend.self.self_ui",
 	"frontend.settings.settings_ui",
 	"frontend.vehicle.vehicle_ui",
 	"frontend.world_ui",
 	"frontend.yav3_ui",
-	"frontend.yrv3.yrv3_ui",
+	"frontend.yim_resupplier.yrv3_ui",
 }
 
 for _, package in ipairs(packages) do

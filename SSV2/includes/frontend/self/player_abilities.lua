@@ -59,7 +59,7 @@ end
 
 return function()
 	ThreadManager:Run(function()
-		charName = LocalPlayer:GetName()
+		charName = LocalPlayer:GetCharacterName()
 	end)
 
 	ImGui.SetWindowFontScale(1.17)

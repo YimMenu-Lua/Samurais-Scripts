@@ -14,7 +14,7 @@ local colRed              = Color("red")
 local drawDetailsTable    = false
 local bottomTextSize
 
----@type table<string, integer>
+---@type array<integer>
 local bulletWidths        = {}
 
 ---@param warehouse? VehicleWarehouse
@@ -24,8 +24,8 @@ return function(warehouse)
 		return
 	end
 
-	local index       = GVars.backend.language_index
-	local bulletWidth = bulletWidths[index]
+	local lang_index  = GVars.backend.language_index
+	local bulletWidth = bulletWidths[lang_index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_IE_VEHS_AMT"),
@@ -36,7 +36,7 @@ return function(warehouse)
 			_T("YRV3_IE_STEAL_TOP_CHANCE"),
 		}, 60.0)
 
-		bulletWidths[index] = bulletWidth
+		bulletWidths[lang_index] = bulletWidth
 	end
 
 	local name       = warehouse:GetName()
@@ -140,7 +140,7 @@ return function(warehouse)
 
 	if (ImGui.BeginTable("##ie_veh_storage", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.BordersInner)) then
 		ImGui.TableSetupColumn(_T("YRV3_IE_VEH_SLOT"), ImGuiTableColumnFlags.WidthFixed, 40)
-		ImGui.TableSetupColumn(_T("YRV3_IE_VEH_NAME"))
+		ImGui.TableSetupColumn(_T("GENERIC_NAME"))
 		ImGui.TableSetupColumn(_T("YRV3_IE_VEH_PLATE"))
 		ImGui.TableSetupColumn(_T("YRV3_IE_VEH_RANGE"))
 		ImGui.TableSetupColumn(_T("YRV3_IE_VEH_COMMISSION"))

@@ -8,13 +8,13 @@
 
 
 
-local drawNamePlate        = require("includes.frontend.yrv3.nameplate")
-local drawVehicleWarehouse = require("includes.frontend.yrv3.vehicle_warehouse")
-local drawWarehouse        = require("includes.frontend.yrv3.warehouse")
+local drawNamePlate        = require("includes.frontend.yim_resupplier.nameplate")
+local drawVehicleWarehouse = require("includes.frontend.yim_resupplier.vehicle_warehouse")
+local drawWarehouse        = require("includes.frontend.yim_resupplier.warehouse")
 local measureBulletWidths  = require("includes.frontend.helpers.measure_text_width")
 local colMoneyGreen        = Color("#85BB65")
 
----@type table<string, integer>
+---@type array<integer>
 local bulletWidths         = {}
 local showEarningsData     = false
 local earningDataIntBuff   = nil
@@ -66,8 +66,8 @@ return function()
 	showEarningsData = GUI:CustomToggle(_T("YRV3_SHOW_EARNINGS_DATA"), showEarningsData)
 
 	if (showEarningsData) then
-		local index       = GVars.backend.language_index
-		local bulletWidth = bulletWidths[index]
+		local lang_index  = GVars.backend.language_index
+		local bulletWidth = bulletWidths[lang_index]
 		if (not bulletWidth) then
 			local labels = {}
 			for _, data in ipairs(earningData) do
@@ -75,7 +75,7 @@ return function()
 			end
 			bulletWidth = measureBulletWidths(labels, 60.0)
 
-			bulletWidths[index] = bulletWidth
+			bulletWidths[lang_index] = bulletWidth
 		end
 
 		ImGui.Separator()

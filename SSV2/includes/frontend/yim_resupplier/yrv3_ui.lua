@@ -24,17 +24,17 @@ local tabNames <const>     = {
 }
 
 local tabCallbacks <const> = {
-	require("includes.frontend.yrv3.office"),
-	require("includes.frontend.yrv3.hangar"),
-	require("includes.frontend.yrv3.clubhouse"),
-	require("includes.frontend.yrv3.bunker"),
-	require("includes.frontend.yrv3.acid_lab"),
-	require("includes.frontend.yrv3.nightclub"),
-	require("includes.frontend.yrv3.cash_safes"),
-	require("includes.frontend.yrv3.money_fronts"),
-	require("includes.frontend.yrv3.salvage_yard"),
-	require("includes.frontend.yrv3.misc"),
-	require("includes.frontend.yrv3.settings"),
+	require("includes.frontend.yim_resupplier.office"),
+	require("includes.frontend.yim_resupplier.hangar"),
+	require("includes.frontend.yim_resupplier.clubhouse"),
+	require("includes.frontend.yim_resupplier.bunker"),
+	require("includes.frontend.yim_resupplier.acid_lab"),
+	require("includes.frontend.yim_resupplier.nightclub"),
+	require("includes.frontend.yim_resupplier.cash_safes"),
+	require("includes.frontend.yim_resupplier.money_fronts"),
+	require("includes.frontend.yim_resupplier.salvage_yard"),
+	require("includes.frontend.yim_resupplier.misc"),
+	require("includes.frontend.yim_resupplier.settings"),
 }
 
 ---@return boolean

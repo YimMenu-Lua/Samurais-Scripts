@@ -78,7 +78,11 @@ function CompanionManager:SpawnCompanion(pedModel, name, is_invincible, is_armed
 		pedModel = _J(pedModel)
 	end
 
-	TaskWait(Game.RequestModel, pedModel)
+	local loaded = pcall(TaskWait, Game.RequestModel, pedModel)
+	if (not loaded) then
+		log.fwarning("[CompanionManager]: Failed to load model (%d). Model could be blacklisted or online-only.", pedModel)
+		return
+	end
 
 	local playerGroup = LocalPlayer:GetGroupIndex()
 	local offsetPos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(

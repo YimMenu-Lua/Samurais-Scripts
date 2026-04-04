@@ -10,7 +10,7 @@
 local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
 local colMoneyGreen       = Color("#85BB65")
 
----@type table<string, integer>
+---@type array<integer>
 local bulletWidths        = {}
 
 ---@param warehouse? Warehouse
@@ -24,15 +24,15 @@ return function(warehouse, notOwnedLabel)
 		return
 	end
 
-	local index       = GVars.backend.language_index
-	local bulletWidth = bulletWidths[index]
+	local lang_index  = GVars.backend.language_index
+	local bulletWidth = bulletWidths[lang_index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_CARGO_AMT"),
 			_T("YRV3_VALUE_TOTAL"),
 		}, 60.0)
 
-		bulletWidths[index] = bulletWidth
+		bulletWidths[lang_index] = bulletWidth
 	end
 
 	local name   = warehouse:GetName()

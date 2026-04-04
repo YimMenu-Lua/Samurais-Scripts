@@ -20,6 +20,12 @@ local Weapons          = require("includes.data.weapons")
 --- | "scenes"
 --- | "clipsets"
 
+---@class YimActionsFavorites
+---@field anims table<string, AnimData>
+---@field scenarios table<string, ScenarioData>
+---@field scenes table<string, SyncedSceneData>
+---@field clipsets table<string, MovementClipsetData>
+
 
 -----------------------------------------------------
 -- YimActions V3
@@ -27,6 +33,9 @@ local Weapons          = require("includes.data.weapons")
 -- Wompus Theater™
 ---@class YimActions
 ---@field protected m_initialized boolean
+---@field private m_file_names { favorites: "saved_actions.json", commands: "action_commands.json" }
+---@field Favorites YimActionsFavorites
+---@field Commands table<string, ActionCommandData>
 ---@field CurrentlyPlaying table<handle, Action>
 ---@field LastPlayed Action[]
 ---@field CompanionManager CompanionManager
@@ -44,6 +53,19 @@ function YimActions:init()
 	self.SceneManager     = SceneManager
 	self.CurrentlyPlaying = {}
 	self.LastPlayed       = {}
+	self.Commands         = {}
+	self.m_file_names     = {
+		favorites = "saved_actions.json",
+		commands  = "action_commands.json",
+	}
+	self.Favorites        = {
+		anims     = {},
+		scenarios = {},
+		scenes    = {},
+		clipsets  = {},
+	}
+
+	self:ReadSavedFavorites()
 
 	Backend:RegisterEventCallbackAll(function()
 		self:ForceCleanup()
@@ -86,36 +108,6 @@ function YimActions:AddActionToRecents(ped)
 			table.insert(self.LastPlayed, current)
 		end
 	end
-end
-
----@param category ActionCategory
----@param name string
----@return boolean
-function YimActions:DoesFavoriteExist(category, name)
-	return GVars.features.yim_actions.favorites[category][name] ~= nil
-end
-
----@param category ActionCategory
----@param name string
----@param data ActionData
----@param action_type eActionType
-function YimActions:AddToFavorites(category, name, data, action_type)
-	if (self:DoesFavoriteExist(category, name)) then
-		Notifier:ShowError(
-			"Samurai's Scripts",
-			"This action is already saved as a favorite!"
-		)
-		return
-	end
-
-	data["type"] = action_type
-	GVars.features.yim_actions.favorites[category][name] = data
-end
-
----@param category ActionCategory
----@param name string
-function YimActions:RemoveFromFavorites(category, name)
-	GVars.features.yim_actions.favorites[category][name] = nil
 end
 
 ---@return boolean
@@ -351,11 +343,9 @@ end
 
 ---@param ped? integer
 function YimActions:Cleanup(ped)
-	ped = self:GetPed(ped)
-
-	if (not self.CurrentlyPlaying[ped]) then
-		return
-	end
+	ped           = self:GetPed(ped)
+	local current = self.CurrentlyPlaying[ped]
+	if (not current) then return end
 
 	self.FXManager:StopPTFX(ped)
 	self.PropManager:Cleanup(ped)
@@ -365,9 +355,13 @@ function YimActions:Cleanup(ped)
 		Audio:PartyMode(false, ped)
 	end
 
-	sleep(200)
-	self.CurrentlyPlaying[ped] = nil
+	sleep(16)
 	TASK.CLEAR_PED_TASKS(ped)
+	local __type = current.action_type
+	if (__type == Enums.eActionType.ANIM or __type == Enums.eActionType.SCENE) then
+		STREAMING.REMOVE_ANIM_DICT(current.data.animDict)
+	end
+	self.CurrentlyPlaying[ped] = nil
 
 	if (ped == LocalPlayer:GetHandle()) then
 		if (PED.IS_PED_USING_ANY_SCENARIO(ped)) then
@@ -448,13 +442,95 @@ function YimActions:OnInterruptEvent()
 	end
 end
 
-function YimActions:RegisterCommands()
-	if (next(GVars.features.yim_actions.action_commands) == nil) then
+function YimActions:ParseFavorites()
+	Serializer:WriteToFile(self.m_file_names.favorites, self.Favorites)
+end
+
+function YimActions:ParseCommands()
+	Serializer:WriteToFile(self.m_file_names.commands, self.Commands)
+end
+
+function YimActions:ReadSavedFavorites()
+	if (not io.exists(self.m_file_names.favorites)) then
+		-- This exists because my dumbass keeps drastically changing
+		-- the config. To avoid pissing off users who have saved favorites,
+		-- this is the price: a few more micro seconds on load.
+		-- This will be removed after one or two more releases.
+
+		---@type YimActionsFavorites?
+		local existing = GVars.features.yim_actions.favorites
+		if (existing) then
+			for k, v in pairs(existing) do
+				if (next(v) ~= nil) then
+					self.Favorites[k] = table.copy(v)
+				end
+			end
+
+			GVars.features.yim_actions.favorites = nil
+		end
+
+		self:ParseFavorites()
 		return
 	end
 
+	---@type YimActionsFavorites?
+	local data = Serializer:ReadFromFile(self.m_file_names.favorites)
+	if (type(data) ~= "table" or not data.anims) then
+		return
+	end
+
+	self.Favorites = data
+end
+
+---@param category ActionCategory
+---@param name string
+---@return boolean
+function YimActions:DoesFavoriteExist(category, name)
+	return self.Favorites[category][name] ~= nil
+end
+
+---@param category ActionCategory
+---@param name string
+---@param data ActionData
+---@param action_type eActionType
+function YimActions:AddToFavorites(category, name, data, action_type)
+	if (self:DoesFavoriteExist(category, name)) then
+		Notifier:ShowError(
+			"Samurai's Scripts",
+			"This action is already saved as a favorite!"
+		)
+		return
+	end
+
+	data["type"] = action_type
+	self.Favorites[category][name] = data
+	self:ParseFavorites()
+end
+
+---@param category ActionCategory
+---@param name string
+function YimActions:RemoveFromFavorites(category, name)
+	self.Favorites[category][name] = nil
+	self:ParseFavorites()
+end
+
+function YimActions:ReadSavedCommands()
+	---@type table<string, ActionCommandData>?
+	local data = Serializer:ReadFromFile(self.m_file_names.commands)
+	if (type(data) ~= "table") then
+		self:ParseCommands()
+		return
+	end
+
+	self.Commands = data
+end
+
+function YimActions:RegisterCommands()
+	self:ReadSavedCommands()
+	if (next(self.Commands) == nil) then return end
+
 	local failed = {}
-	for label, data in pairs(GVars.features.yim_actions.action_commands) do
+	for label, data in pairs(self.Commands) do
 		local action = self:FindActionByStrID(data.type, label)
 		if (not action) then
 			table.insert(failed, data.command)
@@ -463,9 +539,7 @@ function YimActions:RegisterCommands()
 
 		CommandExecutor:RegisterCommand(data.command,
 			function(_)
-				ThreadManager:Run(function()
-					self:Play(action)
-				end)
+				ThreadManager:Run(function() self:Play(action) end)
 			end,
 			{ description = _F("YimActions Command: Plays the '%s' %s.", label, action:TypeAsString():lower()) }
 		)
@@ -474,12 +548,11 @@ function YimActions:RegisterCommands()
 	end
 
 	if (#failed > 0) then
-		Notifier:ShowError(
-			"YimActions",
+		Notifier:ShowError("YimActions",
 			"Some commands were not registered (no matching action). Dumping to console..."
 		)
 
-		log.fdebug("Failed commands:\n\t%s", table.concat(failed, "\n"))
+		Backend:debug("Failed commands:\n\t%s", table.concat(failed, "\n"))
 	end
 end
 
@@ -491,24 +564,24 @@ function YimActions:AddCommandAction(cmd_name, data)
 		return
 	end
 
-	if (not data or not data.type or data.type == Enums.eActionType.UNK or data.type > Enums.eActionType.SCENARIO) then
+	if (not data or not data.type or (data.type == Enums.eActionType.UNK) or (data.type > Enums.eActionType.SCENARIO)) then
 		Notifier:ShowError("YimActions", "Invalid action data")
 		Backend:debug("command data: %s", table.serialize(data))
 		return
 	end
 
-	if (GVars.features.yim_actions.action_commands[data.label] or CommandExecutor:DoesCommandExist(cmd_name)) then
+	if (self.Commands[data.label] or CommandExecutor:DoesCommandExist(cmd_name)) then
 		Notifier:ShowError("YimActions", _F("Command '%s' already exists.", data))
 		return
 	end
 
 	local action = self:FindActionByStrID(data.type, data.label)
 	if (not action) then
-		Notifier:ShowError("YimActions", _F("Could not match an action to ID: '%s'", data.label))
+		Notifier:ShowError("YimActions", _F("Could not find action by name: '%s'", data.label))
 		return
 	end
 
-	GVars.features.yim_actions.action_commands[data.label] = {
+	self.Commands[data.label] = {
 		type    = data.type,
 		command = cmd_name,
 		is_json = false, -- debug flag. unused
@@ -524,19 +597,21 @@ function YimActions:AddCommandAction(cmd_name, data)
 		{ description = _F("YimActions Command: Plays the '%s' %s.", data.label, typename) }
 	)
 
+	self:ParseCommands()
 	Notifier:ShowSuccess("YimActions", _F("New %s command successfully registered: '%s'", typename, cmd_name))
 end
 
 ---@param action_label string
 function YimActions:RemoveCommandAction(action_label)
-	if (not GVars.features.yim_actions.action_commands[action_label]) then
+	if (not self.Commands[action_label]) then
 		return
 	end
 
-	local cmd = GVars.features.yim_actions.action_commands[action_label].command
-	GVars.features.yim_actions.action_commands[action_label] = nil
-	CommandExecutor:RemoveCommand(cmd)
-	Notifier:ShowMessage("YimActions", _F("Action command '%s' removed.", cmd))
+	local command_name          = self.Commands[action_label].command
+	self.Commands[action_label] = nil
+	self:ParseCommands()
+	CommandExecutor:RemoveCommand(command_name)
+	Notifier:ShowMessage("YimActions", _F("Action command '%s' has been removed.", command_name))
 end
 
 ---@param action_type eActionType
@@ -723,10 +798,14 @@ function YimActions.PropManager:SpawnProp(owner, propData, isPed, coords, faceOw
 		Audio:PartyMode(true, owner)
 	end
 
-	TaskWait(Game.RequestModel, propData.model)
-	local prop
+	local loaded = pcall(TaskWait, Game.RequestModel, propData.model)
+	if (not loaded) then
+		log.fwarning("[PropManager]: Failed to load model (%d). Model could be blacklisted or online-only.", propData.model)
+		return
+	end
 
-	if not isPed then
+	local prop
+	if (not isPed) then
 		prop = Game.CreateObject(
 			propData.model,
 			coords,
@@ -744,6 +823,11 @@ function YimActions.PropManager:SpawnProp(owner, propData, isPed, coords, faceOw
 			Game.IsOnline(),
 			false
 		)
+	end
+
+	if (not prop) then
+		log.warning("[PropManager]: Failed to spawn animation prop!")
+		return
 	end
 
 	entities.take_control_of(prop, 300)
@@ -1237,4 +1321,4 @@ function YimActions.Debugger:Draw()
 	end
 end
 
-return YimActions
+return YimActions:init()

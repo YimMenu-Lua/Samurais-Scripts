@@ -8,7 +8,7 @@
 
 
 
--- Auto-generated on <08-02-2026>
+-- Auto-generated on <02-04-2026>
 
 
 ---@diagnostic disable
@@ -47,13 +47,13 @@ return {
 	a_c_chimp = {
 		model_hash = 2825402133,
 		ped_type = 4,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	a_c_chimp_02 = {
 		model_hash = 2114741418,
 		ped_type = 4,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	a_c_chop = {
@@ -221,7 +221,7 @@ return {
 	a_c_rhesus = {
 		model_hash = 3268439891,
 		ped_type = 4,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	a_c_rottweiler = {
@@ -293,7 +293,7 @@ return {
 	a_f_m_bodybuild_01 = {
 		model_hash = 1004114196,
 		ped_type = 4,
-		ped_gender = 0,
+		ped_gender = 1,
 		is_human = true
 	},
 	a_f_m_business_02 = {
@@ -389,7 +389,7 @@ return {
 	a_f_m_soucent_02 = {
 		model_hash = 4079145784,
 		ped_type = 4,
-		ped_gender = 0,
+		ped_gender = 1,
 		is_human = true
 	},
 	a_f_m_soucentmc_01 = {
@@ -4181,7 +4181,7 @@ return {
 	ig_lamardavis_02 = {
 		model_hash = 421830750,
 		ped_type = 4,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	ig_lazlow = {
@@ -4967,7 +4967,7 @@ return {
 	mp_f_misty_01 = {
 		model_hash = 3509125021,
 		ped_type = 4,
-		ped_gender = 0,
+		ped_gender = 1,
 		is_human = true
 	},
 	mp_f_stripperlite = {
@@ -5063,7 +5063,7 @@ return {
 	mp_m_freemode_01 = {
 		model_hash = 1885233650,
 		ped_type = 4,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	mp_m_g_vagfun_01 = {
@@ -5135,31 +5135,31 @@ return {
 	p_franklin_02 = {
 		model_hash = 2937109846,
 		ped_type = 4,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	p_michael_02 = {
 		model_hash = 3538817847,
 		ped_type = 4,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	player_one = {
 		model_hash = 2602752943,
 		ped_type = 1,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	player_two = {
 		model_hash = 2608926626,
 		ped_type = 3,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	player_zero = {
 		model_hash = 225514697,
 		ped_type = 0,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	s_f_m_autoshop_01 = {
@@ -5423,7 +5423,7 @@ return {
 	s_m_m_chemsec_01 = {
 		model_hash = 788443093,
 		ped_type = 4,
-		ped_gender = 1,
+		ped_gender = 0,
 		is_human = true
 	},
 	s_m_m_ciasec_01 = {

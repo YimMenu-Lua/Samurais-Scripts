@@ -100,10 +100,7 @@ function Class(name, opts)
 	end
 
 	if (Serializer and type(cls.serialize) == "function" and type(cls.deserialize) == "function") then
-		local typename = cls.__type:lower():trim()
-		if not Serializer.class_types[typename] then
-			Serializer:RegisterNewType(typename, cls.serialize, cls.deserialize)
-		end
+		Serializer:RegisterNewType(name, cls.serialize, cls.deserialize)
 	end
 
 	-- If ToastNotifier is available, calls `Notifier:ShowMessage`. Otherwise logs to console.

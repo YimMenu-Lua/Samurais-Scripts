@@ -70,11 +70,6 @@ function Player:IsValid()
 	return self:Exists() and PED.IS_PED_A_PLAYER(self:GetHandle())
 end
 
----@return eGameState
-function Player:GetGameState()
-	return self:Resolve().m_player_info:GetGameState()
-end
-
 -- Returns whether the player is currently playing.
 ---@return boolean
 function Player:IsPlaying()
@@ -95,6 +90,26 @@ function Player:IsHostOfScript(scriptName)
 		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 1, 0) == self.m_pid)
 		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 2, 0) == self.m_pid)
 		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 3, 0) == self.m_pid)
+end
+
+---@return eGameState
+function Player:GetGameState()
+	return self:Resolve().m_player_info:GetGameState()
+end
+
+---@return string
+function Player:GetName()
+	return self:Resolve().m_player_info:GetPlayerName()
+end
+
+---@return IPAddress?
+function Player:GetInternalIP()
+	return self:Resolve().m_player_info:GetInternalIP()
+end
+
+---@return IPAddress?
+function Player:GetExternalIP()
+	return self:Resolve().m_player_info:GetExternalIP()
 end
 
 -- [WIP]

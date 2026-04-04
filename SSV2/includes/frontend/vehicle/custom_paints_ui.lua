@@ -182,15 +182,9 @@ local function CustomPaintsUI()
 		end
 	end
 	ImGui.PopItemWidth()
-	ImGui.PushItemWidth(420)
 
-	paintSearchBuffer, _ = ImGui.InputTextWithHint("##custompaintssq",
-		_T("GENERIC_SEARCH_HINT"),
-		paintSearchBuffer,
-		64
-	)
-	Backend.disable_input = ImGui.IsItemActive()
-	ImGui.PopItemWidth()
+	ImGui.SetNextItemWidth(420)
+	paintSearchBuffer = ImGui.InputTextWithHint("##custompaintssq", _T("GENERIC_SEARCH_HINT"), paintSearchBuffer, 64)
 
 	DisplayCustomPaints()
 	ImGui.Spacing()

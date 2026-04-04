@@ -231,7 +231,7 @@ function Theme:serialize()
 		SSAccent   = self.SSAccent:serialize(),
 		SSGradient = self.SSGradient:serialize(),
 		__type     = self.__type,
-		JSON       = true
+		JSON       = self.JSON
 	}
 
 	for k, v in pairs(self.Colors) do
@@ -269,14 +269,14 @@ function Theme.deserialize(t)
 		end
 	end
 
-	newTheme.SSAccent = vec4.deserialize(t.SSAccent)
+	newTheme.SSAccent   = vec4.deserialize(t.SSAccent)
 	newTheme.SSGradient = vec4.deserialize(t.SSGradient)
 
 	newTheme:Normalize()
 	return newTheme
 end
 
-if (Serializer and not Serializer.class_types["Theme"]) then
+if (Serializer) then
 	Serializer:RegisterNewType("Theme", Theme.serialize, Theme.deserialize)
 end
 

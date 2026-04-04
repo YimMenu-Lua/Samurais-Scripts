@@ -324,9 +324,9 @@ end
 -- Conversion Helpers (Optional)
 --------------------------------------
 
-if Serializer and not Serializer.class_types["vec2"] then
+if (Serializer) then
 	Serializer:RegisterNewType("vec2", vec2.serialize, vec2.deserialize)
 end
 
 vec2.magnitude = vec2.length
-vec2.magn = vec2.length
+vec2.mag       = vec2.length

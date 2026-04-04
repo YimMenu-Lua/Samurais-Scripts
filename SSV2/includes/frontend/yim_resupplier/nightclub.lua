@@ -8,8 +8,8 @@
 
 
 local measureBulletWidths    = require("includes.frontend.helpers.measure_text_width")
-local drawNamePlate          = require("includes.frontend.yrv3.nameplate")
-local drawCashSafeLoopToggle = require("includes.frontend.yrv3.cashloop_toggle")
+local drawNamePlate          = require("includes.frontend.yim_resupplier.nameplate")
+local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
 local colMoneyGreen          = Color("#85BB65")
 local tempHubVal             = 0
 local bools                  = {
@@ -17,7 +17,7 @@ local bools                  = {
 	bigTips          = false
 }
 
----@type table<string, integer>
+---@type array<integer>
 local bulletWidths           = {}
 
 local function getClubNameColor()
@@ -60,15 +60,15 @@ return function()
 	bools.coloredNameplate, _ = GUI:CustomToggle("Synthwave & Pain", bools.coloredNameplate)
 	ImGui.Spacing()
 
-	local index       = GVars.backend.language_index
-	local bulletWidth = bulletWidths[index]
+	local lang_index  = GVars.backend.language_index
+	local bulletWidth = bulletWidths[lang_index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_POPULARITY"),
 			_T("YRV3_CASH_SAFE"),
 		}, 60.0)
 
-		bulletWidths[index] = bulletWidth
+		bulletWidths[lang_index] = bulletWidth
 	end
 
 	local popValue  = club:GetPopularity()

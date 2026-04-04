@@ -7,10 +7,10 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local drawBasicBusiness   = require("includes.frontend.yrv3.basic_business")
+local drawBasicBusiness   = require("includes.frontend.yim_resupplier.basic_business")
 local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
 
----@type table<string, integer>
+---@type array<integer>
 local bulletWidths        = {}
 
 return function()
@@ -21,8 +21,8 @@ return function()
 	end
 
 	local clearHeatLabel = _F("%s %s", _T("GENERIC_CLEAR"), _T("YRV3_CWASH_HEAT"))
-	local index          = GVars.backend.language_index
-	local bulletWidth    = bulletWidths[index]
+	local lang_index     = GVars.backend.language_index
+	local bulletWidth    = bulletWidths[lang_index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_CWASH_WORK_EARNINGS"),
@@ -31,7 +31,7 @@ return function()
 			clearHeatLabel
 		}, 60.0)
 
-		bulletWidths[index] = bulletWidth
+		bulletWidths[lang_index] = bulletWidth
 	end
 
 	drawBasicBusiness(carWash, true, bulletWidth, clearHeatLabel)

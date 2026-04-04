@@ -135,12 +135,12 @@ end
 ---@param meta? CommandMeta -- optional metadata
 function CommandExecutor:RegisterCommand(name, callback, meta)
 	self.m_commands[name:lower()] = {
-		callback = callback,
-		args = meta and meta.args or {},
-		description = meta and meta.description or "No description.",
-		alias = meta and meta.alias or nil,
+		callback          = callback,
+		args              = meta and meta.args or {},
+		description       = meta and meta.description or "No description.",
+		alias             = meta and meta.alias or nil,
 		isTranslatorLabel = meta and meta.isTranslatorLabel or false,
-		is_alias = false,
+		is_alias          = false,
 	}
 
 	if (meta and meta.alias) then
@@ -306,7 +306,7 @@ function CommandExecutor:HandleCallbacks()
 			end
 		end
 
-		if ((KeyManager:IsKeyPressed(eVirtualKeyCodes.TAB) or KeyManager:IsKeyPressed(eVirtualKeyCodes.ENTER)) and self.m_suggestions[self.m_cmd_index]) then
+		if ((KeyManager:IsKeyJustPressed(eVirtualKeyCodes.TAB) or KeyManager:IsKeyJustPressed(eVirtualKeyCodes.ENTER)) and self.m_suggestions[self.m_cmd_index]) then
 			self.m_mutation_request = self.m_suggestions[self.m_cmd_index].name .. " "
 			self.m_cmd_index = 0
 		end
@@ -406,11 +406,11 @@ function CommandExecutor:DrawSuggestions()
 				)
 			end
 
-			if GUI:IsItemClicked(GUI.MouseButtons.RIGHT) then
-				local cmd = self.m_commands[suggestion.name]
-				self.m_user_cmd = suggestion.name
+			if (ImGui.IsItemClicked(0)) then
+				local cmd          = self.m_commands[suggestion.name]
+				self.m_user_cmd    = suggestion.name
 				self.m_cmd_entered = cmd and (not cmd.args or #cmd.args == 0)
-				self.m_hint_text = ">_"
+				self.m_hint_text   = ">_"
 			end
 		end
 		ImGui.EndChild()

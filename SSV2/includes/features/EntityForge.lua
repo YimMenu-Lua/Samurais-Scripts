@@ -8,7 +8,8 @@
 
 
 local ForgeEntity = require("includes.structs.ForgeEntity")
-local World = require("includes.modules.World")
+local World       = require("includes.modules.World")
+
 
 -----------------------------------------------------
 -- EntityForge Class
@@ -30,6 +31,9 @@ local World = require("includes.modules.World")
 ---@field EntityGunEnabled boolean
 ---@field EntityGunDistance integer
 ---@field EntityGunRotMult integer EntityGun's rotation multiplier
+---@field FavoriteModels table<hash, { name: string, entityType: eEntityType }>
+---@field SavedForges table<string, ForgeEntityPlainTable>
+---@field private m_file_names { favorites: "forge_favorites.json", forged_entities: "forged_entities" }
 ---@overload fun(): EntityForge
 local EntityForge = {}
 EntityForge.__index = EntityForge
@@ -54,7 +58,14 @@ function EntityForge:init()
 		WorldEntities     = {},
 		childCandidates   = {},
 		parentCandidates  = {},
+		m_file_names      = {
+			favorites       = "forge_favorites.json",
+			forged_entities = "forged_entities.json"
+		},
 	}, self)
+
+	instance:ReadFavorites()
+	instance:ReadSavedForges()
 
 	Backend:RegisterEventCallbackAll(function()
 		instance:ForceCleanup()
@@ -73,6 +84,46 @@ function EntityForge:init()
 	return instance
 end
 
+function EntityForge:ParseFavorites()
+	Serializer:WriteToFile(self.m_file_names.favorites, self.FavoriteModels)
+end
+
+function EntityForge:ParseForges()
+	Serializer:WriteToFile(self.m_file_names.forged_entities, self.SavedForges)
+end
+
+function EntityForge:ReadFavorites()
+	self.FavoriteModels = {}
+	if (not io.exists(self.m_file_names.favorites)) then
+		Serializer:WriteToFile(self.m_file_names.favorites, {})
+		return
+	end
+
+	---@type table<integer, { name: string, entityType: eEntityType }>?
+	local data = Serializer:ReadFromFile(self.m_file_names.favorites)
+	if (type(data) ~= "table" or next(data) == nil) then
+		return
+	end
+
+	self.FavoriteModels = data
+end
+
+function EntityForge:ReadSavedForges()
+	self.SavedForges = {}
+	if (not io.exists(self.m_file_names.forged_entities)) then
+		Serializer:WriteToFile(self.m_file_names.forged_entities, {})
+		return
+	end
+
+	---@type table<string, ForgeEntityPlainTable>?
+	local data = Serializer:ReadFromFile(self.m_file_names.forged_entities)
+	if (type(data) ~= "table" or next(data) == nil) then
+		return
+	end
+
+	self.SavedForges = data
+end
+
 ---@param entity handle
 function EntityForge:RegisterEntity(entity)
 	Decorator:Register(entity, "EntityForge", true)
@@ -88,7 +139,8 @@ function EntityForge:GetPlayerInstance()
 	local p = ForgeEntity.new(
 		LocalPlayer:GetHandle(),
 		"You",
-		-1, Enums.eEntityType.Ped,
+		-1,
+		Enums.eEntityType.Ped,
 		255,
 		LocalPlayer:GetPos(),
 		LocalPlayer:GetRotation()
@@ -394,20 +446,8 @@ function EntityForge:EntityGun()
 			if (self:IsModelInFavorites(self.GrabbedEntity.m_model_hash)) then
 				Notifier:ShowError("EntityForge", "This model is already saved. Please choose a different one!")
 			else
-				local name = _F("%s [%s]",
-					self.GrabbedEntity.m_name,
-					self.GrabbedEntity.m_handle
-				)
-				GVars.features.entity_forge.favorites[self.GrabbedEntity.m_model_hash] = {
-					{
-						name       = name,
-						entityType = self.GrabbedEntity.m_type
-					}
-				}
-
-				Notifier:ShowSuccess("EntityForge",
-					_F("Added %s [%s] to favorites.", name, self.GrabbedEntity.m_handle)
-				)
+				local name = _F("%s [%s]", self.GrabbedEntity.m_name, self.GrabbedEntity.m_handle)
+				self:AddModelToFavorites(self.GrabbedEntity.m_model_hash, name, self.GrabbedEntity.m_type)
 			end
 		end
 
@@ -546,8 +586,7 @@ end
 ---@param isForged? boolean
 ---@return integer | nil
 function EntityForge:CreateEntity(modelHash, name, entityType, coords, pedType, alpha, isForged)
-	local handle
-	local groundZ = 0
+	local handle, groundZ = nil, 0
 	_, groundZ = MISC.GET_GROUND_Z_EXCLUDING_OBJECTS_FOR_3D_COORD(
 		coords.x,
 		coords.y,
@@ -592,10 +631,7 @@ function EntityForge:CreateEntity(modelHash, name, entityType, coords, pedType, 
 	end
 
 	if (not handle or (handle <= 0) or not ENTITY.DOES_ENTITY_EXIST(handle)) then
-		Notifier:ShowError(
-			"EntityForge",
-			_F("Failed to create entity:\n[%s]", name)
-		)
+		Notifier:ShowError("EntityForge", _T("GENERIC_ENTITY_SPAWN_FAIL"))
 		return
 	end
 
@@ -631,9 +667,9 @@ function EntityForge:DeleteEntity(entity)
 		end
 	end
 
-	if (entity.m_parent and (entity.m_parent.modelHash == -1)) then
+	if (entity.m_parent and (entity.m_parent.m_model_hash == -1)) then
 		for i = #self.PlayerEntity.m_children, 1, -1 do
-			if entity.m_handle == self.PlayerEntity.m_children[i].m_handle then
+			if (entity.m_handle == self.PlayerEntity.m_children[i].m_handle) then
 				self:UnregisterEntity(entity.m_handle)
 				table.remove(self.PlayerEntity.m_children, i)
 			end
@@ -654,95 +690,102 @@ function EntityForge:DeleteEntity(entity)
 	end
 end
 
----@param abomination table | ForgeEntity
-function EntityForge:SpawnSavedAbomination(abomination)
-	script.run_in_fiber(function()
-		local function recurse(entityData, parent)
-			local entity
+---@private
+---@param entityData ForgeEntityPlainTable
+function EntityForge:HandleAbominationProperties(handle, entityData)
+	if (not entityData.properties) then
+		return
+	end
 
-			if (not entityData.isPlayer and entityData.modelHash ~= -1) then
-				local handle = self:CreateEntity(
-					entityData.modelHash,
-					entityData.name,
-					entityData.type,
-					LocalPlayer:GetOffsetInWorldCoords(
-						math.random(1, 30),
-						math.random(1, 30),
-						-50
-					),
-					nil,
-					entityData.alpha,
-					true
-				)
+	if (entityData.type == Enums.eEntityType.Vehicle) then
+		Vehicle(handle):ApplyMods(entityData.properties)
+	end
 
-				if (handle) then
-					if (entityData.properties) then
-						if (entityData.type == Enums.eEntityType.Vehicle) then
-							Vehicle(handle):ApplyMods(entityData.properties)
-						end
+	if (entityData.type ~= Enums.eEntityType.Ped) then
+		return
+	end
 
-						if (entityData.type == Enums.eEntityType.Ped) then
-							if (entityData.properties.components) then
-								Game.ApplyPedComponents(
-									handle,
-									entityData.properties.components
-								)
-							end
+	if (entityData.properties.components) then
+		Game.ApplyPedComponents(handle, entityData.properties.components)
+	end
 
-							if (entityData.properties.action) then
-								if (entityData.properties.action.scenario) then
-									while not PED.IS_PED_USING_ANY_SCENARIO(handle) do
-										TASK.TASK_START_SCENARIO_IN_PLACE(
-											handle,
-											entityData.properties.action.scenario,
-											-1,
-											false
-										)
-										yield()
-									end
-								end
-							end
-						end
-					end
-
-					entity = ForgeEntity.new(
-						handle,
-						entityData.name,
-						entityData.modelHash,
-						entityData.type,
-						entityData.alpha,
-						ENTITY.GET_ENTITY_COORDS(handle, false),
-						ENTITY.GET_ENTITY_ROTATION(handle, 2)
-					)
-
-					ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(handle)
-				end
-			else
-				entity = self:GetPlayerInstance()
-				entity.m_name = entityData.name
-			end
-
-			entity.m_properties = entityData.properties or {}
-			entity.m_is_forged = true
-
-			if (parent and not entity.m_is_player) then
-				self:AttachEntity(
-					entity,
-					parent,
-					entityData.parent_bone,
-					entityData.attach_pos,
-					entityData.attach_rot
-				)
-			end
-
-			for _, childData in ipairs(entityData.children or {}) do
-				recurse(childData, entity)
-			end
-
-			return entity
+	if (entityData.properties.action and entityData.properties.action.scenario) then
+		local giveupTimer = Timer.new(1200)
+		while (not PED.IS_PED_USING_ANY_SCENARIO(handle) and not giveupTimer:IsDone()) do
+			TASK.TASK_START_SCENARIO_IN_PLACE(
+				handle,
+				entityData.properties.action.scenario,
+				-1,
+				false
+			)
+			yield()
 		end
+	end
+end
 
-		local rootEntity = recurse(abomination, nil)
+---@private
+---@param entityData ForgeEntityPlainTable
+---@param parent ForgeEntity?
+function EntityForge:__recurse(entityData, parent)
+	local entity
+	if (entityData.isPlayer or entityData.modelHash == -1) then
+		entity        = self:GetPlayerInstance()
+		entity.m_name = entityData.name
+	else
+		local handle = self:CreateEntity(
+			entityData.modelHash,
+			entityData.name,
+			entityData.type,
+			LocalPlayer:GetOffsetInWorldCoords(
+				math.random(1, 30),
+				math.random(1, 30),
+				-50
+			),
+			nil,
+			entityData.alpha,
+			true
+		)
+
+		if (handle) then
+			self:HandleAbominationProperties(handle, entityData)
+			entity = ForgeEntity.new(
+				handle,
+				entityData.name,
+				entityData.modelHash,
+				entityData.type,
+				entityData.alpha,
+				ENTITY.GET_ENTITY_COORDS(handle, false),
+				ENTITY.GET_ENTITY_ROTATION(handle, 2)
+			)
+
+			ENTITY.SET_ENTITY_AS_NO_LONGER_NEEDED(handle)
+		end
+	end
+
+	entity.m_properties = entityData.properties or {}
+	entity.m_is_forged = true
+
+	if (parent and not entity.m_is_player) then
+		self:AttachEntity(
+			entity,
+			parent,
+			entityData.parent_bone,
+			entityData.attach_pos,
+			entityData.attach_rot
+		)
+	end
+
+	for _, childData in ipairs(entityData.children or {}) do
+		self:__recurse(childData, entity)
+	end
+
+	return entity
+end
+
+---@param abomination ForgeEntityPlainTable
+function EntityForge:SpawnSavedAbomination(abomination)
+	ThreadManager:Run(function()
+		local rootEntity = self:__recurse(abomination, nil)
 		if (not rootEntity.m_is_player) then
 			Game.SetEntityCoords(
 				rootEntity.m_handle,
@@ -1065,7 +1108,7 @@ end
 ---@param entity ForgeEntity
 ---@param position? vec3
 function EntityForge:ResetEntityPosition(entity, position)
-	script.run_in_fiber(function()
+	ThreadManager:Run(function()
 		if (not position) then
 			position = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(entity.m_handle, 1, 2, 0)
 		end
@@ -1085,7 +1128,7 @@ end
 ---@param parent ForgeEntity
 ---@param child ForgeEntity
 function EntityForge:DetachEntity(parent, child)
-	script.run_in_fiber(function(detach)
+	ThreadManager:Run(function(detach)
 		if (ENTITY.DOES_ENTITY_EXIST(child.m_handle) and ENTITY.IS_ENTITY_ATTACHED(child.m_handle)) then
 			ENTITY.DETACH_ENTITY(child.m_handle, true, false)
 			self:ResetEntityPosition(child)
@@ -1153,7 +1196,7 @@ function EntityForge:DetachAllEntities(parent)
 		return
 	end
 
-	script.run_in_fiber(function(detachall)
+	ThreadManager:Run(function(detachall)
 		if (not parent.m_children or #parent.m_children == 0) then
 			parent.m_children = {}
 			parent.m_is_forged = false
@@ -1231,7 +1274,7 @@ function EntityForge:Cleanup()
 		table.insert(to_remove, entity)
 	end
 
-	script.run_in_fiber(function(cleanup)
+	ThreadManager:Run(function(cleanup)
 		cleanup:sleep(200)
 
 		for _, entity in ipairs(to_remove) do
@@ -1282,50 +1325,112 @@ function EntityForge:IsModelInFavorites(input)
 		hash = Game.EnsureModelHash(input.m_model_hash)
 	end
 
-	return GVars.features.entity_forge.favorites[hash] ~= nil
+	return self.FavoriteModels[hash] ~= nil
+end
+
+---@param model hash
+---@param name string
+---@param _type eEntityType
+function EntityForge:AddModelToFavorites(model, name, _type)
+	if (self:IsModelInFavorites(model)) then
+		return
+	end
+
+	self.FavoriteModels[model] = { name = name, entityType = _type }
+	self:ParseFavorites()
+	Notifier:ShowSuccess("EntityForge", _F("Added %s to favorites.", name))
+end
+
+---@param modelHash hash
+---@param newName string
+function EntityForge:RenameFavoriteModel(modelHash, newName)
+	local saved = self.FavoriteModels[modelHash]
+	if (not saved) then return end
+	for _, data in pairs(self.FavoriteModels) do
+		if (data.name == newName) then
+			Notifier:ShowError("EntityForge", _T("EF_NAME_EXISTS_ERR"))
+			return
+		end
+	end
+
+	Notifier:ShowSuccess("EntityForge", _F("Renamed '%s' to '%s'", saved.name, newName))
+	saved.name = newName
+	self:ParseFavorites()
 end
 
 ---@param input ForgeEntity
 function EntityForge:RemoveFromFavorites(input)
-	if (not input) then
-		return
-	end
-
-	GVars.features.entity_forge.favorites[input.m_model_hash] = nil
+	if (not input) then return end
+	self.FavoriteModels[input.m_model_hash] = nil
+	self:ParseFavorites()
 end
 
 function EntityForge:RemoveAllFavorites()
-	GVars.features.entity_forge.favorites = {}
+	self.FavoriteModels = {}
+end
+
+---@param name string
+---@return boolean
+function EntityForge:DoesForgeExist(name)
+	return self.SavedForges[name] ~= nil
+end
+
+---@param forge ForgeEntityPlainTable
+function EntityForge:AddForgedEntity(forge)
+	if (self:DoesForgeExist(forge.name)) then
+		Notifier:ShowWarning("EntityForge", _T("EF_IMPORT_DATA_NOTICE"))
+		return
+	end
+
+	self.SavedForges[forge.name] = forge
+	self:ParseForges()
+	Notifier:ShowSuccess("EntityForge", _T("EF_IMPORT_SUCCESS"))
 end
 
 function EntityForge:OverwriteSavedAbomination()
 	local name = EntityForge.currentParent.m_name
-	if (not GVars.features.entity_forge.forged_entities[name]) then
+	if (not self.SavedForges[name]) then
 		return
 	end
 
-	GVars.features.entity_forge.forged_entities[name] = EntityForge.currentParent:serialize()
+	self.SavedForges[name] = EntityForge.currentParent:serialize()
+	self:ParseForges()
 	Notifier:ShowMessage("EntityForge", "Changes saved.")
 end
 
----@param abomination ForgeEntity
+---@param oldName string
+---@param newName string
+---@return ForgeEntityPlainTable
+function EntityForge:RenameSavedForge(oldName, newName)
+	---@type ForgeEntityPlainTable
+	local newForge            = table.copy(self.SavedForges[oldName])
+	newForge.name             = newName
+	self.SavedForges[newName] = newForge
+	self.SavedForges[oldName] = nil
+	Notifier:ShowSuccess("EntityForge", _F("Renamed '%s' to '%s'", oldName, newName))
+	return newForge
+end
+
+---@param abomination ForgeEntity|ForgeEntityPlainTable
 function EntityForge:RemoveSavedAbomination(abomination)
 	if (not abomination) then
 		return
 	end
 
-	GVars.features.entity_forge.forged_entities[abomination.m_name] = nil
+	self.SavedForges[abomination.m_name] = nil
+	self:ParseForges()
 end
 
 function EntityForge:RemoveAllSavedAbominations()
-	GVars.features.entity_forge.forged_entities = {}
+	self.SavedForges = {}
+	self:ParseForges()
 end
 
----@param data any Base64 XOR-encrypted json
+---@param data string Base64 XOR-encrypted json
+---@return ForgeEntityPlainTable?
 function EntityForge:ImportCreation(data)
 	if (not data or not Serializer:IsEncrypted(data)) then
-		Notifier:ShowError(
-			"EntityForge",
+		Notifier:ShowError("EntityForge",
 			"Import Error: Incorrect data type!",
 			true,
 			5.0
@@ -1333,6 +1438,7 @@ function EntityForge:ImportCreation(data)
 		return
 	end
 
+	---@type ForgeEntityPlainTable
 	local abomination = Serializer:Decode(Serializer:XOR(Serializer:B64Decode(data)))
 	if (type(abomination) ~= "table") then
 		Notifier:ShowError(
@@ -1344,7 +1450,7 @@ function EntityForge:ImportCreation(data)
 		return
 	end
 
-	return ForgeEntity.deserialize(abomination)
+	return abomination
 end
 
 return EntityForge

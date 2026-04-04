@@ -355,12 +355,20 @@ end
 
 ---@param t table
 ---@param mt table|metatable
-function RecursiveSetmetatable(t, mt)
+---@param seen? set<table>
+function RecursiveSetMetatable(t, mt, seen)
+	seen = seen or {}
+	if (seen[t]) then
+		return
+	end
+	seen[t] = true
+
 	for _, v in pairs(t) do
 		if (type(v) == "table" and getmetatable(v) == nil) then
-			RecursiveSetmetatable(v, mt)
+			RecursiveSetMetatable(v, mt, seen)
 		end
 	end
+
 	return setmetatable(t, mt)
 end
 
@@ -1009,6 +1017,7 @@ function table.copy(t, seen)
 	return out
 end
 
+-- Merges `src` table into `dest` table.
 ---@param src table
 ---@param dest table
 ---@param path string?
@@ -1422,6 +1431,16 @@ function string.trim(str)
 	return str:match("^%s*(.-)%s*$")
 end
 
+---@param str string
+---@param width integer
+function string.wrap(str, width)
+	local out = {}
+	for i = 1, #str, width do
+		table.insert(out, str:sub(i, i + width - 1))
+	end
+	return table.concat(out, "\n")
+end
+
 -- Splits a string by a separator and returns a table of strings.
 ---@param str string
 ---@param sep string
@@ -1609,6 +1628,12 @@ function math.sum(...)
 	end
 
 	return result
+end
+
+---@param n number|nil
+---@return boolean
+function math.is_null(n)
+	return type(n) ~= "number" or n == 0
 end
 
 ---@param n number

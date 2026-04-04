@@ -85,7 +85,7 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_ride_height pointer<float>
 ---@field private DumpFlags fun(self: CVehicle, enum_flags: Enum, get_func: fun(self: CVehicle, flag: integer): boolean): nil
 ---@overload fun(vehicle: integer): CVehicle|nil
-local CVehicle = Class("CVehicle", { parent = CEntity, symbolic_size = 0xC40, pointer_ctor = true })
+local CVehicle = Class("CVehicle", { parent = CEntity, symbolic_size = 0xC40 })
 
 ---@param vehicle handle
 ---@return CVehicle

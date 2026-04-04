@@ -89,7 +89,14 @@
 ---@field pos_offset? vec3
 ---@field type? eActionType
 
----@alias ActionData AnimData | ScenarioData | SyncedSceneData?
+---@class MovementClipsetData
+---@field Name string
+---@field mvmt string
+---@field wmvmt string?
+---@field strf string?
+---@field wanim string
+
+---@alias ActionData AnimData | ScenarioData | SyncedSceneData | MovementClipsetData?
 
 ---@class ActionCommandData
 ---@field type eActionType

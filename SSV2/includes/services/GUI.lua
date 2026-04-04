@@ -86,6 +86,7 @@ end
 ---@field private m_notifier_pos vec2
 ---@field private m_has_error boolean
 ---@field private m_traceback? string
+---@field private m_wants_input boolean
 ---@field protected m_initialized boolean
 ---@overload fun(): GUI
 local GUI = Class("GUI")
@@ -113,6 +114,7 @@ function GUI:init()
 		m_snap_animator       = WindowAnimator(),
 		m_dummy_tab           = gui.add_tab(Backend.script_name or "Samurai's Scripts"),
 		m_initialized         = true,
+		m_wants_input         = false,
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, GUI)
 end
@@ -224,10 +226,21 @@ function GUI:ResetSize()
 	GVars.ui.window_size.x, GVars.ui.window_size.y = default_size.x, default_size.y
 end
 
+---@return boolean
 function GUI:IsOpen()
 	return self.m_should_draw
 end
 
+---@return boolean
+function GUI:WantsInput()
+	if (not self:IsOpen()) then
+		self.m_wants_input = false
+	end
+
+	return self.m_wants_input
+end
+
+---@return Tab
 function GUI:GetCurrentTab()
 	return self.m_selected_tab
 end
@@ -288,6 +301,11 @@ function GUI:GetSubtab(id, name, parent_name)
 	end
 
 	return child
+end
+
+---@param cond boolean
+function GUI:RequestInput(cond)
+	self.m_wants_input = self.m_wants_input or cond
 end
 
 -- Registers an independent window that can only be drawn when the menu is open.
@@ -728,7 +746,7 @@ function GUI:__DrawImpl()
 				) then
 				Notifier:Open()
 			end
-			self.m_notifier_pos = vec2:new(nextPosX, ImGui.GetCursorPosY())
+			self.m_notifier_pos = vec2:new(GVars.ui.window_pos.x + region.x, GVars.ui.window_pos.y + ImGui.GetCursorPosY())
 
 			if (not isOpen) then
 				self:Tooltip(_T("GUI_NOTIFICATIONS"))
@@ -753,19 +771,20 @@ function GUI:__DrawImpl()
 end
 
 function GUI:Draw()
+	self.m_wants_input = false
+
 	if (not self.m_should_draw or self.m_has_error) then
 		return
 	end
 
 	local startStack = ThemeManager:GetStackDepth()
+
 	ThemeManager:PushTheme()
-	local ok, err = pcall(function()
-		self:__DrawImpl()
-	end)
+	local ok, err = pcall(function() self:__DrawImpl() end)
 	ThemeManager:PopTheme()
 
 	if (not ok) then
-		log.fwarning("[GUI]: Unrecoverable callback error: %s", err)
+		Notifier:ShowError("GUI", _F("Unrecoverable callback error: %s", err), true, 5)
 		self.m_has_error = true
 		self.m_traceback = err
 	end
