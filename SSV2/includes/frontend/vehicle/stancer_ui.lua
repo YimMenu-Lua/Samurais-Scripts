@@ -248,7 +248,7 @@ return function()
 
 	ImGui.Separator()
 
-	if (GUI:Button(_T("GENERIC_RESET"))) then
+	if (GUI:Button(_T("GENERIC_RESET_ALL"))) then
 		ThreadManager:Run(function()
 			Stancer:Reset()
 			if (not PV:IsValid()) then return end

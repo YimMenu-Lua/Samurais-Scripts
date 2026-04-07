@@ -229,9 +229,11 @@ function PlayerVehicle:Reset()
 
 	self:Destroy()
 	self.m_handle = 0
+end
 
-	-- called late so it only resets deltas and keeps the vehicle untouched.
-	self.m_stance_mgr:Reset()
+function PlayerVehicle:Cleanup()
+	self:Reset()
+	self.m_stance_mgr:Cleanup()
 end
 
 ---@return hash

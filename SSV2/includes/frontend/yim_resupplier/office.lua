@@ -8,19 +8,19 @@
 
 
 
-local drawNamePlate        = require("includes.frontend.yim_resupplier.nameplate")
-local drawVehicleWarehouse = require("includes.frontend.yim_resupplier.vehicle_warehouse")
-local drawWarehouse        = require("includes.frontend.yim_resupplier.warehouse")
-local measureBulletWidths  = require("includes.frontend.helpers.measure_text_width")
-local colMoneyGreen        = Color("#85BB65")
+local drawNamePlate         = require("includes.frontend.yim_resupplier.nameplate")
+local drawVehicleWarehouse  = require("includes.frontend.yim_resupplier.vehicle_warehouse")
+local drawWarehouse         = require("includes.frontend.yim_resupplier.warehouse")
+local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
+local colMoneyGreen <const> = Color("#85BB65")
 
 ---@type array<integer>
-local bulletWidths         = {}
-local showEarningsData     = false
-local earningDataIntBuff   = nil
-local earningDataIdx       = 1
-local earningPopupName     = ""
-local earningData <const>  = {
+local bulletWidths          = {}
+local showEarningsData      = false
+local earningDataIntBuff    = nil
+local earningDataIdx        = 1
+local earningPopupName      = ""
+local earningData <const>   = {
 	{ label = "YRV3_LIFETIME_BUY_UNDERTAKEN",  pstat = "MPX_LIFETIME_BUY_UNDERTAKEN",  min = 0, max = 5e3, step = 1,   step_fast = 100 },
 	{ label = "YRV3_LIFETIME_BUY_COMPLETE",    pstat = "MPX_LIFETIME_BUY_COMPLETE",    min = 0, max = 5e3, step = 1,   step_fast = 100 },
 	{ label = "YRV3_LIFETIME_SELL_UNDERTAKEN", pstat = "MPX_LIFETIME_SELL_UNDERTAKEN", min = 0, max = 5e3, step = 1,   step_fast = 100 },
@@ -84,7 +84,7 @@ return function()
 			ImGui.BulletText(_T(data.label))
 			ImGui.SameLine(bulletWidth)
 			if (GUI:Button(_F("%s##%d", _T("GENERIC_EDIT"), i))) then
-				earningDataIdx = i
+				earningDataIdx   = i
 				earningPopupName = _F("%s##%d", _T("YRV3_EDIT_EARNINGS_DATA"), i)
 				ImGui.OpenPopup(earningPopupName)
 			end

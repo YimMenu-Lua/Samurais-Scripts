@@ -10,6 +10,8 @@
 local measureBulletWidths    = require("includes.frontend.helpers.measure_text_width")
 local drawNamePlate          = require("includes.frontend.yim_resupplier.nameplate")
 local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
+local colMoneyGreen <const>  = Color("#85BB65")
+local childWidth             = 240
 
 ---@type array<integer>
 local bulletWidths           = {}
@@ -41,10 +43,9 @@ return function()
 		bulletWidths[lang_index] = bulletWidth
 	end
 
-	local childWidth = 240
-	local cashSafe   = salvage_yard:GetCashSafe()
-	local cashValue  = cashSafe:GetCashValue()
-	local maxCash    = cashSafe:GetCapacity()
+	local cashSafe  = salvage_yard:GetCashSafe()
+	local cashValue = cashSafe:GetCashValue()
+	local maxCash   = cashSafe:GetCapacity()
 
 	ImGui.BulletText(_T("YRV3_CASH_SAFE"))
 	ImGui.SameLine(bulletWidth)
@@ -138,7 +139,7 @@ return function()
 				ImGui.BulletText(_T("GENERIC_VALUE"))
 				ImGui.SameLine()
 				ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - valWidth - 10)
-				GUI:Text(value, Color("#00AA00"))
+				GUI:Text(value, { color = colMoneyGreen })
 
 				ImGui.BulletText(_T("GENERIC_TIME_LEFT"))
 				ImGui.SameLine()
@@ -155,10 +156,7 @@ return function()
 			end
 			ImGui.EndChild()
 			ImGui.EndDisabled()
-			ImGui.SameLine()
-			if (ImGui.GetContentRegionAvail() < childWidth) then
-				ImGui.NewLine()
-			end
+			ImGui.SameLineIfAvail(childWidth)
 		end
 		ImGui.EndTabItem()
 	end
@@ -245,15 +243,12 @@ return function()
 				ImGui.BulletText(_T("GENERIC_VALUE"))
 				ImGui.SameLine()
 				ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - valWidth - 10)
-				GUI:Text(string.formatmoney(carValue), Color("#00AA00"))
+				GUI:Text(string.formatmoney(carValue), { color = colMoneyGreen })
 			end
 
 			ImGui.EndChild()
 			ImGui.EndDisabled()
-			ImGui.SameLine()
-			if (ImGui.GetContentRegionAvail() < childWidth) then
-				ImGui.NewLine()
-			end
+			ImGui.SameLineIfAvail(childWidth)
 		end
 		ImGui.EndTabItem()
 	end

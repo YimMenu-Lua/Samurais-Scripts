@@ -30,8 +30,8 @@ HandlingObject.__index = HandlingObject
 ---@param predicate? Predicate<HandlingObject, PlayerVehicle>
 function HandlingObject.new(flag, flagType, predicate)
 	return setmetatable({
-		m_flag = flag,
-		m_type = flagType,
+		m_flag      = flag,
+		m_type      = flagType,
 		m_predicate = predicate
 	}, HandlingObject)
 end
@@ -50,9 +50,9 @@ function HandlingEditor:init(pv)
 		return self
 	end
 
-	self.m_pv = pv
+	self.m_pv               = pv
 	self.m_handling_objects = {}
-	self.m_initialized = true
+	self.m_initialized      = true
 
 	return self
 end
@@ -83,10 +83,10 @@ end
 ---@return boolean
 function HandlingEditor:GetFlagDefault(obj)
 	return Switch(obj.m_type) {
-		[Enums.eHandlingEditorTypes.TYPE_HF] = self.m_pv:GetHandlingFlag(obj.m_flag),
-		[Enums.eHandlingEditorTypes.TYPE_AF] = self.m_pv:GetAdvancedFlag(obj.m_flag),
+		[Enums.eHandlingEditorTypes.TYPE_HF]  = self.m_pv:GetHandlingFlag(obj.m_flag),
+		[Enums.eHandlingEditorTypes.TYPE_AF]  = self.m_pv:GetAdvancedFlag(obj.m_flag),
 		[Enums.eHandlingEditorTypes.TYPE_MIF] = self.m_pv:GetModelInfoFlag(obj.m_flag),
-		default = false
+		default                               = false
 	}
 end
 
@@ -123,9 +123,7 @@ function HandlingEditor:SetFlag(obj, toggle, reset)
 		set_func = Vehicle.SetModelInfoFlag
 	end
 
-	if (not set_func) then
-		return
-	end
+	if (not set_func) then return end
 
 	set_func(self.m_pv, obj.m_flag, toggle)
 	local callback = toggle and obj.m_on_enable or obj.m_on_disable
@@ -147,7 +145,7 @@ function HandlingEditor:ResetFlag(obj)
 		return
 	end
 
-	if (not obj.m_was_edited or obj.m_default == nil) then
+	if (obj.m_was_edited == false or obj.m_default == nil) then
 		return
 	end
 
@@ -173,9 +171,6 @@ function HandlingEditor:Apply()
 		end
 
 		local checkboxState = table.get_nested_key(GVars, key)
-		-- explicit eval becayse these can be nil or garbage
-		-- we only act on checkbox enabled and default is off because checkboxes don't represent actual flag state in memory
-		-- this prevents disabling default enabled flags on init when a checkbox was never set in the first place
 		if (checkboxState == true and obj.m_default == false) then
 			self:SetFlag(obj, true)
 		end

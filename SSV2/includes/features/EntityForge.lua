@@ -77,7 +77,7 @@ function EntityForge:init()
 			return
 		end
 
-		PLAYER.DISABLE_PLAYER_FIRING(LocalPlayer:GetPlayerID(), true)
+		PLAYER.DISABLE_PLAYER_FIRING(LocalPlayer:GetID(), true)
 		instance:EntityGun()
 	end)
 
@@ -346,7 +346,7 @@ end
 
 -- Grabs and manipulates world entities.
 function EntityForge:EntityGun()
-	if (not PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetPlayerID())) then
+	if (not PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetID())) then
 		if (self.GrabbedEntity) then
 			ENTITY.SET_ENTITY_COLLISION(self.GrabbedEntity.m_handle, true, true)
 		end

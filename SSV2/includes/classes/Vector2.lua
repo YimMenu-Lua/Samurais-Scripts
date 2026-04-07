@@ -25,9 +25,8 @@
 ---@operator eq(vec2): boolean
 ---@operator le(vec2): boolean
 ---@operator lt(vec2): boolean
-vec2 = {}
+vec2 = { __type = "vec2" }
 vec2.__index = vec2
-vec2.__type = "vec2"
 
 
 --------------------------------------

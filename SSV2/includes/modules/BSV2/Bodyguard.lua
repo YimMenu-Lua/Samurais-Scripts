@@ -382,7 +382,7 @@ function Bodyguard:UpdatePosition(allowInside)
 		return
 	end
 
-	if (PLAYER.IS_PLAYER_TELEPORT_ACTIVE() and not PLAYER.UPDATE_PLAYER_TELEPORT(LocalPlayer:GetPlayerID())) then
+	if (PLAYER.IS_PLAYER_TELEPORT_ACTIVE() and not PLAYER.UPDATE_PLAYER_TELEPORT(LocalPlayer:GetID())) then
 		sleep(10)
 		return
 	end

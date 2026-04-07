@@ -12,6 +12,7 @@ local ReservedKeys <const>  = {
 	gpad = Set.new(23, 24, 25, 71, 75)
 }
 
+local COL_RED <const>       = Color("red")
 local NoUnbindKeys <const>  = Set.new("gui_toggle")
 local DefaultConfig <const> = Serializer:GetDefaultConfig()
 local keyName, keyCode
@@ -168,7 +169,7 @@ local function DrawKeybind(gvarKey, isController)
 			_reserved = reserved_set:Contains(keyCode)
 
 			if (_reserved) then
-				GUI:Text(_T("SETTINGS_HOTKEY_RESERVED"), { color = Color("red"), alpha = 0.86, wrap_pos = winSize.x })
+				GUI:Text(_T("SETTINGS_HOTKEY_RESERVED"), { color = COL_RED, alpha = 0.86 })
 			else
 				local valueBarSize = vec2:new(button_size.x, ImGui.GetTextLineHeightWithSpacing())
 				ImGui.Text(_T("SETTINGS_HOTKEY_FOUND"))

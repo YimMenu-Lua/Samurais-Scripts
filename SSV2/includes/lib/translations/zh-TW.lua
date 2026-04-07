@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_HIDE_WEAPON"] = "隱藏武器",
 	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "如果動畫循環播放，這不會執行任何操作。",
 	["YAV3_FLAGS_USE_FULL_BLENDING"] = "使用完全混合",
-	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "替代第一人稱動畫"
+	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "替代第一人稱動畫",
+	["GENERIC_SCRIPT_CONTROL"] = "試著控制腳本",
+	["GENERIC_RESET_ALL"] = "全部重置"
 }

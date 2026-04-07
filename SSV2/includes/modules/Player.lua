@@ -37,7 +37,7 @@ Player.SetAsNoLongerNeeded = nil
 ---@return Player
 function Player.new(p0)
 	local ped, pid = 0, 0
-	if (math.is_inrange(p0, 0, 32)) then
+	if (math.is_inrange(p0, 0, 31)) then
 		pid = p0
 		ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
 	elseif (Game.IsScriptHandle(p0)) then
@@ -48,25 +48,19 @@ function Player.new(p0)
 	end
 
 	if (not PED.IS_PED_A_PLAYER(ped)) then
-		error("Attempt to create a Player instance from a non-player ped.")
+		error("Attempt to create a Player instance from an NPC.")
 	end
 
-	---@type Player
-	local instance = setmetatable({
+	return setmetatable({
 		m_pid    = pid,
 		m_handle = ped,
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, Player)
-
-	return instance
 end
 
 ---@return boolean
 function Player:IsValid()
-	if (self == LocalPlayer) then
-		return true
-	end
-
+	if (self == LocalPlayer) then return true end
 	return self:Exists() and PED.IS_PED_A_PLAYER(self:GetHandle())
 end
 
@@ -85,11 +79,19 @@ end
 ---@param scriptName string
 ---@return boolean
 function Player:IsHostOfScript(scriptName)
-	return (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, -1, 0) == self.m_pid)
-		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 0, 0) == self.m_pid)
-		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 1, 0) == self.m_pid)
-		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 2, 0) == self.m_pid)
-		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 3, 0) == self.m_pid)
+	local pid = self:GetID()
+	for i = -1, 3 do
+		if (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, i, 0) == pid) then
+			return true
+		end
+	end
+
+	return false
+end
+
+---@return ID
+function Player:GetID()
+	return self.m_pid
 end
 
 ---@return eGameState

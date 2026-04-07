@@ -7,12 +7,13 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local SceneManager     = require("includes.services.SceneManager")
-local CompanionManager = require("includes.services.CompanionManager")
-local t_AnimList       = require("includes.data.actions.animations")
-local t_PedScenarios   = require("includes.data.actions.scenarios")
-local Action           = require("includes.structs.Action")
-local Weapons          = require("includes.data.weapons")
+local SceneManager       = require("includes.services.SceneManager")
+local CompanionManager   = require("includes.services.CompanionManager")
+local t_AnimList         = require("includes.data.actions.animations")
+local t_PedScenarios     = require("includes.data.actions.scenarios")
+local Action             = require("includes.structs.Action")
+local Weapons            = require("includes.data.weapons")
+local COL_YELLOW <const> = Color("yellow")
 
 ---@alias ActionCategory
 --- | "anims"
@@ -1283,10 +1284,10 @@ function YimActions.Debugger:Draw()
 		ImGui.BeginChild("##debugPropInfo", 250, 200)
 		ImGui.SeparatorText("Prop Info")
 		if (not self.selectedProp) then
-			GUI:Text("Not Selected.", Color("yellow"))
+			GUI:Text("Not Selected.", { color = COL_YELLOW })
 		else
-			ImGui.BulletText(("Prop Type: [ %s ]"):format(self.selectedProp.type))
-			ImGui.BulletText(("Is Attached: [ %s ]"):format(self.selectedProp.attached))
+			ImGui.BulletText(_F("Prop Type: [ %s ]", self.selectedProp.type))
+			ImGui.BulletText(_F("Is Attached: [ %s ]", self.selectedProp.attached))
 		end
 		ImGui.EndChild()
 		ImGui.EndGroup()

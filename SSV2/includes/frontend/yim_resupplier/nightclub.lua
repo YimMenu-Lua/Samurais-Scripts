@@ -11,6 +11,7 @@ local measureBulletWidths    = require("includes.frontend.helpers.measure_text_w
 local drawNamePlate          = require("includes.frontend.yim_resupplier.nameplate")
 local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
 local colMoneyGreen          = Color("#85BB65")
+local hubChildWidth          = 90
 local tempHubVal             = 0
 local bools                  = {
 	coloredNameplate = false,
@@ -150,7 +151,7 @@ return function()
 		ImGui.PushID(i)
 		ImGui.SetNextWindowBgAlpha(0.64)
 		ImGui.BeginChildEx("##hub_child",
-			vec2:new(90, 300),
+			vec2:new(hubChildWidth, 300),
 			ImGuiChildFlags.AlwaysUseWindowPadding,
 			ImGuiWindowFlags.NoScrollbar
 		)
@@ -176,7 +177,7 @@ return function()
 		ImGui.Spacing()
 		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + 35) * 0.5)
 		ImGui.ValueBar(
-			_F("##bb_hub_%d", i),
+			"##bb_hub",
 			prod / max_units,
 			vec2:new(40, 140),
 			ImGuiValueBarFlags.VERTICAL
@@ -192,7 +193,7 @@ return function()
 
 		local prod_time       = this:GetTimeLeftBeforeProd()
 		local safe_to_trigger = this:CanTriggerProduction() and not this.fast_prod_running
-		local btn_label       = (safe_to_trigger or prod_time <= -1)
+		local btn_label       = (safe_to_trigger or prod_time < 0)
 			and _T("YRV3_TRIGGER_PROD_HUB")
 			or ImGui.TextSpinner()
 
@@ -206,10 +207,7 @@ return function()
 		ImGui.EndChild()
 		ImGui.PopID()
 
-		ImGui.SameLine()
-		if (ImGui.GetContentRegionAvail() < 90) then
-			ImGui.NewLine()
-		end
+		ImGui.SameLineIfAvail(hubChildWidth)
 	end
 
 	tempHubVal = HubTotalValue

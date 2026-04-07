@@ -164,8 +164,16 @@ function Stancer:Init()
 		m_last_seen = 0.0
 	}
 
+	self:ResetDeltas()
+
 	if (self.m_entity:IsValid()) then
+		local handle = self.m_entity:GetHandle()
+		if (not Decorator:IsEntityRegistered(handle)) then
+			Decorator:Register(handle, "Stancer", true)
+		end
+
 		self:ReadWheelArray()
+		self:ReadDefaults()
 		self.m_cached_model    = self.m_entity:GetModelHash()
 		self.m_last_wheels_mod = self.m_entity:GetCustomWheels()
 	end
@@ -178,38 +186,42 @@ end
 ---@return boolean
 function Stancer:CanApplyDrawData()
 	return self.m_entity and self.m_entity:HasWheelDrawData()
+		and self.m_last_wheels_mod and self.m_last_wheels_mod.index ~= -1
 end
 
 function Stancer:Reset()
-	self.m_suspension_height.m_current   = 0.0
-	self.m_suspension_height.m_last_seen = 0.0
+	self:ReadWheelArray()
+	self:ResetDeltas()
 
-	if (not self.m_wheels) then
+	if not (self.m_entity and self.m_entity:IsValid()) then
 		return
 	end
 
+	self.m_entity:SetRideHeight(0.0)
+	local handle = self.m_entity:GetHandle()
+	if (not Decorator:IsEntityRegistered(handle)) then
+		return
+	end
+
+	local visual_size  = Decorator:GetDecor(handle, "m_visual_size")
+	local visual_width = Decorator:GetDecor(handle, "m_visual_width")
+	if (visual_size and visual_size > 0) then
+		self.m_entity:SetVisualWheelSize(visual_size)
+	end
+
+	if (visual_width and visual_width > 0) then
+		self.m_entity:SetVisualWheelWidth(visual_width)
+	end
+
 	for _, v in ipairs(self.decorators) do
-		self.m_deltas[v.wheel_side][v.key] = 0.0
 		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
 		self:ForEach(wheel_array, function(i, cwheel)
 			local decor_key = _F("%s_%d_%d", v.key, v.wheel_side, i)
-			local default   = Decorator:GetDecor(self.m_entity:GetHandle(), decor_key)
+			local default   = Decorator:GetDecor(handle, decor_key)
 			if (type(default) == "number") then
 				v.write_func(cwheel, default, self.m_entity)
 			end
 		end)
-	end
-
-	if (self.m_entity and self.m_entity:IsValid()) then
-		self.m_entity:SetRideHeight(0.0)
-		local visual_size  = Decorator:GetDecor(self.m_entity:GetHandle(), "m_visual_size")
-		local visual_width = Decorator:GetDecor(self.m_entity:GetHandle(), "m_visual_width")
-		if (visual_size and visual_size > 0) then
-			self.m_entity:SetVisualWheelSize(visual_size)
-		end
-		if (visual_width and visual_width > 0) then
-			self.m_entity:SetVisualWheelWidth(visual_width)
-		end
 	end
 end
 
@@ -219,41 +231,36 @@ function Stancer:Cleanup()
 	self.m_cached_model = nil
 end
 
-function Stancer:ResetDeltas()
-	for _, v in pairs(self.decorators) do
-		self.m_deltas[self.eWheelSide.FRONT][v.key] = 0.0
-		self.m_deltas[self.eWheelSide.BACK][v.key]  = 0.0
-	end
-end
-
 -- Main entry
 function Stancer:OnNewVehicle()
-	self.m_reloading = true
-	self:ResetDeltas()
-
-	if (not self.m_entity or not self.m_entity:IsValid()) then
-		self.m_reloading = false
+	if (not self.m_entity:IsValid()) then
 		return
 	end
 
-	self.m_cached_model    = self.m_entity:GetModelHash()
-	self.m_last_wheels_mod = self.m_entity:GetCustomWheels()
+	self.m_reloading = true
 
+	local handle = self.m_entity:GetHandle()
+	if (not Decorator:IsEntityRegistered(handle)) then
+		Decorator:Register(handle, "Stancer", true)
+	end
+
+	self.m_cached_model = self.m_entity:GetModelHash()
+	self:ResetDeltas()
 	self:ReadWheelArray()
 	self:ReadDefaults()
+
 	self.m_reloading = false
 end
 
----@param wheelIndex integer
+---@param wheel CWheel
 ---@param value number
 ---@return number
-function Stancer:GetValueByWheelIndex(wheelIndex, value)
-	-- this is not flipped. default values are referenced from the first wheel per side (front/back)
-	return wheelIndex == 1 and value or -value
+function Stancer:GetValueBySideLR(wheel, value)
+	return wheel:IsLeftWheel() and value or -value
 end
 
 ---@param array array<CWheel>?
----@param fn function
+---@param fn fun(i: integer, cwheel: CWheel)
 function Stancer:ForEach(array, fn)
 	if (not array or #array == 0) then
 		return
@@ -274,33 +281,14 @@ function Stancer:IsVehicleModelSaved()
 	return GVars.features.vehicle.stancer.saved_models[tostring(self.m_entity:GetModelHash())] ~= nil
 end
 
-function Stancer:ReadWheelArray()
-	self.m_wheels = {
-		[self.eWheelSide.FRONT] = {},
-		[self.eWheelSide.BACK]  = {}
-	}
-
-	local wheel_array = self.m_entity:Resolve().m_wheels
-	local wheel_count = self.m_entity:GetNumberOfWheels()
-	if (wheel_count == 2) then
-		table.insert(self.m_wheels[self.eWheelSide.FRONT], CWheel(wheel_array:Get(1)))
-		table.insert(self.m_wheels[self.eWheelSide.BACK], CWheel(wheel_array:Get(2)))
-	else
-		-- I don't think there are any "cars" in GTA with more or less than 2 front wheels
-		local front_count = 2
-		local back_count  = wheel_count - front_count
-		for i = 1, front_count do
-			self.m_wheels[self.eWheelSide.FRONT][i] = CWheel(wheel_array:Get(i))
-		end
-
-		if (back_count == 1) then -- I think there's one vehicle with just one back wheel. I have the memory of a goldfish so I can't remember
-			self.m_wheels[self.eWheelSide.BACK][1] = CWheel(wheel_array:Get(3))
-		else
-			for i = 1, back_count do
-				self.m_wheels[self.eWheelSide.BACK][i] = CWheel(wheel_array:Get(i + front_count))
-			end
-		end
+function Stancer:ResetDeltas()
+	for _, v in ipairs(self.decorators) do
+		self.m_deltas[self.eWheelSide.FRONT][v.key] = 0.0
+		self.m_deltas[self.eWheelSide.BACK][v.key]  = 0.0
 	end
+
+	self.m_suspension_height.m_current   = 0.0
+	self.m_suspension_height.m_last_seen = 0.0
 end
 
 ---@return table<eWheelSide, array<CWheel>>
@@ -374,6 +362,7 @@ function Stancer:OnWheelsChanged()
 		for k, v in pairs(prev_deltas_f) do
 			self.m_deltas[self.eWheelSide.FRONT][k] = v
 		end
+
 		for k, v in pairs(prev_deltas_r) do
 			self.m_deltas[self.eWheelSide.BACK][k] = v
 		end
@@ -404,39 +393,15 @@ function Stancer:AreSavedDeltasLoaded()
 		return false
 	end
 
-	local front_match = true
-	local rear_match  = true
 	for k, v in pairs(self.m_deltas[self.eWheelSide.FRONT]) do
 		if (not math.is_equal(v, front_obj[k])) then
-			front_match = false
-			break
+			return false
 		end
 	end
 
 	for k, v in pairs(self.m_deltas[self.eWheelSide.BACK]) do
 		if (not math.is_equal(v, rear_obj[k])) then
-			rear_match = false
-			break
-		end
-	end
-
-	return front_match and rear_match
-end
-
----@return boolean
-function Stancer:AreDefaultsRegistered()
-	if (not self.m_wheels) then
-		return false
-	end
-
-	local handle = self.m_entity:GetHandle()
-	for _, v in ipairs(self.decorators) do
-		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
-		for i = 1, #wheel_array do
-			local decor = _F("%s_%d_%d", v.key, v.wheel_side, i)
-			if (not Decorator:ExistsOn(handle, decor)) then
-				return false
-			end
+			return false
 		end
 	end
 
@@ -485,37 +450,56 @@ function Stancer:SaveCurrentVehicle()
 	saved[strModel][self.eWheelSide.FRONT]["m_suspension_height"] = self.m_suspension_height.m_current
 end
 
----@return boolean
 function Stancer:RestoreQueueFromDecors()
 	if (self:IsVehicleModelSaved() and GVars.features.vehicle.stancer.auto_apply_saved) then
-		self:LoadSavedDeltas()
-		return true
+		return self:LoadSavedDeltas()
 	end
 
-	return false
-	-- local handle = self.m_entity:GetHandle()
-	-- if (not Decorator:IsEntityRegistered(handle)) then
-	-- 	return false
-	-- end
+	local handle = self.m_entity:GetHandle()
+	if (not Decorator:IsEntityRegistered(handle)) then
+		return
+	end
 
-	-- local success = true
-	-- for _, v in ipairs(self.decorators) do
-	-- 	local queued_key = _F("%s_%d_queue", v.key, v.wheel_side)
-	-- 	local val = Decorator:GetDecor(handle, queued_key)
-	-- 	if (type(val) ~= "number") then
-	-- 		success = false
-	-- 	else
-	-- 		self.m_deltas[v.wheel_side][v.key] = val
-	-- 	end
-	-- end
+	for _, v in ipairs(self.decorators) do
+		local queued_key = _F("%s_%d_queue", v.key, v.wheel_side)
+		local val = Decorator:GetDecor(handle, queued_key)
+		if (type(val) == "number") then
+			self.m_deltas[v.wheel_side][v.key] = val
+		end
+	end
 
-	-- local suspension = Decorator:GetDecor(handle, "m_suspension_height_q")
-	-- if (type(suspension) ~= "number") then
-	-- 	return false
-	-- end
+	local suspension = Decorator:GetDecor(handle, "m_suspension_height_q")
+	if (type(suspension) == "number") then
+		self.m_suspension_height.m_current = suspension
+	end
+end
 
-	-- self.m_suspension_height.m_current = suspension
-	-- return success
+function Stancer:ReadWheelArray()
+	self.m_wheels = {
+		[self.eWheelSide.FRONT] = {},
+		[self.eWheelSide.BACK]  = {}
+	}
+
+	if (not self.m_entity or not self.m_entity:IsValid()) then
+		return
+	end
+
+	local wheel_array = self.m_entity:Resolve().m_wheels
+	local wheel_count = wheel_array:Size()
+	for i = 1, wheel_count do
+		local cwheel = CWheel(wheel_array:At(i))
+		if (not cwheel or not cwheel:IsValid()) then
+			goto continue
+		end
+
+		if (cwheel:IsRearWheel()) then
+			table.insert(self.m_wheels[self.eWheelSide.BACK], cwheel)
+		else
+			table.insert(self.m_wheels[self.eWheelSide.FRONT], cwheel)
+		end
+
+		::continue::
+	end
 end
 
 function Stancer:ReadDefaults()
@@ -523,33 +507,26 @@ function Stancer:ReadDefaults()
 		return
 	end
 
-	local queued_decors_loaded = self:RestoreQueueFromDecors()
-	if (self:AreDefaultsRegistered()) then
-		return
-	end
+	self:RestoreQueueFromDecors()
+	local handle       = self.m_entity:GetHandle()
+	local visual_size  = self.m_entity:GetVisualWheelSize()
+	local visual_width = self.m_entity:GetVisualWheelWidth()
+	Decorator:Register(handle, "m_visual_size", visual_size)
+	Decorator:Register(handle, "m_visual_width", visual_width)
 
-	local handle = self.m_entity:GetHandle()
 	for _, v in ipairs(self.decorators) do
-		local read_func    = v.read_func
-		local wheel_array  = self:GetAllWheelsForSide(v.wheel_side)
-		local visual_size  = self.m_entity:GetVisualWheelSize()
-		local visual_width = self.m_entity:GetVisualWheelWidth()
-
-		Decorator:Register(handle, "m_visual_size", visual_size)
-		Decorator:Register(handle, "m_visual_width", visual_width)
-
+		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
 		self:ForEach(wheel_array, function(i, cwheel)
-			local default_val = read_func(cwheel)
-			local wheel_key   = _F("%s_%d_%d", v.key, v.wheel_side, i)
+			local decor       = _F("%s_%d_%d", v.key, v.wheel_side, i)
+			local existsOn    = Decorator:ExistsOn(handle, decor)
+			local default_val = existsOn and Decorator:GetDecor(handle, decor) or v.read_func(cwheel)
+			if (not existsOn) then
+				Decorator:Register(handle, decor, default_val)
+			end
 
-			Decorator:Register(handle, wheel_key, default_val)
-
-			-- our values are based on the first wheel per axle
-			if (i % 2 == 1) then
+			-- our base values are based on left wheels per axle
+			if (cwheel:IsLeftWheel()) then
 				self.m_base_values[v.wheel_side][v.key] = default_val
-				if (not queued_decors_loaded) then
-					self.m_deltas[v.wheel_side][v.key] = 0.0
-				end
 			end
 		end)
 	end
@@ -618,12 +595,6 @@ function Stancer:Update()
 		return
 	end
 
-	-- thanks for making me reload this slow ass game 15 times.
-	-- here's a guard dog
-	if (not self:AreDefaultsRegistered()) then
-		return
-	end
-
 	self:OnWheelsChanged()
 	self:UpdateBounceMode()
 
@@ -641,20 +612,21 @@ function Stancer:Update()
 	end
 
 	for _, v in ipairs(self.decorators) do
-		local delta_val   = self.m_deltas[v.wheel_side][v.key]
-		-- local pending_key = _F("%s_%d_queue", v.key, v.wheel_side)
-		-- local pending_val = Decorator:GetDecor(handle, pending_key)
-		-- if (pending_val and not math.is_equal(pending_val, delta_val)) then
-		-- 	Decorator:UpdateDecor(handle, pending_key, delta_val)
-		-- end
-
 		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
-		local base_val    = self.m_base_values[v.wheel_side][v.key]
-		self:ForEach(wheel_array, function(i, cwheel)
-			local desired = v.side_dont_care and base_val + delta_val or
-				self:GetValueByWheelIndex(i, base_val + delta_val)
+		local delta       = self.m_deltas[v.wheel_side][v.key]
+		local base        = self.m_base_values[v.wheel_side][v.key]
+		local sum         = base + delta
+		local queued_key  = _F("%s_%d_queue", v.key, v.wheel_side)
+		if (Decorator:ExistsOn(handle, queued_key)) then
+			Decorator:UpdateDecor(handle, queued_key, delta)
+		else
+			Decorator:Register(handle, queued_key, delta)
+		end
 
-			if (math.abs(desired) ~= math.abs(v.read_func(cwheel))) then
+		self:ForEach(wheel_array, function(_, cwheel)
+			local current = v.read_func(cwheel)
+			local desired = v.side_dont_care and sum or self:GetValueBySideLR(cwheel, sum)
+			if (math.abs(desired) ~= math.abs(current)) then
 				v.write_func(cwheel, desired, self.m_entity)
 			end
 		end)

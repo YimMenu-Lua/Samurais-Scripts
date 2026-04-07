@@ -69,6 +69,7 @@ return {
 	["GENERIC_CANCEL"]                     = "Cancel",
 	["GENERIC_APPLY"]                      = "Apply",
 	["GENERIC_RESET"]                      = "Reset",
+	["GENERIC_RESET_ALL"]                  = "Reset All",
 	["GENERIC_REPAIR"]                     = "Repair",
 	["GENERIC_CLEAR"]                      = "Clear",
 	["GENERIC_CLEAR_ALL"]                  = "Clear All",
@@ -162,6 +163,7 @@ return {
 	["GENERIC_COMMANDS"]                   = "Commands",
 	["GENERIC_TURN_ON"]                    = "Turn On",
 	["GENERIC_TURN_OFF"]                   = "Turn Off",
+	["GENERIC_SCRIPT_CONTROL"]             = "Attempting to take control of script",
 	--#endregion
 
 	--#region CasinoPacino
@@ -189,16 +191,13 @@ return {
 	["CP_POKER_SETTINGS"]                  = "Three Card Poker",
 	["CP_POKER_FORCE_ROYAL_FLUSH"]         = "Force all Players Hands to Royal Flush",
 	["CP_POKER_FORCE_BAD_BEAT"]            = "Force Dealer's Hand to 'Bad Beat'",
-	["CP_POKER_SCRIPT_CONTROL"]            = "Taking control of the Three Card Poker script...",
 	["CP_BLACKJACK_SETTINGS"]              = "Blackjack",
 	["CP_BLACKJACK_DEALER_FACE_DOWN_CARD"] = "Dealer's Face Down Card:",
 	["CP_BLACKJACK_FORCE_DEALER_BUST"]     = "Force Dealer to Bust",
-	["CP_BLACKJACK_SCRIPT_CONTROL"]        = "Taking control of the blackjack script...",
 	["CP_NOT_IN_CASINO"]                   = "Not in Casino",
 	["CP_NOT_PLAYING_BLACKJACK"]           = "Not Playing Blackjack",
 	["CP_ROULETTE_SETTINGS"]               = "Roulette",
 	["CP_ROULETTE_FORCE_RED_18"]           = "Force Roulette Wheel to Land on Red 18",
-	["CP_ROULETTE_SCRIPT_CONTROL"]         = "Taking control of the 'Casino Roulette' script...",
 	["CP_SLOT_MACHINES_SETTINGS"]          = "Slot Machines",
 	["CP_SLOT_MACHINES_RIG"]               = "Rig Slot Machines",
 	["CP_SLOT_MACHINES_AUTOPLAY"]          = "Autoplay Slot Machines",

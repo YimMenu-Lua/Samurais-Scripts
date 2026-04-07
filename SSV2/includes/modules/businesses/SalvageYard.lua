@@ -135,13 +135,8 @@ end
 ---@param slot integer
 ---@return string
 function SalvageYard:GetRobberyCarInSlot(slot)
-	local index     = stats.get_int(_F("MPX_MPSV_MODEL_SALVAGE_VEH%d", slot))
-	local modelName = data.vehicle_targets[index]
-	if (not modelName) then
-		return ""
-	end
-
-	return Game.GetVehicleDisplayName(modelName)
+	local index = stats.get_int(_F("MPX_MPSV_MODEL_SALVAGE_VEH%d", slot))
+	return data.vehicle_targets[index] or "NULL"
 end
 
 function SalvageYard:DisableRobberyCooldown()
@@ -350,5 +345,13 @@ function SalvageYard:GetEstimatedIncome()
 
 	return sum + self.m_safe:GetCashValue()
 end
+
+ThreadManager:Run(function()
+	local array = data.vehicle_targets
+	for i = 1, #array do
+		local model = array[i]
+		array[i] = Game.GetVehicleDisplayName(model)
+	end
+end)
 
 return SalvageYard

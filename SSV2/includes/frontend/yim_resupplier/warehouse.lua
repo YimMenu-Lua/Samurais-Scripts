@@ -7,11 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
-local colMoneyGreen       = Color("#85BB65")
+local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
+local colMoneyGreen <const> = Color("#85BB65")
 
 ---@type array<integer>
-local bulletWidths        = {}
+local bulletWidths          = {}
 
 ---@param warehouse? Warehouse
 ---@param notOwnedLabel? string Optional label to display if the business isn't owned

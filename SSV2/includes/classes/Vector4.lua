@@ -27,9 +27,8 @@
 ---@operator eq(vec4): boolean
 ---@operator le(vec4): boolean
 ---@operator lt(vec4): boolean
-vec4 = {}
+vec4 = { __type = "vec4" }
 vec4.__index = vec4
-vec4.__type = "vec4"
 
 
 --------------------------------------

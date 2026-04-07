@@ -12,7 +12,7 @@
 --------------------------------------
 ---@class fwDrawData
 ---@field protected m_ptr pointer
----@field m_stream_render_gfx pointer
+---@field m_stream_render_gfx pointer_ref
 ---@overload fun(ptr: pointer): fwDrawData
 local fwDrawData = Class("fwDrawData", { pointer_ctor = true, symbolic_size = 0x378 })
 

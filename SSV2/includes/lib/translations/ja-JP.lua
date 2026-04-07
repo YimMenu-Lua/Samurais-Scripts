@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_UPPERBODY"] = "上半身のみ",
 	["YAV3_FLAGS_FORCE_START"] = "強制開始",
 	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "アニメーションがループしている場合、これは何も行いません。",
-	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "代替一人称アニメーション"
+	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "代替一人称アニメーション",
+	["GENERIC_SCRIPT_CONTROL"] = "スクリプトを制御しようとしています",
+	["GENERIC_RESET_ALL"] = "すべてリセット"
 }

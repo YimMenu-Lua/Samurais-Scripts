@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_FORCE_START"] = "强制启动",
 	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "替代第一人称动画",
 	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "如果动画循环播放，这不会执行任何操作。",
-	["YAV3_FLAGS_USE_FULL_BLENDING"] = "使用完全混合"
+	["YAV3_FLAGS_USE_FULL_BLENDING"] = "使用完全混合",
+	["GENERIC_SCRIPT_CONTROL"] = "试图控制脚本",
+	["GENERIC_RESET_ALL"] = "全部重置"
 }

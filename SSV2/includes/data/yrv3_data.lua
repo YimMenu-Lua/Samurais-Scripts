@@ -394,7 +394,7 @@ local RawBusinessData <const> = {
 	SellMissionTunables = {
 		["CEO"] = {
 			type = "bool",
-			tuneable = {
+			tuneables = {
 				"EXEC_DISABLE_SELL_AIRATTACKED",
 				"EXEC_DISABLE_SELL_AIRDROP",
 				"EXEC_DISABLE_SELL_AIRFLYLOW",
@@ -415,7 +415,7 @@ local RawBusinessData <const> = {
 		},
 		["Biker"] = {
 			type = "bool",
-			tuneable = {
+			tuneables = {
 				"BIKER_DISABLE_SELL_CONVOY",
 				"BIKER_DISABLE_SELL_PROVEN",
 				"BIKER_DISABLE_SELL_FRIENDS_IN_NEED",
@@ -428,7 +428,7 @@ local RawBusinessData <const> = {
 		},
 		["Nightclub"] = {
 			type = "float",
-			tuneable = {
+			tuneables = {
 				"BB_SELL_MISSIONS_WEIGHTING_MULTI_DROP",
 				"BB_SELL_MISSIONS_WEIGHTING_HACK_DROP",
 				"BB_SELL_MISSIONS_WEIGHTING_ROADBLOCK",
@@ -442,7 +442,7 @@ local RawBusinessData <const> = {
 		},
 		["Hangar"] = {
 			type = "float",
-			tuneable = {
+			tuneables = {
 				"SMUG_SELL_HEAVY_LIFTING_WEIGHTING",
 				"SMUG_SELL_CONTESTED_WEIGHTING",
 				"SMUG_SELL_AGILE_DELIVERY_WEIGHTING",

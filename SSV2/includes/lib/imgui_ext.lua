@@ -985,6 +985,7 @@ function ImGui.BeginChildEx(name, size, childFlags, windowFlags)
 		if (padding) then
 			windowFlags = windowFlags | ImGuiWindowFlags.AlwaysUseWindowPadding
 		end
+		---@diagnostic disable-next-line: param-type-mismatch
 		return ImGui.BeginChild(name, size.x, size.y, border, windowFlags)
 	end
 end

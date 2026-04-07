@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_HOLD_LAST_FRAME"] = "Letzten Frame halten",
 	["YAV3_FLAGS_TURN_OFF_COLLISION"] = "Kollision deaktivieren",
 	["YAV3_FLAGS_PROCESS_ATTACHMENTS"] = "Prozessanhänge",
-	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "Dies hat keine Auswirkung, wenn die Animation in einer Schleife ausgeführt wird."
+	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "Dies hat keine Auswirkung, wenn die Animation in einer Schleife ausgeführt wird.",
+	["GENERIC_SCRIPT_CONTROL"] = "Versuch, die Kontrolle über das Skript zu übernehmen",
+	["GENERIC_RESET_ALL"] = "Alles zurücksetzen"
 }

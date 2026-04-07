@@ -78,7 +78,7 @@ end
 
 -- Returns the current local player's ID.
 ---@return number
-function LocalPlayer:GetPlayerID()
+function LocalPlayer:GetID()
 	return _G.self.get_id()
 end
 
@@ -171,7 +171,7 @@ function LocalPlayer:OnVehicleExit()
 	end
 
 	if (not self.m_vehicle:IsValid()) then
-		self.m_vehicle:Reset()
+		self.m_vehicle:Cleanup()
 	end
 end
 
@@ -179,7 +179,7 @@ end
 ---@param skip_players? boolean -- Ignore network players.
 ---@return handle | nil
 function LocalPlayer:GetEntityInCrosshairs(skip_players)
-	local is_aiming, entity, pid = false, 0, self:GetPlayerID()
+	local is_aiming, entity, pid = false, 0, self:GetID()
 
 	if not PLAYER.IS_PLAYER_FREE_AIMING(pid) then
 		return 0
@@ -247,7 +247,7 @@ end
 
 ---@return boolean
 function LocalPlayer:IsBeingArrested()
-	return PLAYER.IS_PLAYER_BEING_ARRESTED(self:GetPlayerID(), true)
+	return PLAYER.IS_PLAYER_BEING_ARRESTED(self:GetID(), true)
 end
 
 -- Teleports local player to the provided coordinates.
@@ -281,17 +281,6 @@ function LocalPlayer:Teleport(where, keepVehicle, loadGround)
 		LocalPlayer:SetHeading(heading)
 		LocalPlayer:SetCoordsKeepVehicle(coords)
 	end)
-end
-
----@param scriptName string
----@return boolean
-function LocalPlayer:IsHostOfScript(scriptName)
-	local pid = self:GetPlayerID()
-	return (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, -1, 0) == pid)
-		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 0, 0) == pid)
-		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 1, 0) == pid)
-		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 2, 0) == pid)
-		or (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, 3, 0) == pid)
 end
 
 -- Returns whether the player is currently using any mobile or computer app.
@@ -543,8 +532,7 @@ ThreadManager:RegisterLooped("SS_PV_HANDLER", function()
 	end
 
 	if (LocalPlayer.m_vehicle:GetHandle() ~= 0 and not LocalPlayer.m_vehicle:IsValid()) then
-		LocalPlayer.m_vehicle:Reset()
-		sleep(1000)
+		LocalPlayer.m_vehicle:Cleanup()
 	end
 end)
 

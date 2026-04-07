@@ -9,6 +9,7 @@
 
 local CStructView = require("includes.classes.gta.CStructView")
 
+
 ---@class IPAddress
 ---@field private m_decimal uint32_t
 ---@field private m_packed vec4

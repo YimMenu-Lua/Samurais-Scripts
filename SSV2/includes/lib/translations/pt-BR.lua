@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_USE_FULL_BLENDING"] = "Use mistura completa",
 	["YAV3_FLAGS_TURN_OFF_COLLISION"] = "Desativar colisão",
 	["YAV3_FLAGS_FORCE_START"] = "Forçar início",
-	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "Isso não fará nada se a animação estiver em loop."
+	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "Isso não fará nada se a animação estiver em loop.",
+	["GENERIC_SCRIPT_CONTROL"] = "Tentando assumir o controle do script",
+	["GENERIC_RESET_ALL"] = "Redefinir tudo"
 }

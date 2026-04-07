@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_FORCE_START"] = "Wymuś start",
 	["YAV3_FLAGS_TURN_OFF_COLLISION"] = "Wyłącz kolizję",
 	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "To nic nie da, jeśli animacja jest zapętlona.",
-	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "Alternatywna animacja pierwszoosobowa"
+	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "Alternatywna animacja pierwszoosobowa",
+	["GENERIC_SCRIPT_CONTROL"] = "Próba przejęcia kontroli nad scenariuszem",
+	["GENERIC_RESET_ALL"] = "Zresetuj wszystko"
 }

@@ -47,6 +47,7 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_car_handling_data pointer<CCarHandlingData>?
 ---@field public m_model_info_layout pointer<CVehicleModelInfoLayout>
 ---@field public m_can_boost_jump pointer<byte> `bool`
+---@field public m_velocity pointer<vec3>
 ---@field public m_deform_god pointer<uint8_t>
 ---@field public m_water_damage pointer<uint32_t>
 ---@field public m_next_gear pointer<int16_t>
@@ -107,8 +108,9 @@ function CVehicle:init(vehicle)
 	instance.m_sub_handling_data            = atArray(instance.m_handling_data:add(0x158), CCarHandlingData)
 	instance.m_model_info_layout            = instance.m_model_info:add(0x00B0):deref()
 	instance.m_physics_fragments            = phFragInst(ptr:add(0x0030):deref())
-	instance.m_draw_data                    = CVehicleDrawData:init(ptr:add(0x0048):deref())
+	instance.m_draw_data                    = CVehicleDrawData(ptr:add(0x0048):deref())
 	instance.m_can_boost_jump               = ptr:add(0x03A4)
+	instance.m_velocity                     = ptr:add(0x07D0)
 	instance.m_deform_god                   = ptr:add(0x096C)
 	instance.m_is_targetable                = ptr:add(0x0AEE)
 	instance.m_door_lock_status             = ptr:add(0x13D0)
@@ -185,7 +187,9 @@ end
 ---@return CCarHandlingData|CBikeHandlingData|CFlyingHandlingData|any
 function CVehicle:GetSubHandlingData(handlingType)
 	return self:__safecall(nil, function()
-		for _, sub_ptr in self.m_sub_handling_data:Iter() do
+		local array = self.m_sub_handling_data
+		for i = 1, array:Size() do
+			local sub_ptr = array:At(i)
 			if (sub_ptr:is_valid()) then
 				-- local base = CBaseSubHandlingData.new(sub_ptr)
 				-- if (base and base:GetHandlingType() == handlingType) then
@@ -440,7 +444,7 @@ function CVehicle:GetWheel(index)
 		return
 	end
 
-	local ptr = self.m_wheels:Get(index)
+	local ptr = self.m_wheels:At(index)
 	if (not ptr or ptr:is_null()) then
 		return
 	end

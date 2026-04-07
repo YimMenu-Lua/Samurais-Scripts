@@ -42,7 +42,7 @@ function MagicBullet:Update()
 		return
 	end
 
-	if PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetPlayerID()) then
+	if PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetID()) then
 		local entity = LocalPlayer:GetEntityInCrosshairs(false)
 		if (entity and ENTITY.IS_ENTITY_A_PED(entity) and PED.IS_PED_HUMAN(entity)) then
 			if (entity ~= 0) then

@@ -266,4 +266,14 @@ function CWheel:SetConfigFlag(flag, toggle)
 	end)
 end
 
+---@return boolean
+function CWheel:IsLeftWheel()
+	return self:GetConfigFlag(Enums.eWheelConfigFlags.LEFTWHEEL)
+end
+
+---@return boolean
+function CWheel:IsRearWheel()
+	return self:GetConfigFlag(Enums.eWheelConfigFlags.REARWHEEL)
+end
+
 return CWheel

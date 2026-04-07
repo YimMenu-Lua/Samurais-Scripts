@@ -126,18 +126,18 @@ function Ped:IsPedMyEnemy(pedHandle)
 		return false
 	end
 
-	local this = self:GetHandle()
-	if (this == pedHandle) then
+	local localHandle = self:GetHandle()
+	if (localHandle == pedHandle) then
 		return false
 	end
 
-	local rel1 = PED.GET_RELATIONSHIP_BETWEEN_PEDS(this, pedHandle)
-	local rel2 = PED.GET_RELATIONSHIP_BETWEEN_PEDS(pedHandle, this)
+	local rel1 = PED.GET_RELATIONSHIP_BETWEEN_PEDS(localHandle, pedHandle)
+	local rel2 = PED.GET_RELATIONSHIP_BETWEEN_PEDS(pedHandle, localHandle)
 	local pos  = self:GetPos(true)
 
 	return (
-		PED.IS_PED_IN_COMBAT(pedHandle, this)
-		or PED.IS_PED_IN_COMBAT(this, pedHandle)
+		PED.IS_PED_IN_COMBAT(pedHandle, localHandle)
+		or PED.IS_PED_IN_COMBAT(localHandle, pedHandle)
 		or math.is_inrange(rel1, 3, 5)
 		or math.is_inrange(rel2, 3, 5)
 		or PED.IS_ANY_HOSTILE_PED_NEAR_POINT(

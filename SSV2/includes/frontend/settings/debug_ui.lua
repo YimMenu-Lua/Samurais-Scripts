@@ -396,7 +396,7 @@ local function DrawSerializerDebug()
 
 	ImGui.BulletText("Thread State:")
 	ImGui.SameLine()
-	GUI:Text(EnumToString(eThreadState, eState), state_colors[eState])
+	GUI:Text(EnumToString(eThreadState, eState), { color = state_colors[eState] })
 	ImGui.BulletText(_F("Is Disabled: %s", not Serializer:CanAccess()))
 	ImGui.BulletText(_F("Time Since Last Flush: %.0f seconds ago.", Serializer:GetTimeSinceLastFlush() / 1e3))
 

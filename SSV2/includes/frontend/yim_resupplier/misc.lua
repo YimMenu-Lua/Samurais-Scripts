@@ -9,6 +9,7 @@
 
 local sCooldownButtonLabel, bCooldownParam
 local maxSellMissionButtonSize = vec2:new(80, 30)
+local COL_WARN_YELLOW <const>  = Color(240, 190, 2, 255)
 
 local function getAllCDCheckboxes()
 	return GVars.features.yrv3.mc_work_cd
@@ -22,7 +23,7 @@ local function getAllCDCheckboxes()
 		and GVars.features.yrv3.ceo_crate_sell_cd
 		and GVars.features.yrv3.dax_work_cd
 		and GVars.features.yrv3.garment_rob_cd
-		-- and GVars.features.yrv3.cfr_cd -- chicken factory raid
+	-- and GVars.features.yrv3.cfr_cd -- chicken factory raid
 end
 
 ---@param value boolean
@@ -175,7 +176,7 @@ return function()
 	ImGui.TextWrapped(_T("YRV3_SELL_MISSIONS_TT"))
 
 	ImGui.Spacing()
-	GUI:Text(_T("YRV3_SELL_MISSIONS_NOTE"), Color("yellow"))
+	GUI:Text(_T("YRV3_SELL_MISSIONS_NOTE"), { color = COL_WARN_YELLOW })
 
 	for name, data in pairs(YRV3:GetSaleMissionTunables()) do
 		local isFloat      = (data.type == "float")
@@ -190,18 +191,15 @@ return function()
 		end
 
 		if (GUI:Button(label, { size = maxSellMissionButtonSize })) then
-			for _, index in pairs(data.tuneable) do
-				if get_func(index) ~= desiredValue then
-					set_func(index, desiredValue)
+			for _, tuneable_name in pairs(data.tuneables) do
+				if (get_func(tuneable_name) ~= desiredValue) then
+					set_func(tuneable_name, desiredValue)
 				end
 			end
 
-			Notifier:ShowSuccess("YRV3", _F(_T("YRV3_SELL_MISSIONS_NOTIF"), name:lower()))
+			Notifier:ShowSuccess("YRV3", _F(_T("YRV3_SELL_MISSIONS_NOTIF"), name))
 		end
 
-		ImGui.SameLine()
-		if (ImGui.GetContentRegionAvail() <= (buttonWidth + style.ItemSpacing.x)) then
-			ImGui.NewLine()
-		end
+		ImGui.SameLineIfAvail(buttonWidth + style.ItemSpacing.x)
 	end
 end

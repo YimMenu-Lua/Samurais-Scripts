@@ -159,8 +159,8 @@ jobs:
     - name: Bump Version
       if: steps.check_changes.outputs.should_proceed == 'true'
       run: |
-        sed -i "s|return \".*\"|return \"${{steps.increment_tag.outputs.no_prefix}}\"|" SSV2/includes/version.lua
-        sed -i "s|https://img.shields.io/badge/Script%20Version-v[0-9]\+\.[0-9]\+\.[0-9]\+-blue|https://img.shields.io/badge/Script%20Version-${{steps.increment_tag.outputs.version_number}}-blue|g" README.md
+        sed -i "s|return \".*\"|return \"${{ steps.increment_tag.outputs.no_prefix }}\"|" SSV2/includes/version.lua
+        sed -i "s|https://img.shields.io/badge/Script%20Version-v[0-9]\+\.[0-9]\+\.[0-9]\+-blue|https://img.shields.io/badge/Script%20Version-${{ steps.increment_tag.outputs.version_number }}-blue|g" README.md
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add SSV2/includes/version.lua README.md
@@ -173,7 +173,7 @@ jobs:
       with:
         type: 'zip'
         filename: "Samurais_Scripts_${{ steps.increment_tag.outputs.version_number }}.zip"
-        exclusions: /.git* /scripts* /docs* *.json *.md *.editorconfig *.py *.txt LICENSE
+        exclusions: /.git* /dev* /docs* **.json **.md **.editorconfig **.py **.txt *.ps1 .gitignore LICENSE
 
     - name: Upload Release
       if: steps.check_changes.outputs.should_proceed == 'true'

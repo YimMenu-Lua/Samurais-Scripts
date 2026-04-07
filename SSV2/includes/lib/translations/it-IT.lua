@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "Animazione alternativa in prima persona",
 	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "Questo non farà nulla se l'animazione è in loop.",
 	["YAV3_FLAGS_PROCESS_ATTACHMENTS"] = "Allegati del processo",
-	["YAV3_FLAGS_USE_FULL_BLENDING"] = "Usa la miscelazione completa"
+	["YAV3_FLAGS_USE_FULL_BLENDING"] = "Usa la miscelazione completa",
+	["GENERIC_SCRIPT_CONTROL"] = "Tentativo di prendere il controllo della sceneggiatura",
+	["GENERIC_RESET_ALL"] = "Reimposta tutto"
 }

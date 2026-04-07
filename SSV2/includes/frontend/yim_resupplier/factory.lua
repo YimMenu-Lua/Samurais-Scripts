@@ -9,6 +9,8 @@
 
 local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
 local colMoneyGreen       = Color("#85BB65")
+local COL_RED <const>     = Color("red")
+local COL_GREEN <const>   = Color("green")
 
 ---@type array<integer>
 local bulletWidths        = {}
@@ -49,8 +51,10 @@ return function(bb, notOwnedLabel)
 	local supplies      = bb:GetSuppliesCount()
 	local stock         = bb:GetProductCount()
 	local totalValue    = bb:GetProductValue()
-	local eqLabelCol    = updgrade1 and "green" or "red"
-	local staffLabelCol = updgrade2 and "green" or "red"
+	local eqLabel       = updgrade1 and "GENERIC_ACTIVE" or "GENERIC_INACTIVE"
+	local eqLabelCol    = updgrade1 and COL_GREEN or COL_RED
+	local staffLabel    = updgrade2 and "GENERIC_ACTIVE" or "GENERIC_INACTIVE"
+	local staffLabelCol = updgrade2 and COL_GREEN or COL_RED
 	local maxUnits      = bb:GetMaxUnits()
 	local index         = bb:GetIndex() or -1
 
@@ -77,12 +81,12 @@ return function(bb, notOwnedLabel)
 
 	ImGui.BulletText(_T("YRV3_EQUIP_UPGDRADE"))
 	ImGui.SameLine(bulletWidth)
-	GUI:Text(updgrade1 and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), { color = Color(eqLabelCol) })
+	GUI:Text(_T(eqLabel), { color = eqLabelCol })
 
 	if (index < 6) then
 		ImGui.BulletText(_T("YRV3_STAFF_UPGDRADE"))
 		ImGui.SameLine(bulletWidth)
-		GUI:Text(updgrade2 and _T("GENERIC_ACTIVE") or _T("GENERIC_INACTIVE"), { color = Color(staffLabelCol) })
+		GUI:Text(_T(staffLabel), { color = staffLabelCol })
 	end
 
 	ImGui.BulletText(_T("YRV3_SUPPLIES_LABEL"))

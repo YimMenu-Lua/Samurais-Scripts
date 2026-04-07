@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_USE_FULL_BLENDING"] = "전체 혼합 사용",
 	["YAV3_FLAGS_NOT_INTERRUPTABLE"] = "중단할 수 없음",
 	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "대체 1인칭 애니메이션",
-	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "애니메이션이 반복되면 아무 작업도 수행되지 않습니다."
+	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "애니메이션이 반복되면 아무 작업도 수행되지 않습니다.",
+	["GENERIC_SCRIPT_CONTROL"] = "스크립트를 제어하려고 시도 중입니다.",
+	["GENERIC_RESET_ALL"] = "모두 재설정"
 }

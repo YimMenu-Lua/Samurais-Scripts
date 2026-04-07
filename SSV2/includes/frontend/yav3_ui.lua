@@ -868,9 +868,9 @@ local function DrawJsonMovementClipsets()
 	if (#t_MovementClipsetsJson == 0) then
 		local exists = io.exists("movementClipsetsCompact.json")
 		if not exists then
-			ImGui.TextWrapped("You must download the clipsets Json file and save it to the 'scripts_config' folder.")
+			ImGui.TextWrapped("You must download the clipsets Json file and save it to the 'scripts_config/samurais_scripts' folder.")
 			ImGui.SetWindowFontScale(0.8)
-			GUI:Text(s_MovementClipsetsGitHub, Color(s_GitHubLinkColor))
+			GUI:Text(s_MovementClipsetsGitHub, { color = Color(s_GitHubLinkColor) })
 			ImGui.SetWindowFontScale(1.0)
 			GUI:Tooltip("Right click to copy the link.")
 

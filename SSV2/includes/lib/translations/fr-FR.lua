@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_NOT_INTERRUPTABLE"] = "Non Interruptible",
 	["YAV3_FLAGS_HOLD_LAST_FRAME"] = "Conserver la dernière image",
 	["YAV3_FLAGS_USE_FULL_BLENDING"] = "Utiliser le mélange complet",
-	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "Animation alternative à la première personne"
+	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "Animation alternative à la première personne",
+	["GENERIC_SCRIPT_CONTROL"] = "Tentative de prendre le contrôle du script",
+	["GENERIC_RESET_ALL"] = "Tout réinitialiser"
 }

@@ -7,11 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local SGSL                 = require("includes.services.SGSL")
-local RawBusinessData      = require("includes.data.yrv3_data")
+local SGSL                    = require("includes.services.SGSL")
+local RawBusinessData         = require("includes.data.yrv3_data")
 
 ---@enum eCasinoPrize
-Enums.eCasinoPrize         = {
+Enums.eCasinoPrize            = {
 	VEHICLE  = 1,
 	MYSTERY  = 2,
 	CASH     = 3,
@@ -22,7 +22,7 @@ Enums.eCasinoPrize         = {
 	RANDOM   = 8,
 }
 
-local CasinoPrizes <const> = {
+local CasinoPrizes <const>    = {
 	[Enums.eCasinoPrize.VEHICLE] = { v = 18 },
 	[Enums.eCasinoPrize.MYSTERY] = { v = 11 },
 	[Enums.eCasinoPrize.CASH] = { v = 19 },
@@ -32,12 +32,20 @@ local CasinoPrizes <const> = {
 	[Enums.eCasinoPrize.CLOTHING] = { v = 8 },
 }
 
+local CardNumToString <const> = {
+	[0]  = _T("CP_CARD_KING"),
+	[1]  = _T("CP_CARD_ACE"),
+	[11] = _T("CP_CARD_JACK"),
+	[12] = _T("CP_CARD_QUEEN"),
+}
+
+
 ---@class CasinoPacino
 ---@field private m_arcade_prop { coords: vec3, gxt: string }
 ---@field protected m_thread Thread?
 ---@field protected m_initialized boolean
-local CasinoPacino         = {}
-CasinoPacino.__index       = CasinoPacino
+local CasinoPacino   = {}
+CasinoPacino.__index = CasinoPacino
 
 ---@return CasinoPacino
 function CasinoPacino:init()
@@ -91,7 +99,7 @@ function CasinoPacino:GiveWheelPrize(prizeID)
 	local idx                     = prizeID
 
 	if (prizeID == Enums.eCasinoPrize.RANDOM) then
-		math.randomseed(os.time() * 60)
+		math.randomseed(math.floor(os.time() * 60))
 		idx = math.random(Enums.eCasinoPrize.VEHICLE, Enums.eCasinoPrize.CLOTHING)
 	end
 
@@ -101,9 +109,38 @@ function CasinoPacino:GiveWheelPrize(prizeID)
 		return
 	end
 
-
 	prize_wheel_win_state:At(prize_wheel_prize):WriteInt(obj.v)
 	prize_wheel_win_state:At(prize_wheel_prize_state):WriteInt(11)
+end
+
+---@param script_name string
+---@param timeout? integer
+---@return boolean
+function CasinoPacino:TakeControlOfScript(script_name, timeout)
+	if (not script.is_active(script_name)) then
+		return false
+	end
+
+	timeout       = timeout or 10000
+	local success = true
+	local timer   = Timer.new(timeout)
+
+	Notifier:ShowMessage("Casino Pacino", _F("%s '%s'...", _T("GENERIC_SCRIPT_CONTROL"), script_name))
+	while (not LocalPlayer:IsHostOfScript(script_name)) do
+		if (timer:IsDone()) then
+			success = false
+			break
+		end
+
+		network.force_script_host(script_name)
+		yield()
+	end
+
+	if (not success) then
+		Notifier:ShowError("Casino Pacino", _F("%s '%s'", _T("GENERIC_SCRIPT_CTRL_FAIL"), script_name))
+	end
+
+	return success
 end
 
 ---@param card_index number
@@ -113,23 +150,16 @@ function CasinoPacino:GetCardNameFromIndex(card_index)
 	end
 
 	local card_number = math.fmod(card_index, 13)
-	local numberCases = {
-		[0] = _T("CP_CARD_KING"),
-		[1] = _T("CP_CARD_ACE"),
-		[11] = _T("CP_CARD_JACK"),
-		[12] = _T("CP_CARD_QUEEN"),
-		default = tostring(card_number)
-	}
-	local cardName = Match(card_number, numberCases)
-	local cardSuit = ""
+	local cardName    = CardNumToString[card_number] or tostring(card_number)
+	local cardSuit    = ""
 
-	if card_index >= 1 or card_index <= 13 then
+	if (card_index >= 1 or card_index <= 13) then
 		cardSuit = _T("CP_CARD_CLUBS")
-	elseif card_index >= 14 or card_index <= 26 then
+	elseif (card_index >= 14 or card_index <= 26) then
 		cardSuit = _T("CP_CARD_DIAMONDS")
-	elseif card_index >= 27 or card_index <= 39 then
+	elseif (card_index >= 27 or card_index <= 39) then
 		cardSuit = _T("CP_CARD_HEARTS")
-	elseif card_index >= 40 or card_index <= 52 then
+	elseif (card_index >= 40 or card_index <= 52) then
 		cardSuit = _T("CP_CARD_SPADES")
 	end
 
@@ -137,43 +167,23 @@ function CasinoPacino:GetCardNameFromIndex(card_index)
 end
 
 function CasinoPacino:ForceDealerBust()
-	ThreadManager:Run(function(s)
-		local player_id                    = LocalPlayer:GetPlayerID()
+	ThreadManager:Run(function()
+		if (not script.is_active("three_card_poker")) then
+			return
+		end
+
+		if (not self:TakeControlOfScript("blackjack")) then
+			return
+		end
+
+		local player_id                    = LocalPlayer:GetID()
 		local bjc_obj                      = SGSL:Get(SGSL.data.blackjack_cards)
 		local btp_obj                      = SGSL:Get(SGSL.data.blackjack_table_players)
 		local blackjack_cards              = bjc_obj:GetValue()
 		local blackjack_decks              = bjc_obj:GetOffset(1)
 		local blackjack_table_players      = btp_obj:GetValue()
 		local blackjack_table_players_size = btp_obj:GetOffset(1)
-		if (not player_id
-				or not blackjack_cards
-				or not blackjack_decks
-				or not blackjack_table_players
-				or not blackjack_table_players_size
-			) then
-			Notifier:ShowError("Casino Pacino", "Failed to force dealer to bsut! Unable to read script local.")
-			return
-		end
-
-		local giveupTimer = Timer.new(3e4)
-		local success     = true
-		Notifier:ShowMessage("Casino Pacino", _T("CP_BLACKJACK_SCRIPT_CONTROL"))
-		while (not LocalPlayer:IsHostOfScript("blackjack")) do
-			if (giveupTimer:IsDone()) then
-				success = false
-				break
-			end
-
-			network.force_script_host("blackjack")
-			s:yield()
-		end
-
-		if (not success) then
-			Notifier:ShowError("Casino Pacino", _T("GENERIC_SCRIPT_CTRL_FAIL"))
-			return
-		end
-
-		local blackjack_table = locals.get_int("blackjack",
+		local blackjack_table              = locals.get_int("blackjack",
 			blackjack_table_players
 			+ 1
 			+ (player_id * blackjack_table_players_size)
@@ -184,9 +194,7 @@ function CasinoPacino:ForceDealerBust()
 			return
 		end
 
-		local BJCards = ScriptLocal(
-				blackjack_cards,
-				"blackjack")
+		local BJCards = ScriptLocal(blackjack_cards, "blackjack")
 			:At(blackjack_decks)
 			:At(1)
 			:At(blackjack_table * 13)
@@ -211,17 +219,13 @@ function CasinoPacino:SetPokerCards(player_id, players_current_table, card_one, 
 	local three_card_poker_deck_size       = SGSL:Get(SGSL.data.three_card_poker_deck_size):GetValue()
 	local three_card_poker_anti_cheat      = tcp_ac_obj:GetValue()
 	local three_card_poker_anti_cheat_deck = tcp_ac_obj:GetOffset(1)
-	local TCPCards                         = ScriptLocal(
-			three_card_poker_cards,
-			"three_card_poker")
+	local TCPCards                         = ScriptLocal(three_card_poker_cards, "three_card_poker")
 		:At(three_card_poker_current_deck)
 		:At(1)
 		:At(players_current_table * three_card_poker_deck_size)
 		:At(2)
 
-	local TCPAC                            = ScriptLocal(
-			three_card_poker_anti_cheat,
-			"three_card_poker")
+	local TCPAC                            = ScriptLocal(three_card_poker_anti_cheat, "three_card_poker")
 		:At(three_card_poker_anti_cheat_deck)
 		:At(1)
 		:At(1)
@@ -242,18 +246,11 @@ function CasinoPacino:ForcePokerCards()
 		return
 	end
 
-	local player_id = LocalPlayer:GetPlayerID()
-	while ((NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", -1, 0) ~= player_id)
-			and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 0, 0) ~= player_id)
-			and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 1, 0) ~= player_id)
-			and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 2, 0) ~= player_id)
-			and (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("three_card_poker", 3, 0) ~= player_id)
-		) do
-		network.force_script_host("three_card_poker")
-		Notifier:ShowMessage("CasinoPacino", _T("CP_POKER_SCRIPT_CONTROL"))
-		sleep(500)
+	if (not self:TakeControlOfScript("three_card_poker")) then
+		return
 	end
 
+	local player_id                     = LocalPlayer:GetID()
 	local tcpt_obj                      = SGSL:Get(SGSL.data.three_card_poker_table)
 	local tcpc_obj                      = SGSL:Get(SGSL.data.three_card_poker_cards)
 	local three_card_poker_table        = tcpt_obj:GetValue()
@@ -264,38 +261,38 @@ function CasinoPacino:ForcePokerCards()
 	local TCTable                       = ScriptLocal(three_card_poker_table, "three_card_poker"):At(1)
 	local players_current_table         = TCTable:At(player_id * three_card_poker_table_size):At(2):ReadInt()
 
-	if (players_current_table ~= -1) then -- If the player is sitting at a poker table
-		-- "three_card_poker", (three_card_poker_cards) + (three_card_poker_current_deck) + (1 + (players_current_table * three_card_poker_deck_size)) + (2) +
-		local PlayerCardLocal = ScriptLocal(
-				three_card_poker_cards,
-				"three_card_poker")
-			:At(three_card_poker_current_deck)
-			:At(1)
-			:At(players_current_table * three_card_poker_deck_size)
-			:At(2)
+	if (players_current_table == -1) then
+		return
+	end
 
-		local player_0_card_1 = PlayerCardLocal:At(1):At(0 * 3):ReadInt()
-		local player_0_card_2 = PlayerCardLocal:At(2):At(0 * 3):ReadInt()
-		local player_0_card_3 = PlayerCardLocal:At(3):At(0 * 3):ReadInt()
+	local PlayerCardLocal = ScriptLocal(three_card_poker_cards, "three_card_poker")
+		:At(three_card_poker_current_deck)
+		:At(1)
+		:At(players_current_table * three_card_poker_deck_size)
+		:At(2)
 
-		if (player_0_card_1 ~= 50) or (player_0_card_2 ~= 51) or (player_0_card_3 ~= 52) then
-			local total_players = 0
+	local player_0_card_1 = PlayerCardLocal:At(1):At(0 * 3):ReadInt()
+	local player_0_card_2 = PlayerCardLocal:At(2):At(0 * 3):ReadInt()
+	local player_0_card_3 = PlayerCardLocal:At(3):At(0 * 3):ReadInt()
 
-			for player_iter = 0, 31, 1 do
-				local player_table = TCTable:At(player_iter * three_card_poker_table_size):At(2):ReadInt()
-				if (player_iter ~= player_id) and (player_table == players_current_table) then
-					total_players = total_players + 1
-				end
-			end
+	if (player_0_card_1 == 50 or player_0_card_2 == 51 or player_0_card_3 == 52) then
+		return
+	end
 
-			for playing_player_iter = 0, total_players, 1 do
-				self:SetPokerCards(playing_player_iter, players_current_table, 50, 51, 52)
-			end
-
-			if (GVars.features.dunk.set_dealers_poker_cards) then
-				self:SetPokerCards(total_players + 1, players_current_table, 1, 8, 22)
-			end
+	local total_players = 0
+	for player_iter = 0, 31, 1 do
+		local player_table = TCTable:At(player_iter * three_card_poker_table_size):At(2):ReadInt()
+		if ((player_iter ~= player_id) and (player_table == players_current_table)) then
+			total_players = total_players + 1
 		end
+	end
+
+	for playing_player_iter = 0, total_players, 1 do
+		self:SetPokerCards(playing_player_iter, players_current_table, 50, 51, 52)
+	end
+
+	if (GVars.features.dunk.set_dealers_poker_cards) then
+		self:SetPokerCards(total_players + 1, players_current_table, 1, 8, 22)
 	end
 end
 
@@ -304,26 +301,24 @@ function CasinoPacino:ForceRouletteWheel()
 		return
 	end
 
-	local player_id               = LocalPlayer:GetPlayerID()
+	if (not self:TakeControlOfScript("casinoroulette")) then
+		return
+	end
+
 	local rmt_obj                 = SGSL:Get(SGSL.data.roulette_master_table)
 	local roulette_master_table   = rmt_obj:GetValue()
 	local roulette_outcomes_table = rmt_obj:GetOffset(1)
 	local roulette_ball_table     = SGSL:Get(SGSL.data.roulette_ball_table_offset):GetValue()
 
-	while (NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", -1, 0) ~= player_id
-			and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 0, 0) ~= player_id
-			and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 1, 0) ~= player_id
-			and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 2, 0) ~= player_id
-			and NETWORK.NETWORK_GET_HOST_OF_SCRIPT("casinoroulette", 3, 0) ~= player_id
-		) do
-		network.force_script_host("casinoroulette")
-		Notifier:ShowMessage("CasinoPacino", _T("CP_ROULETTE_SCRIPT_CONTROL")) --If you see this spammed, someone if fighting you for control.
-		sleep(500)
-	end
-
-	for tabler_iter = 0, 6, 1 do
-		locals.set_int("casinoroulette",
-			(roulette_master_table) + (roulette_outcomes_table) + (roulette_ball_table) + (tabler_iter), 18)
+	for table_iter = 0, 6, 1 do
+		locals.set_int(
+			"casinoroulette",
+			(roulette_master_table)
+			+ (roulette_outcomes_table)
+			+ (roulette_ball_table)
+			+ (table_iter),
+			18
+		)
 	end
 end
 
@@ -332,16 +327,21 @@ function CasinoPacino:RigSlotMachine()
 		return
 	end
 
-	local needs_run = false
+	local needs_run        = false
+	local rig_enabled      = GVars.features.dunk.rig_slot_machine
 	local SlotsResultLocal = SGSL:Get(SGSL.data.slots_random_result_table):AsLocal()
 
-	if (GVars.features.dunk.rig_slot_machine) then
+	if (rig_enabled) then
 		for slots_iter = 3, 196, 1 do
-			if (slots_iter ~= 67 and slots_iter ~= 132) then
-				if (SlotsResultLocal:At(slots_iter):ReadInt() ~= 6) then
-					needs_run = true
-				end
+			if (slots_iter == 67 or slots_iter == 132) then
+				goto continue
 			end
+
+			if (SlotsResultLocal:At(slots_iter):ReadInt() ~= 6) then
+				needs_run = true
+			end
+
+			::continue::
 		end
 	else
 		local sum = 0
@@ -358,15 +358,19 @@ function CasinoPacino:RigSlotMachine()
 	end
 
 	for slots_iter = 3, 196, 1 do
-		if (slots_iter ~= 67 and slots_iter ~= 132) then
-			local slot_result = 6
-			if (not GVars.features.dunk.rig_slot_machine) then
-				math.randomseed(os.time() + slots_iter)
-				slot_result = math.random(0, 7)
-			end
-
-			SlotsResultLocal:At(slots_iter):WriteInt(slot_result)
+		if (slots_iter == 67 or slots_iter == 132) then
+			goto continue
 		end
+
+		local slot_result = 6
+		if (not rig_enabled) then
+			math.randomseed(os.time() + slots_iter)
+			slot_result = math.random(0, 7)
+		end
+
+		SlotsResultLocal:At(slots_iter):WriteInt(slot_result)
+
+		::continue::
 	end
 end
 
@@ -407,8 +411,7 @@ function CasinoPacino:GetCooldownString()
 	local chipswon_gd   = stats.get_int("MPPLY_CASINO_CHIPS_WON_GD")
 	local max_chip_wins = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_DAILY")
 
-	return
-		(chipswon_gd >= max_chip_wins)
+	return (chipswon_gd >= max_chip_wins)
 		and _F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left)
 		or _T("CP_COOLDOWN_BYPASS_STATUS_OFF")
 end
@@ -428,38 +431,35 @@ function CasinoPacino:GetBJDealerCard()
 	local blackjack_table              = locals.get_int("blackjack",
 		blackjack_table_players
 		+ 1
-		+ (LocalPlayer:GetPlayerID() * blackjack_table_players_size)
+		+ (LocalPlayer:GetID() * blackjack_table_players_size)
 		+ 4
 	)
 
-	if (blackjack_table ~= -1) then
-		local dealers_card = locals.get_int("blackjack",
-			blackjack_cards
-			+ blackjack_decks
-			+ 1
-			+ (blackjack_table * 13)
-			+ 1
-		)
-		return self:GetCardNameFromIndex(dealers_card)
-	else
+	if (blackjack_table == -1) then
 		return _T("CP_NOT_PLAYING_BLACKJACK")
 	end
+
+	local dealers_card = locals.get_int("blackjack",
+		blackjack_cards
+		+ blackjack_decks
+		+ 1
+		+ (blackjack_table * 13)
+		+ 1
+	)
+	return self:GetCardNameFromIndex(dealers_card)
 end
 
 function CasinoPacino:SetCartAutoGrab()
-	if (not GVars.features.dunk.ch_cart_autograb) then
-		return
-	end
+	local FMMC_OBJ     = SGSL:Get(SGSL.data.fm_mission_controller_cart_grab)
+	local SceneLocal   = FMMC_OBJ:AsLocal()
+	local PlaybackRate = FMMC_OBJ:GetOffset(1)
+	local SceneState   = SceneLocal:ReadInt()
 
-	local fmmc_obj    = SGSL:Get(SGSL.data.fm_mission_controller_cart_grab)
-	local fmmc_cg     = fmmc_obj:AsLocal()
-	local fmmc_cg_spd = fmmc_obj:GetOffset(1)
-
-	if (fmmc_cg:ReadInt() == 3) then
-		fmmc_cg:WriteInt(4)
-	elseif (fmmc_cg:ReadInt() == 4) then
-		if (fmmc_cg:At(fmmc_cg_spd):ReadFloat() < 2.0) then
-			fmmc_cg:At(fmmc_cg_spd):WriteFloat(2.0)
+	if (SceneState == 3) then
+		SceneLocal:WriteInt(4)
+	elseif (SceneState == 4) then
+		if (SceneLocal:At(PlaybackRate):ReadFloat() < 2.0) then
+			SceneLocal:At(PlaybackRate):WriteFloat(2.0)
 		end
 	end
 end
@@ -492,9 +492,9 @@ function CasinoPacino:Main()
 	self:RigSlotMachine()
 	self:AutoPlaySlots()
 
-	if (script.is_active("fm_mission_controller")) then
+	if (script.is_active("fm_mission_controller") and GVars.features.dunk.ch_cart_autograb) then
 		self:SetCartAutoGrab()
 	end
 end
 
-return CasinoPacino
+return CasinoPacino:init()

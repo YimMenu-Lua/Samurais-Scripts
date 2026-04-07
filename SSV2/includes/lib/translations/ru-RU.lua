@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "Это ничего не даст, если анимация зациклена.",
 	["YAV3_FLAGS_ALTERNATIVE_FP_ANIM"] = "Альтернативная анимация от первого лица",
 	["YAV3_FLAGS_USE_FULL_BLENDING"] = "Используйте полное смешивание",
-	["YAV3_FLAGS_PROCESS_ATTACHMENTS"] = "Вложения процесса"
+	["YAV3_FLAGS_PROCESS_ATTACHMENTS"] = "Вложения процесса",
+	["GENERIC_SCRIPT_CONTROL"] = "Попытка взять под контроль сценарий",
+	["GENERIC_RESET_ALL"] = "Сбросить все"
 }

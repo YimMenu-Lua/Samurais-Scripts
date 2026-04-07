@@ -824,5 +824,7 @@ return {
 	["YAV3_FLAGS_TURN_OFF_COLLISION"] = "Deshabilitar colisión",
 	["YAV3_FLAGS_PROCESS_ATTACHMENTS"] = "Adjuntos de proceso",
 	["YAV3_FLAGS_USE_FULL_BLENDING"] = "Usar fusión completa",
-	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "Esto no hará nada si la animación se repite."
+	["YAV3_FLAGS_DEAD_POSE_LOOPED_TT"] = "Esto no hará nada si la animación se repite.",
+	["GENERIC_SCRIPT_CONTROL"] = "Intentando tomar el control del guión.",
+	["GENERIC_RESET_ALL"] = "Restablecer todo"
 }
