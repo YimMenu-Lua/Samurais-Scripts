@@ -805,9 +805,9 @@ end
 ---@param seen? table
 function table.serialize(tbl, indent, key_order, seen)
 	indent = indent or 2
-	seen = seen or {}
+	seen   = seen or {}
 
-	if seen[tbl] then
+	if (seen[tbl]) then
 		return '"<circular reference>"'
 	end
 
@@ -817,47 +817,40 @@ function table.serialize(tbl, indent, key_order, seen)
 		return string.rep(" ", level)
 	end
 
-	local is_array = #tbl > 0
-	local pieces = {}
-
-	local function is_empty_table(t)
-		return type(t) == "table" and next(t) == nil
-	end
-
 	local function serialize_value(v, depth)
-		if (type(v) == "string") then
-			return string.format("%q", v)
-		elseif (type(v) == "number" or type(v) == "boolean" or type(v) == "function") then
+		local __type = type(v)
+		if (__type == "string") then
+			return _F("%q", v)
+		elseif (__type == "number" or __type == "boolean" or __type == "function") then
 			return tostring(v)
-		elseif (type(v) == "table") then
-			if is_empty_table(v) then
+		elseif (__type == "table") then
+			if (table.is_empty(v)) then
 				return "{}"
-			elseif seen[v] then
+			elseif (seen[v]) then
 				return "<circular reference>"
 			else
 				return table.serialize(v, depth, key_order, seen)
 			end
-		elseif (getmetatable(v) and v.__type) then
-			return tostring(v.__type)
-		elseif (type(v) == "userdata") then
+		elseif (__type == "userdata" or (getmetatable(v) and v.__type)) then
 			if (v.rip and v.get_address) then
-				return string.format("<pointer@0x%X>", v:get_address())
+				return _F("<pointer@0x%X>", v:get_address())
 			end
-			return "<userdata>"
+			return tostring(v)
 		end
 		return "<unsupported>"
 	end
 
+	local is_array, size = table.is_array(tbl)
+	local keys           = {}
+	local pieces         = {}
 	table.insert(pieces, "{\n")
 
-	local keys = {}
-
-	if is_array then
-		for i = 1, #tbl do
+	if (is_array) then
+		for i = 1, size do
 			table.insert(keys, i)
 		end
 	else
-		if key_order then
+		if (key_order) then
 			for _, k in ipairs(key_order) do
 				if tbl[k] ~= nil then
 					table.insert(keys, k)
@@ -881,7 +874,7 @@ function table.serialize(tbl, indent, key_order, seen)
 	end
 
 	for _, k in ipairs(keys) do
-		local v = tbl[k]
+		local v   = tbl[k]
 		local ind = get_indent(indent + 1)
 
 		if is_array then
@@ -923,9 +916,18 @@ function table.getlen(t)
 	return count
 end
 
----@return boolean
+---@param t table
+---@return boolean, integer size
 function table.is_array(t)
-	return #t > 0
+	local size = #t
+	return size > 0, size
+end
+
+---@param t table
+---@return boolean
+function table.is_empty(t)
+	local is_array, size = table.is_array(t)
+	return is_array and size == 0 or next(t) == nil
 end
 
 -- Calculates an estimate of a table's size in memory.
@@ -1217,9 +1219,9 @@ end
 ---@return boolean, integer -- success/failure and count of removed items
 function table.erase_if(t, pred)
 	local count = 0
-
-	if (table.is_array(t)) then
-		for i = #t, 1, -1 do
+	local is_array, size = table.is_array(t)
+	if (is_array) then
+		for i = size, 1, -1 do
 			if pred(i, t[i]) then
 				table.remove(t, i)
 				count = count + 1
@@ -1737,24 +1739,24 @@ function math.smooth_step(x)
 	return x * x * (3 - 2 * x)
 end
 
----@return int32_t
+---@return -2147483648
 function math.int32_min()
-	return -2 ^ 31
+	return -2147483648
 end
 
----@return int32_t
+---@return 2147483647
 function math.int32_max()
-	return 2 ^ 31
+	return 2147483647
 end
 
----@return uint32_t
+---@return 0
 function math.uint32_min()
 	return 0
 end
 
----@return uint32_t
+---@return 4294967295
 function math.uint32_max()
-	return 2 ^ 32
+	return 4294967295
 end
 
 --#endregion

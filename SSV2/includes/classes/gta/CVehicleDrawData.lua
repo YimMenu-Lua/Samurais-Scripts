@@ -8,7 +8,6 @@
 
 
 local CStructView = require("includes.classes.gta.CStructView")
-local fwDrawData  = require("includes.classes.gta.fwDrawData")
 
 
 --------------------------------------

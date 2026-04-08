@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+-- `uint32_t`
 ---@enum eVehicleHandlingFlags
 -- https://forge.plebmasters.de/vehicleflags?category=DrivingStyleFlags
 local eVehicleHandlingFlags <const> = {

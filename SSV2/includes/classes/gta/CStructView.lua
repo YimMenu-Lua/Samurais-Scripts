@@ -12,8 +12,8 @@
 ---@class CStructBase<T>
 ---@field protected m_ptr pointer
 ---@field private m_size integer
----@field private __type string
 ---@field private __ptr_ctor true
+---@field public __type string
 ---@field public new fun(...): T
 ---@field public IsValid fun(self: T): boolean
 ---@field public GetPointer fun(self: T): pointer

@@ -7,29 +7,19 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local atArray             = require("includes.classes.gta.atArray")
-local CCarHandlingData    = require("includes.classes.gta.CCarHandlingData")
-local CBikeHandlingData   = require("includes.classes.gta.CBikeHandlingData")
-local CEntity             = require("includes.classes.gta.CEntity")
-local CFlyingHandlingData = require("includes.classes.gta.CFlyingHandlingData")
-local CVehicleDrawData    = require("includes.classes.gta.CVehicleDrawData")
-local CWheel              = require("includes.classes.gta.CWheel")
-local fMatrix44           = require("includes.classes.gta.fMatrix44")
-local phFragInst          = require("includes.classes.gta.phFragInst")
+local atArray           = require("includes.classes.gta.atArray")
+local CHandlingData     = require("includes.classes.gta.CHandlingData")
+local CEntity           = require("includes.classes.gta.CEntity")
+local CVehicleDrawData  = require("includes.classes.gta.CVehicleDrawData")
+local CVehicleModelInfo = require("includes.classes.gta.CVehicleModelInfo")
+local CWheel            = require("includes.classes.gta.CWheel")
+local fMatrix44         = require("includes.classes.gta.fMatrix44")
+local phFragInst        = require("includes.classes.gta.phFragInst")
+local CCarHandlingData  = require("includes.classes.gta.CCarHandlingData")
 
 
 ---@class CAdvancedData
----@class CVehicleModelInfo
 ---@class CVehicleDamage
----@class CHandlingData
----@class CVehicleModelInfoLayout
-
-
-local SubHandlingCtorMap <const> = {
-	[Enums.eHandlingType.CAR]    = function(ptr) return CCarHandlingData.new(ptr) end,
-	[Enums.eHandlingType.BIKE]   = function(ptr) return CBikeHandlingData.new(ptr) end,
-	[Enums.eHandlingType.FLYING] = function(ptr) return CFlyingHandlingData.new(ptr) end,
-}
 
 
 --------------------------------------
@@ -40,12 +30,10 @@ local SubHandlingCtorMap <const> = {
 ---@field protected m_ptr pointer
 ---@field public m_physics_fragments phFragInst //0x30 `struct rage::phFragInst`
 ---@field public m_draw_data CVehicleDrawData
----@field public m_handling_data pointer<CHandlingData>
----@field public m_model_info pointer<CVehicleModelInfo>
+---@field public m_handling_data CHandlingData
+---@field public m_model_info CVehicleModelInfo
 ---@field public m_vehicle_damage pointer<CVehicleDamage>
----@field public m_sub_handling_data atArray<CBaseSubHandlingData> `rage::atArray`
 ---@field public m_car_handling_data pointer<CCarHandlingData>?
----@field public m_model_info_layout pointer<CVehicleModelInfoLayout>
 ---@field public m_can_boost_jump pointer<byte> `bool`
 ---@field public m_velocity pointer<vec3>
 ---@field public m_deform_god pointer<uint8_t>
@@ -58,29 +46,6 @@ local SubHandlingCtorMap <const> = {
 ---@field public m_current_steering pointer<float> 0xDC // actual wheel steer. Wr'll use it to rewrite last known wheel steer after exiting a vehicle in IV-Style Exit so we'll no longer need to teleport outside or patch CTaskVehicleExit
 ---@field public m_is_targetable pointer<byte> `bool`
 ---@field public m_door_lock_status pointer<uint32_t>
----@field public m_model_info_flags pointer<uint32_t>
----@field public m_mass pointer<float> -- 0x000C
----@field public m_initial_drag_coeff pointer<float>
----@field public m_drive_bias_rear pointer<float>
----@field public m_drive_bias_front pointer<float>
----@field public m_acceleration pointer<float>
----@field public m_initial_drive_gears pointer<uint8_t>
----@field public m_initial_drive_force pointer<float>
----@field public m_drive_max_flat_velocity pointer<float>
----@field public m_initial_drive_max_flat_vel pointer<float>
----@field public m_steering_lock pointer<float>
----@field public m_steering_lock_ratio pointer<float>
----@field public m_traction_curve_max pointer<float>
----@field public m_low_speed_traction_loss_mult pointer<float> -- 0x00A8
----@field public m_traction_loss_mult pointer<float> -- 0x00B8
----@field public m_monetary_value pointer<uint32_t>
----@field public m_model_flags pointer<uint32_t>
----@field public m_handling_flags pointer<uint32_t>
----@field public m_damage_flags pointer<uint32_t>
----@field public m_deform_mult pointer<float>
----@field public m_wheel_scale pointer<float>
----@field public m_wheel_scale_rear pointer<float>
----@field public m_throttle pointer<float> // 0x8D8
 ---@field public m_wheels atArray<CWheel> -- 0xC30
 ---@field public m_num_wheels number -- 0xC38
 ---@field public m_ride_height pointer<float>
@@ -100,106 +65,67 @@ function CVehicle:init(vehicle)
 	local instance = setmetatable({}, CVehicle)
 	instance:super().init(instance, vehicle)
 
-	local ptr                               = memory.handle_to_ptr(vehicle)
-	instance.m_ptr                          = ptr
-	instance.m_model_info                   = ptr:add(0x20):deref()
-	instance.m_vehicle_damage               = ptr:add(0x0420)
-	instance.m_handling_data                = ptr:add(0x0960):deref()
-	instance.m_sub_handling_data            = atArray(instance.m_handling_data:add(0x158), CCarHandlingData)
-	instance.m_model_info_layout            = instance.m_model_info:add(0x00B0):deref()
-	instance.m_physics_fragments            = phFragInst(ptr:add(0x0030):deref())
-	instance.m_draw_data                    = CVehicleDrawData(ptr:add(0x0048):deref())
-	instance.m_can_boost_jump               = ptr:add(0x03A4)
-	instance.m_velocity                     = ptr:add(0x07D0)
-	instance.m_deform_god                   = ptr:add(0x096C)
-	instance.m_is_targetable                = ptr:add(0x0AEE)
-	instance.m_door_lock_status             = ptr:add(0x13D0)
-	instance.m_water_damage                 = ptr:add(0x00D8)
-	instance.m_next_gear                    = ptr:add(0x0880)
-	instance.m_current_gear                 = ptr:add(0x0882)
-	instance.m_top_gear                     = ptr:add(0x0886)
-	instance.m_engine_health                = ptr:add(0x0910)
-	instance.m_steering_input               = ptr:add(0x09D4)
-	instance.m_current_steering             = ptr:add(0x09DC)
-	instance.m_model_info_flags             = instance.m_model_info:add(0x057C)
-	instance.m_mass                         = instance.m_handling_data:add(0x000C)
-	instance.m_initial_drag_coeff           = instance.m_handling_data:add(0x0010)
-	instance.m_drive_bias_rear              = instance.m_handling_data:add(0x0044)
-	instance.m_drive_bias_front             = instance.m_handling_data:add(0x0048)
-	instance.m_acceleration                 = instance.m_handling_data:add(0x004C)
-	instance.m_initial_drive_gears          = instance.m_handling_data:add(0x0050)
-	instance.m_initial_drive_force          = instance.m_handling_data:add(0x0060)
-	instance.m_drive_max_flat_velocity      = instance.m_handling_data:add(0x0064)
-	instance.m_initial_drive_max_flat_vel   = instance.m_handling_data:add(0x0068)
-	instance.m_steering_lock                = instance.m_handling_data:add(0x0080)
-	instance.m_steering_lock_ratio          = instance.m_handling_data:add(0x0084)
-	instance.m_traction_curve_max           = instance.m_handling_data:add(0x0088)
-	instance.m_low_speed_traction_loss_mult = instance.m_handling_data:add(0x00A8)
-	instance.m_traction_loss_mult           = instance.m_handling_data:add(0x00B8)
-	instance.m_deform_mult                  = instance.m_handling_data:add(0x00F8)
-	instance.m_monetary_value               = instance.m_handling_data:add(0x0118)
-	instance.m_model_flags                  = instance.m_handling_data:add(0x0124)
-	instance.m_handling_flags               = instance.m_handling_data:add(0x0128)
-	instance.m_damage_flags                 = instance.m_handling_data:add(0x012C)
-	instance.m_wheel_scale                  = instance.m_model_info:add(0x048C)
-	instance.m_wheel_scale_rear             = instance.m_model_info:add(0x0490)
-	instance.m_throttle                     = instance.m_model_info:add(0x08D8)
-	instance.m_wheels                       = atArray(ptr:add(0x0C30), CWheel)
-	instance.m_num_wheels                   = ptr:add(0x0C38):get_int()
-	instance.m_ride_height                  = ptr:add(0x0C30):deref():add(0x07C)
+	local ptr                    = memory.handle_to_ptr(vehicle)
+	instance.m_ptr               = ptr
+	instance.m_model_info        = CVehicleModelInfo(ptr:add(0x20):deref())
+	instance.m_vehicle_damage    = ptr:add(0x0420)
+	instance.m_handling_data     = CHandlingData(ptr:add(0x0960):deref())
+	instance.m_physics_fragments = phFragInst(ptr:add(0x0030):deref())
+	instance.m_draw_data         = CVehicleDrawData(ptr:add(0x0048):deref())
+	instance.m_can_boost_jump    = ptr:add(0x03A4)
+	instance.m_velocity          = ptr:add(0x07D0)
+	instance.m_deform_god        = ptr:add(0x096C)
+	instance.m_is_targetable     = ptr:add(0x0AEE)
+	instance.m_door_lock_status  = ptr:add(0x13D0)
+	instance.m_water_damage      = ptr:add(0x00D8)
+	instance.m_next_gear         = ptr:add(0x0880)
+	instance.m_current_gear      = ptr:add(0x0882)
+	instance.m_top_gear          = ptr:add(0x0886)
+	instance.m_engine_health     = ptr:add(0x0910)
+	instance.m_steering_input    = ptr:add(0x09D4)
+	instance.m_current_steering  = ptr:add(0x09DC)
+
+	local array_ptr              = ptr:add(0x0C30)
+	instance.m_wheels            = atArray(array_ptr, CWheel)
+	instance.m_num_wheels        = array_ptr:add(0x8):get_int()
+	instance.m_ride_height       = array_ptr:deref():add(0x007C)
 
 	return instance
+end
+
+---@return eVehicleType
+function CVehicle:GetVehicleType()
+	return self:__safecall(Enums.eVehicleType.VEHICLE_TYPE_NONE, function()
+		return self.m_model_info:GetVehicleType()
+	end)
 end
 
 ---@return float
 function CVehicle:GetAcceleration()
 	return self:__safecall(0, function()
-		return self.m_acceleration:get_float()
-	end)
-end
-
----@param value float
----@return boolean
-function CVehicle:SetAcceleration(value)
-	return self:__safecall(false, function()
-		self.m_acceleration:set_float(value)
-		return true
+		return self.m_handling_data:GetAcceleration()
 	end)
 end
 
 ---@return float
 function CVehicle:GetDeformMultiplier()
-	return self:__safecall(0, function()
-		return self.m_deform_mult:get_float()
+	return self:__safecall(0.0, function()
+		return self.m_handling_data:GetDeformMultiplier()
 	end)
 end
 
----@param value float
----@return boolean
-function CVehicle:SetDeformMultiplier(value)
-	return self:__safecall(false, function()
-		self.m_deform_mult:set_float(value)
-		return true
-	end)
-end
+-- ---@param handlingType eHandlingType
+-- ---@return CCarHandlingData|CBikeHandlingData|CFlyingHandlingData|any
+-- function CVehicle:GetSubHandlingData(handlingType)
+-- 	return self:__safecall(nil, function()
+-- 		return self.m_handling_data:GetSubHandlingData(handlingType)
+-- 	end)
+-- end
 
----@param handlingType eHandlingType
----@return CCarHandlingData|CBikeHandlingData|CFlyingHandlingData|any
-function CVehicle:GetSubHandlingData(handlingType)
+---@return pointer<(CCarHandlingData|CBikeHandlingData|CFlyingHandlingData)?>
+function CVehicle:GetSubHandlingData()
 	return self:__safecall(nil, function()
-		local array = self.m_sub_handling_data
-		for i = 1, array:Size() do
-			local sub_ptr = array:At(i)
-			if (sub_ptr:is_valid()) then
-				-- local base = CBaseSubHandlingData.new(sub_ptr)
-				-- if (base and base:GetHandlingType() == handlingType) then
-				local func = SubHandlingCtorMap[handlingType]
-				return func and func(sub_ptr) or nil
-				-- return func and func(sub_ptr) or base
-				-- end
-			end
-		end
-		return nil
+		return self.m_handling_data:GetSubHandlingData()
 	end)
 end
 
@@ -207,43 +133,15 @@ end
 ---@return boolean
 function CVehicle:GetHandlingFlag(flag)
 	return self:__safecall(false, function()
-		if (type(flag) ~= "number" or self.m_handling_flags:is_null()) then
-			return false
-		end
-
-		local dword_flags = self.m_handling_flags:get_dword()
-		return Bit.IsBitSet(dword_flags, flag)
+		return self.m_handling_data:GetHandlingFlag(flag)
 	end)
-end
-
----@param flag eVehicleHandlingFlags
----@param toggle boolean
-function CVehicle:SetHandlingFlag(flag, toggle)
-	if (not self:IsValid() or type(flag) ~= "number" or type(toggle) ~= "boolean") then
-		return
-	end
-
-	if (self.m_handling_flags:is_null()) then
-		return
-	end
-
-	local dword_flags = self.m_handling_flags:get_dword()
-	local Bitwise     = toggle and Bit.Set or Bit.Clear
-	local new_flags   = Bitwise(dword_flags, flag)
-
-	self.m_handling_flags:set_dword(new_flags)
 end
 
 ---@param flag eVehicleModelFlags
 ---@return boolean
 function CVehicle:GetModelFlag(flag)
 	return self:__safecall(false, function()
-		if (type(flag) ~= "number" or self.m_model_flags:is_null()) then
-			return false
-		end
-
-		local dword_flags = self.m_model_flags:get_dword()
-		return Bit.IsBitSet(dword_flags, flag)
+		return self.m_handling_data:GetModelFlag(flag)
 	end)
 end
 
@@ -251,54 +149,64 @@ end
 ---@return boolean
 function CVehicle:GetModelInfoFlag(flag)
 	return self:__safecall(false, function()
-		if (not self.m_model_info_flags:is_valid()) then
-			return false
-		end
+		return self.m_model_info:GetModelInfoFlag(flag)
+	end)
+end
 
-		local index    = math.floor(flag / 32)
-		local bit_pos  = flag % 32
-		local flag_ptr = self.m_model_info_flags:add(index * 4)
-		if (flag_ptr:is_null()) then
-			return false
-		end
+---@param flag eVehicleAdvancedFlags
+---@return boolean
+function CVehicle:GetAdvancedFlag(flag)
+	if (not self:IsValid()) then
+		return false
+	end
 
-		local flag_bits = flag_ptr:get_dword()
-		return Bit.IsBitSet(flag_bits, bit_pos)
+	if (self:GetVehicleType() ~= Enums.eVehicleType.VEHICLE_TYPE_CAR) then
+		return false
+	end
+
+	local ptr = self:GetSubHandlingData()
+	if (not ptr or ptr:is_null()) then
+		return false
+	end
+
+	---@type CCarHandlingData?
+	local cchd = CCarHandlingData(ptr)
+	if (not cchd or not cchd:IsValid()) then
+		return false
+	end
+
+	local dword_flags = cchd.m_advanced_flags:get_dword()
+	return Bit.IsBitSet(dword_flags, flag)
+end
+
+---@param flag eVehicleHandlingFlags
+---@param toggle boolean
+function CVehicle:SetHandlingFlag(flag, toggle)
+	return self:__safecall(false, function()
+		return self.m_handling_data:SetHandlingFlag(flag, toggle)
+	end)
+end
+
+---@param value float
+---@return boolean
+function CVehicle:SetAcceleration(value)
+	return self:__safecall(false, function()
+		return self.m_handling_data:SetAcceleration(value)
+	end)
+end
+
+---@param value float
+---@return boolean
+function CVehicle:SetDeformMultiplier(value)
+	return self:__safecall(false, function()
+		return self.m_handling_data:SetDeformMultiplier(value)
 	end)
 end
 
 ---@param flag eVehicleModelInfoFlags
 ---@param toggle boolean
 function CVehicle:SetModelInfoFlag(flag, toggle)
-	if (not self:IsValid()) then
-		return
-	end
-
-	local index    = math.floor(flag / 32)
-	local bit_pos  = flag % 32
-	local flag_ptr = self.m_model_info_flags:add(index * 4)
-	if (flag_ptr:is_null()) then
-		return
-	end
-
-	local flag_bits = flag_ptr:get_dword()
-	local Bitwise   = toggle and Bit.Set or Bit.Clear
-	local new_bits  = Bitwise(flag_bits, bit_pos)
-	flag_ptr:set_dword(new_bits)
-end
-
----@param flag eVehicleAdvancedFlags
----@return boolean
-function CVehicle:GetAdvancedFlag(flag)
-	return self:__safecall(false, function()
-		local cchd = self:GetSubHandlingData(Enums.eHandlingType.CAR)
-		if (not cchd or not cchd.m_advanced_flags or cchd.m_advanced_flags:is_null()) then
-			return false
-		end
-
-		local dword_flags = cchd.m_advanced_flags:get_dword()
-		return Bit.IsBitSet(dword_flags, flag)
-	end)
+	self.m_model_info:SetModelInfoFlag(flag, toggle)
 end
 
 ---@param flag eVehicleAdvancedFlags
@@ -308,18 +216,24 @@ function CVehicle:SetAdvancedFlag(flag, toggle)
 		return
 	end
 
-	---@type CCarHandlingData?
-	local cchd = self:GetSubHandlingData(Enums.eHandlingType.CAR)
-	if (not cchd or not cchd.m_advanced_flags or cchd.m_advanced_flags:is_null()) then
+	if (self:GetVehicleType() ~= Enums.eVehicleType.VEHICLE_TYPE_CAR) then
 		return
 	end
 
-	local ptr         = cchd.m_advanced_flags
-	local dword_flags = ptr:get_dword()
-	local Bitwise     = toggle and Bit.Set or Bit.Clear
-	local new_flags   = Bitwise(dword_flags, flag)
+	local ptr = self:GetSubHandlingData()
+	if (not ptr or ptr:is_null()) then
+		return
+	end
 
-	ptr:set_dword(new_flags)
+	---@type CCarHandlingData?
+	local cchd = CCarHandlingData(ptr)
+	if (not cchd or not cchd:IsValid()) then
+		return
+	end
+
+	local dword_flags = cchd.m_advanced_flags:get_dword()
+	local new_bits    = Bit.Toggle(dword_flags, flag, toggle)
+	cchd.m_advanced_flags:set_dword(new_bits)
 end
 
 ---@private

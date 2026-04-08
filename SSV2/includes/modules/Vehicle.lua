@@ -9,6 +9,9 @@
 
 local fMatrix44 = require("includes.classes.gta.fMatrix44")
 require("includes.modules.Entity")
+local CCarHandlingData = require("includes.classes.gta.CCarHandlingData")
+local CBikeHandlingData = require("includes.classes.gta.CBikeHandlingData")
+local CFlyingHandlingData = require("includes.classes.gta.CFlyingHandlingData")
 
 ---@enum eConvertibleRoofState
 Enums.eConvertibleRoofState = {
@@ -1324,21 +1327,24 @@ function Vehicle:SetBoneMatrix(bone_index, matrix)
 	self:Resolve():SetBoneMatrix(bone_index, matrix)
 end
 
----@return CBaseSubHandlingData|any
+---@return (CCarHandlingData|CBikeHandlingData|CFlyingHandlingData)?
 function Vehicle:GetHandlingData()
-	if (not self:IsValid()) then
-		return nil
-	end
-	local handlingType = Enums.eHandlingType.CAR
+	if (not self:IsValid()) then return end
 
 	-- this is bad but whatever
-	if (self:IsBike()) then
-		handlingType = Enums.eHandlingType.BIKE
-	elseif self:IsPlane() or self:IsHeli() then
-		handlingType = Enums.eHandlingType.FLYING
+	local base
+	local ptr = self:Resolve():GetSubHandlingData()
+	if (self:IsCar()) then
+		base = CCarHandlingData
+	elseif (self:IsBike()) then
+		base = CBikeHandlingData
+	elseif (self:IsPlane() or self:IsHeli()) then
+		base = CFlyingHandlingData
 	end
 
-	return self:Resolve():GetSubHandlingData(handlingType)
+	if (not base) then return end
+
+	return base(ptr)
 end
 
 ---@return integer

@@ -14,17 +14,17 @@
 ---@generic T
 ---@class atArray<T>
 ---@field protected m_ptr pointer
----@field private m_data_ptr pointer
 ---@field private m_data array<pointer_ref<T>>
 ---@field private m_size uint16_t
 ---@field private m_capacity uint16_t
 ---@field private m_data_type any
----@overload fun(address: pointer, data_type?: any): atArray
+---@field [integer] pointer_ref<T>
+---@operator len: integer
+---@overload fun(address: pointer, data_type?: optional<T>): atArray
 local atArray = {
 	__type     = "atArray",
 	__ptr_ctor = true
 }
-atArray.__index = atArray
 
 ---@diagnostic disable-next-line
 setmetatable(atArray, {
@@ -35,12 +35,11 @@ setmetatable(atArray, {
 
 ---@generic T
 ---@param ptr pointer
----@param data_type optional<T>
+---@param data_type? optional<T>
 ---@return atArray<T>
 function atArray.new(ptr, data_type)
 	local instance = setmetatable({
 		m_ptr       = ptr,
-		m_data_ptr  = nullptr,
 		m_size      = 0,
 		m_capacity  = 0,
 		m_data      = {},
@@ -48,22 +47,17 @@ function atArray.new(ptr, data_type)
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, atArray)
 
-	if (ptr:is_null()) then
-		return instance
-	end
+	if (ptr:is_null()) then return instance end
 
 	local array_size = ptr:add(0x8):get_word()
-	if (array_size == 0) then
-		return instance
-	end
+	if (array_size == 0) then return instance end
 
-	instance.m_data_ptr  = ptr:deref()
 	instance.m_size      = array_size
 	instance.m_capacity  = ptr:add(0x10):get_word()
 	instance.m_data_type = data_type
 
 	for i = 0, array_size - 1 do
-		instance.m_data[i + 1] = instance.m_data_ptr:add(i * 0x8)
+		instance.m_data[i + 1] = ptr:deref():add(i * 0x8)
 	end
 
 	return instance
@@ -71,7 +65,7 @@ end
 
 ---@return boolean
 function atArray:IsValid()
-	return self.m_ptr:is_valid() and self.m_data_ptr:is_valid()
+	return self.m_ptr:is_valid()
 end
 
 ---@return boolean
@@ -85,40 +79,19 @@ function atArray:IsEmpty()
 end
 
 function atArray:Clear()
-	self.m_ptr       = nullptr
-	self.m_data_ptr  = nullptr
-	self.m_size      = 0
-	self.m_capacity  = 0
-	self.m_data      = {}
-	self.m_data_type = nil
+	self.m_size     = 0
+	self.m_capacity = 0
+	self.m_data     = {}
 end
 
----@return pointer|nil
+---@return pointer
 function atArray:GetPointer()
-	if (not self:IsValid()) then
-		return
-	end
-
 	return self.m_ptr
-end
-
----@return pointer|nil
-function atArray:GetDataPointer()
-	if (not self:IsValid()) then
-		return
-	end
-
-	return self.m_data_ptr
 end
 
 ---@return uint64_t
 function atArray:GetAddress()
-	return self:IsValid() and self.m_ptr:get_address() or 0x0
-end
-
----@return uint64_t
-function atArray:GetDataAddress()
-	return self:IsValid() and self.m_data_ptr:get_address() or 0x0
+	return self.m_ptr:get_address()
 end
 
 ---@return string
@@ -135,7 +108,7 @@ end
 ---@return pointer<T>
 function atArray:At(i)
 	assert(math.is_inrange(i, 1, self.m_size), "[atArray]: Index out of bounds!")
-	return self.m_data[i]:deref()
+	return self.m_data[i]
 end
 
 ---@return uint16_t
@@ -148,7 +121,6 @@ function atArray:Capacity()
 	return self.m_capacity
 end
 
--- NOTE: As opposed to the `At` method, you must dereference the pointers returned by this iterator.
 ---@return fun(): integer, pointer_ref<T> Iterator
 function atArray:Iter()
 	local i = 0
@@ -176,10 +148,26 @@ end
 function atArray:__tostring()
 	local buffer = ""
 	local __type = self:GetDataType()
-	for i, data in self:Iter() do
-		buffer = buffer .. _F("\n[%d] %s* @ 0x%X>", i, __type, data:get_address())
+	for i, ptr in self:Iter() do
+		buffer = buffer .. _F("\n[%d] %s* @ 0x%X>", i, __type, ptr:get_address())
 	end
+
 	return buffer
+end
+
+---@param key any
+function atArray:__index(key)
+	if (type(key) == "number") then
+		local size = rawget(self, "m_size")
+		if (key >= 1 and key <= size) then
+			local data = rawget(self, "m_data")
+			return data[key]
+		end
+		error("[atArray]: Index out of bounds!", 2)
+	end
+
+	---@diagnostic disable-next-line: param-type-mismatch
+	return rawget(atArray, key)
 end
 
 return atArray

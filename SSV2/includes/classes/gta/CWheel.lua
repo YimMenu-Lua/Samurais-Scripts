@@ -7,74 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CStructView        = require("includes.classes.gta.CStructView")
-local VEC3_ZERO <const>  = vec3:zero()
-
----@enum eWheelDynamicFlags
-Enums.eWheelDynamicFlags = {
-	HIT                       = 0,
-	HIT_PREV                  = 1,
-	ON_GAS                    = 2,
-	ON_FIRE                   = 3,
-	CHEAT_TC                  = 4,
-	CHEAT_SC                  = 5,
-	CHEAT_GRIP1               = 6,
-	CHEAT_GRIP2               = 7,
-	BURNOUT                   = 8,
-	BURNOUT_NON_DRIVEN_WHEEL  = 9,
-	INSHALLOWWATER            = 10,
-	INDEEPWATER               = 11,
-	TYRES_HEAT_UP             = 12,
-	ABS_ACTIVE                = 13,
-	ABS                       = 14,
-	ABS_ALT                   = 15,
-	SQUASHING_PED             = 16,
-	REDUCE_GRIP               = 17,
-	TELEPORTED_NO_VFX         = 18,
-	RESET                     = 19,
-	BROKEN_OFF                = 20,
-	FULL_THROTTLE             = 21,
-	SIDE_IMPACT               = 22,
-	DUMMY_TRANSITION          = 23,
-	DUMMY_TRANSITION_PREV     = 24,
-	NO_LATERAL_SPRING         = 25,
-	WITHIN_DAMAGE_REGION      = 26,
-	WITHIN_HEAVYDAMAGE_REGION = 27,
-	TOUCHING_PAVEMENT         = 28,
-	DUMMY                     = 29,
-	FORCE_NO_SLEEP            = 30,
-	SLEEPING_ON_DEBRIS        = 31
-}
-
----@enum eWheelConfigFlags
-Enums.eWheelConfigFlags  = {
-	BIKE_WHEEL                   = 0,
-	LEFTWHEEL                    = 1,
-	REARWHEEL                    = 2,
-	STEER                        = 3, -- this can be used to immediately render steering when changing steering mode in the handling editor. We need to refactor handling editor to reflect vehicle memory instead of runtime bools
-	POWERED                      = 4,
-	TILT_INDEP                   = 5,
-	TILT_SOLID                   = 6,
-	BIKE_CONSTRAINED_COLLIDER    = 7,
-	BIKE_FALLEN_COLLIDER         = 8,
-	INSTANCED                    = 9,
-	DONT_RENDER_STEER            = 10,
-	UPDATE_SUSPENSION            = 11,
-	QUAD_WHEEL                   = 12,
-	HIGH_FRICTION_WHEEL          = 13,
-	DONT_REDUCE_GRIP_ON_BURNOUT  = 14,
-	IS_PHYSICAL                  = 15,
-	BICYCLE_WHEEL                = 16,
-	TRACKED_WHEEL                = 17,
-	PLANE_WHEEL                  = 18,
-	DONT_RENDER_HUB              = 19,
-	SPOILER                      = 20, -- vehicle has a spoiler mod (increased grip)
-	ROTATE_BOUNDS                = 21,
-	EXTEND_ON_UPDATE_SUSPENSION  = 22, -- force wheels to extend on suspension update
-	CENTRE_WHEEL                 = 23, -- for three wheeled cars
-	AMPHIBIOUS_WHEEL             = 24,
-	RENDER_WITH_ZERO_COMPRESSION = 25
-}
+local CStructView       = require("includes.classes.gta.CStructView")
+local VEC3_ZERO <const> = vec3:zero()
 
 
 --------------------------------------
@@ -248,8 +182,8 @@ end
 function CWheel:SetDynamicFlag(flag, toggle)
 	return self:__safecall(false, function()
 		local dwFlags = self.m_wheel_flags:get_dword()
-		local bitFunc = toggle and Bit.Set or Bit.Clear
-		self.m_wheel_flags:set_dword(bitFunc(dwFlags, flag))
+		local newBits = Bit.Toggle(dwFlags, flag, toggle)
+		self.m_wheel_flags:set_dword(newBits)
 		return true
 	end)
 end
@@ -260,20 +194,20 @@ end
 function CWheel:SetConfigFlag(flag, toggle)
 	return self:__safecall(false, function()
 		local dwFlags = self.m_wheel_config_flags:get_dword()
-		local bitFunc = toggle and Bit.Set or Bit.Clear
-		self.m_wheel_config_flags:set_dword(bitFunc(dwFlags, flag))
+		local newBits = Bit.Toggle(dwFlags, flag, toggle)
+		self.m_wheel_config_flags:set_dword(newBits)
 		return true
 	end)
 end
 
 ---@return boolean
 function CWheel:IsLeftWheel()
-	return self:GetConfigFlag(Enums.eWheelConfigFlags.LEFTWHEEL)
+	return self:GetConfigFlag(Enums.eWheelConfigFlags.LEFT_WHEEL)
 end
 
 ---@return boolean
 function CWheel:IsRearWheel()
-	return self:GetConfigFlag(Enums.eWheelConfigFlags.REARWHEEL)
+	return self:GetConfigFlag(Enums.eWheelConfigFlags.REAR_WHEEL)
 end
 
 return CWheel

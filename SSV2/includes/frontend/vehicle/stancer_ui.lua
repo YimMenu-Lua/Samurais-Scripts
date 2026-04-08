@@ -7,13 +7,14 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local PV                   = LocalPlayer:GetVehicle()
-local Stancer              = PV.m_stance_mgr
-local frontStanceDeltas    = Stancer.m_deltas[Stancer.eWheelSide.FRONT]
-local backStanceDeltas     = Stancer.m_deltas[Stancer.eWheelSide.BACK]
-local selected_saved_model = 0
-local saved_vehs_window    = { should_draw = false }
-local ref <const>          = {
+local PV                  = LocalPlayer:GetVehicle()
+local Stancer             = PV.m_stance_mgr
+local frontStanceDeltas   = Stancer.m_deltas[Enums.eWheelAxle.FRONT]
+local backStanceDeltas    = Stancer.m_deltas[Enums.eWheelAxle.REAR]
+local selectedSavedModel  = 0
+local physicsThreadSignal = nil
+local savedVehsWindow     = { should_draw = false }
+local DeltaRef <const>    = {
 	m_camber      = {
 		label = "VEH_STANCE_CAMBER",
 		fmt   = "%.2f°",
@@ -29,8 +30,8 @@ local ref <const>          = {
 	m_susp_comp   = {
 		label = "VEH_STANCE_SUSP_COMP",
 		fmt   = "%.2f",
-		min   = function() return -Stancer.m_base_values[Stancer.eWheelSide.FRONT].m_susp_comp + 0.1 end,
-		max   = function() return Stancer.m_base_values[Stancer.eWheelSide.FRONT].m_susp_comp - 0.1 end,
+		min   = function() return -Stancer.m_base_values[Enums.eWheelAxle.FRONT].m_susp_comp + 0.1 end,
+		max   = function() return Stancer.m_base_values[Enums.eWheelAxle.FRONT].m_susp_comp - 0.1 end,
 	},
 	m_wheel_width = {
 		label         = "VEH_STANCE_WHEEL_WIDTH",
@@ -61,11 +62,16 @@ local function OnSuspensionReset()
 end
 
 local function UpdatePhysics()
+	if (physicsThreadSignal) then
+		return
+	end
+
+	physicsThreadSignal = 1
 	ThreadManager:Run(function()
-		if (not PV:IsValid()) then
-			return
+		if (PV:IsValid() and PV:IsStopped()) then
+			PV:ActivetePhysics()
 		end
-		PHYSICS.ACTIVATE_PHYSICS(PV:GetHandle())
+		physicsThreadSignal = nil
 	end)
 end
 
@@ -101,7 +107,7 @@ end
 ---@param side integer
 ---@param needsPhysicsUpdate? boolean
 local function DrawSlider(key, deltaTable, side, needsPhysicsUpdate)
-	local meta     = ref[key]
+	local meta     = DeltaRef[key]
 	local label    = _F("%s##%d", _T(meta.label), side)
 	local disabled = (meta.drawdata_only and not Stancer:CanApplyDrawData())
 	if (disabled) then
@@ -156,17 +162,17 @@ return function()
 	end
 
 	ImGui.SeparatorText(_T("VEH_STANCE_FRONT_AXLE"))
-	DrawSlider("m_camber", frontStanceDeltas, Stancer.eWheelSide.FRONT)
-	DrawSlider("m_track_width", frontStanceDeltas, Stancer.eWheelSide.FRONT)
+	DrawSlider("m_camber", frontStanceDeltas, Enums.eWheelAxle.FRONT)
+	DrawSlider("m_track_width", frontStanceDeltas, Enums.eWheelAxle.FRONT)
 	ImGui.BeginDisabled(Stancer.m_bounce_mode.enabled)
-	DrawSlider("m_susp_comp", frontStanceDeltas, Stancer.eWheelSide.FRONT, true)
+	DrawSlider("m_susp_comp", frontStanceDeltas, Enums.eWheelAxle.FRONT, true)
 	ImGui.EndDisabled()
 
 	ImGui.SeparatorText(_T("VEH_STANCE_REAR_AXLE"))
-	DrawSlider("m_camber", backStanceDeltas, Stancer.eWheelSide.BACK)
-	DrawSlider("m_track_width", backStanceDeltas, Stancer.eWheelSide.BACK)
+	DrawSlider("m_camber", backStanceDeltas, Enums.eWheelAxle.REAR)
+	DrawSlider("m_track_width", backStanceDeltas, Enums.eWheelAxle.REAR)
 	ImGui.BeginDisabled(Stancer.m_bounce_mode.enabled)
-	DrawSlider("m_susp_comp", backStanceDeltas, Stancer.eWheelSide.BACK, true)
+	DrawSlider("m_susp_comp", backStanceDeltas, Enums.eWheelAxle.REAR, true)
 	ImGui.EndDisabled()
 
 	ImGui.Spacing()
@@ -201,15 +207,15 @@ return function()
 	ImGui.Text(_T("VEH_STANCE_RIDE_HEIGHT"))
 	ImGui.EndDisabled()
 
-	DrawSlider("m_wheel_width", frontStanceDeltas, Stancer.eWheelSide.FRONT)
-	DrawSlider("m_wheel_size", frontStanceDeltas, Stancer.eWheelSide.FRONT)
+	DrawSlider("m_wheel_width", frontStanceDeltas, Enums.eWheelAxle.FRONT)
+	DrawSlider("m_wheel_size", frontStanceDeltas, Enums.eWheelAxle.FRONT)
 
 	ImGui.Spacing()
 	ImGui.SeparatorText(_T("VEH_STANCE_AIR_SUSPENSION"))
 	local current_susp_f = frontStanceDeltas.m_susp_comp
 	local current_susp_r = backStanceDeltas.m_susp_comp
-	local min_susp       = ref.m_susp_comp.min()
-	local max_susp       = ref.m_susp_comp.max()
+	local min_susp       = DeltaRef.m_susp_comp.min()
+	local max_susp       = DeltaRef.m_susp_comp.max()
 
 	ImGui.BeginDisabled(Stancer.m_bounce_mode.enabled)
 	ImGui.BeginDisabled((current_susp_f >= max_susp - 0.01) and (current_susp_r >= max_susp - 0.01))
@@ -265,7 +271,7 @@ return function()
 	if (next(saved_models) ~= nil) then
 		ImGui.SameLine()
 		if (GUI:Button(_T("VEH_STANCE_VIEW_SAVED"))) then
-			saved_vehs_window.should_draw = true
+			savedVehsWindow.should_draw = true
 		end
 
 		ImGui.SameLine()
@@ -282,7 +288,7 @@ return function()
 		)
 	end
 
-	if (saved_vehs_window.should_draw) then
+	if (savedVehsWindow.should_draw) then
 		ImGui.Begin("##viewSavedVehicles",
 			ImGuiWindowFlags.NoTitleBar |
 			ImGuiWindowFlags.NoMove |
@@ -293,9 +299,9 @@ return function()
 				for model_str in pairs(saved_models) do
 					local model       = tonumber(model_str) or 0
 					local name        = Game.GetVehicleDisplayName(model)
-					local is_selected = selected_saved_model == model
+					local is_selected = selectedSavedModel == model
 					if (ImGui.Selectable(name, is_selected)) then
-						selected_saved_model = model
+						selectedSavedModel = model
 					end
 				end
 				ImGui.EndListBox()
@@ -303,9 +309,9 @@ return function()
 
 			ImGui.Separator()
 
-			ImGui.BeginDisabled(selected_saved_model == 0)
+			ImGui.BeginDisabled(selectedSavedModel == 0)
 			if (GUI:Button(_T("GENERIC_REMOVE"))) then
-				GVars.features.vehicle.stancer.saved_models[tostring(selected_saved_model)] = nil
+				GVars.features.vehicle.stancer.saved_models[tostring(selectedSavedModel)] = nil
 			end
 			ImGui.EndDisabled()
 
@@ -316,10 +322,10 @@ return function()
 
 			if (ImGui.DialogBox(_T("GENERIC_REMOVE_ALL"))) then
 				GVars.features.vehicle.stancer.saved_models = {}
-				saved_vehs_window.should_draw = false
+				savedVehsWindow.should_draw = false
 			end
 		end, function()
-			saved_vehs_window.should_draw = false
+			savedVehsWindow.should_draw = false
 		end, true)
 
 		ImGui.End()

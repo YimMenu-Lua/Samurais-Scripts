@@ -657,8 +657,7 @@ function GUI:OnDrawCallback(fixed_height)
 	end
 
 	local size, pos = self:GetNewWindowSizeAndCenterPos(0.45, 0.8); pos.y = 1
-	local bitwise   = GVars.ui.moveable and Bit.Clear or Bit.Set
-	mainWindowFlags = bitwise(mainWindowFlags, ImGuiWindowFlags.NoMove)
+	mainWindowFlags = Bit.Toggle(mainWindowFlags, ImGuiWindowFlags.NoMove, GVars.ui.moveable)
 
 	if (GVars.ui.window_pos:is_zero()) then
 		ImGui.SetNextWindowPos(pos.x, pos.y, ImGuiCond.Always)

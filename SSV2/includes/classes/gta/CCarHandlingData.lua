@@ -7,14 +7,14 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local atArray     = require("includes.classes.gta.atArray")
-local CStructView = require("includes.classes.gta.CStructView")
+local atArray              = require("includes.classes.gta.atArray")
+local CBaseSubHandlingData = require("includes.classes.gta.CBaseSubHandlingData")
 
 
 --------------------------------------
 -- Class: CCarHandlingData
 --------------------------------------
----@class CCarHandlingData : CStructBase<CCarHandlingData>
+---@class CCarHandlingData : CBaseSubHandlingData
 ---@field protected m_ptr pointer
 ---@field private m_size uint16_t
 ---@field public m_back_end_popup_car_impulse_mult pointer<float> -- 0x0008
@@ -31,7 +31,7 @@ local CStructView = require("includes.classes.gta.CStructView")
 ---@field public m_advanced_flags pointer<uint32_t> -- 0x003C
 ---@field public m_advanced_data atArray<CAdvancedData>   -- 0x0040
 ---@overload fun(ptr: pointer): CCarHandlingData
-local CCarHandlingData = CStructView("CCarHandlingData", 0x0048)
+local CCarHandlingData = Class("CCarHandlingData", { parent = CBaseSubHandlingData, pointer_ctor = true })
 
 ---@param ptr pointer
 ---@return CCarHandlingData

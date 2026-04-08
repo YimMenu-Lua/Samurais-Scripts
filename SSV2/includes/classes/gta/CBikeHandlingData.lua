@@ -7,36 +7,38 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CStructView = require("includes.classes.gta.CStructView")
+local CStructView          = require("includes.classes.gta.CStructView")
+local CBaseSubHandlingData = require("includes.classes.gta.CBaseSubHandlingData")
 
 
 --------------------------------------
 -- Class: CBikeHandlingData
 --------------------------------------
----@class CBikeHandlingData : CStructBase<CBikeHandlingData>
----@field m_lean_fwd_com_mult pointer<float> -- 0x0008
----@field m_lean_fwd_force_mult pointer<float> -- 0x000C
----@field m_lean_back_com_mult pointer<float> -- 0x0010
----@field m_lean_back_force_mult pointer<float> -- 0x0014
----@field m_max_bank_angle pointer<float> -- 0x0018
----@field m_anim_angle pointer<float> -- 0x001C
----@field m_anim_angle_inv pointer<float> -- 0x0020
----@field m_unk_0024 pointer<float> -- 0x0024
----@field m_lean_mult pointer<float> -- 0x0028
----@field m_brake_force_mult pointer<float> -- 0x002C
----@field m_air_steer_mult pointer<float> -- 0x0030
----@field m_wheelie_balance_point pointer<float> -- 0x0034
----@field m_stoppie_balance_mult pointer<float> -- 0x0038
----@field m_wheelie_steer_mult pointer<float> -- 0x003C
----@field m_rear_balance_mult pointer<float> -- 0x0040
----@field m_front_balance_mult pointer<float> -- 0x0044
----@field m_ground_side_friction_mult pointer<float> -- 0x0048
----@field m_wheel_ground_side_friction_mult pointer<float> -- 0x004C
----@field m_unk_angle_0050 pointer<float> -- 0x0050
----@field m_unk_angle_0054 pointer<float> -- 0x0054
----@field m_jump_force_mult pointer<float> -- 0x0058
+---@class CBikeHandlingData : CBaseSubHandlingData
+---@field protected m_ptr pointer
+---@field public m_lean_fwd_com_mult pointer<float> -- 0x0008
+---@field public m_lean_fwd_force_mult pointer<float> -- 0x000C
+---@field public m_lean_back_com_mult pointer<float> -- 0x0010
+---@field public m_lean_back_force_mult pointer<float> -- 0x0014
+---@field public m_max_bank_angle pointer<float> -- 0x0018
+---@field public m_anim_angle pointer<float> -- 0x001C
+---@field public m_anim_angle_inv pointer<float> -- 0x0020
+---@field public m_unk_0024 pointer<float> -- 0x0024
+---@field public m_lean_mult pointer<float> -- 0x0028
+---@field public m_brake_force_mult pointer<float> -- 0x002C
+---@field public m_air_steer_mult pointer<float> -- 0x0030
+---@field public m_wheelie_balance_point pointer<float> -- 0x0034
+---@field public m_stoppie_balance_mult pointer<float> -- 0x0038
+---@field public m_wheelie_steer_mult pointer<float> -- 0x003C
+---@field public m_rear_balance_mult pointer<float> -- 0x0040
+---@field public m_front_balance_mult pointer<float> -- 0x0044
+---@field public m_ground_side_friction_mult pointer<float> -- 0x0048
+---@field public m_wheel_ground_side_friction_mult pointer<float> -- 0x004C
+---@field public m_unk_angle_0050 pointer<float> -- 0x0050
+---@field public m_unk_angle_0054 pointer<float> -- 0x0054
+---@field public m_jump_force_mult pointer<float> -- 0x0058
 ---@overload fun(ptr: pointer): CBikeHandlingData
-local CBikeHandlingData = CStructView("CBikeHandlingData", 0x005C)
+local CBikeHandlingData = Class("CBikeHandlingData", { parent = CBaseSubHandlingData, pointer_ctor = true })
 
 ---@param ptr pointer
 ---@return CBikeHandlingData

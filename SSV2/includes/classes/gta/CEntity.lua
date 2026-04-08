@@ -21,20 +21,20 @@ local fwDrawData = require("includes.classes.gta.fwDrawData")
 ---@class CEntity: ClassMeta<CEntity>
 ---@field protected m_ptr pointer
 ---@field m_model_info pointer<CBaseModelInfo> -- 0x0020
----@field m_entity_type uint8_t -- 0x0028
----@field m_model_type pointer<uint8_t> -- CBaseModelInfo + 0x009D
----@field m_flags pointer<uint32_t> -- 0x002D
----@field m_draw_data fwDrawData -- 0x0048
----@field m_transform_matrix pointer<fMatrix44> -- 0x0060
----@field m_render_focus_distance pointer<uint32_t> -- 0x00A8
----@field m_shadow_flags pointer<uint32_t> -- 0x00B0
----@field m_damage_bits pointer<uint32_t> -- 0x0188
----@field m_hostility pointer<uint8_t> -- 0x018C
----@field m_health pointer<float> -- 0x0280
----@field m_max_health pointer<float> -- 0x0284
----@field m_attackers pointer<CAttackers> -- 0x0288
+---@field m_entity_type uint8_t
+---@field m_model_type pointer<eModelType> CBaseModelInfo + 0x009D
+---@field m_flags pointer<uint32_t> `FLAG_ISVISIBLE = 1 << 0`
+---@field m_draw_data fwDrawData
+---@field m_transform_matrix pointer<fMatrix44>
+---@field m_render_focus_distance pointer<uint32_t>
+---@field m_shadow_flags pointer<uint32_t>
+---@field m_damage_bits pointer<uint32_t>
+---@field m_hostility pointer<uint8_t>
+---@field m_health pointer<float>
+---@field m_max_health pointer<float>
+---@field m_attackers pointer_ref<CAttackers> -- 0x0288
 ---@overload fun(entity: handle): CEntity
-local CEntity = Class("CEntity", { symbolic_size = 0x28C })
+local CEntity = Class("CEntity", { symbolic_size = 0x028C })
 
 ---@param entity handle
 ---@return CEntity

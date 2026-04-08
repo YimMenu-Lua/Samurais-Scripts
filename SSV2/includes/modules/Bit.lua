@@ -10,6 +10,7 @@
 -----------------------------------------
 -- Bit (Static)
 -----------------------------------------
+-- Primitive bitwise wrapper.
 ---@ignore [Unfinished]
 ---@class Bit
 local Bit = {}
@@ -17,56 +18,65 @@ Bit.__index = Bit
 
 ---@param n integer
 ---@param pos integer
-Bit.Get = function(n, pos)
+function Bit.Get(n, pos)
 	return (n >> pos) & 1
 end
 
 ---@param n integer
 ---@param pos integer
 ---@return integer
-Bit.Set = function(n, pos)
+function Bit.Set(n, pos)
 	return n | (1 << pos)
 end
 
 ---@param n integer
 ---@param pos integer
 ---@return integer
-Bit.Clear = function(n, pos)
+function Bit.Clear(n, pos)
 	return n & ~(1 << pos)
 end
 
 ---@param n integer
 ---@param pos integer
+---@param toggle boolean
+---@return integer
+function Bit.Toggle(n, pos, toggle)
+	local f = toggle and Bit.Set or Bit.Clear
+	return f(n, pos)
+end
+
+---@param n integer
+---@param pos integer
 ---@return boolean
-Bit.IsBitSet = function(n, pos)
+function Bit.IsBitSet(n, pos)
 	return (n & (1 << pos)) ~= 0
 end
 
 ---@param n integer
 ---@param s integer
 ---@return integer
-Bit.LeftShift = function(n, s)
+function Bit.LeftShift(n, s)
 	return n << s
 end
 
 ---@param n integer
 ---@param s integer
 ---@return integer
-Bit.RightShift = function(n, s)
+function Bit.RightShift(n, s)
 	return n >> s
 end
 
 ---@param n integer
 ---@param bits integer
 ---@return integer
-Bit.RotateLeft = function(n, bits)
+function Bit.LeftRotate(n, bits)
 	return ((n << bits) | (n >> (32 - bits))) & 0xFFFFFFFF
 end
 
 ---@param n integer
 ---@param bits integer
 ---@return integer
-Bit.RotateRight = function(n, bits)
+function Bit.RightRotate(n, bits)
 	return ((n >> bits) | (n << (32 - bits))) & 0xFFFFFFFF
 end
 

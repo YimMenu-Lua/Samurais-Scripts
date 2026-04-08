@@ -13,9 +13,11 @@ local CStructView = require("includes.classes.gta.CStructView")
 --------------------------------------
 -- Class: CBaseSubHandlingData
 --------------------------------------
+---@generic T
 ---@class CBaseSubHandlingData : CStructBase<CBaseSubHandlingData>
 ---@field protected m_ptr pointer
----@field protected m_handling_type pointer<int32_t> -- 0x00C8
+---@field private m_handling_type pointer<int32_t> -- 0x00C8
+---@field public GetHandlingType fun(self: CBaseSubHandlingData): eHandlingType
 ---@overload fun(ptr: pointer): CBaseSubHandlingData
 local CBaseSubHandlingData = CStructView("CBaseSubHandlingData", 0x00CC)
 

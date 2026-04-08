@@ -607,6 +607,33 @@ local function DrawMiscTests()
 
 		printf("\n--------- CWeaponInfo Dump ---------\n\n%s", table.concat(out, ",\n"))
 	end
+
+	if (ImGui.Button("Parse Subhandling Pointers")) then
+		if (self.get_veh() == 0) then return end
+
+		local cvehicle = LocalPlayer:GetVehicle():Resolve()
+		if (not cvehicle:IsValid()) then return end
+
+		local chandlingdata = cvehicle.m_handling_data
+		if (not chandlingdata:IsValid()) then return end
+
+		local array = chandlingdata.m_sub_handling_data
+		for i = 1, #array do
+			local ptr = array[i]:deref()
+			if (not ptr:is_valid()) then
+				printf("index %d: nullptr", i)
+			else
+				local v = ptr:add(0x00C8):get_int()
+				printf("index %d: %d [%s]", i, v, EnumToString(Enums.eHandlingType, v))
+			end
+		end
+	end
+
+	if (ImGui.Button("Dump Subhandling Data")) then
+		if (self.get_veh() == 0) then return end
+
+		print(LocalPlayer:GetVehicle():GetHandlingData())
+	end
 end
 
 return function()

@@ -673,8 +673,11 @@ local function DrawAnimOptions()
 
 					if flag.wasClicked then
 						GUI:PlaySound("Nav")
-						local bitwiseOp = flag.enabled and Bit.Set or Bit.Clear
-						t_SelectedAction.data.flags = bitwiseOp(t_SelectedAction.data.flags, flag.bit)
+						t_SelectedAction.data.flags = Bit.Toggle(
+							t_SelectedAction.data.flags,
+							flag.bit,
+							flag.enabled
+						)
 					end
 				end
 				ImGui.EndChild()
