@@ -63,8 +63,6 @@ function PrivateHeli.spawn(model, spawnPos, godmode)
 	if (Game.IsOnline()) then
 		entities.take_control_of(pilot, 300)
 		entities.take_control_of(handle, 300)
-		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(pilot))
-		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(handle))
 	end
 
 	ENTITY.FREEZE_ENTITY_POSITION(pilot, false)

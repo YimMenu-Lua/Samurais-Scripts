@@ -192,7 +192,7 @@ local function DrawThreads()
 end
 
 local function DrawPointers()
-	local ptr_list, failed_ptr_list = PatternScanner:ListPointers()
+	local ptr_list, failed_ptr_list = PatternScanner:ListPatterns()
 	local total_count, failed_count = table.getlen(ptr_list), #failed_ptr_list
 	local child_height = math.min(total_count * 65, GVars.ui.window_size.y - 30)
 

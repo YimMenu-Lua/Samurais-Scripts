@@ -994,11 +994,10 @@ function YimActions.FXManager:StartPTFX(parent, ptfxData)
 		return
 	end
 
-	TaskWait(Game.RequestNamedPtfxAsset, ptfxData.dict)
-
-	local handle
-	if (Game.IsOnline() and parent ~= LocalPlayer:GetHandle()) then
-		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(parent))
+	local loaded, e = pcall(TaskWait, Game.RequestNamedPtfxAsset, ptfxData.dict)
+	if (not loaded) then
+		log.fwarning("[YimActions]: Failed to load partice effect: %s", e)
+		return
 	end
 
 	if (ptfxData.delay) then
@@ -1007,6 +1006,7 @@ function YimActions.FXManager:StartPTFX(parent, ptfxData)
 
 	GRAPHICS.USE_PARTICLE_FX_ASSET(ptfxData.dict)
 
+	local handle
 	if ENTITY.IS_ENTITY_A_PED(parent) then
 		handle = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(
 			ptfxData.name,

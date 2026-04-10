@@ -101,7 +101,6 @@ function CompanionManager:SpawnCompanion(pedModel, name, is_invincible, is_armed
 	)
 
 	entities.take_control_of(handle, 300)
-	Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(handle))
 	GroupManager:AddPedToGroup(handle)
 	PED.SET_PED_AS_GROUP_MEMBER(handle, playerGroup)
 	PED.SET_PED_NEVER_LEAVES_GROUP(handle, true)

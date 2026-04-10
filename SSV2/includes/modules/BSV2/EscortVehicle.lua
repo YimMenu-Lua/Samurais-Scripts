@@ -36,8 +36,10 @@ function EscortVehicle.new(modelHash, groupName, godMode)
 	local blipName   = groupName or _F("Escort Vehicle (%s)", vehName)
 	local r, g, b, _ = COL_VANTABLACK:AsRGBA() -- Vantablack
 
-	entities.take_control_of(veh, 300)
-	Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(veh))
+	if (Game.IsOnline()) then
+		entities.take_control_of(veh, 300)
+	end
+
 	Game.SetBlipSprite(blip, 229)
 	Game.SetBlipName(blip, blipName)
 
