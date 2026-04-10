@@ -7,8 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local WeaponBrowser     = require("includes.frontend.helpers.weapon_browser").new()
-local PedBrowser        = require("includes.frontend.helpers.ped_browser").new({
+local WeaponBrowser     = require("includes.services.asset_browsers.WeaponBrowser").new()
+local PedBrowser        = require("includes.services.asset_browsers.PedBrowser").new({
 	max_entries         = 250,
 	humans_only         = true,
 	show_preview        = true,

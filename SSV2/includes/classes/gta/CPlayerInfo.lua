@@ -20,6 +20,7 @@ local rlGamerInfo = require("includes.classes.gta.rlGamerInfo")
 ---@field m_swim_speed pointer<float>
 ---@field m_walk_speed pointer<float>
 ---@field m_game_state pointer<eGameState>
+---@field m_ped pointer_ref<CPed>
 ---@field m_is_wanted pointer<bool>
 ---@field m_wanted_level pointer<uint32_t>
 ---@field m_wanted_level_display pointer<uint32_t>
@@ -40,6 +41,7 @@ function CPlayerInfo.new(ptr)
 		m_swim_speed           = ptr:add(0x01C8),
 		m_walk_speed           = ptr:add(0x01E4),
 		m_game_state           = ptr:add(0x0230),
+		m_ped                  = ptr:add(0x0240),
 		m_is_wanted            = ptr:add(0x08E0),
 		m_wanted_level         = ptr:add(0x08E8),
 		m_wanted_level_display = ptr:add(0x08EC),

@@ -7,6 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local COL_YELLOW <const> = Color("yellow")
+
 ---@class TowedVehicle
 ---@field m_handle handle
 ---@field m_model hash
@@ -528,7 +530,7 @@ function Flatbed:OnTick()
 		end
 
 		if (GVars.features.flatbed.show_esp and self.closestVehicle.handle) ~= 0 then
-			Game.DrawBoundingBox(self.closestVehicle.handle, Color("yellow"))
+			Game.DrawBoundingBox(self.closestVehicle.handle, COL_YELLOW)
 		end
 	end
 

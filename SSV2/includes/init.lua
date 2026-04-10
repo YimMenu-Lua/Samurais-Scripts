@@ -121,7 +121,7 @@ local packages  = {
 
 	"frontend.billionaire_services.bsv2_ui",
 	"frontend.casino_ui",
-	"frontend.entity_forge_ui",
+	"frontend.entity_forge.entity_forge_ui",
 	"frontend.mastermind_ui",
 	"frontend.self.self_ui",
 	"frontend.settings.settings_ui",

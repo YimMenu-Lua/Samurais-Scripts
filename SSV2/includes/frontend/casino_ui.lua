@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CasinoPacino = require("includes.features.CasinoPacino"):init()
+local CasinoPacino = require("includes.features.CasinoPacino")
 local SGSL         = require("includes.services.SGSL")
 local casino_pos   = vec3:new(924.6380, 46.6918, 81.1063)
 
@@ -26,7 +26,7 @@ local function drawGamblingTab()
 	GVars.features.dunk.bypass_casino_bans, _ = GUI:CustomToggle(_T("CP_COOLDOWN_BYPASS_ENABLE"),
 		GVars.features.dunk.bypass_casino_bans, {
 			tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"),
-			color   = Color("#AA0000")
+			color   = Color.RED
 		})
 
 	ImGui.BulletText(_T("CP_COOLDOWN_BYPASS_STATUS"))

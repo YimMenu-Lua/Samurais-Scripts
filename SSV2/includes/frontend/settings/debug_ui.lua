@@ -7,10 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local RED <const>               = Color("red")
-local GREEN <const>             = Color("green")
-local BLUE <const>              = Color("blue")
-local GREY <const>              = Color("#636363")
+local COL_GREY <const>          = Color("#636363")
 local LOCALES <const>           = Translator.locales
 
 local side_button_size          = vec2:new(140, 35)
@@ -30,10 +27,10 @@ local current_local
 local current_local_method
 local current_global_method
 local state_colors <const>      = {
-	[eThreadState.UNK] = GREY,
-	[eThreadState.DEAD] = RED,
-	[eThreadState.RUNNING] = GREEN,
-	[eThreadState.SUSPENDED] = BLUE,
+	[eThreadState.UNK]       = COL_GREY,
+	[eThreadState.DEAD]      = Color.RED,
+	[eThreadState.RUNNING]   = Color.GREEN,
+	[eThreadState.SUSPENDED] = Color.BLUE,
 }
 local accessor_read_types       = {
 	"Int",
@@ -195,7 +192,7 @@ local function DrawThreads()
 end
 
 local function DrawPointers()
-	local ptr_list, failed_ptr_list = PatternScanner:ListPointers()
+	local ptr_list, failed_ptr_list = PatternScanner:ListPatterns()
 	local total_count, failed_count = table.getlen(ptr_list), #failed_ptr_list
 	local child_height = math.min(total_count * 65, GVars.ui.window_size.y - 30)
 
@@ -216,7 +213,7 @@ local function DrawPointers()
 				)
 
 				if (address == 0) then
-					ImGui.PushStyleColor(ImGuiCol.Text, RED:AsRGBA())
+					ImGui.PushStyleColor(ImGuiCol.Text, Color.RED:AsRGBA())
 				end
 
 				if ImGui.Selectable(str, (name == ptr_name)) then
@@ -396,7 +393,7 @@ local function DrawSerializerDebug()
 
 	ImGui.BulletText("Thread State:")
 	ImGui.SameLine()
-	GUI:Text(EnumToString(eThreadState, eState), state_colors[eState])
+	GUI:Text(EnumToString(eThreadState, eState), { color = state_colors[eState] })
 	ImGui.BulletText(_F("Is Disabled: %s", not Serializer:CanAccess()))
 	ImGui.BulletText(_F("Time Since Last Flush: %.0f seconds ago.", Serializer:GetTimeSinceLastFlush() / 1e3))
 
@@ -606,6 +603,33 @@ local function DrawMiscTests()
 		end
 
 		printf("\n--------- CWeaponInfo Dump ---------\n\n%s", table.concat(out, ",\n"))
+	end
+
+	if (ImGui.Button("Parse Subhandling Pointers")) then
+		if (self.get_veh() == 0) then return end
+
+		local cvehicle = LocalPlayer:GetVehicle():Resolve()
+		if (not cvehicle:IsValid()) then return end
+
+		local chandlingdata = cvehicle.m_handling_data
+		if (not chandlingdata:IsValid()) then return end
+
+		local array = chandlingdata.m_sub_handling_data
+		for i = 1, #array do
+			local ptr = array[i]:deref()
+			if (not ptr:is_valid()) then
+				printf("index %d: nullptr", i)
+			else
+				local v = ptr:add(0x00C8):get_int()
+				printf("index %d: %d [%s]", i, v, EnumToString(Enums.eHandlingType, v))
+			end
+		end
+	end
+
+	if (ImGui.Button("Dump Subhandling Data")) then
+		if (self.get_veh() == 0) then return end
+
+		print(LocalPlayer:GetVehicle():GetHandlingData())
 	end
 end
 

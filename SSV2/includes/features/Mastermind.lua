@@ -111,7 +111,7 @@ local function getServiceVehicleCoords()
 	local vec_offset = 13
 
 	local final = ser_veh_global:AsGlobal()
-		:At(LocalPlayer:GetPlayerID(), pid_size)
+		:At(LocalPlayer:GetID(), pid_size)
 		:At(offset2)
 		:At(vec_offset)
 
@@ -125,7 +125,7 @@ local function isSubmarineSpawned()
 	local offset2 = sub_global:GetOffset(2)
 	local sub_offset = 4
 	local sub_status = sub_global:AsGlobal()
-		:At(LocalPlayer:GetPlayerID(), pid_size)
+		:At(LocalPlayer:GetID(), pid_size)
 		:At(offset2)
 		:At(sub_offset)
 		:ReadInt()
@@ -173,9 +173,9 @@ function Mastermind:ReadPropertyData()
 		local sub_hash = stats.get_int("MPX_IH_SUB_OWNED")
 		if (sub_hash == _J("kosatka")) then
 			self.m_properties.submarine = {
-				name    = Game.GetGXTLabel("CELL_SUBMARINE"),
-				coords  = vec3:zero(),
-				heading = 0.0,
+				name       = Game.GetGXTLabel("CELL_SUBMARINE"),
+				coords     = vec3:zero(),
+				heading    = 0.0,
 				is_spawned = isSubmarineSpawned()
 			}
 		end

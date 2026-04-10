@@ -120,16 +120,21 @@ def serialize_lua(v, indent=0) -> str:
     return f'"{s}"'
 
 
-def write_lua_table(lua_path, data):
+def write_lua_table(lua_path: str, data, class_name: str = None):
     with open(lua_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(gen_file_header())
-        f.write("return ")
+        if class_name:
+            f.write(f"---@class { class_name }\nlocal { class_name } <const> = ")
+        else:
+            f.write("return ")
         f.write(serialize_lua(data))
+        if class_name:
+            f.write(f"return { class_name }")
         f.write("\n")
 
 
 def read_raw_file(file_name: str, as_json: bool = True):
-    url = f"https://raw.githubusercontent.com/DurtyFree/gta-v-data-dumps/refs/heads/master/{file_name}"
+    url = f"https://raw.githubusercontent.com/DurtyFree/gta-v-data-dumps/refs/heads/master/{ file_name }"
     try:
         resp = requests.get(url)
         resp.raise_for_status()
@@ -141,10 +146,10 @@ def read_raw_file(file_name: str, as_json: bool = True):
     return out
 
 
-def gen_vehicles():
+def gen_vehicles(class_name: str = None):
     jsondata = read_raw_file("vehicles.json")
     out = {}
-    hash_lookup = {}
+    hash_map = {}
 
     with alive_bar(len(jsondata), title="Generating Vehicles", force_tty=True) as bar:
         for veh in jsondata:
@@ -159,14 +164,14 @@ def gen_vehicles():
                 "class_name": veh["Class"],
             }
 
-            hash_lookup[joaat_hash] = str_name
+            hash_map[joaat_hash] = str_name
             bar()
 
-    write_lua_table(LUA_DATA_PATH / "vehicles.lua", out)
-    write_lua_table(LUA_DATA_PATH / "vehicle_hashmap.lua", hash_lookup)
+    write_lua_table(LUA_DATA_PATH / "vehicles.lua", out, class_name)
+    write_lua_table(LUA_DATA_PATH / "vehicle_hashmap.lua", hash_map)
 
 
-def gen_peds():
+def gen_peds(class_name: str = None):
     jsondata = read_raw_file("peds.json")
     out = {}
     hash_lookup = {}
@@ -194,11 +199,11 @@ def gen_peds():
             hash_lookup[joaat_hash] = str_name
             bar()
 
-    write_lua_table(LUA_DATA_PATH / "peds.lua", out)
+    write_lua_table(LUA_DATA_PATH / "peds.lua", out, class_name)
     write_lua_table(LUA_DATA_PATH / "ped_hashmap.lua", hash_lookup)
 
 
-def gen_weapons():
+def gen_weapons(class_name: str = None):
     jsondata = read_raw_file("weapons.json")
     out = {}
 
@@ -214,9 +219,12 @@ def gen_weapons():
             if not gxt or gxt == "WT_INVALID":
                 continue
 
+            group = wpn["Category"]
+            if not group:
+                continue
+
             str_name = wpn["Name"]
             joaat_hash = wpn["Hash"]
-            group = wpn["Category"]
 
             out[joaat_hash] = {
                 "model_name": str_name,
@@ -227,7 +235,7 @@ def gen_weapons():
 
             bar()
 
-    write_lua_table(LUA_DATA_PATH / "weapon_data.lua", out)
+    write_lua_table(LUA_DATA_PATH / "weapon_data.lua", out, class_name)
 
 
 def gen_objects():
@@ -243,15 +251,15 @@ def gen_objects():
     write_lua_table(LUA_DATA_PATH / "objects.lua", out)
 
 
-def generate_lists(vehicles: bool = True, peds: bool = True, objects: bool = True, weapons: bool = True):
+def generate_lists(vehicles: bool, peds: bool, objects: bool, weapons: bool):
     if vehicles:
-        gen_vehicles()
+        gen_vehicles(class_name="VehicleDictionary")
     if peds:
-        gen_peds()
+        gen_peds(class_name="PedDictionary")
+    if weapons:
+        gen_weapons(class_name="WeaponDictionary")
     if objects:
         gen_objects()
-    if weapons:
-        gen_weapons()
 
 
 if __name__ == "__main__":

@@ -9,11 +9,16 @@
 
 local Scene = require("includes.structs.SynchronizedScene")
 
+
 ---@class SceneManager
----@field CurrentlyPlaying table<integer, Scene>
-local SceneManager = {}
+---@field public CurrentlyPlaying table<handle, SynchronisedScene>
+local SceneManager   = {}
 SceneManager.__index = SceneManager
-SceneManager.CurrentlyPlaying = {}
+
+---@return SceneManager
+function SceneManager.new()
+	return setmetatable({ CurrentlyPlaying = {} }, SceneManager)
+end
 
 ---@param model string|hash
 function SceneManager:CreateParticipant(model)
@@ -70,13 +75,10 @@ function SceneManager:PrepareScene(t_Data)
 
 	for _, participant in ipairs(t_Data.participants) do
 		local handle = participant.isPlayer and LocalPlayer:GetHandle() or self:CreateParticipant(participant.model)
-		table.insert(
-			sceneParticipants,
-			{
-				handle = handle,
-				animName = participant.animName
-			}
-		)
+		table.insert(sceneParticipants, {
+			handle   = handle,
+			animName = participant.animName
+		})
 	end
 
 	return Scene.new(
@@ -84,7 +86,7 @@ function SceneManager:PrepareScene(t_Data)
 		t_Data.animDict,
 		{ handle = originEntity, pos_offset = t_Data.origin.pos_offset or vec3:zero() },
 		sceneParticipants,
-		t_Data.params or {}
+		t_Data.params
 	)
 end
 
@@ -328,13 +330,13 @@ function SceneManager:Play(sceneData)
 	end
 end
 
----@param scene Scene
+---@param scene SynchronisedScene
 function SceneManager:Stop(scene)
 	if (not self.CurrentlyPlaying[scene.localHandle]) then
 		return
 	end
 
-	if (Game.IsOnline()) then
+	if (scene.netHandle and scene.netHandle > 0) then
 		NETWORK.NETWORK_STOP_SYNCHRONISED_SCENE(scene.netHandle)
 	else
 		for _, participant in ipairs(scene.participants) do
@@ -351,9 +353,11 @@ function SceneManager:Wipe()
 	end
 
 	for _, scn in pairs(self.CurrentlyPlaying) do
-		NETWORK.NETWORK_STOP_SYNCHRONISED_SCENE(scn.netHandle)
-		Game.DeleteEntity(scn.origin.handle)
+		if (scn.netHandle and scn.netHandle > 0) then
+			NETWORK.NETWORK_STOP_SYNCHRONISED_SCENE(scn.netHandle)
+		end
 
+		Game.DeleteEntity(scn.origin.handle)
 		for _, p in ipairs(scn.participants) do
 			Game.DeleteEntity(p.handle)
 		end

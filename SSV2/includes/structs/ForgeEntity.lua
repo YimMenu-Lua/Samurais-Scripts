@@ -15,7 +15,7 @@
 ---@field type ePedType
 ---@field isAttached boolean
 ---@field isPlayer boolean
----@field properties table
+---@field properties { mods: VehicleMods?, components: PedComponentsTable?, action: { scenario: string? }? }
 ---@field parent_bone string|integer
 ---@field attach_pos vec3
 ---@field attach_rot vec3
@@ -34,7 +34,7 @@
 ---@field m_name string
 ---@field m_model_hash integer
 ---@field m_type eEntityType
----@field m_properties table
+---@field m_properties { mods: VehicleMods?, components: PedComponentsTable?, action: { scenario: string? }? }
 ---@field m_alpha number
 ---@field m_is_attached boolean
 ---@field m_is_forged boolean
@@ -75,10 +75,10 @@ function ForgeEntity.new(handle, name, modelHash, entityType, alpha, coords, rot
 	instance.m_name        = name
 	instance.m_model_hash  = modelHash
 	instance.m_type        = entityType
-	instance.m_properties  = {}
 	instance.m_alpha       = alpha or 255
 	instance.m_is_attached = false
 	instance.m_is_player   = handle == LocalPlayer:GetHandle()
+	instance.m_properties  = {}
 	instance.m_children    = {}
 	instance.m_position    = coords
 	instance.m_rotation    = rotation

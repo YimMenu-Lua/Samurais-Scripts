@@ -7,12 +7,13 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local SceneManager     = require("includes.services.SceneManager")
-local CompanionManager = require("includes.services.CompanionManager")
-local t_AnimList       = require("includes.data.actions.animations")
-local t_PedScenarios   = require("includes.data.actions.scenarios")
-local Action           = require("includes.structs.Action")
-local Weapons          = require("includes.data.weapons")
+local SceneManager       = require("includes.services.SceneManager")
+local CompanionManager   = require("includes.services.CompanionManager")
+local t_AnimList         = require("includes.data.actions.animations")
+local t_PedScenarios     = require("includes.data.actions.scenarios")
+local Action             = require("includes.structs.Action")
+local Weapons            = require("includes.data.weapons")
+local COL_YELLOW <const> = Color("yellow")
 
 ---@alias ActionCategory
 --- | "anims"
@@ -50,7 +51,7 @@ function YimActions:init()
 	end
 
 	self.CompanionManager = CompanionManager.new()
-	self.SceneManager     = SceneManager
+	self.SceneManager     = SceneManager.new()
 	self.CurrentlyPlaying = {}
 	self.LastPlayed       = {}
 	self.Commands         = {}
@@ -993,11 +994,10 @@ function YimActions.FXManager:StartPTFX(parent, ptfxData)
 		return
 	end
 
-	TaskWait(Game.RequestNamedPtfxAsset, ptfxData.dict)
-
-	local handle
-	if (Game.IsOnline() and parent ~= LocalPlayer:GetHandle()) then
-		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(parent))
+	local loaded, e = pcall(TaskWait, Game.RequestNamedPtfxAsset, ptfxData.dict)
+	if (not loaded) then
+		log.fwarning("[YimActions]: Failed to load partice effect: %s", e)
+		return
 	end
 
 	if (ptfxData.delay) then
@@ -1006,6 +1006,7 @@ function YimActions.FXManager:StartPTFX(parent, ptfxData)
 
 	GRAPHICS.USE_PARTICLE_FX_ASSET(ptfxData.dict)
 
+	local handle
 	if ENTITY.IS_ENTITY_A_PED(parent) then
 		handle = GRAPHICS.START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(
 			ptfxData.name,
@@ -1283,10 +1284,10 @@ function YimActions.Debugger:Draw()
 		ImGui.BeginChild("##debugPropInfo", 250, 200)
 		ImGui.SeparatorText("Prop Info")
 		if (not self.selectedProp) then
-			GUI:Text("Not Selected.", Color("yellow"))
+			GUI:Text("Not Selected.", { color = COL_YELLOW })
 		else
-			ImGui.BulletText(("Prop Type: [ %s ]"):format(self.selectedProp.type))
-			ImGui.BulletText(("Is Attached: [ %s ]"):format(self.selectedProp.attached))
+			ImGui.BulletText(_F("Prop Type: [ %s ]", self.selectedProp.type))
+			ImGui.BulletText(_F("Is Attached: [ %s ]", self.selectedProp.attached))
 		end
 		ImGui.EndChild()
 		ImGui.EndGroup()

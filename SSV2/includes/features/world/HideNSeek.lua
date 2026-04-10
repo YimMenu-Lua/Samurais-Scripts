@@ -111,7 +111,7 @@ function HideNSeek:Cleanup()
 
 	local pedHandle = LocalPlayer:GetHandle()
 	TASK.CLEAR_PED_TASKS(pedHandle)
-	PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetPlayerID())
+	PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetID())
 	if (ENTITY.IS_ENTITY_ATTACHED(pedHandle)) then
 		ENTITY.DETACH_ENTITY(pedHandle, true, false)
 	end
@@ -270,9 +270,9 @@ function HideNSeek:HideInTrunk()
 		end
 
 		local cls = VEHICLE.GET_VEHICLE_CLASS(veh)
-		if (cls == Enums.eVehicleClasses.Vans) then
+		if (cls == Enums.eVehicleClass.VANS) then
 			z_offset = 1.1
-		elseif cls == Enums.eVehicleClasses.SUVs then
+		elseif cls == Enums.eVehicleClass.SUV then
 			z_offset = 1.2
 		end
 
@@ -525,19 +525,19 @@ function HideNSeek:WhileHiding()
 		if (self.m_context == eHNSContext.IN_VEHICLE and not ENTITY.DOES_ENTITY_EXIST(LocalPlayer:GetVehicleNative())) then
 			self:Cleanup()
 			LocalPlayer:ClearTasks()
-			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetPlayerID())
+			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetID())
 		end
 
 		if (self.m_context == eHNSContext.CAR_BOOT and not ENTITY.DOES_ENTITY_EXIST(self.m_boot_vehicle.m_handle)) then
 			self:Cleanup()
 			LocalPlayer:ClearTasks()
-			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetPlayerID())
+			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetID())
 		end
 
 		if (self.m_context == eHNSContext.TRASH and not ENTITY.DOES_ENTITY_EXIST(self.m_trash_bin)) then
 			self:Cleanup()
 			LocalPlayer:ClearTasks()
-			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetPlayerID())
+			PLAYER.RESET_WANTED_LEVEL_DIFFICULTY(LocalPlayer:GetID())
 		end
 
 		if (not v_WantedCentrePos) then
@@ -552,7 +552,7 @@ function HideNSeek:WhileHiding()
 		if (self.m_is_wanted and not self.m_was_spotted) then
 			PED.SET_COP_PERCEPTION_OVERRIDES(0.1, 0.1, 0.1, 1.0, 1.0, 1.0, 0.0)
 			---@diagnostic disable-next-line
-			PLAYER.SET_PLAYER_WANTED_CENTRE_POSITION(LocalPlayer:GetPlayerID(), v_WantedCentrePos, true)
+			PLAYER.SET_PLAYER_WANTED_CENTRE_POSITION(LocalPlayer:GetID(), v_WantedCentrePos, true)
 		end
 
 		if (self.m_context == eHNSContext.IN_VEHICLE) then
@@ -705,8 +705,8 @@ function HideNSeek:OnTick()
 		return
 	end
 
-	self.m_is_wanted = PLAYER.GET_PLAYER_WANTED_LEVEL(LocalPlayer:GetPlayerID()) > 0
-	self.m_was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(LocalPlayer:GetPlayerID())
+	self.m_is_wanted = PLAYER.GET_PLAYER_WANTED_LEVEL(LocalPlayer:GetID()) > 0
+	self.m_was_spotted = PLAYER.IS_WANTED_AND_HAS_BEEN_SEEN_BY_COPS(LocalPlayer:GetID())
 	if (not self.m_is_active) then
 		self:GetHidingContext()
 	else

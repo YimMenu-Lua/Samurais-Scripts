@@ -86,9 +86,6 @@ function PrivateJet.spawn(model, airportData)
 		entities.take_control_of(pilot, 300)
 		entities.take_control_of(copilot, 300)
 		entities.take_control_of(handle, 300)
-		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(pilot))
-		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(copilot))
-		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(handle))
 	end
 
 	ENTITY.FREEZE_ENTITY_POSITION(pilot, false)

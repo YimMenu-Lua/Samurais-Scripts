@@ -68,8 +68,12 @@ GenericClass = setmetatable({}, {
 ---@class handle: integer
 -- RAGE JOAAT hash
 ---@class hash: joaat_t
+
 ---@class pointer_ref
----@field deref fun(self: pointer): pointer|nullptr
+---@field deref fun(self: pointer_ref): pointer|nullptr
+---@field get_address fun(self: pointer_ref): uint64_t
+---@field is_null fun(self: pointer_ref): boolean
+---@field is_valid fun(self: pointer_ref): boolean
 
 ---@alias anyval<T> table|metatable|userdata|lightuserdata|function|string|number|boolean Any Lua value except nil.
 ---@alias optional<T> T?

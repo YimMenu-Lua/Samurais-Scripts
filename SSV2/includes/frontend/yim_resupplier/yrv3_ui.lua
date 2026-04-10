@@ -7,9 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local selectedTabID        = 1
-local colMoneyGreen        = Color("#85BB65")
-local tabNames <const>     = {
+local selectedTabID         = 1
+local colMoneyGreen <const> = Color("#85BB65")
+local tabNames <const>      = {
 	"GB_BOSSC",
 	"CELL_HANGAR",
 	"GB_REST_ACCM",
@@ -23,7 +23,7 @@ local tabNames <const>     = {
 	"CELL_16"
 }
 
-local tabCallbacks <const> = {
+local tabCallbacks <const>  = {
 	require("includes.frontend.yim_resupplier.office"),
 	require("includes.frontend.yim_resupplier.hangar"),
 	require("includes.frontend.yim_resupplier.clubhouse"),
@@ -117,9 +117,7 @@ local function YRV3UI()
 	end
 	ImGui.EndChild()
 
-	ImGui.SameLine()
 	ImGui.VerticalSeparator(separatorWidth)
-	ImGui.SameLine()
 
 	ImGui.SetNextWindowBgAlpha(0)
 	ImGui.BeginChild("##yrv3_4")

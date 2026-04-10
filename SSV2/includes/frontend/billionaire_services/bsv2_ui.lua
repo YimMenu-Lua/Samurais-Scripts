@@ -8,11 +8,11 @@
 
 
 local BS                   = BillionaireServices
-local DrawBodyguards       = require("includes.frontend.billionaire_services.bodyguards")
-local DrawEscorts          = require("includes.frontend.billionaire_services.escort_groups")
-local DrawLimousine        = require("includes.frontend.billionaire_services.limousine")
-local DrawHeliService      = require("includes.frontend.billionaire_services.helicopter")
-local DrawJetService       = require("includes.frontend.billionaire_services.jet")
+local DrawBodyguards       = require("includes.frontend.billionaire_services.bodyguards_ui")
+local DrawEscorts          = require("includes.frontend.billionaire_services.escort_groups_ui")
+local DrawLimousine        = require("includes.frontend.billionaire_services.limo_ui")
+local DrawHeliService      = require("includes.frontend.billionaire_services.heli_ui")
+local DrawJetService       = require("includes.frontend.billionaire_services.jet_ui")
 local iSelectedSidebarItem = 1
 local sPreviousTab         = ""
 

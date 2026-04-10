@@ -183,10 +183,10 @@ function PrivateLimo:Spawn(t_Data, spawnPos)
 		return
 	end
 
-	entities.take_control_of(driver, 300)
-	entities.take_control_of(limo, 300)
-	Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(driver))
-	Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(limo))
+	if (Game.IsOnline()) then
+		entities.take_control_of(driver, 300)
+		entities.take_control_of(limo, 300)
+	end
 
 	ENTITY.FREEZE_ENTITY_POSITION(driver, false)
 	ENTITY.SET_ENTITY_INVINCIBLE(driver, true)

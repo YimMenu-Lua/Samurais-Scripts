@@ -8,13 +8,14 @@
 
 
 local CStructView = require("includes.classes.gta.CStructView")
+local CBaseSubHandlingData = require("includes.classes.gta.CBaseSubHandlingData")
 
 
 --------------------------------------
 -- Class: CBoatHandlingData
 --------------------------------------
----@class CBoatHandlingData : CStructBase<CBoatHandlingData>
+---@class CBoatHandlingData : CBaseSubHandlingData
 ---@overload fun(ptr: pointer): CBoatHandlingData
-local CBoatHandlingData = CStructView("CBoatHandlingData")
+local CBoatHandlingData = Class("CBoatHandlingData", { parent = CBaseSubHandlingData, pointer_ctor = true })
 
 return CBoatHandlingData

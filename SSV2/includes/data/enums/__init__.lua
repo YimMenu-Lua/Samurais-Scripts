@@ -7,6 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+-- ### Enums Namespace.
+--
+-- All enums are stored here to avoid polluting the global namespace.
 local Enums <const> = {
 	eActionType            = require("includes.data.enums.action_type"),
 	eAnimFlags             = require("includes.data.enums.anim_flags"),
@@ -25,11 +28,14 @@ local Enums <const> = {
 	ePedType               = require("includes.data.enums.ped_type"),
 	eRagdollBlockingFlags  = require("includes.data.enums.ragdoll_blocking_flags"),
 	eVehicleAdvancedFlags  = require("includes.data.enums.vehicle_advanced_flags"),
-	eVehicleClasses        = require("includes.data.enums.vehicle_classes"),
+	eVehicleClass          = require("includes.data.enums.vehicle_classes"),
 	eVehicleHandlingFlags  = require("includes.data.enums.vehicle_handling_flags"),
 	eVehicleModelFlags     = require("includes.data.enums.vehicle_model_flags"),
 	eVehicleModelInfoFlags = require("includes.data.enums.vehicle_model_info_flags"),
 	eVehicleTask           = require("includes.data.enums.vehicle_task"),
+	eVehicleType           = require("includes.data.enums.vehicle_type"),
+	eWheelConfigFlags      = require("includes.data.enums.wheel_config_flags"),
+	eWheelDynamicFlags     = require("includes.data.enums.wheel_dynamic_flags"),
 }
 
 return Enums

@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
--- `CVehicle::ModelFlags`
+-- `uint32_t`
 ---@enum eVehicleModelFlags
 -- https://gtamods.com/wiki/Handling.meta
 local eVehicleModelFlags <const> = {

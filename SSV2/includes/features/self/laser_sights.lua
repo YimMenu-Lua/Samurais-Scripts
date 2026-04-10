@@ -49,7 +49,7 @@ function LaserSights:Init()
 		GVars.features.weapon.laser_sights.keybind,
 		function()
 			ThreadManager:Run(function()
-				if (not PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetPlayerID())) then
+				if (not PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetID())) then
 					return
 				end
 
@@ -71,7 +71,7 @@ function LaserSights:ShouldRun()
 		and LocalPlayer:IsAlive()
 		and LocalPlayer:IsOnFoot()
 		and WEAPON.IS_PED_ARMED(LocalPlayer:GetHandle(), 4)
-		and PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetPlayerID())
+		and PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetID())
 end
 
 ---@param startPos vec3

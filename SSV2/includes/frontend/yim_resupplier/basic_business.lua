@@ -7,7 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
-local colMoneyGreen = Color("#85BB65")
+local colMoneyGreen <const>  = Color("#85BB65")
+local U32_RED <const>        = Color.RED:AsU32()
+local U32_GREEN <const>      = colMoneyGreen:Darken(0.12):AsU32()
 
 ---@param business CarWash|CarWashSubBusiness
 ---@param isParent boolean
@@ -70,8 +72,8 @@ return function(business, isParent, kvSpacing, clearHeatLabel)
 			ImGuiValueBarFlags.MULTI_VAL,
 			{
 				value2 = duffDirtyCash / maxDuffle,
-				v1Col  = colMoneyGreen:Darken(0.12):AsU32(),
-				v2Col  = Color("red"):AsU32(),
+				v1Col  = U32_GREEN,
+				v2Col  = U32_RED,
 				fmt    = duffCashTxt
 			}
 		)

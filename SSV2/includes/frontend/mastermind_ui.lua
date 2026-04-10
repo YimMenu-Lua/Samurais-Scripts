@@ -133,7 +133,7 @@ local function drawBasicTab()
 			_T("CP_HEIST_COOLDOWN_DISABLE"),
 			GVars.features.yim_heists[key], {
 				tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
-				color   = Color("#AA0000"),
+				color   = Color.RED,
 				onClick = function()
 					YRV3:SetCooldownStateDirty(key, true)
 				end
@@ -198,7 +198,7 @@ local function drawCayoTab()
 	if (on_cooldown) then
 		local minutes_left = (cooldown_seconds_left > 0 and cooldown_seconds_left or cooldown_hard_seconds_left) / 60
 		GUI:HeaderText(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left),
-			{ separator = false, spacing = true, color = Color("#AA0000") })
+			{ separator = false, spacing = true, color = Color.RED })
 	end
 
 	ImGui.BeginDisabled(on_cooldown)
@@ -288,7 +288,7 @@ local function drawCayoTab()
 		_T("CP_HEIST_COOLDOWN_DISABLE"),
 		GVars.features.yim_heists.cayo_cd, {
 			tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
-			color   = Color("#AA0000"),
+			color   = Color.RED,
 			onClick = function()
 				YRV3:SetCooldownStateDirty("cayo_cd", true)
 			end
@@ -335,7 +335,7 @@ local function drawDDayTab()
 	if (on_cooldown) then
 		local minutes_left = cooldown_seconds_left / 60
 		GUI:HeaderText(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left),
-			{ separator = false, spacing = true, color = Color("#AA0000") })
+			{ separator = false, spacing = true, color = Color.RED })
 	end
 
 	ImGui.BeginDisabled(on_cooldown)
@@ -378,7 +378,7 @@ local function drawDDayTab()
 	GVars.features.yim_heists.dday_cd, _ = GUI:CustomToggle(_T("CP_HEIST_COOLDOWN_DISABLE"),
 		GVars.features.yim_heists.dday_cd, {
 			tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
-			color   = Color("#AA0000"),
+			color   = Color.RED,
 			onClick = function()
 				YRV3:SetCooldownStateDirty("dday_cd", true)
 			end

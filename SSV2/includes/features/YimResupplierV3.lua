@@ -234,7 +234,7 @@ function YRV3:GetSalvageYard()
 	return self.m_businesses.salvage_yard
 end
 
----@return table
+---@return dict<{ type: "float"|"bool", tuneables: array<string> }>
 function YRV3:GetSaleMissionTunables()
 	return self.m_raw_data.SellMissionTunables
 end

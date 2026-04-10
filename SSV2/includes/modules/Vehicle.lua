@@ -9,6 +9,9 @@
 
 local fMatrix44 = require("includes.classes.gta.fMatrix44")
 require("includes.modules.Entity")
+local CCarHandlingData = require("includes.classes.gta.CCarHandlingData")
+local CBikeHandlingData = require("includes.classes.gta.CBikeHandlingData")
+local CFlyingHandlingData = require("includes.classes.gta.CFlyingHandlingData")
 
 ---@enum eConvertibleRoofState
 Enums.eConvertibleRoofState = {
@@ -94,7 +97,7 @@ function Vehicle:GetClassName()
 		return "Unknown"
 	end
 
-	return EnumToString(Enums.eVehicleClasses, clsid)
+	return EnumToString(Enums.eVehicleClass, clsid)
 end
 
 function Vehicle:GetEngineHealth()
@@ -469,7 +472,7 @@ function Vehicle:IsPerformanceCar()
 	end
 
 	local cls = self:GetClassID()
-	if (cls == Enums.eVehicleClasses.Sports or cls == Enums.eVehicleClasses.Super) then
+	if (cls == Enums.eVehicleClass.SPORTS or cls == Enums.eVehicleClass.SUPER) then
 		return true
 	end
 
@@ -532,7 +535,7 @@ end
 ---@return boolean
 function Vehicle:IsFormulaOne()
 	return self:GetModelInfoFlag(Enums.eVehicleModelInfoFlags.IS_FORMULA_VEHICLE)
-		or (self:GetClassID() == Enums.eVehicleClasses.OpenWheel)
+		or (self:GetClassID() == Enums.eVehicleClass.OPEN_WHEEL)
 end
 
 -- Returns whether the vehicle is a lowrider equipped with hydraulic suspension.
@@ -965,12 +968,11 @@ function Vehicle:GetMods()
 		table.insert(_mods, VEHICLE.GET_VEHICLE_MOD(handle, i))
 	end
 
-	local window_tint = VEHICLE.GET_VEHICLE_WINDOW_TINT(handle)
-	local plate_text = VEHICLE.GET_VEHICLE_NUMBER_PLATE_TEXT(handle)
-	local col1, col2 = self:GetColors()
-	local wheels = self:GetCustomWheels()
-
-	local struct = VehicleMods.create(
+	local window_tint    = VEHICLE.GET_VEHICLE_WINDOW_TINT(handle)
+	local plate_text     = VEHICLE.GET_VEHICLE_NUMBER_PLATE_TEXT(handle)
+	local col1, col2     = self:GetColors()
+	local wheels         = self:GetCustomWheels()
+	local struct         = VehicleMods.create(
 		_mods,
 		col1,
 		col2,
@@ -980,24 +982,24 @@ function Vehicle:GetMods()
 	)
 
 	struct.window_states = self:GetWindowStates()
-	struct.toggle_mods = self:GetToggleMods()
-	struct.neon = self:GetNeonLights()
+	struct.toggle_mods   = self:GetToggleMods()
+	struct.neon          = self:GetNeonLights()
 
-	if struct.toggle_mods[20] then
+	if (struct.toggle_mods[20]) then
 		local r, g, b = 0, 0, 0
 		r, g, b = VEHICLE.GET_VEHICLE_TYRE_SMOKE_COLOR(handle, r, g, b)
 		struct.tyre_smoke_color = { r = r, g = g, b = b }
 	end
 
-	if struct.toggle_mods[22] then
+	if (struct.toggle_mods[22]) then
 		struct.xenon_color = VEHICLE.GET_VEHICLE_XENON_LIGHT_COLOR_INDEX(handle)
 	end
 
-	if VEHICLE.GET_VEHICLE_LIVERY_COUNT(handle) > 0 then
+	if (VEHICLE.GET_VEHICLE_LIVERY_COUNT(handle) > 0) then
 		struct.livery = VEHICLE.GET_VEHICLE_LIVERY(handle)
 	end
 
-	if VEHICLE.GET_VEHICLE_LIVERY2_COUNT(handle) > 0 then
+	if (VEHICLE.GET_VEHICLE_LIVERY2_COUNT(handle) > 0) then
 		struct.livery2 = VEHICLE.GET_VEHICLE_LIVERY2(handle)
 	end
 
@@ -1006,7 +1008,7 @@ function Vehicle:GetMods()
 
 	VEHICLE.GET_VEHICLE_EXTRA_COLOUR_5(handle, pInt3)
 	VEHICLE.GET_VEHICLE_EXTRA_COLOUR_6(handle, pInt4)
-	struct.interior_color = pInt3
+	struct.interior_color  = pInt3
 	struct.dashboard_color = pInt4
 
 	return struct
@@ -1324,21 +1326,24 @@ function Vehicle:SetBoneMatrix(bone_index, matrix)
 	self:Resolve():SetBoneMatrix(bone_index, matrix)
 end
 
----@return CBaseSubHandlingData|any
+---@return (CCarHandlingData|CBikeHandlingData|CFlyingHandlingData)?
 function Vehicle:GetHandlingData()
-	if (not self:IsValid()) then
-		return nil
-	end
-	local handlingType = Enums.eHandlingType.CAR
+	if (not self:IsValid()) then return end
 
 	-- this is bad but whatever
-	if (self:IsBike()) then
-		handlingType = Enums.eHandlingType.BIKE
-	elseif self:IsPlane() or self:IsHeli() then
-		handlingType = Enums.eHandlingType.FLYING
+	local base
+	local ptr = self:Resolve():GetSubHandlingData()
+	if (self:IsCar()) then
+		base = CCarHandlingData
+	elseif (self:IsBike()) then
+		base = CBikeHandlingData
+	elseif (self:IsPlane() or self:IsHeli()) then
+		base = CFlyingHandlingData
 	end
 
-	return self:Resolve():GetSubHandlingData(handlingType)
+	if (not base) then return end
+
+	return base(ptr)
 end
 
 ---@return integer

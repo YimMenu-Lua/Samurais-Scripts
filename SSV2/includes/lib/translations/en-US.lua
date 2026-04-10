@@ -67,8 +67,10 @@ return {
 	["GENERIC_WAIT_LABEL"]                 = "Please wait",
 	["GENERIC_CONFIRM"]                    = "Confirm",
 	["GENERIC_CANCEL"]                     = "Cancel",
+	["GENERIC_CLOSE"]                      = "Close",
 	["GENERIC_APPLY"]                      = "Apply",
 	["GENERIC_RESET"]                      = "Reset",
+	["GENERIC_RESET_ALL"]                  = "Reset All",
 	["GENERIC_REPAIR"]                     = "Repair",
 	["GENERIC_CLEAR"]                      = "Clear",
 	["GENERIC_CLEAR_ALL"]                  = "Clear All",
@@ -82,7 +84,9 @@ return {
 	["GENERIC_MISC"]                       = "Misc",
 	["GENERIC_ACTIVE"]                     = "Active",
 	["GENERIC_INACTIVE"]                   = "Inactive",
+	["GENERIC_ENABLE"]                     = "Enable",
 	["GENERIC_ENABLED"]                    = "Enabled",
+	["GENERIC_DISABLE"]                    = "Disable",
 	["GENERIC_DISABLED"]                   = "Disabled",
 	["GENERIC_MIN"]                        = "Minimum",
 	["GENERIC_MAX"]                        = "Maximum",
@@ -162,6 +166,12 @@ return {
 	["GENERIC_COMMANDS"]                   = "Commands",
 	["GENERIC_TURN_ON"]                    = "Turn On",
 	["GENERIC_TURN_OFF"]                   = "Turn Off",
+	["GENERIC_SCRIPT_CONTROL"]             = "Attempting to take control of script",
+	["GENERIC_MANUFACTURER"]               = "Manufacturer",
+	["GENERIC_CLASS"]                      = "Class",
+	["GENERIC_YOU"]                        = "You",
+	["GENERIC_CUSTOMIZE"]                  = "Customize",
+	["GENERIC_FAVORITES"]                  = "Favorites",
 	--#endregion
 
 	--#region CasinoPacino
@@ -189,16 +199,13 @@ return {
 	["CP_POKER_SETTINGS"]                  = "Three Card Poker",
 	["CP_POKER_FORCE_ROYAL_FLUSH"]         = "Force all Players Hands to Royal Flush",
 	["CP_POKER_FORCE_BAD_BEAT"]            = "Force Dealer's Hand to 'Bad Beat'",
-	["CP_POKER_SCRIPT_CONTROL"]            = "Taking control of the Three Card Poker script...",
 	["CP_BLACKJACK_SETTINGS"]              = "Blackjack",
 	["CP_BLACKJACK_DEALER_FACE_DOWN_CARD"] = "Dealer's Face Down Card:",
 	["CP_BLACKJACK_FORCE_DEALER_BUST"]     = "Force Dealer to Bust",
-	["CP_BLACKJACK_SCRIPT_CONTROL"]        = "Taking control of the blackjack script...",
 	["CP_NOT_IN_CASINO"]                   = "Not in Casino",
 	["CP_NOT_PLAYING_BLACKJACK"]           = "Not Playing Blackjack",
 	["CP_ROULETTE_SETTINGS"]               = "Roulette",
 	["CP_ROULETTE_FORCE_RED_18"]           = "Force Roulette Wheel to Land on Red 18",
-	["CP_ROULETTE_SCRIPT_CONTROL"]         = "Taking control of the 'Casino Roulette' script...",
 	["CP_SLOT_MACHINES_SETTINGS"]          = "Slot Machines",
 	["CP_SLOT_MACHINES_RIG"]               = "Rig Slot Machines",
 	["CP_SLOT_MACHINES_AUTOPLAY"]          = "Autoplay Slot Machines",
@@ -609,6 +616,7 @@ return {
 	["VEH_STANCE_BOUNCE_MODE_UNAVAIL"]     = "Bounce Mode is only available for SUVs.",
 	["VEH_STANCE_SAVE_MODEL"]              = "Save Current Model",
 	["VEH_STANCE_UPDATE_MODEL"]            = "Update Saved Model",
+	["VEH_STANCE_UPDATE_WARN"]             = "Are you sure you want to overwrite saved stance for the %s ?",
 	["VEH_STANCE_AUTOAPPLY"]               = "Auto-Apply",
 	["VEH_STANCE_AUTOAPPLY_TT"]            = "Automatically apply saved model stance when you enter a vehicle of that model.",
 	["VEH_STANCE_VIEW_SAVED"]              = "View Saved Vehicles",
@@ -731,6 +739,8 @@ return {
 	--#region EntityForge
 	["EF_NEW_NAME_HINT"]                   = "NOTE: Everything will be deleted once you save. You can spawn your creation later.",
 	["EF_NAME_EXISTS_ERR"]                 = "This name already exists. Please choose a different one.",
+	["EF_MODEL_EXISTS_ERR"]                = "This model already exists. Please choose a different one.",
+	["EF_FAV_SAVE_SUCCESS"]                = "Added %s to favorites.",
 	["EF_ROTATE_OBJECT"]                   = "Rotate Object:",
 	["EF_MOVE_OBJECT"]                     = "Move Object:",
 	["EF_MULTIPLIER_LABEL"]                = "Multiplier %.2f",
@@ -744,7 +754,23 @@ return {
 	["EF_ENTITY_GUN_TT"]                   = "Aim your weapon at an entity in the game world and press [E] to add it to the forge pool. Once added, you'll be able to use your mouse to move and manipulate it.",
 	["EF_SHARE_SUCCESS"]                   = "Your saved creation was copied to clipboard. If you share the copied data with other users of this script, they will be able import it into their saved creations.",
 	["EF_IMPORT_SUCCESS"]                  = "Data successfully imported.",
-	["EF_CHILD_ALPHA"]                     = "Child Item Transparency: %d",
+	["EF_ALPHA"]                           = "Transparency: %d",
+	["EF_ALPHA_PLAYER_NOT_ALLOWED"]        = "Modifying transparency is not allowed for the local player entity.",
+	["EF_NONE_SPAWNED_HINT"]               = "Spawn some entities in order to start creating.",
+	["EF_CHILD_CANDIDATES"]                = "Child Candidates",
+	["EF_SPAWNED_ENTITIES"]                = "Spawned Entities",
+	["EF_PARENT_CANDIDATES"]               = "Parent Candidates",
+	["EF_SELF_ATTACH_HINT"]                = "Select a bone from the list then press the button to attach the entity to yourself.",
+	["EF_AXIS_WINDOW"]                     = "Axis Window",
+	["EF_AXIS_WINDOW_TT"]                  = "Opens the movement and rotation controls in an independant window for better visibility.",
+	["EF_CHILD_ITEMS"]                     = "Child Items:",
+	["EF_ROTATION_AXIS_HINT"]              = "Rotation is relative to the attachment bone.",
+	["EF_NEW_FORGE_SUCCESS"]               = "Added '%s' to Saved Creations",
+	["EF_MOUSE_CURSOR_HINT"]               = "Press [ %s ] to %s the mouse cursor.",
+	["EF_TAB_SPAWNER"]                     = "Spawner",
+	["EF_TAB_CREATOR"]                     = "Creator",
+	["EF_TAB_SPAWNED_ENTITIES"]            = "Spawned Entities",
+	["EF_TAB_SAVED_FORGES"]                = "Saved Creations",
 	--#endregion
 
 	--#region YimHeists
@@ -851,6 +877,6 @@ return {
 	--#endregion
 
 	--#region Miscellaneous
-	["PED_BROWSER_TRUNC_TT"]               = "The list is truncated to show only %d entries. Use the search bar to find what you're looking for.",
+	["ASSET_BROWSER_TRUNC_TT"]             = "The list is truncated to show only %d entries. Use the search bar to find what you're looking for.",
 	--#endregion
 }

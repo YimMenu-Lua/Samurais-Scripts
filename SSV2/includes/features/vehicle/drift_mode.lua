@@ -8,6 +8,7 @@
 
 
 local FeatureBase = require("includes.modules.FeatureBase")
+local CWheel      = require("includes.classes.gta.CWheel")
 
 ---@class DriftMode : FeatureBase
 ---@field private m_entity PlayerVehicle -- Reference to PlayerVehicle
@@ -158,9 +159,9 @@ end
 -- 		4
 -- 	)
 
--- 	for i, wheel in wheels:Iter() do
--- 		local cwheel = CWheel(wheel)
--- 		if (not cwheel) then
+-- 	for i, pWheel in wheels:Iter() do
+-- 		local cwheel = CWheel(pWheel:deref())
+-- 		if (not cwheel or not cwheel:IsValid()) then
 -- 			goto continue
 -- 		end
 
@@ -169,9 +170,9 @@ end
 -- 		local drag_co         = cwheel.m_tire_drag_coeff:get_float()
 -- 		local rot_spd         = cwheel.m_rotation_speed:get_float()
 -- 		local top_spd_mult    = cwheel.m_top_speed_mult:get_float()
--- 		local is_full_thottle = cwheel:GetWheelFlag(Enums.eWheelFlags.FULL_THROTTLE)
--- 		local is_cheat_tc     = cwheel:GetWheelFlag(Enums.eWheelFlags.CHEAT_TC)
--- 		local is_cheat_sc     = cwheel:GetWheelFlag(Enums.eWheelFlags.CHEAT_SC)
+-- 		local is_full_thottle = cwheel:GetDynamicFlag(Enums.eWheelDynamicFlags.FULL_THROTTLE)
+-- 		local is_cheat_tc     = cwheel:GetDynamicFlag(Enums.eWheelDynamicFlags.CHEAT_TC)
+-- 		local is_cheat_sc     = cwheel:GetDynamicFlag(Enums.eWheelDynamicFlags.CHEAT_SC)
 -- 		local is_driven       = cwheel:GetConfigFlag(Enums.eWheelConfigFlags.POWERED)
 -- 		local wheel_txt       = _F(
 -- 			"- %d: Power: %.3f | Brake: %.3f | Drag: %.3f | Rotation: %.3f | Speed Mult: %.3f",

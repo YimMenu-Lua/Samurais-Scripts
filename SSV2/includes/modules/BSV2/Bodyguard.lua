@@ -120,6 +120,7 @@ function Bodyguard.new(modelHash, name, spawnPos, weapon, godmode, noRagdoll, be
 		Game.IsOnline(),
 		false
 	)
+
 	if (not ok or not Game.IsScriptHandle(handle)) then
 		Notifier:ShowWarning("Billionaire Services", "Failed to create entity! Please try again later", true, 5)
 		return
@@ -127,7 +128,6 @@ function Bodyguard.new(modelHash, name, spawnPos, weapon, godmode, noRagdoll, be
 
 	if (Game.IsOnline()) then
 		entities.take_control_of(handle, 500)
-		Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(handle))
 	end
 
 	-- ENTITY.SET_ENTITY_LOD_DIST(handle, 0xFFFF) -- huh?
@@ -382,7 +382,7 @@ function Bodyguard:UpdatePosition(allowInside)
 		return
 	end
 
-	if (PLAYER.IS_PLAYER_TELEPORT_ACTIVE() and not PLAYER.UPDATE_PLAYER_TELEPORT(LocalPlayer:GetPlayerID())) then
+	if (PLAYER.IS_PLAYER_TELEPORT_ACTIVE() and not PLAYER.UPDATE_PLAYER_TELEPORT(LocalPlayer:GetID())) then
 		sleep(10)
 		return
 	end

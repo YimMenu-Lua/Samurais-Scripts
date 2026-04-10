@@ -7,15 +7,15 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
-local colMoneyGreen       = Color("#85BB65")
-local colGreen            = Color("green")
-local colRed              = Color("red")
-local drawDetailsTable    = false
+local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
+local colMoneyGreen <const> = Color("#85BB65")
+local COL_GREEN <const>     = Color.GREEN
+local COL_RED <const>       = Color.RED
+local drawDetailsTable      = false
 local bottomTextSize
 
 ---@type array<integer>
-local bulletWidths        = {}
+local bulletWidths          = {}
 
 ---@param warehouse? VehicleWarehouse
 return function(warehouse)
@@ -88,9 +88,9 @@ return function(warehouse)
 
 	ImGui.Spacing()
 	ImGui.Text(_T("YRV3_IE_VEHS_OVERVIEW"))
-	local low_col = low == 10 and colGreen or colRed
-	local mid_col = mid == 10 and colGreen or colRed
-	local top_col = top < 10 and colRed or colGreen
+	local low_col = low == 10 and COL_GREEN or COL_RED
+	local mid_col = mid == 10 and COL_GREEN or COL_RED
+	local top_col = top < 10 and COL_RED or COL_GREEN
 	ImGui.BulletText(_T("YRV3_IE_VEH_RANGE_LOW"))
 	ImGui.SameLine(bulletWidth)
 	GUI:Text(tostring(low), { color = low_col })

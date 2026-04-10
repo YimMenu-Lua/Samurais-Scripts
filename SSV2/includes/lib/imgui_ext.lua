@@ -85,7 +85,7 @@ local spinner_chars <const>   = {
 local DialogBoxColors <const> = {
 	-- info is just derived from default theme
 	[ImGuiDialogBoxStyle.WARN]   = Color(240, 190, 2, 255), -- safety yellow; we should probably define this in the Color class as a named color
-	[ImGuiDialogBoxStyle.SEVERE] = Color("red"),
+	[ImGuiDialogBoxStyle.SEVERE] = Color.RED,
 }
 
 ---@param label string
@@ -116,25 +116,24 @@ end
 ---@param flags? integer ImGuiInputTextFlags
 ---@param maxWidth? float
 ---@param bufferSize? integer
----@return string, boolean
+---@return string result lowercase
+---@return boolean changed
 function ImGui.SearchBar(label, stringBuffer, flags, maxWidth, bufferSize)
-	maxWidth      = maxWidth or -1
-	bufferSize    = bufferSize or math.max(#stringBuffer + 32, 256)
-	flags         = flags or ImGuiInputTextFlags.None
-	local changed = false
+	maxWidth   = maxWidth or -1
+	bufferSize = bufferSize or math.max(#stringBuffer + 32, 256)
+	flags      = flags or 0
 
 	ImGui.SetNextItemWidth(maxWidth)
-	ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 6)
-	ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, 6, 4)
-	stringBuffer, changed = ImGui.InputTextWithHint(
+	ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, 15, 5)
+	local out, changed = ImGui.InputTextWithHint(
 		label,
 		_T("GENERIC_SEARCH_HINT"),
 		stringBuffer,
 		bufferSize,
 		flags
 	)
-	ImGui.PopStyleVar(2)
-	return stringBuffer, changed
+	ImGui.PopStyleVar()
+	return out:lower(), changed
 end
 
 -- Returns a basic animated string
@@ -170,7 +169,27 @@ end
 ---@param bgColor Color
 ---@return Color
 function ImGui.GetAutoTextColor(bgColor)
-	return bgColor:IsDark() and Color("white") or Color("black")
+	return bgColor:IsDark() and Color.WHITE or Color.BLACK
+end
+
+---@param idx ImGuiCol
+---@return Color
+function ImGui.GetStyleColor(idx)
+	return Color(ImGui.GetStyleColorVec4(idx))
+end
+
+---@param idx ImGuiCol
+---@return uint32_t
+function ImGui.GetStyleColorU32(idx)
+	return ImGui.ColorConvertFloat4ToU32({ ImGui.GetStyleColorVec4(idx) })
+end
+
+---@param bgColor uint32_t
+---@return uint32_t
+function ImGui.GetAutoTextColorU32(bgColor)
+	local float4     = ImGui.ColorConvertU32ToFloat4(bgColor)
+	local brightness = Color.CalculateBrightness(float4[1], float4[2], float4[3])
+	return brightness < 0.5 and 0xFFFFFFFF or 0xFF000000
 end
 
 ---@param text string
@@ -239,10 +258,10 @@ end
 -- Wrapper for `ImGui.ColorEdit3` that takes a vec3 and mutates it in place.
 ---@param label string
 ---@param outVector vec3
----@return boolean
+---@return boolean clicked
 function ImGui.ColorEditVec3(label, outVector)
 	if (not IsInstance(outVector, vec3)) then
-		Notifier:ShowError("ImGui", _F("Invalid argument #2: vec3 expected, got %s instead.", type(outVector)), true)
+		log.fwarning("Invalid argument #2: vec3 expected, got %s instead.", type(outVector))
 		return false
 	end
 
@@ -281,12 +300,12 @@ end
 
 ---@param label string
 ---@param outU32 uint32_t
----@return uint32_t, boolean
+---@return uint32_t U32, boolean clicked
 function ImGui.ColorEditU32(label, outU32)
 	local temp, changed = { Color(outU32):AsFloat() }, false
 	temp, changed = ImGui.ColorEdit4(label, temp)
 	if (changed) then
-		return Color(temp):AsU32(), changed
+		return ImGui.ColorConvertFloat4ToU32(temp), changed
 	end
 
 	return outU32, changed
@@ -395,7 +414,7 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 
 	local textY            = pos.y + (size.y - textH) * 0.5
 	local defaultTextColor = ImGui.GetStyleColorU32(ImGuiCol.Text)
-	local autoTextColor    = ImGui.GetAutoTextColor(Color(background)):AsU32()
+	local autoTextColor    = ImGui.GetAutoTextColorU32(background)
 	local textColor        = (hovered or selected) and autoTextColor or defaultTextColor
 	ImGui.ImDrawListAddText(drawList, textX, textY, textColor, finalLabel)
 
@@ -447,18 +466,6 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 	return clicked
 end
 
----@param idx ImGuiCol
----@return Color
-function ImGui.GetStyleColor(idx)
-	return Color(ImGui.GetStyleColorVec4(idx))
-end
-
----@param idx ImGuiCol
----@return uint32_t
-function ImGui.GetStyleColorU32(idx)
-	return ImGui.GetStyleColor(idx):AsU32()
-end
-
 -- https://github.com/ocornut/imgui/issues/5263
 ---@param label string
 ---@param value float
@@ -469,10 +476,8 @@ function ImGui.ValueBar(label, value, size, flags, opts)
 	flags              = flags or ImGuiValueBarFlags.NONE
 	size               = size or vec2:zero()
 	opts               = opts or {}
-
-	---@type boolean
-	local isMultiVal   = flags & ImGuiValueBarFlags.MULTI_VAL ~= 0
-	local isHotizontal = flags & ImGuiValueBarFlags.VERTICAL == 0
+	local isMultiVal   = (flags & ImGuiValueBarFlags.MULTI_VAL) ~= 0
+	local isHotizontal = (flags & ImGuiValueBarFlags.VERTICAL) == 0
 	local region       = vec2:new(ImGui.GetContentRegionAvail())
 
 	if (size.x <= 0) then
@@ -599,6 +604,8 @@ end
 ---@param thickness? float
 ---@param color? uint32_t
 function ImGui.VerticalSeparator(thickness, color)
+	ImGui.SameLine()
+
 	thickness        = thickness or 1
 	color            = color or ImGui.GetStyleColorU32(ImGuiCol.Separator)
 	local drawList   = ImGui.GetWindowDrawList()
@@ -616,6 +623,7 @@ function ImGui.VerticalSeparator(thickness, color)
 	)
 
 	ImGui.Dummy(thickness, 0)
+	ImGui.SameLine()
 end
 
 ---@param label string
@@ -794,16 +802,17 @@ function ImGui.NotifWidget(state, size)
 		end
 
 		if (state.unread and state.unreadCount > 0) then
-			local c  = state.unreadCount
-			local r  = height * 0.32
-			local bx = pmax.x + r * 1.25
-			local by = pmin.y + r * 0.7
+			local c         = state.unreadCount
+			local r         = height * 0.32
+			local bx        = pmax.x + r * 1.25
+			local by        = pmin.y + r * 0.7
+			local accentU32 = accent:AsU32()
 			ImGui.ImDrawListAddCircleFilled(
 				pDrawList,
 				bx,
 				by,
 				r,
-				accent:AsU32(),
+				accentU32,
 				12
 			)
 
@@ -819,7 +828,7 @@ function ImGui.NotifWidget(state, size)
 				14,
 				bx - txtSize.x * 0.5,
 				by - txtSize.y * 0.75,
-				ImGui.GetAutoTextColor(accent):AsU32(),
+				ImGui.GetAutoTextColorU32(accentU32),
 				countTxt
 			)
 			ImGui.SetWindowFontScale(1.0)
@@ -985,6 +994,7 @@ function ImGui.BeginChildEx(name, size, childFlags, windowFlags)
 		if (padding) then
 			windowFlags = windowFlags | ImGuiWindowFlags.AlwaysUseWindowPadding
 		end
+		---@diagnostic disable-next-line: param-type-mismatch
 		return ImGui.BeginChild(name, size.x, size.y, border, windowFlags)
 	end
 end

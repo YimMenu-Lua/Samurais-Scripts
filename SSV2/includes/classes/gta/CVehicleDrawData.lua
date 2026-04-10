@@ -8,7 +8,6 @@
 
 
 local CStructView = require("includes.classes.gta.CStructView")
-local fwDrawData  = require("includes.classes.gta.fwDrawData")
 
 
 --------------------------------------
@@ -73,17 +72,19 @@ end
 --------------------------------------
 -- Class: CVehicleDrawData
 --------------------------------------
----@class CVehicleDrawData : fwDrawData
+---@class CVehicleDrawData
 ---@field m_wheel_draw_data pointer_ref<CWheelDrawData>
 ---@overload fun(ptr: pointer): CVehicleDrawData
-local CVehicleDrawData = Class("CVehicleDrawData", { parent = fwDrawData, pointer_ctor = true })
+local CVehicleDrawData = Class("CVehicleDrawData", { pointer_ctor = true })
 
 ---@param ptr pointer
 ---@return CVehicleDrawData
 function CVehicleDrawData:init(ptr)
-	self.m_ptr = ptr
-	self.m_wheel_draw_data = ptr:add(0x370)
-	return self
+	return setmetatable({
+		m_ptr = ptr,
+		m_wheel_draw_data = ptr:add(0x370)
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, CVehicleDrawData)
 end
 
 ---@return CWheelDrawData

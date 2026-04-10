@@ -513,7 +513,7 @@ function GUI:DrawTopBar()
 
 		local bg               = (hovered or selected) and col1 or ImGui.GetStyleColorU32(ImGuiCol.WindowBg)
 		local defaultTextColor = ImGui.GetStyleColorU32(ImGuiCol.Text)
-		local autoTextColor    = ImGui.GetAutoTextColor(Color(bg)):AsU32()
+		local autoTextColor    = ImGui.GetAutoTextColorU32(bg)
 		local textColor        = (hovered or selected) and autoTextColor or defaultTextColor
 		ImGui.ImDrawListAddText(
 			drawList,
@@ -657,8 +657,7 @@ function GUI:OnDrawCallback(fixed_height)
 	end
 
 	local size, pos = self:GetNewWindowSizeAndCenterPos(0.45, 0.8); pos.y = 1
-	local bitwise   = GVars.ui.moveable and Bit.Clear or Bit.Set
-	mainWindowFlags = bitwise(mainWindowFlags, ImGuiWindowFlags.NoMove)
+	mainWindowFlags = Bit.Toggle(mainWindowFlags, ImGuiWindowFlags.NoMove, GVars.ui.moveable)
 
 	if (GVars.ui.window_pos:is_zero()) then
 		ImGui.SetNextWindowPos(pos.x, pos.y, ImGuiCond.Always)
@@ -858,7 +857,7 @@ end
 -- **Example:**
 --
 --```Lua
--- GUI:Text("Found %s at 0x%X", { color = Color("green"), fmt = { "somePointer", 20015998343868 }})
+-- GUI:Text("Found %s at 0x%X", { color = Color.GREEN, fmt = { "somePointer", 20015998343868 }})
 ---@param text string
 ---@param opts? { color?: Color, alpha?: number, wrap_pos?: number, fmt?: table } Optional parameters
 function GUI:Text(text, opts)
@@ -867,20 +866,24 @@ function GUI:Text(text, opts)
 		text = _F(text, table.unpack(opts.fmt))
 	end
 
-	if (not IsInstance(opts.color, Color)) then
-		ImGui.TextWrapped(text)
-		return
+	local has_wrap_pos = type(opts.wrap_pos) == "number"
+	local has_color    = IsInstance(opts.color, Color)
+
+	if (has_color) then
+		local r, g, b, a = opts.color:AsFloat()
+		ImGui.PushStyleColor(ImGuiCol.Text, r, g, b, opts.alpha or a or 1)
 	end
 
-	local has_wrap_pos = type(opts.wrap_pos) == "number"
-	local r, g, b, a   = opts.color:AsFloat()
-
-	ImGui.PushStyleColor(ImGuiCol.Text, r, g, b, opts.alpha or a or 1)
 	if (has_wrap_pos) then
 		ImGui.PushTextWrapPos(opts.wrap_pos)
 	end
-	ImGui.Text(text)
-	ImGui.PopStyleColor(1)
+
+	ImGui.TextWrapped(text)
+
+	if (has_color) then
+		ImGui.PopStyleColor(1)
+	end
+
 	if (has_wrap_pos) then
 		ImGui.PopTextWrapPos()
 	end

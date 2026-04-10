@@ -13,7 +13,8 @@
 
 ---@diagnostic disable
 
-return {
+---@class WeaponDictionary
+local WeaponDictionary <const> = {
 	[2725352035] = {
 		model_name = "WEAPON_UNARMED",
 		group = "GROUP_UNARMED",
@@ -747,3 +748,5 @@ return {
 		display_name = ""
 	}
 }
+
+return WeaponDictionary
