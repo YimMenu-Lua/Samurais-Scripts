@@ -305,6 +305,8 @@ end
 ---@overload fun() : ThreadManager
 local ThreadManager = Class("ThreadManager")
 
+local mock_routines = {}
+
 ---@return ThreadManager
 function ThreadManager:init()
 	if (self.m_initialized) then return self end
@@ -312,12 +314,11 @@ function ThreadManager:init()
 
 	local instance = setmetatable({
 		m_threads           = {},
-		m_mock_routines     = {},
 		m_callback_handlers = {
 			[Enums.eAPIVersion.L54] = {
 				dispatch = function(callback)
 					table.insert(
-						self.m_mock_routines,
+						mock_routines,
 						coroutine.create(callback)
 					)
 				end
@@ -347,6 +348,8 @@ function ThreadManager:init()
 		}
 		---@diagnostic disable-next-line
 	}, ThreadManager)
+
+	instance.m_mock_routines = mock_routines
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
 		instance:Shutdown()

@@ -12,6 +12,8 @@
 local MockEnv <const> = {}
 MockEnv.__index = MockEnv
 
+local function NOP() end
+
 function MockEnv.Setup(version)
 	if (version ~= Enums.eAPIVersion.L54) then
 		return
@@ -149,7 +151,16 @@ function MockEnv.Setup(version)
 	end
 
 	if (not stats) then stats = {} end
-	if (not ImGui) then ImGui = {} end
+	if (not ImGui) then
+		ImGui = setmetatable({}, { __index = function(...) return NOP end })
+	end
+
+	if (not ImGuiWindowFlags) then
+		ImGuiWindowFlags = setmetatable({}, { __index = function(...) return 0 end })
+	end
+	if (not ImGuiChildFlags) then
+		ImGuiChildFlags = setmetatable({}, { __index = function(...) return 0 end })
+	end
 end
 
 return MockEnv

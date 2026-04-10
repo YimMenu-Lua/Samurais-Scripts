@@ -270,9 +270,9 @@ function HideNSeek:HideInTrunk()
 		end
 
 		local cls = VEHICLE.GET_VEHICLE_CLASS(veh)
-		if (cls == Enums.eVehicleClasses.Vans) then
+		if (cls == Enums.eVehicleClass.VANS) then
 			z_offset = 1.1
-		elseif cls == Enums.eVehicleClasses.SUVs then
+		elseif cls == Enums.eVehicleClass.SUV then
 			z_offset = 1.2
 		end
 

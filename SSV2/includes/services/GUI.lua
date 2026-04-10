@@ -513,7 +513,7 @@ function GUI:DrawTopBar()
 
 		local bg               = (hovered or selected) and col1 or ImGui.GetStyleColorU32(ImGuiCol.WindowBg)
 		local defaultTextColor = ImGui.GetStyleColorU32(ImGuiCol.Text)
-		local autoTextColor    = ImGui.GetAutoTextColor(Color(bg)):AsU32()
+		local autoTextColor    = ImGui.GetAutoTextColorU32(bg)
 		local textColor        = (hovered or selected) and autoTextColor or defaultTextColor
 		ImGui.ImDrawListAddText(
 			drawList,
@@ -857,7 +857,7 @@ end
 -- **Example:**
 --
 --```Lua
--- GUI:Text("Found %s at 0x%X", { color = Color("green"), fmt = { "somePointer", 20015998343868 }})
+-- GUI:Text("Found %s at 0x%X", { color = Color.GREEN, fmt = { "somePointer", 20015998343868 }})
 ---@param text string
 ---@param opts? { color?: Color, alpha?: number, wrap_pos?: number, fmt?: table } Optional parameters
 function GUI:Text(text, opts)

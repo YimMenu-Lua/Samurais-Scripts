@@ -33,7 +33,6 @@ local CCarHandlingData  = require("includes.classes.gta.CCarHandlingData")
 ---@field public m_handling_data CHandlingData
 ---@field public m_model_info CVehicleModelInfo
 ---@field public m_vehicle_damage pointer<CVehicleDamage>
----@field public m_car_handling_data pointer<CCarHandlingData>?
 ---@field public m_can_boost_jump pointer<byte> `bool`
 ---@field public m_velocity pointer<vec3>
 ---@field public m_deform_god pointer<uint8_t>

@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local COL_RED <const> = Color("red")
+local COL_RED <const> = Color.RED
 local timer_data <const> = {
 	{ label = "GENERIC_MILLIS_LABEL",  mult = 1 },
 	{ label = "GENERIC_SECONDS_LABEL", mult = 1e3 },

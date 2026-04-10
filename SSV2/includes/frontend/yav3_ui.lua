@@ -13,9 +13,16 @@ local t_AnimList                 = require("includes.data.actions.animations")
 local t_PedScenarios             = require("includes.data.actions.scenarios")
 local t_SyncedScenes             = require("includes.data.actions.synchronized_scenes")
 local t_MovementClipsets         = require("includes.data.actions.movement_clipsets")
-local t_GamePeds                 = require("includes.data.peds")
 local Action                     = require("includes.structs.Action")
 local PreviewService             = require("includes.services.PreviewService")
+local PedBrowser                 = require("includes.services.asset_browsers.PedBrowser").new({
+	max_entries         = 250,
+	humans_only         = false,
+	show_preview        = true,
+	show_gender_filters = true,
+	show_type_filters   = true,
+})
+
 local i_AnimSortByIndex          = 0
 local i_MovementCategory         = 0
 local i_SelectedRecentIndex      = 1
@@ -25,10 +32,8 @@ local i_SelectedSceneIndex       = 1
 local i_SelectedSidebarItem      = 1
 local i_CompanionIndex           = 1
 local i_CompanionActionCategory  = -1
-local s_SelectedPed              = ""
 local s_SearchBuffer             = ""
 local s_MovementSearchBuffer     = ""
-local s_PedSearchBuffer          = ""
 local s_SelectedFavoriteName     = ""
 local s_NewCommandBuffer         = ""
 local s_MovementClipsetsGitHub   = "https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json"
@@ -39,6 +44,9 @@ local b_SearchBarUsed            = false
 local b_PreviewPeds              = false
 local b_SpawnInvincible          = false
 local b_SpawnArmed               = false
+
+---@type RawPedData?
+local selectedPed                = nil
 
 ---@type Action?
 local t_SelectedAction           = nil
@@ -163,9 +171,6 @@ local function SortDataLists()
 		end)
 		table.sort(t_MovementClipsets, function(a, b)
 			return a.Name < b.Name
-		end)
-		table.sort(t_GamePeds, function(a, b)
-			return a < b
 		end)
 
 		b_DataListsSorted = true
@@ -580,7 +585,7 @@ local function DrawActionsSidebar()
 			ImGui.PushStyleColor(ImGuiCol.Button, r, g, b, a)
 		end
 
-		if ImGui.Button(tab.label, 120, 35) then
+		if (ImGui.Button(tab.label, is_selected and 150 or 128, 35)) then
 			GUI:PlaySound("Nav")
 			if i_SelectedSidebarItem ~= i then
 				s_SearchBuffer = ""
@@ -753,39 +758,8 @@ end
 
 local function GetMovementClipsetsFromJson()
 	b_MovementListCreated = false
-	if not io.exists("movementClipsetsCompact.json") then
-		Notifier:ShowError(
-			"Samurai's Scripts",
-			"Movement Clipsets file not found!",
-			true
-		)
-		return
-	end
-
-	local jsonFile = io.open("movementClipsetsCompact.json", "r")
-	if not jsonFile then
-		Notifier:ShowError(
-			"Samurai's Scripts",
-			"Failed to read Json!",
-			true
-		)
-		return
-	end
-
-	local content = jsonFile:read("*all")
-	jsonFile:close()
-
-	if not content or (#content == 0) then
-		Notifier:ShowError(
-			"Samurai's Scripts",
-			"Failed to read Json data! The file is either empty or corrupted.",
-			true
-		)
-		return
-	end
-
-	local temp = Serializer:Decode(content)
-	if (not temp or type(temp)) ~= "table" then
+	local temp = Serializer:ReadFromFile("movementClipsetsCompact.json")
+	if (not temp or type(temp) ~= "table") then
 		Notifier:ShowError("YimActions",
 			"Failed to read clipset data from Json. Are you use you have the correct file?",
 			true, 5
@@ -796,12 +770,13 @@ local function GetMovementClipsetsFromJson()
 	ThreadManager:Run(function()
 		for _, v in ipairs(temp) do
 			table.insert(t_MovementClipsetsJson, v)
-			yield()
 		end
 
 		table.sort(t_MovementClipsetsJson, function(a, b)
 			return a.Name < b.Name
 		end)
+
+		yield()
 		b_MovementListCreated = (#t_MovementClipsetsJson > 0)
 		temp = nil
 	end)
@@ -1319,60 +1294,25 @@ local function DrawPedSpawnWindow()
 		ImGui.Separator()
 		ImGui.Dummy(1, 10)
 
-		ImGui.BeginChildEx("##ped_spawn_list", vec2:new(440, 400), ImGuiChildFlags.Borders)
-		ImGui.SetNextItemWidth(-1)
-		s_PedSearchBuffer, _ = ImGui.InputTextWithHint(
-			"##search",
-			"Search",
-			s_PedSearchBuffer,
-			128
-		)
-
-		if ImGui.BeginListBox("##ped_list", -1, -1) then
-			for model, data in pairs(t_GamePeds) do
-				if (not s_PedSearchBuffer:isempty() and not model:lower():find(s_PedSearchBuffer:lower())) then
-					goto continue
-				end
-
-				if ImGui.Selectable(model, (s_SelectedPed == model)) then
-					s_SelectedPed = model
-				end
-
-				if ImGui.IsItemHovered() and b_PreviewPeds then
-					i_HoveredPedModelThisFrame = data.model_hash
-				end
-
-				::continue::
-			end
-			ImGui.EndListBox()
-		end
-
-		if b_PreviewPeds and i_HoveredPedModelThisFrame ~= 0 then
-			PreviewService:OnTick(i_HoveredPedModelThisFrame, Enums.eEntityType.Ped)
-		end
-		ImGui.EndChild()
+		selectedPed = PedBrowser:Draw(vec2:new(400, 400))
 
 		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 10, 10)
 
-		b_SpawnInvincible, _ = GUI:CustomToggle("Spawn Invincible", b_SpawnInvincible)
+		b_SpawnInvincible = GUI:CustomToggle("Spawn Invincible", b_SpawnInvincible)
 
 		ImGui.SameLine()
 
-		b_SpawnArmed, _ = GUI:CustomToggle("Spawn Armed", b_SpawnArmed)
-
-		ImGui.SameLine()
-
-		b_PreviewPeds, _ = GUI:CustomToggle("Preview", b_PreviewPeds)
+		b_SpawnArmed = GUI:CustomToggle("Spawn Armed", b_SpawnArmed)
 
 		ImGui.Spacing()
 
-		ImGui.BeginDisabled(not t_GamePeds[s_SelectedPed])
-		if ImGui.Button("Spawn", 80, 35) then
-			GUI:PlaySound("Select")
+		ImGui.BeginDisabled(not selectedPed)
+		if GUI:Button("Spawn", { size = vec2:new(80, 35) }) then
+			if (not selectedPed) then return end
 			ThreadManager:Run(function()
 				CompanionMgr:SpawnCompanion(
-					t_GamePeds[s_SelectedPed].model_hash,
-					s_SelectedPed,
+					selectedPed.model_hash,
+					Game.GetPedModelName(selectedPed.model_hash),
 					b_SpawnInvincible,
 					b_SpawnArmed,
 					false

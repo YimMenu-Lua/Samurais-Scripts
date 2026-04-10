@@ -1657,7 +1657,7 @@ end
 ---@return boolean
 function math.is_equal(a, b, e)
 	e = e or 1e-6
-	return a == b or math.abs(a - b) < 1e-6
+	return a == b or math.abs(a - b) < e
 end
 
 local INT_SIZES <const>     = {

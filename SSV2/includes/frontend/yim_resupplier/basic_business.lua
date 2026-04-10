@@ -8,7 +8,7 @@
 
 local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
 local colMoneyGreen <const>  = Color("#85BB65")
-local U32_RED <const>        = Color("red"):AsU32()
+local U32_RED <const>        = Color.RED:AsU32()
 local U32_GREEN <const>      = colMoneyGreen:Darken(0.12):AsU32()
 
 ---@param business CarWash|CarWashSubBusiness

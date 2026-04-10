@@ -37,11 +37,13 @@ end
 ---@class Stancer : FeatureBase
 ---@field private m_entity PlayerVehicle
 ---@field private m_last_tick milliseconds
----@field private m_cached_model hash
+---@field private m_cached_model_hash? hash
+---@field private m_cached_model_name? string
 ---@field private m_reloading boolean
 ---@field private m_last_wheels_mod {type: integer, index: integer, var: integer}
----@field private m_last_wheel_mod_check_time seconds
----@field private m_json_filename "stancer.json"
+---@field private m_last_wheel_mod_check_time milliseconds
+---@field private m_filename "stancer.json"
+---@field private m_saved_models table<string, table<eWheelAxle, StanceObject>>
 ---@field public m_base_values table<eWheelAxle, StanceObject>
 ---@field public m_deltas table<eWheelAxle, StanceObject>
 ---@field public m_wheels table<eWheelAxle, array<CWheel>>
@@ -49,15 +51,16 @@ end
 ---@field public m_is_active boolean
 ---@field public m_bounce_mode { enabled: boolean, margin: float, speed: float, last_height_f: float, last_height_r: float, t: milliseconds }
 local Stancer   = setmetatable({
-	m_base_values   = {
+	m_base_values  = {
 		[Enums.eWheelAxle.FRONT] = StanceObject.new(),
 		[Enums.eWheelAxle.REAR]  = StanceObject.new(),
 	},
-	m_deltas        = {
+	m_deltas       = {
 		[Enums.eWheelAxle.FRONT] = StanceObject.new(),
 		[Enums.eWheelAxle.REAR]  = StanceObject.new(),
 	},
-	m_json_filename = "stancer.json"
+	m_filename     = "stancer.json",
+	m_saved_models = {},
 }, FeatureBase)
 Stancer.__index = Stancer
 
@@ -96,14 +99,94 @@ function Stancer:Init()
 		end
 
 		self:ReadWheelData()
-		self:ReadDefaults()
-		self.m_cached_model    = self.m_entity:GetModelHash()
-		self.m_last_wheels_mod = self.m_entity:GetCustomWheels()
+		self:ReadDefaultValues()
+		self:RestoreDeltasFromQueue()
+
+		local modelhash          = self.m_entity:GetModelHash()
+		self.m_cached_model_hash = modelhash
+		self.m_cached_model_name = Game.GetVehicleModelName(modelhash)
+		self.m_last_wheels_mod   = self.m_entity:GetCustomWheels()
 	end
+
+	self:InitSavedModels()
 end
 
 function Stancer:ShouldRun()
 	return self.m_entity and self.m_entity:IsValid()
+end
+
+function Stancer:InitSavedModels()
+	if (not io.exists(self.m_filename)) then
+		Serializer:WriteToFile(self.m_filename, {})
+	else
+		self.m_saved_models = Serializer:ReadFromFile(self.m_filename)
+	end
+
+	local existing = GVars.features.vehicle.stancer.saved_models
+	if (not existing) then return end
+
+	local should_parse = false
+	for k, v in pairs(existing) do
+		local oldFmt = tonumber(k)
+		if (type(oldFmt) ~= "number") then
+			goto continue
+		end
+
+		local modelname = Game.GetVehicleModelName(oldFmt)
+		if (modelname ~= "NULL") then
+			self.m_saved_models[modelname] = v
+			should_parse = true
+		end
+		::continue::
+	end
+
+	if (should_parse) then
+		self:ParseSavedModels()
+	end
+
+	GVars.features.vehicle.stancer.saved_models = nil
+end
+
+---@return table<string, table<eWheelAxle, StanceObject>>
+function Stancer:GetSavedModels()
+	return self.m_saved_models
+end
+
+function Stancer:ParseSavedModels()
+	Serializer:WriteToFile(self.m_filename, self.m_saved_models)
+end
+
+function Stancer:SaveCurrentVehicle()
+	ThreadManager:Run(function()
+		local modelName = self:GetCurrentModelName()
+		if (not modelName or modelName == "NULL") then
+			Notifier:ShowError("Stancer", "Failed to save current vehicle.")
+			return
+		end
+
+		self.m_saved_models[modelName] = self.m_deltas
+		self.m_saved_models[modelName][Enums.eWheelAxle.FRONT]["m_suspension_height"] = self.m_suspension_height.m_current
+		self:ParseSavedModels()
+	end)
+end
+
+---@param modelName string
+function Stancer:RemovedSavedVehicle(modelName)
+	if (not self.m_saved_models[modelName]) then
+		return
+	end
+
+	self.m_saved_models[modelName] = nil
+	self:ParseSavedModels()
+end
+
+function Stancer:RemoveAllSavedVehicles()
+	if (next(self.m_saved_models) == nil) then
+		return
+	end
+
+	self.m_saved_models = {}
+	self:ParseSavedModels()
 end
 
 ---@return boolean
@@ -152,42 +235,58 @@ function Stancer:Reset()
 	end
 
 	for _, v in ipairs(StancerData.decorators) do
-		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
+		local wheel_array = self:GetAllWheelsForAxle(v.axle)
 		self:ForEach(wheel_array, function(i, cwheel)
-			local decor_key = _F("%s_%d_%d", v.key, v.wheel_side, i)
+			local decor_key = _F("%s_%d_%d", v.key, v.axle, i)
 			local default   = Decorator:GetDecor(handle, decor_key)
 			if (type(default) == "number") then
-				v.write_func(cwheel, default, self.m_entity)
+				v.write(cwheel, default, self.m_entity)
 			end
 		end)
 	end
 end
 
-function Stancer:Cleanup()
-	self:Reset()
-	Decorator:RemoveEntity(self.m_entity:GetHandle())
-	self.m_cached_model = nil
+---@param handle handle
+function Stancer:RemoveReference(handle)
+	Decorator:RemoveEntity(handle)
 end
 
--- Main entry
+function Stancer:Cleanup()
+	self:Reset()
+	self:RemoveReference(self.m_entity:GetHandle())
+	self.m_cached_model_hash = nil
+	self.m_cached_model_name = nil
+end
+
 function Stancer:OnNewVehicle()
 	if (not self.m_entity:IsValid()) then
 		return
 	end
 
 	self.m_reloading = true
+	self:ResetDeltas()
+	self:ReadWheelData()
 
 	local handle = self.m_entity:GetHandle()
 	if (not Decorator:IsEntityRegistered(handle)) then
 		Decorator:Register(handle, "Stancer", true)
+		self:ReadDefaultValues()
 	end
 
-	self.m_cached_model = self.m_entity:GetModelHash()
-	self:ResetDeltas()
-	self:ReadWheelData()
-	self:ReadDefaults()
+	self:RestoreDeltasFromQueue()
+	local modelhash          = self.m_entity:GetModelHash()
+	self.m_cached_model_hash = modelhash
+	self.m_cached_model_name = Game.GetVehicleModelName(modelhash)
+	self.m_reloading         = false
+end
 
-	self.m_reloading = false
+---@return string
+function Stancer:GetCurrentModelName()
+	if (not self.m_cached_model_name) then
+		self.m_cached_model_name = Game.GetVehicleModelName(self.m_entity:GetModelHash())
+	end
+
+	return self.m_cached_model_name
 end
 
 ---@param array array<CWheel>?
@@ -198,9 +297,7 @@ function Stancer:ForEach(array, fn)
 	end
 
 	for i, v in ipairs(array) do
-		if (v and v:IsValid()) then
-			fn(i, v)
-		end
+		fn(i, v)
 	end
 end
 
@@ -210,8 +307,7 @@ function Stancer:IsVehicleModelSaved()
 		return false
 	end
 
-	local model_str = tostring(self.m_entity:GetModelHash())
-	return GVars.features.vehicle.stancer.saved_models[model_str] ~= nil
+	return self.m_saved_models[self:GetCurrentModelName()] ~= nil
 end
 
 ---@return boolean
@@ -232,17 +328,19 @@ function Stancer:ReadWheelData()
 	local front_axle  = self.m_wheels[Enums.eWheelAxle.FRONT]
 	local rear_axle   = self.m_wheels[Enums.eWheelAxle.REAR]
 	local wheel_array = self.m_entity:Resolve().m_wheels
+	local array_size  = wheel_array:Size()
+	if (array_size == 0) then return end
 
-	for i = 1, wheel_array:Size() do
-		local cwheel = CWheel(wheel_array:At(i):deref())
-		if (not cwheel or not cwheel:IsValid()) then
+	for i = 1, array_size do
+		local wheel = CWheel(wheel_array:At(i):deref())
+		if (not wheel or not wheel:IsValid()) then
 			goto continue
 		end
 
-		if (cwheel:IsRearWheel()) then
-			table.insert(rear_axle, cwheel)
+		if (wheel:IsRearWheel()) then
+			table.insert(rear_axle, wheel)
 		else
-			table.insert(front_axle, cwheel)
+			table.insert(front_axle, wheel)
 		end
 
 		::continue::
@@ -267,82 +365,91 @@ function Stancer:GetWheels()
 	return self.m_wheels
 end
 
----@param side eWheelAxle
+---@param axle eWheelAxle
 ---@return array<CWheel>?
-function Stancer:GetAllWheelsForSide(side)
-	return self:GetWheels()[side]
+function Stancer:GetAllWheelsForAxle(axle)
+	return self:GetWheels()[axle]
 end
 
----@param side eWheelAxle
+---@param axle eWheelAxle
 ---@param n integer
 ---@return CWheel?
-function Stancer:GetNthWheelForSide(side, n)
-	local wheelsbyside = self:GetAllWheelsForSide(side)
-	if (not wheelsbyside) then
-		return
-	end
+function Stancer:GetNthWheelForAxle(axle, n)
+	local wheels = self:GetAllWheelsForAxle(axle)
+	if (not wheels) then return end
 
-	local count = #wheelsbyside
+	local count = #wheels
 	if (count == 0 or n > count) then
 		return
 	end
-	return self.m_wheels[side][n]
+
+	return self.m_wheels[axle][n]
 end
 
----@param side eWheelAxle
+---@param axle eWheelAxle
 ---@return CWheel?
-function Stancer:GetFirstWheelForSide(side)
-	return self:GetNthWheelForSide(side, 1)
+function Stancer:GetFirstWheelForAxle(axle)
+	return self:GetNthWheelForAxle(axle, 1)
+end
+
+---@return { suspension_height: float, front_deltas: StanceObject, rear_deltas: StanceObject }
+function Stancer:CapturePrevState()
+	return {
+		suspension_height = self.m_suspension_height.m_current,
+		front_deltas      = table.copy(self.m_deltas[Enums.eWheelAxle.FRONT]),
+		rear_deltas       = table.copy(self.m_deltas[Enums.eWheelAxle.REAR])
+	}
+end
+
+---@param state { suspension_height: float, front_deltas: StanceObject, rear_deltas: StanceObject }
+function Stancer:RestorePrevState(state)
+	for k, v in pairs(state.front_deltas or {}) do
+		self.m_deltas[Enums.eWheelAxle.FRONT][k] = v
+	end
+
+	for k, v in pairs(state.rear_deltas or {}) do
+		self.m_deltas[Enums.eWheelAxle.REAR][k] = v
+	end
+
+	self.m_suspension_height.m_current = state.suspension_height or 0.0
 end
 
 function Stancer:OnWheelsChanged()
-	if (not self.m_entity or not self.m_entity:IsValid()) then
+	if (not self:ShouldRun()) then
 		return
 	end
 
-	if (Time.Now() - self.m_last_wheel_mod_check_time < 2) then
+	if (Time.Millis() - self.m_last_wheel_mod_check_time < 2000) then
 		return
 	end
 
 	local current = self.m_entity:GetCustomWheels()
 	if (not table.is_equal(self.m_last_wheels_mod, current)) then
-		self.m_reloading    = true
-		local prev_height   = self.m_suspension_height.m_current
-		local prev_deltas_f = table.copy(self.m_deltas[Enums.eWheelAxle.FRONT])
-		local prev_deltas_r = table.copy(self.m_deltas[Enums.eWheelAxle.REAR])
-
-		self:Cleanup()
-		self:OnNewVehicle()
+		self.m_reloading      = true
+		local __state <const> = self:CapturePrevState()
+		self:ResetDeltas()
+		self:ReadDefaultValues()
 		self.m_last_wheels_mod = self.m_entity:GetCustomWheels()
-
-		for k, v in pairs(prev_deltas_f) do
-			self.m_deltas[Enums.eWheelAxle.FRONT][k] = v
-		end
-
-		for k, v in pairs(prev_deltas_r) do
-			self.m_deltas[Enums.eWheelAxle.REAR][k] = v
-		end
-
-		self.m_suspension_height.m_current = prev_height
+		self:RestorePrevState(__state)
 		self.m_reloading = false
 	end
 
-	self.m_last_wheel_mod_check_time = Time.Now()
+	self.m_last_wheel_mod_check_time = Time.Millis()
 end
 
 ---@return boolean
 function Stancer:AreSavedDeltasLoaded()
-	if (not self.m_entity or not self.m_entity:IsValid()) then
+	if (not self:ShouldRun()) then
 		return false
 	end
 
-	if (not self:IsVehicleModelSaved()) then
+	local model = self:GetCurrentModelName()
+	local saved = self.m_saved_models
+	if (not saved) then
 		return false
 	end
 
-	local model     = tostring(self.m_entity:GetModelHash())
-	local saved     = GVars.features.vehicle.stancer.saved_models
-	local front_obj = saved[model][tostring(Enums.eWheelAxle.FRONT)]
+	local front_obj = saved[model][Enums.eWheelAxle.FRONT]
 	local rear_obj  = saved[model][tostring(Enums.eWheelAxle.REAR)]
 
 	if (not front_obj or not rear_obj or next(front_obj) == nil or next(rear_obj) == nil) then
@@ -364,18 +471,19 @@ function Stancer:AreSavedDeltasLoaded()
 	return true
 end
 
+---@param model? string
 ---@return boolean
-function Stancer:LoadSavedDeltas()
-	if (not self.m_entity or not self.m_entity:IsValid()) then
+function Stancer:LoadSavedDeltas(model)
+	if (not self:ShouldRun()) then
 		return false
 	end
 
-	if (not self:IsVehicleModelSaved()) then
+	model = model or self:GetCurrentModelName()
+	local saved = self.m_saved_models
+	if (not saved) then
 		return false
 	end
 
-	local model     = tostring(self.m_entity:GetModelHash())
-	local saved     = GVars.features.vehicle.stancer.saved_models
 	local front_obj = saved[model][Enums.eWheelAxle.FRONT]
 	local rear_obj  = saved[model][Enums.eWheelAxle.REAR]
 
@@ -395,18 +503,11 @@ function Stancer:LoadSavedDeltas()
 		self.m_deltas[Enums.eWheelAxle.REAR][k] = v
 	end
 
-	self.m_entity:ActivetePhysics()
+	self.m_entity:ActivatePhysics()
 	return true
 end
 
-function Stancer:SaveCurrentVehicle()
-	local strModel = tostring(self.m_entity:GetModelHash())
-	local saved = GVars.features.vehicle.stancer.saved_models
-	saved[strModel] = table.copy(self.m_deltas)
-	saved[strModel][Enums.eWheelAxle.FRONT]["m_suspension_height"] = self.m_suspension_height.m_current
-end
-
-function Stancer:RestoreQueueFromDecors()
+function Stancer:RestoreDeltasFromQueue()
 	if (self:IsVehicleModelSaved() and GVars.features.vehicle.stancer.auto_apply_saved) then
 		return self:LoadSavedDeltas()
 	end
@@ -417,10 +518,10 @@ function Stancer:RestoreQueueFromDecors()
 	end
 
 	for _, v in ipairs(StancerData.decorators) do
-		local queued_key = _F("%s_%d_queue", v.key, v.wheel_side)
+		local queued_key = _F("%s_%d_queue", v.key, v.axle)
 		local val = Decorator:GetDecor(handle, queued_key)
 		if (type(val) == "number") then
-			self.m_deltas[v.wheel_side][v.key] = val
+			self.m_deltas[v.axle][v.key] = val
 		end
 	end
 
@@ -430,12 +531,11 @@ function Stancer:RestoreQueueFromDecors()
 	end
 end
 
-function Stancer:ReadDefaults()
+function Stancer:ReadDefaultValues()
 	if (not self.m_entity:IsValid() or not self.m_entity:IsCar()) then
 		return
 	end
 
-	self:RestoreQueueFromDecors()
 	local handle       = self.m_entity:GetHandle()
 	local visual_size  = self.m_entity:GetVisualWheelSize()
 	local visual_width = self.m_entity:GetVisualWheelWidth()
@@ -443,18 +543,18 @@ function Stancer:ReadDefaults()
 	Decorator:Register(handle, "m_visual_width", visual_width)
 
 	for _, v in ipairs(StancerData.decorators) do
-		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
+		local wheel_array = self:GetAllWheelsForAxle(v.axle)
 		self:ForEach(wheel_array, function(i, cwheel)
-			local decor       = _F("%s_%d_%d", v.key, v.wheel_side, i)
+			local decor       = _F("%s_%d_%d", v.key, v.axle, i)
 			local existsOn    = Decorator:ExistsOn(handle, decor)
-			local default_val = existsOn and Decorator:GetDecor(handle, decor) or v.read_func(cwheel)
+			local default_val = existsOn and Decorator:GetDecor(handle, decor) or v.read(cwheel)
 			if (not existsOn) then
 				Decorator:Register(handle, decor, default_val)
 			end
 
 			-- our base values are based on left wheels per axle
 			if (cwheel:IsLeftWheel()) then
-				self.m_base_values[v.wheel_side][v.key] = default_val
+				self.m_base_values[v.axle][v.key] = default_val
 			end
 		end)
 	end
@@ -489,7 +589,7 @@ function Stancer:UpdateBounceMode()
 		return
 	end
 
-	if (vehicle:GetClassID() ~= Enums.eVehicleClasses.SUVs) then
+	if (vehicle:GetClassID() ~= Enums.eVehicleClass.SUV) then
 		Notifier:ShowError("Stancer", _T("VEH_STANCE_BOUNCE_MODE_UNAVAIL")) -- it works for all cars but nah.. **REALISM**
 		self.m_bounce_mode.enabled = false
 		return
@@ -515,7 +615,7 @@ function Stancer:UpdateBounceMode()
 	self.m_deltas[Enums.eWheelAxle.REAR].m_susp_comp  = sweep
 
 	if (vehicle:IsStopped()) then
-		vehicle:ActivetePhysics()
+		vehicle:ActivatePhysics()
 	end
 end
 
@@ -542,22 +642,18 @@ function Stancer:Update()
 	end
 
 	for _, v in ipairs(StancerData.decorators) do
-		local wheel_array = self:GetAllWheelsForSide(v.wheel_side)
-		local delta       = self.m_deltas[v.wheel_side][v.key]
-		local base        = self.m_base_values[v.wheel_side][v.key]
-		local sum         = base + delta
-		local queued_key  = _F("%s_%d_queue", v.key, v.wheel_side)
-		if (Decorator:ExistsOn(handle, queued_key)) then
-			Decorator:UpdateDecor(handle, queued_key, delta)
-		else
-			Decorator:Register(handle, queued_key, delta)
-		end
+		local wheel_array = self:GetAllWheelsForAxle(v.axle)
+		local delta       = self.m_deltas[v.axle][v.key]
+		local queued_key  = _F("%s_%d_queue", v.key, v.axle)
+		Decorator:UpdateDecor(handle, queued_key, delta)
 
+		local base = self.m_base_values[v.axle][v.key]
+		local sum  = base + delta
 		self:ForEach(wheel_array, function(_, cwheel)
-			local current = v.read_func(cwheel)
+			local current = v.read(cwheel)
 			local desired = v.side_dont_care and sum or self:GetValueBySideLR(cwheel, sum)
 			if (math.abs(desired) ~= math.abs(current)) then
-				v.write_func(cwheel, desired, self.m_entity)
+				v.write(cwheel, desired, self.m_entity)
 			end
 		end)
 	end

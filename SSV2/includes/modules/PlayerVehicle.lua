@@ -55,7 +55,7 @@ local Stancer          = require("includes.features.vehicle.stancer")
 ---@field public m_engine_swap_compatible boolean
 ---@field public m_is_shooting_flares boolean
 ---@field public m_is_flatbed boolean cache it so we don't have to call natives in UI threads
----@field public m_stance_mgr Stancer
+---@field public m_stancer Stancer
 ---@overload fun(handle: handle): PlayerVehicle
 local PlayerVehicle = Class("PlayerVehicle", { parent = Vehicle })
 
@@ -99,12 +99,12 @@ function PlayerVehicle:AddFeature(feat)
 end
 
 function PlayerVehicle:InitFeatures()
-	self.m_feat_mgr   = FeatureMgr.new(self)
+	self.m_feat_mgr  = FeatureMgr.new(self)
 	---@diagnostic disable-next-line
-	self.m_lctrl_mgr  = self.m_feat_mgr:Add(LaunchControlMgr.new(self))
-	self.m_nos_mgr    = self.m_feat_mgr:Add(NosMgr.new(self))
-	self.m_abs_mgr    = self.m_feat_mgr:Add(BFD.new(self))
-	self.m_stance_mgr = self.m_feat_mgr:Add(Stancer.new(self))
+	self.m_lctrl_mgr = self.m_feat_mgr:Add(LaunchControlMgr.new(self))
+	self.m_nos_mgr   = self.m_feat_mgr:Add(NosMgr.new(self))
+	self.m_abs_mgr   = self.m_feat_mgr:Add(BFD.new(self))
+	self.m_stancer   = self.m_feat_mgr:Add(Stancer.new(self))
 
 	self.m_feat_mgr:Add(FlappyDoors.new(self))
 	self.m_feat_mgr:Add(DriftMode.new(self))
@@ -201,7 +201,7 @@ function PlayerVehicle:Set(handle)
 		VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(handle, 0.0)
 	end
 
-	self.m_stance_mgr:OnNewVehicle()
+	self.m_stancer:OnNewVehicle()
 	-- self:ResumeThreads()
 	-- self.m_feat_mgr:OnEnable()
 end
@@ -221,6 +221,15 @@ function PlayerVehicle:Reset()
 	self:ResetAllGenericToggleables()
 	self.m_handling_editor:Reset()
 
+	--[[
+		We're resetting default stance when the player switches vehicles because we currently don't have
+		a way to preserve deltas after script reloads (GTA's decorators just refuse to work for me)
+		which could lead to bugs where the previous vehicle would get stuck with a stance with no way to
+		reset it other than respawning the vehicle. So we reset on switch but if the player comes back to it
+		and we still have decorators registered for it then the previous stance will be re-applied.
+	]]
+	self.m_stancer:Reset()
+
 	self.m_autopilot = {
 		eligible           = false,
 		state              = self.eAutoPilotState.NONE,
@@ -233,7 +242,7 @@ end
 
 function PlayerVehicle:Cleanup()
 	self:Reset()
-	self.m_stance_mgr:Cleanup()
+	self.m_stancer:Cleanup()
 end
 
 ---@return hash

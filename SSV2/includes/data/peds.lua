@@ -13,7 +13,8 @@
 
 ---@diagnostic disable
 
-return {
+---@class PedDictionary
+local PedDictionary <const> = {
 	a_c_boar = {
 		model_hash = 3462393972,
 		ped_type = 28,
@@ -6669,3 +6670,5 @@ return {
 		is_human = true
 	}
 }
+
+return PedDictionary

@@ -9,8 +9,8 @@
 
 local measureTextWidth = require("includes.frontend.helpers.measure_text_width")
 local newGroupVehs     = require("includes.data.bsv2_data").NewGroupVehicles
-local WeaponBrowser    = require("includes.frontend.helpers.weapon_browser").new()
-local PedBrowser       = require("includes.frontend.helpers.ped_browser").new({
+local WeaponBrowser    = require("includes.services.asset_browsers.WeaponBrowser").new()
+local PedBrowser       = require("includes.services.asset_browsers.PedBrowser").new({
 	max_entries         = 100,
 	humans_only         = true,
 	show_gender_filters = false,

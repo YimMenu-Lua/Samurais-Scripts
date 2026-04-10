@@ -1,3 +1,15 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
+local COL_VANTABLACK <const> = Color("#000100")
+
+
 -----------------------------------------------------
 -- Module: Escort Vehicle
 -----------------------------------------------------
@@ -22,7 +34,7 @@ function EscortVehicle.new(modelHash, groupName, godMode)
 	local vehName    = wrapper:GetName()
 	local blip       = Game.AddBlipForEntity(veh, 1.14, true)
 	local blipName   = groupName or _F("Escort Vehicle (%s)", vehName)
-	local r, g, b, _ = Color("#000100"):AsRGBA() -- Vantablack
+	local r, g, b, _ = COL_VANTABLACK:AsRGBA() -- Vantablack
 
 	entities.take_control_of(veh, 300)
 	Game.SyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(veh))
@@ -130,7 +142,7 @@ function EscortVehicle:Recover(lastCoords, passengers, lastHeading, groupName)
 	Decorator:Register(self.handle, "BillionaireServices")
 	ENTITY.FREEZE_ENTITY_POSITION(self.handle, true)
 
-	local r, g, b, _ = Color("#000100"):AsRGBA()
+	local r, g, b, _ = COL_VANTABLACK:AsRGBA()
 	local wrapper = Vehicle(self.handle)
 	VEHICLE.SET_VEHICLE_MOD_KIT(self.handle, 0)
 	VEHICLE.SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(self.handle, r, g, b)

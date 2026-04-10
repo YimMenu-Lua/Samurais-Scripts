@@ -9,8 +9,8 @@
 
 local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
 local colMoneyGreen <const> = Color("#85BB65")
-local colGreen <const>      = Color("green")
-local colRed <const>        = Color("red")
+local COL_GREEN <const>     = Color.GREEN
+local COL_RED <const>       = Color.RED
 local drawDetailsTable      = false
 local bottomTextSize
 
@@ -88,9 +88,9 @@ return function(warehouse)
 
 	ImGui.Spacing()
 	ImGui.Text(_T("YRV3_IE_VEHS_OVERVIEW"))
-	local low_col = low == 10 and colGreen or colRed
-	local mid_col = mid == 10 and colGreen or colRed
-	local top_col = top < 10 and colRed or colGreen
+	local low_col = low == 10 and COL_GREEN or COL_RED
+	local mid_col = mid == 10 and COL_GREEN or COL_RED
+	local top_col = top < 10 and COL_RED or COL_GREEN
 	ImGui.BulletText(_T("YRV3_IE_VEH_RANGE_LOW"))
 	ImGui.SameLine(bulletWidth)
 	GUI:Text(tostring(low), { color = low_col })

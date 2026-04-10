@@ -10,7 +10,7 @@
 local measureBulletWidths    = require("includes.frontend.helpers.measure_text_width")
 local drawNamePlate          = require("includes.frontend.yim_resupplier.nameplate")
 local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
-local colMoneyGreen          = Color("#85BB65")
+local colMoneyGreen <const>  = Color("#85BB65")
 local hubChildWidth          = 90
 local tempHubVal             = 0
 local bools                  = {

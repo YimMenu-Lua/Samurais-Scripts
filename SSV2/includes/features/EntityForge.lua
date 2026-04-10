@@ -668,10 +668,12 @@ function EntityForge:DeleteEntity(entity)
 	end
 
 	if (entity.m_parent and (entity.m_parent.m_model_hash == -1)) then
-		for i = #self.PlayerEntity.m_children, 1, -1 do
-			if (entity.m_handle == self.PlayerEntity.m_children[i].m_handle) then
-				self:UnregisterEntity(entity.m_handle)
-				table.remove(self.PlayerEntity.m_children, i)
+		if (self.PlayerEntity) then
+			for i = #self.PlayerEntity.m_children, 1, -1 do
+				if (entity.m_handle == self.PlayerEntity.m_children[i].m_handle) then
+					self:UnregisterEntity(entity.m_handle)
+					table.remove(self.PlayerEntity.m_children, i)
+				end
 			end
 		end
 	end
@@ -718,7 +720,7 @@ function EntityForge:HandleAbominationProperties(handle, entityData)
 				-1,
 				false
 			)
-			yield()
+			yield(200)
 		end
 	end
 end
@@ -727,6 +729,8 @@ end
 ---@param entityData ForgeEntityPlainTable
 ---@param parent ForgeEntity?
 function EntityForge:__recurse(entityData, parent)
+	if (not entityData) then return end
+
 	local entity
 	if (entityData.isPlayer or entityData.modelHash == -1) then
 		entity        = self:GetPlayerInstance()
@@ -763,7 +767,7 @@ function EntityForge:__recurse(entityData, parent)
 	end
 
 	entity.m_properties = entityData.properties or {}
-	entity.m_is_forged = true
+	entity.m_is_forged  = true
 
 	if (parent and not entity.m_is_player) then
 		self:AttachEntity(
@@ -785,12 +789,13 @@ end
 ---@param abomination ForgeEntityPlainTable
 function EntityForge:SpawnSavedAbomination(abomination)
 	ThreadManager:Run(function()
-		local rootEntity = self:__recurse(abomination, nil)
+		local rootEntity = self:__recurse(abomination)
+		if (not rootEntity) then
+			return
+		end
+
 		if (not rootEntity.m_is_player) then
-			Game.SetEntityCoords(
-				rootEntity.m_handle,
-				LocalPlayer:GetOffsetInWorldCoords(1, 5, 0)
-			)
+			Game.SetEntityCoords(rootEntity.m_handle, LocalPlayer:GetOffsetInWorldCoords(1, 5, 0))
 		end
 
 		table.insert(self.AllEntities, rootEntity)
@@ -1314,9 +1319,7 @@ end
 ---@param input string | number | table | ForgeEntity
 ---@return boolean
 function EntityForge:IsModelInFavorites(input)
-	if (not input) then
-		return false
-	end
+	if (not input) then return false end
 
 	local hash = 0
 	if (type(input) == "number" or type(input) == "string") then
@@ -1328,17 +1331,34 @@ function EntityForge:IsModelInFavorites(input)
 	return self.FavoriteModels[hash] ~= nil
 end
 
+---@return boolean
+function EntityForge:IsNameInFavorites(name)
+	for _, data in pairs(self.FavoriteModels) do
+		if (data.name == name) then
+			return true
+		end
+	end
+
+	return false
+end
+
 ---@param model hash
 ---@param name string
 ---@param _type eEntityType
 function EntityForge:AddModelToFavorites(model, name, _type)
 	if (self:IsModelInFavorites(model)) then
+		Notifier:ShowError("EntityForge", _T("EF_MODEL_EXISTS_ERR"))
+		return
+	end
+
+	if (self:IsNameInFavorites(name)) then
+		Notifier:ShowError("EntityForge", _T("EF_NAME_EXISTS_ERR"))
 		return
 	end
 
 	self.FavoriteModels[model] = { name = name, entityType = _type }
 	self:ParseFavorites()
-	Notifier:ShowSuccess("EntityForge", _F("Added %s to favorites.", name))
+	Notifier:ShowSuccess("EntityForge", _F(_T("EF_FAV_SAVE_SUCCESS"), name))
 end
 
 ---@param modelHash hash
@@ -1346,11 +1366,9 @@ end
 function EntityForge:RenameFavoriteModel(modelHash, newName)
 	local saved = self.FavoriteModels[modelHash]
 	if (not saved) then return end
-	for _, data in pairs(self.FavoriteModels) do
-		if (data.name == newName) then
-			Notifier:ShowError("EntityForge", _T("EF_NAME_EXISTS_ERR"))
-			return
-		end
+
+	if (self:IsNameInFavorites(newName)) then
+		Notifier:ShowError("EntityForge", _T("EF_NAME_EXISTS_ERR"))
 	end
 
 	Notifier:ShowSuccess("EntityForge", _F("Renamed '%s' to '%s'", saved.name, newName))

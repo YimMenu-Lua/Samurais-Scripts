@@ -32,8 +32,7 @@ function PreviewService.new(delay)
 end
 
 ---@param modelHash integer
----@param entityType eEntityType
-function PreviewService:Preview(modelHash, entityType)
+function PreviewService:Preview(modelHash)
 	if (self.m_failed_models[modelHash]) then
 		return
 	end
@@ -56,7 +55,6 @@ function PreviewService:Preview(modelHash, entityType)
 		local coords = vec3:zero()
 		local groundZ = 0.0
 		local offset = LocalPlayer:GetOffsetInWorldCoords(1, 5, 0)
-
 		_, groundZ = MISC.GET_GROUND_Z_EXCLUDING_OBJECTS_FOR_3D_COORD(
 			offset.x,
 			offset.y,
@@ -67,7 +65,7 @@ function PreviewService:Preview(modelHash, entityType)
 		)
 
 		coords = vec3:new(offset.x, offset.y, groundZ + 0.5)
-
+		local entityType = Game.GetModelType(modelHash)
 		if (entityType == Enums.eEntityType.Object) then
 			handle = Game.CreateObject(
 				modelHash,
@@ -191,8 +189,11 @@ function PreviewService:Clear()
 end
 
 ---@param hoveredModel integer
----@param entityType eEntityType
-function PreviewService:OnTick(hoveredModel, entityType)
+function PreviewService:OnTick(hoveredModel)
+	if (type(hoveredModel) ~= "number") then
+		return
+	end
+
 	local now = Time.Millis()
 	if (hoveredModel ~= self.m_last_hovered_entity) then
 		self.m_last_hovered_entity = hoveredModel
@@ -202,7 +203,7 @@ function PreviewService:OnTick(hoveredModel, entityType)
 
 	if (self.m_await_spawn and (now - self.m_hover_start_time >= self.m_delay)) then
 		self.m_await_spawn = false
-		self:Preview(hoveredModel, entityType)
+		self:Preview(hoveredModel)
 	end
 
 	if (self.m_current_entity) then

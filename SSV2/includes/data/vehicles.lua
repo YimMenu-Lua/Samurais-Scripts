@@ -13,7 +13,8 @@
 
 ---@diagnostic disable
 
-return {
+---@class VehicleDictionary
+local VehicleDictionary <const> = {
 	adder = {
 		model_hash = 3078201489,
 		display_name = "Adder",
@@ -6462,3 +6463,5 @@ return {
 		class_name = "SPORT_CLASSIC"
 	}
 }
+
+return VehicleDictionary

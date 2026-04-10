@@ -8,10 +8,10 @@
 
 
 local PV                  = LocalPlayer:GetVehicle()
-local Stancer             = PV.m_stance_mgr
+local Stancer             = PV.m_stancer
 local frontStanceDeltas   = Stancer.m_deltas[Enums.eWheelAxle.FRONT]
 local backStanceDeltas    = Stancer.m_deltas[Enums.eWheelAxle.REAR]
-local selectedSavedModel  = 0
+local selectedSavedModel  = ""
 local physicsThreadSignal = nil
 local savedVehsWindow     = { should_draw = false }
 local DeltaRef <const>    = {
@@ -69,7 +69,7 @@ local function UpdatePhysics()
 	physicsThreadSignal = 1
 	ThreadManager:Run(function()
 		if (PV:IsValid() and PV:IsStopped()) then
-			PV:ActivetePhysics()
+			PV:ActivatePhysics()
 		end
 		physicsThreadSignal = nil
 	end)
@@ -159,6 +159,14 @@ return function()
 	if (not Stancer.m_is_active) then
 		ImGui.Text(_T("GENERIC_CARS_ONLY"))
 		return
+	end
+
+	if (GUI:Button(_T("GENERIC_RESET_ALL"))) then
+		ThreadManager:Run(function()
+			Stancer:Reset()
+			if (not PV:IsValid()) then return end
+			OnSuspensionReset()
+		end)
 	end
 
 	ImGui.SeparatorText(_T("VEH_STANCE_FRONT_AXLE"))
@@ -254,28 +262,14 @@ return function()
 
 	ImGui.Separator()
 
-	if (GUI:Button(_T("GENERIC_RESET_ALL"))) then
-		ThreadManager:Run(function()
-			Stancer:Reset()
-			if (not PV:IsValid()) then return end
-			OnSuspensionReset()
-		end)
-	end
-
-	local save_label = Stancer:IsVehicleModelSaved() and "VEH_STANCE_UPDATE_MODEL" or "VEH_STANCE_SAVE_MODEL"
-	if (GUI:Button(_T(save_label))) then
-		Stancer:SaveCurrentVehicle()
-	end
-
-	local saved_models = GVars.features.vehicle.stancer.saved_models
+	local saved_models = Stancer:GetSavedModels()
 	if (next(saved_models) ~= nil) then
-		ImGui.SameLine()
 		if (GUI:Button(_T("VEH_STANCE_VIEW_SAVED"))) then
 			savedVehsWindow.should_draw = true
 		end
 
 		ImGui.SameLine()
-		GVars.features.vehicle.stancer.auto_apply_saved, _ = GUI:CustomToggle(
+		GVars.features.vehicle.stancer.auto_apply_saved = GUI:CustomToggle(
 			_T("VEH_STANCE_AUTOAPPLY"),
 			GVars.features.vehicle.stancer.auto_apply_saved,
 			{
@@ -288,6 +282,15 @@ return function()
 		)
 	end
 
+	local save_label = _T(Stancer:IsVehicleModelSaved() and "VEH_STANCE_UPDATE_MODEL" or "VEH_STANCE_SAVE_MODEL")
+	if (GUI:Button(save_label)) then
+		ImGui.OpenPopup(save_label)
+	end
+
+	if (ImGui.DialogBox(save_label, _F(_T("VEH_STANCE_UPDATE_WARN"), Stancer:GetCurrentModelName()), ImGuiDialogBoxStyle.WARN)) then
+		Stancer:SaveCurrentVehicle()
+	end
+
 	if (savedVehsWindow.should_draw) then
 		ImGui.Begin("##viewSavedVehicles",
 			ImGuiWindowFlags.NoTitleBar |
@@ -296,12 +299,10 @@ return function()
 		)
 		GUI:QuickConfigWindow(_T("VEH_STANCE_VIEW_SAVED"), function()
 			if (ImGui.BeginListBox("##savedVehList", -1, 360)) then
-				for model_str in pairs(saved_models) do
-					local model       = tonumber(model_str) or 0
-					local name        = Game.GetVehicleDisplayName(model)
-					local is_selected = selectedSavedModel == model
-					if (ImGui.Selectable(name, is_selected)) then
-						selectedSavedModel = model
+				for modelName in pairs(saved_models) do
+					local name = Game.GetVehicleDisplayName(modelName)
+					if (ImGui.Selectable(name, (selectedSavedModel == modelName))) then
+						selectedSavedModel = modelName
 					end
 				end
 				ImGui.EndListBox()
@@ -309,9 +310,14 @@ return function()
 
 			ImGui.Separator()
 
-			ImGui.BeginDisabled(selectedSavedModel == 0)
+			ImGui.BeginDisabled(#selectedSavedModel == 0)
+			if (GUI:Button(_T("GENERIC_APPLY"))) then
+				Stancer:LoadSavedDeltas(selectedSavedModel)
+			end
+
+			ImGui.SameLine()
 			if (GUI:Button(_T("GENERIC_REMOVE"))) then
-				GVars.features.vehicle.stancer.saved_models[tostring(selectedSavedModel)] = nil
+				Stancer:RemovedSavedVehicle(selectedSavedModel)
 			end
 			ImGui.EndDisabled()
 
@@ -321,7 +327,7 @@ return function()
 			end
 
 			if (ImGui.DialogBox(_T("GENERIC_REMOVE_ALL"))) then
-				GVars.features.vehicle.stancer.saved_models = {}
+				Stancer:RemoveAllSavedVehicles()
 				savedVehsWindow.should_draw = false
 			end
 		end, function()

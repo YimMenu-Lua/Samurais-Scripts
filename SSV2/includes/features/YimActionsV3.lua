@@ -51,7 +51,7 @@ function YimActions:init()
 	end
 
 	self.CompanionManager = CompanionManager.new()
-	self.SceneManager     = SceneManager
+	self.SceneManager     = SceneManager.new()
 	self.CurrentlyPlaying = {}
 	self.LastPlayed       = {}
 	self.Commands         = {}

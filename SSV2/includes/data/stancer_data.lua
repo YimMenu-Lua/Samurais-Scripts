@@ -16,36 +16,36 @@ Enums.eWheelAxle = {
 }
 
 return {
-	---@type array<{ key: string, wheel_side: eWheelAxle, read_func: ptr_read, write_func: fun(w: CWheel, v: anyval, veh?: PlayerVehicle), side_dont_care?: boolean}>
+	---@type array<{ key: string, axle: eWheelAxle, read: ptr_read, write: fun(w: CWheel, v: anyval, veh?: PlayerVehicle), side_dont_care?: boolean}>
 	decorators = {
 		{
-			key        = "m_camber",
-			wheel_side = Enums.eWheelAxle.FRONT,
-			read_func  = function(w) return w.m_y_rotation:get_float() end,
-			write_func = function(w, v)
+			key   = "m_camber",
+			axle  = Enums.eWheelAxle.FRONT,
+			read  = function(w) return w.m_y_rotation:get_float() end,
+			write = function(w, v)
 				w.m_y_rotation:set_float(v)
 				w.m_y_rotation_inv:set_float(-v)
 			end
 		},
 		{
-			key        = "m_track_width",
-			wheel_side = Enums.eWheelAxle.FRONT,
-			read_func  = function(w) return w.m_x_offset:get_float() end,
-			write_func = function(w, v) w.m_x_offset:set_float(v) end
+			key   = "m_track_width",
+			axle  = Enums.eWheelAxle.FRONT,
+			read  = function(w) return w.m_x_offset:get_float() end,
+			write = function(w, v) w.m_x_offset:set_float(v) end
 		},
 		{
 			key            = "m_susp_comp",
-			wheel_side     = Enums.eWheelAxle.FRONT,
+			axle           = Enums.eWheelAxle.FRONT,
 			side_dont_care = true,
-			read_func      = function(w) return w.m_suspension_forward_offset:get_float() end,
-			write_func     = function(w, v) w.m_suspension_forward_offset:set_float(v) end
+			read           = function(w) return w.m_suspension_forward_offset:get_float() end,
+			write          = function(w, v) w.m_suspension_forward_offset:set_float(v) end
 		},
 		{
 			key            = "m_wheel_width",
-			wheel_side     = Enums.eWheelAxle.FRONT, -- doesn't matter
+			axle           = Enums.eWheelAxle.FRONT, -- doesn't matter
 			side_dont_care = true,
-			read_func      = function(w) return w.m_tyre_width:get_float() end,
-			write_func     = function(w, v, veh)
+			read           = function(w) return w.m_tyre_width:get_float() end,
+			write          = function(w, v, veh)
 				w.m_tyre_width:set_float(v)
 				local cached = Decorator:GetDecor(veh:GetHandle(), "m_visual_width")
 				if (cached and cached > 0 and veh:GetVisualWheelWidth() ~= cached + v) then
@@ -55,10 +55,10 @@ return {
 		},
 		{
 			key            = "m_wheel_size",
-			wheel_side     = Enums.eWheelAxle.FRONT, -- doesn't matter
+			axle           = Enums.eWheelAxle.FRONT, -- doesn't matter
 			side_dont_care = true,
-			read_func      = function(w) return w.m_tyre_radius:get_float() end,
-			write_func     = function(w, v, veh)
+			read           = function(w) return w.m_tyre_radius:get_float() end,
+			write          = function(w, v, veh)
 				w.m_tyre_radius:set_float(v)
 				local cached = Decorator:GetDecor(veh:GetHandle(), "m_visual_size")
 				if (cached and cached > 0 and veh:GetVisualWheelSize() ~= cached + v) then
@@ -67,26 +67,26 @@ return {
 			end
 		},
 		{
-			key        = "m_camber",
-			wheel_side = Enums.eWheelAxle.REAR,
-			read_func  = function(w) return w.m_y_rotation:get_float() end,
-			write_func = function(w, v)
+			key   = "m_camber",
+			axle  = Enums.eWheelAxle.REAR,
+			read  = function(w) return w.m_y_rotation:get_float() end,
+			write = function(w, v)
 				w.m_y_rotation:set_float(v)
 				w.m_y_rotation_inv:set_float(-v)
 			end
 		},
 		{
-			key        = "m_track_width",
-			wheel_side = Enums.eWheelAxle.REAR,
-			read_func  = function(w) return w.m_x_offset:get_float() end,
-			write_func = function(w, v) w.m_x_offset:set_float(v) end
+			key   = "m_track_width",
+			axle  = Enums.eWheelAxle.REAR,
+			read  = function(w) return w.m_x_offset:get_float() end,
+			write = function(w, v) w.m_x_offset:set_float(v) end
 		},
 		{
 			key            = "m_susp_comp",
-			wheel_side     = Enums.eWheelAxle.REAR,
+			axle           = Enums.eWheelAxle.REAR,
 			side_dont_care = true,
-			read_func      = function(w) return w.m_suspension_forward_offset:get_float() end,
-			write_func     = function(w, v) w.m_suspension_forward_offset:set_float(v) end
+			read           = function(w) return w.m_suspension_forward_offset:get_float() end,
+			write          = function(w, v) w.m_suspension_forward_offset:set_float(v) end
 		},
 	}
 }

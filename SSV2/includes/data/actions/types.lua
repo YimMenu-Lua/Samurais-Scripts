@@ -83,7 +83,7 @@
 ---@class SyncedSceneData
 ---@field label string
 ---@field animDict string
----@field params { looped: boolean, holdLastFrame: boolean, startPhase?: float, animSpeed?: float }
+---@field params { looped: boolean, holdLastFrame: boolean, startPhase: float, animSpeed: float }
 ---@field origin { isPlayer: boolean, model: string, pos_offset?: vec3 }
 ---@field participants array<SceneParticipant>
 ---@field pos_offset? vec3

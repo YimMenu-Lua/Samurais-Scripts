@@ -14,11 +14,11 @@
 ---@generic T
 ---@class atArray<T>
 ---@field protected m_ptr pointer
----@field private m_data array<pointer_ref<T>>
+---@field private m_data array<pointer<T>>
 ---@field private m_size uint16_t
 ---@field private m_capacity uint16_t
 ---@field private m_data_type any
----@field [integer] pointer_ref<T>
+---@field [integer] pointer<T>
 ---@operator len: integer
 ---@overload fun(address: pointer, data_type?: optional<T>): atArray
 local atArray = {
@@ -121,7 +121,7 @@ function atArray:Capacity()
 	return self.m_capacity
 end
 
----@return fun(): integer, pointer_ref<T> Iterator
+---@return fun(t: array<T>, i?: integer): integer, pointer<T> Iterator
 function atArray:Iter()
 	local i = 0
 	return function()
@@ -133,10 +133,17 @@ function atArray:Iter()
 	end
 end
 
----@return fun(): integer, pointer<T> Iterator
+---@return fun(t: array<T>, i?: integer): integer, pointer<T> Iterator
 function atArray:__pairs()
 	log.warning("[atArray]: Use of pairs! Please use atArray:Iter() instead.")
 	return self:Iter()
+end
+
+---@return fun(t: array<T>, i?: integer): integer, pointer<T> Iterator
+---@return T v
+---@return integer i
+function atArray:__ipairs()
+	return ipairs(self.m_data)
 end
 
 ---@return integer

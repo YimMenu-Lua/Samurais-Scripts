@@ -545,6 +545,6 @@ function Entity:HasCollidedWithAnything()
 	return ENTITY.HAS_ENTITY_COLLIDED_WITH_ANYTHING(self:GetHandle())
 end
 
-function Entity:ActivetePhysics()
+function Entity:ActivatePhysics()
 	PHYSICS.ACTIVATE_PHYSICS(self:GetHandle())
 end

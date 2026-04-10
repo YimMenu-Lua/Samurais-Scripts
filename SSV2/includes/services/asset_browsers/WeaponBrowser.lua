@@ -6,10 +6,11 @@
 --	* Credit the owner and contributors.
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
-local Weapons <const>    = require("includes.data.weapons")
+
+local Weapons <const>       = require("includes.data.weapons")
 
 ---@type array<{name: string, list?: array<hash>}>
-local Categories <const> = {
+local Categories <const>    = {
 	{ name = "None" },
 	{ name = "Melee",          list = Weapons.Melee },
 	{ name = "Pistols",        list = Weapons.Pistols },
@@ -23,6 +24,7 @@ local Categories <const> = {
 	{ name = "Miscellaneous",  list = Weapons.Misc },
 }
 
+-- TODO: Plug this into AssetBrowserBase
 
 --------------------------------------
 -- WeaponBrowser
@@ -78,7 +80,7 @@ function WeaponBrowser:DrawCategories()
 end
 
 ---@private
-function WeaponBrowser:DrawWeaponList()
+function WeaponBrowser:Iterate()
 	if (not self.m_selected_category.list) then
 		return
 	end
@@ -157,7 +159,7 @@ function WeaponBrowser:Draw()
 		end
 
 		if (self.m_is_list_open) then
-			self:DrawWeaponList()
+			self:Iterate()
 			if (mode == 0) then
 				ImGui.EndCombo()
 				ImGui.PopItemWidth()

@@ -164,11 +164,10 @@ function BillionaireServices:AddNewEscortGroup(group)
 		return
 	end
 
-	local members_ok = true
 	for _, member in ipairs(members) do
 		if (not member.modelHash) then
-			members_ok = false
-			break
+			Notifier:ShowError("Billionaire Services", "Missing entity model hash for one or more group members.")
+			return
 		end
 
 		if (not string.isvalid(member.name)) then
@@ -178,11 +177,6 @@ function BillionaireServices:AddNewEscortGroup(group)
 		if (math.is_null(member.weapon)) then
 			member.weapon = _J("WEAPON_TECPISTOL")
 		end
-	end
-
-	if (not members_ok) then
-		Notifier:ShowError("Billionaire Services", "Missing entity model hash for one or more group members.")
-		return
 	end
 
 	group.JSON                  = true

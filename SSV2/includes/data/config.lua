@@ -202,11 +202,7 @@ local Config <const> = {
 			parachute = false,
 			steer_rear_wheels = false,
 			steer_handbrake = false,
-			stancer = {
-				---@type table<string, table<integer, StanceObject>>
-				saved_models = {},
-				auto_apply_saved = false,
-			},
+			stancer = { auto_apply_saved = false, },
 		},
 		speedometer = {
 			enabled = false,

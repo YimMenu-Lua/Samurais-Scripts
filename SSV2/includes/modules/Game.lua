@@ -7,12 +7,10 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local ped_list <const>     = require("includes.data.peds")
+local RawDataService       = require("includes.services.RawDataService")
+local Refs                 = require("includes.data.refs")
 local ped_hashmap <const>  = require("includes.data.ped_hashmap")
 local veh_hashmap <const>  = require("includes.data.vehicle_hashmap")
-local weapon_data <const>  = require("includes.data.weapon_data")
-local vehicle_data <const> = require("includes.data.vehicles")
-local Refs                 = require("includes.data.refs")
 local SP_CharIDs <const>   = {
 	[225514697]  = 0,
 	[2602752943] = 1,
@@ -302,48 +300,52 @@ function Game.RemovePedFromGroup(ped)
 	end
 end
 
----@param entity integer
+---@param handle handle
 ---@param entity_type? eEntityType
-function Game.DeleteEntity(entity, entity_type)
+function Game.DeleteEntity(handle, entity_type)
+	if (handle == LocalPlayer:GetHandle()) then
+		return
+	end
+
 	ThreadManager:Run(function()
-		entity_type = entity_type or Game.GetEntityType(entity)
-		if (not Game.IsScriptHandle(entity) or entity == LocalPlayer:GetHandle()) then
+		if (not ENTITY.DOES_ENTITY_EXIST(handle)) then
 			return
 		end
 
-		if ENTITY.IS_ENTITY_A_PED(entity) then
-			Game.RemovePedFromGroup(entity)
+		entity_type = entity_type or Game.GetEntityType(handle)
+		if (ENTITY.IS_ENTITY_A_PED(handle)) then
+			Game.RemovePedFromGroup(handle)
 		end
 
-		if Backend:IsBlipRegistered(entity) then
-			Game.RemoveBlipFromEntity(entity)
+		if (Backend:IsBlipRegistered(handle)) then
+			Game.RemoveBlipFromEntity(handle)
 		end
 
-		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(Game.GetEntityModel(entity))
-		ENTITY.DELETE_ENTITY(entity)
+		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(Game.GetEntityModel(handle))
+		ENTITY.DELETE_ENTITY(handle)
 		sleep(50)
 
-		if ENTITY.DOES_ENTITY_EXIST(entity) then
-			ENTITY.SET_ENTITY_AS_MISSION_ENTITY(entity, true, true)
-			ENTITY.DELETE_ENTITY(entity)
+		if (ENTITY.DOES_ENTITY_EXIST(handle)) then
+			ENTITY.SET_ENTITY_AS_MISSION_ENTITY(handle, true, true)
+			ENTITY.DELETE_ENTITY(handle)
 			sleep(50)
 
-			if (ENTITY.DOES_ENTITY_EXIST(entity) and Game.IsOnline()) then
-				TaskWait(entities.take_control_of, { entity, 300 }, 500)
-				ENTITY.DELETE_ENTITY(entity)
+			if (ENTITY.DOES_ENTITY_EXIST(handle) and Game.IsOnline()) then
+				TaskWait(entities.take_control_of, { handle, 500 }, 500)
+				ENTITY.DELETE_ENTITY(handle)
 			end
 			sleep(50)
 
-			if ENTITY.DOES_ENTITY_EXIST(entity) then
+			if ENTITY.DOES_ENTITY_EXIST(handle) then
 				Notifier:ShowError(
 					"Samurai's Scripts",
-					_F("Failed to delete entity: [%d]", entity)
+					_F("Failed to delete entity: [%d]", handle)
 				)
 				return
 			end
 		end
 
-		Backend:RemoveEntity(entity, entity_type)
+		Backend:RemoveEntity(handle, entity_type)
 	end)
 end
 
@@ -377,34 +379,29 @@ end
 function Game.DrawProgressBar(position, width, height, fgCol, bgCol, value)
 	local bgPaddingX = 0.005
 	local bgPaddingY = 0.01
-	local fg = {}
-	local bg = {}
+	local foreground = fgCol:AsVec4()
+	local background = bgCol:AsVec4()
 
-	fg.r, fg.g, fg.b, fg.a = fgCol:AsRGBA()
-	bg.r, bg.g, bg.b, bg.a = bgCol:AsRGBA()
-
-	-- background
 	GRAPHICS.DRAW_RECT(
 		position.x,
 		position.y,
 		width + bgPaddingX,
 		height + bgPaddingY,
-		bg.r,
-		bg.g,
-		bg.b,
-		bg.a,
+		background.x,
+		background.y,
+		background.z,
+		background.w,
 		false
 	)
 
-	-- foreground
 	GRAPHICS.DRAW_RECT(
 		position.x - width * 0.5 + value * width * 0.5,
 		position.y, width * value,
 		height,
-		fg.r,
-		fg.g,
-		fg.b,
-		fg.a,
+		foreground.x,
+		foreground.y,
+		foreground.z,
+		foreground.w,
 		false
 	)
 end
@@ -957,6 +954,16 @@ function Game.StopParticleEffects(fxHandles, dict)
 	end
 end
 
+---@class PedComponentsTable
+---@field component integer
+---@field max_drawables integer
+---@field max_textures integer
+---@field drawable integer
+---@field texture integer
+---@field palette integer
+
+---@param ped handle
+---@return PedComponentsTable
 function Game.GetPedComponents(ped)
 	local variations = {}
 
@@ -977,12 +984,12 @@ function Game.GetPedComponents(ped)
 		end
 
 		table.insert(variations, {
-			component = i,
+			component     = i,
 			max_drawables = max_drawables,
-			max_textures = max_textures,
-			drawable = drawable,
-			texture = texture,
-			palette = palette
+			max_textures  = max_textures,
+			drawable      = drawable,
+			texture       = texture,
+			palette       = palette
 		})
 	end
 
@@ -1200,8 +1207,9 @@ function Game.GetModelHash(modelName)
 	return Game.EnsureModelHash(modelName)
 end
 
+-- This performs an O(1) lookup, it's fine if you see it called per frame in a UI function.
 ---@param modelHash integer
----@return string
+---@return string -- model name or hext string representing the model hash
 function Game.GetPedModelName(modelHash)
 	return ped_hashmap[modelHash] or _F("0x%X", modelHash)
 end
@@ -1212,7 +1220,8 @@ function Game.GetPedTypeFromModel(model)
 		model = ped_hashmap[model]
 	end
 
-	return ped_list[model].ped_type or Enums.ePedType.CIVMALE
+	local list = RawDataService:GetPeds()
+	return list[model].ped_type or Enums.ePedType.CIVMALE
 end
 
 ---@param model integer|string
@@ -1222,7 +1231,8 @@ function Game.GetPedGenderFromModel(model)
 		model = ped_hashmap[model]
 	end
 
-	local found = ped_list[model]
+	local list  = RawDataService:GetPeds()
+	local found = list[model]
 	---@diagnostic disable-next-line
 	return found and found.ped_gender or Enums.ePedGender.UNK
 end
@@ -1233,7 +1243,8 @@ function Game.IsPedModelHuman(model)
 		model = ped_hashmap[model]
 	end
 
-	local found = ped_list[model]
+	local list  = RawDataService:GetPeds()
+	local found = list[model]
 	return found and found.is_human or false
 end
 
@@ -1244,24 +1255,28 @@ function Game.GetVehicleDisplayName(vehModel)
 		return vehicles.get_vehicle_display_name(vehModel)
 	end
 
-	local modelName = ""
+	local modelName
 	if (type(vehModel) == "string") then
 		modelName = vehModel
 	elseif (type(vehModel) == "integer") then
 		modelName = veh_hashmap[vehModel]
 	end
 
-	local data = vehicle_data[modelName]
-	if (not data) then
-		return "NULL"
-	end
+	if (not modelName) then return "NULL" end
+
+	local list = RawDataService:GetVehicles()
+	local data = list[modelName]
+	if (not data) then return "NULL" end
 
 	-- display_name can be nil as well
 	return data.display_name or "NULL"
 end
 
 -- Returns the vehicle's model name, not display name (ex: `youga2`)
+--
+-- This performs an O(1) lookup, it's fine if you see it called per frame in a UI function.
 ---@param modelHash joaat_t
+---@return string -- model name or literal "NULL"
 function Game.GetVehicleModelName(modelHash)
 	return veh_hashmap[modelHash] or "NULL"
 end
@@ -1274,6 +1289,7 @@ function Game.GetWeaponDisplayName(weapon)
 		return name ~= "" and name or "NULL"
 	end
 
+	---@type joaat_t
 	local hash
 	if (type(weapon) == "string") then
 		hash = _J(weapon)
@@ -1281,16 +1297,13 @@ function Game.GetWeaponDisplayName(weapon)
 		hash = weapon
 	end
 
-	if (not hash) then
-		return "NULL"
-	end
+	if (not hash) then return "NULL" end
 
-	local data = weapon_data[hash]
-	if (not data) then
-		return "NULL"
-	end
+	local list = RawDataService:GetWeapons()
+	local data = list[hash]
+	if (not data) then return "NULL" end
 
-	return weapon_data[hash].display_name or "NULL"
+	return data[hash].display_name or "NULL"
 end
 
 ---@return integer
@@ -1507,8 +1520,9 @@ function Game.DrawBoundingBox(entity, color)
 	if (not ENTITY.DOES_ENTITY_EXIST(entity)) then
 		return
 	end
-	local r, g, b, a = color:AsRGBA()
-	local corners = Game.GetBoxCorners(entity)
+
+	local r, g, b, a  = color:AsRGBA()
+	local corners     = Game.GetBoxCorners(entity)
 	local connections = {
 		{ 1, 2 }, { 2, 4 }, { 4, 3 }, { 3, 1 },
 		{ 5, 6 }, { 6, 8 }, { 8, 7 }, { 7, 5 },

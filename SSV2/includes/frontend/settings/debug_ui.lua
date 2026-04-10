@@ -7,10 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local RED <const>               = Color("red")
-local GREEN <const>             = Color("green")
-local BLUE <const>              = Color("blue")
-local GREY <const>              = Color("#636363")
+local COL_GREY <const>          = Color("#636363")
 local LOCALES <const>           = Translator.locales
 
 local side_button_size          = vec2:new(140, 35)
@@ -30,10 +27,10 @@ local current_local
 local current_local_method
 local current_global_method
 local state_colors <const>      = {
-	[eThreadState.UNK] = GREY,
-	[eThreadState.DEAD] = RED,
-	[eThreadState.RUNNING] = GREEN,
-	[eThreadState.SUSPENDED] = BLUE,
+	[eThreadState.UNK]       = COL_GREY,
+	[eThreadState.DEAD]      = Color.RED,
+	[eThreadState.RUNNING]   = Color.GREEN,
+	[eThreadState.SUSPENDED] = Color.BLUE,
 }
 local accessor_read_types       = {
 	"Int",
@@ -216,7 +213,7 @@ local function DrawPointers()
 				)
 
 				if (address == 0) then
-					ImGui.PushStyleColor(ImGuiCol.Text, RED:AsRGBA())
+					ImGui.PushStyleColor(ImGuiCol.Text, Color.RED:AsRGBA())
 				end
 
 				if ImGui.Selectable(str, (name == ptr_name)) then
