@@ -117,9 +117,7 @@ local function YRV3UI()
 	end
 	ImGui.EndChild()
 
-	ImGui.SameLine()
 	ImGui.VerticalSeparator(separatorWidth)
-	ImGui.SameLine()
 
 	ImGui.SetNextWindowBgAlpha(0)
 	ImGui.BeginChild("##yrv3_4")

@@ -119,14 +119,13 @@ end
 ---@return string result lowercase
 ---@return boolean changed
 function ImGui.SearchBar(label, stringBuffer, flags, maxWidth, bufferSize)
-	maxWidth      = maxWidth or -1
-	bufferSize    = bufferSize or math.max(#stringBuffer + 32, 256)
-	flags         = flags or ImGuiInputTextFlags.None
-	local changed = false
+	maxWidth   = maxWidth or -1
+	bufferSize = bufferSize or math.max(#stringBuffer + 32, 256)
+	flags      = flags or 0
 
 	ImGui.SetNextItemWidth(maxWidth)
 	ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, 15, 5)
-	stringBuffer, changed = ImGui.InputTextWithHint(
+	local out, changed = ImGui.InputTextWithHint(
 		label,
 		_T("GENERIC_SEARCH_HINT"),
 		stringBuffer,
@@ -134,7 +133,7 @@ function ImGui.SearchBar(label, stringBuffer, flags, maxWidth, bufferSize)
 		flags
 	)
 	ImGui.PopStyleVar()
-	return stringBuffer:lower(), changed
+	return out:lower(), changed
 end
 
 -- Returns a basic animated string
@@ -171,6 +170,18 @@ end
 ---@return Color
 function ImGui.GetAutoTextColor(bgColor)
 	return bgColor:IsDark() and Color.WHITE or Color.BLACK
+end
+
+---@param idx ImGuiCol
+---@return Color
+function ImGui.GetStyleColor(idx)
+	return Color(ImGui.GetStyleColorVec4(idx))
+end
+
+---@param idx ImGuiCol
+---@return uint32_t
+function ImGui.GetStyleColorU32(idx)
+	return ImGui.ColorConvertFloat4ToU32({ ImGui.GetStyleColorVec4(idx) })
 end
 
 ---@param bgColor uint32_t
@@ -247,10 +258,10 @@ end
 -- Wrapper for `ImGui.ColorEdit3` that takes a vec3 and mutates it in place.
 ---@param label string
 ---@param outVector vec3
----@return boolean
+---@return boolean clicked
 function ImGui.ColorEditVec3(label, outVector)
 	if (not IsInstance(outVector, vec3)) then
-		Notifier:ShowError("ImGui", _F("Invalid argument #2: vec3 expected, got %s instead.", type(outVector)), true)
+		log.fwarning("Invalid argument #2: vec3 expected, got %s instead.", type(outVector))
 		return false
 	end
 
@@ -289,12 +300,12 @@ end
 
 ---@param label string
 ---@param outU32 uint32_t
----@return uint32_t, boolean
+---@return uint32_t U32, boolean clicked
 function ImGui.ColorEditU32(label, outU32)
 	local temp, changed = { Color(outU32):AsFloat() }, false
 	temp, changed = ImGui.ColorEdit4(label, temp)
 	if (changed) then
-		return Color(temp):AsU32(), changed
+		return ImGui.ColorConvertFloat4ToU32(temp), changed
 	end
 
 	return outU32, changed
@@ -455,18 +466,6 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 	return clicked
 end
 
----@param idx ImGuiCol
----@return Color
-function ImGui.GetStyleColor(idx)
-	return Color(ImGui.GetStyleColorVec4(idx))
-end
-
----@param idx ImGuiCol
----@return uint32_t
-function ImGui.GetStyleColorU32(idx)
-	return ImGui.ColorConvertFloat4ToU32({ ImGui.GetStyleColorVec4(idx) })
-end
-
 -- https://github.com/ocornut/imgui/issues/5263
 ---@param label string
 ---@param value float
@@ -477,10 +476,8 @@ function ImGui.ValueBar(label, value, size, flags, opts)
 	flags              = flags or ImGuiValueBarFlags.NONE
 	size               = size or vec2:zero()
 	opts               = opts or {}
-
-	---@type boolean
-	local isMultiVal   = flags & ImGuiValueBarFlags.MULTI_VAL ~= 0
-	local isHotizontal = flags & ImGuiValueBarFlags.VERTICAL == 0
+	local isMultiVal   = (flags & ImGuiValueBarFlags.MULTI_VAL) ~= 0
+	local isHotizontal = (flags & ImGuiValueBarFlags.VERTICAL) == 0
 	local region       = vec2:new(ImGui.GetContentRegionAvail())
 
 	if (size.x <= 0) then
@@ -607,6 +604,8 @@ end
 ---@param thickness? float
 ---@param color? uint32_t
 function ImGui.VerticalSeparator(thickness, color)
+	ImGui.SameLine()
+
 	thickness        = thickness or 1
 	color            = color or ImGui.GetStyleColorU32(ImGuiCol.Separator)
 	local drawList   = ImGui.GetWindowDrawList()
@@ -624,6 +623,7 @@ function ImGui.VerticalSeparator(thickness, color)
 	)
 
 	ImGui.Dummy(thickness, 0)
+	ImGui.SameLine()
 end
 
 ---@param label string
