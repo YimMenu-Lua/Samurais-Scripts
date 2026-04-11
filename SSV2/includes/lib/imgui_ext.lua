@@ -84,7 +84,7 @@ local spinner_chars <const>   = {
 
 local DialogBoxColors <const> = {
 	-- info is just derived from default theme
-	[ImGuiDialogBoxStyle.WARN]   = Color(240, 190, 2, 255), -- safety yellow; we should probably define this in the Color class as a named color
+	[ImGuiDialogBoxStyle.WARN]   = Color("safety_yellow"),
 	[ImGuiDialogBoxStyle.SEVERE] = Color.RED,
 }
 

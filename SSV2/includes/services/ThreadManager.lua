@@ -360,7 +360,7 @@ function ThreadManager:init()
 end
 
 -- Runs a callback once in a fiber.
----@param func function
+---@param func fun(s?: script_util)
 function ThreadManager:Run(func)
 	if (type(func) ~= "function") then
 		Backend:debug("[ThreadManager] Invalid parameter! Expected function, got %s instead.", type(func))
@@ -442,7 +442,7 @@ end
 
 -- Creates a thread that runs in a loop.
 ---@param name string
----@param func function
+---@param func fun(s?: script_util)
 ---@param suspended? boolean
 ---@param is_debug_thread? boolean
 function ThreadManager:RegisterLooped(name, func, suspended, is_debug_thread)

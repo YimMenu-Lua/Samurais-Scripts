@@ -1186,11 +1186,12 @@ function Game.GetRandomCoordsInRange(vecMin, vecMax)
 end
 
 ---@param modelHash number|string
+---@return eEntityType
 function Game.GetModelType(modelHash)
 	modelHash = Game.EnsureModelHash(modelHash)
 
 	if not Game.IsModelHash(modelHash) then
-		return 0
+		return Enums.eEntityType.Invalid
 	end
 
 	if STREAMING.IS_MODEL_A_PED(modelHash) then
@@ -1459,6 +1460,31 @@ end
 ---@param label string
 function Game.GetGXTLabel(label)
 	return HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(label or "")
+end
+
+---@param scriptName string
+---@param timeout? integer
+---@return boolean
+function Game.TakeControlOfScript(scriptName, timeout)
+	if (not script.is_active(scriptName)) then
+		return false
+	end
+
+	timeout     = timeout or 1e4
+	local timer = Timer.new(timeout)
+
+	Notifier:ShowMessage("Samurai's Scripts", _F("%s '%s'...", _T("GENERIC_SCRIPT_CONTROL"), scriptName))
+	while (not LocalPlayer:IsHostOfScript(scriptName)) do
+		if (timer:IsDone()) then
+			Notifier:ShowError("Samurai's Scripts", _F("%s '%s'", _T("GENERIC_SCRIPT_CTRL_FAIL"), scriptName))
+			return false
+		end
+
+		network.force_script_host(scriptName)
+		yield()
+	end
+
+	return true
 end
 
 ---@param weaponHash hash

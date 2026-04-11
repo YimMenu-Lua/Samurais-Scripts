@@ -122,7 +122,6 @@ function RawDataService:NormalizeGenericDict(data)
 
 		for k in pairs(dict) do
 			table.insert(names, k)
-			yield()
 		end
 
 		table.sort(names, function(a, b)
@@ -131,8 +130,9 @@ function RawDataService:NormalizeGenericDict(data)
 
 		for i, name in ipairs(names) do
 			outArray[i] = Pair.new(name, dict[name])
-			yield()
 		end
+
+		yield()
 
 		data.normalized  = outArray
 		data.normalizing = false

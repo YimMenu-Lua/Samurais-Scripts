@@ -11,6 +11,7 @@
 ---@field private m_current_entity? handle
 ---@field private m_current_model? hash
 ---@field private m_current_pos? vec3
+---@field private m_current_type? eEntityType
 ---@field private m_last_hovered_entity? handle
 ---@field private m_hover_start_time integer
 ---@field private m_delay integer
@@ -31,6 +32,9 @@ function PreviewService.new(delay)
 	}, PreviewService)
 end
 
+-- TODO: Make this aware of our window position and anchor the entity
+--
+-- accordingly so it doesn't get hiddent behind the UI.
 ---@param modelHash integer
 function PreviewService:Preview(modelHash)
 	if (self.m_failed_models[modelHash]) then
@@ -41,6 +45,7 @@ function PreviewService:Preview(modelHash)
 		if (self.m_current_entity) then
 			Game.DeleteEntity(self.m_current_entity)
 			self.m_current_entity = nil
+			self.m_current_type   = nil
 			self.m_current_pos    = nil
 		end
 
@@ -51,6 +56,7 @@ function PreviewService:Preview(modelHash)
 			return
 		end
 
+		local entityType = Game.GetModelType(modelHash)
 		local handle
 		local coords = vec3:zero()
 		local groundZ = 0.0
@@ -64,8 +70,7 @@ function PreviewService:Preview(modelHash)
 			false
 		)
 
-		coords = vec3:new(offset.x, offset.y, groundZ + 0.5)
-		local entityType = Game.GetModelType(modelHash)
+		coords = vec3:new(offset.x, offset.y, groundZ + 1)
 		if (entityType == Enums.eEntityType.Object) then
 			handle = Game.CreateObject(
 				modelHash,
@@ -96,41 +101,46 @@ function PreviewService:Preview(modelHash)
 			TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(handle, true)
 		end
 
-		if (not handle) then
+		if (not handle or not ENTITY.DOES_ENTITY_EXIST(handle)) then
 			log.warning("[PreviewService]: Failed to create entity!")
 			return
 		end
 
-		ENTITY.SET_ENTITY_ALPHA(handle, 127, false)
+		ENTITY.SET_ENTITY_ALPHA(handle, 150, false)
 		ENTITY.SET_ENTITY_INVINCIBLE(handle, true)
 		ENTITY.FREEZE_ENTITY_POSITION(handle, true)
 		ENTITY.SET_ENTITY_COLLISION(handle, false, false)
 
-		if (Game.IsOnline() and ENTITY.DOES_ENTITY_EXIST(handle)) then
+		if (entityType == Enums.eEntityType.Vehicle) then
+			VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(handle, 5.0)
+		end
+
+		if (Game.IsOnline()) then
 			entities.take_control_of(handle, 250)
-			Game.DesyncNetworkID(NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(handle))
 		end
 
 		self.m_current_entity = handle
-		self.current_model    = modelHash
+		self.m_current_model  = modelHash
+		self.m_current_type   = entityType
 		self.m_current_pos    = coords
 	end)
 end
 
 ---@private
 function PreviewService:Rotate()
-	ThreadManager:Run(function()
-		if not self.m_current_entity or not ENTITY.DOES_ENTITY_EXIST(self.m_current_entity) then
+	ThreadManager:Run(function(s)
+		if (not self.m_current_entity or not ENTITY.DOES_ENTITY_EXIST(self.m_current_entity)) then
 			return
 		end
 
+		local is_veh  = self.m_current_type and self.m_current_type == Enums.eEntityType.Vehicle or false
 		local heading = ENTITY.GET_ENTITY_HEADING(self.m_current_entity)
 		ENTITY.SET_ENTITY_HEADING(self.m_current_entity, (heading - 0.3) % 360)
 
 		if (LocalPlayer:IsMoving()) then
 			local groundZ      = 0
-			local vec_Offset   = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(LocalPlayer:GetHandle(), 1, 5, 0)
-			_, groundZ         = MISC.GET_GROUND_Z_EXCLUDING_OBJECTS_FOR_3D_COORD(
+			local vec_Offset   = LocalPlayer:GetOffsetInWorldCoords(1, 5, 0)
+			_, groundZ         = MISC.GET_GROUND_Z_FOR_3D_COORD(
 				vec_Offset.x,
 				vec_Offset.y,
 				vec_Offset.z,
@@ -139,18 +149,23 @@ function PreviewService:Rotate()
 				false
 			)
 
-			self.m_current_pos = vec3:new(vec_Offset.x, vec_Offset.y, groundZ + 0.5)
-			ENTITY.SET_ENTITY_COORDS(
+			self.m_current_pos = vec3:new(vec_Offset.x, vec_Offset.y, groundZ + 1)
+			ENTITY.SET_ENTITY_COORDS_NO_OFFSET(
 				self.m_current_entity,
 				self.m_current_pos.x,
 				self.m_current_pos.y,
 				self.m_current_pos.z,
 				false,
 				false,
-				false,
 				false
 			)
 		end
+
+		if (is_veh and not VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(self.m_current_entity)) then
+			VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(self.m_current_entity, 5.0)
+		end
+
+		s:yield()
 	end)
 end
 
@@ -180,7 +195,8 @@ function PreviewService:Clear()
 		end
 
 		self.m_current_entity      = nil
-		self.current_model         = nil
+		self.m_current_model       = nil
+		self.m_current_type        = nil
 		self.m_current_pos         = nil
 		self.m_last_hovered_entity = nil
 		self.m_await_spawn         = false

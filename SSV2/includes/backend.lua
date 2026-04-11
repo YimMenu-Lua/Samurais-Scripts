@@ -33,6 +33,7 @@ Enums.eBackendEvent = {
 
 ---@enum eEntityType
 Enums.eEntityType = {
+	Invalid = -1,
 	Ped     = 1,
 	Vehicle = 2,
 	Object  = 3

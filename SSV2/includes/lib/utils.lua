@@ -877,7 +877,7 @@ function table.serialize(tbl, indent, key_order, seen)
 		local v   = tbl[k]
 		local ind = get_indent(indent + 1)
 
-		if is_array then
+		if (is_array) then
 			table.insert(pieces, ind .. serialize_value(v, indent + 1) .. ",\n")
 		else
 			local key
@@ -926,8 +926,7 @@ end
 ---@param t table
 ---@return boolean
 function table.is_empty(t)
-	local is_array, size = table.is_array(t)
-	return is_array and size == 0 or next(t) == nil
+	return next(t) == nil
 end
 
 -- Calculates an estimate of a table's size in memory.

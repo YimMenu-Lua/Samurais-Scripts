@@ -23,20 +23,20 @@ Enums.eCasinoPrize            = {
 }
 
 local CasinoPrizes <const>    = {
-	[Enums.eCasinoPrize.VEHICLE] = { v = 18 },
-	[Enums.eCasinoPrize.MYSTERY] = { v = 11 },
-	[Enums.eCasinoPrize.CASH] = { v = 19 },
-	[Enums.eCasinoPrize.CHIPS] = { v = 15 },
-	[Enums.eCasinoPrize.RP] = { v = 17 },
-	[Enums.eCasinoPrize.DISCOUNT] = { v = 4 },
-	[Enums.eCasinoPrize.CLOTHING] = { v = 8 },
+	[Enums.eCasinoPrize.VEHICLE]  = 18,
+	[Enums.eCasinoPrize.MYSTERY]  = 11,
+	[Enums.eCasinoPrize.CASH]     = 19,
+	[Enums.eCasinoPrize.CHIPS]    = 15,
+	[Enums.eCasinoPrize.RP]       = 17,
+	[Enums.eCasinoPrize.DISCOUNT] = 4,
+	[Enums.eCasinoPrize.CLOTHING] = 8
 }
 
 local CardNumToString <const> = {
-	[0]  = _T("CP_CARD_KING"),
-	[1]  = _T("CP_CARD_ACE"),
-	[11] = _T("CP_CARD_JACK"),
-	[12] = _T("CP_CARD_QUEEN"),
+	[0]  = "CP_CARD_KING",
+	[1]  = "CP_CARD_KING",
+	[11] = "CP_CARD_KING",
+	[12] = "CP_CARD_KING",
 }
 
 
@@ -103,44 +103,14 @@ function CasinoPacino:GiveWheelPrize(prizeID)
 		idx = math.random(Enums.eCasinoPrize.VEHICLE, Enums.eCasinoPrize.CLOTHING)
 	end
 
-	local obj = CasinoPrizes[idx]
-	if (not obj) then
+	local val = CasinoPrizes[idx]
+	if (not val) then
 		log.fdebug("Unknown prize ID: %d", prizeID)
 		return
 	end
 
-	prize_wheel_win_state:At(prize_wheel_prize):WriteInt(obj.v)
+	prize_wheel_win_state:At(prize_wheel_prize):WriteInt(val)
 	prize_wheel_win_state:At(prize_wheel_prize_state):WriteInt(11)
-end
-
----@param script_name string
----@param timeout? integer
----@return boolean
-function CasinoPacino:TakeControlOfScript(script_name, timeout)
-	if (not script.is_active(script_name)) then
-		return false
-	end
-
-	timeout       = timeout or 10000
-	local success = true
-	local timer   = Timer.new(timeout)
-
-	Notifier:ShowMessage("Casino Pacino", _F("%s '%s'...", _T("GENERIC_SCRIPT_CONTROL"), script_name))
-	while (not LocalPlayer:IsHostOfScript(script_name)) do
-		if (timer:IsDone()) then
-			success = false
-			break
-		end
-
-		network.force_script_host(script_name)
-		yield()
-	end
-
-	if (not success) then
-		Notifier:ShowError("Casino Pacino", _F("%s '%s'", _T("GENERIC_SCRIPT_CTRL_FAIL"), script_name))
-	end
-
-	return success
 end
 
 ---@param card_index number
@@ -149,9 +119,10 @@ function CasinoPacino:GetCardNameFromIndex(card_index)
 		return "Rolling"
 	end
 
-	local card_number = math.fmod(card_index, 13)
-	local cardName    = CardNumToString[card_number] or tostring(card_number)
-	local cardSuit    = ""
+	local cardNum  = math.fmod(card_index, 13)
+	local label    = CardNumToString[cardNum]
+	local cardName = label and _T(label) or tostring(cardNum)
+	local cardSuit = ""
 
 	if (card_index >= 1 or card_index <= 13) then
 		cardSuit = _T("CP_CARD_CLUBS")
@@ -167,12 +138,12 @@ function CasinoPacino:GetCardNameFromIndex(card_index)
 end
 
 function CasinoPacino:ForceDealerBust()
-	ThreadManager:Run(function()
-		if (not script.is_active("three_card_poker")) then
-			return
-		end
+	if (not script.is_active("three_card_poker")) then
+		return
+	end
 
-		if (not self:TakeControlOfScript("blackjack")) then
+	ThreadManager:Run(function()
+		if (not Game.TakeControlOfScript("blackjack")) then
 			return
 		end
 
@@ -219,17 +190,20 @@ function CasinoPacino:SetPokerCards(player_id, players_current_table, card_one, 
 	local three_card_poker_deck_size       = SGSL:Get(SGSL.data.three_card_poker_deck_size):GetValue()
 	local three_card_poker_anti_cheat      = tcp_ac_obj:GetValue()
 	local three_card_poker_anti_cheat_deck = tcp_ac_obj:GetOffset(1)
-	local TCPCards                         = ScriptLocal(three_card_poker_cards, "three_card_poker")
+
+
+	local TCPCards = ScriptLocal(three_card_poker_cards, "three_card_poker")
 		:At(three_card_poker_current_deck)
 		:At(1)
 		:At(players_current_table * three_card_poker_deck_size)
 		:At(2)
 
-	local TCPAC                            = ScriptLocal(three_card_poker_anti_cheat, "three_card_poker")
+	local TCPAC    = ScriptLocal(three_card_poker_anti_cheat, "three_card_poker")
 		:At(three_card_poker_anti_cheat_deck)
 		:At(1)
 		:At(1)
 		:At(players_current_table * three_card_poker_deck_size)
+
 
 	TCPCards:At(1):At(player_id * 3):WriteInt(card_one)
 	TCPAC:At(1):At(player_id * 3):WriteInt(card_one)
@@ -246,7 +220,7 @@ function CasinoPacino:ForcePokerCards()
 		return
 	end
 
-	if (not self:TakeControlOfScript("three_card_poker")) then
+	if (not Game.TakeControlOfScript("three_card_poker")) then
 		return
 	end
 
@@ -301,7 +275,7 @@ function CasinoPacino:ForceRouletteWheel()
 		return
 	end
 
-	if (not self:TakeControlOfScript("casinoroulette")) then
+	if (not Game.TakeControlOfScript("casinoroulette")) then
 		return
 	end
 

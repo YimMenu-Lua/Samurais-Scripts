@@ -41,7 +41,7 @@ end
 -- A simple ped browser UI class.
 --
 -- Draws vehicles inside an ImGui Listbox and provides search and filtering controls.
----@class VehicleBrowser<string, RawVehicleData> : AssetBrowserBase
+---@class VehicleBrowser : AssetBrowserBase
 ---@field private m_selected_item? RawVehicleData
 ---@field private m_cars_only boolean
 ---@field private m_wants_class_filters boolean
@@ -58,12 +58,9 @@ VehicleBrowser.__index       = VehicleBrowser
 ---@return VehicleBrowser
 function VehicleBrowser.new(opts)
 	opts = opts or {}
-	opts.is_normalized_array = true
-
 	local base = AssetBrowserBase.new(opts)
 	local instance = setmetatable(base, VehicleBrowser)
 	instance.m_cars_only = opts.cars_only or false
-	instance.m_wants_preview = opts.show_preview or false
 	instance.m_filter_combo_width = opts.filter_combo_width or 144.0
 	instance.m_class_filter_index = 1
 	instance.m_wants_class_filters = opts.show_class_filters or false
@@ -99,6 +96,7 @@ function VehicleBrowser:DrawManufacturerFilter()
 			local label = (i == 1) and _T(v) or v
 			if (ImGui.Selectable(label, (v == self.m_selected_manufacturer))) then
 				self.m_selected_manufacturer = v
+				ImGui.SetItemDefaultFocus()
 			end
 		end
 		ImGui.EndCombo()
@@ -124,6 +122,7 @@ function VehicleBrowser:DrawClassFilter()
 			local label = (i == 1) and _T(v) or v
 			if (ImGui.Selectable(label, (i == self.m_class_filter_index))) then
 				self.m_class_filter_index = i
+				ImGui.SetItemDefaultFocus()
 			end
 		end
 		ImGui.EndCombo()
@@ -161,24 +160,25 @@ end
 --#region overloads
 
 ---@override
----@param v RawVehicleData
+---@param v Pair<string, RawVehicleData>
 function VehicleBrowser:TryFilters(_, v)
-	return self:FilterByManufacturer(v.manufacturer)
-		and self:FilterByClass(v.class_id)
+	local data = v.second
+	return self:FilterByManufacturer(data.manufacturer)
+		and self:FilterByClass(data.class_id)
 end
 
 ---@override
----@param v RawVehicleData
+---@param v Pair<string, RawVehicleData>
 ---@return joaat_t
 function VehicleBrowser:GetModelFromIterable(_, v)
-	return v.model_hash
+	return v.second.model_hash
 end
 
 ---@override
----@param v RawVehicleData
+---@param v Pair<string, RawVehicleData>
 ---@return string
 function VehicleBrowser:GetNameFromIterable(_, v)
-	return v.display_name
+	return v.second.display_name
 end
 
 --#endregion

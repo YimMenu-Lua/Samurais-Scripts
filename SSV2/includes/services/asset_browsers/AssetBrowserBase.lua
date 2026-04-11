@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
--- ---@enum eAssetBrowserDrawType
+-- ---@enum eAssetBrowserDrawMode
 -- Enums.eAssetBrowserDrawMode = {
 -- 	COMBO   = 0,
 -- 	LISTBOX = 1,
@@ -17,7 +17,6 @@ local REF_COUNTER = 0
 
 ---@class BrowserBaseParams<K, V>
 ---@field item_list? table<K, V>
----@field is_normalized_array? boolean
 ---@field show_preview? boolean
 ---@field max_entries? integer
 
@@ -48,10 +47,11 @@ local REF_COUNTER = 0
 ---@field protected m_preview_enabled boolean
 ---@field protected m_clicked boolean
 ---@field protected m_hovered_this_frame? joaat_t
----@field protected m_uid string
----@field protected m_is_normalized_array boolean
----@field GetModelFromIterable? fun(self: AssetBrowserBase, k: K, v: V): joaat_t
----@field GetNameFromIterable? fun(self: AssetBrowserBase, k: K, v: V): string
+---@field protected m_uid joaat_t
+---@field protected m_is_array boolean
+---@field protected m_iter_idx integer
+---@field GetModelFromIterable? fun(self: AssetBrowserBase, k: K, v: V): joaat_t -- This is for browsers that work with entities and offer a preview toggle.
+---@field GetNameFromIterable? fun(self: AssetBrowserBase, k: K, v: V): string -- should be global for all browsers since base does not know what a label is.
 local AssetBrowserBase <const> = {}
 AssetBrowserBase.__index = AssetBrowserBase
 
@@ -60,21 +60,22 @@ AssetBrowserBase.__index = AssetBrowserBase
 function AssetBrowserBase.new(opts)
 	REF_COUNTER = REF_COUNTER + 1
 	return setmetatable({
-		m_items               = opts.item_list,
-		m_max_entries         = opts.max_entries or -1,
-		m_wants_preview       = opts.show_preview or false,
-		m_preview_enabled     = false,
-		m_clicked             = false,
-		m_search_buffer       = "",
-		m_is_normalized_array = opts.is_normalized_array or false,
-		m_uid                 = "AssetBrowser" .. REF_COUNTER
+		m_items           = opts.item_list,
+		m_max_entries     = opts.max_entries or -1,
+		m_wants_preview   = opts.show_preview or false,
+		m_preview_enabled = false,
+		m_clicked         = false,
+		m_search_buffer   = "",
+		m_iter_idx        = 0,
+		m_uid             = _J("ASSET_BROWSER_" .. REF_COUNTER)
 	}, AssetBrowserBase)
 end
 
----@param tag string
+---@param tag string hidden tag
+---@param label? string display label
 ---@return string
-function AssetBrowserBase:fmt(tag)
-	return _F("##%s_%s", self.m_uid, tag)
+function AssetBrowserBase:fmt(tag, label)
+	return _F("%s##%s%d", self.m_uid, tag, label or "")
 end
 
 -- Must be overloaded to run filtering logic.
@@ -104,8 +105,8 @@ function AssetBrowserBase:GetSelectedItem()
 	return self.m_selected_item
 end
 
----@param k K
----@param v V
+---@param k any
+---@param v any
 ---@param search_empty boolean
 function AssetBrowserBase:__ProcessItem(k, v, search_empty)
 	if (not self:TryFilters(k, v)) then
@@ -115,20 +116,19 @@ function AssetBrowserBase:__ProcessItem(k, v, search_empty)
 	local getName = self.GetNameFromIterable
 	---@type string
 	---@diagnostic disable-next-line
-	local label   = getName and getName(self, k, v) or k
-
+	local label   = getName and getName(self, k, v) or tostring(k)
 	if (not search_empty and not label:lower():contains(self.m_search_buffer)) then
 		return false
 	end
 
 	if (ImGui.Selectable(label, (v == self.m_selected_item))) then
 		self.m_selected_item = v
+		ImGui.SetItemDefaultFocus()
 	end
 
 	if (ImGui.IsItemClicked(0)) then
 		self.m_clicked = true
 		pcall(self.OnItemClicked, self, k, v)
-		ImGui.SetItemDefaultFocus()
 	end
 
 	if (ImGui.IsItemHovered() and self.m_preview_enabled) then
@@ -141,63 +141,84 @@ function AssetBrowserBase:__ProcessItem(k, v, search_empty)
 	return true
 end
 
----@param processed integer
 ---@param search_empty boolean
-function AssetBrowserBase:__Pairs(processed, search_empty)
+function AssetBrowserBase:__Pairs(search_empty)
 	for k, v in pairs(self.m_items) do
 		if (self:__ProcessItem(k, v, search_empty)) then
-			processed = processed + 1
+			self.m_iter_idx = self.m_iter_idx + 1
 		end
 
-		if (self.m_max_entries > 0 and processed >= self.m_max_entries) then
+		if (self.m_max_entries > 0 and self.m_iter_idx >= self.m_max_entries) then
 			break
 		end
 	end
 end
 
----@param processed integer
-function AssetBrowserBase:__iPairs(processed, search_empty)
-	local size = #self.m_items
-	for i = 1, size do
-		if (self.m_max_entries > 0 and processed >= self.m_max_entries) then
+---@param search_empty boolean
+function AssetBrowserBase:__iPairs(search_empty)
+	for i, v in ipairs(self.m_items) do
+		if (self.m_max_entries > 0 and self.m_iter_idx >= self.m_max_entries) then
 			break
 		end
 
-		---@type Pair<K, V>
-		local pair = self.m_items[i]
-		if (self:__ProcessItem(pair.first, pair.second, search_empty)) then
-			processed = processed + 1
+		if (self:__ProcessItem(i, v, search_empty)) then
+			self.m_iter_idx = self.m_iter_idx + 1
 		end
 	end
 end
 
 ---@private
-function AssetBrowserBase:__Iterate()
-	if (not self.m_items) then return end
+---@param is_search_empty boolean
+function AssetBrowserBase:__Iterate(is_search_empty)
+	if (not self.m_items) then
+		return
+	end
 
-	local is_search_empty = self.m_search_buffer:isempty()
-	local processed_items = 0
-	if (self.m_is_normalized_array) then
-		self:__iPairs(processed_items, is_search_empty)
+	if (self.m_is_array == nil) then
+		self.m_is_array = table.is_array(self.m_items)
+	end
+
+	self.m_iter_idx = 0
+	if (self.m_is_array) then
+		self:__iPairs(is_search_empty)
 	else
-		self:__Pairs(processed_items, is_search_empty)
+		self:__Pairs(is_search_empty)
 	end
 end
 
 ---@private
 function AssetBrowserBase:__DrawListBox()
 	local size_x, size_y = self.m_draw_region.x, self.m_draw_region.y
-	self.m_search_buffer = ImGui.SearchBar(self:fmt("searchbar"), self.m_search_buffer, 0, size_x)
+	self.m_search_buffer = ImGui.SearchBar("##searchbar", self.m_search_buffer, 0, size_x)
+	local is_buff_empty  = self.m_search_buffer:isempty()
 
-	if (ImGui.BeginListBox(self:fmt("listbox"), size_x, size_y)) then
-		if (self.m_max_entries > 0 and self.m_search_buffer:isempty()) then
-			ImGui.TextDisabled("[ ! ]")
+	if (ImGui.BeginListBox("##listBox", size_x, size_y)) then
+		if (self.m_max_entries > 0 and is_buff_empty and (self.m_iter_idx >= self.m_max_entries)) then
+			ImGui.TextColored(0.941, 0.745, 0.007, 1.000, "[ ! ]")
 			GUI:Tooltip(_F(_T("ASSET_BROWSER_TRUNC_TT"), self.m_max_entries))
 			ImGui.Separator()
 		end
 
-		self:__Iterate()
+		self:__Iterate(is_buff_empty)
 		ImGui.EndListBox()
+	end
+end
+
+-- This can be overridden by browsers that don't work with game entities
+--
+-- but offer preview nonetheless (ex: AnimBrowser).
+function AssetBrowserBase:HandlePreview()
+	if (not self.m_wants_preview) then
+		return
+	end
+
+	if (self.m_preview_enabled and self.m_hovered_this_frame) then
+		PreviewService:OnTick(self.m_hovered_this_frame)
+	end
+
+	if (PreviewService:GetCurrentEntity() and not (ImGui.IsAnyItemHovered() and self.m_preview_enabled)) then
+		self.m_hovered_this_frame = nil
+		PreviewService:Clear()
 	end
 end
 
@@ -215,6 +236,8 @@ function AssetBrowserBase:__DrawImpl(region)
 	if (self.m_draw_region.x == 0) then self.m_draw_region.x = -1 end
 	if (self.m_draw_region.y == 0) then self.m_draw_region.y = -1 end
 
+	ImGui.PushID(self.m_uid)
+
 	if (self.m_wants_preview) then
 		self.m_preview_enabled = GUI:CustomToggle(_T("GENERIC_PREVIEW"), self.m_preview_enabled)
 	end
@@ -222,15 +245,9 @@ function AssetBrowserBase:__DrawImpl(region)
 	self:DrawFilters()
 	self:__DrawListBox()
 
-	if (self.m_preview_enabled and self.m_hovered_this_frame) then
-		PreviewService:OnTick(self.m_hovered_this_frame)
-	end
+	ImGui.PopID()
 
-	if (PreviewService:GetCurrentEntity() and not (ImGui.IsAnyItemHovered() and self.m_preview_enabled)) then
-		self.m_hovered_this_frame = nil
-		PreviewService:Clear()
-	end
-
+	self:HandlePreview()
 	return self.m_selected_item, self.m_clicked
 end
 

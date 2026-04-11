@@ -19,11 +19,13 @@ local eColorType <const> = {
 	NAMED = 5
 }
 
+---@class NamedColors
 local NamedColors = {
-	yellow = { 1.0, 1.0, 0.0, 1.0 },
-	orange = { 1.0, 0.5, 0.0, 1.0 },
-	pink   = { 1.0, 0.0, 0.5, 1.0 },
-	purple = { 1.0, 0.0, 1.0, 1.0 },
+	yellow        = { 1.000, 1.000, 0.000, 1.000 },
+	orange        = { 1.000, 0.500, 0.000, 1.000 },
+	pink          = { 1.000, 0.000, 0.500, 1.000 },
+	purple        = { 1.000, 0.000, 1.000, 1.000 },
+	safety_yellow = { 0.941, 0.745, 0.007, 1.000 },
 }
 
 ---@param n number
@@ -109,7 +111,7 @@ end
 ---@class Color
 ---@field private m_type eColorType
 ---@field private m_source table?
----@field private m_named_colors dict<{ [1]: float, [2]: float, [3]: float, [4]: float }>
+---@field private m_named_colors NamedColors
 ---@field private __raw_ctor fun(r: float, g: float, b: float, a: float): Color
 ---@field public r float
 ---@field public g float

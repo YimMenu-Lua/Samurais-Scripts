@@ -29,7 +29,7 @@ end
 -- A simple ped browser UI class.
 --
 -- Draws peds inside an ImGui Listbox and provides search and filtering controls.
----@class PedBrowser<string, RawPedData> : AssetBrowserBase
+---@class PedBrowser : AssetBrowserBase
 ---@field private m_selected_item? RawPedData
 ---@field private m_wants_type_filters boolean
 ---@field private m_type_filter_index integer
@@ -46,16 +46,15 @@ PedBrowser.__index       = PedBrowser
 ---@param opts? PedBrowserParams
 ---@return PedBrowser
 function PedBrowser.new(opts)
-	opts                            = opts or {}
-	opts.is_normalized_array        = true
-	local base                      = AssetBrowserBase.new(opts)
-	local instance                  = setmetatable(base, PedBrowser)
-	instance.m_humans_only          = opts.humans_only or false
-	instance.m_wants_type_filters   = opts.show_type_filters or false
+	opts = opts or {}
+	local base = AssetBrowserBase.new(opts)
+	local instance = setmetatable(base, PedBrowser)
+	instance.m_humans_only = opts.humans_only or false
+	instance.m_type_filter_index = 1
+	instance.m_filter_combo_width = opts.filter_combo_width or 144.0
+	instance.m_wants_type_filters = opts.show_type_filters or false
+	instance.m_gender_filter_index = 1
 	instance.m_wants_gender_filters = opts.show_gender_filters or false
-	instance.m_filter_combo_width   = opts.filter_combo_width or 144.0
-	instance.m_type_filter_index    = 1
-	instance.m_gender_filter_index  = 1
 
 	if (instance.m_wants_gender_filters) then
 		local gender_array = { "GENERIC_NONE", "GENERIC_MALE", "GENERIC_FEMALE" }
@@ -152,34 +151,35 @@ function PedBrowser:FilterByType(currentType)
 	return currentType == (self.m_type_filter_index - 2)
 end
 
----@param v RawPedData
-function PedBrowser:FilterNonHumans(v)
+---@param data RawPedData
+function PedBrowser:FilterNonHumans(data)
 	if (not self.m_humans_only) then return true end
-	return v.is_human
+	return data.is_human
 end
 
 --#region overloads
 
 ---@override
----@param v RawPedData
+---@param v Pair<string, RawPedData>
 function PedBrowser:TryFilters(_, v)
-	return self:FilterByGender(v.ped_gender)
-		and self:FilterByType(v.ped_type)
-		and self:FilterNonHumans(v)
+	local data = v.second
+	return self:FilterByGender(data.ped_gender)
+		and self:FilterByType(data.ped_type)
+		and self:FilterNonHumans(data)
 end
 
 ---@override
----@param v RawPedData
+---@param v Pair<string, RawPedData>
 ---@return joaat_t
 function PedBrowser:GetModelFromIterable(_, v)
-	return v.model_hash
+	return v.second.model_hash
 end
 
 ---@override
----@param k string
+---@param v Pair<string, RawPedData>
 ---@return string
-function PedBrowser:GetNameFromIterable(k, _)
-	return k
+function PedBrowser:GetNameFromIterable(_, v)
+	return v.first
 end
 
 --#endregion

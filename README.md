@@ -119,7 +119,7 @@ A full list of available features and their usage [can be found here](docs/Featu
 
 - **Q:** Can this be made compatible with YimMenuV2 once its API is finished?
 - **Short Answer:** No.
-- **Long Answer:** Yes, a compatibility layer can be added to accomodate for all language and API differences but is it worth the trouble and code bloat? Absolutely not. We would be better off rewriting this for V2's API.
+- **Long Answer:** Yes, a compatibility layer can be added to handle all language and API differences but is it worth the trouble and code bloat? Absolutely not. We would be better off rewriting this for V2's API.
 
 ## Contact
 
@@ -138,7 +138,7 @@ A full list of available features and their usage [can be found here](docs/Featu
 | <a href="https://github.com/gir489returns"><img height="40" width="40" alt="gir489returns" src="https://avatars.githubusercontent.com/gir489returns"><br/>gir489returns</a> | [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino) |
 | <a href="https://github.com/tupoy-ya"><img height="40" width="40" alt="tupoy-ya" src="https://avatars.githubusercontent.com/tupoy-ya"><br/>tupoy-ya</a> | Several contributions and shared knowledge. Owner of [YimLuaAPI](https://github.com/TupoyeMenu/YimLuaAPI) |
 | <a href="https://github.com/szalikdev"><img height="40" width="40" alt="szalikdev" src="https://avatars.githubusercontent.com/szalikdev"><br/>szalikdev</a> | Revived the project and joined the cause. Owner of [Acid Labs](https://github.com/acidlabsdev) |
-| <a href="https://github.com/How-Bout-No"><img height="40" width="40" alt="How-Bout-No" src="https://avatars.githubusercontent.com/How-Bout-No"><br/>How-Bout-No</a> | Enhanced compatibility (YimLuaAPI). |
+| <a href="https://github.com/How-Bout-No"><img height="40" width="40" alt="How-Bout-No" src="https://avatars.githubusercontent.com/How-Bout-No"><br/>How-Bout-No</a> | Enhanced compatibility (YimLuaAPI), Mastermind module, and more. |
 | <a href="https://github.com/shinywasabi"><img height="40" width="40" alt="Arthur" src="https://avatars.githubusercontent.com/shinywasabi"><br/>ShinyWasabi</a> | [scrDbg](https://github.com/ShinyWasabi/scrDbg) and other foundational community contributions frequently used as reference |
 | <a href="https://github.com/durtyfree"><img height="40" width="40" alt="DurtyFree" src="https://avatars.githubusercontent.com/durtyfree"><br/>Alexander Schmid</a> | [GTA V data dumps](https://github.com/DurtyFree/gta-v-data-dumps) |
 | <a href="https://github.com/yimura"><img height="40" width="40" alt="Yimura" src="https://avatars.githubusercontent.com/yimura"><br/>Andreas Maerten</a> | GTA V classes (archived/removed) |
