@@ -144,7 +144,7 @@ _Vehicle-centric features extending the capabilities of vanilla vehicles._
 
   Allows you to use a custom NOS boost.
 
-  _Usage:_ Triggered via keybind while driving _(default: **[Left Shift]**)_.
+  _Usage:_ Triggered via keybind while driving _(default: **[Mouse 5]**)_.
 
 - **NOS Purge**
 
