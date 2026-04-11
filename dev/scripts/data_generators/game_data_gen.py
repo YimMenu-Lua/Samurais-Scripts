@@ -129,7 +129,7 @@ def write_lua_table(lua_path: str, data, class_name: str = None):
             f.write("return ")
         f.write(serialize_lua(data))
         if class_name:
-            f.write(f"return { class_name }")
+            f.write(f"\nreturn { class_name }")
         f.write("\n")
 
 
