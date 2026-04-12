@@ -12,6 +12,7 @@
 local CPed        = require("includes.classes.gta.CPed")
 local CVehicle    = require("includes.classes.gta.CVehicle")
 local MemoryPatch = require("includes.structs.MemoryPatch")
+local CEntity     = require("includes.classes.gta.CEntity")
 
 
 ---@class PatchData
@@ -233,18 +234,6 @@ function Memory:GlobalIndexFromAddress(addr)
 	return 0
 end
 
----@param vehicle integer vehicle handle
----@return CVehicle|nil
-function Memory:GetVehicleInternal(vehicle)
-	return CVehicle(vehicle)
-end
-
----@param ped handle A Ped ID, not a Player ID.
----@return CPed|nil
-function Memory:GetPedInternal(ped)
-	return CPed(ped)
-end
-
 -- Checks if a vehicle's handling flag is set. It is recommended to use the `Vehicle` module instead since it caches the CVehicle instance.
 --
 -- This is only useful if you want to quickly get/set a flag once and don't need a `Vehicle` instance.
@@ -252,21 +241,7 @@ end
 ---@param flag eVehicleHandlingFlags
 ---@return boolean
 function Memory:GetVehicleHandlingFlag(vehicle, flag)
-	if not (ENTITY.DOES_ENTITY_EXIST(vehicle) or ENTITY.IS_ENTITY_A_VEHICLE(vehicle)) then
-		return false
-	end
-
-	local cvehicle = self:GetVehicleInternal(vehicle)
-	if (not cvehicle) then
-		return false
-	end
-
-	local m_handling_flags = cvehicle.m_handling_flags
-	if m_handling_flags:is_null() then
-		return false
-	end
-
-	return Bit.IsBitSet(m_handling_flags:get_dword(), flag)
+	return CVehicle(vehicle):GetHandlingFlag(flag)
 end
 
 -- Checks if a vehicle's model info flag is set. It is recommended to use the `Vehicle` module instead since it caches the CVehicle instance.
@@ -276,22 +251,7 @@ end
 ---@param flag eVehicleModelFlags
 ---@return boolean
 function Memory:GetVehicleModelInfoFlag(vehicle, flag)
-	local cvehicle = self:GetVehicleInternal(vehicle)
-	if (not cvehicle) then
-		return false
-	end
-
-	local base_ptr = cvehicle.m_model_info_flags
-	if base_ptr:is_null() then
-		return false
-	end
-
-	local index    = math.floor(flag / 32)
-	local bitPos   = flag % 32
-	local flag_ptr = base_ptr:add(index * 4)
-	local dword    = flag_ptr:get_dword()
-
-	return Bit.IsBitSet(dword, bitPos)
+	return CVehicle(vehicle):GetModelInfoFlag(flag)
 end
 
 -- Unsafe for non-scripted entities.
@@ -300,22 +260,7 @@ end
 ---@param entity handle
 ---@return eModelType
 function Memory:GetEntityModelType(entity)
-	if (not ENTITY.DOES_ENTITY_EXIST(entity)) then
-		return Enums.eModelType.Invalid
-	end
-
-	local isMemSafe, entityType = pcall(function()
-		local pEntity = memory.handle_to_ptr(entity)
-		if (pEntity:is_null()) then
-			return Enums.eModelType.Invalid
-		end
-
-		local m_model_info = pEntity:add(0x0020):deref()
-		local m_model_type = m_model_info:add(0x009D)
-		return m_model_type:get_word() & 0x1F
-	end)
-
-	return isMemSafe and entityType or Enums.eModelType.Invalid
+	return CEntity(entity):GetModelType()
 end
 
 --[[

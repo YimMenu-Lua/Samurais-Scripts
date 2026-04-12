@@ -53,7 +53,7 @@ function atArray.new(ptr, data_type)
 	if (array_size == 0) then return instance end
 
 	instance.m_size      = array_size
-	instance.m_capacity  = ptr:add(0x10):get_word()
+	instance.m_capacity  = ptr:add(0xA):get_word()
 	instance.m_data_type = data_type
 
 	for i = 0, array_size - 1 do
@@ -96,7 +96,7 @@ end
 
 ---@return string
 function atArray:GetDataType()
-	local _t = "unknonwn"
+	local _t = "unknown"
 	if (type(self.m_data_type) == "table" and self.m_data_type.__type) then
 		_t = self.m_data_type.__type
 	end
@@ -135,7 +135,6 @@ end
 
 ---@return fun(t: array<T>, i?: integer): integer, pointer<T> Iterator
 function atArray:__pairs()
-	log.warning("[atArray]: Use of pairs! Please use atArray:Iter() instead.")
 	return self:Iter()
 end
 

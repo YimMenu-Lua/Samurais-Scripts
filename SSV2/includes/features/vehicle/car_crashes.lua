@@ -68,11 +68,9 @@ function CarCrash:Init()
 		name = self.m_entity.MemoryPatches.DeformMult,
 		onEnable = function(patch)
 			local cvehicle = self.m_entity:Resolve()
-			if (not cvehicle) then
-				error("Handling data is null!")
-			end
+			if (not cvehicle) then return end
 
-			local fDeformMult = cvehicle.m_deform_mult
+			local fDeformMult = cvehicle.m_handling_data.m_deform_mult
 			patch.m_state     = {
 				ptr = fDeformMult,
 				default_value = fDeformMult:get_float()
@@ -89,7 +87,7 @@ function CarCrash:Init()
 
 			local ptr = patch.m_state.ptr
 			if (not ptr or ptr:is_null()) then
-				error("pointer is null")
+				return
 			end
 
 			ptr:set_float(patch.m_state.default_value)

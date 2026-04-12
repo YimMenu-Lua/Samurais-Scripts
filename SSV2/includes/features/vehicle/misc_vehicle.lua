@@ -29,28 +29,21 @@ function MiscVehicle:Init()
 	self.m_entity:AddMemoryPatch({
 		name = self.m_entity.MemoryPatches.Turbulence,
 		onEnable = function(patch)
-			if (not self.m_entity:IsPlane()) then
-				error("Invalid vehicle type!")
-				return
-			end
+			if (not self.m_entity:IsPlane()) then return end
 
 			---@type CFlyingHandlingData
 			local handingdata = self.m_entity:GetHandlingData()
-			if (not handingdata) then
-				error("Handling data is null!")
-			end
+			if (not handingdata) then return end
 
-			local fturbulence = handingdata.m_turbulence_force_mult
-			if (fturbulence:is_null()) then
-				error("Pointer is null!")
-			end
+			local fTurbulence = handingdata.m_turbulence_force_mult
+			if (fTurbulence:is_null()) then return end
 
 			patch.m_state = {
-				ptr = fturbulence,
-				default_value = fturbulence:get_float()
+				ptr = fTurbulence,
+				default_value = fTurbulence:get_float()
 			}
 
-			fturbulence:set_float(0.0)
+			fTurbulence:set_float(0.0)
 		end,
 		onDisable = function(patch)
 			if (not patch.m_state or patch.m_state.default_value == nil) then
@@ -58,10 +51,7 @@ function MiscVehicle:Init()
 			end
 
 			local ptr = patch.m_state.ptr
-			if (not ptr or ptr:is_null()) then
-				error("Pointer is null")
-			end
-
+			if (not ptr or ptr:is_null()) then return end
 			ptr:set_float(patch.m_state.default_value)
 		end
 	})
@@ -69,21 +59,16 @@ function MiscVehicle:Init()
 	self.m_entity:AddMemoryPatch({
 		name = self.m_entity.MemoryPatches.WindMult,
 		onEnable = function(patch)
-			if (not self.m_entity:IsPlane()) then
-				error("Invalid vehicle type!")
+			if (not self.m_entity:IsPlane()) then return end
+
+			---@type CFlyingHandlingData?
+			local handingdata = self.m_entity:GetHandlingData()
+			if (not handingdata or not handingdata:IsValid()) then
 				return
 			end
 
-			---@type CFlyingHandlingData
-			local handingdata = self.m_entity:GetHandlingData()
-			if (not handingdata) then
-				error("Handling data is null!")
-			end
-
 			local fwindForce = handingdata.m_wind_force_mult
-			if (fwindForce:is_null()) then
-				error("Pointer is null!")
-			end
+			if (fwindForce:is_null()) then return end
 
 			patch.m_state = {
 				ptr = fwindForce,
@@ -98,10 +83,7 @@ function MiscVehicle:Init()
 			end
 
 			local ptr = patch.m_state.ptr
-			if (not ptr or ptr:is_null()) then
-				error("Pointer is null")
-			end
-
+			if (not ptr or ptr:is_null()) then return end
 			ptr:set_float(patch.m_state.default_value)
 		end
 	})

@@ -602,11 +602,9 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 					name = PV.MemoryPatches.Acceleration,
 					onEnable = function(patch)
 						local cvehicle = PV:Resolve()
-						if (not cvehicle) then
-							error("Handling data is null!")
-						end
+						if (not cvehicle) then return end
 
-						local fAccelMult = cvehicle.m_acceleration
+						local fAccelMult = cvehicle.m_handling_data.m_acceleration
 						patch.m_state    = {
 							ptr = fAccelMult,
 							default_value = fAccelMult:get_float()
@@ -622,10 +620,7 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 						end
 
 						local ptr = patch.m_state.ptr
-						if (not ptr or ptr:is_null()) then
-							error("pointer is null")
-						end
-
+						if (not ptr or ptr:is_null()) then return end
 						ptr:set_float(patch.m_state.default_value)
 					end
 				}, true)

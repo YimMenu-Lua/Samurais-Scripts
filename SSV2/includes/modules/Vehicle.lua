@@ -1326,7 +1326,7 @@ function Vehicle:SetBoneMatrix(bone_index, matrix)
 	self:Resolve():SetBoneMatrix(bone_index, matrix)
 end
 
----@return (CCarHandlingData|CBikeHandlingData|CFlyingHandlingData)?
+---@return (CCarHandlingData|CBikeHandlingData|CFlyingHandlingData|any)?
 function Vehicle:GetHandlingData()
 	if (not self:IsValid()) then return end
 
