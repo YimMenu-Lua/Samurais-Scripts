@@ -854,5 +854,6 @@ return {
 	["EF_TAB_SAVED_FORGES"] = "保存的作品",
 	["GENERIC_ENABLE"] = "使能够",
 	["GENERIC_DISABLE"] = "禁用",
-	["VEH_STANCE_UPDATE_WARN"] = "您确定要覆盖 %s 已保存的姿态吗？"
+	["VEH_STANCE_UPDATE_WARN"] = "您确定要覆盖 %s 已保存的姿态吗？",
+	["ASSET_BROWSER_CONTEXT_TT"] = "右键单击打开上下文菜单。"
 }

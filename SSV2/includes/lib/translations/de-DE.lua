@@ -854,5 +854,6 @@ return {
 	["EF_TAB_SAVED_FORGES"] = "Gespeicherte Kreationen",
 	["GENERIC_DISABLE"] = "Deaktivieren",
 	["GENERIC_ENABLE"] = "Aktivieren",
-	["VEH_STANCE_UPDATE_WARN"] = "Sind Sie sicher, dass Sie die gespeicherte Haltung für %s überschreiben möchten?"
+	["VEH_STANCE_UPDATE_WARN"] = "Sind Sie sicher, dass Sie die gespeicherte Haltung für %s überschreiben möchten?",
+	["ASSET_BROWSER_CONTEXT_TT"] = "Klicken Sie mit der rechten Maustaste, um das Kontextmenü zu öffnen."
 }

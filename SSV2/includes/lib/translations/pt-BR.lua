@@ -854,5 +854,6 @@ return {
 	["EF_TAB_SPAWNER"] = "Gerador",
 	["GENERIC_ENABLE"] = "Habilitar",
 	["GENERIC_DISABLE"] = "Desativar",
-	["VEH_STANCE_UPDATE_WARN"] = "Tem certeza de que deseja substituir a postura salva para %s ?"
+	["VEH_STANCE_UPDATE_WARN"] = "Tem certeza de que deseja substituir a postura salva para %s ?",
+	["ASSET_BROWSER_CONTEXT_TT"] = "Clique com o botão direito para abrir o menu de contexto."
 }

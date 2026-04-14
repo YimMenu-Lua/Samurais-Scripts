@@ -854,5 +854,6 @@ return {
 	["EF_TAB_SAVED_FORGES"] = "Créations enregistrées",
 	["GENERIC_DISABLE"] = "Désactiver",
 	["VEH_STANCE_UPDATE_WARN"] = "Etes-vous sûr de vouloir écraser la position enregistrée pour le %s ?",
-	["GENERIC_ENABLE"] = "Activer"
+	["GENERIC_ENABLE"] = "Activer",
+	["ASSET_BROWSER_CONTEXT_TT"] = "Faites un clic droit pour ouvrir le menu contextuel."
 }

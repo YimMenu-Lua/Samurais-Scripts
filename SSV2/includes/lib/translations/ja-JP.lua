@@ -854,5 +854,6 @@ return {
 	["EF_TAB_SPAWNER"] = "スポナー",
 	["GENERIC_ENABLE"] = "有効にする",
 	["GENERIC_DISABLE"] = "無効にする",
-	["VEH_STANCE_UPDATE_WARN"] = "%s に保存されたスタンスを上書きしてもよろしいですか?"
+	["VEH_STANCE_UPDATE_WARN"] = "%s に保存されたスタンスを上書きしてもよろしいですか?",
+	["ASSET_BROWSER_CONTEXT_TT"] = "右クリックしてコンテキスト メニューを開きます。"
 }

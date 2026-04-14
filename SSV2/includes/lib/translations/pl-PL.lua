@@ -854,5 +854,6 @@ return {
 	["EF_TAB_SAVED_FORGES"] = "Zapisane dzieła",
 	["GENERIC_ENABLE"] = "Włączać",
 	["GENERIC_DISABLE"] = "Wyłączyć",
-	["VEH_STANCE_UPDATE_WARN"] = "Czy na pewno chcesz nadpisać zapisaną postawę dla %s?"
+	["VEH_STANCE_UPDATE_WARN"] = "Czy na pewno chcesz nadpisać zapisaną postawę dla %s?",
+	["ASSET_BROWSER_CONTEXT_TT"] = "Kliknij prawym przyciskiem myszy, aby otworzyć menu kontekstowe."
 }

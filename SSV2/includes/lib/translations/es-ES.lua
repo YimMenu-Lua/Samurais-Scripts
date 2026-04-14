@@ -854,5 +854,6 @@ return {
 	["EF_TAB_SAVED_FORGES"] = "Creaciones guardadas",
 	["GENERIC_ENABLE"] = "Permitir",
 	["GENERIC_DISABLE"] = "Desactivar",
-	["VEH_STANCE_UPDATE_WARN"] = "¿Está seguro de que desea sobrescribir la postura guardada para %s?"
+	["VEH_STANCE_UPDATE_WARN"] = "¿Está seguro de que desea sobrescribir la postura guardada para %s?",
+	["ASSET_BROWSER_CONTEXT_TT"] = "Haga clic derecho para abrir el menú contextual."
 }

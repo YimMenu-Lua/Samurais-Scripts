@@ -854,5 +854,6 @@ return {
 	["EF_MOUSE_CURSOR_HINT"] = "Premi [ %s ] per posizionare %s il cursore del mouse.",
 	["GENERIC_DISABLE"] = "Disabilita",
 	["VEH_STANCE_UPDATE_WARN"] = "Sei sicuro di voler sovrascrivere la posizione salvata per %s ?",
-	["GENERIC_ENABLE"] = "Abilitare"
+	["GENERIC_ENABLE"] = "Abilitare",
+	["ASSET_BROWSER_CONTEXT_TT"] = "Fare clic con il tasto destro per aprire il menu contestuale."
 }

@@ -854,5 +854,6 @@ return {
 	["EF_ALPHA_PLAYER_NOT_ALLOWED"] = "로컬 플레이어 엔터티에는 투명도 수정이 허용되지 않습니다.",
 	["GENERIC_ENABLE"] = "할 수 있게 하다",
 	["VEH_STANCE_UPDATE_WARN"] = "%s에 대해 저장된 자세를 덮어쓰시겠습니까?",
-	["GENERIC_DISABLE"] = "장애를 입히다"
+	["GENERIC_DISABLE"] = "장애를 입히다",
+	["ASSET_BROWSER_CONTEXT_TT"] = "마우스 오른쪽 버튼을 클릭하여 상황에 맞는 메뉴를 엽니다."
 }
