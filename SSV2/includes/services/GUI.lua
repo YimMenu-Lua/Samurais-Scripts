@@ -359,7 +359,7 @@ end
 ---@param x_mod float x modifier (ex: 0.5)
 ---@param y_mod float y modifier (ex: 0.3)
 ---@param custom_size? vec2
----@return vec2, vec2 -- size, center position
+---@return vec2 size, vec2 center
 function GUI:GetNewWindowSizeAndCenterPos(x_mod, y_mod, custom_size)
 	if (self.m_screen_resolution:is_zero()) then
 		self.m_screen_resolution = Game.GetScreenResolution()
@@ -771,7 +771,6 @@ end
 
 function GUI:Draw()
 	self.m_wants_input = false
-
 	if (not self.m_should_draw or self.m_has_error) then
 		return
 	end
@@ -797,7 +796,7 @@ function GUI:Draw()
 		local msg = "[ThemeManager]: stack underflow! Forgot to call PushTheme?"
 		log.warning(msg)
 		self.m_has_error = true
-		self.m_traceback = _F("%s%s", msg, self.m_traceback == nil and "" or self.m_traceback .. "\n\n")
+		self.m_traceback = _F("%s%s", msg, self.m_traceback == nil and "" or (self.m_traceback .. "\n\n"))
 	end
 end
 

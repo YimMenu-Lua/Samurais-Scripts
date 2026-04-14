@@ -547,7 +547,7 @@ return {
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "Niezgodna sesja. Dołącz do trybu bezpłatnego.",
 	["YRV3_STATE_WAIT_TRANSITION"] = "Czekam na przejście w tryb swobodny.",
 	["GENERIC_VEHICLE"] = "Pojazd",
-	["GENERIC_UNKOWN"] = "Nieznany",
+	["GENERIC_UNKNOWN"] = "Nieznany",
 	["GENERIC_VALUE"] = "Wartość",
 	["SY_LIFT_EMPTY"] = "Pusty",
 	["SY_CURRENT_ROBBERY"] = "Aktywny napad: %s",

@@ -104,7 +104,7 @@ return {
 		scenario = "WORLD_HUMAN_BUM_SLUMPED",
 	},
 	{
-		label = " HOBO Standing",
+		label = "HOBO Standing",
 		scenario = "WORLD_HUMAN_BUM_STANDING",
 	},
 	{

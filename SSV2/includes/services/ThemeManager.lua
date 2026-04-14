@@ -45,8 +45,8 @@ function ThemeManager:Load()
 		current = self:GetDefaultTheme()
 	end
 
-	if (getmetatable(current) == nil) then
-		current = Theme.new(current)
+	if (Theme.IsRawTable(current)) then
+		current = Theme.deserialize(current)
 	end
 
 	GVars.ui.style.theme = current
@@ -81,8 +81,8 @@ end
 
 ---@param theme Theme
 function ThemeManager:SetCurrentTheme(theme)
-	if (getmetatable(theme) == nil) then
-		theme = Theme.new(theme)
+	if (Theme.IsRawTable(theme)) then
+		theme = Theme.deserialize(theme)
 	end
 
 	GVars.ui.style.theme = theme

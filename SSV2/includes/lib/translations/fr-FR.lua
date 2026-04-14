@@ -549,7 +549,7 @@ return {
 	["SY_LIFT_EMPTY"] = "Vide",
 	["GENERIC_VALUE"] = "Valeur",
 	["GENERIC_VEHICLE"] = "Véhicule",
-	["GENERIC_UNKOWN"] = "Inconnu",
+	["GENERIC_UNKNOWN"] = "Inconnu",
 	["SY_CHOP_SHOP"] = "Boutique de côtelettes",
 	["SY_CURRENT_ROBBERY"] = "Vol actif : %s",
 	["SY_NOT_OWNED"] = "Vous ne possédez pas de chantier de récupération.",

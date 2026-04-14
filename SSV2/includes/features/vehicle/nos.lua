@@ -158,7 +158,7 @@ function NosMgr:UpdateEngineDamage()
 
 	local current_speed = PV:GetSpeed()
 	local threshold = PV:GetMaxSpeed() * 1.7
-	self.m_engine_danger_ratio = math.min(1, math.max(0, current_speed / threshold))
+	self.m_engine_danger_ratio = math.clamp(current_speed / threshold, 0, 1)
 
 	if (current_speed > threshold) then
 		local handle = PV:GetHandle()
@@ -178,12 +178,13 @@ end
 function NosMgr:Update()
 	local PV = self.m_entity
 	if (GVars.features.vehicle.nos.enabled and PV:IsEngineOn()) then
-		local handle = PV:GetHandle()
-		local buttonPressed = self:IsNOSButtonPressed()
+		local handle  = PV:GetHandle()
+		local pressed = self:IsNOSButtonPressed()
+		local power   = GVars.features.vehicle.nos.power
 
-		if (buttonPressed and PAD.IS_CONTROL_PRESSED(0, 71) and PV:GetEngineHealth() > 50) then
-			VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(handle, GVars.features.vehicle.nos.power / 5)
-			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, GVars.features.vehicle.nos.power)
+		if (pressed and PAD.IS_CONTROL_PRESSED(0, 71) and PV:GetEngineHealth() > 50) then
+			VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(handle, power / 5)
+			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, power)
 			if (GVars.features.vehicle.nos.sound_effect) then
 				AUDIO.SET_VEHICLE_BOOST_ACTIVE(handle, true)
 			end
@@ -195,7 +196,7 @@ function NosMgr:Update()
 			self.m_is_active = true
 		end
 
-		if (self.m_is_active and not buttonPressed) then
+		if (self.m_is_active and not pressed) then
 			VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(handle, 1.0)
 			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, -1)
 			AUDIO.SET_VEHICLE_BOOST_ACTIVE(handle, false)

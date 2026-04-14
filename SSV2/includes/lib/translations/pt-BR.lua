@@ -549,7 +549,7 @@ return {
 	["GENERIC_VEHICLE"] = "Veículo",
 	["GENERIC_VALUE"] = "Valor",
 	["SY_LIFT_EMPTY"] = "Vazio",
-	["GENERIC_UNKOWN"] = "Desconhecido",
+	["GENERIC_UNKNOWN"] = "Desconhecido",
 	["SY_CURRENT_ROBBERY"] = "Roubo Ativo: %s",
 	["SY_ROB_AVAILABLE"] = "Disponível.",
 	["SY_ROB_IN_PROGRESS"] = "Em andamento.",

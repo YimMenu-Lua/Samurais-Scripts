@@ -547,7 +547,7 @@ return {
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "互換性のないセッションです。フリーモードに参加してください。",
 	["YRV3_STATE_WAIT_TRANSITION"] = "フリーモードへの移行を待っています。",
 	["GENERIC_VEHICLE"] = "車両",
-	["GENERIC_UNKOWN"] = "未知",
+	["GENERIC_UNKNOWN"] = "未知",
 	["GENERIC_VALUE"] = "価値",
 	["SY_LIFT_EMPTY"] = "空の",
 	["SY_NOT_OWNED"] = "あなたはサルベージヤードを所有していません。",

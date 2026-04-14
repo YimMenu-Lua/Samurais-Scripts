@@ -548,7 +548,7 @@ return {
 	["YRV3_STATE_WAIT_TRANSITION"] = "Warten auf den Freemode-Übergang.",
 	["GENERIC_VEHICLE"] = "Fahrzeug",
 	["GENERIC_VALUE"] = "Wert",
-	["GENERIC_UNKOWN"] = "Unbekannt",
+	["GENERIC_UNKNOWN"] = "Unbekannt",
 	["SY_LIFT_EMPTY"] = "Leer",
 	["SY_CURRENT_ROBBERY"] = "Aktiver Raubüberfall: %s",
 	["SY_NOT_OWNED"] = "Sie besitzen keinen Schrottplatz.",

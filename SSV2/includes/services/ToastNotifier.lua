@@ -255,7 +255,8 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 		)
 
 		local btnRect = Rect(btnPos, btnBR)
-		if (not self.m_seen and ImGui.IsMouseHoveringRect(btnRect.min.x, btnRect.min.y, btnRect.max.x, btnRect.max.y)) then
+		local hoveringCloseButn = ImGui.IsMouseHoveringRect(btnRect.min.x, btnRect.min.y, btnRect.max.x, btnRect.max.y)
+		if (not self.m_seen and hoveringCloseButn) then
 			if (KeyManager:IsKeyJustPressed(eVirtualKeyCodes.VK_LBUTTON)) then
 				self:Dismiss()
 			end
@@ -263,7 +264,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 			ImGui.SetTooltip(_T("GENERIC_DISMISS"))
 		end
 
-		if (hasCallback) then
+		if (hasCallback and not hoveringCloseButn) then
 			ImGui.SetTooltip("Click to execute.")
 
 			if (KeyManager:IsKeyJustPressed(eVirtualKeyCodes.VK_LBUTTON)) then
@@ -701,24 +702,24 @@ end
 function Notifier:DrawNotifications(start_pos)
 	self:ClearSeen()
 
-	if (not self.m_should_draw) then
-		return
+	if (not self.m_should_draw) then return end
+
+	self.m_viewed      = true
+	local screen_width = GPointers.ScreenResolution.x
+	local far_right    = self.m_window_width * 2
+	if (start_pos.x + far_right > screen_width) then
+		start_pos.x = screen_width - far_right
 	end
 
-	self.m_viewed     = true
-	local count       = self:GetNotifCount()
 	local height      = self:ComputeTotalHeight() + 20
-	local max_screen  = GPointers.ScreenResolution.x
 	local window_pos  = vec2:new(start_pos.x + self.m_window_width, start_pos.y)
 	local window_size = vec2:new(self.m_window_width, height)
 	local style       = ImGui.GetStyle()
-	if (window_pos.x >= max_screen) then
-		window_pos.x = max_screen - self.m_window_width - 10
-	end
 
 	ImGui.SetNextWindowBgAlpha(0.55)
 	ImGui.SetNextWindowPos(window_pos.x, window_pos.y)
 
+	local count = self:GetNotifCount()
 	if (count <= 4) then
 		ImGui.SetNextWindowSize(window_size.x, window_size.y)
 	else

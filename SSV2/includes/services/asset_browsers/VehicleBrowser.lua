@@ -57,14 +57,16 @@ VehicleBrowser.__index       = VehicleBrowser
 ---@param opts? VehBrowserParams
 ---@return VehicleBrowser
 function VehicleBrowser.new(opts)
-	opts = opts or {}
-	local base = AssetBrowserBase.new(opts)
+	opts           = opts or {}
+	local base     = AssetBrowserBase.new(opts)
 	local instance = setmetatable(base, VehicleBrowser)
-	instance.m_cars_only = opts.cars_only or false
-	instance.m_filter_combo_width = opts.filter_combo_width or 144.0
-	instance.m_class_filter_index = 1
-	instance.m_wants_class_filters = opts.show_class_filters or false
-	instance.m_selected_manufacturer = "GENERIC_NONE"
+
+
+	instance.m_cars_only                  = opts.cars_only or false
+	instance.m_filter_combo_width         = opts.filter_combo_width or 144.0
+	instance.m_class_filter_index         = 1
+	instance.m_wants_class_filters        = opts.show_class_filters or false
+	instance.m_selected_manufacturer      = "GENERIC_NONE"
 	instance.m_wants_manufacturer_filters = opts.show_manufacturer_filters or false
 
 	---@diagnostic disable-next-line
@@ -72,20 +74,8 @@ function VehicleBrowser.new(opts)
 end
 
 ---@private
----@return boolean
-function VehicleBrowser:ShouldFilterByClass()
-	return self.m_wants_class_filters
-end
-
----@private
----@return boolean
-function VehicleBrowser:ShouldFilterByManufacturer()
-	return self.m_wants_manufacturer_filters
-end
-
----@private
 function VehicleBrowser:DrawManufacturerFilter()
-	if (not self:ShouldFilterByManufacturer()) then
+	if (not self.m_wants_manufacturer_filters) then
 		return
 	end
 
@@ -106,11 +96,11 @@ end
 
 ---@private
 function VehicleBrowser:DrawClassFilter()
-	if (not self:ShouldFilterByClass()) then
+	if (not self.m_wants_class_filters) then
 		return
 	end
 
-	if (self:ShouldFilterByManufacturer()) then
+	if (self.m_wants_manufacturer_filters) then
 		ImGui.SameLineIfAvail(self.m_filter_combo_width)
 	end
 
@@ -130,16 +120,11 @@ function VehicleBrowser:DrawClassFilter()
 	GUI:Tooltip(_T("GENERIC_LIST_FILTER"))
 end
 
-function VehicleBrowser:DrawFilters()
-	self:DrawManufacturerFilter()
-	self:DrawClassFilter()
-end
-
 ---@private
 ---@param current_mfr string
 ---@return boolean
 function VehicleBrowser:FilterByManufacturer(current_mfr)
-	if (not self:ShouldFilterByManufacturer() or self.m_selected_manufacturer == "GENERIC_NONE") then
+	if (not self.m_wants_manufacturer_filters or self.m_selected_manufacturer == "GENERIC_NONE") then
 		return true
 	end
 
@@ -150,7 +135,7 @@ end
 ---@param currentClassID eVehicleClass
 ---@return boolean
 function VehicleBrowser:FilterByClass(currentClassID)
-	if (not self:ShouldFilterByClass() or self.m_class_filter_index == 1) then
+	if (not self.m_wants_class_filters or self.m_class_filter_index == 1) then
 		return true
 	end
 
@@ -158,6 +143,12 @@ function VehicleBrowser:FilterByClass(currentClassID)
 end
 
 --#region overloads
+
+---@override
+function VehicleBrowser:DrawFilters()
+	self:DrawManufacturerFilter()
+	self:DrawClassFilter()
+end
 
 ---@override
 ---@param v Pair<string, RawVehicleData>
@@ -191,7 +182,9 @@ function VehicleBrowser:Draw(region)
 		self.m_items = RawDataService:GetNormalizedVehicles()
 	end
 
-	return self:__DrawImpl(region)
+	---@type Pair<string, RawVehicleData>?, boolean
+	local pair, clicked = self:__DrawImpl(region)
+	return (pair and pair.second or nil), clicked
 end
 
 return VehicleBrowser

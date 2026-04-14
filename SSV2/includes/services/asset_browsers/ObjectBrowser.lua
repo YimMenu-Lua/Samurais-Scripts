@@ -31,28 +31,36 @@ ObjectBrowser.__index       = ObjectBrowser
 ---@param opts? ObjectBrowserParams
 ---@return ObjectBrowser
 function ObjectBrowser.new(opts)
-	opts = opts or {}
-	local base = AssetBrowserBase.new(opts)
+	opts           = opts or {}
+	local base     = AssetBrowserBase.new(opts)
 	local instance = setmetatable(base, ObjectBrowser)
-	instance.m_wants_mp_filters = opts.show_mp_only_filters or false
-	instance.m_filter_combo_width = opts.filter_combo_width or 144.0
+
+
+	instance.m_wants_mp_filters        = opts.show_mp_only_filters or false
+	instance.m_filter_combo_width      = opts.filter_combo_width or 144.0
 	instance.m_wants_blacklist_filters = opts.show_blacklist_filters or false
 
 	---@diagnostic disable-next-line
 	return instance
 end
 
+--#region overloads
+
+---@override
 ---@param v string
 ---@return joaat_t
 function ObjectBrowser:GetModelFromIterable(_, v)
 	return _J(v)
 end
 
+---@override
 ---@param v string
 ---@return string
 function ObjectBrowser:GetNameFromIterable(_, v)
 	return v
 end
+
+--#endregion
 
 ---@param region? vec2
 ---@return string? selectedObject, boolean clicked

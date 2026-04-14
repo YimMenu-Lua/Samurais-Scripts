@@ -143,7 +143,7 @@ return {
 	["GENERIC_LIST_FILTER"]                = "Filter By",
 	["GENERIC_LIST_GROUP"]                 = "Group By",
 	["GENERIC_EDIT"]                       = "Edit",
-	["GENERIC_UNKOWN"]                     = "Unknown",
+	["GENERIC_UNKNOWN"]                    = "Unknown",
 	["GENERIC_VEHICLE"]                    = "Vehicle",
 	["GENERIC_VALUE"]                      = "Value",
 	["GENERIC_TIME"]                       = "Time",
@@ -878,5 +878,6 @@ return {
 
 	--#region Miscellaneous
 	["ASSET_BROWSER_TRUNC_TT"]             = "The list is truncated to show only %d entries. Use the search bar to find what you're looking for.",
+	["ASSET_BROWSER_CONTEXT_TT"]           = "Right click to open the context menu.",
 	--#endregion
 }

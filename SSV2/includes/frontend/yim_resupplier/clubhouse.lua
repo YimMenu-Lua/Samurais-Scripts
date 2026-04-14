@@ -68,7 +68,7 @@ return function()
 	ImGui.BeginTabBar("##mc_businesses")
 	for i, bb in ipairs(subs) do
 		local norm_name = bb:GetNormalizedName()
-		local name      = norm_name or _T("GENERIC_UNKOWN")
+		local name      = norm_name or _T("GENERIC_UNKNOWN")
 		ImGui.PushID(i)
 		if (ImGui.BeginTabItem(name)) then
 			drawFactory(bb)

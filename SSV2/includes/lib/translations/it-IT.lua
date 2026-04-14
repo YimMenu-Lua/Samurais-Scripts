@@ -548,7 +548,7 @@ return {
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "Sessione incompatibile. Iscriviti alla modalità gratuita.",
 	["GENERIC_VEHICLE"] = "Veicolo",
 	["GENERIC_VALUE"] = "Valore",
-	["GENERIC_UNKOWN"] = "Sconosciuto",
+	["GENERIC_UNKNOWN"] = "Sconosciuto",
 	["SY_LIFT_EMPTY"] = "Vuoto",
 	["SY_CURRENT_ROBBERY"] = "Rapina attiva: %s",
 	["SY_ROB_AVAILABLE"] = "Disponibile.",

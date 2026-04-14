@@ -46,20 +46,22 @@ PedBrowser.__index       = PedBrowser
 ---@param opts? PedBrowserParams
 ---@return PedBrowser
 function PedBrowser.new(opts)
-	opts = opts or {}
-	local base = AssetBrowserBase.new(opts)
+	opts           = opts or {}
+	local base     = AssetBrowserBase.new(opts)
 	local instance = setmetatable(base, PedBrowser)
-	instance.m_humans_only = opts.humans_only or false
-	instance.m_type_filter_index = 1
-	instance.m_filter_combo_width = opts.filter_combo_width or 144.0
-	instance.m_wants_type_filters = opts.show_type_filters or false
-	instance.m_gender_filter_index = 1
+
+
+	instance.m_humans_only          = opts.humans_only or false
+	instance.m_type_filter_index    = 1
+	instance.m_filter_combo_width   = opts.filter_combo_width or 144.0
+	instance.m_wants_type_filters   = opts.show_type_filters or false
+	instance.m_gender_filter_index  = 1
 	instance.m_wants_gender_filters = opts.show_gender_filters or false
 
 	if (instance.m_wants_gender_filters) then
 		local gender_array = { "GENERIC_NONE", "GENERIC_MALE", "GENERIC_FEMALE" }
 		if (not instance.m_humans_only) then
-			gender_array[4] = "GENERIC_UNKOWN"
+			gender_array[4] = "GENERIC_UNKNOWN"
 		end
 
 		instance.m_gender_filter_array = gender_array
@@ -70,20 +72,8 @@ function PedBrowser.new(opts)
 end
 
 ---@private
----@return boolean
-function PedBrowser:ShouldFilterByType()
-	return self.m_wants_type_filters
-end
-
----@private
----@return boolean
-function PedBrowser:ShouldFilterByGender()
-	return self.m_wants_gender_filters
-end
-
----@private
 function PedBrowser:DrawGenderFilter()
-	if (not self:ShouldFilterByGender()) then
+	if (not self.m_wants_gender_filters) then
 		return
 	end
 
@@ -102,11 +92,11 @@ end
 
 ---@private
 function PedBrowser:DrawTypeFilter()
-	if (not self:ShouldFilterByType()) then
+	if (not self.m_wants_type_filters) then
 		return
 	end
 
-	if (self:ShouldFilterByGender()) then
+	if (self.m_wants_gender_filters) then
 		ImGui.SameLineIfAvail(self.m_filter_combo_width)
 	end
 
@@ -124,16 +114,11 @@ function PedBrowser:DrawTypeFilter()
 	GUI:Tooltip(_T("GENERIC_LIST_FILTER"))
 end
 
-function PedBrowser:DrawFilters()
-	self:DrawGenderFilter()
-	self:DrawTypeFilter()
-end
-
 ---@private
 ---@param currentGender ePedGender
 ---@return boolean
 function PedBrowser:FilterByGender(currentGender)
-	if (not self:ShouldFilterByGender() or self.m_gender_filter_index == 1) then
+	if (not self.m_wants_gender_filters or self.m_gender_filter_index == 1) then
 		return true
 	end
 
@@ -144,7 +129,7 @@ end
 ---@param currentType ePedType
 ---@return boolean
 function PedBrowser:FilterByType(currentType)
-	if (not self:ShouldFilterByType() or self.m_type_filter_index == 1) then
+	if (not self.m_wants_type_filters or self.m_type_filter_index == 1) then
 		return true
 	end
 
@@ -158,6 +143,12 @@ function PedBrowser:FilterNonHumans(data)
 end
 
 --#region overloads
+
+---@override
+function PedBrowser:DrawFilters()
+	self:DrawGenderFilter()
+	self:DrawTypeFilter()
+end
 
 ---@override
 ---@param v Pair<string, RawPedData>
@@ -192,7 +183,9 @@ function PedBrowser:Draw(region)
 		self.m_items = RawDataService:GetNormalizedPeds()
 	end
 
-	return self:__DrawImpl(region)
+	---@type Pair<string, RawPedData>?, boolean
+	local pair, clicked = self:__DrawImpl(region)
+	return (pair and pair.second or nil), clicked
 end
 
 return PedBrowser

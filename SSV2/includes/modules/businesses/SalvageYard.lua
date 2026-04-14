@@ -93,7 +93,7 @@ end
 ---@return string
 function SalvageYard:GetWeeklyRobberyStatus(slot)
 	local status = stats.get_int(_F("MPX_SALV23_VEHROB_STATUS%d", slot))
-	return _T(data.robbery_status_labels[status + 1] or "GENERIC_UNKOWN")
+	return _T(data.robbery_status_labels[status + 1] or "GENERIC_UNKNOWN")
 end
 
 ---@return string

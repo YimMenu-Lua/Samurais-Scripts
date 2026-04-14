@@ -548,7 +548,7 @@ return {
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "Sesión incompatible. Únase al modo gratuito.",
 	["GENERIC_VEHICLE"] = "Vehículo",
 	["GENERIC_VALUE"] = "Valor",
-	["GENERIC_UNKOWN"] = "Desconocido",
+	["GENERIC_UNKNOWN"] = "Desconocido",
 	["SY_LIFT_EMPTY"] = "Vacío",
 	["SY_NOT_OWNED"] = "No es propietario de un depósito de salvamento.",
 	["SY_CURRENT_ROBBERY"] = "Robo activo: %s",

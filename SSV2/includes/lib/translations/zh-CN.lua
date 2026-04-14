@@ -547,7 +547,7 @@ return {
 	["YRV3_STATE_WAIT_TRANSITION"] = "等待自由模式转换。",
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "不兼容的会话。请加入免费模式。",
 	["GENERIC_VEHICLE"] = "车辆",
-	["GENERIC_UNKOWN"] = "未知",
+	["GENERIC_UNKNOWN"] = "未知",
 	["GENERIC_VALUE"] = "价值",
 	["SY_LIFT_EMPTY"] = "空的",
 	["SY_NOT_OWNED"] = "您没有废品回收场。",

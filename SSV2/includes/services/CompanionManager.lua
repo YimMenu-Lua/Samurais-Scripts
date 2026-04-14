@@ -70,7 +70,8 @@ end
 ---@param is_armed? boolean
 ---@param is_saved? boolean
 function CompanionManager:SpawnCompanion(pedModel, name, is_invincible, is_armed, is_saved)
-	if (not Game.EnsureModelHash(pedModel)) then
+	if (not pedModel) then
+		log.warning("[CompanionManager]: model hash is nil!")
 		return 0
 	end
 
@@ -81,7 +82,7 @@ function CompanionManager:SpawnCompanion(pedModel, name, is_invincible, is_armed
 	local loaded = pcall(TaskWait, Game.RequestModel, pedModel)
 	if (not loaded) then
 		log.fwarning("[CompanionManager]: Failed to load model (%d). Model could be blacklisted or online-only.", pedModel)
-		return
+		return 0
 	end
 
 	local playerGroup = LocalPlayer:GetGroupIndex()

@@ -21,6 +21,11 @@ local COL_YELLOW <const> = Color("yellow")
 --- | "scenes"
 --- | "clipsets"
 
+---@alias ActionHistorySortMode
+---| 0 Timestamp
+---| 1 Type
+---| 2 Label
+
 ---@class YimActionsFavorites
 ---@field anims table<string, AnimData>
 ---@field scenarios table<string, ScenarioData>
@@ -35,12 +40,14 @@ local COL_YELLOW <const> = Color("yellow")
 ---@class YimActions
 ---@field protected m_initialized boolean
 ---@field private m_file_names { favorites: "saved_actions.json", commands: "action_commands.json" }
----@field Favorites YimActionsFavorites
----@field Commands table<string, ActionCommandData>
----@field CurrentlyPlaying table<handle, Action>
----@field LastPlayed Action[]
----@field CompanionManager CompanionManager
----@field SceneManager SceneManager
+---@field private SceneManager SceneManager
+---@field public Favorites YimActionsFavorites
+---@field public Commands table<string, ActionCommandData>
+---@field public DrawNewCommandWindow boolean
+---@field public CurrentlyPlaying table<handle, Action>
+---@field public LastPlayed { count: integer, sort_mode: ActionHistorySortMode, data: array<{ action: Action, timestamp: seconds, type: eActionType, fmt: string }> }
+---@field private m_history_lookup set<string>
+---@field public CompanionManager CompanionManager
 local YimActions   = {}
 YimActions.__index = YimActions
 
@@ -50,16 +57,22 @@ function YimActions:init()
 		return self
 	end
 
-	self.CompanionManager = CompanionManager.new()
-	self.SceneManager     = SceneManager.new()
-	self.CurrentlyPlaying = {}
-	self.LastPlayed       = {}
-	self.Commands         = {}
-	self.m_file_names     = {
+	self.DrawNewCommandWindow = false
+	self.CompanionManager     = CompanionManager.new()
+	self.SceneManager         = SceneManager.new()
+	self.CurrentlyPlaying     = {}
+	self.m_history_lookup     = {}
+	self.LastPlayed           = {
+		data      = {},
+		count     = 0,
+		sort_mode = 0,
+	}
+	self.Commands             = {}
+	self.m_file_names         = {
 		favorites = "saved_actions.json",
 		commands  = "action_commands.json",
 	}
-	self.Favorites        = {
+	self.Favorites            = {
 		anims     = {},
 		scenarios = {},
 		scenes    = {},
@@ -85,30 +98,86 @@ function YimActions:GetPed(ped)
 	return ped or LocalPlayer:GetHandle()
 end
 
+---@private
 ---@param ped? integer
-function YimActions:AddActionToRecents(ped)
-	ped = self:GetPed(ped)
-	local current = self.CurrentlyPlaying[ped]
+function YimActions:UpdatePlayHistory(ped)
+	local current = self.CurrentlyPlaying[self:GetPed(ped)]
+	if (not current) then return end
 
-	if (not current) then
+	local label = current.data.label
+	local lookupArray = self.m_history_lookup
+	if (lookupArray[label]) then return end
+
+	local type  = current.action_type
+	local fmt   = _F("[%s]  %s", current:TypeAsString(), label)
+	local epoch = DateTime:Now():Epoch()
+	table.insert(self.LastPlayed.data, {
+		action    = current,
+		timestamp = epoch,
+		type      = type,
+		fmt       = fmt,
+	})
+
+	lookupArray[label]    = true
+	self.LastPlayed.count = #self.LastPlayed.data
+	self:SortPlayHistory()
+end
+
+---@param index integer
+function YimActions:RemoveFromHistory(index)
+	local data  = self.LastPlayed.data
+	local count = #data
+	if (count == 0) then return end
+
+	if (count == 1) then
+		self.LastPlayed.data  = {}
+		self.m_history_lookup = {}
+		self.LastPlayed.count = 0
 		return
 	end
 
-	if (#self.LastPlayed == 0) then
-		table.insert(self.LastPlayed, current)
-	else
-		local exists = false
-		for _, action in ipairs(self.LastPlayed) do
-			if action.data.label == current.data.label then
-				exists = true
-				break
-			end
+	---@type { action: Action, timestamp: seconds, type: eActionType, fmt: string }?
+	local entry = table.remove(data, index)
+	if (entry) then
+		self.m_history_lookup[entry.action.data.label] = nil
+	end
+	self.LastPlayed.count = math.max(0, count - 1)
+end
+
+function YimActions:ClearPlayHistory()
+	local count = self.LastPlayed.count
+	if (count == 0) then
+		return
+	end
+
+	local lastPlayed = self.LastPlayed.data
+	ThreadManager:Run(function()
+		for i = count, 1, -1 do
+			table.remove(lastPlayed, i)
+			yield(5)
+		end
+		self.LastPlayed.count = 0
+		self.m_history_lookup = {}
+	end)
+end
+
+---@param mode ActionHistorySortMode?
+function YimActions:SortPlayHistory(mode)
+	if (mode and mode == self.LastPlayed.sort_mode) then
+		return
+	end
+
+	mode = mode or self.LastPlayed.sort_mode
+	table.sort(self.LastPlayed.data, function(a, b)
+		if (mode == 0) then
+			return a.timestamp > b.timestamp
+		elseif (mode == 1) then
+			return a.type < b.type
 		end
 
-		if not exists then
-			table.insert(self.LastPlayed, current)
-		end
-	end
+		return a.action.data.label < b.action.data.label
+	end)
+	self.LastPlayed.sort_mode = mode
 end
 
 ---@return boolean
@@ -215,7 +284,7 @@ function YimActions:PlayAnim(animData, targetPed)
 		false
 	)
 
-	self:AddActionToRecents(targetPed)
+	self:UpdatePlayHistory(targetPed)
 
 	if (not GVars.features.yim_actions.disable_props) then
 		if (animData.props and #animData.props > 0) then
@@ -321,7 +390,7 @@ function YimActions:Play(action, ped)
 		self:PlaySyncedScene(action.data)
 	end
 
-	self:AddActionToRecents(ped)
+	self:UpdatePlayHistory(ped)
 
 	if (Backend.debug_mode) then
 		self.Debugger:Update(ped)
@@ -496,22 +565,32 @@ end
 ---@param action_type eActionType
 function YimActions:AddToFavorites(category, name, data, action_type)
 	if (self:DoesFavoriteExist(category, name)) then
-		Notifier:ShowError(
-			"Samurai's Scripts",
-			"This action is already saved as a favorite!"
-		)
+		Notifier:ShowError("YimActions", "This action is already saved as a favorite!")
+		return
+	end
+
+	---@type table<string, ActionData>?
+	local cat = self.Favorites[category]
+	if (type(cat) ~= "table") then
+		Notifier:ShowError("YimActions", "Unknown action category!")
 		return
 	end
 
 	data["type"] = action_type
-	self.Favorites[category][name] = data
+	cat[name] = data
 	self:ParseFavorites()
 end
 
 ---@param category ActionCategory
 ---@param name string
 function YimActions:RemoveFromFavorites(category, name)
-	self.Favorites[category][name] = nil
+	---@type table<string, ActionData>?
+	local cat = self.Favorites[category]
+	if (type(cat) ~= "table") then
+		return
+	end
+
+	cat[name] = nil
 	self:ParseFavorites()
 end
 
@@ -519,11 +598,12 @@ function YimActions:ReadSavedCommands()
 	---@type table<string, ActionCommandData>?
 	local data = Serializer:ReadFromFile(self.m_file_names.commands)
 	if (type(data) ~= "table") then
-		self:ParseCommands()
+		Serializer:WriteToFile(self.m_file_names.commands, {})
 		return
 	end
 
 	self.Commands = data
+	self:ParseCommands()
 end
 
 function YimActions:RegisterCommands()
@@ -616,10 +696,10 @@ function YimActions:RemoveCommandAction(action_label)
 end
 
 ---@param action_type eActionType
----@param id string
+---@param str_id string
 ---@return Action?
-function YimActions:FindActionByStrID(action_type, id)
-	---@type AnimData|ScenarioData?
+function YimActions:FindActionByStrID(action_type, str_id)
+	---@type array<AnimData|ScenarioData>?
 	local lookup_array = Switch(action_type) {
 		[Enums.eActionType.ANIM]     = t_AnimList,
 		[Enums.eActionType.SCENARIO] = t_PedScenarios,
@@ -631,7 +711,7 @@ function YimActions:FindActionByStrID(action_type, id)
 	end
 
 	for _, data in ipairs(lookup_array) do
-		if (data.label == id) then
+		if (data.label == str_id) then
 			return Action.new(data, action_type)
 		end
 	end

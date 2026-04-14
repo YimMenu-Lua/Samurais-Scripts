@@ -449,22 +449,23 @@ function LocalPlayer:RemoveAttachments(lookup_table)
 	end)
 end
 
----@param data table
+---@param data MovementClipsetData
 ---@param isJson boolean
 function LocalPlayer:SetMovementClipset(data, isJson)
-	local mvmtclipset = isJson and data.Name or data.mvmt
-
 	ThreadManager:Run(function(s)
 		self:ResetMovementClipsets()
 		s:sleep(100)
 
-		local handle = self:GetHandle()
-		if (mvmtclipset) then
-			TaskWait(Game.RequestClipSet, mvmtclipset)
-			PED.SET_PED_MOVEMENT_CLIPSET(handle, mvmtclipset, 1.0)
-			PED.SET_PED_ALTERNATE_MOVEMENT_ANIM(handle, 0, "move_clown@generic", "idle", 1090519040, true)
-			TASK.SET_PED_CAN_PLAY_AMBIENT_IDLES(handle, true, true)
-			self.CurrentMovementClipset = mvmtclipset
+		local handle      = self:GetHandle()
+		local clipsetName = isJson and data.Name or data.mvmt
+		if (clipsetName) then
+			local loaded = pcall(TaskWait, Game.RequestClipSet, clipsetName)
+			if (loaded) then
+				PED.SET_PED_MOVEMENT_CLIPSET(handle, clipsetName, 1.0)
+				PED.SET_PED_ALTERNATE_MOVEMENT_ANIM(handle, 0, "move_clown@generic", "idle", 1090519040, true)
+				TASK.SET_PED_CAN_PLAY_AMBIENT_IDLES(handle, true, true)
+				self.CurrentMovementClipset = clipsetName
+			end
 		end
 
 		if (data.wmvmt) then
@@ -473,9 +474,11 @@ function LocalPlayer:SetMovementClipset(data, isJson)
 		end
 
 		if (data.strf) then
-			TaskWait(Game.RequestClipSet, data.strf)
-			PED.SET_PED_STRAFE_CLIPSET(handle, data.strf)
-			self.CurrentStrafeClipset = data.strf
+			local loaded = pcall(TaskWait, Game.RequestClipSet, data.strf)
+			if (loaded) then
+				PED.SET_PED_STRAFE_CLIPSET(handle, data.strf)
+				self.CurrentStrafeClipset = data.strf
+			end
 		end
 
 		if (data.wanim) then

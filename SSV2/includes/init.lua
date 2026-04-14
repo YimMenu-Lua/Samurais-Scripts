@@ -127,7 +127,7 @@ local packages  = {
 	"frontend.settings.settings_ui",
 	"frontend.vehicle.vehicle_ui",
 	"frontend.world_ui",
-	"frontend.yav3_ui",
+	"frontend.yim_actions.yav3_ui",
 	"frontend.yim_resupplier.yrv3_ui",
 }
 

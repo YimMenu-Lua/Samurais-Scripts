@@ -96,7 +96,7 @@
 ---@field strf string?
 ---@field wanim string
 
----@alias ActionData AnimData | ScenarioData | SyncedSceneData | MovementClipsetData?
+---@alias ActionData AnimData | ScenarioData | SyncedSceneData | MovementClipsetData
 
 ---@class ActionCommandData
 ---@field type eActionType

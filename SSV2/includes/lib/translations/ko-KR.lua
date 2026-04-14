@@ -546,7 +546,7 @@ return {
 	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[비지속적]: 나이트클럽 화장실 직원에게 100만 달러의 팁을 줄 수 있습니다. 수행원은 감사할 것입니다. 귀하의 은행 계좌는 그렇지 않을 것입니다.\n\n참고: 그에게 팁을 주려면 현금이 있어야 합니다.",
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "호환되지 않는 세션입니다. 무료 모드에 참여해 보세요.",
 	["YRV3_STATE_WAIT_TRANSITION"] = "자유 모드 전환을 기다리고 있습니다.",
-	["GENERIC_UNKOWN"] = "알려지지 않은",
+	["GENERIC_UNKNOWN"] = "알려지지 않은",
 	["GENERIC_VEHICLE"] = "차량",
 	["GENERIC_VALUE"] = "값",
 	["SY_LIFT_EMPTY"] = "비어 있는",

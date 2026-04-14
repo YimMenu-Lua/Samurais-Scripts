@@ -546,7 +546,7 @@ return {
 	["YRV3_TRIGGER_PROD_HUB_TT"] = "隨著時間的推移不斷觸發生產。這不像騎自行車的企業那樣是即時的，每次觸發之間有一個延遲（大約 20 秒）。 \n\n[重要]：在啟用此功能之前，您必須確保連接的企業已設置並正在運行，並且您的夜總會中已分配了一名技術人員。",
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "不兼容的會話。請加入免費模式。",
 	["YRV3_STATE_WAIT_TRANSITION"] = "等待自由模式轉換。",
-	["GENERIC_UNKOWN"] = "未知",
+	["GENERIC_UNKNOWN"] = "未知",
 	["GENERIC_VEHICLE"] = "車輛",
 	["GENERIC_VALUE"] = "價值",
 	["SY_LIFT_EMPTY"] = "空的",
