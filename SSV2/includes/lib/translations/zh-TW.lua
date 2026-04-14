@@ -855,5 +855,5 @@ return {
 	["GENERIC_ENABLE"] = "使能夠",
 	["GENERIC_DISABLE"] = "停用",
 	["VEH_STANCE_UPDATE_WARN"] = "您確定要覆蓋 %s 已保存的姿態嗎？",
-	["ASSET_BROWSER_CONTEXT_TT"] = "Right click to open the context menu."
+	["ASSET_BROWSER_CONTEXT_TT"] = "右鍵單擊開啟上下文選單。"
 }
