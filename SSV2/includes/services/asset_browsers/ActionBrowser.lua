@@ -406,17 +406,23 @@ function ActionBrowser:DrawItemContext(k, v)
 
 	local current_label = self.m_name_resolver(v)
 	local current_cat   = self.m_category_name
+	local current_mode  = self.m_mode
 	local is_favorite   = YimActions:DoesFavoriteExist(current_cat, current_label)
+	-- local is_user_gen   = current_cat == "anims" and (Backend.debug_mode and YimActions:GetUGA()[current_label] ~= nil) or false -- TODO: Add an option to create new anim defs
 	local has_command   = YimActions.Commands[current_label] ~= nil
 	local indicators    = ""
 
-	if (is_favorite) then
+	if (is_favorite and current_mode.name ~= "favorites") then
 		indicators = indicators .. "[*] "
 	end
 
 	if (has_command) then
 		indicators = indicators .. "[C] "
 	end
+
+	-- if (is_user_gen) then
+	-- 	indicators = indicators .. "[U] "
+	-- end
 
 	local avail     = ImGui.GetContentRegionAvail()
 	local textWidth = ImGui.CalcTextSize(indicators)
@@ -425,12 +431,12 @@ function ActionBrowser:DrawItemContext(k, v)
 
 	if (ImGui.BeginPopup(context_label)) then
 		if (is_favorite) then
-			if (self.m_mode.can_remove_favorite and ImGui.MenuItem("Remove From Favorites")) then
+			if (current_mode.can_remove_favorite and ImGui.MenuItem("Remove From Favorites")) then
 				GUI:PlaySound("Click")
 				YimActions:RemoveFromFavorites(current_cat, current_label)
 			end
 		else
-			if (self.m_mode.can_add_favorite and ImGui.MenuItem("Add To Favorites")) then
+			if (current_mode.can_add_favorite and ImGui.MenuItem("Add To Favorites")) then
 				GUI:PlaySound("Click")
 				YimActions:AddToFavorites(current_cat, current_label, v, self.m_type)
 			end
@@ -438,12 +444,12 @@ function ActionBrowser:DrawItemContext(k, v)
 
 		if (self.m_type ~= Enums.eActionType.CLIPSET) then
 			if (has_command) then
-				if (self.m_mode.can_remove_command and ImGui.MenuItem("Remove Command")) then
+				if (current_mode.can_remove_command and ImGui.MenuItem("Remove Command")) then
 					GUI:PlaySound("Click")
 					YimActions:RemoveCommandAction(current_label)
 				end
 			else
-				if (self.m_mode.can_add_command and ImGui.MenuItem("Create Command")) then
+				if (current_mode.can_add_command and ImGui.MenuItem("Create Command")) then
 					GUI:PlaySound("Click")
 					YimActions.DrawNewCommandWindow = true
 				end

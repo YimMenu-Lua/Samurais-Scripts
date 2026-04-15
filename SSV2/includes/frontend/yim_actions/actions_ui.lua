@@ -37,6 +37,7 @@ local t_ActionsSidebarItems <const> = {
 	},
 }
 
+---@type array<fun(): string>
 local SideBarTips <const> = {
 	function() return _F(_T("YAV3_STOP_BTN_HINT"), GVars.keyboard_keybinds.stop_anim) end,
 	function() return _F(_T("YAV3_SYMBOL_DEFS_HINT"), "[*]", "[C]", "[U]") end,
@@ -88,9 +89,9 @@ local function DrawActionsSidebar()
 		GUI:PlaySound(GUI.Sounds.Nav)
 		if (sidebarTipIndex == 1) then
 			sidebarTipIndex = #SideBarTips
-			return
+		else
+			sidebarTipIndex = sidebarTipIndex - 1
 		end
-		sidebarTipIndex = sidebarTipIndex - 1
 	end
 	GUI:Tooltip(_T("GENERIC_PREVIOUS"))
 
@@ -99,9 +100,9 @@ local function DrawActionsSidebar()
 		GUI:PlaySound(GUI.Sounds.Nav)
 		if (sidebarTipIndex == #SideBarTips) then
 			sidebarTipIndex = 1
-			return
+		else
+			sidebarTipIndex = sidebarTipIndex + 1
 		end
-		sidebarTipIndex = sidebarTipIndex + 1
 	end
 	GUI:Tooltip(_T("GENERIC_NEXT"))
 	ImGui.SetWindowFontScale(1.0)
