@@ -29,6 +29,11 @@ function Mutex.new()
 	return setmetatable({ m_locked = false }, Mutex)
 end
 
+---@return boolean
+function Mutex:IsLocked()
+	return self.m_locked
+end
+
 function Mutex:Acquire()
 	while (self.m_locked) do
 		yield()

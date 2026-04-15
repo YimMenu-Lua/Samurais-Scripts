@@ -218,13 +218,13 @@ return function()
 	ImGui.BeginTabBar("##companion_actions_tabbar")
 	if (ImGui.BeginTabItem("Animations##companions")) then
 		currentTabName = "companion_anims"
-		selectedAction = sharedDrawFuncs.DrawAnims()
+		selectedAction = sharedDrawFuncs.DrawAnims(currentTabName)
 		ImGui.EndTabItem()
 	end
 
 	if (ImGui.BeginTabItem("Scenarios##companions")) then
 		currentTabName = "companion_scenarios"
-		selectedAction = sharedDrawFuncs.DrawScenarios()
+		selectedAction = sharedDrawFuncs.DrawScenarios(currentTabName)
 		ImGui.EndTabItem()
 	end
 

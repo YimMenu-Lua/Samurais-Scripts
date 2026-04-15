@@ -7,6 +7,25 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+--[[
+	// Summary:
+
+	- An instance must be tied to exactly one action type (see eActionType). It must never change during the lifetime of the object.
+
+	- This browser allows mode changing so that the same instance can be used to draw different "modes". This means we can reuse the same nstance to draw "main" player,
+	"favorites", "history", etc. but does not mean we can change for example an animation browser instance to draw scenarios.
+
+	- As long as the mode name doesn't change (see ActionBrowserMode), this browser draws the same exact items anywhere its called. This also means that we shouldn't
+	draw the same browser in the same window because that would just be a mirror that serves no purpose.
+
+	- When switching modes, the browser will attempt to restore search buffer, filters, selected item, and item context logic fron previous view state so if the user for
+	example filters the main animation list by the "Looped" type then switches to the favorites tab and filters the anim list there by category and types something in the
+	searchbae then switches back and fourth between the two tabs, all changes made in each view will be restored accordingly.
+	
+	- Although this browser allows hot swapping data, m_items must never be mutated after being set (see AssetBrowserBase).
+]]
+
+
 local AssetBrowserBase          = require("includes.services.asset_browsers.AssetBrowserBase")
 local RawDataService            = require("includes.services.RawDataService")
 local Action                    = require("includes.structs.Action")
@@ -69,6 +88,16 @@ end
 ---@field show_preview nil
 -- -@field show_preview? boolean -- [TODO]
 
+---@class ActionsBrowserSwitchModeParams
+---@field mode_name ActionBrowserMode
+---@field new_data? array<ActionData>|dict<ActionData>
+---@field str_id? string
+
+---@class ActionBrowserViewState
+---@field search_buffer string
+---@field selected_type string
+---@field selected_category string
+---@field selected_item? ActionData
 
 --------------------------------------
 -- ActionBrowser
@@ -79,10 +108,11 @@ end
 ---@class ActionBrowser : AssetBrowserBase
 ---@field private m_items? array<ActionData>|dict<ActionData>
 ---@field private m_items_ready boolean
----@field private m_mode { name: ActionBrowserMode, can_add_favorite: boolean, can_remove_favorite: boolean, can_remove_command: boolean, can_add_command: boolean, show_commands: boolean }
----@field private m_require_path string
----@field private m_category_name ActionCategory
 ---@field private m_selected_item? ActionData
+---@field private m_search_buffer string
+---@field private m_require_path string
+---@field private m_mode { name: ActionBrowserMode, can_add_favorite: boolean, can_remove_favorite: boolean, can_remove_command: boolean, can_add_command: boolean, show_commands: boolean }
+---@field private m_category_name ActionCategory
 ---@field private m_type eActionType
 ---@field private m_wants_category_filters boolean
 ---@field private m_selected_category string
@@ -91,6 +121,9 @@ end
 ---@field private m_clicked boolean
 ---@field private m_filter_combo_width float
 ---@field private m_name_resolver fun(v: ActionData): string
+---@field private m_str_id? string
+---@field private m_should_update_scroll_y? boolean
+---@field private m_view_state table<ActionBrowserMode, ActionBrowserViewState>
 ---@field public GetSelectedItem fun(self: ActionBrowser): ActionData
 ---@field GetModelFromIterable nil
 local ActionBrowser <const> = setmetatable({}, AssetBrowserBase)
@@ -145,10 +178,10 @@ function ActionBrowser.new(actionType, opts)
 		or function(v) return v.label end
 
 
-	local modeName   = opts.browser_mode or "main"
-	local isMainMode = modeName == "main"
-	local isClipset  = actionType == Enums.eActionType.CLIPSET
-	instance.m_mode  = {
+	local modeName        = opts.browser_mode or "main"
+	local isMainMode      = modeName == "main"
+	local isClipset       = actionType == Enums.eActionType.CLIPSET
+	instance.m_mode       = {
 		name                = modeName,
 		show_commands       = isMainMode,
 		can_add_favorite    = isMainMode,
@@ -156,50 +189,117 @@ function ActionBrowser.new(actionType, opts)
 		can_add_command     = isMainMode and not isClipset,
 		can_remove_command  = isMainMode and not isClipset,
 	}
+	instance.m_view_state = {
+		[modeName] = {
+			search_buffer     = "",
+			selected_category = "All",
+			selected_type     = "All",
+			selected_item     = nil
+		}
+	}
 
 	---@diagnostic disable-next-line
 	return instance
 end
 
----@param mode_name ActionBrowserMode
----@param new_data? array<ActionData>|dict<ActionData>
----@return ActionBrowser
-function ActionBrowser:SwitchMode(mode_name, new_data)
-	local mode = self.m_mode
-	if (mode_name ~= mode.name or self.m_items ~= new_data) then
-		mode.name = mode_name
-		if (mode_name ~= "main" and mode_name ~= "other") then
-			mode.show_commands       = false
-			mode.can_add_favorite    = false
-			mode.can_add_command     = false
-			mode.can_remove_command  = false
-			mode.can_remove_favorite = (mode_name == "favorites")
-		end
+---@private
+---@param curr_mode_name string
+---@param curr_item ActionData?
+function ActionBrowser:CaptureViewState(curr_mode_name, curr_item)
+	local prev_state                  = self.m_view_state[curr_mode_name] or {}
+	prev_state.search_buffer          = self.m_search_buffer
+	prev_state.selected_category      = self.m_selected_category
+	prev_state.selected_type          = self.m_selected_type
+	prev_state.selected_item          = curr_item
+	self.m_view_state[curr_mode_name] = prev_state
+end
 
-		if (new_data) then
-			self.m_is_array    = table.is_array(new_data)
-			self.m_items_ready = false
-			self.m_items       = new_data
-			self.m_items_ready = true
-		end
+---@private
+---@param mode_name string
+function ActionBrowser:AppendViewState(mode_name)
+	local new_state = self.m_view_state[mode_name]
+	if (not new_state) then
+		new_state = {
+			search_buffer     = "",
+			selected_category = "All",
+			selected_type     = "All",
+			selected_item     = nil
+		}
+	end
+	self.m_view_state[mode_name] = new_state
+	self.m_search_buffer         = new_state.search_buffer
+	self.m_selected_category     = new_state.selected_category
+	self.m_selected_type         = new_state.selected_type
+	self.m_selected_item         = new_state.selected_item
+end
+
+---@param params ActionsBrowserSwitchModeParams
+---@return ActionBrowser
+function ActionBrowser:SwitchMode(params)
+	local new_mode_name    = params.mode_name
+	local new_data         = params.new_data
+	local prev_mode        = self.m_mode
+	local curr_mode_name   = prev_mode.name
+	local prev_item        = self.m_selected_item
+	local reset_view_state = false
+
+	if (new_mode_name ~= curr_mode_name) then
+		prev_mode.name                = new_mode_name
+		local cond                    = (new_mode_name == "main" or new_mode_name == "other")
+		prev_mode.show_commands       = cond
+		prev_mode.can_add_favorite    = cond
+		prev_mode.can_add_command     = cond
+		prev_mode.can_remove_command  = cond
+		prev_mode.can_remove_favorite = cond or (new_mode_name == "favorites")
+		reset_view_state              = true
+	end
+
+	if (new_data and self.m_items ~= new_data) then
+		self.m_items_ready   = false
+		self.m_selected_item = nil
+		self.m_is_array      = table.is_array(new_data)
+		self.m_items         = new_data
+		self.m_items_ready   = true
+		reset_view_state     = true
+	end
+
+	if (params.str_id and params.str_id ~= self.m_str_id) then
+		self.m_str_id                 = params.str_id
+		self.m_should_update_scroll_y = true
+		reset_view_state              = true
+	end
+
+	if (reset_view_state) then
+		self:CaptureViewState(curr_mode_name, prev_item)
+		self:AppendViewState(new_mode_name)
 	end
 
 	return self
 end
 
+---@param str_id? string
 ---@return ActionBrowser
-function ActionBrowser:ResetMode()
-	local mode = self.m_mode
-	if (mode.name ~= "main") then
-		local isClipset          = self.m_type == Enums.eActionType.CLIPSET
-		self.m_items_ready       = false
-		mode.name                = "main"
-		mode.show_commands       = true
-		mode.can_add_favorite    = true
-		mode.can_remove_favorite = true
-		mode.can_add_command     = not isClipset
-		mode.can_remove_command  = not isClipset
-		self.m_items             = nil
+function ActionBrowser:ResetMode(str_id)
+	local current_mode = self.m_mode
+	if (current_mode.name ~= "main") then
+		self:CaptureViewState(current_mode.name, self.m_selected_item)
+
+		local isClipset                  = self.m_type == Enums.eActionType.CLIPSET
+		self.m_items_ready               = false
+		current_mode.name                = "main"
+		current_mode.show_commands       = true
+		current_mode.can_add_favorite    = true
+		current_mode.can_remove_favorite = true
+		current_mode.can_add_command     = not isClipset
+		current_mode.can_remove_command  = not isClipset
+		self.m_items                     = nil
+
+		self:AppendViewState("main")
+	end
+
+	if (str_id and str_id ~= self.m_str_id) then
+		self.m_str_id                 = str_id
+		self.m_should_update_scroll_y = true
 	end
 
 	return self
@@ -357,13 +457,15 @@ end
 ---@param region? vec2
 ---@return Action? selectedAction, boolean clicked
 function ActionBrowser:Draw(region)
-	if (self.m_type == Enums.eActionType.UNK) then
+	if (self.m_type == Enums.eActionType.UNK) then -- should never happen
 		return nil, false
 	end
 
 	if (not self.m_items_ready) then
 		local err = RawDataService:GetPathError(self.m_require_path)
 		if (err and not self.m_on_load_error) then
+			-- AssetBrowserBase draws this inside the listbox to make it clear that
+			-- this is a listbox but something went wrong when fetching data
 			self.m_on_load_error = function()
 				GUI:Text(err, { color = Color.RED })
 			end

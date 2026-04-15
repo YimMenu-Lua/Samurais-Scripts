@@ -855,5 +855,7 @@ return {
 	["GENERIC_ENABLE"] = "Habilitar",
 	["GENERIC_DISABLE"] = "Desativar",
 	["VEH_STANCE_UPDATE_WARN"] = "Tem certeza de que deseja substituir a postura salva para %s ?",
-	["ASSET_BROWSER_CONTEXT_TT"] = "Clique com o botão direito para abrir o menu de contexto."
+	["ASSET_BROWSER_CONTEXT_TT"] = "Clique com o botão direito para abrir o menu de contexto.",
+	["YAV3_SYMBOL_DEFS_HINT"] = "Você já se perguntou quais são os símbolos estranhos em algumas ações da lista?\n\n- %s: Salvo como favorito.\n- %s: Registrado como um comando.\n- %s: Gerado pelo usuário.",
+	["YAV3_LIST_VIEW_HINT"] = "As visualizações de lista de animação e cenário são exatamente as mesmas na guia 'Ações' e na guia 'Companheiros', o que significa que quaisquer filtros que você usar em uma guia também existirão na outra. No entanto, este não é o caso das guias 'histórico' e 'favoritos'."
 }

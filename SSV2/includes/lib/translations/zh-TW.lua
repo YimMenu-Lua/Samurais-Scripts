@@ -855,5 +855,7 @@ return {
 	["GENERIC_ENABLE"] = "使能夠",
 	["GENERIC_DISABLE"] = "停用",
 	["VEH_STANCE_UPDATE_WARN"] = "您確定要覆蓋 %s 已保存的姿態嗎？",
-	["ASSET_BROWSER_CONTEXT_TT"] = "右鍵單擊開啟上下文選單。"
+	["ASSET_BROWSER_CONTEXT_TT"] = "右鍵單擊開啟上下文選單。",
+	["YAV3_LIST_VIEW_HINT"] = "「操作」標籤和「同伴」標籤中的動畫和場景清單視圖完全相同，這表示您在一個標籤中使用的任何篩選器也將存在於另一個標籤中。然而，「歷史記錄」和「收藏夾」標籤的情況並非如此。",
+	["YAV3_SYMBOL_DEFS_HINT"] = "有沒有想過清單中某些操作上的奇怪符號是什麼？ \n\n- %s：儲存為收藏夾。 \n- %s：註冊為指令。 \n- %s：使用者生成。"
 }

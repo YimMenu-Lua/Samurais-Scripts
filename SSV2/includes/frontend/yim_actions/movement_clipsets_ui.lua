@@ -74,7 +74,7 @@ local function DrawJsonMovementClipsets()
 		end
 
 		ImGui.BeginDisabled(not jsonClipsetListCreated)
-		local __t = ClipsetBrowser:SwitchMode("other", jsonArray):Draw()
+		local __t = ClipsetBrowser:SwitchMode({ mode_name = "other", new_data = jsonArray }):Draw()
 		ImGui.EndDisabled()
 
 		selectedClipset = __t and __t.data or nil
@@ -88,7 +88,7 @@ local function DrawFavoriteMovementClipsets()
 		return
 	end
 
-	local __t = ClipsetBrowser:SwitchMode("favorites", favorites):Draw()
+	local __t = ClipsetBrowser:SwitchMode({ mode_name = "favorites", new_data = favorites }):Draw()
 	selectedClipset = __t and __t.data or nil
 end
 

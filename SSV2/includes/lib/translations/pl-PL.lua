@@ -855,5 +855,7 @@ return {
 	["GENERIC_ENABLE"] = "Włączać",
 	["GENERIC_DISABLE"] = "Wyłączyć",
 	["VEH_STANCE_UPDATE_WARN"] = "Czy na pewno chcesz nadpisać zapisaną postawę dla %s?",
-	["ASSET_BROWSER_CONTEXT_TT"] = "Kliknij prawym przyciskiem myszy, aby otworzyć menu kontekstowe."
+	["ASSET_BROWSER_CONTEXT_TT"] = "Kliknij prawym przyciskiem myszy, aby otworzyć menu kontekstowe.",
+	["YAV3_LIST_VIEW_HINT"] = "Widoki animacji i listy scenariuszy są dokładnie takie same na karcie „Akcje” i „Towarzysze”, co oznacza, że ​​wszelkie filtry użyte na jednej karcie będą również dostępne na drugiej. Nie dotyczy to jednak zakładek „historia” i „ulubione”.",
+	["YAV3_SYMBOL_DEFS_HINT"] = "Zastanawiałeś się kiedyś, jakie są dziwne symbole niektórych działań na liście?\n\n- %s: Zapisano jako ulubione.\n- %s: Zarejestrowano jako polecenie.\n- %s: Wygenerowane przez użytkownika."
 }

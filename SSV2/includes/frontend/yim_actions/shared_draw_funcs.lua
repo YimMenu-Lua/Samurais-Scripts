@@ -46,7 +46,7 @@ local function ListFavoritesByCategory(category)
 		return
 	end
 
-	selectedAction = browser:SwitchMode("favorites", cat):Draw()
+	selectedAction = browser:SwitchMode({ mode_name = "favorites", new_data = cat, str_id = "favorites" }):Draw()
 end
 
 local function DrawFavorites()
@@ -86,31 +86,31 @@ local function DrawFavorites()
 end
 
 local function DrawHistory()
-	local count = YimActions.LastPlayed.count
+	local actionHistory = YimActions.LastPlayed
+	local count         = actionHistory:GetCount()
 	if (count == 0) then
 		ImGui.TextWrapped("Animations, scenarios, and scenes you play will appear here.")
 		return
 	end
 
+	ImGui.BeginDisabled(actionHistory:IsLocked())
 	if (GUI:Button(_T("GENERIC_CLEAR"))) then
-		YimActions:ClearPlayHistory()
+		actionHistory:Clear()
 	end
 	ImGui.Separator()
 
 	if (count > 1) then
-		local sort_mode, clicked = ImGui.Combo(_T("GENERIC_LIST_SORT"), YimActions.LastPlayed.sort_mode, "Time\0Type\0Label\0")
-		if (clicked) then
-			YimActions:SortPlayHistory(sort_mode)
-		end
+		local sort_mode, clicked = ImGui.Combo(_T("GENERIC_LIST_SORT"), actionHistory:GetSortMode(), "Time\0Type\0Label\0")
+		if (clicked) then actionHistory:Sort(sort_mode) end
 	end
 
 	if (ImGui.BeginListBox("##playHistory", -1, -1)) then
 		local button_width      = 30
 		local selectable_width  = ImGui.GetContentRegionAvail() - 80
 		local selectable_height = ImGui.GetTextLineHeight()
-		local to_eemove         = nil
+		local to_remove         = nil
 
-		for i, entry in ipairs(YimActions.LastPlayed.data) do
+		for i, entry in actionHistory:Iter() do
 			ImGui.SetWindowFontScale(0.8)
 			ImGui.TextDisabled(DateTime(entry.timestamp):Format("%H:%M"))
 			ImGui.SetWindowFontScale(1.0)
@@ -122,37 +122,42 @@ local function DrawHistory()
 				selectedAction = action
 			end
 
-			local rectMin = vec2:new(ImGui.GetItemRectMin())
-			local rectMax = vec2:new(ImGui.GetItemRectMax())
-			local hovered = ImGui.IsMouseHoveringRect(rectMin.x, rectMin.y, rectMax.x + button_width, rectMax.y)
-			if (hovered) then
+			local rect_min   = vec2:new(ImGui.GetItemRectMin())
+			local rect_max   = vec2:new(ImGui.GetItemRectMax())
+			local is_hovered = ImGui.IsMouseHoveringRect(rect_min.x, rect_min.y, rect_max.x + button_width, rect_max.y)
+			if (is_hovered) then
 				ImGui.SameLine()
 				if (ImGui.SmallButton(" x ")) then
-					to_eemove = i
+					to_remove = i
 				end
 				GUI:Tooltip(_T("GENERIC_DELETE"))
 			end
 		end
 
-		if (to_eemove) then
-			YimActions:RemoveFromHistory(to_eemove)
+		if (to_remove) then
+			actionHistory:Pop(to_remove)
+			to_remove = nil
 		end
 		ImGui.EndListBox()
 	end
+	ImGui.EndDisabled()
 
 	return selectedAction
 end
 
-local function DrawAnims()
-	return Browsers.anims:ResetMode():Draw()
+---@param tabName string
+local function DrawAnims(tabName)
+	return Browsers.anims:ResetMode(tabName):Draw()
 end
 
-local function DrawScenarios()
-	return Browsers.scenarios:ResetMode():Draw()
+---@param tabName string
+local function DrawScenarios(tabName)
+	return Browsers.scenarios:ResetMode(tabName):Draw()
 end
 
-local function DrawScenes()
-	return Browsers.scenes:ResetMode():Draw()
+---@param tabName string
+local function DrawScenes(tabName)
+	return Browsers.scenes:ResetMode(tabName):Draw()
 end
 
 return {

@@ -12,6 +12,7 @@ local CompanionManager   = require("includes.services.CompanionManager")
 local t_AnimList         = require("includes.data.actions.animations")
 local t_PedScenarios     = require("includes.data.actions.scenarios")
 local Action             = require("includes.structs.Action")
+local ActionsHistory     = require("includes.structs.ActionsHistory")
 local Weapons            = require("includes.data.weapons")
 local COL_YELLOW <const> = Color("yellow")
 
@@ -20,11 +21,6 @@ local COL_YELLOW <const> = Color("yellow")
 --- | "scenarios"
 --- | "scenes"
 --- | "clipsets"
-
----@alias ActionHistorySortMode
----| 0 Timestamp
----| 1 Type
----| 2 Label
 
 ---@class YimActionsFavorites
 ---@field anims table<string, AnimData>
@@ -45,8 +41,7 @@ local COL_YELLOW <const> = Color("yellow")
 ---@field public Commands table<string, ActionCommandData>
 ---@field public DrawNewCommandWindow boolean
 ---@field public CurrentlyPlaying table<handle, Action>
----@field public LastPlayed { count: integer, sort_mode: ActionHistorySortMode, data: array<{ action: Action, timestamp: seconds, type: eActionType, fmt: string }> }
----@field private m_history_lookup set<string>
+---@field public LastPlayed ActionsHistory
 ---@field public CompanionManager CompanionManager
 local YimActions   = {}
 YimActions.__index = YimActions
@@ -60,13 +55,8 @@ function YimActions:init()
 	self.DrawNewCommandWindow = false
 	self.CompanionManager     = CompanionManager.new()
 	self.SceneManager         = SceneManager.new()
+	self.LastPlayed           = ActionsHistory.new()
 	self.CurrentlyPlaying     = {}
-	self.m_history_lookup     = {}
-	self.LastPlayed           = {
-		data      = {},
-		count     = 0,
-		sort_mode = 0,
-	}
 	self.Commands             = {}
 	self.m_file_names         = {
 		favorites = "saved_actions.json",
@@ -103,81 +93,21 @@ end
 function YimActions:UpdatePlayHistory(ped)
 	local current = self.CurrentlyPlaying[self:GetPed(ped)]
 	if (not current) then return end
-
-	local label = current.data.label
-	local lookupArray = self.m_history_lookup
-	if (lookupArray[label]) then return end
-
-	local type  = current.action_type
-	local fmt   = _F("[%s]  %s", current:TypeAsString(), label)
-	local epoch = DateTime:Now():Epoch()
-	table.insert(self.LastPlayed.data, {
-		action    = current,
-		timestamp = epoch,
-		type      = type,
-		fmt       = fmt,
-	})
-
-	lookupArray[label]    = true
-	self.LastPlayed.count = #self.LastPlayed.data
-	self:SortPlayHistory()
+	self.LastPlayed:Push(current)
 end
 
 ---@param index integer
 function YimActions:RemoveFromHistory(index)
-	local data  = self.LastPlayed.data
-	local count = #data
-	if (count == 0) then return end
-
-	if (count == 1) then
-		self.LastPlayed.data  = {}
-		self.m_history_lookup = {}
-		self.LastPlayed.count = 0
-		return
-	end
-
-	---@type { action: Action, timestamp: seconds, type: eActionType, fmt: string }?
-	local entry = table.remove(data, index)
-	if (entry) then
-		self.m_history_lookup[entry.action.data.label] = nil
-	end
-	self.LastPlayed.count = math.max(0, count - 1)
+	self.LastPlayed:Pop(index)
 end
 
 function YimActions:ClearPlayHistory()
-	local count = self.LastPlayed.count
-	if (count == 0) then
-		return
-	end
-
-	local lastPlayed = self.LastPlayed.data
-	ThreadManager:Run(function()
-		for i = count, 1, -1 do
-			table.remove(lastPlayed, i)
-			yield(5)
-		end
-		self.LastPlayed.count = 0
-		self.m_history_lookup = {}
-	end)
+	self.LastPlayed:Clear()
 end
 
 ---@param mode ActionHistorySortMode?
 function YimActions:SortPlayHistory(mode)
-	if (mode and mode == self.LastPlayed.sort_mode) then
-		return
-	end
-
-	mode = mode or self.LastPlayed.sort_mode
-	table.sort(self.LastPlayed.data, function(a, b)
-		if (mode == 0) then
-			return a.timestamp > b.timestamp
-		elseif (mode == 1) then
-			return a.type < b.type
-		end
-
-		return a.action.data.label < b.action.data.label
-	end)
-	self.LastPlayed.sort_mode = mode
+	self.LastPlayed:Sort(mode)
 end
 
 ---@return boolean

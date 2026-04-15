@@ -855,5 +855,7 @@ return {
 	["GENERIC_DISABLE"] = "Désactiver",
 	["VEH_STANCE_UPDATE_WARN"] = "Etes-vous sûr de vouloir écraser la position enregistrée pour le %s ?",
 	["GENERIC_ENABLE"] = "Activer",
-	["ASSET_BROWSER_CONTEXT_TT"] = "Faites un clic droit pour ouvrir le menu contextuel."
+	["ASSET_BROWSER_CONTEXT_TT"] = "Faites un clic droit pour ouvrir le menu contextuel.",
+	["YAV3_SYMBOL_DEFS_HINT"] = "Vous êtes-vous déjà demandé quels sont les symboles étranges sur certaines actions de la liste ?\n\n- %s : Enregistré comme favori.\n- %s : Enregistré en tant que commande.\n- %s : Généré par l'utilisateur.",
+	["YAV3_LIST_VIEW_HINT"] = "Les vues de la liste d'animation et de scénario sont exactement les mêmes dans l'onglet « Actions » et dans l'onglet « Compagnons », ce qui signifie que tous les filtres que vous utilisez dans un onglet existeront également dans l'autre. Ce n'est cependant pas le cas pour les onglets « historique » et « favoris »."
 }

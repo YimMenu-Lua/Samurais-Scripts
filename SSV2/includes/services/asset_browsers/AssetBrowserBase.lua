@@ -7,6 +7,31 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+--[[
+	// Summary:
+
+	- Both arrays and dicts are supported. This base broswer only decides whether to use pairs or ipairs for iteration. Other than that, it has no clue what is what
+	and should never do.
+
+	- Subclasses (PedBrowser, ActionBrowser, etc.) must define what their data is and how it should be handled.
+
+	- This base class has stubs (the poor man's virtual functions) that can be overloaded by subclasses to extend the browser's functionality.
+
+	- Member `m_items` must never be mutated after being set. If we need to mutate the data then we have to mark the browser as not ready either by temporarily setting m_items
+	to nil or adding some type of gating around the draw function (see ActionBrowser:SwitchMode for an examplr), do our thing then mark it back as ready.
+	
+	- Optional sorting, filtering, and iteration limits do not touch the data itself but use gotos and breaks inside the loop. A "view cache" type of layer lay be added in the future
+	if we ever need actual data filtering but for now it's just control flow.
+
+	- All our subclass browsers currently lazy-load their data sets once in the drawing function but an instance can always be created with a reference to a data list (see BrowserBaseParams).
+
+	[Known Issue]
+	- By default, this base assumes it will be working with game entities and defines a default preview handling function that works with PreviewService. This is bad and can lead to
+	severe issues. It's only the case because for now only game entity browsers actually have a preview option. If that ever changes, the HandlePreview method MUST be stubbed in this
+	base class and instead defined in each subclass that needs it.
+]]
+
+
 -- ---@enum eAssetBrowserDrawMode
 -- Enums.eAssetBrowserDrawMode = {
 -- 	COMBO   = 0,
@@ -28,16 +53,6 @@ local REF_COUNTER = 0
 -- Base class that draws a game asset list in an ImGui ListBox. Intoduces a reusable object across the entire project
 --
 -- while eliminating repetitive code.
---___
--- **NOTE:**
---
--- Because our assets are mostly dicts, all asset lists are treated as such which breaks ordering for arrays.
---
--- Normalizing all dicts into arrays would cause the script to consume more memory for little to no benefit
---
--- because I don't see a way to achieve that without copying asset lists.
---
--- This design choice however is not final and may change in the future.
 ---@class AssetBrowserBase<K, V>
 ---@field protected m_items table<K, V>?
 ---@field protected m_selected_item V?
@@ -51,7 +66,8 @@ local REF_COUNTER = 0
 ---@field protected m_uid joaat_t
 ---@field protected m_is_array boolean
 ---@field protected m_iter_idx integer
----@field protected m_has_context_menu boolean
+---@field protected m_has_context_menu? boolean
+---@field protected m_should_update_scroll_y? boolean
 ---@field protected m_on_load_error? function -- [Optional] Basic ImGui callback to draw on error.
 ---@field public GetModelFromIterable? fun(self: AssetBrowserBase, k: K, v: V): joaat_t -- This is for browsers that work with entities and offer a preview toggle.
 ---@field public GetNameFromIterable? fun(self: AssetBrowserBase, k: K, v: V): string -- Should be global for all browsers since base has no notion of what "key" and "value" are.
@@ -126,7 +142,13 @@ function AssetBrowserBase:__ProcessItem(k, v, search_empty)
 		return false
 	end
 
-	ImGui.Selectable(label, (v == self.m_selected_item))
+	local is_selected = (v == self.m_selected_item)
+	ImGui.Selectable(label, is_selected)
+
+	if (is_selected and self.m_should_update_scroll_y) then
+		ImGui.SetScrollHereY()
+		self.m_should_update_scroll_y = false
+	end
 
 	if (ImGui.IsItemClicked(0)) then
 		self.m_selected_item = v
@@ -153,6 +175,10 @@ function AssetBrowserBase:__ProcessItem(k, v, search_empty)
 		if (getModel) then
 			self.m_hovered_this_frame = getModel(self, k, v)
 		end
+	end
+
+	if (self.m_should_update_scroll_y and not self.m_selected_item) then
+		self.m_should_update_scroll_y = false
 	end
 
 	return true

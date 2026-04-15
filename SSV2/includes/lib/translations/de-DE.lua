@@ -855,5 +855,7 @@ return {
 	["GENERIC_DISABLE"] = "Deaktivieren",
 	["GENERIC_ENABLE"] = "Aktivieren",
 	["VEH_STANCE_UPDATE_WARN"] = "Sind Sie sicher, dass Sie die gespeicherte Haltung für %s überschreiben möchten?",
-	["ASSET_BROWSER_CONTEXT_TT"] = "Klicken Sie mit der rechten Maustaste, um das Kontextmenü zu öffnen."
+	["ASSET_BROWSER_CONTEXT_TT"] = "Klicken Sie mit der rechten Maustaste, um das Kontextmenü zu öffnen.",
+	["YAV3_LIST_VIEW_HINT"] = "Die Animations- und Szenariolistenansichten sind auf den Registerkarten „Aktionen“ und „Gefährten“ genau gleich, was bedeutet, dass alle Filter, die Sie auf einer Registerkarte verwenden, auch auf der anderen vorhanden sind. Dies gilt jedoch nicht für die Registerkarten „Verlauf“ und „Favoriten“.",
+	["YAV3_SYMBOL_DEFS_HINT"] = "Haben Sie sich jemals gefragt, was die seltsamen Symbole für einige Aktionen in der Liste sind?\n\n- %s: Als Favorit gespeichert.\n- %s: Als Befehl registriert.\n- %s: Vom Benutzer generiert."
 }

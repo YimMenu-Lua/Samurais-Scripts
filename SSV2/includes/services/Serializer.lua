@@ -23,8 +23,8 @@ local eSerializerState <const> = {
 -- Optional parameters
 ---@ignore
 ---@class SerializerOptionals
----@field pretty? boolean Pretty Encoding
----@field indent? integer Number of indentations for pretty encoding.
+---@field pretty? boolean Pretty encoding (defaults to true)
+---@field indent? integer Number of indentations for pretty encoding (defaults to 4 spaces).
 ---@field strict_parsing? boolean -- Refer to the Json package
 ---@field encryption_key? string -- Optional key for XOR encryption
 
@@ -111,16 +111,19 @@ end
 ---@param runtime_vars? table Runtime variables that will be tracked for auto-save.
 ---@param varargs? SerializerOptionals
 function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
-	varargs                = varargs or {}
+	varargs = varargs or {}
+	if (varargs.pretty == nil) then
+		varargs.pretty = true
+	end
+
 	script_name            = script_name or (Backend and Backend.script_name or ("unk_cfg_%s"):format(DateTime:Now():Format("%H_%M_%S")))
 	local filename         = script_name:snakecase()
-
 	self.m_default_config  = default_config or { __version = Backend and Backend.__version or self.__version }
 	self.m_file_name       = _F("%s.json", filename)
 	self.m_backup_file     = _F("%s.bak", filename)
 	self.m_xor_key         = varargs.encryption_key or XOR_KEY
 	self.m_parsing_options = {
-		pretty         = (varargs.pretty ~= nil) and varargs.pretty or true,
+		pretty         = varargs.pretty,
 		indent         = string.rep(" ", varargs.indent or 4),
 		strict_parsing = varargs.strict_parsing or false,
 	}
