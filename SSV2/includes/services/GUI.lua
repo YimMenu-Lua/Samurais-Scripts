@@ -767,6 +767,7 @@ function GUI:__DrawImpl()
 	local next_y_pos = GVars.ui.window_pos.y + topBarHeight + 10
 	self:DrawCallbackWindow(next_y_pos)
 	self:DrawSideBar(next_y_pos)
+	self:DrawWindowRequests()
 end
 
 function GUI:Draw()
@@ -897,7 +898,7 @@ function GUI:Tooltip(text, opts)
 	end
 
 	opts = opts or {}
-	local wrap_pos = opts.wrap_pos or ImGui.GetFontSize() * 25
+	opts.wrap_pos = opts.wrap_pos or ImGui.GetFontSize() * 25
 
 	if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) then
 		ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
@@ -905,7 +906,7 @@ function GUI:Tooltip(text, opts)
 		if (opts.color) then
 			self:Text(text, opts)
 		else
-			ImGui.PushTextWrapPos(wrap_pos)
+			ImGui.PushTextWrapPos(opts.wrap_pos)
 			ImGui.TextWrapped(text)
 			ImGui.PopTextWrapPos()
 		end

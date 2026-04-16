@@ -234,10 +234,10 @@ end
 ---@private
 function AssetBrowserBase:__DrawListBox()
 	local size_x, size_y = self.m_draw_region.x, self.m_draw_region.y
-	self.m_search_buffer = ImGui.SearchBar("##searchbar", self.m_search_buffer, 0, size_x)
+	self.m_search_buffer = ImGui.SearchBar("##assetBrowserSearchbar", self.m_search_buffer, 0, size_x)
 	local is_buff_empty  = self.m_search_buffer:isempty()
 
-	if (ImGui.BeginListBox("##listBox", size_x, size_y)) then
+	if (ImGui.BeginListBox("##assetBrowserlistBox", size_x, size_y)) then
 		if (not self.m_items) then
 			local err_callback = self.m_on_load_error
 			if (err_callback) then

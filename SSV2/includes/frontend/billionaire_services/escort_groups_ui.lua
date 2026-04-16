@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local BSV2             = require("includes.features.extra.billionaire_services.BillionaireServicesV2")
 local measureTextWidth = require("includes.frontend.helpers.measure_text_width")
 local newGroupVehs     = require("includes.data.bsv2_data").NewGroupVehicles
 local WeaponBrowser    = require("includes.services.asset_browsers.WeaponBrowser").new()
@@ -43,7 +44,6 @@ local labelWidths      = {}
 
 ---@type RawEscortGroupData?
 local selectedGroup    = nil
-local BS               = BillionaireServices
 local godMode          = false
 local noRagdoll        = false
 local searchBuffer     = ""
@@ -90,7 +90,7 @@ local function drawSpawner()
 	ImGui.SetNextItemWidth(-1)
 	searchBuffer = ImGui.SearchBar("##searchEscorts", searchBuffer, 0, -1, 128)
 	searchBuffer = searchBuffer:lower()
-	local groups = BS:GetEscortGroupList()
+	local groups = BSV2:GetEscortGroupList()
 
 	if (ImGui.BeginListBox("##escortGroupList", -1, -1)) then
 		for name, group in pairs(groups) do
@@ -141,14 +141,14 @@ local function drawSpawnerFooter()
 	local buttonSize = vec2:new(labelWidth, 40)
 	if (GUI:Button(_T("BSV2_CALL"), { size = buttonSize })) then
 		if (not selectedGroup) then return end
-		BS:SpawnEscortGroup(selectedGroup, godMode, noRagdoll)
+		BSV2:SpawnEscortGroup(selectedGroup, godMode, noRagdoll)
 	end
 
 	if (selectedGroup and selectedGroup.JSON) then
 		ImGui.SameLine()
 		if (GUI:Button(_T("GENERIC_DELETE"), { size = buttonSize })) then
 			if (KeyManager:IsKeyPressed(eVirtualKeyCodes.SHIFT)) then
-				BS:RemoveSavedEscortGroup(selectedGroup.name)
+				BSV2:RemoveSavedEscortGroup(selectedGroup.name)
 				selectedGroup = nil
 			else
 				ImGui.OpenPopup(selectedGroup.name)
@@ -162,19 +162,19 @@ local function drawSpawnerFooter()
 			_T("BSV2_CONFIRM_DELETE_GROUP"),
 			ImGuiDialogBoxStyle.WARN)
 		) then
-		BS:RemoveSavedEscortGroup(selectedGroup.name)
+		BSV2:RemoveSavedEscortGroup(selectedGroup.name)
 		selectedGroup = nil
 	end
 	ImGui.EndChild()
 end
 
 local function drawSpawnedGroups()
-	if (next(BS.EscortGroups) == nil) then
+	if (next(BSV2.EscortGroups) == nil) then
 		ImGui.Text(_T("BSV2_ES_SPAWNED_NONE"))
 		return
 	end
 
-	for _, group in pairs(BS.EscortGroups) do
+	for _, group in pairs(BSV2.EscortGroups) do
 		local isOpen = (groupHeader == group.name)
 
 		if (ImGui.Selectable(_F("[%s] %s", isOpen and "-" or "+", group.name), isOpen)) then
@@ -230,7 +230,7 @@ local function drawSpawnedGroups()
 			ImGui.SameLine()
 
 			if (GUI:Button(_F("%s##%s", _T("GENERIC_RESPAWN"), group.name))) then
-				BS:RespawnEscortGroup(group, godMode, noRagdoll)
+				BSV2:RespawnEscortGroup(group, godMode, noRagdoll)
 			end
 			ImGui.EndDisabled()
 
@@ -304,7 +304,7 @@ local function drawSpawnedGroups()
 
 			ImGui.BeginDisabled(group.wasDismissed)
 			if (GUI:Button(_F("%s##%s", _T("GENERIC_DISMISS"), group.name))) then
-				BS:DismissEscortGroup(group.name)
+				BSV2:DismissEscortGroup(group.name)
 			end
 			ImGui.EndDisabled()
 			ImGui.Unindent()
@@ -315,7 +315,7 @@ local function drawSpawnedGroups()
 end
 
 local function drawSpawnedGroupsFooter()
-	local groupSize = table.getlen(BS.EscortGroups)
+	local groupSize = table.getlen(BSV2.EscortGroups)
 	if (groupSize <= 1) then return end
 
 	ImGui.Dummy(1, 10)
@@ -325,7 +325,7 @@ local function drawSpawnedGroupsFooter()
 	ImGui.Separator()
 	ImGui.Spacing()
 	if (GUI:Button(_T("GENERIC_DISMISS_ALL"))) then
-		BS:Dismiss(BS.SERVICE_TYPE.ESCORT)
+		BSV2:Dismiss(BSV2.SERVICE_TYPE.ESCORT)
 	end
 	ImGui.EndChild()
 end
@@ -367,7 +367,7 @@ end
 
 local function drawGroupCreatorStep1()
 	ImGui.Dummy(0, 15)
-	local groups  = BS:GetEscortGroupList()
+	local groups  = BSV2:GetEscortGroupList()
 	local exists  = groups[newGroup.nameBuffer] ~= nil
 	local isValid = string.isvalid(newGroup.buffer.name) and not exists
 	local text    = isValid and _F(_T("BSV2_ES_NEW_GROUP_NEXT"), "[ > ]") or _T("BSV2_ES_NEW_GROUP_NAME")
@@ -464,7 +464,7 @@ local function drawGroupCreatorStep3()
 		ImGui.SameLine()
 		if (GUI:Button(randomLabel)) then
 			if (not ped or not ped.ped_gender) then return end
-			newGroup.memberNameBuffer = BS:GetRandomPedName(ped.ped_gender)
+			newGroup.memberNameBuffer = BSV2:GetRandomPedName(ped.ped_gender)
 		end
 
 		ImGui.SeparatorText(_T("BSV2_ES_NEW_GROUP_PED_WEAPON"))
@@ -521,7 +521,7 @@ local function drawGroupCreator()
 		end
 
 		if (ImGui.DialogBox("##confirmNewGroup", _F(_T("BSV2_ES_NEW_GROUP_PROMPT"), newGroup.buffer.name), ImGuiDialogBoxStyle.INFO)) then
-			BS:AddNewEscortGroup(table.copy(newGroup.buffer))
+			BSV2:AddNewEscortGroup(table.copy(newGroup.buffer))
 			clearNewGroupBuffer()
 		end
 	end

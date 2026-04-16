@@ -18,7 +18,7 @@
 ---@field build string
 ---@field online string
 
----@alias GAME_VERSION table<eAPIVersion, VersionInfo>
+---@alias GAME_VERSION table<eGameBranch, VersionInfo>
 
 local SCRIPT_NAME <const>    = "Samurai's Scripts"
 local SCRIPT_VERSION <const> = require("includes.version")
@@ -95,14 +95,6 @@ GUI             = require("includes.services.GUI")
 Notifier        = require("includes.services.ToastNotifier").new()
 CommandExecutor = require("includes.services.CommandExecutor"):init()
 Translator      = require("includes.services.Translator")
-----------------------------------------------------------------------------------------------------
-
-
------------------ Big Features (for smaller features, refer to includes/features) ------------------
-BillionaireServices = require("includes.features.BillionaireServicesV2"):init()
-EntityForge         = require("includes.features.EntityForge"):init()
-YimActions          = require("includes.features.YimActionsV3"):init()
-YRV3                = require("includes.features.YimResupplierV3"):init()
 ----------------------------------------------------------------------------------------------------
 
 

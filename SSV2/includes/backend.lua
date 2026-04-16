@@ -8,20 +8,19 @@
 
 
 local PreviewService = require("includes.services.PreviewService")
-local function ClearPreview()
-	PreviewService:Clear()
-end
+local ClearPreview   = function() PreviewService:Clear() end
+
 
 ---@class BlipData
 ---@field handle integer
 ---@field owner integer
 ---@field alpha integer
 
----@enum eAPIVersion
-Enums.eAPIVersion = {
-	V1  = 1, -- YimMenu V1 (Lua54)
-	V2  = 2, -- YimLuaAPI (Lua 54)
-	L54 = 99, -- Mock environment (Lua54)
+---@enum eGameBranch
+Enums.eGameBranch   = {
+	LAGECY   = 1,
+	ENHANCED = 2,
+	MOCK     = 99,
 }
 
 ---@enum eBackendEvent
@@ -32,7 +31,7 @@ Enums.eBackendEvent = {
 }
 
 ---@enum eEntityType
-Enums.eEntityType = {
+Enums.eEntityType   = {
 	Invalid = -1,
 	Ped     = 1,
 	Vehicle = 2,
@@ -41,8 +40,8 @@ Enums.eEntityType = {
 
 -- Global Singleton.
 ---@class Backend
----@field private api_version eAPIVersion
-local Backend = {
+---@field private m_game_branch eGameBranch
+local Backend       = {
 	__version                = "",
 	target_build             = "",
 	target_version           = "",
@@ -79,28 +78,30 @@ local Backend = {
 		[Enums.eEntityType.Vehicle] = 15,
 		[Enums.eEntityType.Object]  = 35,
 	},
+	---@type table<string, fun(handle: handle): any>
+	FeatureEntityHandlers    = {}
 }
-Backend.__index = Backend
+Backend.__index     = Backend
 
 ---@param name string
 ---@param script_version string
 ---@param game_version? GAME_VERSION
 function Backend:init(name, script_version, game_version)
-	local api_ver       = self:GetAPIVersion()
-	self.api_version    = api_ver
+	local branch        = self:GetGameBranch()
+	self.m_game_branch  = branch
 	self.script_name    = name
 	self.__version      = script_version
-	self.target_build   = game_version and game_version[api_ver].build or "any"
-	self.target_version = game_version and game_version[api_ver].online or "any"
+	self.target_build   = game_version and game_version[branch].build or "any"
+	self.target_version = game_version and game_version[branch].online or "any"
 
-	require("includes.lib.compat").SetupEnv(self.api_version)
+	require("includes.lib.compat").SetupEnv(self.m_game_branch)
 	return self
 end
 
----@return eAPIVersion
-function Backend:GetAPIVersion()
-	if (self.api_version) then
-		return self.api_version
+---@return eGameBranch
+function Backend:GetGameBranch()
+	if (self.m_game_branch) then
+		return self.m_game_branch
 	end
 
 	if (not script or (type(script) ~= "table")) then
@@ -109,8 +110,8 @@ function Backend:GetAPIVersion()
 			error("Failed to load: Unknown or unsupported Lua environment.")
 		end
 
-		self.api_version = Enums.eAPIVersion.L54
-		return self.api_version
+		self.m_game_branch = Enums.eGameBranch.MOCK
+		return self.m_game_branch
 	end
 
 	if (type(script["run_in_callback"]) == "function") then
@@ -118,27 +119,28 @@ function Backend:GetAPIVersion()
 	end
 
 	if (not menu_event or not menu_event.Wndproc) then
-		error("Unknown or unsupported game branch.")
+		error("Unknown or unsupported API.")
 	end
 
-	local ylapi_func = _G["get_game_branch"]
-	if (type(ylapi_func) ~= "function") then
-		self.api_version = Enums.eAPIVersion.V1
-		return self.api_version
+	---@type (fun(): integer)?
+	local get_game_branch = _G["get_game_branch"]
+	if (type(get_game_branch) ~= "function") then
+		self.m_game_branch = Enums.eGameBranch.LAGECY
+		return self.m_game_branch
 	end
 
-	local branch = ylapi_func()
+	local branch = get_game_branch()
 	if (type(branch) ~= "number" or branch > 1) then
 		error("Failed to load: Unknown or unsupported game branch.")
 	end
 
-	self.api_version = branch + 1
-	return self.api_version
+	self.m_game_branch = branch + 1 -- Our own eGameBranch starts at 1 to make it compatible with Lua table indices. YimLuaAPI's naturally starts at 0
+	return self.m_game_branch
 end
 
 ---@return boolean
 function Backend:IsMockEnv()
-	return self:GetAPIVersion() == Enums.eAPIVersion.L54
+	return self:GetGameBranch() == Enums.eGameBranch.MOCK
 end
 
 ---@return boolean
@@ -274,18 +276,18 @@ function Backend:RemoveBlip(owner)
 	self.CreatedBlips[owner] = nil
 end
 
+---@param name string
+---@param callback fun(handle: handle): any
+function Backend:RegisterFeatureEntityHandler(name, callback)
+	self.FeatureEntityHandlers[name] = callback
+end
+
 ---@param handle integer
 function Backend:CheckFeatureEntities(handle)
-	if Decorator:ExistsOn(handle, "EntityForge") then
-		EntityForge:RemoveEntityByHandle(handle)
-	end
-
-	if Decorator:ExistsOn(handle, "BillionaireServices") then
-		BillionaireServices:RemoveEntityByHandle(handle)
-	end
-
-	if Decorator:ExistsOn(handle, "YimActions") then
-		YimActions.CompanionManager:RemoveCompanionByHandle(handle)
+	for featName, callback in pairs(self.FeatureEntityHandlers) do
+		if (Decorator:ExistsOn(handle, featName)) then
+			callback(handle)
+		end
 	end
 end
 

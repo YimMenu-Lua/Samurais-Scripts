@@ -646,9 +646,10 @@ return {
 
 	--#region YimActions
 	["YAV3_SCN_STOP_SPINNER"]              = "Stopping current scenario...",
-	["YAV3_STOP_BTN_HINT"]                 = "TIP: You can press %s to stop playing any action or hold it for one second to cleanup everything.",
-	["YAV3_SYMBOL_DEFS_HINT"]              = "Ever wonder what the strange symbols on some actions in the list are?\n\n- %s: Saved as favorite.\n- %s: Registered as a command.\n- %s: User-generated.",
+	["YAV3_STOP_BTN_HINT"]                 = "TIP: You can press %s to stop playing any action or hold it for one second to perform a full reset.",
+	["YAV3_SYMBOL_DEFS_HINT"]              = "Ever wonder what the symbols on some actions in the list are?\n\n- %s: Saved as favorite.\n- %s: Registered as a command.\n- %s: User-generated.",
 	["YAV3_LIST_VIEW_HINT"]                = "The animation and scenario list views are the exact same in the 'Actions' tab and the 'Companions' tab, which means any filters you use in one tab will also exist in the other. This however is not the case for the 'history' and 'favorites' tabs.",
+	["YAV3_VEH_ANIM_HINT"]                 = "Vehicle-centric animations can not be played on foot; even for companions.",
 	["YAV3_ANIM_FLAGS"]                    = "Behavior Flags", -- labelling it 'Animation Flags' breaks translations even further
 	["YAV3_DISABLE_PROPS"]                 = "Disable Props",
 	["YAV3_DISABLE_PTFX"]                  = "Disable Particle Effects",

@@ -12,9 +12,9 @@
 local Compat <const> = {}
 Compat.__index = Compat
 
----@param version eAPIVersion
+---@param version eGameBranch
 function Compat.SetupEnv(version)
-	if (version == Enums.eAPIVersion.L54) then
+	if (version == Enums.eGameBranch.MOCK) then
 		require("includes.lib.mock_env").Setup(version)
 	else
 		print = function(...)

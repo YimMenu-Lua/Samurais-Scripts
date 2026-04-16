@@ -54,7 +54,7 @@ return {
 	["FLTBD_SHOW_TOWBOX_CB"] = "Pudełko ESP",
 	["FLTBD_MAIN_CB"] = "Włącz skrypt",
 	["FLTBD_TOWING_TXT"] = "Pojazd holowany:",
-	["YAV3_STOP_BTN_HINT"] = "WSKAZÓWKA: Możesz nacisnąć %s, aby zatrzymać jakąkolwiek akcję lub przytrzymać go przez jedną sekundę, aby wszystko wyczyścić.",
+	["YAV3_STOP_BTN_HINT"] = "WSKAZÓWKA: Możesz nacisnąć %s, aby zatrzymać jakąkolwiek akcję lub przytrzymać go przez jedną sekundę, aby wykonać pełny reset.",
 	["WRLD_CARPOOL_TT"] = "Umożliwia wsiadanie do pojazdów NPC jako pasażer.",
 	["FLTBD_SHOW_TOWBOX_TT"] = "Rysuje ramkę esp wokół docelowego pojazdu.",
 	["FLTBD_SHOW_TOWPOS_TT"] = "Oznacza pozycję, w której skrypt wykrywa pobliskie pojazdy.",
@@ -857,5 +857,6 @@ return {
 	["VEH_STANCE_UPDATE_WARN"] = "Czy na pewno chcesz nadpisać zapisaną postawę dla %s?",
 	["ASSET_BROWSER_CONTEXT_TT"] = "Kliknij prawym przyciskiem myszy, aby otworzyć menu kontekstowe.",
 	["YAV3_LIST_VIEW_HINT"] = "Widoki animacji i listy scenariuszy są dokładnie takie same na karcie „Akcje” i „Towarzysze”, co oznacza, że ​​wszelkie filtry użyte na jednej karcie będą również dostępne na drugiej. Nie dotyczy to jednak zakładek „historia” i „ulubione”.",
-	["YAV3_SYMBOL_DEFS_HINT"] = "Zastanawiałeś się kiedyś, jakie są dziwne symbole niektórych działań na liście?\n\n- %s: Zapisano jako ulubione.\n- %s: Zarejestrowano jako polecenie.\n- %s: Wygenerowane przez użytkownika."
+	["YAV3_SYMBOL_DEFS_HINT"] = "Czy zastanawiałeś się kiedyś, jakie są symbole niektórych działań na liście?\n\n- %s: Zapisano jako ulubione.\n- %s: Zarejestrowano jako polecenie.\n- %s: Utworzono przez użytkownika.",
+	["YAV3_VEH_ANIM_HINT"] = "Animacji skupiających się na pojazdach nie można odtwarzać na piechotę; nawet dla towarzyszy."
 }

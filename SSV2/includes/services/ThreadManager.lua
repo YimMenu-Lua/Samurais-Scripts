@@ -8,7 +8,7 @@
 
 
 ---@diagnostic disable: lowercase-global
-local API_VER <const> = Backend:GetAPIVersion()
+local API_VER <const> = Backend:GetGameBranch()
 
 ---@enum eThreadState
 eThreadState = {
@@ -315,7 +315,7 @@ function ThreadManager:init()
 	local instance = setmetatable({
 		m_threads           = {},
 		m_callback_handlers = {
-			[Enums.eAPIVersion.L54] = {
+			[Enums.eGameBranch.MOCK] = {
 				dispatch = function(callback)
 					table.insert(
 						mock_routines,
@@ -323,14 +323,14 @@ function ThreadManager:init()
 					)
 				end
 			},
-			[Enums.eAPIVersion.V1] = {
+			[Enums.eGameBranch.LAGECY] = {
 				dispatch = function(callback)
 					script.run_in_fiber(function(s)
 						callback(s)
 					end)
 				end
 			},
-			[Enums.eAPIVersion.V2] = {
+			[Enums.eGameBranch.ENHANCED] = {
 				dispatch = function(callback)
 					script.run_in_fiber(function(s)
 						callback(s)
@@ -369,7 +369,7 @@ function ThreadManager:Run(func)
 
 	local handler = self.m_callback_handlers[API_VER]
 	if not (handler and handler.dispatch) then
-		Backend:debug("[ThreadManager] No handler for API version: %s", EnumToString(Enums.eAPIVersion, API_VER))
+		Backend:debug("[ThreadManager] No handler for API version: %s", EnumToString(Enums.eGameBranch, API_VER))
 		return
 	end
 
@@ -446,7 +446,7 @@ end
 ---@param suspended? boolean
 ---@param is_debug_thread? boolean
 function ThreadManager:RegisterLooped(name, func, suspended, is_debug_thread)
-	local isMock = (API_VER == Enums.eAPIVersion.L54)
+	local isMock = (API_VER == Enums.eGameBranch.MOCK)
 	if (isMock and not is_debug_thread) then return end
 	if (is_debug_thread and not isMock) then return end
 
@@ -613,7 +613,7 @@ function ThreadManager:UpdateMockRoutines()
 		return
 	end
 
-	while (API_VER == Enums.eAPIVersion.L54) do
+	while (API_VER == Enums.eGameBranch.MOCK) do
 		for i = #self.m_mock_routines, 1, -1 do
 			local co = self.m_mock_routines[i]
 			if (coroutine.status(co) == "dead") then

@@ -53,7 +53,7 @@ return {
 	["WRLD_HNS_TT"] = "Le permite esconderse dentro de vehículos, baúles o contenedores de basura. Si tienes un nivel de búsqueda, la policía te perderá siempre que te escondas antes de ser descubierto.",
 	["FLTBD_MAIN_CB"] = "Habilitar secuencia de comandos",
 	["FLTBD_SHOW_TOWPOS_CB"] = "Mostrar posición de remolque",
-	["YAV3_STOP_BTN_HINT"] = "CONSEJO: Puedes presionar %s para detener la reproducción de cualquier acción o mantenerlo presionado durante un segundo para limpiar todo.",
+	["YAV3_STOP_BTN_HINT"] = "SUGERENCIA: Puedes presionar %s para detener la reproducción de cualquier acción o mantenerlo presionado durante un segundo para realizar un reinicio completo.",
 	["WRLD_EXTEND_BOUNDS_TT"] = "Le permite viajar más lejos en el mundo en cualquier dirección.",
 	["FLTBD_SHOW_TOWBOX_CB"] = "Caja ESP",
 	["FLTBD_TOW_ALL_CB"] = "remolcar todo",
@@ -856,6 +856,7 @@ return {
 	["GENERIC_DISABLE"] = "Desactivar",
 	["VEH_STANCE_UPDATE_WARN"] = "¿Está seguro de que desea sobrescribir la postura guardada para %s?",
 	["ASSET_BROWSER_CONTEXT_TT"] = "Haga clic derecho para abrir el menú contextual.",
-	["YAV3_SYMBOL_DEFS_HINT"] = "¿Alguna vez te has preguntado cuáles son los símbolos extraños en algunas acciones de la lista?\n\n- %s: guardado como favorito.\n- %s: registrado como comando.\n- %s: generado por el usuario.",
-	["YAV3_LIST_VIEW_HINT"] = "Las vistas de lista de animaciones y escenarios son exactamente las mismas en la pestaña 'Acciones' y en la pestaña 'Compañeros', lo que significa que cualquier filtro que uses en una pestaña también existirá en la otra. Sin embargo, este no es el caso de las pestañas \"historial\" y \"favoritos\"."
+	["YAV3_SYMBOL_DEFS_HINT"] = "¿Alguna vez te has preguntado cuáles son los símbolos de algunas acciones de la lista?\n\n- %s: guardado como favorito.\n- %s: registrado como comando.\n- %s: generado por el usuario.",
+	["YAV3_LIST_VIEW_HINT"] = "Las vistas de lista de animaciones y escenarios son exactamente las mismas en la pestaña 'Acciones' y en la pestaña 'Compañeros', lo que significa que cualquier filtro que uses en una pestaña también existirá en la otra. Sin embargo, este no es el caso de las pestañas \"historial\" y \"favoritos\".",
+	["YAV3_VEH_ANIM_HINT"] = "Las animaciones centradas en vehículos no se pueden reproducir a pie; incluso para acompañantes."
 }

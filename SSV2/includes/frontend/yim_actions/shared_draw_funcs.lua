@@ -9,6 +9,7 @@
 
 ---@type Action?
 local selectedAction
+local YimActions      = require("includes.features.extra.yim_actions.YimActionsV3")
 local ActionBrowser   = require("includes.services.asset_browsers.ActionBrowser")
 local currentTabName  = ""
 local previousTabName = ""
@@ -50,13 +51,6 @@ local function ListFavoritesByCategory(category)
 end
 
 local function DrawFavorites()
-	local favorites = YimActions.Favorites
-	if (not favorites or next(favorites) == nil) then
-		ImGui.Dummy(1, 80)
-		ImGui.TextWrapped("Nothig saved yet.")
-		return
-	end
-
 	if (ImGui.BeginTabBar("##AnimationsTabBar")) then
 		if (ImGui.BeginTabItem("Animations")) then
 			currentTabName = "anims"
@@ -72,7 +66,7 @@ local function DrawFavorites()
 
 		if (ImGui.BeginTabItem("Scenes")) then
 			currentTabName = "scenes"
-			-- ListFavoritesByCategory("scenes") -- Disabled. Experimental.
+			-- ListFavoritesByCategory("scenes")
 			ImGui.Dummy(1, 60)
 			ImGui.TextDisabled(_T("GENERIC_UNAVAILABLE"))
 			ImGui.EndTabItem()

@@ -10,6 +10,7 @@
 local DrawSpawner              = require("includes.frontend.entity_forge.forge_spawner_ui")
 local DrawCreatorUI            = require("includes.frontend.entity_forge.forge_creator_ui")
 local World                    = require("includes.modules.World")
+local EntityForge              = require("includes.features.extra.entity_forge.EntityForge")
 local markSelectedEntity       = false
 local spawnedEntityIndex       = 0
 local favoriteEntityIndex      = 0

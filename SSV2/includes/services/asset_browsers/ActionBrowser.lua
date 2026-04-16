@@ -28,6 +28,7 @@
 
 local AssetBrowserBase          = require("includes.services.asset_browsers.AssetBrowserBase")
 local RawDataService            = require("includes.services.RawDataService")
+local YimActions                = require("includes.features.extra.yim_actions.YimActionsV3")
 local Action                    = require("includes.structs.Action")
 local AnimCategories <const>    = {
 	"All",
@@ -451,7 +452,7 @@ function ActionBrowser:DrawItemContext(k, v)
 			else
 				if (current_mode.can_add_command and ImGui.MenuItem("Create Command")) then
 					GUI:PlaySound("Click")
-					YimActions.DrawNewCommandWindow = true
+					YimActions.ShouldDrawCmdWindow = true
 				end
 			end
 		end

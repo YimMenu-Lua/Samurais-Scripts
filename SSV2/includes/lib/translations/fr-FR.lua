@@ -57,7 +57,7 @@ return {
 	["FLTBD_SHOW_TOWBOX_CB"] = "Boite ESP",
 	["FLTBD_TOWING_TXT"] = "Véhicule remorqué :",
 	["FLTBD_SHOW_TOWPOS_TT"] = "Marque la position à laquelle le script détecte les véhicules à proximité.",
-	["YAV3_STOP_BTN_HINT"] = "CONSEIL : Vous pouvez appuyer sur %s pour arrêter de jouer une action ou la maintenir enfoncée pendant une seconde pour tout nettoyer.",
+	["YAV3_STOP_BTN_HINT"] = "CONSEIL : Vous pouvez appuyer sur %s pour arrêter l'exécution d'une action ou la maintenir enfoncée pendant une seconde pour effectuer une réinitialisation complète.",
 	["FLTBD_TOW_BTN"] = "Remorquer",
 	["FLTBD_TOW_ALL_CB"] = "Remorquer tout",
 	["FLTBD_ADJUST_POS_TXT"] = "Ajuster la position du véhicule",
@@ -856,6 +856,7 @@ return {
 	["VEH_STANCE_UPDATE_WARN"] = "Etes-vous sûr de vouloir écraser la position enregistrée pour le %s ?",
 	["GENERIC_ENABLE"] = "Activer",
 	["ASSET_BROWSER_CONTEXT_TT"] = "Faites un clic droit pour ouvrir le menu contextuel.",
-	["YAV3_SYMBOL_DEFS_HINT"] = "Vous êtes-vous déjà demandé quels sont les symboles étranges sur certaines actions de la liste ?\n\n- %s : Enregistré comme favori.\n- %s : Enregistré en tant que commande.\n- %s : Généré par l'utilisateur.",
-	["YAV3_LIST_VIEW_HINT"] = "Les vues de la liste d'animation et de scénario sont exactement les mêmes dans l'onglet « Actions » et dans l'onglet « Compagnons », ce qui signifie que tous les filtres que vous utilisez dans un onglet existeront également dans l'autre. Ce n'est cependant pas le cas pour les onglets « historique » et « favoris »."
+	["YAV3_SYMBOL_DEFS_HINT"] = "Vous êtes-vous déjà demandé quels sont les symboles de certaines actions de la liste ?\n\n- %s : enregistré comme favori.\n- %s : enregistré en tant que commande.\n- %s : généré par l'utilisateur.",
+	["YAV3_LIST_VIEW_HINT"] = "Les vues de la liste d'animation et de scénario sont exactement les mêmes dans l'onglet « Actions » et dans l'onglet « Compagnons », ce qui signifie que tous les filtres que vous utilisez dans un onglet existeront également dans l'autre. Ce n'est cependant pas le cas pour les onglets « historique » et « favoris ».",
+	["YAV3_VEH_ANIM_HINT"] = "Les animations centrées sur les véhicules ne peuvent pas être jouées à pied ; même pour les compagnons."
 }

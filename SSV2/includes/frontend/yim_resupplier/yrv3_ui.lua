@@ -7,19 +7,20 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
 local colMoneyGreen <const> = Color("#85BB65")
 local TABS <const>          = {
-	{ label = "GB_BOSSC",              isGXT = true,  callback = require("includes.frontend.yim_resupplier.office") },
-	{ label = "CELL_HANGAR",           isGXT = true,  callback = require("includes.frontend.yim_resupplier.hangar") },
-	{ label = "GB_REST_ACCM",          isGXT = true,  callback = require("includes.frontend.yim_resupplier.clubhouse") },
-	{ label = "CELL_BUNKER",           isGXT = true,  callback = require("includes.frontend.yim_resupplier.bunker") },
-	{ label = "CELL_ACID_LAB",         isGXT = true,  callback = require("includes.frontend.yim_resupplier.acid_lab") },
-	{ label = "CELL_CLUB",             isGXT = true,  callback = require("includes.frontend.yim_resupplier.nightclub") },
-	{ label = "YRV3_CASH_SAFES_LABEL", isGXT = false, callback = require("includes.frontend.yim_resupplier.cash_safes") },
-	{ label = "MP_CARWASH",            isGXT = true,  callback = require("includes.frontend.yim_resupplier.money_fronts") },
-	{ label = "CELL_SLVG_YRD",         isGXT = true,  callback = require("includes.frontend.yim_resupplier.salvage_yard") },
-	{ label = "GENERIC_MISC",          isGXT = false, callback = require("includes.frontend.yim_resupplier.misc") },
-	{ label = "CELL_16",               isGXT = true,  callback = require("includes.frontend.yim_resupplier.settings") },
+	{ label = "GB_BOSSC",              isGXT = true,  callback = require("office_ui") },
+	{ label = "CELL_HANGAR",           isGXT = true,  callback = require("hangar_ui") },
+	{ label = "GB_REST_ACCM",          isGXT = true,  callback = require("clubhouse_ui") },
+	{ label = "CELL_BUNKER",           isGXT = true,  callback = require("bunker_ui") },
+	{ label = "CELL_ACID_LAB",         isGXT = true,  callback = require("acid_lab_ui") },
+	{ label = "CELL_CLUB",             isGXT = true,  callback = require("nightclub_ui") },
+	{ label = "YRV3_CASH_SAFES_LABEL", isGXT = false, callback = require("cash_safes_ui") },
+	{ label = "MP_CARWASH",            isGXT = true,  callback = require("money_fronts_ui") },
+	{ label = "CELL_SLVG_YRD",         isGXT = true,  callback = require("salvage_yard_ui") },
+	{ label = "GENERIC_MISC",          isGXT = false, callback = require("misc_ui") },
+	{ label = "CELL_16",               isGXT = true,  callback = require("yrv3_settings_ui") },
 }; local selectedTab        = TABS[1]
 
 ThreadManager:Run(function()

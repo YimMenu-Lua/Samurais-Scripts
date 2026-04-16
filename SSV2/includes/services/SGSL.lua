@@ -117,7 +117,7 @@ end
 ---@field private m_api_key string
 local SGSL = {
 	data = require("includes.data.globals_locals"),
-	m_api_key = Backend:GetAPIVersion() == Enums.eAPIVersion.V1 and "LEGACY" or "ENHANCED"
+	m_api_key = Backend:GetGameBranch() == Enums.eGameBranch.LAGECY and "LEGACY" or "ENHANCED"
 }
 SGSL.__index = SGSL
 

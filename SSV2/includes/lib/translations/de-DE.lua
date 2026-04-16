@@ -57,7 +57,7 @@ return {
 	["FLTBD_TOW_BTN"] = "Schleppen",
 	["WRLD_CARPOOL_TT"] = "Ermöglicht Ihnen, als Beifahrer in NPC-Fahrzeuge einzusteigen.",
 	["FLTBD_SHOW_TOWBOX_TT"] = "Zeichnet eine ESP-Box um das Zielfahrzeug.",
-	["YAV3_STOP_BTN_HINT"] = "TIPP: Sie können %s drücken, um die Wiedergabe einer Aktion zu beenden, oder die Taste eine Sekunde lang gedrückt halten, um alles zu bereinigen.",
+	["YAV3_STOP_BTN_HINT"] = "TIPP: Sie können %s drücken, um die Wiedergabe einer Aktion zu beenden, oder eine Sekunde lang gedrückt halten, um einen vollständigen Reset durchzuführen.",
 	["FLTBD_FAST_ADJUST_TXT"] = "Halten Sie [SHIFT] gedrückt, um sich schneller zu bewegen.",
 	["FLTBD_SHOW_TOWBOX_CB"] = "Box ESP",
 	["FLTBD_TOW_ALL_CB"] = "Alles abschleppen",
@@ -857,5 +857,6 @@ return {
 	["VEH_STANCE_UPDATE_WARN"] = "Sind Sie sicher, dass Sie die gespeicherte Haltung für %s überschreiben möchten?",
 	["ASSET_BROWSER_CONTEXT_TT"] = "Klicken Sie mit der rechten Maustaste, um das Kontextmenü zu öffnen.",
 	["YAV3_LIST_VIEW_HINT"] = "Die Animations- und Szenariolistenansichten sind auf den Registerkarten „Aktionen“ und „Gefährten“ genau gleich, was bedeutet, dass alle Filter, die Sie auf einer Registerkarte verwenden, auch auf der anderen vorhanden sind. Dies gilt jedoch nicht für die Registerkarten „Verlauf“ und „Favoriten“.",
-	["YAV3_SYMBOL_DEFS_HINT"] = "Haben Sie sich jemals gefragt, was die seltsamen Symbole für einige Aktionen in der Liste sind?\n\n- %s: Als Favorit gespeichert.\n- %s: Als Befehl registriert.\n- %s: Vom Benutzer generiert."
+	["YAV3_SYMBOL_DEFS_HINT"] = "Haben Sie sich jemals gefragt, was die Symbole für einige Aktionen in der Liste sind?\n\n- %s: Als Favorit gespeichert.\n- %s: Als Befehl registriert.\n- %s: Vom Benutzer generiert.",
+	["YAV3_VEH_ANIM_HINT"] = "Fahrzeugzentrierte Animationen können nicht zu Fuß abgespielt werden; auch für Begleiter."
 }

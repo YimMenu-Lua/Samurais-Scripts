@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local YimActions = require("includes.features.extra.yim_actions.YimActionsV3")
 local strBuffer  = ""
 local windowSize = vec2:new(400, 200)
 
@@ -16,11 +17,11 @@ local windowPos
 ---@param selected_action Action?
 return function(selected_action)
 	if (not selected_action) then
-		YimActions.DrawNewCommandWindow = false
+		YimActions.ShouldDrawCmdWindow = false
 		return
 	end
 
-	if (not YimActions.DrawNewCommandWindow) then
+	if (not YimActions.ShouldDrawCmdWindow) then
 		return
 	end
 
@@ -53,14 +54,14 @@ return function(selected_action)
 				strBuffer = ""
 			end)
 
-			YimActions.DrawNewCommandWindow = false
+			YimActions.ShouldDrawCmdWindow = false
 		end
 		ImGui.EndDisabled()
 
 		ImGui.SameLine()
 		if (GUI:Button(_T("GENERIC_CANCEL"))) then
 			strBuffer = ""
-			YimActions.DrawNewCommandWindow = false
+			YimActions.ShouldDrawCmdWindow = false
 		end
 
 		ImGui.End()

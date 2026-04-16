@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BS            = BillionaireServices
+local BSV2          = require("includes.features.extra.billionaire_services.BillionaireServicesV2")
 local limoModels    = require("includes.data.bsv2_data").DefaultLimousines
 local bRequested    = false
 local selectedLimo  = nil
@@ -51,7 +51,7 @@ local function drawSpawner()
 	ImGui.BeginDisabled(not selectedLimo or bRequested)
 	if GUI:Button("Dispatch", { size = vec2:new(100, 35) }) then
 		if (not selectedLimo) then return end
-		BS:CallPrivateLimo(selectedLimo)
+		BSV2:CallPrivateLimo(selectedLimo)
 		bRequested = true
 	end
 	ImGui.EndDisabled()
@@ -183,7 +183,7 @@ local function drawSpawnedLimo(limo)
 end
 
 local function drawSpawnedFooter()
-	local limo = BS.ActiveServices.limo
+	local limo = BSV2.ActiveServices.limo
 	if (not limo) then return end
 
 	ImGui.SetWindowFontScale(1.12)
@@ -213,7 +213,7 @@ local function drawSpawnedFooter()
 		end
 		ImGui.SameLine()
 		if ImGui.Button("Cleanup") then
-			BS:RemoveLimo()
+			BSV2:RemoveLimo()
 			bRequested = false
 		end
 	end
@@ -227,14 +227,14 @@ local function drawSpawnedFooter()
 	ImGui.SameLine()
 
 	if (GUI:Button(_T("GENERIC_DISMISS"), buttonSize)) then
-		BS:Dismiss(BS.SERVICE_TYPE.LIMO)
+		BSV2:Dismiss(BSV2.SERVICE_TYPE.LIMO)
 		bRequested = false
 	end
 end
 
 ---@return string tabName, function? footer
 return function()
-	local limo = BS.ActiveServices.limo
+	local limo = BSV2.ActiveServices.limo
 	if (not limo) then
 		currentTab    = "LIMO_SPAWNER"
 		currentFooter = nil

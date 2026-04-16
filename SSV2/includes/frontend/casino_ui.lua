@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CasinoPacino = require("includes.features.CasinoPacino")
+local CasinoPacino = require("includes.features.online.CasinoPacino")
 local SGSL         = require("includes.services.SGSL")
 local casino_pos   = vec3:new(924.6380, 46.6918, 81.1063)
 

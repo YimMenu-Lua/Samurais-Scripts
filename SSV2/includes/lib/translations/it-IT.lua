@@ -53,7 +53,7 @@ return {
 	["FLTBD_TOWING_TXT"] = "Veicolo rimorchiato:",
 	["FLTBD_SHOW_TOWPOS_CB"] = "Mostra la posizione di traino",
 	["WRLD_HNS_TT"] = "Ti consente di nasconderti all'interno di veicoli, bagagliai o bidoni della spazzatura. Se hai un livello di ricercato, la polizia ti perderà fintanto che ti nascondi prima di essere individuato.",
-	["YAV3_STOP_BTN_HINT"] = "SUGGERIMENTO: puoi premere %s per interrompere l'esecuzione di qualsiasi azione o tenerlo premuto per un secondo per pulire tutto.",
+	["YAV3_STOP_BTN_HINT"] = "SUGGERIMENTO: puoi premere %s per interrompere l'esecuzione di qualsiasi azione o tenerlo premuto per un secondo per eseguire un ripristino completo.",
 	["FLTBD_TOW_BTN"] = "Trainare",
 	["WRLD_CARPOOL_TT"] = "Ti permette di salire sui veicoli NPC come passeggero.",
 	["FLTBD_SHOW_TOWBOX_TT"] = "Disegna una casella ESP attorno al veicolo bersaglio.",
@@ -857,5 +857,6 @@ return {
 	["GENERIC_ENABLE"] = "Abilitare",
 	["ASSET_BROWSER_CONTEXT_TT"] = "Fare clic con il tasto destro per aprire il menu contestuale.",
 	["YAV3_LIST_VIEW_HINT"] = "Le visualizzazioni dell'elenco delle animazioni e degli scenari sono esattamente le stesse nella scheda \"Azioni\" e nella scheda \"Compagni\", il che significa che tutti i filtri che utilizzi in una scheda esisteranno anche nell'altra. Questo però non è il caso delle schede \"cronologia\" e \"preferiti\".",
-	["YAV3_SYMBOL_DEFS_HINT"] = "Ti sei mai chiesto quali siano gli strani simboli su alcune azioni nell'elenco?\n\n- %s: salvato come preferito.\n- %s: registrato come comando.\n- %s: generato dall'utente."
+	["YAV3_SYMBOL_DEFS_HINT"] = "Ti sei mai chiesto quali sono i simboli su alcune azioni nell'elenco?\n\n- %s: salvato come preferito.\n- %s: registrato come comando.\n- %s: generato dall'utente.",
+	["YAV3_VEH_ANIM_HINT"] = "Le animazioni incentrate sui veicoli non possono essere riprodotte a piedi; anche per i compagni."
 }

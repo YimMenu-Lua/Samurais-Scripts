@@ -12,12 +12,14 @@ local Scene = require("includes.structs.SynchronizedScene")
 
 ---@class SceneManager
 ---@field public CurrentlyPlaying table<handle, SynchronisedScene>
+---@field protected m_owner_ref YimActions
 local SceneManager   = {}
 SceneManager.__index = SceneManager
 
+---@param yimactions YimActions
 ---@return SceneManager
-function SceneManager.new()
-	return setmetatable({ CurrentlyPlaying = {} }, SceneManager)
+function SceneManager.new(yimactions)
+	return setmetatable({ m_owner_ref = yimactions, CurrentlyPlaying = {} }, SceneManager)
 end
 
 ---@param model string|hash

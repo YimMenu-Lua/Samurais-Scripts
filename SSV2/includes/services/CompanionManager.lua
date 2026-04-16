@@ -10,6 +10,42 @@
 local GroupManager = require("includes.services.GroupManager")
 
 -----------------------------------------------------
+-- Companion Struct
+-----------------------------------------------------
+---@class Companion
+---@field name string
+---@field handle integer script handle
+---@field model integer model hash
+---@field godmode boolean
+---@field armed boolean
+---@field blip table<string, integer>
+---@field time_created number
+---@field is_saved boolean I forgot what I was going to use this for
+local Companion    = {}
+Companion.__index  = Companion
+
+---@param name string
+---@param handle integer
+---@param model integer
+---@param is_invincible? boolean
+---@param is_armed? boolean
+---@param blip? integer
+---@param is_saved? boolean
+function Companion.new(name, handle, model, is_invincible, is_armed, blip, is_saved)
+	local instance = setmetatable({}, Companion)
+	instance.name = name or "unknown"
+	instance.handle = handle
+	instance.model = model
+	instance.godmode = is_invincible or false
+	instance.armed = is_armed or false
+	instance.blip = { handle = blip or 0, alpha = 255 }
+	instance.is_saved = is_saved or false
+	instance.time_created = Time.Now()
+
+	return instance
+end
+
+-----------------------------------------------------
 -- Companion Manager
 -----------------------------------------------------
 -- Handles comanions (NPCs) for YimActions.
@@ -17,6 +53,7 @@ local GroupManager = require("includes.services.GroupManager")
 ---@field Companions array<Companion>
 ---@field private combat_attributes array<integer>
 ---@field private config_flags array<ePedConfigFlags>
+---@field protected m_owner_instance YimActions
 ---@overload fun(): CompanionManager
 local CompanionManager = {}
 CompanionManager.__index = CompanionManager
@@ -42,16 +79,10 @@ CompanionManager.config_flags = {
 	Enums.ePedConfigFlags.DontLeaveCombatIfTargetPlayerIsAttackedByPolice
 }
 
----@diagnostic disable-next-line: param-type-mismatch
-setmetatable(CompanionManager, {
-	__call = function()
-		return CompanionManager.new()
-	end
-})
-
-function CompanionManager.new()
+---@param yimactions YimActions
+function CompanionManager.new(yimactions)
 	---@diagnostic disable-next-line: param-type-mismatch
-	return setmetatable({ Companions = {} }, CompanionManager)
+	return setmetatable({ m_owner_instance = yimactions, Companions = {} }, CompanionManager)
 end
 
 ---@param entity integer
@@ -161,12 +192,10 @@ function CompanionManager:GetCompanionNameFromHandle(handle)
 end
 
 function CompanionManager:AreAnyCompanionsPlaying()
-	if next(self.Companions) == nil then
-		return false
-	end
+	if (next(self.Companions) == nil) then return false end
 
 	for _, companion in ipairs(self.Companions) do
-		if YimActions:IsPedPlaying(companion.handle) then
+		if (self.m_owner_instance:IsPedPlaying(companion.handle)) then
 			return true
 		end
 	end
@@ -176,17 +205,13 @@ end
 
 ---@param action? Action
 function CompanionManager:AllCompanionsPlay(action)
-	if (not action or not action.data) then
-		return
-	end
-
-	if next(self.Companions) == nil then
+	if (not action or not action.data or next(self.Companions) == nil) then
 		return
 	end
 
 	for _, companion in ipairs(self.Companions) do
-		if companion and companion.handle then
-			YimActions:Play(action, companion.handle)
+		if (companion and companion.handle) then
+			self.m_owner_instance:Play(action, companion.handle)
 		end
 	end
 end
@@ -197,8 +222,8 @@ function CompanionManager:StopAllCompanions()
 	end
 
 	for _, companion in ipairs(self.Companions) do
-		if companion and companion.handle and YimActions:IsPedPlaying(companion.handle) then
-			YimActions:Cleanup(companion.handle)
+		if (companion.handle and self.m_owner_instance:IsPedPlaying(companion.handle)) then
+			self.m_owner_instance:Cleanup(companion.handle)
 		end
 	end
 end
@@ -220,8 +245,8 @@ function CompanionManager:BringAllCompanions()
 			0.0
 		)
 
-		if companion and companion.handle then
-			YimActions:Cleanup(companion.handle)
+		if (companion and companion.handle) then
+			self.m_owner_instance:Cleanup(companion.handle)
 			Game.SetEntityCoordsNoOffset(companion.handle, offsetCoords)
 			x_offset = x_offset + 1
 			y_offset = y_offset + 1
@@ -232,10 +257,10 @@ end
 
 ---@param companion Companion
 function CompanionManager:RemoveCompanion(companion)
-	YimActions:Cleanup(companion.handle)
+	self.m_owner_instance:Cleanup(companion.handle)
 
-	if Game.IsScriptHandle(companion.handle) then
-		if PED.IS_PED_GROUP_MEMBER(companion.handle, LocalPlayer:GetGroupIndex()) then
+	if (Game.IsScriptHandle(companion.handle)) then
+		if (PED.IS_PED_GROUP_MEMBER(companion.handle, LocalPlayer:GetGroupIndex())) then
 			PED.REMOVE_PED_FROM_GROUP(companion.handle)
 		end
 
@@ -253,9 +278,7 @@ function CompanionManager:RemoveCompanion(companion)
 end
 
 function CompanionManager:Wipe()
-	if next(self.Companions) == nil then
-		return
-	end
+	if (next(self.Companions) == nil) then return end
 
 	for _, companion in pairs(self.Companions) do
 		self:UnregisterEntity(companion.handle)
@@ -306,42 +329,6 @@ function CompanionManager:Watchdog()
 	end
 end
 
------------------------------------------------------
--- Companion Struct
------------------------------------------------------
----@class Companion
----@field name string
----@field handle integer script handle
----@field model integer model hash
----@field godmode boolean
----@field armed boolean
----@field blip table<string, integer>
----@field time_created number
----@field is_saved boolean I forgot what I was going to use this for
-Companion = {}
-Companion.__index = Companion
-
----@param name string
----@param handle integer
----@param model integer
----@param is_invincible? boolean
----@param is_armed? boolean
----@param blip? integer
----@param is_saved? boolean
-function Companion.new(name, handle, model, is_invincible, is_armed, blip, is_saved)
-	local instance = setmetatable({}, Companion)
-	instance.name = name or "unknown"
-	instance.handle = handle
-	instance.model = model
-	instance.godmode = is_invincible or false
-	instance.armed = is_armed or false
-	instance.blip = { handle = blip or 0, alpha = 255 }
-	instance.is_saved = is_saved or false
-	instance.time_created = Time.Now()
-
-	return instance
-end
-
 -- Enables/Disables ped invincibility.
 function Companion:ToggleGodmode()
 	script.run_in_fiber(function()
@@ -388,7 +375,7 @@ end
 
 -- PERII
 function Companion:AD_MORTEM_INIMICUS()
-	if NETWORK.NETWORK_IS_ACTIVITY_SESSION() or not LocalPlayer:IsOutside() then
+	if (NETWORK.NETWORK_IS_ACTIVITY_SESSION() or not LocalPlayer:IsOutside()) then
 		return
 	end
 

@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local YimActions          = require("includes.features.extra.yim_actions.YimActionsV3")
 local measureLabelWidth   = require("includes.frontend.helpers.measure_text_width")
 local footerLabelWidths   = {}
 local t_AnimFlags <const> = {

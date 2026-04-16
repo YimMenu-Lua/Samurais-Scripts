@@ -83,12 +83,12 @@ end
 
 ---@return boolean
 function Game.IsLegacy()
-	return Backend:GetAPIVersion() == Enums.eAPIVersion.V1
+	return Backend:GetGameBranch() == Enums.eGameBranch.LAGECY
 end
 
 ---@return boolean
 function Game.IsEnhanced()
-	return Backend:GetAPIVersion() == Enums.eAPIVersion.V2
+	return Backend:GetGameBranch() == Enums.eGameBranch.ENHANCED
 end
 
 ---@return boolean

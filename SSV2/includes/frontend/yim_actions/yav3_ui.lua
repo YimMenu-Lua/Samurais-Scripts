@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local YimActions           = require("includes.features.extra.yim_actions.YimActionsV3")
 local DrawNewCommandWindow = require("includes.frontend.yim_actions.new_command_ui")
 local DrawMainActions      = require("includes.frontend.yim_actions.actions_ui")
 local DrawCompanions       = require("includes.frontend.yim_actions.companions_ui")
@@ -16,7 +17,7 @@ local DrawClipsets         = require("includes.frontend.yim_actions.movement_cli
 local selectedAction
 
 GUI:RegisterNewTab(Enums.eTabID.TAB_EXTRA, "YimActions", function()
-	ImGui.BeginDisabled(YimActions.DrawNewCommandWindow)
+	ImGui.BeginDisabled(YimActions.ShouldDrawCmdWindow)
 	if (ImGui.BeginTabBar("##yimactionsv3")) then
 		if (ImGui.BeginTabItem("Actions")) then
 			selectedAction = DrawMainActions()
@@ -33,7 +34,8 @@ GUI:RegisterNewTab(Enums.eTabID.TAB_EXTRA, "YimActions", function()
 			ImGui.EndTabItem()
 		end
 
-		if (Backend.debug_mode and ImGui.BeginTabItem("Debug")) then
+		if (Backend.debug_mode and ImGui.BeginTabItem("Debug##YAV3")) then
+			---@diagnostic disable-next-line
 			YimActions.Debugger:Draw()
 			ImGui.EndTabItem()
 		end

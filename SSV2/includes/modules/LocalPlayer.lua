@@ -16,7 +16,7 @@ local LaserSights  = require("includes.features.self.laser_sights")
 local Katana       = require("includes.features.self.katana")
 local miscFeatures = require("includes.features.self.miscellaneous")
 local CPed         = require("includes.classes.gta.CPed")
-local YimActions   = require("includes.features.YimActionsV3")
+local YimActions   = require("includes.features.extra.yim_actions.YimActionsV3")
 
 
 --------------------------------------

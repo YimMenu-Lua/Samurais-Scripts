@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BS                   = BillionaireServices
+local BSV2                 = require("includes.features.extra.billionaire_services.BillionaireServicesV2")
 local DrawBodyguards       = require("includes.frontend.billionaire_services.bodyguards_ui")
 local DrawEscorts          = require("includes.frontend.billionaire_services.escort_groups_ui")
 local DrawLimousine        = require("includes.frontend.billionaire_services.limo_ui")
@@ -76,9 +76,9 @@ local function DrawMainSidebar()
 	ImGui.BeginChild("##main_sidebar", 160, GVars.ui.window_size.y * 0.6)
 	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 5, 20)
 	ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 40)
-	if BS:GetServiceCount() > 1 then
+	if BSV2:GetServiceCount() > 1 then
 		if (GUI:Button(_T("GENERIC_DISMISS_ALL"), { colors = dismissAllBtnCols })) then
-			BS:Dismiss(BS.SERVICE_TYPE.ALL)
+			BSV2:Dismiss(BSV2.SERVICE_TYPE.ALL)
 		end
 	else
 		ImGui.TextDisabled(_T("GENERIC_DISMISS_ALL"))

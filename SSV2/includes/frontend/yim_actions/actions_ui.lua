@@ -42,7 +42,23 @@ local SideBarTips <const> = {
 	function() return _F(_T("YAV3_STOP_BTN_HINT"), GVars.keyboard_keybinds.stop_anim) end,
 	function() return _F(_T("YAV3_SYMBOL_DEFS_HINT"), "[*]", "[C]", "[U]") end,
 	function() return _T("YAV3_LIST_VIEW_HINT") end,
-}
+	function() return _T("YAV3_VEH_ANIM_HINT") end,
+}; local tipsCount = #SideBarTips
+
+local function DrawTipsIndicator(currentIndex)
+	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 1, 1)
+	for i = 1, tipsCount do
+		ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 8)
+		ImGui.BeginDisabled(i ~= currentIndex)
+		ImGui.Text(".")
+		ImGui.EndDisabled()
+
+		if (i < tipsCount) then
+			ImGui.SameLine()
+		end
+	end
+	ImGui.PopStyleVar()
+end
 
 local function DrawSidebarItems()
 	local selectedTab = t_ActionsSidebarItems[sidebarItemIndex]
@@ -51,9 +67,9 @@ local function DrawSidebarItems()
 	end
 end
 
-local function DrawActionsSidebar()
+local function DrawSidebar()
 	ImGui.SetNextWindowBgAlpha(0.0)
-	ImGui.BeginChild("##actios_sidebar", 160, GVars.ui.window_size.y * 0.7)
+	ImGui.BeginChild("##actions_sidebar", 160, GVars.ui.window_size.y * 0.7)
 	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 5, 20)
 	ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 40)
 	ImGui.Dummy(1, 100)
@@ -79,13 +95,13 @@ local function DrawActionsSidebar()
 	end
 	ImGui.PopStyleVar(2)
 
-	local region       = vec2:new(ImGui.GetContentRegionAvail())
-	local s_SidebarTip = SideBarTips[sidebarTipIndex]()
+	local region     = vec2:new(ImGui.GetContentRegionAvail())
+	local sidebarTip = SideBarTips[sidebarTipIndex]()
 	ImGui.SetWindowFontScale(0.70)
-	local _, textHeight = ImGui.CalcTextSize(s_SidebarTip, false, region.x)
-	ImGui.SetCursorPos(0.0, ImGui.GetCursorPosY() + region.y - textHeight - 25)
-	ImGui.TextWrapped(s_SidebarTip)
-	if (ImGui.SmallButton("  <  ")) then
+	local _, textHeight = ImGui.CalcTextSize(sidebarTip, false, region.x)
+	ImGui.SetCursorPos(0.0, math.max(ImGui.GetCursorPosY(), ImGui.GetCursorPosY() + region.y - textHeight - 30))
+	ImGui.TextWrapped(sidebarTip)
+	if (ImGui.SmallButton("<    ")) then
 		GUI:PlaySound(GUI.Sounds.Nav)
 		if (sidebarTipIndex == 1) then
 			sidebarTipIndex = #SideBarTips
@@ -96,7 +112,12 @@ local function DrawActionsSidebar()
 	GUI:Tooltip(_T("GENERIC_PREVIOUS"))
 
 	ImGui.SameLine()
-	if (ImGui.SmallButton("  >  ")) then
+	ImGui.SetWindowFontScale(1.25)
+	DrawTipsIndicator(sidebarTipIndex)
+	ImGui.SetWindowFontScale(0.70)
+
+	ImGui.SameLine()
+	if (ImGui.SmallButton("    >")) then
 		GUI:PlaySound(GUI.Sounds.Nav)
 		if (sidebarTipIndex == #SideBarTips) then
 			sidebarTipIndex = 1
@@ -111,10 +132,10 @@ end
 
 return function()
 	ImGui.BeginGroup()
-	DrawActionsSidebar()
+	DrawSidebar()
 
 	ImGui.SameLine()
-	ImGui.BeginChildEx("##main_player",
+	ImGui.BeginChildEx("##yim_actions_main",
 		vec2:new(0, GVars.ui.window_size.y * 0.7),
 		ImGuiChildFlags.Borders | ImGuiChildFlags.AlwaysUseWindowPadding
 	)
