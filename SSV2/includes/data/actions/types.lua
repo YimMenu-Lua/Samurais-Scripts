@@ -22,7 +22,8 @@
 ---@field rot vec3
 ---@field pos vec3
 ---@field delay float
----@field scale float
+---@field scale? float
+---@field bone? integer
 
 ---@class AnimSFX
 ---@field speechName string
@@ -96,7 +97,7 @@
 ---@field strf string?
 ---@field wanim string
 
----@alias ActionData AnimData | ScenarioData | SyncedSceneData | MovementClipsetData?
+---@alias ActionData AnimData | ScenarioData | SyncedSceneData | MovementClipsetData
 
 ---@class ActionCommandData
 ---@field type eActionType

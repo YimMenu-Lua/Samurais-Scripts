@@ -59,9 +59,9 @@ function MemoryBatch.new(name, ida_sig, callback)
 	}
 end
 
----@type table<eAPIVersion, array<MemoryBatch>>
+---@type table<eGameBranch, array<MemoryBatch>>
 local mem_batches <const> = {
-	[Enums.eAPIVersion.V1] = {
+	[Enums.eGameBranch.LAGECY] = {
 		MemoryBatch.new("ScriptGlobals", "48 8D 15 ? ? ? ? 4C 8B C0 E8 ? ? ? ? 48 85 FF 48 89 1D", function(ptr)
 			GPointers.ScriptGlobals = ptr:add(0x3):rip()
 		end),
@@ -94,7 +94,7 @@ local mem_batches <const> = {
 		-- 	GPointers.DynamicFuncs.BreakOffVehicleWheel = _G[func_name]
 		-- end),
 	},
-	[Enums.eAPIVersion.V2] = {
+	[Enums.eGameBranch.ENHANCED] = {
 		MemoryBatch.new("ScriptGlobals", "48 8B 8E B8 00 00 00 48 8D 15 ? ? ? ? 49 89 D8", function(ptr)
 			GPointers.ScriptGlobals = ptr:add(0x7):add(0x3):rip()
 		end),
@@ -110,10 +110,10 @@ local mem_batches <const> = {
 			GPointers.ScreenResolution.y = ptr:add(0x1E):add(0x4):rip():get_word()
 		end),
 	},
-	[Enums.eAPIVersion.L54] = { --[[dummy]] },
+	[Enums.eGameBranch.MOCK] = { --[[dummy]] },
 }
 
-local API_VERSON <const> = Backend:GetAPIVersion()
+local API_VERSON <const> = Backend:GetGameBranch()
 local batches = mem_batches[API_VERSON]
 for _, batch in ipairs(batches) do
 	PatternScanner:Add(batch.m_name, batch.m_pattern, batch.m_callback)

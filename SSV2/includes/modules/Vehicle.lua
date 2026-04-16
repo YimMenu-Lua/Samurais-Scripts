@@ -641,7 +641,7 @@ function Vehicle:MaxPerformance()
 	end
 
 	local function SetPlatformAppropriateMod(modType, modIndex)
-		if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
+		if (Backend:GetGameBranch() == Enums.eGameBranch.LAGECY) then
 			while VEHICLE.IS_VEHICLE_MOD_GEN9_EXCLUSIVE(handle, modType, modIndex) do
 				modIndex = modIndex - 1
 				yield()

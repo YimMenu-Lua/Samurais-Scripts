@@ -50,7 +50,7 @@ end
 local function SafeGetVersion()
 	if (GPointers.GameVersion.build:isempty()) then
 		local ptr, b, o
-		if (Backend:GetAPIVersion() == Enums.eAPIVersion.V1) then
+		if (Backend:GetGameBranch() == Enums.eGameBranch.LAGECY) then
 			ptr = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
 			b = ptr:add(0x24):rip()
 			o = b:add(0x20)

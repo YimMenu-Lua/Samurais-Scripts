@@ -7,9 +7,10 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local Mastermind         = require("includes.features.Mastermind"):init()
+local Mastermind         = require("includes.features.online.Mastermind")
 local SGSL               = require("includes.services.SGSL")
-local secondary_targets  = { "Cash", "Weed", "Coke", "Gold" }
+local YRV3               = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local secondary_targets  = { "Cash", "Weed", "Coke", "Gold", "Paintings" }
 local cayo_secondary_target_i, cayo_secondary_target_c
 
 local heistNames <const> = { -- https://github.com/root-cause/v-labels/blob/master/labels.json
@@ -25,11 +26,6 @@ local heistNames <const> = { -- https://github.com/root-cause/v-labels/blob/mast
 	DataBreaches          = "HPSTRAND_IAAb",
 	BogdanProblem         = "HPSTRAND_SUBb",
 	DoomsdayScenario      = "HPSTRAND_MSILb",
-}
-local tabNames <const>   = { --
-	"YH_BASIC_TAB",          -- Basic
-	"ISLAND_TRAVEL_T",       -- Cayo Perico
-	"FMMC_RSTAR_MHS2",       -- The Doomsday Heist
 }
 
 ---@type HEIST_TYPES
@@ -222,7 +218,7 @@ local function drawCayoTab()
 		_T "YH_CAYO_TARGET_SECONDARY_I",
 		cayo_secondary_target_i,
 		secondary_targets,
-		4
+		5
 	)
 
 	if (secondary_target_click) then
@@ -233,7 +229,7 @@ local function drawCayoTab()
 		_T "YH_CAYO_TARGET_SECONDARY_C",
 		cayo_secondary_target_c,
 		secondary_targets,
-		4
+		5
 	)
 
 	if (secondary_target_click) then
@@ -271,15 +267,32 @@ local function drawCayoTab()
 
 	-- https://www.unknowncheats.me/forum/3058973-post602.html
 	if GUI:Button(_T("CP_HEIST_UNLOCK_ALL")) then
+		-- **NOTE**
+		-- secondary targets need a review. We should either research how the game generates them
+		-- and replicate the best outcome or just do what YimMenuV2 does.
+		-- As of now, most of the time you won't get paid for collecting secondary targets
+		-- because as far as the game is concerned, the payout is nonsensical (I ran a test that showed $14M in secondaries alone).
+		-- I'm going to leave this to HowBoutNo
+
+		stats.set_int("MPX_H4LOOT_CASH_V", 83250)
+		stats.set_int("MPX_H4LOOT_COKE_V", 202500)
+		stats.set_int("MPX_H4LOOT_GOLD_V", 333333)
+		stats.set_int("MPX_H4LOOT_WEED_V", 135000)
+		stats.set_int("MPX_H4LOOT_PAINT_V", 180000)
+		-- Also gotta figure out wtf these below actually do, currently they're just here to hopefully prevent bugs
+		stats.set_int("MPX_H4CNF_BS_GEN", 262143)
+		stats.set_int("MPX_H4CNF_BS_ENTR", 63)
+		stats.set_int("MPX_H4CNF_BS_ABIL", 63)
 		stats.set_int("MPX_H4CNF_WEP_DISRP", 3)
 		stats.set_int("MPX_H4CNF_ARM_DISRP", 3)
 		stats.set_int("MPX_H4CNF_HEL_DISRP", 3)
-		-- Also gotta figure out wtf these below actually do, currently they're just here to hopefully prevent bugs
-		stats.set_int("MPX_H4CNF_BS_GEN", 131071)
-		stats.set_int("MPX_H4CNF_BS_ENTR", 63)
-		stats.set_int("MPX_H4CNF_BS_ABIL", 63)
-		stats.set_int("MPX_H4_MISSIONS", 65535)
-		stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 40000)
+		stats.set_int("MPX_H4CNF_BOLTCUT", 4424)
+		stats.set_int("MPX_H4CNF_UNIFORM", 5256)
+		stats.set_int("MPX_H4CNF_GRAPPEL", 5156)
+		stats.set_int("MPX_H4CNF_APPROACH", -1)
+		stats.set_int("MPX_H4_MISSIONS", -1)
+		stats.set_int("MPX_H4CNF_TROJAN", 5)
+		stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 32)
 	end
 
 	ImGui.EndDisabled() -- on_cooldown
@@ -297,14 +310,7 @@ local function drawCayoTab()
 	if (GVars.backend.debug_mode) then
 		-- This button should only be used if something is severely wrong
 		if GUI:Button(_T("YH_CAYO_RESET_ALL")) then
-			stats.set_int("MPX_H4_MISSIONS", 0)
-			stats.set_int("MPX_H4_PROGRESS", 0)
-			stats.set_int("MPX_H4_PLAYTHROUGH_STATUS", 0)
-			stats.set_int("MPX_H4CNF_APPROACH", 0)
-			stats.set_int("MPX_H4CNF_BS_ENTR", 0)
-			stats.set_int("MPX_H4CNF_BS_GEN", 0)
-			stats.set_int("MPX_H4CNF_BS_ABIL", 0)
-			Notifier:ShowSuccess(Mastermind.__label, "All Cayo progress has been reset!")
+			Mastermind:ResetCayoPerico()
 		end
 	end
 end
@@ -345,9 +351,10 @@ local function drawDDayTab()
 	if (GUI:Button(button_label)) then
 		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 9999)
 	end
-	ImGui.Text(_F(_T("YH_DDAY_HELP2_FMT"), button_label))
+	GUI:HelpMarker(_F(_T("YH_DDAY_HELP2_FMT"), button_label))
 
 	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
+
 	-- Final ACT 1
 	ImGui.BeginDisabled(dday_status == 229383)
 	if (GUI:Button(heistNames.DataBreaches)) then
@@ -356,8 +363,8 @@ local function drawDDayTab()
 		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)
 	end
 	ImGui.EndDisabled()
+
 	-- Final ACT 2
-	ImGui.SameLine()
 	ImGui.BeginDisabled(dday_status == 229378)
 	if (GUI:Button(heistNames.BogdanProblem)) then
 		stats.set_int("MPX_GANGOPS_FLOW_MISSION_PROG", 240)
@@ -365,6 +372,7 @@ local function drawDDayTab()
 		stats.set_int("MPX_GANGOPS_FLOW_NOTIFICATIONS", 1557)
 	end
 	ImGui.EndDisabled()
+
 	-- Final ACT 3
 	ImGui.BeginDisabled(dday_status == 229380)
 	if (GUI:Button(heistNames.DoomsdayScenario)) then
@@ -391,10 +399,10 @@ end
 local function drawAptTab()
 end
 
-local tabCallbacks <const> = {
-	drawBasicTab,
-	drawCayoTab,
-	drawDDayTab,
+local TABS <const> = {
+	{ label = "YH_BASIC_TAB",    is_gxt = false, callback = drawBasicTab }, -- Basic
+	{ label = "ISLAND_TRAVEL_T", is_gxt = true,  callback = drawCayoTab }, -- Cayo Perico
+	{ label = "FMMC_RSTAR_MHS2", is_gxt = true,  callback = drawDDayTab }, -- The Doomsday Heist
 }
 
 local function HeistUI()
@@ -411,10 +419,11 @@ local function HeistUI()
 	cayo_secondary_target_i, cayo_secondary_target_c = Mastermind:GetCayoSecTargets()
 
 	if (ImGui.BeginTabBar("##mastermind")) then
-		for i = 1, #tabNames do
-			local name = tabNames[i]
-			if ImGui.BeginTabItem(name) then
-				tabCallbacks[i]()
+		for _, entry in ipairs(TABS) do
+			local label = entry.label
+			local name  = entry.is_gxt and label or _T(label)
+			if (ImGui.BeginTabItem(name) and entry.callback) then
+				entry.callback()
 				ImGui.EndTabItem()
 			end
 		end
@@ -425,6 +434,22 @@ end
 GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, Mastermind.__label, HeistUI)
 
 ThreadManager:Run(function()
-	Translator:TranslateGXTList(tabNames)
-	Translator:TranslateGXTList(heistNames)
+	-- Removed the Translator call because our own labels should never
+	-- stick since our script's language can be changed at runtime.
+	-- Our translator is built around ImGui's immediate mode nature
+	-- where _T is called every frame without performannce issues since
+	-- translations are simple O(1) lookups. This guarantees labels will
+	-- always match the current script language.
+	-- GXTs however are translated once and kept because you can't change
+	-- the game's language without restarting it.
+
+	for _, entry in ipairs(TABS) do
+		if (entry.is_gxt) then
+			entry.label = Game.GetGXTLabel(entry.label)
+		end
+	end
+
+	for k, label in pairs(heistNames) do
+		heistNames[k] = Game.GetGXTLabel(label)
+	end
 end)

@@ -15,6 +15,7 @@ if (Backend:IsMockEnv()) then
 	return
 end
 
+local YimActions      = require("includes.features.extra.yim_actions.YimActionsV3")
 local commandRegistry = require("includes.lib.commands")
 local weapons         = require("includes.data.weapons")
 local weaponData      = require("includes.data.weapon_data")
@@ -34,7 +35,12 @@ local weapons_map     = {
 }
 
 local function populate_weapons()
+	local branch = Backend:GetGameBranch()
 	for hash, data in pairs(weaponData) do
+		if (branch == Enums.eGameBranch.LAGECY and data.model_name == "WEAPON_STRICKLER") then
+			goto continue
+		end
+
 		if (not WEAPON.IS_WEAPON_VALID(hash)) then
 			goto continue
 		end

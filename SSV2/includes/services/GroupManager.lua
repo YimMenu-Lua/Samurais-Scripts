@@ -8,16 +8,31 @@
 
 
 ---@class GroupManager
+---@field private m_owner_ref BillionaireServices
 ---@field relationshipGroup integer
 ---@field globalTick number
 ---@field Bodyguards table<handle, { member: Bodyguard, lastTaskTime: seconds }>
-local GroupManager = { globalTick = 0 }
-GroupManager.__index = GroupManager
+---@field private m_initialized boolean
+local GroupManager      = { globalTick = 0 }
+GroupManager.__index    = GroupManager
 GroupManager.Bodyguards = {}
-GroupManager.Escorts = {}
+GroupManager.Escorts    = {}
 
-function GroupManager:Init()
-	if not self.relationshipGroup then
+---@param bsv2 BillionaireServices
+function GroupManager:init(bsv2)
+	if (not self.m_initialized) then
+		self.m_owner_ref = bsv2
+		ThreadManager:RegisterLooped("SS_GROUPMGR", function(s)
+			self:OnTick(s)
+			yield()
+		end)
+	end
+
+	return self
+end
+
+function GroupManager:Setup()
+	if (not self.relationshipGroup) then
 		if (PED.DOES_RELATIONSHIP_GROUP_EXIST(_J("WOMPUS_SPECIAL"))) then
 			self.relationshipGroup = _J("WOMPUS_SPECIAL")
 		else
@@ -33,7 +48,7 @@ end
 ---@param handle integer
 function GroupManager:AddPedToGroup(handle)
 	if (not self.relationshipGroup) then
-		self:Init()
+		self:Setup()
 	end
 
 	if ENTITY.DOES_ENTITY_EXIST(handle) and ENTITY.IS_ENTITY_A_PED(handle) then
@@ -45,7 +60,7 @@ end
 ---@param bodyguard Bodyguard
 function GroupManager:AddBodyguard(bodyguard)
 	if (not self.relationshipGroup) then
-		self:Init()
+		self:Setup()
 	end
 
 	if (ENTITY.DOES_ENTITY_EXIST(bodyguard.m_handle) and ENTITY.IS_ENTITY_A_PED(bodyguard.m_handle)) then
@@ -63,7 +78,7 @@ end
 ---@param group EscortGroup
 function GroupManager:AddEscortGroup(group)
 	if not self.relationshipGroup then
-		self:Init()
+		self:Setup()
 	end
 
 	for _, member in pairs(group.members) do
@@ -154,26 +169,22 @@ end
 
 ---@param s script_util
 function GroupManager:OnTick(s)
+	local BSV2 = self.m_owner_ref
 	self.globalTick = (self.globalTick + 1) % 1e6
 	self:HandleBodyuards(s)
 	self:HandleEscorts(s)
 
-	if BillionaireServices.ActiveServices.limo then
-		BillionaireServices.ActiveServices.limo:StateEval()
+	if (BSV2.ActiveServices.limo) then
+		BSV2.ActiveServices.limo:StateEval()
 	end
 
-	if BillionaireServices.ActiveServices.heli then
-		BillionaireServices.ActiveServices.heli:StateEval()
+	if (BSV2.ActiveServices.heli) then
+		BSV2.ActiveServices.heli:StateEval()
 	end
 
-	if BillionaireServices.ActiveServices.jet then
-		BillionaireServices.ActiveServices.jet:StateEval()
+	if (BSV2.ActiveServices.jet) then
+		BSV2.ActiveServices.jet:StateEval()
 	end
 end
-
-ThreadManager:RegisterLooped("SS_GROUPMGR", function(s)
-	GroupManager:OnTick(s)
-	yield()
-end)
 
 return GroupManager

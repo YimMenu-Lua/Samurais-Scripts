@@ -8,7 +8,7 @@
 
 
 local FeatureBase         = require("includes.modules.FeatureBase")
-local YimActions          = require("includes.features.YimActionsV3")
+local YimActions          = require("includes.features.extra.yim_actions.YimActionsV3")
 local trashBins <const>   = {
 	"m23_2_prop_m32_dumpster_01a",
 	"prop_cs_dumpster_01a",

@@ -57,7 +57,7 @@ return {
 	["FLTBD_EXIT_VEH_ERR"] = "首先退出当前车辆。",
 	["WRLD_CARPOOL_TT"] = "允许您作为乘客进入 NPC 车辆。",
 	["FLTBD_NO_VEH_TXT"] = "未发现附近车辆。",
-	["YAV3_STOP_BTN_HINT"] = "提示：您可以按 %s 停止播放任何动作或按住一秒钟以清理所有内容。",
+	["YAV3_STOP_BTN_HINT"] = "提示：您可以按 %s 停止播放任何动作或按住一秒钟以执行完全重置。",
 	["FLTBD_SHOW_TOWPOS_TT"] = "标记脚本检测到附近车辆的位置。",
 	["FLTBD_TOWING_TXT"] = "被牵引车辆：",
 	["FLTBD_MAIN_CB"] = "启用脚本",
@@ -547,7 +547,7 @@ return {
 	["YRV3_STATE_WAIT_TRANSITION"] = "等待自由模式转换。",
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "不兼容的会话。请加入免费模式。",
 	["GENERIC_VEHICLE"] = "车辆",
-	["GENERIC_UNKOWN"] = "未知",
+	["GENERIC_UNKNOWN"] = "未知",
 	["GENERIC_VALUE"] = "价值",
 	["SY_LIFT_EMPTY"] = "空的",
 	["SY_NOT_OWNED"] = "您没有废品回收场。",
@@ -854,5 +854,9 @@ return {
 	["EF_TAB_SAVED_FORGES"] = "保存的作品",
 	["GENERIC_ENABLE"] = "使能够",
 	["GENERIC_DISABLE"] = "禁用",
-	["VEH_STANCE_UPDATE_WARN"] = "您确定要覆盖 %s 已保存的姿态吗？"
+	["VEH_STANCE_UPDATE_WARN"] = "您确定要覆盖 %s 已保存的姿态吗？",
+	["ASSET_BROWSER_CONTEXT_TT"] = "右键单击打开上下文菜单。",
+	["YAV3_SYMBOL_DEFS_HINT"] = "有没有想过列表中某些操作上的符号是什么？\n\n- %s：保存为收藏夹。\n- %s：注册为命令。\n- %s：用户生成。",
+	["YAV3_LIST_VIEW_HINT"] = "“操作”选项卡和“同伴”选项卡中的动画和场景列表视图完全相同，这意味着您在一个选项卡中使用的任何过滤器也将存在于另一个选项卡中。然而，“历史记录”和“收藏夹”选项卡的情况并非如此。",
+	["YAV3_VEH_ANIM_HINT"] = "以车辆为中心的动画无法步行播放；即使对于同伴。"
 }

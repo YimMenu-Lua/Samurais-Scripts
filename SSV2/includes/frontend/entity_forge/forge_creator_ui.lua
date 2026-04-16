@@ -9,6 +9,7 @@
 
 local DrawRotationControls      = require("includes.frontend.entity_forge.rotation_axis_ui")
 local DrawMovementControls      = require("includes.frontend.entity_forge.movement_axis_ui")
+local EntityForge               = require("includes.features.extra.entity_forge.EntityForge")
 local World                     = require("includes.modules.World")
 local t_PedScenarios <const>    = require("includes.data.actions.scenarios")
 local Refs <const>              = require("includes.data.refs")

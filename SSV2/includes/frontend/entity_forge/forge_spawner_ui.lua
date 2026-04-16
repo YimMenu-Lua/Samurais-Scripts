@@ -7,14 +7,14 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local PedBrowser     = require("includes.services.asset_browsers.PedBrowser").new({
+local PedBrowser          = require("includes.services.asset_browsers.PedBrowser").new({
 	show_preview        = true,
 	show_gender_filters = true,
 	show_type_filters   = true,
 	max_entries         = 250
 })
 
-local VehicleBrowser = require("includes.services.asset_browsers.VehicleBrowser").new({
+local VehicleBrowser      = require("includes.services.asset_browsers.VehicleBrowser").new({
 	show_preview              = true,
 	show_class_filters        = true,
 	show_manufacturer_filters = true,
@@ -22,12 +22,12 @@ local VehicleBrowser = require("includes.services.asset_browsers.VehicleBrowser"
 
 })
 
-local ObjectBrowser  = require("includes.services.asset_browsers.ObjectBrowser").new({
+local ObjectBrowser       = require("includes.services.asset_browsers.ObjectBrowser").new({
 	show_preview = true,
 	max_entries = 300
 })
 
-
+local EntityForge         = require("includes.features.extra.entity_forge.EntityForge")
 local childSize           = vec2:new(0, GVars.ui.window_size.y * 0.7)
 local browser_region      = vec2:new(childSize.x, math.max(200, childSize.y - 220))
 local selectedSidebarItem = Enums.eEntityType.Ped

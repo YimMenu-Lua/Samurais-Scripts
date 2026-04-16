@@ -53,7 +53,7 @@ return {
 	["WRLD_CARPOOL"] = "拼車",
 	["WRLD_CARPOOL_TT"] = "允許您作為乘客進入 NPC 車輛。",
 	["FLTBD_SHOW_TOWPOS_CB"] = "顯示牽引位置",
-	["YAV3_STOP_BTN_HINT"] = "提示：您可以按 %s 停止播放任何動作或按住一秒鐘以清理所有內容。",
+	["YAV3_STOP_BTN_HINT"] = "提示：您可以按 %s 停止播放任何動作或按住一秒鐘以執行完全重設。",
 	["FLTBD_SHOW_TOWBOX_CB"] = "箱式ESP",
 	["FLTBD_TOWING_TXT"] = "被牽引車輛：",
 	["FLTBD_SHOW_TOWPOS_TT"] = "標記腳本檢測到附近車輛的位置。",
@@ -546,7 +546,7 @@ return {
 	["YRV3_TRIGGER_PROD_HUB_TT"] = "隨著時間的推移不斷觸發生產。這不像騎自行車的企業那樣是即時的，每次觸發之間有一個延遲（大約 20 秒）。 \n\n[重要]：在啟用此功能之前，您必須確保連接的企業已設置並正在運行，並且您的夜總會中已分配了一名技術人員。",
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "不兼容的會話。請加入免費模式。",
 	["YRV3_STATE_WAIT_TRANSITION"] = "等待自由模式轉換。",
-	["GENERIC_UNKOWN"] = "未知",
+	["GENERIC_UNKNOWN"] = "未知",
 	["GENERIC_VEHICLE"] = "車輛",
 	["GENERIC_VALUE"] = "價值",
 	["SY_LIFT_EMPTY"] = "空的",
@@ -854,5 +854,9 @@ return {
 	["EF_TAB_SPAWNER"] = "產卵者",
 	["GENERIC_ENABLE"] = "使能夠",
 	["GENERIC_DISABLE"] = "停用",
-	["VEH_STANCE_UPDATE_WARN"] = "您確定要覆蓋 %s 已保存的姿態嗎？"
+	["VEH_STANCE_UPDATE_WARN"] = "您確定要覆蓋 %s 已保存的姿態嗎？",
+	["ASSET_BROWSER_CONTEXT_TT"] = "右鍵單擊開啟上下文選單。",
+	["YAV3_LIST_VIEW_HINT"] = "「操作」標籤和「同伴」標籤中的動畫和場景清單視圖完全相同，這表示您在一個標籤中使用的任何篩選器也將存在於另一個標籤中。然而，「歷史記錄」和「收藏夾」標籤的情況並非如此。",
+	["YAV3_SYMBOL_DEFS_HINT"] = "有沒有想過清單中某些操作上的符號是什麼？ \n\n- %s：儲存為收藏夾。 \n- %s：註冊為指令。 \n- %s：使用者生成。",
+	["YAV3_VEH_ANIM_HINT"] = "以車輛為中心的動畫無法步行播放；即使對於同伴。"
 }

@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BS                         = BillionaireServices
+local BSV2                       = require("includes.features.extra.billionaire_services.BillionaireServicesV2")
 local BSdata <const>             = require("includes.data.bsv2_data")
 local HeliModels <const>         = BSdata.DefaultHeliModels
 local PresetDestinations <const> = BSdata.HeliPresetDestinations
@@ -207,13 +207,13 @@ local function drawSpawner()
 
 	ImGui.BeginDisabled(not selectedHeli)
 	if (GUI:Button(_T("BSV2_DISPATCH"), { size = vec2:new(100, 40) })) then
-		BS:CallPrivateHeli(selectedHeli.second, godMode)
+		BSV2:CallPrivateHeli(selectedHeli.second, godMode)
 	end
 	ImGui.EndDisabled()
 end
 
 local function drawSpawnedFooter()
-	local heli = BS.ActiveServices.heli
+	local heli = BSV2.ActiveServices.heli
 	if (not heli) then return end
 
 	ImGui.SetWindowFontScale(1.12)
@@ -233,14 +233,14 @@ local function drawSpawnedFooter()
 	ImGui.SameLine()
 
 	if (GUI:Button(_T("GENERIC_DISMISS"), { size = buttonSize })) then
-		BS:Dismiss(BS.SERVICE_TYPE.HELI)
+		BSV2:Dismiss(BSV2.SERVICE_TYPE.HELI)
 	end
 	ImGui.EndDisabled()
 end
 
 ---@return string tabName, function? footer
 return function()
-	local heli = BS.ActiveServices.heli
+	local heli = BSV2.ActiveServices.heli
 	if (not heli) then
 		currentTab    = "HELI_SPAWNER"
 		currentFooter = nil

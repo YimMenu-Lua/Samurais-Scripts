@@ -19,7 +19,14 @@ local eColorType <const> = {
 	NAMED = 5
 }
 
----@class NamedColors
+-- Just for LuaLS autocomplete so we don't have to memorize every field in NamedColors.
+---@alias NamedColor
+---| "yellow" 		 # 1.000, 1.000, 0.000, 1.000
+---| "orange" 		 # 1.000, 0.500, 0.000, 1.000
+---| "pink" 		 # 1.000, 0.000, 0.500, 1.000
+---| "purple" 		 # 1.000, 0.000, 1.000, 1.000
+---| "safety_yellow" # 0.941, 0.745, 0.007, 1.000
+
 local NamedColors = {
 	yellow        = { 1.000, 1.000, 0.000, 1.000 },
 	orange        = { 1.000, 0.500, 0.000, 1.000 },
@@ -111,7 +118,7 @@ end
 ---@class Color
 ---@field private m_type eColorType
 ---@field private m_source table?
----@field private m_named_colors NamedColors
+---@field private m_named_colors table<NamedColor, { [1]: float, [2]: float, [3]: float, [4]: float }>
 ---@field private __raw_ctor fun(r: float, g: float, b: float, a: float): Color
 ---@field public r float
 ---@field public g float
@@ -122,7 +129,7 @@ end
 ---@field public RED Color
 ---@field public GREEN Color
 ---@field public BLUE Color
----@overload fun(p0: string): Color
+---@overload fun(p0: string|NamedColor): Color
 ---@overload fun(p0: uint32_t): Color
 ---@overload fun(p0: vec4): Color
 ---@overload fun(r: integer, g: integer, b: integer, a: integer): Color
@@ -160,7 +167,7 @@ Color.BLUE  = Color.__raw_ctor(0, 0, 1, 1)
 -- Returns a new `Color` instance.
 --
 -- **NOTE:** Hex strings must be either `RGB` *(shorthand)* or `RRGGBB` or `RRGGBBAA`. No weird CSS formats.
----@overload fun(p0: string): Color
+---@overload fun(p0: string|NamedColor): Color
 ---@overload fun(p0: uint32_t): Color
 ---@overload fun(p0: vec4): Color
 ---@overload fun(r: integer, g: integer, b: integer, a: integer): Color

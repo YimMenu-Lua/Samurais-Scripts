@@ -239,6 +239,30 @@ function SizeOf(T, seen)
 	return 0
 end
 
+-- A switch-case construct without the closure overhead of `Switch`.
+--
+-- **Usage Example**:
+--
+--```Lua
+-- local cases = {
+--     [1] = function() return "one" end,
+--     [2] = function() return "two" end,
+--     default = "other"
+-- }
+-- local result = Match(value, cases)
+--```
+---@generic R1, R2, R3, R4, R5, R6, R7, R8, R9, R10
+---@generic K: anyval
+---@generic V
+---@param case K
+---@param cases table<K, ValueOrFunction<V>>
+---@return V|R1, R2?, R3?, R4?, R5?, R6?, R7?, R8?, R9?, R10?
+function Match(case, cases)
+	local result = cases[case] or cases["default"]
+	assert(result ~= nil, "No case matched and no default provided!")
+	return (type(result) == "function") and result() or result
+end
+
 -- A switch-case construct. This is only beneficial if you have **A LOT** of `if` statements;
 --
 -- otherwise regular `if-elseif-else` chains or cached lookup tables are faster and create less overhead.
@@ -267,36 +291,11 @@ end
 -- }
 -- local result = Match(value, cases)
 --```
----@param case number|string
+---@param case anyval
 function Switch(case)
 	return function(cases)
-		local result = cases[case] or cases["default"]
-		assert(result ~= nil, "No case matched and no default provided!")
-		return (type(result) == "function") and result() or result
+		return Match(case, cases)
 	end
-end
-
--- A switch-case construct without the closure overhead of `Switch`.
---
--- **Usage Example**:
---
---```Lua
--- local cases = {
---     [1] = function() return "one" end,
---     [2] = function() return "two" end,
---     default = "other"
--- }
--- local result = Match(value, cases)
---```
----@generic K: number|string
----@generic V
----@param case K
----@param cases table<K, ValueOrFunction<V>>
----@return V
-function Match(case, cases)
-	local result = cases[case] or cases["default"]
-	assert(result ~= nil, "No case matched and no default provided!")
-	return (type(result) == "function") and result() or result
 end
 
 ---@param e Enum
@@ -1066,11 +1065,10 @@ end
 ---@param src table
 ---@param seen? table
 function table.overwrite(this, src, seen)
-	seen = seen or {}
-	if (seen[src]) then
-		return
-	end
+	if (this == src) then return this end
 
+	seen = seen or {}
+	if (seen[src]) then return end
 	seen[src] = true
 
 	for k in pairs(this) do

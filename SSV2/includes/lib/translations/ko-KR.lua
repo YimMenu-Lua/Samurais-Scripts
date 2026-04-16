@@ -58,7 +58,7 @@ return {
 	["FLTBD_TOW_BTN"] = "끌고 가다",
 	["FLTBD_SHOW_TOWPOS_TT"] = "스크립트가 근처 차량을 감지하는 위치를 표시합니다.",
 	["WRLD_CARPOOL"] = "카풀",
-	["YAV3_STOP_BTN_HINT"] = "팁: %s를 눌러 작업 실행을 중지하거나 1초 동안 누르고 있으면 모든 내용을 정리할 수 있습니다.",
+	["YAV3_STOP_BTN_HINT"] = "팁: %s 키를 눌러 작업 실행을 중지하거나 1초 동안 길게 눌러 전체 재설정을 수행할 수 있습니다.",
 	["FLTBD_ADJUST_POS_TXT"] = "차량 위치 조정",
 	["FLTBD_SHOW_TOWBOX_CB"] = "박스 ESP",
 	["FLTBD_FAST_ADJUST_TXT"] = "더 빠르게 이동하려면 [SHIFT]를 누르세요.",
@@ -546,7 +546,7 @@ return {
 	["YRV3_MILLION_DOLLAR_TIPS_TT"] = "[비지속적]: 나이트클럽 화장실 직원에게 100만 달러의 팁을 줄 수 있습니다. 수행원은 감사할 것입니다. 귀하의 은행 계좌는 그렇지 않을 것입니다.\n\n참고: 그에게 팁을 주려면 현금이 있어야 합니다.",
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "호환되지 않는 세션입니다. 무료 모드에 참여해 보세요.",
 	["YRV3_STATE_WAIT_TRANSITION"] = "자유 모드 전환을 기다리고 있습니다.",
-	["GENERIC_UNKOWN"] = "알려지지 않은",
+	["GENERIC_UNKNOWN"] = "알려지지 않은",
 	["GENERIC_VEHICLE"] = "차량",
 	["GENERIC_VALUE"] = "값",
 	["SY_LIFT_EMPTY"] = "비어 있는",
@@ -854,5 +854,9 @@ return {
 	["EF_ALPHA_PLAYER_NOT_ALLOWED"] = "로컬 플레이어 엔터티에는 투명도 수정이 허용되지 않습니다.",
 	["GENERIC_ENABLE"] = "할 수 있게 하다",
 	["VEH_STANCE_UPDATE_WARN"] = "%s에 대해 저장된 자세를 덮어쓰시겠습니까?",
-	["GENERIC_DISABLE"] = "장애를 입히다"
+	["GENERIC_DISABLE"] = "장애를 입히다",
+	["ASSET_BROWSER_CONTEXT_TT"] = "마우스 오른쪽 버튼을 클릭하여 상황에 맞는 메뉴를 엽니다.",
+	["YAV3_LIST_VIEW_HINT"] = "애니메이션 및 시나리오 목록 보기는 '작업' 탭과 '컴패니언' 탭에서 완전히 동일합니다. 즉, 한 탭에서 사용하는 모든 필터가 다른 탭에도 존재한다는 의미입니다. 그러나 '기록' 및 '즐겨찾기' 탭에는 해당되지 않습니다.",
+	["YAV3_SYMBOL_DEFS_HINT"] = "목록에 있는 일부 작업의 기호가 무엇인지 궁금하신가요?\n\n- %s: 즐겨찾기로 저장됨.\n- %s: 명령으로 등록됨.\n- %s: 사용자 생성.",
+	["YAV3_VEH_ANIM_HINT"] = "차량 중심 애니메이션은 도보로 재생할 수 없습니다. 동료들에게도요."
 }

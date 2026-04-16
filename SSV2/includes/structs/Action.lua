@@ -22,7 +22,6 @@ local ActionTypeToString <const> = {
 ---@class Action
 ---@field data ActionData
 ---@field action_type eActionType
----@field default_flags eAnimFlags
 local Action = {}
 Action.__index = Action
 
@@ -30,17 +29,10 @@ Action.__index = Action
 ---@param action_type eActionType
 ---@return Action
 function Action.new(action_data, action_type)
-	local instance = setmetatable({
+	return setmetatable({
 		action_type = action_type,
-		data = action_data
+		data        = action_data
 	}, Action)
-
-	if (action_type == Enums.eActionType.ANIM) then
-		-- track default hardcoded flags for later. -- nvm this is broken. -- 17/12/25: wtf was-I trying to do with this?
-		instance.default_flags = action_data and action_data.flags or 0
-	end
-
-	return instance
 end
 
 ---@return string

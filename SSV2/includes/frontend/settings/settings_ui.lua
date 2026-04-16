@@ -130,6 +130,7 @@ local function drawThemeSettings()
 	if (ImGui.Begin("##new_theme",
 			ImGuiWindowFlags.NoTitleBar
 			| ImGuiWindowFlags.NoResize
+			| ImGuiWindowFlags.NoMove
 			| ImGuiWindowFlags.AlwaysAutoResize
 		)) then
 		GUI:QuickConfigWindow(_T("SETTINGS_WINDOW_NEW_THEME"), function()
@@ -251,7 +252,7 @@ local function drawThemeSettings()
 				ThemeManager:SetCurrentTheme(selectedTheme)
 			end
 			themeEditor.shouldDraw = false
-		end)
+		end, true)
 		ImGui.End()
 	end
 end

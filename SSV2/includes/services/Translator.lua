@@ -48,6 +48,7 @@ Enums.eTranslatorState = {
 ---@field private m_cache table<string, table<string, string>>
 ---@field private m_last_load_time TimePoint
 ---@field private m_state eTranslatorState
+---@field private m_deferred_batches array<array<string>|dict<string>>
 ---@field protected m_initialized boolean
 local Translator   = {}
 Translator.__index = Translator
@@ -58,17 +59,19 @@ function Translator:init()
 	if (_G.Translator) then return _G.Translator end
 
 	return setmetatable({
-		default_labels   = en_loaded and en or {},
-		locales          = locales_loaded and __locales or { "en-US" },
-		labels           = {},
-		m_cache          = {},
-		m_log_history    = {},
-		m_last_load_time = TimePoint.new(),
-		m_initialized    = true,
-		m_state          = Enums.eTranslatorState.NONE
+		default_labels     = en_loaded and en or {},
+		locales            = locales_loaded and __locales or { "en-US" },
+		labels             = {},
+		m_cache            = {},
+		m_log_history      = {},
+		m_deferred_batches = {},
+		m_last_load_time   = TimePoint.new(),
+		m_initialized      = true,
+		m_state            = Enums.eTranslatorState.NONE
 	}, Translator)
 end
 
+---@private
 ---@return boolean
 function Translator:MatchGameLanguage()
 	local current = LOCALIZATION.GET_CURRENT_LANGUAGE()
@@ -81,6 +84,7 @@ function Translator:MatchGameLanguage()
 	return false
 end
 
+---@public
 ---@param debugBreak? boolean
 function Translator:Load(debugBreak)
 	ThreadManager:Run(function()
@@ -122,10 +126,11 @@ function Translator:Load(debugBreak)
 
 		self.lang_idx = idx
 		self.m_last_load_time:Reset()
+		self:OnPostLoad()
 	end)
 end
 
----@private
+---@public
 ---@param debugBreak? boolean
 function Translator:Reload(debugBreak)
 	if (not self.m_initialized or not self.m_last_load_time:HasElapsed(3e3)) then
@@ -136,26 +141,31 @@ function Translator:Reload(debugBreak)
 	self:Load(debugBreak)
 end
 
+---@public
 ---@return boolean
 function Translator:IsReady()
 	return self.m_initialized and self.m_state == Enums.eTranslatorState.RUNNING
 end
 
+---@public
 ---@return boolean
 function Translator:IsDisabled()
 	return self.m_state == Enums.eTranslatorState.DISABLED
 end
 
+---@public
 ---@return boolean
 function Translator:IsReloading()
 	return self.m_state == Enums.eTranslatorState.RELOADING
 end
 
+---@public
 ---@return boolean
 function Translator:CanReload()
 	return self:IsReady() and self.m_last_load_time:HasElapsed(3e3)
 end
 
+---@private
 ---@param message string
 function Translator:Warn(message)
 	if (self.m_log_history[message]) then
@@ -166,16 +176,7 @@ function Translator:Warn(message)
 	self.m_log_history[message] = true
 end
 
----@return eTranslatorState
-function Translator:GetState()
-	return self.m_state
-end
-
----@return table<string, table<string, string>>
-function Translator:GetCache()
-	return self.m_cache
-end
-
+---@private
 ---@param label string
 ---@return string
 function Translator:GetCachedLabel(label)
@@ -185,6 +186,7 @@ function Translator:GetCachedLabel(label)
 	return self.m_cache[self.lang_idx][label]
 end
 
+---@private
 ---@param label string
 ---@param text string
 function Translator:CacheLabel(label, text)
@@ -194,7 +196,20 @@ function Translator:CacheLabel(label, text)
 	self.m_cache[self.lang_idx][label] = text
 end
 
+---@public
+---@return eTranslatorState
+function Translator:GetState()
+	return self.m_state
+end
+
+---@public
+---@return table<string, table<string, string>>
+function Translator:GetCache()
+	return self.m_cache
+end
+
 -- Translates text to the user's language.
+---@public
 ---@param label string
 ---@return string
 function Translator:Translate(label)
@@ -227,23 +242,27 @@ function Translator:Translate(label)
 	return text
 end
 
--- Translates text using GXTs if expected and available.
----@param label string
----@return string
-function Translator:TranslateGXT(label)
-	local GXT = Game.GetGXTLabel(label)
-	if (string.isvalid(GXT) and GXT ~= "NULL") then
-		return GXT             -- get label from the game.
-	else
-		return self:Translate(label) -- no GXT; use our own translations
+---@param labels array<string>|dict<string>
+function Translator:TranslateGXTList(labels)
+	if (not self:IsReady()) then
+		table.insert(self.m_deferred_batches, labels)
+		return
+	end
+
+	for k, v in pairs(labels) do
+		labels[k] = Game.GetGXTLabel(v)
 	end
 end
 
----@param labels array<string>
-function Translator:TranslateGXTList(labels)
-	for k, v in pairs(labels) do
-		labels[k] = self:TranslateGXT(v)
+---@private
+function Translator:OnPostLoad()
+	for _, batch in ipairs(self.m_deferred_batches) do
+		for k, v in pairs(batch) do
+			batch[k] = Game.GetGXTLabel(v)
+		end
 	end
+
+	self.m_deferred_batches = {}
 end
 
 -- This is called in `Backend`'s main thread.

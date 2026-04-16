@@ -49,7 +49,7 @@ return {
 	["WRLD_EXTEND_BOUNDS"] = "Amplie as Fronteiras Mundiais",
 	["WRLD_EXTEND_BOUNDS_TT"] = "Permite que você viaje pelo mundo em qualquer direção.",
 	["WRLD_CARPOOL_TT"] = "Permite que você entre em veículos NPC como passageiro.",
-	["YAV3_STOP_BTN_HINT"] = "DICA: Você pode pressionar %s para parar de executar qualquer ação ou mantê-lo pressionado por um segundo para limpar tudo.",
+	["YAV3_STOP_BTN_HINT"] = "DICA: Você pode pressionar %s para parar de executar qualquer ação ou mantê-lo pressionado por um segundo para realizar uma reinicialização completa.",
 	["FLTBD_MAIN_CB"] = "Habilitar script",
 	["FLTBD_SHOW_TOWPOS_CB"] = "Mostrar posição de reboque",
 	["WRLD_CARPOOL"] = "Carona",
@@ -549,7 +549,7 @@ return {
 	["GENERIC_VEHICLE"] = "Veículo",
 	["GENERIC_VALUE"] = "Valor",
 	["SY_LIFT_EMPTY"] = "Vazio",
-	["GENERIC_UNKOWN"] = "Desconhecido",
+	["GENERIC_UNKNOWN"] = "Desconhecido",
 	["SY_CURRENT_ROBBERY"] = "Roubo Ativo: %s",
 	["SY_ROB_AVAILABLE"] = "Disponível.",
 	["SY_ROB_IN_PROGRESS"] = "Em andamento.",
@@ -854,5 +854,9 @@ return {
 	["EF_TAB_SPAWNER"] = "Gerador",
 	["GENERIC_ENABLE"] = "Habilitar",
 	["GENERIC_DISABLE"] = "Desativar",
-	["VEH_STANCE_UPDATE_WARN"] = "Tem certeza de que deseja substituir a postura salva para %s ?"
+	["VEH_STANCE_UPDATE_WARN"] = "Tem certeza de que deseja substituir a postura salva para %s ?",
+	["ASSET_BROWSER_CONTEXT_TT"] = "Clique com o botão direito para abrir o menu de contexto.",
+	["YAV3_SYMBOL_DEFS_HINT"] = "Você já se perguntou quais são os símbolos de algumas ações da lista?\n\n- %s: salvo como favorito.\n- %s: registrado como um comando.\n- %s: gerado pelo usuário.",
+	["YAV3_LIST_VIEW_HINT"] = "As visualizações de lista de animação e cenário são exatamente as mesmas na guia 'Ações' e na guia 'Companheiros', o que significa que quaisquer filtros que você usar em uma guia também existirão na outra. No entanto, este não é o caso das guias 'histórico' e 'favoritos'.",
+	["YAV3_VEH_ANIM_HINT"] = "As animações centradas no veículo não podem ser reproduzidas a pé; mesmo para companheiros."
 }

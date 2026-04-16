@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local BSV2              = require("includes.features.extra.billionaire_services.BillionaireServicesV2")
 local WeaponBrowser     = require("includes.services.asset_browsers.WeaponBrowser").new()
 local PedBrowser        = require("includes.services.asset_browsers.PedBrowser").new({
 	max_entries         = 250,
@@ -16,7 +17,6 @@ local PedBrowser        = require("includes.services.asset_browsers.PedBrowser")
 	show_type_filters   = true,
 })
 
-local BS                = BillionaireServices
 local godmode           = false
 local noRagdoll         = false
 local allWeapons        = false
@@ -51,7 +51,7 @@ local function drawSpawnFooter()
 	ImGui.SameLine()
 
 	if (GUI:Button(_T("GENERIC_RANDOM")) and selectedPed) then
-		nameBuff = BS:GetRandomPedName(selectedPed.ped_gender)
+		nameBuff = BSV2:GetRandomPedName(selectedPed.ped_gender)
 	end
 
 	ImGui.SeparatorText(_T("BSV2_WEAPONS_LABEL"))
@@ -69,11 +69,11 @@ local function drawSpawnFooter()
 			return
 		end
 
-		BS:SpawnBodyguard(
+		BSV2:SpawnBodyguard(
 			selectedPed.model_hash,
 			#nameBuff > 0
 			and nameBuff
-			or BS:GetRandomPedName(selectedPed.ped_gender),
+			or BSV2:GetRandomPedName(selectedPed.ped_gender),
 			nil,
 			allWeapons or weaponHash,
 			godmode,
@@ -88,13 +88,13 @@ end
 
 local function drawSpawnedBodyguards()
 	if (ImGui.BeginListBox("##guardlist", -1, -1)) then
-		if (next(BS.Bodyguards) == nil) then
+		if (next(BSV2.Bodyguards) == nil) then
 			ImGui.Text(_T("BSV2_BG_SPAWNED_NONE"))
 			ImGui.EndListBox()
 			return
 		end
 
-		for i, guard in pairs(BS.Bodyguards) do
+		for i, guard in pairs(BSV2.Bodyguards) do
 			ImGui.PushID(i)
 			local is_selected = (bodyguardIdx == i)
 			if (ImGui.Selectable(guard.name, is_selected)) then
@@ -143,7 +143,7 @@ local function drawSpawnedBodyguards()
 
 				if (ImGui.MenuItem(_T("GENERIC_DISMISS"))) then
 					GUI:PlaySound("Cancel")
-					BS:DismissBodyguard(guard)
+					BSV2:DismissBodyguard(guard)
 				end
 
 				ImGui.EndDisabled()
@@ -155,7 +155,7 @@ local function drawSpawnedBodyguards()
 end
 
 local function drawSpawnedBodyguardsFooter()
-	selectedBodyguard = BS.Bodyguards[bodyguardIdx]
+	selectedBodyguard = BSV2.Bodyguards[bodyguardIdx]
 	if (not selectedBodyguard) then
 		return
 	end
@@ -175,14 +175,14 @@ local function drawSpawnedBodyguardsFooter()
 
 	ImGui.BeginDisabled(selectedBodyguard.wasDismissed)
 	if (GUI:Button(_T("GENERIC_DISMISS"), { size = vec2:new(80, 35) })) then
-		BS:DismissBodyguard(selectedBodyguard)
+		BSV2:DismissBodyguard(selectedBodyguard)
 	end
 	ImGui.EndDisabled()
 
 	ImGui.SameLine()
-	ImGui.BeginDisabled(table.getlen(BS.Bodyguards) <= 1)
+	ImGui.BeginDisabled(table.getlen(BSV2.Bodyguards) <= 1)
 	if (GUI:Button(_T("GENERIC_DISMISS_ALL"))) then
-		BS:Dismiss(BS.SERVICE_TYPE.BODYGUARD)
+		BSV2:Dismiss(BSV2.SERVICE_TYPE.BODYGUARD)
 	end
 	ImGui.EndDisabled()
 	ImGui.EndChild()

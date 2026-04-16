@@ -7,38 +7,32 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local selectedTabID         = 1
+local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
 local colMoneyGreen <const> = Color("#85BB65")
-local tabNames <const>      = {
-	"GB_BOSSC",
-	"CELL_HANGAR",
-	"GB_REST_ACCM",
-	"CELL_BUNKER",
-	"CELL_ACID_LAB",
-	"CELL_CLUB",
-	"YRV3_CASH_SAFES_LABEL",
-	"MP_CARWASH",
-	"CELL_SLVG_YRD",
-	"GENERIC_MISC",
-	"CELL_16"
-}
+local TABS <const>          = {
+	{ label = "GB_BOSSC",              isGXT = true,  callback = require("office_ui") },
+	{ label = "CELL_HANGAR",           isGXT = true,  callback = require("hangar_ui") },
+	{ label = "GB_REST_ACCM",          isGXT = true,  callback = require("clubhouse_ui") },
+	{ label = "CELL_BUNKER",           isGXT = true,  callback = require("bunker_ui") },
+	{ label = "CELL_ACID_LAB",         isGXT = true,  callback = require("acid_lab_ui") },
+	{ label = "CELL_CLUB",             isGXT = true,  callback = require("nightclub_ui") },
+	{ label = "YRV3_CASH_SAFES_LABEL", isGXT = false, callback = require("cash_safes_ui") },
+	{ label = "MP_CARWASH",            isGXT = true,  callback = require("money_fronts_ui") },
+	{ label = "CELL_SLVG_YRD",         isGXT = true,  callback = require("salvage_yard_ui") },
+	{ label = "GENERIC_MISC",          isGXT = false, callback = require("misc_ui") },
+	{ label = "CELL_16",               isGXT = true,  callback = require("yrv3_settings_ui") },
+}; local selectedTab        = TABS[1]
 
-local tabCallbacks <const>  = {
-	require("includes.frontend.yim_resupplier.office"),
-	require("includes.frontend.yim_resupplier.hangar"),
-	require("includes.frontend.yim_resupplier.clubhouse"),
-	require("includes.frontend.yim_resupplier.bunker"),
-	require("includes.frontend.yim_resupplier.acid_lab"),
-	require("includes.frontend.yim_resupplier.nightclub"),
-	require("includes.frontend.yim_resupplier.cash_safes"),
-	require("includes.frontend.yim_resupplier.money_fronts"),
-	require("includes.frontend.yim_resupplier.salvage_yard"),
-	require("includes.frontend.yim_resupplier.misc"),
-	require("includes.frontend.yim_resupplier.settings"),
-}
+ThreadManager:Run(function()
+	for _, v in ipairs(TABS) do
+		if (v.isGXT) then
+			v.label = Game.GetGXTLabel(v.label)
+		end
+	end
+end)
 
 ---@return boolean
-local function handleYRV3State()
+local function handleState()
 	local __state = YRV3:GetState()
 	local message = YRV3:GetLastError()
 
@@ -64,38 +58,36 @@ local function handleYRV3State()
 	return false
 end
 
-local function YRV3UI()
-	if (not handleYRV3State()) then
-		return
-	end
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimResupplierV3", function()
+	if (not handleState()) then return end
 
 	local headerHeight   = 100.0
-	local windowHeight   = math.max(400, GVars.ui.window_size.y - headerHeight - 100.0)
+	local footerPadding  = 100.0
+	local windowHeight   = math.max(400, GVars.ui.window_size.y - headerHeight - footerPadding)
 	local sidebarWidth   = math.max(100.0, ImGui.GetWindowWidth() * 0.2)
 	local separatorWidth = 3.0
 
-	if (ImGui.BeginChildEx("##yrv3_header", vec2:new(0, headerHeight), ImGuiChildFlags.Borders)) then
-		local title     = _T("YRV3_MCT_TITLE")
-		local textWidth = ImGui.CalcTextSize(title) + (ImGui.GetStyle().FramePadding.x * 2)
-		ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - textWidth) * 0.5)
+	ImGui.BeginChildEx("##yrv3_header", vec2:new(0, headerHeight), ImGuiChildFlags.Borders)
+	local title     = _T("YRV3_MCT_TITLE")
+	local textWidth = ImGui.CalcTextSize(title) + (ImGui.GetStyle().FramePadding.x * 2)
+	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - textWidth) * 0.5)
 
-		if (GUI:Button(title)) then
-			if (YRV3:IsAnySaleInProgress()) then
-				Notifier:ShowMessage("YRV3", _T("YRV3_MCT_UNAVAIL"))
-			else
-				YRV3:MCT()
-				GUI:Close(true)
-			end
+	if (GUI:Button(title)) then
+		if (YRV3:IsAnySaleInProgress()) then
+			Notifier:ShowMessage("YRV3", _T("YRV3_MCT_UNAVAIL"))
+		else
+			YRV3:MCT()
+			GUI:Close(true)
 		end
-
-		ImGui.Spacing()
-		ImGui.SetWindowFontScale(0.9)
-		ImGui.BulletText(_T("YRV3_INCOME_APPROX_ALL"))
-		ImGui.SameLine()
-		GUI:Text(string.formatmoney(YRV3:GetEstimatedIncome() or 0), { color = colMoneyGreen })
-		ImGui.SetWindowFontScale(1)
-		ImGui.EndChild()
 	end
+
+	ImGui.Spacing()
+	ImGui.SetWindowFontScale(0.9)
+	ImGui.BulletText(_T("YRV3_INCOME_APPROX_ALL"))
+	ImGui.SameLine()
+	GUI:Text(string.formatmoney(YRV3:GetEstimatedIncome() or 0), { color = colMoneyGreen })
+	ImGui.SetWindowFontScale(1)
+	ImGui.EndChild()
 
 	ImGui.Spacing()
 	ImGui.SetNextWindowBgAlpha(0)
@@ -103,39 +95,24 @@ local function YRV3UI()
 
 	ImGui.SetNextWindowBgAlpha(0)
 	ImGui.BeginChild("##yrv3_3", sidebarWidth, 0)
-	for i = 1, #tabNames do
-		local name = tabNames[i]
+	for i, v in ipairs(TABS) do
+		local label = v.label
 		if (ImGui.Selectable2(
-				name,
-				i == selectedTabID,
+				v.isGXT and label or _T(label),
+				(v == selectedTab),
 				vec2:new(sidebarWidth, 27),
 				"center",
 				true
 			)) then
-			selectedTabID = i
+			selectedTab = v
 		end
 	end
 	ImGui.EndChild()
-
 	ImGui.VerticalSeparator(separatorWidth)
-
 	ImGui.SetNextWindowBgAlpha(0)
 	ImGui.BeginChild("##yrv3_4")
-	local callback = tabCallbacks[selectedTabID]
-	if (type(callback) == "function") then
-		callback()
-	end
+	selectedTab.callback()
 	ImGui.EndChild()
 
 	ImGui.EndChild()
-end
-
-GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "YimResupplierV3", YRV3UI)
-
-ThreadManager:Run(function()
-	while (not Translator:IsReady()) do
-		yield()
-	end
-
-	Translator:TranslateGXTList(tabNames)
 end)

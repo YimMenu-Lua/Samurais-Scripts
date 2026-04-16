@@ -55,7 +55,7 @@ return {
 	["WRLD_WANTED_MUSIC"] = "必要な音楽を無効にする",
 	["FLTBD_MAIN_CB"] = "スクリプトを有効にする",
 	["FLTBD_SHOW_TOWBOX_CB"] = "ボックスESP",
-	["YAV3_STOP_BTN_HINT"] = "ヒント: %s を押してアクションの再生を停止するか、1 秒間押し続けるとすべてをクリーンアップできます。",
+	["YAV3_STOP_BTN_HINT"] = "ヒント: %s を押してアクションの再生を停止するか、1 秒間押し続けると完全にリセットできます。",
 	["FLTBD_SHOW_TOWBOX_TT"] = "ターゲット車両の周囲に ESP ボックスを描画します。",
 	["WRLD_CARPOOL_TT"] = "NPC車両に乗客として乗車できるようになります。",
 	["FLTBD_SHOW_TOWPOS_TT"] = "スクリプトが近くの車両を検出した位置をマークします。",
@@ -547,7 +547,7 @@ return {
 	["YRV3_STATE_ERR_WRONG_SESSION"] = "互換性のないセッションです。フリーモードに参加してください。",
 	["YRV3_STATE_WAIT_TRANSITION"] = "フリーモードへの移行を待っています。",
 	["GENERIC_VEHICLE"] = "車両",
-	["GENERIC_UNKOWN"] = "未知",
+	["GENERIC_UNKNOWN"] = "未知",
 	["GENERIC_VALUE"] = "価値",
 	["SY_LIFT_EMPTY"] = "空の",
 	["SY_NOT_OWNED"] = "あなたはサルベージヤードを所有していません。",
@@ -854,5 +854,9 @@ return {
 	["EF_TAB_SPAWNER"] = "スポナー",
 	["GENERIC_ENABLE"] = "有効にする",
 	["GENERIC_DISABLE"] = "無効にする",
-	["VEH_STANCE_UPDATE_WARN"] = "%s に保存されたスタンスを上書きしてもよろしいですか?"
+	["VEH_STANCE_UPDATE_WARN"] = "%s に保存されたスタンスを上書きしてもよろしいですか?",
+	["ASSET_BROWSER_CONTEXT_TT"] = "右クリックしてコンテキスト メニューを開きます。",
+	["YAV3_LIST_VIEW_HINT"] = "アニメーションとシナリオのリスト ビューは、[アクション] タブと [コンパニオン] タブでまったく同じです。つまり、一方のタブで使用したフィルターはもう一方のタブにも存在します。ただし、「履歴」タブと「お気に入り」タブには当てはまりません。",
+	["YAV3_SYMBOL_DEFS_HINT"] = "リスト内の一部のアクションの記号が何なのか考えたことはありますか?\n\n- %s: お気に入りとして保存されました。\n- %s: コマンドとして登録されました。\n- %s: ユーザーが生成しました。",
+	["YAV3_VEH_ANIM_HINT"] = "乗り物中心のアニメーションは徒歩では再生できません。仲間に対しても。"
 }

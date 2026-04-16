@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BS                = BillionaireServices
+local BSV2              = require("includes.features.extra.billionaire_services.BillionaireServicesV2")
 local BSdata <const>    = require("includes.data.bsv2_data")
 local JetModels <const> = BSdata.DefaultJetModels
 local Airports <const>  = BSdata.Airports
@@ -67,7 +67,7 @@ local function drawSpawner()
 
 	ImGui.BeginDisabled(not selectedJet or not selectedAirport)
 	if (GUI:Button(_T("BSV2_DISPATCH"), { size = vec2:new(100, 40) })) then
-		BS:CallPrivateJet(selectedJet.model, selectedAirport)
+		BSV2:CallPrivateJet(selectedJet.model, selectedAirport)
 	end
 	ImGui.EndDisabled()
 	GUI:HelpMarker(_T("BSV2_JET_TOO_FAR_WARN"))
@@ -193,7 +193,7 @@ local function drawSpawnedJet(jet)
 end
 
 local function SpawnedJetFooter()
-	local jet = BS.ActiveServices.jet
+	local jet = BSV2.ActiveServices.jet
 	if (not jet) then return end
 
 	ImGui.SetWindowFontScale(1.12)
@@ -213,13 +213,13 @@ local function SpawnedJetFooter()
 	ImGui.SameLine()
 
 	if (GUI:Button(_T("GENERIC_DISMISS"), buttonSize)) then
-		BS:Dismiss(BS.SERVICE_TYPE.JET)
+		BSV2:Dismiss(BSV2.SERVICE_TYPE.JET)
 	end
 end
 
 ---@return string tabName, function? footer
 return function()
-	local jet = BS.ActiveServices.jet
+	local jet = BSV2.ActiveServices.jet
 	if (not jet) then
 		drawSpawner()
 		currentTab    = "JET_SPAWNER"

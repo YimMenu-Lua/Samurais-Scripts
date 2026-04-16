@@ -249,6 +249,7 @@ function Theme:serialize()
 	return __t
 end
 
+-- Static method
 ---@param t table
 ---@return Theme
 function Theme.deserialize(t)
@@ -274,6 +275,12 @@ function Theme.deserialize(t)
 
 	newTheme:Normalize()
 	return newTheme
+end
+
+-- Static method
+---@param theme Theme
+function Theme.IsRawTable(theme)
+	return getmetatable(theme) == nil or type(theme.new) == "nil"
 end
 
 if (Serializer) then

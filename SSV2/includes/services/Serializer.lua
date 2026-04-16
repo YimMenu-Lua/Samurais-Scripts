@@ -23,8 +23,8 @@ local eSerializerState <const> = {
 -- Optional parameters
 ---@ignore
 ---@class SerializerOptionals
----@field pretty? boolean Pretty Encoding
----@field indent? integer Number of indentations for pretty encoding.
+---@field pretty? boolean Pretty encoding (defaults to true)
+---@field indent? integer Number of indentations for pretty encoding (defaults to 4 spaces).
 ---@field strict_parsing? boolean -- Refer to the Json package
 ---@field encryption_key? string -- Optional key for XOR encryption
 
@@ -111,16 +111,19 @@ end
 ---@param runtime_vars? table Runtime variables that will be tracked for auto-save.
 ---@param varargs? SerializerOptionals
 function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
-	varargs                = varargs or {}
+	varargs = varargs or {}
+	if (varargs.pretty == nil) then
+		varargs.pretty = true
+	end
+
 	script_name            = script_name or (Backend and Backend.script_name or ("unk_cfg_%s"):format(DateTime:Now():Format("%H_%M_%S")))
 	local filename         = script_name:snakecase()
-
 	self.m_default_config  = default_config or { __version = Backend and Backend.__version or self.__version }
 	self.m_file_name       = _F("%s.json", filename)
 	self.m_backup_file     = _F("%s.bak", filename)
 	self.m_xor_key         = varargs.encryption_key or XOR_KEY
 	self.m_parsing_options = {
-		pretty         = (varargs.pretty ~= nil) and varargs.pretty or true,
+		pretty         = varargs.pretty,
 		indent         = string.rep(" ", varargs.indent or 4),
 		strict_parsing = varargs.strict_parsing or false,
 	}
@@ -341,7 +344,6 @@ end
 ---@param fun function
 function Serializer:WithLock(fun)
 	if (self:IsDisabled()) then
-		fun()
 		return
 	end
 
@@ -352,7 +354,6 @@ function Serializer:WithLock(fun)
 	end
 
 	self.m_locked = true
-
 	ThreadManager:Run(function()
 		while (#self.m_lock_queue > 0) do
 			local f = table.remove(self.m_lock_queue, 1)
@@ -525,6 +526,16 @@ function Serializer:OnParseError(msg)
 	self.m_disabled = true
 end
 
+---@private
+---@param msg? string
+---@return Config
+function Serializer:OnReadError(msg)
+	msg = msg or "Unknown error."
+	log.fwarning("[Serializer]: Error reading data: %s", msg)
+	self.m_disabled = true
+	return table.copy(self.m_default_config)
+end
+
 ---@param data any
 function Serializer:Parse(data)
 	if (self:IsDisabled()) then
@@ -560,16 +571,12 @@ function Serializer:Read()
 
 	local f <close> = io.open(self.m_file_name, "r")
 	if (not f) then
-		log.warning("[Serializer]: Failed to read config file!")
-		self.m_disabled = true
-		return table.copy(self.m_default_config)
+		return self:OnReadError("Failed to open file.")
 	end
 
 	local data = f:read("a")
 	if (not data or #data == 0) then
-		log.warning("[Serializer]: Config data is empty or unreadable.")
-		self.m_disabled = true
-		return table.copy(self.m_default_config)
+		return self:OnReadError("Empty or corrupted config.")
 	end
 
 	if (self:IsEncrypted(data)) then
@@ -582,12 +589,14 @@ end
 ---@param item_path string
 ---@return any
 function Serializer:ReadItem(item_path)
-	if (type(GVars) ~= "table") then
+	---@type Config?
+	local T = GVars
+	if (type(T) ~= "table") then
 		log.warning("[Serializer]: No global runtime variables table! Returning default value.")
-		return table.get_nested_key(self.m_default_config, item_path)
+		T = self.m_default_config
 	end
 
-	return table.get_nested_key(GVars, item_path)
+	return table.get_nested_key(T, item_path)
 end
 
 ---@param item_path string
@@ -639,8 +648,8 @@ function Serializer:Reset(exceptions)
 	end
 
 	self:WithLock(function()
-		GUI:Close()
 		self.m_state = eSerializerState.SUSPENDED
+		GUI:Close()
 		sleep(1)
 
 		local temp = {}
@@ -783,7 +792,7 @@ function Serializer:WriteToFile(filename, data)
 		return
 	end
 
-	if (type(filename) ~= "string" or not filename:endswith(".json")) then
+	if (not string.isvalid(filename)) then
 		log.warning("[Serializer]: Invalid file name.")
 		return
 	end
@@ -918,7 +927,7 @@ function Serializer:OnShutdown()
 end
 
 ---@private
----@param mode number 0 | 1
+---@param mode? 0 | 1
 function Serializer:DebugBreak(mode)
 	if (not Backend.debug_mode) then
 		return

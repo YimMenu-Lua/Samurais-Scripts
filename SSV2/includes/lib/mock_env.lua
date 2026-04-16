@@ -15,7 +15,7 @@ MockEnv.__index = MockEnv
 local function NOP() end
 
 function MockEnv.Setup(version)
-	if (version ~= Enums.eAPIVersion.L54) then
+	if (version ~= Enums.eGameBranch.MOCK) then
 		return
 	end
 

@@ -18,7 +18,7 @@
 ---@field build string
 ---@field online string
 
----@alias GAME_VERSION table<eAPIVersion, VersionInfo>
+---@alias GAME_VERSION table<eGameBranch, VersionInfo>
 
 local SCRIPT_NAME <const>    = "Samurai's Scripts"
 local SCRIPT_VERSION <const> = require("includes.version")
@@ -98,14 +98,6 @@ Translator      = require("includes.services.Translator")
 ----------------------------------------------------------------------------------------------------
 
 
------------------ Big Features (for smaller features, refer to includes/features) ------------------
-BillionaireServices = require("includes.features.BillionaireServicesV2"):init()
-EntityForge         = require("includes.features.EntityForge"):init()
-YimActions          = require("includes.features.YimActionsV3"):init()
-YRV3                = require("includes.features.YimResupplierV3"):init()
-----------------------------------------------------------------------------------------------------
-
-
 local base_path = "includes"
 local packages  = {
 	"modules.Audio",
@@ -127,7 +119,7 @@ local packages  = {
 	"frontend.settings.settings_ui",
 	"frontend.vehicle.vehicle_ui",
 	"frontend.world_ui",
-	"frontend.yav3_ui",
+	"frontend.yim_actions.yav3_ui",
 	"frontend.yim_resupplier.yrv3_ui",
 }
 
