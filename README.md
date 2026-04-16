@@ -125,7 +125,7 @@ A full list of available features and their usage [can be found here](docs/Featu
 
 <div>
   <a href="https://discord.gg/RHBUxJ5Qhp">
-    <img height="96" width="192" alt="Discord" src="https://substackcdn.com/image/fetch/$s_!nfCP!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F8a41e45e-aac9-44e5-8b69-55a81058ecbf_875x280.png">
+    <img height="64" width="192" alt="Discord" src="https://substackcdn.com/image/fetch/$s_!nfCP!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F8a41e45e-aac9-44e5-8b69-55a81058ecbf_875x280.png">
   </a>
 </div>
 
