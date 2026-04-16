@@ -48,7 +48,7 @@ local SideBarTips <const> = {
 local function DrawTipsIndicator(currentIndex)
 	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 1, 1)
 	for i = 1, tipsCount do
-		ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 8)
+		ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 10)
 		ImGui.BeginDisabled(i ~= currentIndex)
 		ImGui.Text(".")
 		ImGui.EndDisabled()
@@ -99,7 +99,7 @@ local function DrawSidebar()
 	local sidebarTip = SideBarTips[sidebarTipIndex]()
 	ImGui.SetWindowFontScale(0.70)
 	local _, textHeight = ImGui.CalcTextSize(sidebarTip, false, region.x)
-	ImGui.SetCursorPos(0.0, math.max(ImGui.GetCursorPosY(), ImGui.GetCursorPosY() + region.y - textHeight - 30))
+	ImGui.SetCursorPos(0.0, math.max(ImGui.GetCursorPosY(), ImGui.GetCursorPosY() + region.y - textHeight - 25))
 	ImGui.TextWrapped(sidebarTip)
 	if (ImGui.SmallButton("<    ")) then
 		GUI:PlaySound(GUI.Sounds.Nav)
