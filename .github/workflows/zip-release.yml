@@ -172,8 +172,9 @@ jobs:
       uses: thedoctor0/zip-release@0.7.6
       with:
         type: 'zip'
-        filename: "Samurais_Scripts_${{ steps.increment_tag.outputs.version_number }}.zip"
-        exclusions: /.git* /dev* /docs* **.json **.md **.editorconfig **.py **.txt *.ps1 .gitignore LICENSE
+        path: './SSV2'
+        filename: 'Samurais_Scripts_${{ steps.increment_tag.outputs.version_number }}.zip'
+        exclusions: '**/*.json **/*.md **/*.editorconfig **/*.py **/*.txt **/*.ps1 **/*.gitignore'
 
     - name: Upload Release
       if: steps.check_changes.outputs.should_proceed == 'true'

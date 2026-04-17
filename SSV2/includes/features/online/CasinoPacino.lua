@@ -190,29 +190,24 @@ function CasinoPacino:SetPokerCards(player_id, players_current_table, card_one, 
 	local three_card_poker_deck_size       = SGSL:Get(SGSL.data.three_card_poker_deck_size):GetValue()
 	local three_card_poker_anti_cheat      = tcp_ac_obj:GetValue()
 	local three_card_poker_anti_cheat_deck = tcp_ac_obj:GetOffset(1)
-
-
-	local TCPCards = ScriptLocal(three_card_poker_cards, "three_card_poker")
+	local TCPCards                         = ScriptLocal(three_card_poker_cards, "three_card_poker")
 		:At(three_card_poker_current_deck)
 		:At(1)
 		:At(players_current_table * three_card_poker_deck_size)
 		:At(2)
 
-	local TCPAC    = ScriptLocal(three_card_poker_anti_cheat, "three_card_poker")
+	local TCPAC                            = ScriptLocal(three_card_poker_anti_cheat, "three_card_poker")
 		:At(three_card_poker_anti_cheat_deck)
 		:At(1)
 		:At(1)
 		:At(players_current_table * three_card_poker_deck_size)
 
 
-	TCPCards:At(1):At(player_id * 3):WriteInt(card_one)
-	TCPAC:At(1):At(player_id * 3):WriteInt(card_one)
-
-	TCPCards:At(2):At(player_id * 3):WriteInt(card_two)
-	TCPAC:At(2):At(player_id * 3):WriteInt(card_two)
-
-	TCPCards:At(3):At(player_id * 3):WriteInt(card_three)
-	TCPAC:At(3):At(player_id * 3):WriteInt(card_three)
+	local base = player_id * 3
+	for i, card in ipairs({ card_one, card_two, card_three }) do
+		TCPCards:At(i):At(base):WriteInt(card)
+		TCPAC:At(i):At(base):WriteInt(card)
+	end
 end
 
 function CasinoPacino:ForcePokerCards()
@@ -283,7 +278,6 @@ function CasinoPacino:ForceRouletteWheel()
 	local roulette_master_table   = rmt_obj:GetValue()
 	local roulette_outcomes_table = rmt_obj:GetOffset(1)
 	local roulette_ball_table     = SGSL:Get(SGSL.data.roulette_ball_table_offset):GetValue()
-
 	for table_iter = 0, 6, 1 do
 		locals.set_int(
 			"casinoroulette",

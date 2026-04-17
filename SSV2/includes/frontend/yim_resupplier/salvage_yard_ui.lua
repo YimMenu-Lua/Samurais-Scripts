@@ -14,19 +14,19 @@ local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloo
 local colMoneyGreen <const>  = Color("#85BB65")
 local childWidth             = 240
 
----@type array<integer>
+---@type table<integer, integer>
 local bulletWidths           = {}
 
 return function()
-	local salvage_yard = YRV3:GetSalvageYard()
-	if (not salvage_yard) then
+	local SalvageYard = YRV3:GetSalvageYard()
+	if (not SalvageYard) then
 		ImGui.Text(_T("SY_NOT_OWNED"))
 		return
 	end
 
 	drawNamePlate(
-		salvage_yard,
-		salvage_yard:GetName(),
+		SalvageYard,
+		SalvageYard:GetName(),
 		Color(ImGui.GetStyleColorVec4(ImGuiCol.Text)),
 		true
 	)
@@ -44,7 +44,7 @@ return function()
 		bulletWidths[lang_index] = bulletWidth
 	end
 
-	local cashSafe  = salvage_yard:GetCashSafe()
+	local cashSafe  = SalvageYard:GetCashSafe()
 	local cashValue = cashSafe:GetCashValue()
 	local maxCash   = cashSafe:GetCapacity()
 
@@ -57,14 +57,14 @@ return function()
 		string.formatmoney(cashValue)
 	)
 
-	local threshold = salvage_yard:GetIncomeThreshold()
+	local threshold = SalvageYard:GetIncomeThreshold()
 	ImGui.BulletText(_T("SY_INCOME_THRESHOLD"))
 	ImGui.SameLine(bulletWidth)
 	ImGui.ProgressBar(threshold / 100, -1, 25)
 
-	ImGui.BeginDisabled(salvage_yard:GetIncomeThreshold() >= 100)
+	ImGui.BeginDisabled(SalvageYard:GetIncomeThreshold() >= 100)
 	if (GUI:Button(_T("SY_MAX_THRESHOLD"))) then
-		salvage_yard:MaximizeIncome()
+		SalvageYard:MaximizeIncome()
 	end
 	ImGui.EndDisabled()
 
@@ -74,9 +74,9 @@ return function()
 		{
 			onClick = function(v)
 				if (v) then
-					salvage_yard:LockIncomeDecay()
+					SalvageYard:LockIncomeDecay()
 				else
-					salvage_yard:RestoreIncomeDecay()
+					SalvageYard:RestoreIncomeDecay()
 				end
 			end,
 		}
@@ -98,9 +98,9 @@ return function()
 				end
 			}
 		)
-		ImGui.BeginDisabled(not salvage_yard:IsTowMissionActive() or salvage_yard:IsBringingTowMissionTarget())
+		ImGui.BeginDisabled(not SalvageYard:IsTowMissionActive() or SalvageYard:IsBringingTowMissionTarget())
 		if (GUI:Button(_T("SY_TOW_MISSION_BRING_VEH"))) then
-			salvage_yard:BringTowMissionTarget()
+			SalvageYard:BringTowMissionTarget()
 		end
 		ImGui.EndDisabled()
 		GUI:HelpMarker(_T("SY_TOW_MISSION_BRING_VEH_TT"))
@@ -109,7 +109,7 @@ return function()
 		ImGui.Separator()
 
 		for i = 1, 2 do
-			local isTaken = salvage_yard:IsLiftTaken(i)
+			local isTaken = SalvageYard:IsLiftTaken(i)
 			ImGui.SetNextWindowBgAlpha(0.64)
 			ImGui.BeginDisabled(not isTaken)
 			ImGui.BeginChildEx(
@@ -124,9 +124,9 @@ return function()
 			if (not isTaken) then
 				ImGui.Text(_T("SY_LIFT_EMPTY"))
 			else
-				local vehName   = Game.GetVehicleDisplayName(salvage_yard:GetCarModelOnLift(i))
-				local value     = string.formatmoney(salvage_yard:GetCarValueOnLift(i))
-				local timeleft  = salvage_yard:GetSalvagePosixForLift(i)
+				local vehName   = Game.GetVehicleDisplayName(SalvageYard:GetSalvageModelOnLift(i))
+				local value     = string.formatmoney(SalvageYard:GetSalvageValueOnLift(i))
+				local timeleft  = SalvageYard:GetSalvagePosixForLift(i)
 				local timeStr   = Time.FormatSeconds(timeleft - Time.Epoch())
 				local nameWidth = ImGui.CalcTextSize(vehName)
 				local valWidth  = ImGui.CalcTextSize(value)
@@ -149,9 +149,9 @@ return function()
 
 				ImGui.Separator()
 
-				ImGui.BeginDisabled(timeleft <= 1e3)
+				ImGui.BeginDisabled(timeleft <= 1)
 				if (GUI:Button(_T("SY_INSTANT_SALVAGE"))) then
-					salvage_yard:SalvageNow(i)
+					SalvageYard:SalvageNow(i)
 				end
 				ImGui.EndDisabled()
 			end
@@ -188,29 +188,29 @@ return function()
 
 		ImGui.SeparatorText(_T("SY_WEEKLY_ROBBERIES"))
 		for i = 0, 2 do
-			ImGui.Text(_F(_T("SY_WEEKLY_CAR_STATUS"), i + 1, salvage_yard:GetWeeklyRobberyStatus(i)))
+			ImGui.Text(_F(_T("SY_WEEKLY_CAR_STATUS"), i + 1, SalvageYard:GetWeeklyRobberyStatus(i)))
 			ImGui.Separator()
 		end
 
 		ImGui.Spacing()
 
-		ImGui.Text(_F(_T("SY_CURRENT_ROBBERY"), salvage_yard:GetRobberyName()))
-		if (salvage_yard:IsRobberyActive()) then
+		ImGui.Text(_F(_T("SY_CURRENT_ROBBERY"), SalvageYard:GetRobberyName()))
+		if (SalvageYard:IsRobberyActive()) then
 			ImGui.Text(
 				_F(_T("SY_ROBBERY_ACTIVE_CAR"),
-					salvage_yard:GetRobberyVehicleName())
+					SalvageYard:GetRobberyVehicleName())
 			)
-			ImGui.Text(_F(_T("SY_ROBBERY_CAR_VALUE"), salvage_yard:GetRobberyValue()))
-			ImGui.Text(_F(_T("SY_ROBBERY_CAN_KEEP_CAR"), tostring(salvage_yard:GetRobberyKeepState())))
+			ImGui.Text(_F(_T("SY_ROBBERY_CAR_VALUE"), SalvageYard:GetRobberyValue()))
+			ImGui.Text(_F(_T("SY_ROBBERY_CAN_KEEP_CAR"), tostring(SalvageYard:GetRobberyKeepState())))
 
 			if (GUI:Button(_T("SY_DOUBLE_CAR_WORTH"))) then
-				salvage_yard:DoubleCarWorth()
+				SalvageYard:DoubleCarWorth()
 			end
 
 			ImGui.SameLine()
-			ImGui.BeginDisabled(salvage_yard:ArePrepsCompleted())
+			ImGui.BeginDisabled(SalvageYard:ArePrepsCompleted())
 			if (GUI:Button(_T("SY_COMPLETE_PREPARATIONS"))) then
-				salvage_yard:SkipPreps()
+				SalvageYard:SkipPreps()
 			end
 			ImGui.EndDisabled()
 		end
@@ -218,7 +218,7 @@ return function()
 		ImGui.Spacing()
 
 		for i = 1, 4 do
-			local carName = salvage_yard:GetRobberyCarInSlot(i)
+			local carName = SalvageYard:GetSalvageCarInSlot(i)
 			local isAvailable = carName and not carName:isempty()
 			ImGui.SetNextWindowBgAlpha(0.64)
 			ImGui.BeginDisabled(not isAvailable)
@@ -234,7 +234,7 @@ return function()
 				ImGui.Text(_T("SY_EMPTY"))
 			else
 				local nameWidth = ImGui.CalcTextSize(carName)
-				local carValue  = string.formatmoney(salvage_yard:GetRobberyCarValue(i))
+				local carValue  = string.formatmoney(SalvageYard:GetRobberyCarValue(i))
 				local valWidth  = ImGui.CalcTextSize(carValue)
 				ImGui.BulletText(_T("GENERIC_VEHICLE"))
 				ImGui.SameLine()

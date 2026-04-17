@@ -15,27 +15,24 @@ if (Backend:IsMockEnv()) then
 	return
 end
 
-local YimActions      = require("includes.features.extra.yim_actions.YimActionsV3")
-local commandRegistry = require("includes.lib.commands")
-local weapons         = require("includes.data.weapons")
-local weaponData      = require("includes.data.weapon_data")
-local weapons_map     = {
-	["GROUP_MELEE"]       = weapons.Melee,
-	["GROUP_PISTOL"]      = weapons.Pistols,
-	["GROUP_RIFLE"]       = weapons.AssaultRifles,
-	["GROUP_SHOTGUN"]     = weapons.Shotguns,
-	["GROUP_SMG"]         = weapons.SMG,
-	["GROUP_MG"]          = weapons.MachineGuns,
-	["GROUP_SNIPER"]      = weapons.SniperRifles,
-	["GROUP_HEAVY"]       = weapons.Heavy,
-	["GROUP_THROWN"]      = weapons.Throwables,
-	["GROUP_PETROLCAN"]   = weapons.Misc,
-	["GROUP_STUNGUN"]     = weapons.Misc,
-	["GROUP_TRANQILIZER"] = weapons.Misc,
-}
-
 local function populate_weapons()
-	local branch = Backend:GetGameBranch()
+	local weapons     = require("includes.data.weapons")
+	local weapons_map = {
+		["GROUP_MELEE"]       = weapons.Melee,
+		["GROUP_PISTOL"]      = weapons.Pistols,
+		["GROUP_RIFLE"]       = weapons.AssaultRifles,
+		["GROUP_SHOTGUN"]     = weapons.Shotguns,
+		["GROUP_SMG"]         = weapons.SMG,
+		["GROUP_MG"]          = weapons.MachineGuns,
+		["GROUP_SNIPER"]      = weapons.SniperRifles,
+		["GROUP_HEAVY"]       = weapons.Heavy,
+		["GROUP_THROWN"]      = weapons.Throwables,
+		["GROUP_PETROLCAN"]   = weapons.Misc,
+		["GROUP_STUNGUN"]     = weapons.Misc,
+		["GROUP_TRANQILIZER"] = weapons.Misc,
+	}
+	local weaponData  = require("includes.data.weapon_data")
+	local branch      = Backend:GetGameBranch()
 	for hash, data in pairs(weaponData) do
 		if (branch == Enums.eGameBranch.LAGECY and data.model_name == "WEAPON_STRICKLER") then
 			goto continue
@@ -58,6 +55,16 @@ local function populate_weapons()
 	end
 end
 
+local function register_commands()
+	local yimActions      = require("includes.features.extra.yim_actions.YimActionsV3")
+	local commandRegistry = require("includes.lib.commands")
+	for name, cmd in pairs(commandRegistry) do
+		CommandExecutor:RegisterCommand(name, cmd.callback, cmd.opts)
+	end
+
+	yimActions:RegisterCommands()
+end
+
 GPointers:Init()
 Serializer:FlushObjectQueue()
 Backend:RegisterHandlers()
@@ -65,13 +72,8 @@ Translator:Load()
 GUI:LateInit()
 
 ThreadManager:Run(function()
-	for name, cmd in pairs(commandRegistry) do
-		CommandExecutor:RegisterCommand(name, cmd.callback, cmd.opts)
-	end
-
-	YimActions:RegisterCommands()
-
 	populate_weapons()
+	register_commands()
 
 	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD8, function()
 		LocalPlayer:GetVehicle():RamForward()

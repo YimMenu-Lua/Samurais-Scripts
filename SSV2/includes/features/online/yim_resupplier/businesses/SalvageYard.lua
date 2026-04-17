@@ -44,7 +44,7 @@ end
 ---@param slot integer
 ---@return boolean
 function SalvageYard:IsLiftTaken(slot)
-	return self:GetCarModelOnLift(slot) ~= 0
+	return self:GetSalvageModelOnLift(slot) ~= 0
 end
 
 function SalvageYard:IsTowMissionActive()
@@ -73,13 +73,13 @@ end
 
 ---@param slot integer
 ---@return hash
-function SalvageYard:GetCarModelOnLift(slot)
+function SalvageYard:GetSalvageModelOnLift(slot)
 	return stats.get_int(_F("MPX_MPSV_MODEL_SALVAGE_LIFT%d", slot))
 end
 
 ---@param slot integer
 ---@return integer
-function SalvageYard:GetCarValueOnLift(slot)
+function SalvageYard:GetSalvageValueOnLift(slot)
 	return stats.get_int(_F("MPX_MPSV_VALUE_SALVAGE_LIFT%d", slot))
 end
 
@@ -134,13 +134,9 @@ end
 
 ---@param slot integer
 ---@return string
-function SalvageYard:GetRobberyCarInSlot(slot)
+function SalvageYard:GetSalvageCarInSlot(slot)
 	local index = stats.get_int(_F("MPX_MPSV_MODEL_SALVAGE_VEH%d", slot))
 	return data.vehicle_targets[index] or "NULL"
-end
-
-function SalvageYard:DisableRobberyCooldown()
-	stats.set_int("MPX_SALV23_VEHROB_CD", 0)
 end
 
 function SalvageYard:DisableWeeklyCooldown()
@@ -214,10 +210,13 @@ function SalvageYard:BringTowMissionTarget()
 	self.m_bring_veh_triggered = true
 	ThreadManager:Run(function()
 		-- This is low quality but works... kinda.
-		-- The proper way to do it it so check the mission flow bitset in fm_content_tow_truck_work
-		-- then get the target vehicle. But I'm lazy and don't want to maintain any more script globals and locals.
-		-- 		- Target vehicle: ScriptLocal(1850, "fm_content_tow_truck_work"):At(48):At(0, 9) -- (netID)
-		-- 		- Tow truck: ScriptLocal(1850, "fm_content_tow_truck_work"):At(48):At(1, 9) -- (netID)
+		-- The proper way to do it is either just instantly finish the mission in the script thread or check the mission flow bitset
+		-- then get the target vehicle from there but I'm lazy and don't want to maintain any more script globals and locals.
+		--
+		--  [b3788.0]:
+		-- 	  - FMCTTW        = ScriptLocal(1850, "fm_content_tow_truck_work"):At(48)
+		-- 	  - TargetVehicle = FMCTTW:At(0, 9) -- (netID)
+		-- 	  - Towtruck      = FMCTTW:At(48):At(1, 9) -- (netID)
 		--
 
 		if (not self:IsTowMissionActive()) then
@@ -226,7 +225,7 @@ function SalvageYard:BringTowMissionTarget()
 		end
 
 		if (not LocalPlayer:IsHostOfScript("fm_content_tow_truck_work")) then
-			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
+			Notifier:ShowError(_T("SY_SALVAGE_YARD"), _T("YRV3_SCRIPT_HOST_ERR"))
 			self.m_bring_veh_triggered = false
 			return
 		end
@@ -238,35 +237,35 @@ function SalvageYard:BringTowMissionTarget()
 			return
 		end
 
-		local found, objective = Game.GetObjectiveBlipCoords()
-		if (not found or not objective or objective:is_zero()) then
+		local found, objectiveCoords = Game.GetObjectiveBlipCoords()
+		if (not found or not objectiveCoords or objectiveCoords:is_zero()) then
 			Notifier:ShowError(_T("SY_SALVAGE_YARD"), _T("SY_TOW_OBJECTIVE_NOT_FOUND_ERR"))
 			self.m_bring_veh_triggered = false
 			return
 		end
 
-		local veh = Game.GetClosestVehicle(objective, 1, nil, true, 0)
-		if (veh == 0 or not ENTITY.IS_ENTITY_A_VEHICLE(veh)) then
+		local towTruck     = PV:GetHandle()
+		local objectiveVeh = Game.GetClosestVehicle(objectiveCoords, 1, towTruck, true, 0)
+		if (objectiveVeh == 0 or not ENTITY.IS_ENTITY_A_VEHICLE(objectiveVeh)) then
 			Notifier:ShowError(_T("SY_SALVAGE_YARD"), _T("SY_TOW_VEH_NOT_FOUND_ERR"))
 			self.m_bring_veh_triggered = false
 			return
 		end
 
-		local towTruck  = PV:GetHandle()
 		local myHandle  = LocalPlayer:GetHandle()
 		local myPos     = LocalPlayer:GetPos()
 		local heading   = LocalPlayer:GetHeading()
 		local bonePos   = PV:GetBonePosition("tow_mount_a")
-		local forward   = PV:GetForwardVector()
+		local fwdVec    = PV:GetForwardVector()
 		local offsetPos = vec3:new(
-			bonePos.x - forward.x * 3.5,
-			bonePos.y - forward.y * 3.5,
+			bonePos.x - fwdVec.x * 3.5,
+			bonePos.y - fwdVec.y * 3.5,
 			bonePos.z
 		)
 
-		if (myPos:distance(objective) >= 100) then
+		if (myPos:distance(objectiveCoords) >= 100) then
 			-- update the objective without touching any script locals then jump back to our previous position
-			PED.SET_PED_COORDS_KEEP_VEHICLE(myHandle, objective.x, objective.y, objective.z)
+			PED.SET_PED_COORDS_KEEP_VEHICLE(myHandle, objectiveCoords.x, objectiveCoords.y, objectiveCoords.z)
 			yield()
 			PED.SET_PED_COORDS_KEEP_VEHICLE(myHandle, myPos.x, myPos.y, myPos.z)
 			VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(towTruck, 5.0)
@@ -274,9 +273,9 @@ function SalvageYard:BringTowMissionTarget()
 
 		VEHICLE.SET_VEHICLE_TOW_TRUCK_ARM_POSITION(towTruck, 0.0)
 		sleep(2000)
-		ENTITY.SET_ENTITY_HEADING(veh, heading)
+		ENTITY.SET_ENTITY_HEADING(objectiveVeh, heading)
 		ENTITY.SET_ENTITY_PROOFS(
-			veh,
+			objectiveVeh,
 			false,
 			false,
 			false,
@@ -286,14 +285,14 @@ function SalvageYard:BringTowMissionTarget()
 			false,
 			false
 		)
-		Game.SetEntityCoords(veh, offsetPos)
-		while (Game.GetEntityCoords(veh, false):distance(offsetPos) > 50) do
+		Game.SetEntityCoords(objectiveVeh, offsetPos)
+		while (Game.GetEntityCoords(objectiveVeh, false):distance(offsetPos) > 50) do
 			yield()
 		end
 
-		VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(veh, 5.0)
-		if (not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(veh, towTruck)) then
-			VEHICLE.ATTACH_VEHICLE_TO_TOW_TRUCK(towTruck, veh, false, 0, 0, 0)
+		VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(objectiveVeh, 5.0)
+		if (not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(objectiveVeh, towTruck)) then
+			VEHICLE.ATTACH_VEHICLE_TO_TOW_TRUCK(towTruck, objectiveVeh, false, 0, 0, 0)
 			sleep(500)
 		end
 
@@ -307,11 +306,10 @@ function SalvageYard:BringTowMissionTarget()
 			---@diagnostic enable
 
 			sleep(2000)
-
 			if (LocalPlayer:IsOutside() and not CAM.IS_SCREEN_FADING_OUT() and not CAM.IS_SCREEN_FADED_OUT() and not CAM.IS_SCREEN_FADING_IN()) then
-				if (not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(veh, towTruck)) then
-					VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(veh, 5.0)
-					VEHICLE.SET_ATTACHED_VEHICLE_TO_TOW_TRUCK_ARM_(towTruck, veh)
+				if (not ENTITY.IS_ENTITY_ATTACHED_TO_ENTITY(objectiveVeh, towTruck)) then
+					VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(objectiveVeh, 5.0)
+					VEHICLE.SET_ATTACHED_VEHICLE_TO_TOW_TRUCK_ARM_(towTruck, objectiveVeh)
 				end
 			end
 		end
@@ -336,7 +334,7 @@ function SalvageYard:GetEstimatedIncome()
 	local sum = 0
 
 	for i = 1, 2 do
-		sum = sum + self:GetCarValueOnLift(i)
+		sum = sum + self:GetSalvageValueOnLift(i)
 	end
 
 	for i = 1, 4 do
@@ -350,7 +348,7 @@ ThreadManager:Run(function()
 	local array = data.vehicle_targets
 	for i = 1, #array do
 		local model = array[i]
-		array[i] = Game.GetVehicleDisplayName(model)
+		array[i]    = Game.GetVehicleDisplayName(model)
 	end
 end)
 

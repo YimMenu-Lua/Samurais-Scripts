@@ -885,25 +885,25 @@ function YRV3:CooldownHandler()
 	end
 end
 
-local fadedOutTimer = Timer.new(1e4)
-fadedOutTimer:Pause()
+---@return boolean isRunning, string? scriptName, string displayName
+function YRV3:FindRunningSaleScript()
+	for sn in pairs(self.m_raw_data.SellScripts) do
+		if (script.is_active(sn)) then
+			return true, sn, ScriptDisplayNames[sn] or "None"
+		end
+	end
+
+	return false, nil, "None"
+end
+
 function YRV3:SetupAutosell()
 	if (Time.Millis() - self.m_last_autosell_check_time < 1200) then
 		return
 	end
 
-	for sn in pairs(self.m_raw_data.SellScripts) do
-		if script.is_active(sn) then
-			self.m_sell_script_name = sn
-			self.m_sell_script_running = true
-			self.m_sell_script_disp_name = self:GetRunningSellScriptDisplayName()
-			break
-		else
-			self.m_sell_script_name = "None"
-			self.m_sell_script_disp_name = "None"
-			self.m_sell_script_running = false
-		end
-	end
+	self.m_sell_script_running,
+	self.m_sell_script_name,
+	self.m_sell_script_disp_name = self:FindRunningSaleScript()
 
 	if (self.m_sell_script_running and self.m_bhub_script_handle ~= 0) then -- was triggered from the mct
 		for _, scr in pairs(ScriptsToTerminate) do
@@ -916,9 +916,8 @@ function YRV3:SetupAutosell()
 		end
 
 		sleep(1000)
-
 		if (CAM.IS_SCREEN_FADING_OUT() or CAM.IS_SCREEN_FADED_OUT()) then
-			fadedOutTimer:Resume()
+			local fadedOutTimer = Timer.new(1e4)
 			while (not fadedOutTimer:IsDone()) do
 				if (not CAM.IS_SCREEN_FADED_OUT() or CAM.IS_SCREEN_FADING_IN()) then
 					break
@@ -932,9 +931,6 @@ function YRV3:SetupAutosell()
 				CAM.DO_SCREEN_FADE_IN(100)
 			end
 		end
-
-		fadedOutTimer:Reset()
-		fadedOutTimer:Pause()
 	end
 
 	self.m_last_autosell_check_time = Time.Millis()

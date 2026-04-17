@@ -7,11 +7,13 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+--#region SGSL structs
+
 -----------------------------------------------------
--- SGSLObj
+-- SGSLTable
 -----------------------------------------------------
 -- Represents each table in the globals_locals table.
----@class SGSLObj
+---@class SGSLTable
 ---@field description string
 ---@field file string
 ---@field LEGACY SGSLEntry
@@ -20,20 +22,21 @@
 -----------------------------------------------------
 -- SGSLEntry
 -----------------------------------------------------
--- Represents an entry in SGSLObj, in other words, the LEGACY/ENHANCED table
+-- Represents an entry in SGSLTable, in other words, the LEGACY/ENHANCED field
+--
 -- that contains the actual data.
 ---@class SGSLEntry
 ---@field value number
 ---@field pattern string
 ---@field capture_group number
 ---@field bit_index number
----@field offsets array<{ value: number, capture_group: number }>
+---@field offsets array<{ value: number, capture_group: number, description?: string }>
 ---@field script_name string
-local SGSLEntry = {}
+local SGSLEntry   = {}
 SGSLEntry.__index = SGSLEntry
 
 ---@param value number
----@param offsets array<{ value: number, capture_group: number }>
+---@param offsets array<{ value: number, capture_group: number, description?: string }>
 ---@param script_name string
 ---@param pattern? string
 ---@param capture_group? number
@@ -41,12 +44,12 @@ SGSLEntry.__index = SGSLEntry
 ---@return SGSLEntry
 function SGSLEntry.new(value, offsets, script_name, pattern, capture_group, bit_index)
 	return setmetatable({
-		value = value,
-		offsets = offsets,
-		script_name = script_name,
-		pattern = pattern,
+		value         = value,
+		offsets       = offsets,
+		script_name   = script_name,
+		pattern       = pattern,
 		capture_group = capture_group,
-		bit_index = bit_index
+		bit_index     = bit_index
 	}, SGSLEntry)
 end
 
@@ -94,6 +97,10 @@ function SGSLEntry:AsLocal()
 	return ScriptLocal(self.value, self.script_name)
 end
 
+--#endregion
+
+--#region SGSL
+
 -----------------------------------------------------
 -- SGSL
 -----------------------------------------------------
@@ -101,6 +108,8 @@ end
 --
 -- Provides methods to wrap globals/locals in an `Accessor` object instance *(ScriptGlobal/ScriptLocal)*.
 --
+-- **NOTE:** The `Get` method throws on error. If you're not sure if it will succeed, wrap it in a protected call.
+--___
 -- **Usage Example:**
 --
 --```Lua
@@ -114,29 +123,44 @@ end
 ]]
 --```
 ---@class SGSL
----@field private m_api_key string
+---@field private m_branch_key "LEGACY" | "ENHANCED"
+---@field private m_cache table<SGSLTable, SGSLEntry>
 local SGSL = {
-	data = require("includes.data.globals_locals"),
-	m_api_key = Backend:GetGameBranch() == Enums.eGameBranch.LAGECY and "LEGACY" or "ENHANCED"
+	data         = require("includes.data.globals_locals"),
+	m_branch_key = Backend:GetGameBranch() == Enums.eGameBranch.LAGECY and "LEGACY" or "ENHANCED",
+	m_cache      = {}
 }
 SGSL.__index = SGSL
 
----@param object SGSLObj
+-- This method throws on error. If you're not sure if it will succeed, wrap it in a protected call.
+---@param object SGSLTable
 function SGSL:Get(object)
+	local cached = self.m_cache[object]
+	if (cached) then return cached end
+
 	local objType = type(object)
 	assert(objType == "table", _F("Invalid object type. Table expected, got %s instead.", objType))
 
-	---@type SGSLEntry
-	local entry = object[self.m_api_key]
-	return SGSLEntry.new(
+	---@type SGSLEntry?
+	local entry = object[self.m_branch_key]
+	if (not entry) then
+		error("Failed to find a script global/script local entry!")
+	end
+
+	local outEntry = SGSLEntry.new(
 		entry.value,
 		entry.offsets,
-		object.file:replace(".c", ""),
+		object.file:trim():replace(".c", ""),
 		-- fields below are unnecessary but I'm adding them for debugging purposes
 		entry.pattern,
 		entry.capture_group,
 		entry.bit_index
 	)
+
+	self.m_cache[object] = outEntry
+	return outEntry
 end
+
+--#endregion
 
 return SGSL

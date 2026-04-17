@@ -130,7 +130,7 @@ local RawBusinessData <const> = {
 				if (tunables.get_int("EXEC_SELL_COOLDOWN") > 0) then
 					tunables.set_int("EXEC_SELL_COOLDOWN", 0)
 				end
-				if tunables.get_int("EXEC_SELL_FAIL_COOLDOWN") > 0 then
+				if (tunables.get_int("EXEC_SELL_FAIL_COOLDOWN") > 0) then
 					tunables.set_int("EXEC_SELL_FAIL_COOLDOWN", 0)
 				end
 			end

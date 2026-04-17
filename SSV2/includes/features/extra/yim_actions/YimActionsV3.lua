@@ -202,13 +202,14 @@ function YimActions:InitInVehicleAnim(animData, targetPed)
 	return true
 end
 
+---@nodiscard
 ---@param animData AnimData
 ---@param targetPed? handle
+---@return boolean
 function YimActions:PlayAnim(animData, targetPed)
 	targetPed = self:GetPed(targetPed)
-
 	if (animData.category == "In-Vehicle" and not self:InitInVehicleAnim(animData, targetPed)) then
-		return
+		return false
 	end
 
 	TaskWait(Game.RequestAnimDict, animData.dict)
@@ -226,8 +227,6 @@ function YimActions:PlayAnim(animData, targetPed)
 		false
 	)
 
-	self:UpdatePlayHistory(targetPed)
-
 	if (not GVars.features.yim_actions.disable_props) then
 		if (animData.props and #animData.props > 0) then
 			self.m_prop_mgr:AttachProp(targetPed, animData.props)
@@ -244,29 +243,32 @@ function YimActions:PlayAnim(animData, targetPed)
 
 	local isLooped = Bit.IsBitSet(animData.flags, Enums.eAnimFlags.LOOPING)
 	local isFrozen = Bit.IsBitSet(animData.flags, Enums.eAnimFlags.HOLD_LAST_FRAME)
-
 	if (not isLooped and not isFrozen) then
-		repeat
-			yield()
-		until self:IsAnimDone(targetPed, animData)
-		self.CurrentlyPlaying[targetPed] = nil
+		ThreadManager:Run(function(s)
+			while (not self:IsAnimDone(targetPed, animData)) do
+				s:yield()
+			end
+			self.CurrentlyPlaying[targetPed] = nil
+		end)
 	end
+
+	return true
 end
 
+---@nodiscard
 ---@param scenarioData ScenarioData
 ---@param targetPed? handle
 ---@param playImmediately? boolean
+---@return boolean
 function YimActions:PlayScenario(scenarioData, targetPed, playImmediately)
 	targetPed = self:GetPed(targetPed)
-
-	if scenarioData.label == "Cook On BBQ" then
+	if (scenarioData.label == "Cook On BBQ") then
 		local offsetCoords = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(
 			targetPed,
 			0.0,
 			1.0,
 			0.0
 		)
-
 		local bbq = self.m_prop_mgr:SpawnProp(
 			targetPed,
 			{ model = 286252949 },
@@ -276,13 +278,12 @@ function YimActions:PlayScenario(scenarioData, targetPed, playImmediately)
 			true,
 			true
 		)
-
-		if bbq and bbq ~= 0 then
+		if (bbq and bbq ~= 0) then
 			ENTITY.SET_ENTITY_HEADING(bbq, Game.GetHeading(bbq) - 180)
 		end
 	end
 
-	if self:IsPedPlaying(targetPed) then
+	if (self:IsPedPlaying(targetPed)) then
 		TASK.CLEAR_PED_TASKS_IMMEDIATELY(targetPed) -- avoid scenario exit anims if we start a scenario while already playing one
 	end
 
@@ -292,11 +293,16 @@ function YimActions:PlayScenario(scenarioData, targetPed, playImmediately)
 		-1,
 		not playImmediately
 	)
+
+	return true
 end
 
+---@nodiscard
 ---@param data SyncedSceneData
+---@return boolean
 function YimActions:PlaySyncedScene(data)
 	self.m_scene_mgr:Play(data)
+	return true
 end
 
 ---@param action? Action
@@ -320,22 +326,23 @@ function YimActions:Play(action, ped)
 	TaskWait(function() return self.CurrentlyPlaying[ped] == nil end)
 
 	self.CurrentlyPlaying[ped] = action
+	local success = false
 
+	---@diagnostic disable: param-type-mismatch
 	if (action.action_type == Enums.eActionType.SCENARIO) then
-		---@diagnostic disable-next-line
-		self:PlayScenario(action.data, ped)
+		success = self:PlayScenario(action.data, ped)
 	elseif action.action_type == Enums.eActionType.ANIM then
-		---@diagnostic disable-next-line
-		self:PlayAnim(action.data, ped)
+		success = self:PlayAnim(action.data, ped)
 	elseif action.action_type == Enums.eActionType.SCENE then
-		---@diagnostic disable-next-line
-		self:PlaySyncedScene(action.data)
+		success = self:PlaySyncedScene(action.data)
 	end
+	---@diagnostic enable: param-type-mismatch
 
-	self:UpdatePlayHistory(ped)
-
-	if (Backend.debug_mode) then
-		self.Debugger:Update(ped)
+	if (success) then
+		self:UpdatePlayHistory(ped)
+		if (Backend.debug_mode) then
+			self.Debugger:Update(ped)
+		end
 	end
 end
 
