@@ -216,7 +216,7 @@ function SalvageYard:BringTowMissionTarget()
 		--  [b3788.0]:
 		-- 	  - FMCTTW        = ScriptLocal(1850, "fm_content_tow_truck_work"):At(48)
 		-- 	  - TargetVehicle = FMCTTW:At(0, 9) -- (netID)
-		-- 	  - Towtruck      = FMCTTW:At(48):At(1, 9) -- (netID)
+		-- 	  - Towtruck      = FMCTTW:At(1, 9) -- (netID)
 		--
 
 		if (not self:IsTowMissionActive()) then
