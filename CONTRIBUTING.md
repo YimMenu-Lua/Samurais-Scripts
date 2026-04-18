@@ -183,6 +183,14 @@ You are free to use any style you want, except in these cases:
         DoSomething()
         ```
 
+## Macros
+
+The project defines these global macros for convenience:
+
+- `_F` -> `string.format`
+- `_J` -> `joaat`.
+- `_T` -> `Translator:Translate`
+
 ## Translations
 
 - The primary language for all labels is English (US) (`includes/lib/translations/en-US.lua`).
@@ -206,7 +214,7 @@ Suppose you want to draw some text that gets automatically translated:
     }
     ```
 
-3. Use the `key` with the `_T` wrapper for the [`Translator:Translate(...)`](docs/services/Translator.md) method:
+3. Use the `key` with the `_T` macro:
 
     ```lua
     ImGui.Text(_T("MY_LABEL"))
@@ -230,35 +238,42 @@ The project is organized by responsibility rather than feature size. Folders def
 
 ```bash
 ├─ includes/
-│  ├─ classes/
-│  │  └─ gta/           # Contains reverse-engineered game classes mostly sourced from Yimura's archived repository and others I reversed myself using a mix of debuggers, public research, and personal suffering.
+│  ├─ classes/           # A place where all classes are stored.
+│  │  └─ gta/            # Contains reverse-engineered game classes mostly sourced from Yimura's archived repository and others I reversed myself using a mix of debuggers, public research, and personal suffering.
 │  │
-│  ├─ data/             # A place where all raw data is stored.
-│  │  ├─ actions/       # Contains YimActions V3 data (animations, scenarios, synchronized scenes, and movement clipsets).
-│  │  └─ enums/         # Groups all game and custom enums in one place under one `Enums` global namespace.
+│  ├─ data/              # A place where all raw data is stored.
+│  │  ├─ actions/        # Contains YimActions V3 data (animations, scenarios, synchronized scenes, and movement clipsets).
+│  │  └─ enums/          # Groups all game and custom enums in one place under one `Enums` global namespace.
 │  │
-│  ├─ features/         # Stores all script features.
-│  │  ├─ self/          # Player-specific features.
-│  │  ├─ vehicle/       # Vehicle-specific features.
-│  │  └─ world/         # World-specific features.
+│  ├─ features/          # Stores all script features.
+│  │  ├─ extra/          # Self-contained experience-enhancing features.
+│  │  ├─ online/         # Online-only features.
+│  │  ├─ self/           # Player-specific features.
+│  │  ├─ vehicle/        # Vehicle-specific features.
+│  │  └─ world/          # World-specific features.
 │  │
-│  ├─ frontend/         # This is where UI tabs live.
+│  ├─ frontend/          # This is where UI tabs live. As a contributor, you are free to organize UI source files however you want but this general rule is highly recommended:
+│  │                       # - If your UI requires more than one file, group them in a subfolder.
+│  │                       # - If you have one large file doing a multitude of things, split it into multiple files and group them in a subfolder.
 │  │
-│  ├─ lib/              # Contains project libraries and commands: API extensions, translations, Lua standard library extensions, global utilities, etc.
+│  ├─ lib/               # Contains project libraries and commands: API extensions, ImGui extensions, Lua standard library extensions, global utilities, etc.
+│  │  └─ translations/   # This is where translation files, supported locales, and the translations hash map are stored.
 │  │
-│  ├─ modules/          # Contains custom modules such as native wrappers, game entity abstractions, and higher-level gameplay utilities.
+│  ├─ modules/           # Contains custom modules such as native wrappers, game entity abstractions, YimMenu API wrappers, and higher-level gameplay utilities.
 │  │
-│  ├─ services/         # Contains runtime services (GUI, KeyManager, Serializer, CommandExecutor, etc.)
+│  ├─ services/          # Contains runtime services (GUI, KeyManager, Serializer, CommandExecutor, etc.)
+│  │  └─ asset_browsers/ # Stores an assortment of focused asset browsers and their base class.
 │  │
-│  ├─ structs/          # Stores helper structs.
+│  ├─ structs/           # Stores helper structs.
 │  │
-│  ├─ thirdparty/       # Thirdparty components and their license texts.
+│  ├─ thirdparty/        # Thirdparty components and their license texts.
 │  │
-│  ├─ backend.lua       # Central backend module providing lifecycle coordination, entity management, and API/script version checks.
-│  ├─ version.lua       # This is purely for CI and should never be edited. It stores the latest script version.
-│  └─ init.lua          # Initializes the whole project.
+│  ├─ backend.lua        # Central backend module providing lifecycle coordination, entity management, and API/script version checks.
+│  ├─ tests.lua          # Purely for local tests in a mock environment.
+│  ├─ version.lua        # This is purely for CI and should never be edited. It stores the latest script version.
+│  └─ init.lua           # Initializes the whole project.
 │
-└─ samurais_scripts.lua # Main entry point that calls `init.lua`, handles late initialization for a few modules/services, and lazily populates a few data sets in a fiber.
+└─ samurais_scripts.lua  # Main entry point that calls `init.lua`, handles late initialization for a few modules/services, registers commands, and lazily populates a few data sets in a fiber.
 ```
 
 ## Where Does My Code Go?
@@ -267,11 +282,11 @@ The project is organized by responsibility rather than feature size. Folders def
 | :---: | :---: | :---: |
 | A gameplay feature | `includes/features/` | Features are behavior, not UI. |
 | A UI tab or layout code | `includes/frontend/` | UI only. No game logic. |
-| A reusable system with lifecycle | `includes/services/` | Must be explicitly initialized. |
+| A reusable system with lifecycle | `includes/services/` | - |
 | A reverse-engineered game structure or a custom Lua class | `includes/classes/` | - |
 | A lightweight data container or object | `includes/structs/` | No lifecycle, no side effects. |
 | Raw static data (tables, lists, maps) | `includes/data/` | Never execute logic here. |
-| A native wrapper or abstraction | `includes/modules/` | Bridges Lua `<->` game engine. |
+| A native wrapper or abstraction | `includes/modules/` | Bridges `Lua <-> game engine`. |
 | Utility or extension code | `includes/lib/` | Generic helpers and API/stdlib extensions. |
 | Initialization or bootstrapping | `init.lua` / `backend.lua` | Do not add features here. |
 | A third party module from somewhere/someone else | `includes/thirdparty` | Place in a subfolder accompanied with the module's license *(when applicable)*. |

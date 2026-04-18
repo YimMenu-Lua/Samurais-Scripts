@@ -1,3 +1,5 @@
 # Documentation
 
-In version 1.7.3, the script was updated using [this template repository](https://github.com/xesdoog/SmallBase). For more information, please refer to the [SmallBase docs](https://github.com/xesdoog/SmallBase/tree/main/docs)
+This project was rewritten from scratch using the [SmallBase](https://github.com/xesdoog/SmallBase) template.
+
+A full documentation will soon be generated and uploaded here. In the meantime, feel free to explore [SmallBase's docs](https://github.com/xesdoog/SmallBase/tree/main/docs).

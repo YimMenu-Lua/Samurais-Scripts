@@ -92,7 +92,9 @@ Refer to the [Contribution Guidelines](./CONTRIBUTING.md) for more details on th
 
 ## Documentation
 
-This project was rewritten from scratch using [SmallBase](https://github.com/xesdoog/SmallBase). For API documentation, please refer to the [docs](https://github.com/xesdoog/SmallBase/tree/main/docs).
+This project was rewritten from scratch using the [SmallBase](https://github.com/xesdoog/SmallBase) template.
+
+A full documentation will be uploaded to this repository soon. In the meantime, feel free to explore [SmallBase's docs](https://github.com/xesdoog/SmallBase/tree/main/docs).
 
 >[!Note]
 > Some parts of the API were refactored or extended but nothing has drastically changed.
@@ -143,3 +145,9 @@ A full list of available features and their usage [can be found here](docs/Featu
 | <a href="https://github.com/durtyfree"><img height="40" width="40" alt="DurtyFree" src="https://avatars.githubusercontent.com/durtyfree"><br/>Alexander Schmid</a> | [GTA V data dumps](https://github.com/DurtyFree/gta-v-data-dumps) |
 | <a href="https://github.com/yimura"><img height="40" width="40" alt="Yimura" src="https://avatars.githubusercontent.com/yimura"><br/>Andreas Maerten</a> | GTA V classes (archived/removed) |
 | <a href="https://unknowncheats.me"><img height="40" width="40" alt="UC" src="https://avatars.githubusercontent.com/u/29552835"><br/>UnknownCheats</a> | A treasure trove of information |
+
+## TODO
+
+- [ ] Generate our own docs since we're no longer in sync with [SmallBase](https://github.com/xesdoog/SmallBase).
+- [ ] Fully Refactor EntityForge.
+- [ ] Add support in YimActions for defining custom animations. This will require extracting EntityForge's attachment handler into a reusable module for animation prop configuration.
