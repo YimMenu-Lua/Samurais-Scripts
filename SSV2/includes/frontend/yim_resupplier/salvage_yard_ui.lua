@@ -218,8 +218,8 @@ return function()
 		ImGui.Spacing()
 
 		for i = 1, 4 do
-			local carName = SalvageYard:GetSalvageCarInSlot(i)
-			local isAvailable = carName and not carName:isempty()
+			local carName     = SalvageYard:GetRobberyCarInSlot(i)
+			local isAvailable = string.isvalid(carName)
 			ImGui.SetNextWindowBgAlpha(0.64)
 			ImGui.BeginDisabled(not isAvailable)
 			ImGui.BeginChildEx(

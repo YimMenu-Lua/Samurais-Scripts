@@ -148,7 +148,7 @@ CarWash.__index = CarWash
 ---@return CarWash
 function CarWash.new(opts)
 	local base        = BasicBusiness.new(opts)
-	local instance    = setmetatable(base, CarWash)
+	local instance    = setmetatable(base, CarWash) ---@cast instance CarWash
 	instance.m_safe   = CashSafe.new({
 		name            = opts.name,
 		cash_value_stat = "MPX_CWASH_SAFE_CASH_VALUE",
@@ -189,7 +189,6 @@ function CarWash.new(opts)
 		}))
 	end
 
-	---@diagnostic disable-next-line
 	return instance
 end
 

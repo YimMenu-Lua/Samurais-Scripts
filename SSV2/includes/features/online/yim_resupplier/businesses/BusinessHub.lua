@@ -37,7 +37,7 @@ function BusinessHub.new(opts)
 	assert(type(opts.max_units) == "number", "Missing argument: max_units<integer>")
 
 	local base                 = BusinessBase.new(opts)
-	local instance             = setmetatable(base, BusinessHub)
+	local instance             = setmetatable(base, BusinessHub) ---@cast instance BusinessHub
 	instance.fast_prod_enabled = false
 	instance.fast_prod_running = false
 	instance.m_vpu             = opts.vpu
@@ -45,7 +45,6 @@ function BusinessHub.new(opts)
 	instance.m_prod_bool_g     = SGSL:Get(SGSL.data.bhub_prod_bool_global):AsGlobal()
 	instance.m_tech_global     = base:GetBaseGlobal():At(321)
 
-	---@diagnostic disable-next-line
 	return instance
 end
 

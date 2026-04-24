@@ -23,7 +23,7 @@ local ScriptDisplayNames <const> = {
 	["gb_contraband_sell"]       = "CEO",
 	["gb_gunrunning"]            = "Bunker",
 	["gb_biker_contraband_sell"] = "Biker Business",
-	["fm_content_acid_lab_sell"] = "Acid Lab",
+	["fm_content_acid_lab_sell"] = "Acid Lab (Temporarily disabled)",
 }
 
 local NightclubNames <const>     = {
@@ -330,14 +330,6 @@ function YRV3:PopulateOffice()
 		coords      = ref.coords,
 		custom_name = _F("%s%s", name1, name2)
 	})
-
-	if (not self.m_businesses.office) then
-		return
-	end
-
-	for i = 0, 4 do
-		self.m_businesses.office:AddSubBusiness(i)
-	end
 end
 
 function YRV3:PopulateClubhouse()
@@ -348,9 +340,7 @@ function YRV3:PopulateClubhouse()
 
 	local idx      = club_prop - 90
 	local club_ref = self.m_raw_data.Clubhouses[idx]
-	if (not club_ref) then
-		return
-	end
+	if (not club_ref) then return end
 
 	local safe_data = self.m_raw_data.CashSafes.fronts.clubhouse
 	safe_data.name = "Clubhouse Duffle Bag"
@@ -360,14 +350,6 @@ function YRV3:PopulateClubhouse()
 		coords    = club_ref.coords,
 		safe_data = safe_data
 	})
-
-	if (not self.m_businesses.clubhouse) then
-		return
-	end
-
-	for i = 0, 4 do
-		self.m_businesses.clubhouse:AddSubBusiness(i)
-	end
 end
 
 function YRV3:PopulateBikerBusinesses()
@@ -433,7 +415,7 @@ function YRV3:PopulateNightclub()
 		safedata.name  = clubname
 
 
-		self.m_businesses.nightclub = Nightclub.new({
+		local nightclub = Nightclub.new({
 			id          = nc_index,
 			name        = Game.GetGXTLabel(_F("MP_NCLU_%d", nc_index)),
 			custom_name = clubname,
@@ -441,37 +423,45 @@ function YRV3:PopulateNightclub()
 			safe_data   = safedata
 		})
 
+		if not (nightclub and nightclub:IsValid()) then
+			self.m_data_initialized = true
+			return
+		end
+
 		while (not self.m_initial_data_done) do
 			yield()
 		end
 
 		local owns_cargo = false
-		if (self.m_businesses.hangar) then
+		local hangar     = self.m_businesses.hangar
+		local office     = self.m_businesses.office
+		local clubhouse  = self.m_businesses.clubhouse
+
+		if (hangar and hangar:IsValid()) then
 			owns_cargo = true
-		elseif (self.m_businesses.office) then
-			if (self.m_businesses.office:HasCargoWarehouse()) then
-				owns_cargo = true
-			end
+		elseif (office and office:IsValid()) then
+			owns_cargo = office:HasCargoWarehouse()
 		end
 
 		if (owns_cargo) then
-			self.m_businesses.nightclub:AddSubBusiness(0)
+			nightclub:AddSubBusiness(0)
 		end
 
 		if (self.m_businesses.bunker) then
-			self.m_businesses.nightclub:AddSubBusiness(1)
+			nightclub:AddSubBusiness(1)
 		end
 
-		if (self.m_businesses.clubhouse) then
-			for _, bb in ipairs(self.m_businesses.clubhouse:GetSubBusinesses()) do
+		if (clubhouse and clubhouse:IsValid()) then
+			for _, bb in ipairs(clubhouse:GetSubBusinesses()) do
 				if (bb:IsValid()) then
 					local index = bb:GetIndex()
-					self.m_businesses.nightclub:AddSubBusiness(index + 2)
+					nightclub:AddSubBusiness(index + 2)
 				end
 			end
 		end
 
-		self.m_data_initialized = true
+		self.m_businesses.nightclub = nightclub
+		self.m_data_initialized     = true
 
 		if (GVars.features.yrv3.nc_always_popular) then
 			self.m_businesses.nightclub:LockPopularityDecay()
@@ -650,38 +640,35 @@ end
 ---@param index integer -- `1 .. 7`
 ---@return Factory?
 function YRV3:GetFactoryByIndex(index)
-	if (not self:CanAccess()) then
-		return
-	end
+	if (not self:CanAccess()) then return end
 
 	if (type(index) ~= "number" or not math.is_inrange(index, 1, 7)) then
 		Notifier:ShowError("YRV3", "Invalid factory index! Please make sure to use a number between 1 and 7.")
 		return
 	end
 
-	local factory -- fwd decl
-	if (index < 6) then
+	index = index - 1
+	if (index < 5) then
 		local clubhouse = self.m_businesses.clubhouse
-		if (not clubhouse) then
+		if (not clubhouse) then return end
+
+		local factories = self.m_businesses.clubhouse:GetSubBusinesses()
+		if (type(factories) ~= "table") then
 			return
 		end
 
-		local factories = self.m_businesses.clubhouse:GetSubBusinesses()
-		if (type(factories) == "table") then
-			for _, f in ipairs(factories) do
-				if (f:GetIndex() == index - 1) then
-					factory = f
-					break
-				end
+		for _, f in ipairs(factories) do
+			if (f:GetIndex() == index) then
+				return f
 			end
 		end
+	elseif (index == 5) then
+		return self.m_businesses.bunker
 	elseif (index == 6) then
-		factory = self.m_businesses.bunker
-	elseif (index == 7) then
-		factory = self.m_businesses.acid_lab
+		return self.m_businesses.acid_lab
 	end
 
-	return factory
+	return nil
 end
 
 ---@param index integer -- `1 .. 7`
@@ -731,12 +718,13 @@ function YRV3:CommandToggleProduction(index, isNightclubHub)
 
 	if (factory:HasFullProduction()) then
 		Notifier:ShowError(name, _T("YRV3_FAST_PROD_ERR"))
-	else
-		local prefix = "Fast production"
-		local state  = bool and "enabled" or "disabled"
-		local msg    = isNightclubHub and _F("%s for the %s hub", state, factory:GetName()) or state
-		Notifier:ShowMessage(name, _F("%s %s.", prefix, msg))
+		return
 	end
+
+	local prefix = "Fast production"
+	local state  = bool and "enabled" or "disabled"
+	local msg    = isNightclubHub and _F("%s for the %s hub", state, factory:GetName()) or state
+	Notifier:ShowMessage(name, _F("%s %s.", prefix, msg))
 end
 
 function YRV3:FillAll()
@@ -744,21 +732,23 @@ function YRV3:FillAll()
 		return
 	end
 
-	if (self.m_businesses.office) then
-		for _, wh in ipairs(self.m_businesses.office:GetCargoWarehouses()) do
+	local office = self.m_businesses.office
+	local hangar = self.m_businesses.hangar
+	if (office and office:IsValid()) then
+		for _, wh in ipairs(office:GetCargoWarehouses()) do
 			if (wh:IsValid()) then
 				wh.auto_fill = true
 			end
 		end
 	end
 
-	if (self.m_businesses.hangar and self.m_businesses.hangar:IsValid()) then
-		self.m_businesses.hangar.auto_fill = true
+	if (hangar and hangar:IsValid()) then
+		hangar.auto_fill = true
 	end
 
 	for i = 1, 7 do
 		local factory = self:GetFactoryByIndex(i)
-		if (factory) then
+		if (factory and factory:IsValid() and factory:IsSetup()) then
 			factory:ReStock()
 			sleep(math.random(600, 1200))
 		end

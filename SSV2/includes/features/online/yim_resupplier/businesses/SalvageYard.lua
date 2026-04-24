@@ -24,8 +24,7 @@ SalvageYard.__index = SalvageYard
 ---@param opts SYOpts
 ---@return SalvageYard
 function SalvageYard.new(opts)
-	local base = BusinessFront.new(opts)
-	---@diagnostic disable-next-line
+	local base = BusinessFront.new(opts) ---@cast base SalvageYard
 	return setmetatable(base, SalvageYard)
 end
 
@@ -134,9 +133,9 @@ end
 
 ---@param slot integer
 ---@return string
-function SalvageYard:GetSalvageCarInSlot(slot)
+function SalvageYard:GetRobberyCarInSlot(slot)
 	local index = stats.get_int(_F("MPX_MPSV_MODEL_SALVAGE_VEH%d", slot))
-	return data.vehicle_targets[index] or "NULL"
+	return data.vehicle_targets[index]
 end
 
 function SalvageYard:DisableWeeklyCooldown()

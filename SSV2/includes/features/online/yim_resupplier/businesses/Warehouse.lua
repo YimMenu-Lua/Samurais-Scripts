@@ -93,13 +93,12 @@ function Warehouse.new(opts, warehouse_type)
 	assert(type(opts.max_units) == "number", "Missing argument: max_units<integer>")
 
 	local base                   = BusinessBase.new(opts)
-	local instance               = setmetatable(base, Warehouse)
+	local instance               = setmetatable(base, Warehouse) ---@cast instance Warehouse
 	instance.m_type              = warehouse_type
 	instance.m_size              = opts.size
 	instance.auto_fill           = false
 	instance.m_auto_fill_running = false
 
-	---@diagnostic disable-next-line
 	return instance
 end
 

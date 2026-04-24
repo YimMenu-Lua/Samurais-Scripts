@@ -17,7 +17,7 @@
 ---@field private m_data array<pointer<T>>
 ---@field private m_size uint16_t
 ---@field private m_capacity uint16_t
----@field private m_data_type any
+---@field private m_data_type T|ClassMeta<T>|any
 ---@field [integer] pointer<T>
 ---@operator len: integer
 ---@overload fun(address: pointer, data_type?: optional<T>): atArray

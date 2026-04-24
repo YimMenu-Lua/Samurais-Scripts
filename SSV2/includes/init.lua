@@ -73,8 +73,7 @@ GVars = {}
 ----------------------------------------------------------------------------------------------------
 -- These services must be loaded before any class that registers with/uses them -------------------
 ThreadManager = require("includes.services.ThreadManager"):init()
-Serializer    = require("includes.services.Serializer")
-Serializer:Setup("ssv2", DEFAULT_CONFIG, GVars)
+Serializer    = require("includes.services.Serializer"):Setup("ssv2", DEFAULT_CONFIG, GVars)
 
 
 -- These may look out of place, but they register themselves with Serializer for seamless

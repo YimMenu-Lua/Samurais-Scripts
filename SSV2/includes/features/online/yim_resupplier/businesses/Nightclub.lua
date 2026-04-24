@@ -29,9 +29,9 @@ Nightclub.__index     = Nightclub
 ---@return Nightclub
 function Nightclub.new(opts)
 	local base             = BusinessFront.new(opts)
-	local instance         = setmetatable(base, Nightclub)
+	local instance         = setmetatable(base, Nightclub) ---@cast instance Nightclub
 	instance.m_custom_name = opts.custom_name or "Nightclub"
-	---@diagnostic disable-next-line
+
 	return instance
 end
 

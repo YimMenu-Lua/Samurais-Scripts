@@ -41,10 +41,7 @@ Office.__index = Office
 ---@return Office
 function Office.new(opts)
 	local base                 = BusinessFront.new(opts)
-
-	---@type Office
-	---@diagnostic disable-next-line
-	local instance             = setmetatable(base, Office)
+	local instance             = setmetatable(base, Office) ---@cast instance Office
 	instance.m_custom_name     = opts.custom_name
 	instance.m_earnings_report = {
 		lifetime_buy_undertaken  = 0,
@@ -54,7 +51,12 @@ function Office.new(opts)
 		lifetime_earnings        = 0,
 		lifetime_earnings_fmt    = "$0",
 	}
+
+	for i = 0, 4 do
+		instance:AddSubBusiness(i)
+	end
 	instance:CheckVehicleWarehouse()
+
 	return instance
 end
 
@@ -71,9 +73,7 @@ function Office:CheckVehicleWarehouse()
 
 	local idx = ie_wh_prop - 114
 	local ref = RawBusinessData.VehicleWarehouses[idx]
-	if (not ref) then
-		return
-	end
+	if (not ref) then return end
 
 	self.m_vehicle_warehouse = VehicleWarehouse.new(
 		Game.GetGXTLabel(ref.gxt),

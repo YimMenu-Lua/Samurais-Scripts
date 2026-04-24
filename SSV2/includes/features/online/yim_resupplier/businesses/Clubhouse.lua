@@ -26,12 +26,15 @@ Clubhouse.__index     = Clubhouse
 ---@return Clubhouse
 function Clubhouse.new(opts)
 	local base             = BusinessFront.new(opts)
-	local instance         = setmetatable(base, Clubhouse)
+	local instance         = setmetatable(base, Clubhouse) ---@cast instance Clubhouse
 	local custom_name1     = stats.get_string("MPX_MC_GANG_NAME")
 	local custom_name2     = stats.get_string("MPX_MC_GANG_NAME2")
 	instance.m_custom_name = _F("%s%s", custom_name1, custom_name2)
 
-	---@diagnostic disable-next-line
+	for i = 0, 4 do
+		instance:AddSubBusiness(i)
+	end
+
 	return instance
 end
 

@@ -45,7 +45,7 @@ function BusinessFront.new(opts)
 	-- assert(IsInstance(opts.coords, vec3), "Missing argument: coords<vec3>") -- not necessary. UI does not render a tp button if this is missing and LuaLS will warn as well
 
 	local base                        = BusinessBase.new(opts)
-	local instance                    = setmetatable(base, BusinessFront)
+	local instance                    = setmetatable(base, BusinessFront) ---@cast instance BusinessFront
 	instance.m_subs                   = {}
 	instance.m_last_report_check_time = 0
 
@@ -53,7 +53,6 @@ function BusinessFront.new(opts)
 		instance.m_safe = CashSafe.new(opts.safe_data)
 	end
 
-	---@diagnostic disable-next-line
 	return instance
 end
 

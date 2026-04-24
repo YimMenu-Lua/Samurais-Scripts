@@ -34,6 +34,7 @@ local eSerializerState <const> = {
 --------------------------------------
 ---@class Serializer : ClassMeta<Serializer>
 ---@field protected m_initialized boolean
+---@field protected m_setup boolean
 ---@field protected __schema_hash joaat_t
 ---@field protected m_lock_queue array<function>
 ---@field private m_locked boolean
@@ -76,6 +77,7 @@ function Serializer:init()
 	local instance = setmetatable({
 		m_state            = eSerializerState.INIT,
 		m_initialized      = true,
+		m_setup            = false,
 		m_dirty            = false,
 		m_locked           = false,
 		m_disabled         = false,
@@ -110,7 +112,10 @@ end
 ---@param default_config? table
 ---@param runtime_vars? table Runtime variables that will be tracked for auto-save.
 ---@param varargs? SerializerOptionals
+---@return Serializer
 function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
+	if (self.m_setup) then return self end
+
 	varargs = varargs or {}
 	if (varargs.pretty == nil) then
 		varargs.pretty = true
@@ -137,7 +142,7 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 		log.warning("[Serializer]: Failed to read data! Persistent config will be disabled for this session.")
 		self.m_disabled = true
 		self.m_state    = eSerializerState.SUSPENDED
-		return
+		return self
 	end
 
 	if (not runtime_vars) then
@@ -196,6 +201,9 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 	self.m_last_write_time = TimePoint.new()
 	self:SyncKeys()
 	self:SaveBackup()
+
+	self.m_setup = true
+	return self
 end
 
 -- Ensures that saved config matches the default schema.
@@ -802,14 +810,7 @@ function Serializer:WriteToFile(filename, data)
 		return
 	end
 
-	local f <close>, err = io.open(filename, "w")
-	if (not f) then
-		log.fwarning("[Serializer]: Failed to open file: %s", err)
-		return
-	end
-
-	f:write(self:Encode(data))
-	f:flush()
+	self:WriteInternal(self:Encode(data), filename)
 end
 
 -- A separate read function.
@@ -907,7 +908,7 @@ end
 function Serializer:OnTick()
 	yield()
 
-	if (not self.m_initialized or not self:CanAccess()) then
+	if (not self.m_setup or not self:CanAccess()) then
 		return
 	end
 
@@ -966,7 +967,8 @@ function Serializer:Dump()
 		state          = self:GetStateStr(),
 		key_states     = self.m_key_states,
 		default_config = self.m_default_config,
-		runtime_vars   = _ENV.GVars or {},
+		runtime_vars   = _ENV.GVars and "{} (proxied)" or "NONE",
+		has_backup     = io.exists(self.m_backup_file)
 	}
 
 	print(out)

@@ -46,7 +46,7 @@ function Factory.new(opts)
 	assert(type(opts.id) == "number" and math.is_inrange(opts.id, 0, 6), "Invalid Biker Business id.")
 
 	local base                   = BusinessBase.new(opts)
-	local instance               = setmetatable(base, Factory)
+	local instance               = setmetatable(base, Factory) ---@cast instance Factory
 	instance.m_normalized_name   = opts.normalized_name
 	instance.fast_prod_enabled   = false
 	instance.m_fast_prod_running = false
@@ -64,7 +64,6 @@ function Factory.new(opts)
 	instance.m_prod_time_g       = baseGlobal:At(205):At(idx, 13):At(9)
 	instance.m_restock_g         = restockGlobal:At(1, idx)
 
-	---@diagnostic disable-next-line
 	return instance
 end
 
