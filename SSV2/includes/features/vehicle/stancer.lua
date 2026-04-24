@@ -171,7 +171,7 @@ function Stancer:SaveCurrentVehicle()
 end
 
 ---@param modelName string
-function Stancer:RemovedSavedVehicle(modelName)
+function Stancer:RemoveSavedVehicle(modelName)
 	if (not self.m_saved_models[modelName]) then
 		return
 	end
@@ -325,12 +325,12 @@ function Stancer:ReadWheelData()
 
 	if (not self:ShouldRun()) then return end
 
-	local front_axle  = self.m_wheels[Enums.eWheelAxle.FRONT]
-	local rear_axle   = self.m_wheels[Enums.eWheelAxle.REAR]
 	local wheel_array = self.m_entity:Resolve().m_wheels
 	local array_size  = wheel_array:Size()
 	if (array_size == 0) then return end
 
+	local front_axle = self.m_wheels[Enums.eWheelAxle.FRONT]
+	local rear_axle  = self.m_wheels[Enums.eWheelAxle.REAR]
 	for i = 1, array_size do
 		local wheel = CWheel(wheel_array:At(i):deref())
 		if (not wheel or not wheel:IsValid()) then

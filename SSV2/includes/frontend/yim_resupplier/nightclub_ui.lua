@@ -158,12 +158,14 @@ return function()
 		)
 
 		local this       = hubs[i]
+		local has_tech   = this:GetAssignedTechIndex() ~= -1
 		local prod       = this:GetProductCount()
 		local hub_value  = this:GetProductValue()
 		HubTotalValue    = HubTotalValue + hub_value
 
 		local hub_name   = this:GetName() or _F("Hub %d", i)
 		local text_width = ImGui.CalcTextSize(hub_name)
+		ImGui.BeginDisabled(not has_tech)
 		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetContentRegionAvail() - text_width) * 0.5)
 		ImGui.Text(hub_name)
 
@@ -187,7 +189,8 @@ return function()
 		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + 40) * 0.5)
 		-- TODO: Fix glitchy behavior + session disconnect on Enhanced
 		ImGui.BeginDisabled(Game.IsEnhanced())
-		ImGui.BeginDisabled(prod >= max_units)
+		local is_maxed = prod >= max_units
+		ImGui.BeginDisabled(is_maxed)
 		this.fast_prod_enabled, _ = GUI:CustomToggle("##fast_prod", this.fast_prod_enabled)
 		ImGui.EndDisabled()
 		GUI:Tooltip(_T("YRV3_TRIGGER_PROD_HUB_TT"))
@@ -198,12 +201,16 @@ return function()
 			and _T("YRV3_TRIGGER_PROD_HUB")
 			or ImGui.TextSpinner()
 
-		ImGui.BeginDisabled(not safe_to_trigger or prod >= max_units)
-		if (GUI:Button(btn_label, { size = vec2:new(65, 30) })) then
+		ImGui.BeginDisabled(not safe_to_trigger or is_maxed)
+		if (GUI:Button(has_tech and btn_label or "X", { size = vec2:new(65, 30) })) then
 			this:TriggerProduction()
 		end
 		ImGui.EndDisabled()
 		ImGui.EndDisabled()
+		ImGui.EndDisabled()
+		if (not has_tech) then
+			GUI:Tooltip(_T("YRV3_HUB_TECH_NOT_ASSIGNED_TT"))
+		end
 
 		ImGui.EndChild()
 		ImGui.PopID()

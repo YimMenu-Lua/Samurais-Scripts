@@ -8,8 +8,6 @@
 
 
 local COL_GREY <const>          = Color("#636363")
-local LOCALES <const>           = Translator.locales
-
 local side_button_size          = vec2:new(140, 35)
 local init_g_addr               = 0
 local init_l_addr               = 0
@@ -46,9 +44,6 @@ local TVehTextureLookup <const> = {
 	["brigham"] = "sssa_dlc_2023_01",
 	["clique2"] = "sssa_dlc_2023_01",
 }
-
--- disable game controls
-local input_1, input_2, input_3 = false, false, false
 
 --fwd decl
 local thread_name
@@ -416,9 +411,10 @@ local function DrawTranslatorDebug()
 	ImGui.TextDisabled("You can switch between available languages in Settings -> General.")
 	ImGui.Spacing()
 
-	local state = Translator:GetState()
-	local idx   = (GVars.backend.language_index)
-	local iso   = LOCALES[idx]
+	local locales = Translator.locales
+	local state   = Translator:GetState()
+	local idx     = GVars.backend.language_index
+	local iso     = locales[idx]
 
 	ImGui.BulletText(_F("State: %s", EnumToString(Enums.eTranslatorState, state)))
 	if (state == Enums.eTranslatorState.RUNNING) then
@@ -448,7 +444,7 @@ local function DrawTranslatorDebug()
 	end
 
 	if (GUI:Button("Dump Locales")) then
-		print(Translator.locales)
+		print(locales)
 	end
 
 	if (GUI:Button("Dump Cache")) then

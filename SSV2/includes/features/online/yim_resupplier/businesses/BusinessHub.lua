@@ -7,14 +7,15 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BusinessBase  = require("BusinessBase")
-local SGSL          = require("includes.services.SGSL")
+local BusinessBase = require("BusinessBase")
+local SGSL         = require("includes.services.SGSL")
 
 ---@class HubOpts : BusinessOpts
 ---@field id integer
 ---@field max_units integer
 ---@field name string
 ---@field vpu integer Base Value Per Unit
+
 
 -- Class representing a business that accumulates valuable cargo over time *(Nightclub cargo)*.
 ---@class BusinessHub : BusinessBase
@@ -24,6 +25,7 @@ local SGSL          = require("includes.services.SGSL")
 ---@field private m_vpu integer
 ---@field private m_prod_time_g ScriptGlobal
 ---@field private m_prod_bool_g ScriptGlobal
+---@field private m_tech_global ScriptGlobal
 ---@field private m_fast_prod_running boolean
 ---@field public fast_prod_enabled boolean
 local BusinessHub   = setmetatable({}, BusinessBase)
@@ -41,6 +43,7 @@ function BusinessHub.new(opts)
 	instance.m_vpu             = opts.vpu
 	instance.m_prod_time_g     = SGSL:Get(SGSL.data.bhub_prod_time_global):AsGlobal():At(1, base:GetIndex())
 	instance.m_prod_bool_g     = SGSL:Get(SGSL.data.bhub_prod_bool_global):AsGlobal()
+	instance.m_tech_global     = base:GetBaseGlobal():At(321)
 
 	---@diagnostic disable-next-line
 	return instance
@@ -62,18 +65,48 @@ function BusinessHub:GetProductValue()
 	return math.floor(self:GetProductCount() * self.m_vpu)
 end
 
+-- `BOOL func_19854(int iParam0, int iParam1) // Position - 0x5FD381 (6280065) (legacy b3788.0)`
+---@private
+---@param techIndex integer `0..5`
+---@return boolean
+function BusinessHub:IsTechAssignedToThis(techIndex)
+	local idx    = self:GetIndex()
+	local bitPos = idx
+	local offset = 3
+	if (techIndex < 4) then
+		bitPos = (techIndex * 7) + idx
+		offset = 2
+	end
+	return Bit.IsBitSet(self.m_tech_global:At(offset):ReadInt(), bitPos)
+end
+
+-- `int func_19853(int iParam0) // Position - 0x5FD348 (6280008) (legacy b3788.0)`
+--
+-- Actually wanted to improve UX with tech names using the return index
+--
+-- but apparently only Yohan has a name. We should probably return a bool instead
+---@return integer TechIndex A number between 0 and 5 or -1 if no one is assigned.
+function BusinessHub:GetAssignedTechIndex()
+	for i = 0, 5 do
+		if (self:IsTechAssignedToThis(i)) then
+			return i
+		end
+	end
+
+	return -1
+end
+
 ---@return milliseconds
 function BusinessHub:GetTimeLeftBeforeProd()
 	return self.m_prod_time_g:ReadInt()
 end
 
 function BusinessHub:TriggerProduction()
-	if (self.m_prod_time_g:ReadInt() < 1000) then
+	if (self.m_prod_time_g:ReadInt() < 1000 or self:GetAssignedTechIndex() == -1) then
 		return
 	end
 
 	self.m_prod_time_g:WriteInt(100)
-	self.m_prod_bool_g:At(1):At(self.m_id):WriteInt(0)
 	self.m_prod_bool_g:WriteInt(1)
 end
 
@@ -106,6 +139,12 @@ function BusinessHub:Update()
 	end
 
 	if (self.fast_prod_enabled and not self.m_fast_prod_running and not self:HasFullProduction()) then
+		if (self:GetAssignedTechIndex() == -1) then
+			self.fast_prod_enabled = false
+			Notifier:ShowError(self:GetName(), _T("YRV3_HUB_TECH_NOT_ASSIGNED_TT"))
+			return
+		end
+
 		self.m_fast_prod_running = true
 		self:LoopProduction()
 	end

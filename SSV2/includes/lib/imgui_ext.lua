@@ -576,11 +576,13 @@ function ImGui.ValueBar(label, value, size, flags, opts)
 	ImGui.SetWindowFontScale(fontScale)
 	local valTextSize = vec2:new(ImGui.CalcTextSize(valueText))
 	local valTextPos  = rectStart + (rectSize - valTextSize) / 2
+	local isDisabled  = style.Alpha < 1.0
+	local textColor   = ImGui.GetStyleColorU32(isDisabled and ImGuiCol.TextDisabled or ImGuiCol.Text)
 	ImGui.ImDrawListAddText(
 		pDrawList,
 		valTextPos.x,
 		valTextPos.y,
-		ImGui.GetStyleColorU32(ImGuiCol.Text),
+		textColor,
 		valueText
 	)
 	ImGui.SetWindowFontScale(1)
@@ -592,7 +594,7 @@ function ImGui.ValueBar(label, value, size, flags, opts)
 			pDrawList,
 			posX,
 			posY,
-			ImGui.GetStyleColorU32(ImGuiCol.Text),
+			textColor,
 			label
 		)
 	end

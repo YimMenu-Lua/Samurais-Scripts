@@ -59,7 +59,7 @@ return function(bb, notOwnedLabel)
 	local index         = bb:GetIndex() or -1
 
 	ImGui.BeginChildEx(_F("bb##%s", name),
-		vec2:new(0, index < 6 and 330 or 300),
+		vec2:new(0, index < 6 and 360 or 330),
 		ImGuiChildFlags.AlwaysUseWindowPadding,
 		ImGuiWindowFlags.NoScrollbar
 	)
@@ -108,7 +108,6 @@ return function(bb, notOwnedLabel)
 	end
 	ImGui.EndDisabled()
 
-	ImGui.SameLine()
 	ImGui.BeginDisabled(bb.fast_prod_enabled or stock == maxUnits or supplies < 25)
 	if (GUI:Button(_T("YRV3_TRIGGER_PROD"), { repeatable = true })) then
 		bb:TriggerProduction()

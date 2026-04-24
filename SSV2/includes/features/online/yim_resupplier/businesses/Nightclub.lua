@@ -30,7 +30,7 @@ Nightclub.__index     = Nightclub
 function Nightclub.new(opts)
 	local base             = BusinessFront.new(opts)
 	local instance         = setmetatable(base, Nightclub)
-	instance.m_custom_name = opts.custom_name
+	instance.m_custom_name = opts.custom_name or "Nightclub"
 	---@diagnostic disable-next-line
 	return instance
 end
@@ -51,7 +51,7 @@ end
 
 ---@return string
 function Nightclub:GetCustomName()
-	return self.m_custom_name or "The Palace"
+	return self.m_custom_name
 end
 
 ---@return integer
@@ -65,7 +65,7 @@ function Nightclub:MaxPopularity()
 	end
 
 	stats.set_int("MPX_CLUB_POPULARITY", 1e3)
-	Notifier:ShowSuccess(self:GetCustomName(), _T("YRV3_POPULARITY_NOTIF"))
+	Notifier:ShowSuccess(self.m_custom_name, _T("YRV3_POPULARITY_NOTIF"))
 end
 
 function Nightclub:LockPopularityDecay()

@@ -317,7 +317,7 @@ return function()
 
 			ImGui.SameLine()
 			if (GUI:Button(_T("GENERIC_REMOVE"))) then
-				Stancer:RemovedSavedVehicle(selectedSavedModel)
+				Stancer:RemoveSavedVehicle(selectedSavedModel)
 			end
 			ImGui.EndDisabled()
 
