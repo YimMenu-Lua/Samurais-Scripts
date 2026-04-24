@@ -958,13 +958,11 @@ end
 ---@param value string | number | integer | table
 function table.getduplicates(t, value)
 	local count = 0
-
 	for _, v in ipairs(t) do
 		if (value == v) then
 			count = count + 1
 		end
 	end
-
 	return count
 end
 
@@ -995,8 +993,10 @@ function table.removeduplicates(t, debug)
 	return debug and t_result or t_clean
 end
 
----@param t table
+---@generic T : table
+---@param t T
 ---@param seen? table
+---@return T
 function table.copy(t, seen)
 	seen = seen or {}
 	if seen[t] then
@@ -1023,10 +1023,10 @@ end
 ---@param path string?
 ---@param seen table?
 function table.merge(src, dest, path, seen)
+	if (src == dest) then return end
+
 	seen = seen or {}
-	if (seen[src]) then
-		return
-	end
+	if (seen[src]) then return end
 	seen[src] = true
 
 	for k, v in pairs(src) do
@@ -1039,24 +1039,21 @@ function table.merge(src, dest, path, seen)
 	end
 end
 
----@param inTable table
----@param outTable table
-function table.swap(inTable, outTable)
-	if (inTable == outTable) then
-		return
-	end
+---@param t1 table
+---@param t2 table
+function table.swap(t1, t2)
+	if (t1 == t2) then return end
 
 	local temp = {}
-
-	for k, v in pairs(inTable) do
-		temp[k]    = v
-		inTable[k] = nil
+	for k, v in pairs(t1) do
+		temp[k] = v
+		t1[k]   = nil
 	end
 
-	for k, v in pairs(outTable) do
-		inTable[k]  = v
-		outTable[k] = temp[k]
-		temp[k]     = nil
+	for k, v in pairs(t2) do
+		t1[k]   = v
+		t2[k]   = temp[k]
+		temp[k] = nil
 	end
 end
 
@@ -1065,7 +1062,7 @@ end
 ---@param src table
 ---@param seen? table
 function table.overwrite(this, src, seen)
-	if (this == src) then return this end
+	if (this == src) then return end
 
 	seen = seen or {}
 	if (seen[src]) then return end
@@ -1089,37 +1086,37 @@ function table.overwrite(this, src, seen)
 	end
 end
 
----@param a table
----@param b table
+---@param t1 table
+---@param t2 table
 ---@param seen? table
 ---@return boolean
-function table.is_equal(a, b, seen)
-	if (a == b) then
+function table.is_equal(t1, t2, seen)
+	if (t1 == t2) then
 		return true
 	end
 
-	if (type(a) ~= type(b)) then
+	if (type(t1) ~= type(t2)) then
 		return false
 	end
 
-	if (type(a) ~= "table") then
+	if (type(t1) ~= "table") then
 		return false
 	end
 
 	seen = seen or {}
-	if (seen[a] and seen[b]) then
+	if (seen[t1] and seen[t2]) then
 		return true
 	end
-	seen[a], seen[b] = true, true
+	seen[t1], seen[t2] = true, true
 
-	for k, v in pairs(a) do
-		if (not table.is_equal(v, b[k], seen)) then
+	for k, v in pairs(t1) do
+		if (not table.is_equal(v, t2[k], seen)) then
 			return false
 		end
 	end
 
-	for k in pairs(b) do
-		if (a[k] == nil) then
+	for k in pairs(t2) do
+		if (t1[k] == nil) then
 			return false
 		end
 	end

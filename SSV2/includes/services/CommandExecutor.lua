@@ -558,7 +558,8 @@ function CommandExecutor:GetDefaultCommands()
 	return {
 		["!list"] = {
 			callback = function()
-				if (not self.m_sorted_command_names) then
+				-- We have several similar use cases so it's probably a good idea to add an OrderedMap struct
+				if (not self.m_sorted_command_names or #self.m_sorted_command_names ~= table.getlen(self.m_commands)) then
 					self.m_sorted_command_names = {}
 					for name in pairs(self.m_commands) do
 						table.insert(self.m_sorted_command_names, name)
