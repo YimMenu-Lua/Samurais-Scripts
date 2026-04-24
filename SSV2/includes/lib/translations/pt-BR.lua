@@ -858,5 +858,6 @@ return {
 	["ASSET_BROWSER_CONTEXT_TT"] = "Clique com o botão direito para abrir o menu de contexto.",
 	["YAV3_SYMBOL_DEFS_HINT"] = "Você já se perguntou quais são os símbolos de algumas ações da lista?\n\n- %s: salvo como favorito.\n- %s: registrado como um comando.\n- %s: gerado pelo usuário.",
 	["YAV3_LIST_VIEW_HINT"] = "As visualizações de lista de animação e cenário são exatamente as mesmas na guia 'Ações' e na guia 'Companheiros', o que significa que quaisquer filtros que você usar em uma guia também existirão na outra. No entanto, este não é o caso das guias 'histórico' e 'favoritos'.",
-	["YAV3_VEH_ANIM_HINT"] = "As animações centradas no veículo não podem ser reproduzidas a pé; mesmo para companheiros."
+	["YAV3_VEH_ANIM_HINT"] = "As animações centradas no veículo não podem ser reproduzidas a pé; mesmo para companheiros.",
+	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Nenhum técnico está atribuído a este hub."
 }

@@ -332,6 +332,7 @@ return {
 	["YRV3_TRIGGER_PROD_TT"]               = "Instantly triggers production once as long as you have supplies. You can hold the button to keep triggering it or enable 'Auto-Produce' to fully automate the process.",
 	["YRV3_TRIGGER_PROD_HUB"]              = "Tick", -- I don't know what label to use. We need something short that fits into an 80px wide frame across all supported languages
 	["YRV3_TRIGGER_PROD_HUB_TT"]           = "Keeps triggering production over time. This is not instant like biker businesses, there's a delay between each trigger (approximately 20 seconds).\n\n[IMPROTANT]: You must make sure the connected business is setup and running and you have a technician assigned in your nightclub before enabling this.",
+	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"]      = "No technician is assigned to this hub.",
 	["YRV3_FINISH_SOURCE_MISSION"]         = "Finish Cargo Source Mission",
 	["YRV3_FINISH_SOURCE_MISSION_TT"]      = "Start a source mission then press this button to finish it.",
 	["YRV3_VALUE_TOTAL"]                   = "Total Value",

@@ -858,5 +858,6 @@ return {
 	["ASSET_BROWSER_CONTEXT_TT"] = "Kliknij prawym przyciskiem myszy, aby otworzyć menu kontekstowe.",
 	["YAV3_LIST_VIEW_HINT"] = "Widoki animacji i listy scenariuszy są dokładnie takie same na karcie „Akcje” i „Towarzysze”, co oznacza, że ​​wszelkie filtry użyte na jednej karcie będą również dostępne na drugiej. Nie dotyczy to jednak zakładek „historia” i „ulubione”.",
 	["YAV3_SYMBOL_DEFS_HINT"] = "Czy zastanawiałeś się kiedyś, jakie są symbole niektórych działań na liście?\n\n- %s: Zapisano jako ulubione.\n- %s: Zarejestrowano jako polecenie.\n- %s: Utworzono przez użytkownika.",
-	["YAV3_VEH_ANIM_HINT"] = "Animacji skupiających się na pojazdach nie można odtwarzać na piechotę; nawet dla towarzyszy."
+	["YAV3_VEH_ANIM_HINT"] = "Animacji skupiających się na pojazdach nie można odtwarzać na piechotę; nawet dla towarzyszy.",
+	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Do tego koncentratora nie jest przypisany żaden technik."
 }

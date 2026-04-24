@@ -858,5 +858,6 @@ return {
 	["ASSET_BROWSER_CONTEXT_TT"] = "Haga clic derecho para abrir el menú contextual.",
 	["YAV3_SYMBOL_DEFS_HINT"] = "¿Alguna vez te has preguntado cuáles son los símbolos de algunas acciones de la lista?\n\n- %s: guardado como favorito.\n- %s: registrado como comando.\n- %s: generado por el usuario.",
 	["YAV3_LIST_VIEW_HINT"] = "Las vistas de lista de animaciones y escenarios son exactamente las mismas en la pestaña 'Acciones' y en la pestaña 'Compañeros', lo que significa que cualquier filtro que uses en una pestaña también existirá en la otra. Sin embargo, este no es el caso de las pestañas \"historial\" y \"favoritos\".",
-	["YAV3_VEH_ANIM_HINT"] = "Las animaciones centradas en vehículos no se pueden reproducir a pie; incluso para acompañantes."
+	["YAV3_VEH_ANIM_HINT"] = "Las animaciones centradas en vehículos no se pueden reproducir a pie; incluso para acompañantes.",
+	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "No hay ningún técnico asignado a este centro."
 }

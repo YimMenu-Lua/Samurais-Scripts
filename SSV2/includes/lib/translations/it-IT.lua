@@ -858,5 +858,6 @@ return {
 	["ASSET_BROWSER_CONTEXT_TT"] = "Fare clic con il tasto destro per aprire il menu contestuale.",
 	["YAV3_LIST_VIEW_HINT"] = "Le visualizzazioni dell'elenco delle animazioni e degli scenari sono esattamente le stesse nella scheda \"Azioni\" e nella scheda \"Compagni\", il che significa che tutti i filtri che utilizzi in una scheda esisteranno anche nell'altra. Questo però non è il caso delle schede \"cronologia\" e \"preferiti\".",
 	["YAV3_SYMBOL_DEFS_HINT"] = "Ti sei mai chiesto quali sono i simboli su alcune azioni nell'elenco?\n\n- %s: salvato come preferito.\n- %s: registrato come comando.\n- %s: generato dall'utente.",
-	["YAV3_VEH_ANIM_HINT"] = "Le animazioni incentrate sui veicoli non possono essere riprodotte a piedi; anche per i compagni."
+	["YAV3_VEH_ANIM_HINT"] = "Le animazioni incentrate sui veicoli non possono essere riprodotte a piedi; anche per i compagni.",
+	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Nessun tecnico è assegnato a questo hub."
 }
