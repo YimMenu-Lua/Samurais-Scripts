@@ -78,12 +78,12 @@ return {
 			capture_group = 1
 		}
 	},
-	biker_prod_time_global = {
-		description = "Trigger production for all biker businesses.",
+	mp_business_stuff = {
+		description = "Business stuff",
 		file = "freemode.c",
 		LEGACY = {
 			value = 1845250,
-			pattern = [[Global_(\d{7})\[.*? /\*(\d+)\*/\]\.(f_\d{3}).(f_\d{3})\[.*? /\*(\d+)\*/\].f_9 = .*?;]],
+			pattern = [[Global_(\d{7})\[.*? /\*(\d+)\*/\]\.(f_\d{3}).f_\d{3}\[.*? /\*\d+\*/\].f_9 = .*?;]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -95,20 +95,11 @@ return {
 					value = 260,
 					capture_group = 3
 				},
-				{
-					value = 205,
-					capture_group = 4
-				},
-				{
-					value = 13,
-					capture_group = 5,
-					description = "business index read size."
-				}
 			}
 		},
 		ENHANCED = {
 			value = 1845299,
-			pattern = [[Global_(\d{7})\[.*? /\*(\d+)\*/\]\.(f_\d{3}).(f_\d{3})\[.*? /\*(\d+)\*/\].f_9 = .*?;]],
+			pattern = [[Global_(\d{7})\[.*? /\*(\d+)\*/\]\.(f_\d{3}).f_\d{3}\[.*? /\*\d+\*/\].f_9 = .*?;]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -120,15 +111,6 @@ return {
 					value = 260,
 					capture_group = 3
 				},
-				{
-					value = 205,
-					capture_group = 4
-				},
-				{
-					value = 13,
-					capture_group = 5,
-					description = "business index read size."
-				}
 			}
 		}
 	},

@@ -362,7 +362,7 @@ function CVehicle:GetWheel(index)
 		return
 	end
 
-	return CWheel(ptr)
+	return CWheel(ptr:deref())
 end
 
 ---@return CWheelDrawData

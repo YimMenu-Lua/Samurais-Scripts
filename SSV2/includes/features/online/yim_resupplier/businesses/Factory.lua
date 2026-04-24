@@ -33,6 +33,7 @@ local SGSL         = require("includes.services.SGSL")
 ---@field private m_equipment_upgrade boolean
 ---@field private m_staff_upgrade boolean
 ---@field private m_prod_time_g ScriptGlobal
+---@field private m_restock_g ScriptGlobal
 ---@field private m_fast_prod_running boolean
 ---@field public fast_prod_enabled boolean
 local Factory   = setmetatable({}, BusinessBase)
@@ -57,17 +58,11 @@ function Factory.new(opts)
 	instance.m_equipment_upgrade = mult_1 > 0
 	instance.m_staff_upgrade     = mult_2 > 0
 
-	local g_obj                  = SGSL:Get(SGSL.data.biker_prod_time_global)
-	local pid_size               = g_obj:GetOffset(1)
-	local offset_2               = g_obj:GetOffset(2)
-	local offset_3               = g_obj:GetOffset(3)
-	local index_size             = g_obj:GetOffset(4)
-	instance.m_prod_time_g       = g_obj:AsGlobal()
-		:At(LocalPlayer:GetID(), pid_size)
-		:At(offset_2)
-		:At(offset_3)
-		:At(base:GetIndex(), index_size)
-		:At(9)
+	local idx                    = base:GetIndex()
+	local baseGlobal             = base:GetBaseGlobal()
+	local restockGlobal          = SGSL:Get(SGSL.data.freemode_business_global):AsGlobal()
+	instance.m_prod_time_g       = baseGlobal:At(205):At(idx, 13):At(9)
+	instance.m_restock_g         = restockGlobal:At(1, idx)
 
 	---@diagnostic disable-next-line
 	return instance
@@ -115,10 +110,7 @@ function Factory:ReStock()
 		return
 	end
 
-	SGSL:Get(SGSL.data.freemode_business_global)
-		:AsGlobal()
-		:At(1, self.m_id)
-		:WriteInt(1)
+	self.m_restock_g:WriteInt(1)
 end
 
 ---@return milliseconds
