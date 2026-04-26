@@ -627,6 +627,22 @@ local function DrawMiscTests()
 
 		print(LocalPlayer:GetVehicle():GetHandlingData())
 	end
+
+	if (ImGui.Button("wheel shit")) then
+		if (self.get_veh() == 0) then return end
+		local PV = LocalPlayer:GetVehicle()
+		local wheel_lr = PV:GetWheel(3)
+		if (not wheel_lr) then return end
+
+		local pWheel = wheel_lr:GetPointer()
+		local pvAddr = PV:GetPointer():get_address()
+		for i = 0, 0x3FF do
+			if (pWheel:add(i):deref():get_address() == pvAddr) then
+				printf("m_vehicle: 0x%X", i)
+				break
+			end
+		end
+	end
 end
 
 return function()
