@@ -2,4 +2,4 @@
 CI only. Do not edit.
 --]]
 
-return "1.9.3"
+return "1.9.4"
