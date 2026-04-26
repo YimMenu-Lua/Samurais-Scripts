@@ -37,8 +37,8 @@ return {
 			key            = "m_susp_comp",
 			axle           = Enums.eWheelAxle.FRONT,
 			side_dont_care = true,
-			read           = function(w) return w.m_suspension_forward_offset:get_float() end,
-			write          = function(w, v) w.m_suspension_forward_offset:set_float(v) end
+			read           = function(w) return w.m_rest_position_2:get_float() end,
+			write          = function(w, v) w.m_rest_position_2:set_float(v) end
 		},
 		{
 			key            = "m_wheel_width",
@@ -85,8 +85,8 @@ return {
 			key            = "m_susp_comp",
 			axle           = Enums.eWheelAxle.REAR,
 			side_dont_care = true,
-			read           = function(w) return w.m_suspension_forward_offset:get_float() end,
-			write          = function(w, v) w.m_suspension_forward_offset:set_float(v) end
+			read           = function(w) return w.m_rest_position_2:get_float() end,
+			write          = function(w, v) w.m_rest_position_2:set_float(v) end
 		},
 	}
 }
