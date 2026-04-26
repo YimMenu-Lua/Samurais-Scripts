@@ -34,13 +34,13 @@ local VEC3_ZERO <const> = vec3:zero()
 ---@field m_suspension_length pointer<float>
 ---@field m_max_suspension_travel pointer<float>
 ---@field m_rest_position pointer<float>
----@field m_rest_position_2 pointer<float>
+---@field m_rest_position_2 pointer<float> prefer this to raise/lower individual wheels
 ---@field m_unk0140 pointer<float>
 ---@field m_accel_mass_mult pointer<float>
 ---@field m_unk_0148 pointer<float>
 ---@field m_suspension_raise pointer<float>
 ---@field m_unk_suspension_raise pointer<float>
----@field m_suspension_fwd_offset pointer<float> prefer this to raise/lower individual wheels
+---@field m_suspension_fwd_offset pointer<float>
 ---@field m_hydraulic_state pointer<int32_t> some enum related to hydraulic state. can't find any refs online. where's Yimura when you need to skid from him? :(
 ---@field m_hydraulic_state_2 pointer<int32_t> -- ??
 ---@field m_suspension_compression pointer<float>
