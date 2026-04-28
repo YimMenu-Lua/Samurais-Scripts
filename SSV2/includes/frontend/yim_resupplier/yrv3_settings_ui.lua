@@ -111,8 +111,7 @@ return function()
 		ImGui.EndDisabled()
 	end
 
-	ImGui.Text(_F(_T("YRV3_AUTOSELL_CURRENT"), YRV3:GetRunningSellScriptDisplayName()))
-
+	ImGui.Text(_T("YRV3_AUTOSELL_CURRENT", YRV3:GetRunningSellScriptDisplayName()))
 	GUI:HeaderText(_T("YRV3_AUTO_FILL"), { separator = true, spacing = true })
 	ImGui.Text(_T("YRV3_AUTO_FILL_DELAY"))
 	drawAutofillTimeSelector()

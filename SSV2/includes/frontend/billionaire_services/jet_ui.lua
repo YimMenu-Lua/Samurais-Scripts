@@ -142,12 +142,12 @@ local function drawSpawnedJet(jet)
 		if (GUI:Button(_T("GENERIC_GO"))) then
 			ThreadManager:Run(function(s)
 				if (jet.departureAirport and (jet.departureAirport.name == selectedAirport.name)) then
-					Notifier:ShowError("Private Jet", _F(_T("BSV2_JET_LANDING_SAME_AP_ERR"), selectedAirport.name))
+					Notifier:ShowError("Private Jet", _T("BSV2_JET_LANDING_SAME_AP_ERR", selectedAirport.name))
 					return
 				end
 
 				jet.arrivalAirport = selectedAirport
-				Notifier:ShowMessage("Private Jet", _F(_T("BSV2_JET_FLY_CONFIRM"), selectedAirport.name))
+				Notifier:ShowMessage("Private Jet", _T("BSV2_JET_FLY_CONFIRM", selectedAirport.name))
 				jet:FlyTo(selectedAirport.landingApproach.pos, s)
 			end)
 		end

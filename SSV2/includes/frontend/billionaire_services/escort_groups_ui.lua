@@ -370,7 +370,7 @@ local function drawGroupCreatorStep1()
 	local groups  = BSV2:GetEscortGroupList()
 	local exists  = groups[newGroup.nameBuffer] ~= nil
 	local isValid = string.isvalid(newGroup.buffer.name) and not exists
-	local text    = isValid and _F(_T("BSV2_ES_NEW_GROUP_NEXT"), "[ > ]") or _T("BSV2_ES_NEW_GROUP_NAME")
+	local text    = isValid and _T("BSV2_ES_NEW_GROUP_NEXT", "[ > ]") or _T("BSV2_ES_NEW_GROUP_NAME")
 	ImGui.Text(text)
 
 	ImGui.Spacing()
@@ -389,7 +389,7 @@ end
 local function drawGroupCreatorStep2()
 	ImGui.Dummy(0, 15)
 	local isValid = newGroup.buffer.vehicleModel ~= nil
-	local text    = isValid and _F(_T("BSV2_ES_NEW_GROUP_NEXT"), "[ > ]") or _T("BSV2_ES_NEW_GROUP_VEH")
+	local text    = isValid and _T("BSV2_ES_NEW_GROUP_NEXT", "[ > ]") or _T("BSV2_ES_NEW_GROUP_VEH")
 	ImGui.Text(text)
 
 	ImGui.Spacing()
@@ -420,7 +420,7 @@ local function drawGroupCreatorStep3()
 	local infoText = membersFull and "BSV2_ES_NEW_GROUP_MEMBERS_DONE" or "BSV2_ES_NEW_GROUP_MEMBERS"
 	ImGui.Text(_T(infoText))
 	ImGui.Spacing()
-	ImGui.BulletText(_F(_T("BSV2_ES_NEW_GROUP_MEMBERS_COUNT"), count))
+	ImGui.BulletText(_T("BSV2_ES_NEW_GROUP_MEMBERS_COUNT", count))
 
 	local removeDisabled = not math.is_inrange(count, 1, 3)
 	ImGui.SameLine()
@@ -495,7 +495,7 @@ local function drawGroupCreator()
 		stage / 3.0,
 		vec2:new(ImGui.GetContentRegionAvail() - btnSize.x - style.ItemSpacing.x, btnSize.y),
 		ImGuiValueBarFlags.NONE,
-		{ fmt = _F(_T("BSV2_ES_NEW_GROUP_STEP_LABEL"), stage) }
+		{ fmt = _T("BSV2_ES_NEW_GROUP_STEP_LABEL", stage) }
 	)
 
 	ImGui.SameLine()
@@ -520,7 +520,7 @@ local function drawGroupCreator()
 			GUI:Tooltip(_T("GENERIC_CONFIRM"))
 		end
 
-		if (ImGui.DialogBox("##confirmNewGroup", _F(_T("BSV2_ES_NEW_GROUP_PROMPT"), newGroup.buffer.name), ImGuiDialogBoxStyle.INFO)) then
+		if (ImGui.DialogBox("##confirmNewGroup", _T("BSV2_ES_NEW_GROUP_PROMPT", newGroup.buffer.name), ImGuiDialogBoxStyle.INFO)) then
 			BSV2:AddNewEscortGroup(table.copy(newGroup.buffer))
 			clearNewGroupBuffer()
 		end

@@ -206,7 +206,7 @@ local function drawThemeSettings()
 				if (ThemeManager:DoesThemeExist(newThemeBuff.Name)) then
 					Notifier:ShowError(
 						_T("GENERIC_SETTINGS_LABEL"),
-						_F(_T("SETTINGS_NEW_THEME_NAME_ERR"), newThemeBuff.Name),
+						_T("SETTINGS_NEW_THEME_NAME_ERR", newThemeBuff.Name),
 						false,
 						5
 					)

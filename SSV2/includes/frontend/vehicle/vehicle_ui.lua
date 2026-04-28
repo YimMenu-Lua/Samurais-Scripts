@@ -134,7 +134,7 @@ local function driftMinigameOptions()
 	)
 
 	ImGui.Spacing()
-	ImGui.BulletText(_F(_T("VEH_DRIFT_MINIGAME_PB_LABEL"),
+	ImGui.BulletText(_T("VEH_DRIFT_MINIGAME_PB_LABEL",
 		string.formatint(GVars.features.vehicle.drift_minigame.player_best))
 	)
 end

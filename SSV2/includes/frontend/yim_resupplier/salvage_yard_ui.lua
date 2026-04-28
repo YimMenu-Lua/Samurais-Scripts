@@ -118,7 +118,7 @@ return function()
 				ImGuiChildFlags.AlwaysUseWindowPadding,
 				ImGuiWindowFlags.NoScrollbar
 			)
-			ImGui.SeparatorText(_F(_T("SY_LIFT"), i))
+			ImGui.SeparatorText(_T("SY_LIFT", i))
 			ImGui.Spacing()
 
 			if (not isTaken) then
@@ -188,20 +188,17 @@ return function()
 
 		ImGui.SeparatorText(_T("SY_WEEKLY_ROBBERIES"))
 		for i = 0, 2 do
-			ImGui.Text(_F(_T("SY_WEEKLY_CAR_STATUS"), i + 1, SalvageYard:GetWeeklyRobberyStatus(i)))
+			ImGui.Text(_T("SY_WEEKLY_CAR_STATUS", i + 1, SalvageYard:GetWeeklyRobberyStatus(i)))
 			ImGui.Separator()
 		end
 
 		ImGui.Spacing()
 
-		ImGui.Text(_F(_T("SY_CURRENT_ROBBERY"), SalvageYard:GetRobberyName()))
+		ImGui.Text(_T("SY_CURRENT_ROBBERY", SalvageYard:GetRobberyName()))
 		if (SalvageYard:IsRobberyActive()) then
-			ImGui.Text(
-				_F(_T("SY_ROBBERY_ACTIVE_CAR"),
-					SalvageYard:GetRobberyVehicleName())
-			)
-			ImGui.Text(_F(_T("SY_ROBBERY_CAR_VALUE"), SalvageYard:GetRobberyValue()))
-			ImGui.Text(_F(_T("SY_ROBBERY_CAN_KEEP_CAR"), tostring(SalvageYard:GetRobberyKeepState())))
+			ImGui.Text(_T("SY_ROBBERY_ACTIVE_CAR", SalvageYard:GetRobberyVehicleName()))
+			ImGui.Text(_T("SY_ROBBERY_CAR_VALUE", SalvageYard:GetRobberyValue()))
+			ImGui.Text(_T("SY_ROBBERY_CAN_KEEP_CAR", tostring(SalvageYard:GetRobberyKeepState())))
 
 			if (GUI:Button(_T("SY_DOUBLE_CAR_WORTH"))) then
 				SalvageYard:DoubleCarWorth()
@@ -229,7 +226,7 @@ return function()
 				ImGuiWindowFlags.NoScrollbar
 			)
 
-			ImGui.SeparatorText(_F(_T("SY_VEH_SLOT"), i))
+			ImGui.SeparatorText(_T("SY_VEH_SLOT", i))
 			if (not isAvailable) then
 				ImGui.Text(_T("SY_EMPTY"))
 			else

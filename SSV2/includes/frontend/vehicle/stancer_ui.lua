@@ -294,7 +294,7 @@ return function()
 		ImGui.OpenPopup(save_label)
 	end
 
-	if (ImGui.DialogBox(save_label, _F(_T("VEH_STANCE_UPDATE_WARN"), Stancer:GetCurrentModelName()), ImGuiDialogBoxStyle.WARN)) then
+	if (ImGui.DialogBox(save_label, _T("VEH_STANCE_UPDATE_WARN", Stancer:GetCurrentModelName()), ImGuiDialogBoxStyle.WARN)) then
 		Stancer:SaveCurrentVehicle()
 	end
 

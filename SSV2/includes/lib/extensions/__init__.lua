@@ -39,10 +39,11 @@ sleep     = Time.Sleep
 
 -- Macro for the `Translator:Translate` method.
 ---@param label string
+---@param ... any optional string formatting
 ---@return string
-function _T(label)
+function _T(label, ...)
 	if (not Translator) then return label end
-	return Translator:Translate(label)
+	return Translator:Translate(label, ...)
 end
 
 -- Lua version of Bob Jenskins' [Jenkins One At A Time](https://en.wikipedia.org/wiki/Jenkins_hash_function) hash function.

@@ -1355,7 +1355,7 @@ function EntityForge:AddModelToFavorites(model, name, _type)
 
 	self.FavoriteModels[model] = { name = name, entityType = _type }
 	self:ParseFavorites()
-	Notifier:ShowSuccess("EntityForge", _F(_T("EF_FAV_SAVE_SUCCESS"), name))
+	Notifier:ShowSuccess("EntityForge", _T("EF_FAV_SAVE_SUCCESS", name))
 end
 
 ---@param modelHash hash

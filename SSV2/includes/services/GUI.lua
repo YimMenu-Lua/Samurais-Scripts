@@ -394,7 +394,7 @@ function GUI:DrawDummyTab()
 	ImGui.SetWindowFontScale(1.2)
 	ImGui.SeparatorText(_T("GENERIC_IMPORTANT"))
 	ImGui.SetWindowFontScale(1.0)
-	ImGui.TextWrapped(_F(_T("GUI_NEW_LAYOUT_NOTICE"), GVars.keyboard_keybinds.gui_toggle))
+	ImGui.TextWrapped(_T("GUI_NEW_LAYOUT_NOTICE", GVars.keyboard_keybinds.gui_toggle))
 	ImGui.Spacing()
 	ImGui.EndChild()
 

@@ -389,7 +389,7 @@ local function DrawChildStuff()
 
 				EntityForge.SavedForges[new_creation.name] = new_creation
 				EntityForge:ParseForges()
-				Notifier:ShowSuccess("EntityForge", _F(_T("EF_NEW_FORGE_SUCCESS"), newEntityNameBuffer))
+				Notifier:ShowSuccess("EntityForge", _T("EF_NEW_FORGE_SUCCESS", newEntityNameBuffer))
 
 				s:sleep(300)
 				newEntityNameBuffer = ""
@@ -467,7 +467,7 @@ local function DrawLowerSection()
 end
 
 local function ControlMouseCursor()
-	ImGui.Text(_F(_T("EF_MOUSE_CURSOR_HINT"), "I", gui.mouse_override() and _T("GENERIC_DISABLE") or _T("GENERIC_ENABLE")))
+	ImGui.Text(_T("EF_MOUSE_CURSOR_HINT", "I", gui.mouse_override() and _T("GENERIC_DISABLE") or _T("GENERIC_ENABLE")))
 	if (KeyManager:IsKeyJustPressed(eVirtualKeyCodes.I)) then
 		gui.override_mouse(not gui.mouse_override())
 	end

@@ -647,10 +647,7 @@ function BillionaireServices:CallPrivateJet(model, airportData)
 		self:RegisterEntity(jet:GetHandle())
 		self:RegisterEntity(jet.pilot)
 		self:RegisterEntity(jet.copilot)
-
-		Notifier:ShowMessage("Billionaire Services",
-			_F(_T("BSV2_JET_SPAWN_SUCCESS"), jet.name, airportData.name)
-		)
+		Notifier:ShowMessage("Billionaire Services", _T("BSV2_JET_SPAWN_SUCCESS", jet.name, airportData.name))
 	end)
 end
 
