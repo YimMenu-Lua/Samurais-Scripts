@@ -154,24 +154,28 @@ function LocalPlayer:GetCharacterName()
 end
 
 function LocalPlayer:OnVehicleSwitch()
-	if (self.m_vehicle:IsValid()) then
-		self.m_vehicle:RestoreHeadlights()
-
-		self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
+	local veh = self.m_vehicle
+	if (veh:IsValid()) then
+		veh:RestoreHeadlights()
+		self.m_last_vehicle = Vehicle(veh:GetHandle())
 	end
 
-	self.m_vehicle:Reset()
+	veh:Reset()
 	sleep(500)
-	self.m_vehicle:Set(self:GetVehicleNative())
+	veh:Set(self:GetVehicleNative())
 end
 
 function LocalPlayer:OnVehicleExit()
-	if (not self.m_last_vehicle or self.m_last_vehicle:GetHandle() ~= self.m_vehicle:GetHandle()) then
-		self.m_last_vehicle = Vehicle(self.m_vehicle:GetHandle())
+	local veh = self.m_vehicle
+	if (not veh:IsValid()) then
+		veh:Cleanup()
+		return
 	end
 
-	if (not self.m_vehicle:IsValid()) then
-		self.m_vehicle:Cleanup()
+	local prevHandle = veh:GetHandle()
+	local lastVeh    = self.m_last_vehicle
+	if (prevHandle ~= 0 and (not lastVeh or lastVeh:GetHandle() ~= prevHandle)) then
+		self.m_last_vehicle = Vehicle(prevHandle)
 	end
 end
 

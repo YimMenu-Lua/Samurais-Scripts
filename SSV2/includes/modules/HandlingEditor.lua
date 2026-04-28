@@ -82,12 +82,20 @@ end
 ---@param obj HandlingObject
 ---@return boolean
 function HandlingEditor:GetFlagDefault(obj)
-	return Switch(obj.m_type) {
-		[Enums.eHandlingEditorTypes.TYPE_HF]  = self.m_pv:GetHandlingFlag(obj.m_flag),
-		[Enums.eHandlingEditorTypes.TYPE_AF]  = self.m_pv:GetAdvancedFlag(obj.m_flag),
-		[Enums.eHandlingEditorTypes.TYPE_MIF] = self.m_pv:GetModelInfoFlag(obj.m_flag),
-		default                               = false
-	}
+	local __type = obj.m_type
+	if ((__type) == Enums.eHandlingEditorTypes.TYPE_HF) then
+		return self.m_pv:GetHandlingFlag(obj.m_flag)
+	end
+
+	if ((__type) == Enums.eHandlingEditorTypes.TYPE_AF) then
+		return self.m_pv:GetAdvancedFlag(obj.m_flag)
+	end
+
+	if ((__type) == Enums.eHandlingEditorTypes.TYPE_MIF) then
+		return self.m_pv:GetModelInfoFlag(obj.m_flag)
+	end
+
+	return false
 end
 
 ---@param gvarKey string

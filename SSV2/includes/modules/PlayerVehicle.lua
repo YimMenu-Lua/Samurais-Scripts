@@ -56,7 +56,7 @@ local Stancer          = require("includes.features.vehicle.stancer")
 ---@field public m_is_shooting_flares boolean
 ---@field public m_is_flatbed boolean cache it so we don't have to call natives in UI threads
 ---@field public m_stancer Stancer
----@overload fun(handle: handle): PlayerVehicle
+---@overload fun(handle: handle, opts?: { noassert: boolean }): PlayerVehicle
 local PlayerVehicle = Class("PlayerVehicle", { parent = Vehicle })
 
 PlayerVehicle.mines = {
@@ -143,12 +143,12 @@ function PlayerVehicle.new(handle)
 		m_default_xenon_lights   = { enabled = false, index = 0 },
 		m_default_tire_smoke     = { enabled = false, color = vec3:zero() },
 		m_autopilot              = {
-			eligible = false,
-			state = PlayerVehicle.eAutoPilotState.NONE,
+			eligible           = false,
+			state              = PlayerVehicle.eAutoPilotState.NONE,
 			initial_nozzle_pos = 1,
 		},
 		m_default_max_speed      = 0,
-		---@diagnostic disable-next-line
+		---@diagnostic disable-next-line: param-type-mismatch
 	}, PlayerVehicle)
 
 	instance.m_esc_sm = StateMachine({
@@ -164,16 +164,15 @@ function PlayerVehicle.new(handle)
 	instance:InitFeatures()
 	instance:InitHandlingEditor()
 
-	local main_thread = ThreadManager:RegisterLooped("SS_VEHICLE", function()
-		instance:Main()
-	end)
-
 	Backend:RegisterEventCallbackAll(function()
 		---@diagnostic disable-next-line: invisible
 		instance.m_feat_mgr:Cleanup()
 	end)
 
-	table.insert(instance.m_threads, main_thread)
+	table.insert(instance.m_threads, ThreadManager:RegisterLooped("SS_VEHICLE", function()
+		instance:Main()
+	end))
+
 	return instance
 end
 
@@ -185,7 +184,8 @@ function PlayerVehicle:Set(handle)
 
 	local new_model                     = ENTITY.GET_ENTITY_MODEL(handle)
 	self.m_default_max_speed            = VEHICLE.GET_VEHICLE_MODEL_ESTIMATED_MAX_SPEED(new_model)
-	self.m_last_model                   = new_model
+	self.m_last_model                   = self:GetModelHash()
+	self.m_modelhash                    = new_model
 	self.m_handle                       = handle
 	---@diagnostic disable-next-line
 
@@ -209,7 +209,7 @@ end
 function PlayerVehicle:Reset()
 	-- self:SuspendThreads()
 	if (self:IsValid() and self:IsLocked()) then
-		VEHICLE.SET_VEHICLE_DOORS_LOCKED(self:GetHandle(), 1)
+		self:LockDoors(false)
 		self.m_generic_toggleables["autolockdoors"] = nil
 		self.m_last_model = self:GetModelHash()
 	end
@@ -860,4 +860,4 @@ PlayerVehicle.m_flag_registry = {
 	},
 }
 
-return PlayerVehicle.new(0)
+return PlayerVehicle(0, { noassert = true })

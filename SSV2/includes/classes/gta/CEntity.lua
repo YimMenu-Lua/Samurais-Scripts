@@ -22,8 +22,8 @@ local fwDrawData = require("includes.classes.gta.fwDrawData")
 ---@class CEntity: ClassMeta<CEntity>
 ---@field protected m_ptr pointer
 ---@field m_model_info pointer<CBaseModelInfo> -- 0x0020
----@field m_entity_type uint8_t
 ---@field m_model_type pointer<eModelType> CBaseModelInfo + 0x009D
+---@field m_entity_type pointer<uint8_t>
 ---@field m_flags pointer<uint32_t> `FLAG_ISVISIBLE = 1 << 0`
 ---@field m_draw_data fwDrawData
 ---@field m_transform_matrix pointer<fMatrix44>
@@ -50,11 +50,13 @@ function CEntity:init(entity)
 	local instance                   = setmetatable({ m_ptr = ptr }, CEntity)
 	instance.m_model_info            = ptr:add(0x0020):deref()
 	instance.m_model_type            = instance.m_model_info:add(0x009D)
+	instance.m_entity_type           = ptr:add(0x0028)
 	instance.m_flags                 = ptr:add(0x002D)
 	instance.m_draw_data             = fwDrawData(ptr:add(0x0048):deref())
 	instance.m_transform_matrix      = ptr:add(0x0060)
 	instance.m_render_focus_distance = ptr:add(0x00A8)
 	instance.m_shadow_flags          = ptr:add(0x00B0)
+	instance.m_damage_bits           = ptr:add(0x0188)
 	instance.m_hostility             = ptr:add(0x018C)
 	instance.m_health                = ptr:add(0x0280)
 	instance.m_max_health            = ptr:add(0x0284)

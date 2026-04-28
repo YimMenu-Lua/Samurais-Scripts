@@ -62,29 +62,37 @@ function Entity:__eq(right)
 end
 
 ---@param handle number
----@param opts? {expectedType?: eEntityType, noassert: boolean }
+---@param opts? { expectedType?: eEntityType, noassert?: boolean }
 ---@return Entity
 function Entity.new(handle, opts)
-	opts = opts or {}
-	if not (opts.noassert and Game.IsScriptHandle(handle)) then
-		error("Attempt to create an Entity instance from an invalid entity script handle", 2)
+	opts   = opts or {}
+	handle = handle or 0
+	if (not opts.noassert) then
+		if (not Game.IsScriptHandle(handle)) then
+			error("Attempt to create an Entity instance from an invalid entity script handle", 2)
+		end
 	end
 
 	local expectedType = opts.expectedType
-	if (expectedType and ENTITY.GET_ENTITY_TYPE(handle) ~= expectedType) then
-		local type_str = EnumToString(Enums.eEntityType, expectedType)
-		error(_F("The handle provided does not match the expected entity type (%s).", type_str))
+	if (expectedType) then
+		if (ENTITY.GET_ENTITY_TYPE(handle) ~= expectedType) then
+			local type_str = EnumToString(Enums.eEntityType, expectedType)
+			error(_F("The handle provided does not match the expected entity type (%s).", type_str))
+		end
 	end
 
 	---@type Entity
-	---@diagnostic disable-next-line
-	local instance    = setmetatable({}, Entity)
-	instance.m_handle = handle
+	---@diagnostic disable-next-line: param-type-mismatch
+	local instance = setmetatable({ m_handle = handle }, Entity)
 
 	if (handle ~= 0) then
-		instance.m_modelhash = Game.GetEntityModel(handle)
-		instance.m_ptr       = memory.handle_to_ptr(handle)
-		instance.m_internal  = instance:Resolve()
+		ThreadManager:Run(function()
+			---@diagnostic disable: invisible
+			instance.m_modelhash = Game.GetEntityModel(handle)
+			instance.m_ptr       = memory.handle_to_ptr(handle)
+			instance.m_internal  = instance:Resolve()
+			---@diagnostic enable: invisible
+		end)
 	end
 
 	return instance
@@ -169,10 +177,10 @@ function Entity:Resolve()
 	end
 
 	-- **DO NOT REMOVE. THIS IS NOT USELESS CODE.**
-	-- We have to do this because `Self` is static, it inherits from `Entity` but doesn't have a constructor
+	-- We have to do this because `LocalPlayer` inherits from `Entity` but doesn't have a constructor
 	-- and doesn't store handles or hashes as members (because they can change on player switch).
 
-	local hndl     = self:GetHandle() -- This is overridden in `Self` to always invoke `PLAYER.PLAYER_PED_ID()`
+	local hndl     = self:GetHandle() -- This is overridden in `LocalPlayer` to always invoke `PLAYER.PLAYER_PED_ID()`
 	local ent_type = Game.GetEntityType(hndl)
 	if (ent_type == Enums.eEntityType.Ped) then
 		self.m_internal = CPed(hndl)
@@ -185,6 +193,7 @@ function Entity:Resolve()
 	return self.m_internal
 end
 
+---@return nil
 function Entity:Destroy()
 	self.m_handle    = nil
 	self.m_modelhash = nil
