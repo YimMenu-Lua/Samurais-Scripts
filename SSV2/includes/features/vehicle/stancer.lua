@@ -14,6 +14,7 @@ local StancerData = require("includes.data.stancer_data")
 
 ---@class StanceObject
 ---@field m_track_width float
+---@field m_toe float
 ---@field m_camber float
 ---@field m_susp_comp float
 ---@field m_wheel_width float
@@ -24,6 +25,7 @@ local StanceObject = {}
 function StanceObject.new()
 	return {
 		m_track_width = 0.0,
+		m_toe         = 0.0,
 		m_camber      = 0.0,
 		m_susp_comp   = 0.0,
 		m_wheel_width = 0.0,
@@ -40,7 +42,7 @@ end
 ---@field private m_cached_model_hash? hash
 ---@field private m_cached_model_name? string
 ---@field private m_reloading boolean
----@field private m_last_wheels_mod {type: integer, index: integer, var: integer}
+---@field private m_last_wheels_mod { type: integer, index: integer, var: integer }
 ---@field private m_last_wheel_mod_check_time milliseconds
 ---@field private m_filename "stancer.json"
 ---@field private m_saved_models table<string, table<eWheelAxle, StanceObject>>

@@ -5,10 +5,11 @@
 -- this code as long as you respect these conditions:
 --	* Credit the owner and contributors.
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+--
+-- Converted from Yimura's C++ GTA V Classes: https://github.com/Yimura/GTAV-Classes (forked here: https://github.com/Mr-X-GTA/GTAV-Classes-1)
 
 
 local fwDrawData = require("includes.classes.gta.fwDrawData")
-
 
 ---@class CBaseModelInfo
 ---@class CAttackers

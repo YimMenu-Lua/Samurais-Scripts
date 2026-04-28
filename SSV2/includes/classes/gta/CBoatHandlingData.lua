@@ -7,7 +7,6 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CStructView = require("includes.classes.gta.CStructView")
 local CBaseSubHandlingData = require("includes.classes.gta.CBaseSubHandlingData")
 
 

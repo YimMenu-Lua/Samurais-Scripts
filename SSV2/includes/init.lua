@@ -48,8 +48,8 @@ Enums = require("includes.data.enums.__init__")
 Backend = require("includes.backend"):init(SCRIPT_NAME, SCRIPT_VERSION, GAME_VERSION)
 
 
-require("includes.lib.types")
-require("includes.lib.utils")
+require("includes.lib.meta")
+require("includes.lib.extensions.__init__")
 require("includes.lib.class")
 require("includes.lib.enum")
 require("includes.classes.Pair")

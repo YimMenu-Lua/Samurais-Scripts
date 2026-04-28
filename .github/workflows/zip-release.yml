@@ -110,12 +110,9 @@ jobs:
           let breaking = false;
           let breakingMsg = ">[!Important]\n>**This is a breaking change**\n>To install this update, please remove the previous version completely and then install the new version.\n\n";
 
-          function isBreakingChange(str) {
-            return str.toLowerCase().includes("breaking change");
-          }
+          function isBreakingChange(str) { return str.toLowerCase().includes("breaking change"); }
 
           const mergedPRs = pulls.filter(pr => pr.merged_at && new Date(pr.merged_at) > lastTagDate);
-
           if (mergedPRs.length > 0) {
             for (const pr of mergedPRs) {
               changelog += `### PR #${pr.number}: ${pr.title}\n`;
@@ -125,29 +122,27 @@ jobs:
                 changelog += `${body.trim()}\n\n`;
               }
             }
-          } else {
-            const compared = await github.rest.repos.compareCommits({
-              owner,
-              repo,
-              base: lastTag,
-              head: "main"
-            });
+          }
 
-            const commits = compared.data.commits;
-            for (const commit of commits) {
-              const msg = commit.commit.message || "";
-              const body = commit.commit.body;
+          const compared = await github.rest.repos.compareCommits({
+            owner,
+            repo,
+            base: lastTag,
+            head: "main"
+          });
+          const commits = compared.data.commits;
+          for (const commit of commits) {
+            const msg = commit.commit.message || "";
+            const body = commit.commit.body;
+            const msgLower = msg.toLowerCase();
+            if (msgLower.startsWith("merge ") || msgLower.startsWith("[noci]"))
+              continue;
 
-              if (msg.toLowerCase().startsWith("merge pull"))
-                continue;
-
-              breaking = breaking || isBreakingChange(msg);
-              changelog += `## ${msg}\n\n`;
-
-              if (body) {
-                breaking = breaking || isBreakingChange(body);
-                changelog += `${body.trim()}\n\n`;
-              }
+            breaking = breaking || isBreakingChange(msg);
+            changelog += `## ${msg}\n\n`;
+            if (body) {
+              breaking = breaking || isBreakingChange(body);
+              changelog += `${body.trim()}\n\n`;
             }
           }
 

@@ -22,7 +22,7 @@ local INT_SIZES <const> = {
 --
 -- **[NOTE]**: If you care about performance, or don't care about constants, consider using a simple table instead
 --
--- *(SB already uses tables annotated as enums)*. A simple hash lookup is slightly faster.
+-- *(SSV2 already uses tables annotated as enums)*. A simple hash lookup is slightly faster.
 --
 -- This implementation is more about usability and type-safety.
 --

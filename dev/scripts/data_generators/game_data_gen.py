@@ -179,14 +179,14 @@ def gen_peds(class_name: str = None):
     with alive_bar(len(jsondata), title="Generating Peds", force_tty=True) as bar:
         for ped in jsondata:
             str_name = str(ped["Name"]).lower()
-            str_pedtype = str(ped["Pedtype"]).lower()
-            is_human = str_pedtype != "animal"
+            str_pedtype = str(ped["Pedtype"]).upper()
+            is_human = str_pedtype != "ANIMAL"
             if is_human:
                 gender = 1 if (str_name.startswith("_f_", 1) or str_name.startswith("_f_", 2) or str(ped["PedCapsuleName"]).lower() == "standard_female") else 0
             else:
                 gender = 2
 
-            ped_type = ePedType.get(str_pedtype.upper(), 4) # not sure if it's a good idea to default to civmale
+            ped_type = ePedType.get(str_pedtype, 4) # not sure if it's a good idea to default to civmale
             joaat_hash = ped["Hash"]
 
             out[str_name] = {

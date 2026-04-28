@@ -859,5 +859,6 @@ return {
 	["YAV3_LIST_VIEW_HINT"] = "Die Animations- und Szenariolistenansichten sind auf den Registerkarten „Aktionen“ und „Gefährten“ genau gleich, was bedeutet, dass alle Filter, die Sie auf einer Registerkarte verwenden, auch auf der anderen vorhanden sind. Dies gilt jedoch nicht für die Registerkarten „Verlauf“ und „Favoriten“.",
 	["YAV3_SYMBOL_DEFS_HINT"] = "Haben Sie sich jemals gefragt, was die Symbole für einige Aktionen in der Liste sind?\n\n- %s: Als Favorit gespeichert.\n- %s: Als Befehl registriert.\n- %s: Vom Benutzer generiert.",
 	["YAV3_VEH_ANIM_HINT"] = "Fahrzeugzentrierte Animationen können nicht zu Fuß abgespielt werden; auch für Begleiter.",
-	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Diesem Hub ist kein Techniker zugeordnet."
+	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Diesem Hub ist kein Techniker zugeordnet.",
+	["VEH_STANCE_TOE"] = "Zehe"
 }

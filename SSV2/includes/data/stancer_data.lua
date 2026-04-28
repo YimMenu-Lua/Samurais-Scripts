@@ -19,12 +19,21 @@ return {
 	---@type array<{ key: string, axle: eWheelAxle, read: ptr_read, write: fun(w: CWheel, v: anyval, veh?: PlayerVehicle), side_dont_care?: boolean}>
 	decorators = {
 		{
+			key   = "m_toe",
+			axle  = Enums.eWheelAxle.FRONT,
+			read  = function(w) return w.m_rotation.x end,
+			write = function(w, v)
+				w.m_rotation.x     = v
+				w.m_rotation_inv.x = -v
+			end
+		},
+		{
 			key   = "m_camber",
 			axle  = Enums.eWheelAxle.FRONT,
-			read  = function(w) return w.m_y_rotation:get_float() end,
+			read  = function(w) return w.m_rotation.y end,
 			write = function(w, v)
-				w.m_y_rotation:set_float(v)
-				w.m_y_rotation_inv:set_float(-v)
+				w.m_rotation.y     = v
+				w.m_rotation_inv.y = -v
 			end
 		},
 		{
@@ -67,12 +76,21 @@ return {
 			end
 		},
 		{
+			key   = "m_toe",
+			axle  = Enums.eWheelAxle.REAR,
+			read  = function(w) return w.m_rotation.x end,
+			write = function(w, v)
+				w.m_rotation.x     = v
+				w.m_rotation_inv.x = -v
+			end
+		},
+		{
 			key   = "m_camber",
 			axle  = Enums.eWheelAxle.REAR,
-			read  = function(w) return w.m_y_rotation:get_float() end,
+			read  = function(w) return w.m_rotation.y end,
 			write = function(w, v)
-				w.m_y_rotation:set_float(v)
-				w.m_y_rotation_inv:set_float(-v)
+				w.m_rotation.y     = v
+				w.m_rotation_inv.y = -v
 			end
 		},
 		{

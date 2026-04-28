@@ -2,6 +2,8 @@ name: Generate Translations
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "dev/scripts/translations/**"
       - "SSV2/includes/lib/translations/en-US.lua"

@@ -26,12 +26,12 @@ local CashSafe        = require("CashSafe")
 
 -- Class representing a Business Front.
 --
--- Can be: Nightclub or MC clubhouse
+-- Can be: Nightclub, CEO Office, or MC clubhouse
 ---@class BusinessFront : BusinessBase
 ---@field private m_id integer
 ---@field private m_name string
 ---@field private m_safe CashSafe
----@field private m_subs Factory[]|BusinessHub[]|Warehouse
+---@field private m_subs array<Factory|BusinessHub|Warehouse>
 ---@field private m_earnings_report? BusinessEarningsReport
 ---@field private m_last_report_check_time milliseconds
 local BusinessFront   = setmetatable({}, BusinessBase)
@@ -64,7 +64,7 @@ function BusinessFront:AddSubBusiness(index) end
 ---@return CashSafe
 function BusinessFront:GetCashSafe() return self.m_safe end
 
----@return array<Factory>|array<BusinessHub>
+---@return array<Factory|BusinessHub|Warehouse>
 function BusinessFront:GetSubBusinesses() return self.m_subs end
 
 ---@return boolean
