@@ -119,7 +119,7 @@ return function()
 				ImGui.BeginTabBar("##cargoWarehouses")
 				for i, wh in ipairs(cargoWarehouses) do
 					ImGui.PushID(i)
-					if (ImGui.BeginTabItem(_F(_T("YRV3_WAREHOUSE_SLOT"), i))) then
+					if (ImGui.BeginTabItem(_T("YRV3_WAREHOUSE_SLOT", i))) then
 						drawWarehouse(wh)
 						ImGui.EndTabItem()
 					end

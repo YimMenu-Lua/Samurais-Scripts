@@ -521,7 +521,7 @@ function Stancer:RestoreDeltasFromQueue()
 
 	for _, v in ipairs(StancerData.decorators) do
 		local queued_key = _F("%s_%d_queue", v.key, v.axle)
-		local val = Decorator:GetDecor(handle, queued_key)
+		local val        = Decorator:GetDecor(handle, queued_key)
 		if (type(val) == "number") then
 			self.m_deltas[v.axle][v.key] = val
 		end
@@ -549,7 +549,7 @@ function Stancer:ReadDefaultValues()
 		self:ForEach(wheel_array, function(i, cwheel)
 			local decor       = _F("%s_%d_%d", v.key, v.axle, i)
 			local existsOn    = Decorator:ExistsOn(handle, decor)
-			local default_val = existsOn and Decorator:GetDecor(handle, decor) or v.read(cwheel)
+			local default_val = existsOn and Decorator:GetDecor(handle, decor) or v.read(cwheel, self.m_entity)
 			if (not existsOn) then
 				Decorator:Register(handle, decor, default_val)
 			end
@@ -652,7 +652,7 @@ function Stancer:Update()
 		local base = self.m_base_values[v.axle][v.key]
 		local sum  = base + delta
 		self:ForEach(wheel_array, function(_, cwheel)
-			local current = v.read(cwheel)
+			local current = v.read(cwheel, self.m_entity)
 			local desired = v.side_dont_care and sum or self:GetValueBySideLR(cwheel, sum)
 			if (math.abs(desired) ~= math.abs(current)) then
 				v.write(cwheel, desired, self.m_entity)

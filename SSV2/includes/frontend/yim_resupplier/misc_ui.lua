@@ -154,7 +154,7 @@ return function()
 	ImGui.EndDisabled()
 	if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) and KeyManager:IsKeyJustPressed(eVirtualKeyCodes.TAB)) then
 		local url = "https://github.com/YimMenu-Lua/PayphoneHits"
-		Notifier:ShowMessage("YRV3", _F(_T("GENERIC_URL_COPY_SUCCESS"), url), true, 6)
+		Notifier:ShowMessage("YRV3", _T("GENERIC_URL_COPY_SUCCESS", url), true, 6)
 		ImGui.SetClipboardText(url)
 	end
 	GUI:Tooltip(_T("YRV3_SEXY_SHINABI_NOTICE"))
@@ -198,7 +198,7 @@ return function()
 				end
 			end
 
-			Notifier:ShowSuccess("YRV3", _F(_T("YRV3_SELL_MISSIONS_NOTIF"), name))
+			Notifier:ShowSuccess("YRV3", _T("YRV3_SELL_MISSIONS_NOTIF", name))
 		end
 
 		ImGui.SameLineIfAvail(buttonWidth + style.ItemSpacing.x)

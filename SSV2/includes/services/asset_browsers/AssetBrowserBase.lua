@@ -253,7 +253,7 @@ function AssetBrowserBase:__DrawListBox()
 		local max_entries = self.m_max_entries
 		if (max_entries > 0 and is_buff_empty and (self.m_iter_idx >= max_entries)) then
 			ImGui.TextColored(0.941, 0.745, 0.007, 1.000, "[ ! ]")
-			GUI:Tooltip(_F(_T("ASSET_BROWSER_TRUNC_TT"), max_entries))
+			GUI:Tooltip(_T("ASSET_BROWSER_TRUNC_TT", max_entries))
 			ImGui.Separator()
 		end
 

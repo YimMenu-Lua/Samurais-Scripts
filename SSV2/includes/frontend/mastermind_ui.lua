@@ -120,7 +120,7 @@ local function drawBasicTab()
 		if (heist.opt_info and not is_done) then
 			GUI:Tooltip(heist.opt_info)
 		elseif (on_cooldown) then
-			GUI:Tooltip(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), seconds_left / 60))
+			GUI:Tooltip(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT", seconds_left / 60))
 		end
 		ImGui.EndDisabled()
 
@@ -193,7 +193,7 @@ local function drawCayoTab()
 
 	if (on_cooldown) then
 		local minutes_left = (cooldown_seconds_left > 0 and cooldown_seconds_left or cooldown_hard_seconds_left) / 60
-		GUI:HeaderText(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left),
+		GUI:HeaderText(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT", minutes_left),
 			{ separator = false, spacing = true, color = Color.RED })
 	end
 
@@ -340,7 +340,7 @@ local function drawDDayTab()
 
 	if (on_cooldown) then
 		local minutes_left = cooldown_seconds_left / 60
-		GUI:HeaderText(_F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left),
+		GUI:HeaderText(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT", minutes_left),
 			{ separator = false, spacing = true, color = Color.RED })
 	end
 
@@ -351,7 +351,7 @@ local function drawDDayTab()
 	if (GUI:Button(button_label)) then
 		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 9999)
 	end
-	GUI:HelpMarker(_F(_T("YH_DDAY_HELP2_FMT"), button_label))
+	GUI:HelpMarker(_T("YH_DDAY_HELP2_FMT", button_label))
 
 	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
 

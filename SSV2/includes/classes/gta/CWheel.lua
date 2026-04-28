@@ -42,16 +42,16 @@ local VEC3_ZERO <const> = vec3:zero()
 ---@field m_suspension_raise pointer<float>
 ---@field m_unk_suspension_raise pointer<float>
 ---@field m_suspension_fwd_offset pointer<float>
----@field m_hydraulic_state pointer<int32_t> some enum related to hydraulic state. can't find any refs online. where's Yimura when you need to skid from him? :(
----@field m_hydraulic_state_2 pointer<int32_t> -- ??
+---@field m_hydraulic_state pointer<uint32_t> some enum related to hydraulic state. can't find any refs online. where's Yimura when you need to skid from him? :(
+---@field m_hydraulic_state_2 pointer<uint32_t> -- ??
 ---@field m_suspension_compression pointer<float>
 ---@field m_suspension_compression_2 pointer<float>
 ---@field m_wheel_compression pointer<float>
----@field m_rotation_angle pointer -- radians?
----@field m_rotation_speed pointer -- velocity
----@field m_unk_0174 pointer -- ??
+---@field m_rotation_angle pointer<float> -- radians?
+---@field m_rotation_speed pointer<float> -- velocity
+---@field m_unk_0174 pointer<float> -- ?? don't know what this is. using float to keep the 4 byte alignment
 ---@field m_tyre_temperature pointer<float> -- don't want to admit how long it took to figure out what this little shit is. are we playing Assetto Corsa now? it seems to only be relevant for F1 vehicles
----@field m_unk_0194 pointer -- ??
+---@field m_unk_0194 pointer<float> -- ??
 ---@field m_tire_drag_coeff pointer<float>
 ---@field m_top_speed_mult pointer<float>
 ---@field m_steering_angle pointer<float>
@@ -61,7 +61,7 @@ local VEC3_ZERO <const> = vec3:zero()
 ---@field m_suspension_health pointer<float> -- 100.0f: car gets slammed (old method of shooting your suspension to stance your car) // 0.0f: wheel should fall off but doesn't. Something else must be set to trigger wheel detachment
 ---@field m_tyre_health pointer<float> -- <= 500.0f: flat tyre // 0.0f: no tyre
 ---@field m_tyre_wear_mult pointer<float> -- 0.0f: tyres won't burst from long burnout
----@field m_tyre_wear_unk pointer<float> -- similar? // looks like a wear rate not current tyre wear
+---@field m_tyre_wear_unk pointer<float> -- similar? // looks like rate rather than a multiplier
 ---@field m_wheel_dynamic_flags pointer<eWheelDynamicFlags>
 ---@field m_wheel_config_flags pointer<eWheelConfigFlags>
 ---@field m_tyre_is_burst pointer<bool>
@@ -75,8 +75,8 @@ local CWheel = CStructView("CWheel", 0x020E)
 function CWheel.new(ptr)
 	return setmetatable({
 		m_ptr                      = ptr,
-		m_rotation                 = fVector3(ptr:add(0x0004)),
-		m_rotation_inv             = fVector3(ptr:add(0x000A)),
+		m_rotation                 = fVector3(ptr:add(0x0000)),
+		m_rotation_inv             = fVector3(ptr:add(0x000C)),
 		m_offset_from_body         = ptr:add(0x0020),
 		m_x_offset                 = ptr:add(0x0030),
 		m_last_ground_pos          = fVector3(ptr:add(0x003C)),

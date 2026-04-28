@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local __fmt                     = string.format
 local en_loaded, en             = pcall(require, "lib.translations.en-US")
 local locales_loaded, __locales = pcall(require, "lib.translations.__locales")
 local GameLangToCustom <const>  = {
@@ -211,34 +212,47 @@ end
 -- Translates text to the user's language.
 ---@public
 ---@param label string
+---@param ... any optional string formatting
 ---@return string
-function Translator:Translate(label)
+function Translator:Translate(label, ...)
 	if (not self:IsReady()) then
 		return label
 	end
 
 	if (self.lang_idx ~= GVars.backend.language_index) then
-		self.wants_reload = true
+		self.wants_reload = self.wants_reload or true
 		return label
 	end
 
 	if (not label) then
-		local msg = _F("Missing label! %s", label)
+		local msg = __fmt("Missing label! %s", label)
 		self:Warn(msg)
 		return msg
 	end
 
 	local cached = self:GetCachedLabel(label)
-	if (cached) then return cached end
+	if (cached) then
+		if (...) then
+			-- it would be better to cache the formatted text to
+			-- avoid string formatting in UI loops but we have several
+			-- instances where we're formatting a dynamic variable like
+			-- a cooldown time or some other non-constant value.
+			return __fmt(cached, ...)
+		end
+		return cached
+	end
 
 	local text = self.labels[label]
 	if (not string.isvalid(text)) then
-		self:Warn(_F("Missing translation for label: '%s'", label))
-		return _F("[!MISSING TEXT] %s", label)
+		self:Warn(__fmt("Missing translation for label: '%s'", label))
+		return __fmt("[!MISSING TEXT] %s", label)
 	end
 
-	if (not cached) then self:CacheLabel(label, text) end
+	self:CacheLabel(label, text)
 
+	if (...) then
+		return __fmt(text, ...)
+	end
 	return text
 end
 

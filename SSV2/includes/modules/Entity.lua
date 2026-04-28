@@ -62,13 +62,15 @@ function Entity:__eq(right)
 end
 
 ---@param handle number
----@param expectedType? eEntityType
+---@param opts? {expectedType?: eEntityType, noassert: boolean }
 ---@return Entity
-function Entity.new(handle, expectedType)
-	if (not Game.IsScriptHandle(handle)) then
+function Entity.new(handle, opts)
+	opts = opts or {}
+	if not (opts.noassert and Game.IsScriptHandle(handle)) then
 		error("Attempt to create an Entity instance from an invalid entity script handle", 2)
 	end
 
+	local expectedType = opts.expectedType
 	if (expectedType and ENTITY.GET_ENTITY_TYPE(handle) ~= expectedType) then
 		local type_str = EnumToString(Enums.eEntityType, expectedType)
 		error(_F("The handle provided does not match the expected entity type (%s).", type_str))
@@ -76,11 +78,14 @@ function Entity.new(handle, expectedType)
 
 	---@type Entity
 	---@diagnostic disable-next-line
-	local instance       = setmetatable({}, Entity)
-	instance.m_handle    = handle
-	instance.m_modelhash = Game.GetEntityModel(handle)
-	instance.m_ptr       = memory.handle_to_ptr(handle)
-	instance.m_internal  = instance:Resolve()
+	local instance    = setmetatable({}, Entity)
+	instance.m_handle = handle
+
+	if (handle ~= 0) then
+		instance.m_modelhash = Game.GetEntityModel(handle)
+		instance.m_ptr       = memory.handle_to_ptr(handle)
+		instance.m_internal  = instance:Resolve()
+	end
 
 	return instance
 end
@@ -239,10 +244,9 @@ end
 
 ---@return pointer
 function Entity:GetPointer()
-	if not self.m_ptr then
+	if (not self.m_ptr) then
 		local handle = self:GetHandle()
-		local ptr = memory.handle_to_ptr(handle)
-
+		local ptr    = memory.handle_to_ptr(handle)
 		if (not ptr:is_valid()) then
 			error("Invalid entity.")
 		end

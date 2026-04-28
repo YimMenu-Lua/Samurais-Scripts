@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
----@alias ptr_read fun(w: CWheel): anyval
+---@alias ptr_read fun(w: CWheel, veh?: PlayerVehicle): float
 
 ---@enum eWheelAxle
 Enums.eWheelAxle = {
@@ -16,23 +16,20 @@ Enums.eWheelAxle = {
 }
 
 return {
-	---@type array<{ key: string, axle: eWheelAxle, read: ptr_read, write: fun(w: CWheel, v: anyval, veh?: PlayerVehicle), side_dont_care?: boolean}>
+	---@type array<{ key: string, axle: eWheelAxle, read: ptr_read, write: fun(w: CWheel, v: float, veh?: PlayerVehicle), side_dont_care?: boolean}>
 	decorators = {
 		{
 			key   = "m_toe",
 			axle  = Enums.eWheelAxle.FRONT,
-			read  = function(w) return w.m_rotation.x end,
-			write = function(w, v)
-				w.m_rotation.x     = v
-				w.m_rotation_inv.x = -v
-			end
+			read  = function(w) return w.m_rotation.y end,
+			write = function(w, v) w.m_rotation.y = v end
 		},
 		{
 			key   = "m_camber",
 			axle  = Enums.eWheelAxle.FRONT,
 			read  = function(w) return w.m_rotation.y end,
 			write = function(w, v)
-				w.m_rotation.y     = v
+				w.m_rotation.z = v
 				w.m_rotation_inv.y = -v
 			end
 		},
@@ -53,9 +50,9 @@ return {
 			key            = "m_wheel_width",
 			axle           = Enums.eWheelAxle.FRONT, -- doesn't matter
 			side_dont_care = true,
-			read           = function(w) return w.m_tyre_width:get_float() end,
-			write          = function(w, v, veh)
-				w.m_tyre_width:set_float(v)
+			read           = function() return 0 end,
+			write          = function(_, v, veh)
+				---@type float?
 				local cached = Decorator:GetDecor(veh:GetHandle(), "m_visual_width")
 				if (cached and cached > 0 and veh:GetVisualWheelWidth() ~= cached + v) then
 					veh:SetVisualWheelWidth(cached + v)
@@ -66,9 +63,9 @@ return {
 			key            = "m_wheel_size",
 			axle           = Enums.eWheelAxle.FRONT, -- doesn't matter
 			side_dont_care = true,
-			read           = function(w) return w.m_tyre_radius:get_float() end,
-			write          = function(w, v, veh)
-				w.m_tyre_radius:set_float(v)
+			read           = function() return 0 end,
+			write          = function(_, v, veh)
+				---@type float?
 				local cached = Decorator:GetDecor(veh:GetHandle(), "m_visual_size")
 				if (cached and cached > 0 and veh:GetVisualWheelSize() ~= cached + v) then
 					veh:SetVisualWheelSize(cached + v)
@@ -78,18 +75,15 @@ return {
 		{
 			key   = "m_toe",
 			axle  = Enums.eWheelAxle.REAR,
-			read  = function(w) return w.m_rotation.x end,
-			write = function(w, v)
-				w.m_rotation.x     = v
-				w.m_rotation_inv.x = -v
-			end
+			read  = function(w) return w.m_rotation.y end,
+			write = function(w, v) w.m_rotation.y = v end
 		},
 		{
 			key   = "m_camber",
 			axle  = Enums.eWheelAxle.REAR,
-			read  = function(w) return w.m_rotation.y end,
+			read  = function(w) return w.m_rotation.z end,
 			write = function(w, v)
-				w.m_rotation.y     = v
+				w.m_rotation.z     = v
 				w.m_rotation_inv.y = -v
 			end
 		},

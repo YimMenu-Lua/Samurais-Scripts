@@ -39,8 +39,8 @@ local t_ActionsSidebarItems <const> = {
 
 ---@type array<fun(): string>
 local SideBarTips <const> = {
-	function() return _F(_T("YAV3_STOP_BTN_HINT"), GVars.keyboard_keybinds.stop_anim) end,
-	function() return _F(_T("YAV3_SYMBOL_DEFS_HINT"), "[*]", "[C]", "[U]") end,
+	function() return _T("YAV3_STOP_BTN_HINT", GVars.keyboard_keybinds.stop_anim) end,
+	function() return _T("YAV3_SYMBOL_DEFS_HINT", "[*]", "[C]", "[U]") end,
 	function() return _T("YAV3_LIST_VIEW_HINT") end,
 	function() return _T("YAV3_VEH_ANIM_HINT") end,
 }; local tipsCount = #SideBarTips

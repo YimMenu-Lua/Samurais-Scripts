@@ -380,7 +380,7 @@ function CasinoPacino:GetCooldownString()
 	local max_chip_wins = tunables.get_int("VC_CASINO_CHIP_MAX_WIN_DAILY")
 
 	return (chipswon_gd >= max_chip_wins)
-		and _F(_T("CP_COOLDOWN_BYPASS_STATUS_FORMAT"), minutes_left)
+		and _T("CP_COOLDOWN_BYPASS_STATUS_FORMAT", minutes_left)
 		or _T("CP_COOLDOWN_BYPASS_STATUS_OFF")
 end
 
