@@ -597,6 +597,7 @@ return {
 	["VEH_STEER_ALL_WHEELS"]               = "All Wheel Steering",
 	["VEH_STEER_HANDBRAKE"]                = "Handbrake Steering",
 	["VEH_STEER_HANDBRAKE_TT"]             = "Steers your vehicle's rear whels when you hold the handbrake, similar to monster cars.",
+	["VEH_STANCE_TOE"]                     = "Toe",
 	["VEH_STANCE_CAMBER"]                  = "Camber",
 	["VEH_STANCE_TRACK_WIDTH"]             = "Track Width",
 	["VEH_STANCE_SUSP_COMP"]               = "Suspension Height",

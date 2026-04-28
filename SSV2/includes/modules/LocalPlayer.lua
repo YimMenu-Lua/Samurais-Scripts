@@ -143,7 +143,7 @@ end
 ---@return integer
 function LocalPlayer:GetTotalBalance()
 	if (not Game.IsOnline()) then
-		return stats.get_int(stats.get_prefixed_stat("SPX_TOTAL_CASH"))
+		return stats.get_int(stats.prefix("SPX_TOTAL_CASH"))
 	end
 
 	return self:GetWalletBalance() + self:GetBankBalance()
@@ -524,18 +524,22 @@ end)
 ThreadManager:RegisterLooped("SS_PV_HANDLER", function()
 	yield()
 
-	if (LocalPlayer.m_vehicle and LocalPlayer.m_vehicle:IsValid()) then
+	local PV        = LocalPlayer.m_vehicle
+	local handle    = PV:GetHandle()
+	local nativeVeh = LocalPlayer:GetVehicleNative()
+
+	if (PV:IsValid()) then
 		if (LocalPlayer:IsOnFoot()) then
 			LocalPlayer:OnVehicleExit()
-		elseif (LocalPlayer:IsDriving() and LocalPlayer.m_vehicle:GetHandle() ~= LocalPlayer:GetVehicleNative()) then
+		elseif (LocalPlayer:IsDriving() and handle ~= nativeVeh) then
 			LocalPlayer:OnVehicleSwitch()
 		end
 	elseif (LocalPlayer:IsDriving()) then
-		LocalPlayer.m_vehicle:Set(LocalPlayer:GetVehicleNative())
+		PV:Set(nativeVeh)
 	end
 
-	if (LocalPlayer.m_vehicle:GetHandle() ~= 0 and not LocalPlayer.m_vehicle:IsValid()) then
-		LocalPlayer.m_vehicle:Cleanup()
+	if (handle ~= 0 and not PV:IsValid()) then
+		PV:Cleanup()
 	end
 end)
 

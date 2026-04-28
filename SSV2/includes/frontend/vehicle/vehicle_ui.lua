@@ -433,10 +433,10 @@ nosOptionsWindow = {
 	m_should_draw = false,
 }
 
-GUI:RequestWindow(speedometerOptionsWindow)
-GUI:RequestWindow(driftOptionsWindow)
-GUI:RequestWindow(driftMinigameOptionsWindow)
-GUI:RequestWindow(nosOptionsWindow)
+GUI:RegisterWindowRequest(speedometerOptionsWindow)
+GUI:RegisterWindowRequest(driftOptionsWindow)
+GUI:RegisterWindowRequest(driftMinigameOptionsWindow)
+GUI:RegisterWindowRequest(nosOptionsWindow)
 
 vehicleTab:RegisterGUI(function()
 	vehicleTab:GetGridRenderer():Draw()

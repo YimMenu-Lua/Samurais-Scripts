@@ -124,7 +124,7 @@ end
 ---@param points number
 function DriftMinigame:BankDriftPoints_SP(points)
 	stats.increment_stat(
-		stats.get_prefixed_stat("SPX_TOTAL_CASH"),
+		stats.prefix("SPX_TOTAL_CASH"),
 		points,
 		0,
 		math.int32_max()

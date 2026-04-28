@@ -8,6 +8,7 @@
 
 
 local CStructView       = require("includes.classes.gta.CStructView")
+local fVector3          = require("fVector3")
 local VEC3_ZERO <const> = vec3:zero()
 
 
@@ -18,16 +19,16 @@ local VEC3_ZERO <const> = vec3:zero()
 ---@class CWheel : CStructBase<CWheel>
 ---@field protected m_ptr pointer
 ---@field private m_size uint16_t
----@field m_y_rotation pointer<float>
----@field m_y_rotation_inv pointer<float>
----@field m_offset_from_body pointer<float>
----@field m_x_offset pointer<float> // same as offset from body?
----@field m_last_ground_pos pointer<vec3>
----@field m_wheel_transform array<pointer<fMatrix44>> // TODO: this is wrong; fix it // NOTE: these seem to be a bunch of vector3s, not a 4x4 matrix
----@field m_parallel_wheel_index pointer<int8_t>
----@field m_tyre_radius pointer<float> -- these now work but I had no patience to figure out how to reset them. wheel width/radius changes and sticks but the value in memory immediately reverses back to default
----@field m_rim_radius pointer<float> -- //
----@field m_unk_rim_radius pointer<float> -- // I have no idea what this is for. Its the exact same as 0x0114
+---@field m_rotation fVector3
+---@field m_rotation_inv fVector3 -- used to negate rotation from the previous vector
+---@field m_offset_from_body pointer<float> -- smells like a component of a vector but my alignment makes no sense!
+---@field m_x_offset pointer<float> // same as offset from body? // edit: this is also in a vector (x component). we currently use it for track width so I'm just gonna leave it as is at least for now
+---@field m_last_ground_pos fVector3
+-- -@field m_wheel_transform array<pointer<fMatrix44>> // TODO: this is wrong; fix it // NOTE: these are either a bunch of vector3s or a 3x4 matrix.
+---@field m_parallel_wheel_index pointer<int8_t> -- -1 if the there is no parallel wheel (ex: center wheel)
+---@field m_tyre_radius pointer<float> -- these now work but I had no patience to figure out how to reset them. wheel width/radius changes and sticks but the value in memory immediately reverses back to default then any further attempts at modifying them further increases related wheel dimension
+---@field m_rim_radius pointer<float> -- so we'll leave these to DrawData
+---@field m_unk_rim_radius pointer<float> -- // I have no idea what this is for. Its the exact same as above
 ---@field m_tyre_width pointer<float>
 ---@field m_handling_data pointer<CHandlingData>
 ---@field m_vehicle pointer<CVehicle>
@@ -74,12 +75,12 @@ local CWheel = CStructView("CWheel", 0x020E)
 function CWheel.new(ptr)
 	return setmetatable({
 		m_ptr                      = ptr,
-		m_y_rotation               = ptr:add(0x0008),
-		m_y_rotation_inv           = ptr:add(0x0010),
+		m_rotation                 = fVector3(ptr:add(0x0004)),
+		m_rotation_inv             = fVector3(ptr:add(0x000A)),
 		m_offset_from_body         = ptr:add(0x0020),
 		m_x_offset                 = ptr:add(0x0030),
-		m_last_ground_pos          = ptr:add(0x003C),
-		m_wheel_transform          = { ptr:add(0x090), ptr:add(0x0A0), ptr:add(0x0B0), ptr:add(0x0C0) },
+		m_last_ground_pos          = fVector3(ptr:add(0x003C)),
+		-- m_wheel_transform          = { ptr:add(0x0090), ptr:add(0x00A0), ptr:add(0x00B0), ptr:add(0x00C0) },
 		m_parallel_wheel_index     = ptr:add(0x010F),
 		m_tyre_radius              = ptr:add(0x0110),
 		m_rim_radius               = ptr:add(0x0114),
@@ -127,59 +128,9 @@ function CWheel.new(ptr)
 	}, CWheel)
 end
 
----@return vec3 -- The world position of the wheel or a zero vector if the wheel is invalid.
-function CWheel:GetWorldPosition()
-	return self:__safecall(VEC3_ZERO, function()
-		return self.m_last_ground_pos:get_vec3()
-	end)
-end
-
--- test
----@return vec3
-function CWheel:GetTransformRight()
-	return self:__safecall(VEC3_ZERO, function()
-		return self.m_wheel_transform[1]:get_vec3()
-	end)
-end
-
--- test
----@return vec3
-function CWheel:GetTransformFwd()
-	return self:__safecall(VEC3_ZERO, function()
-		return self.m_wheel_transform[2]:get_vec3()
-	end)
-end
-
--- test
----@return vec3
-function CWheel:GetTransformUp()
-	return self:__safecall(VEC3_ZERO, function()
-		return self.m_wheel_transform[3]:get_vec3()
-	end)
-end
-
--- test
----@return vec3
-function CWheel:GetTransformPos()
-	return self:__safecall(VEC3_ZERO, function()
-		return self.m_wheel_transform[4]:get_vec3()
-	end)
-end
-
--- test
----@return float
-function CWheel:GetTiltAngle()
-	return self:__safecall(0.0, function()
-		local up       = self:GetTransformUp()
-		local world_up = vec3:new(0, 0, 1)
-		local dot      = up:dot_product(world_up)
-		local mag      = up:length()
-		if (mag == 0) then
-			return 0.0
-		end
-
-		return math.deg(math.acos(dot / mag))
-	end)
+---@return fVector3 -- Position where the wheel was last on the ground.
+function CWheel:GetLastGroundPos()
+	return self.m_last_ground_pos
 end
 
 ---@param flag eWheelDynamicFlags

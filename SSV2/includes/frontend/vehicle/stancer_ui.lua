@@ -15,6 +15,12 @@ local selectedSavedModel  = ""
 local physicsThreadSignal = nil
 local savedVehsWindow     = { should_draw = false }
 local DeltaRef <const>    = {
+	m_toe         = {
+		label = "VEH_STANCE_TOE",
+		fmt   = "%.2f°",
+		min   = function() return -0.25 end,
+		max   = function() return 0.25 end
+	},
 	m_camber      = {
 		label = "VEH_STANCE_CAMBER",
 		fmt   = "%.2f°",
@@ -104,11 +110,11 @@ end
 
 ---@param key string
 ---@param deltaTable table
----@param side integer
+---@param axle eWheelAxle
 ---@param needsPhysicsUpdate? boolean
-local function DrawSlider(key, deltaTable, side, needsPhysicsUpdate)
+local function DrawSlider(key, deltaTable, axle, needsPhysicsUpdate)
 	local meta     = DeltaRef[key]
-	local label    = _F("%s##%d", _T(meta.label), side)
+	local label    = _F("%s##%d", _T(meta.label), axle)
 	local disabled = (meta.drawdata_only and not Stancer:CanApplyDrawData())
 	if (disabled) then
 		ImGui.BeginDisabled()
@@ -151,7 +157,7 @@ local function DrawSlider(key, deltaTable, side, needsPhysicsUpdate)
 end
 
 return function()
-	if (self.get_veh() == 0) then
+	if (_G.self.get_veh() == 0) then
 		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
 		return
 	end
@@ -170,6 +176,7 @@ return function()
 	end
 
 	ImGui.SeparatorText(_T("VEH_STANCE_FRONT_AXLE"))
+	DrawSlider("m_toe", frontStanceDeltas, Enums.eWheelAxle.FRONT)
 	DrawSlider("m_camber", frontStanceDeltas, Enums.eWheelAxle.FRONT)
 	DrawSlider("m_track_width", frontStanceDeltas, Enums.eWheelAxle.FRONT)
 	ImGui.BeginDisabled(Stancer.m_bounce_mode.enabled)
@@ -177,6 +184,7 @@ return function()
 	ImGui.EndDisabled()
 
 	ImGui.SeparatorText(_T("VEH_STANCE_REAR_AXLE"))
+	DrawSlider("m_toe", backStanceDeltas, Enums.eWheelAxle.REAR)
 	DrawSlider("m_camber", backStanceDeltas, Enums.eWheelAxle.REAR)
 	DrawSlider("m_track_width", backStanceDeltas, Enums.eWheelAxle.REAR)
 	ImGui.BeginDisabled(Stancer.m_bounce_mode.enabled)
@@ -184,7 +192,6 @@ return function()
 	ImGui.EndDisabled()
 
 	ImGui.Spacing()
-
 	if (GUI:Button(_T("VEH_STANCE_COPY_FB"))) then
 		backStanceDeltas.m_camber      = frontStanceDeltas.m_camber
 		backStanceDeltas.m_track_width = frontStanceDeltas.m_track_width

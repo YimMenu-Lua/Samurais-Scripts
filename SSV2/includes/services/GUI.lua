@@ -7,16 +7,12 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-require("includes.lib.imgui_ext")
-
-GVars.keyboard_keybinds.gui_toggle = GVars.keyboard_keybinds.gui_toggle or "F5"
-local Tab                          = require("includes.modules.Tab")
-local WindowAnimator               = require("includes.services.WindowAnimator")
-local ThemeManager                 = require("includes.services.ThemeManager")
-local debug_counter                = GVars.backend.debug_mode and 7 or 0
-local DrawClock                    = require("includes.frontend.clock")
-
-
+require("includes.lib.extensions.api_imgui")
+local Tab             = require("includes.modules.Tab")
+local WindowAnimator  = require("includes.services.WindowAnimator")
+local ThemeManager    = require("includes.services.ThemeManager")
+local debug_counter   = GVars.backend.debug_mode and 7 or 0
+local DrawClock       = require("includes.frontend.clock")
 local mainWindowFlags = ImGuiWindowFlags.NoTitleBar
 	| ImGuiWindowFlags.NoResize
 	| ImGuiWindowFlags.NoBringToFrontOnFocus
@@ -120,6 +116,11 @@ function GUI:init()
 end
 
 function GUI:LateInit()
+	local toggleKey = GVars.keyboard_keybinds.gui_toggle
+	if (not toggleKey or toggleKey == "Unbound" or toggleKey == 0) then
+		GVars.keyboard_keybinds.gui_toggle = "F5"
+	end
+
 	if (not math.is_inrange(GVars.ui.last_tab.tab_id, TABID_MIN, TABID_MAX)) then
 		GVars.ui.last_tab.tab_id = TABID_MIN
 	end
@@ -310,7 +311,7 @@ end
 
 -- Registers an independent window that can only be drawn when the menu is open.
 ---@param windowData WindowRequest
-function GUI:RequestWindow(windowData)
+function GUI:RegisterWindowRequest(windowData)
 	if (not string.isvalid(windowData.m_label)) then
 		log.warning("[GUI]: Failed to register window request. Invalid window name")
 		return

@@ -266,4 +266,4 @@ local function SelfUI()
 end
 
 self_tab:RegisterGUI(SelfUI)
-GUI:RequestWindow(playerAbilitiesWindow)
+GUI:RegisterWindowRequest(playerAbilitiesWindow)

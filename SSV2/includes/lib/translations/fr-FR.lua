@@ -859,5 +859,6 @@ return {
 	["YAV3_SYMBOL_DEFS_HINT"] = "Vous êtes-vous déjà demandé quels sont les symboles de certaines actions de la liste ?\n\n- %s : enregistré comme favori.\n- %s : enregistré en tant que commande.\n- %s : généré par l'utilisateur.",
 	["YAV3_LIST_VIEW_HINT"] = "Les vues de la liste d'animation et de scénario sont exactement les mêmes dans l'onglet « Actions » et dans l'onglet « Compagnons », ce qui signifie que tous les filtres que vous utilisez dans un onglet existeront également dans l'autre. Ce n'est cependant pas le cas pour les onglets « historique » et « favoris ».",
 	["YAV3_VEH_ANIM_HINT"] = "Les animations centrées sur les véhicules ne peuvent pas être jouées à pied ; même pour les compagnons.",
-	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Aucun technicien n'est affecté à ce hub."
+	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Aucun technicien n'est affecté à ce hub.",
+	["VEH_STANCE_TOE"] = "Orteil"
 }
