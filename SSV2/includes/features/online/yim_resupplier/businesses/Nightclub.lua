@@ -69,8 +69,8 @@ function Nightclub:MaxPopularity()
 end
 
 function Nightclub:LockPopularityDecay()
-	tunables.set_float("NIGHTCLUBPOPDECAY", -1e-8)
-	tunables.set_float("INIGHTCLUBPOPDECAYSTAFFUPGRADE", -1e-8)
+	tunables.set_float("NIGHTCLUBPOPDECAY", -1e-16)
+	tunables.set_float("INIGHTCLUBPOPDECAYSTAFFUPGRADE", -1e-16)
 	self:MaxPopularity()
 end
 
@@ -103,4 +103,4 @@ function Nightclub:AddSubBusiness(index)
 	}))
 end
 
-return Nightclub
+return Nightclub.new

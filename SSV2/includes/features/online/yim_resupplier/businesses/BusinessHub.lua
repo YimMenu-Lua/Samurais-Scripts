@@ -25,7 +25,8 @@ local SGSL         = require("includes.services.SGSL")
 ---@field private m_vpu integer
 ---@field private m_prod_time_g ScriptGlobal
 ---@field private m_prod_bool_g ScriptGlobal
----@field private m_tech_global ScriptGlobal
+---@field private m_tech_idx_g ScriptGlobal
+---@field private m_tech_stopwatch_g ScriptGlobal
 ---@field private m_fast_prod_running boolean
 ---@field public fast_prod_enabled boolean
 local BusinessHub   = setmetatable({}, BusinessBase)
@@ -36,14 +37,18 @@ BusinessHub.__index = BusinessHub
 function BusinessHub.new(opts)
 	assert(type(opts.max_units) == "number", "Missing argument: max_units<integer>")
 
-	local base                 = BusinessBase.new(opts)
-	local instance             = setmetatable(base, BusinessHub) ---@cast instance BusinessHub
-	instance.fast_prod_enabled = false
-	instance.fast_prod_running = false
-	instance.m_vpu             = opts.vpu
-	instance.m_prod_time_g     = SGSL:Get(SGSL.data.bhub_prod_time_global):AsGlobal():At(1, base:GetIndex())
-	instance.m_prod_bool_g     = SGSL:Get(SGSL.data.bhub_prod_bool_global):AsGlobal()
-	instance.m_tech_global     = base:GetBaseGlobal():At(321)
+	local base                  = BusinessBase.new(opts)
+	local instance              = setmetatable(base, BusinessHub) ---@cast instance BusinessHub
+	instance.fast_prod_enabled  = false
+	instance.fast_prod_running  = false
+	instance.m_vpu              = opts.vpu
+
+	local sgslObj               = SGSL:Get(SGSL.data.bhub_prod_time_global)
+	local globalIndex           = sgslObj:GetValue()
+	instance.m_prod_time_g      = ScriptGlobal(globalIndex):At(1, base:GetIndex())
+	instance.m_tech_stopwatch_g = ScriptGlobal(globalIndex - 19)
+	instance.m_prod_bool_g      = SGSL:Get(SGSL.data.bhub_prod_bool_global):AsGlobal()
+	instance.m_tech_idx_g       = base:GetBaseGlobal():At(321)
 
 	return instance
 end
@@ -76,7 +81,7 @@ function BusinessHub:IsTechAssignedToThis(techIndex)
 		bitPos = (techIndex * 7) + idx
 		offset = 2
 	end
-	return Bit.IsBitSet(self.m_tech_global:At(offset):ReadInt(), bitPos)
+	return self.m_tech_idx_g:At(offset):GetBit(bitPos) ~= 0
 end
 
 -- `int func_19853(int iParam0) // Position - 0x5FD348 (6280008) (legacy b3788.0)`
@@ -91,7 +96,6 @@ function BusinessHub:GetAssignedTechIndex()
 			return i
 		end
 	end
-
 	return -1
 end
 
@@ -100,13 +104,40 @@ function BusinessHub:GetTimeLeftBeforeProd()
 	return self.m_prod_time_g:ReadInt()
 end
 
-function BusinessHub:TriggerProduction()
-	if (self.m_prod_time_g:ReadInt() < 1000 or self:GetAssignedTechIndex() == -1) then
+-- Do not directly call this private function, it does not perform any sanity checks.
+---@private
+---@param count integer
+function BusinessHub:SetProductCount(count)
+	local idx = self.m_id
+	self.m_tech_idx_g:At(8):At(1, idx):WriteInt(count)
+	stats.set_int(_F("MPX_HUB_PROD_TOTAL_%d", idx), count)
+end
+
+---@param count? integer
+function BusinessHub:TriggerProduction(count)
+	if (self.m_prod_time_g:ReadInt() < 1000) then
 		return
 	end
 
-	self.m_prod_time_g:WriteInt(100)
-	self.m_prod_bool_g:WriteInt(1)
+	local max     = self:GetMaxUnits()
+	local current = self:GetProductCount()
+	local techIdx = self:GetAssignedTechIndex()
+	if (techIdx == -1 or current == max) then return end
+
+	-- we're not cehcking if count and count < current so this can also remove product
+	local nextVal = math.min(count or (current + 1), max)
+	if (nextVal < max) then
+		self:SetProductCount(nextVal)
+	else
+		self.m_tech_stopwatch_g:At(techIdx, 2):WriteInt(0)
+		self.m_prod_time_g:WriteInt(0)
+		self.m_prod_bool_g:WriteInt(1)
+	end
+end
+
+-- https://www.youtube.com/watch?v=-Gh1lTcwdGY
+function BusinessHub:InstantFillProduction()
+	self:TriggerProduction(self:GetMaxUnits() - 1)
 end
 
 ---@return boolean
@@ -124,7 +155,7 @@ function BusinessHub:LoopProduction()
 	ThreadManager:Run(function()
 		while (self:IsValid() and self.fast_prod_enabled and not self:HasFullProduction()) do
 			self:TriggerProduction()
-			yield()
+			yield(250)
 		end
 
 		self.fast_prod_enabled   = false

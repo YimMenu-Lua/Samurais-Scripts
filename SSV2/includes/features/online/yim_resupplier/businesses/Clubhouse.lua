@@ -100,4 +100,4 @@ function Clubhouse:AddSubBusiness(index)
 	}))
 end
 
-return Clubhouse
+return Clubhouse.new

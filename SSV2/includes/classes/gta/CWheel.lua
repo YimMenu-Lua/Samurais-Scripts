@@ -7,9 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local CStructView       = require("includes.classes.gta.CStructView")
-local fVector3          = require("fVector3")
-local VEC3_ZERO <const> = vec3:zero()
+local CStructView = require("includes.classes.gta.CStructView")
+local fVector3    = require("fVector3")
 
 
 --------------------------------------
@@ -19,8 +18,8 @@ local VEC3_ZERO <const> = vec3:zero()
 ---@class CWheel : CStructBase<CWheel>
 ---@field protected m_ptr pointer
 ---@field private m_size uint16_t
----@field m_rotation fVector3
----@field m_rotation_inv fVector3 -- used to negate rotation from the previous vector
+---@field m_rotation_axis fVector3 -- this (and the one below) look and behave like eulers but they are confusing the hell out of me. 0x4 can either be the x or y component but it controls the wheel's yaw (rotation around z axis?? makes no sense) and 0x8 controls the roll (around x axis, also makes no sense)
+---@field m_constraint_axis fVector3 -- and then this one: when simulating camber, we change the roll in the above field at 0x8 and we MUST set the exact opposite of that value here at 0x10, otherwise the wheel tilts on just one side and sinks into the ground. for now we'll treat this as a collision correction or constraint vector but further insight/help would be appreciated
 ---@field m_offset_from_body pointer<float> -- smells like a component of a vector but my alignment makes no sense!
 ---@field m_x_offset pointer<float> // same as offset from body? // edit: this is also in a vector (x component). we currently use it for track width so I'm just gonna leave it as is at least for now
 ---@field m_last_ground_pos fVector3
@@ -75,8 +74,8 @@ local CWheel = CStructView("CWheel", 0x020E)
 function CWheel.new(ptr)
 	return setmetatable({
 		m_ptr                      = ptr,
-		m_rotation                 = fVector3(ptr:add(0x0000)),
-		m_rotation_inv             = fVector3(ptr:add(0x000C)),
+		m_rotation_axis            = fVector3(ptr:add(0x0000)),
+		m_constraint_axis          = fVector3(ptr:add(0x000C)),
 		m_offset_from_body         = ptr:add(0x0020),
 		m_x_offset                 = ptr:add(0x0030),
 		m_last_ground_pos          = fVector3(ptr:add(0x003C)),

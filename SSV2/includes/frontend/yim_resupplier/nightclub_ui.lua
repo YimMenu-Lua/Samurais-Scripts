@@ -191,12 +191,12 @@ return function()
 		ImGui.BeginDisabled(Game.IsEnhanced())
 		local is_maxed = prod >= max_units
 		ImGui.BeginDisabled(is_maxed)
-		this.fast_prod_enabled, _ = GUI:CustomToggle("##fast_prod", this.fast_prod_enabled)
+		this.fast_prod_enabled = GUI:CustomToggle("##fast_prod", this.fast_prod_enabled)
 		ImGui.EndDisabled()
 		GUI:Tooltip(_T("YRV3_TRIGGER_PROD_HUB_TT"))
 
 		local prod_time       = this:GetTimeLeftBeforeProd()
-		local safe_to_trigger = this:CanTriggerProduction() and not this.fast_prod_running
+		local safe_to_trigger = this:CanTriggerProduction() and not this.fast_prod_enabled
 		local btn_label       = (safe_to_trigger or prod_time < 0)
 			and _T("YRV3_TRIGGER_PROD_HUB")
 			or ImGui.TextSpinner()

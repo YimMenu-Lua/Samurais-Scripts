@@ -245,7 +245,7 @@ return {
 	["YRV3_HANGAR_LAND_ERR"] = "格納庫および販売は現在サポートされていません。",
 	["YRV3_AUTO_SELL_MANUAL"] = "販売を手動で終了する",
 	["YRV3_AUTOSELL_BIKER_LABEL"] = "バイカービジネス",
-	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "アシッドラボ",
+	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Acid Lab（一時的に無効）",
 	["YRV3_AUTOSELL_CEO_LABEL"] = "CEO の倉庫",
 	["YRV3_AUTOSELL_HANGAR_LABEL"] = "格納庫 (航空機のみ)",
 	["YRV3_AUTOSELL_CURRENT"] = "現在販売中: %s",
@@ -860,5 +860,8 @@ return {
 	["YAV3_SYMBOL_DEFS_HINT"] = "リスト内の一部のアクションの記号が何なのか考えたことはありますか?\n\n- %s: お気に入りとして保存されました。\n- %s: コマンドとして登録されました。\n- %s: ユーザーが生成しました。",
 	["YAV3_VEH_ANIM_HINT"] = "乗り物中心のアニメーションは徒歩では再生できません。仲間に対しても。",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "このハブには技術者が割り当てられていません。",
-	["VEH_STANCE_TOE"] = "つま先"
+	["VEH_STANCE_TOE"] = "つま先",
+	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "ナイトクラブカーゴ",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "「自動販売」は 20 秒後に開始されます。タイマーが終了する前にトグルを無効にすることでキャンセルできます。",
+	["YRV3_AUTO_SELL_CANCELED_MSG"] = "「自動販売」はキャンセルされました。"
 }

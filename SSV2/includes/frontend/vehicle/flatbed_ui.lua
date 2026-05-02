@@ -12,12 +12,8 @@ local flatbed_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_FLATBED
 
 flatbed_tab:AddLoopedCommand("FLTBD_MAIN_CB",
 	"features.flatbed.enabled",
-	function()
-		Flatbed:OnTick()
-	end,
-	function()
-		Flatbed:Reset()
-	end,
+	function() Flatbed:OnTick() end,
+	function() Flatbed:Reset() end,
 	nil,
 	true,
 	true

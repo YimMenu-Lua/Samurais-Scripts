@@ -138,9 +138,14 @@ function SalvageYard:GetRobberyCarInSlot(slot)
 	return data.vehicle_targets[index]
 end
 
-function SalvageYard:DisableWeeklyCooldown()
-	tunables.set_int("SALV23_VEH_ROBBERY_WEEK_ID", stats.get_int("MPX_SALV23_WEEK_SYNC") + 1)
-	Notifier:ShowSuccess("Salvage Yard", _T("SY_CD_SKIP_SUCCESS"))
+---@param toggle boolean
+---@param silent? boolean
+function SalvageYard:ToggleWeeklyCooldown(toggle, silent)
+	local weekID = stats.get_int("MPX_SALV23_WEEK_SYNC")
+	tunables.set_int("SALV23_VEH_ROBBERY_WEEK_ID", toggle and weekID + 1 or weekID)
+	if (toggle and not silent) then
+		Notifier:ShowSuccess("Salvage Yard", _T("SY_CD_SKIP_SUCCESS"))
+	end
 end
 
 function SalvageYard:SkipPreps()
@@ -351,4 +356,4 @@ ThreadManager:Run(function()
 	end
 end)
 
-return SalvageYard
+return SalvageYard.new

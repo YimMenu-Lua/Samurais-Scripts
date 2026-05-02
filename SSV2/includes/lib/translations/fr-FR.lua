@@ -256,7 +256,7 @@ return {
 	["YRV3_AUTOSELL_CURRENT"] = "Vente actuelle : %s",
 	["SELF_AUTOHEAL_TT"] = "Régénère votre santé et votre armure.",
 	["YRV3_INCOME_APPROX_ALL_TT"] = "Parcourez tous les onglets pour mettre à jour le montant total.",
-	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Laboratoire d'acide",
+	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Acid Lab (temporairement désactivé)",
 	["SELF_ACTION_MODE"] = "Désactiver le mode action",
 	["SELF_HEADPROPS"] = "Autoriser les accessoires de tête dans les véhicules",
 	["SELF_CROUCH"] = "Accroupissement",
@@ -860,5 +860,8 @@ return {
 	["YAV3_LIST_VIEW_HINT"] = "Les vues de la liste d'animation et de scénario sont exactement les mêmes dans l'onglet « Actions » et dans l'onglet « Compagnons », ce qui signifie que tous les filtres que vous utilisez dans un onglet existeront également dans l'autre. Ce n'est cependant pas le cas pour les onglets « historique » et « favoris ».",
 	["YAV3_VEH_ANIM_HINT"] = "Les animations centrées sur les véhicules ne peuvent pas être jouées à pied ; même pour les compagnons.",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Aucun technicien n'est affecté à ce hub.",
-	["VEH_STANCE_TOE"] = "Orteil"
+	["VEH_STANCE_TOE"] = "Orteil",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "La « vente automatique » démarrera dans 20 secondes. Vous pouvez l'annuler en désactivant la bascule avant la fin du minuteur.",
+	["YRV3_AUTO_SELL_CANCELED_MSG"] = "« Vente automatique » a été annulée.",
+	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Cargaison de boîte de nuit"
 }

@@ -16,13 +16,6 @@ local ClearPreview   = function() PreviewService:Clear() end
 ---@field owner integer
 ---@field alpha integer
 
----@enum eGameBranch
-Enums.eGameBranch   = {
-	LAGECY   = 1,
-	ENHANCED = 2,
-	MOCK     = 99,
-}
-
 ---@enum eBackendEvent
 Enums.eBackendEvent = {
 	RELOAD_UNLOAD  = 1,

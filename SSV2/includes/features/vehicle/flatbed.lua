@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local COL_YELLOW <const> = Color("yellow")
+local COL_YELLOW <const>   = Color("yellow")
 
 ---@class TowedVehicle
 ---@field m_handle handle
@@ -19,15 +19,14 @@ local COL_YELLOW <const> = Color("yellow")
 ---@field m_has_passenggers boolean
 ---@field m_passengers table
 local TowedVehicle <const> = {}
-TowedVehicle.__index = TowedVehicle
-
+TowedVehicle.__index       = TowedVehicle
 function TowedVehicle.new(handle, modelHash, name, towpos)
 	local instance             = setmetatable({}, TowedVehicle)
 	instance.m_handle          = handle
 	instance.m_model           = modelHash
 	instance.m_name            = name
 	instance.m_tow_pos         = towpos
-	instance.m_passengers      = Vehicle(handle):GetOccupants()
+	instance.m_passengers      = Game.GetVehicleOccupants(handle)
 	instance.m_has_passenggers = (instance.m_passengers and #instance.m_passengers > 0) or false
 	return instance
 end
@@ -40,40 +39,42 @@ end
 ---@field private m_coords vec3
 ---@field private m_fwd_vec vec3
 ---@field private m_search_pos vec3
+---@field public modelHash hash
+---@field public towOffset vec3
 ---@field public m_towed_vehicle TowedVehicle
-local Flatbed = {}
+---@field public displayText string
+---@field public shouldPause boolean
+---@field public closestVehicle { isTowable: boolean, isCar: boolean, isBike: boolean, modelHash: hash, handle: handle, name: string }
+local Flatbed   = {}
 Flatbed.__index = Flatbed
 
----@public
-Flatbed.modelHash = 1353720154
-Flatbed.m_handle = 0
-Flatbed.m_previous_handle = 0
-Flatbed.towOffset = vec3:new(0.0, 1.0, 0.69)
-Flatbed.displayText = ""
-Flatbed.shouldPause = false
-Flatbed.closestVehicle = {
-	isTowable = false,
-	isCar = false,
-	isBike = false,
-	modelHash = 0,
-	handle = 0,
-	name = "",
-}
+function Flatbed.new()
+	return setmetatable({
+		modelHash         = 1353720154,
+		m_handle          = 0,
+		m_previous_handle = 0,
+		towOffset         = vec3:new(0.0, 1.0, 0.69),
+		displayText       = "",
+		shouldPause       = false,
+		closestVehicle    = {
+			isTowable = false,
+			isCar     = false,
+			isBike    = false,
+			modelHash = 0,
+			handle    = 0,
+			name      = "",
+		}
+	}, Flatbed)
+end
 
 function Flatbed:Spawn()
 	if (not LocalPlayer:IsOutside()) then
-		Notifier:ShowError(
-			"Samurais Scripts",
-			_T("GENERIC_INTERIOR_ACTION_ERR")
-		)
+		Notifier:ShowError("Samurai's Scripts", _T("GENERIC_INTERIOR_ACTION_ERR"))
 		return
 	end
 
 	if (not LocalPlayer:IsOnFoot()) then
-		Notifier:ShowError(
-			"Samurais Scripts",
-			_T("FLTBD_EXIT_VEH_ERR")
-		)
+		Notifier:ShowError("Samurai's Scripts", _T("FLTBD_EXIT_VEH_ERR"))
 		return
 	end
 
@@ -98,11 +99,7 @@ function Flatbed:Spawn()
 		end
 
 		if (not ENTITY.DOES_ENTITY_EXIST(self.m_handle)) then
-			Notifier:ShowError(
-				"Samurai's Scripts",
-				"Failed to spawn a flatbed truck! Please try again later."
-			)
-
+			Notifier:ShowError("Samurai's Scripts", _T("GENERIC_ENTITY_SPAWN_FAIL"))
 			self.m_handle = 0
 			return
 		end
@@ -128,73 +125,78 @@ end
 
 function Flatbed:SetDisplayText()
 	if (self.m_towed_vehicle) then
-		self.displayText = _F("%s %s.",
-			_T("FLTBD_TOWING_TXT"),
-			self.m_towed_vehicle.m_name)
+		self.displayText = _F("%s %s.", _T("FLTBD_TOWING_TXT"), self.m_towed_vehicle.m_name)
 	else
-		if self.closestVehicle.handle == 0 or self.closestVehicle.name == "" then
+		local closestVeh = self.closestVehicle
+		if (closestVeh.handle == 0 or closestVeh.name:isempty()) then
 			self.displayText = _T("FLTBD_NO_VEH_TXT")
-		elseif self.closestVehicle.modelHash == self.modelHash then
+		elseif (closestVeh.modelHash == self.modelHash) then
 			self.displayText = _T("FLTBD_NOT_ALLOWED_TXT")
 		else
-			self.displayText = _F(
-				"%s %s",
-				_T("FLTBD_NEARBY_VEH_TXT"),
-				self.closestVehicle.name
-			)
+			self.displayText = _F("%s %s", _T("FLTBD_NEARBY_VEH_TXT"), closestVeh.name)
 		end
 	end
 end
 
 function Flatbed:IsClosestVehicleTowable()
-	if (self.closestVehicle.handle == 0 or self.closestVehicle.modelHash == 0) then
+	local closestVeh = self.closestVehicle
+	if (closestVeh.handle == 0 or closestVeh.modelHash == 0) then
 		return false
 	end
 
 	return GVars.features.flatbed.tow_everything
-		or (self.closestVehicle.modelHash == 745926877)
-		or not VEHICLE.IS_THIS_MODEL_A_PLANE(self.closestVehicle.handle)
-		or not VEHICLE.IS_THIS_MODEL_A_HELI(self.closestVehicle.handle)
+		or (closestVeh.modelHash == 745926877)
+		or not VEHICLE.IS_THIS_MODEL_A_PLANE(closestVeh.handle)
+		or not VEHICLE.IS_THIS_MODEL_A_HELI(closestVeh.handle)
 end
 
-function Flatbed:Attach()
-	if (self.closestVehicle.handle == 0) then
-		return
+---@private
+---@return boolean success, vec3? centerOffset
+function Flatbed:PrepareTarget(target)
+	if (target.handle == 0) then
+		return false, nil
 	end
 
-	if (not self.closestVehicle.isTowable) then
+	if (not target.isTowable) then
 		Notifier:ShowWarning("Samurais Scripts", _T("FLTBD_CARS_ONLY_TXT"))
-		return
+		return false, nil
 	end
 
-	if (self.closestVehicle.modelHash == self.modelHash) then
+	if (target.modelHash == self.modelHash) then
 		Notifier:ShowWarning("Samurais Scripts", _T("FLTBD_NOT_ALLOWED_TXT"))
-		return
+		return false, nil
 	end
 
-	if (not entities.take_control_of(self.closestVehicle.handle, 350)) then
+	if (not entities.take_control_of(target.handle, 350)) then
 		Notifier:ShowError("Samurais Scripts", _T("GENERIC_ENTITY_CTRL_FAIL"))
-		return
+		return false, nil
 	end
 
-	local target = self.closestVehicle
 	local minSize, maxSize = Game.GetModelDimensions(
 		target.modelHash or
 		Game.GetEntityModel(target.handle)
 	)
 
-	local centerOffset = vec3:new(
+	return true, vec3:new(
 		(minSize.x + maxSize.x) / 2,
 		(minSize.y - maxSize.y) / 2,
 		(maxSize.z + minSize.z) / 2
 	)
+end
+
+function Flatbed:Attach()
+	local target                 = self.closestVehicle
+	local prepared, centerOffset = self:PrepareTarget(target)
+	if (not prepared or not centerOffset) then
+		return
+	end
 
 	local z_offset = centerOffset.z + self.towOffset.z
-	local maxLift = 3.0
-	local step = 0.05
-	local tries = 0
-	local final_z = z_offset
-	local success = false
+	local maxLift  = 3.0
+	local step     = 0.05
+	local tries    = 0
+	local final_z  = z_offset
+	local success  = false
 
 	ENTITY.SET_ENTITY_HEADING(target.handle, self.m_heading)
 	ENTITY.SET_ENTITY_CANT_CAUSE_COLLISION_DAMAGED_ENTITY(target.handle, self.m_handle)
@@ -318,45 +320,11 @@ function Flatbed:MoveAttachment(x, y, z)
 end
 
 function Flatbed:AttachPhysically()
-	if (self.closestVehicle.handle == 0) then
+	local target                 = self.closestVehicle
+	local prepared, centerOffset = self:PrepareTarget(target)
+	if (not prepared or not centerOffset) then
 		return
 	end
-
-	if (not self.closestVehicle.isTowable) then
-		Notifier:ShowWarning(
-			"Samurais Scripts",
-			_T("FLTBD_CARS_ONLY_ERR")
-		)
-		return
-	end
-
-	if (self.closestVehicle.modelHash == self.modelHash) then
-		Notifier:ShowWarning(
-			"Samurais Scripts",
-			_T("FLTBD_SAME_NOT_ALLOWED_ERR")
-		)
-		return
-	end
-
-	if (not entities.take_control_of(self.closestVehicle.handle, 350)) then
-		Notifier:ShowError(
-			"Samurais Scripts",
-			_T("GENERIC_ENTITY_CTRL_FAIL")
-		)
-		return
-	end
-
-	local target = self.closestVehicle
-	local minSize, maxSize = Game.GetModelDimensions(
-		target.modelHash or
-		Game.GetEntityModel(target.handle)
-	)
-
-	local centerOffset = vec3:new(
-		(minSize.x + maxSize.x) / 2,
-		(minSize.y - maxSize.y),
-		(maxSize.z + minSize.z) / 2
-	)
 
 	local z_offset = centerOffset.z + self.towOffset.z
 	sleep(100)
@@ -424,10 +392,9 @@ end
 
 function Flatbed:ForceCleanup()
 	for _, v in ipairs(entities.get_all_vehicles_as_handles()) do
-		local modelHash = ENTITY.GET_ENTITY_MODEL(v)
+		local modelHash       = ENTITY.GET_ENTITY_MODEL(v)
 		local attachedVehicle = ENTITY.GET_ENTITY_OF_TYPE_ATTACHED_TO_ENTITY(self.m_previous_handle, modelHash)
-
-		if ENTITY.DOES_ENTITY_EXIST(attachedVehicle) and entities.take_control_of(attachedVehicle, 350) then
+		if (ENTITY.DOES_ENTITY_EXIST(attachedVehicle) and entities.take_control_of(attachedVehicle, 350)) then
 			local attachedVehcoords = ENTITY.GET_ENTITY_COORDS(attachedVehicle, false)
 			ENTITY.DETACH_ENTITY(attachedVehicle, true, true)
 			ENTITY.SET_ENTITY_COORDS(
@@ -448,34 +415,37 @@ function Flatbed:ForceCleanup()
 end
 
 function Flatbed:OnKeyPress()
-	if self.m_towed_vehicle then
+	if (self.m_towed_vehicle) then
 		self:Detach()
-	else
+	elseif (self.closestVehicle.isTowable) then
 		self:Attach()
 	end
 end
 
 function Flatbed:Reset()
+	self:OnKeyPress()
+	sleep(50)
+
 	self.closestVehicle = {
 		isTowable = false,
 		modelHash = 0,
-		handle = 0,
-		name = "",
+		handle    = 0,
+		name      = "",
 	}
 
-	if self.m_towed_vehicle then
+	if (self.m_towed_vehicle) then
 		Decorator:RemoveEntity(self.m_towed_vehicle.m_handle)
 	end
 
 	Decorator:RemoveEntity(self.m_handle)
 	self.m_previous_handle = 0
-	self.m_search_pos = vec3:zero()
-	self.m_fwd_vec = vec3:zero()
-	self.m_towed_vehicle = nil
-	self.m_bone_index = -1
-	self.m_heading = 0
-	self.m_coords = vec3:zero()
-	self.m_handle = 0
+	self.m_search_pos      = vec3:zero()
+	self.m_fwd_vec         = vec3:zero()
+	self.m_towed_vehicle   = nil
+	self.m_bone_index      = -1
+	self.m_heading         = 0
+	self.m_coords          = vec3:zero()
+	self.m_handle          = 0
 end
 
 function Flatbed:OnTick()
@@ -484,33 +454,31 @@ function Flatbed:OnTick()
 			self:Reset()
 		end
 
-		sleep(1000)
+		yield()
 		return
 	end
 
 	if (self.m_previous_handle == 0) then
 		self.m_previous_handle = self.m_handle
 	elseif (self.m_previous_handle ~= self.m_handle) then
-		self:Detach()
-		sleep(50)
 		self:Reset()
 	end
 
-	self.m_handle = LocalPlayer:GetVehicleNative()
-	self.m_heading = Game.GetHeading(self.m_handle)
-	self.m_coords = Game.GetEntityCoords(self.m_handle, false)
-	self.m_fwd_vec = Game.GetForwardVector(self.m_previous_handle or self.m_handle)
-	self.m_bone_index = Game.GetEntityBoneIndexByName(self.m_handle, "chassis")
-	self.m_search_pos = vec3:new(
+	self.m_handle                 = LocalPlayer:GetVehicleNative()
+	self.m_heading                = Game.GetHeading(self.m_handle)
+	self.m_coords                 = Game.GetEntityCoords(self.m_handle, false)
+	self.m_fwd_vec                = Game.GetForwardVector(self.m_previous_handle or self.m_handle)
+	self.m_bone_index             = Game.GetEntityBoneIndexByName(self.m_handle, "chassis")
+	self.m_search_pos             = vec3:new(
 		self.m_coords.x - (self.m_fwd_vec.x * 10),
 		self.m_coords.y - (self.m_fwd_vec.y * 10),
 		self.m_coords.z
 	)
 
-	self.closestVehicle.handle = Game.GetClosestVehicle(self.m_search_pos, 5, self.m_handle)
+	self.closestVehicle.handle    = Game.GetClosestVehicle(self.m_search_pos, 5, self.m_handle)
 	self.closestVehicle.modelHash = self.closestVehicle.handle ~= 0 and
 		Game.GetEntityModel(self.closestVehicle.handle) or 0
-	self.closestVehicle.name = self:GetClosestVehicleName()
+	self.closestVehicle.name      = self:GetClosestVehicleName()
 	self.closestVehicle.isTowable = self:IsClosestVehicleTowable()
 
 	self:SetDisplayText()
@@ -534,13 +502,15 @@ function Flatbed:OnTick()
 		end
 	end
 
-	if KeyManager:IsKeybindJustPressed("flatbed") then
+	if (KeyManager:IsKeybindJustPressed("flatbed")) then
 		self:OnKeyPress()
 	end
 end
 
-Backend:RegisterEventCallbackAll(function()
-	Flatbed:ForceCleanup()
-end)
+--------------------
+--------------------
 
-return Flatbed
+local singleInstance = Flatbed.new()
+Backend:RegisterEventCallbackAll(function() singleInstance:ForceCleanup() end)
+Backend:RegisterFeatureEntityHandler("Flatbed", function() singleInstance:Reset() end)
+return singleInstance

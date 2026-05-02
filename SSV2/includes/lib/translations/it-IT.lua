@@ -246,7 +246,7 @@ return {
 	["YRV3_AUTOSELL_HANGAR_LABEL"] = "Hangar (solo aereo)",
 	["YRV3_SELL_MISSIONS_NOTE"] = "[NOTA]: Se prevedi di vendere più di una volta per la stessa attività, cambia sessione dopo aver terminato la prima vendita per ripristinare le missioni, altrimenti molto probabilmente la seconda non verrà avviata.",
 	["YRV3_AUTOSELL_CURRENT"] = "Attualmente in vendita: %s",
-	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Laboratorio degli acidi",
+	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Laboratorio acido (temporaneamente disabilitato)",
 	["YRV3_AUTOSELL_TT"] = "Termina automaticamente una missione di vendita 20 secondi dopo il suo inizio. Non richiede che tu interagisca con nient'altro oltre all'avvio della missione.",
 	["YRV3_MCT_TITLE"] = "Terminale di controllo principale",
 	["YRV3_AUTO_SELL_MANUAL"] = "Termina manualmente la vendita",
@@ -860,5 +860,8 @@ return {
 	["YAV3_SYMBOL_DEFS_HINT"] = "Ti sei mai chiesto quali sono i simboli su alcune azioni nell'elenco?\n\n- %s: salvato come preferito.\n- %s: registrato come comando.\n- %s: generato dall'utente.",
 	["YAV3_VEH_ANIM_HINT"] = "Le animazioni incentrate sui veicoli non possono essere riprodotte a piedi; anche per i compagni.",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Nessun tecnico è assegnato a questo hub.",
-	["VEH_STANCE_TOE"] = "Punta"
+	["VEH_STANCE_TOE"] = "Punta",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "La \"vendita automatica\" inizierà tra 20 secondi. Puoi annullarlo disabilitando l'interruttore prima che scada il timer.",
+	["YRV3_AUTO_SELL_CANCELED_MSG"] = "La \"vendita automatica\" è stata annullata.",
+	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Carico da discoteca"
 }

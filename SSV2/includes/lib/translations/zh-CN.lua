@@ -241,7 +241,7 @@ return {
 	["YRV3_SELL_MISSIONS_TT"] = "这些选项将不会被保存。每个按钮都会禁用该业务最繁琐的销售任务。",
 	["YRV3_SELL_MISSIONS_NOTIF"] = "禁用了最烦人的 %s 出售任务。",
 	["YRV3_AUTO_SELL_SUPPORT_NOTICE"] = "注意：仅支持以下业务：",
-	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "酸实验室",
+	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "酸实验室（暂时禁用）",
 	["YRV3_SELL_MISSIONS_NOTE"] = "[注意]：如果您计划对同一业务进行多次销售，请在完成第一次销售后切换会话以重置任务，否则第二次销售很可能无法开始。",
 	["YRV3_AUTOSELL_BIKER_LABEL"] = "骑车人企业",
 	["YRV3_AUTOSELL_TT"] = "销售任务开始20秒后自动完成。除了开始任务之外，不需要您进行任何交互。",
@@ -860,5 +860,8 @@ return {
 	["YAV3_LIST_VIEW_HINT"] = "“操作”选项卡和“同伴”选项卡中的动画和场景列表视图完全相同，这意味着您在一个选项卡中使用的任何过滤器也将存在于另一个选项卡中。然而，“历史记录”和“收藏夹”选项卡的情况并非如此。",
 	["YAV3_VEH_ANIM_HINT"] = "以车辆为中心的动画无法步行播放；即使对于同伴。",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "没有技术人员被分配到该中心。",
-	["VEH_STANCE_TOE"] = "脚趾"
+	["VEH_STANCE_TOE"] = "脚趾",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "“自动销售”将在 20 秒后开始。您可以通过在计时器结束之前禁用切换来取消它。",
+	["YRV3_AUTO_SELL_CANCELED_MSG"] = "“自动销售”已被取消。",
+	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "夜总会货运"
 }

@@ -247,7 +247,7 @@ return {
 	["YRV3_AUTOSELL_TT"] = "Termina automaticamente uma missão de venda 20 segundos após seu início. Não exige que você interaja com nada além de iniciar a missão.",
 	["YRV3_AUTOSELL_CURRENT"] = "Vendendo atualmente: %s",
 	["YRV3_SELL_MISSIONS_TT"] = "Essas opções não serão salvas. Cada botão desativa as missões de venda mais tediosas para aquele negócio.",
-	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Laboratório de Ácido",
+	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Laboratório de ácido (temporariamente desativado)",
 	["YRV3_AUTO_FILL_DELAY"] = "Atraso global de preenchimento automático:",
 	["YRV3_MCT_TITLE"] = "Terminal de controle mestre",
 	["YRV3_HANGAR_LAND_ERR"] = "Hangar e vendas não são suportados no momento.",
@@ -860,5 +860,8 @@ return {
 	["YAV3_LIST_VIEW_HINT"] = "As visualizações de lista de animação e cenário são exatamente as mesmas na guia 'Ações' e na guia 'Companheiros', o que significa que quaisquer filtros que você usar em uma guia também existirão na outra. No entanto, este não é o caso das guias 'histórico' e 'favoritos'.",
 	["YAV3_VEH_ANIM_HINT"] = "As animações centradas no veículo não podem ser reproduzidas a pé; mesmo para companheiros.",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Nenhum técnico está atribuído a este hub.",
-	["VEH_STANCE_TOE"] = "Dedo do pé"
+	["VEH_STANCE_TOE"] = "Dedo do pé",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "A 'Venda Automática' começará em 20 segundos. Você pode cancelá-lo desativando a alternância antes que o cronômetro termine.",
+	["YRV3_AUTO_SELL_CANCELED_MSG"] = "A 'Venda Automática' foi cancelada.",
+	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Carga de boate"
 }

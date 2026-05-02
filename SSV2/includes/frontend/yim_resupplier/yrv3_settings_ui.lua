@@ -7,12 +7,20 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YRV3               = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local COL_RED <const>    = Color.RED
-local timer_data <const> = {
+local YRV3                      = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local COL_RED <const>           = Color.RED
+local timer_data <const>        = {
 	{ label = "GENERIC_MILLIS_LABEL",  mult = 1 },
 	{ label = "GENERIC_SECONDS_LABEL", mult = 1e3 },
 	{ label = "GENERIC_MINUTES_LABEL", mult = 6e4 },
+}
+local supported_scripts <const> = {
+	"YRV3_AUTOSELL_BUNKER_LABEL",
+	"YRV3_AUTOSELL_HANGAR_LABEL",
+	"YRV3_AUTOSELL_CEO_LABEL",
+	"YRV3_AUTOSELL_BIKER_LABEL",
+	"YRV3_AUTOSELL_NC_CARGO_LABEL",
+	"YRV3_AUTOSELL_LSD_LAB_LABEL",
 }
 
 ---@param v integer
@@ -78,22 +86,18 @@ return function()
 
 	GUI:HeaderText(_T("YRV3_AUTO_SELL"), { separator = true, spacing = true })
 	ImGui.TextWrapped(_T("YRV3_AUTO_SELL_SUPPORT_NOTICE"))
-	ImGui.BulletText(_T("YRV3_AUTOSELL_BUNKER_LABEL"))
-	ImGui.BulletText(_T("YRV3_AUTOSELL_HANGAR_LABEL"))
-	ImGui.BulletText(_T("YRV3_AUTOSELL_CEO_LABEL"))
-	ImGui.BulletText(_T("YRV3_AUTOSELL_BIKER_LABEL"))
-	ImGui.BulletText(_T("YRV3_AUTOSELL_LSD_LAB_LABEL"))
+	for _, scrName in ipairs(supported_scripts) do
+		ImGui.BulletText(_T(scrName))
+	end
 
 	ImGui.Spacing()
-	local autoSellTriggered = YRV3:HasTriggeredAutoSell()
-	ImGui.BeginDisabled(autoSellTriggered)
 	GVars.features.yrv3.autosell, _ = GUI:CustomToggle(_T("YRV3_AUTO_SELL"), GVars.features.yrv3.autosell)
-	ImGui.EndDisabled()
 	GUI:Tooltip(_T("YRV3_AUTOSELL_TT"))
 
 	if (script.is_active("fm_content_smuggler_sell")) then
 		GUI:Text(_T("YRV3_HANGAR_LAND_ERR"), { color = COL_RED })
 	else
+		local autoSellTriggered = YRV3:HasTriggeredAutoSell()
 		ImGui.BeginDisabled(GVars.features.yrv3.autosell
 			or autoSellTriggered
 			or not YRV3:IsAnySaleInProgress()

@@ -1282,6 +1282,29 @@ function Game.GetVehicleModelName(modelHash)
 	return veh_hashmap[modelHash] or "NULL"
 end
 
+---@param handle handle
+---@return array<handle>
+function Game.GetVehicleOccupants(handle)
+	if (not Game.IsScriptHandle(handle)) then
+		return {}
+	end
+
+	---@type array<handle>
+	local passengers = {}
+	local max_seats  = VEHICLE.GET_VEHICLE_MODEL_NUMBER_OF_SEATS(Game.GetEntityModel(handle))
+
+	for i = -1, max_seats do
+		if not VEHICLE.IS_VEHICLE_SEAT_FREE(handle, i, true) then
+			local ped = VEHICLE.GET_PED_IN_VEHICLE_SEAT(handle, i, false)
+			if (ped and ped ~= 0) then
+				table.insert(passengers, ped)
+			end
+		end
+	end
+
+	return passengers
+end
+
 ---@param weapon string|joaat_t
 ---@return string
 function Game.GetWeaponDisplayName(weapon)

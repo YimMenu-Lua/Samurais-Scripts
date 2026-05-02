@@ -245,7 +245,7 @@ return {
 	["YRV3_AUTOSELL_CEO_LABEL"] = "Almacenes del CEO",
 	["YRV3_AUTOSELL_HANGAR_LABEL"] = "Hangar (solo aire)",
 	["YRV3_AUTOSELL_BIKER_LABEL"] = "Negocios de motociclistas",
-	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Laboratorio de ácido",
+	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Laboratorio de ácido (temporalmente deshabilitado)",
 	["YRV3_AUTO_FILL_DELAY"] = "Retraso de autocompletar global:",
 	["YRV3_AUTOSELL_CURRENT"] = "Actualmente vendiendo: %s",
 	["YRV3_AUTOSELL_TT"] = "Finaliza automáticamente una misión de venta 20 segundos después de su inicio. No requiere que interactúes con nada más que comenzar la misión.",
@@ -860,5 +860,8 @@ return {
 	["YAV3_LIST_VIEW_HINT"] = "Las vistas de lista de animaciones y escenarios son exactamente las mismas en la pestaña 'Acciones' y en la pestaña 'Compañeros', lo que significa que cualquier filtro que uses en una pestaña también existirá en la otra. Sin embargo, este no es el caso de las pestañas \"historial\" y \"favoritos\".",
 	["YAV3_VEH_ANIM_HINT"] = "Las animaciones centradas en vehículos no se pueden reproducir a pie; incluso para acompañantes.",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "No hay ningún técnico asignado a este centro.",
-	["VEH_STANCE_TOE"] = "Dedo del pie"
+	["VEH_STANCE_TOE"] = "Dedo del pie",
+	["YRV3_AUTO_SELL_CANCELED_MSG"] = "La \"venta automática\" ha sido cancelada.",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "La 'venta automática' comenzará en 20 segundos. Puede cancelarlo desactivando el interruptor antes de que finalice el cronómetro.",
+	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Carga de discoteca"
 }

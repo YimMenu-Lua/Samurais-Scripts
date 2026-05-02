@@ -130,9 +130,7 @@ local function drawBasicTab()
 			GVars.features.yim_heists[key], {
 				tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
 				color   = Color.RED,
-				onClick = function()
-					YRV3:SetCooldownStateDirty(key, true)
-				end
+				onClick = function() YRV3:ProcessCooldown(key) end
 			})
 		ImGui.PopID()
 
@@ -302,9 +300,7 @@ local function drawCayoTab()
 		GVars.features.yim_heists.cayo_cd, {
 			tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
 			color   = Color.RED,
-			onClick = function()
-				YRV3:SetCooldownStateDirty("cayo_cd", true)
-			end
+			onClick = function() YRV3:ProcessCooldown("cayo_cd") end
 		})
 
 	if (GVars.backend.debug_mode) then
@@ -387,9 +383,7 @@ local function drawDDayTab()
 		GVars.features.yim_heists.dday_cd, {
 			tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
 			color   = Color.RED,
-			onClick = function()
-				YRV3:SetCooldownStateDirty("dday_cd", true)
-			end
+			onClick = function() YRV3:ProcessCooldown("dday_cd") end
 		})
 end
 

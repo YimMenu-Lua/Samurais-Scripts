@@ -7,47 +7,13 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local SGSL                       = require("includes.services.SGSL")
-local Factory                    = require("Factory")
-local Warehouse                  = require("Warehouse")
-local Office                     = require("Office")
-local Nightclub                  = require("Nightclub")
-local Clubhouse                  = require("Clubhouse")
-local CashSafe                   = require("CashSafe")
-local CarWash                    = require("CarWash")
-local SalvageYard                = require("SalvageYard")
+local SGSL <const>                    = require("includes.services.SGSL")
+local IManagedValueController <const> = require("includes.structs.IManagedValueController")
+local RawData <const>                 = require("includes.data.yrv3_data")
 
-local ScriptDisplayNames <const> = {
-	["fm_content_smuggler_sell"] = "Hangar (Land. Not supported.)",
-	["gb_smuggler"]              = "Hangar (Air)",
-	["gb_contraband_sell"]       = "CEO",
-	["gb_gunrunning"]            = "Bunker",
-	["gb_biker_contraband_sell"] = "Biker Business",
-	["fm_content_acid_lab_sell"] = "Acid Lab (Temporarily disabled)",
-}
-
-local NightclubNames <const>     = {
-	"Maisonette Los Santos",
-	"Studio Los Santos",
-	"GALAXY",
-	"Gefangnis",
-	"Omega",
-	"Technologie",
-	"Paradise",
-	"The Palace",
-	"Tony's Fun House",
-}
-
-local ScriptsToTerminate <const> = {
-	"appArcadeBusinessHub",
-	"appsmuggler",
-	"appbikerbusiness",
-	"appbunkerbusiness",
-	"appbusinesshub"
-}
 
 ---@enum eYRState
-Enums.eYRState                   = {
+Enums.eYRState = {
 	IDLE      = 0x0,
 	OFFLINE   = 0x1,
 	WAITING   = 0x2,
@@ -56,6 +22,7 @@ Enums.eYRState                   = {
 	RELOADING = 0x5,
 	ERROR     = 0x6,
 }
+
 
 ---@class YRV3Businesses
 ---@field safes array<CashSafe>
@@ -77,18 +44,18 @@ Enums.eYRState                   = {
 ---@field private m_sell_script_running boolean
 ---@field private m_sell_script_name string?
 ---@field private m_sell_script_disp_name string
----@field private m_raw_data RawBusinessData
 ---@field private m_businesses YRV3Businesses
 ---@field private m_last_autosell_check_time milliseconds
 ---@field private m_last_income_check_time milliseconds
 ---@field private m_last_business_update_time milliseconds
----@field private m_cooldown_state_dirty boolean
+---@field private m_last_cooldown_check_time milliseconds
+---@field private m_cooldown_controller IManagedValueController
 ---@field private m_initial_data_done boolean
 ---@field private m_data_initialized boolean
 ---@field protected m_state eYRState
 ---@field protected m_thread Thread?
 ---@field protected m_initialized boolean
-local YRV3   = { m_raw_data = require("includes.data.yrv3_data") }
+local YRV3   = {}
 YRV3.__index = YRV3
 
 ---@return YRV3
@@ -100,16 +67,17 @@ function YRV3:init()
 	self.m_last_autosell_check_time  = 0
 	self.m_last_income_check_time    = 0
 	self.m_last_business_update_time = 0
+	self.m_last_cooldown_check_time  = 0
 	self.m_state                     = Enums.eYRState.IDLE
 	self.m_has_triggered_autosell    = false
 	self.m_sell_script_running       = false
 	self.m_initial_data_done         = false
 	self.m_data_initialized          = false
-	self.m_cooldown_state_dirty      = true
 	self.m_sell_script_name          = nil
 	self.m_sell_script_disp_name     = "None"
 	self.m_last_error                = ""
 	self.m_businesses                = { safes = {} }
+	self.m_cooldown_controller       = IManagedValueController.new(RawData.Cooldowns)
 
 
 	self.m_thread = ThreadManager:RegisterLooped("SS_YRV3", function()
@@ -137,7 +105,6 @@ function YRV3:Reset()
 	self.m_sell_script_running       = false
 	self.m_initial_data_done         = false
 	self.m_data_initialized          = false
-	self.m_cooldown_state_dirty      = true
 	self.m_state                     = Enums.eYRState.IDLE
 end
 
@@ -234,7 +201,7 @@ end
 
 ---@return dict<{ type: "float"|"bool", tuneables: array<string> }>
 function YRV3:GetSaleMissionTunables()
-	return self.m_raw_data.SellMissionTunables
+	return RawData.SellMissionTunables
 end
 
 ---@return integer
@@ -297,12 +264,12 @@ function YRV3:PopulateHangar()
 	end
 
 	local property_index = stats.get_int("MPX_HANGAR_OWNED")
-	local ref            = self.m_raw_data.Hangars[property_index]
+	local ref            = RawData.Hangars[property_index]
 	if (not ref) then
 		return
 	end
 
-	self.m_businesses.hangar = Warehouse.new({
+	self.m_businesses.hangar = require("Warehouse").new({
 		id        = -1,
 		name      = Game.GetGXTLabel(_F("MP_HANGAR_%d", property_index)),
 		coords    = ref.coords,
@@ -317,19 +284,17 @@ function YRV3:PopulateOffice()
 	end
 
 	local idx = office_prop - 86
-	local ref = self.m_raw_data.Offices[idx]
-	if (not ref) then
-		return
-	end
+	local ref = RawData.Offices[idx]
+	if (not ref) then return end
 
 	local name1 = stats.get_string("MPX_GB_OFFICE_NAME")
 	local name2 = stats.get_string("MPX_GB_OFFICE_NAME2")
-	self.m_businesses.office = Office.new({
+	self.m_businesses.office = require("Office") {
 		id          = idx,
 		name        = Game.GetGXTLabel(ref.gxt),
 		coords      = ref.coords,
 		custom_name = _F("%s%s", name1, name2)
-	})
+	}
 end
 
 function YRV3:PopulateClubhouse()
@@ -339,25 +304,26 @@ function YRV3:PopulateClubhouse()
 	end
 
 	local idx      = club_prop - 90
-	local club_ref = self.m_raw_data.Clubhouses[idx]
+	local club_ref = RawData.Clubhouses[idx]
 	if (not club_ref) then return end
 
-	local safe_data = self.m_raw_data.CashSafes.fronts.clubhouse
+	local safe_data = RawData.CashSafes.fronts.clubhouse
 	safe_data.name = "Clubhouse Duffle Bag"
-	self.m_businesses.clubhouse = Clubhouse.new({
+	self.m_businesses.clubhouse = require("Clubhouse") {
 		id        = idx,
 		name      = Game.GetGXTLabel(club_ref.gxt),
 		coords    = club_ref.coords,
 		safe_data = safe_data
-	})
+	}
 end
 
 function YRV3:PopulateBikerBusinesses()
 	self:PopulateClubhouse()
+	local Factory = require("Factory")
 
 	if (not self.m_businesses.bunker) then
 		local idx = stats.get_int("MPX_PROP_FAC_SLOT5")
-		local ref = self.m_raw_data.Bunkers[idx]
+		local ref = RawData.Bunkers[idx]
 
 		if (ref) then
 			local gxt_idx            = (idx < 28) and idx - 20 or idx - 19
@@ -403,25 +369,24 @@ function YRV3:PopulateNightclub()
 
 	ThreadManager:Run(function()
 		local nc_index = stats.get_int("MPX_NIGHTCLUB_OWNED")
-		local ref      = self.m_raw_data.Nightclubs[nc_index]
+		local ref      = RawData.Nightclubs[nc_index]
 		if (not self:IsPropertyIndexValid(nc_index) or not ref) then
 			self.m_data_initialized = true
 			return
 		end
 
-		local nameid   = stats.get_int("MPX_PROP_NIGHTCLUB_NAME_ID")
-		local safedata = self.m_raw_data.CashSafes.fronts.nightclub
-		local clubname = NightclubNames[nameid + 1]
-		safedata.name  = clubname
+		local nameid    = stats.get_int("MPX_PROP_NIGHTCLUB_NAME_ID")
+		local safedata  = RawData.CashSafes.fronts.nightclub
+		local clubname  = RawData.NightclubNames[nameid + 1]
+		safedata.name   = clubname
 
-
-		local nightclub = Nightclub.new({
+		local nightclub = require("Nightclub") {
 			id          = nc_index,
 			name        = Game.GetGXTLabel(_F("MP_NCLU_%d", nc_index)),
 			custom_name = clubname,
 			coords      = ref.coords,
 			safe_data   = safedata
-		})
+		}
 
 		if not (nightclub and nightclub:IsValid()) then
 			self.m_data_initialized = true
@@ -475,20 +440,21 @@ function YRV3:PopulateCarWash()
 		return
 	end
 
-	self.m_businesses.car_wash = CarWash.new({
+	self.m_businesses.car_wash = require("CarWash") {
 		name   = Game.GetGXTLabel("CELL_CWAS"),
 		coords = vec3:new(25.645266, -1412.290649, 29.362230)
-	})
+	}
 end
 
 function YRV3:PopulateCashSafes()
-	for i, data in ipairs(self.m_raw_data.CashSafes.regular) do
+	local CashSafe = require("CashSafe")
+	for i, data in ipairs(RawData.CashSafes.regular) do
 		local property_index = stats.get_int(data.property_stat)
 		if (not self:IsPropertyIndexValid(property_index)) then
 			goto continue
 		end
 
-		local entry                = self.m_raw_data[data.raw_data_entry][property_index]
+		local entry                = RawData[data.raw_data_entry][property_index]
 		local name                 = entry and Game.GetGXTLabel(entry.gxt) or "NULL"
 		local coords               = entry and entry.coords or nil
 		self.m_businesses.safes[i] = CashSafe.new({
@@ -500,7 +466,6 @@ function YRV3:PopulateCashSafes()
 			room_hash       = data.room_hash,
 			get_max_cash    = data.get_max_cash,
 		})
-
 		::continue::
 	end
 end
@@ -511,18 +476,18 @@ function YRV3:PopulateSalvageYard()
 		return
 	end
 
-	local ref       = self.m_raw_data.SalvageYards[property_index]
+	local ref       = RawData.SalvageYards[property_index]
 	local name      = ref and Game.GetGXTLabel(ref.gxt) or _T("SY_SALVAGE_YARD")
-	local safe_data = self.m_raw_data.CashSafes.fronts.salvage_yard
+	local safe_data = RawData.CashSafes.fronts.salvage_yard
 	safe_data.name  = name
 
 
-	self.m_businesses.salvage_yard = SalvageYard.new({
+	self.m_businesses.salvage_yard = require("SalvageYard") {
 		id        = property_index,
 		name      = name,
 		coords    = ref and ref.coords or nil,
 		safe_data = safe_data
-	})
+	}
 
 	if (self.m_businesses.salvage_yard and GVars.features.yrv3.sy_always_max_income) then
 		self.m_businesses.salvage_yard:LockIncomeDecay()
@@ -761,7 +726,7 @@ function YRV3:GetRunningSellScriptDisplayName()
 		return "None"
 	end
 
-	return ScriptDisplayNames[self.m_sell_script_name] or "None"
+	return RawData.ScriptDisplayNames[self.m_sell_script_name] or "None"
 end
 
 function YRV3:FinishSale()
@@ -770,10 +735,8 @@ function YRV3:FinishSale()
 		return
 	end
 
-	local entry = self.m_raw_data.SellScripts[sn]
-	if (not entry) then
-		return
-	end
+	local func = RawData.SellScripts[sn]
+	if (not func) then return end
 
 	self.m_has_triggered_autosell = true
 	script.execute_as_script(sn, function()
@@ -781,8 +744,7 @@ function YRV3:FinishSale()
 			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
 			return
 		end
-
-		entry.autofinish()
+		func()
 	end)
 end
 
@@ -818,68 +780,30 @@ function YRV3:FinishCEOCargoSourceMission()
 	end
 end
 
----@param key string
----@param state boolean
-function YRV3:SetCooldownStateDirty(key, state)
-	local data = self.m_raw_data.Cooldowns[key]
-	if (not data) then
-		return
-	end
-
-	data.dirty = state
+---@param name string
+function YRV3:ProcessCooldown(name)
+	self.m_cooldown_controller:SetDirty(name, true)
 end
 
----@param state boolean
-function YRV3:SetAllCooldownStatesDirty(state)
-	self.m_cooldown_state_dirty = state
-end
-
-function YRV3:CheckAllCooldowns()
-	if (not self.m_cooldown_state_dirty) then
-		return
-	end
-
-	for _, data in pairs(self.m_raw_data.Cooldowns) do
-		local gvar = data.gstate()
-		if (gvar and data.onEnable) then
-			data.onEnable()
-		elseif (not gvar and type(data.onDisable) == "function") then
-			data.onDisable()
-		end
-		data.dirty = false
-	end
-
-	self.m_cooldown_state_dirty = false
+function YRV3:ProcessAllCooldowns()
+	self.m_cooldown_controller:SetNextCallForced(true)
 end
 
 function YRV3:CooldownHandler()
-	if (self.m_cooldown_state_dirty) then
-		self:CheckAllCooldowns()
+	local now_ms = Time.Millis()
+	if (now_ms - self.m_last_cooldown_check_time < 2000) then
 		return
 	end
 
-	for _, data in pairs(self.m_raw_data.Cooldowns) do
-		if (not data.dirty) then
-			goto continue
-		end
-
-		local gvar = data.gstate()
-		if (gvar and data.onEnable) then
-			data.onEnable()
-		elseif (not gvar and type(data.onDisable) == "function") then
-			data.onDisable()
-		end
-		data.dirty = false
-
-		::continue::
-	end
+	self.m_cooldown_controller:OnCall()
+	self.m_last_cooldown_check_time = now_ms
 end
 
 ---@return boolean isRunning, string? scriptName, string displayName
 function YRV3:FindRunningSaleScript()
-	for sn in pairs(self.m_raw_data.SellScripts) do
+	for sn in pairs(RawData.SellScripts) do
 		if (script.is_active(sn)) then
-			return true, sn, ScriptDisplayNames[sn] or "None"
+			return true, sn, RawData.ScriptDisplayNames[sn] or "None"
 		end
 	end
 
@@ -896,7 +820,7 @@ function YRV3:SetupAutosell()
 	self.m_sell_script_disp_name = self:FindRunningSaleScript()
 
 	if (self.m_sell_script_running and self.m_bhub_script_handle ~= 0) then -- was triggered from the mct
-		for _, scr in pairs(ScriptsToTerminate) do
+		for _, scr in pairs(RawData.ScriptsToTerminate) do
 			if (script.is_active(scr)) then
 				PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 202, 1.0)
 				sleep(200)
@@ -928,17 +852,24 @@ end
 
 function YRV3:AutoSellHandler()
 	self:SetupAutosell()
+	if not (GVars.features.yrv3.autosell and self.m_sell_script_running) then
+		return
+	end
 
-	if (GVars.features.yrv3.autosell
-			and self.m_sell_script_running
-			and not self.m_has_triggered_autosell
-			and not CAM.IS_SCREEN_FADED_OUT()
-		) then
+	local scr_name = self.m_sell_script_name
+	if (not scr_name) then return end
+
+	if (not self.m_has_triggered_autosell and not CAM.IS_SCREEN_FADED_OUT()) then
 		self.m_has_triggered_autosell = true
-		Notifier:ShowMessage("YRV3", "Auto-Sell will start in 20 seconds.")
-		sleep(2e4)
+		Notifier:ShowMessage("YRV3", _T("YRV3_AUTO_SELL_COUNTDOWN"))
 
-		while (AUDIO.IS_MOBILE_PHONE_CALL_ONGOING()) do
+		local timeout = Timer.new(2e4)
+		while (not timeout:IsDone() or AUDIO.IS_MOBILE_PHONE_CALL_ONGOING()) do
+			if (not GVars.features.yrv3.autosell or not script.is_active(scr_name)) then
+				Notifier:ShowMessage("YRV3", _T("YRV3_AUTO_SELL_CANCELED_MSG"))
+				self.m_has_triggered_autosell = false
+				return
+			end
 			yield()
 		end
 
@@ -946,10 +877,9 @@ function YRV3:AutoSellHandler()
 	end
 
 	while (self.m_has_triggered_autosell) do
-		if (not script.is_active(self.m_sell_script_name)) then
+		if (not script.is_active(scr_name)) then
 			break
 		end
-
 		yield()
 	end
 	self.m_has_triggered_autosell = false
@@ -957,9 +887,7 @@ end
 
 -- Master Control Terminal
 function YRV3:MCT()
-	if LocalPlayer:IsBrowsingApps() then
-		return
-	end
+	if (LocalPlayer:IsBrowsingApps()) then return end
 
 	local BusinessHubGlobal1 = SGSL:Get(SGSL.data.arcade_bhub_global_1):AsGlobal()
 	local BusinessHubGlobal2 = SGSL:Get(SGSL.data.arcade_bhub_global_2):AsGlobal()
@@ -1000,15 +928,9 @@ function YRV3:UpdateBusinesses()
 	end
 
 	for key, business in pairs(self.m_businesses) do
-		if (key == "warehouses") then
-			for _, wh in ipairs(business) do
-				if (type(wh.Update) == "function") then
-					wh:Update()
-				end
-			end
-		elseif (key == "safes") then
-			for _, safe in ipairs(self.m_businesses.safes) do
-				safe:Update()
+		if (key == "safes") then
+			for _, cash_safe in ipairs(self.m_businesses.safes) do
+				cash_safe:Update()
 			end
 		elseif (type(business.Update) == "function") then
 			business:Update()
@@ -1020,10 +942,7 @@ end
 
 ---@param business BusinessBase|BasicBusiness
 local function getBusinessIncome(business)
-	if (not business or not business:IsValid()) then
-		return 0
-	end
-
+	if not (business and business:IsValid()) then return 0 end
 	return business:GetEstimatedIncome()
 end
 
@@ -1037,7 +956,6 @@ function YRV3:CalculateEstimatedIncome()
 	end
 
 	local businesses = self.m_businesses
-
 	self.m_total_sum = getBusinessIncome(businesses.office)
 		+ getBusinessIncome(businesses.hangar)
 		+ getBusinessIncome(businesses.bunker)

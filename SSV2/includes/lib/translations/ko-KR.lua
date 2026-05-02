@@ -242,7 +242,7 @@ return {
 	["YRV3_SELL_MISSIONS_NOTIF"] = "가장 짜증나는 %s 판매 임무를 비활성화했습니다.",
 	["YRV3_SELL_MISSIONS_TT"] = "이 옵션은 저장되지 않습니다. 각 버튼은 해당 비즈니스에 대한 가장 지루한 판매 임무를 비활성화합니다.",
 	["YRV3_SELL_MISSIONS_NOTE"] = "[참고]: 동일한 비즈니스에 대해 두 번 이상 판매할 계획이라면 첫 번째 판매를 마친 후 세션을 전환하여 임무를 재설정하세요. 그렇지 않으면 두 번째 판매가 시작되지 않을 가능성이 높습니다.",
-	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "산성 연구실",
+	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "산성 연구소(일시적으로 비활성화됨)",
 	["YRV3_HANGAR_LAND_ERR"] = "격납고 및 판매는 현재 지원되지 않습니다.",
 	["YRV3_AUTOSELL_HANGAR_LABEL"] = "격납고(항공 전용)",
 	["YRV3_AUTOSELL_CEO_LABEL"] = "CEO 창고",
@@ -860,5 +860,8 @@ return {
 	["YAV3_SYMBOL_DEFS_HINT"] = "목록에 있는 일부 작업의 기호가 무엇인지 궁금하신가요?\n\n- %s: 즐겨찾기로 저장됨.\n- %s: 명령으로 등록됨.\n- %s: 사용자 생성.",
 	["YAV3_VEH_ANIM_HINT"] = "차량 중심 애니메이션은 도보로 재생할 수 없습니다. 동료들에게도요.",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "이 허브에는 기술자가 할당되지 않습니다.",
-	["VEH_STANCE_TOE"] = "발가락"
+	["VEH_STANCE_TOE"] = "발가락",
+	["YRV3_AUTO_SELL_CANCELED_MSG"] = "'자동판매'가 취소되었습니다.",
+	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "나이트클럽 화물",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "20초 후에 '자동 판매'가 시작됩니다. 타이머가 끝나기 전에 토글을 비활성화하여 취소할 수 있습니다."
 }

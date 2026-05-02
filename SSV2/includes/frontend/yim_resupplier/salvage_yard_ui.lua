@@ -92,11 +92,7 @@ return function()
 		GVars.features.yrv3.sy_disable_tow_cd = GUI:CustomToggle(
 			_T("SY_DISABLE_TOWING_COOLDOWN"),
 			GVars.features.yrv3.sy_disable_tow_cd,
-			{
-				onClick = function()
-					YRV3:SetCooldownStateDirty("sy_disable_tow_cd", true)
-				end
-			}
+			{ onClick = function() YRV3:ProcessCooldown("sy_disable_tow_cd") end }
 		)
 		ImGui.BeginDisabled(not SalvageYard:IsTowMissionActive() or SalvageYard:IsBringingTowMissionTarget())
 		if (GUI:Button(_T("SY_TOW_MISSION_BRING_VEH"))) then
@@ -166,22 +162,14 @@ return function()
 		GVars.features.yrv3.sy_disable_rob_cd = GUI:CustomToggle(
 			_T("SY_DISABLE_COOLDOWN"),
 			GVars.features.yrv3.sy_disable_rob_cd,
-			{
-				onClick = function()
-					YRV3:SetCooldownStateDirty("sy_disable_rob_cd", true)
-				end
-			}
+			{ onClick = function() YRV3:ProcessCooldown("sy_disable_rob_cd") end }
 		)
 
 		ImGui.SameLine()
 		GVars.features.yrv3.sy_disable_rob_weekly_cd = GUI:CustomToggle(
 			_T("SY_DISABLE_WEEKLY_COOLDOWN"),
 			GVars.features.yrv3.sy_disable_rob_weekly_cd,
-			{
-				onClick = function()
-					YRV3:SetCooldownStateDirty("sy_disable_rob_weekly_cd", true)
-				end
-			}
+			{ onClick = function(v) SalvageYard:ToggleWeeklyCooldown(v) end }
 		)
 
 		ImGui.Spacing()

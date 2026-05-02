@@ -244,7 +244,7 @@ return {
 	["YRV3_SELL_MISSIONS_NOTE"] = "[UWAGA]: Jeśli planujesz sprzedawać więcej niż raz dla tej samej firmy, zmień sesje po zakończeniu pierwszej sprzedaży, aby zresetować misje, w przeciwnym razie druga najprawdopodobniej nie rozpocznie się.",
 	["YRV3_AUTOSELL_CEO_LABEL"] = "Dyrektor Magazynów",
 	["YRV3_AUTOSELL_HANGAR_LABEL"] = "Hangar (tylko powietrze)",
-	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Laboratorium Kwasowe",
+	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Laboratorium Kwasowe (tymczasowo wyłączone)",
 	["YRV3_AUTOSELL_CURRENT"] = "Obecnie sprzedaje: %s",
 	["YRV3_AUTOSELL_TT"] = "Automatycznie kończy misję sprzedaży 20 sekund po jej rozpoczęciu. Nie wymaga interakcji z niczym innym niż rozpoczęcie misji.",
 	["YRV3_MCT_UNAVAIL"] = "Główny terminal sterujący jest obecnie niedostępny.",
@@ -860,5 +860,8 @@ return {
 	["YAV3_SYMBOL_DEFS_HINT"] = "Czy zastanawiałeś się kiedyś, jakie są symbole niektórych działań na liście?\n\n- %s: Zapisano jako ulubione.\n- %s: Zarejestrowano jako polecenie.\n- %s: Utworzono przez użytkownika.",
 	["YAV3_VEH_ANIM_HINT"] = "Animacji skupiających się na pojazdach nie można odtwarzać na piechotę; nawet dla towarzyszy.",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Do tego koncentratora nie jest przypisany żaden technik.",
-	["VEH_STANCE_TOE"] = "Palec u nogi"
+	["VEH_STANCE_TOE"] = "Palec u nogi",
+	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Ładunek z klubu nocnego",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "„Automatyczna sprzedaż” rozpocznie się za 20 sekund. Możesz to anulować, wyłączając przełącznik przed zakończeniem timera.",
+	["YRV3_AUTO_SELL_CANCELED_MSG"] = "„Sprzedaż automatyczna” została anulowana."
 }

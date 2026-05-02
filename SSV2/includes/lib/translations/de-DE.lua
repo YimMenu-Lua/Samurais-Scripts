@@ -243,7 +243,7 @@ return {
 	["YRV3_AUTO_SELL_SUPPORT_NOTICE"] = "Hinweis: Nur diese Unternehmen werden unterstützt:",
 	["YRV3_SELL_MISSIONS_TT"] = "Diese Optionen werden nicht gespeichert. Jede Schaltfläche deaktiviert die mühsamsten Verkaufsmissionen für dieses Unternehmen.",
 	["YRV3_AUTOSELL_HANGAR_LABEL"] = "Hangar (nur Luft)",
-	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Säurelabor",
+	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "Säurelabor (vorübergehend deaktiviert)",
 	["YRV3_AUTOSELL_CURRENT"] = "Derzeit im Verkauf: %s",
 	["YRV3_AUTOSELL_CEO_LABEL"] = "CEO Warehouses",
 	["YRV3_AUTOSELL_BIKER_LABEL"] = "Biker-Unternehmen",
@@ -860,5 +860,8 @@ return {
 	["YAV3_SYMBOL_DEFS_HINT"] = "Haben Sie sich jemals gefragt, was die Symbole für einige Aktionen in der Liste sind?\n\n- %s: Als Favorit gespeichert.\n- %s: Als Befehl registriert.\n- %s: Vom Benutzer generiert.",
 	["YAV3_VEH_ANIM_HINT"] = "Fahrzeugzentrierte Animationen können nicht zu Fuß abgespielt werden; auch für Begleiter.",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Diesem Hub ist kein Techniker zugeordnet.",
-	["VEH_STANCE_TOE"] = "Zehe"
+	["VEH_STANCE_TOE"] = "Zehe",
+	["YRV3_AUTO_SELL_CANCELED_MSG"] = "„Auto-Sell“ wurde abgebrochen.",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "„Auto-Sell“ startet in 20 Sekunden. Sie können es abbrechen, indem Sie den Schalter vor Ablauf des Timers deaktivieren.",
+	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Nachtclub-Fracht"
 }

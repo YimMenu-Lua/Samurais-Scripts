@@ -106,25 +106,8 @@ end
 
 ---@return array<handle>
 function Vehicle:GetOccupants()
-	if not self:IsValid() then
-		return {}
-	end
-
-	---@type array<handle>
-	local passengers = {}
-	local handle     = self:GetHandle()
-	local max_seats  = VEHICLE.GET_VEHICLE_MODEL_NUMBER_OF_SEATS(self:GetModelHash())
-
-	for i = -1, max_seats do
-		if not VEHICLE.IS_VEHICLE_SEAT_FREE(handle, i, true) then
-			local ped = VEHICLE.GET_PED_IN_VEHICLE_SEAT(handle, i, false)
-			if (ped and ped ~= 0) then
-				table.insert(passengers, ped)
-			end
-		end
-	end
-
-	return passengers
+	if (not self:IsValid()) then return {} end
+	return Game.GetVehicleOccupants(self:GetHandle())
 end
 
 ---@return number

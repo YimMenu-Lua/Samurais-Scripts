@@ -241,7 +241,7 @@ return {
 	["YRV3_SELL_MISSIONS_NOTE"] = "[注意]：如果您計劃對同一業務進行多次銷售，請在完成第一次銷售後切換會話以重置任務，否則第二次銷售很可能無法開始。",
 	["YRV3_SEXY_SHINABI_NOTICE"] = "請改用 ShinyWasabi 的 Payphone Hits 腳本。 \n按 [TAB] 複製 GitHub 鏈接。",
 	["YRV3_PAYHPONE_HITS_CB"] = "公用電話熱門歌曲",
-	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "酸實驗室",
+	["YRV3_AUTOSELL_LSD_LAB_LABEL"] = "酸實驗室（暫時停用）",
 	["YRV3_AUTOSELL_HANGAR_LABEL"] = "機庫（僅限航空）",
 	["YRV3_AUTOSELL_CEO_LABEL"] = "首席執行官倉庫",
 	["YRV3_AUTOSELL_BIKER_LABEL"] = "騎車人企業",
@@ -860,5 +860,8 @@ return {
 	["YAV3_SYMBOL_DEFS_HINT"] = "有沒有想過清單中某些操作上的符號是什麼？ \n\n- %s：儲存為收藏夾。 \n- %s：註冊為指令。 \n- %s：使用者生成。",
 	["YAV3_VEH_ANIM_HINT"] = "以車輛為中心的動畫無法步行播放；即使對於同伴。",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "沒有技術人員被分配到該中心。",
-	["VEH_STANCE_TOE"] = "腳趾"
+	["VEH_STANCE_TOE"] = "腳趾",
+	["YRV3_AUTO_SELL_CANCELED_MSG"] = "「自動銷售」已被取消。",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "「自動銷售」將在 20 秒後開始。您可以通过在计时器结束之前禁用切换来取消它。",
+	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "夜總會貨運"
 }

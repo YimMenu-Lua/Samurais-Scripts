@@ -23,7 +23,7 @@ local function toggle_cd(key, yrv3_ref)
 	end
 
 	entry[key] = not entry[key]
-	yrv3_ref:SetCooldownStateDirty(key, true)
+	yrv3_ref:ProcessCooldown(key)
 end
 
 ---@class CarWashDuffleOpts
@@ -260,4 +260,4 @@ function CarWash:Update()
 	end
 end
 
-return CarWash
+return CarWash.new
