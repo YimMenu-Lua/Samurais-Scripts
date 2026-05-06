@@ -17,8 +17,8 @@ local IManagedValue = require("includes.structs.IManagedValue")
 ---@field protected m_type eManagedValueDataType
 ---@field protected m_default_val? T
 ---@field protected m_modified boolean
----@field private __get fun(t: joaat_t|string): T
----@field private __set fun(t: joaat_t|string, v: T): nil
+---@field private __get fun(): T
+---@field private __set fun(v: T): nil
 local IManagedTuneable <const> = setmetatable({}, IManagedValue)
 IManagedTuneable.__index       = IManagedTuneable
 
@@ -33,9 +33,8 @@ IManagedTuneable.__index       = IManagedTuneable
 ---@overload fun(name: string, identifier: ID, dataType: 3, desired_val: boolean): IManagedTuneable<boolean>
 ---@overload fun(name: string, identifier: ID, dataType: 4, desired_val: boolean): IManagedTuneable<boolean>
 function IManagedTuneable.new(name, tuneable, dataType, desired_val)
-	local base     = IManagedValue.new(name, tuneable, Enums.eManagedValueType.TUNEABLE, dataType, desired_val)
-	local instance = setmetatable(base, IManagedTuneable) ---@cast instance IManagedTuneable
-	return instance
+	local base = IManagedValue.new(name, tuneable, Enums.eManagedValueType.TUNEABLE, dataType, desired_val)
+	return setmetatable(base, IManagedTuneable)
 end
 
 return IManagedTuneable
