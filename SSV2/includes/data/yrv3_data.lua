@@ -11,7 +11,7 @@ local SGSL = require("includes.services.SGSL")
 
 
 ---@class IManagedValueCtorData
----@field defs array<{ t: string|joaat_t, v: integer|float|boolean, obj_type: eManagedValueType, data_type: eManagedValueDataType? }>
+---@field defs array<{ t: string|joaat_t, v: integer|float|boolean, bit_index?: integer, obj_type: eManagedValueType, data_type?: eManagedValueDataType }>
 ---@field get_state fun(): boolean
 
 local eDataType <const>  = Enums.eManagedValueDataType
