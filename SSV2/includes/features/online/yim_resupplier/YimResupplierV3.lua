@@ -154,6 +154,14 @@ function YRV3:SetLastError(msg)
 	self.m_last_error = msg
 end
 
+---@alias YRV3BusinessEntry CashSafe[]|Office|Clubhouse|Warehouse|Factory|Nightclub|CarWash|SalvageYard
+
+---@return fun(t: table<string, YRV3BusinessEntry>, string?): string, YRV3BusinessEntry
+---@return table<string, YRV3BusinessEntry>
+function YRV3:BusinessIter()
+	return pairs(self.m_businesses)
+end
+
 ---@return Office?
 function YRV3:GetOffice()
 	return self.m_businesses.office
@@ -351,7 +359,7 @@ function YRV3:PopulateBikerBusinesses()
 
 		self.m_businesses.acid_lab = Factory.new({
 			id         = 6,
-			name       = Game.GetGXTLabel("MP_BWH_ACID"),
+			name       = Game.GetGXTLabel("ACID_LAB_TITLE"),
 			vpu_mult_1 = has_eq_upgrade and eq_upg_mult or 0,
 			vpu_mult_2 = 0,
 			vpu        = tunables.get_int("BIKER_ACID_PRODUCT_VALUE"),
@@ -465,6 +473,7 @@ function YRV3:PopulateCashSafes()
 			interior_id     = data.interior_id,
 			room_hash       = data.room_hash,
 			get_max_cash    = data.get_max_cash,
+			global_offset   = data.global_offset
 		})
 		::continue::
 	end
@@ -650,6 +659,11 @@ end
 ---@param index integer -- `1 .. 7`
 ---@param isNightclubHub? boolean
 function YRV3:CommandToggleProduction(index, isNightclubHub)
+	if (not GVars.features.unsafe_feats_enabled) then
+		Notifier:ShowError("YRV3", _T("YRV3_UNSAFE_FEAT_BYPASS_ERR"))
+		return
+	end
+
 	local factory
 	if (not isNightclubHub) then
 		factory = self:GetFactoryByIndex(index)
@@ -676,8 +690,6 @@ function YRV3:CommandToggleProduction(index, isNightclubHub)
 		return
 	end
 
-	factory.fast_prod_enabled = not factory.fast_prod_enabled
-	local bool = factory.fast_prod_enabled
 	local name = isNightclubHub and self:GetNightclub():GetCustomName() or
 		(factory:GetNormalizedName() or factory:GetName())
 
@@ -686,10 +698,50 @@ function YRV3:CommandToggleProduction(index, isNightclubHub)
 		return
 	end
 
-	local prefix = "Fast production"
-	local state  = bool and "enabled" or "disabled"
-	local msg    = isNightclubHub and _F("%s for the %s hub", state, factory:GetName()) or state
+	factory.fast_prod_enabled = not factory.fast_prod_enabled
+	local bool                = factory.fast_prod_enabled
+	local prefix              = "Fast production"
+	local state               = bool and "enabled" or "disabled"
+	local msg                 = isNightclubHub and _F("%s for the %s hub", state, factory:GetName()) or state
 	Notifier:ShowMessage(name, _F("%s %s.", prefix, msg))
+end
+
+---@return array<CashSafe>
+function YRV3:GetAllSafes()
+	local outArray = {}
+	for key, entry in self:BusinessIter() do
+		if (key == "safes") then
+			for _, safe in ipairs(entry) do
+				table.insert(outArray, safe)
+			end
+		else
+			local func = entry.GetCashSafe
+			if (type(func) == "function") then ---@cast entry BusinessFront|CarWash
+				table.insert(outArray, func(entry))
+			end
+		end
+	end
+	return outArray
+end
+
+function YRV3:FillAllSafes()
+	if (not GVars.features.unsafe_feats_enabled) then
+		Notifier:ShowError("YRV3", _T("YRV3_UNSAFE_FEAT_BYPASS_ERR"))
+		return
+	end
+
+	local count = 0
+	for _, safe in ipairs(self:GetAllSafes()) do
+		if (type(safe.FillNow) == "function" and safe:FillNow()) then
+			count = count + 1
+		end
+	end
+
+	if (count == 0) then
+		Notifier:ShowMessage("YRV3", _T("YRV3_BULK_SAFE_FILL_NONE"))
+	else
+		Notifier:ShowSuccess("YRV3", _T("YRV3_BULK_SAFE_FILL_SUCCESS_FMT", count))
+	end
 end
 
 function YRV3:FillAll()
@@ -923,13 +975,14 @@ function YRV3:UpdateBusinesses()
 		return
 	end
 
-	if (Time.Millis() - self.m_last_business_update_time < 500) then
+	local now_ms = Time.Millis()
+	if (now_ms - self.m_last_business_update_time < 500) then
 		return
 	end
 
-	for key, business in pairs(self.m_businesses) do
+	for key, business in self:BusinessIter() do
 		if (key == "safes") then
-			for _, cash_safe in ipairs(self.m_businesses.safes) do
+			for _, cash_safe in ipairs(business) do
 				cash_safe:Update()
 			end
 		elseif (type(business.Update) == "function") then
@@ -937,7 +990,7 @@ function YRV3:UpdateBusinesses()
 		end
 	end
 
-	self.m_last_business_update_time = Time.Millis()
+	self.m_last_business_update_time = now_ms
 end
 
 ---@param business BusinessBase|BasicBusiness
@@ -951,7 +1004,8 @@ function YRV3:CalculateEstimatedIncome()
 		return
 	end
 
-	if (Time.Millis() - self.m_last_income_check_time < 1200) then
+	local now_ms = Time.Millis()
+	if (now_ms - self.m_last_income_check_time < 1200) then
 		return
 	end
 
@@ -969,7 +1023,7 @@ function YRV3:CalculateEstimatedIncome()
 		self.m_total_sum = self.m_total_sum + safe:GetCashValue()
 	end
 
-	self.m_last_income_check_time = Time.Millis()
+	self.m_last_income_check_time = now_ms
 end
 
 function YRV3:OnTick()

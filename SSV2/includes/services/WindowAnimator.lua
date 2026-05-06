@@ -64,7 +64,7 @@ function WindowAnimator:EaseOutQuad(t)
 	return 1 - (1 - t) * (1 - t)
 end
 
-function WindowAnimator:Apply()
+function WindowAnimator:OnFrame()
 	if (not self.m_active) then
 		return
 	end

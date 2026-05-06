@@ -157,7 +157,7 @@ local function DrawSlider(key, deltaTable, axle, needsPhysicsUpdate)
 end
 
 return function()
-	if (_G.self.get_veh() == 0) then
+	if (PV:GetHandle() == 0) then
 		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
 		return
 	end
@@ -289,12 +289,17 @@ return function()
 		)
 	end
 
-	local save_label = _T(Stancer:IsVehicleModelSaved() and "VEH_STANCE_UPDATE_MODEL" or "VEH_STANCE_SAVE_MODEL")
+	local is_saved   = Stancer:IsVehicleModelSaved()
+	local save_label = _T(is_saved and "VEH_STANCE_UPDATE_MODEL" or "VEH_STANCE_SAVE_MODEL")
 	if (GUI:Button(save_label)) then
-		ImGui.OpenPopup(save_label)
+		if (is_saved) then
+			ImGui.OpenPopup(save_label)
+		else
+			Stancer:SaveCurrentVehicle()
+		end
 	end
 
-	if (ImGui.DialogBox(save_label, _T("VEH_STANCE_UPDATE_WARN", Stancer:GetCurrentModelName()), ImGuiDialogBoxStyle.WARN)) then
+	if (is_saved and ImGui.DialogBox(save_label, _T("VEH_STANCE_UPDATE_WARN", Stancer:GetCurrentModelName()), ImGuiDialogBoxStyle.WARN)) then
 		Stancer:SaveCurrentVehicle()
 	end
 

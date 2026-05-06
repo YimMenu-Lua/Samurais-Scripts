@@ -51,6 +51,7 @@ local eSerializerState <const> = {
 ---@field private m_last_write_time TimePoint
 ---@field private m_deprecated_keys array<string>
 ---@field private m_moved_keys array<{ path: string, file_name: string }> -- Keys to be moved into a separate file and managed by the owner feature.
+---@field private m_renamed_keys array<{ old_path: string, new_path: string }>
 ---@field private m_registered_types table<string, { serializer:fun(), constructor:fun() }>
 ---@overload fun(): Serializer
 local Serializer     = Class("Serializer")
@@ -83,14 +84,17 @@ function Serializer:init()
 		m_disabled         = false,
 		m_registered_types = {},
 		m_deferred_objects = {},
-		m_moved_keys       = {
+		m_moved_keys       = { -- We gave these 2 updates to migrate. Should remove them in the next one
 			{ path = "features.yim_actions.action_commands",  file_name = "action_commands.json" },
 			{ path = "features.entity_forge.favorites",       file_name = "forge_favorites.json" },
 			{ path = "features.entity_forge.forged_entities", file_name = "forged_entities.json" },
 		},
-		m_deprecated_keys  = {
+		m_deprecated_keys  = { -- same here
 			"features.bsv2",
 			"features.entity_forge",
+		},
+		m_renamed_keys     = {
+			{ old_path = "features.yrv3.safe_loop_warn_ack", new_path = "features.unsafe_feats_enabled" } -- remove after 3 updates (current v1.9.4)
 		},
 		m_lock_queue       = {},
 		m_key_states       = {},
@@ -233,6 +237,16 @@ function Serializer:SyncKeys(runtime_vars)
 		for _, path in ipairs(self.m_deprecated_keys) do
 			table.set_nested_key(saved, path, nil)
 			table.set_nested_key(runtime_vars, path, nil)
+		end
+
+		for _, pair in ipairs(self.m_renamed_keys) do
+			local oldPath = pair.old_path
+			local oldVal  = table.get_nested_key(runtime_vars, oldPath)
+			if (oldVal ~= nil) then
+				table.set_nested_key(runtime_vars, pair.new_path, oldVal)
+			end
+			table.set_nested_key(saved, oldPath, nil)
+			table.set_nested_key(runtime_vars, oldPath, nil)
 		end
 
 		if (not saved["__schema_hash"] or saved["__schema_hash"] ~= self.__schema_hash) then

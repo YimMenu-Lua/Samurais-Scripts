@@ -7,9 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local drawBasicBusiness   = require("includes.frontend.yim_resupplier.basic_business_ui")
-local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
 local YRV3                = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
+local drawBasicBusiness   = require("basic_business_ui")
 
 ---@type array<integer>
 local bulletWidths        = {}

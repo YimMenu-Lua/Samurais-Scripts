@@ -7,20 +7,20 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YRV3                   = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local measureBulletWidths    = require("includes.frontend.helpers.measure_text_width")
-local drawNamePlate          = require("includes.frontend.yim_resupplier.nameplate_ui")
-local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
-local colMoneyGreen <const>  = Color("#85BB65")
-local hubChildWidth          = 90
-local tempHubVal             = 0
-local bools                  = {
-	coloredNameplate = false,
-	bigTips          = false
+local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
+local drawNamePlate         = require("nameplate_ui")
+local colMoneyGreen <const> = Color("#85BB65")
+local hubChildWidth         = 300
+local tempHubVal            = 0
+local bools                 = {
+	coloredNameplate      = false,
+	bigTips               = false,
+	techTransferEmptyOnly = false,
 }
 
 ---@type array<integer>
-local bulletWidths           = {}
+local bulletWidths          = {}
 
 local function getClubNameColor()
 	-- synthwave and pain
@@ -47,13 +47,15 @@ return function()
 		return
 	end
 
+	local unsafeFeatsEnabled = GVars.features.unsafe_feats_enabled
 	local bg
 	if (bools.coloredNameplate) then
 		bg = getClubNameColor()
 		ImGui.PushStyleColor(ImGuiCol.Border, bg:AsU32())
 	end
 
-	drawNamePlate(club, club:GetCustomName(), bg)
+	local customName = club:GetCustomName()
+	drawNamePlate(club, customName, bg)
 
 	if (bools.coloredNameplate) then
 		ImGui.PopStyleColor()
@@ -103,42 +105,38 @@ return function()
 	end
 	ImGui.EndDisabled()
 
-	GVars.features.yrv3.nc_always_popular, _ = GUI:CustomToggle(
-		_T("YRV3_NC_ALWAYS_POPULAR"),
+	ImGui.BeginDisabled(not unsafeFeatsEnabled)
+	if (cashSafe:CanInstaFill()) then
+		ImGui.BeginDisabled(cashValue == maxCash)
+		if (GUI:Button(_T("YRV3_CASH_FILL"))) then
+			cashSafe:FillNow()
+		end
+		ImGui.EndDisabled()
+		GUI:HelpMarker(_T("YRV3_CASH_FILL_TT"))
+	end
+
+	if (cashSafe:CanLoop()) then
+		ImGui.BeginDisabled(cashValue >= maxCash)
+		cashSafe.cash_loop_enabled = GUI:CustomToggle(_T("YRV3_CASH_LOOP"), cashSafe.cash_loop_enabled)
+		ImGui.EndDisabled()
+	end
+	ImGui.EndDisabled()
+
+	GVars.features.yrv3.nc_always_popular = GUI:CustomToggle(_T("YRV3_NC_ALWAYS_POPULAR"),
 		GVars.features.yrv3.nc_always_popular,
-		{
-			onClick = function(v)
-				if (v) then
-					club:LockPopularityDecay()
-				else
-					club:RestorePopularityDecay()
-				end
-			end
-		}
+		{ onClick = function(v) club:TogglePopulatirtyLock(v) end }
 	)
 
-	drawCashSafeLoopToggle(cashSafe)
-
-	bools.bigTips, _ = GUI:CustomToggle(
-		_T("YRV3_MILLION_DOLLAR_TIPS"),
-		bools.bigTips,
-		{
-			onClick = function(v)
-				club:ToggleBigTips(v)
-			end
-		}
+	bools.bigTips = GUI:CustomToggle(_T("YRV3_MILLION_DOLLAR_TIPS"), bools.bigTips,
+		{ onClick = function(v) club:ToggleBigTips(v) end }
 	)
 	GUI:HelpMarker(_T("YRV3_MILLION_DOLLAR_TIPS_TT"))
 
 	local hubs = club:GetSubBusinesses()
-	if (not hubs) then
-		return
-	end
+	if (not hubs) then return end
 
 	local hubsize = #hubs
-	if (hubsize == 0) then
-		return
-	end
+	if (hubsize == 0) then return end
 
 	ImGui.Spacing()
 	ImGui.SeparatorText(_T("YRV3_BUSINESS_HUB"))
@@ -146,75 +144,118 @@ return function()
 	ImGui.BulletText(_T("YRV3_VALUE_TOTAL"))
 	ImGui.SameLine()
 	GUI:Text(string.formatmoney(tempHubVal), { color = colMoneyGreen })
+	ImGui.Separator()
 	ImGui.Spacing()
 
+	hubChildWidth = math.min(hubChildWidth, ImGui.GetWindowWidth())
+
 	for i = 1, hubsize do
+		local this     = hubs[i]
+		local tech_idx = this:GetAssignedTechIndex()
+		local has_tech = tech_idx ~= -1
+
 		ImGui.PushID(i)
 		ImGui.SetNextWindowBgAlpha(0.64)
 		ImGui.BeginChildEx("##hub_child",
-			vec2:new(hubChildWidth, 300),
-			ImGuiChildFlags.AlwaysUseWindowPadding,
+			vec2:new(hubChildWidth, has_tech and 280 or 240),
+			ImGuiChildFlags.AlwaysUseWindowPadding | ImGuiChildFlags.Borders,
 			ImGuiWindowFlags.NoScrollbar
 		)
 
-		local this       = hubs[i]
-		local has_tech   = this:GetAssignedTechIndex() ~= -1
-		local prod       = this:GetProductCount()
-		local hub_value  = this:GetProductValue()
-		HubTotalValue    = HubTotalValue + hub_value
+		local prod      = this:GetProductCount()
+		local hub_value = this:GetProductValue()
+		local hub_name  = this:GetName() or _F("Hub %d", i)
 
-		local hub_name   = this:GetName() or _F("Hub %d", i)
-		local text_width = ImGui.CalcTextSize(hub_name)
 		ImGui.BeginDisabled(not has_tech)
-		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetContentRegionAvail() - text_width) * 0.5)
-		ImGui.Text(hub_name)
-
+		ImGui.SeparatorText(hub_name)
 		ImGui.SetWindowFontScale(0.68)
 		local max_units   = this:GetMaxUnits()
 		local prod_txt    = _F("%s/%s", prod, max_units)
 		local text_width2 = ImGui.CalcTextSize(prod_txt)
-		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetContentRegionAvail() - text_width2) * 0.5)
+		local regionWidth = ImGui.GetContentRegionAvail()
+		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (regionWidth - text_width2) * 0.5)
 		ImGui.Text(prod_txt)
 		ImGui.SetWindowFontScale(1)
 
 		ImGui.Spacing()
-		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + 35) * 0.5)
 		ImGui.ValueBar(
 			"##bb_hub",
 			prod / max_units,
-			vec2:new(40, 140),
+			vec2:new(-1, 60),
 			ImGuiValueBarFlags.VERTICAL
 		)
 
-		ImGui.SetCursorPosX((ImGui.GetCursorPosX() + 40) * 0.5)
 		-- TODO: Fix glitchy behavior + session disconnect on Enhanced
+		ImGui.BeginDisabled(not unsafeFeatsEnabled)
 		ImGui.BeginDisabled(Game.IsEnhanced())
+
 		local is_maxed = prod >= max_units
 		ImGui.BeginDisabled(is_maxed)
-		this.fast_prod_enabled = GUI:CustomToggle("##fast_prod", this.fast_prod_enabled)
+		this.fast_prod_enabled = GUI:CustomToggle(_T("YRV3_AUTO_PROD"), this.fast_prod_enabled)
 		ImGui.EndDisabled()
 		GUI:Tooltip(_T("YRV3_TRIGGER_PROD_HUB_TT"))
 
-		local prod_time       = this:GetTimeLeftBeforeProd()
-		local safe_to_trigger = this:CanTriggerProduction() and not this.fast_prod_enabled
-		local btn_label       = (safe_to_trigger or prod_time < 0)
-			and _T("YRV3_TRIGGER_PROD_HUB")
-			or ImGui.TextSpinner()
+		local prod_time          = this:GetTimeLeftBeforeProd()
+		local safe_to_trigger    = this:CanTriggerProduction() and not this.fast_prod_enabled
+		local trigger_label      = _T("YRV3_TRIGGER_PROD")
+		local trigger_label_w    = ImGui.CalcTextSize(trigger_label) + (ImGui.GetStyle().FramePadding.x * 2)
+		local btn_label          = (safe_to_trigger or prod_time < 0) and trigger_label or ImGui.TextSpinner()
+		local transfer_popup_lbl = _F("##transfer_tech_%d", i)
 
 		ImGui.BeginDisabled(not safe_to_trigger or is_maxed)
-		if (GUI:Button(has_tech and btn_label or "X", { size = vec2:new(65, 30) })) then
+		if (GUI:Button(btn_label, { size = vec2:new(trigger_label_w, 0) })) then
 			this:TriggerProduction()
 		end
 		ImGui.EndDisabled()
-		ImGui.EndDisabled()
-		ImGui.EndDisabled()
+
+		ImGui.EndDisabled() -- enhanced
+		ImGui.EndDisabled() -- no technician
+		ImGui.EndDisabled() -- unsafe feats
+
 		if (not has_tech) then
-			GUI:Tooltip(_T("YRV3_HUB_TECH_NOT_ASSIGNED_TT"))
+			if (not is_maxed) then
+				GUI:Tooltip(_T("YRV3_HUB_TECH_NOT_ASSIGNED_TT"))
+			end
+		elseif (GUI:Button(_T("YRV3_HUB_TRANSFER_TECH"))) then
+			ImGui.OpenPopup(transfer_popup_lbl)
+		end
+
+		if (ImGui.BeginPopup(transfer_popup_lbl)) then
+			bools.techTransferEmptyOnly = GUI:CustomToggle(_T("YRV3_HUB_TRANSFER_TECH_REL_ONLY"), bools.techTransferEmptyOnly)
+			GUI:HelpMarker(_T("YRV3_HUB_TRANSFER_TECH_REL_ONLY_TT"))
+			ImGui.Separator()
+			ImGui.Spacing()
+
+			for _, hub in ipairs(hubs) do
+				if (hub == this) then
+					goto continue
+				end
+
+				if (bools.techTransferEmptyOnly and (hub:HasTechnician() or hub:HasFullProduction())) then
+					goto continue
+				end
+
+				if (ImGui.MenuItem(hub:GetName())) then
+					club:TransferTechnician(this, hub)
+					ImGui.CloseCurrentPopup()
+				end
+
+				::continue::
+			end
+
+			ImGui.Separator()
+			ImGui.Spacing()
+
+			if (ImGui.Button(_T("GENERIC_CANCEL"))) then
+				ImGui.CloseCurrentPopup()
+			end
+			ImGui.EndPopup()
 		end
 
 		ImGui.EndChild()
 		ImGui.PopID()
 
+		HubTotalValue = HubTotalValue + hub_value
 		ImGui.SameLineIfAvail(hubChildWidth)
 	end
 

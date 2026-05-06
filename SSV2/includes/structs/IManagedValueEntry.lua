@@ -9,18 +9,17 @@
 
 local ManagedStat     = require("includes.structs.IManagedStat")
 local ManagedTuneable = require("includes.structs.IManagedTuneable")
-local TypeRes         = {
+local TypeRes <const> = {
 	integer = Enums.eManagedValueDataType.INT,
 	float   = Enums.eManagedValueDataType.FLOAT,
 }
-
-local ObjRes          = {
+local ObjRes <const>  = {
 	[Enums.eManagedValueType.TUNEABLE] = ManagedTuneable,
 	[Enums.eManagedValueType.STAT]     = ManagedStat,
 }
 
 
----@generic T : integer|float
+---@generic T : integer|float|boolean
 ---@class IManagedValueEntry<T>
 ---@field private m_name string
 ---@field private m_data array<{ object: IManagedValue<T>, desired_val: T }>
@@ -44,12 +43,14 @@ function IManagedValueEntry.new(name, data_t)
 			elseif (lua_type == "number") then
 				dataType = TypeRes[math.type(value)]
 			end
-			assert(dataType ~= nil, "Unsupported value type! Param #2 must be either integer or float.")
+			assert(dataType ~= nil, "Unsupported value type! Param #2 must be integer, float, or boolean.")
 		end
 
 		local objType = entry.obj_type
 		local Object  = ObjRes[objType]
-		assert(Object ~= nil, _F("Missing or invalid object type! Expected 0 (stat) or 1 (tuneable), got %s instead", objType))
+		assert(Object ~= nil,
+			_F("Missing or invalid object type! Expected 1 (tuneable), 2 (stat), or 3 (packed stat), got %s instead", objType)
+		)
 
 		local objName      = _F("%s_%d", name, i)
 		local managedValue = Object.new(objName, entry.t, dataType, entry.v)
@@ -90,6 +91,7 @@ function IManagedValueEntry:Apply()
 			success = false
 		end
 	end
+
 	return success
 end
 

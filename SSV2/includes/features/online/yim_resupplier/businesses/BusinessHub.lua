@@ -23,6 +23,7 @@ local SGSL         = require("includes.services.SGSL")
 ---@field private m_name string
 ---@field private m_max_units integer
 ---@field private m_vpu integer
+---@field private m_prod_count_stat string
 ---@field private m_prod_time_g ScriptGlobal
 ---@field private m_prod_bool_g ScriptGlobal
 ---@field private m_tech_idx_g ScriptGlobal
@@ -36,9 +37,12 @@ BusinessHub.__index = BusinessHub
 ---@return BusinessHub
 function BusinessHub.new(opts)
 	assert(type(opts.max_units) == "number", "Missing argument: max_units<integer>")
+	local id = opts.id
+	assert(type(opts.id) == "number" and math.is_inrange(opts.id, 0, 6), "Invalid Business Hub id.")
 
 	local base                  = BusinessBase.new(opts)
 	local instance              = setmetatable(base, BusinessHub) ---@cast instance BusinessHub
+	instance.m_prod_count_stat  = _F("MPX_HUB_PROD_TOTAL_%d", id)
 	instance.fast_prod_enabled  = false
 	instance.fast_prod_running  = false
 	instance.m_vpu              = opts.vpu
@@ -60,8 +64,7 @@ end
 
 ---@return integer
 function BusinessHub:GetProductCount()
-	assert(type(self.m_id) == "number" and math.is_inrange(self.m_id, 0, 6), "Invalid Business Hub id.")
-	return stats.get_int(_F("MPX_HUB_PROD_TOTAL_%d", self.m_id))
+	return stats.get_int(self.m_prod_count_stat)
 end
 
 ---@return integer
@@ -69,11 +72,10 @@ function BusinessHub:GetProductValue()
 	return math.floor(self:GetProductCount() * self.m_vpu)
 end
 
--- `BOOL func_19854(int iParam0, int iParam1) // Position - 0x5FD381 (6280065) (legacy b3788.0)`
 ---@private
 ---@param techIndex integer `0..5`
----@return boolean
-function BusinessHub:IsTechAssignedToThis(techIndex)
+---@return integer offset, integer bitPos
+function BusinessHub:GetTechOffsetAndBitPos(techIndex)
 	local idx    = self:GetIndex()
 	local bitPos = idx
 	local offset = 3
@@ -81,6 +83,15 @@ function BusinessHub:IsTechAssignedToThis(techIndex)
 		bitPos = (techIndex * 7) + idx
 		offset = 2
 	end
+	return offset, bitPos
+end
+
+-- `BOOL func_19854(int iParam0, int iParam1) // Position - 0x5FD381 (6280065) (legacy b3788.0)`
+---@private
+---@param techIndex integer `0..5`
+---@return boolean
+function BusinessHub:IsTechAssignedToThis(techIndex)
+	local offset, bitPos = self:GetTechOffsetAndBitPos(techIndex)
 	return self.m_tech_idx_g:At(offset):GetBit(bitPos) ~= 0
 end
 
@@ -99,6 +110,40 @@ function BusinessHub:GetAssignedTechIndex()
 	return -1
 end
 
+---@nodiscard
+---@return boolean
+function BusinessHub:HasTechnician()
+	return self:GetAssignedTechIndex() ~= -1
+end
+
+---@return boolean success
+function BusinessHub:RemoveTechnician()
+	local techIndex = self:GetAssignedTechIndex()
+	if (techIndex == -1) then return false end
+
+	local offset, bitPos = self:GetTechOffsetAndBitPos(techIndex)
+	self.m_tech_idx_g:At(offset):ClearBit(bitPos)
+	self.m_tech_stopwatch_g:At(techIndex, 2):WriteInt(0)
+	return true
+end
+
+---@param techIndex integer `0..5`
+---@return boolean success
+function BusinessHub:AssignTechnician(techIndex)
+	local current = self:GetAssignedTechIndex()
+	if (techIndex == -1 or techIndex == current) then
+		return false
+	end
+
+	if (current ~= -1) then
+		self:RemoveTechnician()
+	end
+
+	local offset, bitPos = self:GetTechOffsetAndBitPos(techIndex)
+	self.m_tech_idx_g:At(offset):SetBit(bitPos)
+	return true
+end
+
 ---@return milliseconds
 function BusinessHub:GetTimeLeftBeforeProd()
 	return self.m_prod_time_g:ReadInt()
@@ -110,7 +155,7 @@ end
 function BusinessHub:SetProductCount(count)
 	local idx = self.m_id
 	self.m_tech_idx_g:At(8):At(1, idx):WriteInt(count)
-	stats.set_int(_F("MPX_HUB_PROD_TOTAL_%d", idx), count)
+	stats.set_int(self.m_prod_count_stat, count)
 end
 
 ---@param count? integer

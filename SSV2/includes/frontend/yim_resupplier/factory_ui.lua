@@ -22,7 +22,6 @@ return function(bb, notOwnedLabel)
 		if (notOwnedLabel) then
 			ImGui.Text(notOwnedLabel)
 		end
-
 		return
 	end
 
@@ -31,8 +30,9 @@ return function(bb, notOwnedLabel)
 		return
 	end
 
-	local lang_idx    = GVars.backend.language_index
-	local bulletWidth = bulletWidths[lang_idx]
+	local unsafeFeatsEnabled = GVars.features.unsafe_feats_enabled
+	local lang_idx           = GVars.backend.language_index
+	local bulletWidth        = bulletWidths[lang_idx]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_EQUIP_UPGDRADE"),
@@ -59,7 +59,7 @@ return function(bb, notOwnedLabel)
 	local index         = bb:GetIndex() or -1
 
 	ImGui.BeginChildEx(_F("bb##%s", name),
-		vec2:new(0, index < 6 and 360 or 330),
+		vec2:new(0, index < 6 and 400 or 370),
 		ImGuiChildFlags.AlwaysUseWindowPadding,
 		ImGuiWindowFlags.NoScrollbar
 	)
@@ -108,6 +108,7 @@ return function(bb, notOwnedLabel)
 	end
 	ImGui.EndDisabled()
 
+	ImGui.BeginDisabled(not unsafeFeatsEnabled)
 	ImGui.BeginDisabled(bb.fast_prod_enabled or stock == maxUnits or supplies < 25)
 	if (GUI:Button(_T("YRV3_TRIGGER_PROD"), { repeatable = true })) then
 		bb:TriggerProduction()
@@ -115,9 +116,10 @@ return function(bb, notOwnedLabel)
 	ImGui.EndDisabled()
 	GUI:HelpMarker(_T("YRV3_TRIGGER_PROD_TT"))
 
-	ImGui.SameLine()
 	ImGui.BeginDisabled(stock == maxUnits)
-	bb.fast_prod_enabled, _ = GUI:CustomToggle(_T("YRV3_AUTO_PROD"), bb.fast_prod_enabled)
+	bb.fast_prod_enabled = GUI:CustomToggle(_T("YRV3_AUTO_PROD"), bb.fast_prod_enabled)
+	GUI:Tooltip(_T("YRV3_AUTO_PROD_TT"))
+	ImGui.EndDisabled()
 	ImGui.EndDisabled()
 
 	ImGui.EndChild()

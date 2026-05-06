@@ -11,6 +11,8 @@
 
 --#region Generic Containers
 
+---@alias GuiCallback function
+
 ---@class array<T> : { [integer]: T }
 ---@class dict<T> : { [string]: T }
 ---@class pair<K, V>: { first: K, second: V } -- Not the same as the `Pair` module. This represents a simple table, the other is a module with metamethods.

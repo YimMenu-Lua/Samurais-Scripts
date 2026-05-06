@@ -43,25 +43,23 @@ local TypeRefs <const> = {
 ---@field protected m_data_type eManagedValueDataType
 ---@field protected m_default_val? T
 ---@field protected m_desired_val T
----@field private m_ready boolean
 ---@field private m_modified boolean
 ---@field private __get fun(t: joaat_t|string): T
 ---@field private __set fun(t: joaat_t|string, v: T)
 local IManagedValue <const> = {}
 IManagedValue.__index       = IManagedValue
 
----@generic V : integer|float|boolean
 ---@generic ID : joaat_t|string
 ---@param name string must be unique
 ---@param identifier joaat_t|string tuneable/stat name or joaat hash
 ---@param valueType eManagedValueType
 ---@param dataType eManagedValueDataType
----@param desired_val integer|float
----@overload fun(name: string, identifier: ID, valueType: eManagedValueType, dataType: 1, desired_val: V): IManagedValue<integer>
----@overload fun(name: string, identifier: ID, valueType: eManagedValueType, dataType: 2, desired_val: V): IManagedValue<float>
----@overload fun(name: string, identifier: ID, valueType: eManagedValueType, dataType: 3, desired_val: V): IManagedValue<boolean>
----@overload fun(name: string, identifier: ID, valueType: 1, dataType: 4, desired_val: V): IManagedValue<boolean>
+---@param desired_val integer|float|boolean
 ---@return IManagedValue<T>
+---@overload fun(name: string, identifier: ID, valueType: eManagedValueType, dataType: 1, desired_val: integer): IManagedValue<integer>
+---@overload fun(name: string, identifier: ID, valueType: eManagedValueType, dataType: 2, desired_val: float): IManagedValue<float>
+---@overload fun(name: string, identifier: ID, valueType: eManagedValueType, dataType: 3, desired_val: boolean): IManagedValue<boolean>
+---@overload fun(name: string, identifier: ID, valueType: 2, dataType: 4, desired_val: boolean): IManagedValue<boolean>
 function IManagedValue.new(name, identifier, valueType, dataType, desired_val)
 	local ref = TypeRefs[valueType]
 	assert(ref ~= nil, "Unknown type reference.")
@@ -80,29 +78,37 @@ function IManagedValue.new(name, identifier, valueType, dataType, desired_val)
 		)
 	end
 
-	local instance  = setmetatable({
+	local instance = setmetatable({
 		m_name         = name,
 		m_id           = identifier,
 		m_managed_type = valueType,
 		m_data_type    = dataType,
 		m_desired_val  = desired_val,
-		m_ready        = false,
 		m_modified     = false,
 		__get          = get_func,
 		__set          = set_func
 	}, IManagedValue)
 
-	local __reset__ = function() instance:Reset() end
-	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, __reset__)
-	Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, __reset__)
 
+	local __clear__ = function() instance:Clear() end
+	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, __clear__)
+	Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, __clear__)
+
+	instance:SaveDefaultValue()
 	return instance
+end
+
+---@protected
+---@nodiscard
+---@return boolean
+function IManagedValue:CanAccess()
+	return Game.IsOnline()
 end
 
 ---@nodiscard
 ---@return boolean
 function IManagedValue:IsReady()
-	return self.m_ready
+	return self.m_default_val ~= nil
 end
 
 ---@nodiscard
@@ -112,9 +118,10 @@ function IManagedValue:NeedsUpdate()
 end
 
 function IManagedValue:SaveDefaultValue()
+	if (not self:CanAccess()) then return end
+
 	local default      = self.__get(self.m_id)
 	self.m_default_val = default
-	self.m_ready       = default ~= nil
 end
 
 ---@nodiscard
@@ -141,7 +148,7 @@ end
 ---@nodiscard
 ---@return boolean
 function IManagedValue:Apply()
-	if (not self.m_ready) then
+	if (not self:IsReady()) then
 		self:SaveDefaultValue()
 		return false
 	end
@@ -160,9 +167,22 @@ function IManagedValue:Reset()
 	self.m_modified = false
 end
 
+function IManagedValue:RebaseDefault()
+	if (self:CanAccess()) then
+		self.m_default_val = self:GetValue()
+	end
+end
+
+---@param v T
+function IManagedValue:SetDesiredValue(v)
+	self.m_desired_val = v
+	self.m_modified    = false
+end
+
 function IManagedValue:Clear()
 	self:Reset()
 	self.m_default_val = nil
+	self.m_modified    = false
 end
 
 return IManagedValue

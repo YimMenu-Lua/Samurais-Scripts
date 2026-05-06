@@ -156,6 +156,44 @@ return {
 			}
 		}
 	},
+	car_wash_safe_global = {
+		description = "car wash safe global",
+		file = "freemode.c",
+		LEGACY = {
+			value = 1882572,
+			pattern = [[Global_(\d{7})\[.*?/\*(\d{3})\*/\]\.f_(\d{3})\.f_27\.f_2 = \w+0;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 315,
+					capture_group = 2,
+					description = "player id read size"
+				},
+				{
+					value = 158,
+					capture_group = 3,
+					description = "car wash entry?"
+				},
+			}
+		},
+		ENHANCED = {
+			value = 1882717,
+			pattern = [[Global_(\d{7})\[.*?/\*(\d{3})\*/\]\.f_(\d{3})\.f_27\.f_2 = \w+0;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 315,
+					capture_group = 2,
+					description = "player id read size"
+				},
+				{
+					value = 158,
+					capture_group = 3,
+					description = "car wash entry?"
+				},
+			}
+		}
+	},
 	gb_contraband_buy_local_1 = {
 		description = "Contraband Buy Local 1",
 		file = "gb_contraband_buy.c",

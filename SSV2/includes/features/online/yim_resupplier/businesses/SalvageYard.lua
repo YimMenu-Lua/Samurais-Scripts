@@ -192,6 +192,15 @@ function SalvageYard:RestoreIncomeDecay()
 	tunables.set_int(797544186, 5)
 end
 
+---@param toggle boolean
+function SalvageYard:ToggleIncomeDecay(toggle)
+	if (toggle) then
+		self:LockIncomeDecay()
+	else
+		self:RestoreIncomeDecay()
+	end
+end
+
 ---@return seconds
 function SalvageYard:GetSalvagePosixForLift(slot)
 	if (not self:IsLiftTaken(slot)) then

@@ -22,24 +22,19 @@ local IManagedValue = require("includes.structs.IManagedValue")
 local IManagedTuneable <const> = setmetatable({}, IManagedValue)
 IManagedTuneable.__index       = IManagedTuneable
 
----@generic V : integer|float|boolean
 ---@generic ID : joaat_t|string
 ---@param name string must be unique
 ---@param tuneable ID tuneable name or joaat hash
 ---@param dataType eManagedValueDataType
----@param desired_val V
----@overload fun(name: string, identifier: ID, dataType: 0, desired_val: V): IManagedTuneable<integer>
----@overload fun(name: string, identifier: ID, dataType: 1, desired_val: V): IManagedTuneable<float>
----@overload fun(name: string, identifier: ID, dataType: 2, desired_val: V): IManagedTuneable<boolean>
+---@param desired_val integer|float|boolean
 ---@return IManagedTuneable<T>
+---@overload fun(name: string, identifier: ID, dataType: 1, desired_val: integer): IManagedTuneable<integer>
+---@overload fun(name: string, identifier: ID, dataType: 2, desired_val: float): IManagedTuneable<float>
+---@overload fun(name: string, identifier: ID, dataType: 3, desired_val: boolean): IManagedTuneable<boolean>
+---@overload fun(name: string, identifier: ID, dataType: 4, desired_val: boolean): IManagedTuneable<boolean>
 function IManagedTuneable.new(name, tuneable, dataType, desired_val)
 	local base     = IManagedValue.new(name, tuneable, Enums.eManagedValueType.TUNEABLE, dataType, desired_val)
 	local instance = setmetatable(base, IManagedTuneable) ---@cast instance IManagedTuneable
-
-	if (script.is_active("tuneables_processing")) then
-		instance:SaveDefaultValue()
-	end
-
 	return instance
 end
 

@@ -8,7 +8,7 @@
 
 
 local YRV3        = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local drawFactory = require("includes.frontend.yim_resupplier.factory_ui")
+local drawFactory = require("factory_ui")
 
 return function()
 	drawFactory(YRV3:GetAcidLab(), _T("YRV3_LSD_LAB_NOT_OWNED"))

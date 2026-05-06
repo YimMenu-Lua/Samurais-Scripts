@@ -303,7 +303,7 @@ local Config <const> = {
 			sy_disable_rob_cd = false,
 			sy_disable_rob_weekly_cd = false,
 			sy_disable_tow_cd = false,
-			safe_loop_warn_ack = false,
+			unsafe_feats_enabled = false,
 		},
 		yim_actions = {
 			auto_close_ped_window = false,

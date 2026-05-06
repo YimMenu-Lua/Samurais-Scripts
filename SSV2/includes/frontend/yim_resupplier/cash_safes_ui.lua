@@ -7,8 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YRV3                   = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
+local YRV3 = require("includes.features.online.yim_resupplier.YimResupplierV3")
 
 return function()
 	local safes = YRV3:GetBusinessSafes()
@@ -16,11 +15,12 @@ return function()
 		return
 	end
 
+	local unsafeFeatsEnabled = GVars.features.unsafe_feats_enabled
 	for i, cashSafe in ipairs(safes) do
 		local name = cashSafe:GetName() or _F("Cash Safe %d", i)
 		ImGui.PushID(i)
 		ImGui.BeginChildEx(name,
-			vec2:new(0, cashSafe:CanLoop() and 195 or 160),
+			vec2:new(0, cashSafe:CanLoop() and 230 or 195),
 			ImGuiChildFlags.AlwaysUseWindowPadding,
 			ImGuiWindowFlags.NoScrollbar
 		)
@@ -51,7 +51,22 @@ return function()
 			string.formatmoney(cashValue)
 		)
 
-		drawCashSafeLoopToggle(cashSafe)
+		ImGui.BeginDisabled(not unsafeFeatsEnabled)
+		if (cashSafe:CanInstaFill()) then
+			ImGui.BeginDisabled(cashValue == maxCash)
+			if (GUI:Button(_T("YRV3_CASH_FILL"))) then
+				cashSafe:FillNow()
+			end
+			ImGui.EndDisabled()
+			GUI:HelpMarker(_T("YRV3_CASH_FILL_TT"))
+		end
+
+		if (cashSafe:CanLoop()) then
+			ImGui.BeginDisabled(cashValue >= maxCash)
+			cashSafe.cash_loop_enabled = GUI:CustomToggle(_T("YRV3_CASH_LOOP"), cashSafe.cash_loop_enabled)
+			ImGui.EndDisabled()
+		end
+		ImGui.EndDisabled()
 
 		ImGui.EndChild()
 		ImGui.PopID()

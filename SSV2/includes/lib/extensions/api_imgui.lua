@@ -481,10 +481,10 @@ function ImGui.ValueBar(label, value, size, flags, opts)
 	local region       = vec2:new(ImGui.GetContentRegionAvail())
 
 	if (size.x <= 0) then
-		if (isHotizontal) then
+		if size.x < 0 then
 			size.x = region.x
 		else
-			size.y = region.y
+			size.x = isHotizontal and region.x or ImGui.GetFontSize() * 2
 		end
 	end
 
@@ -502,10 +502,8 @@ function ImGui.ValueBar(label, value, size, flags, opts)
 	local frameH    = size.y == 0 and (ImGui.GetFrameHeight() - style.FramePadding.y) or size.y
 	local textSize  = vec2:new(ImGui.CalcTextSize(label))
 	local labelSize = hasLabel and vec2:new(textSize.x, frameH) or vec2:zero()
-	local width     = (size and size.x > 0) and size.x or ImGui.CalcItemWidth()
-	local rectSize  = isHotizontal
-		and vec2:new(width, frameH)
-		or vec2:new(ImGui.GetFontSize() * 2, size.y - labelSize.y)
+	local width     = size.x > 0 and size.x or ImGui.CalcItemWidth()
+	local rectSize  = isHotizontal and vec2:new(width, frameH) or vec2:new(width, size.y - labelSize.y)
 	local rectStart = cursorPos + vec2:new(
 		isHotizontal and 0 or math.max(0.0, (labelSize.x - rectSize.x) / 2), 0
 	)

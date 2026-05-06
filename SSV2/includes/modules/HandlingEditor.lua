@@ -74,8 +74,8 @@ function HandlingEditor:PushFlag(gvarKey, flag, flagType, predicate, onEnable, o
 		obj.m_default = self:GetFlagDefault(obj)
 	end
 
-	obj.m_on_enable = onEnable
-	obj.m_on_disable = onDisable
+	obj.m_on_enable                  = onEnable
+	obj.m_on_disable                 = onDisable
 	self.m_handling_objects[gvarKey] = obj
 end
 
@@ -194,6 +194,7 @@ function HandlingEditor:Reset()
 
 	for _, obj in pairs(self.m_handling_objects) do
 		self:ResetFlag(obj)
+		obj.m_default = nil
 	end
 end
 

@@ -22,26 +22,21 @@ local IManagedValue = require("includes.structs.IManagedValue")
 local IManagedStat <const> = setmetatable({}, IManagedValue)
 IManagedStat.__index       = IManagedStat
 
----@generic V : integer|float|boolean
 ---@generic ID : joaat_t|string
 ---@param name string must be unique
----@param stat ID tuneable name or joaat hash
+---@param stat ID stat name or joaat hash
 ---@param dataType eManagedValueDataType
----@param desired_val V
+---@param desired_val integer|float|boolean
 ---@param packed? boolean
----@overload fun(name: string, identifier: ID, dataType: 0, desired_val: V, packed?: boolean): IManagedStat<integer>
----@overload fun(name: string, identifier: ID, dataType: 1, desired_val: V, packed?: boolean): IManagedStat<float>
----@overload fun(name: string, identifier: ID, dataType: 2, desired_val: V, packed?: boolean): IManagedStat<boolean>
 ---@return IManagedStat<T>
+---@overload fun(name: string, identifier: ID, dataType: 1, desired_val: integer, packed?: boolean): IManagedStat<integer>
+---@overload fun(name: string, identifier: ID, dataType: 2, desired_val: float, packed?: boolean): IManagedStat<float>
+---@overload fun(name: string, identifier: ID, dataType: 3, desired_val: boolean, packed?: boolean): IManagedStat<boolean>
+---@overload fun(name: string, identifier: ID, dataType: 4, desired_val: boolean, packed?: boolean): IManagedStat<boolean>
 function IManagedStat.new(name, stat, dataType, desired_val, packed)
 	local statType = packed and Enums.eManagedValueType.PACKED_STAT or Enums.eManagedValueType.STAT
 	local base     = IManagedValue.new(name, stat, statType, dataType, desired_val)
 	local instance = setmetatable(base, IManagedStat) ---@cast instance IManagedStat
-
-	if (script.is_active("stats_controller")) then
-		instance:SaveDefaultValue()
-	end
-
 	return instance
 end
 

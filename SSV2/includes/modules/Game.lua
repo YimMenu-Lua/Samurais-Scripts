@@ -30,7 +30,8 @@ local SP_CharNames <const> = {
 --
 -- Native wrappers and generic helpers.
 ---@class Game
-Game         = {}
+---@field private m_fsl_enabled boolean
+Game         = { m_fsl_enabled = false }
 Game.__index = Game
 
 ---@return VersionInfo
@@ -89,6 +90,16 @@ end
 ---@return boolean
 function Game.IsEnhanced()
 	return Backend:GetGameBranch() == Enums.eGameBranch.ENHANCED
+end
+
+-- `IsFileSaveLocal`. Works the same with CLS.
+---@return boolean
+function Game.IsFSL()
+	if (not Game.m_fsl_enabled) then
+		Game.m_fsl_enabled = not NETSHOPPING.NET_GAMESERVER_USE_SERVER_TRANSACTIONS()
+	end
+
+	return Game.m_fsl_enabled
 end
 
 ---@return boolean

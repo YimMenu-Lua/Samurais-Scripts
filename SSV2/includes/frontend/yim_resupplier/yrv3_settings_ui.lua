@@ -7,14 +7,16 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YRV3                      = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local COL_RED <const>           = Color.RED
-local timer_data <const>        = {
+local YRV3                     = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local unsafeFeatsClicked       = false
+local COL_RED <const>          = Color.RED
+local COL_WARN <const>         = Color("safety_yellow")
+local timerData <const>        = {
 	{ label = "GENERIC_MILLIS_LABEL",  mult = 1 },
 	{ label = "GENERIC_SECONDS_LABEL", mult = 1e3 },
 	{ label = "GENERIC_MINUTES_LABEL", mult = 6e4 },
 }
-local supported_scripts <const> = {
+local supportedScripts <const> = {
 	"YRV3_AUTOSELL_BUNKER_LABEL",
 	"YRV3_AUTOSELL_HANGAR_LABEL",
 	"YRV3_AUTOSELL_CEO_LABEL",
@@ -47,23 +49,23 @@ local function getStepForDelay(ms)
 end
 
 local function drawAutofillTimeSelector()
-	local delay        = GVars.features.yrv3.autofill_delay
-	local mode         = getTimeThreshold(delay)
-	local data         = timer_data[mode]
-	local v            = delay / data.mult
-	local step_ms      = getStepForDelay(delay)
-	local step         = step_ms / data.mult
-	local step_fast    = (step_ms * 5) / data.mult
-	local new_value, c = ImGui.InputFloat(
+	local delay     = GVars.features.yrv3.autofill_delay
+	local mode      = getTimeThreshold(delay)
+	local data      = timerData[mode]
+	local v         = delay / data.mult
+	local stepMS    = getStepForDelay(delay)
+	local step      = stepMS / data.mult
+	local stepFast  = (stepMS * 5) / data.mult
+	local newVal, c = ImGui.InputFloat(
 		"##autofill_delay",
 		v,
 		step,
-		step_fast,
+		stepFast,
 		_F("%.1f %s", v, _T(data.label))
 	)
 
 	if (c) then
-		GVars.features.yrv3.autofill_delay = math.clamp(new_value * data.mult, 100, 6e5)
+		GVars.features.yrv3.autofill_delay = math.clamp(newVal * data.mult, 100, 6e5)
 	end
 end
 
@@ -86,12 +88,12 @@ return function()
 
 	GUI:HeaderText(_T("YRV3_AUTO_SELL"), { separator = true, spacing = true })
 	ImGui.TextWrapped(_T("YRV3_AUTO_SELL_SUPPORT_NOTICE"))
-	for _, scrName in ipairs(supported_scripts) do
+	for _, scrName in ipairs(supportedScripts) do
 		ImGui.BulletText(_T(scrName))
 	end
 
 	ImGui.Spacing()
-	GVars.features.yrv3.autosell, _ = GUI:CustomToggle(_T("YRV3_AUTO_SELL"), GVars.features.yrv3.autosell)
+	GVars.features.yrv3.autosell = GUI:CustomToggle(_T("YRV3_AUTO_SELL"), GVars.features.yrv3.autosell)
 	GUI:Tooltip(_T("YRV3_AUTOSELL_TT"))
 
 	if (script.is_active("fm_content_smuggler_sell")) then
@@ -119,4 +121,27 @@ return function()
 	GUI:HeaderText(_T("YRV3_AUTO_FILL"), { separator = true, spacing = true })
 	ImGui.Text(_T("YRV3_AUTO_FILL_DELAY"))
 	drawAutofillTimeSelector()
+
+	if (not Game.IsFSL()) then
+		ImGui.PushStyleColor(ImGuiCol.Text, COL_WARN:AsFloat())
+		GUI:HeaderText(_T("YRV3_DANGER_ZONE"), { separator = true, spacing = true })
+		_, unsafeFeatsClicked = GUI:Checkbox(_T("YRV3_UNSAFE_FEATS_CB"), GVars.features.unsafe_feats_enabled)
+		if (unsafeFeatsClicked) then
+			if (GVars.features.unsafe_feats_enabled) then
+				GVars.features.unsafe_feats_enabled = false
+			else
+				ImGui.OpenPopup(_T("GENERIC_WARN_LABEL"))
+			end
+		end
+
+		ImGui.Spacing()
+		ImGui.SetWindowFontScale(0.84)
+		ImGui.TextWrapped(_T("YRV3_UNSAFE_FEATS_HINT"))
+		ImGui.SetWindowFontScale(1.0)
+		ImGui.PopStyleColor()
+
+		if (ImGui.DialogBox(_T("GENERIC_WARN_LABEL"), _T("YRV3_UNSAFE_FEATS_PROMPT"), ImGuiDialogBoxStyle.WARN)) then
+			GVars.features.unsafe_feats_enabled = true
+		end
+	end
 end

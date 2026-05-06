@@ -30,6 +30,9 @@ local SGSL         = require("includes.services.SGSL")
 ---@field private m_coords vec3
 ---@field private m_max_units integer
 ---@field private m_vpu integer
+---@field private m_is_setup_stat string
+---@field private m_supply_count_stat string
+---@field private m_product_count_stat string
 ---@field private m_equipment_upgrade boolean
 ---@field private m_staff_upgrade boolean
 ---@field private m_prod_time_g ScriptGlobal
@@ -43,26 +46,30 @@ Factory.__index = Factory
 ---@return Factory
 function Factory.new(opts)
 	assert(type(opts.max_units) == "number", "Missing argument: max_units<integer>")
+	local id = opts.id
 	assert(type(opts.id) == "number" and math.is_inrange(opts.id, 0, 6), "Invalid Biker Business id.")
 
-	local base                   = BusinessBase.new(opts)
-	local instance               = setmetatable(base, Factory) ---@cast instance Factory
-	instance.m_normalized_name   = opts.normalized_name
-	instance.fast_prod_enabled   = false
-	instance.m_fast_prod_running = false
+	local base                    = BusinessBase.new(opts)
+	local instance                = setmetatable(base, Factory) ---@cast instance Factory
+	instance.m_normalized_name    = opts.normalized_name
+	instance.m_is_setup_stat      = _F("MPX_FACTORYSETUP%d", id)
+	instance.m_supply_count_stat  = _F("MPX_MATTOTALFORFACTORY%d", id)
+	instance.m_product_count_stat = _F("MPX_PRODTOTALFORFACTORY%d", id)
+	instance.fast_prod_enabled    = false
+	instance.m_fast_prod_running  = false
 
-	local base_vpu               = opts.vpu
-	local mult_1                 = opts.vpu_mult_1 or 0
-	local mult_2                 = opts.vpu_mult_2 or 0
-	instance.m_vpu               = base_vpu + mult_1 + mult_2
-	instance.m_equipment_upgrade = mult_1 > 0
-	instance.m_staff_upgrade     = mult_2 > 0
+	local base_vpu                = opts.vpu
+	local mult_1                  = opts.vpu_mult_1 or 0
+	local mult_2                  = opts.vpu_mult_2 or 0
+	instance.m_vpu                = base_vpu + mult_1 + mult_2
+	instance.m_equipment_upgrade  = mult_1 > 0
+	instance.m_staff_upgrade      = mult_2 > 0
 
-	local idx                    = base:GetIndex()
-	local baseGlobal             = base:GetBaseGlobal()
-	local restockGlobal          = SGSL:Get(SGSL.data.freemode_business_global):AsGlobal()
-	instance.m_prod_time_g       = baseGlobal:At(205):At(idx, 13):At(9)
-	instance.m_restock_g         = restockGlobal:At(1, idx)
+	local idx                     = base:GetIndex()
+	local baseGlobal              = base:GetBaseGlobal()
+	local restockGlobal           = SGSL:Get(SGSL.data.freemode_business_global):AsGlobal()
+	instance.m_prod_time_g        = baseGlobal:At(205):At(idx, 13):At(9)
+	instance.m_restock_g          = restockGlobal:At(1, idx)
 
 	return instance
 end
@@ -80,17 +87,17 @@ end
 
 ---@return boolean
 function Factory:IsSetup()
-	return stats.get_int(_F("MPX_FACTORYSETUP%d", self.m_id)) == 1
+	return stats.get_int(self.m_is_setup_stat) == 1
 end
 
 ---@return integer
 function Factory:GetSuppliesCount()
-	return stats.get_int(_F("MPX_MATTOTALFORFACTORY%d", self.m_id))
+	return stats.get_int(self.m_supply_count_stat)
 end
 
 ---@return integer
 function Factory:GetProductCount()
-	return stats.get_int(_F("MPX_PRODTOTALFORFACTORY%d", self.m_id))
+	return stats.get_int(self.m_product_count_stat)
 end
 
 ---@return integer

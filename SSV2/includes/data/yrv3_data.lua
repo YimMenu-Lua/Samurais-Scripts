@@ -397,14 +397,13 @@ local RawBusinessData <const> = {
 	},
 	---@alias BusinessHubs array<{ name: string, vpu_tunable: string, max_units_tunable: string, prod_time_tunable: string }>
 	BusinessHubs        = {
-		-- names are shortened and not localized because GXTs are too wide for our current UI
-		{ name = "Cargo",   vpu_tunable = "BB_BUSINESS_VALUE_CARGO",            max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_CARGO",            prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_CARGO" },
-		{ name = "Weapons", vpu_tunable = "BB_BUSINESS_VALUE_WEAPONS",          max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEAPONS",          prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEAPONS" },
-		{ name = "Cocaine", vpu_tunable = "BB_BUSINESS_VALUE_COKE",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COKE",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COKE" },
-		{ name = "Meth",    vpu_tunable = "BB_BUSINESS_VALUE_METH",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_METH",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_METH" },
-		{ name = "Weed",    vpu_tunable = "BB_BUSINESS_VALUE_WEED",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEED",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEED" },
-		{ name = "Fake ID", vpu_tunable = "BB_BUSINESS_VALUE_FORGED_DOCUMENTS", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_FORGED_DOCUMENTS", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_FORGED_DOCUMENTS" },
-		{ name = "Cash",    vpu_tunable = "BB_BUSINESS_VALUE_COUNTERFEIT_CASH", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COUNTERFEIT_CASH", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COUNTERFEIT_CASH" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_CARGO",            max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_CARGO",            prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_CARGO" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_WEAPONS",          max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEAPONS",          prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEAPONS" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_COKE",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COKE",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COKE" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_METH",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_METH",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_METH" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_WEED",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEED",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEED" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_FORGED_DOCUMENTS", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_FORGED_DOCUMENTS", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_FORGED_DOCUMENTS" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_COUNTERFEIT_CASH", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COUNTERFEIT_CASH", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COUNTERFEIT_CASH" },
 	},
 	-- index + 59
 	VehicleWarehouses   = {
@@ -487,9 +486,8 @@ local RawBusinessData <const> = {
 				interior_id     = 278273,
 				room_hash       = 3710124102, -- MAINW_RM
 				raw_data_entry  = "Arcades",
-				get_max_cash    = function()
-					return tunables.get_int("MAXARCADESAFESTORAGE")
-				end,
+				get_max_cash    = function() return tunables.get_int("MAXARCADESAFESTORAGE") end,
+				global_offset   = function() return 439 + 5 end
 			},
 			{
 				property_stat   = "MPX_FIXER_HQ_OWNED",
@@ -498,9 +496,8 @@ local RawBusinessData <const> = {
 				interior_id     = 288257,
 				room_hash       = 767622941, -- ROOM_MAIN
 				raw_data_entry  = "Agencies",
-				get_max_cash    = function()
-					return tunables.get_int("MAXFIXERHQSAFESTORAGE")
-				end,
+				get_max_cash    = function() return tunables.get_int("MAXFIXERHQSAFESTORAGE") end,
+				global_offset   = function() return 519 + 2 end
 			},
 			{
 				property_stat   = "MPX_BAIL_OFFICE_OWNED",
@@ -508,9 +505,11 @@ local RawBusinessData <const> = {
 				raw_data_entry  = "BailOffices",
 				interior_id     = 295425,
 				room_hash       = 2990789022, -- ROOM_OFFICE
-				get_max_cash    = function()
-					return tunables.get_int(-1736487760)
-				end,
+				get_max_cash    = function() return tunables.get_int(-1736487760) end,
+				global_offset   = function()
+					local offset = Game.IsEnhanced() and 532 or 531 -- /\*88\d{1}\*/\]\.f_260\.f_53\d{1}\.f_2 = \w+;
+					return offset + 2
+				end
 				-- no paytime_stat; this functions somewhat similar to the clubhouse duffle
 			},
 			{
@@ -520,9 +519,11 @@ local RawBusinessData <const> = {
 				raw_data_entry  = "HackerDen",
 				interior_id     = 297729,
 				room_hash       = 1055494658, -- ROOM_WORKSHOP
-				get_max_cash    = function()
-					return tunables.get_int(-792265290)
-				end,
+				get_max_cash    = function() return tunables.get_int(-792265290) end,
+				global_offset   = function()
+					local offset = Game.IsEnhanced() and 544 or 543
+					return offset + 2
+				end
 			},
 		},
 		fronts = {
@@ -537,27 +538,26 @@ local RawBusinessData <const> = {
 					end
 					return tunables.get_int(1839510301)
 				end,
+				global_offset   = function() return 504 + 6 end
 			},
 			clubhouse = {
 				cash_value_stat = "MPX_BIKER_BAR_RESUPPLY_CASH",
 				interior_id     = 246273,
 				room_hash       = 405984664, -- BIKERDLC_INT01_OFFRM
-				get_max_cash    = function()
-					return tunables.get_int("BIKER_PASSIVE_INCOME_BAG_LIMIT")
-				end,
+				get_max_cash    = function() return tunables.get_int("BIKER_PASSIVE_INCOME_BAG_LIMIT") end,
 				-- there's no paytime stat; naturally there's still a timer
 				-- but this uses a packed stat int and a bool global as well.
 				-- Im not even gonna bother.
 				-- hint: 36620
+				global_offset   = function() return 394 end
 			},
 			nightclub = {
 				cash_value_stat = "MPX_CLUB_SAFE_CASH_VALUE",
 				paytime_stat    = "MPX_CLUB_PAY_TIME_LEFT",
 				interior_id     = 271617,
 				room_hash       = 3920029441, -- "INT_01_ORIFICE"
-				get_max_cash    = function()
-					return tunables.get_int("NIGHTCLUBMAXSAFEVALUE")
-				end,
+				get_max_cash    = function() return tunables.get_int("NIGHTCLUBMAXSAFEVALUE") end,
+				global_offset   = function() return 364 + 6 end
 			},
 		},
 	}

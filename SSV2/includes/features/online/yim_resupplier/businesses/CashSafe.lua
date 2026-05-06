@@ -1,3 +1,4 @@
+local SGSL = require "includes.services.SGSL"
 -- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
 -- This file is part of Samurai's Scripts.
 --
@@ -15,6 +16,7 @@
 ---@field interior_id? integer
 ---@field room_hash? joaat_t
 ---@field coords? vec3
+---@field global_offset? fun(): integer
 
 -- Class representing a Business Safe that stores cash
 ---@class CashSafe
@@ -24,6 +26,7 @@
 ---@field private m_paytime_stat? string
 ---@field private m_coords? vec3
 ---@field private m_interior_id? integer
+---@field private m_global_entry? ScriptGlobal
 ---@field private m_room_hash joaat_t
 ---@field private m_cash_loop_running boolean
 ---@field private m_last_loop_time seconds
@@ -43,11 +46,15 @@ function CashSafe.new(opts)
 		m_name         = opts.name or "NULL",
 		m_paytime_stat = opts.paytime_stat,
 		m_interior_id  = opts.interior_id,
-		m_room_hash    = opts.room_hash
+		m_room_hash    = opts.room_hash,
+		m_coords       = opts.coords,
 	}, CashSafe)
 
-	if (opts.coords) then
-		instance.m_coords = opts.coords
+	local get_offset = opts.global_offset
+	if (get_offset) then
+		local offset            = get_offset()
+		local base              = SGSL:Get(SGSL.data.mp_business_stuff)
+		instance.m_global_entry = base:AsGlobal():At(offset)
 	end
 
 	return instance
@@ -55,8 +62,14 @@ end
 
 ---@return boolean
 function CashSafe:IsFull()
-	-- le because some people like to break their safes and go over the max
-	return self.m_max_cash <= self:GetCashValue()
+	return self.m_max_cash == self:GetCashValue()
+end
+
+---@private
+---@nodiscard
+---@return boolean
+function CashSafe:IsFucked()
+	return self.m_max_cash < self:GetCashValue()
 end
 
 ---@return boolean
@@ -73,9 +86,16 @@ function CashSafe:IsPlayerNearby()
 	return interior == self.m_interior_id and LocalPlayer:GetRoomHash() == self.m_room_hash
 end
 
+---@nodiscard
 ---@return boolean
 function CashSafe:CanLoop()
 	return type(self.m_paytime_stat) == "string"
+end
+
+---@nodiscard
+---@return boolean
+function CashSafe:CanInstaFill()
+	return self.m_global_entry ~= nil
 end
 
 ---@return string
@@ -116,12 +136,36 @@ function CashSafe:SetPaytimeLeft()
 	stats.set_int(self.m_paytime_stat, 100)
 end
 
+---@private
+---@param v integer
+function CashSafe:SetCashValue(v)
+	if (v < 0 or v > self:GetCapacity()) then
+		return
+	end
+
+	local global = self.m_global_entry
+	local stat   = self.m_cash_stat
+	if (not global or not stat) then
+		return
+	end
+
+	self.m_global_entry:WriteInt(v)
+	stats.set_int(stat, v)
+end
+
+---@return boolean
+function CashSafe:FillNow()
+	if (self:IsFull()) then return false end
+	self:SetCashValue(self:GetCapacity())
+	return true
+end
+
 function CashSafe:Update()
 	if (not self.cash_loop_enabled or self.m_cash_loop_running) then
 		return
 	end
 
-	if (not GVars.features.yrv3.safe_loop_warn_ack) then
+	if (not GVars.features.unsafe_feats_enabled) then
 		self.cash_loop_enabled   = false
 		self.m_cash_loop_running = false
 		return
@@ -131,6 +175,10 @@ function CashSafe:Update()
 		self.cash_loop_enabled   = false
 		self.m_cash_loop_running = false
 		return
+	end
+
+	if (self:IsFucked()) then
+		self:SetCashValue(0)
 	end
 
 	if (self:IsFull() and not self:IsPlayerNearby()) then
@@ -147,12 +195,12 @@ function CashSafe:Update()
 		local collected       = false
 
 		while (self.cash_loop_enabled) do
-			if (not GVars.features.yrv3.safe_loop_warn_ack) then
+			if (not GVars.features.unsafe_feats_enabled) then
 				break
 			end
 
 			if (not self:IsFull()) then
-				if (self:GetPaytimeLeft() >= 100 and not collected) then
+				if (self:GetPaytimeLeft() > 100 and not collected) then
 					self:SetPaytimeLeft()
 				end
 
@@ -161,6 +209,7 @@ function CashSafe:Update()
 						yield()
 					until self:GetCashValue() ~= currentSafeCash
 						or self:IsFull()
+						or self:IsFucked()
 						or not self:IsPlayerNearby()
 						or not self.cash_loop_enabled
 
@@ -169,8 +218,6 @@ function CashSafe:Update()
 			end
 
 			if (self:IsFull() and not self:IsPlayerNearby()) then
-				-- you don't have to worry about forgetting to disable the loop
-				-- it will disable itself as soon as you leave the room where the safe is.
 				break
 			end
 
