@@ -69,14 +69,23 @@ function Nightclub:MaxPopularity()
 end
 
 function Nightclub:LockPopularityDecay()
-	tunables.set_float("NIGHTCLUBPOPDECAY", -1e-8)
-	tunables.set_float("INIGHTCLUBPOPDECAYSTAFFUPGRADE", -1e-8)
+	tunables.set_float("NIGHTCLUBPOPDECAY", -1e-16)
+	tunables.set_float("INIGHTCLUBPOPDECAYSTAFFUPGRADE", -1e-16)
 	self:MaxPopularity()
 end
 
 function Nightclub:RestorePopularityDecay()
 	tunables.set_float("NIGHTCLUBPOPDECAY", -0.1)
 	tunables.set_float("INIGHTCLUBPOPDECAYSTAFFUPGRADE", -0.05)
+end
+
+---@param toggle boolean
+function Nightclub:TogglePopulatirtyLock(toggle)
+	if (toggle) then
+		self:LockPopularityDecay()
+	else
+		self:RestorePopularityDecay()
+	end
 end
 
 function Nightclub:ToggleBigTips(toggle)
@@ -97,10 +106,53 @@ function Nightclub:AddSubBusiness(index)
 
 	table.insert(self.m_subs, BusinessHub.new({
 		id        = index,
-		name      = ref.name,
+		name      = Game.GetGXTLabel(_F("CLUB_STOCK%d", index)),
 		max_units = tunables.get_int(ref.max_units_tunable),
 		vpu       = tunables.get_int(ref.vpu_tunable)
 	}))
 end
 
-return Nightclub
+---@param src BusinessHub
+---@param dest BusinessHub
+function Nightclub:TransferTechnician(src, dest)
+	local srcIDX  = src:GetAssignedTechIndex()
+	local destIDX = dest:GetAssignedTechIndex()
+	if (srcIDX == -1 or srcIDX == destIDX) then -- UI blocks this anyway
+		return
+	end
+
+	local clubName = self:GetCustomName()
+	local srcName  = src:GetName()
+	if (not src:RemoveTechnician()) then
+		Notifier:ShowError(clubName, _T("YRV3_HUB_REMOVE_TECH_FAIL_FMT", srcName))
+		return
+	end
+
+	local destName     = dest:GetName()
+	local destIdxValid = destIDX ~= -1
+	if (destIdxValid and not dest:RemoveTechnician()) then
+		src:AssignTechnician(srcIDX)
+		Notifier:ShowError(clubName, _T("YRV3_HUB_REMOVE_TECH_FAIL_FMT", destName))
+		return
+	end
+
+	if (not dest:AssignTechnician(srcIDX)) then
+		src:AssignTechnician(srcIDX)
+		if (destIdxValid) then
+			dest:AssignTechnician(destIDX)
+		end
+
+		Notifier:ShowError(clubName, _T("YRV3_HUB_TRANSFER_TECH_FAIL_FMT", srcName, destName))
+		return
+	end
+
+	if (destIdxValid and not src:AssignTechnician(destIDX)) then
+		Notifier:ShowWarning(clubName, _T("YRV3_HUB_SWAP_TECH_WARN_FMT"))
+		return
+	end
+
+	local msg = destIdxValid and "YRV3_HUB_SWAP_TECH_SUCCESS_FMT" or "YRV3_HUB_TRANSFER_TECH_SUCCESS_FMT"
+	Notifier:ShowSuccess(clubName, _T(msg, srcName, destName))
+end
+
+return Nightclub.new

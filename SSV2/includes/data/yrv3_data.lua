@@ -9,387 +9,233 @@
 
 local SGSL = require("includes.services.SGSL")
 
+
+---@class IManagedValueCtorData
+---@field defs array<{ t: string|joaat_t, v: integer|float|boolean, bit_index?: integer, obj_type: eManagedValueType, data_type?: eManagedValueDataType }>
+---@field get_state fun(): boolean
+
+local eDataType <const>  = Enums.eManagedValueDataType
+local eValueType <const> = Enums.eManagedValueType
+
+
 ---@class RawBusinessData
 local RawBusinessData <const> = {
-	Cooldowns = {
+	---@type dict<IManagedValueCtorData>
+	Cooldowns           = {
 		["mc_work_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.mc_work_cd
-			end,
-			onEnable = function()
-				if (tunables.get_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL") > 0) then
-					tunables.set_int("BIKER_CLUB_WORK_COOLDOWN_GLOBAL", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.mc_work_cd end,
+			defs      = { { t = "BIKER_CLUB_WORK_COOLDOWN_GLOBAL", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT } },
 		},
 		["hangar_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.hangar_cd
-			end,
-			onEnable = function()
-				local t = {
-					"SMUG_STEAL_EASY_COOLDOWN_TIMER",
-					"SMUG_STEAL_MED_COOLDOWN_TIMER",
-					"SMUG_STEAL_HARD_COOLDOWN_TIMER",
-				}
-				for _, str in ipairs(t) do
-					if (tunables.get_int(str) > 0) then
-						tunables.set_int(str, 0)
-					end
-				end
-			end
+			get_state = function() return GVars.features.yrv3.hangar_cd end,
+			defs      = {
+				{ t = "SMUG_STEAL_EASY_COOLDOWN_TIMER", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+				{ t = "SMUG_STEAL_MED_COOLDOWN_TIMER",  v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+				{ t = "SMUG_STEAL_HARD_COOLDOWN_TIMER", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+			},
 		},
 		["nc_management_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.nc_management_cd
-			end,
-			onEnable = function()
-				if (tunables.get_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN") > 0) then
-					tunables.set_int("BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.nc_management_cd end,
+			defs      = { { t = "BB_CLUB_MANAGEMENT_CLUB_MANAGEMENT_MISSION_COOLDOWN", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT } },
 		},
 		["nc_vip_mission_chance"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.nc_vip_mission_chance
-			end,
-			onEnable = function()
-				if (tunables.get_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT") > 0) then
-					tunables.set_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT", 0)
-				end
-			end,
-			onDisable = function()
-				if (tunables.get_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT") == 0) then
-					tunables.set_int("NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT", 50)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.nc_vip_mission_chance end,
+			defs      = { { t = "NC_TROUBLEMAKER_CHANCE_IS_VIP_EVENT", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT } },
 		},
 		["security_missions_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.security_missions_cd
-			end,
-			onEnable = function()
-				if (tunables.get_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME") > 0) then
-					tunables.set_int("FIXER_SECURITY_CONTRACT_COOLDOWN_TIME", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.security_missions_cd end,
+			defs      = { { t = "FIXER_SECURITY_CONTRACT_COOLDOWN_TIME", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT } },
 		},
 		["ie_vehicle_steal_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.ie_vehicle_steal_cd
-			end,
-			onEnable = function()
-				if (tunables.get_int("IMPEXP_STEAL_COOLDOWN") > 0) then
-					tunables.set_int("IMPEXP_STEAL_COOLDOWN", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.ie_vehicle_steal_cd end,
+			defs      = { { t = "IMPEXP_STEAL_COOLDOWN", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT } },
 		},
 		["ie_vehicle_sell_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.ie_vehicle_sell_cd
-			end,
-			onEnable = function()
-				if (tunables.get_int("IMPEXP_SELL_COOLDOWN") > 0) then
-					tunables.set_int("IMPEXP_SELL_COOLDOWN", 0)
-				end
-				for i = 1, 4, 1 do
-					local __t = _F("IMPEXP_SELL_%d_CAR_COOLDOWN", i)
-					if (tunables.get_int(__t) > 0) then
-						tunables.set_int(__t, 0)
-					end
-				end
-			end
+			get_state = function() return GVars.features.yrv3.ie_vehicle_sell_cd end,
+			defs      = {
+				{ t = "IMPEXP_SELL_COOLDOWN",       v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+				{ t = "IMPEXP_SELL_1_CAR_COOLDOWN", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+				{ t = "IMPEXP_SELL_2_CAR_COOLDOWN", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+				{ t = "IMPEXP_SELL_3_CAR_COOLDOWN", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+				{ t = "IMPEXP_SELL_4_CAR_COOLDOWN", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+			},
 		},
 		["ceo_crate_buy_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.ceo_crate_buy_cd
-			end,
-			onEnable = function()
-				if (tunables.get_int("EXEC_BUY_COOLDOWN") > 0) then
-					tunables.set_int("EXEC_BUY_COOLDOWN", 0)
-				end
-				if (tunables.get_int("EXEC_BUY_FAIL_COOLDOWN") > 0) then
-					tunables.set_int("EXEC_BUY_FAIL_COOLDOWN", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.ceo_crate_buy_cd end,
+			defs      = {
+				{ t = "EXEC_BUY_COOLDOWN",      v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+				{ t = "EXEC_BUY_FAIL_COOLDOWN", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+			},
 		},
 		["ceo_crate_sell_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.ceo_crate_sell_cd
-			end,
-			onEnable = function()
-				if (tunables.get_int("EXEC_SELL_COOLDOWN") > 0) then
-					tunables.set_int("EXEC_SELL_COOLDOWN", 0)
-				end
-				if (tunables.get_int("EXEC_SELL_FAIL_COOLDOWN") > 0) then
-					tunables.set_int("EXEC_SELL_FAIL_COOLDOWN", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.ceo_crate_sell_cd end,
+			defs      = {
+				{ t = "EXEC_SELL_COOLDOWN",      v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+				{ t = "EXEC_SELL_FAIL_COOLDOWN", v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT },
+			},
 		},
 		["dax_work_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.dax_work_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("MPX_XM22JUGGALOWORKCDTIMER") > 0) then
-					stats.set_int("MPX_XM22JUGGALOWORKCDTIMER", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.dax_work_cd end,
+			defs      = { { t = "MPX_XM22JUGGALOWORKCDTIMER", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["garment_rob_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.garment_rob_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("MPX_HACKER24_ROBBERY_CD") > 0) then
-					stats.set_int("MPX_HACKER24_ROBBERY_CD", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.garment_rob_cd end,
+			defs      = { { t = "MPX_HACKER24_ROBBERY_CD", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["cwash_legal_work_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.cwash_legal_work_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("T25_CW_LEG_CD") > 0) then
-					stats.set_int("T25_CW_LEG_CD", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.cwash_legal_work_cd end,
+			defs      = { { t = "MPX_T25_CW_LEG_CD", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["cwash_illegal_work_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.cwash_illegal_work_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("T25_CW_ILEG_CD") > 0) then
-					stats.set_int("T25_CW_ILEG_CD", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.cwash_illegal_work_cd end,
+			defs      = { { t = "MPX_T25_CW_ILEG_CD", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["weedshop_legal_work_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.weedshop_legal_work_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("T25_WS_LEG_CD") > 0) then
-					stats.set_int("T25_WS_LEG_CD", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.weedshop_legal_work_cd end,
+			defs      = { { t = "MPX_T25_WS_LEG_CD", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["weedshop_illegal_work_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.weedshop_illegal_work_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("T25_WS_ILEG_CD") > 0) then
-					stats.set_int("T25_WS_ILEG_CD", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.weedshop_illegal_work_cd end,
+			defs      = { { t = "MPX_T25_WS_ILEG_CD", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["helitours_legal_work_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.helitours_legal_work_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("T25_WS_LEG_CD") > 0) then
-					stats.set_int("T25_WS_LEG_CD", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.helitours_legal_work_cd end,
+			defs      = { { t = "MPX_T25_WS_LEG_CD", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["helitours_illegal_work_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.helitours_illegal_work_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("T25_HT_ILEG_CD") > 0) then
-					stats.set_int("T25_HT_ILEG_CD", 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.helitours_illegal_work_cd end,
+			defs      = { { t = "MPX_T25_HT_ILEG_CD", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["sy_disable_rob_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.sy_disable_rob_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("MPX_SALV23_VEHROB_CD") > 0) then
-					stats.set_int("MPX_SALV23_VEHROB_CD", 0)
-				end
-			end
-		},
-		["sy_disable_rob_weekly_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.sy_disable_rob_weekly_cd
-			end,
-			onEnable = function()
-				local week_sync = stats.get_int("MPX_SALV23_WEEK_SYNC")
-				if (tunables.get_int("SALV23_VEH_ROBBERY_WEEK_ID") == stats.get_int("MPX_SALV23_WEEK_SYNC")) then
-					tunables.set_int("SALV23_VEH_ROBBERY_WEEK_ID", week_sync + 1)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.sy_disable_rob_cd end,
+			defs      = { { t = "MPX_SALV23_VEHROB_CD", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["sy_disable_tow_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yrv3.sy_disable_tow_cd
-			end,
-			onEnable = function()
-				if (tunables.get_int(1521767918) > 0) then -- 120000ms
-					tunables.set_int(1521767918, 0)
-				end
-			end
+			get_state = function() return GVars.features.yrv3.sy_disable_tow_cd end,
+			defs      = { { t = 1521767918, v = 0, obj_type = eValueType.TUNEABLE, data_type = eDataType.INT } },
 		},
 		["cfr_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yim_heists.cfr_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("SALV23_CFR_COOLDOWN") > 0) then
-					stats.set_int("SALV23_CFR_COOLDOWN", 0)
-				end
-			end
+			get_state = function() return GVars.features.yim_heists.cfr_cd end,
+			defs      = { { t = "MPX_SALV23_CFR_COOLDOWN", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["knoway_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yim_heists.knoway_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("MPX_M25_AVI_MISSION_CD") > 0) then
-					stats.set_int("MPX_M25_AVI_MISSION_CD", 0)
-				end
-			end
+			get_state = function() return GVars.features.yim_heists.knoway_cd end,
+			defs      = { { t = "MPX_M25_AVI_MISSION_CD", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["dre_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yim_heists.dre_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("MPX_FIXER_STORY_COOLDOWN") > 0) then
-					stats.set_int("MPX_FIXER_STORY_COOLDOWN", 0)
-				end
-			end
+			get_state = function() return GVars.features.yim_heists.dre_cd end,
+			defs      = { { t = "MPX_FIXER_STORY_COOLDOWN", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["ogfa_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yim_heists.ogfa_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("MPX_HACKER24_MFM_COOLDOWN") > 0) then
-					stats.set_int("MPX_HACKER24_MFM_COOLDOWN", 0)
-				end
-			end
+			get_state = function() return GVars.features.yim_heists.ogfa_cd end,
+			defs      = { { t = "MPX_HACKER24_MFM_COOLDOWN", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 		["cayo_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yim_heists.cayo_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("MPX_H4_COOLDOWN") > 0) then
-					stats.set_int("MPX_H4_COOLDOWN", 0)
-				end
-				if (stats.get_int("MPX_H4_COOLDOWN_HARD") > 0) then
-					stats.set_int("MPX_H4_COOLDOWN_HARD", 0)
-				end
-			end
+			get_state = function() return GVars.features.yim_heists.cayo_cd end,
+			defs      = {
+				{ t = "MPX_H4_COOLDOWN",      v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT },
+				{ t = "MPX_H4_COOLDOWN_HARD", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT },
+			},
 		},
 		["dday_cd"] = {
-			dirty = false,
-			gstate = function()
-				return GVars.features.yim_heists.dday_cd
-			end,
-			onEnable = function()
-				if (stats.get_int("MPX_GANGOPS_LAUNCH_TIME") > 0) then
-					stats.set_int("MPX_GANGOPS_LAUNCH_TIME", 0)
-				end
-			end
+			get_state = function() return GVars.features.yim_heists.dday_cd end,
+			defs      = { { t = "MPX_GANGOPS_LAUNCH_TIME", v = 0, obj_type = eValueType.STAT, data_type = eDataType.INT } },
 		},
 	},
-	SellScripts = {
-		["gb_smuggler"] = { -- air
-			autofinish = function()
-				local GBSMUG_OBJ   = SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1)
-				local GBSMUG_LOCAL = GBSMUG_OBJ:AsLocal()
-				local offset1      = GBSMUG_OBJ:GetOffset(1)
-				local offset2      = SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2):GetOffset(1)
-				GBSMUG_LOCAL:At(offset1):WriteInt(0)
-				GBSMUG_LOCAL:At(offset2):WriteInt(1)
-			end
-		},
-		["gb_gunrunning"] = {
-			autofinish = function()
-				-- TODO: fix this. this is bad. seccess depends on mission type (iLocal_1266.f_1)
-				-- this just forces mission failure by setting the number of delivery vehicles to 0 (it only succeeds on type 16)
-				-- but since we set the amount delivered to non-zero, you get paid nonetheless.
-				-- there's also a side effect that could be used as an exploit but will be almost 100% bannable:
-				-- 		we can force mission subtype to 16 and always set delivered amount to num_vehs * 5. This would
-				-- 		guarantee a mission success everytime but the payment would end up being something nonsensical
-				-- 		like $10.5M on subtype 18 (the two semi-trucks mission) you get paid x10 what you should lol
-				--
-				-- Local_1266.f_573 cancels the mission if set to 3
-				local GBGR_LOCAL = SGSL:Get(SGSL.data.gb_gunrunning_sell_local):AsLocal()
-				local offset2    = SGSL:Get(SGSL.data.bunker_sell_amt_delivered):GetOffset(1)
-				local offset3    = SGSL:Get(SGSL.data.bunker_sell_num_vehs):GetOffset(1)
-				-- local vehicles   = GBGR_LOCAL:At(offset3):ReadInt()
-				-- local mission    = GBGR_LOCAL:At(1):ReadInt()
-				-- local num        = (mission == 16 or mission == 14) and 5 or 1 -- func_148()
-				GBGR_LOCAL:At(offset2):WriteInt(1)
-				GBGR_LOCAL:At(offset3):WriteInt(0)
-			end
-		},
-		["gb_contraband_sell"] = {
-			autofinish = function()
-				SGSL:Get(SGSL.data.gb_contraband_sell_local)
-					:AsLocal()
-					:At(1)
-					:WriteInt(99999)
-			end,
-		},
-		["gb_biker_contraband_sell"] = {
-			autofinish = function()
-				local GBBKR_OBJ   = SGSL:Get(SGSL.data.biker_deliveries_local)
-				local GBBKR_LOCAL = GBBKR_OBJ:AsLocal()
-				local deliveries  = GBBKR_OBJ:GetOffset(1)
-				local target      = SGSL:Get(SGSL.data.biker_required_deliveries_local):GetOffset(1)
-				local value       = GBBKR_LOCAL:At(target):ReadInt()
-				GBBKR_LOCAL:At(deliveries):WriteInt(value)
-			end,
-		},
-		-- ["fm_content_acid_lab_sell"] = {
-		-- 	autofinish = function()
-		-- 		local FMCAL_OBJ   = SGSL:Get(SGSL.data.acid_lab_sell_local)
-		-- 		local FMCAL_LOCAL = FMCAL_OBJ:AsLocal()
-		-- 		local offset      = FMCAL_OBJ:GetOffset(1)
-		-- 		SGSL:Get(SGSL.data.acid_lab_sell_bitset)
-		-- 			:AsLocal()
-		-- 			:At(1)
-		-- 			:At(0)
-		-- 			:SetBit(11)
-		-- 		FMCAL_LOCAL:At(offset):WriteInt(3) -- end reason
-		-- 	end
-		-- },
+	ScriptDisplayNames  = {
+		["fm_content_smuggler_sell"] = "Hangar (Land. Not supported.)",
+		["gb_smuggler"]              = "Hangar (Air)",
+		["gb_contraband_sell"]       = "CEO",
+		["gb_gunrunning"]            = "Bunker",
+		["gb_biker_contraband_sell"] = "Biker Business",
+		["business_battles_sell"]    = "Nightclub",
+		["fm_content_acid_lab_sell"] = "Acid Lab",
+	},
+	NightclubNames      = {
+		"Maisonette Los Santos",
+		"Studio Los Santos",
+		"GALAXY",
+		"Gefangnis",
+		"Omega",
+		"Technologie",
+		"Paradise",
+		"The Palace",
+		"Tony's Fun House",
+	},
+	ScriptsToTerminate  = {
+		"appArcadeBusinessHub",
+		"appsmuggler",
+		"appbikerbusiness",
+		"appbunkerbusiness",
+		"appbusinesshub"
+	},
+	SellScripts         = {
+		["gb_smuggler"] = function()
+			local GBSMUG_OBJ   = SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_1)
+			local GBSMUG_LOCAL = GBSMUG_OBJ:AsLocal()
+			local offset1      = GBSMUG_OBJ:GetOffset(1)
+			local offset2      = SGSL:Get(SGSL.data.gb_smuggler_sell_air_local_2):GetOffset(1)
+			GBSMUG_LOCAL:At(offset1):WriteInt(0)
+			GBSMUG_LOCAL:At(offset2):WriteInt(1)
+		end,
+		["gb_gunrunning"] = function()
+			-- TODO: fix this. this is bad. seccess depends on mission type (iLocal_1266.f_1)
+			-- this just forces mission failure by setting the number of delivery vehicles to 0 (it only succeeds on type 16)
+			-- but since we set the amount delivered to non-zero, you get paid nonetheless.
+			-- there's also a side effect that could be used as an exploit but will be almost 100% bannable:
+			-- 		we can force mission subtype to 16 and always set delivered amount to num_vehs * 5. This would
+			-- 		guarantee a mission success everytime but the payment would end up being something nonsensical
+			-- 		like $10.5M on subtype 18 (the two semi-trucks mission) you get paid x10 what you should lol
+			--
+			-- Local_1266.f_573 cancels the mission if set to 3
+			local GBGR_LOCAL = SGSL:Get(SGSL.data.gb_gunrunning_sell_local):AsLocal()
+			local offset2    = SGSL:Get(SGSL.data.bunker_sell_amt_delivered):GetOffset(1)
+			local offset3    = SGSL:Get(SGSL.data.bunker_sell_num_vehs):GetOffset(1)
+			-- local vehicles   = GBGR_LOCAL:At(offset3):ReadInt()
+			-- local mission    = GBGR_LOCAL:At(1):ReadInt()
+			-- local num        = (mission == 16 or mission == 14) and 5 or 1 -- func_148()
+			GBGR_LOCAL:At(offset2):WriteInt(1)
+			GBGR_LOCAL:At(offset3):WriteInt(0)
+		end,
+		["gb_contraband_sell"] = function()
+			SGSL:Get(SGSL.data.gb_contraband_sell_local)
+				:AsLocal()
+				:At(1)
+				:WriteInt(99999)
+		end,
+		["gb_biker_contraband_sell"] = function()
+			local GBBKR_OBJ   = SGSL:Get(SGSL.data.biker_deliveries_local)
+			local GBBKR_LOCAL = GBBKR_OBJ:AsLocal()
+			local deliveries  = GBBKR_OBJ:GetOffset(1)
+			local target      = SGSL:Get(SGSL.data.biker_required_deliveries_local):GetOffset(1)
+			local value       = GBBKR_LOCAL:At(target):ReadInt()
+			GBBKR_LOCAL:At(deliveries):WriteInt(value)
+		end,
+		["business_battles_sell"] = function()
+			local Obj              = SGSL:Get(SGSL.data.bb_sell_local)
+			local missionState     = SGSL:Get(SGSL.data.bb_sell_mission_state_offset):GetValue()
+			local vehicleArray     = SGSL:Get(SGSL.data.bb_sell_vehicle_array_offset):GetValue()
+			local BB_SELL          = Obj:AsLocal()
+			local delivReq         = Obj:GetOffset(1)
+			local delivMade        = Obj:GetOffset(2)
+			local deliveryVehLocal = BB_SELL:At(vehicleArray):At(0, 42)
+
+			BB_SELL:At(delivMade):WriteInt(BB_SELL:At(delivReq):ReadInt())
+			deliveryVehLocal:At(29):WriteInt(deliveryVehLocal:At(30):ReadInt())
+			BB_SELL:At(missionState):At(1):WriteInt(4)
+			BB_SELL:At(missionState):WriteInt(30)
+		end,
+		-- ["fm_content_acid_lab_sell"] = function()
+		-- 	local deliveriesObj    = SGSL:Get(SGSL.data.acid_lab_sell_deliveries_local)
+		-- 	local missionStateObj  = SGSL:Get(SGSL.data.acid_lab_sell_mission_state_local)
+		-- 	local genericBitset    = SGSL:Get(SGSL.data.acid_lab_sell_gen_bs):AsLocal()
+		-- 	local deliveriesOffset = deliveriesObj:GetOffset(1)
+		-- 	local deliveriesLocal  = deliveriesObj:AsLocal():At(deliveriesOffset)
+
+		-- 	deliveriesLocal:At(1):WriteInt(deliveriesLocal:ReadInt())
+		-- 	genericBitset:At(1):SetBit(11) -- func_594(11)
+		-- 	missionStateObj:AsLocal():At(missionStateObj:GetOffset(1)):WriteInt(4)
+		-- end
 	},
 	SellMissionTunables = {
 		["CEO"] = {
@@ -453,7 +299,7 @@ local RawBusinessData <const> = {
 			},
 		},
 	},
-	CEOWarehouses = {
+	CEOWarehouses       = {
 		{ size = 0, max = 16,  coords = vec3:new(51.311188, -2568.470947, 6.004591) },
 		{ size = 0, max = 16,  coords = vec3:new(-1081.083740, -1261.013184, 5.648909) },
 		{ size = 0, max = 16,  coords = vec3:new(898.484314, -1031.882446, 34.966454) },
@@ -477,7 +323,7 @@ local RawBusinessData <const> = {
 		{ size = 1, max = 42,  coords = vec3:new(541.587646, -1944.362793, 24.985096) },
 		{ size = 2, max = 111, coords = vec3:new(93.278641, -2216.144775, 6.033320) },
 	},
-	BikerBusinesses = {
+	BikerBusinesses     = {
 		{ gxt = "MP_BWH_METH_1",   id = 3, coords = vec3:new(52.903, 6338.585, 31.35), },
 		{ gxt = "MP_BWH_WEED_1",   id = 1, coords = vec3:new(416.7524, 6520.753, 27.7121), },
 		{ gxt = "MP_BWH_CRACK_1",  id = 4, coords = vec3:new(51.7653, 6486.163, 31.428), },
@@ -499,21 +345,21 @@ local RawBusinessData <const> = {
 		{ gxt = "MP_BWH_CASH_4",   id = 2, coords = vec3:new(671.451, -2667.502, 6.0812), },
 		{ gxt = "MP_BWH_FAKEID_4", id = 0, coords = vec3:new(-331.52, -2778.97, 5.12), },
 	},
-	BikerTunables = {
+	BikerTunables       = {
 		[0] = { max_units = 60, vpu = "BIKER_FAKEIDS_PRODUCT_VALUE", mult_1 = "BIKER_FAKEIDS_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_FAKEIDS_PRODUCT_VALUE_STAFF_UPGRADE" },
 		[1] = { max_units = 80, vpu = "BIKER_WEED_PRODUCT_VALUE", mult_1 = "BIKER_WEED_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_WEED_PRODUCT_VALUE_STAFF_UPGRADE" },
 		[2] = { max_units = 40, vpu = "BIKER_COUNTERCASH_PRODUCT_VALUE", mult_1 = "BIKER_COUNTERCASH_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_COUNTERCASH_PRODUCT_VALUE_STAFF_UPGRADE" },
 		[3] = { max_units = 20, vpu = "BIKER_METH_PRODUCT_VALUE", mult_1 = "BIKER_METH_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_METH_PRODUCT_VALUE_STAFF_UPGRADE" },
 		[4] = { max_units = 10, vpu = "BIKER_CRACK_PRODUCT_VALUE", mult_1 = "BIKER_CRACK_PRODUCT_VALUE_EQUIPMENT_UPGRADE", mult_2 = "BIKER_CRACK_PRODUCT_VALUE_STAFF_UPGRADE" },
 	},
-	Hangars = {
+	Hangars             = {
 		{ coords = vec3:new(-1148.908447, -3406.064697, 13.945053) },
 		{ coords = vec3:new(-1393.322021, -3262.968262, 13.944828) },
 		{ coords = vec3:new(-2022.336304, 3154.936768, 32.810272) },
 		{ coords = vec3:new(-1879.105957, 3106.792969, 32.810234) },
 		{ coords = vec3:new(-2470.278076, 3274.427734, 32.835461) },
 	},
-	Bunkers = {
+	Bunkers             = {
 		[21] = { coords = vec3:new(494.680878, 3015.895996, 41.041725) },
 		[22] = { coords = vec3:new(849.619812, 3024.425781, 41.266800) },
 		[23] = { coords = vec3:new(40.422565, 2929.004395, 55.746357) },
@@ -526,7 +372,7 @@ local RawBusinessData <const> = {
 		[30] = { coords = vec3:new(-3030.341797, 3334.570068, 10.105902) },
 		[31] = { coords = vec3:new(-3156.140625, 1376.710693, 17.073570) },
 	},
-	Facilities = {
+	Facilities          = {
 		{ gxt = "MP_DBASE_1",  coords = vec3:new(1273.1376, 2835.0068, 48.0734) }, -- freemode.c func_7238
 		{ gxt = "MP_DBASE_2",  coords = vec3:new(34.4699, 2620.9768, 84.6202) },
 		{ gxt = "MP_DBASE_3",  coords = vec3:new(2755.9807, 3907.2722, 44.3148) },
@@ -537,7 +383,7 @@ local RawBusinessData <const> = {
 		{ gxt = "MP_DBASE_9",  coords = vec3:new(2086.0674, 1761.3461, 103.043) },
 		{ gxt = "MP_DBASE_10", coords = vec3:new(1864.8027, 269.0474, 163.0169) },
 	},
-	Nightclubs = {
+	Nightclubs          = {
 		{ coords = vec3:new(757.009, -1332.32, 26.1802) }, -- am_mp_nightclub.c func_5118 // case 102: *uParam5 is main entrance corona coords
 		{ coords = vec3:new(345.7519, -978.8848, 28.2681) },
 		{ coords = vec3:new(-120.906, -1260.49, 28.2088) },
@@ -550,18 +396,17 @@ local RawBusinessData <const> = {
 		{ coords = vec3:new(-1174.85, -1152.3, 4.56128) },
 	},
 	---@alias BusinessHubs array<{ name: string, vpu_tunable: string, max_units_tunable: string, prod_time_tunable: string }>
-	BusinessHubs = {
-		-- names are shortened and not localized because GXTs are too wide for our current UI
-		{ name = "Cargo",   vpu_tunable = "BB_BUSINESS_VALUE_CARGO",            max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_CARGO",            prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_CARGO" },
-		{ name = "Weapons", vpu_tunable = "BB_BUSINESS_VALUE_WEAPONS",          max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEAPONS",          prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEAPONS" },
-		{ name = "Cocaine", vpu_tunable = "BB_BUSINESS_VALUE_COKE",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COKE",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COKE" },
-		{ name = "Meth",    vpu_tunable = "BB_BUSINESS_VALUE_METH",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_METH",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_METH" },
-		{ name = "Weed",    vpu_tunable = "BB_BUSINESS_VALUE_WEED",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEED",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEED" },
-		{ name = "Fake ID", vpu_tunable = "BB_BUSINESS_VALUE_FORGED_DOCUMENTS", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_FORGED_DOCUMENTS", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_FORGED_DOCUMENTS" },
-		{ name = "Cash",    vpu_tunable = "BB_BUSINESS_VALUE_COUNTERFEIT_CASH", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COUNTERFEIT_CASH", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COUNTERFEIT_CASH" },
+	BusinessHubs        = {
+		{ vpu_tunable = "BB_BUSINESS_VALUE_CARGO",            max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_CARGO",            prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_CARGO" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_WEAPONS",          max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEAPONS",          prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEAPONS" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_COKE",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COKE",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COKE" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_METH",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_METH",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_METH" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_WEED",             max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_WEED",             prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_WEED" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_FORGED_DOCUMENTS", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_FORGED_DOCUMENTS", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_FORGED_DOCUMENTS" },
+		{ vpu_tunable = "BB_BUSINESS_VALUE_COUNTERFEIT_CASH", max_units_tunable = "BB_BUSINESS_TOTAL_MAX_UNITS_COUNTERFEIT_CASH", prod_time_tunable = "BB_BUSINESS_DEFAULT_ACCRUE_TIME_COUNTERFEIT_CASH" },
 	},
 	-- index + 59
-	VehicleWarehouses = {
+	VehicleWarehouses   = {
 		{ gxt = "MP_WAREHOUSE_1",  coords = vec3:new(-631.693, -1778.812, 22.98) }, -- func_7938 case 60:
 		{ gxt = "MP_WAREHOUSE_2",  coords = vec3:new(1007.344, -1854.104, 30.055) },
 		{ gxt = "MP_WAREHOUSE_3",  coords = vec3:new(-72.690, -1820.721, 25.96) },
@@ -574,14 +419,14 @@ local RawBusinessData <const> = {
 		{ gxt = "MP_WAREHOUSE_10", coords = vec3:new(-1157.2069, -2167.5227, 14.6173) },
 	},
 	-- index + 86
-	Offices = {
+	Offices             = {
 		{ gxt = "MP_PROP_OFF1", coords = vec3:new(-1582.7917, -556.7172, 34.9540) }, -- case 87:
 		{ gxt = "MP_PROP_OFF2", coords = vec3:new(-1371.9658, -505.6313, 33.1574) },
 		{ gxt = "MP_PROP_OFF3", coords = vec3:new(-114.8752, -607.7647, 36.2807) },
 		{ gxt = "MP_PROP_OFF4", coords = vec3:new(-82.6223, -794.0724, 44.2273) },
 	},
 	-- index + 90
-	Clubhouses = {
+	Clubhouses          = {
 		{ gxt = "MP_PROP_CLUBH1",  coords = vec3:new(246.5035, -1798.7494, 26.1131) }, -- case 91:
 		{ gxt = "MP_PROP_CLUBH2",  coords = vec3:new(-1464.5, -927.9, 9.0) },
 		{ gxt = "MP_PROP_CLUBH3",  coords = vec3:new(30.0784, -1024.1604, 28.4469) },
@@ -595,7 +440,7 @@ local RawBusinessData <const> = {
 		{ gxt = "MP_PROP_CLUBH11", coords = vec3:new(-32.1085, 6407.398, 30.4903) },
 		{ gxt = "MP_PROP_CLUBH12", coords = vec3:new(-1138.0574, -1572.1804, 3.4157) },
 	},
-	SalvageYards = {
+	SalvageYards        = {
 		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(-195.0317, 6269.1601, 31.4892) }, -- func_3737 // case 162:
 		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(2508.7229, 4110.6401, 38.3481) },
 		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(-509.6919, -1735.85, 19.1262) },
@@ -603,7 +448,7 @@ local RawBusinessData <const> = {
 		{ gxt = "CELL_SLVG_YRD", coords = vec3:new(1194.7052, -1263.8588, 35.2128) },
 	},
 	-- index + 127
-	Arcades = {
+	Arcades             = {
 		{ gxt = "CELL_ARCADE", coords = vec3:new(-238.9248, 6230.4282, 31.5033) }, -- func_5639 // case 128:
 		{ gxt = "CELL_ARCADE", coords = vec3:new(1710.6895, 4758.3442, 41.9292) },
 		{ gxt = "CELL_ARCADE", coords = vec3:new(-103.9111, -1776.6021, 29.5181) },
@@ -612,27 +457,27 @@ local RawBusinessData <const> = {
 		{ gxt = "CELL_ARCADE", coords = vec3:new(723.8805, -822.3783, 24.7562) },
 	},
 	-- index + 154
-	Agencies = {
+	Agencies            = {
 		{ gxt = "FHQ_E_O_3", coords = vec3:new(390.7725, -78.3233, 68.1805) }, -- func_4471 // case 155: uParam1->f_3
 		{ gxt = "FHQ_E_O_3", coords = vec3:new(-1018.2380, -411.9423, 39.6161) },
 		{ gxt = "FHQ_E_O_3", coords = vec3:new(-590.1196, -705.2702, 36.2811) },
 		{ gxt = "FHQ_E_O_3", coords = vec3:new(-1040.2611, -760.1538, 19.8387) },
 	},
 	-- index + 166
-	BailOffices = {
+	BailOffices         = {
 		{ gxt = "PIM_S_BAOF", coords = vec3:new(485.114, -943.441, 26.161) }, -- func_3540 // case 167: case 0: *uParam2
 		{ gxt = "PIM_S_BAOF", coords = vec3:new(123.352, 13.748, 67.315) },
 		{ gxt = "PIM_S_BAOF", coords = vec3:new(-1412.704, -654.563, 27.673) },
 		{ gxt = "PIM_S_BAOF", coords = vec3:new(127.30589, -1709.8208, 28.28193) },
 		{ gxt = "PIM_S_BAOF", coords = vec3:new(-66.372, 6506.075, 30.536) },
 	},
-	HackerDen = {
+	HackerDen           = {
 		{ gxt = "HD_GARNAME", coords = vec3:new(719.3386, -983.1850, 24.1402) },
 	},
-	FieldHangar = {
+	FieldHangar         = {
 		{ gxt = "FHAN_NME_1", coords = vec3:new(2152.74, 4791.05, 41.17) },
 	},
-	CashSafes = {
+	CashSafes           = {
 		regular = {
 			{
 				property_stat   = "MPX_ARCADE_OWNED",
@@ -641,9 +486,8 @@ local RawBusinessData <const> = {
 				interior_id     = 278273,
 				room_hash       = 3710124102, -- MAINW_RM
 				raw_data_entry  = "Arcades",
-				get_max_cash    = function()
-					return tunables.get_int("MAXARCADESAFESTORAGE")
-				end,
+				get_max_cash    = function() return tunables.get_int("MAXARCADESAFESTORAGE") end,
+				global_offset   = function() return 439 + 5 end
 			},
 			{
 				property_stat   = "MPX_FIXER_HQ_OWNED",
@@ -652,9 +496,8 @@ local RawBusinessData <const> = {
 				interior_id     = 288257,
 				room_hash       = 767622941, -- ROOM_MAIN
 				raw_data_entry  = "Agencies",
-				get_max_cash    = function()
-					return tunables.get_int("MAXFIXERHQSAFESTORAGE")
-				end,
+				get_max_cash    = function() return tunables.get_int("MAXFIXERHQSAFESTORAGE") end,
+				global_offset   = function() return 519 + 2 end
 			},
 			{
 				property_stat   = "MPX_BAIL_OFFICE_OWNED",
@@ -662,9 +505,11 @@ local RawBusinessData <const> = {
 				raw_data_entry  = "BailOffices",
 				interior_id     = 295425,
 				room_hash       = 2990789022, -- ROOM_OFFICE
-				get_max_cash    = function()
-					return tunables.get_int(-1736487760)
-				end,
+				get_max_cash    = function() return tunables.get_int(-1736487760) end,
+				global_offset   = function()
+					local offset = Game.IsEnhanced() and 532 or 531 -- /\*88\d{1}\*/\]\.f_260\.f_53\d{1}\.f_2 = \w+;
+					return offset + 2
+				end
 				-- no paytime_stat; this functions somewhat similar to the clubhouse duffle
 			},
 			{
@@ -674,9 +519,11 @@ local RawBusinessData <const> = {
 				raw_data_entry  = "HackerDen",
 				interior_id     = 297729,
 				room_hash       = 1055494658, -- ROOM_WORKSHOP
-				get_max_cash    = function()
-					return tunables.get_int(-792265290)
-				end,
+				get_max_cash    = function() return tunables.get_int(-792265290) end,
+				global_offset   = function()
+					local offset = Game.IsEnhanced() and 544 or 543
+					return offset + 2
+				end
 			},
 		},
 		fronts = {
@@ -691,27 +538,26 @@ local RawBusinessData <const> = {
 					end
 					return tunables.get_int(1839510301)
 				end,
+				global_offset   = function() return 504 + 6 end
 			},
 			clubhouse = {
 				cash_value_stat = "MPX_BIKER_BAR_RESUPPLY_CASH",
 				interior_id     = 246273,
 				room_hash       = 405984664, -- BIKERDLC_INT01_OFFRM
-				get_max_cash    = function()
-					return tunables.get_int("BIKER_PASSIVE_INCOME_BAG_LIMIT")
-				end,
+				get_max_cash    = function() return tunables.get_int("BIKER_PASSIVE_INCOME_BAG_LIMIT") end,
 				-- there's no paytime stat; naturally there's still a timer
 				-- but this uses a packed stat int and a bool global as well.
 				-- Im not even gonna bother.
 				-- hint: 36620
+				global_offset   = function() return 394 end
 			},
 			nightclub = {
 				cash_value_stat = "MPX_CLUB_SAFE_CASH_VALUE",
 				paytime_stat    = "MPX_CLUB_PAY_TIME_LEFT",
 				interior_id     = 271617,
 				room_hash       = 3920029441, -- "INT_01_ORIFICE"
-				get_max_cash    = function()
-					return tunables.get_int("NIGHTCLUBMAXSAFEVALUE")
-				end,
+				get_max_cash    = function() return tunables.get_int("NIGHTCLUBMAXSAFEVALUE") end,
+				global_offset   = function() return 364 + 6 end
 			},
 		},
 	}

@@ -42,65 +42,51 @@ local function setAllCDCheckboxes(value)
 	GVars.features.yrv3.garment_rob_cd        = value
 	-- GVars.features.yrv3.cfr_cd                = value
 
-	YRV3:SetAllCooldownStatesDirty(true)
+	YRV3:ProcessAllCooldowns()
 end
 
 local cooldownsGrid = GridRenderer.new(1)
 cooldownsGrid:AddCheckbox("YRV3_CEO_BUY_CB", "features.yrv3.ceo_crate_buy_cd", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	onClick = function()
-		YRV3:SetCooldownStateDirty("ceo_crate_buy_cd", true)
-	end
+	onClick           = function() YRV3:ProcessCooldown("ceo_crate_buy_cd") end
 })
 
 cooldownsGrid:AddCheckbox("YRV3_CEO_SELL_CB", "features.yrv3.ceo_crate_sell_cd", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	onClick = function()
-		YRV3:SetCooldownStateDirty("ceo_crate_sell_cd", true)
-	end
+	onClick           = function() YRV3:ProcessCooldown("ceo_crate_sell_cd") end
 })
 
 cooldownsGrid:AddCheckbox("YRV3_CLUB_WORK_CB", "features.yrv3.mc_work_cd", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	onClick = function()
-		YRV3:SetCooldownStateDirty("mc_work_cd", true)
-	end
+	onClick           = function() YRV3:ProcessCooldown("mc_work_cd") end
 })
 
 cooldownsGrid:AddCheckbox("YRV3_HANGAR_STEAL_CB", "features.yrv3.hangar_cd", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	onClick = function()
-		YRV3:SetCooldownStateDirty("hangar_cd", true)
-	end
+	onClick           = function() YRV3:ProcessCooldown("hangar_cd") end
 })
 
 cooldownsGrid:AddCheckbox("YRV3_NC_MANAGMENT_CB", "features.yrv3.nc_management_cd", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	onClick = function()
-		YRV3:SetCooldownStateDirty("nc_management_cd", true)
-	end
+	onClick           = function() YRV3:ProcessCooldown("nc_management_cd") end
 })
 
 cooldownsGrid:AddCheckbox("YRV3_NC_CHANCE_ENCOUNTER_CB", "features.yrv3.nc_vip_mission_chance", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	tooltip = "YRV3_NC_CHANCE_ENCOUNTER_TT",
-	onClick = function()
-		YRV3:SetCooldownStateDirty("nc_vip_mission_chance", true)
-	end
+	tooltip           = "YRV3_NC_CHANCE_ENCOUNTER_TT",
+	onClick           = function() YRV3:ProcessCooldown("nc_vip_mission_chance") end
 })
 
 cooldownsGrid:AddCheckbox("YRV3_HACKER_DEN_CD_CB", "features.yrv3.garment_rob_cd", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	onClick = function()
-		YRV3:SetCooldownStateDirty("garment_rob_cd", true)
-	end
+	onClick           = function() YRV3:ProcessCooldown("garment_rob_cd") end
 })
 
 -- cooldownsGrid:AddCheckbox("YRV3_CFR_CD_CB", "features.yrv3.cfr_cd", {
@@ -112,35 +98,27 @@ cooldownsGrid:AddCheckbox("YRV3_HACKER_DEN_CD_CB", "features.yrv3.garment_rob_cd
 -- })
 
 cooldownsGrid:AddCheckbox("YRV3_DAX_WORK_CB", "features.yrv3.dax_work_cd", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	onClick = function()
-		YRV3:SetCooldownStateDirty("dax_work_cd", true)
-	end
+	onClick           = function() YRV3:ProcessCooldown("dax_work_cd") end
 })
 
 cooldownsGrid:AddCheckbox("YRV3_IE_VEH_STEAL_CB", "features.yrv3.ie_vehicle_steal_cd", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	onClick = function()
-		YRV3:SetCooldownStateDirty("ie_vehicle_steal_cd", true)
-	end
+	onClick           = function() YRV3:ProcessCooldown("ie_vehicle_steal_cd") end
 })
 
 cooldownsGrid:AddCheckbox("YRV3_IE_VEH_SELL_CB", "features.yrv3.ie_vehicle_sell_cd", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	onClick = function()
-		YRV3:SetCooldownStateDirty("ie_vehicle_sell_cd", true)
-	end
+	onClick           = function() YRV3:ProcessCooldown("ie_vehicle_sell_cd") end
 })
 
 cooldownsGrid:AddCheckbox("YRV3_SECURITY_WORK_CB", "features.yrv3.security_missions_cd", {
-	persistent = true,
+	persistent        = true,
 	isTranslatorLabel = true,
-	onClick = function()
-		YRV3:SetCooldownStateDirty("security_missions_cd", true)
-	end
+	onClick           = function() YRV3:ProcessCooldown("security_missions_cd") end
 })
 
 return function()

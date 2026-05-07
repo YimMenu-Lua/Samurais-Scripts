@@ -65,6 +65,12 @@ local function register_commands()
 	yimActions:RegisterCommands()
 end
 
+local function unlock_if_fsl()
+	if (Game.IsFSL()) then
+		GVars.features.unsafe_feats_enabled = true
+	end
+end
+
 GPointers:Init()
 Serializer:FlushObjectQueue()
 Backend:RegisterHandlers()
@@ -72,6 +78,7 @@ Translator:Load()
 GUI:LateInit()
 
 ThreadManager:Run(function()
+	unlock_if_fsl()
 	populate_weapons()
 	register_commands()
 
@@ -87,7 +94,7 @@ ThreadManager:Run(function()
 		LocalPlayer:GetVehicle():RamRight()
 	end)
 
-	while not PatternScanner:IsDone() do
+	while (not PatternScanner:IsDone()) do
 		yield()
 	end
 

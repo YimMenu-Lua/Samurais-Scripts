@@ -191,4 +191,4 @@ function Office:Update()
 	end
 end
 
-return Office
+return Office.new

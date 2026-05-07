@@ -156,6 +156,44 @@ return {
 			}
 		}
 	},
+	car_wash_safe_global = {
+		description = "car wash safe global",
+		file = "freemode.c",
+		LEGACY = {
+			value = 1882572,
+			pattern = [[Global_(\d{7})\[.*?/\*(\d{3})\*/\]\.f_(\d{3})\.f_27\.f_2 = \w+0;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 315,
+					capture_group = 2,
+					description = "player id read size"
+				},
+				{
+					value = 158,
+					capture_group = 3,
+					description = "car wash entry?"
+				},
+			}
+		},
+		ENHANCED = {
+			value = 1882717,
+			pattern = [[Global_(\d{7})\[.*?/\*(\d{3})\*/\]\.f_(\d{3})\.f_27\.f_2 = \w+0;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 315,
+					capture_group = 2,
+					description = "player id read size"
+				},
+				{
+					value = 158,
+					capture_group = 3,
+					description = "car wash entry?"
+				},
+			}
+		}
+	},
 	gb_contraband_buy_local_1 = {
 		description = "Contraband Buy Local 1",
 		file = "gb_contraband_buy.c",
@@ -398,8 +436,34 @@ return {
 			}
 		}
 	},
-	acid_lab_sell_local = {
-		description = "Acid Lab Sell Local",
+	acid_lab_sell_deliveries_local = {
+		description = "Acid Lab Deliveries. This shit is pissing me off and my dumbass doesn't know how to use scrDBG without creating a bazillion GB log file.",
+		file = "fm_content_acid_lab_sell.c",
+		LEGACY = {
+			value = 144,
+			pattern = [[if \(.*?Local_(\d{3})\.f_(\d{1}) !=.*?Local_\d{3}\.f_\d{4}\[0 /\*6\*/\]\.f_2\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 9,
+					capture_group = 2
+				}
+			}
+		},
+		ENHANCED = {
+			value = 146,
+			pattern = [[if \(.*?Local_(\d{3})\.f_(\d{1}) !=.*?Local_\d{3}\.f_\d{4}\[0 /\*6\*/\]\.f_2\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 9,
+					capture_group = 2
+				}
+			}
+		}
+	},
+	acid_lab_sell_mission_state_local = {
+		description = "Acid Lab Mission State",
 		file = "fm_content_acid_lab_sell.c",
 		LEGACY = {
 			value = 5723,
@@ -424,7 +488,7 @@ return {
 			}
 		}
 	},
-	acid_lab_sell_bitset = {
+	acid_lab_sell_gen_bs = {
 		description = "Acid Lab Sell Generic Bitset",
 		file = "fm_content_acid_lab_sell.c",
 		LEGACY = {
@@ -873,6 +937,72 @@ return {
 					description = "read size."
 				}
 			}
+		}
+	},
+	bb_sell_local = {
+		description = "business battles sell local",
+		file = "business_battles_sell.c",
+		LEGACY = {
+			value = 2386,
+			pattern = [[if.*?Local_(\d{4})\.f_(\d{3}) -.*?Local_\d{4}\.f_(\d{3}) <= 1 && func_\d+\(28\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 203,
+					capture_group = 2,
+					description = "required deliveries"
+				},
+				{
+					value = 202,
+					capture_group = 3,
+					description = "deliveries made"
+				}
+			}
+		},
+		ENHANCED = {
+			value = 2388,
+			pattern = [[if.*?Local_(\d{4})\.f_(\d{3}) -.*?Local_\d{4}\.f_(\d{3}) <= 1 && func_\d+\(28\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 205,
+					capture_group = 2,
+					description = "required deliveries"
+				},
+				{
+					value = 204,
+					capture_group = 3,
+					description = "deliveries made"
+				}
+			}
+		}
+	},
+	bb_sell_mission_state_offset = {
+		description = "business battles sell mission state local",
+		file = "business_battles_sell.c",
+		LEGACY = {
+			value = 25,
+			pattern = [[if \(!NETWORK::NETWORK_IS_HOST_OF_THIS_SCRIPT\(\)\).*?\n\s+?return;.*?\n.*?\n.*?Local_\d{4}\.f_(\d{2})\s+?=\s+?\w+0;]],
+			capture_group = 1,
+		},
+		ENHANCED = {
+			value = 27,
+			pattern = [[if \(!NETWORK::NETWORK_IS_HOST_OF_THIS_SCRIPT\(\)\).*?\n\s+?return;.*?\n.*?\n.*?Local_\d{4}\.f_(\d{2})\s+?=\s+?\w+0;]],
+			capture_group = 1,
+		}
+	},
+	bb_sell_vehicle_array_offset = {
+		description = "business battles sell mission vehicle array",
+		file = "business_battles_sell.c",
+		LEGACY = {
+			value = 32,
+			pattern = [[Local_\d{4}\.f_(\d{2})\[i /\*42\*/\]\.f_30 = func_\d{3}\(\);]],
+			capture_group = 1,
+		},
+		ENHANCED = {
+			value = 34,
+			pattern = [[Local_\d{4}\.f_(\d{2})\[i /\*42\*/\]\.f_30 = func_\d{3}\(\);]],
+			capture_group = 1,
 		}
 	},
 	request_services_global = {

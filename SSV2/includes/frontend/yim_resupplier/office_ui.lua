@@ -9,10 +9,10 @@
 
 
 local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local drawNamePlate         = require("includes.frontend.yim_resupplier.nameplate_ui")
-local drawVehicleWarehouse  = require("includes.frontend.yim_resupplier.vehicle_warehouse")
-local drawWarehouse         = require("includes.frontend.yim_resupplier.warehouse")
 local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
+local drawNamePlate         = require("nameplate_ui")
+local drawVehicleWarehouse  = require("vehicle_warehouse_ui")
+local drawWarehouse         = require("warehouse_ui")
 local colMoneyGreen <const> = Color("#85BB65")
 
 ---@type array<integer>

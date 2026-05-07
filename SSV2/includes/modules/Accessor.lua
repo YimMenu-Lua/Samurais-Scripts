@@ -222,21 +222,19 @@ end
 ---------------------------
 
 ---@param pos integer
-function Accessor:SetBit(pos)
-	if (math.type(pos) ~= "integer") then
-		return
-	end
+---@return integer
+function Accessor:GetBit(pos)
+	return self:ReadInt() & (1 << pos)
+end
 
+---@param pos integer
+function Accessor:SetBit(pos)
 	local v = self:ReadInt()
 	self:WriteInt(Bit.Set(v, pos))
 end
 
 ---@param pos integer
 function Accessor:ClearBit(pos)
-	if (math.type(pos) ~= "integer") then
-		return
-	end
-
 	local v = self:ReadInt()
 	self:WriteInt(Bit.Clear(v, pos))
 end

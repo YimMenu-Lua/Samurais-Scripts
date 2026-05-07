@@ -82,6 +82,9 @@ Enums.eWarehouseType = {
 ---@field private m_coords vec3
 ---@field private m_size integer
 ---@field private m_max_units integer
+---@field private m_contraband_count_stat string
+---@field private m_assistant_sourcing_func function
+---@field private m_prod_value_func fun(count: integer): integer
 ---@field public auto_fill boolean
 local Warehouse = setmetatable({}, BusinessBase)
 Warehouse.__index = Warehouse
@@ -98,6 +101,26 @@ function Warehouse.new(opts, warehouse_type)
 	instance.m_size              = opts.size
 	instance.auto_fill           = false
 	instance.m_auto_fill_running = false
+
+	if (warehouse_type == Enums.eWarehouseType.HANGAR) then
+		instance.m_contraband_count_stat = "MPX_HANGAR_CONTRABAND_TOTAL"
+		instance.m_assistant_sourcing_func = function()
+			stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
+		end
+		instance.m_prod_value_func = function(count)
+			return math.floor(count * 3e4)
+		end
+	elseif (warehouse_type == Enums.eWarehouseType.SPECIAL_CARGO) then
+		local id = opts.id
+		assert(type(id) == "number" and math.is_inrange(id, 0, 4), "Invalid special cargo warehouse ID.")
+		instance.m_contraband_count_stat = _F("MPX_CONTOTALFORWHOUSE%d", id)
+		instance.m_assistant_sourcing_func = function()
+			stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, id + 12)
+		end
+		instance.m_prod_value_func = function(count)
+			return GetCEOCratesValue(count)
+		end
+	end
 
 	return instance
 end
@@ -120,28 +143,17 @@ end
 
 ---@return integer
 function Warehouse:GetProductCount()
-	if (self.m_type == Enums.eWarehouseType.HANGAR) then
-		return stats.get_int("MPX_HANGAR_CONTRABAND_TOTAL")
-	elseif (self.m_type == Enums.eWarehouseType.SPECIAL_CARGO) then
-		if (not self.m_id or not math.is_inrange(self.m_id, 0, 4)) then
-			return 0
-		end
-		return stats.get_int(_F("MPX_CONTOTALFORWHOUSE%d", self.m_id))
-	end
-
-	return 0
+	return stats.get_int(self.m_contraband_count_stat)
 end
 
 ---@return integer
 function Warehouse:GetProductValue()
-	local stock = self:GetProductCount()
-	if (self.m_type == Enums.eWarehouseType.HANGAR) then
-		return math.floor(stock * 3e4)
-	elseif (self.m_type == Enums.eWarehouseType.SPECIAL_CARGO) then
-		return GetCEOCratesValue(stock)
+	if (not self.m_prod_value_func) then
+		return 0
 	end
 
-	return 0
+	local count = self:GetProductCount()
+	return count > 0 and self.m_prod_value_func(count) or 0
 end
 
 ---@return boolean
@@ -155,14 +167,11 @@ function Warehouse:ReStock()
 		return
 	end
 
-	if (self.m_type == Enums.eWarehouseType.HANGAR) then
-		stats.set_bool_masked("MPX_DLC22022PSTAT_BOOL3", true, 9)
-	elseif (self.m_type == Enums.eWarehouseType.SPECIAL_CARGO) then
-		if (not self.m_id or not math.is_inrange(self.m_id, 0, 4)) then
-			return 0
-		end
-		stats.set_bool_masked("MPX_FIXERPSTAT_BOOL1", true, self.m_id + 12)
+	if (not self.m_assistant_sourcing_func) then
+		return
 	end
+
+	self.m_assistant_sourcing_func()
 end
 
 function Warehouse:AutoFill()

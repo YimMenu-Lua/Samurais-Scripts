@@ -32,9 +32,7 @@ local __base_fields__ <const> = {
 local fVector3 <const> = setmetatable({}, {
 	__type     = "fVector3",
 	__ptr_ctor = true,
-	__call     = function(t, ...)
-		return t.new(...)
-	end
+	__call     = function(t, ...) return t.new(...) end
 })
 
 ---@private

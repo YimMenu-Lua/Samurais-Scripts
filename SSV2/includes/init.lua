@@ -14,6 +14,20 @@
 -- pointers available globally through the `GPointers` table.
 ---@module "init"
 
+
+-- ### Enums Namespace.
+--
+-- All enums are stored here to avoid polluting the global namespace.
+Enums = require("includes.data.enums.__init__")
+
+---@enum eGameBranch
+Enums.eGameBranch = {
+	LAGECY   = 1,
+	ENHANCED = 2,
+	MOCK     = 99,
+}
+
+
 ---@class VersionInfo
 ---@field build string
 ---@field online string
@@ -26,16 +40,10 @@ local DEFAULT_CONFIG <const> = require("includes.data.config")
 
 ---@type GAME_VERSION
 local GAME_VERSION <const>   = {
-	[1]  = { build = "3788.0", online = "1.72" },
-	[2]  = { build = "1013.29", online = "1.72" },
-	[99] = { build = "any", online = "any" },
+	[Enums.eGameBranch.LAGECY]   = { build = "3788.0", online = "1.72" },
+	[Enums.eGameBranch.ENHANCED] = { build = "1013.34", online = "1.72" },
+	[Enums.eGameBranch.MOCK]     = { build = "any", online = "any" },
 }
-
-
--- ### Enums Namespace.
---
--- All enums are stored here to avoid polluting the global namespace.
-Enums = require("includes.data.enums.__init__")
 
 
 -- ### Backend Module

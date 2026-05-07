@@ -7,15 +7,14 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YRV3                   = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local measureBulletWidths    = require("includes.frontend.helpers.measure_text_width")
-local drawNamePlate          = require("includes.frontend.yim_resupplier.nameplate_ui")
-local drawCashSafeLoopToggle = require("includes.frontend.yim_resupplier.cashloop_toggle")
-local colMoneyGreen <const>  = Color("#85BB65")
-local childWidth             = 240
+local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
+local drawNamePlate         = require("nameplate_ui")
+local colMoneyGreen <const> = Color("#85BB65")
+local childWidth            = 240
 
 ---@type table<integer, integer>
-local bulletWidths           = {}
+local bulletWidths          = {}
 
 return function()
 	local SalvageYard = YRV3:GetSalvageYard()
@@ -24,6 +23,7 @@ return function()
 		return
 	end
 
+	local unsafeFeatsEnabled = GVars.features.unsafe_feats_enabled
 	drawNamePlate(
 		SalvageYard,
 		SalvageYard:GetName(),
@@ -68,22 +68,28 @@ return function()
 	end
 	ImGui.EndDisabled()
 
-	GVars.features.yrv3.sy_always_max_income, _ = GUI:CustomToggle(
-		_T("SY_ALWAYS_MAX_INCOME"),
+	ImGui.BeginDisabled(not unsafeFeatsEnabled)
+	if (cashSafe:CanInstaFill()) then
+		ImGui.BeginDisabled(cashValue == maxCash)
+		if (GUI:Button(_T("YRV3_CASH_FILL"))) then
+			cashSafe:FillNow()
+		end
+		ImGui.EndDisabled()
+		GUI:HelpMarker(_T("YRV3_CASH_FILL_TT"))
+	end
+
+	if (cashSafe:CanLoop()) then
+		ImGui.BeginDisabled(cashValue >= maxCash)
+		cashSafe.cash_loop_enabled = GUI:CustomToggle(_T("YRV3_CASH_LOOP"), cashSafe.cash_loop_enabled)
+		ImGui.EndDisabled()
+	end
+	ImGui.EndDisabled()
+
+	GVars.features.yrv3.sy_always_max_income = GUI:CustomToggle(_T("SY_ALWAYS_MAX_INCOME"),
 		GVars.features.yrv3.sy_always_max_income,
-		{
-			onClick = function(v)
-				if (v) then
-					SalvageYard:LockIncomeDecay()
-				else
-					SalvageYard:RestoreIncomeDecay()
-				end
-			end,
-		}
+		{ onClick = function(v) SalvageYard:ToggleIncomeDecay(v) end }
 	)
 	GUI:HelpMarker(_T("SY_ALWAYS_MAX_INCOME_TT"))
-
-	drawCashSafeLoopToggle(cashSafe)
 
 	ImGui.Spacing()
 	ImGui.BeginTabBar("##salvage_yard_tb")
@@ -92,11 +98,7 @@ return function()
 		GVars.features.yrv3.sy_disable_tow_cd = GUI:CustomToggle(
 			_T("SY_DISABLE_TOWING_COOLDOWN"),
 			GVars.features.yrv3.sy_disable_tow_cd,
-			{
-				onClick = function()
-					YRV3:SetCooldownStateDirty("sy_disable_tow_cd", true)
-				end
-			}
+			{ onClick = function() YRV3:ProcessCooldown("sy_disable_tow_cd") end }
 		)
 		ImGui.BeginDisabled(not SalvageYard:IsTowMissionActive() or SalvageYard:IsBringingTowMissionTarget())
 		if (GUI:Button(_T("SY_TOW_MISSION_BRING_VEH"))) then
@@ -166,22 +168,14 @@ return function()
 		GVars.features.yrv3.sy_disable_rob_cd = GUI:CustomToggle(
 			_T("SY_DISABLE_COOLDOWN"),
 			GVars.features.yrv3.sy_disable_rob_cd,
-			{
-				onClick = function()
-					YRV3:SetCooldownStateDirty("sy_disable_rob_cd", true)
-				end
-			}
+			{ onClick = function() YRV3:ProcessCooldown("sy_disable_rob_cd") end }
 		)
 
 		ImGui.SameLine()
 		GVars.features.yrv3.sy_disable_rob_weekly_cd = GUI:CustomToggle(
 			_T("SY_DISABLE_WEEKLY_COOLDOWN"),
 			GVars.features.yrv3.sy_disable_rob_weekly_cd,
-			{
-				onClick = function()
-					YRV3:SetCooldownStateDirty("sy_disable_rob_weekly_cd", true)
-				end
-			}
+			{ onClick = function(v) SalvageYard:ToggleWeeklyCooldown(v) end }
 		)
 
 		ImGui.Spacing()

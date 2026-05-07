@@ -716,7 +716,7 @@ function GUI:__DrawImpl()
 	local topBarHeight = self:GetMaxTopBarHeight()
 
 	self:OnDrawCallback(topBarHeight)
-	self.m_snap_animator:Apply()
+	self.m_snap_animator:OnFrame()
 
 	ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
 	if (ImGui.Begin(self.m_main_window_label, mainWindowFlags)) then

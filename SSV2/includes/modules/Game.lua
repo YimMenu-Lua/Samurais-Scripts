@@ -30,7 +30,8 @@ local SP_CharNames <const> = {
 --
 -- Native wrappers and generic helpers.
 ---@class Game
-Game         = {}
+---@field private m_fsl_enabled boolean
+Game         = { m_fsl_enabled = false }
 Game.__index = Game
 
 ---@return VersionInfo
@@ -89,6 +90,16 @@ end
 ---@return boolean
 function Game.IsEnhanced()
 	return Backend:GetGameBranch() == Enums.eGameBranch.ENHANCED
+end
+
+-- `IsFileSaveLocal`. Works the same with CLS.
+---@return boolean
+function Game.IsFSL()
+	if (not Game.m_fsl_enabled) then
+		Game.m_fsl_enabled = not NETSHOPPING.NET_GAMESERVER_USE_SERVER_TRANSACTIONS()
+	end
+
+	return Game.m_fsl_enabled
 end
 
 ---@return boolean
@@ -1280,6 +1291,29 @@ end
 ---@return string -- model name or literal "NULL"
 function Game.GetVehicleModelName(modelHash)
 	return veh_hashmap[modelHash] or "NULL"
+end
+
+---@param handle handle
+---@return array<handle>
+function Game.GetVehicleOccupants(handle)
+	if (not Game.IsScriptHandle(handle)) then
+		return {}
+	end
+
+	---@type array<handle>
+	local passengers = {}
+	local max_seats  = VEHICLE.GET_VEHICLE_MODEL_NUMBER_OF_SEATS(Game.GetEntityModel(handle))
+
+	for i = -1, max_seats do
+		if not VEHICLE.IS_VEHICLE_SEAT_FREE(handle, i, true) then
+			local ped = VEHICLE.GET_PED_IN_VEHICLE_SEAT(handle, i, false)
+			if (ped and ped ~= 0) then
+				table.insert(passengers, ped)
+			end
+		end
+	end
+
+	return passengers
 end
 
 ---@param weapon string|joaat_t

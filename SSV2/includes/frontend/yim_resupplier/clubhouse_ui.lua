@@ -7,10 +7,10 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local drawNamePlate       = require("includes.frontend.yim_resupplier.nameplate_ui")
-local drawFactory         = require("includes.frontend.yim_resupplier.factory_ui")
-local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
 local YRV3                = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
+local drawNamePlate       = require("nameplate_ui")
+local drawFactory         = require("factory_ui")
 
 ---@type array<integer>
 local bulletWidths        = {}
@@ -22,6 +22,7 @@ return function()
 		return
 	end
 
+	local unsafeFeatsEnabled = GVars.features.unsafe_feats_enabled
 	drawNamePlate(
 		clubhouse,
 		clubhouse:GetCustomName(),
@@ -56,6 +57,23 @@ return function()
 	ImGui.BulletText(_T("YRV3_MC_CLIENT_BIKE_LABEL"))
 	ImGui.SameLine(bulletWidth)
 	ImGui.Text(clubhouse:GetClientBikeName())
+
+	ImGui.BeginDisabled(not unsafeFeatsEnabled)
+	if (cashSafe:CanInstaFill()) then
+		ImGui.BeginDisabled(cashValue == maxCash)
+		if (GUI:Button(_T("YRV3_CASH_FILL"))) then
+			cashSafe:FillNow()
+		end
+		ImGui.EndDisabled()
+		GUI:HelpMarker(_T("YRV3_CASH_FILL_TT"))
+	end
+
+	if (cashSafe:CanLoop()) then
+		ImGui.BeginDisabled(cashValue >= maxCash)
+		cashSafe.cash_loop_enabled = GUI:CustomToggle(_T("YRV3_CASH_LOOP"), cashSafe.cash_loop_enabled)
+		ImGui.EndDisabled()
+	end
+	ImGui.EndDisabled()
 
 	ImGui.Spacing()
 	ImGui.SeparatorText(_T("YRV3_BUSINESSES_LABEL"))

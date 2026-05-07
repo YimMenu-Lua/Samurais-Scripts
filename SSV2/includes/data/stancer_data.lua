@@ -21,16 +21,16 @@ return {
 		{
 			key   = "m_toe",
 			axle  = Enums.eWheelAxle.FRONT,
-			read  = function(w) return w.m_rotation.y end,
-			write = function(w, v) w.m_rotation.y = v end
+			read  = function(w) return w.m_rotation_axis.y end,
+			write = function(w, v) w.m_rotation_axis.y = v end
 		},
 		{
 			key   = "m_camber",
 			axle  = Enums.eWheelAxle.FRONT,
-			read  = function(w) return w.m_rotation.y end,
+			read  = function(w) return w.m_rotation_axis.y end,
 			write = function(w, v)
-				w.m_rotation.z = v
-				w.m_rotation_inv.y = -v
+				w.m_rotation_axis.z = v
+				w.m_constraint_axis.y = -v
 			end
 		},
 		{
@@ -75,16 +75,16 @@ return {
 		{
 			key   = "m_toe",
 			axle  = Enums.eWheelAxle.REAR,
-			read  = function(w) return w.m_rotation.y end,
-			write = function(w, v) w.m_rotation.y = v end
+			read  = function(w) return w.m_rotation_axis.y end,
+			write = function(w, v) w.m_rotation_axis.y = v end
 		},
 		{
 			key   = "m_camber",
 			axle  = Enums.eWheelAxle.REAR,
-			read  = function(w) return w.m_rotation.z end,
+			read  = function(w) return w.m_rotation_axis.z end,
 			write = function(w, v)
-				w.m_rotation.z     = v
-				w.m_rotation_inv.y = -v
+				w.m_rotation_axis.z   = v
+				w.m_constraint_axis.y = -v
 			end
 		},
 		{

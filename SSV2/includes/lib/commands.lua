@@ -10,23 +10,39 @@
 local YRV3 = require("includes.features.online.yim_resupplier.YimResupplierV3")
 
 local commandRegistry <const> = {
-	["yrv3.finish_sale"] = {
+	["toggle_unsafe_feats"] = {
 		callback = function(_)
-			YRV3:CommandFinishSale()
+			if (Game.IsFSL()) then
+				GVars.features.unsafe_feats_enabled = true
+				return
+			end
+
+			GVars.features.unsafe_feats_enabled = not GVars.features.unsafe_feats_enabled
+			local enabled = GVars.features.unsafe_feats_enabled
+			local msg = enabled and "YRV3_UNSAFE_FEATS_ENABLED" or "YRV3_UNSAFE_FEATS_DISABLED"
+			local level = enabled and Enums.eNotificationLevel.WARNING or Enums.eNotificationLevel.MESSAGE
+			Notifier:Add("YRV3", _T(msg), level)
 		end,
-		opts = { description = "Automatically finishes any sale mission you have at the moment (limited to missions supported by YRV3)." }
+		opts = {
+			description = "Toggles unsafe features. Does nothing if FSL is enabled.",
+			alias       = { "yolo", "dangerzone", "fuckit", "ilikeitraw" }
+		}
+	},
+	["yrv3.fill_all_safes"] = {
+		callback = function(_) YRV3:FillAllSafes() end,
+		opts     = { description = "Fills all owned safes." }
+	},
+	["yrv3.finish_sale"] = {
+		callback = function(_) YRV3:CommandFinishSale() end,
+		opts     = { description = "Automatically finishes any sale mission you have at the moment (limited to missions supported by YRV3)." }
 	},
 	["yrv3.restock_all"] = {
-		callback = function(_)
-			YRV3:FillAll()
-		end,
-		opts = { description = "Restocks all your owned businesses." }
+		callback = function(_) YRV3:FillAll() end,
+		opts     = { description = "Restocks all your owned businesses." }
 	},
 	["yrv3.restock_hangar"] = {
-		callback = function(_)
-			YRV3:CommandHangarAutoFill()
-		end,
-		opts = { description = "Restocks your hangar." }
+		callback = function(_) YRV3:CommandHangarAutoFill() end,
+		opts     = { description = "Restocks your hangar." }
 	},
 	["yrv3.restock_warehouse"] = {
 		callback = function(args)
@@ -160,7 +176,7 @@ local commandRegistry <const> = {
 		end,
 		opts = {
 			args = { "Optional: file_name<string>" },
-			description = "Saves the vehicle you're currently sitting in to JSON."
+			description = "Saves the vehicle you're currently sitting in to JSON. Does nothing if you're on foot."
 		}
 	},
 	["spawnjsonveh"] = {
