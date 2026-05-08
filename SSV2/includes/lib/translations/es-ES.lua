@@ -424,7 +424,7 @@ return {
 	["VEH_RALLY_TYRES"] = "Neumáticos de rally",
 	["VEH_RALLY_TYRES_TT"] = "Equipa su vehículo con neumáticos de rallye que mejoran aún más el manejo todoterreno.",
 	["VEH_OFFROAD_ABILITIES"] = "Entusiasta del todoterreno",
-	["VEH_OFFROAD_ABILITIES_TT"] = "Aumenta las capacidades todoterreno de su vehículo.",
+	["VEH_OFFROAD_ABILITIES_TT"] = "Funciona en paralelo con 'Stancer' para aumentar las capacidades todoterreno de su vehículo: aumenta la altura de manejo, ensancha el ancho de vía, fuerza RPM suaves, bloquea los diferenciales delantero y trasero, etc.\n\nPD: se recomienda tener habilitada la opción 'Vehículos rápidos' en la pestaña principal del vehículo (se puede alternar usando el comando 'fastvehs').",
 	["VEH_KERS_BOOST_TT"] = "Equipa su vehículo con impulso KERS (Sistema de recuperación de energía cinética), similar a los autos de F1.",
 	["VEH_FORCE_NO_TC_TT"] = "Obliga a tu vehículo a no tener control de tracción o estabilidad.\nCon esto habilitado, las bicicletas también podrán deslizarse y derrapar.",
 	["VEH_ROCKET_BOOST"] = "Impulso de cohete",

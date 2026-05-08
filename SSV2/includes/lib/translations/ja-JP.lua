@@ -413,7 +413,7 @@ return {
 	["SUBTAB_HANDLING_EDITOR"] = "ハンドリングエディター",
 	["VEH_NO_ENGINE_BRAKE_TT"] = "アクセルを踏んでいなくても速度をあまり落とさずに惰性走行できるようになります。",
 	["VEH_KERS_BOOST_TT"] = "F1 マシンと同様に、車両に KERS (運動エネルギー回生システム) ブーストを装備します。",
-	["VEH_OFFROAD_ABILITIES_TT"] = "車両のオフロード能力を向上させます。",
+	["VEH_OFFROAD_ABILITIES_TT"] = "「スタンサー」と連携して車両のオフロード能力を向上させます。車高を上げ、トレッド幅を広げ、スムーズな RPM を強制し、前後の差動装置をロックします。\n\nPS: メイン車両タブの「高速車両」オプションを有効にすることをお勧めします (「fastvehs」コマンドを使用して切り替えることができます)。",
 	["SUBTAB_GUI"] = "ユーザーインターフェース",
 	["GENERIC_GENERAL_LABEL"] = "一般的な",
 	["SELF_LASER_SIGHTS"] = "レーザー照準器",

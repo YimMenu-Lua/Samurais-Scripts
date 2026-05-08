@@ -21,51 +21,51 @@ local BIKES_BIT <const> = Enums.eVehicleType.VEHICLE_TYPE_BIKE
 ---@type array<HandlingPresetData>
 return {
 	{
-		name                  = "VEH_NO_ENGINE_BRAKE",
-		description           = "VEH_NO_ENGINE_BRAKE_TT",
-		is_translator_name    = true,
-		auto_apply            = true,
-		deltas                = { [Enums.eHandlingEditorTypes.TYPE_HF] = { ["FREEWHEEL_NO_GAS"] = true } },
-		allowed_vehicle_types = 1 << CARS_BIT | 1 << BIKES_BIT,
+		name               = "VEH_NO_ENGINE_BRAKE",
+		description        = "VEH_NO_ENGINE_BRAKE_TT",
+		is_translator_name = true,
+		auto_apply         = true,
+		deltas             = { [Enums.eHandlingEditorTypes.TYPE_HF] = { ["FREEWHEEL_NO_GAS"] = true } },
+		vehicle_bitset     = 1 << CARS_BIT | 1 << BIKES_BIT,
 	},
 	{
-		name                  = "VEH_WHEELIE",
-		description           = "VEH_WHEELIE_TT",
-		is_translator_name    = true,
-		auto_apply            = false,
-		deltas                = { [Enums.eHandlingEditorTypes.TYPE_AF] = { ["CAN_WHEELIE"] = true } },
-		allowed_vehicle_types = 1 << CARS_BIT,
+		name               = "VEH_WHEELIE",
+		description        = "VEH_WHEELIE_TT",
+		is_translator_name = true,
+		auto_apply         = false,
+		deltas             = { [Enums.eHandlingEditorTypes.TYPE_AF] = { ["CAN_WHEELIE"] = true } },
+		vehicle_bitset     = 1 << CARS_BIT,
 	},
 	{
-		name                  = "VEH_KERS_BOOST",
-		description           = "VEH_KERS_BOOST_TT",
-		is_translator_name    = true,
-		auto_apply            = false,
-		deltas                = { [Enums.eHandlingEditorTypes.TYPE_HF] = { ["HAS_KERS"] = true } },
-		allowed_vehicle_types = 1 << CARS_BIT
+		name               = "VEH_KERS_BOOST",
+		description        = "VEH_KERS_BOOST_TT",
+		is_translator_name = true,
+		auto_apply         = false,
+		deltas             = { [Enums.eHandlingEditorTypes.TYPE_HF] = { ["HAS_KERS"] = true } },
+		vehicle_bitset     = 1 << CARS_BIT
 	},
 	{
-		name                  = "VEH_ROCKET_BOOST",
-		description           = "VEH_ROCKET_BOOST_TT",
-		is_translator_name    = true,
-		auto_apply            = false,
-		deltas                = { [Enums.eHandlingEditorTypes.TYPE_MIF] = { ["HAS_ROCKET_BOOST"] = true } },
-		allowed_vehicle_types = 1 << CARS_BIT | 1 << BIKES_BIT
+		name               = "VEH_ROCKET_BOOST",
+		description        = "VEH_ROCKET_BOOST_TT",
+		is_translator_name = true,
+		auto_apply         = false,
+		deltas             = { [Enums.eHandlingEditorTypes.TYPE_MIF] = { ["HAS_ROCKET_BOOST"] = true } },
+		vehicle_bitset     = 1 << CARS_BIT | 1 << BIKES_BIT
 	},
 	{
-		name                  = "VEH_JUMP",
-		description           = "VEH_JUMP_TT",
-		is_translator_name    = true,
-		auto_apply            = false,
-		deltas                = { [Enums.eHandlingEditorTypes.TYPE_MIF] = { ["JUMPING_CAR"] = true, ["HAS_PARACHUTE"] = true, } },
-		allowed_vehicle_types = 1 << CARS_BIT
+		name               = "VEH_JUMP",
+		description        = "VEH_JUMP_TT",
+		is_translator_name = true,
+		auto_apply         = false,
+		deltas             = { [Enums.eHandlingEditorTypes.TYPE_MIF] = { ["JUMPING_CAR"] = true, ["HAS_PARACHUTE"] = true, } },
+		vehicle_bitset     = 1 << CARS_BIT
 	},
 	{
-		name                  = "VEH_OFFROAD_ABILITIES",
-		description           = "VEH_OFFROAD_ABILITIES_TT",
-		is_translator_name    = true,
-		auto_apply            = false,
-		deltas                = {
+		name               = "VEH_OFFROAD_ABILITIES",
+		description        = "VEH_OFFROAD_ABILITIES_TT",
+		is_translator_name = true,
+		auto_apply         = false,
+		deltas             = {
 			[Enums.eHandlingEditorTypes.TYPE_HF] = {
 				["OFFROAD_ABILITIES"]                         = true,
 				["OFFROAD_ABILITIES_X2"]                      = true,
@@ -83,14 +83,14 @@ return {
 			},
 			[Enums.eHandlingEditorTypes.TYPE_MIF] = { ["INCREASE_LOW_SPEED_TORQUE"] = true, },
 		},
-		allowed_vehicle_types = 1 << CARS_BIT
+		vehicle_bitset     = 1 << CARS_BIT
 	},
 	{
-		name                  = "VEH_FORCE_NO_TC",
-		description           = "VEH_FORCE_NO_TC_TT",
-		is_translator_name    = true,
-		auto_apply            = false,
-		deltas                = {
+		name               = "VEH_FORCE_NO_TC",
+		description        = "VEH_FORCE_NO_TC_TT",
+		is_translator_name = true,
+		auto_apply         = false,
+		deltas             = {
 			[Enums.eHandlingEditorTypes.TYPE_HF] = { ["FORCE_NO_TC_OR_SC"] = true },
 			[Enums.eHandlingEditorTypes.TYPE_AF] = {
 				["HOLD_GEAR_WITH_WHEELSPIN"] = true,
@@ -104,23 +104,23 @@ return {
 				["DONT_HOLD_LOW_GEARS_WHEN_ENGINE_UNDER_LOAD"] = false,
 			},
 		},
-		allowed_vehicle_types = 1 << CARS_BIT | 1 << BIKES_BIT
+		vehicle_bitset     = 1 << CARS_BIT | 1 << BIKES_BIT
 	},
 	{
-		name                  = "VEH_LOW_SPEED_WHEELIE",
-		description           = "VEH_LOW_SPEED_WHEELIE_TT",
-		is_translator_name    = true,
-		auto_apply            = false,
-		deltas                = {
+		name               = "VEH_LOW_SPEED_WHEELIE",
+		description        = "VEH_LOW_SPEED_WHEELIE_TT",
+		is_translator_name = true,
+		auto_apply         = false,
+		deltas             = {
 			[Enums.eHandlingEditorTypes.TYPE_HF] = { ["LOW_SPEED_WHEELIES"] = true } },
-		allowed_vehicle_types = 1 << BIKES_BIT
+		vehicle_bitset     = 1 << BIKES_BIT
 	},
 	{
-		name                  = "VEH_RAMP",
-		description           = "VEH_RAMP_TT",
-		is_translator_name    = true,
-		auto_apply            = false,
-		deltas                = {
+		name               = "VEH_RAMP",
+		description        = "VEH_RAMP_TT",
+		is_translator_name = true,
+		auto_apply         = false,
+		deltas             = {
 			[Enums.eHandlingEditorTypes.TYPE_MIF] = {
 				["CRUSHES_OTHER_VEHICLES"]                      = true,
 				["HAS_INCREASED_RAMMING_FORCE"]                 = true,
@@ -131,6 +131,6 @@ return {
 				["RAMP_MOD"]                                    = true,
 			},
 		},
-		allowed_vehicle_types = 1 << CARS_BIT
+		vehicle_bitset     = 1 << CARS_BIT
 	},
 }

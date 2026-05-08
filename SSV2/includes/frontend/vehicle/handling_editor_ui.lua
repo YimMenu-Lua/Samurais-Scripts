@@ -9,11 +9,22 @@
 
 local HandlingEditor           = require("includes.modules.HandlingEditor")
 local Mutex                    = require("includes.classes.Mutex")
+local TableRenderer            = require("includes.frontend.helpers.TableRenderer").new()
 local measureTextWidth         = require("includes.frontend.helpers.measure_text_width")
 local PV <const>               = LocalPlayer:GetVehicle()
 local CARS_BIT <const>         = Enums.eVehicleType.VEHICLE_TYPE_CAR
 local BIKES_BIT <const>        = Enums.eVehicleType.VEHICLE_TYPE_BIKE
+local BIT_TEST <const>         = Bit.IsBitSet
 local presetChildSize          = vec2:new(200, 240)
+local presetSearchBuff         = ""
+local importedPreset           = { clipboardStr = "", decoded = nil }
+local presetSortMode           = 0 -- 0 All | 1: Cars Only | 2: Bikes Only
+local flagFilterMode           = 0 -- 0 All | 1: Enabled Only | 2: Disabled Only
+local flagSortMode             = 0 -- 0: Flag | 1: Name
+local sortModeClicked          = false
+local flagListMutex            = Mutex()
+local btnSize                  = vec2:new(0, 37)
+local mainButtonLabelWidths    = {}
 local popupsToDraw             = {
 	flagDump      = false,
 	confirmDelete = false
@@ -25,11 +36,6 @@ local newPresetWindowData      = {
 	descBuffer      = "",
 	vehTypesBs      = 1 << CARS_BIT,
 }
-local mainButtonLabelWidths    = {}
-local flagFilterMode           = 0
-local flagSortMode             = 0 -- 0: flag | 1: name
-local sortModeClicked          = false
-local listMutex                = Mutex()
 
 ---@alias getFlag  fun(veh: PlayerVehicle, flag: integer): boolean
 ---@alias getAllFlags  fun(veh: PlayerVehicle): uint32_t|array<uint32_t>
@@ -84,7 +90,7 @@ local vehicleFlagOrder <const> = {
 
 -- **must be called in a coroutine**
 local function SortAllOrderedFlags()
-	listMutex:WithLock(function()
+	flagListMutex:WithLock(function()
 		for _, data in pairs(vehicleFlagData) do
 			local ordered_flags = data.ordered_flags
 			if (#ordered_flags == 0) then
@@ -115,7 +121,7 @@ end
 
 ---@param data vehicleDebugDataAlias
 local function drawVehicleFlags(data)
-	if (not Bit.IsBitSet(data.allowed_types, PV:GetType())) then
+	if (not BIT_TEST(data.allowed_types, PV:GetType())) then
 		ImGui.Text(_T("VEH_FLAGS_WRONG_VEH_TYPE"))
 		ImGui.Spacing()
 		return
@@ -146,11 +152,12 @@ local function drawVehicleFlags(data)
 
 			-- TODO: translate names? most of them will stop making sense though and these are for power users anyway
 			-- also keeping them as is may help users who want to do research since they can use the exact flag name as a reference
-			local name    = pair.first
-			local isOwned = HandlingEditor:IsFlagOwned(name)
+			local flagName = pair.first
+			local flagType = data.type
+			local isOwned  = HandlingEditor:IsFlagOwned(_F("%d:%s", flagType, flagName))
 			ImGui.BeginDisabled(isOwned)
-			if (select(2, GUI:CustomToggle(name, isEnabled))) then
-				HandlingEditor:Push(data.type, flag, not isEnabled, data.allowed_types)
+			if (select(2, GUI:CustomToggle(flagName, isEnabled))) then
+				HandlingEditor:Push(flagType, flag, not isEnabled, data.allowed_types)
 			end
 			ImGui.EndDisabled()
 			if (isOwned) then
@@ -168,6 +175,62 @@ local function drawVehicleFlags(data)
 	ImGui.EndDisabled()
 end
 
+---@param currentPreset HandlingPreset
+---@return boolean
+local function filterPresets(currentPreset)
+	local bs = currentPreset.m_vehicle_bitset or 0
+	if (presetSortMode == 1) then
+		return BIT_TEST(bs, CARS_BIT)
+	elseif (presetSortMode == 2) then
+		return BIT_TEST(bs, BIKES_BIT) and not BIT_TEST(bs, CARS_BIT)
+	end
+
+	return true
+end
+
+local function drawImportWindow()
+	if (type(importedPreset.decoded) ~= "table") then
+		if (GUI:Button(_T("GENERIC_CLIPBOARD_DECODE"), { size = btnSize })) then
+			importedPreset.clipboardStr = ImGui.GetClipboardText()
+			if (not string.isvalid(importedPreset.clipboardStr)) then
+				Notifier:ShowError("HandlingEditor", _T("GENERIC_DATA_PARSE_FAIL"))
+				return
+			end
+
+			local ok, res = Serializer:Decode(importedPreset.clipboardStr)
+			if (not ok) then
+				log.warning("Failed to decode JSON data.")
+				importedPreset.decoded = nil
+			else
+				importedPreset.decoded = res
+			end
+		end
+
+		ImGui.Dummy(0, 25)
+		ImGui.TextWrapped(_T("VEH_FLAGS_PRESET_PARSER_TOOLTIP"))
+		return
+	end
+
+	TableRenderer:Draw(importedPreset.decoded, vec2:new(610, 620))
+	ImGui.Spacing()
+	if (GUI:Button(_T("GENERIC_CONFIRM"), { size = btnSize })) then
+		if (HandlingEditor:ImportPreset(importedPreset.decoded)) then
+			Notifier:ShowSuccess("HandlingEditor", _T("VEH_FLAGS_PRESET_IMPORT_SUCCESS"))
+		else
+			Notifier:ShowError("HandlingEditor", _T("VEH_FLAGS_PRESET_IMPORT_FAIL"))
+		end
+		importedPreset.clipboardStr = ""
+		importedPreset.decoded      = nil
+		ImGui.CloseCurrentPopup()
+	end
+
+	ImGui.SameLine()
+	if (GUI:Button(_T("GENERIC_CLEAR"), { size = btnSize })) then
+		importedPreset.clipboardStr = ""
+		importedPreset.decoded      = nil
+	end
+end
+
 local function drawPresets()
 	if (not HandlingEditor:ArePresetsReady()) then
 		ImGui.Text(ImGui.TextSpinner(_T("GENERIC_WAIT_LABEL")))
@@ -175,11 +238,35 @@ local function drawPresets()
 		return
 	end
 
+	presetSortMode = ImGui.Combo(
+		_T("GENERIC_LIST_SORT"),
+		presetSortMode,
+		{
+			_T("GENERIC_ALL"),
+			_T("VEH_FLAGS_PRESET_FILTER_CARS_ONLY"),
+			_T("VEH_FLAGS_PRESET_FILTER_BIKES_ONLY"),
+		},
+		3
+	)
+
+	presetSearchBuff = ImGui.SearchBar("##presetSearch", presetSearchBuff)
+	ImGui.Separator()
+
+	ImGui.SetNextWindowBgAlpha(0.0)
+	ImGui.BeginChild("##presetsScrollRegion", 0, GVars.ui.window_size.y * 0.675)
 	local presets = HandlingEditor:GetPresets()
 	local count   = #presets
 	for i, preset in ipairs(presets) do
 		ImGui.PushID(i)
-		local name        = preset:GetDisplayName()
+		local name = preset:GetDisplayName()
+		if (not name:lower():find(presetSearchBuff)) then
+			goto continue
+		end
+
+		if (not filterPresets(preset)) then
+			goto continue
+		end
+
 		local nameWidth   = ImGui.CalcTextSize(name) + 50
 		presetChildSize.x = math.min(300, math.max(presetChildSize.x, nameWidth, ImGui.GetContentRegionAvail() * 0.48))
 		ImGui.BeginChildEx(name, presetChildSize, ImGuiChildFlags.Borders, ImGuiWindowFlags.NoScrollbar)
@@ -194,7 +281,7 @@ local function drawPresets()
 		ImGui.EndChild()
 		ImGui.Separator()
 
-		local unsupportedVeh = not HandlingEditor:AssertVehicleType(preset.m_veh_types_bs)
+		local unsupportedVeh = not HandlingEditor:AssertVehicleType(preset.m_vehicle_bitset)
 		ImGui.BeginDisabled(unsupportedVeh)
 		GUI:CustomToggle(_T("GENERIC_ENABLE"), HandlingEditor:IsPresetEnabled(preset), {
 			onClick = function(v) HandlingEditor:TogglePreset(preset, v) end
@@ -222,10 +309,26 @@ local function drawPresets()
 		GUI:Tooltip(_T("GENERIC_OPTIONS_LABEL"))
 
 		local flagDumpLabel = _T("VEH_FLAGS_DUMP_PRESET_FLAGS")
-		local isDefault = preset:IsDefault()
+		local isDefault     = preset:IsDefault()
 		if (ImGui.BeginPopup("##presetMenu")) then
 			if (ImGui.MenuItem(flagDumpLabel)) then
 				popupsToDraw.flagDump = true
+			end
+
+			ImGui.BeginDisabled(isDefault)
+			if (ImGui.MenuItem(_T("GENERIC_SHARE"))) then
+				local str = Serializer:Encode(preset:Serialize())
+				if (not str) then
+					Notifier:ShowError("HandlingEditor", _T("GENERIC_DATA_PARSE_FAIL"))
+				else
+					ImGui.SetClipboardText(str)
+					log.fdebug("\n ----------------- %s -----------------\n%s", name, str)
+					Notifier:ShowSuccess("HandlingEditor", _T("VEH_FLAGS_PRESET_SHARE_SUCCESS_FMT", name))
+				end
+			end
+			ImGui.EndDisabled()
+			if (isDefault) then
+				GUI:Tooltip(_T("VEH_FLAGS_PRESET_NO_SHARE"))
 			end
 
 			ImGui.BeginDisabled(isDefault)
@@ -273,6 +376,19 @@ local function drawPresets()
 			ImGui.SameLineIfAvail(presetChildSize.x)
 		end
 		ImGui.PopID()
+		::continue::
+	end
+	ImGui.EndChild()
+
+	ImGui.Separator()
+	if (GUI:Button(_T("EF_IMPORT_DATA"), { size = btnSize })) then -- this label should've been a generic but oh well
+		ImGui.OpenPopup("##presetImportPopup")
+	end
+
+	ImGui.SetNextWindowSizeConstraints(400, 300, 640, 800)
+	if (ImGui.BeginPopupModal("##presetImportPopup", true, ImGuiWindowFlags.AlwaysAutoResize)) then
+		drawImportWindow()
+		ImGui.EndPopup()
 	end
 end
 
@@ -303,8 +419,8 @@ local function drawNewPresetWindow()
 		data.wantsAutoEnable = GUI:Checkbox(_T("GENERIC_AUTO_ENABLE"), data.wantsAutoEnable)
 
 		ImGui.SeparatorText(_T("VEH_FLAGS_NEW_PRESET_VEHICLE_BS"))
-		local allowCars  = Bit.IsBitSet(data.vehTypesBs, CARS_BIT)
-		local allowBikes = Bit.IsBitSet(data.vehTypesBs, BIKES_BIT)
+		local allowCars  = BIT_TEST(data.vehTypesBs, CARS_BIT)
+		local allowBikes = BIT_TEST(data.vehTypesBs, BIKES_BIT)
 		if (select(2, GUI:Checkbox(_T("GENERIC_CARS"), allowCars))) then
 			data.vehTypesBs = Bit.Toggle(data.vehTypesBs, CARS_BIT, not allowCars)
 		end
@@ -330,7 +446,7 @@ local function drawNewPresetWindow()
 
 		ImGui.Spacing()
 		ImGui.Separator()
-		if (GUI:Button(_T("GENERIC_CONFIRM"), { size = vec2:new(0, 37) })) then
+		if (GUI:Button(_T("GENERIC_CONFIRM"), { size = btnSize })) then
 			if (HandlingEditor:AddNewPreset(HandlingEditor:GeneratePresetFromCurrentDeltas(
 					data.nameBuffer,
 					data.vehTypesBs,
@@ -365,7 +481,7 @@ return function()
 	end
 
 	if (ImGui.BeginTabItem(_T("VEH_FLAGS_EDITOR_TAB"))) then
-		ImGui.BeginDisabled(listMutex:IsLocked())
+		ImGui.BeginDisabled(flagListMutex:IsLocked())
 		flagFilterMode = ImGui.Combo(
 			_T("GENERIC_LIST_FILTER"),
 			flagFilterMode,
@@ -440,10 +556,7 @@ return function()
 	end
 
 	if (ImGui.BeginTabItem(_T("VEH_FLAGS_PRESETS_TAB"))) then
-		ImGui.SetNextWindowBgAlpha(0)
-		ImGui.BeginChild("##presetsScrollRegion", 0, GVars.ui.window_size.y * 0.8)
 		drawPresets()
-		ImGui.EndChild()
 		ImGui.EndTabItem()
 	end
 	ImGui.EndTabBar()

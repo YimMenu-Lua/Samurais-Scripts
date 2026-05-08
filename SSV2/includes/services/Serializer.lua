@@ -512,10 +512,11 @@ function Serializer:OnDecodeError()
 	return self:Postprocess(self.m_default_config)
 end
 
+---@private
 ---@param data any
 ---@param etc? any
 ---@return any
-function Serializer:Decode(data, etc)
+function Serializer:DecodeInternal(data, etc)
 	local ok, res = self:DecodeImpl(data, etc)
 	if (not ok) then
 		log.warning("[Serializer]: Your config file is corrupted! Attempting to recover...")
@@ -537,6 +538,13 @@ function Serializer:Decode(data, etc)
 	end
 
 	return self:Postprocess(res)
+end
+
+---@param data any
+---@param etc? any
+---@return boolean success, any result
+function Serializer:Decode(data, etc)
+	return self:DecodeImpl(data, etc)
 end
 
 ---@private
@@ -605,7 +613,7 @@ function Serializer:Read()
 		data = self:Decrypt(data)
 	end
 
-	return self:Decode(data)
+	return self:DecodeInternal(data)
 end
 
 ---@param item_path string
@@ -854,7 +862,7 @@ function Serializer:ReadFromFile(filename, onFileNotFoundErr)
 		return
 	end
 
-	return self:Decode(f:read("a"))
+	return self:DecodeInternal(f:read("a"))
 end
 
 -- Rebuilds objects from simple tables.

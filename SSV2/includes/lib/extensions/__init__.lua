@@ -9,8 +9,10 @@
 
 math.randomseed(os.time())
 
-local Chrono <const> = require("includes.modules.Chrono")
-Bit                  = require("includes.modules.Bit") -- exposed globally sicne it's used all over the project.
+---@type table<table, table<integer, string>>
+local EnumNamesCache <const> = {}
+local Chrono <const>         = require("includes.modules.Chrono")
+Bit                          = require("includes.modules.Bit") -- exposed globally sicne it's used all over the project.
 
 for _, path in ipairs({
 	"std_string",
@@ -308,15 +310,27 @@ end
 ---@param index integer
 function EnumToString(e, index)
 	if (type(e) ~= "table") then
-		return ""
+		return "Unknown"
 	end
+
+	local cache = EnumNamesCache[e]
+	if (not cache) then
+		cache = {}
+		EnumNamesCache[e] = cache
+	end
+
+	local cachedName = cache[index]
+	if (cachedName) then return cachedName end
 
 	for k, v in pairs(e) do
 		if (v == index) then
-			return tostring(k)
+			local name = tostring(k)
+			cache[index] = name
+			return name
 		end
 	end
 
+	cache[index] = "Unknown"
 	return "Unknown"
 end
 

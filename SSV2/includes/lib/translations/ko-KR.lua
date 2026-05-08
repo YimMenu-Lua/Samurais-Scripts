@@ -422,7 +422,7 @@ return {
 	["SELF_LASER_SIGHTS_LENGTH"] = "레이저 광선 길이",
 	["VEH_KERS_BOOST"] = "KERS 부스트",
 	["VEH_OFFROAD_ABILITIES"] = "오프로드 매니아",
-	["VEH_OFFROAD_ABILITIES_TT"] = "차량의 오프로드 성능을 향상시킵니다.",
+	["VEH_OFFROAD_ABILITIES_TT"] = "차량의 오프로드 기능을 높이기 위해 'Stancer'와 함께 작동합니다. 지상고를 높이고, 트랙 폭을 넓히고, RPM을 부드럽게 하고, 전방 및 후방 차동 장치를 잠그는 등의 작업을 수행합니다.\n\nPS: 주 차량 탭에서 '빠른 차량' 옵션을 활성화하는 것이 좋습니다('fastvehs' 명령을 사용하여 전환할 수 있음).",
 	["VEH_FORCE_NO_TC_TT"] = "차량이 견인력이나 안정성 제어 기능을 잃게 됩니다.\n이 기능을 활성화하면 자전거가 미끄러지거나 표류할 수도 있습니다.",
 	["VEH_RALLY_TYRES_TT"] = "차량에 오프로드 핸들링을 더욱 향상시키는 랠리 타이어를 장착합니다.",
 	["VEH_RALLY_TYRES"] = "랠리 타이어",

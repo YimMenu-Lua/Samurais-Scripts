@@ -428,7 +428,7 @@ return {
 	["VEH_LOW_SPEED_WHEELIE"] = "Impennata a bassa velocità",
 	["VEH_RALLY_TYRES"] = "Pneumatici Rally",
 	["SELF_LASER_SIGHTS_TT"] = "Abilita i mirini laser sulle tue armi da fuoco.",
-	["VEH_OFFROAD_ABILITIES_TT"] = "Aumenta le capacità fuoristrada del tuo veicolo.",
+	["VEH_OFFROAD_ABILITIES_TT"] = "Funziona fianco a fianco con \"Stancer\" per aumentare le capacità fuoristrada del tuo veicolo: aumenta l'altezza di marcia, allarga la carreggiata, aumenta il numero di giri in modo uniforme, blocca i differenziali anteriore e posteriore, ecc.\n\nPS: si consiglia di abilitare l'opzione \"Veicoli veloci\" nella scheda principale del veicolo (può essere attivata utilizzando il comando \"fastvehs\").",
 	["VEH_ROCKET_BOOST"] = "Spinta del razzo",
 	["VEH_ROCKET_BOOST_TT"] = "Dota il tuo veicolo di un razzo potenziato, simile al \"Vigilante\".",
 	["VEH_PARACHUTE"] = "Capacità di paracadute",

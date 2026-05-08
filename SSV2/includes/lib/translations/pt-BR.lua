@@ -427,7 +427,7 @@ return {
 	["VEH_LOW_SPEED_WHEELIE_TT"] = "Somente bicicletas: permite que você faça cavalinhos em velocidades muito baixas, semelhante ao 'Manchez'.",
 	["VEH_LOW_SPEED_WHEELIE"] = "Cavalinho de baixa velocidade",
 	["VEH_ROCKET_BOOST"] = "Impulso de foguete",
-	["VEH_OFFROAD_ABILITIES_TT"] = "Aumenta as capacidades offroad do seu veículo.",
+	["VEH_OFFROAD_ABILITIES_TT"] = "Funciona lado a lado com o 'Stancer' para aumentar as capacidades offroad do seu veículo: aumenta a altura do passeio, amplia a largura da pista, força RPM suave, trava os diferenciais dianteiro e traseiro, etc.\n\nPS: É recomendado ter a opção 'Veículos Rápidos' na aba principal do veículo habilitada (pode ser alternada usando o comando 'fastvehs').",
 	["VEH_ROCKET_BOOST_TT"] = "Equipa seu veículo com impulso de foguete, semelhante ao 'Vigilante'.",
 	["VEH_FORCE_NO_TC"] = "Sem controle de tração",
 	["VEH_FORCE_NO_TC_TT"] = "Força seu veículo a não ter controle de tração ou estabilidade.\nCom essa opção ativada, as bicicletas também poderão deslizar e derrapar.",

@@ -423,7 +423,7 @@ return {
 	["VEH_FORCE_NO_TC"] = "Keine Traktionskontrolle",
 	["VEH_OFFROAD_ABILITIES"] = "Offroad-Enthusiast",
 	["VEH_RALLY_TYRES"] = "Rallye-Reifen",
-	["VEH_OFFROAD_ABILITIES_TT"] = "Erhöht die Offroad-Fähigkeiten Ihres Fahrzeugs.",
+	["VEH_OFFROAD_ABILITIES_TT"] = "Funktioniert zusammen mit „Stancer“, um die Offroad-Fähigkeiten Ihres Fahrzeugs zu verbessern: Erhöht die Fahrhöhe, verbreitert die Spurweite, erzwingt gleichmäßige Drehzahlen, sperrt vordere und hintere Differenziale usw.\n\nPS: Es wird empfohlen, die Option „Schnelle Fahrzeuge“ im Hauptfahrzeug-Tab zu aktivieren (kann mit dem Befehl „fastvehs“ umgeschaltet werden).",
 	["VEH_RALLY_TYRES_TT"] = "Rüstet Ihr Fahrzeug mit Rallye-Reifen aus, die das Handling im Gelände weiter verbessern.",
 	["SELF_LASER_SIGHTS_TT"] = "Ermöglicht Laservisiere für Ihre Schusswaffen.",
 	["VEH_FORCE_NO_TC_TT"] = "Zwingt Ihr Fahrzeug dazu, keine Traktions- oder Stabilitätskontrolle zu haben.\nWenn diese Option aktiviert ist, können Fahrräder auch rutschen und driften.",

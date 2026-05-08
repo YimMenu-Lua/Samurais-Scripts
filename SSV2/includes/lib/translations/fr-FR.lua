@@ -420,7 +420,7 @@ return {
 	["VEH_NO_ENGINE_BRAKE"] = "Pas de frein moteur",
 	["SELF_LASER_SIGHTS"] = "Viseur laser",
 	["VEH_OFFROAD_ABILITIES"] = "Passionné de tout-terrain",
-	["VEH_OFFROAD_ABILITIES_TT"] = "Augmente les capacités tout-terrain de votre véhicule.",
+	["VEH_OFFROAD_ABILITIES_TT"] = "Fonctionne côte à côte avec « Stancer » pour augmenter les capacités tout-terrain de votre véhicule : augmente la hauteur de caisse, élargit la largeur de voie, force un régime fluide, verrouille les différentiels avant et arrière, etc.\n\nPS : il est recommandé d'activer l'option « Véhicules rapides » dans l'onglet principal du véhicule (peut être activée à l'aide de la commande « fastvehs »).",
 	["VEH_KERS_BOOST_TT"] = "Équipe votre véhicule du boost KERS (Kinetic Energy Recovery System), similaire aux voitures de F1.",
 	["SELF_LASER_SIGHTS_TT"] = "Permet des vues laser sur vos armes à feu.",
 	["SUBTAB_HANDLING_EDITOR"] = "Éditeur de manipulation",

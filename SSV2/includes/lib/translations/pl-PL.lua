@@ -426,7 +426,7 @@ return {
 	["VEH_NO_ENGINE_BRAKE"] = "Brak hamulca silnikowego",
 	["SELF_LASER_SIGHTS_COL"] = "Kolor laserowy",
 	["VEH_KERS_BOOST"] = "Wzmocnienie KERS",
-	["VEH_OFFROAD_ABILITIES_TT"] = "Zwiększa możliwości terenowe Twojego pojazdu.",
+	["VEH_OFFROAD_ABILITIES_TT"] = "Współpracuje ze „Stacerem”, aby zwiększyć możliwości pojazdu w terenie: podnosi prześwit, poszerza rozstaw kół, wymusza płynne obroty, blokuje przedni i tylny mechanizm różnicowy itp.\n\nPS: Zaleca się włączenie opcji „Szybkie pojazdy” w głównej zakładce pojazdu (można ją przełączać za pomocą polecenia „szybkie pojazdy”).",
 	["VEH_LOW_SPEED_WHEELIE_TT"] = "Tylko rowery: umożliwia jazdę na kółkach przy bardzo małych prędkościach, podobnie jak w przypadku „Mancheza”.",
 	["VEH_ROCKET_BOOST"] = "Wzmocnienie rakiety",
 	["VEH_LOW_SPEED_WHEELIE"] = "Jazda na kółkach przy niskiej prędkości",

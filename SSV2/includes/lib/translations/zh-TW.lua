@@ -417,7 +417,7 @@ return {
 	["SUBTAB_GUI"] = "使用者介面",
 	["GENERIC_CLEAR"] = "清除",
 	["GENERIC_GENERAL_LABEL"] = "一般的",
-	["VEH_OFFROAD_ABILITIES_TT"] = "提高車輛的越野能力。",
+	["VEH_OFFROAD_ABILITIES_TT"] = "與「Stancer」並排工作，可提高車輛的越野能力：提高行駛高度、加寬履帶寬度、強制平穩轉速、鎖定前後差速器等。 \n\nPS：建議啟用主車輛標籤中的「快速車輛」選項（可使用「fastvehs」指令進行切換）。",
 	["VEH_KERS_BOOST"] = "KERS 提升",
 	["VEH_RALLY_TYRES"] = "拉力輪胎",
 	["VEH_OFFROAD_ABILITIES"] = "越野愛好者",

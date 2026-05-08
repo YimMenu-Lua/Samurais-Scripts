@@ -1453,9 +1453,9 @@ function EntityForge:ImportCreation(data)
 		return
 	end
 
-	---@type ForgeEntityPlainTable
-	local abomination = Serializer:Decode(Serializer:XOR(Serializer:B64Decode(data)))
-	if (type(abomination) ~= "table") then
+	---@type boolean, ForgeEntityPlainTable?
+	local ok, res = Serializer:Decode(Serializer:XOR(Serializer:B64Decode(data)))
+	if (not ok) then
 		Notifier:ShowError(
 			"EntityForge",
 			"Import Error: Incorrect data type!",
@@ -1465,7 +1465,7 @@ function EntityForge:ImportCreation(data)
 		return
 	end
 
-	return abomination
+	return res
 end
 
 return EntityForge:init()

@@ -14,7 +14,7 @@ for _, preset in pairs(DEFAULT_PRESETS) do
 	RESERVED_NAMES[preset.name] = true
 end
 
----@type table<string, { onEnable: fun(editor: HandlingEditor), onDisable: fun(editor: HandlingEditor) }>
+---@type table<string, { onEnable: fun(self: HandlingPreset, editor: HandlingEditor), onDisable: fun(self: HandlingPreset, editor: HandlingEditor) }>
 local PRESET_CALLBACKS <const> = {
 	["VEH_KERS_BOOST"] = {
 		onEnable = function(_)
@@ -44,6 +44,27 @@ local PRESET_CALLBACKS <const> = {
 			VEHICLE.SET_USE_HIGHER_CAR_JUMP(PV:GetHandle(), false)
 		end
 	},
+	["VEH_OFFROAD_ABILITIES"] = {
+		onEnable  = function(_)
+			local PV = LocalPlayer:GetVehicle()
+			if (not PV:IsValid()) then return end
+			local stancer       = PV.m_stancer
+			local deltas        = stancer.m_deltas
+			local front         = deltas[Enums.eWheelAxle.FRONT]
+			local rear          = deltas[Enums.eWheelAxle.REAR]
+			front.m_susp_comp   = 0.1207
+			front.m_track_width = -0.047
+			rear.m_susp_comp    = 0.1201
+			rear.m_track_width  = -0.052
+			PV:ActivatePhysics()
+		end,
+		onDisable = function(_)
+			local PV = LocalPlayer:GetVehicle()
+			if (not PV:IsValid()) then return end
+			PV.m_stancer:ResetDeltas(true)
+			PV:ActivatePhysics()
+		end
+	},
 }
 
 ---@param json boolean
@@ -62,7 +83,7 @@ end
 ---@field name string
 ---@field deltas table<eHandlingEditorTypes, table<string, boolean>>
 ---@field auto_apply? boolean
----@field allowed_vehicle_types? integer -- bitset of eVehicleType (cars and bikes only)
+---@field vehicle_bitset? integer -- bitset of eVehicleType (cars and bikes only)
 ---@field is_translator_name? boolean
 ---@field is_user_generated? boolean
 ---@field is_default_preset? boolean
@@ -75,11 +96,12 @@ end
 ---@field private m_cached_flags array<Pair<string, boolean>>
 ---@field private m_is_default_preset boolean
 ---@field private m_is_user_generated boolean
+---@field private m_on_enable_callback? fun(self: HandlingPreset, editor: HandlingEditor): any
+---@field private m_on_disable_callback? fun(self: HandlingPreset, editor: HandlingEditor): any
 ---@field public m_deltas table<eHandlingEditorTypes, table<string, boolean>>
----@field public m_veh_types_bs integer -- bitset of eVehicleType (cars and bikes only)
+---@field public m_vehicle_bitset integer -- bitset of eVehicleType (cars and bikes only)
+---@field public m_category string
 ---@field public auto_apply boolean
----@field public OnEnable? fun(editor: HandlingEditor): any
----@field public OnDisable? fun(editor: HandlingEditor): any
 local HandlingPreset <const> = { m_deltas = {} }
 HandlingPreset.__index       = HandlingPreset
 
@@ -89,22 +111,22 @@ function HandlingPreset.new(data)
 	local name      = data.name
 	local callbacks = PRESET_CALLBACKS[name]
 	return setmetatable({
-		m_name               = name,
-		m_deltas             = NormalizeDeltas(data.deltas, false),
-		m_veh_types_bs       = data.allowed_vehicle_types or (1 << CARS_BIT),
-		m_is_translator_name = data.is_translator_name or false,
-		auto_apply           = data.auto_apply or false,
-		m_is_user_generated  = data.is_user_generated or false,
-		m_is_default_preset  = RESERVED_NAMES[name],
-		m_description        = data.description,
-		OnEnable             = callbacks and callbacks.onEnable or nil,
-		OnDisable            = callbacks and callbacks.onDisable or nil,
+		m_name                = name,
+		m_deltas              = NormalizeDeltas(data.deltas, false),
+		m_vehicle_bitset      = data.vehicle_bitset or (1 << CARS_BIT),
+		m_is_translator_name  = data.is_translator_name or false,
+		auto_apply            = data.auto_apply or false,
+		m_is_user_generated   = data.is_user_generated or false,
+		m_is_default_preset   = RESERVED_NAMES[name],
+		m_description         = data.description,
+		m_on_enable_callback  = callbacks and callbacks.onEnable or nil,
+		m_on_disable_callback = callbacks and callbacks.onDisable or nil,
 	}, HandlingPreset)
 end
 
 ---@return boolean
 function HandlingPreset:IsDefault()
-	return self.m_is_default_preset or not self.m_is_user_generated
+	return self.m_is_default_preset == true
 end
 
 ---@return string
@@ -152,18 +174,64 @@ end
 
 function HandlingPreset:Serialize()
 	return {
-		name                  = self.m_name,
-		deltas                = NormalizeDeltas(self.m_deltas, true),
-		allowed_vehicle_types = self.m_veh_types_bs,
-		auto_apply            = self.auto_apply,
-		description           = self.m_description,
-		is_translator_name    = self.m_is_translator_name,
-		is_user_generated     = self.m_is_user_generated,
-		is_default_preset     = self.m_is_default_preset,
+		name               = self.m_name,
+		deltas             = NormalizeDeltas(self.m_deltas, true),
+		vehicle_bitset     = self.m_vehicle_bitset,
+		auto_apply         = self.auto_apply,
+		description        = self.m_description,
+		is_translator_name = self.m_is_translator_name,
+		is_user_generated  = self.m_is_user_generated,
+		is_default_preset  = self.m_is_default_preset,
 	}
 end
 
+function HandlingPreset:OnEnable(editorInst)
+	local callback = self.m_on_enable_callback
+	if (not callback) then return end
+
+	ThreadManager:Run(function()
+		callback(self, editorInst)
+	end)
+end
+
+function HandlingPreset:OnDisable(editorInst)
+	local callback = self.m_on_disable_callback
+	if (not callback) then return end
+
+	ThreadManager:Run(function()
+		callback(self, editorInst)
+	end)
+end
+
 --#region static funcs
+
+---@nodiscard
+---@param data HandlingPresetData
+---@return boolean
+function HandlingPreset.AssertArgs(data)
+	if (type(data) ~= "table") then
+		return false
+	end
+
+	local deltas = data.deltas
+	if (type(data.name) ~= "string" or type(deltas) ~= "table") then
+		return false
+	end
+
+	for _, t in pairs(deltas) do
+		if (type(t) ~= "table") then
+			return false
+		end
+
+		for k, v in pairs(t) do
+			if (type(k) ~= "string" or type(v) ~= "boolean") then
+				return false
+			end
+		end
+	end
+
+	return true
+end
 
 ---@param name string
 ---@return boolean
@@ -178,7 +246,7 @@ function HandlingPreset.Deserialize(data)
 		m_name               = data.name,
 		m_description        = data.description,
 		m_deltas             = NormalizeDeltas(data.deltas, false),
-		m_veh_types_bs       = data.allowed_vehicle_types or CARS_BIT,
+		m_vehicle_bitset     = data.vehicle_bitset or (1 << CARS_BIT),
 		auto_apply           = data.auto_apply or false,
 		m_is_translator_name = data.is_translator_name,
 		m_is_default_preset  = data.is_default_preset,

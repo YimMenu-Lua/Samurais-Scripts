@@ -420,7 +420,7 @@ return {
 	["VEH_NO_ENGINE_BRAKE_TT"] = "让您在不踩油门时滑行而不会损失太多速度。",
 	["VEH_KERS_BOOST_TT"] = "为您的车辆配备 KERS（动能回​​收系统）助力，类似于 F1 赛车。",
 	["VEH_FORCE_NO_TC_TT"] = "强制您的车辆没有牵引力或稳定性控制。\n启用此功能后，自行车也将能够滑动和漂移。",
-	["VEH_OFFROAD_ABILITIES_TT"] = "提高车辆的越野能力。",
+	["VEH_OFFROAD_ABILITIES_TT"] = "与“Stancer”并排工作，可提高车辆的越野能力：提高行驶高度、加宽履带宽度、强制平稳转速、锁定前后差速器等。\n\nPS：建议启用主车辆选项卡中的“快速车辆”选项（可以使用“fastvehs”命令进行切换）。",
 	["VEH_RALLY_TYRES_TT"] = "为您的车辆配备拉力轮胎，进一步提高越野操控性。",
 	["VEH_LOW_SPEED_WHEELIE"] = "低速前轮离地",
 	["VEH_ROCKET_BOOST"] = "火箭助推器",
