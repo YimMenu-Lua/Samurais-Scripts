@@ -154,6 +154,9 @@ end
 ---@param count integer
 function BusinessHub:SetProductCount(count)
 	local idx = self.m_id
+
+	-- freemode writes stat first then global but it doesn't
+	-- matter since they are happening in the same frame
 	self.m_tech_idx_g:At(8):At(1, idx):WriteInt(count)
 	stats.set_int(self.m_prod_count_stat, count)
 end
@@ -164,19 +167,25 @@ function BusinessHub:TriggerProduction(count)
 		return
 	end
 
+
 	local max     = self:GetMaxUnits()
 	local current = self:GetProductCount()
 	local techIdx = self:GetAssignedTechIndex()
 	if (techIdx == -1 or current == max) then return end
 
-	-- we're not cehcking if count and count < current so this can also remove product
+	-- we're not checking if count < current so this can also remove product
 	local nextVal = math.min(count or (current + 1), max)
+
+	-- we're doing this because freemode does some cleanup
+	-- when production is at capacity so we first skip right
+	-- into stat + global writes up to max - 1 then use the slow
+	-- time globals approach to force natural execution
 	if (nextVal < max) then
 		self:SetProductCount(nextVal)
 	else
 		self.m_tech_stopwatch_g:At(techIdx, 2):WriteInt(0)
 		self.m_prod_time_g:WriteInt(0)
-		self.m_prod_bool_g:WriteInt(1)
+		self.m_prod_bool_g:WriteInt(1) -- <- this is redundant but "if it works, don't fix it"
 	end
 end
 

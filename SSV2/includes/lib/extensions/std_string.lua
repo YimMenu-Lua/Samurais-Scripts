@@ -301,7 +301,7 @@ end
 ---@param str string
 ---@return string
 function string.titlecase(str)
-	return (str:gsub("(%a)([%w_']*)", function(a, b)
+	return (str:gsub("%_+", " "):gsub("(%a)([%w_']*)", function(a, b)
 		return a:upper() .. b:lower()
 	end))
 end

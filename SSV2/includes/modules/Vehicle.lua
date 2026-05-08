@@ -48,8 +48,9 @@ local towTruckModels <const> = Set.new(
 -- Class representing a GTA V vehicle.
 ---@class Vehicle : Entity
 ---@field private m_internal CVehicle
----@field private m_class_id number
+---@field private m_class_id eVehicleClass
 ---@field private m_num_seats number
+---@field private m_type eVehicleType
 ---@field private m_max_passengers number
 ---@field private m_has_loud_radio boolean
 ---@field private m_last_ram_time seconds
@@ -61,6 +62,15 @@ Vehicle = Class("Vehicle", { parent = Entity })
 ---@return boolean
 function Vehicle:IsValid()
 	return ENTITY.DOES_ENTITY_EXIST(self:GetHandle()) and ENTITY.IS_ENTITY_A_VEHICLE(self:GetHandle())
+end
+
+---@return eVehicleType
+function Vehicle:GetType()
+	if (not self.m_type) then
+		self.m_type = self:Resolve():GetVehicleType()
+	end
+
+	return self.m_type
 end
 
 ---@return string
@@ -1203,6 +1213,12 @@ function Vehicle:ModifyTopSpeed(value)
 	VEHICLE.MODIFY_VEHICLE_TOP_SPEED(self:GetHandle(), value)
 end
 
+-- Returns DWORD handling flags.
+---@return uint32_t
+function Vehicle:GetHandlingFlags()
+	return self:Resolve():GetHandlingFlags()
+end
+
 -- Returns whether a handling flag is enabled.
 ---@param flag eVehicleHandlingFlags
 ---@return boolean
@@ -1212,6 +1228,14 @@ function Vehicle:GetHandlingFlag(flag)
 	end
 
 	return self:Resolve():GetHandlingFlag(flag)
+end
+
+-- Writes dword flags.
+---@param flags uint32_t
+function Vehicle:SetHandlingFlags(flags)
+	if (not self:IsValid()) then return end
+
+	self:Resolve():SetHandlingFlags(flags)
 end
 
 -- Enables/disables a vehicle's handling flag.
@@ -1226,6 +1250,14 @@ function Vehicle:SetHandlingFlag(flag, toggle)
 end
 
 -- Returns whether a model flag is enabled.
+---@return uint32_t
+function Vehicle:GetModelFlags()
+	if (not self:IsValid()) then return 0 end
+
+	return self:Resolve():GetModelFlags()
+end
+
+-- Returns whether a model flag is enabled.
 ---@param flag eVehicleModelFlags
 function Vehicle:GetModelFlag(flag)
 	if not self:IsValid() then
@@ -1235,15 +1267,38 @@ function Vehicle:GetModelFlag(flag)
 	return self:Resolve():GetModelFlag(flag)
 end
 
+---@param flags uint32_t
+function Vehicle:SetModelFlags(flags)
+	if (not self:IsValid()) then return end
+	self:Resolve():SetModelFlags(flags)
+end
+
+-- Enables/disables a vehicle's model flag.
+---@param flag eVehicleModelInfoFlags
+---@param toggle boolean
+function Vehicle:SetModelFlag(flag, toggle)
+	if (not self:IsValid()) then return end
+	self:Resolve():SetModelFlag(flag, toggle)
+end
+
+---@return { [1]: uint32_t, [2]: uint32_t, [3]: uint32_t, [4]: uint32_t, [5]: uint32_t, [6]: uint32_t, [7]: uint32_t }
+function Vehicle:GetModelInfoFlags()
+	if (not self:IsValid()) then return {} end
+	return self:Resolve():GetModelInfoFlags()
+end
+
 -- Returns whether a model info flag is enabled **(not the same as model flags)**.
 ---@param flag eVehicleModelInfoFlags
 ---@return boolean
 function Vehicle:GetModelInfoFlag(flag)
-	if not self:IsValid() then
-		return false
-	end
-
+	if (not self:IsValid()) then return false end
 	return self:Resolve():GetModelInfoFlag(flag)
+end
+
+---@param flags  { [1]: uint32_t, [2]: uint32_t, [3]: uint32_t, [4]: uint32_t, [5]: uint32_t, [6]: uint32_t, [7]: uint32_t }
+function Vehicle:SetModelInfoFlags(flags)
+	if (not self:IsValid()) then return end
+	self:Resolve():SetModelInfoFlags(flags)
 end
 
 -- Enables/disables a vehicle's model info flag.
@@ -1255,6 +1310,16 @@ function Vehicle:SetModelInfoFlag(flag, toggle)
 	end
 
 	self:Resolve():SetModelInfoFlag(flag, toggle)
+end
+
+-- Returns DWORD advanced flags.
+---@return uint32_t
+function Vehicle:GetAdvancedFlags()
+	if (not self:IsValid() or not self:IsCar()) then
+		return 0
+	end
+
+	return self:Resolve():GetAdvancedFlags()
 end
 
 -- Returns whether an advanced flag is enabled.
@@ -1277,6 +1342,16 @@ function Vehicle:SetAdvancedFlag(flag, toggle)
 	end
 
 	self:Resolve():SetAdvancedFlag(flag, toggle)
+end
+
+-- Enables/disables a vehicle's advanced flag.
+---@param flags uint32_t
+function Vehicle:SetAdvancedFlags(flags)
+	if (not self:IsValid() or not self:IsCar()) then
+		return
+	end
+
+	self:Resolve():SetAdvancedFlags(flags)
 end
 
 ---@param fHeight float positive = lower, negative = higher. should use values between `-0.1` and `0.1`
@@ -1676,6 +1751,8 @@ end
 
 function Vehicle:Destroy()
 	self.m_handle    = nil
+	self.m_type      = nil
+	self.m_class_id  = nil
 	self.m_modelhash = nil
 	self.m_internal  = nil
 	self.m_ptr       = nil

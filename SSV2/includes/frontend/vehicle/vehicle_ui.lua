@@ -14,7 +14,6 @@ local driftMG           = require("includes.features.vehicle.drift_minigame")
 local customPaintsUI    = require("includes.frontend.vehicle.custom_paints_ui")
 local engine_swap_index = 1
 local vehicleTab        = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
-local handlingEditorTab = vehicleTab:RegisterSubtab("SUBTAB_HANDLING_EDITOR", nil, nil, true)
 local optionWindowFlgs  = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize
 DriftMinigame           = LocalPlayer:GetVehicle():AddFeature(driftMG)
 
@@ -520,34 +519,7 @@ vehicleTab:RegisterGUI(function()
 end)
 
 --#region Handling Editor
-for key, data in pairs(LocalPlayer:GetVehicle().m_flag_registry) do
-	handlingEditorTab:AddBoolCommand(
-		data.cb_label,
-		key,
-		function()
-			if (data.on_cb_enable) then
-				ThreadManager:Run(data.on_cb_enable)
-			end
-		end,
-		function()
-			if (data.on_cb_disable) then
-				ThreadManager:Run(data.on_cb_disable)
-			end
-		end,
-		{ description = data.cb_tt },
-		true,
-		true
-	)
-end
-
-handlingEditorTab:RegisterGUI(function()
-	if (self.get_veh() == 0) then
-		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
-		return
-	end
-
-	handlingEditorTab:GetGridRenderer():Draw()
-end)
+vehicleTab:RegisterSubtab("SUBTAB_HANDLING_EDITOR", require("includes.frontend.vehicle.handling_editor_ui"), nil, true)
 --#endregion
 
 --#region stancer

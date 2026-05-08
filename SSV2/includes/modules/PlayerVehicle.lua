@@ -37,14 +37,13 @@ local Stancer          = require("includes.features.vehicle.stancer")
 -- Singleton controller for our current vehicle.
 ---@class PlayerVehicle : Vehicle
 ---@field private m_handle handle
----@field private m_last_model hash
+---@field private m_last_model joaat_t
 ---@field private m_esc_sm StateMachine
 ---@field private m_feat_mgr FeatureManager
 ---@field private m_nos_mgr NosMgr
 ---@field private m_abs_mgr BFD
 ---@field private m_lctrl_mgr LaunchControlMgr
 ---@field private m_threads array<Thread>
----@field private m_default_handling_flags table<eVehicleHandlingFlags, boolean>
 ---@field private m_default_max_speed float
 ---@field private m_has_loud_radio boolean
 ---@field private m_generic_toggleables table<string, GenericToggleable>
@@ -119,35 +118,24 @@ end
 
 function PlayerVehicle:InitHandlingEditor()
 	self.m_handling_editor = HandlingEditor:init(self)
-	for key, data in pairs(self.m_flag_registry) do
-		self.m_handling_editor:PushFlag(
-			key,
-			data.flag,
-			data.flagType,
-			data.pred,
-			data.on_enable,
-			data.on_disable
-		)
-	end
 end
 
 ---@return PlayerVehicle
 function PlayerVehicle.new(handle)
 	---@type PlayerVehicle
 	local instance = setmetatable({
-		m_is_nos_active          = false,
-		m_handle                 = handle,
-		m_threads                = {},
-		m_default_handling_flags = {},
-		m_generic_toggleables    = {},
-		m_default_xenon_lights   = { enabled = false, index = 0 },
-		m_default_tire_smoke     = { enabled = false, color = vec3:zero() },
-		m_autopilot              = {
+		m_is_nos_active        = false,
+		m_handle               = handle,
+		m_threads              = {},
+		m_generic_toggleables  = {},
+		m_default_xenon_lights = { enabled = false, index = 0 },
+		m_default_tire_smoke   = { enabled = false, color = vec3:zero() },
+		m_autopilot            = {
 			eligible           = false,
 			state              = PlayerVehicle.eAutoPilotState.NONE,
 			initial_nozzle_pos = 1,
 		},
-		m_default_max_speed      = 0,
+		m_default_max_speed    = 0,
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, PlayerVehicle)
 
@@ -178,16 +166,13 @@ end
 
 ---@param handle handle
 function PlayerVehicle:Set(handle)
-	if (handle == self.m_handle) then
-		return
-	end
+	if (handle == self.m_handle) then return end
 
+	self.m_handle                       = handle
 	local new_model                     = ENTITY.GET_ENTITY_MODEL(handle)
 	self.m_default_max_speed            = VEHICLE.GET_VEHICLE_MODEL_ESTIMATED_MAX_SPEED(new_model)
 	self.m_last_model                   = self:GetModelHash()
 	self.m_modelhash                    = new_model
-	self.m_handle                       = handle
-	---@diagnostic disable-next-line
 
 	local temp                          = vec3:zero()
 	self.m_default_tire_smoke.color     = vec3:new(VEHICLE.GET_VEHICLE_TYRE_SMOKE_COLOR(handle, temp.x, temp.y, temp.z))
@@ -196,11 +181,11 @@ function PlayerVehicle:Set(handle)
 	self.m_default_tire_smoke.enabled   = VEHICLE.IS_TOGGLE_MOD_ON(handle, 20)
 	self.m_autopilot.eligible           = self:IsAircraft()
 
-	self.m_handling_editor:Apply()
 	if (GVars.features.vehicle.no_turbulence and VEHICLE.IS_THIS_MODEL_A_PLANE(new_model)) then
 		VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(handle, 0.0)
 	end
 
+	self.m_handling_editor:ApplyPresets()
 	self.m_stancer:OnNewVehicle()
 	-- self:ResumeThreads()
 	-- self.m_feat_mgr:OnEnable()
@@ -245,9 +230,14 @@ function PlayerVehicle:Cleanup()
 	self.m_stancer:Cleanup()
 end
 
----@return hash
+---@return joaat_t
 function PlayerVehicle:GetModelHash()
 	return ENTITY.GET_ENTITY_MODEL(self:GetHandle())
+end
+
+---@return joaat_t
+function PlayerVehicle:GetPreviousModelHash()
+	return self.m_last_model
 end
 
 function PlayerVehicle:GetDefaultMaxSpeed()
@@ -481,19 +471,6 @@ function PlayerVehicle:AutoLock()
 	end
 end
 
----@param gvarKey string
----@param toggle boolean
----@param reset? boolean
-function PlayerVehicle:SetVehicleFlag(gvarKey, toggle, reset)
-	local obj = self.m_handling_editor:GetFlagObject(gvarKey)
-	if (not obj) then
-		return
-	end
-
-	self.m_handling_editor:SetFlag(obj, toggle, reset)
-	table.set_nested_key(GVars, gvarKey, toggle)
-end
-
 function PlayerVehicle:RestoreExhaustPops()
 	self.m_lctrl_mgr:RestoreExhaustPops()
 end
@@ -633,231 +610,6 @@ PlayerVehicle.MemoryPatches = {
 	Turbulence   = "Turbulence",
 	WindMult     = "WindMult",
 	Acceleration = "Acceleration",
-}
-
-PlayerVehicle.m_flag_registry = {
-	["features.vehicle.no_engine_brake"]     = {
-		flag = Enums.eVehicleHandlingFlags.FREEWHEEL_NO_GAS,
-		flagType = Enums.eHandlingEditorTypes.TYPE_HF,
-		pred = function(_, pv)
-			return pv:IsLandVehicle()
-		end,
-		-- Checkbox mass register
-		cb_label = "VEH_NO_ENGINE_BRAKE",
-		cb_tt = "VEH_NO_ENGINE_BRAKE_TT",
-		on_cb_enable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.no_engine_brake", true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.no_engine_brake", false, true)
-		end,
-	},
-	["features.vehicle.kers_boost"]          = {
-		flag = Enums.eVehicleHandlingFlags.HAS_KERS,
-		flagType = Enums.eHandlingEditorTypes.TYPE_HF,
-		pred = function(_, pv)
-			return pv:IsLandVehicle()
-		end,
-		on_enable = function()
-			local PV = LocalPlayer:GetVehicle()
-			if (not PV:IsValid()) then
-				return
-			end
-			VEHICLE.SET_VEHICLE_KERS_ALLOWED(PV:GetHandle(), true)
-		end,
-		on_disable = function()
-			local PV = LocalPlayer:GetVehicle()
-			if (not PV:IsValid()) then
-				return
-			end
-			VEHICLE.SET_VEHICLE_KERS_ALLOWED(PV:GetHandle(), false) -- this is fine, HandlingEditor won't execute this if the vehicle had the handling flag enabled by default
-		end,
-		cb_label = "VEH_KERS_BOOST",
-		cb_tt = "VEH_KERS_BOOST_TT",
-		on_cb_enable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.kers_boost", true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.kers_boost", false, true)
-		end,
-	},
-	["features.vehicle.offroad_abilities"]   = {
-		flag = Enums.eVehicleHandlingFlags.OFFROAD_ABILITIES_X2,
-		flagType = Enums.eHandlingEditorTypes.TYPE_HF,
-		cb_label = "VEH_OFFROAD_ABILITIES",
-		cb_tt = "VEH_OFFROAD_ABILITIES_TT",
-		pred = function(_, pv)
-			return pv:IsLandVehicle()
-		end,
-		on_cb_enable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.offroad_abilities", true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.offroad_abilities", false, true)
-		end,
-	},
-	["features.vehicle.rallye_tyres"]        = {
-		flag = Enums.eVehicleHandlingFlags.HAS_RALLY_TYRES,
-		flagType = Enums.eHandlingEditorTypes.TYPE_HF,
-		cb_label = "VEH_RALLY_TYRES",
-		cb_tt = "VEH_RALLY_TYRES_TT",
-		pred = function(_, pv)
-			return pv:IsLandVehicle()
-		end,
-		on_cb_enable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.rallye_tyres", true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.rallye_tyres", false)
-		end,
-	},
-	["features.vehicle.no_traction_control"] = {
-		flag = Enums.eVehicleHandlingFlags.FORCE_NO_TC_OR_SC,
-		flagType = Enums.eHandlingEditorTypes.TYPE_HF,
-		pred = function(_, pv)
-			return pv:IsBike()
-		end,
-		cb_label = "VEH_FORCE_NO_TC",
-		cb_tt = "VEH_FORCE_NO_TC_TT",
-		on_cb_enable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.no_traction_control", true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.no_traction_control", false, true)
-		end,
-	},
-	["features.vehicle.low_speed_wheelies"]  = {
-		flag = Enums.eVehicleHandlingFlags.LOW_SPEED_WHEELIES,
-		flagType = Enums.eHandlingEditorTypes.TYPE_HF,
-		pred = function(_, pv)
-			return pv:IsBike()
-		end,
-		cb_label = "VEH_LOW_SPEED_WHEELIE",
-		cb_tt = "VEH_LOW_SPEED_WHEELIE_TT",
-		on_cb_enable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.low_speed_wheelies", true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.low_speed_wheelies", false, true)
-		end,
-	},
-	["features.vehicle.rocket_boost"]        = {
-		flag = Enums.eVehicleModelInfoFlags.HAS_ROCKET_BOOST,
-		flagType = Enums.eHandlingEditorTypes.TYPE_MIF,
-		pred = function(_, pv)
-			return pv:IsLandVehicle()
-		end,
-		on_enable = function()
-			Game.RequestNamedPtfxAsset("VEH_IMPEXP_ROCKET") -- will introduce a short yield but it's fine
-		end,
-		on_disable = function()
-			STREAMING.REMOVE_NAMED_PTFX_ASSET("VEH_IMPEXP_ROCKET")
-		end,
-		on_cb_enable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.rocket_boost", true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.rocket_boost", false, true)
-		end,
-		cb_label = "VEH_ROCKET_BOOST",
-		cb_tt = "VEH_ROCKET_BOOST_TT",
-	},
-	["features.vehicle.jump_capability"]     = {
-		flag = Enums.eVehicleModelInfoFlags.JUMPING_CAR,
-		flagType = Enums.eHandlingEditorTypes.TYPE_MIF,
-		pred = function(_, pv)
-			return pv:IsLandVehicle()
-		end,
-		on_enable = function()
-			local PV = LocalPlayer:GetVehicle()
-			if (not PV:IsValid()) then
-				return
-			end
-			VEHICLE.SET_USE_HIGHER_CAR_JUMP(PV:GetHandle(), true)
-		end,
-		on_disable = function()
-			local PV = LocalPlayer:GetVehicle()
-			if (not PV:IsValid()) then
-				return
-			end
-			VEHICLE.SET_USE_HIGHER_CAR_JUMP(PV:GetHandle(), false)
-		end,
-		on_cb_enable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.jump_capability", true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.jump_capability", false, true)
-		end,
-		cb_label = "VEH_JUMP",
-		cb_tt = "VEH_JUMP_TT",
-	},
-	["features.vehicle.parachute"]           = {
-		flag = Enums.eVehicleModelInfoFlags.HAS_PARACHUTE,
-		flagType = Enums.eHandlingEditorTypes.TYPE_MIF,
-		pred = function(_, pv)
-			return pv:IsCar() and GVars.features.vehicle.jump_capability
-		end,
-		on_cb_enable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.parachute", true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.parachute", false, true)
-		end,
-		cb_label = "VEH_PARACHUTE",
-		cb_tt = "VEH_PARACHUTE_TT",
-	},
-	["features.vehicle.steer_rear_wheels"]   = {
-		flag = Enums.eVehicleHandlingFlags.STEER_REARWHEELS,
-		flagType = Enums.eHandlingEditorTypes.TYPE_HF,
-		pred = function(_, pv)
-			return pv:IsCar()
-		end,
-		on_cb_enable = function()
-			local PV = LocalPlayer:GetVehicle()
-			PV:SetVehicleFlag("features.vehicle.steer_rear_wheels", true)
-			PV:SetVehicleFlag("features.vehicle.steer_all_wheels", false, true)
-			PV:SetVehicleFlag("features.vehicle.steer_handbrake", false, true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.steer_rear_wheels", false, true)
-		end,
-		cb_label = "VEH_STEER_REAR_WHEELS",
-	},
-	["features.vehicle.steer_all_wheels"]    = {
-		flag = Enums.eVehicleHandlingFlags.STEER_ALL_WHEELS,
-		flagType = Enums.eHandlingEditorTypes.TYPE_HF,
-		pred = function(_, pv)
-			return pv:IsCar()
-		end,
-		on_cb_enable = function()
-			local PV = LocalPlayer:GetVehicle()
-			PV:SetVehicleFlag("features.vehicle.steer_all_wheels", true)
-			PV:SetVehicleFlag("features.vehicle.steer_rear_wheels", false, true)
-			PV:SetVehicleFlag("features.vehicle.steer_handbrake", false, true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.steer_all_wheels", false, true)
-		end,
-		cb_label = "VEH_STEER_ALL_WHEELS",
-	},
-	["features.vehicle.steer_handbrake"]     = {
-		flag = Enums.eVehicleHandlingFlags.HANDBRAKE_REARWHEELSTEER,
-		flagType = Enums.eHandlingEditorTypes.TYPE_HF,
-		pred = function(_, pv)
-			return pv:IsCar()
-		end,
-		on_cb_enable = function()
-			local PV = LocalPlayer:GetVehicle()
-			PV:SetVehicleFlag("features.vehicle.steer_handbrake", true)
-			PV:SetVehicleFlag("features.vehicle.steer_rear_wheels", false, true)
-			PV:SetVehicleFlag("features.vehicle.steer_all_wheels", false, true)
-		end,
-		on_cb_disable = function()
-			LocalPlayer:GetVehicle():SetVehicleFlag("features.vehicle.steer_handbrake", false, true)
-		end,
-		cb_label = "VEH_STEER_HANDBRAKE",
-		cb_tt = "VEH_STEER_HANDBRAKE_TT",
-	},
 }
 
 return PlayerVehicle(0, { noassert = true })

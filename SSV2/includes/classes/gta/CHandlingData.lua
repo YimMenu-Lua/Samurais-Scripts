@@ -10,16 +10,15 @@
 
 
 local atArray                    = require("includes.classes.gta.atArray")
-local CBaseSubHandlingData       = require("includes.classes.gta.CBaseSubHandlingData")
 local CBikeHandlingData          = require("includes.classes.gta.CBikeHandlingData")
 local CCarHandlingData           = require("includes.classes.gta.CCarHandlingData")
 local CFlyingHandlingData        = require("includes.classes.gta.CFlyingHandlingData")
 local CStructView                = require("includes.classes.gta.CStructView")
 
 local SubHandlingCtorMap <const> = {
-	[Enums.eHandlingType.CAR]    = function(ptr) return CCarHandlingData.new(ptr) end,
-	[Enums.eHandlingType.BIKE]   = function(ptr) return CBikeHandlingData.new(ptr) end,
-	[Enums.eHandlingType.FLYING] = function(ptr) return CFlyingHandlingData.new(ptr) end,
+	[Enums.eVehicleType.VEHICLE_TYPE_CAR]   = function(ptr) return CCarHandlingData.new(ptr) end,
+	[Enums.eVehicleType.VEHICLE_TYPE_BIKE]  = function(ptr) return CBikeHandlingData.new(ptr) end,
+	[Enums.eVehicleType.VEHICLE_TYPE_PLANE] = function(ptr) return CFlyingHandlingData.new(ptr) end,
 }
 
 
@@ -48,13 +47,15 @@ local SubHandlingCtorMap <const> = {
 ---@field m_model_flags pointer<eVehicleModelFlags>
 ---@field m_handling_flags pointer<eVehicleHandlingFlags>
 ---@field m_damage_flags pointer<uint32_t>
----@overload fun(ptr: pointer): CHandlingData
+---@field protected m_subhandling_data_instance CCarHandlingData|CBikeHandlingData|CCarHandlingData|CFlyingHandlingData
+---@overload fun(ptr: pointer, vehicleType: eVehicleType): CHandlingData
 local CHandlingData = CStructView("CHandlingData", 0x0048)
 
 ---@param ptr pointer
+---@param vehicleType eVehicleType
 ---@return CHandlingData
-function CHandlingData.new(ptr)
-	return setmetatable({
+function CHandlingData.new(ptr, vehicleType)
+	local instance = setmetatable({
 		m_ptr                          = ptr,
 		m_mass                         = ptr:add(0x000C),
 		m_initial_drag_coeff           = ptr:add(0x0010),
@@ -78,6 +79,13 @@ function CHandlingData.new(ptr)
 		m_sub_handling_data            = atArray(ptr:add(0x0158)),
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, CHandlingData)
+
+	local subCtor = SubHandlingCtorMap[vehicleType]
+	if (subCtor) then
+		instance.m_subhandling_data_instance = subCtor(instance.m_sub_handling_data[1]:deref())
+	end
+
+	return instance
 end
 
 ---@return float
@@ -94,11 +102,25 @@ function CHandlingData:GetDeformMultiplier()
 	end)
 end
 
+---@return uint32_t
+function CHandlingData:GetHandlingFlags()
+	return self:__safecall(0, function()
+		return self.m_handling_flags:get_dword()
+	end)
+end
+
 ---@param flag eVehicleHandlingFlags
 ---@return boolean
 function CHandlingData:GetHandlingFlag(flag)
 	return self:__safecall(false, function()
 		return Bit.IsBitSet(self.m_handling_flags:get_dword(), flag)
+	end)
+end
+
+---@return uint32_t
+function CHandlingData:GetModelFlags()
+	return self:__safecall(0, function()
+		return self.m_model_flags:get_dword()
 	end)
 end
 
@@ -110,36 +132,9 @@ function CHandlingData:GetModelFlag(flag)
 	end)
 end
 
--- ---@param handlingType eHandlingType
--- ---@return (CCarHandlingData|CBikeHandlingData|CFlyingHandlingData|)?
--- function CHandlingData:GetSubHandlingData(handlingType)
--- 	return self:__safecall(nil, function()
--- 		local array = self.m_sub_handling_data
--- 		for i = 1, array:Size() do
--- 			local sub_ptr = array:At(i)
--- 			if (sub_ptr:is_null()) then
--- 				goto continue
--- 			end
-
--- 			local base = CBaseSubHandlingData(sub_ptr)
--- 			if (not base or base:GetHandlingType() ~= handlingType) then
--- 				goto continue
--- 			end
-
--- 			local ctor = SubHandlingCtorMap[handlingType]
--- 			if (ctor) then return ctor(sub_ptr) end
-
--- 			::continue::
--- 		end
--- 		return nil
--- 	end)
--- end
-
----@return pointer<(CCarHandlingData|CBikeHandlingData|CFlyingHandlingData|)?>
+---@return (CCarHandlingData|CBikeHandlingData|CFlyingHandlingData|)?
 function CHandlingData:GetSubHandlingData()
-	return self:__safecall(nil, function()
-		return self.m_sub_handling_data:At(1)
-	end)
+	return self.m_subhandling_data_instance
 end
 
 ---@param value float
@@ -160,6 +155,16 @@ function CHandlingData:SetDeformMultiplier(value)
 	end)
 end
 
+---@param flags uint32_t
+---@return boolean
+function CHandlingData:SetHandlingFlags(flags)
+	return self:__safecall(false, function()
+		if (self.m_handling_flags:is_null()) then return false end
+		self.m_handling_flags:set_dword(flags)
+		return true
+	end)
+end
+
 ---@param flag eVehicleHandlingFlags
 ---@param toggle boolean
 ---@return boolean
@@ -172,6 +177,32 @@ function CHandlingData:SetHandlingFlag(flag, toggle)
 		if (self.m_handling_flags:is_null()) then return false end
 		local dword_flags = self.m_handling_flags:get_dword()
 		self.m_handling_flags:set_dword(Bit.Toggle(dword_flags, flag, toggle))
+		return true
+	end)
+end
+
+---@param flags uint32_t
+---@return boolean
+function CHandlingData:SetModelFlags(flags)
+	return self:__safecall(false, function()
+		if (self.m_model_flags:is_null()) then return false end
+		self.m_model_flags:set_dword(flags)
+		return true
+	end)
+end
+
+---@param flag eVehicleModelFlags
+---@param toggle boolean
+---@return boolean
+function CHandlingData:SetModelFlag(flag, toggle)
+	if (type(flag) ~= "number" or type(toggle) ~= "boolean") then
+		return false
+	end
+
+	return self:__safecall(false, function()
+		if (self.m_model_flags:is_null()) then return false end
+		local dword_flags = self.m_model_flags:get_dword()
+		self.m_model_flags:set_dword(Bit.Toggle(dword_flags, flag, toggle))
 		return true
 	end)
 end

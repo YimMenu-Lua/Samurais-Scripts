@@ -34,8 +34,8 @@ local function CStructView(name, size)
 	cls.__index = cls
 
 	setmetatable(cls, {
-		__call = function(t, ptr)
-			return t.new(ptr)
+		__call = function(t, ...)
+			return t.new(...)
 		end
 	})
 
