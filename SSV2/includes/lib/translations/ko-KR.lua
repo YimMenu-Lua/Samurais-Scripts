@@ -936,5 +936,6 @@ return {
 	["VEH_FLAGS_PRESET_FILTER_BIKES_ONLY"] = "자전거 전용",
 	["VEH_FLAGS_PRESET_IMPORT_FAIL"] = "사전 설정을 가져오지 못했습니다. 나중에 다시 시도해 주세요.",
 	["VEH_FLAGS_PRESET_PARSER_TOOLTIP"] = "유효한 데이터가 디코딩되면 사전 설정이 여기에 표시됩니다.",
-	["VEH_FLAGS_PRESET_FILTER_CARS_ONLY"] = "자동차 전용"
+	["VEH_FLAGS_PRESET_FILTER_CARS_ONLY"] = "자동차 전용",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"] = "중요: 이 사전 설정에는 '%s.lua'라는 콜백 정의 파일이 있습니다. 미리 설정된 데이터와 공유하는 것도 잊지 마세요."
 }

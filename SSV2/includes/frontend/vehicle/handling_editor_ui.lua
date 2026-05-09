@@ -316,6 +316,8 @@ local function drawPresets()
 				popupsToDraw.flagDump = true
 			end
 
+			local callbackFileName = preset.m_callback_defs_filename
+			local hasCallbackFile  = not isDefault and (callbackFileName ~= nil)
 			ImGui.BeginDisabled(isDefault)
 			if (ImGui.MenuItem(_T("GENERIC_SHARE"))) then
 				local str = Serializer:Encode(preset:Serialize())
@@ -330,6 +332,8 @@ local function drawPresets()
 			ImGui.EndDisabled()
 			if (isDefault) then
 				GUI:Tooltip(_T("VEH_FLAGS_PRESET_NO_SHARE"))
+			elseif (hasCallbackFile) then
+				GUI:WarningMarker(_T("VEH_FLAGS_PRESET_CB_FILE_WARN_FMT", callbackFileName))
 			end
 
 			ImGui.BeginDisabled(isDefault)

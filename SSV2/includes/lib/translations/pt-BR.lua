@@ -936,5 +936,6 @@ return {
 	["VEH_FLAGS_NEW_PRESET_CB_FILE_TT"] = "Nome do arquivo de definições de retorno de chamada opcional. Se você não sabe o que é isso, deixe em branco.",
 	["GENERIC_CLIPBOARD_DECODE"] = "Decodificar dados da área de transferência",
 	["VEH_FLAGS_PRESET_FILTER_BOTH"] = "Carros e bicicletas",
-	["VEH_FLAGS_PRESET_FILTER_CARS_ONLY"] = "Apenas carros"
+	["VEH_FLAGS_PRESET_FILTER_CARS_ONLY"] = "Apenas carros",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"] = "IMPORTANTE: Esta predefinição possui um arquivo de definições de retorno de chamada chamado '%s.lua'. Não se esqueça de compartilhá-lo também com os dados predefinidos."
 }

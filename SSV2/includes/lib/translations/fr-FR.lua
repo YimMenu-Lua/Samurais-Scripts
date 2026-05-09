@@ -936,5 +936,6 @@ return {
 	["VEH_FLAGS_NEW_PRESET_CB_FILE_TT"] = "Nom du fichier de définitions de rappel facultatif. Si vous ne savez pas ce que c'est, laissez-le vide.",
 	["VEH_FLAGS_PRESET_PARSER_TOOLTIP"] = "Le préréglage sera affiché ici une fois que les données valides auront été décodées.",
 	["GENERIC_DATA_PARSE_FAIL"] = "Échec de l'analyse des données ! Veuillez réessayer plus tard.",
-	["VEH_FLAGS_PRESET_FILTER_BIKES_ONLY"] = "Vélos uniquement"
+	["VEH_FLAGS_PRESET_FILTER_BIKES_ONLY"] = "Vélos uniquement",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"] = "IMPORTANT : ce préréglage contient un fichier de définitions de rappel nommé « %s.lua ». N'oubliez pas de le partager également avec les données prédéfinies."
 }

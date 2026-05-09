@@ -613,13 +613,14 @@ return {
 	["VEH_DRIFT_MINIGAME_SOUND_OPT"]       = "Score Sound",
 	["VEH_DRIFT_MINIGAME_SOUND_OPT_TT"]    = "Play a sound when scoring points",
 	["VEH_DRIFT_MINIGAME_PB_LABEL"]        = "Player Best:\t%s Points",
-	["VEH_FLAGS_EDITOR_TAB"]               = " Editor ", -- kep spaces
+	["VEH_FLAGS_EDITOR_TAB"]               = " Editor ",  -- kep spaces
 	["VEH_FLAGS_PRESETS_TAB"]              = " Presets ", -- //
 	["VEH_FLAGS_PRESETS_NONE_TXT"]         = "There are no saved presets. You can create new ones in the 'Editor' tab.",
 	["VEH_FLAGS_FILTER_ENABLED_ONLY"]      = "Enabled Only",
 	["VEH_FLAGS_FILTER_DISABLED_ONLY"]     = "Disabled Only",
 	["VEH_FLAGS_NEW_PRESET"]               = "Save As Preset",
 	["VEH_FLAGS_NEW_PRESET_CB_FILE_TT"]    = "Optional callback definitions file name. If you don't know what this is, please leave it empty.",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"]  = "IMPORTANT: This preset has callback definitions file named '%s.lua'. Don't forget to also share it with the preset data.",
 	["VEH_FLAGS_NEW_PRESET_SUCCESS"]       = "Preset '%s' has been successfully registered.",
 	["VEH_FLAGS_NEW_PRESET_VEHICLE_BS"]    = "Allowed Vehicle Types",
 	["VEH_FLAGS_ADVANCED"]                 = "Advanced Flags",

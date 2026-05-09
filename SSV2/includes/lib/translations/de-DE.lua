@@ -936,5 +936,6 @@ return {
 	["VEH_FLAGS_PRESET_SHARE_SUCCESS_FMT"] = "Die Voreinstellung „%s“ wurde auf Ihr Clipboard kopiert und in der Konsole protokolliert. Andere Skriptbenutzer können die Voreinstellung importieren, indem sie die Daten in das Fenster „Importieren“ einfügen.",
 	["VEH_FLAGS_PRESET_PARSER_TOOLTIP"] = "Die Voreinstellung wird hier angezeigt, sobald gültige Daten dekodiert wurden.",
 	["VEH_FLAGS_NEW_PRESET_CB_FILE_TT"] = "Optionaler Name der Callback-Definitionsdatei. Wenn Sie nicht wissen, was das ist, lassen Sie es bitte leer.",
-	["GENERIC_CLIPBOARD_GET"] = "Daten aus der Zwischenablage abrufen"
+	["GENERIC_CLIPBOARD_GET"] = "Daten aus der Zwischenablage abrufen",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"] = "WICHTIG: Diese Voreinstellung verfügt über eine Callback-Definitionsdatei mit dem Namen „%s.lua“. Vergessen Sie nicht, es auch mit den voreingestellten Daten zu teilen."
 }

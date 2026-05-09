@@ -936,5 +936,6 @@ return {
 	["VEH_FLAGS_PRESET_FILTER_BIKES_ONLY"] = "Sólo bicicletas",
 	["VEH_FLAGS_PRESET_FILTER_BOTH"] = "Coches y bicicletas",
 	["VEH_FLAGS_PRESET_PARSER_TOOLTIP"] = "El valor predeterminado se mostrará aquí una vez que se hayan decodificado los datos válidos.",
-	["VEH_FLAGS_PRESET_IMPORT_SUCCESS"] = "El nuevo ajuste preestablecido se ha importado correctamente."
+	["VEH_FLAGS_PRESET_IMPORT_SUCCESS"] = "El nuevo ajuste preestablecido se ha importado correctamente.",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"] = "IMPORTANTE: Este ajuste preestablecido tiene un archivo de definiciones de devolución de llamada llamado '%s.lua'. No olvides compartirlo también con los datos preestablecidos."
 }

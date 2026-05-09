@@ -936,5 +936,6 @@ return {
 	["VEH_FLAGS_NEW_PRESET_CB_FILE_TT"] = "Nome file delle definizioni di callback facoltativo. Se non sai di cosa si tratta, lascialo vuoto.",
 	["VEH_FLAGS_PRESET_FILTER_BIKES_ONLY"] = "Solo biciclette",
 	["VEH_FLAGS_PRESET_NO_SHARE"] = "Le preimpostazioni predefinite non possono essere condivise poiché sono le stesse per tutti.",
-	["VEH_FLAGS_PRESET_SHARE_SUCCESS_FMT"] = "La preimpostazione '%s' è stata copiata negli appunti e registrata sulla console. Altri utenti di script possono importare la preimpostazione incollando i dati nella finestra \"Importa\"."
+	["VEH_FLAGS_PRESET_SHARE_SUCCESS_FMT"] = "La preimpostazione '%s' è stata copiata negli appunti e registrata sulla console. Altri utenti di script possono importare la preimpostazione incollando i dati nella finestra \"Importa\".",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"] = "IMPORTANTE: questa preimpostazione dispone di un file di definizioni di callback denominato '%s.lua'. Non dimenticare di condividerlo anche con i dati preimpostati."
 }

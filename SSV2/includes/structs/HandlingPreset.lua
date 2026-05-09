@@ -91,7 +91,7 @@ end
 ---@field private m_is_user_generated boolean
 ---@field private m_on_enable_callback? fun(self: HandlingPreset, editor: HandlingEditor): any
 ---@field private m_on_disable_callback? fun(self: HandlingPreset, editor: HandlingEditor): any
----@field private m_callback_defs_filename string
+---@field public m_callback_defs_filename string
 ---@field public m_deltas table<eHandlingEditorTypes, table<string, boolean>>
 ---@field public m_vehicle_bitset integer -- bitset of eVehicleType (cars and bikes only)
 ---@field public m_category string

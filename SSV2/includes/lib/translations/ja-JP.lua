@@ -936,5 +936,6 @@ return {
 	["VEH_FLAGS_PRESET_IMPORT_FAIL"] = "プリセットのインポートに失敗しました。後でもう一度試してください。",
 	["VEH_FLAGS_PRESET_FILTER_CARS_ONLY"] = "車のみ",
 	["VEH_FLAGS_PRESET_FILTER_BOTH"] = "車とバイク",
-	["VEH_FLAGS_PRESET_IMPORT_SUCCESS"] = "新しいプリセットが正常にインポートされました。"
+	["VEH_FLAGS_PRESET_IMPORT_SUCCESS"] = "新しいプリセットが正常にインポートされました。",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"] = "重要: このプリセットには、「%s.lua」という名前のコールバック定義ファイルがあります。プリセットデータとの共有も忘れずに。"
 }

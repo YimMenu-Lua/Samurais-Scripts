@@ -936,5 +936,6 @@ return {
 	["VEH_FLAGS_PRESET_IMPORT_SUCCESS"] = "新预设已成功导入。",
 	["VEH_FLAGS_PRESET_PARSER_TOOLTIP"] = "一旦有效数据被解码，预设将显示在此处。",
 	["VEH_FLAGS_PRESET_IMPORT_FAIL"] = "导入预设失败。请稍后重试。",
-	["VEH_FLAGS_PRESET_FILTER_BOTH"] = "汽车和自行车"
+	["VEH_FLAGS_PRESET_FILTER_BOTH"] = "汽车和自行车",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"] = "重要提示：此预设具有名为“%s.lua”的回调定义文件。不要忘记将其与预设数据一起共享。"
 }

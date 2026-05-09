@@ -936,5 +936,6 @@ return {
 	["VEH_FLAGS_PRESET_FILTER_BOTH"] = "Samochody I Rowery",
 	["VEH_FLAGS_PRESET_FILTER_BIKES_ONLY"] = "Tylko rowery",
 	["VEH_FLAGS_PRESET_IMPORT_FAIL"] = "Nie udało się zaimportować gotowych ustawień. Spróbuj ponownie później.",
-	["VEH_FLAGS_PRESET_IMPORT_SUCCESS"] = "Nowe ustawienie wstępne zostało pomyślnie zaimportowane."
+	["VEH_FLAGS_PRESET_IMPORT_SUCCESS"] = "Nowe ustawienie wstępne zostało pomyślnie zaimportowane.",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"] = "WAŻNE: To ustawienie wstępne zawiera plik definicji wywołań zwrotnych o nazwie „%s.lua”. Nie zapomnij również udostępnić go razem z ustawionymi danymi."
 }

@@ -936,5 +936,6 @@ return {
 	["VEH_FLAGS_PRESET_SHARE_SUCCESS_FMT"] = "預設“%s”已複製到您的剪貼簿並記錄到控制台。其他腳本使用者可以透過將資料貼上到「導入」視窗中來匯入預設。",
 	["VEH_FLAGS_NEW_PRESET_CB_FILE_TT"] = "可選回調定義檔名。如果您不知道這是什麼，請將其留空。",
 	["VEH_FLAGS_PRESET_PARSER_TOOLTIP"] = "一旦有效資料被解碼，預設將顯示在此。",
-	["VEH_FLAGS_PRESET_IMPORT_FAIL"] = "導入預設失敗。請稍後重試。"
+	["VEH_FLAGS_PRESET_IMPORT_FAIL"] = "導入預設失敗。請稍後重試。",
+	["VEH_FLAGS_PRESET_CB_FILE_WARN_FMT"] = "重要提示：此預設具有名為「%s.lua」的回呼定義檔。不要忘記將其與預設資料一起共享。"
 }
