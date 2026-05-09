@@ -44,6 +44,12 @@ local TVehTextureLookup <const> = {
 	["brigham"] = "sssa_dlc_2023_01",
 	["clique2"] = "sssa_dlc_2023_01",
 }
+local audioDebugger             = {
+	soundID      = -1,
+	audioName    = "",
+	audioRef     = "",
+	mpDataLoaded = false
+}
 
 --fwd decl
 local thread_name
@@ -568,64 +574,44 @@ local function DrawPatches()
 end
 
 local function DrawMiscTests()
-	if (ImGui.Button("Test Toasts")) then
-		for i = 1, 5 do
-			local label = _F("Test %d", i)
-			local level = math.random(0, 3)
-			Notifier:Add(label, string.random(), level)
+	ImGui.BeginTabBar("stupidshit")
+	if (ImGui.BeginTabItem("Vehicle Stuff")) then
+		if (ImGui.Button("Dump Subhandling Data")) then
+			if (self.get_veh() == 0) then return end
+			print(LocalPlayer:GetVehicle():GetHandlingData())
 		end
 
-		Notifier:Add("Callable", string.random(), 0, { callback = function() print("notification callback") end })
+		ImGui.EndTabItem()
 	end
 
-	if (ImGui.Button("Dump CWeaponInfo")) then
-		local out           = {}
-		local cpedweaponmgr = LocalPlayer:Resolve():GetWeaponManager()
-		if (not cpedweaponmgr or not cpedweaponmgr:IsValid()) then
-			print("CPedWeaponManager: invalid pointer.")
-			return
+	if (ImGui.BeginTabItem("Audio Debugger")) then
+		audioDebugger.audioName = ImGui.InputTextWithHint("##audioName", "Audio Name", audioDebugger.audioName, 64)
+		audioDebugger.audioRef  = ImGui.InputTextWithHint("##audioRef", "Audio Reference", audioDebugger.audioRef, 128, ImGuiInputTextFlags.CharsNoBlank)
+
+		if (ImGui.Button("Play##audio")) then
+			ThreadManager:Run(function()
+				if not (string.isvalid(audioDebugger.audioName) and string.isvalid(audioDebugger.audioRef)) then
+					return
+				end
+
+				if not (Game.IsOnline() and audioDebugger.mpDataLoaded) then
+					AUDIO.SET_AUDIO_FLAG("LoadMPData", true)
+					audioDebugger.mpDataLoaded = true
+				end
+				AUDIO.PLAY_SOUND_FRONTEND(-1, audioDebugger.audioName, audioDebugger.audioRef, true)
+			end)
 		end
 
-		local cweaponinfo = cpedweaponmgr:GetWeaponInfo()
-		if not (cweaponinfo and cweaponinfo:IsValid()) then
-			print("CWeaponInfo: invalid pointer.")
-			return
+		ImGui.SameLine()
+		if (ImGui.Button("Stop##audio")) then
+			ThreadManager:Run(function()
+				AUDIO.STOP_SOUND(AUDIO.GET_SOUND_ID())
+			end)
 		end
-
-		for k, v in pairs(cweaponinfo) do
-			if (IsInstance(v, "pointer")) then
-				table.insert(out, _F("%s = 0x%X", k, v:get_address()))
-			end
-		end
-
-		printf("\n--------- CWeaponInfo Dump ---------\n\n%s", table.concat(out, ",\n"))
+		ImGui.EndTabItem()
 	end
 
-	if (ImGui.Button("Parse Subhandling Pointers")) then
-		if (self.get_veh() == 0) then return end
-
-		local cvehicle = LocalPlayer:GetVehicle():Resolve()
-		if (not cvehicle:IsValid()) then return end
-
-		local chandlingdata = cvehicle.m_handling_data
-		if (not chandlingdata:IsValid()) then return end
-
-		local array = chandlingdata.m_sub_handling_data
-		for i = 1, #array do
-			local ptr = array[i]:deref()
-			if (not ptr:is_valid()) then
-				printf("index %d: nullptr", i)
-			else
-				local v = ptr:add(0x00C8):get_int()
-				printf("index %d: %d [%s]", i, v, EnumToString(Enums.eHandlingType, v))
-			end
-		end
-	end
-
-	if (ImGui.Button("Dump Subhandling Data")) then
-		if (self.get_veh() == 0) then return end
-		print(LocalPlayer:GetVehicle():GetHandlingData())
-	end
+	ImGui.EndTabBar()
 end
 
 return function()

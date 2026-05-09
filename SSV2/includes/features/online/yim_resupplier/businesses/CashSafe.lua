@@ -1,4 +1,3 @@
-local SGSL = require "includes.services.SGSL"
 -- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
 -- This file is part of Samurai's Scripts.
 --
@@ -6,6 +5,9 @@ local SGSL = require "includes.services.SGSL"
 -- this code as long as you respect these conditions:
 --	* Credit the owner and contributors.
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
+local SGSL = require("includes.services.SGSL")
 
 
 ---@class CashSafeOpts
@@ -110,7 +112,6 @@ end
 
 ---@return integer
 function CashSafe:GetCashValue()
-	assert(type(self.m_cash_stat) == "string", "Invalid player stat.")
 	return stats.get_int(self.m_cash_stat)
 end
 
@@ -139,18 +140,24 @@ end
 ---@private
 ---@param v integer
 function CashSafe:SetCashValue(v)
+	if (math.type(v) ~= "integer") then
+		return
+	end
+
 	if (v < 0 or v > self:GetCapacity()) then
 		return
 	end
 
-	local global = self.m_global_entry
-	local stat   = self.m_cash_stat
-	if (not global or not stat) then
+	local statName     = self.m_cash_stat
+	local scriptGlobal = self.m_global_entry
+	if (not statName or not scriptGlobal) then
 		return
 	end
 
-	self.m_global_entry:WriteInt(v)
-	stats.set_int(stat, v)
+	-- this is exactly what freemode does to increment
+	-- safe cash (minus the clamping, etc.)
+	stats.set_int(statName, v)
+	scriptGlobal:WriteInt(v)
 end
 
 ---@return boolean

@@ -1,4 +1,3 @@
-local ThemeManager = require "includes.services.ThemeManager"
 -- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
 -- This file is part of Samurai's Scripts.
 --
@@ -7,6 +6,8 @@ local ThemeManager = require "includes.services.ThemeManager"
 --	* Credit the owner and contributors.
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
+
+local ThemeManager = require("includes.services.ThemeManager")
 
 ---@enum eNotificationLevel
 Enums.eNotificationLevel = {
@@ -711,7 +712,7 @@ function Notifier:DrawNotifications(start_pos)
 		start_pos.x = screen_width - far_right
 	end
 
-	local height      = self:ComputeTotalHeight() + 20
+	local height      = self:ComputeTotalHeight() + 40
 	local window_pos  = vec2:new(start_pos.x + self.m_window_width, start_pos.y)
 	local window_size = vec2:new(self.m_window_width, height)
 	local style       = ImGui.GetStyle()
@@ -727,7 +728,7 @@ function Notifier:DrawNotifications(start_pos)
 	end
 
 	ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0)
-	ImGui.PushStyleVar(ImGuiStyleVar.ScrollbarSize, 9.0)
+	ImGui.PushStyleVar(ImGuiStyleVar.ScrollbarSize, 9.5)
 	ImGui.PushStyleColor(ImGuiCol.ScrollbarBg, 0)
 	ImGui.SetNextWindowBgAlpha(0)
 	if (ImGui.Begin("##notif_center",
@@ -799,7 +800,7 @@ function Notifier:DrawNotifications(start_pos)
 					drawList
 				)
 
-				ImGui.Dummy(1, notif:ComputeHeight())
+				ImGui.Dummy(1, notif:ComputeHeight() + 20)
 			end
 		end
 

@@ -11,7 +11,7 @@ local measureBulletWidths   = require("includes.frontend.helpers.measure_text_wi
 local colMoneyGreen <const> = Color("#85BB65")
 local COL_GREEN <const>     = Color.GREEN
 local COL_RED <const>       = Color.RED
-local drawDetailsTable      = false
+local detailsTableToggle    = { v = false, clicked = false }
 local bottomTextSize
 
 ---@type array<integer>
@@ -122,48 +122,50 @@ return function(warehouse)
 	ImGui.SetWindowFontScale(1.0)
 	ImGui.EndChild()
 
-	if (count == 0) then
-		return
-	end
+	if (count == 0) then return end
 
-	if (Backend.debug_mode) then
-		if (ImGui.Button("Test")) then
-			warehouse:FinishStealMission()
+	ImGui.Separator()
+	detailsTableToggle.clicked = GUI:CustomToggleEx(_T("YRV3_IE_VEHS_DETAILS_CB"), detailsTableToggle)
+
+	if (detailsTableToggle.v) then
+		if (ImGui.BeginTable("##ie_veh_storage", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.BordersInner)) then
+			ImGui.TableSetupColumn(_T("YRV3_IE_VEH_SLOT"), ImGuiTableColumnFlags.WidthFixed, 40)
+			ImGui.TableSetupColumn(_T("GENERIC_NAME"))
+			ImGui.TableSetupColumn(_T("YRV3_IE_VEH_PLATE"))
+			ImGui.TableSetupColumn(_T("YRV3_IE_VEH_RANGE"))
+			ImGui.TableSetupColumn(_T("YRV3_IE_VEH_COMMISSION"))
+			ImGui.TableHeadersRow()
+
+			for _, veh in ipairs(storedVehs) do
+				ImGui.TableNextRow()
+
+				ImGui.TableSetColumnIndex(0)
+				ImGui.Text(tostring(veh.slot))
+
+				ImGui.TableSetColumnIndex(1)
+				ImGui.Text(veh.name)
+
+				ImGui.TableSetColumnIndex(2)
+				ImGui.Text(veh.plate_text)
+
+				ImGui.TableSetColumnIndex(3)
+				ImGui.Text(veh.range_str)
+
+				ImGui.TableSetColumnIndex(4)
+				ImGui.Text(veh.commis_fmt)
+			end
+			ImGui.EndTable()
 		end
 	end
+	ImGui.Spacing()
 
-	drawDetailsTable = GUI:Checkbox(_T("YRV3_IE_VEHS_DETAILS_CB"), drawDetailsTable)
-
-	if (not drawDetailsTable) then
-		return
+	if (detailsTableToggle.clicked and detailsTableToggle.v and ImGui.GetCursorPosY() > ImGui.GetWindowHeight()) then
+		ImGui.SetScrollHereY()
 	end
 
-	if (ImGui.BeginTable("##ie_veh_storage", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.BordersInner)) then
-		ImGui.TableSetupColumn(_T("YRV3_IE_VEH_SLOT"), ImGuiTableColumnFlags.WidthFixed, 40)
-		ImGui.TableSetupColumn(_T("GENERIC_NAME"))
-		ImGui.TableSetupColumn(_T("YRV3_IE_VEH_PLATE"))
-		ImGui.TableSetupColumn(_T("YRV3_IE_VEH_RANGE"))
-		ImGui.TableSetupColumn(_T("YRV3_IE_VEH_COMMISSION"))
-		ImGui.TableHeadersRow()
-
-		for _, veh in ipairs(storedVehs) do
-			ImGui.TableNextRow()
-
-			ImGui.TableSetColumnIndex(0)
-			ImGui.Text(tostring(veh.slot))
-
-			ImGui.TableSetColumnIndex(1)
-			ImGui.Text(veh.name)
-
-			ImGui.TableSetColumnIndex(2)
-			ImGui.Text(veh.plate_text)
-
-			ImGui.TableSetColumnIndex(3)
-			ImGui.Text(veh.range_str)
-
-			ImGui.TableSetColumnIndex(4)
-			ImGui.Text(veh.commis_fmt)
-		end
-		ImGui.EndTable()
-	end
+	-- if (Backend.debug_mode) then
+	-- 	if (ImGui.Button("Test")) then
+	-- 		warehouse:FinishStealMission()
+	-- 	end
+	-- end
 end

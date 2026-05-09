@@ -8,6 +8,7 @@
 
 
 require("includes.lib.extensions.api_imgui")
+local COL_WARN_YELLOW = Color("safety_yellow")
 local Tab             = require("includes.modules.Tab")
 local WindowAnimator  = require("includes.services.WindowAnimator")
 local ThemeManager    = require("includes.services.ThemeManager")
@@ -930,6 +931,23 @@ function GUI:HelpMarker(text, opts)
 	self:Tooltip(text, opts)
 end
 
+-- Creates a warning marker `[ ! ]` symbol in front of the widget this function is called after.
+--
+-- When the symbol is hovered, it displays a tooltip.
+---@param text string
+---@param opts? { color: Color, alpha: number, wrap_pos: number, fmt: table }
+function GUI:WarningMarker(text, opts)
+	if (GVars.ui.disable_tooltips) then
+		return
+	end
+
+	ImGui.SameLine()
+	ImGui.PushStyleColor(ImGuiCol.TextDisabled, COL_WARN_YELLOW:AsFloat())
+	ImGui.TextDisabled("[ ! ]")
+	ImGui.PopStyleColor()
+	self:Tooltip(text, opts)
+end
+
 -- Displays a multiline tooltip when the ImGui widget this function is called after is hovered.
 ---@param lines array<string>
 ---@param wrap_pos? number
@@ -1058,6 +1076,42 @@ function GUI:Checkbox(label, v, opts)
 	end
 
 	return v, clicked
+end
+
+-- A toggle that works by reference.
+--
+-- **Example Usage:**
+--```Lua
+-- local myBoolRef = { v = false }
+-- if (GUI:CustomToggleEx("My Ref Toggle", myBoolRef)) then
+--    doStuff()
+-- end
+--```
+---@param label string
+---@param bRef { v: boolean } a table with a boolean key named `v`
+---@return boolean clicked
+function GUI:CustomToggleEx(label, bRef)
+	local clicked   = false
+	bRef.v, clicked = ImGui.Toggle(label, bRef.v)
+	return clicked
+end
+
+-- A checkbox that works by reference.
+--
+-- **Example Usage:**
+--```Lua
+-- local myBoolRef = { v = false }
+-- if (GUI:CheckboxEx("My Ref Checkbox", myBoolRef)) then
+--    doStuff()
+-- end
+--```
+---@param label string
+---@param bRef { v: boolean } a table with a boolean key named `v`
+---@return boolean clicked
+function GUI:CheckboxEx(label, bRef)
+	local clicked   = false
+	bRef.v, clicked = ImGui.Toggle(label, bRef.v)
+	return clicked
 end
 
 ---@param label string

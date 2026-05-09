@@ -7,194 +7,459 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
----@enum eHandlingEditorTypes
-Enums.eHandlingEditorTypes = {
-	TYPE_HF  = 0, -- handling flag
-	TYPE_AF  = 1, -- advanced flag
-	TYPE_MIF = 2, -- model info flag
+local HandlingPreset   = require("includes.structs.HandlingPreset")
+local DefaultPresets   = require("includes.data.handling_presets")
+
+---@type table<eHandlingEditorTypes, { enum : table<string, integer>, set: fun(veh: PlayerVehicle, flag: integer, toggle: boolean), get: fun(veh: PlayerVehicle, flag: integer): boolean }>
+local FlagData <const> = {
+	[Enums.eHandlingEditorTypes.TYPE_AF] = {
+		enum = Enums.eVehicleAdvancedFlags,
+		get  = function(veh, flag) return veh:GetAdvancedFlag(flag) end,
+		set  = function(veh, flag, toggle) veh:SetAdvancedFlag(flag, toggle) end,
+	},
+	[Enums.eHandlingEditorTypes.TYPE_HF] = {
+		enum = Enums.eVehicleHandlingFlags,
+		get  = function(veh, flag) return veh:GetHandlingFlag(flag) end,
+		set  = function(veh, flag, toggle) veh:SetHandlingFlag(flag, toggle) end,
+	},
+	[Enums.eHandlingEditorTypes.TYPE_MF] = {
+		enum = Enums.eVehicleModelFlags,
+		get  = function(veh, flag) return veh:GetModelFlag(flag) end,
+		set  = function(veh, flag, toggle) veh:SetModelFlag(flag, toggle) end,
+	},
+	[Enums.eHandlingEditorTypes.TYPE_MIF] = {
+		enum = Enums.eVehicleModelInfoFlags,
+		get  = function(veh, flag) return veh:GetModelInfoFlag(flag) end,
+		set  = function(veh, flag, toggle) veh:SetModelInfoFlag(flag, toggle) end,
+	},
 }
 
----@class HandlingObject
----@field m_flag eVehicleHandlingFlags | eVehicleAdvancedFlags | eVehicleModelInfoFlags
----@field m_type eHandlingEditorTypes
----@field m_default boolean
----@field m_was_edited boolean
----@field m_predicate? Predicate<HandlingObject, PlayerVehicle>
----@field m_on_enable? Callback
----@field m_on_disable? Callback
-local HandlingObject = {}
-HandlingObject.__index = HandlingObject
-
----@param flag eVehicleHandlingFlags | eVehicleAdvancedFlags | eVehicleModelInfoFlags
----@param flagType eHandlingEditorTypes
----@param predicate? Predicate<HandlingObject, PlayerVehicle>
-function HandlingObject.new(flag, flagType, predicate)
-	return setmetatable({
-		m_flag      = flag,
-		m_type      = flagType,
-		m_predicate = predicate
-	}, HandlingObject)
-end
-
 ---@class HandlingEditor
----@field private m_pv PlayerVehicle
----@field private m_handling_objects table<string, HandlingObject>
+---@field private m_vehicle PlayerVehicle
+---@field private m_deltas table<eHandlingEditorTypes, table<string, boolean>>
+---@field private m_stale_deltas table<joaat_t, table<eHandlingEditorTypes, table<string, boolean>>> -- save by model in case a vehicle despawns before cleanup
+---@field private m_presets array<HandlingPreset>
+---@field private m_preset_lookup dict<integer> -- presetName -> m_presets array index. we really need an OrderedList now this is getting out of hand
+---@field private m_active_presets dict<HandlingPreset>
+---@field private m_owned_flags table<string, integer> reference count by flag name. keys are typed like so to abvoid name collision: enumType:flagName (ex: "1:FREEWHEEL_NO_GAS") where "1" is eHandlingEditorTypes.TYPE_HF
+---@field private m_file_name "handling_editor.json"
 ---@field private m_initialized boolean
-local HandlingEditor = {}
+---@field private m_presets_ready boolean
+local HandlingEditor   = {
+	m_initialized    = false,
+	m_presets_ready  = false,
+	m_file_name      = "handling_editor.json",
+	m_presets        = {},
+	m_preset_lookup  = {},
+	m_active_presets = {},
+	m_owned_flags    = {},
+}
 HandlingEditor.__index = HandlingEditor
 
----@param pv PlayerVehicle
-function HandlingEditor:init(pv)
+---@param veh PlayerVehicle
+function HandlingEditor:init(veh)
 	if (self.m_initialized) then
 		log.warning("[HandlingEditor]: Attempt to re-initialize. Only one instance is allowed.")
 		return self
 	end
 
-	self.m_pv               = pv
-	self.m_handling_objects = {}
-	self.m_initialized      = true
+	self.m_vehicle      = veh
+	self.m_stale_deltas = {}
+	self.m_deltas       = {
+		[Enums.eHandlingEditorTypes.TYPE_AF]  = {},
+		[Enums.eHandlingEditorTypes.TYPE_HF]  = {},
+		[Enums.eHandlingEditorTypes.TYPE_MF]  = {},
+		[Enums.eHandlingEditorTypes.TYPE_MIF] = {},
+	}
 
+	if (not io.exists(self.m_file_name)) then
+		Serializer:WriteToFile(self.m_file_name, DefaultPresets)
+	end
+
+	self:FetchPresets()
+	self.m_initialized = true
 	return self
 end
 
----@param gvarKey string
----@param flag eVehicleHandlingFlags | eVehicleAdvancedFlags | eVehicleModelInfoFlags
----@param flagType eHandlingEditorTypes
----@param predicate? Predicate
----@param onEnable? Callback
----@param onDisable? Callback
-function HandlingEditor:PushFlag(gvarKey, flag, flagType, predicate, onEnable, onDisable)
-	if (self.m_handling_objects[gvarKey]) then
-		return
-	end
+function HandlingEditor:FetchPresets()
+	ThreadManager:Run(function()
+		---@type table<string, HandlingPreset>
+		local default_presets = {}
+		self.m_presets        = {}
+		self.m_preset_lookup  = {}
+		local index           = 0
+		local json_presets    = Serializer:ReadFromFile(self.m_file_name) or {} ---@cast json_presets array<HandlingPresetData>
 
-	local obj = HandlingObject.new(flag, flagType, predicate)
+		for _, preset in pairs(DefaultPresets) do
+			local reference = HandlingPreset.new(preset)
+			local name = preset.name
+			table.insert(self.m_presets, reference)
+			default_presets[name] = reference
+			index = index + 1
+			self.m_preset_lookup[name] = index
+		end
 
-	if (self.m_pv and self.m_pv:IsValid()) then
-		obj.m_default = self:GetFlagDefault(obj)
-	end
+		for _, presetData in ipairs(json_presets) do
+			local name = presetData.name
+			local reference = default_presets[name]
+			if (reference) then
+				reference.auto_apply = presetData.auto_apply
+			else
+				table.insert(self.m_presets, HandlingPreset.new(presetData))
+				index = index + 1
+				self.m_preset_lookup[name] = index
+			end
+		end
 
-	obj.m_on_enable                  = onEnable
-	obj.m_on_disable                 = onDisable
-	self.m_handling_objects[gvarKey] = obj
+		self.m_presets_ready = true
+	end)
 end
 
----@param obj HandlingObject
+---@nodiscard
 ---@return boolean
-function HandlingEditor:GetFlagDefault(obj)
-	local __type = obj.m_type
-	if ((__type) == Enums.eHandlingEditorTypes.TYPE_HF) then
-		return self.m_pv:GetHandlingFlag(obj.m_flag)
-	end
+function HandlingEditor:IsInitialized()
+	return self.m_initialized
+end
 
-	if ((__type) == Enums.eHandlingEditorTypes.TYPE_AF) then
-		return self.m_pv:GetAdvancedFlag(obj.m_flag)
-	end
+---@nodiscard
+---@return boolean
+function HandlingEditor:ArePresetsReady()
+	return self.m_presets_ready
+end
 
-	if ((__type) == Enums.eHandlingEditorTypes.TYPE_MIF) then
-		return self.m_pv:GetModelInfoFlag(obj.m_flag)
+---@return boolean
+function HandlingEditor:HasEdits()
+	for _, data in pairs(self.m_deltas) do
+		if (next(data) ~= nil) then
+			return true
+		end
 	end
-
 	return false
 end
 
----@param gvarKey string
----@return HandlingObject?
-function HandlingEditor:GetFlagObject(gvarKey)
-	return self.m_handling_objects[gvarKey]
+-- The flag name must be concatenated with its type enum
+--
+-- Example:
+--
+--```Lua
+-- local is_owned = HandlingEditor:IsFlagOwned(_F("%d:%s", Enums.eHandlingEditorTypes.TYPE_HF, "FREEWHEEL_NO_GAS"))
+--```
+---@param flagName string
+function HandlingEditor:IsFlagOwned(flagName)
+	local refCount = self.m_owned_flags[flagName]
+	return refCount and refCount > 0 or false
 end
 
----@param obj HandlingObject
+---@return boolean
+function HandlingEditor:IsAnyPresetEnabled()
+	return next(self.m_active_presets) ~= nil
+end
+
+---@param preset HandlingPreset
+---@return boolean
+function HandlingEditor:IsPresetEnabled(preset)
+	return self.m_active_presets[preset:GetName()] ~= nil
+end
+
+---@param name string
+---@return boolean
+function HandlingEditor:IsNameReserved(name)
+	return HandlingPreset.IsNameReserved(name)
+end
+
+---@param preset HandlingPreset
+---@return boolean
+function HandlingEditor:DoesPresetExist(preset)
+	return self.m_preset_lookup[preset:GetName()] ~= nil
+end
+
+---@param name string
+---@return boolean
+function HandlingEditor:DoesPresetExistByName(name)
+	return self.m_preset_lookup[name] ~= nil
+end
+
+---@param allowed_types integer
+function HandlingEditor:AssertVehicleType(allowed_types)
+	local vehType = self.m_vehicle:GetType()
+	return Bit.IsBitSet(allowed_types, vehType)
+end
+
+---@param presets? array<HandlingPreset>
+---@return array<HandlingPreset> -- serialized presets
+function HandlingEditor:SerializePresets(presets)
+	presets    = presets or self.m_presets
+	local buff = {}
+	for _, preset in ipairs(presets) do
+		table.insert(buff, preset:Serialize())
+	end
+	return buff
+end
+
+function HandlingEditor:SavePresets()
+	Serializer:WriteToFile(self.m_file_name, self:SerializePresets())
+end
+
+function HandlingEditor:GetPresets()
+	return self.m_presets
+end
+
+---@param name string
+---@param vehicleTypes integer
+---@param description? string
+---@param autoEnable? boolean
+---@return HandlingPreset
+function HandlingEditor:GeneratePresetFromCurrentDeltas(name, vehicleTypes, description, autoEnable)
+	autoEnable = autoEnable or false
+	local deltas = {}
+	for hType, data in pairs(self.m_deltas) do
+		deltas[hType] = deltas[hType] or {}
+		for sName, bState in pairs(data) do
+			deltas[hType][sName] = not bState -- no need to read flags from memory. if a flag is saved then the user wants the opposite of default
+		end
+	end
+
+	return HandlingPreset.new({
+		name              = name,
+		deltas            = deltas,
+		description       = description or _T("GENERIC_NO_DESCRIPTION"),
+		vehicle_bitset    = vehicleTypes,
+		auto_apply        = autoEnable or false,
+		is_default_preset = false,
+		is_user_generated = true,
+	})
+end
+
+---@nodiscard
+---@param preset HandlingPreset
+---@return boolean
+function HandlingEditor:AddNewPreset(preset)
+	self.m_presets_ready = false
+	local name = preset:GetName()
+	if (self.m_preset_lookup[name]) then
+		Notifier:ShowError("HandlingEditor", _T("VEH_FLAGS_NEW_PRESET_ERR"))
+		self.m_presets_ready = true
+		return false
+	end
+
+	table.insert(self.m_presets, preset)
+	self.m_preset_lookup[name] = #self.m_presets
+	self:SavePresets()
+	self.m_presets_ready = true
+	Notifier:ShowSuccess("HandlingEditor", _T("VEH_FLAGS_NEW_PRESET_SUCCESS", name))
+	return true
+end
+
+---@param preset HandlingPreset
+function HandlingEditor:RemovePreset(preset)
+	self.m_presets_ready = false
+	if (preset:IsDefault()) then
+		Notifier:ShowError("HandlingEditor", _T("VEH_FLAGS_PRESET_NO_DELETE"))
+		self.m_presets_ready = true
+		return
+	end
+
+	local index = self.m_preset_lookup[preset:GetName()]
+	table.remove(self.m_presets, index)
+
+	self.m_preset_lookup = {}
+	for i, p in ipairs(self.m_presets) do
+		self.m_preset_lookup[p:GetName()] = i
+	end
+
+	self:SavePresets()
+	self.m_presets_ready = true
+end
+
+---@param data HandlingPresetData
+function HandlingEditor:ImportPreset(data)
+	if (not HandlingPreset.AssertArgs(data)) then
+		return false
+	end
+
+	if (self:DoesPresetExistByName(data.name)) then
+		Notifier:ShowError("HandlingEditor", _T("VEH_FLAGS_NEW_PRESET_ERR"))
+		return false
+	end
+
+	local preset = HandlingPreset.new(data)
+	if (not preset) then return false end
+	return self:AddNewPreset(preset)
+end
+
+---@private
+function HandlingEditor:SaveStaleState()
+	if (not self:HasEdits()) then return end
+
+	local lastModel = self.m_vehicle:GetPreviousModelHash()
+	if (not math.is_null(lastModel)) then
+		self.m_stale_deltas[lastModel] = table.copy(self.m_deltas)
+	end
+end
+
+---@private
+function HandlingEditor:ResetStaleState()
+	local model  = self.m_vehicle:GetModelHash()
+	local stales = self.m_stale_deltas
+	if (stales[model]) then
+		self:Reset()
+		stales[model] = nil
+	end
+end
+
+---@param preset HandlingPreset
 ---@param toggle boolean
----@param reset? boolean
-function HandlingEditor:SetFlag(obj, toggle, reset)
-	if (not self.m_pv or not self.m_pv:IsValid()) then
+function HandlingEditor:TogglePreset(preset, toggle)
+	if (not self.m_vehicle:IsValid()) then
+		if (not toggle) then self:SaveStaleState() end
 		return
 	end
 
-	assert(type(toggle) == "boolean", "Attempt to write garbage data to vehicle memory.")
-
-	if (obj.m_default == nil) then
-		obj.m_default = self:GetFlagDefault(obj)
-	end
-
-	if (toggle ~= obj.m_default and obj.m_was_edited) then
+	if (toggle == self:IsPresetEnabled(preset)) then
 		return
 	end
 
-	local set_func
-	if (obj.m_type == Enums.eHandlingEditorTypes.TYPE_HF) then
-		set_func = Vehicle.SetHandlingFlag
-	elseif (obj.m_type == Enums.eHandlingEditorTypes.TYPE_AF) then
-		set_func = Vehicle.SetAdvancedFlag
-	elseif (obj.m_type == Enums.eHandlingEditorTypes.TYPE_MIF) then
-		set_func = Vehicle.SetModelInfoFlag
-	end
-
-	if (not set_func) then return end
-
-	set_func(self.m_pv, obj.m_flag, toggle)
-	local callback = toggle and obj.m_on_enable or obj.m_on_disable
-	if (type(callback) == "function") then
-		callback()
-	end
-
-	if (reset) then
-		obj.m_was_edited = false
+	local name  = preset:GetName()
+	local vehBS = preset.m_vehicle_bitset
+	if (not self:AssertVehicleType(vehBS)) then
+		self.m_active_presets[name] = nil
 		return
 	end
 
-	obj.m_was_edited = true
-end
-
----@param obj HandlingObject
-function HandlingEditor:ResetFlag(obj)
-	if ((type(obj.m_predicate) == "function") and not obj:m_predicate(self.m_pv)) then
-		return
-	end
-
-	if (obj.m_was_edited == false or obj.m_default == nil) then
-		return
-	end
-
-	obj.m_was_edited = false
-	self:SetFlag(obj, obj.m_default, true)
-	if (type(obj.m_on_disable) == "function") then
-		obj.m_on_disable()
-	end
-end
-
-function HandlingEditor:Apply()
-	if (not self.m_pv or not self.m_pv:IsValid()) then
-		return
-	end
-
-	for key, obj in pairs(self.m_handling_objects) do
-		if ((type(obj.m_predicate) == "function") and not obj:m_predicate(self.m_pv)) then
+	local deltas     = preset.m_deltas
+	local ownedFlags = self.m_owned_flags
+	for editorType, data in pairs(deltas) do
+		local ref = FlagData[editorType]
+		if (not ref) then
+			log.fwarning("[HandlingEditor]: Unknown reference for type enum %s (%s). Skipping.", editorType, type(editorType))
 			goto continue
 		end
 
-		if (obj.m_default == nil) then
-			obj.m_default = self:GetFlagDefault(obj)
+		local enum = ref.enum
+		if (not enum) then
+			log.warning("[HandlingEditor]: Reference table has no flag enum! Skipping.")
+			goto continue
 		end
 
-		local checkboxState = table.get_nested_key(GVars, key)
-		if (checkboxState == true and obj.m_default == false) then
-			self:SetFlag(obj, true)
+		for flagName, state in pairs(data) do
+			local flag = enum[flagName]
+			if (not flag) then
+				log.fwarning("[HandlingEditor]: Could not find a vehicle flag with name %s. Skipping.", flagName)
+				goto skip
+			end
+
+			local ownedFlagName = _F("%d:%s", editorType, flagName)
+			if (toggle) then
+				if (self:Push(editorType, flag, state, vehBS, flagName)) then
+					ownedFlags[ownedFlagName] = (ownedFlags[ownedFlagName] or 0) + 1
+				end
+			else
+				ownedFlags[ownedFlagName] = (ownedFlags[ownedFlagName] or 1) - 1
+				if (ownedFlags[ownedFlagName] == 0) then
+					self:Push(editorType, flag, not state, vehBS, flagName)
+				end
+			end
+			::skip::
+		end
+		::continue::
+	end
+
+	if (toggle) then
+		preset:OnEnable(self)
+		self.m_active_presets[name] = preset
+	else
+		preset:OnDisable(self)
+		self.m_active_presets[name] = nil
+	end
+end
+
+function HandlingEditor:ApplyPresets()
+	for _, preset in ipairs(self.m_presets) do
+		if (preset.auto_apply) then
+			self:TogglePreset(preset, true)
+		end
+	end
+end
+
+---@param flagType eHandlingEditorTypes
+---@param flag integer
+---@param state boolean
+---@param allowed_types integer
+---@param flagName? string -- Mostly used internally to skip converting the int flag back to a string name.
+---@return boolean
+function HandlingEditor:Push(flagType, flag, state, allowed_types, flagName)
+	local vehicle = self.m_vehicle
+	if (not vehicle:IsValid()) then return false end
+
+	self:ResetStaleState()
+
+	if (not self:AssertVehicleType(allowed_types)) then
+		return false
+	end
+
+	local ref = FlagData[flagType]
+	if (not ref) then
+		log.fwarning("[HandlingEditor]: Unknown reference for type enum %s (%s). Skipping.", flagType, type(flagType))
+		return false
+	end
+
+	-- Flags are converted back and forth between string and int because our 3rd party json module can not handle sparse arrays, so deltas are keyed by flag name instead.
+	local name = flagName or EnumToString(ref.enum, flag)
+	if (not name or name == "Unknown") then
+		log.fwarning("[HandlingEditor]: Failed to get name from flag %s (type: %s)", flag, type(flag))
+		return false
+	end
+
+	local default = ref.get(self.m_vehicle, flag)
+	if (default == state) then
+		-- Backend:debug("[HandlingEditor]: Skipped flag %s (already enabled).", name)
+		return false
+	end
+
+	local saved = self.m_deltas[flagType][name]
+	if (saved == nil) then
+		self.m_deltas[flagType][name] = default
+	elseif (saved == state) then
+		self.m_deltas[flagType][name] = nil
+	end
+
+	ref.set(self.m_vehicle, flag, state)
+	return true
+end
+
+---@param manual_trigger? boolean
+function HandlingEditor:Reset(manual_trigger)
+	local vehicle = self.m_vehicle
+	if (not vehicle:IsValid()) then
+		self:SaveStaleState()
+		return
+	end
+
+	local deltas = self.m_deltas
+	for editorType, data in pairs(deltas) do
+		local ref = FlagData[editorType]
+		if (not ref) then goto continue end
+
+		local enum = ref.enum
+		local set  = ref.set
+		for name, state in pairs(data) do
+			local flag = enum[name]
+			if (type(flag) == "number") then
+				set(vehicle, flag, state)
+			end
 		end
 
 		::continue::
 	end
-end
 
-function HandlingEditor:Reset()
-	if (not self.m_pv or not self.m_pv:IsValid()) then
-		return
+	for _, i in pairs(Enums.eHandlingEditorTypes) do
+		self.m_deltas[i] = {}
 	end
 
-	for _, obj in pairs(self.m_handling_objects) do
-		self:ResetFlag(obj)
-		obj.m_default = nil
+	self.m_active_presets = {}
+	self.m_owned_flags    = {}
+	if (manual_trigger and vehicle:IsValid()) then
+		self:ApplyPresets()
 	end
 end
 

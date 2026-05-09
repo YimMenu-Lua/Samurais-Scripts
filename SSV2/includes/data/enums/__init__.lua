@@ -16,6 +16,7 @@ local Enums <const> = {
 	eDrivingFlags          = require("driving_flags"),
 	eGameState             = require("game_state"),
 	eGameLanguage          = require("game_language"),
+	eHandlingEditorTypes   = require("handling_editor_types"),
 	eHandlingType          = require("handling_type"),
 	eLandingGearState      = require("landing_gear_state"),
 	eManagedValueDataType  = require("managed_value_data_type"),

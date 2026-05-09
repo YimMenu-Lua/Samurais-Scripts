@@ -201,7 +201,8 @@ function Stancer:CanApplyDrawData()
 	return self.m_entity:HasWheelDrawData() and wheel_idx ~= -1
 end
 
-function Stancer:ResetDeltas()
+---@param deleteQueue? boolean
+function Stancer:ResetDeltas(deleteQueue)
 	for _, v in ipairs(StancerData.decorators) do
 		self.m_deltas[Enums.eWheelAxle.FRONT][v.key] = 0.0
 		self.m_deltas[Enums.eWheelAxle.REAR][v.key]  = 0.0
@@ -209,6 +210,10 @@ function Stancer:ResetDeltas()
 
 	self.m_suspension_height.m_current   = 0.0
 	self.m_suspension_height.m_last_seen = 0.0
+
+	if (deleteQueue) then
+		self:RemoveReference()
+	end
 end
 
 function Stancer:Reset()
@@ -248,14 +253,15 @@ function Stancer:Reset()
 	end
 end
 
----@param handle handle
+---@param handle? handle
 function Stancer:RemoveReference(handle)
+	handle = handle or self.m_entity:GetHandle()
 	Decorator:RemoveEntity(handle)
 end
 
 function Stancer:Cleanup()
 	self:Reset()
-	self:RemoveReference(self.m_entity:GetHandle())
+	self:RemoveReference()
 	self.m_cached_model_hash = nil
 	self.m_cached_model_name = nil
 end

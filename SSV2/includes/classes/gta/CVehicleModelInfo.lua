@@ -50,6 +50,20 @@ function CVehicleModelInfo:GetVehicleType()
 	end)
 end
 
+---@return { [1]: uint32_t, [2]: uint32_t, [3]: uint32_t, [4]: uint32_t, [5]: uint32_t, [6]: uint32_t, [7]: uint32_t }
+function CVehicleModelInfo:GetModelInfoFlags()
+	return self:__safecall({}, function()
+		local pModelInfoFlags = self.m_model_info_flags
+		if (pModelInfoFlags:is_null()) then return {} end
+
+		local out = {}
+		for i = 1, 7 do
+			out[i] = pModelInfoFlags:add((i - 1) * 0x4):get_dword()
+		end
+		return out
+	end)
+end
+
 ---@param flag eVehicleModelInfoFlags
 ---@return boolean
 function CVehicleModelInfo:GetModelInfoFlag(flag)
@@ -60,7 +74,7 @@ function CVehicleModelInfo:GetModelInfoFlag(flag)
 
 		local index    = math.floor(flag / 32)
 		local bit_pos  = flag % 32
-		local flag_ptr = self.m_model_info_flags:add(index * 4)
+		local flag_ptr = self.m_model_info_flags:add(index * 0x4)
 		if (flag_ptr:is_null()) then
 			return false
 		end
@@ -68,6 +82,15 @@ function CVehicleModelInfo:GetModelInfoFlag(flag)
 		local flag_bits = flag_ptr:get_dword()
 		return Bit.IsBitSet(flag_bits, bit_pos)
 	end)
+end
+
+---@param flags { [1]: uint32_t, [2]: uint32_t, [3]: uint32_t, [4]: uint32_t, [5]: uint32_t, [6]: uint32_t, [7]: uint32_t }
+function CVehicleModelInfo:SetModelInfoFlags(flags)
+	if (not self:IsValid()) then return end
+	local pModelInfoFlags = self.m_model_info_flags
+	for i, u32 in ipairs(flags) do
+		pModelInfoFlags:add((i - 1) * 0x4):set_dword(u32)
+	end
 end
 
 ---@param flag eVehicleModelInfoFlags
@@ -79,7 +102,7 @@ function CVehicleModelInfo:SetModelInfoFlag(flag, toggle)
 
 	local index    = math.floor(flag / 32)
 	local bit_pos  = flag % 32
-	local flag_ptr = self.m_model_info_flags:add(index * 4)
+	local flag_ptr = self.m_model_info_flags:add(index * 0x4)
 	if (flag_ptr:is_null()) then
 		return
 	end

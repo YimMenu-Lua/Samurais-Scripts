@@ -80,7 +80,7 @@ function CVehicle:init(vehicle)
 	instance.m_current_gear      = ptr:add(0x0882)
 	instance.m_top_gear          = ptr:add(0x0886)
 	instance.m_engine_health     = ptr:add(0x0910)
-	instance.m_handling_data     = CHandlingData(ptr:add(0x0960):deref())
+	instance.m_handling_data     = CHandlingData(ptr:add(0x0960):deref(), instance.m_model_info:GetVehicleType())
 	instance.m_deform_god        = ptr:add(0x096C)
 	instance.m_steering_input    = ptr:add(0x09D4)
 	instance.m_current_steering  = ptr:add(0x09DC)
@@ -125,9 +125,11 @@ end
 
 ---@return pointer<(CCarHandlingData|CBikeHandlingData|CFlyingHandlingData)?>
 function CVehicle:GetSubHandlingData()
-	return self:__safecall(nil, function()
-		return self.m_handling_data:GetSubHandlingData()
-	end)
+	return self.m_handling_data:GetSubHandlingData()
+end
+
+function CVehicle:GetHandlingFlags()
+	return self.m_handling_data:GetHandlingFlags()
 end
 
 ---@param flag eVehicleHandlingFlags
@@ -138,46 +140,57 @@ function CVehicle:GetHandlingFlag(flag)
 	end)
 end
 
+---@return uint32_t
+function CVehicle:GetModelFlags()
+	return self.m_handling_data:GetModelFlags()
+end
+
 ---@param flag eVehicleModelFlags
 ---@return boolean
 function CVehicle:GetModelFlag(flag)
-	return self:__safecall(false, function()
-		return self.m_handling_data:GetModelFlag(flag)
-	end)
+	return self.m_handling_data:GetModelFlag(flag)
+end
+
+---@return { [1]: uint32_t, [2]: uint32_t, [3]: uint32_t, [4]: uint32_t, [5]: uint32_t, [6]: uint32_t, [7]: uint32_t }
+function CVehicle:GetModelInfoFlags()
+	return self.m_model_info:GetModelInfoFlags()
 end
 
 ---@param flag eVehicleModelInfoFlags
 ---@return boolean
 function CVehicle:GetModelInfoFlag(flag)
-	return self:__safecall(false, function()
-		return self.m_model_info:GetModelInfoFlag(flag)
-	end)
+	return self.m_model_info:GetModelInfoFlag(flag)
+end
+
+---@return uint32_t
+function CVehicle:GetAdvancedFlags()
+	if (not self:IsValid()) then return 0 end
+
+	if (self:GetVehicleType() ~= Enums.eVehicleType.VEHICLE_TYPE_CAR) then
+		return 0
+	end
+
+	---@type CCarHandlingData?
+	local cchd = self:GetSubHandlingData()
+	if (not cchd or not cchd:IsValid()) then
+		return 0
+	end
+
+	return cchd.m_advanced_flags:get_dword()
 end
 
 ---@param flag eVehicleAdvancedFlags
 ---@return boolean
 function CVehicle:GetAdvancedFlag(flag)
-	if (not self:IsValid()) then
-		return false
-	end
+	return Bit.IsBitSet(self:GetAdvancedFlags(), flag)
+end
 
-	if (self:GetVehicleType() ~= Enums.eVehicleType.VEHICLE_TYPE_CAR) then
-		return false
-	end
-
-	local ptr = self:GetSubHandlingData()
-	if (not ptr or ptr:is_null()) then
-		return false
-	end
-
-	---@type CCarHandlingData?
-	local cchd = CCarHandlingData(ptr)
-	if (not cchd or not cchd:IsValid()) then
-		return false
-	end
-
-	local dword_flags = cchd.m_advanced_flags:get_dword()
-	return Bit.IsBitSet(dword_flags, flag)
+---@param flags uint32_t
+---@return boolean
+function CVehicle:SetHandlingFlags(flags)
+	return self:__safecall(false, function()
+		return self.m_handling_data:SetHandlingFlags(flags)
+	end)
 end
 
 ---@param flag eVehicleHandlingFlags
@@ -189,19 +202,33 @@ function CVehicle:SetHandlingFlag(flag, toggle)
 end
 
 ---@param value float
----@return boolean
+---@return boolean success
 function CVehicle:SetAcceleration(value)
-	return self:__safecall(false, function()
-		return self.m_handling_data:SetAcceleration(value)
-	end)
+	return self.m_handling_data:SetAcceleration(value)
 end
 
 ---@param value float
----@return boolean
+---@return boolean success
 function CVehicle:SetDeformMultiplier(value)
-	return self:__safecall(false, function()
-		return self.m_handling_data:SetDeformMultiplier(value)
-	end)
+	return self.m_handling_data:SetDeformMultiplier(value)
+end
+
+---@param flags uint32_t
+---@return boolean success
+function CVehicle:SetModelFlags(flags)
+	return self.m_handling_data:SetModelFlags(flags)
+end
+
+---@param flag eVehicleModelInfoFlags
+---@param toggle boolean
+---@return boolean success
+function CVehicle:SetModelFlag(flag, toggle)
+	return self.m_handling_data:SetModelFlag(flag, toggle)
+end
+
+---@param flags uint32_t
+function CVehicle:SetModelInfoFlags(flags)
+	self.m_model_info:SetModelInfoFlags(flags)
 end
 
 ---@param flag eVehicleModelInfoFlags
@@ -210,9 +237,8 @@ function CVehicle:SetModelInfoFlag(flag, toggle)
 	self.m_model_info:SetModelInfoFlag(flag, toggle)
 end
 
----@param flag eVehicleAdvancedFlags
----@param toggle boolean
-function CVehicle:SetAdvancedFlag(flag, toggle)
+---@param flags uint32_t
+function CVehicle:SetAdvancedFlags(flags)
 	if (not self:IsValid()) then
 		return
 	end
@@ -221,19 +247,31 @@ function CVehicle:SetAdvancedFlag(flag, toggle)
 		return
 	end
 
-	local ptr = self:GetSubHandlingData()
-	if (not ptr or ptr:is_null()) then
+	---@type CCarHandlingData?
+	local cchd = self:GetSubHandlingData()
+	if (not cchd or not cchd:IsValid()) then
+		return false
+	end
+
+	cchd.m_advanced_flags:set_dword(flags)
+end
+
+---@param flag eVehicleAdvancedFlags
+---@param toggle boolean
+function CVehicle:SetAdvancedFlag(flag, toggle)
+	if (not self:IsValid()) then return end
+
+	if (self:GetVehicleType() ~= Enums.eVehicleType.VEHICLE_TYPE_CAR) then
 		return
 	end
 
 	---@type CCarHandlingData?
-	local cchd = CCarHandlingData(ptr)
+	local cchd = self:GetSubHandlingData()
 	if (not cchd or not cchd:IsValid()) then
 		return
 	end
 
-	local dword_flags = cchd.m_advanced_flags:get_dword()
-	local new_bits    = Bit.Toggle(dword_flags, flag, toggle)
+	local new_bits = Bit.Toggle(self:GetAdvancedFlags(), flag, toggle)
 	cchd.m_advanced_flags:set_dword(new_bits)
 end
 
