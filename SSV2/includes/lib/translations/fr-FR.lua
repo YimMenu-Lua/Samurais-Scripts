@@ -920,6 +920,21 @@ return {
 	["VEH_WHEELIE"] = "Wheelie",
 	["VEH_FLAGS_AUTOENABLE_TT"] = "Ce préréglage sera automatiquement activé dès que vous entrez dans un nouveau véhicule. Vous pouvez toujours désactiver un préréglage tout en ayant activé « Auto-Enable », mais il ne se réactivera qu'une fois que vous changerez de véhicule (réapparaissez votre véhicule, rechargez le script ou montez dans un autre véhicule).",
 	["VEH_WHEELIE_TT"] = "VOITURES UNIQUEMENT : Vous donne la possibilité d'effectuer des wheelies dans n'importe quelle voiture, tout comme les muscle cars par défaut : maintenez « Frein à main » + « Accélération » pendant quelques secondes, puis relâchez le frein à main.",
-	["VEH_FLAGS_NEW_PRESET_ERR"] = "Échec de l'ajout du préréglage ! Un préréglage du même nom existe déjà.",
-	["VEH_RAMP_TT"] = "Équipe votre véhicule d'un mod rampe (non visible) et lui donne une grande force d'éperonnage contre tous les véhicules, le rendant essentiellement imparable."
+	["VEH_FLAGS_NEW_PRESET_ERR"] = "Un preset du même nom existe déjà !",
+	["VEH_RAMP_TT"] = "Équipe votre véhicule d'un mod rampe (non visible) et lui donne une grande force d'éperonnage contre tous les véhicules, le rendant essentiellement imparable.",
+	["GENERIC_FILENAME"] = "Nom de fichier",
+	["VEH_FLAGS_PRESET_IMPORT_SUCCESS"] = "Le nouveau préréglage a été importé avec succès.",
+	["VEH_FLAGS_PRESET_NO_SHARE"] = "Les préréglages par défaut ne peuvent pas être partagés car ils sont les mêmes pour tout le monde.",
+	["VEH_FLAGS_PRESET_IMPORT_FAIL"] = "Échec de l'importation du préréglage. Veuillez réessayer plus tard.",
+	["GENERIC_CLIPBOARD_COPY"] = "Copier dans le presse-papiers",
+	["VEH_FLAGS_PRESET_FILTER_CARS_ONLY"] = "Voitures uniquement",
+	["GENERIC_CLIPBOARD_DECODE"] = "Décoder les données du Presse-papiers",
+	["GENERIC_CLIPBOARD_GET"] = "Obtenir les données du Presse-papiers",
+	["VEH_FLAGS_PRESET_FILTER_BOTH"] = "Voitures et vélos",
+	["GENERIC_CLIPBOARD_PASTE"] = "Coller à partir du presse-papiers",
+	["VEH_FLAGS_PRESET_SHARE_SUCCESS_FMT"] = "Le préréglage '%s' a été copié sur votre clipbloard et enregistré sur la console. D'autres utilisateurs de script peuvent importer le préréglage en collant les données dans la fenêtre « Importer ».",
+	["VEH_FLAGS_NEW_PRESET_CB_FILE_TT"] = "Nom du fichier de définitions de rappel facultatif. Si vous ne savez pas ce que c'est, laissez-le vide.",
+	["VEH_FLAGS_PRESET_PARSER_TOOLTIP"] = "Le préréglage sera affiché ici une fois que les données valides auront été décodées.",
+	["GENERIC_DATA_PARSE_FAIL"] = "Échec de l'analyse des données ! Veuillez réessayer plus tard.",
+	["VEH_FLAGS_PRESET_FILTER_BIKES_ONLY"] = "Vélos uniquement"
 }

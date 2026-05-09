@@ -289,7 +289,55 @@ Changes your current vehicle's engine sound and power.
 
 ### Handling Editor
 
-Extends the pre-existing handling editor in YimMenu with more options focused on handling flags.
+A comprehensive vehicle flag editor and preset system that exposes all currently reversed `advanced`, `handling`, `model`, and `model info` vehicle flags.
+
+- **Features:**
+
+  - Real-time editing of vehicle flags directly from memory.
+  - Dynamic filtering and sorting for easier flag management.
+  - Generate custom presets from currently mutated flags.
+  - Default and user-generated presets can be:
+    - Enabled/disabled manually.
+    - Auto-applied automatically _(On vehicle enter/switch)_.
+    - Exported/imported via clipboard _(User-generated only since defaults are the same for everyone)_.
+  - Presets avoid redundant edits by only storing non-default mutations.
+  - Active presets protect owned flags from manual edits.
+  - Optional user-defined callback files allow user-generated presets to execute custom logic when enabled or disabled.
+  - Defensive runtime protections block faulty or expensive custom callbacks automatically.
+
+- **Custom Callbacks:**
+
+Users can define custom logic to be executed when their custom handling preset is enabled, disabled, or both, following these steps:
+
+- Create a new **uniquely-named** Lua source file _(ex: `my_custom_preset_callbacks.lua`)_
+- Place it in the project's source inside the `includes` folder _(Preferably under `includes/data/`)_.
+- In the file, return a table containing a table key that's exactly your target custom preset's name. The table must contain one or both of these two functions with these exact names: `onEnable` and `onDisable`.
+- If a custom definitions file already exists, you can simply edit that file instead by adding your custom preset callback to the table.
+- Both `onEnable` and `onDisable` provide a reference to the HandlingEditor instance.
+- **IMPORTANT:** Both functions **MUST** return `true` on completion **(even early exits must return true)**. Failure to do so may trigger timeout protection and blacklist the callback _(this is required to catch and prevent deadlocks)_.
+- Example:
+
+    ```Lua
+    return {
+      ["My Custom Handling Preset"] = { -- This key MUST be exactly your target user-generated preset's name.
+          onEnable = function(editor)
+              -- your code goes here (call natives, another SSV2 feature, etc.)
+              -- you can call HandlingEditor methods too (ex: editor:Reset() to reset all flags and presets before applying your custom preset)
+              return true -- This is very important. You must return true when done.
+          end,
+          onDisable = function(editor)
+              -- your code goes here (cleanup logic, etc.)
+              -- you can call HandlingEditor methods too (ex: editor:ApplyPresets() to re-apply all automatic presets after disabling your custom preset)
+              return true -- This is very important. You must return true when done.
+          end,
+      }
+    }
+    ```
+
+  > [!Note]
+  > This process is necessary because both of Lua's default `load` and `loadstring` functions do not exist in YimMenu's Lua sandbox.
+  >
+  > Basic Lua programming knowledge and familiarity with both YimMenu's Lua API and the SSV2 API are required for this.
 
 ### Custom Paint Jobs
 
@@ -375,7 +423,7 @@ Contains the following modules:
 
   Options for Teleport, Set Waypoint, and Request Submarine.
 
-  Ability to change Primary Target, all Secondary Targets on the island and inside the compound, Weapon Loadout, Hard Mode, Unlock All Heist Options *(Approach Vehicles, Disruptions, etc)*, Disable Cooldown
+  Ability to change Primary Target, all Secondary Targets on the island and inside the compound, Weapon Loadout, Hard Mode, Unlock All Heist Options _(Approach Vehicles, Disruptions, etc)_, Disable Cooldown
 
 - **Doomsday**
 

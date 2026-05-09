@@ -34,6 +34,7 @@ local newPresetWindowData      = {
 	wantsAutoEnable = false,
 	nameBuffer      = "",
 	descBuffer      = "",
+	cb_filename     = "",
 	vehTypesBs      = 1 << CARS_BIT,
 }
 
@@ -396,6 +397,7 @@ local function clearPresetWindow()
 	newPresetWindowData.shouldDraw      = false
 	newPresetWindowData.nameBuffer      = ""
 	newPresetWindowData.descBuffer      = ""
+	newPresetWindowData.cb_filename     = ""
 	newPresetWindowData.vehTypesBs      = 1 << CARS_BIT
 	newPresetWindowData.wantsAutoEnable = false
 end
@@ -414,8 +416,18 @@ local function drawNewPresetWindow()
 
 	local data = newPresetWindowData
 	GUI:QuickConfigWindow(_T("VEH_FLAGS_NEW_PRESET_LABEL"), function()
-		data.nameBuffer      = ImGui.InputTextWithHint("*##newPresetName", _T("GENERIC_NAME"), data.nameBuffer, 64)
-		data.descBuffer      = ImGui.InputTextWithHint("*##newPresetDesc", _T("GENERIC_DESCRIPTION"), data.descBuffer, 512)
+		data.nameBuffer  = ImGui.InputTextWithHint("*##newPresetName", _T("GENERIC_NAME"), data.nameBuffer, 64)
+		data.descBuffer  = ImGui.InputTextWithHint("*##newPresetDesc", _T("GENERIC_DESCRIPTION"), data.descBuffer, 512)
+		data.cb_filename = ImGui.InputTextWithHint(
+			"*##newPresetCb",
+			_T("GENERIC_FILENAME"),
+			data.cb_filename,
+			64,
+			ImGuiInputTextFlags.CharsNoBlank
+		); data.cb_filename = data.cb_filename:gsub("[/\\]", ""):gsub("%.lua$", "")
+
+		GUI:HelpMarker(_T("VEH_FLAGS_NEW_PRESET_CB_FILE_TT"))
+
 		data.wantsAutoEnable = GUI:Checkbox(_T("GENERIC_AUTO_ENABLE"), data.wantsAutoEnable)
 
 		ImGui.SeparatorText(_T("VEH_FLAGS_NEW_PRESET_VEHICLE_BS"))
