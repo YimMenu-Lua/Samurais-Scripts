@@ -11,10 +11,11 @@ local BusinessFront    = require("BusinessFront")
 local VehicleWarehouse = require("VehicleWarehouse")
 local Warehouse        = require("Warehouse")
 local RawBusinessData  = require("includes.data.yrv3_data")
+local InteriorIDs      = require("includes.data.refs").InteriorIDs
 
 
 ---@class OfficeOpts : BusinessFrontOpts
----@field custom_name string
+---@field custom_name nil
 ---@field safe_data nil
 
 ---@class OfficeEarningsReport : BusinessEarningsReport
@@ -24,6 +25,7 @@ local RawBusinessData  = require("includes.data.yrv3_data")
 ---@field lifetime_sell_completed integer
 ---@field lifetime_earnings integer
 ---@field lifetime_earnings_fmt string
+
 
 -- Class representing the CEO Office.
 ---@class Office : BusinessFront
@@ -40,9 +42,14 @@ Office.__index = Office
 ---@param opts OfficeOpts
 ---@return Office
 function Office.new(opts)
-	local base                 = BusinessFront.new(opts)
-	local instance             = setmetatable(base, Office) ---@cast instance Office
-	instance.m_custom_name     = opts.custom_name
+	local base       = BusinessFront.new(opts)
+	local instance   = setmetatable(base, Office) ---@cast instance Office
+	local customName = stats.get_string("MPX_GB_OFFICE_NAME") .. stats.get_string("MPX_GB_OFFICE_NAME2")
+	if (not string.isvalid(customName)) then
+		customName = Game.GetGXTLabel("GB_REST_ACC")
+	end
+
+	instance.m_custom_name     = customName
 	instance.m_earnings_report = {
 		lifetime_buy_undertaken  = 0,
 		lifetime_buy_completed   = 0,
@@ -172,6 +179,42 @@ function Office:AddSubBusiness(index)
 		name      = Game.GetGXTLabel(_F("MP_WHOUSE_%d", property_index - 1)),
 		coords    = ref.coords,
 	}, Enums.eWarehouseType.SPECIAL_CARGO))
+end
+
+---@param newName string
+function Office:Rename(newName)
+	-- TODO: convert this into a shared method in base class.
+	newName = newName:trim()
+	script.execute_as_script("freemode", function()
+		if (not string.isvalid(newName)) then
+			newName = Game.GetGXTLabel("GB_REST_ACC")
+		end
+
+		local GPBD_FM_3 = self:GetGPBD3():At(10)
+		local name1     = newName:sub(1, 10)
+		local name2     = newName:sub(11, 32)
+		local g_Name    = GPBD_FM_3:At(343)
+		stats.set_string("MPX_GB_OFFICE_NAME", name1)
+		stats.set_string("MPX_GB_OFFICE_NAME2", name2)
+		stats.set_string("MPX_GB_GANG_NAME", name1)
+		stats.set_string("MPX_GB_GANG_NAME2", name2)
+		g_Name:WriteString(newName, 64)
+
+		if (LocalPlayer:IsBoss()) then
+			GPBD_FM_3:At(106):WriteString(newName, 64)
+		end
+
+		local officeInt = InteriorIDs.INTERIOR_ID_OFFICE
+		if (LocalPlayer:GetInterior() == officeInt) then
+			INTERIOR.REFRESH_INTERIOR(officeInt)
+		end
+
+		local current      = g_Name:ReadString()
+		self.m_custom_name = current
+		if (current ~= newName) then
+			log.warning("Rename failed!")
+		end
+	end)
 end
 
 function Office:Update()

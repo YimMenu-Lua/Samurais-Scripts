@@ -457,4 +457,10 @@ return {
 		"Willard",
 		"Zirconium",
 	},
+
+	InteriorIDs = {
+		INTERIOR_ID_OFFICE    = 240641,
+		INTERIOR_ID_CLUBHOUSE = 246273,
+		INTERIOR_ID_HANGAR    = 260353,
+	},
 }

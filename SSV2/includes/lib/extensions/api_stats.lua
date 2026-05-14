@@ -49,9 +49,10 @@ function stats.get_string(stat_name)
 end
 
 ---@param stat_name string
+---@param v string
 function stats.set_string(stat_name, v)
 	stat_name = stats.prefix(stat_name)
-	if (not stat_name:startswith("MP") or not stat_name:startswith("SP")) then
+	if (not stat_name:startswith("MP") and not stat_name:startswith("SP")) then
 		return
 	end
 
@@ -84,4 +85,30 @@ function stats.increment_stat(stat_name, v, min, max)
 	end
 
 	stat_set(stat_name, sum)
+end
+
+---@param stat_name string
+---@return DateTime
+function stats.get_date(stat_name)
+	stat_name = stats.prefix(stat_name)
+	local ptr = malloc(0x8 * 7)
+
+	if (not STATS.STAT_GET_DATE(_J(stat_name), ptr:get_address(), 7, -1)) then
+		log.warning("STAT_GET_DATE native call failed! Returning a default DateTime object. (note: the native also returns false if you try to read a multiplayer stat in single player).")
+		return DateTime(0)
+	end
+
+	return DateTime.FromRageStruct(ptr)
+end
+
+---@param stat_name string
+---@param date DateTime
+---@return boolean success
+function stats.set_date(stat_name, date)
+	stat_name     = stats.prefix(stat_name)
+	local ptr     = date:AsRageDateStruct()
+	local success = STATS.STAT_SET_DATE(_J(stat_name), ptr:get_address(), 7, true)
+
+	free(ptr)
+	return success
 end

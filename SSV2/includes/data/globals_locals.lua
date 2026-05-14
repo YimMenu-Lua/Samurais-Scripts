@@ -22,6 +22,60 @@ return {
 			capture_group = 1
 		}
 	},
+	gpbd_fm_3 = {
+		description = "GPBD_FM_3",
+		file = "freemode.c",
+		LEGACY = {
+			value = 1892653,
+			pattern = [[if\s+\(!MISC::IS_STRING_NULL_OR_EMPTY\(\w+\)\)$\n\s+?\{$\n\s+?TEXT_LABEL_ASSIGN_STRING\(&\(Global_(\d{7})\[.*?/\*(\d+)\*/\]\.f_10\.f_343\), \w+, 64\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 615,
+					capture_group = 2,
+					description = "player id size",
+				},
+			}
+		},
+		ENHANCED = {
+			value = 1892798,
+			pattern = [[if\s+\(!MISC::IS_STRING_NULL_OR_EMPTY\(\w+\)\)$\n\s+?\{$\n\s+?TEXT_LABEL_ASSIGN_STRING\(&\(Global_(\d{7})\[.*?/\*(\d+)\*/\]\.f_10\.f_343\), \w+, 64\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 615,
+					capture_group = 2,
+					description = "player id size",
+				},
+			}
+		}
+	},
+	freemode_boss_stuff = {
+		description = "freemode global",
+		file = "freemode.c",
+		LEGACY = {
+			value = 2733002,
+			pattern = [[if\s+\(!func_\d+\(4\) && !.*?\(Global_(\d{7})\.f_(\d{3}), 4\)\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 925,
+					capture_group = 2,
+				},
+			}
+		},
+		ENHANCED = {
+			value = 2733138,
+			pattern = [[if\s+\(!func_\d+\(4\) && !.*?\(Global_(\d{7})\.f_(\d{3}), 4\)\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 926,
+					capture_group = 2,
+				},
+			}
+		}
+	},
 	freemode_business_global = {
 		description = "Freemode Business Global",
 		file = "freemode.c",

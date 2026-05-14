@@ -144,7 +144,8 @@ function CashSafe:SetCashValue(v)
 		return
 	end
 
-	if (v < 0 or v > self:GetCapacity()) then
+	local cap = self:GetCapacity()
+	if (v < 0 or v > cap) then
 		return
 	end
 
@@ -158,6 +159,9 @@ function CashSafe:SetCashValue(v)
 	-- safe cash (minus the clamping, etc.)
 	stats.set_int(statName, v)
 	scriptGlobal:WriteInt(v)
+	if (v == cap and self.m_paytime_stat) then
+		self:SetPaytimeLeft() -- marks the safe as full so instead of writing globals for every safe we just trigger normal execution
+	end
 end
 
 ---@return boolean

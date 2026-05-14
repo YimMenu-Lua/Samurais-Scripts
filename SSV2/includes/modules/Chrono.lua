@@ -7,6 +7,47 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local RageTimeStruct <const>        = {}
+RageTimeStruct.__index              = RageTimeStruct
+local RageTimeStructOffsets <const> = {
+	["year"]  = { offset = 0x0, default = 2025, min = 1970, max = 9999 },
+	["month"] = { offset = 0x8, default = 1, min = 1, max = 12 },
+	["day"]   = { offset = 0x10, default = 1, min = 1, max = 31 },
+	["hour"]  = { offset = 0x18, default = 0, min = 0, max = 23 },
+	["min"]   = { offset = 0x20, default = 0, min = 0, max = 59 },
+	["sec"]   = { offset = 0x28, default = 0, min = 0, max = 59 },
+}
+
+---@param epoch seconds
+---@return pointer<array<uint64_t>>
+function RageTimeStruct.FromPosix(epoch)
+	local ostdatetime = os.date("*t", epoch) ---@cast ostdatetime osdate
+	local outPtr      = malloc(0x8 * 7)
+	outPtr:add(0x30):set_qword(0) -- ms
+	for k, v in pairs(RageTimeStructOffsets) do
+		outPtr:add(v.offset):set_qword(ostdatetime[k] or v.default)
+	end
+	return outPtr
+end
+
+---@param ptr pointer<array<uint64_t>>
+---@return DateTime
+function RageTimeStruct.FromPointer(ptr)
+	local t = {}
+	for k, v in pairs(RageTimeStructOffsets) do
+		local val64 = ptr:add(v.offset):get_qword()
+		if (not math.is_inrange(val64, v.min, v.max)) then
+			log.warning("[RageTimeStruct.FromPointer]: Invalid datetime param! Returning a default DateTime object.")
+			free(ptr)
+			return DateTime.new(0)
+		end
+		t[k] = val64
+	end
+
+	free(ptr)
+	return DateTime.new(t)
+end
+
 -- TODO: refactor all this into a chrono class.
 
 --------------------------------------
@@ -14,13 +55,12 @@
 --------------------------------------
 --**Global Singleton.**
 ---@class Time
-local Time = { __type = "Time" }
+local Time   = { __type = "Time" }
 Time.__index = Time
-setmetatable(Time, Time)
 
 -- Returns an approximation of the amount in seconds of CPU time used by the program.
 --
--- **NOTE:** if you need real world clock time, use `DateTime.Now()` or `DateTime.new()`
+-- **NOTE:** if you need real world clock time, use `DateTime.new()` or `DateTime.Now()` or `DateTime.Today()`
 ---@return seconds
 function Time.Now()
 	return os.clock()
@@ -328,7 +368,7 @@ setmetatable(DateTime, {
 	end
 })
 
----@param p1 (seconds|osdateparam)?
+---@param p1 (seconds|osdate)?
 ---@return DateTime
 function DateTime.new(p1)
 	local epoch
@@ -362,6 +402,15 @@ function DateTime.Today()
 	return DateTime.new()
 end
 
+-- Static function.
+--
+-- Frees the pointer when it returns.
+---@param ptr pointer<array<uint64_t>>
+---@return DateTime
+function DateTime.FromRageStruct(ptr)
+	return RageTimeStruct.FromPointer(ptr)
+end
+
 ---@param fmt? string
 ---@return string
 function DateTime:Format(fmt)
@@ -371,18 +420,15 @@ function DateTime:Format(fmt)
 			log.warning("[DateTime]: Calling 'Format' from the DateTime class itself. Please consider creating an instance first.")
 			self.m_fmt_warn = true
 		end
-
 		epoch = os.time()
 	end
 
-	---@diagnostic disable
 	if (fmt == "*t") then
 		log.warning("[DateTime]: '*t' format is not supported. Format method only returns a string.")
-		return ""
 	end
 
+	---@diagnostic disable-next-line
 	return os.date(fmt or "%Y-%m-%d %H:%M:%S", epoch)
-	---@diagnostic enable
 end
 
 ---@return seconds
@@ -398,6 +444,11 @@ end
 ---@return milliseconds
 function DateTime:ToMillis()
 	return self.m_epoch * 1000
+end
+
+---@return pointer<array<uint64_t>>
+function DateTime:AsRageDateStruct()
+	return RageTimeStruct.FromPosix(self.m_epoch)
 end
 
 ---@param a DateTime|seconds

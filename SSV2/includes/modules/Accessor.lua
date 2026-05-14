@@ -212,9 +212,15 @@ function Accessor:WriteVec3(value)
 	Call(self, "set_vec3", value)
 end
 
+-- If `maxLen` is provided, writes a fixed-length string.
 ---@param value string
-function Accessor:WriteString(value)
-	Call(self, "set_string", value)
+---@param maxLen? integer
+function Accessor:WriteString(value, maxLen)
+	if (maxLen) then
+		self:GetPointer():set_fixed_string(value, maxLen)
+	else
+		Call(self, "set_string", value)
+	end
 end
 
 ---------------------------

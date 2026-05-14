@@ -39,12 +39,14 @@ Enums.eYRState = {
 ---@class YRV3
 ---@field private m_last_error string
 ---@field private m_total_sum number
+---@field private m_total_sum_fmt string
 ---@field private m_bhub_script_handle number
 ---@field private m_has_triggered_autosell boolean
 ---@field private m_sell_script_running boolean
 ---@field private m_sell_script_name string?
 ---@field private m_sell_script_disp_name string
 ---@field private m_businesses YRV3Businesses
+---@field private m_boss_types_avail array<{ name: string, id: integer }>
 ---@field private m_last_autosell_check_time milliseconds
 ---@field private m_last_income_check_time milliseconds
 ---@field private m_last_business_update_time milliseconds
@@ -63,6 +65,7 @@ function YRV3:init()
 	if (self.m_initialized) then return self end
 
 	self.m_total_sum                 = 0
+	self.m_total_sum_fmt             = "$0"
 	self.m_bhub_script_handle        = 0
 	self.m_last_autosell_check_time  = 0
 	self.m_last_income_check_time    = 0
@@ -77,6 +80,7 @@ function YRV3:init()
 	self.m_sell_script_disp_name     = "None"
 	self.m_last_error                = ""
 	self.m_businesses                = { safes = {} }
+	self.m_boss_types_avail          = {}
 	self.m_cooldown_controller       = IManagedValueController.new(RawData.Cooldowns)
 
 
@@ -97,10 +101,12 @@ end
 
 function YRV3:Reset()
 	self.m_total_sum                 = 0
+	self.m_total_sum_fmt             = "$0"
 	self.m_last_autosell_check_time  = 0
 	self.m_last_income_check_time    = 0
 	self.m_last_business_update_time = 0
 	self.m_businesses                = { safes = {} }
+	self.m_boss_types_avail          = {}
 	self.m_has_triggered_autosell    = false
 	self.m_sell_script_running       = false
 	self.m_initial_data_done         = false
@@ -110,8 +116,9 @@ end
 
 function YRV3:Reload()
 	ThreadManager:Run(function()
-		self.m_state = Enums.eYRState.RELOADING
-		self.m_total_sum = 0
+		self.m_state         = Enums.eYRState.RELOADING
+		self.m_total_sum     = 0
+		self.m_total_sum_fmt = "$0"
 		sleep(1500) -- dummy busy wait to give the UI time to refresh
 		self:Reset()
 	end)
@@ -162,6 +169,10 @@ function YRV3:BusinessIter()
 	return pairs(self.m_businesses)
 end
 
+function YRV3:GetAvailableBossTypes()
+	return self.m_boss_types_avail
+end
+
 ---@return Office?
 function YRV3:GetOffice()
 	return self.m_businesses.office
@@ -172,12 +183,12 @@ function YRV3:GetHangar()
 	return self.m_businesses.hangar
 end
 
----@return Clubhouse
+---@return Clubhouse?
 function YRV3:GetClubhouse()
 	return self.m_businesses.clubhouse
 end
 
----@return Nightclub
+---@return Nightclub?
 function YRV3:GetNightclub()
 	return self.m_businesses.nightclub
 end
@@ -187,7 +198,7 @@ function YRV3:GetBusinessSafes()
 	return self.m_businesses.safes
 end
 
----@return CarWash
+---@return CarWash?
 function YRV3:GetCarWash()
 	return self.m_businesses.car_wash
 end
@@ -215,6 +226,11 @@ end
 ---@return integer
 function YRV3:GetEstimatedIncome()
 	return self.m_total_sum
+end
+
+---@return string
+function YRV3:GetEstimatedIncomeFmt()
+	return self.m_total_sum_fmt
 end
 
 ---@return boolean
@@ -295,14 +311,12 @@ function YRV3:PopulateOffice()
 	local ref = RawData.Offices[idx]
 	if (not ref) then return end
 
-	local name1 = stats.get_string("MPX_GB_OFFICE_NAME")
-	local name2 = stats.get_string("MPX_GB_OFFICE_NAME2")
 	self.m_businesses.office = require("Office") {
-		id          = idx,
-		name        = Game.GetGXTLabel(ref.gxt),
-		coords      = ref.coords,
-		custom_name = _F("%s%s", name1, name2)
+		id     = idx,
+		name   = Game.GetGXTLabel(ref.gxt),
+		coords = ref.coords,
 	}
+	table.insert(self.m_boss_types_avail, { name = "GB_BOSSC", id = 0 })
 end
 
 function YRV3:PopulateClubhouse()
@@ -323,6 +337,7 @@ function YRV3:PopulateClubhouse()
 		coords    = club_ref.coords,
 		safe_data = safe_data
 	}
+	table.insert(self.m_boss_types_avail, { name = "GB_REST_ACCM", id = 1 })
 end
 
 function YRV3:PopulateBikerBusinesses()
@@ -1009,20 +1024,19 @@ function YRV3:CalculateEstimatedIncome()
 		return
 	end
 
-	local businesses = self.m_businesses
-	self.m_total_sum = getBusinessIncome(businesses.office)
-		+ getBusinessIncome(businesses.hangar)
-		+ getBusinessIncome(businesses.bunker)
-		+ getBusinessIncome(businesses.acid_lab)
-		+ getBusinessIncome(businesses.nightclub)
-		+ getBusinessIncome(businesses.clubhouse)
-		+ getBusinessIncome(businesses.car_wash)
-		+ getBusinessIncome(businesses.salvage_yard)
-
-	for _, safe in ipairs(businesses.safes) do
-		self.m_total_sum = self.m_total_sum + safe:GetCashValue()
+	local total = 0
+	for name, business in self:BusinessIter() do
+		if (name == "safes") then
+			for _, safe in ipairs(business) do
+				total = total + safe:GetCashValue()
+			end
+		else
+			total = total + getBusinessIncome(business)
+		end
 	end
 
+	self.m_total_sum              = total
+	self.m_total_sum_fmt          = string.formatmoney(total)
 	self.m_last_income_check_time = now_ms
 end
 

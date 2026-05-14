@@ -590,9 +590,7 @@ function GUI:DrawCallbackWindow(yPos)
 				ImGuiWindowFlags.NoBringToFrontOnFocus |
 				ImGuiWindowFlags.AlwaysAutoResize)
 			) then
-			ImGui.PushTextWrapPos(fixedWidth - 10)
 			self.m_selected_tab:Draw()
-			ImGui.PopTextWrapPos()
 			ImGui.End()
 		end
 	end
@@ -692,7 +690,7 @@ function GUI:DrawWindowRequests()
 			ImGui.SetNextWindowSize(request.m_size.x, request.m_size.y, ImGuiCond.Always)
 		end
 
-		ImGui.Begin(label, request.m_flags)
+		ImGui.Begin(label, true, request.m_flags or 0)
 		if (request.m_error) then
 			ImGui.Text(_F("Callback error for requested window '%s':", label))
 			ImGui.Indent()

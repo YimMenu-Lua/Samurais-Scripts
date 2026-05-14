@@ -96,6 +96,7 @@ require("includes.modules.Color")
 
 
 GPointers       = require("includes.data.pointers")
+GGlobals        = require("includes.data.script_globals")
 Memory          = require("includes.modules.Memory")
 KeyManager      = require("includes.services.KeyManager"):init()
 GUI             = require("includes.services.GUI")
@@ -118,16 +119,20 @@ local packages  = {
 
 	"services.GridRenderer",
 
-	"frontend.billionaire_services.bsv2_ui",
-	"frontend.casino_ui",
-	"frontend.entity_forge.entity_forge_ui",
-	"frontend.mastermind_ui",
 	"frontend.self.self_ui",
-	"frontend.settings.settings_ui",
 	"frontend.vehicle.vehicle_ui",
 	"frontend.world_ui",
-	"frontend.yim_actions.yav3_ui",
+
 	"frontend.yim_resupplier.yrv3_ui",
+	"frontend.casino_ui",
+	"frontend.mastermind_ui",
+	"frontend.stat_controller_ui",
+
+	"frontend.billionaire_services.bsv2_ui",
+	"frontend.entity_forge.entity_forge_ui",
+	"frontend.yim_actions.yav3_ui",
+
+	"frontend.settings.settings_ui",
 }
 
 for _, package in ipairs(packages) do

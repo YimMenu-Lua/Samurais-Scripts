@@ -408,31 +408,24 @@ function Ped:Teleport(where, keep_vehicle, loadGround)
 	end)
 end
 
--- ---@return array<handle>
--- function Ped:GetNearbyPeds()
--- 	local out    = {}
--- 	local size   = 0x8
--- 	local buffer = memory.allocate(size * 0x4)
+---@param maxCount? integer
+---@return array<handle> nearbyPeds, integer count
+function Ped:GetNearbyPeds(maxCount)
+	maxCount     = maxCount or 10
+	local out    = {}
+	local size   = maxCount * 2 + 2
+	local pArray = malloc(size * 0x4)
+	pArray:add(0x0):set_int(maxCount)
 
--- 	buffer:set_int(size)
--- 	local count = PED.GET_PED_NEARBY_PEDS( -- stupid ass native (skill issue, I know)
--- 		self:GetHandle(),
--- 		---@diagnostic disable-next-line
--- 		buffer,
--- 		-1
--- 	)
+	local count = PED.GET_PED_NEARBY_PEDS(self:GetHandle(), pArray:get_address(), -1)
+	for i = 0, count do
+		local offset = i * 2 + 2
+		local ped    = pArray:add(offset * 0x4):get_int()
+		if (ENTITY.DOES_ENTITY_EXIST(ped) and ENTITY.IS_ENTITY_A_PED(ped)) then
+			table.insert(out, ped)
+		end
+	end
 
--- 	Backend:debug(count)
--- 	if buffer:is_valid() then
--- 		Backend:debug(buffer:add(0):get_int())
--- 		Backend:debug(buffer:add(1):get_int())
--- 		for i = 1, count do
--- 			local ped = buffer:add(i * 4):get_int()
--- 			if (ped ~= 0) then
--- 				table.insert(out, ped)
--- 			end
--- 		end
--- 	end
-
--- 	return out
--- end
+	free(pArray)
+	return out, count
+end

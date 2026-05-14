@@ -40,4 +40,9 @@ function Action:TypeAsString()
 	return ActionTypeToString[self.action_type]
 end
 
+---@return Action
+function Action:Copy()
+	return Action.new(table.copy(self.data), self.action_type)
+end
+
 return Action

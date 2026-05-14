@@ -8,7 +8,6 @@
 
 
 local Refs         = require("includes.data.refs")
-local FeatureMgr   = require("includes.services.FeatureManager")
 local Autoheal     = require("includes.features.self.autoheal")
 local Ragdoll      = require("includes.features.self.ragdoll")
 local MagicBullet  = require("includes.features.self.magic_bullet")
@@ -17,6 +16,8 @@ local Katana       = require("includes.features.self.katana")
 local miscFeatures = require("includes.features.self.miscellaneous")
 local CPed         = require("includes.classes.gta.CPed")
 local YimActions   = require("includes.features.extra.yim_actions.YimActionsV3")
+local YRV3         = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local SGSL         = require("includes.services.SGSL")
 
 
 --------------------------------------
@@ -30,6 +31,7 @@ local YimActions   = require("includes.features.extra.yim_actions.YimActionsV3")
 ---@field private m_vehicle PlayerVehicle
 ---@field private m_last_vehicle? Vehicle
 ---@field private m_feat_mgr FeatureManager
+---@field private m_money_controller PlayerMoneyController
 ---@field public CurrentMovementClipset? string
 ---@field public CurrentStrafeClipset? string
 ---@field public CurrentWeaponMovementClipset? string
@@ -48,8 +50,9 @@ LocalPlayer.Delete              = nil
 LocalPlayer.SetAsNoLongerNeeded = nil
 
 
-LocalPlayer.m_vehicle  = require("includes.modules.PlayerVehicle")
-LocalPlayer.m_feat_mgr = FeatureMgr.new(LocalPlayer)
+LocalPlayer.m_vehicle          = require("includes.modules.PlayerVehicle")
+LocalPlayer.m_money_controller = require("includes.services.PlayerMoneyController").new()
+LocalPlayer.m_feat_mgr         = require("includes.services.FeatureManager").new(LocalPlayer)
 
 ---@diagnostic disable
 LocalPlayer.m_feat_mgr:Add(Autoheal.new(LocalPlayer))
@@ -128,7 +131,13 @@ function LocalPlayer:GetWalletBalance()
 		return 0
 	end
 
-	return MONEY.NETWORK_GET_VC_WALLET_BALANCE(stats.get_character_index())
+	return self.m_money_controller:GetWalletBalance()
+end
+
+---@return string
+function LocalPlayer:GetWalletBalanceFmt()
+	if (not Game.IsOnline()) then return "$0" end
+	return self.m_money_controller:GetWalletBalanceFmt()
 end
 
 ---@return integer
@@ -137,7 +146,13 @@ function LocalPlayer:GetBankBalance()
 		return 0
 	end
 
-	return MONEY.NETWORK_GET_VC_BANK_BALANCE()
+	return self.m_money_controller:GetBankBalance()
+end
+
+---@return string
+function LocalPlayer:GetBankBalanceFmt()
+	if (not Game.IsOnline()) then return "$0" end
+	return self.m_money_controller:GetBankBalanceFmt()
 end
 
 ---@return integer
@@ -146,7 +161,21 @@ function LocalPlayer:GetTotalBalance()
 		return stats.get_int(stats.prefix("SPX_TOTAL_CASH"))
 	end
 
-	return self:GetWalletBalance() + self:GetBankBalance()
+	return self.m_money_controller:GetTotalBalance()
+end
+
+---@return string
+function LocalPlayer:GetTotalBalanceFmt()
+	if (not Game.IsOnline()) then
+		return string.formatmoney(stats.get_int(stats.prefix("SPX_TOTAL_CASH")))
+	end
+
+	return self.m_money_controller:GetTotalBalanceFmt()
+end
+
+---@return PlayerMoneyController
+function LocalPlayer:GetMoneyController()
+	return self.m_money_controller
 end
 
 function LocalPlayer:GetCharacterName()
@@ -513,12 +542,48 @@ end
 function LocalPlayer:Reset()
 	self:Cleanup()
 	self.m_vehicle:Reset()
+	self.m_money_controller:Reset()
 	self.m_last_vehicle = nil
 	self:Destroy()
 end
 
 function LocalPlayer.ForceCloudSave()
 	STATS.STAT_SAVE(0, false, 3, false)
+end
+
+---@param bossType int8_t -- -1 = retire | 0 = CEO | 1 = MC
+function LocalPlayer:RegisterAsBoss(bossType)
+	if (not math.is_inrange(bossType, -1, 1)) then
+		return
+	end
+
+	ThreadManager:Run(function()
+		local pid               = self:GetID()
+		local handle            = self:GetHandle()
+		local freemode_offset   = SGSL:Get(SGSL.data.freemode_boss_stuff):GetOffset(1)
+		local GPBD_FM_3 <const> = GGlobals.GPBD_FM_3:At(pid, 615)
+		local isRetiring        = bossType == -1
+
+		if (isRetiring) then
+			GGlobals.FREEMODE_GLOBAL:At(freemode_offset):ClearBit(17)
+			GPBD_FM_3:At(10):At(4):ClearBit(30)
+			if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Goon", 3) and DECORATOR.DECOR_EXIST_ON(handle, "Player_Goon")) then
+				DECORATOR.DECOR_REMOVE(handle, "Player_Goon")
+			end
+			if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Boss", 3) and DECORATOR.DECOR_EXIST_ON(handle, "Player_Boss")) then
+				DECORATOR.DECOR_REMOVE(handle, "Player_Boss")
+			end
+		else
+			GGlobals.FREEMODE_GLOBAL:At(freemode_offset):SetBit(17)
+			if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Boss", 3)) then
+				DECORATOR.DECOR_SET_INT(self:GetHandle(), "Player_Boss", pid)
+			end
+		end
+
+		GPBD_FM_3:At(10):At(433):WriteInt(bossType)
+		GPBD_FM_3:At(10):At(470):WriteInt(bossType)
+		GPBD_FM_3:At(10):WriteInt(isRetiring and -1 or pid)
+	end)
 end
 
 Backend:RegisterEventCallbackAll(function()
@@ -549,4 +614,5 @@ end)
 
 ThreadManager:RegisterLooped("SS_SELF", function()
 	LocalPlayer.m_feat_mgr:Update()
+	LocalPlayer.m_money_controller:Update()
 end)

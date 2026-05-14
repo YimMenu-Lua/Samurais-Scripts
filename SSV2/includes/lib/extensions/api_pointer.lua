@@ -7,6 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+---@diagnostic disable: lowercase-global
+
 do
 	---@class nullptr : pointer
 	local nullptr <const>     = {}
@@ -67,6 +69,22 @@ local newptr <const> = memory.pointer.new
 function memory.pointer:new(addr)
 	if (addr == 0) then return nullptr end
 	return newptr(self, addr)
+end
+
+-- Wrapper around `memory.allocate` that registers the allocated
+--
+-- pointer in `Backend` to guarantee all allocations are freed on cleanup.
+---@param size integer
+function malloc(size)
+	local ptr = memory.allocate(size)
+	Backend.AllocatedPointers[ptr:get_address()] = ptr
+	return ptr
+end
+
+---@param ptr pointer
+function free(ptr)
+	Backend.AllocatedPointers[ptr:get_address()] = nil
+	memory.free(ptr)
 end
 
 -- Equality comparator for pointer objects.
@@ -137,6 +155,23 @@ function memory.pointer:as(obj)
 	end
 
 	error(_F("Class '%s' has no valid pointer constructor", obj_name))
+end
+
+-- Basically Rockstar's `TEXT_LABEL_ASSIGN_STRING`
+--
+-- Writes a string into the address and fills any remaining free bytes with nulls.
+---@param str string
+---@param max_len integer
+function memory.pointer:set_fixed_string(str, max_len)
+	str = str:sub(1, max_len - 1)
+	local len = #str
+	for i = 1, len do
+		self:add(i - 1):set_byte(str:byte(i))
+	end
+	self:add(len):set_byte(0)
+	for i = len + 1, max_len - 1 do
+		self:add(i):set_byte(0)
+	end
 end
 
 -- Retrieves a 32-bit displacement value from the memory address, optionally adding an offset and adjustment.

@@ -111,13 +111,23 @@ local function SortAllOrderedFlags()
 	end)
 end
 
-local function formatU32Array(array)
-	local out = {}
-	for i, u32 in ipairs(array) do
-		out[i] = _F("0x%X", u32)
+---@param flags uint32_t|array<uint32_t>
+---@return string
+local function formatFlags(flags)
+	local argType = type(flags)
+	if (argType == "table") then
+		local out = {}
+		for i, u32 in ipairs(flags) do
+			out[i] = _F("0x%X", u32)
+		end
+		return _F("{ %s }", table.concat(out, ", "))
 	end
 
-	return _F("{ %s }", table.concat(out, ", "))
+	if (argType ~= "number") then
+		flags = 0
+	end
+
+	return _F("0x%X", flags)
 end
 
 ---@param data vehicleDebugDataAlias
@@ -130,13 +140,12 @@ local function drawVehicleFlags(data)
 
 	local orderedPairs = data.ordered_flags
 	local count        = data.flag_count
-	local maxHeight    = math.min(GVars.ui.window_size.y * 0.54, count * ImGui.GetTextLineHeightWithSpacing())
-	local dowrdOrArray = data.get_all(PV)
-	local fmt          = type(dowrdOrArray) == "table" and formatU32Array(dowrdOrArray) or _F("0x%X", dowrdOrArray)
+	local maxHeight    = math.min(GVars.ui.window_size.y * 0.58, count * ImGui.GetTextLineHeightWithSpacing())
+	local allFlags     = data.get_all(PV)
 	local getFunc      = data.get
 
 	ImGui.BeginDisabled(not PV:IsValid())
-	ImGui.BulletText(fmt)
+	ImGui.BulletText(formatFlags(allFlags))
 
 	-- we should really consider bumping ImGui in MR-X's fork. I'm tired of not having auto-resizing child windows
 	if (ImGui.BeginChildEx("##vehFlags", vec2:new(0, maxHeight), ImGuiChildFlags.Borders)) then
@@ -361,9 +370,8 @@ local function drawPresets()
 			HandlingEditor:RemovePreset(preset)
 		end
 
-		local associatedFlagsPopupOpen = true
 		ImGui.SetNextWindowSizeConstraints(400, 160, 600, 600)
-		if (ImGui.BeginPopupModal(flagDumpLabel, associatedFlagsPopupOpen, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoResize)) then
+		if (ImGui.BeginPopupModal(flagDumpLabel, true, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoResize)) then
 			local flagsArray = preset:GetAssociatedFlags()
 			local flagsCount = #flagsArray
 			ImGui.Text(_F("Flag count: [ %d ]", flagsCount))
@@ -467,7 +475,8 @@ local function drawNewPresetWindow()
 					data.nameBuffer,
 					data.vehTypesBs,
 					data.descBuffer,
-					data.wantsAutoEnable
+					data.wantsAutoEnable,
+					data.cb_filename
 				))) then
 				clearPresetWindow()
 			end
@@ -492,7 +501,8 @@ return function()
 		return
 	end
 
-	if (not ImGui.BeginTabBar("##vehicleFlagsMain")) then
+	local mainTabBarOpen = ImGui.BeginTabBar("##vehicleFlagsMain")
+	if (not mainTabBarOpen) then
 		return
 	end
 
@@ -575,7 +585,10 @@ return function()
 		drawPresets()
 		ImGui.EndTabItem()
 	end
-	ImGui.EndTabBar()
+
+	if (mainTabBarOpen) then
+		ImGui.EndTabBar()
+	end
 
 	if (newPresetWindowData.shouldDraw) then
 		drawNewPresetWindow()

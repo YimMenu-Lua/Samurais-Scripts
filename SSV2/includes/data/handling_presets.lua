@@ -15,8 +15,9 @@
 -- On the up side, the raw data will be much more readavle.
 
 
-local CARS_BIT <const>  = Enums.eVehicleType.VEHICLE_TYPE_CAR
-local BIKES_BIT <const> = Enums.eVehicleType.VEHICLE_TYPE_BIKE
+local ALLOW_CARS <const>  = 1 << Enums.eVehicleType.VEHICLE_TYPE_CAR
+local ALLOW_BIKES <const> = 1 << Enums.eVehicleType.VEHICLE_TYPE_BIKE
+local ALLOW_BOTH <const>  = ALLOW_CARS | ALLOW_BIKES
 
 ---@type array<HandlingPresetData>
 return {
@@ -26,7 +27,7 @@ return {
 		is_translator_name = true,
 		auto_apply         = true,
 		deltas             = { [Enums.eHandlingEditorTypes.TYPE_HF] = { ["FREEWHEEL_NO_GAS"] = true } },
-		vehicle_bitset     = 1 << CARS_BIT | 1 << BIKES_BIT,
+		vehicle_bitset     = ALLOW_BOTH,
 	},
 	{
 		name               = "VEH_WHEELIE",
@@ -34,7 +35,7 @@ return {
 		is_translator_name = true,
 		auto_apply         = false,
 		deltas             = { [Enums.eHandlingEditorTypes.TYPE_AF] = { ["CAN_WHEELIE"] = true } },
-		vehicle_bitset     = 1 << CARS_BIT,
+		vehicle_bitset     = ALLOW_CARS,
 	},
 	{
 		name               = "VEH_KERS_BOOST",
@@ -42,7 +43,7 @@ return {
 		is_translator_name = true,
 		auto_apply         = false,
 		deltas             = { [Enums.eHandlingEditorTypes.TYPE_HF] = { ["HAS_KERS"] = true } },
-		vehicle_bitset     = 1 << CARS_BIT
+		vehicle_bitset     = ALLOW_CARS
 	},
 	{
 		name               = "VEH_ROCKET_BOOST",
@@ -50,7 +51,7 @@ return {
 		is_translator_name = true,
 		auto_apply         = false,
 		deltas             = { [Enums.eHandlingEditorTypes.TYPE_MIF] = { ["HAS_ROCKET_BOOST"] = true } },
-		vehicle_bitset     = 1 << CARS_BIT | 1 << BIKES_BIT
+		vehicle_bitset     = ALLOW_BOTH
 	},
 	{
 		name               = "VEH_JUMP",
@@ -58,7 +59,7 @@ return {
 		is_translator_name = true,
 		auto_apply         = false,
 		deltas             = { [Enums.eHandlingEditorTypes.TYPE_MIF] = { ["JUMPING_CAR"] = true, ["HAS_PARACHUTE"] = true, } },
-		vehicle_bitset     = 1 << CARS_BIT
+		vehicle_bitset     = ALLOW_CARS
 	},
 	{
 		name               = "VEH_OFFROAD_ABILITIES",
@@ -83,7 +84,7 @@ return {
 			},
 			[Enums.eHandlingEditorTypes.TYPE_MIF] = { ["INCREASE_LOW_SPEED_TORQUE"] = true, },
 		},
-		vehicle_bitset     = 1 << CARS_BIT
+		vehicle_bitset     = ALLOW_CARS
 	},
 	{
 		name               = "VEH_FORCE_NO_TC",
@@ -104,7 +105,7 @@ return {
 				["DONT_HOLD_LOW_GEARS_WHEN_ENGINE_UNDER_LOAD"] = false,
 			},
 		},
-		vehicle_bitset     = 1 << CARS_BIT | 1 << BIKES_BIT
+		vehicle_bitset     = ALLOW_BOTH
 	},
 	{
 		name               = "VEH_LOW_SPEED_WHEELIE",
@@ -113,7 +114,7 @@ return {
 		auto_apply         = false,
 		deltas             = {
 			[Enums.eHandlingEditorTypes.TYPE_HF] = { ["LOW_SPEED_WHEELIES"] = true } },
-		vehicle_bitset     = 1 << BIKES_BIT
+		vehicle_bitset     = ALLOW_BIKES
 	},
 	{
 		name               = "VEH_RAMP",
@@ -131,6 +132,6 @@ return {
 				["RAMP_MOD"]                                    = true,
 			},
 		},
-		vehicle_bitset     = 1 << CARS_BIT
+		vehicle_bitset     = ALLOW_CARS
 	},
 }

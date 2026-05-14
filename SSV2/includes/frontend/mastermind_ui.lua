@@ -342,7 +342,7 @@ local function drawDDayTab()
 
 	ImGui.BeginDisabled(on_cooldown)
 	GUI:HeaderText(_T("GENERIC_IMPORTANT"), { separator = true, spacing = true })
-	ImGui.Text(_T("YH_DDAY_HELP1"))
+	ImGui.TextWrapped(_T("YH_DDAY_HELP1"))
 	local button_label = _T("YH_DDAY_FORCE")
 	if (GUI:Button(button_label)) then
 		stats.set_int("MPX_GANGOPS_HEIST_STATUS", 9999)
@@ -414,9 +414,7 @@ local function HeistUI()
 
 	if (ImGui.BeginTabBar("##mastermind")) then
 		for _, entry in ipairs(TABS) do
-			local label = entry.label
-			local name  = entry.is_gxt and label or _T(label)
-			if (ImGui.BeginTabItem(name) and entry.callback) then
+			if (ImGui.BeginTabItem(_T(entry.label)) and entry.callback) then
 				entry.callback()
 				ImGui.EndTabItem()
 			end
@@ -428,22 +426,8 @@ end
 GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, Mastermind.__label, HeistUI)
 
 ThreadManager:Run(function()
-	-- Removed the Translator call because our own labels should never
-	-- stick since our script's language can be changed at runtime.
-	-- Our translator is built around ImGui's immediate mode nature
-	-- where _T is called every frame without performannce issues since
-	-- translations are simple O(1) lookups. This guarantees labels will
-	-- always match the current script language.
-	-- GXTs however are translated once and kept because you can't change
-	-- the game's language without restarting it.
-
+	Translator:TranslateGXTList(heistNames)
 	for _, entry in ipairs(TABS) do
-		if (entry.is_gxt) then
-			entry.label = Game.GetGXTLabel(entry.label)
-		end
-	end
-
-	for k, label in pairs(heistNames) do
-		heistNames[k] = Game.GetGXTLabel(label)
+		Translator:TranslateGXT(entry.label)
 	end
 end)

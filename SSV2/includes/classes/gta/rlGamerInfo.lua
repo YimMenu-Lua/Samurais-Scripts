@@ -47,11 +47,12 @@ end
 
 ---@return string
 function IPAddress:__tostring()
+	local packed = self.m_packed
 	return _F("%d.%d.%d.%d",
-		self.m_packed.x,
-		self.m_packed.y,
-		self.m_packed.z,
-		self.m_packed.w
+		packed.x,
+		packed.y,
+		packed.z,
+		packed.w
 	)
 end
 
