@@ -24,9 +24,10 @@ SSV2 includes polished versions of your favorite features from previous versions
     <li>
       <a href="#online">Online</a>
       <ul>
-        <li><a href="#yimresupplierv3">YimResupplierV3</a></li>
+        <li><a href="#business-manager">Business Manager</a></li>
         <li><a href="#casinopacino">CasinoPacino</a></li>
         <li><a href="#mastermind">Mastermind</a></li>
+        <li><a href="#stat-controller">Stat Controller</a></li>
       </ul>
     </li>
     <li>
@@ -397,7 +398,7 @@ _Usage:_ Sit in the driver's seat of a flatbed truck then approach any vehicle a
 
 ## Online
 
-### YimResupplierV3
+### Business Manager
 
 A business manager that supports auto-fill and auto-sell for several businesses, offers instant production triggers for biker businesses, bunker, acid lab, nightclub controls some job cooldowns, and integrates with CommandExecutor. Includes a SalvageYard script by [@szalikdev](https://github.com/szalikdev).
 
@@ -433,6 +434,10 @@ Contains the following modules:
   1. The Data Breaches
   2. The Bogdan Problem
   3. The Doomsday Scenario
+
+### Stat Controller
+
+Allows you to add multiplayer character stats to a managed list, edit them, and lock their values. Supported stat types are int, float, bool, time, and date.
 
 ## Extra
 

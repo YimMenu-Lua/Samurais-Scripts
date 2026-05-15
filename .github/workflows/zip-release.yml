@@ -112,6 +112,7 @@ jobs:
 
           function isBreakingChange(str) { return str.toLowerCase().includes("breaking change"); }
 
+          const commitHashes = new Set();
           const mergedPRs = pulls.filter(pr => pr.merged_at && new Date(pr.merged_at) > lastTagDate);
           if (mergedPRs.length > 0) {
             for (const pr of mergedPRs) {
@@ -120,6 +121,19 @@ jobs:
               if (body) {
                 breaking = breaking || isBreakingChange(body);
                 changelog += `${body.trim()}\n\n`;
+              }
+              const prCommits = await github.paginate(
+                github.rest.pulls.listCommits,
+                {
+                  owner,
+                  repo,
+                  pull_number: pr.number,
+                  per_page: 100
+                }
+              );
+
+              for (const prCommit of prCommits) {
+                commitHashes.add(prCommit.sha);
               }
             }
           }
@@ -132,6 +146,10 @@ jobs:
           });
           const commits = compared.data.commits;
           for (const commit of commits) {
+            if (commitHashes.has(commit.sha)) {
+              continue;
+            }
+
             const msg = commit.commit.message || "";
             const body = commit.commit.body;
             const msgLower = msg.toLowerCase();
