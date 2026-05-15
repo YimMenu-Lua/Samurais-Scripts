@@ -7,9 +7,10 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local RageTimeStruct <const>        = {}
-RageTimeStruct.__index              = RageTimeStruct
-local RageTimeStructOffsets <const> = {
+-- RAGE DateTime struct
+local RageDTStruct <const>        = {}
+RageDTStruct.__index              = RageDTStruct
+local RageDTStructOffsets <const> = {
 	["year"]  = { offset = 0x0, default = 2025, min = 1970, max = 9999 },
 	["month"] = { offset = 0x8, default = 1, min = 1, max = 12 },
 	["day"]   = { offset = 0x10, default = 1, min = 1, max = 31 },
@@ -20,11 +21,11 @@ local RageTimeStructOffsets <const> = {
 
 ---@param epoch seconds
 ---@return pointer<array<uint64_t>>
-function RageTimeStruct.FromPosix(epoch)
+function RageDTStruct.FromPosix(epoch)
 	local ostdatetime = os.date("*t", epoch) ---@cast ostdatetime osdate
 	local outPtr      = malloc(0x8 * 7)
-	outPtr:add(0x30):set_qword(0) -- ms
-	for k, v in pairs(RageTimeStructOffsets) do
+	outPtr:add(0x30):set_qword(math.random(0, 59)) -- ms
+	for k, v in pairs(RageDTStructOffsets) do
 		outPtr:add(v.offset):set_qword(ostdatetime[k] or v.default)
 	end
 	return outPtr
@@ -32,9 +33,9 @@ end
 
 ---@param ptr pointer<array<uint64_t>>
 ---@return DateTime
-function RageTimeStruct.FromPointer(ptr)
+function RageDTStruct.FromPointer(ptr)
 	local t = {}
-	for k, v in pairs(RageTimeStructOffsets) do
+	for k, v in pairs(RageDTStructOffsets) do
 		local val64 = ptr:add(v.offset):get_qword()
 		if (not math.is_inrange(val64, v.min, v.max)) then
 			log.warning("[RageTimeStruct.FromPointer]: Invalid datetime param! Returning a default DateTime object.")
@@ -404,11 +405,11 @@ end
 
 -- Static function.
 --
--- Frees the pointer when it returns.
+-- Takes a pointer and frees it on return.
 ---@param ptr pointer<array<uint64_t>>
 ---@return DateTime
-function DateTime.FromRageStruct(ptr)
-	return RageTimeStruct.FromPointer(ptr)
+function DateTime.FromRageDateStruct(ptr)
+	return RageDTStruct.FromPointer(ptr)
 end
 
 ---@param fmt? string
@@ -448,7 +449,7 @@ end
 
 ---@return pointer<array<uint64_t>>
 function DateTime:AsRageDateStruct()
-	return RageTimeStruct.FromPosix(self.m_epoch)
+	return RageDTStruct.FromPosix(self.m_epoch)
 end
 
 ---@param a DateTime|seconds

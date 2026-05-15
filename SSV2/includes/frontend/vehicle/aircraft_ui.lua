@@ -13,85 +13,116 @@ local autopilot_index_changed = false
 local autopilot_labels
 local planes_tab              = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_AIRCRAFT", nil, nil, true)
 Flares                        = LocalPlayer:GetVehicle():AddFeature(flrs)
+local optionPopup             = {
+	flags       = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize,
+	label       = "##optionsPopup",
+	should_draw = false,
+	---@type function?
+	callback    = nil
+}
 
-planes_tab:AddBoolCommand(
-	"VEH_FAST_JETS",
-	"features.vehicle.fast_jets",
-	nil,
-	nil,
-	{ description = "VEH_FAST_JETS_TT", isTranslatorLabel = true },
-	false,
-	true
+local function triggerbotSettings()
+	GVars.features.vehicle.aircraft_mg.enemies_only = GUI:CustomToggle(_T("VEH_MG_TRIGGERBOT_ENEMY"),
+		GVars.features.vehicle.aircraft_mg.enemies_only,
+		{ tooltip = _T("VEH_MG_TRIGGERBOT_ENEMY_TT") }
+	)
+
+	GVars.features.vehicle.aircraft_mg.tiggerbot_range = ImGui.SliderFloat(_T("VEH_MG_TRIGGERBOT_RANGE"),
+		GVars.features.vehicle.aircraft_mg.tiggerbot_range,
+		100.0,
+		1000.0,
+		"%.0f"
+	)
+end
+
+local function manualAimSettings()
+	GVars.features.vehicle.aircraft_mg.marker_size = ImGui.SliderFloat(_T("VEH_MG_MARKER_SIZE"),
+		GVars.features.vehicle.aircraft_mg.marker_size,
+		1.0,
+		10.0
+	)
+
+	ImGui.ColorEditVec4(_T("VEH_MG_MARKER_COL"), GVars.features.vehicle.aircraft_mg.marker_color)
+end
+
+planes_tab:AddBoolCommand("VEH_FAST_JETS",
+	{
+		gvar_key          = "features.vehicle.fast_jets",
+		isTranslatorLabel = true,
+		meta              = { description = "VEH_FAST_JETS_TT", isTranslatorLabel = true },
+		registerCommand   = true
+	}
 )
-
-planes_tab:AddBoolCommand(
-	"VEH_NO_JET_STALL",
-	"features.vehicle.no_jet_stall",
-	nil,
-	nil,
-	{ description = "VEH_NO_JET_STALL_TT", isTranslatorLabel = true },
-	false,
-	true
+planes_tab:AddBoolCommand("VEH_NO_JET_STALL",
+	{
+		gvar_key          = "features.vehicle.no_jet_stall",
+		isTranslatorLabel = true,
+		meta              = { description = "VEH_NO_JET_STALL_TT", isTranslatorLabel = true },
+		registerCommand   = true
+	}
 )
-
-planes_tab:AddBoolCommand(
-	"VEH_NO_TURBULENCE",
-	"features.vehicle.no_turbulence",
-	nil,
-	function()
-		ThreadManager:Run(function()
-			local PV = LocalPlayer:GetVehicle()
-			PV:RestorePatch(PV.MemoryPatches.Turbulence)
-			PV:RestorePatch(PV.MemoryPatches.WindMult)
-		end)
-	end,
-	nil,
-	false,
-	true
+planes_tab:AddBoolCommand("VEH_NO_TURBULENCE",
+	{
+		gvar_key          = "features.vehicle.no_turbulence",
+		isTranslatorLabel = true,
+		on_disable        = function()
+			ThreadManager:Run(function()
+				local PV = LocalPlayer:GetVehicle()
+				PV:RestorePatch(PV.MemoryPatches.Turbulence)
+				PV:RestorePatch(PV.MemoryPatches.WindMult)
+			end)
+		end,
+	}
 )
-
-planes_tab:AddBoolCommand(
-	"VEH_FLARES",
-	"features.vehicle.flares",
-	function()
-		Flares:OnEnable()
-	end,
-	function()
-		Flares:OnDisable()
-	end,
-	{ description = "VEH_FLARES_TT" },
-	true,
-	true
+planes_tab:AddBoolCommand("VEH_FLARES",
+	{
+		gvar_key          = "features.vehicle.flares",
+		isTranslatorLabel = true,
+		meta              = { description = "VEH_FLARES_TT" },
+		on_enable         = function() Flares:OnEnable() end,
+		on_disable        = function() Flares:OnDisable() end,
+	}
 )
-
-planes_tab:AddBoolCommand(
-	"VEH_MG_TRIGGERBOT",
-	"features.vehicle.aircraft_mg.triggerbot",
-	nil,
-	nil,
-	{ description = "VEH_MG_TRIGGERBOT_TT" },
-	true,
-	true
+planes_tab:AddBoolCommand("VEH_MG_TRIGGERBOT",
+	{
+		gvar_key          = "features.vehicle.aircraft_mg.triggerbot",
+		isTranslatorLabel = true,
+		meta              = { description = "VEH_MG_TRIGGERBOT_TT" },
+		fineTuning        = {
+			condition = function()
+				return GVars.features.vehicle.aircraft_mg.triggerbot
+			end,
+			callback = function()
+				optionPopup.callback    = triggerbotSettings
+				optionPopup.label       = _T("VEH_MG_TRIGGERBOT")
+				optionPopup.should_draw = true
+			end
+		}
+	}
 )
-
-planes_tab:AddBoolCommand(
-	"VEH_MG_MANUAL_AIM",
-	"features.vehicle.aircraft_mg.manual_aim",
-	nil,
-	nil,
-	{ description = "VEH_MG_MANUAL_AIM_TT" },
-	true,
-	true
+planes_tab:AddBoolCommand("VEH_MG_MANUAL_AIM",
+	{
+		gvar_key          = "features.vehicle.aircraft_mg.manual_aim",
+		isTranslatorLabel = true,
+		meta              = { description = "VEH_MG_MANUAL_AIM_TT" },
+		fineTuning        = {
+			condition = function()
+				return GVars.features.vehicle.aircraft_mg.manual_aim
+			end,
+			callback = function()
+				optionPopup.callback    = manualAimSettings
+				optionPopup.label       = _T("VEH_MG_MANUAL_AIM")
+				optionPopup.should_draw = true
+			end
+		}
+	}
 )
-
-planes_tab:AddBoolCommand(
-	"VEH_COBRA_MANEUVER",
-	"features.vehicle.cobra_maneuver",
-	nil,
-	nil,
-	{ description = "VEH_COBRA_MANEUVER_TT" },
-	true,
-	true
+planes_tab:AddBoolCommand("VEH_COBRA_MANEUVER",
+	{
+		gvar_key          = "features.vehicle.cobra_maneuver",
+		isTranslatorLabel = true,
+		meta              = { description = "VEH_COBRA_MANEUVER_TT" },
+	}
 )
 
 planes_tab:RegisterGUI(function()
@@ -128,29 +159,14 @@ planes_tab:RegisterGUI(function()
 	end
 	ImGui.EndDisabled()
 
-	ImGui.Spacing()
-	ImGui.SeparatorText(_T("GENERIC_SETTINGS_LABEL"))
-	if (GVars.features.vehicle.aircraft_mg.triggerbot) then
-		GVars.features.vehicle.aircraft_mg.enemies_only, _ = GUI:CustomToggle(_T("VEH_MG_TRIGGERBOT_ENEMY"),
-			GVars.features.vehicle.aircraft_mg.enemies_only,
-			{ tooltip = _T("VEH_MG_TRIGGERBOT_ENEMY_TT") }
-		)
-
-		GVars.features.vehicle.aircraft_mg.tiggerbot_range, _ = ImGui.SliderFloat(_T("VEH_MG_TRIGGERBOT_RANGE"),
-			GVars.features.vehicle.aircraft_mg.tiggerbot_range,
-			100.0,
-			1000.0,
-			"%.0f"
-		)
+	if (optionPopup.should_draw) then
+		ImGui.OpenPopup(optionPopup.label)
+		optionPopup.should_draw = false
 	end
 
-	if (GVars.features.vehicle.aircraft_mg.manual_aim) then
-		GVars.features.vehicle.aircraft_mg.marker_size, _ = ImGui.SliderFloat(_T("VEH_MG_MARKER_SIZE"),
-			GVars.features.vehicle.aircraft_mg.marker_size,
-			1.0,
-			10.0
-		)
-
-		ImGui.ColorEditVec4(_T("VEH_MG_MARKER_COL"), GVars.features.vehicle.aircraft_mg.marker_color)
+	ImGui.SetNextWindowSizeConstraints(300, 140, 600, 800)
+	if (optionPopup.callback and ImGui.BeginPopupModal(optionPopup.label, true, optionPopup.flags)) then
+		optionPopup.callback()
+		ImGui.EndPopup()
 	end
 end)

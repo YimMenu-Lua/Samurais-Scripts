@@ -57,13 +57,13 @@ Backend = require("includes.backend"):init(SCRIPT_NAME, SCRIPT_VERSION, GAME_VER
 
 
 require("includes.lib.meta")
-require("includes.lib.extensions.__init__")
-require("includes.lib.class")
-require("includes.lib.enum")
 require("includes.classes.Pair")
 require("includes.classes.Range")
 require("includes.classes.Rect")
 require("includes.classes.Set")
+require("includes.lib.extensions.__init__")
+require("includes.lib.class")
+require("includes.lib.enum")
 require("includes.modules.Accessor")
 
 

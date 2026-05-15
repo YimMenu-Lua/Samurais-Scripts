@@ -491,13 +491,11 @@ ThreadManager:Run(SortAllOrderedFlags)
 return function()
 	if (PV:GetHandle() == 0) then
 		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
-		ImGui.Spacing()
 		return
 	end
 
 	if (not HandlingEditor:IsInitialized()) then
 		ImGui.Text(_T("GENERIC_UNAVAILABLE"))
-		ImGui.Spacing()
 		return
 	end
 

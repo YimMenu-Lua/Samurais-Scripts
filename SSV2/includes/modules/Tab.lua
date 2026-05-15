@@ -7,6 +7,21 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local GridRenderer = require("includes.services.GridRenderer")
+
+---@class BoolCommandParams
+---@field gvar_key string -- A key to insert into GVars (global variables)
+---@field on_enable? function
+---@field on_disable? function
+---@field meta? CommandMeta
+---@field registerCommand? boolean -- register with CommandExecutor
+---@field isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
+---@field global_table? table a table where the global variable lives (defaults to GVars if available or _G)
+---@field fineTuning? { callback: function, condition: boolean|fun(): boolean } -- adds a fine tuning button to the command's widget
+
+---@class LoopedCommandParams : BoolCommandParams
+---@field callback function
+
 --------------------------------------
 -- Tab Struct
 --------------------------------------
@@ -153,15 +168,13 @@ function Tab:RemoveGUI()
 end
 
 ---@param label string
----@param gvar_key string -- A key to insert into GVars (global variables)
----@param on_enable? function
----@param on_disable? function
----@param meta? CommandMeta
----@param noCommand? boolean
----@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
-function Tab:AddBoolCommand(label, gvar_key, on_enable, on_disable, meta, noCommand, isTranslatorLabel)
+---@param opts BoolCommandParams
+function Tab:AddBoolCommand(label, opts)
+	opts           = opts or {}
+	local gvar_key = opts.gvar_key
+	local g_table  = opts.global_table or GVars or _G
 	if (type(label) ~= "string" or type(gvar_key) ~= "string") then
-		error("AddBoolCommand requires a label and global variable key string.")
+		error(_F("[%s]: AddBoolCommand requires a label and global variable key string.", label))
 	end
 
 	local function onClick(value)
@@ -169,37 +182,39 @@ function Tab:AddBoolCommand(label, gvar_key, on_enable, on_disable, meta, noComm
 			return
 		end
 
-		if (value and type(on_enable) == "function") then
-			on_enable()
-		elseif (not value and type(on_disable) == "function") then
-			on_disable()
+		local onEnable, onDisable = opts.on_enable, opts.on_disable
+		if (value and type(onEnable) == "function") then
+			onEnable()
+		elseif (not value and type(onDisable) == "function") then
+			onDisable()
 		end
 	end
 
-	meta = meta or {}
+	local meta = opts.meta or {}
 	self:GetOrCreateGrid():AddCheckbox(
 		label,
 		gvar_key,
 		{
-			persistent = true,
-			tooltip = meta.description,
-			isTranslatorLabel = isTranslatorLabel,
-			onClick = function()
-				local v = table.get_nested_key(GVars, gvar_key)
+			persistent        = true,
+			tooltip           = meta.description,
+			isTranslatorLabel = opts.isTranslatorLabel,
+			fineTuning        = opts.fineTuning,
+			onClick           = function()
+				local v = table.get_nested_key(g_table, gvar_key)
 				onClick(v)
 			end,
 		}
 	)
 
-	if (noCommand or not CommandExecutor or type(table.get_nested_key(GVars, gvar_key)) ~= "boolean") then
+	if not (opts.registerCommand and CommandExecutor and type(table.get_nested_key(g_table, gvar_key)) == "boolean") then
 		return
 	end
 
 	local command_name = label:lower():gsub("%s+", "_")
 	CommandExecutor:RegisterCommand(command_name, function()
-		local v = table.get_nested_key(GVars, gvar_key)
+		local v = table.get_nested_key(g_table, gvar_key)
 		v = not v
-		table.set_nested_key(GVars, gvar_key, v)
+		table.set_nested_key(g_table, gvar_key, v)
 		onClick(v)
 		CommandExecutor:notify(
 			"%s %s",
@@ -210,33 +225,32 @@ function Tab:AddBoolCommand(label, gvar_key, on_enable, on_disable, meta, noComm
 end
 
 ---@param label string
----@param gvar_key string -- A key to insert into GVars (global variables)
----@param callback function
----@param on_disable? function
----@param meta? CommandMeta
----@param noCommand? boolean
----@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
-function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta, noCommand, isTranslatorLabel)
+---@param opts LoopedCommandParams
+function Tab:AddLoopedCommand(label, opts)
+	opts           = opts or {}
+	local gvar_key = opts.gvar_key
+	local g_table  = opts.global_table or GVars or _G
 	if (type(label) ~= "string" or type(gvar_key) ~= "string") then
-		error("AddBoolCommand requires a label and global variable key string.")
+		error(_F("[%s] AddBoolCommand requires a label and global variable key string.", label))
 	end
 
-	meta = meta or {}
-	local command_name = label:lower():gsub("%s+", ""):trim()
-	local config_value = table.get_nested_key(GVars, gvar_key)
+	local meta             = opts.meta or {}
+	local command_name     = label:lower():gsub("%s+", ""):trim()
+	local config_value     = table.get_nested_key(g_table, gvar_key)
 	local suspended_thread = not config_value
-	local thread = ThreadManager:RegisterLooped(_F("SS_%s", command_name:upper()), callback, suspended_thread)
+	local thread           = ThreadManager:RegisterLooped(_F("SS_%s", command_name:upper()), opts.callback, suspended_thread)
 
 	local function toggle()
-		local v = table.get_nested_key(GVars, gvar_key)
-		if (table.get_nested_key(GVars, gvar_key)) then
+		local v = table.get_nested_key(g_table, gvar_key)
+		local onDisable = opts.on_disable
+		if (table.get_nested_key(g_table, gvar_key)) then
 			if thread then thread:Resume() end
 		else
 			if thread then thread:Suspend() end
-			if on_disable then on_disable() end
+			if onDisable then onDisable() end
 		end
 
-		if (not noCommand) then
+		if (not opts.registerCommand) then
 			CommandExecutor:notify(
 				"%s %s.",
 				label,
@@ -249,20 +263,21 @@ function Tab:AddLoopedCommand(label, gvar_key, callback, on_disable, meta, noCom
 		label,
 		gvar_key,
 		{
-			persistent = true,
-			tooltip = meta.description,
-			isTranslatorLabel = isTranslatorLabel,
-			onClick = toggle,
+			persistent        = true,
+			tooltip           = meta.description,
+			isTranslatorLabel = opts.isTranslatorLabel,
+			onClick           = toggle,
+			fineTuning        = opts.fineTuning
 		}
 	)
 
-	if (noCommand or not CommandExecutor) then
+	if not (opts.registerCommand and CommandExecutor and type(table.get_nested_key(g_table, gvar_key)) == "boolean") then
 		return
 	end
 
 	local command_callback = function()
-		local v = table.get_nested_key(GVars, gvar_key)
-		table.set_nested_key(GVars, gvar_key, not v)
+		local v = table.get_nested_key(g_table, gvar_key)
+		table.set_nested_key(g_table, gvar_key, not v)
 		toggle()
 	end
 

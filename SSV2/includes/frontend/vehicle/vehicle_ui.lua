@@ -14,20 +14,14 @@ local driftMG           = require("includes.features.vehicle.drift_minigame")
 local customPaintsUI    = require("includes.frontend.vehicle.custom_paints_ui")
 local engine_swap_index = 1
 local vehicleTab        = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
-local optionWindowFlgs  = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize
+local optionPopup       = {
+	flags       = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize,
+	label       = "##optionsPopup",
+	should_draw = false,
+	---@type function?
+	callback    = nil
+}
 DriftMinigame           = LocalPlayer:GetVehicle():AddFeature(driftMG)
-
----@type WindowRequest
-local speedometerOptionsWindow
-
----@type WindowRequest
-local nosOptionsWindow
-
----@type WindowRequest
-local driftOptionsWindow
-
----@type WindowRequest
-local driftMinigameOptionsWindow
 
 local function speedoOptions()
 	local resolution = Game.GetScreenResolution()
@@ -155,6 +149,36 @@ local function nosOptions()
 	)
 end
 
+local function minesOptions()
+	if (ImGui.BeginCombo("Vehicle Mine Type", selected_mine_name or "Unselected")) then
+		for _, pair in pairs(LocalPlayer:GetVehicle().mines) do
+			local selected = GVars.features.vehicle.mines.selected_type_hash == pair.second
+			if (ImGui.Selectable(pair.first, selected)) then
+				GVars.features.vehicle.mines.selected_type_hash = pair.second
+				selected_mine_name = pair.first
+			end
+		end
+
+		ImGui.EndCombo()
+	end
+end
+
+local function popsOptions()
+	GVars.features.vehicle.bangs_rpm_min = ImGui.SliderFloat("Pops & Bangs RPM Min",
+		GVars.features.vehicle.bangs_rpm_min,
+		2000.0,
+		GVars.features.vehicle.bangs_rpm_max - 1000.0,
+		"%.0f RPM", GVars.features.vehicle.bangs_rpm_min
+	)
+
+	GVars.features.vehicle.bangs_rpm_max = ImGui.SliderFloat("Pops & Bangs RPM Max",
+		GVars.features.vehicle.bangs_rpm_max,
+		GVars.features.vehicle.bangs_rpm_min + 1000.0,
+		9000.0,
+		"%.0f RPM", GVars.features.vehicle.bangs_rpm_max
+	)
+end
+
 local function ToggleSubwoofer(toggle)
 	ThreadManager:Run(function()
 		if (not LocalPlayer:IsDriving()) then
@@ -179,263 +203,262 @@ local function RestoreExhaustPops()
 end
 
 vehicleTab:AddBoolCommand("VEH_SPEEDOMETER",
-	"features.speedometer.enabled", -- GVars index key
-	nil,                         -- onEnable callback
-	nil,                         -- onDisable callback
-	nil,                         -- CommandMeta
-	true,                        -- optional flag to decide whether to register a command with CommandExecutor or not
-	true                         -- Indicates that strings must be translated when drawing
-)
-
-vehicleTab:AddBoolCommand("VEH_ABS_LIGHTS",
-	"features.vehicle.abs_lights",
-	nil,
-	nil,
-	{ description = "VEH_ABS_LIGHTS_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_FAST_AF",
-	"features.vehicle.fast_vehicles",
-	nil,
-	nil,
-	{ description = "VEH_FAST_AF_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_NOS",
-	"features.vehicle.nos.enabled",
-	nil,
-	nil,
-	nil,
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_NOS_PURGE",
-	"features.vehicle.nos.purge",
-	nil,
-	nil,
-	{ description = "VEH_NOS_PURGE_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_POPS_N_BANGS",
-	"features.vehicle.burble_tune",
-	nil,
-	RestoreExhaustPops,
 	{
-		description = "VEH_POPS_N_BANGS_TT",
-		alias = { "pops" }
-	},
-	true,
-	true
+		gvar_key          = "features.speedometer.enabled",
+		isTranslatorLabel = true,
+		fineTuning        = {
+			condition = function()
+				return GVars.features.speedometer.enabled
+			end,
+			callback = function()
+				optionPopup.callback    = speedoOptions
+				optionPopup.label       = _T("VEH_SPEEDOMETER")
+				optionPopup.should_draw = true
+			end
+		}
+	}
 )
-
+vehicleTab:AddBoolCommand("VEH_ABS_LIGHTS",
+	{
+		gvar_key          = "features.vehicle.abs_lights",
+		meta              = { description = "VEH_ABS_LIGHTS_TT" },
+		isTranslatorLabel = true
+	}
+)
+vehicleTab:AddBoolCommand("VEH_FAST_AF",
+	{
+		gvar_key          = "features.vehicle.fast_vehicles",
+		meta              = { description = "VEH_FAST_AF_TT" },
+		isTranslatorLabel = true
+	}
+)
+vehicleTab:AddBoolCommand("VEH_NOS",
+	{
+		gvar_key          = "features.vehicle.nos.enabled",
+		isTranslatorLabel = true,
+		fineTuning        = {
+			condition = function()
+				return GVars.features.vehicle.nos.enabled
+			end,
+			callback = function()
+				optionPopup.callback    = nosOptions
+				optionPopup.label       = _T("VEH_NOS")
+				optionPopup.should_draw = true
+			end
+		}
+	}
+)
+vehicleTab:AddBoolCommand("VEH_NOS_PURGE",
+	{
+		gvar_key          = "features.vehicle.nos.purge",
+		meta              = { description = "VEH_NOS_PURGE_TT" },
+		isTranslatorLabel = true
+	}
+)
+vehicleTab:AddBoolCommand("VEH_POPS_N_BANGS",
+	{
+		gvar_key          = "features.vehicle.burble_tune",
+		meta              = { description = "VEH_POPS_N_BANGS_TT", alias = { "vehpops" }, isTranslatorLabel = true },
+		isTranslatorLabel = true,
+		on_disable        = RestoreExhaustPops,
+		registerCommand   = true,
+		fineTuning        = {
+			condition = function()
+				return GVars.features.vehicle.burble_tune
+			end,
+			callback = function()
+				optionPopup.callback    = popsOptions
+				optionPopup.label       = _T("VEH_POPS_N_BANGS")
+				optionPopup.should_draw = true
+			end
+		}
+	}
+)
 vehicleTab:AddBoolCommand("VEH_DRIFT_MODE",
-	"features.vehicle.drift.enabled",
-	nil,
-	nil,
-	nil,
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_SUBWOOFER",
-	"features.vehicle.subwoofer",
-	nil,
-	ToggleSubwoofer(false),
-	{ description = "VEH_SUBWOOFER_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_HIGH_BEAMS",
-	"features.vehicle.horn_beams",
-	nil,
-	nil,
-	{ description = "VEH_HIGH_BEAMS_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_AUTO_BRAKE_LIGHTS",
-	"features.vehicle.auto_brake_lights",
-	nil,
-	nil,
-	{ description = "VEH_AUTO_BRAKE_LIGHTS_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_STRONG_WINDOWS",
-	"features.vehicle.unbreakable_windows",
-	nil,
-	function()
-		ThreadManager:Run(function()
-			local PV = LocalPlayer:GetVehicle()
-			if (not PV:IsValid()) then
-				return
+	{
+		gvar_key          = "features.vehicle.drift.enabled",
+		isTranslatorLabel = true,
+		fineTuning        = {
+			condition = function()
+				return GVars.features.vehicle.drift.enabled
+			end,
+			callback = function()
+				optionPopup.callback    = driftOptions
+				optionPopup.label       = _T("VEH_DRIFT_MODE")
+				optionPopup.should_draw = true
 			end
-
-			VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS(PV:GetHandle(), false)
-		end)
-	end,
-	{ description = "VEH_STRONG_WINDOWS_TT" },
-	true,
-	true
+		}
+	}
 )
-
-vehicleTab:AddBoolCommand("VEH_STRONG_CRASH",
-	"features.vehicle.strong_crash",
-	nil,
-	function()
-		local PV = LocalPlayer:GetVehicle()
-		PV:RestorePatch(PV.MemoryPatches.DeformMult)
-	end,
-	{ description = "VEH_STRONG_CRASH_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_RGB_LIGHTS",
-	"features.vehicle.rgb_lights.enabled",
-	nil,
-	function()
-		ThreadManager:Run(function()
-			LocalPlayer:GetVehicle():RestoreHeadlights()
-		end)
-	end,
-	{ description = "VEH_RGB_LIGHTS_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_FLAPPY_DOORS",
-	"features.vehicle.flappy_doors",
-	nil,
-	CloseDoors,
-	{ description = "VEH_FLAPPY_DOORS_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_AUTO_LOCK",
-	"features.vehicle.auto_lock_doors",
-	nil,
-	function()
-		LocalPlayer:GetVehicle():ResetGenericToggleable("autolockdoors")
-	end,
-	{ description = "VEH_AUTO_LOCK_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_LAUNCH_CTRL",
-	"features.vehicle.launch_control",
-	nil,
-	nil,
-	{ description = "VEH_LAUNCH_CTRL_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_IV_EXIT",
-	"features.vehicle.iv_exit",
-	nil,
-	function()
-		ThreadManager:Run(function()
-			LocalPlayer:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
-			if (not GVars.features.vehicle.no_wheel_recenter) then
-				Backend:RemoveDisabledControl(75)
-			end
-		end)
-	end,
-	{ description = "VEH_IV_EXIT_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_KEEP_WHEELS_TURNED",
-	"features.vehicle.no_wheel_recenter",
-	nil,
-	nil,
-	{ description = "VEH_KEEP_WHEELS_TURNED_TT" },
-	true,
-	true
-)
-
-vehicleTab:AddBoolCommand("VEH_MINES",
-	"features.vehicle.mines.enabled",
-	nil,
-	nil,
-	{ description = "VEH_MINES_TT" },
-	true,
-	true
-)
-
 vehicleTab:AddLoopedCommand("VEH_DRIFT_MINIGAME",
-	"features.vehicle.drift_minigame.enabled",
-	function()
-		DriftMinigame:OnTick()
-	end,
-	nil,
-	{ description = "VEH_DRIFT_MINIGAME_TT" },
-	true,
-	true
+	{
+		gvar_key          = "features.vehicle.drift_minigame.enabled",
+		meta              = { description = "VEH_DRIFT_MINIGAME_TT" },
+		isTranslatorLabel = true,
+		callback          = function() DriftMinigame:OnTick() end,
+		fineTuning        = {
+			condition = function()
+				return GVars.features.vehicle.drift_minigame.enabled
+			end,
+			callback = function()
+				optionPopup.callback    = driftMinigameOptions
+				optionPopup.label       = _T("VEH_DRIFT_MINIGAME")
+				optionPopup.should_draw = true
+			end
+		}
+	}
 )
-
-speedometerOptionsWindow = {
-	m_label = "##speedometerOptionsWindow",
-	m_callback = function()
-		GUI:QuickConfigWindow("Speedometer Options", speedoOptions, function()
-			GUI:SetRequestedWindowDraw("##speedometerOptionsWindow", false)
-		end)
-	end,
-	m_flags = optionWindowFlgs,
-	m_should_draw = false,
-}
-
-driftOptionsWindow = {
-	m_label = "##driftOptionsWindow",
-	m_callback = function()
-		GUI:QuickConfigWindow("Drift Options", driftOptions, function()
-			GUI:SetRequestedWindowDraw("##driftOptionsWindow", false)
-		end)
-	end,
-	m_flags = optionWindowFlgs,
-	m_should_draw = false,
-}
-
-driftMinigameOptionsWindow = {
-	m_label = "##driftMinigameOptionsWindow",
-	m_callback = function()
-		GUI:QuickConfigWindow("Drift Minigame Options", driftMinigameOptions, function()
-			GUI:SetRequestedWindowDraw("##driftMinigameOptionsWindow", false)
-		end)
-	end,
-	m_flags = optionWindowFlgs,
-	m_should_draw = false,
-}
-
-nosOptionsWindow = {
-	m_label = "##nosOptionsWindow",
-	m_callback = function()
-		GUI:QuickConfigWindow("NOS Options", nosOptions, function()
-			GUI:SetRequestedWindowDraw("##nosOptionsWindow", false)
-		end)
-	end,
-	m_flags = optionWindowFlgs,
-	m_should_draw = false,
-}
-
-GUI:RegisterWindowRequest(speedometerOptionsWindow)
-GUI:RegisterWindowRequest(driftOptionsWindow)
-GUI:RegisterWindowRequest(driftMinigameOptionsWindow)
-GUI:RegisterWindowRequest(nosOptionsWindow)
+vehicleTab:AddBoolCommand("VEH_SUBWOOFER",
+	{
+		gvar_key          = "features.vehicle.subwoofer",
+		meta              = { description = "VEH_SUBWOOFER_TT" },
+		isTranslatorLabel = true,
+		on_disable        = function() ToggleSubwoofer(false) end,
+	}
+)
+vehicleTab:AddBoolCommand("VEH_HIGH_BEAMS",
+	{
+		gvar_key          = "features.vehicle.horn_beams",
+		meta              = { description = "VEH_HIGH_BEAMS_TT" },
+		isTranslatorLabel = true,
+	}
+)
+vehicleTab:AddBoolCommand("VEH_AUTO_BRAKE_LIGHTS",
+	{
+		gvar_key          = "features.vehicle.auto_brake_lights",
+		meta              = { description = "VEH_AUTO_BRAKE_LIGHTS_TT" },
+		isTranslatorLabel = true,
+	}
+)
+vehicleTab:AddBoolCommand("VEH_STRONG_WINDOWS",
+	{
+		gvar_key          = "features.vehicle.unbreakable_windows",
+		meta              = { description = "VEH_STRONG_WINDOWS_TT" },
+		isTranslatorLabel = true,
+		on_disable        = function()
+			ThreadManager:Run(function()
+				local PV = LocalPlayer:GetVehicle()
+				if (not PV:IsValid()) then return end
+				VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS(PV:GetHandle(), false)
+			end)
+		end,
+	}
+)
+vehicleTab:AddBoolCommand("VEH_STRONG_CRASH",
+	{
+		gvar_key          = "features.vehicle.strong_crash",
+		meta              = { description = "VEH_STRONG_CRASH_TT" },
+		isTranslatorLabel = true,
+		on_disable        = function()
+			local PV = LocalPlayer:GetVehicle()
+			PV:RestorePatch(PV.MemoryPatches.DeformMult)
+		end,
+	}
+)
+vehicleTab:AddBoolCommand("VEH_RGB_LIGHTS",
+	{
+		gvar_key          = "features.vehicle.rgb_lights.enabled",
+		meta              = { description = "VEH_RGB_LIGHTS_TT" },
+		isTranslatorLabel = true,
+		on_disable        = function()
+			ThreadManager:Run(function()
+				LocalPlayer:GetVehicle():RestoreHeadlights()
+			end)
+		end,
+		fineTuning        = {
+			condition = function()
+				return GVars.features.vehicle.rgb_lights.enabled
+			end,
+			callback = function()
+				optionPopup.label = _T("VEH_RGB_LIGHTS")
+				optionPopup.callback = function()
+					GVars.features.vehicle.rgb_lights.speed = ImGui.SliderInt("RGB Lights Speed",
+						GVars.features.vehicle.rgb_lights.speed,
+						1,
+						5
+					)
+				end
+				optionPopup.should_draw = true
+			end
+		}
+	}
+)
+vehicleTab:AddBoolCommand("VEH_FLAPPY_DOORS",
+	{
+		gvar_key          = "features.vehicle.flappy_doors",
+		meta              = { description = "VEH_FLAPPY_DOORS_TT" },
+		isTranslatorLabel = true,
+		on_disable        = CloseDoors
+	}
+)
+vehicleTab:AddBoolCommand("VEH_AUTO_LOCK",
+	{
+		gvar_key          = "features.vehicle.auto_lock_doors",
+		meta              = { description = "VEH_AUTO_LOCK_TT" },
+		isTranslatorLabel = true,
+		on_disable        = function()
+			LocalPlayer:GetVehicle():ResetGenericToggleable("autolockdoors")
+		end
+	}
+)
+vehicleTab:AddBoolCommand("VEH_LAUNCH_CTRL",
+	{
+		gvar_key          = "features.vehicle.launch_control",
+		meta              = { description = "VEH_LAUNCH_CTRL_TT" },
+		isTranslatorLabel = true,
+		fineTuning        = {
+			condition = function()
+				return GVars.features.vehicle.launch_control
+			end,
+			callback = function()
+				optionPopup.label       = _T("VEH_LAUNCH_CTRL")
+				optionPopup.should_draw = true
+				optionPopup.callback    = function()
+					GVars.features.vehicle.launch_control_mode, _ = ImGui.Combo(_T("VEH_LAUNCH_CTRL_MODE"),
+						GVars.features.vehicle.launch_control_mode,
+						_F("%s\0%s\0", _T("VEH_LAUNCH_CTRL_REALISTIC"), _T("VEH_LAUNCH_CTRL_RIDICULOUS"))
+					)
+				end
+			end
+		}
+	}
+)
+vehicleTab:AddBoolCommand("VEH_IV_EXIT",
+	{
+		gvar_key          = "features.vehicle.iv_exit",
+		meta              = { description = "VEH_IV_EXIT_TT" },
+		isTranslatorLabel = true,
+		on_disable        = function()
+			ThreadManager:Run(function()
+				LocalPlayer:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
+			end)
+		end
+	}
+)
+vehicleTab:AddBoolCommand("VEH_KEEP_WHEELS_TURNED",
+	{
+		gvar_key          = "features.vehicle.no_wheel_recenter",
+		meta              = { description = "VEH_KEEP_WHEELS_TURNED_TT" },
+		isTranslatorLabel = true,
+	}
+)
+vehicleTab:AddBoolCommand("VEH_MINES",
+	{
+		gvar_key          = "features.vehicle.mines.enabled",
+		meta              = { description = "VEH_MINES_TT" },
+		isTranslatorLabel = true,
+		fineTuning        = {
+			condition = function()
+				return GVars.features.vehicle.mines.enabled
+			end,
+			callback = function()
+				optionPopup.callback    = minesOptions
+				optionPopup.label       = _T("VEH_MINES")
+				optionPopup.should_draw = true
+			end
+		}
+	}
+)
 
 vehicleTab:RegisterGUI(function()
 	vehicleTab:GetGridRenderer():Draw()
@@ -448,73 +471,15 @@ vehicleTab:RegisterGUI(function()
 		{ tooltip = "Limits some features to performance cars only (Launch Control, Pops & Bangs, etc.)" }
 	)
 
-	if (GVars.features.vehicle.burble_tune) then
-		GVars.features.vehicle.bangs_rpm_min, _ = ImGui.SliderFloat("Pops & Bangs RPM Min",
-			GVars.features.vehicle.bangs_rpm_min,
-			2000.0,
-			GVars.features.vehicle.bangs_rpm_max - 1000.0,
-			"%.0f RPM", GVars.features.vehicle.bangs_rpm_min
-		)
-
-		GVars.features.vehicle.bangs_rpm_max, _ = ImGui.SliderFloat("Pops & Bangs RPM Max",
-			GVars.features.vehicle.bangs_rpm_max,
-			GVars.features.vehicle.bangs_rpm_min + 1000.0,
-			9000.0,
-			"%.0f RPM", GVars.features.vehicle.bangs_rpm_max
-		)
+	if (optionPopup.should_draw) then
+		ImGui.OpenPopup(optionPopup.label)
+		optionPopup.should_draw = false
 	end
 
-	if (GVars.features.vehicle.rgb_lights.enabled) then
-		GVars.features.vehicle.rgb_lights.speed, _ = ImGui.SliderInt("RGB Lights Speed",
-			GVars.features.vehicle.rgb_lights.speed,
-			1,
-			5
-		)
-	end
-
-	if (GVars.features.vehicle.mines.enabled) then
-		if (ImGui.BeginCombo("Vehicle Mine Type", selected_mine_name or "Unselected")) then
-			for _, pair in pairs(LocalPlayer:GetVehicle().mines) do
-				local selected = GVars.features.vehicle.mines.selected_type_hash == pair.second
-				if (ImGui.Selectable(pair.first, selected)) then
-					GVars.features.vehicle.mines.selected_type_hash = pair.second
-					selected_mine_name = pair.first
-				end
-			end
-
-			ImGui.EndCombo()
-		end
-	end
-
-	if (GVars.features.speedometer.enabled) then
-		if (GUI:Button("Speedometer##settings")) then
-			speedometerOptionsWindow.m_should_draw = true
-		end
-	end
-
-	if (GVars.features.vehicle.drift.enabled) then
-		if (GUI:Button("Drift Mode##settings")) then
-			driftOptionsWindow.m_should_draw = true
-		end
-	end
-
-	if (GVars.features.vehicle.drift_minigame.enabled) then
-		if (GUI:Button(_F("%s##settings", _T("VEH_DRIFT_MINIGAME")))) then
-			driftMinigameOptionsWindow.m_should_draw = true
-		end
-	end
-
-	if (GVars.features.vehicle.nos.enabled) then
-		if (GUI:Button("NOS##settings")) then
-			nosOptionsWindow.m_should_draw = true
-		end
-	end
-
-	if (GVars.features.vehicle.launch_control) then
-		GVars.features.vehicle.launch_control_mode, _ = ImGui.Combo(_T("VEH_LAUNCH_CTRL_MODE"),
-			GVars.features.vehicle.launch_control_mode,
-			_F("%s\0%s\0", _T("VEH_LAUNCH_CTRL_REALISTIC"), _T("VEH_LAUNCH_CTRL_RIDICULOUS"))
-		)
+	ImGui.SetNextWindowSizeConstraints(300, 140, 600, 800)
+	if (optionPopup.callback and ImGui.BeginPopupModal(optionPopup.label, true, optionPopup.flags)) then
+		optionPopup.callback()
+		ImGui.EndPopup()
 	end
 end)
 

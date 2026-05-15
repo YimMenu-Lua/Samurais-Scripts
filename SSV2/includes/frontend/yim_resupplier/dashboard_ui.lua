@@ -57,6 +57,7 @@ local function drawPortfolio()
 	local bankFmt   = LocalPlayer:GetBankBalanceFmt()
 
 	ImGui.PushStyleColor(ImGuiCol.ChildBg, 0.08, 0.08, 0.08, 0.9)
+	ImGui.PushStyleColor(ImGuiCol.Text, 0.9, 0.9, 0.9, 0.85)
 	ImGui.BeginChildEx("##portfolio", vec2:new(0, 315), ImGuiChildFlags.Borders)
 	GUI:HeaderText(_T("YRV3_DASHBOARD_FINANCES"), { separator = true })
 
@@ -65,6 +66,7 @@ local function drawPortfolio()
 	drawKeyValue(_T("YRV3_DASHBOARD_FUNDS_TOTAL"), LocalPlayer:GetTotalBalanceFmt(), colMoneyGreen)
 	drawKeyValue(_T("YRV3_INCOME_APPROX_ALL"), YRV3:GetEstimatedIncomeFmt(), colMoneyGreen)
 	ImGui.SetWindowFontScale(1.0)
+	ImGui.PopStyleColor()
 	ImGui.Separator()
 	ImGui.Spacing()
 

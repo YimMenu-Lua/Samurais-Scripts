@@ -13,6 +13,8 @@
 
 local __InputText         = ImGui.InputText
 local __InputTextWithHint = ImGui.InputTextWithHint
+local COL_TEXT_LIGHT      = Color(0.9, 0.9, 0.9, 0.87)
+local COL_TEXT_DARK       = Color(0.01, 0.01, 0.01, 0.87)
 
 
 ---@class NotifWidgetState
@@ -169,7 +171,7 @@ end
 ---@param bgColor Color
 ---@return Color
 function ImGui.GetAutoTextColor(bgColor)
-	return bgColor:IsDark() and Color.WHITE or Color.BLACK
+	return bgColor:IsDark() and COL_TEXT_LIGHT or COL_TEXT_DARK
 end
 
 ---@param idx ImGuiCol
