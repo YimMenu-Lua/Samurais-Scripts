@@ -46,10 +46,11 @@ Enums.eTranslatorState = {
 ---@field locales array<string>
 ---@field wants_reload boolean
 ---@field private m_log_history set<string>
----@field private m_cache table<string, table<string, string>>
+---@field private m_cache table<integer, table<string, string>>
 ---@field private m_last_load_time TimePoint
 ---@field private m_state eTranslatorState
 ---@field private m_deferred_batches array<array<string>|dict<string>>
+---@field private m_gxt_labels table<string, string>
 ---@field protected m_initialized boolean
 local Translator   = {}
 Translator.__index = Translator
@@ -66,6 +67,7 @@ function Translator:init()
 		m_cache            = {},
 		m_log_history      = {},
 		m_deferred_batches = {},
+		m_gxt_labels       = {},
 		m_last_load_time   = TimePoint.new(),
 		m_initialized      = true,
 		m_state            = Enums.eTranslatorState.NONE
@@ -183,8 +185,9 @@ end
 function Translator:GetCachedLabel(label)
 	if (self:IsDisabled()) then return "" end
 
-	self.m_cache[self.lang_idx] = self.m_cache[self.lang_idx] or {}
-	return self.m_cache[self.lang_idx][label]
+	local langIndex = self.lang_idx
+	self.m_cache[langIndex] = self.m_cache[langIndex] or {}
+	return self.m_cache[langIndex][label]
 end
 
 ---@private
@@ -193,8 +196,10 @@ end
 function Translator:CacheLabel(label, text)
 	if (self:IsDisabled()) then return end
 
-	self.m_cache[self.lang_idx] = self.m_cache[self.lang_idx] or {}
-	self.m_cache[self.lang_idx][label] = text
+	local langIndex = self.lang_idx
+	local ref = self.m_cache[langIndex] or {}
+	ref[label] = text
+	self.m_cache[langIndex] = ref
 end
 
 ---@public
@@ -204,7 +209,7 @@ function Translator:GetState()
 end
 
 ---@public
----@return table<string, table<string, string>>
+---@return table<integer, table<string, string>>
 function Translator:GetCache()
 	return self.m_cache
 end
@@ -215,6 +220,12 @@ end
 ---@param ... any optional string formatting
 ---@return string
 function Translator:Translate(label, ...)
+	if (not string.isvalid(label)) then
+		local msg = __fmt("Missing label! %s", label)
+		self:Warn(msg)
+		return msg
+	end
+
 	if (not self:IsReady()) then
 		return label
 	end
@@ -222,12 +233,6 @@ function Translator:Translate(label, ...)
 	if (self.lang_idx ~= GVars.backend.language_index) then
 		self.wants_reload = self.wants_reload or true
 		return label
-	end
-
-	if (not label) then
-		local msg = __fmt("Missing label! %s", label)
-		self:Warn(msg)
-		return msg
 	end
 
 	local cached = self:GetCachedLabel(label)
@@ -242,7 +247,7 @@ function Translator:Translate(label, ...)
 		return cached
 	end
 
-	local text = self.labels[label]
+	local text = self.labels[label] or self.m_gxt_labels[label]
 	if (not string.isvalid(text)) then
 		self:Warn(__fmt("Missing translation for label: '%s'", label))
 		return __fmt("[!MISSING TEXT] %s", label)
@@ -254,6 +259,19 @@ function Translator:Translate(label, ...)
 		return __fmt(text, ...)
 	end
 	return text
+end
+
+---@param gxt string
+---@return string
+function Translator:TranslateGXT(gxt)
+	if (not self:IsReady()) then
+		table.insert(self.m_deferred_batches, { gxt })
+		return "NULL"
+	end
+
+	local translated = Game.GetGXTLabel(gxt)
+	self.m_gxt_labels[gxt] = translated
+	return translated
 end
 
 ---@param labels array<string>|dict<string>
@@ -272,7 +290,9 @@ end
 function Translator:OnPostLoad()
 	for _, batch in ipairs(self.m_deferred_batches) do
 		for k, v in pairs(batch) do
-			batch[k] = Game.GetGXTLabel(v)
+			local translated     = Game.GetGXTLabel(v)
+			batch[k]             = translated
+			self.m_gxt_labels[v] = translated
 		end
 	end
 

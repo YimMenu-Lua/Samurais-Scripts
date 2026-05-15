@@ -10,6 +10,7 @@
 local BusinessFront   = require("BusinessFront")
 local Factory         = require("Factory")
 local RawBusinessData = require("includes.data.yrv3_data")
+local InteriorIDs     = require("includes.data.refs").InteriorIDs
 
 -- Class representing a MC Clubhouse business.
 ---@class Clubhouse : BusinessFront
@@ -25,11 +26,14 @@ Clubhouse.__index     = Clubhouse
 ---@param opts BusinessFrontOpts
 ---@return Clubhouse
 function Clubhouse.new(opts)
-	local base             = BusinessFront.new(opts)
-	local instance         = setmetatable(base, Clubhouse) ---@cast instance Clubhouse
-	local custom_name1     = stats.get_string("MPX_MC_GANG_NAME")
-	local custom_name2     = stats.get_string("MPX_MC_GANG_NAME2")
-	instance.m_custom_name = _F("%s%s", custom_name1, custom_name2)
+	local base       = BusinessFront.new(opts)
+	local instance   = setmetatable(base, Clubhouse) ---@cast instance Clubhouse
+	local customName = stats.get_string("MPX_MC_GANG_NAME") .. stats.get_string("MPX_MC_GANG_NAME2")
+	if (not string.isvalid(customName)) then
+		customName = Game.GetGXTLabel("GB_REST_ACCM")
+	end
+
+	instance.m_custom_name = customName
 
 	for i = 0, 4 do
 		instance:AddSubBusiness(i)
@@ -98,6 +102,41 @@ function Clubhouse:AddSubBusiness(index)
 		vpu_mult_2      = has_staff_upgrade and stf_upg_mult or 0,
 		coords          = ref.coords,
 	}))
+end
+
+---@param newName string
+function Clubhouse:Rename(newName)
+	newName = newName:trim()
+	script.execute_as_script("freemode", function()
+		if (not string.isvalid(newName)) then
+			newName = Game.GetGXTLabel("GB_REST_ACCM")
+		end
+
+		local GPBD_FM_3 = self:GetGPBD3():At(10)
+		local name1     = newName:sub(1, 10)
+		local name2     = newName:sub(11, 32)
+		local g_Name    = GPBD_FM_3:At(359)
+		stats.set_string("MPX_MC_CLBHOSE_NAME", name1)
+		stats.set_string("MPX_MC_CLBHOSE_NAME2", name2)
+		stats.set_string("MPX_MC_GANG_NAME", name1)
+		stats.set_string("MPX_MC_GANG_NAME2", name2)
+		g_Name:WriteString(newName, 64)
+
+		if (LocalPlayer:IsBoss()) then
+			GPBD_FM_3:At(106):WriteString(newName, 64)
+		end
+
+		local clubInt = InteriorIDs.INTERIOR_ID_CLUBHOUSE
+		if (LocalPlayer:GetInterior() == clubInt) then
+			INTERIOR.REFRESH_INTERIOR(clubInt)
+		end
+
+		local current      = g_Name:ReadString()
+		self.m_custom_name = current
+		if (current ~= newName) then
+			log.warning("Rename failed!")
+		end
+	end)
 end
 
 return Clubhouse.new

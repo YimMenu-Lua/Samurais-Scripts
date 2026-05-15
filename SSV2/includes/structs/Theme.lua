@@ -11,6 +11,9 @@
 ---@field WindowBg vec4
 ---@field ChildBg vec4
 ---@field PopupBg vec4
+---@field TitleBg vec4
+---@field TitleBgActive vec4
+---@field TitleBgCollapsed vec4
 ---@field Border vec4
 ---@field ScrollbarBg vec4
 ---@field ScrollbarGrab vec4
@@ -81,6 +84,9 @@ function Theme.new(themeTable)
 			WindowBg             = colors and colors.WindowBg or vec4:new(0, 0, 0, 1),
 			ChildBg              = colors and colors.ChildBg or vec4:new(0, 0, 0, 1),
 			PopupBg              = colors and colors.PopupBg or vec4:new(0, 0, 0, 1),
+			TitleBg              = colors and colors.TitleBg or vec4:new(0, 0, 0, 1),
+			TitleBgActive        = colors and colors.TitleBgActive or vec4:new(0, 0, 0, 1),
+			TitleBgCollapsed     = colors and colors.TitleBgCollapsed or vec4:new(0, 0, 0, 1),
 			Border               = colors and colors.Border or vec4:new(0, 0, 0, 1),
 			ScrollbarBg          = colors and colors.ScrollbarBg or vec4:new(0, 0, 0, 1),
 			ScrollbarGrab        = colors and colors.ScrollbarGrab or vec4:new(0, 0, 0, 1),

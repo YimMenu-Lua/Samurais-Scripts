@@ -14,6 +14,28 @@ local drawFactory         = require("factory_ui")
 
 ---@type array<integer>
 local bulletWidths        = {}
+local newNameBuff         = ""
+local renamePopupLabel    = "##renameMC"
+
+---@param clubhouse Clubhouse
+local function drawRenamePopup(clubhouse)
+	ImGui.Spacing()
+
+	newNameBuff = ImGui.InputTextWithHint("##newName", _T("GENERIC_NAME"), newNameBuff, 32)
+
+	ImGui.SameLine()
+	if (GUI:Button(_T("GENERIC_SAVE"))) then
+		clubhouse:Rename(newNameBuff)
+		ImGui.CloseCurrentPopup()
+	end
+	ImGui.SameLine()
+	if (GUI:Button(_T("GENERIC_CANCEL"))) then
+		newNameBuff = clubhouse:GetCustomName()
+		ImGui.CloseCurrentPopup()
+	end
+
+	ImGui.Spacing()
+end
 
 return function()
 	local clubhouse = YRV3:GetClubhouse()
@@ -57,6 +79,22 @@ return function()
 	ImGui.BulletText(_T("YRV3_MC_CLIENT_BIKE_LABEL"))
 	ImGui.SameLine(bulletWidth)
 	ImGui.Text(clubhouse:GetClientBikeName())
+
+	if (GUI:Button(_T("GENERIC_RENAME"))) then
+		newNameBuff = clubhouse:GetCustomName()
+		ImGui.OpenPopup(renamePopupLabel)
+	end
+
+	if (ImGui.BeginPopupModal(
+			renamePopupLabel,
+			true,
+			ImGuiWindowFlags.AlwaysAutoResize
+			| ImGuiWindowFlags.NoSavedSettings
+			| ImGuiWindowFlags.NoMove
+		)) then
+		drawRenamePopup(clubhouse)
+		ImGui.EndPopup()
+	end
 
 	ImGui.BeginDisabled(not unsafeFeatsEnabled)
 	if (cashSafe:CanInstaFill()) then

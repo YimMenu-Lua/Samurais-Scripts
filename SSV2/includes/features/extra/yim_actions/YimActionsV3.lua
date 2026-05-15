@@ -314,7 +314,6 @@ function YimActions:Play(action, ped)
 	end
 
 	ped = self:GetPed(ped)
-
 	if (ped == LocalPlayer:GetHandle() and self:IsPlayerBusy()) then
 		Notifier:ShowMessage("YimActions",
 			"Player is unavailable at this moment. Clear any other tasks then try again."

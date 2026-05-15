@@ -13,6 +13,15 @@ local __base_fields__ <const> = {
 	z = 0x8
 }
 
+---@param ptr pointer
+local function ptr_to_vec3(ptr)
+	return vec3:new(
+		ptr:add(0x0):get_float(),
+		ptr:add(0x4):get_float(),
+		ptr:add(0x8):get_float()
+	)
+end
+
 --------------------------------------
 -- Class: fVector3
 --------------------------------------
@@ -26,7 +35,7 @@ local __base_fields__ <const> = {
 ---@field public x float
 ---@field public y float
 ---@field public z float
----@field public new fun(ptr: pointer): fVector3 -- static
+---@field public new fun(ptr: pointer): fVector3 -- static func
 ---@field public as_vec3 fun(self: fVector3): vec3 -- method
 ---@overload fun(ptr: pointer): fVector3
 local fVector3 <const> = setmetatable({}, {
@@ -46,13 +55,7 @@ function fVector3:__index(key)
 	end
 
 	if (key == "as_vec3") then
-		return function()
-			return vec3:new(
-				ptr:add(0x0):get_float(),
-				ptr:add(0x4):get_float(),
-				ptr:add(0x8):get_float()
-			)
-		end
+		return ptr_to_vec3(ptr)
 	end
 
 	---@diagnostic disable-next-line: param-type-mismatch

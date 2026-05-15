@@ -24,6 +24,7 @@ local SGSL = require("includes.services.SGSL")
 ---@field private m_id integer **Required:** Represents the in-game index. For Hangar, this should be -1
 ---@field private m_max_units integer
 ---@field private m_base_global ScriptGlobal
+---@field private m_gpbd_fm ScriptGlobal
 ---@field private m_name? string
 ---@field private m_coords? vec3
 ---@field private m_blip? integer
@@ -39,6 +40,7 @@ function BusinessBase.new(opts)
 	local pid      = LocalPlayer:GetID() -- we're reading the player ID once but it's fine since YRV3 reloads on session switch anyway.
 	local pid_size = g_obj:GetOffset(1) -- Legacy: 880 / Enhanced: 883
 	local offset   = g_obj:GetOffset(2) -- 260
+
 	return setmetatable({
 		m_is_stale    = false,
 		m_id          = opts.id,
@@ -46,7 +48,8 @@ function BusinessBase.new(opts)
 		m_coords      = opts.coords,
 		m_blip        = opts.blip,
 		m_max_units   = opts.max_units,
-		m_base_global = SG:At(pid, pid_size):At(offset)
+		m_base_global = SG:At(pid, pid_size):At(offset),
+		m_gpbd_fm     = GGlobals.GPBD_FM_3:At(pid, 615)
 	}, BusinessBase)
 end
 
@@ -57,6 +60,9 @@ function BusinessBase:IsValid() return not self.m_is_stale end
 
 ---@return ScriptGlobal
 function BusinessBase:GetBaseGlobal() return self.m_base_global end
+
+---@return ScriptGlobal
+function BusinessBase:GetGPBD3() return self.m_gpbd_fm end
 
 ---@return integer
 function BusinessBase:GetIndex() return self.m_id end

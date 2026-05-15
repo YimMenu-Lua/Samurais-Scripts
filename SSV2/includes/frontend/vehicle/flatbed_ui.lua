@@ -11,12 +11,12 @@ local Flatbed     = require("includes.features.vehicle.flatbed")
 local flatbed_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_FLATBED", nil, nil, true)
 
 flatbed_tab:AddLoopedCommand("FLTBD_MAIN_CB",
-	"features.flatbed.enabled",
-	function() Flatbed:OnTick() end,
-	function() Flatbed:Reset() end,
-	nil,
-	true,
-	true
+	{
+		gvar_key          = "features.flatbed.enabled",
+		isTranslatorLabel = true,
+		callback          = function() Flatbed:OnTick() end,
+		on_disable        = function() Flatbed:Reset() end,
+	}
 )
 
 flatbed_tab:RegisterGUI(function()

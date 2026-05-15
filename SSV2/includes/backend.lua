@@ -31,10 +31,11 @@ Enums.eEntityType   = {
 	Object  = 3
 }
 
+
 -- Global Singleton.
 ---@class Backend
 ---@field private m_game_branch eGameBranch
-local Backend       = {
+local Backend = {
 	__version                = "",
 	target_build             = "",
 	target_version           = "",
@@ -71,10 +72,13 @@ local Backend       = {
 		[Enums.eEntityType.Vehicle] = 15,
 		[Enums.eEntityType.Object]  = 35,
 	},
+
 	---@type table<string, fun(handle: handle): any>
-	FeatureEntityHandlers    = {}
-}
-Backend.__index     = Backend
+	FeatureEntityHandlers    = {},
+
+	---@type table<int64_t, pointer>
+	AllocatedPointers        = {}
+}; Backend.__index = Backend
 
 ---@param name string
 ---@param script_version string
@@ -418,6 +422,10 @@ end
 function Backend:Cleanup()
 	self:EntitySweep()
 	self:TriggerEventCallbacks(Enums.eBackendEvent.RELOAD_UNLOAD)
+
+	for _, ptr in pairs(self.AllocatedPointers) do
+		free(ptr)
+	end
 end
 
 function Backend:OnSessionSwitch()

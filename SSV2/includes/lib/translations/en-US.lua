@@ -13,6 +13,7 @@ return {
 	["SUBTAB_HANDLING_EDITOR"]             = "Handling Editor",
 	["SUBTAB_STANCER"]                     = "Stancer",
 	["SUBTAB_GUI"]                         = "User Interface",
+	["SUBTAB_MPSTAT_CONTROLLER"]           = "Stat Controller",
 	--#endregion
 
 	--#region language names
@@ -191,6 +192,11 @@ return {
 	["GENERIC_CLIPBOARD_PASTE"]            = "Paste From Clipboard",
 	["GENERIC_CLIPBOARD_GET"]              = "Get Clipboard Data",
 	["GENERIC_CLIPBOARD_DECODE"]           = "Decode Clipboard Data",
+	["GENERIC_HELLO"]                      = "Hello",
+	["GENERIC_YES"]                        = "Yes",
+	["GENERIC_NO"]                         = "No",
+	["GENERIC_LOCK"]                       = "Lock",
+	["GENERIC_LOCK_VAL"]                   = "Lock Value",
 	--#endregion
 
 	--#region CasinoPacino
@@ -418,7 +424,9 @@ return {
 	["YRV3_UNSAFE_FEATS_DISABLED"]         = "Unsafe features disabled.",
 	["YRV3_MCT_TITLE"]                     = "Master Control Terminal",
 	["YRV3_MCT_UNAVAIL"]                   = "Master Control Terminal is unavailable at the moment.",
-	["YRV3_INCOME_APPROX_ALL"]             = "Approximate Income From All Businesses: ",
+	["YRV3_INCOME_APPROX_ALL"]             = "Projected Income",
+	["YRV3_BANK"]                          = "Bank:",
+	["YRV3_WALLET"]                        = "Wallet:",
 	["YRV3_CWASH_NOT_OWNED"]               = "You don't own a car wash business.",
 	["YRV3_CWASH_WORK_EARNINGS"]           = "Work Earnings:",
 	["YRV3_CWASH_CASH_CLEAN"]              = "Clean:",
@@ -434,6 +442,24 @@ return {
 	["YRV3_STATE_ERR_WRONG_SESSION"]       = "Incompatible session. Please join free mode.",
 	["YRV3_MC_CLIENT_BIKE_LABEL"]          = "Client Bike",
 	["YRV3_BUSINESSES_LABEL"]              = "Businesses",
+	["YRV3_HEADER_TITLE"]                  = "Quick Actions",
+	["YRV3_DASHBOARD"]                     = "Dashboard",
+	["YRV3_MP_CHAR_INDEX"]                 = "Character Index",
+	["YRV3_MP_CHAR_NAME"]                  = "Character Name",
+	["YRV3_DASHBOARD_FINANCES"]            = "Portfolio",
+	["YRV3_DASHBOARD_NET_WORTH"]           = "Net Worth",
+	["YRV3_DASHBOARD_FUNDS_TOTAL"]         = "Available Funds",
+	["YRV3_DASHBOARD_FUNDS_WALLET"]        = "Wallet",
+	["YRV3_DASHBOARD_FUNDS_BANK"]          = "Bank",
+	["YRV3_DASHBOARD_FUNDS_WITHDRAW"]      = "Withdraw",
+	["YRV3_DASHBOARD_FUNDS_DEPOSIT"]       = "Deposit",
+	["YRV3_DASHBOARD_BOSS_TYPE"]           = "Boss Type",
+	["YRV3_DASHBOARD_BOSS_RETIRED"]        = "Retired",
+	["YRV3_DASHBOARD_BOSS_CEO_FMT"]        = "CEO of %s",
+	["YRV3_DASHBOARD_BOSS_PRES_FMT"]       = "President of %s",
+	["YRV3_DASHBOARD_BOSS_RETIRE"]         = "Retire",
+	["YRV3_DASHBOARD_BOSS_REGISTER"]       = "Register As a Boss",
+	["YRV3_DASHBOARD_MANAGE_FUNDS"]        = "Manage Funds",
 	["YRV3_CASH_SAFES_LABEL"]              = "Cash Safes",
 	["YRV3_CASH_LOOP"]                     = "[ ! ] Cash Loop",
 	["YRV3_CASH_FILL"]                     = "[ ! ] Fill Cash",
@@ -613,7 +639,7 @@ return {
 	["VEH_DRIFT_MINIGAME_SOUND_OPT"]       = "Score Sound",
 	["VEH_DRIFT_MINIGAME_SOUND_OPT_TT"]    = "Play a sound when scoring points",
 	["VEH_DRIFT_MINIGAME_PB_LABEL"]        = "Player Best:\t%s Points",
-	["VEH_FLAGS_EDITOR_TAB"]               = " Editor ",  -- kep spaces
+	["VEH_FLAGS_EDITOR_TAB"]               = " Editor ", -- kep spaces
 	["VEH_FLAGS_PRESETS_TAB"]              = " Presets ", -- //
 	["VEH_FLAGS_PRESETS_NONE_TXT"]         = "There are no saved presets. You can create new ones in the 'Editor' tab.",
 	["VEH_FLAGS_FILTER_ENABLED_ONLY"]      = "Enabled Only",
@@ -950,6 +976,9 @@ return {
 	["BSV2_JET_DISMISS_ERR"]               = "You can not dismiss your jet mid-air! Jump out or ask your pilot to land at an airport first.",
 	["BSV2_CONFIRM_DELETE_GROUP"]          = "Are you sure you want to delete this group ?",
 	--#endregion
+
+	["MPSTAT_CONTROLLDER_DESC"]            = "Manage, edit, and lock multiplayer stats with persistence.",
+	["MPSTAT_LOCK_VAL_TT"]                 = "Locks the stat to the current value.\n\nNote: You must set your desired value before toggling this on, because activating the toggle captures and saves the current stat value to be written in the background.",
 
 	--#region Miscellaneous
 	["ASSET_BROWSER_TRUNC_TT"]             = "The list is truncated to show only %d entries. Use the search bar to find what you're looking for.",

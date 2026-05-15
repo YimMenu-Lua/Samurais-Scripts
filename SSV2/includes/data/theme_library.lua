@@ -18,6 +18,10 @@ local ThemeLibrary <const> = {
 			PopupBg              = vec4:new(0.03, 0.03, 0.04, 0.94),
 			Border               = vec4:new(0.24, 0.18, 0.18, 0.85),
 
+			TitleBg              = vec4:new(0.03, 0.03, 0.04, 0.94),
+			TitleBgActive        = vec4:new(0.03, 0.03, 0.04, 0.94),
+			TitleBgCollapsed     = vec4:new(0.03, 0.03, 0.04, 0.94),
+
 			ScrollbarBg          = vec4:new(0.11, 0.12, 0.13, 0.94),
 			ScrollbarGrab        = vec4:new(0.20, 0.22, 0.25, 0.80),
 			ScrollbarGrabHovered = vec4:new(0.27, 0.30, 0.34, 0.90),
@@ -77,6 +81,10 @@ local ThemeLibrary <const> = {
 			PopupBg              = vec4:new(0.05, 0.06, 0.07, 0.96),
 			Border               = vec4:new(0.20, 0.22, 0.25, 0.90),
 
+			TitleBg              = vec4:new(0.05, 0.06, 0.07, 0.96),
+			TitleBgActive        = vec4:new(0.05, 0.06, 0.07, 0.96),
+			TitleBgCollapsed     = vec4:new(0.05, 0.06, 0.07, 0.96),
+
 			ScrollbarBg          = vec4:new(0.11, 0.12, 0.13, 0.94),
 			ScrollbarGrab        = vec4:new(0.20, 0.22, 0.25, 0.80),
 			ScrollbarGrabHovered = vec4:new(0.27, 0.30, 0.34, 0.90),
@@ -135,6 +143,10 @@ local ThemeLibrary <const> = {
 			ChildBg              = vec4:new(0.03, 0.09, 0.12, 0.92),
 			PopupBg              = vec4:new(0.03, 0.10, 0.12, 1.00),
 			Border               = vec4:new(0.20, 0.22, 0.25, 0.90),
+
+			TitleBg              = vec4:new(0.03, 0.10, 0.12, 1.00),
+			TitleBgActive        = vec4:new(0.03, 0.10, 0.12, 1.00),
+			TitleBgCollapsed     = vec4:new(0.03, 0.10, 0.12, 1.00),
 
 			ScrollbarBg          = vec4:new(0.11, 0.12, 0.13, 0.94),
 			ScrollbarGrab        = vec4:new(0.20, 0.22, 0.25, 0.80),
@@ -198,6 +210,10 @@ local ThemeLibrary <const> = {
 			PopupBg              = vec4:new(0.06, 0.05, 0.11, 0.98),
 			Border               = vec4:new(0.75, 0.55, 0.95, 0.55),
 
+			TitleBg              = vec4:new(0.06, 0.05, 0.11, 0.98),
+			TitleBgActive        = vec4:new(0.06, 0.05, 0.11, 0.98),
+			TitleBgCollapsed     = vec4:new(0.06, 0.05, 0.11, 0.98),
+
 			ScrollbarBg          = vec4:new(0.10, 0.10, 0.10, 1.00),
 			ScrollbarGrab        = vec4:new(0.50, 0.00, 0.50, 1.00),
 			ScrollbarGrabHovered = vec4:new(0.50, 0.00, 0.50, 0.95),
@@ -256,6 +272,10 @@ local ThemeLibrary <const> = {
 			ChildBg              = vec4:new(0.05, 0.05, 0.05, 1.00),
 			PopupBg              = vec4:new(0.06, 0.04, 0.06, 0.90),
 			Border               = vec4:new(1.00, 0.38, 0.33, 1.00),
+
+			TitleBg              = vec4:new(0.06, 0.04, 0.06, 0.90),
+			TitleBgActive        = vec4:new(0.06, 0.04, 0.06, 0.90),
+			TitleBgCollapsed     = vec4:new(0.06, 0.04, 0.06, 0.90),
 
 			ScrollbarBg          = vec4:new(0.23, 0.07, 0.09, 1.00),
 			ScrollbarGrab        = vec4:new(0.95, 0.30, 0.28, 0.80),
@@ -316,6 +336,10 @@ local ThemeLibrary <const> = {
 			PopupBg              = vec4:new(0.85, 0.85, 0.85, 0.90),
 			Border               = vec4:new(0.15, 0.15, 0.15, 1.00),
 
+			TitleBg              = vec4:new(0.85, 0.85, 0.85, 0.90),
+			TitleBgActive        = vec4:new(0.85, 0.85, 0.85, 0.90),
+			TitleBgCollapsed     = vec4:new(0.85, 0.85, 0.85, 0.90),
+
 			ScrollbarBg          = vec4:new(0.87, 0.87, 0.87, 1.00),
 			ScrollbarGrab        = vec4:new(0.75, 0.78, 0.82, 1.00),
 			ScrollbarGrabHovered = vec4:new(0.70, 0.73, 0.77, 1.00),
@@ -374,6 +398,10 @@ local ThemeLibrary <const> = {
 			ChildBg              = vec4:new(0.09, 0.08, 0.09, 0.95),
 			PopupBg              = vec4:new(0.07, 0.06, 0.07, 0.92),
 			Border               = vec4:new(0.96, 0.95, 0.96, 1.00),
+
+			TitleBg              = vec4:new(0.07, 0.06, 0.07, 0.92),
+			TitleBgActive        = vec4:new(0.07, 0.06, 0.07, 0.92),
+			TitleBgCollapsed     = vec4:new(0.07, 0.06, 0.07, 0.92),
 
 			ScrollbarBg          = vec4:new(0.09, 0.08, 0.09, 0.95),
 			ScrollbarGrab        = vec4:new(0.22, 0.05, 0.08, 0.82),
@@ -434,6 +462,10 @@ local ThemeLibrary <const> = {
 			PopupBg              = vec4:new(0.96, 0.97, 0.99, 0.95),
 			Border               = vec4:new(0.10, 0.12, 0.15, 0.90),
 
+			TitleBg              = vec4:new(0.96, 0.97, 0.99, 0.95),
+			TitleBgActive        = vec4:new(0.96, 0.97, 0.99, 0.95),
+			TitleBgCollapsed     = vec4:new(0.96, 0.97, 0.99, 0.95),
+
 			ScrollbarBg          = vec4:new(0.93, 0.95, 0.98, 1.00),
 			ScrollbarGrab        = vec4:new(0.55, 0.65, 0.85, 1.00),
 			ScrollbarGrabHovered = vec4:new(0.50, 0.60, 0.80, 1.00),
@@ -493,6 +525,10 @@ local ThemeLibrary <const> = {
 			PopupBg              = vec4:new(0.06, 0.08, 0.07, 0.92),
 			Border               = vec4:new(0.92, 0.95, 0.93, 1.00),
 
+			TitleBg              = vec4:new(0.06, 0.08, 0.07, 0.92),
+			TitleBgActive        = vec4:new(0.06, 0.08, 0.07, 0.92),
+			TitleBgCollapsed     = vec4:new(0.06, 0.08, 0.07, 0.92),
+
 			ScrollbarBg          = vec4:new(0.08, 0.10, 0.09, 0.95),
 			ScrollbarGrab        = vec4:new(0.10, 0.20, 0.16, 0.85),
 			ScrollbarGrabHovered = vec4:new(0.14, 0.28, 0.21, 0.95),
@@ -551,6 +587,10 @@ local ThemeLibrary <const> = {
 			ChildBg              = vec4:new(0.08, 0.08, 0.09, 0.96),
 			PopupBg              = vec4:new(0.06, 0.06, 0.07, 0.94),
 			Border               = vec4:new(0.92, 0.90, 0.86, 1.00),
+
+			TitleBg              = vec4:new(0.06, 0.06, 0.07, 0.94),
+			TitleBgActive        = vec4:new(0.06, 0.06, 0.07, 0.94),
+			TitleBgCollapsed     = vec4:new(0.06, 0.06, 0.07, 0.94),
 
 			ScrollbarBg          = vec4:new(0.08, 0.08, 0.09, 0.96),
 			ScrollbarGrab        = vec4:new(0.16, 0.15, 0.13, 0.85),

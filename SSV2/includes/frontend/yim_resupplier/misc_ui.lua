@@ -9,6 +9,7 @@
 
 local sCooldownButtonLabel, bCooldownParam
 local YRV3                     = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local GridRenderer             = require("includes.services.GridRenderer")
 local maxSellMissionButtonSize = vec2:new(80, 30)
 local COL_WARN_YELLOW <const>  = Color(240, 190, 2, 255)
 
@@ -24,7 +25,6 @@ local function getAllCDCheckboxes()
 		and GVars.features.yrv3.ceo_crate_sell_cd
 		and GVars.features.yrv3.dax_work_cd
 		and GVars.features.yrv3.garment_rob_cd
-	-- and GVars.features.yrv3.cfr_cd -- chicken factory raid
 end
 
 ---@param value boolean
@@ -40,7 +40,6 @@ local function setAllCDCheckboxes(value)
 	GVars.features.yrv3.ceo_crate_sell_cd     = value
 	GVars.features.yrv3.dax_work_cd           = value
 	GVars.features.yrv3.garment_rob_cd        = value
-	-- GVars.features.yrv3.cfr_cd                = value
 
 	YRV3:ProcessAllCooldowns()
 end
@@ -88,14 +87,6 @@ cooldownsGrid:AddCheckbox("YRV3_HACKER_DEN_CD_CB", "features.yrv3.garment_rob_cd
 	isTranslatorLabel = true,
 	onClick           = function() YRV3:ProcessCooldown("garment_rob_cd") end
 })
-
--- cooldownsGrid:AddCheckbox("YRV3_CFR_CD_CB", "features.yrv3.cfr_cd", {
--- 	persistent = true,
--- 	isTranslatorLabel = true,
--- 	onClick = function()
--- 		YRV3:SetCooldownStateDirty("cfr_cd", true)
--- 	end
--- })
 
 cooldownsGrid:AddCheckbox("YRV3_DAX_WORK_CB", "features.yrv3.dax_work_cd", {
 	persistent        = true,

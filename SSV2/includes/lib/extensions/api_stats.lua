@@ -7,13 +7,15 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local StatPrefixSet <const> = Set.new("MP0", "MP1", "MPP", "SP0", "SP1", "SP2", "SPP")
+
 -- Returns the stat with the appropriate character prefix. This is used with either natives or single player stats
 --
 -- since YimMenu's API already supports the `MPX` syntax for multiplayer stats.
 --
--- For online stats, you can pass a stat starting with `MPX`, `MP0`, `MP1`, or `MP_STAT`.
+-- For online stats, you can pass a stat starting with `MPX`, `MP0`, `MP1`, `MPPLY`, or `MP_STAT`.
 --
--- For single player, you can pass a stat starting with, `SPX`, `SP0`, `SP1`, `SP2`, or `SP_STAT`.
+-- For single player, you can pass a stat starting with, `SPX`, `SP0`, `SP1`, `SP2`, or `SPPLAYER`.
 --
 -- **Usage Example:**
 -- - YimMenu API:
@@ -29,17 +31,16 @@
 ---@param stat_name string
 ---@return string
 function stats.prefix(stat_name)
+	if (StatPrefixSet:Contains(stat_name:sub(1, 3))) then
+		return stat_name
+	end
+
 	local char_idx = Game.GetCharacterIndex()
 	if (stat_name:startswith("MP_STAT")) then
-		local ret, _ = stat_name:replace("MP_STAT", _F("MP%d", char_idx))
-		return ret
+		return select(1, stat_name:replace("MP_STAT", _F("MP%d", char_idx)))
 	end
 
-	if (stat_name:startswith("MP") or stat_name:startswith("SP")) then
-		return stat_name:replace_char(3, tostring(char_idx))
-	end
-
-	return stat_name
+	return stat_name:replace_char(3, tostring(char_idx))
 end
 
 ---@param stat_name string
@@ -49,9 +50,10 @@ function stats.get_string(stat_name)
 end
 
 ---@param stat_name string
+---@param v string
 function stats.set_string(stat_name, v)
 	stat_name = stats.prefix(stat_name)
-	if (not stat_name:startswith("MP") or not stat_name:startswith("SP")) then
+	if (not stat_name:startswith("MP") and not stat_name:startswith("SP")) then
 		return
 	end
 
@@ -84,4 +86,31 @@ function stats.increment_stat(stat_name, v, min, max)
 	end
 
 	stat_set(stat_name, sum)
+end
+
+---@param stat_name string
+---@return DateTime
+function stats.get_date(stat_name)
+	stat_name = stats.prefix(stat_name)
+	local ptr = malloc(0x8 * 7)
+
+	if (not STATS.STAT_GET_DATE(_J(stat_name), ptr:get_address(), 7, -1)) then
+		log.warning("STAT_GET_DATE native call failed! Returning a default DateTime object. (note: the native also returns false if you try to read a multiplayer stat in single player).")
+		free(ptr)
+		return DateTime(0)
+	end
+
+	return DateTime.FromRageDateStruct(ptr)
+end
+
+---@param stat_name string
+---@param date DateTime
+---@return boolean success
+function stats.set_date(stat_name, date)
+	stat_name     = stats.prefix(stat_name)
+	local ptr     = date:AsRageDateStruct()
+	local success = STATS.STAT_SET_DATE(_J(stat_name), ptr:get_address(), 7, true)
+
+	free(ptr)
+	return success
 end

@@ -79,6 +79,10 @@ end
 ---@param scriptName string
 ---@return boolean
 function Player:IsHostOfScript(scriptName)
+	if (not script.is_active(scriptName)) then
+		return false
+	end
+
 	local pid = self:GetID()
 	for i = -1, 3 do
 		if (NETWORK.NETWORK_GET_HOST_OF_SCRIPT(scriptName, i, 0) == pid) then
@@ -87,6 +91,16 @@ function Player:IsHostOfScript(scriptName)
 	end
 
 	return false
+end
+
+---@return boolean
+function Player:IsBoss()
+	return GGlobals.GPBD_FM_3:At(self:GetID(), 615):At(10):ReadInt() == self:GetID()
+end
+
+---@return integer
+function Player:GetBossType()
+	return GGlobals.GPBD_FM_3:At(self:GetID(), 615):At(10):At(433):ReadInt()
 end
 
 ---@return ID

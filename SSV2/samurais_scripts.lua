@@ -72,6 +72,7 @@ local function unlock_if_fsl()
 end
 
 GPointers:Init()
+GGlobals:Init()
 Serializer:FlushObjectQueue()
 Backend:RegisterHandlers()
 Translator:Load()

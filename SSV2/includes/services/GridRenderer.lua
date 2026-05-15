@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
----@class GridItemOpts
+---@class GridItemParams
 ---@field onClick? function Callback to execute when the item is clicked
 ---@field onTrue? function Callback to execute when the item is enabled
 ---@field finalValue? number Exclusive to radio buttons
@@ -16,32 +16,133 @@
 ---@field isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@field tooltip? string
 ---@field disabled? boolean
+---@field global_table? table -- The table where this item's global variable exists (if using a local variable, make sure it lives in a table and pass it here)
+---@field fineTuning? { callback: function, condition: boolean|fun(): boolean }
+
+---@class GridItemCheckboxParams : GridItemParams
+---@field finalValue nil
+---@field buttonRepeat nil
+
+---@class GridItemButtonParams : GridItemParams
+---@field onClick function
+---@field onTrue nil
+---@field persistent nil
+---@field finalValue nil
+
+---@class GridItemRadioParams : GridItemParams
+---@field finalValue number
+---@field buttonRepeat nil
+---@field onTrue nil
+
+
+---@enum eGridItemType
+local eGridItemType <const> = {
+	CHECKBOX     = 0,
+	BUTTON       = 1,
+	RADIO_BUTTON = 2,
+	NEW_LINE     = 3
+}
+
 
 --#region GridItem
 
 ---@ignore
 ---@class GridItem
----@field item_type string
----@field label string
----@field gvar? string
----@field opts GridItemOpts
-GridItem = {}
-GridItem.__index = GridItem
+---@field m_type eGridItemType
+---@field m_label string
+---@field m_gvar? string
+---@field m_opts GridItemParams
+---@field m_uid joaat_t
+---@field m_g_table table
+---@field m_fine_tuning_data? { callback: function, condition: boolean|fun(): boolean }
+local GridItem <const> = {}
+GridItem.__index       = GridItem
 
----@param item_type string
+---@param item_type eGridItemType
 ---@param item_label? string
 ---@param global_variable? string
----@param opts? GridItemOpts
+---@param opts? GridItemParams
+---@return GridItem
 function GridItem.new(item_type, item_label, global_variable, opts)
-	local instance = setmetatable({}, GridItem)
-	instance.item_type = item_type
-	instance.label = item_label or ""
-	instance.gvar = global_variable
-	instance.opts = opts or {}
-	return instance
+	opts = opts or {}
+	local g_table = opts.global_table or _G
+	if (opts.persistent) then
+		g_table = GVars
+	end
+
+	return setmetatable({
+		m_uid              = _J(_F("%d%s", item_type, opts)),
+		m_type             = item_type,
+		m_label            = item_label or "",
+		m_gvar             = global_variable,
+		m_opts             = opts,
+		m_g_table          = g_table,
+		m_fine_tuning_data = opts.fineTuning
+	}, GridItem)
+end
+
+---@return vec2 itemSize
+function GridItem:Draw()
+	local outSize
+	local opts    = self.m_opts
+	local _type   = self.m_type
+	local g_table = self.m_g_table
+	local gvar    = self.m_gvar
+	local label   = opts.isTranslatorLabel and _T(self.m_label) or self.m_label
+	local tooltip = opts.tooltip
+	if (tooltip ~= nil and opts.isTranslatorLabel) then
+		tooltip = _T(tooltip)
+	end
+
+	local result        = false
+	local disblaed_cond = opts.disabled
+	if (disblaed_cond ~= nil) then
+		ImGui.BeginDisabled(disblaed_cond)
+	end
+
+	local config_value
+	if (_type == eGridItemType.CHECKBOX) then
+		config_value         = gvar and table.get_nested_key(g_table, gvar) or false
+		config_value, result = GUI:CustomToggle(label, config_value, { tooltip = tooltip })
+		outSize              = vec2:new(ImGui.CalcTextSize(label) + 90, ImGui.GetTextLineHeightWithSpacing())
+		if (result) then
+			table.set_nested_key(g_table, self.m_gvar, config_value)
+		end
+	elseif (_type == eGridItemType.BUTTON) then
+		result  = GUI:Button(label, { tooltip = tooltip, repeatable = opts.buttonRepeat })
+		outSize = vec2:new(ImGui.GetItemRectSize())
+	elseif (_type == eGridItemType.RADIO_BUTTON) then
+		config_value         = gvar and table.get_nested_key(g_table, gvar) or 0
+		config_value, result = ImGui.RadioButton(label, config_value, opts.finalValue)
+		outSize              = vec2:new(ImGui.GetItemRectSize())
+		if (tooltip) then
+			GUI:Tooltip(tooltip)
+		end
+		if (result and gvar) then
+			table.set_nested_key(g_table, gvar, config_value)
+		end
+	elseif (_type == eGridItemType.NEW_LINE) then
+		ImGui.NewLine()
+		outSize = vec2:zero()
+	end
+
+	if (disblaed_cond ~= nil) then
+		ImGui.EndDisabled()
+	end
+
+	if (result and type(opts.onClick) == "function") then
+		pcall(opts.onClick)
+	end
+
+	if (config_value and type(opts.onTrue) == "function") then
+		pcall(opts.onTrue)
+	end
+
+	return outSize
 end
 
 --#endregion
+
 
 --#region GridRenderer
 
@@ -49,261 +150,145 @@ end
 -- Class: GridRenderer
 --------------------------------------
 -- Renders ImGui widgets (buttons, checkboxes, radio buttons) in a grid layout.
----@class GridRenderer : ClassMeta<GridRenderer>
----@field columns number
----@field elements GridItem[]
----@field item_count number
----@field private padding_x number
----@field private padding_y number
----@field private total_width number
----@field private total_height number
----@field private max_width number
----@field private max_height number
-GridRenderer = Class("GridRenderer")
+---@class GridRenderer
+---@field private m_columns number
+---@field private m_elements GridItem[]
+---@field private m_padding vec2
+---@field private m_total_width number
+---@field private m_total_height number
+---@field private m_max_width number
+---@field private m_max_height number
+---@field private m_hash_map set<joaat_t>
+local GridRenderer   = {}
+GridRenderer.__index = GridRenderer
 
 ---@param columns number The number of columns in the grid.
 ---@param padding_x number? Horizontal padding *(default: 10)*.
 ---@param padding_y number? Vertical padding *(default: 10)*.
 ---@return GridRenderer
 function GridRenderer.new(columns, padding_x, padding_y)
-	local instance        = setmetatable({}, GridRenderer)
-	instance.columns      = columns or 1
-	instance.padding_x    = padding_x or 10
-	instance.padding_y    = padding_y or 10
-	instance.elements     = {}
-	instance.item_count   = 0
-	instance.total_width  = 0
-	instance.total_height = 0
-	instance.max_width    = 0
-	instance.max_height   = 0
-
-	return instance
+	return setmetatable({
+		m_columns      = columns or 1,
+		m_padding      = vec2:new(padding_x or 10, padding_y or 10),
+		m_elements     = {},
+		m_hash_map     = {},
+		m_total_width  = 0,
+		m_total_height = 0,
+		m_max_width    = 0,
+		m_max_height   = 0,
+	}, GridRenderer)
 end
 
----@param item_name string
----@param global_variable? string
----@param on_click? function
-function GridRenderer:DoesItemExist(item_name, global_variable, on_click)
-	if #self.elements > 0 then
-		for _, item in ipairs(self.elements) do
-			if (item_name == item.label) then
-				if (global_variable and global_variable == item.gvar) then
-					return true
-				end
-
-				if (on_click and on_click == item.opts.onClick) then
-					return true
-				end
-
-				return true
-			end
-		end
-	end
-
-	return false
+---@param item GridItem
+function GridRenderer:DoesItemExist(item)
+	return self.m_hash_map[item.m_uid] == true
 end
 
----@param item_type string The type of your ImGui item (checkbox, button, radio button, etc...).
----@param item_label string The item label.
----@param global_variable? any The variable that will be controlled by your ImGui item.
----@param opts? GridItemOpts
+---@param item_type eGridItemType
+---@param item_label string
+---@param global_variable? string The variable's name that will be controlled by your ImGui item.
+---@param opts? GridItemParams
+---@overload fun(self: GridRenderer, item_type: 0, item_label: string, global_variable: string, opts?: GridItemCheckboxParams): boolean
+---@overload fun(self: GridRenderer, item_type: 1, item_label: string, global_variable: nil, opts?: GridItemButtonParams): boolean
+---@overload fun(self: GridRenderer, item_type: 2, item_label: string, global_variable: nil, opts?: GridItemRadioParams): boolean
+---@overload fun(self: GridRenderer, item_type: 3): true
+---@return boolean
 function GridRenderer:AddItem(item_type, item_label, global_variable, opts)
-	if self:DoesItemExist(item_label, global_variable) then
-		return
+	local gridItem = GridItem.new(item_type, item_label, global_variable, opts)
+	if (item_type ~= eGridItemType.NEW_LINE and self:DoesItemExist(gridItem)) then
+		return false
 	end
 
-	table.insert(
-		self.elements,
-		GridItem.new(item_type, item_label, global_variable, opts)
-	)
+	table.insert(self.m_elements, gridItem)
+	self.m_hash_map[gridItem.m_uid] = true
+	return true
 end
 
----@param label string The checkbox label.
----@param global_variable any The variable that will be controlled by the checkbox.
----@param opts? GridItemOpts
+---@param label string
+---@param global_variable string The variable that will be controlled by the checkbox.
+---@param opts? GridItemCheckboxParams
 function GridRenderer:AddCheckbox(label, global_variable, opts)
-	if self:DoesItemExist(label, global_variable) then
-		return
-	end
-
-	opts = opts or {}
-	table.insert(
-		self.elements,
-		GridItem.new(
-			"checkbox",
-			label,
-			global_variable,
-			{
-				onClick = opts.onClick,
-				onTrue = opts.onTrue,
-				finalValue = nil,
-				buttonRepeat = nil,
-				persistent = opts.persistent,
-				isTranslatorLabel = opts.isTranslatorLabel,
-				tooltip = opts.tooltip,
-				disabled = opts.disabled
-			}
-		)
-	)
+	self:AddItem(eGridItemType.CHECKBOX, label, global_variable, opts)
 end
 
----@param label string The button label.
----@param opts? GridItemOpts
+---@param label string
+---@param opts? GridItemButtonParams
 function GridRenderer:AddButton(label, opts)
-	opts = opts or {}
-	if self:DoesItemExist(label, nil, opts.onClick) then
-		return
-	end
-
-	table.insert(
-		self.elements,
-		GridItem.new(
-			"button",
-			label,
-			nil,
-			{
-				onClick = opts.onClick,
-				onTrue = nil,
-				finalValue = nil,
-				buttonRepeat = opts.buttonRepeat,
-				persistent = nil,
-				isTranslatorLabel = opts.isTranslatorLabel,
-				tooltip = opts.tooltip,
-				disabled = opts.disabled
-			}
-		)
-	)
+	self:AddItem(eGridItemType.BUTTON, label, nil, opts)
 end
 
----@param label string The button label.
----@param opts? GridItemOpts
+---@param label string
+---@param opts? GridItemRadioParams
 function GridRenderer:AddRadioButton(label, opts)
-	opts = opts or {}
-	if self:DoesItemExist(label, nil, opts.onClick) then
-		return
-	end
-
-	table.insert(
-		self.elements,
-		GridItem.new(
-			"radio",
-			label,
-			nil,
-			{
-				onClick = opts.onClick,
-				onTrue = nil,
-				finalValue = opts.finalValue,
-				buttonRepeat = nil,
-				persistent = opts.persistent,
-				isTranslatorLabel = opts.isTranslatorLabel,
-				tooltip = opts.tooltip,
-				disabled = opts.disabled
-			}
-		)
-	)
+	self:AddItem(eGridItemType.RADIO_BUTTON, label, nil, opts)
 end
 
 function GridRenderer:AddNewLine()
-	table.insert(self.elements, GridItem.new("newline"))
+	self:AddItem(eGridItemType.NEW_LINE)
 end
 
 function GridRenderer:Draw()
-	local item_count = 0
-	local win_width  = ImGui.GetWindowWidth()
-	local current_x  = ImGui.GetCursorPosX()
-	local current_y  = ImGui.GetCursorPosY()
-	local start_x    = current_x
+	local current_x = ImGui.GetCursorPosX()
+	local current_y = ImGui.GetCursorPosY()
+	local start_x   = current_x
 
-	for _, item in ipairs(self.elements) do
-		local item_size
-		local global_table = item.opts.persistent and GVars or _G
-		local label = item.opts.isTranslatorLabel and _T(item.label)
-			or item.label
-
-		local tooltip
-		if (item.opts.tooltip) then
-			tooltip = item.opts.isTranslatorLabel and _T(item.opts.tooltip)
-				or item.opts.tooltip
-		end
-
-		if (item.item_type:lower() == "checkbox") then
-			item_size   = vec2:new(ImGui.CalcTextSize(label))
-			item_size.x = item_size.x + self.padding_x + 40
-		elseif (item.item_type == "button") then
-			item_size = vec2:new(ImGui.GetItemRectSize())
-		elseif (item.item_type:lower() == "radio") then
-			item_size = vec2:new(ImGui.CalcTextSize(label))
-		end
-
-		local item_width  = item_size.x + self.padding_x
-		local item_height = item_size.y + self.padding_y
-
-		if (self.max_width == 0) then
-			self.max_width = item_width
-		end
-
-		if (self.columns > 1) then
-			if (item_count % self.columns == 0 and item_count > 0) then
-				current_x = ImGui.GetCursorPosX()
-				current_y = current_y + item_height + self.padding_y
-			end
-		elseif current_x + item_width >= win_width - 10 then
-			current_x = start_x
-			current_y = current_y + item_height + self.padding_y
-		end
-
+	for i, item in ipairs(self.m_elements) do
+		ImGui.PushID(i)
 		ImGui.SetCursorPos(current_x, current_y)
-		local result = false
+		local item_size = item:Draw() + self.m_padding
 
-		if (item.opts.disabled ~= nil) then
-			ImGui.BeginDisabled(item.opts.disabled) -- condition
-		end
-
-		local config_value = table.get_nested_key(global_table, item.gvar)
-		if (item.item_type:lower() == "checkbox") then
-			config_value = config_value or false
-			config_value, result = GUI:CustomToggle(label, config_value, { tooltip = tooltip })
-			if (result) then
-				table.set_nested_key(global_table, item.gvar, config_value)
-			end
-		elseif (item.item_type:lower() == "button") then
-			result = GUI:Button(label, { tooltip = tooltip, repeatable = item.opts.buttonRepeat })
-		elseif (item.item_type:lower() == "radio") then
-			config_value = config_value or 0
-			config_value, result = ImGui.RadioButton(label, config_value, item.opts.finalValue)
-			if (tooltip) then
-				GUI:Tooltip(tooltip)
+		local fine_tune_t = item.m_fine_tuning_data
+		if (fine_tune_t) then
+			local can_edit  = true
+			local cond      = fine_tune_t.condition
+			local cond_type = type(cond)
+			if (cond_type == "function") then
+				can_edit = cond()
+			elseif (cond_type == "boolean") then
+				can_edit = cond
 			end
 
-			if (result) then
-				table.set_nested_key(global_table, item.gvar, config_value)
-			end
-		elseif (item.item_type:lower() == "newline") then
-			ImGui.NewLine()
-		end
-
-		if (item.opts.disabled ~= nil) then
-			ImGui.EndDisabled()
-		end
-
-		if result then
-			if (type(item.opts.onClick) == "function") then
-				item.opts.onClick()
+			if (can_edit) then
+				ImGui.SetCursorPos(current_x + item_size.x - 45, current_y + 10)
+				ImGui.SetWindowFontScale(0.75)
+				if (ImGui.SmallButton(" . . . ")) then
+					pcall(fine_tune_t.callback)
+				end
+				ImGui.SetWindowFontScale(1.0)
+				GUI:Tooltip(_T("GENERIC_OPTIONS_LABEL"))
 			end
 		end
 
-		if (config_value and type(item.opts.onTrue) == "function") then
-			item.opts.onTrue()
+		if (item_size.x > self.m_max_width) then
+			self.m_max_width = item_size.x
 		end
 
-		item_count = item_count + 1
-		self.max_width = math.max(self.max_width, item_width)
-		self.max_height = math.max(self.max_height, item_height)
-		current_x = current_x + self.max_width
+		if (self.m_columns > 1) then
+			if (i % self.m_columns == 0) then
+				current_x = start_x
+				current_y = current_y + item_size.y
+			else
+				current_x = current_x + self.m_max_width
+			end
+		else
+			ImGui.SameLine()
+			if (current_x + self.m_max_width > ImGui.GetContentRegionAvail()) then
+				current_x = start_x
+				current_y = current_y + item_size.y
+			else
+				current_x = current_x + self.m_max_width
+			end
+		end
+
+		self.m_max_height = math.max(self.m_max_height, item_size.y)
+		ImGui.PopID()
 	end
 
-	self.total_width  = current_x + self.max_width
-	self.total_height = current_y + self.max_height
+	self.m_total_width  = current_x + self.m_max_width
+	self.m_total_height = current_y + self.m_max_height
+	ImGui.Spacing()
 end
+
+return GridRenderer
 
 --#endregion

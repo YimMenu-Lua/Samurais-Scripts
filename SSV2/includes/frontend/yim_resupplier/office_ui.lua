@@ -21,6 +21,8 @@ local showEarningsData      = { v = false }
 local earningDataIntBuff    = nil
 local earningDataIdx        = 1
 local earningPopupName      = ""
+local newNameBuff           = ""
+local renamePopupLabel      = "##renameCEO"
 local earningData <const>   = {
 	{ label = "YRV3_LIFETIME_BUY_UNDERTAKEN",  pstat = "MPX_LIFETIME_BUY_UNDERTAKEN",  min = 0, max = 5e3, step = 1,   step_fast = 100 },
 	{ label = "YRV3_LIFETIME_BUY_COMPLETE",    pstat = "MPX_LIFETIME_BUY_COMPLETE",    min = 0, max = 5e3, step = 1,   step_fast = 100 },
@@ -28,6 +30,26 @@ local earningData <const>   = {
 	{ label = "YRV3_LIFETIME_SELL_COMPLETE",   pstat = "MPX_LIFETIME_SELL_COMPLETE",   min = 0, max = 5e3, step = 1,   step_fast = 100 },
 	{ label = "YRV3_LIFETIME_EARNINGS",        pstat = "MPX_LIFETIME_CONTRA_EARNINGS", min = 0, max = 1e8, step = 1e5, step_fast = 1e6 },
 }
+
+---@param offfice Office
+local function drawRenamePopup(offfice)
+	ImGui.Spacing()
+
+	newNameBuff = ImGui.InputTextWithHint("##newName", _T("GENERIC_NAME"), newNameBuff, 32)
+
+	ImGui.SameLine()
+	if (GUI:Button(_T("GENERIC_SAVE"))) then
+		offfice:Rename(newNameBuff)
+		ImGui.CloseCurrentPopup()
+	end
+	ImGui.SameLine()
+	if (GUI:Button(_T("GENERIC_CANCEL"))) then
+		newNameBuff = offfice:GetCustomName()
+		ImGui.CloseCurrentPopup()
+	end
+
+	ImGui.Spacing()
+end
 
 ---@param data { label: string, pstat: string, min: integer, max: integer, step: integer, step_fast: integer }
 local function drawStatEdit(data)
@@ -139,6 +161,22 @@ return function()
 	drawNamePlate(office, office:GetCustomName())
 
 	ImGui.Spacing()
+	if (GUI:Button(_T("GENERIC_RENAME"))) then
+		newNameBuff = office:GetCustomName()
+		ImGui.OpenPopup(renamePopupLabel)
+	end
+
+	if (ImGui.BeginPopupModal(
+			renamePopupLabel,
+			true,
+			ImGuiWindowFlags.AlwaysAutoResize
+			| ImGuiWindowFlags.NoSavedSettings
+			| ImGuiWindowFlags.NoMove
+		)) then
+		drawRenamePopup(office)
+		ImGui.EndPopup()
+	end
+
 	ImGui.Spacing()
 	local vehicleWarehouse = office:GetVehicleWarehouse()
 	local cargoWarehouses  = office:GetCargoWarehouses()

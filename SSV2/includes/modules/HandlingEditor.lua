@@ -208,8 +208,9 @@ end
 ---@param vehicleTypes integer
 ---@param description? string
 ---@param autoEnable? boolean
+---@param cbFileName? string
 ---@return HandlingPreset
-function HandlingEditor:GeneratePresetFromCurrentDeltas(name, vehicleTypes, description, autoEnable)
+function HandlingEditor:GeneratePresetFromCurrentDeltas(name, vehicleTypes, description, autoEnable, cbFileName)
 	autoEnable = autoEnable or false
 	local deltas = {}
 	for hType, data in pairs(self.m_deltas) do
@@ -220,13 +221,14 @@ function HandlingEditor:GeneratePresetFromCurrentDeltas(name, vehicleTypes, desc
 	end
 
 	return HandlingPreset.new({
-		name              = name,
-		deltas            = deltas,
-		description       = description or _T("GENERIC_NO_DESCRIPTION"),
-		vehicle_bitset    = vehicleTypes,
-		auto_apply        = autoEnable or false,
-		is_default_preset = false,
-		is_user_generated = true,
+		name                   = name,
+		deltas                 = deltas,
+		description            = description or _T("GENERIC_NO_DESCRIPTION"),
+		vehicle_bitset         = vehicleTypes,
+		auto_apply             = autoEnable or false,
+		is_default_preset      = false,
+		is_user_generated      = true,
+		callback_defs_filename = cbFileName,
 	})
 end
 

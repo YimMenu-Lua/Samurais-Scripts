@@ -34,6 +34,7 @@ local CashSafe        = require("CashSafe")
 ---@field private m_subs array<Factory|BusinessHub|Warehouse>
 ---@field private m_earnings_report? BusinessEarningsReport
 ---@field private m_last_report_check_time milliseconds
+---@field public Rename? fun(p0: integer|string) -- Renames the business. MC and CEO take a string argument and nightclub takes an int index.
 local BusinessFront   = setmetatable({}, BusinessBase)
 BusinessFront.__index = BusinessFront
 

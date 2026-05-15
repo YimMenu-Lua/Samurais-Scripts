@@ -68,15 +68,14 @@ function ActionsHistory:Push(action)
 	if (set[label]) then return end
 
 	table.insert(self.m_data, {
-		action    = action,
+		action    = action:Copy(),
 		timestamp = DateTime:Now():Epoch(),
 		type      = action.action_type,
 		fmt       = _F("[%s]  %s", action:TypeAsString(), label),
 	})
 
 	set[label]   = true
-	self.m_count = #self.m_data
-	self:Sort()
+	self.m_count = self.m_count + 1
 end
 
 ---@param index integer

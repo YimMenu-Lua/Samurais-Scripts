@@ -37,9 +37,8 @@ local GPointers = {
 	GameTime         = nullptr,
 	GameVersion      = { build = "", online = "" },
 	ScreenResolution = vec2:zero(),
+	DynamicFuncs     = {}
 }
-
-GPointers.DynamicFuncs = {}
 
 
 ---@class MemoryBatch

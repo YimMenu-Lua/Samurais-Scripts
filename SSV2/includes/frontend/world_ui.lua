@@ -15,85 +15,80 @@ local KillAll     = require("includes.features.KillAllEnemies")
 local world_tab   = GUI:RegisterNewTab(Enums.eTabID.TAB_WORLD, "World")
 
 world_tab:AddBoolCommand("WRLD_DISABLE_WAVES",
-	"features.world.disable_ocean_waves",
-	nil,
-	function()
-		ThreadManager:Run(function()
-			World:ResetOceanWaves()
-		end)
-	end,
-	nil,
-	false,
-	true
+	{
+		gvar_key          = "features.world.disable_ocean_waves",
+		isTranslatorLabel = true,
+		on_disable        = function()
+			ThreadManager:Run(function()
+				World:ResetOceanWaves()
+			end)
+		end,
+	}
 )
-
 world_tab:AddBoolCommand("WRLD_EXTEND_BOUNDS",
-	"features.world.extend_bounds",
-	nil,
-	function()
-		ThreadManager:Run(function()
-			World:ResetBounds()
-		end)
-	end,
-	{ description = "WRLD_EXTEND_BOUNDS_TT", isTranslatorLabel = true },
-	false,
-	true
+	{
+		gvar_key          = "features.world.extend_bounds",
+		isTranslatorLabel = true,
+		meta              = { description = "WRLD_EXTEND_BOUNDS_TT", isTranslatorLabel = true },
+		registerCommand   = true,
+		on_disable        = function()
+			ThreadManager:Run(function()
+				World:ResetBounds()
+			end)
+		end,
+	}
 )
-
 world_tab:AddBoolCommand("WRLD_FLIGHT_MUSIC",
-	"features.world.disable_flight_music",
-	nil,
-	function()
-		ThreadManager:Run(function()
-			AUDIO.SET_AUDIO_FLAG("DisableFlightMusic", false)
-		end)
-	end,
-	nil,
-	false,
-	true
+	{
+		gvar_key          = "features.world.disable_flight_music",
+		isTranslatorLabel = true,
+		registerCommand   = true,
+		on_disable        = function()
+			ThreadManager:Run(function()
+				AUDIO.SET_AUDIO_FLAG("DisableFlightMusic", false)
+			end)
+		end,
+	}
 )
-
 world_tab:AddBoolCommand("WRLD_WANTED_MUSIC",
-	"features.world.disable_wanted_music",
-	nil,
-	function()
-		ThreadManager:Run(function()
-			AUDIO.SET_AUDIO_FLAG("WantedMusicDisabled", false)
-		end)
-	end,
-	nil,
-	false,
-	true
+	{
+		gvar_key          = "features.world.disable_wanted_music",
+		isTranslatorLabel = true,
+		registerCommand   = true,
+		on_disable        = function()
+			ThreadManager:Run(function()
+				AUDIO.SET_AUDIO_FLAG("WantedMusicDisabled", false)
+			end)
+		end,
+	}
 )
-
 world_tab:AddLoopedCommand("WRLD_HNS",
-	"features.world.hide_n_seek",
-	function()
-		HideNSeek:OnTick()
-	end,
-	function()
-		ThreadManager:Run(function()
-			HideNSeek:OnDisable()
-		end)
-	end,
-	{ description = "WRLD_HNS_TT" },
-	true,
-	true
+	{
+		gvar_key          = "features.world.hide_n_seek",
+		isTranslatorLabel = true,
+		meta              = { description = "WRLD_HNS_TT", alias = { "hidenseek", "trashboy" }, isTranslatorLabel = true },
+		registerCommand   = true,
+		callback          = function() HideNSeek:OnTick() end,
+		on_disable        = function()
+			ThreadManager:Run(function()
+				HideNSeek:OnDisable()
+			end)
+		end,
+	}
 )
-
 world_tab:AddLoopedCommand("WRLD_CARPOOL",
-	"features.world.carpool",
-	function()
-		Carpool:OnTick()
-	end,
-	function()
-		ThreadManager:Run(function()
-			Carpool:OnDisable()
-		end)
-	end,
-	{ description = "WRLD_CARPOOL_TT" },
-	true,
-	true
+	{
+		gvar_key          = "features.world.carpool",
+		isTranslatorLabel = true,
+		meta              = { description = "WRLD_CARPOOL_TT", alias = { "carpool" }, isTranslatorLabel = true },
+		registerCommand   = true,
+		callback          = function() Carpool:OnTick() end,
+		on_disable        = function()
+			ThreadManager:Run(function()
+				Carpool:OnDisable()
+			end)
+		end,
+	}
 )
 
 local carpoolDrivingStyleSwitch = 1
