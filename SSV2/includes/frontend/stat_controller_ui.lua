@@ -13,7 +13,7 @@ local statChildSize    = vec2:new(0, 170)
 local statSearchBuff   = ""
 local newStatBuff      = { name = "", type = "", lock_val = nil, autolock = false }
 local statDateEditBuff = nil
-local currentYear      = os.date("*t").year ---@cast currentYear integer
+local currentYear      = os.date("*t").year
 
 
 local dateTimeDefault_t <const> = {
@@ -32,6 +32,27 @@ local dateTimeOrder_t <const> = {
 	"min",
 	"sec",
 }
+
+local days <const> = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+
+---@param year integer
+local function isLeapYear(year)
+	return year % 4 == 0 and (year % 100 ~= 0 or year % 400 == 0)
+end
+
+---@param year integer
+---@return array<integer>
+local function getDaysForYear(year)
+	days[2] = isLeapYear(year) and 29 or 28
+	return days
+end
+
+---@param year integer
+---@param month integer
+---@return integer
+local function getMaxDaysForMonth(year, month)
+	return getDaysForYear(year)[month]
+end
 
 local statTypes <const> = { "int", "float", "money", "bool", "string", "posix", "date" }
 
@@ -76,25 +97,37 @@ local function drawBoolEditor(label, mpStat, currentVal)
 	end
 end
 
+---@param buff osdate
+local function updateMaxDays(buff)
+	local day = dateTimeDefault_t["day"]
+	day.max = getMaxDaysForMonth(buff.year, buff.month)
+	if (buff.day > day.max) then
+		buff.day = day.max
+	end
+end
+
 ---@param mpStat MPStat
 ---@param current DateTime
 local function drawDateEditor(mpStat, current)
 	if (not statDateEditBuff) then
 		statDateEditBuff = current:AsTable()
+		dateTimeDefault_t["day"].max = getMaxDaysForMonth(statDateEditBuff.year, statDateEditBuff.month)
 	end
 
 	for _, v in pairs(dateTimeOrder_t) do
-		local vv = statDateEditBuff[v]
 		local default = dateTimeDefault_t[v]
-		if (type(vv) ~= "number") then
-			statDateEditBuff[v] = tonumber(vv) or dateTimeDefault_t[v].min
-		end
 
 		if (v == "year") then
 			statDateEditBuff[v] = ImGui.InputInt("Year", statDateEditBuff[v])
 			statDateEditBuff[v] = math.clamp(statDateEditBuff[v], default.min, default.max)
+			if (ImGui.IsItemDeactivatedAfterEdit()) then
+				updateMaxDays(statDateEditBuff)
+			end
 		else
 			statDateEditBuff[v] = ImGui.SliderInt(v:titlecase(), statDateEditBuff[v], default.min, default.max)
+			if (v == "month" and ImGui.IsItemDeactivatedAfterEdit()) then
+				updateMaxDays(statDateEditBuff)
+			end
 		end
 	end
 
