@@ -7,15 +7,20 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local MPStatController = require("includes.modules.MPStatController")
-local drawKeyValue     = require("includes.frontend.helpers.draw_kv")
-local statChildSize    = vec2:new(0, 170)
-local statSearchBuff   = ""
-local newStatBuff      = { name = "", type = "", lock_val = nil, autolock = false }
-local statDateEditBuff = nil
-local currentYear      = os.date("*t").year
-
-
+local MPStatController          = require("includes.features.online.MPStatController")
+local drawKeyValue              = require("includes.frontend.helpers.draw_kv")
+local BitTest                   = Bit.IsBitSet
+local statChildSize             = vec2:new(0, 170)
+local statSearchBuff            = ""
+local newStatBuff               = { name = "", type = "", lock_val = nil, autolock = false }
+local statDateEditBuff          = nil
+local currentYear               = os.date("*t").year
+local currentBitView            = 0 -- 0: hex | 1: binary
+local bitEditorIntChanged       = false
+local statTypes <const>         = { "int", "float", "money", "bool", "string", "posix", "time", "date", "bitset" }
+local statFilterTypes           = { "All" }
+local selectedFilterType        = "All"
+local days <const>              = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
 local dateTimeDefault_t <const> = {
 	["year"]  = { min = 1970, max = currentYear },
 	["month"] = { min = 1, max = 12 },
@@ -24,7 +29,7 @@ local dateTimeDefault_t <const> = {
 	["min"]   = { min = 0, max = 59 },
 	["sec"]   = { min = 0, max = 59 },
 }
-local dateTimeOrder_t <const> = {
+local dateTimeOrder_t <const>   = {
 	"year",
 	"month",
 	"day",
@@ -33,7 +38,9 @@ local dateTimeOrder_t <const> = {
 	"sec",
 }
 
-local days <const> = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+for _, statType in ipairs(statTypes) do
+	table.insert(statFilterTypes, statType)
+end
 
 ---@param year integer
 local function isLeapYear(year)
@@ -54,14 +61,13 @@ local function getMaxDaysForMonth(year, month)
 	return getDaysForYear(year)[month]
 end
 
-local statTypes <const> = { "int", "float", "money", "bool", "string", "posix", "date" }
 
 ---@param label string
 ---@param mpStat MPStat
 ---@param currentVal integer|float
 ---@param zeroMin boolean
 ---@param isFloat boolean
-local function drawIntFloatEditor(label, mpStat, currentVal, zeroMin, isFloat)
+local function drawNumberEditor(label, mpStat, currentVal, zeroMin, isFloat)
 	local inputFunc = isFloat and ImGui.InputFloat or ImGui.InputInt
 	if (mpStat.value_buffer == nil) then
 		mpStat.value_buffer = currentVal
@@ -88,13 +94,70 @@ local function drawIntFloatEditor(label, mpStat, currentVal, zeroMin, isFloat)
 	end
 end
 
----@param label string
 ---@param mpStat MPStat
----@param currentVal boolean
-local function drawBoolEditor(label, mpStat, currentVal)
-	if (select(2, GUI:Checkbox(label, currentVal))) then
-		mpStat:Set(not currentVal)
+---@param currentVal int32_t
+local function drawBitsetEditor(mpStat, currentVal)
+	ImGui.SeparatorText("Bit Editor")
+	ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, 10, 9)
+	if (ImGui.BeginTable("##bitsetEditor", 9, ImGuiTableFlags.SizingFixedFit)) then
+		ImGui.TableNextRow()
+		ImGui.TableSetColumnIndex(0)
+		ImGui.Text("")
+
+		for bit = 7, 0, -1 do
+			ImGui.TableSetColumnIndex(8 - bit)
+			ImGui.Text(tostring(bit))
+		end
+
+		for byte = 3, 0, -1 do
+			ImGui.TableNextRow()
+			ImGui.TableSetColumnIndex(0)
+			ImGui.Text(_F("Byte %d", byte + 1))
+
+			for bit = 7, 0, -1 do
+				local bitPos = (byte * 8) + bit
+				ImGui.TableSetColumnIndex(8 - bit)
+				local enabled = BitTest(currentVal, bitPos)
+				if (enabled) then
+					ImGui.PushStyleColor(ImGuiCol.Button, ImGui.GetStyleColorVec4(ImGuiCol.ButtonActive))
+				end
+				ImGui.SetWindowFontScale(0.8)
+				if (ImGui.Button(enabled and "1" or "0", 23, 28)) then
+					currentVal = Bit.Toggle(currentVal, bitPos, not enabled)
+					mpStat:Set(currentVal)
+				end
+				ImGui.SetWindowFontScale(1.0)
+				if (enabled) then
+					ImGui.PopStyleColor()
+				end
+				GUI:Tooltip(_F("Bit %d", bitPos))
+			end
+		end
+
+		ImGui.EndTable()
 	end
+	ImGui.PopStyleVar()
+
+	ImGui.Spacing()
+	ImGui.SeparatorText("Direct Value")
+	currentVal, bitEditorIntChanged = ImGui.InputInt("##bitEditorInput", currentVal)
+	if (bitEditorIntChanged) then
+		mpStat:Set(currentVal)
+	end
+
+	ImGui.Spacing()
+	ImGui.SeparatorText("View")
+	currentBitView   = ImGui.Combo("##bitView", currentBitView, "Hexadecimal\0Binary\0Decimal\0")
+	local bitViewStr = ""
+	if (currentBitView == 0) then
+		bitViewStr = _F("0x%08X", currentVal)
+	elseif (currentBitView == 1) then
+		bitViewStr = mpStat:Format()
+	else
+		bitViewStr = tostring(currentVal)
+	end
+
+	ImGui.TextDisabled(bitViewStr)
 end
 
 ---@param buff osdate
@@ -115,19 +178,10 @@ local function drawDateEditor(mpStat, current)
 	end
 
 	for _, v in pairs(dateTimeOrder_t) do
-		local default = dateTimeDefault_t[v]
-
-		if (v == "year") then
-			statDateEditBuff[v] = ImGui.InputInt("Year", statDateEditBuff[v])
-			statDateEditBuff[v] = math.clamp(statDateEditBuff[v], default.min, default.max)
-			if (ImGui.IsItemDeactivatedAfterEdit()) then
-				updateMaxDays(statDateEditBuff)
-			end
-		else
-			statDateEditBuff[v] = ImGui.SliderInt(v:titlecase(), statDateEditBuff[v], default.min, default.max)
-			if (v == "month" and ImGui.IsItemDeactivatedAfterEdit()) then
-				updateMaxDays(statDateEditBuff)
-			end
+		local default       = dateTimeDefault_t[v]
+		statDateEditBuff[v] = ImGui.SliderInt(v:titlecase(), statDateEditBuff[v], default.min, default.max)
+		if (v == "year" or v == "month" and ImGui.IsItemDeactivatedAfterEdit()) then
+			updateMaxDays(statDateEditBuff)
 		end
 	end
 
@@ -152,22 +206,40 @@ end
 
 ---@param mpStat MPStat
 local function drawStatEditor(mpStat)
-	local _type   = mpStat.m_type
 	local label   = _F("##%s", mpStat.m_name)
 	local current = mpStat:Get()
+	local _type   = mpStat.m_type
+	local isPosix = _type == "posix"
+	local isTime  = isPosix or _type == "time"
+	local isFloat = _type == "float"
 
-	if (_type == "int" or _type == "posix" or _type == "money" or _type == "float") then
-		drawIntFloatEditor(label, mpStat, current, (_type == "posix"), (_type == "float"))
-		return
-	end
-
-	if (_type == "bool") then
-		drawBoolEditor(label, mpStat, current)
+	if (_type == "int" or _type == "money" or isTime or isFloat) then
+		drawNumberEditor(label, mpStat, current, isTime, isFloat)
 		return
 	end
 
 	if (_type == "date") then
 		drawDateEditor(mpStat, current)
+		return
+	end
+
+	if (_type == "bitset") then
+		drawBitsetEditor(mpStat, current)
+		return
+	end
+
+	if (_type == "bool") then
+		if (select(2, GUI:Checkbox(label, current))) then
+			mpStat:Set(not current)
+		end
+		return
+	end
+
+	if (_type == "string") then
+		if (select(2, ImGui.InputText("##statString", current, 512, ImGuiInputTextFlags.EnterReturnsTrue))) then
+			mpStat:Set(current)
+		end
+		GUI:Tooltip("Press [ENTER] to set the value.")
 		return
 	end
 end
@@ -232,7 +304,7 @@ end
 
 local function drawStatCards()
 	ImGui.SetNextWindowBgAlpha(0)
-	ImGui.BeginChildEx("##statsScroll", vec2:new(0, GVars.ui.window_size.y * 0.7))
+	ImGui.BeginChildEx("##statsScroll", vec2:new(0, GVars.ui.window_size.y * 0.666))
 	local statList   = MPStatController:GetStats()
 	local orderArray = MPStatController:GetStatsOrder()
 	for i, name in pairs(orderArray) do
@@ -243,6 +315,9 @@ local function drawStatCards()
 		ImGui.PushID(i)
 		local mpStat = statList[name]
 		if (not mpStat) then goto continue end
+		if (selectedFilterType ~= "All" and mpStat.m_type ~= selectedFilterType) then
+			goto continue
+		end
 
 		drawStatObject(mpStat)
 		ImGui.PopID()
@@ -260,7 +335,16 @@ GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "SUBTAB_MPSTAT_CONTROLLER", function
 	ImGui.SetWindowFontScale(1.0)
 	ImGui.Spacing()
 	ImGui.Separator()
-	ImGui.Dummy(0, 10)
+	ImGui.Spacing()
+
+	if (ImGui.BeginCombo(_T("GENERIC_LIST_FILTER"), selectedFilterType)) then
+		for _, typeName in ipairs(statFilterTypes) do
+			if (ImGui.Selectable(typeName, (typeName == selectedFilterType))) then
+				selectedFilterType = typeName
+			end
+		end
+		ImGui.EndCombo()
+	end
 
 	statSearchBuff = ImGui.SearchBar("##searchStats", statSearchBuff)
 

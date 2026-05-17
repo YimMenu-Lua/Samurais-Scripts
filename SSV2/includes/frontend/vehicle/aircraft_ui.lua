@@ -47,25 +47,25 @@ end
 
 planes_tab:AddBoolCommand("VEH_FAST_JETS",
 	{
-		gvar_key          = "features.vehicle.fast_jets",
-		isTranslatorLabel = true,
-		meta              = { description = "VEH_FAST_JETS_TT", isTranslatorLabel = true },
-		registerCommand   = true
+		gvar_key         = "features.vehicle.fast_jets",
+		translate_label  = true,
+		meta             = { description = "VEH_FAST_JETS_TT", isTranslatorLabel = true },
+		register_command = true
 	}
 )
 planes_tab:AddBoolCommand("VEH_NO_JET_STALL",
 	{
-		gvar_key          = "features.vehicle.no_jet_stall",
-		isTranslatorLabel = true,
-		meta              = { description = "VEH_NO_JET_STALL_TT", isTranslatorLabel = true },
-		registerCommand   = true
+		gvar_key         = "features.vehicle.no_jet_stall",
+		translate_label  = true,
+		meta             = { description = "VEH_NO_JET_STALL_TT", isTranslatorLabel = true },
+		register_command = true
 	}
 )
 planes_tab:AddBoolCommand("VEH_NO_TURBULENCE",
 	{
-		gvar_key          = "features.vehicle.no_turbulence",
-		isTranslatorLabel = true,
-		on_disable        = function()
+		gvar_key        = "features.vehicle.no_turbulence",
+		translate_label = true,
+		on_disable      = function()
 			ThreadManager:Run(function()
 				local PV = LocalPlayer:GetVehicle()
 				PV:RestorePatch(PV.MemoryPatches.Turbulence)
@@ -76,19 +76,19 @@ planes_tab:AddBoolCommand("VEH_NO_TURBULENCE",
 )
 planes_tab:AddBoolCommand("VEH_FLARES",
 	{
-		gvar_key          = "features.vehicle.flares",
-		isTranslatorLabel = true,
-		meta              = { description = "VEH_FLARES_TT" },
-		on_enable         = function() Flares:OnEnable() end,
-		on_disable        = function() Flares:OnDisable() end,
+		gvar_key        = "features.vehicle.flares",
+		translate_label = true,
+		meta            = { description = "VEH_FLARES_TT" },
+		on_enable       = function() Flares:OnEnable() end,
+		on_disable      = function() Flares:OnDisable() end,
 	}
 )
 planes_tab:AddBoolCommand("VEH_MG_TRIGGERBOT",
 	{
-		gvar_key          = "features.vehicle.aircraft_mg.triggerbot",
-		isTranslatorLabel = true,
-		meta              = { description = "VEH_MG_TRIGGERBOT_TT" },
-		fineTuning        = {
+		gvar_key        = "features.vehicle.aircraft_mg.triggerbot",
+		translate_label = true,
+		meta            = { description = "VEH_MG_TRIGGERBOT_TT" },
+		options_data    = {
 			condition = function()
 				return GVars.features.vehicle.aircraft_mg.triggerbot
 			end,
@@ -102,10 +102,10 @@ planes_tab:AddBoolCommand("VEH_MG_TRIGGERBOT",
 )
 planes_tab:AddBoolCommand("VEH_MG_MANUAL_AIM",
 	{
-		gvar_key          = "features.vehicle.aircraft_mg.manual_aim",
-		isTranslatorLabel = true,
-		meta              = { description = "VEH_MG_MANUAL_AIM_TT" },
-		fineTuning        = {
+		gvar_key        = "features.vehicle.aircraft_mg.manual_aim",
+		translate_label = true,
+		meta            = { description = "VEH_MG_MANUAL_AIM_TT" },
+		options_data    = {
 			condition = function()
 				return GVars.features.vehicle.aircraft_mg.manual_aim
 			end,
@@ -119,9 +119,9 @@ planes_tab:AddBoolCommand("VEH_MG_MANUAL_AIM",
 )
 planes_tab:AddBoolCommand("VEH_COBRA_MANEUVER",
 	{
-		gvar_key          = "features.vehicle.cobra_maneuver",
-		isTranslatorLabel = true,
-		meta              = { description = "VEH_COBRA_MANEUVER_TT" },
+		gvar_key        = "features.vehicle.cobra_maneuver",
+		translate_label = true,
+		meta            = { description = "VEH_COBRA_MANEUVER_TT" },
 	}
 )
 

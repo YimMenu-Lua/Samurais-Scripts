@@ -118,7 +118,7 @@ local function formatFlags(flags)
 	if (argType == "table") then
 		local out = {}
 		for i, u32 in ipairs(flags) do
-			out[i] = _F("0x%X", u32)
+			out[i] = _F("0x%08X", u32)
 		end
 		return _F("{ %s }", table.concat(out, ", "))
 	end
@@ -127,7 +127,7 @@ local function formatFlags(flags)
 		flags = 0
 	end
 
-	return _F("0x%X", flags)
+	return _F("0x%08X", flags)
 end
 
 ---@param data vehicleDebugDataAlias
@@ -141,12 +141,9 @@ local function drawVehicleFlags(data)
 	local orderedPairs = data.ordered_flags
 	local count        = data.flag_count
 	local maxHeight    = math.min(GVars.ui.window_size.y * 0.58, count * ImGui.GetTextLineHeightWithSpacing())
-	local allFlags     = data.get_all(PV)
 	local getFunc      = data.get
 
 	ImGui.BeginDisabled(not PV:IsValid())
-	ImGui.BulletText(formatFlags(allFlags))
-
 	-- we should really consider bumping ImGui in MR-X's fork. I'm tired of not having auto-resizing child windows
 	if (ImGui.BeginChildEx("##vehFlags", vec2:new(0, maxHeight), ImGuiChildFlags.Borders)) then
 		for _, pair in ipairs(orderedPairs) do
@@ -181,6 +178,8 @@ local function drawVehicleFlags(data)
 			::continue::
 		end
 		ImGui.EndChild()
+		ImGui.Separator()
+		ImGui.Text(formatFlags(data.get_all(PV)))
 	end
 	ImGui.EndDisabled()
 end
@@ -528,7 +527,6 @@ return function()
 			mainButtonLabelWidths[landIdx] = maxButtonWidth
 		end
 
-		ImGui.Spacing()
 		local hasPresets = HandlingEditor:IsAnyPresetEnabled()
 		local hasEdits   = HandlingEditor:HasEdits()
 		ImGui.BeginDisabled(hasPresets or not hasEdits)

@@ -12,10 +12,10 @@ local flatbed_tab = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_FLATBED
 
 flatbed_tab:AddLoopedCommand("FLTBD_MAIN_CB",
 	{
-		gvar_key          = "features.flatbed.enabled",
-		isTranslatorLabel = true,
-		callback          = function() Flatbed:OnTick() end,
-		on_disable        = function() Flatbed:Reset() end,
+		gvar_key        = "features.flatbed.enabled",
+		translate_label = true,
+		callback        = function() Flatbed:OnTick() end,
+		on_disable      = function() Flatbed:Reset() end,
 	}
 )
 

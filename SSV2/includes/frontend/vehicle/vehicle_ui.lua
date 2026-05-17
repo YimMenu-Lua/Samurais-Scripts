@@ -204,9 +204,9 @@ end
 
 vehicleTab:AddBoolCommand("VEH_SPEEDOMETER",
 	{
-		gvar_key          = "features.speedometer.enabled",
-		isTranslatorLabel = true,
-		fineTuning        = {
+		gvar_key        = "features.speedometer.enabled",
+		translate_label = true,
+		options_data    = {
 			condition = function()
 				return GVars.features.speedometer.enabled
 			end,
@@ -220,23 +220,23 @@ vehicleTab:AddBoolCommand("VEH_SPEEDOMETER",
 )
 vehicleTab:AddBoolCommand("VEH_ABS_LIGHTS",
 	{
-		gvar_key          = "features.vehicle.abs_lights",
-		meta              = { description = "VEH_ABS_LIGHTS_TT" },
-		isTranslatorLabel = true
+		gvar_key        = "features.vehicle.abs_lights",
+		meta            = { description = "VEH_ABS_LIGHTS_TT" },
+		translate_label = true
 	}
 )
 vehicleTab:AddBoolCommand("VEH_FAST_AF",
 	{
-		gvar_key          = "features.vehicle.fast_vehicles",
-		meta              = { description = "VEH_FAST_AF_TT" },
-		isTranslatorLabel = true
+		gvar_key        = "features.vehicle.fast_vehicles",
+		meta            = { description = "VEH_FAST_AF_TT" },
+		translate_label = true
 	}
 )
 vehicleTab:AddBoolCommand("VEH_NOS",
 	{
-		gvar_key          = "features.vehicle.nos.enabled",
-		isTranslatorLabel = true,
-		fineTuning        = {
+		gvar_key        = "features.vehicle.nos.enabled",
+		translate_label = true,
+		options_data    = {
 			condition = function()
 				return GVars.features.vehicle.nos.enabled
 			end,
@@ -250,19 +250,19 @@ vehicleTab:AddBoolCommand("VEH_NOS",
 )
 vehicleTab:AddBoolCommand("VEH_NOS_PURGE",
 	{
-		gvar_key          = "features.vehicle.nos.purge",
-		meta              = { description = "VEH_NOS_PURGE_TT" },
-		isTranslatorLabel = true
+		gvar_key        = "features.vehicle.nos.purge",
+		meta            = { description = "VEH_NOS_PURGE_TT" },
+		translate_label = true
 	}
 )
 vehicleTab:AddBoolCommand("VEH_POPS_N_BANGS",
 	{
-		gvar_key          = "features.vehicle.burble_tune",
-		meta              = { description = "VEH_POPS_N_BANGS_TT", alias = { "vehpops" }, isTranslatorLabel = true },
-		isTranslatorLabel = true,
-		on_disable        = RestoreExhaustPops,
-		registerCommand   = true,
-		fineTuning        = {
+		gvar_key         = "features.vehicle.burble_tune",
+		meta             = { description = "VEH_POPS_N_BANGS_TT", alias = { "vehpops" }, isTranslatorLabel = true },
+		translate_label  = true,
+		on_disable       = RestoreExhaustPops,
+		register_command = true,
+		options_data     = {
 			condition = function()
 				return GVars.features.vehicle.burble_tune
 			end,
@@ -276,9 +276,9 @@ vehicleTab:AddBoolCommand("VEH_POPS_N_BANGS",
 )
 vehicleTab:AddBoolCommand("VEH_DRIFT_MODE",
 	{
-		gvar_key          = "features.vehicle.drift.enabled",
-		isTranslatorLabel = true,
-		fineTuning        = {
+		gvar_key        = "features.vehicle.drift.enabled",
+		translate_label = true,
+		options_data    = {
 			condition = function()
 				return GVars.features.vehicle.drift.enabled
 			end,
@@ -292,11 +292,11 @@ vehicleTab:AddBoolCommand("VEH_DRIFT_MODE",
 )
 vehicleTab:AddLoopedCommand("VEH_DRIFT_MINIGAME",
 	{
-		gvar_key          = "features.vehicle.drift_minigame.enabled",
-		meta              = { description = "VEH_DRIFT_MINIGAME_TT" },
-		isTranslatorLabel = true,
-		callback          = function() DriftMinigame:OnTick() end,
-		fineTuning        = {
+		gvar_key        = "features.vehicle.drift_minigame.enabled",
+		meta            = { description = "VEH_DRIFT_MINIGAME_TT" },
+		translate_label = true,
+		callback        = function() DriftMinigame:OnTick() end,
+		options_data    = {
 			condition = function()
 				return GVars.features.vehicle.drift_minigame.enabled
 			end,
@@ -310,32 +310,32 @@ vehicleTab:AddLoopedCommand("VEH_DRIFT_MINIGAME",
 )
 vehicleTab:AddBoolCommand("VEH_SUBWOOFER",
 	{
-		gvar_key          = "features.vehicle.subwoofer",
-		meta              = { description = "VEH_SUBWOOFER_TT" },
-		isTranslatorLabel = true,
-		on_disable        = function() ToggleSubwoofer(false) end,
+		gvar_key        = "features.vehicle.subwoofer",
+		meta            = { description = "VEH_SUBWOOFER_TT" },
+		translate_label = true,
+		on_disable      = function() ToggleSubwoofer(false) end,
 	}
 )
 vehicleTab:AddBoolCommand("VEH_HIGH_BEAMS",
 	{
-		gvar_key          = "features.vehicle.horn_beams",
-		meta              = { description = "VEH_HIGH_BEAMS_TT" },
-		isTranslatorLabel = true,
+		gvar_key        = "features.vehicle.horn_beams",
+		meta            = { description = "VEH_HIGH_BEAMS_TT" },
+		translate_label = true,
 	}
 )
 vehicleTab:AddBoolCommand("VEH_AUTO_BRAKE_LIGHTS",
 	{
-		gvar_key          = "features.vehicle.auto_brake_lights",
-		meta              = { description = "VEH_AUTO_BRAKE_LIGHTS_TT" },
-		isTranslatorLabel = true,
+		gvar_key        = "features.vehicle.auto_brake_lights",
+		meta            = { description = "VEH_AUTO_BRAKE_LIGHTS_TT" },
+		translate_label = true,
 	}
 )
 vehicleTab:AddBoolCommand("VEH_STRONG_WINDOWS",
 	{
-		gvar_key          = "features.vehicle.unbreakable_windows",
-		meta              = { description = "VEH_STRONG_WINDOWS_TT" },
-		isTranslatorLabel = true,
-		on_disable        = function()
+		gvar_key        = "features.vehicle.unbreakable_windows",
+		meta            = { description = "VEH_STRONG_WINDOWS_TT" },
+		translate_label = true,
+		on_disable      = function()
 			ThreadManager:Run(function()
 				local PV = LocalPlayer:GetVehicle()
 				if (not PV:IsValid()) then return end
@@ -346,10 +346,10 @@ vehicleTab:AddBoolCommand("VEH_STRONG_WINDOWS",
 )
 vehicleTab:AddBoolCommand("VEH_STRONG_CRASH",
 	{
-		gvar_key          = "features.vehicle.strong_crash",
-		meta              = { description = "VEH_STRONG_CRASH_TT" },
-		isTranslatorLabel = true,
-		on_disable        = function()
+		gvar_key        = "features.vehicle.strong_crash",
+		meta            = { description = "VEH_STRONG_CRASH_TT" },
+		translate_label = true,
+		on_disable      = function()
 			local PV = LocalPlayer:GetVehicle()
 			PV:RestorePatch(PV.MemoryPatches.DeformMult)
 		end,
@@ -357,15 +357,15 @@ vehicleTab:AddBoolCommand("VEH_STRONG_CRASH",
 )
 vehicleTab:AddBoolCommand("VEH_RGB_LIGHTS",
 	{
-		gvar_key          = "features.vehicle.rgb_lights.enabled",
-		meta              = { description = "VEH_RGB_LIGHTS_TT" },
-		isTranslatorLabel = true,
-		on_disable        = function()
+		gvar_key        = "features.vehicle.rgb_lights.enabled",
+		meta            = { description = "VEH_RGB_LIGHTS_TT" },
+		translate_label = true,
+		on_disable      = function()
 			ThreadManager:Run(function()
 				LocalPlayer:GetVehicle():RestoreHeadlights()
 			end)
 		end,
-		fineTuning        = {
+		options_data    = {
 			condition = function()
 				return GVars.features.vehicle.rgb_lights.enabled
 			end,
@@ -385,28 +385,28 @@ vehicleTab:AddBoolCommand("VEH_RGB_LIGHTS",
 )
 vehicleTab:AddBoolCommand("VEH_FLAPPY_DOORS",
 	{
-		gvar_key          = "features.vehicle.flappy_doors",
-		meta              = { description = "VEH_FLAPPY_DOORS_TT" },
-		isTranslatorLabel = true,
-		on_disable        = CloseDoors
+		gvar_key        = "features.vehicle.flappy_doors",
+		meta            = { description = "VEH_FLAPPY_DOORS_TT" },
+		translate_label = true,
+		on_disable      = CloseDoors
 	}
 )
 vehicleTab:AddBoolCommand("VEH_AUTO_LOCK",
 	{
-		gvar_key          = "features.vehicle.auto_lock_doors",
-		meta              = { description = "VEH_AUTO_LOCK_TT" },
-		isTranslatorLabel = true,
-		on_disable        = function()
+		gvar_key        = "features.vehicle.auto_lock_doors",
+		meta            = { description = "VEH_AUTO_LOCK_TT" },
+		translate_label = true,
+		on_disable      = function()
 			LocalPlayer:GetVehicle():ResetGenericToggleable("autolockdoors")
 		end
 	}
 )
 vehicleTab:AddBoolCommand("VEH_LAUNCH_CTRL",
 	{
-		gvar_key          = "features.vehicle.launch_control",
-		meta              = { description = "VEH_LAUNCH_CTRL_TT" },
-		isTranslatorLabel = true,
-		fineTuning        = {
+		gvar_key        = "features.vehicle.launch_control",
+		meta            = { description = "VEH_LAUNCH_CTRL_TT" },
+		translate_label = true,
+		options_data    = {
 			condition = function()
 				return GVars.features.vehicle.launch_control
 			end,
@@ -425,10 +425,10 @@ vehicleTab:AddBoolCommand("VEH_LAUNCH_CTRL",
 )
 vehicleTab:AddBoolCommand("VEH_IV_EXIT",
 	{
-		gvar_key          = "features.vehicle.iv_exit",
-		meta              = { description = "VEH_IV_EXIT_TT" },
-		isTranslatorLabel = true,
-		on_disable        = function()
+		gvar_key        = "features.vehicle.iv_exit",
+		meta            = { description = "VEH_IV_EXIT_TT" },
+		translate_label = true,
+		on_disable      = function()
 			ThreadManager:Run(function()
 				LocalPlayer:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
 			end)
@@ -437,17 +437,17 @@ vehicleTab:AddBoolCommand("VEH_IV_EXIT",
 )
 vehicleTab:AddBoolCommand("VEH_KEEP_WHEELS_TURNED",
 	{
-		gvar_key          = "features.vehicle.no_wheel_recenter",
-		meta              = { description = "VEH_KEEP_WHEELS_TURNED_TT" },
-		isTranslatorLabel = true,
+		gvar_key        = "features.vehicle.no_wheel_recenter",
+		meta            = { description = "VEH_KEEP_WHEELS_TURNED_TT" },
+		translate_label = true,
 	}
 )
 vehicleTab:AddBoolCommand("VEH_MINES",
 	{
-		gvar_key          = "features.vehicle.mines.enabled",
-		meta              = { description = "VEH_MINES_TT" },
-		isTranslatorLabel = true,
-		fineTuning        = {
+		gvar_key        = "features.vehicle.mines.enabled",
+		meta            = { description = "VEH_MINES_TT" },
+		translate_label = true,
+		options_data    = {
 			condition = function()
 				return GVars.features.vehicle.mines.enabled
 			end,

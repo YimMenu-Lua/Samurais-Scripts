@@ -437,7 +437,7 @@ Contains the following modules:
 
 ### Stat Controller
 
-Allows you to add multiplayer character stats to a managed list, edit them, and lock their values. Supported stat types are int, float, bool, time, and date.
+Allows you to add multiplayer character stats to a managed list, edit them, and lock their values. Supported stat types are int, float, bool, string, bitset, time, and date.
 
 ## Extra
 

@@ -7,22 +7,22 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local self_tab                       = GUI:RegisterNewTab(Enums.eTabID.TAB_SELF, "Self")
 local drawPlayerAbilities            = require("includes.frontend.self.player_abilities")
+local selfTab                        = GUI:RegisterNewTab(Enums.eTabID.TAB_SELF, "Self")
 local showAbilities                  = false
-local katana_replace_weapons <const> = {
-	2508868239,
-	1141786504,
-	3713923289,
-	2484171525,
-}
-
 local optionPopup                    = {
 	flags       = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize,
 	label       = "##optionsPopup",
 	should_draw = false,
 	---@type function?
 	callback    = nil
+}
+
+local katana_replace_weapons <const> = {
+	2508868239,
+	1141786504,
+	3713923289,
+	2484171525,
 }
 
 local function laserOptions()
@@ -82,12 +82,12 @@ local function CheckIfRagdollBlocked()
 	end)
 end
 
-self_tab:AddBoolCommand("SELF_AUTOHEAL",
+selfTab:AddBoolCommand("SELF_AUTOHEAL",
 	{
-		gvar_key          = "features.self.autoheal.enabled",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_AUTOHEAL_TT" },
-		fineTuning        = {
+		gvar_key        = "features.self.autoheal.enabled",
+		translate_label = true,
+		meta            = { description = "SELF_AUTOHEAL_TT" },
+		options_data    = {
 			condition = function()
 				return GVars.features.self.autoheal.enabled
 			end,
@@ -105,88 +105,88 @@ self_tab:AddBoolCommand("SELF_AUTOHEAL",
 		}
 	}
 )
-self_tab:AddBoolCommand("SELF_PHONE_ANIMS",
+selfTab:AddBoolCommand("SELF_PHONE_ANIMS",
 	{
-		gvar_key          = "features.self.phone_anims",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_PHONE_ANIMS_TT" },
+		gvar_key        = "features.self.phone_anims",
+		translate_label = true,
+		meta            = { description = "SELF_PHONE_ANIMS_TT" },
 	}
 )
-self_tab:AddBoolCommand("SELF_MC_BIKE_ANIMS",
+selfTab:AddBoolCommand("SELF_MC_BIKE_ANIMS",
 	{
-		gvar_key          = "features.self.mc_alt_bike_anims",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_MC_BIKE_ANIMS_TT" },
+		gvar_key        = "features.self.mc_alt_bike_anims",
+		translate_label = true,
+		meta            = { description = "SELF_MC_BIKE_ANIMS_TT" },
 	}
 )
-self_tab:AddBoolCommand("SELF_ACTION_MODE",
+selfTab:AddBoolCommand("SELF_ACTION_MODE",
 	{
-		gvar_key          = "features.self.disable_action_mode",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_ACTION_MODE_TT" },
+		gvar_key        = "features.self.disable_action_mode",
+		translate_label = true,
+		meta            = { description = "SELF_ACTION_MODE_TT" },
 	}
 )
-self_tab:AddBoolCommand("SELF_HEADPROPS",
+selfTab:AddBoolCommand("SELF_HEADPROPS",
 	{
-		gvar_key          = "features.self.allow_headprops_in_vehicles",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_HEADPROPS_TT" },
+		gvar_key        = "features.self.allow_headprops_in_vehicles",
+		translate_label = true,
+		meta            = { description = "SELF_HEADPROPS_TT" },
 	}
 )
-self_tab:AddBoolCommand("SELF_STAND_ON_VEHS",
+selfTab:AddBoolCommand("SELF_STAND_ON_VEHS",
 	{
-		gvar_key          = "features.self.stand_on_veh_roof",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_STAND_ON_VEHS_TT" },
+		gvar_key        = "features.self.stand_on_veh_roof",
+		translate_label = true,
+		meta            = { description = "SELF_STAND_ON_VEHS_TT" },
 	}
 )
-self_tab:AddBoolCommand("SELF_NO_CARJACKING",
+selfTab:AddBoolCommand("SELF_NO_CARJACKING",
 	{
-		gvar_key          = "features.self.no_carjacking",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_NO_CARJACKING_TT" },
+		gvar_key        = "features.self.no_carjacking",
+		translate_label = true,
+		meta            = { description = "SELF_NO_CARJACKING_TT" },
 	}
 )
-self_tab:AddBoolCommand("SELF_CROUCH",
+selfTab:AddBoolCommand("SELF_CROUCH",
 	{
-		gvar_key          = "features.self.crouch",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_CROUCH_TT" },
-		on_disable        = function() Backend:RemoveDisabledControl(36) end,
+		gvar_key        = "features.self.crouch",
+		translate_label = true,
+		meta            = { description = "SELF_CROUCH_TT" },
+		on_disable      = function() Backend:RemoveDisabledControl(36) end,
 	}
 )
-self_tab:AddBoolCommand("SELF_HANDS_UP",
+selfTab:AddBoolCommand("SELF_HANDS_UP",
 	{
-		gvar_key          = "features.self.hands_up",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_HANDS_UP_TT" },
-		on_disable        = function() Backend:RemoveDisabledControl(29) end,
+		gvar_key        = "features.self.hands_up",
+		translate_label = true,
+		meta            = { description = "SELF_HANDS_UP_TT" },
+		on_disable      = function() Backend:RemoveDisabledControl(29) end,
 	}
 )
-self_tab:AddBoolCommand("SELF_SPRINT_INSIDE",
+selfTab:AddBoolCommand("SELF_SPRINT_INSIDE",
 	{
-		gvar_key          = "features.self.sprint_inside_interiors",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_SPRINT_INSIDE_TT" },
+		gvar_key        = "features.self.sprint_inside_interiors",
+		translate_label = true,
+		meta            = { description = "SELF_SPRINT_INSIDE_TT" },
 	}
 )
-self_tab:AddBoolCommand("SELF_LOCKPICK_ANIM",
+selfTab:AddBoolCommand("SELF_LOCKPICK_ANIM",
 	{
-		gvar_key          = "features.self.jacking_always_lockpick_anim",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_LOCKPICK_ANIM_TT" },
+		gvar_key        = "features.self.jacking_always_lockpick_anim",
+		translate_label = true,
+		meta            = { description = "SELF_LOCKPICK_ANIM_TT" },
 	}
 )
-self_tab:AddBoolCommand("SELF_ROD",
+selfTab:AddBoolCommand("SELF_ROD",
 	{
-		gvar_key          = "features.self.rod",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_ROD_TT" },
-		on_enable         = function()
+		gvar_key        = "features.self.rod",
+		translate_label = true,
+		meta            = { description = "SELF_ROD_TT" },
+		on_enable       = function()
 			GVars.features.self.clumsy = false
 			CheckIfRagdollBlocked()
 		end,
-		fineTuning        = {
+		options_data    = {
 			condition = function()
 				return GVars.features.self.rod
 			end,
@@ -198,16 +198,16 @@ self_tab:AddBoolCommand("SELF_ROD",
 		}
 	}
 )
-self_tab:AddBoolCommand("SELF_CLUMSY",
+selfTab:AddBoolCommand("SELF_CLUMSY",
 	{
-		gvar_key          = "features.self.clumsy",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_CLUMSY_TT" },
-		on_enable         = function()
+		gvar_key        = "features.self.clumsy",
+		translate_label = true,
+		meta            = { description = "SELF_CLUMSY_TT" },
+		on_enable       = function()
 			GVars.features.self.rod = false
 			CheckIfRagdollBlocked()
 		end,
-		fineTuning        = {
+		options_data    = {
 			condition = function()
 				return GVars.features.self.clumsy
 			end,
@@ -219,19 +219,19 @@ self_tab:AddBoolCommand("SELF_CLUMSY",
 		}
 	}
 )
-self_tab:AddBoolCommand("SELF_MAGIC_BULLET",
+selfTab:AddBoolCommand("SELF_MAGIC_BULLET",
 	{
-		gvar_key          = "features.weapon.magic_bullet",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_MAGIC_BULLET_TT" },
+		gvar_key        = "features.weapon.magic_bullet",
+		translate_label = true,
+		meta            = { description = "SELF_MAGIC_BULLET_TT" },
 	}
 )
-self_tab:AddBoolCommand("SELF_LASER_SIGHTS",
+selfTab:AddBoolCommand("SELF_LASER_SIGHTS",
 	{
-		gvar_key          = "features.weapon.laser_sights.enabled",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_LASER_SIGHTS_TT" },
-		fineTuning        = {
+		gvar_key        = "features.weapon.laser_sights.enabled",
+		translate_label = true,
+		meta            = { description = "SELF_LASER_SIGHTS_TT" },
+		options_data    = {
 			condition = function()
 				return GVars.features.weapon.laser_sights.enabled
 			end,
@@ -243,12 +243,12 @@ self_tab:AddBoolCommand("SELF_LASER_SIGHTS",
 		}
 	}
 )
-self_tab:AddBoolCommand("SELF_KATANA",
+selfTab:AddBoolCommand("SELF_KATANA",
 	{
-		gvar_key          = "features.weapon.katana.enabled",
-		isTranslatorLabel = true,
-		meta              = { description = "SELF_KATANA_TT" },
-		fineTuning        = {
+		gvar_key        = "features.weapon.katana.enabled",
+		translate_label = true,
+		meta            = { description = "SELF_KATANA_TT" },
+		options_data    = {
 			condition = function()
 				return GVars.features.weapon.katana.enabled
 			end,
@@ -261,9 +261,9 @@ self_tab:AddBoolCommand("SELF_KATANA",
 	}
 )
 
-local function SelfUI()
+selfTab:RegisterGUI(function()
 	ImGui.SeparatorText(_T("GENERIC_GENERAL_LABEL"))
-	self_tab:GetGridRenderer():Draw()
+	selfTab:GetGridRenderer():Draw()
 
 	if (Game.IsOnline()) then
 		ImGui.Spacing()
@@ -286,6 +286,4 @@ local function SelfUI()
 		optionPopup.callback()
 		ImGui.EndPopup()
 	end
-end
-
-self_tab:RegisterGUI(SelfUI)
+end)

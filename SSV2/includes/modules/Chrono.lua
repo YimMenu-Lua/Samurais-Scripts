@@ -38,7 +38,6 @@ function RageDTStruct.FromPointer(ptr)
 	for k, v in pairs(RageDTStructOffsets) do
 		local val64 = ptr:add(v.offset):get_qword()
 		if (not math.is_inrange(val64, v.min, v.max)) then
-			log.warning("[RageTimeStruct.FromPointer]: Invalid datetime param! Returning a default DateTime object.")
 			free(ptr)
 			return DateTime.new(0)
 		end

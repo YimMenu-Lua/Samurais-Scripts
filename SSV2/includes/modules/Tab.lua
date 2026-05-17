@@ -14,13 +14,13 @@ local GridRenderer = require("includes.services.GridRenderer")
 ---@field on_enable? function
 ---@field on_disable? function
 ---@field meta? CommandMeta
----@field registerCommand? boolean -- register with CommandExecutor
----@field isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
----@field global_table? table a table where the global variable lives (defaults to GVars if available or _G)
----@field fineTuning? { callback: function, condition: boolean|fun(): boolean } -- adds a fine tuning button to the command's widget
+---@field register_command? boolean -- register with CommandExecutor
+---@field translate_label? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
+---@field global_table? table a table where the bool variable lives (defaults to GVars if available or _G); a local table works as well.
+---@field options_data? { callback: function, condition: boolean|fun(): boolean } -- adds a small "options" button to the command's widget
 
 ---@class LoopedCommandParams : BoolCommandParams
----@field callback function
+---@field callback function -- tick function
 
 --------------------------------------
 -- Tab Struct
@@ -40,43 +40,41 @@ local GridRenderer = require("includes.services.GridRenderer")
 local Tab = Class("Tab")
 
 ---@param name string
----@param drawable? GuiCallback
+---@param callback? GuiCallback
 ---@param subtabs? Tab[]
 ---@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@return Tab
-function Tab.new(name, drawable, subtabs, isTranslatorLabel)
-	return setmetatable(
-		{
-			m_name                 = name,
-			m_id                   = joaat(name),
-			m_callback             = drawable,
-			m_subtabs              = subtabs or {},
-			m_has_error            = false,
-			m_has_translator_label = isTranslatorLabel or false
-		},
+function Tab.new(name, callback, subtabs, isTranslatorLabel)
+	subtabs = subtabs or {}
+	return setmetatable({
+		m_name                 = name,
+		m_id                   = _J(_F("%s%s", name, subtabs)),
+		m_callback             = callback,
+		m_subtabs              = subtabs,
+		m_has_error            = false,
+		m_has_translator_label = isTranslatorLabel or false
 		---@diagnostic disable-next-line
-		Tab
-	)
+	}, Tab)
 end
 
 ---@param name string
----@param drawable? GuiCallback
+---@param callback? GuiCallback
 ---@param subtabs? Tab[]
 ---@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@return Tab
-function Tab:RegisterSubtab(name, drawable, subtabs, isTranslatorLabel)
+function Tab:RegisterSubtab(name, callback, subtabs, isTranslatorLabel)
 	assert((type(name) == "string" and #name > 0),
 		"Attempt to register a new tab with no name."
 	)
 
-	local subtab = Tab(name, drawable, subtabs, isTranslatorLabel)
+	local subtab         = Tab(name, callback, subtabs, isTranslatorLabel)
 	self.m_subtabs[name] = subtab
 	return subtab
 end
 
----@param drawable GuiCallback
-function Tab:RegisterGUI(drawable)
-	if (type(drawable) ~= "function") then
+---@param callback GuiCallback
+function Tab:RegisterGUI(callback)
+	if (type(callback) ~= "function") then
 		return
 	end
 
@@ -84,7 +82,7 @@ function Tab:RegisterGUI(drawable)
 		log.fwarning("Tab %s already had a GUI callback. Did you mean to overwrite it?", self:GetName())
 	end
 
-	self.m_callback = drawable
+	self.m_callback = callback
 end
 
 ---@return boolean
@@ -121,7 +119,7 @@ end
 ---@return joaat_t
 function Tab:GetID()
 	if (not self.m_id) then
-		self.m_id = joaat(self.m_name)
+		self.m_id = _J(_F("%s%s", self.m_name, self.m_subtabs))
 	end
 
 	return self.m_id
@@ -197,8 +195,8 @@ function Tab:AddBoolCommand(label, opts)
 		{
 			persistent        = true,
 			tooltip           = meta.description,
-			isTranslatorLabel = opts.isTranslatorLabel,
-			fineTuning        = opts.fineTuning,
+			isTranslatorLabel = opts.translate_label,
+			fineTuning        = opts.options_data,
 			onClick           = function()
 				local v = table.get_nested_key(g_table, gvar_key)
 				onClick(v)
@@ -206,7 +204,7 @@ function Tab:AddBoolCommand(label, opts)
 		}
 	)
 
-	if not (opts.registerCommand and CommandExecutor and type(table.get_nested_key(g_table, gvar_key)) == "boolean") then
+	if not (opts.register_command and CommandExecutor and type(table.get_nested_key(g_table, gvar_key)) == "boolean") then
 		return
 	end
 
@@ -250,7 +248,7 @@ function Tab:AddLoopedCommand(label, opts)
 			if onDisable then onDisable() end
 		end
 
-		if (not opts.registerCommand) then
+		if (not opts.register_command) then
 			CommandExecutor:notify(
 				"%s %s.",
 				label,
@@ -265,13 +263,13 @@ function Tab:AddLoopedCommand(label, opts)
 		{
 			persistent        = true,
 			tooltip           = meta.description,
-			isTranslatorLabel = opts.isTranslatorLabel,
+			isTranslatorLabel = opts.translate_label,
 			onClick           = toggle,
-			fineTuning        = opts.fineTuning
+			fineTuning        = opts.options_data
 		}
 	)
 
-	if not (opts.registerCommand and CommandExecutor and type(table.get_nested_key(g_table, gvar_key)) == "boolean") then
+	if not (opts.register_command and CommandExecutor and type(table.get_nested_key(g_table, gvar_key)) == "boolean") then
 		return
 	end
 

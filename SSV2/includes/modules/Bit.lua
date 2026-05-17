@@ -10,10 +10,10 @@
 -----------------------------------------
 -- Bit (Static)
 -----------------------------------------
--- Primitive bitwise wrapper.
+-- Basic bitwise wrapper.
 ---@ignore [Unfinished]
 ---@class Bit
-local Bit = {}
+local Bit   = {}
 Bit.__index = Bit
 
 ---@param n integer
@@ -78,6 +78,20 @@ end
 ---@return integer
 function Bit.RightRotate(n, bits)
 	return ((n >> bits) | (n << (32 - bits))) & 0xFFFFFFFF
+end
+
+---@param n integer
+---@param size? 8|16|32 bytes
+function Bit.Tostring(n, size)
+	size      = size or 32
+	local out = {}
+	for i = size - 1, 0, -1 do
+		out[#out + 1] = ((n >> i) & 1)
+		if (i < 32 and i % 8 == 0) then
+			out[#out + 1] = " "
+		end
+	end
+	return table.concat(out)
 end
 
 return Bit
