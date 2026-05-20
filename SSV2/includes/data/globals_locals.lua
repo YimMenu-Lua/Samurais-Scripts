@@ -50,32 +50,6 @@ return {
 			}
 		}
 	},
-	freemode_boss_stuff = {
-		description = "freemode global",
-		file = "freemode.c",
-		LEGACY = {
-			value = 2733002,
-			pattern = [[if\s+\(!func_\d+\(4\) && !.*?\(Global_(\d{7})\.f_(\d{3}), 4\)\)]],
-			capture_group = 1,
-			offsets = {
-				{
-					value = 925,
-					capture_group = 2,
-				},
-			}
-		},
-		ENHANCED = {
-			value = 2733138,
-			pattern = [[if\s+\(!func_\d+\(4\) && !.*?\(Global_(\d{7})\.f_(\d{3}), 4\)\)]],
-			capture_group = 1,
-			offsets = {
-				{
-					value = 926,
-					capture_group = 2,
-				},
-			}
-		}
-	},
 	freemode_business_global = {
 		description = "Freemode Business Global",
 		file = "freemode.c",
@@ -102,6 +76,32 @@ return {
 			value = 1572199,
 			pattern = [[if \(VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING\((Global_\w{7})\)\)]],
 			capture_group = 1
+		}
+	},
+	freemode_boss_uid_str = {
+		description = "boss user id string",
+		file = "freemode.c",
+		LEGACY = {
+			value = 2686090,
+			pattern = [[Global_26(\d{5})\.f_(3\d{3})\.f_2\s+=\s+\{.*?\};]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 3083,
+					capture_group = 2,
+				},
+			}
+		},
+		ENHANCED = {
+			value = 2686095,
+			pattern = [[Global_26(\d{5})\.f_(3\d{3})\.f_2\s+=\s+\{.*?\};]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 3083,
+					capture_group = 2,
+				},
+			}
 		}
 	},
 	arcade_bhub_global_1 = {
@@ -1071,6 +1071,34 @@ return {
 			value = 2733138,
 			pattern = [[return Global_(\d{7})\.f_371;]],
 			capture_group = 1
+		}
+	},
+	freemode_boss_offset_1 = {
+		description = "an offset at request_services_global used when registering as a boss",
+		file = "freemode.c",
+		LEGACY = {
+			value = 925,
+			pattern = [[if\s+\(!func_\d+\(4\) && !.*?\(Global_\d{7}\.f_(\d{3}), 4\)\)]],
+			capture_group = 1,
+		},
+		ENHANCED = {
+			value = 926,
+			pattern = [[if\s+\(!func_\d+\(4\) && !.*?\(Global_\d{7}\.f_(\d{3}), 4\)\)]],
+			capture_group = 1,
+		}
+	},
+	freemode_boss_offset_2 = {
+		description = "an offset at request_services_global used when registering as a boss",
+		file = "freemode.c",
+		LEGACY = {
+			value = 3988,
+			pattern = [[if\s+?\(\w+\(Global_27\d{5}\.f_(\d{4})\.f_263, true, true\)\)]],
+			capture_group = 1,
+		},
+		ENHANCED = {
+			value = 3989,
+			pattern = [[if\s+?\(\w+\(Global_27\d{5}\.f_(\d{4})\.f_263, true, true\)\)]],
+			capture_group = 1,
 		}
 	},
 	service_vehicles_global = {

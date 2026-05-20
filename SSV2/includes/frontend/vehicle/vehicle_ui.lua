@@ -7,21 +7,31 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local selected_mine_name
-local Refs              = require("includes.data.refs")
-local default_cfg       = require("includes.data.config")
-local driftMG           = require("includes.features.vehicle.drift_minigame")
-local customPaintsUI    = require("includes.frontend.vehicle.custom_paints_ui")
-local engine_swap_index = 1
-local vehicleTab        = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
-local optionPopup       = {
+local Refs                 = require("includes.data.refs")
+local default_cfg          = require("includes.data.config")
+local driftMG              = require("includes.features.vehicle.drift_minigame")
+local customPaintsUI       = require("includes.frontend.vehicle.custom_paints_ui")
+local engine_swap_index    = 1
+local vehicleTab           = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
+local optionPopup          = {
 	flags       = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize,
 	label       = "##optionsPopup",
 	should_draw = false,
 	---@type function?
 	callback    = nil
 }
-DriftMinigame           = LocalPlayer:GetVehicle():AddFeature(driftMG)
+DriftMinigame              = LocalPlayer:GetVehicle():AddFeature(driftMG)
+
+local vehicleRadioStations = { { station = "OFF", name = "Off" } }
+for _, v in ipairs(Audio.RadioStations) do
+	local station = v.station
+	if (station:startswith("HIDDEN") or station == "RADIO_30_DLC_HEI4_MIX1_REVERB") then
+		goto continue
+	end
+
+	table.insert(vehicleRadioStations, v)
+	::continue::
+end
 
 local function speedoOptions()
 	local resolution = Game.GetScreenResolution()
@@ -150,17 +160,47 @@ local function nosOptions()
 end
 
 local function minesOptions()
-	if (ImGui.BeginCombo("Vehicle Mine Type", selected_mine_name or "Unselected")) then
+	local cfg = GVars.features.vehicle.mines
+	if (ImGui.BeginCombo(_T("GENERIC_TYPE"), cfg.name or _T("GENERIC_NONE"))) then
 		for _, pair in pairs(LocalPlayer:GetVehicle().mines) do
-			local selected = GVars.features.vehicle.mines.selected_type_hash == pair.second
+			local selected = cfg.selected_type_hash == pair.second
 			if (ImGui.Selectable(pair.first, selected)) then
-				GVars.features.vehicle.mines.selected_type_hash = pair.second
-				selected_mine_name = pair.first
+				cfg.selected_type_hash = pair.second
+				cfg.name               = pair.first
 			end
 		end
 
 		ImGui.EndCombo()
 	end
+end
+
+local function defaultStationOptions()
+	ImGui.Spacing()
+	if (ImGui.BeginCombo("##defaultRadio", GVars.features.vehicle.default_station.display_name)) then
+		for _, v in ipairs(vehicleRadioStations) do
+			local station  = v.station
+			local name     = v.name
+			local selected = GVars.features.vehicle.default_station.station_name == station
+			if (ImGui.Selectable(name, selected)) then
+				GVars.features.vehicle.default_station.station_name = station
+				GVars.features.vehicle.default_station.display_name = name
+				ThreadManager:Run(function()
+					if (not LocalPlayer:IsDriving()) then
+						return
+					end
+					LocalPlayer:GetVehicle():SetRadioStation(station)
+				end)
+			end
+		end
+
+		ImGui.EndCombo()
+	end
+end
+
+local function gearboxOptions()
+	ImGui.Spacing()
+	local cfg = GVars.features.vehicle.manual_gearbox
+	cfg.mode  = ImGui.Combo("##gboxManual", cfg.mode, { _T("VEH_GEARBOX_MAN_WCLUTCH"), _T("VEH_GEARBOX_SEQUENTIAL") }, 2)
 end
 
 local function popsOptions()
@@ -411,10 +451,10 @@ vehicleTab:AddBoolCommand("VEH_LAUNCH_CTRL",
 				return GVars.features.vehicle.launch_control
 			end,
 			callback = function()
-				optionPopup.label       = _T("VEH_LAUNCH_CTRL")
+				optionPopup.label       = _T("VEH_LAUNCH_CTRL_MODE")
 				optionPopup.should_draw = true
 				optionPopup.callback    = function()
-					GVars.features.vehicle.launch_control_mode, _ = ImGui.Combo(_T("VEH_LAUNCH_CTRL_MODE"),
+					GVars.features.vehicle.launch_control_mode = ImGui.Combo("##launchCtrlMode",
 						GVars.features.vehicle.launch_control_mode,
 						_F("%s\0%s\0", _T("VEH_LAUNCH_CTRL_REALISTIC"), _T("VEH_LAUNCH_CTRL_RIDICULOUS"))
 					)
@@ -454,6 +494,50 @@ vehicleTab:AddBoolCommand("VEH_MINES",
 			callback = function()
 				optionPopup.callback    = minesOptions
 				optionPopup.label       = _T("VEH_MINES")
+				optionPopup.should_draw = true
+			end
+		}
+	}
+)
+vehicleTab:AddBoolCommand("VEH_DEFAULT_RADIO",
+	{
+		gvar_key        = "features.vehicle.default_station.enabled",
+		meta            = { description = "VEH_DEFAULT_RADIO_TT" },
+		translate_label = true,
+		options_data    = {
+			condition = function()
+				return GVars.features.vehicle.default_station.enabled
+			end,
+			callback = function()
+				optionPopup.callback    = defaultStationOptions
+				optionPopup.label       = _T("VEH_DEFAULT_RADIO")
+				optionPopup.should_draw = true
+			end
+		}
+	}
+)
+vehicleTab:AddBoolCommand("VEH_MANUAL_GEARBOX",
+	{
+		gvar_key        = "features.vehicle.manual_gearbox.enabled",
+		meta            = { description = "VEH_MANUAL_GEARBOX_TT" },
+		translate_label = true,
+		on_enable       = function()
+			local PV = LocalPlayer:GetVehicle()
+			if (not PV:IsValid()) then return end
+			PV.m_manual_gearbox:OnNewVehicle()
+		end,
+		on_disable      = function()
+			local PV = LocalPlayer:GetVehicle()
+			if (not PV:IsValid()) then return end
+			PV.m_manual_gearbox:Reset()
+		end,
+		options_data    = {
+			condition = function()
+				return GVars.features.vehicle.manual_gearbox.enabled
+			end,
+			callback = function()
+				optionPopup.callback    = gearboxOptions
+				optionPopup.label       = _T("VEH_MANUAL_GEARBOX_TYPE")
 				optionPopup.should_draw = true
 			end
 		}

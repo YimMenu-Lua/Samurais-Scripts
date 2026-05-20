@@ -9,17 +9,16 @@
 
 ---@diagnostic disable: lowercase-global
 
---#region consts
-
+--#region defs
 
 ---@enum eControlType
-eControlType                 = {
+eControlType                    = {
 	KEYBOARD   = 0x0,
 	CONTROLLER = 0x1
 }
 
 ---@enum eVirtualKeyCodes
-eVirtualKeyCodes             = { -- https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+eVirtualKeyCodes                = { -- https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 	DIGIT_0                = 0x30,
 	DIGIT_1                = 0x31,
 	DIGIT_2                = 0x32,
@@ -198,19 +197,37 @@ eVirtualKeyCodes             = { -- https://learn.microsoft.com/en-us/windows/wi
 	Z                      = 0x5A,
 }
 
-local WM_KEYDOWN <const>     = 0x0100
-local WM_KEYUP <const>       = 0x0101
-local WM_LBUTTONDOWN <const> = 0x0201
-local WM_LBUTTONUP <const>   = 0x0202
-local WM_MBUTTONDOWN <const> = 0x0207
-local WM_MBUTTONUP <const>   = 0x0208
-local WM_MOUSEWHEEL <const>  = 0x020A
-local WM_RBUTTONDOWN <const> = 0x0204
-local WM_RBUTTONUP <const>   = 0x0205
-local WM_SYSKEYDOWN <const>  = 0x0104
-local WM_SYSKEYUP <const>    = 0x0105
-local WM_XBUTTONDOWN <const> = 0x020B
-local WM_XBUTTONUP <const>   = 0x020C
+local WM_KEYDOWN <const>        = 0x0100
+local WM_KEYUP <const>          = 0x0101
+local WM_LBUTTONDOWN <const>    = 0x0201
+local WM_LBUTTONUP <const>      = 0x0202
+local WM_MBUTTONDOWN <const>    = 0x0207
+local WM_MBUTTONUP <const>      = 0x0208
+local WM_MOUSEWHEEL <const>     = 0x020A -- TODO
+local WM_RBUTTONDOWN <const>    = 0x0204
+local WM_RBUTTONUP <const>      = 0x0205
+local WM_SYSKEYDOWN <const>     = 0x0104
+local WM_SYSKEYUP <const>       = 0x0105
+local WM_XBUTTONDOWN <const>    = 0x020B
+local WM_XBUTTONUP <const>      = 0x020C
+
+local KeyDownMessageSet <const> = Set(
+	WM_KEYDOWN,
+	WM_LBUTTONDOWN,
+	WM_MBUTTONDOWN,
+	WM_RBUTTONDOWN,
+	WM_SYSKEYDOWN,
+	WM_XBUTTONDOWN
+)
+
+local KeyUpMessageSet <const>   = Set(
+	WM_KEYUP,
+	WM_LBUTTONUP,
+	WM_MBUTTONUP,
+	WM_RBUTTONUP,
+	WM_SYSKEYUP,
+	WM_XBUTTONUP
+)
 
 --#endregion
 
@@ -230,8 +247,8 @@ local WM_XBUTTONUP <const>   = 0x020C
 ---@field m_just_pressed boolean
 ---@field m_just_released boolean
 ---@field protected m_prev_pressed boolean
-Key = {}
-Key.__index = Key
+local Key <const> = {}
+Key.__index       = Key
 
 ---@param code integer
 ---@param name string
@@ -277,47 +294,105 @@ function Key:EndFrame() end -- redundant
 ---@field private m_keymap_by_code table<eVirtualKeyCodes, Key>
 ---@field private m_keymap_by_name table<string, Key>
 ---@field private m_registered_keybinds table<eVirtualKeyCodes, Key>
----@field private BeginFrame function
----@field private EndFrame function
----@field private HandleCallbacks function
-KeyManager = Class("KeyManager")
-KeyManager.m_keys = {}
-KeyManager.m_registered_keybinds = {}
-KeyManager.m_keymap_by_code = {}
-KeyManager.m_keymap_by_name = {}
+---@field private m_initialized boolean
+---@overload fun(): KeyManager
+local KeyManager = Class("KeyManager")
 
 function KeyManager:init()
-	---@class KeyManager
-	local instance = setmetatable({}, KeyManager)
+	if (self.m_initialized) then return self end
+	if (_G.KeyManager) then return _G.KeyManager end
+
+	self.m_keys                = {}
+	self.m_registered_keybinds = {}
+	self.m_keymap_by_code      = {}
+	self.m_keymap_by_name      = {}
 
 	for name, code in pairs(eVirtualKeyCodes) do
 		local key = Key.new(code, name)
-		table.insert(instance.m_keys, key)
-		instance.m_keymap_by_code[code] = key
-		instance.m_keymap_by_name[name] = key
+		table.insert(self.m_keys, key)
+		self.m_keymap_by_code[code] = key
+		self.m_keymap_by_name[name] = key
 	end
 
 	event.register_handler(menu_event.Wndproc, function(_, msg, wParam, _)
-		instance:EventHandler(_, msg, wParam, _)
+		self:EventHandler(_, msg, wParam, _)
 	end)
 
 	ThreadManager:RegisterLooped("SS_KEYMGR", function()
-		instance:BeginFrame()
-		instance:HandleCallbacks()
-		instance:EndFrame()
+		self:BeginFrame()
+		self:HandleCallbacks()
+		self:EndFrame()
 	end)
 
-	return instance
+	self.m_initialized = true
+	return self
 end
 
 -- still not perfectly in sync but much better than the duct taped approach of manually clearing just_pressed in a separate fiber 🤦‍♂️
+---@private
 function KeyManager:BeginFrame()
 	for _, key in pairs(self.m_keys) do
 		key:BeginFrame()
 	end
 end
 
+---@private
 function KeyManager:EndFrame() end -- redundant
+
+---@private
+---@param msg integer
+---@param wParam integer
+function KeyManager:OnEvent(msg, wParam)
+	local key = self:GetKeyByCode(wParam)
+	if (not key) then return end
+
+	if (KeyDownMessageSet:Contains(msg)) then
+		key:UpdateState(true)
+	elseif (KeyUpMessageSet:Contains(msg)) then
+		key:UpdateState(false)
+	end
+end
+
+---@private
+function KeyManager:HandleCallbacks()
+	for _, key in pairs(self.m_registered_keybinds) do
+		if (not key.callback) then
+			goto continue
+		end
+
+		if (not key.m_repeat_on_hold) then
+			if (key.m_just_pressed) then
+				key.callback()
+			end
+		else
+			if (key.m_pressed) then
+				key.callback()
+			end
+		end
+
+		::continue::
+	end
+end
+
+---@private
+function KeyManager:EventHandler(_, msg, wParam, _)
+	if (msg == WM_XBUTTONDOWN or msg == WM_XBUTTONUP) then
+		-- the value for secondary mouse buttons is different between keydown and keyup events
+		local xButton = (wParam >> 16)
+		if (xButton == 1) then
+			wParam = 0x10020
+		elseif (xButton == 2) then
+			wParam = 0x20040
+		end
+	end
+
+	if (msg == WM_LBUTTONUP) then
+		wParam = 0x1
+	elseif (msg == WM_RBUTTONUP) then
+		wParam = 0x2
+	end
+	self:OnEvent(msg, wParam)
+end
 
 ---@param code eVirtualKeyCodes
 ---@return Key|nil
@@ -376,6 +451,19 @@ function KeyManager:IsAnyKeyPressed()
 	end
 
 	return false, nil, nil
+end
+
+---@param key eVirtualKeyCodes|string
+---@return boolean
+function KeyManager:IsKeyReleased(key)
+	return not self:IsKeyPressed(key)
+end
+
+---@param key eVirtualKeyCodes|string
+---@return boolean
+function KeyManager:IsKeyJustReleased(key)
+	local _key = self:GetKey(key)
+	return _key and _key.m_just_released or false
 end
 
 ---@param keybindName string
@@ -437,29 +525,27 @@ function KeyManager:IsKeybindJustPressed(keybindName)
 	return false
 end
 
----@param msg integer
----@param wParam integer
-function KeyManager:OnEvent(msg, wParam)
-	local key = self:GetKeyByCode(wParam)
-	if (not key) then
-		return
+---@param keybindName string
+---@return boolean
+function KeyManager:IsKeybindJustReleased(keybindName)
+	local controlType, key = self:GetKeybind(keybindName)
+	if (not key) then return false end
+
+	if (controlType == eControlType.KEYBOARD) then
+		return self:IsKeyJustReleased(key)
 	end
 
-	if (msg == WM_KEYDOWN or
-			msg == WM_SYSKEYDOWN or
-			msg == WM_XBUTTONDOWN or
-			msg == WM_LBUTTONDOWN or
-			msg == WM_RBUTTONDOWN
-		) then
-		key:UpdateState(true)
-	elseif (msg == WM_KEYUP or
-			msg == WM_SYSKEYUP or
-			msg == WM_XBUTTONUP or
-			msg == WM_LBUTTONUP or
-			msg == WM_RBUTTONUP
-		) then
-		key:UpdateState(false)
+	if (controlType == eControlType.CONTROLLER and type(key) == "number") then
+		return key ~= 0 and PAD.IS_CONTROL_JUST_RELEASED(0, key)
 	end
+
+	return false
+end
+
+---@param keybindName string
+---@return boolean
+function KeyManager:IsKeybindReleased(keybindName)
+	return not self:IsKeybindPressed(keybindName)
 end
 
 ---@param key eVirtualKeyCodes | string
@@ -525,45 +611,8 @@ function KeyManager:RemoveKeybind(key)
 	self.m_registered_keybinds[k.m_code] = nil
 end
 
-function KeyManager:HandleCallbacks()
-	for _, key in pairs(self.m_registered_keybinds) do
-		if (not key.callback) then
-			goto continue
-		end
-
-		if (not key.m_repeat_on_hold) then
-			if (key.m_just_pressed) then
-				key.callback()
-			end
-		else
-			if (key.m_pressed) then
-				key.callback()
-			end
-		end
-
-		::continue::
-	end
-end
-
-function KeyManager:EventHandler(_, msg, wParam, _)
-	if (msg == WM_XBUTTONDOWN or msg == WM_XBUTTONUP) then
-		-- the value for secondary mouse buttons is different between keydown and keyup events
-		local xButton = (wParam >> 16)
-		if (xButton == 1) then
-			wParam = 0x10020
-		elseif (xButton == 2) then
-			wParam = 0x20040
-		end
-	end
-
-	if (msg == WM_LBUTTONUP) then
-		wParam = 0x1
-	elseif (msg == WM_RBUTTONUP) then
-		wParam = 0x2
-	end
-	self:OnEvent(msg, wParam)
-end
-
 --#endregion
 
-return KeyManager
+local singleInstance <const> = KeyManager()
+_G.KeyManager                = singleInstance
+return singleInstance

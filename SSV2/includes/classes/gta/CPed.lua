@@ -41,7 +41,7 @@ local CPed = Class("CPed", { parent = CEntity, symbolic_size = 0x161C })
 ---@param ped handle
 ---@return CPed
 function CPed:init(ped)
-	if (not Game.IsScriptHandle(ped) or not ENTITY.IS_ENTITY_A_PED(ped)) then
+	if (not ENTITY.IS_ENTITY_A_PED(ped)) then
 		error("Invalid entity!")
 	end
 

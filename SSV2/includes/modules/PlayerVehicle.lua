@@ -8,7 +8,6 @@
 
 
 local StateMachine     = require("includes.structs.StateMachine")
-local HandlingEditor   = require("includes.modules.HandlingEditor")
 local Speedometer      = require("includes.features.Speedometer")
 local FeatureMgr       = require("includes.services.FeatureManager")
 local NosMgr           = require("includes.features.vehicle.nos")
@@ -23,7 +22,9 @@ local CarCrash         = require("includes.features.vehicle.car_crashes")
 local VehMines         = require("includes.features.vehicle.mines")
 local MiscVehicle      = require("includes.features.vehicle.misc_vehicle")
 local CobraManeuver    = require("includes.features.vehicle.cobra_maneuver")
+local FlagController   = require("includes.features.vehicle.flag_controller")
 local Stancer          = require("includes.features.vehicle.stancer")
+local ManualGearBox    = require("includes.features.vehicle.manual_gearbox")
 
 ---@class GenericToggleable
 ---@field is_toggled boolean
@@ -42,19 +43,20 @@ local Stancer          = require("includes.features.vehicle.stancer")
 ---@field private m_feat_mgr FeatureManager
 ---@field private m_nos_mgr NosMgr
 ---@field private m_abs_mgr BFD
----@field private m_lctrl_mgr LaunchControlMgr
+---@field private m_lctrl_mgr LaunchControl
 ---@field private m_threads array<Thread>
 ---@field private m_default_max_speed float
 ---@field private m_has_loud_radio boolean
 ---@field private m_generic_toggleables table<string, GenericToggleable>
----@field private m_handling_editor HandlingEditor
 ---@field public m_default_xenon_lights { enabled: boolean, index: integer }
 ---@field public m_default_tire_smoke { enabled: boolean, color: vec3 }
 ---@field public m_autopilot { eligible: boolean, state: eAutoPilotState, initial_nozzle_pos: integer, last_interrupted?: seconds }
 ---@field public m_engine_swap_compatible boolean
 ---@field public m_is_shooting_flares boolean
 ---@field public m_is_flatbed boolean cache it so we don't have to call natives in UI threads
+---@field public m_flag_controller VehicleFlagController
 ---@field public m_stancer Stancer
+---@field public m_manual_gearbox ManualGearBox
 ---@overload fun(handle: handle, opts?: { noassert: boolean }): PlayerVehicle
 local PlayerVehicle = Class("PlayerVehicle", { parent = Vehicle })
 
@@ -98,12 +100,13 @@ function PlayerVehicle:AddFeature(feat)
 end
 
 function PlayerVehicle:InitFeatures()
-	self.m_feat_mgr  = FeatureMgr.new(self)
+	self.m_feat_mgr       = FeatureMgr.new(self)
 	---@diagnostic disable-next-line
-	self.m_lctrl_mgr = self.m_feat_mgr:Add(LaunchControlMgr.new(self))
-	self.m_nos_mgr   = self.m_feat_mgr:Add(NosMgr.new(self))
-	self.m_abs_mgr   = self.m_feat_mgr:Add(BFD.new(self))
-	self.m_stancer   = self.m_feat_mgr:Add(Stancer.new(self))
+	self.m_lctrl_mgr      = self.m_feat_mgr:Add(LaunchControlMgr.new(self))
+	self.m_nos_mgr        = self.m_feat_mgr:Add(NosMgr.new(self))
+	self.m_abs_mgr        = self.m_feat_mgr:Add(BFD.new(self))
+	self.m_stancer        = self.m_feat_mgr:Add(Stancer.new(self))
+	self.m_manual_gearbox = self.m_feat_mgr:Add(ManualGearBox.new(self))
 
 	self.m_feat_mgr:Add(FlappyDoors.new(self))
 	self.m_feat_mgr:Add(DriftMode.new(self))
@@ -117,7 +120,7 @@ function PlayerVehicle:InitFeatures()
 end
 
 function PlayerVehicle:InitHandlingEditor()
-	self.m_handling_editor = HandlingEditor:init(self)
+	self.m_flag_controller = FlagController:init(self)
 end
 
 ---@return PlayerVehicle
@@ -166,7 +169,9 @@ end
 
 ---@param handle handle
 function PlayerVehicle:Set(handle)
-	if (handle == self.m_handle) then return end
+	if (handle == self.m_handle or not ENTITY.IS_ENTITY_A_VEHICLE(handle)) then
+		return
+	end
 
 	self.m_handle                       = handle
 	local new_model                     = ENTITY.GET_ENTITY_MODEL(handle)
@@ -181,12 +186,22 @@ function PlayerVehicle:Set(handle)
 	self.m_default_tire_smoke.enabled   = VEHICLE.IS_TOGGLE_MOD_ON(handle, 20)
 	self.m_autopilot.eligible           = self:IsAircraft()
 
-	if (GVars.features.vehicle.no_turbulence and VEHICLE.IS_THIS_MODEL_A_PLANE(new_model)) then
+
+	local feats_cfg = GVars.features.vehicle
+	if (feats_cfg.no_turbulence and VEHICLE.IS_THIS_MODEL_A_PLANE(new_model)) then
 		VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(handle, 0.0)
 	end
 
-	self.m_handling_editor:ApplyPresets()
+	if (feats_cfg.default_station.enabled) then
+		self:SetRadioStation(feats_cfg.default_station.station_name)
+	end
+
+	self.m_flag_controller:ApplyPresets()
 	self.m_stancer:OnNewVehicle()
+
+	if (feats_cfg.manual_gearbox.enabled) then
+		self.m_manual_gearbox:OnNewVehicle()
+	end
 	-- self:ResumeThreads()
 	-- self.m_feat_mgr:OnEnable()
 end
@@ -204,7 +219,8 @@ function PlayerVehicle:Reset()
 	self:RestoreExhaustPops()
 	self:RestoreAllPatches()
 	self:ResetAllGenericToggleables()
-	self.m_handling_editor:Reset()
+	self.m_flag_controller:Reset()
+	self.m_manual_gearbox:Reset()
 
 	--[[
 		We're resetting default stance when the player switches vehicles because we currently don't have
@@ -400,7 +416,28 @@ end
 
 ---@return number
 function PlayerVehicle:GetCurrentGear()
+	if (GVars.features.vehicle.manual_gearbox.enabled and self.m_manual_gearbox) then
+		return self.m_manual_gearbox:GetCurrentGear()
+	end
 	return VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(self:GetHandle())
+end
+
+---@return string
+function PlayerVehicle:GetCurrentGearName()
+	local current     = self:GetCurrentGear()
+	local current_str = tostring(current)
+	if (current <= 0 or current > 100) then
+		return self:IsReversing() and "R" or "N"
+	end
+	return current_str
+end
+
+---@return boolean
+function PlayerVehicle:IsReversing()
+	if (GVars.features.vehicle.manual_gearbox.enabled and self.m_manual_gearbox) then
+		return self.m_manual_gearbox:IsInReverse()
+	end
+	return ENTITY.GET_ENTITY_SPEED_VECTOR(self:GetHandle(), true).y < 0
 end
 
 ---@param toggle boolean

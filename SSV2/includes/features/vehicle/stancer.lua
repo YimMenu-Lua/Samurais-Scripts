@@ -46,6 +46,7 @@ end
 ---@field private m_last_wheel_mod_check_time milliseconds
 ---@field private m_filename "stancer.json"
 ---@field private m_saved_models table<string, table<eWheelAxle, StanceObject>>
+---@field private m_lock { toggled: boolean, owner: string? }
 ---@field public m_base_values table<eWheelAxle, StanceObject>
 ---@field public m_deltas table<eWheelAxle, StanceObject>
 ---@field public m_wheels table<eWheelAxle, array<CWheel>>
@@ -78,6 +79,7 @@ function Stancer:Init()
 	self.m_last_tick                 = 0
 	self.m_last_wheel_mod_check_time = 0
 	self.m_reloading                 = false
+	self.m_lock                      = { toggled = false, owner = nil }
 	self.m_bounce_mode               = {
 		enabled = false,
 		margin  = 0.09,
@@ -115,6 +117,23 @@ end
 
 function Stancer:ShouldRun()
 	return self.m_entity and self.m_entity:IsValid()
+end
+
+-- Marks Stancer as locked and owned by a feature
+---@param ownerName string
+function Stancer:Lock(ownerName)
+	self.m_lock.toggled = true
+	self.m_lock.owner   = ownerName
+end
+
+function Stancer:Unlock()
+	self.m_lock.toggled = false
+	self.m_lock.owner   = nil
+end
+
+---@return boolean locked, string? featureName
+function Stancer:IsLocked()
+	return self.m_lock.toggled, self.m_lock.owner
 end
 
 function Stancer:InitSavedModels()

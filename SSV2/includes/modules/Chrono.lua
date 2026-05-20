@@ -356,7 +356,7 @@ end
 --------------------------------------
 ---@class DateTime
 ---@field private m_epoch seconds
----@field private m_dt osdate
+---@field private m_dt osdatefixed
 ---@field private m_fmt_warn boolean
 ---@overload fun(p1: (seconds|osdateparam)?): DateTime
 local DateTime <const> = { __type = "DateTime" }
@@ -368,7 +368,7 @@ setmetatable(DateTime, {
 	end
 })
 
----@param p1 (seconds|osdate)?
+---@param p1 (seconds|osdate|osdatefixed)?
 ---@return DateTime
 function DateTime.new(p1)
 	local epoch
@@ -436,7 +436,7 @@ function DateTime:Epoch()
 	return self.m_epoch
 end
 
----@return osdate
+---@return osdatefixed
 function DateTime:AsTable()
 	return self.m_dt
 end

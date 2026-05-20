@@ -23,7 +23,12 @@ local eLaunchControlState <const> = {
 	CANCELED = 5
 }
 
----@class LaunchControlMgr
+---@return boolean
+local function is_control_released_2(action)
+	return (PAD.IS_CONTROL_RELEASED(0, action) or PAD.IS_DISABLED_CONTROL_RELEASED(0, action))
+end
+
+---@class LaunchControl
 ---@field private m_entity PlayerVehicle
 ---@field private m_is_active boolean
 ---@field private m_thread? Thread
@@ -32,7 +37,9 @@ local eLaunchControlState <const> = {
 ---@field private m_last_pop_time milliseconds
 ---@field private m_default_pops_off boolean
 ---@field private m_shocking_event_handle? handle
----@overload fun(pv: PlayerVehicle): LaunchControlMgr
+---@field private m_rolling_speed_lock integer?
+---@field private m_from_roll boolean
+---@overload fun(pv: PlayerVehicle): LaunchControl
 ---@diagnostic disable-next-line
 local LaunchControl = setmetatable({}, FeatureBase)
 LaunchControl.__index = LaunchControl
@@ -57,7 +64,7 @@ end
 function LaunchControl:ShouldRun()
 	return self.m_entity
 		and self.m_entity:IsValid()
-		and self.m_entity:IsCar()
+		and self.m_entity:IsLandVehicle()
 		and LocalPlayer:IsAlive()
 		and LocalPlayer:IsDriving()
 		and (not GVars.features.vehicle.performance_only or self.m_entity:IsPerformanceCar())
@@ -78,11 +85,9 @@ end
 
 function LaunchControl:Update()
 	local PV = self.m_entity
-	if (PV:IsElectric()) then
-		return
-	end
+	if (PV:IsElectric()) then return end
 
-	local handle = PV:GetHandle()
+	local handle       = PV:GetHandle()
 	local rpmThreshold = {
 		min = GVars.features.vehicle.bangs_rpm_min / 1e4,
 		max = GVars.features.vehicle.bangs_rpm_max / 1e4
@@ -115,20 +120,15 @@ function LaunchControl:Update()
 			self.m_default_pops_off = true
 		end
 
-		local gear = PV:GetCurrentGear()
-		if (gear == 0) then
-			return
-		end
-
 		if (not PV:IsMoving()) then
 			rpmThreshold.min = rpmThreshold.min - 0.15
 		elseif (PV:GetHandlingFlag(Enums.eVehicleHandlingFlags.FREEWHEEL_NO_GAS)) then
 			rpmThreshold.min = rpmThreshold.min + 0.2
 		end
 
-		local rpm = PV:GetRPM()
-
-		if (PAD.IS_CONTROL_RELEASED(0, 71) and (rpm < 1.0) and math.is_inrange(rpm, rpmThreshold.min, rpmThreshold.max) and (gear ~= 0)) then
+		local rpm      = PV:GetRPM()
+		local released = is_control_released_2(71)
+		if (released and (rpm < 1.0) and math.is_inrange(rpm, rpmThreshold.min, rpmThreshold.max) and not PV:IsReversing()) then
 			if (Time.Millis() < self.m_last_pop_time) then
 				return
 			end
@@ -171,20 +171,93 @@ function LaunchControl:RestoreExhaustPops()
 	AUDIO.ENABLE_VEHICLE_EXHAUST_POPS(PV:GetHandle(), true)
 end
 
+---@param veh PlayerVehicle
+---@param rolling boolean
+function LaunchControl:Charge(veh, rolling)
+	local r, g, b, a = 255, 255, 255, 255
+	local isMoving   = veh:IsMoving()
+	local cond2      = rolling and KeyManager:IsKeybindPressed("rolling_launch") or (isMoving == false and PAD.IS_CONTROL_PRESSED(0, 72))
+	if (PAD.IS_CONTROL_PRESSED(0, 71) and cond2 and not veh:IsDriftButtonPressed()) then
+		if (veh:GetEngineHealth() <= 400) then
+			Notifier:ShowWarning("Samurai's Scripts", _T("VEH_LAUNCH_CTRL_ERR"), false, 5)
+			sleep(5000)
+			return
+		end
+
+		self.m_timer:Resume()
+		self.m_state = eLaunchControlState.LOADING
+		if (not rolling) then
+			veh:Freeze()
+		else
+			if (not self.m_rolling_speed_lock) then
+				self.m_rolling_speed_lock = veh:GetSpeed()
+			else
+				local cvehicle = veh:Resolve()
+				VEHICLE.SET_VEHICLE_MAX_SPEED(veh:GetHandle(), self.m_rolling_speed_lock)
+				cvehicle.m_throttle:set_float(0.45)
+				cvehicle.m_throttle_input:set_float(0.45)
+				cvehicle.m_rpm:set_float(0.45)
+				cvehicle.m_rpm_2:set_float(0.45)
+			end
+		end
+
+		if (self.m_timer:IsDone()) then
+			r, g, b, a = 111, 194, 118, 255
+		end
+
+		Game.DrawText(
+			vec2:new(0.42, 0.936),
+			_T("VEH_LAUNCH_CTRL"),
+			Color(r, g, b, a),
+			vec2:new(0, 0.35),
+			2
+		)
+
+		Game.DrawProgressBar(
+			vec2:new(0.53, 0.95),
+			0.1,
+			0.01,
+			Color(r, g, b, a),
+			Color(0, 0, 0, 150),
+			math.min(1, math.max(0, self.m_timer:Elapsed() / 2000))
+		)
+
+		if (self.m_timer:IsDone() and self.m_state == eLaunchControlState.LOADING) then
+			self.m_state     = eLaunchControlState.READY
+			self.m_from_roll = self.m_from_roll or rolling
+			self.m_timer:Pause()
+		end
+	elseif (self.m_state ~= eLaunchControlState.NONE and self.m_state ~= eLaunchControlState.READY) then
+		if (PAD.IS_CONTROL_RELEASED(0, 71) or not cond2 or not self:ShouldRun()) then
+			r, g, b, a = 255, 255, 255, 255
+			if (not rolling) then
+				veh:Unfreeze()
+			else
+				self.m_rolling_speed_lock = nil
+				VEHICLE.SET_VEHICLE_MAX_SPEED(veh:GetHandle(), -1)
+			end
+			self.m_timer:Reset()
+			self.m_timer:Pause()
+			self.m_from_roll = false
+			self.m_state     = eLaunchControlState.CANCELED
+		end
+	end
+end
+
 function LaunchControl:OnTick()
 	local PV = self.m_entity
 	if (not PV or not PV:IsValid() or not GVars.features.vehicle.launch_control) then
-		sleep(250)
+		yield()
 		return
 	end
 
 	if (GVars.features.vehicle.performance_only and not self.m_entity:IsPerformanceCar()) then
-		sleep(250)
+		yield()
 		return
 	end
 
 	if (not LocalPlayer:IsDriving()) then
-		sleep(250)
+		yield()
 		return
 	end
 
@@ -198,63 +271,17 @@ function LaunchControl:OnTick()
 	end
 
 	local handle = PV:GetHandle()
-	local r, g, b, a = 255, 255, 255, 255
-
 	if (not self.m_timer) then
-		self.m_timer = Timer.new(2000)
-		self.m_timer:Pause()
+		self.m_timer = Timer.new(2000, true)
 	end
 
-	if (not PV:IsMoving() and PV:IsEngineOn()) then
-		if (PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_PRESSED(0, 72) and not PV:IsDriftButtonPressed()) then
-			if (PV:GetEngineHealth() <= 400) then
-				Notifier:ShowWarning("Samurai's Scripts", _T("VEH_LAUNCH_CTRL_ERR"), false, 5)
-				sleep(5000)
-				return
-			end
-
-			self.m_timer:Resume()
-			self.m_state = eLaunchControlState.LOADING
-			PV:Freeze()
-
-			if (self.m_timer:IsDone()) then
-				r, g, b, a = 111, 194, 118, 255
-			end
-
-			Game.DrawText(
-				vec2:new(0.42, 0.936),
-				_T("VEH_LAUNCH_CTRL"),
-				Color(r, g, b, a),
-				vec2:new(0, 0.35),
-				2
-			)
-
-			Game.DrawProgressBar(
-				vec2:new(0.53, 0.95),
-				0.1,
-				0.01,
-				Color(r, g, b, a),
-				Color(0, 0, 0, 150),
-				math.min(1, math.max(0, self.m_timer:Elapsed() / 2000))
-			)
-
-			if (self.m_timer:IsDone() and self.m_state == eLaunchControlState.LOADING) then
-				self.m_state = eLaunchControlState.READY
-				self.m_timer:Pause()
-			end
-		elseif (self.m_state ~= eLaunchControlState.NONE and self.m_state ~= eLaunchControlState.READY) then
-			if (PAD.IS_CONTROL_RELEASED(0, 71) or PAD.IS_CONTROL_RELEASED(0, 72) or not self:ShouldRun()) then
-				r, g, b, a = 255, 255, 255, 255
-				PV:Unfreeze()
-				self.m_timer:Reset()
-				self.m_timer:Pause()
-				self.m_state = eLaunchControlState.CANCELED
-			end
-		end
+	local rolling = PV:IsCar() and PV:IsMoving() and not PV:IsReversing() and math.is_inrange(PV:GetSpeed(), 8, PV:GetMaxSpeed())
+	if (PV:IsEngineOn()) then
+		self:Charge(PV, rolling)
 	end
 
 	if (self.m_state == eLaunchControlState.READY) then
-		if (PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_RELEASED(0, 72)) then
+		if (PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_RELEASED(0, 72) and not KeyManager:IsKeyPressed(eVirtualKeyCodes.N)) then
 			local realistic  = GVars.features.vehicle.launch_control_mode == eLaunchMode.REALISTIC
 			local max_speed  = realistic and PV:GetDefaultMaxSpeed() - 1 or PV:GetMaxSpeed() - 1
 			local max_force  = realistic and 2000 or 5000
@@ -262,33 +289,44 @@ function LaunchControl:OnTick()
 			local start_time = Game.GetGameTimer()
 			local end_time   = start_time + 1200
 
+			if (self.m_from_roll) then
+				max_push = math.min(PV:GetMaxSpeed(), PV:GetSpeed() + 15)
+			end
+
 			PHYSICS.SET_IN_ARENA_MODE(true)
 			VEHICLE.SET_VEHICLE_MAX_LAUNCH_ENGINE_REVS_(handle, 0)
 			PV:Unfreeze()
+			self.m_rolling_speed_lock = nil
+			VEHICLE.SET_VEHICLE_MAX_SPEED(handle, -1)
 			self.m_state = eLaunchControlState.RUNNING
 
 			while (PAD.IS_CONTROL_PRESSED(0, 71) and PV:GetSpeed() < max_push) do
-				local now   = Game.GetGameTimer()
-				local t     = math.min(1.0, (now - start_time) / (end_time - start_time))
-				local power = math.lerp(0.0, max_force, t)
-				ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
-					handle,
-					1,
-					0.0,
-					power,
-					0.0,
-					false,
-					true,
-					false,
-					false
-				)
+				if (not self.m_from_roll) then
+					local now   = Game.GetGameTimer()
+					local t     = math.min(1.0, (now - start_time) / (end_time - start_time))
+					local power = math.lerp(0.0, max_force, t)
+					ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+						handle,
+						1,
+						0.0,
+						power,
+						0.0,
+						false,
+						true,
+						false,
+						false
+					)
+				else
+					VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(handle, 10)
+				end
 
 				yield()
 			end
 
 			VEHICLE.SET_VEHICLE_MAX_LAUNCH_ENGINE_REVS_(handle, 1.0)
 			PHYSICS.SET_IN_ARENA_MODE(false)
-			self.m_state = eLaunchControlState.NONE
+			self.m_state     = eLaunchControlState.NONE
+			self.m_from_roll = false
 			self.m_timer:Reset()
 			self.m_timer:Pause()
 		end

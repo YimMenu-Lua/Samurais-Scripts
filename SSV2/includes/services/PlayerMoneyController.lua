@@ -7,6 +7,17 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local TransactionSystemFuncs <const> = {
+	[0] = {
+		transfer   = NETSHOPPING.NET_GAMESERVER_TRANSFER_BANK_TO_WALLET,
+		get_status = NETSHOPPING.NET_GAMESERVER_TRANSFER_BANK_TO_WALLET_GET_STATUS
+	},
+	[1] = {
+		transfer   = NETSHOPPING.NET_GAMESERVER_TRANSFER_WALLET_TO_BANK,
+		get_status = NETSHOPPING.NET_GAMESERVER_TRANSFER_WALLET_TO_BANK_GET_STATUS
+	}
+}
+
 ---@class PlayerMoneyController
 ---@field private m_bank_balance integer
 ---@field private m_wallet_balance integer
@@ -85,23 +96,22 @@ function PlayerMoneyController:UseTransactionSystem(amount, operation)
 	end
 
 	local success, p0, p1 = false, 0, false
-	success, p0, p1 = NETSHOPPING.NET_GAMESERVER_GET_SESSION_STATE_AND_STATUS(p0, p1)
+	success, p0, p1       = NETSHOPPING.NET_GAMESERVER_GET_SESSION_STATE_AND_STATUS(p0, p1)
 	if (not success or p0 ~= 8) then
 		log.warning("Transaction failed!")
 		return false
 	end
 
-	local tansferFunc = (operation == 0) and NETSHOPPING.NET_GAMESERVER_TRANSFER_BANK_TO_WALLET or NETSHOPPING.NET_GAMESERVER_TRANSFER_WALLET_TO_BANK
-	local statusFunc  = (operation == 0) and NETSHOPPING.NET_GAMESERVER_TRANSFER_BANK_TO_WALLET_GET_STATUS or NETSHOPPING.NET_GAMESERVER_TRANSFER_WALLET_TO_BANK_GET_STATUS
-
-	if (not tansferFunc(stats.get_character_index(), amount)) then
+	local funcs_t = TransactionSystemFuncs[operation]
+	if (not funcs_t.transfer(stats.get_character_index(), amount)) then
 		log.warning("Transaction failed!")
 		return false
 	end
 
-	local status = statusFunc()
+	local get_status = funcs_t.get_status
+	local status     = get_status()
 	while (status == 1) do
-		status = statusFunc()
+		status = get_status()
 		yield()
 	end
 
@@ -144,6 +154,8 @@ function PlayerMoneyController:Deposit(amount)
 end
 
 function PlayerMoneyController:Update()
+	if (not Game.IsOnline()) then return end
+
 	if (not self.m_last_tick:HasElapsed(1000)) then
 		return
 	end

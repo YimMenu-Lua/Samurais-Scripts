@@ -32,13 +32,12 @@ local CVehicleModelInfo = CStructView("CVehicleModelInfo", 0x08DC)
 ---@return CVehicleModelInfo
 function CVehicleModelInfo.new(ptr)
 	return setmetatable({
-		m_ptr               = ptr,
-		m_vehicle_layout    = ptr:add(0x00B0),
-		m_vehicle_type      = ptr:add(0x0340),
-		m_wheel_scale       = ptr:add(0x048C),
-		m_wheel_scale_rear  = ptr:add(0x0490),
-		m_model_info_flags  = ptr:add(0x057C),
-		m_throttle_position = ptr:add(0x08D8),
+		m_ptr              = ptr,
+		m_vehicle_layout   = ptr:add(0x00B0),
+		m_vehicle_type     = ptr:add(0x0340),
+		m_wheel_scale      = ptr:add(0x048C),
+		m_wheel_scale_rear = ptr:add(0x0490),
+		m_model_info_flags = ptr:add(0x057C),
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, CVehicleModelInfo)
 end

@@ -89,8 +89,8 @@ end
 ---@field private m_cached_flags array<Pair<string, boolean>>
 ---@field private m_is_default_preset boolean
 ---@field private m_is_user_generated boolean
----@field private m_on_enable_callback? fun(self: HandlingPreset, editor: HandlingEditor): any
----@field private m_on_disable_callback? fun(self: HandlingPreset, editor: HandlingEditor): any
+---@field private m_on_enable_callback? fun(self: HandlingPreset, editor: VehicleFlagController): any
+---@field private m_on_disable_callback? fun(self: HandlingPreset, editor: VehicleFlagController): any
 ---@field public m_callback_defs_filename string
 ---@field public m_deltas table<eHandlingEditorTypes, table<string, boolean>>
 ---@field public m_vehicle_bitset integer -- bitset of eVehicleType (cars and bikes only)
@@ -183,8 +183,8 @@ function HandlingPreset:Serialize()
 end
 
 ---@private
----@param func fun(self: HandlingPreset, editor: HandlingEditor)
----@param editorInst HandlingEditor
+---@param func fun(self: HandlingPreset, editor: VehicleFlagController)
+---@param editorInst VehicleFlagController
 ---@param funcIndex integer -- 1 OnEnable | 2 OnDisable
 function HandlingPreset:__run(func, editorInst, funcIndex)
 	if (type(func) ~= "function") then return end
@@ -222,12 +222,12 @@ function HandlingPreset:__run(func, editorInst, funcIndex)
 	end)
 end
 
----@param editorInst HandlingEditor
+---@param editorInst VehicleFlagController
 function HandlingPreset:OnEnable(editorInst)
 	self:__run(self.m_on_enable_callback, editorInst, 1)
 end
 
----@param editorInst HandlingEditor
+---@param editorInst VehicleFlagController
 function HandlingPreset:OnDisable(editorInst)
 	self:__run(self.m_on_disable_callback, editorInst, 2)
 end

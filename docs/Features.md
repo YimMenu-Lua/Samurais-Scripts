@@ -195,7 +195,7 @@ _Vehicle-centric features extending the capabilities of vanilla vehicles._
 
 - **Launch Control**
 
-  Simulates launch control by making your vehicle accelerate faster from a standstill and decreasing wheel spin.
+  Simulates launch control by making your vehicle accelerate faster from a standstill and decreasing wheel spin. Also provides a "Rolling" mode where you can hold a button while moving forward to build boost.
 
 - **IV-Style Exit**
 
@@ -216,6 +216,17 @@ _Vehicle-centric features extending the capabilities of vanilla vehicles._
 - **Drift Minigame**
 
   Score points by drifting around Los Santos. You can bank your points for cash in Single Player.
+
+- **Manual Gearbox**
+
+  Allows you to manually switch gears when driving cars and bikes. Has two modes:
+
+  - **Manual With Clutch**: Requires pressing the clutch to change gears _(simplified, no stall)_.
+  - **Sequential**: Directly shift up/down without a clutch.
+
+- **Default Radio**
+
+  Select a default radio station to be automatically set each time you switch vehicles.
 
 - **Ram _(AKA Shunt)_**
 

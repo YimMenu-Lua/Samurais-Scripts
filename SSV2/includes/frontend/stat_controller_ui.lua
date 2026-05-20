@@ -14,7 +14,7 @@ local statChildSize             = vec2:new(0, 170)
 local statSearchBuff            = ""
 local newStatBuff               = { name = "", type = "", lock_val = nil, autolock = false }
 local statDateEditBuff          = nil
-local currentYear               = os.date("*t").year
+local currentYear               = os.date("*t").year ---@cast currentYear integer
 local currentBitView            = 0 -- 0: hex | 1: binary
 local bitEditorIntChanged       = false
 local statTypes <const>         = { "int", "float", "money", "bool", "string", "posix", "time", "date", "bitset" }
@@ -160,7 +160,7 @@ local function drawBitsetEditor(mpStat, currentVal)
 	ImGui.TextDisabled(bitViewStr)
 end
 
----@param buff osdate
+---@param buff osdatefixed
 local function updateMaxDays(buff)
 	local day = dateTimeDefault_t["day"]
 	day.max = getMaxDaysForMonth(buff.year, buff.month)
@@ -327,6 +327,11 @@ local function drawStatCards()
 end
 
 GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "SUBTAB_MPSTAT_CONTROLLER", function()
+	if (not Game.IsOnline()) then
+		ImGui.Text(_T("GENERIC_UNAVAILABLE_SP"))
+		return
+	end
+
 	ImGui.SetWindowFontScale(1.3)
 	ImGui.Text(_T("SUBTAB_MPSTAT_CONTROLLER"))
 

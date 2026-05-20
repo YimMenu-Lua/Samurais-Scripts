@@ -308,7 +308,7 @@ return {
 	["VEH_AUTO_LOCK"] = "자동 잠금",
 	["VEH_FLAPPY_DOORS_TT"] = "내가 왜 이것을 만들었는지 전혀 모르겠습니다.",
 	["VEH_STRONG_CRASH_TT"] = "캠 흔들림, 화면 효과, 더 많은 변형 및 손상으로 충돌을 더욱 무섭게 만듭니다. 고속 충돌은 치명적일 수 있습니다.",
-	["VEH_LAUNCH_CTRL_TT"] = "발사 제어를 시뮬레이션합니다. 고성능 차량에만 사용 가능합니다.",
+	["VEH_LAUNCH_CTRL_TT"] = "두 가지 모드로 발사 제어를 시뮬레이션합니다.\n - 고정: [ACCELETRATE] + [BRAKE]를 3초 동안 누른 다음 브레이크를 놓습니다.\n - 롤링: 최대보다 낮은 속도로 이동하는 동안 [ACCELERATE] + 할당된 키 바인딩(기본값 [N])을 3초 동안 누른 다음 키 바인딩을 놓습니다.\n\n참고: 고정 모드는 '수동 기어박스'에서는 작동하지 않습니다.",
 	["VEH_FLAPPY_DOORS"] = "플래피 도어",
 	["VEH_LAUNCH_CTRL"] = "발사 제어",
 	["VEH_IV_EXIT_TT"] = "GTA IV의 차량 하차 스타일을 모방합니다. [F]를 1초 동안 누르면 엔진이 꺼지고, 보통을 누르면 계속 작동됩니다.",
@@ -965,5 +965,13 @@ return {
 	["YRV3_DASHBOARD_BOSS_REGISTER"] = "상사로 등록",
 	["MPSTAT_CONTROLLDER_DESC"] = "지속적으로 멀티플레이어 통계를 관리, 편집 및 잠급니다.",
 	["MPSTAT_LOCK_VAL_TT"] = "통계를 현재 값으로 잠급니다.\n\n참고: 토글을 활성화하면 백그라운드에 쓸 현재 통계 값을 캡처하고 저장하기 때문에 이 기능을 켜기 전에 원하는 값을 설정해야 합니다.",
-	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "자금 관리"
+	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "자금 관리",
+	["VEH_STANCE_LOCKED_FMT"] = "'Stancer'는 현재 '%s'이(가) 소유하고 있습니다. 사용자 인터페이스를 잠금 해제하려면 소유자 기능을 비활성화하십시오.",
+	["VEH_GEARBOX_SEQUENTIAL"] = "잇달아 일어나는",
+	["VEH_MANUAL_GEARBOX_TT"] = "자동차와 오토바이의 기어를 수동으로 변속할 수 있습니다.\n\n참고: 이 기능이 활성화되면 정지 상태에서는 '런치 컨트롤'이 작동하지 않습니다. '롤링' 모드만 작동합니다.",
+	["VEH_DEFAULT_RADIO_TT"] = "차량을 전환할 때마다 차량의 라디오가 선택된 방송국으로 강제 전환됩니다.\n\n[를 눌러 방송국을 선택할 수 있습니다. . .] 기능을 전환한 후 옵션 버튼을 누릅니다.",
+	["VEH_MANUAL_GEARBOX_TYPE"] = "기어박스 유형",
+	["VEH_DEFAULT_RADIO"] = "기본 라디오",
+	["VEH_MANUAL_GEARBOX"] = "수동변속기",
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "클러치가 있는 수동"
 }

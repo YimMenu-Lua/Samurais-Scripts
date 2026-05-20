@@ -160,7 +160,7 @@ end
 ---@param data { name: string, type: string, autolock?: boolean, lock_val?: anyval }
 function MPStatController:AddStat(data)
 	local statName = data.name
-	local list = self.m_stats
+	local list     = self.m_stats
 	if (list[statName]) then return end
 
 	local instance = MPStat.new(statName, data)
@@ -172,7 +172,9 @@ function MPStatController:AddStat(data)
 end
 
 function MPStatController:OnTick()
-	if (not Game.IsOnline() or not self.m_last_tick:HasElapsed(5000)) then
+	if (not Game.IsOnline()) then return end
+
+	if (not self.m_last_tick:HasElapsed(5000)) then
 		return
 	end
 

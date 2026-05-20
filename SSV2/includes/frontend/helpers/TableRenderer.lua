@@ -51,7 +51,7 @@ TableRenderer.__index = TableRenderer
 ---@return TableRenderer
 function TableRenderer.new()
 	REF_COUNT = REF_COUNT + 1
-	local uid = joaat("TABLE_RENDERER_" .. REF_COUNT)
+	local uid = _J("TABLE_RENDERER_" .. REF_COUNT)
 	return setmetatable({ m_uid = uid }, TableRenderer)
 end
 
@@ -59,18 +59,18 @@ end
 ---@param value anyval
 ---@param isKey boolean
 function TableRenderer:DrawObject(value, isKey)
-	local token  = TableRendererToken.new(value)
-	local txtCol = token.m_color
-	local v      = type(value) == "string" and _F('"%s"', value) or tostring(value)
+	local token = TableRendererToken.new(value)
+	local color = token.m_color
+	local v     = type(value) == "string" and _F('"%s"', value) or tostring(value)
 	if (not isKey) then
-		ImGui.TextColored(txtCol.r, txtCol.g, txtCol.b, txtCol.a, v)
+		ImGui.TextColored(color.r, color.g, color.b, color.a, v)
 		return
 	end
 
 	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0)
 	ImGui.TextColored(PURPLE.r, PURPLE.g, PURPLE.b, PURPLE.a, "[")
 	ImGui.SameLine()
-	ImGui.TextColored(txtCol.r, txtCol.g, txtCol.b, txtCol.a, v)
+	ImGui.TextColored(color.r, color.g, color.b, color.a, v)
 	ImGui.SameLine()
 	ImGui.TextColored(PURPLE.r, PURPLE.g, PURPLE.b, PURPLE.a, "]")
 	ImGui.PopStyleVar()

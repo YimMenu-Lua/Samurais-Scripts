@@ -32,27 +32,21 @@ local SGSL         = require("includes.services.SGSL")
 ---@field private m_last_vehicle? Vehicle
 ---@field private m_feat_mgr FeatureManager
 ---@field private m_money_controller PlayerMoneyController
----@field public CurrentMovementClipset? string
----@field public CurrentStrafeClipset? string
----@field public CurrentWeaponMovementClipset? string
+---@field private m_clipsets { movement?: string, strafe?: string, weapon?: string }
 ---@field protected m_internal CPed
 ---@field SetAsNoLongerNeeded nil
 LocalPlayer = Class("LocalPlayer", { parent = Player })
 
 
----@override
 LocalPlayer.new                 = nil
----@override
 LocalPlayer.Create              = nil
----@override
 LocalPlayer.Delete              = nil
----@override
 LocalPlayer.SetAsNoLongerNeeded = nil
 
-
-LocalPlayer.m_vehicle          = require("includes.modules.PlayerVehicle")
-LocalPlayer.m_money_controller = require("includes.services.PlayerMoneyController").new()
-LocalPlayer.m_feat_mgr         = require("includes.services.FeatureManager").new(LocalPlayer)
+LocalPlayer.m_clipsets          = {}
+LocalPlayer.m_vehicle           = require("includes.modules.PlayerVehicle")
+LocalPlayer.m_money_controller  = require("includes.services.PlayerMoneyController").new()
+LocalPlayer.m_feat_mgr          = require("includes.services.FeatureManager").new(LocalPlayer)
 
 ---@diagnostic disable
 LocalPlayer.m_feat_mgr:Add(Autoheal.new(LocalPlayer))
@@ -191,7 +185,10 @@ function LocalPlayer:OnVehicleSwitch()
 
 	veh:Reset()
 	sleep(500)
-	veh:Set(self:GetVehicleNative())
+	local nativeVeh = self:GetVehicleNative()
+	if (ENTITY.DOES_ENTITY_EXIST(nativeVeh)) then
+		veh:Set(nativeVeh)
+	end
 end
 
 function LocalPlayer:OnVehicleExit()
@@ -489,6 +486,7 @@ function LocalPlayer:SetMovementClipset(data, isJson)
 		self:ResetMovementClipsets()
 		s:sleep(100)
 
+		local clipsets    = self.m_clipsets
 		local handle      = self:GetHandle()
 		local clipsetName = isJson and data.Name or data.mvmt
 		if (clipsetName) then
@@ -497,20 +495,20 @@ function LocalPlayer:SetMovementClipset(data, isJson)
 				PED.SET_PED_MOVEMENT_CLIPSET(handle, clipsetName, 1.0)
 				PED.SET_PED_ALTERNATE_MOVEMENT_ANIM(handle, 0, "move_clown@generic", "idle", 1090519040, true)
 				TASK.SET_PED_CAN_PLAY_AMBIENT_IDLES(handle, true, true)
-				self.CurrentMovementClipset = clipsetName
+				clipsets.movement = clipsetName
 			end
 		end
 
 		if (data.wmvmt) then
 			PED.SET_PED_WEAPON_MOVEMENT_CLIPSET(handle, data.wmvmt)
-			self.CurrentWeaponMovementClipset = data.wmvmt
+			clipsets.weapon = data.wmvmt
 		end
 
 		if (data.strf) then
 			local loaded = pcall(TaskWait, Game.RequestClipSet, data.strf)
 			if (loaded) then
 				PED.SET_PED_STRAFE_CLIPSET(handle, data.strf)
-				self.CurrentStrafeClipset = data.strf
+				clipsets.strafe = data.strf
 			end
 		end
 
@@ -522,16 +520,12 @@ end
 
 function LocalPlayer:ResetMovementClipsets()
 	local handle = self:GetHandle()
-
 	PED.RESET_PED_MOVEMENT_CLIPSET(handle, 0.3)
 	PED.RESET_PED_STRAFE_CLIPSET(handle)
 	PED.RESET_PED_WEAPON_MOVEMENT_CLIPSET(handle)
 	PED.CLEAR_PED_ALTERNATE_MOVEMENT_ANIM(handle, 0, -8.0)
 	WEAPON.SET_WEAPON_ANIMATION_OVERRIDE(handle, 3839837909) -- default
-
-	self.CurrentMovementClipset       = nil
-	self.CurrentStrafeClipset         = nil
-	self.CurrentWeaponMovementClipset = nil
+	self.m_clipsets = {}
 end
 
 function LocalPlayer:Cleanup()
@@ -553,36 +547,113 @@ end
 
 ---@param bossType int8_t -- -1 = retire | 0 = CEO | 1 = MC
 function LocalPlayer:RegisterAsBoss(bossType)
+	if (not Game.IsOnline()) then return end
+
 	if (not math.is_inrange(bossType, -1, 1)) then
 		return
 	end
 
+	if (bossType == -1) then
+		self:Retire()
+		return
+	end
+
+	ThreadManager:Run(function()
+		local pid                 = self:GetID()
+		local GPBD_FM_3 <const>   = GGlobals.GPBD_FM_3:At(pid, 615):At(10)
+		local FM_SERVICES <const> = GGlobals.FM_SERVICES
+		local boss_offset_1       = SGSL:Get(SGSL.data.freemode_boss_offset_1):GetValue()
+		local boss_offset_2       = SGSL:Get(SGSL.data.freemode_boss_offset_2):GetValue()
+		local is_mc               = bossType == 1
+
+		GPBD_FM_3:WriteInt(pid)
+		GPBD_FM_3:At(433):WriteInt(bossType)
+		GPBD_FM_3:At(470):WriteInt(bossType)
+
+		local pUserID = malloc(0x4)
+		local pInt0   = malloc(0x4)
+		local pInt1   = malloc(0x4)
+		STATS.GET_BOSS_GOON_UUID(stats.get_character_index(), pInt0:get_address(), pInt1:get_address())
+		local strUserID, userID = NETWORK.NETWORK_PLAYER_GET_USERID(pid, pUserID:get_address())
+		local int0, int1        = pInt0:get_int(), pInt1:get_int()
+		free(pUserID)
+		free(pInt0)
+		free(pInt1)
+		GPBD_FM_3:At(9, 0):WriteInt(int0)
+		GPBD_FM_3:At(9, 1):WriteInt(int1)
+
+		local sgsl_obj       = SGSL:Get(SGSL.data.freemode_boss_uid_str)
+		local UID_GLOBAL     = sgsl_obj:AsGlobal()
+		local uid_str_offset = sgsl_obj:GetOffset(1)
+		UID_GLOBAL:At(uid_str_offset):At(2):WriteString(strUserID, 64)
+
+		local cloudTime = stats.get_int("MPX_BOSS_END_TIME")
+		if (cloudTime <= 0) then
+			cloudTime = NETWORK.GET_CLOUD_TIME_AS_INT()
+		else
+			cloudTime = cloudTime - 43200
+		end
+		stats.set_int("MPX_BOSS_END_TIME", cloudTime)
+		GPBD_FM_3:At(1):WriteInt(cloudTime)
+
+		if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Boss", 3)) then
+			DECORATOR.DECOR_SET_INT(self:GetHandle(), "Player_Boss", pid)
+		end
+
+		GPBD_FM_3:At(25):WriteInt(-1)
+		GPBD_FM_3:At(26):WriteInt(-1)
+		FM_SERVICES:At(boss_offset_1):ClearBit(15)
+		FM_SERVICES:At(boss_offset_2):At(227):WriteInt(-1)
+		FM_SERVICES:At(boss_offset_2):At(263):WriteInt(-1)
+
+		if (FM_SERVICES:At(boss_offset_2):GetPackedBit(7, 15)) then
+			FM_SERVICES:At(boss_offset_2):ClearPackedBit(7, 15)
+		end
+
+		GPBD_FM_3:At(4):ClearBit(30)
+		GPBD_FM_3:At(4):ClearBit(28)
+
+		if (FM_SERVICES:At(boss_offset_2):At(342):ReadInt() == 0) then
+			FM_SERVICES:At(boss_offset_2):At(342):WriteInt(1)
+		end
+
+		local textType = -1408096250
+		if (is_mc) then
+			STATS.PLAYSTATS_CHANGE_MC_ROLE(int0, int1, -1, -1, GPBD_FM_3:At(434):ReadInt(), 4, GPBD_FM_3:At(472):ReadInt()) -- p2 and p3 are supposed to be Global_1947782.f_2 and Global_1947782.f_3 respectively but I can't be bothered atm
+			textType = -1629413369
+		end
+
+		local business = is_mc and YRV3:GetClubhouse() or YRV3:GetOffice()
+		if (business) then
+			local businessName = business:GetCustomName()
+			GPBD_FM_3:At(106):WriteString(businessName, 64)
+			GPBD_FM_3:At(122):WriteInt(LOCALIZATION.LOCALIZATION_GET_SYSTEM_LANGUAGE())
+			-- STATS.PLAYSTATS_NAMED_USER_CONTENT_(true, bossType, int0, int1, textType, businessName, -81044133) -- this native is missing
+		end
+	end)
+end
+
+function LocalPlayer:Retire()
+	if not (Game.IsOnline() and self:IsBoss()) then return end
+
 	ThreadManager:Run(function()
 		local pid               = self:GetID()
 		local handle            = self:GetHandle()
-		local freemode_offset   = SGSL:Get(SGSL.data.freemode_boss_stuff):GetOffset(1)
-		local GPBD_FM_3 <const> = GGlobals.GPBD_FM_3:At(pid, 615)
-		local isRetiring        = bossType == -1
+		local freemode_offset   = SGSL:Get(SGSL.data.freemode_boss_offset_1):GetValue()
+		local GPBD_FM_3 <const> = GGlobals.GPBD_FM_3:At(pid, 615):At(10)
 
-		if (isRetiring) then
-			GGlobals.FREEMODE_GLOBAL:At(freemode_offset):ClearBit(17)
-			GPBD_FM_3:At(10):At(4):ClearBit(30)
-			if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Goon", 3) and DECORATOR.DECOR_EXIST_ON(handle, "Player_Goon")) then
-				DECORATOR.DECOR_REMOVE(handle, "Player_Goon")
-			end
-			if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Boss", 3) and DECORATOR.DECOR_EXIST_ON(handle, "Player_Boss")) then
-				DECORATOR.DECOR_REMOVE(handle, "Player_Boss")
-			end
-		else
-			GGlobals.FREEMODE_GLOBAL:At(freemode_offset):SetBit(17)
-			if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Boss", 3)) then
-				DECORATOR.DECOR_SET_INT(self:GetHandle(), "Player_Boss", pid)
-			end
+		GGlobals.FM_SERVICES:At(freemode_offset):ClearBit(17)
+		GPBD_FM_3:At(4):ClearBit(30)
+		if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Goon", 3) and DECORATOR.DECOR_EXIST_ON(handle, "Player_Goon")) then
+			DECORATOR.DECOR_REMOVE(handle, "Player_Goon")
+		end
+		if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Boss", 3) and DECORATOR.DECOR_EXIST_ON(handle, "Player_Boss")) then
+			DECORATOR.DECOR_REMOVE(handle, "Player_Boss")
 		end
 
-		GPBD_FM_3:At(10):At(433):WriteInt(bossType)
-		GPBD_FM_3:At(10):At(470):WriteInt(bossType)
-		GPBD_FM_3:At(10):WriteInt(isRetiring and -1 or pid)
+		GPBD_FM_3:At(433):WriteInt(-1)
+		GPBD_FM_3:At(470):WriteInt(-1)
+		GPBD_FM_3:WriteInt(-1)
 	end)
 end
 
@@ -590,29 +661,48 @@ Backend:RegisterEventCallbackAll(function()
 	LocalPlayer:Reset()
 end)
 
-ThreadManager:RegisterLooped("SS_PV_HANDLER", function()
+ThreadManager:RegisterLooped("SS_SELF", function()
+	LocalPlayer.m_feat_mgr:Update()
+	LocalPlayer.m_money_controller:Update()
+end)
+
+ThreadManager:RegisterLooped("SS_VEHICLE_CONTROLLER", function()
 	yield()
+
+	if (LocalPlayer:GetRoomHash() ~= 0) then
+		return
+	end
 
 	local PV        = LocalPlayer.m_vehicle
 	local handle    = PV:GetHandle()
 	local nativeVeh = LocalPlayer:GetVehicleNative()
+	if (not ENTITY.DOES_ENTITY_EXIST(nativeVeh)) then
+		return
+	end
+
+	if (VEHICLE.IS_VEHICLE_BEING_BROUGHT_TO_HALT(nativeVeh)) then
+		return
+	end
+
+	if (CAM.IS_SCREEN_FADING_OUT() or CAM.IS_SCREEN_FADED_OUT()) then
+		return
+	end
 
 	if (PV:IsValid()) then
 		if (LocalPlayer:IsOnFoot()) then
 			LocalPlayer:OnVehicleExit()
 		elseif (LocalPlayer:IsDriving() and handle ~= nativeVeh) then
 			LocalPlayer:OnVehicleSwitch()
+			return
 		end
-	elseif (LocalPlayer:IsDriving()) then
-		PV:Set(nativeVeh)
-	end
+	else
+		if (handle ~= 0) then
+			PV:Cleanup()
+			return
+		end
 
-	if (handle ~= 0 and not PV:IsValid()) then
-		PV:Cleanup()
+		if (LocalPlayer:IsDriving() and ENTITY.IS_ENTITY_A_VEHICLE(nativeVeh)) then
+			PV:Set(nativeVeh)
+		end
 	end
-end)
-
-ThreadManager:RegisterLooped("SS_SELF", function()
-	LocalPlayer.m_feat_mgr:Update()
-	LocalPlayer.m_money_controller:Update()
 end)

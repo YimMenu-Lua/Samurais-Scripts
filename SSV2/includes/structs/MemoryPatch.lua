@@ -17,9 +17,8 @@
 ---@field private OnEnable fun(patch: MemoryPatch): any
 ---@field private OnDisable fun(patch: MemoryPatch): any
 ---@field public m_state any Capture a default state to reset later if needed. *(see `PlayerVehicle:AddMemoryPatch` for default state example)*
-local MemoryPatch <const> = {}
-MemoryPatch.__index = MemoryPatch
-MemoryPatch.__type = "MemoryPatch"
+local MemoryPatch <const> = { __type = "MemoryPatch" }
+MemoryPatch.__index       = MemoryPatch
 
 ---@param name string
 ---@param onEnable function
@@ -27,9 +26,9 @@ MemoryPatch.__type = "MemoryPatch"
 ---@return MemoryPatch
 function MemoryPatch.new(name, onEnable, onDisable)
 	return setmetatable({
-		m_name = name,
+		m_name    = name,
 		m_enabled = false,
-		OnEnable = onEnable,
+		OnEnable  = onEnable,
 		OnDisable = onDisable
 	}, MemoryPatch)
 end
@@ -58,9 +57,7 @@ function MemoryPatch:Apply()
 		return nil
 	end)
 
-	if (not ok) then
-		return nil
-	end
+	if (not ok) then return nil end
 
 	self.m_enabled = true
 	return res
@@ -80,9 +77,7 @@ function MemoryPatch:Restore()
 		return nil
 	end)
 
-	if (not ok) then
-		return nil
-	end
+	if (not ok) then return nil end
 
 	self.m_enabled = false
 	return res

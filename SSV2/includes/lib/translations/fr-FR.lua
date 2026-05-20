@@ -315,7 +315,7 @@ return {
 	["VEH_SPEED_BG"] = "Arrière-plan",
 	["VEH_SPEED_CIRCLE"] = "Cercle",
 	["VEH_MINES"] = "Mines de véhicules",
-	["VEH_LAUNCH_CTRL_TT"] = "Simule le contrôle de lancement. Uniquement disponible pour les voitures de performance.",
+	["VEH_LAUNCH_CTRL_TT"] = "Simule le contrôle de lancement dans deux modes :\n - Stationnaire : maintenez [ACCÉLÉRER] + [BRAKE] pendant 3 secondes, puis relâchez le frein.\n - Roulant : tout en vous déplaçant à une vitesse inférieure à la vitesse maximale, maintenez [ACCÉLÉRER] + la combinaison de touches attribuée (par défaut [N]) pendant 3 secondes, puis relâchez la combinaison de touches.\n\nREMARQUE : le mode stationnaire ne fonctionne pas avec la « boîte de vitesses manuelle ».",
 	["VEH_FLAPPY_DOORS"] = "Portes battantes",
 	["VEH_IV_EXIT_TT"] = "Imite le style de sortie du véhicule de GTA IV : maintenez [F] pendant une seconde pour éteindre le moteur ou appuyez normalement pour le laisser tourner.",
 	["VEH_MINES_TT"] = "Vous permet de larguer une mine depuis n'importe quel véhicule terrestre.",
@@ -965,5 +965,13 @@ return {
 	["MPSTAT_CONTROLLDER_DESC"] = "Gérez, modifiez et verrouillez les statistiques multijoueurs avec persistance.",
 	["YRV3_DASHBOARD_BOSS_PRES_FMT"] = "Président de %s",
 	["MPSTAT_LOCK_VAL_TT"] = "Verrouille la statistique sur la valeur actuelle.\n\nRemarque : Vous devez définir la valeur souhaitée avant de l'activer, car l'activation de la bascule capture et enregistre la valeur de la statistique actuelle pour l'écrire en arrière-plan.",
-	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Gérer les fonds"
+	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Gérer les fonds",
+	["VEH_STANCE_LOCKED_FMT"] = "'Stancer' appartient actuellement à '%s'. Désactivez la fonction propriétaire pour déverrouiller l’interface utilisateur.",
+	["VEH_MANUAL_GEARBOX"] = "Boîte de vitesses manuelle",
+	["VEH_MANUAL_GEARBOX_TT"] = "Vous permet de changer manuellement de vitesse dans les voitures et les motos.\n\nRemarque : lorsque cette option est activée, « Contrôle de lancement » ne fonctionnera pas à l'arrêt ; seul le mode « Rolling » fonctionnera.",
+	["VEH_GEARBOX_SEQUENTIAL"] = "Séquentiel",
+	["VEH_DEFAULT_RADIO"] = "Radio par défaut",
+	["VEH_MANUAL_GEARBOX_TYPE"] = "Type de boîte de vitesses",
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manuel avec embrayage",
+	["VEH_DEFAULT_RADIO_TT"] = "Force la radio de votre véhicule à la station sélectionnée à chaque fois que vous changez de véhicule.\n\nVous pouvez sélectionner une station en appuyant sur la touche [. . .] bouton d’options après avoir activé la fonctionnalité."
 }

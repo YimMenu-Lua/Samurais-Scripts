@@ -30,7 +30,7 @@ local CCarHandlingData  = require("includes.classes.gta.CCarHandlingData")
 ---@ignore
 ---@class CVehicle : CEntity
 ---@field protected m_ptr pointer
----@field public m_physics_fragments phFragInst //0x30 `struct rage::phFragInst`
+---@field public m_physics_fragments phFragInst //0x0030 `struct rage::phFragInst`
 ---@field public m_draw_data CVehicleDrawData
 ---@field public m_handling_data CHandlingData
 ---@field public m_model_info CVehicleModelInfo
@@ -39,16 +39,21 @@ local CCarHandlingData  = require("includes.classes.gta.CCarHandlingData")
 ---@field public m_velocity pointer<vec3>
 ---@field public m_deform_god pointer<uint8_t>
 ---@field public m_water_damage pointer<uint32_t>
----@field public m_next_gear pointer<int16_t>
----@field public m_current_gear pointer<int16_t>
----@field public m_top_gear pointer<int8_t>
+---@field public m_next_gear pointer<uint8_t>
+---@field public m_current_gear pointer<uint8_t>
+---@field public m_top_gear pointer<uint8_t>
+---@field public m_rpm pointer<float>
+---@field public m_rpm_2 pointer<float>
+---@field public m_clutch pointer<float> // 0x08D4
+---@field public m_throttle pointer<float> -- these two might be flipped
+---@field public m_throttle_input pointer<float> //
 ---@field public m_engine_health pointer<float>
----@field public m_steering_input pointer<float> // 0xD4 name might not correctly reflect what this actually is but this seems to store controller input (value is between 0.99 (left) .. -0.99 (right))
----@field public m_current_steering pointer<float> 0xDC // actual wheel steer. Wr'll use it to rewrite last known wheel steer after exiting a vehicle in IV-Style Exit so we'll no longer need to teleport outside or patch CTaskVehicleExit
+---@field public m_steering_input pointer<float> // 0x00D4 name might not correctly reflect what this actually is but this seems to store controller input (value is between 0.99 (left) .. -0.99 (right))
+---@field public m_current_steering pointer<float> 0x00DC // actual wheel steer. Wr'll use it to rewrite last known wheel steer after exiting a vehicle in IV-Style Exit so we'll no longer need to teleport outside or patch CTaskVehicleExit
 ---@field public m_is_targetable pointer<byte> `bool`
 ---@field public m_door_lock_status pointer<uint32_t>
----@field public m_wheels atArray<CWheel> -- 0xC30
----@field public m_num_wheels number -- 0xC38
+---@field public m_wheels atArray<CWheel> -- 0x0C30
+---@field public m_num_wheels number -- 0x0C38
 ---@field public m_ride_height pointer<float>
 ---@field private DumpFlags fun(self: CVehicle, enum_flags: Enum, get_func: fun(self: CVehicle, flag: integer): boolean): nil
 ---@overload fun(vehicle: integer): CVehicle|nil
@@ -57,7 +62,7 @@ local CVehicle = Class("CVehicle", { parent = CEntity, symbolic_size = 0xC40 })
 ---@param vehicle handle
 ---@return CVehicle
 function CVehicle:init(vehicle)
-	if (not Game.IsScriptHandle(vehicle) or not ENTITY.IS_ENTITY_A_VEHICLE(vehicle)) then
+	if (not ENTITY.IS_ENTITY_A_VEHICLE(vehicle)) then
 		error("Invalid entity!")
 	end
 
@@ -79,6 +84,11 @@ function CVehicle:init(vehicle)
 	instance.m_next_gear         = ptr:add(0x0880)
 	instance.m_current_gear      = ptr:add(0x0882)
 	instance.m_top_gear          = ptr:add(0x0886)
+	instance.m_rpm               = ptr:add(0x08C8)
+	instance.m_rpm_2             = ptr:add(0x08CC)
+	instance.m_clutch            = ptr:add(0x08D4)
+	instance.m_throttle          = ptr:add(0x08D8)
+	instance.m_throttle_input    = ptr:add(0x08E0)
 	instance.m_engine_health     = ptr:add(0x0910)
 	instance.m_handling_data     = CHandlingData(ptr:add(0x0960):deref(), instance.m_model_info:GetVehicleType())
 	instance.m_deform_god        = ptr:add(0x096C)

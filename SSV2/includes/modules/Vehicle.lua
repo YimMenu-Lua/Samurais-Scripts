@@ -173,6 +173,15 @@ function Vehicle:GetRadioStationName()
 	return Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 end
 
+---@param station_name string
+function Vehicle:SetRadioStation(station_name)
+	if (self:GetRadioStationName() == station_name) then
+		return
+	end
+
+	AUDIO.SET_VEH_RADIO_STATION(self:GetHandle(), station_name)
+end
+
 ---@return boolean
 function Vehicle:IsRadioOn()
 	return AUDIO.IS_VEHICLE_RADIO_ON(self:GetHandle())
@@ -359,6 +368,11 @@ end
 ---@return boolean
 function Vehicle:IsMoving()
 	return not self:IsStopped()
+end
+
+---@return boolean
+function Vehicle:IsReversing()
+	return ENTITY.GET_ENTITY_SPEED_VECTOR(self:GetHandle(), true).y < 0
 end
 
 ---@param ped handle

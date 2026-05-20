@@ -10,6 +10,7 @@
 local AssetBrowserBase      = require("includes.services.asset_browsers.AssetBrowserBase")
 local RawDataService        = require("includes.services.RawDataService")
 local Manufacturers <const> = require("includes.data.refs").t_VehicleManufacturers
+local IS_ENHANCED <const>   = Game.IsEnhanced()
 
 
 ---@type array<string>
@@ -152,8 +153,13 @@ end
 
 ---@override
 ---@param v Pair<string, RawVehicleData>
+---@return boolean
 function VehicleBrowser:TryFilters(_, v)
 	local data = v.second
+	if (data.enhanced_only and not IS_ENHANCED) then
+		return false
+	end
+
 	return self:FilterByManufacturer(data.manufacturer)
 		and self:FilterByClass(data.class_id)
 end

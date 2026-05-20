@@ -263,6 +263,37 @@ function Accessor:ClearBits(bits)
 	self:WriteInt(v)
 end
 
+---@param offset integer
+---@param index integer
+---@return self, integer
+function Accessor:AtPackedBit(offset, index)
+	local bucket = index // 32
+	local bitPos = index % 32
+	return self:At(offset, bucket), bitPos
+end
+
+---@param offset integer
+---@param bit integer
+---@return integer
+function Accessor:GetPackedBit(offset, bit)
+	local instance, bitPos = self:AtPackedBit(offset, bit)
+	return instance:GetBit(bitPos)
+end
+
+---@param offset integer
+---@param bit integer
+function Accessor:SetPackedBit(offset, bit)
+	local instance, bitPos = self:AtPackedBit(offset, bit)
+	instance:SetBit(bitPos)
+end
+
+---@param offset integer
+---@param bit integer
+function Accessor:ClearPackedBit(offset, bit)
+	local instance, bitPos = self:AtPackedBit(offset, bit)
+	instance:ClearBit(bitPos)
+end
+
 --------------------------------------------------------
 --------------------------------------------------------
 --------------------------------------------------------

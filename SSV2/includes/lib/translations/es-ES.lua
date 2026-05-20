@@ -311,7 +311,7 @@ return {
 	["VEH_AUTO_LOCK_TT"] = "Bloquea automáticamente su vehículo cuando se aleja de él y lo desbloquea nuevamente cuando intenta volver a ingresar o cambiar a un vehículo diferente.",
 	["VEH_LAUNCH_CTRL"] = "Control de lanzamiento",
 	["VEH_RGB_LIGHTS"] = "Faros RGB",
-	["VEH_LAUNCH_CTRL_TT"] = "Simula el control de lanzamiento. Sólo disponible para autos de alto rendimiento.",
+	["VEH_LAUNCH_CTRL_TT"] = "Simula el control de lanzamiento en dos modos:\n - Estacionario: mantenga presionado [ACELERAR] + [FRENO] durante 3 segundos y luego suelte el freno.\n - Rodante: mientras se mueve a una velocidad inferior a la máxima, mantenga presionado [ACELERAR] + la combinación de teclas asignada (predeterminada [N]) durante 3 segundos y luego suelte la combinación de teclas.\n\nNOTA: El modo estacionario no funciona con la 'Caja de cambios manual'.",
 	["VEH_IV_EXIT_TT"] = "Imita el estilo de salida del vehículo de GTA IV: mantén presionado [F] durante un segundo para apagar el motor o presiona normalmente para dejarlo funcionando.",
 	["VEH_MINES"] = "Minas de vehículos",
 	["VEH_KEEP_WHEELS_TURNED"] = "Mantenga las ruedas en marcha",
@@ -965,5 +965,13 @@ return {
 	["YRV3_DASHBOARD_BOSS_RETIRE"] = "Retirarse",
 	["YRV3_DASHBOARD_BOSS_REGISTER"] = "Regístrate como jefe",
 	["MPSTAT_LOCK_VAL_TT"] = "Bloquea la estadística al valor actual.\n\nNota: Debe establecer el valor deseado antes de activar esta opción, ya que al activar la opción se captura y guarda el valor de la estadística actual para escribirlo en segundo plano.",
-	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Administrar fondos"
+	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Administrar fondos",
+	["VEH_STANCE_LOCKED_FMT"] = "'Stancer' actualmente es propiedad de '%s'. Deshabilite la función de propietario para desbloquear la interfaz de usuario.",
+	["VEH_DEFAULT_RADIO"] = "Radio predeterminada",
+	["VEH_GEARBOX_SEQUENTIAL"] = "Secuencial",
+	["VEH_MANUAL_GEARBOX"] = "Caja de cambios manual",
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manual con embrague",
+	["VEH_MANUAL_GEARBOX_TYPE"] = "Tipo de caja de cambios",
+	["VEH_MANUAL_GEARBOX_TT"] = "Le permite cambiar de marcha manualmente en automóviles y motocicletas.\n\nNota: cuando esto está habilitado, el 'Control de inicio' no funcionará mientras esté parado; Sólo funcionará el modo 'Rolling'.",
+	["VEH_DEFAULT_RADIO_TT"] = "Fuerza la radio de tu vehículo a la estación seleccionada cada vez que cambias de vehículo.\n\nPuedes seleccionar una estación presionando el botón [. . .] botón de opciones después de alternar la función."
 }

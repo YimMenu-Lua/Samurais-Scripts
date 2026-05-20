@@ -318,7 +318,7 @@ return {
 	["VEH_MINES"] = "車輛地雷",
 	["VEH_MINES_TT"] = "允許你從任何陸地車輛上投下地雷。",
 	["VEH_SPEED_MARK"] = "標記",
-	["VEH_LAUNCH_CTRL_TT"] = "模擬發射控制。僅適用於高性能汽車。",
+	["VEH_LAUNCH_CTRL_TT"] = "在兩種模式下模擬啟動控制：\n - 靜止：按住 [ACCELETRATE] + [BRAKE] 3 秒鐘，然後放開煞車。 \n - 捲動：以低於最大速度移動時，按住 [ACCELERATE] + 指定的按鍵綁定（預設 [N]）3 秒鐘，然後放開按鍵綁定。 \n\n注意：靜止模式不適用於「手排變速箱」。",
 	["VEH_LAUNCH_CTRL"] = "發射控制",
 	["VEH_KEEP_WHEELS_TURNED_TT"] = "在離開車輛之前，使車輪保持在您離開的任何角度。",
 	["VEH_KEEP_WHEELS_TURNED"] = "保持車輪轉動",
@@ -965,5 +965,13 @@ return {
 	["YRV3_DASHBOARD_BOSS_REGISTER"] = "註冊成為老闆",
 	["MPSTAT_CONTROLLDER_DESC"] = "持久管理、編輯和鎖定多人遊戲統計數據。",
 	["MPSTAT_LOCK_VAL_TT"] = "將統計資料鎖定為目前值。 \n\n注意：您必須在開啟此功能之前設定所需的值，因為啟動切換會擷取並儲存要在背景寫入的目前統計資料值。",
-	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "管理資金"
+	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "管理資金",
+	["VEH_STANCE_LOCKED_FMT"] = "「Stancer」目前由「%s」擁有。停用所有者功能以解鎖使用者介面。",
+	["VEH_DEFAULT_RADIO"] = "預設收音機",
+	["VEH_GEARBOX_SEQUENTIAL"] = "順序",
+	["VEH_MANUAL_GEARBOX_TYPE"] = "變速箱類型",
+	["VEH_MANUAL_GEARBOX_TT"] = "允許您在汽車和摩托車中手動換檔。 \n\n注意：啟用此功能後，「啟動控制」在靜止時將無法運作；只有「滾動」模式才有效。",
+	["VEH_DEFAULT_RADIO_TT"] = "每次切換車輛時，強制將車輛的無線電廣播到選定的電台。 \n\n您可以按 [ 選擇電台。 。 .] 切換功能後的選項按鈕。",
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "手動帶離合器",
+	["VEH_MANUAL_GEARBOX"] = "手排變速箱"
 }

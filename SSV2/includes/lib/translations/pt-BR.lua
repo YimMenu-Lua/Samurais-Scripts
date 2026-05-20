@@ -309,7 +309,7 @@ return {
 	["VEH_FLAPPY_DOORS_TT"] = "Não tenho ideia de por que fiz isso.",
 	["VEH_IV_EXIT"] = "Saída estilo IV",
 	["VEH_AUTO_LOCK_TT"] = "Tranca automaticamente o seu veículo quando você se afasta dele e destranca-o novamente quando você tenta entrar novamente ou mudar para um veículo diferente.",
-	["VEH_LAUNCH_CTRL_TT"] = "Simula o controle de lançamento. Disponível apenas para carros de alto desempenho.",
+	["VEH_LAUNCH_CTRL_TT"] = "Simula o controle de lançamento em dois modos:\n - Estacionário: segure [ACCELETRATE] + [BRAKE] por 3 segundos e depois solte o freio.\n - Rolando: enquanto se move a uma velocidade menor que a máxima, segure [ACCELERATE] + a tecla atribuída (padrão [N]) por 3 segundos e depois solte a tecla.\n\nNOTA: O modo estacionário não funciona com 'Caixa de câmbio manual'.",
 	["VEH_KEEP_WHEELS_TURNED"] = "Mantenha as rodas giradas",
 	["VEH_AUTO_LOCK"] = "Bloqueio automático",
 	["VEH_LAUNCH_CTRL"] = "Controle de lançamento",
@@ -965,5 +965,13 @@ return {
 	["YRV3_DASHBOARD_BOSS_REGISTER"] = "Registre-se como chefe",
 	["MPSTAT_CONTROLLDER_DESC"] = "Gerencie, edite e bloqueie estatísticas multijogador com persistência.",
 	["MPSTAT_LOCK_VAL_TT"] = "Bloqueia a estatística para o valor atual.\n\nNota: Você deve definir o valor desejado antes de ativar esta opção, pois a ativação da alternância captura e salva o valor da estatística atual para ser gravado em segundo plano.",
-	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Gerenciar fundos"
+	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Gerenciar fundos",
+	["VEH_STANCE_LOCKED_FMT"] = "'Sancer' é atualmente propriedade de '%s'. Desative o recurso de proprietário para desbloquear a interface do usuário.",
+	["VEH_DEFAULT_RADIO"] = "Rádio padrão",
+	["VEH_DEFAULT_RADIO_TT"] = "Força o rádio do seu veículo para a estação selecionada sempre que você troca de veículo.\n\nVocê pode selecionar uma estação pressionando o botão [. . .] botão de opções após alternar o recurso.",
+	["VEH_GEARBOX_SEQUENTIAL"] = "Sequencial",
+	["VEH_MANUAL_GEARBOX"] = "Caixa de velocidades manual",
+	["VEH_MANUAL_GEARBOX_TYPE"] = "Tipo de caixa de velocidades",
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manual com embreagem",
+	["VEH_MANUAL_GEARBOX_TT"] = "Permite que você mude manualmente de marcha em carros e motocicletas.\n\nObservação: quando ativado, o 'Controle de Lançamento' não funcionará enquanto estiver parado; apenas o modo 'Rolling' funcionará."
 }

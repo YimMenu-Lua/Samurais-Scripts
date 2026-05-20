@@ -209,3 +209,16 @@ Audio.RadioStations = {
 	{ station = "RADIO_05_TALK_01",               name = "West Coast Talk Radio" },
 	{ station = "RADIO_13_JAZZ",                  name = "Worldwide FM" },
 }
+
+ThreadManager:Run(function(s)
+	for _, v in ipairs(Audio.RadioStations) do
+		local gxt = Game.GetGXTLabel(v.station)
+		if (gxt ~= "NULL") then
+			v.name = gxt
+		end
+	end
+
+	table.sort(Audio.RadioStations, function(a, b)
+		return a.name < b.name
+	end)
+end)

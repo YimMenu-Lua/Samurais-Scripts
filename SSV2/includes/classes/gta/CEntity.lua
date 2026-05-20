@@ -40,7 +40,7 @@ local CEntity = Class("CEntity", { symbolic_size = 0x028C })
 ---@param entity handle
 ---@return CEntity
 function CEntity:init(entity)
-	if (not Game.IsScriptHandle(entity)) then
+	if (not ENTITY.DOES_ENTITY_EXIST(entity)) then
 		error("Invalid entity!")
 	end
 

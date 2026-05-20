@@ -159,6 +159,7 @@ function SelfMisc:UpdateHandsUpAnim()
 		end
 
 		if (self.m_is_playing_hands_up_anim and not (LocalPlayer:IsOnFoot() and LocalPlayer:IsAlive())) then
+			LocalPlayer:ClearTasks()
 			self.m_is_playing_hands_up_anim = false
 		end
 	end

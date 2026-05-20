@@ -311,7 +311,7 @@ return {
 	["VEH_HIGH_BEAMS"] = "Fernlicht auf Hupe",
 	["VEH_IV_EXIT"] = "Ausgang im IV-Stil",
 	["VEH_KEEP_WHEELS_TURNED"] = "Halten Sie die Räder in Bewegung",
-	["VEH_LAUNCH_CTRL_TT"] = "Simuliert die Startsteuerung. Nur für Performance-Fahrzeuge verfügbar.",
+	["VEH_LAUNCH_CTRL_TT"] = "Simuliert die Startsteuerung in zwei Modi:\n – Stationär: Halten Sie [ACCELETRATE] + [BRAKE] 3 Sekunden lang gedrückt und lassen Sie dann die Bremse los.\n – Rollen: Halten Sie bei einer Geschwindigkeit unter der Höchstgeschwindigkeit [ACCELERATE] + die zugewiesene Tastenkombination (Standard [N]) 3 Sekunden lang gedrückt und lassen Sie dann die Tastenkombination los.\n\nHINWEIS: Der stationäre Modus funktioniert nicht mit „Manuellem Getriebe“.",
 	["VEH_AUTO_LOCK_TT"] = "Verriegelt Ihr Fahrzeug automatisch, wenn Sie sich von ihm entfernen, und entriegelt es wieder, wenn Sie versuchen, wieder einzusteigen oder zu einem anderen Fahrzeug zu wechseln.",
 	["VEH_IV_EXIT_TT"] = "Imitiert den Fahrzeugausstiegsstil von GTA IV: Halten Sie [F] eine Sekunde lang gedrückt, um den Motor auszuschalten, oder drücken Sie normal, um ihn laufen zu lassen.",
 	["VEH_KEEP_WHEELS_TURNED_TT"] = "Hält die Räder Ihres Fahrzeugs in jedem Winkel, in dem Sie sie vor dem Verlassen des Fahrzeugs gelassen haben.",
@@ -965,5 +965,13 @@ return {
 	["YRV3_DASHBOARD_BOSS_CEO_FMT"] = "CEO von %s",
 	["MPSTAT_CONTROLLDER_DESC"] = "Verwalten, bearbeiten und sperren Sie Multiplayer-Statistiken dauerhaft.",
 	["MPSTAT_LOCK_VAL_TT"] = "Sperrt die Statistik auf den aktuellen Wert.\n\nHinweis: Sie müssen Ihren gewünschten Wert festlegen, bevor Sie diese Option aktivieren, da durch die Aktivierung des Schalters der aktuelle Statistikwert erfasst und gespeichert wird, damit er im Hintergrund geschrieben wird.",
-	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Fonds verwalten"
+	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Fonds verwalten",
+	["VEH_STANCE_LOCKED_FMT"] = "„Stancer“ gehört derzeit „%s“. Deaktivieren Sie die Besitzerfunktion, um die Benutzeroberfläche zu entsperren.",
+	["VEH_GEARBOX_SEQUENTIAL"] = "Sequentiell",
+	["VEH_MANUAL_GEARBOX_TYPE"] = "Getriebetyp",
+	["VEH_DEFAULT_RADIO"] = "Standardradio",
+	["VEH_DEFAULT_RADIO_TT"] = "Zwingt das Radio Ihres Fahrzeugs jedes Mal zum ausgewählten Sender, wenn Sie das Fahrzeug wechseln.\n\nSie können einen Sender auswählen, indem Sie die Taste [ drücken. . .] Optionsschaltfläche nach dem Umschalten der Funktion.",
+	["VEH_MANUAL_GEARBOX"] = "Manuelles Getriebe",
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manuell mit Kupplung",
+	["VEH_MANUAL_GEARBOX_TT"] = "Ermöglicht das manuelle Schalten der Gänge in Autos und Motorrädern.\n\nHinweis: Wenn diese Option aktiviert ist, funktioniert „Launch Control“ im Stillstand nicht; Nur der „Rolling“-Modus funktioniert."
 }
