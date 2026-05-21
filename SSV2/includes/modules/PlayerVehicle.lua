@@ -160,10 +160,15 @@ function PlayerVehicle.new(handle)
 		instance.m_feat_mgr:Cleanup()
 	end)
 
-	table.insert(instance.m_threads, ThreadManager:RegisterLooped("SS_VEHICLE", function()
+	local thread = ThreadManager:RegisterLooped("SS_VEHICLE", function()
 		instance:Main()
-	end))
+	end, {
+		exception_handler = function()
+			instance:Cleanup()
+		end
+	})
 
+	table.insert(instance.m_threads, thread)
 	return instance
 end
 
@@ -437,7 +442,7 @@ function PlayerVehicle:IsReversing()
 	if (GVars.features.vehicle.manual_gearbox.enabled and self.m_manual_gearbox) then
 		return self.m_manual_gearbox:IsInReverse()
 	end
-	return ENTITY.GET_ENTITY_SPEED_VECTOR(self:GetHandle(), true).y < 0
+	return self:GetSpeedVector().y < 0
 end
 
 ---@param toggle boolean

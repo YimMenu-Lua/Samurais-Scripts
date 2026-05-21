@@ -35,84 +35,50 @@ end
 
 local function speedoOptions()
 	local resolution = Game.GetScreenResolution()
+	local cfg        = GVars.features.speedometer
 	ImGui.Text(_T("VEH_SPEED_UNIT"))
 	ImGui.Separator()
-	GVars.features.speedometer.speed_unit, _ = ImGui.RadioButton("M/s", GVars.features.speedometer.speed_unit, 0)
+
+	cfg.speed_unit = ImGui.RadioButton("M/s", cfg.speed_unit, 0)
 	ImGui.SameLine()
-	GVars.features.speedometer.speed_unit, _ = ImGui.RadioButton("Km/h", GVars.features.speedometer.speed_unit, 1)
+	cfg.speed_unit = ImGui.RadioButton("Km/h", cfg.speed_unit, 1)
 	ImGui.SameLine()
-	GVars.features.speedometer.speed_unit, _ = ImGui.RadioButton("Mi/h", GVars.features.speedometer.speed_unit, 2)
+	cfg.speed_unit = ImGui.RadioButton("Mi/h", cfg.speed_unit, 2)
 
 	ImGui.Spacing()
 	ImGui.Text(_T("GENERIC_POSITION_LABEL"))
 	ImGui.Separator()
-	GVars.features.speedometer.pos.x, _ = ImGui.SliderFloat(
-		_T("GENERIC_LEFT_RIGHT_LABEL"),
-		GVars.features.speedometer.pos.x,
-		0.0,
-		resolution.x - (GVars.features.speedometer.radius * 2.2)
-	)
-	GVars.features.speedometer.pos.y, _ = ImGui.SliderFloat(
-		_T("GENERIC_UP_DOWN_LABEL"),
-		GVars.features.speedometer.pos.y, 0.0,
-		resolution.y - (GVars.features.speedometer.radius * 2)
-	)
+
+	cfg.pos.x = ImGui.SliderFloat(_T("GENERIC_LEFT_RIGHT_LABEL"), cfg.pos.x, 0.0, resolution.x - (cfg.radius * 2.2))
+	cfg.pos.y = ImGui.SliderFloat(_T("GENERIC_UP_DOWN_LABEL"), cfg.pos.y, 0.0, resolution.y - (cfg.radius * 2))
 
 	ImGui.Spacing()
 	ImGui.Text(_T("GENERIC_COLORS_LABEL"))
 	ImGui.Separator()
-	GVars.features.speedometer.colors.circle, _ = ImGui.ColorEditU32(_T("VEH_SPEED_CIRCLE"),
-		GVars.features.speedometer.colors.circle
-	)
 
-	GVars.features.speedometer.colors.circle_bg, _ = ImGui.ColorEditU32(_T("VEH_SPEED_BG"),
-		GVars.features.speedometer.colors.circle_bg
-	)
+	cfg.colors.circle      = ImGui.ColorEditU32(_T("VEH_SPEED_CIRCLE"), cfg.colors.circle)
+	cfg.colors.circle_bg   = ImGui.ColorEditU32(_T("VEH_SPEED_BG"), cfg.colors.circle_bg)
+	cfg.colors.text        = ImGui.ColorEditU32(_T("VEH_SPEED_TEXT"), cfg.colors.text)
+	cfg.colors.markings    = ImGui.ColorEditU32(_T("VEH_SPEED_MARK"), cfg.colors.markings)
+	cfg.colors.needle      = ImGui.ColorEditU32(_T("VEH_SPEED_NEEDLE"), cfg.colors.needle)
+	cfg.colors.needle_base = ImGui.ColorEditU32(_T("VEH_SPEED_NEEDLE_BASE"), cfg.colors.needle_base)
 
-	GVars.features.speedometer.colors.text, _ = ImGui.ColorEditU32(_T("VEH_SPEED_TEXT"),
-		GVars.features.speedometer.colors.text
-	)
-
-	GVars.features.speedometer.colors.markings, _ = ImGui.ColorEditU32(_T("VEH_SPEED_MARK"),
-		GVars.features.speedometer.colors.markings
-	)
-
-	GVars.features.speedometer.colors.needle, _ = ImGui.ColorEditU32(_T("VEH_SPEED_NEEDLE"),
-		GVars.features.speedometer.colors.needle
-	)
-
-	GVars.features.speedometer.colors.needle_base, _ = ImGui.ColorEditU32(_T("VEH_SPEED_NEEDLE_BASE"),
-		GVars.features.speedometer.colors.needle_base
-	)
-
-	if GUI:Button(_T("GENERIC_RESET")) then
-		GVars.features.speedometer.colors = default_cfg.features.speedometer.colors
+	if (GUI:Button(_T("GENERIC_RESET"))) then
+		cfg.colors = table.copy(default_cfg.features.speedometer.colors)
 	end
 end
 
 local function driftOptions()
-	GVars.features.vehicle.drift.mode, _ = ImGui.Combo(_T("VEH_DRIFT_MODE"),
-		GVars.features.vehicle.drift.mode,
-		_F("%s\0%s\0%s\0", _T("VEH_DRIFT_MODE_STRONG"), _T("VEH_DRIFT_MODE_SLIPPERY"), _T("VEH_DRIFT_MODE_MIXED"))
-	)
+	local cfg = GVars.features.vehicle.drift
+	cfg.mode  = ImGui.Combo(_T("VEH_DRIFT_MODE"), cfg.mode, { _T("VEH_DRIFT_MODE_STRONG"), _T("VEH_DRIFT_MODE_SLIPPERY"), _T("VEH_DRIFT_MODE_MIXED") }, 3)
+	cfg.power = ImGui.SliderInt(_T("VEH_POWER_GAIN"), cfg.power, 10, 100)
 
-	GVars.features.vehicle.drift.power, _ = ImGui.SliderInt(_T("VEH_POWER_GAIN"),
-		GVars.features.vehicle.drift.power,
-		10,
-		100
-	)
-
-	ImGui.BeginDisabled(GVars.features.vehicle.drift.mode == 1)
-	GVars.features.vehicle.drift.intensity, _ = ImGui.SliderInt(_T("VEH_DRIFT_MODE_INTENSITY"),
-		GVars.features.vehicle.drift.intensity,
-		0,
-		3
-	)
+	ImGui.BeginDisabled(cfg.mode == 1)
+	cfg.intensity = ImGui.SliderInt(_T("VEH_DRIFT_MODE_INTENSITY"), cfg.intensity, 0, 3)
 	ImGui.EndDisabled()
 	GUI:HelpMarker(_T("VEH_DRIFT_MODE_INTENSITY_TT"))
 
-	GVars.features.vehicle.drift.smoke_fx.enabled = GUI:CustomToggle(_T("VEH_DRIFT_SMOKE"),
-		GVars.features.vehicle.drift.smoke_fx.enabled,
+	cfg.smoke_fx.enabled = GUI:CustomToggle(_T("VEH_DRIFT_SMOKE"), cfg.smoke_fx.enabled,
 		{
 			tooltip = _T("VEH_DRIFT_SMOKE_TT"),
 			onClick = function()
@@ -125,38 +91,27 @@ local function driftOptions()
 		}
 	)
 
-	if (GVars.features.vehicle.drift.smoke_fx.enabled) then
-		ImGui.ColorEditVec3(_T("VEH_DRIFT_SMOKE_COL"), GVars.features.vehicle.drift.smoke_fx.color)
+	if (cfg.smoke_fx.enabled) then
+		ImGui.ColorEditVec3(_T("VEH_DRIFT_SMOKE_COL"), cfg.smoke_fx.color)
 	end
 end
 
 local function driftMinigameOptions()
-	GVars.features.vehicle.drift_minigame.score_sound, _ = GUI:CustomToggle(_T("VEH_DRIFT_MINIGAME_SOUND_OPT"),
-		GVars.features.vehicle.drift_minigame.score_sound,
+	local cfg = GVars.features.vehicle.drift_minigame
+	cfg.score_sound = GUI:CustomToggle(_T("VEH_DRIFT_MINIGAME_SOUND_OPT"), cfg.score_sound,
 		{ tooltip = _T("VEH_DRIFT_MINIGAME_SOUND_OPT_TT") }
 	)
 
 	ImGui.Spacing()
-	ImGui.BulletText(_T("VEH_DRIFT_MINIGAME_PB_LABEL",
-		string.formatint(GVars.features.vehicle.drift_minigame.player_best))
-	)
+	ImGui.BulletText(_T("VEH_DRIFT_MINIGAME_PB_LABEL", string.formatint(cfg.player_best)))
 end
 
 local function nosOptions()
-	GVars.features.vehicle.nos.power, _ = ImGui.SliderInt(_T("VEH_POWER_GAIN"), GVars.features.vehicle.nos.power, 10, 100)
-
-	GVars.features.vehicle.nos.screen_effect, _ = GUI:CustomToggle(_T("VEH_NOS_SCREEN_FX"),
-		GVars.features.vehicle.nos.screen_effect
-	)
-
-	GVars.features.vehicle.nos.sound_effect, _ = GUI:CustomToggle(_T("VEH_NOS_SOUND_FX"),
-		GVars.features.vehicle.nos.sound_effect
-	)
-
-	GVars.features.vehicle.nos.can_damage_engine, _ = GUI:CustomToggle(_T("VEH_NOS_DAMAGE_CB"),
-		GVars.features.vehicle.nos.can_damage_engine,
-		{ tooltip = _T("VEH_NOS_DAMAGE_TT") }
-	)
+	local cfg             = GVars.features.vehicle.nos
+	cfg.power             = ImGui.SliderInt(_T("VEH_POWER_GAIN"), cfg.power, 10, 100)
+	cfg.screen_effect     = GUI:CustomToggle(_T("VEH_NOS_SCREEN_FX"), cfg.screen_effect)
+	cfg.sound_effect      = GUI:CustomToggle(_T("VEH_NOS_SOUND_FX"), cfg.sound_effect)
+	cfg.can_damage_engine = GUI:CustomToggle(_T("VEH_NOS_DAMAGE_CB"), cfg.can_damage_engine, { tooltip = _T("VEH_NOS_DAMAGE_TT") })
 end
 
 local function minesOptions()
@@ -176,18 +131,17 @@ end
 
 local function defaultStationOptions()
 	ImGui.Spacing()
-	if (ImGui.BeginCombo("##defaultRadio", GVars.features.vehicle.default_station.display_name)) then
+	local cfg = GVars.features.vehicle.default_station
+	if (ImGui.BeginCombo("##defaultRadio", cfg.display_name)) then
 		for _, v in ipairs(vehicleRadioStations) do
 			local station  = v.station
 			local name     = v.name
-			local selected = GVars.features.vehicle.default_station.station_name == station
+			local selected = cfg.station_name == station
 			if (ImGui.Selectable(name, selected)) then
-				GVars.features.vehicle.default_station.station_name = station
-				GVars.features.vehicle.default_station.display_name = name
+				cfg.station_name = station
+				cfg.display_name = name
 				ThreadManager:Run(function()
-					if (not LocalPlayer:IsDriving()) then
-						return
-					end
+					if (not LocalPlayer:IsDriving()) then return end
 					LocalPlayer:GetVehicle():SetRadioStation(station)
 				end)
 			end
@@ -204,18 +158,19 @@ local function gearboxOptions()
 end
 
 local function popsOptions()
-	GVars.features.vehicle.bangs_rpm_min = ImGui.SliderFloat("Pops & Bangs RPM Min",
-		GVars.features.vehicle.bangs_rpm_min,
+	local cfg = GVars.features.vehicle
+	cfg.bangs_rpm_min = ImGui.SliderFloat("Pops & Bangs RPM Min",
+		cfg.bangs_rpm_min,
 		2000.0,
-		GVars.features.vehicle.bangs_rpm_max - 1000.0,
-		"%.0f RPM", GVars.features.vehicle.bangs_rpm_min
+		cfg.bangs_rpm_max - 1000.0,
+		"%.0f RPM", cfg.bangs_rpm_min
 	)
 
-	GVars.features.vehicle.bangs_rpm_max = ImGui.SliderFloat("Pops & Bangs RPM Max",
-		GVars.features.vehicle.bangs_rpm_max,
-		GVars.features.vehicle.bangs_rpm_min + 1000.0,
+	cfg.bangs_rpm_max = ImGui.SliderFloat("Pops & Bangs RPM Max",
+		cfg.bangs_rpm_max,
+		cfg.bangs_rpm_min + 1000.0,
 		9000.0,
-		"%.0f RPM", GVars.features.vehicle.bangs_rpm_max
+		"%.0f RPM", cfg.bangs_rpm_max
 	)
 end
 

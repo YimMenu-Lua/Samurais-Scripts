@@ -371,8 +371,13 @@ function Vehicle:IsMoving()
 end
 
 ---@return boolean
+function Vehicle:IsMovingForward()
+	return self:GetSpeedVector().y > 0
+end
+
+---@return boolean
 function Vehicle:IsReversing()
-	return ENTITY.GET_ENTITY_SPEED_VECTOR(self:GetHandle(), true).y < 0
+	return self:GetSpeedVector().y < 0
 end
 
 ---@param ped handle

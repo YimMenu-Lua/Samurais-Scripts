@@ -25,7 +25,11 @@ function GroupManager:init(bsv2)
 		ThreadManager:RegisterLooped("SS_GROUPMGR", function(s)
 			self:OnTick(s)
 			yield()
-		end)
+		end, {
+			exception_handler = function()
+				self:Cleanup()
+			end
+		})
 	end
 
 	return self

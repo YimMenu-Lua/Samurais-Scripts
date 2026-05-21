@@ -53,7 +53,7 @@ local CCarHandlingData  = require("includes.classes.gta.CCarHandlingData")
 ---@field public m_is_targetable pointer<byte> `bool`
 ---@field public m_door_lock_status pointer<uint32_t>
 ---@field public m_wheels atArray<CWheel> -- 0x0C30
----@field public m_num_wheels number -- 0x0C38
+---@field public m_num_wheels integer -- 0x0C38
 ---@field public m_ride_height pointer<float>
 ---@field private DumpFlags fun(self: CVehicle, enum_flags: Enum, get_func: fun(self: CVehicle, flag: integer): boolean): nil
 ---@overload fun(vehicle: integer): CVehicle|nil

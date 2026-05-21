@@ -7,8 +7,16 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local Cast = require("includes.modules.Cast")
-local fmt  = string.format
+local Cast      = require("includes.modules.Cast")
+local fmt       = string.format
+local std_abs   = math.abs
+local std_floor = math.floor
+local std_ceil  = math.ceil
+local std_cos   = math.cos
+local std_max   = math.max
+local std_min   = math.min
+local std_sin   = math.sin
+local std_sqrt  = math.sqrt
 
 ---@param n float
 ---@param x integer number of decimal points
@@ -23,9 +31,7 @@ function math.sum(...)
 	local result = 0
 	local args   = type(...) == "table" and ... or { ... }
 	local __len  = #args
-	if (__len == 0) then
-		return 0
-	end
+	if (__len == 0) then return 0 end
 
 	for i = 1, __len do
 		if (type(args[i]) == "number") then
@@ -61,7 +67,7 @@ end
 ---@return boolean
 function math.is_equal(a, b, e)
 	e = e or 1e-6
-	return a == b or math.abs(a - b) < e
+	return a == b or std_abs(a - b) < e
 end
 
 local INT_SIZES <const>     = {
@@ -119,21 +125,29 @@ end
 ---@param max number
 ---@return number
 function math.clamp(v, min, max)
-	return math.max(min, math.min(max, v))
+	return std_max(min, std_min(max, v))
 end
+
+-- Returns a value between 0 and 1 representing the min/max normalization of `v`
+---@param v number
+---@param min number minimum value
+---@param max number maximum value
+function math.ratio(v, min, max)
+	return (v - min) / (max - min)
+end; math.normalize = math.ratio
 
 ---@param a number
 ---@param b number
----@param t number delta
+---@param t float delta a float between 0 and 1
 function math.lerp(a, b, t)
 	return a + (b - a) * math.clamp(t, 0, 1)
 end
 
--- Generates a triangular wave oscillating between 1 and -1
+-- Generates a triangular wave oscillating between -1 and 1
 ---@param t number
 ---@return number
 function math.tent(t)
-	return 2 * math.abs(2 * (t - math.floor(t + 0.5))) - 1
+	return 2 * std_abs(2 * (t - std_floor(t + 0.5))) - 1
 end
 
 -- 3x² - 2x²

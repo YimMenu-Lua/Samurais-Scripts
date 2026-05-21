@@ -33,7 +33,7 @@ function Flares:Init()
 	self.m_next_shot_time = 0
 	self.m_thread = ThreadManager:RegisterLooped("SS_FLARES", function()
 		self:OnTick()
-	end, not GVars.features.vehicle.flares)
+	end, { suspended = not GVars.features.vehicle.flares })
 end
 
 function Flares:ShouldRun()

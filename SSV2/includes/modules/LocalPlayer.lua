@@ -661,12 +661,12 @@ Backend:RegisterEventCallbackAll(function()
 	LocalPlayer:Reset()
 end)
 
-ThreadManager:RegisterLooped("SS_SELF", function()
+local function self_thread()
 	LocalPlayer.m_feat_mgr:Update()
 	LocalPlayer.m_money_controller:Update()
-end)
+end
 
-ThreadManager:RegisterLooped("SS_VEHICLE_CONTROLLER", function()
+local function player_vehicle_thread()
 	yield()
 
 	if (LocalPlayer:GetRoomHash() ~= 0) then
@@ -705,4 +705,16 @@ ThreadManager:RegisterLooped("SS_VEHICLE_CONTROLLER", function()
 			PV:Set(nativeVeh)
 		end
 	end
-end)
+end
+
+ThreadManager:RegisterLooped("SS_SELF", self_thread, {
+	exception_handler = function()
+		LocalPlayer:Reset()
+	end
+})
+
+ThreadManager:RegisterLooped("SS_VEHICLE_CONTROLLER", player_vehicle_thread, {
+	exception_handler = function()
+		LocalPlayer:GetVehicle():Cleanup()
+	end
+})

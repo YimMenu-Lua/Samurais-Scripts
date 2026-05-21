@@ -381,6 +381,13 @@ function Game.ShowButtonPrompt(text)
 	end
 end
 
+---@param text string
+---@return float
+function Game.GetTextScreenWidth(text)
+	HUD.BEGIN_TEXT_COMMAND_GET_SCREEN_WIDTH_OF_DISPLAY_TEXT(text)
+	return HUD.END_TEXT_COMMAND_GET_SCREEN_WIDTH_OF_DISPLAY_TEXT(true)
+end
+
 ---@param position vec2
 ---@param width float
 ---@param height float

@@ -9,10 +9,15 @@
 
 local FeatureBase = require("includes.modules.FeatureBase")
 
+
+local COL_FG <const>      = Color.WHITE
+local COL_BG <const>      = Color(0, 0, 0, 158)
+local COL_GREEN <const>   = Color(111, 194, 118, 255)
 local eLaunchMode <const> = {
 	REALISTIC = 0,
 	RIDICULOUS = 1
 }
+
 
 ---@enum eLaunchControlState
 local eLaunchControlState <const> = {
@@ -174,7 +179,7 @@ end
 ---@param veh PlayerVehicle
 ---@param rolling boolean
 function LaunchControl:Charge(veh, rolling)
-	local r, g, b, a = 255, 255, 255, 255
+	local main_color = self.m_timer:IsDone() and COL_GREEN or COL_FG
 	local isMoving   = veh:IsMoving()
 	local cond2      = rolling and KeyManager:IsKeybindPressed("rolling_launch") or (isMoving == false and PAD.IS_CONTROL_PRESSED(0, 72))
 	if (PAD.IS_CONTROL_PRESSED(0, 71) and cond2 and not veh:IsDriftButtonPressed()) then
@@ -201,24 +206,22 @@ function LaunchControl:Charge(veh, rolling)
 			end
 		end
 
-		if (self.m_timer:IsDone()) then
-			r, g, b, a = 111, 194, 118, 255
-		end
-
+		local text = rolling and "Anti Lag" or "Launch Control"
 		Game.DrawText(
-			vec2:new(0.42, 0.936),
-			_T("VEH_LAUNCH_CTRL"),
-			Color(r, g, b, a),
+			vec2:new(0.5, 0.9105),
+			text,
+			main_color,
 			vec2:new(0, 0.35),
-			2
+			2,
+			true
 		)
 
 		Game.DrawProgressBar(
-			vec2:new(0.53, 0.95),
+			vec2:new(0.5, 0.9501),
 			0.1,
 			0.01,
-			Color(r, g, b, a),
-			Color(0, 0, 0, 150),
+			main_color,
+			COL_BG,
 			math.min(1, math.max(0, self.m_timer:Elapsed() / 2000))
 		)
 
@@ -229,7 +232,7 @@ function LaunchControl:Charge(veh, rolling)
 		end
 	elseif (self.m_state ~= eLaunchControlState.NONE and self.m_state ~= eLaunchControlState.READY) then
 		if (PAD.IS_CONTROL_RELEASED(0, 71) or not cond2 or not self:ShouldRun()) then
-			r, g, b, a = 255, 255, 255, 255
+			main_color = COL_FG
 			if (not rolling) then
 				veh:Unfreeze()
 			else
@@ -275,7 +278,8 @@ function LaunchControl:OnTick()
 		self.m_timer = Timer.new(2000, true)
 	end
 
-	local rolling = PV:IsCar() and PV:IsMoving() and not PV:IsReversing() and math.is_inrange(PV:GetSpeed(), 8, PV:GetMaxSpeed())
+	local fwd_speed = PV:GetSpeedVector().y
+	local rolling   = PV:IsCar() and math.is_inrange(fwd_speed, 8, PV:GetMaxSpeed())
 	if (PV:IsEngineOn()) then
 		self:Charge(PV, rolling)
 	end

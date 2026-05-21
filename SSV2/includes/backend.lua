@@ -500,7 +500,11 @@ function Backend:RegisterHandlers()
 		Translator:OnTick()
 
 		yield()
-	end)
+	end, {
+		exception_handler = function()
+			Backend:Cleanup()
+		end
+	})
 
 	ThreadManager:RegisterLooped("SS_POOLMGR", function()
 		self:PoolMgr()

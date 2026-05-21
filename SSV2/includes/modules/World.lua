@@ -130,6 +130,10 @@ end)
 
 ThreadManager:RegisterLooped("SS_WORLD", function()
 	World.m_feat_mgr:Update()
-end)
+end, {
+	exception_handler = function()
+		World:Cleanup()
+	end
+})
 
 return World

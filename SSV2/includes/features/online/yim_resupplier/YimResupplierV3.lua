@@ -86,7 +86,7 @@ function YRV3:init()
 
 	self.m_thread = ThreadManager:RegisterLooped("SS_YRV3", function()
 		self:OnTick()
-	end)
+	end, { exception_handler = self:Reset(true) })
 
 	local function __reset__()
 		if (self.m_data_initialized) then self:Reset() end
@@ -99,7 +99,9 @@ function YRV3:init()
 	return self
 end
 
-function YRV3:Reset()
+---@param disable? boolean
+---@param reason? string
+function YRV3:Reset(disable, reason)
 	self.m_total_sum                 = 0
 	self.m_total_sum_fmt             = "$0"
 	self.m_last_autosell_check_time  = 0
@@ -111,7 +113,11 @@ function YRV3:Reset()
 	self.m_sell_script_running       = false
 	self.m_initial_data_done         = false
 	self.m_data_initialized          = false
-	self.m_state                     = Enums.eYRState.IDLE
+	self.m_state                     = disable and Enums.eYRState.ERROR or Enums.eYRState.IDLE
+
+	if (disable) then
+		self:SetLastError(reason or "Unhandled Exception.")
+	end
 end
 
 function YRV3:Reload()

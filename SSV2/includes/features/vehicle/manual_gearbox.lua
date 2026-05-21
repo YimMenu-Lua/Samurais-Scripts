@@ -12,7 +12,7 @@ local HandlingPreset = require("includes.structs.HandlingPreset")
 
 
 local eGearboxType <const> = {
-	W_CLUTCH   = 0,
+	H_PATTERN  = 0,
 	SEQUENTIAL = 1
 }
 
@@ -34,6 +34,8 @@ end
 ---@field private m_cvehicle CVehicle
 ---@field private m_state GearState
 ---@field private m_flag_preset HandlingPreset
+---@field private m_clutch_kick { enabled: boolean, rpm: float, timer: Timer }
+---@field private m_clutch_kick_duration integer
 local ManualGearBox = setmetatable({}, FeatureBase)
 ManualGearBox.__index = ManualGearBox
 
@@ -56,8 +58,14 @@ function ManualGearBox:ShouldRun()
 end
 
 function ManualGearBox:Init()
-	local eAdvancedFlags = Enums.eVehicleAdvancedFlags
-	self.m_state = {
+	local clutch_kick_duration  = 400
+	self.m_clutch_kick_duration = clutch_kick_duration
+	self.m_clutch_kick          = {
+		enabled = false,
+		rpm     = 0.0,
+		timer   = Timer.new(clutch_kick_duration, true),
+	}
+	self.m_state                = {
 		m_current           = 0,
 		m_next              = 0,
 		m_selected          = 0,
@@ -65,7 +73,8 @@ function ManualGearBox:Init()
 		m_is_clutch_pressed = false,
 		m_is_in_reverse     = false
 	}
-	self.m_flag_preset = HandlingPreset.new({
+
+	self.m_flag_preset          = HandlingPreset.new({
 		name = "Manual Gearbox",
 		deltas = {
 			[Enums.eHandlingEditorTypes.TYPE_AF] = {
@@ -89,10 +98,15 @@ function ManualGearBox:Reset()
 		m_is_in_reverse     = false,
 	}
 
-	local cvehicle = self.m_cvehicle
-	cvehicle.m_current_gear:set_byte(0)
-	cvehicle.m_next_gear:set_byte(0)
 	self.m_entity.m_flag_controller:TogglePreset(self.m_flag_preset, false)
+	local cvehicle = self.m_cvehicle
+	if (not cvehicle) then return end
+
+	local pCurrentGear = cvehicle.m_current_gear
+	if (pCurrentGear:is_valid() and pCurrentGear:get_byte() > 10) then
+		cvehicle.m_current_gear:set_byte(0)
+		cvehicle.m_next_gear:set_byte(0)
+	end
 end
 
 function ManualGearBox:OnNewVehicle()
@@ -142,12 +156,40 @@ end
 ---@param state GearState
 ---@param cvehicle CVehicle
 function ManualGearBox:OnClutchRelease(state, cvehicle)
+	local changed_gears = state.m_mutated
 	if (state.m_mutated) then
 		state.m_mutated           = false
 		state.m_is_clutch_pressed = false
 	end
 
 	self:ShiftGears(state, cvehicle)
+
+	if (PAD.IS_CONTROL_PRESSED(0, 71) or PAD.IS_CONTROL_PRESSED(0, 72)) then
+		if (self.m_clutch_kick.enabled) then return end
+
+		self.m_clutch_kick.enabled = true
+		self.m_clutch_kick.rpm     = cvehicle.m_rpm:get_float()
+		self.m_clutch_kick.timer:Reset()
+	end
+end
+
+function ManualGearBox:HandleClutchKick()
+	local _t = self.m_clutch_kick
+	if (not _t.enabled) then return end
+
+	local timer = _t.timer
+	if (timer:IsDone()) then
+		_t.enabled = false
+		_t.rpm     = 0.0
+		return
+	end
+
+	local duration = self.m_clutch_kick_duration
+	local elapsed  = timer:Elapsed()
+	local rpm      = _t.rpm
+	local delta    = math.ratio(elapsed, 0, duration)
+	local power    = math.lerp(10.0, 1.0, delta ^ 2) * rpm
+	VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(self.m_entity:GetHandle(), power)
 end
 
 ---@param state GearState
@@ -242,6 +284,7 @@ function ManualGearBox:Update()
 
 	self:HandleGears(state, cvehicle)
 	self:HandleFwdReverse()
+	self:HandleClutchKick()
 end
 
 return ManualGearBox

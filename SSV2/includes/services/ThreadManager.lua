@@ -58,36 +58,36 @@ eThreadStage = {
 ---@field private m_last_yield_at seconds
 ---@field private m_avg_work_ms milliseconds
 ---@field private m_avg_cycle_ms milliseconds
----@overload fun(name: string, callback: function): Thread
+---@field private m_exc_handler function?
+---@overload fun(name: string, callback: function, exceptionHandler?: function): Thread
 local Thread = Class("Thread")
 
 ---@param name string
 ---@param callback function
-function Thread.new(name, callback)
+---@param exceptionHandler? function
+function Thread.new(name, callback, exceptionHandler)
 	if (not string.isvalid(name)) then
 		name = string.random(5, true):upper()
 	end
 
-	return setmetatable(
-		{
-			m_name          = name,
-			m_callback      = callback,
-			m_can_run       = false,
-			m_should_pause  = false,
-			m_wants_exit    = false,
-			m_state         = eThreadState.UNK,
-			m_stage         = eThreadStage.IDLE,
-			m_time_created  = TimePoint.new(),
-			m_time_started  = 0,
-			m_last_entry_at = 0,
-			m_last_exit_at  = 0,
-			m_last_yield_at = 0,
-			m_avg_work_ms   = 0,
-			m_avg_cycle_ms  = 0,
-		},
+	return setmetatable({
+		m_name          = name,
+		m_callback      = callback,
+		m_exc_handler   = exceptionHandler,
+		m_can_run       = false,
+		m_should_pause  = false,
+		m_wants_exit    = false,
+		m_state         = eThreadState.UNK,
+		m_stage         = eThreadStage.IDLE,
+		m_time_created  = TimePoint.new(),
+		m_time_started  = 0,
+		m_last_entry_at = 0,
+		m_last_exit_at  = 0,
+		m_last_yield_at = 0,
+		m_avg_work_ms   = 0,
+		m_avg_cycle_ms  = 0,
 		---@diagnostic disable-next-line: param-type-mismatch
-		Thread
-	)
+	}, Thread)
 end
 
 ---@return string
@@ -109,6 +109,11 @@ end
 ---@return function
 function Thread:GetCallback()
 	return self.m_callback
+end
+
+---@return function?
+function Thread:GetExceptionHandler()
+	return self.m_exc_handler
 end
 
 ---@return milliseconds
@@ -146,11 +151,22 @@ function Thread:IsSuspended()
 	return self.m_state == eThreadState.SUSPENDED
 end
 
+---@param func function
+function Thread:RegisterExceptionHandler(func)
+	self.m_exc_handler = func
+end
+
+function Thread:OnError()
+	local handler = self.m_exc_handler
+	if (not handler) then return end
+	pcall(handler)
+end
+
 ---@param s? script_util
 function Thread:OnTick(s)
 	self.m_can_run = (type(self.m_callback) == "function")
 	if (not self.m_can_run) then
-		log.fwarning("Thread %s was terminated because it has no callback", self.m_name)
+		log.fwarning("Thread %s was terminated. Nothing to execute!", self.m_name)
 		self:Stop()
 		return
 	end
@@ -192,7 +208,8 @@ function Thread:OnTick(s)
 
 		if (self.m_should_terminate or not ok) then
 			if (not ok and err) then
-				log.fwarning("Thread %s was terminated due to an unhandled exception: %s", self.m_name, err)
+				log.fwarning("Thread %s was terminated due to an exception: %s", self.m_name, err)
+				self:OnError()
 			end
 
 			self:Stop()
@@ -442,13 +459,16 @@ end
 
 -- Creates a thread that runs in a loop.
 ---@param name string
----@param func fun(s?: script_util)
----@param suspended? boolean
----@param is_debug_thread? boolean
-function ThreadManager:RegisterLooped(name, func, suspended, is_debug_thread)
-	local isMock = (API_VER == Enums.eGameBranch.MOCK)
-	if (isMock and not is_debug_thread) then return end
-	if (is_debug_thread and not isMock) then return end
+---@param func fun(s: script_util?)
+---@param kwargs?  { suspended: boolean?, is_debug_thread: boolean?, exception_handler: function? }
+---@return Thread?
+function ThreadManager:RegisterLooped(name, func, kwargs)
+	kwargs            = kwargs or {}
+	local is_mock_env = (API_VER == Enums.eGameBranch.MOCK)
+	local is_debug    = kwargs.is_debug_thread or false
+
+	if (is_mock_env and not is_debug) then return end
+	if (is_debug and not is_mock_env) then return end
 
 	if (not string.isvalid(name)) then
 		name = string.random(5, true):upper()
@@ -459,16 +479,11 @@ function ThreadManager:RegisterLooped(name, func, suspended, is_debug_thread)
 		return
 	end
 
-	local thread = Thread(name, func)
-	if (suspended) then
-		thread:Suspend()
-	end
+	local thread = Thread(name, func, kwargs.exception_handler)
+	if (kwargs.suspended) then thread:Suspend() end
 
 	self.m_threads[name] = thread
-	self:Run(function(s)
-		thread:OnTick(s)
-	end)
-
+	self:Run(function(s) thread:OnTick(s) end)
 	return thread
 end
 
