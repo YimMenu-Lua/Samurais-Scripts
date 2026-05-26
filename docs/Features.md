@@ -221,8 +221,8 @@ _Vehicle-centric features extending the capabilities of vanilla vehicles._
 
   Allows you to manually switch gears when driving cars and bikes. Has two modes:
 
-  - **Manual With Clutch**: Requires pressing the clutch to change gears _(simplified, no stall)_.
-  - **Sequential**: Directly shift up/down without a clutch. You can still use the clutch to rev and/or clutch-kick.
+  - **Manual With Clutch**: Requires pressing the clutch to change gears. Stalling behavior can be disabled by enabling the `Clutch Assist` toggle.
+  - **Sequential**: Directly shift up/down without a clutch. You can still use the clutch to clutch-kick, rev, or kick-start the engine.
 
   **NOTE**: While not in reverse gear, **[S]** always works as a brake; the car will not automatically go in reverse when you hold the brake button so you must select reverse gear then use **[S]** to drive backwards and vice versa.
 
