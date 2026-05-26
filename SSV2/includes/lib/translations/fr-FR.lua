@@ -973,5 +973,10 @@ return {
 	["VEH_DEFAULT_RADIO"] = "Radio par défaut",
 	["VEH_MANUAL_GEARBOX_TYPE"] = "Type de boîte de vitesses",
 	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manuel avec embrayage",
-	["VEH_DEFAULT_RADIO_TT"] = "Force la radio de votre véhicule à la station sélectionnée à chaque fois que vous changez de véhicule.\n\nVous pouvez sélectionner une station en appuyant sur la touche [. . .] bouton d’options après avoir activé la fonctionnalité."
+	["VEH_DEFAULT_RADIO_TT"] = "Force la radio de votre véhicule à la station sélectionnée à chaque fois que vous changez de véhicule.\n\nVous pouvez sélectionner une station en appuyant sur la touche [. . .] bouton d’options après avoir activé la fonctionnalité.",
+	["VEH_PERF_ONLY"] = "Performances uniquement",
+	["VEH_PERF_ONLY_TT"] = "Limite certaines fonctionnalités aux voitures de performance uniquement (Launch Control, Pops & Bangs, etc.)",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "Veuillez appuyer sur l'embrayage ou mettre la vitesse au point mort avant de démarrer le moteur.",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Mode manuel uniquement : désactive le comportement de calage du moteur.",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Assistance à l'embrayage"
 }

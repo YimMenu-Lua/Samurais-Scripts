@@ -973,5 +973,10 @@ return {
 	["VEH_DEFAULT_RADIO_TT"] = "Zwingt das Radio Ihres Fahrzeugs jedes Mal zum ausgewählten Sender, wenn Sie das Fahrzeug wechseln.\n\nSie können einen Sender auswählen, indem Sie die Taste [ drücken. . .] Optionsschaltfläche nach dem Umschalten der Funktion.",
 	["VEH_MANUAL_GEARBOX"] = "Manuelles Getriebe",
 	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manuell mit Kupplung",
-	["VEH_MANUAL_GEARBOX_TT"] = "Ermöglicht das manuelle Schalten der Gänge in Autos und Motorrädern.\n\nHinweis: Wenn diese Option aktiviert ist, funktioniert „Launch Control“ im Stillstand nicht; Nur der „Rolling“-Modus funktioniert."
+	["VEH_MANUAL_GEARBOX_TT"] = "Ermöglicht das manuelle Schalten der Gänge in Autos und Motorrädern.\n\nHinweis: Wenn diese Option aktiviert ist, funktioniert „Launch Control“ im Stillstand nicht; Nur der „Rolling“-Modus funktioniert.",
+	["VEH_PERF_ONLY_TT"] = "Beschränkt einige Funktionen nur auf Hochleistungsautos (Launch Control, Pops & Bangs usw.)",
+	["VEH_PERF_ONLY"] = "Nur Leistung",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "Bitte treten Sie die Kupplung oder schalten Sie den Gang in den Leerlauf, bevor Sie den Motor starten.",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Kupplungsassistent",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Nur manueller Modus: Deaktiviert das Motorabwürgeverhalten."
 }

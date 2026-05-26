@@ -973,5 +973,10 @@ return {
 	["VEH_GEARBOX_MAN_WCLUTCH"] = "手动带离合器",
 	["VEH_MANUAL_GEARBOX"] = "手动变速箱",
 	["VEH_GEARBOX_SEQUENTIAL"] = "顺序",
-	["VEH_MANUAL_GEARBOX_TT"] = "允许您在汽车和摩托车中手动换档。\n\n注意：启用此功能后，“启动控制”在静止时将不起作用；只有“滚动”模式才有效。"
+	["VEH_MANUAL_GEARBOX_TT"] = "允许您在汽车和摩托车中手动换档。\n\n注意：启用此功能后，“启动控制”在静止时将不起作用；只有“滚动”模式才有效。",
+	["VEH_PERF_ONLY"] = "仅性能",
+	["VEH_PERF_ONLY_TT"] = "将某些功能仅限于高性能汽车（启动控制、砰砰声等）",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "启动发动机前，请踩下离合器或将档位置于空档。",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "离合器辅助装置",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "仅手动模式：禁用发动机熄火行为。"
 }

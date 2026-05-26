@@ -973,5 +973,10 @@ return {
 	["VEH_GEARBOX_SEQUENTIAL"] = "Sequenziale",
 	["VEH_MANUAL_GEARBOX_TT"] = "Ti consente di cambiare marcia manualmente in auto e moto.\n\nNota: quando è abilitato, \"Launch Control\" non funzionerà da fermo; funzionerà solo la modalità 'Rolling'.",
 	["VEH_DEFAULT_RADIO_TT"] = "Forza la radio del tuo veicolo alla stazione selezionata ogni volta che cambi veicolo.\n\nPuoi selezionare una stazione premendo il pulsante [. . .] pulsante delle opzioni dopo aver attivato la funzione.",
-	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manuale Con Frizione"
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manuale Con Frizione",
+	["VEH_PERF_ONLY"] = "Solo prestazioni",
+	["VEH_PERF_ONLY_TT"] = "Limita alcune funzionalità solo alle auto ad alte prestazioni (Launch Control, Pops & Bangs, ecc.)",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "Si prega di premere la frizione o mettere la marcia in folle prima di avviare il motore.",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Assistenza alla frizione",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Solo modalità manuale: disabilita il comportamento di stallo del motore."
 }

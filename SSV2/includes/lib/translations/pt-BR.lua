@@ -973,5 +973,10 @@ return {
 	["VEH_MANUAL_GEARBOX"] = "Caixa de velocidades manual",
 	["VEH_MANUAL_GEARBOX_TYPE"] = "Tipo de caixa de velocidades",
 	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manual com embreagem",
-	["VEH_MANUAL_GEARBOX_TT"] = "Permite que você mude manualmente de marcha em carros e motocicletas.\n\nObservação: quando ativado, o 'Controle de Lançamento' não funcionará enquanto estiver parado; apenas o modo 'Rolling' funcionará."
+	["VEH_MANUAL_GEARBOX_TT"] = "Permite que você mude manualmente de marcha em carros e motocicletas.\n\nObservação: quando ativado, o 'Controle de Lançamento' não funcionará enquanto estiver parado; apenas o modo 'Rolling' funcionará.",
+	["VEH_PERF_ONLY_TT"] = "Limita alguns recursos apenas a carros de alto desempenho (Controle de Lançamento, Pops & Bangs, etc.)",
+	["VEH_PERF_ONLY"] = "Somente desempenho",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "Pressione a embreagem ou coloque a marcha em ponto morto antes de ligar o motor.",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Somente modo manual: desativa o comportamento de parada do motor.",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Assistência de embreagem"
 }

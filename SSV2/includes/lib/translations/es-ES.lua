@@ -973,5 +973,10 @@ return {
 	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manual con embrague",
 	["VEH_MANUAL_GEARBOX_TYPE"] = "Tipo de caja de cambios",
 	["VEH_MANUAL_GEARBOX_TT"] = "Le permite cambiar de marcha manualmente en automóviles y motocicletas.\n\nNota: cuando esto está habilitado, el 'Control de inicio' no funcionará mientras esté parado; Sólo funcionará el modo 'Rolling'.",
-	["VEH_DEFAULT_RADIO_TT"] = "Fuerza la radio de tu vehículo a la estación seleccionada cada vez que cambias de vehículo.\n\nPuedes seleccionar una estación presionando el botón [. . .] botón de opciones después de alternar la función."
+	["VEH_DEFAULT_RADIO_TT"] = "Fuerza la radio de tu vehículo a la estación seleccionada cada vez que cambias de vehículo.\n\nPuedes seleccionar una estación presionando el botón [. . .] botón de opciones después de alternar la función.",
+	["VEH_PERF_ONLY"] = "Sólo rendimiento",
+	["VEH_PERF_ONLY_TT"] = "Limita algunas funciones solo a autos de alto rendimiento (Control de lanzamiento, Pops & Bangs, etc.)",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "Presione el embrague o ponga la marcha en punto muerto antes de arrancar el motor.",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Asistencia de embrague",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Solo modo manual: desactiva el comportamiento de calado del motor."
 }

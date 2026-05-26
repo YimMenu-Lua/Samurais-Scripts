@@ -14,10 +14,10 @@ local CHandlingData     = require("includes.classes.gta.CHandlingData")
 local CEntity           = require("includes.classes.gta.CEntity")
 local CVehicleDrawData  = require("includes.classes.gta.CVehicleDrawData")
 local CVehicleModelInfo = require("includes.classes.gta.CVehicleModelInfo")
+local CTransmission     = require("includes.classes.gta.CTransmission")
 local CWheel            = require("includes.classes.gta.CWheel")
 local fMatrix44         = require("includes.classes.gta.fMatrix44")
 local phFragInst        = require("includes.classes.gta.phFragInst")
-local CCarHandlingData  = require("includes.classes.gta.CCarHandlingData")
 
 
 ---@class CAdvancedData
@@ -30,26 +30,22 @@ local CCarHandlingData  = require("includes.classes.gta.CCarHandlingData")
 ---@ignore
 ---@class CVehicle : CEntity
 ---@field protected m_ptr pointer
----@field public m_physics_fragments phFragInst //0x0030 `struct rage::phFragInst`
 ---@field public m_draw_data CVehicleDrawData
 ---@field public m_handling_data CHandlingData
 ---@field public m_model_info CVehicleModelInfo
 ---@field public m_vehicle_damage pointer<CVehicleDamage>
 ---@field public m_can_boost_jump pointer<byte> `bool`
 ---@field public m_velocity pointer<vec3>
+---@field public m_transmission CTransmission
 ---@field public m_deform_god pointer<uint8_t>
+---@field public m_frag_inst phFragInst //0x09C0 `fragInstGTA`
+---@field public m_turbo pointer<float>
 ---@field public m_water_damage pointer<uint32_t>
----@field public m_next_gear pointer<uint8_t>
----@field public m_current_gear pointer<uint8_t>
----@field public m_top_gear pointer<uint8_t>
----@field public m_rpm pointer<float>
----@field public m_rpm_2 pointer<float>
----@field public m_clutch pointer<float> // 0x08D4
----@field public m_throttle pointer<float> -- these two might be flipped
----@field public m_throttle_input pointer<float> //
 ---@field public m_engine_health pointer<float>
----@field public m_steering_input pointer<float> // 0x00D4 name might not correctly reflect what this actually is but this seems to store controller input (value is between 0.99 (left) .. -0.99 (right))
----@field public m_current_steering pointer<float> 0x00DC // actual wheel steer. Wr'll use it to rewrite last known wheel steer after exiting a vehicle in IV-Style Exit so we'll no longer need to teleport outside or patch CTaskVehicleExit
+---@field public m_steering_input pointer<float> // 0x00D4 name might not correctly reflect what this actually is but this seems to store controller input (value is between 1.0 (left) .. -1.0 (right))
+---@field public m_steering_angle pointer<float> 0x00DC // steering angle?. We'll use it to rewrite last known steering value after exiting a vehicle in IV-Style Exit so we'll no longer have to teleport outside or patch CTaskVehicleExit
+---@field public m_throttle_power pointer<float> m_steering_angle + 0x8
+---@field public m_brake_power pointer<float>
 ---@field public m_is_targetable pointer<byte> `bool`
 ---@field public m_door_lock_status pointer<uint32_t>
 ---@field public m_wheels atArray<CWheel> -- 0x0C30
@@ -71,35 +67,32 @@ function CVehicle:init(vehicle)
 	local instance = setmetatable({}, CVehicle)
 	instance:super().init(instance, vehicle)
 
-	local ptr                    = memory.handle_to_ptr(vehicle)
-	instance.m_ptr               = ptr
-	instance.m_model_info        = CVehicleModelInfo(ptr:add(0x0020):deref())
-	instance.m_water_damage      = ptr:add(0x00D8)
-	instance.m_physics_fragments = phFragInst(ptr:add(0x0030):deref())
-	instance.m_draw_data         = CVehicleDrawData(ptr:add(0x0048):deref())
-	instance.m_can_boost_jump    = ptr:add(0x03A4)
-	instance.m_vehicle_damage    = ptr:add(0x0420)
-	instance.m_velocity          = ptr:add(0x07D0)
-	instance.m_is_targetable     = ptr:add(0x0AEE)
-	instance.m_next_gear         = ptr:add(0x0880)
-	instance.m_current_gear      = ptr:add(0x0882)
-	instance.m_top_gear          = ptr:add(0x0886)
-	instance.m_rpm               = ptr:add(0x08C8)
-	instance.m_rpm_2             = ptr:add(0x08CC)
-	instance.m_clutch            = ptr:add(0x08D4)
-	instance.m_throttle          = ptr:add(0x08D8)
-	instance.m_throttle_input    = ptr:add(0x08E0)
-	instance.m_engine_health     = ptr:add(0x0910)
-	instance.m_handling_data     = CHandlingData(ptr:add(0x0960):deref(), instance.m_model_info:GetVehicleType())
-	instance.m_deform_god        = ptr:add(0x096C)
-	instance.m_steering_input    = ptr:add(0x09D4)
-	instance.m_current_steering  = ptr:add(0x09DC)
-	instance.m_door_lock_status  = ptr:add(0x13D0)
+	local ptr                   = memory.handle_to_ptr(vehicle)
+	instance.m_ptr              = ptr
+	instance.m_model_info       = CVehicleModelInfo(ptr:add(0x0020):deref())
+	instance.m_draw_data        = CVehicleDrawData(ptr:add(0x0048):deref())
+	instance.m_turbo            = ptr:add(0x007C)
+	instance.m_water_damage     = ptr:add(0x00D8)
+	instance.m_can_boost_jump   = ptr:add(0x03A4)
+	instance.m_vehicle_damage   = ptr:add(0x0420)
+	instance.m_velocity         = ptr:add(0x07D0)
+	instance.m_transmission     = CTransmission(ptr:add(0x0880))
+	instance.m_engine_health    = ptr:add(0x0910)
+	instance.m_handling_data    = CHandlingData(ptr:add(0x0960):deref(), instance.m_model_info:GetVehicleType())
+	instance.m_deform_god       = ptr:add(0x096C)
+	instance.m_frag_inst        = phFragInst(ptr:add(0x09C0):deref())
+	instance.m_steering_input   = ptr:add(0x09D4)
+	instance.m_steering_angle   = ptr:add(0x09DC)
+	instance.m_throttle_power   = ptr:add(0x09E4)
+	instance.m_brake_power      = ptr:add(0x09E8)
+	instance.m_is_targetable    = ptr:add(0x0AEE)
 
-	local array_ptr              = ptr:add(0x0C30)
-	instance.m_wheels            = atArray(array_ptr, CWheel)
-	instance.m_num_wheels        = array_ptr:add(0x8):get_int()
-	instance.m_ride_height       = array_ptr:deref():add(0x007C)
+	local array_ptr             = ptr:add(0x0C30)
+	instance.m_wheels           = atArray(array_ptr, CWheel)
+	instance.m_num_wheels       = array_ptr:add(0x8):get_int()
+	instance.m_ride_height      = array_ptr:deref():add(0x007C)
+
+	instance.m_door_lock_status = ptr:add(0x13D0)
 
 	return instance
 end
@@ -124,14 +117,6 @@ function CVehicle:GetDeformMultiplier()
 		return self.m_handling_data:GetDeformMultiplier()
 	end)
 end
-
--- ---@param handlingType eHandlingType
--- ---@return CCarHandlingData|CBikeHandlingData|CFlyingHandlingData|any
--- function CVehicle:GetSubHandlingData(handlingType)
--- 	return self:__safecall(nil, function()
--- 		return self.m_handling_data:GetSubHandlingData(handlingType)
--- 	end)
--- end
 
 ---@return pointer<(CCarHandlingData|CBikeHandlingData|CFlyingHandlingData)?>
 function CVehicle:GetSubHandlingData()
@@ -332,7 +317,7 @@ end
 ---@param boneIndex integer
 ---@return fMatrix44
 function CVehicle:GetBoneMatrix(boneIndex)
-	local ph_frag_inst = self.m_physics_fragments
+	local ph_frag_inst = self.m_frag_inst
 	if not ph_frag_inst then
 		return fMatrix44:zero()
 	end
@@ -348,7 +333,7 @@ end
 ---@param boneIndex integer
 ---@param matrix fMatrix44
 function CVehicle:SetBoneMatrix(boneIndex, matrix)
-	local ph_frag_inst = self.m_physics_fragments
+	local ph_frag_inst = self.m_frag_inst
 	if not ph_frag_inst then
 		return
 	end

@@ -73,7 +73,7 @@ function Set:Clear()
 	self.m_data = {}
 end
 
----@param element T
+---@param element any
 ---@return boolean
 function Set:Contains(element)
 	return self.m_data[element] == true

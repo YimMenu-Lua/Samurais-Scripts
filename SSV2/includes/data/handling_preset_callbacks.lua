@@ -61,6 +61,24 @@ return {
 			return true
 		end
 	},
+	["VEH_RAMP"] = {
+		onEnable  = function(_)
+			local PV = LocalPlayer:GetVehicle()
+			if (not PV:IsValid()) then return true end
+			VEHICLE.SET_ALLOW_RAMMING_SOOP_OR_RAMP(PV:GetHandle(), true)
+			VEHICLE.VEHICLE_SET_RAMP_AND_RAMMING_CARS_TAKE_DAMAGE(PV:GetHandle(), false)
+			return true
+		end,
+		onDisable = function(_)
+			local PV = LocalPlayer:GetVehicle()
+			if (not PV:IsValid()) then return true end
+			local model = PV:GetModelHash()
+			if (model ~= 0xCEB28249 and model ~= 0xED62BFA9) then
+				VEHICLE.SET_ALLOW_RAMMING_SOOP_OR_RAMP(PV:GetHandle(), false)
+			end
+			return true
+		end
+	},
 	["VEH_OFFROAD_ABILITIES"] = {
 		onEnable  = function(_)
 			local PV = LocalPlayer:GetVehicle()

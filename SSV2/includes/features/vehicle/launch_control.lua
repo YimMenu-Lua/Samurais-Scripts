@@ -197,12 +197,12 @@ function LaunchControl:Charge(veh, rolling)
 			if (not self.m_rolling_speed_lock) then
 				self.m_rolling_speed_lock = veh:GetSpeed()
 			else
-				local cvehicle = veh:Resolve()
+				local transmission = veh:Resolve().m_transmission
 				VEHICLE.SET_VEHICLE_MAX_SPEED(veh:GetHandle(), self.m_rolling_speed_lock)
-				cvehicle.m_throttle:set_float(0.45)
-				cvehicle.m_throttle_input:set_float(0.45)
-				cvehicle.m_rpm:set_float(0.45)
-				cvehicle.m_rpm_2:set_float(0.45)
+				transmission.m_throttle:set_float(0.45)
+				transmission.m_throttle_input:set_float(0.45)
+				transmission.m_rpm:set_float(0.45)
+				transmission.m_rpm_2:set_float(0.45)
 			end
 		end
 

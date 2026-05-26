@@ -527,6 +527,8 @@ return {
 	--#endregion
 
 	--#region Vehicle
+	["VEH_PERF_ONLY"]                      = "Performance Only",
+	["VEH_PERF_ONLY_TT"]                   = "Limits some features to performance cars only (Launch Control, Pops & Bangs, etc.)",
 	["VEH_SPEEDOMETER"]                    = "Speedometer",
 	["VEH_FAST_AF"]                        = "Fast Vehicles",
 	["VEH_FAST_AF_TT"]                     = "Increases the top speed of any land vehicle you drive.",
@@ -728,6 +730,9 @@ return {
 	["VEH_MANUAL_GEARBOX_TYPE"]            = "Gearbox Type",
 	["VEH_GEARBOX_MAN_WCLUTCH"]            = "Manual With Clutch",
 	["VEH_GEARBOX_SEQUENTIAL"]             = "Sequential",
+	["VEH_GEARBOX_CLUTCH_ASSIST"]          = "Clutch Assist",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"]       = "Manual Mode Only: Disables engine stalling behavior.",
+	["VEH_GEARBOX_ENGINE_START_ERR"]       = "Please press the clutch or put the gear in neutral before starting the engine.",
 	--#endregion
 
 	--#region World

@@ -66,7 +66,7 @@ function IVStyleExit:LeaveVehicle(keepEngineOn)
 	LocalPlayer:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, keepEngineOn)
 
 	if (enabled) then
-		self.m_last_steer_angle = self.m_entity:Resolve().m_current_steering:get_float()
+		self.m_last_steer_angle = self.m_entity:Resolve().m_steering_angle:get_float()
 		if (not keepEngineOn) then
 			VEHICLE.SET_VEHICLE_ENGINE_ON(self.m_entity:GetHandle(), false, true, false)
 		end
@@ -112,7 +112,7 @@ function IVStyleExit:Update()
 	if (self.m_pending_steering) then
 		local veh = self.m_entity
 		if (veh and veh:IsValid()) then
-			local pSteering = veh:Resolve().m_current_steering
+			local pSteering = veh:Resolve().m_steering_angle
 			pSteering:set_float(self.m_last_steer_angle)
 		end
 

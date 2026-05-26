@@ -973,5 +973,10 @@ return {
 	["VEH_DEFAULT_RADIO_TT"] = "Wymusza przełączenie radia pojazdu na wybraną stację przy każdej zmianie pojazdu.\n\nMożesz wybrać stację, naciskając przycisk [. . .] przycisk opcji po przełączeniu tej funkcji.",
 	["VEH_MANUAL_GEARBOX_TT"] = "Umożliwia ręczną zmianę biegów w samochodach i motocyklach.\n\nUwaga: gdy ta opcja jest włączona, funkcja „Launch Control” nie będzie działać podczas postoju; będzie działać tylko tryb „Rolling”.",
 	["VEH_MANUAL_GEARBOX"] = "Ręczna skrzynia biegów",
-	["VEH_GEARBOX_MAN_WCLUTCH"] = "Ręczny ze sprzęgłem"
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "Ręczny ze sprzęgłem",
+	["VEH_PERF_ONLY"] = "Tylko wydajność",
+	["VEH_PERF_ONLY_TT"] = "Ogranicza niektóre funkcje tylko do samochodów wyczynowych (kontrola uruchamiania, trzaski i huki itp.)",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "Przed uruchomieniem silnika naciśnij sprzęgło lub ustaw bieg na luzie.",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Asystent sprzęgła",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Tylko tryb ręczny: wyłącza zachowanie zgaśnięcia silnika."
 }

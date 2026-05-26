@@ -7,22 +7,34 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local Refs                 = require("includes.data.refs")
-local default_cfg          = require("includes.data.config")
-local driftMG              = require("includes.features.vehicle.drift_minigame")
-local customPaintsUI       = require("includes.frontend.vehicle.custom_paints_ui")
-local engine_swap_index    = 1
-local vehicleTab           = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
-local optionPopup          = {
+local PV <const>                = LocalPlayer:GetVehicle()
+local Refs                      = require("includes.data.refs")
+local default_cfg               = require("includes.data.config")
+local driftMG                   = require("includes.features.vehicle.drift_minigame")
+local drawKeybind               = require("includes.frontend.helpers.draw_keybind")
+local drawPaintJobs             = require("includes.frontend.vehicle.custom_paints_ui")
+local engine_swap_index         = 1
+local gearbox_mode_clicked      = false
+local vehicleTab                = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
+local optionPopup               = {
 	flags       = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize,
 	label       = "##optionsPopup",
 	should_draw = false,
 	---@type function?
 	callback    = nil
 }
-DriftMinigame              = LocalPlayer:GetVehicle():AddFeature(driftMG)
 
-local vehicleRadioStations = { { station = "OFF", name = "Off" } }
+local manualGearboxKeybindNames = {
+	"shift_up",
+	"shift_down",
+	"clutch",
+	"engine_start_stop",
+}
+
+DriftMinigame                   = PV:AddFeature(driftMG)
+ManualGearbox                   = PV.m_manual_gearbox
+
+local vehicleRadioStations      = { { station = "OFF", name = "Off" } }
 for _, v in ipairs(Audio.RadioStations) do
 	local station = v.station
 	if (station:startswith("HIDDEN") or station == "RADIO_30_DLC_HEI4_MIX1_REVERB") then
@@ -33,11 +45,17 @@ for _, v in ipairs(Audio.RadioStations) do
 	::continue::
 end
 
+---@param toggle? boolean
+local function toggleEngineAutostart(toggle)
+	ThreadManager:Run(function()
+		ManualGearbox:SetEngineAutoStart(toggle)
+	end)
+end
+
 local function speedoOptions()
 	local resolution = Game.GetScreenResolution()
 	local cfg        = GVars.features.speedometer
-	ImGui.Text(_T("VEH_SPEED_UNIT"))
-	ImGui.Separator()
+	ImGui.SeparatorText(_T("VEH_SPEED_UNIT"))
 
 	cfg.speed_unit = ImGui.RadioButton("M/s", cfg.speed_unit, 0)
 	ImGui.SameLine()
@@ -46,22 +64,22 @@ local function speedoOptions()
 	cfg.speed_unit = ImGui.RadioButton("Mi/h", cfg.speed_unit, 2)
 
 	ImGui.Spacing()
-	ImGui.Text(_T("GENERIC_POSITION_LABEL"))
-	ImGui.Separator()
+	ImGui.SeparatorText(_T("GENERIC_POSITION_LABEL"))
 
 	cfg.pos.x = ImGui.SliderFloat(_T("GENERIC_LEFT_RIGHT_LABEL"), cfg.pos.x, 0.0, resolution.x - (cfg.radius * 2.2))
 	cfg.pos.y = ImGui.SliderFloat(_T("GENERIC_UP_DOWN_LABEL"), cfg.pos.y, 0.0, resolution.y - (cfg.radius * 2))
 
 	ImGui.Spacing()
-	ImGui.Text(_T("GENERIC_COLORS_LABEL"))
-	ImGui.Separator()
+	ImGui.SeparatorText(_T("GENERIC_COLORS_LABEL"))
 
 	cfg.colors.circle      = ImGui.ColorEditU32(_T("VEH_SPEED_CIRCLE"), cfg.colors.circle)
-	cfg.colors.circle_bg   = ImGui.ColorEditU32(_T("VEH_SPEED_BG"), cfg.colors.circle_bg)
 	cfg.colors.text        = ImGui.ColorEditU32(_T("VEH_SPEED_TEXT"), cfg.colors.text)
 	cfg.colors.markings    = ImGui.ColorEditU32(_T("VEH_SPEED_MARK"), cfg.colors.markings)
 	cfg.colors.needle      = ImGui.ColorEditU32(_T("VEH_SPEED_NEEDLE"), cfg.colors.needle)
 	cfg.colors.needle_base = ImGui.ColorEditU32(_T("VEH_SPEED_NEEDLE_BASE"), cfg.colors.needle_base)
+
+	ImGui.Separator()
+	ImGui.Spacing()
 
 	if (GUI:Button(_T("GENERIC_RESET"))) then
 		cfg.colors = table.copy(default_cfg.features.speedometer.colors)
@@ -154,7 +172,41 @@ end
 local function gearboxOptions()
 	ImGui.Spacing()
 	local cfg = GVars.features.vehicle.manual_gearbox
-	cfg.mode  = ImGui.Combo("##gboxManual", cfg.mode, { _T("VEH_GEARBOX_MAN_WCLUTCH"), _T("VEH_GEARBOX_SEQUENTIAL") }, 2)
+	cfg.mode, gearbox_mode_clicked = ImGui.Combo(_T("VEH_MANUAL_GEARBOX_TYPE"),
+		cfg.mode,
+		{ _T("VEH_GEARBOX_MAN_WCLUTCH"), _T("VEH_GEARBOX_SEQUENTIAL") },
+		2
+	)
+
+	if (gearbox_mode_clicked) then
+		toggleEngineAutostart()
+	end
+
+	if (cfg.mode == 0) then
+		cfg.disable_stalling = GUI:Checkbox(_T("VEH_GEARBOX_CLUTCH_ASSIST"), cfg.disable_stalling, {
+			onClick = function(v) toggleEngineAutostart(not v) end,
+		})
+		GUI:HelpMarker(_T("VEH_GEARBOX_CLUTCH_ASSIST_TT"))
+	end
+
+	ImGui.Spacing()
+	ImGui.SeparatorText(_T("SETTINGS_KEYBINDS"))
+	if (ImGui.BeginTabBar("##gearboxKeybinds")) then
+		if (ImGui.BeginTabItem(_T("SETTINGS_KEYBINDS_KEYBOARD"))) then
+			for _, key in ipairs(manualGearboxKeybindNames) do
+				drawKeybind(key, false)
+			end
+			ImGui.EndTabItem()
+		end
+
+		if (ImGui.BeginTabItem(_T("SETTINGS_KEYBINDS_CONTROLLER"))) then
+			for _, key in ipairs(manualGearboxKeybindNames) do
+				drawKeybind(key, true)
+			end
+			ImGui.EndTabItem()
+		end
+		ImGui.EndTabBar()
+	end
 end
 
 local function popsOptions()
@@ -477,12 +529,10 @@ vehicleTab:AddBoolCommand("VEH_MANUAL_GEARBOX",
 		meta            = { description = "VEH_MANUAL_GEARBOX_TT" },
 		translate_label = true,
 		on_enable       = function()
-			local PV = LocalPlayer:GetVehicle()
 			if (not PV:IsValid()) then return end
 			PV.m_manual_gearbox:OnNewVehicle()
 		end,
 		on_disable      = function()
-			local PV = LocalPlayer:GetVehicle()
 			if (not PV:IsValid()) then return end
 			PV.m_manual_gearbox:Reset()
 		end,
@@ -492,7 +542,7 @@ vehicleTab:AddBoolCommand("VEH_MANUAL_GEARBOX",
 			end,
 			callback = function()
 				optionPopup.callback    = gearboxOptions
-				optionPopup.label       = _T("VEH_MANUAL_GEARBOX_TYPE")
+				optionPopup.label       = _T("VEH_MANUAL_GEARBOX")
 				optionPopup.should_draw = true
 			end
 		}
@@ -505,9 +555,9 @@ vehicleTab:RegisterGUI(function()
 	ImGui.Spacing()
 	ImGui.SeparatorText("Settings")
 
-	GVars.features.vehicle.performance_only, _ = GUI:CustomToggle("Performance Cars Only",
+	GVars.features.vehicle.performance_only = GUI:CustomToggle(_T("VEH_PERF_ONLY"),
 		GVars.features.vehicle.performance_only,
-		{ tooltip = "Limits some features to performance cars only (Launch Control, Pops & Bangs, etc.)" }
+		{ tooltip = _T("VEH_PERF_ONLY_TT") }
 	)
 
 	if (optionPopup.should_draw) then
@@ -515,9 +565,11 @@ vehicleTab:RegisterGUI(function()
 		optionPopup.should_draw = false
 	end
 
-	ImGui.SetNextWindowSizeConstraints(300, 140, 600, 800)
+	ImGui.SetNextWindowSizeConstraints(520, 140, 800, 600)
 	if (optionPopup.callback and ImGui.BeginPopupModal(optionPopup.label, true, optionPopup.flags)) then
+		ImGui.PushItemWidth(400)
 		optionPopup.callback()
+		ImGui.PopItemWidth()
 		ImGui.EndPopup()
 	end
 end)
@@ -530,10 +582,10 @@ vehicleTab:RegisterSubtab("SUBTAB_HANDLING_EDITOR", require("includes.frontend.v
 vehicleTab:RegisterSubtab("SUBTAB_STANCER", require("includes.frontend.vehicle.stancer_ui"), nil, true)
 --#endregion
 
-local swap_btn_size = vec2:new(140, 35)
+local swap_btn_size   = vec2:new(140, 35)
 local swap_wnd_height = 260
 vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
-	if (self.get_veh() == 0) then
+	if (_G.self.get_veh() == 0) then
 		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
 		return
 	end
@@ -561,7 +613,6 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 	ImGui.BeginChild("##engine_s_btns", 0, swap_wnd_height)
 	if (GUI:Button(_T("GENERIC_CONFIRM"), { size = swap_btn_size })) then
 		ThreadManager:Run(function()
-			local PV = LocalPlayer:GetVehicle()
 			if (PV:GetModelHash() == _J(Refs.engineSwaps[engine_swap_index].audioname)) then
 				Notifier:ShowError(_T("VEH_ENGINE_SWAP"), _T("VEH_ENGINE_SWAP_SAME_ERR"), false, 5)
 				return
@@ -605,7 +656,6 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 					AUDIO.SET_VEH_RADIO_STATION(PV:GetHandle(), "OFF")
 				end
 			end, function()
-				local PV = LocalPlayer:GetVehicle()
 				PV:RestorePatch(PV.MemoryPatches.Acceleration)
 				AUDIO.FORCE_USE_AUDIO_GAME_OBJECT(PV:GetHandle(),
 					Game.GetVehicleDisplayName(PV:GetModelHash())
@@ -616,7 +666,6 @@ vehicleTab:RegisterSubtab("VEH_ENGINE_SWAP", function()
 
 	if (GUI:Button(_T("GENERIC_RESET"), { size = swap_btn_size })) then
 		ThreadManager:Run(function()
-			local PV = LocalPlayer:GetVehicle()
 			PV:ResetGenericToggleable("engine_swap")
 		end)
 	end
@@ -634,7 +683,7 @@ vehicleTab:RegisterSubtab("SUBTAB_PAINTS", function()
 		return
 	end
 
-	customPaintsUI()
+	drawPaintJobs()
 end, nil, true)
 
 require("includes.frontend.vehicle.flatbed_ui")

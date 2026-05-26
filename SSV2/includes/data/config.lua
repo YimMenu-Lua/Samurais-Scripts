@@ -42,48 +42,49 @@ local Config <const> = {
 		auto_close = false,
 	},
 	keyboard_keybinds = {
-		gui_toggle       = "F5",
-		kill_all_enemies = "F7",
-		enemies_flee     = "F8",
+		gui_toggle        = "F5",
+		kill_all_enemies  = "F7",
+		enemies_flee      = "F8",
 		-- missile_defence  = "F9",
-		cobra_maneuver   = "X",
-		flatbed          = "X",
-		laser_sights     = "L",
-		nos              = "MOUSE5",
-		rolling_launch   = "N",
-		panik            = "F12",
-		nos_purge        = "X",
-		rod              = "X",
-		drift_mode       = "SHIFT",
+		cobra_maneuver    = "X",
+		flatbed           = "X",
+		laser_sights      = "L",
+		nos               = "MOUSE5",
+		rolling_launch    = "N",
+		panik             = "F12",
+		nos_purge         = "X",
+		rod               = "X",
+		drift_mode        = "SHIFT",
 		-- trigger_bot      = "SHIFT",
-		veh_mine         = "NUMPAD0",
-		stop_anim        = "G",
-		shift_up         = "NUMPAD9",
-		shift_down       = "NUMPAD3",
-		clutch           = "NUMPAD5",
+		veh_mine          = "NUMPAD0",
+		stop_anim         = "G",
+		shift_up          = "NUMPAD9",
+		shift_down        = "NUMPAD3",
+		clutch            = "NUMPAD5",
+		engine_start_stop = "NUMPAD1",
 	},
 	gamepad_keybinds = {
-		flatbed        = {
+		flatbed           = {
 			code = 288,
 			name = "A"
 		},
-		laser_sights   = {
+		laser_sights      = {
 			code = 303,
 			name = "DPAD UP"
 		},
-		nos            = {
+		nos               = {
 			code = 289,
 			name = "X"
 		},
-		nos_purge      = {
+		nos_purge         = {
 			code = 288,
 			name = "A"
 		},
-		rod            = {
+		rod               = {
 			code = 288,
 			name = "A"
 		},
-		drift_mode     = {
+		drift_mode        = {
 			code = 288,
 			name = "A"
 		},
@@ -91,27 +92,31 @@ local Config <const> = {
 		-- 	code = 0,
 		-- 	name = "Unbound"
 		-- },
-		veh_mine       = {
+		veh_mine          = {
 			code = 0,
 			name = "Unbound"
 		},
-		stop_anim      = {
+		stop_anim         = {
 			code = 0,
 			name = "Unbound"
 		},
-		rolling_launch = {
+		rolling_launch    = {
 			code = 0,
 			name = "Unbound"
 		},
-		shift_up       = {
+		shift_up          = {
 			code = 0,
 			name = "Unbound"
 		},
-		shift_down     = {
+		shift_down        = {
 			code = 0,
 			name = "Unbound"
 		},
-		clutch         = {
+		clutch            = {
+			code = 0,
+			name = "Unbound"
+		},
+		engine_start_stop = {
 			code = 0,
 			name = "Unbound"
 		},
@@ -167,7 +172,8 @@ local Config <const> = {
 			},
 			manual_gearbox = {
 				enabled = false,
-				mode = 0,
+				disable_stalling = false,
+				mode = 0, ---@type eManualGearboxType
 			},
 			bangs_rpm_max = 9000.0,
 			bangs_rpm_min = 4000.0,

@@ -24,7 +24,7 @@ local MiscVehicle      = require("includes.features.vehicle.misc_vehicle")
 local CobraManeuver    = require("includes.features.vehicle.cobra_maneuver")
 local FlagController   = require("includes.features.vehicle.flag_controller")
 local Stancer          = require("includes.features.vehicle.stancer")
-local ManualGearBox    = require("includes.features.vehicle.manual_gearbox")
+local ManualGearbox    = require("includes.features.vehicle.manual_gearbox")
 
 ---@class GenericToggleable
 ---@field is_toggled boolean
@@ -56,7 +56,7 @@ local ManualGearBox    = require("includes.features.vehicle.manual_gearbox")
 ---@field public m_is_flatbed boolean cache it so we don't have to call natives in UI threads
 ---@field public m_flag_controller VehicleFlagController
 ---@field public m_stancer Stancer
----@field public m_manual_gearbox ManualGearBox
+---@field public m_manual_gearbox ManualGearbox
 ---@overload fun(handle: handle, opts?: { noassert: boolean }): PlayerVehicle
 local PlayerVehicle = Class("PlayerVehicle", { parent = Vehicle })
 
@@ -106,7 +106,7 @@ function PlayerVehicle:InitFeatures()
 	self.m_nos_mgr        = self.m_feat_mgr:Add(NosMgr.new(self))
 	self.m_abs_mgr        = self.m_feat_mgr:Add(BFD.new(self))
 	self.m_stancer        = self.m_feat_mgr:Add(Stancer.new(self))
-	self.m_manual_gearbox = self.m_feat_mgr:Add(ManualGearBox.new(self))
+	self.m_manual_gearbox = self.m_feat_mgr:Add(ManualGearbox.new(self))
 
 	self.m_feat_mgr:Add(FlappyDoors.new(self))
 	self.m_feat_mgr:Add(DriftMode.new(self))
@@ -422,7 +422,7 @@ end
 ---@return number
 function PlayerVehicle:GetCurrentGear()
 	if (GVars.features.vehicle.manual_gearbox.enabled and self.m_manual_gearbox) then
-		return self.m_manual_gearbox:GetCurrentGear()
+		return self.m_manual_gearbox:GetSelectedGear()
 	end
 	return VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(self:GetHandle())
 end

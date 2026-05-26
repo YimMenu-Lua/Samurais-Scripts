@@ -973,5 +973,10 @@ return {
 	["VEH_MANUAL_GEARBOX_TT"] = "允許您在汽車和摩托車中手動換檔。 \n\n注意：啟用此功能後，「啟動控制」在靜止時將無法運作；只有「滾動」模式才有效。",
 	["VEH_DEFAULT_RADIO_TT"] = "每次切換車輛時，強制將車輛的無線電廣播到選定的電台。 \n\n您可以按 [ 選擇電台。 。 .] 切換功能後的選項按鈕。",
 	["VEH_GEARBOX_MAN_WCLUTCH"] = "手動帶離合器",
-	["VEH_MANUAL_GEARBOX"] = "手排變速箱"
+	["VEH_MANUAL_GEARBOX"] = "手排變速箱",
+	["VEH_PERF_ONLY"] = "僅性能",
+	["VEH_PERF_ONLY_TT"] = "將某些功能僅限於高性能汽車（啟動控制、砰砰聲等）",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "啟動引擎前，請踩下離合器或將檔位置於空檔。",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "僅手動模式：停用引擎熄火行為。",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "離合器輔助裝置"
 }

@@ -973,5 +973,10 @@ return {
 	["VEH_DEFAULT_RADIO_TT"] = "車両を切り替えるたびに、車両のラジオを選択した放送局に強制的に送信します。\n\n[. 。機能を切り替えた後、.] オプション ボタンを押します。",
 	["VEH_MANUAL_GEARBOX_TYPE"] = "ギアボックスの種類",
 	["VEH_GEARBOX_MAN_WCLUTCH"] = "マニュアルクラッチ付",
-	["VEH_DEFAULT_RADIO"] = "デフォルトの無線"
+	["VEH_DEFAULT_RADIO"] = "デフォルトの無線",
+	["VEH_PERF_ONLY"] = "パフォーマンスのみ",
+	["VEH_PERF_ONLY_TT"] = "一部の機能をパフォーマンスカーのみに制限します (ローンチコントロール、ポップス&バングなど)",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "エンジンを始動する前にクラッチを押すかギアをニュートラルにしてください。",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "手動モードのみ: エンジン停止動作を無効にします。",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "クラッチアシスト"
 }
