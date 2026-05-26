@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local WARN_YELLOW <const> = Color("safety_yellow")
 local PV                  = LocalPlayer:GetVehicle()
 local Stancer             = PV.m_stancer
 local frontStanceDeltas   = Stancer.m_deltas[Enums.eWheelAxle.FRONT]
@@ -156,6 +157,90 @@ local function DrawSlider(key, deltaTable, axle, needsPhysicsUpdate)
 	end
 end
 
+local function DrawSavedVehicles()
+	local saved_models = Stancer:GetSavedModels()
+	if (next(saved_models) ~= nil) then
+		if (GUI:Button(_T("VEH_STANCE_VIEW_SAVED"))) then
+			savedVehsWindow.should_draw = true
+		end
+
+		ImGui.SameLine()
+		GVars.features.vehicle.stancer.auto_apply_saved = GUI:CustomToggle(
+			_T("VEH_STANCE_AUTOAPPLY"),
+			GVars.features.vehicle.stancer.auto_apply_saved,
+			{
+				tooltip = _T("VEH_STANCE_AUTOAPPLY_TT"),
+				onClick = function(v)
+					if (not v) then return end
+					ThreadManager:Run(function() Stancer:LoadSavedDeltas() end)
+				end
+			}
+		)
+	end
+
+	local is_saved   = Stancer:IsVehicleModelSaved()
+	local save_label = _T(is_saved and "VEH_STANCE_UPDATE_MODEL" or "VEH_STANCE_SAVE_MODEL")
+	if (GUI:Button(save_label)) then
+		if (is_saved) then
+			ImGui.OpenPopup(save_label)
+		else
+			Stancer:SaveCurrentVehicle()
+		end
+	end
+
+	if (is_saved and ImGui.DialogBox(save_label, _T("VEH_STANCE_UPDATE_WARN", Stancer:GetCurrentModelName()), ImGuiDialogBoxStyle.WARN)) then
+		Stancer:SaveCurrentVehicle()
+	end
+
+	if (not savedVehsWindow.should_draw) then
+		return
+	end
+
+	ImGui.Begin("##viewSavedVehicles",
+		ImGuiWindowFlags.NoTitleBar |
+		ImGuiWindowFlags.NoMove |
+		ImGuiWindowFlags.NoResize
+	)
+	GUI:QuickConfigWindow(_T("VEH_STANCE_VIEW_SAVED"), function()
+		if (ImGui.BeginListBox("##savedVehList", -1, 360)) then
+			for modelName in pairs(saved_models) do
+				local name = Game.GetVehicleDisplayName(modelName)
+				if (ImGui.Selectable(name, (selectedSavedModel == modelName))) then
+					selectedSavedModel = modelName
+				end
+			end
+			ImGui.EndListBox()
+		end
+
+		ImGui.Separator()
+
+		ImGui.BeginDisabled(#selectedSavedModel == 0)
+		if (GUI:Button(_T("GENERIC_APPLY"))) then
+			Stancer:LoadSavedDeltas(selectedSavedModel)
+		end
+
+		ImGui.SameLine()
+		if (GUI:Button(_T("GENERIC_REMOVE"))) then
+			Stancer:RemoveSavedVehicle(selectedSavedModel)
+		end
+		ImGui.EndDisabled()
+
+		ImGui.SameLine()
+		if (GUI:Button(_T("GENERIC_REMOVE_ALL"))) then
+			ImGui.OpenPopup(_T("GENERIC_REMOVE_ALL"))
+		end
+
+		if (ImGui.DialogBox(_T("GENERIC_REMOVE_ALL"))) then
+			Stancer:RemoveAllSavedVehicles()
+			savedVehsWindow.should_draw = false
+		end
+	end, function()
+		savedVehsWindow.should_draw = false
+	end, true)
+
+	ImGui.End()
+end
+
 return function()
 	if (PV:GetHandle() == 0) then
 		ImGui.Text(_T("GENERIC_NOT_IN_VEH"))
@@ -167,6 +252,13 @@ return function()
 		return
 	end
 
+	local isLocked, ownerName = Stancer:IsLocked()
+	if (isLocked and ownerName) then
+		GUI:Text(_T("VEH_STANCE_LOCKED_FMT", ownerName), { color = WARN_YELLOW })
+		ImGui.Spacing()
+	end
+
+	ImGui.BeginDisabled(isLocked)
 	if (GUI:Button(_T("GENERIC_RESET_ALL"))) then
 		ThreadManager:Run(function()
 			Stancer:Reset()
@@ -257,7 +349,7 @@ return function()
 	ImGui.EndDisabled()
 
 	ImGui.SameLine()
-	Stancer.m_bounce_mode.enabled, _ = GUI:CustomToggle(_T("VEH_STANCE_BOUNCE_MODE"),
+	Stancer.m_bounce_mode.enabled = GUI:CustomToggle(_T("VEH_STANCE_BOUNCE_MODE"),
 		Stancer.m_bounce_mode.enabled,
 		{
 			tooltip = _T("VEH_STANCE_BOUNCE_MODE_TT"),
@@ -268,86 +360,7 @@ return function()
 	)
 
 	ImGui.Separator()
-
-	local saved_models = Stancer:GetSavedModels()
-	if (next(saved_models) ~= nil) then
-		if (GUI:Button(_T("VEH_STANCE_VIEW_SAVED"))) then
-			savedVehsWindow.should_draw = true
-		end
-
-		ImGui.SameLine()
-		GVars.features.vehicle.stancer.auto_apply_saved = GUI:CustomToggle(
-			_T("VEH_STANCE_AUTOAPPLY"),
-			GVars.features.vehicle.stancer.auto_apply_saved,
-			{
-				tooltip = _T("VEH_STANCE_AUTOAPPLY_TT"),
-				onClick = function(v)
-					if (not v) then return end
-					ThreadManager:Run(function() Stancer:LoadSavedDeltas() end)
-				end
-			}
-		)
-	end
-
-	local is_saved   = Stancer:IsVehicleModelSaved()
-	local save_label = _T(is_saved and "VEH_STANCE_UPDATE_MODEL" or "VEH_STANCE_SAVE_MODEL")
-	if (GUI:Button(save_label)) then
-		if (is_saved) then
-			ImGui.OpenPopup(save_label)
-		else
-			Stancer:SaveCurrentVehicle()
-		end
-	end
-
-	if (is_saved and ImGui.DialogBox(save_label, _T("VEH_STANCE_UPDATE_WARN", Stancer:GetCurrentModelName()), ImGuiDialogBoxStyle.WARN)) then
-		Stancer:SaveCurrentVehicle()
-	end
-
-	if (savedVehsWindow.should_draw) then
-		ImGui.Begin("##viewSavedVehicles",
-			ImGuiWindowFlags.NoTitleBar |
-			ImGuiWindowFlags.NoMove |
-			ImGuiWindowFlags.NoResize
-		)
-		GUI:QuickConfigWindow(_T("VEH_STANCE_VIEW_SAVED"), function()
-			if (ImGui.BeginListBox("##savedVehList", -1, 360)) then
-				for modelName in pairs(saved_models) do
-					local name = Game.GetVehicleDisplayName(modelName)
-					if (ImGui.Selectable(name, (selectedSavedModel == modelName))) then
-						selectedSavedModel = modelName
-					end
-				end
-				ImGui.EndListBox()
-			end
-
-			ImGui.Separator()
-
-			ImGui.BeginDisabled(#selectedSavedModel == 0)
-			if (GUI:Button(_T("GENERIC_APPLY"))) then
-				Stancer:LoadSavedDeltas(selectedSavedModel)
-			end
-
-			ImGui.SameLine()
-			if (GUI:Button(_T("GENERIC_REMOVE"))) then
-				Stancer:RemoveSavedVehicle(selectedSavedModel)
-			end
-			ImGui.EndDisabled()
-
-			ImGui.SameLine()
-			if (GUI:Button(_T("GENERIC_REMOVE_ALL"))) then
-				ImGui.OpenPopup(_T("GENERIC_REMOVE_ALL"))
-			end
-
-			if (ImGui.DialogBox(_T("GENERIC_REMOVE_ALL"))) then
-				Stancer:RemoveAllSavedVehicles()
-				savedVehsWindow.should_draw = false
-			end
-		end, function()
-			savedVehsWindow.should_draw = false
-		end, true)
-
-		ImGui.End()
-	end
-
+	DrawSavedVehicles()
+	ImGui.EndDisabled()
 	ImGui.Spacing()
 end

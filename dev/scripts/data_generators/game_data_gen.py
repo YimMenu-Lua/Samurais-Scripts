@@ -155,6 +155,7 @@ def gen_vehicles(class_name: str = None):
         for veh in jsondata:
             str_name = str(veh["Name"]).lower()
             joaat_hash = veh["Hash"]
+            enhanced_only = joaat_hash in (0x438F6593, 0x170341C2, 0xA71D0D4F, 0x5C54030C, 0x39085F47)
 
             out[str_name] = {
                 "model_hash": joaat_hash,
@@ -162,6 +163,7 @@ def gen_vehicles(class_name: str = None):
                 "manufacturer": veh["ManufacturerDisplayName"]["English"],
                 "class_id": veh["ClassId"],
                 "class_name": veh["Class"],
+                "enhanced_only": enhanced_only
             }
 
             hash_map[joaat_hash] = str_name
@@ -169,7 +171,6 @@ def gen_vehicles(class_name: str = None):
 
     write_lua_table(LUA_DATA_PATH / "vehicles.lua", out, class_name)
     write_lua_table(LUA_DATA_PATH / "vehicle_hashmap.lua", hash_map)
-
 
 def gen_peds(class_name: str = None):
     jsondata = read_raw_file("peds.json")

@@ -178,8 +178,8 @@ function PatternScanner:RetryScan()
 		return
 	end
 
-	local sizeof_failed = #self.m_failed_patterns
-	if (sizeof_failed == 0) then
+	local count = #self.m_failed_patterns
+	if (count == 0) then
 		log.debug("[PatternScanner] No failed pointers to rescan.")
 		return
 	end
@@ -188,7 +188,7 @@ function PatternScanner:RetryScan()
 		local success = 0
 		self.m_state  = eScannerState.BUSY
 
-		for i = sizeof_failed, 1, -1 do
+		for i = count, 1, -1 do
 			local pattern = self.m_failed_patterns[i]
 			if (pattern:Scan()) then
 				table.remove(self.m_failed_patterns, i)
@@ -198,7 +198,7 @@ function PatternScanner:RetryScan()
 			yield()
 		end
 
-		log.fdebug("[PatternScanner] Recovered %d/%d failed pattern(s)", success, sizeof_failed)
+		log.fdebug("[PatternScanner] Recovered %d/%d failed pattern(s)", success, count)
 		self.m_state = eScannerState.DONE
 	end)
 end

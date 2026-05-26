@@ -68,6 +68,7 @@ return {
 		auto_apply         = false,
 		deltas             = {
 			[Enums.eHandlingEditorTypes.TYPE_HF] = {
+				["SMOOTHED_COMPRESSION"]                      = true,
 				["OFFROAD_ABILITIES"]                         = true,
 				["OFFROAD_ABILITIES_X2"]                      = true,
 				["HAS_RALLY_TYRES"]                           = true,
@@ -75,12 +76,12 @@ return {
 				["LESS_SNOW_SINK"]                            = true,
 			},
 			[Enums.eHandlingEditorTypes.TYPE_AF] = {
-				["DIFF_LOCKING_FRONT"]       = true,
-				["DIFF_LOCKING_REAR"]        = true,
-				["FORCE_SMOOTH_RPM"]         = true,
-				["HOLD_GEAR_WITH_WHEELSPIN"] = false,
-				["ASSIST_TRACTION_CONTROL"]  = false,
-				["ASSIST_STABILITY_CONTROL"] = false,
+				["DIFF_LOCKING_FRONT"]        = true,
+				["DIFF_LOCKING_REAR"]         = true,
+				["FORCE_SMOOTH_RPM"]          = true,
+				["HOLD_GEAR_WITH_WHEELSPIN"]  = false,
+				["DISABLE_TRACTION_CONTROL"]  = false,
+				["DISABLE_STABILITY_CONTROL"] = false,
 			},
 			[Enums.eHandlingEditorTypes.TYPE_MIF] = { ["INCREASE_LOW_SPEED_TORQUE"] = true, },
 		},
@@ -94,11 +95,11 @@ return {
 		deltas             = {
 			[Enums.eHandlingEditorTypes.TYPE_HF] = { ["FORCE_NO_TC_OR_SC"] = true },
 			[Enums.eHandlingEditorTypes.TYPE_AF] = {
-				["HOLD_GEAR_WITH_WHEELSPIN"] = true,
-				["HARD_REV_LIMIT"]           = true,
-				["FORCE_SMOOTH_RPM"]         = false,
-				["ASSIST_TRACTION_CONTROL"]  = false,
-				["ASSIST_STABILITY_CONTROL"] = false,
+				["HOLD_GEAR_WITH_WHEELSPIN"]  = true,
+				["HARD_REV_LIMIT"]            = true,
+				["FORCE_SMOOTH_RPM"]          = false,
+				["DISABLE_TRACTION_CONTROL"]  = true,
+				["DISABLE_STABILITY_CONTROL"] = true,
 			},
 			[Enums.eHandlingEditorTypes.TYPE_MIF] = {
 				["INCREASE_LOW_SPEED_TORQUE"]                  = true,

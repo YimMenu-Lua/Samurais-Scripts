@@ -10,14 +10,14 @@
 --------------------------------------
 -- Class: Set
 --------------------------------------
----@generic T
 ---@class Set<T> : { [T]: true }
----@field protected m_data table<anyval, true>
+---@field protected m_data table<T, true>
 ---@field protected m_data_type string
----@overload fun(...): Set<...>
-Set = {}
+---@field new fun(...: T): Set<T>
+---@overload fun(...: T): Set<T>
+Set         = { __type = "Set" }
 Set.__index = Set
-Set.__type = "Set"
+
 ---@diagnostic disable-next-line: param-type-mismatch
 setmetatable(Set, {
 	__call = function(_, ...)
@@ -25,13 +25,10 @@ setmetatable(Set, {
 	end
 })
 
----@generic T
----@param ... T
----@return Set<T>
 function Set.new(...)
 	---@diagnostic disable-next-line: param-type-mismatch
 	local instance = setmetatable({ m_data = {} }, Set)
-	local args = { ... }
+	local args     = { ... }
 
 	if (#args > 0) then
 		instance.m_data_type = type(args[1])
@@ -43,7 +40,7 @@ function Set.new(...)
 	return instance
 end
 
----@param element anyval
+---@param element T
 function Set:Push(element)
 	if (element == nil) then
 		return
@@ -67,12 +64,8 @@ function Set:Push(element)
 	self.m_data[element] = true
 end
 
----@param element anyval
+---@param element T
 function Set:Pop(element)
-	if (type(element) ~= self.m_data_type) then
-		return
-	end
-
 	self.m_data[element] = nil
 end
 
@@ -80,7 +73,7 @@ function Set:Clear()
 	self.m_data = {}
 end
 
----@param element anyval
+---@param element any
 ---@return boolean
 function Set:Contains(element)
 	return self.m_data[element] == true
@@ -96,10 +89,14 @@ function Set:Size()
 	return table.getlen(self.m_data)
 end
 
+---@return fun(t: table<T, true>, index?: T): T, true
+---@return table<T, true>
 function Set:Iter()
 	return pairs(self.m_data)
 end
 
+---@return fun(t: table<T, true>, index?: T): T, true
+---@return table<T, true>
 function Set:__pairs()
 	return pairs(self.m_data)
 end

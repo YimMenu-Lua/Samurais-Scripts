@@ -19,6 +19,7 @@
 ---@field manufacturer string
 ---@field class_id eVehicleClass
 ---@field class_name string
+---@field enhanced_only boolean
 
 ---@class RawWeaponData
 ---@field model_name string

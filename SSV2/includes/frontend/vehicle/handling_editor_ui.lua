@@ -7,11 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local HandlingEditor           = require("includes.modules.HandlingEditor")
 local Mutex                    = require("includes.classes.Mutex")
 local TableRenderer            = require("includes.frontend.helpers.TableRenderer").new()
 local measureTextWidth         = require("includes.frontend.helpers.measure_text_width")
 local PV <const>               = LocalPlayer:GetVehicle()
+local FlagController           = PV.m_flag_controller
 local CARS_BIT <const>         = Enums.eVehicleType.VEHICLE_TYPE_CAR
 local BIKES_BIT <const>        = Enums.eVehicleType.VEHICLE_TYPE_BIKE
 local BIT_TEST <const>         = Bit.IsBitSet
@@ -161,10 +161,10 @@ local function drawVehicleFlags(data)
 			-- also keeping them as is may help users who want to do research since they can use the exact flag name as a reference
 			local flagName = pair.first
 			local flagType = data.type
-			local isOwned  = HandlingEditor:IsFlagOwned(_F("%d:%s", flagType, flagName))
+			local isOwned  = FlagController:IsFlagOwned(_F("%d:%s", flagType, flagName))
 			ImGui.BeginDisabled(isOwned)
 			if (select(2, GUI:CustomToggle(flagName, isEnabled))) then
-				HandlingEditor:Push(flagType, flag, not isEnabled, data.allowed_types)
+				FlagController:Push(flagType, flag, not isEnabled, data.allowed_types)
 			end
 			ImGui.EndDisabled()
 			if (isOwned) then
@@ -179,7 +179,9 @@ local function drawVehicleFlags(data)
 		end
 		ImGui.EndChild()
 		ImGui.Separator()
-		ImGui.Text(formatFlags(data.get_all(PV)))
+		ImGui.SetWindowFontScale(0.8)
+		ImGui.TextWrapped(formatFlags(data.get_all(PV)))
+		ImGui.SetWindowFontScale(1.0)
 	end
 	ImGui.EndDisabled()
 end
@@ -223,7 +225,7 @@ local function drawImportWindow()
 	TableRenderer:Draw(importedPreset.decoded, vec2:new(610, 620))
 	ImGui.Spacing()
 	if (GUI:Button(_T("GENERIC_CONFIRM"), { size = btnSize })) then
-		if (HandlingEditor:ImportPreset(importedPreset.decoded)) then
+		if (FlagController:ImportPreset(importedPreset.decoded)) then
 			Notifier:ShowSuccess("HandlingEditor", _T("VEH_FLAGS_PRESET_IMPORT_SUCCESS"))
 		else
 			Notifier:ShowError("HandlingEditor", _T("VEH_FLAGS_PRESET_IMPORT_FAIL"))
@@ -241,7 +243,7 @@ local function drawImportWindow()
 end
 
 local function drawPresets()
-	if (not HandlingEditor:ArePresetsReady()) then
+	if (not FlagController:ArePresetsReady()) then
 		ImGui.Text(ImGui.TextSpinner(_T("GENERIC_WAIT_LABEL")))
 		ImGui.Spacing()
 		return
@@ -263,7 +265,7 @@ local function drawPresets()
 
 	ImGui.SetNextWindowBgAlpha(0.0)
 	ImGui.BeginChild("##presetsScrollRegion", 0, GVars.ui.window_size.y * 0.675)
-	local presets = HandlingEditor:GetPresets()
+	local presets = FlagController:GetPresets()
 	local count   = #presets
 	for i, preset in ipairs(presets) do
 		ImGui.PushID(i)
@@ -290,10 +292,10 @@ local function drawPresets()
 		ImGui.EndChild()
 		ImGui.Separator()
 
-		local unsupportedVeh = not HandlingEditor:AssertVehicleType(preset.m_vehicle_bitset)
+		local unsupportedVeh = not FlagController:AssertVehicleType(preset.m_vehicle_bitset)
 		ImGui.BeginDisabled(unsupportedVeh)
-		GUI:CustomToggle(_T("GENERIC_ENABLE"), HandlingEditor:IsPresetEnabled(preset), {
-			onClick = function(v) HandlingEditor:TogglePreset(preset, v) end
+		GUI:CustomToggle(_T("GENERIC_ENABLE"), FlagController:IsPresetEnabled(preset:GetName()), {
+			onClick = function(v) FlagController:TogglePreset(preset, v) end
 		})
 		ImGui.EndDisabled()
 		if (unsupportedVeh) then
@@ -303,8 +305,8 @@ local function drawPresets()
 		GUI:CustomToggle(_T("GENERIC_AUTO_ENABLE"), preset.auto_apply, {
 			onClick = function(v)
 				preset.auto_apply = v
-				HandlingEditor:SavePresets()
-				if (v) then HandlingEditor:TogglePreset(preset, v) end
+				FlagController:SavePresets()
+				if (v) then FlagController:TogglePreset(preset, v) end
 			end,
 			tooltip = _T("VEH_FLAGS_AUTOENABLE_TT")
 		})
@@ -366,7 +368,7 @@ local function drawPresets()
 		end
 
 		if (ImGui.DialogBox(_T("GENERIC_WARN_LABEL"), _T("GENERIC_CONFIRM_WARN"), ImGuiDialogBoxStyle.WARN)) then
-			HandlingEditor:RemovePreset(preset)
+			FlagController:RemovePreset(preset)
 		end
 
 		ImGui.SetNextWindowSizeConstraints(400, 160, 600, 600)
@@ -462,7 +464,7 @@ local function drawNewPresetWindow()
 			return
 		end
 
-		if (HandlingEditor:DoesPresetExistByName(data.nameBuffer)) then
+		if (FlagController:DoesPresetExistByName(data.nameBuffer)) then
 			GUI:Text(_T("GENERIC_NAME_ERR"), { color = Color.RED })
 			return
 		end
@@ -470,7 +472,7 @@ local function drawNewPresetWindow()
 		ImGui.Spacing()
 		ImGui.Separator()
 		if (GUI:Button(_T("GENERIC_CONFIRM"), { size = btnSize })) then
-			if (HandlingEditor:AddNewPreset(HandlingEditor:GeneratePresetFromCurrentDeltas(
+			if (FlagController:AddNewPreset(FlagController:GeneratePresetFromCurrentDeltas(
 					data.nameBuffer,
 					data.vehTypesBs,
 					data.descBuffer,
@@ -493,7 +495,7 @@ return function()
 		return
 	end
 
-	if (not HandlingEditor:IsInitialized()) then
+	if (not FlagController:IsInitialized()) then
 		ImGui.Text(_T("GENERIC_UNAVAILABLE"))
 		return
 	end
@@ -527,11 +529,11 @@ return function()
 			mainButtonLabelWidths[landIdx] = maxButtonWidth
 		end
 
-		local hasPresets = HandlingEditor:IsAnyPresetEnabled()
-		local hasEdits   = HandlingEditor:HasEdits()
+		local hasPresets = FlagController:IsAnyPresetEnabled()
+		local hasEdits   = FlagController:HasEdits()
 		ImGui.BeginDisabled(hasPresets or not hasEdits)
 		if (GUI:Button(_T("GENERIC_RESET_DEFAULT"), { size = vec2:new(maxButtonWidth, 37.5) })) then
-			HandlingEditor:Reset(true)
+			FlagController:Reset(true)
 		end
 		ImGui.EndDisabled()
 		if (hasPresets) then
@@ -552,7 +554,7 @@ return function()
 		if (Backend.debug_mode) then
 			ImGui.SameLine()
 			if (ImGui.Button("Parse Object", maxButtonWidth, 37.5) and hasEdits) then
-				print(table.serialize(HandlingEditor:GeneratePresetFromCurrentDeltas("test", 1 << CARS_BIT)))
+				print(table.serialize(FlagController:GeneratePresetFromCurrentDeltas("test", 1 << CARS_BIT)))
 			end
 		end
 

@@ -18,7 +18,7 @@
 -- NOTE: This file is only for default callbacks. Please do not edit unless you're contributing a new default handling preset.
 -- For user-generated callbacks, you can define a new file with the same structure of this one.
 
----@alias HandlingPresetCallback fun(self: HandlingPreset, editor: HandlingEditor): boolean
+---@alias HandlingPresetCallback fun(self: HandlingPreset, editor: VehicleFlagController): boolean
 ---@alias HandlingPresetCallbackData { onEnable: HandlingPresetCallback, onDisable: HandlingPresetCallback }
 
 ---@type dict<HandlingPresetCallbackData>
@@ -61,14 +61,33 @@ return {
 			return true
 		end
 	},
+	["VEH_RAMP"] = {
+		onEnable  = function(_)
+			local PV = LocalPlayer:GetVehicle()
+			if (not PV:IsValid()) then return true end
+			VEHICLE.SET_ALLOW_RAMMING_SOOP_OR_RAMP(PV:GetHandle(), true)
+			VEHICLE.VEHICLE_SET_RAMP_AND_RAMMING_CARS_TAKE_DAMAGE(PV:GetHandle(), false)
+			return true
+		end,
+		onDisable = function(_)
+			local PV = LocalPlayer:GetVehicle()
+			if (not PV:IsValid()) then return true end
+			local model = PV:GetModelHash()
+			if (model ~= 0xCEB28249 and model ~= 0xED62BFA9) then
+				VEHICLE.SET_ALLOW_RAMMING_SOOP_OR_RAMP(PV:GetHandle(), false)
+			end
+			return true
+		end
+	},
 	["VEH_OFFROAD_ABILITIES"] = {
 		onEnable  = function(_)
 			local PV = LocalPlayer:GetVehicle()
 			if (not PV:IsValid()) then return true end
-			local stancer       = PV.m_stancer
-			local deltas        = stancer.m_deltas
-			local front         = deltas[Enums.eWheelAxle.FRONT]
-			local rear          = deltas[Enums.eWheelAxle.REAR]
+			local stancer = PV.m_stancer
+			local deltas  = stancer.m_deltas
+			local front   = deltas[Enums.eWheelAxle.FRONT]
+			local rear    = deltas[Enums.eWheelAxle.REAR]
+			stancer:Lock(_T("VEH_OFFROAD_ABILITIES"))
 			front.m_susp_comp   = 0.1207
 			front.m_track_width = -0.047
 			rear.m_susp_comp    = 0.1201
@@ -79,7 +98,9 @@ return {
 		onDisable = function(_)
 			local PV = LocalPlayer:GetVehicle()
 			if (not PV:IsValid()) then return true end
-			PV.m_stancer:ResetDeltas(true)
+			local stancer = PV.m_stancer
+			stancer:ResetDeltas(true)
+			stancer:Unlock()
 			PV:ActivatePhysics()
 			return true
 		end

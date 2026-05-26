@@ -308,7 +308,7 @@ return {
 	["VEH_RGB_LIGHTS_TT"] = "Uruchamia pętlę RGB w reflektorach pojazdu. Możesz dostosować prędkość w dolnej części tego okna.",
 	["VEH_KEEP_WHEELS_TURNED"] = "Trzymaj koła skręcone",
 	["VEH_STRONG_CRASH"] = "Silniejsze awarie",
-	["VEH_LAUNCH_CTRL_TT"] = "Symuluje kontrolę startu. Dostępne tylko dla samochodów wyczynowych.",
+	["VEH_LAUNCH_CTRL_TT"] = "Symuluje kontrolę startu w dwóch trybach:\n - Na postoju: Przytrzymaj [ACCELETRATE] + [HAMULEC] przez 3 sekundy, a następnie zwolnij hamulec.\n - Toczenie: Podczas jazdy z prędkością mniejszą niż maksymalna, przytrzymaj [ACCELERATE] + przypisany klawisz (domyślnie [N]) przez 3 sekundy, a następnie zwolnij klawisz.\n\nUWAGA: Tryb stacjonarny nie działa z ręczną skrzynią biegów.",
 	["VEH_LAUNCH_CTRL"] = "Uruchom kontrolę",
 	["VEH_IV_EXIT_TT"] = "Naśladuje styl opuszczania pojazdu z GTA IV: Przytrzymaj [F] przez jedną sekundę, aby wyłączyć silnik, lub naciśnij normalnie, aby pozostawić włączony.",
 	["VEH_MINES"] = "Kopalnie pojazdów",
@@ -965,5 +965,18 @@ return {
 	["YRV3_DASHBOARD_BOSS_REGISTER"] = "Zarejestruj się jako szef",
 	["YRV3_DASHBOARD_BOSS_PRES_FMT"] = "Prezydent %s",
 	["MPSTAT_LOCK_VAL_TT"] = "Blokuje statystykę do bieżącej wartości.\n\nUwaga: Przed włączeniem tej opcji musisz ustawić żądaną wartość, ponieważ aktywacja przełącznika przechwytuje i zapisuje bieżącą wartość statystyki do zapisania w tle.",
-	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Zarządzaj funduszami"
+	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Zarządzaj funduszami",
+	["VEH_STANCE_LOCKED_FMT"] = "„Stancer” jest obecnie własnością „%s”. Wyłącz funkcję właściciela, aby odblokować interfejs użytkownika.",
+	["VEH_MANUAL_GEARBOX_TYPE"] = "Typ skrzyni biegów",
+	["VEH_DEFAULT_RADIO"] = "Domyślne radio",
+	["VEH_GEARBOX_SEQUENTIAL"] = "Ciągły",
+	["VEH_DEFAULT_RADIO_TT"] = "Wymusza przełączenie radia pojazdu na wybraną stację przy każdej zmianie pojazdu.\n\nMożesz wybrać stację, naciskając przycisk [. . .] przycisk opcji po przełączeniu tej funkcji.",
+	["VEH_MANUAL_GEARBOX_TT"] = "Umożliwia ręczną zmianę biegów w samochodach i motocyklach.\n\nUwaga: gdy ta opcja jest włączona, funkcja „Launch Control” nie będzie działać podczas postoju; będzie działać tylko tryb „Rolling”.",
+	["VEH_MANUAL_GEARBOX"] = "Ręczna skrzynia biegów",
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "Ręczny ze sprzęgłem",
+	["VEH_PERF_ONLY"] = "Tylko wydajność",
+	["VEH_PERF_ONLY_TT"] = "Ogranicza niektóre funkcje tylko do samochodów wyczynowych (kontrola uruchamiania, trzaski i huki itp.)",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "Przed uruchomieniem silnika naciśnij sprzęgło lub ustaw bieg na luzie.",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Asystent sprzęgła",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Tylko tryb ręczny: wyłącza zachowanie zgaśnięcia silnika."
 }

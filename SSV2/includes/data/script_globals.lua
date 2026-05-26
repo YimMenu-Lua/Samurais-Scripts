@@ -16,7 +16,7 @@ local SGSL = require("includes.services.SGSL")
 ---@class GGlobals
 ---@field GPBD_FM_3 ScriptGlobal
 ---@field MP_BUSINESS_STUFF ScriptGlobal
----@field FREEMODE_GLOBAL ScriptGlobal
+---@field FM_SERVICES ScriptGlobal
 local GGlobals                = {}
 GGlobals.__index              = GGlobals
 
@@ -30,7 +30,7 @@ local GlobalsRegistry <const> = {
 		GGlobals.MP_BUSINESS_STUFF = SGSL:Get(SGSL.data.mp_business_stuff):AsGlobal()
 	end,
 	function()
-		GGlobals.FREEMODE_GLOBAL = SGSL:Get(SGSL.data.freemode_boss_stuff):AsGlobal()
+		GGlobals.FM_SERVICES = SGSL:Get(SGSL.data.request_services_global):AsGlobal()
 	end,
 }
 

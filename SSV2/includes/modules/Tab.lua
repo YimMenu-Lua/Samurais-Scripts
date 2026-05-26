@@ -236,7 +236,7 @@ function Tab:AddLoopedCommand(label, opts)
 	local command_name     = label:lower():gsub("%s+", ""):trim()
 	local config_value     = table.get_nested_key(g_table, gvar_key)
 	local suspended_thread = not config_value
-	local thread           = ThreadManager:RegisterLooped(_F("SS_%s", command_name:upper()), opts.callback, suspended_thread)
+	local thread           = ThreadManager:RegisterLooped(_F("SS_%s", command_name:upper()), opts.callback, { suspended = suspended_thread })
 
 	local function toggle()
 		local v = table.get_nested_key(g_table, gvar_key)

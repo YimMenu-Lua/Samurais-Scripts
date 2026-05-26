@@ -51,7 +51,7 @@ local MfrFilters <const>    = {
 	"Ford",
 	"Honda",
 	"Jaguar",
-	"Koeniggsegg",
+	"Koenigsegg",
 	"Lamborghini",
 	"Land Rover",
 	"Lexus",

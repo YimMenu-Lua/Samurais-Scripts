@@ -527,6 +527,8 @@ return {
 	--#endregion
 
 	--#region Vehicle
+	["VEH_PERF_ONLY"]                      = "Performance Only",
+	["VEH_PERF_ONLY_TT"]                   = "Limits some features to performance cars only (Launch Control, Pops & Bangs, etc.)",
 	["VEH_SPEEDOMETER"]                    = "Speedometer",
 	["VEH_FAST_AF"]                        = "Fast Vehicles",
 	["VEH_FAST_AF_TT"]                     = "Increases the top speed of any land vehicle you drive.",
@@ -554,7 +556,7 @@ return {
 	["VEH_AUTO_LOCK"]                      = "Auto Lock",
 	["VEH_AUTO_LOCK_TT"]                   = "Automatically locks your vehicle when you move away from it and unlocks it again when you try to re-enter or switch to a different vehicle.",
 	["VEH_LAUNCH_CTRL"]                    = "Launch Control",
-	["VEH_LAUNCH_CTRL_TT"]                 = "Simulates launch control. Only available for performance cars.",
+	["VEH_LAUNCH_CTRL_TT"]                 = "Simulates launch control in two modes:\n  - Stationary: Hold [ACCELETRATE] + [BRAKE] for 3 seconds then release the brake.\n  - Rolling: While moving at a speed less than max, hold [ACCELERATE] + the assigned keybind (default [N]) for 3 seconds then release the keybind.\n\nNOTE: Stationary mode does not work with 'Manual Gearbox'.",
 	["VEH_LAUNCH_CTRL_MODE"]               = "Launch Control Mode",
 	["VEH_LAUNCH_CTRL_REALISTIC"]          = "Realistic",
 	["VEH_LAUNCH_CTRL_RIDICULOUS"]         = "Ridiculous",
@@ -701,6 +703,7 @@ return {
 	["VEH_STANCE_WHEEL_SIZE"]              = "Wheel Size",
 	["VEH_STANCE_NON_STOCK"]               = "This option requires non-stock wheels.",
 	["VEH_STANCE_INCOMPATIBLE"]            = "This option is incompatible with current vehicle.",
+	["VEH_STANCE_LOCKED_FMT"]              = "'Stancer' is currently owned by '%s'. Disable the owner feature to unlock the user interface.",
 	["VEH_STANCE_FRONT_AXLE"]              = "Front Axle",
 	["VEH_STANCE_REAR_AXLE"]               = "Rear Axle",
 	["VEH_STANCE_COPY_FB"]                 = "Copy Front To Back",
@@ -720,6 +723,16 @@ return {
 	["VEH_STANCE_VIEW_SAVED"]              = "View Saved Vehicles",
 	["VEH_LOCKED"]                         = "Vehicle locked.",
 	["VEH_UNLOCKED"]                       = "Vehicle unlocked.",
+	["VEH_DEFAULT_RADIO"]                  = "Default Radio",
+	["VEH_DEFAULT_RADIO_TT"]               = "Forces your vehicle's radio to the selected station each time you switch vehicles.\n\nYou can select a station by pressing the [. . .] options button after toggling the feature.",
+	["VEH_MANUAL_GEARBOX"]                 = "Manual Gearbox",
+	["VEH_MANUAL_GEARBOX_TT"]              = "Allows you to manually shift gears in cars and motorcycles.\n\nNote: When this is enabled, 'Launch Control' will not work while stationary; only 'Rolling' mode will work.",
+	["VEH_MANUAL_GEARBOX_TYPE"]            = "Gearbox Type",
+	["VEH_GEARBOX_MAN_WCLUTCH"]            = "Manual With Clutch",
+	["VEH_GEARBOX_SEQUENTIAL"]             = "Sequential",
+	["VEH_GEARBOX_CLUTCH_ASSIST"]          = "Clutch Assist",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"]       = "Manual Mode Only: Disables engine stalling behavior.",
+	["VEH_GEARBOX_ENGINE_START_ERR"]       = "Please press the clutch or put the gear in neutral before starting the engine.",
 	--#endregion
 
 	--#region World

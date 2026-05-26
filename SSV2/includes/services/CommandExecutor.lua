@@ -643,12 +643,8 @@ function CommandExecutor:GetDefaultCommands()
 				end
 
 				local newkey = KeyManager:GetKey(args[1])
-				if (not newkey or not IsInstance(newkey, Key)) then
-					Notifier:ShowError(
-						"CommandExecutor",
-						"Unknown parameter.\nUsage example: !setkey F8",
-						true
-					)
+				if (not newkey) then
+					Notifier:ShowError("CommandExecutor", "Unknown parameter.\nUsage example: !setkey F8", true)
 					return
 				end
 

@@ -7,35 +7,73 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local UnitCases <const> = {
+local gui_registered           = false
+local last_engine_state        = true
+local RUNTIME_COLORS <const>   = {
+	INDICATOR_RED   = Color(1.0, 0.215, 0.215, 1.0):AsU32(),
+	INDICATOR_GREEN = Color(0.1, 0.91, 0.0, 1.0):AsU32(),
+	INDICATOR_BLUE  = Color(0.215, 0.315, 1.0, 1.0):AsU32(),
+	INDICATOR_AMBER = Color(1.0, 0.8, 0.0, 1.0):AsU32(),
+	INDICATOR_OFF   = Color(0.1, 0.1, 0.1, 0.55):AsU32(),
+	CIRCLE_BG       = 1711868169
+}
+local UNIT_MULTIPLIERS <const> = {
 	[0]     = 1,
 	[1]     = 3.6,
 	default = 2.236936
 }
 
+---@param col uint32_t
+---@param alpha integer
+---@return uint32_t
+local function set_u32_alpha(col, alpha)
+	alpha = math.clamp(math.floor(alpha), 0, 255)
+	return (col & 0xFFFFFF) | (alpha << 0x18)
+end
+
+---@param veh PlayerVehicle
+---@return boolean
+local function get_is_tc_esc_dsabled(veh)
+	return veh:GetAdvancedFlag(Enums.eVehicleAdvancedFlags.DISABLE_TRACTION_CONTROL)
+		or veh:GetAdvancedFlag(Enums.eVehicleAdvancedFlags.DISABLE_STABILITY_CONTROL)
+end
+
 
 ---@class Speedometer
+---@field private m_cached_ticks { x1: float, y1: float, x2: float, y2: float, angle: float, value: integer }
+---@field private m_cached_unit_sizes dict<vec2>
+---@field private m_last_max_fractions integer
+---@field private m_last_max_value integer
+---@field private m_tick_marks integer
+---@field private m_line_thickness float
+---@field private m_font_scale float
 local Speedometer   = {
-	cached_ticks       = nil,
-	cached_unit_sizes  = {},
-	last_max_fractions = nil,
-	last_max_value     = nil,
-	tick_marks         = 10,
-	line_thickness     = 3.0,
-	font_scale         = 1.0,
-	_state             = {
+	m_cached_ticks       = {},
+	m_cached_unit_sizes  = {},
+	m_last_max_fractions = 0,
+	m_last_max_value     = 0,
+	m_tick_marks         = 10,
+	m_line_thickness     = 3.0,
+	m_font_scale         = 1.0,
+
+	---@public
+	_state               = {
 		should_draw      = false,
 		speed_modifier   = 1,
-		PV               = nil,
+		PV               = nil, ---@type PlayerVehicle
 		IsEngineOn       = false,
 		HasABS           = false,
 		IsABSEngaged     = false,
 		IsESCEngaged     = false,
+		IsESCDisabled    = false,
 		IsNOSActive      = false,
 		IsAircraft       = false,
 		IsSports         = false,
 		IsShootingFlares = false,
+		IsReversing      = false,
+		IsStopped        = false,
 		Manufacturer     = "",
+		GearName         = "",
 		NOSDangerRatio   = 0.0,
 		CurrentSpeed     = 0,
 		CurrentAltitude  = 0,
@@ -46,48 +84,90 @@ local Speedometer   = {
 		EngineHealth     = 0,
 		LandingGearState = Enums.eLandingGearState.UNK
 	}
-}
-Speedometer.__index = Speedometer
+}; Speedometer.__index = Speedometer
 
+---@public
 function Speedometer:UpdateState()
-	self._state.PV = LocalPlayer:GetVehicle()
-	if (not self._state.PV) then
-		self._state.should_draw = false
+	local state = self._state
+	local PV    = LocalPlayer:GetVehicle()
+	if not (PV and PV:IsValid()) then
+		state.should_draw = false
 		return
 	end
 
-	self._state.speed_modifier   = Match(GVars.features.speedometer.speed_unit, UnitCases)
-	self._state.CurrentSpeed     = self._state.PV:GetSpeed() * self._state.speed_modifier
-	self._state.MaxSpeed         = math.floor(
-		(self._state.PV:GetDefaultMaxSpeed()
-			* (GVars.features.vehicle.fast_vehicles and 1.8 or 1))
-		* self._state.speed_modifier
-	)
-	self._state.CurrentAltitude  = self._state.PV:GetHeightAboveGround()
-	self._state.Manufacturer     = self._state.PV:GetManufacturerName()
-	self._state.IsEngineOn       = self._state.PV:IsEngineOn()
-	self._state.HasABS           = self._state.PV:HasABS()
-	self._state.IsABSEngaged     = self._state.PV:IsABSEngaged()
-	self._state.IsESCEngaged     = self._state.PV:IsESCEngaged()
-	self._state.IsNOSActive      = self._state.PV:IsNOSActive()
-	self._state.IsAircraft       = self._state.PV:IsPlane() or self._state.PV:IsHeli()
-	self._state.IsSports         = self._state.PV:IsSportsOrSuper()
-	self._state.IsShootingFlares = self._state.PV.m_is_shooting_flares
-	self._state.Throttle         = math.max(0.1, self._state.PV:GetThrottle())
-	self._state.RPM              = self._state.PV:GetRPM()
-	self._state.Gear             = self._state.PV:GetCurrentGear()
-	self._state.EngineHealth     = self._state.PV:GetEngineHealth()
-	self._state.NOSDangerRatio   = self._state.PV:GetNOSDangerRatio()
-	self._state.LandingGearState = self._state.PV:GetLandingGearState()
-	self._state.should_draw      = (self._state.PV and self._state.PV:IsValid()
-		and self._state.IsEngineOn
+	local speed_modifier   = Match(GVars.features.speedometer.speed_unit, UNIT_MULTIPLIERS)
+	local fast_vehicles    = GVars.features.vehicle.fast_vehicles
+	local IsEngineOn       = PV:IsEngineOn()
+	state.PV               = PV
+	state.speed_modifier   = speed_modifier
+	state.CurrentSpeed     = PV:GetSpeed() * speed_modifier
+	state.MaxSpeed         = math.floor((PV:GetDefaultMaxSpeed() * (fast_vehicles and 1.8 or 1)) * speed_modifier)
+	state.CurrentAltitude  = PV:GetHeightAboveGround()
+	state.Manufacturer     = PV:GetManufacturerName()
+	state.IsEngineOn       = IsEngineOn
+	state.HasABS           = PV:HasABS()
+	state.IsABSEngaged     = PV:IsABSEngaged()
+	state.IsESCEngaged     = PV:IsESCEngaged()
+	state.IsESCDisabled    = get_is_tc_esc_dsabled(PV)
+	state.IsNOSActive      = PV:IsNOSActive()
+	state.IsAircraft       = PV:IsPlane() or PV:IsHeli()
+	state.IsSports         = PV:IsSportsOrSuper()
+	state.IsShootingFlares = PV.m_is_shooting_flares
+	state.Throttle         = math.max(0.1, PV:GetThrottle())
+	state.RPM              = PV:GetRPM()
+	state.Gear             = PV:GetCurrentGear()
+	state.GearName         = PV:GetCurrentGearName()
+	state.EngineHealth     = PV:GetEngineHealth()
+	state.NOSDangerRatio   = PV:GetNOSDangerRatio()
+	state.LandingGearState = PV:GetLandingGearState()
+	state.IsReversing      = PV:IsReversing()
+	state.IsStopped        = PV:IsStopped()
+	state.should_draw      = (PV and PV:IsValid())
 		and LocalPlayer:IsDriving()
+		and LocalPlayer:IsOutside()
 		and not LocalPlayer:IsUsingPhone()
 		and not LocalPlayer:IsBrowsingApps()
 		and not HUD.IS_PAUSE_MENU_ACTIVE()
 		and not CAM.IS_SCREEN_FADING_OUT()
 		and not CAM.IS_SCREEN_FADED_OUT()
-	)
+end
+
+---@private
+---@param scale float
+function Speedometer:SetFontScale(scale)
+	if (self.m_font_scale ~= scale) then
+		self.m_font_scale = scale
+		ImGui.SetWindowFontScale(scale)
+	end
+end
+
+---@private
+function Speedometer:ResetFontScale()
+	if (self.m_font_scale == 1.0) then
+		return
+	end
+
+	self.m_font_scale = 1.0
+	ImGui.SetWindowFontScale(1.0)
+end
+
+function Speedometer:HandleVisibility()
+	local engine_state = self._state.IsEngineOn
+	if (last_engine_state == engine_state) then
+		return
+	end
+
+	last_engine_state        = engine_state
+	local target_bg_alpha    = engine_state and 1.0 or 0.35
+	local target_fg_alpha    = engine_state and 0.52 or 0.78
+	local user_colors        = GVars.features.speedometer.colors
+	RUNTIME_COLORS.CIRCLE_BG = set_u32_alpha(RUNTIME_COLORS.CIRCLE_BG, target_fg_alpha * 255)
+
+	for k, user_col in pairs(user_colors) do
+		if (k ~= "needle_base") then
+			user_colors[k] = set_u32_alpha(user_col, target_bg_alpha * 255)
+		end
+	end
 end
 
 ---@private
@@ -97,27 +177,25 @@ end
 ---@param max_value number
 ---@param IsAircraft boolean
 function Speedometer:GenerateTicks(radius, start_angle, end_angle, max_value, IsAircraft)
-	local tick_step = not IsAircraft and 20 or 500
+	local tick_step     = not IsAircraft and 20 or 500
 	local max_fractions = math.ceil(max_value / tick_step) * tick_step
-
-	if (self.last_max_fractions == max_fractions) and (self.last_max_value == max_value) then
+	if (self.m_last_max_fractions == max_fractions and self.m_last_max_value == max_value) then
 		return
 	end
 
-	self.last_max_fractions = max_fractions
-	self.last_max_value = max_value
-	self.cached_ticks = {}
+	self.m_last_max_fractions = max_fractions
+	self.m_last_max_value     = max_value
+	self.m_cached_ticks       = {}
 
 	for i = 0, max_fractions, tick_step do
-		local fraction = i / max_fractions
-		local angle = start_angle + (end_angle - start_angle) * fraction
+		local fraction     = i / max_fractions
+		local angle        = start_angle + (end_angle - start_angle) * fraction
 		local sin_a, cos_a = math.sin(angle), math.cos(angle)
-
-		table.insert(self.cached_ticks, {
-			x1 = cos_a * (radius - 10),
-			y1 = sin_a * (radius - 10),
-			x2 = cos_a * radius,
-			y2 = sin_a * radius,
+		table.insert(self.m_cached_ticks, {
+			x1    = cos_a * (radius - 10),
+			y1    = sin_a * (radius - 10),
+			x2    = cos_a * radius,
+			y2    = sin_a * radius,
 			angle = angle,
 			value = i,
 		})
@@ -128,40 +206,44 @@ end
 ---@param ImDrawlist userdata
 ---@param center vec2
 function Speedometer:DrawABSNOSESCIndicators(ImDrawlist, center)
-	if (not self._state.PV) then
-		return
-	end
+	local state = self._state
+	if (not state.PV) then return end
 
-	if (self._state.HasABS) then
-		local abs_color = self._state.IsABSEngaged and Color(1.0, 0.8, 0.0, 1.0):AsU32() or
-			Color(0.1, 0.1, 0.1, 0.5):AsU32()
-
+	local engine_on = state.IsEngineOn
+	local pos_y     = center.y + 100
+	if (state.HasABS) then
+		local abs_color = (engine_on and state.IsABSEngaged) and RUNTIME_COLORS.INDICATOR_AMBER or RUNTIME_COLORS.INDICATOR_OFF
 		ImGui.ImDrawListAddText(
 			ImDrawlist,
-			center.x - 50,
-			center.y + 100,
+			center.x - 60,
+			pos_y,
 			abs_color,
 			"ABS"
 		)
 
-		local esc_color = self._state.IsESCEngaged and Color(1.0, 0.215, 0.215, 1.0):AsU32() or
-			Color(0.1, 0.1, 0.1, 0.5):AsU32()
+
+		local esc_color = (engine_on and state.IsESCEngaged) and RUNTIME_COLORS.INDICATOR_RED or RUNTIME_COLORS.INDICATOR_OFF
+		local esc_txt   = "TC ESC"
+		if (state.IsESCDisabled) then
+			esc_color = RUNTIME_COLORS.INDICATOR_RED
+			esc_txt   = "TC/ESC OFF"
+		end
 
 		ImGui.ImDrawListAddText(
 			ImDrawlist,
-			center.x + 25,
-			center.y + 100,
+			center.x + 19,
+			pos_y,
 			esc_color,
-			"ESC"
+			esc_txt
 		)
 	end
 
-	if (self._state.IsNOSActive) then
+	if (state.IsNOSActive) then
 		ImGui.ImDrawListAddText(
 			ImDrawlist,
-			center.x - 12.5,
-			center.y + 100,
-			Color(0.215, 0.315, 1.0, 1.0):AsU32(),
+			center.x - 20,
+			pos_y,
+			RUNTIME_COLORS.INDICATOR_BLUE,
 			"NOS"
 		)
 	end
@@ -171,25 +253,23 @@ end
 ---@param ImDrawlist userdata
 ---@param center vec2
 function Speedometer:DrawAirplaneIndicators(ImDrawlist, center)
-	local flare_color = self._state.IsShootingFlares and Color(0.1, 0.91, 0.0, 1.0) or Color(0.1, 0.1, 0.1, 0.5)
-
+	local state       = self._state
+	local flare_color = state.IsShootingFlares and RUNTIME_COLORS.INDICATOR_GREEN or RUNTIME_COLORS.INDICATOR_OFF
 	ImGui.ImDrawListAddText(
 		ImDrawlist,
 		center.x - 50,
 		center.y + 100,
-		flare_color:AsU32(),
+		flare_color,
 		"FLRS"
 	)
 
-	local gearState = self._state.LandingGearState
-	local gear_color = (gearState > -1 and gearState < 4)
-		and Color(0.91, 0.1, 0.0, 1.0) or Color(0.1, 0.1, 0.1, 0.5)
-
+	local gearState  = state.LandingGearState
+	local gear_color = (gearState > -1 and gearState < 4) and RUNTIME_COLORS.INDICATOR_RED or RUNTIME_COLORS.INDICATOR_OFF
 	ImGui.ImDrawListAddText(
 		ImDrawlist,
 		center.x + 30,
 		center.y + 100,
-		gear_color:AsU32(),
+		gear_color,
 		"GEAR"
 	)
 end
@@ -234,11 +314,7 @@ end
 ---@param ImDrawlist userdata
 ---@param center vec2
 function Speedometer:DrawLowerIndicators(ImDrawlist, center)
-	if self.font_scale ~= 0.77 then
-		ImGui.SetWindowFontScale(0.77)
-		self.font_scale = 0.77
-	end
-
+	self:SetFontScale(0.77)
 	if (self._state.IsAircraft) then
 		self:DrawAirplaneIndicators(ImDrawlist, center)
 	else
@@ -251,17 +327,21 @@ end
 ---@param center vec2
 ---@param radius number
 function Speedometer:DrawEngineWarning(ImDrawList, center, radius)
-	if (self._state.EngineHealth < 800) then
-		local pulse = 0.5 + 0.5 * math.sin(Time.Now() * 5)
-		local color = Color(1, self._state.EngineHealth < 400 and pulse or 0.9, 0, 1):AsU32()
-		local offset = vec2:new(-radius + 72, 15)
-		local p1 = center + offset + vec2:new(0, -7)
-		local p2 = center + offset + vec2:new(-12, 12)
-		local p3 = center + offset + vec2:new(12, 12)
-		ImGui.ImDrawListAddTriangle(ImDrawList, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, color)
-		ImGui.ImDrawListAddText(ImDrawList, p1.x - 1, p1.y + 2.8, color, "!")
-		ImGui.ImDrawListAddText(ImDrawList, 11.2, p1.x - 30, p1.y + 25, color, "CHECK ENGINE")
+	local state  = self._state
+	local health = state.EngineHealth
+	if (not state.IsEngineOn or health > 800) then
+		return
 	end
+
+	local pulse  = 0.5 + 0.5 * math.sin(Time.Now() * 5)
+	local color  = Color(1, health < 400 and pulse or 0.9, 0, 1):AsU32()
+	local offset = vec2:new(-radius + 72, 15)
+	local p1     = center + offset + vec2:new(0, -7)
+	local p2     = center + offset + vec2:new(-12, 12)
+	local p3     = center + offset + vec2:new(12, 12)
+	ImGui.ImDrawListAddTriangle(ImDrawList, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, color)
+	ImGui.ImDrawListAddText(ImDrawList, p1.x - 1, p1.y + 2.8, color, "!")
+	ImGui.ImDrawListAddText(ImDrawList, 11.2, p1.x - 30, p1.y + 25, color, "CHECK ENGINE")
 end
 
 ---@private
@@ -273,11 +353,13 @@ end
 ---@param current_altitude number
 ---@param max_altitude number
 function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_speed, current_altitude, max_altitude)
-	local value                  = self._state.IsAircraft and current_altitude or current_speed
-	local max_value              = self._state.IsAircraft and max_altitude or max_speed
+	local state                  = self._state
+	local value                  = state.IsAircraft and current_altitude or current_speed
+	local max_value              = state.IsAircraft and max_altitude or max_speed
 	local start_angle, end_angle = -math.pi * 1.25, math.pi * 0.25
+	local cgf_colors             = GVars.features.speedometer.colors
 
-	self:GenerateTicks(radius, start_angle, end_angle, max_value, self._state.IsAircraft)
+	self:GenerateTicks(radius, start_angle, end_angle, max_value, state.IsAircraft)
 
 	local ratio = math.min(value / max_value, 1.0)
 	local angle = start_angle + (end_angle - start_angle) * ratio
@@ -290,7 +372,7 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 		center.x,
 		center.y,
 		radius + 10,
-		GVars.features.speedometer.colors.circle_bg
+		RUNTIME_COLORS.CIRCLE_BG
 	)
 
 	-- outer circle
@@ -299,9 +381,9 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 		center.x,
 		center.y,
 		radius + 10,
-		GVars.features.speedometer.colors.circle,
+		cgf_colors.circle,
 		100,
-		self.line_thickness
+		self.m_line_thickness
 	)
 
 	-- if IsNOSActive() then -- TODO: Replace with crash detection + red-ish color
@@ -310,23 +392,24 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 	-- end
 
 	-- check engine
-	if (not self._state.IsAircraft) then
-		if (type(self._state.Manufacturer) == "string") then
-			local textWidth = ImGui.CalcTextSize(self._state.Manufacturer)
+	if (not state.IsAircraft) then
+		local mfr = state.Manufacturer
+		if (string.isvalid(mfr)) then
+			local textWidth = ImGui.CalcTextSize(mfr)
 			ImGui.ImDrawListAddText(
 				ImDrawList,
 				19.5,
 				center.x - 5 - (textWidth / 2),
 				center.y - 15 - (radius / 2),
-				GVars.features.speedometer.colors.text - (math.pi * 10),
-				self._state.Manufacturer
+				cgf_colors.text - (math.pi * 10),
+				mfr
 			)
 		end
 		self:DrawEngineWarning(ImDrawList, center, radius)
 	end
 
 	-- fractions
-	for _, tick in ipairs(self.cached_ticks or {}) do
+	for _, tick in ipairs(self.m_cached_ticks) do
 		local p1 = center + vec2:new(tick.x1, tick.y1)
 		local p2 = center + vec2:new(tick.x2, tick.y2)
 
@@ -336,7 +419,7 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 			p1.y,
 			p2.x,
 			p2.y,
-			GVars.features.speedometer.colors.markings,
+			cgf_colors.markings,
 			1.5
 		)
 
@@ -355,7 +438,7 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 			ImDrawList,
 			txt_draw_pos.x,
 			txt_draw_pos.y,
-			GVars.features.speedometer.colors.text,
+			cgf_colors.text,
 			label
 		)
 	end
@@ -363,7 +446,7 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 	-- analog needle
 	for t = 0.0, 1.0, 0.25 do
 		local segment = center + (needle_end - center) * t
-		local thickness = self.line_thickness * (1.0 - t * 0.5)
+		local thickness = self.m_line_thickness * (1.0 - t * 0.5)
 
 		ImGui.ImDrawListAddLine(
 			ImDrawList,
@@ -371,7 +454,7 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 			center.y,
 			segment.x,
 			segment.y,
-			GVars.features.speedometer.colors.needle,
+			cgf_colors.needle,
 			thickness
 		)
 	end
@@ -381,64 +464,55 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 		ImDrawList,
 		center.x,
 		center.y,
-		self.line_thickness * 17.0,
-		GVars.features.speedometer.colors.needle_base
+		self.m_line_thickness * 17.0,
+		cgf_colors.needle_base
 	)
 
-	local unit_buff = (GVars.features.speedometer.speed_unit == 0 and "M/s") or
-		(GVars.features.speedometer.speed_unit == 1 and "Km/h") or "Mi/h"
-	local display_value = math.floor(current_speed)
-	local value_str = tostring(display_value)
-	local unit_size = self.cached_unit_sizes[unit_buff]
+	local unit      = GVars.features.speedometer.speed_unit
+	local unit_buff = (unit == 0 and "M/s") or (unit == 1 and "Km/h") or "Mi/h"
+	local value_str = tostring(state.IsEngineOn and math.floor(current_speed) or 0)
+	local unit_size = self.m_cached_unit_sizes[unit_buff]
 
-	if not unit_size then
+	if (not unit_size) then
 		unit_size = vec2:new(ImGui.CalcTextSize(unit_buff))
-		self.cached_unit_sizes[unit_buff] = unit_size
+		self.m_cached_unit_sizes[unit_buff] = unit_size
 	end
 
-	if self.font_scale ~= 1.4 then
-		ImGui.SetWindowFontScale(1.4)
-		self.font_scale = 1.4
-	end
-
+	self:SetFontScale(1.4)
 	local value_text_size = vec2:new(ImGui.CalcTextSize(value_str))
-
 	ImGui.ImDrawListAddText(
 		ImDrawList,
 		center.x - (value_text_size.x * 0.5),
 		center.y - 20,
-		GVars.features.speedometer.colors.text,
+		cgf_colors.text,
 		value_str
 	)
 
-	if self.font_scale ~= 1.0 then
-		ImGui.SetWindowFontScale(1.0)
-		self.font_scale = 1.0
-	end
-
+	self:ResetFontScale()
 	ImGui.ImDrawListAddText(
 		ImDrawList,
 		center.x - unit_size.x * 0.5,
 		center.y + 15,
-		GVars.features.speedometer.colors.text,
+		cgf_colors.text,
 		unit_buff
 	)
 
-	if (self._state.IsEngineOn) then
+	local IsAircraft = state.IsAircraft
+	if (state.IsEngineOn) then
 		-- rpm/jet throttle
-		local rpm_ratio = self._state.IsAircraft and self._state.Throttle or self._state.RPM
-		local max_segments = 12
+		local rpm_ratio       = IsAircraft and state.Throttle or state.RPM
+		local max_segments    = 12
 		local active_segments = math.floor(max_segments * rpm_ratio)
-		local normalized_rpm = math.min(math.max(rpm_ratio, 0.0), 1.0)
-		local r = normalized_rpm ^ 1.2
-		local g = 1.0 - normalized_rpm
-		local b = 0.0
-		local a = 1.0
-		local rpm_color = Color(r, g, b, a):AsU32()
+		local normalized_rpm  = math.min(math.max(rpm_ratio, 0.0), 1.0)
+		local r               = normalized_rpm ^ 1.2
+		local g               = 1.0 - normalized_rpm
+		local b               = 0.0
+		local a               = 1.0
+		local rpm_color       = Color(r, g, b, a):AsU32()
 
 		for _ = 0, active_segments - 1 do
 			local rpm_angle_range = start_angle - end_angle
-			local rpm_angle_end = start_angle + rpm_angle_range * rpm_ratio - 0.07
+			local rpm_angle_end   = start_angle + rpm_angle_range * rpm_ratio - 0.07
 
 			self:DrawSmoothArc(
 				ImDrawList,
@@ -453,31 +527,33 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 		end
 	end
 
-	if (self._state.IsAircraft) then
-		if self.font_scale ~= 0.77 then
-			ImGui.SetWindowFontScale(0.77)
-			self.font_scale = 0.77
-		end
-
+	local gear     = state.Gear
+	local text_col = cgf_colors.text
+	if (IsAircraft) then
+		self:SetFontScale(0.77)
 		ImGui.ImDrawListAddText(
 			ImDrawList,
 			center.x - 43,
 			center.y - 80,
-			GVars.features.speedometer.colors.text,
+			text_col,
 			_F("Altitude [%.0fm]", current_altitude)
 		)
-	elseif (self._state.Gear) then
-		if (self.font_scale ~= 1.5) then
-			ImGui.SetWindowFontScale(1.5)
-			self.font_scale = 1.5
+	elseif (gear) then
+		self:SetFontScale(1.5)
+		local gear_name = state.GearName
+		local gear_str  = gear_name
+		local IsSports  = state.IsSports
+		if (gear > 0 and gear < 255) then
+			local gbox_cfg = GVars.features.vehicle.manual_gearbox
+			if (gbox_cfg.enabled) then
+				gear_str = gbox_cfg.mode == 0 and gear_name or _F("S%s", gear_name)
+			else
+				gear_str = _F("D%s", gear_name)
+			end
 		end
 
-		local gear_str = (self._state.Gear == 0) and ((current_speed > 1 and "R") or "N") or
-			_F("%s%d", self._state.IsSports and "S" or "D", self._state.Gear)
-		local gear_color = self._state.IsSports and Color(1.0, 0.3, 0.3, 1.0):AsU32() or
-			GVars.features.speedometer.colors.text
-		local gear_text_width, _ = ImGui.CalcTextSize(gear_str)
-
+		local gear_color      = IsSports and RUNTIME_COLORS.INDICATOR_RED or text_col
+		local gear_text_width = ImGui.CalcTextSize(gear_str)
 		ImGui.ImDrawListAddText(
 			ImDrawList,
 			center.x - (gear_text_width * 0.5),
@@ -490,13 +566,18 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 	self:DrawLowerIndicators(ImDrawList, center)
 end
 
+---@public
 ---@param offset? float
 function Speedometer:Draw(offset)
-	if (not LocalPlayer:IsDriving() or not GVars.features.speedometer.enabled) then
+	local state = self._state
+	local cfg = GVars.features.speedometer
+	if not (cfg.enabled and state.should_draw) then
 		return
 	end
 
-	local pos        = GVars.features.speedometer.pos
+	self:HandleVisibility()
+
+	local pos        = cfg.pos
 	local radius     = 150
 	local resolution = Game.GetScreenResolution()
 	if (pos.x == 0 and pos.y == 0) then
@@ -512,17 +593,17 @@ function Speedometer:Draw(offset)
 		| ImGuiWindowFlags.NoMove
 
 	-- RIP Paul Walker
-	if (self._state.NOSDangerRatio >= 0.8) then
-		local window_width = radius * 1.3
+	if (state.NOSDangerRatio >= 0.8) then
+		local width = radius * 1.3
 		local pulse = 0.5 + 0.5 * math.sin(Time.Now() * 12)
-		ImGui.SetNextWindowSize(window_width, 100, ImGuiCond.Always)
+		ImGui.SetNextWindowSize(width, 100, ImGuiCond.Always)
 		ImGui.SetNextWindowPos(pos.x + radius * 0.7, pos.y - 120, ImGuiCond.Always)
 		ImGui.PushStyleColor(ImGuiCol.WindowBg, 1, pulse, 0.02, 0.9)
 		ImGui.PushStyleColor(ImGuiCol.Text, 0.1, 0.1, 0.1, 1.0)
 		if (ImGui.Begin("##dangertomanifold", windowFlags)) then
 			ImGui.SetWindowFontScale(1.4)
 			local wrn_width = ImGui.CalcTextSize("Warning!!!")
-			ImGui.SetCursorPosX((window_width - wrn_width) / 2)
+			ImGui.SetCursorPosX((width - wrn_width) / 2)
 			ImGui.Text("Warning!!!")
 			ImGui.SetWindowFontScale(1.2)
 			ImGui.Text("Danger to Manifold")
@@ -535,8 +616,8 @@ function Speedometer:Draw(offset)
 	ImGui.SetNextWindowBgAlpha(0.0)
 	ImGui.SetNextWindowSize(radius * 2.5, radius * 2)
 	ImGui.SetNextWindowPos(pos.x, pos.y, ImGuiCond.Always)
-	if ImGui.Begin("##SpeedometerWindow", windowFlags | ImGuiWindowFlags.NoBackground) then
-		if (not self._state.should_draw) then
+	if (ImGui.Begin("##SpeedometerWindow", windowFlags | ImGuiWindowFlags.NoBackground)) then
+		if (not state.should_draw) then
 			ImGui.End()
 			return
 		end
@@ -553,17 +634,18 @@ function Speedometer:Draw(offset)
 			ImDrawList,
 			center,
 			radius,
-			self._state.CurrentSpeed,
-			self._state.MaxSpeed,
-			self._state.CurrentAltitude,
+			state.CurrentSpeed,
+			state.MaxSpeed,
+			state.CurrentAltitude,
 			max_altitude
 		)
 		ImGui.End()
 	end
 end
 
-GUI:RegisterIndependentGUI(function()
-	Speedometer:Draw()
-end)
+if (not gui_registered) then
+	gui_registered = true
+	GUI:RegisterIndependentGUI(function() Speedometer:Draw() end)
+end
 
 return Speedometer

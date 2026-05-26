@@ -311,7 +311,7 @@ return {
 	["VEH_KEEP_WHEELS_TURNED"] = "Mantieni le ruote girate",
 	["VEH_IV_EXIT"] = "Uscita IV-Stile",
 	["VEH_FLAPPY_DOORS"] = "Porte a soffietto",
-	["VEH_LAUNCH_CTRL_TT"] = "Simula il controllo del lancio. Disponibile solo per auto ad alte prestazioni.",
+	["VEH_LAUNCH_CTRL_TT"] = "Simula il controllo del lancio in due modalità:\n - Stazionario: tieni premuto [ACCELETRATE] + [BRAKE] per 3 secondi, quindi rilascia il freno.\n - Rolling: mentre ti muovi a una velocità inferiore alla massima, tieni premuto [ACCELETRATE] + la combinazione di tasti assegnata (predefinita [N]) per 3 secondi, quindi rilascia la combinazione di tasti.\n\nNOTA: la modalità stazionaria non funziona con il \"cambio manuale\".",
 	["VEH_SPEED_CIRCLE"] = "Cerchio",
 	["VEH_KEEP_WHEELS_TURNED_TT"] = "Mantiene le ruote del tuo veicolo nell'angolazione che hai lasciato prima di scendere dal veicolo.",
 	["VEH_IV_EXIT_TT"] = "Imita lo stile di uscita del veicolo di GTA IV: tieni premuto [F] per un secondo per spegnere il motore o premi normalmente per lasciarlo acceso.",
@@ -965,5 +965,18 @@ return {
 	["YRV3_DASHBOARD_BOSS_PRES_FMT"] = "Presidente di %s",
 	["YRV3_DASHBOARD_BOSS_TYPE"] = "Tipo di capo",
 	["MPSTAT_LOCK_VAL_TT"] = "Blocca la statistica sul valore corrente.\n\nNota: è necessario impostare il valore desiderato prima di attivare questa opzione, poiché l'attivazione dell'interruttore acquisisce e salva il valore della statistica corrente da scrivere in background.",
-	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Gestisci i fondi"
+	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Gestisci i fondi",
+	["VEH_STANCE_LOCKED_FMT"] = "'Stancer' è attualmente di proprietà di '%s'. Disabilitare la funzione proprietario per sbloccare l'interfaccia utente.",
+	["VEH_MANUAL_GEARBOX"] = "Cambio manuale",
+	["VEH_DEFAULT_RADIO"] = "Radio predefinita",
+	["VEH_MANUAL_GEARBOX_TYPE"] = "Tipo di cambio",
+	["VEH_GEARBOX_SEQUENTIAL"] = "Sequenziale",
+	["VEH_MANUAL_GEARBOX_TT"] = "Ti consente di cambiare marcia manualmente in auto e moto.\n\nNota: quando è abilitato, \"Launch Control\" non funzionerà da fermo; funzionerà solo la modalità 'Rolling'.",
+	["VEH_DEFAULT_RADIO_TT"] = "Forza la radio del tuo veicolo alla stazione selezionata ogni volta che cambi veicolo.\n\nPuoi selezionare una stazione premendo il pulsante [. . .] pulsante delle opzioni dopo aver attivato la funzione.",
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "Manuale Con Frizione",
+	["VEH_PERF_ONLY"] = "Solo prestazioni",
+	["VEH_PERF_ONLY_TT"] = "Limita alcune funzionalità solo alle auto ad alte prestazioni (Launch Control, Pops & Bangs, ecc.)",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "Si prega di premere la frizione o mettere la marcia in folle prima di avviare il motore.",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Assistenza alla frizione",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Solo modalità manuale: disabilita il comportamento di stallo del motore."
 }

@@ -8,6 +8,7 @@
 
 
 ---@meta
+---@diagnostic disable: duplicate-doc-field
 
 --#region Generic Containers
 
@@ -79,6 +80,15 @@ GenericClass = setmetatable({}, {
 
 ---@alias anyval<T> table|metatable|userdata|lightuserdata|function|string|number|boolean Any Lua value except nil.
 ---@alias optional<T> T?
+
+-- LuaLS has these fields defined as integer|string which is annoying as fuck
+---@class osdatefixed : osdate
+---@field year  integer
+---@field month integer
+---@field day   integer
+---@field hour  integer
+---@field min   integer
+---@field sec   integer
 
 --#endregion
 

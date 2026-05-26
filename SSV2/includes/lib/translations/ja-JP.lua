@@ -311,7 +311,7 @@ return {
 	["VEH_AUTO_LOCK_TT"] = "車両から離れると自動的にロックされ、再乗車するか別の車両に乗り換えようとすると再びロックが解除されます。",
 	["VEH_SPEED_CIRCLE"] = "丸",
 	["VEH_SPEED_BG"] = "背景",
-	["VEH_LAUNCH_CTRL_TT"] = "ローンチコントロールをシミュレートします。パフォーマンスカーにのみご利用いただけます。",
+	["VEH_LAUNCH_CTRL_TT"] = "2 つのモードでローンチ コントロールをシミュレートします:\n - 静止: [ACCELETRATE] + [BRAKE] を 3 秒間押し続けてからブレーキを放します。\n - ローリング: 最大速度未満で移動中に、[ACCELERATE] + 割り当てられたキーバインド (デフォルトは [N]) を 3 秒間押し続けてからキーバインドを放します。\n\n注: 静止モードは「手動ギアボックス」では機能しません。",
 	["VEH_LAUNCH_CTRL"] = "ローンチコントロール",
 	["VEH_FLAPPY_DOORS_TT"] = "なぜこれを作ったのか分かりません。",
 	["VEH_RGB_LIGHTS_TT"] = "車のヘッドライトで RGB ループを開始します。このウィンドウの下部で速度を調整できます。",
@@ -965,5 +965,18 @@ return {
 	["YRV3_DASHBOARD_BOSS_RETIRE"] = "引退",
 	["YRV3_DASHBOARD_BOSS_REGISTER"] = "ボスとして登録する",
 	["MPSTAT_LOCK_VAL_TT"] = "統計を現在の値にロックします。\n\n注: トグルをアクティブにすると、バックグラウンドで書き込まれる現在の統計値がキャプチャおよび保存されるため、これをオンにする前に希望の値を設定する必要があります。",
-	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "資金を管理する"
+	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "資金を管理する",
+	["VEH_STANCE_LOCKED_FMT"] = "「Stancer」は現在「%s」によって所有されています。ユーザー インターフェイスのロックを解除するには、所有者機能を無効にします。",
+	["VEH_MANUAL_GEARBOX"] = "マニュアルギアボックス",
+	["VEH_GEARBOX_SEQUENTIAL"] = "一連",
+	["VEH_MANUAL_GEARBOX_TT"] = "車やオートバイのギアを手動でシフトできるようにします。\n\n注: これを有効にすると、停止中は「ローンチ コントロール」が機能しなくなります。 「ローリング」モードのみが機能します。",
+	["VEH_DEFAULT_RADIO_TT"] = "車両を切り替えるたびに、車両のラジオを選択した放送局に強制的に送信します。\n\n[. 。機能を切り替えた後、.] オプション ボタンを押します。",
+	["VEH_MANUAL_GEARBOX_TYPE"] = "ギアボックスの種類",
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "マニュアルクラッチ付",
+	["VEH_DEFAULT_RADIO"] = "デフォルトの無線",
+	["VEH_PERF_ONLY"] = "パフォーマンスのみ",
+	["VEH_PERF_ONLY_TT"] = "一部の機能をパフォーマンスカーのみに制限します (ローンチコントロール、ポップス&バングなど)",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "エンジンを始動する前にクラッチを押すかギアをニュートラルにしてください。",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "手動モードのみ: エンジン停止動作を無効にします。",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "クラッチアシスト"
 }

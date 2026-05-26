@@ -75,11 +75,15 @@ function YimActions:init()
 	}
 
 	instance:ReadSavedFavorites()
-	ThreadManager:RegisterLooped("SS_YIMACTIONS", function() instance:OnTick() end)
 	Backend:RegisterEventCallbackAll(function() instance:ForceCleanup() end)
 	Backend:RegisterFeatureEntityHandler("YimActions", function(handle)
 		instance.CompanionManager:RemoveCompanionByHandle(handle)
 	end)
+	ThreadManager:RegisterLooped("SS_YIMACTIONS", function() instance:OnTick() end, {
+		exception_handler = function()
+			instance:Cleanup()
+		end
+	})
 
 	instance.m_initialized = true
 	return instance

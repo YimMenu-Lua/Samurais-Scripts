@@ -8,13 +8,13 @@
 
 
 -- Scares nearby enemies and forces them to flee
----@class Terrifier
+---@class EnemiesFlee
 ---@field private m_active boolean
 ---@field private m_last_triggered milliseconds
-local Terrifier = { m_active = false, m_last_triggered = 0 }
-Terrifier.__index = Terrifier
+local EnemiesFlee   = { m_active = false, m_last_triggered = 0 }
+EnemiesFlee.__index = EnemiesFlee
 
-function Terrifier:OnClick()
+function EnemiesFlee:OnClick()
 	if (self.m_active or Time.Millis() - self.m_last_triggered < 500) then
 		return
 	end
@@ -83,7 +83,7 @@ function Terrifier:OnClick()
 end
 
 KeyManager:RegisterKeybind(GVars.keyboard_keybinds.enemies_flee, function()
-	Terrifier:OnClick()
+	EnemiesFlee:OnClick()
 end)
 
-return Terrifier
+return EnemiesFlee

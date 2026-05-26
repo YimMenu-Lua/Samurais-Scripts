@@ -307,7 +307,7 @@ return {
 	["VEH_RGB_LIGHTS"] = "RGB 头灯",
 	["VEH_FLAPPY_DOORS_TT"] = "我不知道我为什么要做这个。",
 	["VEH_IV_EXIT"] = "IV 式退出",
-	["VEH_LAUNCH_CTRL_TT"] = "模拟发射控制。仅适用于高性能汽车。",
+	["VEH_LAUNCH_CTRL_TT"] = "在两种模式下模拟启动控制：\n - 静止：按住 [ACCELETRATE] + [BRAKE] 3 秒钟，然后松开刹车。\n - 滚动：以低于最大速度移动时，按住 [ACCELERATE] + 指定的按键绑定（默认 [N]）3 秒钟，然后松开按键绑定。\n\n注意：静止模式不适用于“手动变速箱”。",
 	["VEH_AUTO_LOCK_TT"] = "当您离开车辆时自动锁定您的车辆，并在您尝试重新进入或切换到其他车辆时再次解锁。",
 	["VEH_MINES"] = "车辆地雷",
 	["VEH_LAUNCH_CTRL"] = "发射控制",
@@ -965,5 +965,18 @@ return {
 	["YRV3_DASHBOARD_BOSS_RETIRED"] = "退休",
 	["MPSTAT_CONTROLLDER_DESC"] = "持久管理、编辑和锁定多人游戏统计数据。",
 	["MPSTAT_LOCK_VAL_TT"] = "将统计数据锁定为当前值。\n\n注意：您必须在打开此功能之前设置所需的值，因为激活切换会捕获并保存要在后台写入的当前统计数据值。",
-	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "管理资金"
+	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "管理资金",
+	["VEH_STANCE_LOCKED_FMT"] = "“Stancer”当前由“%s”拥有。禁用所有者功能以解锁用户界面。",
+	["VEH_DEFAULT_RADIO"] = "默认收音机",
+	["VEH_DEFAULT_RADIO_TT"] = "每次切换车辆时，强制将车辆的无线电广播到选定的电台。\n\n您可以通过按 [ 选择电台。 。 .] 切换功能后的选项按钮。",
+	["VEH_MANUAL_GEARBOX_TYPE"] = "变速箱类型",
+	["VEH_GEARBOX_MAN_WCLUTCH"] = "手动带离合器",
+	["VEH_MANUAL_GEARBOX"] = "手动变速箱",
+	["VEH_GEARBOX_SEQUENTIAL"] = "顺序",
+	["VEH_MANUAL_GEARBOX_TT"] = "允许您在汽车和摩托车中手动换档。\n\n注意：启用此功能后，“启动控制”在静止时将不起作用；只有“滚动”模式才有效。",
+	["VEH_PERF_ONLY"] = "仅性能",
+	["VEH_PERF_ONLY_TT"] = "将某些功能仅限于高性能汽车（启动控制、砰砰声等）",
+	["VEH_GEARBOX_ENGINE_START_ERR"] = "启动发动机前，请踩下离合器或将档位置于空档。",
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "离合器辅助装置",
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "仅手动模式：禁用发动机熄火行为。"
 }
