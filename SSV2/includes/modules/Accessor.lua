@@ -67,19 +67,17 @@ local function Call(self, method, ...)
 	return dispatcher(self, method, args)
 end
 
----@param m_base number
----@param m_type eAccessorType
----@param script? string
+---@param base number
+---@param accessor_type eAccessorType
+---@param script_name? string
 ---@param path? table
 ---@return Accessor
-function Accessor.new(m_base, m_type, script, path)
-	assert(type(m_base) == "number" and m_base > 0, "Invalid base address!")
-
-	return setmetatable(
-		{
-			m_index = m_base,
-			m_type = m_type or 0,
-			m_script = script,
+function Accessor.new(base, accessor_type, script_name, path)
+	assert(type(base) == "number" and base > 0, "Invalid base address!")
+	return setmetatable({
+			m_index = base,
+			m_type = accessor_type or 0,
+			m_script = script_name,
 			m_path = path or {}
 		},
 		---@diagnostic disable-next-line

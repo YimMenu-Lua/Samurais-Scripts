@@ -25,8 +25,7 @@ local ThemeManager   = {
 		colors     = 0,
 		style_vars = 0
 	}
-}
-ThemeManager.__index = ThemeManager
+}; ThemeManager.__index = ThemeManager
 
 ---@private
 function ThemeManager:LoadLibrary()

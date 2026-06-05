@@ -18,6 +18,7 @@ local TransactionSystemFuncs <const> = {
 	}
 }
 
+
 ---@class PlayerMoneyController
 ---@field private m_bank_balance integer
 ---@field private m_wallet_balance integer
@@ -28,7 +29,7 @@ local TransactionSystemFuncs <const> = {
 ---@field private m_wallet_fmt string
 ---@field private m_total_fmt string
 local PlayerMoneyController <const> = {}
-PlayerMoneyController.__index = PlayerMoneyController
+PlayerMoneyController.__index       = PlayerMoneyController
 
 ---@return PlayerMoneyController
 function PlayerMoneyController.new()

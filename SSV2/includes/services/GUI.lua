@@ -296,7 +296,7 @@ function GUI:RegisterNewTab(id, name, callback, subtabs, isTranslatorLabel)
 		error(_F("Tab '%s' already exists.", name))
 	end
 
-	local newtab = Pair.new(name, Tab(name, callback, subtabs, isTranslatorLabel))
+	local newtab = Pair(name, Tab(name, callback, subtabs, isTranslatorLabel))
 	table.insert(self.m_tabs[id], newtab)
 	return newtab.second
 end
@@ -606,7 +606,6 @@ function GUI:DrawCallbackWindow(yPos)
 				ImGuiWindowFlags.AlwaysAutoResize)
 			) then
 			self.m_selected_tab:Draw()
-			ImGui.Spacing()
 			ImGui.End()
 		end
 	end

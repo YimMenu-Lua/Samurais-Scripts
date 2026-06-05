@@ -200,7 +200,7 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 		runtime_vars[key] = saved_value
 	end
 
-	local ignored_set      = Set.new("__schema_hash", "__dev_reset", "__version")
+	local ignored_set      = Set("__schema_hash", "__dev_reset", "__version")
 	self.__schema_hash     = _J(table.snapshot(self.m_default_config, { ignored_keys = ignored_set }))
 	self.m_state           = eSerializerState.IDLE
 	self.m_last_write_time = TimePoint.new()
@@ -671,7 +671,7 @@ end
 
 ---@param exceptions? Set<string>
 function Serializer:Reset(exceptions)
-	exceptions = exceptions or Set.new("backend.debug_mode", "__schema_hash")
+	exceptions = exceptions or Set("backend.debug_mode", "__schema_hash")
 	local data = self:Read()
 	if (type(data) ~= "table") then
 		log.warning("[Serializer]: Invalid data type!")

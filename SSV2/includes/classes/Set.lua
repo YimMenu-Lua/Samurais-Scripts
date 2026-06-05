@@ -15,11 +15,14 @@
 ---@field protected m_data_type string
 ---@field new fun(...: T): Set<T>
 ---@overload fun(...: T): Set<T>
-local Set = Callable("Set")
+local Set = Callable("Set", {
+	ctor = function(t, ...)
+		return t:new(...)
+	end
+})
 
-function Set.new(...)
-	---@diagnostic disable-next-line: param-type-mismatch
-	local instance = setmetatable({ m_data = {} }, Set)
+function Set:new(...)
+	local instance = setmetatable({ m_data = {} }, self)
 	local args     = { ... }
 
 	if (#args > 0) then

@@ -27,13 +27,47 @@ local eColorType <const> = {
 ---| "purple" 		 # 1.000, 0.000, 1.000, 1.000
 ---| "safety_yellow" # 0.941, 0.745, 0.007, 1.000
 
-local NamedColors = {
+local NamedColors <const> = {
 	yellow        = { 1.000, 1.000, 0.000, 1.000 },
 	orange        = { 1.000, 0.500, 0.000, 1.000 },
 	pink          = { 1.000, 0.000, 0.500, 1.000 },
 	purple        = { 1.000, 0.000, 1.000, 1.000 },
 	safety_yellow = { 0.941, 0.745, 0.007, 1.000 },
 }
+
+
+--------------------------------------
+-- Class: Color
+--------------------------------------
+-- Color instances can be created using color name strings either defined in `NamedColors` (ex: `Color("purple")`) or
+--
+-- self-regsitered (after using the `RegisterNamedColor` method), hex strings, ABGR integers (`uint32`),
+--
+-- RGBA (`[0 .. 255]`), or normalized RGBA (`[0.0f .. 1.0f]`).
+---@class Color : Callable<Color>
+---@field private m_type eColorType
+---@field private m_source table?
+---@field private m_named_colors table<NamedColor, { [1]: float, [2]: float, [3]: float, [4]: float }>
+---@field private __raw_ctor fun(self: Color, r: float, g: float, b: float, a: float): Color
+---@field public r float
+---@field public g float
+---@field public b float
+---@field public a float
+---@field public BLACK Color
+---@field public WHITE Color
+---@field public RED Color
+---@field public GREEN Color
+---@field public BLUE Color
+---@overload fun(p0: string|NamedColor): Color
+---@overload fun(p0: uint32_t): Color
+---@overload fun(p0: vec4): Color
+---@overload fun(r: integer, g: integer, b: integer, a: integer): Color
+---@overload fun(r: float, g: float, b: float, a: float): Color
+local Color = Callable("Color", {
+	t_data = { m_named_colors = NamedColors },
+	ctor   = function(t, ...) return t.new(...) end
+})
+
 
 ---@param n number
 ---@return integer
@@ -106,61 +140,29 @@ local function process_params(...)
 	error("[Color]: unsupported arguments")
 end
 
-
---------------------------------------
--- Class: Color
---------------------------------------
--- Color instances can be created using color name strings either defined in `NamedColors` (ex: `Color("purple")`) or
---
--- self-regsitered (after using the `RegisterNamedColor` method), hex strings, ABGR integers (`uint32`),
---
--- RGBA (`[0 .. 255]`), or normalized RGBA (`[0.0f .. 1.0f]`).
----@class Color
----@field private m_type eColorType
----@field private m_source table?
----@field private m_named_colors table<NamedColor, { [1]: float, [2]: float, [3]: float, [4]: float }>
----@field private __raw_ctor fun(r: float, g: float, b: float, a: float): Color
----@field public r float
----@field public g float
----@field public b float
----@field public a float
----@field public BLACK Color
----@field public WHITE Color
----@field public RED Color
----@field public GREEN Color
----@field public BLUE Color
----@overload fun(p0: string|NamedColor): Color
----@overload fun(p0: uint32_t): Color
----@overload fun(p0: vec4): Color
----@overload fun(r: integer, g: integer, b: integer, a: integer): Color
----@overload fun(r: float, g: float, b: float, a: float): Color
-Color = Class("Color")
-Color.m_named_colors = NamedColors
-
 ---@private
 ---@param r float
 ---@param g float
 ---@param b float
 ---@param a float
 ---@return Color
-function Color.__raw_ctor(r, g, b, a)
+function Color:__raw_ctor(r, g, b, a)
 	return setmetatable({
-		r = r,
-		g = g,
-		b = b,
-		a = a,
+		r      = r,
+		g      = g,
+		b      = b,
+		a      = a,
 		m_type = eColorType.FLOAT
-		---@diagnostic disable-next-line: param-type-mismatch
-	}, Color)
+	}, self)
 end
 
 -- Constant basic colors for easy access.
 
-Color.BLACK = Color.__raw_ctor(0, 0, 0, 1)
-Color.WHITE = Color.__raw_ctor(1, 1, 1, 1)
-Color.RED   = Color.__raw_ctor(1, 0, 0, 1)
-Color.GREEN = Color.__raw_ctor(0, 1, 0, 1)
-Color.BLUE  = Color.__raw_ctor(0, 0, 1, 1)
+Color.BLACK = Color:__raw_ctor(0, 0, 0, 1)
+Color.WHITE = Color:__raw_ctor(1, 1, 1, 1)
+Color.RED   = Color:__raw_ctor(1, 0, 0, 1)
+Color.GREEN = Color:__raw_ctor(0, 1, 0, 1)
+Color.BLUE  = Color:__raw_ctor(0, 0, 1, 1)
 
 -------------------------------------------
 
@@ -176,7 +178,7 @@ Color.BLUE  = Color.__raw_ctor(0, 0, 1, 1)
 ---@return Color
 function Color.new(...)
 	local r, g, b, a, t = process_params(...)
-	local instance      = Color.__raw_ctor(r, g, b, a)
+	local instance      = Color:__raw_ctor(r, g, b, a)
 	instance.m_type     = t
 
 	if (DEBUG_TRACK_SOURCE) then
@@ -264,7 +266,7 @@ end
 ---@param c Color color to mix with
 ---@param f float factor
 function Color:Mix(c, f)
-	return self.__raw_ctor(
+	return Color:__raw_ctor(
 		self.r + (c.r - self.r) * f,
 		self.g + (c.g - self.g) * f,
 		self.b + (c.b - self.b) * f,
@@ -285,7 +287,7 @@ function Color:Darken(f, includeAlpha)
 		a = math.clamp(a - f, 0, 1)
 	end
 
-	return self.__raw_ctor(r, g, b, a)
+	return Color:__raw_ctor(r, g, b, a)
 end
 
 -- Returns a new instance. Does not mutate.
@@ -301,7 +303,7 @@ function Color:Brighten(f, includeAlpha)
 		a = math.clamp(a + f, 0, 1)
 	end
 
-	return self.__raw_ctor(r, g, b, a)
+	return Color:__raw_ctor(r, g, b, a)
 end
 
 -- Returns the luminance of the color *(brightness)*.
@@ -407,7 +409,7 @@ function Color.FromHSV(h, s, v, a)
 		r, g, b = c, 0, x
 	end
 
-	return Color(r + m, g + m, b + m, a)
+	return Color:__raw_ctor(r + m, g + m, b + m, a)
 end
 
 ---------------------------------------------------------------------------------
@@ -423,7 +425,7 @@ end
 ---@param right Color
 ---@return Color
 function Color:__add(right)
-	return self.__raw_ctor(
+	return Color:__raw_ctor(
 		math.min(self.r + right.r, 1),
 		math.min(self.g + right.g, 1),
 		math.min(self.b + right.b, 1),
@@ -434,7 +436,7 @@ end
 ---@param right Color
 ---@return Color
 function Color:__sub(right)
-	return self.__raw_ctor(
+	return Color:__raw_ctor(
 		math.max(self.r - right.r, 0),
 		math.max(self.g - right.g, 0),
 		math.max(self.b - right.b, 0),
@@ -445,7 +447,7 @@ end
 ---@param right Color
 ---@return Color
 function Color:__mul(right)
-	return self.__raw_ctor(
+	return Color:__raw_ctor(
 		math.min(self.r * right.r, 1),
 		math.min(self.g * right.g, 1),
 		math.min(self.b * right.b, 1),
@@ -456,7 +458,7 @@ end
 ---@param right Color
 ---@return Color
 function Color:__div(right)
-	return self.__raw_ctor(
+	return Color:__raw_ctor(
 		right.r == 0 and 0 or self.r / right.r,
 		right.g == 0 and 0 or self.g / right.g,
 		right.b == 0 and 0 or self.b / right.b,
@@ -487,13 +489,16 @@ end
 function Color.deserialize(t)
 	if (type(t) ~= "table" or t.__type ~= "color") then
 		log.warning("[Color]: Deserialization failed: invalid data!")
-		return Color.__raw_ctor(0, 0, 0, 0)
+		return Color:__raw_ctor(0, 0, 0, 0)
 	end
 
-	return Color.__raw_ctor(t.r, t.g, t.b, t.a)
+	return Color:__raw_ctor(t.r, t.g, t.b, t.a)
 end
 
 if (Serializer) then
 	Serializer:RegisterNewType("color", Color.serialize, Color.deserialize)
 end
 ------------------------------------------------------------------------------------------
+
+_G.Color = Color
+return Color

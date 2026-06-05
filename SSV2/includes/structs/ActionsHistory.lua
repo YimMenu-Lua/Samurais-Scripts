@@ -28,7 +28,7 @@ local Mutex = require("includes.classes.Mutex")
 ---@field protected m_lookup_set set<string>
 ---@field protected m_mutex Mutex
 local ActionsHistory <const> = {}
-ActionsHistory.__index = ActionsHistory
+ActionsHistory.__index       = ActionsHistory
 
 ---@return ActionsHistory
 function ActionsHistory.new()
@@ -37,7 +37,7 @@ function ActionsHistory.new()
 		m_sort_mode  = 0,
 		m_data       = {},
 		m_lookup_set = {},
-		m_mutex      = Mutex.new(),
+		m_mutex      = Mutex(),
 	}, ActionsHistory)
 end
 

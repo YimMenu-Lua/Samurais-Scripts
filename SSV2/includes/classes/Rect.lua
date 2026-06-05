@@ -10,18 +10,21 @@
 --------------------------------------
 -- Class: Rect
 --------------------------------------
----@class Rect
----@field min vec2
----@field max vec2
+---@class Rect : Callable<Rect>
+---@field public min vec2
+---@field public max vec2
 ---@overload fun(min: vec2, max: vec2) : Rect
-local Rect = Callable("Rect")
+local Rect = Callable("Rect", {
+	ctor = function(t, ...)
+		return t:new(...)
+	end
+})
 
 ---@param min vec2
 ---@param max vec2
 ---@return Rect
-function Rect.new(min, max)
-	---@diagnostic disable-next-line
-	return setmetatable({ min = min, max = max }, Rect)
+function Rect:new(min, max)
+	return setmetatable({ min = min, max = max }, self)
 end
 
 ---@return float

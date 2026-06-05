@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local StatPrefixSet <const> = require("includes.classes.Set").new("MP0", "MP1", "MPP", "SP0", "SP1", "SP2", "SPP")
+local StatPrefixSet <const> = require("includes.classes.Set")("MP0", "MP1", "MPP", "SP0", "SP1", "SP2", "SPP")
 
 -- Returns the stat with the appropriate character prefix. This is used with either natives or single player stats
 --

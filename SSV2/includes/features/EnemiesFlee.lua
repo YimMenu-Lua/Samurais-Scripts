@@ -29,11 +29,10 @@ function EnemiesFlee:OnClick()
 		end
 
 		Notifier:ShowSuccess("Samurai's Scripts", _T("WRLD_FLEE_ALL_NOTIF"), false, 10.5)
-		self.m_active = true
-		---@type Set<handle>
-		local task_set = Set.new()
-		local trash = {}
-		local timer = Timer.new(1e4)
+		self.m_active  = true
+		local task_set = Set() ---@type Set<handle>
+		local trash    = {}
+		local timer    = Timer.new(1e4)
 
 		while (not timer:IsDone()) do
 			for _, p in ipairs(entities.get_all_peds_as_handles()) do

@@ -16,15 +16,15 @@ local newThemeBuff
 
 local cfgReset        = {
 	---@type Set<string>
-	exceptions = Set.new("backend.debug_mode", "__schema_hash"),
+	exceptions = Set("backend.debug_mode", "__schema_hash"),
 	excToggles = {
-		{ pair = Pair.new("GUI", "ui"),                               clicked = false, selected = false },
-		{ pair = Pair.new("Controller Keybinds", "gamepad_keybinds"), clicked = false, selected = false },
-		{ pair = Pair.new("Keyboard Keybinds", "keyboard_keybinds"),  clicked = false, selected = false },
-		{ pair = Pair.new("Casino Pacino", "features.dunk"),          clicked = false, selected = false },
-		{ pair = Pair.new("EntityForge", "features.entity_forge"),    clicked = false, selected = false },
-		{ pair = Pair.new("YimActions", "features.yim_actions"),      clicked = false, selected = false },
-		{ pair = Pair.new("YimResupplier", "features.yrv3"),          clicked = false, selected = false },
+		{ pair = Pair("GUI", "ui"),                               clicked = false, selected = false },
+		{ pair = Pair("Controller Keybinds", "gamepad_keybinds"), clicked = false, selected = false },
+		{ pair = Pair("Keyboard Keybinds", "keyboard_keybinds"),  clicked = false, selected = false },
+		{ pair = Pair("Casino Pacino", "features.dunk"),          clicked = false, selected = false },
+		{ pair = Pair("EntityForge", "features.entity_forge"),    clicked = false, selected = false },
+		{ pair = Pair("YimActions", "features.yim_actions"),      clicked = false, selected = false },
+		{ pair = Pair("YimResupplier", "features.yrv3"),          clicked = false, selected = false },
 	},
 	open = false,
 }

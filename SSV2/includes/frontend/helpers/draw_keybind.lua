@@ -9,11 +9,11 @@
 
 local Set                   = require("includes.classes.Set")
 local ReservedKeys <const>  = {
-	kb   = Set.new(0x01, 0x07, 0x0A, 0x0B, 0x1B, 0x24, 0x2C, 0x2D, 0x46, 0x5B, 0x5C, 0x5E),
-	gpad = Set.new(23, 24, 25, 71, 75)
+	kb   = Set(0x01, 0x07, 0x0A, 0x0B, 0x1B, 0x24, 0x2C, 0x2D, 0x46, 0x5B, 0x5C, 0x5E),
+	gpad = Set(23, 24, 25, 71, 75)
 }
 
-local NoUnbindKeys <const>  = Set.new("gui_toggle")
+local NoUnbindKeys <const>  = Set("gui_toggle")
 local DefaultConfig <const> = Serializer:GetDefaultConfig()
 local currentKeyName        = ""
 local _reserved             = false

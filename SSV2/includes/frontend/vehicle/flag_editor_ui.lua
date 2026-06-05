@@ -98,7 +98,7 @@ local function SortAllOrderedFlags()
 			if (#ordered_flags == 0) then
 				local count = 0
 				for name, flag in pairs(data.enum) do
-					table.insert(ordered_flags, Pair.new(name, flag))
+					table.insert(ordered_flags, Pair(name, flag))
 					count = count + 1
 				end
 				data.flag_count = count

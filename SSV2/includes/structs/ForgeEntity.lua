@@ -29,7 +29,7 @@
 -- ForgeEntity Struct
 -----------------------------------------------------
 -- Represents an entity spawned with `EntityForge` (ped, vehicle, object).
----@class ForgeEntity
+---@class ForgeEntity : Callable<ForgeEntity>
 ---@field m_handle integer
 ---@field m_name string
 ---@field m_model_hash integer
@@ -50,15 +50,7 @@
 ---@field m_attach_pos vec3
 ---@field m_attach_rot vec3
 ---@overload fun(handle: handle, name: string, modelHash: hash, entityType: eEntityType, alpha: number, coords: vec3, rotation: vec3): ForgeEntity
-local ForgeEntity = {}
-ForgeEntity.__index = ForgeEntity
-ForgeEntity.__type = "ForgeEntity"
----@diagnostic disable-next-line
-setmetatable(ForgeEntity, {
-	__call = function(_, ...)
-		return ForgeEntity.new(...)
-	end
-})
+local ForgeEntity = Callable("ForgeEntity")
 
 ---@param handle handle
 ---@param name string
@@ -69,20 +61,20 @@ setmetatable(ForgeEntity, {
 ---@param rotation vec3
 ---@return ForgeEntity
 function ForgeEntity.new(handle, name, modelHash, entityType, alpha, coords, rotation)
-	---@diagnostic disable-next-line: param-type-mismatch
-	local instance         = setmetatable({}, ForgeEntity)
-	instance.m_handle      = handle
-	instance.m_name        = name
-	instance.m_model_hash  = modelHash
-	instance.m_type        = entityType
-	instance.m_alpha       = alpha or 255
-	instance.m_is_attached = false
-	instance.m_is_player   = handle == LocalPlayer:GetHandle()
-	instance.m_properties  = {}
-	instance.m_children    = {}
-	instance.m_position    = coords
-	instance.m_rotation    = rotation
-	return instance
+	return setmetatable({
+		m_handle      = handle,
+		m_name        = name,
+		m_model_hash  = modelHash,
+		m_type        = entityType,
+		m_alpha       = alpha or 255,
+		m_is_attached = false,
+		m_is_player   = handle == LocalPlayer:GetHandle(),
+		m_properties  = {},
+		m_children    = {},
+		m_position    = coords,
+		m_rotation    = rotation,
+		---@diagnostic disable-next-line: param-type-mismatch
+	}, ForgeEntity)
 end
 
 ---@return boolean

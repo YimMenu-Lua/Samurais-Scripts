@@ -10,13 +10,8 @@
 ---@class FeatureBase
 ---@field protected m_entity Entity? -- reference to the entity if one owns the feature
 ---@field protected m_active boolean
-local FeatureBase = {}
+local FeatureBase   = {}
 FeatureBase.__index = FeatureBase
-setmetatable(FeatureBase, {
-	__call = function(_, entity)
-		return FeatureBase.new(entity)
-	end
-})
 
 ---@param entity Entity?
 function FeatureBase.new(entity)

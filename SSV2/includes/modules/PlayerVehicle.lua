@@ -62,11 +62,11 @@ local ManualGearbox    = require("includes.features.vehicle.manual_gearbox")
 local PlayerVehicle = Class("PlayerVehicle", { parent = Vehicle })
 
 PlayerVehicle.mines = {
-	Pair.new("Spikes", -647126932),
-	Pair.new("Slick", 1459276487),
-	Pair.new("Explosive", 1508567460),
-	Pair.new("EMP", 1776356704),
-	Pair.new("Kinetic", 1007245390),
+	Pair("Spikes", -647126932),
+	Pair("Slick", 1459276487),
+	Pair("Explosive", 1508567460),
+	Pair("EMP", 1776356704),
+	Pair("Kinetic", 1007245390),
 }
 
 ---@enum eAutoPilotState

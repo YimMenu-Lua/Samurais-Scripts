@@ -99,18 +99,16 @@ end
 ---@field public auto_apply boolean
 ---@overload fun(data: VehicleFlagPresetData) : VehicleFlagPreset
 local VehicleFlagPreset <const> = Callable("VehicleFlagPreset", {
-	ctor = function(self, ...)
-		return self.new(...)
-	end
+	ctor = function(t, ...) return t:new(...) end
 })
 
 ---@param data VehicleFlagPresetData
 ---@return VehicleFlagPreset
-function VehicleFlagPreset.new(data)
+function VehicleFlagPreset:new(data)
 	local name                = data.name
 	local is_default          = RESERVED_NAMES[name]
 	local callbacks, filename = load_callbacks_for_preset(name, data)
-	return MakeInstance({
+	return setmetatable({
 		m_name                   = name,
 		m_deltas                 = NormalizeDeltas(data.deltas, false),
 		m_vehicle_bitset         = data.vehicle_bitset or (1 << CARS_BIT),
@@ -122,7 +120,7 @@ function VehicleFlagPreset.new(data)
 		m_on_enable_callback     = callbacks and callbacks.onEnable or nil,
 		m_on_disable_callback    = callbacks and callbacks.onDisable or nil,
 		m_callback_defs_filename = not is_default and filename or nil,
-	}, VehicleFlagPreset)
+	}, self)
 end
 
 ---@return boolean
@@ -160,7 +158,7 @@ function VehicleFlagPreset:GetAssociatedFlags()
 		local temp = {}
 		for _, data in pairs(self.m_deltas) do
 			for name, bool in pairs(data) do
-				table.insert(temp, Pair.new(name, bool))
+				table.insert(temp, Pair(name, bool))
 			end
 		end
 		self.m_cached_flags = temp
@@ -277,7 +275,7 @@ end
 ---@return VehicleFlagPreset
 function VehicleFlagPreset.Deserialize(data)
 	local is_user_generated = not RESERVED_NAMES[data.name]
-	return MakeInstance({
+	return setmetatable({
 		m_name                   = data.name,
 		m_description            = data.description,
 		m_deltas                 = NormalizeDeltas(data.deltas, false),
@@ -287,6 +285,7 @@ function VehicleFlagPreset.Deserialize(data)
 		m_is_default_preset      = data.is_default_preset,
 		m_is_user_generated      = is_user_generated,
 		m_callback_defs_filename = is_user_generated and data.callback_defs_filename or nil
+		---@diagnostic disable-next-line
 	}, VehicleFlagPreset)
 end
 

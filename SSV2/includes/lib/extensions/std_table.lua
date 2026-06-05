@@ -440,10 +440,9 @@ function table.is_equal(t1, t2, seen)
 	return true
 end
 
----@generic K, V
----@param t table<K, V>
+---@param t table
 ---@param path string
----@return V?
+---@return any
 function table.get_nested_value(t, path)
 	local current = t
 	for key in path:gmatch("[^%.]+") do

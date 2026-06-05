@@ -13,7 +13,7 @@
 ---@field callback? fun(self: StateMachine, context: table|metatable|userdata|lightuserdata)
 
 
----@class StateMachine
+---@class StateMachine : Callable<StateMachine>
 ---@field private m_is_active boolean
 ---@field private m_is_toggled boolean state flip
 ---@field private m_callback Callback<StateMachine, table|metatable|userdata|lightuserdata>
@@ -21,17 +21,10 @@
 ---@field private m_interval seconds
 ---@field private m_next_update seconds
 ---@overload fun(opts?: StateMachineParams) : StateMachine
-local StateMachine = {}
-StateMachine.__index = StateMachine
----@diagnostic disable-next-line
-setmetatable(StateMachine, {
-	__call = function(_, ...)
-		return StateMachine:new(...)
-	end
-})
+local StateMachine = Callable("StateMachine")
 
 ---@param opts StateMachineParams
-function StateMachine:new(opts)
+function StateMachine.new(opts)
 	return setmetatable({
 		m_predicate   = opts.predicate,
 		m_interval    = opts.interval or 0,

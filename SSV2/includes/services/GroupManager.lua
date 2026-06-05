@@ -137,7 +137,7 @@ function GroupManager:HandleBodyuards(s)
 		return
 	end
 
-	local trash        = Set.new() ---@type Set<handle>
+	local trash        = Set() ---@type Set<handle>
 	local globalTick   = self.globalTick
 	local playerCoords = LocalPlayer:GetPos()
 	for ped, data in pairs(self.Bodyguards) do
@@ -184,7 +184,7 @@ function GroupManager:HandleEscorts(s)
 		return
 	end
 
-	local trash      = Set.new() ---@type Set<string>
+	local trash      = Set() ---@type Set<string>
 	local globalTick = self.globalTick
 	for name, data in pairs(self.Escorts) do
 		local group = data.group

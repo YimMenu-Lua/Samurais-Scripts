@@ -20,16 +20,16 @@ local Pair        = require("includes.classes.Pair")
 local SelfMisc        = setmetatable({}, FeatureBase)
 SelfMisc.__index      = SelfMisc
 SelfMisc.m_cell_input = {
-	Pair.new(172, 1),
-	Pair.new(173, 2),
-	Pair.new(174, 3),
-	Pair.new(175, 4),
-	Pair.new(176, 5),
-	Pair.new(177, 5),
-	Pair.new(178, 5),
-	Pair.new(179, 5),
-	Pair.new(180, 1),
-	Pair.new(181, 2),
+	Pair(172, 1),
+	Pair(173, 2),
+	Pair(174, 3),
+	Pair(175, 4),
+	Pair(176, 5),
+	Pair(177, 5),
+	Pair(178, 5),
+	Pair(179, 5),
+	Pair(180, 1),
+	Pair(181, 2),
 }
 
 ---@param ent LocalPlayer

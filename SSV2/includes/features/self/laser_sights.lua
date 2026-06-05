@@ -19,7 +19,7 @@ local Set         = require("includes.classes.Set")
 local LaserSights            = setmetatable({}, FeatureBase)
 LaserSights.__index          = LaserSights
 
-LaserSights.WeaponExclusions = Set.new(
+LaserSights.WeaponExclusions = Set(
 	0x34A67B97,
 	0xBA536372,
 	0x184140A1,

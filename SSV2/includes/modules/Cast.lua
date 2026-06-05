@@ -20,27 +20,18 @@
 --print(c:AsInt16_t()) --> -1
 --```
 -----------------------------------------
----@ignore
----@class Cast
+---@class Cast : Callable<Cast>
 ---@field private m_value integer
 ---@overload fun(n: integer): Cast
-local Cast = {}
-Cast.__index = Cast
----@diagnostic disable-next-line: param-type-mismatch
-setmetatable(Cast, {
-	__call = function(_, n)
-		return Cast.new(n)
-	end
-})
+local Cast = Callable("Cast", { ctor = function(t, ...) return t:new(...) end })
 
 -- Constructor
 ---@param n integer
 ---@return Cast
-function Cast.new(n)
+function Cast:new(n)
 	local _t = type(n)
 	assert(_t == "number", _F("[Cast]: Invalid parameter! Number expected, got %s instead", _t))
-	---@diagnostic disable-next-line: param-type-mismatch
-	return setmetatable({ m_value = n }, Cast)
+	return setmetatable({ m_value = n }, self)
 end
 
 ---@return uint8_t

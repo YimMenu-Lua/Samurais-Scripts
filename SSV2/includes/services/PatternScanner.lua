@@ -18,22 +18,14 @@
 -- > [!Note]
 --
 -- > This is just an intermediate object. There is no use for it outside of `PatternScanner`.
----@generic T
----@class Pattern<T>
+---@class Pattern : Callable<Pattern>
 ---@field private m_name string
 ---@field private m_address uint64_t
 ---@field protected m_ptr pointer
 ---@field private m_sig string
 ---@field private m_callback fun(ptr: pointer): any
 ---@overload fun(name: string, ida_sig: string, func: fun(ptr: pointer): any): Pattern
-local Pattern = { __type = "Pattern" }
-Pattern.__index = Pattern
----@diagnostic disable-next-line
-setmetatable(Pattern, {
-	__call = function(cls, ...)
-		return cls.new(...)
-	end,
-})
+local Pattern = Callable("Pattern")
 
 function Pattern:__tostring()
 	return _F("Pattern<%s> @ 0x%X", self.m_name, self.m_address)

@@ -194,7 +194,7 @@ function RawDataService:NormalizeGenericDict(data)
 		end)
 
 		for i, name in ipairs(names) do
-			outArray[i] = Pair.new(name, dict[name])
+			outArray[i] = Pair(name, dict[name])
 		end
 
 		yield()

@@ -23,7 +23,7 @@ Enums.eConvertibleRoofState  = {
 	RAISING  = 3
 }
 
-local collisionInvalidModels = Set.new(
+local collisionInvalidModels = Set(
 	3008087081,
 	415536433,
 	874602658,
@@ -36,7 +36,7 @@ local collisionInvalidModels = Set.new(
 	1067874014
 )
 
-local towTruckModels <const> = Set.new(
+local towTruckModels <const> = Set(
 	_J("towtruck"),
 	_J("towtruck2"),
 	_J("towtruck3"),

@@ -51,10 +51,10 @@ function Callable(name, args)
 end
 
 -- A `setmetatable` abstraction to avoid param-type-mismatch warnings.
----@generic T, C
+---@generic T
 ---@param t T
----@param base C
----@return C
+---@param base T
+---@return T
 function MakeInstance(t, base)
 	---@diagnostic disable-next-line
 	return setmetatable(t, base)
