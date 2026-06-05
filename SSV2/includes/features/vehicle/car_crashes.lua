@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Audio       = require("includes.modules.Audio")
 local FeatureBase = require("includes.modules.FeatureBase")
 
 ---@class CrashLevel
@@ -23,8 +24,8 @@ local FeatureBase = require("includes.modules.FeatureBase")
 ---@field private m_crash_levels { minor: CrashLevel, major: CrashLevel, fatal: CrashLevel }
 ---@overload fun(pv: PlayerVehicle): CarCrash
 ---@diagnostic disable-next-line
-local CarCrash = setmetatable({}, FeatureBase)
-CarCrash.__index = CarCrash
+local CarCrash    = setmetatable({}, FeatureBase)
+CarCrash.__index  = CarCrash
 
 ---@param pv PlayerVehicle
 ---@return CarCrash

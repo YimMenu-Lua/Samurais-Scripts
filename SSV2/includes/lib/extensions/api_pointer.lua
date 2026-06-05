@@ -9,6 +9,8 @@
 
 ---@diagnostic disable: lowercase-global
 
+local Range = require("includes.classes.Range")
+
 do
 	---@class nullptr : pointer
 	local nullptr <const>     = {}
@@ -151,15 +153,13 @@ function memory.pointer:as(obj)
 	local __mt = getmetatable(obj)
 	local call = __mt and __mt.__call or nil
 	if (type(call) == "function") then
-		return call(self)
+		return call(obj, self)
 	end
 
 	error(_F("Class '%s' has no valid pointer constructor", obj_name))
 end
 
--- Basically Rockstar's `TEXT_LABEL_ASSIGN_STRING`
---
--- Writes a string into the address and fills any remaining free bytes with nulls.
+-- Writes a fixed-length string at the address.
 ---@param str string
 ---@param max_len integer
 function memory.pointer:set_fixed_string(str, max_len)
@@ -281,7 +281,7 @@ function memory.pointer:dump(size)
 	end
 
 	local result = {}
-	size = size or 0x10
+	size         = size or 0x10
 	for i = 0, size - 1 do
 		table.insert(result, _F("%02X", self:add(i):get_byte()))
 	end
@@ -298,13 +298,13 @@ end
 function memory.pointer:create_pattern(size)
 	if (self:is_null()) then return "" end
 
-	local out                      = {}
-	local REG_DIRECT_RANGE <const> = Range(0xC0, 0x100)
-	size                           = size or 0x10
+	size               = size or 0x10
+	local out          = {}
+	local direct_range = Range(0xC0, 0x100)
 
 	for i = 0, size - 1 do
 		local byte = self:add(i):get_byte()
-		out[#out + 1] = REG_DIRECT_RANGE:Contains(byte) and "??" or _F("%02X", byte)
+		out[#out + 1] = direct_range:Contains(byte) and "??" or _F("%02X", byte)
 	end
 
 	return table.concat(out, " ")

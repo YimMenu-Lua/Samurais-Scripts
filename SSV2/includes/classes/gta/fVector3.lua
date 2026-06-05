@@ -7,20 +7,13 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local ptr_to_vec3 = memory.pointer.get_vec3
 local __base_fields__ <const> = {
 	x = 0x0,
 	y = 0x4,
 	z = 0x8
 }
 
----@param ptr pointer
-local function ptr_to_vec3(ptr)
-	return vec3:new(
-		ptr:add(0x0):get_float(),
-		ptr:add(0x4):get_float(),
-		ptr:add(0x8):get_float()
-	)
-end
 
 --------------------------------------
 -- Class: fVector3
@@ -30,7 +23,7 @@ end
 -- This has no math or geometric methods, it's a simple memory view
 --
 -- but can be cast to a vec3 object using the `as_vec3` method.
----@class fVector3
+---@class fVector3 : Callable<fVector3>
 ---@field protected m_ptr pointer
 ---@field public x float
 ---@field public y float
@@ -38,10 +31,11 @@ end
 ---@field public new fun(ptr: pointer): fVector3 -- static func
 ---@field public as_vec3 fun(self: fVector3): vec3 -- method
 ---@overload fun(ptr: pointer): fVector3
-local fVector3 <const> = setmetatable({}, {
-	__type     = "fVector3",
-	__ptr_ctor = true,
-	__call     = function(t, ...) return t.new(...) end
+local fVector3 <const> = Callable("fVector3", {
+	ptr_ctor = true,
+	ctor     = function(t, ptr)
+		return t.new(ptr)
+	end
 })
 
 ---@private

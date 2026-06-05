@@ -340,7 +340,7 @@ function ThreadManager:init()
 					)
 				end
 			},
-			[Enums.eGameBranch.LAGECY] = {
+			[Enums.eGameBranch.LEGACY] = {
 				dispatch = function(callback)
 					script.run_in_fiber(function(s)
 						callback(s)

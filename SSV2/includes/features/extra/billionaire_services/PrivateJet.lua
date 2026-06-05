@@ -8,6 +8,8 @@
 
 
 require("includes.modules.Vehicle")
+local Decorator = require("includes.modules.Decorator")
+
 
 -----------------------------------------------------
 -- Private Jet Class
@@ -157,7 +159,7 @@ function PrivateJet.spawn(ref, model, airportData)
 			},
 			radio         = {
 				isOn = true,
-				stationName = Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+				stationName = Game.GetLabelText(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 			},
 			wasDismissed  = false,
 			task          = Enums.eVehicleTask.NONE,
@@ -646,7 +648,7 @@ function PrivateJet:StateEval()
 	if self:IsPlayerInJet() then
 		self.radio.isOn = AUDIO.IS_VEHICLE_RADIO_ON(self.m_handle)
 		self.radio.stationName = self.radio.isOn
-			and Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+			and Game.GetLabelText(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 			or "Off"
 	end
 

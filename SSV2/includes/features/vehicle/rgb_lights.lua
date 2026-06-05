@@ -30,20 +30,20 @@ function RGBLights.new(pv)
 end
 
 function RGBLights:Init()
-	self.m_is_active = false
-	self.m_light_index = 0
-	self.m_brightness = 1.0
-	self.m_light_direction = -0.1
+	self.m_is_active        = false
+	self.m_light_index      = 0
+	self.m_brightness       = 1.0
+	self.m_light_direction  = -0.1
 	self.m_last_update_time = 0
 end
 
 function RGBLights:ShouldRun()
-	return (self.m_entity
-		and self.m_entity:IsValid()
-		and self.m_entity:IsLandVehicle()
-		and self.m_entity:IsEngineOn()
-		and GVars.features.vehicle.rgb_lights.enabled
-		and not VEHICLE.GET_BOTH_VEHICLE_HEADLIGHTS_DAMAGED(self.m_entity:GetHandle())
+	local veh = self.m_entity
+	return (GVars.features.vehicle.rgb_lights.enabled
+		and (veh and veh:IsValid())
+		and veh:IsLandVehicle()
+		and veh:IsEngineOn()
+		and not VEHICLE.GET_BOTH_VEHICLE_HEADLIGHTS_DAMAGED(veh:GetHandle())
 	)
 end
 
@@ -53,11 +53,11 @@ function RGBLights:IsActive()
 end
 
 function RGBLights:Update()
-	local PV = self.m_entity
+	local PV     = self.m_entity
 	local handle = PV:GetHandle()
-	local speed = GVars.features.vehicle.rgb_lights.speed
+	local speed  = GVars.features.vehicle.rgb_lights.speed
 
-	if (not PV.m_default_xenon_lights.enabled) then
+	if (not PV.m_default_xenon_lights.enabled and not VEHICLE.IS_TOGGLE_MOD_ON(handle, 22)) then
 		VEHICLE.TOGGLE_VEHICLE_MOD(handle, 22, true)
 	end
 
@@ -65,14 +65,17 @@ function RGBLights:Update()
 		return
 	end
 
-	VEHICLE.SET_VEHICLE_XENON_LIGHT_COLOR_INDEX(handle, self.m_light_index)
 	VEHICLE.SET_VEHICLE_LIGHT_MULTIPLIER(handle, self.m_brightness)
 
 	self.m_brightness = self.m_brightness + self.m_light_direction
 
 	if (self.m_brightness <= 0.1 or self.m_brightness >= 1.0) then
-		self.m_light_index = (self.m_light_index + 1) % 13
+		self.m_light_index     = (self.m_light_index + 1) % 13
 		self.m_light_direction = -self.m_light_direction
+	end
+
+	if (self.m_brightness <= 0.05) then
+		VEHICLE.SET_VEHICLE_XENON_LIGHT_COLOR_INDEX(handle, self.m_light_index)
 	end
 
 	self.m_last_update_time = Time.Millis() + (100 / speed)

@@ -11,8 +11,7 @@
 -- Class: atArray
 --------------------------------------
 ---@ignore
----@generic T
----@class atArray<T>
+---@class atArray<T> : Callable<atArray>
 ---@field protected m_ptr pointer
 ---@field private m_data array<pointer<T>>
 ---@field private m_size uint16_t
@@ -20,31 +19,19 @@
 ---@field private m_data_type T|ClassMeta<T>|any
 ---@field [integer] pointer<T>
 ---@operator len: integer
----@overload fun(address: pointer, data_type?: optional<T>): atArray
-local atArray = {
-	__type     = "atArray",
-	__ptr_ctor = true
-}
-
----@diagnostic disable-next-line
-setmetatable(atArray, {
-	__call = function(cls, ...)
-		return cls.new(...)
-	end,
-})
+---@overload fun(ptr: pointer, data_type?: optional<T>): atArray<T>
+local atArray = Callable("atArray", { ptr_ctor = true })
 
 ---@generic T
 ---@param ptr pointer
 ---@param data_type? optional<T>
 ---@return atArray<T>
 function atArray.new(ptr, data_type)
-	local instance = setmetatable({
-		m_ptr       = ptr,
-		m_size      = 0,
-		m_capacity  = 0,
-		m_data      = {},
-		m_data_type = nil
-		---@diagnostic disable-next-line: param-type-mismatch
+	local instance = MakeInstance({
+		m_ptr      = ptr,
+		m_size     = 0,
+		m_capacity = 0,
+		m_data     = {},
 	}, atArray)
 
 	if (ptr:is_null()) then return instance end
@@ -56,8 +43,11 @@ function atArray.new(ptr, data_type)
 	instance.m_capacity  = ptr:add(0xA):get_word()
 	instance.m_data_type = data_type
 
+	local pData          = ptr:deref()
+	if (pData:is_null()) then return instance end
+
 	for i = 0, array_size - 1 do
-		instance.m_data[i + 1] = ptr:deref():add(i * 0x8)
+		instance.m_data[i + 1] = pData:add(i * 0x8)
 	end
 
 	return instance

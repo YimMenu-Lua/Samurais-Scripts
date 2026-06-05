@@ -164,7 +164,7 @@ function Mastermind:ReadPropertyData()
 		local agency_ref = self.m_raw_data.Agencies[agency_idx]
 		if (agency_ref) then
 			self.m_properties.agency = {
-				name   = Game.GetGXTLabel(agency_ref.gxt),
+				name   = Game.GetLabelText(agency_ref.gxt),
 				coords = agency_ref.coords
 			}
 		end
@@ -173,7 +173,7 @@ function Mastermind:ReadPropertyData()
 		local hangar_ref = self.m_raw_data.FieldHangar[hangar_idx]
 		if (hangar_ref) then
 			self.m_properties.hangar = {
-				name   = Game.GetGXTLabel(hangar_ref.gxt),
+				name   = Game.GetLabelText(hangar_ref.gxt),
 				coords = hangar_ref.coords
 			}
 		end
@@ -182,7 +182,7 @@ function Mastermind:ReadPropertyData()
 		local facility_ref = self.m_raw_data.Facilities[facility_idx]
 		if (facility_ref) then
 			self.m_properties.facility = {
-				name   = Game.GetGXTLabel(facility_ref.gxt),
+				name   = Game.GetLabelText(facility_ref.gxt),
 				coords = facility_ref.coords
 			}
 		end
@@ -190,7 +190,7 @@ function Mastermind:ReadPropertyData()
 		local sub_hash = stats.get_int("MPX_IH_SUB_OWNED")
 		if (sub_hash == _J("kosatka")) then
 			self.m_properties.submarine = {
-				name       = Game.GetGXTLabel("CELL_SUBMARINE"),
+				name       = Game.GetLabelText("CELL_SUBMARINE"),
 				coords     = vec3:zero(),
 				heading    = 0.0,
 				is_spawned = isSubmarineSpawned()

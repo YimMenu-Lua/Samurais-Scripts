@@ -978,5 +978,6 @@ return {
 	["VEH_PERF_ONLY_TT"] = "将某些功能仅限于高性能汽车（启动控制、砰砰声等）",
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "启动发动机前，请踩下离合器或将档位置于空档。",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "离合器辅助装置",
-	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "仅手动模式：禁用发动机熄火行为。"
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "仅手动模式：禁用发动机熄火行为。",
+	["VEH_GEARBOX_AUTO"] = "自动的"
 }

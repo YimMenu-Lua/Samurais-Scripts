@@ -15,15 +15,7 @@
 ---@field protected m_data_type string
 ---@field new fun(...: T): Set<T>
 ---@overload fun(...: T): Set<T>
-Set         = { __type = "Set" }
-Set.__index = Set
-
----@diagnostic disable-next-line: param-type-mismatch
-setmetatable(Set, {
-	__call = function(_, ...)
-		return Set.new(...)
-	end
-})
+local Set = Callable("Set")
 
 function Set.new(...)
 	---@diagnostic disable-next-line: param-type-mismatch
@@ -101,7 +93,4 @@ function Set:__pairs()
 	return pairs(self.m_data)
 end
 
--- This is probably bad. Set:Contains() should be the only source of truth.
--- function Set:__index(key)
--- 	return Set[key] or (self.m_data[key] == true)
--- end
+return Set

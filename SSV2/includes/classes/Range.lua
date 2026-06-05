@@ -17,14 +17,7 @@
 ---@field private m_max number
 ---@field private m_step number
 ---@overload fun(from: number, to: number, step?: number): Range
-Range = {}
-Range.__index = Range
----@diagnostic disable-next-line
-setmetatable(Range, {
-	__call = function(_, from, to, step)
-		return Range.new(from, to, step)
-	end
-})
+local Range = Callable("Range")
 
 ---@param from number
 ---@param to number

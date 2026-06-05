@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Decorator      = require("includes.modules.Decorator")
 local PreviewService = require("includes.services.PreviewService")
 local ClearPreview   = function() PreviewService:Clear() end
 
@@ -122,7 +123,7 @@ function Backend:GetGameBranch()
 	---@type (fun(): integer)?
 	local get_game_branch = _G["get_game_branch"]
 	if (type(get_game_branch) ~= "function") then
-		self.m_game_branch = Enums.eGameBranch.LAGECY
+		self.m_game_branch = Enums.eGameBranch.LEGACY
 		return self.m_game_branch
 	end
 

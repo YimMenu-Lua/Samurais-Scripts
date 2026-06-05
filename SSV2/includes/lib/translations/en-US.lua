@@ -730,6 +730,7 @@ return {
 	["VEH_MANUAL_GEARBOX_TYPE"]            = "Gearbox Type",
 	["VEH_GEARBOX_MAN_WCLUTCH"]            = "Manual With Clutch",
 	["VEH_GEARBOX_SEQUENTIAL"]             = "Sequential",
+	["VEH_GEARBOX_AUTO"]                   = "Automatic",
 	["VEH_GEARBOX_CLUTCH_ASSIST"]          = "Clutch Assist",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"]       = "Manual Mode Only: Disables engine stalling behavior.",
 	["VEH_GEARBOX_ENGINE_START_ERR"]       = "Please press the clutch or put the gear in neutral before starting the engine.",

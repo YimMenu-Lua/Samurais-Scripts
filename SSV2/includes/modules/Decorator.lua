@@ -14,14 +14,16 @@
 --
 -- Custom decorator to mark entities owned by this script.
 ---@class Decorator
----@field RegisteredEntities table<integer, table<string, any>>
+---@field private m_registry table<handle, table<string, any>>
 ---@field private m_last_gc seconds
-Decorator = { m_last_gc = 0 }
-Decorator.RegisteredEntities = {}
+local Decorator   = {
+	m_last_gc  = 0,
+	m_registry = {}
+}; Decorator.__index = Decorator ---@private
 
 ---@param entity integer
 function Decorator:IsEntityRegistered(entity)
-	return self.RegisteredEntities[entity] ~= nil
+	return self.m_registry[entity] ~= nil
 end
 
 ---@param entity integer
@@ -32,7 +34,7 @@ function Decorator:ExistsOn(entity, key)
 		return false
 	end
 
-	return self.RegisteredEntities[entity][key] and self.RegisteredEntities[entity][key] ~= nil
+	return self.m_registry[entity][key] and self.m_registry[entity][key] ~= nil
 end
 
 ---@param entity handle
@@ -43,7 +45,7 @@ function Decorator:GetDecor(entity, key)
 		return
 	end
 
-	return self.RegisteredEntities[entity][key]
+	return self.m_registry[entity][key]
 end
 
 -- If a decor doesn't exist for the entity, this will register it nonetheless.
@@ -58,14 +60,14 @@ function Decorator:UpdateDecor(entity, key, new_value)
 		return
 	end
 
-	self.RegisteredEntities[entity][key] = new_value
+	self.m_registry[entity][key] = new_value
 end
 
 ---@param entity integer
 ---@param key string
 ---@param value any
 function Decorator:Register(entity, key, value)
-	local existing = self.RegisteredEntities[entity]
+	local existing = self.m_registry[entity]
 	if (existing) then
 		if (existing[key]) then
 			return
@@ -73,7 +75,7 @@ function Decorator:Register(entity, key, value)
 
 		existing[key] = value
 	else
-		self.RegisteredEntities[entity] = { [key] = value }
+		self.m_registry[entity] = { [key] = value }
 	end
 end
 
@@ -83,7 +85,7 @@ function Decorator:RemoveEntity(entity)
 		return
 	end
 
-	self.RegisteredEntities[entity] = nil
+	self.m_registry[entity] = nil
 end
 
 ---@param entity integer
@@ -96,9 +98,9 @@ function Decorator:CollectGarbage()
 		return
 	end
 
-	for handle, _ in pairs(self.RegisteredEntities) do
+	for handle, _ in pairs(self.m_registry) do
 		if (not ENTITY.DOES_ENTITY_EXIST(handle)) then
-			self.RegisteredEntities[handle] = nil
+			self.m_registry[handle] = nil
 		end
 	end
 
@@ -107,11 +109,11 @@ end
 
 ---@param entity integer
 function Decorator:DebugDump(entity)
-	if next(self.RegisteredEntities) == nil then
+	if next(self.m_registry) == nil then
 		return
 	end
 
-	if not self.RegisteredEntities[entity] then
+	if not self.m_registry[entity] then
 		Backend:debug(_F("[%s] is not registered.", entity))
 		return
 	end
@@ -120,7 +122,9 @@ function Decorator:DebugDump(entity)
 		_F(
 			"[%s] is registered with: %s",
 			entity,
-			self.RegisteredEntities[entity]
+			self.m_registry[entity]
 		)
 	)
 end
+
+return Decorator

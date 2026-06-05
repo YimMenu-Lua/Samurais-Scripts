@@ -8,6 +8,7 @@
 
 
 local PV <const>                = LocalPlayer:GetVehicle()
+local Audio                     = require("includes.modules.Audio")
 local Refs                      = require("includes.data.refs")
 local default_cfg               = require("includes.data.config")
 local driftMG                   = require("includes.features.vehicle.drift_minigame")
@@ -45,10 +46,10 @@ for _, v in ipairs(Audio.RadioStations) do
 	::continue::
 end
 
----@param toggle? boolean
-local function toggleEngineAutostart(toggle)
+local function onManualGearboxModeSwitch()
 	ThreadManager:Run(function()
-		ManualGearbox:SetEngineAutoStart(toggle)
+		ManualGearbox:Reset()
+		ManualGearbox:OnNewVehicle()
 	end)
 end
 
@@ -174,17 +175,21 @@ local function gearboxOptions()
 	local cfg = GVars.features.vehicle.manual_gearbox
 	cfg.mode, gearbox_mode_clicked = ImGui.Combo(_T("VEH_MANUAL_GEARBOX_TYPE"),
 		cfg.mode,
-		{ _T("VEH_GEARBOX_MAN_WCLUTCH"), _T("VEH_GEARBOX_SEQUENTIAL") },
-		2
+		{ _T("VEH_GEARBOX_MAN_WCLUTCH"), _T("VEH_GEARBOX_SEQUENTIAL"), _T("VEH_GEARBOX_AUTO") },
+		3
 	)
 
 	if (gearbox_mode_clicked) then
-		toggleEngineAutostart()
+		onManualGearboxModeSwitch()
 	end
 
 	if (cfg.mode == 0) then
 		cfg.disable_stalling = GUI:Checkbox(_T("VEH_GEARBOX_CLUTCH_ASSIST"), cfg.disable_stalling, {
-			onClick = function(v) toggleEngineAutostart(not v) end,
+			onClick = function(v)
+				ThreadManager:Run(function(s)
+					ManualGearbox:SetEngineAutoStart(not v)
+				end)
+			end,
 		})
 		GUI:HelpMarker(_T("VEH_GEARBOX_CLUTCH_ASSIST_TT"))
 	end
@@ -575,7 +580,7 @@ vehicleTab:RegisterGUI(function()
 end)
 
 --#region Handling Editor
-vehicleTab:RegisterSubtab("SUBTAB_HANDLING_EDITOR", require("includes.frontend.vehicle.handling_editor_ui"), nil, true)
+vehicleTab:RegisterSubtab("SUBTAB_HANDLING_EDITOR", require("includes.frontend.vehicle.flag_editor_ui"), nil, true)
 --#endregion
 
 --#region stancer

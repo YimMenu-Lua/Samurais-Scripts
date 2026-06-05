@@ -7,6 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Pair = require("includes.classes.Pair")
+
+
 ---@class RawPedData
 ---@field model_hash hash
 ---@field ped_type ePedType
@@ -41,7 +44,7 @@ local RawDataService <const> = {
 	m_base_data    = {},
 	m_error_paths  = {},
 }
-RawDataService.__index = RawDataService
+RawDataService.__index       = RawDataService
 
 ---@generic T
 ---@param path string

@@ -44,7 +44,7 @@ local function setAllCDCheckboxes(value)
 	YRV3:ProcessAllCooldowns()
 end
 
-local cooldownsGrid = GridRenderer.new(1)
+local cooldownsGrid = GridRenderer(1)
 cooldownsGrid:AddCheckbox("YRV3_CEO_BUY_CB", "features.yrv3.ceo_crate_buy_cd", {
 	persistent        = true,
 	isTranslatorLabel = true,

@@ -17,4 +17,10 @@ local CBaseSubHandlingData = require("includes.classes.gta.CBaseSubHandlingData"
 ---@overload fun(ptr: pointer): CBoatHandlingData
 local CBoatHandlingData = Class("CBoatHandlingData", { parent = CBaseSubHandlingData, pointer_ctor = true })
 
+---@param ptr pointer
+function CBoatHandlingData.new(ptr)
+	---@diagnostic disable-next-line: param-type-mismatch
+	return setmetatable({ m_ptr = ptr }, CBoatHandlingData)
+end
+
 return CBoatHandlingData

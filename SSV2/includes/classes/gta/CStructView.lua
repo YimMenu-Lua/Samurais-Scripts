@@ -20,65 +20,64 @@
 ---@field public GetAddress fun(self: T): uint64_t
 ---@field __safecall fun(self: T, default: any, func: fun(...?): R1, R2?, R3?, R4?, R5?, ...?): R1, R2?, R3?, R4?, R5?, ...?
 
+---@diagnostic disable: invisible
+
+---@param self CStructBase
+local function is_valid(self)
+	return self.m_ptr and self.m_ptr:is_valid() or false
+end
+
+---@param self CStructBase
+local function get_pointer(self)
+	return self.m_ptr or nullptr
+end
+
+---@param self CStructBase
+local function get_address(self)
+	return self.m_ptr and self.m_ptr:get_address() or 0x0
+end
+
+---@generic R1, R2, R3, R4, R5
+---@param self CStructBase
+---@param default any Defaul value to return on failure
+---@param func fun(...): R1, R2?, R3?, R4?, R5?, ... ?
+---@param ... any
+---@return R1, R2?, R3?, R4?, R5?, ... ?
+local function safe_call(self, default, func, ...)
+	if (not self:IsValid()) then
+		return default
+	end
+
+	local results = { pcall(func, ...) }
+	local ok      = results[1]
+	local err     = results[2]
+
+	if (not ok) then
+		log.fwarning("Safecall failed in %s: %s", self.__type, err)
+		return default
+	end
+
+	table.remove(results, 1)
+	return table.unpack(results)
+end
+
+---@diagnostic enable: invisible
+
 -- Creates a basic GTA class definition with default methods.
 ---@generic T
 ---@param name string
 ---@param size? integer Optional sugar, plays nice with `SizeOf`
 ---@return CStructBase<T>
-local function CStructView(name, size)
-	local cls = {
-		m_size     = size or GenericClass.m_size,
-		__type     = name,
-		__ptr_ctor = true
-	}
-	cls.__index = cls
-
-	setmetatable(cls, {
-		__call = function(t, ...)
-			return t.new(...)
-		end
+return function(name, size)
+	return Callable(name, {
+		ctor     = function(t, ptr) return t.new(ptr) end,
+		ptr_ctor = true,
+		t_data   = {
+			m_size     = size or GenericClass.m_size,
+			IsValid    = is_valid,
+			GetPointer = get_pointer,
+			GetAddress = get_address,
+			__safecall = safe_call
+		},
 	})
-
-	---@return boolean
-	function cls:IsValid()
-		return self.m_ptr and self.m_ptr:is_valid() or false
-	end
-
-	---@return pointer
-	function cls:GetPointer()
-		return self.m_ptr or nullptr
-	end
-
-	---@return uint64_t
-	function cls:GetAddress()
-		return self.m_ptr and self.m_ptr:get_address() or 0x0
-	end
-
-	---@private
-	---@generic R1, R2, R3, R4, R5
-	---@param default any Defaul value to return on failure
-	---@param func fun(...): R1, R2?, R3?, R4?, R5?, ... ?
-	---@param ... any
-	---@return R1, R2?, R3?, R4?, R5?, ... ?
-	function cls:__safecall(default, func, ...)
-		if (not self:IsValid()) then
-			return default
-		end
-
-		local results = { pcall(func, ...) }
-		local ok      = results[1]
-		local err     = results[2]
-
-		if (not ok) then
-			log.fwarning("Safecall failed in %s: %s", self.__type, err)
-			return default
-		end
-
-		table.remove(results, 1)
-		return table.unpack(results)
-	end
-
-	return cls
 end
-
-return CStructView

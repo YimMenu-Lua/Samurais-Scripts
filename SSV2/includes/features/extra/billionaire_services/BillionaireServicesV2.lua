@@ -14,8 +14,10 @@ local PrivateJet     = require("PrivateJet")
 local PrivateLimo    = require("PrivateLimo")
 
 local BSV2Data       = require("includes.data.bsv2_data")
+local Decorator      = require("includes.modules.Decorator")
 local GroupManager   = require("includes.services.GroupManager")
 local RandomPedNames = require("includes.data.ped_names")
+
 
 ---@alias ServiceType integer
 ---| -1 # ALL
@@ -63,10 +65,10 @@ local RandomPedNames = require("includes.data.ped_names")
 
 
 ---@class BillionaireServices
----@field Bodyguards table<integer, Bodyguard>
----@field EscortGroups table<string, EscortGroup>
----@field EscortVehicles table<integer, EscortVehicle>
----@field protected m_initialized boolean
+---@field private m_initialized boolean
+---@field public Bodyguards table<integer, Bodyguard>
+---@field public EscortGroups table<string, EscortGroup>
+---@field public EscortVehicles table<integer, EscortVehicle>
 local BillionaireServices               = {}
 BillionaireServices.__index             = BillionaireServices
 BillionaireServices.Bodyguards          = {}
@@ -83,12 +85,9 @@ BillionaireServices.SERVICE_TYPE        = {
 	JET       = 4,
 }
 BillionaireServices.ActiveServices      = {
-	---@type PrivateLimo
-	limo = nil,
-	---@type PrivateHeli
-	heli = nil,
-	---@type PrivateJet
-	jet = nil,
+	limo = nil, ---@type PrivateLimo
+	heli = nil, ---@type PrivateHeli
+	jet  = nil, ---@type PrivateJet
 }
 
 BillionaireServices.VehicleTaskToString = {
@@ -103,17 +102,18 @@ BillionaireServices.VehicleTaskToString = {
 
 ---@return BillionaireServices
 function BillionaireServices:init()
-	if (not self.m_initialized) then
-		self:ParseEscortGroups()
-		self.GroupManager            = GroupManager:init(BillionaireServices)
-		self.GroupManager.globalTick = GroupManager.globalTick or 0
-		self.m_initialized           = true
+	if (self.m_initialized) then return self end
 
-		Backend:RegisterEventCallbackAll(function() self:ForceCleanup() end)
-		Backend:RegisterFeatureEntityHandler("BillionaireServices", function(handle)
-			self:RemoveEntityByHandle(handle)
-		end)
-	end
+	self:ParseEscortGroups()
+	Backend:RegisterEventCallbackAll(function() self:ForceCleanup() end)
+	Backend:RegisterFeatureEntityHandler("BillionaireServices", function(handle)
+		self:RemoveEntityByHandle(handle)
+	end)
+
+	local groupMgr      = GroupManager(self)
+	groupMgr.globalTick = groupMgr.globalTick or 0
+	self.GroupManager   = groupMgr
+	self.m_initialized  = true
 
 	return self
 end

@@ -9,11 +9,12 @@
 
 local StaticEmitter = require("includes.structs.StaticEmitter")
 
+
 ---@class Audio
 ---@field StaticEmitters table<string, { name: string, default_station: string }>
 ---@field private m_frontend_sound_id integer
 ---@field private m_active_emitters table<string, StaticEmitter>
-Audio = { m_active_emitters = {} }
+local Audio   = { m_active_emitters = {} }
 Audio.__index = Audio
 
 ---@param data { name: string, default_station: string }
@@ -210,9 +211,9 @@ Audio.RadioStations = {
 	{ station = "RADIO_13_JAZZ",                  name = "Worldwide FM" },
 }
 
-ThreadManager:Run(function(s)
+ThreadManager:Run(function()
 	for _, v in ipairs(Audio.RadioStations) do
-		local gxt = Game.GetGXTLabel(v.station)
+		local gxt = Game.GetLabelText(v.station)
 		if (gxt ~= "NULL") then
 			v.name = gxt
 		end
@@ -222,3 +223,5 @@ ThreadManager:Run(function(s)
 		return a.name < b.name
 	end)
 end)
+
+return Audio

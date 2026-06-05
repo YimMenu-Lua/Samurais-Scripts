@@ -978,5 +978,6 @@ return {
 	["VEH_PERF_ONLY_TT"] = "Limita algunas funciones solo a autos de alto rendimiento (Control de lanzamiento, Pops & Bangs, etc.)",
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Presione el embrague o ponga la marcha en punto muerto antes de arrancar el motor.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Asistencia de embrague",
-	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Solo modo manual: desactiva el comportamiento de calado del motor."
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Solo modo manual: desactiva el comportamiento de calado del motor.",
+	["VEH_GEARBOX_AUTO"] = "Automático"
 }

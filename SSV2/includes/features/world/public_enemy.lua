@@ -7,7 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local FeatureBase                  = require("includes.modules.FeatureBase")
+local FeatureBase = require("includes.modules.FeatureBase")
+local Set         = require("includes.classes.Set")
+
 
 ---@class PublicEnemy : FeatureBase
 ---@field private m_last_scan_time TimePoint

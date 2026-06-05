@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Set                   = require("includes.classes.Set")
 local ReservedKeys <const>  = {
 	kb   = Set.new(0x01, 0x07, 0x0A, 0x0B, 0x1B, 0x24, 0x2C, 0x2D, 0x46, 0x5B, 0x5C, 0x5E),
 	gpad = Set.new(23, 24, 25, 71, 75)
@@ -14,11 +15,11 @@ local ReservedKeys <const>  = {
 
 local NoUnbindKeys <const>  = Set.new("gui_toggle")
 local DefaultConfig <const> = Serializer:GetDefaultConfig()
-local keyName, keyCode
 local currentKeyName        = ""
 local _reserved             = false
 local key_container_size    = vec2:new(160, 32)
 local button_size           = vec2:new(120, 32)
+local keyName, keyCode
 
 
 local function GetCurrentKey()
@@ -51,8 +52,8 @@ return function(gvarKey, isController)
 	local label               = gvarKey:replace("_", " "):titlecase()
 	local main_path           = isController and "gamepad_keybinds" or "keyboard_keybinds"
 	local current_path        = _F("%s.%s", main_path, gvarKey)
-	local current_key         = table.get_nested_key(GVars, current_path)
-	local default_key         = table.get_nested_key(DefaultConfig, current_path)
+	local current_key         = table.get_nested_value(GVars, current_path)
+	local default_key         = table.get_nested_value(DefaultConfig, current_path)
 	local style               = ImGui.GetStyle()
 	local framePaddingX       = style.FramePadding.x
 	local unbind_label        = _T("SETTINGS_KEYBINDS_UNBIND")
@@ -111,7 +112,7 @@ return function(gvarKey, isController)
 
 	if (ImGui.DialogBox(resetPopup, _T("SETTINGS_KEYBINDS_RESET_COFNIRM"), ImGuiDialogBoxStyle.WARN)) then
 		local newKey = isController and table.copy(default_key) or default_key
-		table.set_nested_key(GVars, current_path, newKey)
+		table.set_nested_value(GVars, current_path, newKey)
 		if (not isController and type(newKey) ~= "table") then
 			KeyManager:UpdateKeybind(current_key, { id = newKey })
 		end
@@ -119,7 +120,7 @@ return function(gvarKey, isController)
 
 	if (ImGui.DialogBox(unbindPopup, _T("SETTINGS_KEYBINDS_UNBIND_COFNIRM"), ImGuiDialogBoxStyle.WARN)) then
 		local newKey = isController and { name = "Unbound", code = 0 } or "Unbound"
-		table.set_nested_key(GVars, current_path, newKey)
+		table.set_nested_value(GVars, current_path, newKey)
 		if (not isController and type(newKey) ~= "table") then
 			KeyManager:UpdateKeybind(current_key, { id = newKey })
 		end
@@ -197,7 +198,7 @@ return function(gvarKey, isController)
 				end
 
 				local newKey = isController and { name = keyName, code = keyCode } or keyName
-				table.set_nested_key(GVars, current_path, newKey)
+				table.set_nested_value(GVars, current_path, newKey)
 				ImGui.CloseCurrentPopup()
 				keyCode, keyName = nil, nil
 			end

@@ -7,6 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Decorator  = require("includes.modules.Decorator")
+
 ---@alias ptr_read fun(w: CWheel, veh?: PlayerVehicle): float
 
 ---@enum eWheelAxle
@@ -15,9 +17,17 @@ Enums.eWheelAxle = {
 	REAR  = 2,
 }
 
+---@class StanceItem
+---@field key string
+---@field axle eWheelAxle
+---@field read fun(w: CWheel, veh?: PlayerVehicle): float
+---@field write fun(w: CWheel, v: float, veh?: PlayerVehicle)
+---@field side_dont_care? boolean
+
+
 return {
-	---@type array<{ key: string, axle: eWheelAxle, read: ptr_read, write: fun(w: CWheel, v: float, veh?: PlayerVehicle), side_dont_care?: boolean}>
-	decorators = {
+	---@type array<StanceItem>
+	items = {
 		{
 			key   = "m_toe",
 			axle  = Enums.eWheelAxle.FRONT,

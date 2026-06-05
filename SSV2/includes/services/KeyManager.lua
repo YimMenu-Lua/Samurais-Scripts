@@ -9,6 +9,9 @@
 
 ---@diagnostic disable: lowercase-global
 
+local Set = require("includes.classes.Set")
+
+
 --#region defs
 
 ---@enum eControlType
@@ -235,7 +238,7 @@ local KeyUpMessageSet <const>   = Set(
 --#region Key
 
 --------------------------------------
--- Subclass: Key
+-- Struct: Key
 --------------------------------------
 ---@ignore
 ---@class Key
@@ -253,15 +256,15 @@ Key.__index       = Key
 ---@param code integer
 ---@param name string
 function Key.new(code, name)
-	local instance            = setmetatable({}, Key)
-	instance.m_code           = code
-	instance.m_name           = name
-	instance.m_pressed        = false
-	instance.m_prev_pressed   = false
-	instance.m_just_pressed   = false
-	instance.m_just_released  = false
-	instance.m_repeat_on_hold = false
-	return instance
+	return setmetatable({
+		m_code           = code,
+		m_name           = name,
+		m_pressed        = false,
+		m_prev_pressed   = false,
+		m_just_pressed   = false,
+		m_just_released  = false,
+		m_repeat_on_hold = false,
+	}, Key)
 end
 
 ---@param state boolean
@@ -289,14 +292,14 @@ function Key:EndFrame() end -- redundant
 --------------------------------------
 -- Class: KeyManager
 --------------------------------------
----@class KeyManager : ClassMeta<KeyManager>
+---@class KeyManager : Callable<KeyManager>
 ---@field private m_keys Key[]
 ---@field private m_keymap_by_code table<eVirtualKeyCodes, Key>
 ---@field private m_keymap_by_name table<string, Key>
 ---@field private m_registered_keybinds table<eVirtualKeyCodes, Key>
 ---@field private m_initialized boolean
 ---@overload fun(): KeyManager
-local KeyManager = Class("KeyManager")
+local KeyManager = Callable("KeyManager")
 
 function KeyManager:init()
 	if (self.m_initialized) then return self end
@@ -325,6 +328,7 @@ function KeyManager:init()
 	end)
 
 	self.m_initialized = true
+	_G.KeyManager      = self
 	return self
 end
 
@@ -613,6 +617,4 @@ end
 
 --#endregion
 
-local singleInstance <const> = KeyManager()
-_G.KeyManager                = singleInstance
-return singleInstance
+return KeyManager()

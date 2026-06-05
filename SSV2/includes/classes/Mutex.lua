@@ -14,19 +14,11 @@
 ---@class Mutex
 ---@field protected m_locked boolean
 ---@overload fun(): Mutex
-local Mutex = {}
-Mutex.__index = Mutex
----@diagnostic disable-next-line
-setmetatable(Mutex, {
-	__call = function(_)
-		return Mutex.new()
-	end
-})
+local Mutex = Callable("Mutex")
 
 ---@return Mutex
 function Mutex.new()
-	---@diagnostic disable-next-line
-	return setmetatable({ m_locked = false }, Mutex)
+	return MakeInstance({ m_locked = false }, Mutex)
 end
 
 ---@return boolean

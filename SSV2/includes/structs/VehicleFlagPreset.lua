@@ -7,11 +7,12 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
----@type table<string, table<"OnEnable"|"OnDisable", boolean>>
+---@type dict<set<string>>
 local BAD_CALLBACKS <const>     = {}
 local CARS_BIT <const>          = Enums.eVehicleType.VEHICLE_TYPE_CAR
-local DEFAULT_PRESETS <const>   = require("includes.data.handling_presets")
-local DEFAULT_CALLBACKS <const> = require("includes.data.handling_preset_callbacks")
+local DEFAULT_PRESETS <const>   = require("includes.data.vehicle_flag_presets")
+local DEFAULT_CALLBACKS <const> = require("includes.data.vehicle_flag_preset_callbacks")
+local Pair                      = require("includes.classes.Pair")
 local RESERVED_NAMES <const>    = {}
 for _, preset in pairs(DEFAULT_PRESETS) do
 	RESERVED_NAMES[preset.name] = true
@@ -30,8 +31,8 @@ local function NormalizeDeltas(deltas, json)
 end
 
 ---@param name string
----@param data HandlingPresetData
----@return HandlingPresetCallbackData? data, string? filename
+---@param data VehicleFlagPresetData
+---@return VehicleFlagCallbackData? data, string? filename
 local function load_callbacks_for_preset(name, data)
 	if (RESERVED_NAMES[name]) then
 		return DEFAULT_CALLBACKS[name]
@@ -54,7 +55,7 @@ local function load_callbacks_for_preset(name, data)
 		return
 	end
 
-	---@cast res dict<HandlingPresetCallbackData>
+	---@cast res dict<VehicleFlagCallbackData>
 	local out = res[name]
 	if (not out) then
 		log.fwarning("Custom Handling Presets: The provided file does not contain any callback definitions for a preset with name '%s'.", name)
@@ -70,7 +71,7 @@ Please refer to "includes/data/handling_preset_callbacks.lua" for table structur
 end
 
 
----@class HandlingPresetData
+---@class VehicleFlagPresetData
 ---@field name string
 ---@field deltas table<eHandlingEditorTypes, table<string, boolean>>
 ---@field auto_apply? boolean
@@ -82,30 +83,34 @@ end
 ---@field callback_defs_filename? string
 
 
----@class HandlingPreset
+---@class VehicleFlagPreset : Callable<VehicleFlagPreset>
 ---@field private m_name string
 ---@field private m_description? string
 ---@field private m_is_translator_name boolean
 ---@field private m_cached_flags array<Pair<string, boolean>>
 ---@field private m_is_default_preset boolean
 ---@field private m_is_user_generated boolean
----@field private m_on_enable_callback? fun(self: HandlingPreset, editor: VehicleFlagController): any
----@field private m_on_disable_callback? fun(self: HandlingPreset, editor: VehicleFlagController): any
+---@field private m_on_enable_callback? fun(self: VehicleFlagPreset, editor: VehicleFlagController): any
+---@field private m_on_disable_callback? fun(self: VehicleFlagPreset, editor: VehicleFlagController): any
 ---@field public m_callback_defs_filename string
 ---@field public m_deltas table<eHandlingEditorTypes, table<string, boolean>>
 ---@field public m_vehicle_bitset integer -- bitset of eVehicleType (cars and bikes only)
 ---@field public m_category string
 ---@field public auto_apply boolean
-local HandlingPreset <const> = { m_deltas = {} }
-HandlingPreset.__index       = HandlingPreset
+---@overload fun(data: VehicleFlagPresetData) : VehicleFlagPreset
+local VehicleFlagPreset <const> = Callable("VehicleFlagPreset", {
+	ctor = function(self, ...)
+		return self.new(...)
+	end
+})
 
----@param data HandlingPresetData
----@return HandlingPreset
-function HandlingPreset.new(data)
+---@param data VehicleFlagPresetData
+---@return VehicleFlagPreset
+function VehicleFlagPreset.new(data)
 	local name                = data.name
 	local is_default          = RESERVED_NAMES[name]
 	local callbacks, filename = load_callbacks_for_preset(name, data)
-	return setmetatable({
+	return MakeInstance({
 		m_name                   = name,
 		m_deltas                 = NormalizeDeltas(data.deltas, false),
 		m_vehicle_bitset         = data.vehicle_bitset or (1 << CARS_BIT),
@@ -117,21 +122,21 @@ function HandlingPreset.new(data)
 		m_on_enable_callback     = callbacks and callbacks.onEnable or nil,
 		m_on_disable_callback    = callbacks and callbacks.onDisable or nil,
 		m_callback_defs_filename = not is_default and filename or nil,
-	}, HandlingPreset)
+	}, VehicleFlagPreset)
 end
 
 ---@return boolean
-function HandlingPreset:IsDefault()
+function VehicleFlagPreset:IsDefault()
 	return self.m_is_default_preset == true
 end
 
 ---@return string
-function HandlingPreset:GetName()
+function VehicleFlagPreset:GetName()
 	return self.m_name
 end
 
 ---@return string
-function HandlingPreset:GetDisplayName()
+function VehicleFlagPreset:GetDisplayName()
 	if (not self.m_is_user_generated and self.m_is_translator_name) then
 		return _T(self.m_name)
 	end
@@ -139,7 +144,7 @@ function HandlingPreset:GetDisplayName()
 end
 
 ---@return string?
-function HandlingPreset:GetDescription()
+function VehicleFlagPreset:GetDescription()
 	local desc = self.m_description
 	if (not desc) then return end
 
@@ -150,7 +155,7 @@ function HandlingPreset:GetDescription()
 end
 
 ---@return array<Pair<string, boolean>>
-function HandlingPreset:GetAssociatedFlags()
+function VehicleFlagPreset:GetAssociatedFlags()
 	if (not self.m_cached_flags) then
 		local temp = {}
 		for _, data in pairs(self.m_deltas) do
@@ -164,11 +169,11 @@ function HandlingPreset:GetAssociatedFlags()
 	return self.m_cached_flags
 end
 
-function HandlingPreset:Copy()
-	return HandlingPreset.Deserialize(self:Serialize())
+function VehicleFlagPreset:Copy()
+	return VehicleFlagPreset.Deserialize(self:Serialize())
 end
 
-function HandlingPreset:Serialize()
+function VehicleFlagPreset:Serialize()
 	return {
 		name                   = self.m_name,
 		deltas                 = NormalizeDeltas(self.m_deltas, true),
@@ -183,10 +188,10 @@ function HandlingPreset:Serialize()
 end
 
 ---@private
----@param func fun(self: HandlingPreset, editor: VehicleFlagController)
+---@param func fun(self: VehicleFlagPreset, editor: VehicleFlagController)
 ---@param editorInst VehicleFlagController
 ---@param funcIndex integer -- 1 OnEnable | 2 OnDisable
-function HandlingPreset:__run(func, editorInst, funcIndex)
+function VehicleFlagPreset:__run(func, editorInst, funcIndex)
 	if (type(func) ~= "function") then return end
 	if (not editorInst or not editorInst:IsInitialized()) then return end
 
@@ -195,7 +200,7 @@ function HandlingPreset:__run(func, editorInst, funcIndex)
 	local ref        = BAD_CALLBACKS[presetName]
 	if (ref and ref[funcName]) then
 		log.fwarning(
-			"[HandlingPreset]: %s callback execution blocked for preset '%s' (bad callback).",
+			"[VehicleFlagPreset]: %s callback execution blocked for preset '%s' (bad callback).",
 			funcName,
 			presetName
 		)
@@ -209,7 +214,7 @@ function HandlingPreset:__run(func, editorInst, funcIndex)
 
 		if (not ok) then
 			log.fwarning(
-				"[HandlingPreset]: %s callback failed for preset '%s'. Future executions will be blocked.\nTraceback: %s",
+				"[VehicleFlagPreset]: %s callback failed for preset '%s'. Future executions will be blocked.\nTraceback: %s",
 				funcName,
 				presetName,
 				res
@@ -223,21 +228,21 @@ function HandlingPreset:__run(func, editorInst, funcIndex)
 end
 
 ---@param editorInst VehicleFlagController
-function HandlingPreset:OnEnable(editorInst)
+function VehicleFlagPreset:OnEnable(editorInst)
 	self:__run(self.m_on_enable_callback, editorInst, 1)
 end
 
 ---@param editorInst VehicleFlagController
-function HandlingPreset:OnDisable(editorInst)
+function VehicleFlagPreset:OnDisable(editorInst)
 	self:__run(self.m_on_disable_callback, editorInst, 2)
 end
 
 --#region static funcs
 
 ---@nodiscard
----@param data HandlingPresetData
+---@param data VehicleFlagPresetData
 ---@return boolean
-function HandlingPreset.AssertArgs(data)
+function VehicleFlagPreset.AssertArgs(data)
 	if (type(data) ~= "table") then
 		return false
 	end
@@ -264,15 +269,15 @@ end
 
 ---@param name string
 ---@return boolean
-function HandlingPreset.IsNameReserved(name)
+function VehicleFlagPreset.IsNameReserved(name)
 	return RESERVED_NAMES[name]
 end
 
----@param data HandlingPresetData
----@return HandlingPreset
-function HandlingPreset.Deserialize(data)
+---@param data VehicleFlagPresetData
+---@return VehicleFlagPreset
+function VehicleFlagPreset.Deserialize(data)
 	local is_user_generated = not RESERVED_NAMES[data.name]
-	return setmetatable({
+	return MakeInstance({
 		m_name                   = data.name,
 		m_description            = data.description,
 		m_deltas                 = NormalizeDeltas(data.deltas, false),
@@ -282,9 +287,9 @@ function HandlingPreset.Deserialize(data)
 		m_is_default_preset      = data.is_default_preset,
 		m_is_user_generated      = is_user_generated,
 		m_callback_defs_filename = is_user_generated and data.callback_defs_filename or nil
-	}, HandlingPreset)
+	}, VehicleFlagPreset)
 end
 
 --#endregion
 
-return HandlingPreset
+return VehicleFlagPreset

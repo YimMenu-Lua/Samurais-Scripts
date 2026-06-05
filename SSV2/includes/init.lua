@@ -22,7 +22,7 @@ Enums = require("includes.data.enums.__init__")
 
 ---@enum eGameBranch
 Enums.eGameBranch = {
-	LAGECY   = 1,
+	LEGACY   = 1,
 	ENHANCED = 2,
 	MOCK     = 99,
 }
@@ -40,7 +40,7 @@ local DEFAULT_CONFIG <const> = require("includes.data.config")
 
 ---@type GAME_VERSION
 local GAME_VERSION <const>   = {
-	[Enums.eGameBranch.LAGECY]   = { build = "3788.0", online = "1.72" },
+	[Enums.eGameBranch.LEGACY]   = { build = "3788.0", online = "1.72" },
 	[Enums.eGameBranch.ENHANCED] = { build = "1013.34", online = "1.72" },
 	[Enums.eGameBranch.MOCK]     = { build = "any", online = "any" },
 }
@@ -57,13 +57,10 @@ Backend = require("includes.backend"):init(SCRIPT_NAME, SCRIPT_VERSION, GAME_VER
 
 
 require("includes.lib.meta")
-require("includes.classes.Pair")
-require("includes.classes.Range")
-require("includes.classes.Rect")
-require("includes.classes.Set")
-require("includes.lib.extensions.__init__")
+require("includes.lib.callable")
 require("includes.lib.class")
 require("includes.lib.enum")
+require("includes.lib.extensions.__init__")
 require("includes.modules.Accessor")
 
 
@@ -106,18 +103,14 @@ Translator      = require("includes.services.Translator")
 ----------------------------------------------------------------------------------------------------
 
 
-local base_path = "includes"
-local packages  = {
-	"modules.Audio",
-	"modules.Decorator",
+local base_path = "includes."
+local sub_paths = {
 	"modules.Entity",
 	"modules.Object",
 	"modules.Ped",
 	"modules.Player",
 	"modules.Vehicle",
 	"modules.LocalPlayer",
-
-	"services.GridRenderer",
 
 	"frontend.self.self_ui",
 	"frontend.vehicle.vehicle_ui",
@@ -135,11 +128,11 @@ local packages  = {
 	"frontend.settings.settings_ui",
 }
 
-for _, package in ipairs(packages) do
+for _, sub_path in ipairs(sub_paths) do
 	xpcall(require,
 		function(err)
 			log.warning(tostring(err))
 		end,
-		_F("%s.%s", base_path, package)
+		base_path .. sub_path
 	)
 end

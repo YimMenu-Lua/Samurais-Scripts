@@ -7,14 +7,15 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local fMatrix44 = require("includes.classes.gta.fMatrix44")
 require("includes.modules.Entity")
-local CCarHandlingData = require("includes.classes.gta.CCarHandlingData")
-local CBikeHandlingData = require("includes.classes.gta.CBikeHandlingData")
-local CFlyingHandlingData = require("includes.classes.gta.CFlyingHandlingData")
+local fMatrix44              = require("includes.classes.gta.fMatrix44")
+local Set                    = require("includes.classes.Set")
+local CCarHandlingData       = require("includes.classes.gta.CCarHandlingData")
+local CBikeHandlingData      = require("includes.classes.gta.CBikeHandlingData")
+local CFlyingHandlingData    = require("includes.classes.gta.CFlyingHandlingData")
 
 ---@enum eConvertibleRoofState
-Enums.eConvertibleRoofState = {
+Enums.eConvertibleRoofState  = {
 	INVALID  = -1,
 	RAISED   = 0,
 	LOWERING = 1,
@@ -57,7 +58,7 @@ local towTruckModels <const> = Set.new(
 ---@field Resolve fun() : CVehicle
 ---@field Create fun(_, modelHash: joaat_t, entityType: eEntityType, pos?: vec3, heading?: number, isNetwork?: boolean, isScriptHostPed?: boolean): Vehicle
 ---@overload fun(handle: handle): Vehicle
-Vehicle = Class("Vehicle", { parent = Entity })
+Vehicle                      = Class("Vehicle", { parent = Entity })
 
 ---@return boolean
 function Vehicle:IsValid()
@@ -88,7 +89,7 @@ function Vehicle:GetManufacturerName()
 		return ""
 	end
 
-	return Game.GetGXTLabel(VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(self:GetModelHash()))
+	return Game.GetLabelText(VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(self:GetModelHash()))
 end
 
 ---@return number
@@ -170,7 +171,7 @@ function Vehicle:GetRadioStationName()
 		return "OFF"
 	end
 
-	return Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+	return Game.GetLabelText(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 end
 
 ---@param station_name string
@@ -653,7 +654,7 @@ function Vehicle:MaxPerformance()
 	end
 
 	local function SetPlatformAppropriateMod(modType, modIndex)
-		if (Backend:GetGameBranch() == Enums.eGameBranch.LAGECY) then
+		if (Backend:GetGameBranch() == Enums.eGameBranch.LEGACY) then
 			while VEHICLE.IS_VEHICLE_MOD_GEN9_EXCLUSIVE(handle, modType, modIndex) do
 				modIndex = modIndex - 1
 				yield()

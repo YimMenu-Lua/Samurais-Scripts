@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Set               = require("includes.classes.Set")
 local JSON <const>      = require("includes.thirdparty.json.json")()
 local B64_CHARS <const> = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 local XOR_KEY <const>   = "\xA3\x4F\xD2\x9B\x7E\xC1\xE8\x36\x5D\x0A\xF7\xB4\x6C\x2D\x89\x50\x1E\x73\xC9\xAF\x3B\x92\x58\xE0\x14\x7D\xA6\xCB\x81\x3F\xD5\x67"
@@ -226,27 +227,27 @@ function Serializer:SyncKeys(runtime_vars)
 
 		for _, data in ipairs(self.m_moved_keys) do
 			---@type table?
-			local current = table.get_nested_key(saved, data.path)
+			local current = table.get_nested_value(saved, data.path)
 			if (type(current) == "table") then
 				self:WriteToFile(data.file_name, current)
 			end
-			table.set_nested_key(saved, data.path, nil)
-			table.set_nested_key(runtime_vars, data.path, nil)
+			table.set_nested_value(saved, data.path, nil)
+			table.set_nested_value(runtime_vars, data.path, nil)
 		end
 
 		for _, path in ipairs(self.m_deprecated_keys) do
-			table.set_nested_key(saved, path, nil)
-			table.set_nested_key(runtime_vars, path, nil)
+			table.set_nested_value(saved, path, nil)
+			table.set_nested_value(runtime_vars, path, nil)
 		end
 
 		for _, pair in ipairs(self.m_renamed_keys) do
 			local oldPath = pair.old_path
-			local oldVal  = table.get_nested_key(runtime_vars, oldPath)
+			local oldVal  = table.get_nested_value(runtime_vars, oldPath)
 			if (oldVal ~= nil) then
-				table.set_nested_key(runtime_vars, pair.new_path, oldVal)
+				table.set_nested_value(runtime_vars, pair.new_path, oldVal)
 			end
-			table.set_nested_key(saved, oldPath, nil)
-			table.set_nested_key(runtime_vars, oldPath, nil)
+			table.set_nested_value(saved, oldPath, nil)
+			table.set_nested_value(runtime_vars, oldPath, nil)
 		end
 
 		if (not saved["__schema_hash"] or saved["__schema_hash"] ~= self.__schema_hash) then
@@ -626,7 +627,7 @@ function Serializer:ReadItem(item_path)
 		T = self.m_default_config
 	end
 
-	return table.get_nested_key(T, item_path)
+	return table.get_nested_value(T, item_path)
 end
 
 ---@param item_path string
@@ -637,7 +638,7 @@ function Serializer:SaveItem(item_path, value)
 		return
 	end
 
-	table.set_nested_key(GVars, item_path, value)
+	table.set_nested_value(GVars, item_path, value)
 end
 
 ---@param defaults table
@@ -651,7 +652,7 @@ function Serializer:DeepReset(defaults, current, out, exceptions, prefix)
 		out = out or {}
 
 		if (exceptions:Contains(path)) then
-			local preserved = table.get_nested_key(_ENV.GVars, path)
+			local preserved = table.get_nested_value(_ENV.GVars, path)
 			out[key] = preserved ~= nil and preserved or def_val
 		elseif (type(def_val) == "table") then
 			out[key] = {}

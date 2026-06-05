@@ -11,11 +11,12 @@
 -- Class: Pair
 --------------------------------------
 ---@class Pair<K, V> : { first: K, second: V }
-Pair = {}
+local Pair   = {}
 Pair.__index = Pair
 
-local _mt = {}
-_mt.__index = function(self, k)
+
+local _mt      = {}
+_mt.__index    = function(self, k)
 	if (k == "first") then
 		return self._raw[1]
 	end
@@ -73,3 +74,5 @@ function Pair.new(a, b)
 	local obj = { _raw = { a, b } }
 	return setmetatable(obj, _mt)
 end
+
+return Pair

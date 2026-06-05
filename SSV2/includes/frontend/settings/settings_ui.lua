@@ -7,6 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Pair            = require("includes.classes.Pair")
+local Set             = require("includes.classes.Set")
 local ThemeManager    = require("includes.services.ThemeManager")
 local LOCALES <const> = Translator.locales
 local selectedTheme

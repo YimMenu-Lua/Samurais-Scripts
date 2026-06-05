@@ -7,6 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Audio        = require("includes.modules.Audio")
+local Decorator    = require("includes.modules.Decorator")
 local GroupManager = require("includes.services.GroupManager")
 
 -----------------------------------------------------
@@ -53,11 +55,9 @@ end
 ---@field Companions array<Companion>
 ---@field private combat_attributes array<integer>
 ---@field private config_flags array<ePedConfigFlags>
----@field protected m_owner_instance YimActions
----@overload fun(): CompanionManager
+---@field private m_owner_instance YimActions
 local CompanionManager = {}
 CompanionManager.__index = CompanionManager
-CompanionManager.Companions = {}
 CompanionManager.combat_attributes = {
 	1, 2, 3, 4, 5, 13, 20, 21, 22, 27, 28, 31, 34, 38, 41, 42, 46, 50, 54, 55, 58, 61, 68, 71
 }
@@ -81,7 +81,6 @@ CompanionManager.config_flags = {
 
 ---@param yimactions YimActions
 function CompanionManager.new(yimactions)
-	---@diagnostic disable-next-line: param-type-mismatch
 	return setmetatable({ m_owner_instance = yimactions, Companions = {} }, CompanionManager)
 end
 

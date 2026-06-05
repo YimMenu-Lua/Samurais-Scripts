@@ -7,17 +7,16 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
----@generic T
 ---@class ClassMeta<T>
----@field new? fun(...): T
----@field init? fun(self: T, ...): T
----@field extend fun(self: T, subclassName: string): T
----@field super fun(self: T): ClassMeta<T>
----@field isinstance fun(self: any, class: any): boolean
----@field notify fun(_, fmt: string, ...?: any) : nil
----@field __name string
----@field __type string
----@field __base? ClassMeta<T>
+---@field public new? fun(...): ClassMeta<T>
+---@field public init? fun(self: T, ...): ClassMeta<T>
+---@field public extend fun(self: T, subclassName: string): ClassMeta<T>
+---@field public isinstance fun(self: any, class: any): boolean
+---@field public notify fun(self: T, fmt: string, ...?: any) : nil
+---@field public __name string
+---@field public __type string
+---@field protected super fun(self: T): ClassMeta<T>
+---@field protected __base? ClassMeta<T>
 
 -- TODO: refactor this into forward declarations and lazy base class resolution because I'm done juggling Lua require order. IM DONE
 
@@ -42,7 +41,7 @@ function Class(name, opts)
 	if (base) then
 		-- so I have to manually copy base metamethods? https://www.youtube.com/watch?v=AxkZJmi-5xc
 		for k, v in pairs(base) do
-			if k:match("^__") and cls[k] == nil then
+			if (k:match("^__") and cls[k] == nil) then
 				cls[k] = v
 			end
 		end
@@ -57,7 +56,7 @@ function Class(name, opts)
 			__call = function(c, ...)
 				local instance
 
-				if base then
+				if (base) then
 					if base.new then
 						instance = base.new(...)
 					elseif base.init then
@@ -65,9 +64,9 @@ function Class(name, opts)
 					end
 				end
 
-				if c.new then
+				if (c.new) then
 					instance = c.new(...)
-				elseif c.init then
+				elseif (c.init) then
 					instance = c:init(...)
 				else
 					instance = {}

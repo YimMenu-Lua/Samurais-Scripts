@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Audio       = require("includes.modules.Audio")
 local World       = require("includes.modules.World")
 local HideNSeek   = require("includes.features.world.HideNSeek").new()
 local Carpool     = require("includes.features.world.carpool").new()

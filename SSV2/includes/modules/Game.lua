@@ -84,7 +84,7 @@ end
 
 ---@return boolean
 function Game.IsLegacy()
-	return Backend:GetGameBranch() == Enums.eGameBranch.LAGECY
+	return Backend:GetGameBranch() == Enums.eGameBranch.LEGACY
 end
 
 ---@return boolean
@@ -1499,7 +1499,7 @@ function Game.LoadGroundAtCoord(coords)
 end
 
 ---@param label string
-function Game.GetGXTLabel(label)
+function Game.GetLabelText(label)
 	return HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(label or "")
 end
 

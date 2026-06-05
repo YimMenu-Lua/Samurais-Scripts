@@ -14,14 +14,7 @@
 ---@field min vec2
 ---@field max vec2
 ---@overload fun(min: vec2, max: vec2) : Rect
-Rect = {}
-Rect.__index = Rect
----@diagnostic disable-next-line
-setmetatable(Rect, {
-	__call = function(_, ...)
-		return Rect.new(...)
-	end
-})
+local Rect = Callable("Rect")
 
 ---@param min vec2
 ---@param max vec2
@@ -93,3 +86,5 @@ end
 function Rect:__add(other)
 	return self:Add(other)
 end
+
+return Rect

@@ -11,11 +11,13 @@
 
 -- Global ImGui extensions and overloads
 
+local Rect                = require("includes.classes.Rect")
+local WindowAnimation     = require("includes.structs.WindowAnimation")
 local __InputText         = ImGui.InputText
 local __InputTextWithHint = ImGui.InputTextWithHint
 local COL_TEXT_LIGHT      = Color(0.9, 0.9, 0.9, 0.87)
 local COL_TEXT_DARK       = Color(0.01, 0.01, 0.01, 0.87)
-
+local DialogBoxAnimation  = WindowAnimation()
 
 ---@class NotifWidgetState
 ---@field unreadCount number
@@ -24,7 +26,7 @@ local COL_TEXT_DARK       = Color(0.01, 0.01, 0.01, 0.87)
 ---@field open boolean
 
 ---@enum ImGuiSpinnerStyle
-ImGuiSpinnerStyle   = {
+ImGuiSpinnerStyle         = {
 	SCAN        = 1,
 	FILL        = 2,
 	BOUNCE      = 3,
@@ -39,14 +41,14 @@ ImGuiSpinnerStyle   = {
 }
 
 ---@enum ImGuiValueBarFlags
-ImGuiValueBarFlags  = {
+ImGuiValueBarFlags        = {
 	NONE      = 0,
 	VERTICAL  = 1 << 0,
 	MULTI_VAL = 1 << 1,
 }
 
 ---@enum ImGuiDialogBoxStyle
-ImGuiDialogBoxStyle = {
+ImGuiDialogBoxStyle       = {
 	INFO   = 0,
 	WARN   = 1,
 	SEVERE = 2,
@@ -852,42 +854,57 @@ function ImGui.NotifWidget(state, size)
 	return clicked
 end
 
+-- Call this in the same frame before `ImGui.DialogBox`
+function ImGui.OpenDialogBox(label)
+	DialogBoxAnimation:Setup(Enums.eWindowAnimType.APPEAR, {
+		init_alpha   = 0.1,
+		end_alpha    = 1.0,
+		init_size    = vec2:new(10, 10),
+		end_size     = vec2:new(400, 200),
+		window_label = label,
+		duration     = 0.08,
+		ease_func    = math.ease_in_quad
+	})
+	GUI:PlaySound(GUI.Sounds.Radar)
+	ImGui.OpenPopup(label)
+end
+
 -- Draws a dialog box with Confirm/Cancel buttons.
 --
--- You must call `ImGui.OpenPopup` right before it and use the same label.
+-- You must call `ImGui.OpenDialogBox` right before it and use the same label.
 --
 -- **Example:**
 --
 --```Lua
+-- local box_label = "Delete File"
+-- local msg = "Are you sure you want to delete this file?"
 -- local function scary_func()
 -- 	MyClass:DoTheThing()
 -- end
 --
 -- if ImGui.Button("Do The Thing") then
---	ImGui.OpenPopup("Delete File")
+--	ImGui.OpenDialogBox(box_label)
 -- end
 --
--- if ImGui.DialogBox(
--- 	"Delete File",
--- 	"Are you sure you want to delete this file?",
--- 	ImGuiDialogBoxStyle.WARN
--- ) then
+-- if ImGui.DialogBox(box_label, msg, ImGuiDialogBoxStyle.WARN) then
 -- 	scary_func()
 -- end
 --```
 ---@param label string
----@param message? string -- Optional: Defaults to: "This action is irreversible. Are you sure you want to proceed?"
+---@param message? string -- Optional: Defaults to `"This action is irreversible. Are you sure you want to proceed?"`
 ---@param boxStyle? ImGuiDialogBoxStyle
 ---@return boolean
 function ImGui.DialogBox(label, message, boxStyle)
 	boxStyle      = boxStyle or ImGuiDialogBoxStyle.INFO
 	message       = message or _T("GENERIC_CONFIRM_WARN")
-	local col     = DialogBoxColors[boxStyle] or Color(ImGui.GetStyleColorVec4(ImGuiCol.PopupBg))
+	local col     = DialogBoxColors[boxStyle] or ImGui.GetStyleColor(ImGuiCol.PopupBg)
 	local textCol = ImGui.GetAutoTextColor(col)
 	local v       = false
 
-	ImGui.SetNextWindowBgAlpha(0.97)
-	ImGui.SetNextWindowSizeConstraints(440, 200, 440, 600)
+	DialogBoxAnimation:OnFrame()
+	if (not DialogBoxAnimation:IsActive()) then
+		ImGui.SetNextWindowSizeConstraints(440, 200, 440, 600)
+	end
 	ImGui.PushStyleColor(ImGuiCol.TitleBg, col.r, col.g, col.b, col.a)
 	ImGui.PushStyleColor(ImGuiCol.TitleBgActive, col.r, col.g, col.b, col.a)
 	ImGui.PushStyleColor(ImGuiCol.TitleBgCollapsed, col.r, col.g, col.b, col.a) -- is this even necessary?
@@ -923,7 +940,7 @@ function ImGui.DialogBox(label, message, boxStyle)
 		end
 
 		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + firstCursorPos)
-		if (ImGui.Button(_T("GENERIC_CONFIRM"), buttonSize.x, buttonSize.y)) then
+		if (GUI:Button(_T("GENERIC_CONFIRM"), { size = buttonSize })) then
 			v = true
 			ImGui.CloseCurrentPopup()
 		end
@@ -935,7 +952,7 @@ function ImGui.DialogBox(label, message, boxStyle)
 		ImGui.SameLine()
 		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + buttonSize.x - spacing)
 
-		if (ImGui.Button(_T("GENERIC_CANCEL"), buttonSize.x, buttonSize.y)) then
+		if (GUI:Button(_T("GENERIC_CANCEL"), { size = buttonSize })) then
 			v = false
 			ImGui.CloseCurrentPopup()
 		end

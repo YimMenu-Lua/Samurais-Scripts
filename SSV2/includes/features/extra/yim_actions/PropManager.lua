@@ -7,6 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Audio = require("includes.modules.Audio")
+
+
 -----------------------------------------------------
 -- PropManager Subclass
 -----------------------------------------------------
@@ -15,7 +18,7 @@
 ---@field protected m_owner_ref YimActions
 ---@field private m_props table<handle, array<handle>>
 local PropManager <const> = { m_props = {} }
-PropManager.__index = PropManager
+PropManager.__index       = PropManager
 
 ---@param yimactions YimActions
 ---@return PropManager

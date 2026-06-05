@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Pair             = require("includes.classes.Pair")
 local StateMachine     = require("includes.structs.StateMachine")
 local Speedometer      = require("includes.features.Speedometer")
 local FeatureMgr       = require("includes.services.FeatureManager")
@@ -421,7 +422,7 @@ end
 
 ---@return number
 function PlayerVehicle:GetCurrentGear()
-	if (GVars.features.vehicle.manual_gearbox.enabled and self.m_manual_gearbox) then
+	if (self.m_manual_gearbox:IsActive()) then
 		return self.m_manual_gearbox:GetSelectedGear()
 	end
 	return VEHICLE.GET_VEHICLE_CURRENT_DRIVE_GEAR_(self:GetHandle())
@@ -439,7 +440,7 @@ end
 
 ---@return boolean
 function PlayerVehicle:IsReversing()
-	if (GVars.features.vehicle.manual_gearbox.enabled and self.m_manual_gearbox) then
+	if (self.m_manual_gearbox:IsActive()) then
 		return self.m_manual_gearbox:IsInReverse()
 	end
 	return self:GetSpeedVector().y < 0

@@ -978,5 +978,6 @@ return {
 	["VEH_PERF_ONLY_TT"] = "一部の機能をパフォーマンスカーのみに制限します (ローンチコントロール、ポップス&バングなど)",
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "エンジンを始動する前にクラッチを押すかギアをニュートラルにしてください。",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "手動モードのみ: エンジン停止動作を無効にします。",
-	["VEH_GEARBOX_CLUTCH_ASSIST"] = "クラッチアシスト"
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "クラッチアシスト",
+	["VEH_GEARBOX_AUTO"] = "自動"
 }

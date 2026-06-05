@@ -978,5 +978,6 @@ return {
 	["VEH_PERF_ONLY_TT"] = "Limita alcune funzionalità solo alle auto ad alte prestazioni (Launch Control, Pops & Bangs, ecc.)",
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Si prega di premere la frizione o mettere la marcia in folle prima di avviare il motore.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Assistenza alla frizione",
-	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Solo modalità manuale: disabilita il comportamento di stallo del motore."
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Solo modalità manuale: disabilita il comportamento di stallo del motore.",
+	["VEH_GEARBOX_AUTO"] = "Automatico"
 }

@@ -30,7 +30,7 @@ function Clubhouse.new(opts)
 	local instance   = setmetatable(base, Clubhouse) ---@cast instance Clubhouse
 	local customName = stats.get_string("MPX_MC_GANG_NAME") .. stats.get_string("MPX_MC_GANG_NAME2")
 	if (not string.isvalid(customName)) then
-		customName = Game.GetGXTLabel("GB_REST_ACCM")
+		customName = Game.GetLabelText("GB_REST_ACCM")
 	end
 
 	instance.m_custom_name = customName
@@ -94,8 +94,8 @@ function Clubhouse:AddSubBusiness(index)
 
 	table.insert(self.m_subs, Factory.new({
 		id              = index,
-		name            = Game.GetGXTLabel(ref.gxt),
-		normalized_name = not normalized_name:isempty() and Game.GetGXTLabel(normalized_name) or nil,
+		name            = Game.GetLabelText(ref.gxt),
+		normalized_name = not normalized_name:isempty() and Game.GetLabelText(normalized_name) or nil,
 		max_units       = ref2.max_units,
 		vpu             = tunables.get_int(ref2.vpu),
 		vpu_mult_1      = has_eq_upgrade and eq_upg_mult or 0,
@@ -109,7 +109,7 @@ function Clubhouse:Rename(newName)
 	newName = newName:trim()
 	script.execute_as_script("freemode", function()
 		if (not string.isvalid(newName)) then
-			newName = Game.GetGXTLabel("GB_REST_ACCM")
+			newName = Game.GetLabelText("GB_REST_ACCM")
 		end
 
 		local GPBD_FM_3 = self:GetGPBD3():At(10)

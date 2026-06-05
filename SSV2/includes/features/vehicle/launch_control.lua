@@ -7,9 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local FeatureBase = require("includes.modules.FeatureBase")
-
-
+local Audio               = require("includes.modules.Audio")
+local FeatureBase         = require("includes.modules.FeatureBase")
 local COL_FG <const>      = Color.WHITE
 local COL_BG <const>      = Color(0, 0, 0, 158)
 local COL_GREEN <const>   = Color(111, 194, 118, 255)
@@ -33,7 +32,8 @@ local function is_control_released_2(action)
 	return (PAD.IS_CONTROL_RELEASED(0, action) or PAD.IS_DISABLED_CONTROL_RELEASED(0, action))
 end
 
----@class LaunchControl
+
+---@class LaunchControl : FeatureBase<LaunchControl>
 ---@field private m_entity PlayerVehicle
 ---@field private m_is_active boolean
 ---@field private m_thread? Thread

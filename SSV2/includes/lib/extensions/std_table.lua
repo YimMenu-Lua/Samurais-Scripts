@@ -8,6 +8,7 @@
 
 
 local LUA_TABLE_OVERHEAD <const> = 3 * 0x8 -- 0x18
+local Set                        = require("includes.classes.Set")
 
 ---@generic K, V
 ---@param t table<K, V>
@@ -21,16 +22,18 @@ function table.get(t, k, default)
 	return v ~= nil and v or default
 end
 
----@param t table
----@param value any
----@return string|number|nil -- the table key where the value was found or nil
+-- Shallow
+---@generic K, V
+---@param t table<K, V>
+---@param value V
+---@return K?
 function table.matchbyvalue(t, value)
-	if not t or (table.getlen(t) == 0) then
+	if (not t or (table.getlen(t) == 0)) then
 		return nil
 	end
 
 	for k, v in pairs(t) do
-		if v == value then
+		if (v == value) then
 			return k
 		end
 	end
@@ -38,6 +41,7 @@ function table.matchbyvalue(t, value)
 	return nil
 end
 
+-- Deep
 ---@param t table
 ---@param value anyval
 ---@param seen? set<table>
@@ -54,7 +58,7 @@ function table.find(t, value, seen)
 		end
 
 		if (type(v) == "table") then
-			return table.find(v, value, v)
+			return table.find(v, value, seen)
 		end
 	end
 
@@ -63,51 +67,57 @@ end
 
 ---@generic K, V
 ---@param t table<K, V>
----@param pred fun(k: K, v: V): boolean
+---@param predicate fun(k: K, v: V): boolean
 ---@return V?
-function table.findfirst(t, pred)
+function table.findfirst(t, predicate)
 	for k, v in pairs(t) do
-		if pred(k, v) then return v end
+		if (predicate(k, v)) then
+			return v
+		end
 	end
 	return nil
 end
 
+-- Returns a new table with items that pass the filter criteria.
 ---@generic K, V
 ---@param t table<K, V>
----@param pred fun(k: K, v: V): boolean
+---@param predicate fun(k: K, v: V): boolean
 ---@return table<K, V>
-function table.filter(t, pred)
+function table.filter(t, predicate)
 	local out = {}
 	for k, v in pairs(t) do
-		if pred(k, v) then out[k] = v end
+		if (predicate(k, v)) then
+			out[k] = v
+		end
 	end
-
 	return out
 end
 
 -- Serializes tables in pretty format and avoids circular reference.
----@param tbl table
+---@param t table
 ---@param indent? number
 ---@param key_order? table
 ---@param seen? table
-function table.serialize(tbl, indent, key_order, seen)
-	indent = indent or 2
+function table.serialize(t, indent, key_order, seen)
+	indent = indent or 0
 	seen   = seen or {}
 
-	if (seen[tbl]) then
+	if (seen[t]) then
 		return '"<circular reference>"'
 	end
 
-	seen[tbl] = true
+	seen[t] = true
 
 	local function get_indent(level)
-		return string.rep(" ", level)
+		return string.rep("\t", level)
 	end
 
 	local function serialize_value(v, depth)
 		local __type = type(v)
 		if (__type == "string") then
 			return _F("%q", v)
+		elseif (__type == "nil") then
+			return __type
 		elseif (__type == "number" or __type == "boolean" or __type == "function") then
 			return tostring(v)
 		elseif (__type == "table") then
@@ -124,33 +134,34 @@ function table.serialize(tbl, indent, key_order, seen)
 			end
 			return tostring(v)
 		end
-		return "<unsupported>"
+		return _F("[%s]:<unsupported>", __type)
 	end
 
-	local is_array, size = table.is_array(tbl)
+	local is_array, size = table.is_array(t)
 	local keys           = {}
 	local pieces         = {}
 	table.insert(pieces, "{\n")
 
 	if (is_array) then
-		for i = 1, size do
+		local array_start = t[0] ~= nil and 0 or 1
+		for i = array_start, size do
 			table.insert(keys, i)
 		end
 	else
 		if (key_order) then
 			for _, k in ipairs(key_order) do
-				if tbl[k] ~= nil then
+				if t[k] ~= nil then
 					table.insert(keys, k)
 				end
 			end
 
-			for k in pairs(tbl) do
+			for k in pairs(t) do
 				if not table.find(keys, k) then
 					table.insert(keys, k)
 				end
 			end
 		else
-			for k in pairs(tbl) do
+			for k in pairs(t) do
 				table.insert(keys, k)
 			end
 
@@ -161,14 +172,14 @@ function table.serialize(tbl, indent, key_order, seen)
 	end
 
 	for _, k in ipairs(keys) do
-		local v   = tbl[k]
+		local v   = t[k]
 		local ind = get_indent(indent + 1)
 
 		if (is_array) then
 			table.insert(pieces, ind .. serialize_value(v, indent + 1) .. ",\n")
 		else
 			local key
-			if type(k) == "string" and k:match("^[%a_][%w_]*$") then
+			if (type(k) == "string" and k:match("^[%a_][%w_]*$")) then
 				key = k
 			else
 				key = "[" .. serialize_value(k, indent + 1) .. "]"
@@ -182,6 +193,7 @@ function table.serialize(tbl, indent, key_order, seen)
 	return table.concat(pieces)
 end
 
+---@param t table
 function table.print(t)
 	print(table.serialize(t))
 end
@@ -214,7 +226,7 @@ end
 
 -- Calculates an estimate of a table's size in memory.
 --
--- NOTE: This is **VERY** inaccurate.
+-- NOTE: This is **VERY** inaccurate and does not reflect real memory usage.
 ---@param t table
 ---@param seen? table
 ---@return number
@@ -283,7 +295,7 @@ end
 
 -- Removes duplicate items from a table. Mutates in place and returns the count of found items.
 ---@param t table
----@return integer count
+---@return integer removed_items_count
 function table.remove_duplicates(t)
 	local seen, count = {}, 0
 	for k, v in pairs(t) do
@@ -303,7 +315,7 @@ end
 
 ---@generic T : table
 ---@param t T
----@param seen? table
+---@param seen? table<table, table>
 ---@return T
 function table.copy(t, seen)
 	seen = seen or {}
@@ -324,8 +336,8 @@ end
 -- Merges `src` table into `dest` table.
 ---@param src table
 ---@param dest table
----@param path string?
----@param seen table?
+---@param path? string
+---@param seen? table
 function table.merge(src, dest, path, seen)
 	if (src == dest) then return end
 
@@ -355,10 +367,10 @@ function table.swap(t1, t2)
 	end
 
 	for k, v in pairs(t2) do
-		t1[k]   = v
-		t2[k]   = temp[k]
-		temp[k] = nil
+		t1[k] = v
+		t2[k] = temp[k]
 	end
+	temp = nil
 end
 
 -- Overwrites `this` table with `src` table.
@@ -428,10 +440,11 @@ function table.is_equal(t1, t2, seen)
 	return true
 end
 
----@param t table
+---@generic K, V
+---@param t table<K, V>
 ---@param path string
----@return any
-function table.get_nested_key(t, path)
+---@return V?
+function table.get_nested_value(t, path)
 	local current = t
 	for key in path:gmatch("[^%.]+") do
 		current = current[key]
@@ -446,7 +459,7 @@ end
 ---@param t table
 ---@param path string
 ---@param value any
-function table.set_nested_key(t, path, value)
+function table.set_nested_value(t, path, value)
 	local parts = {}
 	for key in path:gmatch("[^%.]+") do
 		parts[#parts + 1] = key
@@ -466,27 +479,27 @@ end
 
 -- Snapshots a table into a string.
 ---@generic K, V, P
----@param t table
----@param opts? { out?: table, path?: string, ignored_keys: Set<string> | Predicate<K, V, P?>}
+---@param t table<K, V>
+---@param args? { out?: table, path?: string, ignored_keys: Set<string> | Predicate<K, V, P?>}
 ---@return string
-function table.snapshot(t, opts)
-	opts       = opts or {}
-	local out  = opts.out or {}
-	local path = opts.path or ""
+function table.snapshot(t, args)
+	args       = args or {}
+	local out  = args.out or {}
+	local path = args.path or ""
 
 	for k, v in pairs(t) do
-		if (opts.ignored_keys) then
-			if (IsInstance(opts.ignored_keys, Set) and opts.ignored_keys:Contains(k)) then
+		if (args.ignored_keys) then
+			if (IsInstance(args.ignored_keys, Set) and args.ignored_keys:Contains(k)) then
 				goto continue
-			elseif (type(opts.ignored_keys) == "function" and opts.ignored_keys(k, v, path)) then
+			elseif (type(args.ignored_keys) == "function" and args.ignored_keys(k, v, path)) then
 				goto continue
 			end
 		end
 
 		local p = path .. "." .. tostring(k)
 		out[#out + 1] = p .. ":" .. type(v)
-		if type(v) == "table" then
-			table.snapshot(v, { out = out, path = p, ignored_keys = opts.ignored_keys })
+		if (type(v) == "table") then
+			table.snapshot(v, { out = out, path = p, ignored_keys = args.ignored_keys })
 		end
 
 		::continue::
@@ -498,11 +511,11 @@ end
 
 ---@generic K, V
 ---@param t table<K, V>
----@param pred fun(k: K, v: V): boolean
+---@param predicate fun(k: K, v: V): boolean
 ---@return boolean success
-function table.erase_first_if(t, pred)
+function table.erase_first_if(t, predicate)
 	for k, v in pairs(t) do
-		if (pred(k, v)) then
+		if (predicate(k, v)) then
 			t[k] = nil
 			return true
 		end
@@ -512,14 +525,14 @@ end
 
 ---@generic K, V
 ---@param t table<K, V>
----@param pred fun(k: K, v: V): boolean
+---@param predicate fun(k: K, v: V): boolean
 ---@return boolean success, integer count
-function table.erase_if(t, pred)
+function table.erase_if(t, predicate)
 	local count = 0
 	local is_array, size = table.is_array(t)
 	if (is_array) then
 		for i = size, 1, -1 do
-			if pred(i, t[i]) then
+			if (predicate(i, t[i])) then
 				table.remove(t, i)
 				count = count + 1
 			end
@@ -527,7 +540,7 @@ function table.erase_if(t, pred)
 	else
 		local temp = {}
 		for k, v in pairs(t) do
-			if pred(k, v) then
+			if (predicate(k, v)) then
 				temp[#temp + 1] = k
 				count = count + 1
 			end
