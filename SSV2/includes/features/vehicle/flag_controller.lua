@@ -7,8 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local HandlingPreset          = require("includes.structs.HandlingPreset")
-local DefaultPresets          = require("includes.data.handling_presets")
+local FlagPreset <const>      = require("includes.structs.VehicleFlagPreset")
+local DefaultPresets <const>  = require("includes.data.vehicle_flag_presets")
 
 ---@type table<eHandlingEditorTypes, { enum : table<string, integer>, set: fun(veh: PlayerVehicle, flag: integer, toggle: boolean), get: fun(veh: PlayerVehicle, flag: integer): boolean }>
 local FlagData <const>        = {
@@ -38,9 +38,9 @@ local FlagData <const>        = {
 ---@field private m_vehicle PlayerVehicle
 ---@field private m_deltas table<eHandlingEditorTypes, table<string, boolean>>
 ---@field private m_stale_deltas table<joaat_t, table<eHandlingEditorTypes, table<string, boolean>>> -- save by model in case a vehicle despawns before cleanup
----@field private m_presets array<HandlingPreset>
+---@field private m_presets array<VehicleFlagPreset>
 ---@field private m_preset_lookup dict<integer> -- presetName -> m_presets array index. we really need an OrderedList now this is getting out of hand
----@field private m_active_presets dict<HandlingPreset>
+---@field private m_active_presets dict<VehicleFlagPreset>
 ---@field private m_owned_flags table<string, integer> reference count by flag name. keys are typed like so to abvoid name collision: enumType:flagName (ex: "1:FREEWHEEL_NO_GAS") where "1" is eHandlingEditorTypes.TYPE_HF
 ---@field private m_file_name "handling_editor.json"
 ---@field private m_initialized boolean
@@ -59,7 +59,7 @@ VehicleFlagController.__index = VehicleFlagController
 ---@param veh PlayerVehicle
 function VehicleFlagController:init(veh)
 	if (self.m_initialized) then
-		log.warning("[HandlingEditor]: Attempt to re-initialize. Only one instance is allowed.")
+		log.warning("[VehicleFlagController]: Attempt to re-initialize. Only one instance is allowed.")
 		return self
 	end
 
@@ -83,15 +83,15 @@ end
 
 function VehicleFlagController:FetchPresets()
 	ThreadManager:Run(function()
-		---@type table<string, HandlingPreset>
+		---@type table<string, VehicleFlagPreset>
 		local default_presets = {}
 		self.m_presets        = {}
 		self.m_preset_lookup  = {}
 		local index           = 0
-		local json_presets    = Serializer:ReadFromFile(self.m_file_name) or {} ---@cast json_presets array<HandlingPresetData>
+		local json_presets    = Serializer:ReadFromFile(self.m_file_name) or {} ---@cast json_presets array<VehicleFlagPresetData>
 
 		for _, preset in pairs(DefaultPresets) do
-			local reference = HandlingPreset.new(preset)
+			local reference = FlagPreset(preset)
 			local name = preset.name
 			table.insert(self.m_presets, reference)
 			default_presets[name] = reference
@@ -105,7 +105,7 @@ function VehicleFlagController:FetchPresets()
 			if (reference) then
 				reference.auto_apply = presetData.auto_apply
 			else
-				table.insert(self.m_presets, HandlingPreset.new(presetData))
+				table.insert(self.m_presets, FlagPreset(presetData))
 				index = index + 1
 				self.m_preset_lookup[name] = index
 			end
@@ -145,6 +145,7 @@ end
 -- local is_owned = HandlingEditor:IsFlagOwned(_F("%d:%s", Enums.eHandlingEditorTypes.TYPE_HF, "FREEWHEEL_NO_GAS"))
 --```
 ---@param flagName string
+---@return boolean
 function VehicleFlagController:IsFlagOwned(flagName)
 	local refCount = self.m_owned_flags[flagName]
 	return refCount and refCount > 0 or false
@@ -164,10 +165,10 @@ end
 ---@param name string
 ---@return boolean
 function VehicleFlagController:IsNameReserved(name)
-	return HandlingPreset.IsNameReserved(name)
+	return FlagPreset.IsNameReserved(name)
 end
 
----@param preset HandlingPreset
+---@param preset VehicleFlagPreset
 ---@return boolean
 function VehicleFlagController:DoesPresetExist(preset)
 	return self.m_preset_lookup[preset:GetName()] ~= nil
@@ -180,13 +181,14 @@ function VehicleFlagController:DoesPresetExistByName(name)
 end
 
 ---@param allowed_types integer
+---@return boolean
 function VehicleFlagController:AssertVehicleType(allowed_types)
 	local vehType = self.m_vehicle:GetType()
 	return Bit.IsBitSet(allowed_types, vehType)
 end
 
----@param presets? array<HandlingPreset>
----@return array<HandlingPreset> -- serialized presets
+---@param presets? array<VehicleFlagPreset>
+---@return array<VehicleFlagPreset> -- serialized presets
 function VehicleFlagController:SerializePresets(presets)
 	presets    = presets or self.m_presets
 	local buff = {}
@@ -200,6 +202,7 @@ function VehicleFlagController:SavePresets()
 	Serializer:WriteToFile(self.m_file_name, self:SerializePresets())
 end
 
+---@return array<VehicleFlagPreset>
 function VehicleFlagController:GetPresets()
 	return self.m_presets
 end
@@ -209,18 +212,18 @@ end
 ---@param description? string
 ---@param autoEnable? boolean
 ---@param cbFileName? string
----@return HandlingPreset
+---@return VehicleFlagPreset
 function VehicleFlagController:GeneratePresetFromCurrentDeltas(name, vehicleTypes, description, autoEnable, cbFileName)
 	autoEnable = autoEnable or false
 	local deltas = {}
-	for hType, data in pairs(self.m_deltas) do
-		deltas[hType] = deltas[hType] or {}
+	for enumType, data in pairs(self.m_deltas) do
+		deltas[enumType] = deltas[enumType] or {}
 		for sName, bState in pairs(data) do
-			deltas[hType][sName] = not bState -- no need to read flags from memory. if a flag is saved then the user wants the opposite of default
+			deltas[enumType][sName] = not bState -- no need to read flags from memory. if a flag is saved then the user wants the opposite of default
 		end
 	end
 
-	return HandlingPreset.new({
+	return FlagPreset({
 		name                   = name,
 		deltas                 = deltas,
 		description            = description or _T("GENERIC_NO_DESCRIPTION"),
@@ -233,7 +236,7 @@ function VehicleFlagController:GeneratePresetFromCurrentDeltas(name, vehicleType
 end
 
 ---@nodiscard
----@param preset HandlingPreset
+---@param preset VehicleFlagPreset
 ---@return boolean
 function VehicleFlagController:AddNewPreset(preset)
 	self.m_presets_ready = false
@@ -252,7 +255,7 @@ function VehicleFlagController:AddNewPreset(preset)
 	return true
 end
 
----@param preset HandlingPreset
+---@param preset VehicleFlagPreset
 function VehicleFlagController:RemovePreset(preset)
 	self.m_presets_ready = false
 	if (preset:IsDefault()) then
@@ -273,9 +276,9 @@ function VehicleFlagController:RemovePreset(preset)
 	self.m_presets_ready = true
 end
 
----@param data HandlingPresetData
+---@param data VehicleFlagPresetData
 function VehicleFlagController:ImportPreset(data)
-	if (not HandlingPreset.AssertArgs(data)) then
+	if (not FlagPreset.AssertArgs(data)) then
 		return false
 	end
 
@@ -284,7 +287,7 @@ function VehicleFlagController:ImportPreset(data)
 		return false
 	end
 
-	local preset = HandlingPreset.new(data)
+	local preset = FlagPreset(data)
 	if (not preset) then return false end
 	return self:AddNewPreset(preset)
 end
@@ -309,7 +312,7 @@ function VehicleFlagController:ResetStaleState()
 	end
 end
 
----@param preset HandlingPreset
+---@param preset VehicleFlagPreset
 ---@param toggle boolean
 function VehicleFlagController:TogglePreset(preset, toggle)
 	if (not self.m_vehicle:IsValid()) then

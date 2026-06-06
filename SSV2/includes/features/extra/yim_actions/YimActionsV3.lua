@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Audio            = require("includes.modules.Audio")
 local PropManager      = require("PropManager")
 local FXManager        = require("FXManager")
 local YAV3Debugger     = require("YAV3Debugger")

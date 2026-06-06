@@ -102,24 +102,24 @@ function GridItem:Draw()
 
 	local config_value
 	if (_type == eGridItemType.CHECKBOX) then
-		config_value         = gvar and table.get_nested_key(g_table, gvar) or false
+		config_value         = gvar and table.get_nested_value(g_table, gvar) or false
 		config_value, result = GUI:CustomToggle(label, config_value, { tooltip = tooltip })
 		outSize              = vec2:new(ImGui.CalcTextSize(label) + 90, ImGui.GetTextLineHeightWithSpacing())
 		if (result) then
-			table.set_nested_key(g_table, self.m_gvar, config_value)
+			table.set_nested_value(g_table, self.m_gvar, config_value)
 		end
 	elseif (_type == eGridItemType.BUTTON) then
 		result  = GUI:Button(label, { tooltip = tooltip, repeatable = opts.buttonRepeat })
 		outSize = vec2:new(ImGui.GetItemRectSize())
 	elseif (_type == eGridItemType.RADIO_BUTTON) then
-		config_value         = gvar and table.get_nested_key(g_table, gvar) or 0
+		config_value         = gvar and table.get_nested_value(g_table, gvar) or 0
 		config_value, result = ImGui.RadioButton(label, config_value, opts.finalValue)
 		outSize              = vec2:new(ImGui.GetItemRectSize())
 		if (tooltip) then
 			GUI:Tooltip(tooltip)
 		end
 		if (result and gvar) then
-			table.set_nested_key(g_table, gvar, config_value)
+			table.set_nested_value(g_table, gvar, config_value)
 		end
 	elseif (_type == eGridItemType.NEW_LINE) then
 		ImGui.NewLine()
@@ -159,15 +159,15 @@ end
 ---@field private m_max_width number
 ---@field private m_max_height number
 ---@field private m_hash_map set<joaat_t>
-local GridRenderer   = {}
-GridRenderer.__index = GridRenderer
+---@overload fun(columns: integer, padding_x?: float, padding_y?: float) : GridRenderer
+local GridRenderer = Callable("GridRenderer")
 
----@param columns number The number of columns in the grid.
----@param padding_x number? Horizontal padding *(default: 10)*.
----@param padding_y number? Vertical padding *(default: 10)*.
+---@param columns integer The number of columns in the grid. Defaults to 1.
+---@param padding_x? float Horizontal padding *(default: 10)*.
+---@param padding_y? float Vertical padding *(default: 10)*.
 ---@return GridRenderer
 function GridRenderer.new(columns, padding_x, padding_y)
-	return setmetatable({
+	return MakeInstance({
 		m_columns      = columns or 1,
 		m_padding      = vec2:new(padding_x or 10, padding_y or 10),
 		m_elements     = {},

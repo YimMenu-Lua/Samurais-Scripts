@@ -60,7 +60,7 @@ end
 
 ---@type table<eGameBranch, array<MemoryBatch>>
 local mem_batches <const> = {
-	[Enums.eGameBranch.LAGECY] = {
+	[Enums.eGameBranch.LEGACY] = {
 		MemoryBatch.new("ScriptGlobals", "48 8D 15 ? ? ? ? 4C 8B C0 E8 ? ? ? ? 48 85 FF 48 89 1D", function(ptr)
 			GPointers.ScriptGlobals = ptr:add(0x3):rip()
 		end),

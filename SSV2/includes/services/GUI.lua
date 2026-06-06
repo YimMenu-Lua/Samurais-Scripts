@@ -9,11 +9,14 @@
 
 require("includes.lib.extensions.api_imgui")
 local COL_WARN_YELLOW = Color("safety_yellow")
+local Audio           = require("includes.modules.Audio")
+local Pair            = require("includes.classes.Pair")
+local Rect            = require("includes.classes.Rect")
 local Tab             = require("includes.modules.Tab")
-local WindowAnimator  = require("includes.services.WindowAnimator")
+local WindowAnimation = require("includes.structs.WindowAnimation")
 local ThemeManager    = require("includes.services.ThemeManager")
-local debug_counter   = GVars.backend.debug_mode and 7 or 0
 local DrawClock       = require("includes.frontend.clock")
+local debug_counter   = 0
 local mainWindowFlags = ImGuiWindowFlags.NoTitleBar
 	| ImGuiWindowFlags.NoResize
 	| ImGuiWindowFlags.NoBringToFrontOnFocus
@@ -62,9 +65,9 @@ end
 
 
 --------------------------------------
--- GUI Class
+-- Class: GUI
 --------------------------------------
----@class GUI : ClassMeta<GUI>
+---@class GUI : Callable<GUI>
 ---@field private m_main_window_label string
 ---@field private m_selected_tab Tab
 ---@field private m_selected_category eTabID
@@ -79,14 +82,14 @@ end
 ---@field private m_is_drawing_sidebar boolean
 ---@field private m_cursor_pos vec2
 ---@field private m_sidebar_width number
----@field private m_snap_animator WindowAnimator
+---@field private m_window_anim WindowAnimation
 ---@field private m_notifier_pos vec2
 ---@field private m_has_error boolean
 ---@field private m_traceback? string
 ---@field private m_wants_input boolean
 ---@field protected m_initialized boolean
 ---@overload fun(): GUI
-local GUI = Class("GUI")
+local GUI = Callable("GUI")
 
 ---@private
 ---@return GUI
@@ -94,57 +97,60 @@ function GUI:init()
 	if (self.m_initialized) then return self end
 	if (_G.GUI) then return _G.GUI end
 
-	return setmetatable({
-		m_main_window_label   = "##ss_main_window",
-		m_should_draw         = false,
-		m_has_error           = false,
-		m_is_drawing_sidebar  = false,
-		m_sidebar_width       = 200,
-		m_cb_window_pos       = vec2:zero(),
-		m_notifier_pos        = vec2:zero(),
-		m_screen_resolution   = vec2:zero(),
-		m_selected_category   = Enums.eTabID.TAB_SELF,
-		m_tabs                = defaultTabs,
-		m_independent_windows = {},
-		m_requested_windows   = {},
-		m_prev_category_tabs  = {},
-		m_snap_animator       = WindowAnimator(),
-		m_dummy_tab           = gui.add_tab(Backend.script_name or "Samurai's Scripts"),
-		m_initialized         = true,
-		m_wants_input         = false,
-		---@diagnostic disable-next-line: param-type-mismatch
-	}, GUI)
+	self.m_main_window_label   = "##ss_main_window"
+	self.m_should_draw         = false
+	self.m_has_error           = false
+	self.m_is_drawing_sidebar  = false
+	self.m_wants_input         = false
+	self.m_sidebar_width       = 200
+	self.m_cb_window_pos       = vec2:zero()
+	self.m_notifier_pos        = vec2:zero()
+	self.m_screen_resolution   = vec2:zero()
+	self.m_selected_category   = Enums.eTabID.TAB_SELF
+	self.m_tabs                = defaultTabs
+	self.m_independent_windows = {}
+	self.m_requested_windows   = {}
+	self.m_prev_category_tabs  = {}
+	self.m_window_anim         = WindowAnimation()
+	self.m_dummy_tab           = gui.add_tab(Backend.script_name or "Samurai's Scripts")
+	self.m_initialized         = true
+
+
+	_G.GUI = self
+	return self
 end
 
 function GUI:LateInit()
+	debug_counter   = GVars.backend.debug_mode and 7 or 0
 	local toggleKey = GVars.keyboard_keybinds.gui_toggle
-	if (not toggleKey or toggleKey == "Unbound" or toggleKey == 0) then
-		GVars.keyboard_keybinds.gui_toggle = "F5"
+	if (not toggleKey or not string.isvalid(toggleKey) or toggleKey:lower() == "unbound") then
+		toggleKey                          = "F5"
+		GVars.keyboard_keybinds.gui_toggle = toggleKey
 	end
 
-	if (not math.is_inrange(GVars.ui.last_tab.tab_id, TABID_MIN, TABID_MAX)) then
-		GVars.ui.last_tab.tab_id = TABID_MIN
+	local tab_id, array_idx = GVars.ui.last_tab.tab_id, GVars.ui.last_tab.array_index
+	if (not math.is_inrange(tab_id, TABID_MIN, TABID_MAX)) then
+		tab_id    = TABID_MIN
+		array_idx = TABID_MIN
 	end
 
-	local __t = self.m_tabs[GVars.ui.last_tab.tab_id][GVars.ui.last_tab.array_index]
-	if (not __t) then
-		GVars.ui.last_tab.array_index = 1
+	local category_tabs = self.m_tabs[tab_id]
+	local current_tab   = category_tabs[array_idx]
+	if (not current_tab) then
+		array_idx   = 1
+		current_tab = category_tabs[1]
 	end
 
 	self.m_screen_resolution      = GPointers.ScreenResolution
-	self.m_selected_category      = GVars.ui.last_tab.tab_id
-	self.m_selected_tab           = self.m_tabs[GVars.ui.last_tab.tab_id][GVars.ui.last_tab.array_index].second
-	self.m_selected_category_tabs = self.m_tabs[GVars.ui.last_tab.tab_id]
-	self.m_is_drawing_sidebar     = #self.m_selected_category_tabs > 1
+	self.m_selected_category      = tab_id
+	self.m_selected_category_tabs = category_tabs
+	self.m_selected_tab           = current_tab.second
+	self.m_is_drawing_sidebar     = #category_tabs > 1
+	GVars.ui.last_tab.tab_id      = tab_id
+	GVars.ui.last_tab.array_index = array_idx
 
-	KeyManager:RegisterKeybind(GVars.keyboard_keybinds.gui_toggle, function()
-		self:Toggle()
-	end)
-
-	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
-		self:Close()
-	end)
-
+	KeyManager:RegisterKeybind(toggleKey, function() self:Toggle() end)
+	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function() self:Close() end)
 	ThemeManager:Load()
 
 	self.m_dummy_tab:add_imgui(function() self:DrawDummyTab() end)
@@ -190,14 +196,20 @@ function GUI:GetMaxTopBarHeight()
 	return 124.2 -- 1080 * 0.115
 end
 
----@param align? number -- 0: top center | 1: bottom center | 2: left center | 3: right center | 4: center
+---@param align? number
+---|0 top center
+---|1 bottom center
+---|2 left center
+---|3 right center
+---|4 center
 function GUI:Snap(align)
 	local resolution     = Game.GetScreenResolution()
+	local cfg            = GVars.ui
 	local top_bar_height = resolution.y * 0.12
-	local size           = vec2:new(GVars.ui.window_size.x, GVars.ui.window_size.y + top_bar_height + 10)
+	local size           = vec2:new(cfg.window_size.x, cfg.window_size.y + top_bar_height + 10)
 	local _, center      = self:GetNewWindowSizeAndCenterPos(0.5, 0.8, size)
 	local top_center     = vec2:new(center.x, 1)
-	local endPos         = Switch(align or 0) {
+	local end_pos        = Switch(align or 0) {
 		[0]     = top_center,
 		[1]     = vec2:new(center.x, resolution.y - size.y),
 		[2]     = vec2:new(1, center.y),
@@ -206,7 +218,11 @@ function GUI:Snap(align)
 		default = top_center
 	}
 
-	self.m_snap_animator:Init(self.m_main_window_label, GVars.ui.window_pos, endPos, 3)
+	self.m_window_anim:Setup(Enums.eWindowAnimType.MOVE, {
+		init_pos = cfg.window_pos,
+		end_pos  = end_pos,
+		duration = 0.8,
+	})
 	self:PlaySound(self.Sounds.Nav)
 end
 
@@ -269,18 +285,18 @@ end
 
 ---@param id eTabID Category
 ---@param name string
----@param drawable? function
+---@param callback? GuiCallback
 ---@param subtabs? Tab[]
 ---@param isTranslatorLabel? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@return Tab
-function GUI:RegisterNewTab(id, name, drawable, subtabs, isTranslatorLabel)
+function GUI:RegisterNewTab(id, name, callback, subtabs, isTranslatorLabel)
 	assert((string.isvalid(name)), "Attempt to register a new tab with no name.")
 
 	if (self:DoesTabExist(id, name)) then
 		error(_F("Tab '%s' already exists.", name))
 	end
 
-	local newtab = Pair.new(name, Tab(name, drawable, subtabs, isTranslatorLabel))
+	local newtab = Pair(name, Tab(name, callback, subtabs, isTranslatorLabel))
 	table.insert(self.m_tabs[id], newtab)
 	return newtab.second
 end
@@ -292,13 +308,13 @@ end
 function GUI:GetSubtab(id, name, parent_name)
 	local parent = self:GetTab(id, parent_name)
 	if (not parent) then
-		self:notify("A parent tab with the name '%s' does not exist.", parent_name)
+		log.fwarning("A parent tab with the name '%s' does not exist.", parent_name)
 		return
 	end
 
 	local child = parent:GetSubtab(name)
 	if (not child) then
-		self:notify("A sub-tab with the name '%s' does not exist.", name)
+		log.fwarning("A sub-tab with the name '%s' does not exist.", name)
 		return
 	end
 
@@ -310,51 +326,50 @@ function GUI:RequestInput(cond)
 	self.m_wants_input = self.m_wants_input or cond
 end
 
--- Registers an independent window that can only be drawn when the menu is open.
+-- Registers a window that can only be drawn when the menu is open.
 ---@param windowData WindowRequest
 function GUI:RegisterWindowRequest(windowData)
+	local label = windowData.m_label
 	if (not string.isvalid(windowData.m_label)) then
 		log.warning("[GUI]: Failed to register window request. Invalid window name")
 		return
 	end
 
-	if (self.m_requested_windows[windowData.m_label]) then
-		log.fwarning("[GUI]: Failed to register window request. A window with the name %s already exists!",
-			windowData.m_label
-		)
+	local reqs = self.m_requested_windows
+	if (reqs[label]) then
+		log.fwarning("[GUI]: Failed to register window request! A window with the name %s already exists.", label)
 		return
 	end
 
-	self.m_requested_windows[windowData.m_label] = windowData
+	reqs[label] = windowData
 end
 
 ---@param label string
 ---@param toggle boolean
 function GUI:SetRequestedWindowDraw(label, toggle)
 	local req = self.m_requested_windows[label]
-	if (not req) then
-		return
-	end
-
+	if (not req) then return end
 	req.m_should_draw = toggle
 end
 
 -- Registers an independent window that can be drawn without the menu open.
----@param drawfunc function
-function GUI:RegisterIndependentGUI(drawfunc)
-	if (type(drawfunc) ~= "function") then
+---@param callback GuiCallback
+function GUI:RegisterIndependentGUI(callback)
+	if (type(callback) ~= "function") then
 		return
 	end
 
-	table.insert(self.m_independent_windows, drawfunc)
+	table.insert(self.m_independent_windows, callback)
 end
 
+---@param level eNotificationLevel
 ---@param fmt string
 ---@param ... any
-function GUI:Notify(fmt, ...)
+function GUI:Notify(level, fmt, ...)
+	level      = level or Enums.eNotificationLevel.MESSAGE
 	local msg  = (... ~= nil) and _F(fmt, ...) or fmt
 	local name = Backend.script_name:replace("_", " "):titlecase()
-	Notifier:ShowMessage(name, msg)
+	Notifier:Add(name, msg, level)
 end
 
 -- Calculates a new window size and center position vectors in relation to the screen resolution.
@@ -402,7 +417,7 @@ function GUI:DrawDummyTab()
 	ImGui.SetNextWindowBgAlpha(0)
 	ImGui.BeginChild("##footer", 480, 40)
 	ImGui.Separator()
-	ImGui.TextDisabled(("v%s"):format(Backend.__version))
+	ImGui.TextDisabled(_F("v%s", Backend.__version))
 	if (self:IsItemClicked(self.MouseButtons.LEFT)) then
 		debug_counter = debug_counter + 1
 
@@ -420,7 +435,7 @@ function GUI:DrawDummyTab()
 
 	if (GVars.backend.debug_mode) then
 		ImGui.SameLine()
-		ImGui.TextDisabled("DEBUG")
+		ImGui.TextDisabled("[DEBUG]")
 	end
 	ImGui.EndChild()
 end
@@ -651,6 +666,7 @@ function GUI:DrawSideBar(yPos)
 end
 
 ---@private
+---@param fixed_height float
 function GUI:OnDrawCallback(fixed_height)
 	if (not gui.mouse_override()) then
 		gui.override_mouse(true)
@@ -673,6 +689,8 @@ function GUI:OnDrawCallback(fixed_height)
 	else
 		ImGui.SetNextWindowSize(GVars.ui.window_size.x, fixed_height, ImGuiCond.Always)
 	end
+
+	self.m_window_anim:OnFrame()
 end
 
 ---@private
@@ -713,9 +731,7 @@ end
 ---@private
 function GUI:__DrawImpl()
 	local topBarHeight = self:GetMaxTopBarHeight()
-
 	self:OnDrawCallback(topBarHeight)
-	self.m_snap_animator:OnFrame()
 
 	ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
 	if (ImGui.Begin(self.m_main_window_label, mainWindowFlags)) then
@@ -1013,7 +1029,7 @@ function GUI:SetClipBoardText(text, eval)
 
 	self:PlaySound(self.Sounds.Click)
 	ImGui.SetClipboardText(text)
-	self:Notify("Link copied to clipboard.")
+	self:Notify(Enums.eNotificationLevel.SUCCESS, "Link copied to clipboard.")
 end
 
 -- Plays a sound when an ImGui widget is clicked.

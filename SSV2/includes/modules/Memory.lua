@@ -23,11 +23,11 @@ local CEntity     = require("includes.classes.gta.CEntity")
 --------------------------------------
 -- Class: Memory
 --------------------------------------
----@class Memory : ClassMeta<Memory>
+---@class Memory : Callable<Memory>
 ---@field private m_patches table<Obj, table<string, MemoryPatch>>
 ---@field protected m_initialized boolean
 ---@overload fun(): Memory
-local Memory = Class("Memory")
+local Memory = Callable("Memory")
 
 ---@return Memory
 function Memory:init()
@@ -50,7 +50,7 @@ end
 local function SafeGetVersion()
 	if (GPointers.GameVersion.build:isempty()) then
 		local ptr, b, o
-		if (Backend:GetGameBranch() == Enums.eGameBranch.LAGECY) then
+		if (Backend:GetGameBranch() == Enums.eGameBranch.LEGACY) then
 			ptr = memory.scan_pattern("8B C3 33 D2 C6 44 24 20")
 			b = ptr:add(0x24):rip()
 			o = b:add(0x20)

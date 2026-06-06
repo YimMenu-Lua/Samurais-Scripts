@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Pair                     = require("includes.classes.Pair")
 local Mutex                    = require("includes.classes.Mutex")
 local TableRenderer            = require("includes.frontend.helpers.TableRenderer").new()
 local measureTextWidth         = require("includes.frontend.helpers.measure_text_width")
@@ -97,7 +98,7 @@ local function SortAllOrderedFlags()
 			if (#ordered_flags == 0) then
 				local count = 0
 				for name, flag in pairs(data.enum) do
-					table.insert(ordered_flags, Pair.new(name, flag))
+					table.insert(ordered_flags, Pair(name, flag))
 					count = count + 1
 				end
 				data.flag_count = count
@@ -186,7 +187,7 @@ local function drawVehicleFlags(data)
 	ImGui.EndDisabled()
 end
 
----@param currentPreset HandlingPreset
+---@param currentPreset VehicleFlagPreset
 ---@return boolean
 local function filterPresets(currentPreset)
 	local bs = currentPreset.m_vehicle_bitset or 0
@@ -264,9 +265,21 @@ local function drawPresets()
 	ImGui.Separator()
 
 	ImGui.SetNextWindowBgAlpha(0.0)
-	ImGui.BeginChild("##presetsScrollRegion", 0, GVars.ui.window_size.y * 0.675)
+	ImGui.BeginChild("##presetsScrollRegion", 0, GVars.ui.window_size.y * 0.7)
 	local presets = FlagController:GetPresets()
 	local count   = #presets
+	ImGui.SetWindowFontScale(3.0)
+	if (GUI:Button("+", { size = vec2:new(presetChildSize.x - 1, presetChildSize.y), tooltip = _T("EF_IMPORT_DATA") })) then
+		ImGui.OpenPopup("##presetImportPopup")
+	end
+	ImGui.SetWindowFontScale(1.0)
+	ImGui.SetNextWindowSizeConstraints(400, 300, 640, 800)
+	if (ImGui.BeginPopupModal("##presetImportPopup", true, ImGuiWindowFlags.AlwaysAutoResize)) then
+		drawImportWindow()
+		ImGui.EndPopup()
+	end
+	ImGui.SameLineIfAvail(presetChildSize.x)
+
 	for i, preset in ipairs(presets) do
 		ImGui.PushID(i)
 		local name = preset:GetDisplayName()
@@ -393,17 +406,6 @@ local function drawPresets()
 		::continue::
 	end
 	ImGui.EndChild()
-
-	ImGui.Separator()
-	if (GUI:Button(_T("EF_IMPORT_DATA"), { size = btnSize })) then -- this label should've been a generic but oh well
-		ImGui.OpenPopup("##presetImportPopup")
-	end
-
-	ImGui.SetNextWindowSizeConstraints(400, 300, 640, 800)
-	if (ImGui.BeginPopupModal("##presetImportPopup", true, ImGuiWindowFlags.AlwaysAutoResize)) then
-		drawImportWindow()
-		ImGui.EndPopup()
-	end
 end
 
 local function clearPresetWindow()

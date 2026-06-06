@@ -11,11 +11,12 @@
 -- Class: Pair
 --------------------------------------
 ---@class Pair<K, V> : { first: K, second: V }
-Pair = {}
-Pair.__index = Pair
+---@overload fun(k: K, v: V): Pair<K, V>
+local Pair = Callable("Pair", { ctor = function(t, ...) return t:new(...) end })
 
-local _mt = {}
-_mt.__index = function(self, k)
+
+local _mt <const> = {}
+_mt.__index       = function(self, k)
 	if (k == "first") then
 		return self._raw[1]
 	end
@@ -27,7 +28,7 @@ _mt.__index = function(self, k)
 	return _mt[k]
 end
 
-_mt.__newindex = function(self, k, v)
+_mt.__newindex    = function(self, k, v)
 	if (type(k) == "number") then -- table.insert won't work without this
 		if (k == 1) then
 			self._raw[1] = v
@@ -69,7 +70,9 @@ end
 ---@param a K
 ---@param b V
 ---@return Pair<K, V>
-function Pair.new(a, b)
+function Pair:new(a, b)
 	local obj = { _raw = { a, b } }
 	return setmetatable(obj, _mt)
 end
+
+return Pair

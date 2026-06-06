@@ -7,7 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local FeatureBase                  = require("includes.modules.FeatureBase")
+local FeatureBase = require("includes.modules.FeatureBase")
+local Set         = require("includes.classes.Set")
+
 
 ---@class PublicEnemy : FeatureBase
 ---@field private m_last_scan_time TimePoint
@@ -58,7 +60,7 @@ end
 
 function PublicEnemy:Init()
 	self.m_enabled            = false
-	self.m_hostile_peds       = Set.new()
+	self.m_hostile_peds       = Set()
 	self.m_last_scan_time     = TimePoint.new()
 	self.m_last_task_time     = TimePoint.new()
 	self.m_hostile_count      = 0

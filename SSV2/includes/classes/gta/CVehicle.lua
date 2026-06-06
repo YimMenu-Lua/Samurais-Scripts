@@ -38,18 +38,18 @@ local phFragInst        = require("includes.classes.gta.phFragInst")
 ---@field public m_velocity pointer<vec3>
 ---@field public m_transmission CTransmission
 ---@field public m_deform_god pointer<uint8_t>
----@field public m_frag_inst phFragInst //0x09C0 `fragInstGTA`
+---@field public m_frag_inst phFragInst 0x09C0 `fragInstGTA`
 ---@field public m_turbo pointer<float>
 ---@field public m_water_damage pointer<uint32_t>
 ---@field public m_engine_health pointer<float>
----@field public m_steering_input pointer<float> // 0x00D4 name might not correctly reflect what this actually is but this seems to store controller input (value is between 1.0 (left) .. -1.0 (right))
----@field public m_steering_angle pointer<float> 0x00DC // steering angle?. We'll use it to rewrite last known steering value after exiting a vehicle in IV-Style Exit so we'll no longer have to teleport outside or patch CTaskVehicleExit
+---@field public m_steering_input pointer<float> 0x00D4 name might not correctly reflect what this actually is but this seems to store controller input (value is between 1.0 (left) .. -1.0 (right))
+---@field public m_steering_angle pointer<float> 0x00DC // steering angle? // the same max value that this member can reach is the same value that YimMenu shows in the handling editor tab so yes, this is indeed the current steering angle.
 ---@field public m_throttle_power pointer<float> m_steering_angle + 0x8
 ---@field public m_brake_power pointer<float>
 ---@field public m_is_targetable pointer<byte> `bool`
 ---@field public m_door_lock_status pointer<uint32_t>
----@field public m_wheels atArray<CWheel> -- 0x0C30
----@field public m_num_wheels integer -- 0x0C38
+---@field public m_wheels atArray<CWheel> 0x0C30
+---@field public m_num_wheels integer array start + 8 so atArray.m_size
 ---@field public m_ride_height pointer<float>
 ---@field private DumpFlags fun(self: CVehicle, enum_flags: Enum, get_func: fun(self: CVehicle, flag: integer): boolean): nil
 ---@overload fun(vehicle: integer): CVehicle|nil
@@ -62,9 +62,7 @@ function CVehicle:init(vehicle)
 		error("Invalid entity!")
 	end
 
-	---@type CVehicle
-	---@diagnostic disable-next-line: param-type-mismatch
-	local instance = setmetatable({}, CVehicle)
+	local instance = MakeInstance({}, self) ---@cast instance CVehicle
 	instance:super().init(instance, vehicle)
 
 	local ptr                   = memory.handle_to_ptr(vehicle)

@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local Decorator   = require("includes.modules.Decorator")
 local FeatureBase = require("includes.modules.FeatureBase")
 local CWheel      = require("includes.classes.gta.CWheel")
 local StancerData = require("includes.data.stancer_data")
@@ -220,9 +221,9 @@ function Stancer:CanApplyDrawData()
 	return self.m_entity:HasWheelDrawData() and wheel_idx ~= -1
 end
 
----@param deleteQueue? boolean
-function Stancer:ResetDeltas(deleteQueue)
-	for _, v in ipairs(StancerData.decorators) do
+---@param clearQueue? boolean
+function Stancer:ResetDeltas(clearQueue)
+	for _, v in ipairs(StancerData.items) do
 		self.m_deltas[Enums.eWheelAxle.FRONT][v.key] = 0.0
 		self.m_deltas[Enums.eWheelAxle.REAR][v.key]  = 0.0
 	end
@@ -230,7 +231,7 @@ function Stancer:ResetDeltas(deleteQueue)
 	self.m_suspension_height.m_current   = 0.0
 	self.m_suspension_height.m_last_seen = 0.0
 
-	if (deleteQueue) then
+	if (clearQueue) then
 		self:RemoveReference()
 	end
 end
@@ -260,7 +261,7 @@ function Stancer:Reset()
 		self.m_entity:SetVisualWheelWidth(visual_width)
 	end
 
-	for _, v in ipairs(StancerData.decorators) do
+	for _, v in ipairs(StancerData.items) do
 		local wheel_array = self:GetAllWheelsForAxle(v.axle)
 		self:ForEach(wheel_array, function(i, cwheel)
 			local decor_key = _F("%s_%d_%d", v.key, v.axle, i)
@@ -544,7 +545,7 @@ function Stancer:RestoreDeltasFromQueue()
 		return
 	end
 
-	for _, v in ipairs(StancerData.decorators) do
+	for _, v in ipairs(StancerData.items) do
 		local queued_key = _F("%s_%d_queue", v.key, v.axle)
 		local val        = Decorator:GetDecor(handle, queued_key)
 		if (type(val) == "number") then
@@ -569,7 +570,7 @@ function Stancer:ReadDefaultValues()
 	Decorator:Register(handle, "m_visual_size", visual_size)
 	Decorator:Register(handle, "m_visual_width", visual_width)
 
-	for _, v in ipairs(StancerData.decorators) do
+	for _, v in ipairs(StancerData.items) do
 		local wheel_array = self:GetAllWheelsForAxle(v.axle)
 		self:ForEach(wheel_array, function(i, cwheel)
 			local decor       = _F("%s_%d_%d", v.key, v.axle, i)
@@ -668,7 +669,7 @@ function Stancer:Update()
 		Decorator:UpdateDecor(handle, "m_suspension_height_q", self.m_suspension_height.m_current)
 	end
 
-	for _, v in ipairs(StancerData.decorators) do
+	for _, v in ipairs(StancerData.items) do
 		local wheel_array = self:GetAllWheelsForAxle(v.axle)
 		local delta       = self.m_deltas[v.axle][v.key]
 		local queued_key  = _F("%s_%d_queue", v.key, v.axle)

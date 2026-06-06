@@ -7,13 +7,15 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local FeatureBase                = require("includes.modules.FeatureBase")
-local HandlingPreset             = require("includes.structs.HandlingPreset")
+local FeatureBase = require("includes.modules.FeatureBase")
+local FlagPreset  = require("includes.structs.VehicleFlagPreset")
+
 
 ---@enum eManualGearboxType
 local eManualGearboxType <const> = {
 	H_PATTERN  = 0,
-	SEQUENTIAL = 1
+	SEQUENTIAL = 1,
+	AUTO       = 2,
 }
 
 ---@enum eGearDriveState
@@ -52,12 +54,13 @@ end
 ---@field private m_gear_state GearSelectState
 ---@field private m_drive_state eGearDriveState
 ---@field private m_last_input eGearInputLast -- TODO: use this for downshift protection (sequential) and money shifts (manual)
----@field private m_flag_preset HandlingPreset
+---@field private m_flag_preset VehicleFlagPreset
 ---@field private m_clutch_kick { enabled: boolean, rpm: float, timer: Timer }
 ---@field private m_kick_start { enabled: boolean, timer: Timer }
 ---@field private m_clutch_kick_duration integer
 ---@field private m_force_sequential boolean
 ---@field private m_force_neutral boolean
+---@field private m_is_single_gear boolean
 local ManualGearbox   = setmetatable({}, FeatureBase)
 ManualGearbox.__index = ManualGearbox
 
@@ -72,11 +75,29 @@ end
 ---@return boolean
 function ManualGearbox:ShouldRun()
 	local veh = self.m_entity
-	return GVars.features.vehicle.manual_gearbox.enabled
+	return self:GetConfig().enabled
+		and LocalPlayer:IsAlive()
 		and LocalPlayer:IsDriving()
 		and veh:IsValid()
+		and veh:IsDriveable()
 		and veh:IsLandVehicle()
-		and not veh:IsElectric()
+end
+
+---@return boolean
+function ManualGearbox:IsInReverse()
+	return self.m_gear_state.m_is_in_reverse
+end
+
+---@return boolean
+function ManualGearbox:IsSingleGear()
+	return self.m_is_single_gear
+end
+
+---@return boolean
+function ManualGearbox:IsActive()
+	local cfg     = self:GetConfig()
+	local is_auto = cfg.mode == eManualGearboxType.AUTO
+	return cfg.enabled and not is_auto and not self.m_is_single_gear
 end
 
 function ManualGearbox:Init()
@@ -86,15 +107,19 @@ function ManualGearbox:Init()
 	self.m_clutch_kick_duration = clutch_kick_duration
 	self.m_force_sequential     = false
 	self.m_force_neutral        = false
+	self.m_is_single_gear       = false
+
 	self.m_kick_start           = {
 		enabled = false,
 		timer   = Timer.new(266, true)
 	}
+
 	self.m_clutch_kick          = {
 		enabled = false,
 		rpm     = 0.0,
 		timer   = Timer.new(clutch_kick_duration, true),
 	}
+
 	self.m_gear_state           = {
 		m_current           = 0,
 		m_previous          = 0,
@@ -105,9 +130,9 @@ function ManualGearbox:Init()
 		m_has_stalled       = false,
 	}
 
-	self.m_flag_preset          = HandlingPreset.new({
-		name = "Manual Gearbox",
-		deltas = {
+	self.m_flag_preset          = FlagPreset({
+		name           = "Manual Gearbox",
+		deltas         = {
 			[Enums.eHandlingEditorTypes.TYPE_AF] = {
 				["GEARBOX_MANUAL"]       = true,
 				["GEARBOX_DIRECT_SHIFT"] = false,
@@ -132,14 +157,17 @@ function ManualGearbox:Reset()
 		m_is_in_reverse     = false,
 		m_has_stalled       = false,
 	}
+
 	self.m_kick_start          = {
 		enabled = false,
 		timer   = Timer.new(266, true)
 	}
+
 	self.m_drive_state         = eGearDriveState.INVALID
 	self.m_last_input          = eGearInputLast.NONE
 	self.m_force_sequential    = false
 	self.m_force_neutral       = false
+	self.m_is_single_gear      = false
 	self.m_clutch_kick.enabled = false
 	self.m_clutch_kick.rpm     = 0.0
 	self.m_clutch_kick.timer:Reset()
@@ -154,42 +182,45 @@ function ManualGearbox:Reset()
 	end
 end
 
+---@return { enabled: boolean, mode: eManualGearboxType, disable_stalling: boolean}
+function ManualGearbox:GetConfig()
+	return GVars.features.vehicle.manual_gearbox
+end
+
 ---@param toggle? boolean
 function ManualGearbox:SetEngineAutoStart(toggle)
 	local veh = self.m_entity
 	if (not veh:IsValid()) then return end
 
-	local cfg = GVars.features.vehicle.manual_gearbox
+	local cfg = self:GetConfig()
 	if (toggle == nil) then
 		toggle = not cfg.disable_stalling
 	end
 
-	local mode         = cfg.mode
-	local handle       = veh:GetHandle()
-	local engine_state = veh:IsEngineOn()
-
-	if (mode == eManualGearboxType.SEQUENTIAL) then
-		VEHICLE.SET_VEHICLE_ENGINE_ON(handle, engine_state, true, false)
-	elseif (cfg.mode == eManualGearboxType.H_PATTERN) then
-		VEHICLE.SET_VEHICLE_ENGINE_ON(handle, engine_state, true, toggle)
-	end
+	VEHICLE.SET_VEHICLE_ENGINE_ON(veh:GetHandle(), veh:IsEngineOn(), true, toggle)
 end
 
 function ManualGearbox:OnNewVehicle()
 	local veh = self.m_entity
-	if not (GVars.features.vehicle.manual_gearbox.enabled and veh:IsValid()) then
+	local cfg = self:GetConfig()
+	if not (cfg.enabled and veh:IsValid()) then
 		return
 	end
 
-	local flag_controller = veh.m_flag_controller
-	local cvehicle        = veh:Resolve()
+	local cvehicle = veh:Resolve()
 	if (not cvehicle or not cvehicle:IsValid()) then
 		return
 	end
 
-	self.m_cvehicle    = cvehicle
-	local pCurrentGear = cvehicle.m_transmission.m_current_gear
-	local pPrevGear    = cvehicle.m_transmission.m_previous_gear
+	local transmission    = cvehicle.m_transmission
+	self.m_is_single_gear = veh:IsElectric() or transmission.m_top_gear:get_byte() == 1
+	self.m_cvehicle       = cvehicle
+	if (self.m_is_single_gear) then
+		return
+	end
+
+	local pCurrentGear = transmission.m_current_gear
+	local pPrevGear    = transmission.m_previous_gear
 	if (veh:IsStopped()) then
 		pCurrentGear:set_byte(0)
 		pPrevGear:set_byte(0)
@@ -204,15 +235,9 @@ function ManualGearbox:OnNewVehicle()
 		enabled = false,
 		timer   = Timer.new(266, true)
 	}
-	-- self.m_force_sequential      = veh:IsBike()
 
 	self:SetEngineAutoStart()
-	flag_controller:TogglePreset(self.m_flag_preset, true)
-end
-
----@return boolean
-function ManualGearbox:IsInReverse()
-	return self.m_gear_state.m_is_in_reverse
+	veh.m_flag_controller:TogglePreset(self.m_flag_preset, cfg.mode ~= eManualGearboxType.AUTO)
 end
 
 ---@return boolean
@@ -273,13 +298,14 @@ function ManualGearbox:OnClutchRelease(gear_state, cvehicle)
 end
 
 function ManualGearbox:HandleEngineStalling()
-	local cfg               = GVars.features.vehicle.manual_gearbox
+	local cfg               = self:GetConfig()
 	local veh               = self.m_entity
 	local handle            = veh:GetHandle()
-	local is_sequential     = cfg.mode == eManualGearboxType.SEQUENTIAL or self.m_force_sequential
+	local is_auto           = cfg.mode == eManualGearboxType.AUTO
+	local no_clutch         = cfg.mode == eManualGearboxType.SEQUENTIAL or is_auto or self.m_force_sequential
 	local is_engine_on      = veh:IsEngineOn()
 	local is_in_neutral     = self:WantsNeutral()
-	local is_clutch_pressed = self.m_gear_state.m_is_clutch_pressed or is_sequential
+	local is_clutch_pressed = self.m_gear_state.m_is_clutch_pressed or no_clutch
 	local speed             = veh:GetSpeed()
 
 	if (KeyManager:IsKeybindJustPressed("engine_start_stop")) then
@@ -290,8 +316,10 @@ function ManualGearbox:HandleEngineStalling()
 		VEHICLE.SET_VEHICLE_ENGINE_ON(handle, not is_engine_on, false, true)
 	end
 
+	if (is_auto) then return end
+
 	if (is_engine_on) then
-		if (cfg.disable_stalling or is_sequential or (veh:IsBike() and self:IsInReverse())) then
+		if (cfg.disable_stalling or no_clutch or (veh:IsBike() and self:IsInReverse())) then
 			return
 		end
 
@@ -373,9 +401,8 @@ end
 ---@param gear_state GearSelectState
 ---@param cvehicle CVehicle
 function ManualGearbox:WhileDriving(gear_state, cvehicle)
-	self:HandleEngineStalling()
-
-	if (gear_state.m_is_clutch_pressed) then
+	local cfg = self:GetConfig()
+	if (gear_state.m_is_clutch_pressed or cfg.mode == eManualGearboxType.AUTO) then
 		self.m_force_neutral = false
 		return
 	end
@@ -412,9 +439,13 @@ end
 ---@param gear_state GearSelectState
 ---@param cvehicle CVehicle
 function ManualGearbox:HandleGears(gear_state, cvehicle)
+	local gearbox_type = self:GetConfig().mode
+	if (gearbox_type == eManualGearboxType.AUTO) then
+		return
+	end
+
 	self:ShiftGears(gear_state)
 
-	local gearbox_type      = GVars.features.vehicle.manual_gearbox.mode
 	local is_sequential     = gearbox_type == eManualGearboxType.SEQUENTIAL or self.m_force_sequential
 	local allow_gear_select = is_sequential and true or gear_state.m_is_clutch_pressed
 	if (not allow_gear_select) then return end
@@ -437,7 +468,7 @@ function ManualGearbox:HandleGears(gear_state, cvehicle)
 	end
 
 	if (KeyManager:IsKeybindJustPressed("shift_down")) then
-		if (gear_state.m_selected == 0 and self.m_entity:IsStopped()) then
+		if (gear_state.m_selected == 0 and self.m_entity:GetSpeedVector().y < 3) then
 			gear_state.m_is_in_reverse = true
 			cvehicle:SetHandlingFlag(Enums.eVehicleHandlingFlags.NO_REVERSE, false)
 		end
@@ -471,9 +502,14 @@ function ManualGearbox:HandleFwdReverse(gear_state)
 end
 
 function ManualGearbox:Update()
-	if (not self.m_entity:IsValid()) then return end
+	self:HandleEngineStalling()
+
+	if (self.m_is_single_gear or not self.m_entity:IsValid() or self:GetConfig().mode == eManualGearboxType.AUTO) then
+		return
+	end
 
 	local gear_state, cvehicle = self.m_gear_state, self.m_cvehicle
+
 	if (KeyManager:IsKeybindPressed("clutch")) then
 		self:OnClutchPress(gear_state, cvehicle)
 	elseif (KeyManager:IsKeybindJustReleased("clutch")) then

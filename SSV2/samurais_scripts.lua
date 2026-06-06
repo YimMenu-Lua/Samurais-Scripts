@@ -34,7 +34,7 @@ local function populate_weapons()
 	local weaponData  = require("includes.data.weapon_data")
 	local branch      = Backend:GetGameBranch()
 	for hash, data in pairs(weaponData) do
-		if (branch == Enums.eGameBranch.LAGECY and data.model_name == "WEAPON_STRICKLER") then
+		if (branch == Enums.eGameBranch.LEGACY and data.model_name == "WEAPON_STRICKLER") then
 			goto continue
 		end
 
@@ -42,7 +42,7 @@ local function populate_weapons()
 			goto continue
 		end
 
-		data.display_name  = Game.GetGXTLabel(data.gxt)
+		data.display_name  = Game.GetLabelText(data.gxt)
 		local weapon_group = weapons_map[data.group]
 		if (not weapon_group) then
 			goto continue

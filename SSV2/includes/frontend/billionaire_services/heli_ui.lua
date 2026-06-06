@@ -166,7 +166,7 @@ local function drawHeliControls(heli)
 					or "RADIO_22_DLC_BATTLE_MIX1_RADIO"
 				)
 				heli.radio.isOn        = AUDIO.IS_VEHICLE_RADIO_ON(heli:GetHandle())
-				heli.radio.stationName = Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+				heli.radio.stationName = Game.GetLabelText(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 			end)
 		end
 

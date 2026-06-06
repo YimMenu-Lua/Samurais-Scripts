@@ -127,7 +127,7 @@ end
 ---@field private m_cache table<SGSLTable, SGSLEntry>
 local SGSL = {
 	data         = require("includes.data.globals_locals"),
-	m_branch_key = Backend:GetGameBranch() == Enums.eGameBranch.LAGECY and "LEGACY" or "ENHANCED",
+	m_branch_key = Backend:GetGameBranch() == Enums.eGameBranch.LEGACY and "LEGACY" or "ENHANCED",
 	m_cache      = {}
 }
 SGSL.__index = SGSL

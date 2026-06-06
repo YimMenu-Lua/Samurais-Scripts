@@ -46,7 +46,7 @@ function Office.new(opts)
 	local instance   = setmetatable(base, Office) ---@cast instance Office
 	local customName = stats.get_string("MPX_GB_OFFICE_NAME") .. stats.get_string("MPX_GB_OFFICE_NAME2")
 	if (not string.isvalid(customName)) then
-		customName = Game.GetGXTLabel("GB_REST_ACC")
+		customName = Game.GetLabelText("GB_REST_ACC")
 	end
 
 	instance.m_custom_name     = customName
@@ -83,7 +83,7 @@ function Office:CheckVehicleWarehouse()
 	if (not ref) then return end
 
 	self.m_vehicle_warehouse = VehicleWarehouse.new(
-		Game.GetGXTLabel(ref.gxt),
+		Game.GetLabelText(ref.gxt),
 		ref.coords
 	)
 end
@@ -176,7 +176,7 @@ function Office:AddSubBusiness(index)
 		id        = index,
 		size      = ref.size,
 		max_units = ref.max,
-		name      = Game.GetGXTLabel(_F("MP_WHOUSE_%d", property_index - 1)),
+		name      = Game.GetLabelText(_F("MP_WHOUSE_%d", property_index - 1)),
 		coords    = ref.coords,
 	}, Enums.eWarehouseType.SPECIAL_CARGO))
 end
@@ -187,7 +187,7 @@ function Office:Rename(newName)
 	newName = newName:trim()
 	script.execute_as_script("freemode", function()
 		if (not string.isvalid(newName)) then
-			newName = Game.GetGXTLabel("GB_REST_ACC")
+			newName = Game.GetLabelText("GB_REST_ACC")
 		end
 
 		local GPBD_FM_3 = self:GetGPBD3():At(10)

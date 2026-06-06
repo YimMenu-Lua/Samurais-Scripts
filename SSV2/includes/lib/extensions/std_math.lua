@@ -128,7 +128,7 @@ function math.clamp(v, min, max)
 	return std_max(min, std_min(max, v))
 end
 
--- Returns a value between 0 and 1 representing the min/max normalization of `v`
+-- Returns a value between 0.0 and 1.0 representing the min/max normalization of `v`
 ---@param v number
 ---@param min number minimum value
 ---@param max number maximum value
@@ -138,9 +138,39 @@ end; math.normalize = math.ratio
 
 ---@param a number
 ---@param b number
----@param t float delta a float between 0 and 1
-function math.lerp(a, b, t)
-	return a + (b - a) * math.clamp(t, 0, 1)
+---@param delta float `0.0 .. 1.0`
+---@return float
+function math.lerp(a, b, delta)
+	delta = math.clamp(delta, 0, 1)
+	return a + (b - a) * delta
+end
+
+-- https://easings.net
+---@param delta float `0.0 .. 1.0`
+---@return float
+function math.ease_in_quad(delta)
+	delta = math.clamp(delta, 0, 1)
+	return delta * delta
+end
+
+-- https://easings.net
+---@param delta float `0.0 .. 1.0`
+---@return float
+function math.ease_out_quad(delta)
+	delta = math.clamp(delta, 0, 1)
+	return 1 - (1 - delta) * (1 - delta)
+end
+
+-- https://easings.net
+---@param delta float `0.0 .. 1.0`
+---@return float
+function math.ease_in_out_quad(delta)
+	delta = math.clamp(delta, 0, 1)
+	if (delta > 0.5) then
+		return ((-2 * delta + 2) ^ 2) / 2
+	end
+
+	return 2 * delta * delta
 end
 
 -- Generates a triangular wave oscillating between -1 and 1

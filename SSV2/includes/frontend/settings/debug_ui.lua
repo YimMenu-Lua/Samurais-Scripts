@@ -122,7 +122,7 @@ local function DrawEntities()
 				end
 
 				ImGui.SameLine()
-				if GUI:Button(_F(" D ##%d", handle)) then
+				if GUI:Button(_F(" X ##%d", handle)) then
 					Game.DeleteEntity(handle)
 				end
 			end
@@ -481,7 +481,7 @@ local function PopulateVehlistOnce()
 	end)
 end
 
-local function DrawDummyVehSpawnMenu()
+local function DrawVehPreviewTest()
 	local resolution = Game.GetScreenResolution()
 	ImGui.Text("Lightweight Vehicle Preview Test")
 	PopulateVehlistOnce()
@@ -491,8 +491,8 @@ local function DrawDummyVehSpawnMenu()
 			ImGui.PushID(i)
 			ImGui.Selectable(veh.displayname, false)
 			if ImGui.IsItemHovered() then
-				local item_min = vec2:new(ImGui.GetItemRectMin())
-				hovered_y = item_min.y
+				local item_min    = vec2:new(ImGui.GetItemRectMin())
+				hovered_y         = item_min.y
 				selected_veh_name = veh.name
 			elseif not ImGui.IsAnyItemHovered() then
 				hovered_y = nil
@@ -575,10 +575,18 @@ end
 
 local function DrawMiscTests()
 	ImGui.BeginTabBar("stupidshit")
-	if (ImGui.BeginTabItem("Vehicle Stuff")) then
+	if (ImGui.BeginTabItem("Misc Stuff")) then
 		if (ImGui.Button("Dump Subhandling Data")) then
 			if (self.get_veh() == 0) then return end
 			print(LocalPlayer:GetVehicle():GetHandlingData())
+		end
+
+		if (ImGui.Button("Test Box")) then
+			ImGui.OpenDialogBox("test_box")
+		end
+
+		if (ImGui.DialogBox("Test Dialog", "Test dialog box.", ImGuiDialogBoxStyle.SEVERE)) then
+			print("Test dialog box.")
 		end
 
 		ImGui.EndTabItem()
@@ -654,7 +662,7 @@ return function()
 	end
 
 	if ImGui.BeginTabItem("Preview Test") then
-		DrawDummyVehSpawnMenu()
+		DrawVehPreviewTest()
 		ImGui.EndTabItem()
 	end
 

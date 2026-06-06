@@ -8,6 +8,7 @@
 
 
 local COL_VANTABLACK <const> = Color("#000100")
+local Decorator              = require("includes.modules.Decorator")
 
 
 -----------------------------------------------------

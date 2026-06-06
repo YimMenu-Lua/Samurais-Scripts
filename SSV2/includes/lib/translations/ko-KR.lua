@@ -978,5 +978,6 @@ return {
 	["VEH_PERF_ONLY_TT"] = "일부 기능을 고성능 차량으로만 제한합니다(런치 컨트롤, 팝 앤 뱅 등).",
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "엔진을 시동하기 전에 클러치를 누르거나 기어를 중립에 두십시오.",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "수동 모드 전용: 엔진 정지 동작을 비활성화합니다.",
-	["VEH_GEARBOX_CLUTCH_ASSIST"] = "클러치 어시스트"
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "클러치 어시스트",
+	["VEH_GEARBOX_AUTO"] = "오토매틱"
 }

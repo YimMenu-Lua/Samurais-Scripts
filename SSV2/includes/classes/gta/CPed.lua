@@ -59,8 +59,7 @@ function CPed:init(ped)
 		m_armor            = ptr:add(0x150C),
 		m_cash             = ptr:add(0x1614),
 		m_player_info      = CPlayerInfo(ptr:add(0x10A8):deref()),
-		---@diagnostic disable-next-line: param-type-mismatch
-	}, CPed)
+	}, self)
 end
 
 ---@return boolean

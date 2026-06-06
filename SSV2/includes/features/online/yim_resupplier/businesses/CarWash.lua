@@ -179,7 +179,7 @@ function CarWash.new(opts)
 	instance.m_subs         = {}
 	if (stats.get_int("MPX_SB_WEED_SHOP_OWNED") ~= 0) then
 		table.insert(instance.m_subs, CarWashSubBusiness.new({
-			name                           = Game.GetGXTLabel("CELL_WSHOP"),
+			name                           = Game.GetLabelText("CELL_WSHOP"),
 			coords                         = vec3:new(-1162.051147, -1564.757202, 4.410227),
 			heat_packed_stat               = 24925,
 			legal_work_cooldown_gvar_key   = "weedshop_legal_work_cd",
@@ -189,7 +189,7 @@ function CarWash.new(opts)
 
 	if (stats.get_int("MPX_SB_HELI_TOURS_OWNED") ~= 0) then
 		table.insert(instance.m_subs, CarWashSubBusiness.new({
-			name                           = Game.GetGXTLabel("CELL_HELIT"),
+			name                           = Game.GetLabelText("CELL_HELIT"),
 			coords                         = vec3:new(-753.524841, -1511.244751, 5.015130),
 			heat_packed_stat               = 24926,
 			legal_work_cooldown_gvar_key   = "helitours_legal_work_cd",

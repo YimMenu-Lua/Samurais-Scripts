@@ -269,7 +269,7 @@ function Translator:TranslateGXT(gxt)
 		return "NULL"
 	end
 
-	local translated = Game.GetGXTLabel(gxt)
+	local translated = Game.GetLabelText(gxt)
 	self.m_gxt_labels[gxt] = translated
 	return translated
 end
@@ -282,7 +282,7 @@ function Translator:TranslateGXTList(labels)
 	end
 
 	for k, v in pairs(labels) do
-		labels[k] = Game.GetGXTLabel(v)
+		labels[k] = Game.GetLabelText(v)
 	end
 end
 
@@ -290,7 +290,7 @@ end
 function Translator:OnPostLoad()
 	for _, batch in ipairs(self.m_deferred_batches) do
 		for k, v in pairs(batch) do
-			local translated     = Game.GetGXTLabel(v)
+			local translated     = Game.GetLabelText(v)
 			batch[k]             = translated
 			self.m_gxt_labels[v] = translated
 		end

@@ -18,17 +18,15 @@
 ---@class FeatureManager
 ---@field private m_entity Entity|any -- reference to the entity that owns the feature(s)
 ---@field private m_features array<FeatureBase>
-local FeatureManager = {}
+local FeatureManager   = {}
 FeatureManager.__index = FeatureManager
 
 ---@param entity Entity|any
 function FeatureManager.new(entity)
-	local instane = setmetatable({
-		m_entity = entity,
+	return setmetatable({
+		m_entity   = entity,
 		m_features = {}
 	}, FeatureManager)
-
-	return instane
 end
 
 ---@generic T : FeatureBase

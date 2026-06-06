@@ -978,5 +978,6 @@ return {
 	["VEH_PERF_ONLY_TT"] = "Ogranicza niektóre funkcje tylko do samochodów wyczynowych (kontrola uruchamiania, trzaski i huki itp.)",
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Przed uruchomieniem silnika naciśnij sprzęgło lub ustaw bieg na luzie.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Asystent sprzęgła",
-	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Tylko tryb ręczny: wyłącza zachowanie zgaśnięcia silnika."
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Tylko tryb ręczny: wyłącza zachowanie zgaśnięcia silnika.",
+	["VEH_GEARBOX_AUTO"] = "Automatyczny"
 }

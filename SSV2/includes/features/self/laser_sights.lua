@@ -7,8 +7,10 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local FeatureBase            = require("includes.modules.FeatureBase")
-local World                  = require("includes.modules.World")
+local FeatureBase = require("includes.modules.FeatureBase")
+local World       = require("includes.modules.World")
+local Set         = require("includes.classes.Set")
+
 
 ---@class LaserSights : FeatureBase
 ---@field private m_entity LocalPlayer
@@ -17,7 +19,7 @@ local World                  = require("includes.modules.World")
 local LaserSights            = setmetatable({}, FeatureBase)
 LaserSights.__index          = LaserSights
 
-LaserSights.WeaponExclusions = Set.new(
+LaserSights.WeaponExclusions = Set(
 	0x34A67B97,
 	0xBA536372,
 	0x184140A1,

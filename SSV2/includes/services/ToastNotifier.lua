@@ -8,9 +8,11 @@
 
 
 local ThemeManager = require("includes.services.ThemeManager")
+local Rect         = require("includes.classes.Rect")
+
 
 ---@enum eNotificationLevel
-Enums.eNotificationLevel = {
+Enums.eNotificationLevel     = {
 	MESSAGE = 0,
 	SUCCESS = 1,
 	WARNING = 2,
@@ -19,12 +21,12 @@ Enums.eNotificationLevel = {
 }
 
 ---@enum eNotificationContext
-Enums.eNotificationContext = {
+Enums.eNotificationContext   = {
 	TOAST = 0,
 	CENTER = 1,
 }
 
-local bgColors <const> = {
+local bgColors <const>       = {
 	[Enums.eNotificationLevel.MESSAGE] = Color(0.25, 0.25, 0.25, 1.0),
 	[Enums.eNotificationLevel.SUCCESS] = Color(0.1, 0.6, 0.1, 0.5),
 	[Enums.eNotificationLevel.WARNING] = Color(0.8, 0.6, 0.1, 0.5),
@@ -825,4 +827,4 @@ end
 
 --#endregion
 
-return Notifier
+return Notifier.new()

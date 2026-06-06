@@ -11,22 +11,14 @@
 -- Class: Mutex
 --------------------------------------
 -- Simple mutual exclusivity.
----@class Mutex
----@field protected m_locked boolean
+---@class Mutex : Callable<Mutex>
+---@field private m_locked boolean
 ---@overload fun(): Mutex
-local Mutex = {}
-Mutex.__index = Mutex
----@diagnostic disable-next-line
-setmetatable(Mutex, {
-	__call = function(_)
-		return Mutex.new()
-	end
-})
+local Mutex = Callable("Mutex", { ctor = function(t) return t:new() end })
 
 ---@return Mutex
-function Mutex.new()
-	---@diagnostic disable-next-line
-	return setmetatable({ m_locked = false }, Mutex)
+function Mutex:new()
+	return setmetatable({ m_locked = false }, self)
 end
 
 ---@return boolean

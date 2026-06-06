@@ -106,7 +106,7 @@ function Nightclub:AddSubBusiness(index)
 
 	table.insert(self.m_subs, BusinessHub.new({
 		id        = index,
-		name      = Game.GetGXTLabel(_F("CLUB_STOCK%d", index)),
+		name      = Game.GetLabelText(_F("CLUB_STOCK%d", index)),
 		max_units = tunables.get_int(ref.max_units_tunable),
 		vpu       = tunables.get_int(ref.vpu_tunable)
 	}))

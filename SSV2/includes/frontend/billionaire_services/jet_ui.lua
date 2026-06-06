@@ -181,7 +181,7 @@ local function drawSpawnedJet(jet)
 					or "RADIO_22_DLC_BATTLE_MIX1_RADIO"
 				)
 				jet.radio.isOn        = AUDIO.IS_VEHICLE_RADIO_ON(jet:GetHandle())
-				jet.radio.stationName = Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+				jet.radio.stationName = Game.GetLabelText(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 			end)
 		end
 

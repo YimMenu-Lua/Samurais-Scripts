@@ -794,7 +794,7 @@ function PrivateLimo:StateEval()
 	if self:IsPlayerInLimo() then
 		self.radio.isOn = AUDIO.IS_VEHICLE_RADIO_ON(self.m_handle)
 		self.radio.stationName = self.radio.isOn
-			and Game.GetGXTLabel(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
+			and Game.GetLabelText(AUDIO.GET_PLAYER_RADIO_STATION_NAME())
 			or "Off"
 	end
 

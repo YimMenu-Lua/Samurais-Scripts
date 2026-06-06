@@ -19,7 +19,7 @@ local ALLOW_CARS <const>  = 1 << Enums.eVehicleType.VEHICLE_TYPE_CAR
 local ALLOW_BIKES <const> = 1 << Enums.eVehicleType.VEHICLE_TYPE_BIKE
 local ALLOW_BOTH <const>  = ALLOW_CARS | ALLOW_BIKES
 
----@type array<HandlingPresetData>
+---@type array<VehicleFlagPresetData>
 return {
 	{
 		name               = "VEH_NO_ENGINE_BRAKE",

@@ -978,5 +978,6 @@ return {
 	["VEH_PERF_ONLY_TT"] = "Limite certaines fonctionnalités aux voitures de performance uniquement (Launch Control, Pops & Bangs, etc.)",
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Veuillez appuyer sur l'embrayage ou mettre la vitesse au point mort avant de démarrer le moteur.",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Mode manuel uniquement : désactive le comportement de calage du moteur.",
-	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Assistance à l'embrayage"
+	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Assistance à l'embrayage",
+	["VEH_GEARBOX_AUTO"] = "Automatique"
 }

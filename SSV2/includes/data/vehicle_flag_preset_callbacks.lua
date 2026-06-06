@@ -18,10 +18,10 @@
 -- NOTE: This file is only for default callbacks. Please do not edit unless you're contributing a new default handling preset.
 -- For user-generated callbacks, you can define a new file with the same structure of this one.
 
----@alias HandlingPresetCallback fun(self: HandlingPreset, editor: VehicleFlagController): boolean
----@alias HandlingPresetCallbackData { onEnable: HandlingPresetCallback, onDisable: HandlingPresetCallback }
+---@alias VehicleFlagPresetCallback fun(self: VehicleFlagPreset, editor: VehicleFlagController): boolean
+---@alias VehicleFlagCallbackData { onEnable: VehicleFlagPresetCallback, onDisable: VehicleFlagPresetCallback }
 
----@type dict<HandlingPresetCallbackData>
+---@type dict<VehicleFlagCallbackData>
 return {
 	["VEH_KERS_BOOST"] = {
 		onEnable = function(_)

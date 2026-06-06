@@ -12,35 +12,27 @@
 --------------------------------------
 -- A simple `Range` utiliy.
 ---@ignore -- manual docs
----@class Range
+---@class Range : Callable<Range>
 ---@field private m_min number
 ---@field private m_max number
 ---@field private m_step number
 ---@overload fun(from: number, to: number, step?: number): Range
-Range = {}
-Range.__index = Range
----@diagnostic disable-next-line
-setmetatable(Range, {
-	__call = function(_, from, to, step)
-		return Range.new(from, to, step)
-	end
-})
+local Range = Callable("Range", { ctor = function(t, ...) return t:new(...) end })
 
 ---@param from number
 ---@param to number
 ---@param step? number
 ---@return Range
-function Range.new(from, to, step)
+function Range:new(from, to, step)
 	step = step or 1
 	assert(type(from) == "number" and type(to) == "number", "Range requires numeric from/to")
 	assert(step ~= 0, "Step cannot be 0")
 
 	return setmetatable({
-		m_min = from,
-		m_max = to,
+		m_min  = from,
+		m_max  = to,
 		m_step = step,
-		---@diagnostic disable-next-line
-	}, Range)
+	}, self)
 end
 
 ---@param value number

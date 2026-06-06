@@ -17,7 +17,7 @@
 ---@class array<T> : { [integer]: T }
 ---@class dict<T> : { [string]: T }
 ---@class pair<K, V>: { first: K, second: V } -- Not the same as the `Pair` module. This represents a simple table, the other is a module with metamethods.
----@class set<T>: { T: true } -- Not the same as the `Set` module. This represents a simple table, the other is a module with metamethods.
+---@class set<T>: { [T]: true } -- Not the same as the `Set` module. This represents a simple table, the other is a module with metamethods.
 ---@class tuple<T1, T2>: { [1]: T1, [2]: T2 }
 
 ---@generic V
@@ -34,7 +34,7 @@ GenericClass = setmetatable({}, {
 	__metatable = false
 })
 
----@alias Obj table|metatable|userdata
+---@alias Obj table|metatable|userdata|Callable|ClassMeta|CStructBase
 
 ---@class Enum
 ---@field public First fun(self: Enum): integer Returns the first value of the enum.

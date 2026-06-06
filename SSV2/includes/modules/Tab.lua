@@ -147,7 +147,7 @@ end
 function Tab:GetOrCreateGrid(columns, padding_x, padding_y)
 	if (not self.m_grid_layout) then
 		local spacing = ImGui.GetStyle().ItemSpacing
-		self.m_grid_layout = GridRenderer.new(
+		self.m_grid_layout = GridRenderer(
 			columns or 1,
 			padding_x or spacing.x,
 			padding_y or spacing.y
@@ -198,21 +198,21 @@ function Tab:AddBoolCommand(label, opts)
 			isTranslatorLabel = opts.translate_label,
 			fineTuning        = opts.options_data,
 			onClick           = function()
-				local v = table.get_nested_key(g_table, gvar_key)
+				local v = table.get_nested_value(g_table, gvar_key)
 				onClick(v)
 			end,
 		}
 	)
 
-	if not (opts.register_command and CommandExecutor and type(table.get_nested_key(g_table, gvar_key)) == "boolean") then
+	if not (opts.register_command and CommandExecutor and type(table.get_nested_value(g_table, gvar_key)) == "boolean") then
 		return
 	end
 
 	local command_name = label:lower():gsub("%s+", "_")
 	CommandExecutor:RegisterCommand(command_name, function()
-		local v = table.get_nested_key(g_table, gvar_key)
+		local v = table.get_nested_value(g_table, gvar_key)
 		v = not v
-		table.set_nested_key(g_table, gvar_key, v)
+		table.set_nested_value(g_table, gvar_key, v)
 		onClick(v)
 		CommandExecutor:notify(
 			"%s %s",
@@ -234,14 +234,14 @@ function Tab:AddLoopedCommand(label, opts)
 
 	local meta             = opts.meta or {}
 	local command_name     = label:lower():gsub("%s+", ""):trim()
-	local config_value     = table.get_nested_key(g_table, gvar_key)
+	local config_value     = table.get_nested_value(g_table, gvar_key)
 	local suspended_thread = not config_value
 	local thread           = ThreadManager:RegisterLooped(_F("SS_%s", command_name:upper()), opts.callback, { suspended = suspended_thread })
 
 	local function toggle()
-		local v = table.get_nested_key(g_table, gvar_key)
+		local v = table.get_nested_value(g_table, gvar_key)
 		local onDisable = opts.on_disable
-		if (table.get_nested_key(g_table, gvar_key)) then
+		if (table.get_nested_value(g_table, gvar_key)) then
 			if thread then thread:Resume() end
 		else
 			if thread then thread:Suspend() end
@@ -269,13 +269,13 @@ function Tab:AddLoopedCommand(label, opts)
 		}
 	)
 
-	if not (opts.register_command and CommandExecutor and type(table.get_nested_key(g_table, gvar_key)) == "boolean") then
+	if not (opts.register_command and CommandExecutor and type(table.get_nested_value(g_table, gvar_key)) == "boolean") then
 		return
 	end
 
 	local command_callback = function()
-		local v = table.get_nested_key(g_table, gvar_key)
-		table.set_nested_key(g_table, gvar_key, not v)
+		local v = table.get_nested_value(g_table, gvar_key)
+		table.set_nested_value(g_table, gvar_key, not v)
 		toggle()
 	end
 

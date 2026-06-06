@@ -978,5 +978,6 @@ return {
 	["VEH_PERF_ONLY"] = "Nur Leistung",
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Bitte treten Sie die Kupplung oder schalten Sie den Gang in den Leerlauf, bevor Sie den Motor starten.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Kupplungsassistent",
-	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Nur manueller Modus: Deaktiviert das Motorabwürgeverhalten."
+	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Nur manueller Modus: Deaktiviert das Motorabwürgeverhalten.",
+	["VEH_GEARBOX_AUTO"] = "Automatisch"
 }

@@ -52,7 +52,7 @@
 ---@field ItemSpacing vec2
 ---@field FramePadding vec2
 
----@class Theme
+---@class Theme : Callable<Theme>
 ---@field Name string
 ---@field Colors ThemeColors
 ---@field Styles ThemeStyles
@@ -60,14 +60,7 @@
 ---@field SSGradient vec4
 ---@field JSON? boolean
 ---@overload fun(themeTable?: table): Theme
-local Theme = { __type = "Theme" }
-Theme.__index = Theme
----@diagnostic disable-next-line
-setmetatable(Theme, {
-	__call = function(_, ...)
-		return Theme.new(...)
-	end
-})
+local Theme = Callable("Theme", { ctor = function(t, ...) return t.new(...) end })
 
 ---@param themeTable? Theme
 ---@return Theme

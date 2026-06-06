@@ -62,6 +62,7 @@ local Speedometer   = {
 		speed_modifier   = 1,
 		PV               = nil, ---@type PlayerVehicle
 		IsEngineOn       = false,
+		IsSingleGear     = false,
 		HasABS           = false,
 		IsABSEngaged     = false,
 		IsESCEngaged     = false,
@@ -105,6 +106,7 @@ function Speedometer:UpdateState()
 	state.CurrentAltitude  = PV:GetHeightAboveGround()
 	state.Manufacturer     = PV:GetManufacturerName()
 	state.IsEngineOn       = IsEngineOn
+	state.IsSingleGear     = PV.m_manual_gearbox:IsSingleGear()
 	state.HasABS           = PV:HasABS()
 	state.IsABSEngaged     = PV:IsABSEngaged()
 	state.IsESCEngaged     = PV:IsESCEngaged()
@@ -545,8 +547,9 @@ function Speedometer:DrawImpl(ImDrawList, center, radius, current_speed, max_spe
 		local IsSports  = state.IsSports
 		if (gear > 0 and gear < 255) then
 			local gbox_cfg = GVars.features.vehicle.manual_gearbox
-			if (gbox_cfg.enabled) then
-				gear_str = gbox_cfg.mode == 0 and gear_name or _F("S%s", gear_name)
+			local mode = gbox_cfg.mode
+			if (gbox_cfg.enabled and mode < 2 and not state.IsSingleGear) then
+				gear_str = mode == 0 and gear_name or _F("S%s", gear_name)
 			else
 				gear_str = _F("D%s", gear_name)
 			end

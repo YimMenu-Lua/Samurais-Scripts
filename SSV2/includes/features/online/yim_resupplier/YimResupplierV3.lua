@@ -301,7 +301,7 @@ function YRV3:PopulateHangar()
 
 	self.m_businesses.hangar = require("Warehouse").new({
 		id        = -1,
-		name      = Game.GetGXTLabel(_F("MP_HANGAR_%d", property_index)),
+		name      = Game.GetLabelText(_F("MP_HANGAR_%d", property_index)),
 		coords    = ref.coords,
 		max_units = 50,
 	}, Enums.eWarehouseType.HANGAR)
@@ -319,7 +319,7 @@ function YRV3:PopulateOffice()
 
 	self.m_businesses.office = require("Office") {
 		id     = idx,
-		name   = Game.GetGXTLabel(ref.gxt),
+		name   = Game.GetLabelText(ref.gxt),
 		coords = ref.coords,
 	}
 	table.insert(self.m_boss_types_avail, { name = "GB_BOSSC", id = 0 })
@@ -339,7 +339,7 @@ function YRV3:PopulateClubhouse()
 	safe_data.name = "Clubhouse Duffle Bag"
 	self.m_businesses.clubhouse = require("Clubhouse") {
 		id        = idx,
-		name      = Game.GetGXTLabel(club_ref.gxt),
+		name      = Game.GetLabelText(club_ref.gxt),
 		coords    = club_ref.coords,
 		safe_data = safe_data
 	}
@@ -363,7 +363,7 @@ function YRV3:PopulateBikerBusinesses()
 
 			self.m_businesses.bunker = Factory.new({
 				id         = 5,
-				name       = Game.GetGXTLabel(_F("MP_BUNKER_%d", gxt_idx)),
+				name       = Game.GetLabelText(_F("MP_BUNKER_%d", gxt_idx)),
 				coords     = ref and ref.coords or vec3:zero(),
 				vpu_mult_1 = has_eq_upgrade and eq_upg_mult or 0,
 				vpu_mult_2 = has_staff_upgrade and stf_upg_mult or 0,
@@ -380,7 +380,7 @@ function YRV3:PopulateBikerBusinesses()
 
 		self.m_businesses.acid_lab = Factory.new({
 			id         = 6,
-			name       = Game.GetGXTLabel("ACID_LAB_TITLE"),
+			name       = Game.GetLabelText("ACID_LAB_TITLE"),
 			vpu_mult_1 = has_eq_upgrade and eq_upg_mult or 0,
 			vpu_mult_2 = 0,
 			vpu        = tunables.get_int("BIKER_ACID_PRODUCT_VALUE"),
@@ -411,7 +411,7 @@ function YRV3:PopulateNightclub()
 
 		local nightclub = require("Nightclub") {
 			id          = nc_index,
-			name        = Game.GetGXTLabel(_F("MP_NCLU_%d", nc_index)),
+			name        = Game.GetLabelText(_F("MP_NCLU_%d", nc_index)),
 			custom_name = clubname,
 			coords      = ref.coords,
 			safe_data   = safedata
@@ -470,7 +470,7 @@ function YRV3:PopulateCarWash()
 	end
 
 	self.m_businesses.car_wash = require("CarWash") {
-		name   = Game.GetGXTLabel("CELL_CWAS"),
+		name   = Game.GetLabelText("CELL_CWAS"),
 		coords = vec3:new(25.645266, -1412.290649, 29.362230)
 	}
 end
@@ -484,7 +484,7 @@ function YRV3:PopulateCashSafes()
 		end
 
 		local entry                = RawData[data.raw_data_entry][property_index]
-		local name                 = entry and Game.GetGXTLabel(entry.gxt) or "NULL"
+		local name                 = entry and Game.GetLabelText(entry.gxt) or "NULL"
 		local coords               = entry and entry.coords or nil
 		self.m_businesses.safes[i] = CashSafe.new({
 			name            = name,
@@ -507,7 +507,7 @@ function YRV3:PopulateSalvageYard()
 	end
 
 	local ref       = RawData.SalvageYards[property_index]
-	local name      = ref and Game.GetGXTLabel(ref.gxt) or _T("SY_SALVAGE_YARD")
+	local name      = ref and Game.GetLabelText(ref.gxt) or _T("SY_SALVAGE_YARD")
 	local safe_data = RawData.CashSafes.fronts.salvage_yard
 	safe_data.name  = name
 

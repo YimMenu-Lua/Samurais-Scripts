@@ -8,6 +8,8 @@
 
 
 local FeatureBase = require("includes.modules.FeatureBase")
+local Pair        = require("includes.classes.Pair")
+
 
 ---@class SelfMisc : FeatureBase
 ---@field private m_entity LocalPlayer
@@ -15,19 +17,19 @@ local FeatureBase = require("includes.modules.FeatureBase")
 ---@field public m_phone_anims_enabled boolean
 ---@field public m_is_crouching boolean
 ---@field public m_is_playing_hands_up_anim boolean
-local SelfMisc = setmetatable({}, FeatureBase)
-SelfMisc.__index = SelfMisc
+local SelfMisc        = setmetatable({}, FeatureBase)
+SelfMisc.__index      = SelfMisc
 SelfMisc.m_cell_input = {
-	Pair.new(172, 1),
-	Pair.new(173, 2),
-	Pair.new(174, 3),
-	Pair.new(175, 4),
-	Pair.new(176, 5),
-	Pair.new(177, 5),
-	Pair.new(178, 5),
-	Pair.new(179, 5),
-	Pair.new(180, 1),
-	Pair.new(181, 2),
+	Pair(172, 1),
+	Pair(173, 2),
+	Pair(174, 3),
+	Pair(175, 4),
+	Pair(176, 5),
+	Pair(177, 5),
+	Pair(178, 5),
+	Pair(179, 5),
+	Pair(180, 1),
+	Pair(181, 2),
 }
 
 ---@param ent LocalPlayer

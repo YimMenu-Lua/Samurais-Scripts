@@ -15,6 +15,7 @@ local ActionTypeToString <const> = {
 	[Enums.eActionType.CLIPSET]  = "Movement Clipset"
 }
 
+
 -----------------------------------------------------
 -- Action Struct
 -----------------------------------------------------
@@ -22,7 +23,7 @@ local ActionTypeToString <const> = {
 ---@class Action
 ---@field data ActionData
 ---@field action_type eActionType
-local Action = {}
+local Action   = {}
 Action.__index = Action
 
 ---@param action_data ActionData
