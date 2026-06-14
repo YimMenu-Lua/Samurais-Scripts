@@ -31,7 +31,7 @@ return function()
 
 	if (ImGui.BeginPopupModal("##bossRegister", true, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize)) then
 		ImGui.Spacing()
-		if (ImGui.BeginCombo("##registerAsBoss", _T(bossTypeNames[currentBossType] or "GENERIC_NONE"))) then
+		if (ImGui.BeginCombo("##registerAsBoss", _T(bossTypeNames[selectedBossType] or "GENERIC_NONE"))) then
 			for _, bossType in ipairs(availableBossTypes) do
 				local id = bossType.id
 				if (ImGui.Selectable(_T(bossType.name), (id == selectedBossType))) then
