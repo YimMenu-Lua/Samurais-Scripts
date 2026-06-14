@@ -559,77 +559,11 @@ function LocalPlayer:RegisterAsBoss(bossType)
 	end
 
 	ThreadManager:Run(function()
-		local pid                 = self:GetID()
-		local GPBD_FM_3 <const>   = GGlobals.GPBD_FM_3:At(pid, 615):At(10)
-		local FM_SERVICES <const> = GGlobals.FM_SERVICES
-		local boss_offset_1       = SGSL:Get(SGSL.data.freemode_boss_offset_1):GetValue()
-		local boss_offset_2       = SGSL:Get(SGSL.data.freemode_boss_offset_2):GetValue()
-		local is_mc               = bossType == 1
-
-		GPBD_FM_3:WriteInt(pid)
-		GPBD_FM_3:At(433):WriteInt(bossType)
-		GPBD_FM_3:At(470):WriteInt(bossType)
-
-		local pUserID = malloc(0x4)
-		local pInt0   = malloc(0x4)
-		local pInt1   = malloc(0x4)
-		STATS.GET_BOSS_GOON_UUID(stats.get_character_index(), pInt0:get_address(), pInt1:get_address())
-		local strUserID, userID = NETWORK.NETWORK_PLAYER_GET_USERID(pid, pUserID:get_address())
-		local int0, int1        = pInt0:get_int(), pInt1:get_int()
-		free(pUserID)
-		free(pInt0)
-		free(pInt1)
-		GPBD_FM_3:At(9, 0):WriteInt(int0)
-		GPBD_FM_3:At(9, 1):WriteInt(int1)
-
-		local sgsl_obj       = SGSL:Get(SGSL.data.freemode_boss_uid_str)
-		local UID_GLOBAL     = sgsl_obj:AsGlobal()
-		local uid_str_offset = sgsl_obj:GetOffset(1)
-		UID_GLOBAL:At(uid_str_offset):At(2):WriteString(strUserID, 64)
-
-		local cloudTime = stats.get_int("MPX_BOSS_END_TIME")
-		if (cloudTime <= 0) then
-			cloudTime = NETWORK.GET_CLOUD_TIME_AS_INT()
-		else
-			cloudTime = cloudTime - 43200
-		end
-		stats.set_int("MPX_BOSS_END_TIME", cloudTime)
-		GPBD_FM_3:At(1):WriteInt(cloudTime)
-
-		if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Boss", 3)) then
-			DECORATOR.DECOR_SET_INT(self:GetHandle(), "Player_Boss", pid)
-		end
-
-		GPBD_FM_3:At(25):WriteInt(-1)
-		GPBD_FM_3:At(26):WriteInt(-1)
-		FM_SERVICES:At(boss_offset_1):ClearBit(15)
-		FM_SERVICES:At(boss_offset_2):At(227):WriteInt(-1)
-		FM_SERVICES:At(boss_offset_2):At(263):WriteInt(-1)
-
-		if (FM_SERVICES:At(boss_offset_2):GetPackedBit(7, 15)) then
-			FM_SERVICES:At(boss_offset_2):ClearPackedBit(7, 15)
-		end
-
-		GPBD_FM_3:At(4):ClearBit(30)
-		GPBD_FM_3:At(4):ClearBit(28)
-
-		if (FM_SERVICES:At(boss_offset_2):At(342):ReadInt() == 0) then
-			FM_SERVICES:At(boss_offset_2):At(342):WriteInt(1)
-		end
-
-		local textType = -1408096250
-		if (is_mc) then
-			STATS.PLAYSTATS_CHANGE_MC_ROLE(int0, int1, -1, -1, GPBD_FM_3:At(434):ReadInt(), 4, GPBD_FM_3:At(472):ReadInt()) -- p2 and p3 are supposed to be Global_1947782.f_2 and Global_1947782.f_3 respectively but I can't be bothered atm
-			textType = -1629413369
-		end
-
-		local business = is_mc and YRV3:GetClubhouse() or YRV3:GetOffice()
-		if (business) then
-			local businessName = business:GetCustomName()
-			GPBD_FM_3:At(106):WriteString(businessName, 64)
-			GPBD_FM_3:At(122):WriteInt(LOCALIZATION.LOCALIZATION_GET_SYSTEM_LANGUAGE())
-			-- STATS.PLAYSTATS_NAMED_USER_CONTENT_(true, bossType, int0, int1, textType, businessName, -81044133) -- this native is missing
-		end
+        scr_function.call_script_function("freemode", "GB_REGISTER", "2D 03 14 00 00 72", "void", {
+		    { "bool", true },
+		    { "int", bossType },
+		    { "int", 208508824 }
+		})
 	end)
 end
 
@@ -637,23 +571,9 @@ function LocalPlayer:Retire()
 	if not (Game.IsOnline() and self:IsBoss()) then return end
 
 	ThreadManager:Run(function()
-		local pid               = self:GetID()
-		local handle            = self:GetHandle()
-		local freemode_offset   = SGSL:Get(SGSL.data.freemode_boss_offset_1):GetValue()
-		local GPBD_FM_3 <const> = GGlobals.GPBD_FM_3:At(pid, 615):At(10)
-
-		GGlobals.FM_SERVICES:At(freemode_offset):ClearBit(17)
-		GPBD_FM_3:At(4):ClearBit(30)
-		if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Goon", 3) and DECORATOR.DECOR_EXIST_ON(handle, "Player_Goon")) then
-			DECORATOR.DECOR_REMOVE(handle, "Player_Goon")
-		end
-		if (DECORATOR.DECOR_IS_REGISTERED_AS_TYPE("Player_Boss", 3) and DECORATOR.DECOR_EXIST_ON(handle, "Player_Boss")) then
-			DECORATOR.DECOR_REMOVE(handle, "Player_Boss")
-		end
-
-		GPBD_FM_3:At(433):WriteInt(-1)
-		GPBD_FM_3:At(470):WriteInt(-1)
-		GPBD_FM_3:WriteInt(-1)
+        scr_function.call_script_function("freemode", "GB_RETIRE", "2D 01 03 00 00 38 00 56 ? ? 25 5B", "void", {
+		    { "bool", true }
+		})
 	end)
 end
 
