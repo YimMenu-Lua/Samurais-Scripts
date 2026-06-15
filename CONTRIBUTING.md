@@ -2,6 +2,31 @@
 
 Thank you for considering contributing to this project! It's people like you that make the open source community a great place to learn, inspire, and create.
 
+## Language Server
+
+A modified version of [YimLLS](https://github.com/YimMenu-Lua/YimLLS) can be found [here](https://github.com/xesdoog/YimLLSX). Fork the repo and point to its path in your workspace to have type hints for everything the project adds to the vanilla API.
+
+- Example `.code-workspace` or `settings.json` file:
+  
+  ```JSON
+  {
+  	"folders": [
+  		{
+  			"path": "."
+  		},
+  	],
+  	"settings": {
+      "Lua.workspace.checkThirdParty": false,
+      "Lua.workspace.library": [
+  			"MyDrive:\\Path\\To\\YimLLSX"
+      ],
+      "Lua.runtime.builtin": {
+  			"debug": "disable",
+  		},
+  	}
+  }
+  ```
+
 ## Commit Convention
 
 These are recommended, but not enforced yet. We follow slightly similar commit guidelines to [YimMenu](https://github.com/Mr-X-GTA/YimMenu/blob/master/CONTRIBUTING.md):
@@ -45,7 +70,7 @@ These are recommended, but not enforced yet. We follow slightly similar commit g
 
 ### Annotations
 
-Annotate all enums, classes, and class methods using [LuaLS](https://luals.github.io/wiki/annotations/)'s style.
+Annotate all enums, classes, and class methods following the [Lua Language Server](https://luals.github.io/wiki/annotations/) standard.
 
 Annotations are critical for readability, code completion, error checking, and automatic generation of class documentations.
 
@@ -110,7 +135,7 @@ You are free to use any style you want, except in these cases:
         SomeFunc(param1, param2, param3, param4, param5, param6, param7, param8, param9, ...)
         ```
 
-    - Preferred (Pythonic) style:
+    - Preferred *(Pythonic)* style:
 
         ```lua
         SomeFunc(
@@ -131,7 +156,7 @@ You are free to use any style you want, except in these cases:
 
   - Always try to use guarded if statements when applicable.
 
-    - Example:
+    - Bad Example:
 
         ```lua
         local cond_1 = false
@@ -256,7 +281,8 @@ The project is organized by responsibility rather than feature size. Folders def
 │  │                       # - If your UI requires more than one file, group them in a subfolder.
 │  │                       # - If you have one large file doing a multitude of things, split it into multiple files and group them in a subfolder.
 │  │
-│  ├─ lib/               # Contains project libraries and commands: API extensions, ImGui extensions, Lua standard library extensions, global utilities, etc.
+│  ├─ lib/               # Serves as the project's library folder.
+│  │  ├─ extensions/     # API and standard library extensions.
 │  │  └─ translations/   # This is where translation files, supported locales, and the translations hash map are stored.
 │  │
 │  ├─ modules/           # Contains custom modules such as native wrappers, game entity abstractions, YimMenu API wrappers, and higher-level gameplay utilities.
