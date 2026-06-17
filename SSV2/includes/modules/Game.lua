@@ -112,43 +112,42 @@ function Game.IsOnline()
 	return network.is_session_started() and not Game.IsInNetworkTransition()
 end
 
----@param handle integer
+---@param value any
 ---@return boolean
-function Game.IsScriptHandle(handle)
-	if not handle or type(handle) ~= "number" then
+function Game.IsScriptHandle(value)
+	if (type(value) ~= "number") then
 		return false
 	end
 
-	return ENTITY.DOES_ENTITY_EXIST(handle)
+	return ENTITY.DOES_ENTITY_EXIST(value)
 end
 
----@param value integer | string
----@return boolean
+-- Checks if `value` is a model hash.
+---@param value any
+---@return boolean, joaat_t
 function Game.IsModelHash(value)
-	if type(value) == "string" then
-		value = _J(value)
+	local v_type = type(value)
+	if (v_type ~= "string" and v_type ~= "number") then
+		return false, 0
 	end
 
-	return type(value) == "number" and value >= 0xFFFF and STREAMING.IS_MODEL_VALID(value)
+	if (v_type == "string") then value = _J(value) end
+	return STREAMING.IS_MODEL_VALID(value), value
 end
 
----@param input any
----@return integer
-function Game.EnsureModelHash(input)
-	if not input then
-		return 0
-	end
+-- Tries to return a joaat hash from  either a string model name, an int model hash, or an entity script handle.
+--
+-- If none match, it gracefully returns 0 without throwing.
+---@param value any
+---@return joaat_t
+function Game.EnsureModelHash(value)
+	if (not value) then return 0 end
 
-	if Game.IsModelHash(input) then
-		if type(input) == "string" then
-			return _J(input)
-		else
-			return input
-		end
-	end
+	local isModelHash, hash = Game.IsModelHash(value)
+	if (isModelHash) then return hash end
 
-	if Game.IsScriptHandle(input) then
-		return Game.GetEntityModel(input)
+	if (Game.IsScriptHandle(value)) then
+		return Game.GetEntityModel(value)
 	end
 
 	return 0
@@ -810,7 +809,7 @@ function Game.SyncNetworkID(netID)
 		return false
 	end
 
-	local timer = Timer.new(250)
+	local timer = Timer(250)
 	NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
 	while not NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) and not timer:IsDone() do
 		NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
@@ -828,7 +827,7 @@ function Game.DesyncNetworkID(netID)
 		return
 	end
 
-	local timer = Timer.new(250)
+	local timer = Timer(250)
 	NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
 	while not NETWORK.NETWORK_HAS_CONTROL_OF_NETWORK_ID(netID) and timer:IsDone() do
 		NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(netID)
@@ -1182,9 +1181,7 @@ function Game.SetWaypointCoords(target)
 			end
 		end
 
-		if (not x or not y) then
-			return
-		end
+		if not (x and y) then return end
 
 		HUD.DELETE_WAYPOINTS_FROM_THIS_PLAYER()
 		HUD.SET_NEW_WAYPOINT(x, y)
@@ -1511,9 +1508,7 @@ function Game.TakeControlOfScript(scriptName, timeout)
 		return false
 	end
 
-	timeout     = timeout or 1e4
-	local timer = Timer.new(timeout)
-
+	local timer = Timer(timeout or 1e4)
 	Notifier:ShowMessage("Samurai's Scripts", _F("%s '%s'...", _T("GENERIC_SCRIPT_CONTROL"), scriptName))
 	while (not LocalPlayer:IsHostOfScript(scriptName)) do
 		if (timer:IsDone()) then

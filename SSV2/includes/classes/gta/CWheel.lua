@@ -8,7 +8,7 @@
 
 
 local CStructView = require("includes.classes.gta.CStructView")
-local fVector3    = require("fVector3")
+local fVector3    = require("includes.classes.gta.fVector3")
 
 
 --------------------------------------

@@ -13,7 +13,7 @@ local Range = require("includes.classes.Range")
 
 do
 	---@class nullptr : pointer
-	local nullptr <const>     = {}
+	local nullptr <const>     = { __type = "nullptr" }
 	local NOP <const>         = function() end -- there's also a global no-op function but it gets defined after we load this file.
 	local RET_ZERO <const>    = function() return 0 end
 	local RET_STR <const>     = function() return "" end

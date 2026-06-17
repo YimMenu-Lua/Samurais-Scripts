@@ -60,10 +60,8 @@ local function SafeGetVersion()
 			o = ptr:add(0x47):add(0x3):rip()
 		end
 
-		GPointers.GameVersion = {
-			build  = b:get_string(),
-			online = o:get_string()
-		}
+		GPointers.GameVersion.build  = b:get_string()
+		GPointers.GameVersion.online = o:get_string()
 	end
 
 	return GPointers.GameVersion

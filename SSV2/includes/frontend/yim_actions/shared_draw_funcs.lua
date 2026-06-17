@@ -83,7 +83,7 @@ local function DrawHistory()
 	local actionHistory = YimActions.LastPlayed
 	local count         = actionHistory:GetCount()
 	if (count == 0) then
-		ImGui.TextWrapped("Animations, scenarios, and scenes you play will appear here.")
+		ImGui.TextWrapped(_T("YAV3_ANIM_HISTORY_TT"))
 		return
 	end
 
@@ -94,7 +94,12 @@ local function DrawHistory()
 	ImGui.Separator()
 
 	if (count > 1) then
-		local sort_mode, clicked = ImGui.Combo(_T("GENERIC_LIST_SORT"), actionHistory:GetSortMode(), "Time\0Type\0Label\0")
+		local sort_mode, clicked = ImGui.Combo(
+			_T("GENERIC_LIST_SORT"),
+			actionHistory:GetSortMode(),
+			{ _T("GENERIC_TIME"), _T("GENERIC_TYPE"), _T("GENERIC_LABEL"), },
+			3
+		)
 		if (clicked) then actionHistory:Sort(sort_mode) end
 	end
 

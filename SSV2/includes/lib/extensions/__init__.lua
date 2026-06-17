@@ -15,29 +15,34 @@ local Chrono <const>         = require("includes.modules.Chrono")
 Bit                          = require("includes.modules.Bit") -- exposed globally sicne it's used all over the project.
 
 for _, path in ipairs({
-	"std_string",
-	"std_math",
-	"std_table",
-	"std_io",
+	"includes.lib.extensions.std_string",
+	"includes.lib.extensions.std_math",
+	"includes.lib.extensions.std_table",
+	"includes.lib.extensions.std_io",
 
-	"api_stats",
-	"api_pointer",
+	"includes.lib.extensions.api_stats",
+	"includes.lib.extensions.api_pointer",
 
 	-- api_imgui must be required in the GUI class.
 }) do require(path) end
 
 
-Time      = Chrono.Time
-Timer     = Chrono.Timer
-TimePoint = Chrono.TimePoint
-DateTime  = Chrono.DateTime
-_F        = string.format
+Time               = Chrono.Time
+Timer              = Chrono.Timer
+TimePoint          = Chrono.TimePoint
+DateTime           = Chrono.DateTime
+_F                 = string.format
 
 ---@diagnostic disable: lowercase-global
-yield     = coroutine.yield
-sleep     = Time.Sleep
+yield              = coroutine.yield
+sleep              = Time.Sleep
 ---@diagnostic enable: lowercase-global
 
+local type         = type
+local rawget       = rawget
+local getmetatable = getmetatable
+local math_type    = math.type
+local tostring     = tostring
 
 -- Macro for the `Translator:Translate` method.
 ---@param label string
@@ -73,6 +78,81 @@ end; _J = _G.joaat or Joaat
 -- A dummy function (no-operation).
 function NOP() end
 
+-- Checks if the provided runtime argument matches its expected type. Only single types are supported at the moment.
+---@param arg any The argument to check.
+---@param argName string The name of the argument.
+---@param expected string|Obj|unknown The expected type. Can be a string type as used with the `type` function or a reference to an object/class.
+---@param onErrorCallback? fun(msg: string) Optional function to handle the error message in case of mismatch. Defaults to `error`.
+---@return boolean success, string message
+function AssertArg(arg, argName, expected, onErrorCallback)
+	if (not IsInstance(arg, expected)) then
+		local expectedType = type(expected)
+		local argType      = type(arg)
+		if ((expected == "float" or expected == "integer") and argType == "number") then
+			---@diagnostic disable-next-line
+			argType = math_type(arg) -- 'got integer' or 'got float' instead makes more sense than 'got number'
+		end
+
+		local expectedName = expectedType == "string" and expected or expected.__type or expectedType
+		if (argType == "table") then
+			argType = arg.__type or "table"
+		end
+
+		local err      = _F("Invalid argument '%s'! Expected '%s', got '%s' instead.", argName, expectedName, argType)
+		local callback = onErrorCallback or error
+		callback(err)
+		return false, err
+	end
+
+	return true, ""
+end
+
+-- We do have an `ArgDescriptor` struct and an `ArgParser` module that are not included in the project because
+--
+-- it's getting unnecessarily bloated for no significant benefit. This simple annotation does the job fine.
+---@class BasicArgDescriptor
+---@field [1] any argument
+---@field [2] string|Obj|unknown expected type
+---@field [3] string? argument name
+
+-- Checks if the provided runtime arguments match their expected types. Exits on first mismatch.
+--
+-- Both Lua's default type names as well as references to our own custom classes/objects are supported as expected types.
+--
+-- Example Usage:
+--```Lua
+-- local success = AssertArgs({
+-- 	{ iParam0,      "number",  "iParam0" },
+-- 	{ bParam1,      "boolean" }, -- here the param's position will be used as the arg's name; ie: "2".
+-- 	{ targetPlayer, Player,    "targetPlayer" },
+-- 	{ pData,        "pointer", "pData" },
+-- }, { msg_handler = log.warning }) -- On failure, a warning log will be used instead of throwing an error.
+--```
+---@param descriptors array<BasicArgDescriptor> An array of tables where each table has the arg as the first key, the expected type as the second, and optionally the arg's name as the third.
+---@param opts? { msg_handler: fun(msg: string), test_run: boolean}
+---@return boolean success
+function AssertArgs(descriptors, opts)
+	opts           = opts or {}
+	local test_run = opts.test_run or false
+	local msgh     = test_run and log.warning or opts.msg_handler
+	local fdebug   = log.fdebug
+
+	for i, v in ipairs(descriptors) do
+		local arg      = v[1]
+		local expected = v[2]
+		local name     = v[3] or tostring(i)
+		if (not AssertArg(arg, name, expected, msgh)) then
+			if (not test_run) then
+				return false
+			end
+		elseif (test_run) then
+			fdebug("%s: pass", name)
+		end
+	end
+
+	return true
+end
+
 -------
 
 local ISINSTANCE_STD_TYPES <const>  = {
@@ -87,6 +167,7 @@ local ISINSTANCE_MATH_TYPES <const> = {
 	["integer"] = true,
 	["float"]   = true
 }
+
 -- Returns whether `obj` is an instance of `T`. Can be used instead of Lua's default `type` function.
 --
 -- **Usage Example**:
@@ -116,10 +197,18 @@ function IsInstance(obj, T)
 		return T == "nil"
 	end
 
+	if (obj == T) then
+		return true
+	end
+
 	local obj_type <const> = type(obj)
 	local T_type <const>   = type(T)
 	local obj_mt           = getmetatable(obj)
 	local T_mt             = getmetatable(T)
+
+	if (obj_mt == T) then
+		return true
+	end
 
 	if (T_type == "string" and T == "pointer" and obj_type == "userdata") then
 		return (obj_mt and type(obj_mt.rip) == "function" or false)
@@ -141,23 +230,28 @@ function IsInstance(obj, T)
 				return true
 			end
 
-			while obj_mt do
+			if (not obj_mt) then
+				return false
+			end
+
+			-- this fucker is heavy. it takes a full millisecond to test LocalPlayer against Entity (3 base classes up)
+			-- TODO: refactor the `Class` function to cache the inheritance chain in each new class using a set or a basic table<T, true>
+			local cls = rawget(obj_mt, "__index")
+			if (cls) then obj_mt = cls end
+
+			while (obj_mt) do
 				if (obj_mt == T) then
 					return true
 				end
 				obj_mt = rawget(obj_mt, "__base")
 			end
 			return false
-		else
-			if (obj_mt or T_mt) then
-				return obj_mt == T_mt
-			end
 		end
 	end
 
 	if (T_type == "string") then
 		if ((obj_type) == "number" and ISINSTANCE_MATH_TYPES[T]) then
-			return math.type(obj) == T
+			return math_type(obj) == T
 		end
 
 		if (ISINSTANCE_STD_TYPES[T]) then

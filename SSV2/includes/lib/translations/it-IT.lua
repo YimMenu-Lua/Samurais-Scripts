@@ -861,7 +861,7 @@ return {
 	["YAV3_VEH_ANIM_HINT"] = "Le animazioni incentrate sui veicoli non possono essere riprodotte a piedi; anche per i compagni.",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Nessun tecnico è assegnato a questo hub.",
 	["VEH_STANCE_TOE"] = "Punta",
-	["YRV3_AUTO_SELL_COUNTDOWN"] = "La \"vendita automatica\" inizierà tra 20 secondi. Puoi annullarlo disabilitando l'interruttore prima che scada il timer.",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "La \"vendita automatica\" inizierà tra 20 secondi. Puoi annullarlo prima che scada il timer disabilitando la funzione o facendo clic su questa notifica.",
 	["YRV3_AUTO_SELL_CANCELED_MSG"] = "La \"vendita automatica\" è stata annullata.",
 	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Carico da discoteca",
 	["YRV3_HUB_TRANSFER_TECH"] = "[! ] Tecnico Trasferimenti",
@@ -979,5 +979,11 @@ return {
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Si prega di premere la frizione o mettere la marcia in folle prima di avviare il motore.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Assistenza alla frizione",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Solo modalità manuale: disabilita il comportamento di stallo del motore.",
-	["VEH_GEARBOX_AUTO"] = "Automatico"
+	["VEH_GEARBOX_AUTO"] = "Automatico",
+	["GENERIC_LABEL"] = "Etichetta",
+	["YAV3_ANIM_HISTORY_TT"] = "Le animazioni, gli scenari e le scene riprodotte appariranno qui.",
+	["BSV2_ES_DRIVE_PROPERTY_TEXT"] = "Fare clic su una proprietà per raggiungerla.",
+	["BSV2_ES_DRIVE_PROPERTY"] = "Proprietà di proprietà",
+	["GENERIC_RETRY"] = "Riprova",
+	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"] = "Le funzionalità non sicure sono sempre abilitate quando si utilizza FSL."
 }

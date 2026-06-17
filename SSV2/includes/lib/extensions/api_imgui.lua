@@ -991,7 +991,7 @@ end
 --
 -- It's strongly recommended to use `ImGuiChildFlags` in YimMenu even though they don't exist
 --
--- in the API *(we define them ourselves, see the top of this file)*.
+-- in the API *(we define them ourselves, see [ImGuiChildFlags](lua://ImGuiChildFlags))*.
 ---@param name string
 ---@param size vec2
 ---@param childFlags? integer

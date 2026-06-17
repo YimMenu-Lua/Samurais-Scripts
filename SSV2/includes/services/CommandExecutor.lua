@@ -10,9 +10,18 @@
 local ThemeManager = require("includes.services.ThemeManager")
 
 ---@class CommandMeta
----@field args? string[]
+---@field args? array<string>
 ---@field description? string
----@field alias? string[]
+---@field alias? array<string>
+---@field isTranslatorLabel? boolean
+
+-- Runtime command object *(not the `CommandDef` raw definition)*
+---@class Command
+---@field callback fun(...)
+---@field description string
+---@field args array<string>
+---@field alias? array<string>
+---@field is_alias? boolean
 ---@field isTranslatorLabel? boolean
 
 ---@class CommandsWindow
@@ -34,8 +43,8 @@ local ThemeManager = require("includes.services.ThemeManager")
 ---@field private m_user_cmd string
 ---@field private m_hint_text string
 ---@field private m_history array<string>
----@field private m_suggestions array<{name: string, def: string}>
----@field private m_commands table<string, { callback: fun(...), args: string[], description: string, alias?: string[], is_alias?: boolean, isTranslatorLabel?: boolean }>
+---@field private m_suggestions array<{ name: string, def: string }>
+---@field private m_commands dict<Command>
 ---@field private m_sorted_command_names array<string>
 ---@field private m_screen_size vec2
 ---@field private m_window CommandsWindow
@@ -72,25 +81,22 @@ function CommandExecutor:init()
 
 	self.m_commands = self:GetDefaultCommands()
 	for name, data in pairs(self.m_commands) do
-		if data.alias then
+		if (data.alias) then
 			for _, a in ipairs(data.alias) do
 				self:RegisterAlias(a, name)
 			end
 		end
 	end
 
-	ThreadManager:RegisterLooped("SS_COMMANDS", function()
-		self:HandleCallbacks()
-	end)
+	ThreadManager:RegisterLooped("SS_COMMANDS", function() self:OnTick() end)
+	GUI:RegisterIndependentGUI(function() self:Draw() end)
 
-	GUI:RegisterIndependentGUI(function()
-		self:Draw()
-	end)
-
+	KeyManager:AssertKeybind(true, "commands_console.key", "F4")
 	KeyManager:RegisterKeybind(GVars.commands_console.key, function()
-		self.m_window.should_draw = not self.m_window.should_draw
-		gui.override_mouse(self.m_window.should_draw)
-		Backend.disable_input = self.m_window.should_draw
+		local v                   = not self.m_window.should_draw
+		self.m_window.should_draw = v
+		Backend.disable_input     = v
+		gui.override_mouse(v)
 	end)
 
 	-- hardcoded.
@@ -228,7 +234,7 @@ function CommandExecutor:ParseCommand(input)
 	return cmd and cmd:lower() or "", args
 end
 
-function CommandExecutor:HandleCallbacks()
+function CommandExecutor:OnTick()
 	if (not self.m_window.should_draw) then
 		sleep(500)
 		return
@@ -242,10 +248,7 @@ function CommandExecutor:HandleCallbacks()
 		local callback  = command and command.callback or nil
 
 		if (type(callback) == "function") then
-			ThreadManager:Run(function()
-				callback(args)
-			end)
-
+			ThreadManager:Run(function() callback(args) end)
 			table.insert(self.m_history, self.m_user_cmd)
 			if (GVars.commands_console.auto_close and not self:IsBuiltinCommand(cmd)) then
 				self:Close()

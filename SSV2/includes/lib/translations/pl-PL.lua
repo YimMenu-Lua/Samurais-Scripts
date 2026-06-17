@@ -862,7 +862,7 @@ return {
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Do tego koncentratora nie jest przypisany żaden technik.",
 	["VEH_STANCE_TOE"] = "Palec u nogi",
 	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Ładunek z klubu nocnego",
-	["YRV3_AUTO_SELL_COUNTDOWN"] = "„Automatyczna sprzedaż” rozpocznie się za 20 sekund. Możesz to anulować, wyłączając przełącznik przed zakończeniem timera.",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "„Automatyczna sprzedaż” rozpocznie się za 20 sekund. Możesz ją anulować przed zakończeniem odliczania, wyłączając tę ​​funkcję lub klikając to powiadomienie.",
 	["YRV3_AUTO_SELL_CANCELED_MSG"] = "„Sprzedaż automatyczna” została anulowana.",
 	["YRV3_HUB_REMOVE_TECH_FAIL_FMT"] = "Nie udało się usunąć technika z %s!",
 	["YRV3_HUB_TRANSFER_TECH_FAIL_FMT"] = "Nie udało się przenieść technika z %s do %s!",
@@ -979,5 +979,11 @@ return {
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Przed uruchomieniem silnika naciśnij sprzęgło lub ustaw bieg na luzie.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Asystent sprzęgła",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Tylko tryb ręczny: wyłącza zachowanie zgaśnięcia silnika.",
-	["VEH_GEARBOX_AUTO"] = "Automatyczny"
+	["VEH_GEARBOX_AUTO"] = "Automatyczny",
+	["GENERIC_LABEL"] = "Etykieta",
+	["YAV3_ANIM_HISTORY_TT"] = "Tutaj pojawią się animacje, scenariusze i sceny, w które grasz.",
+	["BSV2_ES_DRIVE_PROPERTY"] = "Posiadane nieruchomości",
+	["BSV2_ES_DRIVE_PROPERTY_TEXT"] = "Kliknij nieruchomość, aby do niej udać się.",
+	["GENERIC_RETRY"] = "Spróbować ponownie",
+	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"] = "Niebezpieczne funkcje są zawsze włączone podczas korzystania z FSL."
 }

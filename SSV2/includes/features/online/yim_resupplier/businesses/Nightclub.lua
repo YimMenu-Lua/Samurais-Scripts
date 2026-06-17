@@ -7,12 +7,21 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BusinessFront   = require("BusinessFront")
-local BusinessHub     = require("BusinessHub")
-local RawBusinessData = require("includes.data.yrv3_data")
+local BusinessFront         = require("BusinessFront")
+local BusinessHub           = require("BusinessHub")
+local RawBusinessData       = require("includes.data.yrv3_data")
+local InteriorIDs           = require("includes.data.refs").InteriorIDs
+local NightclubNames        = RawBusinessData.NightclubNames
+local NAMES_MAX <const>     = #NightclubNames - 1
+local ClubID2BitPos <const> = { [8] = 0 } ---@type array<integer>
+for i = 0, 7, 1 do
+	ClubID2BitPos[i] = i + 24
+end
+
 
 ---@class ClubOpts : BusinessFrontOpts
 ---@field custom_name string
+
 
 -- Class representing the Nightclub business.
 ---@class Nightclub : BusinessFront
@@ -22,16 +31,15 @@ local RawBusinessData = require("includes.data.yrv3_data")
 ---@field private m_safe CashSafe
 ---@field private m_subs BusinessHub[]
 ---@field public GetSubBusinesses fun(self: Nightclub): BusinessHub[]
-local Nightclub       = setmetatable({}, BusinessFront)
-Nightclub.__index     = Nightclub
+local Nightclub   = setmetatable({}, BusinessFront)
+Nightclub.__index = Nightclub
 
 ---@param opts ClubOpts
 ---@return Nightclub
 function Nightclub.new(opts)
 	local base             = BusinessFront.new(opts)
 	local instance         = setmetatable(base, Nightclub) ---@cast instance Nightclub
-	instance.m_custom_name = opts.custom_name or "Nightclub"
-
+	instance.m_custom_name = opts.custom_name or NightclubNames[stats.get_int("MPX_PROP_NIGHTCLUB_NAME_ID") + 1] or "Nightclub" -- I don't know why YRV3 is in charge of assigning custom_name. am-I retarded?
 	return instance
 end
 
@@ -153,6 +161,35 @@ function Nightclub:TransferTechnician(src, dest)
 
 	local msg = destIdxValid and "YRV3_HUB_SWAP_TECH_SUCCESS_FMT" or "YRV3_HUB_TRANSFER_TECH_SUCCESS_FMT"
 	Notifier:ShowSuccess(clubName, _T(msg, srcName, destName))
+end
+
+---@param nameID integer -- zero-based index
+function Nightclub:Rename(nameID)
+	if (nameID == stats.get_int("MPX_PROP_NIGHTCLUB_NAME_ID")) then
+		return
+	end
+
+	if (not math.is_inrange(nameID, 0, NAMES_MAX)) then
+		log.fwarning("[%s]: Rename failed with wrong name ID! Expected integer between 0 and %d, got %s instead.", self:GetCustomName(), NAMES_MAX, nameID)
+		return
+	end
+
+	ThreadManager:Run(function()
+		local newBit   = ClubID2BitPos[nameID]
+		local bitfield = self:GetBaseGlobal():At(364):At(1)
+		bitfield:ClearBit(0)
+		for i = 24, 31 do
+			bitfield:ClearBit(i)
+		end
+		bitfield:SetBit(newBit)
+		stats.set_int("MPX_PROP_NIGHTCLUB_NAME_ID", nameID)
+		self.m_custom_name = NightclubNames[nameID + 1]
+
+		local interiorID = InteriorIDs.INTERIOR_ID_NIGHTCLUB
+		if (LocalPlayer:GetInteriorID() == interiorID) then --[[likely redundant]]
+			INTERIOR.REFRESH_INTERIOR(interiorID)
+		end
+	end)
 end
 
 return Nightclub.new

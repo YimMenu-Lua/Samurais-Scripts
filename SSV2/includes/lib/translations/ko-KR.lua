@@ -863,7 +863,7 @@ return {
 	["VEH_STANCE_TOE"] = "발가락",
 	["YRV3_AUTO_SELL_CANCELED_MSG"] = "'자동판매'가 취소되었습니다.",
 	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "나이트클럽 화물",
-	["YRV3_AUTO_SELL_COUNTDOWN"] = "20초 후에 '자동 판매'가 시작됩니다. 타이머가 끝나기 전에 토글을 비활성화하여 취소할 수 있습니다.",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "20초 후에 '자동 판매'가 시작됩니다. 기능을 비활성화하거나 이 알림을 클릭하여 타이머가 끝나기 전에 취소할 수 있습니다.",
 	["YRV3_HUB_TRANSFER_TECH_FAIL_FMT"] = "기술자를 %s에서 %s(으)로 전송하지 못했습니다!",
 	["YRV3_HUB_REMOVE_TECH_FAIL_FMT"] = "%s에서 기술자를 제거하지 못했습니다!",
 	["YRV3_HUB_SWAP_TECH_WARN_FMT"] = "소스 허브에 기술자를 다시 할당하지 못했기 때문에 할당되지 않은 기술자 한 명이 남았습니다.",
@@ -979,5 +979,11 @@ return {
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "엔진을 시동하기 전에 클러치를 누르거나 기어를 중립에 두십시오.",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "수동 모드 전용: 엔진 정지 동작을 비활성화합니다.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "클러치 어시스트",
-	["VEH_GEARBOX_AUTO"] = "오토매틱"
+	["VEH_GEARBOX_AUTO"] = "오토매틱",
+	["GENERIC_LABEL"] = "상표",
+	["YAV3_ANIM_HISTORY_TT"] = "재생하는 애니메이션, 시나리오, 장면이 여기에 표시됩니다.",
+	["BSV2_ES_DRIVE_PROPERTY"] = "소유 부동산",
+	["BSV2_ES_DRIVE_PROPERTY_TEXT"] = "해당 부동산을 클릭하면 해당 부동산으로 이동합니다.",
+	["GENERIC_RETRY"] = "다시 해 보다",
+	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"] = "FSL을 사용하면 안전하지 않은 기능이 항상 활성화됩니다."
 }

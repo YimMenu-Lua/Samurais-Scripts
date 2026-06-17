@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local MAX_ITEMS <const>         = 20
 local MPStatController          = require("includes.features.online.MPStatController")
 local drawKeyValue              = require("includes.frontend.helpers.draw_kv")
 local BitTest                   = Bit.IsBitSet
@@ -303,12 +304,18 @@ local function drawNewStatPopup()
 end
 
 local function drawStatCards()
-	ImGui.SetNextWindowBgAlpha(0)
-	ImGui.BeginChildEx("##statsScroll", vec2:new(0, GVars.ui.window_size.y * 0.666))
 	local statList   = MPStatController:GetStats()
 	local orderArray = MPStatController:GetStatsOrder()
+	local processed  = 0
+
+	ImGui.SetNextWindowBgAlpha(0)
+	ImGui.BeginChildEx("##statsScroll", vec2:new(0, GVars.ui.window_size.y * 0.63))
 	for i, name in pairs(orderArray) do
 		if (not name:lower():find(statSearchBuff)) then
+			goto continue
+		end
+
+		if (processed > MAX_ITEMS) then
 			goto continue
 		end
 
@@ -321,9 +328,17 @@ local function drawStatCards()
 
 		drawStatObject(mpStat)
 		ImGui.PopID()
+		processed = processed + 1
+
 		::continue::
 	end
 	ImGui.EndChild()
+
+	local size = #orderArray
+	if (size > MAX_ITEMS) then
+		ImGui.TextColored(0.941, 0.745, 0.007, 1, "[ ! ]")
+		GUI:Tooltip(_T("ASSET_BROWSER_TRUNC_TT", MAX_ITEMS))
+	end
 end
 
 GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "SUBTAB_MPSTAT_CONTROLLER", function()

@@ -100,7 +100,7 @@ local MPStatController <const> = {
 function MPStatController:init()
 	if (self.m_initialized) then return self end
 
-	self.m_last_tick = TimePoint.new()
+	self.m_last_tick = TimePoint()
 	local fname      = self.m_filename
 	if (not io.exists(fname)) then
 		Serializer:WriteToFile(fname, PStats)

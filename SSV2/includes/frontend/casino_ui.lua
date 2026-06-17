@@ -10,8 +10,59 @@
 local CasinoPacino = require("includes.features.online.CasinoPacino")
 local SGSL         = require("includes.services.SGSL")
 local casino_pos   = vec3:new(924.6380, 46.6918, 81.1063)
+local heist_guns   = {
+	{ --Karl Abolaji
+		{ '##1", "##2' },
+		{ "Micro SMG Loadout", "Machine Pistol Loadout" },
+		{ "Micro SMG Loadout", "Shotgun Loadout" },
+		{ "Shotgun Loadout",   "Revolver Loadout" }
+	},
+	{ --Gustavo Fring
+		{ '##1", "##2' },
+		{ "Rifle Loadout", "Shotgun Loadout" },
+		{ "Rifle Loadout", "Shotgun Loadout" },
+		{ "Rifle Loadout", "Shotgun Loadout" },
+	},
+	{ --Charlie Reed
+		{ '##1", "##2' },
+		{ "SMG Loadout",            "Shotgun Loadout" },
+		{ "Machine Pistol Loadout", "Shotgun Loadout" },
+		{ "SMG Loadout",            "Shotgun Loadout" }
+	},
+	{ --Chester McCoy
+		{ '##1", "##2' },
+		{ "MK II Shotgun Loadout", "MK II Rifle Loadout" },
+		{ "MK II SMG Loadout",     "MK II Rifle Loadout" },
+		{ "MK II Shotgun Loadout", "MK II Rifle Loadout" }
+	},
+	{ --Laddie Paddie Sadie Enweird
+		{ '##1", "##2' },
+		{ "Combat PDW Loadout", "Rifle Loadout" },
+		{ "Shotgun Loadout",    "Rifle Loadout" },
+		{ "Shotgun Loadout",    "Combat MG Loadout" }
+	}
+}
+local heist_cars   = {
+	{ --Karim Deniz
+		"Issi Classic", "Asbo", "Kanjo", "Sentinel Classic"
+	},
+	{ --Taliana Martinez
+		"Retinue MK II", "Drift Yosemite", "Sugoi", "Jugular"
+	},
+	{ --Eddie Toh
+		"Sultan Classic", "Guantlet Classic", "Ellie", "Komoda"
+	},
+	{ --Zach Nelson
+		"Manchez", "Stryder", "Defiler", "Lectro"
+	},
+	{ --Chester McCoy
+		"Zhaba", "Vagrant", "Outlaw", "Everon"
+	},
+}
 
 local function drawGamblingTab()
+	local cfg = GVars.features.dunk
+
 	if (GUI:Button(_T("CP_TP_CASINO"))) then
 		LocalPlayer:Teleport(casino_pos)
 	end
@@ -23,79 +74,60 @@ local function drawGamblingTab()
 	end
 
 	GUI:HeaderText(_T("CP_COOLDOWN_BYPASS"), { separator = true, spacing = true })
-	GVars.features.dunk.bypass_casino_bans, _ = GUI:CustomToggle(_T("CP_COOLDOWN_BYPASS_ENABLE"),
-		GVars.features.dunk.bypass_casino_bans, {
-			tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"),
-			color   = Color.RED
-		})
+	cfg.bypass_casino_bans = GUI:CustomToggle(_T("CP_COOLDOWN_BYPASS_ENABLE"), cfg.bypass_casino_bans, {
+		tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"),
+		color   = Color.RED
+	})
 
 	ImGui.BulletText(_T("CP_COOLDOWN_BYPASS_STATUS"))
 	ImGui.SameLine()
 	ImGui.Text(CasinoPacino:GetCooldownString())
 
 	GUI:HeaderText(_T("CP_POKER_SETTINGS"), { separator = true, spacing = true })
-	GVars.features.dunk.force_poker_cards, _ = GUI:CustomToggle(_T("CP_POKER_FORCE_ROYAL_FLUSH"),
-		GVars.features.dunk.force_poker_cards
-	)
 
-	GVars.features.dunk.set_dealers_poker_cards, _ = GUI:CustomToggle(_T("CP_POKER_FORCE_BAD_BEAT"),
-		GVars.features.dunk.set_dealers_poker_cards
-	)
+	cfg.force_poker_cards = GUI:CustomToggle(_T("CP_POKER_FORCE_ROYAL_FLUSH"), cfg.force_poker_cards)
+
+	cfg.set_dealers_poker_cards = GUI:CustomToggle(_T("CP_POKER_FORCE_BAD_BEAT"), cfg.set_dealers_poker_cards)
 
 	GUI:HeaderText(_T("CP_BLACKJACK_SETTINGS"), { separator = true, spacing = true })
 	ImGui.BulletText(_T("CP_BLACKJACK_DEALER_FACE_DOWN_CARD"))
+
 	ImGui.SameLine()
 	ImGui.Text(CasinoPacino:GetBJDealerCard())
-	if GUI:Button(_T("CP_BLACKJACK_FORCE_DEALER_BUST")) then
+
+	if (GUI:Button(_T("CP_BLACKJACK_FORCE_DEALER_BUST"))) then
 		CasinoPacino:ForceDealerBust()
 	end
 
 	GUI:HeaderText(_T("CP_ROULETTE_SETTINGS"), { separator = true, spacing = true })
-	GVars.features.dunk.force_roulette_wheel, _ = GUI:CustomToggle(_T("CP_ROULETTE_FORCE_RED_18"),
-		GVars.features.dunk.force_roulette_wheel
-	)
+
+	cfg.force_roulette_wheel = GUI:CustomToggle(_T("CP_ROULETTE_FORCE_RED_18"), cfg.force_roulette_wheel)
 
 	GUI:HeaderText(_T("CP_SLOT_MACHINES_SETTINGS"), { separator = true, spacing = true })
-	GVars.features.dunk.rig_slot_machine, _ = GUI:CustomToggle(_T("CP_SLOT_MACHINES_RIG"),
-		GVars.features.dunk.rig_slot_machine
-	)
 
-	GVars.features.dunk.autoplay_slots, _ = GUI:CustomToggle(_T("CP_SLOT_MACHINES_AUTOPLAY"),
-		GVars.features.dunk.autoplay_slots
-	)
+	cfg.rig_slot_machine = GUI:CustomToggle(_T("CP_SLOT_MACHINES_RIG"), cfg.rig_slot_machine)
 
-	if (GVars.features.dunk.autoplay_slots) then
-		GVars.features.dunk.cap_slot_machine_chips, _ = GUI:CustomToggle(_T("CP_SLOT_MACHINES_CAP_CHIPS"),
-			GVars.features.dunk.cap_slot_machine_chips
-		)
+	cfg.autoplay_slots = GUI:CustomToggle(_T("CP_SLOT_MACHINES_AUTOPLAY"), cfg.autoplay_slots)
 
-		if (GVars.features.dunk.cap_slot_machine_chips) then
+	if (cfg.autoplay_slots) then
+		cfg.cap_slot_machine_chips = GUI:CustomToggle(_T("CP_SLOT_MACHINES_CAP_CHIPS"), cfg.cap_slot_machine_chips)
+
+		if (cfg.cap_slot_machine_chips) then
 			ImGui.SameLine()
 			ImGui.PushItemWidth(200)
-			GVars.features.dunk.slot_machine_cap, _ = ImGui.SliderInt("##chips_cap",
-				GVars.features.dunk.slot_machine_cap,
-				1e3,
-				1e5
-			)
+			cfg.slot_machine_cap = ImGui.SliderInt("##chips_cap", cfg.slot_machine_cap, 1e3, 1e5)
 			ImGui.PopItemWidth()
 		end
 
 		ImGui.Text(_T("CP_AUTOPLAY_SLOTS_TIME_DELAY"))
 		ImGui.SameLine()
-		if (not GVars.features.dunk.autoplay_slots_delay_random) then
+		if (not cfg.autoplay_slots_delay_random) then
 			ImGui.PushItemWidth(200)
-			GVars.features.dunk.autoplay_slots_delay, _ = ImGui.SliderInt("##delay_time",
-				GVars.features.dunk.autoplay_slots_delay,
-				500,
-				1e4,
-				"%d ms"
-			)
+			cfg.autoplay_slots_delay = ImGui.SliderInt("##delay_time", cfg.autoplay_slots_delay, 500, 1e4, "%d ms")
 			ImGui.SameLine()
 		end
 
-		GVars.features.dunk.autoplay_slots_delay_random, _ = GUI:CustomToggle(_T("GENERIC_RANDOM"),
-			GVars.features.dunk.autoplay_slots_delay_random
-		)
+		cfg.autoplay_slots_delay_random = GUI:CustomToggle(_T("GENERIC_RANDOM"), cfg.autoplay_slots_delay_random)
 	end
 
 	GUI:HeaderText(_T("CP_LUCKY_WHEEL_SETTINGS"), { separator = true, spacing = true })
@@ -219,44 +251,10 @@ local function drawHeistTab()
 	end
 
 	if (new_gunman > 0) then
-		local gunList = {
-			[1] = { --Karl Abolaji
-				{ '##1", "##2' },
-				{ "Micro SMG Loadout", "Machine Pistol Loadout" },
-				{ "Micro SMG Loadout", "Shotgun Loadout" },
-				{ "Shotgun Loadout",   "Revolver Loadout" }
-			},
-			[2] = { --Gustavo Fring
-				{ '##1", "##2' },
-				{ "Rifle Loadout", "Shotgun Loadout" },
-				{ "Rifle Loadout", "Shotgun Loadout" },
-				{ "Rifle Loadout", "Shotgun Loadout" },
-			},
-			[3] = { --Charlie Reed
-				{ '##1", "##2' },
-				{ "SMG Loadout",            "Shotgun Loadout" },
-				{ "Machine Pistol Loadout", "Shotgun Loadout" },
-				{ "SMG Loadout",            "Shotgun Loadout" }
-			},
-			[4] = { --Chester McCoy
-				{ '##1", "##2' },
-				{ "MK II Shotgun Loadout", "MK II Rifle Loadout" },
-				{ "MK II SMG Loadout",     "MK II Rifle Loadout" },
-				{ "MK II Shotgun Loadout", "MK II Rifle Loadout" }
-			},
-			[5] = { --Laddie Paddie Sadie Enweird
-				{ '##1", "##2' },
-				{ "Combat PDW Loadout", "Rifle Loadout" },
-				{ "Shotgun Loadout",    "Rifle Loadout" },
-				{ "Shotgun Loadout",    "Combat MG Loadout" }
-			}
-
-		}
-
 		local new_weapons, weapons_clicked = ImGui.Combo(
 			_T("CP_HEIST_WEAPONS"),
 			casino_heist_weapons,
-			gunList[new_gunman][casino_heist_approach + 1],
+			heist_guns[new_gunman][casino_heist_approach + 1],
 			2
 		)
 		if (weapons_clicked) then
@@ -282,27 +280,10 @@ local function drawHeistTab()
 	end
 
 	if (new_driver > 0) then
-		local carList = {
-			[1] = { --Karim Deniz
-				"Issi Classic", "Asbo", "Kanjo", "Sentinel Classic"
-			},
-			[2] = { --Taliana Martinez
-				"Retinue MK II", "Drift Yosemite", "Sugoi", "Jugular"
-			},
-			[3] = { --Eddie Toh
-				"Sultan Classic", "Guantlet Classic", "Ellie", "Komoda"
-			},
-			[4] = { --Zach Nelson
-				"Manchez", "Stryder", "Defiler", "Lectro"
-			},
-			[5] = { --Chester McCoy
-				"Zhaba", "Vagrant", "Outlaw", "Everon"
-			},
-		}
 		local new_car, car_clicked = ImGui.Combo(
 			_T("CP_HEIST_GETAWAY_VEHS"),
 			casino_heist_cars,
-			carList[new_driver],
+			heist_cars[new_driver],
 			4
 		)
 		if (car_clicked) then
@@ -346,10 +327,8 @@ local function drawHeistTab()
 
 	ImGui.PopItemWidth()
 	GUI:HeaderText(_T("GENERIC_OPTIONS_LABEL"), { separator = true, spacing = true })
-	GVars.features.dunk.ch_cart_autograb, _ = GUI:CustomToggle(
-		_T("CP_HEIST_AUTOGRAB"),
-		GVars.features.dunk.ch_cart_autograb
-	) -- this was disabled for no reason
+
+	GVars.features.dunk.ch_cart_autograb = GUI:CustomToggle(_T("CP_HEIST_AUTOGRAB"), GVars.features.dunk.ch_cart_autograb)
 
 	-- this serves as a "cooldown disabler" as well because you need to reset it anyway to be able to replay
 	-- so we don't need a separate cooldown button or checkbox
@@ -389,15 +368,15 @@ local function drawHeistTab()
 	end
 
 	if (GUI:Button(_T("CP_HEIST_MAX_PLAYER_CUTS"))) then
-		local bgchpco = SGSL:Get(SGSL.data.gb_casino_heist_planning_cut_offset):GetValue()
-		local gbchp = SGSL:Get(SGSL.data.gb_casino_heist_planning):AsGlobal():At(bgchpco)
+		local offset        = SGSL:Get(SGSL.data.gb_casino_heist_planning_cut_offset):GetValue()
+		local heistPlanning = SGSL:Get(SGSL.data.gb_casino_heist_planning):AsGlobal():At(offset)
 		for i = 1, 4, 1 do
-			gbchp:At(i):WriteInt(100)
+			heistPlanning:At(i):WriteInt(100)
 		end
 	end
 end
 
-local function DrawDunk()
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Casino Pacino", function()
 	if (not Game.IsOnline()) then
 		ImGui.Text(_T("GENERIC_UNAVAILABLE_SP"))
 		return
@@ -408,18 +387,15 @@ local function DrawDunk()
 		return
 	end
 
-	if (ImGui.BeginTabBar("##dunkBar")) then
-		if ImGui.BeginTabItem(_T("CASINO_GAMBLING_TAB")) then
-			drawGamblingTab()
-			ImGui.EndTabItem()
-		end
-
-		if ImGui.BeginTabItem(_T("CP_CASINO_HEIST_TAB")) then
-			drawHeistTab()
-			ImGui.EndTabItem()
-		end
-		ImGui.EndTabBar()
+	ImGui.BeginTabBar("##dunkBar")
+	if (ImGui.BeginTabItem(_T("CASINO_GAMBLING_TAB"))) then
+		drawGamblingTab()
+		ImGui.EndTabItem()
 	end
-end
 
-GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Casino Pacino", DrawDunk)
+	if (ImGui.BeginTabItem(_T("CP_CASINO_HEIST_TAB"))) then
+		drawHeistTab()
+		ImGui.EndTabItem()
+	end
+	ImGui.EndTabBar()
+end)

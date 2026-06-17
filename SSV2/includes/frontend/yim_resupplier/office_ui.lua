@@ -7,12 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-
 local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
 local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
-local drawNamePlate         = require("nameplate_ui")
-local drawVehicleWarehouse  = require("vehicle_warehouse_ui")
-local drawWarehouse         = require("warehouse_ui")
+local drawNamePlate         = require("includes.frontend.yim_resupplier.nameplate_ui")
+local drawVehicleWarehouse  = require("includes.frontend.yim_resupplier.vehicle_warehouse_ui")
+local drawWarehouse         = require("includes.frontend.yim_resupplier.warehouse_ui")
 local colMoneyGreen <const> = Color("#85BB65")
 
 ---@type array<integer>
@@ -23,6 +22,7 @@ local earningDataIdx        = 1
 local earningPopupName      = ""
 local newNameBuff           = ""
 local renamePopupLabel      = "##renameCEO"
+local shouldDrawRenamePopup = false
 local earningData <const>   = {
 	{ label = "YRV3_LIFETIME_BUY_UNDERTAKEN",  pstat = "MPX_LIFETIME_BUY_UNDERTAKEN",  min = 0, max = 5e3, step = 1,   step_fast = 100 },
 	{ label = "YRV3_LIFETIME_BUY_COMPLETE",    pstat = "MPX_LIFETIME_BUY_COMPLETE",    min = 0, max = 5e3, step = 1,   step_fast = 100 },
@@ -151,6 +151,13 @@ local function drawSpecialCargo(warehouses)
 	end
 end
 
+local function contextCallback()
+	if (ImGui.MenuItem(_T("GENERIC_RENAME"))) then
+		shouldDrawRenamePopup = true
+		ImGui.CloseCurrentPopup()
+	end
+end
+
 return function()
 	local office = YRV3:GetOffice()
 	if (not office) then
@@ -158,11 +165,11 @@ return function()
 		return
 	end
 
-	drawNamePlate(office, office:GetCustomName())
+	drawNamePlate(office, { customName = office:GetCustomName(), contextMenuCallback = contextCallback })
 
-	ImGui.Spacing()
-	if (GUI:Button(_T("GENERIC_RENAME"))) then
-		newNameBuff = office:GetCustomName()
+	if (shouldDrawRenamePopup) then
+		newNameBuff           = office:GetCustomName()
+		shouldDrawRenamePopup = false
 		ImGui.OpenPopup(renamePopupLabel)
 	end
 

@@ -80,7 +80,7 @@ function CashSafe:IsPlayerNearby()
 		return false
 	end
 
-	local interior = LocalPlayer:GetInterior()
+	local interior = LocalPlayer:GetInteriorID()
 	if (interior == 0) then
 		return false
 	end

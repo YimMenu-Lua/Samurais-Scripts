@@ -68,7 +68,7 @@ function Translator:init()
 		m_log_history      = {},
 		m_deferred_batches = {},
 		m_gxt_labels       = {},
-		m_last_load_time   = TimePoint.new(),
+		m_last_load_time   = TimePoint(),
 		m_initialized      = true,
 		m_state            = Enums.eTranslatorState.NONE
 	}, Translator)

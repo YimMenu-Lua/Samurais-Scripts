@@ -134,7 +134,7 @@ function FXManager:StartSFX(ped)
 		return
 	end
 
-	self.m_sfx_timers[ped] = self.m_sfx_timers[ped] or Timer.new(0)
+	self.m_sfx_timers[ped] = self.m_sfx_timers[ped] or Timer(0)
 	local timer            = self.m_sfx_timers[ped]
 
 	if (not timer:IsDone()) then

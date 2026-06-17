@@ -203,7 +203,7 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 	local ignored_set      = Set("__schema_hash", "__dev_reset", "__version")
 	self.__schema_hash     = _J(table.snapshot(self.m_default_config, { ignored_keys = ignored_set }))
 	self.m_state           = eSerializerState.IDLE
-	self.m_last_write_time = TimePoint.new()
+	self.m_last_write_time = TimePoint()
 	self:SyncKeys()
 	self:SaveBackup()
 

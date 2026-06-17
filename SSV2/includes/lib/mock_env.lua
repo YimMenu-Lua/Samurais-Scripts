@@ -9,12 +9,15 @@
 
 ---@diagnostic disable: duplicate-set-field
 
-local MockEnv <const> = {}
-MockEnv.__index = MockEnv
+local function nop() end
 
-local function NOP() end
+---@param t table
+---@param ret_type any
+local function dummy_mt(t, ret_type)
+	return setmetatable(t, { __index = function(...) return ret_type or nop end })
+end
 
-function MockEnv.Setup(version)
+return function(version)
 	if (version ~= Enums.eGameBranch.MOCK) then
 		return
 	end
@@ -45,7 +48,7 @@ function MockEnv.Setup(version)
 			max_size   = 1024 * 500
 		})
 
-		local levels <const> = { "debug", "info", "warning" }
+		local levels <const> = { "debug", "info", "warning", "error" }
 
 		---@class log
 		log = {}
@@ -64,15 +67,15 @@ function MockEnv.Setup(version)
 
 	if (not script) then
 		script = {
-			register_looped   = NOP,
-			run_in_fiber      = NOP,
-			execute_as_script = NOP,
+			register_looped   = nop,
+			run_in_fiber      = nop,
+			execute_as_script = nop,
 			is_active         = function(_) return false end,
 		}
 	end
 
 	if (not event) then
-		event = { register_handler = NOP }
+		event = { register_handler = nop }
 	end
 
 	if (not menu_event) then
@@ -118,49 +121,25 @@ function MockEnv.Setup(version)
 	end
 
 	if (not vec3) then
-		vec3 = {}
+		vec3         = {}
+		vec3.__index = vec3
 		---@param x float
 		---@param y float
 		---@param z float
 		---@return vec3
 		function vec3:new(x, y, z)
-			return setmetatable(
-				{
-					x = x or 0,
-					y = y or 0,
-					z = z or 0,
-				},
-				vec3
-			)
+			return setmetatable({
+				x = x or 0,
+				y = y or 0,
+				z = z or 0,
+			}, self)
 		end
 	end
 
-	if (not gui) then
-		gui         = {
-			add_imgui             = NOP,
-			add_always_draw_imgui = NOP,
-			override_mouse        = NOP,
-			is_open               = function() return false end,
-			mouse_override        = function() return false end,
-		}
-		gui.add_tab = function(_) return gui end
-	end
-
-	if (not STREAMING) then
-		STREAMING = { IS_PLAYER_SWITCH_IN_PROGRESS = function() return false end, }
-	end
-
-	if (not stats) then stats = {} end
-	if (not ImGui) then
-		ImGui = setmetatable({}, { __index = function(...) return NOP end })
-	end
-
-	if (not ImGuiWindowFlags) then
-		ImGuiWindowFlags = setmetatable({}, { __index = function(...) return 0 end })
-	end
-	if (not ImGuiChildFlags) then
-		ImGuiChildFlags = setmetatable({}, { __index = function(...) return 0 end })
-	end
+	if (not gui) then gui = dummy_mt({}, function() return gui end) end
+	if (not STREAMING) then STREAMING = dummy_mt({}) end
+	if (not stats) then stats = dummy_mt({}) end
+	if (not tunables) then tunables = dummy_mt({}) end
+	if (not ImGui) then ImGui = dummy_mt({}) end
+	if (not ImGuiWindowFlags) then ImGuiWindowFlags = dummy_mt({}, 0) end
 end
-
-return MockEnv

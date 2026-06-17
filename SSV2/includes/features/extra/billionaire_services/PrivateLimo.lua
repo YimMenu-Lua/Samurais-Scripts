@@ -47,29 +47,27 @@ PrivateLimo.drivingModes       = {
 ---@param t_Data table
 ---@param vehicleHandle integer
 ---@param driverHandle integer
+---@return PrivateLimo
 function PrivateLimo.new(ref, t_Data, vehicleHandle, driverHandle)
-	return setmetatable(
-		{
-			m_owner_ref        = ref,
-			limoData           = t_Data,
-			m_handle           = vehicleHandle,
-			m_modelhash        = t_Data.model,
-			name               = Vehicle(vehicleHandle):GetName() or "Private Limousine",
-			driver             = driverHandle,
-			driverName         = ref:GetRandomPedName(Enums.ePedGender.MALE),
-			lastCheckTime      = Time.Now() + 3,
-			currentDrivingMode = 1,
-			wasDismissed       = false,
-			isRemoteControlled = false,
-			task               = Enums.eVehicleTask.NONE,
-			isReady            = false,
-			radio              = {
-				isOn = false,
-				stationName = "OFF"
-			}
-		},
-		PrivateLimo
-	)
+	return setmetatable({
+		m_owner_ref        = ref,
+		limoData           = t_Data,
+		m_handle           = vehicleHandle,
+		m_modelhash        = t_Data.model,
+		name               = Game.GetVehicleDisplayName(Game.GetEntityModel(vehicleHandle)) or "Private Limousine",
+		driver             = driverHandle,
+		driverName         = ref:GetRandomPedName(Enums.ePedGender.MALE),
+		lastCheckTime      = Time.Now() + 3,
+		currentDrivingMode = 1,
+		wasDismissed       = false,
+		isRemoteControlled = false,
+		task               = Enums.eVehicleTask.NONE,
+		isReady            = false,
+		radio              = {
+			isOn = false,
+			stationName = "OFF"
+		}
+	}, PrivateLimo)
 end
 
 ---@param t_Data table
@@ -173,7 +171,7 @@ function PrivateLimo:Spawn(ref, t_Data, spawnPos)
 	end
 
 	local driver = Game.CreatePed(self.driverModel, vec3:zero())
-	if not Game.IsScriptHandle(driver) then
+	if (not Game.IsScriptHandle(driver)) then
 		Backend:debug("Failed to create ped.")
 		return
 	end
@@ -181,7 +179,7 @@ function PrivateLimo:Spawn(ref, t_Data, spawnPos)
 	ENTITY.FREEZE_ENTITY_POSITION(driver, true)
 	local limo = self:CreateVehicle(t_Data, spawnPos)
 
-	if not Game.IsScriptHandle(limo) then
+	if (not Game.IsScriptHandle(limo)) then
 		Backend:debug("Failed to create vehicle.")
 		return
 	end
@@ -213,9 +211,9 @@ function PrivateLimo:Spawn(ref, t_Data, spawnPos)
 	VEHICLE.SET_VEHICLE_DIRT_LEVEL(limo, 0)
 	Game.FadeInEntity(limo)
 
-	local timer1 = Timer.new(1000)
-	while not VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(limo) do
-		if timer1:IsDone() then
+	local timer1 = Timer(1000)
+	while (not VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(limo)) do
+		if (timer1:IsDone()) then
 			break
 		end
 		yield()
@@ -224,16 +222,14 @@ function PrivateLimo:Spawn(ref, t_Data, spawnPos)
 	sleep(1000)
 	AUDIO.SET_VEH_RADIO_STATION(limo, "RADIO_22_DLC_BATTLE_MIX1_RADIO")
 	AUDIO.SET_VEHICLE_RADIO_LOUD(limo, true)
-	self.radio.isOn = AUDIO.IS_VEHICLE_RADIO_ON(limo)
+	self.radio.isOn        = AUDIO.IS_VEHICLE_RADIO_ON(limo)
 	self.radio.stationName = AUDIO.GET_PLAYER_RADIO_STATION_NAME()
+
 
 	local blip = Game.AddBlipForEntity(limo, 1.0)
 	Game.SetBlipName(blip, "Private Limousine")
 	Game.SetBlipSprite(blip, 724)
-	self.blip = {
-		handle = blip,
-		alpha = 255
-	}
+	self.blip = { handle = blip, alpha = 255 }
 
 	Game.FadeInEntity(driver)
 	Game.FadeInEntity(limo)
@@ -531,7 +527,7 @@ function PrivateLimo:ReleaseControl()
 		ENTITY.SET_ENTITY_ALPHA(self.limoClone, 0, false)
 		Game.DeleteEntity(self.playerClone)
 
-		local timer = Timer.new(2000)
+		local timer = Timer(2000)
 		while Game.IsScriptHandle(self.playerClone) do
 			if timer:IsDone()
 				or (self.playerSeat and VEHICLE.IS_VEHICLE_SEAT_FREE(self.m_handle, self.playerSeat, true)) then
@@ -759,7 +755,7 @@ function PrivateLimo:StateEval()
 
 		self:ReleaseControl()
 
-		local timer = Timer.new(2000)
+		local timer = Timer(2000)
 		while not timer:IsDone() do
 			if self:IsPlayerInLimo() then
 				break

@@ -581,14 +581,6 @@ local function DrawMiscTests()
 			print(LocalPlayer:GetVehicle():GetHandlingData())
 		end
 
-		if (ImGui.Button("Test Box")) then
-			ImGui.OpenDialogBox("test_box")
-		end
-
-		if (ImGui.DialogBox("Test Dialog", "Test dialog box.", ImGuiDialogBoxStyle.SEVERE)) then
-			print("Test dialog box.")
-		end
-
 		ImGui.EndTabItem()
 	end
 

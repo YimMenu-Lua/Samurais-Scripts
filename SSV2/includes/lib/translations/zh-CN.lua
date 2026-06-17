@@ -861,7 +861,7 @@ return {
 	["YAV3_VEH_ANIM_HINT"] = "以车辆为中心的动画无法步行播放；即使对于同伴。",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "没有技术人员被分配到该中心。",
 	["VEH_STANCE_TOE"] = "脚趾",
-	["YRV3_AUTO_SELL_COUNTDOWN"] = "“自动销售”将在 20 秒后开始。您可以通过在计时器结束之前禁用切换来取消它。",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "“自动销售”将在 20 秒后开始。您可以在计时器结束之前通过禁用该功能或​​单击此通知来取消它。",
 	["YRV3_AUTO_SELL_CANCELED_MSG"] = "“自动销售”已被取消。",
 	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "夜总会货运",
 	["YRV3_HUB_TRANSFER_TECH"] = "[！ ] 转技术员",
@@ -979,5 +979,11 @@ return {
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "启动发动机前，请踩下离合器或将档位置于空档。",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "离合器辅助装置",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "仅手动模式：禁用发动机熄火行为。",
-	["VEH_GEARBOX_AUTO"] = "自动的"
+	["VEH_GEARBOX_AUTO"] = "自动的",
+	["GENERIC_LABEL"] = "标签",
+	["YAV3_ANIM_HISTORY_TT"] = "您所玩的动画、场景和场景将出现在此处。",
+	["BSV2_ES_DRIVE_PROPERTY_TEXT"] = "单击某个属性即可前往该属性。",
+	["BSV2_ES_DRIVE_PROPERTY"] = "拥有的财产",
+	["GENERIC_RETRY"] = "重试",
+	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"] = "使用 FSL 时始终启用不安全功能。"
 }

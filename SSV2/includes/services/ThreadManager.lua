@@ -79,7 +79,7 @@ function Thread.new(name, callback, exceptionHandler)
 		m_wants_exit    = false,
 		m_state         = eThreadState.UNK,
 		m_stage         = eThreadStage.IDLE,
-		m_time_created  = TimePoint.new(),
+		m_time_created  = TimePoint(),
 		m_time_started  = 0,
 		m_last_entry_at = 0,
 		m_last_exit_at  = 0,

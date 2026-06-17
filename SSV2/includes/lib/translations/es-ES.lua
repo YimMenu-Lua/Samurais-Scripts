@@ -862,7 +862,7 @@ return {
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "No hay ningún técnico asignado a este centro.",
 	["VEH_STANCE_TOE"] = "Dedo del pie",
 	["YRV3_AUTO_SELL_CANCELED_MSG"] = "La \"venta automática\" ha sido cancelada.",
-	["YRV3_AUTO_SELL_COUNTDOWN"] = "La 'venta automática' comenzará en 20 segundos. Puede cancelarlo desactivando el interruptor antes de que finalice el cronómetro.",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "La 'venta automática' comenzará en 20 segundos. Puede cancelarlo antes de que finalice el cronómetro desactivando la función o haciendo clic en esta notificación.",
 	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Carga de discoteca",
 	["YRV3_HUB_TRANSFER_TECH"] = "[ ! ] Técnico de transferencia",
 	["YRV3_HUB_TRANSFER_TECH_FAIL_FMT"] = "¡Error al transferir el técnico de %s a %s!",
@@ -979,5 +979,11 @@ return {
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Presione el embrague o ponga la marcha en punto muerto antes de arrancar el motor.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Asistencia de embrague",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Solo modo manual: desactiva el comportamiento de calado del motor.",
-	["VEH_GEARBOX_AUTO"] = "Automático"
+	["VEH_GEARBOX_AUTO"] = "Automático",
+	["GENERIC_LABEL"] = "Etiqueta",
+	["YAV3_ANIM_HISTORY_TT"] = "Aquí aparecerán animaciones, escenarios y escenas que juegues.",
+	["BSV2_ES_DRIVE_PROPERTY"] = "Propiedades propias",
+	["BSV2_ES_DRIVE_PROPERTY_TEXT"] = "Haga clic en una propiedad para viajar a ella.",
+	["GENERIC_RETRY"] = "Rever",
+	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"] = "Las funciones inseguras siempre están habilitadas cuando se usa FSL."
 }

@@ -861,7 +861,7 @@ return {
 	["YAV3_VEH_ANIM_HINT"] = "As animações centradas no veículo não podem ser reproduzidas a pé; mesmo para companheiros.",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Nenhum técnico está atribuído a este hub.",
 	["VEH_STANCE_TOE"] = "Dedo do pé",
-	["YRV3_AUTO_SELL_COUNTDOWN"] = "A 'Venda Automática' começará em 20 segundos. Você pode cancelá-lo desativando a alternância antes que o cronômetro termine.",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "A 'Venda Automática' começará em 20 segundos. Você pode cancelá-lo antes que o cronômetro termine, desativando o recurso ou clicando nesta notificação.",
 	["YRV3_AUTO_SELL_CANCELED_MSG"] = "A 'Venda Automática' foi cancelada.",
 	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Carga de boate",
 	["YRV3_HUB_REMOVE_TECH_FAIL_FMT"] = "Falha ao remover técnico de %s!",
@@ -979,5 +979,11 @@ return {
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Pressione a embreagem ou coloque a marcha em ponto morto antes de ligar o motor.",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Somente modo manual: desativa o comportamento de parada do motor.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Assistência de embreagem",
-	["VEH_GEARBOX_AUTO"] = "Automático"
+	["VEH_GEARBOX_AUTO"] = "Automático",
+	["GENERIC_LABEL"] = "Rótulo",
+	["YAV3_ANIM_HISTORY_TT"] = "Animações, cenários e cenas que você reproduz aparecerão aqui.",
+	["BSV2_ES_DRIVE_PROPERTY"] = "Propriedades próprias",
+	["BSV2_ES_DRIVE_PROPERTY_TEXT"] = "Clique em uma propriedade para viajar até ela.",
+	["GENERIC_RETRY"] = "Tentar novamente",
+	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"] = "Recursos inseguros estão sempre habilitados ao usar FSL."
 }

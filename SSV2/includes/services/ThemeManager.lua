@@ -9,7 +9,7 @@
 
 
 local Theme <const>        = require("includes.structs.Theme")
-local ThemeLibrary <const> = require("includes.data.theme_library")
+local ThemeLibrary <const> = require("includes.lib.theme_library")
 
 
 ---@class ThemeManager

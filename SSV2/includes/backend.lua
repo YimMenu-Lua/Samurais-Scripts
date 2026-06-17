@@ -20,8 +20,10 @@ local ClearPreview   = function() PreviewService:Clear() end
 ---@enum eBackendEvent
 Enums.eBackendEvent = {
 	RELOAD_UNLOAD  = 1,
-	SESSION_SWITCH = 2,
-	PLAYER_SWITCH  = 3,
+	PLAYER_SWITCH  = 2,
+	SESSION_SWITCH = 3,
+	SESSION_JOIN   = 4, -- Only works when switching from SP to Online, not between sessions
+	SESSION_LEAVE  = 5, -- Only works when switching from Online to SP, not between sessions
 }
 
 ---@enum eEntityType
@@ -56,8 +58,9 @@ local Backend = {
 	---@type table<eBackendEvent, array<function>>
 	EventCallbacks           = {
 		[Enums.eBackendEvent.RELOAD_UNLOAD]  = { ClearPreview },
-		[Enums.eBackendEvent.SESSION_SWITCH] = { ClearPreview },
-		[Enums.eBackendEvent.PLAYER_SWITCH]  = { ClearPreview }
+		[Enums.eBackendEvent.PLAYER_SWITCH]  = { ClearPreview },
+		[Enums.eBackendEvent.SESSION_SWITCH] = {},
+		[Enums.eBackendEvent.SESSION_LEAVE]  = {},
 	},
 
 	---@type table<eEntityType, table<handle, handle>>
@@ -77,7 +80,7 @@ local Backend = {
 	---@type table<string, fun(handle: handle): any>
 	FeatureEntityHandlers    = {},
 
-	---@type table<int64_t, pointer>
+	---@type table<uint64_t, pointer>
 	AllocatedPointers        = {}
 }; Backend.__index = Backend
 
@@ -411,10 +414,11 @@ end
 
 ---@param event eBackendEvent
 function Backend:TriggerEventCallbacks(event)
-	for _, fn in ipairs(self.EventCallbacks[event] or {}) do
-		if (type(fn) == "function") then
-			xpcall(fn, function(err)
-				log.fwarning("[Backend]: Callback error for event %s: %s", EnumToString(Enums.eBackendEvent, event), err)
+	for _, cb in ipairs(self.EventCallbacks[event] or {}) do
+		if (type(cb) == "function") then
+			xpcall(cb, function(err)
+				local evt_name = EnumToString(Enums.eBackendEvent, event)
+				log.fwarning("[Backend]: Callback error for event %s: %s", evt_name, err)
 			end)
 		end
 	end
@@ -501,30 +505,35 @@ function Backend:RegisterHandlers()
 		Translator:OnTick()
 
 		yield()
-	end, {
-		exception_handler = function()
-			Backend:Cleanup()
-		end
-	})
+	end, { exception_handler = function() Backend:Cleanup() end })
 
 	ThreadManager:RegisterLooped("SS_POOLMGR", function()
 		self:PoolMgr()
 		yield()
 	end)
 
-	event.register_handler(menu_event.MenuUnloaded, function() self:Cleanup() end)
-	event.register_handler(menu_event.ScriptsReloaded, function() self:Cleanup() end)
+	event.register_handler(menu_event.MenuUnloaded, function()
+		self:Cleanup()
+	end)
+
+	event.register_handler(menu_event.ScriptsReloaded, function()
+		self:Cleanup()
+	end)
+
+	event.register_handler(menu_event.playerMgrInit, function()
+		self:TriggerEventCallbacks(Enums.eBackendEvent.SESSION_JOIN)
+	end)
+
+	event.register_handler(menu_event.playerMgrShutdown, function()
+		self:TriggerEventCallbacks(Enums.eBackendEvent.SESSION_LEAVE)
+	end)
 end
 
 -- ### Baguette
-------
--- Note: This **will remove** all registered threads and not just stop or suspend them.
---
--- You can only restart (re-register) them by reloading the script.
 function Backend:PANIQUE()
 	ThreadManager:Run(function()
 		self:Cleanup()
-		for i = Enums.eBackendEvent.SESSION_SWITCH, Enums.eBackendEvent.PLAYER_SWITCH do
+		for i = Enums.eBackendEvent.PLAYER_SWITCH, Enums.eBackendEvent.SESSION_LEAVE do
 			self:TriggerEventCallbacks(i)
 			sleep(100)
 		end

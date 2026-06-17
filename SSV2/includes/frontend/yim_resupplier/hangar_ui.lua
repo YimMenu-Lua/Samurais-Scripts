@@ -8,7 +8,7 @@
 
 
 local YRV3          = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local drawWarehouse = require("warehouse_ui")
+local drawWarehouse = require("includes.frontend.yim_resupplier.warehouse_ui")
 
 return function()
 	drawWarehouse(YRV3:GetHangar(), _T("YRV3_HANGAR_NOT_OWNED"))

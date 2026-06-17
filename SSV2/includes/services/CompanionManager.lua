@@ -457,7 +457,7 @@ function Companion:AD_MORTEM_INIMICUS()
 	)
 	sleep(2500)
 
-	local timer = Timer.new(5000)
+	local timer = Timer(5000)
 	while (ENTITY.GET_ENTITY_HEIGHT_ABOVE_GROUND(self.handle) > 1 and not timer:IsDone()) do
 		local tDelta = math.min(1, Game.GetFrameTime() * 10)
 		local lastPos = Game.GetEntityCoords(self.handle, false)
@@ -511,7 +511,7 @@ function Companion:AD_MORTEM_INIMICUS()
 	CAM.RENDER_SCRIPT_CAMS(false, true, 500, true, false)
 	CAM.DESTROY_CAM(cam, false)
 
-	local timer_2 = Timer.new(10000)
+	local timer_2 = Timer(1e4)
 	while (not timer_2:IsDone()) do
 		if (not LocalPlayer:IsAlive()) then
 			break

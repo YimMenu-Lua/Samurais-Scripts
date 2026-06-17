@@ -7,15 +7,16 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YRV3                = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local measureBulletWidths = require("includes.frontend.helpers.measure_text_width")
-local drawNamePlate       = require("nameplate_ui")
-local drawFactory         = require("factory_ui")
+local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
+local drawNamePlate         = require("includes.frontend.yim_resupplier.nameplate_ui")
+local drawFactory           = require("includes.frontend.yim_resupplier.factory_ui")
 
 ---@type array<integer>
-local bulletWidths        = {}
-local newNameBuff         = ""
-local renamePopupLabel    = "##renameMC"
+local bulletWidths          = {}
+local newNameBuff           = ""
+local renamePopupLabel      = "##renameMC"
+local shouldDrawRenamePopup = false
 
 ---@param clubhouse Clubhouse
 local function drawRenamePopup(clubhouse)
@@ -37,6 +38,13 @@ local function drawRenamePopup(clubhouse)
 	ImGui.Spacing()
 end
 
+local function contextCallback()
+	if (ImGui.MenuItem(_T("GENERIC_RENAME"))) then
+		shouldDrawRenamePopup = true
+		ImGui.CloseCurrentPopup()
+	end
+end
+
 return function()
 	local clubhouse = YRV3:GetClubhouse()
 	if (not clubhouse) then
@@ -47,8 +55,7 @@ return function()
 	local unsafeFeatsEnabled = GVars.features.unsafe_feats_enabled
 	drawNamePlate(
 		clubhouse,
-		clubhouse:GetCustomName(),
-		Color(ImGui.GetStyleColorVec4(ImGuiCol.Text))
+		{ customName = clubhouse:GetCustomName(), contextMenuCallback = contextCallback }
 	)
 	ImGui.Spacing()
 
@@ -80,22 +87,6 @@ return function()
 	ImGui.SameLine(bulletWidth)
 	ImGui.Text(clubhouse:GetClientBikeName())
 
-	if (GUI:Button(_T("GENERIC_RENAME"))) then
-		newNameBuff = clubhouse:GetCustomName()
-		ImGui.OpenPopup(renamePopupLabel)
-	end
-
-	if (ImGui.BeginPopupModal(
-			renamePopupLabel,
-			true,
-			ImGuiWindowFlags.AlwaysAutoResize
-			| ImGuiWindowFlags.NoSavedSettings
-			| ImGuiWindowFlags.NoMove
-		)) then
-		drawRenamePopup(clubhouse)
-		ImGui.EndPopup()
-	end
-
 	ImGui.BeginDisabled(not unsafeFeatsEnabled)
 	if (cashSafe:CanInstaFill()) then
 		ImGui.BeginDisabled(cashValue == maxCash)
@@ -112,6 +103,23 @@ return function()
 		ImGui.EndDisabled()
 	end
 	ImGui.EndDisabled()
+
+	if (shouldDrawRenamePopup) then
+		newNameBuff = clubhouse:GetCustomName()
+		ImGui.OpenPopup(renamePopupLabel)
+		shouldDrawRenamePopup = false
+	end
+
+	if (ImGui.BeginPopupModal(
+			renamePopupLabel,
+			true,
+			ImGuiWindowFlags.AlwaysAutoResize
+			| ImGuiWindowFlags.NoSavedSettings
+			| ImGuiWindowFlags.NoMove
+		)) then
+		drawRenamePopup(clubhouse)
+		ImGui.EndPopup()
+	end
 
 	ImGui.Spacing()
 	ImGui.SeparatorText(_T("YRV3_BUSINESSES_LABEL"))

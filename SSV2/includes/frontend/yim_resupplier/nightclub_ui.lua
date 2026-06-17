@@ -8,8 +8,9 @@
 
 
 local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local clubNames             = require("includes.data.yrv3_data").NightclubNames
 local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
-local drawNamePlate         = require("nameplate_ui")
+local drawNamePlate         = require("includes.frontend.yim_resupplier.nameplate_ui")
 local colMoneyGreen <const> = Color("#85BB65")
 local hubChildWidth         = 300
 local tempHubVal            = 0
@@ -17,7 +18,9 @@ local bools                 = {
 	coloredNameplate      = false,
 	bigTips               = false,
 	techTransferEmptyOnly = false,
+	drawRenamePopup       = false
 }
+local renamePopupLabel      = "##renameNightclub"
 
 ---@type array<integer>
 local bulletWidths          = {}
@@ -39,14 +42,56 @@ Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, function()
 	bools.bigTips = false
 end)
 
+---@param club Nightclub
+local function drawRenamePopup(club)
+	ImGui.Spacing()
+
+	local name_id = stats.get_int("MPX_PROP_NIGHTCLUB_NAME_ID")
+	if (ImGui.BeginCombo("##clubName", clubNames[name_id + 1])) then
+		for i, name in ipairs(clubNames) do
+			local real_id     = i - 1
+			local is_selected = name_id == real_id
+
+			ImGui.Selectable(name, is_selected)
+			if (ImGui.IsItemClicked()) then
+				club:Rename(real_id)
+				GUI:PlaySound(GUI.Sounds.Click)
+				ImGui.EndCombo()
+				ImGui.CloseCurrentPopup()
+				return
+			end
+
+			if (is_selected) then
+				ImGui.SetItemDefaultFocus()
+			end
+		end
+		ImGui.EndCombo()
+	end
+
+	ImGui.Spacing()
+end
+
+local function contextCallback()
+	bools.coloredNameplate = GUI:CustomToggle("Synthwave & Pain", bools.coloredNameplate)
+
+	ImGui.Spacing()
+	ImGui.Separator()
+
+	if (ImGui.MenuItem(_T("GENERIC_RENAME"))) then
+		bools.shouldDrawRenamePopup = true
+		ImGui.CloseCurrentPopup()
+	end
+	ImGui.Separator()
+end
+
 return function()
-	local HubTotalValue = 0
 	local club = YRV3:GetNightclub()
 	if (not club) then
 		ImGui.Text(_T("YRV3_CLUB_NOT_OWNED"))
 		return
 	end
 
+	local HubTotalValue      = 0
 	local unsafeFeatsEnabled = GVars.features.unsafe_feats_enabled
 	local bg
 	if (bools.coloredNameplate) then
@@ -55,14 +100,11 @@ return function()
 	end
 
 	local customName = club:GetCustomName()
-	drawNamePlate(club, customName, bg)
+	drawNamePlate(club, { customName = customName, bgColor = bg, contextMenuCallback = contextCallback })
 
 	if (bools.coloredNameplate) then
 		ImGui.PopStyleColor()
 	end
-
-	bools.coloredNameplate, _ = GUI:CustomToggle("Synthwave & Pain", bools.coloredNameplate)
-	ImGui.Spacing()
 
 	local lang_index  = GVars.backend.language_index
 	local bulletWidth = bulletWidths[lang_index]
@@ -260,4 +302,20 @@ return function()
 	end
 
 	tempHubVal = HubTotalValue
+
+	if (bools.shouldDrawRenamePopup) then
+		ImGui.OpenPopup(renamePopupLabel)
+		bools.shouldDrawRenamePopup = false
+	end
+
+	if (ImGui.BeginPopupModal(
+			renamePopupLabel,
+			true,
+			ImGuiWindowFlags.AlwaysAutoResize
+			| ImGuiWindowFlags.NoSavedSettings
+			| ImGuiWindowFlags.NoMove
+		)) then
+		drawRenamePopup(club)
+		ImGui.EndPopup()
+	end
 end
