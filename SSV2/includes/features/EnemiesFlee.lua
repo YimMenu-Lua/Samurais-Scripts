@@ -32,7 +32,7 @@ function EnemiesFlee:OnClick()
 		self.m_active  = true
 		local task_set = Set() ---@type Set<handle>
 		local trash    = {}
-		local timer    = Timer.new(1e4)
+		local timer    = Timer(1e4)
 
 		while (not timer:IsDone()) do
 			for _, p in ipairs(entities.get_all_peds_as_handles()) do

@@ -18,10 +18,10 @@ PatternScanner = require("includes.services.PatternScanner")
 -- You can add new indexes to this global table from any other file
 --
 -- as long as it's loaded before `GPointers:Init()` is called *(bottom of init.lua)*.
+--___
+-- **[Note]:** All objects except pointers are not reassigned during memory scans so it's safe
 --
--- **NOTE:** Please make sure no modules/files try to use a pointer before the scan is complete.
---
--- You can call `PatternScanner:IsDone()` to double check.-
+-- to hold references before `PatternScanner` is done.
 ---@class GPointers
 ---@field ScriptGlobals pointer
 ---@field GameState pointer<byte>
@@ -40,49 +40,39 @@ local GPointers = {
 	DynamicFuncs     = {}
 }
 
-
----@class MemoryBatch
----@field m_name string
----@field m_pattern string
----@field m_callback fun(ptr: pointer)
-local MemoryBatch <const> = {}
-MemoryBatch.__index = MemoryBatch
----@param name string
----@param ida_sig string
+---@generic P0: string, P1: string
+---@param name P0
+---@param ida_sig P1
 ---@param callback fun(ptr: pointer)
-function MemoryBatch.new(name, ida_sig, callback)
-	return {
-		m_name     = name,
-		m_pattern  = ida_sig,
-		m_callback = callback
-	}
+---@return { name: P0, sig: P1, callback: fun(ptr: pointer) }
+local function MakeBatch(name, ida_sig, callback)
+	return { name = name, sig = ida_sig, callback = callback }
 end
 
----@type table<eGameBranch, array<MemoryBatch>>
 local mem_batches <const> = {
 	[Enums.eGameBranch.LEGACY] = {
-		MemoryBatch.new("ScriptGlobals", "48 8D 15 ? ? ? ? 4C 8B C0 E8 ? ? ? ? 48 85 FF 48 89 1D", function(ptr)
+		MakeBatch("ScriptGlobals", "48 8D 15 ? ? ? ? 4C 8B C0 E8 ? ? ? ? 48 85 FF 48 89 1D", function(ptr)
 			GPointers.ScriptGlobals = ptr:add(0x3):rip()
 		end),
-		MemoryBatch.new("GameVersion", "8B C3 33 D2 C6 44 24 20", function(ptr)
+		MakeBatch("GameVersion", "8B C3 33 D2 C6 44 24 20", function(ptr)
 			local pGameBuild             = ptr:add(0x24):rip()
 			local pOnlineVersion         = pGameBuild:add(0x20)
 			GPointers.GameVersion.build  = pGameBuild:get_string()
 			GPointers.GameVersion.online = pOnlineVersion:get_string()
 		end),
-		MemoryBatch.new("GameState", "81 39 5D 6D FF AF 75 20", function(ptr)
+		MakeBatch("GameState", "81 39 5D 6D FF AF 75 20", function(ptr)
 			GPointers.GameState = ptr:add(0xA):rip():add(0x1)
 		end),
-		MemoryBatch.new("GameTime", "8B 05 ? ? ? ? 89 ? 48 8D 4D C8", function(ptr)
+		MakeBatch("GameTime", "8B 05 ? ? ? ? 89 ? 48 8D 4D C8", function(ptr)
 			GPointers.GameTime = ptr:add(0x2):rip()
 		end),
-		MemoryBatch.new("ScreenResolution", "66 0F 6E 0D ? ? ? ? 0F B7 3D", function(ptr)
+		MakeBatch("ScreenResolution", "66 0F 6E 0D ? ? ? ? 0F B7 3D", function(ptr)
 			GPointers.ScreenResolution.x = ptr:sub(0x4):rip():get_word()
 			GPointers.ScreenResolution.y = ptr:add(0x4):rip():get_word()
 		end),
 
 		-- TODO: enable once dynamic calls become stable. For now either the JIT compiler is broken or I'm just outright stupid.
-		-- MemoryBatch.new("BreakOffVehicleWheel", "F3 44 0F 11 4C 24 ? E8 ? ? ? ? EB 7A", function(ptr)
+		-- MakeBatch("BreakOffVehicleWheel", "F3 44 0F 11 4C 24 ? E8 ? ? ? ? EB 7A", function(ptr)
 		-- 	local func_ptr = ptr:add(0x7)
 		-- 	local func_name = memory.dynamic_call(
 		-- 		"void",
@@ -94,17 +84,17 @@ local mem_batches <const> = {
 		-- end),
 	},
 	[Enums.eGameBranch.ENHANCED] = {
-		MemoryBatch.new("ScriptGlobals", "48 8B 8E B8 00 00 00 48 8D 15 ? ? ? ? 49 89 D8", function(ptr)
+		MakeBatch("ScriptGlobals", "48 8B 8E B8 00 00 00 48 8D 15 ? ? ? ? 49 89 D8", function(ptr)
 			GPointers.ScriptGlobals = ptr:add(0x7):add(0x3):rip()
 		end),
-		MemoryBatch.new("GameVersion", "4C 8D 0D ? ? ? ? 48 8D 5C 24 ? 48 89 D9 48 89 FA", function(ptr)
+		MakeBatch("GameVersion", "4C 8D 0D ? ? ? ? 48 8D 5C 24 ? 48 89 D9 48 89 FA", function(ptr)
 			GPointers.GameVersion.build  = ptr:add(0x3):rip():get_string()
 			GPointers.GameVersion.online = ptr:add(0x47):add(0x3):rip():get_string()
 		end),
-		MemoryBatch.new("GameState", "83 3D ? ? ? ? ? 0F 85 ? ? ? ? BA ? 00", function(ptr)
+		MakeBatch("GameState", "83 3D ? ? ? ? ? 0F 85 ? ? ? ? BA ? 00", function(ptr)
 			GPointers.GameState = ptr:add(0x2):rip():add(0x1)
 		end),
-		MemoryBatch.new("ScreenResolution", "75 39 0F 57 C0 F3 0F 2A 05", function(ptr)
+		MakeBatch("ScreenResolution", "75 39 0F 57 C0 F3 0F 2A 05", function(ptr)
 			GPointers.ScreenResolution.x = ptr:add(0x5):add(0x4):rip():get_word()
 			GPointers.ScreenResolution.y = ptr:add(0x1E):add(0x4):rip():get_word()
 		end),
@@ -112,10 +102,9 @@ local mem_batches <const> = {
 	[Enums.eGameBranch.MOCK] = { --[[dummy]] },
 }
 
-local API_VERSON <const> = Backend:GetGameBranch()
-local batches = mem_batches[API_VERSON]
+local batches = mem_batches[Backend:GetGameBranch()]
 for _, batch in ipairs(batches) do
-	PatternScanner:Add(batch.m_name, batch.m_pattern, batch.m_callback)
+	PatternScanner:Add(batch.name, batch.sig, batch.callback)
 end
 
 return GPointers

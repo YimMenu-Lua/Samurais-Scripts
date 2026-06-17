@@ -300,6 +300,7 @@ end
 
 ---@class ScriptGlobal : Accessor
 ---@field At fun(self: ScriptGlobal, offset: integer, size?: integer): ScriptGlobal
+---@field __type "ScriptGlobal"
 ---@overload fun(address: integer): ScriptGlobal
 ScriptGlobal = Class("ScriptGlobal", { parent = Accessor })
 
@@ -315,20 +316,22 @@ end
 
 ---@class ScriptLocal : Accessor
 ---@field At fun(self: ScriptLocal, offset: integer, size?: integer): ScriptLocal
+---@field ReadString nil
+---@field WriteString nil
+---@field WriteUint nil
+---@field __type "ScriptLocal"
 ---@overload fun(address: integer, scr: string): ScriptLocal
 ScriptLocal = Class("ScriptLocal", { parent = Accessor })
 ---@diagnostic disable-next-line
-setmetatable(ScriptLocal,
-	{
-		__call = function(_, scr, addr)
-			return ScriptLocal.new(scr, addr)
-		end,
-		__index = Accessor
-	}
-)
+setmetatable(ScriptLocal, {
+	__call = function(_, addr, scr)
+		return ScriptLocal.new(addr, scr)
+	end,
+	__index = Accessor
+})
 
----@param address integer Local address
----@param script_name string Script name
+---@param address integer
+---@param script_name string
 ---@return ScriptLocal
 function ScriptLocal.new(address, script_name)
 	assert(string.isvalid(script_name), "Invalid script name for ScriptLocal!")
@@ -337,7 +340,7 @@ function ScriptLocal.new(address, script_name)
 	instance.__index.ReadString  = nil
 	instance.__index.WriteString = nil
 	instance.__index.WriteUint   = nil
-	instance.__index.__type      = ScriptLocal.__type
+	instance.__index.__type      = "ScriptLocal"
 
 	---@diagnostic disable-next-line
 	return setmetatable(instance, ScriptLocal)

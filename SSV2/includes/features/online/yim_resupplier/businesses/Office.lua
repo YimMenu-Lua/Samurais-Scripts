@@ -205,7 +205,7 @@ function Office:Rename(newName)
 		end
 
 		local officeInt = InteriorIDs.INTERIOR_ID_OFFICE
-		if (LocalPlayer:GetInterior() == officeInt) then
+		if (LocalPlayer:GetInteriorID() == officeInt) then
 			INTERIOR.REFRESH_INTERIOR(officeInt)
 		end
 

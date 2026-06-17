@@ -470,6 +470,41 @@ function KeyManager:IsKeyJustReleased(key)
 	return _key and _key.m_just_released or false
 end
 
+---@param restoreOnFail boolean Automatically reset to default if assertion fails
+---@param keyPath string Keybind path as registered in the [Config](lua://Config) table. Example: `"keyboard_keybinds.nos"`
+---@param default? string|table Default key to fallback to. A string for keyboard keybinds and a table for controller keybinds.
+---@return boolean
+function KeyManager:AssertKeybind(restoreOnFail, keyPath, default)
+	local default_cfg = Serializer:GetDefaultConfig()
+	default           = default or table.get_nested_value(default_cfg, keyPath)
+
+	if (not default) then
+		log.ferror("[KeyManager]: Assertion failed for keybind at '%s': No default value!", keyPath)
+		return false
+	end
+
+	local runtime      = table.get_nested_value(GVars, keyPath)
+	local runtime_type = type(runtime)
+	local success      = runtime ~= nil and runtime_type == type(default)
+
+	if (success) then
+		if (runtime_type == "number") then
+			success = runtime ~= 0
+		elseif (runtime_type == "string") then
+			success = string.isvalid(runtime) and string.lower(runtime) ~= "unbound"
+		elseif (runtime_type == "table") then
+			success = runtime.code ~= 0
+		end
+	end
+
+	if (not success and restoreOnFail) then
+		table.set_nested_value(GVars, keyPath, default)
+		Backend:debug("Restored keybind at %s", keyPath)
+	end
+
+	return success
+end
+
 ---@param keybindName string
 ---@return eControlType, (integer|string)?
 function KeyManager:GetKeybind(keybindName)
@@ -483,9 +518,9 @@ function KeyManager:GetKeybind(keybindName)
 		local gpad_t = GVars.gamepad_keybinds[keybindName]
 		if (type(gpad_t) ~= "table" or not gpad_t.code) then
 			key = 0
+		else
+			key = gpad_t.code
 		end
-
-		key = gpad_t.code
 	end
 
 	return control, key
@@ -552,6 +587,7 @@ function KeyManager:IsKeybindReleased(keybindName)
 	return not self:IsKeybindPressed(keybindName)
 end
 
+-- Non-persistent. Registers a keybind once for this session.
 ---@param key eVirtualKeyCodes | string
 ---@param callback function
 ---@param onKeyDown? boolean Set to true to loop the callback on key down. Ignore or set to false to execute once on key up only.
@@ -581,6 +617,7 @@ function KeyManager:RegisterKeybind(key, callback, onKeyDown)
 	self.m_registered_keybinds[__key.m_code] = __key
 end
 
+-- Updates a runtime keybind *(unrelated to persistent feature keybinds)*.
 ---@param oldKey eVirtualKeyCodes | string
 ---@param newKey { id: eVirtualKeyCodes | string, newCallback: function }
 function KeyManager:UpdateKeybind(oldKey, newKey)
@@ -603,6 +640,7 @@ function KeyManager:UpdateKeybind(oldKey, newKey)
 	self:RegisterKeybind(newKey.id, callback, on_key_down)
 end
 
+-- Removes a runtime keybind *(unrelated to persistent feature keybinds)*.
 ---@param key eVirtualKeyCodes | string
 function KeyManager:RemoveKeybind(key)
 	local k = self:GetKey(key)

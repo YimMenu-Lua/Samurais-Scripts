@@ -8,7 +8,7 @@
 
 
 local YRV3        = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local drawFactory = require("factory_ui")
+local drawFactory = require("includes.frontend.yim_resupplier.factory_ui")
 
 return function()
 	drawFactory(YRV3:GetBunker(), _T("YRV3_BUNKER_NOT_OWNED"))

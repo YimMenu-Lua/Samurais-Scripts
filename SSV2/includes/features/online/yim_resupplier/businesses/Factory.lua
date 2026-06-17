@@ -105,14 +105,17 @@ function Factory:GetProductValue()
 	return math.floor(self:GetProductCount() * self.m_vpu)
 end
 
-function Factory:ReStock()
+---@param silent? boolean -- Suppress notifications
+function Factory:ReStock(silent)
 	if (not self:IsValid() or not self:IsSetup()) then
 		return
 	end
 
 	if (self:HasFullSupplies()) then
-		local name = self:GetNormalizedName() or self:GetName()
-		Notifier:ShowError(name, _T("YRV3_RESTOCK_ERR"))
+		if (not silent) then
+			local name = self:GetNormalizedName() or self:GetName()
+			Notifier:ShowError(name, _T("YRV3_RESTOCK_ERR"))
+		end
 		return
 	end
 

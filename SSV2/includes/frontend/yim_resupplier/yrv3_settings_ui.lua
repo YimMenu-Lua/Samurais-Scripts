@@ -8,7 +8,6 @@
 
 
 local YRV3                     = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local unsafeFeatsClicked       = false
 local COL_RED <const>          = Color.RED
 local COL_WARN <const>         = Color("safety_yellow")
 local timerData <const>        = {
@@ -24,6 +23,7 @@ local supportedScripts <const> = {
 	"YRV3_AUTOSELL_NC_CARGO_LABEL",
 	"YRV3_AUTOSELL_LSD_LAB_LABEL",
 }
+local unsafeFeatsPopupLabel ---@type string?
 
 ---@param v integer
 local function getTimeThreshold(v)
@@ -71,6 +71,7 @@ end
 
 return function()
 	local __state        = YRV3:GetState()
+	local autosellState  = YRV3:GetAutoSellState()
 	local isReloading    = __state == Enums.eYRState.RELOADING
 	local waitLabel      = _T("GENERIC_WAIT_LABEL")
 	local label          = isReloading and ImGui.TextSpinner(waitLabel) or _T("GENERIC_RELOAD")
@@ -82,9 +83,7 @@ return function()
 	end
 	ImGui.EndDisabled()
 
-	if (isReloading) then
-		return
-	end
+	if (isReloading) then return end
 
 	GUI:HeaderText(_T("YRV3_AUTO_SELL"), { separator = true, spacing = true })
 	ImGui.TextWrapped(_T("YRV3_AUTO_SELL_SUPPORT_NOTICE"))
@@ -99,20 +98,13 @@ return function()
 	if (script.is_active("fm_content_smuggler_sell")) then
 		GUI:Text(_T("YRV3_HANGAR_LAND_ERR"), { color = COL_RED })
 	else
-		local autoSellTriggered = YRV3:HasTriggeredAutoSell()
-		ImGui.BeginDisabled(GVars.features.yrv3.autosell
-			or autoSellTriggered
-			or not YRV3:IsAnySaleInProgress()
-		)
-		if (GUI:Button(_T("YRV3_AUTO_SELL_MANUAL"))) then
-			autoSellTriggered = true
-			YRV3:FinishSale()
-			ThreadManager:Run(function()
-				repeat
-					yield()
-				until not YRV3:IsAnySaleInProgress()
-				autoSellTriggered = false
-			end)
+		ImGui.BeginDisabled(autosellState == Enums.eAutoSellState.TRIGGERED or not YRV3:IsAnySaleInProgress())
+		local taskSellLabel = "YRV3_AUTO_SELL_MANUAL"
+		if (autosellState == Enums.eAutoSellState.CANCELED or autosellState == Enums.eAutoSellState.FAILED) then
+			taskSellLabel = "GENERIC_RETRY"
+		end
+		if (GUI:Button(_T(taskSellLabel))) then
+			YRV3:FinishSale(true)
 		end
 		ImGui.EndDisabled()
 	end
@@ -122,26 +114,31 @@ return function()
 	ImGui.Text(_T("YRV3_AUTO_FILL_DELAY"))
 	drawAutofillTimeSelector()
 
-	if (not Game.IsFSL()) then
-		ImGui.PushStyleColor(ImGuiCol.Text, COL_WARN:AsFloat())
-		GUI:HeaderText(_T("YRV3_DANGER_ZONE"), { separator = true, spacing = true })
-		_, unsafeFeatsClicked = GUI:Checkbox(_T("YRV3_UNSAFE_FEATS_CB"), GVars.features.unsafe_feats_enabled)
-		if (unsafeFeatsClicked) then
+	GUI:HeaderText(_T("YRV3_DANGER_ZONE"), { separator = true, spacing = true, color = COL_WARN })
+
+	local isFSL     = Game.IsFSL()
+	local lowerText = isFSL and "YRV3_UNSAFE_FEATS_FSL_ON_TXT" or "YRV3_UNSAFE_FEATS_HINT"
+	ImGui.BeginDisabled(isFSL)
+	GUI:Checkbox(_T("YRV3_UNSAFE_FEATS_CB"), GVars.features.unsafe_feats_enabled, {
+		onClick = function()
 			if (GVars.features.unsafe_feats_enabled) then
 				GVars.features.unsafe_feats_enabled = false
 			else
-				ImGui.OpenPopup(_T("GENERIC_WARN_LABEL"))
+				unsafeFeatsPopupLabel = _F("%s##unsafeFeats", _T("GENERIC_WARN_LABEL"))
+				ImGui.OpenPopup(unsafeFeatsPopupLabel)
 			end
 		end
+	})
+	ImGui.EndDisabled()
+	ImGui.Spacing()
 
-		ImGui.Spacing()
-		ImGui.SetWindowFontScale(0.84)
-		ImGui.TextWrapped(_T("YRV3_UNSAFE_FEATS_HINT"))
-		ImGui.SetWindowFontScale(1.0)
-		ImGui.PopStyleColor()
+	ImGui.SetWindowFontScale(0.86)
+	ImGui.TextWrapped(_T(lowerText))
+	ImGui.SetWindowFontScale(1.0)
 
-		if (ImGui.DialogBox(_T("GENERIC_WARN_LABEL"), _T("YRV3_UNSAFE_FEATS_PROMPT"), ImGuiDialogBoxStyle.WARN)) then
-			GVars.features.unsafe_feats_enabled = true
-		end
+	if (not unsafeFeatsPopupLabel) then return end
+
+	if (ImGui.DialogBox(unsafeFeatsPopupLabel, _T("YRV3_UNSAFE_FEATS_PROMPT"), ImGuiDialogBoxStyle.WARN)) then
+		GVars.features.unsafe_feats_enabled = true
 	end
 end

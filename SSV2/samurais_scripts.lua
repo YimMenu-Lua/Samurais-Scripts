@@ -79,9 +79,9 @@ Translator:Load()
 GUI:LateInit()
 
 ThreadManager:Run(function()
-	unlock_if_fsl()
 	populate_weapons()
 	register_commands()
+	unlock_if_fsl()
 
 	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD8, function()
 		LocalPlayer:GetVehicle():RamForward()

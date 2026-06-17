@@ -58,7 +58,7 @@ function DriftMinigame:Init()
 	self.m_extra_text           = ""
 	self.m_player_best          = GVars.features.vehicle.drift_minigame.player_best
 	self.m_text_color           = Color(255, 192, 0, 200)
-	self.m_bank_timer           = Timer.new(5e3)
+	self.m_bank_timer           = Timer(5e3)
 	self.m_game_timer           = 0
 end
 

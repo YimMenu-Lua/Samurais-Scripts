@@ -121,13 +121,10 @@ function GUI:init()
 end
 
 function GUI:LateInit()
-	debug_counter   = GVars.backend.debug_mode and 7 or 0
-	local toggleKey = GVars.keyboard_keybinds.gui_toggle
-	if (not toggleKey or not string.isvalid(toggleKey) or toggleKey:lower() == "unbound") then
-		toggleKey                          = "F5"
-		GVars.keyboard_keybinds.gui_toggle = toggleKey
-	end
+	KeyManager:AssertKeybind(true, "keyboard_keybinds.gui_toggle", "F5")
+	debug_counter = GVars.backend.debug_mode and 7 or 0
 
+	local toggleKey = GVars.keyboard_keybinds.gui_toggle
 	local tab_id, array_idx = GVars.ui.last_tab.tab_id, GVars.ui.last_tab.array_index
 	if (not math.is_inrange(tab_id, TABID_MIN, TABID_MAX)) then
 		tab_id    = TABID_MIN
@@ -161,20 +158,19 @@ function GUI:LateInit()
 	end
 end
 
+local trace
+local err = "[GUI]: Unrecoverable callback error. Please contact a developer."
 function GUI:Toggle()
 	self.m_should_draw = not self.m_should_draw
 
 	if (self.m_should_draw and self.m_has_error) then
 		self.m_should_draw = false
-
-		local msg = "[GUI]: Unrecoverable callback error. Please contact a developer."
-		Notifier:ShowError("GUI", msg, false, 6.0)
+		Notifier:ShowError("GUI", err, false, 6.0)
 
 		if (self.m_traceback) then
-			msg = msg .. "\n    Traceback: " .. self.m_traceback
+			trace = trace or (err .. "\n    Traceback: " .. self.m_traceback)
+			log.error(trace)
 		end
-
-		log.warning(msg)
 	end
 
 	gui.override_mouse(self.m_should_draw)
@@ -849,20 +845,30 @@ function GUI:HeaderText(text, opts)
 		ImGui.Spacing()
 	end
 
-	if (opts.color) then
-		ImGui.PushStyleColor(ImGuiCol.Text, opts.color:AsFloat())
+	local separator = opts.separator
+	local color     = opts.color
+	local col_stack = 0
+
+	if (color) then
+		local r, g, b, a = color:AsFloat()
+		ImGui.PushStyleColor(ImGuiCol.Text, r, g, b, a)
+		col_stack = col_stack + 1
+		if (separator) then
+			ImGui.PushStyleColor(ImGuiCol.Separator, r, g, b, a)
+			col_stack = col_stack + 1
+		end
 	end
 
 	ImGui.SetWindowFontScale(opts.scale or 1.114)
-	if (opts.separator) then
+	if (separator) then
 		ImGui.SeparatorText(text)
 	else
 		ImGui.Text(text)
 	end
 	ImGui.SetWindowFontScale(1.0)
 
-	if (opts.color) then
-		ImGui.PopStyleColor()
+	if (col_stack > 0) then
+		ImGui.PopStyleColor(col_stack)
 	end
 end
 
@@ -1033,16 +1039,14 @@ function GUI:SetClipBoardText(text, eval)
 end
 
 -- Plays a sound when an ImGui widget is clicked.
----@param sound string|table
+---@param sound string|{ soundName: string, soundRef: string }
 function GUI:PlaySound(sound)
 	if (GVars.ui.disable_sound_feedback) then
 		return
 	end
 
 	local _sound = (type(sound) == "string") and self.Sounds[sound] or sound
-	if (not _sound) then
-		return
-	end
+	if (not _sound) then return end
 
 	ThreadManager:Run(function()
 		AUDIO.PLAY_SOUND_FRONTEND(-1, _sound.soundName, _sound.soundRef, false)
@@ -1052,44 +1056,46 @@ end
 ---@param label string
 ---@param v boolean
 ---@param opts? { tooltip?: string, color?: Color, onClick?: fun(v?: boolean) } the `color` optional param applies to the optional tooltip, not the toggle.
----@return boolean, boolean
+---@return boolean value, boolean clicked
 function GUI:CustomToggle(label, v, opts)
-	local clicked = false
-	opts          = opts or {}
-	v, clicked    = ImGui.Toggle(label, v)
+	opts           = opts or {}
+	local r, c     = ImGui.Toggle(label, v)
+	local tooltip  = opts.tooltip
+	local callback = opts.onClick
 
-	if (opts.tooltip) then
-		self:Tooltip(opts.tooltip, { color = opts.color })
+	if (tooltip) then
+		self:Tooltip(tooltip, { color = opts.color })
 	end
 
-	if (clicked and type(opts.onClick) == "function") then
-		opts.onClick(v)
+	if (c and type(callback) == "function") then
+		callback(v)
 	end
 
-	return v, clicked
+	return r, c
 end
 
 ---@param label string
 ---@param v boolean
 ---@param opts? { tooltip?: string, color?: Color, onClick?: fun(v?: boolean) }
----@return boolean, boolean
+---@return boolean value, boolean clicked
 function GUI:Checkbox(label, v, opts)
-	local clicked = false
-	opts          = opts or {}
-	v, clicked    = ImGui.Checkbox(label, v)
+	opts           = opts or {}
+	local r, c     = ImGui.Checkbox(label, v)
+	local tooltip  = opts.tooltip
+	local callback = opts.onClick
 
-	if (opts.tooltip) then
-		self:Tooltip(opts.tooltip, { color = opts.color })
+	if (tooltip) then
+		self:Tooltip(tooltip, { color = opts.color })
 	end
 
-	if (clicked) then
+	if (c) then
 		self:PlaySound(self.Sounds.Checkbox)
-		if (type(opts.onClick) == "function") then
-			opts.onClick(v)
+		if (type(callback) == "function") then
+			callback(r)
 		end
 	end
 
-	return v, clicked
+	return r, c
 end
 
 -- A toggle that works by reference.
@@ -1124,7 +1130,7 @@ end
 ---@return boolean clicked
 function GUI:CheckboxEx(label, bRef)
 	local clicked   = false
-	bRef.v, clicked = ImGui.Toggle(label, bRef.v)
+	bRef.v, clicked = ImGui.Checkbox(label, bRef.v)
 	return clicked
 end
 

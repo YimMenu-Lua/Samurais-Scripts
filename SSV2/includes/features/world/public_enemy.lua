@@ -61,8 +61,8 @@ end
 function PublicEnemy:Init()
 	self.m_enabled            = false
 	self.m_hostile_peds       = Set()
-	self.m_last_scan_time     = TimePoint.new()
-	self.m_last_task_time     = TimePoint.new()
+	self.m_last_scan_time     = TimePoint()
+	self.m_last_task_time     = TimePoint()
 	self.m_hostile_count      = 0
 	self.m_last_hostile_count = 0
 	self.m_max_count          = 50

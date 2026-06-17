@@ -8,9 +8,9 @@
 
 
 local Audio            = require("includes.modules.Audio")
-local PropManager      = require("PropManager")
-local FXManager        = require("FXManager")
-local YAV3Debugger     = require("YAV3Debugger")
+local PropManager      = require("includes.features.extra.yim_actions.PropManager")
+local FXManager        = require("includes.features.extra.yim_actions.FXManager")
+local YAV3Debugger     = require("includes.features.extra.yim_actions.YAV3Debugger")
 
 local SceneManager     = require("includes.services.SceneManager")
 local CompanionManager = require("includes.services.CompanionManager")
@@ -741,7 +741,7 @@ function YimActions:OnKeyDown()
 
 	if (KeyManager:IsKeybindJustPressed("stop_anim")) then
 		ThreadManager:Run(function()
-			local timer = Timer.new(1000)
+			local timer = Timer(1000)
 			while (KeyManager:IsKeybindPressed("stop_anim")) do
 				if (timer:IsDone()) then
 					GUI:PlaySound(GUI.Sounds.Cancel)

@@ -7,8 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BusinessBase    = require("BusinessBase")
-local CashSafe        = require("CashSafe")
+local BusinessBase = require("BusinessBase")
+local CashSafe     = require("CashSafe")
 
 ---@class BusinessFrontOpts : BusinessOpts
 ---@field id integer
@@ -24,6 +24,7 @@ local CashSafe        = require("CashSafe")
 ---@field lifetime_earnings? integer
 ---@field lifetime_earnings_fmt? string
 
+
 -- Class representing a Business Front.
 --
 -- Can be: Nightclub, CEO Office, or MC clubhouse
@@ -34,7 +35,8 @@ local CashSafe        = require("CashSafe")
 ---@field private m_subs array<Factory|BusinessHub|Warehouse>
 ---@field private m_earnings_report? BusinessEarningsReport
 ---@field private m_last_report_check_time milliseconds
----@field public Rename? fun(p0: integer|string) -- Renames the business. MC and CEO take a string argument and nightclub takes an int index.
+---@field public Rename? fun(self: BusinessFront, p0: integer|string) -- Renames the business. MC and CEO take a string argument and nightclub takes an int index.
+---@field public GetCustomName? fun(self: BusinessFront): string
 local BusinessFront   = setmetatable({}, BusinessBase)
 BusinessFront.__index = BusinessFront
 

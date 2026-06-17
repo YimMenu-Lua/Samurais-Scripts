@@ -43,6 +43,7 @@ local towTruckModels <const> = Set(
 	_J("towtruck4")
 )
 
+
 --------------------------------------
 -- Class: Vehicle
 --------------------------------------
@@ -58,7 +59,7 @@ local towTruckModels <const> = Set(
 ---@field Resolve fun() : CVehicle
 ---@field Create fun(_, modelHash: joaat_t, entityType: eEntityType, pos?: vec3, heading?: number, isNetwork?: boolean, isScriptHostPed?: boolean): Vehicle
 ---@overload fun(handle: handle): Vehicle
-Vehicle                      = Class("Vehicle", { parent = Entity })
+Vehicle = Class("Vehicle", { parent = Entity })
 
 ---@return boolean
 function Vehicle:IsValid()
@@ -76,28 +77,19 @@ end
 
 ---@return string
 function Vehicle:GetName()
-	if not self:IsValid() then
-		return ""
-	end
-
+	if (not self:IsValid()) then return "" end
 	return Game.GetVehicleDisplayName(self:GetModelHash())
 end
 
 ---@return string
 function Vehicle:GetManufacturerName()
-	if not self:IsValid() then
-		return ""
-	end
-
+	if (not self:IsValid()) then return "" end
 	return Game.GetLabelText(VEHICLE.GET_MAKE_NAME_FROM_VEHICLE_MODEL(self:GetModelHash()))
 end
 
 ---@return number
 function Vehicle:GetClassID()
-	if not self:IsValid() then
-		return -1
-	end
-
+	if (not self:IsValid()) then return -1 end
 	return VEHICLE.GET_VEHICLE_CLASS(self:GetHandle())
 end
 

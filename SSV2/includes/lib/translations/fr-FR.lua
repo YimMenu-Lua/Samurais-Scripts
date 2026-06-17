@@ -861,7 +861,7 @@ return {
 	["YAV3_VEH_ANIM_HINT"] = "Les animations centrées sur les véhicules ne peuvent pas être jouées à pied ; même pour les compagnons.",
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Aucun technicien n'est affecté à ce hub.",
 	["VEH_STANCE_TOE"] = "Orteil",
-	["YRV3_AUTO_SELL_COUNTDOWN"] = "La « vente automatique » démarrera dans 20 secondes. Vous pouvez l'annuler en désactivant la bascule avant la fin du minuteur.",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "La « vente automatique » démarrera dans 20 secondes. Vous pouvez l'annuler avant la fin du minuteur en désactivant la fonctionnalité ou en cliquant sur cette notification.",
 	["YRV3_AUTO_SELL_CANCELED_MSG"] = "« Vente automatique » a été annulée.",
 	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Cargaison de boîte de nuit",
 	["YRV3_HUB_TRANSFER_TECH_REL_ONLY"] = "Pertinent uniquement",
@@ -979,5 +979,11 @@ return {
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Veuillez appuyer sur l'embrayage ou mettre la vitesse au point mort avant de démarrer le moteur.",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Mode manuel uniquement : désactive le comportement de calage du moteur.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Assistance à l'embrayage",
-	["VEH_GEARBOX_AUTO"] = "Automatique"
+	["VEH_GEARBOX_AUTO"] = "Automatique",
+	["GENERIC_LABEL"] = "Étiquette",
+	["YAV3_ANIM_HISTORY_TT"] = "Les animations, scénarios et scènes que vous jouez apparaîtront ici.",
+	["BSV2_ES_DRIVE_PROPERTY"] = "Propriétés possédées",
+	["BSV2_ES_DRIVE_PROPERTY_TEXT"] = "Cliquez sur une propriété pour vous y rendre.",
+	["GENERIC_RETRY"] = "Réessayer",
+	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"] = "Les fonctionnalités non sécurisées sont toujours activées lors de l’utilisation de FSL."
 }

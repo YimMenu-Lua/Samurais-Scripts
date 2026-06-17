@@ -151,6 +151,8 @@ end
 
 function Mastermind:ReadPropertyData()
 	ThreadManager:Run(function()
+		table.clear(self.m_properties)
+
 		while (Game.IsInNetworkTransition()) do
 			yield()
 		end

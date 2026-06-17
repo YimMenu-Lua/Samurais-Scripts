@@ -31,8 +31,8 @@ function IVStyleExit:Init()
 	self.m_triggered        = false
 	self.m_pending_steering = false
 	self.m_last_steer_angle = 0.0
-	self.m_steering_timer   = Timer.new(200)
-	self.m_timer            = Timer.new(1000)
+	self.m_steering_timer   = Timer(200)
+	self.m_timer            = Timer(1000)
 	self.m_timer:Pause()
 	self.m_steering_timer:Pause()
 end

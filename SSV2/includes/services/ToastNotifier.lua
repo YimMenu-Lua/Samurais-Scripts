@@ -52,17 +52,11 @@ local frontendSounds <const> = {
 	},
 }
 
----@param caller string
----@param message string
-local function logError(caller, message)
-	log.fwarning("[ERROR] (%s): %s", caller, message)
-end
-
-local logLevels <const> = {
-	[Enums.eNotificationLevel.MESSAGE] = log.debug,
-	[Enums.eNotificationLevel.SUCCESS] = log.info,
-	[Enums.eNotificationLevel.WARNING] = log.warning,
-	[Enums.eNotificationLevel.ERROR]   = logError,
+local logLevels <const>      = {
+	[Enums.eNotificationLevel.MESSAGE] = log.fdebug,
+	[Enums.eNotificationLevel.SUCCESS] = log.finfo,
+	[Enums.eNotificationLevel.WARNING] = log.fwarning,
+	[Enums.eNotificationLevel.ERROR]   = log.ferror,
 }
 
 --#region Notification
@@ -77,8 +71,8 @@ local logLevels <const> = {
 ---@field m_seen boolean
 ---@field m_accent_color Color
 ---@field m_callback? Callback
-local Notification <const> = {}
-Notification.__index = Notification
+local Notification <const>   = {}
+Notification.__index         = Notification
 
 ---@param title string
 ---@param message string
@@ -111,7 +105,7 @@ function Notification:Invoke()
 	end
 
 	xpcall(self.m_callback, function(err)
-		logError(self.m_title, err)
+		log.ferror("%s: %s", self.m_title:gsub("%s.*$", ""), err)
 	end)
 
 	self:Dismiss()
@@ -138,7 +132,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 	ease               = ease or self:GetEaseIn()
 	local isToast      = context == Enums.eNotificationContext.TOAST
 	local isNotif      = not isToast
-	local hasCallback  = isNotif and self.m_callback ~= nil
+	local hasCallback  = self.m_callback ~= nil
 	local cardRounding = context == Enums.eNotificationContext.TOAST and 3.0 or 8.0
 	local padding      = 12.0
 	local accentWidth  = 8.0
@@ -235,48 +229,50 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 		self.m_title
 	)
 
-	if (isNotif and hovered) then
-		local btnPos = vec2:new(cardBR.x - padding - rightButtonW + 6.0, cardTL.y + padding - 2.0)
-		local btnBR  = vec2:new(btnPos.x + 20.0, btnPos.y + 20.0)
-		local btnBg  = ImGui.GetStyleColorU32(ImGuiCol.Button)
-		ImGui.ImDrawListAddRectFilled(
-			pImDrawList,
-			btnPos.x,
-			btnPos.y,
-			btnBR.x,
-			btnBR.y,
-			btnBg,
-			6.0
-		)
+	if (hovered) then
+		local hoveringCloseButn = false
+		if (isNotif) then
+			local btnPos = vec2:new(cardBR.x - padding - rightButtonW + 6.0, cardTL.y + padding - 2.0)
+			local btnBR  = vec2:new(btnPos.x + 20.0, btnPos.y + 20.0)
+			local btnBg  = ImGui.GetStyleColorU32(ImGuiCol.Button)
+			ImGui.ImDrawListAddRectFilled(
+				pImDrawList,
+				btnPos.x,
+				btnPos.y,
+				btnBR.x,
+				btnBR.y,
+				btnBg,
+				6.0
+			)
 
-		ImGui.ImDrawListAddText(
-			pImDrawList,
-			btnPos.x + 5.0,
-			btnPos.y - 1.0,
-			Color(200, 60, 60, 230.0 * alpha):AsU32(),
-			"X"
-		)
+			ImGui.ImDrawListAddText(
+				pImDrawList,
+				btnPos.x + 5.0,
+				btnPos.y - 1.0,
+				Color(200, 60, 60, 230.0 * alpha):AsU32(),
+				"X"
+			)
 
-		local btnRect = Rect(btnPos, btnBR)
-		local hoveringCloseButn = ImGui.IsMouseHoveringRect(btnRect.min.x, btnRect.min.y, btnRect.max.x, btnRect.max.y)
-		if (not self.m_seen and hoveringCloseButn) then
-			if (KeyManager:IsKeyJustPressed(eVirtualKeyCodes.VK_LBUTTON)) then
-				self:Dismiss()
+			local btnRect = Rect(btnPos, btnBR)
+			hoveringCloseButn = ImGui.IsMouseHoveringRect(btnRect.min.x, btnRect.min.y, btnRect.max.x, btnRect.max.y)
+			if (not self.m_seen and hoveringCloseButn) then
+				ImGui.SetTooltip(_T("GENERIC_DISMISS"))
+				if (KeyManager:IsKeyJustPressed(eVirtualKeyCodes.VK_LBUTTON)) then
+					self:Dismiss()
+				end
 			end
-
-			ImGui.SetTooltip(_T("GENERIC_DISMISS"))
 		end
 
 		if (hasCallback and not hoveringCloseButn) then
 			ImGui.SetTooltip("Click to execute.")
-
 			if (KeyManager:IsKeyJustPressed(eVirtualKeyCodes.VK_LBUTTON)) then
+				GUI:PlaySound(GUI.Sounds.Click)
 				self:Invoke()
 			end
 		end
 	end
 
-	local bodyPos = vec2:new(cardTL.x + padding, cardTL.y + padding + titleSize.y + titleSpacing)
+	local bodyPos        = vec2:new(cardTL.x + padding, cardTL.y + padding + titleSize.y + titleSpacing)
 	local tr, tg, tb, ta = textCol:AsRGBA()
 	ImGui.ImDrawListAddText(
 		pImDrawList,
@@ -451,11 +447,11 @@ function Toast:Log()
 	end
 
 	local logFunc = logLevels[self:GetLevel()]
-	if (type(logFunc) ~= "function") then
+	if (not logFunc) then
 		return
 	end
 
-	logFunc(_F("%s, %s", self:GetTitle(), self:GetMessage()))
+	logFunc("%s: %s", self:GetTitle():gsub("%s.*$", ""), self:GetMessage())
 end
 
 --#endregion
@@ -566,40 +562,37 @@ end
 
 function Notifier:ComputeTotalHeight()
 	local total = 80.0
-
 	for _, notif in ipairs(self.m_notifs) do
 		if (not notif.m_seen) then
 			total = total + notif:ComputeHeight()
 			total = total + 10.0
 		end
 	end
-
 	return total + 20
 end
 
 ---@param title string The notification title.
 ---@param message string The notification body.
 ---@param level eNotificationLevel The notification type.
----@param opts? { log?: boolean, duration?: seconds, callback?: Callback }
+---@param opts? { log?: boolean, duration?: seconds, callback?: function }
 function Notifier:Add(title, message, level, opts)
-	opts = opts or {}
-
 	local now = Time.Now()
 	if (self.m_last_title == title and self.m_last_message == message) and (now - self.m_last_time) < self.m_rate_limit then
 		return
 	end
 
+	opts                = opts or {}
+	local duration      = opts.duration or 3
 	self.m_last_title   = title
 	self.m_last_message = message
 	self.m_last_time    = now
 	self.m_viewed       = (self.m_should_draw == true)
-	local id            = string.format("##%s%d", title, self:GetToastCount() + 1)
+	local id            = _F("##%s%d", title, self:GetToastCount() + 1)
 	local timestamp     = os.date("%H:%M")
 	local notif         = Notification.new(_F("%s\t[%s]", title, timestamp), message, level, id, opts.callback)
-	local toast         = Toast.new(opts.duration or 3.0, opts.log or false)
+	local toast         = Toast.new(duration or 3.0, opts.log or false)
 
 	table.insert(self.m_notifs, notif)
-
 	if (not self:IsMuted()) then
 		table.insert(self.m_toasts, toast:Bind(notif))
 	end
@@ -609,7 +602,7 @@ end
 ---@param message string The notification body.
 ---@param withLog? boolean **Optional:** Log to console as well.
 ---@param duration? number **Optional:** The duration of the notification *(default 3s)*.
----@param callback? Callback
+---@param callback? Callback **Optional:** a callback to execute when the toast or the notification is clicked.
 function Notifier:ShowMessage(caller, message, withLog, duration, callback)
 	local opts = { duration = duration or 3, log = withLog or false, callback = callback }
 	self:Add(caller, message, Enums.eNotificationLevel.MESSAGE, opts)
@@ -619,7 +612,7 @@ end
 ---@param message string The notification body.
 ---@param withLog? boolean **Optional:** Log to console as well.
 ---@param duration? number **Optional:** The duration of the notification *(default 3s)*.
----@param callback? Callback
+---@param callback? Callback **Optional:** a callback to execute when the toast or the notification is clicked.
 function Notifier:ShowSuccess(caller, message, withLog, duration, callback)
 	local opts = { duration = duration or 3, log = withLog or false, callback = callback }
 	self:Add(caller, message, Enums.eNotificationLevel.SUCCESS, opts)
@@ -629,7 +622,7 @@ end
 ---@param message string The notification body.
 ---@param withLog? boolean **Optional:** Log to console as well.
 ---@param duration? number **Optional:** The duration of the notification *(default 3s)*.
----@param callback? Callback
+---@param callback? Callback **Optional:** a callback to execute when the toast or the notification is clicked.
 function Notifier:ShowWarning(caller, message, withLog, duration, callback)
 	local opts = { duration = duration or 3, log = withLog or false, callback = callback }
 	self:Add(caller, message, Enums.eNotificationLevel.WARNING, opts)
@@ -639,7 +632,7 @@ end
 ---@param message string The notification body.
 ---@param withLog? boolean **Optional:** Log to console as well.
 ---@param duration? number **Optional:** The duration of the notification *(default 3s)*.
----@param callback? Callback
+---@param callback? Callback **Optional:** a callback to execute when the toast or the notification is clicked.
 function Notifier:ShowError(caller, message, withLog, duration, callback)
 	local opts = { duration = duration or 3, log = withLog or false, callback = callback }
 	self:Add(caller, message, Enums.eNotificationLevel.ERROR, opts)

@@ -248,6 +248,9 @@ end
 
 ---@return joaat_t
 function Entity:GetModelHash()
+	if (self.m_modelhash == nil) then
+		self.m_modelhash = Game.GetEntityModel(self:GetHandle())
+	end
 	return self.m_modelhash
 end
 
@@ -337,13 +340,13 @@ function Entity:GetHeightAboveGround()
 end
 
 ---@return integer
-function Entity:GetInterior()
+function Entity:GetInteriorID()
 	return self:Exists() and INTERIOR.GET_INTERIOR_FROM_ENTITY(self:GetHandle()) or 0
 end
 
 ---@return boolean
 function Entity:IsOutside()
-	return self:GetInterior() == 0
+	return self:GetInteriorID() == 0
 end
 
 ---@return joaat_t

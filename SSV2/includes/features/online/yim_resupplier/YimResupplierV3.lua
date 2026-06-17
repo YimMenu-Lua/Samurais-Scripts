@@ -11,6 +11,16 @@ local SGSL <const>                    = require("includes.services.SGSL")
 local IManagedValueController <const> = require("includes.structs.IManagedValueController")
 local RawData <const>                 = require("includes.data.yrv3_data")
 
+---@return boolean
+local function IsScreenFadingOrFadedOut()
+	return CAM.IS_SCREEN_FADED_OUT() or CAM.IS_SCREEN_FADING_OUT()
+end
+
+---@return boolean
+local function IsScreenFadingOrFadedIn()
+	return CAM.IS_SCREEN_FADED_IN() or CAM.IS_SCREEN_FADING_IN()
+end
+
 
 ---@enum eYRState
 Enums.eYRState = {
@@ -36,12 +46,21 @@ Enums.eYRState = {
 ---@field salvage_yard? SalvageYard
 
 
+---@enum eAutoSellState
+Enums.eAutoSellState = {
+	NONE      = 0,
+	TRIGGERED = 1,
+	CANCELED  = 2,
+	FAILED    = 3
+}
+
+
 ---@class YRV3
 ---@field private m_last_error string
 ---@field private m_total_sum number
 ---@field private m_total_sum_fmt string
 ---@field private m_bhub_script_handle number
----@field private m_has_triggered_autosell boolean
+---@field private m_autosell_state eAutoSellState
 ---@field private m_sell_script_running boolean
 ---@field private m_sell_script_name string?
 ---@field private m_sell_script_disp_name string
@@ -72,7 +91,7 @@ function YRV3:init()
 	self.m_last_business_update_time = 0
 	self.m_last_cooldown_check_time  = 0
 	self.m_state                     = Enums.eYRState.IDLE
-	self.m_has_triggered_autosell    = false
+	self.m_autosell_state            = Enums.eAutoSellState.NONE
 	self.m_sell_script_running       = false
 	self.m_initial_data_done         = false
 	self.m_data_initialized          = false
@@ -80,9 +99,13 @@ function YRV3:init()
 	self.m_sell_script_disp_name     = "None"
 	self.m_last_error                = ""
 	self.m_businesses                = { safes = {} }
-	self.m_boss_types_avail          = {}
+	self.m_boss_types_avail          = { { name = "GB_BOSS" --[[VIP]], id = 0 } }
 	self.m_cooldown_controller       = IManagedValueController.new(RawData.Cooldowns)
 
+	-- this is stupid but works. we're just caching the label so that we can later use it anywhere with the _T macro
+	-- we should probably decouble game labels from our own, something like a global table where we can do `label = GLabels.GB_BOSS`
+	-- while still keeping Translator compatibility.
+	Translator:TranslateGXT("GB_BOSS")
 
 	self.m_thread = ThreadManager:RegisterLooped("SS_YRV3", function()
 		self:OnTick()
@@ -108,11 +131,11 @@ function YRV3:Reset(disable, reason)
 	self.m_last_income_check_time    = 0
 	self.m_last_business_update_time = 0
 	self.m_businesses                = { safes = {} }
-	self.m_boss_types_avail          = {}
-	self.m_has_triggered_autosell    = false
+	self.m_boss_types_avail          = { { name = "GB_BOSS" --[[VIP]], id = 0 } }
 	self.m_sell_script_running       = false
 	self.m_initial_data_done         = false
 	self.m_data_initialized          = false
+	self.m_autosell_state            = Enums.eAutoSellState.NONE
 	self.m_state                     = disable and Enums.eYRState.ERROR or Enums.eYRState.IDLE
 
 	if (disable) then
@@ -244,9 +267,9 @@ function YRV3:IsAnySaleInProgress()
 	return self.m_sell_script_running
 end
 
----@return boolean
-function YRV3:HasTriggeredAutoSell()
-	return self.m_has_triggered_autosell
+---@return eAutoSellState
+function YRV3:GetAutoSellState()
+	return self.m_autosell_state
 end
 
 ---@param stat string
@@ -322,7 +345,7 @@ function YRV3:PopulateOffice()
 		name   = Game.GetLabelText(ref.gxt),
 		coords = ref.coords,
 	}
-	table.insert(self.m_boss_types_avail, { name = "GB_BOSSC", id = 0 })
+	self.m_boss_types_avail[1].name = "GB_BOSSC"
 end
 
 function YRV3:PopulateClubhouse()
@@ -580,7 +603,7 @@ function YRV3:CommandFinishSale()
 		return
 	end
 
-	self:FinishSale()
+	self:FinishSale(true)
 end
 
 ---@param index number
@@ -638,7 +661,7 @@ function YRV3:GetFactoryByIndex(index)
 	if (not self:CanAccess()) then return end
 
 	if (type(index) ~= "number" or not math.is_inrange(index, 1, 7)) then
-		Notifier:ShowError("YRV3", "Invalid factory index! Please make sure to use a number between 1 and 7.")
+		Notifier:ShowError("Business Manager", "Invalid factory index! Please make sure to use a number between 1 and 7.")
 		return
 	end
 
@@ -670,18 +693,18 @@ end
 function YRV3:CommandFactoryRestock(index)
 	local factory = self:GetFactoryByIndex(index)
 	if (not factory) then
-		Notifier:ShowError("YRV3", _T("YRV3_MC_NONE_OWNED"), false, 5)
+		Notifier:ShowError("Business Manager", _T("YRV3_MC_NONE_OWNED"), false, 5)
 		return
 	end
 
-	factory:ReStock()
+	factory:ReStock(true)
 end
 
 ---@param index integer -- `1 .. 7`
 ---@param isNightclubHub? boolean
 function YRV3:CommandToggleProduction(index, isNightclubHub)
 	if (not GVars.features.unsafe_feats_enabled) then
-		Notifier:ShowError("YRV3", _T("YRV3_UNSAFE_FEAT_BYPASS_ERR"))
+		Notifier:ShowError("Business Manager", _T("YRV3_UNSAFE_FEAT_BYPASS_ERR"))
 		return
 	end
 
@@ -691,7 +714,7 @@ function YRV3:CommandToggleProduction(index, isNightclubHub)
 	else
 		local nc = self.m_businesses.nightclub
 		if (not nc) then
-			Notifier:ShowError("YRV3", _T("YRV3_CLUB_NOT_OWNED"), false, 5)
+			Notifier:ShowError("Business Manager", _T("YRV3_CLUB_NOT_OWNED"), false, 5)
 			return
 		end
 
@@ -707,7 +730,7 @@ function YRV3:CommandToggleProduction(index, isNightclubHub)
 	end
 
 	if (not factory) then
-		Notifier:ShowError("YRV3", _T("YRV3_GENERIC_NOT_OWNED"), false, 5)
+		Notifier:ShowError("Business Manager", _T("YRV3_GENERIC_NOT_OWNED"), false, 5)
 		return
 	end
 
@@ -747,7 +770,7 @@ end
 
 function YRV3:FillAllSafes()
 	if (not GVars.features.unsafe_feats_enabled) then
-		Notifier:ShowError("YRV3", _T("YRV3_UNSAFE_FEAT_BYPASS_ERR"))
+		Notifier:ShowError("Business Manager", _T("YRV3_UNSAFE_FEAT_BYPASS_ERR"))
 		return
 	end
 
@@ -759,9 +782,9 @@ function YRV3:FillAllSafes()
 	end
 
 	if (count == 0) then
-		Notifier:ShowMessage("YRV3", _T("YRV3_BULK_SAFE_FILL_NONE"))
+		Notifier:ShowMessage("Business Manager", _T("YRV3_BULK_SAFE_FILL_NONE"))
 	else
-		Notifier:ShowSuccess("YRV3", _T("YRV3_BULK_SAFE_FILL_SUCCESS_FMT", count))
+		Notifier:ShowSuccess("Business Manager", _T("YRV3_BULK_SAFE_FILL_SUCCESS_FMT", count))
 	end
 end
 
@@ -787,7 +810,7 @@ function YRV3:FillAll()
 	for i = 1, 7 do
 		local factory = self:GetFactoryByIndex(i)
 		if (factory and factory:IsValid() and factory:IsSetup()) then
-			factory:ReStock()
+			factory:ReStock(true)
 			sleep(math.random(600, 1200))
 		end
 	end
@@ -802,29 +825,40 @@ function YRV3:GetRunningSellScriptDisplayName()
 	return RawData.ScriptDisplayNames[self.m_sell_script_name] or "None"
 end
 
-function YRV3:FinishSale()
+---@param doCleanup boolean
+function YRV3:FinishSale(doCleanup)
 	local sn = self.m_sell_script_name
-	if (not sn) then
-		return
-	end
+	if (not sn) then return end
 
 	local func = RawData.SellScripts[sn]
 	if (not func) then return end
 
-	self.m_has_triggered_autosell = true
-	script.execute_as_script(sn, function()
+	self.m_autosell_state = Enums.eAutoSellState.TRIGGERED
+	ThreadManager:Run(function()
 		if (not LocalPlayer:IsHostOfScript(sn)) then
-			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
+			Notifier:ShowError("Business Manager", _T("YRV3_SCRIPT_HOST_ERR"))
+			self.m_autosell_state = Enums.eAutoSellState.FAILED
 			return
 		end
-		func()
+
+		local ok, err = pcall(func)
+		if (not ok) then
+			Notifier:ShowError("Business Manager", _F("Autosell failed with error: %s", err))
+			self.m_autosell_state = Enums.eAutoSellState.FAILED
+			return
+		end
+
+		if (not doCleanup) then return end
+
+		while (self:IsAnySaleInProgress()) do yield() end
+		self.m_autosell_state = Enums.eAutoSellState.NONE
 	end)
 end
 
 function YRV3:FinishCEOCargoSourceMission()
 	if (script.is_active("gb_contraband_buy")) then
 		if (not LocalPlayer:IsHostOfScript("gb_contraband_buy")) then
-			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
+			Notifier:ShowError("Business Manager", _T("YRV3_SCRIPT_HOST_ERR"))
 			return
 		end
 
@@ -834,7 +868,7 @@ function YRV3:FinishCEOCargoSourceMission()
 		buyLocal:At(192):WriteInt(4)
 	elseif (script.is_active("fm_content_cargo")) then
 		if (not LocalPlayer:IsHostOfScript("fm_content_cargo")) then
-			Notifier:ShowError("YRV3", _T("YRV3_SCRIPT_HOST_ERR"))
+			Notifier:ShowError("Business Manager", _T("YRV3_SCRIPT_HOST_ERR"))
 			return
 		end
 
@@ -902,14 +936,11 @@ function YRV3:SetupAutosell()
 			end
 		end
 
-		sleep(1000)
-		if (CAM.IS_SCREEN_FADING_OUT() or CAM.IS_SCREEN_FADED_OUT()) then
-			local fadedOutTimer = Timer.new(1e4)
+		sleep(2000)
+		if (IsScreenFadingOrFadedOut) then
+			local fadedOutTimer = Timer(1e4)
 			while (not fadedOutTimer:IsDone()) do
-				if (not CAM.IS_SCREEN_FADED_OUT() or CAM.IS_SCREEN_FADING_IN()) then
-					break
-				end
-
+				if (IsScreenFadingOrFadedIn()) then break end
 				yield()
 			end
 
@@ -932,30 +963,30 @@ function YRV3:AutoSellHandler()
 	local scr_name = self.m_sell_script_name
 	if (not scr_name) then return end
 
-	if (not self.m_has_triggered_autosell and not CAM.IS_SCREEN_FADED_OUT()) then
-		self.m_has_triggered_autosell = true
-		Notifier:ShowMessage("YRV3", _T("YRV3_AUTO_SELL_COUNTDOWN"))
+	if (self.m_autosell_state == Enums.eAutoSellState.NONE and not IsScreenFadingOrFadedOut()) then
+		self.m_autosell_state = Enums.eAutoSellState.TRIGGERED
+		Notifier:ShowMessage("Business Manager", _T("YRV3_AUTO_SELL_COUNTDOWN"), false, 20, function()
+			if (self.m_autosell_state == Enums.eAutoSellState.TRIGGERED) then
+				self.m_autosell_state = Enums.eAutoSellState.CANCELED
+			end
+		end)
 
-		local timeout = Timer.new(2e4)
+		local timeout = Timer(2e4)
 		while (not timeout:IsDone() or AUDIO.IS_MOBILE_PHONE_CALL_ONGOING()) do
-			if (not GVars.features.yrv3.autosell or not script.is_active(scr_name)) then
-				Notifier:ShowMessage("YRV3", _T("YRV3_AUTO_SELL_CANCELED_MSG"))
-				self.m_has_triggered_autosell = false
+			if (not GVars.features.yrv3.autosell or not script.is_active(scr_name) or self.m_autosell_state ~= Enums.eAutoSellState.TRIGGERED) then
+				Notifier:ShowMessage("Business Manager", _T("YRV3_AUTO_SELL_CANCELED_MSG"))
 				return
 			end
 			yield()
 		end
 
-		self:FinishSale()
+		self:FinishSale(false)
 	end
 
-	while (self.m_has_triggered_autosell) do
-		if (not script.is_active(scr_name)) then
-			break
-		end
+	while (self.m_autosell_state == Enums.eAutoSellState.TRIGGERED and script.is_active(scr_name)) do
 		yield()
 	end
-	self.m_has_triggered_autosell = false
+	self.m_autosell_state = Enums.eAutoSellState.NONE
 end
 
 -- Master Control Terminal

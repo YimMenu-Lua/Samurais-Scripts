@@ -111,13 +111,13 @@ function ManualGearbox:Init()
 
 	self.m_kick_start           = {
 		enabled = false,
-		timer   = Timer.new(266, true)
+		timer   = Timer(266, true)
 	}
 
 	self.m_clutch_kick          = {
 		enabled = false,
 		rpm     = 0.0,
-		timer   = Timer.new(clutch_kick_duration, true),
+		timer   = Timer(clutch_kick_duration, true),
 	}
 
 	self.m_gear_state           = {
@@ -160,7 +160,7 @@ function ManualGearbox:Reset()
 
 	self.m_kick_start          = {
 		enabled = false,
-		timer   = Timer.new(266, true)
+		timer   = Timer(266, true)
 	}
 
 	self.m_drive_state         = eGearDriveState.INVALID
@@ -233,7 +233,7 @@ function ManualGearbox:OnNewVehicle()
 	self.m_force_neutral         = false
 	self.m_kick_start            = {
 		enabled = false,
-		timer   = Timer.new(266, true)
+		timer   = Timer(266, true)
 	}
 
 	self:SetEngineAutoStart()

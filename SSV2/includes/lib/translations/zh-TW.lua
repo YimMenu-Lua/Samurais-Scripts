@@ -862,7 +862,7 @@ return {
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "沒有技術人員被分配到該中心。",
 	["VEH_STANCE_TOE"] = "腳趾",
 	["YRV3_AUTO_SELL_CANCELED_MSG"] = "「自動銷售」已被取消。",
-	["YRV3_AUTO_SELL_COUNTDOWN"] = "「自動銷售」將在 20 秒後開始。您可以通过在计时器结束之前禁用切换来取消它。",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "「自動銷售」將在 20 秒後開始。您可以在計時器結束之前透過停用該功能或點擊此通知來取消它。",
 	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "夜總會貨運",
 	["YRV3_HUB_TRANSFER_TECH_REL_ONLY"] = "僅相關",
 	["YRV3_HUB_TRANSFER_TECH"] = "[！ ] 轉技術員",
@@ -979,5 +979,11 @@ return {
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "啟動引擎前，請踩下離合器或將檔位置於空檔。",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "僅手動模式：停用引擎熄火行為。",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "離合器輔助裝置",
-	["VEH_GEARBOX_AUTO"] = "自動的"
+	["VEH_GEARBOX_AUTO"] = "自動的",
+	["GENERIC_LABEL"] = "標籤",
+	["YAV3_ANIM_HISTORY_TT"] = "您所玩的動畫、場景和場景將出現在此。",
+	["BSV2_ES_DRIVE_PROPERTY_TEXT"] = "點選某個屬性即可前往該屬性。",
+	["BSV2_ES_DRIVE_PROPERTY"] = "擁有的財產",
+	["GENERIC_RETRY"] = "重試",
+	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"] = "使用 FSL 時始終啟用不安全功能。"
 }

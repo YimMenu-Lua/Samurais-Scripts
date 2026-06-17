@@ -351,7 +351,7 @@ function EntityForge:EntityGun()
 		return
 	end
 
-	local aimedAtEntity = LocalPlayer:GetEntityInCrosshairs(true)
+	local aimedAtEntity = LocalPlayer:GetEntityInCrosshairs(true) ---@type handle?
 	local existing_entity
 
 	if (aimedAtEntity and (ENTITY.IS_ENTITY_DEAD(aimedAtEntity, false) or Backend:IsScriptEntity(aimedAtEntity))) then
@@ -710,7 +710,7 @@ function EntityForge:HandleAbominationProperties(handle, entityData)
 	end
 
 	if (entityData.properties.action and entityData.properties.action.scenario) then
-		local giveupTimer = Timer.new(1200)
+		local giveupTimer = Timer(1200)
 		while (not PED.IS_PED_USING_ANY_SCENARIO(handle) and not giveupTimer:IsDone()) do
 			TASK.TASK_START_SCENARIO_IN_PLACE(
 				handle,

@@ -17,7 +17,6 @@ local miscFeatures = require("includes.features.self.miscellaneous")
 local CPed         = require("includes.classes.gta.CPed")
 local YimActions   = require("includes.features.extra.yim_actions.YimActionsV3")
 local YRV3         = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local SGSL         = require("includes.services.SGSL")
 
 
 --------------------------------------
@@ -90,7 +89,7 @@ function LocalPlayer:GetPos(_)
 	return _G.self.get_pos()
 end
 
--- Returns the vehicle you're driving, not just sitting in.
+-- Always returns the single instance of [PlayerVehicle](lua://PlayerVehicle)
 ---@override
 ---@return PlayerVehicle
 function LocalPlayer:GetVehicle()
@@ -207,7 +206,7 @@ end
 
 -- Returns the entity local player is aiming at.
 ---@param skip_players? boolean -- Ignore network players.
----@return handle | nil
+---@return handle
 function LocalPlayer:GetEntityInCrosshairs(skip_players)
 	local is_aiming, entity, pid = false, 0, self:GetID()
 
@@ -216,15 +215,17 @@ function LocalPlayer:GetEntityInCrosshairs(skip_players)
 	end
 
 	is_aiming, entity = PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(pid, entity)
-	if is_aiming and ENTITY.DOES_ENTITY_EXIST(entity) then
-		if ENTITY.IS_ENTITY_A_PED(entity) then
-			if PED.IS_PED_A_PLAYER(entity) and skip_players then
-				return 0
-			end
+	if not is_aiming or not ENTITY.DOES_ENTITY_EXIST(entity) then
+		return 0
+	end
 
-			if PED.IS_PED_IN_ANY_VEHICLE(entity, false) then -- aiming at an occupied vehicle returns the driver ped instead of the vehicle.
-				return PED.GET_VEHICLE_PED_IS_IN(entity, false) -- force return the vehicle.
-			end
+	if ENTITY.IS_ENTITY_A_PED(entity) then
+		if PED.IS_PED_A_PLAYER(entity) and skip_players then
+			return 0
+		end
+
+		if PED.IS_PED_IN_ANY_VEHICLE(entity, false) then -- aiming at an occupied vehicle returns the driver ped instead of the vehicle.
+			return PED.GET_VEHICLE_PED_IS_IN(entity, false) -- force return the vehicle.
 		end
 	end
 
@@ -545,24 +546,37 @@ function LocalPlayer.ForceCloudSave()
 	STATS.STAT_SAVE(0, false, 3, false)
 end
 
----@param bossType int8_t -- -1 = retire | 0 = CEO | 1 = MC
+---@param bossType int8_t
+---| -1: Retire
+---| 0: VIP/CEO
+---| 1: MC
 function LocalPlayer:RegisterAsBoss(bossType)
-	if (not Game.IsOnline()) then return end
+	if (not Game.IsOnline()) then
+		return
+	end
 
 	if (not math.is_inrange(bossType, -1, 1)) then
 		return
 	end
 
-	if (bossType == -1) then
-		self:Retire()
+	if (self:IsBoss()) then
+		if (bossType == -1) then
+			self:Retire()
+		end
+		-- no smart boss switch. must explicitly retire then register again
+		return
+	end
+
+	if (bossType == 1 and not YRV3:GetClubhouse()) then
+		Notifier:ShowError("Business Manager", _T("YRV3_CLUBHOUSE_NOT_OWNED"))
 		return
 	end
 
 	ThreadManager:Run(function()
-        scr_function.call_script_function("freemode", "GB_REGISTER", "2D 03 14 00 00 72", "void", {
-		    { "bool", true },
-		    { "int", bossType },
-		    { "int", 208508824 }
+		scr_function.call_script_function("freemode", "GB_REGISTER", "2D 03 14 00 00 72", "void", {
+			{ "bool", true },
+			{ "int",  bossType },
+			{ "int",  208508824 }
 		})
 	end)
 end
@@ -571,8 +585,8 @@ function LocalPlayer:Retire()
 	if not (Game.IsOnline() and self:IsBoss()) then return end
 
 	ThreadManager:Run(function()
-        scr_function.call_script_function("freemode", "GB_RETIRE", "2D 01 03 00 00 38 00 56 ? ? 25 5B", "void", {
-		    { "bool", true }
+		scr_function.call_script_function("freemode", "GB_RETIRE", "2D 01 03 00 00 38 00 56 ? ? 25 5B", "void", {
+			{ "bool", true }
 		})
 	end)
 end

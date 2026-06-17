@@ -862,7 +862,7 @@ return {
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "Diesem Hub ist kein Techniker zugeordnet.",
 	["VEH_STANCE_TOE"] = "Zehe",
 	["YRV3_AUTO_SELL_CANCELED_MSG"] = "„Auto-Sell“ wurde abgebrochen.",
-	["YRV3_AUTO_SELL_COUNTDOWN"] = "„Auto-Sell“ startet in 20 Sekunden. Sie können es abbrechen, indem Sie den Schalter vor Ablauf des Timers deaktivieren.",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "„Auto-Sell“ startet in 20 Sekunden. Sie können es vor Ablauf des Timers abbrechen, indem Sie entweder die Funktion deaktivieren oder auf diese Benachrichtigung klicken.",
 	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "Nachtclub-Fracht",
 	["YRV3_HUB_TRANSFER_TECH"] = "[ ! ] Transfertechniker",
 	["YRV3_HUB_TRANSFER_TECH_FAIL_FMT"] = "Der Techniker konnte nicht von %s nach %s übertragen werden!",
@@ -979,5 +979,11 @@ return {
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "Bitte treten Sie die Kupplung oder schalten Sie den Gang in den Leerlauf, bevor Sie den Motor starten.",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "Kupplungsassistent",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "Nur manueller Modus: Deaktiviert das Motorabwürgeverhalten.",
-	["VEH_GEARBOX_AUTO"] = "Automatisch"
+	["VEH_GEARBOX_AUTO"] = "Automatisch",
+	["GENERIC_LABEL"] = "Etikett",
+	["YAV3_ANIM_HISTORY_TT"] = "Animationen, Szenarien und Szenen, die Sie spielen, werden hier angezeigt.",
+	["BSV2_ES_DRIVE_PROPERTY_TEXT"] = "Klicken Sie auf eine Immobilie, um dorthin zu reisen.",
+	["BSV2_ES_DRIVE_PROPERTY"] = "Eigene Immobilien",
+	["GENERIC_RETRY"] = "Wiederholen",
+	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"] = "Unsichere Funktionen sind bei Verwendung von FSL immer aktiviert."
 }

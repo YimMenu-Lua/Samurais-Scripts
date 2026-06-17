@@ -7,11 +7,12 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BSV2             = require("includes.features.extra.billionaire_services.BillionaireServicesV2")
-local measureTextWidth = require("includes.frontend.helpers.measure_text_width")
-local newGroupVehs     = require("includes.data.bsv2_data").NewGroupVehicles
-local WeaponBrowser    = require("includes.services.asset_browsers.WeaponBrowser").new()
-local PedBrowser       = require("includes.services.asset_browsers.PedBrowser").new({
+local BSV2                      = require("includes.features.extra.billionaire_services.BillionaireServicesV2")
+local measureTextWidth          = require("includes.frontend.helpers.measure_text_width")
+local propertyDestSelector      = require("includes.frontend.billionaire_services.prop_destinations_ui")
+local newGroupVehs              = require("includes.data.bsv2_data").NewGroupVehicles
+local WeaponBrowser             = require("includes.services.asset_browsers.WeaponBrowser").new()
+local PedBrowser                = require("includes.services.asset_browsers.PedBrowser").new({
 	max_entries         = 100,
 	humans_only         = true,
 	show_gender_filters = false,
@@ -19,37 +20,37 @@ local PedBrowser       = require("includes.services.asset_browsers.PedBrowser").
 	show_preview        = false,
 })
 
-local drivingStyle     = {
+local drivingStyle              = {
 	index      = 1,
 	normal     = false,
 	aggressive = false
 }
 
-local newGroup         = {
-	---@type RawEscortGroupData
+local shouldDrawPropertyBrowser = false
+
+local newGroup                  = {
 	---@diagnostic disable-next-line
-	buffer             = {},
+	dataBuffer         = {}, ---@type RawEscortGroupData
 	stage              = 1,
 	vehicle_index      = 1,
+	memberWeaponBuffer = 0,
 	nameBuffer         = "",
 	memberNameBuffer   = "",
-	memberWeaponBuffer = 0,
-	---@type RawPedData?
-	memberPedBuffer    = nil,
+	memberPedBuffer    = nil, ---@type RawPedData?
 	can_progress       = false
 }
 
 ---@type array<integer>
-local labelWidths      = {}
+local labelWidths               = {}
 
 ---@type RawEscortGroupData?
-local selectedGroup    = nil
-local godMode          = false
-local noRagdoll        = false
-local searchBuffer     = ""
-local currentTab       = ""
-local currentFooter    = nil
-local groupHeader      = nil
+local selectedGroup             = nil
+local godMode                   = false
+local noRagdoll                 = false
+local searchBuffer              = ""
+local currentTab                = ""
+local currentFooter             = nil
+local groupHeader               = nil
 
 
 ---@param buff RawEscortGroupData
@@ -175,10 +176,10 @@ local function drawSpawnedGroups()
 	end
 
 	for _, group in pairs(BSV2.EscortGroups) do
-		local isOpen = (groupHeader == group.name)
-
-		if (ImGui.Selectable(_F("[%s] %s", isOpen and "-" or "+", group.name), isOpen)) then
-			groupHeader = group.name
+		local groupName = group.name
+		local isOpen    = (groupHeader == groupName)
+		if (ImGui.Selectable(_F("[%s] %s", isOpen and "-" or "+", groupName), isOpen)) then
+			groupHeader = groupName
 		end
 
 		GUI:Tooltip(group:GetTaskAsString())
@@ -188,11 +189,13 @@ local function drawSpawnedGroups()
 			if (isOpen) then
 				groupHeader = nil
 			else
-				groupHeader = group.name
+				groupHeader = groupName
 			end
 		end
 
 		if (isOpen) then
+			ImGui.PushID(groupName)
+			ImGui.BeginDisabled(group.wasDismissed) --wasDismissed
 			ImGui.Indent()
 			ImGui.Text(_F("Vehicle: %s", group.vehicle.name))
 			ImGui.Text(_F("Group Task: %s", group:GetTaskAsString()))
@@ -207,7 +210,7 @@ local function drawSpawnedGroups()
 
 			ImGui.Spacing()
 
-			if (GUI:Button(_F("Repair Vehicle##%s", group.name))) then
+			if (GUI:Button(_T("GENERIC_REPAIR"))) then
 				ThreadManager:Run(function()
 					group:RepairGroupVehicle()
 				end)
@@ -216,37 +219,35 @@ local function drawSpawnedGroups()
 			ImGui.SameLine()
 
 			local playerInVeh = group.vehicle:IsPlayerInEscortVehicle()
-			ImGui.BeginDisabled(playerInVeh)
-			if (GUI:Button(_F("Go To##%s", group.name))) then
+			ImGui.BeginDisabled(playerInVeh) --playerInVeh
+			if (GUI:Button(_T("GENERIC_GOTO"))) then
 				group:BringPlayer()
 			end
 
 			ImGui.SameLine()
-
-			if (GUI:Button(_F("%s##%s", _T("GENERIC_BRING"), group.name))) then
+			if (GUI:Button(_T("GENERIC_BRING"))) then
 				group:Bring()
 			end
 
 			ImGui.SameLine()
-
-			if (GUI:Button(_F("%s##%s", _T("GENERIC_RESPAWN"), group.name))) then
+			if (GUI:Button(_T("GENERIC_RESPAWN"))) then
 				BSV2:RespawnEscortGroup(group, godMode, noRagdoll)
 			end
-			ImGui.EndDisabled()
+			ImGui.EndDisabled() --playerInVeh
 
 			if (playerInVeh) then
-				local popupName = _F("escort driving options##%s", group.name)
-				if (GUI:Button(_F("%s >##%s", _T("BSV2_ES_DRIVING_OPTIONS"), group.name))) then
+				local popupName = _F("escort driving options##%s", groupName)
+				if (GUI:Button(_T("BSV2_ES_DRIVING_OPTIONS"))) then
 					ImGui.OpenPopup(popupName)
 				end
 
 				if (ImGui.BeginPopup(popupName)) then
-					if (ImGui.MenuItem(_F("%s##%s", _T("GENERIC_WANDER"), group.name))) then
+					if (ImGui.MenuItem(_T("GENERIC_WANDER"))) then
 						ThreadManager:Run(function() group:Wander() end)
 						ImGui.CloseCurrentPopup()
 					end
 
-					if (ImGui.MenuItem(_F("%s##%s", _T("BSV2_ES_DRIVE_WP"), group.name))) then
+					if (ImGui.MenuItem(_T("BSV2_ES_DRIVE_WP"))) then
 						ThreadManager:Run(function()
 							local v_Pos = Game.GetWaypointCoords()
 							if (not v_Pos) then
@@ -261,7 +262,7 @@ local function drawSpawnedGroups()
 						ImGui.CloseCurrentPopup()
 					end
 
-					if (ImGui.MenuItem(_F("%s##%s", _T("BSV2_ES_DRIVE_OBJ"), group.name))) then
+					if (ImGui.MenuItem(_T("BSV2_ES_DRIVE_OBJ"))) then
 						ThreadManager:Run(function()
 							local b_Found, v_Pos = Game.GetObjectiveBlipCoords()
 							if (not b_Found) then
@@ -273,6 +274,11 @@ local function drawSpawnedGroups()
 							GUI:PlaySound("Select")
 							group:GoTo(v_Pos)
 						end)
+						ImGui.CloseCurrentPopup()
+					end
+
+					if (ImGui.MenuItem(_T("BSV2_ES_DRIVE_PROPERTY"))) then
+						shouldDrawPropertyBrowser = true
 						ImGui.CloseCurrentPopup()
 					end
 
@@ -302,15 +308,34 @@ local function drawSpawnedGroups()
 				ImGui.SameLine()
 			end
 
-			ImGui.BeginDisabled(group.wasDismissed)
 			if (GUI:Button(_F("%s##%s", _T("GENERIC_DISMISS"), group.name))) then
 				BSV2:DismissEscortGroup(group.name)
 			end
-			ImGui.EndDisabled()
 			ImGui.Unindent()
+			ImGui.EndDisabled() --wasDismissed
+			ImGui.PopID()
 		end
 
 		ImGui.Separator()
+
+		if (shouldDrawPropertyBrowser) then
+			shouldDrawPropertyBrowser = false
+			ImGui.OpenPopup("##escortsPropertyBrowser")
+		end
+
+		if (ImGui.BeginPopupModal("##escortsPropertyBrowser", true, ImGuiWindowFlags.AlwaysAutoResize)) then
+			local selected, pos = propertyDestSelector()
+			if (selected and pos ~= nil) then
+				Game.SetWaypointCoords(pos)
+				ThreadManager:Run(function() group:GoTo(pos) end)
+				ImGui.CloseCurrentPopup()
+			end
+
+			ImGui.Separator()
+			ImGui.Spacing()
+			ImGui.TextWrapped(_T("BSV2_ES_DRIVE_PROPERTY_TEXT"))
+			ImGui.EndPopup()
+		end
 	end
 end
 
@@ -369,7 +394,7 @@ local function drawGroupCreatorStep1()
 	ImGui.Dummy(0, 15)
 	local groups  = BSV2:GetEscortGroupList()
 	local exists  = groups[newGroup.nameBuffer] ~= nil
-	local isValid = string.isvalid(newGroup.buffer.name) and not exists
+	local isValid = string.isvalid(newGroup.dataBuffer.name) and not exists
 	local text    = isValid and _T("BSV2_ES_NEW_GROUP_NEXT", "[ > ]") or _T("BSV2_ES_NEW_GROUP_NAME")
 	ImGui.Text(text)
 
@@ -378,9 +403,9 @@ local function drawGroupCreatorStep1()
 
 	if (exists) then
 		ImGui.TextColored(1, 0, 0, 1, _T("BSV2_ES_NEW_GROUP_NAME_ERR"))
-		newGroup.buffer.name = nil
+		newGroup.dataBuffer.name = nil
 	else
-		newGroup.buffer.name = newGroup.nameBuffer
+		newGroup.dataBuffer.name = newGroup.nameBuffer
 	end
 
 	newGroup.can_progress = isValid
@@ -388,7 +413,7 @@ end
 
 local function drawGroupCreatorStep2()
 	ImGui.Dummy(0, 15)
-	local isValid = newGroup.buffer.vehicleModel ~= nil
+	local isValid = newGroup.dataBuffer.vehicleModel ~= nil
 	local text    = isValid and _T("BSV2_ES_NEW_GROUP_NEXT", "[ > ]") or _T("BSV2_ES_NEW_GROUP_VEH")
 	ImGui.Text(text)
 
@@ -398,8 +423,8 @@ local function drawGroupCreatorStep2()
 		for i, hash in ipairs(newGroupVehs) do
 			local name = Game.GetVehicleDisplayName(hash)
 			if (ImGui.Selectable(name, (i == newGroup.vehicle_index))) then
-				newGroup.vehicle_index       = i
-				newGroup.buffer.vehicleModel = hash
+				newGroup.vehicle_index           = i
+				newGroup.dataBuffer.vehicleModel = hash
 			end
 		end
 		ImGui.EndCombo()
@@ -409,12 +434,12 @@ local function drawGroupCreatorStep2()
 end
 
 local function drawGroupCreatorStep3()
-	newGroup.buffer.members = newGroup.buffer.members or {}
-	local style             = ImGui.GetStyle()
-	local regionX, regionY  = ImGui.GetContentRegionAvail()
-	local members           = newGroup.buffer.members
-	local count             = #members
-	local membersFull       = count == 3
+	newGroup.dataBuffer.members = newGroup.dataBuffer.members or {}
+	local style                 = ImGui.GetStyle()
+	local regionX, regionY      = ImGui.GetContentRegionAvail()
+	local members               = newGroup.dataBuffer.members
+	local count                 = #members
+	local membersFull           = count == 3
 
 	ImGui.Spacing()
 	local infoText = membersFull and "BSV2_ES_NEW_GROUP_MEMBERS_DONE" or "BSV2_ES_NEW_GROUP_MEMBERS"
@@ -510,7 +535,7 @@ local function drawGroupCreator()
 			GUI:Tooltip(_T("GENERIC_NEXT"))
 		end
 	elseif (newGroup.stage == 3) then
-		local isValid = validateGroupBuffer(newGroup.buffer)
+		local isValid = validateGroupBuffer(newGroup.dataBuffer)
 		ImGui.BeginDisabled(not isValid)
 		if (GUI:Button("OK", { size = btnSize })) then
 			ImGui.OpenPopup("##confirmNewGroup")
@@ -520,8 +545,8 @@ local function drawGroupCreator()
 			GUI:Tooltip(_T("GENERIC_CONFIRM"))
 		end
 
-		if (ImGui.DialogBox("##confirmNewGroup", _T("BSV2_ES_NEW_GROUP_PROMPT", newGroup.buffer.name), ImGuiDialogBoxStyle.INFO)) then
-			BSV2:AddNewEscortGroup(table.copy(newGroup.buffer))
+		if (ImGui.DialogBox("##confirmNewGroup", _T("BSV2_ES_NEW_GROUP_PROMPT", newGroup.dataBuffer.name), ImGuiDialogBoxStyle.INFO)) then
+			BSV2:AddNewEscortGroup(table.copy(newGroup.dataBuffer))
 			clearNewGroupBuffer()
 		end
 	end

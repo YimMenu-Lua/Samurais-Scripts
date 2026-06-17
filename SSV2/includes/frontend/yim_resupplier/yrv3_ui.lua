@@ -11,18 +11,18 @@ local YRV3               = require("includes.features.online.yim_resupplier.YimR
 local drawTxnUI          = require("includes.frontend.yim_resupplier.helpers.withdraw_deposit_popup")
 local drawBossRegisterUI = require("includes.frontend.yim_resupplier.helpers.boss_register_combo")
 local TABS <const>       = {
-	{ label = "YRV3_DASHBOARD",        isGXT = false, callback = require("dashboard_ui") },
-	{ label = "GB_BOSSC",              isGXT = true,  callback = require("office_ui") },
-	{ label = "GB_REST_ACCM",          isGXT = true,  callback = require("clubhouse_ui") },
-	{ label = "CELL_CLUB",             isGXT = true,  callback = require("nightclub_ui") },
-	{ label = "CELL_HANGAR",           isGXT = true,  callback = require("hangar_ui") },
-	{ label = "CELL_BUNKER",           isGXT = true,  callback = require("bunker_ui") },
-	{ label = "CELL_ACID_LAB",         isGXT = true,  callback = require("acid_lab_ui") },
-	{ label = "CELL_SLVG_YRD",         isGXT = true,  callback = require("salvage_yard_ui") },
-	{ label = "MP_CARWASH",            isGXT = true,  callback = require("money_fronts_ui") },
-	{ label = "YRV3_CASH_SAFES_LABEL", isGXT = false, callback = require("cash_safes_ui") },
-	{ label = "GENERIC_MISC",          isGXT = false, callback = require("misc_ui") },
-	{ label = "CELL_16",               isGXT = true,  callback = require("yrv3_settings_ui") },
+	{ label = "YRV3_DASHBOARD",        isGXT = false, callback = require("includes.frontend.yim_resupplier.dashboard_ui") },
+	{ label = "GB_BOSSC",              isGXT = true,  callback = require("includes.frontend.yim_resupplier.office_ui") },
+	{ label = "GB_REST_ACCM",          isGXT = true,  callback = require("includes.frontend.yim_resupplier.clubhouse_ui") },
+	{ label = "CELL_CLUB",             isGXT = true,  callback = require("includes.frontend.yim_resupplier.nightclub_ui") },
+	{ label = "CELL_HANGAR",           isGXT = true,  callback = require("includes.frontend.yim_resupplier.hangar_ui") },
+	{ label = "CELL_BUNKER",           isGXT = true,  callback = require("includes.frontend.yim_resupplier.bunker_ui") },
+	{ label = "CELL_ACID_LAB",         isGXT = true,  callback = require("includes.frontend.yim_resupplier.acid_lab_ui") },
+	{ label = "CELL_SLVG_YRD",         isGXT = true,  callback = require("includes.frontend.yim_resupplier.salvage_yard_ui") },
+	{ label = "MP_CARWASH",            isGXT = true,  callback = require("includes.frontend.yim_resupplier.money_fronts_ui") },
+	{ label = "YRV3_CASH_SAFES_LABEL", isGXT = false, callback = require("includes.frontend.yim_resupplier.cash_safes_ui") },
+	{ label = "GENERIC_MISC",          isGXT = false, callback = require("includes.frontend.yim_resupplier.misc_ui") },
+	{ label = "CELL_16",               isGXT = true,  callback = require("includes.frontend.yim_resupplier.yrv3_settings_ui") },
 }; local selectedTab     = TABS[1]
 
 
@@ -106,7 +106,7 @@ GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Business Manager", function()
 	ImGui.SameLine()
 	if (GUI:Button(_T("YRV3_MCT_TITLE"))) then
 		if (YRV3:IsAnySaleInProgress()) then
-			Notifier:ShowMessage("YRV3", _T("YRV3_MCT_UNAVAIL"))
+			Notifier:ShowMessage("Business Manager", _T("YRV3_MCT_UNAVAIL"))
 		else
 			YRV3:MCT()
 			GUI:Close(true)

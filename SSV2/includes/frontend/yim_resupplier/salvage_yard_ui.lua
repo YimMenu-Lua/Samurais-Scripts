@@ -9,7 +9,7 @@
 
 local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
 local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
-local drawNamePlate         = require("nameplate_ui")
+local drawNamePlate         = require("includes.frontend.yim_resupplier.nameplate_ui")
 local colMoneyGreen <const> = Color("#85BB65")
 local childWidth            = 240
 
@@ -23,18 +23,12 @@ return function()
 		return
 	end
 
-	local unsafeFeatsEnabled = GVars.features.unsafe_feats_enabled
-	drawNamePlate(
-		SalvageYard,
-		SalvageYard:GetName(),
-		Color(ImGui.GetStyleColorVec4(ImGuiCol.Text)),
-		true
-	)
-
+	drawNamePlate(SalvageYard, { customName = SalvageYard:GetName(), tpKeepVeh = true })
 	ImGui.Spacing()
 
-	local lang_index  = GVars.backend.language_index
-	local bulletWidth = bulletWidths[lang_index]
+	local unsafeFeatsEnabled = GVars.features.unsafe_feats_enabled
+	local lang_index         = GVars.backend.language_index
+	local bulletWidth        = bulletWidths[lang_index]
 	if (not bulletWidth) then
 		bulletWidth = measureBulletWidths({
 			_T("YRV3_CASH_SAFE"),

@@ -7,11 +7,11 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local Bodyguard      = require("Bodyguard")
-local EscortGroup    = require("EscortGroup")
-local PrivateHeli    = require("PrivateHeli")
-local PrivateJet     = require("PrivateJet")
-local PrivateLimo    = require("PrivateLimo")
+local Bodyguard      = require("includes.features.extra.billionaire_services.Bodyguard")
+local EscortGroup    = require("includes.features.extra.billionaire_services.EscortGroup")
+local PrivateHeli    = require("includes.features.extra.billionaire_services.PrivateHeli")
+local PrivateJet     = require("includes.features.extra.billionaire_services.PrivateJet")
+local PrivateLimo    = require("includes.features.extra.billionaire_services.PrivateLimo")
 
 local BSV2Data       = require("includes.data.bsv2_data")
 local Decorator      = require("includes.modules.Decorator")
@@ -559,7 +559,7 @@ function BillionaireServices:CallPrivateHeli(model, godmode)
 		self:RegisterEntity(heli.pilot)
 
 		if (not isInWater) then
-			local timer = Timer.new(3e4)
+			local timer = Timer(3e4)
 			TASK.TASK_HELI_MISSION(
 				heli.pilot,
 				heli.m_handle,

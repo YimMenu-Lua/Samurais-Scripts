@@ -10,12 +10,14 @@
 -- Basic compatibility layers/API stubs
 
 local Compat <const> = {}
-Compat.__index = Compat
+Compat.__index       = Compat
+local _f             = string.format
+local tostr          = tostring
 
 ---@param version eGameBranch
 function Compat.SetupEnv(version)
 	if (version == Enums.eGameBranch.MOCK) then
-		require("includes.lib.mock_env").Setup(version)
+		require("includes.lib.mock_env")(version)
 	else
 		print = function(...)
 			local out = {}
@@ -32,9 +34,9 @@ function Compat.SetupEnv(version)
 						str = ok and result or "<serialization error!>"
 					end
 				elseif (IsInstance(v, "pointer")) then
-					str = string.format("Pointer @ 0x%X", v:get_address())
+					str = _f("Pointer @ 0x%X", v:get_address())
 				else
-					local ok, result = pcall(tostring, v)
+					local ok, result = pcall(tostr, v)
 					str = ok and result or "<tostring error!>"
 				end
 
@@ -44,19 +46,25 @@ function Compat.SetupEnv(version)
 			log.info(table.concat(out, "\t"))
 		end
 
+		---@diagnostic disable-next-line
+		log.error = function(msg)
+			log.warning(_f("\27[31m[ERROR]: %s\27[0m", msg))
+		end
+
 		do
 			local levels = {
 				debug   = log.debug,
 				info    = log.info,
 				warning = log.warning,
+				error   = log.error
 			}
 
 			for level, func in pairs(levels) do
 				local fname = "f" .. level
 				log[fname] = function(fmt, ...)
-					local ok, msg = pcall(string.format, fmt, ...)
+					local ok, msg = pcall(_f, fmt, ...)
 					if (not ok) then
-						msg = string.format("<format error: %s> %s", tostring(msg), tostring(fmt))
+						msg = _f("<format error: %s> %s", tostr(msg), tostr(fmt))
 					end
 
 					func(msg)
@@ -67,10 +75,8 @@ function Compat.SetupEnv(version)
 
 	---@param fmt string
 	---@param ... any
-	---@diagnostic disable-next-line: lowercase-global
-	printf = function(fmt, ...)
-		log.finfo(fmt, ...)
-	end
+	---@diagnostic disable-next-line
+	printf = function(fmt, ...) log.finfo(fmt, ...) end
 end
 
 return Compat

@@ -862,7 +862,7 @@ return {
 	["YRV3_HUB_TECH_NOT_ASSIGNED_TT"] = "このハブには技術者が割り当てられていません。",
 	["VEH_STANCE_TOE"] = "つま先",
 	["YRV3_AUTOSELL_NC_CARGO_LABEL"] = "ナイトクラブカーゴ",
-	["YRV3_AUTO_SELL_COUNTDOWN"] = "「自動販売」は 20 秒後に開始されます。タイマーが終了する前にトグルを無効にすることでキャンセルできます。",
+	["YRV3_AUTO_SELL_COUNTDOWN"] = "「自動販売」は 20 秒後に開始されます。機能を無効にするか、この通知をクリックすることで、タイマーが終了する前にキャンセルできます。",
 	["YRV3_AUTO_SELL_CANCELED_MSG"] = "「自動販売」はキャンセルされました。",
 	["YRV3_HUB_REMOVE_TECH_FAIL_FMT"] = "%s から技術者を削除できませんでした!",
 	["YRV3_HUB_TRANSFER_TECH_REL_ONLY"] = "関連のみ",
@@ -979,5 +979,11 @@ return {
 	["VEH_GEARBOX_ENGINE_START_ERR"] = "エンジンを始動する前にクラッチを押すかギアをニュートラルにしてください。",
 	["VEH_GEARBOX_CLUTCH_ASSIST_TT"] = "手動モードのみ: エンジン停止動作を無効にします。",
 	["VEH_GEARBOX_CLUTCH_ASSIST"] = "クラッチアシスト",
-	["VEH_GEARBOX_AUTO"] = "自動"
+	["VEH_GEARBOX_AUTO"] = "自動",
+	["GENERIC_LABEL"] = "ラベル",
+	["YAV3_ANIM_HISTORY_TT"] = "再生したアニメーション、シナリオ、シーンがここに表示されます。",
+	["BSV2_ES_DRIVE_PROPERTY_TEXT"] = "物件をクリックしてその物件に移動します。",
+	["BSV2_ES_DRIVE_PROPERTY"] = "所有物件",
+	["GENERIC_RETRY"] = "リトライ",
+	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"] = "FSL を使用する場合、安全でない機能は常に有効になります。"
 }

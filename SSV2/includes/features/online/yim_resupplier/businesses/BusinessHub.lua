@@ -190,6 +190,7 @@ function BusinessHub:TriggerProduction(count)
 end
 
 -- https://www.youtube.com/watch?v=-Gh1lTcwdGY
+---@private
 function BusinessHub:InstantFillProduction()
 	self:TriggerProduction(self:GetMaxUnits() - 1)
 end

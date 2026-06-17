@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local TransactionSystemFuncs <const> = {
+local TxnSysFuncs <const> = {
 	[0] = {
 		transfer   = NETSHOPPING.NET_GAMESERVER_TRANSFER_BANK_TO_WALLET,
 		get_status = NETSHOPPING.NET_GAMESERVER_TRANSFER_BANK_TO_WALLET_GET_STATUS
@@ -40,7 +40,7 @@ function PlayerMoneyController.new()
 		m_bank_fmt               = "$0",
 		m_wallet_fmt             = "$0",
 		m_total_fmt              = "$0",
-		m_last_tick              = TimePoint.new(),
+		m_last_tick              = TimePoint(),
 		m_use_transaction_system = not Game.IsFSL(),
 	}, PlayerMoneyController)
 end
@@ -103,7 +103,7 @@ function PlayerMoneyController:UseTransactionSystem(amount, operation)
 		return false
 	end
 
-	local funcs_t = TransactionSystemFuncs[operation]
+	local funcs_t = TxnSysFuncs[operation]
 	if (not funcs_t.transfer(stats.get_character_index(), amount)) then
 		log.warning("Transaction failed!")
 		return false
@@ -126,12 +126,19 @@ end
 
 ---@param amount integer
 function PlayerMoneyController:Withdraw(amount)
+	if (self.m_bank_balance <= 0) then
+		Notifier:ShowError("Withdraw", "Insufficient funds!")
+		return
+	end
+
+	if (amount <= 0) then return end -- probably unnecessary
+
 	if (NETWORK.NETWORK_IS_ACTIVITY_SESSION()) then
 		log.warning("Monetary operations are not available in activity sessions.")
 		return
 	end
 
-	amount = math.clamp(amount, 0, self.m_bank_balance)
+	amount = math.min(amount, self.m_bank_balance)
 	if (self.m_use_transaction_system and not self:UseTransactionSystem(amount, 0)) then
 		return
 	end
@@ -141,12 +148,14 @@ end
 
 ---@param amount integer
 function PlayerMoneyController:Deposit(amount)
+	amount = math.min(amount, self.m_wallet_balance)
+	if (amount <= 0) then return end -- probably unnecessary
+
 	if (NETWORK.NETWORK_IS_ACTIVITY_SESSION()) then
 		log.warning("Monetary operations are not available in activity sessions.")
 		return
 	end
 
-	amount = math.clamp(amount, 0, self.m_wallet_balance)
 	if (self.m_use_transaction_system and not self:UseTransactionSystem(amount, 1)) then
 		return
 	end

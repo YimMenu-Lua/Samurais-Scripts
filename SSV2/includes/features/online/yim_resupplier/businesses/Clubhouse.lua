@@ -127,7 +127,7 @@ function Clubhouse:Rename(newName)
 		end
 
 		local clubInt = InteriorIDs.INTERIOR_ID_CLUBHOUSE
-		if (LocalPlayer:GetInterior() == clubInt) then
+		if (LocalPlayer:GetInteriorID() == clubInt) then
 			INTERIOR.REFRESH_INTERIOR(clubInt)
 		end
 

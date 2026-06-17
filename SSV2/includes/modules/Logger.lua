@@ -64,6 +64,7 @@ end
 ---@return string
 local function get_caller_info(stack_depth)
 	stack_depth = stack_depth or 12
+	---@diagnostic disable-next-line: undefined-global
 	local info = debug.getinfo(stack_depth, "nSl")
 
 	while (not info or not info.currentline or not info.name) do
@@ -72,6 +73,7 @@ local function get_caller_info(stack_depth)
 		end
 
 		stack_depth = stack_depth - 1
+		---@diagnostic disable-next-line: undefined-global
 		info = debug.getinfo(stack_depth, "nSl")
 	end
 

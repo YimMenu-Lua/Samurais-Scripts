@@ -7,8 +7,8 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local Bodyguard     = require("Bodyguard")
-local EscortVehicle = require("EscortVehicle")
+local Bodyguard     = require("includes.features.extra.billionaire_services.Bodyguard")
+local EscortVehicle = require("includes.features.extra.billionaire_services.EscortVehicle")
 
 
 -----------------------------------------------------
@@ -271,7 +271,9 @@ function EscortGroup:Bring()
 			0.1
 		)
 
-		Game.SetEntityCoordsNoOffset(self.vehicle.handle, pos)
+		local handle = self.vehicle.handle
+		Game.SetEntityCoordsNoOffset(handle, pos)
+		VEHICLE.SET_VEHICLE_ON_GROUND_PROPERLY(handle, 5.0)
 	end)
 end
 
@@ -616,7 +618,7 @@ function EscortGroup:Dismiss(s)
 		driver:Speak("GENERIC_BYE", "SPEECH_PARAMS_FORCE_SHOUTED")
 		TASK.TASK_VEHICLE_DRIVE_WANDER(driver.m_handle, self.vehicle.handle, 20, 803243)
 
-		local dismissTimer = Timer.new(9000)
+		local dismissTimer = Timer(9000)
 		repeat
 			s:sleep(500)
 		until dismissTimer:IsDone()

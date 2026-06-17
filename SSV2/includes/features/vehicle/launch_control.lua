@@ -57,11 +57,10 @@ function LaunchControl.new(pv)
 end
 
 function LaunchControl:Init()
-	self.m_state = eLaunchControlState.NONE
-	self.m_timer = Timer.new(2000)
-	self.m_timer:Pause()
+	self.m_state         = eLaunchControlState.NONE
+	self.m_timer         = Timer(2000, true)
 	self.m_last_pop_time = 0
-	self.m_thread = ThreadManager:RegisterLooped("SS_LAUNCH_CTRL", function()
+	self.m_thread        = ThreadManager:RegisterLooped("SS_LAUNCH_CTRL", function()
 		self:OnTick()
 	end)
 end
@@ -275,7 +274,7 @@ function LaunchControl:OnTick()
 
 	local handle = PV:GetHandle()
 	if (not self.m_timer) then
-		self.m_timer = Timer.new(2000, true)
+		self.m_timer = Timer(2000, true)
 	end
 
 	local fwd_speed = PV:GetSpeedVector().y

@@ -626,7 +626,7 @@ function Bodyguard:GrabNearestVehicle()
 
 			TASK.TASK_ENTER_VEHICLE(self.m_handle, closestVehicle, -1, -1, 2.0, 1, "")
 
-			local timer = Timer.new(10000)
+			local timer = Timer(10000)
 			repeat
 				yield()
 			until not self:IsOnFoot() or timer:IsDone()
@@ -871,7 +871,7 @@ function Bodyguard:Dismiss(s)
 	TASK.TASK_WANDER_STANDARD(self.m_handle, 0, 0)
 	Backend:RemoveBlip(self.m_handle)
 
-	local dismissTimer = Timer.new(9000)
+	local dismissTimer = Timer(9000)
 	repeat
 		s:sleep(500)
 	until dismissTimer:IsDone()
@@ -887,7 +887,7 @@ function Bodyguard:StateEval()
 
 	if not self.evalTimer then
 		if (self.task ~= eGuardTask.NONE) and (self.task ~= eGuardTask.STAND_GUARD) then
-			self.evalTimer = Timer.new(10000)
+			self.evalTimer = Timer(10000)
 			self.evalStartPos = self:GetPos()
 			self.evalLastTask = self.task
 		end
@@ -1082,7 +1082,7 @@ function Bodyguard:TaskEnterVehicle(vehicle, timeout, seatIndex)
 				""
 			)
 
-			local timer = Timer.new(5000)
+			local timer = Timer(5000)
 			while not timer:IsDone() do
 				if not seatIndex or PED.IS_PED_SITTING_IN_VEHICLE(self.m_handle, vehicle) then
 					break
@@ -1248,7 +1248,7 @@ function Bodyguard:TickVehicleEscort(s)
 				if self:IsEscort() then
 					for _, member in ipairs(self.escortGroup.members) do
 						if not PED.IS_PED_SITTING_IN_VEHICLE(member.m_handle, self.vehicle.handle) then
-							local timer = Timer.new(5000)
+							local timer = Timer(5000)
 							repeat
 								s:sleep(100)
 							until PED.IS_PED_SITTING_IN_VEHICLE(member.m_handle, self.vehicle.handle) or timer:IsDone()

@@ -39,13 +39,13 @@ function RageDTStruct.FromPointer(ptr)
 		local val64 = ptr:add(v.offset):get_qword()
 		if (not math.is_inrange(val64, v.min, v.max)) then
 			free(ptr)
-			return DateTime.new(0)
+			return DateTime:new(0)
 		end
 		t[k] = val64
 	end
 
 	free(ptr)
-	return DateTime.new(t)
+	return DateTime:new(t)
 end
 
 -- TODO: refactor all this into a chrono class.
@@ -60,7 +60,7 @@ Time.__index = Time
 
 -- Returns an approximation of the amount in seconds of CPU time used by the program.
 --
--- **NOTE:** if you need real world clock time, use `DateTime.new()` or `DateTime.Now()` or `DateTime.Today()`
+-- **NOTE:** if you need real world clock time, use `DateTime:new()` or `DateTime.Now()` or `DateTime.Today()`
 ---@return seconds
 function Time.Now()
 	return os.clock()
@@ -211,21 +211,14 @@ end
 ---@field private m_start_time milliseconds
 ---@field private m_pause_time milliseconds|nil
 ---@field private m_is_paused boolean
----@overload fun(ms: milliseconds): Timer
-local Timer <const> = { __type = "Timer" }
-Timer.__index = Timer
----@diagnostic disable-next-line: param-type-mismatch
-setmetatable(Timer, {
-	__call = function(_, ...)
-		return Timer.new(...)
-	end
-})
+---@overload fun(ms: milliseconds, startPaused?: boolean): Timer
+local Timer <const> = Callable("Timer", { ctor = function(t, ...) return t:new(...) end })
 
 -- Creates a new timer that runs for `duration` milliseconds.
 ---@param duration milliseconds
 ---@param startPaused? boolean
 ---@return Timer
-function Timer.new(duration, startPaused)
+function Timer:new(duration, startPaused)
 	assert(type(duration) == "number" and duration > 0, "Timer duration must be a number >= 0 (milliseconds).")
 	local instance = setmetatable({
 		m_duration   = math.max(0, duration or 0),
@@ -309,20 +302,12 @@ end
 ---@class TimePoint
 ---@field private m_value milliseconds
 ---@overload fun(): TimePoint
-local TimePoint <const> = { __type = "TimePoint" }
-TimePoint.__index = TimePoint
----@diagnostic disable-next-line: param-type-mismatch
-setmetatable(TimePoint, {
-	__call = function(_, ...)
-		return TimePoint.new()
-	end
-})
+local TimePoint <const> = Callable("TimePoint", { ctor = function(t) return t:new() end })
 
 -- Returns a new point in time in milliseconds starting now *(zero ms)*.
 ---@return TimePoint
-function TimePoint.new()
-	---@diagnostic disable-next-line: param-type-mismatch
-	return setmetatable({ m_value = Time.Millis() }, TimePoint)
+function TimePoint:new()
+	return setmetatable({ m_value = Time.Millis() }, self)
 end
 
 ---@return milliseconds
@@ -358,29 +343,22 @@ end
 ---@field private m_epoch seconds
 ---@field private m_dt osdatefixed
 ---@field private m_fmt_warn boolean
----@overload fun(p1: (seconds|osdateparam)?): DateTime
-local DateTime <const> = { __type = "DateTime" }
-DateTime.__index = DateTime
----@diagnostic disable-next-line: param-type-mismatch
-setmetatable(DateTime, {
-	__call = function(_, p1)
-		return DateTime.new(p1)
-	end
-})
+---@overload fun(p0: (seconds|osdateparam)?): DateTime
+local DateTime <const> = Callable("DateTime", { ctor = function(t, ...) return t:new(...) end })
 
----@param p1 (seconds|osdate|osdatefixed)?
+---@param p0 (seconds|osdate|osdatefixed)?
 ---@return DateTime
-function DateTime.new(p1)
+function DateTime:new(p0)
 	local epoch
 
-	if (type(p1) == "table") then
-		assert(type(p1.year) == "number", "Invalid argument: year<integer>")
-		assert(type(p1.month) == "number", "Invalid argument: month<integer>")
-		assert(type(p1.day) == "number", "Invalid argument: day<integer>")
+	if (type(p0) == "table") then
+		assert(type(p0.year) == "number", "Invalid argument: year<integer>")
+		assert(type(p0.month) == "number", "Invalid argument: month<integer>")
+		assert(type(p0.day) == "number", "Invalid argument: day<integer>")
 		---@diagnostic disable-next-line: param-type-mismatch
-		epoch = os.time(p1)
-	elseif (type(p1) == "number") then
-		epoch = p1
+		epoch = os.time(p0)
+	elseif (type(p0) == "number") then
+		epoch = p0
 	else
 		epoch = os.time()
 	end
@@ -388,18 +366,17 @@ function DateTime.new(p1)
 	return setmetatable({
 		m_epoch = epoch,
 		m_dt    = os.date("*t", epoch)
-		---@diagnostic disable-next-line: param-type-mismatch
-	}, DateTime)
+	}, self)
 end
 
 ---@return DateTime
 function DateTime.Now()
-	return DateTime.new()
+	return DateTime:new()
 end
 
 ---@return DateTime
 function DateTime.Today()
-	return DateTime.new()
+	return DateTime:new()
 end
 
 -- Static function.
@@ -456,11 +433,11 @@ end
 ---@return DateTime
 function DateTime.__add(a, b)
 	if type(a) == "number" then
-		return DateTime.new(b.m_epoch + a)
+		return DateTime:new(b.m_epoch + a)
 	elseif type(b) == "number" then
-		return DateTime.new(a.m_epoch + b)
+		return DateTime:new(a.m_epoch + b)
 	elseif (IsInstance(a, DateTime) and IsInstance(b, DateTime)) then
-		return DateTime.new(a.m_epoch + b.m_epoch)
+		return DateTime:new(a.m_epoch + b.m_epoch)
 	else
 		error("Attempt to perform arithmetic on a DateTime object with an invalid operand.")
 	end
@@ -471,9 +448,9 @@ end
 ---@return DateTime|seconds -- DateTime or duration
 function DateTime.__sub(a, b)
 	if (type(a) == "number") then
-		return DateTime.new(b.m_epoch - a)
+		return DateTime:new(b.m_epoch - a)
 	elseif (type(b) == "number") then
-		return DateTime.new(a.m_epoch - b)
+		return DateTime:new(a.m_epoch - b)
 	elseif (IsInstance(a, DateTime) and IsInstance(b, DateTime)) then
 		return a.m_epoch - b.m_epoch
 	else
