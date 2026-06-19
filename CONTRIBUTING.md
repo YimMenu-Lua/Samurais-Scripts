@@ -4,7 +4,7 @@ Thank you for considering contributing to this project! It's people like you tha
 
 ## Language Server
 
-A modified version of [YimLLS](https://github.com/YimMenu-Lua/YimLLS) can be found [here](https://github.com/xesdoog/YimLLSX). Fork the repo and point to its path in your workspace to have type hints for everything the project adds to the vanilla API.
+A modified version of [YimLLS](https://github.com/YimMenu-Lua/YimLLS) can be found [here](https://github.com/xesdoog/YimLLSX). Clone the repo and point to its path in your workspace to have type hints for everything the project adds to the vanilla API.
 
 - Example `.code-workspace` or `settings.json` file:
   
