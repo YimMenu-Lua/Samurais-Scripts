@@ -340,7 +340,9 @@ function Office:RemoveClutter(clutter_t)
 		end
 
 		if (name == "cash") then
-			shouldRefresh = remove_office_cash_clutter_set(interior)
+			if (remove_office_cash_clutter_set(interior)) then
+				shouldRefresh = true
+			end
 		elseif (remove_office_clutter_set(interior, name)) then
 			shouldRefresh = true
 		end
