@@ -11,39 +11,39 @@ local YRV3                    = require("includes.features.online.yim_resupplier
 local drawKeyValue            = require("includes.frontend.helpers.draw_kv")
 local drawTxnPopup            = require("includes.frontend.yim_resupplier.helpers.withdraw_deposit_popup")
 local drawBossRegisterUI      = require("includes.frontend.yim_resupplier.helpers.boss_register_combo")
-local colMoneyGreen <const>   = Color("#85BB65")
 local moneyCardChildSize      = vec2:new(200, 90)
 local moneyCardBtnSize        = vec2:new(0, 35)
 local bossLabel               = ""
-local moneyCardColors <const> = {
-	[0] = Color(0.033, 0.45, 0.15, 0.95),
-	[1] = Color(0.78, 0.78, 0.78, 0.90)
-}
+local colMoneyGreen <const>   = Color("#85BB65")
+local colCardGreen <const>    = Color(0.033, 0.45, 0.15, 0.95)
+local colCardWhite <const>    = Color(0.78, 0.78, 0.78, 0.90)
+local moneyCardColors <const> = { colCardGreen, colCardWhite }
 
----@param cardType 0|1 -- 0: wallet | 1: bank
----@param money integer
----@param formattedMoney string
-local function drawMoneyCard(cardType, money, formattedMoney)
+---@param cardType
+---| 1: wallet
+---| 2: bank
+---@param amount integer
+---@param amountFmt string
+local function drawMoneyCard(cardType, amount, amountFmt)
 	local outerWidth = ImGui.GetContentRegionAvail()
-	local label      = (cardType == 0) and "YRV3_DASHBOARD_FUNDS_WALLET" or "YRV3_DASHBOARD_FUNDS_BANK"
-	local bgCol      = moneyCardColors[cardType]
+	local label      = (cardType == 1) and "YRV3_DASHBOARD_FUNDS_WALLET" or "YRV3_DASHBOARD_FUNDS_BANK"
+	local bgCol      = moneyCardColors[cardType] or Color.WHITE
 	ImGui.PushStyleColor(ImGuiCol.ChildBg, bgCol:AsFloat())
 	ImGui.PushStyleColor(ImGuiCol.Text, ImGui.GetAutoTextColor(bgCol):AsFloat())
 	ImGui.BeginChildEx(label, moneyCardChildSize, ImGuiChildFlags.AlwaysUseWindowPadding)
-	if (money > 9999999) then
+	if (amount > 9999999) then
 		local availWidth, _ = ImGui.GetContentRegionAvail()
 		ImGui.SetWindowFontScale(1.15)
-		if (ImGui.CalcTextSize(formattedMoney) > availWidth and outerWidth > moneyCardChildSize.x) then
+		if (ImGui.CalcTextSize(amountFmt) > availWidth and outerWidth > moneyCardChildSize.x) then
 			moneyCardChildSize.x = moneyCardChildSize.x + 10
 		end
-		ImGui.SetWindowFontScale(1.0)
 	end
 
 	ImGui.SetWindowFontScale(0.75)
 	ImGui.Text(_T(label))
 
 	ImGui.SetWindowFontScale(1.15)
-	ImGui.Text(formattedMoney)
+	ImGui.Text(amountFmt)
 	ImGui.SetWindowFontScale(1.0)
 	ImGui.Spacing()
 	ImGui.EndChild()
@@ -71,9 +71,9 @@ local function drawPortfolio()
 	ImGui.Spacing()
 
 	moneyCardChildSize.x = math.max(200, ImGui.GetContentRegionAvail() * 0.484)
-	drawMoneyCard(0, walletBal, walletFmt)
+	drawMoneyCard(1, walletBal, walletFmt)
 	ImGui.SameLineIfAvail(moneyCardChildSize.x)
-	drawMoneyCard(1, bankBal, bankFmt)
+	drawMoneyCard(2, bankBal, bankFmt)
 
 	local withdrawLabel = _T("YRV3_DASHBOARD_FUNDS_WITHDRAW")
 	local depositLabel  = _T("YRV3_DASHBOARD_FUNDS_DEPOSIT")

@@ -59,7 +59,7 @@ end
 ---@return int64_t
 function CPlayerInfo:GetRockstarID()
 	return self:__safecall(0, function()
-		return self.m_rl_gamer_info.m_rockstar_id:get_int()
+		return self.m_rl_gamer_info:GetRockstarID()
 	end)
 end
 

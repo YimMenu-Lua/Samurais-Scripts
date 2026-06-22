@@ -92,20 +92,25 @@ end
 ---@return boolean
 function PlayerMoneyController:UseTransactionSystem(amount, operation)
 	if (NETSHOPPING.NET_GAMESERVER_TRANSACTION_IN_PROGRESS()) then
-		log.warning("Another transaction is in progress.")
+		log.error("Another transaction is in progress.")
 		return false
 	end
 
 	local success, p0, p1 = false, 0, false
 	success, p0, p1       = NETSHOPPING.NET_GAMESERVER_GET_SESSION_STATE_AND_STATUS(p0, p1)
 	if (not success or p0 ~= 8) then
-		log.warning("Transaction failed!")
+		log.error("Transaction failed!")
 		return false
 	end
 
 	local funcs_t = TxnSysFuncs[operation]
+	if (not funcs_t) then
+		log.error("Unknown operation!")
+		return false
+	end
+
 	if (not funcs_t.transfer(stats.get_character_index(), amount)) then
-		log.warning("Transaction failed!")
+		log.error("Transaction failed!")
 		return false
 	end
 
@@ -117,13 +122,14 @@ function PlayerMoneyController:UseTransactionSystem(amount, operation)
 	end
 
 	if (status ~= 3) then
-		log.warning("Transaction failed!")
+		log.error("Transaction failed!")
 		return false
 	end
 
 	return NETSHOPPING.NET_GAMESERVER_TRANSFER_CASH_SET_TELEMETRY_NONCE_SEED()
 end
 
+-- ### Must be called in a fiber.
 ---@param amount integer
 function PlayerMoneyController:Withdraw(amount)
 	if (self.m_bank_balance <= 0) then
@@ -131,10 +137,13 @@ function PlayerMoneyController:Withdraw(amount)
 		return
 	end
 
-	if (amount <= 0) then return end -- probably unnecessary
+	if (amount <= 0) then -- probably unnecessary
+		Notifier:ShowError("Withdraw", "Invalid amount!")
+		return
+	end
 
 	if (NETWORK.NETWORK_IS_ACTIVITY_SESSION()) then
-		log.warning("Monetary operations are not available in activity sessions.")
+		Notifier:ShowError("Withdraw", "Monetary operations are not available in activity sessions.")
 		return
 	end
 
@@ -146,13 +155,17 @@ function PlayerMoneyController:Withdraw(amount)
 	MONEY.WITHDRAW_VC(amount)
 end
 
+-- ### Must be called in a fiber.
 ---@param amount integer
 function PlayerMoneyController:Deposit(amount)
 	amount = math.min(amount, self.m_wallet_balance)
-	if (amount <= 0) then return end -- probably unnecessary
+	if (amount <= 0) then -- probably unnecessary
+		Notifier:ShowError("Deposit", "Invalid amount!")
+		return
+	end
 
 	if (NETWORK.NETWORK_IS_ACTIVITY_SESSION()) then
-		log.warning("Monetary operations are not available in activity sessions.")
+		Notifier:ShowError("Deposit", "Monetary operations are not available in activity sessions.")
 		return
 	end
 

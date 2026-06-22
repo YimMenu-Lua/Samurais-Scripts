@@ -7,12 +7,44 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local BusinessFront    = require("BusinessFront")
-local VehicleWarehouse = require("VehicleWarehouse")
-local Warehouse        = require("Warehouse")
-local RawBusinessData  = require("includes.data.yrv3_data")
-local InteriorIDs      = require("includes.data.refs").InteriorIDs
+local BusinessFront       = require("BusinessFront")
+local VehicleWarehouse    = require("VehicleWarehouse")
+local Warehouse           = require("Warehouse")
+local RawBusinessData     = require("includes.data.yrv3_data")
+local IPLPrefixes <const> = {
+	"ex_sm_13_",
+	"ex_sm_15_",
+	"ex_dt1_02_",
+	"ex_dt1_11_",
+}
+local IPLVars <const>     = {
+	"office_01a",
+	"office_01b",
+	"office_01c",
+	"office_02a",
+	"office_02b",
+	"office_02c",
+	"office_03a",
+	"office_03b",
+	"office_03c",
+}
 
+---@class OfficeClutterItemsParam
+---@field cash boolean
+---@field Swag_Silver? boolean
+---@field Swag_Pills? boolean
+---@field Swag_Med? boolean
+---@field Swag_JewelWatch? boolean
+---@field Swag_Ivory? boolean
+---@field Swag_Guns? boolean
+---@field Swag_Gems? boolean
+---@field Swag_Furcoats? boolean
+---@field Swag_electronic? boolean
+---@field Swag_DrugStatue? boolean
+---@field Swag_DrugBags? boolean
+---@field Swag_Counterfeit? boolean
+---@field Swag_Booze_cigs? boolean
+---@field Swag_Art? boolean
 
 ---@class OfficeOpts : BusinessFrontOpts
 ---@field custom_name nil
@@ -32,10 +64,13 @@ local InteriorIDs      = require("includes.data.refs").InteriorIDs
 ---@field private m_id integer
 ---@field private m_name string
 ---@field private m_custom_name string
+---@field private m_ipl_name string
+---@field private m_interior_name_hash joaat_t
 ---@field private m_subs array<Warehouse>
 ---@field private m_vehicle_warehouse? VehicleWarehouse
 ---@field private m_earnings_report OfficeEarningsReport
 ---@field private m_last_report_check_time milliseconds
+---@field private m_last_known_interior integer
 local Office   = setmetatable({}, BusinessFront)
 Office.__index = Office
 
@@ -49,8 +84,12 @@ function Office.new(opts)
 		customName = Game.GetLabelText("GB_REST_ACC")
 	end
 
-	instance.m_custom_name     = customName
-	instance.m_earnings_report = {
+	local iplPrefix                = IPLPrefixes[opts.id or 1]
+	local iplSuffix                = IPLVars[stats.get_int("MPX_PROP_OFFICE_VAR")]
+	instance.m_ipl_name            = iplPrefix .. iplSuffix
+	instance.m_last_known_interior = 0
+	instance.m_custom_name         = customName
+	instance.m_earnings_report     = {
 		lifetime_buy_undertaken  = 0,
 		lifetime_buy_completed   = 0,
 		lifetime_sell_undertaken = 0,
@@ -63,12 +102,36 @@ function Office.new(opts)
 		instance:AddSubBusiness(i)
 	end
 	instance:CheckVehicleWarehouse()
+	--[[
+	scr_function.add_script_function_hook("am_mp_property_int", "NO_OFFICE_CLUTTER", "2D 03 05 00 00 43 75 04 66 38", function(args, rets)
+		local iParam0 = args:get_int(0)
+		if (iParam0 == 0 or iParam0 == 1) then
+			rets:set_int(0, 0)
+			return false
+		end
+		return true
+	end) ]]
 
 	return instance
 end
 
 function Office:Reset()
+	-- scr_function.remove_script_function_hook("am_mp_property_int", "NO_OFFICE_CLUTTER")
 	self:ResetImpl()
+end
+
+---@return string
+function Office:GetIPLName()
+	return self.m_ipl_name
+end
+
+---@return boolean
+function Office:IsPlayerInside()
+	if (LocalPlayer:IsOutside()) then
+		return false
+	end
+
+	return STREAMING.IS_IPL_ACTIVE(self.m_ipl_name)
 end
 
 ---@private
@@ -204,9 +267,8 @@ function Office:Rename(newName)
 			GPBD_FM_3:At(106):WriteString(newName, 64)
 		end
 
-		local officeInt = InteriorIDs.INTERIOR_ID_OFFICE
-		if (LocalPlayer:GetInteriorID() == officeInt) then
-			INTERIOR.REFRESH_INTERIOR(officeInt)
+		if (self:IsPlayerInside()) then
+			INTERIOR.REFRESH_INTERIOR(LocalPlayer:GetInteriorID())
 		end
 
 		local current      = g_Name:ReadString()
@@ -215,6 +277,81 @@ function Office:Rename(newName)
 			log.warning("Rename failed!")
 		end
 	end)
+end
+
+---@private
+---@param officeInt integer
+---@return boolean
+local function remove_office_cash_clutter_set(officeInt)
+	local out = false
+	for i = 1, 24 do
+		local suffix = i < 10 and "0" .. i or tostring(i)
+		local setName = "Cash_Set_" .. suffix
+		if (INTERIOR.IS_INTERIOR_ENTITY_SET_ACTIVE(officeInt, setName)) then
+			INTERIOR.DEACTIVATE_INTERIOR_ENTITY_SET(officeInt, setName)
+			out = true
+		end
+	end
+	return out
+end
+
+---@private
+---@param officeInt integer
+---@param baseName string
+---@return boolean
+local function remove_office_clutter_set(officeInt, baseName)
+	local out = false
+	if (INTERIOR.IS_INTERIOR_ENTITY_SET_ACTIVE(officeInt, baseName)) then
+		INTERIOR.DEACTIVATE_INTERIOR_ENTITY_SET(officeInt, baseName)
+		out = true
+	end
+
+	for i = 2, 3 do
+		local setName = baseName .. i
+		if (INTERIOR.IS_INTERIOR_ENTITY_SET_ACTIVE(officeInt, setName)) then
+			INTERIOR.DEACTIVATE_INTERIOR_ENTITY_SET(officeInt, setName)
+			out = true
+		end
+	end
+
+	return out
+end
+
+---@param clutter_t OfficeClutterItemsParam
+function Office:RemoveClutter(clutter_t)
+	local interior = LocalPlayer:GetInteriorID()
+	if (interior == self.m_last_known_interior) then
+		return
+	end
+
+	if (not self:IsPlayerInside()) then
+		self.m_last_known_interior = interior
+		return
+	end
+
+	if (not PLAYER.IS_PLAYER_CONTROL_ON(LocalPlayer:GetID())) then
+		return
+	end
+
+	local shouldRefresh = false
+	for name, bValue in pairs(clutter_t) do
+		if (not bValue) then
+			goto continue
+		end
+
+		if (name == "cash") then
+			shouldRefresh = remove_office_cash_clutter_set(interior)
+		elseif (remove_office_clutter_set(interior, name)) then
+			shouldRefresh = true
+		end
+
+		::continue::
+	end
+
+	if (shouldRefresh) then
+		INTERIOR.REFRESH_INTERIOR(interior)
+	end
+	self.m_last_known_interior = interior
 end
 
 function Office:Update()
@@ -228,9 +365,15 @@ function Office:Update()
 		end
 	end
 
-	if (Time.Millis() - self.m_last_report_check_time > 5000 and GUI:IsOpen()) then
+	local now_ms = Time.Millis()
+	if (now_ms - self.m_last_report_check_time > 5000 and GUI:IsOpen()) then
 		self:UpdateEarningsReport()
-		self.m_last_report_check_time = Time.Millis()
+		self.m_last_report_check_time = now_ms
+	end
+
+	local cfg = GVars.features.yrv3.office_clutter
+	if (cfg.auto_disable) then
+		self:RemoveClutter(cfg.items)
 	end
 end
 

@@ -120,7 +120,6 @@ function Accessor:At(offset, size)
 	end
 
 	table.insert(newPath, offset)
-
 	return Accessor.new(self.m_index, self.m_type, self.m_script, newPath)
 end
 
@@ -309,7 +308,7 @@ ScriptGlobal = Class("ScriptGlobal", { parent = Accessor })
 function ScriptGlobal.new(address)
 	local instance = Accessor.new(address, Enums.eAccessorType.GLOBAL)
 	---@diagnostic disable: undefined-field
-	instance.__index.__type = ScriptGlobal.__type
+	instance.__index.__type = "ScriptGlobal"
 	---@diagnostic disable-next-line
 	return setmetatable(instance, ScriptGlobal)
 end

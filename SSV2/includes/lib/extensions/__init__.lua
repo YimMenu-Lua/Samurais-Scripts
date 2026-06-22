@@ -486,13 +486,20 @@ end
 -- Simply adds a number suffix if a file with the same name and extension already exists.
 ---@param base_name string
 ---@param extension string
----@return string
+---@return string filename
 function GenerateUniqueFilename(base_name, extension)
-	local filename = _F("%s%s", base_name, extension)
+	if (not extension:startswith(".")) then
+		extension = "." .. extension
+	end
+
+	local filename = base_name .. extension
 	local suffix   = 0
 
 	while (io.exists(filename)) do
-		suffix   = suffix + 1
+		suffix = suffix + 1
+	end
+
+	if (suffix > 0) then
 		filename = _F("%s_%d%s", base_name, suffix, extension)
 	end
 

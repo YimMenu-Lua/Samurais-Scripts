@@ -10,6 +10,7 @@
 --------------------------------------
 -- Class: phFragInst
 --------------------------------------
+-- TODO: research this nonsensical thing or remove it.
 ---@class phFragInst
 ---@field protected m_ptr pointer
 ---@field public m_cache_entry pointer
@@ -18,15 +19,7 @@
 ---@field public m_obj_matrices pointer<fMatrix44[]> `rage::fMatrix44`
 ---@field public m_global_matrices pointer<fMatrix44[]> `rage::fMatrix44`
 ---@overload fun(addr: pointer): phFragInst
-local phFragInst = {}
-phFragInst.__index = phFragInst
-phFragInst.__type = "phFragInst"
----@diagnostic disable-next-line: param-type-mismatch
-setmetatable(phFragInst, {
-	__call = function(cls, ...)
-		return cls.new(...)
-	end,
-})
+local phFragInst = Callable("phFragInst")
 
 ---@param ptr pointer
 ---@return phFragInst|nil

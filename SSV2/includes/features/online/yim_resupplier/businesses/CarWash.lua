@@ -148,9 +148,9 @@ CarWash.__index = CarWash
 ---@param opts BasicBusinessOpts
 ---@return CarWash
 function CarWash.new(opts)
-	local base              = BasicBusiness.new(opts)
-	local instance          = setmetatable(base, CarWash) ---@cast instance CarWash
-	local cashSafe          = CashSafe.new({
+	local base     = BasicBusiness.new(opts)
+	local instance = setmetatable(base, CarWash) ---@cast instance CarWash
+	local cashSafe = CashSafe.new({
 		name            = opts.name,
 		cash_value_stat = "MPX_CWASH_SAFE_CASH_VALUE",
 		paytime_stat    = "MPX_CWASH_PAY_TIME_LEFT",
@@ -158,6 +158,7 @@ function CarWash.new(opts)
 		room_hash       = 4269274169,
 		get_max_cash    = function() return tunables.get_int("TYCOON_CAR_WASH_SAFE_MAX_STORAGE_AMOUNT") end,
 	})
+
 
 	local sgslObj           = SGSL:Get(SGSL.data.car_wash_safe_global)
 	local pidSize           = sgslObj:GetOffset(1)
@@ -169,16 +170,18 @@ function CarWash.new(opts)
 		:At(27)
 		:At(2)
 
-	instance.m_safe         = cashSafe
-	instance.m_duffle       = CarWashDuffle.new({
+
+	instance.m_safe   = cashSafe
+	instance.m_duffle = CarWashDuffle.new({
 		name            = opts.name,
 		cash_value_stat = "MPX_CAR_WASH_DUFFEL_VALUE",
 		get_max_cash    = function() return tunables.get_int(564305888) end
 	})
 
-	instance.m_subs         = {}
+
+	local subs = {}
 	if (stats.get_int("MPX_SB_WEED_SHOP_OWNED") ~= 0) then
-		table.insert(instance.m_subs, CarWashSubBusiness.new({
+		table.insert(subs, CarWashSubBusiness.new({
 			name                           = Game.GetLabelText("CELL_WSHOP"),
 			coords                         = vec3:new(-1162.051147, -1564.757202, 4.410227),
 			heat_packed_stat               = 24925,
@@ -188,7 +191,7 @@ function CarWash.new(opts)
 	end
 
 	if (stats.get_int("MPX_SB_HELI_TOURS_OWNED") ~= 0) then
-		table.insert(instance.m_subs, CarWashSubBusiness.new({
+		table.insert(subs, CarWashSubBusiness.new({
 			name                           = Game.GetLabelText("CELL_HELIT"),
 			coords                         = vec3:new(-753.524841, -1511.244751, 5.015130),
 			heat_packed_stat               = 24926,
@@ -197,6 +200,7 @@ function CarWash.new(opts)
 		}))
 	end
 
+	instance.m_subs = subs
 	return instance
 end
 

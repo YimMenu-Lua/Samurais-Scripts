@@ -36,9 +36,9 @@ BusinessHub.__index = BusinessHub
 ---@param opts HubOpts
 ---@return BusinessHub
 function BusinessHub.new(opts)
-	assert(type(opts.max_units) == "number", "Missing argument: max_units<integer>")
 	local id = opts.id
-	assert(type(opts.id) == "number" and math.is_inrange(opts.id, 0, 6), "Invalid Business Hub id.")
+	assert(type(opts.max_units) == "number", "Missing argument: max_units<integer>")
+	assert(type(id) == "number" and math.is_inrange(id, 0, 6), "Invalid Business Hub id.")
 
 	local base                  = BusinessBase.new(opts)
 	local instance              = setmetatable(base, BusinessHub) ---@cast instance BusinessHub
@@ -100,7 +100,7 @@ end
 -- Actually wanted to improve UX with tech names using the return index
 --
 -- but apparently only Yohan has a name. We should probably return a bool instead
----@return integer TechIndex A number between 0 and 5 or -1 if no one is assigned.
+---@return integer techIndex A number between 0 and 5 or -1 if no one is assigned.
 function BusinessHub:GetAssignedTechIndex()
 	for i = 0, 5 do
 		if (self:IsTechAssignedToThis(i)) then
@@ -192,7 +192,8 @@ end
 -- https://www.youtube.com/watch?v=-Gh1lTcwdGY
 ---@private
 function BusinessHub:InstantFillProduction()
-	self:TriggerProduction(self:GetMaxUnits() - 1)
+	self:SetProductCount(self:GetMaxUnits() - 1)
+	self:TriggerProduction()
 end
 
 ---@return boolean
@@ -207,6 +208,11 @@ end
 
 ---@private
 function BusinessHub:LoopProduction()
+	if (self.m_fast_prod_running) then
+		return
+	end
+
+	self.m_fast_prod_running = true
 	ThreadManager:Run(function()
 		while (self:IsValid() and self.fast_prod_enabled and not self:HasFullProduction()) do
 			self:TriggerProduction()
@@ -230,7 +236,6 @@ function BusinessHub:Update()
 			return
 		end
 
-		self.m_fast_prod_running = true
 		self:LoopProduction()
 	end
 end

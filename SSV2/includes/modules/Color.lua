@@ -8,6 +8,7 @@
 
 
 local DEBUG_TRACK_SOURCE <const> = false
+local _f = _F or string.format
 
 ---@enum eColorType
 local eColorType <const> = {
@@ -48,7 +49,7 @@ local NamedColors <const> = {
 ---@field private m_type eColorType
 ---@field private m_source table?
 ---@field private m_named_colors table<NamedColor, { [1]: float, [2]: float, [3]: float, [4]: float }>
----@field private __raw_ctor fun(self: Color, r: float, g: float, b: float, a: float): Color
+---@field private __raw_ctor fun(r: float, g: float, b: float, a: float): Color
 ---@field public r float
 ---@field public g float
 ---@field public b float
@@ -64,10 +65,10 @@ local NamedColors <const> = {
 ---@overload fun(r: integer, g: integer, b: integer, a: integer): Color
 ---@overload fun(r: float, g: float, b: float, a: float): Color
 local Color = Callable("Color", {
-	t_data = { m_named_colors = NamedColors },
-	ctor   = function(t, ...) return t.new(...) end
+	ctor = function(t, ...)
+		return t.new(...)
+	end
 })
-
 
 ---@param n number
 ---@return integer
@@ -116,7 +117,7 @@ local function process_params(...)
 			return r / 255, g / 255, b / 255, a / 255, eColorType.U32
 		elseif (t == "string") then
 			local key   = v:lower()
-			local named = Color.m_named_colors[key]
+			local named = NamedColors[key]
 			if (named) then
 				return named[1], named[2], named[3], named[4], eColorType.NAMED
 			end
@@ -146,23 +147,25 @@ end
 ---@param b float
 ---@param a float
 ---@return Color
-function Color:__raw_ctor(r, g, b, a)
+function Color.__raw_ctor(r, g, b, a)
 	return setmetatable({
-		r      = r,
-		g      = g,
-		b      = b,
-		a      = a,
-		m_type = eColorType.FLOAT
-	}, self)
+		r              = r,
+		g              = g,
+		b              = b,
+		a              = a,
+		m_type         = eColorType.FLOAT,
+		m_named_colors = NamedColors
+		---@diagnostic disable-next-line
+	}, Color)
 end
 
 -- Constant basic colors for easy access.
 
-Color.BLACK = Color:__raw_ctor(0, 0, 0, 1)
-Color.WHITE = Color:__raw_ctor(1, 1, 1, 1)
-Color.RED   = Color:__raw_ctor(1, 0, 0, 1)
-Color.GREEN = Color:__raw_ctor(0, 1, 0, 1)
-Color.BLUE  = Color:__raw_ctor(0, 0, 1, 1)
+Color.BLACK = Color.__raw_ctor(0, 0, 0, 1)
+Color.WHITE = Color.__raw_ctor(1, 1, 1, 1)
+Color.RED   = Color.__raw_ctor(1, 0, 0, 1)
+Color.GREEN = Color.__raw_ctor(0, 1, 0, 1)
+Color.BLUE  = Color.__raw_ctor(0, 0, 1, 1)
 
 -------------------------------------------
 
@@ -178,7 +181,7 @@ Color.BLUE  = Color:__raw_ctor(0, 0, 1, 1)
 ---@return Color
 function Color.new(...)
 	local r, g, b, a, t = process_params(...)
-	local instance      = Color:__raw_ctor(r, g, b, a)
+	local instance      = Color.__raw_ctor(r, g, b, a)
 	instance.m_type     = t
 
 	if (DEBUG_TRACK_SOURCE) then
@@ -204,18 +207,19 @@ end
 function Color:RegisterNamedColor(name, ...)
 	name = name:lower()
 
-	if (Color.m_named_colors[name]) then
-		log.fwarning("[Color]: '%s' already exists.", name)
+	if (NamedColors[name]) then
+		log.fwarning("[Color]: A color with the name '%s' already exists.", name)
 		return
 	end
 
 	local ok, r, g, b, a = pcall(process_params, ...)
 	if (not ok) then
-		log.fwarning("[Color]: Failed to register named color '%s'. Invalid color argument(s)", name)
+		log.fwarning("[Color]: Failed to register color with name '%s'. Invalid argument(s)", name)
 		return
 	end
 
-	Color.m_named_colors[name] = { r, g, b, a }
+	NamedColors[name]   = { r, g, b, a }
+	self.m_named_colors = NamedColors
 end
 
 -- Returns the color in **RGBA** format [0 - 255].
@@ -247,7 +251,7 @@ end
 ---@return string
 function Color:AsHex()
 	local r, g, b, a = self:AsRGBA()
-	return string.format("#%02X%02X%02X%02X", r, g, b, a)
+	return _f("#%02X%02X%02X%02X", r, g, b, a)
 end
 
 ---@param normalize? boolean Normalize to `[0 .. 1]`
@@ -266,7 +270,7 @@ end
 ---@param c Color color to mix with
 ---@param f float factor
 function Color:Mix(c, f)
-	return Color:__raw_ctor(
+	return Color.__raw_ctor(
 		self.r + (c.r - self.r) * f,
 		self.g + (c.g - self.g) * f,
 		self.b + (c.b - self.b) * f,
@@ -287,7 +291,7 @@ function Color:Darken(f, includeAlpha)
 		a = math.clamp(a - f, 0, 1)
 	end
 
-	return Color:__raw_ctor(r, g, b, a)
+	return Color.__raw_ctor(r, g, b, a)
 end
 
 -- Returns a new instance. Does not mutate.
@@ -303,7 +307,7 @@ function Color:Brighten(f, includeAlpha)
 		a = math.clamp(a + f, 0, 1)
 	end
 
-	return Color:__raw_ctor(r, g, b, a)
+	return Color.__raw_ctor(r, g, b, a)
 end
 
 -- Returns the luminance of the color *(brightness)*.
@@ -409,7 +413,7 @@ function Color.FromHSV(h, s, v, a)
 		r, g, b = c, 0, x
 	end
 
-	return Color:__raw_ctor(r + m, g + m, b + m, a)
+	return Color.__raw_ctor(r + m, g + m, b + m, a)
 end
 
 ---------------------------------------------------------------------------------
@@ -425,7 +429,7 @@ end
 ---@param right Color
 ---@return Color
 function Color:__add(right)
-	return Color:__raw_ctor(
+	return Color.__raw_ctor(
 		math.min(self.r + right.r, 1),
 		math.min(self.g + right.g, 1),
 		math.min(self.b + right.b, 1),
@@ -436,7 +440,7 @@ end
 ---@param right Color
 ---@return Color
 function Color:__sub(right)
-	return Color:__raw_ctor(
+	return Color.__raw_ctor(
 		math.max(self.r - right.r, 0),
 		math.max(self.g - right.g, 0),
 		math.max(self.b - right.b, 0),
@@ -447,7 +451,7 @@ end
 ---@param right Color
 ---@return Color
 function Color:__mul(right)
-	return Color:__raw_ctor(
+	return Color.__raw_ctor(
 		math.min(self.r * right.r, 1),
 		math.min(self.g * right.g, 1),
 		math.min(self.b * right.b, 1),
@@ -458,7 +462,7 @@ end
 ---@param right Color
 ---@return Color
 function Color:__div(right)
-	return Color:__raw_ctor(
+	return Color.__raw_ctor(
 		right.r == 0 and 0 or self.r / right.r,
 		right.g == 0 and 0 or self.g / right.g,
 		right.b == 0 and 0 or self.b / right.b,
@@ -469,7 +473,7 @@ end
 
 function Color:__tostring()
 	local r, g, b, a = self:AsRGBA()
-	return string.format(
+	return _f(
 		"[Color] Float: %.3f %.3f %.3f %.3f | RGBA: %d %d %d %d | Hex: %s | U32: 0x%X",
 		self.r, self.g, self.b, self.a,
 		r, g, b, a,
@@ -481,6 +485,7 @@ end
 ------------------------------------------------------------------------------------------
 -- Helpers for `Serializer` to seamlessly parse a color object to JSON and reconstruct it.
 
+---@return { __type: "color", r: float, g: float, b: float, a: float }
 function Color:serialize()
 	return { __type = "color", r = self.r, g = self.g, b = self.b, a = self.a }
 end
@@ -489,10 +494,10 @@ end
 function Color.deserialize(t)
 	if (type(t) ~= "table" or t.__type ~= "color") then
 		log.warning("[Color]: Deserialization failed: invalid data!")
-		return Color:__raw_ctor(0, 0, 0, 0)
+		return Color.__raw_ctor(0, 0, 0, 0)
 	end
 
-	return Color:__raw_ctor(t.r, t.g, t.b, t.a)
+	return Color.__raw_ctor(t.r, t.g, t.b, t.a)
 end
 
 if (Serializer) then

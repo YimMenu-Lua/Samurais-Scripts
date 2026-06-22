@@ -144,11 +144,15 @@ function YRV3:Reset(disable, reason)
 end
 
 function YRV3:Reload()
+	if (self.m_state == Enums.eYRState.RELOADING) then
+		return
+	end
+
+	self.m_state = Enums.eYRState.RELOADING
 	ThreadManager:Run(function()
-		self.m_state         = Enums.eYRState.RELOADING
 		self.m_total_sum     = 0
 		self.m_total_sum_fmt = "$0"
-		sleep(1500) -- dummy busy wait to give the UI time to refresh
+		sleep(1500) -- dummy busy wait
 		self:Reset()
 	end)
 end

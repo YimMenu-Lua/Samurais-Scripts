@@ -340,6 +340,26 @@ local Config <const> = {
 			sy_disable_rob_weekly_cd = false,
 			sy_disable_tow_cd = false,
 			unsafe_feats_enabled = false,
+			office_clutter = {
+				auto_disable = false,
+				items = {
+					cash             = false,
+					Swag_Silver      = false,
+					Swag_Pills       = false,
+					Swag_Med         = false,
+					Swag_JewelWatch  = false,
+					Swag_Ivory       = false,
+					Swag_Guns        = false,
+					Swag_Gems        = false,
+					Swag_Furcoats    = false,
+					Swag_electronic  = false,
+					Swag_DrugStatue  = false,
+					Swag_DrugBags    = false,
+					Swag_Counterfeit = false,
+					Swag_Booze_cigs  = false,
+					Swag_Art         = false,
+				}
+			}
 		},
 		yim_actions = {
 			auto_close_ped_window = false,
