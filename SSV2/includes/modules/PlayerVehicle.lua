@@ -48,6 +48,7 @@ local ManualGearbox    = require("includes.features.vehicle.manual_gearbox")
 ---@field private m_threads array<Thread>
 ---@field private m_default_max_speed float
 ---@field private m_has_loud_radio boolean
+---@field private m_top_speed_modified boolean
 ---@field private m_generic_toggleables table<string, GenericToggleable>
 ---@field public m_default_xenon_lights { enabled: boolean, index: integer }
 ---@field public m_default_tire_smoke { enabled: boolean, color: vec3 }
@@ -193,19 +194,19 @@ function PlayerVehicle:Set(handle)
 	self.m_autopilot.eligible           = self:IsAircraft()
 
 
-	local feats_cfg = GVars.features.vehicle
-	if (feats_cfg.no_turbulence and VEHICLE.IS_THIS_MODEL_A_PLANE(new_model)) then
+	local cfg = GVars.features.vehicle
+	if (cfg.no_turbulence and VEHICLE.IS_THIS_MODEL_A_PLANE(new_model)) then
 		VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(handle, 0.0)
 	end
 
-	if (feats_cfg.default_station.enabled) then
-		self:SetRadioStation(feats_cfg.default_station.station_name)
+	if (cfg.default_station.enabled) then
+		self:SetRadioStation(cfg.default_station.station_name)
 	end
 
 	self.m_flag_controller:ApplyPresets()
 	self.m_stancer:OnNewVehicle()
 
-	if (feats_cfg.manual_gearbox.enabled) then
+	if (cfg.manual_gearbox.enabled) then
 		self.m_manual_gearbox:OnNewVehicle()
 	end
 	-- self:ResumeThreads()
@@ -607,42 +608,44 @@ function PlayerVehicle:Main()
 		return
 	end
 
+	local cfg    = GVars.features.vehicle
 	local handle = self:GetHandle()
 
-	if (GVars.features.vehicle.fast_vehicles) then
-		if (self:GetMaxSpeed() <= 80) then
-			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, 100)
-		end
-	elseif (self:GetMaxSpeed() >= 80) then
+	if (cfg.fast_vehicles) then
+		VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, cfg.fast_vehicles_speed or 10)
+		self.m_top_speed_modified = true
+	elseif (self.m_top_speed_modified) then
 		VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, -1)
+		self.m_top_speed_modified = false
 	end
 
-	if (GVars.features.vehicle.subwoofer and (not self:HasLoudRadio() or not self.m_generic_toggleables["subwoofer"])) then
+	if (cfg.subwoofer and (not self:HasLoudRadio() or not self.m_generic_toggleables["subwoofer"])) then
 		self:AddGenericToggleable("subwoofer", function()
 			self:ToggleSubwoofer(true)
 		end, self.ToggleSubwoofer, { self, false })
 	end
 
-	if (GVars.features.vehicle.unbreakable_windows) then
+	if (cfg.unbreakable_windows) then
 		local native = VEHICLE.SET_DONT_PROCESS_VEHICLE_GLASS
 		self:AddGenericToggleable("strongwindows", function()
 			native(handle, true)
 		end, native, { handle, false })
 	end
 
-	if (GVars.features.vehicle.auto_brake_lights and LocalPlayer:IsDriving()) then
+	if (cfg.auto_brake_lights and LocalPlayer:IsDriving()) then
 		if (self:IsDriveable() and self:IsEngineOn() and not self:IsMoving() and not PAD.IS_CONTROL_PRESSED(0, 72)) then
 			VEHICLE.SET_VEHICLE_BRAKE_LIGHTS(handle, true)
 		end
 	end
 
-	self.m_is_flatbed = self:IsFlatbedTruck()
+	self.m_is_flatbed             = self:IsFlatbedTruck()
 	self.m_engine_swap_compatible = self:IsCar()
+
 	self.m_feat_mgr:Update()
 	self:UpdateESC()
 	self:AutoLock()
 	self:HandleAutopilot()
-	Speedometer:UpdateState()
+	Speedometer:UpdateState(self)
 end
 
 -- Just for convenience so we don't have to remember patch names.

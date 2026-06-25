@@ -130,13 +130,20 @@ function YRV3:Reset(disable, reason)
 	self.m_last_autosell_check_time  = 0
 	self.m_last_income_check_time    = 0
 	self.m_last_business_update_time = 0
-	self.m_businesses                = { safes = {} }
 	self.m_boss_types_avail          = { { name = "GB_BOSS" --[[VIP]], id = 0 } }
 	self.m_sell_script_running       = false
 	self.m_initial_data_done         = false
 	self.m_data_initialized          = false
 	self.m_autosell_state            = Enums.eAutoSellState.NONE
 	self.m_state                     = disable and Enums.eYRState.ERROR or Enums.eYRState.IDLE
+
+	for _, business in self:BusinessIter() do
+		local reset = business.Reset
+		if (reset) then
+			---@diagnostic disable-next-line
+			reset(business)
+		end
+	end; self.m_businesses = { safes = {} }
 
 	if (disable) then
 		self:SetLastError(reason or "Unhandled Exception.")
