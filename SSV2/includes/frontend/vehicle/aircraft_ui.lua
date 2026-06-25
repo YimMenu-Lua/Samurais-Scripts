@@ -8,11 +8,11 @@
 
 
 local flrs                    = require("includes.features.vehicle.flares")
+Flares                        = LocalPlayer:GetVehicle():AddFeature(flrs)
 local autopilot_state_idx     = 0
 local autopilot_index_changed = false
 local autopilot_labels
 local planes_tab              = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_AIRCRAFT", nil, nil, true)
-Flares                        = LocalPlayer:GetVehicle():AddFeature(flrs)
 local optionPopup             = {
 	flags       = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize,
 	label       = "##optionsPopup",
@@ -50,7 +50,18 @@ planes_tab:AddBoolCommand("VEH_FAST_JETS",
 		gvar_key         = "features.vehicle.fast_jets",
 		translate_label  = true,
 		meta             = { description = "VEH_FAST_JETS_TT", isTranslatorLabel = true },
-		register_command = true
+		register_command = true,
+		options_data     = {
+			condition = function() return GVars.features.vehicle.fast_jets end,
+			callback  = function()
+				optionPopup.callback    = function()
+					local cfg           = GVars.features.vehicle
+					cfg.fast_jets_speed = ImGui.SliderFloat("##speed", cfg.fast_jets_speed, 100.0, 300.0)
+				end
+				optionPopup.label       = _T("VEH_FAST_JETS")
+				optionPopup.should_draw = true
+			end
+		}
 	}
 )
 planes_tab:AddBoolCommand("VEH_NO_JET_STALL",

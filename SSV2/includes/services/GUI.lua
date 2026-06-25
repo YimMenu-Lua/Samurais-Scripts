@@ -889,10 +889,11 @@ function GUI:Text(text, opts)
 	end
 
 	local has_wrap_pos = type(opts.wrap_pos) == "number"
-	local has_color    = IsInstance(opts.color, Color)
+	local color        = opts.color
+	local has_color    = color ~= nil
 
-	if (has_color) then
-		local r, g, b, a = opts.color:AsFloat()
+	if (has_color) then ---@cast color Color
+		local r, g, b, a = color:AsFloat()
 		ImGui.PushStyleColor(ImGuiCol.Text, r, g, b, opts.alpha or a or 1)
 	end
 

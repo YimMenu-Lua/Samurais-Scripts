@@ -9,6 +9,7 @@
 
 local gui_registered           = false
 local last_engine_state        = true
+local last_captured_top_spd    = 0.0
 local RUNTIME_COLORS <const>   = {
 	INDICATOR_RED   = Color(1.0, 0.215, 0.215, 1.0):AsU32(),
 	INDICATOR_GREEN = Color(0.1, 0.91, 0.0, 1.0):AsU32(),
@@ -88,21 +89,25 @@ local Speedometer   = {
 }; Speedometer.__index = Speedometer
 
 ---@public
-function Speedometer:UpdateState()
+---@param PV PlayerVehicle
+function Speedometer:UpdateState(PV)
 	local state = self._state
-	local PV    = LocalPlayer:GetVehicle()
 	if not (PV and PV:IsValid()) then
 		state.should_draw = false
 		return
 	end
 
-	local speed_modifier   = Match(GVars.features.speedometer.speed_unit, UNIT_MULTIPLIERS)
-	local fast_vehicles    = GVars.features.vehicle.fast_vehicles
-	local IsEngineOn       = PV:IsEngineOn()
+	local speed_modifier = Match(GVars.features.speedometer.speed_unit, UNIT_MULTIPLIERS)
+	local IsEngineOn     = PV:IsEngineOn()
+	local IsNosActive    = PV:IsNOSActive()
+	if (not IsNosActive) then
+		last_captured_top_spd = PV:GetMaxSpeed()
+	end
+
 	state.PV               = PV
 	state.speed_modifier   = speed_modifier
 	state.CurrentSpeed     = PV:GetSpeed() * speed_modifier
-	state.MaxSpeed         = math.floor((PV:GetDefaultMaxSpeed() * (fast_vehicles and 1.8 or 1)) * speed_modifier)
+	state.MaxSpeed         = math.floor(last_captured_top_spd * speed_modifier)
 	state.CurrentAltitude  = PV:GetHeightAboveGround()
 	state.Manufacturer     = PV:GetManufacturerName()
 	state.IsEngineOn       = IsEngineOn
@@ -111,7 +116,7 @@ function Speedometer:UpdateState()
 	state.IsABSEngaged     = PV:IsABSEngaged()
 	state.IsESCEngaged     = PV:IsESCEngaged()
 	state.IsESCDisabled    = get_is_tc_esc_dsabled(PV)
-	state.IsNOSActive      = PV:IsNOSActive()
+	state.IsNOSActive      = IsNosActive
 	state.IsAircraft       = PV:IsPlane() or PV:IsHeli()
 	state.IsSports         = PV:IsSportsOrSuper()
 	state.IsShootingFlares = PV.m_is_shooting_flares

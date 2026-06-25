@@ -16,18 +16,11 @@ local CStructView = require("includes.classes.gta.CStructView")
 ---@field private m_decimal uint32_t
 ---@field private m_packed vec4
 ---@overload fun(n: uint32_t): IPAddress
-local IPAddress <const> = {}
-IPAddress.__index = IPAddress
----@diagnostic disable-next-line
-setmetatable(IPAddress, {
-	__call = function(t, ...)
-		return t.new(...)
-	end
-})
+local IPAddress <const> = Callable("IPAddress", { ctor = function(t, n) return t:new(n) end })
 
 ---@param n uint32_t
 ---@return IPAddress
-function IPAddress.new(n)
+function IPAddress:new(n)
 	local packed = vec4:zero()
 	if (n ~= 0) then
 		packed = vec4:new(
@@ -41,8 +34,7 @@ function IPAddress.new(n)
 	return setmetatable({
 		m_decimal = n,
 		m_packed  = packed
-		---@diagnostic disable-next-line
-	}, IPAddress)
+	}, self)
 end
 
 ---@return string
@@ -60,14 +52,16 @@ end
 -- Class: rlGamerInfo
 --------------------------------------
 ---@class rlGamerInfo : CStructBase<rlGamerInfo>
----@field m_peer_id pointer<uint64_t>
----@field m_rockstar_id pointer<int64_t>
----@field m_external_ip pointer<uint32_t>
----@field m_external_port pointer<uint16_t>
----@field m_internal_ip pointer<uint32_t>
----@field m_internal_port pointer<uint16_t>
----@field m_nat_type pointer<uint32_t>
----@field m_player_name pointer<string> // 0x00DC
+---@field private m_peer_id pointer<uint64_t>
+---@field private m_rockstar_id pointer<int64_t>
+---@field private m_external_ip pointer<uint32_t>
+---@field private m_external_port pointer<uint16_t>
+---@field private m_internal_ip pointer<uint32_t>
+---@field private m_internal_port pointer<uint16_t>
+---@field private m_nat_type pointer<uint32_t>
+---@field private m_player_name pointer<string> // 0x00DC
+---@field private m_cached_extern_ipaddr IPAddress
+---@field private m_cached_intern_ipaddr IPAddress
 ---@overload fun(ptr: pointer): rlGamerInfo
 local rlGamerInfo = CStructView("rlGamerInfo", 0x0F90)
 
@@ -88,14 +82,25 @@ function rlGamerInfo.new(ptr)
 	}, rlGamerInfo)
 end
 
+---@return int64_t
+function rlGamerInfo:GetRockstarID()
+	return self.m_rockstar_id:get_int()
+end
+
 ---@return IPAddress
 function rlGamerInfo:GetExternalIP()
-	return IPAddress(self.m_external_ip:get_dword())
+	if (not self.m_cached_extern_ipaddr) then
+		self.m_cached_extern_ipaddr = IPAddress(self.m_external_ip:get_dword())
+	end
+	return self.m_cached_extern_ipaddr
 end
 
 ---@return IPAddress
 function rlGamerInfo:GetInternalIP()
-	return IPAddress(self.m_internal_ip:get_dword())
+	if (not self.m_cached_intern_ipaddr) then
+		self.m_cached_intern_ipaddr = IPAddress(self.m_internal_ip:get_dword())
+	end
+	return self.m_cached_intern_ipaddr
 end
 
 ---@return string

@@ -17,7 +17,7 @@
 ---@field private m_name string
 ---@field private m_coords vec3
 ---@field private m_generic_val_get_func fun(): anyval
----@field private m_generic_val_set_func function
+---@field private m_generic_val_set_func fun(...: any)
 ---@field protected m_is_stale boolean
 local BasicBusiness = {}
 BasicBusiness.__index = BasicBusiness
@@ -52,8 +52,8 @@ function BasicBusiness:GetGenericValue()
 	return self.m_generic_val_get_func()
 end
 
-function BasicBusiness:SetGenericValue()
-	self.m_generic_val_set_func()
+function BasicBusiness:SetGenericValue(...)
+	self.m_generic_val_set_func(...)
 end
 
 return BasicBusiness

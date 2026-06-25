@@ -109,8 +109,8 @@ function MiscVehicle:ShootExplosiveMG(enemiesOnly, targetEntity, startPos, endPo
 end
 
 function MiscVehicle:UpdateMachineGuns()
-	if (not GVars.features.vehicle.aircraft_mg.triggerbot
-			and not GVars.features.vehicle.aircraft_mg.manual_aim) then
+	local cfg = GVars.features.vehicle.aircraft_mg
+	if not (cfg.triggerbot or cfg.manual_aim) then
 		return
 	end
 
@@ -120,8 +120,8 @@ function MiscVehicle:UpdateMachineGuns()
 
 	local PV                        = self.m_entity
 	local handle                    = PV:GetHandle()
-	local manualAim                 = GVars.features.vehicle.aircraft_mg.manual_aim
-	local triggerbotRange           = GVars.features.vehicle.aircraft_mg.tiggerbot_range
+	local manualAim                 = cfg.manual_aim
+	local triggerbotRange           = cfg.tiggerbot_range
 	local playerPos                 = LocalPlayer:GetPos()
 	local rotation                  = manualAim and CAM.GET_GAMEPLAY_CAM_ROT(2) or PV:GetRotation(2)
 	local direction                 = rotation:to_direction()
@@ -129,8 +129,8 @@ function MiscVehicle:UpdateMachineGuns()
 	local destination               = playerPos + direction * multiplier
 	local hit, endCoords, entityHit = World:RayCast(playerPos, destination, -1, handle)
 
-	if (hit and GVars.features.vehicle.aircraft_mg.triggerbot and (ENTITY.IS_ENTITY_A_PED(entityHit) or ENTITY.IS_ENTITY_A_VEHICLE(entityHit))) then
-		local enemiesOnly = GVars.features.vehicle.aircraft_mg.enemies_only
+	if (hit and cfg.triggerbot and (ENTITY.IS_ENTITY_A_PED(entityHit) or ENTITY.IS_ENTITY_A_VEHICLE(entityHit))) then
+		local enemiesOnly = cfg.enemies_only
 		local ped         = Game.GetClosestPed(endCoords, 50, true)
 		local veh         = Game.GetClosestVehicle(endCoords, 50, handle)
 
@@ -150,8 +150,8 @@ function MiscVehicle:UpdateMachineGuns()
 			self:ShootExplosiveMG(false, 0, playerPos, endPos)
 		end
 
-		local color = GVars.features.vehicle.aircraft_mg.marker_color
-		local markerSize = GVars.features.vehicle.aircraft_mg.marker_size
+		local color      = cfg.marker_color
+		local markerSize = cfg.marker_size
 		local markerDest = hit and endCoords or vec3:new(
 			playerPos.x + direction.x * 50,
 			playerPos.y + direction.y * 50,
@@ -206,17 +206,18 @@ function MiscVehicle:DisableAirTurbulence()
 end
 
 function MiscVehicle:Update()
-	local PV = self.m_entity
+	local PV     = self.m_entity
 	local handle = PV:GetHandle()
+	local cfg    = GVars.features.vehicle
 
-	if (GVars.features.vehicle.fast_jets and PV:IsPlane() and (VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(handle) ~= 1.0)) then
+	if (cfg.fast_jets and PV:IsPlane() and (VEHICLE.GET_VEHICLE_FLIGHT_NOZZLE_POSITION(handle) ~= 1.0)) then
 		local speed      = PV:GetSpeed()
 		local gearState  = PV:GetLandingGearState()
 		local rot        = PV:GetRotation(2)
 		local pitch      = rot.x
-		local baseThrust = 2e4
-		local minThrust  = 5e3
-		local maxSpeed   = 164.0
+		local baseThrust = 25e3
+		local minThrust  = 1e4
+		local maxSpeed   = cfg.fast_jets_speed or 150.0
 		local thrustMult = 1.0
 
 		if (pitch >= 60) then
@@ -225,10 +226,7 @@ function MiscVehicle:Update()
 			thrustMult = 1.4
 		end
 
-		if speed >= 72 and speed < maxSpeed
-			and PAD.IS_CONTROL_PRESSED(0, 87)
-			and gearState == Enums.eLandingGearState.RETRACTED
-		then
+		if (speed >= 70 and speed < maxSpeed and PAD.IS_CONTROL_PRESSED(0, 87) and gearState == Enums.eLandingGearState.RETRACTED) then
 			local lerp   = math.min(1.0, (speed) / (maxSpeed))
 			local thrust = math.min(minThrust, baseThrust * thrustMult * (1.0 - lerp))
 			ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
@@ -245,13 +243,13 @@ function MiscVehicle:Update()
 		end
 	end
 
-	if (GVars.features.vehicle.no_jet_stall) then
+	if (cfg.no_jet_stall) then
 		if (PV:IsDriveable() and PV:GetEngineHealth() > 350 and PV:GetHeightAboveGround() > 5.0 and not PV:IsEngineOn()) then
 			VEHICLE.SET_VEHICLE_ENGINE_ON(handle, true, true, false)
 		end
 	end
 
-	if (GVars.features.vehicle.no_turbulence) then
+	if (cfg.no_turbulence) then
 		self:DisableAirTurbulence()
 	end
 

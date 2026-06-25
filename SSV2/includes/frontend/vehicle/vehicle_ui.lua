@@ -281,7 +281,20 @@ vehicleTab:AddBoolCommand("VEH_FAST_AF",
 	{
 		gvar_key        = "features.vehicle.fast_vehicles",
 		meta            = { description = "VEH_FAST_AF_TT" },
-		translate_label = true
+		translate_label = true,
+		options_data    = {
+			condition = function()
+				return GVars.features.vehicle.fast_vehicles
+			end,
+			callback = function()
+				optionPopup.callback    = function()
+					local cfg               = GVars.features.vehicle
+					cfg.fast_vehicles_speed = ImGui.SliderFloat("##speed", cfg.fast_vehicles_speed, 10.0, 100.0)
+				end
+				optionPopup.label       = _T("VEH_FAST_AF")
+				optionPopup.should_draw = true
+			end
+		}
 	}
 )
 vehicleTab:AddBoolCommand("VEH_NOS",

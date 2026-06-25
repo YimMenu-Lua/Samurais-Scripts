@@ -71,6 +71,7 @@ Enums.eWarehouseType = {
 ---@field coords vec3
 ---@field size? integer Special Cargo only
 
+
 -- Class representing a warehouse that stores valuable cargo.
 --
 -- Can be `CEO Special Cargo Warehouse` or `Hangar`.
@@ -86,7 +87,7 @@ Enums.eWarehouseType = {
 ---@field private m_assistant_sourcing_func function
 ---@field private m_prod_value_func fun(count: integer): integer
 ---@field public auto_fill boolean
-local Warehouse = setmetatable({}, BusinessBase)
+local Warehouse   = setmetatable({}, BusinessBase)
 Warehouse.__index = Warehouse
 
 ---@param opts WarehouseOpts

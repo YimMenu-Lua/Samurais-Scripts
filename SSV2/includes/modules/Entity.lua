@@ -346,7 +346,12 @@ end
 
 ---@return boolean
 function Entity:IsOutside()
-	return self:GetInteriorID() == 0
+	local interiorID = self:GetInteriorID()
+	if (interiorID == 0) then
+		return true
+	end
+	local groupID = INTERIOR.GET_INTERIOR_GROUP_ID(interiorID)
+	return groupID > 0
 end
 
 ---@return joaat_t

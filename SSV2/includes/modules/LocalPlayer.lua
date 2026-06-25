@@ -33,6 +33,9 @@ local YRV3         = require("includes.features.online.yim_resupplier.YimResuppl
 ---@field private m_money_controller PlayerMoneyController
 ---@field private m_clipsets { movement?: string, strafe?: string, weapon?: string }
 ---@field protected m_internal CPed
+---@field new nil
+---@field Create nil
+---@field Delete nil
 ---@field SetAsNoLongerNeeded nil
 LocalPlayer = Class("LocalPlayer", { parent = Player })
 

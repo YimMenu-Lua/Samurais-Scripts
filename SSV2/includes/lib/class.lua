@@ -50,38 +50,35 @@ function Class(name, opts)
 	end
 
 	-- classes can be initialized directly without explicitly calling the constructor.
-	setmetatable(
-		cls,
-		{
-			__call = function(c, ...)
-				local instance
+	setmetatable(cls, {
+		__call = function(c, ...)
+			local instance
 
-				if (base) then
-					if base.new then
-						instance = base.new(...)
-					elseif base.init then
-						instance = base:init(...)
-					end
+			if (base) then
+				if base.new then
+					instance = base.new(...)
+				elseif base.init then
+					instance = base:init(...)
 				end
+			end
 
-				if (c.new) then
-					instance = c.new(...)
-				elseif (c.init) then
-					instance = c:init(...)
-				else
-					instance = {}
-				end
+			if (c.new) then
+				instance = c.new(...)
+			elseif (c.init) then
+				instance = c:init(...)
+			else
+				instance = {}
+			end
 
-				if (type(instance) == "table") then
-					instance.__type = c.__type
-					setmetatable(instance, c)
-				end
+			if (type(instance) == "table") then
+				instance.__type = c.__type
+				setmetatable(instance, c)
+			end
 
-				return instance
-			end,
-			__index = base,
-		}
-	)
+			return instance
+		end,
+		__index = base,
+	})
 
 	function cls:super()
 		return self.__base or self

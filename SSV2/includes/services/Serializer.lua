@@ -7,12 +7,13 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local Set               = require("includes.classes.Set")
-local JSON <const>      = require("includes.thirdparty.json.json")()
-local B64_CHARS <const> = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-local XOR_KEY <const>   = "\xA3\x4F\xD2\x9B\x7E\xC1\xE8\x36\x5D\x0A\xF7\xB4\x6C\x2D\x89\x50\x1E\x73\xC9\xAF\x3B\x92\x58\xE0\x14\x7D\xA6\xCB\x81\x3F\xD5\x67"
+local Set                    = require("includes.classes.Set")
+local JSON <const>           = require("includes.thirdparty.json.json")()
+local B64_CHARS <const>      = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+local PUBLIC_XOR_KEY <const> = "\xA3\x4F\xD2\x9B\x7E\xC1\xE8\x36\x5D\x0A\xF7\xB4\x6C\x2D\x89\x50\x1E\x73\xC9\xAF\x3B\x92\x58\xE0\x14\x7D\xA6\xCB\x81\x3F\xD5\x67"
 
 assert(JSON.VERSION == "20211016.28", "Bad Json package version.")
+
 ---@enum eSerializerState
 local eSerializerState <const> = {
 	INIT      = -1,
@@ -76,41 +77,29 @@ function Serializer:init()
 	if (self.m_initialized) then return self end
 	if (_G.Serializer) then return _G.Serializer end
 
-	local instance = setmetatable({
-		m_state            = eSerializerState.INIT,
-		m_initialized      = true,
-		m_setup            = false,
-		m_dirty            = false,
-		m_locked           = false,
-		m_disabled         = false,
-		m_registered_types = {},
-		m_deferred_objects = {},
-		m_moved_keys       = { -- We gave these 2 updates to migrate. Should remove them in the next one
-			{ path = "features.yim_actions.action_commands",  file_name = "action_commands.json" },
-			{ path = "features.entity_forge.favorites",       file_name = "forge_favorites.json" },
-			{ path = "features.entity_forge.forged_entities", file_name = "forged_entities.json" },
-		},
-		m_deprecated_keys  = { -- same here
-			"features.bsv2",
-			"features.entity_forge",
-		},
-		m_renamed_keys     = {
-			{ old_path = "features.yrv3.safe_loop_warn_ack", new_path = "features.unsafe_feats_enabled" } -- remove after 3 updates (current v1.9.4)
-		},
-		m_lock_queue       = {},
-		m_key_states       = {},
-		---@diagnostic disable-next-line
-	}, Serializer)
+	self.m_state            = eSerializerState.INIT
+	self.m_initialized      = true
+	self.m_setup            = false
+	self.m_dirty            = false
+	self.m_locked           = false
+	self.m_disabled         = false
+	self.m_registered_types = {}
+	self.m_deferred_objects = {}
+	self.m_lock_queue       = {}
+	self.m_key_states       = {}
+	self.m_moved_keys       = {}
+	self.m_deprecated_keys  = {}
+	self.m_renamed_keys     = {}
 
 	ThreadManager:RegisterLooped("SS_SERIALIZER", function()
-		instance:OnTick()
+		self:OnTick()
 	end)
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
-		instance:OnShutdown()
+		self:OnShutdown()
 	end)
 
-	return instance
+	return self
 end
 
 ---@param script_name? string
@@ -131,7 +120,7 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 	self.m_default_config  = default_config or { __version = Backend and Backend.__version or self.__version }
 	self.m_file_name       = _F("%s.json", filename)
 	self.m_backup_file     = _F("%s.bak", filename)
-	self.m_xor_key         = varargs.encryption_key or XOR_KEY
+	self.m_xor_key         = varargs.encryption_key or PUBLIC_XOR_KEY
 	self.m_parsing_options = {
 		pretty         = varargs.pretty,
 		indent         = string.rep(" ", varargs.indent or 4),
@@ -144,7 +133,7 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 
 	local config_data = self:Read()
 	if (type(config_data) ~= "table") then
-		log.warning("[Serializer]: Failed to read data! Persistent config will be disabled for this session.")
+		log.error("[Serializer]: Failed to read data! Persistent config will be disabled for this session.")
 		self.m_disabled = true
 		self.m_state    = eSerializerState.SUSPENDED
 		return self
@@ -155,41 +144,39 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 		_ENV.GVars   = runtime_vars
 	end
 
-	setmetatable(
-		runtime_vars,
-		{
-			__index = function(_, k)
-				local value = self.m_key_states[k]
-				if (value ~= nil) then
-					return value
-				end
-
-				local default = self.m_default_config[value]
-				value         = config_data[k]
-				if (value ~= nil) then
-					self.m_key_states[k] = value
-					self.m_dirty         = true
-					return value
-				elseif (default ~= nil) then
-					self.m_key_states[k] = default
-					self.m_dirty         = true
-				end
-
-				return self.m_key_states[k]
-			end,
-			__newindex = function(_, k, v)
-				if (self.m_default_config[k] == nil) then
-					local value = config_data[k] ~= nil and config_data[k] or v
-					self.m_key_states[k] = value
-				end
-
-				if (self.m_key_states[k] ~= v) then
-					self.m_key_states[k] = v
-					self.m_dirty         = true
-				end
+	setmetatable(runtime_vars, {
+		__index = function(_, k)
+			local value = self.m_key_states[k]
+			if (value ~= nil) then
+				return value
 			end
-		}
-	)
+
+			local default = self.m_default_config[value]
+			value         = config_data[k]
+			if (value ~= nil) then
+				self.m_key_states[k] = value
+				self.m_dirty         = true
+				return value
+			elseif (default ~= nil) then
+				self.m_key_states[k] = default
+				self.m_dirty         = true
+			end
+
+			return self.m_key_states[k]
+		end,
+
+		__newindex = function(_, k, v)
+			if (self.m_default_config[k] == nil) then
+				local value = config_data[k] ~= nil and config_data[k] or v
+				self.m_key_states[k] = value
+			end
+
+			if (self.m_key_states[k] ~= v) then
+				self.m_key_states[k] = v
+				self.m_dirty         = true
+			end
+		end
+	})
 
 	for key, default_value in pairs(self.m_default_config) do
 		local saved_value = config_data[key]
@@ -334,12 +321,12 @@ end
 
 ---@return milliseconds
 function Serializer:GetLastWriteTime()
-	return self.m_last_write_time and self.m_last_write_time:Value() or 0
+	return self.m_last_write_time:Value()
 end
 
 ---@return milliseconds
 function Serializer:GetTimeSinceLastFlush()
-	return self.m_last_write_time and self.m_last_write_time:Elapsed() or 0
+	return self.m_last_write_time:Elapsed()
 end
 
 ---@return Config
@@ -396,6 +383,7 @@ function Serializer:WithLock(fun)
 end
 
 ---@param value any
+---@param seen? table
 ---@return any
 function Serializer:Preprocess(value, seen)
 	seen = seen or {}

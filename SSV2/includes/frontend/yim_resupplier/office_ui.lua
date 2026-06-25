@@ -7,48 +7,121 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
-local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
-local drawNamePlate         = require("includes.frontend.yim_resupplier.nameplate_ui")
-local drawVehicleWarehouse  = require("includes.frontend.yim_resupplier.vehicle_warehouse_ui")
-local drawWarehouse         = require("includes.frontend.yim_resupplier.warehouse_ui")
-local colMoneyGreen <const> = Color("#85BB65")
+local YRV3                    = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local measureBulletWidths     = require("includes.frontend.helpers.measure_text_width")
+local drawNamePlate           = require("includes.frontend.yim_resupplier.nameplate_ui")
+local drawVehicleWarehouse    = require("includes.frontend.yim_resupplier.vehicle_warehouse_ui")
+local drawWarehouse           = require("includes.frontend.yim_resupplier.warehouse_ui")
+local colMoneyGreen <const>   = Color("#85BB65")
 
 ---@type array<integer>
-local bulletWidths          = {}
-local showEarningsData      = { v = false }
-local earningDataIntBuff    = nil
-local earningDataIdx        = 1
-local earningPopupName      = ""
-local newNameBuff           = ""
-local renamePopupLabel      = "##renameCEO"
-local shouldDrawRenamePopup = false
-local earningData <const>   = {
+local bulletWidths            = {}
+local clutterItemNameWidths   = {}
+local showEarningsData        = { v = false }
+local earningDataIntBuff      = nil
+local earningDataIdx          = 1
+local earningPopupName        = ""
+local newNameBuff             = ""
+local popups                  = {
+	rename  = false,
+	clutter = false
+}
+local earningData <const>     = {
 	{ label = "YRV3_LIFETIME_BUY_UNDERTAKEN",  pstat = "MPX_LIFETIME_BUY_UNDERTAKEN",  min = 0, max = 5e3, step = 1,   step_fast = 100 },
 	{ label = "YRV3_LIFETIME_BUY_COMPLETE",    pstat = "MPX_LIFETIME_BUY_COMPLETE",    min = 0, max = 5e3, step = 1,   step_fast = 100 },
 	{ label = "YRV3_LIFETIME_SELL_UNDERTAKEN", pstat = "MPX_LIFETIME_SELL_UNDERTAKEN", min = 0, max = 5e3, step = 1,   step_fast = 100 },
 	{ label = "YRV3_LIFETIME_SELL_COMPLETE",   pstat = "MPX_LIFETIME_SELL_COMPLETE",   min = 0, max = 5e3, step = 1,   step_fast = 100 },
 	{ label = "YRV3_LIFETIME_EARNINGS",        pstat = "MPX_LIFETIME_CONTRA_EARNINGS", min = 0, max = 1e8, step = 1e5, step_fast = 1e6 },
 }
+local clutterNamesMap <const> = {
+	["cash"]             = "YRV3_OFFICE_CLUTTER_CASH",
+	["Swag_Silver"]      = "YRV3_OFFICE_CLUTTER_SILVER",
+	["Swag_Pills"]       = "YRV3_OFFICE_CLUTTER_PILLS",
+	["Swag_Med"]         = "YRV3_OFFICE_CLUTTER_MEDS",
+	["Swag_JewelWatch"]  = "YRV3_OFFICE_CLUTTER_JEWEL",
+	["Swag_Ivory"]       = "YRV3_OFFICE_CLUTTER_IVORY",
+	["Swag_Guns"]        = "YRV3_OFFICE_CLUTTER_CUNS",
+	["Swag_Gems"]        = "YRV3_OFFICE_CLUTTER_GEMS",
+	["Swag_Furcoats"]    = "YRV3_OFFICE_CLUTTER_FURCOATS",
+	["Swag_electronic"]  = "YRV3_OFFICE_CLUTTER_ELECTRONICS",
+	["Swag_DrugStatue"]  = "YRV3_OFFICE_CLUTTER_DRUGSTATUES",
+	["Swag_DrugBags"]    = "YRV3_OFFICE_CLUTTER_DRUGBAGS",
+	["Swag_Counterfeit"] = "YRV3_OFFICE_CLUTTER_COUNTERFEIT",
+	["Swag_Booze_cigs"]  = "YRV3_OFFICE_CLUTTER_BOOZE",
+	["Swag_Art"]         = "YRV3_OFFICE_CLUTTER_ART",
+}; local clutterItemsCount    = table.getlen(clutterNamesMap)
 
----@param offfice Office
-local function drawRenamePopup(offfice)
+---@param office Office
+local function drawRenamePopup(office)
 	ImGui.Spacing()
 
 	newNameBuff = ImGui.InputTextWithHint("##newName", _T("GENERIC_NAME"), newNameBuff, 32)
 
 	ImGui.SameLine()
 	if (GUI:Button(_T("GENERIC_SAVE"))) then
-		offfice:Rename(newNameBuff)
+		office:Rename(newNameBuff)
 		ImGui.CloseCurrentPopup()
 	end
 	ImGui.SameLine()
 	if (GUI:Button(_T("GENERIC_CANCEL"))) then
-		newNameBuff = offfice:GetCustomName()
+		newNameBuff = office:GetCustomName()
 		ImGui.CloseCurrentPopup()
 	end
 
 	ImGui.Spacing()
+end
+
+---@param items table<string, boolean>
+---@return boolean
+local function areAllItemsEnabled(items)
+	for _, bool in pairs(items) do
+		if (not bool) then
+			return false
+		end
+	end
+	return true
+end
+
+local function drawOfficeClutterOptions()
+	local cfg        = GVars.features.yrv3.office_clutter
+	local items      = cfg.items
+	cfg.auto_disable = GUI:CustomToggle(_T("YRV3_OFFICE_CLUTTER_AUTO_CLEAR"), cfg.auto_disable, {
+		tooltip = _T("YRV3_OFFICE_CLUTTER_AUTO_CLEAR_TT"),
+	})
+
+	ImGui.Spacing()
+	ImGui.SeparatorText(_T("YRV3_OFFICE_CLUTTER_ITEM_SELECT"))
+
+	local allEnabled = areAllItemsEnabled(items)
+	local btnLabel   = allEnabled and "YRV3_CB_UNCHECK_ALL" or "YRV3_CB_CHECK_ALL"
+	if (GUI:Button(_T(btnLabel))) then
+		for name in pairs(items) do
+			items[name] = not allEnabled
+		end
+	end
+
+	local langIndex  = GVars.backend.language_index
+	local labelWidth = clutterItemNameWidths[langIndex]
+	if (not labelWidth) then
+		local labels = {}
+		for _, name in pairs(clutterNamesMap) do
+			table.insert(labels, _T(name))
+		end
+		labelWidth                       = measureBulletWidths(labels, 60.0)
+		clutterItemNameWidths[langIndex] = labelWidth
+	end
+
+	ImGui.Spacing()
+	local idx = 0
+	for name, bValue in pairs(items) do
+		local label = _T(clutterNamesMap[name] or "GENERIC_UNKNOWN")
+		items[name] = GUI:CustomToggle(label, bValue)
+		idx         = idx + 1
+
+		if (idx < clutterItemsCount and (idx & 1 == 1)) then
+			ImGui.SameLine(labelWidth)
+		end
+	end
 end
 
 ---@param data { label: string, pstat: string, min: integer, max: integer, step: integer, step_fast: integer }
@@ -153,7 +226,12 @@ end
 
 local function contextCallback()
 	if (ImGui.MenuItem(_T("GENERIC_RENAME"))) then
-		shouldDrawRenamePopup = true
+		popups.rename = true
+		ImGui.CloseCurrentPopup()
+	end
+
+	if (ImGui.MenuItem(_T("YRV3_OFFICE_CLUTTER_LABEL"))) then
+		popups.clutter = true
 		ImGui.CloseCurrentPopup()
 	end
 end
@@ -167,20 +245,36 @@ return function()
 
 	drawNamePlate(office, { customName = office:GetCustomName(), contextMenuCallback = contextCallback })
 
-	if (shouldDrawRenamePopup) then
-		newNameBuff           = office:GetCustomName()
-		shouldDrawRenamePopup = false
-		ImGui.OpenPopup(renamePopupLabel)
+	if (popups.rename) then
+		popups.rename = false
+		newNameBuff   = office:GetCustomName()
+		ImGui.OpenPopup("##renameCEO")
+	end
+
+	if (popups.clutter) then
+		popups.clutter = false
+		ImGui.OpenPopup("##officeClutter")
 	end
 
 	if (ImGui.BeginPopupModal(
-			renamePopupLabel,
+			"##renameCEO",
 			true,
 			ImGuiWindowFlags.AlwaysAutoResize
 			| ImGuiWindowFlags.NoSavedSettings
 			| ImGuiWindowFlags.NoMove
 		)) then
 		drawRenamePopup(office)
+		ImGui.EndPopup()
+	end
+
+	if (ImGui.BeginPopupModal(
+			"##officeClutter",
+			true,
+			ImGuiWindowFlags.AlwaysAutoResize
+			| ImGuiWindowFlags.NoSavedSettings
+			| ImGuiWindowFlags.NoMove
+		)) then
+		drawOfficeClutterOptions()
 		ImGui.EndPopup()
 	end
 

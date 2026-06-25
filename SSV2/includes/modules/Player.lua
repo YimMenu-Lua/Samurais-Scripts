@@ -21,15 +21,15 @@
 ---@field private m_pid ID PlayerID
 ---@field public Resolve fun(self: Player) : CPed
 ---@field public super fun(self: Player): Ped
+---@field Create nil
+---@field Delete nil
+---@field SetAsNoLongerNeeded nil
 ---@overload fun(p0: ID | handle): Player
 Player = Class("Player", { parent = Ped })
 
 
----@override
 Player.Create              = nil
----@override
 Player.Delete              = nil
----@override
 Player.SetAsNoLongerNeeded = nil
 
 

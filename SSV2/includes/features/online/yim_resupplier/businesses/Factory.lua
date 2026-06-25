@@ -45,9 +45,9 @@ Factory.__index = Factory
 ---@param opts FactoryOpts
 ---@return Factory
 function Factory.new(opts)
-	assert(type(opts.max_units) == "number", "Missing argument: max_units<integer>")
 	local id = opts.id
-	assert(type(opts.id) == "number" and math.is_inrange(opts.id, 0, 6), "Invalid Biker Business id.")
+	assert(type(opts.max_units) == "number", "Missing argument: max_units<integer>")
+	assert(type(id) == "number" and math.is_inrange(id, 0, 6), "Invalid Biker Business id.")
 
 	local base                    = BusinessBase.new(opts)
 	local instance                = setmetatable(base, Factory) ---@cast instance Factory
@@ -75,7 +75,7 @@ function Factory.new(opts)
 end
 
 function Factory:Reset()
-	self.fast_prod_enabled = false
+	self.fast_prod_enabled   = false
 	self.m_fast_prod_running = false
 	self:ResetImpl()
 end
@@ -176,6 +176,11 @@ end
 
 ---@private
 function Factory:LoopProduction()
+	if (self.m_fast_prod_running) then
+		return
+	end
+
+	self.m_fast_prod_running = true
 	ThreadManager:Run(function()
 		while (self:IsValid() and self.fast_prod_enabled and not self:HasFullProduction()) do
 			if (self:GetSuppliesCount() <= 25) then
@@ -193,16 +198,13 @@ function Factory:LoopProduction()
 end
 
 function Factory:Update()
-	if (not self:IsValid() or not self:IsSetup()) then
+	if not (self:IsValid() and self:IsSetup()) then
 		return
 	end
 
 	if (self.fast_prod_enabled and not self.m_fast_prod_running and not self:HasFullProduction()) then
-		self.m_fast_prod_running = true
 		self:LoopProduction()
 	end
-
-	-- more stuff later
 end
 
 return Factory
