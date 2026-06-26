@@ -99,13 +99,15 @@ function YRV3:init()
 	self.m_sell_script_disp_name     = "None"
 	self.m_last_error                = ""
 	self.m_businesses                = { safes = {} }
-	self.m_boss_types_avail          = { { name = "GB_BOSS" --[[VIP]], id = 0 } }
+	self.m_boss_types_avail          = { { name = "PIM_MAGB" --[[SecuroServ VIP]], id = 0 } }
 	self.m_cooldown_controller       = IManagedValueController.new(RawData.Cooldowns)
 
-	-- this is stupid but works. we're just caching the label so that we can later use it anywhere with the _T macro
+	-- this is stupid but works. we're just caching the labels so that we can later use them anywhere with the _T macro
 	-- we should probably decouble game labels from our own, something like a global table where we can do `label = GLabels.GB_BOSS`
 	-- while still keeping Translator compatibility.
-	Translator:TranslateGXT("GB_BOSS")
+	for _, v in ipairs({ "PIM_MAGB", "PIM_MAGBC", "PI_BIK_MCP", "PIM_REGBOSS", "PIM_MAGM0B" }) do
+		Translator:TranslateGXT(v)
+	end
 
 	self.m_thread = ThreadManager:RegisterLooped("SS_YRV3", function()
 		self:OnTick()
@@ -130,7 +132,7 @@ function YRV3:Reset(disable, reason)
 	self.m_last_autosell_check_time  = 0
 	self.m_last_income_check_time    = 0
 	self.m_last_business_update_time = 0
-	self.m_boss_types_avail          = { { name = "GB_BOSS" --[[VIP]], id = 0 } }
+	self.m_boss_types_avail          = { { name = "PIM_MAGB" --[[SecuroServ VIP]], id = 0 } }
 	self.m_sell_script_running       = false
 	self.m_initial_data_done         = false
 	self.m_data_initialized          = false
@@ -356,7 +358,7 @@ function YRV3:PopulateOffice()
 		name   = Game.GetLabelText(ref.gxt),
 		coords = ref.coords,
 	}
-	self.m_boss_types_avail[1].name = "GB_BOSSC"
+	self.m_boss_types_avail[1].name = "PIM_MAGBC"
 end
 
 function YRV3:PopulateClubhouse()
@@ -377,7 +379,7 @@ function YRV3:PopulateClubhouse()
 		coords    = club_ref.coords,
 		safe_data = safe_data
 	}
-	table.insert(self.m_boss_types_avail, { name = "GB_REST_ACCM", id = 1 })
+	self.m_boss_types_avail[2] = { name = "PI_BIK_MCP", id = 1 }
 end
 
 function YRV3:PopulateBikerBusinesses()

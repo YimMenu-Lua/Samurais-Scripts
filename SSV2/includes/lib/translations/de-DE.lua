@@ -961,7 +961,6 @@ return {
 	["YRV3_DASHBOARD_BOSS_RETIRED"] = "Im Ruhestand",
 	["YRV3_DASHBOARD_BOSS_TYPE"] = "Boss-Typ",
 	["YRV3_DASHBOARD_BOSS_PRES_FMT"] = "Präsident von %s",
-	["YRV3_DASHBOARD_BOSS_REGISTER"] = "Registrieren Sie sich als Chef",
 	["YRV3_DASHBOARD_BOSS_CEO_FMT"] = "CEO von %s",
 	["MPSTAT_CONTROLLDER_DESC"] = "Verwalten, bearbeiten und sperren Sie Multiplayer-Statistiken dauerhaft.",
 	["MPSTAT_LOCK_VAL_TT"] = "Sperrt die Statistik auf den aktuellen Wert.\n\nHinweis: Sie müssen Ihren gewünschten Wert festlegen, bevor Sie diese Option aktivieren, da durch die Aktivierung des Schalters der aktuelle Statistikwert erfasst und gespeichert wird, damit er im Hintergrund geschrieben wird.",

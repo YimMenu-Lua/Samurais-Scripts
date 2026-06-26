@@ -59,20 +59,22 @@ end
 ---@param value anyval
 ---@param isKey boolean
 function TableRenderer:DrawObject(value, isKey)
-	local token = TableRendererToken.new(value)
-	local color = token.m_color
-	local v     = type(value) == "string" and _F('"%s"', value) or tostring(value)
+	local token      = TableRendererToken.new(value)
+	local color      = token.m_color
+	local r, g, b, a = color:AsFloat()
+	local v          = type(value) == "string" and _F('"%s"', value) or tostring(value)
 	if (not isKey) then
-		ImGui.TextColored(color.r, color.g, color.b, color.a, v)
+		ImGui.TextColored(r, g, b, a, v)
 		return
 	end
 
+	local r2, g2, b2, a2 = PURPLE:AsFloat()
 	ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0)
-	ImGui.TextColored(PURPLE.r, PURPLE.g, PURPLE.b, PURPLE.a, "[")
+	ImGui.TextColored(r2, g2, b2, a2, "[")
 	ImGui.SameLine()
-	ImGui.TextColored(color.r, color.g, color.b, color.a, v)
+	ImGui.TextColored(r, g, b, a, v)
 	ImGui.SameLine()
-	ImGui.TextColored(PURPLE.r, PURPLE.g, PURPLE.b, PURPLE.a, "]")
+	ImGui.TextColored(r2, g2, b2, a2, "]")
 	ImGui.PopStyleVar()
 end
 
@@ -89,7 +91,8 @@ function TableRenderer:DrawValue(value, depth, seen)
 	end
 
 	if (seen[value]) then
-		ImGui.TextColored(RED.r, RED.g, RED.b, RED.a, "<circular_reference>")
+		local r, g, b, a = RED:AsFloat()
+		ImGui.TextColored(r, g, b, a, "<circular_reference>")
 		return
 	end
 
