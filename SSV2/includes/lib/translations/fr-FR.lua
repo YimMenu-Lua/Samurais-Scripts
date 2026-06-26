@@ -960,8 +960,6 @@ return {
 	["YRV3_DASHBOARD_BOSS_CEO_FMT"] = "PDG de %s",
 	["YRV3_DASHBOARD_FUNDS_TOTAL"] = "Fonds disponibles",
 	["YRV3_DASHBOARD_BOSS_TYPE"] = "Type de patron",
-	["YRV3_DASHBOARD_BOSS_RETIRE"] = "Se retirer",
-	["YRV3_DASHBOARD_BOSS_REGISTER"] = "Inscrivez-vous en tant que patron",
 	["MPSTAT_CONTROLLDER_DESC"] = "Gérez, modifiez et verrouillez les statistiques multijoueurs avec persistance.",
 	["YRV3_DASHBOARD_BOSS_PRES_FMT"] = "Président de %s",
 	["MPSTAT_LOCK_VAL_TT"] = "Verrouille la statistique sur la valeur actuelle.\n\nRemarque : Vous devez définir la valeur souhaitée avant de l'activer, car l'activation de la bascule capture et enregistre la valeur de la statistique actuelle pour l'écrire en arrière-plan.",

@@ -13,7 +13,7 @@ local selectedBossType = -1
 return function()
 	local currentBossType = LocalPlayer:GetBossType()
 	if (currentBossType > -1) then
-		if (GUI:Button(_T("YRV3_DASHBOARD_BOSS_RETIRE"))) then
+		if (GUI:Button(_T("PIM_MAGM0B"))) then
 			LocalPlayer:Retire()
 		end
 		return
@@ -24,7 +24,7 @@ return function()
 		return
 	end
 
-	if (GUI:Button(_T("YRV3_DASHBOARD_BOSS_REGISTER"))) then
+	if (GUI:Button(_T("PIM_REGBOSS"))) then
 		ImGui.OpenPopup("##bossRegister")
 	end
 

@@ -10,7 +10,7 @@
 math.randomseed(os.time())
 
 ---@type table<table, table<integer, string>>
-local EnumNamesCache <const> = {}
+local EnumNamesCache <const> = setmetatable({}, { __mode = "v" })
 local Chrono <const>         = require("includes.modules.Chrono")
 Bit                          = require("includes.modules.Bit") -- exposed globally sicne it's used all over the project.
 

@@ -52,7 +52,8 @@ return function(business, args)
 	local bg                = args.bgColor
 	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - custom_name_width) * 0.5)
 	if (bg) then
-		ImGui.TextColored(bg.r, bg.g, bg.b, bg.a, custom_name)
+		local r, g, b, a = bg:AsFloat()
+		ImGui.TextColored(r, g, b, a, custom_name)
 	else
 		ImGui.Text(custom_name)
 	end

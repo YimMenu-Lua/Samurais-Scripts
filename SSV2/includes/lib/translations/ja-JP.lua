@@ -962,8 +962,6 @@ return {
 	["YRV3_DASHBOARD_FUNDS_TOTAL"] = "利用可能な資金",
 	["YRV3_DASHBOARD_BOSS_PRES_FMT"] = "%sの社長",
 	["MPSTAT_CONTROLLDER_DESC"] = "マルチプレイヤー統計を永続的に管理、編集、ロックします。",
-	["YRV3_DASHBOARD_BOSS_RETIRE"] = "引退",
-	["YRV3_DASHBOARD_BOSS_REGISTER"] = "ボスとして登録する",
 	["MPSTAT_LOCK_VAL_TT"] = "統計を現在の値にロックします。\n\n注: トグルをアクティブにすると、バックグラウンドで書き込まれる現在の統計値がキャプチャおよび保存されるため、これをオンにする前に希望の値を設定する必要があります。",
 	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "資金を管理する",
 	["VEH_STANCE_LOCKED_FMT"] = "「Stancer」は現在「%s」によって所有されています。ユーザー インターフェイスのロックを解除するには、所有者機能を無効にします。",

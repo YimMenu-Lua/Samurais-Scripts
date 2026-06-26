@@ -460,8 +460,6 @@ return {
 	["YRV3_DASHBOARD_BOSS_RETIRED"]        = "Retired",
 	["YRV3_DASHBOARD_BOSS_CEO_FMT"]        = "CEO of %s",
 	["YRV3_DASHBOARD_BOSS_PRES_FMT"]       = "President of %s",
-	["YRV3_DASHBOARD_BOSS_RETIRE"]         = "Retire",
-	["YRV3_DASHBOARD_BOSS_REGISTER"]       = "Register As a Boss",
 	["YRV3_DASHBOARD_MANAGE_FUNDS"]        = "Manage Funds",
 	["YRV3_CASH_SAFES_LABEL"]              = "Cash Safes",
 	["YRV3_CASH_LOOP"]                     = "[ ! ] Cash Loop",

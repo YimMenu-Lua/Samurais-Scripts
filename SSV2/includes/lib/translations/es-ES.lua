@@ -962,8 +962,6 @@ return {
 	["MPSTAT_CONTROLLDER_DESC"] = "Administre, edite y bloquee estadísticas multijugador con persistencia.",
 	["YRV3_DASHBOARD_BOSS_CEO_FMT"] = "CEO de %s",
 	["YRV3_DASHBOARD_BOSS_TYPE"] = "Tipo de jefe",
-	["YRV3_DASHBOARD_BOSS_RETIRE"] = "Retirarse",
-	["YRV3_DASHBOARD_BOSS_REGISTER"] = "Regístrate como jefe",
 	["MPSTAT_LOCK_VAL_TT"] = "Bloquea la estadística al valor actual.\n\nNota: Debe establecer el valor deseado antes de activar esta opción, ya que al activar la opción se captura y guarda el valor de la estadística actual para escribirlo en segundo plano.",
 	["YRV3_DASHBOARD_MANAGE_FUNDS"] = "Administrar fondos",
 	["VEH_STANCE_LOCKED_FMT"] = "'Stancer' actualmente es propiedad de '%s'. Deshabilite la función de propietario para desbloquear la interfaz de usuario.",

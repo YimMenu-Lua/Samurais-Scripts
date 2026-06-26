@@ -895,20 +895,22 @@ end
 ---@param boxStyle? ImGuiDialogBoxStyle
 ---@return boolean
 function ImGui.DialogBox(label, message, boxStyle)
-	boxStyle      = boxStyle or ImGuiDialogBoxStyle.INFO
-	message       = message or _T("GENERIC_CONFIRM_WARN")
-	local col     = DialogBoxColors[boxStyle] or ImGui.GetStyleColor(ImGuiCol.PopupBg)
-	local textCol = ImGui.GetAutoTextColor(col)
-	local v       = false
+	boxStyle         = boxStyle or ImGuiDialogBoxStyle.INFO
+	message          = message or _T("GENERIC_CONFIRM_WARN")
+	local col        = DialogBoxColors[boxStyle] or ImGui.GetStyleColor(ImGuiCol.PopupBg)
+	local r, g, b, a = col:AsFloat()
+	local textCol    = ImGui.GetAutoTextColor(col)
+	local v          = false
 
 	DialogBoxAnimation:OnFrame()
 	if (not DialogBoxAnimation:IsActive()) then
 		ImGui.SetNextWindowSizeConstraints(440, 200, 440, 600)
 	end
-	ImGui.PushStyleColor(ImGuiCol.TitleBg, col.r, col.g, col.b, col.a)
-	ImGui.PushStyleColor(ImGuiCol.TitleBgActive, col.r, col.g, col.b, col.a)
-	ImGui.PushStyleColor(ImGuiCol.TitleBgCollapsed, col.r, col.g, col.b, col.a) -- is this even necessary?
-	ImGui.PushStyleColor(ImGuiCol.Text, textCol.r, textCol.g, textCol.b, textCol.a)
+
+	ImGui.PushStyleColor(ImGuiCol.TitleBg, r, g, b, a)
+	ImGui.PushStyleColor(ImGuiCol.TitleBgActive, r, g, b, a)
+	ImGui.PushStyleColor(ImGuiCol.TitleBgCollapsed, r, g, b, a) -- is this even necessary?
+	ImGui.PushStyleColor(ImGuiCol.Text, textCol:AsFloat())
 	local open = ImGui.BeginPopupModal(
 		label,
 		true,
@@ -933,10 +935,10 @@ function ImGui.DialogBox(label, message, boxStyle)
 
 		ImGui.Dummy(0, 40)
 		if (boxStyle > ImGuiDialogBoxStyle.INFO) then
-			ImGui.PushStyleColor(ImGuiCol.Button, col.r, col.g, col.b, math.max(col.a * 0.8, 0.8))
-			ImGui.PushStyleColor(ImGuiCol.ButtonHovered, col.r, col.g, col.b, col.a)
-			ImGui.PushStyleColor(ImGuiCol.ButtonActive, col.r, col.g, col.b, math.max(col.a * 0.7, 0.7))
-			ImGui.PushStyleColor(ImGuiCol.Text, textCol.r, textCol.g, textCol.b, textCol.a)
+			ImGui.PushStyleColor(ImGuiCol.Button, r, g, b, math.max(a * 0.8, 0.8))
+			ImGui.PushStyleColor(ImGuiCol.ButtonHovered, r, g, b, a)
+			ImGui.PushStyleColor(ImGuiCol.ButtonActive, r, g, b, math.max(a * 0.7, 0.7))
+			ImGui.PushStyleColor(ImGuiCol.Text, textCol:AsFloat())
 		end
 
 		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + firstCursorPos)
