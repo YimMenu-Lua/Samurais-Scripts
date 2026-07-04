@@ -22,18 +22,6 @@ local eColorType <const> = {
 	NAMED = 5
 }
 
----@class Float4
----@field [1] float
----@field [2] float
----@field [3] float
----@field [4] float
-
----@class UByte4
----@field [1] uint8_t
----@field [2] uint8_t
----@field [3] uint8_t
----@field [4] uint8_t
-
 -- Just for LuaLS autocomplete so we don't have to memorize every field in NamedColors.
 ---@alias NamedColor
 ---| "yellow" 		 # 1.000, 1.000, 0.000, 1.000
@@ -483,8 +471,7 @@ end
 ---@param b float
 ---@return float
 function Color.CalculateBrightness(r, g, b, _)
-	local _gc = Color.GetChannel
-	return (0.299 * _gc(r)) + (0.587 * _gc(g)) + (0.114 * _gc(b))
+	return (0.299 * r) + (0.587 * g) + (0.114 * b)
 end
 
 -- https://stackoverflow.com/a/56678483

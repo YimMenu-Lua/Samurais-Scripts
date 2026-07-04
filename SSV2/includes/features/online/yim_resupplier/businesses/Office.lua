@@ -246,36 +246,18 @@ end
 
 ---@param newName string
 function Office:Rename(newName)
-	-- TODO: convert this into a shared method in base class.
-	newName = newName:trim()
-	script.execute_as_script("freemode", function()
-		if (not string.isvalid(newName)) then
-			newName = Game.GetLabelText("GB_REST_ACC")
-		end
+	ThreadManager:Run(function(s)
+		scr_function.call_script_function("freemode",
+			"OFFICE_RENAME",
+			"2D 02 14 00 00 38 01 56 ? ? 38 00 2C 05 ? ? 06 56 ? ? 26 2D",
+			"void",
+			{
+				{ "const char*", newName },
+				{ "bool",        true },
+			}
+		)
 
-		local GPBD_FM_3 = self:GetGPBD3():At(10)
-		local name1     = newName:sub(1, 10)
-		local name2     = newName:sub(11, 32)
-		local g_Name    = GPBD_FM_3:At(343)
-		stats.set_string("MPX_GB_OFFICE_NAME", name1)
-		stats.set_string("MPX_GB_OFFICE_NAME2", name2)
-		stats.set_string("MPX_GB_GANG_NAME", name1)
-		stats.set_string("MPX_GB_GANG_NAME2", name2)
-		g_Name:WriteString(newName, 64)
-
-		if (LocalPlayer:IsBoss()) then
-			GPBD_FM_3:At(106):WriteString(newName, 64)
-		end
-
-		if (self:IsPlayerInside()) then
-			INTERIOR.REFRESH_INTERIOR(LocalPlayer:GetInteriorID())
-		end
-
-		local current      = g_Name:ReadString()
-		self.m_custom_name = current
-		if (current ~= newName) then
-			log.warning("Rename failed!")
-		end
+		self.m_custom_name = newName
 	end)
 end
 

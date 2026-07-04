@@ -10,7 +10,7 @@
 local BusinessFront   = require("BusinessFront")
 local Factory         = require("Factory")
 local RawBusinessData = require("includes.data.yrv3_data")
-local InteriorIDs     = require("includes.data.refs").InteriorIDs
+
 
 -- Class representing a MC Clubhouse business.
 ---@class Clubhouse : BusinessFront
@@ -20,8 +20,8 @@ local InteriorIDs     = require("includes.data.refs").InteriorIDs
 ---@field private m_safe CashSafe
 ---@field private m_subs Factory[]
 ---@field public GetSubBusinesses fun(self: Clubhouse): Factory[]
-local Clubhouse       = setmetatable({}, BusinessFront)
-Clubhouse.__index     = Clubhouse
+local Clubhouse   = setmetatable({}, BusinessFront)
+Clubhouse.__index = Clubhouse
 
 ---@param opts BusinessFrontOpts
 ---@return Clubhouse
@@ -106,36 +106,18 @@ end
 
 ---@param newName string
 function Clubhouse:Rename(newName)
-	newName = newName:trim()
-	script.execute_as_script("freemode", function()
-		if (not string.isvalid(newName)) then
-			newName = Game.GetLabelText("GB_REST_ACCM")
-		end
+	ThreadManager:Run(function()
+		scr_function.call_script_function("freemode",
+			"MC_RENAME",
+			"2D 02 14 00 00 38 01 56 ? ? 38 00 2C 05 ? ? 06 56 ? ? 26 31",
+			"void",
+			{
+				{ "const char*", newName },
+				{ "bool",        true },
+			}
+		)
 
-		local GPBD_FM_3 = self:GetGPBD3():At(10)
-		local name1     = newName:sub(1, 10)
-		local name2     = newName:sub(11, 32)
-		local g_Name    = GPBD_FM_3:At(359)
-		stats.set_string("MPX_MC_CLBHOSE_NAME", name1)
-		stats.set_string("MPX_MC_CLBHOSE_NAME2", name2)
-		stats.set_string("MPX_MC_GANG_NAME", name1)
-		stats.set_string("MPX_MC_GANG_NAME2", name2)
-		g_Name:WriteString(newName, 64)
-
-		if (LocalPlayer:IsBoss()) then
-			GPBD_FM_3:At(106):WriteString(newName, 64)
-		end
-
-		local clubInt = InteriorIDs.INTERIOR_ID_CLUBHOUSE
-		if (LocalPlayer:GetInteriorID() == clubInt) then
-			INTERIOR.REFRESH_INTERIOR(clubInt)
-		end
-
-		local current      = g_Name:ReadString()
-		self.m_custom_name = current
-		if (current ~= newName) then
-			log.warning("Rename failed!")
-		end
+		self.m_custom_name = newName
 	end)
 end
 

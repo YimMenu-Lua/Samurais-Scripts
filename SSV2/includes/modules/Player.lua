@@ -118,12 +118,12 @@ function Player:GetName()
 	return self:Resolve().m_player_info:GetPlayerName()
 end
 
----@return IPAddress?
+---@return IPV4?
 function Player:GetInternalIP()
 	return self:Resolve().m_player_info:GetInternalIP()
 end
 
----@return IPAddress?
+---@return IPV4?
 function Player:GetExternalIP()
 	return self:Resolve().m_player_info:GetExternalIP()
 end

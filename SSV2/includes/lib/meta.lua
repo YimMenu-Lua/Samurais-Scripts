@@ -72,6 +72,18 @@ GenericClass = setmetatable({}, {
 -- RAGE JOAAT hash
 ---@class hash: joaat_t
 
+---@class Float4
+---@field [1] float
+---@field [2] float
+---@field [3] float
+---@field [4] float
+
+---@class UByte4
+---@field [1] uint8_t
+---@field [2] uint8_t
+---@field [3] uint8_t
+---@field [4] uint8_t
+
 ---@class pointer_ref
 ---@field deref fun(self: pointer_ref): pointer|nullptr
 ---@field get_address fun(self: pointer_ref): uint64_t

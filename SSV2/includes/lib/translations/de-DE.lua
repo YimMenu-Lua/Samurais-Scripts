@@ -956,7 +956,6 @@ return {
 	["YRV3_DASHBOARD_FUNDS_WITHDRAW"] = "Zurückziehen",
 	["YRV3_DASHBOARD_FUNDS_BANK"] = "Bank",
 	["YRV3_DASHBOARD_FUNDS_TOTAL"] = "Verfügbare Mittel",
-	["YRV3_DASHBOARD_BOSS_RETIRE"] = "Ausscheiden",
 	["YRV3_DASHBOARD_FUNDS_DEPOSIT"] = "Kaution",
 	["YRV3_DASHBOARD_BOSS_RETIRED"] = "Im Ruhestand",
 	["YRV3_DASHBOARD_BOSS_TYPE"] = "Boss-Typ",
