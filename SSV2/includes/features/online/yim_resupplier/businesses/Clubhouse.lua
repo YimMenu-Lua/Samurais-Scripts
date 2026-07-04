@@ -107,6 +107,10 @@ end
 ---@param newName string
 function Clubhouse:Rename(newName)
 	ThreadManager:Run(function()
+		if (not string.isvalid(newName)) then
+			newName = Game.GetLabelText("GB_REST_ACCM")
+		end
+
 		scr_function.call_script_function("freemode",
 			"MC_RENAME",
 			"2D 02 14 00 00 38 01 56 ? ? 38 00 2C 05 ? ? 06 56 ? ? 26 31",
