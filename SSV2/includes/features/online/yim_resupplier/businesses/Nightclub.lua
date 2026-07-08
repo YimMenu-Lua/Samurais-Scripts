@@ -10,7 +10,6 @@
 local BusinessFront         = require("BusinessFront")
 local BusinessHub           = require("BusinessHub")
 local RawBusinessData       = require("includes.data.yrv3_data")
-local InteriorIDs           = require("includes.data.refs").InteriorIDs
 local NightclubNames        = RawBusinessData.NightclubNames
 local NAMES_MAX <const>     = #NightclubNames - 1
 local ClubID2BitPos <const> = { [8] = 0 } ---@type array<integer>
@@ -184,11 +183,6 @@ function Nightclub:Rename(nameID)
 		bitfield:SetBit(newBit)
 		stats.set_int("MPX_PROP_NIGHTCLUB_NAME_ID", nameID)
 		self.m_custom_name = NightclubNames[nameID + 1]
-
-		local interiorID = InteriorIDs.INTERIOR_ID_NIGHTCLUB
-		if (LocalPlayer:GetInteriorID() == interiorID) then --[[likely redundant]]
-			INTERIOR.REFRESH_INTERIOR(interiorID)
-		end
 	end)
 end
 

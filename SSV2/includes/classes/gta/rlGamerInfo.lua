@@ -12,40 +12,49 @@
 local CStructView = require("includes.classes.gta.CStructView")
 
 
----@class IPAddress
----@field private m_decimal uint32_t
----@field private m_packed vec4
----@overload fun(n: uint32_t): IPAddress
-local IPAddress <const> = Callable("IPAddress", { ctor = function(t, n) return t:new(n) end })
+---@class IPV4
+---@field private m_dword uint32_t
+---@field private m_bytes UByte4
+---@field private m_fmt string
+---@overload fun(n: uint32_t): IPV4
+local IPV4 <const> = Callable("IPV4", { ctor = function(t, n) return t:new(n) end })
 
 ---@param n uint32_t
----@return IPAddress
-function IPAddress:new(n)
-	local packed = vec4:zero()
-	if (n ~= 0) then
-		packed = vec4:new(
-			math.floor(n / 16777216),
-			math.floor(n / 65536) % 256,
-			math.floor(n / 256) % 256,
-			n % 256
-		)
-	end
-
+---@return IPV4
+function IPV4:new(n)
+	local ubyte4 = {
+		(n >> 24) & 0xFF,
+		(n >> 16) & 0xFF,
+		(n >> 8) & 0xFF,
+		n & 0xFF
+	}
 	return setmetatable({
-		m_decimal = n,
-		m_packed  = packed
+		m_dword = n,
+		m_bytes = ubyte4,
+		m_fmt   = table.concat(ubyte4, ".")
 	}, self)
 end
 
+---@return uint32_t
+function IPV4:GetU32()
+	return self.m_dword
+end
+
+---@return uint8_t a, uint8_t b, uint8_t c, uint8_t d
+function IPV4:Unpack()
+	---@diagnostic disable-next-line: redundant-return-value
+	return table.unpack(self.m_bytes)
+end
+
 ---@return string
-function IPAddress:__tostring()
-	local packed = self.m_packed
-	return _F("%d.%d.%d.%d",
-		packed.x,
-		packed.y,
-		packed.z,
-		packed.w
-	)
+function IPV4:__tostring()
+	return self.m_fmt
+end
+
+---@param right IPV4
+---@return boolean
+function IPV4:__eq(right)
+	return self.m_dword == right.m_dword
 end
 
 --------------------------------------
@@ -60,8 +69,8 @@ end
 ---@field private m_internal_port pointer<uint16_t>
 ---@field private m_nat_type pointer<uint32_t>
 ---@field private m_player_name pointer<string> // 0x00DC
----@field private m_cached_extern_ipaddr IPAddress
----@field private m_cached_intern_ipaddr IPAddress
+---@field private m_cached_extern_ipv4 IPV4
+---@field private m_cached_intern_ipv4 IPV4
 ---@overload fun(ptr: pointer): rlGamerInfo
 local rlGamerInfo = CStructView("rlGamerInfo", 0x0F90)
 
@@ -87,20 +96,20 @@ function rlGamerInfo:GetRockstarID()
 	return self.m_rockstar_id:get_int()
 end
 
----@return IPAddress
+---@return IPV4
 function rlGamerInfo:GetExternalIP()
-	if (not self.m_cached_extern_ipaddr) then
-		self.m_cached_extern_ipaddr = IPAddress(self.m_external_ip:get_dword())
+	if (not self.m_cached_extern_ipv4) then
+		self.m_cached_extern_ipv4 = IPV4(self.m_external_ip:get_dword())
 	end
-	return self.m_cached_extern_ipaddr
+	return self.m_cached_extern_ipv4
 end
 
----@return IPAddress
+---@return IPV4
 function rlGamerInfo:GetInternalIP()
-	if (not self.m_cached_intern_ipaddr) then
-		self.m_cached_intern_ipaddr = IPAddress(self.m_internal_ip:get_dword())
+	if (not self.m_cached_intern_ipv4) then
+		self.m_cached_intern_ipv4 = IPV4(self.m_internal_ip:get_dword())
 	end
-	return self.m_cached_intern_ipaddr
+	return self.m_cached_intern_ipv4
 end
 
 ---@return string

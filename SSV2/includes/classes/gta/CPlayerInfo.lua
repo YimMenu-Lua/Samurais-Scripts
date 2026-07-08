@@ -63,14 +63,14 @@ function CPlayerInfo:GetRockstarID()
 	end)
 end
 
----@return IPAddress?
+---@return IPV4?
 function CPlayerInfo:GetExternalIP()
 	return self:__safecall(nil, function()
 		return self.m_rl_gamer_info:GetExternalIP()
 	end)
 end
 
----@return IPAddress?
+---@return IPV4?
 function CPlayerInfo:GetInternalIP()
 	return self:__safecall(nil, function()
 		return self.m_rl_gamer_info:GetInternalIP()
