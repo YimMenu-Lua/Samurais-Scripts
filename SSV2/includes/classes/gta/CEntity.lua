@@ -23,8 +23,8 @@ Enums.eEntityFlags1 = { -- uint8? // TODO
 ---@enum eEntityFlags2
 Enums.eEntityFlags2 = { -- uint32
 	INVISIBLE = 0x0,
-	DYNAMIC   = 0x22,   -- peds, vehicles, destructibles, etc. (CDynamicEntity)
-	FIXED     = 0x23,   -- solid immovable objects. we can use these for vehicle crash severity (DYNAMIC? 'tis but a scratch! FIXED?: straight to the grave)
+	DYNAMIC   = 0x10,   -- peds, vehicles, destructibles, etc. (CDynamicEntity)
+	FIXED     = 0x11,   -- solid immovable objects. we can use these for vehicle crash severity (DYNAMIC? 'tis but a scratch! FIXED?: straight to the grave)
 }
 
 
