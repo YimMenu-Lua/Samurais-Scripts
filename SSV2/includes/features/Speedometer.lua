@@ -23,6 +23,12 @@ local UNIT_MULTIPLIERS <const> = {
 	[1]     = 3.6,
 	default = 2.236936
 }
+local windowFlags              = ImGuiWindowFlags.NoTitleBar
+	| ImGuiWindowFlags.NoResize
+	| ImGuiWindowFlags.NoScrollbar
+	| ImGuiWindowFlags.NoScrollWithMouse
+	| ImGuiWindowFlags.NoCollapse
+	| ImGuiWindowFlags.NoMove
 
 ---@param col uint32_t
 ---@param alpha integer
@@ -107,7 +113,7 @@ function Speedometer:UpdateState(PV)
 	state.PV               = PV
 	state.speed_modifier   = speed_modifier
 	state.CurrentSpeed     = PV:GetSpeed() * speed_modifier
-	state.MaxSpeed         = math.floor(last_captured_top_spd * speed_modifier)
+	state.MaxSpeed         = math.ceil(last_captured_top_spd * speed_modifier)
 	state.CurrentAltitude  = PV:GetHeightAboveGround()
 	state.Manufacturer     = PV:GetManufacturerName()
 	state.IsEngineOn       = IsEngineOn
@@ -342,13 +348,13 @@ function Speedometer:DrawEngineWarning(ImDrawList, center, radius)
 
 	local pulse  = 0.5 + 0.5 * math.sin(Time.Now() * 5)
 	local color  = Color(1, health < 400 and pulse or 0.9, 0, 1):AsU32()
-	local offset = vec2:new(-radius + 72, 15)
-	local p1     = center + offset + vec2:new(0, -7)
-	local p2     = center + offset + vec2:new(-12, 12)
-	local p3     = center + offset + vec2:new(12, 12)
+	local offset = vec2:new(-radius + 100, 45)
+	local p1     = center + offset + vec2:new(0, -5)
+	local p2     = center + offset + vec2:new(-10, 10)
+	local p3     = center + offset + vec2:new(10, 10)
 	ImGui.ImDrawListAddTriangle(ImDrawList, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, color)
 	ImGui.ImDrawListAddText(ImDrawList, p1.x - 1, p1.y + 2.8, color, "!")
-	ImGui.ImDrawListAddText(ImDrawList, 11.2, p1.x - 30, p1.y + 25, color, "CHECK ENGINE")
+	ImGui.ImDrawListAddText(ImDrawList, 11.2, p1.x - 30, p1.y + 20, color, "CHECK ENGINE")
 end
 
 ---@private
@@ -587,18 +593,11 @@ function Speedometer:Draw(offset)
 
 	local pos        = cfg.pos
 	local radius     = 150
-	local resolution = Game.GetScreenResolution()
+	local resolution = GPointers.ScreenResolution
 	if (pos.x == 0 and pos.y == 0) then
 		pos.x = resolution.x - (radius * 2.5)
 		pos.y = resolution.y - (radius * 3.5)
 	end
-
-	local windowFlags = ImGuiWindowFlags.NoTitleBar
-		| ImGuiWindowFlags.NoResize
-		| ImGuiWindowFlags.NoScrollbar
-		| ImGuiWindowFlags.NoScrollWithMouse
-		| ImGuiWindowFlags.NoCollapse
-		| ImGuiWindowFlags.NoMove
 
 	-- RIP Paul Walker
 	if (state.NOSDangerRatio >= 0.8) then
@@ -610,9 +609,10 @@ function Speedometer:Draw(offset)
 		ImGui.PushStyleColor(ImGuiCol.Text, 0.1, 0.1, 0.1, 1.0)
 		if (ImGui.Begin("##dangertomanifold", windowFlags)) then
 			ImGui.SetWindowFontScale(1.4)
-			local wrn_width = ImGui.CalcTextSize("Warning!!!")
+			local title     = "Warning!!!"
+			local wrn_width = ImGui.CalcTextSize(title)
 			ImGui.SetCursorPosX((width - wrn_width) / 2)
-			ImGui.Text("Warning!!!")
+			ImGui.Text(title)
 			ImGui.SetWindowFontScale(1.2)
 			ImGui.Text("Danger to Manifold")
 			ImGui.SetWindowFontScale(1.0)

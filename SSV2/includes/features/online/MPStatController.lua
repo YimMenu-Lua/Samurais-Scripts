@@ -60,14 +60,18 @@ function MPStat:Set(v)
 end
 
 function MPStat:LockValue()
-	if (self.m_lock_val == nil) then
-		self.m_lock_val = self:Get()
+	local value   = self.m_lock_val
+	local current = self:Get(true)
+	if (value == nil) then
+		self.m_lock_val = current
+		return
 	end
 
-	local desired = self.m_lock_val
-	if (desired == nil) then return end
-	if (self:Get(true) == desired) then return end
-	self:Set(desired)
+	if (current == value) then
+		return
+	end
+
+	self:Set(value)
 end
 
 ---@return { name: string, type: string, autolock?: boolean, lock_val?: anyval }
@@ -107,7 +111,7 @@ function MPStatController:init()
 	end
 
 	self:FetchStats()
-	ThreadManager:RegisterLooped("SS_MPSTAT_CONTROLLER", function()
+	ThreadManager:RegisterLooped("SS_MP_STAT_CONTROLLER", function()
 		self:OnTick()
 	end)
 
@@ -127,7 +131,7 @@ function MPStatController:FetchStats()
 	for name, data in pairs(jsondata) do
 		local existing = self.m_stats[name]
 		if (existing) then
-			existing.autolock = data.autolock
+			existing.autolock = data.autolock or false
 			if (data.lock_val ~= nil) then
 				existing.m_lock_val = data.lock_val
 			end
@@ -150,31 +154,35 @@ end
 
 function MPStatController:SaveStats()
 	local buff = {}
-	for _, mpStat in ipairs(self.m_stats) do
-		table.insert(buff, mpStat:Serialize())
+	for name, mpStat in pairs(self.m_stats) do
+		buff[name] = mpStat:Serialize()
 	end
 
 	Serializer:WriteToFile(self.m_filename, buff)
 end
 
 ---@param data { name: string, type: string, autolock?: boolean, lock_val?: anyval }
-function MPStatController:AddStat(data)
+function MPStatController:Add(data)
 	local statName = data.name
 	local list     = self.m_stats
-	if (list[statName]) then return end
+	if (list[statName]) then
+		log.fwarning("[MPStatController]: A multiplayer stat with the name '%s' already exists! Use the search bar in the StatController UI to find it.", statName)
+		return
+	end
 
-	local instance = MPStat.new(statName, data)
-	if (instance == nil) then return end
-
-	list[statName] = instance
+	list[statName] = MPStat.new(statName, data)
 	table.insert(self.m_stat_order, statName)
 	self:SaveStats()
 end
 
 function MPStatController:OnTick()
-	if (not Game.IsOnline()) then return end
+	yield()
 
-	if (not self.m_last_tick:HasElapsed(5000)) then
+	if (not Game.IsOnline()) then
+		return
+	end
+
+	if (not self.m_last_tick:HasElapsed(3000)) then
 		return
 	end
 

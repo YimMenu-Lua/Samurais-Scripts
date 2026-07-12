@@ -7,17 +7,12 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
--- Basic compatibility layers/API stubs
+local _f, tostr = string.format, tostring
 
-local Compat <const> = {}
-Compat.__index       = Compat
-local _f             = string.format
-local tostr          = tostring
-
----@param version eGameBranch
-function Compat.SetupEnv(version)
-	if (version == Enums.eGameBranch.MOCK) then
-		require("includes.lib.mock_env")(version)
+---@param branch eGameBranch
+return function(branch)
+	if (branch == Enums.eGameBranch.MOCK) then
+		require("includes.lib.mock_env")(branch)
 	else
 		print = function(...)
 			local out = {}
@@ -78,5 +73,3 @@ function Compat.SetupEnv(version)
 	---@diagnostic disable-next-line
 	printf = function(fmt, ...) log.finfo(fmt, ...) end
 end
-
-return Compat

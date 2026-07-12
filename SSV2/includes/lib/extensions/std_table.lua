@@ -129,9 +129,6 @@ function table.serialize(t, indent, key_order, seen)
 				return table.serialize(v, depth, key_order, seen)
 			end
 		elseif (__type == "userdata" or (getmetatable(v) and v.__type)) then
-			if (v.rip and v.get_address) then
-				return _F("<pointer@0x%X>", v:get_address())
-			end
 			return tostring(v)
 		end
 		return _F("[%s]:<unsupported>", __type)
@@ -143,7 +140,11 @@ function table.serialize(t, indent, key_order, seen)
 	table.insert(pieces, "{\n")
 
 	if (is_array) then
-		local array_start = t[0] ~= nil and 0 or 1
+		local array_start = 1
+		if (t.__type ~= "atArray" and t[0] ~= nil) then
+			array_start = 0
+		end
+
 		for i = array_start, size do
 			table.insert(keys, i)
 		end

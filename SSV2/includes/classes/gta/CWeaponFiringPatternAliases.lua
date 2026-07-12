@@ -28,7 +28,7 @@ local CWeaponFiringPatternAliases = CStructView("CWeaponFiringPatternAliases")
 function CWeaponFiringPatternAliases.new(ptr)
 	return setmetatable({
 		m_name_hash = ptr:add(0x0),
-		m_aliases   = atArray(ptr:add(0x8))
+		-- m_aliases   = atArray(ptr:add(0x8)) -- sus
 		---@diagnostic disable-next-line: param-type-mismatch
 	}, CWeaponFiringPatternAliases)
 end

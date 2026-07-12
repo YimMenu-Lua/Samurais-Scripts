@@ -8,23 +8,26 @@
 
 
 local YRV3                    = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local drawRenamePopup         = require("includes.frontend.yim_resupplier.helpers.front_rename_popup")
 local measureBulletWidths     = require("includes.frontend.helpers.measure_text_width")
 local drawNamePlate           = require("includes.frontend.yim_resupplier.nameplate_ui")
 local drawVehicleWarehouse    = require("includes.frontend.yim_resupplier.vehicle_warehouse_ui")
 local drawWarehouse           = require("includes.frontend.yim_resupplier.warehouse_ui")
 local colMoneyGreen <const>   = Color("#85BB65")
 
----@type array<integer>
-local bulletWidths            = {}
-local clutterItemNameWidths   = {}
-local showEarningsData        = { v = false }
+local office                  = nil ---@type Office?
+local showEarningsData        = false
 local earningDataIntBuff      = nil
 local earningDataIdx          = 1
-local earningPopupName        = ""
-local newNameBuff             = ""
-local popups                  = {
-	rename  = false,
-	clutter = false
+local earningsPopupName       = ""
+local newNameBuff             = { value = "" }
+local bulletWidths            = {} ---@type array<integer>
+local clutterItemNameWidths   = {}
+local popupData               = {
+	label       = "",
+	should_draw = false,
+	callback    = NOP,
+	args        = {}
 }
 local earningData <const>     = {
 	{ label = "YRV3_LIFETIME_BUY_UNDERTAKEN",  pstat = "MPX_LIFETIME_BUY_UNDERTAKEN",  min = 0, max = 5e3, step = 1,   step_fast = 100 },
@@ -51,26 +54,6 @@ local clutterNamesMap <const> = {
 	["Swag_Art"]         = "YRV3_OFFICE_CLUTTER_ART",
 }; local clutterItemsCount    = table.getlen(clutterNamesMap)
 
----@param office Office
-local function drawRenamePopup(office)
-	ImGui.Spacing()
-
-	newNameBuff = ImGui.InputTextWithHint("##newName", _T("GENERIC_NAME"), newNameBuff, 32)
-
-	ImGui.SameLine()
-	if (GUI:Button(_T("GENERIC_SAVE"))) then
-		office:Rename(newNameBuff)
-		ImGui.CloseCurrentPopup()
-	end
-	ImGui.SameLine()
-	if (GUI:Button(_T("GENERIC_CANCEL"))) then
-		newNameBuff = office:GetCustomName()
-		ImGui.CloseCurrentPopup()
-	end
-
-	ImGui.Spacing()
-end
-
 ---@param items table<string, boolean>
 ---@return boolean
 local function areAllItemsEnabled(items)
@@ -80,6 +63,16 @@ local function areAllItemsEnabled(items)
 		end
 	end
 	return true
+end
+
+---@param label string
+---@param callback fun(...?: any)
+---@param ... any Args
+local function setNextPopup(label, callback, ...)
+	popupData.label       = label
+	popupData.callback    = callback
+	popupData.should_draw = true
+	popupData.args        = { ... }
 end
 
 local function drawOfficeClutterOptions()
@@ -147,26 +140,26 @@ local function drawStatEdit(data)
 end
 
 local function drawEarningsRecap()
-	GUI:CustomToggleEx(_T("YRV3_SHOW_EARNINGS_DATA"), showEarningsData)
-	if (not showEarningsData.v) then return end
+	showEarningsData = GUI:CustomToggle(_T("YRV3_SHOW_EARNINGS_DATA"), showEarningsData)
+	if (not showEarningsData) then return end
 
-	local lang_index  = GVars.backend.language_index
-	local bulletWidth = bulletWidths[lang_index]
+	local langIndex   = GVars.backend.language_index
+	local bulletWidth = bulletWidths[langIndex]
 	if (not bulletWidth) then
 		local labels = {}
 		for _, data in ipairs(earningData) do
 			labels[#labels + 1] = _T(data.label)
 		end
-		bulletWidth              = measureBulletWidths(labels, 60.0)
-		bulletWidths[lang_index] = bulletWidth
+		bulletWidth             = measureBulletWidths(labels, 60.0)
+		bulletWidths[langIndex] = bulletWidth
 	end
 
 	ImGui.Separator()
 	for i, data in ipairs(earningData) do
 		if (GUI:Button(_F("%s##%d", _T("GENERIC_EDIT"), i))) then
-			earningDataIdx   = i
-			earningPopupName = _F("%s##%d", _T("YRV3_EDIT_EARNINGS_DATA"), i)
-			ImGui.OpenPopup(earningPopupName)
+			earningDataIdx    = i
+			earningsPopupName = _F("%s##%d", _T("YRV3_EDIT_EARNINGS_DATA"), i)
+			ImGui.OpenPopup(earningsPopupName)
 		end
 
 		ImGui.SameLine()
@@ -181,7 +174,7 @@ local function drawEarningsRecap()
 	ImGui.Separator()
 
 	if (ImGui.BeginPopupModal(
-			earningPopupName,
+			earningsPopupName,
 			true,
 			ImGuiWindowFlags.AlwaysAutoResize
 			| ImGuiWindowFlags.NoSavedSettings
@@ -226,55 +219,45 @@ end
 
 local function contextCallback()
 	if (ImGui.MenuItem(_T("GENERIC_RENAME"))) then
-		popups.rename = true
+		if (office) then
+			newNameBuff.value = office:GetCustomName()
+		end
+		setNextPopup("##rename_ceo", drawRenamePopup, newNameBuff, office)
 		ImGui.CloseCurrentPopup()
 	end
 
 	if (ImGui.MenuItem(_T("YRV3_OFFICE_CLUTTER_LABEL"))) then
-		popups.clutter = true
+		setNextPopup("##office_clutter", drawOfficeClutterOptions)
 		ImGui.CloseCurrentPopup()
 	end
 end
 
 return function()
-	local office = YRV3:GetOffice()
+	office = YRV3:GetOffice()
 	if (not office) then
 		ImGui.Text(_T("YRV3_CEO_OFFICE_NOT_OWNED"))
 		return
 	end
 
-	drawNamePlate(office, { customName = office:GetCustomName(), contextMenuCallback = contextCallback })
+	local customName = office:GetCustomName()
+	drawNamePlate(office, {
+		customName          = customName,
+		contextMenuCallback = contextCallback
+	})
 
-	if (popups.rename) then
-		popups.rename = false
-		newNameBuff   = office:GetCustomName()
-		ImGui.OpenPopup("##renameCEO")
-	end
-
-	if (popups.clutter) then
-		popups.clutter = false
-		ImGui.OpenPopup("##officeClutter")
+	if (popupData.should_draw) then
+		popupData.should_draw = false
+		ImGui.OpenPopup(popupData.label)
 	end
 
 	if (ImGui.BeginPopupModal(
-			"##renameCEO",
+			popupData.label,
 			true,
 			ImGuiWindowFlags.AlwaysAutoResize
 			| ImGuiWindowFlags.NoSavedSettings
 			| ImGuiWindowFlags.NoMove
 		)) then
-		drawRenamePopup(office)
-		ImGui.EndPopup()
-	end
-
-	if (ImGui.BeginPopupModal(
-			"##officeClutter",
-			true,
-			ImGuiWindowFlags.AlwaysAutoResize
-			| ImGuiWindowFlags.NoSavedSettings
-			| ImGuiWindowFlags.NoMove
-		)) then
-		drawOfficeClutterOptions()
+		popupData.callback(table.unpack(popupData.args))
 		ImGui.EndPopup()
 	end
 

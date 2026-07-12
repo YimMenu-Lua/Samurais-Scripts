@@ -18,21 +18,50 @@ local ClearPreview   = function() PreviewService:Clear() end
 ---@field alpha integer
 
 ---@enum eBackendEvent
-Enums.eBackendEvent = {
+Enums.eBackendEvent      = {
 	RELOAD_UNLOAD  = 1,
 	PLAYER_SWITCH  = 2,
 	SESSION_SWITCH = 3,
-	SESSION_JOIN   = 4, -- Only works when switching from SP to Online, not between sessions
-	SESSION_LEAVE  = 5, -- Only works when switching from Online to SP, not between sessions
+	SESSION_JOIN   = 4,
+	SESSION_LEAVE  = 5,
 }
 
 ---@enum eEntityType
-Enums.eEntityType   = {
+Enums.eEntityType        = {
 	Invalid = -1,
 	Ped     = 1,
 	Vehicle = 2,
 	Object  = 3
 }
+
+local mouse_keys <const> = {
+	18,
+	24,
+	25,
+	68,
+	69,
+	70,
+	91,
+	92,
+	106,
+	114,
+	122,
+	135,
+	142,
+	144,
+	176,
+	223,
+	229,
+	237,
+	257,
+	294,
+}
+local disableControl     = PAD.DISABLE_CONTROL_ACTION
+local function disableMouseInput()
+	for _, action in ipairs(mouse_keys) do
+		disableControl(0, action, true)
+	end
+end
 
 
 -- Global Singleton.
@@ -88,16 +117,69 @@ local Backend = {
 ---@param script_version string
 ---@param game_version? GAME_VERSION
 function Backend:init(name, script_version, game_version)
+	game_version        = game_version or {}
 	local branch        = self:GetGameBranch()
-	self.m_game_branch  = branch
+	local version_t     = game_version[branch] or { build = "any", online = "any" }
+	self.target_build   = version_t.build
+	self.target_version = version_t.online
 	self.script_name    = name
 	self.__version      = script_version
-	self.target_build   = game_version and game_version[branch].build or "any"
-	self.target_version = game_version and game_version[branch].online or "any"
 
-	require("includes.lib.compat").SetupEnv(self.m_game_branch)
+	require("includes.lib.compat")(branch)
 	return self
 end
+
+---@diagnostic disable: undefined-global, undefined-field
+
+---@nodiscard
+---@return boolean
+local function is_standalone()
+	local arg = _G.arg
+	if (type(arg) ~= "table") then
+		return false
+	end
+
+	if (arg[0] == nil and arg[-1] == nil) then
+		return false
+	end
+
+	return true
+end
+
+---@nodiscard
+---@return boolean
+local function is_yim_api()
+	local _t1, _t2 = _G.menu_event, _G.scr_function
+	if (type(_t1) ~= "table" or type(_t2) ~= "table") then
+		return false
+	end
+
+	return _t1.Wndproc == 8 and type(_t2.call_script_function) == "function"
+end
+
+--[[
+---@nodiscard
+---@return boolean
+local function is_stand_api()
+	local menu = _G.menu
+	if (type(menu) ~= "table" or _G.SCRIPT_SILENT_START == nil) then
+		return false
+	end
+
+	return type(menu.my_root) == "function"
+end
+
+---@nodiscard
+---@return boolean
+local function is_cherax_api()
+	local g_lua = _G.g_lua
+	if (type(g_lua) ~= "table") then
+		return false
+	end
+
+	return type(g_lua.register) == "function"
+end
+]]
 
 ---@return eGameBranch
 function Backend:GetGameBranch()
@@ -105,38 +187,49 @@ function Backend:GetGameBranch()
 		return self.m_game_branch
 	end
 
-	if (not script or (type(script) ~= "table")) then
-		---@diagnostic disable-next-line: undefined-global
-		if (util or (menu and menu.root) or SCRIPT_SILENT_START or (_VERSION ~= "Lua 5.4")) then
-			error("Failed to load: Unknown or unsupported Lua environment.")
+	local has_jit = (type(_G.jit) == "table")
+	if (is_standalone()) then
+		if (has_jit) then
+			error("LuaJIT is not supported!") -- var attributes, bit operators, etc. not worth the headache
 		end
 
+		print(("Running locally in %s for %s."):format(_VERSION, (package.config:sub(1, 1) == "\\") and "Windows" or "Unix"))
 		self.m_game_branch = Enums.eGameBranch.MOCK
 		return self.m_game_branch
 	end
 
-	if (type(script["run_in_callback"]) == "function") then
-		error("YimMenuV2 is not supported. If you want to run this script in GTA V Enhanced, download YimLuaAPI.")
+	local script = _G.script
+	if (type(script) ~= "table") then
+		error("Failed to load! Wrong API.")
 	end
 
-	if (not menu_event or not menu_event.Wndproc) then
-		error("Unknown or unsupported API.")
+	if (type(script["run_in_callback"]) == "function" and has_jit) then
+		error("YimMenuV2 is not supported. If you want to run the project in GTA V Enhanced, download YimLuaAPI from GitHub.")
 	end
 
-	---@type (fun(): integer)?
-	local get_game_branch = _G["get_game_branch"]
+	if (not is_yim_api()) then
+		error("Failed to load! Unknown host.")
+	end
+
+	local get_game_branch --[[@type (fun(): integer)?]] = _G.get_game_branch
 	if (type(get_game_branch) ~= "function") then
 		self.m_game_branch = Enums.eGameBranch.LEGACY
-		return self.m_game_branch
+	else
+		local branch = get_game_branch()
+		if (type(branch) ~= "number" or not math.is_inrange(branch, 0, 1)) then
+			error(_F("Failed to load! Unknown or unsupported game branch (%s). Is this YimLuaAPI?"), branch)
+		end
+		self.m_game_branch = branch + 1 -- Our game branch enum starts at 1. YimLuaAPI's naturally starts at 0
 	end
 
-	local branch = get_game_branch()
-	if (type(branch) ~= "number" or branch > 1) then
-		error("Failed to load: Unknown or unsupported game branch.")
-	end
-
-	self.m_game_branch = branch + 1 -- Our own eGameBranch starts at 1 to make it compatible with Lua table indices. YimLuaAPI's naturally starts at 0
 	return self.m_game_branch
+end
+
+---@diagnostic enable: undefined-global, undefined-field
+
+---@return boolean
+function Backend:IsDebug()
+	return self.is_debug
 end
 
 ---@return boolean
@@ -151,20 +244,17 @@ end
 
 ---@param data string
 function Backend:debug(data, ...)
-	if (not self.debug_mode) then
+	if (not self.is_debug) then
 		return
 	end
 
 	log.fdebug(data, ...)
 end
 
+---@return boolean
 function Backend:MatchGameVersion()
-	local gv = Memory:GetGameVersion()
-	return (gv and gv.build
-		and gv.online
-		and (self.target_build == gv.build)
-		and (self.target_version == gv.online)
-	)
+	local gv = GPointers.GameVersion
+	return self.target_build == gv.build and self.target_version == gv.online
 end
 
 ---@return boolean
@@ -185,21 +275,15 @@ end
 ---@param entity_type eEntityType
 ---@return number
 function Backend:GetMaxAllowedEntities(entity_type)
-	if not self.MaxAllowedEntities[entity_type] then
-		return 0
-	end
-
-	return self.MaxAllowedEntities[entity_type]
+	return self.MaxAllowedEntities[entity_type] or 0
 end
 
 ---@param value number
 ---@param entity_type eEntityType
 function Backend:SetMaxAllowedEntities(entity_type, value)
-	if not self.MaxAllowedEntities[entity_type] then
-		return
-	end
-
-	self.MaxAllowedEntities[entity_type] = value
+	local max = self.MaxAllowedEntities
+	if (not max[entity_type]) then return end
+	max[entity_type] = value
 end
 
 ---@param entity_type eEntityType
@@ -213,7 +297,7 @@ end
 ---@return boolean
 function Backend:IsEntityRegistered(handle)
 	for _, cat in pairs(self.SpawnedEntities) do
-		if cat[handle] then
+		if (cat[handle]) then
 			return true
 		end
 	end
@@ -231,38 +315,43 @@ end
 ---@param entity_type? eEntityType
 ---@param etc? table -- metadata
 function Backend:RegisterEntity(handle, entity_type, etc)
-	if not Game.IsScriptHandle(handle) then
+	if (not Game.IsScriptHandle(handle)) then
 		return
 	end
 
-	if (not self.SpawnedEntities[entity_type]) then
-		log.fwarning("Attempt to register an entity to an unknown type: %s", entity_type)
+	entity_type = entity_type or Game.GetEntityType(handle)
+	local entry = self.SpawnedEntities[entity_type]
+	if (not entry) then
+		log.ferror("Attempt to register an entity to an unknown type: %s", entity_type)
 		return
 	end
 
-	self.SpawnedEntities[entity_type][handle] = etc or handle
+	entry[handle] = etc or handle
 end
 
 ---@param handle number
 ---@param entity_type eEntityType
 function Backend:RemoveEntity(handle, entity_type)
-	if not (self.SpawnedEntities[entity_type] or self.SpawnedEntities[entity_type][handle]) then
+	entity_type = entity_type or Game.GetEntityType(handle)
+	local entry = self.SpawnedEntities[entity_type]
+	if not (entry and entry[handle]) then
 		return
 	end
 
-	self.SpawnedEntities[entity_type][handle] = nil
+	entry[handle] = nil
 end
 
 ---@param blip_handle number
 ---@param owner number
 ---@param initial_alpha? number
 function Backend:RegisterBlip(blip_handle, owner, initial_alpha)
-	if not Game.IsScriptHandle(owner) or not HUD.DOES_BLIP_EXIST(blip_handle) then
+	if (not Game.IsScriptHandle(owner) or not HUD.DOES_BLIP_EXIST(blip_handle)) then
 		return
 	end
 
-	if self.CreatedBlips[owner] then
-		Game.RemoveBlipFromEntity(self.CreatedBlips[owner].handle)
+	local blipData = self.CreatedBlips[owner]
+	if (blipData) then
+		Game.RemoveBlipFromEntity(blipData.handle)
 	end
 
 	self.CreatedBlips[owner] = {
@@ -313,47 +402,52 @@ function Backend:EntitySweep()
 
 	if (next(self.CreatedBlips) ~= nil) then
 		for _, blip in pairs(self.CreatedBlips) do
-			if (HUD.DOES_BLIP_EXIST(blip.handle)) then
-				HUD.REMOVE_BLIP(blip.handle)
+			local hBlip = blip.handle
+			if (HUD.DOES_BLIP_EXIST(hBlip)) then
+				HUD.REMOVE_BLIP(hBlip)
 			end
 			self:RemoveBlip(blip.owner)
 		end
 	end
 end
 
+local entityArray <const> = {
+	Backend.SpawnedEntities[Enums.eEntityType.Object],
+	Backend.SpawnedEntities[Enums.eEntityType.Ped],
+	Backend.SpawnedEntities[Enums.eEntityType.Vehicle]
+}
 function Backend:PoolMgr()
-	local timeout = self.debug_mode and 500 or 2e3
+	local timeout = self.is_debug and 500 or 2e3
+	local blips   = self.CreatedBlips
 
-	for index, category in ipairs({
-		self.SpawnedEntities[Enums.eEntityType.Object],
-		self.SpawnedEntities[Enums.eEntityType.Ped],
-		self.SpawnedEntities[Enums.eEntityType.Vehicle]
-	}) do
-		if (next(category) == nil) then
+	for eType, entry in ipairs(entityArray) do
+		if (next(entry) == nil) then
 			goto continue
 		end
 
-		for handle in pairs(category) do
+		for handle in pairs(entry) do
 			if (not ENTITY.DOES_ENTITY_EXIST(handle)) then
 				self:CheckFeatureEntities(handle)
-				Game.DeleteEntity(handle, index)
+				Game.DeleteEntity(handle, eType)
 			end
 
 			if (ENTITY.IS_ENTITY_DEAD(handle, false)) then
 				self:CheckFeatureEntities(handle)
-				Game.DeleteEntity(handle, index)
-			elseif (ENTITY.IS_ENTITY_A_PED(handle) and self.CreatedBlips[handle]) then
-				local blip = self.CreatedBlips[handle]
+				Game.DeleteEntity(handle, eType)
+			elseif (ENTITY.IS_ENTITY_A_PED(handle) and blips[handle]) then
+				local blipData = blips[handle]
+				local alpha    = blipData.alpha
+				local hBlip    = blipData.handle
 				if (PED.IS_PED_IN_ANY_VEHICLE(handle, true)) then
-					if (blip.alpha > 0) then
-						HUD.SET_BLIP_ALPHA(blip.handle, 0)
-						blip.alpha = 0
+					if (alpha > 0) then
+						alpha = 0
+						HUD.SET_BLIP_ALPHA(hBlip, alpha)
+						blipData.alpha = alpha
 					end
-				else
-					if (blip.alpha < 255) then
-						HUD.SET_BLIP_ALPHA(blip.handle, 255)
-						blip.alpha = 255
-					end
+				elseif (alpha < 255) then
+					alpha = 255
+					HUD.SET_BLIP_ALPHA(hBlip, alpha)
+					blipData.alpha = alpha
 				end
 			end
 		end
@@ -361,7 +455,7 @@ function Backend:PoolMgr()
 		::continue::
 	end
 
-	sleep(timeout)
+	yield(timeout)
 end
 
 -- Registers a callback to execute on backend event.
@@ -418,7 +512,7 @@ function Backend:TriggerEventCallbacks(event)
 		if (type(cb) == "function") then
 			xpcall(cb, function(err)
 				local evt_name = EnumToString(Enums.eBackendEvent, event)
-				log.fwarning("[Backend]: Callback error for event %s: %s", evt_name, err)
+				log.fwarning("[Backend]: Callback failed for event '%s': %s", evt_name, err)
 			end)
 		end
 	end
@@ -478,20 +572,20 @@ end
 
 function Backend:RegisterHandlers()
 	local mockEnv = self:IsMockEnv()
-	self.debug_mode = mockEnv or GVars.backend.debug_mode or false
+	self.is_debug = mockEnv or GVars.backend.debug_mode or false
 
 	if (mockEnv) then return end
 
 	ThreadManager:RegisterLooped("SS_CTRLS", function()
-		if (self.disable_input or GUI:WantsInput()) then
+		if (self:AreControlsDisabled()) then
 			PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
 		else
-			if ((gui.is_open() or GUI:IsOpen())) then
-				self:DisableAttackInput()
+			if (gui.is_open() or GUI:IsOpen()) then
+				disableMouseInput()
 			end
 
 			for _, control in pairs(self.ControlsToDisable) do
-				PAD.DISABLE_CONTROL_ACTION(0, control, true)
+				disableControl(0, control, true)
 			end
 		end
 	end)
@@ -505,7 +599,7 @@ function Backend:RegisterHandlers()
 		Translator:OnTick()
 
 		yield()
-	end, { exception_handler = function() Backend:Cleanup() end })
+	end, { exception_handler = function() self:Cleanup() end })
 
 	ThreadManager:RegisterLooped("SS_POOLMGR", function()
 		self:PoolMgr()
@@ -520,11 +614,11 @@ function Backend:RegisterHandlers()
 		self:Cleanup()
 	end)
 
-	event.register_handler(menu_event.playerMgrInit, function()
+	event.register_handler(menu_event.PlayerMgrInit, function()
 		self:TriggerEventCallbacks(Enums.eBackendEvent.SESSION_JOIN)
 	end)
 
-	event.register_handler(menu_event.playerMgrShutdown, function()
+	event.register_handler(menu_event.PlayerMgrShutdown, function()
 		self:TriggerEventCallbacks(Enums.eBackendEvent.SESSION_LEAVE)
 	end)
 end
@@ -548,25 +642,6 @@ function Backend:PANIQUE()
 
 		gui.show_warning("PANIQUE!", "(Ó _ Ò )!!")
 	end)
-end
-
-function Backend:DisableAttackInput()
-	PAD.DISABLE_CONTROL_ACTION(0, 18, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 24, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 25, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 69, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 70, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 106, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 122, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 135, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 142, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 144, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 176, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 223, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 229, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 237, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 257, true)
-	PAD.DISABLE_CONTROL_ACTION(0, 294, true)
 end
 
 return Backend

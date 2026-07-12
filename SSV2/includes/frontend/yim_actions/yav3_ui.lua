@@ -34,7 +34,7 @@ GUI:RegisterNewTab(Enums.eTabID.TAB_EXTRA, "YimActions", function()
 			ImGui.EndTabItem()
 		end
 
-		if (Backend.debug_mode and ImGui.BeginTabItem("Debug##YAV3")) then
+		if (Backend.is_debug and ImGui.BeginTabItem("Debug##YAV3")) then
 			---@diagnostic disable-next-line
 			YimActions.Debugger:Draw()
 			ImGui.EndTabItem()

@@ -54,9 +54,14 @@ function CashSafe.new(opts)
 
 	local get_offset = opts.global_offset
 	if (get_offset) then
-		local offset            = get_offset()
+		local cash_offset       = get_offset()
 		local base              = SGSL:Get(SGSL.data.mp_business_stuff)
-		instance.m_global_entry = base:AsGlobal():At(offset)
+		local pid_size          = base:GetOffset(1)
+		local field_offset      = base:GetOffset(2) or 260
+		instance.m_global_entry = base:AsGlobal()
+			:At(LocalPlayer:GetID(), pid_size)
+			:At(field_offset)
+			:At(cash_offset)
 	end
 
 	return instance
@@ -76,16 +81,11 @@ end
 
 ---@return boolean
 function CashSafe:IsPlayerNearby()
-	if (not self.m_interior_id or not self.m_room_hash) then
+	if (not self.m_room_hash) then
 		return false
 	end
 
-	local interior = LocalPlayer:GetInteriorID()
-	if (interior == 0) then
-		return false
-	end
-
-	return interior == self.m_interior_id and LocalPlayer:GetRoomHash() == self.m_room_hash
+	return LocalPlayer:GetRoomHash() == self.m_room_hash
 end
 
 ---@nodiscard
@@ -189,7 +189,7 @@ function CashSafe:Update()
 	end
 
 	if (self:IsFucked()) then
-		self:SetCashValue(0)
+		self:SetCashValue(self:GetCapacity())
 	end
 
 	if (self:IsFull() and not self:IsPlayerNearby()) then

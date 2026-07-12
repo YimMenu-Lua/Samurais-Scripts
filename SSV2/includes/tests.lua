@@ -26,6 +26,19 @@ AssertArgs({
 	{ nullptr,     "pointer", }, -- fail (nullptr is just a dummy table)
 }, { test_run = true })
 
+KeyManager:RegisterKeybind(eVirtualKeyCodes.F10, function()
+	if (not LocalPlayer:HasControl()) then
+		return
+	end
+
+	local pUnkFlags = LocalPlayer:Resolve().m_flags_unk
+	printf("\n%s", Bit.Tostring(pUnkFlags:get_int(), 8))
+	LocalPlayer:Freeze()
+	printf("\n%s", Bit.Tostring(pUnkFlags:get_int(), 8))
+	LocalPlayer:Unfreeze()
+	printf("\n%s", Bit.Tostring(pUnkFlags:get_int(), 8))
+end)
+
 --]]
 
 -- ThreadManager:UpdateMockRoutines()

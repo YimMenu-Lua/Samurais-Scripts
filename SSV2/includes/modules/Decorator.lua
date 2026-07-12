@@ -34,18 +34,16 @@ function Decorator:ExistsOn(entity, key)
 		return false
 	end
 
-	return self.m_registry[entity][key] and self.m_registry[entity][key] ~= nil
+	local data = self.m_registry[entity]
+	return data ~= nil and data[key] ~= nil
 end
 
 ---@param entity handle
 ---@param key string
 ---@return any
 function Decorator:GetDecor(entity, key)
-	if (not self:ExistsOn(entity, key)) then
-		return
-	end
-
-	return self.m_registry[entity][key]
+	local data = self.m_registry[entity]
+	return data and data[key] or nil
 end
 
 -- If a decor doesn't exist for the entity, this will register it nonetheless.
@@ -53,7 +51,7 @@ end
 -- The only requirement is that the entity itself is registered.
 ---@param entity handle
 ---@param key string
----@param new_value anyval
+---@param new_value any
 ---@return any
 function Decorator:UpdateDecor(entity, key, new_value)
 	if (not self:IsEntityRegistered(entity)) then
@@ -67,21 +65,22 @@ end
 ---@param key string
 ---@param value any
 function Decorator:Register(entity, key, value)
-	local existing = self.m_registry[entity]
-	if (existing) then
-		if (existing[key]) then
-			return
-		end
-
-		existing[key] = value
-	else
+	local registered = self.m_registry[entity]
+	if (not registered) then
 		self.m_registry[entity] = { [key] = value }
+		return
 	end
+
+	if (registered[key]) then
+		return
+	end
+
+	registered[key] = value
 end
 
 ---@param entity integer
 function Decorator:RemoveEntity(entity)
-	if not self:IsEntityRegistered(entity) then
+	if (not self:IsEntityRegistered(entity)) then
 		return
 	end
 
@@ -94,37 +93,34 @@ function Decorator:Validate(entity)
 end
 
 function Decorator:CollectGarbage()
-	if (Time.Now() - self.m_last_gc < 5) then
+	local now = Time.Now()
+	if (now - self.m_last_gc < 5) then
 		return
 	end
 
-	for handle, _ in pairs(self.m_registry) do
+	for handle in pairs(self.m_registry) do
 		if (not ENTITY.DOES_ENTITY_EXIST(handle)) then
 			self.m_registry[handle] = nil
 		end
 	end
 
-	self.m_last_gc = Time.Now()
+	self.m_last_gc = now
 end
 
 ---@param entity integer
 function Decorator:DebugDump(entity)
-	if next(self.m_registry) == nil then
+	local reg = self.m_registry
+	if (next(reg) == nil) then
 		return
 	end
 
-	if not self.m_registry[entity] then
-		Backend:debug(_F("[%s] is not registered.", entity))
+	local data = reg[entity]
+	if (not data) then
+		Backend:debug("[Decorator] [%s]: not registered.", entity)
 		return
 	end
 
-	Backend:debug(
-		_F(
-			"[%s] is registered with: %s",
-			entity,
-			self.m_registry[entity]
-		)
-	)
+	Backend:debug("[Decorator] [%s]: registered with %s", entity, data)
 end
 
 return Decorator

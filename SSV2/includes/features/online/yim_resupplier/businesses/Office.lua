@@ -315,7 +315,7 @@ function Office:RemoveClutter(clutter_t)
 		return
 	end
 
-	if (not PLAYER.IS_PLAYER_CONTROL_ON(LocalPlayer:GetID())) then
+	if (not LocalPlayer:HasControl()) then
 		return
 	end
 

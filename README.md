@@ -3,35 +3,40 @@
 <!-- markdownlint-disable MD041 -->
 
 <div align="center">
-  <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest">
-    <img alt="Script Version" src="https://img.shields.io/badge/Script%20Version-v1.9.9-blue?style=for-the-badge">
-  </a>
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/blob/main/LICENSE">
-    <img alt="License" src="https://img.shields.io/badge/License-GPL--3.0-white?style=for-the-badge">
+    <img alt="License" src="https://img.shields.io/badge/License-GPL--3.0-white?style=plastic">
   </a>
-  <a href="https://github.com/YimMenu-Lua/Samurais-Scripts">
-    <img alt="Game Version" src="https://img.shields.io/badge/Game%20Build-latest-green?style=for-the-badge">
+  <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest">
+    <img alt="Latest Release" src="https://img.shields.io/badge/Latest%20Release-v1.9.9-blue?style=plastic">
   </a>
-  <a href="https://github.com/YimMenu-Lua/Samurais-Scripts">
-    <img alt="Online Version" src="https://img.shields.io/badge/Online%20Version-latest-green?style=for-the-badge">
-  </a>
-  <br/>
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/issues">
     <img alt="Issues" src="https://img.shields.io/github/issues/YimMenu-Lua/Samurais-Scripts?style=plastic">
   </a>
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/pulls">
     <img alt="PRs" src="https://img.shields.io/github/issues-pr/YimMenu-Lua/Samurais-Scripts?style=plastic">
   </a>
-</div>
+
+  <h3>Supported Builds</h3>
+
+  <a href="https://github.com/YimMenu-Lua/Samurais-Scripts">
+    <img alt="Online" src="https://img.shields.io/badge/Online%20Version-1.72-green?style=for-the-badge">
+  </a>
+  <a href="https://github.com/YimMenu-Lua/Samurais-Scripts">
+    <img alt="Legacy Build" src="https://img.shields.io/badge/Legacy-3788.0-green?style=for-the-badge">
+  </a>
+  <a href="https://github.com/YimMenu-Lua/Samurais-Scripts">
+    <img alt="Enhanced Build" src="https://img.shields.io/badge/Enhanced-1013.34-green?style=for-the-badge">
+  </a>
+</div><br><br>
 
 <details>
-  <summary>Table of Contents</summary>
-  <ol>
+  <summary><strong>Table of Contents</strong></summary>
+  <ul>
     <li><a href="#about">About</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
-        <li><a href="#setup">setup</a></li>
+        <li><a href="#setup">Setup</a></li>
         <li><a href="#commands-console">Commands Console</a></li>
       </ul>
     </li>
@@ -41,8 +46,9 @@
     <li><a href="#faq">FAQ</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
+  </ul>
 </details>
+<br>
 
 # About
 
@@ -61,19 +67,14 @@ A modular GTA V Lua framework focused on enhancing the player's experience throu
 
 - Once in-game, press **[F5]** to toggle the script's UI.
 
+  >[!Note]
+  > Releases are scheduled for Sundays at 8AM.
+
 ### Commands Console
 
 - Use **[F4]** to toggle the console window.
 - Type `!ls` or `!dump` to dump all available commands.
 - All default commands are prefixed with an exclamation mark `<!>`.
-
->[!Note]
-> Releases are scheduled for Sundays at 8AM.
-> If the game gets updated during the week and we push an update, you can manually update your local copy if you don't want to wait until the end of the week.
-> All you need is the [SSV2](./SSV2) folder.
-
->[!Important]
-> **Do not use this in YimMenuV2. It will not work.**
 
 ## Contributing
 
