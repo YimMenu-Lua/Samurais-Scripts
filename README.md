@@ -68,8 +68,8 @@ A modular GTA V Lua framework focused on enhancing the player's experience throu
 
 - Once in-game, press **[F5]** to toggle the script's UI.
 
-  >[!Note]
-  > Releases are scheduled for Sundays at 8AM.
+>[!Note]
+> Releases are scheduled for Sundays at 8AM.
 
 ### Commands Console
 
