@@ -21,6 +21,7 @@
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts">
     <img alt="Online" src="https://img.shields.io/badge/Online%20Version-1.72-green?style=for-the-badge">
   </a>
+  <br>
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts">
     <img alt="Legacy Build" src="https://img.shields.io/badge/Legacy-3788.0-green?style=for-the-badge">
   </a>
