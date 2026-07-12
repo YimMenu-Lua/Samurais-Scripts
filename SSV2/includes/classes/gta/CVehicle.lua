@@ -62,11 +62,9 @@ function CVehicle:init(vehicle)
 		error("Invalid entity!")
 	end
 
-	local instance = MakeInstance({}, self) ---@cast instance CVehicle
-	instance:super().init(instance, vehicle)
-
-	local ptr                   = memory.handle_to_ptr(vehicle)
-	instance.m_ptr              = ptr
+	local base                  = CEntity(vehicle)
+	local ptr                   = base:GetPointer()
+	local instance              = setmetatable(base, self) ---@cast instance CVehicle
 	instance.m_model_info       = CVehicleModelInfo(ptr:add(0x0020):deref())
 	instance.m_draw_data        = CVehicleDrawData(ptr:add(0x0048):deref())
 	instance.m_turbo            = ptr:add(0x007C)

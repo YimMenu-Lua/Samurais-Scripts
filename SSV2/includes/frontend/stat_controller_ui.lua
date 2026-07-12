@@ -290,7 +290,7 @@ local function drawNewStatPopup()
 
 	ImGui.BeginDisabled(newStatBuff.name == "" or newStatBuff.type == "")
 	if (GUI:Button(_T("GENERIC_CONFIRM"))) then
-		MPStatController:AddStat(table.copy(newStatBuff))
+		MPStatController:Add(table.copy(newStatBuff))
 		newStatBuff = { name = "", type = "" }
 		ImGui.CloseCurrentPopup()
 	end

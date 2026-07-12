@@ -553,7 +553,7 @@ return function()
 		end
 		ImGui.EndDisabled()
 
-		if (Backend.debug_mode) then
+		if (Backend.is_debug) then
 			ImGui.SameLine()
 			if (ImGui.Button("Parse Object", maxButtonWidth, 37.5) and hasEdits) then
 				print(table.serialize(FlagController:GeneratePresetFromCurrentDeltas("test", 1 << CARS_BIT)))

@@ -609,7 +609,7 @@ function ThreadManager:Shutdown()
 end
 
 function ThreadManager:DebugPrint()
-	if (not Backend.debug_mode) then
+	if (not Backend.is_debug) then
 		return
 	end
 

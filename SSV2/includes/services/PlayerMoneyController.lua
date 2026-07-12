@@ -24,7 +24,6 @@ local TxnSysFuncs <const> = {
 ---@field private m_wallet_balance integer
 ---@field private m_total_balance integer
 ---@field private m_last_tick TimePoint
----@field protected m_use_transaction_system boolean
 ---@field private m_bank_fmt string
 ---@field private m_wallet_fmt string
 ---@field private m_total_fmt string
@@ -34,14 +33,13 @@ PlayerMoneyController.__index       = PlayerMoneyController
 ---@return PlayerMoneyController
 function PlayerMoneyController.new()
 	return setmetatable({
-		m_bank_balance           = 0,
-		m_wallet_balance         = 0,
-		m_total_balance          = 0,
-		m_bank_fmt               = "$0",
-		m_wallet_fmt             = "$0",
-		m_total_fmt              = "$0",
-		m_last_tick              = TimePoint(),
-		m_use_transaction_system = not Game.IsFSL(),
+		m_bank_balance   = 0,
+		m_wallet_balance = 0,
+		m_total_balance  = 0,
+		m_bank_fmt       = "$0",
+		m_wallet_fmt     = "$0",
+		m_total_fmt      = "$0",
+		m_last_tick      = TimePoint(),
 	}, PlayerMoneyController)
 end
 
@@ -52,6 +50,7 @@ function PlayerMoneyController:Reset()
 	self.m_bank_fmt       = "$0"
 	self.m_wallet_fmt     = "$0"
 	self.m_total_fmt      = "$0"
+
 	self.m_last_tick:Reset()
 end
 
@@ -88,9 +87,15 @@ end
 ---@private
 ---@nodiscard
 ---@param amount integer
----@param operation 0|1 -- 0: Withdraw | 1: Deposit
+---@param operation
+---| 0: Withdraw
+---| 1: Deposit
 ---@return boolean
 function PlayerMoneyController:UseTransactionSystem(amount, operation)
+	if (not NETSHOPPING.NET_GAMESERVER_USE_SERVER_TRANSACTIONS()) then
+		return true
+	end
+
 	if (NETSHOPPING.NET_GAMESERVER_TRANSACTION_IN_PROGRESS()) then
 		log.error("Another transaction is in progress.")
 		return false
@@ -132,7 +137,8 @@ end
 -- ### Must be called in a fiber.
 ---@param amount integer
 function PlayerMoneyController:Withdraw(amount)
-	if (self.m_bank_balance <= 0) then
+	local balance = self.m_bank_balance
+	if (balance <= 0) then
 		Notifier:ShowError("Withdraw", "Insufficient funds!")
 		return
 	end
@@ -147,8 +153,8 @@ function PlayerMoneyController:Withdraw(amount)
 		return
 	end
 
-	amount = math.min(amount, self.m_bank_balance)
-	if (self.m_use_transaction_system and not self:UseTransactionSystem(amount, 0)) then
+	amount = math.min(amount, balance)
+	if (not self:UseTransactionSystem(amount, 0)) then
 		return
 	end
 
@@ -169,7 +175,7 @@ function PlayerMoneyController:Deposit(amount)
 		return
 	end
 
-	if (self.m_use_transaction_system and not self:UseTransactionSystem(amount, 1)) then
+	if (not self:UseTransactionSystem(amount, 1)) then
 		return
 	end
 
@@ -177,9 +183,7 @@ function PlayerMoneyController:Deposit(amount)
 end
 
 function PlayerMoneyController:Update()
-	if (not Game.IsOnline()) then return end
-
-	if (not self.m_last_tick:HasElapsed(1000)) then
+	if not (Game.IsOnline() and self.m_last_tick:HasElapsed(1000)) then
 		return
 	end
 

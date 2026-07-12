@@ -17,15 +17,15 @@ local function dummy_mt(t, ret_type)
 	return setmetatable(t, { __index = function(...) return ret_type or nop end })
 end
 
-return function(version)
-	if (version ~= Enums.eGameBranch.MOCK) then
+return function(branch)
+	if (branch ~= Enums.eGameBranch.MOCK) then
 		return
 	end
 
 	if (not io["exists"]) then
 		io.exists = function(filepath)
 			local ok, f = pcall(io.open, filepath, "r")
-			if not ok or not f then
+			if (not ok or not f) then
 				return false
 			end
 
@@ -80,15 +80,15 @@ return function(version)
 
 	if (not menu_event) then
 		menu_event = {
-			playerLeave               = 1,
-			playerJoin                = 2,
-			playerMgrInit             = 3,
-			playerMgrShutdown         = 4,
-			ChatMessageReceived       = 5,
-			ScriptedGameEventReceived = 6,
-			MenuUnloaded              = 7,
-			ScriptsReloaded           = 8,
-			Wndproc                   = 9
+			PlayerLeave               = 0,
+			PlayerJoin                = 1,
+			PlayerMgrInit             = 2,
+			PlayerMgrShutdown         = 3,
+			ChatMessageReceived       = 4,
+			ScriptedGameEventReceived = 5,
+			MenuUnloaded              = 6,
+			ScriptsReloaded           = 7,
+			Wndproc                   = 8
 		}
 	end
 

@@ -10,13 +10,16 @@
 local start_time = os.clock()
 require("includes.init")
 
-if (Backend:IsMockEnv()) then
+local isMock = Backend:IsMockEnv()
+if (isMock or Backend:IsDebug()) then
 	require("includes.tests")
-	return
+	if (isMock) then return end
 end
 
 local function populate_weapons()
+	local branch      = Backend:GetGameBranch()
 	local weapons     = require("includes.data.weapons")
+	local weapon_data = require("includes.data.weapon_data")
 	local weapons_map = {
 		["GROUP_MELEE"]       = weapons.Melee,
 		["GROUP_PISTOL"]      = weapons.Pistols,
@@ -31,9 +34,8 @@ local function populate_weapons()
 		["GROUP_STUNGUN"]     = weapons.Misc,
 		["GROUP_TRANQILIZER"] = weapons.Misc,
 	}
-	local weaponData  = require("includes.data.weapon_data")
-	local branch      = Backend:GetGameBranch()
-	for hash, data in pairs(weaponData) do
+
+	for hash, data in pairs(weapon_data) do
 		if (branch == Enums.eGameBranch.LEGACY and data.model_name == "WEAPON_STRICKLER") then
 			goto continue
 		end

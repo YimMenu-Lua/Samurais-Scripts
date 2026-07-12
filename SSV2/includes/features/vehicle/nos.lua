@@ -15,6 +15,7 @@ local FeatureBase = require("includes.modules.FeatureBase")
 ---@field private m_purge_fx_l array<handle>|nil
 ---@field private m_purge_fx_r array<handle>|nil
 ---@field private m_engine_danger_ratio float
+---@field private m_cached_max_speed float
 ---@field private m_is_active boolean
 local NosMgr = setmetatable({}, FeatureBase)
 NosMgr.__index = NosMgr
@@ -28,8 +29,9 @@ function NosMgr.new(pv)
 end
 
 function NosMgr:Init()
-	self.m_is_active = false
+	self.m_is_active           = false
 	self.m_engine_danger_ratio = 0.0
+	self.m_cached_max_speed    = 0.0
 end
 
 function NosMgr:Cleanup()
@@ -50,11 +52,12 @@ function NosMgr:Cleanup()
 end
 
 function NosMgr:ShouldRun()
-	return (self.m_entity
-		and self.m_entity:IsValid()
-		and self.m_entity:IsLandVehicle()
+	local veh = self.m_entity
+	return (veh
+		and veh:IsValid()
+		and veh:IsLandVehicle()
 		and LocalPlayer:IsDriving()
-		and not self.m_entity:IsElectric())
+		and not veh:IsElectric())
 end
 
 ---@return boolean
@@ -72,12 +75,12 @@ end
 
 ---@return boolean
 function NosMgr:IsNOSButtonPressed()
-	return KeyManager:IsKeybindPressed("nos")
+	return KeyManager:IsKeybindPressed("nos") and self.m_entity:GetEngineHealth() > 300
 end
 
 ---@return boolean
 function NosMgr:IsPurgeButtonPressed()
-	return KeyManager:IsKeybindPressed("nos_purge")
+	return KeyManager:IsKeybindPressed("nos_purge") and self.m_entity:GetEngineHealth() > 300
 end
 
 function NosMgr:UpdateFX()
@@ -157,10 +160,10 @@ function NosMgr:UpdateEngineDamage()
 	end
 
 	local current_speed = PV:GetSpeed()
-	local threshold = PV:GetMaxSpeed() * 1.7
+	local threshold = self.m_cached_max_speed * 1.7
 	self.m_engine_danger_ratio = math.clamp(current_speed / threshold, 0, 1)
 
-	if (current_speed > threshold) then
+	if (current_speed >= threshold) then
 		local handle = PV:GetHandle()
 		VEHICLE.SET_VEHICLE_ENGINE_HEALTH(handle, 50)
 		AUDIO.PLAY_SOUND_FROM_ENTITY(
@@ -176,55 +179,63 @@ function NosMgr:UpdateEngineDamage()
 end
 
 function NosMgr:Update()
-	local PV = self.m_entity
-	if (GVars.features.vehicle.nos.enabled and PV:IsEngineOn()) then
-		local handle  = PV:GetHandle()
-		local pressed = self:IsNOSButtonPressed()
-		local power   = GVars.features.vehicle.nos.power
+	local PV  = self.m_entity
+	local cfg = GVars.features.vehicle.nos
 
-		if (pressed and PAD.IS_CONTROL_PRESSED(0, 71) and PV:GetEngineHealth() > 50) then
-			VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(handle, power / 5)
-			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, power)
-			if (GVars.features.vehicle.nos.sound_effect) then
-				AUDIO.SET_VEHICLE_BOOST_ACTIVE(handle, true)
-			end
+	if (not self.m_is_active) then
+		self.m_cached_max_speed = PV:GetMaxSpeed()
+	end
 
-			if (GVars.features.vehicle.nos.screen_effect) then
-				GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrous", 0, false)
-			end
-
-			self.m_is_active = true
-		end
-
-		if (self.m_is_active and not pressed) then
-			VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(handle, 1.0)
-			VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, -1)
-			AUDIO.SET_VEHICLE_BOOST_ACTIVE(handle, false)
-
-			if (GVars.features.vehicle.nos.screen_effect) then
-				GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrousOut", 0, false)
-			end
-
-			if (GRAPHICS.ANIMPOSTFX_IS_RUNNING("DragRaceNitrous")) then
-				GRAPHICS.ANIMPOSTFX_STOP("DragRaceNitrous")
-			end
-
-			if (GRAPHICS.ANIMPOSTFX_IS_RUNNING("DragRaceNitrousOut")) then
-				GRAPHICS.ANIMPOSTFX_STOP("DragRaceNitrousOut")
-			end
-
-			self.m_is_active = false
-		end
-
+	if (cfg.enabled) then
 		self:UpdateFX()
+
+		if (PV:IsEngineOn()) then
+			local handle  = PV:GetHandle()
+			local pressed = self:IsNOSButtonPressed()
+			local power   = cfg.power
+
+			if (pressed and PAD.IS_CONTROL_PRESSED(0, 71) and PV:GetEngineHealth() > 50) then
+				VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(handle, math.clamp(power / 10, 1.0, 5.0))
+				VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, power)
+				if (cfg.sound_effect) then
+					AUDIO.SET_VEHICLE_BOOST_ACTIVE(handle, true)
+				end
+
+				if (cfg.screen_effect) then
+					GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrous", 0, false)
+				end
+
+				self.m_is_active = true
+			end
+
+			if (self.m_is_active and not pressed) then
+				VEHICLE.SET_VEHICLE_CHEAT_POWER_INCREASE(handle, 1.0)
+				VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, -1)
+				AUDIO.SET_VEHICLE_BOOST_ACTIVE(handle, false)
+
+				if (cfg.screen_effect) then
+					GRAPHICS.ANIMPOSTFX_PLAY("DragRaceNitrousOut", 0, false)
+				end
+
+				if (GRAPHICS.ANIMPOSTFX_IS_RUNNING("DragRaceNitrous")) then
+					GRAPHICS.ANIMPOSTFX_STOP("DragRaceNitrous")
+				end
+
+				if (GRAPHICS.ANIMPOSTFX_IS_RUNNING("DragRaceNitrousOut")) then
+					GRAPHICS.ANIMPOSTFX_STOP("DragRaceNitrousOut")
+				end
+
+				self.m_is_active = false
+			end
+		end
+
+		if (cfg.can_damage_engine) then
+			self:UpdateEngineDamage()
+		end
 	end
 
-	if (GVars.features.vehicle.nos.purge) then
+	if (cfg.purge) then
 		self:UpdatePurgeFX()
-	end
-
-	if (GVars.features.vehicle.nos.can_damage_engine) then
-		self:UpdateEngineDamage()
 	end
 end
 

@@ -238,6 +238,27 @@ local RawBusinessData <const> = {
 		-- end
 	},
 	SellMissionTunables = {
+		["Biker"] = {
+			type = "bool",
+			tuneables = {
+				"BIKER_DISABLE_SELL_CONVOY",
+				"BIKER_DISABLE_SELL_PROVEN",
+				"BIKER_DISABLE_SELL_FRIENDS_IN_NEED",
+				"BIKER_DISABLE_SELL_BORDER_PATROL",
+				"BIKER_DISABLE_SELL_HELICOPTER_DROP",
+				"BIKER_DISABLE_SELL_POSTMAN",
+				"BIKER_DISABLE_SELL_AIR_DROP_AT_SEA",
+				"BIKER_DISABLE_SELL_STING_OP",
+			}
+		},
+		["Bunker"] = {
+			type = "float",
+			tuneables = {
+				"GR_AMBUSHED_AMBUSHED_WEIGHTING",
+				"GR_HILL_CLIMB_HILL_CLIMB_WEIGHTING",
+				"GR_ROUGH_TERRAIN_ROUGH_TERRAIN_WEIGHTING",
+			},
+		},
 		["CEO"] = {
 			type = "bool",
 			tuneables = {
@@ -259,18 +280,17 @@ local RawBusinessData <const> = {
 				"EXEC_DISABLE_SELL_TRACKIFY"
 			}
 		},
-		["Biker"] = {
-			type = "bool",
+		["Hangar"] = {
+			type = "float",
 			tuneables = {
-				"BIKER_DISABLE_SELL_CONVOY",
-				"BIKER_DISABLE_SELL_PROVEN",
-				"BIKER_DISABLE_SELL_FRIENDS_IN_NEED",
-				"BIKER_DISABLE_SELL_BORDER_PATROL",
-				"BIKER_DISABLE_SELL_HELICOPTER_DROP",
-				"BIKER_DISABLE_SELL_POSTMAN",
-				"BIKER_DISABLE_SELL_AIR_DROP_AT_SEA",
-				"BIKER_DISABLE_SELL_STING_OP",
-			}
+				"SMUG_SELL_HEAVY_LIFTING_WEIGHTING",
+				"SMUG_SELL_CONTESTED_WEIGHTING",
+				"SMUG_SELL_AGILE_DELIVERY_WEIGHTING",
+				"SMUG_SELL_FLYING_FORTRESS_WEIGHTING",
+				"SMUG_SELL_AIR_DELIVERY_WEIGHTING",
+				"SMUG_SELL_AIR_POLICE_WEIGHTING",
+				"SMUG_SELL_UNDER_THE_RADAR_WEIGHTING"
+			},
 		},
 		["Nightclub"] = {
 			type = "float",
@@ -284,18 +304,6 @@ local RawBusinessData <const> = {
 				"BB_SELL_MISSIONS_WEIGHTING_NOT_A_SCRATCH",
 				"BB_SELL_MISSIONS_WEIGHTING_FOLLOW_HELI",
 				"BB_SELL_MISSIONS_WEIGHTING_FIND_BUYER"
-			},
-		},
-		["Hangar"] = {
-			type = "float",
-			tuneables = {
-				"SMUG_SELL_HEAVY_LIFTING_WEIGHTING",
-				"SMUG_SELL_CONTESTED_WEIGHTING",
-				"SMUG_SELL_AGILE_DELIVERY_WEIGHTING",
-				"SMUG_SELL_FLYING_FORTRESS_WEIGHTING",
-				"SMUG_SELL_AIR_DELIVERY_WEIGHTING",
-				"SMUG_SELL_AIR_POLICE_WEIGHTING",
-				"SMUG_SELL_UNDER_THE_RADAR_WEIGHTING"
 			},
 		},
 	},

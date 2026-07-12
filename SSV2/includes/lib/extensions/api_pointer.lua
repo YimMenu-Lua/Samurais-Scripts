@@ -273,7 +273,7 @@ function memory.pointer:set_matrix44(matrix)
 	self:add(0x30):set_float(m4.x); self:add(0x34):set_float(m4.y); self:add(0x38):set_float(m4.z); self:add(0x3C):set_float(m4.w)
 end
 
----@param size? number bytes
+---@param size? number bits, defaults to 16
 function memory.pointer:dump(size)
 	if (self:is_null()) then
 		log.debug("Memory Dump<nullptr>")

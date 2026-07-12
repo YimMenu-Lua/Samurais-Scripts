@@ -15,9 +15,11 @@
 ---@module "init"
 
 
--- ### Enums Namespace.
+-- ### Namespace: Enums
 --
 -- All enums are stored here to avoid polluting the global namespace.
+--
+-- Exposed globally so it can be extended from anywhere.
 Enums = require("includes.data.enums.__init__")
 
 ---@enum eGameBranch
@@ -32,12 +34,11 @@ Enums.eGameBranch = {
 ---@field build string
 ---@field online string
 
----@alias GAME_VERSION table<eGameBranch, VersionInfo>
-
 local SCRIPT_NAME <const>    = "Samurai's Scripts"
 local SCRIPT_VERSION <const> = require("includes.version")
 local DEFAULT_CONFIG <const> = require("includes.data.config")
 
+---@alias GAME_VERSION table<eGameBranch, VersionInfo>
 ---@type GAME_VERSION
 local GAME_VERSION <const>   = {
 	[Enums.eGameBranch.LEGACY]   = { build = "3788.0", online = "1.72" },

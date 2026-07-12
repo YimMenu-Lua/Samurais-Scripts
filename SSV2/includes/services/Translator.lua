@@ -103,7 +103,7 @@ function Translator:Load(debugBreak)
 		end
 
 		local idx = GVars.backend.language_index
-		if (debugBreak and Backend.debug_mode) then
+		if (debugBreak and Backend.is_debug) then
 			idx = 69
 		end
 

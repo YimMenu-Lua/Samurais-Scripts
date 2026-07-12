@@ -45,21 +45,20 @@ function CPed:init(ped)
 		error("Invalid entity!")
 	end
 
-	self:super().init(self, ped)
-	local ptr = memory.handle_to_ptr(ped)
-	return setmetatable({
-		m_ptr              = ptr,
-		m_ped_intelligence = ptr:add(0x10A0),
-		m_ped_inventory    = ptr:add(0x10B0),
-		m_ped_weapon_mgr   = ptr:add(0x10B8),
-		m_velocity         = ptr:add(0x0300),
-		m_ped_type         = ptr:add(0x1098),
-		m_ped_task_flag    = ptr:add(0x144B),
-		m_seatbelt         = ptr:add(0x143C),
-		m_armor            = ptr:add(0x150C),
-		m_cash             = ptr:add(0x1614),
-		m_player_info      = CPlayerInfo(ptr:add(0x10A8):deref()),
-	}, self)
+	local base                  = CEntity(ped)
+	local ptr                   = base:GetPointer()
+	local instance              = setmetatable(base, self) ---@cast instance CPed
+	instance.m_velocity         = ptr:add(0x0300)
+	instance.m_ped_type         = ptr:add(0x1098)
+	instance.m_ped_intelligence = ptr:add(0x10A0)
+	instance.m_player_info      = CPlayerInfo(ptr:add(0x10A8):deref())
+	instance.m_ped_inventory    = ptr:add(0x10B0)
+	instance.m_ped_weapon_mgr   = ptr:add(0x10B8)
+	instance.m_ped_task_flag    = ptr:add(0x144B)
+	instance.m_seatbelt         = ptr:add(0x143C)
+	instance.m_armor            = ptr:add(0x150C)
+	instance.m_cash             = ptr:add(0x1614)
+	return instance
 end
 
 ---@return boolean

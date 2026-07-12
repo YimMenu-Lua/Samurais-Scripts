@@ -15,6 +15,12 @@
 -- **Parent:** `Ped`.
 --
 -- Class representing a GTA V player (Unfinished).
+--____
+-- **IMPORTANT**: Class methods that use player id and ped handle must always use `:GetID()` and `:GetHandle()`
+--
+-- instead of directly reading cached class members. This is because [LocalPlayer](LocalPlayer.lua) inherits this class and does not
+--
+-- cache handles or IDs; it always resolves them live.
 ---@class Player : Ped
 ---@field private m_internal CPed
 ---@field private m_handle handle
@@ -39,23 +45,24 @@ function Player.new(p0)
 	local ped, pid = 0, 0
 	if (math.is_inrange(p0, 0, 31)) then
 		pid = p0
-		ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
-	elseif (Game.IsScriptHandle(p0)) then
+		ped = PLAYER.GET_PLAYER_PED(pid)
+	elseif (ENTITY.IS_ENTITY_A_PED(p0)) then
 		ped = p0
 		pid = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(p0)
 	else
 		error("Invalid parameter. Function expects a player ID or a ped handle.")
 	end
 
-	if (not PED.IS_PED_A_PLAYER(ped)) then
-		error("Attempt to create a Player instance from an NPC.")
+	if (not NETWORK.NETWORK_IS_PLAYER_CONNECTED(pid)) then
+		error("Invalid player.")
 	end
 
-	return setmetatable({
-		m_pid    = pid,
-		m_handle = ped,
-		---@diagnostic disable-next-line: param-type-mismatch
-	}, Player)
+	local base        = Entity(ped)
+	---@diagnostic disable-next-line: param-type-mismatch
+	local instance    = setmetatable(base, Player) ---@cast instance Player
+	instance.m_pid    = pid
+	instance.m_handle = ped
+	return instance
 end
 
 ---@return boolean
@@ -93,11 +100,20 @@ function Player:IsHostOfScript(scriptName)
 	return false
 end
 
+-- ```C
+-- BOOL func_24957(ePedComponentType epctParam0) // Position - 0x72351E (7484702) (b3725.0)
+-- ```
+--___
+-- not sure if reading the global is cheaper than calling the script function but it would definitely be much batter than global maintenance
 ---@return boolean
 function Player:IsBoss()
-	return GGlobals.GPBD_FM_3:At(self:GetID(), 615):At(10):ReadInt() == self:GetID()
+	local pid = self:GetID()
+	return GGlobals.GPBD_FM_3:At(pid, 615):At(10):ReadInt() == pid
 end
 
+-- ```C
+-- int func_11572(ePedComponentType epctParam0) // Position - 0x41A1CE (4301262) (b3725.0)
+-- ```
 ---@return integer
 function Player:GetBossType()
 	return GGlobals.GPBD_FM_3:At(self:GetID(), 615):At(10):At(433):ReadInt()
@@ -126,6 +142,11 @@ end
 ---@return IPV4?
 function Player:GetExternalIP()
 	return self:Resolve().m_player_info:GetExternalIP()
+end
+
+---@return boolean
+function Player:HasControl()
+	return PLAYER.IS_PLAYER_CONTROL_ON(self:GetID())
 end
 
 -- [WIP]

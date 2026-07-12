@@ -344,7 +344,7 @@ function YimActions:Play(action, ped)
 
 	if (success) then
 		self:UpdatePlayHistory(ped)
-		if (Backend.debug_mode) then
+		if (Backend.is_debug) then
 			self.Debugger:Update(ped)
 		end
 	end
@@ -398,7 +398,7 @@ function YimActions:Cleanup(ped)
 		self:ResetPlayer()
 	end
 
-	if (Backend.debug_mode) then
+	if (Backend.is_debug) then
 		self.Debugger:Remove(ped)
 	end
 end

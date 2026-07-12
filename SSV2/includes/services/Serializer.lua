@@ -941,7 +941,7 @@ end
 ---@private
 ---@param mode? 0 | 1
 function Serializer:DebugBreak(mode)
-	if (not Backend.debug_mode) then
+	if (not Backend.is_debug) then
 		return
 	end
 

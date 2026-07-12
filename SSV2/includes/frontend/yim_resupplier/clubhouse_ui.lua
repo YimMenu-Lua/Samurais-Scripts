@@ -8,35 +8,16 @@
 
 
 local YRV3                  = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local drawRenamePopup       = require("includes.frontend.yim_resupplier.helpers.front_rename_popup")
 local measureBulletWidths   = require("includes.frontend.helpers.measure_text_width")
 local drawNamePlate         = require("includes.frontend.yim_resupplier.nameplate_ui")
 local drawFactory           = require("includes.frontend.yim_resupplier.factory_ui")
 
 ---@type array<integer>
 local bulletWidths          = {}
-local newNameBuff           = ""
+local newNameBuff           = { value = "" }
 local renamePopupLabel      = "##renameMC"
 local shouldDrawRenamePopup = false
-
----@param clubhouse Clubhouse
-local function drawRenamePopup(clubhouse)
-	ImGui.Spacing()
-
-	newNameBuff = ImGui.InputTextWithHint("##newName", _T("GENERIC_NAME"), newNameBuff, 32)
-
-	ImGui.SameLine()
-	if (GUI:Button(_T("GENERIC_SAVE"))) then
-		clubhouse:Rename(newNameBuff)
-		ImGui.CloseCurrentPopup()
-	end
-	ImGui.SameLine()
-	if (GUI:Button(_T("GENERIC_CANCEL"))) then
-		newNameBuff = clubhouse:GetCustomName()
-		ImGui.CloseCurrentPopup()
-	end
-
-	ImGui.Spacing()
-end
 
 local function contextCallback()
 	if (ImGui.MenuItem(_T("GENERIC_RENAME"))) then
@@ -52,11 +33,11 @@ return function()
 		return
 	end
 
-	local unsafeFeatsEnabled = GVars.features.unsafe_feats_enabled
-	drawNamePlate(
-		clubhouse,
-		{ customName = clubhouse:GetCustomName(), contextMenuCallback = contextCallback }
-	)
+	local customName = clubhouse:GetCustomName()
+	drawNamePlate(clubhouse, {
+		customName          = customName,
+		contextMenuCallback = contextCallback
+	})
 	ImGui.Spacing()
 
 	local lang_index  = GVars.backend.language_index
@@ -87,7 +68,7 @@ return function()
 	ImGui.SameLine(bulletWidth)
 	ImGui.Text(clubhouse:GetClientBikeName())
 
-	ImGui.BeginDisabled(not unsafeFeatsEnabled)
+	ImGui.BeginDisabled(not GVars.features.unsafe_feats_enabled)
 	if (cashSafe:CanInstaFill()) then
 		ImGui.BeginDisabled(cashValue == maxCash)
 		if (GUI:Button(_T("YRV3_CASH_FILL"))) then
@@ -105,7 +86,7 @@ return function()
 	ImGui.EndDisabled()
 
 	if (shouldDrawRenamePopup) then
-		newNameBuff = clubhouse:GetCustomName()
+		newNameBuff.value = customName
 		ImGui.OpenPopup(renamePopupLabel)
 		shouldDrawRenamePopup = false
 	end
@@ -117,7 +98,7 @@ return function()
 			| ImGuiWindowFlags.NoSavedSettings
 			| ImGuiWindowFlags.NoMove
 		)) then
-		drawRenamePopup(clubhouse)
+		drawRenamePopup(newNameBuff, clubhouse)
 		ImGui.EndPopup()
 	end
 
@@ -132,8 +113,8 @@ return function()
 
 	ImGui.BeginTabBar("##mc_businesses")
 	for i, bb in ipairs(subs) do
-		local norm_name = bb:GetNormalizedName()
-		local name      = norm_name or _T("GENERIC_UNKNOWN")
+		local norm = bb:GetNormalizedName()
+		local name = norm or _T("GENERIC_UNKNOWN")
 		ImGui.PushID(i)
 		if (ImGui.BeginTabItem(name)) then
 			drawFactory(bb)
