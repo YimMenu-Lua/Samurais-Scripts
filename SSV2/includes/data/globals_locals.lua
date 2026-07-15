@@ -287,13 +287,13 @@ return {
 		description = "Contraband Buy Local 2",
 		file = "fm_content_cargo.c",
 		LEGACY = {
-			value = 5991,
-			pattern = [[func_\w+\(&.*?Local_(59..?), \w+\);]],
+			value = 6030,
+			pattern = [[func_\w+\(&.*?Local_(60\d{2}), \w+\);]],
 			capture_group = 1
 		},
 		ENHANCED = {
 			value = 5993,
-			pattern = [[func_\w+\(&.*?Local_(59..?), \w+\);]],
+			pattern = [[func_\w+\(&.*?Local_(60\d{2}), \w+\);]],
 			capture_group = 1
 		}
 	},
