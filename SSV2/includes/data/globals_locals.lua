@@ -37,7 +37,7 @@ return {
 		]],
 		file = "freemode.c",
 		LEGACY = {
-			value = 2658291,
+			value = 2658293,
 			pattern = [[MISC::SET_BIT\(&\(Global_(\d{7})\[PLAYER::PLAYER_ID\(\) /\*(\d{3})\*/\]\.(f_\d{3})\.f_\d{1}\), 31\);]],
 			capture_group = 1,
 			offsets = {
@@ -73,7 +73,7 @@ return {
 		description = "GPBD_FM_3",
 		file = "freemode.c",
 		LEGACY = {
-			value = 1892653,
+			value = 1892925,
 			pattern = [[\w+\(&\(Global_(\d{7})\[.*?/\*(\d+)\*/\]\.f_10\.f_343\), \w+, 64\);]],
 			capture_group = 1,
 			offsets = {
@@ -101,7 +101,7 @@ return {
 		description = "Freemode Business Global",
 		file = "freemode.c",
 		LEGACY = {
-			value = 1673807,
+			value = 1673813,
 			pattern = [[if.*?Global_\d{7}\[.*?\] != 0 && func_\w+\(.*?\) && \w+\)]],
 			capture_group = 1
 		},
@@ -129,7 +129,7 @@ return {
 		description = "Arcade Business Hub Global 1",
 		file = "apparcadebusinesshub.c",
 		LEGACY = {
-			value = 1950053,
+			value = 1950557,
 			pattern = [[else if \(Global_\w{7}\)]],
 			capture_group = 1
 		},
@@ -143,7 +143,7 @@ return {
 		description = "Arcade Business Hub Global 2",
 		file = "apparcadebusinesshub.c",
 		LEGACY = {
-			value = 1970093,
+			value = 1970624,
 			pattern = [[if \(MISC::IS_STRING_NULL_OR_EMPTY\(\w+\) \|\| (Global_\w{7}) ==.*?\)]],
 			capture_group = 1
 		},
@@ -157,12 +157,12 @@ return {
 		description = "Business stuff",
 		file = "freemode.c",
 		LEGACY = {
-			value = 1845250,
+			value = 1845298,
 			pattern = [[Global_(\d{7})\[.*? /\*(\d+)\*/\]\.(f_\d{3}).f_\d{3}\[.*? /\*\d+\*/\].f_9 = .*?;]],
 			capture_group = 1,
 			offsets = {
 				{
-					value = 880,
+					value = 881,
 					capture_group = 2,
 					description = "playerID read size."
 				},
@@ -193,7 +193,7 @@ return {
 		description = "Business Hub time left to produce.",
 		file = "freemode.c",
 		LEGACY = {
-			value = 2708951,
+			value = 2709062,
 			pattern = [[Global_(\d{7})\[.*?\] =.*?Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
 			capture_group = 1
 		},
@@ -207,7 +207,7 @@ return {
 		description = "Business Hub some production bool. Flips back after production is triggered.",
 		file = "freemode.c",
 		LEGACY = {
-			value = 2708962,
+			value = 2709073,
 			pattern = [[Global_(\d{7})\[.*?\] =.*?Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
 			capture_group = 2,
 			offsets = {
@@ -235,12 +235,12 @@ return {
 		description = "car wash safe global",
 		file = "freemode.c",
 		LEGACY = {
-			value = 1882572,
+			value = 1882652,
 			pattern = [[Global_(\d{7})\[.*?/\*(\d{3})\*/\]\.f_(\d{3})\.f_27\.f_2 = \w+0;]],
 			capture_group = 1,
 			offsets = {
 				{
-					value = 315,
+					value = 321,
 					capture_group = 2,
 					description = "player id read size"
 				},
@@ -273,7 +273,7 @@ return {
 		description = "Contraband Buy Local 1",
 		file = "gb_contraband_buy.c",
 		LEGACY = {
-			value = 625,
+			value = 632,
 			pattern = [[switch \(((.*?Local_\d{3}))\.f_5]],
 			capture_group = 1
 		},
@@ -292,7 +292,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 5993,
+			value = 6029,
 			pattern = [[func_\w+\(&.*?Local_(60\d{2}), \w+\);]],
 			capture_group = 1
 		}
@@ -301,7 +301,7 @@ return {
 		description = "Contraband Buy Local 3",
 		file = "fm_content_cargo.c",
 		LEGACY = {
-			value = 6110,
+			value = 6149,
 			pattern = [[if \(.*?(Local_\d{4})\.(f_\d{4}) == 0]],
 			capture_group = 1,
 			offsets = {
@@ -327,7 +327,7 @@ return {
 		description = "Contraband Sell Local",
 		file = "gb_contraband_sell.c",
 		LEGACY = {
-			value = 567,
+			value = 574,
 			pattern = [[MISC::CLEAR_BIT\(&\((.*?Local_\d{3})\.f_\d{1,2}\), \w+0]],
 			capture_group = 1
 		},
@@ -341,7 +341,7 @@ return {
 		description = "Biker Contraband Sell Local",
 		file = "gb_biker_contraband_sell.c",
 		LEGACY = {
-			value = 729,
+			value = 736,
 			pattern = [[.*?Local_(\d{3})\.f_(\d{3}) = func_\w+\(-1\);]],
 			capture_group = 1,
 			offsets = {
@@ -369,7 +369,7 @@ return {
 		description = "Biker Contraband Sell Local",
 		file = "gb_biker_contraband_sell.c",
 		LEGACY = {
-			value = 729,
+			value = 736,
 			pattern = [[else if \(!func_\w+\(.*?\) &&.*?(Local_\d{3})(\.f_\d{3}) > 0\)]],
 			capture_group = 1,
 			offsets = {
@@ -397,7 +397,7 @@ return {
 		description = "Hangar Sell Local 1 (air)",
 		file = "gb_smuggler.c",
 		LEGACY = {
-			value = 1989,
+			value = 1996,
 			pattern = [[for \(i = 0; i < func_\w{2}\(func_\w{4}\(\), func_\w{2}\(\), .*?(Local_\d{4})\.(f_\d{4}), -1\); i = i \+ 1\)]],
 			capture_group = 1,
 			offsets = {
@@ -423,7 +423,7 @@ return {
 		description = "Hangar Sell Local 2 (air)",
 		file = "gb_smuggler.c",
 		LEGACY = {
-			value = 1989,
+			value = 1996,
 			pattern = [[if .*?(Local_\d{4})\.(f_\d{4}) > 0 && func_.*?&.*?Local_\d{4}\.f_\d{4}\), 30000, \w+]],
 			capture_group = 1,
 			offsets = {
@@ -449,7 +449,7 @@ return {
 		description = "Bunker Sell Local 1",
 		file = "gb_gunrunning.c",
 		LEGACY = {
-			value = 1266,
+			value = 1273,
 			pattern = [[Local_1\d{3}\.f_\d{3} = func_\w+\(func_\w+\(\),.*?(Local_1\d{3})\.(f_\d{3}), \w+, -1\);]],
 			capture_group = 1
 		},
@@ -463,7 +463,7 @@ return {
 		description = "Amount delivered.",
 		file = "gb_gunrunning.c",
 		LEGACY = {
-			value = 1266,
+			value = 1273,
 			pattern = [[func_\w+\((.*?Local_\d{4})(\.f_\d{3}), \w+, "GR_HUD_TOT".*?, 255, 0\);]],
 			capture_group = 1,
 			offsets = {
@@ -489,7 +489,7 @@ return {
 		description = "Number of delivery vehicles.",
 		file = "gb_gunrunning.c",
 		LEGACY = {
-			value = 1266,
+			value = 1273,
 			pattern = [[for \(i = 0; i < func_\w+\(func_\w+\(\), func_\w+\(\),.*?(Local_\d{4})(\.f_\d{3}),.*?Local_\d{4}\.f_\d{3}\); i = i \+ 1\)]],
 			capture_group = 1,
 			offsets = {
@@ -515,7 +515,7 @@ return {
 		description = "Acid Lab Deliveries. This shit is pissing me off and my dumbass doesn't know how to use scrDBG without creating a bazillion GB log file.",
 		file = "fm_content_acid_lab_sell.c",
 		LEGACY = {
-			value = 144,
+			value = 151,
 			pattern = [[if \(.*?Local_(\d{3})\.f_(\d{1}) !=.*?Local_\d{3}\.f_\d{4}\[0 /\*6\*/\]\.f_2\)]],
 			capture_group = 1,
 			offsets = {
@@ -541,7 +541,7 @@ return {
 		description = "Acid Lab Mission State",
 		file = "fm_content_acid_lab_sell.c",
 		LEGACY = {
-			value = 5723,
+			value = 5758,
 			pattern = [[if \((.*?Local_5\d{3})(\.f_\d{4}) == 0\)]],
 			capture_group = 1,
 			offsets = {
@@ -567,7 +567,7 @@ return {
 		description = "Acid Lab Sell Generic Bitset",
 		file = "fm_content_acid_lab_sell.c",
 		LEGACY = {
-			value = 5597,
+			value = 5632,
 			pattern = [[func_\w{3}\(&.?(Local_5\d+), \w+\)]],
 			capture_group = 1
 		},
@@ -581,7 +581,7 @@ return {
 		description = "Three Card Poker Table Local",
 		file = "three_card_poker.c",
 		LEGACY = {
-			value = 771,
+			value = 778,
 			pattern = [[if \((.*?Local_\d{3})\[.*? /\*(\d+)\*/\]\.f_\d+ ==.*?&&.*?Local_\d{3}\[.*?\]\.f_\d+ > 0 \|\| .*?Local_\d{3}\[.*?\]\.f_\d+ > 0\)]],
 			capture_group = 1,
 			offsets = {
@@ -607,7 +607,7 @@ return {
 		description = "Three Card Poker Cards Local",
 		file = "three_card_poker.c",
 		LEGACY = {
-			value = 138,
+			value = 145,
 			pattern = [[STREAMING::REQUEST_MODEL\(func_\d+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\.f_\d+\[.*?\], .*?Local_\d{4}\.f_\d+\)\);]],
 			capture_group = 1,
 			offsets = {
@@ -649,7 +649,7 @@ return {
 		description = "Three Card Poker Anti Cheat",
 		file = "three_card_poker.c",
 		LEGACY = {
-			value = 1060,
+			value = 1067,
 			pattern = [[if \(.*?(Local_\d{4})(\.f_\d{3})\.f_\d+\[.*?\] !=.*?Local_\d{3}\.f_\d+\[PLAYER::PLAYER_ID\(\) .*?\]\.f_1\[.*?\]\)]],
 			capture_group = 1,
 			offsets = {
@@ -677,7 +677,7 @@ return {
 		description = "Blackjack Table Players Local",
 		file = "blackjack.c",
 		LEGACY = {
-			value = 1798,
+			value = 1805,
 			pattern = [[if \(.*?Local_\d{4}\[.*?/\*(\d+)\*/\]\.f_\d+ == \w+ && \w+\(.*?Local_\d{4}\[.*?\], \d+\)\)]],
 			capture_group = 2,
 			offsets = {
@@ -703,7 +703,7 @@ return {
 		description = "Blackjack Cards Local",
 		file = "blackjack.c",
 		LEGACY = {
-			value = 138,
+			value = 145,
 			pattern = [[if \(func_\w+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\) == 10 \|\| func_\d+\(.*?Local_\d{3}\.f_\d{3}\[.*?\]\) == 11\)]],
 			capture_group = 1,
 			offsets = {
@@ -729,7 +729,7 @@ return {
 		description = "Roulette Master Table Local",
 		file = "casinoroulette.c",
 		LEGACY = {
-			value = 146,
+			value = 153,
 			pattern = [[NETWORK::NETWORK_REGISTER_HOST_BROADCAST_VARIABLES\(&\(.*?(Local_\d{3})(\.f_\d{4})\), 295, 0\);]],
 			capture_group = 1,
 			offsets = {
@@ -771,7 +771,7 @@ return {
 		description = "Slots Random Results Table Local",
 		file = "casino_slots.c",
 		LEGACY = {
-			value = 1372,
+			value = 1379,
 			pattern = [[\w+ = func_\d+\(.*?(Local_\d{4})\.f_1\[.*?\]\[.*?Local_\d+\[0\]\], .*?Local_\d+?\.f_1\[.*?\]\[.*?Local_\d+\[1\]\], .*?Local_\d{4}\.f_1\[.*?\]\[.*?Local_\d+\[2\]\]\);]],
 			capture_group = 1
 		},
@@ -785,7 +785,7 @@ return {
 		description = "Slots Slot Machine State",
 		file = "casino_slots.c",
 		LEGACY = {
-			value = 1662,
+			value = 1669,
 			pattern = [[MISC::CLEAR_BIT\(&.*?(Local_\d{4}), 18\)]],
 			capture_group = 1
 		},
@@ -799,7 +799,7 @@ return {
 		description = "Prize Wheel Win State Local",
 		file = "casino_lucky_wheel.c",
 		LEGACY = {
-			value = 302,
+			value = 309,
 			pattern = [[(Local_\d{3})(\.f_\d{2}) =.*?Local_\d{3}\.f_\d{2} % 20]],
 			capture_group = 1,
 			offsets = {
@@ -825,7 +825,7 @@ return {
 		description = "Prize Wheel Prize State Offset",
 		file = "casino_lucky_wheel.c",
 		LEGACY = {
-			value = 302,
+			value = 309,
 			pattern = [[if \(.?(Local_\d{3})(\.f_..) >= 5 && .?Local_\d{3}\.f_\d{2} <= 12\)]],
 			capture_group = 1,
 			offsets = {
@@ -851,7 +851,7 @@ return {
 		description = "Casino Heist Planning Global",
 		file = "gb_casino_heist_planning.c",
 		LEGACY = {
-			value = 1971952,
+			value = 1972483,
 			pattern = [[!NETWORK::NETWORK_IS_PLAYER_ACTIVE\(Global_\d{7}\.f_\d{4}]],
 			capture_group = 1
 		},
@@ -899,7 +899,7 @@ return {
 		description = "FM Mission Controller Cart Grab Local",
 		file = "fm_mission_controller.c",
 		LEGACY = {
-			value = 10295,
+			value = 10311,
 			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d{5}\.f_\d+\), .?(Local_\d{5})(\.f_\d+\))]],
 			capture_group = 1,
 			offsets = {
@@ -927,7 +927,7 @@ return {
 		description = "Import/Export steal auto complete mission.",
 		file = "gb_vehicle_export.c",
 		LEGACY = {
-			value = 880,
+			value = 887,
 			pattern = [[.*?Local_(\d{3})\.f_(459)\s+=\s+\w+;]],
 			capture_group = 1,
 			offsets = {
@@ -1018,7 +1018,7 @@ return {
 		description = "business battles sell local",
 		file = "business_battles_sell.c",
 		LEGACY = {
-			value = 2386,
+			value = 2393,
 			pattern = [[if.*?Local_(\d{4})\.f_(\d{3}) -.*?Local_\d{4}\.f_(\d{3}) <= 1 && func_\d+\(28\)]],
 			capture_group = 1,
 			offsets = {
@@ -1084,7 +1084,7 @@ return {
 		description = "Request Services Global. Only used for Kosatka atm, same global for all services.",
 		file = "am_mp_submarine.c",
 		LEGACY = {
-			value = 2733002,
+			value = 2733190,
 			pattern = [[return Global_(\d{7})\.f_371;]],
 			capture_group = 1
 		},
@@ -1093,5 +1093,5 @@ return {
 			pattern = [[return Global_(\d{7})\.f_371;]],
 			capture_group = 1
 		}
-	},
+	}
 }
