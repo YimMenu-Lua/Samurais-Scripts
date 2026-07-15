@@ -71,7 +71,7 @@ def read_local_file(file_path: str) -> str:
     if not os.path.exists(file_path):
         print(f"Local file not found: {file_path}")
         sys.exit(1)
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, "r", encoding="utf-8", newline="\n") as f:
         return f.read()
 
 
@@ -112,7 +112,7 @@ def scan_entry(entry: dict, file_content: str, file_name: str):
     if not entry or "pattern" not in entry:
         return None
 
-    pattern = re.compile(entry["pattern"])
+    pattern = re.compile(entry["pattern"], re.DOTALL)
     capture_group = int(entry.get("capture_group", 0))
 
     for lineno, line in enumerate(file_content.splitlines(), 1):
@@ -186,17 +186,17 @@ def serialize_lua(v, indent=1):
 
 
 def generate(offsets_table: list, version: int, local: bool, path: str):
-    version_key = "LEGACY" if version == 0 else "ENHANCED"
+    branch_name = "ENHANCED" if version == 1 else "LEGACY"
 
     for name, data in offsets_table.items():
-        ver = data.get(version_key)
-        if not ver:
+        entry = data.get(branch_name)
+        if not entry:
             continue
 
-        print(f"\n--- Scanning for: {name} ({version_key}) ---")
+        print(f"\n--- Scanning for: {name} ({branch_name}) ---")
         file_name = data["file"]
         file_content = read_file(local, file_name, path, version)
-        result = scan_entry(ver, file_content, file_name)
+        result = scan_entry(entry, file_content, file_name)
         if not result:
             print(f"[MISS] {name} (pattern not found in {file_name})")
             continue
@@ -204,13 +204,13 @@ def generate(offsets_table: list, version: int, local: bool, path: str):
         print(f"[FOUND] {result['file']}:{result['lineno']} -> {result['match']}")
 
         if result["base_value"] is not None:
-            ver["value"] = result["base_value"]
+            entry["value"] = result["base_value"]
 
-        if "offsets" in ver and result["offset_values"]:
+        if "offsets" in entry and result["offset_values"]:
             for i, newv in enumerate(result["offset_values"]):
-                if newv is not None and i < len(ver["offsets"]):
-                    print(f"\tFound offset for {name} ({version_key}): .f_{newv}")
-                    ver["offsets"][i]["value"] = newv
+                if newv is not None and i < len(entry["offsets"]):
+                    print(f"\tFound offset for {name} ({branch_name}): .f_{newv}")
+                    entry["offsets"][i]["value"] = newv
 
 
 def main():
@@ -237,7 +237,7 @@ def main():
     diff_only = args.diff
 
     if isinstance(version, int) and isinstance(url, str):
-        REPO_URLS[version] = url
+        REPO_URLS[version] = url.removeprefix("/")
 
     if auto:
         generate(offsets_table, 0, False, "")

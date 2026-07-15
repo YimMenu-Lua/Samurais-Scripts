@@ -12,17 +12,18 @@ local SGSL = require("includes.services.SGSL")
 
 -- No this is not a typo. Double G's my G!
 --
--- Script globals stored and exposed globally. Can be used for caching as well *(though SGSL already does that)*
+-- Script globals stored and exposed globally. Can be used for caching as well *(though [SGSL](lua://SGSL) already does that)*
 ---@class GGlobals
----@field GPBD_FM_3 ScriptGlobal
----@field MP_BUSINESS_STUFF ScriptGlobal
----@field FM_SERVICES ScriptGlobal
-local GGlobals                = {}
-GGlobals.__index              = GGlobals
+---@field public GPBD ScriptGlobal
+---@field public GPBD_FM_3 ScriptGlobal
+---@field public MP_BUSINESS_STUFF ScriptGlobal
+---@field public FM_SERVICES ScriptGlobal
+local GGlobals   = {}
+GGlobals.__index = GGlobals
 
 -- Register globals here. Functions will be executed when GGlobals:init is called.
 ---@type array<function>
-local GlobalsRegistry <const> = {
+local func_array = {
 	function()
 		GGlobals.GPBD_FM_3 = SGSL:Get(SGSL.data.gpbd_fm_3):AsGlobal()
 	end,
@@ -35,7 +36,7 @@ local GlobalsRegistry <const> = {
 }
 
 function GGlobals:Init()
-	for _, func in ipairs(GlobalsRegistry) do
+	for _, func in ipairs(func_array) do
 		pcall(func)
 	end
 end

@@ -122,6 +122,7 @@ local Config <const> = {
 		},
 	},
 	features = {
+		unsafe_feats_enabled = false,
 		self = {
 			phone_anims = false,
 			mc_alt_bike_anims = false,
@@ -341,7 +342,6 @@ local Config <const> = {
 			sy_disable_rob_cd = false,
 			sy_disable_rob_weekly_cd = false,
 			sy_disable_tow_cd = false,
-			unsafe_feats_enabled = false,
 			office_clutter = {
 				auto_disable = false,
 				items = {

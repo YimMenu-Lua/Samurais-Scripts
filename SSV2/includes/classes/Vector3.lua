@@ -56,8 +56,8 @@ function vec3:unpack()
 	return self.x, self.y, self.z
 end
 
--- Returns a zero vector (0, 0, 0).
----@return vec3
+-- Returns a zero 3D vector.
+---@return vec3<0, 0, 0>
 function vec3:zero()
 	return vec3:new(0, 0, 0)
 end

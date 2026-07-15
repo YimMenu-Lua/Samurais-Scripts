@@ -64,14 +64,14 @@ do
 	}; setmetatable(nullptr, __null_mt); _G.nullptr = nullptr
 end
 
-local fMatrix44      = require("includes.classes.gta.fMatrix44")
-local newptr <const> = memory.pointer.new
+local fMatrix44 = require("includes.classes.gta.fMatrix44")
+-- local newptr <const> = memory.pointer.new
 
----@return pointer
-function memory.pointer:new(addr)
-	if (addr == 0) then return nullptr end
-	return newptr(self, addr)
-end
+-- ---@return pointer
+-- function memory.pointer:new(addr)
+-- 	if (addr == 0) then return nullptr end
+-- 	return newptr(self, addr)
+-- end
 
 -- Wrapper around `memory.allocate` that registers the allocated
 --

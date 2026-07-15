@@ -122,12 +122,12 @@ end
 --- Returns the coords and heading to either the Kosatka/Terrorbyte/MOC, whichever is called in.
 ---@return vec3, float
 local function getServiceVehicleCoords()
-	local ser_veh_global = SGSL:Get(SGSL.data.service_vehicles_global)
-	local pid_size = ser_veh_global:GetOffset(1)
-	local offset2 = ser_veh_global:GetOffset(2)
+	local gpbd       = SGSL:Get(SGSL.data.gpbd)
+	local pid_size   = gpbd:GetOffset(1)
+	local offset2    = gpbd:GetOffset(2)
 	local vec_offset = 13
 
-	local final = ser_veh_global:AsGlobal()
+	local final      = gpbd:AsGlobal()
 		:At(LocalPlayer:GetID(), pid_size)
 		:At(offset2)
 		:At(vec_offset)
@@ -137,9 +137,9 @@ end
 
 ---@return boolean
 local function isSubmarineSpawned()
-	local sub_global = SGSL:Get(SGSL.data.service_vehicles_global)
-	local pid_size = sub_global:GetOffset(1)
-	local offset2 = sub_global:GetOffset(2)
+	local sub_global = SGSL:Get(SGSL.data.gpbd)
+	local pid_size   = sub_global:GetOffset(1)
+	local offset2    = sub_global:GetOffset(2)
 	local sub_offset = 4
 	local sub_status = sub_global:AsGlobal()
 		:At(LocalPlayer:GetID(), pid_size)

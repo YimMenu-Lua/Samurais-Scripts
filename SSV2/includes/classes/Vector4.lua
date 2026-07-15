@@ -81,8 +81,8 @@ function vec4:unpack()
 	return self.x, self.y, self.z, self.w
 end
 
--- Returns a zero vector (0, 0, 0, 0).
----@return vec4
+-- Returns a zero 4D vector.
+---@return vec4<0, 0, 0, 0>
 function vec4:zero()
 	return vec4:new(0, 0, 0, 0)
 end

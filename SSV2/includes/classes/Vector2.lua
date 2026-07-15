@@ -72,8 +72,8 @@ function vec2:unpack()
 	return self.x, self.y
 end
 
--- Returns a zero vector (0, 0).
----@return vec2
+-- Returns a zero 2D vector.
+---@return vec2<0, 0>
 function vec2:zero()
 	return vec2:new(0, 0)
 end

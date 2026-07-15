@@ -38,7 +38,7 @@ function BusinessBase.new(opts)
 	local g_obj    = SGSL:Get(SGSL.data.mp_business_stuff)
 	local SG       = g_obj:AsGlobal()
 	local pid      = LocalPlayer:GetID() -- we're reading the player ID once but it's fine since YRV3 reloads on session switch anyway.
-	local pid_size = g_obj:GetOffset(1) -- Legacy: 880 / Enhanced: 883
+	local pid_size = g_obj:GetOffset(1) -- Legacy: 881 / Enhanced: 884
 	local offset   = g_obj:GetOffset(2) -- 260
 
 	return setmetatable({

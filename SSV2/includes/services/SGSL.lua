@@ -12,7 +12,7 @@
 -----------------------------------------------------
 -- SGSLTable
 -----------------------------------------------------
--- Represents each table in the globals_locals table.
+-- Represents each table in the [globals_locals](../data/globals_locals.lua) table.
 ---@class SGSLTable
 ---@field description string
 ---@field file string
@@ -71,7 +71,7 @@ function SGSLEntry:GetOffset(index)
 	return _t.value
 end
 
--- ---@generic T : ScriptGlobal | ScriptLocal
+-- ---@generic T : ScriptGlobal | ScriptLocal | unknown -- unknown silences "param-type-mismatch" which occurs when a class definition is annotated with a function overload.
 -- ---@param accessor T
 -- ---@return T
 -- function SGSLEntry:As(accessor)
@@ -83,15 +83,15 @@ end
 -- 	end
 -- end
 
---prefer explicit methods to keep me from punching a hole in my monitor
+-- Explicit casting.
 
--- Wraps the value in a `ScriptGlobal` object.
+-- Wraps the value in a [ScriptGlobal](lua://ScriptGlobal) object.
 ---@return ScriptGlobal
 function SGSLEntry:AsGlobal()
 	return ScriptGlobal(self.value)
 end
 
--- Wraps the value in a `ScriptLocal` object.
+-- Wraps the value in a [ScriptLocal](lua://ScriptLocal) object.
 ---@return ScriptLocal
 function SGSLEntry:AsLocal()
 	return ScriptLocal(self.value, self.script_name)
@@ -104,11 +104,11 @@ end
 -----------------------------------------------------
 -- SGSL
 -----------------------------------------------------
--- Fetches script globals, locals, and their offsets.
+-- Fetches script globals, locals, and their offsets *(if any)*.
 --
--- Provides methods to wrap globals/locals in an `Accessor` object instance *(ScriptGlobal/ScriptLocal)*.
+-- Provides methods to wrap globals/locals in an [Accessor](lua://Accessor) object instance *(ScriptGlobal/ScriptLocal)*.
 --
--- **NOTE:** The `Get` method throws on error. If you're not sure if it will succeed, wrap it in a protected call.
+-- **NOTE:** The [Get](lua://SGSL.Get) method throws on error. If you're not sure if it will succeed, wrap it in a protected call.
 --___
 -- **Usage Example:**
 --
@@ -138,11 +138,9 @@ function SGSL:Get(object)
 	local cached = self.m_cache[object]
 	if (cached) then return cached end
 
-	local objType = type(object)
-	assert(objType == "table", _F("Invalid object type. Table expected, got %s instead.", objType))
+	AssertArg(object, "#1", "table")
 
-	---@type SGSLEntry?
-	local entry = object[self.m_branch_key]
+	local entry = object[self.m_branch_key] ---@type SGSLEntry?
 	if (not entry) then
 		error("Failed to find a script global/script local entry!")
 	end
