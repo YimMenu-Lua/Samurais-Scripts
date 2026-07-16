@@ -199,10 +199,10 @@ def generate(offsets_table: list, version: int, local: bool, path: str):
         file_content = read_file(local, file_name, path, version)
         result = scan_entry(entry, file_content, file_name)
         if not result:
-            print(f"[MISS] {name} (pattern not found in {file_name})")
+            print(f"\033[31m[MISS] {name} (pattern not found in {file_name})\033[0m")
             continue
 
-        print(f"[FOUND] {result['file']}:{result['lineno']} -> {result.get('base_value', "NULL")}")
+        print(f"\033[32m[FOUND]\033[0m {result['file']}:{result['lineno']} -> {result.get('base_value', "NULL")}")
 
         if result["base_value"] is not None:
             entry["value"] = result["base_value"]

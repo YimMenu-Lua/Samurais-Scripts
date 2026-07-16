@@ -42,7 +42,7 @@ local DEFAULT_CONFIG <const> = require("includes.data.config")
 ---@type GAME_VERSION
 local GAME_VERSION <const>   = {
 	[Enums.eGameBranch.LEGACY]   = { build = "3889.0", online = "1.73" },
-	[Enums.eGameBranch.ENHANCED] = { build = "1013.34[outdated]", online = "1.72" },
+	[Enums.eGameBranch.ENHANCED] = { build = "1158.13", online = "1.73" },
 	[Enums.eGameBranch.MOCK]     = { build = "any", online = "any" },
 }
 

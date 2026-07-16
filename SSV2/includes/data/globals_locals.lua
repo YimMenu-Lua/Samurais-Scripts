@@ -288,12 +288,12 @@ return {
 		file = "fm_content_cargo.c",
 		LEGACY = {
 			value = 6030,
-			pattern = [[Position.*?0x21F25C.*?\n\{\n.*?return\s+func.*?Local_(\d{4}), \w+0\);]],
+			pattern = [[Position.*?0x21F25C[^\r\n]*\r?\n\s*\{\r?\n\s*return\s+func.*?Local_(\d{4}),\s*\w+0\);]],
 			capture_group = 1
 		},
 		ENHANCED = {
 			value = 6068,
-			pattern = [[Position.*?0x22F3DC.*?\n\{\n.*?return\s+func.*?Local_(\d{4}), \w+0\);]],
+			pattern = [[Position.*?0x22F3DC[^\r\n]*\r?\n\s*\{\r?\n\s*return\s+func.*?Local_(\d{4}),\s*\w+0\);]],
 			capture_group = 1
 		}
 	},
