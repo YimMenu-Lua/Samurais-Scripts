@@ -163,7 +163,8 @@ end
 
 ---@return boolean
 function Office:HasCargoWarehouse()
-	return self.m_subs[1] and self.m_subs[1]:IsValid()
+	local first = self.m_subs[1]
+	return first and first:IsValid() or false
 end
 
 ---@return integer
@@ -208,15 +209,15 @@ function Office:GetEarningsReport()
 end
 
 function Office:UpdateEarningsReport()
-	self.m_earnings_report                          = self.m_earnings_report or {}
-
-	local lifetime_earnings                         = stats.get_int("MPX_LIFETIME_CONTRA_EARNINGS")
-	self.m_earnings_report.lifetime_earnings        = lifetime_earnings
-	self.m_earnings_report.lifetime_earnings_fmt    = string.formatmoney(lifetime_earnings)
-	self.m_earnings_report.lifetime_buy_undertaken  = stats.get_int("MPX_LIFETIME_BUY_UNDERTAKEN")
-	self.m_earnings_report.lifetime_buy_completed   = stats.get_int("MPX_LIFETIME_BUY_COMPLETE")
-	self.m_earnings_report.lifetime_sell_undertaken = stats.get_int("MPX_LIFETIME_SELL_UNDERTAKEN")
-	self.m_earnings_report.lifetime_sell_completed  = stats.get_int("MPX_LIFETIME_SELL_COMPLETE")
+	local report_data                    = self.m_earnings_report or {}
+	local lifetime_earnings              = stats.get_int("MPX_LIFETIME_CONTRA_EARNINGS")
+	report_data.lifetime_earnings        = lifetime_earnings
+	report_data.lifetime_earnings_fmt    = string.formatmoney(lifetime_earnings)
+	report_data.lifetime_buy_undertaken  = stats.get_int("MPX_LIFETIME_BUY_UNDERTAKEN")
+	report_data.lifetime_buy_completed   = stats.get_int("MPX_LIFETIME_BUY_COMPLETE")
+	report_data.lifetime_sell_undertaken = stats.get_int("MPX_LIFETIME_SELL_UNDERTAKEN")
+	report_data.lifetime_sell_completed  = stats.get_int("MPX_LIFETIME_SELL_COMPLETE")
+	self.m_earnings_report               = report_data
 end
 
 ---@param index integer
