@@ -112,42 +112,43 @@ def scan_entry(entry: dict, file_content: str, file_name: str):
     if not entry or "pattern" not in entry:
         return None
 
-    pattern = re.compile(entry["pattern"], re.DOTALL)
+    pattern = re.compile(entry["pattern"])
     capture_group = int(entry.get("capture_group", 0))
+    match = pattern.search(file_content)
 
-    for lineno, line in enumerate(file_content.splitlines(), 1):
-        match = pattern.search(line)
-        if not match:
+    if not match:
+        return None
+
+    try:
+        target = match.group(capture_group)
+    except IndexError:
+        target = match.group(0)
+
+    lineno = file_content.count("\n", 0, match.start()) + 1
+    base_value = digits(target)
+    if base_value == 0:
+        return None
+    
+    offsets = []
+
+    for offset in entry.get("offsets", []):
+        if not offset or "value" not in offset:
+            offsets.append(None)
             continue
 
+        offset_capture_group = int(offset.get("capture_group", 0))
         try:
-            target = match.group(capture_group)
+            result = match.group(offset_capture_group)
         except IndexError:
-            target = match.group(0)
+            result = match.group(0)
+        offsets.append(digits(result))
 
-        base_value = digits(target)
-        offsets = []
-
-        for offset in entry.get("offsets", []):
-            if not offset or "value" not in offset:
-                offsets.append(None)
-                continue
-
-            offset_capture_group = int(offset.get("capture_group", 0))
-            try:
-                result = match.group(offset_capture_group)
-            except IndexError:
-                result = match.group(0)
-            offsets.append(digits(result))
-
-        return {
-            "file": file_name,
-            "lineno": lineno,
-            "match": match.group(0),
-            "base_value": base_value,
-            "offset_values": offsets,
-        }
-    return None
+    return {
+        "file": file_name,
+        "lineno": lineno,
+        "base_value": base_value,
+        "offset_values": offsets,
+    }
 
 
 def serialize_lua(v, indent=1):
@@ -201,7 +202,7 @@ def generate(offsets_table: list, version: int, local: bool, path: str):
             print(f"[MISS] {name} (pattern not found in {file_name})")
             continue
 
-        print(f"[FOUND] {result['file']}:{result['lineno']} -> {result['match']}")
+        print(f"[FOUND] {result['file']}:{result['lineno']} -> {result.get('base_value', "NULL")}")
 
         if result["base_value"] is not None:
             entry["value"] = result["base_value"]
