@@ -53,7 +53,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 2658294,
+			value = 2658296,
 			pattern = [[MISC::SET_BIT\(&\(Global_(\d{7})\[PLAYER::PLAYER_ID\(\) /\*(\d{3})\*/\]\.(f_\d{3})\.f_\d{1}\), 31\);]],
 			capture_group = 1,
 			offsets = {
@@ -85,7 +85,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 1892798,
+			value = 1893070,
 			pattern = [[\w+\(&\(Global_(\d{7})\[.*?/\*(\d+)\*/\]\.f_10\.f_343\), \w+, 64\);]],
 			capture_group = 1,
 			offsets = {
@@ -106,7 +106,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 1673814,
+			value = 1673820,
 			pattern = [[if.*?Global_\d{7}\[.*?\] != 0 && func_\w+\(.*?\) && \w+\)]],
 			capture_group = 1
 		}
@@ -134,7 +134,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 1950567,
+			value = 1951071,
 			pattern = [[else if \(Global_\w{7}\)]],
 			capture_group = 1
 		}
@@ -148,7 +148,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 1970664,
+			value = 1971195,
 			pattern = [[if \(MISC::IS_STRING_NULL_OR_EMPTY\(\w+\) \|\| (Global_\w{7}) ==.*?\)]],
 			capture_group = 1
 		}
@@ -173,12 +173,12 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 1845299,
+			value = 1845347,
 			pattern = [[Global_(\d{7})\[.*? /\*(\d+)\*/\]\.(f_\d{3}).f_\d{3}\[.*? /\*\d+\*/\].f_9 = .*?;]],
 			capture_group = 1,
 			offsets = {
 				{
-					value = 883,
+					value = 884,
 					capture_group = 2,
 					description = "playerID read size."
 				},
@@ -198,7 +198,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 2709086,
+			value = 2709197,
 			pattern = [[Global_(\d{7})\[.*?\] =.*?Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
 			capture_group = 1
 		}
@@ -219,7 +219,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 2709097,
+			value = 2709208,
 			pattern = [[Global_(\d{7})\[.*?\] = Global_\d{7}\[.*?\] +.*?Global_(\d{7})\.(f_1)\[.*?\] - .*?;]],
 			capture_group = 2,
 			offsets = {
@@ -252,12 +252,12 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 1882717,
+			value = 1882797,
 			pattern = [[Global_(\d{7})\[.*?/\*(\d{3})\*/\]\.f_(\d{3})\.f_27\.f_2 = \w+0;]],
 			capture_group = 1,
 			offsets = {
 				{
-					value = 315,
+					value = 321,
 					capture_group = 2,
 					description = "player id read size"
 				},
@@ -278,7 +278,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 627,
+			value = 634,
 			pattern = [[switch \(.*?Local_(\d{3})\.f_5]],
 			capture_group = 1
 		}
@@ -312,7 +312,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 6112,
+			value = 6151,
 			pattern = [[if \(.*?(Local_6\d{3})\.(f_1\d{3}) == 0]],
 			capture_group = 1,
 			offsets = {
@@ -332,7 +332,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 569,
+			value = 576,
 			pattern = [[MISC::CLEAR_BIT\(&\(.*?Local_(\d{3})\.f_\d{1,2}\), \w+0]],
 			capture_group = 1
 		}
@@ -353,7 +353,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 731,
+			value = 738,
 			pattern = [[.*?Local_(\d{3})\.f_(\d{3}) = func_\w+\(-1\);]],
 			capture_group = 1,
 			offsets = {
@@ -381,7 +381,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 731,
+			value = 738,
 			pattern = [[else if \(!func_\w+\(.*?\) &&.*?(Local_\d{3})(\.f_\d{3}) > 0\)]],
 			capture_group = 1,
 			offsets = {
@@ -408,7 +408,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 1991,
+			value = 1998,
 			pattern = [[for \(i = 0; i < func_\w{2}\(func_\w{4}\(\), func_\w{2}\(\), .*?(Local_\d{4})\.(f_\d{4}), -1\); i = i \+ 1\)]],
 			capture_group = 1,
 			offsets = {
@@ -434,7 +434,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 1991,
+			value = 1998,
 			pattern = [[if .*?(Local_\d{4})\.(f_\d{4}) > 0 && func_.*?&.*?Local_\d{4}\.f_\d{4}\), 30000, \w+]],
 			capture_group = 1,
 			offsets = {
@@ -454,7 +454,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 1268,
+			value = 1275,
 			pattern = [[Local_1\d{3}\.f_\d{3} = func_\w+\(func_\w+\(\),.*?(Local_1\d{3})\.(f_\d{3}), \w+, -1\);]],
 			capture_group = 1
 		}
@@ -474,7 +474,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 1268,
+			value = 1275,
 			pattern = [[func_\w+\(.*?Local_(\d{4})\.f_(\d{3}), \w+, "GR_HUD_TOT".*?, 255, 0\);]],
 			capture_group = 1,
 			offsets = {
@@ -500,7 +500,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 1268,
+			value = 1275,
 			pattern = [[for \(i = 0; i < func_\w+\(func_\w+\(\), func_\w+\(\),.*?(Local_\d{4})(\.f_\d{3}),.*?Local_\d{4}\.f_\d{3}\); i = i \+ 1\)]],
 			capture_group = 1,
 			offsets = {
@@ -526,7 +526,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 146,
+			value = 153,
 			pattern = [[if \(.*?Local_(\d{3})\.f_(\d{1}) !=.*?Local_\d{3}\.f_\d{4}\[0 /\*6\*/\]\.f_2\)]],
 			capture_group = 1,
 			offsets = {
@@ -552,7 +552,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 5725,
+			value = 5760,
 			pattern = [[if \(.*?Local_(5\d{3})(\.f_\d{4}) == 0\)]],
 			capture_group = 1,
 			offsets = {
@@ -572,7 +572,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 5599,
+			value = 5634,
 			pattern = [[func_\w{3}\(&.?(Local_5\d+), \w+\)]],
 			capture_group = 1
 		}
@@ -592,7 +592,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 773,
+			value = 780,
 			pattern = [[if \(.*?Local_(\d{3})\[.*? /\*(\d+)\*/\]\.f_\d+ ==.*?&&.*?Local_\d{3}\[.*?\]\.f_\d+ > 0 \|\| .*?Local_\d{3}\[.*?\]\.f_\d+ > 0\)]],
 			capture_group = 1,
 			offsets = {
@@ -619,7 +619,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 140,
+			value = 147,
 			pattern = [[STREAMING::REQUEST_MODEL\(func_\d+\(.*?Local_(\d{3})(\.f_\d{3})\[.*?\]\.f_\d+\[.*?\], .*?Local_\d{4}\.f_\d+\)\);]],
 			capture_group = 1,
 			offsets = {
@@ -661,7 +661,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 1062,
+			value = 1069,
 			pattern = [[if \(.*?(Local_\d{4})(\.f_\d{3})\.f_\d+\[.*?\] !=.*?Local_\d{3}\.f_\d+\[PLAYER::PLAYER_ID\(\) .*?\]\.f_1\[.*?\]\)]],
 			capture_group = 1,
 			offsets = {
@@ -688,7 +688,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 1800,
+			value = 1807,
 			pattern = [[if \(.*?Local_\d{4}\[.*?/\*(\d+)\*/\]\.f_\d+ == \w+ && \w+\(.*?Local_\d{4}\[.*?\], \d+\)\)]],
 			capture_group = 2,
 			offsets = {
@@ -714,7 +714,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 140,
+			value = 147,
 			pattern = [[if \(func_\w+\(.*?(Local_\d{3})(\.f_\d{3})\[.*?\]\) == 10 \|\| func_\d+\(.*?Local_\d{3}\.f_\d{3}\[.*?\]\) == 11\)]],
 			capture_group = 1,
 			offsets = {
@@ -741,7 +741,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 148,
+			value = 155,
 			pattern = [[NETWORK::NETWORK_REGISTER_HOST_BROADCAST_VARIABLES\(&\(.*?(Local_\d{3})(\.f_\d{4})\), 295, 0\);]],
 			capture_group = 1,
 			offsets = {
@@ -776,7 +776,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 1374,
+			value = 1381,
 			pattern = [[\w+ = func_\d+\(.*?(Local_\d{4})\.f_1\[.*?\]\[.*?Local_\d+\[0\]\], .*?Local_\d+?\.f_1\[.*?\]\[.*?Local_\d+\[1\]\], .*?Local_\d{4}\.f_1\[.*?\]\[.*?Local_\d+\[2\]\]\);]],
 			capture_group = 1
 		}
@@ -790,7 +790,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 1664,
+			value = 1671,
 			pattern = [[MISC::CLEAR_BIT\(&.*?(Local_\d{4}), 18\)]],
 			capture_group = 1
 		}
@@ -810,7 +810,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 304,
+			value = 311,
 			pattern = [[(Local_\d{3})(\.f_\d{2}) =.*?Local_\d{3}\.f_\d{2} % 20]],
 			capture_group = 1,
 			offsets = {
@@ -836,7 +836,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 304,
+			value = 311,
 			pattern = [[if \(.?(Local_\d{3})(\.f_..) >= 5 && .?Local_\d{3}\.f_\d{2} <= 12\)]],
 			capture_group = 1,
 			offsets = {
@@ -856,7 +856,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 1973231,
+			value = 1973762,
 			pattern = [[!NETWORK::NETWORK_IS_PLAYER_ACTIVE\(Global_\d{7}\.f_\d{4}]],
 			capture_group = 1
 		}
@@ -911,7 +911,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 10697,
+			value = 10713,
 			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d{5}\.f_\d+\), .?(Local_\d{5})(\.f_\d+\))]],
 			capture_group = 1,
 			offsets = {
@@ -939,7 +939,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 882,
+			value = 889,
 			pattern = [[.*?Local_(\d{3})\.f_(459)\s+=\s+\w+;]],
 			capture_group = 1,
 			offsets = {
@@ -1035,7 +1035,7 @@ return {
 			}
 		},
 		ENHANCED = {
-			value = 2388,
+			value = 2395,
 			pattern = [[if.*?Local_(\d{4})\.f_(\d{3}) -.*?Local_\d{4}\.f_(\d{3}) <= 1 && func_\d+\(28\)]],
 			capture_group = 1,
 			offsets = {
@@ -1089,7 +1089,7 @@ return {
 			capture_group = 1
 		},
 		ENHANCED = {
-			value = 2733138,
+			value = 2733326,
 			pattern = [[return Global_(\d{7})\.f_371;]],
 			capture_group = 1
 		}
