@@ -1,6 +1,8 @@
 -- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
 -- This file is part of Samurai's Scripts.
 --
+-- Original Author: gir489/spankerincrease
+--
 -- Permission is hereby granted to copy, modify, and redistribute
 -- this code as long as you respect these conditions:
 --	* Credit the owner and contributors.
@@ -8,60 +10,39 @@
 
 
 local CasinoPacino = require("includes.features.online.CasinoPacino")
-local SGSL         = require("includes.services.SGSL")
 local casino_pos   = vec3:new(924.6380, 46.6918, 81.1063)
-local heist_guns   = {
-	{ --Karl Abolaji
-		{ '##1", "##2' },
-		{ "Micro SMG Loadout", "Machine Pistol Loadout" },
-		{ "Micro SMG Loadout", "Shotgun Loadout" },
-		{ "Shotgun Loadout",   "Revolver Loadout" }
-	},
-	{ --Gustavo Fring
-		{ '##1", "##2' },
-		{ "Rifle Loadout", "Shotgun Loadout" },
-		{ "Rifle Loadout", "Shotgun Loadout" },
-		{ "Rifle Loadout", "Shotgun Loadout" },
-	},
-	{ --Charlie Reed
-		{ '##1", "##2' },
-		{ "SMG Loadout",            "Shotgun Loadout" },
-		{ "Machine Pistol Loadout", "Shotgun Loadout" },
-		{ "SMG Loadout",            "Shotgun Loadout" }
-	},
-	{ --Chester McCoy
-		{ '##1", "##2' },
-		{ "MK II Shotgun Loadout", "MK II Rifle Loadout" },
-		{ "MK II SMG Loadout",     "MK II Rifle Loadout" },
-		{ "MK II Shotgun Loadout", "MK II Rifle Loadout" }
-	},
-	{ --Laddie Paddie Sadie Enweird
-		{ '##1", "##2' },
-		{ "Combat PDW Loadout", "Rifle Loadout" },
-		{ "Shotgun Loadout",    "Rifle Loadout" },
-		{ "Shotgun Loadout",    "Combat MG Loadout" }
-	}
-}
-local heist_cars   = {
-	{ --Karim Deniz
-		"Issi Classic", "Asbo", "Kanjo", "Sentinel Classic"
-	},
-	{ --Taliana Martinez
-		"Retinue MK II", "Drift Yosemite", "Sugoi", "Jugular"
-	},
-	{ --Eddie Toh
-		"Sultan Classic", "Guantlet Classic", "Ellie", "Komoda"
-	},
-	{ --Zach Nelson
-		"Manchez", "Stryder", "Defiler", "Lectro"
-	},
-	{ --Chester McCoy
-		"Zhaba", "Vagrant", "Outlaw", "Everon"
-	},
+local prizeBtnSize = vec2:new(0, 32)
+
+---@type dict<eCasinoPrize>
+local prizeLabels  = {
+	["CP_LUCKY_WHEEL_GIVE_VEHICLE"]  = Enums.eCasinoPrize.VEHICLE,
+	["CP_LUCKY_WHEEL_GIVE_MYSTERY"]  = Enums.eCasinoPrize.MYSTERY,
+	["CP_LUCKY_WHEEL_GIVE_CASH"]     = Enums.eCasinoPrize.CASH,
+	["CP_LUCKY_WHEEL_GIVE_CHIPS"]    = Enums.eCasinoPrize.CHIPS,
+	["CP_LUCKY_WHEEL_GIVE_RP"]       = Enums.eCasinoPrize.RP,
+	["CP_LUCKY_WHEEL_GIVE_DISCOUNT"] = Enums.eCasinoPrize.DISCOUNT,
+	["CP_LUCKY_WHEEL_GIVE_CLOTHING"] = Enums.eCasinoPrize.CLOTHING,
+	["CP_LUCKY_WHEEL_GIVE_SURPRISE"] = Enums.eCasinoPrize.RANDOM,
 }
 
-local function drawGamblingTab()
-	local cfg = GVars.features.dunk
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Casino Pacino", function()
+	if (not Game.IsOnline()) then
+		ImGui.Text(_T("GENERIC_UNAVAILABLE_SP"))
+		return
+	end
+
+	if (not Backend:IsUpToDate()) then
+		ImGui.Text(_T("GENERIC_OUTDATED"))
+		return
+	end
+
+	ImGui.SetWindowFontScale(1.3)
+	ImGui.Text("Casino Pacino")
+	ImGui.SetWindowFontScale(0.89)
+	ImGui.Text("It's not Al anymore, it's DUNK!")
+	ImGui.SetWindowFontScale(1.0)
+	ImGui.Separator()
+
 
 	if (GUI:Button(_T("CP_TP_CASINO"))) then
 		LocalPlayer:Teleport(casino_pos)
@@ -73,7 +54,12 @@ local function drawGamblingTab()
 		Game.SetWaypointCoords(casino_pos)
 	end
 
+	ImGui.Separator()
+	ImGui.Spacing()
+
 	GUI:HeaderText(_T("CP_COOLDOWN_BYPASS"), { separator = true, spacing = true })
+
+	local cfg = GVars.features.dunk
 	cfg.bypass_casino_bans = GUI:CustomToggle(_T("CP_COOLDOWN_BYPASS_ENABLE"), cfg.bypass_casino_bans, {
 		tooltip = _T("CP_COOLDOWN_BYPASS_TOOLTIP"),
 		color   = Color.RED
@@ -85,8 +71,7 @@ local function drawGamblingTab()
 
 	GUI:HeaderText(_T("CP_POKER_SETTINGS"), { separator = true, spacing = true })
 
-	cfg.force_poker_cards = GUI:CustomToggle(_T("CP_POKER_FORCE_ROYAL_FLUSH"), cfg.force_poker_cards)
-
+	cfg.force_poker_cards       = GUI:CustomToggle(_T("CP_POKER_FORCE_ROYAL_FLUSH"), cfg.force_poker_cards)
 	cfg.set_dealers_poker_cards = GUI:CustomToggle(_T("CP_POKER_FORCE_BAD_BEAT"), cfg.set_dealers_poker_cards)
 
 	GUI:HeaderText(_T("CP_BLACKJACK_SETTINGS"), { separator = true, spacing = true })
@@ -106,23 +91,19 @@ local function drawGamblingTab()
 	GUI:HeaderText(_T("CP_SLOT_MACHINES_SETTINGS"), { separator = true, spacing = true })
 
 	cfg.rig_slot_machine = GUI:CustomToggle(_T("CP_SLOT_MACHINES_RIG"), cfg.rig_slot_machine)
-
-	cfg.autoplay_slots = GUI:CustomToggle(_T("CP_SLOT_MACHINES_AUTOPLAY"), cfg.autoplay_slots)
+	cfg.autoplay_slots   = GUI:CustomToggle(_T("CP_SLOT_MACHINES_AUTOPLAY"), cfg.autoplay_slots)
 
 	if (cfg.autoplay_slots) then
 		cfg.cap_slot_machine_chips = GUI:CustomToggle(_T("CP_SLOT_MACHINES_CAP_CHIPS"), cfg.cap_slot_machine_chips)
 
 		if (cfg.cap_slot_machine_chips) then
 			ImGui.SameLine()
-			ImGui.PushItemWidth(200)
 			cfg.slot_machine_cap = ImGui.SliderInt("##chips_cap", cfg.slot_machine_cap, 1e3, 1e5)
-			ImGui.PopItemWidth()
 		end
 
 		ImGui.Text(_T("CP_AUTOPLAY_SLOTS_TIME_DELAY"))
 		ImGui.SameLine()
 		if (not cfg.autoplay_slots_delay_random) then
-			ImGui.PushItemWidth(200)
 			cfg.autoplay_slots_delay = ImGui.SliderInt("##delay_time", cfg.autoplay_slots_delay, 500, 1e4, "%d ms")
 			ImGui.SameLine()
 		end
@@ -132,270 +113,25 @@ local function drawGamblingTab()
 
 	GUI:HeaderText(_T("CP_LUCKY_WHEEL_SETTINGS"), { separator = true, spacing = true })
 
-	---@type dict<eCasinoPrize>
-	local labels = {
-		[_T("CP_LUCKY_WHEEL_GIVE_VEHICLE")]  = Enums.eCasinoPrize.VEHICLE,
-		[_T("CP_LUCKY_WHEEL_GIVE_MYSTERY")]  = Enums.eCasinoPrize.MYSTERY,
-		[_T("CP_LUCKY_WHEEL_GIVE_CASH")]     = Enums.eCasinoPrize.CASH,
-		[_T("CP_LUCKY_WHEEL_GIVE_CHIPS")]    = Enums.eCasinoPrize.CHIPS,
-		[_T("CP_LUCKY_WHEEL_GIVE_RP")]       = Enums.eCasinoPrize.RP,
-		[_T("CP_LUCKY_WHEEL_GIVE_DISCOUNT")] = Enums.eCasinoPrize.DISCOUNT,
-		[_T("CP_LUCKY_WHEEL_GIVE_CLOTHING")] = Enums.eCasinoPrize.CLOTHING,
-		[_T("CP_LUCKY_WHEEL_GIVE_SURPRISE")] = Enums.eCasinoPrize.RANDOM,
-	}
-
-	local maxwidth = 0
-	local padding = ImGui.GetStyle().FramePadding.x * 4 -- double padding
-	for label in pairs(labels) do
-		local width = ImGui.CalcTextSize(label) + padding
-		if (width > maxwidth) then
-			maxwidth = width
+	if (prizeBtnSize.x == 0) then
+		for key in pairs(prizeLabels) do
+			local width = ImGui.CalcTextSize(_T(key)) + (ImGui.GetStyle().FramePadding.x * 4)
+			if (width > prizeBtnSize.x) then
+				prizeBtnSize.x = width
+			end
 		end
 	end
 
 	local btnIdx = 1
-	for label, prizeID in pairs(labels) do
-		if (GUI:Button(label, { size = vec2:new(maxwidth, 32) })) then
+	for label, prizeID in pairs(prizeLabels) do
+		if (GUI:Button(_T(label), { size = prizeBtnSize })) then
 			CasinoPacino:GiveWheelPrize(prizeID)
 		end
-		if (btnIdx % 2 ~= 0) then
+
+		if ((btnIdx & 1) == 1) then
 			ImGui.SameLine()
 		end
+
 		btnIdx = btnIdx + 1
 	end
-end
-
-local function drawHeistTab()
-	local arcade = CasinoPacino:GetOwnedArcade()
-	if (not arcade) then
-		ImGui.Text(_T("CP_ARCADE_NOT_OWNED"))
-		return
-	end
-
-	if (GUI:Button(_T("CP_TP_ARCADE"))) then
-		LocalPlayer:Teleport(arcade.coords)
-	end
-
-	ImGui.SameLine()
-
-	if (GUI:Button(_T("GENERIC_SET_WAYPOINT"))) then
-		Game.SetWaypointCoords(arcade.coords)
-	end
-
-	local casino_heist_approach      = stats.get_int("MPX_H3OPT_APPROACH")
-	local casino_heist_target        = stats.get_int("MPX_H3OPT_TARGET")
-	local casino_heist_last_approach = stats.get_int("MPX_H3_LAST_APPROACH")
-	local casino_heist_hard          = stats.get_int("MPX_H3_HARD_APPROACH")
-	local casino_heist_gunman        = stats.get_int("MPX_H3OPT_CREWWEAP")
-	local casino_heist_driver        = stats.get_int("MPX_H3OPT_CREWDRIVER")
-	local casino_heist_hacker        = stats.get_int("MPX_H3OPT_CREWHACKER")
-	local casino_heist_weapons       = stats.get_int("MPX_H3OPT_WEAPS")
-	local casino_heist_cars          = stats.get_int("MPX_H3OPT_VEHS")
-	local casino_heist_masks         = stats.get_int("MPX_H3OPT_MASKS")
-
-	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
-	ImGui.PushItemWidth(200)
-
-	local new_approach, approach_clicked = ImGui.Combo(_T("CP_HEIST_APPROACH"),
-		casino_heist_approach,
-		{ "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" },
-		4
-	)
-
-	if (approach_clicked) then
-		stats.set_int("MPX_H3OPT_APPROACH", new_approach)
-	end
-
-	local new_last_approach, last_approach_clicked = ImGui.Combo(
-		_T("CP_HEIST_LAST_APPROACH"),
-		casino_heist_last_approach,
-		{ "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" },
-		4
-	)
-
-	if (last_approach_clicked) then
-		stats.set_int("MPX_H3_LAST_APPROACH", new_last_approach)
-	end
-
-	local new_hard_approach, hard_approach_clicked = ImGui.Combo(
-		_T("CP_HEIST_HARD_APPROACH"),
-		casino_heist_hard,
-		{ "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" },
-		4
-	)
-
-	if (hard_approach_clicked) then
-		stats.set_int("MPX_H3_HARD_APPROACH", new_hard_approach)
-	end
-
-	local new_target, target_clicked = ImGui.Combo(
-		_T("CP_HEIST_TARGET"),
-		casino_heist_target,
-		{ "Money", "Gold", "Art", "Diamonds" },
-		4
-	)
-
-	if (target_clicked) then
-		stats.set_int("MPX_H3OPT_TARGET", new_target)
-	end
-
-	local new_gunman, gunman_clicked = ImGui.Combo(
-		_T("CP_HEIST_GUNMAN"),
-		casino_heist_gunman,
-		{ "Unselected", "Karl Abolaji", "Gustavo Mota", "Charlie Reed", "Chester McCoy", "Patrick McReary" },
-		6
-	)
-
-	if (gunman_clicked) then
-		stats.set_int("MPX_H3OPT_CREWWEAP", new_gunman)
-	end
-
-	if (new_gunman > 0) then
-		local new_weapons, weapons_clicked = ImGui.Combo(
-			_T("CP_HEIST_WEAPONS"),
-			casino_heist_weapons,
-			heist_guns[new_gunman][casino_heist_approach + 1],
-			2
-		)
-		if (weapons_clicked) then
-			stats.set_int("MPX_H3OPT_WEAPS", new_weapons)
-		end
-	end
-
-	local new_driver, driver_clicked = ImGui.Combo(
-		_T("CP_HEIST_DRIVER"),
-		casino_heist_driver,
-		{
-			"Unselected",
-			"Karim Deniz",
-			"Taliana Martinez",
-			"Eddie Toh",
-			"Zach Nelson",
-			"Chester McCoy"
-		},
-		6
-	)
-	if (driver_clicked) then
-		stats.set_int("MPX_H3OPT_CREWDRIVER", new_driver)
-	end
-
-	if (new_driver > 0) then
-		local new_car, car_clicked = ImGui.Combo(
-			_T("CP_HEIST_GETAWAY_VEHS"),
-			casino_heist_cars,
-			heist_cars[new_driver],
-			4
-		)
-		if (car_clicked) then
-			stats.set_int("MPX_H3OPT_VEHS", new_car)
-		end
-	end
-
-	local new_hacker, hacker_clicked = ImGui.Combo(
-		_T("CP_HEIST_HACKER"),
-		casino_heist_hacker,
-		{ "Unselected", "Rickie Lukens", "Christian Feltz", "Yohan Blair", "Avi Schwartzman", "Page Harris" },
-		6
-	)
-	if (hacker_clicked) then
-		stats.set_int("MPX_H3OPT_CREWHACKER", new_hacker)
-	end
-
-	local new_masks, masks_clicked = ImGui.Combo(
-		_T("CP_HEIST_MASKS"),
-		casino_heist_masks,
-		{
-			"Unselected",
-			"Geometric Set",
-			"Hunter Set",
-			"Oni Half Mask Set",
-			"Emoji Set",
-			"Ornate Skull Set",
-			"Lucky Fruit Set",
-			"Gurilla Set",
-			"Clown Set",
-			"Animal Set",
-			"Riot Set",
-			"Oni Set",
-			"Hockey Set"
-		},
-		13
-	)
-	if (masks_clicked) then
-		stats.set_int("MPX_H3OPT_MASKS", new_masks)
-	end
-
-	ImGui.PopItemWidth()
-	GUI:HeaderText(_T("GENERIC_OPTIONS_LABEL"), { separator = true, spacing = true })
-
-	GVars.features.dunk.ch_cart_autograb = GUI:CustomToggle(_T("CP_HEIST_AUTOGRAB"), GVars.features.dunk.ch_cart_autograb)
-
-	-- this serves as a "cooldown disabler" as well because you need to reset it anyway to be able to replay
-	-- so we don't need a separate cooldown button or checkbox
-	if (GUI:Button(_T("CP_HEIST_UNLOCK_ALL"))) then
-		stats.set_int("MPX_H3OPT_ACCESSPOINTS", -1)
-		stats.set_int("MPX_H3OPT_POI", -1)
-		stats.set_int("MPX_H3OPT_BITSET0", -1)
-		stats.set_int("MPX_H3OPT_BITSET1", -1)
-		stats.set_int("MPX_H3OPT_BODYARMORLVL", 3)
-		stats.set_int("MPX_H3OPT_DISRUPTSHIP", 3)
-		stats.set_int("MPX_H3OPT_KEYLEVELS", 2)
-		stats.set_int("MPX_H3_COMPLETEDPOSIX", 0)
-		stats.set_int("MPX_CAS_HEIST_FLOW", -1)
-		stats.set_int("MPPLY_H3_COOLDOWN", 0)
-		stats.set_packed_stat_bool(26969, true) --Unlock High Roller
-	end
-
-	if (GUI:Button(_T("CP_HEIST_ZERO_AI_CUTS"))) then
-		tunables.set_int("CH_LESTER_CUT", 0)
-		tunables.set_int("HEIST3_PREPBOARD_GUNMEN_KARL_CUT", 0)
-		tunables.set_int("HEIST3_PREPBOARD_GUNMEN_GUSTAVO_CUT", 0)
-		tunables.set_int("HEIST3_PREPBOARD_GUNMEN_CHARLIE_CUT", 0)
-		tunables.set_int("HEIST3_PREPBOARD_GUNMEN_CHESTER_CUT", 0)
-		tunables.set_int("HEIST3_PREPBOARD_GUNMEN_PATRICK_CUT", 0)
-		tunables.set_int("HEIST3_DRIVERS_KARIM_CUT", 0)
-		tunables.set_int("HEIST3_DRIVERS_TALIANA_CUT", 0)
-		tunables.set_int("HEIST3_DRIVERS_EDDIE_CUT", 0)
-		tunables.set_int("HEIST3_DRIVERS_ZACH_CUT", 0)
-		tunables.set_int("HEIST3_DRIVERS_CHESTER_CUT", 0)
-		tunables.set_int("HEIST3_HACKERS_CHRISTIAN_CUT", 0)
-		tunables.set_int("HEIST3_HACKERS_YOHAN_CUT", 0)
-		tunables.set_int("HEIST3_HACKERS_AVI_CUT", 0)
-		tunables.set_int("HEIST3_HACKERS_RICKIE_CUT", 0)
-		tunables.set_int("HEIST3_HACKERS_PAIGE_CUT", 0)
-		tunables.set_int("HEIST3_FINALE_CLEAN_VEHICLE", 0)
-		tunables.set_int("HEIST3_FINALE_DECOY_GUNMAN", 0)
-	end
-
-	if (GUI:Button(_T("CP_HEIST_MAX_PLAYER_CUTS"))) then
-		local offset        = SGSL:Get(SGSL.data.gb_casino_heist_planning_cut_offset):GetValue()
-		local heistPlanning = SGSL:Get(SGSL.data.gb_casino_heist_planning):AsGlobal():At(offset)
-		for i = 1, 4, 1 do
-			heistPlanning:At(i):WriteInt(100)
-		end
-	end
-end
-
-GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Casino Pacino", function()
-	if (not Game.IsOnline()) then
-		ImGui.Text(_T("GENERIC_UNAVAILABLE_SP"))
-		return
-	end
-
-	if (not Backend:IsUpToDate()) then
-		ImGui.Text(_T("GENERIC_OUTDATED"))
-		return
-	end
-
-	ImGui.BeginTabBar("##dunkBar")
-	if (ImGui.BeginTabItem(_T("CASINO_GAMBLING_TAB"))) then
-		drawGamblingTab()
-		ImGui.EndTabItem()
-	end
-
-	if (ImGui.BeginTabItem(_T("CP_CASINO_HEIST_TAB"))) then
-		drawHeistTab()
-		ImGui.EndTabItem()
-	end
-	ImGui.EndTabBar()
 end)

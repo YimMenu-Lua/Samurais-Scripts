@@ -71,6 +71,13 @@ GenericClass = setmetatable({}, {
 ---@class handle: integer
 -- RAGE JOAAT hash
 ---@class hash: joaat_t
+---@class GXT : string -- A GTA label.
+
+---@class Int4
+---@field [1] integer
+---@field [2] integer
+---@field [3] integer
+---@field [4] integer
 
 ---@class Float4
 ---@field [1] float

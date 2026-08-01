@@ -87,7 +87,7 @@ selfTab:AddBoolCommand("SELF_AUTOHEAL",
 		gvar_key        = "features.self.autoheal.enabled",
 		translate_label = true,
 		meta            = { description = "SELF_AUTOHEAL_TT" },
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.self.autoheal.enabled
 			end,
@@ -186,7 +186,7 @@ selfTab:AddBoolCommand("SELF_ROD",
 			GVars.features.self.clumsy = false
 			CheckIfRagdollBlocked()
 		end,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.self.rod
 			end,
@@ -207,7 +207,7 @@ selfTab:AddBoolCommand("SELF_CLUMSY",
 			GVars.features.self.rod = false
 			CheckIfRagdollBlocked()
 		end,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.self.clumsy
 			end,
@@ -231,7 +231,7 @@ selfTab:AddBoolCommand("SELF_LASER_SIGHTS",
 		gvar_key        = "features.weapon.laser_sights.enabled",
 		translate_label = true,
 		meta            = { description = "SELF_LASER_SIGHTS_TT" },
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.weapon.laser_sights.enabled
 			end,
@@ -248,7 +248,7 @@ selfTab:AddBoolCommand("SELF_KATANA",
 		gvar_key        = "features.weapon.katana.enabled",
 		translate_label = true,
 		meta            = { description = "SELF_KATANA_TT" },
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.weapon.katana.enabled
 			end,

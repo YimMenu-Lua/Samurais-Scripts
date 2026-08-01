@@ -13,7 +13,7 @@
 ---@field opts CommandMeta
 
 
-local YRV3 = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local BusinessMgr = require("includes.features.online.business_mgr.BusinessManager")
 
 ---@param msg string
 local function notify_err(msg)
@@ -48,7 +48,7 @@ return {
 				return
 			end
 
-			YRV3:FillAllSafes()
+			BusinessMgr:FillAllSafes()
 		end,
 		opts     = { description = "Fills all owned safes." }
 	},
@@ -59,7 +59,7 @@ return {
 				return
 			end
 
-			YRV3:CommandFinishSale()
+			BusinessMgr:CommandFinishSale()
 		end,
 		opts     = { description = "Automatically finishes any sale mission you have at the moment (limited to missions supported by YRV3)." }
 	},
@@ -70,7 +70,7 @@ return {
 				return
 			end
 
-			YRV3:FillAll()
+			BusinessMgr:FillAll()
 		end,
 		opts     = { description = "Restocks all your owned businesses." }
 	},
@@ -81,7 +81,7 @@ return {
 				return
 			end
 
-			YRV3:CommandHangarAutoFill()
+			BusinessMgr:CommandHangarAutoFill()
 		end,
 		opts     = { description = "Restocks your hangar." }
 	},
@@ -92,7 +92,7 @@ return {
 				return
 			end
 
-			local office = YRV3:GetOffice()
+			local office = BusinessMgr:GetOffice()
 			if (not office) then
 				notify_err(_T("YRV3_CEO_OFFICE_NOT_OWNED"))
 				return
@@ -106,7 +106,7 @@ return {
 					end
 				end
 			elseif (type(arg) == "number") then
-				YRV3:CommandWarehouseAutoFill(arg)
+				BusinessMgr:CommandWarehouseAutoFill(arg)
 			else
 				notify_err("Invalid command argument!")
 			end
@@ -127,10 +127,10 @@ return {
 			local arg = args[1]
 			if (type(arg) == "string" and arg == "all") then
 				for i = 1, 7 do
-					YRV3:CommandFactoryRestock(i)
+					BusinessMgr:CommandFactoryRestock(i)
 				end
 			elseif (type(arg) == "number") then
-				YRV3:CommandFactoryRestock(arg)
+				BusinessMgr:CommandFactoryRestock(arg)
 			else
 				notify_err("Invalid command argument!")
 			end
@@ -151,10 +151,10 @@ return {
 			local arg = args[1]
 			if (type(arg) == "string" and arg == "all") then
 				for i = 1, 7 do
-					YRV3:CommandToggleProduction(i, false)
+					BusinessMgr:CommandToggleProduction(i, false)
 				end
 			elseif (type(arg) == "number") then
-				YRV3:CommandToggleProduction(arg, false)
+				BusinessMgr:CommandToggleProduction(arg, false)
 			else
 				notify_err("Invalid command argument!")
 			end
@@ -175,10 +175,10 @@ return {
 			local arg = args[1]
 			if (type(arg) == "string" and arg == "all") then
 				for i = 1, 7 do
-					YRV3:CommandToggleProduction(i, true)
+					BusinessMgr:CommandToggleProduction(i, true)
 				end
 			elseif (type(arg) == "number") then
-				YRV3:CommandToggleProduction(arg, true)
+				BusinessMgr:CommandToggleProduction(arg, true)
 			else
 				notify_err("Invalid command argument!")
 			end
@@ -337,9 +337,10 @@ return {
 	},
 	["teleport"] = {
 		callback = function(args)
-			local x = args[1]
-			local y = args[2]
-			local z = args[3] or 0
+			local x        = args[1]
+			local y        = args[2]
+			local z        = args[3] or 0
+			local keep_veh = args[4] or false
 
 			if (#args < 2) then
 				local wpc = Game.GetWaypointCoords()
@@ -351,18 +352,25 @@ return {
 				x, y, _ = wpc:unpack()
 			end
 
-			if ((type(x) ~= "number") or (type(y) ~= "number")) then
-				notify_err("Missing or incorrect parameter. Usage: teleport <X> <Y> [Z]")
-				return
+			local t_x, t_y = type(x), type(y)
+			if (t_x ~= "number" or t_y ~= "number") then
+				if (t_x == "string" and t_y == "string" and string.endswith(x, ",") and string.endswith(y, ",")) then
+					-- this is so we can simply copy and paste C-style coords from decomps (ex: -1057.521f, -686.812f, 22.584f)
+					x = tonumber(string.replace(x, "f,", ""))
+					y = tonumber(string.replace(y, "f,", ""))
+					z = tonumber(string.replace(tostring(z), "f", ""))
+				else
+					notify_err("Missing or incorrect parameter. Usage: teleport <X> <Y> [Z]")
+					return
+				end
 			end
 
-			local coords = vec3:new(x, y, z)
-			LocalPlayer:Teleport(coords, false, z == 0)
+			LocalPlayer:Teleport(vec3:new(x, y, z), keep_veh, z == 0)
 		end,
 		opts = {
 			description =
-			"Teleports to given coordinates or waypoint if none given. Will try to teleport to top level if no Z argument given.\nUsage Example:\n  - teleport 69 420 69\n  - tp 123.456 789.1011",
-			args = { "X<number>", "Y<number>", "Optional: Z<number>" },
+			"Teleports to given coordinates or waypoint if none given. Will try to teleport to top level if no Z argument given.\nUsage Example:\n  - teleport 69 420 69\n  - tp 123.456 789.1011\n  - tp 1234.538f, 4567.121f, 89.420f true",
+			args = { "X<number>", "Y<number>", "Optional: Z<number>", "Optional: keep_veh<boolean>" },
 			alias = { "tp" }
 		}
 	},

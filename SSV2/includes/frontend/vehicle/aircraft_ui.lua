@@ -51,7 +51,7 @@ planes_tab:AddBoolCommand("VEH_FAST_JETS",
 		translate_label  = true,
 		meta             = { description = "VEH_FAST_JETS_TT", isTranslatorLabel = true },
 		register_command = true,
-		options_data     = {
+		ctx_callback     = {
 			condition = function() return GVars.features.vehicle.fast_jets end,
 			callback  = function()
 				optionPopup.callback    = function()
@@ -99,7 +99,7 @@ planes_tab:AddBoolCommand("VEH_MG_TRIGGERBOT",
 		gvar_key        = "features.vehicle.aircraft_mg.triggerbot",
 		translate_label = true,
 		meta            = { description = "VEH_MG_TRIGGERBOT_TT" },
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.aircraft_mg.triggerbot
 			end,
@@ -116,7 +116,7 @@ planes_tab:AddBoolCommand("VEH_MG_MANUAL_AIM",
 		gvar_key        = "features.vehicle.aircraft_mg.manual_aim",
 		translate_label = true,
 		meta            = { description = "VEH_MG_MANUAL_AIM_TT" },
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.aircraft_mg.manual_aim
 			end,

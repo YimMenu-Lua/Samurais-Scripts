@@ -17,7 +17,7 @@
 ---@field tooltip? string
 ---@field disabled? boolean
 ---@field global_table? table -- The table where this item's global variable exists (if using a local variable, make sure it lives in a table and pass it here)
----@field fineTuning? { callback: function, condition: boolean|fun(): boolean }
+---@field contextData? { callback: function, condition: boolean|fun(): boolean }
 
 ---@class GridItemCheckboxParams : GridItemParams
 ---@field finalValue nil
@@ -54,7 +54,7 @@ local eGridItemType <const> = {
 ---@field m_opts GridItemParams
 ---@field m_uid joaat_t
 ---@field m_g_table table
----@field m_fine_tuning_data? { callback: function, condition: boolean|fun(): boolean }
+---@field m_context? { callback: function, condition: boolean|fun(): boolean }
 local GridItem <const> = {}
 GridItem.__index       = GridItem
 
@@ -71,13 +71,13 @@ function GridItem.new(item_type, item_label, global_variable, opts)
 	end
 
 	return setmetatable({
-		m_uid              = _J(_F("%d%s", item_type, opts)),
-		m_type             = item_type,
-		m_label            = item_label or "",
-		m_gvar             = global_variable,
-		m_opts             = opts,
-		m_g_table          = g_table,
-		m_fine_tuning_data = opts.fineTuning
+		m_uid     = _J(_F("%d%s", item_type, opts)),
+		m_type    = item_type,
+		m_label   = item_label or "",
+		m_gvar    = global_variable,
+		m_opts    = opts,
+		m_g_table = g_table,
+		m_context = opts.contextData
 	}, GridItem)
 end
 
@@ -237,22 +237,22 @@ function GridRenderer:Draw()
 		ImGui.SetCursorPos(current_x, current_y)
 		local item_size = item:Draw() + self.m_padding
 
-		local fine_tune_t = item.m_fine_tuning_data
-		if (fine_tune_t) then
-			local can_edit  = true
-			local cond      = fine_tune_t.condition
-			local cond_type = type(cond)
+		local ctx = item.m_context
+		if (ctx) then
+			local should_draw_ctx = true
+			local cond            = ctx.condition
+			local cond_type       = type(cond)
 			if (cond_type == "function") then
-				can_edit = cond()
+				should_draw_ctx = cond()
 			elseif (cond_type == "boolean") then
-				can_edit = cond
+				should_draw_ctx = cond
 			end
 
-			if (can_edit) then
+			if (should_draw_ctx) then
 				ImGui.SetCursorPos(current_x + item_size.x - 45, current_y + 10)
 				ImGui.SetWindowFontScale(0.75)
 				if (ImGui.SmallButton(" . . . ")) then
-					pcall(fine_tune_t.callback)
+					pcall(ctx.callback)
 				end
 				ImGui.SetWindowFontScale(1.0)
 				GUI:Tooltip(_T("GENERIC_OPTIONS_LABEL"))

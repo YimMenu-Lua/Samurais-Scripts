@@ -36,14 +36,15 @@ function WorldMisc:Init()
 end
 
 function WorldMisc:ShouldRun()
-	return (not Backend:IsPlayerSwitchInProgress()
-		and not script.is_active("maintransition")
-	)
+	return not Game.IsPlayerSwitchInProgress() and not script.is_active("maintransition")
 end
 
 function WorldMisc:Cleanup()
 	self.m_entity:ResetBounds()
 	self.m_entity:ResetOceanWaves()
+	AUDIO.SET_AUDIO_FLAG("DisableFlightMusic", false)
+	AUDIO.SET_AUDIO_FLAG("WantedMusicDisabled", false)
+
 	self.m_bounds_extended       = false
 	self.m_ocean_waves_disabled  = false
 	self.m_flight_music_disabled = false
@@ -51,20 +52,26 @@ function WorldMisc:Cleanup()
 end
 
 function WorldMisc:Update()
-	if (GVars.features.world.extend_bounds and not self.m_bounds_extended) then
-		self.m_entity:ExtendBounds()
+	local worldInst = self.m_entity
+	local config    = GVars.features.world
+	if (config.extend_bounds and not self.m_bounds_extended) then
+		worldInst:ExtendBounds()
+		self.m_bounds_extended = true
 	end
 
-	if (GVars.features.world.disable_ocean_waves and not self.m_ocean_waves_disabled) then
-		self.m_entity:DisableOceanWaves()
+	if (config.disable_ocean_waves and not self.m_ocean_waves_disabled) then
+		worldInst:DisableOceanWaves()
+		self.m_ocean_waves_disabled = true
 	end
 
-	if (GVars.features.world.disable_flight_music and not self.m_flight_music_disabled) then
+	if (config.disable_flight_music and not self.m_flight_music_disabled) then
 		AUDIO.SET_AUDIO_FLAG("DisableFlightMusic", true)
+		self.m_flight_music_disabled = true
 	end
 
-	if (GVars.features.world.disable_wanted_music and not self.m_wanted_music_disabled) then
+	if (config.disable_wanted_music and not self.m_wanted_music_disabled) then
 		AUDIO.SET_AUDIO_FLAG("WantedMusicDisabled", true)
+		self.m_wanted_music_disabled = true
 	end
 end
 

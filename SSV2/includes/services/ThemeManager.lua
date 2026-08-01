@@ -39,8 +39,8 @@ end
 function ThemeManager:Load()
 	self:LoadLibrary()
 
-	local current = GVars.ui.style.theme
-	if (not current or not current.Colors) then
+	local current = self:GetTheme(GVars.ui.style.theme)
+	if (not current or not current.Colors or not current.__type) then
 		current = self:GetDefaultTheme()
 	end
 
@@ -48,7 +48,7 @@ function ThemeManager:Load()
 		current = Theme.deserialize(current)
 	end
 
-	GVars.ui.style.theme = current
+	GVars.ui.style.theme = current.Name:replace(" ", ""):trim()
 	self.m_current_theme = current
 end
 
@@ -84,7 +84,7 @@ function ThemeManager:SetCurrentTheme(theme)
 		theme = Theme.deserialize(theme)
 	end
 
-	GVars.ui.style.theme = theme
+	GVars.ui.style.theme = theme.Name:replace(" ", ""):trim()
 	self.m_current_theme = theme
 end
 

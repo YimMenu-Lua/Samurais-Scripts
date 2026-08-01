@@ -103,6 +103,7 @@ return {
 	["GENERIC_PLAY"]                       = "Play",
 	["GENERIC_START"]                      = "Start",
 	["GENERIC_STOP"]                       = "Stop",
+	["GENERIC_RESUME"]                     = "Resume",
 	["GENERIC_EMERGENCY_STOP"]             = "Emergency Stop",
 	["GENERIC_USE"]                        = "Use",
 	["GENERIC_ATTACH"]                     = "Attach",
@@ -168,6 +169,7 @@ return {
 	["GENERIC_FEMALE"]                     = "Female",
 	["GENERIC_PREVIEW"]                    = "Preview",
 	["GENERIC_RIGHT_CLICK_TT"]             = "Right click for more options.",
+	["GENERIC_DRIVING_COMMANDS"]           = "Driving Style",
 	["GENERIC_DRIVING_STYLE"]              = "Driving Style",
 	["GENERIC_DRIVING_STYLE_NORMAL"]       = "Normal",
 	["GENERIC_DRIVING_STYLE_AGGRO"]        = "Aggressive",
@@ -199,6 +201,8 @@ return {
 	["GENERIC_NO"]                         = "No",
 	["GENERIC_LOCK"]                       = "Lock",
 	["GENERIC_LOCK_VAL"]                   = "Lock Value",
+	["GENERIC_PLAYER_FMT"]                 = "Player %s",
+	["GENERIC_SESSION_REFRESH_NOTIF"]      = "Please join a new session in order for the changes to take effect.",
 	--#endregion
 
 	--#region CasinoPacino
@@ -258,9 +262,9 @@ return {
 	["CP_HEIST_HACKER"]                    = "Crew Hacker",
 	["CP_HEIST_MASKS"]                     = "Crew Masks",
 	["CP_HEIST_AUTOGRAB"]                  = "Auto Collect Loot", -- Translator chokes on "Auto Grab" with some languages
-	["CP_HEIST_UNLOCK_ALL"]                = "Unlock All Heist Options",
 	["CP_HEIST_ZERO_AI_CUTS"]              = "Zero Crew Cuts",
-	["CP_HEIST_MAX_PLAYER_CUTS"]           = "Max All Player Cuts",
+	["CP_HEIST_PLAYER_CUTS"]               = "Player Cuts",
+	["CP_HEIST_MAX_PLAYER_CUTS"]           = "Max All",
 	["CP_HEIST_COOLDOWN_DISABLE"]          = "Disable Heist Cooldown",
 	["CP_HEIST_SETUP"]                     = "Heist Setup",
 	--#endregion
@@ -421,7 +425,7 @@ return {
 	["YRV3_UNSAFE_FEATS_CB"]               = "Toggle Unsafe Features",
 	["YRV3_UNSAFE_FEATS_HINT"]             = "[TIP]: All unsafe feature labels are prefixed with '[ ! ]'.",
 	["YRV3_UNSAFE_FEATS_PROMPT"]           = "These features are unsafe and may result in account suspension if abused.\n\nPress 'Confirm' to acknowledge this warning and accept the risk, or 'Cancel' to go back. You can revoke this acknowledgment at any time later by disabling this checkbox.",
-	["YRV3_UNSAFE_FEAT_BYPASS_ERR"]        = "This feature is unsafe. You must explicitly enale 'Unsafe Features' in YRV3's settings tab before using it.",
+	["YRV3_UNSAFE_FEAT_BYPASS_ERR"]        = "This feature is unsafe. You must explicitly enable 'Unsafe Features' in the 'Settings' tab before using it.",
 	["YRV3_UNSAFE_FEATS_ENABLED"]          = "Unsafe features enabled.",
 	["YRV3_UNSAFE_FEATS_DISABLED"]         = "Unsafe features disabled.",
 	["YRV3_UNSAFE_FEATS_FSL_ON_TXT"]       = "Unsafe features are always enabled when using FSL.",
@@ -460,6 +464,8 @@ return {
 	["YRV3_DASHBOARD_BOSS_RETIRED"]        = "Retired",
 	["YRV3_DASHBOARD_BOSS_CEO_FMT"]        = "CEO of %s",
 	["YRV3_DASHBOARD_BOSS_PRES_FMT"]       = "President of %s",
+	["YRV3_DASHBOARD_BOSS_ASSOCIATE"]      = "Associate",
+	["YRV3_DASHBOARD_BOSS_ASSOCIATE_ERR"]  = "You can not register as a boss while working for someone else.",
 	["YRV3_DASHBOARD_MANAGE_FUNDS"]        = "Manage Funds",
 	["YRV3_CASH_SAFES_LABEL"]              = "Cash Safes",
 	["YRV3_CASH_LOOP"]                     = "[ ! ] Cash Loop",
@@ -909,7 +915,11 @@ return {
 	["EF_TAB_SAVED_FORGES"]                = "Saved Creations",
 	--#endregion
 
-	--#region YimHeists
+	--#region HeistEditor
+	["YH_SUBTITLE_TXT"]                    = "Setup your heists to your liking then press the 'Confirm' button at the bottom.",
+	["YH_GENERIC_SKIP_PREPS"]              = "Skip Preparations",
+	["YH_GENERIC_SKIP_PREPS_TT"]           = "All secondary objectives have been completed.",
+	["YH_GENERIC_CD_LABEL"]                = "Disable Cooldown",
 	["YH_BASIC_TAB"]                       = "Basic",
 	["YH_PREP_SKIP_NOTIF"]                 = "All preparation missions have been skipped. You can now start the final mission.",
 	["YH_COOLDOWN_BYPASS_TOOLTIP"]         = "Disables cooldown, may result in ban. Use at your own risk!",
@@ -921,12 +931,38 @@ return {
 	["YH_CAYO_TARGET_SECONDARY_BUTTON"]    = "Set All Secondary Targets",
 	["YH_CAYO_DIFFICULTY"]                 = "Hard Mode",
 	["YH_CAYO_WEAPONS"]                    = "Weapon Loadout",
+	["YH_APPROACH_VEHICLE"]                = "Approach Vehicle",
+	["YH_CAYO_TROJAN"]                     = "Supply Truck Location",
+	["YH_SECONDARY_TARGET_TXT"]            = "Secondary targets are automatically set when the 'Confirm' button is pressed. This is done to avoid breaking loot logic.",
 	["YH_CAYO_RESET_ALL"]                  = "Reset ALL Progress",
 	["YH_FACILITY_NOT_OWNED"]              = "Purchase a Facility to access The Doomsday Heist.", -- GOPS_BASE_HELP
 	["YH_TP_FACILITY"]                     = "Teleport to Facility",
 	["YH_DDAY_FORCE"]                      = "FORCE RESET",
 	["YH_DDAY_HELP1"]                      = "This method is necessary if you have never played Doomsday as a host. If you have already played and completed some heists as host, skip this step.",
 	["YH_DDAY_HELP2_FMT"]                  = "Press the '%s' button, then call Lester to cancel all 3 heists for Doomsday.",
+	["YH_GENERIC_PROPERTY"]                = "Base Of Operations",
+	["YH_REQUIRED_PROPERTY_ERR"]           = "You don't own the required property for this heist!",
+	["YH_REQUIRED_PROPERTY_ERR_FMT"]       = "Purchase a %s to access the %s",
+	["YH_VIEW_BOOSTS"]                     = "Weekly Boosts",
+	["YH_BOOST_STATUS"]                    = "Boost Status:",
+	["YH_SKIP_OBJECTIVE"]                  = "Skip Objective",
+	["YH_SKIP_OBJECTIVE_TT"]               = "Attempts to skip the current objective. Can be used to pass the casino heist double-keycards alone.\n\n[NOTE]: May not work with all heists.",
+	["YH_LOAD_ERR"]                        = "Something went wrong! Please reload the script when you're in a freemode session.",
+	["YH_FAIL_MISSION"]                    = "Fail Mission",
+	["YH_FINISH_MISSION"]                  = "Instant Finish",
+	["YH_FINISH_MISSION_TT"]               = "Attempts to instantly finish the current mission. May not work with all missions/heists.",
+	["YH_TP_CH_LOADING_BAY"]               = "Loading Bay",
+	["YH_TP_CH_UTIL_RM"]                   = "Utility Room",
+	["YH_TP_CH_CASH_ROOM"]                 = "Small Cash Room",
+	["YH_TP_CH_BASEMENT"]                  = "Lower Level (B1)",
+	["YH_TP_CH_MANTRAP"]                   = "Mantrap",
+	["YH_TP_CH_VAULT"]                     = "Vault",
+	["YH_TP_CH_ELEV_SHAFT"]                = "Elevator Shaft",
+	["YH_DDAY_SELECTED_ACT"]               = "Selected Act",
+	["YH_APT_HEISTS_LABEL"]                = "Apartment Heists",
+	["YH_APT_SELECTED_JOB"]                = "Selected Job",
+	["YH_CH_SOLO_PATCH"]                   = "Heist Board Patch",
+	["YH_CH_SOLO_PATCH_TT"]                = "Allows you to set up the final planning board. Must be enabled before starting the heist.\n\n[IMPORTANT]: Make sure to disable this after completing the heist. Keeping it enabled forever may cause issues and/or instabilities.",
 	--#endregion
 
 	--#region BillionaireServicesV2

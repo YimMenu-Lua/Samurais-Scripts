@@ -10,7 +10,7 @@
 math.randomseed(os.time())
 
 ---@type table<table, table<integer, string>>
-local EnumNamesCache <const> = setmetatable({}, { __mode = "v" })
+local EnumNamesCache <const> = setmetatable({}, { __mode = "kv" })
 local Chrono <const>         = require("includes.modules.Chrono")
 Bit                          = require("includes.modules.Bit") -- exposed globally sicne it's used all over the project.
 
@@ -27,31 +27,19 @@ for _, path in ipairs({
 }) do require(path) end
 
 
-Time               = Chrono.Time
-Timer              = Chrono.Timer
-TimePoint          = Chrono.TimePoint
-DateTime           = Chrono.DateTime
-_F                 = string.format
-
----@diagnostic disable: lowercase-global
-yield              = coroutine.yield
-sleep              = Time.Sleep
----@diagnostic enable: lowercase-global
+_G.Time            = Chrono.Time
+_G.Timer           = Chrono.Timer
+_G.TimePoint       = Chrono.TimePoint
+_G.DateTime        = Chrono.DateTime
+_G._F              = string.format
+_G.yield           = coroutine.yield
+_G.sleep           = Time.Sleep
 
 local type         = type
 local rawget       = rawget
 local getmetatable = getmetatable
 local math_type    = math.type
 local tostring     = tostring
-
--- Macro for the `Translator:Translate` method.
----@param label string
----@param ... any optional string formatting
----@return string
-function _T(label, ...)
-	if (not Translator) then return label end
-	return Translator:Translate(label, ...)
-end
 
 -- Lua version of Bob Jenskins' [Jenkins One At A Time](https://en.wikipedia.org/wiki/Jenkins_hash_function) hash function.
 ---@param key string

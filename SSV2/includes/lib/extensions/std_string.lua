@@ -148,13 +148,14 @@ end
 ---@param str string
 ---@param old string
 ---@param new string
----@return string, number
+---@return string
 function string.replace(str, old, new)
-	if old == "" then
-		return str, 0
+	if (old == "") then
+		return str
 	end
 
-	return str:gsub(old:gsub("([^%w])", "%%%1"), new)
+	local res = str:gsub(old:gsub("([^%w])", "%%%1"), new)
+	return res
 end
 
 ---@param str string

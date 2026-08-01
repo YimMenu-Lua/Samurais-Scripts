@@ -12,21 +12,45 @@
 -- Global ImGui extensions and overloads
 
 local Rect                = require("includes.classes.Rect")
-local WindowAnimation     = require("includes.structs.WindowAnimation")
+local DialogBoxAnimation  = require("includes.structs.WindowAnimation")()
+local ThemeManager        = require("includes.services.ThemeManager")
 local __InputText         = ImGui.InputText
 local __InputTextWithHint = ImGui.InputTextWithHint
 local COL_TEXT_LIGHT      = Color(0.9, 0.9, 0.9, 0.87)
 local COL_TEXT_DARK       = Color(0.01, 0.01, 0.01, 0.87)
-local DialogBoxAnimation  = WindowAnimation()
+
 
 ---@class NotifWidgetState
----@field unreadCount number
----@field muted boolean
----@field unread boolean
----@field open boolean
+---@field public m_is_muted boolean
+---@field public m_is_open boolean
+---@field public m_has_unread boolean
+---@field public m_unread_count number
+---@overload fun(): NotifWidgetState
+NotifWidgetState = Callable("NotifWidgetState", { ctor = function(t, ...) return t:new() end })
+
+---@return NotifWidgetState
+function NotifWidgetState:new()
+	return setmetatable({
+		m_is_muted     = false,
+		m_is_open      = false,
+		m_has_unread   = false,
+		m_unread_count = 0,
+	}, self)
+end
+
+function NotifWidgetState:Update()
+	if (not Notifier) then
+		return
+	end
+
+	self.m_is_muted     = Notifier:IsMuted()
+	self.m_is_open      = Notifier:IsOpen()
+	self.m_has_unread   = Notifier:HasUnread()
+	self.m_unread_count = Notifier:GetNotifCount()
+end
 
 ---@enum ImGuiSpinnerStyle
-ImGuiSpinnerStyle         = {
+ImGuiSpinnerStyle   = {
 	SCAN        = 1,
 	FILL        = 2,
 	BOUNCE      = 3,
@@ -41,14 +65,14 @@ ImGuiSpinnerStyle         = {
 }
 
 ---@enum ImGuiValueBarFlags
-ImGuiValueBarFlags        = {
+ImGuiValueBarFlags  = {
 	NONE      = 0,
 	VERTICAL  = 1 << 0,
 	MULTI_VAL = 1 << 1,
 }
 
 ---@enum ImGuiDialogBoxStyle
-ImGuiDialogBoxStyle       = {
+ImGuiDialogBoxStyle = {
 	INFO   = 0,
 	WARN   = 1,
 	SEVERE = 2,
@@ -91,6 +115,28 @@ local DialogBoxColors <const> = {
 	[ImGuiDialogBoxStyle.WARN]   = Color("safety_yellow"),
 	[ImGuiDialogBoxStyle.SEVERE] = Color.RED,
 }
+
+---@param text string
+---@param color? Color
+function ImGui.TextCentered(text, color)
+	local textWidth   = ImGui.CalcTextSize(text)
+	local windowWidth = ImGui.GetContentRegionAvail()
+	local posX        = (windowWidth - textWidth) * 0.5
+
+	if (posX > 0.0) then
+		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + posX)
+	end
+
+	if (color) then
+		ImGui.PushStyleColor(ImGuiCol.Text, color:AsFloat())
+	end
+
+	ImGui.Text(text)
+
+	if (color) then
+		ImGui.PopStyleColor(1)
+	end
+end
 
 ---@param label string
 ---@param text string
@@ -337,6 +383,7 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 	local max      = pos + size
 	local rect     = Rect(pos, vec2:new(pos.x + size.x, pos.y + size.y))
 	local rectSize = rect:GetSize()
+	local theme    = ThemeManager:GetCurrentTheme()
 
 	ImGui.InvisibleButton(label, rectSize.x, rectSize.y)
 	local hovered = ImGui.IsItemHovered()
@@ -355,8 +402,8 @@ function ImGui.Selectable2(label, selected, size, align, ellipsis, shouldHighlig
 		)
 	end
 
-	local accent       = GVars.ui.style.theme.SSAccent
-	local gradient     = GVars.ui.style.theme.SSGradient
+	local accent       = theme.SSAccent
+	local gradient     = theme.SSGradient
 	local selectedCol  = ImGui.GetColorU32(
 		accent.x,
 		accent.y,
@@ -742,6 +789,7 @@ end
 function ImGui.NotifWidget(state, size)
 	ImGui.BeginGroup()
 
+	local theme     = ThemeManager:GetCurrentTheme()
 	local clicked   = ImGui.InvisibleButton("##ss_bell_widget", size.x, size.y)
 	local hovered   = ImGui.IsItemHovered()
 	local pDrawList = ImGui.GetWindowDrawList()
@@ -749,11 +797,11 @@ function ImGui.NotifWidget(state, size)
 	local pmax      = vec2:new(ImGui.GetItemRectMax())
 	local width     = pmax.x - pmin.x
 	local height    = pmax.y - pmin.y
-	local accent    = Color(GVars.ui.style.theme.SSAccent)
+	local accent    = Color(theme.SSAccent)
 	local widgetCol = ImGui.GetStyleColorU32(ImGuiCol.Button)
 
-	if (not state.muted) then
-		if (state.open and not hovered) then
+	if (not state.m_is_muted) then
+		if (state.m_is_open and not hovered) then
 			widgetCol = ImGui.GetStyleColorU32(ImGuiCol.ButtonActive)
 		end
 
@@ -789,7 +837,7 @@ function ImGui.NotifWidget(state, size)
 		rounding
 	)
 
-	if (not state.muted) then
+	if (not state.m_is_muted) then
 		local dotsRad = (width / 3) * 0.3
 		local dotsY   = (pmin.y + pmax.y) * 0.5
 		local spacing = dotsRad * 3
@@ -805,8 +853,8 @@ function ImGui.NotifWidget(state, size)
 			)
 		end
 
-		if (state.unread and state.unreadCount > 0) then
-			local c         = state.unreadCount
+		if (state.m_has_unread and state.m_unread_count > 0) then
+			local c         = state.m_unread_count
 			local r         = height * 0.32
 			local bx        = pmax.x + r * 1.25
 			local by        = pmin.y + r * 0.7
@@ -825,7 +873,7 @@ function ImGui.NotifWidget(state, size)
 			end
 
 			ImGui.SetWindowFontScale(0.5)
-			local countTxt = _F("%s%d", state.unreadCount > 9 and "+" or "", c)
+			local countTxt = _F("%s%d", state.m_unread_count > 9 and "+" or "", c)
 			local txtSize = vec2:new(ImGui.CalcTextSize(countTxt))
 			ImGui.ImDrawListAddText(
 				pDrawList,
@@ -1018,6 +1066,28 @@ function ImGui.BeginChildEx(name, size, childFlags, windowFlags)
 		---@diagnostic disable-next-line: param-type-mismatch
 		return ImGui.BeginChild(name, size.x, size.y, border, windowFlags)
 	end
+end
+
+---@param label string
+---@param v integer
+---@param v_min integer
+---@param v_max integer
+---@param step integer
+function ImGui.SliderIntWithStep(label, v, v_min, v_max, step)
+	local scaledMin         = math.floor(v_min / step)
+	local scaledMax         = math.floor(v_max / step)
+	local scaledValue       = math.floor(v / step)
+
+	local newValue, changed = ImGui.SliderInt(
+		label,
+		scaledValue,
+		scaledMin,
+		scaledMax,
+		_F("%d%%", scaledValue * 5),
+		---@diagnostic disable-next-line
+		ImGuiSliderFlags.NoInput
+	)
+	return newValue * step, changed
 end
 
 --#endregion

@@ -56,7 +56,7 @@ end
 
 function IVStyleExit:ShouldReapplySteering()
 	local fVal = math.abs(self.m_last_steer_angle)
-	return fVal ~= 0 and fVal < 1 and fVal > 0.001
+	return math.is_inrange(fVal, 0.01, 1.0)
 end
 
 ---@param keepEngineOn boolean
@@ -84,21 +84,21 @@ function IVStyleExit:LeaveVehicle(keepEngineOn)
 end
 
 function IVStyleExit:Update()
-	PAD.DISABLE_CONTROL_ACTION(0, 75, true)
+	local veh     = self.m_entity
+	local iv_exit = GVars.features.vehicle.iv_exit
+	if (iv_exit) then
+		PAD.DISABLE_CONTROL_ACTION(0, 75, true)
 
-	if (PAD.IS_DISABLED_CONTROL_PRESSED(0, 75)) then
-		if (self.m_entity:GetSpeed() > 15) then
-			TASK.TASK_LEAVE_VEHICLE(LocalPlayer:GetHandle(), self.m_entity:GetHandle(), 4160)
-			self:Cleanup()
-			return
+		if (PAD.IS_DISABLED_CONTROL_PRESSED(0, 75)) then
+			if (veh:GetSpeed() >= 15) then
+				TASK.TASK_LEAVE_VEHICLE(LocalPlayer:GetHandle(), veh:GetHandle(), 4160)
+				self:Cleanup()
+				return
+			end
+
+			self.m_triggered = true
+			self.m_timer:Resume()
 		end
-
-		if (not GVars.features.vehicle.iv_exit and not self.m_triggered) then
-			self:LeaveVehicle(false)
-		end
-
-		self.m_triggered = true
-		self.m_timer:Resume()
 	end
 
 	if (self.m_triggered) then
@@ -110,7 +110,6 @@ function IVStyleExit:Update()
 	end
 
 	if (self.m_pending_steering) then
-		local veh = self.m_entity
 		if (veh and veh:IsValid()) then
 			local pSteering = veh:Resolve().m_steering_angle
 			pSteering:set_float(self.m_last_steer_angle)
@@ -125,7 +124,6 @@ function IVStyleExit:Update()
 	if (self.m_triggered and not LocalPlayer:IsDriving()) then
 		LocalPlayer:SetConfigFlag(Enums.ePedConfigFlags.LeaveEngineOnWhenExitingVehicles, false)
 		self:Cleanup()
-		return
 	end
 end
 

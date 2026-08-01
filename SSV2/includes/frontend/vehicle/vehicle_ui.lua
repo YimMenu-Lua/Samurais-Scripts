@@ -148,21 +148,44 @@ local function minesOptions()
 	end
 end
 
+---@param station string
+local function setVehicleRadio(station)
+	if not (PV and PV:IsValid() and PV:IsEngineOn() and LocalPlayer:IsDriving()) then
+		return
+	end
+	PV:SetRadioStation(station)
+end
+
 local function defaultStationOptions()
 	ImGui.Spacing()
 	local cfg = GVars.features.vehicle.default_station
+
+	if (ImGui.Button("Online Favorite")) then
+		ThreadManager:Run(function()
+			local gxt   = "OFF"
+			local name  = "Off"
+			local index = stats.get_int("MPPLY_MOST_FAVORITE_STATION")
+			if (math.is_inrange(index, 0, AUDIO.GET_NUM_UNLOCKED_RADIO_STATIONS() - 1)) then
+				gxt  = AUDIO.GET_RADIO_STATION_NAME(index)
+				name = Game.GetLabelText(gxt)
+			end
+
+			setVehicleRadio(gxt)
+			cfg.station_name = gxt
+			cfg.display_name = name
+		end)
+	end
+
 	if (ImGui.BeginCombo("##defaultRadio", cfg.display_name)) then
 		for _, v in ipairs(vehicleRadioStations) do
 			local station  = v.station
 			local name     = v.name
 			local selected = cfg.station_name == station
-			if (ImGui.Selectable(name, selected)) then
+			ImGui.Selectable(name, selected)
+			if (ImGui.IsItemClicked(0)) then
 				cfg.station_name = station
 				cfg.display_name = name
-				ThreadManager:Run(function()
-					if (not LocalPlayer:IsDriving()) then return end
-					LocalPlayer:GetVehicle():SetRadioStation(station)
-				end)
+				ThreadManager:Run(function() setVehicleRadio(station) end)
 			end
 		end
 
@@ -258,7 +281,7 @@ vehicleTab:AddBoolCommand("VEH_SPEEDOMETER",
 	{
 		gvar_key        = "features.speedometer.enabled",
 		translate_label = true,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.speedometer.enabled
 			end,
@@ -282,7 +305,7 @@ vehicleTab:AddBoolCommand("VEH_FAST_AF",
 		gvar_key        = "features.vehicle.fast_vehicles",
 		meta            = { description = "VEH_FAST_AF_TT" },
 		translate_label = true,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.fast_vehicles
 			end,
@@ -301,7 +324,7 @@ vehicleTab:AddBoolCommand("VEH_NOS",
 	{
 		gvar_key        = "features.vehicle.nos.enabled",
 		translate_label = true,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.nos.enabled
 			end,
@@ -327,7 +350,7 @@ vehicleTab:AddBoolCommand("VEH_POPS_N_BANGS",
 		translate_label  = true,
 		on_disable       = RestoreExhaustPops,
 		register_command = true,
-		options_data     = {
+		ctx_callback     = {
 			condition = function()
 				return GVars.features.vehicle.burble_tune
 			end,
@@ -343,7 +366,7 @@ vehicleTab:AddBoolCommand("VEH_DRIFT_MODE",
 	{
 		gvar_key        = "features.vehicle.drift.enabled",
 		translate_label = true,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.drift.enabled
 			end,
@@ -361,7 +384,7 @@ vehicleTab:AddLoopedCommand("VEH_DRIFT_MINIGAME",
 		meta            = { description = "VEH_DRIFT_MINIGAME_TT" },
 		translate_label = true,
 		callback        = function() DriftMinigame:OnTick() end,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.drift_minigame.enabled
 			end,
@@ -430,7 +453,7 @@ vehicleTab:AddBoolCommand("VEH_RGB_LIGHTS",
 				LocalPlayer:GetVehicle():RestoreHeadlights()
 			end)
 		end,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.rgb_lights.enabled
 			end,
@@ -471,7 +494,7 @@ vehicleTab:AddBoolCommand("VEH_LAUNCH_CTRL",
 		gvar_key        = "features.vehicle.launch_control",
 		meta            = { description = "VEH_LAUNCH_CTRL_TT" },
 		translate_label = true,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.launch_control
 			end,
@@ -512,7 +535,7 @@ vehicleTab:AddBoolCommand("VEH_MINES",
 		gvar_key        = "features.vehicle.mines.enabled",
 		meta            = { description = "VEH_MINES_TT" },
 		translate_label = true,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.mines.enabled
 			end,
@@ -529,7 +552,7 @@ vehicleTab:AddBoolCommand("VEH_DEFAULT_RADIO",
 		gvar_key        = "features.vehicle.default_station.enabled",
 		meta            = { description = "VEH_DEFAULT_RADIO_TT" },
 		translate_label = true,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.default_station.enabled
 			end,
@@ -554,7 +577,7 @@ vehicleTab:AddBoolCommand("VEH_MANUAL_GEARBOX",
 			if (not PV:IsValid()) then return end
 			PV.m_manual_gearbox:Reset()
 		end,
-		options_data    = {
+		ctx_callback    = {
 			condition = function()
 				return GVars.features.vehicle.manual_gearbox.enabled
 			end,

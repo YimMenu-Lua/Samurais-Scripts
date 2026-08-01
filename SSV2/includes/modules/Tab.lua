@@ -17,7 +17,7 @@ local GridRenderer = require("includes.services.GridRenderer")
 ---@field register_command? boolean -- register with CommandExecutor
 ---@field translate_label? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@field global_table? table a table where the bool variable lives (defaults to GVars if available or _G); a local table works as well.
----@field options_data? { callback: function, condition: boolean|fun(): boolean } -- adds a small "options" button to the command's widget
+---@field ctx_callback? { callback: function, condition: boolean|fun(): boolean } -- adds a small "options" button to the command's widget
 
 ---@class LoopedCommandParams : BoolCommandParams
 ---@field callback function -- tick function
@@ -196,7 +196,7 @@ function Tab:AddBoolCommand(label, opts)
 			persistent        = true,
 			tooltip           = meta.description,
 			isTranslatorLabel = opts.translate_label,
-			fineTuning        = opts.options_data,
+			contextData       = opts.ctx_callback,
 			onClick           = function()
 				local v = table.get_nested_value(g_table, gvar_key)
 				onClick(v)
@@ -265,7 +265,7 @@ function Tab:AddLoopedCommand(label, opts)
 			tooltip           = meta.description,
 			isTranslatorLabel = opts.translate_label,
 			onClick           = toggle,
-			fineTuning        = opts.options_data
+			contextData       = opts.ctx_callback
 		}
 	)
 

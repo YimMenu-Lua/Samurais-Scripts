@@ -97,6 +97,10 @@ ThreadManager:Run(function()
 		LocalPlayer:GetVehicle():RamRight()
 	end)
 
+	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD5, function()
+		print(tunables.get_int("HEIST_SETUP_COST_FLEECA"))
+	end)
+
 	while (not PatternScanner:IsDone()) do
 		yield()
 	end

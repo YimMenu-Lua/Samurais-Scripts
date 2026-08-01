@@ -216,7 +216,7 @@ function Backend:GetGameBranch()
 		self.m_game_branch = Enums.eGameBranch.LEGACY
 	else
 		local branch = get_game_branch()
-		if (type(branch) ~= "number" or not math.is_inrange(branch, 0, 1)) then
+		if (type(branch) ~= "number" or branch < 0 or branch > 1) then
 			error(_F("Failed to load! Unknown or unsupported game branch (%s). Is this YimLuaAPI?"), branch)
 		end
 		self.m_game_branch = branch + 1 -- Our game branch enum starts at 1. YimLuaAPI's naturally starts at 0
@@ -262,14 +262,11 @@ function Backend:IsUpToDate()
 	return (self.target_build == "any") or self:MatchGameVersion()
 end
 
+-- Returns whether the entity was created by us.
 ---@param handle integer
 ---@return boolean
 function Backend:IsScriptEntity(handle)
 	return Decorator:Validate(handle)
-end
-
-function Backend:IsPlayerSwitchInProgress()
-	return STREAMING.IS_PLAYER_SWITCH_IN_PROGRESS()
 end
 
 ---@param entity_type eEntityType
@@ -554,7 +551,8 @@ function Backend:OnPlayerSwitch()
 		return
 	end
 
-	if (not self:IsPlayerSwitchInProgress()) then
+	local isSwitchInProgress = Game.IsPlayerSwitchInProgress
+	if (not isSwitchInProgress()) then
 		return
 	end
 
@@ -562,7 +560,7 @@ function Backend:OnPlayerSwitch()
 	ThreadManager:Run(function()
 		self:TriggerEventCallbacks(Enums.eBackendEvent.PLAYER_SWITCH)
 
-		while (self:IsPlayerSwitchInProgress()) do
+		while (isSwitchInProgress()) do
 			yield()
 		end
 

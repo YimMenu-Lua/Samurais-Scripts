@@ -122,10 +122,10 @@ end
 
 function GUI:LateInit()
 	KeyManager:AssertKeybind(true, "keyboard_keybinds.gui_toggle", "F5")
-	debug_counter = GVars.backend.debug_mode and 7 or 0
-
-	local toggleKey = GVars.keyboard_keybinds.gui_toggle
-	local tab_id, array_idx = GVars.ui.last_tab.tab_id, GVars.ui.last_tab.array_index
+	debug_counter           = GVars.backend.debug_mode and 7 or 0
+	local uiCfg             = GVars.ui
+	local toggleKey         = GVars.keyboard_keybinds.gui_toggle
+	local tab_id, array_idx = uiCfg.last_tab.tab_id, uiCfg.last_tab.array_index
 	if (not math.is_inrange(tab_id, TABID_MIN, TABID_MAX)) then
 		tab_id    = TABID_MIN
 		array_idx = TABID_MIN
@@ -143,8 +143,8 @@ function GUI:LateInit()
 	self.m_selected_category_tabs = category_tabs
 	self.m_selected_tab           = current_tab.second
 	self.m_is_drawing_sidebar     = #category_tabs > 1
-	GVars.ui.last_tab.tab_id      = tab_id
-	GVars.ui.last_tab.array_index = array_idx
+	uiCfg.last_tab.tab_id         = tab_id
+	uiCfg.last_tab.array_index    = array_idx
 
 	KeyManager:RegisterKeybind(toggleKey, function() self:Toggle() end)
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function() self:Close() end)
@@ -159,16 +159,16 @@ function GUI:LateInit()
 end
 
 local trace
-local err = "[GUI]: Unrecoverable callback error. Please contact a developer."
+local generic_err = "[GUI]: Unrecoverable callback error. Please contact a developer."
 function GUI:Toggle()
 	self.m_should_draw = not self.m_should_draw
 
 	if (self.m_should_draw and self.m_has_error) then
 		self.m_should_draw = false
-		Notifier:ShowError("GUI", err, false, 6.0)
+		Notifier:ShowError("GUI", generic_err, false, 6.0)
 
 		if (self.m_traceback) then
-			trace = trace or (err .. "\n    Traceback: " .. self.m_traceback)
+			trace = trace or (generic_err .. "\n    Traceback: " .. self.m_traceback)
 			log.error(trace)
 		end
 	end
@@ -247,7 +247,7 @@ end
 
 ---@return boolean
 function GUI:WantsInput()
-	if (not self:IsOpen()) then
+	if (not self.m_should_draw) then
 		self.m_wants_input = false
 	end
 
@@ -317,6 +317,7 @@ function GUI:GetSubtab(id, name, parent_name)
 	return child
 end
 
+-- Blocks the game from capturing keyboard input.
 ---@param cond boolean
 function GUI:RequestInput(cond)
 	self.m_wants_input = self.m_wants_input or cond
@@ -340,6 +341,7 @@ function GUI:RegisterWindowRequest(windowData)
 	reqs[label] = windowData
 end
 
+-- Draws the requested window next frame.
 ---@param label string
 ---@param toggle boolean
 function GUI:SetRequestedWindowDraw(label, toggle)
@@ -348,7 +350,7 @@ function GUI:SetRequestedWindowDraw(label, toggle)
 	req.m_should_draw = toggle
 end
 
--- Registers an independent window that can be drawn without the menu open.
+-- Registers a window that can be drawn independently.
 ---@param callback GuiCallback
 function GUI:RegisterIndependentGUI(callback)
 	if (type(callback) ~= "function") then
@@ -400,7 +402,7 @@ end
 ---@private
 function GUI:DrawDummyTab()
 	ImGui.SetNextWindowBgAlpha(0)
-	ImGui.BeginChild("##clock", 480, 400)
+	ImGui.BeginChild("##dummy_tab_clock", 480, 400)
 	DrawClock()
 	ImGui.Dummy(1, 10)
 	ImGui.SetWindowFontScale(1.2)
@@ -410,40 +412,36 @@ function GUI:DrawDummyTab()
 	ImGui.Spacing()
 	ImGui.EndChild()
 
+	local cfg = GVars.backend
 	ImGui.SetNextWindowBgAlpha(0)
-	ImGui.BeginChild("##footer", 480, 40)
+	ImGui.BeginChild("##dummy_tab_footer", 480, 40)
 	ImGui.Separator()
-	ImGui.TextDisabled(_F("v%s", Backend.__version))
+	ImGui.TextDisabled(_F("v%s %s", Backend.__version, cfg.debug_mode and "[DEBUG]" or ""))
 	if (self:IsItemClicked(self.MouseButtons.LEFT)) then
 		debug_counter = debug_counter + 1
-
 		if (debug_counter == 7) then
 			self:PlaySound(GUI.Sounds.Nav)
-			log.debug("Debug mode activated. Please reload the script to load debug tools & UIs.")
-			GVars.backend.debug_mode = true
+			log.debug("Debug mode enabled. Please reload the script to load debug tools & UIs.")
+			cfg.debug_mode = true
 		elseif (debug_counter > 7) then
 			self:PlaySound(GUI.Sounds.Cancel)
-			log.debug("Debug mode deactivated. Please reload the script to hide debug tools & UIs.")
-			GVars.backend.debug_mode = false
-			debug_counter = 0
+			log.debug("Debug mode disabled. Please reload the script to unload debug tools & UIs.")
+			cfg.debug_mode = false
+			debug_counter  = 0
 		end
-	end
-
-	if (GVars.backend.debug_mode) then
-		ImGui.SameLine()
-		ImGui.TextDisabled("[DEBUG]")
 	end
 	ImGui.EndChild()
 end
 
+-- TODO: this needs to be in api_imgui.lua as a general widget just like Selectable2.
 local underlineX       = 0.0
 local underlineW       = 0.0
 local underlineTargetX = 0.0
 local underlineTargetW = 0.0
 local underlineSet     = false
-
 ---@private
 function GUI:DrawTopBar()
+	local theme         = ThemeManager:GetCurrentTheme()
 	local drawList      = ImGui.GetWindowDrawList()
 	local tabCount      = table.getlen(tabIdToString) - 1
 	local availWidth, _ = ImGui.GetContentRegionAvail()
@@ -454,8 +452,8 @@ function GUI:DrawTopBar()
 	local totalWidth    = tabCount * elemWidth + (tabCount - 1) * spacing
 	local startX        = (availWidth - totalWidth) * 0.5
 	local cursorPos     = vec2:new(ImGui.GetCursorScreenPos())
-	local accent        = GVars.ui.style.theme.SSAccent
-	local gradient      = GVars.ui.style.theme.SSGradient
+	local accent        = theme.SSAccent
+	local gradient      = theme.SSGradient
 
 	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + startX)
 
@@ -574,9 +572,7 @@ function GUI:DrawTopBar()
 		underlinePos.y,
 		underlineEnd.x,
 		underlineEnd.y,
-		ImGui.GetColorU32(gradient.x, gradient.y, gradient.z, gradient.w),
-		GVars.ui.style.theme.Styles.WindowRounding
-	)
+		ImGui.GetColorU32(gradient.x, gradient.y, gradient.z, gradient.w), theme.Styles.WindowRounding)
 
 	ImGui.Separator()
 	self.m_cursor_pos = vec2:new(ImGui.GetCursorScreenPos())
@@ -590,74 +586,81 @@ function GUI:DrawCallbackWindow(yPos)
 		cb_window_pos_x = cb_window_pos_x + self.m_sidebar_width + 10
 	end
 
-	if (self.m_selected_tab) then
-		local fixedWidth = self.m_is_drawing_sidebar and (GVars.ui.window_size.x - self.m_sidebar_width - 10) or GVars.ui.window_size.x
-		ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
-		ImGui.SetNextWindowPos(cb_window_pos_x, yPos, ImGuiCond.Always)
-		ImGui.SetNextWindowSizeConstraints(fixedWidth, 20, fixedWidth, GVars.ui.window_size.y - 10)
-		if (ImGui.Begin("##ss_callback_window",
-				ImGuiWindowFlags.NoTitleBar |
-				ImGuiWindowFlags.NoMove |
-				ImGuiWindowFlags.NoBringToFrontOnFocus |
-				ImGuiWindowFlags.AlwaysAutoResize)
-			) then
-			self.m_selected_tab:Draw()
-			ImGui.End()
-		end
+	local selected_tab = self.m_selected_tab
+	if (not selected_tab) then
+		return
+	end
+
+	local fixedWidth = self.m_is_drawing_sidebar and (GVars.ui.window_size.x - self.m_sidebar_width - 10) or GVars.ui.window_size.x
+	ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
+	ImGui.SetNextWindowPos(cb_window_pos_x, yPos, ImGuiCond.Always)
+	ImGui.SetNextWindowSizeConstraints(fixedWidth, 20, fixedWidth, GVars.ui.window_size.y - 10)
+	if (ImGui.Begin("##ss_callback_window",
+			ImGuiWindowFlags.NoTitleBar |
+			ImGuiWindowFlags.NoMove |
+			ImGuiWindowFlags.NoBringToFrontOnFocus |
+			ImGuiWindowFlags.AlwaysAutoResize)
+		) then
+		selected_tab:Draw()
+		ImGui.End()
 	end
 end
 
 ---@private
 ---@param yPos float
 function GUI:DrawSideBar(yPos)
-	if (not self.m_selected_category or not tabIdToString[self.m_selected_category]) then
+	local cat = self.m_selected_category
+	if (not cat or not tabIdToString[cat]) then
 		self.m_is_drawing_sidebar = false
 		return
 	end
 
 	self.m_selected_category_tabs = self.m_selected_category_tabs or {}
-	local ctabsCount              = #self.m_selected_category_tabs
-	self.m_is_drawing_sidebar     = ctabsCount > 1
+	local tabCount                = #self.m_selected_category_tabs
+	self.m_is_drawing_sidebar     = tabCount > 1
 
-	if (ctabsCount == 0) then -- should never happen unless a ui file fails to load
+	if (tabCount == 0) then -- should never happen unless a ui file fails to load
 		return
 	end
 
 	if (not self.m_selected_tab) then
-		if (self.m_prev_category_tabs[self.m_selected_category]) then
-			self.m_selected_tab = self.m_prev_category_tabs[self.m_selected_category]
+		if (self.m_prev_category_tabs[cat]) then
+			self.m_selected_tab = self.m_prev_category_tabs[cat]
 		else
 			self.m_selected_tab = self.m_selected_category_tabs[1].second
 		end
 	end
 
-	if (ctabsCount > 1) then
-		local selectableSize = vec2:new(self.m_sidebar_width - 30, 32)
-		ImGui.SetNextWindowBgAlpha(GVars.ui.style.bg_alpha)
-		ImGui.SetNextWindowPos(GVars.ui.window_pos.x, yPos, ImGuiCond.Always)
-		ImGui.SetNextWindowSizeConstraints(self.m_sidebar_width, 0, self.m_sidebar_width, GVars.ui.window_size.y)
-		if (ImGui.Begin("##ss_side_bar",
-				ImGuiWindowFlags.NoTitleBar |
-				ImGuiWindowFlags.NoResize |
-				ImGuiWindowFlags.NoMove |
-				ImGuiWindowFlags.NoBringToFrontOnFocus |
-				ImGuiWindowFlags.AlwaysAutoResize)
-			) then
-			for i, pair in ipairs(self.m_selected_category_tabs) do
-				if (pair and pair.second) then
-					local tab   = pair.second
-					local label = tab:GetName()
-					ImGui.PushID(i)
-					if (ImGui.Selectable2(label, self.m_selected_tab == tab, selectableSize)) then
-						self:PlaySound(self.Sounds.Nav)
-						self.m_selected_tab           = tab
-						GVars.ui.last_tab.array_index = i
-					end
-					ImGui.PopID()
+	if (tabCount == 1) then
+		return
+	end
+
+	local uiCfg = GVars.ui
+	local selectableSize = vec2:new(self.m_sidebar_width - 30, 32)
+	ImGui.SetNextWindowBgAlpha(uiCfg.style.bg_alpha)
+	ImGui.SetNextWindowPos(uiCfg.window_pos.x, yPos, ImGuiCond.Always)
+	ImGui.SetNextWindowSizeConstraints(self.m_sidebar_width, 0, self.m_sidebar_width, uiCfg.window_size.y)
+	if (ImGui.Begin("##ss_side_bar",
+			ImGuiWindowFlags.NoTitleBar |
+			ImGuiWindowFlags.NoResize |
+			ImGuiWindowFlags.NoMove |
+			ImGuiWindowFlags.NoBringToFrontOnFocus |
+			ImGuiWindowFlags.AlwaysAutoResize)
+		) then
+		for i, pair in ipairs(self.m_selected_category_tabs) do
+			if (pair and pair.second) then
+				local tab   = pair.second
+				local label = tab:GetName()
+				ImGui.PushID(i)
+				if (ImGui.Selectable2(label, self.m_selected_tab == tab, selectableSize)) then
+					self:PlaySound(self.Sounds.Nav)
+					self.m_selected_tab        = tab
+					uiCfg.last_tab.array_index = i
 				end
+				ImGui.PopID()
 			end
-			ImGui.End()
 		end
+		ImGui.End()
 	end
 end
 
@@ -668,22 +671,22 @@ function GUI:OnDrawCallback(fixed_height)
 		gui.override_mouse(true)
 	end
 
-	local size, pos = self:GetNewWindowSizeAndCenterPos(0.45, 0.8); pos.y = 1
-	mainWindowFlags = Bit.Toggle(mainWindowFlags, ImGuiWindowFlags.NoMove, GVars.ui.moveable)
+	local uiCfg     = GVars.ui
+	local size, pos = self:GetNewWindowSizeAndCenterPos(0.45, 0.8); pos.y = 1.0
+	mainWindowFlags = Bit.Toggle(mainWindowFlags, ImGuiWindowFlags.NoMove, uiCfg.moveable)
 
-	if (GVars.ui.window_pos:is_zero()) then
+	if (uiCfg.window_pos:is_zero()) then
 		ImGui.SetNextWindowPos(pos.x, pos.y, ImGuiCond.Always)
-		GVars.ui.window_pos = pos
+		uiCfg.window_pos = pos
 	else
-		local cond = GVars.ui.moveable and ImGuiCond.FirstUseEver or ImGuiCond.Always
-		ImGui.SetNextWindowPos(pos.x, pos.y, cond)
+		ImGui.SetNextWindowPos(pos.x, pos.y, uiCfg.moveable and ImGuiCond.FirstUseEver or ImGuiCond.Always)
 	end
 
-	if (GVars.ui.window_size:is_zero()) then
+	if (uiCfg.window_size:is_zero()) then
 		ImGui.SetNextWindowSize(size.x, fixed_height, ImGuiCond.Always)
-		GVars.ui.window_size = size
+		uiCfg.window_size = size
 	else
-		ImGui.SetNextWindowSize(GVars.ui.window_size.x, fixed_height, ImGuiCond.Always)
+		ImGui.SetNextWindowSize(uiCfg.window_size.x, fixed_height, ImGuiCond.Always)
 	end
 
 	self.m_window_anim:OnFrame()
@@ -696,26 +699,26 @@ function GUI:DrawWindowRequests()
 			goto continue
 		end
 
-		if (request.m_pos) then
-			ImGui.SetNextWindowPos(request.m_pos.x, request.m_pos.y, ImGuiCond.Always)
+		local pos = request.m_pos
+		if (pos) then
+			ImGui.SetNextWindowPos(pos.x, pos.y, ImGuiCond.Always)
 		end
 
-		if (request.m_size) then
-			ImGui.SetNextWindowSize(request.m_size.x, request.m_size.y, ImGuiCond.Always)
+		local size = request.m_size
+		if (size) then
+			ImGui.SetNextWindowSize(size.x, size.y, ImGuiCond.Always)
 		end
 
 		ImGui.Begin(label, true, request.m_flags or 0)
 		if (request.m_error) then
 			ImGui.Text(_F("Callback error for requested window '%s':", label))
 			ImGui.Indent()
-			ImGui.PushStyleColor(ImGuiCol.Text, 1, 0, 0, 1)
-			ImGui.Text(request.m_error)
-			ImGui.PopStyleColor(1)
+			ImGui.TextColored(1, 0, 0, 1, request.m_error)
 			ImGui.Unindent()
 		else
-			local ok, err = pcall(request.m_callback)
+			local ok, res = pcall(request.m_callback)
 			if (not ok) then
-				request.m_error = type(err) == "string" and err or "Unknown error."
+				request.m_error = type(res) == "string" and res or "Unknown error."
 			end
 		end
 		ImGui.End()
@@ -724,6 +727,7 @@ function GUI:DrawWindowRequests()
 	end
 end
 
+local notifStateStruct = NotifWidgetState()
 ---@private
 function GUI:__DrawImpl()
 	local topBarHeight = self:GetMaxTopBarHeight()
@@ -741,6 +745,7 @@ function GUI:__DrawImpl()
 		ImGui.SetWindowFontScale(1)
 
 		if (Notifier) then
+			notifStateStruct:Update()
 			ImGui.SameLine()
 			local isOpen     = Notifier:IsOpen()
 			local widgetSize = vec2:new(27, 22)
@@ -748,13 +753,7 @@ function GUI:__DrawImpl()
 			local nextPosX   = ImGui.GetCursorPosX() + region.x - widgetSize.x - 20
 			local nextPosY   = ImGui.GetCursorPosY() + (widgetSize.y * 0.25)
 			ImGui.SetCursorPos(nextPosX, nextPosY)
-			if (ImGui.NotifWidget({
-					muted       = Notifier:IsMuted(),
-					open        = isOpen,
-					unread      = Notifier:HasUnread(),
-					unreadCount = Notifier:GetNotifCount(),
-				}, widgetSize)
-				) then
+			if (ImGui.NotifWidget(notifStateStruct, widgetSize)) then
 				Notifier:Open()
 			end
 			self.m_notifier_pos = vec2:new(GVars.ui.window_pos.x + region.x, GVars.ui.window_pos.y + ImGui.GetCursorPosY())
@@ -821,7 +820,7 @@ function GUI:ShowWindowHeightLimit()
 		| ImGuiWindowFlags.AlwaysAutoResize
 		| ImGuiWindowFlags.NoBackground
 
-	local color       = Color(GVars.ui.style.theme.SSAccent:unpack())
+	local color       = Color(ThemeManager:GetCurrentTheme().SSAccent:unpack())
 	local topHeight   = self:GetMaxTopBarHeight()
 	local pos         = vec2:new(GVars.ui.window_pos.x, GVars.ui.window_pos.y + GVars.ui.window_size.y + topHeight - 10)
 	ImGui.SetNextWindowSize(GVars.ui.window_size.x + 10, 0)

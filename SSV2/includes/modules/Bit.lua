@@ -38,6 +38,19 @@ end
 
 ---@param n integer
 ---@param pos integer
+---@return integer
+function Bit.Flip(n, pos)
+	return n ~ (1 << pos)
+end
+
+---@param n integer
+---@return integer
+function Bit.FlipAll(n)
+	return ~n
+end
+
+---@param n integer
+---@param pos integer
 ---@param toggle boolean
 ---@return integer
 function Bit.Toggle(n, pos, toggle)

@@ -108,6 +108,11 @@ function Game.IsInNetworkTransition()
 end
 
 ---@return boolean
+function Game.IsPlayerSwitchInProgress()
+	return STREAMING.IS_PLAYER_SWITCH_IN_PROGRESS()
+end
+
+---@return boolean
 function Game.IsOnline()
 	return network.is_session_started() and not Game.IsInNetworkTransition()
 end
@@ -1495,7 +1500,7 @@ function Game.LoadGroundAtCoord(coords)
 	return true
 end
 
----@param label string
+---@param label GXT
 function Game.GetLabelText(label)
 	return HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(label or "")
 end

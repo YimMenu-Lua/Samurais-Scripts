@@ -50,11 +50,7 @@ function Player.new(p0)
 		ped = p0
 		pid = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(p0)
 	else
-		error("Invalid parameter. Function expects a player ID or a ped handle.")
-	end
-
-	if (not NETWORK.NETWORK_IS_PLAYER_CONNECTED(pid)) then
-		error("Invalid player.")
+		error("Invalid parameter! Player class constructor expects either a player ID or a ped handle.")
 	end
 
 	local base        = Entity(ped)
@@ -63,6 +59,11 @@ function Player.new(p0)
 	instance.m_pid    = pid
 	instance.m_handle = ped
 	return instance
+end
+
+---@return ID
+function Player:GetID()
+	return self.m_pid
 end
 
 ---@return boolean
@@ -83,6 +84,11 @@ function Player:IsMale()
 	return self:GetModelHash() == 0x705E61F2
 end
 
+---@return boolean
+function Player:IsSessionHost()
+	return NETWORK.NETWORK_GET_HOST_PLAYER_INDEX() == self:GetID()
+end
+
 ---@param scriptName string
 ---@return boolean
 function Player:IsHostOfScript(scriptName)
@@ -101,7 +107,7 @@ function Player:IsHostOfScript(scriptName)
 end
 
 -- ```C
--- BOOL func_24957(ePedComponentType epctParam0) // Position - 0x72351E (7484702) (b3725.0)
+-- BOOL func_25246(Player plParam0) // Position - 0x734BC9 (7556041) (b3889.0)
 -- ```
 --___
 -- not sure if reading the global is cheaper than calling the script function but it would definitely be much batter than global maintenance
@@ -112,16 +118,42 @@ function Player:IsBoss()
 end
 
 -- ```C
--- int func_11572(ePedComponentType epctParam0) // Position - 0x41A1CE (4301262) (b3725.0)
+-- int func_11637(Player plParam0) // Position - 0x41F6DE (4323038) (b3889.0)
 -- ```
----@return integer
+---@return eBossType
 function Player:GetBossType()
+	if (not self:IsBoss()) then
+		return Enums.eBossType.NONE
+	end
+
 	return GGlobals.GPBD_FM_3:At(self:GetID(), 615):At(10):At(433):ReadInt()
 end
 
----@return ID
-function Player:GetID()
-	return self.m_pid
+---@return -1|ID -- PlayerID or -1
+function Player:GetBossOfPlayer()
+	local pid     = self:GetID()
+	local boss_id = GGlobals.GPBD_FM_3:At(pid, 615):At(10):ReadInt()
+	if (boss_id == pid) then -- we're our own boss. we don't call IsBoss here to avoid calling GetID and reading GPBD_FM_3 all over again
+		return -1
+	end
+
+	return GGlobals.GPBD_FM_3:At(boss_id, 615):At(10):ReadInt()
+end
+
+---@return boolean
+function Player:IsAssociate()
+	local id = self:GetBossOfPlayer()
+	return id ~= -1 and id ~= self:GetID()
+end
+
+---@return eBossType
+function Player:GetAssociateType()
+	local boss_id = self:GetBossOfPlayer()
+	if (boss_id == -1 or boss_id == self:GetID()) then
+		return Enums.eBossType.NONE
+	end
+
+	return GGlobals.GPBD_FM_3:At(boss_id, 615):At(10):At(433):ReadInt()
 end
 
 ---@return eGameState
@@ -148,5 +180,3 @@ end
 function Player:HasControl()
 	return PLAYER.IS_PLAYER_CONTROL_ON(self:GetID())
 end
-
--- [WIP]

@@ -7,6 +7,10 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+require("includes.classes.Vector2")
+require("includes.classes.Vector3")
+require("includes.classes.Vector4")
+
 ---@class Config
 local Config <const> = {
 	backend = {
@@ -21,17 +25,10 @@ local Config <const> = {
 		moveable = false,
 		style = {
 			bg_alpha = 0.7,
+			theme = "Synthwave"
 		},
-		window_size = {
-			__type = "vec2",
-			x = 864,
-			y = 864,
-		},
-		window_pos = {
-			__type = "vec2",
-			x = 0,
-			y = 0,
-		},
+		window_size = vec2:new(864, 864),
+		window_pos = vec2:new(1, 1),
 		last_tab = {
 			tab_id = 1,
 			array_index = 1,
@@ -158,12 +155,7 @@ local Config <const> = {
 				power = 50,
 				smoke_fx = {
 					enabled = false,
-					color = {
-						__type = "vec3",
-						x = 1,
-						y = 1,
-						z = 1,
-					}
+					color = vec3:new(1, 1, 1)
 				},
 			},
 			default_station = {
@@ -216,13 +208,7 @@ local Config <const> = {
 				manual_aim = false,
 				enemies_only = false,
 				marker_size = 1.6,
-				marker_color = {
-					__type = "vec4",
-					x = 0,
-					y = 1,
-					z = 0,
-					w = 1,
-				}
+				marker_color = vec4:new(0, 1, 0, 1)
 			},
 			flares = false,
 			drift_minigame = {
@@ -247,11 +233,7 @@ local Config <const> = {
 			enabled = false,
 			speed_unit = 0,
 			radius = 160,
-			pos = {
-				__type = "vec2",
-				x = 0.0,
-				y = 0.0
-			},
+			pos = vec2:zero(),
 			colors = {
 				circle = 0xFF313195,
 				circle_bg = 0x66090909,
@@ -273,13 +255,7 @@ local Config <const> = {
 				enabled = false,
 				keybind = "L",
 				ray_length = 500,
-				color = {
-					__type = "vec4",
-					x = 1,
-					y = 0,
-					z = 0,
-					w = 0.9
-				}
+				color = vec4:new(1, 0, 0, 0.9)
 			},
 			katana = {
 				enabled = false,
@@ -305,10 +281,12 @@ local Config <const> = {
 			rig_slot_machine = false,
 			autoplay_slots = false,
 			cap_slot_machine_chips = false,
-			ch_cart_autograb = false,
 			autoplay_slots_delay_random = false,
+			zero_ai_cuts = false,
 			slot_machine_cap = 0,
 			autoplay_slots_delay = 500,
+			disable_heist_cooldown = false,
+			ch_cart_autograb = false,
 		},
 		yim_heists = {
 			cfr_cd = false,
@@ -317,6 +295,8 @@ local Config <const> = {
 			ogfa_cd = false,
 			cayo_cd = false,
 			dday_cd = false,
+			sixty_nine = false,
+			solo_missions = false,
 		},
 		yrv3 = {
 			autofill_delay = 500,

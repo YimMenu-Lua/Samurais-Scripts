@@ -8,11 +8,15 @@
 
 
 local Set                    = require("includes.classes.Set")
+local Theme                  = require("includes.structs.Theme")
 local JSON <const>           = require("includes.thirdparty.json.json")()
 local B64_CHARS <const>      = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 local PUBLIC_XOR_KEY <const> = "\xA3\x4F\xD2\x9B\x7E\xC1\xE8\x36\x5D\x0A\xF7\xB4\x6C\x2D\x89\x50\x1E\x73\xC9\xAF\x3B\x92\x58\xE0\x14\x7D\xA6\xCB\x81\x3F\xD5\x67"
 
 assert(JSON.VERSION == "20211016.28", "Bad Json package version.")
+require("includes.classes.Vector2")
+require("includes.classes.Vector3")
+require("includes.classes.Vector4")
 
 ---@enum eSerializerState
 local eSerializerState <const> = {
@@ -83,7 +87,12 @@ function Serializer:init()
 	self.m_dirty            = false
 	self.m_locked           = false
 	self.m_disabled         = false
-	self.m_registered_types = {}
+	self.m_registered_types = {
+		["vec2"] = { constructor = vec2.new, serializer = vec2.serialize },
+		["vec3"] = { constructor = vec3.new, serializer = vec3.serialize },
+		["vec4"] = { constructor = vec4.new, serializer = vec4.serialize },
+		["theme"] = { constructor = Theme.deserialize, serializer = Theme.serialize },
+	}
 	self.m_deferred_objects = {}
 	self.m_lock_queue       = {}
 	self.m_key_states       = {}
@@ -136,7 +145,7 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 		log.error("[Serializer]: Failed to read data! Persistent config will be disabled for this session.")
 		self.m_disabled = true
 		self.m_state    = eSerializerState.SUSPENDED
-		return self
+		config_data     = self.m_default_config
 	end
 
 	if (not runtime_vars) then
@@ -187,12 +196,14 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 		runtime_vars[key] = saved_value
 	end
 
-	local ignored_set      = Set("__schema_hash", "__dev_reset", "__version")
-	self.__schema_hash     = _J(table.snapshot(self.m_default_config, { ignored_keys = ignored_set }))
-	self.m_state           = eSerializerState.IDLE
-	self.m_last_write_time = TimePoint()
-	self:SyncKeys()
-	self:SaveBackup()
+	if (not self.m_disabled) then
+		local ignored_set      = Set("__schema_hash", "__dev_reset", "__version")
+		self.__schema_hash     = _J(table.snapshot(self.m_default_config, { ignored_keys = ignored_set }))
+		self.m_state           = eSerializerState.IDLE
+		self.m_last_write_time = TimePoint()
+		self:SyncKeys()
+		self:SaveBackup()
+	end
 
 	self.m_setup = true
 	return self
@@ -552,7 +563,7 @@ function Serializer:OnReadError(msg)
 	msg = msg or "Unknown error."
 	log.fwarning("[Serializer]: Error reading data: %s", msg)
 	self.m_disabled = true
-	return table.copy(self.m_default_config)
+	return self.m_default_config
 end
 
 ---@param data any
@@ -585,7 +596,7 @@ end
 ---@return table
 function Serializer:Read()
 	if (self:IsDisabled()) then
-		return table.copy(self.m_default_config)
+		return self.m_default_config
 	end
 
 	local f <close> = io.open(self.m_file_name, "r")
@@ -894,7 +905,7 @@ function Serializer:FlushObjectQueue()
 	self:WithLock(function()
 		for _, t in ipairs(self.m_deferred_objects) do
 			for k, v in pairs(self.m_key_states) do
-				if ((type(v) == "table" and (type(t) == "table"))) then
+				if (type(v) == "table" and type(t) == "table") then
 					self.m_key_states[k] = self:Reconstruct(v)
 				end
 			end

@@ -117,10 +117,10 @@ local sub_paths = {
 	"frontend.vehicle.vehicle_ui",
 	"frontend.world_ui",
 
-	"frontend.yim_resupplier.yrv3_ui",
+	"frontend.business_mgr.business_mgr_ui",
 	"frontend.casino_ui",
-	"frontend.mastermind_ui",
 	"frontend.stat_controller_ui",
+	"frontend.heist_editor.heist_editor_ui",
 
 	"frontend.billionaire_services.bsv2_ui",
 	"frontend.entity_forge.entity_forge_ui",

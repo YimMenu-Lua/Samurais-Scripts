@@ -1,6 +1,8 @@
 -- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
 -- This file is part of Samurai's Scripts.
 --
+-- Original Author: gir489/spankerincrease
+--
 -- Permission is hereby granted to copy, modify, and redistribute
 -- this code as long as you respect these conditions:
 --	* Credit the owner and contributors.
@@ -8,7 +10,16 @@
 
 
 local SGSL                    = require("includes.services.SGSL")
-local RawBusinessData         = require("includes.data.yrv3_data")
+local chipCdStats             = {
+	"MPPLY_CASINO_CHIPS_WON_GD",
+	"MPPLY_CASINO_CHIPS_WONTIM",
+	"MPPLY_CASINO_GMBLNG_GD",
+	"MPPLY_CASINO_BAN_TIME",
+	"MPPLY_CASINO_CHIPS_PURTIM",
+	"MPPLY_CASINO_CHIPS_PUR_GD",
+	"MPPLY_CASINO_CHIPS_SOLD",
+	"MPPLY_CASINO_CHIPS_SELTIM",
+}
 
 ---@enum eCasinoPrize
 Enums.eCasinoPrize            = {
@@ -34,16 +45,15 @@ local CasinoPrizes <const>    = {
 
 local CardNumToString <const> = {
 	[0]  = "CP_CARD_KING",
-	[1]  = "CP_CARD_KING",
-	[11] = "CP_CARD_KING",
-	[12] = "CP_CARD_KING",
+	[1]  = "CP_CARD_ACE",
+	[11] = "CP_CARD_JACK",
+	[12] = "CP_CARD_QUEEN",
 }
 
 
 ---@class CasinoPacino
----@field private m_arcade_prop { coords: vec3, gxt: string }
----@field protected m_thread Thread?
----@field protected m_initialized boolean
+---@field private m_thread Thread?
+---@field private m_initialized boolean
 local CasinoPacino   = {}
 CasinoPacino.__index = CasinoPacino
 
@@ -53,13 +63,10 @@ function CasinoPacino:init()
 		return self
 	end
 
-	local instance = setmetatable({}, self)
-	instance.m_initialized = true
-	instance.m_thread = ThreadManager:RegisterLooped("SS_DUNK", function()
-		instance:Main()
-	end)
+	self.m_thread      = ThreadManager:RegisterLooped("SS_DUNK", function() self:Main() end)
+	self.m_initialized = true
 
-	return instance
+	return self
 end
 
 ---@return boolean
@@ -67,22 +74,7 @@ function CasinoPacino:CanAccess()
 	return Backend:IsUpToDate()
 		and Game.IsOnline()
 		and not Backend:IsMockEnv()
-		and not script.is_active("maintransition")
 		and not NETWORK.NETWORK_IS_ACTIVITY_SESSION()
-end
-
----@return { coords: vec3, gxt: string }?
-function CasinoPacino:GetOwnedArcade()
-	if (not self.m_arcade_prop) then
-		local arcade_idx = stats.get_int("MPX_ARCADE_OWNED")
-		local property = RawBusinessData.Arcades[arcade_idx]
-		if (not property) then
-			return
-		end
-		self.m_arcade_prop = property
-	end
-
-	return self.m_arcade_prop
 end
 
 ---@param prizeID eCasinoPrize
@@ -190,13 +182,15 @@ function CasinoPacino:SetPokerCards(player_id, players_current_table, card_one, 
 	local three_card_poker_deck_size       = SGSL:Get(SGSL.data.three_card_poker_deck_size):GetValue()
 	local three_card_poker_anti_cheat      = tcp_ac_obj:GetValue()
 	local three_card_poker_anti_cheat_deck = tcp_ac_obj:GetOffset(1)
-	local TCPCards                         = ScriptLocal(three_card_poker_cards, "three_card_poker")
+
+
+	local TCPCards = ScriptLocal(three_card_poker_cards, "three_card_poker")
 		:At(three_card_poker_current_deck)
 		:At(1)
 		:At(players_current_table * three_card_poker_deck_size)
 		:At(2)
 
-	local TCPAC                            = ScriptLocal(three_card_poker_anti_cheat, "three_card_poker")
+	local TCPAC    = ScriptLocal(three_card_poker_anti_cheat, "three_card_poker")
 		:At(three_card_poker_anti_cheat_deck)
 		:At(1)
 		:At(1)
@@ -417,34 +411,14 @@ function CasinoPacino:GetBJDealerCard()
 	return self:GetCardNameFromIndex(dealers_card)
 end
 
-function CasinoPacino:SetCartAutoGrab()
-	local FMMC_OBJ     = SGSL:Get(SGSL.data.fm_mission_controller_cart_grab)
-	local SceneLocal   = FMMC_OBJ:AsLocal()
-	local PlaybackRate = FMMC_OBJ:GetOffset(1)
-	local SceneState   = SceneLocal:ReadInt()
-
-	if (SceneState == 3) then
-		SceneLocal:WriteInt(4)
-	elseif (SceneState == 4) then
-		if (SceneLocal:At(PlaybackRate):ReadFloat() < 2.0) then
-			SceneLocal:At(PlaybackRate):WriteFloat(2.0)
-		end
-	end
-end
-
-function CasinoPacino:BypassCooldown()
+function CasinoPacino:BypassChipCooldown()
 	if (not GVars.features.dunk.bypass_casino_bans) then
 		return
 	end
 
-	stats.set_int("MPPLY_CASINO_CHIPS_WON_GD", 0)
-	stats.set_int("MPPLY_CASINO_CHIPS_WONTIM", 0)
-	stats.set_int("MPPLY_CASINO_GMBLNG_GD", 0)
-	stats.set_int("MPPLY_CASINO_BAN_TIME", 0)
-	stats.set_int("MPPLY_CASINO_CHIPS_PURTIM", 0)
-	stats.set_int("MPPLY_CASINO_CHIPS_PUR_GD", 0)
-	stats.set_int("MPPLY_CASINO_CHIPS_SOLD", 0)
-	stats.set_int("MPPLY_CASINO_CHIPS_SELTIM", 0)
+	for _, v in ipairs(chipCdStats) do
+		stats.set_int(v, 0)
+	end
 end
 
 function CasinoPacino:Main()
@@ -454,15 +428,11 @@ function CasinoPacino:Main()
 		return
 	end
 
-	self:BypassCooldown()
+	self:BypassChipCooldown()
 	self:ForcePokerCards()
 	self:ForceRouletteWheel()
 	self:RigSlotMachine()
 	self:AutoPlaySlots()
-
-	if (script.is_active("fm_mission_controller") and GVars.features.dunk.ch_cart_autograb) then
-		self:SetCartAutoGrab()
-	end
 end
 
 return CasinoPacino:init()

@@ -53,41 +53,43 @@ YimActions.__index = YimActions
 
 ---@return YimActions
 function YimActions:init()
-	if (self.m_initialized) then return self end
+	if (self.m_initialized) then
+		return self
+	end
 
-	local instance            = setmetatable({}, YimActions)
-	instance.m_scene_mgr      = SceneManager.new(instance)
-	instance.m_prop_mgr       = PropManager.new(instance)
-	instance.m_fx_mgr         = FXManager.new(instance)
-	instance.CompanionManager = CompanionManager.new(instance)
-	instance.LastPlayed       = ActionsHistory.new()
-	instance.Debugger         = YAV3Debugger.new(instance)
-	instance.CurrentlyPlaying = {}
-	instance.Commands         = {}
-	instance.Favorites        = {
+	local compMgr         = CompanionManager.new(self)
+	self.CompanionManager = compMgr
+	self.m_scene_mgr      = SceneManager.new(self)
+	self.m_prop_mgr       = PropManager.new(self)
+	self.m_fx_mgr         = FXManager.new(self)
+	self.LastPlayed       = ActionsHistory.new()
+	self.Debugger         = YAV3Debugger.new(self)
+	self.CurrentlyPlaying = {}
+	self.Commands         = {}
+	self.Favorites        = {
 		anims     = {},
 		scenarios = {},
 		scenes    = {},
 		clipsets  = {},
 	}
-	instance.m_file_names     = {
+	self.m_file_names     = {
 		favorites = "saved_actions.json",
 		commands  = "action_commands.json",
 	}
 
-	instance:ReadSavedFavorites()
-	Backend:RegisterEventCallbackAll(function() instance:ForceCleanup() end)
+	self:ReadSavedFavorites()
+	Backend:RegisterEventCallbackAll(function() self:ForceCleanup() end)
 	Backend:RegisterFeatureEntityHandler("YimActions", function(handle)
-		instance.CompanionManager:RemoveCompanionByHandle(handle)
+		compMgr:RemoveCompanionByHandle(handle)
 	end)
-	ThreadManager:RegisterLooped("SS_YIMACTIONS", function() instance:OnTick() end, {
+	ThreadManager:RegisterLooped("SS_YIMACTIONS", function() self:OnTick() end, {
 		exception_handler = function()
-			instance:Cleanup()
+			self:Cleanup()
 		end
 	})
 
-	instance.m_initialized = true
-	return instance
+	self.m_initialized = true
+	return self
 end
 
 ---@param ped? integer
@@ -137,7 +139,7 @@ function YimActions:IsPlayerBusy()
 		or LocalPlayer:IsInWater()
 		or LocalPlayer:IsRagdoll()
 		or Game.IsInNetworkTransition()
-		or Backend:IsPlayerSwitchInProgress()
+		or Game.IsPlayerSwitchInProgress()
 end
 
 ---@param ped? integer
@@ -434,7 +436,7 @@ function YimActions:OnInterruptEvent()
 		return
 	end
 
-	if (not LocalPlayer:IsAlive() or LocalPlayer:IsBeingArrested() or Backend:IsPlayerSwitchInProgress() or Game.IsInNetworkTransition()) then
+	if (not LocalPlayer:IsAlive() or LocalPlayer:IsBeingArrested() or Game.IsPlayerSwitchInProgress() or Game.IsInNetworkTransition()) then
 		self:ForceCleanup()
 		yield()
 		return
@@ -475,23 +477,6 @@ end
 
 function YimActions:ReadSavedFavorites()
 	if (not io.exists(self.m_file_names.favorites)) then
-		-- This exists because my dumbass keeps drastically changing
-		-- the config. To avoid pissing off users who have saved favorites,
-		-- this is the price: a few more micro seconds on load.
-		-- This will be removed after one or two more releases.
-
-		---@type YimActionsFavorites?
-		local existing = GVars.features.yim_actions.favorites
-		if (existing) then
-			for k, v in pairs(existing) do
-				if (next(v) ~= nil) then
-					self.Favorites[k] = table.copy(v)
-				end
-			end
-
-			GVars.features.yim_actions.favorites = nil
-		end
-
 		self:ParseFavorites()
 		return
 	end
@@ -565,7 +550,7 @@ function YimActions:RegisterCommands()
 
 	local failed = {}
 	for label, data in pairs(self.Commands) do
-		local action = self:FindActionByStrID(data.type, label)
+		local action = self:GetActionByLabel(data.type, label)
 		if (not action) then
 			table.insert(failed, data.command)
 			goto continue
@@ -582,11 +567,11 @@ function YimActions:RegisterCommands()
 	end
 
 	if (#failed > 0) then
-		Notifier:ShowError("YimActions",
+		Notifier:ShowWarning("YimActions",
 			"Some commands were not registered (no matching action). Dumping to console..."
 		)
 
-		Backend:debug("Failed commands:\n\t%s", table.concat(failed, "\n"))
+		Backend:debug("Failed = {\n\t%s\n}", table.concat(failed, ",\n\t"))
 	end
 end
 
@@ -609,7 +594,7 @@ function YimActions:AddCommandAction(cmd_name, data)
 		return
 	end
 
-	local action = self:FindActionByStrID(data.type, data.label)
+	local action = self:GetActionByLabel(data.type, data.label)
 	if (not action) then
 		Notifier:ShowError("YimActions", _F("Could not find action by name: '%s'", data.label))
 		return
@@ -649,9 +634,9 @@ function YimActions:RemoveCommandAction(action_label)
 end
 
 ---@param action_type eActionType
----@param str_id string
+---@param label string
 ---@return Action?
-function YimActions:FindActionByStrID(action_type, str_id)
+function YimActions:GetActionByLabel(action_type, label)
 	---@type array<AnimData|ScenarioData>?
 	local lookup_array = Switch(action_type) {
 		[Enums.eActionType.ANIM]     = require("includes.data.actions.animations"),
@@ -659,35 +644,35 @@ function YimActions:FindActionByStrID(action_type, str_id)
 		default                      = nil
 	}
 
-	if (not lookup_array) then return nil end
-
-	for _, data in ipairs(lookup_array) do
-		if (data.label == str_id) then
-			return Action.new(data, action_type)
+	if (lookup_array) then
+		for _, data in ipairs(lookup_array) do
+			if (data.label == label) then
+				return Action.new(data, action_type)
+			end
 		end
 	end
 
 	return nil
 end
 
-function YimActions:DrawPoliceTorchLight()
+function YimActions:DrawPoliceFlashLight()
 	local playerProps = self.m_prop_mgr:GetPropsForPed(LocalPlayer:GetHandle())
 	if (not playerProps) then return end
 
-	local torch = playerProps[1]
-	if not (torch and ENTITY.DOES_ENTITY_EXIST(torch) and (Game.GetEntityModel(torch) == 211760048)) then
+	local flashLight = playerProps[1]
+	if not (flashLight and ENTITY.DOES_ENTITY_EXIST(flashLight) and (Game.GetEntityModel(flashLight) == 211760048)) then
 		return
 	end
 
-	local torchPos = Game.GetEntityCoords(torch, false)
-	local torchFwd = (Game.GetForwardVector(torch)):inverse(true)
+	local objPos = Game.GetEntityCoords(flashLight, false)
+	local objFwd = (Game.GetForwardVector(flashLight)):inverse(true)
 	GRAPHICS.DRAW_SPOT_LIGHT(
-		torchPos.x,
-		torchPos.y,
-		torchPos.z - 0.2,
-		torchFwd.x,
-		torchFwd.y,
-		torchFwd.z,
+		objPos.x,
+		objPos.y,
+		objPos.z - 0.2,
+		objFwd.x,
+		objFwd.y,
+		objFwd.z,
 		226,
 		130,
 		78,
@@ -708,7 +693,7 @@ function YimActions:GoofyUnaliveAnim()
 	ThreadManager:Run(function()
 		local current  = LocalPlayer:GetCurrentWeaponHash()
 		local is_armed = false
-		if (current ~= 0 and WEAPON.GET_WEAPONTYPE_GROUP(current) ~= _J("GROUP_PISTOL")) then
+		if (current ~= 0 and WEAPON.GET_WEAPONTYPE_GROUP(current) == _J("GROUP_PISTOL")) then
 			is_armed = true
 		else
 			for _, hash in ipairs(Weapons.Pistols) do
@@ -720,16 +705,13 @@ function YimActions:GoofyUnaliveAnim()
 			end
 		end
 
-		PED.SET_PED_CAN_SWITCH_WEAPON(ped, false)
+		if (not is_armed) then return end
 
+		PED.SET_PED_CAN_SWITCH_WEAPON(ped, false)
 		while (ENTITY.GET_ENTITY_ANIM_CURRENT_TIME(ped, "mp_suicide", "pistol") < 0.299) do
 			yield()
 		end
-
-		if (is_armed) then
-			PED.SET_PED_SHOOTS_AT_COORD(ped, 0.0, 0.0, 0.0, false)
-		end
-
+		PED.SET_PED_SHOOTS_AT_COORD(ped, 0.0, 0.0, 0.0, false)
 		PED.SET_PED_CAN_SWITCH_WEAPON(ped, true)
 	end)
 end
@@ -769,6 +751,7 @@ function YimActions:OnTick()
 
 	self:OnKeyDown()
 
+	local cfg     = GVars.features.yim_actions
 	local ped     = LocalPlayer:GetHandle()
 	local current = self.CurrentlyPlaying[ped]
 	if (not current) then return end
@@ -779,9 +762,10 @@ function YimActions:OnTick()
 			return
 		end
 
-		if (not GVars.features.yim_actions.disable_ptfx and not GVars.features.yim_actions.disable_props) then
-			if (current.data.label and current.data.label:lower():find("police torch")) then
-				self:DrawPoliceTorchLight()
+		if (not cfg.disable_ptfx and not cfg.disable_props) then
+			local label = current.data.label
+			if (label and label:lower():find("police torch")) then
+				self:DrawPoliceFlashLight()
 			end
 		end
 
@@ -790,7 +774,7 @@ function YimActions:OnTick()
 			self:GoofyUnaliveAnim()
 		end
 
-		if (current.data.sfx and not GVars.features.yim_actions.disable_sfx) then
+		if (current.data.sfx and not cfg.disable_sfx) then
 			self.m_fx_mgr:StartSFX()
 		end
 	end

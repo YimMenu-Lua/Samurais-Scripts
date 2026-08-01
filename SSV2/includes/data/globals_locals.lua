@@ -861,6 +861,80 @@ return {
 			capture_group = 1
 		}
 	},
+	og_heists_player_cuts_global_1 = {
+		description = "OG heists Player Cuts Global1 + 1",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 1935929,
+			pattern = [[if\s+\(func_\d+\(PLAYER::PLAYER_ID\(\)\)\)[\r\n]?.?\s+func_\d+\(Global_\d+, Global_\d+\.f_\d+, Global_\d+\.f_\d+\);[\r\n]?.?\s+else[\r\n]?.?\s+func_\d+\(Global_\d+, Global_\d+\.f_\d{2}, Global_(\d+)\.f_1\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 1936406,
+			pattern = [[if\s+\(func_\d+\(PLAYER::PLAYER_ID\(\)\)\)[\r\n]?.?\s+func_\d+\(Global_\d+, Global_\d+\.f_\d+, Global_\d+\.f_\d+\);[\r\n]?.?\s+else[\r\n]?.?\s+func_\d+\(Global_\d+, Global_\d+\.f_\d{2}, Global_(\d+)\.f_1\);]],
+			capture_group = 1
+		}
+	},
+	og_heists_player_cuts_global_2 = {
+		description = "OG heists Player Cuts Global2 (struct<5>)",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 1937897,
+			pattern = [[if\s+\(func_\d+\(PLAYER::PLAYER_ID\(\)\)\)[\r\n]?.?\s+func_\d+\(Global_\d+, Global_\d+\.f_\d+, Global_(\d{7})\.f_(\d{4})\);[\r\n]?.?\s+else[\r\n]?.?\s+func_\d+\(Global_\d+, Global_\d+\.f_\d{2}, Global_\d+\.f_1\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 3008,
+					capture_group = 2
+				}
+			}
+		},
+		ENHANCED = {
+			value = 1938374,
+			pattern = [[if\s+\(func_\d+\(PLAYER::PLAYER_ID\(\)\)\)[\r\n]?.?\s+func_\d+\(Global_\d+, Global_\d+\.f_\d+, Global_(\d{7})\.f_(\d{4})\);[\r\n]?.?\s+else[\r\n]?.?\s+func_\d+\(Global_\d+, Global_\d+\.f_\d{2}, Global_\d+\.f_1\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 3008,
+					capture_group = 2
+				}
+			}
+		}
+	},
+	gb_gang_ops_planning_player_cuts = {
+		description = "GangOps Player Cuts Global + Offsets",
+		file = "gb_gang_ops_planning.c",
+		LEGACY = {
+			value = 1968511,
+			pattern = [[Global_\d{7}\.f_\d{3}\.f_\d{2}\[.+?\]\s+?=\s+?-1;[\r\n]?\s+?Global_(\d{7})\.f_(\d{3})\.f_(\d{2})\[.+?\]\s+?=\s+?0;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 812,
+					capture_group = 2
+				},
+				{
+					value = 50,
+					capture_group = 3
+				},
+			}
+		},
+		ENHANCED = {
+			value = 1969071,
+			pattern = [[Global_\d{7}\.f_\d{3}\.f_\d{2}\[.+?\]\s+?=\s+?-1;[\r\n]?\s+?Global_(\d{7})\.f_(\d{3})\.f_(\d{2})\[.+?\]\s+?=\s+?0;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 812,
+					capture_group = 2
+				},
+				{
+					value = 50,
+					capture_group = 3
+				},
+			}
+		}
+	},
 	gb_casino_heist_planning_cut_offset = {
 		description = "Casino Heist Planning Cut Offset",
 		file = "gb_casino_heist_planning.c",
@@ -922,6 +996,169 @@ return {
 				}
 			}
 		}
+	},
+	cayo_perico_player_cut_global = {
+		description = "Player cuts global",
+		file = "heist_island_planning.c",
+		LEGACY = {
+			value = 1979291,
+			pattern = [[return IS_BIT_SET\(Global_(\d{7})\.f_\d{4}, 15\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 1980570,
+			pattern = [[.*->f_(\d{3})\.f_(\d{2})\[\d\] = \*Global_262145\.f_\d{5};]],
+			capture_group = 1
+		},
+	},
+	cayo_perico_player_cut_offsets = {
+		description = "Player cuts offsets",
+		file = "heist_island_planning.c",
+		LEGACY = {
+			value = 831,
+			pattern = [[.*->f_(\d{3})\.f_(\d{2})\[\d\] = \*Global_262145\.f_\d{5};]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 56,
+					capture_group = 2,
+				}
+			}
+		},
+		ENHANCED = {
+			value = 831,
+			pattern = [[.*->f_(\d{3})\.f_(\d{2})\[\d\] = \*Global_262145\.f_\d{5};]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 56,
+					capture_group = 2,
+				}
+			}
+		},
+	},
+	fmmc_launcher_min_players_local = {
+		description = "fmmc launcher minimum required players",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 20194,
+			pattern = [[Local_(\d+)\.f_(\d+)\s+=\s+1;[\r\n]?\s+Global_\d+\.f_\d+\s+=\s+1;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 15,
+					capture_group = 2,
+				}
+			}
+		},
+		ENHANCED = {
+			value = 20196,
+			pattern = [[Local_(\d+)\.f_(\d+)\s+=\s+1;[\r\n]?\s+Global_\d+\.f_\d+\s+=\s+1;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 15,
+					capture_group = 2,
+				}
+			}
+		},
+	},
+	fmmc_launcher_mission_var_offset = {
+		description = "fmmc launcher mission variation offset",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 34,
+			pattern = [[HUD_MG_TENNIS.*,\s+64\);[\r\n]?.+?Local_\d+\.f_\d+\),.*Local_\d+\.f_(\d+)\s+\+\s+1,\s+64\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 34,
+			pattern = [[HUD_MG_TENNIS.*,\s+64\);[\r\n]?.+?Local_\d+\.f_\d+\),.*Local_\d+\.f_(\d+)\s+\+\s+1,\s+64\);]],
+			capture_group = 1
+		},
+	},
+	fmmc_skip_obj_local = {
+		description = "fm mission controller skip objective",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 19808,
+			pattern = [[Local_(\d+)\.f_(\d+)\s?<\s?6\s?&&.*>= 0]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 1062,
+					capture_group = 2,
+				}
+			}
+		},
+		ENHANCED = {
+			value = 20412,
+			pattern = [[Local_(\d+)\.f_(\d+)\s?<\s?6\s?&&.*>= 0]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 1062,
+					capture_group = 2,
+				}
+			}
+		},
+	},
+	fmmc_team_score_offset = {
+		description = "fm mission controller team score",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 1232,
+			pattern = [[OVT_BLIMP_T.*\);[\r\n]?\s+?HUD::ADD_TEXT_COMPONENT_INTEGER.*?Local_\d{5}\.f_(\d{4})\[0\]\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 1232,
+			pattern = [[OVT_BLIMP_T.*\);[\r\n]?\s+?HUD::ADD_TEXT_COMPONENT_INTEGER.*?Local_\d{5}\.f_(\d{4})\[0\]\);]],
+			capture_group = 1
+		},
+	},
+	fmmc_20_skip_obj_local = {
+		description = [[fm mission controller 2020 skip objective.
+		For some reason R* moved pretty much all code from fmmc2020 to v3 only in Legacy.
+		We'll have to manually update this shit because my dumbass though this would never happen
+		so we're stuck with a single filename for both branches.]],
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 56716,
+			pattern = [[Local_(\d+)\.f_(\d+)\s?<\s?6\s?&&.*>= 0]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 1589,
+					capture_group = 2,
+				}
+			}
+		},
+		ENHANCED = {
+			value = 56504,
+			pattern = [[Local_(\d+)\.f_(\d+)\s?<\s?6\s?&&.*>= 0]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 1589,
+					capture_group = 2,
+				}
+			}
+		},
+	},
+	fmmc_20_team_score_offset = {
+		description = "fm mission controller 2020 team score",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 1776,
+			pattern = [[if\s+\(.*?\+\s+iLocal_\d{5}\.f_(\d{4})\[0\]\s+<\s+iLocal_\d{5}\.f_\d{4}\[1\]\s+\|\|\s+.*?\s+\+\s+iLocal_\d{5}\.f_\d{4}\[1\]\s+<\s+iLocal_\d{5}\.f_\d{4}\[0\]\)]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 1776,
+			pattern = [[if\s+\(.*?\+\s+iLocal_\d{5}\.f_(\d{4})\[0\]\s+<\s+iLocal_\d{5}\.f_\d{4}\[1\]\s+\|\|\s+.*?\s+\+\s+iLocal_\d{5}\.f_\d{4}\[1\]\s+<\s+iLocal_\d{5}\.f_\d{4}\[0\]\)]],
+			capture_group = 1
+		},
 	},
 	ie_objective_local = {
 		description = "Import/Export steal auto complete mission.",
@@ -1093,5 +1330,195 @@ return {
 			pattern = [[return Global_(\d{7})\.f_371;]],
 			capture_group = 1
 		}
-	}
+	},
+	heist_boosts_global_start = {
+		description = "weekly boost global init",
+		file = "tuneables_processing.c",
+		LEGACY = {
+			value = 37632,
+			pattern = [[Global_262145\.f_(\d{5})\s+=.*-341592538, .*\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 38231,
+			pattern = [[Global_262145\.f_(\d{5})\s+=.*-341592538, .*\);]],
+			capture_group = 1
+		}
+	},
+	jobs_root_content_id_global = {
+		description = "Stores root content ID hash of original heists and hacker24 jobs (maybe more jobs, haven't checked)",
+		file = "freemode.c",
+		LEGACY = {
+			value = 2635459,
+			pattern = [[HUD::SET_WARNING_MESSAGE_WITH_HEADER\("HCOST_TITLE".*?,\s+"HCOST_BODY".*?,\s+18,\s+"HEIST_WARN_2".*?,\s+true,\s+Global_(\d+)\.f_(\d{2}),\s+func_\d+\(Global_\d+\),\s+0,\s+true,\s+0\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 52,
+					capture_group = 2,
+					description = "Setup cost offset."
+				}
+			}
+		},
+		ENHANCED = {
+			value = 2635459,
+			pattern = [[HUD::SET_WARNING_MESSAGE_WITH_HEADER\("HCOST_TITLE".*?,\s+"HCOST_BODY".*?,\s+18,\s+"HEIST_WARN_2".*?,\s+true,\s+Global_(\d+)\.f_(\d{2}),\s+func_\d+\(Global_\d+\),\s+0,\s+true,\s+0\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 52,
+					capture_group = 2,
+					description = "Setup cost offset."
+				}
+			}
+		}
+	},
+	apt_heist_board_state_global = {
+		description = "1: default. 6: heist selected. 7: prompt to pay setup fee. 8: launching. 9: in heist launch menu (do not directly set to 9, it breaks. set to 8 instead)",
+		file = "freemode.c",
+		LEGACY = {
+			value = 2635125,
+			pattern = [[HUD::SET_WARNING_MESSAGE_WITH_HEADER\("HCOST_TITLE".*?,\s+"HCOST_BODY".*?,\s+18,\s+"HEIST_WARN_2".*?,\s+true,\s+Global_(\d+)\.f_(\d{2}),\s+func_\d+\(Global_\d+\),\s+0,\s+true,\s+0\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 2635459,
+			pattern = [[HUD::SET_WARNING_MESSAGE_WITH_HEADER\("HCOST_TITLE".*?,\s+"HCOST_BODY".*?,\s+18,\s+"HEIST_WARN_2".*?,\s+true,\s+Global_(\d+)\.f_(\d{2}),\s+func_\d+\(Global_\d+\),\s+0,\s+true,\s+0\);]],
+			capture_group = 1
+		}
+	},
+	solo_missions_global = {
+		description = "SoloMissions global",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 4718592,
+			pattern = [[Global_(\d+)\.f_\d+\s?=.+?"minNu"]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 4718592,
+			pattern = [[Global_(\d+)\.f_\d+\s?=.+?"minNu"]],
+			capture_group = 1
+		}
+	},
+	solo_missions_global_offset_1 = {
+		description = "SoloMissions global offset minNumParticipants",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 3769,
+			pattern = [[Global_\d+\.f_(\d+)\s?=.+?"minNu"]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 3769,
+			pattern = [[Global_(\d+)\.f_\d+\s?=.+?"minNu"]],
+			capture_group = 1
+		}
+	},
+	solo_missions_global_offset_2 = {
+		description = "SoloMissions global offset numberOfTeams",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 3772,
+			pattern = [[Global_\d+\.f_(\d+)\s?=.+?"dtn"]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 3772,
+			pattern = [[Global_\d+\.f_(\d+)\s?=.+?"dtn"]],
+			capture_group = 1
+		}
+	},
+	solo_missions_global_offset_3 = {
+		description = "SoloMissions global offset maxNumberOfTeams",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 3773,
+			pattern = [[Global_\d+\.f_(\d+)\s?=.+?"tnum"]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 3773,
+			pattern = [[Global_\d+\.f_(\d+)\s?=.+?"tnum"]],
+			capture_group = 1
+		}
+	},
+	solo_missions_global_offset_4 = {
+		description = "SoloMissions global offset numPlayersPerTeam",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 3775,
+			pattern = [[else.*[\r\n]?.*?HUD::ADD_TEXT_COMPONENT_INTEGER\(Global_\d+\.f_(\d+)\[.*\]\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 3775,
+			pattern = [[else.*[\r\n]?.*?HUD::ADD_TEXT_COMPONENT_INTEGER\(Global_\d+\.f_(\d+)\[.*\]\);]],
+			capture_group = 1
+		}
+	},
+	solo_missions_global_offset_5 = {
+		description = "SoloMissions global offset nextContentID",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 133252,
+			pattern = [[if\s+?\(!MISC::IS_STRING_NULL_OR_EMPTY\(&Global_\d+\.f_(\d+)\[.*/\*6\*/\]\)\)]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 139752,
+			pattern = [[if\s+?\(!MISC::IS_STRING_NULL_OR_EMPTY\(&Global_\d+\.f_(\d+)\[.*/\*6\*/\]\)\)]],
+			capture_group = 1
+		}
+	},
+	solo_missions_global_offset_6 = {
+		description = "SoloMissions global offset criticalMinimumForTeam",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 190163,
+			pattern = [[MISC::SET_BIT.*?Global_\d+\.f_\d{4}\[.*?/\*\d+\*/\]\.f_\d{5}\), 0\);[\r\n]?\s+?Global_\d+\.f_(\d+)\[.*?\]\s+=\s+Global_\d+\.f_\d{4}\[.*?\];]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 196663,
+			pattern = [[MISC::SET_BIT.*?Global_\d+\.f_\d{4}\[.*?/\*\d+\*/\]\.f_\d{5}\), 0\);[\r\n]?\s+?Global_\d+\.f_(\d+)\[.*?\]\s+=\s+Global_\d+\.f_\d{4}\[.*?\];]],
+			capture_group = 1
+		}
+	},
+	solo_missions_mission_header_global = {
+		description = "SoloMissions mission header minimum players global",
+		file = "fmmc_launcher.c",
+		LEGACY = {
+			value = 794989,
+			pattern = [[Global_\d+\.f_\d{3}\[.*?/\*204\*/\]\.f_\d{3}\s+=\s+Global_(\d{6})\.f_(\d)\[.*?/\*(\d{2})\*/\]\.f_75;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 4,
+					capture_group = 2
+				},
+				{
+					value = 95,
+					capture_group = 3,
+					description = "stride"
+				},
+			}
+		},
+		ENHANCED = {
+			value = 794989,
+			pattern = [[MISC::SET_BIT.*?Global_\d+\.f_\d{4}\[.*?/\*\d+\*/\]\.f_\d{5}\), 0\);[\r\n]?\s+?Global_\d+\.f_(\d+)\[.*?\]\s+=\s+Global_\d+\.f_\d{4}\[.*?\];]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 4,
+					capture_group = 2
+				},
+				{
+					value = 95,
+					capture_group = 3,
+					description = "stride"
+				},
+			}
+		}
+	},
 }
