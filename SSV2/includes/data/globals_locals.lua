@@ -1118,13 +1118,10 @@ return {
 		},
 	},
 	fmmc_20_skip_obj_local = {
-		description = [[fm mission controller 2020 skip objective.
-		For some reason R* moved pretty much all code from fmmc2020 to v3 only in Legacy.
-		We'll have to manually update this shit because my dumbass though this would never happen
-		so we're stuck with a single filename for both branches.]],
+		description = "",
 		file = "fm_mission_controller_2020.c",
 		LEGACY = {
-			value = 56716,
+			value = 56070,
 			pattern = [[Local_(\d+)\.f_(\d+)\s?<\s?6\s?&&.*>= 0]],
 			capture_group = 1,
 			offsets = {
@@ -1151,12 +1148,12 @@ return {
 		file = "fm_mission_controller_2020.c",
 		LEGACY = {
 			value = 1776,
-			pattern = [[if\s+\(.*?\+\s+iLocal_\d{5}\.f_(\d{4})\[0\]\s+<\s+iLocal_\d{5}\.f_\d{4}\[1\]\s+\|\|\s+.*?\s+\+\s+iLocal_\d{5}\.f_\d{4}\[1\]\s+<\s+iLocal_\d{5}\.f_\d{4}\[0\]\)]],
+			pattern = [[if\s+\(.*?\+\s+.?Local_\d{5}\.f_(\d{4})\[0\]\s+<\s+.?Local_\d{5}\.f_\d{4}\[1\]\s+\|\|\s+.*?\s+\+\s+.?Local_\d{5}\.f_\d{4}\[1\]\s+<\s+.?Local_\d{5}\.f_\d{4}\[0\]\)]],
 			capture_group = 1
 		},
 		ENHANCED = {
 			value = 1776,
-			pattern = [[if\s+\(.*?\+\s+iLocal_\d{5}\.f_(\d{4})\[0\]\s+<\s+iLocal_\d{5}\.f_\d{4}\[1\]\s+\|\|\s+.*?\s+\+\s+iLocal_\d{5}\.f_\d{4}\[1\]\s+<\s+iLocal_\d{5}\.f_\d{4}\[0\]\)]],
+			pattern = [[if\s+\(.*?\+\s+.?Local_\d{5}\.f_(\d{4})\[0\]\s+<\s+.?Local_\d{5}\.f_\d{4}\[1\]\s+\|\|\s+.*?\s+\+\s+.?Local_\d{5}\.f_\d{4}\[1\]\s+<\s+.?Local_\d{5}\.f_\d{4}\[0\]\)]],
 			capture_group = 1
 		},
 	},
@@ -1518,6 +1515,880 @@ return {
 					capture_group = 3,
 					description = "stride"
 				},
+			}
+		}
+	},
+	mgh_h3_hack_1 = {
+		description = "",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 54118,
+			pattern = [[MISC::CLEAR_BIT\(&.?Local_\d+,\s+12\);[\r\n]\s+func_\d+\(&.?Local_(\d{5}),\s+&.?Local_\d{5}\[.*\/\*2\*\/\],\s+false,\s+joaat\("heist"\),\s+Global_\d{6}\.f_1\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 55028,
+			pattern = [[MISC::CLEAR_BIT\(&.?Local_\d+,\s+12\);[\r\n]\s+func_\d+\(&.?Local_(\d{5}),\s+&.?Local_\d{5}\[.*\/\*2\*\/\],\s+false,\s+joaat\("heist"\),\s+Global_\d{6}\.f_1\);]],
+			capture_group = 1
+		}
+	},
+	mgh_h3_hack_1_p = {
+		description = "",
+		file = "am_mp_arc_cab_manager.c",
+		LEGACY = {
+			value = 2872,
+			pattern = [[case\s+0:[\r\n]\s+if\s+\(.?Local_\d+\.f_\d+\s+!=\s+79\s+&&\s+.?Local_\d+\.f_\d+\s+!=\s+80\s+&&\s+.?Local_\d+\.f_\d+\s+!=\s+11\)[\r\n]\s+func_\d+\(&.?Local_(\d{4}),\s+&\(.?Local_\d+\.f_\d+\),\s+4,\s+-1,\s+false\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 2874,
+			pattern = [[case\s+0:[\r\n]\s+if\s+\(.?Local_\d+\.f_\d+\s+!=\s+79\s+&&\s+.?Local_\d+\.f_\d+\s+!=\s+80\s+&&\s+.?Local_\d+\.f_\d+\s+!=\s+11\)[\r\n]\s+func_\d+\(&.?Local_(\d{4}),\s+&\(.?Local_\d+\.f_\d+\),\s+4,\s+-1,\s+false\);]],
+			capture_group = 1
+		}
+	},
+	mgh_h3_hack_2 = {
+		description = "",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 55188,
+			pattern = [[MISC::CLEAR_BIT\(&.?Local_\d+,\s+13\);[\r\n]\s+func_\d+\(&.?Local_(\d{5}),\s+&.?Local_\d{5}\[.*\/\*2\*\/\],\s+false,\s+joaat\("heist"\),\s+Global_\d{6}\.f_1\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 56098,
+			pattern = [[MISC::CLEAR_BIT\(&.?Local_\d+,\s+13\);[\r\n]\s+func_\d+\(&.?Local_(\d{5}),\s+&.?Local_\d{5}\[.*\/\*2\*\/\],\s+false,\s+joaat\("heist"\),\s+Global_\d{6}\.f_1\);]],
+			capture_group = 1
+		}
+	},
+	mgh_h3_hack_2_p = {
+		description = "",
+		file = "am_mp_arc_cab_manager.c",
+		LEGACY = {
+			value = 3877,
+			pattern = [[case\s+1:[\r\n]\s+if\s+\(.?Local_\d+\.f_\d+\s+!=\s+79\s+&&\s+.?Local_\d+\.f_\d+\s+!=\s+80\s+&&\s+.?Local_\d+\.f_\d+\s+!=\s+11\)[\r\n]\s+func_\d+\(&.?Local_(\d{4}),\s+&\(.?Local_\d+\.f_\d+\),\s+4,\s+-1,\s+false\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 3879,
+			pattern = [[case\s+1:[\r\n]\s+if\s+\(.?Local_\d+\.f_\d+\s+!=\s+79\s+&&\s+.?Local_\d+\.f_\d+\s+!=\s+80\s+&&\s+.?Local_\d+\.f_\d+\s+!=\s+11\)[\r\n]\s+func_\d+\(&.?Local_(\d{4}),\s+&\(.?Local_\d+\.f_\d+\),\s+4,\s+-1,\s+false\);]],
+			capture_group = 1
+		}
+	},
+	mgh_h4_hack = {
+		description = "",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 27240,
+			pattern = [[MISC::CLEAR_BIT\(&.?Local_\d+,\s+11\);[\r\n]\s+func_\d+\(&.?Local_(\d{5}),\s+&.?Local_\d{5}\[.*\/\*2\*\/\],\s+false,\s+joaat\("heist"\),\s+Global_\d{6}\.f_1\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 27642,
+			pattern = [[MISC::CLEAR_BIT\(&.?Local_\d+,\s+11\);[\r\n]\s+func_\d+\(&.?Local_(\d{5}),\s+&.?Local_\d{5}\[.*\/\*2\*\/\],\s+false,\s+joaat\("heist"\),\s+Global_\d{6}\.f_1\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc20_local_1 = {
+		description = "All casino fingerprints and keyboard access control (+24)",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 10088,
+			pattern = [[if\s+\(func_\d+\(false,\s+false\)\)[\r\n]\s+\{[\r\n]\s+func_\d+\(&.?Local_(\d+),\s+\w+\(.?Local_\d{5}\.f_\d{4},\s+3\),\s+true\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 10490,
+			pattern = [[if\s+\(func_\d+\(false,\s+false\)\)[\r\n]\s+\{[\r\n]\s+func_\d+\(&.?Local_(\d+),\s+\w+\(.?Local_\d{5}\.f_\d{4},\s+3\),\s+true\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc20_local_2 = {
+		description = "All casino fingerprints and keyboard access control",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 1021,
+			pattern = [[switch\s+\(.*?Local_(\d{4})\.f_(\d{3})\)[\r\n]\s+\{[\r\n]\s+case\s+0:]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 135,
+					capture_group = 2
+				}
+			}
+		},
+		ENHANCED = {
+			value = 1023,
+			pattern = [[switch\s+\(.*?Local_(\d{4})\.f_(\d{3})\)[\r\n]\s+\{[\r\n]\s+case\s+0:]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 135,
+					capture_group = 2
+				}
+			}
+		}
+	},
+	mgh_fmmc20_local_3 = {
+		description = "All casino fingerprints and keyboard access control",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 31109,
+			pattern = [[if\s+\(.?Local_(\d{5})\s+==\s+4\)[\r\n]\s+func_\d+\("UT_WELD_HELP",\s+"UT_WELD_HELP_MK",.*,\s+true]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 31511,
+			pattern = [[if\s+\(.?Local_(\d{5})\s+==\s+4\)[\r\n]\s+func_\d+\("UT_WELD_HELP",\s+"UT_WELD_HELP_MK",.*,\s+true]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc20_local_4 = {
+		description = "All casino fingerprints and keyboard access control",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 32349,
+			pattern = [[Local_\d+\.f_3\s+=\s+.*\.f_13\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 32751,
+			pattern = [[Local_\d+\.f_3\s+=\s+.*\.f_13\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc20_local_5 = {
+		description = "All casino fingerprints and keyboard access control",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 1266,
+			pattern = [[AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"Input_Highlight",\s+.?Local_\d+,\s+true\);[\r\n]\s+MISC::SET_BIT.*Local_(\d{4})\.f_\d{2}\),\s+5\s+\+\s+.*\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 1268,
+			pattern = [[AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"Input_Highlight",\s+.?Local_\d+,\s+true\);[\r\n]\s+MISC::SET_BIT.*Local_(\d{4})\.f_\d{2}\),\s+5\s+\+\s+.*\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc20_local_6 = {
+		description = "voltlab Complete immediately. this:set_int(this:at(1):get_int()); this:at(2):set_int(3)",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 1764,
+			pattern = [[if\s+\(.?Local_\d{4}\s+==\s+.?Local_(\d{4})\)[\r\n]\s+AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"All_Connected_Correct",]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 1766,
+			pattern = [[if\s+\(.?Local_\d{4}\s+==\s+.?Local_(\d{4})\)[\r\n]\s+AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"All_Connected_Correct",]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc20_local_7 = {
+		description = "h3 pwd box",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 32323,
+			pattern = [[if\s+\(.?Local_\d{5}\.f_\d{4}\[.*\]\s+==.*Local_\d{5}\s+&&\s+.?Local_(\d{5})\s+>\s+0\)[\r\n]\s+NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 32725,
+			pattern = [[if\s+\(.?Local_\d{5}\.f_\d{4}\[.*\]\s+==.*Local_\d{5}\s+&&\s+.?Local_(\d{5})\s+>\s+0\)[\r\n]\s+NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_local_1 = {
+		description = "(+24)",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 10111,
+			pattern = [[if\s+\(func_\d+\(false,\s+false\)\)[\r\n]\s+\{[\r\n]\s+func_\d+\(&.?Local_(\d+),\s+\w+\(.?Local_\d{5}\.f_\d{4},\s+3\),\s+true\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 10513,
+			pattern = [[if\s+\(func_\d+\(false,\s+false\)\)[\r\n]\s+\{[\r\n]\s+func_\d+\(&.?Local_(\d+),\s+\w+\(.?Local_\d{5}\.f_\d{4},\s+3\),\s+true\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_local_2 = {
+		description = "",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 1021,
+			pattern = [[switch\s+\(.*?Local_(\d{4})\.f_(\d{3})\)[\r\n]\s+\{[\r\n]\s+case\s+0:]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 135,
+					capture_group = 2
+				}
+			}
+		},
+		ENHANCED = {
+			value = 1023,
+			pattern = [[switch\s+\(.*?Local_(\d{4})\.f_(\d{3})\)[\r\n]\s+\{[\r\n]\s+case\s+0:]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 135,
+					capture_group = 2
+				}
+			}
+		}
+	},
+	mgh_fmmc_v3_local_3 = {
+		description = "",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 31201,
+			pattern = [[if\s+\(.?Local_(\d{5})\s+==\s+4\)[\r\n]\s+func_\d+\("UT_WELD_HELP",\s+"UT_WELD_HELP_MK",.*,\s+true]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 31603,
+			pattern = [[if\s+\(.?Local_(\d{5})\s+==\s+4\)[\r\n]\s+func_\d+\("UT_WELD_HELP",\s+"UT_WELD_HELP_MK",.*,\s+true]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_local_4 = {
+		description = "",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 32453,
+			pattern = [[Local_(\d+)\[.*/\*13\*/\]\.f_3\s+=.*\.f_13\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 32855,
+			pattern = [[Local_(\d+)\[.*/\*13\*/\]\.f_3\s+=.*\.f_13\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_local_5 = {
+		description = "",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 1266,
+			pattern = [[AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"Input_Highlight",\s+.?Local_\d+,\s+true\);[\r\n]\s+MISC::SET_BIT.*Local_(\d{4})\.f_\d{2}\),\s+5\s+\+\s+.*\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 1268,
+			pattern = [[AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"Input_Highlight",\s+.?Local_\d+,\s+true\);[\r\n]\s+MISC::SET_BIT.*Local_(\d{4})\.f_\d{2}\),\s+5\s+\+\s+.*\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_local_6 = {
+		description = "",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 1764,
+			pattern = [[if\s+\(.?Local_\d{4}\s+==\s+.?Local_(\d{4})\)[\r\n]\s+AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"All_Connected_Correct",]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 1766,
+			pattern = [[if\s+\(.?Local_\d{4}\s+==\s+.?Local_(\d{4})\)[\r\n]\s+AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"All_Connected_Correct",]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_local_7 = {
+		description = "",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 32415,
+			pattern = [[if\s+\(.?Local_\d{5}\.f_\d{4}\[.*\]\s+==.*Local_\d{5}\s+&&\s+.?Local_(\d{5})\s+>\s+0\)[\r\n]\s+NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 32817,
+			pattern = [[if\s+\(.?Local_\d{5}\.f_\d{4}\[.*\]\s+==.*Local_\d{5}\s+&&\s+.?Local_(\d{5})\s+>\s+0\)[\r\n]\s+NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_local_8 = {
+		description = "data crack",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 1386,
+			pattern = [[.?Local(_\d+)\[7\s+\/\*4\*\/\]\s+=\s+0;[\r\n]\s+MISC::CLEAR_BIT\(&.?Local_\d{5},\s+26\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 1388,
+			pattern = [[.?Local(_\d+)\[7\s+\/\*4\*\/\]\s+=\s+0;[\r\n]\s+MISC::CLEAR_BIT\(&.?Local_\d{5},\s+26\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_local_9 = {
+		description = "",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 26464,
+			pattern = [[MISC::CLEAR_BIT\(&.?Local_\d+,\s+10\);[\r\n]\s+func_\d+\(&.?Local_(\d{5}),\s+&.?Local_\d{5}\[.*\/\*2\*\/\],\s+false,\s+joaat\("heist"\),\s+Global_\d{6}\.f_1\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 26866,
+			pattern = [[MISC::CLEAR_BIT\(&.?Local_\d+,\s+10\);[\r\n]\s+func_\d+\(&.?Local_(\d{5}),\s+&.?Local_\d{5}\[.*\/\*2\*\/\],\s+false,\s+joaat\("heist"\),\s+Global_\d{6}\.f_1\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_local_10 = {
+		description = "",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 27512,
+			pattern = [[COPY_SCRIPT_STRUCT\(.*\);[\r\n]\s+func_\d+\(&.*?Local_(\d+),\s+&.?Local_\d+\[.*/\*2\*/\],.*Global_\d+\.f_1\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 27914,
+			pattern = [[COPY_SCRIPT_STRUCT\(.*\);[\r\n]\s+func_\d+\(&.*?Local_(\d+),\s+&.?Local_\d+\[.*/\*2\*/\],.*Global_\d+\.f_1\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_local_11 = {
+		description = "k26 access code",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 32416,
+			pattern = [[Local_(\d+)\.f_9\s+=\s+GRAPHICS::REQUEST_SCALEFORM_MOVIE\("DIGITAL_SAFE_DISPLAY"\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 32818,
+			pattern = [[Local_(\d+)\.f_9\s+=\s+GRAPHICS::REQUEST_SCALEFORM_MOVIE\("DIGITAL_SAFE_DISPLAY"\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_local_1 = {
+		description = "IP address minigame",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 187,
+			pattern = [[AUDIO::PLAY_SOUND_FRONTEND\(.?Local_(\d{3})\[0\],\s+"HACKING_COUNTDOWN_IP_FIND",\s+0,]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 189,
+			pattern = [[AUDIO::PLAY_SOUND_FRONTEND\(.?Local_(\d{3})\[0\],\s+"HACKING_COUNTDOWN_IP_FIND",\s+0,]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_local_2 = {
+		description = "IP address minigame",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 184,
+			pattern = [[if\s+\(.?Local_(\d{3})\s==\s+0\)[\r\n]\s+\{[\r\n].*\("H_USE_PC8", -1\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 186,
+			pattern = [[AUDIO::PLAY_SOUND_FRONTEND\(.?Local_(\d{3})\[0\],\s+"HACKING_COUNTDOWN_IP_FIND",\s+0,]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_local_3 = {
+		description = "IP address minigame",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 199,
+			pattern = [[if\s+\(.?Local_(\d{3})\s+== 5\s+\|\|\s+.?Local_(\d{3})\s+==\s+6\)]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 201,
+			pattern = [[if\s+\(.?Local_(\d{3})\s+== 5\s+\|\|\s+.?Local_(\d{3})\s+==\s+6\)]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_local_4 = {
+		description = "IP address minigame",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 1312,
+			pattern = [[switch\s+\(.*?Local_(\d{4})\.f_(\d{3})\)[\r\n]\s+\{[\r\n]\s+case\s+0:]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 135,
+					capture_group = 2
+				}
+			}
+		},
+		ENHANCED = {
+			value = 1314,
+			pattern = [[if\s+\(.?Local_(\d{3})\s+== 5\s+\|\|\s+.?Local_(\d{3})\s+==\s+6\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 135,
+					capture_group = 2
+				}
+			}
+		}
+	},
+	mgh_fmmc_local_5 = {
+		description = "IP address minigame (+24)",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 11837,
+			pattern = [[if\s+\(func_\w+\(&.?Local_(\d{5})\)\)[\r\n].*if\s+\(!PED::IS_PED_RUNNING_MOBILE_PHONE_TASK]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 12239,
+			pattern = [[if\s+\(func_\w+\(&.?Local_(\d{5})\)\)[\r\n].*if\s+\(!PED::IS_PED_RUNNING_MOBILE_PHONE_TASK]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_local_6 = {
+		description = "skip drilling",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 10125,
+			pattern = [[if\s+\(!ENTITY::IS_ENTITY_ATTACHED\(\S+\)\s+&&\s+.?Local_(\d+)\.f_\d+\s+>\s+0\.08f\)]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 10527,
+			pattern = [[if\s+\(!ENTITY::IS_ENTITY_ATTACHED\(\S+\)\s+&&\s+.?Local_(\d+)\.f_\d+\s+>\s+0\.08f\)]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_local_7 = {
+		description = "skip drilling",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 10165,
+			pattern = [[else\s+if\s+\(.?Local_(\d{5})\.f_7\s+==\s+.*?Local_\d{5}\.f_37\)]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 10567,
+			pattern = [[else\s+if\s+\(.?Local_(\d{5})\.f_7\s+==\s+.*?Local_\d{5}\.f_37\)]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_local_8 = {
+		description = "ch dkc",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 63445,
+			pattern = [[\s+>\s+8800\)[\r\n]\s+MISC::SET_BIT\(&.?Local_(\d{5}),\s+1\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 64655,
+			pattern = [[\s+>\s+8800\)[\r\n]\s+MISC::SET_BIT\(&.?Local_(\d{5}),\s+1\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_local_9 = {
+		description = "ch dkc",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 1586,
+			pattern = [[AUDIO::SET_VARIABLE_ON_SOUND\(.?Local_\d+,\s+"Damage",\s+.?Local_\d+\);[\r\n]\s+switch\s+\(.?Local_(\d{4})\)]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 1588,
+			pattern = [[AUDIO::SET_VARIABLE_ON_SOUND\(.?Local_\d+,\s+"Damage",\s+.?Local_\d+\);[\r\n]\s+switch\s+\(.?Local_(\d{4})\)]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_ih_1 = {
+		description = "this:set_int(this:at(1):get_int()); this:at(2):set_int(3)",
+		file = "fm_content_island_heist.c",
+		LEGACY = {
+			value = 798,
+			pattern = [[if\s+\(.?Local_\d{3}\s+==\s+.?Local_(\d{3})\)[\r\n].*AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"All_Connected_Correct",.*,\s+true\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 800,
+			pattern = [[if\s+\(.?Local_\d{3}\s+==\s+.?Local_(\d{3})\)[\r\n].*AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"All_Connected_Correct",.*,\s+true\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_ih_2 = {
+		description = "+24",
+		file = "fm_content_island_heist.c",
+		LEGACY = {
+			value = 10279,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 10281,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_vehrob_prep_1 = {
+		description = "this:set_int(this:at(1):get_int()); this:at(2):set_int(3)",
+		file = "fm_content_vehrob_prep.c",
+		LEGACY = {
+			value = 579,
+			pattern = [[if\s+\(.?Local_\d{3}\s+==\s+.?Local_(\d{3})\)[\r\n].*AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"All_Connected_Correct",.*,\s+true\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 581,
+			pattern = [[if\s+\(.?Local_\d{3}\s+==\s+.?Local_(\d{3})\)[\r\n].*AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"All_Connected_Correct",.*,\s+true\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_vehrob_prep_2 = {
+		description = "+24",
+		file = "fm_content_vehrob_prep.c",
+		LEGACY = {
+			value = 9338,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 9340,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		}
+	},
+	mgh_am_mp_arc_cab_magr_1 = {
+		description = "this:set_int(this:at(1):get_int()); this:at(2):set_int(3)",
+		file = "am_mp_arc_cab_manager.c",
+		LEGACY = {
+			value = 487,
+			pattern = [[if\s+\(.?Local_\d{3}\s+==\s+.?Local_(\d{3})\)[\r\n].*AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"All_Connected_Correct",.*,\s+true\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 489,
+			pattern = [[if\s+\(.?Local_\d{3}\s+==\s+.?Local_(\d{3})\)[\r\n].*AUDIO::PLAY_SOUND_FRONTEND\(-1,\s+"All_Connected_Correct",.*,\s+true\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_bb = {
+		description = "this:at(24):set_int(7)",
+		file = "fm_content_business_battles.c",
+		LEGACY = {
+			value = 4251,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 4253,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		}
+	},
+	mgh_hotwire = {
+		description = "",
+		file = "am_mp_hotwire.c",
+		LEGACY = {
+			value = 310,
+			pattern = [[else\s+if.*Local_(\d{3}),\s+3000,.*\)[\r\n]\s+\{[\r\n]\s+.*\(.*,\s+0\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 312,
+			pattern = [[else\s+if.*Local_(\d{3}),\s+3000,.*\)[\r\n]\s+\{[\r\n]\s+.*\(.*,\s+0\);]],
+			capture_group = 1
+		}
+	},
+	mgh_wordhack = {
+		description = "offset 53. success is case 5 in func_15",
+		file = "word_hack.c",
+		LEGACY = {
+			value = 68,
+			pattern = [[func_1\(.*,\s+&Global_\d+,\s+&.?Local_(\d{2}),\s+&.?Local_\d+\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 68,
+			pattern = [[func_1\(.*,\s+&Global_\d+,\s+&.?Local_(\d{2}),\s+&.?Local_\d+\);]],
+			capture_group = 1
+		}
+	},
+	mgh_circ_block_hack = {
+		description = "offset 9. success is case 2 in func_1",
+		file = "circuitblockhack.c",
+		LEGACY = {
+			value = 72,
+			pattern = [[switch\s+\(.?Local_(\d{2})\.f_(\d{1})\)]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 72,
+			pattern = [[switch\s+\(.?Local_(\d{2})\.f_(\d{1})\)]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_hh_finale = {
+		description = "+1",
+		file = "fm_content_hacker_house_finale.c",
+		LEGACY = {
+			value = 6062,
+			pattern = [[switch\s+\(.?Local_(\d{4})\.f_\d{4}\[.*\/\*5\*\/\]\)]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 6064,
+			pattern = [[switch\s+\(.?Local_(\d{4})\.f_\d{4}\[.*\/\*5\*\/\]\)]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_hwp = {
+		description = "",
+		file = "fm_content_hacker_whistle_prep.c",
+		LEGACY = {
+			value = 5230,
+			pattern = [[func_\d+\(&.?Local_\d{4}, 5, 5, 10, 10, 8, 10, 0, 0,]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 5232,
+			pattern = [[func_\d+\(&.?Local_\d{4}, 5, 5, 10, 10, 8, 10, 0, 0,]],
+			capture_group = 1
+		}
+	},
+	mgh_ah3b = {
+		description = "",
+		file = "agency_heist3b.c",
+		LEGACY = {
+			value = 6229,
+			pattern = [[func_\d+\(&.?Local_\d{4}, 5, 5, 50, 10, 8, 0, 0, 0,]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 6229,
+			pattern = [[func_\d+\(&.?Local_\d{4}, 5, 5, 50, 10, 8, 0, 0, 0,]],
+			capture_group = 1
+		}
+	},
+	mgh_bb_sell = {
+		description = "",
+		file = "business_battles_sell.c",
+		LEGACY = {
+			value = 463,
+			pattern = [[MISC::SET_BIT\(&.?Local_(\d+), 0\);[\r\n]\s+MISC::SET_BIT\(&\(.?Local_\d+\.f_1\), 0\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 465,
+			pattern = [[MISC::SET_BIT\(&.?Local_(\d+), 0\);[\r\n]\s+MISC::SET_BIT\(&\(.?Local_\d+\.f_1\), 0\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_bb_bs = {
+		description = "",
+		file = "fm_content_business_battles.c",
+		LEGACY = {
+			value = 4251,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 4253,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_ih_bs = {
+		description = "",
+		file = "fm_content_island_heist.c",
+		LEGACY = {
+			value = 10279,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 10281,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_vrcp_bs = {
+		description = "+2",
+		file = "fm_content_vehrob_casino_prize.c",
+		LEGACY = {
+			value = 7893,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 7895,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+;[\r\n]\s+return -1;]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_vrp_bs = {
+		description = "",
+		file = "fm_content_vehrob_police.c",
+		LEGACY = {
+			value = 7772,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+\.f_\d+;[\r\n]\s+switch]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 7774,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+\.f_\d+;[\r\n]\s+switch]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_vehrob_prep_bs = {
+		description = "",
+		file = "fm_content_vehrob_prep.c",
+		LEGACY = {
+			value = 9338,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+\.f_\d+;[\r\n]\s+switch]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 9340,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+\.f_\d+;[\r\n]\s+switch]],
+			capture_group = 1
+		}
+	},
+	mgh_fm_c_vip_c_bs = {
+		description = "",
+		file = "fm_content_vip_contract_1.c",
+		LEGACY = {
+			value = 7661,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+\.f_\d+;[\r\n]\s+switch]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 7663,
+			pattern = [[Local_(\d+)\.f_\d+\s+=\s+.?Local_\d+\.f_\d+;[\r\n]\s+switch]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc20_bs = {
+		description = "",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 30325,
+			pattern = [[.?Local_\d+\[7\s+\/\*4\*\/\]\s+=\s+0;[\r\n]\s+MISC::CLEAR_BIT\(&.?Local_(\d{5}),\s+26\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 30727,
+			pattern = [[.?Local_\d+\[7\s+\/\*4\*\/\]\s+=\s+0;[\r\n]\s+MISC::CLEAR_BIT\(&.?Local_(\d{5}),\s+26\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_v3_bs = {
+		description = "",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 30417,
+			pattern = [[.?Local_\d+\[7\s+\/\*4\*\/\]\s+=\s+0;[\r\n]\s+MISC::CLEAR_BIT\(&.?Local_(\d{5}),\s+26\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 30819,
+			pattern = [[.?Local_\d+\[7\s+\/\*4\*\/\]\s+=\s+0;[\r\n]\s+MISC::CLEAR_BIT\(&.?Local_(\d{5}),\s+26\);]],
+			capture_group = 1
+		}
+	},
+	mgh_fmmc_bs = {
+		description = "",
+		file = "fm_mission_controller.c",
+		LEGACY = {
+			value = 9831,
+			pattern = [[if\s+\(\*Global_\d{7}\.f_\d{6}\s+!=\s+Global_262145\.f_\d+\)[\r\n]\s+func_\d+\(&.?Local_(\d+),\s+true,\s+true\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 10233,
+			pattern = [[if\s+\(\*Global_\d{7}\.f_\d{6}\s+!=\s+Global_262145\.f_\d+\)[\r\n]\s+func_\d+\(&.?Local_(\d+),\s+true,\s+true\);]],
+			capture_group = 1
+		}
+	},
+	mgh_gb_cashingout_bs = {
+		description = "",
+		file = "gb_cashing_out.c",
+		LEGACY = {
+			value = 433,
+			pattern = [[MISC::SET_BIT\(&.?Local_(\d+), 0\);[\r\n]\s+MISC::SET_BIT\(&\(.?Local_\d+\.f_1\), 0\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 435,
+			pattern = [[MISC::SET_BIT\(&.?Local_(\d+), 0\);[\r\n]\s+MISC::SET_BIT\(&\(.?Local_\d+\.f_1\), 0\);]],
+			capture_group = 1
+		}
+	},
+	mgh_gb_gr_defend_bs = {
+		description = "",
+		file = "gb_gunrunning_defend.c",
+		LEGACY = {
+			value = 2293,
+			pattern = [[MISC::SET_BIT\(&.?Local_(\d+), 0\);[\r\n]\s+MISC::SET_BIT\(&\(.?Local_\d+\.f_1\), 0\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 2295,
+			pattern = [[MISC::SET_BIT\(&.?Local_(\d+), 0\);[\r\n]\s+MISC::SET_BIT\(&\(.?Local_\d+\.f_1\), 0\);]],
+			capture_group = 1
+		}
+	},
+	mgh_gb_sightseer_bs = {
+		description = "",
+		file = "gb_sightseer.c",
+		LEGACY = {
+			value = 489,
+			pattern = [[MISC::SET_BIT\(&.?Local_(\d+), 0\);[\r\n]\s+MISC::SET_BIT\(&\(.?Local_\d+\.f_1\), 0\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 491,
+			pattern = [[MISC::SET_BIT\(&.?Local_(\d+), 0\);[\r\n]\s+MISC::SET_BIT\(&\(.?Local_\d+\.f_1\), 0\);]],
+			capture_group = 1
+		}
+	},
+	mgh_tmp_v2_global = {
+		description = "",
+		file = "gb_casino_heist.c",
+		LEGACY = {
+			value = 2731782,
+			pattern = [[func_\w+\(&Global_(\d+),\s+"BBHACK_YET"\s+/\*YETARIAN\*/\);]],
+			capture_group = 1
+		},
+		ENHANCED = {
+			value = 2731918,
+			pattern = [[MISC::SET_BIT\(&.?Local_(\d+), 0\);[\r\n]\s+MISC::SET_BIT\(&\(.?Local_\d+\.f_1\), 0\);]],
+			capture_group = 1
+		}
+	},
+	mgh_stash_house = {
+		description = "",
+		file = "fm_content_stash_house.c",
+		LEGACY = {
+			value = 151,
+			pattern = [[Local_(\d+)\.f_(\d{2})\[.*/\*2\*/\]\s+=\s+iLocal_(\d+)\.f_(\d{2})\[.*/\*2\*/\]\s+\+\s+\w+0;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 22,
+					capture_group = 2
+				}
+			}
+		},
+		ENHANCED = {
+			value = 153,
+			pattern = [[Local_(\d+)\.f_(\d{2})\[.*/\*2\*/\]\s+=\s+iLocal_(\d+)\.f_(\d{2})\[.*/\*2\*/\]\s+\+\s+\w+0;]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 22,
+					capture_group = 2
+				}
 			}
 		}
 	},

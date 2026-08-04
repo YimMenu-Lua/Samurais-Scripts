@@ -14,62 +14,67 @@ local tpLabelWidths   = {} ---@type table<integer, integer>
 local GXTLabels       = Translator.gxt_labels
 
 ---@param instance CayoPericoHeist
+---@return boolean
 local function header(instance)
 	local kosatka = instance:GetProperty()
-	if (not kosatka) then
+	local ignore_prop = GVars.features.yim_heists.ignore_prop_req
+	if (not kosatka and not ignore_prop) then
 		ImGui.TextWrapped(GXTLabels.HIF_SUB_HELP --[[ works the same as _T("HIF_SUB_HELP") minus the cost of calling _T ]])
-		return
+		return false
 	end
 
-	ImGui.SetWindowFontScale(1.16)
-	ImGui.TextCentered(_T("YH_GENERIC_PROPERTY"))
-	ImGui.SetWindowFontScale(0.88)
-	ImGui.TextCentered(GXTLabels.CELL_SUBMARINE)
-	ImGui.SetWindowFontScale(1.0)
+	if (kosatka) then
+		ImGui.SetWindowFontScale(1.16)
+		ImGui.TextCentered(_T("YH_GENERIC_PROPERTY"))
+		ImGui.SetWindowFontScale(0.88)
+		ImGui.TextCentered(GXTLabels.CELL_SUBMARINE)
+		ImGui.SetWindowFontScale(1.0)
 
-	local is_spawned = kosatka.is_spawned
-	if (not is_spawned) then
-		if (instance:GetKosatkaRequestState()) then
-			ImGui.TextDisabled(ImGui.TextSpinner())
+		local is_spawned = kosatka.is_spawned
+		if (not is_spawned) then
+			if (instance:GetKosatkaRequestState()) then
+				ImGui.TextDisabled(ImGui.TextSpinner())
+			else
+				local btn_label   = _T("YH_CAYO_REQUEST_SUB")
+				local label_width = ImGui.CalcTextSize(btn_label)
+				ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - label_width) * 0.5)
+				if (GUI:Button(btn_label)) then
+					instance:RequestKosatka()
+				end
+			end
 		else
-			local btn_label   = _T("YH_CAYO_REQUEST_SUB")
-			local label_width = ImGui.CalcTextSize(btn_label)
-			ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - label_width) * 0.5)
-			if (GUI:Button(btn_label)) then
-				instance:RequestKosatka()
+			local coords, heading = kosatka.coords, kosatka.heading
+			if (not coords or coords:is_zero()) then
+				return true
+			end
+
+			local style          = ImGui.GetStyle()
+			local tp_label       = _T("GENERIC_TELEPORT")
+			local wp_label       = _T("GENERIC_SET_WAYPOINT")
+			local lang_idx       = GVars.backend.language_index
+			local tp_label_width = tpLabelWidths[lang_idx]
+			if (not tp_label_width) then
+				tp_label_width = ImGui.CalcTextSize(tp_label)
+					+ ImGui.CalcTextSize(wp_label)
+					+ style.ItemSpacing.x
+					+ (style.FramePadding.x * 4); tpLabelWidths[lang_idx] = tp_label_width
+			end
+
+			ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - tp_label_width) * 0.5)
+			if (GUI:Button(tp_label)) then
+				local fwd_angle = math.rad(heading + 90)
+				local offset    = vec3:new(math.cos(fwd_angle), math.sin(fwd_angle), 4) -- front of door
+				LocalPlayer:Teleport(coords + offset)
+			end
+
+			ImGui.SameLine()
+			if (GUI:Button(wp_label)) then
+				Game.SetWaypointCoords(coords)
 			end
 		end
-	else
-		local coords, heading = kosatka.coords, kosatka.heading
-		if (not coords or coords:is_zero()) then
-			return
-		end
-
-		local style          = ImGui.GetStyle()
-		local tp_label       = _T("GENERIC_TELEPORT")
-		local wp_label       = _T("GENERIC_SET_WAYPOINT")
-		local lang_idx       = GVars.backend.language_index
-		local tp_label_width = tpLabelWidths[lang_idx]
-		if (not tp_label_width) then
-			tp_label_width = ImGui.CalcTextSize(tp_label)
-				+ ImGui.CalcTextSize(wp_label)
-				+ style.ItemSpacing.x
-				+ (style.FramePadding.x * 4); tpLabelWidths[lang_idx] = tp_label_width
-		end
-
-		ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - tp_label_width) * 0.5)
-
-		if (GUI:Button(tp_label)) then
-			local fwd_angle = math.rad(heading + 90)
-			local offset    = vec3:new(math.cos(fwd_angle), math.sin(fwd_angle), 4) -- front of door
-			LocalPlayer:Teleport(coords + offset)
-		end
-
-		ImGui.SameLine()
-		if (GUI:Button(wp_label)) then
-			Game.SetWaypointCoords(coords)
-		end
 	end
+
+	return true
 end
 
 ---@param instance CayoPericoHeist

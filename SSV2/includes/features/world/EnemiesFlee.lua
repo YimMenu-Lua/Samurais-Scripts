@@ -84,7 +84,7 @@ function EnemiesFlee:OnClick()
 	end)
 end
 
-KeyManager:RegisterKeybind(GVars.keyboard_keybinds.enemies_flee, function()
+KeyManager:RegisterKeybind(GVars.keybinds.enemies_flee, function()
 	EnemiesFlee:OnClick()
 end)
 

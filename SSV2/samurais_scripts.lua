@@ -75,7 +75,7 @@ end
 
 GPointers:Init()
 GGlobals:Init()
-Serializer:FlushObjectQueue()
+-- Serializer:FlushObjectQueue()
 Backend:RegisterHandlers()
 Translator:Load()
 GUI:LateInit()
@@ -85,20 +85,16 @@ ThreadManager:Run(function()
 	register_commands()
 	unlock_if_fsl()
 
-	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD8, function()
+	KeyManager:RegisterKeybind(GVars.keybinds.veh_ram_fwd, function()
 		LocalPlayer:GetVehicle():RamForward()
 	end)
 
-	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD4, function()
+	KeyManager:RegisterKeybind(GVars.keybinds.veh_ram_left, function()
 		LocalPlayer:GetVehicle():RamLeft()
 	end)
 
-	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD6, function()
+	KeyManager:RegisterKeybind(GVars.keybinds.veh_ram_right, function()
 		LocalPlayer:GetVehicle():RamRight()
-	end)
-
-	KeyManager:RegisterKeybind(eVirtualKeyCodes.NUMPAD5, function()
-		print(tunables.get_int("HEIST_SETUP_COST_FLEECA"))
 	end)
 
 	while (not PatternScanner:IsDone()) do

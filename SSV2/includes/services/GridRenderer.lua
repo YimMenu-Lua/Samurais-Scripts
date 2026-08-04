@@ -7,6 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+local KeyBindEditorUI = require("includes.frontend.helpers.KeybindEditorUI").new()
+local defaultKeybinds <const> = Serializer:GetDefaultConfig().quick_toggle_keybinds
+
 ---@class GridItemParams
 ---@field onClick? function Callback to execute when the item is clicked
 ---@field onTrue? function Callback to execute when the item is enabled
@@ -17,7 +20,7 @@
 ---@field tooltip? string
 ---@field disabled? boolean
 ---@field global_table? table -- The table where this item's global variable exists (if using a local variable, make sure it lives in a table and pass it here)
----@field contextData? { callback: function, condition: boolean|fun(): boolean }
+---@field contextData? { callback: function, condition?: fun(): boolean }
 
 ---@class GridItemCheckboxParams : GridItemParams
 ---@field finalValue nil
@@ -41,6 +44,12 @@ local eGridItemType <const> = {
 	BUTTON       = 1,
 	RADIO_BUTTON = 2,
 	NEW_LINE     = 3
+}
+
+local contextPopupData <const> = {
+	label       = "##GridRendererCtx",
+	should_draw = false, -- ImGui.OpenPopup does not work from within another popup so just in case a grid is drawn inside a one, we'll always use this bool flag instead
+	callback    = NOP
 }
 
 
@@ -81,8 +90,81 @@ function GridItem.new(item_type, item_label, global_variable, opts)
 	}, GridItem)
 end
 
+---@private
+function GridItem:DrawToggleKeybind()
+	ImGui.SeparatorText(_T("SETTINGS_KEYBINDS"))
+	ImGui.BeginTabBar("##gridItemKeybind")
+	if (ImGui.BeginTabItem(_T("SETTINGS_KEYBINDS_KEYBOARD"))) then
+		local label   = self.m_label
+		local keybind = GVars.quick_toggle_keybinds[label]
+		local default = defaultKeybinds[label]
+		KeyBindEditorUI:DrawKey(keybind, false, { defaultKeybind = default, hideLabel = true })
+		ImGui.EndTabItem()
+	end
+
+	if (ImGui.BeginTabItem(_T("SETTINGS_KEYBINDS_CONTROLLER"))) then
+		local label   = self.m_label
+		local keybind = GVars.quick_toggle_keybinds[label]
+		local default = defaultKeybinds[label]
+		KeyBindEditorUI:DrawKey(keybind, true, { defaultKeybind = default, hideLabel = true })
+		ImGui.EndTabItem()
+	end
+	ImGui.EndTabBar()
+	ImGui.Separator()
+	ImGui.Spacing()
+end
+
+---@private
+---@return GuiCallback
+function GridItem:MakeContext()
+	return function()
+		self:DrawToggleKeybind()
+		ImGui.Spacing()
+
+		local ctx = self.m_context
+		if (not ctx) then
+			return
+		end
+
+		local callback    = ctx.callback
+		local should_draw = true
+		local condition   = ctx.condition
+		if (condition) then
+			should_draw = condition()
+		end
+
+		if not (callback and should_draw) then
+			return
+		end
+
+		ImGui.SeparatorText(_T("GENERIC_OPTIONS_LABEL"))
+		ImGui.Spacing()
+		pcall(callback)
+	end
+end
+
+---@private
+---@param size vec2
+---@param x float
+---@param y float
+function GridItem:DrawContextPopup(size, x, y)
+	local translateLabel = self.m_opts.isTranslatorLabel or false
+	local label = self.m_label
+	ImGui.SetCursorPos(x + size.x - 35, y + 10)
+	ImGui.SetWindowFontScale(0.75)
+	if (ImGui.SmallButton(" . . . ")) then
+		contextPopupData.callback    = self:MakeContext()
+		contextPopupData.label       = translateLabel and _T(label) or label
+		contextPopupData.should_draw = true
+	end
+	ImGui.SetWindowFontScale(1.0)
+	GUI:Tooltip(_T("GENERIC_OPTIONS_LABEL"))
+end
+
+---@param x float
+---@param y float
 ---@return vec2 itemSize
-function GridItem:Draw()
+function GridItem:Draw(x, y)
 	local outSize
 	local opts    = self.m_opts
 	local _type   = self.m_type
@@ -137,6 +219,8 @@ function GridItem:Draw()
 	if (config_value and type(opts.onTrue) == "function") then
 		pcall(opts.onTrue)
 	end
+
+	self:DrawContextPopup(outSize, x, y)
 
 	return outSize
 end
@@ -235,29 +319,7 @@ function GridRenderer:Draw()
 	for i, item in ipairs(self.m_elements) do
 		ImGui.PushID(i)
 		ImGui.SetCursorPos(current_x, current_y)
-		local item_size = item:Draw() + self.m_padding
-
-		local ctx = item.m_context
-		if (ctx) then
-			local should_draw_ctx = true
-			local cond            = ctx.condition
-			local cond_type       = type(cond)
-			if (cond_type == "function") then
-				should_draw_ctx = cond()
-			elseif (cond_type == "boolean") then
-				should_draw_ctx = cond
-			end
-
-			if (should_draw_ctx) then
-				ImGui.SetCursorPos(current_x + item_size.x - 45, current_y + 10)
-				ImGui.SetWindowFontScale(0.75)
-				if (ImGui.SmallButton(" . . . ")) then
-					pcall(ctx.callback)
-				end
-				ImGui.SetWindowFontScale(1.0)
-				GUI:Tooltip(_T("GENERIC_OPTIONS_LABEL"))
-			end
-		end
+		local item_size = item:Draw(current_x, current_y) + self.m_padding
 
 		if (item_size.x > self.m_max_width) then
 			self.m_max_width = item_size.x
@@ -287,6 +349,18 @@ function GridRenderer:Draw()
 	self.m_total_width  = current_x + self.m_max_width
 	self.m_total_height = current_y + self.m_max_height
 	ImGui.Spacing()
+
+	local popup_label = contextPopupData.label
+	if (contextPopupData.should_draw) then
+		contextPopupData.should_draw = false
+		ImGui.OpenPopup(popup_label)
+	end
+
+	ImGui.SetNextWindowSizeConstraints(400, 140, 600, 800)
+	if (ImGui.BeginPopupModal(popup_label, true, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoResize)) then
+		contextPopupData.callback()
+		ImGui.EndPopup()
+	end
 end
 
 return GridRenderer

@@ -1038,5 +1038,16 @@ return {
 	["YH_APT_HEISTS_LABEL"] = "Wohnungsüberfälle",
 	["YH_APT_SELECTED_JOB"] = "Ausgewählter Job",
 	["YH_CH_SOLO_PATCH"] = "Heist-Board-Patch",
-	["YH_CH_SOLO_PATCH_TT"] = "Ermöglicht Ihnen, die endgültige Planungstafel einzurichten. Muss vor Beginn des Raubüberfalls aktiviert werden.\n\n[WICHTIG]: Stellen Sie sicher, dass Sie dies nach Abschluss des Raubüberfalls deaktivieren. Wenn es dauerhaft aktiviert bleibt, kann es zu Problemen und/oder Instabilitäten kommen."
+	["YH_CH_SOLO_PATCH_TT"] = "Ermöglicht Ihnen, die endgültige Planungstafel einzurichten. Muss vor Beginn des Raubüberfalls aktiviert werden.\n\n[WICHTIG]: Stellen Sie sicher, dass Sie dies nach Abschluss des Raubüberfalls deaktivieren. Wenn es dauerhaft aktiviert bleibt, kann es zu Problemen und/oder Instabilitäten kommen.",
+	["SETTINGS_HOTKEY_MOD_TIP"] = "Tipp: Sie können eine Taste gedrückt halten, um sie als Modifikator zu verwenden, bevor Sie eine Taste zuweisen (z. B. STRG + F).",
+	["YH_APT_STRANDS_LOCKED"] = "Sie haben keinen der Wohnungsüberfälle freigeschaltet. Drücken Sie die Schaltfläche unten, um sie alle auf einmal zu entsperren.",
+	["YH_SIXTY_NINE_TT"] = "Raubüberfall-Setups kosten neunundsechzig Dollar.",
+	["YH_SOLO_MISSIONS_TT"] = "Originalskript von „TCRoid“: Spielen Sie Raubüberfälle und Missionen alleine.",
+	["GENERIC_UNLOCK_ALL"] = "Alle freischalten",
+	["YH_MGH_ERR"] = "Bei „MiniGameHack“ ist ein Problem aufgetreten und es ist derzeit nicht verfügbar.",
+	["YH_MGH_FMT"] = "„MiniGameHack“ von sch-lda.\n\nSie können die Tastenkombination [%s] drücken, um MiniGameHack zu verwenden, ohne die Benutzeroberfläche zu öffnen.",
+	["YH_MGH_NONE_FOUND_WARN"] = "Es konnten keine Minispiele gefunden werden!",
+	["YH_IGNORE_PROP_REQ_TT"] = "Ignorieren Sie Eigentumsüberprüfungen für Eigentum und Eigentumsverbesserungen bei Raubüberfällen, die diese erfordern.",
+	["YH_K26_DISABLE_WEEKLY_RESET"] = "Deaktivieren Sie das Zurücksetzen der wöchentlichen Auszahlung",
+	["YH_K26_DISABLE_LASERS"] = "Lasergitter deaktivieren"
 }

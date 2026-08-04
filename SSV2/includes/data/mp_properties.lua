@@ -172,11 +172,9 @@ return {
 		{ gxt = "PIM_S_BAOF", coords = vec3:new(-66.372, 6506.075, 30.536) },
 	},
 	Mansions          = {
-		{ gxt = "PIM_S_BAOF", coords = vec3:new(485.114, -943.441, 26.161) }, -- func_3540 // case 167: case 0: *uParam2
-		{ gxt = "PIM_S_BAOF", coords = vec3:new(123.352, 13.748, 67.315) },
-		{ gxt = "PIM_S_BAOF", coords = vec3:new(-1412.704, -654.563, 27.673) },
-		{ gxt = "PIM_S_BAOF", coords = vec3:new(127.30589, -1709.8208, 28.28193) },
-		{ gxt = "PIM_S_BAOF", coords = vec3:new(-66.372, 6506.075, 30.536) },
+		{ gxt = "PIM_S_MANS_AJ", coords = vec3:new(-1693.94, 495.508, 128.73) },
+		{ gxt = "PIM_S_MANS_MD", coords = vec3:new(548.514, 783.8, 202.081) },
+		{ gxt = "PIM_S_MANS_TH", coords = vec3:new(-2549.55, 1909.94, 169.125) },
 	},
 	HackerDen         = {
 		{ gxt = "HD_GARNAME", coords = vec3:new(719.3386, -983.1850, 24.1402) },

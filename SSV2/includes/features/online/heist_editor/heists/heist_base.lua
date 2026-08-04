@@ -8,7 +8,8 @@
 
 
 local SGSL                = require("includes.services.SGSL")
-local boostTunableInit    = SGSL:Get(SGSL.data.heist_boosts_global_start):AsGlobal()
+local boostTunableOffset  = SGSL:Get(SGSL.data.heist_boosts_global_start):GetValue()
+local boostTunableInit    = ScriptGlobal(262145):At(boostTunableOffset)
 local tpLabelWidths       = {}
 local confirmBtnSize      = vec2:new(0, 40)
 local boolColors          = {
@@ -32,7 +33,7 @@ local is_activity_session = NETWORK.NETWORK_IS_ACTIVITY_SESSION
 ---@field payout_tunable? IManagedTuneable
 ---@field managed_values? array<IManagedValueCtorData>
 ---@field gui_callback? fun(self: Heist): nil
----@field custom_header_cb? fun(self: Heist): nil
+---@field custom_header_cb? fun(self: Heist): boolean
 ---@field property_fail_msg? string
 
 
@@ -41,10 +42,10 @@ local is_activity_session = NETWORK.NETWORK_IS_ACTIVITY_SESSION
 ---@field private m_traceback? string
 ---@field protected m_name string
 ---@field protected m_gui_callback fun(self: Heist): nil
----@field protected m_custom_header_callback? fun(self: Heist): nil
+---@field protected m_custom_header_callback? fun(self: Heist): boolean
 ---@field protected m_is_property_required boolean
 ---@field protected m_property? BasicProperty
----@field protected m_property_fail_msg? string
+---@field protected m_property_fail_msg string
 ---@field protected m_boost_bit? integer
 ---@field protected m_player_cuts? Int4
 ---@field protected m_payout_tunable? IManagedTuneable
@@ -70,10 +71,10 @@ function Heist.new(args)
 		m_boost_bit              = args.boost_bit,
 		m_payout_tunable         = args.payout_tunable,
 		m_managed_values         = args.managed_values,
-		m_is_property_required   = args.requires_property,
 		m_gui_callback           = args.gui_callback,
 		m_custom_header_callback = args.custom_header_cb,
-		m_property_fail_msg      = args.property_fail_msg,
+		m_property_fail_msg      = args.property_fail_msg or "YH_REQUIRED_PROPERTY_ERR",
+		m_is_property_required   = args.requires_property or false,
 		m_has_error              = false,
 		m_is_active              = false,
 	}, Heist)
@@ -199,52 +200,56 @@ end
 -- Normally we separate game logic from UI. This is the only exception.
 
 ---@private
+---@nodiscard
+---@return boolean
 function Heist:DrawHeader()
 	local customCallbakc = self.m_custom_header_callback
 	if (customCallbakc) then
-		customCallbakc(self)
-		return
+		return customCallbakc(self)
 	end
 
 	local property = self.m_property
-	if (self.m_is_property_required and not property) then
-		local msg = _T(self.m_property_fail_msg or "YH_REQUIRED_PROPERTY_ERR")
-		ImGui.Text(msg)
-		return
+	local ignored  = GVars.features.yim_heists.ignore_prop_req
+	if (self.m_is_property_required and not property and not ignored) then
+		ImGui.Text(_T(self.m_property_fail_msg))
+		return false
 	end
 
-	if (not property) then return end
-	ImGui.SetWindowFontScale(1.16)
-	ImGui.TextCentered(_T("YH_GENERIC_PROPERTY"))
-	ImGui.SetWindowFontScale(0.88)
-	ImGui.TextCentered(_T(property.name))
-	ImGui.SetWindowFontScale(1.0)
+	if (property) then
+		ImGui.SetWindowFontScale(1.16)
+		ImGui.TextCentered(_T("YH_GENERIC_PROPERTY"))
+		ImGui.SetWindowFontScale(0.88)
+		ImGui.TextCentered(_T(property.name))
+		ImGui.SetWindowFontScale(1.0)
 
-	local coords = property.coords
-	if (not coords) then return end
+		local coords = property.coords
+		if (coords and not coords:is_zero()) then
+			local style          = ImGui.GetStyle()
+			local tp_label       = _T("GENERIC_TELEPORT")
+			local wp_label       = _T("GENERIC_SET_WAYPOINT")
+			local lang_idx       = GVars.backend.language_index
+			local tp_label_width = tpLabelWidths[lang_idx]
+			if (not tp_label_width) then
+				tp_label_width = ImGui.CalcTextSize(tp_label)
+					+ ImGui.CalcTextSize(wp_label)
+					+ style.ItemSpacing.x
+					+ (style.FramePadding.x * 4); tpLabelWidths[lang_idx] = tp_label_width
+			end
 
-	local style          = ImGui.GetStyle()
-	local tp_label       = _T("GENERIC_TELEPORT")
-	local wp_label       = _T("GENERIC_SET_WAYPOINT")
-	local lang_idx       = GVars.backend.language_index
-	local tp_label_width = tpLabelWidths[lang_idx]
-	if (not tp_label_width) then
-		tp_label_width = ImGui.CalcTextSize(tp_label)
-			+ ImGui.CalcTextSize(wp_label)
-			+ style.ItemSpacing.x
-			+ (style.FramePadding.x * 4); tpLabelWidths[lang_idx] = tp_label_width
+			ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - tp_label_width) * 0.5)
+
+			if (GUI:Button(tp_label)) then
+				LocalPlayer:Teleport(coords)
+			end
+
+			ImGui.SameLine()
+			if (GUI:Button(wp_label)) then
+				Game.SetWaypointCoords(coords)
+			end
+		end
 	end
 
-	ImGui.SetCursorPosX((ImGui.GetContentRegionAvail() - tp_label_width) * 0.5)
-
-	if (GUI:Button(tp_label)) then
-		LocalPlayer:Teleport(coords)
-	end
-
-	ImGui.SameLine()
-	if (GUI:Button(wp_label)) then
-		Game.SetWaypointCoords(coords)
-	end
+	return true
 end
 
 function Heist:Draw()
@@ -266,7 +271,7 @@ function Heist:Draw()
 	local requiresProp = self.m_is_property_required
 	local topBarHeight = GUI:GetMaxTopBarHeight()
 	local headerHeight = requiresProp and 130.0 or 0.0
-	local footerHeight = 195.0
+	local footerHeight = 205.0
 	local middleHeight = GVars.ui.window_size.y - topBarHeight - headerHeight - footerHeight
 	local isActive     = self.m_is_active
 
@@ -274,8 +279,12 @@ function Heist:Draw()
 	if (requiresProp) then
 		ImGui.SetNextWindowBgAlpha(0.45)
 		ImGui.BeginChildEx("##heist_header", vec2:new(0, headerHeight), ImGuiChildFlags.Borders)
-		self:DrawHeader()
+		local ret = self:DrawHeader()
 		ImGui.EndChild()
+		if not (ret or GVars.features.yim_heists.ignore_prop_req) then
+			ImGui.EndDisabled() -- isActive
+			return
+		end
 	end
 	ImGui.EndDisabled() -- isActive
 

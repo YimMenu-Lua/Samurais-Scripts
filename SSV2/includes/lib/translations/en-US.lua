@@ -203,6 +203,7 @@ return {
 	["GENERIC_LOCK_VAL"]                   = "Lock Value",
 	["GENERIC_PLAYER_FMT"]                 = "Player %s",
 	["GENERIC_SESSION_REFRESH_NOTIF"]      = "Please join a new session in order for the changes to take effect.",
+	["GENERIC_UNLOCK_ALL"]                 = "Unlock All",
 	--#endregion
 
 	--#region CasinoPacino
@@ -866,6 +867,7 @@ return {
 	["SETTINGS_WINDOW_ACCENT_COL"]         = "Accent Color",
 	["SETTINGS_WINDOW_TOP_FRAME_BG"]       = "Top Bar Button Gradient",
 	["SETTINGS_HOTKEY_WAIT"]               = "Press any key",
+	["SETTINGS_HOTKEY_MOD_TIP"]            = "Tip: You can hold a button to use as a modifier before assigning a key (ex: CTRL + F).",
 	["SETTINGS_HOTKEY_FOUND"]              = "New Key:",
 	["SETTINGS_HOTKEY_RESERVED"]           = "This key is reserved. Please choose a different one.",
 	["SETTINGS_KEYBINDS"]                  = "Keybinds",
@@ -960,9 +962,18 @@ return {
 	["YH_TP_CH_ELEV_SHAFT"]                = "Elevator Shaft",
 	["YH_DDAY_SELECTED_ACT"]               = "Selected Act",
 	["YH_APT_HEISTS_LABEL"]                = "Apartment Heists",
+	["YH_APT_STRANDS_LOCKED"]              = "You haven't unlocked any of the apartment heists. Press the button below to unlock them all at once.",
 	["YH_APT_SELECTED_JOB"]                = "Selected Job",
+	["YH_SIXTY_NINE_TT"]                   = "Heist setups cost sixty nine dollars.",
+	["YH_SOLO_MISSIONS_TT"]                = "Original script by 'TCRoid': Play heists and missions solo.",
+	["YH_MGH_FMT"]                         = "'MiniGameHack' by sch-lda.\n\nYou can press the [%s] keybind to use MiniGameHack without opening the user interface.",
+	["YH_MGH_ERR"]                         = "'MiniGameHack' encountered an issue and is currently unavailable.",
+	["YH_MGH_NONE_FOUND_WARN"]             = "Could not find any minigames!",
+	["YH_IGNORE_PROP_REQ_TT"]              = "Ignore property and property upgrade ownership checks for heists that require them.",
 	["YH_CH_SOLO_PATCH"]                   = "Heist Board Patch",
 	["YH_CH_SOLO_PATCH_TT"]                = "Allows you to set up the final planning board. Must be enabled before starting the heist.\n\n[IMPORTANT]: Make sure to disable this after completing the heist. Keeping it enabled forever may cause issues and/or instabilities.",
+	["YH_K26_DISABLE_LASERS"]              = "Disable Laser Grid",
+	["YH_K26_DISABLE_WEEKLY_RESET"]        = "Disable Weekly Payout Reset",
 	--#endregion
 
 	--#region BillionaireServicesV2

@@ -1038,5 +1038,16 @@ return {
 	["YH_APT_HEISTS_LABEL"] = "아파트 강도",
 	["YH_CH_SOLO_PATCH_TT"] = "최종 계획 위원회를 설정할 수 있습니다. 강탈을 시작하기 전에 활성화해야 합니다.\n\n[중요]: 강탈을 완료한 후에는 이 기능을 비활성화하세요. 영원히 활성화된 상태로 유지하면 문제 및/또는 불안정이 발생할 수 있습니다.",
 	["YH_CH_SOLO_PATCH"] = "습격 보드 패치",
-	["YH_DDAY_SELECTED_ACT"] = "선택된 법"
+	["YH_DDAY_SELECTED_ACT"] = "선택된 법",
+	["YH_APT_STRANDS_LOCKED"] = "아파트 강도 사건을 잠금 해제하지 않았습니다. 아래 버튼을 누르면 한 번에 모두 잠금이 해제됩니다.",
+	["SETTINGS_HOTKEY_MOD_TIP"] = "팁: 키를 할당하기 전에 버튼을 길게 눌러 수정자로 사용할 수 있습니다(예: CTRL + F).",
+	["YH_MGH_FMT"] = "sch-lda의 'MiniGameHack'.\n\n[%s] 키 바인딩을 눌러 사용자 인터페이스를 열지 않고도 MiniGameHack을 사용할 수 있습니다.",
+	["YH_IGNORE_PROP_REQ_TT"] = "속성이 필요한 강도에 대한 속성 및 속성 업그레이드 소유권 확인을 무시합니다.",
+	["GENERIC_UNLOCK_ALL"] = "모두 잠금 해제",
+	["YH_MGH_NONE_FOUND_WARN"] = "미니게임을 찾을 수 없습니다!",
+	["YH_SIXTY_NINE_TT"] = "강도 설정 비용은 69달러입니다.",
+	["YH_MGH_ERR"] = "'MiniGameHack'에 문제가 발생하여 현재 사용할 수 없습니다.",
+	["YH_SOLO_MISSIONS_TT"] = "'TCroid'의 원본 스크립트: 습격과 임무를 솔로로 플레이하세요.",
+	["YH_K26_DISABLE_WEEKLY_RESET"] = "주간 지급 재설정 비활성화",
+	["YH_K26_DISABLE_LASERS"] = "레이저 그리드 비활성화"
 }

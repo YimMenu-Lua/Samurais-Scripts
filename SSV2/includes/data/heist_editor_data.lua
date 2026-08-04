@@ -8,7 +8,9 @@
 
 
 local eDataType          = Enums.eManagedValueDataType
+local heistEditorPath    = "includes.features.online.heist_editor"
 local Pair               = require("includes.classes.Pair")
+local mpProperties       = require("includes.data.mp_properties")
 local newManagedTuneable = require("includes.structs.IManagedTuneable").new
 
 -- TODO: Add a simple property manager service
@@ -30,8 +32,144 @@ local newManagedTuneable = require("includes.structs.IManagedTuneable").new
 -- }; Enums.eHeistCategory       = eHeistCategory
 
 
+local MansionPlanningRoomStats = {
+	"MPX_MANSION_AJ_PLANNING_ROOM",
+	"MPX_MANSION_MD_PLANNING_ROOM",
+	"MPX_MANSION_TH_PLANNING_ROOM",
+}
+local MansionStats = {
+	"MPX_MANSION_AJ_OWNED",
+	"MPX_MANSION_MD_OWNED",
+	"MPX_MANSION_TH_OWNED",
+}
+
+-- TODO: property resolution is repeated in several places. add a property manager service.
+---@param id integer
+---@param data_key string
+---@return GenericProperty?
+---@overload fun(prop_id: int, data_key: "Mansions"): MansionProperty
+local function get_generic_property(id, data_key)
+	if (id == 0) then return end
+
+	local entry = mpProperties[data_key]
+	if (not entry) then return end
+
+	local data = entry[id]
+	local name = data.gxt
+	if (name) then
+		Translator:TranslateGXT(name)
+	else
+		name = data.name or "GENERIC_UNKNOWN"
+	end
+
+	local out = { name = name, coords = data.coords }
+	if (data_key == "Mansions") then
+		out.has_art_room = stats.get_int(MansionPlanningRoomStats[id]) ~= 0
+	end
+
+	return out
+end
+
 return {
-	BoostableHeistNames      = {
+	HeistResolvers      = {
+		{
+			resolve_property = function()
+				for i = 1, 9 do
+					local id = stats.get_int("MPX_MULTI_PROPERTY_" .. i)
+					if (id ~= 0) then
+						-- we need a GET_PROPERTY_SIZE implementation to figure out if it's a high end apt or not
+						-- or we can go caveman-style like we already do and just add all high end apartment data by ID
+						return get_generic_property(id, "Apartments")
+					end
+				end
+				return nil
+			end,
+			get_ctor = function()
+				return require(heistEditorPath .. ".heists.og_heists").new
+			end
+		},
+		{
+			resolve_property = function()
+				return get_generic_property(stats.get_int("MPX_DBASE_OWNED"), "Facilities")
+			end,
+			get_ctor = function()
+				return require(heistEditorPath .. ".heists.gang_ops").new
+			end
+		},
+		{
+			resolve_property = function()
+				return get_generic_property(stats.get_int("MPX_ARCADE_OWNED"), "Arcades")
+			end,
+			get_ctor = function()
+				return require(heistEditorPath .. ".heists.casino_heist").new
+			end
+		},
+		{
+			resolve_property = function() return nil end, -- special case vehicle property. the constructor handles it instead
+			get_ctor = function()
+				return require(heistEditorPath .. ".heists.cayo_perico").new
+			end
+		},
+		{
+			resolve_property = function()
+				for i, statname in ipairs(MansionStats) do
+					local id = stats.get_int(statname)
+					if (id ~= 0) then
+						return get_generic_property(i, "Mansions")
+					end
+				end
+				return nil
+			end,
+			get_ctor = function()
+				return require(heistEditorPath .. ".heists.k26_heist").new
+			end
+		},
+	},
+	JobResolvers        = {
+		{
+			gxt = "",
+			setup = NOP,
+			reset = NOP,
+			managed_values = nil,
+			resolve_property = function()
+				return get_generic_property(stats.get_int("MPX_FIXER_HQ_OWNED"), "Agencies")
+			end,
+		},
+		{
+			gxt = "",
+			setup = NOP,
+			reset = NOP,
+			managed_values = nil,
+			resolve_property = function()
+				return get_generic_property(stats.get_int("MPX_AUTO_SHOP_OWNED"), "AutoShops")
+			end,
+		},
+		{
+			gxt = "",
+			setup = NOP,
+			reset = NOP,
+			managed_values = nil,
+			resolve_property = function()
+				if (stats.get_int("MPX_HACKER_DEN_OWNED") == 0) then
+					return
+				end
+				return mpProperties.HackerDen[1]
+			end,
+		},
+		{
+			gxt = "",
+			setup = NOP,
+			reset = NOP,
+			managed_values = nil,
+			resolve_property = function()
+				if (stats.get_int("MPX_AMCKENZIE_HANGAR_OWNED") == 0) then
+					return
+				end
+				return mpProperties.FieldHangar[1]
+			end,
+		},
+	},
+	BoostableHeistNames = {
 		"HTITLE_TUT",
 		"HTITLE_HUMANE",
 		"HTITLE_PRISON",
@@ -47,17 +185,7 @@ return {
 		"DLCC_AVIM",
 		"DLCC_KORTZ",
 	},
-	MansionPlanningRoomStats = {
-		"MPX_MANSION_TH_PLANNING_ROOM",
-		"MPX_MANSION_AJ_PLANNING_ROOM",
-		"MPX_MANSION_MD_PLANNING_ROOM",
-	},
-	MansionStats             = {
-		"MPX_MANSION_TH_OWNED",
-		"MPX_MANSION_AJ_OWNED",
-		"MPX_MANSION_MD_OWNED",
-	},
-	CostTunables             = {
+	CostTunables        = {
 		newManagedTuneable("SETUP_COST_FLEECA", "HEIST_SETUP_COST_FLEECA", eDataType.INT, 69),
 		newManagedTuneable("SETUP_COST_HUMANE_LABS", "HEIST_SETUP_COST_HUMANE_LABS", eDataType.INT, 69),
 		newManagedTuneable("SETUP_COST_PRISON_BREAK", "HEIST_SETUP_COST_PRISON_BREAK", eDataType.INT, 69),
@@ -69,7 +197,7 @@ return {
 		newManagedTuneable("H2_COST_SILO_OPERATION", "H2_COST_SILO_OPERATION", eDataType.INT, 69),
 		newManagedTuneable("H4_REPLAY_COST", "H4_REPLAY_COST", eDataType.INT, 69),
 	},
-	CasinoHeistData          = {
+	CasinoHeistData     = {
 		approaches           = { "Unselected", "Silent & Sneaky", "The Big Con", "Aggressive" },
 		targets              = { "Money", "Gold", "Art", "Diamonds" },
 		gunmen               = { "Unselected", "Karl Abolaji", "Gustavo Mota", "Charlie Reed", "Chester McCoy", "Patrick McReary" },
@@ -184,7 +312,7 @@ return {
 			{ label = "YH_TP_CH_VAULT",       coords = vec3:new(2488.3, -267.4, -70.6) },
 		}
 	},
-	CayoPericoData           = {
+	CayoPericoData      = {
 		primary_target         = { "Tequila", "Ruby Necklace", "Bearer Bonds", "Pink Diamond", "Madrazo Files", "Panther Statue" },
 		weapons                = { "Unselected", "Aggressor", "Conspirator", "Crackshot", "Saboteur", "Marksman" },
 		supply_truck_locations = { "Unselected", "Airport", "North Dock", "Main Dock East", "Main Dock West", "Compound" },
@@ -234,4 +362,45 @@ return {
 			{ label = "YH_TP_IH_ENTRANCE", coords = 5048.157, -5821.616, -12.726 },
 		}
 	},
+	K26Data             = {
+		targets = { -- Pair<GXT, BitPos>
+			"KH_END_TAR0",
+			"KH_END_TAR1",
+			"KH_END_TAR2",
+			"KH_END_TAR3",
+			"KH_END_TAR4",
+			"KH_END_TAR5",
+			"KH_END_TAR6",
+			"KH_END_TAR7",
+			"KH_END_TAR8",
+			"KH_END_TAR9",
+			"KH_END_TAR10",
+			"KH_END_TAR11",
+			"KH_END_TAR12",
+			"KH_END_TAR13",
+			"KH_END_TAR14",
+			"KH_END_TAR15",
+			"KH_END_TAR16",
+			"KH_END_TAR17",
+			"KH_END_TAR18",
+			"KH_END_TAR19",
+			"KH_END_TAR20",
+			"KH_END_TAR21",
+			"KH_END_TAR22",
+			"KH_END_TAR23",
+			"KH_END_TAR24",
+			"KH_END_TAR25",
+			"KH_END_TAR26",
+		},
+		secondary_objectives = {
+			Pair("MPX_K26_GENERAL_BS", -1),
+			Pair("MPX_K26_GENERAL_BS2", -1),
+			Pair("MPX_K26_ROBBERY_PROG", -1),
+			Pair("MPX_K26_SCOPING_BS", -1),
+			Pair("MPX_K26_POI_BS", -1),
+		},
+		teleports = {
+			{ label = "YH_TP_KOTZ_VAULT_DOOR", coords = vec3:new(2634.33, 5862.16, -61) }
+		}
+	}
 }

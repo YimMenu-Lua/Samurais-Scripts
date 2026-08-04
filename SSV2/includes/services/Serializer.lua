@@ -9,14 +9,17 @@
 
 local Set                    = require("includes.classes.Set")
 local Theme                  = require("includes.structs.Theme")
+local Keybind                = require("includes.structs.Keybind")
 local JSON <const>           = require("includes.thirdparty.json.json")()
 local B64_CHARS <const>      = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 local PUBLIC_XOR_KEY <const> = "\xA3\x4F\xD2\x9B\x7E\xC1\xE8\x36\x5D\x0A\xF7\xB4\x6C\x2D\x89\x50\x1E\x73\xC9\xAF\x3B\x92\x58\xE0\x14\x7D\xA6\xCB\x81\x3F\xD5\x67"
 
 assert(JSON.VERSION == "20211016.28", "Bad Json package version.")
+
 require("includes.classes.Vector2")
 require("includes.classes.Vector3")
 require("includes.classes.Vector4")
+require("includes.modules.Color")
 
 ---@enum eSerializerState
 local eSerializerState <const> = {
@@ -76,6 +79,7 @@ Serializer.__credits = [[
 	]]
 
 
+---@private
 ---@return Serializer
 function Serializer:init()
 	if (self.m_initialized) then return self end
@@ -88,6 +92,8 @@ function Serializer:init()
 	self.m_locked           = false
 	self.m_disabled         = false
 	self.m_registered_types = {
+		["color"] = { constructor = Color.deserialize, serializer = Color.serialize },
+		["keybind"] = { constructor = Keybind.deserialize, serializer = Keybind.serialize },
 		["vec2"] = { constructor = vec2.new, serializer = vec2.serialize },
 		["vec3"] = { constructor = vec3.new, serializer = vec3.serialize },
 		["vec4"] = { constructor = vec4.new, serializer = vec4.serialize },
@@ -97,7 +103,10 @@ function Serializer:init()
 	self.m_lock_queue       = {}
 	self.m_key_states       = {}
 	self.m_moved_keys       = {}
-	self.m_deprecated_keys  = {}
+	self.m_deprecated_keys  = {
+		"keyboard_keybinds",
+		"gamepad_keybinds",
+	}
 	self.m_renamed_keys     = {}
 
 	ThreadManager:RegisterLooped("SS_SERIALIZER", function()
@@ -111,6 +120,7 @@ function Serializer:init()
 	return self
 end
 
+---@public
 ---@param script_name? string
 ---@param default_config? table
 ---@param runtime_vars? table Runtime variables that will be tracked for auto-save.
@@ -160,7 +170,7 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 				return value
 			end
 
-			local default = self.m_default_config[value]
+			local default = self.m_default_config[k]
 			value         = config_data[k]
 			if (value ~= nil) then
 				self.m_key_states[k] = value
@@ -205,6 +215,7 @@ function Serializer:Setup(script_name, default_config, runtime_vars, varargs)
 		self:SaveBackup()
 	end
 
+	self:FlushObjectQueue()
 	self.m_setup = true
 	return self
 end
@@ -872,6 +883,10 @@ function Serializer:Reconstruct(object)
 		return object
 	end
 
+	if (getmetatable(object) ~= nil) then
+		return object
+	end
+
 	if (object.__type) then
 		local name  = tostring(object.__type):lower()
 		local entry = self.m_registered_types[name]
@@ -879,10 +894,12 @@ function Serializer:Reconstruct(object)
 		if (entry and type(entry.constructor) == "function") then
 			local ok, result = pcall(entry.constructor, object)
 			if (ok and result) then
-				-- Backend:debug("Reconstructed object: %s", name)
+				if (name:lower() == "keybind") then
+					Backend:debug("Reconstructed object: %s", name)
+				end
 				return result
 			else
-				-- Backend:debug("Constructor failed for object '%s' error: ", name, result)
+				Backend:debug("Constructor failed for object '%s' error: ", name, result)
 				return object
 			end
 		end

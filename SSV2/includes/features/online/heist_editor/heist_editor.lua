@@ -7,95 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local heistData               = require("includes.data.heist_editor_data")
-local mpProperties            = require("includes.data.mp_properties")
+local heistData <const>       = require("includes.data.heist_editor_data")
 local IManagedValueController = require("includes.services.IManagedValueController")
-
--- TODO: property resolution is repeated in several places. add a property manager service.
----@param prop_id integer
----@param data_key string
----@return GenericProperty?
-local function get_generic_property(prop_id, data_key)
-	if (prop_id == 0) then return end
-
-	local entry = mpProperties[data_key]
-	if (not entry) then return end
-
-	local t = entry[prop_id]
-	local gxt = t.gxt
-	if (gxt) then
-		Translator:TranslateGXT(gxt)
-	end
-	return { name = gxt or t.name or "GENERIC_UNKNOWN", coords = t.coords }
-end
-
-local HeistResolvers <const> = {
-	{
-		resolve_property = function()
-			return get_generic_property(stats.get_int("MPX_DBASE_OWNED"), "Facilities")
-		end,
-		ctor = require("includes.features.online.heist_editor.heists.gang_ops").new
-	},
-	{
-		resolve_property = function()
-			return get_generic_property(stats.get_int("MPX_ARCADE_OWNED"), "Arcades")
-		end,
-		ctor = require("includes.features.online.heist_editor.heists.casino_heist").new
-	},
-	{
-		resolve_property = function() return nil end, -- special case vehicle property. the constructor handles it instead
-		ctor = require("includes.features.online.heist_editor.heists.cayo_perico").new
-	},
-	{
-		resolve_property = function()
-			for i = 1, 9 do
-				local id = stats.get_int("MPX_MULTI_PROPERTY_" .. i)
-				if (id ~= 0) then
-					return get_generic_property(id, "Apartments")
-				end
-			end
-			return nil
-		end,
-		ctor = require("includes.features.online.heist_editor.heists.og_heists").new
-	},
-	-- {
-	-- 	resolve_property = function()
-	-- 		for _, statname in ipairs(mansionStats) do
-	-- 			local id = stats.get_int(statname)
-	-- 			if (id ~= 0) then
-	-- 				return get_generic_property(id, "Mansions")
-	-- 			end
-	-- 		end
-	-- 		return nil
-	-- 	end,
-	-- },
-	-- {
-	-- 	resolve_property = function()
-	-- 		return get_generic_property(stats.get_int("MPX_FIXER_HQ_OWNED"), "Agencies")
-	-- 	end,
-	-- },
-	-- {
-	-- 	resolve_property = function()
-	-- 		return get_generic_property(stats.get_int("MPX_AUTO_SHOP_OWNED"), "AutoShops")
-	-- 	end,
-	-- },
-	-- {
-	-- 	resolve_property = function()
-	-- 		if (stats.get_int("MPX_HACKER_DEN_OWNED") == 0) then
-	-- 			return
-	-- 		end
-	-- 		return mpProperties.HackerDen[1]
-	-- 	end,
-	-- },
-	-- {
-	-- 	resolve_property = function()
-	-- 		if (stats.get_int("MPX_AMCKENZIE_HANGAR_OWNED") == 0) then
-	-- 			return
-	-- 		end
-	-- 		return mpProperties.FieldHangar[1]
-	-- 	end,
-	-- },
-}
+local GetRunningFmmcScript    = Game.GetRunningFmmcScript
 
 -- TODO: re-implement simple jobs
 ---@class Job
@@ -107,8 +21,8 @@ local HeistResolvers <const> = {
 ---@field private m_managed_value_controller IManagedValueController
 ---@field private m_running_script ("fm_mission_controller"|"fm_mission_controller_2020"|"fm_mission_controller_v3")?
 ---@field private m_controller_last_tick TimePoint
----@field public SoloMissions SoloMissions
-local HeistEditor   = { m_heists = {}, SoloMissions = require("includes.thirdparty.SoloMissions") }
+---@field private m_ready boolean
+local HeistEditor   = { m_heists = {} }
 HeistEditor.__index = HeistEditor
 
 function HeistEditor:init()
@@ -116,6 +30,7 @@ function HeistEditor:init()
 		return self
 	end
 
+	self.m_ready                    = false
 	self.m_managed_value_controller = IManagedValueController.new()
 	self.m_controller_last_tick     = TimePoint()
 
@@ -136,6 +51,20 @@ function HeistEditor:init()
 
 	self.m_initialized = true
 	return self
+end
+
+---@return boolean
+function HeistEditor:IsReady()
+	return self.m_ready
+end
+
+function HeistEditor:Reload()
+	self:Reset()
+	ThreadManager:Run(function(s)
+		self.m_ready = false
+		sleep(1200)
+		self.m_ready = true
+	end)
 end
 
 function HeistEditor:Reset()
@@ -168,25 +97,25 @@ end
 
 ---@private
 function HeistEditor:RebuildHeists()
+	self.m_ready = false
 	ThreadManager:Run(function()
 		while (Game.IsInNetworkTransition()) do
 			yield()
 		end
 
-		if (not network.is_session_started() or NETWORK.NETWORK_IS_ACTIVITY_SESSION()) then
+		if (not network.is_session_started()) then
 			return
 		end
 
 		table.clear(self.m_heists)
-		for _, v in ipairs(HeistResolvers) do
-			local ctor = v.ctor ---@type (fun(GenericProperty?): Heist)?
-			if (not ctor) then
-				goto continue
+		for _, v in ipairs(heistData.HeistResolvers) do
+			local get_ctor = v.get_ctor ---@type (fun(): (fun(GenericProperty?: GenericProperty): Heist)?)
+			local ctor     = get_ctor and get_ctor() or nil
+			if (ctor) then
+				self:Append(ctor(v.resolve_property()))
 			end
-
-			self:Append(ctor(v.resolve_property()))
-			::continue::
 		end
+		self.m_ready = true
 	end)
 end
 
@@ -197,7 +126,7 @@ function HeistEditor:SetSetupCosts()
 			t:SaveDefaultValue()
 		end
 
-		---@diagnostic disable-next-line
+		---@diagnostic disable: discard-returns
 		t:Apply()
 	end
 end
@@ -242,9 +171,7 @@ function HeistEditor:OnTick(s)
 	end
 
 
-	local SoloMissions    = self.SoloMissions
-	self.m_running_script = SoloMissions:GetRunningFmmcScript()
-	SoloMissions:OnTick()
+	self.m_running_script = GetRunningFmmcScript()
 	self:TickMVC()
 
 	for _, heist in ipairs(self.m_heists) do

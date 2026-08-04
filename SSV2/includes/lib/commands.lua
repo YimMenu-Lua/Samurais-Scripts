@@ -374,6 +374,22 @@ return {
 			alias = { "tp" }
 		}
 	},
+	["copycoords"] = {
+		callback = function(args)
+			local coords   = LocalPlayer:GetPos()
+			local c_syntax = args[1] == true
+			if (not c_syntax) then
+				ImGui.SetClipboardText(tostring(coords))
+				return
+			end
+
+			ImGui.SetClipboardText(_F("%.4ff, %.4ff, %.4ff", coords.x, coords.y, coords.z))
+		end,
+		opts = {
+			description = "dev helper. copies local player's coordinates to clipboard.",
+			args = { "Optional: c_syntax<boolean>" },
+		}
+	},
 	-- for copy/paste convenience. keep at the bottom
 	--[[
 	["example"] = {

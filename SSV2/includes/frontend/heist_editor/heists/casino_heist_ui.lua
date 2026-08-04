@@ -8,7 +8,7 @@
 
 
 local rawData <const>      = require("includes.data.heist_editor_data").CasinoHeistData
-local SoloMissions <const> = require("includes.thirdparty.SoloMissions")
+local SoloMissions <const> = require("includes.thirdparty.SoloMissions.SoloMissions")
 local drawPlayerCuts       = require("includes.frontend.heist_editor.helpers.draw_player_cuts")
 local enableBoardPatch     = false
 local teleportsArray       = rawData.teleports
@@ -122,12 +122,19 @@ local function main(instance)
 	cfg.disable_heist_cooldown = GUI:CustomToggle(_T("YH_GENERIC_CD_LABEL"), cfg.disable_heist_cooldown)
 	cfg.zero_ai_cuts           = GUI:CustomToggle(_T("CP_HEIST_ZERO_AI_CUTS"), cfg.zero_ai_cuts)
 	cfg.ch_cart_autograb       = GUI:CustomToggle(_T("CP_HEIST_AUTOGRAB"), cfg.ch_cart_autograb)
-	enableBoardPatch           = GUI:CustomToggle(_T("YH_CH_SOLO_PATCH"), enableBoardPatch, {
+
+	local solo_enabled         = GVars.features.yim_heists.solo_missions
+	ImGui.BeginDisabled(not solo_enabled)
+	enableBoardPatch = GUI:CustomToggle(_T("YH_CH_SOLO_PATCH"), enableBoardPatch, {
 		onClick = function(v)
 			SoloMissions:ToggleCasinoPatch(v)
 		end,
 		tooltip = _T("YH_CH_SOLO_PATCH_TT")
 	})
+	ImGui.EndDisabled()                                                                  -- !solo_enabled
+	if (not solo_enabled) then
+		GUI:Tooltip("Please enable 'SoloMissions' first!", { color = Color("safety_yellow") }) -- has no relation but makes sense. why would we enable the patch if we're not going to play solo?
+	end
 end
 
 return {

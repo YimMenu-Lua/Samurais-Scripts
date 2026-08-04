@@ -7,7 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local GridRenderer = require("includes.services.GridRenderer")
+local GridRenderer  = require("includes.services.GridRenderer")
+local Keybind       = require("includes.structs.Keybind")
+local DefaultConfig = Serializer:GetDefaultConfig()
 
 ---@class BoolCommandParams
 ---@field gvar_key string -- A key to insert into GVars (global variables)
@@ -17,13 +19,14 @@ local GridRenderer = require("includes.services.GridRenderer")
 ---@field register_command? boolean -- register with CommandExecutor
 ---@field translate_label? boolean If you want to pass a translator key as the label, provide it as is without the `_T` function and set this to true.
 ---@field global_table? table a table where the bool variable lives (defaults to GVars if available or _G); a local table works as well.
----@field ctx_callback? { callback: function, condition: boolean|fun(): boolean } -- adds a small "options" button to the command's widget
+---@field ctx_data? { callback: function, condition?: fun(): boolean } -- adds a gui callback to the small "options" button next to the command's widget
 
 ---@class LoopedCommandParams : BoolCommandParams
 ---@field callback function -- tick function
 
+
 --------------------------------------
--- Tab Struct
+-- Class: Tab
 --------------------------------------
 ---@ignore
 ---@class Tab : ClassMeta<Tab>
@@ -165,6 +168,22 @@ function Tab:RemoveGUI()
 	self.m_callback = nil
 end
 
+---@private
+---@param label string
+---@param callback function
+function Tab:InjectKeybinds(label, callback)
+	local saved_keybinds   = GVars.quick_toggle_keybinds
+	local default_keybinds = DefaultConfig.quick_toggle_keybinds
+	local toggle_keybind   = saved_keybinds[label] or default_keybinds[label]
+
+	if (not toggle_keybind or Keybind.IsRawTable(toggle_keybind)) then
+		toggle_keybind        = Keybind.MakeDummy(label)
+		saved_keybinds[label] = toggle_keybind
+	end
+
+	KeyManager:RegisterKeybind(toggle_keybind, callback)
+end
+
 ---@param label string
 ---@param opts BoolCommandParams
 function Tab:AddBoolCommand(label, opts)
@@ -196,7 +215,7 @@ function Tab:AddBoolCommand(label, opts)
 			persistent        = true,
 			tooltip           = meta.description,
 			isTranslatorLabel = opts.translate_label,
-			contextData       = opts.ctx_callback,
+			contextData       = opts.ctx_data,
 			onClick           = function()
 				local v = table.get_nested_value(g_table, gvar_key)
 				onClick(v)
@@ -204,22 +223,27 @@ function Tab:AddBoolCommand(label, opts)
 		}
 	)
 
-	if not (opts.register_command and CommandExecutor and type(table.get_nested_value(g_table, gvar_key)) == "boolean") then
-		return
-	end
-
-	local command_name = label:lower():gsub("%s+", "_")
-	CommandExecutor:RegisterCommand(command_name, function()
+	local function flip_bool()
 		local v = table.get_nested_value(g_table, gvar_key)
 		v = not v
 		table.set_nested_value(g_table, gvar_key, v)
 		onClick(v)
-		CommandExecutor:notify(
-			"%s %s",
-			label,
-			v and "Enabled" or "Disabled"
-		)
-	end, meta)
+
+		local name = opts.translate_label and _T(label) or label
+		Notifier:ShowMessage(name, _F("%s.", v and "Enabled" or "Disabled"))
+	end
+
+	if (type(table.get_nested_value(g_table, gvar_key)) ~= "boolean") then
+		return
+	end
+
+
+	if (CommandExecutor and opts.register_command) then
+		local command_name = label:lower():gsub("%s+", "_")
+		CommandExecutor:RegisterCommand(command_name, flip_bool, meta)
+	end
+
+	self:InjectKeybinds(label, flip_bool)
 end
 
 ---@param label string
@@ -248,13 +272,8 @@ function Tab:AddLoopedCommand(label, opts)
 			if onDisable then onDisable() end
 		end
 
-		if (not opts.register_command) then
-			CommandExecutor:notify(
-				"%s %s.",
-				label,
-				v and "Enabled" or "Disabled"
-			)
-		end
+		local name = opts.translate_label and _T(label) or label
+		Notifier:ShowMessage(name, _F("%s.", v and "Enabled" or "Disabled"))
 	end
 
 	self:GetOrCreateGrid():AddCheckbox(
@@ -265,21 +284,25 @@ function Tab:AddLoopedCommand(label, opts)
 			tooltip           = meta.description,
 			isTranslatorLabel = opts.translate_label,
 			onClick           = toggle,
-			contextData       = opts.ctx_callback
+			contextData       = opts.ctx_data
 		}
 	)
 
-	if not (opts.register_command and CommandExecutor and type(table.get_nested_value(g_table, gvar_key)) == "boolean") then
-		return
-	end
-
-	local command_callback = function()
+	local function flip_bool()
 		local v = table.get_nested_value(g_table, gvar_key)
 		table.set_nested_value(g_table, gvar_key, not v)
 		toggle()
 	end
 
-	CommandExecutor:RegisterCommand(command_name, command_callback, meta)
+	if (type(table.get_nested_value(g_table, gvar_key)) ~= "boolean") then
+		return
+	end
+
+	if (opts.register_command and CommandExecutor) then
+		CommandExecutor:RegisterCommand(command_name, flip_bool, meta)
+	end
+
+	self:InjectKeybinds(label, flip_bool)
 end
 
 function Tab:Notify(fmt, ...)

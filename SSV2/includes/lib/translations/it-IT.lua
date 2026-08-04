@@ -1038,5 +1038,16 @@ return {
 	["YH_APT_SELECTED_JOB"] = "Lavoro selezionato",
 	["YH_APT_HEISTS_LABEL"] = "Furti in appartamenti",
 	["YH_CH_SOLO_PATCH"] = "Patch per la scheda della rapina",
-	["YH_CH_SOLO_PATCH_TT"] = "Consente di impostare la scheda di pianificazione definitiva. Deve essere abilitato prima di iniziare il colpo.\n\n[IMPORTANTE]: assicurati di disabilitarlo dopo aver completato il colpo. Mantenerlo abilitato per sempre può causare problemi e/o instabilità."
+	["YH_CH_SOLO_PATCH_TT"] = "Consente di impostare la scheda di pianificazione definitiva. Deve essere abilitato prima di iniziare il colpo.\n\n[IMPORTANTE]: assicurati di disabilitarlo dopo aver completato il colpo. Mantenerlo abilitato per sempre può causare problemi e/o instabilità.",
+	["GENERIC_UNLOCK_ALL"] = "Sblocca tutto",
+	["SETTINGS_HOTKEY_MOD_TIP"] = "Suggerimento: puoi tenere premuto un pulsante da utilizzare come modificatore prima di assegnare un tasto (ad esempio: CTRL + F).",
+	["YH_APT_STRANDS_LOCKED"] = "Non hai sbloccato nessuna delle rapine in appartamento. Premi il pulsante qui sotto per sbloccarli tutti in una volta.",
+	["YH_SIXTY_NINE_TT"] = "L'organizzazione della rapina costa sessantanove dollari.",
+	["YH_MGH_ERR"] = "\"MiniGameHack\" ha riscontrato un problema e al momento non è disponibile.",
+	["YH_SOLO_MISSIONS_TT"] = "Sceneggiatura originale di 'TCRoid': gioca a rapine e missioni da solo.",
+	["YH_MGH_FMT"] = "'MiniGameHack' di sch-lda.\n\nPuoi premere la combinazione di tasti [%s] per utilizzare MiniGameHack senza aprire l'interfaccia utente.",
+	["YH_K26_DISABLE_WEEKLY_RESET"] = "Disabilita la reimpostazione dei pagamenti settimanali",
+	["YH_MGH_NONE_FOUND_WARN"] = "Impossibile trovare nessun minigioco!",
+	["YH_IGNORE_PROP_REQ_TT"] = "Ignora i controlli di proprietà sulla proprietà e sull'aggiornamento della proprietà per i furti che li richiedono.",
+	["YH_K26_DISABLE_LASERS"] = "Disabilita griglia laser"
 }

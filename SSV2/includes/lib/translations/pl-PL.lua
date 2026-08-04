@@ -1038,5 +1038,16 @@ return {
 	["YH_APT_SELECTED_JOB"] = "Wybrana praca",
 	["YH_APT_HEISTS_LABEL"] = "Napady na mieszkania",
 	["YH_TP_CH_ELEV_SHAFT"] = "Szyb windy",
-	["YH_DDAY_SELECTED_ACT"] = "Wybrany akt"
+	["YH_DDAY_SELECTED_ACT"] = "Wybrany akt",
+	["YH_SIXTY_NINE_TT"] = "Przygotowanie do napadu kosztuje sześćdziesiąt dziewięć dolarów.",
+	["GENERIC_UNLOCK_ALL"] = "Odblokuj wszystko",
+	["YH_SOLO_MISSIONS_TT"] = "Oryginalny scenariusz autorstwa „TCRoid”: Graj w napady i misje solo.",
+	["SETTINGS_HOTKEY_MOD_TIP"] = "Wskazówka: możesz przytrzymać przycisk, aby użyć go jako modyfikatora przed przypisaniem klawisza (np. CTRL + F).",
+	["YH_APT_STRANDS_LOCKED"] = "Nie odblokowałeś żadnego z napadów na mieszkanie. Naciśnij przycisk poniżej, aby odblokować je wszystkie na raz.",
+	["YH_MGH_FMT"] = "„MiniGameHack” autorstwa sch-lda.\n\nMożesz nacisnąć klawisz [%s], aby użyć MiniGameHack bez otwierania interfejsu użytkownika.",
+	["YH_IGNORE_PROP_REQ_TT"] = "Ignoruj ​​kontrole własności i ulepszeń nieruchomości w przypadku napadów, które ich wymagają.",
+	["YH_MGH_ERR"] = "„MiniGameHack” napotkał problem i jest obecnie niedostępny.",
+	["YH_MGH_NONE_FOUND_WARN"] = "Nie udało się znaleźć żadnych minigier!",
+	["YH_K26_DISABLE_LASERS"] = "Wyłącz siatkę laserową",
+	["YH_K26_DISABLE_WEEKLY_RESET"] = "Wyłącz cotygodniowe resetowanie wypłat"
 }

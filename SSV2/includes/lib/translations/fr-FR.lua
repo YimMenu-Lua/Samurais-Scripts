@@ -1038,5 +1038,16 @@ return {
 	["YH_APT_HEISTS_LABEL"] = "Vols d’appartement",
 	["YH_APT_SELECTED_JOB"] = "Emploi sélectionné",
 	["YH_CH_SOLO_PATCH_TT"] = "Vous permet de mettre en place le tableau de planification final. Doit être activé avant de commencer le braquage.\n\n[IMPORTANT] : assurez-vous de désactiver cette option après avoir terminé le braquage. Le garder activé pour toujours peut provoquer des problèmes et/ou des instabilités.",
-	["YH_CH_SOLO_PATCH"] = "Patch du tableau de braquage"
+	["YH_CH_SOLO_PATCH"] = "Patch du tableau de braquage",
+	["GENERIC_UNLOCK_ALL"] = "Tout débloquer",
+	["YH_MGH_FMT"] = "'MiniGameHack' par sch-lda.\n\nVous pouvez appuyer sur la touche [%s] pour utiliser MiniGameHack sans ouvrir l'interface utilisateur.",
+	["YH_K26_DISABLE_WEEKLY_RESET"] = "Désactiver la réinitialisation des paiements hebdomadaires",
+	["YH_SIXTY_NINE_TT"] = "Les configurations de braquage coûtent soixante-neuf dollars.",
+	["YH_MGH_NONE_FOUND_WARN"] = "Impossible de trouver des mini-jeux !",
+	["SETTINGS_HOTKEY_MOD_TIP"] = "Astuce : Vous pouvez maintenir un bouton enfoncé pour l'utiliser comme modificateur avant d'attribuer une touche (ex : CTRL + F).",
+	["YH_APT_STRANDS_LOCKED"] = "Vous n'avez débloqué aucun braquage d'appartement. Appuyez sur le bouton ci-dessous pour les déverrouiller tous en même temps.",
+	["YH_IGNORE_PROP_REQ_TT"] = "Ignorez les contrôles de propriété et de mise à niveau de propriété pour les braquages ​​qui les nécessitent.",
+	["YH_K26_DISABLE_LASERS"] = "Désactiver la grille laser",
+	["YH_MGH_ERR"] = "« MiniGameHack » a rencontré un problème et est actuellement indisponible.",
+	["YH_SOLO_MISSIONS_TT"] = "Scénario original de « TCRoid » : jouez en solo aux braquages ​​et aux missions."
 }

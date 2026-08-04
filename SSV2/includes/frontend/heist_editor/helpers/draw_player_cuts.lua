@@ -35,14 +35,12 @@ return function(instance, sane_v, launcher_script_name)
 		end
 	end
 
-	if (not sane_v) then
-		for i = 1, 4 do
-			cuts[i] = ImGui.SliderIntWithStep(_T("GENERIC_PLAYER_FMT", i), cuts[i], 5, 100, 5)
+	local min, max = 5, 100
+	for i = 1, 4 do
+		if (sane_v) then
+			min = 15
+			max = 100 - sum(cuts) + cuts[i]
 		end
-	else
-		cuts[1] = ImGui.SliderIntWithStep(_T("GENERIC_PLAYER_FMT", 1), cuts[1], 15 --[[MEMBER_MIN_HEIST_FINALE_TAKE_PERCENTAGE]], (100 - sum(cuts[2], cuts[3], cuts[4])), 5)
-		cuts[2] = ImGui.SliderIntWithStep(_T("GENERIC_PLAYER_FMT", 2), cuts[2], 15 --[[MEMBER_MIN_HEIST_FINALE_TAKE_PERCENTAGE]], (100 - sum(cuts[1], cuts[3], cuts[4])), 5)
-		cuts[3] = ImGui.SliderIntWithStep(_T("GENERIC_PLAYER_FMT", 3), cuts[3], 15 --[[MEMBER_MIN_HEIST_FINALE_TAKE_PERCENTAGE]], (100 - sum(cuts[1], cuts[2], cuts[4])), 5)
-		cuts[4] = ImGui.SliderIntWithStep(_T("GENERIC_PLAYER_FMT", 4), cuts[4], 15 --[[MEMBER_MIN_HEIST_FINALE_TAKE_PERCENTAGE]], (100 - sum(cuts[1], cuts[2], cuts[3])), 5)
+		cuts[i] = ImGui.SliderIntWithStep(_T("GENERIC_PLAYER_FMT", i), cuts[i], min, max, 5)
 	end
 end

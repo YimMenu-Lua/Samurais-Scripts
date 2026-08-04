@@ -121,10 +121,8 @@ function GUI:init()
 end
 
 function GUI:LateInit()
-	KeyManager:AssertKeybind(true, "keyboard_keybinds.gui_toggle", "F5")
 	debug_counter           = GVars.backend.debug_mode and 7 or 0
 	local uiCfg             = GVars.ui
-	local toggleKey         = GVars.keyboard_keybinds.gui_toggle
 	local tab_id, array_idx = uiCfg.last_tab.tab_id, uiCfg.last_tab.array_index
 	if (not math.is_inrange(tab_id, TABID_MIN, TABID_MAX)) then
 		tab_id    = TABID_MIN
@@ -146,7 +144,14 @@ function GUI:LateInit()
 	uiCfg.last_tab.tab_id         = tab_id
 	uiCfg.last_tab.array_index    = array_idx
 
-	KeyManager:RegisterKeybind(toggleKey, function() self:Toggle() end)
+
+	local runtimeKeybind = GVars.keybinds.gui_toggle
+	if (not runtimeKeybind or not runtimeKeybind.new) then
+		runtimeKeybind = Serializer:GetDefaultConfig().keybinds.gui_toggle
+		GVars.keybinds.gui_toggle = runtimeKeybind
+	end
+
+	KeyManager:RegisterKeybind(runtimeKeybind, function() self:Toggle() end)
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function() self:Close() end)
 	ThemeManager:Load()
 
@@ -408,7 +413,7 @@ function GUI:DrawDummyTab()
 	ImGui.SetWindowFontScale(1.2)
 	ImGui.SeparatorText(_T("GENERIC_IMPORTANT"))
 	ImGui.SetWindowFontScale(1.0)
-	ImGui.TextWrapped(_T("GUI_NEW_LAYOUT_NOTICE", GVars.keyboard_keybinds.gui_toggle))
+	ImGui.TextWrapped(_T("GUI_NEW_LAYOUT_NOTICE", GVars.keybinds.gui_toggle:GetCurrentKeyName()))
 	ImGui.Spacing()
 	ImGui.EndChild()
 

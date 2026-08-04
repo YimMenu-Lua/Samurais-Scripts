@@ -10,13 +10,6 @@
 local drawPlayerAbilities            = require("includes.frontend.self.player_abilities")
 local selfTab                        = GUI:RegisterNewTab(Enums.eTabID.TAB_SELF, "Self")
 local showAbilities                  = false
-local optionPopup                    = {
-	flags       = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize,
-	label       = "##optionsPopup",
-	should_draw = false,
-	---@type function?
-	callback    = nil
-}
 
 local katana_replace_weapons <const> = {
 	2508868239,
@@ -87,20 +80,13 @@ selfTab:AddBoolCommand("SELF_AUTOHEAL",
 		gvar_key        = "features.self.autoheal.enabled",
 		translate_label = true,
 		meta            = { description = "SELF_AUTOHEAL_TT" },
-		ctx_callback    = {
-			condition = function()
-				return GVars.features.self.autoheal.enabled
-			end,
+		ctx_data        = {
 			callback = function()
-				optionPopup.callback    = function()
-					GVars.features.self.autoheal.regen_speed = ImGui.SliderInt(
-						_T("SELF_REGEN_SPEED"),
-						GVars.features.self.autoheal.regen_speed,
-						1, 100
-					)
-				end
-				optionPopup.label       = _T("SELF_AUTOHEAL")
-				optionPopup.should_draw = true
+				GVars.features.self.autoheal.regen_speed = ImGui.SliderInt(
+					_T("SELF_REGEN_SPEED"),
+					GVars.features.self.autoheal.regen_speed,
+					1, 100
+				)
 			end
 		}
 	}
@@ -186,16 +172,7 @@ selfTab:AddBoolCommand("SELF_ROD",
 			GVars.features.self.clumsy = false
 			CheckIfRagdollBlocked()
 		end,
-		ctx_callback    = {
-			condition = function()
-				return GVars.features.self.rod
-			end,
-			callback = function()
-				optionPopup.callback    = ragdollOptions
-				optionPopup.label       = _T("SELF_ROD")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = ragdollOptions }
 	}
 )
 selfTab:AddBoolCommand("SELF_CLUMSY",
@@ -207,16 +184,7 @@ selfTab:AddBoolCommand("SELF_CLUMSY",
 			GVars.features.self.rod = false
 			CheckIfRagdollBlocked()
 		end,
-		ctx_callback    = {
-			condition = function()
-				return GVars.features.self.clumsy
-			end,
-			callback = function()
-				optionPopup.callback    = ragdollOptions
-				optionPopup.label       = _T("SELF_CLUMSY")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = ragdollOptions }
 	}
 )
 selfTab:AddBoolCommand("SELF_MAGIC_BULLET",
@@ -231,16 +199,7 @@ selfTab:AddBoolCommand("SELF_LASER_SIGHTS",
 		gvar_key        = "features.weapon.laser_sights.enabled",
 		translate_label = true,
 		meta            = { description = "SELF_LASER_SIGHTS_TT" },
-		ctx_callback    = {
-			condition = function()
-				return GVars.features.weapon.laser_sights.enabled
-			end,
-			callback = function()
-				optionPopup.callback    = laserOptions
-				optionPopup.label       = _T("SELF_LASER_SIGHTS")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = laserOptions }
 	}
 )
 selfTab:AddBoolCommand("SELF_KATANA",
@@ -248,16 +207,7 @@ selfTab:AddBoolCommand("SELF_KATANA",
 		gvar_key        = "features.weapon.katana.enabled",
 		translate_label = true,
 		meta            = { description = "SELF_KATANA_TT" },
-		ctx_callback    = {
-			condition = function()
-				return GVars.features.weapon.katana.enabled
-			end,
-			callback = function()
-				optionPopup.callback    = katanaOptions
-				optionPopup.label       = _T("SELF_KATANA")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = katanaOptions }
 	}
 )
 
@@ -274,16 +224,5 @@ selfTab:RegisterGUI(function()
 			ImGui.Spacing()
 			drawPlayerAbilities()
 		end
-	end
-
-	if (optionPopup.should_draw) then
-		ImGui.OpenPopup(optionPopup.label)
-		optionPopup.should_draw = false
-	end
-
-	ImGui.SetNextWindowSizeConstraints(300, 140, 600, 800)
-	if (optionPopup.callback and ImGui.BeginPopupModal(optionPopup.label, true, optionPopup.flags)) then
-		optionPopup.callback()
-		ImGui.EndPopup()
 	end
 end)

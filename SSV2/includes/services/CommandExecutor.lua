@@ -8,6 +8,7 @@
 
 
 local ThemeManager = require("includes.services.ThemeManager")
+local Keybind      = require("includes.structs.Keybind")
 
 ---@class CommandMeta
 ---@field args? array<string>
@@ -49,6 +50,7 @@ local ThemeManager = require("includes.services.ThemeManager")
 ---@field private m_screen_size vec2
 ---@field private m_window CommandsWindow
 ---@field private m_mutation_request? string
+---@field private m_toggle_keybind Keybind
 local CommandExecutor = Class("CommandExecutor")
 
 -- Constructor
@@ -91,8 +93,16 @@ function CommandExecutor:init()
 	ThreadManager:RegisterLooped("SS_COMMANDS", function() self:OnTick() end)
 	GUI:RegisterIndependentGUI(function() self:Draw() end)
 
-	KeyManager:AssertKeybind(true, "commands_console.key", "F4")
-	KeyManager:RegisterKeybind(GVars.commands_console.key, function()
+	local savedKeybinds  = GVars.keybinds
+	local runtimeKeybind = savedKeybinds.commands_console_toggle
+	if (not runtimeKeybind or Keybind.IsRawTable(runtimeKeybind)) then
+		local defaultKeybind                  = Serializer:GetDefaultConfig().keybinds.commands_console_toggle
+		runtimeKeybind                        = defaultKeybind or Keybind.MakeDummy("Toggle Commands Console")
+		savedKeybinds.commands_console_toggle = runtimeKeybind
+	end
+	self.m_toggle_keybind = runtimeKeybind
+
+	KeyManager:RegisterKeybind(runtimeKeybind, function()
 		local v                   = not self.m_window.should_draw
 		self.m_window.should_draw = v
 		Backend.disable_input     = v
@@ -100,9 +110,9 @@ function CommandExecutor:init()
 	end)
 
 	-- hardcoded.
-	KeyManager:RegisterKeybind(eVirtualKeyCodes.ESC, function()
-		self:Close()
-	end)
+	KeyManager:RegisterKeybindByCode("CloseCmdWindow", eVirtualKeyCodes.ESC, false, {
+		callback = function() self:Close() end
+	})
 
 	Backend:RegisterEventCallback(Enums.eBackendEvent.RELOAD_UNLOAD, function()
 		self:Close()
@@ -645,18 +655,17 @@ function CommandExecutor:GetDefaultCommands()
 					return
 				end
 
-				local newkey = KeyManager:GetKey(args[1])
+				local newkey = KeyManager:GetVirtualKey(args[1])
 				if (not newkey) then
-					Notifier:ShowError("CommandExecutor", "Unknown parameter.\nUsage example: !setkey F8", true)
+					Notifier:ShowError("CommandExecutor",
+						"Unknown parameter.\nUsage example: !setkey F8\n\nNOTE: Only keyboard keys are accepted.", -- I lie. controller keys work just the same but nah
+						true
+					)
 					return
 				end
 
-				local cmd_cfg = Serializer:ReadItem("commands_console")
-				local oldkey = cmd_cfg.key
-				cmd_cfg.key = newkey.m_name
-				GVars.commands_console = cmd_cfg
-				self:notify("Default toggle key set to [%s].", newkey.m_name)
-				KeyManager:UpdateKeybind(oldkey, newkey)
+				self.m_toggle_keybind:SetKeyboardBinding(newkey)
+				self:notify("Default toggle key set to [%s].", newkey.name)
 			end,
 			args = { "<key: string | number>" },
 			description = "Sets the default command window key."

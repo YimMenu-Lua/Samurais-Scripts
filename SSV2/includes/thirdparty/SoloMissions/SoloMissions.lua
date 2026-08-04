@@ -5,11 +5,12 @@
 -- License: None.
 
 
-local SGSL               = require("includes.services.SGSL")
-local sgslData           = SGSL.data
-local soloMissionsGlobal = SGSL:Get(sgslData.solo_missions_global):AsGlobal()
-local FMMC_L_MP_OBJ      = SGSL:Get(sgslData.fmmc_launcher_min_players_local)
-local fmmcLMinPlayers    = FMMC_L_MP_OBJ:AsLocal()
+local SGSL                 = require("includes.services.SGSL")
+local GetRunningFmmcScript = Game.GetRunningFmmcScript
+local sgslData             = SGSL.data
+local soloMissionsGlobal   = SGSL:Get(sgslData.solo_missions_global):AsGlobal()
+local FMMC_L_MP_OBJ        = SGSL:Get(sgslData.fmmc_launcher_min_players_local)
+local fmmcLMinPlayers      = FMMC_L_MP_OBJ:AsLocal()
 
 
 local FMMC_SERV_BS_OBJ        = SGSL:Get(sgslData.fmmc_skip_obj_local)
@@ -23,14 +24,7 @@ local mhmpOffset              = MHMP_OBJ:GetOffset(1)
 local mhmpReadSize            = MHMP_OBJ:GetOffset(2)
 local missionHeaderMinPlayers = MHMP_OBJ:AsGlobal():At(mhmpOffset)
 
-
-local FmmcScriptNames     = {
-	"fm_mission_controller",
-	"fm_mission_controller_2020",
-	"fm_mission_controller_v3",
-}
-
-local SoloMissionsGlobals = {
+local SoloMissionsGlobals     = {
 	minNumParticipants     = soloMissionsGlobal:At(SGSL:Get(sgslData.solo_missions_global_offset_1):GetValue()),
 	numberOfTeams          = soloMissionsGlobal:At(SGSL:Get(sgslData.solo_missions_global_offset_2):GetValue()),
 	maxNumberOfTeams       = soloMissionsGlobal:At(SGSL:Get(sgslData.solo_missions_global_offset_3):GetValue()),
@@ -39,7 +33,7 @@ local SoloMissionsGlobals = {
 	criticalMinimumForTeam = soloMissionsGlobal:At(SGSL:Get(sgslData.solo_missions_global_offset_6):GetValue()),
 }
 
-local SoloMissionsLocals  = {
+local SoloMissionsLocals      = {
 	["fmmc_launcher"] = {
 		minPlayers       = fmmcLMinPlayers:At(FMMC_L_MP_OBJ:GetOffset(1)),
 		missionVariation = fmmcLMinPlayers:At(SGSL:Get(sgslData.fmmc_launcher_mission_var_offset):GetValue()),
@@ -72,6 +66,7 @@ local SoloMissions   = {}
 SoloMissions.__index = SoloMissions
 
 ---@private
+---@return SoloMissions
 function SoloMissions:new()
 	if (self.m_initialized) then
 		return self
@@ -84,35 +79,30 @@ function SoloMissions:new()
 		patch:disable_patch()
 	end)
 
+	ThreadManager:RegisterLooped("SS_SOLO_MISSIONS", function()
+		self:OnTick()
+	end)
+
 	self.m_initialized = true
 	return self
 end
 
----@return string?
-function SoloMissions:GetRunningFmmcScript()
-	for _, v in ipairs(FmmcScriptNames) do
-		if (script.is_active(v)) then
-			return v
-		end
-	end
-end
-
 function SoloMissions:SkipObjective()
-	local scr = self:GetRunningFmmcScript()
+	local scr = GetRunningFmmcScript()
 	if (not scr) then return end
 
 	SoloMissionsLocals[scr].serverBitSet2:SetBit(17)
 end
 
 function SoloMissions:ForceFail()
-	local scr = self:GetRunningFmmcScript()
+	local scr = GetRunningFmmcScript()
 	if (not scr) then return end
 
 	SoloMissionsLocals[scr].serverBitSet:SetBits({ 16, 20 })
 end
 
 function SoloMissions:InstantFinish()
-	local scr = self:GetRunningFmmcScript()
+	local scr = GetRunningFmmcScript()
 	if (not scr) then return end
 
 	local scrLocals = SoloMissionsLocals[scr]
@@ -170,4 +160,5 @@ function SoloMissions:OnTick()
 	SoloMissionsGlobals.maxNumberOfTeams:WriteInt(1)
 end
 
-return SoloMissions:new()
+local singleInstance <const> = SoloMissions:new()
+return singleInstance

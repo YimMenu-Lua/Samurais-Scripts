@@ -13,7 +13,7 @@ local SGSL  = require("includes.services.SGSL")
 local sgi   = stats.get_int
 local ssi   = stats.set_int
 local tgi   = tunables.get_int
-local sco   = 52
+local sco   = 52 -- setup cost (offset from board state global)
 
 
 ---@class HeistStrand
@@ -41,6 +41,7 @@ local heistData <const> = {
 ---@field private m_player_cuts_global_1 ScriptGlobal
 ---@field private m_player_cuts_global_2 ScriptGlobal
 ---@field private m_strand_list array<HeistStrand>
+---@field public m_none_unlocked boolean
 ---@field public m_current_strand? HeistStrand
 local ApartmentHeist    = setmetatable({}, Heist)
 ApartmentHeist.__index  = ApartmentHeist
@@ -99,6 +100,7 @@ function ApartmentHeist:RebuildStrandList()
 	self.m_current_strand = nil
 	local rcid            = self.m_content_id_global:ReadInt()
 	local lst             = self.m_strand_list or {}
+	local none_unlocked   = true
 	for i, strand in ipairs(heistData) do
 		local data = strand.root_data
 		local hash = data.second
@@ -106,7 +108,14 @@ function ApartmentHeist:RebuildStrandList()
 		if (hash == rcid) then
 			self.m_current_strand = strand
 		end
-	end; self.m_strand_list = lst
+
+		if (sgi(data.first) == hash) then
+			none_unlocked = false
+		end
+	end
+
+	self.m_strand_list   = lst
+	self.m_none_unlocked = none_unlocked
 end
 
 ---@return Int4
@@ -148,6 +157,16 @@ function ApartmentHeist:SetCurrentStrand(reset)
 	end
 
 	ssi("MPX_CURRENT_HEIST_STRAND", strand.int_index)
+end
+
+function ApartmentHeist:UnlockAllSrands()
+	for _, strand in ipairs(heistData) do
+		local pair     = strand.root_data
+		local statName = pair.first
+		ssi(statName, pair.second)
+		ssi(statName .. "_L", 5) -- num finished as leader (included in ShinyWasabi's UnlockEverything)
+		ssi(statName .. "_M", 5) -- num finished as member
+	end
 end
 
 function ApartmentHeist:FixPlayerCuts()

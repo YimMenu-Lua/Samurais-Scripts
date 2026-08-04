@@ -20,13 +20,13 @@ local cfgReset         = {
 	---@type Set<string>
 	exceptions = Set("backend.debug_mode", "__schema_hash"),
 	excToggles = {
-		{ pair = Pair("GUI", "ui"),                               clicked = false, selected = false },
-		{ pair = Pair("Controller Keybinds", "gamepad_keybinds"), clicked = false, selected = false },
-		{ pair = Pair("Keyboard Keybinds", "keyboard_keybinds"),  clicked = false, selected = false },
-		{ pair = Pair("Casino Pacino", "features.dunk"),          clicked = false, selected = false },
-		{ pair = Pair("EntityForge", "features.entity_forge"),    clicked = false, selected = false },
-		{ pair = Pair("YimActions", "features.yim_actions"),      clicked = false, selected = false },
-		{ pair = Pair("YimResupplier", "features.yrv3"),          clicked = false, selected = false },
+		{ pair = Pair("GUI", "ui"),                                      clicked = false, selected = false },
+		{ pair = Pair("Keybinds", "keybinds"),                           clicked = false, selected = false },
+		{ pair = Pair("Quick Toggle Keybinds", "quick_toggle_keybinds"), clicked = false, selected = false },
+		{ pair = Pair("Casino Pacino", "features.dunk"),                 clicked = false, selected = false },
+		{ pair = Pair("EntityForge", "features.entity_forge"),           clicked = false, selected = false },
+		{ pair = Pair("YimActions", "features.yim_actions"),             clicked = false, selected = false },
+		{ pair = Pair("YimResupplier", "features.yrv3"),                 clicked = false, selected = false },
 	},
 	open = false,
 }

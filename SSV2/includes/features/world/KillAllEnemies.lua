@@ -47,7 +47,7 @@ function EnemyKiller:OnClick()
 	end)
 end
 
-KeyManager:RegisterKeybind(GVars.keyboard_keybinds.kill_all_enemies, function()
+KeyManager:RegisterKeybind(GVars.keybinds.kill_all_enemies, function()
 	EnemyKiller:OnClick()
 end)
 

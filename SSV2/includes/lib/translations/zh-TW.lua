@@ -1038,5 +1038,16 @@ return {
 	["YH_TP_CH_ELEV_SHAFT"] = "電梯井道",
 	["YH_CH_SOLO_PATCH_TT"] = "允許您設定最終的規劃板。必須在開始搶劫之前啟用。 \n\n[重要]：確保在完成搶劫後停用此功能。永遠保持啟用狀態可能會導致問題和/或不穩定。",
 	["YH_APT_HEISTS_LABEL"] = "公寓搶劫案",
-	["YH_APT_SELECTED_JOB"] = "所選職位"
+	["YH_APT_SELECTED_JOB"] = "所選職位",
+	["GENERIC_UNLOCK_ALL"] = "全部解鎖",
+	["YH_SIXTY_NINE_TT"] = "搶劫設定花費六十九美元。",
+	["YH_APT_STRANDS_LOCKED"] = "你還沒有解鎖任何公寓搶劫案。按下下面的按鈕即可一次解鎖它們。",
+	["YH_SOLO_MISSIONS_TT"] = "原始劇本由“TCRoid”編寫：單獨進行搶劫和任務。",
+	["SETTINGS_HOTKEY_MOD_TIP"] = "提示：您可以在分配鍵之前按住按鈕用作修飾鍵（例如：CTRL + F）。",
+	["YH_K26_DISABLE_WEEKLY_RESET"] = "停用每週支付重置",
+	["YH_K26_DISABLE_LASERS"] = "禁用雷射網格",
+	["YH_MGH_NONE_FOUND_WARN"] = "找不到任何小遊戲！",
+	["YH_IGNORE_PROP_REQ_TT"] = "忽略需要財產和財產升級所有權檢查的搶劫。",
+	["YH_MGH_ERR"] = "「MiniGameHack」遇到問題，目前不可用。",
+	["YH_MGH_FMT"] = "sch-lda 的「MiniGameHack」。 \n\n您可以按 [%s] 鍵綁定來使用 MiniGameHack，而無需開啟使用者介面。"
 }

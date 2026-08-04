@@ -1038,5 +1038,16 @@ return {
 	["YH_DDAY_SELECTED_ACT"] = "Ato Selecionado",
 	["YH_APT_HEISTS_LABEL"] = "Assaltos a apartamentos",
 	["YH_TP_CH_ELEV_SHAFT"] = "Eixo do elevador",
-	["YH_CH_SOLO_PATCH_TT"] = "Permite configurar o quadro de planejamento final. Deve ser ativado antes de iniciar o assalto.\n\n[IMPORTANTE]: certifique-se de desativar esta opção após concluir o assalto. Mantê-lo ativado para sempre pode causar problemas e/ou instabilidades."
+	["YH_CH_SOLO_PATCH_TT"] = "Permite configurar o quadro de planejamento final. Deve ser ativado antes de iniciar o assalto.\n\n[IMPORTANTE]: certifique-se de desativar esta opção após concluir o assalto. Mantê-lo ativado para sempre pode causar problemas e/ou instabilidades.",
+	["SETTINGS_HOTKEY_MOD_TIP"] = "Dica: você pode segurar um botão para usar como modificador antes de atribuir uma tecla (ex: CTRL + F).",
+	["YH_SIXTY_NINE_TT"] = "As configurações de assalto custam sessenta e nove dólares.",
+	["GENERIC_UNLOCK_ALL"] = "Desbloquear tudo",
+	["YH_SOLO_MISSIONS_TT"] = "Roteiro original de 'TCRoid': Jogue assaltos e missões sozinho.",
+	["YH_MGH_FMT"] = "'MiniGameHack' por sch-lda.\n\nVocê pode pressionar a tecla [%s] para usar o MiniGameHack sem abrir a interface do usuário.",
+	["YH_APT_STRANDS_LOCKED"] = "Você não desbloqueou nenhum dos assaltos a apartamentos. Pressione o botão abaixo para desbloquear todos de uma vez.",
+	["YH_MGH_NONE_FOUND_WARN"] = "Não foi possível encontrar nenhum minijogo!",
+	["YH_MGH_ERR"] = "'MiniGameHack' encontrou um problema e não está disponível no momento.",
+	["YH_IGNORE_PROP_REQ_TT"] = "Ignore as verificações de propriedade e atualização de propriedades para assaltos que as exijam.",
+	["YH_K26_DISABLE_WEEKLY_RESET"] = "Desativar redefinição de pagamento semanal",
+	["YH_K26_DISABLE_LASERS"] = "Desativar grade laser"
 }

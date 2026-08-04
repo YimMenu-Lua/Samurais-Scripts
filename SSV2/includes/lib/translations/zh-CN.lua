@@ -1038,5 +1038,16 @@ return {
 	["YH_APT_HEISTS_LABEL"] = "公寓抢劫案",
 	["YH_APT_SELECTED_JOB"] = "所选职位",
 	["YH_CH_SOLO_PATCH"] = "抢劫板补丁",
-	["YH_CH_SOLO_PATCH_TT"] = "允许您设置最终的规划板。必须在开始抢劫之前启用。\n\n[重要]：确保在完成抢劫后禁用此功能。永远保持启用状态可能会导致问题和/或不稳定。"
+	["YH_CH_SOLO_PATCH_TT"] = "允许您设置最终的规划板。必须在开始抢劫之前启用。\n\n[重要]：确保在完成抢劫后禁用此功能。永远保持启用状态可能会导致问题和/或不稳定。",
+	["GENERIC_UNLOCK_ALL"] = "全部解锁",
+	["YH_SIXTY_NINE_TT"] = "抢劫设置花费六十九美元。",
+	["YH_APT_STRANDS_LOCKED"] = "你还没有解锁任何公寓抢劫案。按下下面的按钮即可一次性解锁它们。",
+	["SETTINGS_HOTKEY_MOD_TIP"] = "提示：您可以在分配键之前按住按钮用作修饰键（例如：CTRL + F）。",
+	["YH_SOLO_MISSIONS_TT"] = "原创剧本由“TCRoid”编写：单独进行抢劫和任务。",
+	["YH_MGH_FMT"] = "sch-lda 的“MiniGameHack”。\n\n您可以按 [%s] 键绑定来使用 MiniGameHack，而无需打开用户界面。",
+	["YH_MGH_ERR"] = "“MiniGameHack”遇到问题，目前不可用。",
+	["YH_K26_DISABLE_LASERS"] = "禁用激光网格",
+	["YH_MGH_NONE_FOUND_WARN"] = "找不到任何小游戏！",
+	["YH_K26_DISABLE_WEEKLY_RESET"] = "禁用每周支付重置",
+	["YH_IGNORE_PROP_REQ_TT"] = "忽略需要财产和财产升级所有权检查的抢劫。"
 }

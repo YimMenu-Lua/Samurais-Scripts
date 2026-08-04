@@ -1038,5 +1038,16 @@ return {
 	["YH_TP_CH_BASEMENT"] = "Nivel Inferior (B1)",
 	["YH_APT_SELECTED_JOB"] = "Trabajo seleccionado",
 	["YH_CH_SOLO_PATCH"] = "Parche del tablero de atraco",
-	["YH_CH_SOLO_PATCH_TT"] = "Le permite configurar el tablero de planificación final. Debe habilitarse antes de comenzar el atraco.\n\n[IMPORTANTE]: asegúrese de deshabilitarlo después de completar el atraco. Mantenerlo habilitado para siempre puede causar problemas y/o inestabilidades."
+	["YH_CH_SOLO_PATCH_TT"] = "Le permite configurar el tablero de planificación final. Debe habilitarse antes de comenzar el atraco.\n\n[IMPORTANTE]: asegúrese de deshabilitarlo después de completar el atraco. Mantenerlo habilitado para siempre puede causar problemas y/o inestabilidades.",
+	["GENERIC_UNLOCK_ALL"] = "Desbloquear todo",
+	["YH_SIXTY_NINE_TT"] = "Las configuraciones de atraco cuestan sesenta y nueve dólares.",
+	["SETTINGS_HOTKEY_MOD_TIP"] = "Consejo: Puedes mantener presionado un botón para usarlo como modificador antes de asignar una tecla (por ejemplo: CTRL + F).",
+	["YH_APT_STRANDS_LOCKED"] = "No has desbloqueado ninguno de los atracos a los apartamentos. Pulsa el botón de abajo para desbloquearlos todos a la vez.",
+	["YH_SOLO_MISSIONS_TT"] = "Guión original de 'TCRoid': Juega atracos y misiones en solitario.",
+	["YH_K26_DISABLE_WEEKLY_RESET"] = "Deshabilitar el reinicio de pagos semanales",
+	["YH_MGH_FMT"] = "'MiniGameHack' de sch-lda.\n\nPuedes presionar la combinación de teclas [%s] para usar MiniGameHack sin abrir la interfaz de usuario.",
+	["YH_MGH_ERR"] = "'MiniGameHack' encontró un problema y actualmente no está disponible.",
+	["YH_K26_DISABLE_LASERS"] = "Desactivar cuadrícula láser",
+	["YH_IGNORE_PROP_REQ_TT"] = "Ignore las verificaciones de propiedad y mejora de propiedad para detectar atracos que las requieran.",
+	["YH_MGH_NONE_FOUND_WARN"] = "¡No se pudo encontrar ningún minijuego!"
 }

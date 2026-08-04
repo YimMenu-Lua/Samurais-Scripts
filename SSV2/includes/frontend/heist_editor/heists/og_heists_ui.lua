@@ -13,10 +13,19 @@ local drawPlayerCuts = require("includes.frontend.heist_editor.helpers.draw_play
 return function(instance)
 	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
 
+	if (instance.m_none_unlocked) then
+		ImGui.TextWrapped(_T("YH_APT_STRANDS_LOCKED"))
+
+		ImGui.Spacing()
+		if (GUI:Button(_T("GENERIC_UNLOCK_ALL"))) then
+			instance:UnlockAllSrands()
+		end
+		return
+	end
+
 	local current    = instance.m_current_strand
 	local nil_strand = current == nil
 	local preview    = current and current.gxt or "GENERIC_NONE"
-
 	ImGui.InputText(_T("YH_APT_SELECTED_JOB"), _T(preview), 256, ImGuiInputTextFlags.ReadOnly)
 
 	--[[ if (ImGui.BeginCombo(_T("YH_APT_SELECTED_JOB"), _T(preview))) then
