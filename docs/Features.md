@@ -419,7 +419,7 @@ A business manager that supports auto-fill and auto-sell for several businesses,
 
 An updated and slightly refactored version of [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino).
 
-### HeistEditor (WIP)
+### HeistEditor
 
 An work in progress heist editor. Originally added by [@How-Bout-No](https://github.com/How-Bout-No) as **Mastermind**, it was rewritten as an extensible base with more features.
 
