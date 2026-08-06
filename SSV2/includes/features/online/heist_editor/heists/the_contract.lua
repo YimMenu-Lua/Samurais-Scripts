@@ -57,6 +57,7 @@ end
 function TheContract:Init()
 	local bs      = sgi("MPX_FIXER_STORY_BS")
 	local bs2     = sgi("MPX_FIXER_COMPLETED_BS")
+	local strand  = sgi("MPX_FIXER_STORY_STRAND")
 	local highest = 0
 	for i = 0, 11 do
 		if (Bit.IsBitSet(bs, i)) then
@@ -65,6 +66,15 @@ function TheContract:Init()
 	end
 	self.m_current_bs    = highest
 	self.m_none_unlocked = not (Bit.IsBitSet(bs2, 0) and Bit.IsBitSet(bs2, 4)) -- bit 9 is payphone hits which are automatically unlocked when you buy an agency
+
+	if (math.is_inrange(highest, 4, 6)) then
+		strand = 1
+	elseif (math.is_inrange(highest, 7, 9)) then
+		strand = 2
+	else
+		strand = 0
+	end
+	ssi("MPX_FIXER_STORY_STRAND", strand)
 end
 
 ---@return Int4
@@ -88,9 +98,9 @@ function TheContract:SetProgression(reset)
 	ssi("MPX_FIXER_STORY_BS", v)
 
 	local strand = 0
-	if (math.is_inrange(selectedBs, 3, 5)) then
+	if (math.is_inrange(selectedBs, 4, 6)) then
 		strand = 1
-	elseif (selectedBs > 5) then
+	elseif (math.is_inrange(selectedBs, 7, 9)) then
 		strand = 2
 	end
 	ssi("MPX_FIXER_STORY_STRAND", strand)
