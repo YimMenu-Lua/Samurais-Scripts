@@ -1,6 +1,6 @@
 -- This code was implemented from MiniGameHack: https://github.com/YimMenu-Lua/MiniGameHack with the author's permission.
 --
--- Original Author: sch-ida (sch): https://github.com/sch-lda
+-- Original Author: sch-lda (sch): https://github.com/sch-lda
 --
 -- License: None.
 
