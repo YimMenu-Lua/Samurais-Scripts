@@ -81,10 +81,9 @@ end
 local function main(instance)
 	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
 
-	local is_hard_mode = stats.get_bit("MPX_H4_PROGRESS", 12) ~= 0
-	GUI:CustomToggle(_T("YH_CAYO_DIFFICULTY"), is_hard_mode, {
-		onClick = function(v)
-			stats.toggle_bit("MPX_H4_PROGRESS", 12, not is_hard_mode)
+	GUI:CustomToggle(_T("YH_CAYO_DIFFICULTY"), instance:IsOnHardMode(), {
+		onClick = function()
+			instance:ToggleHardMode()
 		end
 	})
 

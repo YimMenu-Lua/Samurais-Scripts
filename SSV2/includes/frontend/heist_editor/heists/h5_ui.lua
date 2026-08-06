@@ -7,10 +7,13 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local rawData <const> = require("includes.data.heist_editor_data").K26Data
-local targets <const> = rawData.targets
-local GXTLabels       = Translator.gxt_labels
-local tpLabelWidths   = {} ---@type table<integer, integer>
+local rawData <const>   = require("includes.data.heist_editor_data").K26Data
+local drawTeleports     = require("includes.frontend.heist_editor.helpers.draw_teleports")
+local targets <const>   = rawData.targets
+local teleports <const> = rawData.teleports
+local GXTLabels         = Translator.gxt_labels
+local tpLabelWidths     = {} ---@type table<integer, integer>
+local selectedTpLoc     = teleports[1]
 
 ---@param instance KortzHeist
 ---@return boolean
@@ -106,5 +109,8 @@ end
 
 return {
 	header_callback = header,
-	main_callback   = main
+	main_callback   = main,
+	draw_teleports  = function(_)
+		drawTeleports(teleports, selectedTpLoc)
+	end
 }

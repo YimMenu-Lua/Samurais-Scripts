@@ -577,6 +577,7 @@ function Backend:RegisterHandlers()
 	ThreadManager:RegisterLooped("SS_CTRLS", function()
 		if (self:AreControlsDisabled()) then
 			PAD.DISABLE_ALL_CONTROL_ACTIONS(0)
+			PAD.DISABLE_ALL_CONTROL_ACTIONS(1)
 		else
 			if (gui.is_open() or GUI:IsOpen()) then
 				disableMouseInput()

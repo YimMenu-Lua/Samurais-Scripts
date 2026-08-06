@@ -9,6 +9,7 @@
 
 local rawData <const>      = require("includes.data.heist_editor_data").CasinoHeistData
 local SoloMissions <const> = require("includes.thirdparty.SoloMissions.SoloMissions")
+local drawTeleports        = require("includes.frontend.heist_editor.helpers.draw_teleports")
 local drawPlayerCuts       = require("includes.frontend.heist_editor.helpers.draw_player_cuts")
 local enableBoardPatch     = false
 local teleportsArray       = rawData.teleports
@@ -25,32 +26,6 @@ local setupOrder           = {
 	"cars",
 	"masks"
 }
-
----@param instance CasinoHeist
-local function drawTeleports(instance)
-	ImGui.Spacing()
-	ImGui.SeparatorText(_T("GENERIC_TELEPORT"))
-	if (ImGui.BeginCombo("##teleportList", _T(selectedTpLoc.label))) then
-		for _, v in ipairs(teleportsArray) do
-			local is_selected = v == selectedTpLoc
-			if (ImGui.Selectable(_T(v.label), is_selected)) then
-				selectedTpLoc = v
-			end
-			if (is_selected) then
-				ImGui.SetItemDefaultFocus()
-			end
-		end
-		ImGui.EndCombo()
-	end
-
-	local coords = selectedTpLoc.coords
-	ImGui.SameLine()
-	ImGui.BeginDisabled(not coords or coords:is_zero())
-	if (GUI:Button(_T("GENERIC_GO"))) then
-		LocalPlayer:Teleport(coords)
-	end
-	ImGui.EndDisabled() -- !coords
-end
 
 ---@param instance CasinoHeist
 local function main(instance)
@@ -139,5 +114,7 @@ end
 
 return {
 	main_callback  = main,
-	draw_teleports = drawTeleports
+	draw_teleports = function(_)
+		drawTeleports(teleportsArray, selectedTpLoc)
+	end
 }

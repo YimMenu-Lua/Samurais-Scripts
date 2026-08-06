@@ -1049,5 +1049,7 @@ return {
 	["YH_MGH_NONE_FOUND_WARN"] = "Es konnten keine Minispiele gefunden werden!",
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignorieren Sie Eigentumsüberprüfungen für Eigentum und Eigentumsverbesserungen bei Raubüberfällen, die diese erfordern.",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "Deaktivieren Sie das Zurücksetzen der wöchentlichen Auszahlung",
-	["YH_K26_DISABLE_LASERS"] = "Lasergitter deaktivieren"
+	["YH_K26_DISABLE_LASERS"] = "Lasergitter deaktivieren",
+	["YH_TP_K26_VAULT_DOOR"] = "Tresortür",
+	["YH_SELECTED_MISSION"] = "Ausgewählte Mission"
 }

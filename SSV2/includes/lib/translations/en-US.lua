@@ -919,6 +919,7 @@ return {
 
 	--#region HeistEditor
 	["YH_SUBTITLE_TXT"]                    = "Setup your heists to your liking then press the 'Confirm' button at the bottom.",
+	["YH_GENERIC_SKIP_CUTSCENE"]           = "Skip Cutscene",
 	["YH_GENERIC_SKIP_PREPS"]              = "Skip Preparations",
 	["YH_GENERIC_SKIP_PREPS_TT"]           = "All secondary objectives have been completed.",
 	["YH_GENERIC_CD_LABEL"]                = "Disable Cooldown",
@@ -960,10 +961,12 @@ return {
 	["YH_TP_CH_MANTRAP"]                   = "Mantrap",
 	["YH_TP_CH_VAULT"]                     = "Vault",
 	["YH_TP_CH_ELEV_SHAFT"]                = "Elevator Shaft",
+	["YH_TP_K26_VAULT_DOOR"]               = "Vault Door",
 	["YH_DDAY_SELECTED_ACT"]               = "Selected Act",
 	["YH_APT_HEISTS_LABEL"]                = "Apartment Heists",
 	["YH_APT_STRANDS_LOCKED"]              = "You haven't unlocked any of the apartment heists. Press the button below to unlock them all at once.",
 	["YH_APT_SELECTED_JOB"]                = "Selected Job",
+	["YH_SELECTED_MISSION"]                = "Selected Mission",
 	["YH_SIXTY_NINE_TT"]                   = "Heist setups cost sixty nine dollars.",
 	["YH_SOLO_MISSIONS_TT"]                = "Original script by 'TCRoid': Play heists and missions solo.",
 	["YH_MGH_FMT"]                         = "'MiniGameHack' by sch-lda.\n\nYou can press the [%s] keybind to use MiniGameHack without opening the user interface.",

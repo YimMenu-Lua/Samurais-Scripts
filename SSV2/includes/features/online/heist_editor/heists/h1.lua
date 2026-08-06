@@ -54,7 +54,7 @@ function ApartmentHeist.new(apartment)
 		script_name       = "fm_mission_controller",
 		property          = apartment,
 		requires_property = false, -- TODO (I really don't feel like scraping decompiled noodles for apartment data)
-		gui_callback      = require("includes.frontend.heist_editor.heists.og_heists_ui"),
+		gui_callback      = require("includes.frontend.heist_editor.heists.h1_ui"),
 		property_fail_msg = "DLCC_HEIST_H",
 		managed_values    = {
 			["apartment_heist_cooldown"] = {

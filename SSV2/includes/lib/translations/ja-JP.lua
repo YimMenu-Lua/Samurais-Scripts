@@ -1049,5 +1049,7 @@ return {
 	["YH_MGH_FMT"] = "sch-lda の「MiniGameHack」。\n\n[%s] キーバインドを押すと、ユーザー インターフェイスを開かずに MiniGameHack を使用できます。",
 	["YH_SOLO_MISSIONS_TT"] = "「TCroid」によるオリジナル スクリプト: ソロで強盗やミッションをプレイします。",
 	["YH_MGH_ERR"] = "「MiniGameHack」は問題が発生したため、現在利用できません。",
-	["YH_IGNORE_PROP_REQ_TT"] = "不動産および不動産アップグレードの所有権チェックが必要な強盗については無視します。"
+	["YH_IGNORE_PROP_REQ_TT"] = "不動産および不動産アップグレードの所有権チェックが必要な強盗については無視します。",
+	["YH_TP_K26_VAULT_DOOR"] = "金庫室の扉",
+	["YH_SELECTED_MISSION"] = "選択されたミッション"
 }

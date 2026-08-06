@@ -119,7 +119,7 @@ end
 ---@param bit_pos integer
 ---@return integer
 function stats.get_bit(stat_name, bit_pos)
-	return stats.get_int(stat_name) & (1 << bit_pos)
+	return (stats.get_int(stat_name) >> bit_pos) & 1
 end
 
 ---@param stat_name string
@@ -139,6 +139,12 @@ end
 ---@param toggle boolean
 function stats.toggle_bit(stat_name, bit_pos, toggle)
 	stats.set_int(stat_name, Bit.Toggle(stats.get_int(stat_name), bit_pos, toggle))
+end
+
+---@param stat_name string
+---@param bit_pos integer
+function stats.flip_bit(stat_name, bit_pos)
+	stats.set_int(stat_name, Bit.Flip(stats.get_int(stat_name), bit_pos))
 end
 
 ---@param stat_name string

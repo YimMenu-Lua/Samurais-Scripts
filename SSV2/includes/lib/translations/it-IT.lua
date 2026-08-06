@@ -1049,5 +1049,7 @@ return {
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "Disabilita la reimpostazione dei pagamenti settimanali",
 	["YH_MGH_NONE_FOUND_WARN"] = "Impossibile trovare nessun minigioco!",
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignora i controlli di proprietà sulla proprietà e sull'aggiornamento della proprietà per i furti che li richiedono.",
-	["YH_K26_DISABLE_LASERS"] = "Disabilita griglia laser"
+	["YH_K26_DISABLE_LASERS"] = "Disabilita griglia laser",
+	["YH_SELECTED_MISSION"] = "Missione selezionata",
+	["YH_TP_K26_VAULT_DOOR"] = "Porta del caveau"
 }

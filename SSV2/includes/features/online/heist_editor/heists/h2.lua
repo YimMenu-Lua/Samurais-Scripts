@@ -45,7 +45,7 @@ function GangOps.new(facilityProperty)
 		script_name       = "fm_mission_controller",
 		property          = facilityProperty,
 		requires_property = true,
-		gui_callback      = require("includes.frontend.heist_editor.heists.gangops_ui"),
+		gui_callback      = require("includes.frontend.heist_editor.heists.h2_ui"),
 		property_fail_msg = "GOPS_BASE_HELP",
 		managed_values    = {
 			["doomsday_heist_cooldown"] = {

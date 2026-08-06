@@ -50,12 +50,6 @@ local SoloMissionsLocals      = {
 		nextMission   = fmmc20BsLocal:At(FMMC20_SERV_BS_OBJ:GetOffset(1)),
 		teamScore     = fmmc20BsLocal:At(SGSL:Get(sgslData.fmmc_20_team_score_offset):GetValue()):At(1),
 	},
-	["fm_mission_controller_v3"] = { -- TODO
-		serverBitSet  = fmmc20BsLocal:At(1),
-		serverBitSet2 = fmmc20BsLocal:At(2),
-		nextMission   = fmmc20BsLocal:At(FMMC20_SERV_BS_OBJ:GetOffset(1)),
-		teamScore     = fmmc20BsLocal:At(SGSL:Get(sgslData.fmmc_20_team_score_offset):GetValue()):At(1),
-	}
 }
 
 

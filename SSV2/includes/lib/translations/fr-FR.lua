@@ -1049,5 +1049,7 @@ return {
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignorez les contrôles de propriété et de mise à niveau de propriété pour les braquages ​​qui les nécessitent.",
 	["YH_K26_DISABLE_LASERS"] = "Désactiver la grille laser",
 	["YH_MGH_ERR"] = "« MiniGameHack » a rencontré un problème et est actuellement indisponible.",
-	["YH_SOLO_MISSIONS_TT"] = "Scénario original de « TCRoid » : jouez en solo aux braquages ​​et aux missions."
+	["YH_SOLO_MISSIONS_TT"] = "Scénario original de « TCRoid » : jouez en solo aux braquages ​​et aux missions.",
+	["YH_TP_K26_VAULT_DOOR"] = "Porte du coffre-fort",
+	["YH_SELECTED_MISSION"] = "Mission sélectionnée"
 }

@@ -61,7 +61,7 @@ local function drawBoostedHeists()
 	ImGui.EndDisabled()
 end
 
-GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Heist Editor", function()
+GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Heist Editor [WIP]", function()
 	if (not Game.IsOnline()) then
 		GUI:Text(_T("GENERIC_UNAVAILABLE_SP"))
 		return

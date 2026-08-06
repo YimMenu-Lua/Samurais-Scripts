@@ -41,7 +41,7 @@ return function(instance)
 
 	GUI:HeaderText(_T("GENERIC_OPTIONS_LABEL"), { separator = true, spacing = true })
 
-	GVars.features.yim_heists.dday_cd, _ = GUI:CustomToggle(_T("YH_GENERIC_CD_LABEL"),
+	GVars.features.yim_heists.dday_cd = GUI:CustomToggle(_T("YH_GENERIC_CD_LABEL"),
 		GVars.features.yim_heists.dday_cd, {
 			tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
 			color   = Color.RED,

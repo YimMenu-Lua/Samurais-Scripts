@@ -11,7 +11,7 @@ local SGSL                = require("includes.services.SGSL")
 local boostTunableOffset  = SGSL:Get(SGSL.data.heist_boosts_global_start):GetValue()
 local boostTunableInit    = ScriptGlobal(262145):At(boostTunableOffset)
 local tpLabelWidths       = {}
-local confirmBtnSize      = vec2:new(0, 40)
+local lowerBtnSize        = vec2:new(0, 40)
 local boolColors          = {
 	[true]  = vec4:new(0.0, 0.96, 0.04, 1.0),
 	[false] = vec4:new(0.96, 0.0, 0.02, 1.0),
@@ -331,13 +331,13 @@ function Heist:Draw()
 
 	ImGui.Separator()
 	ImGui.BeginDisabled(isOnDummyTimeout or isActive)
-	local confirmLabel    = _T("GENERIC_CONFIRM")
-	local confirmLblWidth = ImGui.CalcTextSize(confirmLabel) + 40
-	if (confirmLblWidth > confirmBtnSize.x) then
-		confirmBtnSize.x = confirmLblWidth
+	local skipLabel   = _T("YH_GENERIC_SKIP_CUTSCENE")
+	local maxLblWidth = ImGui.CalcTextSize(skipLabel) + 20
+	if (maxLblWidth > lowerBtnSize.x) then
+		lowerBtnSize.x = maxLblWidth
 	end
 
-	if (GUI:Button(confirmLabel, { size = confirmBtnSize })) then
+	if (GUI:Button(_T("GENERIC_CONFIRM"), { size = lowerBtnSize })) then
 		self.m_dummy_confirm_timer = self.m_dummy_confirm_timer or Timer(1200)
 		self.m_dummy_confirm_timer:Reset()
 		ThreadManager:Run(function()
@@ -348,7 +348,7 @@ function Heist:Draw()
 	local reset = self.Reset
 	if (reset) then
 		ImGui.SameLine()
-		if (GUI:Button(_T("GENERIC_RESET"), { size = confirmBtnSize })) then
+		if (GUI:Button(_T("GENERIC_RESET"), { size = lowerBtnSize })) then
 			self.m_dummy_confirm_timer = self.m_dummy_confirm_timer or Timer(1200)
 			self.m_dummy_confirm_timer:Reset()
 			ThreadManager:Run(function()
@@ -357,6 +357,17 @@ function Heist:Draw()
 		end
 	end
 	ImGui.EndDisabled() -- isOnDummyTimeout || isActive
+
+	ImGui.SameLineIfAvail(lowerBtnSize.x)
+	ImGui.BeginDisabled(not isActive)
+	if (GUI:Button(skipLabel, { size = lowerBtnSize })) then
+		ThreadManager:Run(function(s)
+			if (CUTSCENE.IS_CUTSCENE_PLAYING()) then
+				CUTSCENE.STOP_CUTSCENE_IMMEDIATELY()
+			end
+		end)
+	end
+	ImGui.EndDisabled()
 end
 
 --#endregion ImGui

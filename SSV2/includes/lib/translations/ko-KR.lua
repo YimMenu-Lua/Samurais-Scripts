@@ -1049,5 +1049,7 @@ return {
 	["YH_MGH_ERR"] = "'MiniGameHack'에 문제가 발생하여 현재 사용할 수 없습니다.",
 	["YH_SOLO_MISSIONS_TT"] = "'TCroid'의 원본 스크립트: 습격과 임무를 솔로로 플레이하세요.",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "주간 지급 재설정 비활성화",
-	["YH_K26_DISABLE_LASERS"] = "레이저 그리드 비활성화"
+	["YH_K26_DISABLE_LASERS"] = "레이저 그리드 비활성화",
+	["YH_TP_K26_VAULT_DOOR"] = "금고 문",
+	["YH_SELECTED_MISSION"] = "선택된 임무"
 }

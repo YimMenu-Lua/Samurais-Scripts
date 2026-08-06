@@ -1049,5 +1049,7 @@ return {
 	["YH_MGH_ERR"] = "'MiniGameHack' encontrou um problema e não está disponível no momento.",
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignore as verificações de propriedade e atualização de propriedades para assaltos que as exijam.",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "Desativar redefinição de pagamento semanal",
-	["YH_K26_DISABLE_LASERS"] = "Desativar grade laser"
+	["YH_K26_DISABLE_LASERS"] = "Desativar grade laser",
+	["YH_TP_K26_VAULT_DOOR"] = "Porta do cofre",
+	["YH_SELECTED_MISSION"] = "Missão Selecionada"
 }

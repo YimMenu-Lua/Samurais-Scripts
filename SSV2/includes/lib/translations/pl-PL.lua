@@ -1049,5 +1049,7 @@ return {
 	["YH_MGH_ERR"] = "„MiniGameHack” napotkał problem i jest obecnie niedostępny.",
 	["YH_MGH_NONE_FOUND_WARN"] = "Nie udało się znaleźć żadnych minigier!",
 	["YH_K26_DISABLE_LASERS"] = "Wyłącz siatkę laserową",
-	["YH_K26_DISABLE_WEEKLY_RESET"] = "Wyłącz cotygodniowe resetowanie wypłat"
+	["YH_K26_DISABLE_WEEKLY_RESET"] = "Wyłącz cotygodniowe resetowanie wypłat",
+	["YH_SELECTED_MISSION"] = "Wybrana misja",
+	["YH_TP_K26_VAULT_DOOR"] = "Drzwi do skarbca"
 }

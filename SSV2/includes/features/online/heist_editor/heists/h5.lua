@@ -9,16 +9,11 @@
 
 local sgi        = stats.get_int
 local ssi        = stats.set_int
-local ssb        = stats.set_bit
-local scb        = stats.clear_bit
-local sgb        = stats.get_bit
 local tgi        = tunables.get_int
 local tsi        = tunables.set_int
-local Pair       = require("includes.classes.Pair")
 local Heist      = require("includes.features.online.heist_editor.heists.heist_base")
 local k26Data    = require("includes.data.heist_editor_data").K26Data
-local SGSL       = require("includes.services.SGSL")
-local drawFuncs  = require("includes.frontend.heist_editor.heists.k26_ui")
+local drawFuncs  = require("includes.frontend.heist_editor.heists.h5_ui")
 local eDataType  = Enums.eManagedValueDataType
 local eValueType = Enums.eManagedValueType
 
@@ -61,10 +56,11 @@ function KortzHeist.new(mansion)
 	})
 
 
-	local instance = setmetatable(base, KortzHeist) ---@cast instance KortzHeist
+	local instance          = setmetatable(base, KortzHeist) ---@cast instance KortzHeist
+	instance.DrawWhenActive = drawFuncs.draw_teleports
 
 	if (GVars.features.yim_heists.kortz_week_bypass) then
-		instance:ToggleWeeklyCooldown(true, true)
+		instance:ToggleWeeklyPayoutReset(true, true)
 	end
 
 	instance:Init()
@@ -95,7 +91,7 @@ end
 
 ---@param toggle boolean
 ---@param silent? boolean
-function KortzHeist:ToggleWeeklyCooldown(toggle, silent)
+function KortzHeist:ToggleWeeklyPayoutReset(toggle, silent)
 	local week_id   = sgi("MPX_K26_WEEK_ID")
 	local toggle_id = week_id + 1
 	if (toggle_id > 6) then

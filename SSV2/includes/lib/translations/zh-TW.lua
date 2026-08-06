@@ -1049,5 +1049,7 @@ return {
 	["YH_MGH_NONE_FOUND_WARN"] = "找不到任何小遊戲！",
 	["YH_IGNORE_PROP_REQ_TT"] = "忽略需要財產和財產升級所有權檢查的搶劫。",
 	["YH_MGH_ERR"] = "「MiniGameHack」遇到問題，目前不可用。",
-	["YH_MGH_FMT"] = "sch-lda 的「MiniGameHack」。 \n\n您可以按 [%s] 鍵綁定來使用 MiniGameHack，而無需開啟使用者介面。"
+	["YH_MGH_FMT"] = "sch-lda 的「MiniGameHack」。 \n\n您可以按 [%s] 鍵綁定來使用 MiniGameHack，而無需開啟使用者介面。",
+	["YH_SELECTED_MISSION"] = "選定的任務",
+	["YH_TP_K26_VAULT_DOOR"] = "金庫門"
 }

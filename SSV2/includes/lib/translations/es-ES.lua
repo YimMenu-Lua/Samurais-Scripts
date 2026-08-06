@@ -1049,5 +1049,7 @@ return {
 	["YH_MGH_ERR"] = "'MiniGameHack' encontró un problema y actualmente no está disponible.",
 	["YH_K26_DISABLE_LASERS"] = "Desactivar cuadrícula láser",
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignore las verificaciones de propiedad y mejora de propiedad para detectar atracos que las requieran.",
-	["YH_MGH_NONE_FOUND_WARN"] = "¡No se pudo encontrar ningún minijuego!"
+	["YH_MGH_NONE_FOUND_WARN"] = "¡No se pudo encontrar ningún minijuego!",
+	["YH_TP_K26_VAULT_DOOR"] = "Puerta de la bóveda",
+	["YH_SELECTED_MISSION"] = "Misión seleccionada"
 }

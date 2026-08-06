@@ -85,7 +85,7 @@ return {
 				return nil
 			end,
 			get_ctor = function()
-				return require(heistEditorPath .. ".heists.og_heists").new
+				return require(heistEditorPath .. ".heists.h1").new
 			end
 		},
 		{
@@ -93,7 +93,7 @@ return {
 				return get_generic_property(stats.get_int("MPX_DBASE_OWNED"), "Facilities")
 			end,
 			get_ctor = function()
-				return require(heistEditorPath .. ".heists.gang_ops").new
+				return require(heistEditorPath .. ".heists.h2").new
 			end
 		},
 		{
@@ -101,40 +101,43 @@ return {
 				return get_generic_property(stats.get_int("MPX_ARCADE_OWNED"), "Arcades")
 			end,
 			get_ctor = function()
-				return require(heistEditorPath .. ".heists.casino_heist").new
+				return require(heistEditorPath .. ".heists.h3").new
 			end
 		},
 		{
 			resolve_property = function() return nil end, -- special case vehicle property. the constructor handles it instead
 			get_ctor = function()
-				return require(heistEditorPath .. ".heists.cayo_perico").new
+				return require(heistEditorPath .. ".heists.h4").new
 			end
 		},
 		{
 			resolve_property = function()
-				for i, statname in ipairs(MansionStats) do
-					local id = stats.get_int(statname)
-					if (id ~= 0) then
+				for i, statname in ipairs(MansionPlanningRoomStats) do
+					if (stats.get_int(statname) ~= 0) then
 						return get_generic_property(i, "Mansions")
 					end
 				end
-				return nil
+
+				for i, statname in ipairs(MansionStats) do
+					if (stats.get_int(statname) ~= 0) then
+						return get_generic_property(i, "Mansions")
+					end
+				end
 			end,
 			get_ctor = function()
-				return require(heistEditorPath .. ".heists.k26_heist").new
+				return require(heistEditorPath .. ".heists.h5").new
+			end
+		},
+		{
+			resolve_property = function()
+				return get_generic_property(stats.get_int("MPX_FIXER_HQ_OWNED"), "Agencies")
+			end,
+			get_ctor = function()
+				return require(heistEditorPath .. ".heists.the_contract").new
 			end
 		},
 	},
 	JobResolvers        = {
-		{
-			gxt = "",
-			setup = NOP,
-			reset = NOP,
-			managed_values = nil,
-			resolve_property = function()
-				return get_generic_property(stats.get_int("MPX_FIXER_HQ_OWNED"), "Agencies")
-			end,
-		},
 		{
 			gxt = "",
 			setup = NOP,
@@ -179,7 +182,7 @@ return {
 		"ACH_ACHGO3_NAME",
 		"ACH_ACHGO4_NAME",
 		"CH_END_NAME",
-		"DLCC_CONTR",
+		"FIX_APP_VIP_TU",
 		"AWT_1026",
 		"DLCC_FHAN",
 		"DLCC_AVIM",
@@ -400,7 +403,23 @@ return {
 			Pair("MPX_K26_POI_BS", -1),
 		},
 		teleports = {
-			{ label = "YH_TP_KOTZ_VAULT_DOOR", coords = vec3:new(2634.33, 5862.16, -61) }
+			{ label = "YH_TP_K26_VAULT_DOOR", coords = vec3:new(2634.33, 5862.16, -61) }
+		}
+	},
+	DrDreData           = {
+		missions = {
+			"AWT_968",
+			"FXR_BM_VC_NGH",
+			"FXR_BM_VC_S_Y",
+			"AWT_969",
+			"FXR_BM_VC_S_L",
+			"FXR_BM_VC_S_W",
+			"AWT_970",
+			"FXR_BM_VC_S_F",
+			"FXR_BM_VC_S_B",
+			"AWT_971",
+			"AWT_972",
+			"AWT_973",
 		}
 	}
 }

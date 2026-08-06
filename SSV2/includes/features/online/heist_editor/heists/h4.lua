@@ -8,11 +8,13 @@
 
 
 local ssi                          = stats.set_int
+local sfb                          = stats.flip_bit
 local sgi                          = stats.get_int
+local sgb                          = stats.get_bit
 local Heist                        = require("includes.features.online.heist_editor.heists.heist_base")
 local SGSL                         = require("includes.services.SGSL")
 local heistData                    = require("includes.data.heist_editor_data").CayoPericoData
-local drawFuncs                    = require("includes.frontend.heist_editor.heists.cayo_perico_ui")
+local drawFuncs                    = require("includes.frontend.heist_editor.heists.h4_ui")
 local eDataType                    = Enums.eManagedValueDataType
 local eValueType                   = Enums.eManagedValueType
 local gpbgObject                   = SGSL:Get(SGSL.data.gpbd)
@@ -202,6 +204,15 @@ function CayoPericoHeist:Reset()
 	self:SetPlayerCuts(true)
 	self:SetSecondaries(true)
 	stats.toggle_bit("MPX_H4_PROGRESS", 12, false)
+end
+
+---@return boolean
+function CayoPericoHeist:IsOnHardMode()
+	return sgb("MPX_H4_PROGRESS", 12) ~= 0
+end
+
+function CayoPericoHeist:ToggleHardMode()
+	sfb("MPX_H4_PROGRESS", 12)
 end
 
 function CayoPericoHeist:Update()

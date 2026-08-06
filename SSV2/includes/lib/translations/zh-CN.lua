@@ -1049,5 +1049,7 @@ return {
 	["YH_K26_DISABLE_LASERS"] = "禁用激光网格",
 	["YH_MGH_NONE_FOUND_WARN"] = "找不到任何小游戏！",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "禁用每周支付重置",
-	["YH_IGNORE_PROP_REQ_TT"] = "忽略需要财产和财产升级所有权检查的抢劫。"
+	["YH_IGNORE_PROP_REQ_TT"] = "忽略需要财产和财产升级所有权检查的抢劫。",
+	["YH_TP_K26_VAULT_DOOR"] = "金库门",
+	["YH_SELECTED_MISSION"] = "选定的任务"
 }
