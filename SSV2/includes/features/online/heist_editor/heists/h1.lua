@@ -56,16 +56,16 @@ function ApartmentHeist.new(apartment)
 		requires_property = false, -- TODO (I really don't feel like scraping decompiled noodles for apartment data)
 		gui_callback      = require("includes.frontend.heist_editor.heists.h1_ui"),
 		property_fail_msg = "DLCC_HEIST_H",
-		managed_values    = {
-			["apartment_heist_cooldown"] = {
-				get_state = function()
-					return false
-				end,
-				defs = {
-					-- { t = "MPX_GANGOPS_LAUNCH_TIME", v = Time.Epoch() - 2629743, obj_type = eValueType.STAT, data_type = eDataType.INT },
-				}
-			}
-		}
+		-- managed_values    = { -- og heists use a bitset global instead. // void func_18392() // Position - 0x5AA1B7 (5939639) Hash - 0xEBC9A1E3 ^0xF86F4BD3
+		-- 	["apartment_heist_cooldown"] = {
+		-- 		get_state = function()
+		-- 			return false
+		-- 		end,
+		-- 		defs = {
+		-- 			-- { t = "MPX_GANGOPS_LAUNCH_TIME", v = Time.Epoch() - 2629743, obj_type = eValueType.STAT, data_type = eDataType.INT },
+		-- 		}
+		-- 	}
+		-- }
 	})
 
 
