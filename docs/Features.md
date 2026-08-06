@@ -26,7 +26,7 @@ SSV2 includes polished versions of your favorite features from previous versions
       <ul>
         <li><a href="#business-manager">Business Manager</a></li>
         <li><a href="#casinopacino">CasinoPacino</a></li>
-        <li><a href="#mastermind">Mastermind</a></li>
+        <li><a href="#heisteditor">HeistEditor</a></li>
         <li><a href="#stat-controller">Stat Controller</a></li>
       </ul>
     </li>
@@ -419,34 +419,9 @@ A business manager that supports auto-fill and auto-sell for several businesses,
 
 An updated and slightly refactored version of [Casino Pacino](https://github.com/YimMenu-Lua/Casino-Pacino).
 
-### Mastermind
+### HeistEditor (WIP)
 
-A heist editor added by [@How-Bout-No](https://github.com/How-Bout-No) [WIP].
-
-Contains the following modules:
-
-- **Basic**
-
-  Options for Teleport, Set Waypoint, Skip Preps, and Disable Cooldowns on:
-  - Cluckin Bell
-  - KnoWay
-  - Dr Dre Contract
-  - Oscar Guzman
-
-- **Cayo Perico**
-
-  Options for Teleport, Set Waypoint, and Request Submarine.
-
-  Ability to change Primary Target, all Secondary Targets on the island and inside the compound, Weapon Loadout, Hard Mode, Unlock All Heist Options _(Approach Vehicles, Disruptions, etc)_, Disable Cooldown
-
-- **Doomsday**
-
-  Options for Teleport and Set Waypoint to Facility.
-
-  Skip all Preps/Setups and Disable Cooldowns on all 3 Acts (your choice):
-  1. The Data Breaches
-  2. The Bogdan Problem
-  3. The Doomsday Scenario
+An work in progress heist editor. Originally added by [@How-Bout-No](https://github.com/How-Bout-No) as **Mastermind**, it was rewritten as an extensible base with more features.
 
 ### Stat Controller
 
