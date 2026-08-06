@@ -84,23 +84,23 @@ end
 
 ---@param reset? boolean
 function TheContract:SetProgression(reset)
-	ssi("MPX_FIXER_STORY_BS", 0)
 	if (reset) then
+		ssi("MPX_FIXER_STORY_BS", 3 --[[(1 << 0 | 1 << 1)]])
 		ssi("MPX_FIXER_STORY_STRAND", 0)
 		return
 	end
 
-	local selectedBs = self.m_current_bs
-	local v = sgi("MPX_FIXER_STORY_BS")
-	for i = 0, selectedBs do
+	local bs = self.m_current_bs
+	local v  = 0
+	for i = 0, bs do
 		v = v | (1 << i)
 	end
 	ssi("MPX_FIXER_STORY_BS", v)
 
 	local strand = 0
-	if (math.is_inrange(selectedBs, 4, 6)) then
+	if (math.is_inrange(bs, 4, 6)) then
 		strand = 1
-	elseif (math.is_inrange(selectedBs, 7, 9)) then
+	elseif (math.is_inrange(bs, 7, 9)) then
 		strand = 2
 	end
 	ssi("MPX_FIXER_STORY_STRAND", strand)
@@ -122,7 +122,7 @@ function TheContract:Setup()
 end
 
 function TheContract:Reset()
-	self.m_current_bs = 0
+	self.m_current_bs = 3
 	self:SetProgression(true)
 end
 
