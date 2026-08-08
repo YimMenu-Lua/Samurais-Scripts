@@ -171,7 +171,7 @@ return {
 	["CP_HEIST_MAX_PLAYER_CUTS"] = "Maks Wszystko",
 	["SY_INFORMATION"] = "Informacja",
 	["SY_DISABLE_WEEKLY_COOLDOWN"] = "Wyłącz cotygodniowy czas odnowienia",
-	["CP_HEIST_AUTOGRAB"] = "Automatyczne zbieranie łupów",
+	["YH_TROLLEY_AUTOGRAB"] = "Automatyczne zbieranie łupów z wózka",
 	["SY_LIFT"] = "Podnieś %d",
 	["SY_LIFT_AVAILABLE"] = "Winda %s: dostępna",
 	["SY_WEEKLY_CAR_STATUS"] = "Samochód %d: %s",
@@ -1046,10 +1046,14 @@ return {
 	["YH_APT_STRANDS_LOCKED"] = "Nie odblokowałeś żadnego z napadów na mieszkanie. Naciśnij przycisk poniżej, aby odblokować je wszystkie na raz.",
 	["YH_MGH_FMT"] = "„MiniGameHack” autorstwa sch-lda.\n\nMożesz nacisnąć klawisz [%s], aby użyć MiniGameHack bez otwierania interfejsu użytkownika.",
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignoruj ​​kontrole własności i ulepszeń nieruchomości w przypadku napadów, które ich wymagają.",
-	["YH_MGH_ERR"] = "„MiniGameHack” napotkał problem i jest obecnie niedostępny.",
+	["YH_MGH_LOAD_ERR"] = "Nie udało się załadować gry „MiniGameHack” i jest ona obecnie niedostępna.",
 	["YH_MGH_NONE_FOUND_WARN"] = "Nie udało się znaleźć żadnych minigier!",
 	["YH_K26_DISABLE_LASERS"] = "Wyłącz siatkę laserową",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "Wyłącz cotygodniowe resetowanie wypłat",
 	["YH_SELECTED_MISSION"] = "Wybrana misja",
-	["YH_TP_K26_VAULT_DOOR"] = "Drzwi do skarbca"
+	["YH_TP_K26_VAULT_DOOR"] = "Drzwi do skarbca",
+	["YH_SM_LOAD_ERR"] = "Nie udało się załadować misji „SoloMissions” i jest ona obecnie niedostępna.",
+	["YH_GENERIC_SKIP_CUTSCENE"] = "Pomiń przerywnik filmowy",
+	["YH_K26_NOT_SETUP_ERR"] = "Przygotuj napad w studiu artystycznym swojej rezydencji, a następnie naciśnij mały przycisk w prawym górnym rogu interfejsu, aby ponownie załadować „HeistEditor”.",
+	["YH_K26_INVALID_TARGET_ERR"] = "Wybierz prawidłowy cel główny."
 }

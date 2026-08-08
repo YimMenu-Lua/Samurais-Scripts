@@ -969,12 +969,12 @@ return {
 			}
 		}
 	},
-	fm_mission_controller_cart_grab = {
-		description = "FM Mission Controller Cart Grab Local",
+	fmmc_trolley_scene = {
+		description = "FM Mission Controller loot trolley synchronized scene local.",
 		file = "fm_mission_controller.c",
 		LEGACY = {
 			value = 10311,
-			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d{5}\.f_\d+\), .?(Local_\d{5})(\.f_\d+\))]],
+			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d+\.f_\d+\), .?Local_(\d+)\.f_(\d+)\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -986,7 +986,63 @@ return {
 		},
 		ENHANCED = {
 			value = 10713,
-			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d{5}\.f_\d+\), .?(Local_\d{5})(\.f_\d+\))]],
+			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d+\.f_\d+\), .?Local_(\d+)\.f_(\d+)\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 14,
+					capture_group = 2,
+					description = "scene rate"
+				}
+			}
+		}
+	},
+	fmmc20_trolley_scene = {
+		description = "FM Mission Controller 2020 loot trolley synchronized scene local.",
+		file = "fm_mission_controller_2020.c",
+		LEGACY = {
+			value = 30873,
+			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d+\.f_\d+\), .?Local_(\d+)\.f_(\d+)\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 14,
+					capture_group = 2,
+					description = "scene rate"
+				}
+			}
+		},
+		ENHANCED = {
+			value = 31275,
+			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d+\.f_\d+\), .?Local_(\d+)\.f_(\d+)\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 14,
+					capture_group = 2,
+					description = "scene rate"
+				}
+			}
+		}
+	},
+	fmmc_v3_trolley_scene = {
+		description = "FM Mission Controller V3 loot trolley synchronized scene local.",
+		file = "fm_mission_controller_v3.c",
+		LEGACY = {
+			value = 30965,
+			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d+\.f_\d+\), .?Local_(\d+)\.f_(\d+)\)]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 14,
+					capture_group = 2,
+					description = "scene rate"
+				}
+			}
+		},
+		ENHANCED = {
+			value = 31367,
+			pattern = [[PED::SET_SYNCHRONIZED_SCENE_RATE\(NETWORK::NETWORK_GET_LOCAL_SCENE_FROM_NETWORK_ID\(.?Local_\d+\.f_\d+\), .?Local_(\d+)\.f_(\d+)\)]],
 			capture_group = 1,
 			offsets = {
 				{
@@ -1382,6 +1438,72 @@ return {
 			value = 2635459,
 			pattern = [[HUD::SET_WARNING_MESSAGE_WITH_HEADER\("HCOST_TITLE".*?,\s+"HCOST_BODY".*?,\s+18,\s+"HEIST_WARN_2".*?,\s+true,\s+Global_(\d+)\.f_(\d{2}),\s+func_\d+\(Global_\d+\),\s+0,\s+true,\s+0\);]],
 			capture_group = 1
+		}
+	},
+	k26_gen_bs_global = {
+		description = "kortz heist general bitset",
+		file = "kortz_planning.c",
+		LEGACY = {
+			value = 1983730,
+			pattern = [[SET_BIT\(&\(Global_(\d+)\[.*/\*(\d{3})\*/\]\.f_(\d{3})\), 28\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 149,
+					capture_group = 2,
+					description = "array size"
+				},
+				{
+					value = 137,
+					capture_group = 3,
+					description = "gen bs offset"
+				}
+			}
+		},
+		ENHANCED = {
+			value = 1985024,
+			pattern = [[SET_BIT\(&\(Global_(\d+)\[.*/\*(\d{3})\*/\]\.f_(\d{3})\), 28\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 149,
+					capture_group = 2,
+					description = "array size"
+				},
+				{
+					value = 137,
+					capture_group = 3,
+					description = "gen bs offset"
+				}
+			}
+		}
+	},
+	h4_gen_bs_global = {
+		description = "Cayo Perico general bitset",
+		file = "heist_island_planning.c",
+		LEGACY = {
+			value = 1981269,
+			pattern = [[SET_BIT\(&\(Global_(\d+)\[.*/\*(\d{2})\*/\]\.f_1\), 12\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 53,
+					capture_group = 2,
+					description = "array size"
+				},
+			}
+		},
+		ENHANCED = {
+			value = 1982548,
+			pattern = [[SET_BIT\(&\(Global_(\d+)\[.*/\*(\d{2})\*/\]\.f_1\), 12\);]],
+			capture_group = 1,
+			offsets = {
+				{
+					value = 53,
+					capture_group = 2,
+					description = "array size"
+				},
+			}
 		}
 	},
 	solo_missions_global = {

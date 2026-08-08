@@ -15,6 +15,8 @@ local GetRunningFmmcScript    = Game.GetRunningFmmcScript
 ---@class Job
 
 
+-- difficulty tuneables: ,\s+1f\);[\r\n].*,\s+1\.25f\);
+
 ---@class HeistEditor
 ---@field private m_heists array<Heist>
 ---@field private m_jobs array<Job> -- TODO

@@ -157,7 +157,7 @@ return {
 	["CP_HEIST_GUNMAN"] = "船員槍手",
 	["CP_HEIST_MASKS"] = "船員面具",
 	["CP_HEIST_HACKER"] = "船員黑客",
-	["CP_HEIST_AUTOGRAB"] = "自動收集戰利品",
+	["YH_TROLLEY_AUTOGRAB"] = "自動收集手推車戰利品",
 	["CP_HEIST_WEAPONS"] = "船員武器",
 	["SY_VEH_SLOT"] = "插槽 %d",
 	["SY_EMPTY"] = "空的",
@@ -1048,8 +1048,12 @@ return {
 	["YH_K26_DISABLE_LASERS"] = "禁用雷射網格",
 	["YH_MGH_NONE_FOUND_WARN"] = "找不到任何小遊戲！",
 	["YH_IGNORE_PROP_REQ_TT"] = "忽略需要財產和財產升級所有權檢查的搶劫。",
-	["YH_MGH_ERR"] = "「MiniGameHack」遇到問題，目前不可用。",
+	["YH_MGH_LOAD_ERR"] = "“MiniGameHack”載入失敗，目前不可用。",
 	["YH_MGH_FMT"] = "sch-lda 的「MiniGameHack」。 \n\n您可以按 [%s] 鍵綁定來使用 MiniGameHack，而無需開啟使用者介面。",
 	["YH_SELECTED_MISSION"] = "選定的任務",
-	["YH_TP_K26_VAULT_DOOR"] = "金庫門"
+	["YH_TP_K26_VAULT_DOOR"] = "金庫門",
+	["YH_GENERIC_SKIP_CUTSCENE"] = "跳過過場動畫",
+	["YH_K26_INVALID_TARGET_ERR"] = "請選擇一個有效的主要目標。",
+	["YH_K26_NOT_SETUP_ERR"] = "請在您豪宅的藝術工作室中設定搶劫，然後按下使用者介面右上角的小按鈕重新載入「HeistEditor」。",
+	["YH_SM_LOAD_ERR"] = "“SoloMissions”加載失敗，目前不可用。"
 }

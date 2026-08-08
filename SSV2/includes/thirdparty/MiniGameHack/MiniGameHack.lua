@@ -1,4 +1,4 @@
--- This code was implemented from MiniGameHack: https://github.com/YimMenu-Lua/MiniGameHack with the author's permission.
+-- This code was refactored and implemented from MiniGameHack: https://github.com/YimMenu-Lua/MiniGameHack with the author's permission.
 --
 -- Original Author: sch-lda (sch): https://github.com/sch-lda
 --
@@ -9,29 +9,30 @@ local Keybind        = require("includes.structs.Keybind")
 local mghData        = require("includes.thirdparty.MiniGameHack.mgh_data")
 local SGSL           = require("includes.services.SGSL")
 local sgslData       = SGSL.data
+local SGSLGet        = SGSL.Get
 local isScriptActive = script.is_active
+local sum            = math.sum
 
 
 ---@class MiniGameHack
 ---@field private m_initialized boolean
+---@field private m_is_disabled boolean
 ---@field private m_tmp_v2_g ScriptGlobal
 ---@field private m_is_busy boolean
----@field private m_is_disabled boolean
 ---@field private m_quarantine table<string, set<integer>>
-local MiniGameHack   = {}
+local MiniGameHack   = { m_initialized = false, m_is_disabled = false }
 MiniGameHack.__index = MiniGameHack
 
+---@private
 function MiniGameHack:init()
 	if (self.m_initialized) then
 		return self
 	end
 
-	local defKeybinds    = Serializer:GetDefaultConfig().keybinds
 	local rtKeybinds     = GVars.keybinds
 	local runtimeKeybind = rtKeybinds.minigamehack
-
 	if (not runtimeKeybind or Keybind.IsRawTable(runtimeKeybind)) then
-		runtimeKeybind = defKeybinds.minigamehack
+		runtimeKeybind = Serializer:GetDefaultConfig().keybinds.minigamehack
 		rtKeybinds.minigamehack = runtimeKeybind
 	end
 
@@ -84,6 +85,38 @@ function MiniGameHack:QuarantineEntry(scrName, index)
 	q[scrName] = set
 end
 
+---@private
+---@nodiscard
+---@param key string
+---@param scrName string
+---@param index integer
+---@overload fun(self: MiniGameHack, key: string, scrName: string, index: integer): false, nil
+---@overload fun(self: MiniGameHack, key: string, scrName: string, index: integer): true, ScriptLocal
+---@return boolean success, ScriptLocal?
+function MiniGameHack:SGSLGet(key, scrName, index)
+	if (not key) then
+		log.error("[MiniGameHack]: Missing data key: sgsl_entry<string>")
+		self:QuarantineEntry(scrName, index)
+		return false, nil
+	end
+
+	local ref --[[@type SGSLTable?]] = sgslData[key]
+	if (not ref) then
+		log.ferror("[MiniGameHack]: Unknown SGSL index: '%s'", key)
+		self:QuarantineEntry(scrName, index)
+		return false, nil
+	end
+
+	local success, entry = pcall(SGSLGet, SGSL, ref) -- because this bitch throws
+	if (not success) then
+		log.ferror("[MiniGameHack]: Failed to retrieve main data for script '%s' at index %d", scrName, index)
+		self:QuarantineEntry(scrName, index)
+		return false, nil
+	end
+
+	return true, entry:AsLocal()
+end
+
 ---@public
 function MiniGameHack:OnCall()
 	if (self.m_is_busy or self.m_is_disabled) then
@@ -107,19 +140,19 @@ function MiniGameHack:OnCall()
 
 			found_scr = true
 			for i, v in ipairs(t) do
-				if (self:IsEntryInQuarantine(scr, i)) then
+				local success, scrLocal = self:SGSLGet(v.sgsl_entry, scr, i)
+				if not (success and scrLocal) then
+					self:QuarantineEntry(scr, i)
 					goto skip
 				end
 
-				local scrLocal = SGSL:Get(sgslData[v.sgsl_entry]):AsLocal()
 				local ok, err = pcall(v.callback, scrLocal, s)
 				if (not ok) then
-					log.fwarning("[MiniGameHack]: An error occured. This miningame will be skipped next time. Error: %s", err)
+					log.fwarning("[MiniGameHack]: An error occured. This miningame will be ignored next time.\nError message: %s", err)
 					self:QuarantineEntry(scr, i)
 				end
 				::skip::
 			end
-
 			::continue::
 		end
 
@@ -129,16 +162,21 @@ function MiniGameHack:OnCall()
 			end
 
 			found_scr = true
-			for _, v in ipairs(t) do
-				local scrLocal   = SGSL:Get(sgslData[v.sgsl_entry]):AsLocal()
-				local offset_sum = math.sum(v.offsets)
-				if (offset_sum > 0) then
-					scrLocal = scrLocal:At(offset_sum)
+			for i, v in ipairs(t) do
+				local success, scrLocal = self:SGSLGet(v.sgsl_entry, scr, i)
+				if not (success and scrLocal) then
+					self:QuarantineEntry(scr, i)
+					goto skip
+				end
+
+				local offset = sum(v.offsets)
+				if (offset > 0) then
+					scrLocal = scrLocal:At(offset)
 				end
 
 				scrLocal:SetBits(v.bits)
+				::skip::
 			end
-
 			::continue::
 		end
 

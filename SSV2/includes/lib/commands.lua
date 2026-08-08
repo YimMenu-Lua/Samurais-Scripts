@@ -390,6 +390,45 @@ return {
 			args = { "Optional: c_syntax<boolean>" },
 		}
 	},
+	["playerwptp"] = {
+		callback = function(args)
+			local pid, name
+			local player  = args[1]
+			local argtype = type(player)
+			local isnum   = argtype == "number"
+			if (isnum) then
+				pid  = player
+				name = PLAYER.GET_PLAYER_NAME(pid)
+			elseif (argtype == "string") then
+				name = player
+				for i = 0, 31 do
+					if (PLAYER.GET_PLAYER_NAME(i):lower() == player:lower()) then
+						pid = i
+					end
+				end
+			end
+
+			if (not pid) then
+				notify_err(_F("Failed to find player by %s!", isnum and "ID" or "name"))
+				return
+			end
+
+			if (not NETWORK.NETWORK_GET_PLAYER_OWNS_WAYPOINT(pid)) then
+				Notifier:ShowWarning("CommandExecutor", _F("Failed to get waypoint coords from '%s'. Are you sure they have one set?", name))
+				return
+			end
+
+			PLAYER.SET_APPLY_WAYPOINT_OF_PLAYER(pid, 147)
+			Notifier:ShowMessage("CommandExecutor", _F("Teleporting to %s's waypoint.", name))
+			sleep(300)
+			command.call("waypointtp", {})
+		end,
+		opts = {
+			description = "Teleports you to a player's waypoint if they have one set. (untested!)",
+			args        = { "player<number|string>: Player ID or name." },
+			alias       = { "pwptp" }
+		}
+	},
 	-- for copy/paste convenience. keep at the bottom
 	--[[
 	["example"] = {

@@ -159,7 +159,7 @@ return {
 	["SY_EMPTY"] = "空の",
 	["CP_HEIST_COOLDOWN_DISABLE"] = "強盗のクールダウンを無効にする",
 	["CP_HEIST_MAX_PLAYER_CUTS"] = "すべてをマックスにする",
-	["CP_HEIST_AUTOGRAB"] = "戦利品の自動収集",
+	["YH_TROLLEY_AUTOGRAB"] = "トロリーの戦利品を自動収集",
 	["CP_HEIST_GETAWAY_VEHS"] = "逃走用車両",
 	["CP_HEIST_DRIVER"] = "逃走ドライバー",
 	["CP_HEIST_ZERO_AI_CUTS"] = "乗員削減ゼロ",
@@ -1048,8 +1048,12 @@ return {
 	["YH_K26_DISABLE_LASERS"] = "レーザーグリッドを無効にする",
 	["YH_MGH_FMT"] = "sch-lda の「MiniGameHack」。\n\n[%s] キーバインドを押すと、ユーザー インターフェイスを開かずに MiniGameHack を使用できます。",
 	["YH_SOLO_MISSIONS_TT"] = "「TCroid」によるオリジナル スクリプト: ソロで強盗やミッションをプレイします。",
-	["YH_MGH_ERR"] = "「MiniGameHack」は問題が発生したため、現在利用できません。",
+	["YH_MGH_LOAD_ERR"] = "「MiniGameHack」はロードに失敗したため、現在利用できません。",
 	["YH_IGNORE_PROP_REQ_TT"] = "不動産および不動産アップグレードの所有権チェックが必要な強盗については無視します。",
 	["YH_TP_K26_VAULT_DOOR"] = "金庫室の扉",
-	["YH_SELECTED_MISSION"] = "選択されたミッション"
+	["YH_SELECTED_MISSION"] = "選択されたミッション",
+	["YH_SM_LOAD_ERR"] = "「SoloMissions」はロードに失敗したため、現在利用できません。",
+	["YH_K26_INVALID_TARGET_ERR"] = "有効なプライマリ ターゲットを選択してください。",
+	["YH_GENERIC_SKIP_CUTSCENE"] = "カットシーンをスキップ",
+	["YH_K26_NOT_SETUP_ERR"] = "邸宅のアート スタジオで強盗を設定し、UI の右上にある小さなボタンを押して「HeistEditor」をリロードしてください。"
 }

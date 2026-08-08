@@ -164,7 +164,7 @@ return {
 	["CP_HEIST_COOLDOWN_DISABLE"] = "Deaktivieren Sie die Abklingzeit des Raubüberfalls",
 	["SY_VEHICLES"] = "Fahrzeuge",
 	["CP_HEIST_HACKER"] = "Crew-Hacker",
-	["CP_HEIST_AUTOGRAB"] = "Beute automatisch sammeln",
+	["YH_TROLLEY_AUTOGRAB"] = "Automatisches Sammeln von Trolley-Beute",
 	["SY_LIFT"] = "Hebe %d",
 	["SY_VEH_SLOT"] = "Steckplatz %d",
 	["SY_LIFTS"] = "Aufzüge",
@@ -1044,12 +1044,16 @@ return {
 	["YH_SIXTY_NINE_TT"] = "Raubüberfall-Setups kosten neunundsechzig Dollar.",
 	["YH_SOLO_MISSIONS_TT"] = "Originalskript von „TCRoid“: Spielen Sie Raubüberfälle und Missionen alleine.",
 	["GENERIC_UNLOCK_ALL"] = "Alle freischalten",
-	["YH_MGH_ERR"] = "Bei „MiniGameHack“ ist ein Problem aufgetreten und es ist derzeit nicht verfügbar.",
+	["YH_MGH_LOAD_ERR"] = "„MiniGameHack“ konnte nicht geladen werden und ist derzeit nicht verfügbar.",
 	["YH_MGH_FMT"] = "„MiniGameHack“ von sch-lda.\n\nSie können die Tastenkombination [%s] drücken, um MiniGameHack zu verwenden, ohne die Benutzeroberfläche zu öffnen.",
 	["YH_MGH_NONE_FOUND_WARN"] = "Es konnten keine Minispiele gefunden werden!",
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignorieren Sie Eigentumsüberprüfungen für Eigentum und Eigentumsverbesserungen bei Raubüberfällen, die diese erfordern.",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "Deaktivieren Sie das Zurücksetzen der wöchentlichen Auszahlung",
 	["YH_K26_DISABLE_LASERS"] = "Lasergitter deaktivieren",
 	["YH_TP_K26_VAULT_DOOR"] = "Tresortür",
-	["YH_SELECTED_MISSION"] = "Ausgewählte Mission"
+	["YH_SELECTED_MISSION"] = "Ausgewählte Mission",
+	["YH_GENERIC_SKIP_CUTSCENE"] = "Zwischensequenz überspringen",
+	["YH_K26_INVALID_TARGET_ERR"] = "Bitte wählen Sie ein gültiges primäres Ziel aus.",
+	["YH_K26_NOT_SETUP_ERR"] = "Bitte richten Sie den Raubüberfall im Kunstatelier Ihrer Villa ein und drücken Sie dann die kleine Schaltfläche oben rechts in der Benutzeroberfläche, um „HeistEditor“ neu zu laden.",
+	["YH_SM_LOAD_ERR"] = "„SoloMissions“ konnte nicht geladen werden und ist derzeit nicht verfügbar."
 }

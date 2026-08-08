@@ -9,8 +9,8 @@
 
 require("includes.lib.callable")
 
-local joaat                             = _G.joaat
 local REF_COUNT                         = 0
+local joaat                             = _G.joaat
 local IS_CONTROL_PRESSED                = PAD.IS_CONTROL_PRESSED
 local IS_CONTROL_JUST_PRESSED           = PAD.IS_CONTROL_JUST_PRESSED
 local IS_CONTROL_JUST_RELEASED          = PAD.IS_CONTROL_JUST_RELEASED
@@ -196,7 +196,7 @@ function Keybind:GetID()
 end
 
 ---@private
----@return boolean isKeyboard, Keybinding
+---@return boolean isController, Keybinding
 function Keybind:GetBindingImpl()
 	if (isUsingKeyboard()) then
 		return false, self.m_keyboard_binding

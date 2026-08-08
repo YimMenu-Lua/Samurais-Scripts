@@ -163,7 +163,7 @@ return {
 	["CP_HEIST_COOLDOWN_DISABLE"] = "Desactivar el tiempo de reutilización del atraco",
 	["CP_HEIST_ZERO_AI_CUTS"] = "Cortes de tripulación cero",
 	["SY_VEHICLES"] = "Vehículos",
-	["CP_HEIST_AUTOGRAB"] = "Botín de recogida automática",
+	["YH_TROLLEY_AUTOGRAB"] = "Botín de carro de recogida automática",
 	["CP_HEIST_SETUP"] = "Configuración del atraco",
 	["SY_LIFTS"] = "Ascensores",
 	["SY_EMPTY"] = "Vacío",
@@ -1046,10 +1046,14 @@ return {
 	["YH_SOLO_MISSIONS_TT"] = "Guión original de 'TCRoid': Juega atracos y misiones en solitario.",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "Deshabilitar el reinicio de pagos semanales",
 	["YH_MGH_FMT"] = "'MiniGameHack' de sch-lda.\n\nPuedes presionar la combinación de teclas [%s] para usar MiniGameHack sin abrir la interfaz de usuario.",
-	["YH_MGH_ERR"] = "'MiniGameHack' encontró un problema y actualmente no está disponible.",
+	["YH_MGH_LOAD_ERR"] = "'MiniGameHack' no se pudo cargar y actualmente no está disponible.",
 	["YH_K26_DISABLE_LASERS"] = "Desactivar cuadrícula láser",
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignore las verificaciones de propiedad y mejora de propiedad para detectar atracos que las requieran.",
 	["YH_MGH_NONE_FOUND_WARN"] = "¡No se pudo encontrar ningún minijuego!",
 	["YH_TP_K26_VAULT_DOOR"] = "Puerta de la bóveda",
-	["YH_SELECTED_MISSION"] = "Misión seleccionada"
+	["YH_SELECTED_MISSION"] = "Misión seleccionada",
+	["YH_GENERIC_SKIP_CUTSCENE"] = "Saltar escena",
+	["YH_SM_LOAD_ERR"] = "'SoloMissions' no se pudo cargar y actualmente no está disponible.",
+	["YH_K26_INVALID_TARGET_ERR"] = "Seleccione un objetivo principal válido.",
+	["YH_K26_NOT_SETUP_ERR"] = "Configure el atraco en el estudio de arte de su mansión y luego presione el botón pequeño en la parte superior derecha de la interfaz de usuario para recargar 'HeistEditor'."
 }

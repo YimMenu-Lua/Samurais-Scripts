@@ -163,7 +163,7 @@ return {
 	["CP_HEIST_DRIVER"] = "逃跑司机",
 	["CP_HEIST_COOLDOWN_DISABLE"] = "禁用抢劫冷却时间",
 	["CP_HEIST_ZERO_AI_CUTS"] = "零裁减人员",
-	["CP_HEIST_AUTOGRAB"] = "自动收集战利品",
+	["YH_TROLLEY_AUTOGRAB"] = "自动收集手推车战利品",
 	["SY_EMPTY"] = "空的",
 	["CP_HEIST_SETUP"] = "抢劫设置",
 	["SY_VEHICLES"] = "车辆",
@@ -1045,11 +1045,15 @@ return {
 	["SETTINGS_HOTKEY_MOD_TIP"] = "提示：您可以在分配键之前按住按钮用作修饰键（例如：CTRL + F）。",
 	["YH_SOLO_MISSIONS_TT"] = "原创剧本由“TCRoid”编写：单独进行抢劫和任务。",
 	["YH_MGH_FMT"] = "sch-lda 的“MiniGameHack”。\n\n您可以按 [%s] 键绑定来使用 MiniGameHack，而无需打开用户界面。",
-	["YH_MGH_ERR"] = "“MiniGameHack”遇到问题，目前不可用。",
+	["YH_MGH_LOAD_ERR"] = "“MiniGameHack”加载失败，当前不可用。",
 	["YH_K26_DISABLE_LASERS"] = "禁用激光网格",
 	["YH_MGH_NONE_FOUND_WARN"] = "找不到任何小游戏！",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "禁用每周支付重置",
 	["YH_IGNORE_PROP_REQ_TT"] = "忽略需要财产和财产升级所有权检查的抢劫。",
 	["YH_TP_K26_VAULT_DOOR"] = "金库门",
-	["YH_SELECTED_MISSION"] = "选定的任务"
+	["YH_SELECTED_MISSION"] = "选定的任务",
+	["YH_GENERIC_SKIP_CUTSCENE"] = "跳过过场动画",
+	["YH_K26_INVALID_TARGET_ERR"] = "请选择一个有效的主要目标。",
+	["YH_K26_NOT_SETUP_ERR"] = "请在您豪宅的艺术工作室中设置抢劫，然后按用户界面右上角的小按钮重新加载“HeistEditor”。",
+	["YH_SM_LOAD_ERR"] = "“SoloMissions”加载失败，当前不可用。"
 }

@@ -153,7 +153,7 @@ end
 function KeyBindEditorUI:DrawKey(keybind, drawGamepad, args)
 	if (not keybind) then return end -- should never happen. we must make sure the keybind exists (if it doesn't, create it or get it from default table before passing it here)
 
-	if (not drawGamepad and keybind:IgnoresGamepad()) then
+	if (drawGamepad and keybind:IgnoresGamepad()) then
 		return -- does not support controller bindings (currently GUI and CommandExecutor use this)
 	end
 

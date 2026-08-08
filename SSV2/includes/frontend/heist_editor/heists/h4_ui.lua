@@ -122,6 +122,7 @@ local function main(instance)
 		tooltip = _T("YH_COOLDOWN_BYPASS_TOOLTIP"),
 		color   = Color.RED,
 	})
+	cfg.cayo_cart_autograb = GUI:CustomToggle(_T("YH_TROLLEY_AUTOGRAB"), cfg.cayo_cart_autograb)
 end
 
 return {

@@ -56,7 +56,7 @@ end
 
 function TheContract:Init()
 	local bs      = sgi("MPX_FIXER_STORY_BS")
-	local bs2     = sgi("MPX_FIXER_COMPLETED_BS")
+	local bs2     = sgi("MPX_FIXER_GENERAL_BS")
 	local strand  = sgi("MPX_FIXER_STORY_STRAND")
 	local highest = 0
 	for i = 0, 11 do
@@ -77,14 +77,10 @@ function TheContract:Init()
 	ssi("MPX_FIXER_STORY_STRAND", strand)
 end
 
----@return Int4
-function TheContract:GetPlayerCuts()
-	return self.m_player_cuts
-end
-
 ---@param reset? boolean
 function TheContract:SetProgression(reset)
 	if (reset) then
+		self.m_current_bs = 3
 		ssi("MPX_FIXER_STORY_BS", 3 --[[(1 << 0 | 1 << 1)]])
 		ssi("MPX_FIXER_STORY_STRAND", 0)
 		return
@@ -110,7 +106,7 @@ function TheContract:UnlockAllMissions()
 	ssi("MPX_FIXER_COMPLETED_BS", -1)
 	ssi("MPX_FIXER_GENERAL_BS", -1)
 	ssi("MPX_FIXER_FIRST_TIME", 1)
-	self.m_current_bs = 1
+	self:SetProgression(true)
 end
 
 function TheContract:SkipPreps()
@@ -122,7 +118,6 @@ function TheContract:Setup()
 end
 
 function TheContract:Reset()
-	self.m_current_bs = 3
 	self:SetProgression(true)
 end
 

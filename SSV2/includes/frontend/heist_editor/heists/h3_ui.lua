@@ -96,10 +96,10 @@ local function main(instance)
 	ImGui.Spacing()
 	cfg.disable_heist_cooldown = GUI:CustomToggle(_T("YH_GENERIC_CD_LABEL"), cfg.disable_heist_cooldown)
 	cfg.zero_ai_cuts           = GUI:CustomToggle(_T("CP_HEIST_ZERO_AI_CUTS"), cfg.zero_ai_cuts)
-	cfg.ch_cart_autograb       = GUI:CustomToggle(_T("CP_HEIST_AUTOGRAB"), cfg.ch_cart_autograb)
+	cfg.ch_cart_autograb       = GUI:CustomToggle(_T("YH_TROLLEY_AUTOGRAB"), cfg.ch_cart_autograb)
 
 	local solo_enabled         = GVars.features.yim_heists.solo_missions
-	ImGui.BeginDisabled(not solo_enabled)
+	ImGui.BeginDisabled(SoloMissions:IsDisabled() or not solo_enabled)
 	enableBoardPatch = GUI:CustomToggle(_T("YH_CH_SOLO_PATCH"), enableBoardPatch, {
 		onClick = function(v)
 			SoloMissions:ToggleCasinoPatch(v)

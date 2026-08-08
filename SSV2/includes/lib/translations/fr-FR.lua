@@ -159,7 +159,7 @@ return {
 	["CP_HEIST_TARGET"] = "Cible du braquage",
 	["CP_HEIST_HACKER"] = "Pirate d'équipage",
 	["CP_HEIST_WEAPONS"] = "Armes d'équipage",
-	["CP_HEIST_AUTOGRAB"] = "Collecte automatique du butin",
+	["YH_TROLLEY_AUTOGRAB"] = "Butin de chariot à collecte automatique",
 	["SY_EMPTY"] = "Vide",
 	["CP_HEIST_SETUP"] = "Configuration du braquage",
 	["CP_HEIST_ZERO_AI_CUTS"] = "Zéro coupe d’équipage",
@@ -1048,8 +1048,12 @@ return {
 	["YH_APT_STRANDS_LOCKED"] = "Vous n'avez débloqué aucun braquage d'appartement. Appuyez sur le bouton ci-dessous pour les déverrouiller tous en même temps.",
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignorez les contrôles de propriété et de mise à niveau de propriété pour les braquages ​​qui les nécessitent.",
 	["YH_K26_DISABLE_LASERS"] = "Désactiver la grille laser",
-	["YH_MGH_ERR"] = "« MiniGameHack » a rencontré un problème et est actuellement indisponible.",
+	["YH_MGH_LOAD_ERR"] = "« MiniGameHack » n'a pas pu être chargé et est actuellement indisponible.",
 	["YH_SOLO_MISSIONS_TT"] = "Scénario original de « TCRoid » : jouez en solo aux braquages ​​et aux missions.",
 	["YH_TP_K26_VAULT_DOOR"] = "Porte du coffre-fort",
-	["YH_SELECTED_MISSION"] = "Mission sélectionnée"
+	["YH_SELECTED_MISSION"] = "Mission sélectionnée",
+	["YH_GENERIC_SKIP_CUTSCENE"] = "Sauter la cinématique",
+	["YH_K26_INVALID_TARGET_ERR"] = "Veuillez sélectionner une cible principale valide.",
+	["YH_SM_LOAD_ERR"] = "« SoloMissions » n'a pas pu être chargé et est actuellement indisponible.",
+	["YH_K26_NOT_SETUP_ERR"] = "Veuillez configurer le braquage dans le studio d'art de votre manoir, puis appuyez sur le petit bouton en haut à droite de l'interface utilisateur pour recharger « HeistEditor »."
 }

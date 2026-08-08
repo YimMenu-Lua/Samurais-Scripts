@@ -51,7 +51,7 @@ end
 ---@field private m_boost_bit integer
 ---@field private m_player_cuts Int4
 ---@field private m_player_cuts_global ScriptGlobal
----@field private m_cart_grab_local ScriptLocal
+---@field private m_trolley_scene_local ScriptLocal
 ---@field private m_scene_rate_local ScriptLocal
 ---@field private m_setup_data CasinoHeistSetupData
 ---@field private m_secondaries_unlocked boolean
@@ -86,7 +86,7 @@ function CasinoHeist.new(arcadeProperty)
 
 	local instance    = setmetatable(base, CasinoHeist) ---@cast instance CasinoHeist
 
-	local FMMC_OBJ    = SGSL:Get(SGSL.data.fm_mission_controller_cart_grab)
+	local FMMC_OBJ    = SGSL:Get(SGSL.data.fmmc_trolley_scene)
 	local GBCHP       = SGSL:Get(SGSL.data.gb_casino_heist_planning):AsGlobal()
 	local CUTS_OBJ    = SGSL:Get(SGSL.data.gb_casino_heist_planning_cut_offset)
 
@@ -98,10 +98,10 @@ function CasinoHeist.new(arcadeProperty)
 	local cutsOffset3 = CUTS_OBJ:GetOffset(2) -- 92
 
 
-	instance.m_player_cuts_global = GBCHP:At(cutsOffset1):At(cutsOffset2):At(cutsOffset3)
-	instance.m_cart_grab_local    = sceneLocal
-	instance.m_scene_rate_local   = sceneLocal:At(rateOffset)
-	instance.DrawWhenActive       = drawFuncs.draw_teleports
+	instance.m_player_cuts_global  = GBCHP:At(cutsOffset1):At(cutsOffset2):At(cutsOffset3)
+	instance.m_trolley_scene_local = sceneLocal
+	instance.m_scene_rate_local    = sceneLocal:At(rateOffset)
+	instance.DrawWhenActive        = drawFuncs.draw_teleports
 
 	instance:Init()
 	return instance
@@ -185,8 +185,8 @@ function CasinoHeist:SetPlayerCuts(reset)
 	end
 end
 
-function CasinoHeist:SetCartAutoGrab()
-	local sceneLocal = self.m_cart_grab_local
+function CasinoHeist:AutoGrabTrolleyLoot()
+	local sceneLocal = self.m_trolley_scene_local
 	local pbrLocal   = self.m_scene_rate_local
 	local sceneState = sceneLocal:ReadInt()
 
@@ -221,8 +221,8 @@ function CasinoHeist:Reset()
 end
 
 function CasinoHeist:Update()
-	if (self.m_is_active) then
-		self:SetCartAutoGrab()
+	if (self.m_is_active and GVars.features.dunk.ch_cart_autograb) then
+		self:AutoGrabTrolleyLoot()
 	end
 
 	-- ai cuts sometimes revert when you select the final board.

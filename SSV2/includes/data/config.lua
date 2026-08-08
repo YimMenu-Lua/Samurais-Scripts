@@ -474,7 +474,8 @@ local Config <const> = {
 			kortz_week_bypass = false,
 			sixty_nine = false,
 			solo_missions = false,
-			ignore_prop_req = false
+			ignore_prop_req = false,
+			cayo_cart_autograb = false
 		},
 		yrv3 = {
 			autofill_delay = 500,

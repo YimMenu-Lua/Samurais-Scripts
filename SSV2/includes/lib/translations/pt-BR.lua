@@ -159,7 +159,7 @@ return {
 	["CP_HEIST_WEAPONS"] = "Armas da Tripulação",
 	["CP_HEIST_HACKER"] = "Tripulação Hacker",
 	["CP_HEIST_ZERO_AI_CUTS"] = "Zero cortes de tripulação",
-	["CP_HEIST_AUTOGRAB"] = "Coleta automática de saques",
+	["YH_TROLLEY_AUTOGRAB"] = "Coleta automática de saques de carrinho",
 	["CP_HEIST_MASKS"] = "Máscaras de tripulação",
 	["SY_EMPTY"] = "Vazio",
 	["CP_HEIST_MAX_PLAYER_CUTS"] = "Máximo de tudo",
@@ -1046,10 +1046,14 @@ return {
 	["YH_MGH_FMT"] = "'MiniGameHack' por sch-lda.\n\nVocê pode pressionar a tecla [%s] para usar o MiniGameHack sem abrir a interface do usuário.",
 	["YH_APT_STRANDS_LOCKED"] = "Você não desbloqueou nenhum dos assaltos a apartamentos. Pressione o botão abaixo para desbloquear todos de uma vez.",
 	["YH_MGH_NONE_FOUND_WARN"] = "Não foi possível encontrar nenhum minijogo!",
-	["YH_MGH_ERR"] = "'MiniGameHack' encontrou um problema e não está disponível no momento.",
+	["YH_MGH_LOAD_ERR"] = "'MiniGameHack' falhou ao carregar e está indisponível no momento.",
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignore as verificações de propriedade e atualização de propriedades para assaltos que as exijam.",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "Desativar redefinição de pagamento semanal",
 	["YH_K26_DISABLE_LASERS"] = "Desativar grade laser",
 	["YH_TP_K26_VAULT_DOOR"] = "Porta do cofre",
-	["YH_SELECTED_MISSION"] = "Missão Selecionada"
+	["YH_SELECTED_MISSION"] = "Missão Selecionada",
+	["YH_K26_NOT_SETUP_ERR"] = "Por favor, configure o assalto no estúdio de arte da sua mansão e pressione o pequeno botão no canto superior direito da interface para recarregar o 'HeistEditor'.",
+	["YH_SM_LOAD_ERR"] = "'SoloMissions' falhou ao carregar e está indisponível no momento.",
+	["YH_GENERIC_SKIP_CUTSCENE"] = "Pular cena",
+	["YH_K26_INVALID_TARGET_ERR"] = "Selecione um alvo principal válido."
 }

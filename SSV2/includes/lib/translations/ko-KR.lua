@@ -159,7 +159,7 @@ return {
 	["CP_HEIST_DRIVER"] = "도주 드라이버",
 	["CP_HEIST_MASKS"] = "승무원 마스크",
 	["CP_HEIST_TARGET"] = "강탈 대상",
-	["CP_HEIST_AUTOGRAB"] = "전리품 자동 수집",
+	["YH_TROLLEY_AUTOGRAB"] = "트롤리 전리품 자동 수집",
 	["CP_HEIST_GETAWAY_VEHS"] = "도주 차량",
 	["CP_HEIST_COOLDOWN_DISABLE"] = "습격 쿨다운 비활성화",
 	["CP_HEIST_MAX_PLAYER_CUTS"] = "최대 모두",
@@ -1046,10 +1046,14 @@ return {
 	["GENERIC_UNLOCK_ALL"] = "모두 잠금 해제",
 	["YH_MGH_NONE_FOUND_WARN"] = "미니게임을 찾을 수 없습니다!",
 	["YH_SIXTY_NINE_TT"] = "강도 설정 비용은 69달러입니다.",
-	["YH_MGH_ERR"] = "'MiniGameHack'에 문제가 발생하여 현재 사용할 수 없습니다.",
+	["YH_MGH_LOAD_ERR"] = "'MiniGameHack'을 로드하지 못하여 현재 사용할 수 없습니다.",
 	["YH_SOLO_MISSIONS_TT"] = "'TCroid'의 원본 스크립트: 습격과 임무를 솔로로 플레이하세요.",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "주간 지급 재설정 비활성화",
 	["YH_K26_DISABLE_LASERS"] = "레이저 그리드 비활성화",
 	["YH_TP_K26_VAULT_DOOR"] = "금고 문",
-	["YH_SELECTED_MISSION"] = "선택된 임무"
+	["YH_SELECTED_MISSION"] = "선택된 임무",
+	["YH_GENERIC_SKIP_CUTSCENE"] = "컷신 건너뛰기",
+	["YH_SM_LOAD_ERR"] = "'SoloMissions'을 로드하지 못하여 현재 사용할 수 없습니다.",
+	["YH_K26_NOT_SETUP_ERR"] = "저택의 아트 스튜디오에서 습격을 설정한 다음 UI 오른쪽 상단에 있는 작은 버튼을 눌러 'HeistEditor'를 다시 로드하세요.",
+	["YH_K26_INVALID_TARGET_ERR"] = "유효한 기본 타겟을 선택하세요."
 }

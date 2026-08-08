@@ -113,7 +113,13 @@ GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Heist Editor [WIP]", function()
 	end
 
 	ImGui.SameLineIfAvail(sm_cb_x)
+	local isSmDisabled = SoloMissions:IsDisabled()
+	ImGui.BeginDisabled(isSmDisabled)
 	cfg.solo_missions = GUI:Checkbox("SoloMissions", cfg.solo_missions, { tooltip = _T("YH_SOLO_MISSIONS_TT") })
+	ImGui.EndDisabled()
+	if (isSmDisabled) then
+		GUI:Tooltip(_T("YH_SM_LOAD_ERR"), { color = COL_RED })
+	end
 
 	local prop_cb_x = checkboxSizes["IgnoreProperty"]
 	if (not prop_cb_x) then
@@ -137,8 +143,7 @@ GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Heist Editor [WIP]", function()
 	end
 
 	ImGui.Separator()
-
-	ImGui.BeginDisabled(not HeistEditor:GetRunningScript())
+	ImGui.BeginDisabled(isSmDisabled or not HeistEditor:GetRunningScript())
 	if (GUI:Button(_T("YH_FAIL_MISSION"), { size = editorButtonSize, colors = buttonRedColors })) then
 		SoloMissions:ForceFail()
 	end
@@ -164,7 +169,7 @@ GUI:RegisterNewTab(Enums.eTabID.TAB_ONLINE, "Heist Editor [WIP]", function()
 	ImGui.EndDisabled()
 	GUI:Tooltip(_T("YH_MGH_FMT", GVars.keybinds.minigamehack:GetCurrentKeyName()))
 	if (isMghDisabled) then
-		GUI:Tooltip(_T("YH_MGH_ERR"), { color = COL_RED })
+		GUI:Tooltip(_T("YH_MGH_LOAD_ERR"), { color = COL_RED })
 	end
 	ImGui.Separator()
 

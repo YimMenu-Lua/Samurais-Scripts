@@ -262,7 +262,6 @@ return {
 	["CP_HEIST_GETAWAY_VEHS"]              = "Getaway Vehicles",
 	["CP_HEIST_HACKER"]                    = "Crew Hacker",
 	["CP_HEIST_MASKS"]                     = "Crew Masks",
-	["CP_HEIST_AUTOGRAB"]                  = "Auto Collect Loot", -- Translator chokes on "Auto Grab" with some languages
 	["CP_HEIST_ZERO_AI_CUTS"]              = "Zero Crew Cuts",
 	["CP_HEIST_PLAYER_CUTS"]               = "Player Cuts",
 	["CP_HEIST_MAX_PLAYER_CUTS"]           = "Max All",
@@ -923,6 +922,7 @@ return {
 	["YH_GENERIC_SKIP_PREPS"]              = "Skip Preparations",
 	["YH_GENERIC_SKIP_PREPS_TT"]           = "All secondary objectives have been completed.",
 	["YH_GENERIC_CD_LABEL"]                = "Disable Cooldown",
+	["YH_TROLLEY_AUTOGRAB"]                = "Auto Collect Trolley Loot", -- Translator chokes on "Auto Grab" with some languages
 	["YH_BASIC_TAB"]                       = "Basic",
 	["YH_PREP_SKIP_NOTIF"]                 = "All preparation missions have been skipped. You can now start the final mission.",
 	["YH_COOLDOWN_BYPASS_TOOLTIP"]         = "Disables cooldown, may result in ban. Use at your own risk!",
@@ -970,11 +970,14 @@ return {
 	["YH_SIXTY_NINE_TT"]                   = "Heist setups cost sixty nine dollars.",
 	["YH_SOLO_MISSIONS_TT"]                = "Original script by 'TCRoid': Play heists and missions solo.",
 	["YH_MGH_FMT"]                         = "'MiniGameHack' by sch-lda.\n\nYou can press the [%s] keybind to use MiniGameHack without opening the user interface.",
-	["YH_MGH_ERR"]                         = "'MiniGameHack' encountered an issue and is currently unavailable.",
+	["YH_MGH_LOAD_ERR"]                    = "'MiniGameHack' failed to load and is currently unavailable.",
+	["YH_SM_LOAD_ERR"]                     = "'SoloMissions' failed to load and is currently unavailable.",
 	["YH_MGH_NONE_FOUND_WARN"]             = "Could not find any minigames!",
 	["YH_IGNORE_PROP_REQ_TT"]              = "Ignore property and property upgrade ownership checks for heists that require them.",
 	["YH_CH_SOLO_PATCH"]                   = "Heist Board Patch",
 	["YH_CH_SOLO_PATCH_TT"]                = "Allows you to set up the final planning board. Must be enabled before starting the heist.\n\n[IMPORTANT]: Make sure to disable this after completing the heist. Keeping it enabled forever may cause issues and/or instabilities.",
+	["YH_K26_NOT_SETUP_ERR"]               = "Please setup the heist in your mansion's art studio then press the small button in the top right of the UI to reload 'HeistEditor'.",
+	["YH_K26_INVALID_TARGET_ERR"]          = "Please select a valid primary target.",
 	["YH_K26_DISABLE_LASERS"]              = "Disable Laser Grid",
 	["YH_K26_DISABLE_WEEKLY_RESET"]        = "Disable Weekly Payout Reset",
 	--#endregion

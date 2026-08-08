@@ -1,3 +1,10 @@
+-- This code was refactored and implemented from MiniGameHack: https://github.com/YimMenu-Lua/MiniGameHack with the author's permission.
+--
+-- Original Author: sch-lda (sch): https://github.com/sch-lda
+--
+-- License: None.
+
+
 ---@class MiniGameHackLocals
 ---@field sgsl_entry string
 ---@field callback fun(scrLocal: ScriptLocal, s: script_util)
@@ -6,9 +13,6 @@
 ---@field sgsl_entry string
 ---@field offsets array<integer>
 ---@field bits array<integer>
-
----@class MiniGameHackBsGlobals : MiniGameHackBsLocals
----@field scrLocal? ScriptGlobal
 
 
 ---@type { main_locals: table<string, array<MiniGameHackLocals>>, bs_locals: table<string, array<MiniGameHackBsLocals>> }
@@ -158,7 +162,7 @@ return {
 				callback = function(scrLocal, s)
 					for i = 0, 2 do
 						scrLocal:At(1):At(i, 2):At(1):WriteInt(0)
-						s:sleep(100)
+						s:sleep(300)
 						PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 237, 1.0)
 					end
 				end
@@ -236,7 +240,7 @@ return {
 					for i = 0, 2 do
 						local offsetLocal = scrLocal:At(22):At(i, 2)
 						offsetLocal:WriteInt(offsetLocal:At(1):ReadInt())
-						s:sleep(250)
+						s:sleep(300)
 						PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 235, 1.0)
 					end
 				end
@@ -269,15 +273,15 @@ return {
 			},
 			{
 				sgsl_entry = "mgh_fmmc20_bs",
-				offsets = { 9, 18, 26, 28 },
-				bits = { 0 }
+				offsets = {},
+				bits = { 9, 18, 26, 28 }
 			},
 		},
 		["fm_mission_controller_v3"] = {
 			{
 				sgsl_entry = "mgh_fmmc_v3_bs",
-				offsets = { 9, 18, 26, 28 },
-				bits = { 0 }
+				offsets = {},
+				bits = { 9, 18, 26, 28 }
 			},
 		},
 		["am_mp_arc_cab_manager"] = {

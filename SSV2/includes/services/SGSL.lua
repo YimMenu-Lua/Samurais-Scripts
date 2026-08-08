@@ -92,7 +92,7 @@ function SGSLEntry:AsGlobal()
 end
 
 -- Wraps the value in a [ScriptLocal](lua://ScriptLocal) object.
----@param scr_name? string -- Set a different fm script name (because R* like to break our ballz and move half a script into a new script)
+---@param scr_name? string -- Set a different fm script name in case two different scripts use the same local and offsets or R* does a switcheroo.
 ---@return ScriptLocal
 function SGSLEntry:AsLocal(scr_name)
 	scr_name = scr_name or self.script_name

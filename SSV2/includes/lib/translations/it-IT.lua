@@ -165,7 +165,7 @@ return {
 	["CP_HEIST_COOLDOWN_DISABLE"] = "Disable Heist Cooldown",
 	["CP_HEIST_SETUP"] = "Configurazione della rapina",
 	["CP_HEIST_GETAWAY_VEHS"] = "Veicoli per la fuga",
-	["CP_HEIST_AUTOGRAB"] = "Raccogli automaticamente il bottino",
+	["YH_TROLLEY_AUTOGRAB"] = "Raccogli automaticamente il bottino del carrello",
 	["SY_EMPTY"] = "Vuoto",
 	["SY_VEH_SLOT"] = "Spazio %d",
 	["SY_ROBBERY_COOLDOWN"] = "Recupero per rapina",
@@ -1043,7 +1043,7 @@ return {
 	["SETTINGS_HOTKEY_MOD_TIP"] = "Suggerimento: puoi tenere premuto un pulsante da utilizzare come modificatore prima di assegnare un tasto (ad esempio: CTRL + F).",
 	["YH_APT_STRANDS_LOCKED"] = "Non hai sbloccato nessuna delle rapine in appartamento. Premi il pulsante qui sotto per sbloccarli tutti in una volta.",
 	["YH_SIXTY_NINE_TT"] = "L'organizzazione della rapina costa sessantanove dollari.",
-	["YH_MGH_ERR"] = "\"MiniGameHack\" ha riscontrato un problema e al momento non è disponibile.",
+	["YH_MGH_LOAD_ERR"] = "Impossibile caricare \"MiniGameHack\" e al momento non è disponibile.",
 	["YH_SOLO_MISSIONS_TT"] = "Sceneggiatura originale di 'TCRoid': gioca a rapine e missioni da solo.",
 	["YH_MGH_FMT"] = "'MiniGameHack' di sch-lda.\n\nPuoi premere la combinazione di tasti [%s] per utilizzare MiniGameHack senza aprire l'interfaccia utente.",
 	["YH_K26_DISABLE_WEEKLY_RESET"] = "Disabilita la reimpostazione dei pagamenti settimanali",
@@ -1051,5 +1051,9 @@ return {
 	["YH_IGNORE_PROP_REQ_TT"] = "Ignora i controlli di proprietà sulla proprietà e sull'aggiornamento della proprietà per i furti che li richiedono.",
 	["YH_K26_DISABLE_LASERS"] = "Disabilita griglia laser",
 	["YH_SELECTED_MISSION"] = "Missione selezionata",
-	["YH_TP_K26_VAULT_DOOR"] = "Porta del caveau"
+	["YH_TP_K26_VAULT_DOOR"] = "Porta del caveau",
+	["YH_GENERIC_SKIP_CUTSCENE"] = "Salta il filmato",
+	["YH_K26_NOT_SETUP_ERR"] = "Imposta la rapina nello studio d'arte della tua villa, quindi premi il piccolo pulsante in alto a destra dell'interfaccia utente per ricaricare \"HeistEditor\".",
+	["YH_K26_INVALID_TARGET_ERR"] = "Seleziona un target primario valido.",
+	["YH_SM_LOAD_ERR"] = "Impossibile caricare \"SoloMissions\" e al momento non è disponibile."
 }

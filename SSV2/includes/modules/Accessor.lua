@@ -237,6 +237,19 @@ function Accessor:SetBit(pos)
 end
 
 ---@param pos integer
+function Accessor:FlipBit(pos)
+	local v = self:ReadInt()
+	self:WriteInt(Bit.Flip(v, pos))
+end
+
+---@param pos integer
+---@param toggle boolean
+function Accessor:ToggleBit(pos, toggle)
+	local v = self:ReadInt()
+	self:WriteInt(Bit.Toggle(v, pos, toggle))
+end
+
+---@param pos integer
 function Accessor:ClearBit(pos)
 	local v = self:ReadInt()
 	self:WriteInt(Bit.Clear(v, pos))

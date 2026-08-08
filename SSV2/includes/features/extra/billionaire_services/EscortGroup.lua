@@ -566,21 +566,25 @@ function EscortGroup:GetInTheFuckingCar()
 	if (not self:SanityCheck()) then return false end
 
 	for _, member in ipairs(self.members) do
-		if (member:IsValid() and member:IsAlive()) then
-			local seat = member.seatIndex or -2
-			local ped  = member.m_handle
+		if not (member:IsValid() and member:IsAlive()) then
+			goto continue
+		end
 
-			if (not PED.IS_PED_SITTING_IN_VEHICLE(ped, self.vehicle.handle)) then
-				Backend:debug(_F("Forcing %s into seat %d", member.name, seat))
-				TASK.CLEAR_PED_TASKS_IMMEDIATELY(ped)
-				sleep(1)
-				PED.SET_PED_INTO_VEHICLE(ped, self.vehicle.handle, seat)
+		local seat = member.seatIndex or -2
+		local ped  = member.m_handle
+		local veh  = self.vehicle.handle
+		if (not PED.IS_PED_SITTING_IN_VEHICLE(ped, veh)) then
+			Backend:debug(_F("Forcing %s into seat %d", member.name, seat))
+			TASK.CLEAR_PED_TASKS_IMMEDIATELY(ped)
+			sleep(1)
+			PED.SET_PED_INTO_VEHICLE(ped, veh, seat)
 
-				if (member:IsEscortPassenger()) then
-					member.task = member.TASKS.SIT_IN_VEH
-				end
+			if (member:IsEscortPassenger()) then
+				member.task = member.TASKS.SIT_IN_VEH
 			end
 		end
+
+		::continue::
 	end
 
 	return true
@@ -589,49 +593,51 @@ end
 function EscortGroup:Dismiss(s)
 	self.wasDismissed = true
 	self:GetInVehicle()
-	local driver = self:GetDriver()
-	local veh = driver and driver:GetVehicle()
+	local driver     = self:GetDriver()
+	local veh        = driver and driver:GetVehicle()
+	local veh_handle = self.vehicle.handle
+
 	if (driver
 			and driver:IsAlive()
-			and (self.vehicle and Game.IsScriptHandle(self.vehicle.handle))
-			and (veh and veh:GetHandle() == self.vehicle.handle)
+			and (self.vehicle and Game.IsScriptHandle(veh_handle))
+			and (veh and veh:GetHandle() == veh_handle)
 		) then
 		if (self.vehicle:IsPlayerInEscortVehicle()) then
 			driver:ClearTasks()
-			TASK.TASK_VEHICLE_TEMP_ACTION(driver.m_handle, self.vehicle.handle, 1, -1)
-			while not VEHICLE.IS_VEHICLE_STOPPED(self.vehicle.handle) do
+			TASK.TASK_VEHICLE_TEMP_ACTION(driver.m_handle, veh_handle, 1, -1)
+			while not VEHICLE.IS_VEHICLE_STOPPED(veh_handle) do
 				if not self.vehicle:IsPlayerInEscortVehicle() then
 					break
 				end
 				yield()
 			end
 
-			TASK.TASK_LEAVE_VEHICLE(LocalPlayer:GetHandle(), self.vehicle.handle, 0)
+			TASK.TASK_LEAVE_VEHICLE(LocalPlayer:GetHandle(), veh_handle, 0)
 			repeat
 				s:sleep(100)
-			until not PED.IS_PED_IN_VEHICLE(LocalPlayer:GetHandle(), self.vehicle.handle, false)
+			until not PED.IS_PED_IN_VEHICLE(LocalPlayer:GetHandle(), veh_handle, false)
 			s:sleep(2000)
 		end
 
 		driver.task = driver.TASKS.GO_HOME
 		self.task = Enums.eVehicleTask.GO_HOME
 		driver:Speak("GENERIC_BYE", "SPEECH_PARAMS_FORCE_SHOUTED")
-		TASK.TASK_VEHICLE_DRIVE_WANDER(driver.m_handle, self.vehicle.handle, 20, 803243)
+		TASK.TASK_VEHICLE_DRIVE_WANDER(driver.m_handle, veh_handle, 20, 803243)
 
 		local dismissTimer = Timer(9000)
 		repeat
 			s:sleep(500)
 		until dismissTimer:IsDone()
-		Game.FadeOutEntity(self.vehicle.handle)
+		Game.FadeOutEntity(veh_handle)
 	else
 		for _, escort in ipairs(self.members) do
-			if escort and escort.m_handle then
-				if PED.IS_PED_IN_ANY_VEHICLE(escort.m_handle, false) then
+			if (escort and escort.m_handle) then
+				if (PED.IS_PED_IN_ANY_VEHICLE(escort.m_handle, false)) then
 					TASK.TASK_LEAVE_ANY_VEHICLE(escort.m_handle, 0, 0)
 					s:sleep(250)
 				end
 
-				escort.task = escort.TASKS.GO_HOME
+				escort.task         = escort.TASKS.GO_HOME
 				escort.wasDismissed = true
 				TASK.TASK_WANDER_STANDARD(escort.m_handle, 0, 0)
 			end
@@ -639,7 +645,7 @@ function EscortGroup:Dismiss(s)
 	end
 
 	for _, escort in ipairs(self.members) do
-		if escort and escort.m_handle and (not driver or escort.m_handle ~= driver.m_handle) then
+		if (escort and escort.m_handle and (not driver or escort.m_handle ~= driver.m_handle)) then
 			Game.FadeOutEntity(escort.m_handle)
 		end
 	end
@@ -654,7 +660,7 @@ function EscortGroup:BackgroundWorker(s, globalTick)
 		return
 	end
 
-	local playerInVehicle = PED.IS_PED_SITTING_IN_ANY_VEHICLE(LocalPlayer:GetHandle())
+	local playerInVehicle = not LocalPlayer:IsOnFoot()
 
 	if (not self:IsIdle()) then
 		if (self.task == Enums.eVehicleTask.GOTO and self.lastTaskCoords) then
@@ -663,7 +669,7 @@ function EscortGroup:BackgroundWorker(s, globalTick)
 				return
 			end
 
-			local speed = ENTITY.GET_ENTITY_SPEED(self.vehicle.handle)
+			local speed     = ENTITY.GET_ENTITY_SPEED(self.vehicle.handle)
 			local threshold = math.max(40, speed * 2)
 			if (self.vehicle:GetPos():distance(self.lastTaskCoords) <= threshold) then
 				Notifier:ShowMessage(
@@ -676,7 +682,7 @@ function EscortGroup:BackgroundWorker(s, globalTick)
 	end
 
 	for _, escort in ipairs(self.members) do
-		if not escort:Exists() or not escort:IsAlive() then
+		if not (escort:Exists() and escort:IsAlive()) then
 			self:RemoveMember(escort)
 			s:sleep(5)
 			goto continue

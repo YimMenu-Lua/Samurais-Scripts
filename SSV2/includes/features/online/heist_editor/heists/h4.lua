@@ -43,6 +43,9 @@ local subOffset                    = 4
 ---@field private m_setup_data CayoPrericoSetupData
 ---@field private m_player_cuts Int4
 ---@field private m_player_cuts_global ScriptGlobal
+---@field private m_trolley_scene_local ScriptLocal
+---@field private m_gen_bs_g ScriptGlobal
+---@field private m_scene_rate_local ScriptLocal
 ---@field private m_kosatka? VehicleProperty
 ---@field m_kosatka_global ScriptGlobal
 local CayoPericoHeist   = setmetatable({}, Heist)
@@ -74,15 +77,27 @@ function CayoPericoHeist.new()
 
 	local instance     = setmetatable(base, CayoPericoHeist) ---@cast instance CayoPericoHeist
 	local owns_kosatka = sgi("MPX_IH_SUB_OWNED") == _J("kosatka")
+
+	local FMMC_OBJ     = SGSL:Get(SGSL.data.fmmc20_trolley_scene)
+	local sceneLocal   = FMMC_OBJ:AsLocal()
+	local rateOffset   = FMMC_OBJ:GetOffset(1)
+
 	local HIP          = SGSL:Get(SGSL.data.cayo_perico_player_cut_global):AsGlobal()
 	local obj          = SGSL:Get(SGSL.data.cayo_perico_player_cut_offsets)
 	local cuts_offset1 = obj:GetValue() -- 831
 	local cuts_offset2 = obj:GetOffset(1) -- 56
 
+	local H4_GENBS_OBJ = SGSL:Get(SGSL.data.h4_gen_bs_global)
+	local array_size   = H4_GENBS_OBJ:GetOffset(1)
+
 
 	instance.m_player_cuts_global  = HIP:At(cuts_offset1):At(cuts_offset2)
+	instance.m_trolley_scene_local = sceneLocal
+	instance.m_scene_rate_local    = sceneLocal:At(rateOffset)
+
 	instance.m_kosatka_global      = GPBD:At(LocalPlayer:GetID(), pidSize):At(offset2)
 	instance.m_last_sub_check_time = TimePoint()
+	instance.m_gen_bs_g            = H4_GENBS_OBJ:AsGlobal():At(LocalPlayer:GetID(), array_size):At(1)
 
 	if (owns_kosatka) then
 		instance.m_kosatka = {
@@ -213,9 +228,26 @@ end
 
 function CayoPericoHeist:ToggleHardMode()
 	sfb("MPX_H4_PROGRESS", 12)
+	self.m_gen_bs_g:FlipBit(12)
+end
+
+function CayoPericoHeist:AutoGrabTrolleyLoot()
+	local sceneLocal = self.m_trolley_scene_local
+	local rateLocal  = self.m_scene_rate_local
+	local sceneState = sceneLocal:ReadInt()
+
+	if (sceneState == 3) then
+		sceneLocal:WriteInt(4)
+	elseif (sceneState == 4 and rateLocal:ReadFloat() ~= 2.0) then
+		rateLocal:WriteFloat(2.0)
+	end
 end
 
 function CayoPericoHeist:Update()
+	if (self.m_is_active and GVars.features.yim_heists.cayo_cart_autograb) then
+		self:AutoGrabTrolleyLoot()
+	end
+
 	local kosatka = self.m_kosatka
 	if (not kosatka) then
 		return

@@ -290,10 +290,10 @@ end
 ---@param loadGround? boolean
 function LocalPlayer:Teleport(where, keepVehicle, loadGround)
 	ThreadManager:Run(function()
-		if (not self:IsOutside()) then
-			Notifier:ShowError(_T("GENERIC_TELEPORT"), _T("GENERIC_TP_INTERIOR_ERR"))
-			return
-		end
+		-- if (not self:IsOutside()) then
+		-- 	Notifier:ShowError(_T("GENERIC_TELEPORT"), _T("GENERIC_TP_INTERIOR_ERR"))
+		-- 	return
+		-- end
 
 		local coords = Game.Ensure3DCoords(where)
 		if (not coords or coords:is_zero()) then

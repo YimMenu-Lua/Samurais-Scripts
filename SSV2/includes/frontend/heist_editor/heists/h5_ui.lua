@@ -70,6 +70,12 @@ end
 local function main(instance)
 	GUI:HeaderText(_T("CP_HEIST_SETUP"), { separator = true, spacing = true })
 
+	GUI:CustomToggle(_T("YH_CAYO_DIFFICULTY"), instance:IsOnHardMode(), {
+		onClick = function()
+			instance:ToggleHardMode()
+		end
+	})
+
 	local preview = targets[instance.m_current_target + 1] or "GENERIC_NONE"
 	if (ImGui.BeginCombo(_T("CP_HEIST_TARGET"), _T(preview))) then
 		for i, v in ipairs(rawData.targets) do
