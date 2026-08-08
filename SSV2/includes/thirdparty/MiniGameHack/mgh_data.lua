@@ -161,7 +161,8 @@ return {
 				sgsl_entry = "mgh_fmmc_v3_local_11",
 				callback = function(scrLocal, s)
 					for i = 0, 2 do
-						scrLocal:At(1):At(i, 2):At(1):WriteInt(0)
+						scrLocal:At(1):At(i, 2):At(1):WriteInt(1)
+						scrLocal:At(1):At(i, 2):WriteInt(1)
 						s:sleep(300)
 						PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 237, 1.0)
 					end
@@ -237,11 +238,12 @@ return {
 			{
 				sgsl_entry = "mgh_stash_house",
 				callback = function(scrLocal, s)
+					local offsetLocal = scrLocal:At(22)
 					for i = 0, 2 do
-						local offsetLocal = scrLocal:At(22):At(i, 2)
-						offsetLocal:WriteInt(offsetLocal:At(1):ReadInt())
+						offsetLocal:At(i, 2):WriteInt(1)
+						offsetLocal:At(i, 2):At(1):WriteInt(1)
 						s:sleep(300)
-						PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 235, 1.0)
+						PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 237, 1.0)
 					end
 				end
 			},

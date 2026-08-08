@@ -331,12 +331,11 @@ end
 ---@param outVector vec4
 ---@return boolean
 function ImGui.ColorEditVec4(label, outVector)
-	if (not IsInstance(outVector, vec4)) then
-		Notifier:ShowError("ImGui", _F("Invalid argument #2: vec4 expected, got %s instead.", type(outVector)), true)
+	if (type(outVector) ~= "table" or outVector.__type ~= "vec4") then
 		return false
 	end
 
-	local temp, changed = { outVector:unpack() }, false
+	local temp, changed = { outVector.x, outVector.y, outVector.z, outVector.w }, false
 	temp, changed = ImGui.ColorEdit4(label, temp)
 	if (changed) then
 		outVector.x = temp[1]

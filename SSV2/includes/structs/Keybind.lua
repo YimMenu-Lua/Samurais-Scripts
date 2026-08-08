@@ -123,10 +123,6 @@ Keybind.__index = Keybind
 ---@param kwargs? KeybindKeywordArgs
 ---@return Keybind
 function Keybind:new(name, keys, kwargs)
-	if (not name) then
-		print(keys)
-		print(kwargs)
-	end
 	REF_COUNT        = REF_COUNT + 1
 	kwargs           = kwargs or {}
 	local no_gamepad = kwargs.no_gamepad or false

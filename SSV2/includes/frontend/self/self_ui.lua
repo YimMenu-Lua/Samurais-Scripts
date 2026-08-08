@@ -19,13 +19,9 @@ local katana_replace_weapons <const> = {
 }
 
 local function laserOptions()
-	ImGui.ColorEditVec4(_T("SELF_LASER_SIGHTS_COL"), GVars.features.weapon.laser_sights.color)
-
-	GVars.features.weapon.laser_sights.ray_length = ImGui.SliderInt(_T("SELF_LASER_SIGHTS_LENGTH"),
-		GVars.features.weapon.laser_sights.ray_length,
-		100,
-		1000
-	)
+	local cfg = GVars.features.weapon.laser_sights
+	ImGui.ColorEditVec4(_T("SELF_LASER_SIGHTS_COL"), cfg.color)
+	cfg.ray_length = ImGui.SliderInt(_T("SELF_LASER_SIGHTS_LENGTH"), cfg.ray_length, 100, 1000)
 end
 
 local function ragdollOptions()

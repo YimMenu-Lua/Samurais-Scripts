@@ -94,9 +94,9 @@ function Serializer:init()
 	self.m_registered_types = {
 		["color"] = { constructor = Color.deserialize, serializer = Color.serialize },
 		["keybind"] = { constructor = Keybind.deserialize, serializer = Keybind.serialize },
-		["vec2"] = { constructor = vec2.new, serializer = vec2.serialize },
-		["vec3"] = { constructor = vec3.new, serializer = vec3.serialize },
-		["vec4"] = { constructor = vec4.new, serializer = vec4.serialize },
+		["vec2"] = { constructor = vec2.deserialize, serializer = vec2.serialize },
+		["vec3"] = { constructor = vec3.deserialize, serializer = vec3.serialize },
+		["vec4"] = { constructor = vec4.deserialize, serializer = vec4.serialize },
 		["theme"] = { constructor = Theme.deserialize, serializer = Theme.serialize },
 	}
 	self.m_deferred_objects = {}

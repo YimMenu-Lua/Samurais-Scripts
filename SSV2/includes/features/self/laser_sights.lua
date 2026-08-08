@@ -10,6 +10,7 @@
 local FeatureBase = require("includes.modules.FeatureBase")
 local World       = require("includes.modules.World")
 local Set         = require("includes.classes.Set")
+local min, floor  = math.min, math.floor
 
 
 local function LaserSightsToggleCB()
@@ -112,7 +113,8 @@ function LaserSights:Update()
 		return
 	end
 
-	local wpn_idx = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(LocalPlayer:GetHandle(), 0)
+	local cfg      = GVars.features.weapon.laser_sights
+	local wpn_idx  = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(LocalPlayer:GetHandle(), 0)
 	local wpn_bone = 0
 	for _, bone in ipairs(self.WeaponBoneNames) do
 		local boneIndex = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(wpn_idx, bone)
@@ -122,41 +124,35 @@ function LaserSights:Update()
 		end
 	end
 
-	local color = GVars.features.weapon.laser_sights.color
-	local bone_pos = ENTITY.GET_ENTITY_BONE_POSTION(wpn_idx, wpn_bone)
-	local camRotation = CAM.GET_GAMEPLAY_CAM_ROT(0)
-	local direction = camRotation:to_direction()
-	local destination = vec3:new(
-		bone_pos.x + direction.x * GVars.features.weapon.laser_sights.ray_length,
-		bone_pos.y + direction.y * GVars.features.weapon.laser_sights.ray_length,
-		bone_pos.z + direction.z * GVars.features.weapon.laser_sights.ray_length
+	local color = cfg.color
+	if (color.w < 0.499) then -- lesser values are invisible
+		color.w = 1.0
+	end
+
+	local bone_pos          = ENTITY.GET_ENTITY_BONE_POSTION(wpn_idx, wpn_bone)
+	local camRotation       = CAM.GET_GAMEPLAY_CAM_ROT(0)
+	local direction         = camRotation:to_direction()
+	local destination       = vec3:new(
+		bone_pos.x + direction.x * cfg.ray_length,
+		bone_pos.y + direction.y * cfg.ray_length,
+		bone_pos.z + direction.z * cfg.ray_length
 	)
 
 	local hit, endCoords, _ = World:RayCast(bone_pos, destination, -1, LocalPlayer:GetHandle())
-	local r, g, b, a = math.min(255, color.x * 255),
-		math.min(255, color.y * 255),
-		math.min(255, color.z * 255),
-		math.min(255, color.w * 255)
+	local r, g, b, a        = floor(min(255, color.x * 255)),
+		floor(min(255, color.y * 255)),
+		floor(min(255, color.z * 255)),
+		floor(min(255, color.w * 255))
 
 	self:DrawLaserBeam(bone_pos, hit and endCoords or destination, r, g, b, a)
 	if (hit) then
-		GRAPHICS.DRAW_MARKER(
-			28,
+		GRAPHICS.DRAW_LIGHT_WITH_RANGE(
 			endCoords.x,
 			endCoords.y,
 			endCoords.z,
-			0.0,
-			0.0,
-			0.0,
-			0.0,
-			0.0,
-			0.0,
-			0.01,
-			0.01,
-			0.01,
-			r, g, b, a,
-			---@diagnostic disable-next-line
-			false, false, 2, false, 0, 0, false
+			r, g, b,
+			1.0,
+			0.5
 		)
 	end
 end
