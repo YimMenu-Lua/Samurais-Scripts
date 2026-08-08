@@ -13,13 +13,6 @@ local autopilot_state_idx     = 0
 local autopilot_index_changed = false
 local autopilot_labels
 local planes_tab              = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_AIRCRAFT", nil, nil, true)
-local optionPopup             = {
-	flags       = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize,
-	label       = "##optionsPopup",
-	should_draw = false,
-	---@type function?
-	callback    = nil
-}
 
 local function triggerbotSettings()
 	GVars.features.vehicle.aircraft_mg.enemies_only = GUI:CustomToggle(_T("VEH_MG_TRIGGERBOT_ENEMY"),
@@ -51,15 +44,10 @@ planes_tab:AddBoolCommand("VEH_FAST_JETS",
 		translate_label  = true,
 		meta             = { description = "VEH_FAST_JETS_TT", isTranslatorLabel = true },
 		register_command = true,
-		options_data     = {
-			condition = function() return GVars.features.vehicle.fast_jets end,
-			callback  = function()
-				optionPopup.callback    = function()
-					local cfg           = GVars.features.vehicle
-					cfg.fast_jets_speed = ImGui.SliderFloat("##speed", cfg.fast_jets_speed, 100.0, 300.0)
-				end
-				optionPopup.label       = _T("VEH_FAST_JETS")
-				optionPopup.should_draw = true
+		ctx_data         = {
+			callback = function()
+				local cfg           = GVars.features.vehicle
+				cfg.fast_jets_speed = ImGui.SliderFloat("##speed", cfg.fast_jets_speed, 100.0, 300.0)
 			end
 		}
 	}
@@ -99,16 +87,7 @@ planes_tab:AddBoolCommand("VEH_MG_TRIGGERBOT",
 		gvar_key        = "features.vehicle.aircraft_mg.triggerbot",
 		translate_label = true,
 		meta            = { description = "VEH_MG_TRIGGERBOT_TT" },
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.aircraft_mg.triggerbot
-			end,
-			callback = function()
-				optionPopup.callback    = triggerbotSettings
-				optionPopup.label       = _T("VEH_MG_TRIGGERBOT")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = triggerbotSettings }
 	}
 )
 planes_tab:AddBoolCommand("VEH_MG_MANUAL_AIM",
@@ -116,16 +95,7 @@ planes_tab:AddBoolCommand("VEH_MG_MANUAL_AIM",
 		gvar_key        = "features.vehicle.aircraft_mg.manual_aim",
 		translate_label = true,
 		meta            = { description = "VEH_MG_MANUAL_AIM_TT" },
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.aircraft_mg.manual_aim
-			end,
-			callback = function()
-				optionPopup.callback    = manualAimSettings
-				optionPopup.label       = _T("VEH_MG_MANUAL_AIM")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = manualAimSettings }
 	}
 )
 planes_tab:AddBoolCommand("VEH_COBRA_MANEUVER",
@@ -169,15 +139,4 @@ planes_tab:RegisterGUI(function()
 		end
 	end
 	ImGui.EndDisabled()
-
-	if (optionPopup.should_draw) then
-		ImGui.OpenPopup(optionPopup.label)
-		optionPopup.should_draw = false
-	end
-
-	ImGui.SetNextWindowSizeConstraints(300, 140, 600, 800)
-	if (optionPopup.callback and ImGui.BeginPopupModal(optionPopup.label, true, optionPopup.flags)) then
-		optionPopup.callback()
-		ImGui.EndPopup()
-	end
 end)

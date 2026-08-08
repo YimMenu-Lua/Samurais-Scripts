@@ -13,6 +13,7 @@
 local Enums <const> = {
 	eActionType            = require("includes.data.enums.action_type"),
 	eAnimFlags             = require("includes.data.enums.anim_flags"),
+	eBossType              = require("includes.data.enums.boss_type"),
 	eDrivingFlags          = require("includes.data.enums.driving_flags"),
 	eGameState             = require("includes.data.enums.game_state"),
 	eGameLanguage          = require("includes.data.enums.game_language"),
@@ -30,6 +31,7 @@ local Enums <const> = {
 	ePedTaskIndex          = require("includes.data.enums.ped_task_index"),
 	ePedType               = require("includes.data.enums.ped_type"),
 	eRagdollBlockingFlags  = require("includes.data.enums.ragdoll_blocking_flags"),
+	eScriptStackSize       = require("includes.data.enums.script_stack_sizes"),
 	eVehicleAdvancedFlags  = require("includes.data.enums.vehicle_advanced_flags"),
 	eVehicleClass          = require("includes.data.enums.vehicle_classes"),
 	eVehicleHandlingFlags  = require("includes.data.enums.vehicle_handling_flags"),

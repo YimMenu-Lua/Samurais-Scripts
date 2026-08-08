@@ -7,16 +7,18 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local Audio               = require("includes.modules.Audio")
-local FeatureBase         = require("includes.modules.FeatureBase")
-local COL_FG <const>      = Color.WHITE
-local COL_BG <const>      = Color(0, 0, 0, 158)
-local COL_GREEN <const>   = Color(111, 194, 118, 255)
-local eLaunchMode <const> = {
+local Audio             = require("includes.modules.Audio")
+local FeatureBase       = require("includes.modules.FeatureBase")
+local COL_FG <const>    = Color.WHITE
+local COL_BG <const>    = Color(0, 0, 0, 158)
+local COL_GREEN <const> = Color(111, 194, 118, 255)
+
+
+---@enum eLaunchControlMode
+local eLaunchControlMode <const> = {
 	REALISTIC = 0,
 	RIDICULOUS = 1
 }
-
 
 ---@enum eLaunchControlState
 local eLaunchControlState <const> = {
@@ -66,13 +68,13 @@ function LaunchControl:Init()
 end
 
 function LaunchControl:ShouldRun()
-	return self.m_entity
-		and self.m_entity:IsValid()
-		and self.m_entity:IsLandVehicle()
+	local veh, cfg = self.m_entity, GVars.features.vehicle
+	return veh and veh:IsValid()
+		and veh:IsLandVehicle()
 		and LocalPlayer:IsAlive()
 		and LocalPlayer:IsDriving()
-		and (not GVars.features.vehicle.performance_only or self.m_entity:IsPerformanceCar())
-		and (GVars.features.vehicle.launch_control or GVars.features.vehicle.burble_tune)
+		and (not cfg.performance_only or veh:IsPerformanceCar())
+		and (cfg.launch_control or cfg.burble_tune)
 end
 
 -- function LaunchControl:OnEnable()
@@ -91,10 +93,11 @@ function LaunchControl:Update()
 	local PV = self.m_entity
 	if (PV:IsElectric()) then return end
 
+	local cfg          = GVars.features.vehicle
 	local handle       = PV:GetHandle()
 	local rpmThreshold = {
-		min = GVars.features.vehicle.bangs_rpm_min / 1e4,
-		max = GVars.features.vehicle.bangs_rpm_max / 1e4
+		min = cfg.bangs_rpm_min / 1e4,
+		max = cfg.bangs_rpm_max / 1e4
 	}
 
 	if (self.m_state == eLaunchControlState.LOADING or self.m_state == eLaunchControlState.READY) then
@@ -115,7 +118,7 @@ function LaunchControl:Update()
 		self.m_last_pop_time = Time.Millis() + math.random(60, 120)
 		Audio:PlayExhaustPop(handle, false)
 	else
-		if (not GVars.features.vehicle.burble_tune) then
+		if (not cfg.burble_tune) then
 			return
 		end
 
@@ -247,13 +250,13 @@ function LaunchControl:Charge(veh, rolling)
 end
 
 function LaunchControl:OnTick()
-	local PV = self.m_entity
-	if (not PV or not PV:IsValid() or not GVars.features.vehicle.launch_control) then
+	local PV, cfg = self.m_entity, GVars.features.vehicle
+	if (not PV or not PV:IsValid() or not cfg.launch_control) then
 		yield()
 		return
 	end
 
-	if (GVars.features.vehicle.performance_only and not self.m_entity:IsPerformanceCar()) then
+	if (cfg.performance_only and not PV:IsPerformanceCar()) then
 		yield()
 		return
 	end
@@ -284,9 +287,9 @@ function LaunchControl:OnTick()
 	end
 
 	if (self.m_state == eLaunchControlState.READY) then
-		if (PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_RELEASED(0, 72) and not KeyManager:IsKeyPressed(eVirtualKeyCodes.N)) then
-			local realistic  = GVars.features.vehicle.launch_control_mode == eLaunchMode.REALISTIC
-			local max_speed  = realistic and PV:GetDefaultMaxSpeed() - 1 or PV:GetMaxSpeed() - 1
+		if (PAD.IS_CONTROL_PRESSED(0, 71) and PAD.IS_CONTROL_RELEASED(0, 72) and not KeyManager:IsKeybindPressed("rolling_launch")) then
+			local realistic  = cfg.launch_control_mode == eLaunchControlMode.REALISTIC
+			local max_speed  = (realistic and PV:GetDefaultMaxSpeed() or PV:GetMaxSpeed()) - 1
 			local max_force  = realistic and 2000 or 5000
 			local max_push   = realistic and max_speed * 0.55 or max_speed
 			local start_time = Game.GetGameTimer()

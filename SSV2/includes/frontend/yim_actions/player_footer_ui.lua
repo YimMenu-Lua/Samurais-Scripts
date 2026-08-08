@@ -104,14 +104,15 @@ local function DrawAnimOptions(selectedAction)
 	local opts_lbl_width    = ImGui.CalcTextSize(opts_lbl) + 20
 	local style             = ImGui.GetStyle()
 	local opts_button_width = opts_lbl_width + style.FramePadding.x
+	local actionData        = selectedAction.data
 
 	ImGui.SameLine()
 	ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail() - opts_button_width)
 
 	ImGui.BeginDisabled(not selectedAction)
 	if (GUI:Button(_T("GENERIC_OPTIONS_LABEL"), { size = vec2:new(opts_lbl_width, 35) })) then
-		if (not t_DefaultFlags[selectedAction.data.label]) then
-			t_DefaultFlags[selectedAction.data.label] = selectedAction.data.flags
+		if (not t_DefaultFlags[actionData.label]) then
+			t_DefaultFlags[actionData.label] = actionData.flags
 		end
 		ImGui.OpenPopup("##animflags")
 	end
@@ -140,18 +141,25 @@ local function DrawAnimOptions(selectedAction)
 
 			ImGui.Spacing()
 			ImGui.SeparatorText(_T("YAV3_ANIM_FLAGS"))
+			ImGui.SetWindowFontScale(0.89)
+			ImGui.TextDisabled(Bit.Tostring(actionData.flags, 32))
+			ImGui.SetWindowFontScale(1.0)
 
-			local defaultFlags = t_DefaultFlags[selectedAction.data.label]
-			ImGui.BeginDisabled(not defaultFlags or defaultFlags == selectedAction.data.flags)
+			ImGui.SameLine()
+			ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 5.0)
+			local defaultFlags = t_DefaultFlags[actionData.label]
+			ImGui.BeginDisabled(not defaultFlags or defaultFlags == actionData.flags)
 			if (GUI:Button(_T("GENERIC_RESET"))) then
-				selectedAction.data.flags = defaultFlags
+				actionData.flags = defaultFlags
 			end
 			ImGui.EndDisabled()
+
 			ImGui.Spacing()
+			ImGui.Separator()
 
 			for name, flag in pairs(t_AnimFlags) do
 				ImGui.PushID(_F("##flag_%s", name))
-				local isEnabled = Bit.IsBitSet(selectedAction.data.flags, flag.bit)
+				local isEnabled = Bit.IsBitSet(actionData.flags, flag.bit)
 				flag.enabled, flag.wasClicked = ImGui.Checkbox(_T(flag.label), isEnabled)
 				ImGui.PopID()
 
@@ -161,11 +169,7 @@ local function DrawAnimOptions(selectedAction)
 
 				if (flag.wasClicked) then
 					GUI:PlaySound("Nav")
-					selectedAction.data.flags = Bit.Toggle(
-						selectedAction.data.flags,
-						flag.bit,
-						flag.enabled
-					)
+					actionData.flags = Bit.Flip(actionData.flags, flag.bit)
 				end
 			end
 			ImGui.EndChild()

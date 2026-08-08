@@ -9,6 +9,7 @@
 
 return {
 	[Enums.ePedGender.MALE] = {
+		"John Rockstar",
 		"Long Johnsson",
 		"Wayne 'The Wok' Ferguson",
 		"Hugh G. Rection",
@@ -20,6 +21,7 @@ return {
 		"Lube Skyballer",
 		"Steve Snobs",
 		"Barry McCockiner",
+		"Jeff Trumpstein",
 		"Randy Meatwagon",
 		"Peter Draggin",
 		"Mick Lickalot",
@@ -28,10 +30,10 @@ return {
 		"Elawn Musty",
 		"Sammy 'The Rat' Gravano",
 		"Billy The Elder",
-		"John 'Babayaga' Brick",
+		"Jardani Jovonovich",
 		"Alexander The Mediocre",
 		"Quagmire",
-		"Bill Fates",
+		"Gill Bates",
 		"Clint Beefwood",
 		"Leroy NoScope",
 		"Sir Shootsalot",
@@ -51,8 +53,7 @@ return {
 		"Luigi Mangione",
 		"Doc Holliday",
 		"Pee Diddler",
-		"Noscope Pope",
-		"Edward Kennway",
+		"Edward Kenway",
 	},
 	[Enums.ePedGender.FEMALE] = {
 		"Laquisha",

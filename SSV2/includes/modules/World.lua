@@ -128,7 +128,8 @@ Backend:RegisterEventCallback(Enums.eBackendEvent.SESSION_SWITCH, function()
 	World:Cleanup()
 end)
 
-ThreadManager:RegisterLooped("SS_WORLD", function()
+ThreadManager:RegisterLooped("SS_WORLD", function(s)
+	s:yield()
 	World.m_feat_mgr:Update()
 end, {
 	exception_handler = function()

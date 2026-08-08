@@ -172,9 +172,13 @@ end
 ---@nodiscard
 ---@return boolean
 function IManagedValue:Apply()
-	if (not self:IsReady()) then
+	if (self.m_desired_val == nil) then
 		self:SaveDefaultValue()
 		return false
+	end
+
+	if (self.__get() == self.m_desired_val) then
+		return true
 	end
 
 	self.__set(self.m_desired_val)

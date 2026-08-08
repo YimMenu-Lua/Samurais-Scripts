@@ -7,6 +7,13 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+require("includes.classes.Vector2")
+require("includes.classes.Vector3")
+require("includes.classes.Vector4")
+
+local Keybind = require("includes.structs.Keybind")
+
+
 ---@class Config
 local Config <const> = {
 	backend = {
@@ -21,106 +28,271 @@ local Config <const> = {
 		moveable = false,
 		style = {
 			bg_alpha = 0.7,
+			theme = "Synthwave"
 		},
-		window_size = {
-			__type = "vec2",
-			x = 864,
-			y = 864,
-		},
-		window_pos = {
-			__type = "vec2",
-			x = 0,
-			y = 0,
-		},
+		window_size = vec2:new(864, 864),
+		window_pos = vec2:new(1, 1),
 		last_tab = {
 			tab_id = 1,
 			array_index = 1,
 		}
 	},
-	commands_console = {
-		key = "F4",
-		auto_close = false,
+	commands_console = { auto_close = false },
+	keybinds = {
+		gui_toggle = Keybind:new("Toggle GUI",
+			{
+				keyboard_binding = {
+					key = { name = "F5", code = 0x74 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{
+				no_gamepad = true,
+				is_exclusive = true,
+				repeat_on_hold = false,
+				allow_unbind = false
+			}
+		),
+		commands_console_toggle = Keybind:new("Toggle Commands Console",
+			{
+				keyboard_binding = {
+					key = { name = "F4", code = 0x73 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{
+				no_gamepad = true,
+				is_exclusive = true,
+				repeat_on_hold = false,
+				allow_unbind = false
+			}
+		),
+		kill_all_enemies = Keybind:new("Kill All Enemies",
+			{
+				keyboard_binding = {
+					key = { name = "F7", code = 0x76 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			}
+		),
+		enemies_flee = Keybind:new("Enemies Flee",
+			{
+				keyboard_binding = {
+					key = { name = "F8", code = 0x77 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			}
+		),
+		cobra_maneuver = Keybind:new("Cobra Maneuver",
+			{
+				keyboard_binding = {
+					key = { name = "X", code = 0x58 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			}
+		),
+		flatbed_tow = Keybind:new("Flatbed Tow",
+			{
+				keyboard_binding = {
+					key = { name = "X", code = 0x58 }
+				},
+				controller_binding = {
+					key = { name = "A", code = 288 }
+				},
+			}
+		),
+		nos_purge = Keybind:new("NOS Purge",
+			{
+				keyboard_binding = {
+					key = { name = "X", code = 0x58 }
+				},
+				controller_binding = {
+					key = { name = "A", code = 288 }
+				},
+			}
+		),
+		rod = Keybind:new("Ragdoll On Demand",
+			{
+				keyboard_binding = {
+					key = { name = "X", code = 0x58 }
+				},
+				controller_binding = {
+					key = { name = "A", code = 288 }
+				},
+			}
+		),
+		laser_sights = Keybind:new("Laser Sights",
+			{
+				keyboard_binding = {
+					key = { name = "L", code = 0x4C }
+				},
+				controller_binding = {
+					key = { name = "DPAD UP", code = 303 }
+				},
+			}
+		),
+		nos = Keybind:new("NOS",
+			{
+				keyboard_binding = {
+					key = { name = "MOUSE5", code = 0x20040 }
+				},
+				controller_binding = {
+					key = { name = "X", code = 289 }
+				},
+			}
+		),
+		rolling_launch = Keybind:new("Rolling Anti-Lag",
+			{
+				keyboard_binding = {
+					key = { name = "N", code = 0x4E }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			}
+		),
+		panik = Keybind:new("PANIQUE!!!",
+			{
+				keyboard_binding = {
+					key = { name = "F12", code = 0x7B },
+					modifier = { name = "Control", code = 0x11 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{ allow_unbind = false }
+		),
+		drift_mode = Keybind:new("Drift Mode",
+			{
+				keyboard_binding = {
+					key = { name = "SHIFT", code = 0x10 }
+				},
+				controller_binding = {
+					key = { name = "A", code = 288 }
+				},
+			}
+		),
+		stop_anim = Keybind:new("Stop Animation/Scenario",
+			{
+				keyboard_binding = {
+					key = { name = "G", code = 0x47 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			}
+		),
+		veh_mine = Keybind:new("Deploy Vehicle Mines",
+			{
+				keyboard_binding = {
+					key = { name = "NUMPAD0", code = 0x60 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			}
+		),
+		shift_up = Keybind:new("ManualGearbox: Shift Up",
+			{
+				keyboard_binding = {
+					key = { name = "NUMPAD9", code = 0x69 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{ is_exclusive = true }
+		),
+		shift_down = Keybind:new("ManualGearbox: Shift Down",
+			{
+				keyboard_binding = {
+					key = { name = "NUMPAD3", code = 0x63 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{ is_exclusive = true }
+		),
+		clutch = Keybind:new("ManualGearbox: Clutch",
+			{
+				keyboard_binding = {
+					key = { name = "NUMPAD5", code = 0x65 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{ is_exclusive = true }
+		),
+		engine_start_stop = Keybind:new("ManualGearbox: Engine Start/Stop",
+			{
+				keyboard_binding = {
+					key = { name = "NUMPAD1", code = 0x61 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{ is_exclusive = true }
+		),
+		veh_ram_fwd = Keybind:new("Vehicle Ram Forward",
+			{
+				keyboard_binding = {
+					key = { name = "NUMPAD8", code = 0x68 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{ is_exclusive = true }
+		),
+		veh_ram_left = Keybind:new("Vehicle Ram Left",
+			{
+				keyboard_binding = {
+					key = { name = "NUMPAD4", code = 0x64 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{ is_exclusive = true }
+		),
+		veh_ram_right = Keybind:new("Vehicle Ram Left",
+			{
+				keyboard_binding = {
+					key = { name = "NUMPAD6", code = 0x66 }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{ is_exclusive = true }
+		),
+		minigamehack = Keybind:new("MiniGameHack",
+			{
+				keyboard_binding = {
+					key = { name = "DEL", code = 0x2E }
+				},
+				controller_binding = {
+					key = { name = "Unbound", code = 0 }
+				},
+			},
+			{ is_exclusive = true }
+		),
 	},
-	keyboard_keybinds = {
-		gui_toggle        = "F5",
-		kill_all_enemies  = "F7",
-		enemies_flee      = "F8",
-		-- missile_defence  = "F9",
-		cobra_maneuver    = "X",
-		flatbed           = "X",
-		laser_sights      = "L",
-		nos               = "MOUSE5",
-		rolling_launch    = "N",
-		panik             = "F12",
-		nos_purge         = "X",
-		rod               = "X",
-		drift_mode        = "SHIFT",
-		-- trigger_bot      = "SHIFT",
-		veh_mine          = "NUMPAD0",
-		stop_anim         = "G",
-		shift_up          = "NUMPAD9",
-		shift_down        = "NUMPAD3",
-		clutch            = "NUMPAD5",
-		engine_start_stop = "NUMPAD1",
-	},
-	gamepad_keybinds = {
-		flatbed           = {
-			code = 288,
-			name = "A"
-		},
-		laser_sights      = {
-			code = 303,
-			name = "DPAD UP"
-		},
-		nos               = {
-			code = 289,
-			name = "X"
-		},
-		nos_purge         = {
-			code = 288,
-			name = "A"
-		},
-		rod               = {
-			code = 288,
-			name = "A"
-		},
-		drift_mode        = {
-			code = 288,
-			name = "A"
-		},
-		-- trigger_bot = {
-		-- 	code = 0,
-		-- 	name = "Unbound"
-		-- },
-		veh_mine          = {
-			code = 0,
-			name = "Unbound"
-		},
-		stop_anim         = {
-			code = 0,
-			name = "Unbound"
-		},
-		rolling_launch    = {
-			code = 0,
-			name = "Unbound"
-		},
-		shift_up          = {
-			code = 0,
-			name = "Unbound"
-		},
-		shift_down        = {
-			code = 0,
-			name = "Unbound"
-		},
-		clutch            = {
-			code = 0,
-			name = "Unbound"
-		},
-		engine_start_stop = {
-			code = 0,
-			name = "Unbound"
-		},
-	},
+	quick_toggle_keybinds = {}, ---@type table<string, Keybind>
 	features = {
 		unsafe_feats_enabled = false,
 		self = {
@@ -158,12 +330,7 @@ local Config <const> = {
 				power = 50,
 				smoke_fx = {
 					enabled = false,
-					color = {
-						__type = "vec3",
-						x = 1,
-						y = 1,
-						z = 1,
-					}
+					color = vec3:new(1, 1, 1)
 				},
 			},
 			default_station = {
@@ -216,13 +383,7 @@ local Config <const> = {
 				manual_aim = false,
 				enemies_only = false,
 				marker_size = 1.6,
-				marker_color = {
-					__type = "vec4",
-					x = 0,
-					y = 1,
-					z = 0,
-					w = 1,
-				}
+				marker_color = vec4:new(0, 1, 0, 1)
 			},
 			flares = false,
 			drift_minigame = {
@@ -247,11 +408,7 @@ local Config <const> = {
 			enabled = false,
 			speed_unit = 0,
 			radius = 160,
-			pos = {
-				__type = "vec2",
-				x = 0.0,
-				y = 0.0
-			},
+			pos = vec2:zero(),
 			colors = {
 				circle = 0xFF313195,
 				circle_bg = 0x66090909,
@@ -273,13 +430,7 @@ local Config <const> = {
 				enabled = false,
 				keybind = "L",
 				ray_length = 500,
-				color = {
-					__type = "vec4",
-					x = 1,
-					y = 0,
-					z = 0,
-					w = 0.9
-				}
+				color = vec4:new(1, 0, 0, 0.9)
 			},
 			katana = {
 				enabled = false,
@@ -305,10 +456,12 @@ local Config <const> = {
 			rig_slot_machine = false,
 			autoplay_slots = false,
 			cap_slot_machine_chips = false,
-			ch_cart_autograb = false,
 			autoplay_slots_delay_random = false,
+			zero_ai_cuts = false,
 			slot_machine_cap = 0,
 			autoplay_slots_delay = 500,
+			disable_heist_cooldown = false,
+			ch_cart_autograb = false,
 		},
 		yim_heists = {
 			cfr_cd = false,
@@ -317,10 +470,16 @@ local Config <const> = {
 			ogfa_cd = false,
 			cayo_cd = false,
 			dday_cd = false,
+			kortz_cd = false,
+			kortz_week_bypass = false,
+			sixty_nine = false,
+			solo_missions = false,
+			ignore_prop_req = false,
+			cayo_cart_autograb = false
 		},
 		yrv3 = {
 			autofill_delay = 500,
-			auto_sell = false,
+			autosell = false,
 			hangar_cd = false,
 			nc_management_cd = false,
 			nc_vip_mission_chance = false,

@@ -24,6 +24,7 @@ local ObjRes <const>  = {
 ---@field private m_name string
 ---@field private m_data array<{ object: IManagedValue<T>, desired_val: T }>
 ---@field private m_dirty boolean
+---@field private m_modified boolean
 ---@field private GetCheckboxState fun(): boolean
 local IManagedValueEntry <const> = {}
 IManagedValueEntry.__index       = IManagedValueEntry
@@ -89,6 +90,8 @@ function IManagedValueEntry:Apply()
 	for _, entry in ipairs(self.m_data) do
 		if (not entry.object:Apply()) then
 			success = false
+		else
+			self.m_modified = true
 		end
 	end
 
@@ -108,7 +111,7 @@ function IManagedValueEntry:OnCall(force)
 	end
 
 	local state = self:GetCheckboxState()
-	if (not state) then
+	if (not state and self.m_modified) then
 		self:Reset()
 	elseif (not self:Apply()) then
 		return

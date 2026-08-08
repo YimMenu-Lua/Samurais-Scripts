@@ -7,12 +7,18 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local TxnSysFuncs <const> = {
-	[0] = {
+---@enum eTransactionType
+local eTransactionType <const> = {
+	WITHDRAW = 0,
+	DEPOSIT  = 1
+}
+
+local TxnSysFuncs <const>      = {
+	[eTransactionType.WITHDRAW] = {
 		transfer   = NETSHOPPING.NET_GAMESERVER_TRANSFER_BANK_TO_WALLET,
 		get_status = NETSHOPPING.NET_GAMESERVER_TRANSFER_BANK_TO_WALLET_GET_STATUS
 	},
-	[1] = {
+	[eTransactionType.DEPOSIT] = {
 		transfer   = NETSHOPPING.NET_GAMESERVER_TRANSFER_WALLET_TO_BANK,
 		get_status = NETSHOPPING.NET_GAMESERVER_TRANSFER_WALLET_TO_BANK_GET_STATUS
 	}
@@ -84,12 +90,11 @@ function PlayerMoneyController:GetTotalBalanceFmt()
 	return self.m_total_fmt
 end
 
+-- TODO: Needs testing without FSL. // atm_trigger @ 0x1369 && 0x1533
 ---@private
 ---@nodiscard
 ---@param amount integer
----@param operation
----| 0: Withdraw
----| 1: Deposit
+---@param operation eTransactionType
 ---@return boolean
 function PlayerMoneyController:UseTransactionSystem(amount, operation)
 	if (not NETSHOPPING.NET_GAMESERVER_USE_SERVER_TRANSACTIONS()) then
@@ -97,25 +102,25 @@ function PlayerMoneyController:UseTransactionSystem(amount, operation)
 	end
 
 	if (NETSHOPPING.NET_GAMESERVER_TRANSACTION_IN_PROGRESS()) then
-		log.error("Another transaction is in progress.")
+		log.warning("[PlayerMoneyController]: Another transaction is in progress. Please try again later!")
 		return false
 	end
 
 	local success, p0, p1 = false, 0, false
 	success, p0, p1       = NETSHOPPING.NET_GAMESERVER_GET_SESSION_STATE_AND_STATUS(p0, p1)
-	if (not success or p0 ~= 8) then
-		log.error("Transaction failed!")
+	if (p0 ~= 8) then
+		log.ferror("[PlayerMoneyController]: GET_SESSION_STATE_AND_STATUS failed with: (%s, %s, %s)", success, p0, p1)
 		return false
 	end
 
 	local funcs_t = TxnSysFuncs[operation]
 	if (not funcs_t) then
-		log.error("Unknown operation!")
+		log.error("[PlayerMoneyController]: Unknown operation!")
 		return false
 	end
 
 	if (not funcs_t.transfer(stats.get_character_index(), amount)) then
-		log.error("Transaction failed!")
+		log.error("[PlayerMoneyController]: NET_GAMESERVER_TRANSFER failed!") -- knowing R*, there's probably a cap
 		return false
 	end
 
@@ -127,11 +132,12 @@ function PlayerMoneyController:UseTransactionSystem(amount, operation)
 	end
 
 	if (status ~= 3) then
-		log.error("Transaction failed!")
+		log.ferror("[PlayerMoneyController]: Transaction failed with status '%s' (Expected 3).", status)
 		return false
 	end
 
-	return NETSHOPPING.NET_GAMESERVER_TRANSFER_CASH_SET_TELEMETRY_NONCE_SEED()
+	NETSHOPPING.NET_GAMESERVER_TRANSFER_CASH_SET_TELEMETRY_NONCE_SEED()
+	return true
 end
 
 -- ### Must be called in a fiber.
@@ -154,7 +160,8 @@ function PlayerMoneyController:Withdraw(amount)
 	end
 
 	amount = math.min(amount, balance)
-	if (not self:UseTransactionSystem(amount, 0)) then
+	if (not self:UseTransactionSystem(amount, eTransactionType.WITHDRAW)) then
+		Notifier:ShowError("Withdraw", "Transaction failed!")
 		return
 	end
 
@@ -175,7 +182,8 @@ function PlayerMoneyController:Deposit(amount)
 		return
 	end
 
-	if (not self:UseTransactionSystem(amount, 1)) then
+	if (not self:UseTransactionSystem(amount, eTransactionType.DEPOSIT)) then
+		Notifier:ShowError("Deposit", "Transaction failed!")
 		return
 	end
 
@@ -183,7 +191,7 @@ function PlayerMoneyController:Deposit(amount)
 end
 
 function PlayerMoneyController:Update()
-	if not (Game.IsOnline() and self.m_last_tick:HasElapsed(1000)) then
+	if not (Game.IsOnline() and self.m_last_tick:HasElapsed(2000)) then
 		return
 	end
 

@@ -78,21 +78,8 @@ GVars = {}
 
 ----------------------------------------------------------------------------------------------------
 -- These services must be loaded before any class that registers with/uses them -------------------
-ThreadManager = require("includes.services.ThreadManager"):init()
-Serializer    = require("includes.services.Serializer"):Setup("ssv2", DEFAULT_CONFIG, GVars)
-
-
--- These may look out of place, but they register themselves with Serializer for seamless
---
--- object serialization and deserialization. They are also needed in the next batch of
---
--- services, especially vec2, hence the weird stage they are required at.
-require("includes.classes.Vector2")
-require("includes.classes.Vector3")
-require("includes.classes.Vector4")
-require("includes.modules.Color")
-
-
+ThreadManager   = require("includes.services.ThreadManager"):init()
+Serializer      = require("includes.services.Serializer"):Setup("ssv2", DEFAULT_CONFIG, GVars)
 GPointers       = require("includes.data.pointers")
 GGlobals        = require("includes.data.script_globals")
 Memory          = require("includes.modules.Memory")
@@ -117,10 +104,10 @@ local sub_paths = {
 	"frontend.vehicle.vehicle_ui",
 	"frontend.world_ui",
 
-	"frontend.yim_resupplier.yrv3_ui",
+	"frontend.business_mgr.business_mgr_ui",
 	"frontend.casino_ui",
-	"frontend.mastermind_ui",
 	"frontend.stat_controller_ui",
+	"frontend.heist_editor.heist_editor_ui",
 
 	"frontend.billionaire_services.bsv2_ui",
 	"frontend.entity_forge.entity_forge_ui",

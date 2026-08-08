@@ -9,7 +9,7 @@
 
 local Pair             = require("includes.classes.Pair")
 local StateMachine     = require("includes.structs.StateMachine")
-local Speedometer      = require("includes.features.Speedometer")
+local Speedometer      = require("includes.features.vehicle.Speedometer")
 local FeatureMgr       = require("includes.services.FeatureManager")
 local NosMgr           = require("includes.features.vehicle.nos")
 local FlappyDoors      = require("includes.features.vehicle.flappy_doors")

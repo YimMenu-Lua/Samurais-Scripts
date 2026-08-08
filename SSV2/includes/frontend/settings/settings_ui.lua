@@ -7,28 +7,30 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local Pair            = require("includes.classes.Pair")
-local Set             = require("includes.classes.Set")
-local ThemeManager    = require("includes.services.ThemeManager")
-local LOCALES <const> = Translator.locales
+local Pair             = require("includes.classes.Pair")
+local Set              = require("includes.classes.Set")
+local ThemeManager     = require("includes.services.ThemeManager")
+local LOCALES <const>  = Translator:GetLocales()
+local COL_WARN <const> = Color("safety_yellow")
 local selectedTheme
 local newThemeBuff
+local unsafeFeatsPopupLabel ---@type string?
 
-local cfgReset        = {
+local cfgReset         = {
 	---@type Set<string>
 	exceptions = Set("backend.debug_mode", "__schema_hash"),
 	excToggles = {
-		{ pair = Pair("GUI", "ui"),                               clicked = false, selected = false },
-		{ pair = Pair("Controller Keybinds", "gamepad_keybinds"), clicked = false, selected = false },
-		{ pair = Pair("Keyboard Keybinds", "keyboard_keybinds"),  clicked = false, selected = false },
-		{ pair = Pair("Casino Pacino", "features.dunk"),          clicked = false, selected = false },
-		{ pair = Pair("EntityForge", "features.entity_forge"),    clicked = false, selected = false },
-		{ pair = Pair("YimActions", "features.yim_actions"),      clicked = false, selected = false },
-		{ pair = Pair("YimResupplier", "features.yrv3"),          clicked = false, selected = false },
+		{ pair = Pair("GUI", "ui"),                                      clicked = false, selected = false },
+		{ pair = Pair("Keybinds", "keybinds"),                           clicked = false, selected = false },
+		{ pair = Pair("Quick Toggle Keybinds", "quick_toggle_keybinds"), clicked = false, selected = false },
+		{ pair = Pair("Casino Pacino", "features.dunk"),                 clicked = false, selected = false },
+		{ pair = Pair("EntityForge", "features.entity_forge"),           clicked = false, selected = false },
+		{ pair = Pair("YimActions", "features.yim_actions"),             clicked = false, selected = false },
+		{ pair = Pair("YimResupplier", "features.yrv3"),                 clicked = false, selected = false },
 	},
 	open = false,
 }
-local themeEditor     = {
+local themeEditor      = {
 	shouldDraw      = false,
 	liveEdit        = false,
 	shouldFocusName = false,
@@ -82,6 +84,35 @@ local function drawGeneralSettings()
 	ImGui.Separator()
 	if ImGui.Button(_T("SETTINGS_CFG_RESET")) then
 		cfgReset.open = true
+	end
+
+	ImGui.Spacing()
+	GUI:HeaderText(_T("YRV3_DANGER_ZONE"), { separator = true, spacing = true, color = COL_WARN })
+
+	local isFSL     = Game.IsFSL()
+	local lowerText = isFSL and "YRV3_UNSAFE_FEATS_FSL_ON_TXT" or "YRV3_UNSAFE_FEATS_HINT"
+	ImGui.BeginDisabled(isFSL)
+	GUI:Checkbox(_T("YRV3_UNSAFE_FEATS_CB"), GVars.features.unsafe_feats_enabled, {
+		onClick = function()
+			if (GVars.features.unsafe_feats_enabled) then
+				GVars.features.unsafe_feats_enabled = false
+			else
+				unsafeFeatsPopupLabel = _F("%s##unsafeFeats", _T("GENERIC_WARN_LABEL"))
+				ImGui.OpenPopup(unsafeFeatsPopupLabel)
+			end
+		end
+	})
+	ImGui.EndDisabled()
+	ImGui.Spacing()
+
+	ImGui.SetWindowFontScale(0.9)
+	ImGui.TextWrapped(_T(lowerText))
+	ImGui.SetWindowFontScale(1.0)
+
+	if (not unsafeFeatsPopupLabel) then return end
+
+	if (ImGui.DialogBox(unsafeFeatsPopupLabel, _T("YRV3_UNSAFE_FEATS_PROMPT"), ImGuiDialogBoxStyle.WARN)) then
+		GVars.features.unsafe_feats_enabled = true
 	end
 
 	if (cfgReset.open) then
@@ -145,13 +176,11 @@ local function drawThemeSettings()
 
 			themeEditor.liveEdit, _ = GUI:CustomToggle(
 				_T("SETTINGS_NEW_THEME_LIVE_EDIT"),
-				themeEditor.liveEdit,
-				{
+				themeEditor.liveEdit, {
 					onClick = function(v)
 						ThemeManager:SetCurrentTheme(v and newThemeBuff or selectedTheme)
 					end
-				}
-			)
+				})
 
 			ImGui.Spacing()
 			if (themeEditor.shouldFocusName) then

@@ -8,22 +8,16 @@
 
 
 local PV <const>                = LocalPlayer:GetVehicle()
+local defaultKeybinds <const>   = Serializer:GetDefaultConfig().keybinds
 local Audio                     = require("includes.modules.Audio")
 local Refs                      = require("includes.data.refs")
 local default_cfg               = require("includes.data.config")
 local driftMG                   = require("includes.features.vehicle.drift_minigame")
-local drawKeybind               = require("includes.frontend.helpers.draw_keybind")
+local KeyBindEditorUI           = require("includes.frontend.helpers.KeybindEditorUI").new()
 local drawPaintJobs             = require("includes.frontend.vehicle.custom_paints_ui")
 local engine_swap_index         = 1
 local gearbox_mode_clicked      = false
 local vehicleTab                = GUI:RegisterNewTab(Enums.eTabID.TAB_VEHICLE, "SUBTAB_CARS", nil, nil, true)
-local optionPopup               = {
-	flags       = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize,
-	label       = "##optionsPopup",
-	should_draw = false,
-	---@type function?
-	callback    = nil
-}
 
 local manualGearboxKeybindNames = {
 	"shift_up",
@@ -148,21 +142,44 @@ local function minesOptions()
 	end
 end
 
+---@param station string
+local function setVehicleRadio(station)
+	if not (PV and PV:IsValid() and PV:IsEngineOn() and LocalPlayer:IsDriving()) then
+		return
+	end
+	PV:SetRadioStation(station)
+end
+
 local function defaultStationOptions()
 	ImGui.Spacing()
 	local cfg = GVars.features.vehicle.default_station
+
+	if (ImGui.Button("Online Favorite")) then
+		ThreadManager:Run(function()
+			local gxt   = "OFF"
+			local name  = "Off"
+			local index = stats.get_int("MPPLY_MOST_FAVORITE_STATION")
+			if (math.is_inrange(index, 0, AUDIO.GET_NUM_UNLOCKED_RADIO_STATIONS() - 1)) then
+				gxt  = AUDIO.GET_RADIO_STATION_NAME(index)
+				name = Game.GetLabelText(gxt)
+			end
+
+			setVehicleRadio(gxt)
+			cfg.station_name = gxt
+			cfg.display_name = name
+		end)
+	end
+
 	if (ImGui.BeginCombo("##defaultRadio", cfg.display_name)) then
 		for _, v in ipairs(vehicleRadioStations) do
 			local station  = v.station
 			local name     = v.name
 			local selected = cfg.station_name == station
-			if (ImGui.Selectable(name, selected)) then
+			ImGui.Selectable(name, selected)
+			if (ImGui.IsItemClicked(0)) then
 				cfg.station_name = station
 				cfg.display_name = name
-				ThreadManager:Run(function()
-					if (not LocalPlayer:IsDriving()) then return end
-					LocalPlayer:GetVehicle():SetRadioStation(station)
-				end)
+				ThreadManager:Run(function() setVehicleRadio(station) end)
 			end
 		end
 
@@ -199,14 +216,16 @@ local function gearboxOptions()
 	if (ImGui.BeginTabBar("##gearboxKeybinds")) then
 		if (ImGui.BeginTabItem(_T("SETTINGS_KEYBINDS_KEYBOARD"))) then
 			for _, key in ipairs(manualGearboxKeybindNames) do
-				drawKeybind(key, false)
+				local keybind = GVars.keybinds[key]
+				KeyBindEditorUI:DrawKey(keybind, false, { defaultKeybind = defaultKeybinds[key] })
 			end
 			ImGui.EndTabItem()
 		end
 
 		if (ImGui.BeginTabItem(_T("SETTINGS_KEYBINDS_CONTROLLER"))) then
 			for _, key in ipairs(manualGearboxKeybindNames) do
-				drawKeybind(key, true)
+				local keybind = GVars.keybinds[key]
+				KeyBindEditorUI:DrawKey(keybind, true, { defaultKeybind = defaultKeybinds[key] })
 			end
 			ImGui.EndTabItem()
 		end
@@ -258,16 +277,7 @@ vehicleTab:AddBoolCommand("VEH_SPEEDOMETER",
 	{
 		gvar_key        = "features.speedometer.enabled",
 		translate_label = true,
-		options_data    = {
-			condition = function()
-				return GVars.features.speedometer.enabled
-			end,
-			callback = function()
-				optionPopup.callback    = speedoOptions
-				optionPopup.label       = _T("VEH_SPEEDOMETER")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = speedoOptions }
 	}
 )
 vehicleTab:AddBoolCommand("VEH_ABS_LIGHTS",
@@ -282,17 +292,10 @@ vehicleTab:AddBoolCommand("VEH_FAST_AF",
 		gvar_key        = "features.vehicle.fast_vehicles",
 		meta            = { description = "VEH_FAST_AF_TT" },
 		translate_label = true,
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.fast_vehicles
-			end,
+		ctx_data        = {
 			callback = function()
-				optionPopup.callback    = function()
-					local cfg               = GVars.features.vehicle
-					cfg.fast_vehicles_speed = ImGui.SliderFloat("##speed", cfg.fast_vehicles_speed, 10.0, 100.0)
-				end
-				optionPopup.label       = _T("VEH_FAST_AF")
-				optionPopup.should_draw = true
+				local cfg               = GVars.features.vehicle
+				cfg.fast_vehicles_speed = ImGui.SliderFloat("##speed", cfg.fast_vehicles_speed, 10.0, 100.0)
 			end
 		}
 	}
@@ -301,16 +304,7 @@ vehicleTab:AddBoolCommand("VEH_NOS",
 	{
 		gvar_key        = "features.vehicle.nos.enabled",
 		translate_label = true,
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.nos.enabled
-			end,
-			callback = function()
-				optionPopup.callback    = nosOptions
-				optionPopup.label       = _T("VEH_NOS")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = nosOptions }
 	}
 )
 vehicleTab:AddBoolCommand("VEH_NOS_PURGE",
@@ -327,32 +321,14 @@ vehicleTab:AddBoolCommand("VEH_POPS_N_BANGS",
 		translate_label  = true,
 		on_disable       = RestoreExhaustPops,
 		register_command = true,
-		options_data     = {
-			condition = function()
-				return GVars.features.vehicle.burble_tune
-			end,
-			callback = function()
-				optionPopup.callback    = popsOptions
-				optionPopup.label       = _T("VEH_POPS_N_BANGS")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data         = { callback = popsOptions }
 	}
 )
 vehicleTab:AddBoolCommand("VEH_DRIFT_MODE",
 	{
 		gvar_key        = "features.vehicle.drift.enabled",
 		translate_label = true,
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.drift.enabled
-			end,
-			callback = function()
-				optionPopup.callback    = driftOptions
-				optionPopup.label       = _T("VEH_DRIFT_MODE")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = driftOptions }
 	}
 )
 vehicleTab:AddLoopedCommand("VEH_DRIFT_MINIGAME",
@@ -361,16 +337,7 @@ vehicleTab:AddLoopedCommand("VEH_DRIFT_MINIGAME",
 		meta            = { description = "VEH_DRIFT_MINIGAME_TT" },
 		translate_label = true,
 		callback        = function() DriftMinigame:OnTick() end,
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.drift_minigame.enabled
-			end,
-			callback = function()
-				optionPopup.callback    = driftMinigameOptions
-				optionPopup.label       = _T("VEH_DRIFT_MINIGAME")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = driftMinigameOptions }
 	}
 )
 vehicleTab:AddBoolCommand("VEH_SUBWOOFER",
@@ -430,20 +397,13 @@ vehicleTab:AddBoolCommand("VEH_RGB_LIGHTS",
 				LocalPlayer:GetVehicle():RestoreHeadlights()
 			end)
 		end,
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.rgb_lights.enabled
-			end,
+		ctx_data        = {
 			callback = function()
-				optionPopup.label = _T("VEH_RGB_LIGHTS")
-				optionPopup.callback = function()
-					GVars.features.vehicle.rgb_lights.speed = ImGui.SliderInt("RGB Lights Speed",
-						GVars.features.vehicle.rgb_lights.speed,
-						1,
-						5
-					)
-				end
-				optionPopup.should_draw = true
+				GVars.features.vehicle.rgb_lights.speed = ImGui.SliderInt("RGB Lights Speed",
+					GVars.features.vehicle.rgb_lights.speed,
+					1,
+					5
+				)
 			end
 		}
 	}
@@ -471,19 +431,12 @@ vehicleTab:AddBoolCommand("VEH_LAUNCH_CTRL",
 		gvar_key        = "features.vehicle.launch_control",
 		meta            = { description = "VEH_LAUNCH_CTRL_TT" },
 		translate_label = true,
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.launch_control
-			end,
+		ctx_data        = {
 			callback = function()
-				optionPopup.label       = _T("VEH_LAUNCH_CTRL_MODE")
-				optionPopup.should_draw = true
-				optionPopup.callback    = function()
-					GVars.features.vehicle.launch_control_mode = ImGui.Combo("##launchCtrlMode",
-						GVars.features.vehicle.launch_control_mode,
-						_F("%s\0%s\0", _T("VEH_LAUNCH_CTRL_REALISTIC"), _T("VEH_LAUNCH_CTRL_RIDICULOUS"))
-					)
-				end
+				GVars.features.vehicle.launch_control_mode = ImGui.Combo("##launchCtrlMode",
+					GVars.features.vehicle.launch_control_mode,
+					_F("%s\0%s\0", _T("VEH_LAUNCH_CTRL_REALISTIC"), _T("VEH_LAUNCH_CTRL_RIDICULOUS"))
+				)
 			end
 		}
 	}
@@ -512,16 +465,7 @@ vehicleTab:AddBoolCommand("VEH_MINES",
 		gvar_key        = "features.vehicle.mines.enabled",
 		meta            = { description = "VEH_MINES_TT" },
 		translate_label = true,
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.mines.enabled
-			end,
-			callback = function()
-				optionPopup.callback    = minesOptions
-				optionPopup.label       = _T("VEH_MINES")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = minesOptions }
 	}
 )
 vehicleTab:AddBoolCommand("VEH_DEFAULT_RADIO",
@@ -529,16 +473,7 @@ vehicleTab:AddBoolCommand("VEH_DEFAULT_RADIO",
 		gvar_key        = "features.vehicle.default_station.enabled",
 		meta            = { description = "VEH_DEFAULT_RADIO_TT" },
 		translate_label = true,
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.default_station.enabled
-			end,
-			callback = function()
-				optionPopup.callback    = defaultStationOptions
-				optionPopup.label       = _T("VEH_DEFAULT_RADIO")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = defaultStationOptions }
 	}
 )
 vehicleTab:AddBoolCommand("VEH_MANUAL_GEARBOX",
@@ -554,16 +489,7 @@ vehicleTab:AddBoolCommand("VEH_MANUAL_GEARBOX",
 			if (not PV:IsValid()) then return end
 			PV.m_manual_gearbox:Reset()
 		end,
-		options_data    = {
-			condition = function()
-				return GVars.features.vehicle.manual_gearbox.enabled
-			end,
-			callback = function()
-				optionPopup.callback    = gearboxOptions
-				optionPopup.label       = _T("VEH_MANUAL_GEARBOX")
-				optionPopup.should_draw = true
-			end
-		}
+		ctx_data        = { callback = gearboxOptions }
 	}
 )
 
@@ -577,19 +503,6 @@ vehicleTab:RegisterGUI(function()
 		GVars.features.vehicle.performance_only,
 		{ tooltip = _T("VEH_PERF_ONLY_TT") }
 	)
-
-	if (optionPopup.should_draw) then
-		ImGui.OpenPopup(optionPopup.label)
-		optionPopup.should_draw = false
-	end
-
-	ImGui.SetNextWindowSizeConstraints(520, 140, 800, 600)
-	if (optionPopup.callback and ImGui.BeginPopupModal(optionPopup.label, true, optionPopup.flags)) then
-		ImGui.PushItemWidth(400)
-		optionPopup.callback()
-		ImGui.PopItemWidth()
-		ImGui.EndPopup()
-	end
 end)
 
 --#region Handling Editor

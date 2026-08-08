@@ -32,7 +32,7 @@ end
 function AutoHeal:ShouldRun()
 	return (GVars.features.self.autoheal.enabled
 		and LocalPlayer:IsAlive()
-		and not Backend:IsPlayerSwitchInProgress()
+		and not Game.IsPlayerSwitchInProgress()
 		and not script.is_active("maintransition")
 	)
 end

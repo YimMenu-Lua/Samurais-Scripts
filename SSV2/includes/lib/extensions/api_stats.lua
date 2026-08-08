@@ -114,3 +114,66 @@ function stats.set_date(stat_name, date)
 	free(ptr)
 	return success
 end
+
+---@param stat_name string
+---@param bit_pos integer
+---@return integer
+function stats.get_bit(stat_name, bit_pos)
+	return (stats.get_int(stat_name) >> bit_pos) & 1
+end
+
+---@param stat_name string
+---@param bit_pos integer
+function stats.set_bit(stat_name, bit_pos)
+	stats.set_int(stat_name, Bit.Set(stats.get_int(stat_name), bit_pos))
+end
+
+---@param stat_name string
+---@param bit_pos integer
+function stats.clear_bit(stat_name, bit_pos)
+	stats.set_int(stat_name, Bit.Clear(stats.get_int(stat_name), bit_pos))
+end
+
+---@param stat_name string
+---@param bit_pos integer
+---@param toggle boolean
+function stats.toggle_bit(stat_name, bit_pos, toggle)
+	stats.set_int(stat_name, Bit.Toggle(stats.get_int(stat_name), bit_pos, toggle))
+end
+
+---@param stat_name string
+---@param bit_pos integer
+function stats.flip_bit(stat_name, bit_pos)
+	stats.set_int(stat_name, Bit.Flip(stats.get_int(stat_name), bit_pos))
+end
+
+---@param stat_name string
+---@param bits integer[]
+function stats.set_bits(stat_name, bits)
+	local v = stats.get_int(stat_name)
+	for _, bit_pos in ipairs(bits) do
+		v = Bit.Set(v, bit_pos)
+	end
+	stats.set_int(stat_name, v)
+end
+
+---@param stat_name string
+---@param bits integer[]
+function stats.clear_bits(stat_name, bits)
+	local v = stats.get_int(stat_name)
+	for _, bit_pos in ipairs(bits) do
+		v = Bit.Clear(v, bit_pos)
+	end
+	stats.set_int(stat_name, v)
+end
+
+---@param stat_name string
+---@param bits integer[]
+---@param toggle boolean
+function stats.toggle_bits(stat_name, bits, toggle)
+	local v = stats.get_int(stat_name)
+	for _, bit_pos in ipairs(bits) do
+		v = Bit.Toggle(v, bit_pos, toggle)
+	end
+	stats.set_int(stat_name, v)
+end

@@ -146,6 +146,8 @@ A full list of available features and their usage [can be found here](docs/Featu
 | <a href="https://github.com/shinywasabi"><img height="40" width="40" alt="Arthur" src="https://avatars.githubusercontent.com/shinywasabi"><br/>ShinyWasabi</a> | [scrDbg](https://github.com/ShinyWasabi/scrDbg) and other foundational community contributions frequently used as reference |
 | <a href="https://github.com/durtyfree"><img height="40" width="40" alt="DurtyFree" src="https://avatars.githubusercontent.com/durtyfree"><br/>Alexander Schmid</a> | [GTA V data dumps](https://github.com/DurtyFree/gta-v-data-dumps) |
 | <a href="https://github.com/yimura"><img height="40" width="40" alt="Yimura" src="https://avatars.githubusercontent.com/yimura"><br/>Andreas Maerten</a> | GTA V classes (archived/removed) |
+| <a href="https://github.com/sch-lda"><img height="40" width="40" alt="SCH" src="https://avatars.githubusercontent.com/sch-lda"><br/>sch-lda (SCH)</a> | [MiniGameHack](https://github.com/YimMenu-Lua/MiniGameHack) |
+| <a href="https://github.com/TCRoid"><img height="40" width="40" alt="TCRoid" src="https://avatars.githubusercontent.com/TCRoid"><br/>TCRoid (Rostal)</a> | [SoloMissions](https://github.com/YimMenu-Lua/SoloMissions) |
 | <a href="https://unknowncheats.me"><img height="40" width="40" alt="UC" src="https://avatars.githubusercontent.com/u/29552835"><br/>UnknownCheats</a> | A treasure trove of information |
 
 ## TODO

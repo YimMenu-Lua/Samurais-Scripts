@@ -7,6 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
+---@diagnostic disable: invisible
 local COL_GREY <const>          = Color("#636363")
 local side_button_size          = vec2:new(140, 35)
 local init_g_addr               = 0
@@ -14,6 +15,7 @@ local init_l_addr               = 0
 local g_offset_count            = 0
 local l_offset_count            = 0
 local l_scr_name                = ""
+local gxt_buff                  = { c = false, v = "", r = "" }
 local selected_g_type_idx       = 1
 local selected_l_type_idx       = 1
 local selected_entity_type      = 1
@@ -294,7 +296,7 @@ local function DrawGlobalsAndLocals()
 	ImGui.Text("Type:")
 	for i, gtype in ipairs(accessor_read_types) do
 		ImGui.SameLine()
-		ImGui.PushID("GlobalType##" .. i)
+		ImGui.PushID(i)
 		selected_g_type_idx, _ = ImGui.RadioButton(tostring(gtype), selected_g_type_idx, i)
 		ImGui.PopID()
 	end
@@ -417,7 +419,7 @@ local function DrawTranslatorDebug()
 	ImGui.TextDisabled("You can switch between available languages in Settings -> General.")
 	ImGui.Spacing()
 
-	local locales = Translator.locales
+	local locales = Translator.m_locales
 	local state   = Translator:GetState()
 	local idx     = GVars.backend.language_index
 	local iso     = locales[idx]
@@ -446,7 +448,7 @@ local function DrawTranslatorDebug()
 	ImGui.EndDisabled()
 
 	if (GUI:Button("Dump Labels")) then
-		print(Translator.labels)
+		print(Translator.m_labels)
 	end
 
 	if (GUI:Button("Dump Locales")) then
@@ -456,6 +458,19 @@ local function DrawTranslatorDebug()
 	if (GUI:Button("Dump Cache")) then
 		print(Translator:GetCache())
 	end
+
+	ImGui.Separator()
+	ImGui.Spacing()
+	gxt_buff.v, gxt_buff.c = ImGui.InputText("GXT Translator", gxt_buff.v, 64, ImGuiInputTextFlags.EnterReturnsTrue)
+	if (gxt_buff.c) then
+		ThreadManager:Run(function(s)
+			gxt_buff.r = Translator:TranslateGXT(gxt_buff.v)
+			gxt_buff.v = ""
+		end)
+	end
+
+	ImGui.Text(_F("Result: %s", gxt_buff.r))
+	ImGui.Spacing()
 end
 
 local function PopulateVehlistOnce()

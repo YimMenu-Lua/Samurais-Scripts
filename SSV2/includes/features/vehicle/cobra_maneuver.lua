@@ -25,8 +25,7 @@ end
 
 function CobraManeuver:Init()
 	self.m_is_active = false
-
-	KeyManager:RegisterKeybind(eVirtualKeyCodes.X, function()
+	KeyManager:RegisterKeybind(GVars.keybinds.cobra_maneuver, function()
 		self:Main()
 	end)
 end

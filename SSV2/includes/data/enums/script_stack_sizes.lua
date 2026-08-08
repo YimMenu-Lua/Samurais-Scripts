@@ -1,0 +1,42 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
+---@enum eScriptStackSize
+local eScriptStackSize <const> = {
+	MICRO                = 128,
+	MINI                 = 512,
+	DEFAULT              = 1424,
+	SPECIAL_ABILITY      = 1828,
+	FRIEND               = 2050,
+	SHOP                 = 2324,
+	CELLPHONE            = 2600,
+	VEHICLE_SPAWN        = 3568,
+	CAR_MOD_SHOP         = 3750,
+	PAUSE_MENU_SCRIPT    = 3076,
+	APP_INTERNET         = 4592,
+	MULTIPLAYER_MISSION  = 5050,
+	CONTACTS_APP         = 4000,
+	INTERACTION_MENU     = 9800,
+	SCRIPT_XML           = 8344,
+	PROPERTY_INT         = 19400,
+	ACTIVITY_CREATOR_INT = 15900,
+	SMPL_INTERIOR        = 2512,
+	WAREHOUSE            = 14100,
+	IE_DELIVERY          = 2324,
+	SHOP_CONTROLLER      = 3800,
+	AM_MP_YACHT          = 5000,
+	INGAMEHUD            = 4600,
+	TRANSITION           = 8032,
+	FMMC_LAUNCHER        = 28000,
+	MULTIPLAYER_FREEMODE = 92500,
+	MISSION              = 64500,
+	MP_LAUNCH_SCRIPT     = 35250,
+}
+
+return eScriptStackSize

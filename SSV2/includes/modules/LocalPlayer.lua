@@ -16,7 +16,7 @@ local Katana       = require("includes.features.self.katana")
 local miscFeatures = require("includes.features.self.miscellaneous")
 local CPed         = require("includes.classes.gta.CPed")
 local YimActions   = require("includes.features.extra.yim_actions.YimActionsV3")
-local YRV3         = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local BusinessMgr  = require("includes.features.online.business_mgr.BusinessManager")
 
 
 --------------------------------------
@@ -285,15 +285,15 @@ function LocalPlayer:IsBeingArrested()
 end
 
 -- Teleports local player to the provided coordinates.
----@param where (integer|vec3)? -- [blip ID](https://wiki.rage.mp/wiki/Blips) or vector3 coordinates
+---@param where (integer|vec3) -- [blip ID](https://wiki.rage.mp/wiki/Blips) or vector3 coordinates
 ---@param keepVehicle? boolean
 ---@param loadGround? boolean
 function LocalPlayer:Teleport(where, keepVehicle, loadGround)
 	ThreadManager:Run(function()
-		if (not self:IsOutside()) then
-			Notifier:ShowError(_T("GENERIC_TELEPORT"), _T("GENERIC_TP_INTERIOR_ERR"))
-			return
-		end
+		-- if (not self:IsOutside()) then
+		-- 	Notifier:ShowError(_T("GENERIC_TELEPORT"), _T("GENERIC_TP_INTERIOR_ERR"))
+		-- 	return
+		-- end
 
 		local coords = Game.Ensure3DCoords(where)
 		if (not coords or coords:is_zero()) then
@@ -549,10 +549,7 @@ function LocalPlayer.ForceCloudSave()
 	STATS.STAT_SAVE(0, false, 3, false)
 end
 
----@param bossType int8_t
----| -1: Retire
----| 0: VIP/CEO
----| 1: MC
+---@param bossType eBossType
 function LocalPlayer:RegisterAsBoss(bossType)
 	if (not Game.IsOnline()) then
 		return
@@ -563,14 +560,14 @@ function LocalPlayer:RegisterAsBoss(bossType)
 	end
 
 	if (self:IsBoss()) then
-		if (bossType == -1) then
+		if (bossType == Enums.eBossType.NONE) then
 			self:Retire()
 		end
 		-- no smart boss switch. must explicitly retire then register again
 		return
 	end
 
-	if (bossType == 1 and not YRV3:GetClubhouse()) then
+	if (bossType == Enums.eBossType.MC and not BusinessMgr:GetClubhouse()) then
 		Notifier:ShowError("Business Manager", _T("YRV3_CLUBHOUSE_NOT_OWNED"))
 		return
 	end

@@ -9,7 +9,8 @@
 
 ---@diagnostic disable: lowercase-global
 
-local Set = require("includes.classes.Set")
+local Set     = require("includes.classes.Set")
+local Keybind = require("includes.structs.Keybind")
 
 
 --#region defs
@@ -237,38 +238,54 @@ local KeyUpMessageSet <const>   = Set(
 
 --#region Key
 
+-- I got tired of juggling keyboard and controller keys.
+--
+-- For controller, we have to have a table with the PAD key
+--
+-- and its name because I'm not adding another giant map to
+--
+-- resolve gamepad keys. Keyboard keys can be simple (VK key or string)
+--
+-- and our [Key](lua://Key) object stores both the name and the code
+--
+-- so this generic key is yet another duct-taped abstraction to unify both
+--
+-- into a simple and serialization-friendly object.
+
+-- Class representing a generic key.
+---@class GenericKey
+---@field name string
+---@field code integer
+
 --------------------------------------
--- Struct: Key
+-- Class: Key
 --------------------------------------
 ---@ignore
----@class Key
----@field m_code integer https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
----@field m_name string The key name
----@field callback function
----@field m_repeat_on_hold boolean
----@field m_pressed boolean
----@field m_just_pressed boolean
----@field m_just_released boolean
----@field protected m_prev_pressed boolean
-local Key <const> = {}
-Key.__index       = Key
+---@class VirtualKey: GenericKey
+---@field public code integer https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+---@field public name string The key name
+---@field private m_pressed boolean
+---@field private m_just_pressed boolean
+---@field private m_just_released boolean
+---@field private m_prev_pressed boolean
+local VirtualKey <const> = {}
+VirtualKey.__index       = VirtualKey
 
 ---@param code integer
 ---@param name string
-function Key.new(code, name)
+function VirtualKey.new(code, name)
 	return setmetatable({
-		m_code           = code,
-		m_name           = name,
-		m_pressed        = false,
-		m_prev_pressed   = false,
-		m_just_pressed   = false,
-		m_just_released  = false,
-		m_repeat_on_hold = false,
-	}, Key)
+		code            = code,
+		name            = name,
+		m_pressed       = false,
+		m_prev_pressed  = false,
+		m_just_pressed  = false,
+		m_just_released = false,
+	}, VirtualKey)
 end
 
 ---@param state boolean
-function Key:UpdateState(state)
+function VirtualKey:UpdateState(state)
 	if (state and self.m_pressed) then
 		return
 	end
@@ -276,13 +293,13 @@ function Key:UpdateState(state)
 	self.m_pressed = state
 end
 
-function Key:BeginFrame()
+function VirtualKey:BeginFrame()
 	self.m_just_pressed  = self.m_pressed and not self.m_prev_pressed
 	self.m_just_released = not self.m_pressed and self.m_prev_pressed
 	self.m_prev_pressed  = self.m_pressed
 end
 
-function Key:EndFrame() end -- redundant
+function VirtualKey:EndFrame() end -- redundant
 
 --#endregion
 
@@ -293,10 +310,10 @@ function Key:EndFrame() end -- redundant
 -- Class: KeyManager
 --------------------------------------
 ---@class KeyManager : Callable<KeyManager>
----@field private m_keys Key[]
----@field private m_keymap_by_code table<eVirtualKeyCodes, Key>
----@field private m_keymap_by_name table<string, Key>
----@field private m_registered_keybinds table<eVirtualKeyCodes, Key>
+---@field private m_virtual_keys VirtualKey[]
+---@field private m_vk_map_by_code table<eVirtualKeyCodes, VirtualKey>
+---@field private m_vk_map_by_name table<string, VirtualKey>
+---@field private m_registered_keybinds table<string, Keybind>
 ---@field private m_initialized boolean
 ---@overload fun(): KeyManager
 local KeyManager = Callable("KeyManager")
@@ -305,16 +322,16 @@ function KeyManager:init()
 	if (self.m_initialized) then return self end
 	if (_G.KeyManager) then return _G.KeyManager end
 
-	self.m_keys                = {}
+	self.m_virtual_keys        = {}
+	self.m_vk_map_by_code      = {}
+	self.m_vk_map_by_name      = {}
 	self.m_registered_keybinds = {}
-	self.m_keymap_by_code      = {}
-	self.m_keymap_by_name      = {}
 
 	for name, code in pairs(eVirtualKeyCodes) do
-		local key = Key.new(code, name)
-		table.insert(self.m_keys, key)
-		self.m_keymap_by_code[code] = key
-		self.m_keymap_by_name[name] = key
+		local key = VirtualKey.new(code, name)
+		table.insert(self.m_virtual_keys, key)
+		self.m_vk_map_by_code[code] = key
+		self.m_vk_map_by_name[name] = key
 	end
 
 	event.register_handler(menu_event.Wndproc, function(_, msg, wParam, _)
@@ -332,10 +349,9 @@ function KeyManager:init()
 	return self
 end
 
--- still not perfectly in sync but much better than the duct taped approach of manually clearing just_pressed in a separate fiber 🤦‍♂️
 ---@private
 function KeyManager:BeginFrame()
-	for _, key in pairs(self.m_keys) do
+	for _, key in ipairs(self.m_virtual_keys) do
 		key:BeginFrame()
 	end
 end
@@ -360,21 +376,7 @@ end
 ---@private
 function KeyManager:HandleCallbacks()
 	for _, key in pairs(self.m_registered_keybinds) do
-		if (not key.callback) then
-			goto continue
-		end
-
-		if (not key.m_repeat_on_hold) then
-			if (key.m_just_pressed) then
-				key.callback()
-			end
-		else
-			if (key.m_pressed) then
-				key.callback()
-			end
-		end
-
-		::continue::
+		key:OnTick()
 	end
 end
 
@@ -399,27 +401,27 @@ function KeyManager:EventHandler(_, msg, wParam, _)
 end
 
 ---@param code eVirtualKeyCodes
----@return Key|nil
+---@return VirtualKey?
 function KeyManager:GetKeyByCode(code)
 	if (not code) then
 		return
 	end
 
-	return self.m_keymap_by_code[code]
+	return self.m_vk_map_by_code[code]
 end
 
 ---@param name string
----@return Key|nil
+---@return VirtualKey?
 function KeyManager:GetKeyByName(name)
 	if (not name) then
 		return
 	end
 
-	return self.m_keymap_by_name[name:upper()]
+	return self.m_vk_map_by_name[name:upper()]
 end
 
 ---@param key eVirtualKeyCodes|string
-function KeyManager:GetKey(key)
+function KeyManager:GetVirtualKey(key)
 	if (type(key) == "number") then
 		return self:GetKeyByCode(key)
 	elseif (type(key) == "string") then
@@ -432,29 +434,50 @@ function KeyManager:GetCurrentControlType()
 	return PAD.IS_USING_KEYBOARD_AND_MOUSE(0) and eControlType.KEYBOARD or eControlType.CONTROLLER
 end
 
+---@diagnostic disable: invisible
+
 ---@param key eVirtualKeyCodes|string
 ---@return boolean
 function KeyManager:IsKeyPressed(key)
-	local _key = self:GetKey(key)
+	local _key = self:GetVirtualKey(key)
 	return _key and _key.m_pressed or false
 end
 
 ---@param key eVirtualKeyCodes|string
 ---@return boolean
 function KeyManager:IsKeyJustPressed(key)
-	local _key = self:GetKey(key)
+	local _key = self:GetVirtualKey(key)
 	return _key and _key.m_just_pressed or false
 end
 
----@return boolean, eVirtualKeyCodes|nil, string|nil
+---@return boolean, eVirtualKeyCodes? keyCode, string? keyName
 function KeyManager:IsAnyKeyPressed()
-	for _, key in ipairs(self.m_keys) do
-		if key.m_pressed then
-			return true, key.m_code, key.m_name
+	for _, key in ipairs(self.m_virtual_keys) do
+		if (key.m_pressed) then
+			return true, key.code, key.name
 		end
 	end
+	return false
+end
 
-	return false, nil, nil
+---@return boolean, eVirtualKeyCodes? keyCode, string? keyName
+function KeyManager:IsAnyKeyJustPressed()
+	for _, key in ipairs(self.m_virtual_keys) do
+		if (key.m_just_pressed) then
+			return true, key.code, key.name
+		end
+	end
+	return false
+end
+
+---@return boolean, eVirtualKeyCodes? keyCode, string? keyName
+function KeyManager:IsAnyKeyJustReleased()
+	for _, key in ipairs(self.m_virtual_keys) do
+		if (key.m_just_released) then
+			return true, key.code, key.name
+		end
+	end
+	return false
 end
 
 ---@param key eVirtualKeyCodes|string
@@ -466,36 +489,27 @@ end
 ---@param key eVirtualKeyCodes|string
 ---@return boolean
 function KeyManager:IsKeyJustReleased(key)
-	local _key = self:GetKey(key)
+	local _key = self:GetVirtualKey(key)
 	return _key and _key.m_just_released or false
 end
 
+---@diagnostic enable: invisible
+
 ---@param restoreOnFail boolean Automatically reset to default if assertion fails
 ---@param keyPath string Keybind path as registered in the [Config](lua://Config) table. Example: `"keyboard_keybinds.nos"`
----@param default? string|table Default key to fallback to. A string for keyboard keybinds and a table for controller keybinds.
+---@param default? Keybind
 ---@return boolean
 function KeyManager:AssertKeybind(restoreOnFail, keyPath, default)
 	local default_cfg = Serializer:GetDefaultConfig()
-	default           = default or table.get_nested_value(default_cfg, keyPath)
+	default           = default or table.get_nested_value(default_cfg, keyPath) ---@type Keybind?
 
 	if (not default) then
 		log.ferror("[KeyManager]: Assertion failed for keybind at '%s': No default value!", keyPath)
 		return false
 	end
 
-	local runtime      = table.get_nested_value(GVars, keyPath)
-	local runtime_type = type(runtime)
-	local success      = runtime ~= nil and runtime_type == type(default)
-
-	if (success) then
-		if (runtime_type == "number") then
-			success = runtime ~= 0
-		elseif (runtime_type == "string") then
-			success = string.isvalid(runtime) and string.lower(runtime) ~= "unbound"
-		elseif (runtime_type == "table") then
-			success = runtime.code ~= 0
-		end
-	end
+	local runtime = table.get_nested_value(GVars, keyPath) ---@type Keybind?
+	local success = (runtime and not runtime:IsDummy()) or false
 
 	if (not success and restoreOnFail) then
 		table.set_nested_value(GVars, keyPath, default)
@@ -505,25 +519,10 @@ function KeyManager:AssertKeybind(restoreOnFail, keyPath, default)
 	return success
 end
 
----@param keybindName string
----@return eControlType, (integer|string)?
-function KeyManager:GetKeybind(keybindName)
-	local control = self:GetCurrentControlType()
-	local key     = nil
-	if (control == eControlType.KEYBOARD) then
-		key = GVars.keyboard_keybinds[keybindName]
-	end
-
-	if (control == eControlType.CONTROLLER) then
-		local gpad_t = GVars.gamepad_keybinds[keybindName]
-		if (type(gpad_t) ~= "table" or not gpad_t.code) then
-			key = 0
-		else
-			key = gpad_t.code
-		end
-	end
-
-	return control, key
+---@param gvar_key string
+---@return eControlType, Keybind?
+function KeyManager:GetKeybind(gvar_key)
+	return self:GetCurrentControlType(), GVars.keybinds[gvar_key]
 end
 
 ---@param keybindName string
@@ -533,52 +532,42 @@ function KeyManager:IsKeybindPressed(keybindName)
 		return false
 	end
 
-	local controlType, key = self:GetKeybind(keybindName)
-	if (not key) then return false end
-
-	if (controlType == eControlType.KEYBOARD) then
-		return self:IsKeyPressed(key)
+	local _, keybind = self:GetKeybind(keybindName)
+	if (not keybind) then
+		return false
 	end
 
-	if (controlType == eControlType.CONTROLLER and type(key) == "number") then
-		return key ~= 0 and PAD.IS_CONTROL_PRESSED(0, key)
-	end
-
-	return false
+	return keybind:IsPressed()
 end
 
 ---@param keybindName string
 ---@return boolean
 function KeyManager:IsKeybindJustPressed(keybindName)
-	local controlType, key = self:GetKeybind(keybindName)
-	if (not key) then return false end
-
-	if (controlType == eControlType.KEYBOARD) then
-		return self:IsKeyJustPressed(key)
+	if (Backend:AreControlsDisabled()) then
+		return false
 	end
 
-	if (controlType == eControlType.CONTROLLER and type(key) == "number") then
-		return key ~= 0 and PAD.IS_CONTROL_JUST_PRESSED(0, key)
+	local _, keybind = self:GetKeybind(keybindName)
+	if (not keybind) then
+		return false
 	end
 
-	return false
+	return keybind:IsJustPressed()
 end
 
 ---@param keybindName string
 ---@return boolean
 function KeyManager:IsKeybindJustReleased(keybindName)
-	local controlType, key = self:GetKeybind(keybindName)
-	if (not key) then return false end
-
-	if (controlType == eControlType.KEYBOARD) then
-		return self:IsKeyJustReleased(key)
+	if (Backend:AreControlsDisabled()) then
+		return false
 	end
 
-	if (controlType == eControlType.CONTROLLER and type(key) == "number") then
-		return key ~= 0 and PAD.IS_CONTROL_JUST_RELEASED(0, key)
+	local _, keybind = self:GetKeybind(keybindName)
+	if (not keybind) then
+		return false
 	end
 
-	return false
+	return keybind:IsJustReleased()
 end
 
 ---@param keybindName string
@@ -587,70 +576,87 @@ function KeyManager:IsKeybindReleased(keybindName)
 	return not self:IsKeybindPressed(keybindName)
 end
 
--- Non-persistent. Registers a keybind once for this session.
----@param key eVirtualKeyCodes | string
----@param callback function
----@param onKeyDown? boolean Set to true to loop the callback on key down. Ignore or set to false to execute once on key up only.
-function KeyManager:RegisterKeybind(key, callback, onKeyDown)
-	if (onKeyDown == nil) then
-		onKeyDown = false
-	end
-
-	local __key = self:GetKey(key)
-	if (not __key or not __key.m_code) then
-		log.fwarning("[KeyManager]: Attempt to register a keybind to an unknown key %s", key)
+---@param keybind Keybind
+---@param callback? function
+function KeyManager:RegisterKeybind(keybind, callback)
+	if (Keybind.IsRawTable(keybind)) then
+		Backend:debug("Ignored junk keybind %s", table.serialize(keybind))
 		return
 	end
 
-	if (type(callback) ~= "function") then
-		log.fwarning("[KeyManager]: Keybind registration for %s was rejected. No callback.", __key.m_name:upper())
+	if (type(callback) == "function") then
+		keybind:SetCallback(callback)
 	end
 
-	if (self.m_registered_keybinds[__key.m_code]) then
-		log.fwarning(
-			"[KeyManager]: Key '%s' was already assigned to a different function! Did you mean to overwrite it?",
-			__key.m_name:upper())
-	end
-
-	__key.callback = callback
-	__key.m_repeat_on_hold = onKeyDown
-	self.m_registered_keybinds[__key.m_code] = __key
+	self.m_registered_keybinds[keybind:GetName()] = keybind
 end
 
--- Updates a runtime keybind *(unrelated to persistent feature keybinds)*.
----@param oldKey eVirtualKeyCodes | string
----@param newKey { id: eVirtualKeyCodes | string, newCallback: function }
-function KeyManager:UpdateKeybind(oldKey, newKey)
-	local k = self:GetKey(oldKey)
-	if (not k or not k.m_code) then
-		return
-	end
+---@param name string
+---@param keyCode eVirtualKeyCodes
+---@param isController boolean
+---@param kwargs? KeybindKeywordArgs
+---@return Keybind?
+function KeyManager:RegisterKeybindByCode(name, keyCode, isController, kwargs)
+	local keyName = isController and Game.GetControllerKeyByCode(keyCode) or (self:GetKeyByCode(keyCode) or {}).name
+	if (not keyName) then return end
 
-	local registered = self.m_registered_keybinds[k.m_code]
+	local bind    = { key = { name = keyName, code = keyCode } } ---@type Keybinding
+	local keybind = Keybind:new(name, {
+		keyboard_binding   = isController and nil or bind,
+		controller_binding = isController and bind or nil,
+	}, kwargs)
+
+
+	self.m_registered_keybinds[name] = keybind
+	return keybind
+end
+
+---@param name string
+---@param keyName string
+---@param isController boolean
+---@param kwargs? KeybindKeywordArgs
+---@return Keybind?
+function KeyManager:RegisterKeybindByName(name, keyName, isController, kwargs)
+	local keyCode = isController and Game.GetControllerKeyByName(keyName) or (self:GetKeyByName(keyName) or {}).code
+	if (not keyCode) then return end
+
+	local bind    = { key = { name = keyName, code = keyCode } } ---@type Keybinding
+	local keybind = Keybind:new(name, {
+		keyboard_binding   = isController and nil or bind,
+		controller_binding = isController and bind or nil,
+	}, kwargs)
+
+
+	self.m_registered_keybinds[name] = keybind
+	return keybind
+end
+
+-- Updates a runtime keybind.
+---@param name string
+---@param newKey GenericKey|VirtualKey
+---@param isController boolean
+---@param callback function?
+function KeyManager:UpdateKeybind(name, newKey, isController, callback)
+	local registered = self.m_registered_keybinds[name]
 	if (not registered) then
 		return
 	end
 
-	local callback, on_key_down = registered.callback, registered.m_repeat_on_hold
-	if (type(newKey.newCallback) == "function") then
-		callback = newKey.newCallback
+	if (isController) then
+		registered:SetKeyboardBinding(newKey)
+	else
+		registered:SetControllerBinding(newKey)
 	end
 
-	self:RemoveKeybind(oldKey)
-	self:RegisterKeybind(newKey.id, callback, on_key_down)
+	if (type(callback) == "function") then
+		registered:SetCallback(callback)
+	end
 end
 
--- Removes a runtime keybind *(unrelated to persistent feature keybinds)*.
----@param key eVirtualKeyCodes | string
-function KeyManager:RemoveKeybind(key)
-	local k = self:GetKey(key)
-	if (not k or not k.m_code) then
-		return
-	end
-
-	k.callback = nil
-	k.m_repeat_on_hold = false
-	self.m_registered_keybinds[k.m_code] = nil
+-- Removes a runtime keybind.
+---@param name string
+function KeyManager:RemoveKeybind(name)
+	self.m_registered_keybinds[name] = nil
 end
 
 --#endregion

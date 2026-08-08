@@ -12,6 +12,22 @@ local World       = require("includes.modules.World")
 local Set         = require("includes.classes.Set")
 
 
+local function LaserSightsToggleCB()
+	ThreadManager:Run(function()
+		if (not PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetID())) then
+			return
+		end
+
+		GVars.features.weapon.laser_sights.enabled = not GVars.features.weapon.laser_sights.enabled
+		AUDIO.PLAY_SOUND_FRONTEND(
+			-1,
+			"TARGET_COUNTER_TICK",
+			"DLC_SM_GENERIC_MISSION_SOUNDS",
+			false
+		)
+	end)
+end
+
 ---@class LaserSights : FeatureBase
 ---@field private m_entity LocalPlayer
 ---@field private m_is_active boolean
@@ -47,25 +63,7 @@ end
 
 function LaserSights:Init()
 	self.m_is_active = false
-	KeyManager:RegisterKeybind(
-		GVars.features.weapon.laser_sights.keybind,
-		function()
-			ThreadManager:Run(function()
-				if (not PLAYER.IS_PLAYER_FREE_AIMING(LocalPlayer:GetID())) then
-					return
-				end
-
-				GVars.features.weapon.laser_sights.enabled = not GVars.features.weapon.laser_sights.enabled
-				AUDIO.PLAY_SOUND_FRONTEND(
-					-1,
-					"TARGET_COUNTER_TICK",
-					"DLC_SM_GENERIC_MISSION_SOUNDS",
-					false
-				)
-			end)
-		end,
-		false
-	)
+	KeyManager:RegisterKeybind(GVars.keybinds.laser_sights, LaserSightsToggleCB)
 end
 
 function LaserSights:ShouldRun()

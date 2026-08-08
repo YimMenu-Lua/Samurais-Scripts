@@ -133,10 +133,9 @@ function Ped:IsPedMyEnemy(pedHandle)
 
 	local rel1 = PED.GET_RELATIONSHIP_BETWEEN_PEDS(localHandle, pedHandle)
 	local rel2 = PED.GET_RELATIONSHIP_BETWEEN_PEDS(pedHandle, localHandle)
-	local pos  = self:GetPos(true)
+	local pos  = ENTITY.GET_ENTITY_COORDS(pedHandle, true)
 
-	return (
-		PED.IS_PED_IN_COMBAT(pedHandle, localHandle)
+	return (PED.IS_PED_IN_COMBAT(pedHandle, localHandle)
 		or PED.IS_PED_IN_COMBAT(localHandle, pedHandle)
 		or math.is_inrange(rel1, 3, 5)
 		or math.is_inrange(rel2, 3, 5)

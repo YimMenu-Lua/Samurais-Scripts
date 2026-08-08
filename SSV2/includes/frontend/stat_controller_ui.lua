@@ -123,10 +123,12 @@ local function drawBitsetEditor(mpStat, currentVal)
 					ImGui.PushStyleColor(ImGuiCol.Button, ImGui.GetStyleColorVec4(ImGuiCol.ButtonActive))
 				end
 				ImGui.SetWindowFontScale(0.8)
+				ImGui.PushID(bitPos)
 				if (ImGui.Button(enabled and "1" or "0", 23, 28)) then
 					currentVal = Bit.Toggle(currentVal, bitPos, not enabled)
 					mpStat:Set(currentVal)
 				end
+				ImGui.PopID()
 				ImGui.SetWindowFontScale(1.0)
 				if (enabled) then
 					ImGui.PopStyleColor()

@@ -58,13 +58,13 @@ eThreadStage = {
 ---@field private m_last_yield_at seconds
 ---@field private m_avg_work_ms milliseconds
 ---@field private m_avg_cycle_ms milliseconds
----@field private m_exc_handler function?
----@overload fun(name: string, callback: function, exceptionHandler?: function): Thread
+---@field private m_exc_handler? fun(msg?: string)
+---@overload fun(name: string, callback: function, exceptionHandler?: fun(msg?: string)): Thread
 local Thread = Class("Thread")
 
 ---@param name string
 ---@param callback function
----@param exceptionHandler? function
+---@param exceptionHandler? fun(msg?: string)
 function Thread.new(name, callback, exceptionHandler)
 	if (not string.isvalid(name)) then
 		name = string.random(5, true):upper()
@@ -111,7 +111,7 @@ function Thread:GetCallback()
 	return self.m_callback
 end
 
----@return function?
+---@return fun(msg?: string)?
 function Thread:GetExceptionHandler()
 	return self.m_exc_handler
 end
@@ -151,15 +151,16 @@ function Thread:IsSuspended()
 	return self.m_state == eThreadState.SUSPENDED
 end
 
----@param func function
+---@param func fun(msg?: string)?
 function Thread:RegisterExceptionHandler(func)
 	self.m_exc_handler = func
 end
 
-function Thread:OnError()
+---@param msg string?
+function Thread:OnError(msg)
 	local handler = self.m_exc_handler
 	if (not handler) then return end
-	pcall(handler)
+	pcall(handler, msg)
 end
 
 ---@param s? script_util
@@ -208,8 +209,9 @@ function Thread:OnTick(s)
 
 		if (self.m_should_terminate or not ok) then
 			if (not ok and err) then
-				log.fwarning("Thread %s was terminated due to an exception: %s", self.m_name, err)
-				self:OnError()
+				local msg = _F("Thread %s was terminated due to an exception: %s", self.m_name, err)
+				log.warning(msg)
+				self:OnError(msg)
 			end
 
 			self:Stop()
@@ -393,74 +395,10 @@ function ThreadManager:Run(func)
 	handler.dispatch(func)
 end
 
---[[
--- Fiber-safe variant of `ThreadManager:Run` that captures return values and writes them into the provided buffer (DataBuffer or table).
---
--- For single values, you can always just store a local somewhere outside the UI function then call `Run` and manually asign the value.
---
--- However with multiple values, this function is cleaner.
---
--- - **Run Example:**
---
---```Lua
--- local some_val_1 = false
--- local some_val_2 = ""
--- local function MyImGuiFunction()
--- 	ThreadManager:Run(function()
--- 		some_val_1, some_val_2 = NAMESPACE.SOME_GTA_NATIVE()
--- 	end)
---
--- 	if (some_val_1) then
--- 		ImGui.Text(some_val_2)
--- 	end
--- end
---```
---
--- - **WithBuffer Example:**
---
---```Lua
--- local myBuff = { false, "" }
--- local function MyImGuiFunction()
--- 	ThreadManager:WithBuffer(myBuff, function()
--- 		return NAMESPACE.SOME_GTA_NATIVE()
--- 	end)
---
--- 	if (myBuff[1]) then
--- 		ImGui.Text(myBuff[2])
--- 	end
--- end
---```
----@generic R1, R2, R3, R4, R5, R6, R7, R8, R9
----@param outBuff array<any>|DataBuffer|DataBuffer[] A buffer that will contain the function output. Can be a single `DataBuffer` object, an empty array, an array of arbitrary data, or an array of `DataBuffer` objects.
----@param func fun(): R1, R2?, R3?, R4?, R5?, R6?, R7?, R8?, R9?, ...?
-function ThreadManager:WithBuffer(outBuff, func)
-	if (not outBuff) then
-		return
-	end
-
-	self:Run(function()
-		if (IsInstance(outBuff, DataBuffer)) then
-			outBuff:Set(func())
-			return
-		end
-
-		local res = { func() }
-		for i = 1, #res do
-			local buff = outBuff[i]
-			if (IsInstance(buff, DataBuffer)) then
-				buff:Set(res[i])
-			else
-				outBuff[i] = res[i]
-			end
-		end
-	end)
-end
-]]
-
 -- Creates a thread that runs in a loop.
 ---@param name string
 ---@param func fun(s: script_util?)
----@param kwargs?  { suspended: boolean?, is_debug_thread: boolean?, exception_handler: function? }
+---@param kwargs?  { suspended: boolean?, is_debug_thread: boolean?, exception_handler?: fun(msg?: string)? }
 ---@return Thread?
 function ThreadManager:RegisterLooped(name, func, kwargs)
 	kwargs            = kwargs or {}

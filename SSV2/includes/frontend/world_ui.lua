@@ -7,15 +7,30 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local Audio       = require("includes.modules.Audio")
-local World       = require("includes.modules.World")
-local HideNSeek   = require("includes.features.world.HideNSeek").new()
-local Carpool     = require("includes.features.world.carpool").new()
-local EnemiesFlee = require("includes.features.EnemiesFlee")
-local KillAll     = require("includes.features.KillAllEnemies")
-local world_tab   = GUI:RegisterNewTab(Enums.eTabID.TAB_WORLD, "World")
+local Audio                         = require("includes.modules.Audio")
+local World                         = require("includes.modules.World")
+local HideNSeek                     = require("includes.features.world.HideNSeek").new()
+local Carpool                       = require("includes.features.world.carpool").new()
+local EnemiesFlee                   = require("includes.features.world.EnemiesFlee")
+local KillAll                       = require("includes.features.world.KillAllEnemies")
+local measureTextWidth              = require("includes.frontend.helpers.measure_text_width")
+local carpoolDrivingStyleSwitch     = 1
+local drivingStyle1Clicked          = false
+local drivingStyle2Clicked          = false
+local buttonWidthCache              = {}
+local buttonSize                    = vec2:new(0, 36)
+local carpoolRoofStateCases <const> = {
+	[Enums.eConvertibleRoofState.RAISED]   = "Lower",
+	[Enums.eConvertibleRoofState.LOWERING] = "Lowering",
+	[Enums.eConvertibleRoofState.LOWERED]  = "Raise",
+	[Enums.eConvertibleRoofState.RAISING]  = "Raising",
+	default                                = ""
+}
 
-world_tab:AddBoolCommand("WRLD_DISABLE_WAVES",
+
+local worldTab = GUI:RegisterNewTab(Enums.eTabID.TAB_WORLD, "TAB_WORLD", nil, nil, true)
+
+worldTab:AddBoolCommand("WRLD_DISABLE_WAVES",
 	{
 		gvar_key        = "features.world.disable_ocean_waves",
 		translate_label = true,
@@ -26,7 +41,7 @@ world_tab:AddBoolCommand("WRLD_DISABLE_WAVES",
 		end,
 	}
 )
-world_tab:AddBoolCommand("WRLD_EXTEND_BOUNDS",
+worldTab:AddBoolCommand("WRLD_EXTEND_BOUNDS",
 	{
 		gvar_key         = "features.world.extend_bounds",
 		translate_label  = true,
@@ -39,7 +54,7 @@ world_tab:AddBoolCommand("WRLD_EXTEND_BOUNDS",
 		end,
 	}
 )
-world_tab:AddBoolCommand("WRLD_FLIGHT_MUSIC",
+worldTab:AddBoolCommand("WRLD_FLIGHT_MUSIC",
 	{
 		gvar_key         = "features.world.disable_flight_music",
 		translate_label  = true,
@@ -51,7 +66,7 @@ world_tab:AddBoolCommand("WRLD_FLIGHT_MUSIC",
 		end,
 	}
 )
-world_tab:AddBoolCommand("WRLD_WANTED_MUSIC",
+worldTab:AddBoolCommand("WRLD_WANTED_MUSIC",
 	{
 		gvar_key         = "features.world.disable_wanted_music",
 		translate_label  = true,
@@ -63,7 +78,7 @@ world_tab:AddBoolCommand("WRLD_WANTED_MUSIC",
 		end,
 	}
 )
-world_tab:AddLoopedCommand("WRLD_HNS",
+worldTab:AddLoopedCommand("WRLD_HNS",
 	{
 		gvar_key         = "features.world.hide_n_seek",
 		translate_label  = true,
@@ -77,7 +92,7 @@ world_tab:AddLoopedCommand("WRLD_HNS",
 		end,
 	}
 )
-world_tab:AddLoopedCommand("WRLD_CARPOOL",
+worldTab:AddLoopedCommand("WRLD_CARPOOL",
 	{
 		gvar_key         = "features.world.carpool",
 		translate_label  = true,
@@ -92,17 +107,6 @@ world_tab:AddLoopedCommand("WRLD_CARPOOL",
 	}
 )
 
-local carpoolDrivingStyleSwitch = 1
-local drivingStyle1Clicked = false
-local drivingStyle2Clicked = false
-local carpoolRoofStateCases <const> = {
-	[Enums.eConvertibleRoofState.RAISED]   = "Lower",
-	[Enums.eConvertibleRoofState.LOWERING] = "Lowering",
-	[Enums.eConvertibleRoofState.LOWERED]  = "Raise",
-	[Enums.eConvertibleRoofState.RAISING]  = "Raising",
-	default                                = ""
-}
-
 local function ShowCarpoolControls()
 	if (not GVars.features.world.carpool or not Carpool:IsActive()) then
 		return
@@ -114,24 +118,24 @@ local function ShowCarpoolControls()
 	ImGui.Separator()
 
 	ImGui.Spacing()
-	ImGui.SeparatorText("Driving Commands:")
+	ImGui.SeparatorText(_T("GENERIC_DRIVING_COMMANDS"))
 
-	ImGui.BulletText("Driving Style:")
+	ImGui.BulletText(_T("GENERIC_DRIVING_STYLE"))
 	ImGui.SameLine()
-	carpoolDrivingStyleSwitch, drivingStyle1Clicked = ImGui.RadioButton("Chill", carpoolDrivingStyleSwitch, 1)
+	carpoolDrivingStyleSwitch, drivingStyle1Clicked = ImGui.RadioButton(_T("GENERIC_DRIVING_STYLE_NORMAL"), carpoolDrivingStyleSwitch, 1)
 
 	ImGui.SameLine()
 
-	carpoolDrivingStyleSwitch, drivingStyle2Clicked = ImGui.RadioButton("Aggressive", carpoolDrivingStyleSwitch, 2)
+	carpoolDrivingStyleSwitch, drivingStyle2Clicked = ImGui.RadioButton(_T("GENERIC_DRIVING_STYLE_AGGRO"), carpoolDrivingStyleSwitch, 2)
 
 	if (drivingStyle1Clicked or drivingStyle2Clicked) then
 		Carpool:SetDrivingStyle(carpoolDrivingStyleSwitch)
 	end
 
-	local tsk = Carpool:GetCurrentTask()
-	if GUI:Button(tsk ~= 99 and "Stop The Vehicle" or "Keep Driving") then
+	local currentTask = Carpool:GetCurrentTask()
+	if (GUI:Button(currentTask ~= 99 and _T("GENERIC_STOP") or _T("GENERIC_RESUME"))) then
 		ThreadManager:Run(function()
-			if (tsk == 99) then
+			if (currentTask == 99) then
 				Carpool:Resume()
 			else
 				Carpool:Stop()
@@ -141,53 +145,40 @@ local function ShowCarpoolControls()
 
 	ImGui.SameLine()
 
-	if GUI:Button("Cruise Around") then
-		ThreadManager:Run(function()
-			Carpool:Wander()
-		end)
+	if (GUI:Button(_T("GENERIC_WANDER"))) then
+		ThreadManager:Run(function() Carpool:Wander() end)
 	end
 
-	if GUI:Button("Drive To Waypoint") then
+	if (GUI:Button(_T("BSV2_ES_DRIVE_WP"))) then
 		ThreadManager:Run(function()
 			local wp = Game.GetWaypointCoords()
-
 			if (not wp or wp:is_zero()) then
-				Notifier:ShowError(
-					"Samurai's Scripts",
-					"Please set a waypoint on the map first!"
-				)
+				Notifier:ShowError("Carpool", "Please set a waypoint on the map first!")
 				return
 			end
 
 			Carpool:GoTo(wp)
-			Notifier:ShowMessage(
-				"Samurai's Scripts",
-				"Driving to waypoint..."
-			)
 		end)
 	end
 
 	ImGui.SameLine()
 
-	if GUI:Button("Drive To Objective") then
+	if (GUI:Button(_T("BSV2_ES_DRIVE_OBJ"))) then
 		ThreadManager:Run(function()
-			local objective_found, objective_coords = Game.GetObjectiveBlipCoords()
-			if (not objective_found) then
-				Notifier:ShowError(
-					"Samurai's Scripts",
-					"No objective found!"
-				)
+			local found, coords = Game.GetObjectiveBlipCoords()
+			if (not found) then
+				Notifier:ShowError("Carpool", "No objective found!")
 				return
 			end
 
-			Carpool:GoTo(objective_coords)
-			Notifier:ShowMessage("Samurai's Scripts", "Driving to objective...")
+			Carpool:GoTo(coords)
 		end)
 	end
 
-	if Carpool.cachedVehicleData.maxSeats > 1 then
+	local vehicleData = Carpool.cachedVehicleData
+	if (vehicleData.maxSeats > 1) then
 		ImGui.Spacing()
-		ImGui.SeparatorText("Seats:")
+		ImGui.SeparatorText(_T("BSV2_SEAT_CTRL"))
 		ImGui.Spacing()
 
 		if GUI:Button(_F("< %s", _T("VEH_SEAT_PREV"))) then
@@ -205,13 +196,13 @@ local function ShowCarpoolControls()
 	end
 
 	ImGui.Spacing()
-	ImGui.SeparatorText("Radio:")
+	ImGui.SeparatorText(_T("BSV2_RADIO_CTRL"))
 
-	if GUI:Button(Carpool.cachedVehicleData.radio.isOn and "Turn Off" or "Turn On") then
+	if (GUI:Button(_T(vehicleData.radio.isOn and "GENERIC_TURN_OFF" or "GENERIC_TURN_ON"))) then
 		ThreadManager:Run(function()
 			AUDIO.SET_VEH_RADIO_STATION(
 				Carpool:GetVehicle():GetHandle(),
-				Carpool.cachedVehicleData.radio.isOn
+				vehicleData.radio.isOn
 				and "OFF"
 				or Audio.RadioStations[math.random(1, (#Audio.RadioStations - 1))].station
 			)
@@ -219,28 +210,24 @@ local function ShowCarpoolControls()
 	end
 
 	ImGui.SameLine()
-
 	GUI:VehicleRadioCombo(
 		Carpool:GetVehicle():GetHandle(),
 		"##carpoolradio",
-		tostring(Carpool.cachedVehicleData.radio.station)
+		vehicleData.radio.station or "OFF"
 	)
 
-	if Carpool.cachedVehicleData.isConvertible then
+	if (vehicleData.isConvertible) then
 		ImGui.Spacing()
 		ImGui.SeparatorText("Convertible Roof:")
 		ImGui.Spacing()
 
-		local roofState = Carpool.cachedVehicleData.roofState
+		local roofState       = vehicleData.roofState
 		local roofButtonLabel = Match(roofState, carpoolRoofStateCases)
 		ImGui.BeginDisabled(roofState == 1 or roofState == 3)
 
-		if GUI:Button(roofButtonLabel) then
-			if Carpool.cachedVehicleData.speed > 6.66 then
-				Notifier:ShowError(
-					"Samurai's Scripts",
-					"You can not operate the convertible roof at this speed."
-				)
+		if (GUI:Button(roofButtonLabel)) then
+			if (vehicleData.speed > 6.66) then
+				Notifier:ShowError("Samurai's Scripts", "You can not operate the convertible roof at this speed.")
 				return
 			end
 
@@ -258,8 +245,7 @@ end
 
 local public_enemy_clicked = false
 local function WorldUI()
-	world_tab:GetGridRenderer():Draw()
-
+	worldTab:GetGridRenderer():Draw()
 	ImGui.Spacing()
 
 	World.m_public_enemy.m_enabled, public_enemy_clicked = GUI:CustomToggle(_T("WRLD_PUBLIC_ENEMY"),
@@ -273,22 +259,34 @@ local function WorldUI()
 		end)
 	end
 
-	ImGui.SameLine()
+	ImGui.Spacing()
 
-	if (GUI:Button(_T("WRLD_KILL_ALL"), { tooltip = _T("WRLD_KILL_ALL_TT") })) then
+	local lang_idx = GVars.backend.language_index
+	local buttonWidth = buttonWidthCache[lang_idx]
+	if (not buttonWidth) then
+		buttonWidth = measureTextWidth({
+			_T("WRLD_KILL_ALL"),
+			_T("WRLD_FLEE_ALL")
+		}, 20.0)
+		buttonWidthCache[lang_idx] = buttonWidth
+		buttonSize.x = buttonWidth
+	end
+
+	ImGui.Spacing()
+
+	if (GUI:Button(_T("WRLD_KILL_ALL"), { size = buttonSize, tooltip = _T("WRLD_KILL_ALL_TT") })) then
 		KillAll:OnClick()
 	end
 
-	ImGui.SameLine()
-
-	if (GUI:Button(_T("WRLD_FLEE_ALL"), { tooltip = _T("WRLD_FLEE_ALL_TT") })) then
+	if (GUI:Button(_T("WRLD_FLEE_ALL"), { size = buttonSize, tooltip = _T("WRLD_FLEE_ALL_TT") })) then
 		EnemiesFlee:OnClick()
 	end
 
 	ShowCarpoolControls()
 
 	ImGui.Spacing()
+	ImGui.Separator()
 	ImGui.TextDisabled("The world is simple. For now.")
 end
 
-world_tab:RegisterGUI(WorldUI)
+worldTab:RegisterGUI(WorldUI)

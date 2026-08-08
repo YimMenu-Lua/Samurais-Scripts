@@ -154,7 +154,7 @@ function Notification:Draw(context, x_left, content_width, pImDrawList, ease, pe
 	local alpha       = 0.0 + ease
 	local cardTL      = vec2:new(cursor.x, cursor.y + slideOffset)
 	local cardBR      = vec2:new(cursor.x + cardWidth, cursor.y + slideOffset + cardHeight)
-	local frameBG     = GVars.ui.style.theme.Colors.FrameBg
+	local frameBG     = ThemeManager:GetCurrentTheme().Colors.FrameBg
 	local windowAlpha = GVars.ui.style.bg_alpha
 	local hovered     = ImGui.IsMouseHoveringRect(cardTL.x, cardTL.y, cardBR.x, cardBR.y)
 	local mainCol     = Color(frameBG.x, frameBG.y, frameBG.z, isNotif and 1 or (windowAlpha * alpha))
@@ -742,7 +742,7 @@ function Notifier:DrawNotifications(start_pos)
 			window_pos.x + self.m_window_width - 10,
 			window_pos.y + height - 10,
 			ImGui.GetColorU32(windowBG.x, windowBG.y, windowBG.z, windowBG.w),
-			GVars.ui.style.theme.Styles.WindowRounding or 2
+			ThemeManager:GetCurrentTheme().Styles.WindowRounding or 2
 		)
 
 		ImGui.Spacing()

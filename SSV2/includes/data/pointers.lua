@@ -98,6 +98,7 @@ local mem_batches <const> = {
 		-- 	GPointers.DynamicFuncs.BreakOffVehicleWheel = _G[func_name]
 		-- end),
 	},
+
 	[BRANCH_ENHANCED] = {
 		make_batch("ScreenResolution", "75 39 0F 57 C0 F3 0F 2A 05", function(ptr)
 			GPointers.ScreenResolution.x = ptr:add(0x5):add(0x4):rip():get_word()

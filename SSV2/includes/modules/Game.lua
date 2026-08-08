@@ -7,19 +7,25 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local RawDataService       = require("includes.services.RawDataService")
-local Refs                 = require("includes.data.refs")
-local ped_hashmap <const>  = require("includes.data.ped_hashmap")
-local veh_hashmap <const>  = require("includes.data.vehicle_hashmap")
-local SP_CharIDs <const>   = {
+local RawDataService          = require("includes.services.RawDataService")
+local Refs                    = require("includes.data.refs")
+local ped_hashmap <const>     = require("includes.data.ped_hashmap")
+local veh_hashmap <const>     = require("includes.data.vehicle_hashmap")
+local SP_CharIDs <const>      = {
 	[225514697]  = 0,
 	[2602752943] = 1,
 	[2608926626] = 2,
 }
-local SP_CharNames <const> = {
+local SP_CharNames <const>    = {
 	"Michael",
 	"Franklin",
 	"Trevor",
+}
+
+local FmmcScriptNames <const> = {
+	"fm_mission_controller",
+	"fm_mission_controller_2020",
+	"fm_mission_controller_v3",
 }
 
 
@@ -69,17 +75,71 @@ function Game.GetGameTimer()
 	return MISC.GET_GAME_TIMER()
 end
 
----@return integer | nil, string | nil
-function Game.GetKeyPressed()
-	if PAD.IS_USING_KEYBOARD_AND_MOUSE(0) then
-		return nil, nil
+---@return boolean pressed, integer? padCode, string? padName
+function Game.IsAnyControllerKeyPressed()
+	if (PAD.IS_USING_KEYBOARD_AND_MOUSE(0)) then
+		return false
 	end
 
-	for _, v in ipairs(Refs.gamepadControls) do
-		if PAD.IS_CONTROL_JUST_PRESSED(0, v.ctrl) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, v.ctrl) then
-			return v.ctrl, v.gpad
+	for name, code in pairs(Refs.gamepadControls) do
+		if (PAD.IS_CONTROL_PRESSED(0, code) or PAD.IS_DISABLED_CONTROL_PRESSED(0, code)) then
+			return true, code, name
 		end
 	end
+
+	return false
+end
+
+---@return boolean justPressed, integer? padCode, string? padName
+function Game.IsAnyControllerKeyJustPressed()
+	if (PAD.IS_USING_KEYBOARD_AND_MOUSE(0)) then
+		return false
+	end
+
+	for name, code in pairs(Refs.gamepadControls) do
+		if (PAD.IS_CONTROL_JUST_PRESSED(0, code) or PAD.IS_DISABLED_CONTROL_JUST_PRESSED(0, code)) then
+			return true, code, name
+		end
+	end
+
+	return false
+end
+
+---@return boolean justPressed, integer? padCode, string? padName
+function Game.IsAnyControllerKeyJustReleased()
+	if (PAD.IS_USING_KEYBOARD_AND_MOUSE(0)) then
+		return false
+	end
+
+	for name, code in pairs(Refs.gamepadControls) do
+		if (PAD.IS_CONTROL_JUST_RELEASED(0, code) or PAD.IS_DISABLED_CONTROL_JUST_RELEASED(0, code)) then
+			return true, code, name
+		end
+	end
+
+	return false
+end
+
+---@param keyName string
+---@return integer? padCode
+function Game.GetControllerKeyByName(keyName)
+	return Refs.gamepadControls[keyName]
+end
+
+---@param padCode integer
+---@return string? keyName
+function Game.GetControllerKeyByCode(padCode)
+	return Refs.reverseGamepadControls[padCode]
+end
+
+---@return string?
+function Game.GetRunningFmmcScript()
+	for _, v in ipairs(FmmcScriptNames) do
+		if (script.is_active(v)) then
+			return v
+		end
+	end
+	return nil
 end
 
 ---@return boolean
@@ -105,6 +165,11 @@ end
 ---@return boolean
 function Game.IsInNetworkTransition()
 	return script.is_active("maintransition")
+end
+
+---@return boolean
+function Game.IsPlayerSwitchInProgress()
+	return STREAMING.IS_PLAYER_SWITCH_IN_PROGRESS()
 end
 
 ---@return boolean
@@ -1495,7 +1560,7 @@ function Game.LoadGroundAtCoord(coords)
 	return true
 end
 
----@param label string
+---@param label GXT
 function Game.GetLabelText(label)
 	return HUD.GET_FILENAME_FOR_AUDIO_CONVERSATION(label or "")
 end

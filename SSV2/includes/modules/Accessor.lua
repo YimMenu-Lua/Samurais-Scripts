@@ -237,6 +237,19 @@ function Accessor:SetBit(pos)
 end
 
 ---@param pos integer
+function Accessor:FlipBit(pos)
+	local v = self:ReadInt()
+	self:WriteInt(Bit.Flip(v, pos))
+end
+
+---@param pos integer
+---@param toggle boolean
+function Accessor:ToggleBit(pos, toggle)
+	local v = self:ReadInt()
+	self:WriteInt(Bit.Toggle(v, pos, toggle))
+end
+
+---@param pos integer
 function Accessor:ClearBit(pos)
 	local v = self:ReadInt()
 	self:WriteInt(Bit.Clear(v, pos))
@@ -262,7 +275,7 @@ end
 
 ---@param offset integer
 ---@param index integer
----@return self, integer
+---@return self, integer bitPos
 function Accessor:AtPackedBit(offset, index)
 	local bucket = index // 32
 	local bitPos = index % 32
@@ -299,6 +312,7 @@ end
 
 ---@class ScriptGlobal : Accessor
 ---@field At fun(self: ScriptGlobal, offset: integer, size?: integer): ScriptGlobal
+---@field AtPackedBit fun(self: ScriptGlobal, offset: integer, index: integer): ScriptGlobal, bitPos: integer
 ---@field __type "ScriptGlobal"
 ---@overload fun(address: integer): ScriptGlobal
 ScriptGlobal = Class("ScriptGlobal", { parent = Accessor })
@@ -315,6 +329,7 @@ end
 
 ---@class ScriptLocal : Accessor
 ---@field At fun(self: ScriptLocal, offset: integer, size?: integer): ScriptLocal
+---@field AtPackedBit fun(self: ScriptLocal, offset: integer, index: integer): ScriptLocal, bitPos: integer
 ---@field ReadString nil
 ---@field WriteString nil
 ---@field WriteUint nil
@@ -334,12 +349,12 @@ setmetatable(ScriptLocal, {
 ---@return ScriptLocal
 function ScriptLocal.new(address, script_name)
 	assert(string.isvalid(script_name), "Invalid script name for ScriptLocal!")
-	local instance               = Accessor.new(address, Enums.eAccessorType.LOCAL, script_name)
+	local instance          = Accessor.new(address, Enums.eAccessorType.LOCAL, script_name)
 	---@diagnostic disable: undefined-field
-	instance.__index.ReadString  = nil
-	instance.__index.WriteString = nil
-	instance.__index.WriteUint   = nil
-	instance.__index.__type      = "ScriptLocal"
+	instance.ReadString     = nil
+	instance.WriteString    = nil
+	instance.WriteUint      = nil
+	instance.__index.__type = "ScriptLocal"
 
 	---@diagnostic disable-next-line
 	return setmetatable(instance, ScriptLocal)

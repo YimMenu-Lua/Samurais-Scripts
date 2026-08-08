@@ -7,7 +7,7 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
-local YRV3          = require("includes.features.online.yim_resupplier.YimResupplierV3")
+local BusinessMgr   = require("includes.features.online.business_mgr.BusinessManager")
 local Pair          = require("includes.classes.Pair")
 local clicked       = false
 local searchBuffer  = ""
@@ -32,7 +32,7 @@ local function readBusinessData()
 	end
 
 	PropertyData = {}
-	for key, business in YRV3:BusinessIter() do
+	for key, business in BusinessMgr:BusinessIter() do
 		if (key == "safes") then
 			fromArray(business)
 		else
