@@ -7,7 +7,7 @@
     <img alt="License" src="https://img.shields.io/badge/License-GPL--3.0-white?style=plastic">
   </a>
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/releases/latest">
-    <img alt="Latest Release" src="https://img.shields.io/badge/Latest%20Release-v2.0.0-blue?style=plastic">
+    <img alt="Latest Release" src="https://img.shields.io/badge/Latest%20Release-v2.0.1-blue?style=plastic">
   </a>
   <a href="https://github.com/YimMenu-Lua/Samurais-Scripts/issues">
     <img alt="Issues" src="https://img.shields.io/github/issues/YimMenu-Lua/Samurais-Scripts?style=plastic">
