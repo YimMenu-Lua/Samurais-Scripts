@@ -1055,5 +1055,14 @@ return {
 	["YH_GENERIC_SKIP_CUTSCENE"] = "跳过过场动画",
 	["YH_K26_INVALID_TARGET_ERR"] = "请选择一个有效的主要目标。",
 	["YH_K26_NOT_SETUP_ERR"] = "请在您豪宅的艺术工作室中设置抢劫，然后按用户界面右上角的小按钮重新加载“HeistEditor”。",
-	["YH_SM_LOAD_ERR"] = "“SoloMissions”加载失败，当前不可用。"
+	["YH_SM_LOAD_ERR"] = "“SoloMissions”加载失败，当前不可用。",
+	["SUBTAB_FREE_SHOPPING"] = "Free Shopping",
+	["FS_ENHANCED_BUILTIN"] = "Enhanced already has Free Shopping built into YimMenuV2. Use Recovery > Main > Free Shopping.",
+	["FS_ENABLE"] = "Enable Free Shopping",
+	["FS_ENABLE_TT"] = "Applies to new purchases while enabled.",
+	["FS_DESCRIPTION"] = "Makes every purchase you make (almost) free.",
+	["FS_LEGACY_ONLY"] = "Free Shopping currently supports the Legacy Lua API only.",
+	["FS_ACTIVE"] = "Free Shopping is active.",
+	["FS_UNAVAILABLE"] = "Free Shopping unavailable",
+	["FS_DISABLED"] = "Free Shopping is disabled."
 }

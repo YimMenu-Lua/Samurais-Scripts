@@ -1055,5 +1055,14 @@ return {
 	["YH_SM_LOAD_ERR"] = "「SoloMissions」はロードに失敗したため、現在利用できません。",
 	["YH_K26_INVALID_TARGET_ERR"] = "有効なプライマリ ターゲットを選択してください。",
 	["YH_GENERIC_SKIP_CUTSCENE"] = "カットシーンをスキップ",
-	["YH_K26_NOT_SETUP_ERR"] = "邸宅のアート スタジオで強盗を設定し、UI の右上にある小さなボタンを押して「HeistEditor」をリロードしてください。"
+	["YH_K26_NOT_SETUP_ERR"] = "邸宅のアート スタジオで強盗を設定し、UI の右上にある小さなボタンを押して「HeistEditor」をリロードしてください。",
+	["FS_DESCRIPTION"] = "Makes every purchase you make (almost) free.",
+	["SUBTAB_FREE_SHOPPING"] = "Free Shopping",
+	["FS_ENABLE_TT"] = "Applies to new purchases while enabled.",
+	["FS_DISABLED"] = "Free Shopping is disabled.",
+	["FS_LEGACY_ONLY"] = "Free Shopping currently supports the Legacy Lua API only.",
+	["FS_ENHANCED_BUILTIN"] = "Enhanced already has Free Shopping built into YimMenuV2. Use Recovery > Main > Free Shopping.",
+	["FS_UNAVAILABLE"] = "Free Shopping unavailable",
+	["FS_ENABLE"] = "Enable Free Shopping",
+	["FS_ACTIVE"] = "Free Shopping is active."
 }

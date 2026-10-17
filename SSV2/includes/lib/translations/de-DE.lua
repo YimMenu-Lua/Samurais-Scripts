@@ -1055,5 +1055,14 @@ return {
 	["YH_GENERIC_SKIP_CUTSCENE"] = "Zwischensequenz überspringen",
 	["YH_K26_INVALID_TARGET_ERR"] = "Bitte wählen Sie ein gültiges primäres Ziel aus.",
 	["YH_K26_NOT_SETUP_ERR"] = "Bitte richten Sie den Raubüberfall im Kunstatelier Ihrer Villa ein und drücken Sie dann die kleine Schaltfläche oben rechts in der Benutzeroberfläche, um „HeistEditor“ neu zu laden.",
-	["YH_SM_LOAD_ERR"] = "„SoloMissions“ konnte nicht geladen werden und ist derzeit nicht verfügbar."
+	["YH_SM_LOAD_ERR"] = "„SoloMissions“ konnte nicht geladen werden und ist derzeit nicht verfügbar.",
+	["SUBTAB_FREE_SHOPPING"] = "Free Shopping",
+	["FS_DESCRIPTION"] = "Makes every purchase you make (almost) free.",
+	["FS_ENHANCED_BUILTIN"] = "Enhanced already has Free Shopping built into YimMenuV2. Use Recovery > Main > Free Shopping.",
+	["FS_ENABLE"] = "Enable Free Shopping",
+	["FS_ENABLE_TT"] = "Applies to new purchases while enabled.",
+	["FS_ACTIVE"] = "Free Shopping is active.",
+	["FS_DISABLED"] = "Free Shopping is disabled.",
+	["FS_UNAVAILABLE"] = "Free Shopping unavailable",
+	["FS_LEGACY_ONLY"] = "Free Shopping currently supports the Legacy Lua API only."
 }

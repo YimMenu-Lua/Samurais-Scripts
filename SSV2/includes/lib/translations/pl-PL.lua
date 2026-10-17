@@ -1055,5 +1055,14 @@ return {
 	["YH_SM_LOAD_ERR"] = "Nie udało się załadować misji „SoloMissions” i jest ona obecnie niedostępna.",
 	["YH_GENERIC_SKIP_CUTSCENE"] = "Pomiń przerywnik filmowy",
 	["YH_K26_NOT_SETUP_ERR"] = "Przygotuj napad w studiu artystycznym swojej rezydencji, a następnie naciśnij mały przycisk w prawym górnym rogu interfejsu, aby ponownie załadować „HeistEditor”.",
-	["YH_K26_INVALID_TARGET_ERR"] = "Wybierz prawidłowy cel główny."
+	["YH_K26_INVALID_TARGET_ERR"] = "Wybierz prawidłowy cel główny.",
+	["FS_ENABLE"] = "Enable Free Shopping",
+	["SUBTAB_FREE_SHOPPING"] = "Free Shopping",
+	["FS_ENHANCED_BUILTIN"] = "Enhanced already has Free Shopping built into YimMenuV2. Use Recovery > Main > Free Shopping.",
+	["FS_ACTIVE"] = "Free Shopping is active.",
+	["FS_ENABLE_TT"] = "Applies to new purchases while enabled.",
+	["FS_DESCRIPTION"] = "Makes every purchase you make (almost) free.",
+	["FS_UNAVAILABLE"] = "Free Shopping unavailable",
+	["FS_DISABLED"] = "Free Shopping is disabled.",
+	["FS_LEGACY_ONLY"] = "Free Shopping currently supports the Legacy Lua API only."
 }

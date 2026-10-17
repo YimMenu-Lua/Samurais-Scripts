@@ -1055,5 +1055,14 @@ return {
 	["YH_GENERIC_SKIP_CUTSCENE"] = "Sauter la cinématique",
 	["YH_K26_INVALID_TARGET_ERR"] = "Veuillez sélectionner une cible principale valide.",
 	["YH_SM_LOAD_ERR"] = "« SoloMissions » n'a pas pu être chargé et est actuellement indisponible.",
-	["YH_K26_NOT_SETUP_ERR"] = "Veuillez configurer le braquage dans le studio d'art de votre manoir, puis appuyez sur le petit bouton en haut à droite de l'interface utilisateur pour recharger « HeistEditor »."
+	["YH_K26_NOT_SETUP_ERR"] = "Veuillez configurer le braquage dans le studio d'art de votre manoir, puis appuyez sur le petit bouton en haut à droite de l'interface utilisateur pour recharger « HeistEditor ».",
+	["FS_UNAVAILABLE"] = "Free Shopping unavailable",
+	["SUBTAB_FREE_SHOPPING"] = "Free Shopping",
+	["FS_ENABLE_TT"] = "Applies to new purchases while enabled.",
+	["FS_ACTIVE"] = "Free Shopping is active.",
+	["FS_DESCRIPTION"] = "Makes every purchase you make (almost) free.",
+	["FS_ENABLE"] = "Enable Free Shopping",
+	["FS_LEGACY_ONLY"] = "Free Shopping currently supports the Legacy Lua API only.",
+	["FS_ENHANCED_BUILTIN"] = "Enhanced already has Free Shopping built into YimMenuV2. Use Recovery > Main > Free Shopping.",
+	["FS_DISABLED"] = "Free Shopping is disabled."
 }

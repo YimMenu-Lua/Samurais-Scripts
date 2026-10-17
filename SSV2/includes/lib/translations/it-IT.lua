@@ -1055,5 +1055,14 @@ return {
 	["YH_GENERIC_SKIP_CUTSCENE"] = "Salta il filmato",
 	["YH_K26_NOT_SETUP_ERR"] = "Imposta la rapina nello studio d'arte della tua villa, quindi premi il piccolo pulsante in alto a destra dell'interfaccia utente per ricaricare \"HeistEditor\".",
 	["YH_K26_INVALID_TARGET_ERR"] = "Seleziona un target primario valido.",
-	["YH_SM_LOAD_ERR"] = "Impossibile caricare \"SoloMissions\" e al momento non è disponibile."
+	["YH_SM_LOAD_ERR"] = "Impossibile caricare \"SoloMissions\" e al momento non è disponibile.",
+	["SUBTAB_FREE_SHOPPING"] = "Free Shopping",
+	["FS_DESCRIPTION"] = "Makes every purchase you make (almost) free.",
+	["FS_ENABLE_TT"] = "Applies to new purchases while enabled.",
+	["FS_ENHANCED_BUILTIN"] = "Enhanced already has Free Shopping built into YimMenuV2. Use Recovery > Main > Free Shopping.",
+	["FS_ENABLE"] = "Enable Free Shopping",
+	["FS_ACTIVE"] = "Free Shopping is active.",
+	["FS_LEGACY_ONLY"] = "Free Shopping currently supports the Legacy Lua API only.",
+	["FS_UNAVAILABLE"] = "Free Shopping unavailable",
+	["FS_DISABLED"] = "Free Shopping is disabled."
 }

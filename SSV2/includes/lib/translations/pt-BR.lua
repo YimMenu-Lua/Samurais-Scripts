@@ -1055,5 +1055,14 @@ return {
 	["YH_K26_NOT_SETUP_ERR"] = "Por favor, configure o assalto no estúdio de arte da sua mansão e pressione o pequeno botão no canto superior direito da interface para recarregar o 'HeistEditor'.",
 	["YH_SM_LOAD_ERR"] = "'SoloMissions' falhou ao carregar e está indisponível no momento.",
 	["YH_GENERIC_SKIP_CUTSCENE"] = "Pular cena",
-	["YH_K26_INVALID_TARGET_ERR"] = "Selecione um alvo principal válido."
+	["YH_K26_INVALID_TARGET_ERR"] = "Selecione um alvo principal válido.",
+	["SUBTAB_FREE_SHOPPING"] = "Free Shopping",
+	["FS_ENABLE"] = "Enable Free Shopping",
+	["FS_UNAVAILABLE"] = "Free Shopping unavailable",
+	["FS_ENABLE_TT"] = "Applies to new purchases while enabled.",
+	["FS_ENHANCED_BUILTIN"] = "Enhanced already has Free Shopping built into YimMenuV2. Use Recovery > Main > Free Shopping.",
+	["FS_ACTIVE"] = "Free Shopping is active.",
+	["FS_DESCRIPTION"] = "Makes every purchase you make (almost) free.",
+	["FS_LEGACY_ONLY"] = "Free Shopping currently supports the Legacy Lua API only.",
+	["FS_DISABLED"] = "Free Shopping is disabled."
 }

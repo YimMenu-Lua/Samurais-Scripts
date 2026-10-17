@@ -1055,5 +1055,14 @@ return {
 	["YH_GENERIC_SKIP_CUTSCENE"] = "컷신 건너뛰기",
 	["YH_SM_LOAD_ERR"] = "'SoloMissions'을 로드하지 못하여 현재 사용할 수 없습니다.",
 	["YH_K26_NOT_SETUP_ERR"] = "저택의 아트 스튜디오에서 습격을 설정한 다음 UI 오른쪽 상단에 있는 작은 버튼을 눌러 'HeistEditor'를 다시 로드하세요.",
-	["YH_K26_INVALID_TARGET_ERR"] = "유효한 기본 타겟을 선택하세요."
+	["YH_K26_INVALID_TARGET_ERR"] = "유효한 기본 타겟을 선택하세요.",
+	["FS_ENHANCED_BUILTIN"] = "Enhanced already has Free Shopping built into YimMenuV2. Use Recovery > Main > Free Shopping.",
+	["FS_ACTIVE"] = "Free Shopping is active.",
+	["SUBTAB_FREE_SHOPPING"] = "Free Shopping",
+	["FS_DESCRIPTION"] = "Makes every purchase you make (almost) free.",
+	["FS_ENABLE_TT"] = "Applies to new purchases while enabled.",
+	["FS_ENABLE"] = "Enable Free Shopping",
+	["FS_LEGACY_ONLY"] = "Free Shopping currently supports the Legacy Lua API only.",
+	["FS_UNAVAILABLE"] = "Free Shopping unavailable",
+	["FS_DISABLED"] = "Free Shopping is disabled."
 }
