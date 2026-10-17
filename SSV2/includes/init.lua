@@ -106,6 +106,7 @@ local sub_paths = {
 
 	"frontend.business_mgr.business_mgr_ui",
 	"frontend.casino_ui",
+	"frontend.free_shopping_ui",
 	"frontend.stat_controller_ui",
 	"frontend.heist_editor.heist_editor_ui",
 
