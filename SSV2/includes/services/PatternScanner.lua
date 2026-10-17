@@ -51,7 +51,15 @@ end
 -- Logs a debug messages on successful or failure.
 ---@return boolean
 function Pattern:Scan()
-	self.m_ptr     = memory.scan_pattern(self.m_sig)
+	local ok, result = pcall(memory.scan_pattern, self.m_sig)
+	if (not ok or not result) then
+		self.m_ptr     = nullptr
+		self.m_address = 0x0
+		log.fwarning("[PatternScanner]: Scan failed for %s: %s", self.m_name, tostring(result))
+		return false
+	end
+
+	self.m_ptr     = result
 	self.m_address = self.m_ptr:get_address()
 
 	if (self.m_ptr:is_null()) then

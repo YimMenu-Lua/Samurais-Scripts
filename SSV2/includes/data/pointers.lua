@@ -27,6 +27,7 @@ end
 --- A place to store functions returned from `memory.dynamic_call`
 ---@class DynamicFuncs
 ---@field BreakOffVehicleWheel? fun(pVehicleDamage: pointer<CVehicleDamage>, wheelIdx: integer, ptfxChance: float, deleteChance: float, burstChance: float, setOnFire: bool, isNetwork: bool)
+---@field BasketAddItem? fun(itemAddress: uint64_t, quantity: integer): boolean
 
 -- ### A place to store pointers globally.
 --
@@ -44,15 +45,19 @@ end
 ---@field GameVersion VersionInfo
 ---@field ScreenResolution vec2
 ---@field DynamicFuncs DynamicFuncs
+---@field NativeRegistrationTable pointer<ScrNativeRegistrationTable>
+---@field NetCatalog pointer<NetCatalog>
 local GPointers = {
-	Init             = function() PatternScanner:Scan() end,
-	Retry            = function() PatternScanner:RetryScan() end,
-	ScriptGlobals    = zero_ptr(),
-	GameState        = zero_ptr(),
-	GameTime         = zero_ptr(),
-	ScreenResolution = vec2:zero(),
-	GameVersion      = { build = "", online = "" },
-	DynamicFuncs     = {}
+	Init             		= function() PatternScanner:Scan() end,
+	Retry            		= function() PatternScanner:RetryScan() end,
+	ScriptGlobals    		= zero_ptr(),
+	GameState        		= zero_ptr(),
+	GameTime         		= zero_ptr(),
+	NativeRegistrationTable = zero_ptr(),
+	NetCatalog              = zero_ptr(),
+	ScreenResolution 		= vec2:zero(),
+	GameVersion      		= { build = "", online = "" },
+	DynamicFuncs     		= {}
 }
 
 ---@generic P0: string, P1: string
@@ -84,6 +89,19 @@ local mem_batches <const> = {
 		end),
 		make_batch("GameTime", "8B 05 ? ? ? ? 89 ? 48 8D 4D C8", function(ptr)
 			assign(GPointers.GameTime, ptr:add(0x2):rip())
+		end),
+		make_batch("NativeRegistrationTable", "48 8D 0D ? ? ? ? 48 8B 14 FA E8 ? ? ? ? 48 85 C0 75 0A", function(ptr)
+			assign(GPointers.NativeRegistrationTable, ptr:add(0x3):rip())
+		end),
+		make_batch("NetCatalog", "48 8D 0D ? ? ? ? 33 FF E8 ? ? ? ? 84 C0 74 26 48 8D 54 24 38 48 8D 0D", function(ptr)
+			assign(GPointers.NetCatalog, ptr:add(0x3):rip())
+		end),
+		make_batch("BasketAddItem", "48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 40 8B F2 48 8B F9 E9", function(ptr)
+			GPointers.DynamicFuncs.BasketAddItem = nil
+			local name = memory.dynamic_call("bool", { "void*", "int" }, ptr)
+			local func = _G[name]
+			assert(type(func) == "function", "Could not bind basket add function")
+			GPointers.DynamicFuncs.BasketAddItem = func
 		end),
 
 		-- TODO: enable once dynamic calls become stable. For now either the JIT compiler is broken or I'm just outright stupid.
