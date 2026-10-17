@@ -7,10 +7,9 @@
 --	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
 
 
--- Behaviour reference:
--- https://github.com/YimMenu/YimMenuV2/blob/4dae1c6ba6aade8b5f05ac1534dcff09cb394ee3/src/game/features/recovery/FreeShopping.cpp
 return {
 	NativeHashes = {
+		GetPrice    = 0xD2ACF01ED6E6D7C6,
 		BasketStart = 0x5156B6B1D1CD58FE,
 		BasketAdd   = 0x5E8BF7E974BEA7D7,
 		FakeCash    = 0x97F5AFA09D818568,
