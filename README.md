@@ -68,6 +68,10 @@ A modular GTA V Lua framework focused on enhancing the player's experience throu
 
 - Once in-game, press **[F5]** to toggle the script's UI.
 
+For the native YimMenuV2 Lua API, use **`SSV2-enhanced`** from the same release ZIP.
+Copy its `samurais_v2.lua` and `includes/ssv2` directory into
+`%AppData%\YimMenuV2\scripts`, then load `samurais_v2.lua`.
+
 >[!Note]
 > Releases are scheduled for Sundays at 8AM.
 
@@ -109,21 +113,15 @@ A full list of available features and their usage [can be found here](docs/Featu
 ## FAQ
 
 - **Q:** Does this support Enhanced?
-- **A:** Partially. You can use [YimLuaAPI](https://github.com/TupoyeMenu/YimLuaAPI) to test it but stability is not guaranteed as of now.
+- **A:** The `SSV2-enhanced` edition targets GTA V Enhanced and the native YimMenuV2 Lua API.
 
 - **Q:** What is YimLuaAPI and how do I use it?
 - **A:**
   - **What is it:** [YimLuaAPI](https://github.com/TupoyeMenu/YimLuaAPI) is a universal Lua API that works for both Legacy and Enhanced.
   - **How to use it:** Right now there is no release because it's still in development. If you want to try it, you have to compile it yourself. Once you have `YimLuaAPI.dll`, inject it into any GTA branch (Legacy/Enhanced), it will create a folder on first injection: `%AppData%\YimLuaAPI`. Simply place the script there and you're done. You can still use YimMenu/YimMenuV2 but the script has to only exist in YimLuaAPI.
 
-- **Q:** Why can't-I run this in YimMenuV2?
-- **A:** There are several reasons why:
-  - YimMenuV2 doesn't have a finished Lua API. `require` isn't even present, let alone custom bindings.
-  - There are several versions and flavors of the Lua programming language. This project is written in [Lua 5.4](https://www.lua.org/manual/5.4/) and YimMenuV2's API uses [LuaJIT](https://luajit.org/). Explaining the difference here is not ideal but it's not only the language difference, it's also how they are embedded in each menu.
-
-- **Q:** Can this be made compatible with YimMenuV2 once its API is finished?
-- **Short Answer:** No.
-- **Long Answer:** Yes, a compatibility layer can be added to handle all language and API differences but is it worth the trouble and code bloat? Absolutely not. We would be better off rewriting this for V2's API.
+- **Q:** Which edition runs in YimMenuV2?
+- **A:** Use `SSV2-enhanced`. The original `SSV2` runtime uses Lua 5.4 and the V1/YimLuaAPI environment; the Enhanced edition uses LuaJIT and native V2 APIs. The release contains both editions so you can select the correct one.
 
 ## Contact
 

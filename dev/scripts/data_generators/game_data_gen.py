@@ -29,6 +29,8 @@ from pathlib import Path
 
 PARENT_PATH = Path(__file__).resolve().parent.parent
 SCRIPT_ROOT = PARENT_PATH.parent.parent
+sys.path.insert(0, str(SCRIPT_ROOT / "dev/scripts/enhanced"))
+from sync_enhanced import sync_shared_data
 LUA_DATA_PATH = SCRIPT_ROOT / "SSV2/includes/data"
 SS_NOTICE = """-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
 -- This file is part of Samurai's Scripts.
@@ -261,6 +263,7 @@ def generate_lists(vehicles: bool, peds: bool, objects: bool, weapons: bool):
         gen_weapons(class_name="WeaponDictionary")
     if objects:
         gen_objects()
+    sync_shared_data(SCRIPT_ROOT, groups={"game-data"})
 
 
 if __name__ == "__main__":
