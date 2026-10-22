@@ -10,9 +10,13 @@ on:
       - "SSV2/includes/lib/translations/__locales.lua"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
-  group: ss_translations-${{ github.ref }}
-  cancel-in-progress: true
+  group: ss_generated-${{ github.ref }}
+  queue: max
+  cancel-in-progress: false
 
 jobs:
   generate:
@@ -23,6 +27,8 @@ jobs:
 
     - name: Checkout Repo
       uses: actions/checkout@v7
+      with:
+        ref: ${{ github.ref_name }}
 
     - name: Setup Python
       uses: actions/setup-python@v6
@@ -39,5 +45,6 @@ jobs:
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add SSV2/includes/lib/translations/
+        git add SSV2-enhanced/includes/ssv2/data/locales/ SSV2-enhanced/includes/ssv2/data/locale_codes.lua SSV2-enhanced/includes/ssv2/data/gxt_labels.lua
         git diff --cached --quiet || git commit -m "chore(Translations): update translations"
         git push
