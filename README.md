@@ -146,7 +146,7 @@ A full list of available features and their usage [can be found here](docs/Featu
 | <a href="https://github.com/yimura"><img height="40" width="40" alt="Yimura" src="https://avatars.githubusercontent.com/yimura"><br/>Andreas Maerten</a> | GTA V classes (archived/removed) |
 | <a href="https://github.com/sch-lda"><img height="40" width="40" alt="SCH" src="https://avatars.githubusercontent.com/sch-lda"><br/>sch-lda (SCH)</a> | [MiniGameHack](https://github.com/YimMenu-Lua/MiniGameHack) |
 | <a href="https://github.com/TCRoid"><img height="40" width="40" alt="TCRoid" src="https://avatars.githubusercontent.com/TCRoid"><br/>TCRoid (Rostal)</a> | [SoloMissions](https://github.com/YimMenu-Lua/SoloMissions) |
-| <a href="https://github.com/tuyilmaz"><img height="40" width="40" alt="tuyilmaz" src="https://avatars.githubusercontent.com/tuyilmaz"><br/>tuyilmaz</a> | Free Shopping |
+| <a href="https://github.com/tuyilmaz"><img height="40" width="40" alt="tuyilmaz" src="https://avatars.githubusercontent.com/tuyilmaz"><br/>tuyilmaz</a> | Free Shopping and Enhanced port. |
 | <a href="https://unknowncheats.me"><img height="40" width="40" alt="UC" src="https://avatars.githubusercontent.com/u/29552835"><br/>UnknownCheats</a> | A treasure trove of information |
 
 ## TODO
