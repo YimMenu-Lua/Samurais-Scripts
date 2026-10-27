@@ -14,6 +14,7 @@ return {
 	["SUBTAB_STANCER"]                     = "Stancer",
 	["SUBTAB_GUI"]                         = "User Interface",
 	["SUBTAB_MPSTAT_CONTROLLER"]           = "Stat Controller",
+	["SUBTAB_FREE_SHOPPING"]               = "Free Shopping",
 	--#endregion
 
 	--#region language names
@@ -1069,6 +1070,17 @@ return {
 
 	["MPSTAT_CONTROLLDER_DESC"]            = "Manage, edit, and lock multiplayer stats with persistence.",
 	["MPSTAT_LOCK_VAL_TT"]                 = "Locks the stat to the current value.\n\nNote: You must set your desired value before toggling this on, because activating the toggle captures and saves the current stat value to be written in the background.",
+
+	--#region Free Shopping
+	["FS_ENHANCED_BUILTIN"]               = "Enhanced already has Free Shopping built into YimMenuV2. Use Recovery > Main > Free Shopping.",
+	["FS_DESCRIPTION"]                    = "Makes every purchase you make (almost) free.",
+	["FS_ENABLE"]                         = "Enable Free Shopping",
+	["FS_ENABLE_TT"]                      = "Applies to new purchases while enabled.",
+	["FS_ACTIVE"]                         = "Free Shopping is active.",
+	["FS_DISABLED"]                       = "Free Shopping is disabled.",
+	["FS_LEGACY_ONLY"]                    = "Free Shopping currently supports the Legacy Lua API only.",
+	["FS_UNAVAILABLE"]                    = "Free Shopping unavailable",
+	--#endregion
 
 	--#region Miscellaneous
 	["ASSET_BROWSER_TRUNC_TT"]             = "The list is truncated to show only %d entries. Use the search bar to find what you're looking for.",
