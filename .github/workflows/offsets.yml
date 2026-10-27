@@ -5,10 +5,14 @@ on:
   schedule:
     - cron: '0 2 * * 6'
 
+permissions:
+  contents: write
+
 
 concurrency:
-  group: ss_offsets-${{ github.ref }}
-  cancel-in-progress: true
+  group: ss_generated-${{ github.ref }}
+  queue: max
+  cancel-in-progress: false
 
 
 jobs:
@@ -18,6 +22,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
 
       - name: Fetch Upstream
         run: |
@@ -83,5 +89,6 @@ jobs:
           git add dev/scripts/offsets/legacy.last_commit_hash
           git add dev/scripts/offsets/enhanced.last_commit_hash
           git add SSV2/includes/data/globals_locals.lua
+          git add SSV2-enhanced/includes/ssv2/data/globals_locals.lua
           git diff --cached --quiet || git commit -m "chore(offsets): update script globals & locals"
           git push

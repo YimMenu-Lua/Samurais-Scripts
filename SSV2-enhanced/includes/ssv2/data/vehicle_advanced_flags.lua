@@ -1,0 +1,44 @@
+-- Copyright (C) 2026 SAMURAI (xesdoog) & Contributors.
+-- This file is part of Samurai's Scripts.
+--
+-- Permission is hereby granted to copy, modify, and redistribute
+-- this code as long as you respect these conditions:
+--	* Credit the owner and contributors.
+--	* Provide a copy of or a link to the original license (GPL-3.0 or later); see LICENSE.md or <https://www.gnu.org/licenses/>.
+
+
+---@enum eVehicleAdvancedFlags
+local eVehicleAdvancedFlags = {
+	DIFF_FRONT                                    = 0,
+	DIFF_REAR                                     = 1,
+	DIFF_CENTRE                                   = 2,
+	DIFF_LIMITED_FRONT                            = 3,
+	DIFF_LIMITED_REAR                             = 4,
+	DIFF_LIMITED_CENTRE                           = 5,
+	DIFF_LOCKING_FRONT                            = 6,
+	DIFF_LOCKING_REAR                             = 7,
+	DIFF_LOCKING_CENTRE                           = 8,
+	GEARBOX_FULL_AUTO                             = 9,
+	GEARBOX_MANUAL                                = 10,
+	GEARBOX_DIRECT_SHIFT                          = 11,
+	GEARBOX_ELECTRIC                              = 12,
+	DISABLE_TRACTION_CONTROL                      = 13,
+	DISABLE_STABILITY_CONTROL                     = 14,
+	ALLOW_REDUCED_SUSPENSION_FORCE                = 15,
+	HARD_REV_LIMIT                                = 16,
+	HOLD_GEAR_WITH_WHEELSPIN                      = 17,
+	INCREASE_SUSPENSION_FORCE_WITH_SPEED          = 18,
+	BLOCK_INCREASED_ROT_VELOCITY_WITH_DRIVE_FORCE = 19,
+	REDUCED_SELF_RIGHTING_SPEED                   = 20,
+	CLOSE_RATIO_GEARBOX                           = 21,
+	FORCE_SMOOTH_RPM                              = 22,
+	ALLOW_TURN_ON_SPOT                            = 23,
+	CAN_WHEELIE                                   = 24,
+	ENABLE_WHEEL_BLOCKER_SIDE_IMPACTS             = 25,
+	FIX_OLD_BUGS                                  = 26,
+	USE_DOWNFORCE_BIAS                            = 27,
+	REDUCE_BODY_ROLL_WITH_SUSPENSION_MODS         = 28,
+	ALLOWS_EXTENDED_MODS                          = 29
+}
+
+return eVehicleAdvancedFlags

@@ -38,6 +38,9 @@ import threading
 
 PARENT_PATH = Path(__file__).resolve().parent.parent
 LUA_PATH = PARENT_PATH.parent.parent / "SSV2/includes/lib/translations"
+SCRIPT_ROOT = PARENT_PATH.parent.parent
+sys.path.insert(0, str(SCRIPT_ROOT / "dev/scripts/enhanced"))
+from sync_enhanced import sync_shared_data
 HASHMAP_PATH = LUA_PATH / "__hashmap.json"
 MAX_WORKERS = min(16, (os.cpu_count() or 2) * 4)
 TRANSLATOR_LOCK = threading.Lock()
@@ -242,6 +245,8 @@ def main():
 
     try:
         generate_translations(dry_run=args.dry_run, diff_only=args.diff)
+        if not args.dry_run and not args.diff:
+            sync_shared_data(SCRIPT_ROOT, groups={"translations"})
     except Exception as e:
         print("ERROR:", e)
         sys.exit(1)

@@ -1,0 +1,21 @@
+-- Input constants from Samurai's Scripts; GPL-3.0-or-later.
+return {
+    ["R3"] = 79,
+    ["LT"] = 72,
+    ["RT"] = 71,
+    ["DPAD RIGHT"] = 344,
+    ["DPAD LEFT"] = 308,
+    ["DPAD DOWN"] = 311,
+    ["A"] = 288,
+    ["X"] = 289,
+    ["Y"] = 178,
+    ["DPAD UP"] = 303,
+    ["LEFT STICK"] = 127,
+    ["L3"] = 36,
+    ["LB"] = 117,
+    ["RB"] = 118,
+    ["B"] = 194,
+    ["(NONE)"] = 322,
+    ["BACK"] = 244,
+    ["START"] = 318,
+}

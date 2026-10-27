@@ -31,6 +31,8 @@ from slpp import slpp as Lua
 
 PARENT_PATH = Path(__file__).resolve().parent.parent
 SCRIPT_ROOT = PARENT_PATH.parent.parent
+sys.path.insert(0, str(SCRIPT_ROOT / "dev/scripts/enhanced"))
+from sync_enhanced import sync_shared_data
 REPO_URLS = [
     "https://raw.githubusercontent.com/acidlabsgg/gtav-legacy-scripts/refs/heads/main/scripts",
     "https://raw.githubusercontent.com/acidlabsgg/gtav-enhanced-scripts/refs/heads/main/scripts",
@@ -262,10 +264,12 @@ def main():
 
     if original_content == new_content:
         print("No changes detected.")
+        sync_shared_data(SCRIPT_ROOT, groups={"offsets"})
         return
 
     with open(table_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(new_content)
+    sync_shared_data(SCRIPT_ROOT, groups={"offsets"})
 
 
 if __name__ == "__main__":
